@@ -1,7 +1,7 @@
 ---
 phase: 08
 title: "Domain build: one function decides whether a compiled domain matches its YAML (also orphans), used by build-domain-registry --check, the doctor row and the test; a duplicate workflow key is refused"
-status: pending
+status: completed
 depends_on: ["06 landed for the registrations.mjs line only"]
 parallel: "group B; script and test work may start at once, the one import in registrations.mjs waits for 06"
 effort: ~0.5d

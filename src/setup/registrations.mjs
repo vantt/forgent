@@ -26,13 +26,12 @@ import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { isDeepStrictEqual } from 'node:util';
 
 import { detectRcFiles, hasSourceLine, deadSourceLines, probeShellIntegrationInvocation } from './shell-rc.mjs';
 import { releaseBinaryPath } from '../util/release-binary-path.mjs';
 import { RELEASE_TARGETS, releaseTargetForHost } from '../util/release-targets.mjs';
 import { hashFile, listLegacyNodeSourceFiles } from '../../scripts/build-rust-distribution.mjs';
-import { compileDomain } from '../../scripts/build-domain-registry.mjs';
+import { checkCompiledDomains } from '../../scripts/build-domain-registry.mjs';
 import { mainCheckoutHookWired } from './git-hooks.mjs';
 import { loadRunnerConfigForDir } from '../runner/dispatch/config.mjs';
 import { INSTALL_ROOT, agentShapeProblem, findAgentDuplicates, readAgentDefinition, scanAgentTiers } from '../runner/agent-definitions.mjs';
@@ -1129,35 +1128,8 @@ registerCheck({
 export function checkDomainRegistryCompiled(cwd) {
   const domainsDir = path.join(cwd, 'domains');
   if (!fs.existsSync(domainsDir)) return { passed: true, message: 'no domains/ directory here — nothing to check' };
-  const problems = [];
-  let checked = 0;
-  for (const entry of fs.readdirSync(domainsDir, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name))) {
-    if (!entry.isDirectory() || !fs.existsSync(path.join(domainsDir, entry.name, 'registry.yaml'))) continue;
-    checked += 1;
-    const compiled = path.join(domainsDir, entry.name, 'compiled.json');
-    if (!fs.existsSync(compiled)) {
-      problems.push(`domains/${entry.name}/compiled.json is missing`);
-      continue;
-    }
-    let onDisk;
-    try {
-      onDisk = JSON.parse(fs.readFileSync(compiled, 'utf8'));
-    } catch (err) {
-      problems.push(`domains/${entry.name}/compiled.json is unreadable (${err.message})`);
-      continue;
-    }
-    let fromYaml;
-    try {
-      fromYaml = JSON.parse(JSON.stringify(compileDomain(path.join(domainsDir, entry.name))));
-    } catch (err) {
-      problems.push(err.message);
-      continue;
-    }
-    if (!isDeepStrictEqual(onDisk, fromYaml)) problems.push(`domains/${entry.name}/compiled.json is stale — run npm run build:domains`);
-  }
-  if (problems.length > 0) {
-    return { passed: false, message: problems.join('; ') };
-  }
+  const { checked, problems } = checkCompiledDomains(domainsDir);
+  if (problems.length > 0) return { passed: false, message: problems.join('; ') };
   return { passed: true, message: `${checked} domain registr${checked === 1 ? 'y' : 'ies'} compiled, readable and in step with their YAML` };
 }
 

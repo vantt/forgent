@@ -38,3 +38,16 @@ Hướng dẫn này cho máy owner và máy thứ ba (forgentX, fg-server). fg-s
 - Lệnh: chỉ các lệnh chung ở trên. Không có cấu hình mới, không đổi `~/.fgos/config.json`.
 - Dòng doctor mong đợi: `decision-citation-drift` vẫn đạt (`no new findings`). Không có dòng doctor mới.
 - Quay lại: revert merge commit trên `main`, kích hoạt lại release trước đó ở trên, ghi SHA revert lên bảng.
+
+## P08: một phép kiểm cho domain đã biên dịch
+
+- **Commit trên main:** ghi sau khi land (nhánh `harden/t8-p08-domain-build`).
+- **Người dùng thấy gì:**
+  - `fgos doctor` dòng `domain-registry-compiled` và `npm run build:domains -- --check` dùng chung một hàm `checkCompiledDomains`, nên hai nơi luôn báo cùng một tập lỗi.
+  - Một `domains/<tên>/compiled.json` mà thư mục không còn `registry.yaml` (domain mồ côi) giờ bị báo đỏ, nêu tên domain. Trước đây không ai xét.
+  - Hai file workflow cùng khoá (`x.yaml` và `x.yml`) làm bước build lỗi, nêu cả hai file, thay vì âm thầm lấy file sau.
+  - `compiled.json` phải khớp từng byte với bản biên dịch từ YAML (trước đây dòng doctor chỉ so nội dung JSON); build luôn ghi đúng định dạng nên không ảnh hưởng ai dùng `npm run build:domains`.
+  - Số dòng doctor và id dòng không đổi.
+- **Lệnh trên từng workspace:** `git pull --rebase`; build, stage, kích hoạt release như thường lệ; `fgos doctor </dev/null`; `node scripts/build-domain-registry.mjs --check`.
+- **Doctor mong đợi:** `domain-registry-compiled` xanh. Dự án nào có `compiled.json` mồ côi hoặc sửa tay thì thấy đỏ: xoá file mồ côi hoặc chạy `npm run build:domains`.
+- **Quay lại:** revert commit merge của phase; dòng doctor và `--check` trở lại phán như cũ. Không có dữ liệu trên đĩa bị đổi.

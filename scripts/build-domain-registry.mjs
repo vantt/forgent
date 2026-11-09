@@ -1,12 +1,9 @@
 #!/usr/bin/env node
-// build-domain-registry.mjs — compile each domain's YAML (registry.yaml + workflows/*.yaml)
-// into domains/<domain>/compiled.json.
+// build-domain-registry.mjs — compile each domain's YAML into domains/<domain>/compiled.json.
 //
 // src/state/domain-registry.mjs loads the compiled file at import time, so one YAML typo cannot
-// take down every verb (hooks included) and `fgos doctor` is still there to report it. The YAML
-// stays the source of truth: test/state/domain-registry-compiled.test.mjs fails when the two
-// drift, `--check` does the same from the command line, and the doctor check
-// `domain-registry-compiled` reports a stale or unparsable one using compileDomain below.
+// take down every verb. The YAML stays the source of truth: `--check`, the doctor check
+// `domain-registry-compiled` and the test all judge drift with checkCompiledDomains below.
 
 import fs from 'node:fs';
 import path from 'node:path';
@@ -34,11 +31,15 @@ export function compileDomain(domainDir) {
   const domain = path.basename(domainDir);
   const registry = parseDomainFile(registryPath, domain, 'registry.yaml') ?? {};
   const workflows = {};
+  const sources = {};
   const workflowsDir = path.join(domainDir, 'workflows');
   if (fs.existsSync(workflowsDir)) {
     for (const file of fs.readdirSync(workflowsDir).sort()) {
       if (!/\.ya?ml$/.test(file)) continue;
-      workflows[path.basename(file, path.extname(file))] = parseDomainFile(path.join(workflowsDir, file), domain, `workflows/${file}`);
+      const key = path.basename(file, path.extname(file));
+      if (key in sources) throw new Error(`domains/${domain}/workflows: ${sources[key]} and ${file} both define workflow "${key}"`);
+      sources[key] = file;
+      workflows[key] = parseDomainFile(path.join(workflowsDir, file), domain, `workflows/${file}`);
     }
   }
   return { registry, workflows };
@@ -58,22 +59,37 @@ function render(compiled) {
   return `${JSON.stringify(compiled, null, 2)}\n`;
 }
 
+/** Judges each domain directory with a compiled.json or registry.yaml; the build's --check and the doctor row share it. */
+export function checkCompiledDomains(domainsDir = path.join(root, 'domains')) {
+  const problems = [];
+  let checked = 0;
+  for (const entry of fs.readdirSync(domainsDir, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name))) {
+    const dir = path.join(domainsDir, entry.name);
+    const [yaml, json] = ['registry.yaml', 'compiled.json'].map((name) => fs.existsSync(path.join(dir, name)));
+    if (!entry.isDirectory() || !(yaml || json)) continue;
+    checked += 1;
+    const rel = `domains/${entry.name}/compiled.json`;
+    if (!yaml) { problems.push(`${rel} has no registry.yaml — delete it or restore the YAML`); continue; }
+    if (!json) { problems.push(`${rel} is missing`); continue; }
+    const text = fs.readFileSync(path.join(dir, 'compiled.json'), 'utf8');
+    try { JSON.parse(text); } catch (err) { problems.push(`${rel} is unreadable (${err.message})`); continue; }
+    try { if (text !== render(compileDomain(dir))) problems.push(`${rel} is stale — run npm run build:domains`); } catch (err) { problems.push(err.message); }
+  }
+  return { checked, problems };
+}
+
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   ensureAddonForScript();
-  const check = process.argv.includes('--check');
-  let stale = 0;
+  if (process.argv.includes('--check')) {
+    const { problems } = checkCompiledDomains();
+    for (const problem of problems) console.error(problem);
+    process.exit(problems.length > 0 ? 1 : 0);
+  }
   for (const [name, compiled] of Object.entries(compileAllDomains())) {
     const target = path.join(root, 'domains', name, 'compiled.json');
     const next = render(compiled);
-    const current = fs.existsSync(target) ? fs.readFileSync(target, 'utf8') : null;
-    if (current === next) continue;
-    if (check) {
-      console.error(`stale: domains/${name}/compiled.json (run: npm run build:domains)`);
-      stale += 1;
-    } else {
-      fs.writeFileSync(target, next);
-      console.log(`wrote domains/${name}/compiled.json`);
-    }
+    if (fs.existsSync(target) && fs.readFileSync(target, 'utf8') === next) continue;
+    fs.writeFileSync(target, next);
+    console.log(`wrote domains/${name}/compiled.json`);
   }
-  if (stale > 0) process.exit(1);
 }
