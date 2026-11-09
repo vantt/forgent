@@ -76,3 +76,12 @@ Hướng dẫn này cho máy owner và máy thứ ba (forgentX, fg-server). fg-s
 - Dòng doctor mong đợi: không đổi.
 - Quay lại: revert merge commit; không có file nào trên đĩa đổi định dạng.
 
+## P03: thư mục wrapper `.claude/skills/<tên>` chỉ còn `SKILL.md`
+
+- Commit trên `main`: `593be681c` (xem dòng bảng HARDEN "T8 P03 lands").
+- Phép thử trước khi làm (`plans/reports/research-261109-1317-harden-t8-reference-copy-probe.md`): một seat Claude đi theo wrapper và đọc `references/` qua đường `.agents/skills/...`, không cần bản sao trong `.claude`; kết quả đạt.
+- Người dùng thấy gì: render không còn chép `references/`, `scripts/` và file anh em khác của skill vào `.claude/skills/<tên>/`; 29 file bản sao (3 393 dòng, gồm cả bản sao `scripts/` và `CREATION-LOG.md` của `distill`) bị xoá khỏi git. Lệnh `distill` chạy từ `.agents/skills/distill/scripts/distill.mjs` (đã kiểm). Lần render hoặc `fgos setup` kế tiếp xoá bản sao cũ còn sót trên máy.
+- Lệnh trên từng workspace: `git pull --rebase`; build, stage, kích hoạt release như thường lệ.
+- Dòng doctor mong đợi: không đổi.
+- Quay lại: revert commit; một lần render sinh lại các bản sao.
+
