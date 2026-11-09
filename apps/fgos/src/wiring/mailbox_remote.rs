@@ -23,9 +23,12 @@ use fgos_identity::pins::{self, PinState};
 use fgos_identity::shared::{self, MachineRef};
 use fgos_identity::text::{iso_utc_now, iso_utc_secs};
 use fgos_identity::{project, signing, Refusal, Signature};
-use fgos_mailbox::record::{Paths, Record, Wait};
+use fgos_mailbox::record::{Paths, Record, Reported, Wait};
 use fgos_mailbox::verbs;
-use fgos_mailbox_core::{Limits, RemoteSend, Timestamp, WriterKey};
+use fgos_mailbox_core::{
+    record_error_text, refusal_text, Limits, MessageId, Refusal as MailRefusal, RemoteSend,
+    Timestamp, WriterKey,
+};
 use serde_json::{json, Value};
 use std::path::Path;
 
@@ -537,6 +540,32 @@ pub fn names_remote_head(ctx: &Context<'_>, from: &WriterKey, to: &str) -> Resul
     }
 }
 
+/// The id `machine` gave the message that `hint` names in this record, when `from` was offered it
+/// from that machine; the message is marked answered. A hint that names nothing of the kind is
+/// refused like a same-machine hint is.
+fn reply_parent(
+    ctx: &Context<'_>,
+    from: &WriterKey,
+    hint: &str,
+    machine: &str,
+) -> Result<String, String> {
+    let held = ctx
+        .record
+        .hold(ctx.wait, ctx.now, ctx.limits, |state, _| {
+            let generation = state.binding(from).map(|binding| binding.generation);
+            let found =
+                state.remote_reply_parent(from, generation, &MessageId::from_text(hint), machine);
+            Reported {
+                changed: found.is_some(),
+                value: found,
+            }
+        })
+        .map_err(|error| record_error_text(error.code()))?;
+    held.value
+        .value
+        .ok_or_else(|| refusal_text(&MailRefusal::ReplyToNotOffered, ctx.limits))
+}
+
 /// Sends `body` to the session `to` names on another machine, when one
 /// does; see the module's comment. `from` is the caller's full session id.
 pub fn send(
@@ -572,6 +601,15 @@ pub fn send(
             return Outcome::Refused(format!("not recorded: {}", refusal_line(&refusal)))
         }
     };
+    // A reply names the message it answers by this record's id; the recipient's machine knows it by
+    // the id that machine gave it, which is what goes on the wire.
+    let reply_to = match reply_to {
+        None => None,
+        Some(hint) => match reply_parent(ctx, from, hint, &target.machine.id) {
+            Ok(origin_id) => Some(origin_id),
+            Err(text) => return Outcome::Refused(text),
+        },
+    };
     let label = format!("{}@{}", target.handle, target.machine.id);
     let req = RemoteSend {
         from,
@@ -592,7 +630,7 @@ pub fn send(
             id: id.as_str(),
             from: &session.info.id,
             body,
-            reply_to,
+            reply_to: reply_to.as_deref(),
             wake,
             body_ref: cross.body_ref,
         };
@@ -633,8 +671,8 @@ pub fn send(
 #[cfg(test)]
 mod tests {
     use super::{
-        printable, SENT_DOMAIN, SENT_DOMAIN_BODY_REF, SENT_DOMAIN_WAKE, SETTLED_DOMAIN,
-        WIRE_MAX_BODY_BYTES,
+        printable, ACCEPTED_PAYLOAD_VERSIONS, SENT_DOMAIN, SENT_DOMAIN_BODY_REF, SENT_DOMAIN_WAKE,
+        SETTLED_DOMAIN, WIRE_MAX_BODY_BYTES,
     };
 
     #[test]
@@ -669,6 +707,25 @@ mod tests {
             SENT_DOMAIN_BODY_REF
         );
         assert_eq!(domain["bodyRefVersion"]["v"], 3);
+        // The acknowledgement request rides every version already accepted, adds no domain, and
+        // is bounded by the age the receiver accepts.
+        let request = &domain["ackRequest"];
+        assert_eq!(request["field"], "ackWithinSec");
+        assert_eq!(
+            request["versions"],
+            serde_json::json!(ACCEPTED_PAYLOAD_VERSIONS)
+        );
+        assert_eq!(request["minimum"], 1);
+        assert_eq!(
+            request["maximum"],
+            crate::wiring::mailbox_ingest::MAX_AGE_SEC
+        );
+        assert!(request.get("signingDomain").is_none());
+        assert!(domain["payload"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|field| field["field"] == "ackWithinSec"));
         let settled = contract["types"]
             .as_array()
             .unwrap()

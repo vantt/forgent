@@ -1,8 +1,9 @@
 mod common;
 
-use common::{key, t, Pair, B_NAME};
+use common::{key, plain, t, Pair, B_NAME};
 use fgos_mailbox_core::{
-    CounterReason, Ingested, MessageState, Refusal, RemoteMail, Settlement, WakeDrop,
+    CounterReason, Ingested, MailboxState, MessageId, MessageState, Refusal, RemoteMail,
+    Settlement, WakeDrop,
 };
 use std::collections::BTreeSet;
 
@@ -24,6 +25,8 @@ fn mail<'a>(
         body,
         max_body_bytes: WIRE_CAP,
         wake: false,
+        ack_within_sec: None,
+        reply_to: None,
         stop_drains: &NO_CLIS,
         nudge_clis: &NO_CLIS,
     }
@@ -298,5 +301,99 @@ fn each_remote_sender_session_stops_waking_at_its_own_cap_while_its_mail_still_l
     assert!(
         other.effective,
         "another remote sender has its own wake budget"
+    );
+}
+
+#[test]
+fn a_verified_cross_machine_reply_naming_a_watched_id_marks_it_acknowledged_once_only_from_the_machine_it_went_to(
+) {
+    let mut pair = Pair::new(t(0));
+    let from = key("session-1");
+    let b = key("b");
+
+    // The flag a remote sender signed is carried onto the header it becomes.
+    let flagged = RemoteMail {
+        ack_within_sec: Some(600),
+        ..mail(&from, "m1", &b, "please read")
+    };
+    let Ingested::Recorded { id, .. } = ingest(&mut pair, &flagged, 1).unwrap() else {
+        panic!("recorded")
+    };
+    assert_eq!(pair.state.message(&id).unwrap().ack_within_sec, Some(600));
+
+    // A reply across machines names the original's id on its own machine, and only a message
+    // the head was offered, from that machine, counts.
+    let generation = pair.state.binding(&b).map(|binding| binding.generation);
+    let reply_parent = |pair: &mut Pair, hint: &MessageId, machine: &str| {
+        pair.state
+            .remote_reply_parent(&b, generation, hint, machine)
+    };
+    assert_eq!(
+        reply_parent(&mut pair, &id, "peer-machine"),
+        None,
+        "not offered yet"
+    );
+    pair.deliver("b", t(2));
+    assert_eq!(reply_parent(&mut pair, &id, "other-machine"), None);
+    assert_eq!(
+        reply_parent(&mut pair, &MessageId::from_text("nope"), "peer-machine"),
+        None
+    );
+    assert!(!pair.state.message(&id).unwrap().answered);
+    assert_eq!(
+        reply_parent(&mut pair, &id, "peer-machine").as_deref(),
+        Some("m1")
+    );
+    assert!(pair.state.message(&id).unwrap().answered);
+
+    // A flagged send of this record's head to a head on `peer-machine` is watched under that machine.
+    let mut req = plain("a", B_NAME, "need an answer");
+    req.need_ack = Some(600);
+    let watched = pair.try_send(req, t(3)).unwrap().id;
+    let mut json = serde_json::to_value(&pair.state).unwrap();
+    json["ack_watch"][0]["to_machine"] = serde_json::json!("peer-machine");
+    pair.state = serde_json::from_value::<MailboxState>(json).unwrap();
+    let acked = |pair: &Pair| {
+        pair.state
+            .ack_watches()
+            .find(|w| w.id == watched)
+            .unwrap()
+            .acked
+    };
+
+    let wrong_machine = RemoteMail {
+        machine: "other-machine",
+        reply_to: Some(watched.as_str()),
+        ..mail(&from, "r0", &b, "read")
+    };
+    assert!(ingest(&mut pair, &wrong_machine, 4).is_ok());
+    assert!(!acked(&pair), "another machine cannot acknowledge it");
+
+    let named = watched.to_string();
+    let reply = |name: &'static str| RemoteMail {
+        reply_to: Some(named.as_str()),
+        ..mail(&from, name, &b, "read, nothing to add")
+    };
+    assert!(ingest(&mut pair, &reply("r1"), 5).is_ok());
+    assert!(acked(&pair));
+    let changed = pair
+        .state
+        .ack_watches()
+        .find(|w| w.id == watched)
+        .unwrap()
+        .changed_at;
+    assert!(ingest(&mut pair, &reply("r2"), 6).is_ok());
+    assert_eq!(
+        pair.state
+            .ack_watches()
+            .find(|w| w.id == watched)
+            .unwrap()
+            .changed_at,
+        changed,
+        "a second reply changes nothing"
+    );
+    assert_eq!(
+        ingest(&mut pair, &reply("r1"), 7).unwrap(),
+        Ingested::Duplicate
     );
 }

@@ -12,10 +12,20 @@
         { "field": "to", "type": "object {id, machine}", "meaning": "recipient's full session id (as published in the shared directory) and machine id" },
         { "field": "kind", "type": "string", "meaning": "message kind as the same-machine mailbox defines it" },
         { "field": "body", "type": "string", "meaning": "UTF-8 text, at most limits.maxBodyBytes bytes" },
-        { "field": "reply_to", "type": "string, optional", "meaning": "full id of the message this one answers" },
+        { "field": "reply_to", "type": "string, optional", "meaning": "the id the receiver's own machine gave the message this one answers, that is, the id the receiver of this event has in its own record; the sender's host translates the id its user typed to it, and a receiver that is waiting for an acknowledgement of that id marks it acknowledged when this event is verified and signed by the machine it sent the message to" },
+        { "field": "ackWithinSec", "type": "integer, optional", "meaning": "the sender needs an acknowledgement of this message within this many seconds; see ackRequest" },
         { "field": "sentAt", "type": "RFC 3339 string", "meaning": "display only; never used to order, age or dedupe a message" },
         { "field": "sig", "type": "string", "meaning": "signature of the canonical payload under the signing domain, by the sender machine's key" }
       ],
+      "ackRequest": {
+        "field": "ackWithinSec",
+        "versions": [1, 2, 3],
+        "minimum": 1,
+        "maximum": 86400,
+        "when": "only a send that asks for an acknowledgement; it is a signed field of the version the message already has, under that version's own signing domain, so no version and no domain is added, and a send without the request is unchanged, byte for byte",
+        "receiver": "a receiver that knows the field reads an integer from minimum to maximum (the same bound as mailbox.remote.maxAgeSec), shows the recipient the line that asks for a one-line reply, and drops an event whose value is of any other type or range with the counted reason remote-malformed; the reply, a message that names the original in reply_to, is the acknowledgement",
+        "olderReaders": "a receiver that does not know the field ignores it: its shape check reads the named fields only, so it takes the message and shows the plain frame, without the line that asks for a reply; the sender then sees the message as unacknowledged at its deadline"
+      },
       "wakeVersion": {
         "v": 2,
         "signingDomain": "fgos-mailbox-message/2\n",

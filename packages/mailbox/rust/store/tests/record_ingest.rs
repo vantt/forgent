@@ -27,6 +27,8 @@ fn mail<'a>(
         body,
         max_body_bytes: 2048,
         wake: false,
+        ack_within_sec: None,
+        reply_to: None,
         stop_drains: &NO_CLIS,
         nudge_clis: &NO_CLIS,
     }

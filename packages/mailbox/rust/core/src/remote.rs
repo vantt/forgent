@@ -13,7 +13,7 @@ use crate::counters::CounterReason;
 use crate::delivery::Refusal;
 use crate::envelope::{Header, MessageState, Origin};
 use crate::frame;
-use crate::ids::{Cli, IdSource, MessageId, WriterKey};
+use crate::ids::{Cli, Generation, IdSource, MessageId, WriterKey};
 use crate::limits::Limits;
 use crate::policy::{check_sender_key, LifetimeKey};
 use crate::state::MailboxState;
@@ -48,6 +48,13 @@ pub struct RemoteMail<'a> {
     /// Whether the signed event asked for a wake. Whether it takes effect is
     /// decided here, never by the sender.
     pub wake: bool,
+    /// The signed acknowledgement request: the sender needs a reply within
+    /// this many seconds. Only shown to the recipient; the sender judges it.
+    pub ack_within_sec: Option<u64>,
+    /// The id the signer's own machine gave the message this one answers
+    /// (never an id of this record). A verified reply naming a message the
+    /// signer's machine is watched for marks that watch acknowledged.
+    pub reply_to: Option<&'a str>,
     /// The CLIs whose `Stop` takes mail, and those whose idle head can be
     /// nudged, as for a same-machine send.
     pub stop_drains: &'a BTreeSet<Cli>,
@@ -173,6 +180,11 @@ impl MailboxState {
             return Ok(Ingested::Duplicate);
         }
         self.remote.seen.insert(seen, now);
+        // A verified reply is the acknowledgement, whether or not this record
+        // goes on to take it; the seen mark above makes it count once.
+        if let Some(watched) = mail.reply_to {
+            self.mark_acked(&MessageId::from_text(watched), Some(mail.machine));
+        }
         let account = remote_account(mail.machine, mail.from);
         self.count_attempt_for(
             &account,
@@ -265,9 +277,32 @@ impl MailboxState {
                     .map(str::to_string),
                 settled: false,
             }),
-            ack_within_sec: None,
+            ack_within_sec: mail.ack_within_sec,
         });
         Ok(Ingested::Recorded { id, wake })
+    }
+
+    /// Check 4 for a reply to a message from another machine: `hint` must
+    /// name a message from `to_machine` that was offered to `from`'s current
+    /// generation (`from_generation`). Marks it answered and returns the id
+    /// its machine gave it, which is what the reply names on the wire.
+    /// `None` when no such message exists.
+    pub fn remote_reply_parent(
+        &mut self,
+        from: &WriterKey,
+        from_generation: Option<Generation>,
+        hint: &MessageId,
+        to_machine: &str,
+    ) -> Option<String> {
+        let header = self.messages.iter_mut().find(|h| {
+            &h.id == hint
+                && &h.to == from
+                && Some(h.to_generation) == from_generation
+                && matches!(h.state, MessageState::Offered { .. })
+                && h.origin.as_ref().is_some_and(|o| o.machine == to_machine)
+        })?;
+        header.answered = true;
+        header.origin.as_ref().map(|o| o.id.clone())
     }
 
     /// The messages from other machines that were offered or refused since

@@ -45,7 +45,7 @@ use std::collections::BTreeMap;
 use std::path::Path;
 
 /// `mailbox.remote.maxAgeSec` and `mailbox.remote.clockSkewSec` of the wire contract.
-const MAX_AGE_SEC: u64 = 86_400;
+pub(super) const MAX_AGE_SEC: u64 = 86_400;
 const CLOCK_SKEW_SEC: u64 = 300;
 
 /// Whether an event stamped `ts` is young enough for a record with no baseline to read: the same
@@ -92,6 +92,10 @@ struct Verified {
     body: Body,
     /// The signed event asked for a wake and its machine's key is confirmed here.
     wake: bool,
+    /// The signed request for an acknowledgement within this many seconds.
+    ack_within_sec: Option<u64>,
+    /// The id the signer's machine gave the message this one answers.
+    reply_to: Option<String>,
 }
 
 fn text<'a>(object: &'a Value, key: &str) -> Option<&'a str> {
@@ -159,6 +163,21 @@ fn verify(
     let Some((id, from_id, machine, to_id, body)) = shape() else {
         return Err(malformed(&claimed));
     };
+    // Two optional fields every version may carry under its own signature: the acknowledgement
+    // request, an integer of 1 to the maximum age, and the id of the sender machine's message this
+    // one answers. One of the wrong type or range is malformed, never silently ignored.
+    let ack_within_sec = match payload.get("ackWithinSec") {
+        None => None,
+        Some(value) => match value.as_u64().filter(|sec| (1..=MAX_AGE_SEC).contains(sec)) {
+            Some(sec) => Some(sec),
+            None => return Err(malformed(&machine)),
+        },
+    };
+    let reply_to = match payload.get("reply_to") {
+        None => None,
+        Some(Value::String(id)) => Some(id.clone()),
+        Some(_) => return Err(malformed(&machine)),
+    };
     // The sender's session belongs to the machine that signed for it.
     let Some((owner, local)) = from_id.split_once('/') else {
         return Err(malformed(&machine));
@@ -203,6 +222,8 @@ fn verify(
         to_id,
         body,
         wake,
+        ack_within_sec,
+        reply_to,
     })
 }
 
@@ -394,6 +415,8 @@ pub fn ingest(
             body,
             max_body_bytes: WIRE_MAX_BODY_BYTES,
             wake: mail.wake,
+            ack_within_sec: mail.ack_within_sec,
+            reply_to: mail.reply_to.as_deref(),
             stop_drains: &stop_drains,
             nudge_clis: &nudge_clis,
         });
@@ -649,6 +672,74 @@ mod tests {
         assert_eq!(
             reason(verify(&receiver, &claimed, TS, NOW, &cross(true))),
             Some(CounterReason::RemoteSignature)
+        );
+
+        // ackWithinSec is taken in versions 1-3 under that version's own domain, with the reply
+        // target beside it; a value of the wrong type or range is malformed, never ignored.
+        let from_id = format!("{machine}/s1");
+        let flagged = |v: u64, domain: &str, edit: &dyn Fn(&mut Value)| {
+            let mut payload = json!({
+                "v": v, "id": "a1", "from": { "id": from_id, "machine": machine },
+                "to": { "id": "recv/abc", "machine": "recv" }, "kind": "message",
+                "sentAt": "2026-10-29T00:00:00.000Z",
+            });
+            match v {
+                3 => {
+                    payload["bodyHash"] = json!("a".repeat(64));
+                    payload["bodyBytes"] = json!(2);
+                }
+                _ => payload["body"] = json!("hi"),
+            }
+            if v == 2 {
+                payload["wake"] = json!(true);
+            }
+            payload["ackWithinSec"] = json!(600);
+            payload["reply_to"] = json!("origin-id");
+            edit(&mut payload);
+            sign_payload(&sender, domain, payload).unwrap()
+        };
+        for (v, domain) in [
+            (1, SENT_DOMAIN),
+            (2, SENT_DOMAIN_WAKE),
+            (3, SENT_DOMAIN_BODY_REF),
+        ] {
+            let taken = verify(
+                &receiver,
+                &flagged(v, domain, &|_| {}),
+                TS,
+                NOW,
+                &cross(true),
+            )
+            .expect("a flagged message of this version is taken");
+            assert_eq!(taken.ack_within_sec, Some(600), "version {v}");
+            assert_eq!(taken.reply_to.as_deref(), Some("origin-id"), "version {v}");
+            let plain = flagged(v, domain, &|p| {
+                let object = p.as_object_mut().unwrap();
+                object.remove("ackWithinSec");
+                object.remove("reply_to");
+            });
+            let taken = verify(&receiver, &plain, TS, NOW, &cross(true)).unwrap();
+            assert_eq!((taken.ack_within_sec, taken.reply_to), (None, None));
+        }
+        let bad = |value: Value| {
+            reason(verify(
+                &receiver,
+                &flagged(1, SENT_DOMAIN, &|p| p["ackWithinSec"] = value.clone()),
+                TS,
+                NOW,
+                &cross(true),
+            ))
+        };
+        let expect = Some(CounterReason::RemoteMalformed);
+        for value in [json!(0), json!(-5), json!(1.5), json!("600"), json!(null)] {
+            assert_eq!(bad(value.clone()), expect, "{value}");
+        }
+        assert_eq!(bad(json!(MAX_AGE_SEC + 1)), expect);
+        assert!(bad(json!(MAX_AGE_SEC)).is_none());
+        let reply_not_text = flagged(1, SENT_DOMAIN, &|p| p["reply_to"] = json!(7));
+        assert_eq!(
+            reason(verify(&receiver, &reply_not_text, TS, NOW, &cross(true))),
+            expect
         );
     }
 
