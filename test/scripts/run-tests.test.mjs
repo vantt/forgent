@@ -1051,3 +1051,52 @@ test('the suite report module does not import the launcher back, or the launcher
   // The check sees a cycle when there is one: test-select.mjs imports the launcher directly.
   assert.equal(staticImportClosure(path.join(REPO_ROOT, 'scripts', 'test-select.mjs')).has(launcher), true);
 });
+
+for (const signal of ['SIGTERM', 'SIGINT', 'SIGHUP']) {
+  test(`a gate killed by ${signal} still removes its own run dirs and stops the processes running in them, and leaves another live run's dirs alone`, async (t) => {
+    const root = tmpFixtureRoot();
+    const dirsFile = path.join(root, 'dirs.json');
+    const runnerPidFile = path.join(root, 'runner.pid');
+    // A live run's dir that this gate does not own: it must survive.
+    const neighbour = fs.mkdtempSync('/var/tmp/fgos-test-fixtures-');
+    const alive = (pid) => { try { process.kill(pid, 0); return true; } catch { return false; } };
+    let gatePid;
+    t.after(() => {
+      fs.rmSync(neighbour, { recursive: true, force: true });
+      for (const file of [runnerPidFile]) {
+        try { process.kill(Number(fs.readFileSync(file, 'utf8')), 'SIGKILL'); } catch { /* gone */ }
+      }
+      try { if (gatePid) process.kill(gatePid, 'SIGKILL'); } catch { /* gone */ }
+      fs.rmSync(root, { recursive: true, force: true });
+    });
+    write(root, 'wait.test.mjs',
+      "import { test } from 'node:test';\nimport fs from 'node:fs';\n" +
+      `fs.writeFileSync(${JSON.stringify(runnerPidFile)}, String(process.pid));\n` +
+      `fs.writeFileSync(${JSON.stringify(dirsFile)}, JSON.stringify([process.env.TMPDIR, process.env.FGOS_TEST_FIXTURE_ROOT]));\n` +
+      "test('waits to be killed', () => new Promise(() => setInterval(() => {}, 1000)));\n");
+    const scriptUrl = pathToFileURL(path.join(REPO_ROOT, 'scripts', 'run-tests.mjs')).href;
+    const driver = write(root, 'gate.mjs',
+      `import { runChosenTests } from ${JSON.stringify(scriptUrl)};\n` +
+      `const r = runChosenTests([${JSON.stringify(path.join(root, 'wait.test.mjs'))}], { cwd: ${JSON.stringify(root)}, stdio: 'ignore', watchdogPollMs: 200, watchdog: true });\n` +
+      'process.exit(r.status);\n');
+    const gate = spawn(process.execPath, [driver], { stdio: 'ignore' });
+    gatePid = gate.pid;
+    const exited = new Promise((resolve) => gate.on('exit', (code, sig) => resolve({ code, sig })));
+    const deadline = Date.now() + 60_000;
+    while (!fs.existsSync(dirsFile) && Date.now() < deadline) await delay(50);
+    assert.ok(fs.existsSync(dirsFile), 'the fixture test must start');
+    const dirs = JSON.parse(fs.readFileSync(dirsFile, 'utf8'));
+    const runnerPid = Number(fs.readFileSync(runnerPidFile, 'utf8'));
+    for (const dir of dirs) assert.ok(fs.existsSync(dir), `${dir} exists while the gate runs`);
+
+    gate.kill(signal);
+    const { sig } = await exited;
+    assert.equal(sig, signal, 'the gate dies by the signal it was sent, so its exit status stays truthful');
+
+    const cleanupDeadline = Date.now() + 30_000;
+    while ((dirs.some((dir) => fs.existsSync(dir)) || alive(runnerPid)) && Date.now() < cleanupDeadline) await delay(100);
+    for (const dir of dirs) assert.equal(fs.existsSync(dir), false, `${dir} is removed after the gate was killed`);
+    assert.equal(alive(runnerPid), false, 'the test run that was running in those dirs is stopped');
+    assert.ok(fs.existsSync(neighbour), "another run's dir is untouched");
+  });
+}
