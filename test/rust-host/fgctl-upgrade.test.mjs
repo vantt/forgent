@@ -176,12 +176,23 @@ test('R1, R2, R3, R6: A -> B upgrade then repair round-trips reported digest wit
   const hashesBefore = hashDirectory(workHistoryDir);
   assert.ok(Object.keys(hashesBefore).length >= 2, 'Must have at least 2 work-state files');
 
-  // Step 3: fgctl upgrade --from B
-  const upgradeRes = runFgctl(['upgrade', '--from', releaseDirB], { cwd: projDir, stateHome });
+  // Step 3: fgctl upgrade --from B, run by a stale machine fgctl: B's fgctl bytes plus one
+  // trailing byte, which still executes. The upgrade replaces the running binary with B's.
+  const machineBin = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-upgrade-machine-bin-'));
+  const staleFgctl = path.join(machineBin, path.basename(FGCTL_BIN));
+  const releaseFgctl = fs.readFileSync(FGCTL_BIN);
+  const staleBytes = Buffer.concat([releaseFgctl, Buffer.from([0])]);
+  fs.writeFileSync(staleFgctl, staleBytes, { mode: 0o755 });
+  const upgradeRes = spawnSync(staleFgctl, ['upgrade', '--from', releaseDirB], {
+    cwd: projDir,
+    env: { ...withoutActiveRelease(process.env), FGOS_STATE_HOME: stateHome },
+    encoding: 'utf8',
+  });
   assert.equal(upgradeRes.status, 0, `fgctl upgrade must succeed: ${upgradeRes.stderr}`);
-  // B ships the very fgctl this test runs, so the upgrade reports it current and writes nothing.
-  assert.match(upgradeRes.stdout, /^fgctl: up to date with the release \(sha256:[0-9a-f]{64}\)$/m);
-  assert.ok(!fs.existsSync(`${FGCTL_BIN}.prev`), 'an up-to-date fgctl is never moved aside');
+  assert.match(upgradeRes.stdout, /^fgctl: replaced .* with the release's fgctl \(sha256:[0-9a-f]{64}\); previous binary kept at .*\.prev$/m);
+  assert.ok(fs.readFileSync(staleFgctl).equals(releaseFgctl), 'the machine fgctl now holds the release bytes');
+  assert.ok(fs.readFileSync(`${staleFgctl}.prev`).equals(staleBytes), 'the replaced bytes are kept as .prev');
+  fs.rmSync(machineBin, { recursive: true, force: true });
 
   // Step 4: Verify upgraded activation
   const versionResB = runFgos(['version', '--runtime-json'], { cwd: projDir, stateHome });
