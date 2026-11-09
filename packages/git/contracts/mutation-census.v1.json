@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "0969686426c31ebf0fabe3e0bae0e41a548ef47e62faf5eb7c8716d9e3e83b1c",
+  "payloadDigest": "63978bdc7364c2918a4962112b840155ad1286c4bed45a40876a8b0bc157e56f",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "f0cf5643d796b57cb40bb7cfd76d3adee75f8925148f2636595a8d931db02fa4",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -69,8 +69,10 @@
     ".agents/skills/instruction-audit/references/report-template.md": "9d3b7abfd876d88e8a6a7e1820ea6a2aaf02472a75a69603921344fa0db699d6",
     ".agents/skills/instruction-audit/scripts/instruction-audit.mjs": "d634de90f1b9835d00d13c059c2a439c18b4aa6fbd3a97fcc4763435845df490",
     ".githooks/pre-commit": "476f66f95261ff4c18cbd1f797bc492e638f2fafbbfb32286bf8c1ebcd2fe46b",
-    "apps/fgctl/src/main.rs": "c0a5f1114e19af469efbdcabfeb6bb61a0a36c7a7969ef3b3f96764c25f1cdb5",
-    "apps/fgctl/tests/cli_surface.rs": "1bd605a1ded61f6c4a53f935a234fa1cb75030202108a236dc0145d1a48def6c",
+    "apps/fgctl/build.rs": "316b3d73c7472689532b7ffc164b15fe73f097e1c3e5f53545bc6283ac1c8183",
+    "apps/fgctl/src/help.rs": "20f23f61bf1ca032c28295e84fc5f483fbe4797d49789a689b33f10b4ff95062",
+    "apps/fgctl/src/main.rs": "970939598d1b2fbd44cf1000d371ace988b909bd5bc4a8bde38b4ee020a1b6ac",
+    "apps/fgctl/tests/cli_surface.rs": "2c7e314c1c76bad780a24feccc6338ebebd19bd216775863a5d6c62905bacbfb",
     "apps/fgctl/tests/git_wal_activation_gate.rs": "cb4573d686b03639e3e78baca940a2c66cf02c81d645b5d0824ea4a33ece0160",
     "apps/fgctl/tests/windows_holder_lock_gate.rs": "c1bfc1a2b6992cfe70c59acf9350a6da5fcce08033bb76fc1720d2c5df1091fa",
     "apps/fgos-gateway/build.rs": "0109e37c64e9474009c71bb3f3220496fad07dfd77b28c796f1f828c9d2d5671",

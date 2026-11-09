@@ -72,20 +72,6 @@ after(() => {
   }
 });
 
-test('R1: CLI recognizes valid subcommands; refuses unrecognized subcommands', () => {
-  const disallowed = ['help', '--help', 'bogus', 'foo'];
-  for (const sub of disallowed) {
-    const res = runFgctl([sub]);
-    assert.notEqual(res.status, 0, `fgctl ${sub} must exit non-zero`);
-    assert.match(res.stderr, /Usage: fgctl <stage\|status\|init\|upgrade\|repair\|verify>/, `Must name subcommands in usage`);
-  }
-
-  // No args
-  const resNoArgs = runFgctl([]);
-  assert.notEqual(resNoArgs.status, 0, 'fgctl with no args must exit non-zero');
-  assert.match(resNoArgs.stderr, /Usage: fgctl <stage\|status\|init\|upgrade\|repair\|verify>/);
-});
-
 test('R8: status --json on empty store reports empty array, not an error', () => {
   const stateHome = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-empty-store-'));
   try {

@@ -7,28 +7,39 @@ use fgos_distribution::{
 };
 use std::path::PathBuf;
 
-fn print_usage_and_exit() -> ! {
-    eprintln!("Usage: fgctl <stage|status|init|upgrade|repair|verify> [options]");
-    eprintln!();
-    eprintln!("Subcommands:");
-    eprintln!("  stage    Stage a release tree into the machine release store");
-    eprintln!("  status   Show staged releases in the machine release store");
-    eprintln!("  init     Initialize and activate fgOS in a workspace");
-    eprintln!("           release source: --from <path|URL> > FGCTL_FROM > FGCTL_VERSION=<tag> > project pin > latest release");
-    eprintln!("           --override-pin <reason>: recovery only; activate the release --from names, already staged");
-    eprintln!("           on this machine, although it differs from the pin. Every check still runs, the reason");
-    eprintln!(
-        "           goes into activation.json, and .fgos/distribution.json is left unchanged"
-    );
-    eprintln!("  upgrade  Upgrade workspace to a new release candidate");
-    eprintln!("           release source: --from <path|URL> > FGCTL_FROM > FGCTL_VERSION=<tag> > latest release");
-    eprintln!(
-        "           then replaces this fgctl with the one the release ships when they differ,"
-    );
-    eprintln!("           keeping the old binary as <path>.prev");
-    eprintln!("  repair   Repair or rollback workspace activation");
-    eprintln!("  verify   Verify active release files against manifest");
-    std::process::exit(1);
+mod help;
+
+use help::{find_verb, parse_flags, print_overview, print_verb_help, unknown_verb};
+
+/// `fgctl <version> (<commit12>, <commit date>)`; the commit parts read
+/// `unknown commit` when the build did not state them.
+fn print_version(json: bool) {
+    let version = env!("CARGO_PKG_VERSION");
+    let commit = env!("FGCTL_BUILD_COMMIT");
+    let commit_date = env!("FGCTL_BUILD_COMMIT_DATE");
+    if json {
+        let known = |value: &str| (!value.is_empty()).then(|| value.to_string());
+        let object = serde_json::json!({
+            "name": "fgctl",
+            "version": version,
+            "commit": known(commit),
+            "commitTime": known(commit_date),
+        });
+        println!("{object}");
+    } else if commit.is_empty() {
+        println!("fgctl {version} (unknown commit)");
+    } else if commit_date.is_empty() {
+        println!("fgctl {version} ({commit})");
+    } else {
+        println!("fgctl {version} ({commit}, {commit_date})");
+    }
+}
+
+fn current_dir_or_exit() -> PathBuf {
+    std::env::current_dir().unwrap_or_else(|err| {
+        eprintln!("Error reading current directory: {}", err);
+        std::process::exit(1);
+    })
 }
 
 /// After `fgctl upgrade` activated a release: make this binary the `fgctl`
@@ -44,16 +55,16 @@ fn refresh_own_binary(cwd: &std::path::Path) {
     };
     match refresh_fgctl_for_workspace(cwd, &installed) {
         Ok(FgctlRefresh::UpToDate { digest }) => {
-            println!("fgctl: up to date with the release ({digest})");
+            eprintln!("fgctl: up to date with the release ({digest})");
         }
         Ok(FgctlRefresh::NotShipped) => {
-            println!(
+            eprintln!(
                 "fgctl: the release ships no fgctl; {} left unchanged",
                 installed.display()
             );
         }
         Ok(FgctlRefresh::Replaced { previous, digest }) => {
-            println!(
+            eprintln!(
                 "fgctl: replaced {} with the release's fgctl ({digest}); previous binary kept at {}",
                 installed.display(),
                 previous.display()
@@ -62,7 +73,7 @@ fn refresh_own_binary(cwd: &std::path::Path) {
             let project = fgos_distribution::workspace::resolve_workspace_root(cwd)
                 .map(|root| root.display().to_string())
                 .unwrap_or_else(|_| cwd.display().to_string());
-            println!(
+            eprintln!(
                 "fgctl: this is the machine-wide fgctl for every project; the release active in {project} chose it"
             );
         }
@@ -75,9 +86,6 @@ fn refresh_own_binary(cwd: &std::path::Path) {
 
 fn main() {
     let args: Vec<String> = std::env::args().collect();
-    if args.len() < 2 {
-        print_usage_and_exit();
-    }
 
     // Hidden, unlisted: the holder-lock helper roles. The activation gate must
     // not run anything from a candidate release, so it re-executes `fgctl`.
@@ -92,28 +100,35 @@ fn main() {
         let route_args: Vec<std::ffi::OsString> = std::env::args_os().skip(2).collect();
         std::process::exit(fgos_holder_lock::route::main(&route_args));
     }
-    match args[1].as_str() {
-        "stage" => {
-            let mut from_path: Option<PathBuf> = None;
-            let mut i = 2;
-            while i < args.len() {
-                if args[i] == "--from" && i + 1 < args.len() {
-                    from_path = Some(PathBuf::from(&args[i + 1]));
-                    i += 2;
-                } else {
-                    eprintln!("Unknown option: {}", args[i]);
-                    print_usage_and_exit();
-                }
+
+    let Some(name) = args.get(1).map(String::as_str) else {
+        print_overview();
+        return;
+    };
+    match name {
+        "--help" | "-h" => return print_overview(),
+        "--version" | "-V" => return print_version(false),
+        "help" => {
+            match args.get(2).map(String::as_str) {
+                None => print_overview(),
+                Some(topic) => match find_verb(topic) {
+                    Some(verb) => print_verb_help(verb),
+                    None => unknown_verb(topic),
+                },
             }
+            return;
+        }
+        _ => {}
+    }
+    let Some(verb) = find_verb(name) else {
+        unknown_verb(name);
+    };
+    let flags = parse_flags(verb, &args[2..]);
 
-            let from = match from_path {
-                Some(p) => p,
-                None => {
-                    eprintln!("Error: --from <path> is required for 'fgctl stage'");
-                    print_usage_and_exit();
-                }
-            };
-
+    match verb.name {
+        "version" => print_version(flags.has("--json")),
+        "stage" => {
+            let from = PathBuf::from(flags.require("--from"));
             let store_root = resolve_machine_release_store_root();
             match stage_release(&store_root, &from) {
                 Ok(StageOutcome::Staged { artifact_digest }) => {
@@ -129,18 +144,7 @@ fn main() {
             }
         }
         "status" => {
-            let mut json_output = false;
-            let mut i = 2;
-            while i < args.len() {
-                if args[i] == "--json" {
-                    json_output = true;
-                    i += 1;
-                } else {
-                    eprintln!("Unknown option: {}", args[i]);
-                    print_usage_and_exit();
-                }
-            }
-
+            let json_output = flags.has("--json");
             let store_root = resolve_machine_release_store_root();
             let cwd = std::env::current_dir().unwrap_or_else(|_| PathBuf::from("."));
 
@@ -192,67 +196,23 @@ fn main() {
             }
         }
         "init" => {
-            let mut from_path: Option<String> = None;
-            let mut pin_override_reason: Option<String> = None;
-            let mut i = 2;
-            while i < args.len() {
-                if args[i] == "--from" && i + 1 < args.len() {
-                    from_path = Some(args[i + 1].clone());
-                    i += 2;
-                } else if args[i] == "--override-pin" && i + 1 < args.len() {
-                    pin_override_reason = Some(args[i + 1].clone());
-                    i += 2;
-                } else {
-                    eprintln!("Unknown option: {}", args[i]);
-                    print_usage_and_exit();
-                }
-            }
-
-            let cwd = match std::env::current_dir() {
-                Ok(d) => d,
-                Err(err) => {
-                    eprintln!("Error reading current directory: {}", err);
-                    std::process::exit(1);
-                }
-            };
-
-            let inputs = fgos_distribution::fetch::SourceInputs::from_env(from_path);
+            let cwd = current_dir_or_exit();
+            let inputs = fgos_distribution::fetch::SourceInputs::from_env(flags.value("--from"));
             let endpoint = fgos_distribution::fetch::DownloadEndpoint::from_env();
-            match fgos_distribution::init_workspace_resolving(
+            let pin_override_reason = flags.value("--override-pin");
+            if let Err(err) = fgos_distribution::init_workspace_resolving(
                 &cwd,
                 &inputs,
                 &endpoint,
                 pin_override_reason.as_deref(),
             ) {
-                Ok(()) => {}
-                Err(err) => {
-                    eprintln!("Error: {}", err);
-                    std::process::exit(1);
-                }
+                eprintln!("Error: {}", err);
+                std::process::exit(1);
             }
         }
         "upgrade" => {
-            let mut from_path: Option<String> = None;
-            let mut i = 2;
-            while i < args.len() {
-                if args[i] == "--from" && i + 1 < args.len() {
-                    from_path = Some(args[i + 1].clone());
-                    i += 2;
-                } else {
-                    eprintln!("Unknown option: {}", args[i]);
-                    print_usage_and_exit();
-                }
-            }
-
-            let cwd = match std::env::current_dir() {
-                Ok(d) => d,
-                Err(err) => {
-                    eprintln!("Error reading current directory: {}", err);
-                    std::process::exit(1);
-                }
-            };
-
-            let inputs = fgos_distribution::fetch::SourceInputs::from_env(from_path);
+            let cwd = current_dir_or_exit();
+            let inputs = fgos_distribution::fetch::SourceInputs::from_env(flags.value("--from"));
             let endpoint = fgos_distribution::fetch::DownloadEndpoint::from_env();
             if let Err(err) = upgrade_workspace_resolving(&cwd, &inputs, &endpoint) {
                 eprintln!("Error: {}", err);
@@ -261,51 +221,17 @@ fn main() {
             refresh_own_binary(&cwd);
         }
         "repair" => {
-            if let Some(arg) = args[2..].first() {
-                eprintln!("Unknown option: {}", arg);
-                print_usage_and_exit();
-            }
-
-            let cwd = match std::env::current_dir() {
-                Ok(d) => d,
-                Err(err) => {
-                    eprintln!("Error reading current directory: {}", err);
-                    std::process::exit(1);
-                }
-            };
-
-            match repair_workspace(&cwd) {
-                Ok(()) => {}
-                Err(err) => {
-                    eprintln!("Error: {}", err);
-                    std::process::exit(1);
-                }
+            if let Err(err) = repair_workspace(&current_dir_or_exit()) {
+                eprintln!("Error: {}", err);
+                std::process::exit(1);
             }
         }
         "verify" => {
-            if let Some(arg) = args[2..].first() {
-                eprintln!("Unknown option: {}", arg);
-                print_usage_and_exit();
-            }
-
-            let cwd = match std::env::current_dir() {
-                Ok(d) => d,
-                Err(err) => {
-                    eprintln!("Error reading current directory: {}", err);
-                    std::process::exit(1);
-                }
-            };
-
-            match verify_workspace(&cwd) {
-                Ok(()) => {}
-                Err(err) => {
-                    eprintln!("Error: {}", err);
-                    std::process::exit(1);
-                }
+            if let Err(err) = verify_workspace(&current_dir_or_exit()) {
+                eprintln!("Error: {}", err);
+                std::process::exit(1);
             }
         }
-        _ => {
-            print_usage_and_exit();
-        }
+        _ => unreachable!("every verb in the table has an arm"),
     }
 }

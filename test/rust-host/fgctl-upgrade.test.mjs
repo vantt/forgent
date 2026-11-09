@@ -189,7 +189,7 @@ test('R1, R2, R3, R6: A -> B upgrade then repair round-trips reported digest wit
     encoding: 'utf8',
   });
   assert.equal(upgradeRes.status, 0, `fgctl upgrade must succeed: ${upgradeRes.stderr}`);
-  assert.match(upgradeRes.stdout, /^fgctl: replaced .* with the release's fgctl \(sha256:[0-9a-f]{64}\); previous binary kept at .*\.prev$/m);
+  assert.match(upgradeRes.stderr, /^fgctl: replaced .* with the release's fgctl \(sha256:[0-9a-f]{64}\); previous binary kept at .*\.prev$/m);
   assert.ok(fs.readFileSync(staleFgctl).equals(releaseFgctl), 'the machine fgctl now holds the release bytes');
   assert.ok(fs.readFileSync(`${staleFgctl}.prev`).equals(staleBytes), 'the replaced bytes are kept as .prev');
   fs.rmSync(machineBin, { recursive: true, force: true });
