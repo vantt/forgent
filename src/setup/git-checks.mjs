@@ -60,7 +60,7 @@ export function checkGit(cwd, kind, loaderOptions, run) {
           ...eventStoreMappingProblems(eventStoreDoctorOf(cwd, run, { loaderOptions })),
         ], 'repository transport settings and fetch mappings are as fgOS expects', { fetchRefspecs: facts.fetchRefspecs, untrustedTransportConfig: keys, reservedLegacyRefs: reserved });
         // Nothing to fetch from: the mappings are installed once a remote exists, so a local-only project is not red for it.
-        return hasRemote || !result.passed ? result : { ...result, status: 'skip', fix: noRemoteFix, message: `no Git remote "${remote}" configured, so there is no fetch mapping to install; add one when the project has a remote` };
+        return hasRemote || !result.passed ? result : { ...result, status: 'skip', fixCommand: noRemoteFix, message: `no Git remote "${remote}" configured, so there is no fetch mapping to install; add one when the project has a remote` };
       }
       case 'git-operation-journal': {
         const { journal } = facts;

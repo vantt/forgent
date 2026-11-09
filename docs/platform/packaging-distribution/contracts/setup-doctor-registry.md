@@ -42,6 +42,8 @@ Current Node `fgos setup` remains implemented as deprecated legacy compatibility
 
 The `eventStore` section's standard values (`seal.intervalSec`, `seal.coalesceSec`, `sync.intervalSec`, `rebuild.maxAttempts`, `remote`) live in `core/config-standard/eventStore.yaml` with its shape in `core/config-schema/eventStore.schema.yaml`; `EVENT_STORE_DEFAULTS` in `src/event-store/config.mjs` names the same values and a test pins that they agree. `seal.coalesceSec` (default 30, an integer of at least 1) is the runner's seal batching window, and a malformed value fails every Event Store doctor row with `event-store-config: invalid seal.coalesceSec`. The `eventStore.remote` default (`origin`) is the standard's; the `git-repository-config` check diagnoses obsolete exact legacy mappings on the configured remote and on historical `origin`, and the `git-publication-refspecs` fix repairs them.
 
+A fix repairs the row with its own id; `registerFix({ id, fix, repairs: [rowIds] })` names the rows it repairs when their ids differ (the Git WAL fix repairs `git-operation-journal`, the fetch-mapping fix `git-repository-config`, a config fix the config rows whose contract row names it).
+
 The registries are independent. A module may register only a check, only a fix, or both. The rows over the config files (`config-*`, and `gateway-token-configured` for the machine files) are registered from the config crate's `doctor-rows.v1.json` contract by `src/setup/config-checks.mjs`.
 
 ## 3. Doctor Contract
@@ -49,7 +51,10 @@ The registries are independent. A module may register only a check, only a fix, 
 `fgos doctor`:
 
 - runs registered checks;
-- reports individual pass/fail status as a row `{id, description, passed, message, detail?}`; `detail` is an optional JSON value that holds the facts behind the row's one-sentence `message` (for example the versions and floor behind a compatibility failure) and appears only in `fgos doctor --json`;
+- reports each row as `{id, description, passed, status, message, fix?, detail?}`; `detail` is an optional JSON value that holds the facts behind the row's one-sentence `message` (for example the versions and floor behind a compatibility failure) and appears only in `fgos doctor --json`;
+- gives each row a `status`: `fail` when `passed` is false, `warn` for a passing row whose message opens with `warning:`, `skip` for a row that says `status: 'skip'` itself (nothing to judge here, with its reason in the message), otherwise `ok`. `passed` stays for existing readers and is false exactly when `status` is `fail`;
+- gives each failing row a `fix`: the command that repairs it (`fgos doctor --fix` when a registered fix repairs that row, or the row's own command), or `null` when only a person can repair it and the message says how. A skipping row may carry the `fix` that would make it apply (a row result names its own command `fixCommand`; the report calls it `fix`);
+- reports at the top level `ok` (no row has status `fail`) and `next[]` (the failing rows' fix commands, each once, in registry order), so an agent loops `fgos doctor --fix`, then `fgos doctor --json`, until `ok` without reading the exit code, which stays 0 (`--strict` exits 1 when `ok` is false);
 - does not write files by default, and in a repository with no fgOS setup writes nothing at all (no `.fgos`) and starts no child process;
 - should tell the user what command or fix path applies when a check fails;
 - answers readiness only. A live incident is read and repaired through its component's own verb; doctor keeps at most one read-only pointer row for it (below).

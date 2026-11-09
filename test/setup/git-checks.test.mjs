@@ -191,7 +191,7 @@ test('the repository-config row skips, naming the command that adds a remote, wh
     const result = checkGit(repo, 'git-repository-config', options);
     assert.equal(result.passed, true, result.message);
     assert.equal(result.status, 'skip');
-    assert.equal(result.fix, 'git remote add origin <url> && fgos doctor --fix');
+    assert.equal(result.fixCommand, 'git remote add origin <url> && fgos doctor --fix');
     assert.match(result.message, /no Git remote "origin"/);
   });
 });

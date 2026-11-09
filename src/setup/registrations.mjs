@@ -292,22 +292,24 @@ function rowStatus({ passed, status, message }) {
  */
 export async function runDoctor(repoRoot, { fix = false, checks = DOCTOR_CHECKS, fixes = FIX_REGISTRATIONS } = {}) {
   const fixed = fix ? runFixes(repoRoot, fixes) : undefined;
-  const repairedByDoctor = new Set(fixes.flatMap((entry) => entry.repairs ?? [entry.id]));
+  const repairedByDoctor = new Set();
+  for (const entry of fixes) for (const rowId of entry.repairs ?? [entry.id]) repairedByDoctor.add(rowId);
   // A check may return its result directly or as a promise (one drives promise-based runner code).
   // Rows of one run share what they read once (the Work view).
   const run = createDoctorRun();
   const rows = [];
+  const next = [];
   for (const { id, description, check } of checks) {
     const result = await check(repoRoot, run);
     const status = rowStatus(result);
-    const repair = result.fix ?? (status === 'fail' ? (repairedByDoctor.has(id) ? DOCTOR_FIX_COMMAND : null) : undefined);
+    const repair = result.fixCommand ?? (status === 'fail' ? (repairedByDoctor.has(id) ? DOCTOR_FIX_COMMAND : null) : undefined);
+    if (status === 'fail' && repair && !next.includes(repair)) next.push(repair);
     rows.push({
       id, description, passed: result.passed, status, message: result.message,
       ...(repair !== undefined && { fix: repair }),
       ...(result.detail !== undefined && { detail: result.detail }),
     });
   }
-  const next = [...new Set(rows.filter((row) => row.status === 'fail' && row.fix).map((row) => row.fix))];
   return { ok: rows.every((row) => row.status !== 'fail'), next, ...(fixed !== undefined && { fixed }), checks: rows };
 }
 

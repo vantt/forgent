@@ -1206,7 +1206,7 @@ test('a doctor run reports a status per row, the command that repairs each faili
     row('fine', { passed: true, message: 'all good' }),
     row('heads-up', { passed: true, message: 'warning: a note' }),
     row('left-out', { passed: true, status: 'skip', message: 'not applicable here' }),
-    row('own-command', { passed: false, message: 'broken', fix: 'fgos thing --yes' }),
+    row('own-command', { passed: false, message: 'broken', fixCommand: 'fgos thing --yes' }),
     row('repaired-by-fix-a', { passed: false, message: 'broken' }),
     row('repaired-by-fix-b', { passed: false, message: 'broken' }),
     row('needs-a-person', { passed: false, message: 'broken', detail: { why: 'x' } }),

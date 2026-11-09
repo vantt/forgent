@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "bf29be75418770b53052b3d73302526bb243f40e1b125368d7c49dba71cbd593",
+  "payloadDigest": "7878d20cda51147d5a9d40e288ad9ab5f1783a329d1a498265ca2a2c53f644d4",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "f0cf5643d796b57cb40bb7cfd76d3adee75f8925148f2636595a8d931db02fa4",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -1122,7 +1122,7 @@
     "src/setup/event-store-checks.mjs": "0d527f4f9e030760a5cac112557f4089dea1c297d3720087757554b1e0e86ac2",
     "src/setup/event-store-fixes.mjs": "6075174c2a02253e34dda0b021cf46bd33b61f75917fe07d70967fd94e6e3052",
     "src/setup/executor-profile-warnings.mjs": "2432e3184db33f212b5c47929acb97901de0ca7b78c278a9b58f7c3908d48179",
-    "src/setup/git-checks.mjs": "e369915fef44c02a0f4ce5550918dc94886e0a55618165486384ded1c9c4d717",
+    "src/setup/git-checks.mjs": "7a9873c59b9849c37921c3469e06c1309436c3839a64946ffb631402f0c9aabe",
     "src/setup/git-hooks.mjs": "7c35308129bc8032a436107c561cefa0637cceb72b295eab1ecd2e163c0d0f66",
     "src/setup/git-retention-note.mjs": "8e4bacd772c5562a964c4beeea95d9ee808f41e122a7b6adc09fee81c96949fd",
     "src/setup/holder-lock-checks.mjs": "e4536c9f2f383ee323374e9a48dceb81e6cb7dcdc4c6040a58e3ff90dc1fc864",
@@ -1136,7 +1136,7 @@
     "src/setup/model-pool-checks.mjs": "785804058781fa333fa2bbc89330cacc4bcc0e498073c9229236838f1d602f23",
     "src/setup/omp-natives-checks.mjs": "6f6faadb66ac09828741445c599dcbaee9462486157ab7074433e2dbcf4d9aad",
     "src/setup/project-launcher.mjs": "3153fdb9caad59eaeace759de1cd126c22f41585fcd1e15f00c1577ab0f9806b",
-    "src/setup/registrations.mjs": "363e53c2b2baabff92668a0a3f1f810e6e7cc3ddf0b3bf626b2a8a0813f44760",
+    "src/setup/registrations.mjs": "d5732e3a3d2f6999b7a32ce5d1c225c7f7ff44334553e258c049b824155dde59",
     "src/setup/run-supervisor-checks.mjs": "1846a2d7bd9190720be5a165d15f7ed3c55cc64da7e1e169308fd93f28ca5732",
     "src/setup/runner-config-conversion.mjs": "6e2711a0a909265b82241901e7f9642889bdc3e9d1ab5a69fafd81b477a64ac6",
     "src/setup/seat-binding-checks.mjs": "31466fd0d56700e12de4b369f8592da7ecf009590c6767340cadc84efa70770f",
@@ -1256,35 +1256,7 @@
     "src/workflow/units-source.mjs": "fd7d7a3ed5db5f00c6244fc60da479aa739e1935e1ffaf02341f71f3a326e307",
     "scripts/lib/git-one-door-declarations.v1.json": "c06a8ee8c3164c54bfd3cd4401271c3e080ae3bb86e5a469cf7532d3fd60d3e9"
   },
-  "sites": [
-    {
-      "path": "src/setup/git-checks.mjs",
-      "line": 125,
-      "spawn": "loadNativeAddon -> src/git/native.mjs:11",
-      "binary": "param loaderOptions (fixGitDriverDirectories escapes: returned from an anonymous function (src/setup/registrations.mjs:310))",
-      "family": "unresolved-binary",
-      "siteId": "fixGitDriverDirectories:c037ac7f301f3a05a213a0f64c0f05034e13173f3d0bd206abfaf5c75b76163a",
-      "callerDigests": [
-        "4981b44398cfa4f6c7d003952274302081e782bc98588ab08a1f8a4671026dae"
-      ],
-      "escapes": []
-    },
-    {
-      "path": "src/setup/git-checks.mjs",
-      "line": 135,
-      "spawn": "afterDriverDirectories -> src/setup/git-checks.mjs:130",
-      "binary": "param loaderOptions (fixGitFetchMapping escapes: returned from an anonymous function (src/setup/registrations.mjs:310))",
-      "family": "unresolved-binary",
-      "siteId": "fixGitFetchMapping:87539d9d1c8de01636c6e15987d9bb5e760285265547e2469a5bc0585a920756",
-      "callerDigests": [
-        "71f0bbdf7de7114d90d6ea43de624af822557000dd7ddfaf33fa1a69e19d53ae"
-      ],
-      "escapes": [
-        "returned from an anonymous function (src/setup/registrations.mjs:310)",
-        "returned from an anonymous function (src/setup/registrations.mjs:310)"
-      ]
-    }
-  ],
+  "sites": [],
   "classes": [
     {
       "path": ".agents/skills/distill/scripts/distill.mjs",
@@ -3544,49 +3516,49 @@
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 1820,
+      "line": 1822,
       "spawn": "execFileSync",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 3420,
-      "spawn": "checkBwrapAvailable -> src/setup/registrations.mjs:1297",
+      "line": 3422,
+      "spawn": "checkBwrapAvailable -> src/setup/registrations.mjs:1299",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 3468,
+      "line": 3470,
       "spawn": "runAllConfinementProbes -> src/runner/dispatch/confinement/probes/harness.mjs:834",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 3509,
-      "spawn": "checkBwrapAvailable -> src/setup/registrations.mjs:1297",
+      "line": 3511,
+      "spawn": "checkBwrapAvailable -> src/setup/registrations.mjs:1299",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 3516,
+      "line": 3518,
       "spawn": "probePeerRunHidden -> src/runner/dispatch/confinement/probes/harness.mjs:525",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 3751,
+      "line": 3753,
       "spawn": "probeIdentity -> src/util/session-identity.mjs:56",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 3815,
+      "line": 3817,
       "spawn": "createSeatBindingClient -> src/seat-binding/client.mjs:142",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
