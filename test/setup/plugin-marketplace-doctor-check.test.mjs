@@ -114,18 +114,18 @@ test('check passes without touching claude when the claude binary is not on PATH
   }
 });
 
-test('check fails when the marketplace is not configured at all', () => {
+test('check warns, never fails, and names fgos wire-agents when the marketplace is not configured at all', () => {
   const dir = mkTempDir();
   const { scriptPath } = writeFakeClaude(dir, { marketplaces: [], plugins: [] });
   withFakeClaude(scriptPath, () => {
     const { passed, message } = checkById('claude-plugin-marketplace').check(process.cwd());
-    assert.equal(passed, false);
-    assert.match(message, /marketplace "fgos-plugins" not configured — run fgos wire-agents/);
+    assert.equal(passed, true);
+    assert.match(message, /^warning: Claude Code marketplace "fgos-plugins" not configured.*run fgos wire-agents/);
   });
   fs.rmSync(dir, { recursive: true, force: true });
 });
 
-test('check fails when the marketplace is configured but the fgOS plugin is not enabled', () => {
+test('check warns when the marketplace is configured but the fgOS plugin is not enabled', () => {
   const dir = mkTempDir();
   const { scriptPath } = writeFakeClaude(dir, {
     marketplaces: [{ name: 'fgos-plugins', source: 'directory', path: '/some/repo' }],
@@ -133,8 +133,8 @@ test('check fails when the marketplace is configured but the fgOS plugin is not 
   });
   withFakeClaude(scriptPath, () => {
     const { passed, message } = checkById('claude-plugin-marketplace').check(process.cwd());
-    assert.equal(passed, false);
-    assert.match(message, /plugin not installed\/enabled/);
+    assert.equal(passed, true);
+    assert.match(message, /^warning: fgOS Claude Code plugin not installed\/enabled.*run fgos wire-agents/);
   });
   fs.rmSync(dir, { recursive: true, force: true });
 });
@@ -153,7 +153,7 @@ test('check accepts a directory-sourced marketplace entry (dev-checkout self-hos
   fs.rmSync(dir, { recursive: true, force: true });
 });
 
-test('check treats a disabled fgOS plugin entry as not enabled', () => {
+test('check treats a disabled fgOS plugin entry as not enabled and warns', () => {
   const dir = mkTempDir();
   const { scriptPath } = writeFakeClaude(dir, {
     marketplaces: [{ name: 'fgos-plugins', source: 'github', repo: 'vantt/forgent' }],
@@ -161,8 +161,8 @@ test('check treats a disabled fgOS plugin entry as not enabled', () => {
   });
   withFakeClaude(scriptPath, () => {
     const { passed, message } = checkById('claude-plugin-marketplace').check(process.cwd());
-    assert.equal(passed, false);
-    assert.match(message, /plugin not installed\/enabled/);
+    assert.equal(passed, true);
+    assert.match(message, /^warning: fgOS Claude Code plugin not installed\/enabled.*run fgos wire-agents/);
   });
   fs.rmSync(dir, { recursive: true, force: true });
 });

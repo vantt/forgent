@@ -230,7 +230,7 @@ file or key in their message; the message always names the exact target.
 | `legacy-node-payload-present` | The legacy Node payload named by the release manifest exists | `no active fgos rust host release or dev checkout found` | you | `fgctl repair` |
 | `active-release-matches-checkout` | Activated Node payload matches doctor's source working tree; staged dependencies excluded | changed/missing/extra counts, up to five paths, digest and activation time | you | Use `npm run fgos:dev -- <verb>` for working-tree code, or rebuild/stage/upgrade to update plain `fgos`; no automatic fix. Skips outside source checkouts, absent activation, same-checkout dev manifests and linked worktrees whose activation belongs to main. Does not certify Rust host freshness |
 | `config-awareness` | Which config level is active (project or global) and whether the other exists | never fails | info | none |
-| `claude-plugin-marketplace` | The fgOS Claude Code plugin marketplace is registered and the plugin enabled | `fgOS Claude Code plugin not installed/enabled — run fgos wire-agents ...` | wire-agents | `fgos wire-agents --yes` (needs the `claude` CLI on `PATH`) |
+| `claude-plugin-marketplace` | The fgOS Claude Code plugin marketplace is registered and the plugin enabled | a `warning:` (it never fails) `fgOS Claude Code plugin not installed/enabled ... run fgos wire-agents` | wire-agents | `fgos wire-agents --yes` (needs the `claude` CLI on `PATH`) |
 
 ### 4.2. Project config (written by setup or `--fix`)
 

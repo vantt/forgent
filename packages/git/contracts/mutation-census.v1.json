@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "9de3bbc46b325f701aa7e4f2be71404d73b0c52429d6fc7afe820c99e286b1d2",
+  "payloadDigest": "b3b33d636349b16fcea4a8d56bc847fc7f5613b759bdb759bf1715653cd557b9",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "f0cf5643d796b57cb40bb7cfd76d3adee75f8925148f2636595a8d931db02fa4",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -1115,7 +1115,7 @@
     "src/seat-binding/client.mjs": "206a9ecbbc301f2c3c9688535dbeb60fabbe67052b870a62e23e7481ae82fdd8",
     "src/setup/agent-cli-trust.mjs": "d6e89dffb8312644b843029d800e5cc48bda69acc5d790a05c98c20d86cc40ef",
     "src/setup/agent-hooks.mjs": "6b123c05dba51ba6c384575391b4eac2f6f1bcf2468e18c80c9443b276f3bbc9",
-    "src/setup/agent-wiring.mjs": "439e1e03ab89f634e2df98ca969bb6c16c0b6521cf76e17224ebd37c7e310995",
+    "src/setup/agent-wiring.mjs": "7a9021c589c350482c4489ae54c469b6030e7b01ebfdc65d13bacd86d4b030eb",
     "src/setup/agy-permissions.mjs": "ed40e05c846fbf499d0a0bfbe0e066f27ad060e144e55f8fa809b2b0e024df78",
     "src/setup/ansi.mjs": "02c0e971ac01c71fb7db8d6506debd3c35d55feedceeb93eac7843b83fa0d430",
     "src/setup/bin-discovery.mjs": "d7d3536129adcbe5c6fc5297ef1f6ba1fcdc86d5195b7e968c14480b10e77101",

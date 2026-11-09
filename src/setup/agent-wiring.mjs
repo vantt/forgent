@@ -61,18 +61,20 @@ function claudePluginJson(args, env) {
 const hasMarketplace = (marketplaces) => marketplaces.some((m) => m?.name === CLAUDE_PLUGIN_MARKETPLACE_NAME);
 const pluginEnabled = (plugins) => plugins.some((p) => typeof p?.id === 'string' && p.id.startsWith('fgOS@') && p.enabled === true);
 
-/** Doctor row `claude-plugin-marketplace`: reports, never writes; the fix it names is `fgos wire-agents`. */
+/** Doctor row `claude-plugin-marketplace`: reports, never writes. A missing plugin is a choice the person may
+ * make (global agent config is opt-in), so it warns and names `fgos wire-agents`; only a `claude` that
+ * cannot answer its own plugin listing fails. */
 export function checkClaudePluginMarketplace({ env = process.env } = {}) {
   if (!claudePresent(env)) return { passed: true, message: 'claude CLI not found on PATH — nothing to check (Claude Code plugin surface not applicable here)' };
   const marketplaces = claudePluginJson(['plugin', 'marketplace', 'list', '--json'], env);
   if (marketplaces === null) return { passed: false, message: '"claude plugin marketplace list --json" failed to run or parse' };
   if (!hasMarketplace(marketplaces)) {
-    return { passed: false, message: `Claude Code marketplace "${CLAUDE_PLUGIN_MARKETPLACE_NAME}" not configured — run ${WIRE_AGENTS_COMMAND} (opt-in: it changes your Claude config, backs it up first)` };
+    return { passed: true, message: `warning: Claude Code marketplace "${CLAUDE_PLUGIN_MARKETPLACE_NAME}" not configured, so the /fgOS:* plugin skills are missing; installing it is your choice: run ${WIRE_AGENTS_COMMAND} (opt-in: it changes your Claude config, backs it up first)` };
   }
   const plugins = claudePluginJson(['plugin', 'list', '--json'], env);
   if (plugins === null) return { passed: false, message: '"claude plugin list --json" failed to run or parse' };
   if (!pluginEnabled(plugins)) {
-    return { passed: false, message: `fgOS Claude Code plugin not installed/enabled — run ${WIRE_AGENTS_COMMAND} (opt-in: it changes your Claude config, backs it up first)` };
+    return { passed: true, message: `warning: fgOS Claude Code plugin not installed/enabled, so the /fgOS:* plugin skills are missing; installing it is your choice: run ${WIRE_AGENTS_COMMAND} (opt-in: it changes your Claude config, backs it up first)` };
   }
   return { passed: true, message: `Claude Code marketplace "${CLAUDE_PLUGIN_MARKETPLACE_NAME}" configured, fgOS plugin enabled` };
 }
