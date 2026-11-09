@@ -9,7 +9,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 
-import { projectAgentMarkdown, AgentDefinitionError, findAgentYamlFiles, resolveAgentFiles } from '../../scripts/project-agents.mjs';
+import { projectAgentMarkdown, AgentDefinitionError, findAgentYamlFiles, resolveAgentFiles, projectAll } from '../../scripts/project-agents.mjs';
 import { writeProjectConfig } from '../helpers/config-fixture.mjs';
 
 function mkTempDir() {
@@ -189,3 +189,68 @@ test('resolveAgentFiles still throws AgentDefinitionError when two non-legacy so
 });
 
 
+
+function scratchRepo(yamlByStem) {
+  const dir = mkTempDir();
+  const coreDir = path.join(dir, 'core', 'agents');
+  fs.mkdirSync(coreDir, { recursive: true });
+  for (const [stem, yaml] of Object.entries(yamlByStem)) fs.writeFileSync(path.join(coreDir, `${stem}.yaml`), yaml);
+  const targetDir = path.join(dir, 'out');
+  return { dir, targetDir, run: () => projectAll(resolveAgentFiles(findAgentYamlFiles(dir), dir), { repoRoot: dir, targetDir }) };
+}
+
+test('a persona declaring a name other than its file stem is refused and cannot reach another agent file', () => {
+  const repo = scratchRepo({ persona: VALID_YAML.replace('name: test-agent', 'name: code-reviewer') });
+  try {
+    fs.mkdirSync(repo.targetDir);
+    const foreign = path.join(repo.targetDir, 'code-reviewer.md');
+    fs.writeFileSync(foreign, 'foreign agent\n');
+    assert.throws(() => repo.run(), /declares name "code-reviewer" but its file stem is "persona"/);
+    assert.equal(fs.readFileSync(foreign, 'utf8'), 'foreign agent\n');
+    assert.equal(fs.existsSync(path.join(repo.targetDir, 'persona.md')), false);
+  } finally {
+    fs.rmSync(repo.dir, { recursive: true, force: true });
+  }
+});
+
+test('a frontmatter scalar holding a newline is refused with the field and file named, before any write', () => {
+  const evil = VALID_YAML.replace('description: A test agent.', 'description: "x\\n---\\nmodel: opus"');
+  const repo = scratchRepo({ 'test-agent': evil });
+  try {
+    assert.throws(() => repo.run(), /core\/agents\/test-agent\.yaml: field "description" holds a newline/);
+    assert.equal(fs.existsSync(repo.targetDir), false);
+  } finally {
+    fs.rmSync(repo.dir, { recursive: true, force: true });
+  }
+});
+
+test('an existing target without the generated stamp is refused by name and the run writes nothing', () => {
+  const repo = scratchRepo({ 'test-agent': VALID_YAML, 'other-agent': VALID_YAML.replace('name: test-agent', 'name: other-agent') });
+  try {
+    fs.mkdirSync(repo.targetDir);
+    const foreign = path.join(repo.targetDir, 'test-agent.md');
+    fs.writeFileSync(foreign, 'hand written\n');
+    assert.throws(() => repo.run(), /core\/agents\/test-agent\.yaml: refusing to overwrite .*test-agent\.md/);
+    assert.equal(fs.readFileSync(foreign, 'utf8'), 'hand written\n');
+    assert.equal(fs.existsSync(path.join(repo.targetDir, 'other-agent.md')), false);
+  } finally {
+    fs.rmSync(repo.dir, { recursive: true, force: true });
+  }
+});
+
+test('the real core personas project byte-identically, and a second run over its own output is accepted', () => {
+  const root = path.resolve(import.meta.dirname, '..', '..');
+  const targetDir = path.join(mkTempDir(), 'out');
+  try {
+    const files = resolveAgentFiles(findAgentYamlFiles(root), root);
+    projectAll(files, { repoRoot: root, targetDir });
+    for (const stem of ['council-assumptions', 'council-feedback-loops', 'council-ship-maintain', 'fgos-placeholder']) {
+      const source = path.join(root, 'core', 'agents', `${stem}.yaml`);
+      const expected = projectAgentMarkdown(stem, fs.readFileSync(source, 'utf8'), path.join('core', 'agents', `${stem}.yaml`));
+      assert.equal(fs.readFileSync(path.join(targetDir, `${stem}.md`), 'utf8'), expected, stem);
+    }
+    assert.doesNotThrow(() => projectAll(files, { repoRoot: root, targetDir }));
+  } finally {
+    fs.rmSync(path.dirname(targetDir), { recursive: true, force: true });
+  }
+});
