@@ -1,1 +1,1 @@
-{"count":1,"firstSeq":109,"kind":"seal","lastSeq":109,"machineId":"fg-server-sqs7es","origin":"b4be6b4b536d5b71195ab878c6ec43e0","scope":"project","sha256":"bf1bbfaa5504e3193d972520d627d706b41bd61904f6770d96c16c01d8c07984","stream":"project:mailbox","v":1}
+{"count":1,"firstSeq":11,"kind":"seal","lastSeq":11,"machineId":"fg-server-sqs7es","origin":"b4be6b4b536d5b71195ab878c6ec43e0","scope":"project","sha256":"2f1fabac64f1a7eda30dd3c9aa5811b5e17274af0c2b8b0c96ef91c2982755a4","stream":"project:identity","v":1}
