@@ -75,9 +75,7 @@ Stale registrations make `fgos worktree create` refuse with
 
 ```sh
 export AK_NO_AUTO_UPDATE=1                     # a kit install may otherwise bump the ak binary
-mv .claude/skills/ui-spec "${TMPDIR:-/tmp}/fgos-work/ui-spec"   # trap: tracked ui-spec makes ak refuse "ClaudeKit project detected"
 ak kit install engineer --target claude-code --yes
-mv "${TMPDIR:-/tmp}/fgos-work/ui-spec" .claude/skills/ui-spec
 git checkout -- .claude/settings.json .claude/agents   # ak rewrites both; keep ours
 ak projects add "$PWD"
 ```
