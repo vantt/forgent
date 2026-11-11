@@ -2546,7 +2546,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
     // imports a herdr client or a dispatch adapter, so there is no path from
     // this case to sending anything into a pane.
     case 'dispatch': {
-      const sub = requireField(positional[0], 'dispatch requires a sub-verb: fgos dispatch <show-run|inspect|watch|recover|reconcile|decide|explain|probe-account>');
+      const sub = requireField(positional[0], 'dispatch requires a sub-verb: fgos dispatch <show-run|inspect|watch|recover|reconcile|decide|explain|probe-account|probe-session>');
       const retired = await retiredDispatchDoorMessage(sub, positional, flags);
       if (retired) throw new StoreError('validation', retired);
       const KNOWN_DISPATCH_SUBVERBS = [
@@ -2558,11 +2558,12 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         'decide',
         'explain',
         'probe-account',
+        'probe-session',
       ];
       if (!KNOWN_DISPATCH_SUBVERBS.includes(sub)) {
         throw new StoreError('validation', `unknown dispatch sub-verb "${sub}": expected ${KNOWN_DISPATCH_SUBVERBS.join(', ')}`);
       }
-      if (sub === 'probe-account') {
+      if (sub === 'probe-account' || sub === 'probe-session') {
         const { runDispatchCli } = await import('../src/runner/dispatch/cli.mjs');
         return await runDispatchCli(rawArgv, { returnResult: true });
       }

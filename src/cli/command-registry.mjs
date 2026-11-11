@@ -1412,8 +1412,8 @@ export const COMMAND_REGISTRY = [
   }),
   withSubcommands({
     name: 'dispatch',
-    invoke: 'fgos dispatch <show-run|inspect|watch|recover|reconcile|decide|explain|probe-account> [args]',
-    description: 'Dispatch-owned reads and repairs; it runs no work itself (one task runs through `fgos run`, planned work through `fgos workflow start`). "decide" answers which mechanism and executor a dispatch resolves to; "explain" lays out why a capability binds to its family, tier, model and invocation; "show-run"/"watch"/"inspect" read Run state; "recover" observes or applies recovery of a STANDALONE Run; "reconcile" is a narrow, local CAS-guarded guard repair plus provider-capacity quarantine door that never recovers, launches, signals, or controls a Run; "probe-account" is a diagnostic over one provider account.',
+    invoke: 'fgos dispatch <show-run|inspect|watch|recover|reconcile|decide|explain|probe-account|probe-session> [args]',
+    description: 'Dispatch-owned reads and repairs; it runs no work itself (one task runs through `fgos run`, planned work through `fgos workflow start`). "decide" answers which mechanism and executor a dispatch resolves to; "explain" lays out why a capability binds to its family, tier, model and invocation; "show-run"/"watch"/"inspect" read Run state; "recover" observes or applies recovery of a STANDALONE Run; "reconcile" is a narrow, local CAS-guarded guard repair plus provider-capacity quarantine door that never recovers, launches, signals, or controls a Run; "probe-account" is a diagnostic over one provider account; "probe-session" is a diagnostic over one executor\'s session transcript.',
     subcommands: {
       'show-run': {
         description: 'Read one Run\'s recorded state.',
@@ -1568,6 +1568,22 @@ export const COMMAND_REGISTRY = [
         },
         examples: ['fgos dispatch probe-account --provider openai --account tetcu72'],
       },
+      'probe-session': {
+        description: 'Diagnostic: run one tiny read-only seat of one executor through the real dispatch door (cheapest model its family allows) and report where its CLI wrote the session in the attempt home, the folder `runner.yaml` declares, whether Execution kept it, where `transcriptPath` points and its size. Names the `runner.yaml` line to change when the declared folder is wrong. Prints paths, counts and sizes only, never session content. Exit 0 when the session was kept; otherwise exit 1 with the category in the JSON.',
+        parameters: {
+          type: 'object',
+          properties: {
+            executor: { type: 'string', description: 'Executor id (positional), e.g. gemini or deepseek.' },
+            invocation: { type: 'string', description: 'Invocation id to probe (default: the first confined cli invocation of the executor).' },
+            'timeout-ms': { type: 'string', description: 'Timeout of the seat in milliseconds.' },
+            cwd: { type: 'string', description: 'Working directory the probe runs in (default: the current directory; --dir is accepted too).' },
+            'repo-root': { type: 'string', description: 'Main checkout repository root.' },
+          },
+          positional: ['executor'],
+          required: ['executor'],
+        },
+        examples: ['fgos dispatch probe-session gemini', 'fgos dispatch probe-session deepseek --invocation pi-herdr --json'],
+      },
     },
     examples: [
       'fgos dispatch decide --for general-purpose --has-live-task-access',
@@ -1577,7 +1593,7 @@ export const COMMAND_REGISTRY = [
     ],
     touchesState: true,
     // "reconcile"/"recover" write guard and Run state (touchesState: true);
-    // "probe-account" spawns provider CLIs (externalEffect: true). A verb with
+    // "probe-account" and "probe-session" spawn provider CLIs (externalEffect: true). A verb with
     // several sub-modes is classified by its most-privileged effect on each axis.
     store: 'none',
     mutatesStore: (positional, flags) => positional[0] === 'recover' && flags.action !== undefined,

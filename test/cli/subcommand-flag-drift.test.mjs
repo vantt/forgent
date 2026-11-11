@@ -51,6 +51,7 @@ const GLOBAL = new Set(['dir', 'json', 'help']);
 const DELEGATES = {
   'dispatch decide': () => caseBlock(functionBody(DISPATCH_CLI, 'runDispatchCli'), 'decide'),
   'dispatch probe-account': () => caseBlock(functionBody(DISPATCH_CLI, 'runDispatchCli'), 'probe-account'),
+  'dispatch probe-session': () => caseBlock(functionBody(DISPATCH_CLI, 'runDispatchCli'), 'probe-session'),
 };
 
 // Verbs whose shared tail is itself one sub-verb's handler.

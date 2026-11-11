@@ -1,5 +1,5 @@
 // dispatch/cli.mjs — dispatch behavior + the thin CLI doors over it (D7, tsk-2uf-1):
-// the `decide`/`probe-account`/`reconcile` subcommands of `node src/runner/dispatch.mjs`
+// the `decide`/`probe-account`/`probe-session`/`reconcile` subcommands of `node src/runner/dispatch.mjs`
 // (`runDispatchCli`). One task runs through `fgos run`, planned work through a Workflow;
 // the raw `execute` and `log` subcommands are gone. See `docs/history/dispatch-activation-
 // and-handoff-redesign/CONTEXT.md` D7 for the module split.
@@ -27,6 +27,7 @@ import { compileDispatchPlan } from './plan.mjs';
 import { executeAssignment } from './assignment-runner.mjs';
 import { adoptRun } from '../../run-supervisor/client.mjs';
 import { runAccountProbe } from './provider-account-probe.mjs';
+import { runSessionProbe } from './provider-session-probe.mjs';
 import { createCredentialRenewal } from './provider-credential-renewal.mjs';
 import { createRoundTerminalControl } from './terminal-slot.mjs';
 import { envForSession } from './worker-session.mjs';
@@ -343,6 +344,28 @@ export function guardCwdRepoRootDivergence(cwd, repoRoot) {
   }
 }
 
+/** The inline Assignment a probe runs, built and claimed under the repository's assignments directory. */
+function probeAssignmentFactory(repoRoot) {
+  const fgosDir = fgosDirFromRoot(repoRoot);
+  const assignmentsDir = path.join(fgosDir, 'assignments');
+  return (contract) => claimAssignmentId(() => buildAssignment({
+    options: { assignmentsDir },
+    provenance: { kind: 'inline', contract, caller: { writerId: String(resolveWriterIdentity(fgosDir).id) } },
+  }), assignmentsDir);
+}
+
+/** The one door the probes dispatch through: a read-only Assignment, with login renewal as a real dispatch has it. */
+function readOnlyProbeDispatch({ cwd, repoRoot }) {
+  return (assignment, { runnerConfig, cliOverride }) => executeAssignment(assignment, {
+    cwd,
+    repoRoot,
+    runnerConfig,
+    cliOverride,
+    isReadOnlyMode: true,
+    providerCredentialRenew: createCredentialRenewal(),
+  });
+}
+
 /**
  * Body of `node src/runner/dispatch.mjs <decide|probe-account|reconcile> ...`, called from the
  * barrel's script guard; `fgos dispatch decide|probe-account` reach it with `returnResult`.
@@ -414,8 +437,6 @@ export async function runDispatchCli(argv = process.argv.slice(2), { returnResul
         }
         const cwd = path.resolve(flagValue('--cwd') ?? flagValue('--dir') ?? process.cwd());
         const repoRoot = path.resolve(flagValue('--repo-root') ?? resolveMainCheckoutRoot(cwd) ?? resolveRepoRoot(cwd));
-        const assignmentsDir = path.join(fgosDirFromRoot(repoRoot), 'assignments');
-        const fgosDir = fgosDirFromRoot(repoRoot);
         const invocationFlag = flagValue('--invocation');
         const herdrBin = resolveHerdrBin();
         const result = await runAccountProbe({
@@ -426,18 +447,8 @@ export async function runDispatchCli(argv = process.argv.slice(2), { returnResul
           invocationIds: invocationFlag ? invocationFlag.split(',').map((s) => s.trim()).filter(Boolean) : null,
           repoRoot,
           timeoutMs: positiveIntFlag('--timeout-ms'),
-          createAssignment: (contract) => claimAssignmentId(() => buildAssignment({
-            options: { assignmentsDir },
-            provenance: { kind: 'inline', contract, caller: { writerId: String(resolveWriterIdentity(fgosDir).id) } },
-          }), assignmentsDir),
-          dispatch: (assignment, { runnerConfig, cliOverride }) => executeAssignment(assignment, {
-            cwd,
-            repoRoot,
-            runnerConfig,
-            cliOverride,
-            isReadOnlyMode: true,
-            providerCredentialRenew: createCredentialRenewal(),
-          }),
+          createAssignment: probeAssignmentFactory(repoRoot),
+          dispatch: readOnlyProbeDispatch({ cwd, repoRoot }),
           closePane: ({ paneId, herdrSession, terminalKey }) => {
             // A run record that carries no key was written before panes were addressed by key:
             // nothing proves which pane it was, so it is left open.
@@ -455,6 +466,32 @@ export async function runDispatchCli(argv = process.argv.slice(2), { returnResul
             return closed;
           },
         });
+        if (returnResult) return result;
+        process.stdout.write(`${JSON.stringify(result)}\n`);
+      } catch (err) {
+        if (returnResult) throw err;
+        process.stderr.write(`${err.message}\n`);
+        process.exitCode = 1;
+      }
+      break;
+    }
+    case 'probe-session': {
+      // Diagnostic: one tiny read-only seat of one executor; where its CLI wrote the session, whether it was kept.
+      try {
+        if (!executorId) throw new StoreError('validation', 'dispatch probe-session requires an executor id: fgos dispatch probe-session <executorId> [--invocation <id>]');
+        const cwd = path.resolve(flagValue('--cwd') ?? flagValue('--dir') ?? process.cwd());
+        const repoRoot = path.resolve(flagValue('--repo-root') ?? resolveMainCheckoutRoot(cwd) ?? resolveRepoRoot(cwd));
+        const result = await runSessionProbe({
+          cfg: loadRunnerConfigForDir(repoRoot),
+          executorId,
+          invocationId: flagValue('--invocation') ?? null,
+          repoRoot,
+          timeoutMs: positiveIntFlag('--timeout-ms'),
+          createAssignment: probeAssignmentFactory(repoRoot),
+          dispatch: readOnlyProbeDispatch({ cwd, repoRoot }),
+        });
+        // Exit 0 only when the session was kept; the category names why not.
+        if (!result.kept) process.exitCode = 1;
         if (returnResult) return result;
         process.stdout.write(`${JSON.stringify(result)}\n`);
       } catch (err) {
@@ -487,7 +524,7 @@ export async function runDispatchCli(argv = process.argv.slice(2), { returnResul
       break;
     }
     default: {
-      const msg = `unknown subcommand ${JSON.stringify(subcommand)}. Usage: node src/runner/dispatch.mjs decide <executorId> [--has-live-task-access] | decide --for <purpose> [--needs-soul] [--has-live-task-access] | decide --needs-soul [--has-live-task-access] | reconcile <runDir> | probe-account --provider <provider> --account <accountId> [--executor <id>] [--invocation <id,...>] [--timeout-ms <ms>]. To run a task: fgos run "<prompt>"; decide --work: fgos dispatch decide --work <workId>\n`;
+      const msg = `unknown subcommand ${JSON.stringify(subcommand)}. Usage: node src/runner/dispatch.mjs decide <executorId> [--has-live-task-access] | decide --for <purpose> [--needs-soul] [--has-live-task-access] | decide --needs-soul [--has-live-task-access] | reconcile <runDir> | probe-account --provider <provider> --account <accountId> [--executor <id>] [--invocation <id,...>] [--timeout-ms <ms>] | probe-session <executorId> [--invocation <id>] [--timeout-ms <ms>]. To run a task: fgos run "<prompt>"; decide --work: fgos dispatch decide --work <workId>\n`;
       if (returnResult) throw new StoreError('validation', msg.trim());
       process.stderr.write(msg);
       process.exitCode = 1;

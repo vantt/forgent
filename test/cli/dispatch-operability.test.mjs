@@ -115,7 +115,7 @@ test('dispatch entry in command-registry declares touchesState: true and externa
   assert.equal(helpResult.status, 0);
   assert.match(
     helpResult.stdout,
-    /fgos dispatch <show-run\|inspect\|watch\|recover\|reconcile\|decide\|explain\|probe-account> \[args\] \[write\+external\]/,
+    /fgos dispatch <show-run\|inspect\|watch\|recover\|reconcile\|decide\|explain\|probe-account\|probe-session> \[args\] \[write\+external\]/,
   );
 });
 
