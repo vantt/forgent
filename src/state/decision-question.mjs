@@ -11,6 +11,8 @@
 // NFC normalisation with a letter-boundary check instead of `\b`, which only
 // understands ASCII and so never matches a Vietnamese word like "nghị".
 
+import fs from 'node:fs';
+
 export const DECISION_QUESTION_PARTS = [
   { key: 'happening', title: 'Chuyện gì đang xảy ra', hint: '1-2 câu, ngôn ngữ thường', labels: ['chuyện gì đang xảy ra', 'chuyện gì', 'what is happening'] },
   { key: 'cause', title: 'Nguyên nhân', hint: 'đã kiểm bằng gì; chưa biết nguyên nhân thì chỉ xin phép điều tra', labels: ['nguyên nhân', 'cause'] },
@@ -87,4 +89,71 @@ export function formatDecisionQuestion(parts) {
   return DECISION_QUESTION_PARTS.filter((part) => parts[part.key])
     .map((part) => `## ${part.title}\n\n${parts[part.key]}`)
     .join('\n\n');
+}
+
+const QUESTION_TOOL_NAMES = new Set(['AskUserQuestion', 'ask', 'ask_question']);
+const TRANSCRIPT_TAIL_BYTES = 256 * 1024;
+
+function readTail(file) {
+  const fd = fs.openSync(file, 'r');
+  try {
+    const size = fs.fstatSync(fd).size;
+    const length = Math.min(size, TRANSCRIPT_TAIL_BYTES);
+    const buffer = Buffer.alloc(length);
+    fs.readSync(fd, buffer, 0, length, size - length);
+    return buffer.toString('utf8');
+  } finally {
+    fs.closeSync(fd);
+  }
+}
+
+// Assistant text written since the owner's last real message. Tool results, meta entries (skill bodies,
+// command caveats) and background-task notifications also arrive as user entries; they do not end the turn.
+function textOfThisTurn(transcriptPath) {
+  const texts = [];
+  for (const line of readTail(transcriptPath).split('\n').reverse()) {
+    let entry;
+    try {
+      entry = JSON.parse(line);
+    } catch {
+      continue;
+    }
+    const content = entry?.message?.content;
+    if (entry.type === 'user') {
+      const isToolResult = Array.isArray(content) && content.every((block) => block?.type === 'tool_result');
+      const isNotification = typeof content === 'string' && content.trimStart().startsWith('<task-notification>');
+      if (!isToolResult && !entry.isMeta && !isNotification) break;
+    } else if (entry.type === 'assistant' && Array.isArray(content)) {
+      for (const block of content) if (block?.type === 'text' && block.text) texts.unshift(block.text);
+    }
+  }
+  return texts.join('\n');
+}
+
+/**
+ * The verdict of the AskUserQuestion hook for a normalized call `{ toolName, toolInput, transcriptPath }`: the
+ * question the owner sees, with its options (part 3) and the analysis written in this turn before it, must carry
+ * the five parts. An unreadable transcript is not a reason to pass: the question and options are still checked.
+ */
+export function decisionQuestionHookVerdict({ toolName, toolInput, transcriptPath }) {
+  if (!QUESTION_TOOL_NAMES.has(toolName)) return { blocked: false };
+  const questions = Array.isArray(toolInput?.questions) ? toolInput.questions : [];
+  const parts = questions.flatMap((q) => [
+    q?.question,
+    Array.isArray(q?.options) && q.options.length > 0 ? `Options:\n${q.options.map((o) => `- ${o?.label ?? ''}: ${o?.description ?? ''}`).join('\n')}` : '',
+  ]);
+  let turnText = '';
+  try {
+    if (transcriptPath) turnText = textOfThisTurn(transcriptPath);
+  } catch {
+    turnText = '';
+  }
+  const missing = checkDecisionQuestion([turnText, ...parts].filter(Boolean).join('\n'));
+  if (missing.length === 0) return { blocked: false };
+  return {
+    blocked: true,
+    reason:
+      `write the analysis before asking. Missing parts of the decision-question template: ${missing.map((part) => part.title).join(', ')}. ` +
+      `Write each as a labeled part in your message (or in the question), then ask again:\n${describeDecisionQuestion()}`,
+  };
 }

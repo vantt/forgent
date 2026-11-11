@@ -88,7 +88,7 @@ import { inspectEntries, inspectPath } from '../src/util/git-paths.mjs';
 import { mainCheckoutResetUseCase } from '../src/runner/main-checkout-reset-guard.mjs';
 import { editUseCase, parseEditFlags } from '../src/verbs/state/edit.mjs';
 import { unknownFlagMessage } from '../src/cli/flag-check.mjs';
-import { parseArgs } from '../src/cli/parse-args.mjs';
+import { parseArgs, parseListFlag } from '../src/cli/parse-args.mjs';
 import { moveUseCase } from '../src/verbs/state/move.mjs';
 import { listUseCase, graphUseCase, workflowUseCase, gateCheckUseCase, staleUseCase } from '../src/verbs/state/read.mjs';
 import { showRunUseCase } from '../src/verbs/dispatch/show-run.mjs';
@@ -422,79 +422,6 @@ function resolveVerifyTimeoutMs(verb, flags, repoRoot) {
   }
   // The config is the main checkout's; a session worktree reaches it only through a `.fgos` link, which the door refuses.
   return loadRunnerConfigForDir(mainCheckoutRootAt(repoRoot)).timeoutMs;
-}
-
-/**
- * The Unit `fgos run "<prompt>"` stands for: the prompt is its objective, `--writes` its write scope
- * (none: a read-only unit), `--provider` its soft executor preference, `--persona` its persona,
- * `--input` the files it is handed (Unit `inputs`) and `--verify` the command that checks its work.
- * Every flag is checked against the config and the persona tiers here, so a wrong one leaves no
- * unit run behind. A writing unit needs a linked worktree; this never creates one.
- */
-async function adhocUnitFromPrompt(prompt, flags, { mainRoot, isLinkedWorktree }) {
-  // `--sync <ref>` without a prompt is a sync-only unit: the runner merges the ref and a worker
-  // runs only when the merge stops on conflicts.
-  const syncOnly = prompt === undefined && flags.sync !== undefined;
-  if (!syncOnly && (typeof prompt !== 'string' || !prompt.trim())) {
-    throw new StoreError('validation', 'fgos run "<prompt>" needs a non-empty prompt');
-  }
-  const syncBase = flags.sync === undefined ? undefined : requireField(flags.sync, '--sync requires a ref to merge (a branch, tag or commit, e.g. main)');
-  const writes = parseListFlag(flags.writes);
-  if (syncBase !== undefined && flags.writes === undefined) {
-    throw new StoreError('validation', 'fgos run --sync needs --writes: merging a ref changes the branch, so the unit is a writing unit in a linked worktree (the conflicted paths join the scope by themselves)');
-  }
-  if (flags.writes !== undefined && writes.length === 0) {
-    throw new StoreError('validation', 'fgos run "<prompt>" --writes needs at least one path; omit it for a read-only unit');
-  }
-  if (writes.length > 0 && !isLinkedWorktree()) {
-    throw new StoreError('validation', 'fgos run "<prompt>" --writes needs a linked worktree: create one with `git worktree add <path>` and pass --worktree <path> (or run from inside it)');
-  }
-  const inputs = parseListFlag(flags.input);
-  if (flags.input !== undefined && inputs.length === 0) {
-    throw new StoreError('validation', 'fgos run "<prompt>" --input needs at least one repo-relative path (comma-separated); omit it for a unit with no input files');
-  }
-  const prefer = parseListFlag(flags.provider);
-  if (flags.provider !== undefined) {
-    const executors = loadRunnerConfigForDir(mainRoot).executors ?? {};
-    const valid = Object.keys(executors).filter((id) => (executors[id]?.kind ?? 'agent') === 'agent');
-    const unknown = prefer.find((id) => !valid.includes(id));
-    if (prefer.length === 0 || unknown !== undefined) {
-      throw new StoreError('validation', `unknown --provider "${unknown ?? ''}"; valid providers: ${valid.join(', ') || '(none registered)'}`);
-    }
-  }
-  if (flags.persona !== undefined) {
-    const persona = requireField(flags.persona, '--persona requires a persona name');
-    const { resolveAgentDefinition } = await import('../src/runner/agent-definitions.mjs');
-    try {
-      resolveAgentDefinition(persona, { projectRoot: mainRoot });
-    } catch (err) {
-      throw new StoreError('validation', err.message);
-    }
-  }
-  const { randomBytes } = await import('node:crypto');
-  // ASCII only, so the id is a safe path segment whatever the prompt's script or punctuation.
-  const slug = (syncOnly ? `sync-${syncBase}` : prompt).normalize('NFKD').replace(/[\u0300-\u036f]/g, '').replace(/[đĐ]/g, 'd').toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-').replace(/^-+/, '').slice(0, 40).replace(/-+$/, '') || 'task';
-  return {
-    id: `adhoc-${slug}-${randomBytes(2).toString('hex')}`,
-    ...(syncOnly ? {} : { objective: prompt }),
-    ...(syncBase !== undefined ? { syncBase } : {}),
-    capability: flags.capability === undefined ? 'execute' : requireField(flags.capability, '--capability requires a capability name'),
-    writes,
-    ...(flags.rigor !== undefined ? { rigor: requireField(flags.rigor, '--rigor requires a level') } : {}),
-    ...(prefer.length > 0 ? { prefer } : {}),
-    ...(flags.persona !== undefined ? { persona: flags.persona } : {}),
-    ...(inputs.length > 0 ? { inputs } : {}),
-    ...(flags.verify !== undefined ? { verify: requireField(flags.verify, '--verify requires a command, e.g. --verify "npm test"') } : {}),
-  };
-}
-
-function parseListFlag(value) {
-  if (value === undefined || value === true) return [];
-  return value
-    .split(',')
-    .map((s) => s.trim())
-    .filter(Boolean);
 }
 
 // Per str73-done-flip-cos-check D2: --acceptance carries a JSON-encoded array
@@ -933,29 +860,6 @@ function submitWork(dir, text, opts = {}) {
   };
   const { event } = addWork(dir, work);
   return event.payload;
-}
-
-// The dispatch doors that ran one task straight through dispatch are gone; each now has a
-// runUnit door. This is the one place that says which: every caller of `fgos dispatch`
-// (shell, gateway, scripts) gets the same validation error, before anything runs.
-async function retiredDispatchDoorMessage(sub, positional, flags) {
-  if (sub === 'execute') {
-    if (flags.assignment !== undefined) {
-      return 'fgos dispatch execute --assignment was removed: run the unit with `fgos run --unit <file>`, or planned work with `fgos workflow start <preset>|--units <file>`.';
-    }
-    const executorId = positional[1] && !String(positional[1]).startsWith('--') ? positional[1] : undefined;
-    const { runDoorHint } = await import('../src/runner/dispatch/cli.mjs');
-    const hint = runDoorHint({
-      cwd: typeof flags.cwd === 'string' ? flags.cwd : process.cwd(),
-      executorId,
-      capability: typeof flags.for === 'string' ? flags.for : undefined,
-    });
-    return `fgos dispatch execute was removed: run one task with ${hint}, or a unit file with \`fgos run --unit <file>\`.`;
-  }
-  if (sub === 'log') {
-    return 'fgos dispatch log was removed: every run records its own provenance under `.fgos/assignments/<unitRunId>/`; run work through `fgos run` and read it there.';
-  }
-  return null;
 }
 
 async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slice(3)) {
@@ -2546,23 +2450,10 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
     // imports a herdr client or a dispatch adapter, so there is no path from
     // this case to sending anything into a pane.
     case 'dispatch': {
-      const sub = requireField(positional[0], 'dispatch requires a sub-verb: fgos dispatch <show-run|inspect|watch|recover|reconcile|decide|explain|probe-account|probe-session>');
-      const retired = await retiredDispatchDoorMessage(sub, positional, flags);
+      const { retiredDispatchDoorMessage, decideCommand } = await import('../src/runner/dispatch/decide.mjs');
+      const retired = retiredDispatchDoorMessage(positional[0], positional, flags);
       if (retired) throw new StoreError('validation', retired);
-      const KNOWN_DISPATCH_SUBVERBS = [
-        'show-run',
-        'inspect',
-        'watch',
-        'recover',
-        'reconcile',
-        'decide',
-        'explain',
-        'probe-account',
-        'probe-session',
-      ];
-      if (!KNOWN_DISPATCH_SUBVERBS.includes(sub)) {
-        throw new StoreError('validation', `unknown dispatch sub-verb "${sub}": expected ${KNOWN_DISPATCH_SUBVERBS.join(', ')}`);
-      }
+      const sub = requireSubVerb('dispatch', positional);
       if (sub === 'probe-account') {
         const { runDispatchCli } = await import('../src/runner/dispatch/cli.mjs');
         return await runDispatchCli(rawArgv, { returnResult: true });
@@ -2578,16 +2469,20 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       }
       if (sub === 'decide') {
         // Dispatch holds no Work store: `decide --work` gets its Work lookup from here.
-        const { runDispatchCli } = await import('../src/runner/dispatch/cli.mjs');
         const { resolveWorkForDispatch } = await import('../src/runner/work-dispatch.mjs');
-        try {
-          return await runDispatchCli(rawArgv, { returnResult: true, resolveWork: resolveWorkForDispatch });
-        } catch (err) {
-          if (err.errorClass) {
-            process.stdout.write(`${JSON.stringify({ error: err.message, ...(err.errorClass ? { errorClass: err.errorClass } : {}) })}\n`);
-          }
-          throw err;
-        }
+        const text = (name) => (typeof flags[name] === 'string' ? flags[name] : undefined);
+        return await decideCommand({
+          executorId: positional[1],
+          cwd: text('cwd') ?? text('dir'),
+          repoRoot: text('repo-root'),
+          hasLiveTaskAccess: flags['has-live-task-access'] !== undefined,
+          for: text('for'),
+          workId: text('work'),
+          assignment: text('assignment'),
+          stage: text('stage'),
+          needsSoul: flags['needs-soul'] !== undefined,
+          resolveWork: resolveWorkForDispatch,
+        });
       }
       const repoRootForDispatch = flags.dir !== undefined ? path.dirname(dir) : process.cwd();
       if (sub === 'explain') {
@@ -2708,155 +2603,17 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
     }
     case 'run': {
       const { runUnit, resolveGitRoots } = await import('../src/runner/execution/run.mjs');
-      const { parseRunTimeout } = await import('../src/runner/dispatch/config.mjs');
-      const unitPath = flags.unit;
-      const resumeUnitRunId = flags.resume;
-      const prompt = positional[0];
-      if (!unitPath && !resumeUnitRunId && prompt === undefined && flags.sync === undefined) {
-        throw new StoreError('validation', 'fgos run requires --unit <file|-> or --resume <unitRunId>, a "<prompt>", or --sync <ref>');
-      }
-      if ([unitPath, resumeUnitRunId, prompt].filter((v) => v !== undefined).length > 1) {
-        throw new StoreError('validation', 'fgos run takes either a "<prompt>", --unit or --resume, not more than one');
-      }
-      if (positional.length > 1) {
-        throw new StoreError('validation', `fgos run takes one prompt; quote the prompt ("${positional.join(' ')}")`);
-      }
-      // The flags that build a unit from a prompt mean nothing to a --unit file or a resume; refused, never dropped.
-      // A bare `--sync <ref>` builds a sync-only unit from the same flags (a --unit file names `syncBase`).
-      if (flags.sync !== undefined && (unitPath || resumeUnitRunId)) {
-        throw new StoreError('validation', '--sync only applies to fgos run "<prompt>" or a bare --sync <ref>; a --unit file names syncBase, and a resume keeps the sync it started with');
-      }
-      const buildsUnit = prompt !== undefined || flags.sync !== undefined;
-      const promptOnlyFlag = !buildsUnit && ['provider', 'persona', 'writes', 'capability', 'rigor', 'input', 'verify'].find((f) => flags[f] !== undefined);
-      if (promptOnlyFlag) {
-        throw new StoreError('validation', `--${promptOnlyFlag} only applies to fgos run "<prompt>"`);
-      }
-      const pattern = flags.pattern;
-      const overrideStr = flags.override;
-      let overrides = [];
-      if (overrideStr) {
-        try {
-          const parsed = JSON.parse(overrideStr);
-          overrides = Array.isArray(parsed) ? parsed : [parsed];
-        } catch (e) {
-          throw new StoreError('validation', `invalid JSON for --override: ${e.message}`);
-        }
-      }
-      // `--effort <level>` is a reasoningEffort override for bind(): added to every override that
-      // does not name one, and as a trailing unscoped override when none is unscoped, so a role a
-      // scoped override does not name still gets it. bind() checks it against the chosen executor.
-      if (flags.effort !== undefined) {
-        const effort = requireField(flags.effort, '--effort requires a level (low, medium, high, max)');
-        if (!overrides.some((ov) => ov && typeof ov === 'object' && !ov.scope)) overrides.push({});
-        for (const ov of overrides) {
-          if (ov.reasoningEffort === undefined) ov.reasoningEffort = effort;
-        }
-      }
-      // `--timeout <dur>` (90m, 5400s, 2h) gives the run its own time instead of runner.timeoutMs, the
-      // same way: a `timeoutMs` key on every override that does not name one. It is kept in unit.json,
-      // so a resumed run keeps it and --timeout cannot change it.
-      if (flags.timeout !== undefined) {
-        if (resumeUnitRunId) throw new StoreError('validation', '--timeout cannot change a resumed unit run: it keeps the timeout it was started with');
-        let timeoutMs;
-        try {
-          timeoutMs = parseRunTimeout(requireField(flags.timeout, '--timeout requires a duration, e.g. 90m or 5400s'));
-        } catch (err) {
-          throw new StoreError('validation', err.message);
-        }
-        if (!overrides.some((ov) => ov && typeof ov === 'object' && !ov.scope)) overrides.push({});
-        for (const ov of overrides) {
-          if (ov.timeoutMs === undefined) ov.timeoutMs = timeoutMs;
-        }
-      }
-      // `--account <pool/account>` pins the account the same way: an `account` key on every override
-      // that does not name one. runUnit checks it against each seat's bound executor before the unit
-      // run exists; a resumed run keeps the account its bindings already carry.
-      if (flags.account !== undefined) {
-        if (resumeUnitRunId) throw new StoreError('validation', '--account cannot change a resumed unit run: it keeps the account its seats were bound to');
-        const account = requireField(flags.account, '--account requires pool/account (an account of a pool in ~/.fgos/private/accounts.yaml, for example openai/work)');
-        if (!overrides.some((ov) => ov && typeof ov === 'object' && !ov.scope)) overrides.push({});
-        for (const ov of overrides) {
-          if (ov.account === undefined) ov.account = account;
-        }
-      }
-      const repoRoot = flags.dir;
-      const worktree = flags.worktree;
-      const { createCaseAdmissionPort, activityUnitOf, confinedWriteRefusal } = await import('../src/workflow/case-admission-port.mjs');
-      const portRoot = repoRoot ? path.resolve(repoRoot) : (() => { try { return resolveGitRoots(process.cwd()).mainCheckoutRoot; } catch { return null; } })();
-      // A confined writer must be refused before anything needs a lock or an
-      // addon; the case port uses this same read-only/masked-view check.
-      if (flags.writes !== undefined) {
-        const confined = confinedWriteRefusal({ mainRoot: portRoot ?? process.cwd(), caseId: typeof flags.case === 'string' ? flags.case : null });
-        if (confined) throw new RunnerConfigError(`nested-write-from-confined-worker: a writing dispatch from inside a confined worker is refused: ${confined}; a confined worker may dispatch read-only work only`, { code: 'nested-write-from-confined-worker', phase: 'pre-admission' });
-      }
-      const runWarning = checkDirDiffersFromCwd({ dir: typeof flags.dir === 'string' ? flags.dir : undefined, worktree: flags.worktree });
-      // Everything about the one-liner is checked here, before runUnit creates a unit run.
-      const unitData = !buildsUnit ? undefined : await adhocUnitFromPrompt(prompt, flags, {
-        mainRoot: repoRoot ? path.resolve(repoRoot) : resolveGitRoots(process.cwd()).mainCheckoutRoot,
-        // Where a writing unit would run: --worktree, else here. Only a linked worktree may be written.
-        isLinkedWorktree: () => resolveGitRoots(worktree ? path.resolve(worktree) : process.cwd()).isLinkedWorktree,
+      const { buildRunRequest } = await import('../src/runner/execution/run-request.mjs');
+      const { createCaseAdmissionPort, activityUnitOf } = await import('../src/workflow/case-admission-port.mjs');
+      // The Workflow's case port is injected so the Execution Core never imports the Workflow.
+      const runOptions = buildRunRequest(flags, positional, {
+        cwd: process.cwd(),
+        gitRoots: resolveGitRoots,
+        caseAdmission: { createPort: createCaseAdmissionPort, activityUnitOf },
       });
-      if (resumeUnitRunId) {
-        if (flags.params !== undefined) {
-          throw new StoreError('validation', '--params cannot change a resumed unit run: it keeps the request it was started with');
-        }
-        if (flags.param !== undefined) {
-          throw new StoreError('validation', '--param cannot change a resumed unit run: it keeps the request it was started with');
-        }
-      }
-      let request;
-      if (flags.params !== undefined || flags.param !== undefined) {
-        const { requestFromFlags } = await import('../src/runner/execution/run-request.mjs');
-        try {
-          request = requestFromFlags({ params: flags.params, param: flags.param });
-        } catch (err) {
-          throw new RunnerConfigError(`${err.code}: ${err.message}`, { code: err.code, phase: 'pre-admission' });
-        }
-      }
-
-      // `--case <id> --activity <id>` names the case this run is an activity of: it is admitted into that
-      // case (entry, MUST rules, write overlap, frame) before anything exists. Without them the run is
-      // standalone, and a writing one goes on only into a worktree no case owns.
-      const caseFlagsGiven = ['case', 'activity', 'route', 'reason'].filter((f) => flags[f] !== undefined);
-      let caseRef;
-      if (caseFlagsGiven.length > 0) {
-        if (resumeUnitRunId) throw new StoreError('validation', '--case cannot change a resumed unit run: it keeps the case it was admitted into');
-        const caseId = requireField(flags.case, `--${caseFlagsGiven.find((f) => f !== 'case') ?? 'case'} needs --case <caseId>: ${caseFlagsGiven.join(', ')} only apply to a run that names a case`);
-        const activity = requireField(flags.activity, '--case needs --activity <id>: the activity of the case\'s guide this run is');
-        if (flags.route !== undefined && !['should', 'may-instead', 'unlisted'].includes(flags.route)) {
-          throw new StoreError('validation', '--route must be should, may-instead or unlisted');
-        }
-        caseRef = {
-          caseId,
-          activity,
-          ...(flags.route !== undefined ? { route: flags.route } : {}),
-          ...(flags.reason !== undefined ? { reason: requireField(flags.reason, '--reason requires text') } : {}),
-        };
-      }
-      // The Workflow's port, injected here so the Execution Core never imports the Workflow: a writing
-      // run goes on only into a worktree no case owns.
-      const activityUnit = caseRef ? activityUnitOf({ mainRoot: portRoot, caseId: caseRef.caseId, activity: caseRef.activity }) : undefined;
-
+      const runWarning = checkDirDiffersFromCwd({ dir: typeof flags.dir === 'string' ? flags.dir : undefined, worktree: flags.worktree });
       try {
-        return attachDirWarning(await runUnit({
-          unitPath,
-          unitData,
-          ...(portRoot ? { caseAdmission: createCaseAdmissionPort({ repoRoot: portRoot }) } : {}),
-          ...(caseRef ? { caseRef } : {}),
-          ...(activityUnit !== undefined ? { activityUnit } : {}),
-          ...(request !== undefined ? { request } : {}),
-          // No door of this release can attest a person, so an override tier above the resolved one, or an
-          // accepted dependence, is refused by name. A prompt-built unit's --capability and --persona are the
-          // unit's own declarations, like the same keys of a --unit file.
-          raiseAuthorized: false,
-          pattern,
-          stanceOptions: flags['stance-options'] === undefined ? undefined : requireField(flags['stance-options'], '--stance-options requires pipe-separated option labels').split('|'),
-          overrides,
-          resumeUnitRunId,
-          repoRoot,
-          cwd: process.cwd(),
-          worktree,
-        }), runWarning);
+        return attachDirWarning(await runUnit(runOptions), runWarning);
       } catch (err) {
         if (err instanceof RunnerConfigError && err.code && !err.message.includes(err.code)) {
           err.message = `${err.code}: ${err.message}`;
@@ -4618,27 +4375,32 @@ function renderPretty(verb, data) {
 // `uninstall` and `git` (they resolve the main checkout themselves), `tool` (writes only the local status overlay),
 // and the verbs with a worktree guard of their own (`init`, `approve`, `sync-root`, `promote-to-component`,
 // `catchup`, `unclaim`, `return`, whose own registered-session check is deliberately more permissive).
-const ALLOWED_HOOK_KINDS = new Set(['dispatch-decide', 'decision-question', 'main-checkout-delete-guard', 'mailbox']);
+// The main-checkout delete guard keeps its own script (it answers in each agent's protocol itself); the other
+// in-process kinds are judged by src/runner/hook.mjs.
+const DELETE_GUARD_HOOK_KIND = 'main-checkout-delete-guard';
 
 async function handleHook(rest) {
   const [kind, ...flags] = rest;
+  const { IN_PROCESS_HOOK_KINDS, NATIVE_HOOK_KINDS, serveHook } = await import('../src/runner/hook.mjs');
+  const allowedKinds = [...IN_PROCESS_HOOK_KINDS, DELETE_GUARD_HOOK_KIND];
   if (!kind || kind === '--help' || kind === '-h') {
     process.stdout.write(
-      'Usage: fgos hook <dispatch-decide|decision-question|main-checkout-delete-guard|mailbox> [--format=standard|agy] [--cli <claude|codex> --event <stop|post-tool-use>]\n\n' +
+      `Usage: fgos hook <${allowedKinds.join('|')}> [--format=standard|agy]\n\n` +
         'Execute managed hook guards for supported coding agents (Claude, Codex, AGY, OMP, Pi).\n',
     );
     process.exit(0);
   }
 
-  if (!ALLOWED_HOOK_KINDS.has(kind)) {
-    process.stderr.write(`Error: Unknown hook kind "${kind}". Allowed kinds: ${[...ALLOWED_HOOK_KINDS].join(', ')}\n`);
+  if (NATIVE_HOOK_KINDS.includes(kind)) {
+    process.stderr.write(`Error: hook kind "${kind}" is served by the native fgos host; this direct-node channel does not run it. Run it through the project shim (.fgos/installation/bin/fgos hook ${kind}).\n`);
+    process.exit(1);
+  }
+  if (!allowedKinds.includes(kind)) {
+    process.stderr.write(`Error: Unknown hook kind "${kind}". Allowed kinds: ${allowedKinds.join(', ')}\n`);
     process.exit(1);
   }
 
-  // The native Rust host serves `hook mailbox` before this payload runs.
-  // This channel (npm bin, `node bin/fgos.mjs`) has no mailbox, so the hook
-  // stays quiet and never blocks or fails the CLI that called it.
-  if (kind === 'mailbox') process.exit(0);
+  if (kind !== DELETE_GUARD_HOOK_KIND) await serveHook(kind, flags);
 
   let rawStdin = '';
   try {
@@ -4646,116 +4408,12 @@ async function handleHook(rest) {
   } catch {
     rawStdin = '';
   }
-
-  let parsed = null;
-  if (rawStdin && rawStdin.trim()) {
-    try {
-      parsed = JSON.parse(rawStdin);
-    } catch {
-      parsed = null;
-    }
-  }
-
-  const isAgyFormat =
-    flags.includes('--format=agy') || (parsed && typeof parsed === 'object' && parsed.toolCall !== undefined);
-
-  if (isAgyFormat) {
-    if (kind === 'dispatch-decide') {
-      const toolInput = parsed?.toolCall?.args || {};
-      const payloadCwd =
-        Array.isArray(parsed?.workspacePaths) && parsed.workspacePaths[0]
-          ? parsed.workspacePaths[0]
-          : process.cwd();
-      const subagentType =
-        typeof toolInput.subagent_type === 'string' && toolInput.subagent_type.trim()
-          ? toolInput.subagent_type
-          : typeof toolInput.agent === 'string' && toolInput.agent.trim()
-            ? toolInput.agent
-            : 'general-purpose';
-
-      try {
-        const { decideExecutorCli } = await import('../src/runner/dispatch/cli.mjs');
-        const decided = await decideExecutorCli(undefined, {
-          cwd: payloadCwd,
-          for: subagentType,
-          needsSoul: true,
-          hasLiveTaskAccess: true,
-        });
-        if (decided.mechanism !== 'in-process') {
-          const { runDoorHint } = await import('../src/runner/dispatch/cli.mjs');
-          process.stdout.write(
-            JSON.stringify({
-              decision: 'deny',
-              reason: `BLOCKED: this subagent call resolves to out-of-process dispatch (no native in-process handler for "${subagentType}"). Run it through ${runDoorHint({ cwd: payloadCwd, executorId: decided.executorId, capability: subagentType })} instead.`,
-            }) + '\n',
-          );
-          process.exit(0);
-        }
-      } catch {
-        // fail-open
-      }
-      process.stdout.write(JSON.stringify({ decision: 'allow' }) + '\n');
-      process.exit(0);
-    } else if (kind === 'decision-question') {
-      const toolName = parsed?.toolCall?.name || '';
-      if (toolName === 'AskUserQuestion' || toolName === 'ask' || toolName === 'ask_question') {
-        try {
-          const { checkDecisionQuestion, describeDecisionQuestion } = await import(
-            '../src/state/decision-question.mjs'
-          );
-          const questions = Array.isArray(parsed?.toolCall?.args?.questions)
-            ? parsed.toolCall.args.questions
-            : [];
-          const textToCheck = questions
-            .flatMap((q) => [
-              q?.question,
-              Array.isArray(q?.options) && q.options.length > 0
-                ? `Options:\n${q.options.map((o) => `- ${o?.label ?? ''}: ${o?.description ?? ''}`).join('\n')}`
-                : '',
-            ])
-            .filter(Boolean)
-            .join('\n');
-          const missing = checkDecisionQuestion(textToCheck);
-          if (missing.length > 0) {
-            process.stdout.write(
-              JSON.stringify({
-                decision: 'deny',
-                reason: `BLOCKED: write the analysis before asking. Missing parts of the decision-question template: ${missing.map((p) => p.title).join(', ')}.\n${describeDecisionQuestion()}`,
-              }) + '\n',
-            );
-            process.exit(0);
-          }
-        } catch {
-          // fail-open
-        }
-      }
-      process.stdout.write(JSON.stringify({ decision: 'allow' }) + '\n');
-      process.exit(0);
-    }
-  }
-
-  const scriptPath = path.resolve(
-    path.dirname(fileURLToPath(import.meta.url)),
-    '..',
-    'scripts',
-    `${kind}-hook.mjs`,
-  );
-  if (!fs.existsSync(scriptPath)) {
-    process.stderr.write(`Error: Hook script not found at ${scriptPath}\n`);
-    process.exit(1);
-  }
-
-  const child = spawnSync(process.execPath, [scriptPath, ...flags], {
-    input: rawStdin,
-    stdio: ['pipe', 'inherit', 'inherit'],
-    env: process.env,
-  });
-
+  const scriptPath = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', 'scripts', `${kind}-hook.mjs`);
+  const child = spawnSync(process.execPath, [scriptPath, ...flags], { input: rawStdin, stdio: ['pipe', 'inherit', 'inherit'], env: process.env });
   if (child.error) {
     process.stderr.write(`Error invoking hook script: ${child.error.message}\n`);
     process.exit(1);
   }
-
   process.exit(child.status ?? (child.signal ? 1 : 0));
 }
 

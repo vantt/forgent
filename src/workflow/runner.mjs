@@ -163,6 +163,8 @@ async function runUnitWithRecovery(run, { step, u, unitData, state, base, attemp
     personaScope: run.personaScope,
     workflowId: workflow.id,
     overrides: unitOverridesOf(u, state.seats?.personas, { effort: state.effort, timeoutMs: state.timeoutMs, account: state.account ?? null, loopOf: loopFn }),
+    // A run-level account pin that no seat of a unit takes runs that unit unpinned: the pin applies where it is served.
+    accountPin: 'where-served',
     caseAdmission: run.port,
     caseRef: { caseId: workflowRunId, activity: step.id, unitId: u.id },
     onCaseAdmitted: ({ reservationId }) => recordScheduled(reservationId),

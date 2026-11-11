@@ -157,12 +157,19 @@ function requireFreeWorktree(port, worktree) {
   throw new CaseAdmissionRefusedError({ code: answer, condition: binding?.condition ?? `worktree ${worktree} is not free for a run that names no case: ${answer}${owner}` });
 }
 
+const ACCOUNT_PIN_MODES = ['strict', 'where-served'];
+
 /**
  * Refuse, before a unit run exists, what the calling door has no authority for (accepting a dependence, a
  * tier raised by an override or its persona: no door is authorized yet) and a pinned account that no seat
- * takes (unless only a Workflow run pinned it), that a seat it applies to refuses, or that is quarantined now.
+ * takes (unless the caller asked `accountPin: 'where-served'`), that a seat it applies to refuses, or that is
+ * quarantined now. A pin never moves a seat to another pool: `strict`, the default, refuses a run whose pin no
+ * seat takes; `where-served` runs such a unit unpinned and each seat's provenance keeps why.
  */
 async function assertDoorChoicesBeforeRun(unit, runnerConfig, options, collaboration, herdrPresent) {
+  if (options.accountPin !== undefined && !ACCOUNT_PIN_MODES.includes(options.accountPin)) {
+    throw new RunnerConfigError(`accountPin must be one of ${ACCOUNT_PIN_MODES.join(', ')}, got ${JSON.stringify(options.accountPin)}`, { phase: 'pre-admission' });
+  }
   const overrides = options.overrides ?? [];
   const objects = overrides.filter((o) => o && typeof o === 'object');
   if (options.raiseAuthorized !== true && objects.some((o) => o.acceptDependence === true)) {
@@ -189,8 +196,7 @@ async function assertDoorChoicesBeforeRun(unit, runnerConfig, options, collabora
   const refused = seats.find((r) => r.refused?.reason?.startsWith('account-pin'));
   if (refused) throw new RunnerConfigError(`cannot pin the account for seat "${refused.seat}": ${refused.refused.detail}`);
   if (!seats.some((r) => r.account)) {
-    // A pin that only a Workflow run set, and no seat takes, runs the unit unpinned; each seat's provenance keeps why.
-    if (objects.filter((o) => o.account !== undefined).every((o) => o.origin === 'workflow')) return;
+    if (options.accountPin === 'where-served') return;
     const why = seats.filter((r) => r.accountSkipped).map((r) => `seat "${r.seat}": ${r.accountSkipped.detail}`);
     throw new RunnerConfigError(`the pinned account applies to no seat of this unit${why.length ? ` (${why.join('; ')})` : ': no seat its override names binds here'}`);
   }
