@@ -5,7 +5,7 @@ envelope (canonical JSON digest, contract v3 plus the `external` section), the 0
 outbox, takes the attempt lock and hands it to `fgos internal supervise` at descriptor 3, then prints
 the attempt directory for the external host's `FGOS_ATTEMPT_DIR`.
 
-Read-only attempt, `linux-pgroup` containment, no steps: settle and bwrap are out of the spike.
+No steps (settle is out of the spike). `linux-pgroup` containment; with SANDBOX=1, `linux-gate` behind bwrap.
 
 Usage: python3 -I start-external-attempt.py <host-bin> <cli> <cli-abs-path> <cwd> <state-dir> [KEY=VALUE ...]
 """
@@ -14,6 +14,7 @@ import fcntl
 import hashlib
 import json
 import os
+import shutil
 import subprocess
 import sys
 import time
@@ -27,6 +28,43 @@ def canonical(value):
 
 def boottime_ns():
     return time.clock_gettime_ns(time.CLOCK_BOOTTIME)
+
+
+def sandbox(run_dir, socket_path, cwd, outbox, agent_env):
+    """`linux-gate` containment with the prefix the bwrap driver builds for a terminal attempt
+    (src/runner/dispatch/confinement/drivers/bwrap.mjs): read-only root, private /tmp, own PID
+    namespace with the gate as pid 1, the workspace, outbox and a private home writable, the socket
+    bound read-only under a masked runtime dir, the machine-private roots masked, and an empty `gate-exit.json` the gate fills in place.
+
+    The private home gets only `auth.json` of the Codex home, as the driver's `codex-home` source does;
+    `CODEX_HOME` and `HOME` point at it."""
+    home = os.path.join(os.path.dirname(os.path.dirname(run_dir)), "home")
+    os.makedirs(home, mode=0o700)
+    source = agent_env.get("CODEX_HOME")
+    if source:
+        shutil.copyfile(os.path.join(source, "auth.json"), os.path.join(home, "auth.json"))
+        os.chmod(os.path.join(home, "auth.json"), 0o600)
+    agent_env["CODEX_HOME"] = home
+    agent_env["HOME"] = home
+    # The gate keeps the host's environment under the envelope's: the host's TMPDIR points at a
+    # directory the read-only root hides from writes, and Codex's own sandbox locks a file there.
+    agent_env["TMPDIR"] = "/tmp"
+    gate_exit = os.path.join(run_dir, "gate-exit.json")
+    open(gate_exit, "w").close()
+    runtime = os.path.dirname(os.path.dirname(socket_path))
+    prefix = ["--ro-bind", "/", "/", "--dev", "/dev", "--proc", "/proc", "--tmpfs", "/tmp",
+              "--unshare-pid", "--as-pid-1", "--setenv", "FGOS_CONFINED", "1", "--die-with-parent"]
+    for path in (outbox, cwd, home, gate_exit):
+        prefix += ["--bind", path, path]
+    # The machine-private roots the driver hides from every confined dispatch, masked like the runtime dir.
+    hidden = [d for d in (os.path.expanduser("~/.fgos/private"), os.path.expanduser("~/.config/herdr")) if os.path.isdir(d)]
+    for d in hidden + [runtime]:
+        prefix += ["--tmpfs", d]
+    prefix += ["--ro-bind", socket_path, socket_path]
+    for d in hidden + [runtime]:
+        prefix += ["--remount-ro", d]
+    prefix += ["--"]
+    return {"preferred": "linux-gate", "bwrapPrefix": ["/usr/bin/bwrap", *prefix]}
 
 
 def main():
@@ -51,6 +89,10 @@ def main():
     os.write(fd, json.dumps({"v": 1, "attemptId": attempt_id, "env": {}, "controlEpoch": 0, "controlToken": "spike"}).encode())
     os.close(fd)
 
+    containment = {"preferred": "linux-pgroup"}
+    if os.environ.get("SANDBOX") == "1":
+        containment = sandbox(run_dir, socket_path, os.path.abspath(cwd), outbox, agent_env)
+
     body = {
         "v": 3,
         "attemptId": attempt_id,
@@ -74,7 +116,7 @@ def main():
                 "stderr": os.path.join(capture_dir, "stderr.log"),
             },
         },
-        "containment": {"preferred": "linux-pgroup"},
+        "containment": containment,
         "deadlines": {
             "softAt": None,
             "idleMs": None,

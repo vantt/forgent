@@ -71,7 +71,34 @@ Fix: the host binary started as `fgos-exec-<cli>` is `fgos exec <cli>`; paseo's 
 `fgos-codex` lists the same modes as `codex` (with `Auto-review`), codex starts with `--enable goals`, and an
 archived agent still ends as receipt `exited`. Who creates the link (setup, a doctor row) belongs to the adapter.
 
+## Result behind bwrap (2026-11-11, `linux-gate`)
+
+`live.sh sandbox` writes the envelope with `containment: linux-gate` and the prefix the bwrap driver builds for
+a terminal attempt (read-only root, private `/tmp`, own PID namespace with the gate as pid 1, workspace, outbox
+and private home writable, the socket bound read-only under the masked runtime dir, `~/.fgos/private` and
+`~/.config/herdr` masked, an empty `gate-exit.json` bound in). `live.sh probe` runs the agent. No Rust change.
+
+| Check | Result |
+|---|---|
+| Bind | `supervisor-binding.json` domain `linux-gate`, guarantee `kernel`; agent pid 2 in its own namespace, gate pid 1 |
+| Steer | "BANANA" during `sleep 40`; the command ran on and printed `step1` |
+| Writes | inside the workspace: written; in the paseo state dir: `read-only file system` |
+| Masks | `~/.fgos/private` reads empty; `/run/user/<uid>` holds only the attempt's socket |
+| Close | archive: gate fills `gate-exit.json` in place, receipt `exited` |
+| Cancel | `cancel-requested.json` during `sleep 40`: receipt `cancelled` within 1 s, `sleep` gone |
+
+Two things the adapter must do, both found live:
+
+1. **Path variables of the host's environment.** The gate keeps the host's environment under the envelope's. The
+   paseo daemon's `TMPDIR` pointed into the read-only root, and every Codex shell command panicked on its sandbox
+   lock there. The harness sets `TMPDIR=/tmp` in the envelope env; the adapter must override every host path
+   variable that points outside the grants (at least `TMPDIR`, and `HOME`/`CODEX_HOME` to the private home).
+2. **The CLI's own sandbox off.** Codex's sandbox is a second bwrap and cannot create a namespace inside fgOS's
+   ("No permissions to create a new namespace"). fgOS's own confined Codex invocations already pass
+   `-s danger-full-access`; through paseo that is the agent mode `full-access`, so the adapter starts the agent in
+   that mode (or the provider pins it).
+
 ## Not in the spike
 
 Runner adapter `paseo-spawn` in `bind()`, the settle and finalize-home steps (the harness writes `steps: []`),
-bwrap, spec and contract edits, doctor rows.
+spec and contract edits, doctor rows.
