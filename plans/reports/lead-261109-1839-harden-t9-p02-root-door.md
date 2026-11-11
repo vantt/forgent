@@ -1,6 +1,6 @@
 # HARDEN T9 P02 - invocation-root door
 
-Branch `harden/t9-p02-root-door` from `origin/main` `5ec8addad`. Status: see the end.
+Branch `harden/t9-p02-root-door` from `origin/main` `5ec8addad`. Status: DONE. Full `npm test` on the last code state: 8627 pass, 1 fail (the known V7n addendum), no ERROR lines.
 
 ## What changed
 
@@ -50,6 +50,7 @@ bin -57 (+44/-101), src -2 net (+138/-117 over paths, host-bin, fanout, lock-sta
 
 ## Lessons
 
+- OPC's fail-closed review: a read error under a destructive policy must refuse, not fall back to cwd; a throwing facts reader injected in the unit test is the proof. The one exception (no Git door installed, so an unactivated package can be uninstalled) is never allowed to the destructive policy.
 - A `--dir` validation under `main-checkout` broke tests and real flows (`setup --dir <project>` from elsewhere); a destructive verb needs its own policy. Run the wide `test/cli test/setup` sets before deciding a guard's breadth.
 - `run-tests.mjs` takes files, not directories; pass `test/cli/*.test.mjs`.
 - A `git commit` fails on census drift after every source edit; squash the WIP commits before rebasing, otherwise the census conflicts at each commit.
