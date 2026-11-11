@@ -8,6 +8,10 @@
 /// Envelope v3: reading, digest, side file.
 pub mod envelope;
 
+/// `fgos exec <cli>`: the door an external agent host starts instead of the agent CLI.
+#[cfg(unix)]
+pub mod exec;
+
 /// The `fgos internal gate` route: pid 1 of the attempt's process domain.
 pub mod gate;
 

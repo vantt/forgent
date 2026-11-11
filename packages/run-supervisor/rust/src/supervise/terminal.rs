@@ -141,15 +141,15 @@ impl Plan {
     }
 }
 
-/// The attempt's listening socket; the path is removed when this goes.
-struct AttemptSocket {
+/// The attempt's listening socket; the path is removed when this goes. Shared with the external mode.
+pub(super) struct AttemptSocket {
     listener: Option<UnixListener>,
     path: PathBuf,
 }
 
 impl AttemptSocket {
     /// Bind inside a directory only this user can use, mode 0600.
-    fn bind(path: &Path) -> Result<AttemptSocket, String> {
+    pub(super) fn bind(path: &Path) -> Result<AttemptSocket, String> {
         if path.as_os_str().len() > MAX_SOCKET_PATH {
             return Err(format!(
                 "socket path {} is longer than {MAX_SOCKET_PATH} bytes",
@@ -180,7 +180,7 @@ impl AttemptSocket {
 
     /// The gate's connection: same uid, first frame HELLO for this attempt. Anything else is dropped
     /// and the wait goes on, so a stranger cannot take the gate's place or end the wait.
-    fn accept_gate(&self, attempt_id: &str, limit: Duration) -> Option<UnixStream> {
+    pub(super) fn accept_gate(&self, attempt_id: &str, limit: Duration) -> Option<UnixStream> {
         let listener = self.listener.as_ref()?;
         // SAFETY: getuid has no failure mode.
         let me = unsafe { libc::getuid() };
@@ -207,7 +207,7 @@ impl AttemptSocket {
     }
 
     /// No second connection is taken once the gate is in, or when it never came.
-    fn close(&mut self) {
+    pub(super) fn close(&mut self) {
         self.listener = None;
         let _ = fs::remove_file(&self.path);
     }
@@ -220,7 +220,11 @@ impl Drop for AttemptSocket {
 }
 
 /// One frame with descriptors riding on it (`SCM_RIGHTS`).
-fn send_frame_with_fds(stream: &UnixStream, frame: &Value, fds: &[RawFd]) -> std::io::Result<()> {
+pub(super) fn send_frame_with_fds(
+    stream: &UnixStream,
+    frame: &Value,
+    fds: &[RawFd],
+) -> std::io::Result<()> {
     let body = serde_json::to_vec(frame).map_err(std::io::Error::other)?;
     let mut wire = (body.len() as u32).to_be_bytes().to_vec();
     wire.extend_from_slice(&body);
@@ -461,7 +465,7 @@ fn foreground_facts(gate: u32) -> String {
 }
 
 /// The process a `{host, bootId, pidNs, pid, startTime}` record names.
-fn tuple_of(record: &Value) -> Option<ProcTuple> {
+pub(super) fn tuple_of(record: &Value) -> Option<ProcTuple> {
     Some(ProcTuple {
         host: record["host"].as_str()?.to_string(),
         boot_id: record["bootId"].as_str().map(String::from),
@@ -471,7 +475,7 @@ fn tuple_of(record: &Value) -> Option<ProcTuple> {
     })
 }
 
-fn domain_of(kind: &str, gate: ProcTuple) -> Result<Domain, String> {
+pub(super) fn domain_of(kind: &str, gate: ProcTuple) -> Result<Domain, String> {
     match kind {
         "linux-gate" => Ok(Domain::LinuxGate(gate)),
         "linux-pgroup" => Ok(Domain::LinuxPgroup(gate)),

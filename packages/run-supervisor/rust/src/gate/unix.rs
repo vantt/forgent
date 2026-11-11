@@ -19,7 +19,7 @@ use serde_json::{json, Value};
 
 use super::{
     ceiling_left, go_matches, load_config, publish_gate_exit, read_side_env, read_stop, Config,
-    GateArgs, GoEnd, StartError, Stop, EXIT_NO_GO,
+    GateArgs, GoEnd, LaunchMode, StartError, Stop, EXIT_NO_GO,
 };
 use crate::go_channel::{write_frame, FrameBuf, FrameError};
 use crate::route::{report, EXIT_ENVELOPE_INVALID, EXIT_INTERNAL};
@@ -50,14 +50,36 @@ pub fn run(args: &GateArgs) -> i32 {
             return EXIT_INTERNAL;
         }
     };
-    let config = match load_config(&args.envelope) {
+    let mut config = match load_config(&args.envelope) {
         Ok(config) => config,
         Err(why) => {
             report("gate", "envelope-invalid", &why);
             return EXIT_ENVELOPE_INVALID;
         }
     };
-    if config.terminal != matches!(args.go, GoEnd::Socket(_)) {
+    // The external host chose the agent's arguments (the CLI's protocol mode); the program stays the
+    // envelope's. No other mode takes arguments from outside the envelope.
+    match (config.mode, &args.agent_argv) {
+        (LaunchMode::External, Some(argv)) => config.args = argv.clone(),
+        (LaunchMode::External, None) => {
+            report(
+                "gate",
+                "envelope-invalid",
+                "an external gate needs --agent-argv",
+            );
+            return EXIT_ENVELOPE_INVALID;
+        }
+        (_, Some(_)) => {
+            report(
+                "gate",
+                "envelope-invalid",
+                "--agent-argv is for the external mode only",
+            );
+            return EXIT_ENVELOPE_INVALID;
+        }
+        (_, None) => {}
+    }
+    if config.mode.dials_socket() != matches!(args.go, GoEnd::Socket(_)) {
         report(
             "gate",
             "envelope-invalid",
@@ -75,11 +97,11 @@ pub fn run(args: &GateArgs) -> i32 {
         );
         return EXIT_INTERNAL;
     }
-    // Own PDEATHSIG in the terminal gate rather than relying on bwrap's
-    // --die-with-parent surviving setup and exec with --as-pid-1.
+    // Own PDEATHSIG in a gate that has a carrier (a pane, an external host) rather than relying on
+    // bwrap's --die-with-parent surviving setup and exec with --as-pid-1.
     // Direct gates deliberately survive their monitor for later adoption.
     #[cfg(target_os = "linux")]
-    if config.terminal && is_init {
+    if config.mode.dials_socket() && is_init {
         if let Err(err) = fgos_process::control::arm_parent_death_signal() {
             report("gate", "parent-death-setup-failed", &err.to_string());
             return EXIT_INTERNAL;
@@ -127,7 +149,7 @@ pub fn run(args: &GateArgs) -> i32 {
     }
     // The attempt lock, and the dispatch-cwd lease when the envelope is mutating, ride on GO.
     // The gate holds them until it exits; they are close-on-exec, so nothing it starts inherits them.
-    let expected_locks = if config.terminal {
+    let expected_locks = if config.mode.dials_socket() {
         1 + usize::from(config.mutating)
     } else {
         0
@@ -458,9 +480,10 @@ fn supervise_agent(
     let mut status: Option<ExitStatus> = None;
     let mut agent_pid: Option<libc::pid_t> = None;
     let mut agent_tuple: Option<facts::ProcTuple> = None;
-    let mut channel = config.terminal.then_some(Channel {
+    let mut channel = config.mode.dials_socket().then_some(Channel {
         frames: arrived.rest,
-        brief_delivered: false,
+        // An external agent has no brief from fgOS: its host sends the prompt through the CLI's protocol.
+        brief_delivered: config.mode == LaunchMode::External,
         gone: false,
         result_seen: None,
     });
@@ -588,7 +611,7 @@ fn supervise_agent(
     }
 
     end_domain(agent_pid, agent_tuple.as_ref(), pid1);
-    if config.terminal {
+    if config.mode == LaunchMode::Terminal {
         give_back_foreground();
     }
 
@@ -650,11 +673,14 @@ fn spawn_agent(
         );
         cmd.current_dir("/");
     }
-    cmd.args(&config.args)
-        .env_clear()
-        .envs(&config.env)
-        .envs(&secrets);
-    if config.terminal {
+    cmd.args(&config.args);
+    // An external agent keeps its host's environment (the host's own launch settings, its locale, its
+    // PATH); every other agent starts from nothing. The envelope's map and the secrets win either way.
+    if config.mode != LaunchMode::External {
+        cmd.env_clear();
+    }
+    cmd.envs(&config.env).envs(&secrets);
+    if config.mode == LaunchMode::Terminal {
         // The gate runs in the pane, so these are the pane's own values: its terminal type and which
         // pane, tab and server it belongs to. What the controller had (another pane, or none) must never
         // replace them, and the cleared environment must not lose them: a full-screen agent without a
@@ -669,7 +695,22 @@ fn spawn_agent(
         Some(anchor) => cmd.env("FGOS_PIDNS_ANCHOR", anchor.to_string()),
         None => cmd.env_remove("FGOS_PIDNS_ANCHOR"),
     };
-    if config.terminal {
+    if config.mode == LaunchMode::External {
+        // The host's pipes are the agent's: it speaks the CLI's protocol over them, and fgOS copies
+        // nothing. The agent leads a session of its own so a stop reaches its whole group.
+        cmd.stdin(Stdio::inherit())
+            .stdout(Stdio::inherit())
+            .stderr(Stdio::inherit());
+        // SAFETY: setsid is async-signal-safe.
+        unsafe {
+            cmd.pre_exec(|| {
+                if libc::setsid() < 0 {
+                    return Err(io::Error::last_os_error());
+                }
+                Ok(())
+            });
+        }
+    } else if config.mode == LaunchMode::Terminal {
         // The agent is the pane's REPL: it keeps the pane's tty on all three descriptors and, with no
         // session of its own (a pane's tty belongs to the shell's session), leads a process group that is
         // made the tty's foreground group before it starts.

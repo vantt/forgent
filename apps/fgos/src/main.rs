@@ -202,6 +202,18 @@ fn main() {
         std::process::exit(fgos_holder_lock::route::main(&args[2..]));
     }
 
+    // `fgos exec <cli> [args...]`: the command an external agent host starts in place of the agent CLI.
+    // It replaces this process (exec), so it runs before the route table, the composition root and any
+    // spawn: the host's pipes must reach the agent untouched.
+    #[cfg(unix)]
+    if args.get(1).is_some_and(|a| a == "exec") {
+        let rest: Vec<String> = args[2..]
+            .iter()
+            .map(|a| a.to_string_lossy().into_owned())
+            .collect();
+        std::process::exit(fgos_run_supervisor::exec::main(&rest));
+    }
+
     let cli_args = if args.len() > 1 { &args[1..] } else { &[] };
 
     // R1: No host-global options are recognized in R1 -- the first positional

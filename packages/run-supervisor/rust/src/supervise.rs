@@ -36,6 +36,8 @@ use crate::route::{
 use fgos_identity::text::iso_utc_now;
 
 #[cfg(unix)]
+mod external;
+#[cfg(unix)]
 mod terminal;
 #[cfg(unix)]
 mod unix;
@@ -551,10 +553,9 @@ fn supervise(args: &SuperviseArgs) -> Result<i32, Refusal> {
         .as_str()
         .map(PathBuf::from)
         .ok_or_else(|| invalid("runDir missing"))?;
-    let terminal = match envelope["mode"].as_str() {
-        Some("direct") => false,
-        Some("terminal") => true,
-        _ => return Err(invalid("mode must be direct or terminal")),
+    let mode = match envelope["mode"].as_str() {
+        Some(mode @ ("direct" | "terminal" | "external")) => mode,
+        _ => return Err(invalid("mode must be direct, terminal or external")),
     };
     // A supervisor already ran this attempt (or its receipt exists): a second one would take the lock and,
     // by the predecessor rule, end the live domain the first one left running. Leave the attempt to adopt.
@@ -571,8 +572,10 @@ fn supervise(args: &SuperviseArgs) -> Result<i32, Refusal> {
         code: "envelope-invalid",
         why,
     })?;
-    if terminal {
-        return supervise_terminal(&envelope, &run_dir, locks, &watch);
+    match mode {
+        "terminal" => return supervise_terminal(&envelope, &run_dir, locks, &watch),
+        "external" => return supervise_external(&envelope, &run_dir, locks, &watch),
+        _ => {}
     }
 
     let driver = open_driver(&envelope).map_err(Refusal::internal)?;
@@ -713,6 +716,30 @@ fn supervise_terminal(
     watch: &Watch,
 ) -> Result<i32, Refusal> {
     terminal::run(envelope, run_dir, locks, watch)
+}
+
+#[cfg(unix)]
+fn supervise_external(
+    envelope: &Value,
+    run_dir: &Path,
+    locks: os::Locks,
+    watch: &Watch,
+) -> Result<i32, Refusal> {
+    external::run(envelope, run_dir, locks, watch)
+}
+
+#[cfg(not(unix))]
+fn supervise_external(
+    _envelope: &Value,
+    _run_dir: &Path,
+    _locks: os::Locks,
+    _watch: &Watch,
+) -> Result<i32, Refusal> {
+    Err(Refusal {
+        exit: EXIT_INTERNAL,
+        code: "external-mode-unsupported",
+        why: "the external launch mode has no driver on this platform".into(),
+    })
 }
 
 #[cfg(not(unix))]

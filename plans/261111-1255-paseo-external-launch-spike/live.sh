@@ -1,0 +1,38 @@
+#!/bin/sh
+# Spike live check: paseo starts codex through `fgos exec` as an external attempt.
+# Subcommands: attempt | run <attemptDir> | steer <agent> | tree <attemptDir> | stop <agent> | show <attemptDir>
+set -eu
+W=/home/vantt/projects/forgent-worktrees/paseo-external-spike
+S=/home/vantt/projects/forgent/.fgos/runtime/tmp/paseo-run
+HOST="$W/target/debug/fgos"
+PASEO() { (cd "$S" && npx --no-install paseo --host 127.0.0.1:6797 "$@"); }
+
+case "$1" in
+  attempt)
+    mkdir -p "$S/work-ext" "$S/state"
+    python3 -I "$W/plans/261111-1255-paseo-external-launch-spike/start-external-attempt.py" \
+      "$HOST" codex /home/vantt/.local/bin/codex "$S/work-ext" "$S/state" CODEX_HOME=/home/vantt/.codex-tetnu
+    ;;
+  run)
+    PASEO run --no-wait --json --provider fgos-codex --env "FGOS_ATTEMPT_DIR=$2" --cwd "$S/work-ext" --title ext-steer \
+      "Run the shell command 'sleep 40; echo step1' (one command, wait for it). Then summarize. If a new message arrives while you work, answer it in your next reply."
+    ;;
+  steer)
+    date -u +%T.%N
+    PASEO send --no-wait --behavior steer "$2" "MAILTEST6: reply with the word BANANA right now and say what you are doing."
+    ;;
+  wait) PASEO wait "$2" --timeout 3m >/dev/null 2>&1 || true; PASEO logs "$2" | tail -8 ;;
+  stop) PASEO stop "$2" ;;
+  respawn)
+    # What a host reopening the agent would do: start the gate again for the same attempt.
+    set +e
+    FGOS_ATTEMPT_DIR="$2" timeout 20 "$HOST" exec codex app-server </dev/null
+    echo "second spawn exit=$?"
+    ;;
+  tree)
+    for f in supervisor-binding.json agent-binding.json gate-exit.json receipt.json closed.json; do
+      [ -s "$2/$f" ] && { echo "== $f"; cat "$2/$f"; echo; }
+    done
+    echo "== supervisor.log"; tail -5 "$2/supervisor.log"
+    ;;
+esac

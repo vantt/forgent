@@ -65,15 +65,24 @@ pub struct GateArgs {
     pub lock_fds: Vec<u32>,
     /// The attempt's named job (Windows): the gate opens it to be a second holder.
     pub job_name: Option<String>,
+    /// `external` mode: the arguments the external host gave `fgos exec`, which replace `launch.args`.
+    pub agent_argv: Option<Vec<String>>,
 }
 
 impl GateArgs {
     /// Parse the arguments after `internal gate`:
-    /// `--protocol 1 --envelope <path> (--go-fd N | --go-socket <path>) [--lock-fds 3,4] [--job-name <name>]`.
+    /// `--protocol 1 --envelope <path> (--go-fd N | --go-socket <path>) [--lock-fds 3,4] [--job-name <name>] [--agent-argv <json array>]`.
     pub fn parse(args: &[String]) -> Result<GateArgs, ArgsError> {
         let flags = Flags::parse(
             args,
-            &["envelope", "go-fd", "go-socket", "lock-fds", "job-name"],
+            &[
+                "envelope",
+                "go-fd",
+                "go-socket",
+                "lock-fds",
+                "job-name",
+                "agent-argv",
+            ],
             0,
         )?;
         let envelope = PathBuf::from(flags.require("envelope")?);
@@ -94,11 +103,18 @@ impl GateArgs {
                 .collect::<Result<_, _>>()?,
             None => Vec::new(),
         };
+        let agent_argv = match flags.get("agent-argv") {
+            Some(text) => Some(serde_json::from_str::<Vec<String>>(text).map_err(|e| {
+                ArgsError::Usage(format!("--agent-argv is not a JSON array of strings: {e}"))
+            })?),
+            None => None,
+        };
         Ok(GateArgs {
             envelope,
             go,
             lock_fds,
             job_name: flags.get("job-name").map(String::from),
+            agent_argv,
         })
     }
 }
@@ -126,6 +142,26 @@ pub fn run(args: &[String]) -> i32 {
     }
 }
 
+/// The envelope's `mode`.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum LaunchMode {
+    /// The gate owns the agent's IO (capture files, stdin) and survives its supervisor.
+    Direct,
+    /// The agent is a pane's interactive program; the GO channel is a socket.
+    Terminal,
+    /// An external agent host started `fgos exec`: the agent keeps the host's stdio and the host speaks
+    /// the CLI's protocol directly; the GO channel is a socket.
+    External,
+}
+
+#[cfg(unix)]
+impl LaunchMode {
+    /// The modes whose gate dials the supervisor's socket and receives the locks with GO.
+    pub(crate) fn dials_socket(self) -> bool {
+        matches!(self, LaunchMode::Terminal | LaunchMode::External)
+    }
+}
+
 /// What the gate reads from the envelope.
 pub(crate) struct Config {
     pub(crate) attempt_id: String,
@@ -145,9 +181,9 @@ pub(crate) struct Config {
     pub(crate) grace: Duration,
     /// The current boot, read once.
     pub(crate) boot_id: Option<String>,
-    /// `terminal`: the agent runs in a pane and the supervisor may disappear while it runs.
+    /// How the agent is carried: by the gate alone, in a pane, or by an external host that owns its stdio.
     #[cfg(unix)]
-    pub(crate) terminal: bool,
+    pub(crate) mode: LaunchMode,
     /// The envelope says the dispatch cwd is held by a lease, so a second lock description comes with GO.
     #[cfg(unix)]
     pub(crate) mutating: bool,
@@ -196,23 +232,37 @@ pub(crate) fn load_config(path: &Path) -> Result<Config, String> {
         (Some(boot), Some(ns)) => Some((boot.to_string(), ns)),
         _ => None,
     };
-    let terminal = match value["mode"].as_str() {
-        Some("terminal") => true,
-        Some("direct") => false,
+    let mode = match value["mode"].as_str() {
+        Some("terminal") => LaunchMode::Terminal,
+        Some("direct") => LaunchMode::Direct,
+        Some("external") => LaunchMode::External,
         _ => return Err("envelope field mode missing".into()),
     };
     #[cfg(unix)]
-    let orphan_settle = match (terminal, value["terminal"]["orphanSettleMs"].as_u64()) {
-        (true, Some(ms)) => Duration::from_millis(ms),
-        (true, None) => return Err("a terminal envelope needs terminal.orphanSettleMs".into()),
-        (false, _) => Duration::ZERO,
+    let orphan_settle = match mode {
+        LaunchMode::Direct => Duration::ZERO,
+        LaunchMode::Terminal | LaunchMode::External => {
+            let section = if mode == LaunchMode::Terminal {
+                "terminal"
+            } else {
+                "external"
+            };
+            match value[section]["orphanSettleMs"].as_u64() {
+                Some(ms) => Duration::from_millis(ms),
+                None => {
+                    return Err(format!(
+                        "a {section} envelope needs {section}.orphanSettleMs"
+                    ))
+                }
+            }
+        }
     };
-    // Only the Unix gate has a terminal mode; the mode is still validated everywhere.
+    // Only the Unix gate has the socket modes; the mode is still validated everywhere.
     #[cfg(windows)]
-    let _ = terminal;
+    let _ = mode;
     Ok(Config {
         #[cfg(unix)]
-        terminal,
+        mode,
         #[cfg(unix)]
         mutating: value["mutation"] == "mutating",
         #[cfg(unix)]
@@ -473,7 +523,8 @@ mod tests {
                 envelope: "/e.json".into(),
                 go: GoEnd::Fd(5),
                 lock_fds: vec![3, 4],
-                job_name: None
+                job_name: None,
+                agent_argv: None
             }
         );
         let pipe = GateArgs::parse(&argv(&[
@@ -493,7 +544,8 @@ mod tests {
                 envelope: "/e.json".into(),
                 go: GoEnd::Socket("p".into()),
                 lock_fds: vec![],
-                job_name: Some("Local\\j".into())
+                job_name: Some("Local\\j".into()),
+                agent_argv: None
             }
         );
         assert_eq!(
