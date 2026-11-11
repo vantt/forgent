@@ -67,7 +67,7 @@ import { enableCancelOnSignal } from '../src/run-supervisor/cancel-opt-in.mjs';
 // copy's own on-disk location" approach `integrationScriptPath()` already
 // uses in src/setup/registrations.mjs.
 const PACKAGE_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-import { resolveFgosDir, fgosDirFromRoot, resolveMainCheckoutRoot } from '../src/runner/paths.mjs';
+import { resolveInvocationRoot, fgosDirFromRoot } from '../src/runner/paths.mjs';
 import { resolveFgosFile, FGOS_FILE } from '../src/state/fgos-file-registry.mjs';
 import { resolveCliVersionInfo } from '../src/cli/version.mjs';
 import { hasRealVerify } from '../src/intake/discovery.mjs';
@@ -111,7 +111,7 @@ import { HolderLockError, createLockScope } from '../src/holder-lock/index.mjs';
 import { collectLockStatus } from '../src/runner/lock-status.mjs';
 import { fenceLock, parseLockParams } from '../src/runner/lock-fence.mjs';
 import { formatLockDurationMs } from '../src/util/format-lock-duration.mjs';
-import { clearBeaconIfOwn, readBeacon } from '../src/runner/main-checkout-activity.mjs';
+import { clearBeaconIfOwn } from '../src/runner/main-checkout-activity.mjs';
 import { resolveWriterIdentity } from '../src/util/session-identity.mjs';
 import { resolveStateRoot as worktreeStateRoot } from '../src/holder-lock/state-root.mjs';
 import { createSession, endSession, listSessions, reclaimOrphanedSessions, isSessionWorktree, SessionError } from '../src/runner/session.mjs';
@@ -134,24 +134,17 @@ import { formatCheck, bold } from '../src/setup/ansi.mjs';
 // overridable by a later edit.
 const SUBMIT_VERIFY_SENTINEL = 'chưa xác định — P15 bổ sung';
 
-// `overrideDir` (tsk-56t D1): an explicit, opt-in escape hatch alongside D5's
-// strict cwd resolution, never a replacement for it — omitting `--dir`
-// leaves every existing caller byte-identical to before this cell. A
-// worktree-resident session (no `.fgos/` at its own cwd, per ADR0020) passes
-// `--dir <mainRoot>` to reach the one real store explicitly, instead of the
-// CLI silently git-resolving upward (which would reopen D5 for every caller,
-// not just this one).
-function dataDir(overrideDir) {
-  if (overrideDir !== undefined) {
-    if (typeof overrideDir !== 'string' || !overrideDir.trim()) {
-      throw new StoreError('validation', '--dir requires a non-empty path value');
-    }
-    return fgosDirFromRoot(overrideDir);
-  }
-  // strict: true — this CLI's `.fgos/` always lives under the caller's own
-  // cwd, never git-resolved upward (D5: the pull door's `take`/`return`
-  // operate directly on `cwd`, never a worktree).
-  return resolveFgosDir(process.cwd(), { strict: true });
+// The root a verb that acts on the main checkout (setup, doctor, uninstall, git, unclaim, wire-agents,
+// resync-worktree, main-checkout-reset) takes, from `cwd` or from the checkout `--dir` names.
+// `--dir` is taken as the project root the caller names; `main-checkout-only` (a destructive verb) requires it to be
+// the main root of the repository the command runs in.
+function mainCheckoutRootOf(flags, cwd = process.cwd(), policy = 'main-checkout') {
+  return resolveInvocationRoot({ cwd, dir: flags.dir, policy }).root;
+}
+
+// The main checkout of the repository `cwd` sits in (`cwd` itself outside a repository).
+function mainCheckoutRootAt(cwd) {
+  return mainCheckoutRootOf({}, cwd);
 }
 
 // `main-checkout-reset` reads: the commits a reset would drop and the whole-repo status, both through
@@ -467,7 +460,7 @@ function resolveVerifyTimeoutMs(verb, flags, repoRoot) {
     return timeoutMs;
   }
   // The config is the main checkout's; a session worktree reaches it only through a `.fgos` link, which the door refuses.
-  return loadRunnerConfigForDir(resolveMainCheckoutRoot(repoRoot) ?? repoRoot).timeoutMs;
+  return loadRunnerConfigForDir(mainCheckoutRootAt(repoRoot)).timeoutMs;
 }
 
 /**
@@ -1052,7 +1045,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
 
     case 'git': {
       const sub = positional[0];
-      const root = flags.dir !== undefined ? path.dirname(dir) : (resolveMainCheckoutRoot(process.cwd()) ?? process.cwd());
+      const root = mainCheckoutRootOf(flags);
       if (sub === 'status') {
         return readGitStatus(root);
       }
@@ -1247,13 +1240,13 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       // `path.dirname(dir)`, not `process.cwd()` (tsk-5hv, found by
       // fgos-coding-implement): `dir` already reflects `--dir` when given
       // (every skill's own hard rule: resolve the main checkout and pass
-      // it explicitly) or `process.cwd()` when omitted (dataDir()'s own
+      // it explicitly) or `process.cwd()` when omitted (the invocation-root door's own
       // documented cwd-strict contract) -- reusing it here instead of a
       // bare `process.cwd()` is what keeps this call correct for a
       // worktree-resident session, since `.fgos/config.json` is
       // unconditionally wiped from every freshly-created worktree
       // (ADR0020) and a bare cwd would silently resolve to nothing there.
-      const cfg = loadRunnerConfigForDir(resolveMainCheckoutRoot(path.dirname(dir)) ?? path.dirname(dir));
+      const cfg = loadRunnerConfigForDir(mainCheckoutRootAt(path.dirname(dir)));
       const callerVerdict = parseDiscoverCallerVerdict(flags);
       const repoRoot = path.dirname(dir);
       const list = listWork(dir).work;
@@ -1289,7 +1282,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       const id = requireField(positional[0] ?? flags.id, 'plan requires an id: fgos plan <id>');
       // path.dirname(dir), not process.cwd() -- see the discover case above
       // for why (tsk-5hv, found by fgos-coding-implement).
-      const cfg = loadRunnerConfigForDir(resolveMainCheckoutRoot(path.dirname(dir)) ?? path.dirname(dir));
+      const cfg = loadRunnerConfigForDir(mainCheckoutRootAt(path.dirname(dir)));
       const callerVerdict = parsePlanCallerVerdict(flags);
       const repoRoot = path.dirname(dir);
       const list = listWork(dir).work;
@@ -3180,7 +3173,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       // the stable main checkout — deriving repoRoot from it keeps every
       // git op in this handler targeting that stable root instead of the
       // caller's own possibly-transient cwd. Byte-identical to before when
-      // --dir is omitted (dataDir() resolves dir from process.cwd() too in
+      // --dir is omitted (the invocation-root door resolves dir from process.cwd() too in
       // that case).
       const repoRoot = path.dirname(dir);
 
@@ -3312,7 +3305,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       // never `process.cwd()`: a session returning from inside a worktree
       // would otherwise read that branch's own possibly-stale copy of
       // config.json instead of the project's real one.
-      const invariantCheckCommands = readInvariantCheckCommands(resolveMainCheckoutRoot(path.dirname(dir)) ?? path.dirname(dir));
+      const invariantCheckCommands = readInvariantCheckCommands(mainCheckoutRootAt(path.dirname(dir)));
 
       const view = listWork(dir);
       const item = view.work[id];
@@ -3791,7 +3784,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       // deriving repoRoot from it keeps catchup's Sync and its trusted
       // main resolution on that stable root instead of the worktree
       // currently checked out on the item's own branch. Byte-identical to today when
-      // --dir is omitted (dataDir() resolves dir from process.cwd() too
+      // --dir is omitted (the invocation-root door resolves dir from process.cwd() too
       // in that case). This verb has no `--trust-dir` gate, unlike
       // approve/sync-root/promote-to-component — a real per-verb
       // difference the adapter owns.
@@ -3812,7 +3805,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       if (sub === 'create') {
         if (positional.length !== 2) throw new Error('usage: fgos worktree create <path> [--branch <name> | --detach] [--base <ref>] [--json]');
         const cwd = process.cwd();
-        const repoRoot = resolveMainCheckoutRoot(cwd) ?? cwd;
+        const repoRoot = mainCheckoutRootAt(cwd);
         const stateRoot = worktreeStateRoot({ fgosDir: path.join(repoRoot, '.fgos') }).stateRoot;
         const writer = gitWriter(path.join(repoRoot, '.fgos'));
         const { createWorktreeUseCase } = await import('../src/verbs/worktree/create.mjs');
@@ -3824,7 +3817,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       if (sub === 'remove') {
         if (positional.length !== 2) throw new Error('usage: fgos worktree remove <path> --delivered-to <ref> [--discard-ignored] [--json]');
         const cwd = process.cwd();
-        const repoRoot = resolveMainCheckoutRoot(cwd) ?? cwd;
+        const repoRoot = mainCheckoutRootAt(cwd);
         const stateRoot = worktreeStateRoot({ fgosDir: path.join(repoRoot, '.fgos') }).stateRoot;
         const writer = gitWriter(path.join(repoRoot, '.fgos'));
         const { removeWorktreeUseCase } = await import('../src/verbs/worktree/remove.mjs');
@@ -4014,7 +4007,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       // `resync-worktree` (:4939) — setup's writes are unconditional (tsk-5hi),
       // so run from a linked worktree this used to materialize .fgos/config.json
       // INSIDE the worktree (ADR0020 violation), not just report wrong.
-      const repoRoot = flags.dir !== undefined ? path.dirname(dir) : (resolveMainCheckoutRoot(process.cwd()) ?? process.cwd());
+      const repoRoot = mainCheckoutRootOf(flags);
       const { integrationScriptPath, runFixes } = await import('../src/setup/checks.mjs');
       const { installGitHooks } = await import('../src/setup/git-hooks.mjs');
       const { installClaudeCodeHook } = await import('../src/setup/claude-code-hooks.mjs');
@@ -4156,7 +4149,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         );
       }
       // tsk-2xj: same --dir resolution as `doctor`/`setup` above.
-      const repoRoot = flags.dir !== undefined ? path.dirname(dir) : (resolveMainCheckoutRoot(process.cwd()) ?? process.cwd());
+      const repoRoot = mainCheckoutRootOf(flags);
       const { integrationScriptPath } = await import('../src/setup/checks.mjs');
       const { uninstallGitHooks } = await import('../src/setup/git-hooks.mjs');
       const { detectRcFiles, hasSourceLine } = await import('../src/setup/shell-rc.mjs');
@@ -4220,7 +4213,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
     // The one opt-in door to a person's own agent config (src/setup/agent-wiring.mjs). Without --yes
     // it only plans; --yes backs up each file first. Its project is the main checkout, like setup's.
     case 'wire-agents': {
-      const repoRoot = resolveMainCheckoutRoot(process.cwd()) ?? process.cwd();
+      const repoRoot = mainCheckoutRootOf({});
       const { planAgentWiring, applyAgentWiring } = await import('../src/setup/agent-wiring.mjs');
       const plan = planAgentWiring(repoRoot);
       const result = flags.yes ? applyAgentWiring(plan) : { applied: false };
@@ -4245,14 +4238,14 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       // shared store even when run from a linked worktree (ADR0020: a
       // worktree never carries its own .fgos/, so process.cwd() there was
       // silently checking/writing the wrong tree).
-      const repoRoot = flags.dir !== undefined ? path.dirname(dir) : (resolveMainCheckoutRoot(process.cwd()) ?? process.cwd());
+      const repoRoot = mainCheckoutRootOf(flags);
       const { runDoctor } = await import('../src/setup/checks.mjs');
       return runDoctor(repoRoot, { fix: Boolean(flags.fix) });
     }
 
     case 'unclaim': {
       const id = requireField(positional[0] ?? flags.id, 'unclaim requires an id: fgos unclaim <id>');
-      const repoRoot = flags.dir !== undefined ? path.dirname(dir) : (resolveMainCheckoutRoot(process.cwd()) ?? process.cwd());
+      const repoRoot = mainCheckoutRootOf(flags);
       const claim = readClaim(dir, id);
       if (!claim) return { released: false, reason: 'no-claim' };
       const durableView = foldEvents(readRawEvents(dir));
@@ -4387,81 +4380,31 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       throw new StoreError('validation', `unknown lock sub-verb "${sub}". Usage: fgos lock fence <name> [--param k=v] [--yes] [--attest-stopped]`);
     }
 
-    case 'lock-status': {
-      const { mainCheckout, locks, problems } = collectLockStatus({ fgosDir: dir });
-      // The commit-activity beacon is reported on its own: it is a hint the
-      // pre-commit hook reads, never a lock claim/land/approve wait on.
-      const beacon = readBeacon(dir);
-      return {
-        mainCheckout,
-        locks,
-        problems,
-        beacon: beacon.status === 'ok'
-          ? {
-            status: 'present',
-            writer: beacon.record.writer.id,
-            ageMs: Date.now() - beacon.record.writtenAt,
-            windowMs: beacon.record.windowMs,
-            active: Date.now() - beacon.record.writtenAt <= beacon.record.windowMs,
-          }
-          : { status: beacon.status },
-      };
-    }
+    case 'lock-status':
+      return collectLockStatus({ fgosDir: dir });
 
-    // tsk-1d7 (docs/history/stale-worktree-index-guard/CONTEXT.md D3): the
-    // repair verb `.githooks/pre-commit`'s own stale-index guard (D2)
-    // prints as its refuse-message command. Run FROM INSIDE the stale
-    // worktree (the same place the hook just refused a commit) — `--path`
-    // exists only so a test/caller can point this at a worktree other than
-    // its own cwd. `resyncWorktree`'s own `repoRoot` param must be the MAIN
-    // checkout, never the worktree itself, since branch refs and
-    // `--git-common-dir` must resolve against the shared repo (tsk-jgs:
-    // `dir` alone is NOT that root here -- `dir` is `dataDir(flags.dir)`,
-    // which for the bare/default invocation this case exists to support is
-    // cwd-strict, never git-resolved, per `dataDir`'s own doc comment
-    // above -- so it silently resolves to `<worktreePath>/.fgos`, a path
-    // that never exists on disk for a linked worktree, ADR0020). When
-    // `--dir` is given explicitly, `path.dirname(dir)` recovers the
-    // caller-supplied root correctly, same as every other verb here; when
-    // it is omitted, resolve the real main checkout the same way
-    // `dispatch.mjs`/`registrations.mjs` already do for exactly this
-    // worktree-or-main-checkout ambiguity: `resolveMainCheckoutRoot`
-    // (`src/runner/paths.mjs`), which shells `git --git-common-dir` from
-    // the worktree itself.
+    // The repair verb `.githooks/pre-commit`'s stale-index guard prints. Run FROM INSIDE the stale
+    // worktree; `--path` points it at another one. `resyncWorktree` needs the MAIN checkout (branch
+    // refs and `--git-common-dir` resolve against the shared repo), which `mainCheckoutRootOf` reads
+    // from the worktree itself, or from `--dir` when that names the main root.
     case 'resync-worktree': {
       const worktreePath = flags.path ? path.resolve(flags.path) : process.cwd();
       const checkedOut = gitWorktrees(worktreePath).find((row) => realpathOr(Buffer.from(row.path).toString('utf8')) === realpathOr(worktreePath))?.branch;
       const branch = flags.branch ?? (checkedOut?.startsWith('refs/heads/') ? checkedOut.slice('refs/heads/'.length) : null);
       if (!branch) throw new StoreError('validation', `resync-worktree: "${worktreePath}" has no branch checked out; pass --branch <name>`);
-      const repoRoot = flags.dir !== undefined ? path.dirname(dir) : (resolveMainCheckoutRoot(worktreePath) ?? path.dirname(dir));
+      const repoRoot = mainCheckoutRootOf(flags, worktreePath);
       return resyncWorktree(repoRoot, worktreePath, branch);
     }
 
-    // tsk-3au: the safe path for a destructive `git reset --hard` on the
-    // main checkout — refuses when the whole-repo tree is dirty (reusing
-    // `isMainTreeClean`, the same whole-repo check `approve` already uses,
-    // never a fresh git-status reimplementation) unless the caller passes
-    // `--confirm` after seeing the full status this case prints into the
-    // error. `repoRoot` is derived from `dir` (never `process.cwd()`) so
-    // this verb behaves identically whether invoked from the main checkout
-    // or, per this item's own theme, from a worktree's cwd with `--dir`.
-    //
-    // tsk-5iv D1 (round-3 review, HIGH): `repoRoot = path.dirname(dir)` and
-    // `dir` defaults to `dataDir(undefined)` -- cwd-strict, never
-    // git-resolved (paths.mjs's own `strict: true` contract). Called with
-    // no `--dir` from inside a linked worktree, `repoRoot` silently
-    // resolves to the WORKTREE, not the main checkout, while this verb's
-    // own error text below still prints "main checkout, whole repo" and
-    // (with --confirm) runs `git reset --hard` against that wrong tree --
-    // the exact destructive-reset-on-the-wrong-tree failure mode AGENTS.md
-    // tells every session to use THIS verb instead of raw `git reset
-    // --hard` to avoid. Refuse outright rather than silently proceed,
-    // matching the same `isMainWorktree` guard other verbs in this file
-    // already use (e.g. the `init`/`approve --github` cases above).
+    // tsk-3au: the safe path for a destructive `git reset --hard` on the main checkout -- refuses when the
+    // whole-repo tree is dirty (the whole-repo check `approve` uses) unless `--confirm` follows the full
+    // status this case prints into the error. The repository acted on is the main checkout
+    // (`mainCheckoutRootOf`); without `--dir`, a linked worktree's cwd is refused so the reset is never aimed
+    // at a tree the caller did not name, and a `--dir` that is not the main checkout is refused by the door.
     case 'main-checkout-reset': {
       const sha = requireField(flags.sha, 'main-checkout-reset requires --sha <sha>: fgos main-checkout-reset --sha <sha> [--confirm]');
-      const repoRoot = path.dirname(dir);
-      if (flags.dir === undefined && !isMainWorktree(repoRoot)) {
+      const repoRoot = mainCheckoutRootOf(flags, process.cwd(), 'main-checkout-only');
+      if (flags.dir === undefined && !isMainWorktree(process.cwd())) {
         throw new StoreError(
           'validation',
           'main-checkout-reset: refusing to run without --dir <mainRoot> -- cwd is a linked worktree, and without --dir this verb would silently ' +
@@ -4509,7 +4452,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         return { sha, wasDirty: dirty, lostCommitCount, confirmed, operationId, snapshot: restored.snapshot };
       };
       try {
-        return await withMainCheckout(createLockScope('main-checkout-reset'), 'reset', reset, { fgosDir: dir });
+        return await withMainCheckout(createLockScope('main-checkout-reset'), 'reset', reset, { fgosDir: fgosDirFromRoot(repoRoot) });
       } catch (err) {
         throw lockErrorToStoreError(err, 'main-checkout-reset');
       }
@@ -5030,7 +4973,7 @@ async function main() {
     if (unknownFlag) throw new StoreError('validation', unknownFlag);
 
     faultClass = 'dir-invalid';
-    dir = dataDir(flags.dir);
+    dir = resolveInvocationRoot({ cwd: process.cwd(), dir: flags.dir, policy: verb === 'init' ? 'strict-cwd' : 'caller-tree' }).fgosDir;
     // tsk-4fu-2: a verb registered `store: 'require'`
     // (command-registry.mjs) reads/writes through this `dir` — refuse
     // before ever reaching its handler when `.fgos/` isn't there yet,

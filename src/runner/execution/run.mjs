@@ -5,7 +5,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import { publishMutableProjection } from '../../native/proof-helpers.mjs';
-import { createGitInspect, gitWriter } from '../../git/inspect.mjs';
+import { gitWriter, readRepoFacts } from '../../git/inspect.mjs';
 
 import {
   assertCaseAdmissionPort, normalizeCaseRef, briefNeverReached, noBriefDelivered, seatLaunchesUsed, SEAT_LAUNCH_CEILING,
@@ -42,7 +42,6 @@ import { cancelOnSignalEnabled } from '../../run-supervisor/cancel-opt-in.mjs';
 import { readCancelWaitMs } from '../../run-supervisor/gate-kill-grace.mjs';
 import { listGenerations } from '../../run-supervisor/run-lock.mjs';
 import { currentAttemptOf } from './unit-state.mjs';
-import { resolveStateRoot } from '../../holder-lock/index.mjs';
 import { admitFreshUnit, leftByDeadController, loadResumedUnit, writesWorktree } from './unit-run-start.mjs';
 
 function publishUnitSummary(unitDir) {
@@ -62,7 +61,7 @@ export function detectHerdrPresent(env = process.env) {
 /** The main checkout root and the worktree path of `cwd`, read through Git Inspect. */
 export function resolveGitRoots(cwd = process.cwd(), { allowNoRepository = false } = {}) {
   try {
-    const result = createGitInspect({ stateRoot: resolveStateRoot().stateRoot, repoPath: cwd, trustedMain: cwd }).resolveRepo();
+    const result = readRepoFacts(cwd);
     // A read-only caller may work in a directory that is no repository: that directory is its own project root.
     if (result.notARepository && allowNoRepository) {
       let root = cwd;

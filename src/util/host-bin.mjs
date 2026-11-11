@@ -1,68 +1,22 @@
-import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
-import { resolveWorkspaceInstallationBin } from '../setup/bin-discovery.mjs';
-import { resolveMainCheckoutRoot } from '../runner/paths.mjs';
-import { fileURLToPath } from 'node:url';
-
-const PACKAGE_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
+import { resolveMainCheckoutRoot, fgosDirFromRoot } from '../runner/paths.mjs';
+import { resolveActiveHostBin } from './host-bin-path.mjs';
 
 const HOST_TIMEOUT_MS = 5_000;
 const CONVENTION_UNKNOWN_VERB =
   'fgos: unknown verb "convention". Usage: fgos <command> [args...]';
 
 /**
- * Resolves the host binary path according to the precedence:
- * 1. process.env.FGOS_HOST_BIN (if set, exists, and is a file).
- * 2. Active release manifest in <mainCheckoutRoot>/.fgos/installation (resolveWorkspaceInstallationBin).
- * 3. Never falls back to searching target/ or $PATH.
- *
- * Returns absolute path to binary or null.
+ * The host binary of the project `dir` sits in, through the one activation reader
+ * (`resolveActiveHostBin`): FGOS_HOST_BIN, else the activation of the main checkout's
+ * `.fgos/installation`, else the nearest activation above `dir`. Never another
+ * checkout's host, never `target/` or `$PATH`. Returns an absolute path or null.
  */
-export function resolveHostBin(dir = process.cwd(), options = {}) {
-  if (process.env.FGOS_HOST_BIN) {
-    const candidate = path.resolve(process.env.FGOS_HOST_BIN);
-    try {
-      if (fs.existsSync(candidate) && fs.statSync(candidate).isFile()) {
-        return candidate;
-      }
-    } catch {}
-  }
-
+export function resolveHostBin(dir = process.cwd()) {
   const cleanDir = typeof dir === 'string' && dir.endsWith('.fgos') ? path.dirname(dir) : dir;
   const mainRoot = resolveMainCheckoutRoot(cleanDir) || cleanDir;
-  try {
-    const bin = resolveWorkspaceInstallationBin(mainRoot);
-    if (bin && fs.existsSync(bin) && fs.statSync(bin).isFile()) {
-      return bin;
-    }
-  } catch {}
-
-  // Hermetic resolution support: when packageRoot is specified via options
-  // or FGOS_PACKAGE_ROOT env, search only that root instead of falling back to
-  // developer workstation's process.cwd() or PACKAGE_ROOT.
-  const customPackageRoot = options?.packageRoot !== undefined
-    ? options.packageRoot
-    : (process.env.FGOS_PACKAGE_ROOT ? path.resolve(process.env.FGOS_PACKAGE_ROOT) : undefined);
-
-  const fallbackDirs = customPackageRoot !== undefined
-    ? (customPackageRoot ? [customPackageRoot] : [])
-    : [process.cwd(), PACKAGE_ROOT];
-
-  // If dir was a temporary directory (e.g. in tests) with no installation,
-  // check the active workspace installation of fallback directories
-  for (const fallbackDir of fallbackDirs) {
-    try {
-      const root = resolveMainCheckoutRoot(fallbackDir);
-      if (root && root !== mainRoot) {
-        const bin = resolveWorkspaceInstallationBin(root);
-        if (bin && fs.existsSync(bin) && fs.statSync(bin).isFile()) {
-          return bin;
-        }
-      }
-    } catch {}
-  }
-  return null;
+  return resolveActiveHostBin({ fgosDir: fgosDirFromRoot(mainRoot), cwd: cleanDir }).bin;
 }
 
 /**
@@ -76,8 +30,8 @@ export function resolveHostBin(dir = process.cwd(), options = {}) {
  * @param {'main-checkout'|'caller'} [options.dirScope] root to measure (default main-checkout)
  * @returns {object} data field from the returned fgos.v1 envelope
  */
-export function invokeHost(args, { input, dir = process.cwd(), packageRoot, dirScope = 'main-checkout' } = {}) {
-  const hostBin = resolveHostBin(dir, { packageRoot });
+export function invokeHost(args, { input, dir = process.cwd(), dirScope = 'main-checkout' } = {}) {
+  const hostBin = resolveHostBin(dir);
   if (!hostBin) {
     const err = new Error('Rust host binary unavailable (FGOS_HOST_BIN unset and no active installation manifest)');
     err.code = 'host-unavailable';

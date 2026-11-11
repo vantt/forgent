@@ -5,7 +5,7 @@
 // run as plain `node scripts/<name>.mjs` from a source checkout has no activated payload, so it stages
 // this checkout's addon the same way the test launcher does before it opens the port.
 
-import { createGitInspect, gitPortOptions } from '../../src/git/inspect.mjs';
+import { createGitInspect, gitPortOptions, readRepoFacts } from '../../src/git/inspect.mjs';
 import { createGitScopedCommit } from '../../src/git/scoped-commit.mjs';
 import { loadNativeAddon } from '../../src/git/native.mjs';
 import { ensureGitAddon } from '../git-addon.mjs';
@@ -43,7 +43,7 @@ export function scopedCommitRepo(cwd = process.cwd(), env = process.env) {
 
 /** The main checkout's root, from whichever checkout of the repository `cwd` sits in. */
 export function mainCheckoutRoot(cwd = process.cwd()) {
-  return inspectRepo(cwd).resolveRepo().trustedMainRoot;
+  return openPort(() => readRepoFacts(cwd).trustedMainRoot, process.env);
 }
 
 /** Every `status` entry, all pages, with `path` decoded to a string. */

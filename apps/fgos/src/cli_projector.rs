@@ -817,6 +817,41 @@ mod tests {
         let _ = std::fs::remove_dir_all(&base);
     }
 
+    /// The tree and expected answers every reader of "which project does this
+    /// directory act on" shares: this walk, the Node invocation-root door and the
+    /// identity crate's main root.
+    #[test]
+    fn the_root_walk_answers_the_shared_root_table() {
+        let table: serde_json::Value = serde_json::from_str(include_str!(
+            "../../../test/rust-host/fixtures/invocation-root-table.json"
+        ))
+        .unwrap();
+        let base = std::env::temp_dir().join(format!("fgos_root_table_{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&base);
+        std::fs::create_dir_all(&base).unwrap();
+        let base = std::fs::canonicalize(base).unwrap();
+        for step in table["steps"].as_array().unwrap() {
+            if let Some(dir) = step["mkdir"].as_str() {
+                std::fs::create_dir_all(base.join(dir)).unwrap();
+            } else if let Some(file) = step["write"].as_str() {
+                std::fs::write(base.join(file), "x\n").unwrap();
+            }
+            // The walk reads no Git: the repository steps of the table are skipped, and a
+            // directory a repository step would have created (a linked worktree) is made plain.
+        }
+        for row in table["rows"].as_array().unwrap() {
+            std::fs::create_dir_all(base.join(row["cwd"].as_str().unwrap())).unwrap();
+        }
+        let home = base.join(table["home"].as_str().unwrap());
+        for row in table["rows"].as_array().unwrap() {
+            let walked =
+                resolve_target_root(&[], &base.join(row["cwd"].as_str().unwrap()), Some(&home));
+            let expected = row["project"].as_str().map(|p| base.join(p));
+            assert_eq!(walked.ok(), expected, "project of {}", row["name"]);
+        }
+        let _ = std::fs::remove_dir_all(&base);
+    }
+
     #[test]
     fn identity_request_ignores_the_shell_appended_dir_flag() {
         let args: Vec<OsString> = ["identity", "--json", "--dir", "/repo", "--pid=42"]

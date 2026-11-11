@@ -1,5 +1,4 @@
 import { execFileSync } from 'node:child_process';
-import { fileURLToPath } from 'node:url';
 import { resolveMainCheckoutRoot, resolveRepoRoot, fgosDirFromRoot } from './paths.mjs';
 import { loadRunnerConfigForDir } from './dispatch/config.mjs';
 import { readConfig } from '../config/facade.mjs';
@@ -10,14 +9,14 @@ import { runUnit } from './execution/run.mjs';
 import { createCaseAdmissionPort } from '../workflow/case-admission-port.mjs';
 import { workDispatchHint, workUnitFor } from './work-dispatch.mjs';
 import fs from 'node:fs';
-import { resolveFgosBin } from '../setup/bin-discovery.mjs';
+import { resolveActiveHostBin } from '../util/host-bin-path.mjs';
 import { isMainModule } from '../../scripts/lib/is-main-module.mjs';
 
-const REPO_ROOT = fileURLToPath(new URL('../..', import.meta.url));
-const LOCAL_FGOS_MJS = fileURLToPath(new URL('../../bin/fgos.mjs', import.meta.url));
-
-function resolveBinFgos() {
-  return resolveFgosBin(REPO_ROOT)?.path ?? LOCAL_FGOS_MJS;
+/** The host that serves `fgos` for the project at `root`; none is a refusal, never another checkout's binary. */
+export function resolveBinFgos(root) {
+  const { bin, tried } = resolveActiveHostBin({ fgosDir: fgosDirFromRoot(root), cwd: root });
+  if (!bin) throw new Error(`no fgos host for ${root}; looked at ${tried.join(', ')}`);
+  return bin;
 }
 
 /**
@@ -87,12 +86,7 @@ export async function fanoutBatchExecutorCli(
       }
 
       const binFgosPath = resolveBinFgos(root);
-      const execFgos = (args, options) => {
-        if (binFgosPath.endsWith('.mjs')) {
-          return execFileSync(process.execPath, [binFgosPath, ...args], options);
-        }
-        return execFileSync(binFgosPath, args, options);
-      };
+      const execFgos = (args, options) => execFileSync(binFgosPath, args, options);
 
       let picked = false;
       let wtPath = cwd;
