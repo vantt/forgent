@@ -14,6 +14,8 @@ import {
   writeLocalStatus,
   resolvedStatus,
   classifyRegistryPosture,
+  checkTools,
+  queryTools,
 } from '../../src/state/tool-registry.mjs';
 
 function tmpDir() {
@@ -210,4 +212,45 @@ test('classifyRegistryPosture: registered but not present (missing or unknown) i
   const uncheckedResult = classifyRegistryPosture(tools, {});
   assert.equal(uncheckedResult.posture, 'degraded');
   assert.equal(uncheckedResult.unknownCount, 2);
+});
+
+// ─── checkTools / queryTools: the use cases behind `fgos tool check|query` ───────────────────────
+
+const TOOL_EXECUTORS = {
+  gitnexus: { kind: 'tool', for: ['Impact Analysis'], invocations: [{ via: 'mcp', command: 'mcp:gitnexus' }], scanTarget: '.gitnexus' },
+  c3: { kind: 'tool', for: ['impact-analysis'], invocations: [{ via: 'mcp', command: 'mcp:c3' }], scanTarget: '.c3' },
+  docs: { kind: 'tool', for: ['docs-lookup'], invocations: [{ via: 'mcp', command: 'mcp:docs' }], scanTarget: '.docs' },
+};
+
+test('checkTools refuses a name no executor declares as a tool, before it probes or writes anything', async () => {
+  const dir = tmpDir();
+  await assert.rejects(
+    () => checkTools({ executors: TOOL_EXECUTORS, dir, repoRoot: dir, name: 'agy' }),
+    (err) => err.category === 'validation' && /tool "agy" not found\./.test(err.message),
+  );
+  assert.deepEqual(readLocalStatus(dir), {}, 'no overlay was written');
+});
+
+test('checkTools probes only the named tool and keeps the overlay entries of the others; unnamed, it probes every declared tool', async () => {
+  const dir = tmpDir();
+  const repoRoot = tmpDir();
+  fs.mkdirSync(path.join(repoRoot, '.gitnexus'));
+  writeLocalStatus(dir, { c3: { status: 'present', checkedAt: '2020-01-01T00:00:00.000Z' } });
+  const one = await checkTools({ executors: TOOL_EXECUTORS, dir, repoRoot, name: 'gitnexus' });
+  assert.deepEqual(Object.keys(one.checked), ['gitnexus']);
+  assert.equal(one.checked.gitnexus.status, 'present');
+  assert.equal(readLocalStatus(dir).c3.checkedAt, '2020-01-01T00:00:00.000Z', 'an unnamed tool keeps its entry');
+  const all = await checkTools({ executors: TOOL_EXECUTORS, dir, repoRoot });
+  assert.deepEqual(Object.keys(all.checked).sort(), ['c3', 'docs', 'gitnexus']);
+  assert.equal(all.checked.c3.status, 'missing');
+});
+
+test('queryTools filters by capability spelling and status, and reports a tool never checked here as unknown, not missing', () => {
+  const dir = tmpDir();
+  writeLocalStatus(dir, { gitnexus: { status: 'present', checkedAt: 'x' } });
+  const byCapability = queryTools({ executors: TOOL_EXECUTORS, dir, capability: 'Impact_Analysis' });
+  assert.deepEqual(byCapability.providers.map((t) => [t.name, t.status]).sort(), [['c3', 'unknown'], ['gitnexus', 'present']]);
+  assert.deepEqual(queryTools({ executors: TOOL_EXECUTORS, dir, capability: 'impact-analysis', status: 'present' }).providers.map((t) => t.name), ['gitnexus']);
+  assert.deepEqual(queryTools({ executors: TOOL_EXECUTORS, dir, capability: 'nothing-serves-this' }), { providers: [] });
+  assert.equal(queryTools({ executors: TOOL_EXECUTORS, dir }).providers.length, 3);
 });

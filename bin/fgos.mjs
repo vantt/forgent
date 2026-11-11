@@ -43,7 +43,7 @@ import { runFourDoorChecks } from '../src/state/retrospective-doors.mjs';
 import { findAuthoritativeMatch, findDuplicateAuthoritativeClaims } from '../src/report/authoritative-match.mjs';
 import { checkVerifyForC4 } from '../src/intake/verify-pattern-check.mjs';
 import { parseFrontmatter } from '../src/report/frontmatter.mjs';
-import { probeTool, readLocalStatus, writeLocalStatus, resolvedStatus, normalizeCapability, toolsFromExecutors } from '../src/state/tool-registry.mjs';
+import { checkTools, queryTools } from '../src/state/tool-registry.mjs';
 import { EventLogError } from '../src/state/event-log.mjs';
 import { foldEvents, conflictsFor } from '../src/state/replay.mjs';
 import { deriveTitle, classify } from '../src/intake/classify.mjs';
@@ -2451,7 +2451,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
     // this case to sending anything into a pane.
     case 'dispatch': {
       const { retiredDispatchDoorMessage, decideCommand } = await import('../src/runner/dispatch/decide.mjs');
-      const retired = retiredDispatchDoorMessage(positional[0], positional, flags);
+      const retired = retiredDispatchDoorMessage(positional[0], positional, { assignment: flags.assignment, cwd: flags.cwd, for: flags.for });
       if (retired) throw new StoreError('validation', retired);
       const sub = requireSubVerb('dispatch', positional);
       if (sub === 'probe-account') {
@@ -2470,16 +2470,16 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       if (sub === 'decide') {
         // Dispatch holds no Work store: `decide --work` gets its Work lookup from here.
         const { resolveWorkForDispatch } = await import('../src/runner/work-dispatch.mjs');
-        const text = (name) => (typeof flags[name] === 'string' ? flags[name] : undefined);
+        const text = (value) => (typeof value === 'string' ? value : undefined);
         return await decideCommand({
           executorId: positional[1],
-          cwd: text('cwd') ?? text('dir'),
-          repoRoot: text('repo-root'),
+          cwd: text(flags.cwd) ?? text(flags.dir),
+          repoRoot: text(flags['repo-root']),
           hasLiveTaskAccess: flags['has-live-task-access'] !== undefined,
-          for: text('for'),
-          workId: text('work'),
-          assignment: text('assignment'),
-          stage: text('stage'),
+          for: text(flags.for),
+          workId: text(flags.work),
+          assignment: text(flags.assignment),
+          stage: text(flags.stage),
           needsSoul: flags['needs-soul'] !== undefined,
           resolveWork: resolveWorkForDispatch,
         });
@@ -3619,47 +3619,26 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
     // Read-only listing of the personas a `--seats "@name"` seat can name; a pure read of the
     // three definition tiers (src/runner/agent-listing.mjs), no store and no event.
     case 'agents': {
-      const sub = requireField(positional[0], 'agents requires a sub-verb: fgos agents list');
-      if (sub !== 'list') throw new StoreError('validation', `unknown agents sub-verb "${sub}". Usage: fgos agents list`);
+      requireSubVerb('agents', positional);
       const { listAgents } = await import('../src/runner/agent-listing.mjs');
       const { resolveGitRoots } = await import('../src/runner/execution/run.mjs');
       const projectRoot = typeof flags.worktree === 'string' ? path.resolve(flags.worktree) : resolveGitRoots(process.cwd()).worktreeRoot;
       return { projectRoot, ...listAgents({ projectRoot }) };
     }
     case 'tool': {
-      const sub = requireField(positional[0], 'tool requires a sub-verb: fgos tool <check|query> ...');
+      const sub = requireSubVerb('tool', positional);
       const repoRoot = path.dirname(dir);
-      const cfg = loadRunnerConfigForDir(repoRoot);
-      const tools = toolsFromExecutors(cfg.executors);
+      const { executors } = loadRunnerConfigForDir(repoRoot);
       if (sub === 'check') {
-        const name = optionalField(flags.name, 'tool check --name requires a non-empty value.');
-        if (name !== undefined && !tools[name]) {
-          throw new StoreError('validation', `tool "${name}" not found.`);
-        }
-        const targets = name !== undefined ? [name] : Object.keys(tools);
-        const localStatus = readLocalStatus(dir);
-        const results = {};
-        for (const toolName of targets) {
-          const status = await probeTool(tools[toolName], repoRoot);
-          const checkedAt = new Date().toISOString();
-          localStatus[toolName] = { status, checkedAt };
-          results[toolName] = { status, checkedAt };
-        }
-        writeLocalStatus(dir, localStatus);
-        return { checked: results };
+        return checkTools({ executors, dir, repoRoot, name: optionalField(flags.name, 'tool check --name requires a non-empty value.') });
       }
-      if (sub === 'query') {
-        const localStatus = readLocalStatus(dir);
-        const capabilityFlag = optionalField(flags.capability, 'tool query --capability requires a non-empty value.');
-        const normalizedCapability = capabilityFlag !== undefined ? normalizeCapability(capabilityFlag) : undefined;
-        const statusFlag = optionalField(flags.status, 'tool query --status requires a non-empty value.');
-        const providers = Object.values(tools)
-          .filter((tool) => normalizedCapability === undefined || tool.capability === normalizedCapability)
-          .map((tool) => ({ ...tool, status: resolvedStatus(tool.name, localStatus) }))
-          .filter((tool) => statusFlag === undefined || tool.status === statusFlag);
-        return { providers };
-      }
-      throw new StoreError('validation', `unknown tool sub-verb "${sub}". Usage: fgos tool <check|query> ...`);
+      // `query`: requireSubVerb admitted only the registry's two sub-verbs.
+      return queryTools({
+        executors,
+        dir,
+        capability: optionalField(flags.capability, 'tool query --capability requires a non-empty value.'),
+        status: optionalField(flags.status, 'tool query --status requires a non-empty value.'),
+      });
     }
 
     // Do-and-announce shell-integration + config bootstrap (str87-fgos-setup-doctor

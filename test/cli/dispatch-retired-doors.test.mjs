@@ -143,17 +143,29 @@ for (const sub of ['execute', 'log', 'fanout-batch']) {
   });
 }
 
-test('the legacy payload answers hook mailbox quietly with exit 0', () => {
+test('the legacy payload refuses the native hook kinds by name instead of answering them', () => {
   const { root } = mkStore();
-  // boundary: the quiet answer is the legacy payload's own exit status and stdout, seen by the CLI that runs the hook line
-  const out = spawnSync(process.execPath, [FGOS, 'hook', 'mailbox', '--cli', 'claude', '--event', 'stop'], {
-    cwd: root,
-    encoding: 'utf8',
-    input: JSON.stringify({ hook_event_name: 'Stop', session_id: 'x' }),
-  });
-  assert.equal(out.status, 0, out.stderr);
-  assert.equal(out.stdout, '');
-  assert.equal(out.stderr, '');
+  for (const kind of ['mailbox', 'mailbox-sync']) {
+    // boundary: the refusal is the legacy payload's own exit status and streams, seen by the CLI that runs the hook line
+    const out = spawnSync(process.execPath, [FGOS, 'hook', kind, '--cli', 'claude', '--event', 'stop'], {
+      cwd: root,
+      encoding: 'utf8',
+      input: JSON.stringify({ hook_event_name: 'Stop', session_id: 'x' }),
+    });
+    assert.equal(out.status, 1, out.stderr);
+    assert.equal(out.stdout, '');
+    assert.match(out.stderr, new RegExp(`hook kind "${kind}" is served by the native fgos host`));
+  }
+});
+
+test('fgos dispatch decide writes a refusal once, on stderr, with nothing on stdout', () => {
+  const { root, fgosDir } = mkStore();
+  writeConfig(fgosDir);
+  const out = run(FGOS, ['dispatch', 'decide', '--work', 'no-such-item'], root);
+  assert.notEqual(out.status, 0);
+  assert.equal(out.stdout, '', 'the refusal is not also printed as JSON on stdout');
+  assert.equal(out.stderr.split('\n').filter((line) => line.includes('no work item "no-such-item" found')).length, 1, out.stderr);
+  assert.match(out.stderr, /no work item "no-such-item" found/);
 });
 
 test('fgos hook dispatch-decide (agy payload) denies an out-of-process subagent call and points at a door fgos run accepts, not dispatch execute', () => {

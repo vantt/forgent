@@ -49,13 +49,12 @@ const GLOBAL = new Set(['dir', 'json', 'help']);
 // Sub-verbs whose handler hands the raw argv to another parser: the region of
 // that parser which handles the sub-verb.
 const DELEGATES = {
-  'dispatch decide': () => caseBlock(functionBody(DISPATCH_CLI, 'runDispatchCli'), 'decide'),
   'dispatch probe-account': () => caseBlock(functionBody(DISPATCH_CLI, 'runDispatchCli'), 'probe-account'),
   'dispatch probe-session': () => caseBlock(functionBody(DISPATCH_CLI, 'runDispatchCli'), 'probe-session'),
 };
 
 // Verbs whose shared tail is itself one sub-verb's handler.
-const FALLTHROUGH = { workflow: 'operations' };
+const FALLTHROUGH = { workflow: 'operations', tool: 'query' };
 
 // Verbs with a single sub-verb guard (`if (sub !== 'x') throw`): the whole case is that sub-verb.
 const SINGLE = { agents: 'list' };
@@ -244,7 +243,7 @@ for (const entry of MULTI) {
 test('the scanner sees what it claims to: known reads in known regions', () => {
   const dispatch = subRegions('dispatch', verbCase('dispatch'), Object.keys(MULTI.find((e) => e.name === 'dispatch').subcommands));
   assert.ok(regionReads(dispatch.regions.inspect, 'probe').has('provider-capacity'));
-  assert.ok(flagReads(DELEGATES['dispatch decide']()).has('has-live-task-access'));
+  assert.ok(regionReads(dispatch.regions.decide, 'probe').has('has-live-task-access'));
   const merge = subRegions('merge', verbCase('merge'), ['list', 'next']);
   const nextReads = regionReads(merge.regions.next, 'probe');
   for (const name of ['acknowledge-iron-law', 'timeout', 'no-timeout', 'wait', 'no-wait']) assert.ok(nextReads.has(name), name);
