@@ -230,7 +230,7 @@ export function buildConfinementAttestation({
   outcome = null,
   driverClaims = null,
 } = {}) {
-  const reqMode = request.requirement?.mode ?? "unconfined";
+  const reqMode = request.requirement.mode;
   const isExplicitUnconfined = reqMode === "unconfined" && !request.requirement?.omitted;
   // A legacy omitted policy observes as unknown, never as enforced.
   const determinedOutcome = outcome
@@ -434,7 +434,7 @@ function claimsMatchCoverage(claims, coverage) {
  * enforce and prepares the sandbox. `prepareConfinementForLaunch` runs it for every launch.
  */
 export async function assessAndPrepare(request, opts = {}) {
-  const reqMode = request.requirement?.mode ?? "unconfined";
+  const reqMode = request.requirement.mode;
   const isRequired = reqMode === "required";
 
   if (request.requirement?.mode === "preferred") {
