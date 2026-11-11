@@ -29,6 +29,28 @@ export function repositoryDirs(start) {
   }
 }
 
+/**
+ * Linked-checkout registrations of the repository at `cwd` whose checkout lies under one of `roots`
+ * (the run's own temp dirs): each outlives its deleted checkout and makes every later worktree add of
+ * that repository refuse until it is pruned. Read from the registration files, like the identity check.
+ */
+export function worktreeRegistrationsUnder(cwd, roots) {
+  const dirs = repositoryDirs(cwd);
+  const realRoots = roots.filter(Boolean).map((root) => { try { return fs.realpathSync(root); } catch { return path.resolve(root); } });
+  if (!dirs || realRoots.length === 0) return [];
+  const base = path.join(dirs.commonDir, 'worktrees');
+  let names;
+  try { names = fs.readdirSync(base); } catch { return []; }
+  const found = [];
+  for (const name of names.sort()) {
+    let gitdir;
+    try { gitdir = fs.readFileSync(path.join(base, name, 'gitdir'), 'utf8').trim(); } catch { continue; }
+    const checkout = path.dirname(gitdir);
+    if (realRoots.some((root) => checkout === root || checkout.startsWith(root + path.sep))) found.push({ name, checkout });
+  }
+  return found;
+}
+
 /** `section.key value` lines of one config file whose full key matches `pattern`, in file order. */
 export function configEntries(file, pattern) {
   let text;

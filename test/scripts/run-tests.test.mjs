@@ -7,7 +7,7 @@ import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { spawn, spawnSync, execFileSync } from 'node:child_process';
 import { setTimeout as delay } from 'node:timers/promises';
-import { parseEtime, parsePs, treeOf, findOverdue } from '../../scripts/lib/test-file-watchdog.mjs';
+import { parseEtime, parsePs, treeOf, findOverdue, reapRunDirs } from '../../scripts/lib/test-file-watchdog.mjs';
 import { discoverTestFiles, buildTestArgv, GIT_CONFIG_GUARD_PATH, GIT_SPAWN_SPY_PATH, snapshotGitIdentity, diffGitIdentity, buildTestEnv, runTests, runChosenTests, runSelectedTests, KEEP_TMP_ENV, REPO_ROOT, DEFAULT_TEST_ROOT, snapshotFgos, diffFgosSnapshots, SENSITIVE_FGOS_FILES, leftoverTempPrefixes } from '../../scripts/run-tests.mjs';
 import { writeRawProjectConfig } from '../helpers/config-fixture.mjs';
 
@@ -325,7 +325,7 @@ function mirroredRepoRoot(prefix) {
   fs.copyFileSync(realLibPath, path.join(root, 'scripts', 'lib', 'is-main-module.mjs'));
   fs.copyFileSync(realQueueLibPath, path.join(root, 'scripts', 'lib', 'full-suite-queue.mjs'));
   // ...and the libraries run-tests.mjs and the distribution builder (its one-door census step) import.
-  for (const rel of ['lib/dev-host-manifest.mjs', 'lib/test-file-cpu.mjs', 'lib/git-addon-stage.mjs', 'lib/git-dir-layout.mjs', 'lib/js-source-lexer.mjs', 'lib/git-spawn-match.mjs', 'git-one-door-scan.mjs']) {
+  for (const rel of ['lib/dev-host-manifest.mjs', 'lib/test-file-cpu.mjs', 'lib/git-addon-stage.mjs', 'lib/git-dir-layout.mjs', 'lib/git-ports.mjs', 'git-addon.mjs', 'lib/js-source-lexer.mjs', 'lib/git-spawn-match.mjs', 'git-one-door-scan.mjs']) {
     fs.copyFileSync(fileURLToPath(new URL(`../../scripts/${rel}`, import.meta.url)), path.join(root, 'scripts', rel));
   }
   // run-tests.mjs builds the native addon record through the distribution builder's helpers.
@@ -454,8 +454,10 @@ test('runSelectedTests passes a run whose temp root holds no fgos-* leftovers', 
 });
 
 // The suite runs inside a checkout of the real repository: a test that registers a linked checkout there
-// and keeps it leaves a registration that outlives the run's temp dir and blocks every later worktree add.
-test('a run fails when it leaves a linked-checkout registration whose checkout was in its temp dir, and names it', () => {
+// and keeps it leaves a registration that outlives the run's temp dir and blocks every later worktree add
+// on the machine. The run fails, names it and takes it back through the Worktree port's prune (injected
+// here; the port's own refusal rules are the Git crate's proof); a registration the port refuses stays named.
+test('a run fails when it leaves a linked-checkout registration in its temp dir, names it and prunes it once the checkout is gone', () => {
   const base = tempBase();
   const registrations = path.join(base, '.git', 'worktrees');
   const register = (name, checkout) => {
@@ -463,16 +465,63 @@ test('a run fails when it leaves a linked-checkout registration whose checkout w
     fs.writeFileSync(path.join(registrations, name, 'gitdir'), `${path.join(checkout, '.git')}\n`);
   };
   register('kept-by-a-person', path.join(base, 'elsewhere'));
-  const logs = [];
-  const result = runSelectedTests(['a.test.mjs'], {
-    cwd: base,
-    env: { TMPDIR: base },
-    log: (msg) => logs.push(msg),
-    spawn: (_exec, _argv, { env }) => { register('verify-AbCdEf', path.join(env.TMPDIR, 'fgos-worktrees', 'verify-AbCdEf')); return { status: 0 }; },
+  const pruned = [];
+  const run = (prune) => {
+    const logs = [];
+    const result = runSelectedTests(['a.test.mjs'], {
+      cwd: base,
+      env: { TMPDIR: base },
+      log: (msg) => logs.push(msg),
+      pruneCheckout: prune,
+      spawn: (_exec, _argv, { env }) => {
+        const checkout = path.join(env.TMPDIR, 'fgos-worktrees', 'verify-AbCdEf');
+        fs.mkdirSync(checkout, { recursive: true });
+        register('verify-AbCdEf', checkout);
+        return { status: 0 };
+      },
+    });
+    return { result, logs };
+  };
+
+  const removed = run((checkout) => {
+    assert.equal(fs.existsSync(checkout), false, 'pruned only after the run dir and the checkout in it are gone');
+    pruned.push(checkout);
+    fs.rmSync(path.join(registrations, 'verify-AbCdEf'), { recursive: true });
   });
-  assert.equal(result.status, 1);
-  assert.deepEqual(result.strayWorktrees.map((w) => w.name), ['verify-AbCdEf']);
-  assert.ok(logs.some((line) => line.includes('verify-AbCdEf')), 'the ERROR names the registration');
+  assert.equal(removed.result.status, 1);
+  assert.deepEqual(removed.result.strayWorktrees.map((w) => [w.name, w.removed]), [['verify-AbCdEf', true]]);
+  assert.deepEqual(pruned.map((c) => path.basename(c)), ['verify-AbCdEf']);
+  assert.ok(removed.logs.some((line) => line.includes('verify-AbCdEf') && line.includes('removed now')), 'the ERROR names the registration and says it went');
+  assert.ok(fs.existsSync(path.join(registrations, 'kept-by-a-person')), "a registration outside the run's dirs is never touched");
+
+  const refused = run(() => { throw Object.assign(new Error('not ours'), { code: 'worktree-prune-registration-unproven' }); });
+  assert.equal(refused.result.status, 1);
+  assert.deepEqual(refused.result.strayWorktrees.map((w) => [w.name, w.removed, w.reason]), [['verify-AbCdEf', false, 'worktree-prune-registration-unproven']]);
+  assert.ok(refused.logs.some((line) => line.includes('still registered: worktree-prune-registration-unproven')));
+  assert.ok(refused.logs.some((line) => line.includes('git worktree prune')), 'what still stands comes with the manual step');
+  fs.rmSync(base, { recursive: true, force: true });
+});
+
+// The launcher of a killed run cannot clean up; its watchdog sibling removes the run's dirs. A linked
+// checkout a test registered in them would outlive them and block every later worktree add, so the
+// watchdog prunes it too, and only after the dirs are gone.
+test("a killed run's watchdog prunes the registrations of linked checkouts that were in the run dirs it removed", () => {
+  const base = tempBase();
+  const registrations = path.join(base, '.git', 'worktrees');
+  const runDir = path.join(base, 'fgos-test-run-XyZ');
+  const checkout = path.join(runDir, 'fgos-worktrees', 'verify-Killed');
+  fs.mkdirSync(checkout, { recursive: true });
+  fs.mkdirSync(path.join(registrations, 'verify-Killed'), { recursive: true });
+  fs.writeFileSync(path.join(registrations, 'verify-Killed', 'gitdir'), `${path.join(checkout, '.git')}\n`);
+  const pruned = [];
+  const reaped = reapRunDirs([runDir], {
+    procRoot: path.join(base, 'no-proc'),
+    repo: base,
+    prune: (target) => { assert.equal(fs.existsSync(runDir), false, 'the dirs go first'); pruned.push(target); },
+  });
+  assert.equal(fs.existsSync(runDir), false);
+  assert.deepEqual(reaped.map((r) => [r.name, r.removed]), [['verify-Killed', true]]);
+  assert.deepEqual(pruned.map((c) => path.basename(c)), ['verify-Killed']);
   fs.rmSync(base, { recursive: true, force: true });
 });
 

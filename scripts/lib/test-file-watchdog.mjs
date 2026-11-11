@@ -17,6 +17,8 @@
 import fs from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { worktreeRegistrationsUnder } from './git-dir-layout.mjs';
+import { pruneMissingCheckouts } from './git-ports.mjs';
 
 // ps prints whole seconds from a clock sampled per process, so a child may
 // read a little older than its parent; the ceiling applies when the parent is
@@ -98,8 +100,11 @@ function isAlive(pid) {
  * A run's own dirs after its launcher was killed: SIGKILL every process whose environment names one of
  * `dirs` as its temp root or fixture root (only this run's tests inherit those), then remove the dirs.
  * Another run has dirs of its own, so it is never matched. Without /proc (macOS) only the removal happens.
+ * A linked checkout of `repo` that a test registered inside those dirs leaves a registration behind once
+ * the dirs go, and every later worktree add there refuses; it is pruned through the Worktree port.
+ * Returns those registrations, each with `removed` (and `reason` when it stayed).
  */
-export function reapRunDirs(dirs, { procRoot = '/proc' } = {}) {
+export function reapRunDirs(dirs, { procRoot = '/proc', repo = null, prune = undefined } = {}) {
   const own = new Set(dirs);
   let entries = [];
   try { entries = fs.readdirSync(procRoot); } catch { /* no /proc */ }
@@ -114,9 +119,12 @@ export function reapRunDirs(dirs, { procRoot = '/proc' } = {}) {
     if (!mine) continue;
     try { process.kill(Number(entry), 'SIGKILL'); } catch { /* already gone */ }
   }
+  // Read before the dirs go: the roots are compared by their real paths.
+  const registrations = repo ? worktreeRegistrationsUnder(repo, dirs) : [];
   for (const dir of dirs) {
     try { fs.rmSync(dir, { recursive: true, force: true, maxRetries: 3 }); } catch { /* best effort */ }
   }
+  return registrations.length ? pruneMissingCheckouts(repo, registrations, { prune }) : [];
 }
 
 function snapshot() {
@@ -143,7 +151,9 @@ function main(argv) {
   const cleanDirs = opts.clean ? JSON.parse(opts.clean) : [];
   // The launcher blocks in spawnSync and cannot run a signal handler, so this sibling does its cleanup.
   const launcherGone = () => {
-    reapRunDirs(cleanDirs);
+    for (const { name, checkout, removed, reason } of reapRunDirs(cleanDirs, { repo: opts.repo || null })) {
+      console.error(`test-file-watchdog: registration ${name} (${checkout}) ${removed ? 'removed' : `still registered: ${reason}`}`);
+    }
     process.exit(0);
   };
   const limits = JSON.parse(fs.readFileSync(opts.limits, 'utf8'));
