@@ -62,6 +62,47 @@ fn explain_names_the_schema_node_and_says_undescribed_for_a_key_without_one() {
 }
 
 #[test]
+fn explain_names_the_layer_of_a_list_or_mapping_that_only_the_global_file_sets() {
+    let dir = common::temp("inspect", "explain-global-list");
+    let roots = common::lay_out(
+        &dir,
+        &json!({ "files": { "home/.fgos/config.yaml": [
+            "runner:",
+            "  executors:",
+            "    claude:",
+            "      supports:",
+            "        skills: [\"ak:cook\"]",
+        ] } }),
+    );
+    with_bundle(|ctx| {
+        let snap = snapshot(ctx, &roots).unwrap();
+        for text in [
+            "runner.executors.claude.supports.skills",
+            "runner.executors.claude.supports.skills[0]",
+        ] {
+            let list = explain(ctx, Some(&snap), &parse_path(text).unwrap());
+            assert_eq!(list["current"]["layer"], "global", "{text}");
+            assert_eq!(list["current"]["line"], 5, "{text}");
+            assert_eq!(list["file"], "global:config.yaml", "{text}");
+        }
+        let shown = show(
+            ctx,
+            &snap,
+            &parse_path("runner.executors.claude.supports.skills").unwrap(),
+        );
+        let list = explain(
+            ctx,
+            Some(&snap),
+            &parse_path("runner.executors.claude.supports.skills").unwrap(),
+        );
+        assert_eq!(
+            list["current"], shown["provenance"][0],
+            "explain and show read the same origin"
+        );
+    });
+}
+
+#[test]
 fn explain_answers_a_runtime_key_and_names_the_nearest_keys_of_a_typo() {
     with_bundle(|ctx| {
         let wait = explain(ctx, None, &parse_path("dispatch.cancelWaitMs").unwrap());
