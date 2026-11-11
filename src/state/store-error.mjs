@@ -2,12 +2,14 @@
 // bottom so the shell, the command registry and the store all take it from one place; store.mjs
 // re-exports it, so every existing importer keeps working.
 
-/** Error raised by this module. `category` is the CLI exit-code contract (R4). */
+/** Error raised by this module. `category` is the CLI exit-code contract (R4). `faultClass`, when given, names the
+ * malformed-call class the shell records for an invocation that never reached its verb. */
 export class StoreError extends Error {
-  constructor(category, message) {
+  constructor(category, message, { faultClass } = {}) {
     super(message);
     this.name = 'StoreError';
     this.category = category;
+    if (faultClass) this.faultClass = faultClass;
   }
 }
 

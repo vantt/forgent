@@ -14,9 +14,9 @@ import {
   listSessions,
   reclaimOrphanedSessions,
   acquireSessionsLock,
-  isSessionWorktree,
   SessionError,
 } from '../../src/runner/session.mjs';
+import { isSessionWorktree } from '../../src/runner/worktree.mjs';
 
 // Every test builds its own disposable git repo (git init in a mkdtemp dir)
 // and points session worktrees at a separate mkdtemp base — no test ever

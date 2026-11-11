@@ -106,6 +106,15 @@ test("a verb's own refusal is not a malformed call and is never recorded", () =>
   assert.doesNotMatch(result.stderr, /invocation fault recorded/);
 });
 
+test('a malformed worktree call exits 4 as a validation refusal, never 1, and is not recorded', () => {
+  const cwd = tmpGitCwd();
+  for (const args of [['worktree', 'frobnicate'], ['worktree', 'create'], ['worktree', 'remove', 'a', 'b']]) {
+    const result = run(cwd, args);
+    assert.equal(result.status, 4, `${args.join(' ')}: ${result.stderr}`);
+  }
+  assert.deepEqual(faultRecords(cwd), []);
+});
+
 test('recording never writes to events.jsonl', () => {
   const cwd = tmpGitCwd();
   const before = eventLineCount(cwd);

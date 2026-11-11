@@ -26,6 +26,7 @@
     "src/git/refs.mjs": "infra",
     "src/git/remote.mjs": "infra",
     "src/git/worktree.mjs": "infra",
+    "src/verbs/worktree/context.mjs": "use-case",
     "src/verbs/worktree/create.mjs": "use-case",
     "src/verbs/worktree/remove.mjs": "use-case",
     "src/git/native.mjs": "infra",

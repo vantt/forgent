@@ -30,7 +30,6 @@ import path from 'node:path';
 import readline from 'node:readline';
 import { execFileSync, execSync, spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { randomUUID } from 'node:crypto';
 import { initStore, addWork, moveWork, settleClaim, editWork, resolveParkReason, addDecision, addOutcome, recordFriction, listWork, readyWork, isDepsAndLineageReady, footprintConflicts, computedSchedule, readRawEvents, putInAwaiting, answerAwaiting, setFocus, goalFocusShow, assertAcceptanceEvidence, assertPlanEvidence, assertValidDocType, recordGateApprove, recordCall, recordCallReturn,      parseDecisionRelation, decisionTextLooksLikeSupersession, registerTopicStore, renameTopicStore, splitTopicStore, mergeTopicStore, retireTopicStore, reserveDocStore, registerDocStore, markDocRenderedStore, promoteDocStore, demoteDocStore, supersedeDocStore, retireDocStore, moveDocPathStore, attestDocStore } from '../src/state/store.mjs';
 import { StoreError, EXIT_CODES, categoryOf } from '../src/state/store-error.mjs';
 import { exitCodeOf } from '../src/cli/verb-exit.mjs';
@@ -88,7 +87,7 @@ import { normalizePath } from '../src/util/normalize-path.mjs';
 import { collectOutcomeEntry } from '../src/report/item-trace.mjs';
 import { cleanupMergedBranch, isWorkingTreeClean as isMainTreeClean, buildOwnFileSet, readInvariantCheckCommands } from '../src/runner/merge.mjs';
 import { inspectEntries, inspectPath } from '../src/util/git-paths.mjs';
-import { assertSafeMainCheckoutReset } from '../src/runner/main-checkout-reset-guard.mjs';
+import { mainCheckoutResetUseCase } from '../src/runner/main-checkout-reset-guard.mjs';
 import { editUseCase, parseEditFlags } from '../src/verbs/state/edit.mjs';
 import { unknownFlagMessage } from '../src/cli/flag-check.mjs';
 import { parseArgs } from '../src/cli/parse-args.mjs';
@@ -99,22 +98,19 @@ import { invokeDispatchInspectOperation } from '../src/verbs/dispatch/inspect.mj
 import { invokeDispatchReconcileOperation } from '../src/verbs/dispatch/reconcile.mjs';
 import { watchRunUseCase } from '../src/verbs/dispatch/watch.mjs';
 import { recoverObserveUseCase, recoverApplyUseCase } from '../src/verbs/dispatch/recover.mjs';
-import { branchNameFor, branchExists, resyncWorktree, detectTrunk, isMainWorktree, currentHead, realpathOrSelf as realpathOr, inspectGit, resolveRefSha, gitWorktrees, createVerifyCheckout, removeWorktree } from '../src/runner/worktree.mjs';
+import { branchNameFor, branchExists, resyncWorktree, detectTrunk, isMainWorktree, admitStoreAccess, currentHead, realpathOrSelf as realpathOr, inspectGit, resolveRefSha, createVerifyCheckout, removeWorktree } from '../src/runner/worktree.mjs';
 import { claimWork, ClaimError, readWorkerSlotCeiling } from '../src/runner/claim-port.mjs';
 import { isReclaimEligible } from '../src/runner/claim-liveness.mjs';
-import { withMainCheckout } from '../src/runner/repo-locks.mjs';
-import { commitAt, gitPortOptions, gitWriter, pathExistsAt } from '../src/git/inspect.mjs';
-import { nativeError } from '../src/git/native.mjs';
-import { createGitSafeRestore } from '../src/git/restore.mjs';
+import { commitAt, pathExistsAt } from '../src/git/inspect.mjs';
 import { readGitStatus, readMergeHead, recoverGitOperations } from '../src/git/status.mjs';
-import { HolderLockError, createLockScope } from '../src/holder-lock/index.mjs';
+import { HolderLockError } from '../src/holder-lock/index.mjs';
 import { collectLockStatus } from '../src/runner/lock-status.mjs';
 import { fenceLock, parseLockParams } from '../src/runner/lock-fence.mjs';
 import { formatLockDurationMs } from '../src/util/format-lock-duration.mjs';
 import { clearBeaconIfOwn } from '../src/runner/main-checkout-activity.mjs';
 import { resolveWriterIdentity } from '../src/util/session-identity.mjs';
 import { resolveStateRoot as worktreeStateRoot } from '../src/holder-lock/state-root.mjs';
-import { createSession, endSession, listSessions, reclaimOrphanedSessions, isSessionWorktree, SessionError } from '../src/runner/session.mjs';
+import { createSession, endSession, listSessions, reclaimOrphanedSessions, sessionSummary, SessionError } from '../src/runner/session.mjs';
 import { visitCount } from '../src/runner/anti-loop.mjs';
 import { DEFAULTS } from '../src/state/work.mjs';
 import { DEFAULT_DOMAIN, getDomain, stepForPhase, domainSteps, effectiveStep, resolveDomainName } from '../src/state/domain-registry.mjs';
@@ -145,41 +141,6 @@ function mainCheckoutRootOf(flags, cwd = process.cwd(), policy = 'main-checkout'
 // The main checkout of the repository `cwd` sits in (`cwd` itself outside a repository).
 function mainCheckoutRootAt(cwd) {
   return mainCheckoutRootOf({}, cwd);
-}
-
-// `main-checkout-reset` reads: the commits a reset would drop and the whole-repo status, both through
-// Inspect. Listing is advisory, so it is bounded and degrades instead of failing the verb.
-const RESET_LISTED_COMMITS = 50;
-function describeLostCommits(inspect, commits) {
-  const shown = commits.slice(0, RESET_LISTED_COMMITS);
-  let objects = [];
-  try {
-    objects = inspect.readObjects({ oids: shown, maxBytes: 8 * 1024 * 1024 });
-  } catch (_err) {
-    // Details unavailable: the short ids below still name every listed commit.
-  }
-  const lines = shown.map((oid, i) => {
-    const object = objects[i];
-    if (object?.kind !== 'present' || object.objectType !== 'commit') return `${oid.slice(0, 7)} (commit details unavailable)`;
-    const [header, ...body] = Buffer.from(object.bytes).toString('utf8').split('\n\n');
-    const author = /^author (.*) <([^>]*)> \d+ [+-]\d{4}$/m.exec(header);
-    return `${oid.slice(0, 7)} ${author ? `${author[1]} (${author[2]})` : '(unknown author)'}: ${body.join('\n\n').split('\n', 1)[0]}`;
-  });
-  if (commits.length > shown.length) lines.push(`... and ${commits.length - shown.length} more`);
-  return lines.join('\n');
-}
-function renderStatus(inspect) {
-  const lines = [];
-  let cursor;
-  do {
-    const page = inspect.status({ untracked: 'all', maxEntries: 4096, cursor });
-    for (const entry of page.entries) {
-      const xy = entry.untracked ? '??' : entry.ignored ? '!!' : String.fromCharCode(entry.index, entry.worktree).replaceAll('.', ' ');
-      lines.push(`${xy} ${Buffer.from(entry.path).toString('utf8')}`);
-    }
-    cursor = page.nextCursor;
-  } while (cursor);
-  return lines.join('\n');
 }
 
 // `currentHead`/`resolveRefSha` live in src/runner/worktree.mjs (tsk-49i
@@ -3803,30 +3764,24 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
     case 'worktree': {
       const sub = requireField(positional[0], 'worktree requires a sub-verb: create <path> | remove <path> --delivered-to <ref> [--discard-ignored]');
       if (sub === 'create') {
-        if (positional.length !== 2) throw new Error('usage: fgos worktree create <path> [--branch <name> | --detach] [--base <ref>] [--json]');
-        const cwd = process.cwd();
-        const repoRoot = mainCheckoutRootAt(cwd);
-        const stateRoot = worktreeStateRoot({ fgosDir: path.join(repoRoot, '.fgos') }).stateRoot;
-        const writer = gitWriter(path.join(repoRoot, '.fgos'));
+        if (positional.length !== 2) throw new StoreError('validation', 'usage: fgos worktree create <path> [--branch <name> | --detach] [--base <ref>] [--json]');
+        const { worktreeContext } = await import('../src/verbs/worktree/context.mjs');
         const { createWorktreeUseCase } = await import('../src/verbs/worktree/create.mjs');
-        return createWorktreeUseCase({ cwd, repoRoot, stateRoot, writer }, {
+        return createWorktreeUseCase(worktreeContext(process.cwd(), mainCheckoutRootAt(process.cwd())), {
           path: positional[1], branch: optionalField(flags.branch, 'worktree create --branch requires a name'),
           detach: Boolean(flags.detach), base: optionalField(flags.base, 'worktree create --base requires a ref'),
         });
       }
       if (sub === 'remove') {
-        if (positional.length !== 2) throw new Error('usage: fgos worktree remove <path> --delivered-to <ref> [--discard-ignored] [--json]');
-        const cwd = process.cwd();
-        const repoRoot = mainCheckoutRootAt(cwd);
-        const stateRoot = worktreeStateRoot({ fgosDir: path.join(repoRoot, '.fgos') }).stateRoot;
-        const writer = gitWriter(path.join(repoRoot, '.fgos'));
+        if (positional.length !== 2) throw new StoreError('validation', 'usage: fgos worktree remove <path> --delivered-to <ref> [--discard-ignored] [--json]');
+        const { worktreeContext } = await import('../src/verbs/worktree/context.mjs');
         const { removeWorktreeUseCase } = await import('../src/verbs/worktree/remove.mjs');
-        return removeWorktreeUseCase({ cwd, repoRoot, stateRoot, writer }, {
+        return removeWorktreeUseCase(worktreeContext(process.cwd(), mainCheckoutRootAt(process.cwd())), {
           path: positional[1], deliveredTo: requireField(flags['delivered-to'], 'worktree remove requires --delivered-to <ref>'),
           discardIgnored: flags['discard-ignored'],
         });
       }
-      throw new Error(`unknown worktree sub-verb: ${sub}`);
+      throw new StoreError('validation', `unknown worktree sub-verb: ${sub}`);
     }
     // Opt-in per-session git worktree lifecycle (fgos-multi-session-checkout
     // Epic 1, D6/D7): a first-class `session` verb family wiring session.mjs's
@@ -3849,30 +3804,11 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         if (sub === 'start') {
           const itemId = optionalField(flags.item, 'session start --item requires a non-empty id value (omit --item entirely to start a session with no item bound)');
           const entry = createSession(repoRoot, { itemId });
-          // Explicit projection, not a spread: decouples the public envelope
-          // from session.mjs's internal registry-entry shape (mirrors every
-          // other converted verb, e.g. move's {id,from,to,seq}).
-          return {
-            sessionId: entry.sessionId,
-            worktreePath: entry.worktreePath,
-            itemId: entry.itemId,
-            startCommit: entry.startCommit,
-            pid: entry.pid,
-            startedAt: entry.startedAt,
-          };
+          return sessionSummary(entry);
         }
         if (sub === 'end') {
           const sessionId = requireField(positional[1], 'session end requires a session id: fgos session end <session-id> [--force]');
-          const entry = endSession(repoRoot, sessionId, { force: Boolean(flags.force) });
-          return {
-            sessionId: entry.sessionId,
-            worktreePath: entry.worktreePath,
-            itemId: entry.itemId,
-            startCommit: entry.startCommit,
-            pid: entry.pid,
-            startedAt: entry.startedAt,
-            forced: Boolean(flags.force),
-          };
+          return { ...sessionSummary(endSession(repoRoot, sessionId, { force: Boolean(flags.force) })), forced: Boolean(flags.force) };
         }
         if (sub === 'list') {
           return listSessions(repoRoot);
@@ -4389,11 +4325,8 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
     // from the worktree itself, or from `--dir` when that names the main root.
     case 'resync-worktree': {
       const worktreePath = flags.path ? path.resolve(flags.path) : process.cwd();
-      const checkedOut = gitWorktrees(worktreePath).find((row) => realpathOr(Buffer.from(row.path).toString('utf8')) === realpathOr(worktreePath))?.branch;
-      const branch = flags.branch ?? (checkedOut?.startsWith('refs/heads/') ? checkedOut.slice('refs/heads/'.length) : null);
-      if (!branch) throw new StoreError('validation', `resync-worktree: "${worktreePath}" has no branch checked out; pass --branch <name>`);
       const repoRoot = mainCheckoutRootOf(flags, worktreePath);
-      return resyncWorktree(repoRoot, worktreePath, branch);
+      return resyncWorktree(repoRoot, worktreePath, flags.branch);
     }
 
     // tsk-3au: the safe path for a destructive `git reset --hard` on the main checkout -- refuses when the
@@ -4404,55 +4337,8 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
     case 'main-checkout-reset': {
       const sha = requireField(flags.sha, 'main-checkout-reset requires --sha <sha>: fgos main-checkout-reset --sha <sha> [--confirm]');
       const repoRoot = mainCheckoutRootOf(flags, process.cwd(), 'main-checkout-only');
-      if (flags.dir === undefined && !isMainWorktree(process.cwd())) {
-        throw new StoreError(
-          'validation',
-          'main-checkout-reset: refusing to run without --dir <mainRoot> -- cwd is a linked worktree, and without --dir this verb would silently ' +
-            'target it (git reset --hard) instead of the main checkout. Pass --dir <mainRoot> explicitly, e.g. ' +
-            '`fgos main-checkout-reset --sha <sha> --dir "$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)"`.',
-        );
-      }
-      const reset = async (handle) => {
-        const confirmed = Boolean(flags.confirm);
-        const inspect = inspectGit(repoRoot);
-        const target = inspect.resolveCommit({ name: sha });
-        if (!target) throw new StoreError('validation', `main-checkout-reset: "${sha}" does not name a commit in "${repoRoot}"`);
-        const head = inspect.resolveCommit({ name: 'HEAD' });
-        if (!head) throw new StoreError('validation', `main-checkout-reset: "${repoRoot}" has no commit to reset from`);
-        const dirty = !isMainTreeClean(repoRoot);
-        const lostCommitCount = inspect.countCommits({ include: head, exclude: target });
-        try {
-          assertSafeMainCheckoutReset({ dirty, confirmed, lostCommitCount, sha });
-        } catch (err) {
-          let details = `main-checkout-reset: ${err.message}`;
-          if (dirty) {
-            details += `\n\nFull git status (main checkout, whole repo):\n${renderStatus(inspect) || '(empty)'}`;
-          }
-          if (lostCommitCount > 0) {
-            const lost = inspect.compareCommits({ left: target, right: head }).commits;
-            details += `\n\nCommits about to be discarded (${lostCommitCount}):\n${describeLostCommits(inspect, lost)}`;
-          }
-          throw new StoreError('validation', details);
-        }
-        // Without --confirm only a clean forward move reaches here: a plain restore, nothing discarded.
-        const options = gitPortOptions(repoRoot, { mutation: true });
-        const operationId = randomUUID();
-        const request = {
-          expectedHead: head,
-          target,
-          reason: `main-checkout-reset --sha ${sha}`,
-          ...(confirmed ? { discardLocalDelta: true, confirmedBy: `fgos main-checkout-reset --confirm (writer ${options.writer})` } : {}),
-        };
-        let restored;
-        try {
-          restored = createGitSafeRestore(options).apply({ operationId, request }, [handle]);
-        } catch (err) {
-          throw new StoreError('validation', `main-checkout-reset: SafeRestore refused to reset "${repoRoot}" to ${sha}: ${nativeError(err).cause}`);
-        }
-        return { sha, wasDirty: dirty, lostCommitCount, confirmed, operationId, snapshot: restored.snapshot };
-      };
       try {
-        return await withMainCheckout(createLockScope('main-checkout-reset'), 'reset', reset, { fgosDir: fgosDirFromRoot(repoRoot) });
+        return await mainCheckoutResetUseCase({ repoRoot, cwd: process.cwd(), explicitDir: flags.dir !== undefined }, { sha, confirmed: Boolean(flags.confirm) });
       } catch (err) {
         throw lockErrorToStoreError(err, 'main-checkout-reset');
       }
@@ -4974,62 +4860,17 @@ async function main() {
 
     faultClass = 'dir-invalid';
     dir = resolveInvocationRoot({ cwd: process.cwd(), dir: flags.dir, policy: verb === 'init' ? 'strict-cwd' : 'caller-tree' }).fgosDir;
-    // tsk-4fu-2: a verb registered `store: 'require'`
-    // (command-registry.mjs) reads/writes through this `dir` — refuse
-    // before ever reaching its handler when `.fgos/` isn't there yet,
-    // instead of letting a write create a fresh, empty one (the worktree
-    // phantom-store hazard this item closes). `init` is deliberately never
-    // in that set — it is the one legitimate door that creates `.fgos/` —
-    // but gets the opposite check: refuse when `cwd` is a linked worktree,
-    // the one remaining path that could recreate a live `.fgos/` there and
-    // defeat ADR0020.
     const entry = COMMAND_REGISTRY.find((e) => e.name === verb);
     if (entry?.nativeOnly) {
       process.stderr.write(`fgos: "${verb}" chỉ có ở Rust host.\n`);
       process.exit(4);
     }
-    faultClass = 'store-missing';
-    if (entry?.store === 'require' && !fs.existsSync(dir)) {
-      throw new StoreError(
-        'validation',
-        `.fgos/ not found at "${dir}" -- run "fgos init" here first, or check you are not inside a linked worktree (worktrees never carry .fgos/, per ADR0020: docs/platform/runner/decisions/h-36d872fbb0e5.md#0020--chặn-fgos-khỏi-worktree-worker-không-khóa-không-cô-lập).`,
-      );
-    }
-    // A worktree made outside fgOS's own lifecycle carries a real, frozen `.fgos/` copy, so the missing-store refusal above
-    // never fires for it. `fs.existsSync(dir)` is required here, not implied: `fgos session start` from a `.fgos/`-less
-    // ADR0020-stripped worktree is the legitimate case that verb serves (it symlinks `.fgos/` in). Skipped when `--dir` was
-    // passed: the caller took responsibility for that root, and `isMainWorktree(process.cwd())` would check the wrong one.
-    // `isSessionWorktree` admits the one other legitimate non-main case, an already-created `fgos session start` worktree.
-    faultClass = 'disconnected-worktree-store';
-    if (
-      flags.dir === undefined &&
-      declared(entry?.mutatesStore, positional, flags) &&
-      fs.existsSync(dir) &&
-      !isMainWorktree(process.cwd()) &&
-      !isSessionWorktree(process.cwd())
-    ) {
-      throw new StoreError(
-        'validation',
-        `"${verb}" refused: "${process.cwd()}" is a linked worktree whose .fgos/ at "${dir}" is a real but disconnected snapshot, never the shared store outside "fgos pick"/"fgos take" (ADR0020-stripped) or "fgos session start" (symlinked) -- pass --dir <mainRoot> to reach the real store explicitly, e.g. ` +
-          '`--dir "$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)"`.',
-      );
-    }
-    faultClass = 'init-in-worktree';
-    if (verb === 'init' && !isMainWorktree(process.cwd())) {
-      throw new StoreError(
-        'validation',
-        `"fgos init" refused inside a linked worktree ("${process.cwd()}") -- worktrees never carry .fgos/ by design (ADR0020); run "fgos init" from the main checkout instead.`,
-      );
-    }
-    // tsk-56t D2: a `store: 'read'` verb tolerates a missing store (a fresh non-worktree dir is a legitimate "not evaluated"
-    // case), but a worktree-resident session that forgets `--dir` would then see a silent, real-looking empty view. The
-    // warning goes to stderr: `ready`/`triage` can return a bare array when unpaginated, so a JSON `data` field would change
-    // that shape in this one runtime case.
-    if (entry?.store === 'read' && !fs.existsSync(dir) && !isMainWorktree(process.cwd())) {
-      process.stderr.write(
-        `fgos: warning: .fgos/ not found at "${dir}" -- this view may be empty because the real store lives elsewhere (worktrees never carry .fgos/, per ADR0020); pass --dir <mainRoot> to read it.\n`,
-      );
-    }
+    // Whether this verb may touch the store from here (missing store, disconnected snapshot, `init` in a worktree, an
+    // empty-looking view) is one decision, `admitStoreAccess`; its refusals carry their own fault class.
+    const { warning } = admitStoreAccess({
+      verb, store: entry?.store, mutates: declared(entry?.mutatesStore, positional, flags), dir, cwd: process.cwd(), explicitDir: flags.dir !== undefined,
+    });
+    if (warning) process.stderr.write(warning);
     // Past this line the verb's own handler runs, and its refusals ("work X
     // not found", an Iron Law trip, a held lock) are correct answers rather
     // than misuse — so nothing there is recorded. The one exception is an
@@ -5074,7 +4915,7 @@ async function main() {
       fgosDir: dir,
       cwd: process.cwd(),
       verb,
-      faultClass: faultClass ?? (parsed && isEventStoreChild(verb, parsed.positional, parsed.flags) ? 'event-store-child' : null),
+      faultClass: err.faultClass ?? faultClass ?? (parsed && isEventStoreChild(verb, parsed.positional, parsed.flags) ? 'event-store-child' : null),
       message: err.message,
       argv: process.argv.slice(2),
     });

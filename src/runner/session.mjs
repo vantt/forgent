@@ -67,48 +67,18 @@ function fgosDirOf(repoRoot) {
 }
 
 /**
- * Whether `repoRoot` is a genuine `fgos session`-created worktree, never a
- * plain (or forged) symlink pointing somewhere else: `.fgos` at `repoRoot`
- * must be a symbolic link (`createSession`'s own `fs.symlinkSync` above,
- * D10 -- never a checked-out copy) AND its realpath must equal the real
- * main checkout's own `.fgos` realpath (`resolveMainCheckoutRoot`, which
- * resolves via `--git-common-dir` and so cannot itself be redirected by a
- * worktree-local symlink). A bare `isSymbolicLink()` check alone would be
- * forgeable -- a worktree could carry a `.fgos` symlink pointing anywhere
- * -- so both conditions are required; unlike `isMainWorktree`
- * (worktree.mjs), which only tells the main checkout apart from every
- * linked worktree and does not itself distinguish a legitimate session
- * worktree from an ad-hoc one, this answers the narrower question a caller
- * needs before treating a linked worktree's own `.fgos` as the real shared
- * store rather than a stale, disconnected snapshot.
- *
- * Never throws: any filesystem error (missing `.fgos`, not inside a git
- * checkout at all) means "not a session worktree", the safe answer.
+ * The public envelope of a session registry entry: an explicit projection, not a spread, so the envelope does not
+ * follow the registry entry's internal shape.
  */
-export function isSessionWorktree(repoRoot) {
-  const linkPath = path.join(repoRoot, '.fgos');
-  let linkStat;
-  try {
-    linkStat = fs.lstatSync(linkPath);
-  } catch {
-    return false;
-  }
-  if (!linkStat.isSymbolicLink()) return false;
-
-  const mainCheckoutRoot = resolveMainCheckoutRoot(repoRoot);
-  if (!mainCheckoutRoot) return false;
-
-  let linkRealPath;
-  let mainFgosRealPath;
-  try {
-    linkRealPath = fs.realpathSync.native(linkPath);
-    mainFgosRealPath = fs.realpathSync.native(fgosDirOf(mainCheckoutRoot));
-  } catch {
-    return false;
-  }
-  return process.platform === 'win32'
-    ? linkRealPath.toLowerCase() === mainFgosRealPath.toLowerCase()
-    : linkRealPath === mainFgosRealPath;
+export function sessionSummary(entry) {
+  return {
+    sessionId: entry.sessionId,
+    worktreePath: entry.worktreePath,
+    itemId: entry.itemId,
+    startCommit: entry.startCommit,
+    pid: entry.pid,
+    startedAt: entry.startedAt,
+  };
 }
 
 /** Remove the `.fgos` symlink we created inside a session worktree. It is our
