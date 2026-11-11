@@ -66,7 +66,7 @@ import {
   categoryOf,
   EXIT_CODES,
 } from '../state/store.mjs';
-import { readClaims, withMainState, getMainFgosDir } from '../state/runtime-coordination.mjs';
+import { readClaims, withMainState } from '../state/runtime-coordination.mjs';
 import { maintainEventStore } from '../event-store/maintenance.mjs';
 import { processSealCoalescer } from '../event-store/seal-coalescing.mjs';
 import { DEFAULTS, truncateTitle } from '../state/work.mjs';
@@ -92,7 +92,7 @@ import { resolveRoot, hasOpenDescendant, indexChildrenByParent } from '../state/
 import { cleanupMergedBranch } from './merge.mjs';
 import { claimWork, ClaimError, readWorkerSlotCeiling } from './claim-port.mjs';
 import { hasWorkerSlotRoom, countWorkerSlots } from '../state/worker-slots.mjs';
-import { resolveRepoRoot, fgosDirFromRoot } from './paths.mjs';
+import { resolveRepoRoot, fgosDirFromRoot, resolveInvocationRoot } from './paths.mjs';
 import { FALLBACK_VERIFY, resolveDiscovery, classificationPatchFromVerdict } from '../intake/discovery.mjs';
 import { resolvePlan, resolveContentRoot } from '../intake/plan.mjs';
 import { planVerdictFromPlanMd } from '../intake/plan-verdict-from-plan-md.mjs';
@@ -1785,7 +1785,7 @@ export async function runWatch(options = {}) {
   let store = null;
   try {
     const dir = options.dir ?? fgosDirFromRoot(options.repoRoot ?? resolveRepoRoot(options.cwd ?? process.cwd()));
-    store = { cwd: path.dirname(dir), trustedMain: path.dirname(getMainFgosDir(dir)) };
+    store = { cwd: path.dirname(dir), trustedMain: resolveInvocationRoot({ cwd: path.dirname(dir), policy: 'main-checkout' }).root };
   } catch { /* reported by runOnce */ }
   const maintain = (policy) => { if (store) maintainEventStore(store.cwd, { trustedMain: store.trustedMain, ...policy }); };
 

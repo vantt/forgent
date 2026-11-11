@@ -54,6 +54,9 @@
 // worktree carrying a frozen `.fgos/` copy. `landsWork` (true, or
 // `(positional) => boolean`) marks the verbs that run Land, so their end trigger
 // releases the candidates Work has recorded. Both default to false when absent.
+// `eventStoreChild` (`(positional, flags) => boolean`) marks the invocation that is a detached seal or publish child of
+// the Event Store lifecycle itself: it opens no start or end trigger (the child does one seal or one sync and nothing
+// around it) and a failure of it is always recorded, since nobody waits for it.
 // Every entry carries `store`, same discipline as `paginated` above.
 
 // `subcommands` (optional) is set on a verb whose first positional is a
@@ -1662,6 +1665,7 @@ export const COMMAND_REGISTRY = [
     touchesState: true,
     store: 'open',
     mutatesStore: (positional) => positional[0] === 'sync',
+    eventStoreChild: (positional, flags) => positional[0] === 'seal' || (positional[0] === 'sync' && flags.opportunistic === true),
     externalEffect: true,
     paginated: false,
     deprecated: null,

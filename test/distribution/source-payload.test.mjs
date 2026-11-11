@@ -7,6 +7,7 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { listLegacyNodeSourceFiles } from '../../scripts/build-rust-distribution.mjs';
 import { inspectRepo } from '../../scripts/lib/git-ports.mjs';
+import { OWN_CLI } from '../../src/util/spawn-detached-fgos.mjs';
 
 test('source payload excludes ignored setup output, includes untracked source and works without Git', (t) => {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-payload-'));
@@ -25,4 +26,11 @@ test('source payload excludes ignored setup output, includes untracked source an
   assert.deepEqual(listLegacyNodeSourceFiles(root, () => inspectRepo(root)), [
     '.agents/hooks.json', '.agents/skills/instruction-audit/SKILL.md', '.agents/source.mjs', 'package.json',
   ]);
+});
+
+test('the entry a detached child runs sits in the payload at the same layout as the module that spawns it', () => {
+  const repoRoot = path.resolve(path.dirname(new URL(import.meta.url).pathname), '../..');
+  const entry = path.relative(repoRoot, OWN_CLI).split(path.sep).join('/');
+  assert.equal(entry, 'bin/fgos.mjs', 'spawn-detached-fgos.mjs finds the CLI entry two levels above src/util');
+  assert.ok(listLegacyNodeSourceFiles(repoRoot, () => inspectRepo(repoRoot)).includes(entry), 'the entry is part of the staged source payload');
 });

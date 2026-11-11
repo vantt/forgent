@@ -23,7 +23,7 @@ import { providerAccountInventory } from '../runner/dispatch/provider-capacity.m
 import { legacyStateKey } from '../runner/dispatch/llm-accounts.mjs';
 import { parseAccountPin } from '../runner/execution/account-pin.mjs';
 import { normalizeStanceOptions } from '../runner/execution/unit.mjs';
-import { spawnDetachedCli } from '../cli/detached-child.mjs';
+import { spawnDetachedCli } from '../util/spawn-detached-fgos.mjs';
 import { ADVANCE_DETACHED_ENV } from './case-lock.mjs';
 import { assertWriteChains, workflowCheckout, workflowCommit } from './unit-handoff.mjs';
 import { inheritFrom } from './case-inherit.mjs';

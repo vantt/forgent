@@ -35,7 +35,7 @@ import os from 'node:os';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import { currentHead, inspectGit, gitWorktrees, compareCommits, removeWorktree, isCheckoutDirty } from './worktree.mjs';
-import { fgosDirFromRoot, resolveMainCheckoutRoot } from './paths.mjs';
+import { fgosDirFromRoot, resolveInvocationRoot } from './paths.mjs';
 import { resolveHolderLiveness, selfRecord } from '../native/process-identity.mjs';
 import { acquireSync, createLockScope, lockHolders, resolveLock } from '../holder-lock/index.mjs';
 import { addWorktreeSync } from './repo-locks.mjs';
@@ -384,7 +384,7 @@ export function endSession(repoRoot, sessionId, { force = false } = {}) {
   } finally {
     lock.release();
     // A clean writer exit seals what this session left open (spec §16), outside the `sessions` lock.
-    maintainEventStore(repoRoot, { trustedMain: resolveMainCheckoutRoot(repoRoot) ?? repoRoot, shutdown: true });
+    maintainEventStore(repoRoot, { trustedMain: () => resolveInvocationRoot({ cwd: repoRoot, policy: 'main-checkout' }).root, shutdown: true });
   }
 }
 

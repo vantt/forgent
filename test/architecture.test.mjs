@@ -1517,6 +1517,35 @@ test('Event Store keeps consumer boundaries and one native export importer', () 
   assert.deepEqual(violations, []);
 });
 
+// A lower layer defines its own conventions and never knows the shell: these folders import nothing from `src/cli`.
+// The one named exception reads the CLI version for a doctor row and goes when that row reads the version at its owner.
+const CLI_IMPORT_EXCEPTIONS = ['src/setup/registrations.mjs'];
+const NO_CLI_IMPORT_DIRS = ['src/event-store/', 'src/workflow/', 'src/observe/', 'src/verbs/', 'src/setup/'];
+
+export function cliImportsOf(file, source) {
+  return extractImports(source)
+    .map((specifier) => path.relative(root, path.resolve(root, path.dirname(file), specifier)).split(path.sep).join('/'))
+    .filter((target) => target === 'src/cli' || target.startsWith('src/cli/'));
+}
+
+test('event-store, workflow, observe, verbs and setup import nothing from src/cli beyond the one named exception', () => {
+  const violations = [];
+  for (const file of onDisk.filter((f) => NO_CLI_IMPORT_DIRS.some((dir) => f.startsWith(dir)) && !CLI_IMPORT_EXCEPTIONS.includes(f))) {
+    for (const target of cliImportsOf(file, fs.readFileSync(path.join(root, file), 'utf8'))) violations.push(`${file} -> ${target}`);
+  }
+  assert.deepEqual(violations, []);
+  for (const file of CLI_IMPORT_EXCEPTIONS) {
+    assert.ok(cliImportsOf(file, fs.readFileSync(path.join(root, file), 'utf8')).length > 0, `${file} no longer imports src/cli: drop it from the exceptions`);
+  }
+});
+
+test('the src/cli import guard catches a static, a dynamic and a multi-line import and ignores other folders', () => {
+  assert.deepEqual(cliImportsOf('src/observe/x.mjs', "import { a } from '../cli/version.mjs';"), ['src/cli/version.mjs']);
+  assert.deepEqual(cliImportsOf('src/observe/x.mjs', "const m = await import('../cli/detached-child.mjs');"), ['src/cli/detached-child.mjs']);
+  assert.deepEqual(cliImportsOf('src/verbs/a/x.mjs', "import {\n  a,\n} from '../../cli/approve-fault-log.mjs';"), ['src/cli/approve-fault-log.mjs']);
+  assert.deepEqual(cliImportsOf('src/observe/x.mjs', "import { a } from '../util/x.mjs'; // ../cli/y.mjs"), []);
+});
+
 test('pattern vocabulary rename is complete with no live retired aliases or deleted modules', () => {
   const forbidden = [
     '\\bPRESETS\\b',
@@ -1621,22 +1650,18 @@ const ENTRY_LEAF_IMPORTS = [
 ];
 const ARM_STATIC_IMPORTS = [
   '../src/cli/deprecation.mjs',
-  '../src/cli/detached-child.mjs',
   '../src/cli/flag-check.mjs',
-  '../src/cli/invocation-fault-log.mjs',
   '../src/cli/version.mjs',
   '../src/config/facade.mjs',
   '../src/event-store/maintenance.mjs',
-  '../src/event-store/seal-coalescing.mjs',
   '../src/git/inspect.mjs',
   '../src/git/status.mjs',
   '../src/holder-lock/index.mjs',
-  '../src/holder-lock/state-root.mjs',
-  '../src/install/coexist.mjs',
   '../src/intake/classify.mjs',
   '../src/intake/discovery.mjs',
   '../src/intake/plan.mjs',
   '../src/intake/verify-pattern-check.mjs',
+  '../src/observe/invocation-fault-log.mjs',
   '../src/report/authoritative-match.mjs',
   '../src/report/capability-plan-lint.mjs',
   '../src/report/context-render.mjs',
@@ -1667,7 +1692,6 @@ const ARM_STATIC_IMPORTS = [
   '../src/runner/worker-log.mjs',
   '../src/runner/worktree.mjs',
   '../src/setup/ansi.mjs',
-  '../src/setup/event-store-fixes.mjs',
   '../src/state/awaiting-context.mjs',
   '../src/state/cleanup-harness.mjs',
   '../src/state/cursor.mjs',

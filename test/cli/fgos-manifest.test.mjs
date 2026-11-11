@@ -62,7 +62,7 @@ test('manifest verb-name set equals the set of verbs runVerb() actually dispatch
 test('every registry entry has touchesState, externalEffect, paginated booleans, a store mode and the required keys', () => {
   const baseKeys = ['deprecated', 'description', 'examples', 'externalEffect', 'invoke', 'name', 'paginated', 'parameters', 'store', 'touchesState'];
   for (const entry of COMMAND_REGISTRY) {
-    const expectedKeys = [...baseKeys, ...(entry.nativeOnly !== undefined ? ['nativeOnly'] : []), ...(entry.subcommands !== undefined ? ['subcommands'] : []), ...(entry.retiredFlags !== undefined ? ['retiredFlags'] : []), ...['mutatesStore', 'landsWork'].filter((k) => entry[k] !== undefined)].sort();
+    const expectedKeys = [...baseKeys, ...(entry.nativeOnly !== undefined ? ['nativeOnly'] : []), ...(entry.subcommands !== undefined ? ['subcommands'] : []), ...(entry.retiredFlags !== undefined ? ['retiredFlags'] : []), ...['mutatesStore', 'landsWork', 'eventStoreChild'].filter((k) => entry[k] !== undefined)].sort();
     assert.deepEqual(
       Object.keys(entry).sort(),
       expectedKeys,
@@ -91,10 +91,10 @@ test('every registry entry has touchesState, externalEffect, paginated booleans,
   }
 });
 
-test('mutatesStore and landsWork are true or a predicate, and sit only on a verb that touches state', () => {
+test('mutatesStore, landsWork and eventStoreChild are true or a predicate, and sit only on a verb that touches state', () => {
   // Why no existing test proves it: the key-set test above only checks which keys exist, not their shape.
   for (const entry of COMMAND_REGISTRY) {
-    for (const key of ['mutatesStore', 'landsWork']) {
+    for (const key of ['mutatesStore', 'landsWork', 'eventStoreChild']) {
       if (entry[key] === undefined) continue;
       assert.ok(entry[key] === true || typeof entry[key] === 'function', `entry "${entry.name}" has invalid ${key}`);
       assert.ok(entry.touchesState, `entry "${entry.name}" declares ${key} without touchesState`);

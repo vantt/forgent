@@ -30,7 +30,7 @@ import path from 'node:path';
 import readline from 'node:readline';
 import { execFileSync, execSync, spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { initStore, addWork, moveWork, settleClaim, editWork, resolveParkReason, addDecision, addOutcome, recordFriction, listWork, readyWork, isDepsAndLineageReady, footprintConflicts, computedSchedule, readRawEvents, putInAwaiting, answerAwaiting, setFocus, goalFocusShow, assertAcceptanceEvidence, assertPlanEvidence, assertValidDocType, recordGateApprove, recordCall, recordCallReturn,      parseDecisionRelation, decisionTextLooksLikeSupersession, registerTopicStore, renameTopicStore, splitTopicStore, mergeTopicStore, retireTopicStore, reserveDocStore, registerDocStore, markDocRenderedStore, promoteDocStore, demoteDocStore, supersedeDocStore, retireDocStore, moveDocPathStore, attestDocStore } from '../src/state/store.mjs';
+import { addWork, moveWork, settleClaim, editWork, resolveParkReason, addDecision, addOutcome, recordFriction, listWork, readyWork, isDepsAndLineageReady, footprintConflicts, computedSchedule, readRawEvents, putInAwaiting, answerAwaiting, setFocus, goalFocusShow, assertAcceptanceEvidence, assertPlanEvidence, assertValidDocType, recordGateApprove, recordCall, recordCallReturn,      parseDecisionRelation, decisionTextLooksLikeSupersession, registerTopicStore, renameTopicStore, splitTopicStore, mergeTopicStore, retireTopicStore, reserveDocStore, registerDocStore, markDocRenderedStore, promoteDocStore, demoteDocStore, supersedeDocStore, retireDocStore, moveDocPathStore, attestDocStore } from '../src/state/store.mjs';
 import { StoreError, EXIT_CODES, categoryOf } from '../src/state/store-error.mjs';
 import { exitCodeOf } from '../src/cli/verb-exit.mjs';
 import { resolveDocPath } from '../src/report/knowledge-resolver.mjs';
@@ -47,7 +47,7 @@ import { probeTool, readLocalStatus, writeLocalStatus, resolvedStatus, normalize
 import { EventLogError } from '../src/state/event-log.mjs';
 import { foldEvents, conflictsFor } from '../src/state/replay.mjs';
 import { deriveTitle, classify } from '../src/intake/classify.mjs';
-import { mintMachineId, mintWorkId } from '../src/util/identity-mint.mjs';
+import { mintWorkId } from '../src/util/identity-mint.mjs';
 import { wrapEnvelope } from '../src/state/envelope.mjs';
 import { loadRunnerConfigForDir } from '../src/runner/dispatch/config.mjs';
 import { RunnerConfigError } from '../src/runner/dispatch/runner-config-error.mjs';
@@ -76,10 +76,8 @@ import { generateEnduserDocsIndex } from '../src/report/enduser-index-generate.m
 import { rankImpact } from '../src/state/impact.mjs';
 import { FINAL_STATUSES } from '../src/state/work.mjs';
 import { isResolvedStatus } from '../src/state/frontier.mjs';
-import { readClaim, releaseClaim, getMainFgosDir } from '../src/state/runtime-coordination.mjs';
-import { maintainEventStore } from '../src/event-store/maintenance.mjs';
-import { processSealCoalescer } from '../src/event-store/seal-coalescing.mjs';
-import { spawnDetachedCli } from '../src/cli/detached-child.mjs';
+import { readClaim, releaseClaim } from '../src/state/runtime-coordination.mjs';
+import { runWithEventStoreLifecycle } from '../src/event-store/maintenance.mjs';
 import { paginate } from '../src/state/cursor.mjs';
 import { runGoalCheck, detachedWorktreeFgosHint, runInvariantChecks, invariantFailureAsCheck } from '../src/runner/goal-check.mjs';
 import { frozenJudgeHits, footprintDiffHits } from '../src/runner/frozen-judge.mjs';
@@ -109,17 +107,14 @@ import { fenceLock, parseLockParams } from '../src/runner/lock-fence.mjs';
 import { formatLockDurationMs } from '../src/util/format-lock-duration.mjs';
 import { clearBeaconIfOwn } from '../src/runner/main-checkout-activity.mjs';
 import { resolveWriterIdentity } from '../src/util/session-identity.mjs';
-import { resolveStateRoot as worktreeStateRoot } from '../src/holder-lock/state-root.mjs';
 import { createSession, endSession, listSessions, reclaimOrphanedSessions, sessionSummary, SessionError } from '../src/runner/session.mjs';
 import { visitCount } from '../src/runner/anti-loop.mjs';
 import { DEFAULTS } from '../src/state/work.mjs';
 import { DEFAULT_DOMAIN, getDomain, stepForPhase, domainSteps, effectiveStep, resolveDomainName } from '../src/state/domain-registry.mjs';
-import { writeCoexistenceManifest } from '../src/install/coexist.mjs';
 import { MANIFEST_SCHEMA_VERSION, COMMAND_REGISTRY, declared } from '../src/cli/command-registry.mjs';
-import { recordInvocationFault, resolveFaultLogPath } from '../src/cli/invocation-fault-log.mjs';
+import { recordInvocationFault } from '../src/observe/invocation-fault-log.mjs';
 import { computeAwaitingContext } from '../src/state/awaiting-context.mjs';
 import { readConfig, initConfigFile } from '../src/config/facade.mjs';
-import { fixEventStoreLockDirs } from '../src/setup/event-store-fixes.mjs';
 import { countWorkerSlots, hasWorkerSlotRoom } from '../src/state/worker-slots.mjs';
 import { assessCleanupReadiness, blockedItemsNowResolvable } from '../src/state/cleanup-harness.mjs';
 import { formatCheck, bold } from '../src/setup/ansi.mjs';
@@ -141,6 +136,11 @@ function mainCheckoutRootOf(flags, cwd = process.cwd(), policy = 'main-checkout'
 // The main checkout of the repository `cwd` sits in (`cwd` itself outside a repository).
 function mainCheckoutRootAt(cwd) {
   return mainCheckoutRootOf({}, cwd);
+}
+
+// What an Event Store verb reads: the project the `.fgos` `dir` belongs to, and the main checkout that owns the store.
+function eventStoreContext(dir) {
+  return { cwd: path.dirname(dir), trustedMain: mainCheckoutRootAt(path.dirname(dir)) };
 }
 
 // `currentHead`/`resolveRefSha` live in src/runner/worktree.mjs (tsk-49i
@@ -965,43 +965,8 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
     }
 
     case 'init': {
-      // `init` is the first step of setup, and the store cannot open without a machine id and its locks directory,
-      // which setup creates. Create them here through the Identity mint and the lock-dirs fix (idempotent: an existing id is kept, and a
-      // clone's own `fgos.machineId` still wins).
-      mintMachineId(worktreeStateRoot().stateRoot);
-      fixEventStoreLockDirs(path.dirname(dir));
-      initStore(dir);
-      // D4: detection/manifest writing must never fail init — a permissions
-      // quirk or unexpected error here still leaves `.fgos/` initialized.
-      let detectedHarnesses = [];
-      try {
-        const manifest = writeCoexistenceManifest(path.dirname(dir), dir);
-        detectedHarnesses = manifest.detected_harnesses;
-      } catch {
-        // Swallowed by design (D4 fail-safe) — see comment above.
-      }
-      // D4 fail-safe, same discipline as the coexistence manifest above: a
-      // failed HEAD lookup (a repo with zero commits, an unreadable ref) lands
-      // in the same catch — a plain non-fatal notice, not a distinction worth
-      // making. A cwd that is no repository never gets here: the two fixes
-      // above resolve the repository and refuse it.
-      let gitHeadless = false;
-      try {
-        gitHeadless = typeof inspectGit(path.dirname(dir)).resolveCommit({ name: 'HEAD' }) !== 'string';
-      } catch {
-        gitHeadless = true;
-      }
-      // Last and fail-safe like the steps above: an interrupted Land, ScopedCommit or remote transfer is recovered here, so a
-      // machine that only runs `init` on upgrade settles it without `fgos git recover` by hand.
-      let gitRecovery;
-      let gitRecoveryWarning;
-      try {
-        const { recovered, kept } = recoverGitOperations(path.dirname(dir));
-        if (recovered.length || kept.length) gitRecovery = { recovered, kept };
-      } catch (err) {
-        gitRecoveryWarning = `Git recovery refused: ${err.message}; run \`fgos git recover\``;
-      }
-      return { dir, detectedHarnesses, ...(gitHeadless ? { gitHeadless: true } : {}), ...(gitRecovery ? { gitRecovery } : {}), ...(gitRecoveryWarning ? { gitRecoveryWarning } : {}) };
+      const { initStoreUseCase } = await import('../src/verbs/state/init.mjs');
+      return initStoreUseCase({ dir });
     }
 
     case 'git': {
@@ -2896,7 +2861,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
     // own validation and refusals. The Event Store is Linux-only, so every one of them refuses elsewhere.
     case 'events': {
       const sub = positional[0];
-      const ctx = { cwd: path.dirname(dir), trustedMain: path.dirname(getMainFgosDir(dir)) };
+      const ctx = eventStoreContext(dir);
       if (sub === 'sync') {
         const { syncUseCase } = await import('../src/verbs/events/sync.mjs');
         return syncUseCase(ctx, { remote: flags.remote, noPush: flags['no-push'], opportunistic: flags.opportunistic });
@@ -2918,7 +2883,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
 
     case 'rebuild': {
       const { rebuildStoreUseCase } = await import('../src/verbs/events/rebuild.mjs');
-      return rebuildStoreUseCase({ cwd: path.dirname(dir), trustedMain: path.dirname(getMainFgosDir(dir)) });
+      return rebuildStoreUseCase(eventStoreContext(dir));
     }
 
     // Rollup view theo bộ (P24, request-class per D1: a pure read — never
@@ -4643,28 +4608,6 @@ function renderPretty(verb, data) {
 // `uninstall` and `git` (they resolve the main checkout themselves), `tool` (writes only the local status overlay),
 // and the verbs with a worktree guard of their own (`init`, `approve`, `sync-root`, `promote-to-component`,
 // `catchup`, `unclaim`, `return`, whose own registered-session check is deliberately more permissive).
-// A Work command's seal is not waited for: the answer is already printed, so the pending seals go to one short detached
-// `fgos events seal` child that certifies everything open and exits. No child (spawn failed, or killed first) loses
-// nothing: the events are durable and the next command or the `event-store-incidents` pointer covers them (spec §16).
-function handSealsToChild() {
-  for (const { root, stream, checkpointPath } of processSealCoalescer.takeHandedOff()) {
-    spawnDetachedCli({ cwd: root, args: ['events', 'seal', '--stream', stream, ...(checkpointPath ? ['--history', checkpointPath] : []), '--dir', root] });
-  }
-}
-// The detached children (the seal child and the publish child) have no caller to read their error, so a child that
-// fails leaves a record whatever the verb's own classification is.
-function isEventStoreChild(verb, positional, flags) {
-  return verb === 'events' && (positional[0] === 'seal' || (positional[0] === 'sync' && flags.opportunistic === true));
-}
-// A verb that opens the Event Store carries the opportunistic seal and publish triggers of spec §16 at its start and end.
-function opensEventStore(entry, verb, positional, flags) {
-  // The seal child does exactly one seal: no start or end trigger (no second seal sweep, no publish) around it.
-  if (verb === 'events' && positional[0] === 'seal') return false;
-  // The publish child does one opportunistic sync and nothing around it, or its own end trigger would start another child.
-  if (verb === 'events' && positional[0] === 'sync' && flags.opportunistic) return false;
-  return !!entry && entry.store !== 'none';
-}
-
 const ALLOWED_HOOK_KINDS = new Set(['dispatch-decide', 'decision-question', 'main-checkout-delete-guard', 'mailbox']);
 
 async function handleHook(rest) {
@@ -4836,16 +4779,13 @@ async function main() {
   // arg-parse fault never reached this catch at all and could not be recorded.
   let faultClass = 'arg-parse';
   let dir;
-  let parsed = null;
-  // Set once the verb is known to open the Event Store: the facts both lifecycle triggers need (spec §16).
-  let eventStoreLifecycle = null;
-  let sweepsLand = false;
-  // A dispatched worker seals inline: a detached child would leave the attempt's process domain.
+  // Set once the verb is known: whether it is itself a seal or publish child, and its sub-verb (the only argument the
+  // fault record keeps by value).
+  let eventStoreChild = false;
+  let sub;
   const { currentDispatchDepth } = await import('../src/runner/dispatch/adapters.mjs');
-  if (currentDispatchDepth() === 0) processSealCoalescer.handOff();
   try {
     const { flags, positional } = parseArgs(rest);
-    parsed = { flags, positional };
 
     // Same rule as the Rust host: any exact `--help`/`-h` token asks for help,
     // even where the parser took it as the previous flag's value.
@@ -4879,32 +4819,42 @@ async function main() {
     // above already answers it without new machinery. The error itself still
     // comes from `runVerb` unchanged.
     faultClass = entry ? null : 'unknown-verb';
-    // The main checkout is resolved (it runs git) only for a verb that opens the store; the other verbs never pay for it.
-    if (opensEventStore(entry, verb, positional, flags)) {
-      eventStoreLifecycle = { trustedMain: path.dirname(getMainFgosDir(dir)), dispatched: currentDispatchDepth() > 0 };
-      sweepsLand = declared(entry.landsWork, positional);
-      // `init` creates the store, so only its end trigger has anything to maintain. A command outside a dispatched worker
-      // hands its seals to a child and runs the same seal-if-due policy in its end trigger, so a start trigger would only
-      // repeat that work on the print path; a stale or crashed batch is sealed by that end trigger or the child.
-      if (verb !== 'init' && eventStoreLifecycle.dispatched) maintainEventStore(path.dirname(dir), eventStoreLifecycle);
-    }
-    const data = await runVerb(verb, flags, positional, dir, rest);
-    if (flags.pretty && (verb === 'setup' || verb === 'doctor')) {
-      process.stdout.write(renderPretty(verb, data));
-    } else if (verb === 'plan-lint' && !flags.json) {
-      process.stdout.write(renderPlanLintReport(data));
-    } else if (verb === 'wire-agents' && !flags.json) {
-      const { renderAgentWiringText } = await import('../src/setup/agent-wiring.mjs');
-      process.stdout.write(renderAgentWiringText(data));
-    } else if (verb === 'workflow' && positional[0] === 'propose' && !flags.json) {
-      const { renderProposalText } = await import('../src/workflow/propose.mjs');
-      process.stdout.write(renderProposalText(data));
-    } else {
-      process.stdout.write(`${JSON.stringify(wrapEnvelope(data), null, 2)}\n`);
-    }
-    // The exit code is the verb's own call (`exitCodeOf` (src/cli/verb-exit.mjs)): outcome verbs map to the canonical execution
-    // codes (RUL99), `plan-lint` exits 1 on a hard finding, `doctor --strict` on a failing check. The default is 0.
-    process.exitCode = exitCodeOf(verb, data, { positional, flags });
+    // The Event Store lifecycle (spec §16) wraps the verb, its answer and its exit code; the verb's own registry entry
+    // says whether it opens the store, ran Land, or is itself a seal or publish child.
+    eventStoreChild = declared(entry?.eventStoreChild, positional, flags);
+    sub = entry?.subcommands && Object.hasOwn(entry.subcommands, positional[0]) ? positional[0] : undefined;
+    await runWithEventStoreLifecycle({
+      cwd: path.dirname(dir),
+      // Resolved only for a verb that opens the store, and only once: it runs Git.
+      trustedMain: () => mainCheckoutRootAt(path.dirname(dir)),
+      dispatched: currentDispatchDepth() > 0,
+      opensStore: !!entry && entry.store !== 'none' && !eventStoreChild,
+      creating: verb === 'init',
+      landed: declared(entry?.landsWork, positional),
+      recordFault: (triggerFaultClass, message) => recordInvocationFault({ fgosDir: dir, cwd: process.cwd(), verb, sub, faultClass: triggerFaultClass, message, argv: process.argv.slice(2) }),
+      releaseLand: async (trustedMain) => {
+        const { releaseRecordedLand } = await import('../src/runner/merge.mjs');
+        for (const warning of releaseRecordedLand(trustedMain).warnings) process.stderr.write(`fgos: warning: Land candidate release: ${warning}\n`);
+      },
+    }, async () => {
+      const data = await runVerb(verb, flags, positional, dir, rest);
+      if (flags.pretty && (verb === 'setup' || verb === 'doctor')) {
+        process.stdout.write(renderPretty(verb, data));
+      } else if (verb === 'plan-lint' && !flags.json) {
+        process.stdout.write(renderPlanLintReport(data));
+      } else if (verb === 'wire-agents' && !flags.json) {
+        const { renderAgentWiringText } = await import('../src/setup/agent-wiring.mjs');
+        process.stdout.write(renderAgentWiringText(data));
+      } else if (verb === 'workflow' && positional[0] === 'propose' && !flags.json) {
+        const { renderProposalText } = await import('../src/workflow/propose.mjs');
+        process.stdout.write(renderProposalText(data));
+      } else {
+        process.stdout.write(`${JSON.stringify(wrapEnvelope(data), null, 2)}\n`);
+      }
+      // The exit code is the verb's own call (`exitCodeOf` (src/cli/verb-exit.mjs)): outcome verbs map to the canonical execution
+      // codes (RUL99), `plan-lint` exits 1 on a hard finding, `doctor --strict` on a failing check. The default is 0.
+      process.exitCode = exitCodeOf(verb, data, { positional, flags });
+    });
   } catch (err) {
     // tsk-5z0: record before reporting, and only say the record exists when
     // one actually landed — `recordInvocationFault` returns null when the
@@ -4915,7 +4865,9 @@ async function main() {
       fgosDir: dir,
       cwd: process.cwd(),
       verb,
-      faultClass: err.faultClass ?? faultClass ?? (parsed && isEventStoreChild(verb, parsed.positional, parsed.flags) ? 'event-store-child' : null),
+      sub,
+      // The detached children have no caller to read their error, so a child that fails leaves a record whatever the verb's own classification is.
+      faultClass: err.faultClass ?? faultClass ?? (eventStoreChild ? 'event-store-child' : null),
       message: err.message,
       argv: process.argv.slice(2),
     });
@@ -4928,22 +4880,6 @@ async function main() {
       process.exitCode = 1;
     } else {
       process.exitCode = EXIT_CODES[categoryOf(err)] ?? 1;
-    }
-  } finally {
-    // The end trigger runs after the verb's answer is written, on success and on refusal alike. Only a session that is
-    // not a dispatched worker publishes (D13); sealing is always safe.
-    handSealsToChild();
-    if (eventStoreLifecycle) {
-      const maintained = maintainEventStore(path.dirname(dir), { ...eventStoreLifecycle, end: true });
-      // The command's answer is already out and a trigger never fails it, so a trigger that could not finish leaves its record.
-      if (maintained.error) {
-        recordInvocationFault({ fgosDir: dir, cwd: process.cwd(), verb, faultClass: 'event-store-end-trigger', message: maintained.error, argv: process.argv.slice(2) });
-      }
-      // A dispatched worker never releases: only the clone owner's own session does (D13).
-      if (sweepsLand && !eventStoreLifecycle.dispatched) {
-        const { releaseRecordedLand } = await import('../src/runner/merge.mjs');
-        for (const warning of releaseRecordedLand(eventStoreLifecycle.trustedMain).warnings) process.stderr.write(`fgos: warning: Land candidate release: ${warning}\n`);
-      }
     }
   }
 }

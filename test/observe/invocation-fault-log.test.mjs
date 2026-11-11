@@ -15,6 +15,8 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync, spawnSync } from 'node:child_process';
+import { argvShape, appendFaultRecord, recordInvocationFault, FAULT_LOG_MAX_BYTES } from '../../src/observe/invocation-fault-log.mjs';
+import { recordApprovePostSuccessFault } from '../../src/observe/approve-fault-log.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '../..');
@@ -196,4 +198,56 @@ test('the fault log is gitignored in this repo — recorded argv must never be c
     0,
     `.fgos/logs/${FAULT_LOG} must be gitignored: the records carry the raw argv of the bad call`,
   );
+});
+
+test('a recorded call keeps the verb, sub-verb and flag names and only the length of every value', () => {
+  const secret = 'sk-live-0123456789abcdef';
+  assert.deepEqual(
+    argvShape(['workflow', 'propose', '--request', secret, '--token=hunter2', '--json', 'free text'], { sub: 'propose' }),
+    ['workflow', 'propose', '--request', `<${secret.length}>`, '--token=<7>', '--json', '<9>'],
+  );
+  assert.deepEqual(argvShape(['nosuchverb', '--whatever']), ['nosuchverb', '--whatever']);
+  assert.deepEqual(argvShape(['x', 'propose']), ['x', '<7>'], 'a second token is a value unless the caller names it as the sub-verb');
+  assert.deepEqual(argvShape(['x', `--${'a'.repeat(60)}`]), ['x', '<62>'], 'a flag name that is too long to be one is a value');
+  assert.deepEqual(argvShape(undefined), []);
+});
+
+test('a secret passed to a bad call never reaches the fault log file, which is private to its owner', () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-fault-shape-'));
+  const secret = 'sk-live-0123456789abcdef';
+  fs.mkdirSync(path.join(root, '.fgos'));
+  const logPath = recordInvocationFault({
+    fgosDir: path.join(root, '.fgos'), cwd: root, verb: 'work', sub: 'add', faultClass: 'arg-parse', message: 'bad call', argv: ['work', 'add', '--api-key', secret],
+  });
+  assert.ok(logPath);
+  const text = fs.readFileSync(logPath, 'utf8');
+  assert.ok(!text.includes(secret));
+  assert.deepEqual(JSON.parse(text).argv, ['work', 'add', '--api-key', `<${secret.length}>`]);
+  assert.equal(fs.statSync(logPath).mode & 0o777, 0o600);
+  fs.rmSync(root, { recursive: true, force: true });
+});
+
+test('a fault log past its size cap drops its oldest half, keeps the newest records whole and stays 0600', () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-fault-cap-'));
+  const logPath = path.join(root, 'logs', 'faults.jsonl');
+  const filler = 'x'.repeat(1000);
+  const total = Math.ceil(FAULT_LOG_MAX_BYTES / 1000) + 10;
+  for (let n = 0; n < total; n += 1) appendFaultRecord(logPath, { n, filler });
+  const before = fs.readFileSync(logPath, 'utf8').split('\n').filter(Boolean).map((line) => JSON.parse(line).n);
+  assert.ok(before.length < total, 'the cap dropped records while the log grew');
+  assert.equal(before.at(-1), total - 1, 'the newest record is kept');
+  assert.deepEqual(before, [...before].sort((a, b) => a - b), 'what is kept keeps its order');
+  assert.ok(fs.statSync(logPath).size <= FAULT_LOG_MAX_BYTES + 2000);
+  assert.equal(fs.statSync(logPath).mode & 0o777, 0o600);
+  fs.rmSync(root, { recursive: true, force: true });
+});
+
+test('the approve post-success fault log shares the private, capped file rules', () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-fault-approve-'));
+  fs.mkdirSync(path.join(root, '.fgos'));
+  const logPath = recordApprovePostSuccessFault(path.join(root, '.fgos'), { id: 'item-1', phase: 'post-merge', detail: 'lock busy' });
+  assert.ok(logPath);
+  assert.equal(JSON.parse(fs.readFileSync(logPath, 'utf8')).id, 'item-1');
+  assert.equal(fs.statSync(logPath).mode & 0o777, 0o600);
+  fs.rmSync(root, { recursive: true, force: true });
 });

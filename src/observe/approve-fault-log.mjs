@@ -6,7 +6,7 @@
 // Deliberately NOT a Work event — same reasoning as
 // `invocation-fault-log.mjs`: the Event Store is the FSM source, a pure
 // diagnostic record has no business in it — and deliberately NOT sharing
-// the state lock (CONTEXT.md D2): a plain `fs.appendFileSync` to its own
+// the state lock (CONTEXT.md D2): a plain append (`appendFaultRecord`) to its own
 // file, so a record here can still succeed while the state lock stays
 // contended. Never throws into its caller — a failure recording the
 // failure must not mask (or replace) the original error.
@@ -17,9 +17,8 @@
 // guaranteed to exist by that point, so no main-checkout fallback is
 // needed here.
 
-import fs from 'node:fs';
-import path from 'node:path';
 import { resolveFgosFile, FGOS_FILE } from '../state/fgos-file-registry.mjs';
+import { appendFaultRecord } from './invocation-fault-log.mjs';
 
 /**
  * Append one record. Returns the path written, or `null` when nothing was
@@ -33,8 +32,7 @@ export function recordApprovePostSuccessFault(dir, { id, phase, detail, mergedSh
     if (detail !== undefined) record.detail = detail;
     if (mergedSha !== undefined) record.mergedSha = mergedSha;
     if (mergedInto !== undefined) record.mergedInto = mergedInto;
-    fs.mkdirSync(path.dirname(logPath), { recursive: true });
-    fs.appendFileSync(logPath, `${JSON.stringify(record)}\n`);
+    appendFaultRecord(logPath, record);
     return logPath;
   } catch {
     return null;
