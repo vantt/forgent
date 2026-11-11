@@ -154,7 +154,7 @@ function validateAccountId(accountId, label) {
 
 const CLI_KEY = /^[a-z0-9][a-z0-9_-]*$/;
 const ENV_NAME = /^[A-Za-z_][A-Za-z0-9_]*$/;
-const CREDENTIAL_STORE_KEYS = Object.freeze(['use', 'homeEnv', 'files']);
+const CREDENTIAL_STORE_KEYS = Object.freeze(['use', 'homeEnv', 'files', 'sessionDir']);
 
 function normalizeCredentialSource(credentialSource, label) {
   if (!isPlainObject(credentialSource)) {
@@ -231,7 +231,7 @@ export function expandCredentialHome(home) {
  * the config door and the confinement request door.
  */
 export function credentialStoreProblem(store) {
-  if (!isPlainObject(store)) return 'must be an object {use, homeEnv, files?}';
+  if (!isPlainObject(store)) return 'must be an object {use, homeEnv, files?, sessionDir?}';
   for (const key of Object.keys(store)) {
     if (!CREDENTIAL_STORE_KEYS.includes(key)) return `contains unknown key "${key}" (allowed: ${CREDENTIAL_STORE_KEYS.join(', ')})`;
   }
@@ -244,6 +244,10 @@ export function credentialStoreProblem(store) {
       return '"files" must be a non-empty list of relative paths without ".."';
     }
     if (new Set(files).size !== files.length) return '"files" must not repeat a path';
+  }
+  if (store.sessionDir !== undefined
+    && (typeof store.sessionDir !== 'string' || !store.sessionDir.trim() || path.isAbsolute(store.sessionDir) || store.sessionDir.split(/[\\/]/).includes('..'))) {
+    return '"sessionDir" must be a relative path without ".."';
   }
   return null;
 }

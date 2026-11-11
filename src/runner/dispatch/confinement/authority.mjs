@@ -26,7 +26,7 @@ import {
 import { computeProbeFingerprint, runAllConfinementProbes } from "./probes/harness.mjs";
 import { normalizeLegacyConfinement, requestIsBlind } from "./policies.mjs";
 import { evaluateBypassPairing } from "./bypass-pairing.mjs";
-import { OWNERSHIP_MARKER_FILE, CREDENTIAL_HOME_KEPT, CREDENTIAL_HOME_HELD, CREDENTIAL_KEEP_MAX_ATTEMPTS, ATTEMPT_HOME_MARKER_CONTRACT, countCredentialKeep, readAttemptHomeRecord, removeAttemptHome, settleHeldCredentialHomes, MAX_HOME_MARKER_BYTES } from "./cleanup.mjs";
+import { OWNERSHIP_MARKER_FILE, CREDENTIAL_HOME_KEPT, CREDENTIAL_HOME_HELD, CREDENTIAL_KEEP_MAX_ATTEMPTS, ATTEMPT_HOME_MARKER_CONTRACT, countCredentialKeep, readAttemptHomeRecord, removeAttemptHome, keepSessionTranscript, describeAttemptHome, settleHeldCredentialHomes, MAX_HOME_MARKER_BYTES } from "./cleanup.mjs";
 import { writeBackRenewedCredential } from "../provider-credential-renewal.mjs";
 import {
   canonicalJson,
@@ -642,7 +642,7 @@ function requireLaunchContext(request) {
 
 // Per planned resource: its binding for the prepared invocation and, for a temporary directory, its
 // finalization entry; both carry the digest of the ownership marker found in it.
-function bindPlanResources(backendPlan, preparedConfinement) {
+function bindPlanResources(backendPlan, preparedConfinement, sessionDir) {
   const resourceBindings = [];
   const finalizationResources = [];
   for (const res of backendPlan.resources || []) {
@@ -670,6 +670,8 @@ function bindPlanResources(backendPlan, preparedConfinement) {
         ...(res.resource === 'private-home' && preparedConfinement?.credentialWriteBack
           ? { credentialWriteBack: preparedConfinement.credentialWriteBack }
           : {}),
+        // The folder of the home the CLI writes its session to; finalize-home keeps it before the home goes.
+        ...(res.resource === 'private-home' && sessionDir ? { sessionDir } : {}),
       });
     }
 
@@ -761,7 +763,7 @@ export async function prepareConfinementForLaunch(request, opts = {}) {
   // The real env (with secrets) is never persisted here: the attempt keeps it in the side file its
   // controller writes next to the envelope.
   const redactedEnv = redactEnvForPersistence(workerEnv);
-  const { resourceBindings, finalizationResources } = bindPlanResources(backendPlan, preparedConfinement);
+  const { resourceBindings, finalizationResources } = bindPlanResources(backendPlan, preparedConfinement, request.invocation?.credentialStore?.sessionDir);
 
   // 1. Publish authority-prepared-invocation.v1
   const preparedInvocationRecord = {
@@ -922,6 +924,30 @@ function readAttemptHomeMarker(homeDir, attemptId, runDir) {
   return marker;
 }
 
+const TRANSCRIPT_DIR = path.join('protected', 'session');
+
+/** Where a seat's kept session is, relative to the run directory, or null when none was kept. */
+function transcriptPathOf(runDir) {
+  try { return fs.readdirSync(path.join(runDir, TRANSCRIPT_DIR)).length > 0 ? TRANSCRIPT_DIR : null; } catch { return null; }
+}
+
+// Copy the session of one home into the run directory and note what the home held, by name only. Nothing
+// here can stop the removal: a refused or failed copy becomes a structured warning.
+function keepSessionBeforeRemoval({ target, sessionDir, runDir, launchCommandId }, keeping) {
+  const warn = (code, message) => {
+    keeping.warnings.push({ code, message, launchCommandId });
+    process.stderr.write(`fgos: session transcript not kept (${code}): ${message}\n`);
+  };
+  try { keeping.homeLayout.push(...describeAttemptHome(target).map((entry) => ({ ...entry, launchCommandId }))); } catch { /* a layout is a diagnostic only */ }
+  if (!sessionDir) return warn('session-dir-undeclared', 'the executor declares no session directory');
+  try {
+    const kept = keepSessionTranscript({ homeDir: target, sessionDir, destDir: path.join(runDir, TRANSCRIPT_DIR), root: path.join(runDir, 'protected') });
+    if (!kept.found) warn('session-not-written', `the CLI wrote nothing under "${sessionDir}" in its home`);
+  } catch (err) {
+    warn('session-copy-failed', err.message);
+  }
+}
+
 /**
  * Give the credential back and remove every private home of one attempt, whatever way the attempt
  * ended. The caller (supervisor or adopt step) holds the attempt lock and the process domain is
@@ -934,7 +960,11 @@ function readAttemptHomeMarker(homeDir, attemptId, runDir) {
  * failed only from the home's host record, never from the home. Once its own homes are done, the held
  * homes of other attempts under the same temp roots are settled when their record allows it.
  *
- * @returns {{state: 'cleaned'|'credential-home-kept'|'credential-home-held', homes: number}}
+ * Before a home is removed, the session directory its executor declares is copied into the run directory
+ * (`keepSessionBeforeRemoval`); a copy that fails is a warning and never keeps the home or the login back.
+ *
+ * @returns {{state: 'cleaned'|'credential-home-kept'|'credential-home-held', homes: number, transcriptPath: string|null,
+ *   homeLayout: object[], warnings: Array<{code: string, message: string}>}} `transcriptPath` is relative to `runDir`
  */
 export function finalizeAttemptHome({ runDir, attemptId } = {}) {
   if (typeof runDir !== 'string' || typeof attemptId !== 'string' || attemptId === '') {
@@ -946,12 +976,13 @@ export function finalizeAttemptHome({ runDir, attemptId } = {}) {
     for (const res of descriptor.resources || descriptor.temporaryDirectories || []) {
       const target = res.pathRef || res.path;
       if (!target || homes.some((h) => h.target === target) || !fs.existsSync(target)) continue;
-      homes.push({ target, marker: readAttemptHomeMarker(target, attemptId, runDir), writeBack: res.credentialWriteBack, launchCommandId: path.basename(file, '.json') });
+      homes.push({ target, marker: readAttemptHomeMarker(target, attemptId, runDir), writeBack: res.credentialWriteBack, sessionDir: res.sessionDir, launchCommandId: path.basename(file, '.json') });
     }
   }
   let kept = 0;
   let held = 0;
-  for (const { target, marker, writeBack, launchCommandId } of homes) {
+  const keeping = { warnings: [], homeLayout: [] };
+  for (const { target, marker, writeBack, sessionDir, launchCommandId } of homes) {
     const record = { attemptId, runDir, dispatchId: marker.dispatchId, launchCommandId };
     // A home whose staging failed the allowed number of times is left to a later settle; doctor reports it.
     if ((readAttemptHomeRecord(target, record)?.credentialKept?.attempts ?? 0) >= CREDENTIAL_KEEP_MAX_ATTEMPTS) { held += 1; continue; }
@@ -963,13 +994,16 @@ export function finalizeAttemptHome({ runDir, attemptId } = {}) {
       continue;
     }
     if (result.status === 'failed') process.stderr.write(`fgos: credential write-back not done (${result.code})\n`);
+    keepSessionBeforeRemoval({ target, sessionDir, runDir, launchCommandId }, keeping);
     removeAttemptHome(target, marker.dispatchId);
   }
   // Homes held by other attempts under the same roots: whatever kept them may be gone by now.
   try {
     settleHeldCredentialHomes({ tempRoots: [...new Set(homes.map(({ target }) => path.dirname(path.dirname(target))))] });
   } catch { /* they stay held; doctor names them */ }
-  if (kept > 0) return { state: CREDENTIAL_HOME_KEPT, homes: homes.length };
+  const transcriptPath = transcriptPathOf(runDir);
+  const reported = { homes: homes.length, transcriptPath, homeLayout: keeping.homeLayout, warnings: keeping.warnings };
+  if (kept > 0) return { state: CREDENTIAL_HOME_KEPT, ...reported };
   const cleanupState = held > 0 ? 'retained' : 'cleaned';
   for (const { file, descriptor } of descriptors) {
     if (descriptor.cleanupState === cleanupState) continue;
@@ -980,5 +1014,5 @@ export function finalizeAttemptHome({ runDir, attemptId } = {}) {
       updatedAt: new Date().toISOString(),
     });
   }
-  return { state: held > 0 ? CREDENTIAL_HOME_HELD : 'cleaned', homes: homes.length };
+  return { state: held > 0 ? CREDENTIAL_HOME_HELD : 'cleaned', ...reported };
 }

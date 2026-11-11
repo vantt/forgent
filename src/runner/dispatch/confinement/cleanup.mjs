@@ -13,6 +13,7 @@ import path from 'node:path';
 import { stopProcessesInside } from '../stop-processes-inside.mjs';
 import { writeFileAtomic, writeBackRenewedCredential } from '../provider-credential-renewal.mjs';
 import { readAgentFileSync } from '../../../native/proof-helpers.mjs';
+import { refuseSymlink } from '../../../util/refuse-symlink.mjs';
 
 export const OWNERSHIP_MARKER_FILE = '.fgos-confinement-owner.json';
 
@@ -259,6 +260,108 @@ export function removeAttemptHome(homeDir, dispatchId) {
   fs.rmSync(homeDir, { recursive: true, force: true });
   fs.rmSync(recordPathOf(homeDir), { force: true });
   removeEmptyDispatchParent(homeDir, dispatchId);
+}
+
+/**
+ * Copy the session directory of an attempt home into `destDir` (mode 0700 for directories, 0600 for files) before the
+ * home is removed. Only that directory is read: `sessionDir` is a relative path inside the home, and no part of it may
+ * be a symbolic link, nor any entry under it, so a link the agent planted cannot pull a file from outside the home. A
+ * file already in `destDir` is never overwritten. When the copy fails, what this call created is removed again and
+ * the error is thrown.
+ *
+ * @returns {{found: boolean, files: number, bytes: number}} `found` is false when the home has no such directory
+ */
+export function keepSessionTranscript({ homeDir, sessionDir, destDir, root = destDir }) {
+  if (typeof sessionDir !== 'string' || sessionDir === '' || path.isAbsolute(sessionDir) || sessionDir.split(/[\\/]/).includes('..')) {
+    throw new Error(`session directory "${sessionDir}" must be a relative path without ".."`);
+  }
+  let source = homeDir;
+  for (const part of sessionDir.split(/[\\/]/).filter(Boolean)) {
+    source = path.join(source, part);
+    if (!refuseSymlink(source, 'the session directory of the attempt home', { optional: true })) return { found: false, files: 0, bytes: 0 };
+  }
+  if (!fs.lstatSync(source).isDirectory()) throw new Error(`${sessionDir} in the attempt home is not a directory`);
+  const createdFiles = [];
+  const createdDirs = [];
+  let bytes = 0;
+  const copyDir = (from, to) => {
+    if (!fs.existsSync(to)) {
+      ensurePrivateDir(to, { root });
+      createdDirs.push(to);
+    }
+    for (const name of fs.readdirSync(from)) {
+      const entry = path.join(from, name);
+      const stat = refuseSymlink(entry, 'the session directory of the attempt home');
+      const target = path.join(to, name);
+      if (stat.isDirectory()) { copyDir(entry, target); continue; }
+      if (!stat.isFile()) throw new Error(`${entry} is not a regular file`);
+      fs.copyFileSync(entry, target, fs.constants.COPYFILE_EXCL);
+      createdFiles.push(target);
+      fs.chmodSync(target, 0o600);
+      bytes += stat.size;
+    }
+  };
+  try {
+    copyDir(source, destDir);
+  } catch (err) {
+    for (const file of createdFiles) fs.rmSync(file, { force: true });
+    for (const dir of createdDirs.reverse()) { try { fs.rmdirSync(dir); } catch { /* not empty: it was there before */ } }
+    throw err;
+  }
+  return { found: true, files: createdFiles.length, bytes };
+}
+
+const HOME_LAYOUT_LIMIT = 60;
+
+/** Files and bytes under `dir`, never following a link. */
+function measureTree(dir) {
+  let files = 0;
+  let bytes = 0;
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    const entryPath = path.join(dir, entry.name);
+    if (entry.isDirectory()) {
+      const inner = measureTree(entryPath);
+      files += inner.files;
+      bytes += inner.bytes;
+    } else if (entry.isFile()) {
+      files += 1;
+      bytes += fs.lstatSync(entryPath).size;
+    }
+  }
+  return { files, bytes };
+}
+
+/**
+ * What an attempt home holds, by name and size only (never content): its top-level entries and the entries one level
+ * into each directory, at most HOME_LAYOUT_LIMIT of them. It says where a CLI wrote its session when the declared
+ * session directory is wrong. The ownership marker is left out.
+ *
+ * @returns {Array<{path: string, kind: 'dir'|'file'|'link'|'other', files: number, bytes: number}>}
+ */
+export function describeAttemptHome(homeDir) {
+  const layout = [];
+  const visit = (dir, prefix, depth) => {
+    let entries;
+    try { entries = fs.readdirSync(dir, { withFileTypes: true }).sort((a, b) => (a.name < b.name ? -1 : 1)); } catch { return; }
+    for (const entry of entries) {
+      if (layout.length >= HOME_LAYOUT_LIMIT) return;
+      if (prefix === '' && entry.name === OWNERSHIP_MARKER_FILE) continue;
+      const entryPath = path.join(dir, entry.name);
+      const rel = prefix === '' ? entry.name : `${prefix}/${entry.name}`;
+      try {
+        if (entry.isDirectory()) {
+          layout.push({ path: rel, kind: 'dir', ...measureTree(entryPath) });
+          if (depth < 1) visit(entryPath, rel, depth + 1);
+        } else if (entry.isFile()) {
+          layout.push({ path: rel, kind: 'file', files: 1, bytes: fs.lstatSync(entryPath).size });
+        } else {
+          layout.push({ path: rel, kind: entry.isSymbolicLink() ? 'link' : 'other', files: 0, bytes: 0 });
+        }
+      } catch { /* an entry that vanished while listing */ }
+    }
+  };
+  visit(homeDir, '', 0);
+  return layout;
 }
 
 /**
