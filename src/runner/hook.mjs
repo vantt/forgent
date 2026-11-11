@@ -11,7 +11,6 @@
 // of a verdict itself; a refusal of the project's config blocks (see src/runner/dispatch/hook.mjs).
 
 import fs from 'node:fs';
-import { decideDispatchHook } from './dispatch/hook.mjs';
 import { decisionQuestionHookVerdict } from '../state/decision-question.mjs';
 
 /** Hook kinds this module judges. */
@@ -65,7 +64,8 @@ export async function runHook(kind, { stdin, format = null, env = process.env, c
   const call = normalizeHookPayload(stdin, { format, env, cwd });
   if (call === null) return answer(allow, format);
   try {
-    const verdict = kind === 'dispatch-decide' ? await decideDispatchHook(call) : decisionQuestionHookVerdict(call);
+    // The dispatch verdict loads the config, plan and repository doors; the question verdict needs none of them.
+    const verdict = kind === 'dispatch-decide' ? await (await import('./dispatch/hook.mjs')).decideDispatchHook(call) : decisionQuestionHookVerdict(call);
     return answer(verdict, call.format);
   } catch {
     return answer(allow, call.format);

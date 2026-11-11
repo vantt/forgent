@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "67faedc59ed2a0107f6d34ab581e4a26016a15407eb545fbf8cc09ded15720be",
+  "payloadDigest": "b4f22322962e3939c0d76e31c378ed541c8ea80bdd05cec48d456bd4a6bc42e1",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -1090,7 +1090,7 @@
     "src/runner/gateway-control.mjs": "0e47bc274b4836003c5e1881461a4f1f7490ff782ef39dde711af7ef5952a04c",
     "src/runner/github-adapter.mjs": "162d7b2064b9b311ea88afba25567601420626743dff6b72b0aba78f42220c00",
     "src/runner/goal-check.mjs": "bed1a778d1f702695160cab5896bb65a96e6c18c7a446ed6bc3b530c7b8ab66c",
-    "src/runner/hook.mjs": "70c2a61e11dfb70ed238e25c8641b7c8a5c5514dcfc1357fd5c4f6b81ca57cf4",
+    "src/runner/hook.mjs": "e6e990d24a291eb2d0836cc1bf85580c224249164a3b251b2a6baebb905597b9",
     "src/runner/iron-law-gate.mjs": "37e253ef40240e535e6587d41b393e6ddecc7cb174104760d0f48ba168203d43",
     "src/runner/lock-fence.mjs": "d88aabce1f8f078fe6ad86b27c0201f1d22f7471af61ff78617f9e7fdb890b06",
     "src/runner/lock-status.mjs": "4b6ae78ea99f9d95c52aa7cb2efab010bd6b3e7b1f9989ad2fd3353c18182112",
