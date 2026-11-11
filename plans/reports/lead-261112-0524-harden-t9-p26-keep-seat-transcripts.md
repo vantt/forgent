@@ -77,7 +77,7 @@ and lease (the door refuses a launch that names none); this keeps `dispatch/cli.
 - Fixtures that followed the standard: policy baseline snapshot (`sessionDir`), config authoring record
   (`repo-differences.v1.json`: five `invocations` differences), architecture manifest, doctor check list, census.
 - `cargo test -p fgos-config` and `cargo test -p fgos` green. `fgos config check` ok on the dev host; `fgos doctor --json`
-  shows the new row as a warning. Full `npm test`: see the board line / final status.
+  shows the new row as a warning. Full `npm test` (twice, 8712 tests): only the known V7n addendum red; no ERROR lines. The first run also caught the runUnit admission-port rule, fixed by injecting the port in bin.
 
 Net size against the estimate (+110 Node src, +50 tests): src and bin +386, tests +341 (the probe needs the layout reader,
 the verb body and a probe module of 151 lines; the estimate undercounted them).
