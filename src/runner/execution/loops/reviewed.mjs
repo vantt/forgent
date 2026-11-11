@@ -25,7 +25,16 @@ export const ERROR_OUTCOMES = Object.freeze([
   'blocked',
 ]);
 
-export const DEFAULT_MAX_ROUNDS = 2;
+/**
+ * The round limit the caller resolved from `runner.loops.reviewed.maxRounds` (the standard holds its value, a
+ * project or the machine may change it). The loop keeps no number of its own: a missing or unusable limit is a
+ * refusal by name, not a silent default.
+ */
+function maxRoundsOf(params) {
+  const maxRounds = params?.maxRounds;
+  if (Number.isInteger(maxRounds) && maxRounds >= 1) return maxRounds;
+  throw Object.assign(new Error(`the reviewed loop needs params.maxRounds, an integer >= 1 from runner.loops.reviewed.maxRounds in the effective config, got ${JSON.stringify(maxRounds)}`), { code: 'reviewed-max-rounds-missing' });
+}
 
 export const PARAMS = Object.freeze({
   maxRounds: Object.freeze({
@@ -127,7 +136,7 @@ function assessRound(results, producerSeat) {
  * cannot establish completion and must remain unknown to the summary.
  */
 export function reviewedHistoryOutcome(unit, cfg, priorResults, params = {}, seats = []) {
-  const maxRounds = params?.maxRounds ?? DEFAULT_MAX_ROUNDS;
+  const maxRounds = maxRoundsOf(params);
   const producerSeat = seats.find((seat) => seat.role === 'producer')?.seat ?? 'producer';
   const checkerList = seats.filter((seat) => seat.role !== 'producer').map((seat) => seat.seat);
   const hasVerify = hasVerifyCommand(unit, cfg);
@@ -159,7 +168,7 @@ export function reviewedHistoryOutcome(unit, cfg, priorResults, params = {}, sea
  */
 export async function runReviewed(unit, cfg, hooks = {}, params = {}) {
   const { runRole, verify, history, hasLaunchRoom } = hooks;
-  const maxRounds = params?.maxRounds ?? DEFAULT_MAX_ROUNDS;
+  const maxRounds = maxRoundsOf(params);
   const priorResults = typeof history === 'function' ? history() : (Array.isArray(history) ? history : []);
   const shippedCheckersByRigor = hooks?.shippedCheckersByRigor;
 

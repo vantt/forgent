@@ -361,7 +361,7 @@ test('a reviewed run that cannot launch its next round ends at the last evaluati
       hasLaunchRoom: (seats) => { roles.push(`room?${seats}`); return false; },
       shippedCheckersByRigor: shippedCatalog().loops.reviewed.checkersByRigor,
     },
-    {},
+    { maxRounds: 2 },
   );
   assert.equal(result.outcome, 'findings');
   assert.equal(result.rounds, 1);
