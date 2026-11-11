@@ -35,7 +35,8 @@ function mintAttemptWriterId(attemptId) {
 }
 
 test('terminal envelope vector carries every terminal field and the digest reproduces', () => {
-  for (const field of Object.keys(envelopeContract.fields)) assert.ok(field in terminalEnvelope, `terminal vector carries ${field}`);
+  // `external` belongs to the external mode alone.
+  for (const field of Object.keys(envelopeContract.fields).filter((f) => f !== 'external')) assert.ok(field in terminalEnvelope, `terminal vector carries ${field}`);
   assert.equal(terminalEnvelope.mode, 'terminal');
   assert.equal(terminalEnvelope.agentProtocol.mode, 'terminal');
   assert.equal(terminalEnvelope.slot.key, terminalEnvelope.attemptId);

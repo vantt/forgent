@@ -687,12 +687,14 @@ function pickConfinedInvocation(executorEntry, invocationId, { herdrPresent = fa
     return named ? { inv: named, effective: named.confinement ?? executorEntry.confinement } : null;
   }
   // No invocation named: the first plain cli invocation that declares a backend (a
-  // herdr-spawn invocation only runs on the herdr transport, which names it). An
+  // herdr-spawn invocation only runs on the herdr transport, which names it; a
+  // paseo-spawn invocation needs a paseo daemon and runs only when pinned). An
   // invocation without an id cannot be pinned, so it only counts when it is also
   // the one a run would take by default (the first cli invocation).
   const cliInvocations = invocations.filter((inv) => inv?.via === 'cli');
   const withBackend = cliInvocations.find(
     (inv) => (herdrPresent || inv.adapter !== 'herdr-spawn')
+      && inv.adapter !== 'paseo-spawn'
       && (inv.confinement ?? executorEntry.confinement)?.backend
       && (inv.id || inv === cliInvocations[0]),
   );

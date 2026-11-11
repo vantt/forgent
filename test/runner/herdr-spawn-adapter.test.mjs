@@ -8,19 +8,22 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { EXECUTOR_ADAPTERS, DispatchError } from '../../src/runner/dispatch/transport.mjs';
 
-test('herdr-spawn is a registered adapter that refuses to be executed directly, by name', async () => {
-  const herdrSpawn = EXECUTOR_ADAPTERS['herdr-spawn'];
-  assert.equal(herdrSpawn.locus, 'herdr-pane');
-  await assert.rejects(
-    () => herdrSpawn(
-      { command: 'node', args: ['-v'], env: {}, interactiveMode: { exitCommand: '/exit' } },
-      { cwd: process.cwd(), workId: 'direct-herdr-item', tier: 'standard', model: 'sonnet' },
-    ),
-    (err) => {
-      assert.ok(err instanceof DispatchError);
-      assert.equal(err.errorClass, 'herdr-spawn-supervised-only');
-      assert.match(err.message, /run supervisor/);
-      return true;
-    },
-  );
+// paseo-spawn is the same kind of adapter: its attempt runs in the `external` mode (test/runner/paseo-launch.test.mjs).
+test('herdr-spawn and paseo-spawn are registered adapters that refuse to be executed directly, by name', async () => {
+  for (const [name, locus] of [['herdr-spawn', 'herdr-pane'], ['paseo-spawn', 'external-host']]) {
+    const adapter = EXECUTOR_ADAPTERS[name];
+    assert.equal(adapter.locus, locus);
+    await assert.rejects(
+      () => adapter(
+        { command: 'node', args: ['-v'], env: {}, interactiveMode: { exitCommand: '/exit' } },
+        { cwd: process.cwd(), workId: 'direct-item', tier: 'standard', model: 'sonnet' },
+      ),
+      (err) => {
+        assert.ok(err instanceof DispatchError);
+        assert.equal(err.errorClass, `${name}-supervised-only`);
+        assert.match(err.message, /run supervisor/);
+        return true;
+      },
+    );
+  }
 });

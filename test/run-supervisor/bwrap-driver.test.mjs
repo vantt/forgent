@@ -35,15 +35,17 @@ function withRuntimeDir(t, dir) {
   t.after(() => { if (saved === undefined) delete process.env.XDG_RUNTIME_DIR; else process.env.XDG_RUNTIME_DIR = saved; });
 }
 
-test('a terminal launch dies with its parent and binds back read-only only the GO socket its gate dials', (t) => {
+test('a terminal or external launch dies with its carrier and binds back read-only only the GO socket its gate dials', (t) => {
   withRuntimeDir(t, '/run/user/4242');
   const socket = '/run/user/4242/fgos/0123456789abcdef.sock';
-  const { invocation } = prepare(t, { launchMode: 'terminal', attemptId: 'att-t', gateCommand: ['/host/fgos', 'internal', 'gate', '--go-socket', socket] });
-  const args = invocation.args;
-  assert.ok(args.includes('--die-with-parent'));
-  const bind = args.findIndex((a, i) => a === '--ro-bind' && args[i + 1] === socket);
-  assert.ok(bind >= 0 && args[bind + 2] === socket);
-  assert.equal(args.includes(path.dirname(socket)), false, 'never the socket directory, which holds every attempt\'s socket');
+  for (const launchMode of ['terminal', 'external']) {
+    const { invocation } = prepare(t, { launchMode, attemptId: 'att-t', gateCommand: ['/host/fgos', 'internal', 'gate', '--go-socket', socket] });
+    const args = invocation.args;
+    assert.ok(args.includes('--die-with-parent'), launchMode);
+    const bind = args.findIndex((a, i) => a === '--ro-bind' && args[i + 1] === socket);
+    assert.ok(bind >= 0 && args[bind + 2] === socket, launchMode);
+    assert.equal(args.includes(path.dirname(socket)), false, 'never the socket directory, which holds every attempt\'s socket');
+  }
   // A direct attempt dials nothing: its GO channel is an inherited descriptor.
   const direct = prepare(t, { launchMode: 'direct', attemptId: 'att-d', gateCommand: ['/host/fgos', 'internal', 'gate', '--go-fd', '5'] }).invocation.args;
   assert.equal(direct.includes(socket), false);

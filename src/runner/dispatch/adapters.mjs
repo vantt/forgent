@@ -13,7 +13,14 @@ export const DEFAULT_ADAPTER = 'cli-spawn';
 export const EXECUTOR_ADAPTER_NAMES = Object.freeze([
   DEFAULT_ADAPTER,
   'herdr-spawn',
+  'paseo-spawn',
 ]);
+
+/**
+ * The adapters whose worker is briefed with `brief.mjs` and answers in the bare `outbox` under its run
+ * directory: nothing reads their stdout (a pane, an external host that keeps the agent's pipes).
+ */
+export const BRIEF_OUTBOX_ADAPTERS = Object.freeze(new Set(['herdr-spawn', 'paseo-spawn']));
 
 /**
  * Adapter metadata registry for Assignment-owned recovery profiles.
@@ -28,6 +35,11 @@ export const ADAPTER_REGISTRY = {
     locus: 'herdr-pane',
     preparedInvocationContract: 'exact-v1',
     receiptContract: 'herdr-adapter-receipt.v1',
+  },
+  'paseo-spawn': {
+    locus: 'external-host',
+    preparedInvocationContract: 'exact-v1',
+    receiptContract: 'confinement-adapter-receipt.v1',
   },
 };
 
@@ -44,6 +56,7 @@ function uninitializedAdapter(name) {
 export const EXECUTOR_ADAPTERS = {
   [DEFAULT_ADAPTER]: uninitializedAdapter(DEFAULT_ADAPTER),
   'herdr-spawn': uninitializedAdapter('herdr-spawn'),
+  'paseo-spawn': uninitializedAdapter('paseo-spawn'),
 };
 
 /**

@@ -242,7 +242,7 @@ export async function settleAttempt({ runDir, envelope }) {
         repoRoot: context.repoRoot ?? envelope.cwd,
         updateRunJson: 'settled',
         ...(context.providerCapacityRuntimeDir ? { providerCapacityRuntimeDir: context.providerCapacityRuntimeDir } : {}),
-        adapter: envelope.mode === 'terminal' ? 'herdr-spawn' : 'cli-spawn',
+        adapter: ({ terminal: 'herdr-spawn', external: 'paseo-spawn' })[envelope.mode] ?? 'cli-spawn',
       },
     });
     return { result: 'done', detail: { settled: 'now', runId: runMeta.runId, status: settled.status } };

@@ -511,8 +511,8 @@ test('resolveExecutorAndOverrides resolves "claude" as a literal registered exec
   assert.equal(resolved.executorId, 'claude');
 });
 
-test('EXECUTOR_ADAPTERS registers adapters: cli-spawn (default) and herdr-spawn', () => {
-  assert.deepEqual(Object.keys(EXECUTOR_ADAPTERS), ['cli-spawn', 'herdr-spawn']);
+test('EXECUTOR_ADAPTERS registers adapters: cli-spawn (default), herdr-spawn and paseo-spawn', () => {
+  assert.deepEqual(Object.keys(EXECUTOR_ADAPTERS), ['cli-spawn', 'herdr-spawn', 'paseo-spawn']);
   assert.equal(DEFAULT_ADAPTER, 'cli-spawn');
 });
 

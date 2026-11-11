@@ -341,6 +341,7 @@ function twoInvocationConfig(extraCapabilities = {}) {
         invocations: [
           { id: 'duo-plain', via: 'cli', adapter: 'cli-spawn', command: 'duo' },
           { id: 'duo-herdr', via: 'cli', adapter: 'herdr-spawn', command: 'duo', confinement: { backend: 'bwrap' } },
+          { id: 'duo-paseo', via: 'cli', adapter: 'paseo-spawn', command: 'duo', confinement: { backend: 'bwrap' } },
           {
             id: 'duo-confined',
             via: 'cli',
@@ -355,12 +356,15 @@ function twoInvocationConfig(extraCapabilities = {}) {
   };
 }
 
-test('bind: with no invocation named, records the plain cli invocation that can carry the posture', () => {
+test('bind: with no invocation named, records the plain cli invocation that can carry the posture; a paseo one runs only when pinned', () => {
   const ask = { unit: { id: 'u1', capability: 'docs:write', writes: [] }, role: 'producer' };
   const result = bind(ask, { runnerConfig: twoInvocationConfig(), session: { headless: true } });
   assert.equal(result.transport, 'cli');
-  assert.equal(result.invocation, 'duo-confined', 'not the executor first cli invocation, and not its herdr-spawn one');
+  assert.equal(result.invocation, 'duo-confined', 'not the executor first cli invocation, nor its herdr-spawn or paseo-spawn one');
   assert.equal(result.provenance.invocation.value, 'duo-confined');
+  const pinned = bind({ ...ask, overrides: [{ executor: 'duo', invocation: 'duo-paseo', origin: 'human-cli' }] }, { runnerConfig: twoInvocationConfig(), session: { headless: true } });
+  assert.equal(pinned.invocation, 'duo-paseo');
+  assert.equal(pinned.transport, 'paseo');
 });
 
 test('bind: inside herdr the herdr invocation is recorded; a herdr-only executor is only usable there', () => {
@@ -511,8 +515,8 @@ test('bind: a run timeout comes from an override, else the unit, else nothing (t
 
 test('bind: a bare executor in a unit prefer takes the herdr transport even when a confined cli invocation is listed first', () => {
   const config = twoInvocationConfig();
-  const [plain, herdrInv, confined] = config.executors.duo.invocations;
-  config.executors.duo.invocations = [plain, confined, herdrInv];
+  const byId = (id) => config.executors.duo.invocations.find((inv) => inv.id === id);
+  config.executors.duo.invocations = [byId('duo-plain'), byId('duo-confined'), byId('duo-herdr')];
   const herdr = { headless: true, herdrPresent: true };
   const bare = bind(preferAsk({ capability: 'docs:write', prefer: ['duo'] }), { runnerConfig: config, session: herdr });
   assert.equal(bare.invocation, 'duo-herdr');

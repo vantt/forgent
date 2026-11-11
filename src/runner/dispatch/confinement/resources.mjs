@@ -17,6 +17,7 @@ import { resolveConfinementTempRoot } from './cleanup.mjs';
 import { createGitInspect, gitPortOptions } from '../../../git/inspect.mjs';
 import { userRuntimeDir } from '../../../run-supervisor/runtime-dir.mjs';
 import { machineLoginStores } from '../llm-accounts.mjs';
+import { BRIEF_OUTBOX_ADAPTERS } from '../adapters.mjs';
 
 /**
  * `hostRead: blind` leaves the host readable except what other dispatches and live agent
@@ -514,8 +515,8 @@ export function resolveConfinementResources({
     // shape to keep in sync with `brief.mjs`; binding herdr-spawn's REAL
     // outbox instead reuses the exact "bind wherever this adapter's worker
     // actually writes" shape cli-spawn already established.
-    const isHerdrSpawn = context.adapter === 'herdr-spawn';
-    if (isHerdrSpawn) {
+    // paseo-spawn briefs its worker the same way (no stdout reaches fgOS), so it shares that outbox.
+    if (BRIEF_OUTBOX_ADAPTERS.has(context.adapter)) {
       targetDir = path.join(context.runDir, 'outbox');
       try {
         fs.mkdirSync(targetDir, { recursive: true });

@@ -6,7 +6,7 @@
     "attemptId": "string, the id the envelope of this launch would carry",
     "unitRunId": "string",
     "runDir": "absolute path of the attempt directory; adopt accepts the intent only when it names the directory it was found in",
-    "mode": { "enum": ["direct", "terminal"], "meaning": "what the controller would have launched. The adopt-written envelope is always direct: no agent of a not-started attempt runs in a pane" },
+    "mode": { "enum": ["direct", "terminal", "external"], "meaning": "what the controller would have launched. The adopt-written envelope is always direct: no agent of a not-started attempt runs in a pane" },
     "cwd": "absolute working directory of the agent",
     "launch": {
       "capture": { "stdout": "absolute path", "stderr": "absolute path" },

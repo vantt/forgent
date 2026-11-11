@@ -298,3 +298,9 @@ registerSupervisedOnlyAdapter('herdr-spawn', {
   preparedInvocationContract: 'exact-v1',
   receiptContract: 'herdr-adapter-receipt.v1',
 });
+
+registerSupervisedOnlyAdapter('paseo-spawn', {
+  locus: 'external-host',
+  preparedInvocationContract: 'exact-v1',
+  receiptContract: 'confinement-adapter-receipt.v1',
+});

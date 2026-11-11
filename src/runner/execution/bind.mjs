@@ -338,7 +338,7 @@ function refusalOf(refusal, { session, unit }) {
 /** How the transport got to the invocation that runs. */
 function transportOf({ cand, executorEntry, session, launchFacts }) {
   const invocation = executorEntry?.invocations?.find((inv) => inv?.id === cand.invocation);
-  const transport = invocation?.adapter === 'herdr-spawn' ? 'herdr' : 'cli';
+  const transport = invocation?.adapter === 'herdr-spawn' ? 'herdr' : invocation?.adapter === 'paseo-spawn' ? 'paseo' : 'cli';
   if (cand.pinned) {
     const source = cand.source === 'override' ? 'override-pinned-invocation'
       : cand.source === 'unit-prefer' ? 'unit-prefer-pinned-invocation' : 'prefer-pinned-invocation';

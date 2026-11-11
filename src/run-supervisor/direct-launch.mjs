@@ -109,14 +109,14 @@ export function prepareAttemptFiles(runDir, attemptId) {
   return binds;
 }
 
-/** The sandbox command: the gate of this attempt. `direct`: GO channel at descriptor 5; `terminal`: the gate dials `goSocket`. */
+/** The sandbox command: the gate of this attempt. `direct`: GO channel at descriptor 5; `terminal` and `external`: the gate dials `goSocket`. */
 export function attemptGateCommand(hostBin, runDir, { goSocket = null } = {}) {
   const base = [hostBin, 'internal', 'gate', '--protocol', String(PROTOCOL), '--envelope', path.join(path.resolve(runDir), 'envelope.json')];
   return goSocket ? [...base, '--go-socket', goSocket] : [...base, '--go-fd', '5'];
 }
 
-/** Where the gate of a `terminal` attempt reaches its supervisor: a hashed name in the owner-only runtime socket directory. */
-export function terminalSocketPath(attemptId) {
+/** Where the gate of a `terminal` or `external` attempt reaches its supervisor: a hashed name in the owner-only runtime socket directory. */
+export function attemptSocketPath(attemptId) {
   const name = crypto.createHash('sha256').update(attemptId).digest('hex').slice(0, 16);
   return path.join(ensureRuntimeSocketDir(), `${name}.sock`);
 }
@@ -171,16 +171,18 @@ function attemptSteps({ runDir, host, stepEnv, extraSteps = [] }) {
  * what the adopt door needs to close this attempt if the controller dies before it writes the envelope.
  * Written under the lock and replaced atomically; a resumed attempt with no envelope gets its new launch's intent.
  * A terminal attempt publishes it again with `pane` (`{slot: {key, groupKey}, endpointEnv}`) right before its
- * pane is allocated, so adopt can release that pane by its key.
+ * pane is allocated, so adopt can release that pane by its key. `mode` is the launch mode (`direct`,
+ * `terminal` or `external`).
  */
-export function writeAttemptIntent({ runDir, attemptId, unitRunId, terminal, cwd, host, stepEnv, pane = null }) {
+export function writeAttemptIntent({ runDir, attemptId, unitRunId, mode, cwd, host, stepEnv, pane = null }) {
   const paths = attemptPaths(runDir, attemptId);
+  const terminal = mode === 'terminal';
   publishMutableProjection(path.join(paths.runDir, 'attempt-intent.json'), {
     v: 1,
     attemptId,
     unitRunId,
     runDir: paths.runDir,
-    mode: terminal ? 'terminal' : 'direct',
+    mode,
     cwd,
     launch: { capture: { stdout: paths.stdout, stderr: paths.stderr }, outboxDir: paths.outboxDir },
     steps: attemptSteps({ runDir: paths.runDir, host, stepEnv, extraSteps: terminal ? ['cleanup-trust'] : [] }),
@@ -198,12 +200,18 @@ export function removeAttemptIntent(runDir) {
  * Build the envelope v3 body (without digest) of one attempt.
  * `attemptId` is minted by the controller and equals the launch command id; `runDir` is the absolute
  * attempt directory (`runs/<NN>`); `attempt` is `prepareConfinementForLaunch(...).attempt`.
+ * `terminal` (a pane) or `external` (an external host starts the gate through `fgos exec`) picks the
+ * mode; neither is `direct`.
  */
-export function buildEnvelope({ attemptId, unitRunId, runDir, host, cwd, mutating, attempt, timeoutMs, idleTimeoutMs, maxOutputBytes, cli, stepEnv, gateKillGraceMs, killWaitMs, cwdLeaseFile, cwdLeaseOwner, identity, terminal = null, extraSteps = [] }) {
+export function buildEnvelope({ attemptId, unitRunId, runDir, host, cwd, mutating, attempt, timeoutMs, idleTimeoutMs, maxOutputBytes, cli, stepEnv, gateKillGraceMs, killWaitMs, cwdLeaseFile, cwdLeaseOwner, identity, terminal = null, external = null, extraSteps = [] }) {
   if (2 + extraSteps.length > MAX_ATTEMPT_STEPS) throw new DispatchError('too-many-steps', `an attempt runs at most ${MAX_ATTEMPT_STEPS} steps`, { runDir });
   const paths = attemptPaths(runDir, attemptId);
   const confined = Array.isArray(attempt.bwrapPrefix);
-  const mode = terminal ? 'terminal' : 'direct';
+  const mode = terminal ? 'terminal' : external ? 'external' : 'direct';
+  // The external host's own environment lies under the envelope's (the gate keeps it for the host's
+  // protocol): its TMPDIR names a directory a sandbox's read-only root refuses, so a confined attempt
+  // points it at the sandbox's private /tmp.
+  const env = withIdentityEnv(external && confined ? { ...attempt.env, TMPDIR: '/tmp' } : attempt.env, identity);
   return {
     v: 3,
     attemptId,
@@ -217,12 +225,13 @@ export function buildEnvelope({ attemptId, unitRunId, runDir, host, cwd, mutatin
     mutation: mutating ? 'mutating' : 'read-only',
     launch: {
       command: attempt.command,
-      args: attempt.args,
+      // An external host supplies the agent's arguments itself (its protocol mode).
+      args: external ? [] : attempt.args,
       // The writer id of the attempt and its lineage are not secrets.
-      env: withIdentityEnv(attempt.env, identity),
+      env,
       stdinPolicy: 'null',
       briefPath: terminal ? terminal.briefPath : null,
-      outboxDir: terminal?.outboxDir ?? paths.outboxDir,
+      outboxDir: terminal?.outboxDir ?? external?.outboxDir ?? paths.outboxDir,
       ...(maxOutputBytes ? { maxOutputBytes } : {}),
       capture: { stdout: paths.stdout, stderr: paths.stderr },
     },
@@ -246,6 +255,7 @@ export function buildEnvelope({ attemptId, unitRunId, runDir, host, cwd, mutatin
       slot: { key: attemptId, groupKey: terminal.groupKey },
       terminal: { socketPath: terminal.socketPath, exitCommand: terminal.exitCommand ?? null, orphanSettleMs: terminal.orphanSettleMs, ...(terminal.retainFailedPaneMs !== undefined ? { retainFailedPaneMs: terminal.retainFailedPaneMs } : {}) },
     } : {}),
+    ...(external ? { external: { socketPath: external.socketPath, orphanSettleMs: external.orphanSettleMs, helloLimitMs: external.helloLimitMs } } : {}),
     ...(cwdLeaseFile ? { cwdLeaseFile, ...(cwdLeaseOwner ? { cwdLeaseOwner } : {}) } : {}),
   };
 }

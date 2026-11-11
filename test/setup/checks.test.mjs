@@ -136,6 +136,7 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, with no repo
       'executor-confinement',
       'invocation-git-write-grants',
       'herdr-executor-kinds',
+      'paseo-executors',
       // Phase 06 (executor-policy-dispatch-seams): legacy policy-shaped
       // executor/capability warnings, named with their migration target.
       'executor-profile-warnings',

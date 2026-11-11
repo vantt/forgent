@@ -166,6 +166,31 @@ test('the envelope is immutable, digest-checked and secret-free; the side file i
   assert.deepEqual(attemptGateCommand('/h/fgos', runDir), ['/h/fgos', 'internal', 'gate', '--protocol', '1', '--envelope', path.join(runDir, 'envelope.json'), '--go-fd', '5']);
 });
 
+// The external mode's own shape; the supervisor's side of it is proven in the crate (supervise/external.rs).
+test('an external envelope names its socket and hello limit, leaves the arguments to the host, points a confined TMPDIR at the private /tmp and carries no pane', (t) => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-envelope-external-'));
+  t.after(() => fs.rmSync(dir, { recursive: true, force: true }));
+  const build = (bwrap) => buildEnvelope({
+    attemptId: 'att-x', unitRunId: 'unit-1', runDir: dir, host: { hostBin: '/h/fgos', payloadRoot: '/h/payload' }, cwd: dir, mutating: false,
+    attempt: { command: '/bin/codex', args: ['exec', '{prompt}'], env: { PATH: '/bin' }, ...(bwrap ? { bwrapPrefix: ['--unshare-pid', '--'], bwrapExecutable: '/usr/bin/bwrap' } : {}) },
+    timeoutMs: 60_000, idleTimeoutMs: null, cli: 'codex', stepEnv: { PATH: '/bin', FGOS_STATE_ROOT: '/state' },
+    gateKillGraceMs: 1000, killWaitMs: 1000,
+    external: { socketPath: '/run/user/1/fgos/abc.sock', orphanSettleMs: 2000, helloLimitMs: 30_000, outboxDir: path.join(dir, 'outbox') },
+  });
+  const confined = build(true);
+  assert.equal(confined.mode, 'external');
+  assert.equal(confined.agentProtocol.mode, 'external');
+  assert.deepEqual(confined.external, { socketPath: '/run/user/1/fgos/abc.sock', orphanSettleMs: 2000, helloLimitMs: 30_000 });
+  assert.deepEqual(confined.launch.args, [], 'the host runs the CLI with its own arguments');
+  assert.equal(confined.launch.outboxDir, path.join(dir, 'outbox'));
+  assert.equal(confined.launch.env.TMPDIR, '/tmp');
+  assert.equal(confined.containment.preferred, 'linux-gate');
+  assert.deepEqual(confined.steps.map((s) => s.stepId), ['settle-attempt', 'finalize-home']);
+  assert.equal(confined.slot, undefined);
+  assert.equal(confined.terminal, undefined);
+  assert.equal(build(false).launch.env.TMPDIR, undefined, 'unconfined, the host\'s own TMPDIR is usable');
+});
+
 test('awaitSettledResult returns null for a supervisor that is gone and an attempt the adopt door cannot finish', async (t) => {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-await-'));
   t.after(() => fs.rmSync(dir, { recursive: true, force: true }));

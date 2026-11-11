@@ -130,6 +130,7 @@ import { checkRunSupervisorRoute, checkRuntimeSocketDir, fixRuntimeSocketDir, ch
 import { checkIdentityMachineId, checkIdentityMachineKey, checkIdentityProjectId, checkIdentitySharedDirectory, checkIdentitySshKeygen, fixIdentityMachineId, fixIdentityMachineKey } from './identity-checks.mjs';
 import { checkTerminalControl, checkTerminalAllocations } from './terminal-control-checks.mjs';
 import { checkOmpNativesPresent, ompExecutorsOf } from './omp-natives-checks.mjs';
+import { checkPaseoExecutors } from './paseo-checks.mjs';
 import { checkLockKernelSemantics, checkLockBorrowVectors, checkLockHolders, fixLockDirs } from './holder-lock-checks.mjs';
 export { mainCheckoutHookWired } from './git-hooks.mjs';
 export { claudeCodeHookWired } from './claude-code-hooks.mjs';
@@ -2390,6 +2391,18 @@ registerCheck({
       // An unreadable runner config is its own row's failure; here it only means no executor is known to run omp.
     }
     return checkOmpNativesPresent({ ompExecutors });
+  },
+});
+
+registerCheck({
+  id: 'paseo-executors',
+  description: 'every invocation that runs through paseo (adapter paseo-spawn) has its fgos-<cli> provider in the paseo daemon; warns when the daemon does not answer; readiness only, never writes paseo config',
+  check: (cwd) => {
+    try {
+      return checkPaseoExecutors(loadRunnerConfigForDir(cwd));
+    } catch (err) {
+      return { passed: true, message: `runner config not loadable here, paseo invocations not evaluated: ${err.message}` };
+    }
   },
 });
 

@@ -567,7 +567,7 @@ $defs:
   adapterName:
     description: "The adapters that can spawn an executor."
     type: string
-    enum: [cli-spawn, herdr-spawn]
+    enum: [cli-spawn, herdr-spawn, paseo-spawn]
   envMap:
     description: "Environment variables of a launch, by name."
     type: object

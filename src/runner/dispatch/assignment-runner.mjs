@@ -75,7 +75,7 @@ import {
   attemptGateCommand,
   withIdentityEnv,
   prepareAttemptFiles,
-  terminalSocketPath,
+  attemptSocketPath,
   attemptStepEnv as attemptStepEnvOf,
   awaitSettledResult,
   buildEnvelope,
@@ -93,6 +93,8 @@ import { register as registerDeliveredAttempt, unregister as unregisterDelivered
 import { watchWritesOutsideWorkspace } from '../../run-supervisor/stray-writes.mjs';
 import { prepareTerminalAttempt, followPaneScreen, withoutPaneEnv, PANE_IDLE_TIMEOUT_MS, ORPHAN_SETTLE_MS } from './herdr-round.mjs';
 import { resolveHerdrBin, workLabelOf } from './terminal-slot.mjs';
+import { createPaseoCarrier, paseoModeFor, paseoProviderId, refreshExecLink, waitForSocket, writeExternalBrief } from './paseo-launch.mjs';
+import { resolveStateRoot } from '../../holder-lock/state-root.mjs';
 import { retainFailedPaneMsOf } from '../../terminal-control/config.mjs';
 import { finalizeAttemptHome, prepareConfinementForLaunch } from './confinement/authority.mjs';
 import { CREDENTIAL_HOME_KEPT } from './confinement/cleanup.mjs';
@@ -401,6 +403,10 @@ function validateAssignmentLegality(asgn, opts = {}) {
 
 /** The CLIs whose screens the terminal adapters of the agent protocol know. */
 const TERMINAL_CLIS = new Set(['claude', 'codex', 'agy', 'pi', 'omp']);
+/** The run-supervisor launch mode each adapter runs as; an adapter not listed cannot run as an attempt. */
+const ATTEMPT_MODE_OF_ADAPTER = Object.freeze({ 'cli-spawn': 'direct', 'herdr-spawn': 'terminal', 'paseo-spawn': 'external' });
+/** How long the external host gets to start the gate once it was asked (the supervisor then ends the attempt). */
+const EXTERNAL_HELLO_LIMIT_MS = 30_000;
 
 /**
  * The argv an interactive agent starts with in a pane: the executor's own args without the prompt (the
@@ -677,13 +683,15 @@ async function leaseAccountForAttempt({ cfg, opts, compiledPlan, effectivePolicy
  * The one attempt this controller launches: what it owns until the handover (the attempt locks, the pane of a
  * terminal attempt, the provider lease, its run control) and how far it got. `closeAttempt` reads only this.
  */
-function openAttempt({ runDir, runId, attemptId, unitRunId, terminal, cwd, host, stepEnv, custody, leaseRuntimeDir }) {
+function openAttempt({ runDir, runId, attemptId, unitRunId, mode, cwd, host, stepEnv, custody, leaseRuntimeDir }) {
   return {
     runDir,
     runId,
     attemptId,
     unitRunId,
-    terminal,
+    // `direct`, `terminal` (a pane) or `external` (an external host starts the gate).
+    mode,
+    terminal: mode === 'terminal',
     cwd,
     host,
     stepEnv,
@@ -696,6 +704,8 @@ function openAttempt({ runDir, runId, attemptId, unitRunId, terminal, cwd, host,
     lease: null,
     // Set once a terminal attempt has its pane; until the handover it is this controller's to give back.
     terminalPrep: null,
+    // Set once an external attempt has its brief: what the host is asked to start.
+    externalPrep: null,
     // This controller's run control `{ controlEpoch, controlToken }`, taken once the run is known to launch.
     control: null,
     intentWritten: false,
@@ -714,7 +724,7 @@ function publishAttemptIntent(attempt, pane = null) {
     runDir: path.resolve(attempt.runDir),
     attemptId: attempt.attemptId,
     unitRunId: attempt.unitRunId,
-    terminal: attempt.terminal,
+    mode: attempt.mode,
     cwd: attempt.cwd,
     host: attempt.host,
     stepEnv: attempt.stepEnv,
@@ -892,7 +902,8 @@ async function buildLaunch(attempt, ctx) {
   let parentWriterId = null;
   try { parentWriterId = String(resolveWriterIdentity(fgosDir).id); } catch { /* no controller identity: the lineage stays empty */ }
   const attemptIdentity = { writerId: attemptWriterId, parentWriterId };
-  const terminalSocket = attempt.terminal ? terminalSocketPath(attemptId) : null;
+  const external = attempt.mode === 'external';
+  const terminalSocket = attempt.mode !== 'direct' ? attemptSocketPath(attemptId) : null;
   const attemptArgs = attempt.terminal
     ? terminalAgentArgs({ resolvedCmd, prompt, model: effectivePolicy.model, runDir: attemptRunDir, writerId: attemptWriterId, caseContext: opts.caseContext ?? null })
     : resolvedCmd.args;
@@ -945,7 +956,7 @@ async function buildLaunch(attempt, ctx) {
     },
     requirement: ctx.confinementRequirement,
     attemptId,
-    launchMode: attempt.terminal ? 'terminal' : 'direct',
+    launchMode: attempt.mode,
     gateCommand: attemptGateCommand(attempt.host.hostBin, runDir, { goSocket: terminalSocket }),
     attemptBinds: prepareAttemptFiles(runDir, attemptId),
   }), { adapterPort: opts.adapterPort });
@@ -1006,6 +1017,26 @@ async function buildLaunch(attempt, ctx) {
     });
   }
 
+  // An external attempt's brief is what its host hands the agent; the mode paseo starts it in is checked here,
+  // before anything is handed over.
+  if (external) {
+    const cli = commandCli(prepResult.attempt.command);
+    attempt.externalPrep = {
+      ...writeExternalBrief({
+        runDir: attemptRunDir,
+        prompt,
+        runId,
+        attemptId,
+        effectiveContract: { ...effectiveContract, assignment: { role: assignment.role, posture: assignment.posture, operation: assignment.operation } },
+      }),
+      cli,
+      paseoMode: paseoModeFor(cli, { confined: Array.isArray(prepResult.attempt.bwrapPrefix) }),
+      socketPath: terminalSocket,
+      cwd: prepResult.attempt.cwd,
+      title: (({ id, title }) => [id ?? executorId, title].filter(Boolean).join(' ').slice(0, 120))(workLabelOf(assignment)),
+    };
+  }
+
   // The envelope, the secret side file and the context the settle step needs. The envelope is immutable from
   // here on; nothing the controller still learns changes what the attempt runs.
   const mutating = ctx.effectiveMutation === 'mutating';
@@ -1018,7 +1049,8 @@ async function buildLaunch(attempt, ctx) {
     mutating: mutating && opts.forceSharedCwd !== true,
     attempt: attempt.terminal ? { ...prepResult.attempt, env: withoutPaneEnv(prepResult.attempt.env) } : prepResult.attempt,
     timeoutMs,
-    idleTimeoutMs: attempt.terminal ? PANE_IDLE_TIMEOUT_MS : cfg.idleTimeoutMs,
+    // An external attempt has no output the supervisor reads, so no idle timer.
+    idleTimeoutMs: attempt.terminal ? PANE_IDLE_TIMEOUT_MS : external ? null : cfg.idleTimeoutMs,
     maxOutputBytes: cfg.maxBuffer || 10485760,
     cli: attempt.terminal && TERMINAL_CLIS.has(resolvedCmd.interactiveMode?.kind) ? resolvedCmd.interactiveMode.kind : commandCli(prepResult.attempt.command),
     stepEnv: attempt.stepEnv,
@@ -1038,6 +1070,9 @@ async function buildLaunch(attempt, ctx) {
         },
         extraSteps: ['cleanup-trust'],
       }
+      : {}),
+    ...(external
+      ? { external: { socketPath: terminalSocket, orphanSettleMs: ORPHAN_SETTLE_MS, helloLimitMs: EXTERNAL_HELLO_LIMIT_MS, outboxDir: attempt.externalPrep.outboxDir } }
       : {}),
     ...(mutating
       ? { cwdLeaseFile: attempt.locks.cwdLease.path, ...(process.platform === 'win32' ? { cwdLeaseOwner: attempt.locks.cwdLease.domainEndpoint() } : {}) }
@@ -1069,6 +1104,36 @@ async function buildLaunch(attempt, ctx) {
   return { envelope, settings: attemptSettings };
 }
 
+/** `external-agent.json`: which host agent carries the attempt, for a person and for later cleanup. */
+function recordExternalAgent(runDir, record) {
+  publishMutableProjection(path.join(runDir, 'external-agent.json'), record);
+}
+
+/**
+ * Ask the external host (paseo) to start the attempt's agent once the supervisor listens. A host that
+ * refuses leaves the gate unstarted: the supervisor then ends the attempt as not started
+ * (`external-gate-silent`), so a refusal here is reported and the binding wait goes on.
+ */
+async function startExternalAgent(attempt, envelope, child) {
+  const prep = attempt.externalPrep;
+  const carrier = createPaseoCarrier();
+  const record = { v: 1, host: 'paseo', provider: paseoProviderId(prep.cli), mode: prep.paseoMode, agentId: null };
+  try {
+    if (!(await waitForSocket(prep.socketPath, { child }))) {
+      process.stderr.write(`fgos: paseo-spawn: the supervisor of ${attempt.attemptId} is not listening; the agent was not requested\n`);
+      return null;
+    }
+    refreshExecLink({ stateRoot: resolveStateRoot().stateRoot, cli: prep.cli, hostBin: envelope.hostBin });
+    record.agentId = await carrier.start({ cli: prep.cli, mode: prep.paseoMode, attemptDir: envelope.runDir, cwd: prep.cwd, title: prep.title, prompt: prep.text });
+    process.stderr.write(`fgos: paseo-spawn agent=${record.agentId} provider=${record.provider} runDir=${envelope.runDir}\n`);
+  } catch (err) {
+    record.refused = { code: err.code ?? 'external-host-refused', message: err.message };
+    process.stderr.write(`fgos: paseo-spawn: ${err.message}\n`);
+  }
+  recordExternalAgent(path.resolve(attempt.runDir), record);
+  return { carrier, agentId: record.agentId, record };
+}
+
 /**
  * Hand the attempt to the supervisor and wait only for its binding, then read the answer the settle step
  * writes. Whatever the outcome, only the attempt copy of the locks closes here; the controller keeps cwd custody.
@@ -1078,6 +1143,7 @@ async function awaitBinding(attempt, { envelope, settings, onChunk, timeoutMs })
   const attemptRunDir = path.resolve(runDir);
   let bound;
   let supervisor;
+  let external = null;
   // A Ctrl-C from here until the binding is known waits for the binding and then cancels the attempt; one that
   // came earlier refuses the launch (cancel-registry.mjs).
   beginAttemptLaunch(attemptRunDir);
@@ -1085,6 +1151,7 @@ async function awaitBinding(attempt, { envelope, settings, onChunk, timeoutMs })
     supervisor = startSupervisor({ envelope, locks: attempt.locks, stepEnv: attempt.stepEnv, extraEnv: attempt.terminalPrep?.endpointEnv });
     attempt.handedOver = true;
     if (process.platform === 'win32') attempt.locks.releaseAttempt();
+    if (attempt.externalPrep) external = await startExternalAgent(attempt, envelope, supervisor.child);
     bound = await waitForBinding(attemptRunDir, supervisor.child);
     if (bound.state === 'bound') registerDeliveredAttempt(attemptRunDir);
   } finally {
@@ -1111,6 +1178,12 @@ async function awaitBinding(attempt, { envelope, settings, onChunk, timeoutMs })
   // supervisor to cancel (registered with the binding above).
   let stopScreen = null;
   let settledResult;
+  // The agent's turn ending closes it at its host: its pipes close, the CLI exits and the attempt settles.
+  const closing = external?.agentId
+    ? external.carrier.closeWhenDone(external.agentId, { timeoutMs, cwd: attempt.externalPrep.cwd })
+      .then((closed) => recordExternalAgent(attemptRunDir, { ...external.record, closed }))
+      .catch((err) => process.stderr.write(`fgos: paseo agent ${external.agentId} not closed (${err.message})\n`))
+    : null;
   try {
     stopScreen = attempt.terminalPrep ? followPaneScreen({ tc: attempt.terminalPrep.tc, key: attempt.terminalPrep.slot.key, onChunk }) : null;
     settledResult = await awaitSettledResult({
@@ -1125,6 +1198,7 @@ async function awaitBinding(attempt, { envelope, settings, onChunk, timeoutMs })
   } finally {
     unregisterDeliveredAttempt(attemptRunDir);
     stopScreen?.();
+    await closing;
   }
   if (!settledResult) {
     // A fresher controller took the run control over while the agent ran: the settle step refused to append (it
@@ -1254,10 +1328,11 @@ export async function executeAssignment(assignment, opts = {}) {
       ?.find((inv) => inv?.id === pinnedInvocationId && inv?.via === 'cli');
     if (pinnedInvocation?.adapter) resolvedAdapter = pinnedInvocation.adapter;
   }
-  // Every dispatch runs as an attempt of the run supervisor, `direct` (cli-spawn) or `terminal` (herdr-spawn);
-  // an adapter that is neither has no way to run here and is refused before anything is admitted.
-  if (resolvedAdapter !== 'cli-spawn' && resolvedAdapter !== 'herdr-spawn') {
-    throw new DispatchError('supervised-adapter-required', `executor "${resolvedExecutorId}" names adapter "${resolvedAdapter}", which cannot run as an attempt of the run supervisor (cli-spawn and herdr-spawn can)`, {
+  // Every dispatch runs as an attempt of the run supervisor, `direct` (cli-spawn), `terminal` (herdr-spawn) or
+  // `external` (paseo-spawn); any other adapter has no way to run here and is refused before anything is admitted.
+  const launchMode = ATTEMPT_MODE_OF_ADAPTER[resolvedAdapter];
+  if (!launchMode) {
+    throw new DispatchError('supervised-adapter-required', `executor "${resolvedExecutorId}" names adapter "${resolvedAdapter}", which cannot run as an attempt of the run supervisor (${Object.keys(ATTEMPT_MODE_OF_ADAPTER).join(', ')} can)`, {
       adapter: resolvedAdapter, cwd, executorId: resolvedExecutorId, capability: compiledPlan.capability,
     });
   }
@@ -1332,10 +1407,11 @@ export async function executeAssignment(assignment, opts = {}) {
     runId,
     attemptId: opts.launchCommandId || `cmd_${Date.now()}_${crypto.randomBytes(4).toString('hex')}`,
     unitRunId: declaredUnitRunId ?? effectiveAssignment.assignmentId,
-    // Both shapes run under the run supervisor: `direct` keeps the agent in a process tree the supervisor
-    // owns, `terminal` runs it in a pane of the terminal-control port. The controller prepares and hands
-    // over; it never settles, signals the agent or closes a pane.
-    terminal: resolvedAdapter === 'herdr-spawn',
+    // Every shape runs under the run supervisor: `direct` keeps the agent in a process tree the supervisor
+    // owns, `terminal` runs it in a pane of the terminal-control port, `external` has an external host start
+    // it through the gate. The controller prepares and hands over; it never settles, signals the agent or
+    // closes a pane.
+    mode: launchMode,
     cwd,
     // The host and the step environment are resolved before the lock and outside any state transaction.
     host: resumedOver ? null : resolveAttemptHost(),

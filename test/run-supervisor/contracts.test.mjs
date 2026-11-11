@@ -44,7 +44,7 @@ test('the envelope vector is a complete v3 direct envelope', () => {
   const envelope = readJson('packages/run-supervisor/contracts/vectors/envelope-digest.v1.json').cases
     .find((c) => c.name === 'envelope-direct-mutating').input;
   const contract = readJson('packages/run-supervisor/contracts/envelope.v3.json');
-  for (const field of Object.keys(contract.fields).filter((f) => !['slot', 'terminal'].includes(f))) {
+  for (const field of Object.keys(contract.fields).filter((f) => !['slot', 'terminal', 'external'].includes(f))) {
     assert.ok(field in envelope, `vector carries ${field}`);
   }
   assert.equal(envelope.v, 3);
