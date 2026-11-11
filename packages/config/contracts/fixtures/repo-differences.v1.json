@@ -317,6 +317,9 @@
  ],
  "standard-only": [
   [
+   "dispatch"
+  ],
+  [
    "eventStore",
    "seal"
   ],

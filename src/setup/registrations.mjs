@@ -1692,7 +1692,7 @@ registerFix({ id: 'lock-dirs', fix: (cwd) => fixLockDirs(cwd) });
 // Run supervisor (docs/platform/run-supervisor/spec.md): the host routes with the containment driver agents
 // run in, the runtime socket directory, attempts nobody holds (and the units awaiting resume) and the
 // gate's kill grace with the cancel wait.
-// `dispatch.gateKillGraceMs` and `dispatch.cancelWaitMs` are read with a default and never written by setup.
+// `dispatch.gateKillGraceMs` and `dispatch.cancelWaitMs` take their values from the dispatch section of the standard and are never written by setup.
 registerCheck({
   id: 'run-supervisor-route',
   description: 'the host binary serves supervise, gate, adopt and attempt-step at protocol 1 and names the containment driver agents run in and its level (kernel or best-effort)',
@@ -1710,7 +1710,7 @@ registerCheck({
 });
 registerCheck({
   id: 'run-supervisor-config',
-  description: 'dispatch.gateKillGraceMs is an integer of at least 1000 ms (default 10000) and dispatch.cancelWaitMs is an integer of at least 1000 ms and not shorter than it (default gateKillGraceMs + 5000)',
+  description: 'dispatch.gateKillGraceMs and dispatch.cancelWaitMs read through the config door (each at least 1000 ms) and the cancel wait is not shorter than the grace',
   check: (cwd) => checkRunSupervisorConfig(cwd),
 });
 registerFix({ id: 'runtime-socket-dir', fix: () => fixRuntimeSocketDir() });

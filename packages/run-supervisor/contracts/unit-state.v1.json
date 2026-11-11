@@ -44,10 +44,10 @@
   "config": {
     "dispatch.cancelWaitMs": {
       "type": "integer, milliseconds",
-      "default": "dispatch.gateKillGraceMs + 5000 (so 15000 with the default grace)",
+      "default": "15000, the standard value in core/config-standard/dispatch.yaml",
       "min": 1000,
-      "reader": "project-over-global, the same reader as dispatch.gateKillGraceMs (src/run-supervisor/gate-kill-grace.mjs)",
-      "setup": "setup never writes the key into a config file; an absent key is the default. Setup and doctor registration is added together with the doctor check for stuck attempts"
+      "reader": "project over global over standard through the config door, the same reader as dispatch.gateKillGraceMs (src/run-supervisor/gate-kill-grace.mjs)",
+      "setup": "setup never writes the key into a config file; an absent key takes the standard value. Setup and doctor registration is added together with the doctor check for stuck attempts"
     }
   },
   "deferred": {

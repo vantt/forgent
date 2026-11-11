@@ -19,7 +19,7 @@ import { routeEnv } from '../util/host-bin-path.mjs';
 import { RUN_SUPERVISOR_PROTOCOL as PROTOCOL } from '../run-supervisor/protocol.mjs';
 import { resolveRuntimeSocketDir, ensureRuntimeSocketDir, RuntimeDirError, SOCKET_PATH_MAX_BYTES, SOCKET_NAME_BYTES } from '../run-supervisor/runtime-dir.mjs';
 import { listOpenAttemptDirs } from '../run-supervisor/client.mjs';
-import { GATE_KILL_GRACE_KEY, readDispatchConfig, resolveGateKillGrace, gateKillGraceProblem, CANCEL_WAIT_KEY, resolveCancelWait, cancelWaitProblem } from '../run-supervisor/gate-kill-grace.mjs';
+import { GATE_KILL_GRACE_KEY, readDispatchConfig, resolveGateKillGrace, CANCEL_WAIT_KEY, resolveCancelWait } from '../run-supervisor/gate-kill-grace.mjs';
 import { attemptLockState } from '../runner/dispatch/visibility-session.mjs';
 import { fgosDirFromRoot } from '../runner/paths.mjs';
 
@@ -225,28 +225,23 @@ export function checkRunAttemptsStuck(repoRoot) {
 // ---------------------------------------------------------------------
 
 /**
- * `dispatch.gateKillGraceMs` and `dispatch.cancelWaitMs` after the config merge (project over global), read
- * once: value and source of each. The grace fails below 1000 ms or when not an integer; the cancel wait
- * fails when unusable or shorter than the grace (the controller would leave before the gate could finish
- * stopping the agent).
+ * `dispatch.gateKillGraceMs` and `dispatch.cancelWaitMs` after the config merge (project over global over
+ * the standard), read once: value and source of each. The section schema refuses an unusable value (the
+ * door's refusal is the message); the one rule judged here is across the two keys: a cancel wait shorter
+ * than the grace makes the controller leave before the gate can finish stopping the agent.
  */
 export function checkRunSupervisorConfig(repoRoot, { globalConfigPath } = {}) {
-  let snapshot;
+  let grace;
+  let wait;
   try {
-    snapshot = readDispatchConfig({ projectRoot: path.resolve(repoRoot), globalConfigPath });
+    const snapshot = readDispatchConfig({ projectRoot: path.resolve(repoRoot), globalConfigPath });
+    grace = resolveGateKillGrace(snapshot);
+    wait = resolveCancelWait(snapshot);
   } catch (err) {
     return { passed: false, message: `${GATE_KILL_GRACE_KEY} and ${CANCEL_WAIT_KEY} unreadable: ${err.message}` };
   }
-  const grace = resolveGateKillGrace(snapshot);
-  const wait = resolveCancelWait(snapshot);
-  const problems = [];
-  const graceProblem = gateKillGraceProblem(grace.value);
-  if (graceProblem) problems.push(`${graceProblem} (${grace.source})`);
-  const waitProblem = cancelWaitProblem(wait.value);
-  if (waitProblem) problems.push(`${waitProblem} (${wait.source})`);
-  else if (Number.isInteger(wait.grace) && wait.value < wait.grace) {
-    problems.push(`${CANCEL_WAIT_KEY} = ${wait.value} (${wait.source}) is shorter than ${GATE_KILL_GRACE_KEY} = ${wait.grace}: a stopped controller would leave before the gate can finish stopping the agent`);
+  if (wait.value < grace.value) {
+    return { passed: false, message: `${CANCEL_WAIT_KEY} = ${wait.value} (${wait.source}) is shorter than ${GATE_KILL_GRACE_KEY} = ${grace.value} (${grace.source}): a stopped controller would leave before the gate can finish stopping the agent` };
   }
-  if (problems.length > 0) return { passed: false, message: problems.join('; ') };
   return { passed: true, message: `${GATE_KILL_GRACE_KEY} = ${grace.value} (${grace.source}); ${CANCEL_WAIT_KEY} = ${wait.value} (${wait.source})` };
 }

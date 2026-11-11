@@ -103,12 +103,12 @@ fn explain_names_the_layer_of_a_list_or_mapping_that_only_the_global_file_sets()
 }
 
 #[test]
-fn explain_answers_a_runtime_key_and_names_the_nearest_keys_of_a_typo() {
+fn explain_answers_a_dispatch_key_from_its_schema_and_names_the_nearest_keys_of_a_typo() {
     with_bundle(|ctx| {
         let wait = explain(ctx, None, &parse_path("dispatch.cancelWaitMs").unwrap());
         assert_eq!(wait["described"], true);
-        assert_eq!(wait["runtimeKey"], true);
-        assert_eq!(wait["default"], "dispatch.gateKillGraceMs + 5000");
+        assert_eq!(wait["standard"], 15000);
+        assert_eq!(wait["configFile"], "config");
         assert_eq!(wait["owner"], "run-supervisor");
         assert_eq!(wait["minimum"], 1000);
         let typo = explain(ctx, None, &parse_path("dispatch.cancelWaitM").unwrap());
