@@ -333,3 +333,21 @@ test('buildRunRequest hands the case port its project root, and the request para
   assert.equal(request.raiseAuthorized, false, 'no door of this release can attest a person');
   assert.throws(() => build(root, { unit: 'u.yaml', params: '[1]' }), (err) => err instanceof RunnerConfigError && err.code === 'param-invalid' && err.phase === 'pre-admission');
 });
+
+test('buildRunRequest refuses a writing run from inside a dispatched worker when the Workflow port says its view cannot write, before it reads any config', () => {
+  const root = runRepo();
+  const before = process.env.FGOS_DISPATCH_DEPTH;
+  const asked = [];
+  const confined = { ...caseAdmission, confinedWriteRefusal: (options) => { asked.push(options); return 'its view of the bindings is read-only'; } };
+  const call = () => buildRunRequest({ dir: root, capability: 'docs:write', writes: 'notes.md' }, ['Write notes'], { cwd: root, gitRoots: resolveGitRoots, caseAdmission: confined });
+  try {
+    delete process.env.FGOS_DISPATCH_DEPTH;
+    assert.throws(call, /--writes needs a linked worktree/, 'outside a dispatched worker the port is not asked and the flags are judged as usual');
+    assert.deepEqual(asked, []);
+    process.env.FGOS_DISPATCH_DEPTH = '1';
+    assert.throws(call, (err) => err instanceof RunnerConfigError && err.code === 'nested-write-from-confined-worker' && err.phase === 'pre-admission' && /its view of the bindings is read-only/.test(err.message));
+    assert.deepEqual(asked, [{ mainRoot: root, caseId: null }]);
+  } finally {
+    if (before === undefined) delete process.env.FGOS_DISPATCH_DEPTH; else process.env.FGOS_DISPATCH_DEPTH = before;
+  }
+});

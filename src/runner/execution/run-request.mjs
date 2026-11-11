@@ -9,6 +9,7 @@ import { slugOf } from '../../util/slug.mjs';
 import { loadRunnerConfigForDir, parseRunTimeout } from '../dispatch/config.mjs';
 import { RunnerConfigError } from '../dispatch/runner-config-error.mjs';
 import { resolveAgentDefinition } from '../agent-definitions.mjs';
+import { currentDispatchDepth } from '../dispatch/adapters.mjs';
 
 // A flag that is bare (`--flag` with no value) or empty means no value was given: refused, never passed on.
 function requireField(value, message) {
@@ -269,7 +270,7 @@ function refuseConflictingFlags(flags, positional) {
  * `runUnit` takes, or throws one refusal.
  *
  * `roots` is what the caller owns: `cwd`, `gitRoots(cwd)` (`{ mainCheckoutRoot, isLinkedWorktree }`) and
- * `caseAdmission` (`createPort({ repoRoot })`, `activityUnitOf({ mainRoot, caseId, activity })`), the Workflow's
+ * `caseAdmission` (`createPort({ repoRoot })`, `activityUnitOf({ mainRoot, caseId, activity })`, `confinedWriteRefusal({ mainRoot, caseId })`), the Workflow's
  * port, handed in so the Execution Core never imports the Workflow. A run's own account pin is `strict`: no seat
  * taking it refuses the run, and a pin never moves a seat to another pool.
  */
@@ -284,6 +285,14 @@ export function buildRunRequest(flags, positional, roots) {
   const repoRoot = flags.dir;
   const worktree = flags.worktree;
   const portRoot = repoRoot ? path.resolve(repoRoot) : (() => { try { return roots.gitRoots(roots.cwd).mainCheckoutRoot; } catch { return null; } })();
+  // A writing run from inside a dispatched (confined) worker is refused before anything needs the config, a lock or
+  // an addon: Execution knows it is dispatched, the Workflow port knows what the worker's view of the case ledger is.
+  if (flags.writes !== undefined && currentDispatchDepth() > 0) {
+    const confined = roots.caseAdmission.confinedWriteRefusal({ mainRoot: portRoot ?? roots.cwd, caseId: typeof flags.case === 'string' ? flags.case : null });
+    if (confined) {
+      throw new RunnerConfigError(`nested-write-from-confined-worker: a writing dispatch from inside a confined worker is refused: ${confined}; a confined worker may dispatch read-only work only`, { code: 'nested-write-from-confined-worker', phase: 'pre-admission' });
+    }
+  }
   // Everything about the one-liner is checked here, before runUnit creates a unit run.
   const unitData = !buildsUnit ? undefined : adhocUnitFromPrompt(prompt, flags, {
     mainRoot: repoRoot ? path.resolve(repoRoot) : roots.gitRoots(roots.cwd).mainCheckoutRoot,

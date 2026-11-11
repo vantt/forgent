@@ -16,7 +16,7 @@ import { writeProjectConfig } from '../helpers/config-fixture.mjs';
 const executeAssignment = bindableExecute(executeAssignmentRaw);
 import { RunnerConfigError } from '../../src/runner/dispatch/runner-config-error.mjs';
 import { compileDispatchPlan } from '../../src/runner/dispatch/plan.mjs';
-import { decideExecutorCli } from '../../src/runner/dispatch/cli.mjs';
+import { decideExecutorCli } from '../../src/runner/dispatch/decide.mjs';
 import { acquireRunControl, releaseRunControl } from '../../src/run-supervisor/run-lock.mjs';
 import { canonicalJson, computeSha256Digest } from '../../src/native/proof-helpers.mjs';
 import { initStore, addWork, listWork, settleClaim } from '../../src/state/store.mjs';

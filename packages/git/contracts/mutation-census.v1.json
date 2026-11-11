@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "b4f22322962e3939c0d76e31c378ed541c8ea80bdd05cec48d456bd4a6bc42e1",
+  "payloadDigest": "afac0e89dc9b85bb6d91824fbb810309c125625d4319aa33184b3fbb512a88f9",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -114,7 +114,7 @@
     "apps/fgos/tests/windows_semantics_probe.rs": "ecb59690bbf1259baa1defb6417c24005138526bb565f216f9db3c2ad784d240",
     "apps/fgos/tests/windows_support/mod.rs": "2b8a17676526c87ea5ecfb2074a70a3511fbf9267f9de78a35dc355f272830fb",
     "bin/fgos-runner.mjs": "94f320cbc601fcb518c7489525e1c7d692da67e1a2f285e8b12189aee2f42d1a",
-    "bin/fgos.mjs": "ea865012867277ede1ade79ff2a791807eea65b90eec6c1e515449023c7da52c",
+    "bin/fgos.mjs": "a0a967e9bee1784855df1fb38c4cf1c3f98197c10da06802c39b195f113b9494",
     "core/skills/_shared/capability-catalog.md": "4299584409592ac4ae9668cd0cb4dd0442edc1c78a42ccd9cfe0bae22bf11bc4",
     "core/skills/_shared/capability-matching.md": "eb67cde05d45c171c1d4803f9d2fbec5fc63565b9fd0a0549c866a7eb262521d",
     "core/skills/_shared/catchup-self-recovery.md": "3b77650c71a0225f00ffa8fe9524d7c0052977204f425c1999225b6f80802c69",
@@ -1073,7 +1073,7 @@
     "src/runner/execution/patterns/catalog-entries.mjs": "d96ef8305f33b49d07e7a49b5537a2c5534d88d7d95d690a86d371bb8e3ccdc2",
     "src/runner/execution/patterns/catalog.mjs": "d95d8fc276930093c14d2a757b8cc5217cf20a21bd06b891f7c191ab905addce",
     "src/runner/execution/patterns/retired-keys.mjs": "c07f8407d169c7db410aba99db2b7bb1119f5a20ec7a7b63f8cb81d1324e0f40",
-    "src/runner/execution/run-request.mjs": "31d437f81fdedf1e27de842ecafe33532c2aafe3e727a30b0e00ef2514e42504",
+    "src/runner/execution/run-request.mjs": "e704b5658f03fae0ce279e31aaee560af3f9648e7f41d39863ce406a0bb03494",
     "src/runner/execution/run.mjs": "66b1af180b969939b0b43bae3e9c1872b73de19f300777e524d7751461a45db3",
     "src/runner/execution/seat-ledger.mjs": "e033ac97585dc96b22b35d69d361d96d04b2e2b84703bcde241442ec84e74680",
     "src/runner/execution/seat-policy.mjs": "6a0b9671a9ceb020be1e74d306ea2e277cb324244faf391e85feff10ee7d2eaf",
