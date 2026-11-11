@@ -57,6 +57,15 @@ test('unknown dispatch sub-verb rejects before requiring runId (exit 4 validatio
   assert.ok(!result.stderr.includes('requires a runId'), `stderr should not mention runId: ${result.stderr}`);
 });
 
+test('fgos dispatch probe-session names its usage without an executor and refuses an executor the config does not register, before any seat starts', () => {
+  const bare = runFgos(['dispatch', 'probe-session']);
+  assert.equal(bare.status, 4, `expected exit 4, got ${bare.status} (stderr: ${bare.stderr})`);
+  assert.match(bare.stderr, /probe-session requires an executor id/);
+  const unknown = runFgos(['dispatch', 'probe-session', 'no-such-executor', '--json']);
+  assert.notEqual(unknown.status, 0);
+  assert.match(unknown.stderr + unknown.stdout, /no agent executor "no-such-executor"/);
+});
+
 test('--run alias works on show-run and not-found maps to exit 2 precondition', () => {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'dispatch-operability-cli-'));
   fs.mkdirSync(path.join(root, '.fgos'), { recursive: true });

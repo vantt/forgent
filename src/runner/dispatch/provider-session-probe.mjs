@@ -1,45 +1,30 @@
-// One executor, one tiny read-only seat through the door a real read-only dispatch uses (the same one the
-// account probe uses), then a report of where its CLI wrote the session in the attempt home, whether
+// One executor, one tiny read-only seat through the one execution door (`runUnit`, handed in by the caller:
+// Dispatch never imports the layer above it), bound by the executor, invocation and weakest tier it is
+// pinned to so the cheapest model of its family runs, then a report of where its CLI wrote the session in the attempt home, whether
 // finalize-home kept it, and where the kept copy is. Agent CLIs change where they write often; this is
 // the repeatable check, so a CLI upgrade is judged in minutes per executor. Read-only: it changes no
 // config and repairs nothing, it names the `runner.yaml` line to change when the declared folder is wrong.
 //
 // It never reads session content: names, counts and sizes only, because a session can hold secrets.
 
+import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 
-import { probeContract, withProbeBinding, readRunOutcome } from './provider-account-probe.mjs';
+import { readRunOutcome } from './provider-account-probe.mjs';
 import { MODEL_POLICY_TIERS } from './config.mjs';
-import { parseTierCell } from './tier-cell.mjs';
 import { credentialStoreOf } from './provider-capacity.mjs';
 import { OWNERSHIP_MARKER_FILE } from './confinement/cleanup.mjs';
 
 export const SESSION_PROBE_PROMPT = 'Session probe: there is no task. Reply with the single word OK.';
-export const DEFAULT_SESSION_PROBE_TIMEOUT_MS = 3 * 60 * 1000;
 
 /** The categories a probe ends in; only `kept` is success. */
 export const SESSION_PROBE_CATEGORIES = Object.freeze([
   'kept', 'run-failed', 'no-private-home', 'dir-undeclared', 'dir-mismatch', 'no-session-written', 'copy-failed',
 ]);
 
-/**
- * The cheapest model `executorId` is allowed: the first cell of its family's weakest tier that names a model.
- * Null when the family declares none, and the invocation default applies.
- */
-export function cheapestModelFor(cfg, executorId) {
-  const executor = cfg?.executors?.[executorId];
-  const family = executor?.providerModel ?? executor?.provider ?? executorId;
-  const tiers = cfg?.modelPolicies?.[family] ?? {};
-  for (const tier of MODEL_POLICY_TIERS) {
-    if (tiers[tier] === undefined) continue;
-    try {
-      const entry = parseTierCell(tiers[tier], family)[0];
-      if (entry?.model) return entry.model;
-    } catch { /* a malformed cell is skipped; the config check names it */ }
-  }
-  return null;
-}
+/** The weakest tier of the ladder: the cheapest model each family allows. */
+export const CHEAPEST_TIER = MODEL_POLICY_TIERS[0];
 
 /**
  * The invocation a probe runs: the one named by `invocationId`, else the first confined `cli` invocation of the
@@ -110,9 +95,11 @@ export function describeSessionKeep({ runDir, invocation, executorId }) {
   return { step, declaredSessionDir, observedSessionPaths, transcriptPath, ...size, warnings, fix, hasHome: Number(detail?.homes ?? 0) > 0 };
 }
 
+// A seat that failed on the provider's side (quota, a dead login) can still have written and kept its
+// session; what the probe judges is the session, so a kept copy wins over the seat's own outcome.
 function categoryOf({ ranOk, keep }) {
-  if (!ranOk) return 'run-failed';
   if (keep.transcriptPath) return 'kept';
+  if (!ranOk) return 'run-failed';
   if (!keep.hasHome) return 'no-private-home';
   if (keep.warnings.some((w) => w.code === 'session-copy-failed')) return 'copy-failed';
   if (keep.declaredSessionDir === null) return 'dir-undeclared';
@@ -121,21 +108,25 @@ function categoryOf({ ranOk, keep }) {
 
 /**
  * Run the probe seat and report `{ executorId, invocationId, model, outcome, category, kept, declaredSessionDir,
- * observedSessionPaths, transcriptPath, files, sizeBytes, fix, warnings, runDir }`. `createAssignment(contract)`
- * builds and claims an inline Assignment; `dispatch(assignment, { runnerConfig, cliOverride })` is the Assignment
- * door and resolves to a RunResult; both are injectable for tests.
+ * observedSessionPaths, transcriptPath, files, sizeBytes, fix, warnings, runDir }`. `runUnit(options)` is the
+ * execution door and resolves to `{ outcome, results[] }`; it is injectable for tests.
  */
 export async function runSessionProbe({
-  cfg, executorId, invocationId = null, repoRoot, model, timeoutMs = DEFAULT_SESSION_PROBE_TIMEOUT_MS,
-  prompt = SESSION_PROBE_PROMPT, createAssignment, dispatch,
+  cfg, executorId, invocationId = null, repoRoot, cwd = repoRoot, prompt = SESSION_PROBE_PROMPT, runUnit,
 } = {}) {
+  if (typeof runUnit !== 'function') throw new Error('the session probe needs the execution door (runUnit)');
   const invocation = sessionProbeInvocation(cfg, executorId, invocationId);
-  const probeModel = model ?? cheapestModelFor(cfg, executorId);
-  const assignment = withProbeBinding(createAssignment(probeContract({ prompt, timeoutMs })), { executorId, invocationId: invocation.id });
-  const cliOverride = { preferExecutor: executorId, preferInvocation: invocation.id, ...(probeModel ? { model: probeModel } : {}) };
+  const unitData = { id: `probe-session-${crypto.randomBytes(3).toString('hex')}`, objective: prompt, capability: 'execute', writes: [] };
+  const overrides = [{ executor: executorId, invocation: invocation.id, tier: CHEAPEST_TIER }];
   let run;
+  let bound = null;
   try {
-    run = readRunOutcome(await dispatch(assignment, { runnerConfig: cfg, cliOverride }), { repoRoot });
+    const unit = await runUnit({ unitData, overrides, raiseAuthorized: false, repoRoot, cwd });
+    const last = unit?.results?.at(-1) ?? null;
+    bound = last?.binding ?? null;
+    run = last?.runResult
+      ? readRunOutcome(last.runResult, { repoRoot })
+      : { ok: false, text: `the unit ended as ${unit?.outcome ?? 'unknown'} with no seat result`, runDir: null };
   } catch (err) {
     run = { ok: false, text: err?.message ?? String(err), runDir: err?.runDir ?? null };
   }
@@ -144,7 +135,7 @@ export async function runSessionProbe({
   return {
     executorId,
     invocationId: invocation.id,
-    model: probeModel,
+    model: bound?.model ?? null,
     outcome: run.ok ? 'ok' : 'failed',
     category,
     kept: category === 'kept',

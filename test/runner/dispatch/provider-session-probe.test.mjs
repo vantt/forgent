@@ -10,7 +10,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 
-import { cheapestModelFor, runSessionProbe, sessionProbeInvocation } from '../../../src/runner/dispatch/provider-session-probe.mjs';
+import { CHEAPEST_TIER, runSessionProbe, sessionProbeInvocation } from '../../../src/runner/dispatch/provider-session-probe.mjs';
 import { finalizeHome } from '../../../src/run-supervisor/steps/finalize-home.mjs';
 
 const dirs = [];
@@ -25,7 +25,6 @@ const SECRET = 'prompt text and tool output that can hold a secret';
 const store = (extra = {}) => ({ use: 'pi', homeEnv: 'PI_CODING_AGENT_DIR', files: ['auth.json'], ...extra });
 const confined = { backend: 'bwrap' };
 const configWith = (credentialStore) => ({
-  modelPolicies: { fixture: { standard: 'pricey-model', nano: ['cheap-model@pool-a', 'other@pool-b'] } },
   executors: {
     fixture: {
       kind: 'agent',
@@ -40,20 +39,22 @@ const configWith = (credentialStore) => ({
 });
 
 /**
- * An Assignment door whose "CLI" writes `files` (relative path -> text) into a real private home, then runs the
+ * An execution door whose "CLI" writes `files` (relative path -> text) into a real private home, then runs the
  * real finalize-home step over it, then records the step the way the supervisor does.
  */
-function fixtureDoor({ repoRoot, cfg, files = {}, fail = false }) {
+function fixtureDoor({ repoRoot, cfg, files = {}, fail = false, providerLimit = false }) {
   const calls = [];
-  const dispatch = async (assignment, { runnerConfig, cliOverride }) => {
-    calls.push({ assignment, runnerConfig, cliOverride });
+  const runUnit = async (options) => {
+    calls.push(options);
     if (fail) throw Object.assign(new Error('seat refused to start'), { runDir: null });
-    const runDir = path.join(repoRoot, '.fgos', 'assignments', assignment.assignmentId, 'runs', '01');
+    const [{ invocation: invocationId }] = options.overrides;
+    const unitId = options.unitData.id;
+    const runDir = path.join(repoRoot, '.fgos', 'assignments', unitId, 'runs', '01');
     fs.mkdirSync(path.join(runDir, 'protected', 'confinement-finalization'), { recursive: true });
-    const invocation = cfg.executors.fixture.invocations.find((inv) => inv.id === assignment.binding.invocation);
+    const invocation = cfg.executors.fixture.invocations.find((inv) => inv.id === invocationId);
     // Only an invocation with a login store is handed a private home.
     if (invocation.credentialStore) {
-      const home = path.join(repoRoot, 'confinement', assignment.assignmentId, 'home');
+      const home = path.join(repoRoot, 'confinement', unitId, 'home');
       fs.mkdirSync(home, { recursive: true });
       fs.writeFileSync(path.join(home, 'auth.json'), '{"login":"copy"}');
       for (const [rel, text] of Object.entries(files)) {
@@ -61,7 +62,7 @@ function fixtureDoor({ repoRoot, cfg, files = {}, fail = false }) {
         fs.writeFileSync(path.join(home, rel), text);
       }
       fs.writeFileSync(path.join(home, '.fgos-confinement-owner.json'), JSON.stringify({
-        contract: 'confinement-resource-ownership.v2', creator: 'fgos-confinement', attemptId: 'att-1', runDir, dispatchId: assignment.assignmentId, resource: 'private-home', createdAt: new Date().toISOString(),
+        contract: 'confinement-resource-ownership.v2', creator: 'fgos-confinement', attemptId: 'att-1', runDir, dispatchId: unitId, resource: 'private-home', createdAt: new Date().toISOString(),
       }));
       fs.writeFileSync(path.join(runDir, 'protected', 'confinement-finalization', 'cmd-1.json'), JSON.stringify({
         contract: 'confinement-finalization.v1', launchCommandId: 'cmd-1', cleanupState: 'pending', cleanupResult: null,
@@ -74,28 +75,33 @@ function fixtureDoor({ repoRoot, cfg, files = {}, fail = false }) {
     fs.mkdirSync(path.join(runDir, 'steps'), { recursive: true });
     fs.writeFileSync(path.join(runDir, 'steps', 'finalize-home.json'), JSON.stringify({ v: 1, stepId: 'finalize-home', status: 'done', detail: done.detail }));
     fs.writeFileSync(path.join(runDir, 'stdout.log'), 'OK\n');
-    return {
-      contract: { id: 'assignment-run-result', version: 2 },
-      runId: `run_${assignment.assignmentId}`,
-      status: 'done',
-      confidence: 'reported',
-      runtime: { stdoutLog: path.relative(repoRoot, path.join(runDir, 'stdout.log')) },
-      classification: {
-        policy: { disposition: 'allow' }, delivery: { mode: 'fresh' }, provenance: 'native-v2',
-        execution: { status: 'completed', exitCode: 0 }, assessment: { verdict: 'pass' }, confidence: { level: 'reported', basis: ['captured-stdout'] },
-      },
+    const passed = {
+      policy: { disposition: 'allow' }, delivery: { mode: 'fresh' }, provenance: 'native-v2',
+      execution: { status: 'completed', exitCode: 0 }, assessment: { verdict: 'pass' }, confidence: { level: 'reported', basis: ['captured-stdout'] },
     };
+    const limited = {
+      policy: { disposition: 'needs-input', code: 'provider-limit' }, delivery: { mode: 'fresh' }, provenance: 'native-v2',
+      execution: { status: 'failed', exitCode: 1 }, assessment: { verdict: 'not-applicable' }, confidence: { level: 'failed', basis: ['captured-stdout'] },
+      failure: { family: 'provider', code: 'provider-limit', cause: 'provider' },
+    };
+    const runResult = {
+      contract: { id: 'assignment-run-result', version: 2 },
+      runId: `run_${unitId}`,
+      status: providerLimit ? 'failed' : 'done',
+      confidence: providerLimit ? 'failed' : 'reported',
+      runtime: { stdoutLog: path.relative(repoRoot, path.join(runDir, 'stdout.log')) },
+      classification: providerLimit ? limited : passed,
+    };
+    return { unitRunId: unitId, outcome: 'pass', rounds: 1, results: [{ binding: { executor: 'fixture', invocation: invocationId, model: 'cheap-model' }, runResult }] };
   };
-  let n = 0;
-  const createAssignment = (contract) => Object.freeze({ assignmentId: `asgn_probe_${++n}`, provenance: { kind: 'inline', contract } });
-  return { calls, dispatch, createAssignment };
+  return { calls, runUnit };
 }
 
-async function probe({ credentialStore, files, fail, invocationId = null }) {
+async function probe({ credentialStore, files, fail, providerLimit, invocationId = null }) {
   const repoRoot = tmp('fgos-session-probe-');
   const cfg = configWith(credentialStore);
-  const door = fixtureDoor({ repoRoot, cfg, files, fail });
-  const report = await runSessionProbe({ cfg, executorId: 'fixture', invocationId, repoRoot, timeoutMs: 1000, createAssignment: door.createAssignment, dispatch: door.dispatch });
+  const door = fixtureDoor({ repoRoot, cfg, files, fail, providerLimit });
+  const report = await runSessionProbe({ cfg, executorId: 'fixture', invocationId, repoRoot, runUnit: door.runUnit });
   return { report, door, repoRoot };
 }
 
@@ -111,11 +117,11 @@ test('a session written in the declared folder is reported kept, with its path, 
   assert.equal(report.fix, null);
   assert.equal(JSON.stringify(report).includes(SECRET), false, 'the report holds paths, counts and sizes only');
   assert.equal(fs.readFileSync(path.join(report.transcriptPath, 'w', 's1.jsonl'), 'utf8'), SECRET);
-  const [{ assignment, runnerConfig, cliOverride }] = door.calls;
-  assert.equal(assignment.binding.posture, 'read-only');
-  assert.equal(assignment.provenance.contract.mutation, 'read-only');
-  assert.equal(runnerConfig.executors.fixture.kind, 'agent');
-  assert.deepEqual(cliOverride, { preferExecutor: 'fixture', preferInvocation: 'fixture-bwrap', model: 'cheap-model' }, 'the confined invocation runs on the cheapest model of its family');
+  const [call] = door.calls;
+  assert.deepEqual(call.unitData.writes, [], 'the probe unit is read-only');
+  assert.deepEqual(call.overrides, [{ executor: 'fixture', invocation: 'fixture-bwrap', tier: 'nano' }], 'the confined invocation runs at the weakest tier, so on the cheapest model of its family');
+  assert.equal(call.raiseAuthorized, false);
+  assert.equal(report.model, 'cheap-model');
 });
 
 test('a CLI that wrote its session outside the declared folder is a mismatch, and the report names the line to change', async () => {
@@ -150,6 +156,13 @@ test('an invocation without a private home is reported as having nothing to keep
   assert.equal(report.category, 'no-private-home');
 });
 
+test('a seat that hit a provider limit but wrote a session is still reported kept, with its own outcome beside it', async () => {
+  const { report } = await probe({ credentialStore: store({ sessionDir: 'sessions' }), files: { 'sessions/s1.jsonl': SECRET }, providerLimit: true });
+  assert.equal(report.category, 'kept');
+  assert.equal(report.kept, true);
+  assert.equal(report.outcome, 'failed');
+});
+
 test('a seat that fails to run is reported as a failed run, not as a session fault', async () => {
   const { report } = await probe({ credentialStore: store({ sessionDir: 'sessions' }), fail: true });
   assert.equal(report.category, 'run-failed');
@@ -167,7 +180,10 @@ test('the probe runs the first confined cli invocation unless one is named, and 
   assert.throws(() => sessionProbeInvocation(cfg, 'tool'), /no agent executor "tool"/);
 });
 
-test('the cheapest model is the first named model of the weakest tier the family declares', () => {
-  assert.equal(cheapestModelFor(configWith(store()), 'fixture'), 'cheap-model');
-  assert.equal(cheapestModelFor({ executors: { fixture: { kind: 'agent' } } }, 'fixture'), null);
+test('the probe pins the weakest tier of the ladder', () => {
+  assert.equal(CHEAPEST_TIER, 'nano');
+});
+
+test('a probe without the execution door is refused', async () => {
+  await assert.rejects(runSessionProbe({ cfg: configWith(store()), executorId: 'fixture', repoRoot: '/r' }), /needs the execution door/);
 });

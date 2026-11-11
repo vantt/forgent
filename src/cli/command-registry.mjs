@@ -1569,13 +1569,12 @@ export const COMMAND_REGISTRY = [
         examples: ['fgos dispatch probe-account --provider openai --account tetcu72'],
       },
       'probe-session': {
-        description: 'Diagnostic: run one tiny read-only seat of one executor through the real dispatch door (cheapest model its family allows) and report where its CLI wrote the session in the attempt home, the folder `runner.yaml` declares, whether Execution kept it, where `transcriptPath` points and its size. Names the `runner.yaml` line to change when the declared folder is wrong. Prints paths, counts and sizes only, never session content. Exit 0 when the session was kept; otherwise exit 1 with the category in the JSON.',
+        description: 'Diagnostic: run one tiny read-only seat of one executor through the real dispatch door (weakest tier, so the cheapest model its family allows) and report where its CLI wrote the session in the attempt home, the folder `runner.yaml` declares, whether Execution kept it, where `transcriptPath` points and its size. Names the `runner.yaml` line to change when the declared folder is wrong. Prints paths, counts and sizes only, never session content. Exit 0 when the session was kept; otherwise exit 1 with the category in the JSON.',
         parameters: {
           type: 'object',
           properties: {
             executor: { type: 'string', description: 'Executor id (positional), e.g. gemini or deepseek.' },
             invocation: { type: 'string', description: 'Invocation id to probe (default: the first confined cli invocation of the executor).' },
-            'timeout-ms': { type: 'string', description: 'Timeout of the seat in milliseconds.' },
             cwd: { type: 'string', description: 'Working directory the probe runs in (default: the current directory; --dir is accepted too).' },
             'repo-root': { type: 'string', description: 'Main checkout repository root.' },
           },

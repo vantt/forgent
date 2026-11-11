@@ -2563,9 +2563,15 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       if (!KNOWN_DISPATCH_SUBVERBS.includes(sub)) {
         throw new StoreError('validation', `unknown dispatch sub-verb "${sub}": expected ${KNOWN_DISPATCH_SUBVERBS.join(', ')}`);
       }
-      if (sub === 'probe-account' || sub === 'probe-session') {
+      if (sub === 'probe-account') {
         const { runDispatchCli } = await import('../src/runner/dispatch/cli.mjs');
         return await runDispatchCli(rawArgv, { returnResult: true });
+      }
+      if (sub === 'probe-session') {
+        // Dispatch holds no execution door: the probe's seat runs through the same `runUnit` as `fgos run`.
+        const { runDispatchCli } = await import('../src/runner/dispatch/cli.mjs');
+        const { runUnit } = await import('../src/runner/execution/run.mjs');
+        return await runDispatchCli(rawArgv, { returnResult: true, runUnit });
       }
       if (sub === 'decide') {
         // Dispatch holds no Work store: `decide --work` gets its Work lookup from here.

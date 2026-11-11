@@ -80,6 +80,7 @@
     "src/runner/dispatch/provider-auth-failure.mjs": "infra",
     "src/runner/dispatch/provider-credential-probe.mjs": "infra",
     "src/runner/dispatch/provider-account-probe.mjs": "infra",
+    "src/runner/dispatch/provider-session-probe.mjs": "infra",
     "src/runner/dispatch/provider-credential-renewal.mjs": "infra",
     "src/runner/dispatch/assignment-runner.mjs": "infra",
     "src/runner/dispatch/run-admission.mjs": "infra",
