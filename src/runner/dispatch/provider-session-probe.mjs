@@ -14,7 +14,6 @@ import path from 'node:path';
 import { readRunOutcome } from './provider-account-probe.mjs';
 import { MODEL_POLICY_TIERS } from './config.mjs';
 import { credentialStoreOf } from './provider-capacity.mjs';
-import { OWNERSHIP_MARKER_FILE } from './confinement/cleanup.mjs';
 
 export const SESSION_PROBE_PROMPT = 'Session probe: there is no task. Reply with the single word OK.';
 
@@ -79,9 +78,9 @@ export function describeSessionKeep({ runDir, invocation, executorId }) {
   const detail = step?.detail ?? null;
   const store = credentialStoreOf(invocation);
   const declaredSessionDir = store?.sessionDir ?? null;
-  const loginFiles = new Set([OWNERSHIP_MARKER_FILE, ...(store?.files ?? [])]);
-  // Entries of the home that are not login files: where a session can be. A directory the login files sit in
-  // (`bin/fd`) is not one of them.
+  const loginFiles = new Set(store?.files ?? []);
+  // Entries of the home that are not login files: where a session can be (finalize-home leaves its own marker
+  // out of the layout). A directory the login files sit in (`bin/fd`) is not one of them.
   const observedSessionPaths = (detail?.homeLayout ?? [])
     .filter((entry) => !loginFiles.has(entry.path) && ![...loginFiles].some((file) => file.startsWith(`${entry.path}/`)))
     .map(({ path: entryPath, kind, files, bytes }) => ({ path: entryPath, kind, files, bytes }));

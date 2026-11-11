@@ -36,6 +36,7 @@ import { hashFile, listLegacyNodeSourceFiles } from '../../scripts/build-rust-di
 import { checkCompiledDomains } from '../../scripts/build-domain-registry.mjs';
 import { mainCheckoutHookWired } from './git-hooks.mjs';
 import { loadRunnerConfigForDir } from '../runner/dispatch/config.mjs';
+import { checkSessionKeepDeclared } from './session-keep-declared.mjs';
 import { INSTALL_ROOT, agentShapeProblem, findAgentDuplicates, readAgentDefinition, scanAgentTiers } from '../runner/agent-definitions.mjs';
 import { isWithinDir } from '../runner/dispatch/assignment-layout.mjs';
 import { ownedSkillNames } from './skill-wrappers.mjs';
@@ -2413,6 +2414,18 @@ registerCheck({
       return checkExecutorProfileWarnings(cwd, loadRunnerConfigForDir(cwd));
     } catch (err) {
       return { passed: true, message: `runner config not loadable here, executor-profile warnings not evaluated: ${err.message}` };
+    }
+  },
+});
+
+registerCheck({
+  id: 'session-keep-declared',
+  description: 'read-only pointer: confined agent invocations that declare no session directory keep no seat transcript; fgos dispatch probe-session <executorId> shows where the CLI writes it (a warning, never a failure; doctor never runs the probe)',
+  check: (cwd) => {
+    try {
+      return checkSessionKeepDeclared(loadRunnerConfigForDir(cwd));
+    } catch (err) {
+      return { passed: true, message: `runner config not loadable here, session directories not evaluated: ${err.message}` };
     }
   },
 });
