@@ -295,6 +295,7 @@
     "src/runner/execution/account-rotation.mjs": "infra",
     "src/runner/execution/dry-bind.mjs": "infra",
     "src/runner/execution/explain.mjs": "infra",
+    "src/runner/execution/custody-door.mjs": "infra",
     "src/runner/execution/seat-ledger.mjs": "domain",
     "src/runner/execution/seat-resolver.mjs": "domain",
     "src/runner/execution/legacy-seat-read.mjs": "domain",

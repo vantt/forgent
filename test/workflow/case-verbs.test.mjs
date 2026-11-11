@@ -306,6 +306,20 @@ test('gate: a failing command leaves the milestone unachieved and records why', 
   assert.deepEqual(last.receipts, []);
 });
 
+test('gate: a command killed before it reaches an exit is an infrastructure failure: the case records execution-failure, never findings, and the milestone stays unreached', { skip: process.platform === 'win32' && 'exec replaces the shell on POSIX only' }, async () => {
+  const tmp = setupRepo();
+  declareGate(tmp, `exec "${process.execPath}" -e "process.kill(process.pid, 'SIGKILL')"`);
+  const id = await builtCase(tmp);
+
+  const result = await gateWorkflow(id, { ...opts(tmp), ...GATE, writes: ['README.md'] });
+  assert.equal(result.outcome, 'execution-failure');
+  assert.equal(result.gate.status, null);
+  assert.equal(result.gate.passed, false);
+
+  assert.equal(statusWorkflow(id, opts(tmp)).case.milestones.integrated.state, 'unreached');
+  assert.equal(settleEvents(tmp, id).at(-1).payload.outcome, 'execution-failure');
+});
+
 test('gate: with no declared command, no tested paths or no worktree it refuses by name before touching the case; a command passed by the caller is never run', async () => {
   const tmp = setupRepo();
   const id = await builtCase(tmp);

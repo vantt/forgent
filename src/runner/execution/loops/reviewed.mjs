@@ -6,7 +6,7 @@
 import { roleUnit } from './role-tasks.mjs';
 import { resolveSeats, requiresDistinctFamilies, VERIFY_SEAT } from '../seat-resolver.mjs';
 import { createBindBarrier } from '../seat-ledger.mjs';
-import { verifyCommandOf, hasVerifyCommand } from './verify.mjs';
+import { verifyCommandOf, hasVerifyCommand, verifySeatResult } from './verify.mjs';
 
 export const VALID_OUTCOMES = Object.freeze([
   'pass',
@@ -258,15 +258,7 @@ export async function runReviewed(unit, cfg, hooks = {}, params = {}) {
       })),
     );
     const verifyPromise = runPendingVerify
-      ? Promise.resolve().then(async () => {
-        const vRes = await verify(unit);
-        return {
-          seat: VERIFY_SEAT,
-          round: r,
-          outcome: vRes?.pass ? 'pass' : 'findings',
-          findings: vRes?.findings || (vRes?.pass ? [] : ['Verification failed']),
-        };
-      })
+      ? Promise.resolve().then(async () => verifySeatResult(await verify(unit), r))
       : null;
 
     let firstRejection;

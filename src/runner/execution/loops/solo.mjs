@@ -4,7 +4,7 @@
  */
 
 import { resolveSeats, VERIFY_SEAT } from '../seat-resolver.mjs';
-import { verifyCommandOf } from './verify.mjs';
+import { verifyCommandOf, verifySeatResult } from './verify.mjs';
 
 export const VALID_OUTCOMES = Object.freeze([
   'pass',
@@ -57,13 +57,7 @@ export async function runSolo(unit, cfg, { runRole, verify, history } = {}, para
   if (existingVer) {
     verifyResult = existingVer;
   } else if (typeof verify === 'function') {
-    const vRes = await verify(unit);
-    verifyResult = {
-      seat: VERIFY_SEAT,
-      round: 1,
-      outcome: vRes?.pass ? 'pass' : 'findings',
-      findings: vRes?.findings || (vRes?.pass ? [] : ['Verification failed']),
-    };
+    verifyResult = verifySeatResult(await verify(unit), 1);
   } else {
     throw new TypeError('verify hook is required when verification is configured');
   }

@@ -21,7 +21,7 @@ import { runLoop, loopRunsVerify } from './loops/index.mjs';
 import { shippedCatalog } from '../dispatch/shipped-catalog.mjs';
 import { ERROR_OUTCOMES } from './loops/reviewed.mjs';
 import { verifyCommandOf } from './loops/verify.mjs';
-import { runCommand } from '../goal-check.mjs';
+import { answerOfVerify, runVerify } from './custody-door.mjs';
 import { executeAssignment } from '../dispatch/assignment-runner.mjs';
 import { buildUnitRunAssignment } from '../dispatch/assignment.mjs';
 import { createCredentialProbe } from '../dispatch/provider-credential-probe.mjs';
@@ -383,13 +383,8 @@ async function verifyUnit({ unitRecord, scope }, targetUnit) {
   const runnerConfig = unitRecord.configSnapshot.runner;
   const verifyCmd = verifyCommandOf(targetUnit, runnerConfig);
   if (!verifyCmd) return { pass: true };
-  const outcome = await runCommand(verifyCmd, unitRecord.worktree, runnerConfig.timeoutMs, { custody: scope.custody });
-  if (outcome.passed) return { pass: true };
-  const how = outcome.timedOut
-    ? `timed out after ${runnerConfig.timeoutMs}ms`
-    : outcome.status === null ? 'could not run' : `exited ${outcome.status}`;
-  const tail = outcome.output.trim().split('\n').slice(-20).join('\n');
-  return { pass: false, findings: [`Verification command ${how}: ${verifyCmd}${tail ? `\n${tail}` : ''}`] };
+  const verified = await runVerify({ command: verifyCmd, cwd: unitRecord.worktree, timeoutMs: runnerConfig.timeoutMs, custody: scope.custody });
+  return answerOfVerify(verified, 'Verification command', verifyCmd);
 }
 
 async function runCollaboration(ctx) {
