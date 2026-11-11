@@ -22,6 +22,8 @@ function runnerConfig(capabilities) {
     executors: Object.fromEntries(Object.entries(FAMILIES).map(([id, family]) => [id, { agentType: id, providerModel: family }])),
     modelPolicies: Object.fromEntries(Object.values(FAMILIES).map((family) => [family, { nano: 'm', standard: 'm', advanced: 'm', flagship: 'm', frontier: 'm' }])),
     capabilities,
+    // The effective config always carries the standard's loop settings; the reviewed loop reads its round limit from them.
+    loops: shippedCatalog().loops,
   };
 }
 
