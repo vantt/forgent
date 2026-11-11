@@ -44,7 +44,7 @@ const configWith = (credentialStore) => ({
  */
 function fixtureDoor({ repoRoot, cfg, files = {}, fail = false, providerLimit = false }) {
   const calls = [];
-  const runUnit = async (options) => {
+  const executionDoor = async (options) => {
     calls.push(options);
     if (fail) throw Object.assign(new Error('seat refused to start'), { runDir: null });
     const [{ invocation: invocationId }] = options.overrides;
@@ -94,14 +94,14 @@ function fixtureDoor({ repoRoot, cfg, files = {}, fail = false, providerLimit = 
     };
     return { unitRunId: unitId, outcome: 'pass', rounds: 1, results: [{ binding: { executor: 'fixture', invocation: invocationId, model: 'cheap-model' }, runResult }] };
   };
-  return { calls, runUnit };
+  return { calls, executionDoor };
 }
 
 async function probe({ credentialStore, files, fail, providerLimit, invocationId = null }) {
   const repoRoot = tmp('fgos-session-probe-');
   const cfg = configWith(credentialStore);
   const door = fixtureDoor({ repoRoot, cfg, files, fail, providerLimit });
-  const report = await runSessionProbe({ cfg, executorId: 'fixture', invocationId, repoRoot, runUnit: door.runUnit });
+  const report = await runSessionProbe({ cfg, executorId: 'fixture', invocationId, repoRoot, executionDoor: door.executionDoor });
   return { report, door, repoRoot };
 }
 

@@ -1,4 +1,4 @@
-// One executor, one tiny read-only seat through the one execution door (`runUnit`, handed in by the caller:
+// One executor, one tiny read-only seat through the one execution door (handed in by the caller:
 // Dispatch never imports the layer above it), bound by the executor, invocation and weakest tier it is
 // pinned to so the cheapest model of its family runs, then a report of where its CLI wrote the session in the attempt home, whether
 // finalize-home kept it, and where the kept copy is. Agent CLIs change where they write often; this is
@@ -107,20 +107,20 @@ function categoryOf({ ranOk, keep }) {
 
 /**
  * Run the probe seat and report `{ executorId, invocationId, model, outcome, category, kept, declaredSessionDir,
- * observedSessionPaths, transcriptPath, files, sizeBytes, fix, warnings, runDir }`. `runUnit(options)` is the
- * execution door and resolves to `{ outcome, results[] }`; it is injectable for tests.
+ * observedSessionPaths, transcriptPath, files, sizeBytes, fix, warnings, runDir }`. `executionDoor(options)` is the
+ * execution door (`runUnit` with its case admission) and resolves to `{ outcome, results[] }`; it is injectable for tests.
  */
 export async function runSessionProbe({
-  cfg, executorId, invocationId = null, repoRoot, cwd = repoRoot, prompt = SESSION_PROBE_PROMPT, runUnit,
+  cfg, executorId, invocationId = null, repoRoot, cwd = repoRoot, prompt = SESSION_PROBE_PROMPT, executionDoor,
 } = {}) {
-  if (typeof runUnit !== 'function') throw new Error('the session probe needs the execution door (runUnit)');
+  if (typeof executionDoor !== 'function') throw new Error('the session probe needs the execution door (executionDoor)');
   const invocation = sessionProbeInvocation(cfg, executorId, invocationId);
   const unitData = { id: `probe-session-${crypto.randomBytes(3).toString('hex')}`, objective: prompt, capability: 'execute', writes: [] };
   const overrides = [{ executor: executorId, invocation: invocation.id, tier: CHEAPEST_TIER }];
   let run;
   let bound = null;
   try {
-    const unit = await runUnit({ unitData, overrides, raiseAuthorized: false, repoRoot, cwd });
+    const unit = await executionDoor({ unitData, overrides, raiseAuthorized: false, repoRoot, cwd });
     const last = unit?.results?.at(-1) ?? null;
     bound = last?.binding ?? null;
     run = last?.runResult

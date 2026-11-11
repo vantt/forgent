@@ -2568,10 +2568,13 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         return await runDispatchCli(rawArgv, { returnResult: true });
       }
       if (sub === 'probe-session') {
-        // Dispatch holds no execution door: the probe's seat runs through the same `runUnit` as `fgos run`.
+        // Dispatch holds no execution door: the probe's seat runs through the same `runUnit` as `fgos run`, admitted
+        // the same way (the port is injected here, Execution never imports the Workflow).
         const { runDispatchCli } = await import('../src/runner/dispatch/cli.mjs');
         const { runUnit } = await import('../src/runner/execution/run.mjs');
-        return await runDispatchCli(rawArgv, { returnResult: true, runUnit });
+        const { createCaseAdmissionPort } = await import('../src/workflow/case-admission-port.mjs');
+        const executionDoor = (options) => runUnit({ ...options, caseAdmission: createCaseAdmissionPort({ repoRoot: options.repoRoot }) });
+        return await runDispatchCli(rawArgv, { returnResult: true, executionDoor });
       }
       if (sub === 'decide') {
         // Dispatch holds no Work store: `decide --work` gets its Work lookup from here.

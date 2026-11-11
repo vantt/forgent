@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "7b099b40a7374f59b202439b400d7d8fa47ce4893d3d2a3e020c0298fe1ff92d",
+  "payloadDigest": "a07d1a7dedbfad93c2657a25803f0254dc9ac5af04035ca3906ebfde29e6fdb1",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -114,7 +114,7 @@
     "apps/fgos/tests/windows_semantics_probe.rs": "ecb59690bbf1259baa1defb6417c24005138526bb565f216f9db3c2ad784d240",
     "apps/fgos/tests/windows_support/mod.rs": "2b8a17676526c87ea5ecfb2074a70a3511fbf9267f9de78a35dc355f272830fb",
     "bin/fgos-runner.mjs": "94f320cbc601fcb518c7489525e1c7d692da67e1a2f285e8b12189aee2f42d1a",
-    "bin/fgos.mjs": "078de88d2e84a087b548f8cc04fcf4b0bf9fc1bc0ede16d5f332965bcb8bb30e",
+    "bin/fgos.mjs": "9636ad4c8edff22c97a04ea04ebd04e484062166c724f472a3c959346bc46051",
     "core/skills/_shared/capability-catalog.md": "4299584409592ac4ae9668cd0cb4dd0442edc1c78a42ccd9cfe0bae22bf11bc4",
     "core/skills/_shared/capability-matching.md": "eb67cde05d45c171c1d4803f9d2fbec5fc63565b9fd0a0549c866a7eb262521d",
     "core/skills/_shared/catchup-self-recovery.md": "3b77650c71a0225f00ffa8fe9524d7c0052977204f425c1999225b6f80802c69",
@@ -998,7 +998,7 @@
     "src/runner/dispatch/assignment-runner.mjs": "bfe1fd4d2fd89ba010b443df7e80b0f8a17f2b1137b5ff6d5de2ba38c2f3e0c6",
     "src/runner/dispatch/assignment.mjs": "ae48427b5bc38db61d98b265e9ad7fd36d55f9a933085c988a8b695e5672501a",
     "src/runner/dispatch/brief.mjs": "c51d5398653cd6f839c2902134e627e57af7911b473fe16904478919c2d95e14",
-    "src/runner/dispatch/cli.mjs": "d33dd53c140f06614e323338a9eeb442a1a8ed94101d4d3f1ee4d74d2efb746e",
+    "src/runner/dispatch/cli.mjs": "f9ae8e6a98cc69b857c060ca2b47c6fc26720fb33b34270a6fa96b6d5407e6c6",
     "src/runner/dispatch/config.mjs": "0cccd513955b0c00d187b09d6c93da68263c14de34d049c53a62fbbf7cca917f",
     "src/runner/dispatch/confinement/attestation-store.mjs": "bcfc9d06ef3eec84bb2d1d9ad4f11bc6a9179ccdf08be15cede4f035e7c73494",
     "src/runner/dispatch/confinement/authority.mjs": "27adcde24d0b207720362c2751d2b701d562422e9c9b9e19eb24c86f26f7722e",
@@ -1025,7 +1025,7 @@
     "src/runner/dispatch/provider-capacity.mjs": "48bb0d7e40d6d8e691225aee15cdcac40dd830adce45a78e938f22b729410a18",
     "src/runner/dispatch/provider-credential-probe.mjs": "636e65b7078eeb5a659c4eb38fff92306b8263f09748f50ac443dfa14c39dc71",
     "src/runner/dispatch/provider-credential-renewal.mjs": "e7d5db54388fede40b4432d1efd4ef9009fdce82804655482fbbc4b770778ad6",
-    "src/runner/dispatch/provider-session-probe.mjs": "648e342780291514d60f29e7ec8ba379cf555ce5e26a9061afdbbc3eb359e77b",
+    "src/runner/dispatch/provider-session-probe.mjs": "95dc5e6542c2086ba14482bcf3ab6c9f036e4b8a9619ca814d3026284ccfbdf1",
     "src/runner/dispatch/reconciliation-planner.mjs": "470b4cc079d13accf997044c96dd037da3bcf41d89cb79427a248284e03ccf06",
     "src/runner/dispatch/recovery-planner.mjs": "cebf66e9c7cb427dfb7c6800cd4f0790a7185d70d2ea54cf0942fefca2f7ccc4",
     "src/runner/dispatch/resolve.mjs": "ad932b4261ab5b1652bc8d03ed568768c8fa305caf6749538f2855f1b5d95d4c",
@@ -2054,14 +2054,14 @@
     },
     {
       "path": "bin/fgos.mjs",
-      "line": 3389,
+      "line": 3392,
       "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:180",
       "binary": "(config door value (readConfig({ projectRoot: repoRoot, sections: ['invariantChecks'] })))",
       "class": "configured-binary"
     },
     {
       "path": "bin/fgos.mjs",
-      "line": 3533,
+      "line": 3536,
       "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:180",
       "binary": "(config door value (readConfig({ projectRoot: repoRoot, sections: ['invariantChecks'] })))",
       "class": "configured-binary"

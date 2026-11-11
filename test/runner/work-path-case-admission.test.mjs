@@ -92,7 +92,7 @@ test('every production call of runUnit injects the case admission port, so no wr
       }
     }
   }
-  assert.equal(calls, 6, 'the six writing call sites of runUnit are the ones checked');
+  assert.equal(calls, 7, 'the six writing call sites of runUnit and the read-only session probe door are the ones checked');
   // The only other place runUnit is defined or named is the Execution Core itself.
   const stray = ['src', 'bin'].flatMap((dir) => execFileSync('grep', ['-rl', '--include=*.mjs', 'runUnit(', path.join(root, dir)], { encoding: 'utf8' }).split('\n').filter(Boolean))
     .map((f) => path.relative(root, f)).filter((f) => !files.includes(f) && f !== 'src/runner/execution/run.mjs');
