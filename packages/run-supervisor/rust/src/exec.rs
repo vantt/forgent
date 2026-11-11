@@ -6,6 +6,10 @@
 //! that attempt: the envelope must be in `external` mode and name this CLI, and the gate dials the
 //! supervisor that is already waiting on the attempt's socket. Either way this process is replaced by
 //! `exec`: the host's pipes reach the agent untouched and nothing here copies a byte.
+//!
+//! The same door answers to the program name `fgos-exec-<cli>` (a link to the host binary). A host that
+//! runs only the first word of its configured command for a probe (paseo runs `<command[0]> --version`
+//! to gate CLI features) then reaches the CLI's own `--version` instead of fgOS's.
 
 use std::ffi::CString;
 use std::path::{Path, PathBuf};
@@ -16,6 +20,16 @@ use crate::envelope;
 
 /// The variable an external host sets per agent to name the attempt directory.
 pub const ATTEMPT_DIR_ENV: &str = "FGOS_ATTEMPT_DIR";
+
+/// The program-name prefix that selects this door: `fgos-exec-codex` is `fgos exec codex`.
+pub const PROGRAM_PREFIX: &str = "fgos-exec-";
+
+/// The CLI a program name selects, when the host binary was started as `fgos-exec-<cli>`.
+pub fn cli_from_program(argv0: &str) -> Option<&str> {
+    let name = Path::new(argv0).file_name()?.to_str()?;
+    name.strip_prefix(PROGRAM_PREFIX)
+        .filter(|cli| !cli.is_empty())
+}
 
 /// Exit codes of a refusal (an `exec` that succeeded never returns).
 const EXIT_USAGE: i32 = 2;
@@ -201,6 +215,17 @@ mod tests {
                 serde_json::json!({"preferred": "linux-gate", "bwrapPrefix": prefix});
         }
         body
+    }
+
+    #[test]
+    fn a_program_named_fgos_exec_cli_selects_that_cli() {
+        assert_eq!(
+            cli_from_program("/home/u/bin/fgos-exec-codex"),
+            Some("codex")
+        );
+        assert_eq!(cli_from_program("fgos-exec-pi"), Some("pi"));
+        assert_eq!(cli_from_program("/usr/bin/fgos"), None);
+        assert_eq!(cli_from_program("fgos-exec-"), None);
     }
 
     #[test]

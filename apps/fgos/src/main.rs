@@ -205,6 +205,18 @@ fn main() {
     // `fgos exec <cli> [args...]`: the command an external agent host starts in place of the agent CLI.
     // It replaces this process (exec), so it runs before the route table, the composition root and any
     // spawn: the host's pipes must reach the agent untouched.
+    // Started as `fgos-exec-<cli>` (a link to this binary), it is `fgos exec <cli>`.
+    #[cfg(unix)]
+    if let Some(cli) = args
+        .first()
+        .and_then(|a| a.to_str())
+        .and_then(fgos_run_supervisor::exec::cli_from_program)
+    {
+        let rest: Vec<String> = std::iter::once(cli.to_string())
+            .chain(args[1..].iter().map(|a| a.to_string_lossy().into_owned()))
+            .collect();
+        std::process::exit(fgos_run_supervisor::exec::main(&rest));
+    }
     #[cfg(unix)]
     if args.get(1).is_some_and(|a| a == "exec") {
         let rest: Vec<String> = args[2..]

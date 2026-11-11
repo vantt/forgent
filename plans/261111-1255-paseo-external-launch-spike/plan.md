@@ -57,14 +57,19 @@ Evidence: `live.sh` + `start-external-attempt.py` in this directory; attempt dir
 | 3 | Met. Steer during `sleep 40` answered "BANANA — I'm still waiting…" at Codex's 30 s exec yield; the command was not killed |
 | 4 | Met. `paseo agent archive` closed the pipes, codex exited 0: receipt `exited`, `captureDigests` null, `closed.json` with `steps: []`. (`paseo stop` only interrupts a turn and leaves the process.) |
 | 5 | Met. A second `fgos exec` for the same attempt: `go-socket-refused`, exit 64, nothing ran |
-| 6 | Met. `cargo test -p fgos-run-supervisor` green (existing suites plus 3 new `exec` unit tests) |
+| 6 | Met. `cargo test -p fgos-run-supervisor` green (existing suites plus 4 new `exec` unit tests) |
 | extra | `cancel-requested.json` from fgOS: receipt `cancelled`, `stoppedBy: cancel`; paseo marks the agent `error` ("Codex app-server exited") |
 
 Impact analysis: inactive (no provider present); callers checked with `rg`.
 
-Observed, not explained: through `fgos-codex` paseo lists the modes `Default Permissions, Full Access` and starts
-`codex app-server` without `--enable goals`; the stock `codex` provider lists `Auto-review` too. The stub wrapper
-earlier got `--enable goals`, so the difference comes from the probe path and needs a look before the adapter.
+Feature gates (found and fixed): with `command: [fgos, exec, codex]` paseo listed only `Default Permissions,
+Full Access` and started `codex app-server` without `--enable goals`. Cause: paseo gates Codex features by
+version and probes `<command[0]> --version` without the rest of the prefix
+(`resolveBinaryVersion(launchPrefix.command)`, `providers/diagnostic-utils.ts`), so it read fgOS's version.
+Fix: the host binary started as `fgos-exec-<cli>` is `fgos exec <cli>`; paseo's command is a link
+`fgos-exec-codex` to the host (`live.sh link`). After it: `fgos-exec-codex --version` prints `codex-cli 0.161.0`,
+`fgos-codex` lists the same modes as `codex` (with `Auto-review`), codex starts with `--enable goals`, and an
+archived agent still ends as receipt `exited`. Who creates the link (setup, a doctor row) belongs to the adapter.
 
 ## Not in the spike
 

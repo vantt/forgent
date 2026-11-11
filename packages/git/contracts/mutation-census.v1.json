@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "d9df0347074bfb69d9593601bfda8600b1011ec763cef9ac31cde189ce87c6db",
+  "payloadDigest": "be773058db61a80c87f40aa0d40a4dfd6c8bff83c69683a99a913e8a5aa3fe67",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -86,7 +86,7 @@
     "apps/fgos/src/cli_presenter.rs": "b93778742194566aac6e085536cbcbcc4ff709ac3d1bbaff8870a8cf2c43dada",
     "apps/fgos/src/cli_projector.rs": "bb086e512a2fe630f45340d3b4600291906b1e1a4e438f3dc1dae4c66d8edb84",
     "apps/fgos/src/legacy_exec.rs": "bf2f790d202ad3a25735fc3f9c33feb7aeffdfb015b1e0aafa9282c8b8bcba40",
-    "apps/fgos/src/main.rs": "cf253f68be7e6ea29ca4947585eb6d675048393f8457cda910deb657ea904b7b",
+    "apps/fgos/src/main.rs": "ab3967842974bce1f8d0e29ddc47fd692defefb21b0e1eed87fe47baf2fa30cb",
     "apps/fgos/src/wiring/event_store_clone.rs": "923d718f7a6bd5705cbe6e4d4c8393672c1ef4a2142facc9ada314307a4d7574",
     "apps/fgos/src/wiring/identity_log.rs": "d7d9dd503ecbd84a5373aa27f6853996e6944aba2940d15e8284cd92c14eef7a",
     "apps/fgos/src/wiring/mailbox_body.rs": "5acd3ddf4ba2ae8cf53a48bb84ffe310f873fdef8593452b765a78cc3dec129e",
@@ -661,7 +661,7 @@
     "packages/run-supervisor/rust/src/adopt.rs": "66aa8f598111b84f869257220d42e323c3e6740dfdc8a9bd208e3d2b00c4e587",
     "packages/run-supervisor/rust/src/attempt_step.rs": "26e1265bdecfc91814e86c925ba9f58fa60c7c858a17496ced1dbad65607deef",
     "packages/run-supervisor/rust/src/envelope.rs": "3b21c3a57d6a80d4d9a74cc7bd4f8b9fa0d9f291baf2477ffdd3565d6eeafe63",
-    "packages/run-supervisor/rust/src/exec.rs": "be24b2e40c243fa6ec4306c40e16afe91b6a9b24a1bce86c80f19430d5c7f566",
+    "packages/run-supervisor/rust/src/exec.rs": "e8f9313901d26a2d5c16bfc75fb991c59ec964d9e66762ce096ae7ffb044c266",
     "packages/run-supervisor/rust/src/gate.rs": "45e80d72320fe4a7c674386e802b19c7341babb2b5ccf9caf2a16ee6e4d8401d",
     "packages/run-supervisor/rust/src/gate/unix.rs": "14e3744dc6c747a2fe1b23e7ffc42dc224dceebe6c593dde05065d232177f602",
     "packages/run-supervisor/rust/src/gate/windows.rs": "055105a38476430107647cd306d6ad95dbf1bd725499649b95ce6b1044c11dac",

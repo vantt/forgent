@@ -8,6 +8,13 @@ HOST="$W/target/debug/fgos"
 PASEO() { (cd "$S" && npx --no-install paseo --host 127.0.0.1:6797 "$@"); }
 
 case "$1" in
+  link)
+    # The command paseo is configured with: a link named fgos-exec-<cli> to the host binary, so paseo's
+    # `<command[0]> --version` probe reaches the CLI's version, not fgOS's.
+    mkdir -p "$S/bin"
+    ln -sfn "$HOST" "$S/bin/fgos-exec-codex"
+    "$S/bin/fgos-exec-codex" --version
+    ;;
   attempt)
     mkdir -p "$S/work-ext" "$S/state"
     python3 -I "$W/plans/261111-1255-paseo-external-launch-spike/start-external-attempt.py" \
