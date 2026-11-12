@@ -39,7 +39,7 @@ const HOW_TO_DOC = 'docs/how-to-parallel-lanes.md (workshop root, one level up f
 const ROOT_FILE_ALLOWLIST = new Set([
   '.gitattributes', '.gitignore', 'AGENTS.md', 'CHANGELOG.md', 'CLAUDE.md',
   'Cargo.lock', 'Cargo.toml', 'LICENSE', 'README.md', 'clippy.toml',
-  'install.sh', 'package-lock.json', 'package.json', 'rustfmt.toml',
+  'install.sh', 'package-lock.json', 'package.json', 'rust-toolchain.toml', 'rustfmt.toml',
 ]);
 
 function rootFileRefusal(committingToplevel) {
