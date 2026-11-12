@@ -4,12 +4,12 @@
 Document type: BA-grade subcomponent specification
 Audience: Human reviewer, maintainer, implementation agent, documentation agent
 Purpose: Define how a project run by fgOS places every piece of maintained documentation in a space of axes, so that a writer finds the document that already holds what it wants to write before it may create a new one, and so that the space improves itself over time
-Design status: Draft for owner review, revised on the evening of 2026-11-12 after three measurements (section 15) and the owner's decisions of that day (section 17). Not signed. All questions of section 13 are decided.
-Implementation: Not started in fgOS. The search and graph it relies on exist outside fgOS and were measured on the fgOS corpus on 2026-11-12: OHS (the owner's fork, release v0.17.2-vantt.9, with ohs-lang-vi) and pkm (vantt/momentell); the fgOS locate door, the write-door refusal, the claim-unit retrospective writer and the observer do not exist yet
-Canonical: No (becomes canonical when signed)
+Design status: Signed by the owner on 2026-11-12. A change is recorded as a new entry in section 17, decision history.
+Implementation: Not started in fgOS. The search and graph it relies on exist outside fgOS and were measured on the fgOS corpus on 2026-11-12: OHS (the owner's fork, release v0.17.2-vantt.9, with ohs-lang-vi) and pkm (vantt/pkm, release 0.1.0); the fgOS locate door, the write-door refusal, the claim-unit retrospective writer and the observer do not exist yet
+Canonical: Yes
 Provenance: Written by the DOCOS lead after the owner asked for a dedicated spec on 2026-11-12, from the documentation area draft, the 2026-08 identity-axis discussion, measurements of docs/doc-registry.json and the maintained corpus, a locate prototype, a recall measurement with an independent gold set, and an end-to-end A/B/C trial with 78 agent runs on 2026-11-12 (plans/reports/measurement-261112-1314-docos-document-identity-recall.md)
 Writer type: Agent draft writer
-Canonical for: Nothing yet; once signed, the axis model, the common value sets, the identifier kinds and their registers, the locate-before-write rule and the self-improvement loop
+Canonical for: The four stops, user knowledge units that carry one claim, the axis model and its common value sets, the identifier kinds and their registers, locate before write through pkm with OHS, and the self-improvement loop
 Use this when: Deciding where a piece of documentation belongs, reviewing the locate verb or the search view, adding a domain profile, or changing an axis value set
 Do not use this for: Path and placement rules (Convention), the write-door steps around this subcomponent (documentation area spec), or user-document lifecycle (knowledge-registry contract)
 Last reviewed: 2026-11-12
@@ -409,7 +409,7 @@ fgOS does not build its own search engine. It calls two providers through the to
 | Provider | Gives | What it is |
 |---|---|---|
 | **OHS** (`vantt/obsidian-hybrid-search`, the owner's fork) | hybrid search: BM25 over FTS5 with the `ohs-lang-vi` pack (normalisation, tone restoration, Telex and VNI, typos, synonyms, word segmentation), embeddings in sqlite-vec, RRF fusion | SQLite file, rebuildable from the documents; a Node process with a stdio server |
-| **pkm** (in `vantt/momentell`) | the one search door over OHS, the note graph (Markdown links), near-meaning pairs, zones, rule-based proposals | Rust library and CLI with a SQLite index |
+| **pkm** (`vantt/pkm`, release 0.1.0) | the one search door over OHS, the note graph (Markdown links), near-meaning pairs, zones, rule-based proposals | Rust library and CLI with a SQLite index |
 
 Both indexes are caches rebuilt from the documents, never truth, as platform-foundations L3 clauses 2 and 3 require. They live under `.fgos/runtime/`, and a `fgos doctor` check reports their freshness and the providers' presence, as the install/setup/doctor gate requires.
 
@@ -606,23 +606,41 @@ For each work item, the retrospective writer states the one to three claims the 
 
 ## 14. Implementation Alignment
 
-Nothing is implemented. Reused when built: doc-health (extraction and checks), the dead-verb and dead-path rules (first two coding kinds), Convention classify, the knowledge registry (slots, lifecycle, split, merge, rename, path-move, lineage), the decision index and id minting, `fgos tool query`, the governance holder table, the observe area's records. New: the view component, the locate verb, the refusal at the write door, the observer, the `fgos doctor` freshness check, starter-area seeding in `fgos setup`. The documentation spec's statement that slice 1 adds no store and no new `fgos doc` verb no longer holds once this spec is signed; that is a deliberate change for the owner to accept.
+| Part | Status | Where | Next action |
+|---|---|---|---|
+| Hybrid search (BM25 with `ohs-lang-vi`, e5-small embeddings) | exists outside fgOS, measured on the fgOS corpus | OHS fork, release `v0.17.2-vantt.9` | register as a tool provider; doctor freshness check |
+| Search door, graph, pairs, zones, proposals | exists outside fgOS | `vantt/pkm`, release 0.1.0 (split out of momentell on 2026-11-12; crates `pkm-core`, `pkm-cli`, `pkm-mcp`, `pkm-lifecycle`) | link `pkm-core` as a library or call the CLI/MCP; the gaps are the [requirements to pkm](../../../../../plans/reports/requirements-261112-1533-fgos-to-pkm-structure-mechanism.md) R1 to R9 |
+| Retrospective writer adds evidence to claim units (stop 1) | not started | `fgos-coding-knowledge`, cleanup gate | first phase: it cuts the largest source of new documents without new technology |
+| Locate door in fgOS (draft translation, top 10, log) | not started | write door | after the pkm locate call (R5) |
+| Admission ceiling and reviewer (stop 3) | specified | [admission](../admission/spec.md) | admission phase |
+| Axis checks, identifier resolution | specified | [doc-checks](../doc-checks/spec.md) | doc-checks phase |
+| Observer (stop 4) | not started | pkm proposals (R7) into fgOS work items | last |
 
-No component-boundary change until the view component and the observer are placed; the plan states their rows.
+Reused: doc-health, the dead-verb and dead-path rules, Convention classify, the knowledge registry (slots, lifecycle, split, merge, rename, path-move, lineage), the decision index and id minting, `fgos tool query`, the governance holder table, the observe area's records. fgOS adds no search engine of its own. The documentation spec's statement that slice 1 adds no store no longer holds: the OHS and pkm indexes are rebuildable caches under `.fgos/runtime/`.
+
+No component-boundary change until the provider entries and the observer sink are placed; the plan states their rows.
 
 ## 15. Verification
 
-**Gate before signing: a recall measurement.** Build a set of known same-subject groups:
+**Measured before signing (2026-11-12),** in [the measurement report](../../../../../plans/reports/measurement-261112-1314-docos-document-identity-recall.md):
 
-- the three 2026-08 worktree-reclaim user documents (`orphaned-worktree-reclaim-must-check-for-live-uncommitted-work`, `why-reclaimorphanedcheckout-refuses-a-live-session-worktree`, `why-session-claim-liveness-reuses-worktree-activity-not-pid-or-event-age`), noting that example 8.6.1 already suggests the third is a different subject;
-- the 7 event-log rules defined in both `docs/platform/work-state/spec.md` and `docs/platform/runner/subcomponents/h-6979005beaf7/spec.md`;
-- 20 or more groups drawn from the 479 user topics by an independent reviewer, not by the author of the extractor.
+| Measurement | Result |
+|---|---|
+| Gold set | 37 same-subject groups (88 documents) and 10 near misses, chosen by an independent agent by reading |
+| Identifier overlap alone, top 3 | 31.8%: rejected as the ranking |
+| OHS hybrid, developer notes in English, top 3 / top 10 | 91.7% / 95.8% |
+| Same notes in Vietnamese as written, top 3 | 0%: hence translation (8.1 step 1) |
+| End-to-end decisions, 26 cases (20 known duplicates from history on a snapshot before the duplicate, 6 new subjects) | grep 50%, pkm with OHS **73%**, plus rule text 69%; about 10,000 fewer tokens per write with pkm |
 
-For each member, run locate with the member's own text as the intended change and the member removed from the view. Pass: the other members appear in the top 3 for at least 90% of members. Below that, either the extractor is fixed, or embeddings are proposed with the miss list as evidence. The same set is the regression guard for every later coefficient or extractor change (8.5.3).
+What the trial did not settle: the remaining errors are judgements on close claims, several of them arguable labels. They are bounded by admission's ceiling and the observer, not removed.
+
+**After implementation:**
+
+- **In use, from the locate log:** share of writes that grew a top-10 candidate; share of creation requests the reviewer refused; new units per week against the ceiling; `outside-region` rate; pairs above the duplicate threshold. The first two must not fall below the trial's 73% decision rate; new units per week must stay under the ceiling.
+- **Regression set:** the gold set and the 26 trial cases rerun after any change of provider version, model or ranking.
+- **Owning proofs:** the locate door's input and output at the use-case boundary; the write-door refusal at the CLI boundary with one wiring proof; the retrospective writer's evidence path in the cleanup gate's owning test.
 
 The non-coding profiles (6.2 to 6.4) bind only after the same measurement on a real project in that domain.
-
-After implementation: one owning proof per behavior at the lowest layer: extractor kinds in the Rust component, locate verdicts in the use case, observer proposals in the use case, the write-door refusal at the CLI boundary with one wiring proof.
 
 ## 16. Related Files
 
@@ -652,3 +670,4 @@ After implementation: one owning proof per behavior at the lowest layer: extract
 - 2026-11-12, owner: question 6, one closed sub-area level is allowed; question 7, the standard domain profiles stay in this spec, because splitting them out from the start makes the model hard to read, and `domains/<domain>/` carries extensions and new domains.
 - 2026-11-12, owner: question 4, no code-path-to-area table in this version; the writer picks `area` from the closed list, and a table comes later only if measurement shows it is needed, built as a test-kept machine-readable file, never from prose such as `component-boundary.md`.
 - 2026-11-12 evening, after the measurements of section 15: four stops (claim units with evidence, locate through pkm with OHS, admission with a weekly ceiling, closed axes with an observer); identifiers become a boost; the writer translates its draft and reads ten candidates; no verdict from a score; the model is a faceted classification with SKOS-shaped vocabularies; composite documents are not split.
+- 2026-11-12, owner: spec signed.

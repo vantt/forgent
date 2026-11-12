@@ -113,6 +113,8 @@ pkm-core is already a clean library crate inside the `momentell` workspace (depe
 
 The lead recommends option 2, done as a mechanical move before fgOS writes code against the API. Not decided here.
 
+**Update, 2026-11-12 evening:** the owner chose option 2. pkm now lives in `vantt/pkm` (release 0.1.0, crates `pkm-core`, `pkm-cli`, `pkm-mcp`, `pkm-lifecycle`, with an integration guide). R8 is met in shape; R1 to R7 and R9 remain open against that repository.
+
 ## 6. Open questions
 
 1. Which repository owns the profile format (R1), and is it versioned with `schema.yaml` or separately?

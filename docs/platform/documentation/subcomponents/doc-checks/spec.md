@@ -4,12 +4,12 @@
 Document type: BA-grade subcomponent specification
 Audience: Human reviewer, maintainer, implementation agent, documentation agent
 Purpose: Define the one command that checks maintained documentation, the body rules it runs, where it runs, and the commit gate that makes its refusal real
-Design status: Draft, split out of the documentation area spec on 2026-11-12. Not signed. The questions of section 11 are decided (owner, 2026-11-12).
+Design status: Signed by the owner on 2026-11-12. A change is recorded as a new entry in section 15, decision history.
 Implementation: Partial. doc-health runs three body rules over the whole platform corpus; path input, the new rules, the staged-content read and the pre-commit wiring are not built
-Canonical: No (becomes canonical when signed)
+Canonical: Yes
 Provenance: Sections 6.2 to 6.5, 10, 11.1, 12 and 13 of the documentation area spec as of 2026-11-07, moved here when the owner split the area into subcomponents on 2026-11-12
 Writer type: Agent draft writer
-Canonical for: Nothing yet; once signed, the documentation check command, its rules and the documentation commit gate
+Canonical for: The documentation check command, its rules and the documentation commit gate
 Use this when: Adding or changing a documentation body rule, wiring the check into a door or a hook, or reading a check finding
 Do not use this for: Placement rules (Convention), the axes and locate (document identity), or registry lifecycle (knowledge-registry contract)
 Last reviewed: 2026-11-12
@@ -49,7 +49,7 @@ It is an extension of doc-health, not a second checker (L10).
 
 - Placement verdicts. Convention decides them; the check calls `fgos convention check` and reports its verdict.
 - What the identity rules mean. Document identity defines `area`, `question` and identifier resolution; this subcomponent runs those rules.
-- A shipped `fgos doc check` verb. It becomes due only when project-owned rules exist (Convention Q13).
+- A shipped documentation-check verb. It becomes due only when project-owned rules exist (Convention Q13).
 - A skill-name existence check.
 
 ## 3. Entry Points And Triggers
@@ -225,3 +225,4 @@ Done means: `npm test` and `cargo test --workspace` are green apart from tests t
 - 2026-11-06, owner, after the architecture panel: item `p-cd2ejz7wa5`, an honest commit gate for documentation checks, opened apart from the identity work. Documentation findings refuse the commit; a host error refuses it in an activated workspace.
 - 2026-11-12, owner: the documentation area is split into subcomponents; the checks become this spec, and their first phase comes first in the order.
 - 2026-11-12, owner: section 11 accepted: `doc-provisional-aged` reports after 30 days without refusing; the shell wrapper's `--dir` placement is fixed as its own item.
+- 2026-11-12, owner: spec signed.

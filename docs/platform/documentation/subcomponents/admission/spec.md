@@ -4,12 +4,12 @@
 Document type: BA-grade subcomponent specification
 Audience: Human reviewer, maintainer, implementation agent, documentation agent
 Purpose: Define how a change that opens or moves documentation authority is admitted: by an independent reviewer inside a frame the owner approved, with the owner asked only for what falls outside it
-Design status: Draft, split out of the documentation area spec on 2026-11-12 and rewritten from the per-topic owner approval of 2026-11-07 to a reviewer inside an approved frame. Not signed. The questions of section 11 are decided (owner, 2026-11-12).
+Design status: Signed by the owner on 2026-11-12. A change is recorded as a new entry in section 15, decision history.
 Implementation: Not started. The doors it checks at exist (the registry store door, fgos doc reserve, doc promote, supersede, path-move); the reviewer run, the frame record and the checks do not
-Canonical: No (becomes canonical when signed)
+Canonical: Yes
 Provenance: Sections 6.7 and 6.8 of the documentation area spec as of 2026-11-07; the owner's objection the same day that asking him for every new topic is wrong; the frame defaults the owner approved on 2026-11-12 (document identity, section 13, question 3)
 Writer type: Agent draft writer
-Canonical for: Nothing yet; once signed, which effects need admission, who decides them, the frame, and the admission record
+Canonical for: Which effects need admission, who decides them, the frame, and the admission record
 Use this when: A change would create a topic, an area, a sub-area or an active document, move authority, or change an axis value set
 Do not use this for: Growing an existing section (no admission), or the checks a document passes (doc-checks)
 Last reviewed: 2026-11-12
@@ -224,3 +224,4 @@ fgOS has no proof of a person: the Identity spec leaves out human accounts, and 
 - 2026-11-07, owner: asking him for every new topic is wrong. The lead proposed an independent reviewer inside an approved frame, with the owner asked only beyond it.
 - 2026-11-12, owner: frame defaults approved (document identity, question 3); the documentation area is split into subcomponents and admission becomes this spec, written to the reviewer-and-frame model.
 - 2026-11-12, owner: section 11 accepted: the area value list is one machine-readable file in the project instance, owned by document identity and checked against each area's overview document; the digest is weekly, as one generated document plus a line in the owner's mailbox.
+- 2026-11-12, owner: spec signed.

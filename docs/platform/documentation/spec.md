@@ -38,10 +38,10 @@ H2, the Knowledge and Documentation Engine, makes documentation grow by improvin
 
 | Subcomponent | Owns | Spec | Status |
 |---|---|---|---|
-| Document identity | the axes (locating and narrowing), their value sets in three tiers, locate before write, the search view, self-improvement of areas and identifiers | [document-identity](subcomponents/document-identity/spec.md) | draft; questions 1 to 7 decided; signing gated by a recall measurement |
-| doc-checks | the one check command, its body rules, the commit gate, where registry lints run | [doc-checks](subcomponents/doc-checks/spec.md) | draft |
-| Admission | which effects open or move authority, the independent reviewer, the frame, the owner's batch, the admission record | [admission](subcomponents/admission/spec.md) | draft |
-| Write door | the documentation skill, its steps and dispositions, the pointer line, live templates, the retrospective writer's default | [write-door](subcomponents/write-door/spec.md) | draft |
+| Document identity | the four stops, claim units, the axes in three tiers, locate before write through pkm with OHS, self-improvement | [document-identity](subcomponents/document-identity/spec.md) | signed 2026-11-12 |
+| doc-checks | the one check command, its body rules, the commit gate, where registry lints run | [doc-checks](subcomponents/doc-checks/spec.md) | signed 2026-11-12 |
+| Admission | which effects open or move authority, the independent reviewer, the frame, the owner's batch, the admission record | [admission](subcomponents/admission/spec.md) | signed 2026-11-12 |
+| Write door | the documentation skill, its steps and dispositions, the pointer line, live templates, the retrospective writer's default | [write-door](subcomponents/write-door/spec.md) | signed 2026-11-12 |
 | Reading surfaces | generated surfaces from one source: decision index, docs index, the user-document index, the distilled agent surface (A6) | not written yet | planned |
 
 Owned outside this area and consumed here:
@@ -76,16 +76,15 @@ A writer never changes structure to get past a refusal; structure changes come o
 
 ## 4. Build Order
 
-Each step is one phase that ships something checkable on its own:
+Each step is one phase that ships something checkable on its own. Revised on 2026-11-12 after the measurements: the largest source of new documents is the retrospective writer's one-document-per-item design, so it goes first.
 
-1. **doc-checks**: path input, the verb and rule-claim rules, staged reads and the pre-commit gate (item `p-cd2ejz7wa5`). Cheapest, extends what runs, useful at once.
-2. **Document identity, view and locate**: the Rust search view, the locate verb, and the recall measurement that gates signing.
-3. **Admission**: the effect checks at the doors, the reviewer run, the frame, refusal texts.
-4. **Write door**: the skill, the pointer line, live templates; the retrospective writer's default (item `p-ixrbglli5o`) once its completion path exists.
-5. **Document identity, observer**: self-improvement of areas and identifiers.
-6. **Reading surfaces**: its spec first, then the surfaces.
-
-Moving the 479 existing user documents into the new model is not a phase of its own: the observer proposes those moves once step 5 runs.
+1. **Retrospective writer adds evidence to claim units** (stop 1 of document identity; item `p-ixrbglli5o`), with the cleanup gate accepting the evidence or the admission handoff. Cuts the main source without new technology.
+2. **doc-checks**: path input, the verb and rule-claim rules, staged reads and the pre-commit gate (item `p-cd2ejz7wa5`); the 6 documents with invalid YAML frontmatter.
+3. **Locate through pkm with OHS**: register both as tool providers, the fgOS locate door (translation, top 10, log), doctor freshness checks.
+4. **Admission**: effect checks at the doors, the reviewer run, the frame and its weekly ceiling, refusal texts.
+5. **Write door**: the skill, the pointer seed, live templates.
+6. **Observer**: pkm's structural proposals into fgOS work items; merging the 479 story documents into claim units over time.
+7. **Reading surfaces**: its spec first, then the surfaces.
 
 ## 5. Objectives Map
 
@@ -160,3 +159,4 @@ D-tsk28x-8 (2026-08-25) set one engine with two tiers, a human tier that accepts
 - 2026-11-06, architecture panel and owner decisions: "no match, then create" is withdrawn; a writer must be admitted to open or move authority, and a missed lookup never grants create. Six roles admitted for new writes. Durable claim identity deferred. Items opened: `p-cd2ejz7wa5` (honest commit gate), `p-ixrbglli5o` (retrospective writer grows by default, after its completion path).
 - 2026-11-07, lead: topic admission by an approved owner answer per topic. The owner objected the same day: asking him for every new topic is wrong.
 - 2026-11-12, owner: a dedicated spec for document identity (axes, locate, search view in Rust, three tiers, self-improvement); the area is split into subcomponents (document identity, doc-checks, admission, write door, later reading surfaces) and this spec becomes their map; admission moves to an independent reviewer inside an approved frame; the build order of section 4.
+- 2026-11-12, owner: the four subcomponent specs are signed; the build order puts the retrospective writer's claim-and-evidence change first; pkm is split into its own repository `vantt/pkm`.

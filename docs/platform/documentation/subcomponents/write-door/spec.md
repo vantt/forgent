@@ -4,12 +4,12 @@
 Document type: BA-grade subcomponent specification
 Audience: Human reviewer, maintainer, implementation agent, documentation agent
 Purpose: Define the one door through which any agent writes, changes, moves or retires maintained documentation, and the steps it follows
-Design status: Draft, split out of the documentation area spec on 2026-11-12, with its owner-finding step replaced by locate from document identity. Not signed. The questions of section 11 are decided (owner, 2026-11-12).
+Design status: Signed by the owner on 2026-11-12. A change is recorded as a new entry in section 15, decision history.
 Implementation: Not started. The doors it calls exist (Convention, the knowledge registry, doc-health, the decision index); the skill, the pointer line and the live templates do not
-Canonical: No (becomes canonical when signed)
+Canonical: Yes
 Provenance: Sections 3, 4, 6.1, 7 and the template concept of the documentation area spec as of 2026-11-07, moved here when the owner split the area into subcomponents on 2026-11-12
 Writer type: Agent draft writer
-Canonical for: Nothing yet; once signed, the documentation skill's steps, its dispositions, the pointer line and the live templates
+Canonical for: The documentation skill's steps, its dispositions, the pointer line and the live templates
 Use this when: Changing how an agent writes documentation, or reviewing why a write grew one document instead of creating another
 Do not use this for: Where content belongs (document identity), what is checked (doc-checks), or who admits a creation (admission)
 Last reviewed: 2026-11-12
@@ -108,7 +108,14 @@ One template per document kind the door creates (spec, contract, architecture, d
 
 ### 6.4. The retrospective writer
 
-This is item `p-ixrbglli5o`. The retrospective writer (`fgos-coding-knowledge`) follows the same steps: locate, then grow or re-attest an existing section by default. It requests a creation only through admission.
+This is item `p-ixrbglli5o`, and stop 1 of [document identity](../document-identity/spec.md#1-current-summary). The retrospective writer (`fgos-coding-knowledge`) does not write a document per work item. For each item it:
+
+1. states the one to three **claims** the item showed (a fact, rule, failure mode, decision or procedure, one each);
+2. for each claim, drafts it in the corpus's language and locates ([document identity 8.1](../document-identity/spec.md#81-locate-before-every-write));
+3. when a candidate unit carries the claim, adds the item as **evidence** to that unit (a link to the work item and its decision or incident) and refines the claim's statement only if the item changed it;
+4. when no candidate carries it, hands the claim and the item's material to an admission request (below).
+
+The story of the item stays where it already is, in the work item and the event log (platform-foundations L1: log against state). Units therefore grow with the number of distinct claims, not with the number of items; most items add a line of evidence and create nothing.
 
 Condition before it ships: a retrospective item whose knowledge fits no section and gets no admitted creation leaves material. Today the cleanup gate (`checkRetrospectiveContent` in `src/state/cleanup-harness.mjs`) accepts only a non-engine decision, a linked existing document or a registry attestation, so such an item parks at cleanup. The completion path (decided 2026-11-12): the writer puts the material into its admission request for a creation, with the locate result, and the retrospective item records `material handed to admission request <id>`. The cleanup gate accepts that record as a fourth kind of evidence, after checking that the request exists and carries the material and the locate result. If admission admits, the document is created from that material; if it refuses, the material stays in the request item, where the observer can use it (for example to propose a sub-area when several requests share an identifier cluster). This changes the cleanup gate's contract, which the work-state area owns; the change is made as a contract change with its owning proof, never as a loosened check. The gate still refuses an engine closing report and still never accepts a manufactured decision.
 
@@ -156,7 +163,7 @@ Condition before it ships: a retrospective item whose knowledge fits no section 
 | Skill and pointer line | planned | write-door phase |
 | Live templates | planned | move and fix headers |
 | Locate step | planned | after document identity's view and verb |
-| Retrospective writer default | planned | item `p-ixrbglli5o`, after its completion path |
+| Retrospective writer adds evidence to claim units | planned, first phase | item `p-ixrbglli5o` |
 
 ## 13. Verification
 
@@ -181,3 +188,4 @@ Condition before it ships: a retrospective item whose knowledge fits no section 
 - 2026-11-06, architecture panel and owner: "no match, then create" is withdrawn; a missed lookup never grants create. Item `p-ixrbglli5o` opened.
 - 2026-11-12, owner: the documentation area is split into subcomponents; the owner-finding step becomes locate from document identity.
 - 2026-11-12, owner: the pointer line is a fifth instruction seed, documentation-door.md under core/instructions; a retrospective item with material only hands it to an admission request, and the cleanup gate accepts that request as evidence, as a contract change owned by work state.
+- 2026-11-12, owner: spec signed.
