@@ -22,6 +22,7 @@ const INFO_REFUSALS = new Map([
   ['pool-unusable', 'account state'],
   ['pool-excluded', 'account state'],
   ['not-an-agent-seat', 'tool executor'],
+  ['agent-cli-missing', 'no agent CLI installed'],
 ]);
 
 const CORE_CAPABILITIES = ['execute', 'code:implement'];
@@ -47,6 +48,8 @@ function bindCapabilityPostures(runnerConfig) {
   }
   const postureFailures = [];
   const noPool = [];
+  const noCli = [];
+  let cliFix = '';
   const otherFailures = [];
   const coverage = [];
   for (const cap of capsToCheck) {
@@ -62,6 +65,7 @@ function bindCapabilityPostures(runnerConfig) {
       const reason = bound.refused.reason;
       if (reason === 'posture-unavailable') postureFailures.push(`${cap}: posture-unavailable${detail}`);
       else if (reason === 'headless-no-executor' || reason === 'no-candidate') noPool.push(cap);
+      else if (reason === 'agent-cli-missing') { noCli.push(cap); cliFix = bound.refused.fix ?? ''; }
       else otherFailures.push(`${cap}: ${reason}${detail}`);
     } else if (bound.executor) {
       coverage.push(`${cap} -> ${bound.executor}${bound.invocation ? ` (${bound.invocation})` : ''}`);
@@ -75,6 +79,8 @@ function bindCapabilityPostures(runnerConfig) {
   const info = noPool.length > 0
     ? [`no candidate executor available for capabilities: ${noPool.join(', ')}. Fix: Declare runner.capabilities.<cap>.prefer in .fgos/config.json.`]
     : [];
+  // A machine with no agent CLI has nothing to bind yet: said once, with the fix, never a failure of the config.
+  if (noCli.length > 0) info.push(`no agent CLI is installed, so ${noCli.join(', ')} bind nothing yet. Fix: ${cliFix}`);
   return { problems, info, coverage };
 }
 

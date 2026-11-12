@@ -15,7 +15,7 @@ import {
   checkHerdrExecutorKinds,
 } from '../../src/setup/registrations.mjs';
 
-seedStubAgentClis('codex');
+seedStubAgentClis('codex', 'omp', 'pi', 'agy');
 
 // Phase 01 group D. These are the checks that turn "the machine is not set up for
 // interactive dispatch" from a runtime surprise into a doctor line.

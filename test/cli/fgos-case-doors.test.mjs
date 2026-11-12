@@ -1,6 +1,8 @@
 // test/cli/fgos-case-doors.test.mjs — the case flags of the two doors: `fgos run --case` and `fgos workflow start --case`
 
 import '../helpers/process-tmp-root.mjs';
+import { seedStubAgentClis } from '../helpers/agent-clis.mjs';
+seedStubAgentClis('claude', 'codex', 'omp', 'pi', 'agy', 'glm', 'disallowed-provider');
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import path from 'node:path';
