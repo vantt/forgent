@@ -115,8 +115,10 @@ The lead recommends option 2, done as a mechanical move before fgOS writes code 
 
 **Update, 2026-11-12 evening:** the owner chose option 2. pkm now lives in `vantt/pkm` (release 0.1.0, crates `pkm-core`, `pkm-cli`, `pkm-mcp`, `pkm-lifecycle`, with an integration guide). R8 is met in shape; R1 to R7 and R9 remain open against that repository.
 
+**Update, 2026-11-12 night:** the owner decided that fgOS links `pkm-core` into its own `fgos` binary, pinned by tag, and exposes its own `fgos doc` verbs behind a locate port (no `fgos pkm` passthrough). The embedding needs that follow from it (OHS index path and settings as typed configuration, no output or panics from the library, the OHS child owned by the session, a small stable API) were added to [`vantt/pkm` issue 1](https://github.com/vantt/pkm/issues/1); a separate older-glibc binary is no longer needed for fgOS.
+
 ## 6. Open questions
 
 1. Which repository owns the profile format (R1), and is it versioned with `schema.yaml` or separately?
 2. Does the locate log (R7, "new sub-value") stay with the consumer, passed in per run, or may pkm keep it in its index?
-3. Licence of pkm for fgOS: the owner allowed fgOS to use `ohs-lang-vi` on 2026-11-12; pkm itself needs the same statement.
+3. Licence of pkm for fgOS: the owner allowed fgOS to use `ohs-lang-vi` on 2026-11-12; pkm itself needs the same statement. *Answered 2026-11-12 night: the owner allows fgOS to link and distribute pkm inside fgOS releases.*

@@ -55,7 +55,7 @@ The model has three tiers, so it serves any project fgOS runs, not only fgOS its
 2. a **domain profile** per kind of work: coding, marketing, sales, customer support (section 6);
 3. a **project instance** with that project's real values (section 7 is the fgOS repository's).
 
-fgOS owns the structure and the rules; the mechanism comes from two providers it calls through its tool registry: **OHS** for hybrid search (BM25 with the Vietnamese pack, plus embeddings) and **pkm** for the graph and the one search door over both (section 8.2). What fgOS needs from pkm is written as a requirement: [fgOS to pkm requirements](../../../../../plans/reports/requirements-261112-1533-fgos-to-pkm-structure-mechanism.md).
+fgOS owns the structure and the rules; the mechanism comes from two components: **OHS** for hybrid search (BM25 with the Vietnamese pack, plus embeddings), an external tool in fgOS's tool registry, and **pkm** for the graph and the one search door over both, linked into the `fgos` binary as a library (section 8.2). What fgOS needs from pkm is written as a requirement: [fgOS to pkm requirements](../../../../../plans/reports/requirements-261112-1533-fgos-to-pkm-structure-mechanism.md).
 
 ## 2. Why this spec exists: the earlier axes and what they did
 
@@ -404,14 +404,16 @@ There is **no verdict from the score**. Queries about subjects with no unit scor
 
 ### 8.2. The search view
 
-fgOS does not build its own search engine. It calls two providers through the tool registry, the way it calls GitNexus for impact analysis:
+fgOS does not build its own search engine. It uses two components:
 
-| Provider | Gives | What it is |
+| Component | Gives | How fgOS uses it |
 |---|---|---|
-| **OHS** (`vantt/obsidian-hybrid-search`, the owner's fork) | hybrid search: BM25 over FTS5 with the `ohs-lang-vi` pack (normalisation, tone restoration, Telex and VNI, typos, synonyms, word segmentation), embeddings in sqlite-vec, RRF fusion | SQLite file, rebuildable from the documents; a Node process with a stdio server |
-| **pkm** (`vantt/pkm`, release 0.1.0) | the one search door over OHS, the note graph (Markdown links), near-meaning pairs, zones, rule-based proposals | Rust library and CLI with a SQLite index |
+| **OHS** (`vantt/obsidian-hybrid-search`, the owner's fork) | hybrid search: BM25 over FTS5 with the `ohs-lang-vi` pack (normalisation, tone restoration, Telex and VNI, typos, synonyms, word segmentation), embeddings in sqlite-vec, RRF fusion | an external tool: a Node process with a stdio server and a SQLite file rebuildable from the documents; registered in the tool registry with doctor rows, the way GitNexus is for impact analysis |
+| **pkm** (`vantt/pkm`) | the one search door over OHS, the note graph (Markdown links), near-meaning pairs, zones, rule-based proposals | **linked into the `fgos` host** as the `pkm-core` crate, pinned by tag; it starts and stops OHS as its child process |
 
-Both indexes are caches rebuilt from the documents, never truth, as platform-foundations L3 clauses 2 and 3 require. They live under `.fgos/runtime/`, and a `fgos doctor` check reports their freshness and the providers' presence, as the install/setup/doctor gate requires.
+**pkm is linked, not called** (owner, 2026-11-12, with a licence to link and distribute pkm inside fgOS releases). fgOS ships it in its own binary, so no project installs pkm separately. fgOS exposes its own verbs (`fgos doc locate` and the observer's reads), behind a locate port with pkm as the adapter (design principle 3); it never re-exports pkm's CLI as `fgos pkm ...`, which would be a second door beside the `pkm` CLI. When OHS is absent the port reports itself degraded and falls back to full-text search over the files. Raising the pinned pkm tag is its own change and reruns the regression set of section 15. pkm brings `rusqlite` with bundled SQLite; one binary holds one SQLite build, so any later SQLite use in fgOS takes the same `rusqlite` version.
+
+Both indexes are caches rebuilt from the documents, never truth, as platform-foundations L3 clauses 2 and 3 require. They live under `.fgos/runtime/`, never in the document tree, and a `fgos doctor` check reports their freshness and OHS's presence, as the install/setup/doctor gate requires. What fgOS needs from pkm to embed it this way (the OHS index path and settings passed as typed configuration, no output or panics from the library, the OHS child owned by the session) is tracked in [`vantt/pkm` issue 1](https://github.com/vantt/pkm/issues/1).
 
 Choices, from the measurements and the owner's fork's own model evaluation (its report V22, 2026-11-02):
 
@@ -609,7 +611,7 @@ For each work item, the retrospective writer states the one to three claims the 
 | Part | Status | Where | Next action |
 |---|---|---|---|
 | Hybrid search (BM25 with `ohs-lang-vi`, e5-small embeddings) | exists outside fgOS, measured on the fgOS corpus | OHS fork, release `v0.17.2-vantt.9` | register as a tool provider; doctor freshness check |
-| Search door, graph, pairs, zones, proposals | exists outside fgOS | `vantt/pkm`, release 0.1.0 (split out of momentell on 2026-11-12; crates `pkm-core`, `pkm-cli`, `pkm-mcp`, `pkm-lifecycle`) | link `pkm-core` as a library or call the CLI/MCP; the gaps are the [requirements to pkm](../../../../../plans/reports/requirements-261112-1533-fgos-to-pkm-structure-mechanism.md) R1 to R9 |
+| Search door, graph, pairs, zones, proposals | exists outside fgOS | `vantt/pkm`, release 0.1.0 (split out of momentell on 2026-11-12; crates `pkm-core`, `pkm-cli`, `pkm-mcp`, `pkm-lifecycle`) | link `pkm-core` into the `fgos` host (decided 2026-11-12); the gaps are the [requirements to pkm](../../../../../plans/reports/requirements-261112-1533-fgos-to-pkm-structure-mechanism.md) R1 to R9 |
 | Retrospective writer adds evidence to claim units (stop 1) | not started | `fgos-coding-knowledge`, cleanup gate | first phase: it cuts the largest source of new documents without new technology |
 | Locate door in fgOS (draft translation, top 10, log) | not started | write door | after the pkm locate call (R5) |
 | Admission ceiling and reviewer (stop 3) | specified | [admission](../admission/spec.md) | admission phase |
@@ -637,7 +639,7 @@ What the trial did not settle: the remaining errors are judgements on close clai
 **After implementation:**
 
 - **In use, from the locate log:** share of writes that grew a top-10 candidate; share of creation requests the reviewer refused; new units per week against the ceiling; `outside-region` rate; pairs above the duplicate threshold. The first two must not fall below the trial's 73% decision rate; new units per week must stay under the ceiling.
-- **Regression set:** the gold set and the 26 trial cases rerun after any change of provider version, model or ranking.
+- **Regression set:** the gold set and the 26 trial cases rerun after any change of provider version, model or ranking. The data lives in [verification/recall](verification/recall/gold-set.json): `gold-set.json` (groups and near misses), `vi-queries.json` and `vi-queries-en.json` (the developer notes and their translations), `trial-cases.json` and the three trial briefs.
 - **Owning proofs:** the locate door's input and output at the use-case boundary; the write-door refusal at the CLI boundary with one wiring proof; the retrospective writer's evidence path in the cleanup gate's owning test.
 
 The non-coding profiles (6.2 to 6.4) bind only after the same measurement on a real project in that domain.
@@ -670,4 +672,5 @@ The non-coding profiles (6.2 to 6.4) bind only after the same measurement on a r
 - 2026-11-12, owner: question 6, one closed sub-area level is allowed; question 7, the standard domain profiles stay in this spec, because splitting them out from the start makes the model hard to read, and `domains/<domain>/` carries extensions and new domains.
 - 2026-11-12, owner: question 4, no code-path-to-area table in this version; the writer picks `area` from the closed list, and a table comes later only if measurement shows it is needed, built as a test-kept machine-readable file, never from prose such as `component-boundary.md`.
 - 2026-11-12 evening, after the measurements of section 15: four stops (claim units with evidence, locate through pkm with OHS, admission with a weekly ceiling, closed axes with an observer); identifiers become a boost; the writer translates its draft and reads ten candidates; no verdict from a score; the model is a faceted classification with SKOS-shaped vocabularies; composite documents are not split.
+- 2026-11-12 night, owner: pkm is compiled into the `fgos` host as a library and fgOS may distribute it; fgOS exposes `fgos doc` verbs through a locate port, not a `fgos pkm` passthrough; `rusqlite` with bundled SQLite stays the SQLite binding (8.2).
 - 2026-11-12, owner: spec signed.

@@ -1,0 +1,240 @@
+[
+ {
+  "id": "c01",
+  "kind": "duplicate",
+  "group": "g01",
+  "later": "docs/explanation/write-rejected-no-diff-check.md",
+  "earlier": [
+   "docs/explanation/fgos-write-rejected-structural-deadlock.md",
+   "docs/explanation/write-rejected-trust-branchheadattake.md"
+  ],
+  "draft": "# A blob-equality proof that couldn't handle \"never existed at all\"\n\n`tsk-198` closed a gap in `tsk-4s6`'s own fix. `tsk-4s6` added\n`isUnchangedSinceBranchHeadAtTake` (`src/runner/merge.mjs`, next to\n`isMergeUnionPath`) as a second trust criterion for restoring a\n`fgos-write-rejected` `.fgos/` path to main's HEAD — proving the branch\nnever intentionally edited that path since `branchHeadAtTake`. It did this\nvia blob-equality: `git rev-parse <branchHeadAtTake>:<path>` compared\nagainst `git rev-parse <branch>:<path>`.\n\n## The gap blob-equality couldn't cover\n\nBlob-equality throws (caught, returns `false`) when the path never existed\non the branch at `branchHeadAtTake` at all. So a path the branch never\npossessed at any point — not merely \"unchanged since fork\" — still fell\nthrough to `fgos-write-rejected`, even though the branch contributed\nliterally nothing to it.\n\nConfirmed live merging `fgw/tsk-25b`: `tsk-4s6`'s own fix had already\nresolved 2 of its original 3 blocked paths (`config.json`, the legacy\n`events.jsonl` baseline — both genuinely unchanged since\n`branchHeadAtTake`). The one remaining path,\n`.fgos/events.jsonl.backup-tsk-1lv-4-dedup-fix-20260817`, was present at\nthe merge-base and on main's current HEAD, but absent from BOTH the\nbranch's `branchHeadAtTake` commit and its current tip —\n`git rev-parse branchHeadAtTake:<path>` threw \"exists on disk, but not in\n`<ref>`\". The branch never introduced this path at all, yet still got\nblocked as if it had a real conflicting"
+ },
+ {
+  "id": "c02",
+  "kind": "duplicate",
+  "group": "g02",
+  "later": "docs/explanation/events-jsonl-opportunistic-truncation-check.md",
+  "earlier": [
+   "docs/knowledge/how-to-reconstruct-fgos-tracking-state-after-an-operator-mis/reconstruct-fgos-tracking-state-after-an-operator-mistake-discards-events-jsonl.md",
+   "docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md",
+   "docs/explanation/events-jsonl-concurrent-data-loss-investigation.md"
+  ],
+  "draft": "# The truncation guard existed but nobody ran it — now it runs itself\n\n`tsk-1ji` is the implementation item deferred from [`tsk-24e`'s\ninvestigation](events-jsonl-concurrent-data-loss-investigation.md)\n(D1 detect-and-warn, D2 periodic auto-commit). It diagnosed *why* the\ndata loss kept happening despite an existing detector already being in\nplace, then shipped the actual fix.\n\n## The detector already existed — it just never ran\n\n`tsk-4oq`'s ~26-event history vanishing from `.fgos/events.jsonl` turned\nout to be a live, real-world reoccurrence of a failure class an earlier\nitem (`tsk-cgg`, done) had already diagnosed and built a detector for: a\n`git stash`/`checkout`/`reset`/`clean` on the shared main checkout\nsilently reverting the tracked, uncommitted-tail `events.jsonl` to an\nolder committed snapshot while `fgos` verbs kept appending on top.\n`src/state/events-jsonl-truncation-guard.mjs`'s mark-and-content-hash\nmechanism (registered as `fgos doctor`'s `events-jsonl-not-truncated`\ncheck) was correctly implemented — but had a real efficacy gap this\nsession live-confirmed: **it only ran when a human or session explicitly\ninvoked `fgos doctor`.** Nothing in the normal pick/return/approve/submit\nflow ever called it.\n\n## The gap, made concrete\n\nThe sidecar mark was last legitimately advanced at `seq 21929`\n(`2026-08-20T05:46:23Z`). Nobody ran `fgos doctor` again until roughly\n2.5 hours and dozens of other items' worth of concurrent activity later —\nat which point the check reported"
+ },
+ {
+  "id": "c03",
+  "kind": "duplicate",
+  "group": "g03",
+  "later": "docs/knowledge/why-the-live-events-jsonl-corrupted-and-why-the-fix-needed-a/why-live-events-jsonl-corrupted-and-how-it-was-fixed.md",
+  "earlier": [
+   "docs/knowledge/how-to-resolve-a-git-merge-conflict-on-fgos-events-jsonl-wit/resolve-an-events-jsonl-merge-conflict.md"
+  ],
+  "draft": "# Why the live events.jsonl corrupted, and why the fix needed a split\n\n`tsk-n4i` was filed after `tsk-66l`'s dry run of\n`scripts/migrate-status-proposed-to-awaiting-approval.mjs` refused to run\nagainst the shared live `.fgos/events.jsonl`, tripping its own\nseq-contiguity guard. This explains what actually caused that, why it\nwasn't the race `events.lock` already guards against, and why the repair\nended up as two separate items instead of one.\n\n## The corruption was a merge-conflict artifact, not a lock bug\n\n`events.lock` (commit `3adfb3f`, 2026-07-17) already closes the race window\n`src/state/events.mjs`'s own design comment calls \"spike-confirmed\nduplicate-seq corruption\" — two processes reading the same last `seq` and\nboth writing `N+1`. It was tempting to assume the live store's corruption\nwas a lingering instance of exactly that. `git blame` on the corrupted\nlines said otherwise:\n\n> \"Root cause is ad hoc git-merge-conflict hand-resolution on tracked\n> `.fgos/events.jsonl` (commits `aa9ae156`, `9e3fb469`, both 2026-07-28),\n> not an appendEvent race -- events.lock (commit `3adfb3f`) predates the\n> corruption by 11 days.\"\n> — real locked decision D1, `docs/history/live-events-seq-corruption/CONTEXT.md`\n\nThe two commits used two *different* ad hoc resolution strategies in the\nsame session:\n\n> `fix: resolve events.jsonl merge conflict - keep both sides sorted by timestamp`\n> `fix: merge tsk-3oa events (keep theirs, rebuild)`\n> — real commit messages, quoted in the same CONTEXT"
+ },
+ {
+  "id": "c04",
+  "kind": "duplicate",
+  "group": "g04",
+  "later": "docs/knowledge/how-to-check-main-checkout-lock-status-before-retrying/check-main-checkout-lock-status-before-retrying.md",
+  "earlier": [
+   "docs/knowledge/how-to-clear-a-stuck-fgos-main-checkout-lock/clear-a-stuck-main-checkout-lock.md",
+   "docs/knowledge/how-to-wait-out-a-genuinely-active-main-checkout-lock-holder/wait-out-an-active-main-checkout-lock-holder.md"
+  ],
+  "draft": "# How to check main-checkout-lock status before retrying\n\nUse this when `fgos take`/`fgos pick` refuses with `lock-held` or\n`lock-ambiguous`, or `fgos unlock`/`fgos merge` refuses because the main\ncheckout lock is held — and you need to know whether the holder is still\ngenuinely live, and how long before the lock is eligible for reclaim,\nbefore deciding whether to wait or retry.\n\n## Before you start\n\nThis applies to `.fgos/main-checkout.lock` only. The other three locks in\nthe same lineage — `runner.lock`, `sessions.lock`, `events.lock` — write a\nbare PID with no timestamp and no TTL concept at all, so age and\nremaining-TTL are not computable for them (`tsk-5z2` CONTEXT.md D5, after\nconfirming this against each lock's own acquire function: `runner.lock`\nin `src/runner/loop.mjs:204-276`, `sessions.lock` in\n`src/runner/session.mjs:191-219`, `events.lock` in\n`src/state/events.mjs:211-227`). If a refusal names one of those three\ninstead, this doc does not apply.\n\n## Steps\n\n1. **Run the read-only status verb.** It never blocks and never mutates\n   the lock:\n\n   ```\n   fgos lock-status --json\n   ```\n\n   A real run against a currently-held lock (this session, 2026-08-05)\n   returned:\n\n   ```json\n   {\n     \"outcome\": \"live\",\n     \"holderPid\": \"01c09aa4-0ebd-48bf-8ae9-ae204baad61b\",\n     \"lockAgeMs\": 152121,\n     \"remainingTtlMs\": 27879,\n     \"lockAge\": \"2m32s\",\n     \"remainingTtl\": \"27s\"\n   }\n   ```\n\n2. **Read `outcome`.** It is one of four values\n   (`src/runner/main-checkout-lock.m"
+ },
+ {
+  "id": "c05",
+  "kind": "duplicate",
+  "group": "g05",
+  "later": "docs/explanation/claim-ambiguous-lock-inline-self-heal.md",
+  "earlier": [
+   "docs/knowledge/why-fgos-main-checkout-lock-could-report-ambiguous-with-no-r/main-checkout-lock-toctou-race.md"
+  ],
+  "draft": "# The one remaining lock state that still needed a human — closed with a one-line retry, not a new mechanism\n\n`tsk-2l8` closed the last gap in `main-checkout.lock`'s self-healing\nstory: an `AMBIGUOUS` lock state (unparseable content, not a live holder\ndisagreeing) forced `pick`/`take` to fail closed and required a person to\nrun `/fgOS:unlock` manually before retrying — the one place a stuck lock\nstill needed human intervention, against the repo's own priority #2\n(\"Release con người\" — release people from having to sit and watch).\n\n## What was already true, verified by code before any design work\n\nThe item's own description is explicit that this was verified against\nreal code, not assumed: `src/state/events.mjs` already had a proper\nstale-pid-reclaim (dead holder pid → atomic reclaim, TOCTOU-safe) —\nunrelated to this gap. `src/runner/main-checkout-lock.mjs` already\nself-reclaimed a numeric pid holder too — but a holder carrying a\n**string** identity (a session id, whose liveness can't be probed the\nsame way a pid can) fell through to `AMBIGUOUS`, `exit 7`, and a required\nmanual `/fgOS:unlock`.\n\n## A much larger design was proposed, then deliberately narrowed\n\nThe item's own submitted description proposed learning from\nupstream `beehive`'s `lock.mjs` (lines 172-352): a two-tier reclaim —\na soft window (stale mtime → candidate) plus a hard ceiling (takeover\nregardless), an atomic rename to a `.stale-*` file, and a post-rename\ncontent re-verify to guard the TOCTOU window against "
+ },
+ {
+  "id": "c06",
+  "kind": "duplicate",
+  "group": "g06",
+  "later": "docs/explanation/main-checkout-lock-release-early-compound-cleanup.md",
+  "earlier": [
+   "docs/knowledge/why-acquiremaincheckoutlock-s-release-on-exit-is-opt-in-neve/main-checkout-lock-release-on-exit-opt-in.md",
+   "docs/knowledge/why-the-pre-commit-hook-got-its-own-shorter-main-checkout-lo/why-the-pre-commit-hook-got-its-own-shorter-lock-ttl.md"
+  ],
+  "draft": "# A sweep loop's own commits held the shared lock \"hot\" for its entire run\n\n`tsk-5zv` fixed a real, reproduced operational pain: `retro-loop`/\n`cleanup-loop` paralyzed concurrent `take`/`pick`/`approve` for any OTHER\nsession because per-item commits never released\n`.fgos/main-checkout.lock` between items.\n\n## Root cause, confirmed via code trace\n\n`fgos-coding-compounding` (retro-loop) and `cleanup-next` write directly to\nthe main checkout — no worktree, since the item's own `fgw/<id>` branch is\nalready merged/torn down by this stage. Each commit fires the pre-commit\nhook, which acquires the STR65 main-checkout lock file (guarding against\ntwo writers racing one shared git index). The hook never proactively\nreleases it — `HOOK_TTL_MS=20s` self-expiry only\n(`src/runner/main-checkout-lock.mjs:131`), by design.\n\nThe loop's own session identity is stable across the whole run\n(`resolveWriterIdentity` reads `CLAUDE_CODE_SESSION_ID`/`FGOS_SESSION_ID`\nfrom env), so self-recognition (D6) means the loop never blocks itself —\nbut the lock stays continuously \"hot\" for the ENTIRE sweep duration (up to\n15 items per retro-loop run), refusing every OTHER session's\ntake/pick/approve for that whole time.\n\nAn already-proven fix pattern for this exact class of problem already\nexisted and was already shipped, just not applied everywhere it was\nneeded: `bin/fgos.mjs`'s `case 'return'` (`tsk-45z`) already calls\n`releaseMainCheckoutLockIfOwn(dir, resolveWriterIdentity(dir).id)` right at\na main-sourced"
+ },
+ {
+  "id": "c07",
+  "kind": "duplicate",
+  "group": "g07",
+  "later": "docs/how-to/write-wrapper-script-for-worktree-guard-refusal.md",
+  "earlier": [
+   "docs/how-to/handle-worktree-guard-refusal-of-compound-dispatch-command.md"
+  ],
+  "draft": "# Use `scripts/write-wrapper-script.mjs` instead of hand-authoring a wrapper file\n\n`tsk-37l` replaced the hand-rolled-every-time wrapper `.sh` workaround\n(`docs/how-to/handle-worktree-guard-refusal-of-compound-dispatch-command.md`)\nwith one small, reusable, general-purpose script. A scratchpad sweep\nacross 12+ real past sessions found the same pattern hand-authored\nindependently over and over — `dispatch-tsk-*.sh`, `run-verify*.sh`,\n`run-gate-check.sh` (appearing independently in at least 3 separate\nsessions), `poll-discover.sh`, `smoke-doctor.sh`/`smoke-handoff.sh` — each\none written inline via `Write` following the exact shape\n`executor-dispatch-fallback.md`'s Step B already prescribes in prose.\n\n## The tool\n\n```bash\nnode scripts/write-wrapper-script.mjs --command \"<the compound command>\" [--dir <path>] [--name <base-name>]\n```\n\nWrites an executable (`chmod 0755`) shell wrapper file\n(`#!/bin/sh\\nset -eu\\n<command>\\n`) into `--dir` (defaults to `cwd`),\nnamed `--name` (defaults to a random `wrapper-<hex>.sh`), and prints its\nabsolute path — one CLI call instead of authoring a `.sh` file via\n`Write` every time. Pass that printed path as the single file to invoke\nthrough Monitor in place of the refused compound line.\n\n## When to use it\n\nSame trigger condition as before: a worktree-isolated session's Bash/\nMonitor tool refuses a compound command (e.g. `fgos run \"$(cat <file>)\"\n--provider <executor> ... 2>&1`) with \"too complex to verify that it\nstays inside the worktree\" — even "
+ },
+ {
+  "id": "c08",
+  "kind": "duplicate",
+  "group": "g08",
+  "later": "docs/knowledge/why-reclaimorphanedcheckout-refuses-a-checkout-the-calling-s/why-reclaimorphanedcheckout-refuses-a-live-session-worktree.md",
+  "earlier": [
+   "docs/knowledge/why-reclaiming-an-orphaned-worktree-checkout-must-check-for/orphaned-worktree-reclaim-must-check-for-live-uncommitted-work.md"
+  ],
+  "draft": "# Why `reclaimOrphanedCheckout` refuses a checkout the calling session is live inside\n\n`fgos approve`'s merge cleanup (`cleanupMergedBranch` ->\n`reclaimOrphanedCheckout`, `src/runner/worktree.mjs`) could destroy a git\nworktree the calling session — or an ancestor session in a chained\n`EnterWorktree` lineage — was still actively standing inside.\n\n## The real incident\n\nDiscovered live during `tsk-4iv-1`'s own merge: the overall approve/merge\noperation only *partially* succeeded — the `git merge` itself landed, but\nthe item's own state transition to `done` then failed with a separate\nerror (\"cannot move to done from stage executing — must pass through\ncompound-learn stage first\", exit code 2). No data was lost (branches and\ncommits survived in the object database), but the worktree directories\nvanished from disk mid-operation without warning, breaking the active\nsession's own `cwd` — including an ancestor worktree the session was\nactively working in, plus its nested child worktree.\n\n## Root cause\n\n`reclaimOrphanedCheckout` force-removed any checkout of a merged branch it\nfound via `git worktree list`, with no check for whether that checkout\nwas the calling session's own live worktree. This is destructive under\nthe documented `tsk-424` chained-`EnterWorktree` pattern (root worktree ->\n`EnterWorktree` into a child item's worktree): approving the child, then\nits root, from inside that chain reclaimed each one's own live worktree\nout from under the session mid-operation.\n\nBefore thi"
+ },
+ {
+  "id": "c09",
+  "kind": "duplicate",
+  "group": "g09",
+  "later": "docs/explanation/driving-loop-worktree-resync-on-reentry.md",
+  "earlier": [
+   "docs/knowledge/how-to-tell-a-stale-worktree-index-apart-from-real-uncommitt/tell-a-stale-worktree-index-apart-from-real-uncommitted-work.md"
+  ],
+  "draft": "# The driving loop now resyncs a re-entered worktree instead of trusting it\n\n`tsk-4gc` closed a real, 100%-reproducible bug: `fgos-coding-driving`'s\nown loop skipped re-claiming a worktree whenever an item's `status` was\nalready `doing` before invoking the `executing`-stage skill — but that\nbypass also skipped `resyncClaimWorktree`, which only ran through `fgos\npick`'s own reattach path.\n\n## Confirmed live and 100% reproducible\n\nOn `tsk-17h` (2026-08-20): after both children (`tsk-17h-1`,\n`tsk-17h-2`) were approved and merged into `fgw/tsk-17h`, re-entering the\nparent's already-standing worktree left its index/working-tree stale\nrelative to the branch's new tip — `git status` showed the just-merged\nfiles as *deleted*, even though `git log` correctly showed the new\ncommits reachable. Required a manual `git reset --hard HEAD` to resync.\nThis is the exact fan-out/pick sequential-then-merge-parent flow both\n`/fgOS:pick` and `fgos-fanout` route through — any root/parent item\nanchored by open children, then re-driven after those children are\napproved, hits this every time.\n\n## What shipped\n\n`fgos-coding-driving`'s claim step is no longer a bare skip when\n`status == 'doing'`. On the loop's first invocation of the\n`executing`-stage skill: run a fresh `fgos pick` claim when not yet\nclaimed, **or run `fgos resync-worktree` (no claim/CAS involved) when\nalready claimed** — never a bare skip either way. Updated across all\nrender copies of both `SKILL.md` and `references/loop-mechanics.md`"
+ },
+ {
+  "id": "c10",
+  "kind": "duplicate",
+  "group": "g10",
+  "later": "docs/explanation/worktree-isolation-existing-path-hazard.md",
+  "earlier": [
+   "docs/knowledge/why-fgos-fanout-treats-a-dispatched-agent-s-worktree-isolati/why-fanouts-worktree-isolation-race-is-a-recoverable-self-heal-not-a-lowered-batch-cap.md"
+  ],
+  "draft": "# The worktree-isolation race in concurrent fanout, precisely characterized — and the fix that actually works\n\n> **Removed door (2026-10-14).** The raw dispatch CLI doors this document\n> mentions — `dispatch execute` (with `--contract`, `--assignment`,\n> `--cwd`/`--repo-root`, `--prompt-file`), `dispatch log` and\n> `dispatch fanout-batch` — were removed (decision 0062 in\n> `docs/platform/runner/decisions/h-36d872fbb0e5.md#0061-unit-ad-hoc-được-preferpersona-mềm-one-liner-fgos-run-workflow-start---units--effort-unit-ghi-nối-nhánh-thay-một-phần-mục-1-của-0047`). Work now runs through `fgos run \"<prompt>\"` /\n> `fgos run --unit` or `fgos workflow start`, and fanout through\n> `node src/runner/fanout-batch.mjs`. The account below is kept as history.\n\n`tsk-u87` resolved a live-blocking hazard for `fgos-fanout`'s concurrent\ndispatch: Claude Code's worktree-isolation state (which worktree\nBash/Edit/Write/git may target) is tracked at the **session** level, not\nper dispatched agent — so a sub-agent entering its own worktree can\nsilently redirect the coordinator's or a sibling's next tool call into\nthe wrong worktree.\n\n## Real incidents that motivated this\n\n- **2026-08-13 (`tsk-1y0`):** 3 sub-agents dispatched concurrently. One\n  sibling was starved completely (6 consecutive `Write` refusals, zero\n  progress); the other two survived only via their own persistent\n  retrying. The coordinator's own shell commands were also repeatedly\n  redirected into a sibling's worktree.\n- **2026-08-19 ("
+ },
+ {
+  "id": "c11",
+  "kind": "duplicate",
+  "group": "g11",
+  "later": "docs/knowledge/how-to-recover-fgos-approve-fgos-sync-root-from-inside-a-wor/recover-approve-sync-root-from-inside-a-worktree-with-trust-dir.md",
+  "earlier": [
+   "docs/knowledge/how-to-run-a-state-writing-fgos-verb-from-inside-a-picked-wo/run-a-state-verb-from-inside-a-worktree.md",
+   "docs/knowledge/why-fgos-merge-now-refuses-outside-the-main-checkout/why-fgos-merge-now-refuses-outside-the-main-checkout.md"
+  ],
+  "draft": "# How to recover `fgos approve`/`fgos sync-root` from inside a worktree with `--trust-dir`\n\nUse this when you need to run `fgos approve <id>` or `fgos sync-root <id>`\nwhile your session's shell is still sitting inside the item's own linked\nworktree (checked out on `fgw/<id>`) instead of the main checkout — for\nexample, right after a `verify-fail-post-merge` block, without leaving the\nworktree session first.\n\n## Before you start\n\nBy default, both verbs refuse outright when invoked from inside any linked\nworktree — a registered `fgos session start` worktree, an ad-hoc `git\nworktree add`, or the item's own `pick`'d worktree. This is deliberate: it\ncloses two real incidents this codebase already hit —\n\n- **`P44`** — without the guard, a merge could silently land on the\n  worktree's own detached HEAD (never main), or a goal-check could verify\n  the worktree's own possibly-stale tree while `approve` still reported\n  \"verified on main.\"\n- **`review-260718`** — the `--github` merge path once called into GitHub\n  and moved the item to `done` *before* this same guard ever ran, reopening\n  the exact same risk from a different code path. The guard is now\n  positioned ahead of every source branch, including `--github`.\n\n`--trust-dir` does not remove either guard — it changes what `repoRoot`\nthose guards check, from your shell's own `cwd` to the value `--dir`\nresolves to.\n\n## Steps\n\n1. **Only use `--trust-dir` together with an explicit `--dir` pointed at\n   the real main checkout.** Withou"
+ },
+ {
+  "id": "c12",
+  "kind": "duplicate",
+  "group": "g12",
+  "later": "docs/knowledge/why-the-decision-id-collision-auto-resolver-only-trusts-a-sh/merge-auto-resolves-decision-id-collision.md",
+  "earlier": [
+   "docs/knowledge/how-to-resolve-an-fgos-approve-merge-conflict-caused-by-two/resolve-a-decision-id-collision-merge-conflict-on-approve.md"
+  ],
+  "draft": "# Why the decision-ID-collision auto-resolver only trusts a shared link target, not a shared id, to detect an edit dispute\n\n`mergeRunnerItemLocked` (`src/runner/merge.mjs`) now attempts one specific,\nproven-real recovery before aborting a conflicted merge: the decision-ID\ncollision `docs/how-to/resolve-a-decision-id-collision-merge-conflict-on-approve.md`\nalready documents by hand (`tsk-66l`'s real occurrence). This traces the one\ndesign decision in that implementation most likely to bite a future reader —\nwhy the classifier's first version was wrong, and what the real fix was.\n\n## The shape being auto-resolved\n\nTwo branches independently pick the same \"next free\" decision id and each\ninsert their own new row into `docs/decisions/0000-index.md` at the same\nposition, under two *different* files. `classifyDecisionIndexCollision`\nrecognizes this by requiring: the ONLY conflicted path is the index file,\nevery conflict hunk is a pure two-sided insertion (both sides non-empty, no\nidentical line shared), and every inserted line matches the index's own row\nshape. When it matches, `autoResolveDecisionIndexCollision` renumbers the\nincoming branch's colliding file(s) to the real next-free id (never\ntouching `HEAD`'s own numbering — `HEAD` is always treated as already-\nauthoritative, the same \"find the real next-free ID from main\" step the\nhow-to's step 2 already does by hand) and merges both rows into the index,\nsorted numerically.\n\n## The bug caught before it shipped: id-equality is no"
+ },
+ {
+  "id": "c13",
+  "kind": "duplicate",
+  "group": "g13",
+  "later": "docs/knowledge/why-the-verify-fail-post-merge-playbook-s-retry-step-moves-a/why-the-verify-fail-post-merge-playbook-retries-through-awaiting-approval-not-proposed.md",
+  "earlier": [
+   "docs/knowledge/how-to-diagnose-an-fgos-approve-blocked-by-verify-fail-post/diagnose-a-verify-fail-post-merge-block-on-approve.md",
+   "docs/knowledge/why-merge-loop-self-diagnoses-only-verify-fail-post-merge-ne/merge-loop-self-diagnoses-verify-fail-post-merge.md"
+  ],
+  "draft": "# Why the verify-fail-post-merge playbook retries through `awaiting-approval`, not `proposed`\n\n`plugins/fgOS/skills/merge-loop/SKILL.md`'s `verify-fail-post-merge`\nplaybook (step 5) documented `fgos move <id> --to proposed` as the FSM\nrecovery door from `blocked` back to a retryable state. `proposed` does\nnot exist in `status-fsm.mjs` — confirmed both by grep (no match) and\nlive, while driving `tsk-1wr`: `fgos move tsk-1wr --to proposed --expect\nblocked` was refused outright: `no transition from blocked to proposed\nfor work tsk-1wr -- valid targets from blocked are: todo, doing,\nawaiting-approval, delivered, wontfix`.\n\nThe correct door, proven live on the same item: `fgos move tsk-1wr --to\nawaiting-approval --expect blocked` succeeded, and the retried `approve`\nlanded cleanly. `awaiting-approval` is the status `approve`'s own case in\n`bin/fgos.mjs` reads to attempt a merge in the first place — the natural\nre-entry point for \"retry the merge,\" not a separate staging status that\nwas never built.\n\nThe fix scoped to exactly this: the state name in both the command and\nits own FSM-door description at `SKILL.md` lines 204-206, nothing else in\nthe playbook's logic.\n\n## Two more stale references, same class (`tsk-63jf`)\n\nFound in the same post-batch audit that surfaced `tsk-3q8`: two more\ntext-only stale references, both fixed together since they're the same\nclass (a description or comment citing something that has since changed\nor was never quite right, with the *described behavior*"
+ },
+ {
+  "id": "c14",
+  "kind": "duplicate",
+  "group": "g14",
+  "later": "docs/explanation/approve-owns-self-recovery-merge-loop-thin-caller.md",
+  "earlier": [
+   "docs/explanation/catchup-self-recovery-shared-reference.md"
+  ],
+  "draft": "# Self-recovery moved from `merge-loop` into `approve` itself\n\n`tsk-6av` re-architected where merge self-recovery lives, directly\nbuilding on [`tsk-c5u`'s own finding](catchup-self-recovery-shared-reference.md)\nthat self-recovery playbooks were scattered across skill files and never\nreached `approve/SKILL.md` — the skill an interactive session actually\nuses to drive a single item's merge.\n\n## The remaining problem after `tsk-c5u`\n\n`tsk-c5u` extracted the self-recovery decision logic into a shared\nreference file and pointed `approve` at it — but the merge pipeline was\nstill passive on failure in a structural sense: `merge-next` stopped and\nreported instead of self-recovering even when it could, and `merge-loop`\ndidn't automatically advance past a blocked item in the pool. Root cause:\nthe self-recovery decision tree lived in `merge-loop/SKILL.md` and its\nown `blocked-pick-decision-tree.md` reference — but `approve` is the\nlayer that actually *attempts* the merge and hits the block in the first\nplace (`merge-next` itself only picks a frontier id, then calls\n`approve`).\n\n## What shipped\n\nSelf-recovery playbooks (`merge-conflict`, `verify-fail-post-merge`,\n`verify-timeout-post-merge`) now run **directly inside `approve`**, on\nevery attempt — before `merge-loop` ever sees a blocked pick at all.\n`approve/SKILL.md`'s own park-handling table changed `merge-conflict`\nand `verify-fail-post-merge`/`verify-timeout-post-merge` from \"no\n[self-recovery]\" to \"yes: run the shared playbook, the"
+ },
+ {
+  "id": "c15",
+  "kind": "duplicate",
+  "group": "g16",
+  "later": "docs/explanation/worker-prompt-inline-completion-signal.md",
+  "earlier": [
+   "docs/explanation/dispatch-execute-unsignaled-outcome.md",
+   "docs/explanation/unsignaled-detection-backtick-false-positive.md"
+  ],
+  "draft": "# The completion-signal instruction was three file-hops away from the worker that needed to read it\n\n`tsk-3km` fixed a reliability gap: `worker-prompt-skill-pointer.txt` and\n`worker-prompt-default.txt` (the real prompt templates rendered for an\nout-of-process worker) never stated the `[DONE]`/`[BLOCKED]`\ncompletion-signal requirement directly. The instruction only reached a\nheadless worker through a 3-hop file redirect chain: the prompt's\n`{skillPath}` → `.claude/skills/fgos-coding-implement/SKILL.md` (a thin\nwrapper) → `.agents/skills/fgos-coding-implement/SKILL.md` →\n`../_shared/coding-worker-contract.md`. Only `worker-prompt-discovery.txt`\nwas self-contained for this — its own \"How to finish\" section is written\ndirectly into that template.\n\n## Confirmed live 4 times, 2 distinct root causes\n\n`coding-worker-contract.md` already documented two prior instances of\nworkers not signaling completion correctly:\n\n- `tsk-1dsr` — a git permission denial case,\n- `tsk-5gd` — a backtick-quoted `[DONE]` false positive (a parsing bug,\n  already fixed).\n\nThis item added a third, independent root cause — the instruction never\nreaching the worker's context at all in a one-shot headless dispatch, not a\nparsing bug — confirmed twice more before the fix landed:\n\n- **`tsk-2ux`** (2026-08-23) — a real, correct dispatch (`agy`/gemini,\n  commit `f1643e39`, correct diff, 309/309 tests passed) still returned\n  `outcome: 'unsignaled'`, no `[DONE]` token anywhere in stdout, forcing\n  driver-side git for"
+ },
+ {
+  "id": "c16",
+  "kind": "duplicate",
+  "group": "g17",
+  "later": "docs/explanation/dispatch-attestation-level-2-enforcement-halt.md",
+  "earlier": [
+   "docs/knowledge/worktree-dispatch-attestation-level-1-advisory-only-never-a/worktree-dispatch-attestation-level-1-advisory-only.md"
+  ],
+  "draft": "# From advisory-only to a real halt — closing the gap a wrongly-spawned worker exposed\n\n`tsk-34o5` escalated worktree-dispatch attestation from advisory-only\n(level 1, `tsk-2ig`/`tsk-4hl`) to a real enforcement halt at\nreap/return/approve, closing the exact gap\n[`tsk-43z`](dispatch-execute-repo-root-cwd-separation.md)'s own incident\nexposed: a wrongly-spawned worker committed straight to `main`, caught\nonly by luck plus a manual revert.\n\n## What level 1 already had, unchanged here\n\nLevel 1 already captured `baseCommit`/`headRef` for a real worktree\ndispatch before spawn (`captureDispatchAttestation`,\n`src/runner/dispatch/transport.mjs:113-127`) and persisted it into an\n`executor.dispatch` event (`src/runner/loop.mjs`), plus an advisory-only\n`footprintDiffHits` check (`src/runner/frozen-judge.mjs`). None of that\ncapture/persist machinery changed — this item only added a consumer that\nactually acts on what was already being recorded.\n\n## Why enforcement, and why now\n\nThree reasons recorded directly in the item's own text: (1) `tsk-43z` is\nreal proof this failure mode happens — the root-cause fix for that\nincident already landed, but nothing enforced the *next* variant of the\nsame class. (2) It complements schedule-ahead dispatch\n(`computeSchedule`'s footprint-declared wave planning): rather than\npaying the cost of a live, global runtime ledger the way upstream\n`beehive` does, fgOS enforces at the boundary instead — paying the cost\nonly when a real violation occurs. (3) It conve"
+ },
+ {
+  "id": "c17",
+  "kind": "duplicate",
+  "group": "g18",
+  "later": "docs/knowledge/why-every-agent-task-tool-dispatch-is-enforced-through-a-pre/why-dispatch-decide-is-a-hard-hook-enforced-gate-not-a-convention.md",
+  "earlier": [
+   "docs/knowledge/how-to-wire-a-skill-through-the-dispatch-decision/wire-a-skill-through-the-native-vs-cli-spawn-dispatch-decision.md"
+  ],
+  "draft": "# Why `dispatch decide` is a hard, hook-enforced gate, not a convention\n\n> **Removed door (2026-10-14).** The raw dispatch CLI doors this document\n> mentions — `dispatch execute` (with `--contract`, `--assignment`,\n> `--cwd`/`--repo-root`, `--prompt-file`), `dispatch log` and\n> `dispatch fanout-batch` — were removed (decision 0062 in\n> `docs/platform/runner/decisions/h-36d872fbb0e5.md#0061-unit-ad-hoc-được-preferpersona-mềm-one-liner-fgos-run-workflow-start---units--effort-unit-ghi-nối-nhánh-thay-một-phần-mục-1-của-0047`). Work now runs through `fgos run \"<prompt>\"` /\n> `fgos run --unit` or `fgos workflow start`, and fanout through\n> `node src/runner/fanout-batch.mjs`. The account below is kept as history.\n\n`tsk-5tm` had already written and gotten approval for the final wording of\n`AGENTS.md`'s `## Dispatch` section — but approval alone didn't make it\nreal: the agreed text sat unread inside `docs/history/\ntask-dispatch-unification/DISCUSSION.md`, and the version actually live in\n`AGENTS.md` was a weaker paraphrase with none of `tsk-5tm`'s real\nstructure. This item is what closed that gap by making \"every dispatch\ngoes through `decide`\" a mechanically enforced rule instead of prose\nsomeone has to remember to read.\n\n## The evidence that prose alone doesn't work\n\n> D1: \"moi dispatch\" la CUONG CHE CUNG (hook chan that), khong phai\n> convention/prose\n\nThe proof was found live, inside the very session that produced this\nitem: that session itself fired `Agent(subagent_type: \"fork\")`"
+ },
+ {
+  "id": "c18",
+  "kind": "duplicate",
+  "group": "g19",
+  "later": "docs/explanation/cross-provider-egress-governance.md",
+  "earlier": [
+   "docs/knowledge/executor-cross-provider-governance/executor-cross-provider-governance.md"
+  ],
+  "draft": "# The gate checked the command name, not where the data actually went\n\n`tsk-5x7-2` is the second of `tsk-5x7`'s three dependency-free children —\nthe governance-egress fix, kept deliberately dependency-free from the\nDispatchPlan piece.\n\n## The gap\n\nThe cross-provider governance gate (`resolve.mjs:322`) inspected only\n`executor.command` against `CLAUDE_CLI_COMMANDS` — blind to an env\noverride. `glm`, the executor `tsk-gb3` added, keeps\n`command: \"claude\"` while routing to OpenRouter's GLM 5.2 entirely\nthrough an env override. Real egress was cross-provider; the old gate\nnever saw it.\n\n## Deliberately dependency-free, not a vocabulary refactor\n\nThis item's own framing is explicit: this is a live policy hole, not a\nvocabulary refactor — it must not sit behind a structural redesign. The\nfix uses only fields that already existed:\n`executor.providerModel`, `invocations[].command`, `invocations[].env`,\n`allowCrossProvider`, `carries`. It reuses the ALREADY-BUILT\n`EXECUTOR_CARRIES` enum (`config.mjs:364`, already enforced at\n`resolve.mjs:243-258`) as the egress content vocabulary, rather than\ninventing a parallel one.\n\n## What shipped\n\nA declared-egress check — `providerFamily` + an `egress` descriptor\n(`kind`, `target`, `content`) — replaces the old command-name gate.\n`plan.governance` is populated with the resolved egress descriptor so it\nreaches the dispatch audit event. This piece deliberately does NOT edit\n`cli.mjs` — the event-writing half was hoisted into the sibling\n`DispatchP"
+ },
+ {
+  "id": "c19",
+  "kind": "duplicate",
+  "group": "g20",
+  "later": "docs/knowledge/herdr-plugin-dashboard-layout-work-items-panel-action-queue/herdr-dashboard-layout-and-action-queues.md",
+  "earlier": [
+   "docs/knowledge/why-herdr-s-dashboard-lists-became-real-tables-and-why-in-pr/herdr-dashboard-table-view-scope-and-sort.md"
+  ],
+  "draft": "# herdr-plugin dashboard layout: work-items panel + action-queue boxes\n\n`tsk-1d5` redesigned herdr-plugin's TUI (`herdr-plugin/src/ui.rs`) from a\n2-pane Work-items/In-process split into a left \"browse all work\" panel\nplus a right \"action queues\" panel of 3 separate boxes. This is the\nlocked layout spec for that redesign.\n\n## Left panel: Work Items\n\n- **Tabs**: `TODO` / `DOING` / `REVIEW` / `DONE` — filtered client-side\n  over one `fgos triage --json --all` response; no separate CLI call per\n  tab.\n- **Columns**, in order: `ID`, `Tier`, `Priority`, `Status`, `Stage`,\n  `Blocked By`, `Blocks`, `Title`.\n- **Row order**: `priority` field, ascending — smaller number is higher\n  priority (`priority-formula.mjs`'s inverted scale, `computePriority` =\n  `impact × weight(urgency) / effort × risk-discount`, wired at\n  `resolveDiscovery`/`resolveDecompose`). This replaces `rankImpact`'s\n  own default order (tier → blocks desc → component size) for display\n  purposes.\n- **`DONE` tab** also includes `wontfix` (canceled) items, not just the\n  `delivered`/`retrospective`/`cleanup`/`done` tail chain.\n- **Filter/search**: `/` key activates a one-line search that expands at\n  the bottom, overlaying the status bar; `Esc` cancels, `Enter` applies;\n  hidden by default. Applies to the Work Items panel only — it never\n  filters the 3 right-side boxes.\n\n## Right panel: 3 separate action-queue boxes\n\nNever merged into one table — always 3 distinct bordered boxes:\n\n| Box | Membership | Source |\n|---|--"
+ },
+ {
+  "id": "c20",
+  "kind": "duplicate",
+  "group": "g21",
+  "later": "docs/knowledge/why-herdr-cockpit-stacked-worker-launches-into-a-single-reus/why-herdr-cockpit-stacked-worker-launches-into-one-pane.md",
+  "earlier": [
+   "docs/knowledge/why-auto-launched-herdr-panes-must-be-labeled-before-spawnin/why-auto-launched-herdr-panes-must-be-labeled-before-spawning-claude.md"
+  ],
+  "draft": "# Why herdr cockpit stacked worker launches into one pane\n\nA review after `tsk-2sj` merged (worker-slot occupancy;\n`docs/explanation/worker-slot-is-the-engine-owned-occupancy-unit-across-every-launcher.md`)\nfound three real defects in herdr-plugin, all rooted in the same shape:\ntwo launch guards keyed on pane labels that nothing was actually writing\nat the moment the guard checked them. Full evidence trail:\n`docs/history/herdr-cockpit-pane-guard-reuse-and-boot-window/`.\n\n## Defect 1: a reused pane was retired on its previous occupant's stale label\n\n`retire_settled_pending_panes` (`app.rs:805-819`) retired a reused pane\nthe instant it saw *any* label on it — including the label the\n*previous* occupant had left behind, not a fresh label from the new\nlaunch. That let herdr keep stacking new worker launches into the same\npane for the whole claim window, since the guard treated a stale label as\nproof the new launch had already settled.\n\n**Fix**: cross-check the label's task id against `doing_item_ids()` — a\nlabel only counts as \"this pane has settled\" when it names a task that is\nactually `doing` right now, not merely present.\n\n## Defect 2: auto-discover had no boot-window guard\n\n`main.rs:494-501`'s auto-discover launch condition relied on\n`discovery_worker_alive`, which only turns true *after* the discovery\nworker's own claim lands — leaving a real window at boot where the\ncondition read false and auto-discover could launch a second discovery\nworker before the first one's claim h"
+ },
+ {
+  "id": "n01",
+  "kind": "new",
+  "draft": "We need to export fgos run data to Prometheus to draw charts in Grafana, tracking the number of workers currently running and the time for each run."
+ },
+ {
+  "id": "n02",
+  "kind": "new",
+  "draft": "When an item has been blocked for too long, an email should be sent to the project owner via SMTP."
+ },
+ {
+  "id": "n03",
+  "kind": "new",
+  "draft": "Write a Python library to call fgos from a script, so there is no need to shell out to the CLI."
+ },
+ {
+  "id": "n04",
+  "kind": "new",
+  "draft": "The gateway's web dashboard needs a dark-mode toggle button; at night it is too glaring on the eyes."
+ },
+ {
+  "id": "n05",
+  "kind": "new",
+  "draft": "The CLI's error messages should have a Vietnamese version, with the language selectable in the config."
+ },
+ {
+  "id": "n06",
+  "kind": "new",
+  "draft": "Consider selling a commercial edition: issue license keys and split paid plans by seat count."
+ }
+]

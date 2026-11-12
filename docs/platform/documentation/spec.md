@@ -80,7 +80,7 @@ Each step is one phase that ships something checkable on its own. Revised on 202
 
 1. **Retrospective writer adds evidence to claim units** (stop 1 of document identity; item `p-ixrbglli5o`), with the cleanup gate accepting the evidence or the admission handoff. Cuts the main source without new technology.
 2. **doc-checks**: path input, the verb and rule-claim rules, staged reads and the pre-commit gate (item `p-cd2ejz7wa5`); the 6 documents with invalid YAML frontmatter.
-3. **Locate through pkm with OHS**: register both as tool providers, the fgOS locate door (translation, top 10, log), doctor freshness checks.
+3. **Locate through pkm with OHS**: link `pkm-core` into the `fgos` host behind a locate port, register OHS as a tool provider, the `fgos doc locate` door (translation, top 10, log), doctor freshness checks, and the recall regression set as a repeatable measurement.
 4. **Admission**: effect checks at the doors, the reviewer run, the frame and its weekly ceiling, refusal texts.
 5. **Write door**: the skill, the pointer seed, live templates.
 6. **Observer**: pkm's structural proposals into fgOS work items; merging the 479 story documents into claim units over time.
