@@ -1276,7 +1276,7 @@ impl GitDriver {
             let result = loan.run_borrowed(
                 &fgos_holder_lock::BorrowSpec {
                     argv,
-                    cwd: Some(cwd.into()),
+                    cwd: Some(child_path(cwd)),
                     env: env.0,
                     clear_env: true,
                     stdio: fgos_holder_lock::BorrowStdio::Null,
@@ -1327,7 +1327,7 @@ impl GitDriver {
             bwrap_prefix: None,
             fd_map: Vec::new(),
             env: env.0,
-            cwd: cwd.into(),
+            cwd: child_path(cwd),
             stdin: Some(pipe_file(stdin_r)),
             stdout: Some(pipe_file(stdout_w)),
             stderr: Some(pipe_file(stderr_w)),
@@ -1781,8 +1781,25 @@ impl Output {
 }
 fn text_path(path: &Path) -> Result<String> {
     path.to_str()
-        .map(str::to_owned)
+        .map(|text| plain_drive_path(text).unwrap_or(text).to_owned())
         .ok_or_else(|| failure("non-utf8-authority-path"))
+}
+/// A path as a child Git process receives it. `fs::canonicalize` returns a Windows verbatim drive
+/// path (`\\?\D:\...`), the driver's one internal spelling of a real path; Git rejects it as
+/// `GIT_DIR` or `-C`, so every path that leaves for a child passes through here (or `text_path`)
+/// and nowhere else.
+fn child_path(path: &Path) -> PathBuf {
+    path.to_str()
+        .and_then(plain_drive_path)
+        .map_or_else(|| path.to_path_buf(), PathBuf::from)
+}
+/// The plain spelling of a verbatim drive path, `None` for any other path. A verbatim UNC path
+/// (`\\?\UNC\host\share`) stays as it is: it has no plain drive spelling.
+fn plain_drive_path(path: &str) -> Option<&str> {
+    let rest = path.strip_prefix(r"\\?\")?;
+    let bytes = rest.as_bytes();
+    (bytes.len() >= 3 && bytes[0].is_ascii_alphabetic() && bytes[1] == b':' && bytes[2] == b'\\')
+        .then_some(rest)
 }
 /// The main checkout of the repository holding `start` (or the repository
 /// directory of a bare one), read from disk only: it walks up from `start`
@@ -3376,6 +3393,45 @@ mod tests {
             release(handle),
             fgos_holder_lock::Release::Released { .. }
         ));
+    }
+    #[test]
+    fn verbatim_drive_paths_are_written_plainly_and_nothing_else_changes() {
+        assert_eq!(
+            plain_drive_path(r"\\?\D:\a\forgent\repo"),
+            Some(r"D:\a\forgent\repo")
+        );
+        assert_eq!(plain_drive_path(r"\\?\d:\"), Some(r"d:\"));
+        assert_eq!(plain_drive_path(r"\\?\UNC\host\share\repo"), None);
+        assert_eq!(plain_drive_path(r"\\?\D:"), None);
+        assert_eq!(plain_drive_path(r"D:\a\forgent"), None);
+        assert_eq!(plain_drive_path("/tmp/forgent"), None);
+    }
+    #[test]
+    fn a_path_reaches_a_child_git_only_through_the_plain_spelling() {
+        let source = include_str!("driver.rs");
+        let start = source
+            .find("pub(crate) fn invoke_input(")
+            .expect("invoke_input");
+        let body = &source[start..];
+        let body = &body[..body.find("\n    }\n").expect("end of invoke_input")];
+        for banned in [".to_str()", ".to_string_lossy()", ".display()"] {
+            assert!(
+                !body.contains(banned),
+                "invoke_input spells a path with {banned}: use text_path or child_path"
+            );
+        }
+        for line in body.lines() {
+            let carries_path = ["--git-dir=", "--work-tree=", "core.hooksPath=", "cwd:"]
+                .iter()
+                .any(|key| line.contains(key));
+            assert!(
+                !carries_path
+                    || line.trim_end().ends_with("&Path,")
+                    || line.contains("text_path(")
+                    || line.contains("child_path("),
+                "a path-valued argument bypasses the plain spelling: {line}"
+            );
+        }
     }
     #[test]
     fn shell_paths_use_forward_slashes_only_on_windows() {

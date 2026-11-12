@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "7edf992e9ffa3d4909a122554221aba0128830a32f389dd1b3afc8d9c6299f71",
+  "payloadDigest": "09d38a15f2f8a7d4a4197bfd826d6c987a150bf62c78edd062ca0f214f229461",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -390,7 +390,7 @@
     "packages/git/node-addon/src/single_load.rs": "91190bfaa1e0476b3e65559318f7fd3475844070afaca38d72d0c3018da6d825",
     "packages/git/node-addon/src/yaml.rs": "cdb0ecd0b330966e5fd3c8e41e2069bf87722f1ac16df8363e514e9441d4432c",
     "packages/git/node-addon/tests/yaml_parts.rs": "835efdf2a4183cd1197385f318bfb370db8804ae9f4e8e500548c75fd6a3462f",
-    "packages/git/rust/src/driver.rs": "be9e63e50807ef34e371bd3a786f3b0cc5512954c0af8c08759a38015c8fcdc8",
+    "packages/git/rust/src/driver.rs": "2e2f3200ed3af07e041c41a936110aacd6451bafb5c28ac9880ef6f5760704f6",
     "packages/git/rust/src/inspect.rs": "f01f4b4709058650ef9643c8331aa20ab69eef7353abca9769eacb8b829fa2e7",
     "packages/git/rust/src/land.rs": "3397a76d1f4c00b4d1ca20a3394f445b129d59f59a031c5c9cd419665f684803",
     "packages/git/rust/src/lib.rs": "893a5d7e030d70bfca10662b97bfeba8a323ea739dcd5727735203ec677bc2a0",
@@ -2412,19 +2412,19 @@
       "path": "packages/git/rust/src/driver.rs",
       "line": 1325,
       "spawn": "Command::new <- packages/process/rust/src/mapped.rs:226",
-      "binary": "? path.to_str() .map(str::to_owned) .ok_or_else(|| failure(\"non-utf8-authority-pat",
+      "binary": "? path.to_str() .map(|text| plain_drive_path(text).unwrap_or(text).to_owned()) .ok",
       "class": "git-driver"
     },
     {
       "path": "packages/git/rust/src/driver.rs",
-      "line": 3055,
+      "line": 3072,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"
     },
     {
       "path": "packages/git/rust/src/driver.rs",
-      "line": 3366,
+      "line": 3383,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"
