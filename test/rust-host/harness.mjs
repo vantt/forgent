@@ -668,6 +668,10 @@ export async function runDifferentialCase(entryA, entryB, testCase, options = {}
 /**
  * Runs multi-step isolated write (e.g. init then add in clean temp repos).
  */
+// A step in a fresh machine home runs the git floor probe from scratch (dozens of sandboxed git runs), and the
+// suite runs many cases at once, so a loaded runner needs far more than a lone case's bound.
+const ISOLATED_STEP_TIMEOUT_MS = 90000;
+
 async function runMultiStepIsolatedWrite(entryA, entryB, testCase, options = {}) {
   const scratchA = path.join(os.tmpdir(), "fgos-iso-A-" + crypto.randomBytes(6).toString("hex"));
   const scratchB = path.join(os.tmpdir(), "fgos-iso-B-" + crypto.randomBytes(6).toString("hex"));
@@ -690,6 +694,7 @@ async function runMultiStepIsolatedWrite(entryA, entryB, testCase, options = {})
       id: `${testCase.id}-step1-init`,
       args: ["init"],
       modes: ["semantic-json"],
+      timeoutMs: ISOLATED_STEP_TIMEOUT_MS,
       cwd: scratchA,
       env: { HOME: homeA, USERPROFILE: homeA },
       ignoreChildren: true,
@@ -731,6 +736,7 @@ async function runMultiStepIsolatedWrite(entryA, entryB, testCase, options = {})
         "--description", "harness task description",
       ],
       modes: ["semantic-json"],
+      timeoutMs: ISOLATED_STEP_TIMEOUT_MS,
       cwd: scratchA,
       ignoreChildren: true,
     };
@@ -776,7 +782,7 @@ async function runMultiStepIsolatedWrite(entryA, entryB, testCase, options = {})
     const differences = [...initComparison.differences, ...addComparison.differences];
     // A failed step is only diagnosable from what it exited with and said.
     for (const [step, a, b] of [["init", initResA, initResB], ["add", addResA, addResB]]) {
-      if (differences.length > 0) differences.push(`${step}: A exit ${a.exitCode} stderr ${JSON.stringify(a.stderrText.slice(0, 600))}; B exit ${b.exitCode} stderr ${JSON.stringify(b.stderrText.slice(0, 600))}`);
+      if (differences.length > 0) differences.push(`${step}: A exit ${a.exitCode} signal ${a.signal} after ${a.wallClock?.durationMs} ms stderr ${JSON.stringify(a.stderrText.slice(0, 600))}; B exit ${b.exitCode} signal ${b.signal} after ${b.wallClock?.durationMs} ms stderr ${JSON.stringify(b.stderrText.slice(0, 600))}`);
     }
     if (JSON.stringify(normCreatedA) !== JSON.stringify(normCreatedB)) {
       differences.push(`Created delta mismatch: ${JSON.stringify(normCreatedA)} !== ${JSON.stringify(normCreatedB)}`);
