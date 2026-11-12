@@ -946,6 +946,28 @@ fn read_tracked_pin(distribution_path: &Path) -> PinFile {
     }
 }
 
+/// The release tag already on record for `digest`: the committed pin's when
+/// the pin names that release, else the current activation's pin snapshot
+/// when it does. A repair re-publishes a release that was activated before, so
+/// it keeps that tag; a release neither names has no tag that can be fetched
+/// again, and the pin it gets is digest-only.
+fn recorded_release_tag(
+    pin: PinFile,
+    activation: &WorkspaceActivationBinding,
+    digest: &str,
+) -> Option<String> {
+    let from_pin = pin
+        .present()
+        .filter(|p| p.project_runtime.artifact_digest == digest)
+        .and_then(|p| p.project_runtime.release_version);
+    from_pin.or_else(|| {
+        let runtime = activation.pin_snapshot.get("projectRuntime")?;
+        (runtime.get("artifactDigest")?.as_str()? == digest)
+            .then(|| runtime.get("releaseVersion")?.as_str().map(str::to_string))
+            .flatten()
+    })
+}
+
 /// The release `fgctl init --override-pin` may activate: one that differs
 /// from the tracked pin and is already staged in the machine store
 /// (`releases/<digest>/`; a quarantined release has been moved out of it).
@@ -2101,6 +2123,12 @@ pub fn repair_workspace(start_dir: &Path) -> Result<(), InitError> {
     let lock = ActivationLockGuard::acquire(&workspace_root)?;
     cleanup_stale_activation_tmp_files(&installation_dir);
 
+    let release_tag = recorded_release_tag(
+        read_tracked_pin(&workspace_root.join(PIN_FILE_RELATIVE)),
+        &current_activation,
+        &target_digest,
+    );
+
     publish_and_tail(PublishArgs {
         workspace_root: &workspace_root,
         store_root: &store_root,
@@ -2109,7 +2137,7 @@ pub fn repair_workspace(start_dir: &Path) -> Result<(), InitError> {
         previous_artifact_digest: None,
         tracked_pin: None,
         update_pin: true,
-        release_tag: None,
+        release_tag: release_tag.as_deref(),
         pin_override_reason: None,
         _lock: &lock,
     })
@@ -2567,6 +2595,58 @@ mod tests {
 
     const PINNED: &str = "sha256:1111111111111111111111111111111111111111111111111111111111111111";
     const OTHER: &str = "sha256:2222222222222222222222222222222222222222222222222222222222222222";
+
+    fn activation_snapshotting(digest: &str, tag: Option<&str>) -> WorkspaceActivationBinding {
+        serde_json::from_value(serde_json::json!({
+            "schemaVersion": 1,
+            "repositoryId": "r",
+            "workspaceId": "w",
+            "workStateId": "s",
+            "activationId": "a",
+            "status": "ready",
+            "artifactDigest": digest,
+            "releasePath": "/store/release",
+            "shimVersion": "1",
+            "resolvedDependencies": {},
+            "pinSnapshot": { "projectRuntime": { "artifactDigest": digest, "releaseVersion": tag } },
+            "activatedAt": "2026-11-12T00:00:00Z",
+            "activatedBy": { "tool": "fgctl", "version": "0" },
+        }))
+        .unwrap()
+    }
+
+    #[test]
+    fn a_repaired_release_keeps_the_tag_the_pin_or_the_activation_already_names() {
+        let tagged_pin = || {
+            let mut pin = pin_for(PINNED);
+            pin.project_runtime.release_version = Some("v1.2.0".to_string());
+            PinFile::Present(pin)
+        };
+        let untagged = activation_snapshotting(PINNED, None);
+        let tagged = activation_snapshotting(PINNED, Some("v1.1.0"));
+
+        let tag = |pin, activation: &WorkspaceActivationBinding, digest| {
+            recorded_release_tag(pin, activation, digest)
+        };
+        assert_eq!(
+            tag(tagged_pin(), &untagged, PINNED).as_deref(),
+            Some("v1.2.0")
+        );
+        assert_eq!(
+            tag(PinFile::Absent, &tagged, PINNED).as_deref(),
+            Some("v1.1.0")
+        );
+        assert_eq!(
+            tag(PinFile::Unreadable, &tagged, PINNED).as_deref(),
+            Some("v1.1.0")
+        );
+        assert_eq!(
+            tag(tagged_pin(), &tagged, OTHER),
+            None,
+            "a release neither names has no tag"
+        );
+        assert_eq!(tag(PinFile::Absent, &untagged, PINNED), None);
+    }
 
     #[test]
     fn pin_override_selects_a_staged_release_that_differs_from_the_pin() {

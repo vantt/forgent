@@ -24,7 +24,8 @@ pub enum FgctlRefresh {
     /// The release ships no `fgctl` (built before it shipped); nothing was written.
     NotShipped,
     /// The installed bytes already are the release's `fgctl`; nothing was written.
-    UpToDate { digest: String },
+    /// `release` is the active release's short digest, the one the closing block names.
+    UpToDate { release: String },
     /// The installed binary now holds the release's bytes; the old bytes are at `previous`.
     Replaced { previous: PathBuf, digest: String },
 }
@@ -125,7 +126,7 @@ pub fn refresh_fgctl(
     })?;
     if sha256_hex(&old_bytes) == entry.digest {
         return Ok(FgctlRefresh::UpToDate {
-            digest: entry.digest.clone(),
+            release: crate::init::short_digest(artifact_digest),
         });
     }
 
@@ -437,7 +438,7 @@ mod tests {
         assert_eq!(
             outcome,
             FgctlRefresh::UpToDate {
-                digest: sha256_hex(b"the same fgctl")
+                release: crate::init::short_digest(&digest)
             }
         );
         assert_eq!(machine_listing(&scratch.0), ["fgctl"]);

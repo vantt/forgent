@@ -71,7 +71,8 @@ Examples:
 
 Exit codes:
   0 activated, or nothing to do   1 failed (the message names the cause)
-  2 usage error
+  2 usage error, or activated but not ready (the checks listed need you)
+  4 unreadable pin (.fgos/distribution.json is not valid JSON)
 
 Next:
   fgos doctor --json, then fgos run \"<prompt>\".
@@ -107,7 +108,8 @@ Examples:
 
 Exit codes:
   0 upgraded, or already current   1 failed (the activation stands when the
-  failure is only the fgctl refresh)   2 usage error
+  failure is only the fgctl refresh)
+  2 usage error, or activated but not ready (the checks listed need you)
 
 Next:
   fgctl verify, then fgos doctor --json. To go back: fgctl repair.
@@ -336,7 +338,7 @@ pub fn print_overview() {
     println!("  help      Show this overview, or `fgctl help <command>`");
     println!();
     println!("Run `fgctl <command> --help` for what a command changes, its options, examples and exit codes.");
-    println!("Exit codes: 0 ok, 1 failed, 2 usage error.");
+    println!("Exit codes: 0 ok, 1 failed, 2 usage error or not ready, 4 unreadable pin.");
 }
 
 pub fn print_verb_help(verb: &Verb) {

@@ -55,8 +55,8 @@ fn refresh_own_binary(cwd: &std::path::Path) {
         }
     };
     match refresh_fgctl_for_workspace(cwd, &installed) {
-        Ok(FgctlRefresh::UpToDate { digest }) => {
-            eprintln!("fgctl: up to date with the release ({digest})");
+        Ok(FgctlRefresh::UpToDate { release }) => {
+            eprintln!("fgctl: up to date with the release ({release})");
         }
         Ok(FgctlRefresh::NotShipped) => {
             eprintln!(
