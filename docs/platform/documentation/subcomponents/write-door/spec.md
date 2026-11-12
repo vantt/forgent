@@ -4,7 +4,7 @@
 Document type: BA-grade subcomponent specification
 Audience: Human reviewer, maintainer, implementation agent, documentation agent
 Purpose: Define the one door through which any agent writes, changes, moves or retires maintained documentation, and the steps it follows
-Design status: Draft, split out of the documentation area spec on 2026-11-12, with its owner-finding step replaced by locate from document identity. Not signed. Open questions in section 11.
+Design status: Draft, split out of the documentation area spec on 2026-11-12, with its owner-finding step replaced by locate from document identity. Not signed. The questions of section 11 are decided (owner, 2026-11-12).
 Implementation: Not started. The doors it calls exist (Convention, the knowledge registry, doc-health, the decision index); the skill, the pointer line and the live templates do not
 Canonical: No (becomes canonical when signed)
 Provenance: Sections 3, 4, 6.1, 7 and the template concept of the documentation area spec as of 2026-11-07, moved here when the owner split the area into subcomponents on 2026-11-12
@@ -110,7 +110,7 @@ One template per document kind the door creates (spec, contract, architecture, d
 
 This is item `p-ixrbglli5o`. The retrospective writer (`fgos-coding-knowledge`) follows the same steps: locate, then grow or re-attest an existing section by default. It requests a creation only through admission.
 
-Condition before it ships: a retrospective item whose knowledge fits no section and gets no admitted creation leaves material. Today the cleanup gate (`checkRetrospectiveContent` in `src/state/cleanup-harness.mjs`) accepts only a non-engine decision, a linked existing document or a registry attestation, so such an item parks at cleanup. The item must first give that case a legitimate completion path. It never weakens the gate and never manufactures a decision to pass it.
+Condition before it ships: a retrospective item whose knowledge fits no section and gets no admitted creation leaves material. Today the cleanup gate (`checkRetrospectiveContent` in `src/state/cleanup-harness.mjs`) accepts only a non-engine decision, a linked existing document or a registry attestation, so such an item parks at cleanup. The completion path (decided 2026-11-12): the writer puts the material into its admission request for a creation, with the locate result, and the retrospective item records `material handed to admission request <id>`. The cleanup gate accepts that record as a fourth kind of evidence, after checking that the request exists and carries the material and the locate result. If admission admits, the document is created from that material; if it refuses, the material stays in the request item, where the observer can use it (for example to propose a sub-area when several requests share an identifier cluster). This changes the cleanup gate's contract, which the work-state area owns; the change is made as a contract change with its owning proof, never as a loosened check. The gate still refuses an engine closing report and still never accepts a manufactured decision.
 
 ## 7. Rules And Invariants
 
@@ -146,8 +146,8 @@ Condition before it ships: a retrospective item whose knowledge fits no section 
 
 ## 11. Open Questions
 
-1. **Where the pointer line lives.** Recommendation: one instruction seed under core/instructions, rendered into every agent CLI's always-loaded file by the existing instruction registry.
-2. **The material-only completion path for item `p-ixrbglli5o`.** To be designed with the cleanup gate's owner; recommendation: a registry attestation that records the material and the locate result, so cleanup sees real evidence.
+1. **Where the pointer line lives.** *Decided 2026-11-12:* one new instruction seed, a file named documentation-door.md under core/instructions, holding one sentence; the existing instruction registry renders it into every agent CLI's always-loaded file next to the four seeds already there, and `fgos setup` carries it to every project that uses fgOS. No new mechanism.
+2. **The material-only completion path for item `p-ixrbglli5o`.** *Decided 2026-11-12:* the material goes into the admission request, and the cleanup gate accepts that request as evidence (section 6.4). Rejected: loosening the gate to accept a closing report (the gate excludes engine reports on purpose), and attesting the nearest section without growing it (false evidence).
 
 ## 12. Implementation Alignment
 
@@ -164,6 +164,7 @@ Condition before it ships: a retrospective item whose knowledge fits no section 
 |---|---|
 | Template headers are real | a case in `test/scripts/doc-health.test.mjs` over the template folder |
 | The retrospective writer grows by default | a case in the owning test of `fgos-coding-knowledge`'s cleanup path |
+| The cleanup gate accepts a material handoff to an admission request, and still refuses an engine report | cases in `test/state/cleanup-harness.test.mjs`, the gate's owning test |
 | End to end | one wiring proof: a write with an existing owner grows it and creates nothing |
 
 ## 14. Related Files
@@ -179,3 +180,4 @@ Condition before it ships: a retrospective item whose knowledge fits no section 
 - 2026-11-06, owner review: the owner of content is found by what it asserts, never by topic; the audience decides only the surface.
 - 2026-11-06, architecture panel and owner: "no match, then create" is withdrawn; a missed lookup never grants create. Item `p-ixrbglli5o` opened.
 - 2026-11-12, owner: the documentation area is split into subcomponents; the owner-finding step becomes locate from document identity.
+- 2026-11-12, owner: the pointer line is a fifth instruction seed, documentation-door.md under core/instructions; a retrospective item with material only hands it to an admission request, and the cleanup gate accepts that request as evidence, as a contract change owned by work state.
