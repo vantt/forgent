@@ -1,7 +1,7 @@
 ---
 phase: 28
 title: "Worker env allowlist: a seat starts from named ambient variables, not the runner's whole environment"
-status: in-flight
+status: landed
 depends_on: []
 parallel: "file-disjoint from P07 (run.mjs, unit-handoff, unit-run-start, settle); P27 (confinement authority, bwrap driver, herdr-round, trust-store) is not touched"
 ---
@@ -23,7 +23,7 @@ parallel: "file-disjoint from P07 (run.mjs, unit-handoff, unit-run-start, settle
 
 ## Files
 
-`src/runner/dispatch/adapters.mjs`, `src/runner/dispatch/terminal-slot.mjs`, `src/runner/dispatch/assignment-runner.mjs` (one line), tests (`test/runner/dispatch/worker-env-case-context.test.mjs` owns the allowlist; `test/run-supervisor/terminal-cutover.test.mjs` is the pane wiring proof; `test/run-supervisor/fixtures/terminal-agent.mjs` records names), `test/session-identity/attempt-writer-id.test.mjs` (retired per-name proofs), runner business rules spec, `CHANGELOG.md`.
+`src/runner/dispatch/adapters.mjs`, `packages/run-supervisor/contracts/worker-env-allowlist.v1.json` (the list, with a reason per name; `package.json` `files`), `src/runner/dispatch/terminal-slot.mjs`, `src/runner/dispatch/assignment-runner.mjs` and `herdr-round.mjs` (one line each), tests (`test/runner/dispatch/worker-env-case-context.test.mjs` owns the allowlist; `test/run-supervisor/terminal-cutover.test.mjs` is the pane wiring proof; `test/run-supervisor/fixtures/terminal-agent.mjs` records names), `test/session-identity/attempt-writer-id.test.mjs` (retired per-name proofs), runner business rules spec, `CHANGELOG.md`.
 
 ## Validation
 
