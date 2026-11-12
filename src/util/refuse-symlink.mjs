@@ -18,3 +18,24 @@ export function refuseSymlink(entryPath, context, { optional = false } = {}) {
   }
   return stat;
 }
+
+/**
+ * The first symbolic link on the way from `root` down `relativePath` (each component below `root`,
+ * the last included), or null when there is none or the path stops existing. `root` itself is the
+ * caller's own ground and is not tested. For a reader or remover that must never act through a link
+ * in a parent directory, which a check of the leaf alone does not see.
+ */
+export function firstSymlinkUnder(root, relativePath) {
+  let current = root;
+  for (const part of relativePath.split(/[\\/]/).filter(Boolean)) {
+    current = `${current}${current.endsWith('/') || current.endsWith('\\') ? '' : '/'}${part}`;
+    let stat;
+    try {
+      stat = fs.lstatSync(current);
+    } catch {
+      return null;
+    }
+    if (stat.isSymbolicLink()) return current;
+  }
+  return null;
+}

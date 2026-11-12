@@ -179,3 +179,24 @@ test('the shell profile is only named, and global agent wiring is left with how 
   const wiring = result.leftToYou.find((line) => line.includes('fgos wire-agents'));
   assert.ok(wiring && wiring.includes('claude plugin uninstall fgOS@fgos-plugins'), result.leftToYou.join('\n'));
 });
+
+test('a linked skills root, a linked agent directory and a linked extensions directory are never walked', () => {
+  const pkg = makePackage();
+  const project = makeProject(pkg);
+  const outside = mkTemp('uninstall-outside-');
+  // The whole .agents/skills tree and the omp extensions directory live elsewhere, behind links.
+  fs.cpSync(path.join(project, '.agents', 'skills'), path.join(outside, 'skills'), { recursive: true });
+  fs.rmSync(path.join(project, '.agents', 'skills'), { recursive: true });
+  fs.symlinkSync(path.join(outside, 'skills'), path.join(project, '.agents', 'skills'));
+  fs.cpSync(path.join(project, '.omp', 'extensions'), path.join(outside, 'extensions'), { recursive: true });
+  fs.rmSync(path.join(project, '.omp', 'extensions'), { recursive: true });
+  fs.symlinkSync(path.join(outside, 'extensions'), path.join(project, '.omp', 'extensions'));
+  const outsideBefore = fs.readdirSync(path.join(outside, 'skills')).sort();
+
+  const result = uninstallProject(project, { apply: true, packageRoot: pkg, home: mkTemp('uninstall-home-') });
+  assert.deepEqual(fs.readdirSync(path.join(outside, 'skills')).sort(), outsideBefore, 'nothing behind the link is removed');
+  assert.ok(fs.existsSync(path.join(outside, 'extensions', 'fgos-hooks.ts')));
+  assert.ok(result.keeps.some((line) => line.includes('.agents/skills') && line.includes('symbolic link')), result.keeps.join('\n'));
+  assert.ok(result.keeps.some((line) => line.includes('.omp/extensions/fgos-hooks.ts') && line.includes('symbolic link')), result.keeps.join('\n'));
+  assert.equal(exists(project, '.claude/skills/alpha'), false, 'the unlinked part is still reversed');
+});

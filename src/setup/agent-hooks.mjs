@@ -12,10 +12,11 @@
 // 5. Runnable Probe: doctor checks verify both configuration presence AND that the shim is runnable
 //    with benign input via non-shell spawnSync with finite timeout.
 
-import { existsSync, lstatSync, mkdirSync, readFileSync, readdirSync, realpathSync, rmdirSync, unlinkSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, readdirSync, realpathSync, rmdirSync, unlinkSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { mailboxHookTimeoutSec, mailboxOptIn, mailboxRefusalLine } from './mailbox-limits.mjs';
+import { firstSymlinkUnder } from '../util/refuse-symlink.mjs';
 
 export const SUPPORTED_AGENTS = ['claude', 'codex', 'agy', 'omp', 'pi'];
 
@@ -678,8 +679,6 @@ export function checkAllAgentHooks(cwd) {
 
 const SHIM_MENTION = '.fgos/installation/bin/fgos';
 
-const isLink = (file) => lstatSync(file).isSymbolicLink();
-
 /** Every command string a hook file still carries (nested `hooks.<Event>` entries, agy groups). */
 function remainingCommands(config) {
   const found = [];
@@ -704,7 +703,8 @@ function uninstallJsonRows(repoRoot, cli, apply) {
   const file = path.join(repoRoot, spec.file);
   if (!existsSync(file)) return null;
   const base = { cli, file, label: spec.label, removed: [], kept: [] };
-  if (isLink(file)) return { ...base, state: 'symlink', kept: [`${spec.label} is a symbolic link: left as it is`] };
+  const link = firstSymlinkUnder(repoRoot, spec.file);
+  if (link) return { ...base, state: 'symlink', kept: [`${spec.label} is reached through a symbolic link (${link}): left as it is`] };
   const config = readJsonSafe(file);
   if (config === null || typeof config !== 'object') return { ...base, state: 'malformed', kept: [`${spec.label} is not valid JSON: left as it is`] };
   for (const row of hookRows(repoRoot).filter((r) => r.cli === cli)) {
@@ -733,7 +733,8 @@ function uninstallExtension(repoRoot, dir, apply) {
   if (!existsSync(file)) return null;
   const label = `${dir}/extensions/fgos-hooks.ts`;
   const base = { cli: dir.slice(1), file, label, removed: [], kept: [] };
-  if (isLink(file)) return { ...base, state: 'symlink', kept: [`${label} is a symbolic link: left as it is`] };
+  const link = firstSymlinkUnder(repoRoot, path.join(dir, 'extensions', 'fgos-hooks.ts'));
+  if (link) return { ...base, state: 'symlink', kept: [`${label} is reached through a symbolic link (${link}): left as it is`] };
   const cli = dir.slice(1);
   const generated = [generateInProcessExtensionSource({ cli, mailbox: true }), generateInProcessExtensionSource({ cli, mailbox: false })];
   if (!generated.includes(readFileSync(file, 'utf8'))) return { ...base, state: 'edited', kept: [`${label} differs from the generated extension: left as it is`] };

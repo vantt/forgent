@@ -21,7 +21,7 @@ import path from 'node:path';
 import { createGitInspect, gitPortOptions } from '../git/inspect.mjs';
 import { inspectEntries, inspectPath } from '../util/git-paths.mjs';
 import { listDomainDirs } from '../util/domain-dirs.mjs';
-import { refuseSymlink } from '../util/refuse-symlink.mjs';
+import { firstSymlinkUnder, refuseSymlink } from '../util/refuse-symlink.mjs';
 import { computeInstructionProjection, materializeInstructionProjection } from './instruction-projections.mjs';
 
 const FRONTMATTER_PATTERN = /^---\r?\n[\s\S]*?\r?\n---\r?\n/;
@@ -745,6 +745,12 @@ export function generatedSkillDirs(projectRoot, owned) {
     [path.join(projectRoot, '.agents', 'skills'), isOwnAgentsDir],
   ]) {
     if (!fs.existsSync(root)) continue;
+    // A link in the skills root or above it is never walked: what it leads to is not this project's.
+    const link = firstSymlinkUnder(projectRoot, path.relative(projectRoot, root));
+    if (link) {
+      foreign.push({ dir: link, why: 'a symbolic link: left as it is' });
+      continue;
+    }
     for (const entry of fs.readdirSync(root, { withFileTypes: true })) {
       if (isOwnTmpFile(entry.name)) continue;
       const dir = path.join(root, entry.name);

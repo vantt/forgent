@@ -246,6 +246,14 @@ fn project_shim(workspace_root: &Path) -> PathBuf {
 }
 
 fn find_installation(workspace_root: &Path) -> Result<Option<PathBuf>, UninstallError> {
+    // A link in `.fgos` would carry the removal and the backup out of the project.
+    let fgos_dir = workspace_root.join(".fgos");
+    match std::fs::symlink_metadata(&fgos_dir) {
+        Ok(meta) if meta.file_type().is_symlink() => return Err(UninstallError::Symlink(fgos_dir)),
+        Ok(_) => {}
+        Err(err) if err.kind() == std::io::ErrorKind::NotFound => return Ok(None),
+        Err(err) => return Err(err.into()),
+    }
     let dir = installation_dir(workspace_root);
     match std::fs::symlink_metadata(&dir) {
         Ok(meta) if meta.file_type().is_symlink() => Err(UninstallError::Symlink(dir)),
@@ -819,6 +827,21 @@ mod tests {
             Err(UninstallError::Symlink(_))
         ));
         assert!(outside.exists());
+
+        // A link in `.fgos` itself would lead the removal and the backup out of the project.
+        let linked = scratch("linked-fgos");
+        std::fs::create_dir_all(outside.join("installation")).unwrap();
+        std::fs::write(outside.join("installation").join("activation.json"), "keep").unwrap();
+        std::os::unix::fs::symlink(&outside, linked.join(".fgos")).unwrap();
+        assert!(matches!(
+            find_installation(&linked),
+            Err(UninstallError::Symlink(_))
+        ));
+        assert!(outside
+            .join("installation")
+            .join("activation.json")
+            .exists());
+        let _ = std::fs::remove_dir_all(&linked);
         let _ = std::fs::remove_dir_all(&root);
         let _ = std::fs::remove_dir_all(&outside);
     }
