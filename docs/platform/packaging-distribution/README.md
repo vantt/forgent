@@ -62,6 +62,7 @@ Do not use this area as the owner for ordinary workflow semantics after a runtim
 | Understand instruction merge policy and `AGENTS.md` projection | [contracts/instruction-composition-and-projection.md](contracts/instruction-composition-and-projection.md) |
 | Understand skill/plugin/extension packaging across agent hosts | [contracts/skill-package-distribution.md](contracts/skill-package-distribution.md) |
 | See proof paths and test commands | [verification/install-and-release-proof.md](verification/install-and-release-proof.md) |
+| See which packaging-standard rules fgOS meets and which stay open | [verification/packaging-checklist.md](verification/packaging-checklist.md) |
 | See code-panel packet closeout and whole-track proof | [reports/track-closeout.md](reports/track-closeout.md) |
 | Check whether legacy/history details were preserved | [verification/source-preservation-audit.md](verification/source-preservation-audit.md) |
 | Coordinate implementation through code-panel packets | [code-panel-rollout-plan.md](code-panel-rollout-plan.md) |

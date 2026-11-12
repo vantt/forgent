@@ -9,7 +9,7 @@ Implementation status: Current evidence snapshot
 Canonical: Yes, after review
 Owner: Platform documentation
 Source type: Code/test scan
-Last reviewed: 2026-09-21
+Last reviewed: 2026-11-12
 Related:
 - docs/platform/packaging-distribution/verification/implementation-alignment.md
 - docs/platform/packaging-distribution/contracts/skill-package-distribution.md
@@ -38,8 +38,14 @@ This document points to evidence. It is not the design authority.
 | Workspace local `fgos` enters Rust host | `test/rust-host/fgctl-init.test.mjs` asserts `.fgos/installation/bin/fgos version --runtime-json` reports `host: "rust"` and the activated `artifactDigest`; `scripts/ci-external-consumer.sh` repeats the same assertion against installed release assets |
 | `fgctl upgrade` and repair path | `test/rust-host/fgctl-upgrade.test.mjs`, `apps/fgctl/src/main.rs` |
 | External consumer flow | `scripts/ci-external-consumer.sh`, `.github/workflows/ci.yml`, `.github/workflows/release.yml` |
-| Install script behavior | `install.sh`, `test/install/install-sh.test.mjs` |
-| Legacy Node packaging | `package.json`, `bin/fgos.mjs`, `bin/fgos-runner.mjs`, `test/install-packaging.test.mjs` |
+| Install script behavior | `install.sh`, `scripts/install.ps1`, `test/install/install-sh.test.mjs`, `test/install/install-ps1.test.mjs` |
+| `fgctl init` closing block and no-op re-runs | `packages/distribution/rust/src/init.rs` unit tests, `test/rust-host/closing-block.test.mjs` |
+| `fgctl` and `fgos` command surface (`--version`, `--help`, exit codes, did-you-mean) | `apps/fgctl/tests/cli_surface.rs`, `apps/fgos/tests/cli_tests.rs`, `test/cli/fgos-help.test.mjs`, `test/cli/first-run-guide.test.mjs` |
+| `fgctl uninstall` and `fgos uninstall` | `packages/distribution/rust/src/uninstall.rs` unit tests, `apps/fgctl/tests/uninstall_surface.rs`, `test/setup/uninstall-project.test.mjs` |
+| Activation versus pin drift | `packages/distribution/rust/tests/pin_drift.rs`, `test/setup/pin-drift-check.test.mjs` (one golden) |
+| Upgrade from a JSON-era release | `test/verbs/settle-legacy-config.test.mjs`, the upgrade step of `scripts/ci-external-consumer.sh` |
+| Release gate and version agreement | `test/scripts/prepare-release.test.mjs`, `test/scripts/previous-release-tag.test.mjs`, `.github/workflows/release.yml` (`suite`) |
+| Legacy Node packaging (retired as an install channel; the entry points stay for the dev checkout and the staged legacy-node payload) | `package.json`, `bin/fgos.mjs`, `bin/fgos-runner.mjs`, `test/install-packaging.test.mjs` |
 | Shell helper resolution | `scripts/fgos-shell-integration.sh`, `test/scripts/fgos-shell-integration.test.mjs` |
 | Doctor/fix registry and legacy setup compatibility | `src/setup/checks.mjs`, `src/setup/registrations.mjs`, `test/setup/registrations.test.mjs` |
 | Config precedence | `src/config/global-config.mjs`, `test/config/global-config.test.mjs` |
