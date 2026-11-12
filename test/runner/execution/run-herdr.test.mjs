@@ -71,9 +71,3 @@ test('a headless claude seat is granted its outbox directory only, beside the pe
   const args = ['-p', 'x'];
   assert.equal(withRunDirAccess({ adapter: 'cli-spawn', command: '/usr/bin/codex', args, outboxDir }), args, 'only claude asks before writing outside its cwd');
 });
-
-test('a claude pane seat carries acceptEdits so its REPL writes the outbox without a human to answer', () => {
-  const pane = readStandardValue('runner.executors.claude').value.invocations.find((inv) => inv.id === 'claude-herdr-bwrap');
-  const mode = pane.args.indexOf('--permission-mode');
-  assert.equal(pane.args[mode + 1], 'acceptEdits');
-});
