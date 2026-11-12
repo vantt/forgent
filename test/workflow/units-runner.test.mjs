@@ -460,18 +460,12 @@ test('CLI workflow start --units takes --effort, --timeout and --account and rep
   assert.deepEqual(state.writeBranches.map((e) => e.unitId), ['w-u']);
   assert.match(state.steps['w-u'].units['w-u'].results.at(-1).runResult.agentClaim.summary, /Effort: high/);
 
-  // resume with --timeout or --account is refused
+  // resume with --timeout is refused (the refusals themselves are owned by workflow-runner-resume.test.mjs; this is the wiring proof)
   assert.throws(() => execFileSync(process.execPath, [
     path.resolve('bin/fgos.mjs'), 'workflow', 'resume', state.workflowRunId,
     '--timeout', '2h',
     '--dir', tmp,
   ], { cwd: tmp, env: cliEnv, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }), /--timeout cannot change a resumed workflow run/);
-
-  assert.throws(() => execFileSync(process.execPath, [
-    path.resolve('bin/fgos.mjs'), 'workflow', 'resume', state.workflowRunId,
-    '--account', 'node/acct-cli',
-    '--dir', tmp,
-  ], { cwd: tmp, env: cliEnv, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }), /--account cannot change a resumed workflow run/);
 });
 
 

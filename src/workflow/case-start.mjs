@@ -35,15 +35,33 @@ import { chargeNestedCase, refundNestedCase } from './case-frame.mjs';
 const FRAME_COUNT_KEYS = Object.freeze(['dispatches', 'mutatingDispatches', 'fallbackPerSeat', 'deviationsBeforeAsk', 'seatLaunchesPerDispatch']);
 
 /**
+ * The pairs of a `--frame key=value,key=value` text. A value may hold `=`; a pair with no key or no `=` is refused.
+ *
+ * @param {string} text
+ * @returns {Record<string, string>}
+ */
+export function parseFrameFlag(text) {
+  const pairs = {};
+  for (const pair of text.split(',')) {
+    const at = pair.indexOf('=');
+    const key = at < 0 ? '' : pair.slice(0, at).trim();
+    if (key === '') throw new RunnerConfigError(`--frame takes key=value pairs, e.g. dispatches=3,rigorFloor=high; "${pair.trim()}" has no key`);
+    pairs[key] = pair.slice(at + 1).trim();
+  }
+  return pairs;
+}
+
+/**
  * The frame a case opens with: the guide's defaults, narrowed by the flags given at start and never
  * widened. A count may only go down, the rigor floor only up; a count the guide leaves to the approver
  * takes whatever is given. A guide with no frame defaults has nothing to narrow.
  *
  * @param {object | null | undefined} guide
- * @param {Record<string, number | string> | undefined} flags
+ * @param {Record<string, number | string> | string | undefined} given the pairs, or the `--frame` text (`key=value,key=value`)
  * @returns {object | null}
  */
-export function resolveFrame(guide, flags) {
+export function resolveFrame(guide, given) {
+  const flags = typeof given === 'string' ? parseFrameFlag(given) : given;
   const asked = flags && Object.keys(flags).length > 0 ? flags : null;
   const defaults = guide?.frameDefaults ?? null;
   if (defaults === null) {

@@ -2111,11 +2111,8 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
           stanceOptions: flags['stance-options'] === undefined ? undefined : requireField(flags['stance-options'], '--stance-options requires pipe-separated option labels').split('|'),
           contextRefs: flags['context-ref'],
           // --frame k=v,k=v: narrows the guide's frame defaults for this case, never widens them.
-          frame: flags.frame === undefined ? undefined : Object.fromEntries(requireField(flags.frame, '--frame requires key=value pairs, e.g. dispatches=3,rigorFloor=high').split(',').map((pair) => {
-            const [key, ...value] = pair.split('=');
-            return [key.trim(), value.join('=').trim()];
-          })),
-          seats: flags.seats === undefined ? undefined : requireField(flags.seats, '--seats requires pipe-separated lenses').split('|'),
+          frame: flags.frame === undefined ? undefined : requireField(flags.frame, '--frame requires key=value pairs, e.g. dispatches=3,rigorFloor=high'),
+          seats: flags.seats === undefined ? undefined : requireField(flags.seats, '--seats requires pipe-separated lenses'),
           // --case <parentCaseId>: open this case or wave under a conductor case, charged to its frame.
           parentCase: flags.case === undefined ? undefined : requireField(flags.case, '--case requires the id of the parent case'),
           // --inherit <closedCaseId>: take over the milestones a closed case of the same request and base commit reached.
@@ -2179,11 +2176,9 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       if (sub === 'resume') {
         const { resumeWorkflow } = await import('../src/workflow/index.mjs');
         const workflowRunId = runIdOf('fgos workflow resume <id>');
-        if (flags.timeout !== undefined) throw new StoreError('validation', '--timeout cannot change a resumed workflow run: it keeps the timeout it was started with');
-        if (flags.account !== undefined) throw new StoreError('validation', '--account cannot change a resumed workflow run: it keeps the account its seats were bound to');
-        // --seats on resume is only a consistency check: the run keeps the seats it started with.
-        const seats = flags.seats === undefined ? undefined : requireField(flags.seats, '--seats requires pipe-separated lenses').split('|');
-        return withDirWarning(() => resumeWorkflow(workflowRunId, { repoRoot: flags.dir, cwd: process.cwd(), worktree: flags.worktree, seats, detached }));
+        // The use case refuses --timeout and --account, and checks --seats against the seats the run started with.
+        const seats = flags.seats === undefined ? undefined : requireField(flags.seats, '--seats requires pipe-separated lenses');
+        return withDirWarning(() => resumeWorkflow(workflowRunId, { repoRoot: flags.dir, cwd: process.cwd(), worktree: flags.worktree, seats, timeout: flags.timeout, account: flags.account, detached }));
       }
 
       // Operations a step offers, read from the Workflow definition

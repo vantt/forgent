@@ -49,10 +49,11 @@ export function personaNameOf(entry) {
  * Validate the ordered seat entries of a request and return them trimmed. An entry is a plain-text
  * lens or `@name`, a named persona; whether the name exists is decided by the caller that resolves it.
  *
- * @param {string[]} raw entries as given (the CLI splits its value on "|")
+ * @param {string[] | string} given entries, or the `--seats` text, which is split on "|"
  * @returns {string[]}
  */
-export function normalizeSeats(raw) {
+export function normalizeSeats(given) {
+  const raw = typeof given === 'string' ? given.split('|') : given;
   if (!Array.isArray(raw)) throw new RunnerConfigError('--seats requires an ordered list of lenses or @persona names separated by "|"');
   if (raw.length < SEAT_MIN_ENTRIES) {
     throw new RunnerConfigError(`--seats needs at least ${SEAT_MIN_ENTRIES} lenses or @persona names separated by "|", got ${raw.length}`);

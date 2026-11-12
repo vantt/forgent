@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "1a1752ae48d89c3357dcc0a56028dfe1fcc2fb16a12fbf28020841ba03669d2e",
+  "payloadDigest": "5c94649b5b2996679855bb7c02c87ce44eac8dfae34e68e65d9b0f1eff83f365",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -115,7 +115,7 @@
     "apps/fgos/tests/windows_semantics_probe.rs": "ecb59690bbf1259baa1defb6417c24005138526bb565f216f9db3c2ad784d240",
     "apps/fgos/tests/windows_support/mod.rs": "2b8a17676526c87ea5ecfb2074a70a3511fbf9267f9de78a35dc355f272830fb",
     "bin/fgos-runner.mjs": "24fa9b497547a104912b90ab98b3d53fbbe0068a5977a7a04724789c8e717156",
-    "bin/fgos.mjs": "dff2ad902cf209a5f11a25db505814b2a651e14e9c110c19d2cc2d647e013b12",
+    "bin/fgos.mjs": "52b5ddb48b940f78d1c3935c491eaa2f1f5278988d9b3ae938dd89c666b53bad",
     "core/skills/_shared/capability-catalog.md": "4299584409592ac4ae9668cd0cb4dd0442edc1c78a42ccd9cfe0bae22bf11bc4",
     "core/skills/_shared/capability-matching.md": "eb67cde05d45c171c1d4803f9d2fbec5fc63565b9fd0a0549c866a7eb262521d",
     "core/skills/_shared/catchup-self-recovery.md": "3b77650c71a0225f00ffa8fe9524d7c0052977204f425c1999225b6f80802c69",
@@ -1251,8 +1251,8 @@
     "src/workflow/case-lock.mjs": "c5f5df8c003ba78ff4d2983ce578a3dee022c4595f5c0f2a2804f56649a83e33",
     "src/workflow/case-projection.mjs": "c418e9756fdae9378d39a1d343131cbed90cfd8e66d405f5928b02d89e058723",
     "src/workflow/case-runtime.mjs": "d48c51dff1a0c2ebdc77329f422cca295aeb1b188aa2bfe5300a4ac6ab3f1941",
-    "src/workflow/case-start.mjs": "d6355d47df4916bdf69591bfb3c802f1c98f136241186968672c201fb082a8c3",
-    "src/workflow/case-verbs.mjs": "3428e3c3da7860307171fee91b3abf285a9295d6fc876e64df1aa6b732ae7653",
+    "src/workflow/case-start.mjs": "d6ab60b0e18c077dbf65e5111b334917b5b2c42ab93c323452dd2eac5d677917",
+    "src/workflow/case-verbs.mjs": "fff61cbc9e419f6e1eed82e29af0cf4db6b0c3176b4351cab638fd4b0e5e4f24",
     "src/workflow/checked.mjs": "ff61a4c3ecd3d492dcd4a97c91efc12250fd1ffd99ebd598b1c458691a6bc038",
     "src/workflow/definition.mjs": "f6f218dcf620ac2db6f5e2fc8e6172427b4863bd0267270acf4335648e13f992",
     "src/workflow/dir-guard.mjs": "d8224116ef0781fe57fef08bf706c1d51f25619a2b0a641c696432bdd2973044",
@@ -1266,10 +1266,10 @@
     "src/workflow/ref-digests.mjs": "7379462ef6521267e12cb028c030a9292d6b6bb176419df9663ecf6547f5a09e",
     "src/workflow/runner.mjs": "a40aa80a2deb1a2f138e9873c96e0defb6b34d4f65de3a502e324b789a6e90bc",
     "src/workflow/seat-providers.mjs": "6562fb1390c44aa90735ee9bc08f6c1c8074498b51d7ecf51a18d75c7423f702",
-    "src/workflow/seats.mjs": "15b5619133dd3b6f5d2a838f12d5041f59d415fa59d47de14ff61940f8f62dac",
+    "src/workflow/seats.mjs": "6dcc59baef66d7078de9273f1119e0dd8799a17749f9612738c529eab39c1870",
     "src/workflow/steps.mjs": "bc8a112e26d87bed526b7ca47ea991f77ca3a789b559a23f2afed7577786f4be",
     "src/workflow/store.mjs": "a8c6f6d21fc01e107fd46e9d1350453ccaf4bc0e299ccbc2417a9447f0f9becc",
-    "src/workflow/unit-handoff.mjs": "151c194971b9204332d565e4baa4cc2af593a7b8a75089a722baf7d2ddbaf2c1",
+    "src/workflow/unit-handoff.mjs": "3ed523873aaed31083182417ceb5ff4cc2bd93838e314211e10c49073db676e9",
     "src/workflow/units-source.mjs": "fd7d7a3ed5db5f00c6244fc60da479aa739e1935e1ffaf02341f71f3a326e307",
     "scripts/lib/git-one-door-declarations.v1.json": "c06a8ee8c3164c54bfd3cd4401271c3e080ae3bb86e5a469cf7532d3fd60d3e9"
   },
@@ -2104,14 +2104,14 @@
     },
     {
       "path": "bin/fgos.mjs",
-      "line": 3145,
+      "line": 3140,
       "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:180",
       "binary": "(config door value (readConfig({ projectRoot: repoRoot, sections: ['invariantChecks'] })))",
       "class": "configured-binary"
     },
     {
       "path": "bin/fgos.mjs",
-      "line": 3289,
+      "line": 3284,
       "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:180",
       "binary": "(config door value (readConfig({ projectRoot: repoRoot, sections: ['invariantChecks'] })))",
       "class": "configured-binary"

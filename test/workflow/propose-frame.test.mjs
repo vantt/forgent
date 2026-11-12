@@ -3,7 +3,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
 import { proposeFrame, ProposeFrameError, FRAME_ALLOWANCE } from '../../src/workflow/propose-frame.mjs';
-import { resolveFrame } from '../../src/workflow/case-start.mjs';
+import { resolveFrame, parseFrameFlag } from '../../src/workflow/case-start.mjs';
 import { shippedCatalog } from '../../src/runner/dispatch/shipped-catalog.mjs';
 
 const catalog = () => ({ runnerConfig: {}, shipped: shippedCatalog() });
@@ -195,4 +195,26 @@ test('a read pass the case runs besides its slices raises the seat-launch ceilin
   assert.equal(withPass.frame.seatLaunchesPerDispatch, 8, 'a reviewed pass at standard plans four seat launches, twice with fallback');
   assert.equal(withPass.frame.dispatches, alone.frame.dispatches, 'the pass is already counted among the reads');
   assert.deepEqual(withPass.breakdown.seatLaunches.map((l) => l.id), ['note', 'validate-plan']);
+});
+
+// ---- the --frame text ------------------------------------------------------------------------------
+
+test('the --frame text is key=value pairs split on "," with each side trimmed, a value may hold "="', () => {
+  assert.deepEqual(parseFrameFlag('dispatches=3'), { dispatches: '3' });
+  assert.deepEqual(parseFrameFlag(' dispatches = 3 , rigorFloor=high '), { dispatches: '3', rigorFloor: 'high' });
+  assert.deepEqual(parseFrameFlag('note=a=b'), { note: 'a=b' });
+  assert.deepEqual(parseFrameFlag('rigorFloor='), { rigorFloor: '' });
+});
+
+test('a --frame pair with no key or no "=" is refused by name', () => {
+  for (const text of ['=3', 'dispatches', 'dispatches=3,', ',', ' =3']) {
+    assert.throws(() => parseFrameFlag(text), /--frame takes key=value pairs/, JSON.stringify(text));
+  }
+});
+
+test('the case start narrows the guide defaults from the --frame text exactly as from the parsed pairs', () => {
+  const guide = { id: 'g', frameDefaults: { dispatches: 5, mutatingDispatches: 2, fallbackPerSeat: 2, deviationsBeforeAsk: 1, rigorFloor: 'standard' } };
+  assert.deepEqual(resolveFrame(guide, 'dispatches=3,rigorFloor=high'), resolveFrame(guide, { dispatches: '3', rigorFloor: 'high' }));
+  assert.equal(resolveFrame(guide, 'dispatches=3,rigorFloor=high').dispatches, 3);
+  assert.throws(() => resolveFrame(guide, 'dispatches=9'), /widens the guide's default 5/);
 });

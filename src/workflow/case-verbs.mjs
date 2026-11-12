@@ -114,8 +114,8 @@ function handOff({ mainRoot, workflowRunId, worktreePath, options }) {
  * @param {string} [params.unitsPath] Path to a units file (YAML/JSON list of Units), one step per Unit
  * @param {string} [params.effort] Reasoning effort every unit asks for (low, medium, high, max)
  * @param {string} [params.request] The owner's request this run serves; given to every unit
- * @param {object} [params.frame] Counts and floor that narrow the guide's frame defaults, never widen them
- * @param {string[]} [params.seats] Ordered entries (lenses or `@name` personas): rebuild the base with one panel seat per entry (see seats.mjs)
+ * @param {object | string} [params.frame] Counts and floor that narrow the guide's frame defaults, never widen them; or the `--frame` text `key=value,key=value`
+ * @param {string[] | string} [params.seats] Ordered entries, or the `--seats` text split on "|" (lenses or `@name` personas): rebuild the base with one panel seat per entry (see seats.mjs)
  * @param {string} [params.repoRoot]
  * @param {string} [params.cwd]
  * @param {string} [params.worktree]
@@ -308,9 +308,14 @@ function heldConductor(mainRoot, workflowRunId) {
  * @param {boolean} [options.detached] Hand advancing to a detached process; `options.cliPath` overrides its CLI entry
  * @param {string} [options.repoRoot]
  * @param {string} [options.cwd]
+ * @param {string} [options.seats] Only a consistency check (`a|b`, or the entries): the run keeps the seats it started with
+ * @param {string} [options.timeout] Refused: a resumed run keeps its timeout
+ * @param {string} [options.account] Refused: a resumed run keeps its account
  * @returns {Promise<object>} Projected state; with `detached`, plus `detached: { pid, logPath, statusCommand }`
  */
 export async function resumeWorkflow(workflowRunId, options = {}) {
+  if (options.timeout !== undefined) throw new RunnerConfigError('--timeout cannot change a resumed workflow run: it keeps the timeout it was started with');
+  if (options.account !== undefined) throw new RunnerConfigError('--account cannot change a resumed workflow run: it keeps the account its seats were bound to');
   const { mainRoot, worktreePath } = rootsOf(workflowRunId, options, 'resumeWorkflow');
   let hold = tryAcquireAdvanceLock(mainRoot, workflowRunId);
   if (hold === null) {

@@ -146,7 +146,8 @@ test('invalid seat lists are refused with the reason', () => {
     [['fine lens', 42], /must be text/],
   ];
   for (const [seats, pattern] of cases) assert.throws(() => normalizeSeats(seats), pattern, JSON.stringify(seats));
-  assert.throws(() => normalizeSeats('a|b'), /ordered list/);
+  assert.throws(() => normalizeSeats(7), /ordered list/);
+  assert.throws(() => normalizeSeats('one lens only'), /at least 2/);
   assert.equal(normalizeSeats(['x'.repeat(160), 'abc']).length, 2, '3 and 160 characters are allowed');
   assert.deepEqual(normalizeSeats([' @finance-controller ', `@a${'b'.repeat(63)}`]), ['@finance-controller', `@a${'b'.repeat(63)}`]);
 });
@@ -271,4 +272,9 @@ test('a pattern whose loop is panel expands under seats and non-panel is refused
     () => rawExpandWorkflowSeats(curatedCustomPanel, LENSES, { loopOf: customLoopOf }),
     /fixes its own seats/,
   );
+});
+
+test('the --seats text is split on "|" and each entry trimmed, spaces inside a lens kept', () => {
+  assert.deepEqual(normalizeSeats(' cash flow and payback | @finance-controller|renewal leverage '), ['cash flow and payback', '@finance-controller', 'renewal leverage']);
+  assert.throws(() => normalizeSeats('cash flow||renewal leverage'), /seat 2 is empty/);
 });

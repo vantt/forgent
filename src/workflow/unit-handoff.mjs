@@ -14,6 +14,7 @@ import { removeWorktree, deleteBranchRef } from '../runner/worktree.mjs';
 import { worktreeAdminScope } from '../runner/execution/custody-door.mjs';
 
 import { RunnerConfigError } from '../runner/dispatch/runner-config-error.mjs';
+import { foldRunSetting } from '../runner/execution/run-request.mjs';
 import { anonymousInputName, OWN_PREVIOUS_NAME, SEAT_PLACEHOLDER, reportDigest, resolveUnitInputs } from '../runner/execution/handoff-refs.mjs';
 import { seatKeyOf } from '../runner/execution/legacy-seat-read.mjs';
 import { stepSubjectDigest, unitRunsOf } from './ref-digests.mjs';
@@ -191,7 +192,6 @@ export function unitPatternOf(template) {
 export function unitOverridesOf(unit, seatPersonas = [], options = {}) {
   const { effort = null, timeoutMs = null, account = null } = options ?? {};
   const unitTimeoutMs = unit.timeoutMs ?? unit.template?.timeoutMs;
-  const applyTimeout = unitTimeoutMs === undefined && timeoutMs !== null;
 
   const isPanel = typeof options?.loopOf === 'function' ? options.loopOf(unit.template?.pattern) === 'panel' : false;
   const seatScoped = isPanel
@@ -200,23 +200,16 @@ export function unitOverridesOf(unit, seatPersonas = [], options = {}) {
       persona: name,
       personaPin: { name, digest, text, ...(identity === undefined ? {} : { identity }) },
       origin: 'workflow',
-      ...(effort !== null ? { reasoningEffort: effort } : {}),
-      ...(applyTimeout ? { timeoutMs } : {}),
-      ...(account !== null ? { account } : {}),
     }))
     : [];
 
-  const hasFallback = effort !== null || applyTimeout || account !== null;
-  if (!hasFallback) return seatScoped;
-
-  // The run-level account pin carries the workflow origin, so the door can tell it from a pin a person typed.
-  const fallback = {
-    ...(effort !== null ? { reasoningEffort: effort } : {}),
-    ...(applyTimeout ? { timeoutMs } : {}),
-    ...(account !== null ? { account, origin: 'workflow' } : {}),
-  };
-
-  return [...seatScoped, fallback];
+  // Each run-level setting is the one fold the Execution door owns; a unit's own timeout wins over the run's.
+  let overrides = seatScoped;
+  if (effort !== null) overrides = foldRunSetting(overrides, 'reasoningEffort', effort);
+  if (unitTimeoutMs === undefined && timeoutMs !== null) overrides = foldRunSetting(overrides, 'timeoutMs', timeoutMs);
+  if (account === null) return overrides;
+  // The account pin's mode rides `accountPin` on the run options; the label only records in the binding's provenance who asked.
+  return foldRunSetting(overrides, 'account', account).map((ov) => (ov.scope ? ov : { ...ov, origin: 'workflow' }));
 }
 
 /**

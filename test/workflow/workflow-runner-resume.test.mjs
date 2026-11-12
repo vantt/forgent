@@ -198,3 +198,9 @@ test('a unit that throws instead of returning fails its step and the workflow wi
   const types = readWorkflowEvents({ repoRoot: tmp, workflowRunId: state.workflowRunId }).map((e) => e.type);
   assert.deepEqual(types.filter((t) => t === 'step.fail' || t === 'workflow.fail'), ['step.fail', 'workflow.fail']);
 });
+
+test('resume refuses --timeout and --account before it reads the run: a resumed run keeps what it started with', async () => {
+  const tmp = setupTestRepo();
+  await assert.rejects(resumeWorkflow('no-such-run', { repoRoot: tmp, cwd: tmp, timeout: '2h' }), /--timeout cannot change a resumed workflow run: it keeps the timeout it was started with/);
+  await assert.rejects(resumeWorkflow('no-such-run', { repoRoot: tmp, cwd: tmp, account: 'node/acct-cli' }), /--account cannot change a resumed workflow run: it keeps the account its seats were bound to/);
+});
