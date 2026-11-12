@@ -10,6 +10,7 @@
 
 mod cli_presenter;
 mod cli_projector;
+mod exit_codes;
 mod legacy_exec;
 mod wiring;
 use fgos_distribution::suggest::suggest;
