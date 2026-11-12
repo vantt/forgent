@@ -10,6 +10,8 @@ import { recoverGitOperations } from '../../git/status.mjs';
 import { initConfigFile } from '../../config/facade.mjs';
 import { settleLegacyConfig } from './settle-legacy-config.mjs';
 
+const WORK_STORE_NOTE = 'Work is not available on this platform yet: the Event Store runs on Linux only, so fgOS installs and activates here but the Work verbs refuse.';
+
 /**
  * Give the project and the machine their header-only `config.yaml` when a scope has no file (the config door's
  * create-only `init`: an existing file, a legacy `config.json` included, is left alone). Nothing needs these files to
@@ -36,7 +38,7 @@ export function createConfigFiles(projectRoot) {
  * headless-repository notice, the header-only config files and the recovery of an interrupted Git operation. Only the
  * first three can refuse; every later step is fail-safe, so a quirk there still leaves `.fgos/` initialized.
  *
- * @returns {{ dir: string, detectedHarnesses: object[], config: object, legacyConfig?: string[], legacyConfigNote?: string, legacyConfigWarning?: string, gitHeadless?: true, gitRecovery?: object, gitRecoveryWarning?: string }}
+ * @returns {{ dir: string, detectedHarnesses: object[], config: object, legacyConfig?: string[], legacyConfigNote?: string, legacyConfigWarning?: string, workStore?: 'unsupported-platform', workStoreNote?: string, gitHeadless?: true, gitRecovery?: object, gitRecoveryWarning?: string }}
  */
 export function initStoreUseCase({ dir, workStore = eventStorePlatformSupported() }) {
   const root = path.dirname(dir);
@@ -79,6 +81,7 @@ export function initStoreUseCase({ dir, workStore = eventStorePlatformSupported(
     ...(legacy.steps.length ? { legacyConfig: legacy.steps } : {}),
     ...(legacy.note ? { legacyConfigNote: legacy.note } : {}),
     ...(legacy.warning ? { legacyConfigWarning: legacy.warning } : {}),
+    ...(workStore ? {} : { workStore: 'unsupported-platform', workStoreNote: WORK_STORE_NOTE }),
     config,
     ...(gitHeadless ? { gitHeadless: true } : {}),
     ...(gitRecovery ? { gitRecovery } : {}),

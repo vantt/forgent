@@ -589,7 +589,7 @@ pub struct ReadyFacts {
     /// How the user types `fgos`: bare, or the launcher's absolute path when
     /// its directory is not on PATH.
     pub run_command: String,
-    /// Lines the init step asked the user to see (`legacyConfigNote`, `legacyConfigWarning`).
+    /// Lines the init step asked the user to see (`legacyConfigNote`, `legacyConfigWarning`, `workStoreNote`).
     pub notes: Vec<String>,
 }
 
@@ -640,7 +640,7 @@ pub fn init_notes(init_stdout: &[u8]) -> Vec<String> {
         return Vec::new();
     };
     let data = value.get("data").unwrap_or(&value);
-    ["legacyConfigNote", "legacyConfigWarning"]
+    ["legacyConfigNote", "legacyConfigWarning", "workStoreNote"]
         .iter()
         .filter_map(|key| data.get(*key).and_then(|v| v.as_str()))
         .map(str::to_string)
@@ -2910,6 +2910,37 @@ mod tests {
         assert_eq!(
             block.text,
             "Ready: fgOS v1.2.0 active (0123456789ab)\nNext: fgos run \"<prompt>\"\n"
+        );
+    }
+
+    #[test]
+    fn the_work_store_note_of_a_platform_without_an_event_store_reaches_every_closing_block() {
+        let init = serde_json::json!({
+            "data": { "workStore": "unsupported-platform", "workStoreNote": "Work is not available on this platform yet", "dir": "x" }
+        })
+        .to_string();
+        let notes = init_notes(init.as_bytes());
+        assert_eq!(
+            notes,
+            vec!["Work is not available on this platform yet".to_string()]
+        );
+        let mut f = facts(false);
+        f.notes = notes;
+        let ready = closing_block(&doctor_json(true, &[]), &f).unwrap();
+        assert!(
+            ready
+                .text
+                .contains("Note: Work is not available on this platform yet"),
+            "{}",
+            ready.text
+        );
+        let not_ready = closing_block(&doctor_json(false, &[("a", "fail", None)]), &f).unwrap();
+        assert!(
+            not_ready
+                .text
+                .contains("Note: Work is not available on this platform yet"),
+            "{}",
+            not_ready.text
         );
     }
 

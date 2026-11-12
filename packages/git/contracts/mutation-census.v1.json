@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "8072a7581de53a186f98930dcebd1d3118faec49af569c557ec820fcbb1841f5",
+  "payloadDigest": "4f2e6735328b5cc372b7b86facc4be2a3dba23f8d8c8ec5bdf56d60dfa185a9e",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -274,7 +274,7 @@
     "packages/distribution/rust/src/fetch.rs": "9dbae58808da3d0139eb76508b3e8975676b588ee776b97e23ebaad619242899",
     "packages/distribution/rust/src/fgctl_refresh.rs": "0dbc9856da60bcc36af414dedba195a7a85bd4ed4def2cb4bd644e1e898337a3",
     "packages/distribution/rust/src/git_gate.rs": "7d50addca54b78ca0b5d6b61c9d857b2de82016a1cc53faefc7c1038da163cba",
-    "packages/distribution/rust/src/init.rs": "97a0d48e6059a9f18b5fd9672066bdc51663eca117d24301b45fbcd4b405903e",
+    "packages/distribution/rust/src/init.rs": "270320309fdead941575b055361fd6fb9314f76add1fb8619ef09ab44b548ac5",
     "packages/distribution/rust/src/lib.rs": "2606ca37fcc561c271012139c4f7921129a141a6163f440ae7858a3d5edbb3dd",
     "packages/distribution/rust/src/lock.rs": "ee39bccc87c5b34a7799ee886fe3c4b9f59346f22c550c67123efa49f9681f8e",
     "packages/distribution/rust/src/manifest.rs": "7aa7f3d42c3ac708e44cb0bbf4be36c414eaf0b29f0bdafc5bb768901fb46bda",
@@ -1241,7 +1241,7 @@
     "src/verbs/merge/review.mjs": "538e8087eed7befd51b7ef78a93d1b12fa13f0fff260ec40e50e7f8e019ac49a",
     "src/verbs/merge/sync-root.mjs": "81a4f2a88e187e748716c6df5430439849f55339b301b1214c63e7c66a53d732",
     "src/verbs/state/edit.mjs": "734029f844bf8eb4b9c50ff7698c59dda48bd2a6b3ec3ffe8b601f0a31571223",
-    "src/verbs/state/init.mjs": "2b11eb62194d16cc51fbc106d9beae81add98b97ef0d02c10c575b2e77256989",
+    "src/verbs/state/init.mjs": "ca3c234f6b0284c0f7c9144939d27eb30b253aa8a99b4089611f0c2589bef504",
     "src/verbs/state/move.mjs": "d2be22ddac01830ec35469b5a895f2c0883dd14e0b63ec3ae2c5e44cc2a2350c",
     "src/verbs/state/read.mjs": "a49ff63f71318e7b6066059078273a6c224ad7ec10c8790f25fabd13cae5cd93",
     "src/verbs/state/settle-legacy-config.mjs": "8a4365757f03c413368d7609902930103ddcbb0de2ceb9232e1fc9cef651419d",

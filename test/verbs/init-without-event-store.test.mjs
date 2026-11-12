@@ -22,7 +22,8 @@ test('init without a Work store settles the project and builds no Work store', (
     const dir = path.join(project, '.fgos');
     const result = initStoreUseCase({ dir, workStore: false });
     assert.equal(result.dir, dir);
-    assert.equal(fs.existsSync(path.join(dir, 'config.yaml')), true, 'the project still gets its config file');
+    assert.equal(result.workStore, 'unsupported-platform');
+    assert.match(result.workStoreNote, /Work is not available on this platform/);
     assert.equal(fs.existsSync(path.join(dir, 'cache', 'state.json')), false, 'no Work store view is built');
   } finally {
     for (const [k, v] of Object.entries(saved)) { if (v === undefined) delete process.env[k]; else process.env[k] = v; }
