@@ -170,6 +170,9 @@ fn main() {
                             r.created_at.as_deref().unwrap_or("none")
                         );
                     }
+                    if let Some(drift) = &ws.pin_drift {
+                        println!("{drift}");
+                    }
                     println!("{}", status_result_line(Some(&ws)));
                 }
             } else {

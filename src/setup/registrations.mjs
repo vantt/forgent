@@ -2921,7 +2921,47 @@ registerCheck({
   check: checkActiveReleaseMatchesCheckout,
 });
 
-// ─── Confinement Authority (Phase 01 R7, docs/platform/agent-confinement/README.md) ─
+const shortDigest = (digest) => String(digest).replace(/^sha256:/, '').slice(0, 12);
+
+/**
+ * The activation differs from the committed exact-digest pin: a warning, never a failure or a repair, because a
+ * machine may run ahead of the pin on purpose. Reads the two files the way `pin_drift` in the distribution crate
+ * does (an unusable pin is no pin) and prints the same line; both are tested against one golden.
+ */
+export function checkActivationMatchesPin(cwd) {
+  const root = resolveMainCheckoutRoot(cwd) ?? path.resolve(cwd);
+  try {
+    const readJson = (relative) => {
+      const file = doctorDriftPath(root, relative, true);
+      return file ? JSON.parse(fs.readFileSync(file, 'utf8')) : null;
+    };
+    let pin = null;
+    try { pin = readJson('.fgos/distribution.json'); } catch (error) {
+      if (error instanceof SyntaxError) pin = null; else throw error;
+    }
+    const pinned = pin?.projectRuntime?.artifactDigest;
+    if (typeof pinned !== 'string') return { passed: true, status: 'skip', message: 'activation-matches-pin skipped: no committed pin' };
+    const activation = readJson('.fgos/installation/activation.json');
+    if (typeof activation?.artifactDigest !== 'string') return { passed: true, status: 'skip', message: 'activation-matches-pin skipped: no activation in this workspace' };
+    if (activation.artifactDigest === pinned) return { passed: true, message: `active release matches the pin (${shortDigest(pinned)})` };
+    const reason = typeof activation.pinOverrideReason === 'string' ? activation.pinOverrideReason : 'none';
+    return {
+      passed: true,
+      message: `warning: active ${shortDigest(activation.artifactDigest)} != pin ${shortDigest(pinned)} (override: ${reason})`,
+      fixCommand: 'fgctl init to follow the pin, or fgctl upgrade and commit the moved .fgos/distribution.json if you are ahead on purpose',
+    };
+  } catch (error) {
+    return { passed: true, message: `warning: could not compare the activation with the pin: ${error.message}` };
+  }
+}
+
+registerCheck({
+  id: 'activation-matches-pin',
+  description: 'the active release is the one the committed .fgos/distribution.json pin names (warns when it differs)',
+  check: (cwd) => checkActivationMatchesPin(cwd),
+});
+
+// ─── Confinement Authority (Phase 01 R7,docs/platform/agent-confinement/README.md) ─
 
 export function checkConfinementPoliciesDeclared(cwd) {
   let runner;

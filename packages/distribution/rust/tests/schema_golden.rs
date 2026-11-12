@@ -502,6 +502,7 @@ fn test_release_status_and_workspace_status_serde() {
         active_artifact_digest: "sha256:test".to_string(),
         previous_artifact_digest: None,
         quarantined: false,
+        pin_drift: None,
         releases: vec![release.clone()],
     };
 

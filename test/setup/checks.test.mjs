@@ -145,6 +145,7 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, with no repo
       'rust-host-target-supported',
       'legacy-node-payload-present',
       'active-release-matches-checkout',
+      'activation-matches-pin',
       'confinement-policies-declared',
       'confinement-backend-registry-readable',
       'confinement-bwrap-platform',

@@ -49,7 +49,10 @@ fn an_override_reason_is_carried_only_when_the_activation_has_one() {
     };
     let explained = by_name("activation differs and an override");
     let drift = pin_drift(&activation_of(&explained), pin_of(&explained).as_ref()).unwrap();
-    assert_eq!(drift.override_reason.as_deref(), Some("testing the next build"));
+    assert_eq!(
+        drift.override_reason.as_deref(),
+        Some("testing the next build")
+    );
     let bare = by_name("activation differs with no override");
     let drift = pin_drift(&activation_of(&bare), pin_of(&bare).as_ref()).unwrap();
     assert_eq!(drift.override_reason, None);

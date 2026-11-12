@@ -1136,7 +1136,11 @@ fn init_workspace_tagged(
                     .map(|_| " (this workspace's active release was quarantined by `fgctl verify`; provide --from to reacquire it)")
                     .unwrap_or("");
                 return Err(InitError::Custom(format!(
-                    "pinned release {} is not staged in release store and no --from source was provided{}",
+                    "pinned release {} is not staged in release store and no --from source was provided{}\n\
+                     A digest names no download, so choose the release yourself:\n\
+                     \x20\x20fgctl init --from <release>   (a release directory or tarball with the pinned digest)\n\
+                     \x20\x20FGCTL_VERSION=<tag> fgctl init   (the tag whose digest is the pinned one)\n\
+                     \x20\x20fgctl init --override-pin <reason> --from <staged release>   (run a release already staged here instead of the pin)",
                     pin_digest, quarantine_note
                 )));
             }
@@ -2049,6 +2053,9 @@ pub fn verify_workspace(start_dir: &Path) -> Result<(), InitError> {
             check_workspace_shims(&installation_dir.join("bin"), cfg!(windows))
                 .map_err(InitError::Custom)?;
             println!("verified {}", short_digest(&active_digest));
+            if let Some(drift) = workspace_pin_drift(&workspace_root, &current_activation) {
+                println!("{drift}");
+            }
             Ok(())
         }
         Err(err_msg) => {
@@ -2107,7 +2114,62 @@ pub struct FgctlWorkspaceStatus {
     pub previous_artifact_digest: Option<String>,
     #[serde(default, skip_serializing_if = "std::ops::Not::not")]
     pub quarantined: bool,
+    /// Set only when the committed pin names a different release than the active one.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub pin_drift: Option<PinDrift>,
     pub releases: Vec<ReleaseStatusEntry>,
+}
+
+/// The active release differs from the one the committed pin names.
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct PinDrift {
+    pub active_digest: String,
+    pub pin_digest: String,
+    /// Why `fgctl init --override-pin` chose the active release; none when nobody said.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub override_reason: Option<String>,
+}
+
+impl std::fmt::Display for PinDrift {
+    /// The one line `fgctl status`, `fgctl verify` and `fgos doctor` all print.
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "active {} != pin {} (override: {})",
+            short_digest(&self.active_digest),
+            short_digest(&self.pin_digest),
+            self.override_reason.as_deref().unwrap_or("none")
+        )
+    }
+}
+
+/// Compares the activation with the committed pin. `None` when there is no
+/// pin or both name the same release.
+pub fn pin_drift(
+    activation: &WorkspaceActivationBinding,
+    pin: Option<&TrackedDistributionPin>,
+) -> Option<PinDrift> {
+    let pin_digest = &pin?.project_runtime.artifact_digest;
+    if *pin_digest == activation.artifact_digest {
+        return None;
+    }
+    Some(PinDrift {
+        active_digest: activation.artifact_digest.clone(),
+        pin_digest: pin_digest.clone(),
+        override_reason: activation.pin_override_reason.clone(),
+    })
+}
+
+/// [`pin_drift`] of the workspace's own pin file; an unreadable pin is no pin.
+fn workspace_pin_drift(
+    workspace_root: &Path,
+    activation: &WorkspaceActivationBinding,
+) -> Option<PinDrift> {
+    let pin = read_tracked_pin(&workspace_root.join(".fgos").join("distribution.json"))
+        .ok()
+        .flatten();
+    pin_drift(activation, pin.as_ref())
 }
 
 /// The one line `fgctl status` ends with: the active release, or what to run.
@@ -2134,10 +2196,13 @@ pub fn get_workspace_status(start_dir: &Path, store_root: &Path) -> Option<Fgctl
     let activation: WorkspaceActivationBinding = serde_json::from_str(&content).ok()?;
     let releases = list_releases(store_root).unwrap_or_default();
 
+    let pin_drift = workspace_pin_drift(&workspace_root, &activation);
+
     Some(FgctlWorkspaceStatus {
         active_artifact_digest: activation.artifact_digest,
         previous_artifact_digest: activation.previous_artifact_digest,
         quarantined: activation.status == "quarantined",
+        pin_drift,
         releases,
     })
 }
@@ -2730,6 +2795,7 @@ mod tests {
             active_artifact_digest: "sha256:0123456789abcdef".to_string(),
             previous_artifact_digest: None,
             quarantined,
+            pin_drift: None,
             releases: vec![],
         };
         assert_eq!(status_result_line(Some(&ws(false))), "active 0123456789ab");

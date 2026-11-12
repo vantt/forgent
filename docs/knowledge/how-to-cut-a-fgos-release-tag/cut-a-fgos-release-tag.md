@@ -56,6 +56,24 @@ publishes the GitHub Release.
    `SHA256SUMS`, runs `scripts/ci-external-consumer.sh --assets dist`, and
    publishes the GitHub Release.
 
+6. **Move the pin to the published release.** The committed
+   `.fgos/distribution.json` pins one exact digest, so it names the old
+   release until you move it. Once the Release is published, in this repo run
+   `FGCTL_VERSION=vX.Y.Z fgctl upgrade`; it activates the published release
+   and rewrites the pin with its digest and tag (`upgrade_workspace_resolving`
+   in `packages/distribution/rust/src/init.rs`). Then commit the moved pin and
+   confirm doctor is quiet about it:
+
+   ```bash
+   git add .fgos/distribution.json
+   git commit -m "chore(release): pin vX.Y.Z"
+   fgos doctor --json   # `activation-matches-pin` is no longer a warning
+   ```
+
+   Until this step is done, every machine that runs the new release shows
+   `active <digest12> != pin <digest12>` in `fgctl status`, `fgctl verify`
+   and `fgos doctor`.
+
 ## After you're done
 
 `README.md`'s `## Install` section documents the tag-pinned command with

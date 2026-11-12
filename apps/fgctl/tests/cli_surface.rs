@@ -187,3 +187,37 @@ fn a_digest_only_pin_with_nothing_staged_names_three_ways_out() {
         assert!(stderr.contains(way), "missing `{way}`:\n{stderr}");
     }
 }
+
+#[test]
+fn status_names_the_drift_between_the_active_release_and_the_pin_before_its_result_line() {
+    const ACTIVATION: &str = include_str!(
+        "../../../packages/distribution/rust/tests/goldens/activation-binding-minimal.json"
+    );
+    let dir = Scratch::new("status-drift");
+    let git_dir = dir.path().join(".git");
+    for sub in ["objects", "refs"] {
+        std::fs::create_dir_all(git_dir.join(sub)).unwrap();
+    }
+    std::fs::write(git_dir.join("HEAD"), "ref: refs/heads/main\n").unwrap();
+    let installation = dir.path().join(".fgos").join("installation");
+    std::fs::create_dir_all(&installation).unwrap();
+    let mut activation: serde_json::Value = serde_json::from_str(ACTIVATION).unwrap();
+    activation["pinOverrideReason"] = "trying the next build".into();
+    std::fs::write(installation.join("activation.json"), activation.to_string()).unwrap();
+    std::fs::write(
+        dir.path().join(".fgos").join("distribution.json"),
+        r#"{"schemaVersion":1,"projectRuntime":{"policy":"exact-digest","artifactDigest":"sha256:ffffffffffff1111"}}"#,
+    )
+    .unwrap();
+
+    let out = fgctl(dir.path(), &["status"]);
+    assert_eq!(out.status.code(), Some(0), "{}", text(&out.stderr));
+    let stdout = text(&out.stdout);
+    let lines: Vec<&str> = stdout.lines().collect();
+    assert_eq!(
+        lines[lines.len() - 2],
+        "active 08e33ffd77cc != pin ffffffffffff (override: trying the next build)",
+        "{stdout}"
+    );
+    assert_eq!(lines[lines.len() - 1], "active 08e33ffd77cc", "{stdout}");
+}
