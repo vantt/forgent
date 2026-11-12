@@ -2,8 +2,9 @@
 
 use std::io;
 
-/// `N` random bytes from the kernel.
-#[cfg(target_os = "linux")]
+/// `N` random bytes from the kernel generator. There is no fallback: when the
+/// system source fails the caller gets the error and no id is made.
+#[cfg(unix)]
 pub fn random_bytes<const N: usize>() -> io::Result<[u8; N]> {
     use std::io::Read;
     let mut bytes = [0u8; N];
@@ -11,12 +12,29 @@ pub fn random_bytes<const N: usize>() -> io::Result<[u8; N]> {
     Ok(bytes)
 }
 
-#[cfg(not(target_os = "linux"))]
+#[cfg(windows)]
 pub fn random_bytes<const N: usize>() -> io::Result<[u8; N]> {
-    Err(io::Error::new(
-        io::ErrorKind::Unsupported,
-        "native random identity driver unavailable",
-    ))
+    use windows_sys::Win32::Security::Cryptography::{
+        BCryptGenRandom, BCRYPT_USE_SYSTEM_PREFERRED_RNG,
+    };
+    let mut bytes = [0u8; N];
+    let len = u32::try_from(N)
+        .map_err(|_| io::Error::new(io::ErrorKind::InvalidInput, "too many random bytes"))?;
+    // SAFETY: fills `bytes` with the system-preferred generator; no algorithm handle is passed.
+    let status = unsafe {
+        BCryptGenRandom(
+            std::ptr::null_mut(),
+            bytes.as_mut_ptr(),
+            len,
+            BCRYPT_USE_SYSTEM_PREFERRED_RNG,
+        )
+    };
+    if status != 0 {
+        return Err(io::Error::other(format!(
+            "the system random generator failed: {status:#x}"
+        )));
+    }
+    Ok(bytes)
 }
 
 /// 128 random bits as 32 lowercase hex characters, from the kernel.
@@ -143,5 +161,21 @@ mod iso_tests {
         ] {
             assert_eq!(iso_utc_secs(bad), None, "{bad}");
         }
+    }
+}
+
+#[cfg(test)]
+mod random_tests {
+    use super::{random_bytes, random_hex128};
+
+    #[test]
+    fn the_host_kernel_generator_gives_distinct_non_zero_bytes() {
+        let a = random_bytes::<16>().expect("the host generator works");
+        let b = random_bytes::<16>().expect("the host generator works");
+        assert_ne!(a, [0u8; 16]);
+        assert_ne!(a, b);
+        let hex = random_hex128().expect("the host generator works");
+        assert_eq!(hex.len(), 32);
+        assert!(hex.bytes().all(|c| c.is_ascii_hexdigit()));
     }
 }

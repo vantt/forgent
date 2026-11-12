@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "d6eb5923e4bc90d7056c8f218eaf318f0f62078db554e9be23eb450a412ec0f2",
+  "payloadDigest": "937260d1e9bf5f4bb4d79aa54ef4ed1f889d03098ff939dd641d79415189bac0",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -498,7 +498,7 @@
     "packages/identity/rust/src/session.rs": "c47d0ee2bc070e02979f702a17031d48799867de27dd0688c74d6477a255c5a2",
     "packages/identity/rust/src/shared.rs": "0af34e63b1832c74dd7f48aabca466b6ff425b93bd6c54b9206ca29f04c0d995",
     "packages/identity/rust/src/signing.rs": "103554f2b75e499663b689c8d9ea1ffe01e871be7ee19ea01c7268a7e64e546a",
-    "packages/identity/rust/src/text.rs": "8fda76ecfa83419c11ab8dc456c1f76cea387e61700e997469667194c8747f91",
+    "packages/identity/rust/src/text.rs": "9639cf6ee8a57d88dbc620a505575ce1054b437c0ac2172426e93193bd45604a",
     "packages/identity/rust/tests/attempt_writer_id.rs": "97e308f3922b15715df4491a719a09f242f7469bb44fe7b063fec9e2e9a93ad5",
     "packages/identity/rust/tests/directory.rs": "23a4e315960c947278a9863a435c281a7e94dae6ee5fac2a89eec351e5326eb8",
     "packages/identity/rust/tests/golden.rs": "42e3a4c98aaa1e336f0346b8ac2207c9b84726e399c214200297c463507ed49e",
