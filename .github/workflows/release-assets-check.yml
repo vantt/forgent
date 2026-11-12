@@ -64,7 +64,7 @@ jobs:
       - name: cargo test (identity crate, without the mint tests)
         if: runner.os == 'Windows'
         run: >
-          cargo test -p fgos-identity --lib
+          cargo test -p fgos-identity --no-fail-fast --lib
           --test attempt_writer_id --test directory --test golden --test machine --test project
           --test register_current --test session --test shared --test signing
 
