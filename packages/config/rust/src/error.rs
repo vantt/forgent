@@ -17,7 +17,7 @@ pub struct Detail {
     pub belongs_in: Option<String>,
     /// For a merge that cannot combine two layers: the layers that hold a value at the path.
     pub layers: Vec<&'static str>,
-    /// For an unknown key: the nearest keys the schemas and the runtime key list know, as paths.
+    /// For an unknown key: the nearest keys the schemas know, as paths.
     pub suggest: Vec<String>,
 }
 

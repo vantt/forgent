@@ -15,7 +15,7 @@
 // assumed to be an agent — so every outcome is a categorized exit code
 // (R4), and callers should branch on the code, never on the message text.
 //
-// Exit codes (R4): The canonical exit-code table lives in src/state/store-error.mjs's
+// Exit codes (R4): The canonical exit-code table lives in src/cli/exit-codes.mjs's
 // EXIT_CODES export (codes 2-5, 7-9 for store/preflight; 0=ok, 1=unexpected),
 // src/runner/execution/outcome-exit.mjs (execution outcomes: policy-refusal=4, provider-limit=10,
 // execution-failure=11, partial-writes=12, blocked=13, findings=14; RUL99),
@@ -30,9 +30,9 @@ import path from 'node:path';
 import readline from 'node:readline';
 import { execFileSync, execSync, spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { randomUUID } from 'node:crypto';
-import { initStore, addWork, moveWork, settleClaim, editWork, resolveParkReason, addDecision, addOutcome, recordFriction, listWork, readyWork, isDepsAndLineageReady, footprintConflicts, computedSchedule, readRawEvents, putInAwaiting, answerAwaiting, setFocus, goalFocusShow, assertAcceptanceEvidence, assertPlanEvidence, assertValidDocType, recordGateApprove, recordCall, recordCallReturn,      parseDecisionRelation, decisionTextLooksLikeSupersession, registerTopicStore, renameTopicStore, splitTopicStore, mergeTopicStore, retireTopicStore, reserveDocStore, registerDocStore, markDocRenderedStore, promoteDocStore, demoteDocStore, supersedeDocStore, retireDocStore, moveDocPathStore, attestDocStore } from '../src/state/store.mjs';
-import { StoreError, EXIT_CODES, categoryOf } from '../src/state/store-error.mjs';
+import { addWork, moveWork, settleClaim, editWork, resolveParkReason, addDecision, addOutcome, recordFriction, listWork, readyWork, isDepsAndLineageReady, footprintConflicts, computedSchedule, readRawEvents, putInAwaiting, answerAwaiting, setFocus, goalFocusShow, assertAcceptanceEvidence, assertPlanEvidence, assertValidDocType, recordGateApprove, recordCall, recordCallReturn,      parseDecisionRelation, decisionTextLooksLikeSupersession, registerTopicStore, renameTopicStore, splitTopicStore, mergeTopicStore, retireTopicStore, reserveDocStore, registerDocStore, markDocRenderedStore, promoteDocStore, demoteDocStore, supersedeDocStore, retireDocStore, moveDocPathStore, attestDocStore } from '../src/state/store.mjs';
+import { StoreError, categoryOf } from '../src/state/store-error.mjs';
+import { EXIT_CODES } from '../src/cli/exit-codes.mjs';
 import { exitCodeOf } from '../src/cli/verb-exit.mjs';
 import { resolveDocPath } from '../src/report/knowledge-resolver.mjs';
 import { resolveDocId } from '../src/state/knowledge-registry.mjs';
@@ -44,11 +44,11 @@ import { runFourDoorChecks } from '../src/state/retrospective-doors.mjs';
 import { findAuthoritativeMatch, findDuplicateAuthoritativeClaims } from '../src/report/authoritative-match.mjs';
 import { checkVerifyForC4 } from '../src/intake/verify-pattern-check.mjs';
 import { parseFrontmatter } from '../src/report/frontmatter.mjs';
-import { probeTool, readLocalStatus, writeLocalStatus, resolvedStatus, normalizeCapability, toolsFromExecutors } from '../src/state/tool-registry.mjs';
+import { checkTools, queryTools } from '../src/state/tool-registry.mjs';
 import { EventLogError } from '../src/state/event-log.mjs';
 import { foldEvents, conflictsFor } from '../src/state/replay.mjs';
 import { deriveTitle, classify } from '../src/intake/classify.mjs';
-import { mintMachineId, mintWorkId } from '../src/util/identity-mint.mjs';
+import { mintWorkId } from '../src/util/identity-mint.mjs';
 import { wrapEnvelope } from '../src/state/envelope.mjs';
 import { loadRunnerConfigForDir } from '../src/runner/dispatch/config.mjs';
 import { RunnerConfigError } from '../src/runner/dispatch/runner-config-error.mjs';
@@ -67,9 +67,8 @@ import { enableCancelOnSignal } from '../src/run-supervisor/cancel-opt-in.mjs';
 // copy's own on-disk location" approach `integrationScriptPath()` already
 // uses in src/setup/registrations.mjs.
 const PACKAGE_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-import { resolveFgosDir, fgosDirFromRoot, resolveMainCheckoutRoot } from '../src/runner/paths.mjs';
+import { resolveInvocationRoot, fgosDirFromRoot } from '../src/runner/paths.mjs';
 import { resolveFgosFile, FGOS_FILE } from '../src/state/fgos-file-registry.mjs';
-import { resolveCliVersionInfo } from '../src/cli/version.mjs';
 import { hasRealVerify } from '../src/intake/discovery.mjs';
 import { replaceLockedDecisionsSection, resolveContentRoot } from '../src/intake/plan.mjs';
 import { findSourceCaptureIds } from '../src/report/enduser-index.mjs';
@@ -77,10 +76,8 @@ import { generateEnduserDocsIndex } from '../src/report/enduser-index-generate.m
 import { rankImpact } from '../src/state/impact.mjs';
 import { FINAL_STATUSES } from '../src/state/work.mjs';
 import { isResolvedStatus } from '../src/state/frontier.mjs';
-import { readClaim, releaseClaim, getMainFgosDir } from '../src/state/runtime-coordination.mjs';
-import { maintainEventStore } from '../src/event-store/maintenance.mjs';
-import { processSealCoalescer } from '../src/event-store/seal-coalescing.mjs';
-import { spawnDetachedCli } from '../src/cli/detached-child.mjs';
+import { readClaim, releaseClaim } from '../src/state/runtime-coordination.mjs';
+import { runWithEventStoreLifecycle } from '../src/event-store/maintenance.mjs';
 import { paginate } from '../src/state/cursor.mjs';
 import { runGoalCheck, detachedWorktreeFgosHint, runInvariantChecks, invariantFailureAsCheck } from '../src/runner/goal-check.mjs';
 import { frozenJudgeHits, footprintDiffHits } from '../src/runner/frozen-judge.mjs';
@@ -88,10 +85,10 @@ import { normalizePath } from '../src/util/normalize-path.mjs';
 import { collectOutcomeEntry } from '../src/report/item-trace.mjs';
 import { cleanupMergedBranch, isWorkingTreeClean as isMainTreeClean, buildOwnFileSet, readInvariantCheckCommands } from '../src/runner/merge.mjs';
 import { inspectEntries, inspectPath } from '../src/util/git-paths.mjs';
-import { assertSafeMainCheckoutReset } from '../src/runner/main-checkout-reset-guard.mjs';
+import { mainCheckoutResetUseCase } from '../src/runner/main-checkout-reset-guard.mjs';
 import { editUseCase, parseEditFlags } from '../src/verbs/state/edit.mjs';
 import { unknownFlagMessage } from '../src/cli/flag-check.mjs';
-import { parseArgs } from '../src/cli/parse-args.mjs';
+import { parseArgs, parseListFlag } from '../src/cli/parse-args.mjs';
 import { moveUseCase } from '../src/verbs/state/move.mjs';
 import { listUseCase, graphUseCase, workflowUseCase, gateCheckUseCase, staleUseCase } from '../src/verbs/state/read.mjs';
 import { showRunUseCase } from '../src/verbs/dispatch/show-run.mjs';
@@ -99,31 +96,25 @@ import { invokeDispatchInspectOperation } from '../src/verbs/dispatch/inspect.mj
 import { invokeDispatchReconcileOperation } from '../src/verbs/dispatch/reconcile.mjs';
 import { watchRunUseCase } from '../src/verbs/dispatch/watch.mjs';
 import { recoverObserveUseCase, recoverApplyUseCase } from '../src/verbs/dispatch/recover.mjs';
-import { branchNameFor, branchExists, resyncWorktree, detectTrunk, isMainWorktree, currentHead, realpathOrSelf as realpathOr, inspectGit, resolveRefSha, gitWorktrees, createVerifyCheckout, removeWorktree } from '../src/runner/worktree.mjs';
+import { branchNameFor, branchExists, resyncWorktree, detectTrunk, isMainWorktree, admitStoreAccess, currentHead, realpathOrSelf as realpathOr, inspectGit, resolveRefSha, createVerifyCheckout, removeWorktree } from '../src/runner/worktree.mjs';
 import { claimWork, ClaimError, readWorkerSlotCeiling } from '../src/runner/claim-port.mjs';
 import { isReclaimEligible } from '../src/runner/claim-liveness.mjs';
-import { withMainCheckout } from '../src/runner/repo-locks.mjs';
-import { commitAt, gitPortOptions, gitWriter, pathExistsAt } from '../src/git/inspect.mjs';
-import { nativeError } from '../src/git/native.mjs';
-import { createGitSafeRestore } from '../src/git/restore.mjs';
+import { commitAt, pathExistsAt } from '../src/git/inspect.mjs';
 import { readGitStatus, readMergeHead, recoverGitOperations } from '../src/git/status.mjs';
-import { HolderLockError, createLockScope } from '../src/holder-lock/index.mjs';
+import { HolderLockError } from '../src/holder-lock/index.mjs';
 import { collectLockStatus } from '../src/runner/lock-status.mjs';
 import { fenceLock, parseLockParams } from '../src/runner/lock-fence.mjs';
 import { formatLockDurationMs } from '../src/util/format-lock-duration.mjs';
-import { clearBeaconIfOwn, readBeacon } from '../src/runner/main-checkout-activity.mjs';
+import { clearBeaconIfOwn } from '../src/runner/main-checkout-activity.mjs';
 import { resolveWriterIdentity } from '../src/util/session-identity.mjs';
-import { resolveStateRoot as worktreeStateRoot } from '../src/holder-lock/state-root.mjs';
-import { createSession, endSession, listSessions, reclaimOrphanedSessions, isSessionWorktree, SessionError } from '../src/runner/session.mjs';
+import { createSession, endSession, listSessions, reclaimOrphanedSessions, sessionSummary, SessionError } from '../src/runner/session.mjs';
 import { visitCount } from '../src/runner/anti-loop.mjs';
 import { DEFAULTS } from '../src/state/work.mjs';
 import { DEFAULT_DOMAIN, getDomain, stepForPhase, domainSteps, effectiveStep, resolveDomainName } from '../src/state/domain-registry.mjs';
-import { writeCoexistenceManifest } from '../src/install/coexist.mjs';
 import { MANIFEST_SCHEMA_VERSION, COMMAND_REGISTRY, declared } from '../src/cli/command-registry.mjs';
-import { recordInvocationFault, resolveFaultLogPath } from '../src/cli/invocation-fault-log.mjs';
+import { recordInvocationFault } from '../src/observe/invocation-fault-log.mjs';
 import { computeAwaitingContext } from '../src/state/awaiting-context.mjs';
 import { readConfig, initConfigFile } from '../src/config/facade.mjs';
-import { fixEventStoreLockDirs } from '../src/setup/event-store-fixes.mjs';
 import { countWorkerSlots, hasWorkerSlotRoom } from '../src/state/worker-slots.mjs';
 import { assessCleanupReadiness, blockedItemsNowResolvable } from '../src/state/cleanup-harness.mjs';
 import { formatCheck, bold } from '../src/setup/ansi.mjs';
@@ -134,59 +125,22 @@ import { formatCheck, bold } from '../src/setup/ansi.mjs';
 // overridable by a later edit.
 const SUBMIT_VERIFY_SENTINEL = 'chưa xác định — P15 bổ sung';
 
-// `overrideDir` (tsk-56t D1): an explicit, opt-in escape hatch alongside D5's
-// strict cwd resolution, never a replacement for it — omitting `--dir`
-// leaves every existing caller byte-identical to before this cell. A
-// worktree-resident session (no `.fgos/` at its own cwd, per ADR0020) passes
-// `--dir <mainRoot>` to reach the one real store explicitly, instead of the
-// CLI silently git-resolving upward (which would reopen D5 for every caller,
-// not just this one).
-function dataDir(overrideDir) {
-  if (overrideDir !== undefined) {
-    if (typeof overrideDir !== 'string' || !overrideDir.trim()) {
-      throw new StoreError('validation', '--dir requires a non-empty path value');
-    }
-    return fgosDirFromRoot(overrideDir);
-  }
-  // strict: true — this CLI's `.fgos/` always lives under the caller's own
-  // cwd, never git-resolved upward (D5: the pull door's `take`/`return`
-  // operate directly on `cwd`, never a worktree).
-  return resolveFgosDir(process.cwd(), { strict: true });
+// The root a verb that acts on the main checkout (setup, doctor, uninstall, git, unclaim, wire-agents,
+// resync-worktree, main-checkout-reset) takes, from `cwd` or from the checkout `--dir` names.
+// `--dir` is taken as the project root the caller names; `main-checkout-only` (a destructive verb) requires it to be
+// the main root of the repository the command runs in.
+function mainCheckoutRootOf(flags, cwd = process.cwd(), policy = 'main-checkout') {
+  return resolveInvocationRoot({ cwd, dir: flags.dir, policy }).root;
 }
 
-// `main-checkout-reset` reads: the commits a reset would drop and the whole-repo status, both through
-// Inspect. Listing is advisory, so it is bounded and degrades instead of failing the verb.
-const RESET_LISTED_COMMITS = 50;
-function describeLostCommits(inspect, commits) {
-  const shown = commits.slice(0, RESET_LISTED_COMMITS);
-  let objects = [];
-  try {
-    objects = inspect.readObjects({ oids: shown, maxBytes: 8 * 1024 * 1024 });
-  } catch (_err) {
-    // Details unavailable: the short ids below still name every listed commit.
-  }
-  const lines = shown.map((oid, i) => {
-    const object = objects[i];
-    if (object?.kind !== 'present' || object.objectType !== 'commit') return `${oid.slice(0, 7)} (commit details unavailable)`;
-    const [header, ...body] = Buffer.from(object.bytes).toString('utf8').split('\n\n');
-    const author = /^author (.*) <([^>]*)> \d+ [+-]\d{4}$/m.exec(header);
-    return `${oid.slice(0, 7)} ${author ? `${author[1]} (${author[2]})` : '(unknown author)'}: ${body.join('\n\n').split('\n', 1)[0]}`;
-  });
-  if (commits.length > shown.length) lines.push(`... and ${commits.length - shown.length} more`);
-  return lines.join('\n');
+// The main checkout of the repository `cwd` sits in (`cwd` itself outside a repository).
+function mainCheckoutRootAt(cwd) {
+  return mainCheckoutRootOf({}, cwd);
 }
-function renderStatus(inspect) {
-  const lines = [];
-  let cursor;
-  do {
-    const page = inspect.status({ untracked: 'all', maxEntries: 4096, cursor });
-    for (const entry of page.entries) {
-      const xy = entry.untracked ? '??' : entry.ignored ? '!!' : String.fromCharCode(entry.index, entry.worktree).replaceAll('.', ' ');
-      lines.push(`${xy} ${Buffer.from(entry.path).toString('utf8')}`);
-    }
-    cursor = page.nextCursor;
-  } while (cursor);
-  return lines.join('\n');
+
+// What an Event Store verb reads: the project the `.fgos` `dir` belongs to, and the main checkout that owns the store.
+function eventStoreContext(dir) {
+  return { cwd: path.dirname(dir), trustedMain: mainCheckoutRootAt(path.dirname(dir)) };
 }
 
 // `currentHead`/`resolveRefSha` live in src/runner/worktree.mjs (tsk-49i
@@ -467,80 +421,7 @@ function resolveVerifyTimeoutMs(verb, flags, repoRoot) {
     return timeoutMs;
   }
   // The config is the main checkout's; a session worktree reaches it only through a `.fgos` link, which the door refuses.
-  return loadRunnerConfigForDir(resolveMainCheckoutRoot(repoRoot) ?? repoRoot).timeoutMs;
-}
-
-/**
- * The Unit `fgos run "<prompt>"` stands for: the prompt is its objective, `--writes` its write scope
- * (none: a read-only unit), `--provider` its soft executor preference, `--persona` its persona,
- * `--input` the files it is handed (Unit `inputs`) and `--verify` the command that checks its work.
- * Every flag is checked against the config and the persona tiers here, so a wrong one leaves no
- * unit run behind. A writing unit needs a linked worktree; this never creates one.
- */
-async function adhocUnitFromPrompt(prompt, flags, { mainRoot, isLinkedWorktree }) {
-  // `--sync <ref>` without a prompt is a sync-only unit: the runner merges the ref and a worker
-  // runs only when the merge stops on conflicts.
-  const syncOnly = prompt === undefined && flags.sync !== undefined;
-  if (!syncOnly && (typeof prompt !== 'string' || !prompt.trim())) {
-    throw new StoreError('validation', 'fgos run "<prompt>" needs a non-empty prompt');
-  }
-  const syncBase = flags.sync === undefined ? undefined : requireField(flags.sync, '--sync requires a ref to merge (a branch, tag or commit, e.g. main)');
-  const writes = parseListFlag(flags.writes);
-  if (syncBase !== undefined && flags.writes === undefined) {
-    throw new StoreError('validation', 'fgos run --sync needs --writes: merging a ref changes the branch, so the unit is a writing unit in a linked worktree (the conflicted paths join the scope by themselves)');
-  }
-  if (flags.writes !== undefined && writes.length === 0) {
-    throw new StoreError('validation', 'fgos run "<prompt>" --writes needs at least one path; omit it for a read-only unit');
-  }
-  if (writes.length > 0 && !isLinkedWorktree()) {
-    throw new StoreError('validation', 'fgos run "<prompt>" --writes needs a linked worktree: create one with `git worktree add <path>` and pass --worktree <path> (or run from inside it)');
-  }
-  const inputs = parseListFlag(flags.input);
-  if (flags.input !== undefined && inputs.length === 0) {
-    throw new StoreError('validation', 'fgos run "<prompt>" --input needs at least one repo-relative path (comma-separated); omit it for a unit with no input files');
-  }
-  const prefer = parseListFlag(flags.provider);
-  if (flags.provider !== undefined) {
-    const executors = loadRunnerConfigForDir(mainRoot).executors ?? {};
-    const valid = Object.keys(executors).filter((id) => (executors[id]?.kind ?? 'agent') === 'agent');
-    const unknown = prefer.find((id) => !valid.includes(id));
-    if (prefer.length === 0 || unknown !== undefined) {
-      throw new StoreError('validation', `unknown --provider "${unknown ?? ''}"; valid providers: ${valid.join(', ') || '(none registered)'}`);
-    }
-  }
-  if (flags.persona !== undefined) {
-    const persona = requireField(flags.persona, '--persona requires a persona name');
-    const { resolveAgentDefinition } = await import('../src/runner/agent-definitions.mjs');
-    try {
-      resolveAgentDefinition(persona, { projectRoot: mainRoot });
-    } catch (err) {
-      throw new StoreError('validation', err.message);
-    }
-  }
-  const { randomBytes } = await import('node:crypto');
-  // ASCII only, so the id is a safe path segment whatever the prompt's script or punctuation.
-  const slug = (syncOnly ? `sync-${syncBase}` : prompt).normalize('NFKD').replace(/[\u0300-\u036f]/g, '').replace(/[đĐ]/g, 'd').toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-').replace(/^-+/, '').slice(0, 40).replace(/-+$/, '') || 'task';
-  return {
-    id: `adhoc-${slug}-${randomBytes(2).toString('hex')}`,
-    ...(syncOnly ? {} : { objective: prompt }),
-    ...(syncBase !== undefined ? { syncBase } : {}),
-    capability: flags.capability === undefined ? 'execute' : requireField(flags.capability, '--capability requires a capability name'),
-    writes,
-    ...(flags.rigor !== undefined ? { rigor: requireField(flags.rigor, '--rigor requires a level') } : {}),
-    ...(prefer.length > 0 ? { prefer } : {}),
-    ...(flags.persona !== undefined ? { persona: flags.persona } : {}),
-    ...(inputs.length > 0 ? { inputs } : {}),
-    ...(flags.verify !== undefined ? { verify: requireField(flags.verify, '--verify requires a command, e.g. --verify "npm test"') } : {}),
-  };
-}
-
-function parseListFlag(value) {
-  if (value === undefined || value === true) return [];
-  return value
-    .split(',')
-    .map((s) => s.trim())
-    .filter(Boolean);
+  return loadRunnerConfigForDir(mainCheckoutRootAt(repoRoot)).timeoutMs;
 }
 
 // Per str73-done-flip-cos-check D2: --acceptance carries a JSON-encoded array
@@ -981,78 +862,16 @@ function submitWork(dir, text, opts = {}) {
   return event.payload;
 }
 
-// The dispatch doors that ran one task straight through dispatch are gone; each now has a
-// runUnit door. This is the one place that says which: every caller of `fgos dispatch`
-// (shell, gateway, scripts) gets the same validation error, before anything runs.
-async function retiredDispatchDoorMessage(sub, positional, flags) {
-  if (sub === 'execute') {
-    if (flags.assignment !== undefined) {
-      return 'fgos dispatch execute --assignment was removed: run the unit with `fgos run --unit <file>`, or planned work with `fgos workflow start <preset>|--units <file>`.';
-    }
-    const executorId = positional[1] && !String(positional[1]).startsWith('--') ? positional[1] : undefined;
-    const { runDoorHint } = await import('../src/runner/dispatch/cli.mjs');
-    const hint = runDoorHint({
-      cwd: typeof flags.cwd === 'string' ? flags.cwd : process.cwd(),
-      executorId,
-      capability: typeof flags.for === 'string' ? flags.for : undefined,
-    });
-    return `fgos dispatch execute was removed: run one task with ${hint}, or a unit file with \`fgos run --unit <file>\`.`;
-  }
-  if (sub === 'log') {
-    return 'fgos dispatch log was removed: every run records its own provenance under `.fgos/assignments/<unitRunId>/`; run work through `fgos run` and read it there.';
-  }
-  return null;
-}
-
 async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slice(3)) {
   switch (verb) {
-    case 'version': {
-      return resolveCliVersionInfo();
-    }
-
     case 'init': {
-      // `init` is the first step of setup, and the store cannot open without a machine id and its locks directory,
-      // which setup creates. Create them here through the Identity mint and the lock-dirs fix (idempotent: an existing id is kept, and a
-      // clone's own `fgos.machineId` still wins).
-      mintMachineId(worktreeStateRoot().stateRoot);
-      fixEventStoreLockDirs(path.dirname(dir));
-      initStore(dir);
-      // D4: detection/manifest writing must never fail init — a permissions
-      // quirk or unexpected error here still leaves `.fgos/` initialized.
-      let detectedHarnesses = [];
-      try {
-        const manifest = writeCoexistenceManifest(path.dirname(dir), dir);
-        detectedHarnesses = manifest.detected_harnesses;
-      } catch {
-        // Swallowed by design (D4 fail-safe) — see comment above.
-      }
-      // D4 fail-safe, same discipline as the coexistence manifest above: a
-      // failed HEAD lookup (a repo with zero commits, an unreadable ref) lands
-      // in the same catch — a plain non-fatal notice, not a distinction worth
-      // making. A cwd that is no repository never gets here: the two fixes
-      // above resolve the repository and refuse it.
-      let gitHeadless = false;
-      try {
-        gitHeadless = typeof inspectGit(path.dirname(dir)).resolveCommit({ name: 'HEAD' }) !== 'string';
-      } catch {
-        gitHeadless = true;
-      }
-      // Last and fail-safe like the steps above: an interrupted Land, ScopedCommit or remote transfer is recovered here, so a
-      // machine that only runs `init` on upgrade settles it without `fgos git recover` by hand.
-      let gitRecovery;
-      let gitRecoveryWarning;
-      try {
-        const { recovered, kept } = recoverGitOperations(path.dirname(dir));
-        if (recovered.length || kept.length) gitRecovery = { recovered, kept };
-      } catch (err) {
-        gitRecoveryWarning = `Git recovery refused: ${err.message}; run \`fgos git recover\``;
-      }
-      return { dir, detectedHarnesses, ...(gitHeadless ? { gitHeadless: true } : {}), ...(gitRecovery ? { gitRecovery } : {}), ...(gitRecoveryWarning ? { gitRecoveryWarning } : {}) };
+      const { initStoreUseCase } = await import('../src/verbs/state/init.mjs');
+      return initStoreUseCase({ dir });
     }
 
     case 'git': {
       const sub = positional[0];
-      const root = flags.dir !== undefined ? path.dirname(dir) : (resolveMainCheckoutRoot(process.cwd()) ?? process.cwd());
+      const root = mainCheckoutRootOf(flags);
       if (sub === 'status') {
         return readGitStatus(root);
       }
@@ -1247,13 +1066,13 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       // `path.dirname(dir)`, not `process.cwd()` (tsk-5hv, found by
       // fgos-coding-implement): `dir` already reflects `--dir` when given
       // (every skill's own hard rule: resolve the main checkout and pass
-      // it explicitly) or `process.cwd()` when omitted (dataDir()'s own
+      // it explicitly) or `process.cwd()` when omitted (the invocation-root door's own
       // documented cwd-strict contract) -- reusing it here instead of a
       // bare `process.cwd()` is what keeps this call correct for a
       // worktree-resident session, since `.fgos/config.json` is
       // unconditionally wiped from every freshly-created worktree
       // (ADR0020) and a bare cwd would silently resolve to nothing there.
-      const cfg = loadRunnerConfigForDir(resolveMainCheckoutRoot(path.dirname(dir)) ?? path.dirname(dir));
+      const cfg = loadRunnerConfigForDir(mainCheckoutRootAt(path.dirname(dir)));
       const callerVerdict = parseDiscoverCallerVerdict(flags);
       const repoRoot = path.dirname(dir);
       const list = listWork(dir).work;
@@ -1289,7 +1108,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       const id = requireField(positional[0] ?? flags.id, 'plan requires an id: fgos plan <id>');
       // path.dirname(dir), not process.cwd() -- see the discover case above
       // for why (tsk-5hv, found by fgos-coding-implement).
-      const cfg = loadRunnerConfigForDir(resolveMainCheckoutRoot(path.dirname(dir)) ?? path.dirname(dir));
+      const cfg = loadRunnerConfigForDir(mainCheckoutRootAt(path.dirname(dir)));
       const callerVerdict = parsePlanCallerVerdict(flags);
       const repoRoot = path.dirname(dir);
       const list = listWork(dir).work;
@@ -2627,38 +2446,39 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
     // imports a herdr client or a dispatch adapter, so there is no path from
     // this case to sending anything into a pane.
     case 'dispatch': {
-      const sub = requireField(positional[0], 'dispatch requires a sub-verb: fgos dispatch <show-run|inspect|watch|recover|reconcile|decide|explain|probe-account>');
-      const retired = await retiredDispatchDoorMessage(sub, positional, flags);
+      const { retiredDispatchDoorMessage, decideCommand } = await import('../src/runner/dispatch/decide.mjs');
+      const retired = retiredDispatchDoorMessage(positional[0], positional, { assignment: flags.assignment, cwd: flags.cwd, for: flags.for });
       if (retired) throw new StoreError('validation', retired);
-      const KNOWN_DISPATCH_SUBVERBS = [
-        'show-run',
-        'inspect',
-        'watch',
-        'recover',
-        'reconcile',
-        'decide',
-        'explain',
-        'probe-account',
-      ];
-      if (!KNOWN_DISPATCH_SUBVERBS.includes(sub)) {
-        throw new StoreError('validation', `unknown dispatch sub-verb "${sub}": expected ${KNOWN_DISPATCH_SUBVERBS.join(', ')}`);
-      }
+      const sub = requireSubVerb('dispatch', positional);
       if (sub === 'probe-account') {
         const { runDispatchCli } = await import('../src/runner/dispatch/cli.mjs');
         return await runDispatchCli(rawArgv, { returnResult: true });
       }
+      if (sub === 'probe-session') {
+        // Dispatch holds no execution door: the probe's seat runs through the same `runUnit` as `fgos run`, admitted
+        // the same way (the port is injected here, Execution never imports the Workflow).
+        const { runDispatchCli } = await import('../src/runner/dispatch/cli.mjs');
+        const { runUnit } = await import('../src/runner/execution/run.mjs');
+        const { createCaseAdmissionPort } = await import('../src/workflow/case-admission-port.mjs');
+        const executionDoor = (options) => runUnit({ ...options, caseAdmission: createCaseAdmissionPort({ repoRoot: options.repoRoot }) });
+        return await runDispatchCli(rawArgv, { returnResult: true, executionDoor });
+      }
       if (sub === 'decide') {
         // Dispatch holds no Work store: `decide --work` gets its Work lookup from here.
-        const { runDispatchCli } = await import('../src/runner/dispatch/cli.mjs');
         const { resolveWorkForDispatch } = await import('../src/runner/work-dispatch.mjs');
-        try {
-          return await runDispatchCli(rawArgv, { returnResult: true, resolveWork: resolveWorkForDispatch });
-        } catch (err) {
-          if (err.errorClass) {
-            process.stdout.write(`${JSON.stringify({ error: err.message, ...(err.errorClass ? { errorClass: err.errorClass } : {}) })}\n`);
-          }
-          throw err;
-        }
+        const text = (value) => (typeof value === 'string' ? value : undefined);
+        return await decideCommand({
+          executorId: positional[1],
+          cwd: text(flags.cwd) ?? text(flags.dir),
+          repoRoot: text(flags['repo-root']),
+          hasLiveTaskAccess: flags['has-live-task-access'] !== undefined,
+          for: text(flags.for),
+          workId: text(flags.work),
+          assignment: text(flags.assignment),
+          stage: text(flags.stage),
+          needsSoul: flags['needs-soul'] !== undefined,
+          resolveWork: resolveWorkForDispatch,
+        });
       }
       const repoRootForDispatch = flags.dir !== undefined ? path.dirname(dir) : process.cwd();
       if (sub === 'explain') {
@@ -2779,155 +2599,17 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
     }
     case 'run': {
       const { runUnit, resolveGitRoots } = await import('../src/runner/execution/run.mjs');
-      const { parseRunTimeout } = await import('../src/runner/dispatch/config.mjs');
-      const unitPath = flags.unit;
-      const resumeUnitRunId = flags.resume;
-      const prompt = positional[0];
-      if (!unitPath && !resumeUnitRunId && prompt === undefined && flags.sync === undefined) {
-        throw new StoreError('validation', 'fgos run requires --unit <file|-> or --resume <unitRunId>, a "<prompt>", or --sync <ref>');
-      }
-      if ([unitPath, resumeUnitRunId, prompt].filter((v) => v !== undefined).length > 1) {
-        throw new StoreError('validation', 'fgos run takes either a "<prompt>", --unit or --resume, not more than one');
-      }
-      if (positional.length > 1) {
-        throw new StoreError('validation', `fgos run takes one prompt; quote the prompt ("${positional.join(' ')}")`);
-      }
-      // The flags that build a unit from a prompt mean nothing to a --unit file or a resume; refused, never dropped.
-      // A bare `--sync <ref>` builds a sync-only unit from the same flags (a --unit file names `syncBase`).
-      if (flags.sync !== undefined && (unitPath || resumeUnitRunId)) {
-        throw new StoreError('validation', '--sync only applies to fgos run "<prompt>" or a bare --sync <ref>; a --unit file names syncBase, and a resume keeps the sync it started with');
-      }
-      const buildsUnit = prompt !== undefined || flags.sync !== undefined;
-      const promptOnlyFlag = !buildsUnit && ['provider', 'persona', 'writes', 'capability', 'rigor', 'input', 'verify'].find((f) => flags[f] !== undefined);
-      if (promptOnlyFlag) {
-        throw new StoreError('validation', `--${promptOnlyFlag} only applies to fgos run "<prompt>"`);
-      }
-      const pattern = flags.pattern;
-      const overrideStr = flags.override;
-      let overrides = [];
-      if (overrideStr) {
-        try {
-          const parsed = JSON.parse(overrideStr);
-          overrides = Array.isArray(parsed) ? parsed : [parsed];
-        } catch (e) {
-          throw new StoreError('validation', `invalid JSON for --override: ${e.message}`);
-        }
-      }
-      // `--effort <level>` is a reasoningEffort override for bind(): added to every override that
-      // does not name one, and as a trailing unscoped override when none is unscoped, so a role a
-      // scoped override does not name still gets it. bind() checks it against the chosen executor.
-      if (flags.effort !== undefined) {
-        const effort = requireField(flags.effort, '--effort requires a level (low, medium, high, max)');
-        if (!overrides.some((ov) => ov && typeof ov === 'object' && !ov.scope)) overrides.push({});
-        for (const ov of overrides) {
-          if (ov.reasoningEffort === undefined) ov.reasoningEffort = effort;
-        }
-      }
-      // `--timeout <dur>` (90m, 5400s, 2h) gives the run its own time instead of runner.timeoutMs, the
-      // same way: a `timeoutMs` key on every override that does not name one. It is kept in unit.json,
-      // so a resumed run keeps it and --timeout cannot change it.
-      if (flags.timeout !== undefined) {
-        if (resumeUnitRunId) throw new StoreError('validation', '--timeout cannot change a resumed unit run: it keeps the timeout it was started with');
-        let timeoutMs;
-        try {
-          timeoutMs = parseRunTimeout(requireField(flags.timeout, '--timeout requires a duration, e.g. 90m or 5400s'));
-        } catch (err) {
-          throw new StoreError('validation', err.message);
-        }
-        if (!overrides.some((ov) => ov && typeof ov === 'object' && !ov.scope)) overrides.push({});
-        for (const ov of overrides) {
-          if (ov.timeoutMs === undefined) ov.timeoutMs = timeoutMs;
-        }
-      }
-      // `--account <pool/account>` pins the account the same way: an `account` key on every override
-      // that does not name one. runUnit checks it against each seat's bound executor before the unit
-      // run exists; a resumed run keeps the account its bindings already carry.
-      if (flags.account !== undefined) {
-        if (resumeUnitRunId) throw new StoreError('validation', '--account cannot change a resumed unit run: it keeps the account its seats were bound to');
-        const account = requireField(flags.account, '--account requires pool/account (an account of a pool in ~/.fgos/private/accounts.yaml, for example openai/work)');
-        if (!overrides.some((ov) => ov && typeof ov === 'object' && !ov.scope)) overrides.push({});
-        for (const ov of overrides) {
-          if (ov.account === undefined) ov.account = account;
-        }
-      }
-      const repoRoot = flags.dir;
-      const worktree = flags.worktree;
+      const { buildRunRequest } = await import('../src/runner/execution/run-request.mjs');
       const { createCaseAdmissionPort, activityUnitOf, confinedWriteRefusal } = await import('../src/workflow/case-admission-port.mjs');
-      const portRoot = repoRoot ? path.resolve(repoRoot) : (() => { try { return resolveGitRoots(process.cwd()).mainCheckoutRoot; } catch { return null; } })();
-      // A confined writer must be refused before anything needs a lock or an
-      // addon; the case port uses this same read-only/masked-view check.
-      if (flags.writes !== undefined) {
-        const confined = confinedWriteRefusal({ mainRoot: portRoot ?? process.cwd(), caseId: typeof flags.case === 'string' ? flags.case : null });
-        if (confined) throw new RunnerConfigError(`nested-write-from-confined-worker: a writing dispatch from inside a confined worker is refused: ${confined}; a confined worker may dispatch read-only work only`, { code: 'nested-write-from-confined-worker', phase: 'pre-admission' });
-      }
-      const runWarning = checkDirDiffersFromCwd({ dir: typeof flags.dir === 'string' ? flags.dir : undefined, worktree: flags.worktree });
-      // Everything about the one-liner is checked here, before runUnit creates a unit run.
-      const unitData = !buildsUnit ? undefined : await adhocUnitFromPrompt(prompt, flags, {
-        mainRoot: repoRoot ? path.resolve(repoRoot) : resolveGitRoots(process.cwd()).mainCheckoutRoot,
-        // Where a writing unit would run: --worktree, else here. Only a linked worktree may be written.
-        isLinkedWorktree: () => resolveGitRoots(worktree ? path.resolve(worktree) : process.cwd()).isLinkedWorktree,
+      // The Workflow's case port is injected so the Execution Core never imports the Workflow.
+      const request = buildRunRequest(flags, positional, {
+        cwd: process.cwd(),
+        gitRoots: resolveGitRoots,
+        caseAdmission: { createPort: createCaseAdmissionPort, activityUnitOf, confinedWriteRefusal },
       });
-      if (resumeUnitRunId) {
-        if (flags.params !== undefined) {
-          throw new StoreError('validation', '--params cannot change a resumed unit run: it keeps the request it was started with');
-        }
-        if (flags.param !== undefined) {
-          throw new StoreError('validation', '--param cannot change a resumed unit run: it keeps the request it was started with');
-        }
-      }
-      let request;
-      if (flags.params !== undefined || flags.param !== undefined) {
-        const { requestFromFlags } = await import('../src/runner/execution/run-request.mjs');
-        try {
-          request = requestFromFlags({ params: flags.params, param: flags.param });
-        } catch (err) {
-          throw new RunnerConfigError(`${err.code}: ${err.message}`, { code: err.code, phase: 'pre-admission' });
-        }
-      }
-
-      // `--case <id> --activity <id>` names the case this run is an activity of: it is admitted into that
-      // case (entry, MUST rules, write overlap, frame) before anything exists. Without them the run is
-      // standalone, and a writing one goes on only into a worktree no case owns.
-      const caseFlagsGiven = ['case', 'activity', 'route', 'reason'].filter((f) => flags[f] !== undefined);
-      let caseRef;
-      if (caseFlagsGiven.length > 0) {
-        if (resumeUnitRunId) throw new StoreError('validation', '--case cannot change a resumed unit run: it keeps the case it was admitted into');
-        const caseId = requireField(flags.case, `--${caseFlagsGiven.find((f) => f !== 'case') ?? 'case'} needs --case <caseId>: ${caseFlagsGiven.join(', ')} only apply to a run that names a case`);
-        const activity = requireField(flags.activity, '--case needs --activity <id>: the activity of the case\'s guide this run is');
-        if (flags.route !== undefined && !['should', 'may-instead', 'unlisted'].includes(flags.route)) {
-          throw new StoreError('validation', '--route must be should, may-instead or unlisted');
-        }
-        caseRef = {
-          caseId,
-          activity,
-          ...(flags.route !== undefined ? { route: flags.route } : {}),
-          ...(flags.reason !== undefined ? { reason: requireField(flags.reason, '--reason requires text') } : {}),
-        };
-      }
-      // The Workflow's port, injected here so the Execution Core never imports the Workflow: a writing
-      // run goes on only into a worktree no case owns.
-      const activityUnit = caseRef ? activityUnitOf({ mainRoot: portRoot, caseId: caseRef.caseId, activity: caseRef.activity }) : undefined;
-
+      const runWarning = checkDirDiffersFromCwd({ dir: typeof flags.dir === 'string' ? flags.dir : undefined, worktree: flags.worktree });
       try {
-        return attachDirWarning(await runUnit({
-          unitPath,
-          unitData,
-          ...(portRoot ? { caseAdmission: createCaseAdmissionPort({ repoRoot: portRoot }) } : {}),
-          ...(caseRef ? { caseRef } : {}),
-          ...(activityUnit !== undefined ? { activityUnit } : {}),
-          ...(request !== undefined ? { request } : {}),
-          // No door of this release can attest a person, so an override tier above the resolved one, or an
-          // accepted dependence, is refused by name. A prompt-built unit's --capability and --persona are the
-          // unit's own declarations, like the same keys of a --unit file.
-          raiseAuthorized: false,
-          pattern,
-          stanceOptions: flags['stance-options'] === undefined ? undefined : requireField(flags['stance-options'], '--stance-options requires pipe-separated option labels').split('|'),
-          overrides,
-          resumeUnitRunId,
-          repoRoot,
-          cwd: process.cwd(),
-          worktree,
-        }), runWarning);
+        return attachDirWarning(await runUnit(request), runWarning);
       } catch (err) {
         if (err instanceof RunnerConfigError && err.code && !err.message.includes(err.code)) {
           err.message = `${err.code}: ${err.message}`;
@@ -2942,7 +2624,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
     // own validation and refusals. The Event Store is Linux-only, so every one of them refuses elsewhere.
     case 'events': {
       const sub = positional[0];
-      const ctx = { cwd: path.dirname(dir), trustedMain: path.dirname(getMainFgosDir(dir)) };
+      const ctx = eventStoreContext(dir);
       if (sub === 'sync') {
         const { syncUseCase } = await import('../src/verbs/events/sync.mjs');
         return syncUseCase(ctx, { remote: flags.remote, noPush: flags['no-push'], opportunistic: flags.opportunistic });
@@ -2964,7 +2646,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
 
     case 'rebuild': {
       const { rebuildStoreUseCase } = await import('../src/verbs/events/rebuild.mjs');
-      return rebuildStoreUseCase({ cwd: path.dirname(dir), trustedMain: path.dirname(getMainFgosDir(dir)) });
+      return rebuildStoreUseCase(eventStoreContext(dir));
     }
 
     // Rollup view theo bộ (P24, request-class per D1: a pure read — never
@@ -3180,7 +2862,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       // the stable main checkout — deriving repoRoot from it keeps every
       // git op in this handler targeting that stable root instead of the
       // caller's own possibly-transient cwd. Byte-identical to before when
-      // --dir is omitted (dataDir() resolves dir from process.cwd() too in
+      // --dir is omitted (the invocation-root door resolves dir from process.cwd() too in
       // that case).
       const repoRoot = path.dirname(dir);
 
@@ -3312,7 +2994,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       // never `process.cwd()`: a session returning from inside a worktree
       // would otherwise read that branch's own possibly-stale copy of
       // config.json instead of the project's real one.
-      const invariantCheckCommands = readInvariantCheckCommands(resolveMainCheckoutRoot(path.dirname(dir)) ?? path.dirname(dir));
+      const invariantCheckCommands = readInvariantCheckCommands(mainCheckoutRootAt(path.dirname(dir)));
 
       const view = listWork(dir);
       const item = view.work[id];
@@ -3791,7 +3473,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       // deriving repoRoot from it keeps catchup's Sync and its trusted
       // main resolution on that stable root instead of the worktree
       // currently checked out on the item's own branch. Byte-identical to today when
-      // --dir is omitted (dataDir() resolves dir from process.cwd() too
+      // --dir is omitted (the invocation-root door resolves dir from process.cwd() too
       // in that case). This verb has no `--trust-dir` gate, unlike
       // approve/sync-root/promote-to-component — a real per-verb
       // difference the adapter owns.
@@ -3810,30 +3492,24 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
     case 'worktree': {
       const sub = requireField(positional[0], 'worktree requires a sub-verb: create <path> | remove <path> --delivered-to <ref> [--discard-ignored]');
       if (sub === 'create') {
-        if (positional.length !== 2) throw new Error('usage: fgos worktree create <path> [--branch <name> | --detach] [--base <ref>] [--json]');
-        const cwd = process.cwd();
-        const repoRoot = resolveMainCheckoutRoot(cwd) ?? cwd;
-        const stateRoot = worktreeStateRoot({ fgosDir: path.join(repoRoot, '.fgos') }).stateRoot;
-        const writer = gitWriter(path.join(repoRoot, '.fgos'));
+        if (positional.length !== 2) throw new StoreError('validation', 'usage: fgos worktree create <path> [--branch <name> | --detach] [--base <ref>] [--json]');
+        const { worktreeContext } = await import('../src/verbs/worktree/context.mjs');
         const { createWorktreeUseCase } = await import('../src/verbs/worktree/create.mjs');
-        return createWorktreeUseCase({ cwd, repoRoot, stateRoot, writer }, {
+        return createWorktreeUseCase(worktreeContext(process.cwd(), mainCheckoutRootAt(process.cwd())), {
           path: positional[1], branch: optionalField(flags.branch, 'worktree create --branch requires a name'),
           detach: Boolean(flags.detach), base: optionalField(flags.base, 'worktree create --base requires a ref'),
         });
       }
       if (sub === 'remove') {
-        if (positional.length !== 2) throw new Error('usage: fgos worktree remove <path> --delivered-to <ref> [--discard-ignored] [--json]');
-        const cwd = process.cwd();
-        const repoRoot = resolveMainCheckoutRoot(cwd) ?? cwd;
-        const stateRoot = worktreeStateRoot({ fgosDir: path.join(repoRoot, '.fgos') }).stateRoot;
-        const writer = gitWriter(path.join(repoRoot, '.fgos'));
+        if (positional.length !== 2) throw new StoreError('validation', 'usage: fgos worktree remove <path> --delivered-to <ref> [--discard-ignored] [--json]');
+        const { worktreeContext } = await import('../src/verbs/worktree/context.mjs');
         const { removeWorktreeUseCase } = await import('../src/verbs/worktree/remove.mjs');
-        return removeWorktreeUseCase({ cwd, repoRoot, stateRoot, writer }, {
+        return removeWorktreeUseCase(worktreeContext(process.cwd(), mainCheckoutRootAt(process.cwd())), {
           path: positional[1], deliveredTo: requireField(flags['delivered-to'], 'worktree remove requires --delivered-to <ref>'),
           discardIgnored: flags['discard-ignored'],
         });
       }
-      throw new Error(`unknown worktree sub-verb: ${sub}`);
+      throw new StoreError('validation', `unknown worktree sub-verb: ${sub}`);
     }
     // Opt-in per-session git worktree lifecycle (fgos-multi-session-checkout
     // Epic 1, D6/D7): a first-class `session` verb family wiring session.mjs's
@@ -3856,30 +3532,11 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         if (sub === 'start') {
           const itemId = optionalField(flags.item, 'session start --item requires a non-empty id value (omit --item entirely to start a session with no item bound)');
           const entry = createSession(repoRoot, { itemId });
-          // Explicit projection, not a spread: decouples the public envelope
-          // from session.mjs's internal registry-entry shape (mirrors every
-          // other converted verb, e.g. move's {id,from,to,seq}).
-          return {
-            sessionId: entry.sessionId,
-            worktreePath: entry.worktreePath,
-            itemId: entry.itemId,
-            startCommit: entry.startCommit,
-            pid: entry.pid,
-            startedAt: entry.startedAt,
-          };
+          return sessionSummary(entry);
         }
         if (sub === 'end') {
           const sessionId = requireField(positional[1], 'session end requires a session id: fgos session end <session-id> [--force]');
-          const entry = endSession(repoRoot, sessionId, { force: Boolean(flags.force) });
-          return {
-            sessionId: entry.sessionId,
-            worktreePath: entry.worktreePath,
-            itemId: entry.itemId,
-            startCommit: entry.startCommit,
-            pid: entry.pid,
-            startedAt: entry.startedAt,
-            forced: Boolean(flags.force),
-          };
+          return { ...sessionSummary(endSession(repoRoot, sessionId, { force: Boolean(flags.force) })), forced: Boolean(flags.force) };
         }
         if (sub === 'list') {
           return listSessions(repoRoot);
@@ -3958,47 +3615,26 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
     // Read-only listing of the personas a `--seats "@name"` seat can name; a pure read of the
     // three definition tiers (src/runner/agent-listing.mjs), no store and no event.
     case 'agents': {
-      const sub = requireField(positional[0], 'agents requires a sub-verb: fgos agents list');
-      if (sub !== 'list') throw new StoreError('validation', `unknown agents sub-verb "${sub}". Usage: fgos agents list`);
+      requireSubVerb('agents', positional);
       const { listAgents } = await import('../src/runner/agent-listing.mjs');
       const { resolveGitRoots } = await import('../src/runner/execution/run.mjs');
       const projectRoot = typeof flags.worktree === 'string' ? path.resolve(flags.worktree) : resolveGitRoots(process.cwd()).worktreeRoot;
       return { projectRoot, ...listAgents({ projectRoot }) };
     }
     case 'tool': {
-      const sub = requireField(positional[0], 'tool requires a sub-verb: fgos tool <check|query> ...');
+      const sub = requireSubVerb('tool', positional);
       const repoRoot = path.dirname(dir);
-      const cfg = loadRunnerConfigForDir(repoRoot);
-      const tools = toolsFromExecutors(cfg.executors);
+      const { executors } = loadRunnerConfigForDir(repoRoot);
       if (sub === 'check') {
-        const name = optionalField(flags.name, 'tool check --name requires a non-empty value.');
-        if (name !== undefined && !tools[name]) {
-          throw new StoreError('validation', `tool "${name}" not found.`);
-        }
-        const targets = name !== undefined ? [name] : Object.keys(tools);
-        const localStatus = readLocalStatus(dir);
-        const results = {};
-        for (const toolName of targets) {
-          const status = await probeTool(tools[toolName], repoRoot);
-          const checkedAt = new Date().toISOString();
-          localStatus[toolName] = { status, checkedAt };
-          results[toolName] = { status, checkedAt };
-        }
-        writeLocalStatus(dir, localStatus);
-        return { checked: results };
+        return checkTools({ executors, dir, repoRoot, name: optionalField(flags.name, 'tool check --name requires a non-empty value.') });
       }
-      if (sub === 'query') {
-        const localStatus = readLocalStatus(dir);
-        const capabilityFlag = optionalField(flags.capability, 'tool query --capability requires a non-empty value.');
-        const normalizedCapability = capabilityFlag !== undefined ? normalizeCapability(capabilityFlag) : undefined;
-        const statusFlag = optionalField(flags.status, 'tool query --status requires a non-empty value.');
-        const providers = Object.values(tools)
-          .filter((tool) => normalizedCapability === undefined || tool.capability === normalizedCapability)
-          .map((tool) => ({ ...tool, status: resolvedStatus(tool.name, localStatus) }))
-          .filter((tool) => statusFlag === undefined || tool.status === statusFlag);
-        return { providers };
-      }
-      throw new StoreError('validation', `unknown tool sub-verb "${sub}". Usage: fgos tool <check|query> ...`);
+      // `query`: requireSubVerb admitted only the registry's two sub-verbs.
+      return queryTools({
+        executors,
+        dir,
+        capability: optionalField(flags.capability, 'tool query --capability requires a non-empty value.'),
+        status: optionalField(flags.status, 'tool query --status requires a non-empty value.'),
+      });
     }
 
     // Do-and-announce shell-integration + config bootstrap (str87-fgos-setup-doctor
@@ -4014,7 +3650,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       // `resync-worktree` (:4939) — setup's writes are unconditional (tsk-5hi),
       // so run from a linked worktree this used to materialize .fgos/config.json
       // INSIDE the worktree (ADR0020 violation), not just report wrong.
-      const repoRoot = flags.dir !== undefined ? path.dirname(dir) : (resolveMainCheckoutRoot(process.cwd()) ?? process.cwd());
+      const repoRoot = mainCheckoutRootOf(flags);
       const { integrationScriptPath, runFixes } = await import('../src/setup/checks.mjs');
       const { installGitHooks } = await import('../src/setup/git-hooks.mjs');
       const { installClaudeCodeHook } = await import('../src/setup/claude-code-hooks.mjs');
@@ -4156,7 +3792,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         );
       }
       // tsk-2xj: same --dir resolution as `doctor`/`setup` above.
-      const repoRoot = flags.dir !== undefined ? path.dirname(dir) : (resolveMainCheckoutRoot(process.cwd()) ?? process.cwd());
+      const repoRoot = mainCheckoutRootOf(flags);
       const { integrationScriptPath } = await import('../src/setup/checks.mjs');
       const { uninstallGitHooks } = await import('../src/setup/git-hooks.mjs');
       const { detectRcFiles, hasSourceLine } = await import('../src/setup/shell-rc.mjs');
@@ -4220,7 +3856,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
     // The one opt-in door to a person's own agent config (src/setup/agent-wiring.mjs). Without --yes
     // it only plans; --yes backs up each file first. Its project is the main checkout, like setup's.
     case 'wire-agents': {
-      const repoRoot = resolveMainCheckoutRoot(process.cwd()) ?? process.cwd();
+      const repoRoot = mainCheckoutRootOf({});
       const { planAgentWiring, applyAgentWiring } = await import('../src/setup/agent-wiring.mjs');
       const plan = planAgentWiring(repoRoot);
       const result = flags.yes ? applyAgentWiring(plan) : { applied: false };
@@ -4245,14 +3881,14 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       // shared store even when run from a linked worktree (ADR0020: a
       // worktree never carries its own .fgos/, so process.cwd() there was
       // silently checking/writing the wrong tree).
-      const repoRoot = flags.dir !== undefined ? path.dirname(dir) : (resolveMainCheckoutRoot(process.cwd()) ?? process.cwd());
+      const repoRoot = mainCheckoutRootOf(flags);
       const { runDoctor } = await import('../src/setup/checks.mjs');
       return runDoctor(repoRoot, { fix: Boolean(flags.fix) });
     }
 
     case 'unclaim': {
       const id = requireField(positional[0] ?? flags.id, 'unclaim requires an id: fgos unclaim <id>');
-      const repoRoot = flags.dir !== undefined ? path.dirname(dir) : (resolveMainCheckoutRoot(process.cwd()) ?? process.cwd());
+      const repoRoot = mainCheckoutRootOf(flags);
       const claim = readClaim(dir, id);
       if (!claim) return { released: false, reason: 'no-claim' };
       const durableView = foldEvents(readRawEvents(dir));
@@ -4387,136 +4023,36 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       throw new StoreError('validation', `unknown lock sub-verb "${sub}". Usage: fgos lock fence <name> [--param k=v] [--yes] [--attest-stopped]`);
     }
 
-    case 'lock-status': {
-      const { mainCheckout, locks, problems } = collectLockStatus({ fgosDir: dir });
-      // The commit-activity beacon is reported on its own: it is a hint the
-      // pre-commit hook reads, never a lock claim/land/approve wait on.
-      const beacon = readBeacon(dir);
-      return {
-        mainCheckout,
-        locks,
-        problems,
-        beacon: beacon.status === 'ok'
-          ? {
-            status: 'present',
-            writer: beacon.record.writer.id,
-            ageMs: Date.now() - beacon.record.writtenAt,
-            windowMs: beacon.record.windowMs,
-            active: Date.now() - beacon.record.writtenAt <= beacon.record.windowMs,
-          }
-          : { status: beacon.status },
-      };
-    }
+    case 'lock-status':
+      return collectLockStatus({ fgosDir: dir });
 
-    // tsk-1d7 (docs/history/stale-worktree-index-guard/CONTEXT.md D3): the
-    // repair verb `.githooks/pre-commit`'s own stale-index guard (D2)
-    // prints as its refuse-message command. Run FROM INSIDE the stale
-    // worktree (the same place the hook just refused a commit) — `--path`
-    // exists only so a test/caller can point this at a worktree other than
-    // its own cwd. `resyncWorktree`'s own `repoRoot` param must be the MAIN
-    // checkout, never the worktree itself, since branch refs and
-    // `--git-common-dir` must resolve against the shared repo (tsk-jgs:
-    // `dir` alone is NOT that root here -- `dir` is `dataDir(flags.dir)`,
-    // which for the bare/default invocation this case exists to support is
-    // cwd-strict, never git-resolved, per `dataDir`'s own doc comment
-    // above -- so it silently resolves to `<worktreePath>/.fgos`, a path
-    // that never exists on disk for a linked worktree, ADR0020). When
-    // `--dir` is given explicitly, `path.dirname(dir)` recovers the
-    // caller-supplied root correctly, same as every other verb here; when
-    // it is omitted, resolve the real main checkout the same way
-    // `dispatch.mjs`/`registrations.mjs` already do for exactly this
-    // worktree-or-main-checkout ambiguity: `resolveMainCheckoutRoot`
-    // (`src/runner/paths.mjs`), which shells `git --git-common-dir` from
-    // the worktree itself.
+    // The repair verb `.githooks/pre-commit`'s stale-index guard prints. Run FROM INSIDE the stale
+    // worktree; `--path` points it at another one. `resyncWorktree` needs the MAIN checkout (branch
+    // refs and `--git-common-dir` resolve against the shared repo), which `mainCheckoutRootOf` reads
+    // from the worktree itself, or from `--dir` when that names the main root.
     case 'resync-worktree': {
       const worktreePath = flags.path ? path.resolve(flags.path) : process.cwd();
-      const checkedOut = gitWorktrees(worktreePath).find((row) => realpathOr(Buffer.from(row.path).toString('utf8')) === realpathOr(worktreePath))?.branch;
-      const branch = flags.branch ?? (checkedOut?.startsWith('refs/heads/') ? checkedOut.slice('refs/heads/'.length) : null);
-      if (!branch) throw new StoreError('validation', `resync-worktree: "${worktreePath}" has no branch checked out; pass --branch <name>`);
-      const repoRoot = flags.dir !== undefined ? path.dirname(dir) : (resolveMainCheckoutRoot(worktreePath) ?? path.dirname(dir));
-      return resyncWorktree(repoRoot, worktreePath, branch);
+      const repoRoot = mainCheckoutRootOf(flags, worktreePath);
+      return resyncWorktree(repoRoot, worktreePath, flags.branch);
     }
 
-    // tsk-3au: the safe path for a destructive `git reset --hard` on the
-    // main checkout — refuses when the whole-repo tree is dirty (reusing
-    // `isMainTreeClean`, the same whole-repo check `approve` already uses,
-    // never a fresh git-status reimplementation) unless the caller passes
-    // `--confirm` after seeing the full status this case prints into the
-    // error. `repoRoot` is derived from `dir` (never `process.cwd()`) so
-    // this verb behaves identically whether invoked from the main checkout
-    // or, per this item's own theme, from a worktree's cwd with `--dir`.
-    //
-    // tsk-5iv D1 (round-3 review, HIGH): `repoRoot = path.dirname(dir)` and
-    // `dir` defaults to `dataDir(undefined)` -- cwd-strict, never
-    // git-resolved (paths.mjs's own `strict: true` contract). Called with
-    // no `--dir` from inside a linked worktree, `repoRoot` silently
-    // resolves to the WORKTREE, not the main checkout, while this verb's
-    // own error text below still prints "main checkout, whole repo" and
-    // (with --confirm) runs `git reset --hard` against that wrong tree --
-    // the exact destructive-reset-on-the-wrong-tree failure mode AGENTS.md
-    // tells every session to use THIS verb instead of raw `git reset
-    // --hard` to avoid. Refuse outright rather than silently proceed,
-    // matching the same `isMainWorktree` guard other verbs in this file
-    // already use (e.g. the `init`/`approve --github` cases above).
+    // tsk-3au: the safe path for a destructive `git reset --hard` on the main checkout -- refuses when the
+    // whole-repo tree is dirty (the whole-repo check `approve` uses) unless `--confirm` follows the full
+    // status this case prints into the error. The repository acted on is the main checkout
+    // (`mainCheckoutRootOf`); without `--dir`, a linked worktree's cwd is refused so the reset is never aimed
+    // at a tree the caller did not name, and a `--dir` that is not the main checkout is refused by the door.
     case 'main-checkout-reset': {
       const sha = requireField(flags.sha, 'main-checkout-reset requires --sha <sha>: fgos main-checkout-reset --sha <sha> [--confirm]');
-      const repoRoot = path.dirname(dir);
-      if (flags.dir === undefined && !isMainWorktree(repoRoot)) {
-        throw new StoreError(
-          'validation',
-          'main-checkout-reset: refusing to run without --dir <mainRoot> -- cwd is a linked worktree, and without --dir this verb would silently ' +
-            'target it (git reset --hard) instead of the main checkout. Pass --dir <mainRoot> explicitly, e.g. ' +
-            '`fgos main-checkout-reset --sha <sha> --dir "$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)"`.',
-        );
-      }
-      const reset = async (handle) => {
-        const confirmed = Boolean(flags.confirm);
-        const inspect = inspectGit(repoRoot);
-        const target = inspect.resolveCommit({ name: sha });
-        if (!target) throw new StoreError('validation', `main-checkout-reset: "${sha}" does not name a commit in "${repoRoot}"`);
-        const head = inspect.resolveCommit({ name: 'HEAD' });
-        if (!head) throw new StoreError('validation', `main-checkout-reset: "${repoRoot}" has no commit to reset from`);
-        const dirty = !isMainTreeClean(repoRoot);
-        const lostCommitCount = inspect.countCommits({ include: head, exclude: target });
-        try {
-          assertSafeMainCheckoutReset({ dirty, confirmed, lostCommitCount, sha });
-        } catch (err) {
-          let details = `main-checkout-reset: ${err.message}`;
-          if (dirty) {
-            details += `\n\nFull git status (main checkout, whole repo):\n${renderStatus(inspect) || '(empty)'}`;
-          }
-          if (lostCommitCount > 0) {
-            const lost = inspect.compareCommits({ left: target, right: head }).commits;
-            details += `\n\nCommits about to be discarded (${lostCommitCount}):\n${describeLostCommits(inspect, lost)}`;
-          }
-          throw new StoreError('validation', details);
-        }
-        // Without --confirm only a clean forward move reaches here: a plain restore, nothing discarded.
-        const options = gitPortOptions(repoRoot, { mutation: true });
-        const operationId = randomUUID();
-        const request = {
-          expectedHead: head,
-          target,
-          reason: `main-checkout-reset --sha ${sha}`,
-          ...(confirmed ? { discardLocalDelta: true, confirmedBy: `fgos main-checkout-reset --confirm (writer ${options.writer})` } : {}),
-        };
-        let restored;
-        try {
-          restored = createGitSafeRestore(options).apply({ operationId, request }, [handle]);
-        } catch (err) {
-          throw new StoreError('validation', `main-checkout-reset: SafeRestore refused to reset "${repoRoot}" to ${sha}: ${nativeError(err).cause}`);
-        }
-        return { sha, wasDirty: dirty, lostCommitCount, confirmed, operationId, snapshot: restored.snapshot };
-      };
+      const repoRoot = mainCheckoutRootOf(flags, process.cwd(), 'main-checkout-only');
       try {
-        return await withMainCheckout(createLockScope('main-checkout-reset'), 'reset', reset, { fgosDir: dir });
+        return await mainCheckoutResetUseCase({ repoRoot, cwd: process.cwd(), explicitDir: flags.dir !== undefined }, { sha, confirmed: Boolean(flags.confirm) });
       } catch (err) {
         throw lockErrorToStoreError(err, 'main-checkout-reset');
       }
     }
 
     default:
-      throw new StoreError('validation', `unknown verb "${verb ?? ''}". Usage: fgos <version|init|add|submit|discover|plan|move|retrospective|cleanup|compound|edit|item|ask|answer|decision|list|ready|rebuild|events|rollup|take|return|review|approve|sync-root|reject|catchup|triage|session|gateway|goal|tool|setup|doctor|lock|lock-status|git|main-checkout-reset> ...`);
+      throw new StoreError('validation', `unknown verb "${verb ?? ''}". Usage: fgos <init|add|submit|discover|plan|move|retrospective|cleanup|compound|edit|item|ask|answer|decision|list|ready|rebuild|events|rollup|take|return|review|approve|sync-root|reject|catchup|triage|session|gateway|goal|tool|setup|doctor|lock|lock-status|git|main-checkout-reset> ...`);
   }
 }
 
@@ -4529,13 +4065,14 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
 // `--help --json`.
 
 function publicManifestEntries() {
-  return COMMAND_REGISTRY.map(({ name, invoke, description, parameters, examples, subcommands, touchesState, externalEffect, paginated, deprecated }) => ({
+  return COMMAND_REGISTRY.map(({ name, invoke, description, parameters, examples, subcommands, guide, touchesState, externalEffect, paginated, deprecated }) => ({
     name,
     invoke,
     description,
     parameters,
     examples,
     ...(subcommands ? { subcommands } : {}),
+    ...(guide ? { guide } : {}),
     touchesState,
     externalEffect,
     paginated,
@@ -4559,6 +4096,39 @@ function renderParameterLines(parameters, indent) {
   return lines;
 }
 
+// The flags one verb (or one sub-verb) reads, one line each, with the default
+// the schema declares; a description that names its default is left as written,
+// a switch otherwise defaults to off and a valued flag to unset.
+function renderFlagLines(parameters, indent) {
+  const positional = parameters?.positional || [];
+  return Object.entries(parameters?.properties || {})
+    .filter(([name]) => !positional.includes(name))
+    .map(([name, spec]) => {
+      const text = spec.description ?? '';
+      const dflt = spec.default ?? (spec.type === 'boolean' ? 'off' : 'unset');
+      const note = /default/i.test(text) ? '' : ` (default: ${dflt})`;
+      return `${indent}--${name}${spec.type === 'boolean' ? '' : ' <value>'}  ${text}${note}`;
+    });
+}
+
+// The registry `guide` of a verb, as the help sections a person needs before
+// running it: what it changes on disk, what it needs, every flag with its
+// default, examples, exit codes and the next command.
+function renderGuide(entry) {
+  const flags = entry.subcommands
+    ? Object.entries(entry.subcommands).flatMap(([sub, spec]) => [`        fgos ${entry.name} ${sub}`, ...renderFlagLines(spec.parameters, '            ')])
+    : renderFlagLines(entry.parameters, '        ');
+  const g = entry.guide;
+  return [
+    '    Changes on disk:', `        ${g.changes}`,
+    '    Prerequisites:', `        ${g.prerequisites}`,
+    '    Options:', ...flags, '        Every verb also takes --dir <root> (default: the project found from the current directory) and --json.',
+    '    Examples:', ...(entry.examples ?? []).map((example) => `        ${example}`),
+    '    Exit codes:', ...g.exitCodes.map((code) => `        ${code}`),
+    '    Next:', `        ${g.next}`,
+  ];
+}
+
 function renderHelpText(entries = publicManifestEntries()) {
   // Label for touchesState+externalEffect: 'read' (both false), 'write'
   // (touches only), 'external' (effect only), or 'write+external' (both true).
@@ -4569,7 +4139,10 @@ function renderHelpText(entries = publicManifestEntries()) {
     return 'read';
   };
   const lines = [`fgos — the fgOS work-item CLI (schema_version ${MANIFEST_SCHEMA_VERSION})`, ''];
-  for (const entry of entries) {
+  // The whole list names a deprecated verb once, under Compatibility; one verb's own help keeps its full entry.
+  const single = entries.length === 1;
+  const compatibility = single ? [] : entries.filter((entry) => entry.deprecated);
+  for (const entry of single ? entries : entries.filter((e) => !e.deprecated)) {
     const label = labelFor(entry.touchesState, entry.externalEffect);
     lines.push(`${entry.invoke} [${label}]`);
     lines.push(`    ${entry.description}`);
@@ -4579,10 +4152,16 @@ function renderHelpText(entries = publicManifestEntries()) {
       lines.push(`        ${spec.description}`);
       lines.push(...renderParameterLines(spec.parameters, '        '));
     }
+    if (single && entry.guide) lines.push(...renderGuide(entry));
     const deprecationText = formatDeprecation(entry.deprecated);
     if (deprecationText) {
       lines.push(`    DEPRECATED — ${deprecationText}`);
     }
+    lines.push('');
+  }
+  if (compatibility.length > 0) {
+    lines.push('Compatibility (deprecated, still callable; `fgos <verb> --help` has the detail):');
+    for (const entry of compatibility) lines.push(`    ${entry.invoke} — ${formatDeprecation(entry.deprecated)}`);
     lines.push('');
   }
   return `${lines.join('\n').trimEnd()}\n`;
@@ -4814,49 +4393,32 @@ function renderPretty(verb, data) {
 // `uninstall` and `git` (they resolve the main checkout themselves), `tool` (writes only the local status overlay),
 // and the verbs with a worktree guard of their own (`init`, `approve`, `sync-root`, `promote-to-component`,
 // `catchup`, `unclaim`, `return`, whose own registered-session check is deliberately more permissive).
-// A Work command's seal is not waited for: the answer is already printed, so the pending seals go to one short detached
-// `fgos events seal` child that certifies everything open and exits. No child (spawn failed, or killed first) loses
-// nothing: the events are durable and the next command or the `event-store-incidents` pointer covers them (spec §16).
-function handSealsToChild() {
-  for (const { root, stream, checkpointPath } of processSealCoalescer.takeHandedOff()) {
-    spawnDetachedCli({ cwd: root, args: ['events', 'seal', '--stream', stream, ...(checkpointPath ? ['--history', checkpointPath] : []), '--dir', root] });
-  }
-}
-// The detached children (the seal child and the publish child) have no caller to read their error, so a child that
-// fails leaves a record whatever the verb's own classification is.
-function isEventStoreChild(verb, positional, flags) {
-  return verb === 'events' && (positional[0] === 'seal' || (positional[0] === 'sync' && flags.opportunistic === true));
-}
-// A verb that opens the Event Store carries the opportunistic seal and publish triggers of spec §16 at its start and end.
-function opensEventStore(entry, verb, positional, flags) {
-  // The seal child does exactly one seal: no start or end trigger (no second seal sweep, no publish) around it.
-  if (verb === 'events' && positional[0] === 'seal') return false;
-  // The publish child does one opportunistic sync and nothing around it, or its own end trigger would start another child.
-  if (verb === 'events' && positional[0] === 'sync' && flags.opportunistic) return false;
-  return !!entry && entry.store !== 'none';
-}
-
-const ALLOWED_HOOK_KINDS = new Set(['dispatch-decide', 'decision-question', 'main-checkout-delete-guard', 'mailbox']);
+// The main-checkout delete guard keeps its own script (it answers in each agent's protocol itself); the other
+// in-process kinds are judged by src/runner/hook.mjs.
+const DELETE_GUARD_HOOK_KIND = 'main-checkout-delete-guard';
 
 async function handleHook(rest) {
   const [kind, ...flags] = rest;
+  const { IN_PROCESS_HOOK_KINDS, NATIVE_HOOK_KINDS, serveHook } = await import('../src/runner/hook.mjs');
+  const allowedKinds = [...IN_PROCESS_HOOK_KINDS, DELETE_GUARD_HOOK_KIND];
   if (!kind || kind === '--help' || kind === '-h') {
     process.stdout.write(
-      'Usage: fgos hook <dispatch-decide|decision-question|main-checkout-delete-guard|mailbox> [--format=standard|agy] [--cli <claude|codex> --event <stop|post-tool-use>]\n\n' +
+      `Usage: fgos hook <${allowedKinds.join('|')}> [--format=standard|agy]\n\n` +
         'Execute managed hook guards for supported coding agents (Claude, Codex, AGY, OMP, Pi).\n',
     );
     process.exit(0);
   }
 
-  if (!ALLOWED_HOOK_KINDS.has(kind)) {
-    process.stderr.write(`Error: Unknown hook kind "${kind}". Allowed kinds: ${[...ALLOWED_HOOK_KINDS].join(', ')}\n`);
+  if (NATIVE_HOOK_KINDS.includes(kind)) {
+    process.stderr.write(`Error: hook kind "${kind}" is served by the native fgos host; this direct-node channel does not run it. Run it through the project shim (.fgos/installation/bin/fgos hook ${kind}).\n`);
+    process.exit(1);
+  }
+  if (!allowedKinds.includes(kind)) {
+    process.stderr.write(`Error: Unknown hook kind "${kind}". Allowed kinds: ${allowedKinds.join(', ')}\n`);
     process.exit(1);
   }
 
-  // The native Rust host serves `hook mailbox` before this payload runs.
-  // This channel (npm bin, `node bin/fgos.mjs`) has no mailbox, so the hook
-  // stays quiet and never blocks or fails the CLI that called it.
-  if (kind === 'mailbox') process.exit(0);
+  if (kind !== DELETE_GUARD_HOOK_KIND) await serveHook(kind, flags);
 
   let rawStdin = '';
   try {
@@ -4864,116 +4426,12 @@ async function handleHook(rest) {
   } catch {
     rawStdin = '';
   }
-
-  let parsed = null;
-  if (rawStdin && rawStdin.trim()) {
-    try {
-      parsed = JSON.parse(rawStdin);
-    } catch {
-      parsed = null;
-    }
-  }
-
-  const isAgyFormat =
-    flags.includes('--format=agy') || (parsed && typeof parsed === 'object' && parsed.toolCall !== undefined);
-
-  if (isAgyFormat) {
-    if (kind === 'dispatch-decide') {
-      const toolInput = parsed?.toolCall?.args || {};
-      const payloadCwd =
-        Array.isArray(parsed?.workspacePaths) && parsed.workspacePaths[0]
-          ? parsed.workspacePaths[0]
-          : process.cwd();
-      const subagentType =
-        typeof toolInput.subagent_type === 'string' && toolInput.subagent_type.trim()
-          ? toolInput.subagent_type
-          : typeof toolInput.agent === 'string' && toolInput.agent.trim()
-            ? toolInput.agent
-            : 'general-purpose';
-
-      try {
-        const { decideExecutorCli } = await import('../src/runner/dispatch/cli.mjs');
-        const decided = await decideExecutorCli(undefined, {
-          cwd: payloadCwd,
-          for: subagentType,
-          needsSoul: true,
-          hasLiveTaskAccess: true,
-        });
-        if (decided.mechanism !== 'in-process') {
-          const { runDoorHint } = await import('../src/runner/dispatch/cli.mjs');
-          process.stdout.write(
-            JSON.stringify({
-              decision: 'deny',
-              reason: `BLOCKED: this subagent call resolves to out-of-process dispatch (no native in-process handler for "${subagentType}"). Run it through ${runDoorHint({ cwd: payloadCwd, executorId: decided.executorId, capability: subagentType })} instead.`,
-            }) + '\n',
-          );
-          process.exit(0);
-        }
-      } catch {
-        // fail-open
-      }
-      process.stdout.write(JSON.stringify({ decision: 'allow' }) + '\n');
-      process.exit(0);
-    } else if (kind === 'decision-question') {
-      const toolName = parsed?.toolCall?.name || '';
-      if (toolName === 'AskUserQuestion' || toolName === 'ask' || toolName === 'ask_question') {
-        try {
-          const { checkDecisionQuestion, describeDecisionQuestion } = await import(
-            '../src/state/decision-question.mjs'
-          );
-          const questions = Array.isArray(parsed?.toolCall?.args?.questions)
-            ? parsed.toolCall.args.questions
-            : [];
-          const textToCheck = questions
-            .flatMap((q) => [
-              q?.question,
-              Array.isArray(q?.options) && q.options.length > 0
-                ? `Options:\n${q.options.map((o) => `- ${o?.label ?? ''}: ${o?.description ?? ''}`).join('\n')}`
-                : '',
-            ])
-            .filter(Boolean)
-            .join('\n');
-          const missing = checkDecisionQuestion(textToCheck);
-          if (missing.length > 0) {
-            process.stdout.write(
-              JSON.stringify({
-                decision: 'deny',
-                reason: `BLOCKED: write the analysis before asking. Missing parts of the decision-question template: ${missing.map((p) => p.title).join(', ')}.\n${describeDecisionQuestion()}`,
-              }) + '\n',
-            );
-            process.exit(0);
-          }
-        } catch {
-          // fail-open
-        }
-      }
-      process.stdout.write(JSON.stringify({ decision: 'allow' }) + '\n');
-      process.exit(0);
-    }
-  }
-
-  const scriptPath = path.resolve(
-    path.dirname(fileURLToPath(import.meta.url)),
-    '..',
-    'scripts',
-    `${kind}-hook.mjs`,
-  );
-  if (!fs.existsSync(scriptPath)) {
-    process.stderr.write(`Error: Hook script not found at ${scriptPath}\n`);
-    process.exit(1);
-  }
-
-  const child = spawnSync(process.execPath, [scriptPath, ...flags], {
-    input: rawStdin,
-    stdio: ['pipe', 'inherit', 'inherit'],
-    env: process.env,
-  });
-
+  const scriptPath = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', 'scripts', `${kind}-hook.mjs`);
+  const child = spawnSync(process.execPath, [scriptPath, ...flags], { input: rawStdin, stdio: ['pipe', 'inherit', 'inherit'], env: process.env });
   if (child.error) {
     process.stderr.write(`Error invoking hook script: ${child.error.message}\n`);
     process.exit(1);
   }
-
   process.exit(child.status ?? (child.signal ? 1 : 0));
 }
 
@@ -5007,16 +4465,13 @@ async function main() {
   // arg-parse fault never reached this catch at all and could not be recorded.
   let faultClass = 'arg-parse';
   let dir;
-  let parsed = null;
-  // Set once the verb is known to open the Event Store: the facts both lifecycle triggers need (spec §16).
-  let eventStoreLifecycle = null;
-  let sweepsLand = false;
-  // A dispatched worker seals inline: a detached child would leave the attempt's process domain.
+  // Set once the verb is known: whether it is itself a seal or publish child, and its sub-verb (the only argument the
+  // fault record keeps by value).
+  let eventStoreChild = false;
+  let sub;
   const { currentDispatchDepth } = await import('../src/runner/dispatch/adapters.mjs');
-  if (currentDispatchDepth() === 0) processSealCoalescer.handOff();
   try {
     const { flags, positional } = parseArgs(rest);
-    parsed = { flags, positional };
 
     // Same rule as the Rust host: any exact `--help`/`-h` token asks for help,
     // even where the parser took it as the previous flag's value.
@@ -5030,63 +4485,18 @@ async function main() {
     if (unknownFlag) throw new StoreError('validation', unknownFlag);
 
     faultClass = 'dir-invalid';
-    dir = dataDir(flags.dir);
-    // tsk-4fu-2: a verb registered `store: 'require'`
-    // (command-registry.mjs) reads/writes through this `dir` — refuse
-    // before ever reaching its handler when `.fgos/` isn't there yet,
-    // instead of letting a write create a fresh, empty one (the worktree
-    // phantom-store hazard this item closes). `init` is deliberately never
-    // in that set — it is the one legitimate door that creates `.fgos/` —
-    // but gets the opposite check: refuse when `cwd` is a linked worktree,
-    // the one remaining path that could recreate a live `.fgos/` there and
-    // defeat ADR0020.
+    dir = resolveInvocationRoot({ cwd: process.cwd(), dir: flags.dir, policy: verb === 'init' ? 'strict-cwd' : 'caller-tree' }).fgosDir;
     const entry = COMMAND_REGISTRY.find((e) => e.name === verb);
     if (entry?.nativeOnly) {
       process.stderr.write(`fgos: "${verb}" chỉ có ở Rust host.\n`);
       process.exit(4);
     }
-    faultClass = 'store-missing';
-    if (entry?.store === 'require' && !fs.existsSync(dir)) {
-      throw new StoreError(
-        'validation',
-        `.fgos/ not found at "${dir}" -- run "fgos init" here first, or check you are not inside a linked worktree (worktrees never carry .fgos/, per ADR0020: docs/platform/runner/decisions/h-36d872fbb0e5.md#0020--chặn-fgos-khỏi-worktree-worker-không-khóa-không-cô-lập).`,
-      );
-    }
-    // A worktree made outside fgOS's own lifecycle carries a real, frozen `.fgos/` copy, so the missing-store refusal above
-    // never fires for it. `fs.existsSync(dir)` is required here, not implied: `fgos session start` from a `.fgos/`-less
-    // ADR0020-stripped worktree is the legitimate case that verb serves (it symlinks `.fgos/` in). Skipped when `--dir` was
-    // passed: the caller took responsibility for that root, and `isMainWorktree(process.cwd())` would check the wrong one.
-    // `isSessionWorktree` admits the one other legitimate non-main case, an already-created `fgos session start` worktree.
-    faultClass = 'disconnected-worktree-store';
-    if (
-      flags.dir === undefined &&
-      declared(entry?.mutatesStore, positional, flags) &&
-      fs.existsSync(dir) &&
-      !isMainWorktree(process.cwd()) &&
-      !isSessionWorktree(process.cwd())
-    ) {
-      throw new StoreError(
-        'validation',
-        `"${verb}" refused: "${process.cwd()}" is a linked worktree whose .fgos/ at "${dir}" is a real but disconnected snapshot, never the shared store outside "fgos pick"/"fgos take" (ADR0020-stripped) or "fgos session start" (symlinked) -- pass --dir <mainRoot> to reach the real store explicitly, e.g. ` +
-          '`--dir "$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)"`.',
-      );
-    }
-    faultClass = 'init-in-worktree';
-    if (verb === 'init' && !isMainWorktree(process.cwd())) {
-      throw new StoreError(
-        'validation',
-        `"fgos init" refused inside a linked worktree ("${process.cwd()}") -- worktrees never carry .fgos/ by design (ADR0020); run "fgos init" from the main checkout instead.`,
-      );
-    }
-    // tsk-56t D2: a `store: 'read'` verb tolerates a missing store (a fresh non-worktree dir is a legitimate "not evaluated"
-    // case), but a worktree-resident session that forgets `--dir` would then see a silent, real-looking empty view. The
-    // warning goes to stderr: `ready`/`triage` can return a bare array when unpaginated, so a JSON `data` field would change
-    // that shape in this one runtime case.
-    if (entry?.store === 'read' && !fs.existsSync(dir) && !isMainWorktree(process.cwd())) {
-      process.stderr.write(
-        `fgos: warning: .fgos/ not found at "${dir}" -- this view may be empty because the real store lives elsewhere (worktrees never carry .fgos/, per ADR0020); pass --dir <mainRoot> to read it.\n`,
-      );
-    }
+    // Whether this verb may touch the store from here (missing store, disconnected snapshot, `init` in a worktree, an
+    // empty-looking view) is one decision, `admitStoreAccess`; its refusals carry their own fault class.
+    const { warning } = admitStoreAccess({
+      verb, store: entry?.store, mutates: declared(entry?.mutatesStore, positional, flags), dir, cwd: process.cwd(), explicitDir: flags.dir !== undefined,
+    });
+    if (warning) process.stderr.write(warning);
     // Past this line the verb's own handler runs, and its refusals ("work X
     // not found", an Iron Law trip, a held lock) are correct answers rather
     // than misuse — so nothing there is recorded. The one exception is an
@@ -5095,32 +4505,42 @@ async function main() {
     // above already answers it without new machinery. The error itself still
     // comes from `runVerb` unchanged.
     faultClass = entry ? null : 'unknown-verb';
-    // The main checkout is resolved (it runs git) only for a verb that opens the store; the other verbs never pay for it.
-    if (opensEventStore(entry, verb, positional, flags)) {
-      eventStoreLifecycle = { trustedMain: path.dirname(getMainFgosDir(dir)), dispatched: currentDispatchDepth() > 0 };
-      sweepsLand = declared(entry.landsWork, positional);
-      // `init` creates the store, so only its end trigger has anything to maintain. A command outside a dispatched worker
-      // hands its seals to a child and runs the same seal-if-due policy in its end trigger, so a start trigger would only
-      // repeat that work on the print path; a stale or crashed batch is sealed by that end trigger or the child.
-      if (verb !== 'init' && eventStoreLifecycle.dispatched) maintainEventStore(path.dirname(dir), eventStoreLifecycle);
-    }
-    const data = await runVerb(verb, flags, positional, dir, rest);
-    if (flags.pretty && (verb === 'setup' || verb === 'doctor')) {
-      process.stdout.write(renderPretty(verb, data));
-    } else if (verb === 'plan-lint' && !flags.json) {
-      process.stdout.write(renderPlanLintReport(data));
-    } else if (verb === 'wire-agents' && !flags.json) {
-      const { renderAgentWiringText } = await import('../src/setup/agent-wiring.mjs');
-      process.stdout.write(renderAgentWiringText(data));
-    } else if (verb === 'workflow' && positional[0] === 'propose' && !flags.json) {
-      const { renderProposalText } = await import('../src/workflow/propose.mjs');
-      process.stdout.write(renderProposalText(data));
-    } else {
-      process.stdout.write(`${JSON.stringify(wrapEnvelope(data), null, 2)}\n`);
-    }
-    // The exit code is the verb's own call (`exitCodeOf` (src/cli/verb-exit.mjs)): outcome verbs map to the canonical execution
-    // codes (RUL99), `plan-lint` exits 1 on a hard finding, `doctor --strict` on a failing check. The default is 0.
-    process.exitCode = exitCodeOf(verb, data, { positional, flags });
+    // The Event Store lifecycle (spec §16) wraps the verb, its answer and its exit code; the verb's own registry entry
+    // says whether it opens the store, ran Land, or is itself a seal or publish child.
+    eventStoreChild = declared(entry?.eventStoreChild, positional, flags);
+    sub = entry?.subcommands && Object.hasOwn(entry.subcommands, positional[0]) ? positional[0] : undefined;
+    await runWithEventStoreLifecycle({
+      cwd: path.dirname(dir),
+      // Resolved only for a verb that opens the store, and only once: it runs Git.
+      trustedMain: () => mainCheckoutRootAt(path.dirname(dir)),
+      dispatched: currentDispatchDepth() > 0,
+      opensStore: !!entry && entry.store !== 'none' && !eventStoreChild,
+      creating: verb === 'init',
+      landed: declared(entry?.landsWork, positional),
+      recordFault: (triggerFaultClass, message) => recordInvocationFault({ fgosDir: dir, cwd: process.cwd(), verb, sub, faultClass: triggerFaultClass, message, argv: process.argv.slice(2) }),
+      releaseLand: async (trustedMain) => {
+        const { releaseRecordedLand } = await import('../src/runner/merge.mjs');
+        for (const warning of releaseRecordedLand(trustedMain).warnings) process.stderr.write(`fgos: warning: Land candidate release: ${warning}\n`);
+      },
+    }, async () => {
+      const data = await runVerb(verb, flags, positional, dir, rest);
+      if (flags.pretty && (verb === 'setup' || verb === 'doctor')) {
+        process.stdout.write(renderPretty(verb, data));
+      } else if (verb === 'plan-lint' && !flags.json) {
+        process.stdout.write(renderPlanLintReport(data));
+      } else if (verb === 'wire-agents' && !flags.json) {
+        const { renderAgentWiringText } = await import('../src/setup/agent-wiring.mjs');
+        process.stdout.write(renderAgentWiringText(data));
+      } else if (verb === 'workflow' && positional[0] === 'propose' && !flags.json) {
+        const { renderProposalText } = await import('../src/workflow/propose.mjs');
+        process.stdout.write(renderProposalText(data));
+      } else {
+        process.stdout.write(`${JSON.stringify(wrapEnvelope(data), null, 2)}\n`);
+      }
+      // The exit code is the verb's own call (`exitCodeOf` (src/cli/verb-exit.mjs)): outcome verbs map to the canonical execution
+      // codes (RUL99), `plan-lint` exits 1 on a hard finding, `doctor --strict` on a failing check. The default is 0.
+      process.exitCode = exitCodeOf(verb, data, { positional, flags });
+    });
   } catch (err) {
     // tsk-5z0: record before reporting, and only say the record exists when
     // one actually landed — `recordInvocationFault` returns null when the
@@ -5131,7 +4551,9 @@ async function main() {
       fgosDir: dir,
       cwd: process.cwd(),
       verb,
-      faultClass: faultClass ?? (parsed && isEventStoreChild(verb, parsed.positional, parsed.flags) ? 'event-store-child' : null),
+      sub,
+      // The detached children have no caller to read their error, so a child that fails leaves a record whatever the verb's own classification is.
+      faultClass: err.faultClass ?? faultClass ?? (eventStoreChild ? 'event-store-child' : null),
       message: err.message,
       argv: process.argv.slice(2),
     });
@@ -5144,22 +4566,6 @@ async function main() {
       process.exitCode = 1;
     } else {
       process.exitCode = EXIT_CODES[categoryOf(err)] ?? 1;
-    }
-  } finally {
-    // The end trigger runs after the verb's answer is written, on success and on refusal alike. Only a session that is
-    // not a dispatched worker publishes (D13); sealing is always safe.
-    handSealsToChild();
-    if (eventStoreLifecycle) {
-      const maintained = maintainEventStore(path.dirname(dir), { ...eventStoreLifecycle, end: true });
-      // The command's answer is already out and a trigger never fails it, so a trigger that could not finish leaves its record.
-      if (maintained.error) {
-        recordInvocationFault({ fgosDir: dir, cwd: process.cwd(), verb, faultClass: 'event-store-end-trigger', message: maintained.error, argv: process.argv.slice(2) });
-      }
-      // A dispatched worker never releases: only the clone owner's own session does (D13).
-      if (sweepsLand && !eventStoreLifecycle.dispatched) {
-        const { releaseRecordedLand } = await import('../src/runner/merge.mjs');
-        for (const warning of releaseRecordedLand(eventStoreLifecycle.trustedMain).warnings) process.stderr.write(`fgos: warning: Land candidate release: ${warning}\n`);
-      }
     }
   }
 }

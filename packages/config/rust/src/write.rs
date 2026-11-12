@@ -278,7 +278,7 @@ pub fn commit_observed(
 }
 
 /// The check a person's `set` or `patch` passes before it reaches [`commit`]: every key the edits
-/// set must be described by a section schema or the runtime key list. The refusals name each
+/// set must be described by a section schema. The refusals name each
 /// unknown key with the nearest keys, together with the reason's own refusal when the reason is
 /// unusable, so one answer holds every problem. `unset` is never refused, so a mistyped key that
 /// was written can be removed. Migration and repair keep unknown keys of an older file and do not

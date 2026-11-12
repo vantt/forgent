@@ -143,14 +143,16 @@ test('an account of a provider no candidate of the seat belongs to is refused be
   assert.deepEqual(unitRuns(fx), []);
 });
 
-test('an account that only a Workflow run pinned and no seat takes runs the unit unpinned, where the same pin from the command line is refused', { skip: SKIP }, async () => {
+test('an account pin the caller asked to apply where it is served runs a unit no seat takes unpinned; a strict pin, the default, refuses it, and an unknown pin mode is refused', { skip: SKIP }, async () => {
   const fx = setup({ alpha: { family: 'alpha', logins: { a1: 'live' } }, beta: { family: 'beta', logins: { b1: 'live' } } }, { prefer: ['alpha'] });
-  const res = await run(fx, solo('u-pin-workflow'), { overrides: [{ origin: 'workflow', account: 'beta/b1' }] });
+  const res = await run(fx, solo('u-pin-where-served'), { overrides: [{ account: 'beta/b1' }], accountPin: 'where-served' });
   assert.equal(res.outcome, 'pass', JSON.stringify(res.results[0]).slice(0, 1500));
   const [attempt] = attemptsOf(fx.repoRoot, res);
   assert.equal(attempt.binding.executor, 'alpha');
   assert.notEqual(attempt.binding.account?.pool, 'beta');
-  await assert.rejects(run(fx, solo('u-pin-cli'), pin('beta/b1')), /applies to no seat/);
+  await assert.rejects(run(fx, solo('u-pin-strict'), { overrides: [{ account: 'beta/b1' }], accountPin: 'strict' }), /applies to no seat/);
+  await assert.rejects(run(fx, solo('u-pin-default'), pin('beta/b1')), /applies to no seat/);
+  await assert.rejects(run(fx, solo('u-pin-mode'), { overrides: [{ account: 'beta/b1' }], accountPin: 'anywhere' }), /accountPin must be one of strict, where-served/);
 });
 
 // A writing seat that already changed the worktree before its provider limit is not run again on top of its own

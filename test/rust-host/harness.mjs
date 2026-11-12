@@ -856,7 +856,7 @@ export function generateCoverageFloorCases(options = {}) {
   // - stdout zero
   cases.push({
     id: "coverage-exit-category-stdout-zero",
-    args: ["version"],
+    args: ["workflow", "list"],
     modes: ["semantic-json"],
     expectedExitCode: 0,
     ignoreChildren: true,
@@ -872,10 +872,10 @@ export function generateCoverageFloorCases(options = {}) {
     ignoreChildren: true,
   });
 
-  // 3. Reads of version
+  // 3. A read that needs no store (`version` is a native route the Node entry no longer serves)
   cases.push({
     id: "coverage-read-version",
-    args: ["version"],
+    args: ["workflow", "list"],
     modes: ["semantic-json"],
     expectedExitCode: 0,
     ignoreChildren: true,
@@ -931,7 +931,7 @@ export function generateCoverageFloorCases(options = {}) {
   // 9. Caller cwd distinct from product root
   cases.push({
     id: "coverage-distinct-caller-cwd",
-    args: ["version"],
+    args: ["workflow", "list"],
     cwd: os.tmpdir(),
     modes: ["semantic-json"],
     expectedExitCode: 0,
@@ -941,7 +941,7 @@ export function generateCoverageFloorCases(options = {}) {
   // 10. Stdin-consuming case
   cases.push({
     id: "coverage-stdin-consuming-case",
-    args: ["version"],
+    args: ["workflow", "list"],
     stdin: "synthetic stdin payload\n",
     modes: ["semantic-json"],
     expectedExitCode: 0,
@@ -951,7 +951,7 @@ export function generateCoverageFloorCases(options = {}) {
   // 11. Target-specific signal / process-tree case
   cases.push({
     id: "coverage-signal-process-tree-case",
-    args: ["version"],
+    args: ["workflow", "list"],
     modes: ["semantic-json"],
     expectedExitCode: 0,
     ignoreChildren: false, // Asserts child process (git rev-parse) parity!

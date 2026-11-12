@@ -24,6 +24,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { createGitInspect, gitPortOptions } from '../git/inspect.mjs';
 import { resolveFgosFile, FGOS_FILE } from './fgos-file-registry.mjs';
+import { StoreError } from './store-error.mjs';
 
 /** The full kind domain (repository-harness's own set, minus 'http' — 0 real
  * usage confirmed at tsk-in1-1 time (DISCUSSION.md §3 #14): no executor ever
@@ -251,6 +252,38 @@ export function writeLocalStatus(dir, statusMap) {
 export function resolvedStatus(name, localStatus) {
   const entry = localStatus[name];
   return entry && typeof entry.status === 'string' ? entry.status : 'unknown';
+}
+
+/**
+ * `fgos tool check`: probe `name` (every registered tool when omitted) on THIS machine and write the answers to the
+ * local, gitignored overlay, never the shared event log. A tool that probes as missing is a fact to report, not an
+ * error; only a `name` no executor declares is refused.
+ */
+export async function checkTools({ executors, dir, repoRoot, name }) {
+  const tools = toolsFromExecutors(executors);
+  if (name !== undefined && !tools[name]) throw new StoreError('validation', `tool "${name}" not found.`);
+  const targets = name !== undefined ? [name] : Object.keys(tools);
+  const localStatus = readLocalStatus(dir);
+  const checked = {};
+  for (const toolName of targets) {
+    const status = await probeTool(tools[toolName], repoRoot);
+    const checkedAt = new Date().toISOString();
+    localStatus[toolName] = { status, checkedAt };
+    checked[toolName] = { status, checkedAt };
+  }
+  writeLocalStatus(dir, localStatus);
+  return { checked };
+}
+
+/** `fgos tool query`: the registered tools (config-declared, merged with this machine's overlay), by capability and status. */
+export function queryTools({ executors, dir, capability, status }) {
+  const localStatus = readLocalStatus(dir);
+  const normalizedCapability = capability !== undefined ? normalizeCapability(capability) : undefined;
+  const providers = Object.values(toolsFromExecutors(executors))
+    .filter((tool) => normalizedCapability === undefined || tool.capability === normalizedCapability)
+    .map((tool) => ({ ...tool, status: resolvedStatus(tool.name, localStatus) }))
+    .filter((tool) => status === undefined || tool.status === status);
+  return { providers };
 }
 
 /**

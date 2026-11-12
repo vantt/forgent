@@ -151,6 +151,10 @@ test('R1 & R2: Release tree builder stages release tree and produces canonical m
       fs.existsSync(path.join(legacyNodeDir, 'packages', 'holder-lock', 'contracts', 'lock-registry.v1.json')),
       'The lock registry every kernel lock resolves through must be staged in legacy-node',
     );
+    assert.ok(
+      fs.existsSync(path.join(legacyNodeDir, 'packages', 'host-runtime', 'contracts', 'exit-codes.v1.json')),
+      'The exit-code table the shell entry loads must be staged in legacy-node',
+    );
 
     // 6. Verify manifest.json and its required §5 fields
     const manifestPath = path.join(tempOut, 'manifest.json');

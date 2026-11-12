@@ -3,16 +3,16 @@
 // bin/fgos.mjs, fgos-runner, and session/worktree management stop deriving
 // these independently.
 //
-// D5: root resolution takes an explicit `strict` mode rather than picking
-// one behavior for both existing callers — bin/fgos.mjs's CLI is
-// intentionally cwd-strict (never git-resolved, see its own dataDir()
-// comment), while fgos-runner/session management deliberately resolves via
-// git so it works correctly from inside a worktree. Both are preserved
-// exactly; `strict` is the switch between them.
+// One Git read of the repository facts feeds every root answer in this file:
+// the invocation-root door, `resolveRepoRoot` and `resolveMainCheckoutRoot`.
+// A caller holding the facts passes them through `facts`, so one invocation
+// reads Git once for all three.
 
 import fs from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
-import { createGitInspect, gitPortOptions } from '../git/inspect.mjs';
+import { createGitInspect, gitPortOptions, readRepoFacts } from '../git/inspect.mjs';
+import { nativeError } from '../git/native.mjs';
 import { branchNameFor, checkoutPathForBranch, realpathOrSelf } from './worktree.mjs';
 
 function validationError(message) {
@@ -21,25 +21,60 @@ function validationError(message) {
   return error;
 }
 
-/** Resolve the repo root. Default (git) mode asks Git Inspect for the
- * checkout `cwd` sits in — never `__dirname`, since fgos-runner's
- * binary may live in a different repo than the one it runs on — and
- * throws with category 'validation' when `cwd` is not inside a git repo,
- * or the repo has no resolvable HEAD (no commits yet). `strict: true`
- * (bin/fgos.mjs's CLI contract) skips git entirely and returns `cwd`
- * as-is: `.fgos/` always lives under the caller's own cwd, never
- * resolved upward, never treating a worktree as equivalent to its main
- * checkout. */
-export function resolveRepoRoot(cwd = process.cwd(), { strict = false } = {}) {
-  if (strict) return cwd;
+/** `readRepoFacts` that reads an unreadable repository as no repository. */
+function repoFactsOrNone(cwd, facts) {
+  if (facts) return facts;
+  try {
+    return readRepoFacts(cwd);
+  } catch {
+    return { notARepository: true };
+  }
+}
 
+// No Git door on this install (no addon, no host to run the lock driver): nothing that reads a repository can run,
+// as for an unactivated package install being uninstalled, so it reads as no repository.
+const NO_GIT_DOOR_CODES = new Set(['git-addon-unavailable', 'lock-driver-unavailable']);
+const TRUST_CAUSES = new Set(['untrusted-worktree', 'trusted-main-gitfile-unsupported']);
+
+/**
+ * The facts the invocation-root door judges. A repository Git refuses to trust (a `.git` file whose `gitdir`
+ * does not point back, say) is a refusal under every policy. An unreadable answer reads as no repository only
+ * under `caller-tree`, or when the install has no Git door at all; every other policy acts on a checkout, so it refuses by name rather than act on `cwd`.
+ * `needRepository` also refuses a genuine "not a repository" answer (the destructive policy).
+ */
+function repoFactsOrRefuse(cwd, facts, { lenient = false, needRepository = false, read = readRepoFacts } = {}) {
+  let answer = facts;
+  if (!answer) {
+    try {
+      answer = read(cwd);
+    } catch (err) {
+      const cause = nativeError(err).cause ?? err.message;
+      if (TRUST_CAUSES.has(cause)) throw validationError(`"${cwd}" is inside a Git repository fgOS cannot trust: ${cause}`);
+      if (needRepository || !(lenient || NO_GIT_DOOR_CODES.has(err?.code))) {
+        throw validationError(`cannot establish the main checkout of "${cwd}": ${cause}`);
+      }
+      answer = { notARepository: true };
+    }
+  }
+  if (needRepository && (answer.notARepository || !answer.trustedMainRoot)) {
+    throw validationError(`cannot establish the main checkout of "${cwd}": it is not inside a Git repository`);
+  }
+  return answer;
+}
+
+/** Resolve the repo root: the checkout `cwd` sits in, asked of Git Inspect
+ * — never `__dirname`, since fgos-runner's binary may live in a different
+ * repo than the one it runs on. Throws with category 'validation' when `cwd`
+ * is not inside a git repo, or the repo has no resolvable HEAD (no commits
+ * yet). */
+export function resolveRepoRoot(cwd = process.cwd(), { facts } = {}) {
   let inspect;
   let repoRoot;
   try {
     inspect = createGitInspect(gitPortOptions(cwd));
-    const facts = inspect.resolveRepo();
-    if (facts.notARepository || !facts.worktreeRoot) throw new Error('not a git checkout');
-    repoRoot = facts.worktreeRoot;
+    const answer = facts ?? inspect.resolveRepo();
+    if (answer.notARepository || !answer.worktreeRoot) throw new Error('not a git checkout');
+    repoRoot = answer.worktreeRoot;
   } catch (err) {
     throw validationError(`fgos-runner must run inside a git repository (cwd: ${cwd}): ${err.message}`);
   }
@@ -60,25 +95,90 @@ export function resolveRepoRoot(cwd = process.cwd(), { strict = false } = {}) {
 /** Resolve the MAIN CHECKOUT root — never a linked worktree's own root,
  * unlike `resolveRepoRoot` above (which returns whichever checkout `cwd`
  * sits in). Via Git Inspect's trusted main root, the checkout that owns the
- * common `.git` regardless of which worktree `cwd` is inside (same
- * resolution `scripts/fgos-shell-integration.sh`'s `fgos` shell function
- * reaches through `--git-common-dir`). Returns `null`, never throws, when `cwd`
- * is not inside a git checkout at all — the one real caller of this
- * distinction (tsk-5hv, extracted from `src/setup/registrations.mjs`'s
- * own `resolveMainCheckout`, now delegating here instead of duplicating
- * the git read) needs a graceful "nothing to resolve" path, not a
- * thrown validation error. `.fgos/` is unconditionally wiped from every
- * freshly-created worktree (ADR0020) — any caller that needs the real
- * `.fgos/config.json` (not a worktree-local phantom) must resolve through
- * this function, never `resolveRepoRoot`. */
-export function resolveMainCheckoutRoot(cwd = process.cwd()) {
-  let facts;
+ * common `.git` regardless of which worktree `cwd` is inside. Returns `null`,
+ * never throws, when `cwd` is not inside a git checkout at all. `.fgos/` is
+ * unconditionally wiped from every freshly-created worktree (ADR0020) — any
+ * caller that needs the real `.fgos/config.json` (not a worktree-local
+ * phantom) must resolve through this function, never `resolveRepoRoot`. */
+export function resolveMainCheckoutRoot(cwd = process.cwd(), { facts } = {}) {
+  const answer = repoFactsOrNone(cwd, facts);
+  return answer.notARepository || !answer.trustedMainRoot ? null : realpathOrSelf(answer.trustedMainRoot);
+}
+
+const isDirectory = (target) => {
   try {
-    facts = createGitInspect(gitPortOptions(cwd)).resolveRepo();
+    return fs.statSync(target).isDirectory();
   } catch {
-    return null;
+    return false;
   }
-  return facts.notARepository || !facts.trustedMainRoot ? null : realpathOrSelf(facts.trustedMainRoot);
+};
+
+/** The nearest directory at or above `start`, never above `ceiling` and never `home`, holding a `.fgos` directory. */
+function nearestStoreRoot(start, ceiling, home) {
+  for (let dir = start; ; dir = path.dirname(dir)) {
+    if (dir === home) return null;
+    if (isDirectory(path.join(dir, '.fgos'))) return dir;
+    if (dir === ceiling || path.dirname(dir) === dir) return null;
+  }
+}
+
+/**
+ * Which project, and which `.fgos`, an invocation acts on: `{ root, fgosDir, found }`.
+ *
+ * Policies:
+ * - `caller-tree` (default): the nearest `.fgos` directory walking up from `cwd`,
+ *   never above the Git top level of `cwd`'s checkout and never the home directory's
+ *   own `.fgos` (the machine's global directory). `found` is false when none exists;
+ *   `root` is then the Git top level (or `cwd` outside a repository), where a store
+ *   would be created.
+ * - `main-checkout`: the trusted main checkout root of `cwd`'s repository, from any
+ *   of its worktrees (`cwd` itself outside a repository).
+ * - `main-checkout-only`: `main-checkout` for a verb that destroys state: a `--dir` must be that main root.
+ * - `strict-cwd`: `cwd` itself; refused inside a repository unless `cwd` is its top level,
+ *   so a store is never created in a subdirectory.
+ *
+ * `readFacts` replaces the Git read (default `readRepoFacts`).
+ *
+ * `dir` is the caller's request for the root. It is validated, never walked; under
+ * `main-checkout-only` it must be the main checkout root of `cwd`'s repository.
+ */
+export function resolveInvocationRoot({ cwd = process.cwd(), dir, policy = 'caller-tree', home = os.homedir(), facts, readFacts } = {}) {
+  const read = readFacts ?? readRepoFacts;
+  const answer = (root, found) => ({ root, fgosDir: fgosDirFromRoot(root), found });
+  if (dir !== undefined) {
+    if (typeof dir !== 'string' || !dir.trim()) {
+      throw validationError('--dir requires a non-empty path value');
+    }
+    const requested = path.resolve(dir);
+    if (policy === 'main-checkout-only') {
+      const main = resolveMainCheckoutRoot(cwd, { facts: repoFactsOrRefuse(cwd, facts, { needRepository: true, read }) });
+      if (main && realpathOrSelf(requested) !== main) {
+        throw validationError(
+          `--dir "${dir}" is not the main checkout of the repository at "${cwd}" ("${main}"); this command acts on the main checkout only -- pass --dir "${main}" or run it from there.`,
+        );
+      }
+    }
+    return answer(requested, isDirectory(path.join(requested, '.fgos')));
+  }
+  const repo = repoFactsOrRefuse(cwd, facts, { lenient: policy === 'caller-tree', needRepository: policy === 'main-checkout-only', read });
+  if (policy === 'main-checkout' || policy === 'main-checkout-only') {
+    const main = resolveMainCheckoutRoot(cwd, { facts: repo });
+    return answer(main ?? path.resolve(cwd), main !== null && isDirectory(path.join(main, '.fgos')));
+  }
+  const here = realpathOrSelf(path.resolve(cwd));
+  const top = repo.notARepository || !repo.worktreeRoot ? null : realpathOrSelf(repo.worktreeRoot);
+  if (policy === 'strict-cwd') {
+    if (top && top !== here) {
+      throw validationError(
+        `"${cwd}" is inside the repository whose top level is "${top}" -- run this command from "${top}", or pass --dir <project root>.`,
+      );
+    }
+    return answer(path.resolve(cwd), isDirectory(path.join(cwd, '.fgos')));
+  }
+  if (policy !== 'caller-tree') throw validationError(`unknown root policy "${policy}"`);
+  const homeReal = home ? realpathOrSelf(path.resolve(home)) : null;
+  const found = nearestStoreRoot(here, top, homeReal);
+  return found ? answer(found, true) : answer(top ?? path.resolve(cwd), false);
 }
 
 /** Join an already-resolved repo root onto `.fgos` — the single place that
@@ -86,12 +186,6 @@ export function resolveMainCheckoutRoot(cwd = process.cwd()) {
  * resolved) produces the identical path. */
 export function fgosDirFromRoot(root) {
   return path.join(path.resolve(root), '.fgos');
-}
-
-/** Resolve the repo root (per `opts`' `strict`/`cwd`) and join `.fgos` in
- * one call — the shape most callers actually want. */
-export function resolveFgosDir(cwd = process.cwd(), opts = {}) {
-  return fgosDirFromRoot(resolveRepoRoot(cwd, opts));
 }
 
 /** The logs directory under an already-resolved `.fgos` root. */

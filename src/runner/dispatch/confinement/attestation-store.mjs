@@ -26,7 +26,7 @@ export const REQUIRED_CHANNELS = Object.freeze([
   'network',
 ]);
 export const VALID_PHASES = Object.freeze(['prepared', 'completed', 'failed', 'refused']);
-export const VALID_OUTCOMES = Object.freeze(['enforced', 'unconfined', 'degraded', 'refused', 'unknown']);
+export const ATTESTATION_OUTCOMES = Object.freeze(['enforced', 'unconfined', 'degraded', 'refused', 'unknown']);
 
 export class AttestationStoreError extends Error {
   constructor(message) {
@@ -51,8 +51,8 @@ export function validateAttestationCompleteness(attestation) {
   if (!VALID_PHASES.includes(attestation.phase)) {
     throw new AttestationStoreError(`attestation phase must be one of ${VALID_PHASES.join('/')}, got "${attestation.phase}".`);
   }
-  if (!VALID_OUTCOMES.includes(attestation.outcome)) {
-    throw new AttestationStoreError(`attestation outcome must be one of ${VALID_OUTCOMES.join('/')}, got "${attestation.outcome}".`);
+  if (!ATTESTATION_OUTCOMES.includes(attestation.outcome)) {
+    throw new AttestationStoreError(`attestation outcome must be one of ${ATTESTATION_OUTCOMES.join('/')}, got "${attestation.outcome}".`);
   }
 
   // Channels completeness verification

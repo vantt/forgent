@@ -57,7 +57,7 @@ import { readIronLawLevel, recordIronLawSkip, recordIronLawAcknowledge } from '.
 import { listSessions } from '../../runner/session.mjs';
 import { runGoalCheck } from '../../runner/goal-check.mjs';
 import { mergeGitHubPR } from '../../runner/github-adapter.mjs';
-import { recordApprovePostSuccessFault } from '../../cli/approve-fault-log.mjs';
+import { recordApprovePostSuccessFault } from '../../observe/approve-fault-log.mjs';
 import { checkDispatchAttestation } from '../../runner/attestation-guard.mjs';
 
 // Approve's own success paths call `moveWork(...to:'delivered'...)` as their very last step. That

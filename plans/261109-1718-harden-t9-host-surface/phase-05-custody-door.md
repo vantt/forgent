@@ -1,16 +1,16 @@
 ---
 phase: 05
-title: "PROPOSED - AWAITING OWNER APPROVAL: one run-supervisor door to run a command under worktree custody, and one Execution door that runs a verify under custody and classifies it; workflow stops naming the custody mechanisms"
-status: pending
-depends_on: ["04 landed (layer order)", "COOK's unit-run-result contract text (branch cook/unit-run-result, tip 444dd1b1b: section 7 names both doors)", "owner approval of COOK's four-step split (decision 81)"]
+title: "one run-supervisor door to run a command under worktree custody, and one Execution door that runs a verify under custody and classifies it; workflow stops naming the custody mechanisms"
+status: completed
+depends_on: ["04 landed (layer order)", "COOK's unit-run-result contract text (branch cook/unit-run-result, tip 444dd1b1b: section 7 names both doors)", "owner decision 85 (approved)"]
 parallel: "T4 (Execution layer); beside P19 (file-disjoint); touches no bin/fgos.mjs range"
 effort: ~1.5d
 net_size: "Node about -35 (custody door +30, seven call sites -30; verify door +25, two classifiers and the gate's own digest -60); Rust 0; tests about +40 (estimate)"
 ---
 
-# Phase 05 - Custody door and classified verify door (COOK step 3; authority audit AU-06, AU-12) - proposed - awaiting owner approval
+# Phase 05 - Custody door and classified verify door (COOK step 3; authority audit AU-06, AU-12) - approved (owner decision 85), landed
 
-**Not started and not gating** until the owner approves COOK's split. COOK's text now exists (`docs/platform/runner/contracts/unit-run-result.md` on branch `cook/unit-run-result`, §7) and names both doors; this phase cites it for the exact signatures. If the text names a different shape, step 1 stops and reports.
+**Approved by owner decision 85.** COOK's text exists (`docs/platform/runner/contracts/unit-run-result.md` on branch `cook/unit-run-result`, §7) and names both doors; this phase cites it for the exact signatures. If the text names a different shape, step 1 stops and reports.
 
 **Authority moved:** worktree custody (T4 run-supervisor) stops being taken by Workflow directly; "run the verify command and turn its exit into a verdict or an infrastructure failure" moves from two copies (Execution `verifyUnit`, Workflow `runCaseGate`) to one Execution door.
 

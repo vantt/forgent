@@ -455,7 +455,7 @@ export function normalizePreferCandidates(prefer) {
 /**
  * Advisory-only, config-load-time warning: an `executors.<id>` entry that declares neither `providerModel` nor
  * `provider`, and whose `via:"cli"` invocation yields no usable command, has no reliable way to name its provider
- * family there: `deriveProviderFamily` falls to its `'claude'` default while other call sites read a different
+ * family there: `familyOf` falls to its `'claude'` default while other call sites read a different
  * (or no) family. Safe only when a real `via:"cli"` command exists; unsafe for a bare entry with a real non-Claude
  * flat `.command` and for an invocations-shaped entry with no cli invocation at all. Never throws; it only
  * recommends declaring `providerModel` so every call site agrees.

@@ -478,3 +478,54 @@ fn adopt_an_intent_whose_pane_was_never_allocated_closes_with_nothing_to_release
     assert_eq!(receipt["detail"]["noRecord"], true, "{receipt}");
     assert!(herdr.calls_starting("pane close").is_empty());
 }
+
+#[test]
+fn adopt_probe_answers_stuck_and_adoptable_when_the_release_that_wrote_the_envelope_is_there() {
+    let a = attempt("matrix-probe-adoptable", &STEPS);
+    a.bind_release(&internal_harness(), &a.payload_with_entry());
+    let before = a.snapshot();
+    let line = adopt(&a.dir, &["--probe-only"]);
+    assert_eq!(
+        (line["state"].as_str(), line["adoptable"].as_bool()),
+        (Some("needs-adopt"), Some(true)),
+        "{line}"
+    );
+    assert!(line.get("gone").is_none(), "{line}");
+    assert_eq!(a.snapshot(), before, "a probe writes nothing");
+}
+
+#[test]
+fn adopt_probe_names_what_is_gone_when_the_release_that_wrote_the_envelope_was_removed() {
+    let a = attempt("matrix-probe-gone", &STEPS);
+    let payload = a.payload_with_entry();
+    let missing_host = a.path("removed-host");
+    a.bind_release(&missing_host, &payload);
+    let line = adopt(&a.dir, &["--probe-only"]);
+    assert_eq!(
+        (line["state"].as_str(), line["adoptable"].as_bool()),
+        (Some("needs-adopt"), Some(false)),
+        "{line}"
+    );
+    assert_eq!(line["gone"], json!([missing_host]));
+
+    a.bind_release(&internal_harness(), &a.path("removed-payload"));
+    let line = adopt(&a.dir, &["--probe-only"]);
+    assert_eq!(line["adoptable"], false, "{line}");
+    assert_eq!(
+        line["gone"],
+        json!([a.path("removed-payload/src/run-supervisor/attempt-step.mjs")])
+    );
+}
+
+#[test]
+fn adopt_probe_takes_no_lock_and_answers_nothing_about_adoption_while_the_attempt_runs() {
+    let a = attempt("matrix-probe-held", &STEPS);
+    a.bind_release(&a.path("removed-host"), &a.path("removed-payload"));
+    let _lock = hold_lock(&a.dir);
+    let line = adopt(&a.dir, &["--probe-only"]);
+    assert_eq!(line["state"], "running", "{line}");
+    assert!(
+        line.get("adoptable").is_none() && line.get("gone").is_none(),
+        "{line}"
+    );
+}

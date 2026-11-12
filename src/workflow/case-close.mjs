@@ -17,7 +17,7 @@ import { isCaseId, runDirOf, runsRoot } from '../runner/execution/case-run-paths
 import { assignmentDir } from '../runner/dispatch/assignment-layout.mjs';
 import { deriveUnitState } from '../runner/execution/unit-state.mjs';
 import { unitControllerHeld } from '../runner/execution/unit-control.mjs';
-import { dispatchCwdHolder } from '../run-supervisor/cwd-lock.mjs';
+import { custodyHeld } from '../runner/execution/custody-door.mjs';
 import { realpathOrNull } from '../run-supervisor/payload-root.mjs';
 
 /**
@@ -187,7 +187,7 @@ const KEEP_REASONS = [
   { reason: 'names-other-case', blocks: false, fires: ({ record, caseId }) => record?.workflow?.caseId !== caseId },
   { reason: 'named-by-other-case', blocks: false, fires: ({ unitRunId, namedElsewhere }) => namedElsewhere.has(unitRunId) },
   { reason: 'controller-held', blocks: true, fires: ({ expected }) => unitControllerHeld(expected) },
-  { reason: 'custody-held', blocks: true, fires: ({ record, fgosDir }) => typeof record.worktree === 'string' && Boolean(dispatchCwdHolder(fgosDir, record.worktree)) },
+  { reason: 'custody-held', blocks: true, fires: ({ record, fgosDir }) => typeof record.worktree === 'string' && custodyHeld(fgosDir, record.worktree) },
   { reason: 'unsettled', blocks: true, fires: ({ expected }) => { const { unitState } = deriveUnitState(expected, { probe: NO_PROBE }); return unitState !== 'completed' && unitState !== 'failed'; } },
 ];
 

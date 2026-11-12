@@ -42,11 +42,15 @@ test('a packaged workflow is discovered with its directory and owning domain fro
   write('domains/finance/workflows/close.yaml', workflowText('finance/close'));
   write('domains/finance/workflows/not-a-package/other.yaml', workflowText('ignored'));
 
-  assert.deepEqual([...discoverWorkflows({ packageRoot: root }).keys()].sort(), ['finance/audit', 'finance/close', 'flat', 'packed']);
+  const fixtureIds = ['finance/audit', 'finance/close', 'flat', 'packed'];
+  const discovered = [...discoverWorkflows({ packageRoot: root }).keys()];
+  assert.ok(fixtureIds.every((id) => discovered.includes(id)));
+  assert.ok(!discovered.includes('ignored'));
   const source = (id) => loadWorkflowWithSource(id, { packageRoot: root }).source;
-  assert.deepEqual({ ...source('flat') }, { sourcePath: path.join(root, 'core/workflows/flat.yaml'), workflowDir: null, owningDomain: null });
-  assert.deepEqual({ ...source('packed') }, { sourcePath: path.join(root, 'core/workflows/packed/wf.packed.yaml'), workflowDir: path.join(root, 'core/workflows/packed'), owningDomain: null });
+  assert.deepEqual({ ...source('flat') }, { root: 'project', sourcePath: path.join(root, 'core/workflows/flat.yaml'), workflowDir: null, owningDomain: null });
+  assert.deepEqual({ ...source('packed') }, { root: 'project', sourcePath: path.join(root, 'core/workflows/packed/wf.packed.yaml'), workflowDir: path.join(root, 'core/workflows/packed'), owningDomain: null });
   assert.deepEqual({ ...source('finance/audit') }, {
+    root: 'project',
     sourcePath: path.join(root, 'domains/finance/workflows/audit/wf.audit.yaml'),
     workflowDir: path.join(root, 'domains/finance/workflows/audit'),
     owningDomain: 'finance',

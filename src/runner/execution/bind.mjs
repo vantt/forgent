@@ -5,8 +5,7 @@
 // launch view, the account view) and turns its answer into the binding; it never ranks or filters.
 
 import { decideExecutorDispatchMechanism } from '../dispatch/mechanism.mjs';
-import { deriveProviderFamily } from '../dispatch/resolve.mjs';
-import { checkProviderDisallowed, renderedEffortLevels } from '../dispatch/provider-adapter.mjs';
+import { checkProviderDisallowed, familyOf, renderedEffortLevels } from '../dispatch/provider-adapter.mjs';
 import { canApplyPosture, resolvePostureInvocation } from '../dispatch/confinement/policies.mjs';
 import { MODEL_POLICY_TIERS, assertReasoningEffort, assertRunTimeoutMs } from '../dispatch/config.mjs';
 import { RunnerConfigError } from '../dispatch/runner-config-error.mjs';
@@ -44,11 +43,11 @@ function findMatchingOverride(overrides, unit, seat, role) {
 }
 
 /** The provider family of an executor id: its own `providerModel`/`provider`, else inferred from its command. */
-export function getProviderFamily(runnerConfig, executorId) {
+function executorFamily(runnerConfig, executorId) {
   const entry = executorsOf(runnerConfig ?? {})[executorId];
   const cli = entry?.invocations?.find((inv) => inv?.via === 'cli');
   const ownCommand = cli?.command || cli?.adapter || entry?.command || entry?.adapter;
-  return deriveProviderFamily(entry, cli?.command ?? entry?.command ?? (ownCommand ? undefined : runnerCommandOf(runnerConfig ?? {})));
+  return familyOf(entry, cli?.command ?? entry?.command ?? (ownCommand ? undefined : runnerCommandOf(runnerConfig ?? {})));
 }
 
 /**
@@ -80,6 +79,7 @@ function resolvePersona({ ask, unit, matchingOverride, capEntries }) {
 }
 
 // ---- machine facts ------------------------------------------------------------------------------
+const isPlainObject = (value) => value !== null && typeof value === 'object' && !Array.isArray(value);
 const executorsOf = (runnerConfig) => runnerConfig.executors ?? runnerConfig.runner?.executors ?? {};
 const runnerCommandOf = (runnerConfig) => runnerConfig.executor?.command ?? runnerConfig.runner?.executor?.command;
 
@@ -102,7 +102,7 @@ function disallowedReason(runnerConfig, id, entry, family) {
  * inside herdr and it can carry the posture, else the first plain one that can.
  */
 function executorFacts(id, entry, { runnerConfig, executors, session }) {
-  const family = getProviderFamily(runnerConfig, id);
+  const family = executorFamily(runnerConfig, id);
   const mechanism = decideExecutorDispatchMechanism(runnerConfig, id, { hasLiveTaskAccess: Boolean(session.hasNativeAgent) });
   const supported = Array.isArray(entry.supports?.reasoningEffort) ? entry.supports.reasoningEffort : null;
   const herdrPresent = session.herdrPresent === true;
@@ -202,6 +202,17 @@ function accountViewOf(runnerConfig, launchView, accounts = null, now = Date.now
   return { pools: Object.fromEntries([...pools].map((pool) => [pool, poolOf(pool)])) };
 }
 
+/**
+ * When the account Seat Binding's view holds quarantined now ends (epoch milliseconds, the largest safe
+ * integer when only a person clears it), or null when the view offers it: the judgement the crate ranks by,
+ * so a pinned account is refused for the reason a ranked one is passed over. The lease re-checks it under
+ * its lock at the time of use.
+ */
+export function accountQuarantineOf(runnerConfig, { pool, id }, { runtimeDir, now = Date.now() } = {}) {
+  const view = accountViewOf(runnerConfig, launchViewOf(runnerConfig, {}), { runtimeDir }, now);
+  return view.pools[pool]?.find((account) => account.id === id)?.quarantinedUntil ?? null;
+}
+
 // ---- the ask ------------------------------------------------------------------------------------
 
 /** The unit's own `prefer` (`fgos run --provider`) in the shape the crate reads. */
@@ -219,6 +230,38 @@ function crateOverrideOf(override) {
   if (override.acceptDependence === true) out.acceptDependence = true;
   if (!override.scope && override.executor) out.runWide = true;
   return Object.keys(out).length > 0 ? out : undefined;
+}
+
+/** A `modelPolicies` or `tierFallback` section keyed by the family name, whatever spelling it was written in; null when it already is. */
+function familyKeyedSection(section, listsFamilies) {
+  const misspelt = (key) => typeof key === 'string' && familyOf(key) !== key;
+  const named = (value) => (typeof value === 'string' ? familyOf(value) : value);
+  if (listsFamilies ? !Object.values(section).flat().some(misspelt) : !Object.keys(section).some(misspelt)) return null;
+  if (listsFamilies) return Object.fromEntries(Object.entries(section).map(([tier, families]) => [tier, [...new Set([families].flat().map(named))]]));
+  // A cell written under the family's own name wins over one written under another spelling of it.
+  const keyed = {};
+  for (const [key, cells] of Object.entries(section)) {
+    const family = named(key);
+    if (key === family || keyed[family] === undefined) keyed[family] = cells;
+  }
+  return keyed;
+}
+
+/**
+ * The runner config with its family-keyed sections (`modelPolicies` cells, `tierFallback` lists) keyed by the
+ * name `familyOf` gives each family, so a cell written under `codex` is found for an executor of family `openai`.
+ * Returns the config itself when every key already is that name.
+ */
+function familyKeyed(runnerConfig) {
+  const apply = (section) => {
+    const policies = isPlainObject(section.modelPolicies) ? familyKeyedSection(section.modelPolicies, false) : null;
+    const fallback = isPlainObject(section.tierFallback) ? familyKeyedSection(section.tierFallback, true) : null;
+    return policies || fallback ? { ...section, ...(policies ? { modelPolicies: policies } : {}), ...(fallback ? { tierFallback: fallback } : {}) } : null;
+  };
+  const top = apply(runnerConfig);
+  const nested = isPlainObject(runnerConfig.runner) ? apply(runnerConfig.runner) : null;
+  if (!top && !nested) return runnerConfig;
+  return { ...(top ?? runnerConfig), ...(nested ? { runner: nested } : {}) };
 }
 
 /**
@@ -251,7 +294,8 @@ export function askFor({ seat, unit, independentOf = [], preferIndependentOf = [
 function requestOf(ask, ctx, walk) {
   const { unit, seat = 'producer', role = 'producer', posture: seatPosture = PRODUCER_POSTURE, readOnly = false } = ask ?? {};
   const { independentOf = [], preferIndependentOf = null, overrides = [], blind = false } = ask ?? {};
-  const { runnerConfig = {}, session = {} } = ctx ?? {};
+  const { runnerConfig: configAsWritten = {}, session = {} } = ctx ?? {};
+  const runnerConfig = familyKeyed(configAsWritten);
   const executors = executorsOf(runnerConfig);
   const isWriteEmpty = !Array.isArray(unit?.writes) || unit.writes.length === 0;
   const isReadOnlyPosture = readOnly === true || seatPosture.readOnly === true || isWriteEmpty;
@@ -275,12 +319,12 @@ function requestOf(ask, ctx, walk) {
   // Only roles that do the unit's work are asked for its skills; a checker or panel seat reads the result.
   const requiredSkills = !seatPosture.forceOutOfProcess && Array.isArray(unit?.skills) ? unit.skills : [];
   // A hard `independentOf` names executors (or seats not bound yet): the crate compares provider families.
-  const hard = [...new Set(independentOf.map((dep) => (executors[dep] ? getProviderFamily(runnerConfig, dep) : dep)))];
+  const hard = [...new Set(independentOf.map((dep) => (executors[dep] ? executorFamily(runnerConfig, dep) : dep)))];
   // A soft preference names the seats already bound, each at the executor it holds now.
   const peers = [];
   for (const [index, peer] of (Array.isArray(preferIndependentOf) ? preferIndependentOf : []).entries()) {
     if (!peer?.executor) continue;
-    const entry = { seat: peer.seat ?? `${peer.executor}#${index}`, executor: peer.executor, family: getProviderFamily(runnerConfig, peer.executor) };
+    const entry = { seat: peer.seat ?? `${peer.executor}#${index}`, executor: peer.executor, family: executorFamily(runnerConfig, peer.executor) };
     const at = peers.findIndex((known) => known.seat === entry.seat);
     if (at >= 0) peers[at] = entry; else peers.push(entry);
   }
@@ -365,7 +409,7 @@ function fallbackFrom(previous, binding, { reason, rotation, detail, runnerConfi
   if (rotation) return { ...base, kind: 'account-rotation', ...detail };
   // Not a step of the walk: the same candidate again after its lease or its brief failed.
   if (reason === 'lease-conflict' || reason === 'brief-not-delivered') return { ...base, kind: reason };
-  const sameFamily = getProviderFamily(runnerConfig, previous.executor) === getProviderFamily(runnerConfig, binding.executor);
+  const sameFamily = executorFamily(runnerConfig, previous.executor) === executorFamily(runnerConfig, binding.executor);
   return { ...base, kind: 'next-candidate', walk: sameFamily ? 'entry' : 'family' };
 }
 
@@ -440,6 +484,7 @@ function bindingOf({ out, prep, ask, ctx, walk }) {
     executor: cand.executor,
     invocation: cand.invocation ?? null,
     transport,
+    family: cand.family,
     pool: cand.pool ?? null,
     tier: policy.tier,
     model,

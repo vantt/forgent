@@ -51,19 +51,36 @@ ${blindLine}
 }
 
 async function run(workflowYaml, capabilities, extra = {}) {
-  const packageRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-blind-pools-'));
-  fs.mkdirSync(path.join(packageRoot, 'core', 'workflows'), { recursive: true });
-  fs.writeFileSync(path.join(packageRoot, 'core', 'workflows', 'fixture.yaml'), workflowYaml);
+  const payloadRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-blind-pools-'));
+  fs.mkdirSync(path.join(payloadRoot, 'core', 'workflows'), { recursive: true });
+  fs.writeFileSync(path.join(payloadRoot, 'core', 'workflows', 'fixture.yaml'), workflowYaml);
   const cwd = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-blind-pools-project-'));
   try {
-    return await checkBlindStepsUseProvenPools(cwd, { packageRoot, loadRunnerConfig: () => ({ ...runnerConfig(capabilities), ...extra }) });
+    return await checkBlindStepsUseProvenPools(cwd, { payloadRoot, loadRunnerConfig: () => ({ ...runnerConfig(capabilities), ...extra }) });
   } finally {
-    fs.rmSync(packageRoot, { recursive: true, force: true });
+    fs.rmSync(payloadRoot, { recursive: true, force: true });
     fs.rmSync(cwd, { recursive: true, force: true });
   }
 }
 
 const BLIND = workflow('          blind: true');
+
+test('a project definition of a shipped id is the one whose blind unit is judged, and the message names it', async () => {
+  const payloadRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-blind-pools-'));
+  const project = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-blind-pools-project-'));
+  try {
+    for (const [root, text] of [[payloadRoot, workflow('')], [project, BLIND]]) {
+      fs.mkdirSync(path.join(root, 'core', 'workflows'), { recursive: true });
+      fs.writeFileSync(path.join(root, 'core', 'workflows', 'fixture.yaml'), text);
+    }
+    const result = await checkBlindStepsUseProvenPools(project, { payloadRoot, loadRunnerConfig: () => runnerConfig({ 'fixture:propose': prefer('mistral') }) });
+    assert.equal(result.passed, false, 'the shipped definition is not blind; the project one is, and it runs');
+    assert.ok(result.message.includes(`project definition ${path.join(project, 'core/workflows/fixture.yaml')}`), result.message);
+  } finally {
+    fs.rmSync(payloadRoot, { recursive: true, force: true });
+    fs.rmSync(project, { recursive: true, force: true });
+  }
+});
 
 test('the check is registered in the doctor registry', () => {
   assert.ok(DOCTOR_CHECKS.map((c) => c.id).includes('blind-steps-use-proven-pools'));
@@ -127,16 +144,16 @@ test('a capability pool from a prefix entry is resolved by bind like at run time
 });
 
 test('a runner config that cannot be loaded passes with a note instead of throwing', async () => {
-  const packageRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-blind-pools-'));
+  const payloadRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-blind-pools-'));
   try {
     const result = await checkBlindStepsUseProvenPools(os.tmpdir(), {
-      packageRoot,
+      payloadRoot,
       loadRunnerConfig: () => { throw new Error('no such file'); },
     });
     assert.equal(result.passed, true);
     assert.match(result.message, /not evaluated: no such file/);
   } finally {
-    fs.rmSync(packageRoot, { recursive: true, force: true });
+    fs.rmSync(payloadRoot, { recursive: true, force: true });
   }
 });
 

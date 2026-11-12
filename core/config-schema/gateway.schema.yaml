@@ -11,7 +11,7 @@ properties:
     minimum: 0
     maximum: 65535
   bind:
-    description: IP address the gateway binds; 0.0.0.0 is reachable on the LAN and Tailscale by design.
+    description: IP address the gateway binds; loopback keeps it on this machine, so set 0.0.0.0 (or a LAN or Tailscale address) to reach it from other machines.
     type: string
   token:
     description: Bearer token of the gateway; it moves to the private token file in the user's fgOS directory (~/.fgos/private/gateway-token) and is never written to a config file.

@@ -14,6 +14,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
 import { COMMAND_REGISTRY } from '../../src/cli/command-registry.mjs';
+import { OUTCOME_EXIT_CODES } from '../../src/runner/execution/outcome-exit.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const FGOS = path.resolve(__dirname, '../../bin/fgos.mjs');
@@ -88,4 +89,47 @@ test('fgos --help (top-level, no verb) behavior is unchanged', () => {
   for (const registryEntry of COMMAND_REGISTRY) {
     assert.ok(result.stdout.includes(registryEntry.invoke), `--help text is missing "${registryEntry.invoke}"`);
   }
+});
+
+// A person must be able to learn what a verb does to the machine, what it needs,
+// every flag with its default, an example, its exit codes and what to run next,
+// from `fgos <verb> --help` alone. The text is rendered from the registry
+// entry's `guide` and its parameter schema, so these read both.
+const GUIDED_VERBS = ['init', 'doctor', 'config', 'uninstall', 'run'];
+
+for (const verb of GUIDED_VERBS) {
+  test(`fgos ${verb} --help states what it changes, needs, accepts, returns and leads to`, () => {
+    const result = run(tmpCwd(), [verb, '--help']);
+    assert.equal(result.status, 0, result.stderr);
+    for (const section of ['Changes on disk:', 'Prerequisites:', 'Options:', 'Examples:', 'Exit codes:', 'Next:']) {
+      assert.ok(result.stdout.includes(section), `${verb} help lacks ${section}`);
+    }
+    const e = entry(verb);
+    const flagsOf = (parameters) => Object.keys(parameters?.properties ?? {}).filter((name) => !(parameters.positional ?? []).includes(name));
+    const flagNames = [
+      ...(e.subcommands ? [] : flagsOf(e.parameters)),
+      ...Object.values(e.subcommands ?? {}).flatMap((sub) => flagsOf(sub.parameters)),
+    ];
+    for (const name of flagNames) {
+      assert.ok(result.stdout.includes(`--${name}`), `${verb} help omits --${name}`);
+    }
+    for (const example of e.examples) assert.ok(result.stdout.includes(example), `${verb} help omits example ${example}`);
+    for (const code of e.guide.exitCodes) assert.ok(result.stdout.includes(code), `${verb} help omits exit code ${code}`);
+  });
+}
+
+test('fgos run --help lists the exit code of every execution outcome', () => {
+  const codes = entry('run').guide.exitCodes.map((line) => Number(line.split(' ')[0]));
+  for (const [outcome, code] of Object.entries(OUTCOME_EXIT_CODES)) {
+    assert.ok(codes.includes(code), `run help lacks exit code ${code} (${outcome})`);
+  }
+});
+
+test('fgos --help names setup once, under Compatibility, not among the verbs', () => {
+  const result = run(tmpCwd(), ['--help']);
+  assert.equal(result.status, 0, result.stderr);
+  const [verbs, compatibility] = result.stdout.split('Compatibility (');
+  assert.ok(compatibility, 'no Compatibility section');
+  assert.doesNotMatch(verbs, /^fgos setup \[/m, 'setup is still listed among the verbs');
+  assert.match(compatibility, /fgos setup .*fgctl init/);
 });

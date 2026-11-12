@@ -25,3 +25,12 @@ export function parseArgs(args) {
   }
   return { flags, positional };
 }
+
+/** A comma-separated flag value as a trimmed list; no value (or a bare flag) is an empty list. */
+export function parseListFlag(value) {
+  if (value === undefined || value === true) return [];
+  return value
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean);
+}

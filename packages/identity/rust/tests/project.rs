@@ -237,3 +237,36 @@ fn a_file_is_only_read_when_version_id_and_handle_follow_the_rules() {
     write("not json");
     assert!(matches!(project::read(&root), Err(Error::Invalid(_))));
 }
+
+/// The main root, as the identity door reads it, over the tree and expected answers
+/// shared with the Node invocation-root door and the host walk.
+#[test]
+fn the_main_root_answers_the_shared_root_table() {
+    let table: serde_json::Value = serde_json::from_str(include_str!(
+        "../../../../test/rust-host/fixtures/invocation-root-table.json"
+    ))
+    .unwrap();
+    let base = scratch("root-table");
+    for step in table["steps"].as_array().unwrap() {
+        if let Some(dir) = step["mkdir"].as_str() {
+            fs::create_dir_all(base.join(dir)).unwrap();
+        } else if let Some(file) = step["write"].as_str() {
+            fs::write(base.join(file), "x\n").unwrap();
+        } else {
+            let git_step = step["git"].as_array().unwrap();
+            let args: Vec<&str> = git_step[1..].iter().map(|a| a.as_str().unwrap()).collect();
+            git(&base.join(git_step[0].as_str().unwrap()), &args);
+        }
+    }
+    let state = base.join("state");
+    project_init(&state, &base.join("home/proj"), Some("proj"), false).unwrap();
+    for row in table["rows"].as_array().unwrap() {
+        let answered = project_info_root(&state, &base.join(row["cwd"].as_str().unwrap()));
+        let expected = row["main"].as_str().map(|p| base.join(p));
+        assert_eq!(answered, expected, "main root of {}", row["name"]);
+    }
+}
+
+fn project_info_root(state: &Path, cwd: &Path) -> Option<PathBuf> {
+    project::project_at(state, cwd).ok().map(|(_, root)| root)
+}

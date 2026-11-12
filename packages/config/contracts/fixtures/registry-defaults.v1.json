@@ -73,9 +73,9 @@
     "absent": true
    },
    "standard": {
-    "value": "0.0.0.0"
+    "value": "127.0.0.1"
    },
-   "reason": "the Rust reader's DEFAULT_BIND, apps/fgos-gateway/src/gateway.rs; setup never seeded it"
+   "reason": "the gateway binds loopback unless the config says otherwise; setup never seeded it"
   },
   {
    "path": "eventStore.seal.intervalSec",

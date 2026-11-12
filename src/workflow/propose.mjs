@@ -18,6 +18,7 @@ import { loadRunnerConfigForDir } from '../runner/dispatch/config.mjs';
 import { RunnerConfigError } from '../runner/dispatch/runner-config-error.mjs';
 import { shippedCatalog } from '../runner/dispatch/shipped-catalog.mjs';
 import { resolveGitRoots } from '../runner/execution/run.mjs';
+import { slugOf } from '../util/slug.mjs';
 import { RIGOR_ORDER } from './guide-schema.mjs';
 import { guideSha256 } from './case-start.mjs';
 import { inheritCandidates, inheritFrom } from './case-inherit.mjs';
@@ -38,8 +39,6 @@ const WHOLE_REPO = /^(\.|\*\*|\.\/?\*\*?)\/?$/;
 
 const rank = (rigor) => RIGOR_ORDER.indexOf(rigor);
 const isText = (value) => typeof value === 'string' && value.trim() !== '';
-const slugOf = (text) => String(text).normalize('NFKD').replace(/[̀-ͯ]/g, '').replace(/[đĐ]/g, 'd').toLowerCase()
-  .replace(/[^a-z0-9]+/g, '-').replace(/^-+/, '').slice(0, 40).replace(/-+$/, '') || 'case';
 
 /**
  * What a plan's case is called when the person names no worktree or branch. Every plan file is called plan.md, so
@@ -50,7 +49,7 @@ export function planCaseSlug(plan) {
   const posix = path.posix.normalize(plan.split(path.sep).join('/'));
   const dir = path.posix.dirname(posix);
   const base = path.posix.basename(posix, path.posix.extname(posix));
-  const name = slugOf(base.toLowerCase() === 'plan' ? path.posix.basename(dir) : base);
+  const name = slugOf(base.toLowerCase() === 'plan' ? path.posix.basename(dir) : base, 'case');
   return `${name}-${crypto.createHash('sha256').update(dir).digest('hex').slice(0, 6)}`;
 }
 
@@ -450,7 +449,7 @@ export function proposeFromSlices({ manifest, plan, guide, runnerConfig, shipped
   if (writing.length > 0 && !runnerConfig?.capabilities?.['code:implement']?.verify) {
     refusals.push({ code: 'gate-command-missing', detail: 'the whole-worktree gate runs the command declared as capabilities.code:implement.verify: declare it' });
   }
-  const slug = plan ? planCaseSlug(plan) : slugOf(request);
+  const slug = plan ? planCaseSlug(plan) : slugOf(request, 'case');
   proposal.worktree = worktree ?? `../${slug}-worktree`;
   proposal.branch = branch ?? `case/${slug}`;
   if (refusals.length > 0 || proposal.frame === null) {
@@ -546,8 +545,8 @@ export function proposeFromRequest({ request, writes = [], verify, ports, runner
   const added = verdict.expansions.flatMap((e) => e.add);
   const finalWrites = [...writes, ...added];
   proposal.kind = 'single-run';
-  proposal.worktree = worktree ?? `../${slugOf(request)}-worktree`;
-  proposal.branch = `case/${slugOf(request)}`;
+  proposal.worktree = worktree ?? `../${slugOf(request, 'case')}-worktree`;
+  proposal.branch = `case/${slugOf(request, 'case')}`;
   proposal.slices = [{ id: 'request', objective: request, writes, finalWrites, verify, kind: judged.kind, ruleId: judged.ruleId, capability: judged.capability, pattern: judged.pattern, rigor: judged.rigor, dispatch: true }];
   proposal.expansions = verdict.expansions;
   proposal.commands = [

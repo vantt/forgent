@@ -12,7 +12,7 @@ use crate::route::{
     EXIT_VERSION_MISMATCH,
 };
 
-const ENTRY: &str = "src/run-supervisor/attempt-step.mjs";
+pub(crate) const ENTRY: &str = "src/run-supervisor/attempt-step.mjs";
 
 pub fn run(args: &[String]) -> i32 {
     let flags = match Flags::parse(args, &["run-dir"], 1) {

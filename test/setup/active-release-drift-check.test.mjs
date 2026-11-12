@@ -334,6 +334,12 @@ test('real builder selection and staged production dependency payload agree with
   fs.chmodSync(path.join(f.source, 'target/release/fgos'), 0o755);
   // The builder records the native addon: its compiled library and the locked napi crates it was built from.
   put(f.source, `target/release/${nativeAddonLibraryName()}`, 'native addon fixture\n');
+  // It also ships the fgctl it was built with, and reads every compiled file from this fixture's target directory,
+  // so an ambient CARGO_TARGET_DIR must not redirect it.
+  put(f.source, `target/release/${process.platform === 'win32' ? 'fgctl.exe' : 'fgctl'}`, 'fgctl fixture\n');
+  const ambientTarget = process.env.CARGO_TARGET_DIR;
+  delete process.env.CARGO_TARGET_DIR;
+  t.after(() => { if (ambientTarget !== undefined) process.env.CARGO_TARGET_DIR = ambientTarget; });
   fs.copyFileSync(path.join(REPO_ROOT, 'Cargo.lock'), path.join(f.source, 'Cargo.lock'));
   const built = path.join(f.temp, 'built');
   // The host pins the state root for every payload it starts; the checkout reader the builder spawns only

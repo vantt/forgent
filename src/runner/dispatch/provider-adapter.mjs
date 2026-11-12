@@ -1,5 +1,5 @@
 // src/runner/dispatch/provider-adapter.mjs
-// Provider facts shared by the launch path and the doctor: provider-family normalization, the
+// Provider facts shared by the launch path and the doctor: provider-family naming (`familyOf`), the
 // registry of policy-shaped flags, the denylist check, reasoning-effort rendering and the
 // launched-model check. Pure: no spawn, no fs, no network, no mutation of its inputs.
 import path from 'node:path';
@@ -19,16 +19,7 @@ export const KNOWN_POLICY_SHAPED_FLAGS = {
     '--permission-mode',
     '--dangerously-skip-permissions',
   ],
-  codex: [
-    '--model',
-    '-s',
-    '-s read-only',
-    '-s danger-full-access',
-    '--dangerously-bypass-approvals-and-sandbox',
-    '--dangerously-skip-permissions',
-    '--skip-git-repo-check',
-  ],
-  'openai-codex': [
+  openai: [
     '--model',
     '-s',
     '-s read-only',
@@ -38,11 +29,6 @@ export const KNOWN_POLICY_SHAPED_FLAGS = {
     '--skip-git-repo-check',
   ],
   gemini: [
-    '--model',
-    '--mode',
-    '--effort',
-  ],
-  agy: [
     '--model',
     '--mode',
     '--effort',
@@ -70,38 +56,23 @@ export const KNOWN_POLICY_SHAPED_FLAGS = {
   ],
 };
 
+/** Other spellings of the family the config keys `modelPolicies` and its pools by. */
+const FAMILY_ALIASES = Object.freeze({ 'openai-codex': 'openai', codex: 'openai', glm: 'z-ai', agy: 'gemini' });
+
 /**
- * Normalizes providerFamily and command into a canonical provider family key.
- * Handles display aliases, provider model identifiers, and CLI commands.
+ * The provider family: the one answer to "which provider serves this", the key of `modelPolicies`, of
+ * `tierFallback`, of pools and of the denylist. `source` is an executor entry (its own `providerModel`, else
+ * `provider`) or a spelling; with neither, the family is inferred from `command` (an executor entry that names
+ * nothing is `claude`). A declared vendor always wins over the CLI harness: harnesses like pi or claude can
+ * invoke third-party models, and the vendor is the egress destination. `openai-codex`, `codex`, `glm` and
+ * `agy` are spellings of `openai`, `z-ai` and `gemini`. Pure.
  */
-export function normalizeProviderFamily(providerFamily, command) {
-  const norm = String(providerFamily ?? '').trim().toLowerCase();
-  const cmd = String(command ?? '').trim().toLowerCase();
-
-  // Declared vendor / provider family always takes precedence over CLI harness.
-  // Harnesses like pi or claude can invoke third-party models; vendor indicates egress destination.
-  if (norm) {
-    if (norm === 'z-ai' || norm === 'glm') return 'z-ai';
-    // M6: bare 'openai' (a providerModel/provider value some configs declare
-    // instead of the CLI-derived 'openai-codex') is the same provider family
-    // as 'openai-codex'/'codex' -- unified here so provider-capacity
-    // inventory lookup and the fault classifier never silently split one
-    // provider's accounts/quarantine state across two different keys.
-    if (norm === 'openai-codex' || norm === 'openai' || norm === 'codex') return 'openai-codex';
-    if (norm === 'gemini' || norm === 'agy') return 'gemini';
-    if (norm === 'claude') return 'claude';
-    if (norm === 'deepseek') return 'deepseek';
-    if (norm === 'pi') return 'pi';
-    return norm;
-  }
-
-  // Fallback: derive vendor family from CLI command only when no provider family was declared
-  if (cmd === 'codex') return 'openai-codex';
-  if (cmd === 'agy') return 'gemini';
-  if (cmd === 'claude') return 'claude';
-  if (cmd === 'glm') return 'z-ai';
-  if (cmd === 'pi') return 'pi';
-  return cmd || 'unknown';
+export function familyOf(source, command) {
+  const isEntry = source !== null && typeof source === 'object';
+  const declared = isEntry ? (source.providerModel || source.provider) : source;
+  const text = (value) => (typeof value === 'string' ? value.trim().toLowerCase() : '');
+  const key = text(declared) || text(command) || (isEntry ? 'claude' : '');
+  return Object.hasOwn(FAMILY_ALIASES, key) ? FAMILY_ALIASES[key] : key;
 }
 
 /**
@@ -119,8 +90,8 @@ export function normalizeDisallowedProviders(disallowedProviders) {
     : (typeof disallowedProviders[Symbol.iterator] === 'function' ? disallowedProviders : []);
   for (const entry of list) {
     if (typeof entry === 'string' && entry.trim()) {
-      const canonical = normalizeProviderFamily(entry);
-      if (canonical && canonical !== 'unknown') {
+      const canonical = familyOf(entry);
+      if (canonical) {
         normalized.add(canonical);
       }
     }
@@ -139,8 +110,8 @@ export function normalizeDisallowedProviders(disallowedProviders) {
  * @returns {{ disallowed: boolean, canonicalProvider: string }}
  */
 export function checkProviderDisallowed(disallowedProviders, candidateProvider, candidateCommand) {
-  const canonicalProvider = normalizeProviderFamily(candidateProvider, candidateCommand);
-  if (!disallowedProviders || !canonicalProvider || canonicalProvider === 'unknown') {
+  const canonicalProvider = familyOf(candidateProvider, candidateCommand);
+  if (!disallowedProviders || !canonicalProvider) {
     return { disallowed: false, canonicalProvider };
   }
   const denySet = disallowedProviders instanceof Set
@@ -168,8 +139,7 @@ export function isProviderDisallowed(disallowedProviders, candidateProvider, can
  * Returns known policy-shaped flags for a given provider family.
  */
 export function getProviderPolicyShapedFlags(providerFamily, command) {
-  const norm = normalizeProviderFamily(providerFamily, command);
-  return KNOWN_POLICY_SHAPED_FLAGS[norm] ?? [];
+  return KNOWN_POLICY_SHAPED_FLAGS[familyOf(providerFamily, command)] ?? [];
 }
 
 /**

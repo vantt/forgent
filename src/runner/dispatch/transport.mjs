@@ -213,7 +213,7 @@ export function resolveExecutorCommand(cfg, { prompt, model, tier, executorId, f
     // and showing e.g. "claude" for glm (routed to z-ai via env
     // override) or the raw non-Claude command for any executor with no
     // alias of its own. `executor.governance.providerFamily` is
-    // resolve.mjs's own deriveProviderFamily(executorEntry,
+    // resolve.mjs's own familyOf(executorEntry,
     // executor.command) result, already computed correctly a few lines
     // above in resolveExecutorConfig — the correct fallback.
     // How the prompt reaches an interactive worker: `file-pointer` (default)

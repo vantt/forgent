@@ -4,7 +4,7 @@
 // the executor was decided upstream (Seat Binding for a unit seat, the caller's own pin elsewhere).
 
 import { RunnerConfigError } from './runner-config-error.mjs';
-import { deriveProviderFamily } from './resolve.mjs';
+import { familyOf } from './provider-adapter.mjs';
 import { checkProviderDisallowed } from './provider-adapter.mjs';
 
 /**
@@ -42,9 +42,9 @@ export function resolveExecutorProvider({ runnerConfig, primaryExecutor, options
   }
   const registeredExecutorCommand = registeredExecutorEntry?.invocations?.find((inv) => inv.via === 'cli')?.command;
   const resolvedProvider = registeredExecutorEntry
-    ? deriveProviderFamily(registeredExecutorEntry, registeredExecutorCommand)
+    ? familyOf(registeredExecutorEntry, registeredExecutorCommand)
     : isImplicitDefaultExecutor
-      ? deriveProviderFamily({ command: runnerConfig?.executor?.command }, primaryExecutor)
+      ? familyOf({ command: runnerConfig?.executor?.command }, primaryExecutor)
       : primaryExecutor;
   return { resolvedProvider, registeredExecutorEntry };
 }

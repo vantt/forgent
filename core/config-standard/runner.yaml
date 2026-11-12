@@ -61,6 +61,7 @@ runner:
           credentialStore:
             use: pi
             homeEnv: PI_CODING_AGENT_DIR
+            sessionDir: sessions
             files: ["auth.json", "models-store.json", "settings.json", "trust.json", "bin/fd", "models.json"]
           args:
             - "--model"
@@ -109,6 +110,7 @@ runner:
           credentialStore:
             use: pi
             homeEnv: PI_CODING_AGENT_DIR
+            sessionDir: sessions
             files: ["auth.json", "models-store.json", "settings.json", "trust.json", "bin/fd", "models.json"]
           args:
             - "--model"
@@ -150,6 +152,7 @@ runner:
           credentialStore:
             use: pi
             homeEnv: PI_CODING_AGENT_DIR
+            sessionDir: sessions
             files: ["auth.json", "models-store.json", "settings.json", "trust.json", "bin/fd"]
           args:
             - "--model"
@@ -180,6 +183,7 @@ runner:
           credentialStore:
             use: omp
             homeEnv: PI_CODING_AGENT_DIR
+            sessionDir: sessions
             files: ["agent.db", "config.yml"]
           env:
             PI_CONFIG_DIR: "../../tmp/fgos-omp-config"
@@ -201,6 +205,7 @@ runner:
           credentialStore:
             use: omp
             homeEnv: PI_CODING_AGENT_DIR
+            sessionDir: sessions
             files: ["agent.db", "config.yml"]
           env:
             PI_CONFIG_DIR: "../../tmp/fgos-omp-config"
@@ -231,6 +236,7 @@ runner:
           credentialStore:
             use: omp
             homeEnv: PI_CODING_AGENT_DIR
+            sessionDir: sessions
             files: ["agent.db", "config.yml", "models.db"]
           env:
             PI_CONFIG_DIR: "../../tmp/fgos-omp-config"
@@ -257,6 +263,7 @@ runner:
           credentialStore:
             use: omp
             homeEnv: PI_CODING_AGENT_DIR
+            sessionDir: sessions
             files: ["agent.db", "config.yml", "models.db"]
           env:
             PI_CONFIG_DIR: "../../tmp/fgos-omp-config"
@@ -284,6 +291,7 @@ runner:
           credentialStore:
             use: pi
             homeEnv: PI_CODING_AGENT_DIR
+            sessionDir: sessions
             files: ["auth.json", "models-store.json", "settings.json", "trust.json", "bin/fd", "models.json"]
           args:
             - "--model"
@@ -308,6 +316,7 @@ runner:
           credentialStore:
             use: pi
             homeEnv: PI_CODING_AGENT_DIR
+            sessionDir: sessions
             files: ["auth.json", "models-store.json", "settings.json", "trust.json", "bin/fd", "models.json"]
           args:
             - "--model"

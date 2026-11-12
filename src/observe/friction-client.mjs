@@ -7,7 +7,7 @@
 // stderr, never thrown into the workflow that recorded the friction.
 
 import { invokeHost } from '../util/host-bin.mjs';
-import { recordInvocationFault } from '../cli/invocation-fault-log.mjs';
+import { recordInvocationFault } from './invocation-fault-log.mjs';
 import { fgosDirFromRoot } from '../runner/paths.mjs';
 
 const INPUT_REFUSAL = /^fgos: error: invocation failed: provider failed: friction-invalid-input:\s*/;
@@ -45,6 +45,7 @@ function callHost(what, args, { dir, input }) {
       fgosDir: dir ? (dir.endsWith('.fgos') ? dir : fgosDirFromRoot(dir)) : null,
       cwd: dir,
       verb: 'friction',
+      sub: args[1],
       faultClass: 'friction-write-failed',
       message: `${code}: ${err.message}`,
       argv: args,

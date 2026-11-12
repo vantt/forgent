@@ -10,9 +10,9 @@
 // (the pool a first binding and a quota fallback both choose from), so nothing is dispatched, written
 // or paid for.
 
-import { explainSeat, getProviderFamily } from '../runner/execution/bind.mjs';
+import { explainSeat } from '../runner/execution/bind.mjs';
 import { simulateUnitBindings } from '../runner/execution/dry-bind.mjs';
-import { loadWorkflowDefinitions, withUnreadableDefinitions, workflowRoots, workflowUnitContract } from './workflow-definition-files.mjs';
+import { readWorkflowCatalog, sourceOf, withUnreadableDefinitions, workflowUnitContract } from './workflow-catalog-reader.mjs';
 
 /**
  * Pairs a live canary proved blind: a worker of that provider family, run through that transport
@@ -56,7 +56,7 @@ function describeCandidate(runnerConfig, bound) {
   return {
     executor: bound.executor,
     invocation: bound.invocation,
-    family: getProviderFamily(runnerConfig, bound.executor),
+    family: bound.family,
     transport: TRANSPORT_BY_ADAPTER[invocation?.adapter] ?? 'unknown',
     backend: invocation?.confinement?.backend ?? 'none',
   };
@@ -73,39 +73,41 @@ function candidatesForRole(unit, seat, runnerConfig, session) {
     { runnerConfig, session: { headless: true, ...session } },
     { chain: false },
   );
-  const named = (c) => ({ executor: c.executor, invocation: c.invocation ?? null });
+  const named = (c) => ({ executor: c.executor, invocation: c.invocation ?? null, family: launchView?.executors[c.executor]?.family });
   return [
     ...(ranked?.candidates ?? []).map(named),
     // A family with no cell is dropped before posture is judged, so the executor must itself carry it.
     ...(ranked?.skipped ?? []).filter((skip) => CONFIG_GAPS.has(skip.reason) && launchView?.executors[skip.executor]?.defaultInvocation && !launchView.executors[skip.executor].disallowed).map((skip) => ({
       executor: skip.executor,
       invocation: launchView?.executors[skip.executor]?.defaultInvocation ?? null,
+      family: launchView?.executors[skip.executor]?.family,
     })),
   ].map((candidate) => describeCandidate(runnerConfig, candidate));
 }
 
 /**
- * @param {string} cwd Project root (its own core/ and domains/ workflows are checked too).
+ * @param {string} cwd Project root (its own core/ and domains/ workflows win over the shipped ones).
  * @param {object} options
- * @param {string} options.packageRoot Root holding the shipped core/ and domains/.
+ * @param {string} [options.payloadRoot] Root holding the shipped core/ and domains/; the running payload when absent.
  * @param {() => object} options.loadRunnerConfig Returns the project's runner config; may throw.
  * @returns {Promise<{ passed: boolean, message: string }>}
  */
-export async function checkBlindStepsUseProvenPools(cwd, { packageRoot, loadRunnerConfig }) {
+export async function checkBlindStepsUseProvenPools(cwd, { payloadRoot, loadRunnerConfig }) {
   let runnerConfig;
   try {
     runnerConfig = loadRunnerConfig(cwd);
   } catch (err) {
     return { passed: true, message: `runner config not loadable here, blind pools not evaluated: ${err.message}` };
   }
-  const loaded = loadWorkflowDefinitions(workflowRoots(cwd, packageRoot));
-  return withUnreadableDefinitions(await evaluateBlindPools(loaded.workflows, runnerConfig), loaded.unreadable);
+  const loaded = readWorkflowCatalog(cwd, { payloadRoot });
+  return withUnreadableDefinitions(await evaluateBlindPools(loaded.catalog, runnerConfig), loaded.unreadable);
 }
 
-async function evaluateBlindPools(workflows, runnerConfig) {
+async function evaluateBlindPools(catalog, runnerConfig) {
   const problems = [];
   let evaluated = 0;
-  for (const wf of workflows.values()) {
+  for (const entry of catalog.values()) {
+    const wf = entry.workflow;
     for (const step of wf.steps) {
       for (const u of step?.units ?? []) {
         const template = u?.template ?? {};
@@ -125,10 +127,10 @@ async function evaluateBlindPools(workflows, runnerConfig) {
             }
           }
           for (const c of unproven.values()) {
-            problems.push(`${label}: ${c.executor} via ${c.invocation} (family ${c.family}, ${c.transport}, confinement ${c.backend})`);
+            problems.push(`${label}: ${c.executor} via ${c.invocation} (family ${c.family}, ${c.transport}, confinement ${c.backend}) [${sourceOf(entry)}]`);
           }
         } catch (err) {
-          problems.push(`${label}: could not be evaluated (${err.message})`);
+          problems.push(`${label}: could not be evaluated (${err.message}) [${sourceOf(entry)}]`);
         }
       }
     }

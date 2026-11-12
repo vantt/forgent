@@ -19,7 +19,8 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { loadRunnerConfigForDir } from '../../src/runner/dispatch/config.mjs';
-import { resolveExecutorAndOverrides, deriveProviderFamily } from '../../src/runner/dispatch/resolve.mjs';
+import { resolveExecutorAndOverrides } from '../../src/runner/dispatch/resolve.mjs';
+import { familyOf } from '../../src/runner/dispatch/provider-adapter.mjs';
 import { parseTierCell } from '../../src/runner/dispatch/tier-cell.mjs';
 import { resolveExecutorCommand } from '../../src/runner/dispatch/transport.mjs';
 
@@ -62,7 +63,7 @@ export function resolveNormalizedSnapshotRow(cfg, executorId, workTier, throwawa
   const { executorId: resolvedExecutorId, executor, overrides, bindingSource } = resolveExecutorAndOverrides(cfg, executorId);
 
   // 2. Resolve model for tier using production policy tier mapping
-  const provider = deriveProviderFamily(executor);
+  const provider = familyOf(executor);
   const tierMap = { light: 'nano', standard: 'standard', heavy: 'frontier' };
   const policyTier = tierMap[workTier] ?? workTier;
   const [{ model }] = parseTierCell(cfg.modelPolicies[provider][policyTier], provider);
@@ -401,6 +402,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     credentialStore: {
       use: 'omp',
       homeEnv: 'PI_CODING_AGENT_DIR',
+      sessionDir: 'sessions',
       files: [
         'agent.db',
         'config.yml'
@@ -437,6 +439,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     credentialStore: {
       use: 'omp',
       homeEnv: 'PI_CODING_AGENT_DIR',
+      sessionDir: 'sessions',
       files: [
         'agent.db',
         'config.yml'
@@ -473,6 +476,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     credentialStore: {
       use: 'omp',
       homeEnv: 'PI_CODING_AGENT_DIR',
+      sessionDir: 'sessions',
       files: [
         'agent.db',
         'config.yml'
@@ -505,6 +509,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     credentialStore: {
       use: 'omp',
       homeEnv: 'PI_CODING_AGENT_DIR',
+      sessionDir: 'sessions',
       files: [
         'agent.db',
         'config.yml'
@@ -537,6 +542,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     credentialStore: {
       use: 'omp',
       homeEnv: 'PI_CODING_AGENT_DIR',
+      sessionDir: 'sessions',
       files: [
         'agent.db',
         'config.yml'
@@ -569,6 +575,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     credentialStore: {
       use: 'omp',
       homeEnv: 'PI_CODING_AGENT_DIR',
+      sessionDir: 'sessions',
       files: [
         'agent.db',
         'config.yml'
@@ -601,6 +608,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     credentialStore: {
       use: 'omp',
       homeEnv: 'PI_CODING_AGENT_DIR',
+      sessionDir: 'sessions',
       files: [
         'agent.db',
         'config.yml'
@@ -633,6 +641,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     credentialStore: {
       use: 'omp',
       homeEnv: 'PI_CODING_AGENT_DIR',
+      sessionDir: 'sessions',
       files: [
         'agent.db',
         'config.yml'
@@ -665,6 +674,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     credentialStore: {
       use: 'omp',
       homeEnv: 'PI_CODING_AGENT_DIR',
+      sessionDir: 'sessions',
       files: [
         'agent.db',
         'config.yml'
@@ -849,6 +859,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     credentialStore: {
       use: 'pi',
       homeEnv: 'PI_CODING_AGENT_DIR',
+      sessionDir: 'sessions',
       files: [
         'auth.json',
         'models-store.json',
@@ -886,6 +897,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     credentialStore: {
       use: 'pi',
       homeEnv: 'PI_CODING_AGENT_DIR',
+      sessionDir: 'sessions',
       files: [
         'auth.json',
         'models-store.json',
@@ -923,6 +935,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     credentialStore: {
       use: 'pi',
       homeEnv: 'PI_CODING_AGENT_DIR',
+      sessionDir: 'sessions',
       files: [
         'auth.json',
         'models-store.json',
@@ -960,6 +973,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     credentialStore: {
       use: 'pi',
       homeEnv: 'PI_CODING_AGENT_DIR',
+      sessionDir: 'sessions',
       files: [
         'auth.json',
         'models-store.json',
@@ -998,6 +1012,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     credentialStore: {
       use: 'pi',
       homeEnv: 'PI_CODING_AGENT_DIR',
+      sessionDir: 'sessions',
       files: [
         'auth.json',
         'models-store.json',
@@ -1036,6 +1051,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     credentialStore: {
       use: 'pi',
       homeEnv: 'PI_CODING_AGENT_DIR',
+      sessionDir: 'sessions',
       files: [
         'auth.json',
         'models-store.json',

@@ -7,15 +7,13 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { machineHome, writeProjectConfig, writeRawProjectConfig } from '../helpers/config-fixture.mjs';
+import { runHook, normalizeHookPayload } from '../../src/runner/hook.mjs';
 
-// Real, live runs of the actual hook script -- no fixture stands in for
-// `decide`'s own real subprocess call (tsk-60f's own verify field demands
-// this be proven "bằng lần chạy thật, không phải fixture").
+// The verdict of the Agent/Task guard, judged in-process: one fixture table run for each payload format (the
+// standard one of Claude Code and Codex, and agy's), because both must answer alike. Real configs on real git
+// repositories stand behind each row; nothing stands in for `decide`.
 
-const hookPath = fileURLToPath(new URL('../../scripts/dispatch-decide-hook.mjs', import.meta.url));
-// A scratch home: the hook reads the machine's global config too, and a developer's own file must not decide a test.
-// It is the home the config fixture lays a project fixture's machine-only keys (executors) into.
-const env = { ...process.env, HOME: machineHome() };
+const HOME = machineHome();
 
 function mkTempGitRepo() {
   const repoRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'dispatch-decide-hook-'));
@@ -29,121 +27,142 @@ function mkTempGitRepo() {
 function writeRunnerConfigFixture(root, cfg) {
   fs.mkdirSync(path.join(root, '.fgos'), { recursive: true });
   // A project config in the seat-binding schema: the loader refuses one that has no marker.
-  const patterns = { ...cfg.patterns, seatBinding: { schema: 1 } };
-  writeProjectConfig(root, { runner: { ...cfg, patterns } });
+  writeProjectConfig(root, { runner: { ...cfg, patterns: { ...cfg.patterns, seatBinding: { schema: 1 } } } });
 }
 
-function runHook(repoRoot, payload) {
-  return spawnSync(process.execPath, [hookPath], {
+const IN_PROCESS_CONFIG = {
+  executor: { command: 'claude', args: ['{prompt}'] },
+  modelPolicies: { claude: { standard: 'sonnet' } },
+  defaults: { tier: 'standard' },
+  timeoutMs: 5000,
+};
+const OUT_OF_PROCESS_CONFIG = {
+  ...IN_PROCESS_CONFIG,
+  capabilities: { blocked: { prefer: 'tool-only' } },
+  executors: { 'tool-only': { kind: 'tool', command: 'agy', args: ['{prompt}'], allowCrossProvider: true } },
+};
+
+/** The payload each format sends for a tool call; `stray` is a cwd the payload claims, which no verdict may read. */
+const FORMATS = {
+  standard: {
+    format: null,
+    payload: (project, tool, input, stray) => ({ tool_name: tool, tool_input: input, cwd: stray ?? project }),
+    env: (project) => ({ ...process.env, HOME, CLAUDE_PROJECT_DIR: project }),
+  },
+  agy: {
+    format: 'agy',
+    payload: (project, tool, input, stray) => ({ toolCall: { name: tool, args: input }, workspacePaths: [project], ...(stray ? { cwd: stray } : {}) }),
+    env: () => ({ ...process.env, HOME }),
+  },
+};
+
+/** What a format's answer says: `blocked`, and the text the agent is shown. */
+function verdictOf(format, out) {
+  if (format === 'agy') {
+    assert.equal(out.exitCode, 0, 'agy always exits 0');
+    const decision = JSON.parse(out.stdout.trim());
+    return { blocked: decision.decision === 'deny', text: decision.reason ?? '' };
+  }
+  assert.equal(out.stdout, '', 'the standard protocol answers on stderr');
+  return { blocked: out.exitCode === 2, text: out.stderr };
+}
+
+async function judge(name, project, tool, input, { stray, cwd = project } = {}) {
+  const f = FORMATS[name];
+  const out = await runHook('dispatch-decide', {
+    stdin: JSON.stringify(f.payload(project, tool, input, stray)),
+    format: f.format,
+    env: f.env(project),
+    cwd,
+  });
+  return verdictOf(name, out);
+}
+
+for (const name of Object.keys(FORMATS)) {
+  test(`dispatch-decide hook, ${name} format: an Agent call with no registered executor resolves in-process and passes`, async () => {
+    const repo = mkTempGitRepo();
+    writeRunnerConfigFixture(repo, IN_PROCESS_CONFIG);
+    assert.equal((await judge(name, repo, 'Agent', { subagent_type: 'general-purpose' })).blocked, false);
+    // The Task tool is enforced the same way, and a missing subagent_type is the Agent tool's own default.
+    assert.equal((await judge(name, repo, 'Task', {})).blocked, false);
+  });
+
+  test(`dispatch-decide hook, ${name} format: a call that resolves to a registered out-of-process executor is blocked with a door fgos run accepts`, async () => {
+    const repo = mkTempGitRepo();
+    writeRunnerConfigFixture(repo, OUT_OF_PROCESS_CONFIG);
+    const { blocked, text } = await judge(name, repo, 'Agent', { subagent_type: 'blocked' });
+    assert.equal(blocked, true);
+    assert.match(text, /BLOCKED/);
+    assert.match(text, /fgos run "<prompt>" --capability blocked/);
+    assert.match(text, /"tool-only" is a tool executor/);
+    assert.doesNotMatch(text, /--provider tool-only|dispatch execute|dispatch\.mjs execute/);
+  });
+
+  test(`dispatch-decide hook, ${name} format: a payload cwd of /tmp, a missing path or the home directory is judged against the project, which blocks`, async () => {
+    const repo = mkTempGitRepo();
+    writeRunnerConfigFixture(repo, OUT_OF_PROCESS_CONFIG);
+    for (const stray of ['/tmp', '/nonexistent/elsewhere', os.homedir(), path.dirname(repo)]) {
+      // The hook process itself may have been started anywhere too.
+      const { blocked } = await judge(name, repo, 'Agent', { subagent_type: 'blocked' }, { stray, cwd: '/tmp' });
+      assert.equal(blocked, true, `payload cwd ${stray} must not move the verdict away from the project`);
+    }
+  });
+
+  test(`dispatch-decide hook, ${name} format: a refused project config blocks, naming the refusal ids and fgos config check`, async () => {
+    const repo = mkTempGitRepo();
+    fs.mkdirSync(path.join(repo, '.fgos'), { recursive: true });
+    writeRawProjectConfig(repo, 'runner: [unclosed\n');
+    const { blocked, text } = await judge(name, repo, 'Agent', { subagent_type: 'general-purpose' });
+    assert.equal(blocked, true, text);
+    assert.match(text, /config-[a-z-]+/);
+    assert.match(text, /fgos config check/);
+  });
+
+  test(`dispatch-decide hook, ${name} format: an empty payload and a payload that is not JSON allow the call`, async () => {
+    const f = FORMATS[name];
+    for (const stdin of ['', '   \n', 'not json{{{', '[1,2]', 'null']) {
+      const out = await runHook('dispatch-decide', { stdin, format: f.format, env: f.env('/nonexistent'), cwd: '/tmp' });
+      assert.equal(verdictOf(name, out).blocked, false, JSON.stringify(stdin));
+    }
+  });
+
+  test(`dispatch-decide hook, ${name} format: a tool that is not Agent or Task is never judged`, async () => {
+    const repo = mkTempGitRepo();
+    writeRunnerConfigFixture(repo, OUT_OF_PROCESS_CONFIG);
+    assert.equal((await judge(name, repo, 'Bash', { command: 'ls', subagent_type: 'blocked' })).blocked, false);
+  });
+
+  test(`dispatch-decide hook, ${name} format: a project directory that does not exist blocks instead of judging some other directory`, async () => {
+    const { blocked, text } = await judge(name, '/nonexistent/project', 'Agent', { subagent_type: 'general-purpose' });
+    assert.equal(blocked, true);
+    assert.match(text, /project directory "\/nonexistent\/project" does not exist/);
+  });
+
+  test(`dispatch-decide hook, ${name} format: a project that is not inside any git checkout allows the call`, async () => {
+    const notARepo = fs.mkdtempSync(path.join(os.tmpdir(), 'dispatch-decide-hook-no-git-'));
+    assert.equal((await judge(name, notARepo, 'Agent', { subagent_type: 'general-purpose' })).blocked, false);
+  });
+}
+
+test('the harness project directory is the one a verdict is judged against: the environment first, then the directory the hook started in, never the payload', () => {
+  const payload = JSON.stringify({ tool_name: 'Agent', tool_input: {}, cwd: '/payload-cwd' });
+  assert.equal(normalizeHookPayload(payload, { env: { CLAUDE_PROJECT_DIR: '/from-env' }, cwd: '/started-here' }).projectDir, '/from-env');
+  assert.equal(normalizeHookPayload(payload, { env: {}, cwd: '/started-here' }).projectDir, '/started-here');
+  const agy = JSON.stringify({ toolCall: { name: 'Agent', args: {} }, workspacePaths: ['/workspace', '/other'], cwd: '/payload-cwd' });
+  assert.equal(normalizeHookPayload(agy, { env: { CLAUDE_PROJECT_DIR: '/from-env' }, cwd: '/started-here' }).projectDir, '/workspace');
+});
+
+test('hook entry script: a legacy registration that names the script still gets the same verdict as fgos hook dispatch-decide', () => {
+  const repo = mkTempGitRepo();
+  writeRunnerConfigFixture(repo, OUT_OF_PROCESS_CONFIG);
+  const script = fileURLToPath(new URL('../../scripts/dispatch-decide-hook.mjs', import.meta.url));
+  // boundary: the script is only an entry; its exit code and stream are what a registered harness reads
+  const result = spawnSync(process.execPath, [script], {
     encoding: 'utf8',
-    cwd: repoRoot,
-    env,
-    input: JSON.stringify(payload),
+    cwd: repo,
+    env: { ...process.env, HOME, CLAUDE_PROJECT_DIR: repo },
+    input: JSON.stringify({ tool_name: 'Agent', tool_input: { subagent_type: 'blocked' }, cwd: '/tmp' }),
   });
-}
-
-test('allows a real Agent call with no registered executor for its subagent_type -- resolves in-process via --needs-soul default', () => {
-  const repoRoot = mkTempGitRepo();
-  writeRunnerConfigFixture(repoRoot, {
-    executor: { command: 'claude', args: ['{prompt}'] },
-    modelPolicies: { claude: { standard: 'sonnet' } },
-    defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
-    timeoutMs: 5000,
-  });
-  const result = runHook(repoRoot, { tool_name: 'Agent', tool_input: { subagent_type: 'general-purpose' }, cwd: repoRoot });
-  assert.equal(result.status, 0, result.stderr);
-  assert.doesNotMatch(result.stderr, /BLOCKED/);
-  fs.rmSync(repoRoot, { recursive: true, force: true });
-});
-
-test('blocks a real Agent call whose subagent_type resolves to a registered out-of-process executor', () => {
-  const repoRoot = mkTempGitRepo();
-  writeRunnerConfigFixture(repoRoot, {
-    executor: { command: 'claude', args: ['{prompt}'] },
-    capabilities: { blocked: { prefer: 'tool-only' } },
-    executors: { 'tool-only': { kind: 'tool', command: 'agy', args: ['{prompt}'], allowCrossProvider: true } },
-    modelPolicies: { claude: { standard: 'sonnet' } },
-    defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
-    timeoutMs: 5000,
-  });
-  const result = runHook(repoRoot, { tool_name: 'Agent', tool_input: { subagent_type: 'blocked' }, cwd: repoRoot });
-  assert.equal(result.status, 2);
-  assert.match(result.stderr, /BLOCKED/);
-  assert.match(result.stderr, /fgos run "<prompt>" --capability blocked/);
-  assert.match(result.stderr, /"tool-only" is a tool executor/);
-  assert.doesNotMatch(result.stderr, /--provider tool-only/);
-  assert.doesNotMatch(result.stderr, /dispatch execute|dispatch\.mjs execute/);
-  fs.rmSync(repoRoot, { recursive: true, force: true });
-});
-
-test('allows a real Task call the same way an Agent call resolves (both tool names enforced identically)', () => {
-  const repoRoot = mkTempGitRepo();
-  writeRunnerConfigFixture(repoRoot, {
-    executor: { command: 'claude', args: ['{prompt}'] },
-    modelPolicies: { claude: { standard: 'sonnet' } },
-    defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
-    timeoutMs: 5000,
-  });
-  const result = runHook(repoRoot, { tool_name: 'Task', tool_input: { subagent_type: 'general-purpose' }, cwd: repoRoot });
-  assert.equal(result.status, 0, result.stderr);
-  fs.rmSync(repoRoot, { recursive: true, force: true });
-});
-
-test('ignores a non-Agent/Task tool call entirely -- never even calls decide', () => {
-  const repoRoot = mkTempGitRepo();
-  const result = runHook(repoRoot, { tool_name: 'Bash', tool_input: { command: 'ls' }, cwd: repoRoot });
-  assert.equal(result.status, 0);
-  assert.equal(result.stderr, '');
-  fs.rmSync(repoRoot, { recursive: true, force: true });
-});
-
-test('blocks (exit 2) when the project config is refused, naming the refusal ids and `fgos config check`', () => {
-  const repoRoot = mkTempGitRepo();
-  fs.mkdirSync(path.join(repoRoot, '.fgos'), { recursive: true });
-  writeRawProjectConfig(repoRoot, 'runner: [unclosed\n');
-  const result = runHook(repoRoot, { tool_name: 'Agent', tool_input: { subagent_type: 'general-purpose' }, cwd: repoRoot });
   assert.equal(result.status, 2, result.stderr);
   assert.match(result.stderr, /BLOCKED/);
-  assert.match(result.stderr, /config-[a-z-]+/);
-  assert.match(result.stderr, /fgos config check/);
-  fs.rmSync(repoRoot, { recursive: true, force: true });
-});
-
-test('fails open (allows) on empty stdin', () => {
-  const repoRoot = mkTempGitRepo();
-  const result = spawnSync(process.execPath, [hookPath], { encoding: 'utf8', cwd: repoRoot, env, input: '' });
-  assert.equal(result.status, 0);
-  fs.rmSync(repoRoot, { recursive: true, force: true });
-});
-
-test('fails open (allows) on malformed JSON stdin', () => {
-  const repoRoot = mkTempGitRepo();
-  const result = spawnSync(process.execPath, [hookPath], { encoding: 'utf8', cwd: repoRoot, env, input: 'not json{{{' });
-  assert.equal(result.status, 0);
-  fs.rmSync(repoRoot, { recursive: true, force: true });
-});
-
-test('fails open (allows) when the payload cwd is not inside any git checkout', () => {
-  const notARepo = fs.mkdtempSync(path.join(os.tmpdir(), 'dispatch-decide-hook-no-git-'));
-  const result = spawnSync(process.execPath, [hookPath], {
-    encoding: 'utf8',
-    cwd: notARepo,
-    env,
-    input: JSON.stringify({ tool_name: 'Agent', tool_input: { subagent_type: 'general-purpose' }, cwd: notARepo }),
-  });
-  assert.equal(result.status, 0);
-  fs.rmSync(notARepo, { recursive: true, force: true });
-});
-
-test('defaults subagent_type to "general-purpose" when tool_input omits it, matching the Agent tool\'s own default', () => {
-  const repoRoot = mkTempGitRepo();
-  writeRunnerConfigFixture(repoRoot, {
-    executor: { command: 'claude', args: ['{prompt}'] },
-    modelPolicies: { claude: { standard: 'sonnet' } },
-    defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
-    timeoutMs: 5000,
-  });
-  const result = runHook(repoRoot, { tool_name: 'Agent', tool_input: {}, cwd: repoRoot });
-  assert.equal(result.status, 0, result.stderr);
-  fs.rmSync(repoRoot, { recursive: true, force: true });
 });

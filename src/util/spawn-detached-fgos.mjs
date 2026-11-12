@@ -7,7 +7,8 @@ import fs from 'node:fs';
 import { spawn } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
-const OWN_CLI = fileURLToPath(new URL('../../bin/fgos.mjs', import.meta.url));
+/** The CLI entry a detached child runs: the entry of the release payload this module sits in. */
+export const OWN_CLI = fileURLToPath(new URL('../../bin/fgos.mjs', import.meta.url));
 
 /**
  * @param {{ args: string[], cwd?: string, env?: object, logPath?: string, logStdout?: boolean, cliPath?: string }} spec

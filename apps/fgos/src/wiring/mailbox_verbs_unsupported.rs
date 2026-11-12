@@ -8,6 +8,7 @@ pub use super::mailbox_surface::{
     INBOX_DESCRIPTOR, INBOX_OPERATION_ID, LIST_DESCRIPTOR, LIST_OPERATION_ID, SEND_DESCRIPTOR,
     SEND_OPERATION_ID, STATUS_DESCRIPTOR, STATUS_OPERATION_ID,
 };
+use crate::exit_codes;
 use fgos_host_runtime::{
     EventSink, HostInvocation, InvocationControl, OperationProvider, OperationRequest,
     ProviderDescriptor, ProviderError, ProviderOutcome,
@@ -18,7 +19,6 @@ use std::future::Future;
 use std::pin::Pin;
 
 const REFUSAL: &str = "the agent mailbox is not available on this platform (it needs unix process ancestry and file locks)";
-const EXIT_REFUSED: i32 = 1;
 
 /// One `fgos mailbox` invocation: only whether `--json` was asked, since every
 /// verb gets the same refusal.
@@ -44,7 +44,7 @@ fn answer(request: &MailboxRequest) -> MailboxAnswer {
         text: format!("fgos: {REFUSAL}"),
         data: json!({ "ok": false, "error": REFUSAL }),
         json: request.json,
-        exit: EXIT_REFUSED,
+        exit: exit_codes::unexpected(),
         already_written: false,
         warning: None,
     }

@@ -152,6 +152,8 @@ export function collaborationOfRecord(record, { shipped } = {}) {
   if (loop === 'reviewed' && selectorParams.maxRounds === undefined && reviewedTuning.maxRounds !== undefined) {
     effectiveParams.maxRounds = reviewedTuning.maxRounds;
   }
+  // A record that kept no round limit ran under the standard's: the number comes from the config door, not from the loop.
+  if (loop === 'reviewed' && effectiveParams.maxRounds === undefined) effectiveParams.maxRounds = shipped?.loops?.reviewed?.maxRounds;
   const storedSeats = record?.seats ?? seatsOfRecord(record);
   if (storedSeats && storedSeats.length > 0) {
     effectiveParams.seats = storedSeats.map(({ seat, role, persona, tier }) => ({ seat, ...(role ? { role } : {}), ...(persona ? { persona } : {}), ...(tier ? { tier } : {}) }));

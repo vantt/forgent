@@ -17,6 +17,7 @@ import { judge } from '../native/process-identity.mjs';
 import { listAssignmentRuns } from './dispatch/assignment-layout.mjs';
 import { runsRoot } from './execution/case-run-paths.mjs';
 import { listOpenAttemptDirs } from '../run-supervisor/client.mjs';
+import { readBeacon } from './main-checkout-activity.mjs';
 
 const REPORTED_SCOPES = new Set(['repo', 'machine']);
 const PLACEHOLDER = /<([^<>]+)>/g;
@@ -286,13 +287,22 @@ function collectLockProblems({ fgosDir, lockRoot, now }) {
   return [...foreign, ...predecessors, ...hotRecordProblems(fgosDir, now)];
 }
 
+/** The commit-activity beacon on its own: a hint the pre-commit hook reads, never a lock to wait on. */
+function beaconStatus(fgosDir, now) {
+  const beacon = readBeacon(fgosDir);
+  if (beacon.status !== 'ok') return { status: beacon.status };
+  const ageMs = now - beacon.record.writtenAt;
+  return { status: 'present', writer: beacon.record.writer.id, ageMs, windowMs: beacon.record.windowMs, active: ageMs <= beacon.record.windowMs };
+}
+
 /**
- * collectLockStatus({ fgosDir, now }) -> { mainCheckout, locks, problems }
+ * collectLockStatus({ fgosDir, now }) -> { mainCheckout, locks, problems, beacon }
  *
  * `locks` has one row per repo- or machine-scoped registry row; `mainCheckout`
  * is the main-checkout row's `{ outcome, holders, guarantee }` for callers
  * that only care about that one lock; `problems` lists the findings that need
- * a person, each with its way out.
+ * a person, each with its way out; `beacon` is the commit-activity beacon's
+ * age and window.
  */
 export function collectLockStatus({ fgosDir, now = Date.now() }) {
   const params = { fgosDir };
@@ -326,5 +336,6 @@ export function collectLockStatus({ fgosDir, now = Date.now() }) {
     mainCheckout: { outcome: main?.status ?? 'unknown', holders: main?.holders ?? null, path: main?.path ?? null, guarantee: main?.guarantee ?? null },
     locks,
     problems: collectLockProblems({ fgosDir, lockRoot: machineParams.lockRoot, now }),
+    beacon: beaconStatus(fgosDir, now),
   };
 }

@@ -701,6 +701,10 @@ $defs:
               type: string
               pattern: "\\S"
             minItems: 1
+          sessionDir:
+            description: "Folder of the private home where the CLI writes its session, relative and without parent steps. Execution copies it into the run directory before it removes the home; without it no transcript is kept. Check where a CLI writes with `fgos dispatch probe-session <executorId>`."
+            type: string
+            pattern: "\\S"
         required: [use, homeEnv]
       interactiveMode:
         $ref: "#/$defs/interactiveMode"

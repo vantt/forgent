@@ -1,4 +1,4 @@
-// finalize-home: give the credential back and remove the private homes of the attempt. The step
+// finalize-home: give the credential back, keep the session of the seat and remove the private homes of the attempt. The step
 // runs only while the supervisor or adopt holds the attempt lock and the process domain is empty.
 // A home whose marker is not this attempt's throws (message starts with the code) and stays.
 
@@ -12,6 +12,9 @@ export async function finalizeHome({ envelope }) {
   // is already written; the secrets have no reader left once the home is finalized.
   fs.rmSync(envelope.sideFile, { force: true });
   // The retry budget is used up: the home stays for the owner, adopt does not run the step again.
-  if (finalized.state === 'credential-home-held') return { result: 'done', detail: { homes: finalized.homes, outcome: 'credential-home-held' } };
-  return { result: 'done', detail: { homes: finalized.homes } };
+  // `transcriptPath` is relative to the run directory: where the seat's session was kept, null when none was.
+  // `homeLayout` names what each home held, never content: it shows where a CLI wrote when the declared folder is wrong.
+  const kept = { homes: finalized.homes, transcriptPath: finalized.transcriptPath, homeLayout: finalized.homeLayout, warnings: finalized.warnings };
+  if (finalized.state === 'credential-home-held') return { result: 'done', detail: { ...kept, outcome: 'credential-home-held' } };
+  return { result: 'done', detail: kept };
 }

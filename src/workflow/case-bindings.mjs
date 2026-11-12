@@ -2,7 +2,7 @@
 // Architecture guard: MUST NOT import src/state/** or src/runner/coordination/** (A4 boundary)
 //
 // The record is runtime state beside the ledger, never a ledger line. Its file is named by the worktree's
-// identity (`cwdDevIno`, the key the dispatch-cwd lease uses, so every spelling of one directory is one
+// identity (`worktreeKey`, the key the custody lease uses, so every spelling of one directory is one
 // file). Exclusive create is the cross-case mutex; the case's own `advance` hold orders the rest:
 //
 //   exclusive create {state: pending} + fsync  ->  `binding` event + fsync  ->  rename over the same
@@ -14,9 +14,8 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { cwdDevIno } from '../holder-lock/registry.mjs';
 import { currentDispatchDepth } from '../runner/dispatch/adapters.mjs';
-import { dispatchCwdHolder } from '../run-supervisor/cwd-lock.mjs';
+import { custodyHeld, worktreeKey } from '../runner/execution/custody-door.mjs';
 import { installOnce, replaceDurably } from '../native/door.mjs';
 import { appendWorkflowEvent, fsyncDirectory, readWorkflowEvents } from './store.mjs';
 import { projectCase } from './case-projection.mjs';
@@ -51,7 +50,7 @@ export function ensureBindingsSentinel(mainRoot) {
 
 /** The identity key of a worktree, or null when it does not exist. */
 export function bindingKeyOf(worktree) {
-  return cwdDevIno(worktree) ?? null;
+  return worktreeKey(worktree);
 }
 
 function parseRecord(file) {
@@ -146,7 +145,7 @@ export function unbindWorktree({ mainRoot, hold, caseId, generation, key, worktr
   if (!fs.existsSync(file)) return { unbound: true, reason: 'no-record' };
   const record = parseRecord(file);
   if (!record || record.caseId !== caseId || record.generation !== generation) return { unbound: false, reason: 'generation-mismatch' };
-  if (dispatchCwdHolder(path.join(mainRoot, '.fgos'), worktree ?? record.worktreeRoot) !== null) return { unbound: false, reason: 'attempt-not-quiet' };
+  if (custodyHeld(path.join(mainRoot, '.fgos'), worktree ?? record.worktreeRoot)) return { unbound: false, reason: 'attempt-not-quiet' };
   appendWorkflowEvent({
     repoRoot: mainRoot,
     workflowRunId: caseId,

@@ -6,7 +6,7 @@
 // or written.
 
 import { explainSeat } from './bind.mjs';
-import { deriveProviderFamily } from '../dispatch/resolve.mjs';
+import { familyOf } from '../dispatch/provider-adapter.mjs';
 import { readLlmAccounts, legacyStateKey } from '../dispatch/llm-accounts.mjs';
 import { credentialSourceForCli, credentialStoreOf, providerAccountInventory } from '../dispatch/provider-capacity.mjs';
 
@@ -64,7 +64,7 @@ export function explainCapability(runnerConfig, { capability, rigor, session } =
   if (binding.refused) return { ask, refused: binding.refused, explanation };
 
   const executorEntry = runnerConfig.executors?.[binding.executor];
-  const family = executorEntry ? deriveProviderFamily(executorEntry) : null;
+  const family = executorEntry ? familyOf(executorEntry) : null;
   const p = binding.provenance ?? {};
   const storeOf = (executor, invocation) => storeOfBinding(runnerConfig.executors?.[executor], invocation);
 
@@ -108,7 +108,7 @@ export function explainCapability(runnerConfig, { capability, rigor, session } =
     candidates,
     walk: walk.map((b, position) => ({
       position,
-      family: deriveProviderFamily(runnerConfig.executors?.[b.executor]),
+      family: familyOf(runnerConfig.executors?.[b.executor] ?? {}),
       executor: b.executor,
       invocation: b.invocation,
       pool: b.pool,

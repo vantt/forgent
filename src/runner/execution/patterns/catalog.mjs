@@ -11,7 +11,6 @@ import {
 } from '../seat-resolver.mjs';
 import {
   paramTableOf,
-  DEFAULT_MAX_ROUNDS,
   DEFAULT_REBUTTAL,
 } from '../loops/index.mjs';
 import {
@@ -242,7 +241,6 @@ function layerParams({ paramTable, loop, entry, loopConfig, requestParams, selec
     else if (Object.hasOwn(unitDeclared, param)) take(param, deepClone(unitDeclared[param]), 'unit');
     else if (entry.defaults && Object.hasOwn(entry.defaults, param)) take(param, deepClone(entry.defaults[param]), 'pattern-default');
     else if (loopConfig && Object.hasOwn(loopConfig, param)) take(param, deepClone(loopConfig[param]), 'config');
-    else if (loop === 'reviewed' && param === 'maxRounds') take(param, DEFAULT_MAX_ROUNDS, 'builtin');
     else if (loop === 'debate' && param === 'rebuttal') take(param, DEFAULT_REBUTTAL, 'builtin');
   }
   return { effective, provenance };

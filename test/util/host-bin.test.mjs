@@ -26,29 +26,36 @@ test('resolveHostBin prioritizes process.env.FGOS_HOST_BIN', () => {
   }
 });
 
-test('resolveHostBin returns null when no host is available in empty dir', () => {
+test('resolveHostBin returns null for a project with no activation, never another checkout\'s host', () => {
   const original = process.env.FGOS_HOST_BIN;
-  const originalPkgRoot = process.env.FGOS_PACKAGE_ROOT;
+  const project = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-host-bin-none-'));
   try {
     delete process.env.FGOS_HOST_BIN;
-    // An arbitrary temp directory has no .fgos/installation.
-    // Hermetic: specify empty packageRoot via parameter or FGOS_PACKAGE_ROOT env
-    // to prevent falling back to developer workstation's .fgos/installation.
-    assert.equal(resolveHostBin('/tmp', { packageRoot: '/tmp' }), null);
-
-    process.env.FGOS_PACKAGE_ROOT = '/tmp';
-    assert.equal(resolveHostBin('/tmp'), null);
+    // process.cwd() is a checkout that may well have an active release; a directory elsewhere must not borrow it.
+    assert.equal(resolveHostBin(project), null);
   } finally {
-    if (original !== undefined) {
-      process.env.FGOS_HOST_BIN = original;
-    } else {
-      delete process.env.FGOS_HOST_BIN;
-    }
-    if (originalPkgRoot !== undefined) {
-      process.env.FGOS_PACKAGE_ROOT = originalPkgRoot;
-    } else {
-      delete process.env.FGOS_PACKAGE_ROOT;
-    }
+    if (original !== undefined) process.env.FGOS_HOST_BIN = original;
+    fs.rmSync(project, { recursive: true, force: true });
+  }
+});
+
+test('resolveHostBin returns the host of the project\'s own active release', {
+  skip: process.platform === 'win32',
+}, () => {
+  const original = process.env.FGOS_HOST_BIN;
+  const project = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-host-bin-active-'));
+  try {
+    delete process.env.FGOS_HOST_BIN;
+    const release = path.join(project, 'release');
+    fs.mkdirSync(path.join(release, 'bin'), { recursive: true });
+    fs.writeFileSync(path.join(release, 'bin', 'fgos'), '#!/bin/sh\n', { mode: 0o755 });
+    fs.mkdirSync(path.join(project, '.fgos', 'installation'), { recursive: true });
+    fs.writeFileSync(path.join(project, '.fgos', 'installation', 'activation.json'), JSON.stringify({ status: 'ready', releasePath: release }));
+    assert.equal(resolveHostBin(project), path.join(release, 'bin', 'fgos'));
+    assert.equal(resolveHostBin(path.join(project, '.fgos')), path.join(release, 'bin', 'fgos'), 'a .fgos path names its project');
+  } finally {
+    if (original !== undefined) process.env.FGOS_HOST_BIN = original;
+    fs.rmSync(project, { recursive: true, force: true });
   }
 });
 
@@ -70,25 +77,16 @@ test('invokeHost runs metrics ping and returns envelope data', () => {
 
 test('invokeHost throws host-unavailable when host cannot be resolved', () => {
   const original = process.env.FGOS_HOST_BIN;
-  const originalPkgRoot = process.env.FGOS_PACKAGE_ROOT;
+  const project = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-host-bin-unavailable-'));
   try {
     delete process.env.FGOS_HOST_BIN;
-    process.env.FGOS_PACKAGE_ROOT = '/tmp';
     assert.throws(
-      () => invokeHost(['metrics', 'ping'], { dir: '/tmp', packageRoot: '/tmp' }),
+      () => invokeHost(['metrics', 'ping'], { dir: project }),
       (err) => err.code === 'host-unavailable'
     );
   } finally {
-    if (original !== undefined) {
-      process.env.FGOS_HOST_BIN = original;
-    } else {
-      delete process.env.FGOS_HOST_BIN;
-    }
-    if (originalPkgRoot !== undefined) {
-      process.env.FGOS_PACKAGE_ROOT = originalPkgRoot;
-    } else {
-      delete process.env.FGOS_PACKAGE_ROOT;
-    }
+    if (original !== undefined) process.env.FGOS_HOST_BIN = original;
+    fs.rmSync(project, { recursive: true, force: true });
   }
 });
 

@@ -1,7 +1,7 @@
 ---
 phase: 03
 title: "Git and worktree arms: one worktree context, usage errors as StoreError, reset use case with the main-checkout policy, store admission beside isMainWorktree"
-status: pending
+status: landed
 depends_on: ["02 landed (the root door)"]
 parallel: "T2 layer; alone in its layer except it may share the layer slot with nothing else"
 effort: ~1.25d

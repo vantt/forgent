@@ -134,7 +134,7 @@ test('a failing unit verify becomes findings that carry its exit status and outp
 // The child sleeps far longer than any plausible machine slowness, so only the timeout kill can end the run early.
 const VERIFY_CHILD_SLEEP_MS = 120000;
 
-test('a verify command that outlives runner.timeoutMs fails the verify with the timeout named, never hangs', async () => {
+test('a verify command that outlives runner.timeoutMs is an infrastructure failure with the timeout named, never a findings verdict, and never hangs', async () => {
   const { repoRoot, worktreeDir } = setupGitRepo();
   reviewedConfig(repoRoot, ['alpha', 'beta']);
   withModelPolicies(repoRoot, [], { timeoutMs: 4000 });
@@ -145,8 +145,11 @@ test('a verify command that outlives runner.timeoutMs fails the verify with the 
     { id: 'u-verify-slow', verify: `node -e "setTimeout(() => {}, ${VERIFY_CHILD_SLEEP_MS})"` },
     { pattern: 'reviewed', params: { maxRounds: 1 } },
   );
-  assert.equal(res.outcome, 'findings');
-  assert.ok(res.findings.some((f) => /timed out after 4000ms/.test(f)), res.findings.join('\n'));
+  assert.equal(res.outcome, 'execution-failure');
+  const verified = res.results.find((r) => r.seat === 'verify');
+  assert.equal(verified.outcome, 'execution-failure');
+  assert.equal(verified.infrastructure, 'timeout');
+  assert.match(verified.error, /timed out after 4000ms/);
   assert.ok(Date.now() - started < VERIFY_CHILD_SLEEP_MS / 2, 'the run did not wait for the verify command to finish by itself');
 });
 
@@ -228,6 +231,30 @@ test('a solo run with a failing verify command settles with findings and no seco
   assert.equal(fixture.readRecord().execution?.status, 'settled');
   assert.equal(fixture.readRecord().settlement?.outcome, 'findings');
   assert.equal(fixture.readSummary().outcome, 'findings');
+});
+
+test('a solo verify that is killed settles as an infrastructure failure with no second producer launch, and resume runs the verify again', { skip: process.platform === 'win32' && 'exec replaces the shell on POSIX only' }, async (t) => {
+  const fixture = recordedUnitFixture(t);
+  fixture.record.unit.verify = `exec "${process.execPath}" -e "process.kill(process.pid, 'SIGKILL')"`;
+  fs.writeFileSync(path.join(fixture.unitDir, 'unit.json'), JSON.stringify(fixture.record));
+  const runDir = path.join(fixture.unitDir, 'producer', '1', 'runs', '01');
+  fs.mkdirSync(runDir, { recursive: true });
+  fs.writeFileSync(path.join(runDir, 'result.json'), JSON.stringify({
+    runId: 'settled-producer', settledAt: '2026-10-05T01:01:00Z', classification: { outcome: { category: 'ok' } },
+  }));
+
+  const first = await runUnit({ repoRoot: fixture.repoRoot, cwd: fixture.worktreeDir, resumeUnitRunId: fixture.unitRunId });
+  assert.equal(first.outcome, 'execution-failure');
+  const killed = first.results.find((r) => r.seat === 'verify');
+  assert.equal(killed.infrastructure, 'not-run');
+  assert.match(killed.error, /could not run/);
+  assert.equal(first.results.filter((r) => r.seat === 'producer').length, 1);
+
+  fixture.record.unit.verify = 'node -e "process.exit(0)"';
+  fs.writeFileSync(path.join(fixture.unitDir, 'unit.json'), JSON.stringify(fixture.record));
+  const resumed = await runUnit({ repoRoot: fixture.repoRoot, cwd: fixture.worktreeDir, resumeUnitRunId: fixture.unitRunId });
+  assert.equal(resumed.outcome, 'pass');
+  assert.equal(resumed.results.filter((r) => r.seat === 'verify' && r.outcome === 'pass').length, 1);
 });
 
 test('capability-level verify on panel is neither run nor refused', async () => {

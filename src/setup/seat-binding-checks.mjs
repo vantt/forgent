@@ -5,7 +5,7 @@ import { simulateUnitBindings } from '../runner/execution/dry-bind.mjs';
 import { hasUsablePrefer } from '../runner/execution/seat-resolver.mjs';
 import { resolveCollaboration, loopOf } from '../runner/execution/patterns/catalog.mjs';
 import { shippedCatalog } from '../runner/dispatch/shipped-catalog.mjs';
-import { loadWorkflowDefinitions, withUnreadableDefinitions, workflowRoots, workflowUnitContract } from './workflow-definition-files.mjs';
+import { declaredActivities, readWorkflowCatalog, sourceOf, withUnreadableDefinitions, workflowUnitContract } from './workflow-catalog-reader.mjs';
 const MAX_LISTED = 8;
 const listed = (items) => (items.length > MAX_LISTED ? `${items.slice(0, MAX_LISTED).join('; ')}; and ${items.length - MAX_LISTED} more` : items.join('; '));
 
@@ -84,19 +84,19 @@ function bindCapabilityPostures(runnerConfig) {
  * published to the later). A policy refusal fails the row; the rest is listed as information: capabilities
  * with no pool, account-state refusals, tiers lowered by `maxTier` and seats that share a provider family.
  *
- * @param {string} cwd Project root (its own core/ and domains/ workflows are read too).
+ * @param {string} cwd Project root (its own core/ and domains/ workflows win over the shipped ones).
  * @param {object} options
- * @param {string} options.packageRoot Root holding the shipped core/ and domains/.
+ * @param {string} [options.payloadRoot] Root holding the shipped core/ and domains/; the running payload when absent.
  * @param {() => object} options.loadRunnerConfig Returns the project's runner config; may throw.
  */
-export async function checkSeatBindingDryBind(cwd, { packageRoot, loadRunnerConfig }) {
+export async function checkSeatBindingDryBind(cwd, { payloadRoot, loadRunnerConfig }) {
   let runnerConfig;
   try {
     runnerConfig = loadRunnerConfig(cwd);
   } catch (err) {
     return { passed: true, message: `runner config not loadable here, seats not bound: ${err.message}` };
   }
-  const loaded = loadWorkflowDefinitions(workflowRoots(cwd, packageRoot));
+  const loaded = readWorkflowCatalog(cwd, { payloadRoot });
   const problems = [];
   const info = [];
   const shipped = shippedCatalog();
@@ -105,8 +105,12 @@ export async function checkSeatBindingDryBind(cwd, { packageRoot, loadRunnerConf
   const posture = bindCapabilityPostures(runnerConfig);
   problems.push(...posture.problems);
   info.push(...posture.info);
-  for (const wf of loaded.workflows.values()) {
-    for (const activity of wf.activities ?? []) {
+  for (const entry of loaded.catalog.values()) {
+    const wf = entry.workflow;
+    const defined = sourceOf(entry);
+    const flag = (text) => problems.push(`${text} [${defined}]`);
+    if (entry.overridesShipped) info.push(`${wf.id}: ${defined} replaces the shipped definition`);
+    for (const activity of declaredActivities(entry)) {
       const u = activity?.unit;
       if (!u || typeof u !== 'object') continue;
       if ('step' in u && 'units' in u) continue;
@@ -120,7 +124,7 @@ export async function checkSeatBindingDryBind(cwd, { packageRoot, loadRunnerConf
           shipped,
         });
       } catch (err) {
-        problems.push(`${label}: ${err.message}`);
+        flag(`${label}: ${err.message}`);
       }
     }
     for (const step of wf.steps) {
@@ -133,7 +137,7 @@ export async function checkSeatBindingDryBind(cwd, { packageRoot, loadRunnerConf
           const pattern = u.template.pattern;
           const loop = loopOf(pattern, { effective: runnerConfig }) ?? (['solo', 'reviewed', 'panel', 'debate'].includes(pattern) ? pattern : 'solo');
           if (loop !== 'reviewed') {
-            problems.push(`${label}: acceptOutcomes requires a reviewed template and unique pass/findings outcomes`);
+            flag(`${label}: acceptOutcomes requires a reviewed template and unique pass/findings outcomes`);
             continue;
           }
         }
@@ -141,14 +145,14 @@ export async function checkSeatBindingDryBind(cwd, { packageRoot, loadRunnerConf
         try {
           ({ seats } = await simulateUnitBindings(unit, runnerConfig, { session: DRY_BIND_SESSION, workflowId: wf.id }));
         } catch (err) {
-          problems.push(`${label}: could not be evaluated (${err.message})`);
+          flag(`${label}: could not be evaluated (${err.message})`);
           continue;
         }
         for (const seat of seats) {
           if (seat.refused) {
             const kind = INFO_REFUSALS.get(seat.refused.reason);
             if (kind) info.push(`${label}: seat ${seat.seat} not bound, ${kind} (${seat.refused.reason})`);
-            else problems.push(`${label}: seat ${seat.seat} refused for ${seat.refused.reason}: ${seat.refused.detail}`);
+            else flag(`${label}: seat ${seat.seat} refused for ${seat.refused.reason}: ${seat.refused.detail}`);
             continue;
           }
           bound += 1;

@@ -21,14 +21,6 @@ pub(crate) fn annotations() -> impl Iterator<Item = &'static Value> {
     contract()["annotations"].as_array().into_iter().flatten()
 }
 
-/// The keys a runtime reads with a built-in default that no section schema describes.
-pub(crate) fn runtime_keys() -> impl Iterator<Item = &'static Value> {
-    contract!("runtime-keys.v1.json")["keys"]
-        .as_array()
-        .into_iter()
-        .flatten()
-}
-
 /// The names of a path's keys; `None` when it goes through a list index.
 fn key_names(path: &[Segment]) -> Option<Vec<&str>> {
     path.iter()
@@ -37,26 +29,6 @@ fn key_names(path: &[Segment]) -> Option<Vec<&str>> {
             Segment::Index(_) => None,
         })
         .collect()
-}
-
-/// The runtime key row at exactly `path`.
-pub fn runtime_key(path: &[Segment]) -> Option<&'static Value> {
-    let want = key_names(path)?.join(".");
-    runtime_keys().find(|row| row["path"] == want.as_str())
-}
-
-/// Whether `path` is a runtime key or a mapping on the way to one.
-fn on_runtime_key(path: &[Segment]) -> bool {
-    key_names(path).is_some_and(|names| {
-        let own = names.join(".");
-        runtime_keys().any(|row| {
-            let full = row["path"].as_str().unwrap_or_default();
-            full == own
-                || full
-                    .strip_prefix(&own)
-                    .is_some_and(|rest| rest.starts_with('.'))
-        })
-    })
 }
 
 /// Edit distance between two names, ignoring case; small inputs only.
@@ -398,7 +370,7 @@ impl Schemas {
     pub fn undescribed(&self, value: &Value) -> Vec<Vec<Segment>> {
         let mut out = Vec::new();
         descend(value, &mut Vec::new(), &mut |path, _| {
-            let known = self.resolve(path).is_some() || on_runtime_key(path);
+            let known = self.resolve(path).is_some();
             if !known {
                 out.push(path.to_vec());
             }
@@ -409,8 +381,8 @@ impl Schemas {
         out
     }
 
-    /// The key names a mapping at `prefix` may hold: the section names at the root, the named
-    /// properties of a schema node, and the next segment of every runtime key below it.
+    /// The key names a mapping at `prefix` may hold: the section names at the root, or the named
+    /// properties of a schema node.
     fn names_under(&self, prefix: &[Segment]) -> Vec<String> {
         let mut names: Vec<String> = match prefix.is_empty() {
             true => self.sections.iter().map(|s| s.name.clone()).collect(),
@@ -421,17 +393,6 @@ impl Schemas {
                     .collect()
             }),
         };
-        let held = key_names(prefix).unwrap_or_default().join(".");
-        for row in runtime_keys() {
-            let full = row["path"].as_str().unwrap_or_default();
-            let rest = match held.is_empty() {
-                true => Some(full),
-                false => full.strip_prefix(&held).and_then(|r| r.strip_prefix('.')),
-            };
-            if let Some(next) = rest.and_then(|r| r.split('.').next()) {
-                names.push(next.to_string());
-            }
-        }
         names.sort();
         names.dedup();
         names
@@ -443,9 +404,7 @@ impl Schemas {
         let Some(names) = key_names(path) else {
             return Vec::new();
         };
-        let Some(depth) = (0..path.len())
-            .find(|d| self.resolve(&path[..=*d]).is_none() && !on_runtime_key(&path[..=*d]))
-        else {
+        let Some(depth) = (0..path.len()).find(|d| self.resolve(&path[..=*d]).is_none()) else {
             return Vec::new();
         };
         let wrong = names[depth];

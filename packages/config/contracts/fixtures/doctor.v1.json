@@ -288,25 +288,6 @@
    }
   },
   {
-   "id": "runtime-key-is-not-unknown",
-   "why": "a key the runtime reads with a default is listed in the runtime key contract and is not reported",
-   "input": {
-    "files": {
-     "project/.fgos/config.yaml": [
-      "dispatch:",
-      "  # @fgos:why [vantt] slow machine",
-      "  cancelWaitMs: 20000"
-     ]
-    },
-    "writer": {
-     "session": "vantt"
-    }
-   },
-   "expect": {
-    "rows": []
-   }
-  },
-  {
    "id": "redundant-value-says-whether-a-note-would-go",
    "why": "spec 11: equal to the standard; a note on it needs the acknowledgement",
    "input": {

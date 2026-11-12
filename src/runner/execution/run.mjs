@@ -5,7 +5,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import { publishMutableProjection } from '../../native/proof-helpers.mjs';
-import { createGitInspect, gitWriter } from '../../git/inspect.mjs';
+import { gitWriter, readRepoFacts } from '../../git/inspect.mjs';
 
 import {
   assertCaseAdmissionPort, normalizeCaseRef, briefNeverReached, noBriefDelivered, seatLaunchesUsed, SEAT_LAUNCH_CEILING,
@@ -21,7 +21,7 @@ import { runLoop, loopRunsVerify } from './loops/index.mjs';
 import { shippedCatalog } from '../dispatch/shipped-catalog.mjs';
 import { ERROR_OUTCOMES } from './loops/reviewed.mjs';
 import { verifyCommandOf } from './loops/verify.mjs';
-import { runCommand } from '../goal-check.mjs';
+import { answerOfVerify, runVerify } from './custody-door.mjs';
 import { executeAssignment } from '../dispatch/assignment-runner.mjs';
 import { buildUnitRunAssignment } from '../dispatch/assignment.mjs';
 import { createCredentialProbe } from '../dispatch/provider-credential-probe.mjs';
@@ -42,7 +42,6 @@ import { cancelOnSignalEnabled } from '../../run-supervisor/cancel-opt-in.mjs';
 import { readCancelWaitMs } from '../../run-supervisor/gate-kill-grace.mjs';
 import { listGenerations } from '../../run-supervisor/run-lock.mjs';
 import { currentAttemptOf } from './unit-state.mjs';
-import { resolveStateRoot } from '../../holder-lock/index.mjs';
 import { admitFreshUnit, leftByDeadController, loadResumedUnit, writesWorktree } from './unit-run-start.mjs';
 
 function publishUnitSummary(unitDir) {
@@ -62,7 +61,7 @@ export function detectHerdrPresent(env = process.env) {
 /** The main checkout root and the worktree path of `cwd`, read through Git Inspect. */
 export function resolveGitRoots(cwd = process.cwd(), { allowNoRepository = false } = {}) {
   try {
-    const result = createGitInspect({ stateRoot: resolveStateRoot().stateRoot, repoPath: cwd, trustedMain: cwd }).resolveRepo();
+    const result = readRepoFacts(cwd);
     // A read-only caller may work in a directory that is no repository: that directory is its own project root.
     if (result.notARepository && allowNoRepository) {
       let root = cwd;
@@ -384,13 +383,8 @@ async function verifyUnit({ unitRecord, scope }, targetUnit) {
   const runnerConfig = unitRecord.configSnapshot.runner;
   const verifyCmd = verifyCommandOf(targetUnit, runnerConfig);
   if (!verifyCmd) return { pass: true };
-  const outcome = await runCommand(verifyCmd, unitRecord.worktree, runnerConfig.timeoutMs, { custody: scope.custody });
-  if (outcome.passed) return { pass: true };
-  const how = outcome.timedOut
-    ? `timed out after ${runnerConfig.timeoutMs}ms`
-    : outcome.status === null ? 'could not run' : `exited ${outcome.status}`;
-  const tail = outcome.output.trim().split('\n').slice(-20).join('\n');
-  return { pass: false, findings: [`Verification command ${how}: ${verifyCmd}${tail ? `\n${tail}` : ''}`] };
+  const verified = await runVerify({ command: verifyCmd, cwd: unitRecord.worktree, timeoutMs: runnerConfig.timeoutMs, custody: scope.custody });
+  return answerOfVerify(verified, 'Verification command', verifyCmd);
 }
 
 async function runCollaboration(ctx) {
@@ -838,13 +832,8 @@ async function dispatchBound(ctx, role, { bound, assignmentId, assignmentDir, ob
     committedRunnerConfig: ctx.liveConfig(),
     providerCredentialProbe: createCredentialProbe(),
     providerCredentialRenew: createCredentialRenewal(),
-    cliOverride: {
-      preferExecutor: bound.executor, preferInvocation: bound.invocation, tier: bound.tier, model: bound.model,
-      // The lease takes exactly the account Seat Binding named in the pool that serves `model`.
-      ...(bound.pool ? { pool: bound.pool } : {}),
-      ...(bound.leaseAccount ? { leaseAccount: bound.leaseAccount, accountViewDigest: bound.bindingInput?.accountViewDigest ?? null } : {}),
-      ...(bound.reasoningEffort ? { reasoningEffort: bound.reasoningEffort } : {}),
-    },
+    // Seat Binding's own answer: Dispatch executes it and records its provenance as bound.
+    binding: bound,
     isReadOnlyMode: readOnly,
     ...(bound.timeoutMs ? { timeoutMs: bound.timeoutMs } : {}),
     session: role.session,

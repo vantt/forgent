@@ -101,9 +101,27 @@
     "runner",
     "executors",
     "deepseek",
+    "invocations"
+   ],
+   "reason": "the standard declares the folder of the private home where the pi or omp login store writes its session (credentialStore.sessionDir), which Execution keeps before it removes the home; the pinned authoring source predates the key"
+  },
+  {
+   "path": [
+    "runner",
+    "executors",
+    "deepseek",
     "supports"
    ],
    "reason": "the standard names no kit skill; the pinned authoring source declares the cook skill this executor loads, which a machine now declares in its own config"
+  },
+  {
+   "path": [
+    "runner",
+    "executors",
+    "gemini",
+    "invocations"
+   ],
+   "reason": "the standard declares the folder of the private home where the pi or omp login store writes its session (credentialStore.sessionDir), which Execution keeps before it removes the home; the pinned authoring source predates the key"
   },
   {
    "path": [
@@ -119,6 +137,15 @@
     "runner",
     "executors",
     "glm",
+    "invocations"
+   ],
+   "reason": "the standard declares the folder of the private home where the pi or omp login store writes its session (credentialStore.sessionDir), which Execution keeps before it removes the home; the pinned authoring source predates the key"
+  },
+  {
+   "path": [
+    "runner",
+    "executors",
+    "glm",
     "supports"
    ],
    "reason": "the standard names no kit skill; the pinned authoring source declares the cook skill this executor loads, which a machine now declares in its own config"
@@ -128,9 +155,27 @@
     "runner",
     "executors",
     "openai",
+    "invocations"
+   ],
+   "reason": "the standard declares the folder of the private home where the pi or omp login store writes its session (credentialStore.sessionDir), which Execution keeps before it removes the home; the pinned authoring source predates the key"
+  },
+  {
+   "path": [
+    "runner",
+    "executors",
+    "openai",
     "supports"
    ],
    "reason": "the standard names no kit skill; the pinned authoring source declares the cook skill this executor loads, which a machine now declares in its own config"
+  },
+  {
+   "path": [
+    "runner",
+    "executors",
+    "xai",
+    "invocations"
+   ],
+   "reason": "the standard declares the folder of the private home where the pi or omp login store writes its session (credentialStore.sessionDir), which Execution keeps before it removes the home; the pinned authoring source predates the key"
   },
   {
    "path": [
@@ -316,6 +361,9 @@
   }
  ],
  "standard-only": [
+  [
+   "dispatch"
+  ],
   [
    "eventStore",
    "seal"

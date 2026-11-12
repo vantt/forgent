@@ -184,7 +184,7 @@ lệ có lý do" dưới) có thể tự chứa output của trợ lý bắt đ�
 
 ## 4. Exit Codes
 
-`src/state/store.mjs`'s `EXIT_CODES` (2 precondition [bao gồm not-found / run-not-found / missing-run] · 3 conflict ·
+bảng `packages/host-runtime/contracts/exit-codes.v1.json` (đọc bởi `EXIT_CODES` ở `src/cli/exit-codes.mjs` và bởi Rust host `apps/fgos/src/exit_codes.rs`; 2 precondition [bao gồm not-found / run-not-found / missing-run] · 3 conflict ·
 4 validation · 5 corrupt-log · 7 lock-timeout · 8 session-fail · 9 merge-fail · 4 not-found) cộng
 `OUTCOME_EXIT_CODES` (4 policy-refusal · 10 provider-limit · 11 execution-failure · 12 partial-writes ·
 13 blocked · 14 findings) cộng `src/runner/loop.mjs`'s `EXIT_BUSY` (6, riêng của

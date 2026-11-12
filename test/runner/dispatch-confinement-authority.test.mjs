@@ -516,3 +516,10 @@ test("M4 / M4b lock: authority.mjs contains 0 adapter layer imports (static or d
     }
   }
 });
+
+test("a request whose requirement names no mode is refused by the constructor, and a built request always carries its mode", () => {
+  const base = { capability: "advise", executorId: "test-exec", invocation: { command: "echo", args: [], adapter: "cli-spawn" }, context: { cwd: os.tmpdir(), runDir: os.tmpdir() } };
+  assert.throws(() => buildConfinementRequest({ ...base, requirement: { policyId: null, policy: null } }), /requirement\.mode must be one of/);
+  const built = buildConfinementRequest(base);
+  assert.equal(built.requirement.mode, "unconfined");
+});

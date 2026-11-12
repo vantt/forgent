@@ -14,7 +14,7 @@ import { effectiveDispatchPolicy } from '../../src/runner/dispatch/plan.mjs';
 import { buildAssignment } from '../helpers/declared-assignment.mjs';
 import { RunnerConfigError } from '../../src/runner/dispatch/runner-config-error.mjs';
 import {
-  normalizeProviderFamily,
+  familyOf,
   normalizeDisallowedProviders,
   checkProviderDisallowed,
   isProviderDisallowed,
@@ -40,25 +40,25 @@ process.exit(0);
 
 test('provider-adapter canonicalizes provider families and deny lists symmetrically', () => {
   // Aliases mapping to canonical families
-  assert.equal(normalizeProviderFamily('openai'), 'openai-codex');
-  assert.equal(normalizeProviderFamily('codex'), 'openai-codex');
-  assert.equal(normalizeProviderFamily('openai-codex'), 'openai-codex');
-  assert.equal(normalizeProviderFamily('glm'), 'z-ai');
-  assert.equal(normalizeProviderFamily('z-ai'), 'z-ai');
-  assert.equal(normalizeProviderFamily('agy'), 'gemini');
-  assert.equal(normalizeProviderFamily('gemini'), 'gemini');
-  assert.equal(normalizeProviderFamily('claude'), 'claude');
-  assert.equal(normalizeProviderFamily('deepseek'), 'deepseek');
-  assert.equal(normalizeProviderFamily('custom-vendor'), 'custom-vendor');
+  assert.equal(familyOf('openai'), 'openai');
+  assert.equal(familyOf('codex'), 'openai');
+  assert.equal(familyOf('openai'), 'openai');
+  assert.equal(familyOf('glm'), 'z-ai');
+  assert.equal(familyOf('z-ai'), 'z-ai');
+  assert.equal(familyOf('agy'), 'gemini');
+  assert.equal(familyOf('gemini'), 'gemini');
+  assert.equal(familyOf('claude'), 'claude');
+  assert.equal(familyOf('deepseek'), 'deepseek');
+  assert.equal(familyOf('custom-vendor'), 'custom-vendor');
 
   // Declared vendor takes precedence over CLI harness command
-  assert.equal(normalizeProviderFamily('openai', 'pi'), 'openai-codex');
-  assert.equal(normalizeProviderFamily('deepseek', 'pi'), 'deepseek');
-  assert.equal(normalizeProviderFamily('z-ai', 'claude'), 'z-ai');
+  assert.equal(familyOf('openai', 'pi'), 'openai');
+  assert.equal(familyOf('deepseek', 'pi'), 'deepseek');
+  assert.equal(familyOf('z-ai', 'claude'), 'z-ai');
 
   // Normalizing deny list
   const denySet = normalizeDisallowedProviders(['openai', 'glm', 'agy', 'deepseek']);
-  assert.ok(denySet.has('openai-codex'));
+  assert.ok(denySet.has('openai'));
   assert.ok(denySet.has('z-ai'));
   assert.ok(denySet.has('gemini'));
   assert.ok(denySet.has('deepseek'));
@@ -83,7 +83,6 @@ test('direct dispatch gate enforces canonical provider matching for OpenAI famil
     modelPolicies: {
       claude: { standard: 'claude-3-7-sonnet' },
       openai: { standard: 'gpt-4o' },
-      'openai-codex': { standard: 'gpt-4o' },
     },
     executors: {
       'exec-openai': {
@@ -124,7 +123,7 @@ test('direct dispatch gate enforces canonical provider matching for OpenAI famil
       runnerConfig,
       options: { disallowedProviders: ['openai'] },
     }),
-    (err) => err instanceof RunnerConfigError && /governance gate rejected provider "openai-codex"/.test(err.message),
+    (err) => err instanceof RunnerConfigError && /governance gate rejected provider "openai"/.test(err.message),
   );
 
   // 2. deny 'openai-codex' blocks declared 'openai'
@@ -134,7 +133,7 @@ test('direct dispatch gate enforces canonical provider matching for OpenAI famil
       runnerConfig,
       options: { disallowedProviders: ['openai-codex'] },
     }),
-    (err) => err instanceof RunnerConfigError && /governance gate rejected provider "openai-codex"/.test(err.message),
+    (err) => err instanceof RunnerConfigError && /governance gate rejected provider "openai"/.test(err.message),
   );
 
   // 3. deny 'codex' blocks declared 'openai-codex'
@@ -144,7 +143,7 @@ test('direct dispatch gate enforces canonical provider matching for OpenAI famil
       runnerConfig,
       options: { disallowedProviders: ['codex'] },
     }),
-    (err) => err instanceof RunnerConfigError && /governance gate rejected provider "openai-codex"/.test(err.message),
+    (err) => err instanceof RunnerConfigError && /governance gate rejected provider "openai"/.test(err.message),
   );
 });
 
@@ -154,8 +153,8 @@ test('direct dispatch gate enforces canonical provider matching for OpenAI famil
 // matching below is exercised through executeAssignment itself.
 
 const DOOR_FAMILY_CASES = [
-  { name: 'OpenAI (declared openai, deny openai-codex)', providerModel: 'openai', deny: ['openai-codex'], canonical: 'openai-codex' },
-  { name: 'OpenAI (declared openai-codex, deny codex)', providerModel: 'openai-codex', deny: ['codex'], canonical: 'openai-codex' },
+  { name: 'OpenAI (declared openai, deny openai-codex)', providerModel: 'openai', deny: ['openai-codex'], canonical: 'openai' },
+  { name: 'OpenAI (declared openai-codex, deny codex)', providerModel: 'openai-codex', deny: ['codex'], canonical: 'openai' },
   { name: 'Z-AI (declared z-ai, deny glm)', providerModel: 'z-ai', deny: ['glm'], canonical: 'z-ai' },
   { name: 'Z-AI (declared glm, deny z-ai)', providerModel: 'glm', deny: ['z-ai'], canonical: 'z-ai' },
   { name: 'Gemini (declared gemini, deny agy)', providerModel: 'gemini', deny: ['agy'], canonical: 'gemini' },
@@ -382,7 +381,6 @@ test('governance negative controls: unrelated providers are allowed, disallowedE
     modelPolicies: {
       claude: { standard: 'claude-3-7-sonnet' },
       openai: { standard: 'gpt-4o' },
-      'openai-codex': { standard: 'gpt-4o' },
     },
     executors: baseExecutors,
   };

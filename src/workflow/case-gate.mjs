@@ -14,19 +14,14 @@ import path from 'node:path';
 
 import { assertRunTimeoutMs, loadRunnerConfigForDir } from '../runner/dispatch/config.mjs';
 import { RunnerConfigError } from '../runner/dispatch/runner-config-error.mjs';
-import { runCommand } from '../runner/goal-check.mjs';
-import { createLockScope } from '../holder-lock/index.mjs';
-import { admitSuccessor, recordCustodyHandoff } from '../run-supervisor/cwd-lock.mjs';
-import { verifyCommandOf } from '../runner/execution/loops/verify.mjs';
-import { VERIFY_SEAT } from '../runner/execution/seat-resolver.mjs';
+import { answerOfVerify, outcomeOfVerify, runUnderCustody, runVerify } from '../runner/execution/custody-door.mjs';
+import { verifyCommandOf, verifySeatResult } from '../runner/execution/loops/verify.mjs';
 import { CaseAdmissionRefusedError } from '../runner/execution/case-admission-port.mjs';
 import { createCaseAdmissionPort } from './case-admission-port.mjs';
 import { GATE_RUN_PREFIX } from './case-runtime.mjs';
 
 /** The default activity a gate settles: the one that produces the integrated tree's receipt. */
 const GATE_ACTIVITY = 'integrate';
-
-const TAIL_LINES = 20;
 
 /**
  * Run the gate command in `worktree` for `activity` of case `caseId`, and settle the result.
@@ -46,7 +41,7 @@ const TAIL_LINES = 20;
  * @param {string} [params.reason]
  * @param {object} [params.runnerConfig] test seam: the config instead of the project's
  * @param {object} [params.env]
- * @returns {Promise<{ caseId: string, activity: string, reservationId: string, outcome: 'pass'|'findings', gate: object }>}
+ * @returns {Promise<{ caseId: string, activity: string, reservationId: string, outcome: 'pass'|'findings'|'execution-failure', gate: object }>}
  */
 export async function runCaseGate({
   mainRoot,
@@ -81,12 +76,10 @@ export async function runCaseGate({
   const port = createCaseAdmissionPort({ repoRoot: mainRoot, env });
   const unitRunId = `${GATE_RUN_PREFIX}${Date.now()}-${crypto.randomBytes(4).toString('hex')}`;
   // The gate's command runs as a borrower of the worktree's custody lease, so killing the gate ends the command
-  // with it and a reservation whose custody is free is provably dead.
-  const custody = admitSuccessor(createLockScope('unit-custody'), path.join(mainRoot, '.fgos'), realWorktree);
+  // with it and a reservation whose custody is free is provably dead. Custody is released before the settle, so
+  // the worktree is quiet when the port gives its binding back.
   let admitted;
-  let result;
-  let startedAt;
-  try {
+  const verified = await runUnderCustody(path.join(mainRoot, '.fgos'), realWorktree, async (custody) => {
     admitted = port.admit({
       unitRunId,
       caseRef: { caseId, activity, ...(reason ? { reason } : {}) },
@@ -100,40 +93,28 @@ export async function runCaseGate({
       reason: reason ?? null,
     });
     if (admitted.refused) throw new CaseAdmissionRefusedError(admitted.refused);
-    startedAt = Date.now();
-    try {
-      result = await runCommand(verify, realWorktree, limit, { custody });
-      recordCustodyHandoff(custody, result);
-    } catch (error) {
-      result = { passed: false, status: null, timedOut: false, output: String(error?.message ?? error) };
-    }
-  } finally {
-    // Released before the settle, so the worktree is quiet when the port gives its binding back.
-    custody.release();
-  }
-  const passed = result.passed === true;
-  const outcome = passed ? 'pass' : 'findings';
-  const how = result.timedOut ? `timed out after ${limit}ms` : result.status === null ? 'could not run' : `exited ${result.status}`;
-  const tail = String(result.output ?? '').trim().split('\n').slice(-TAIL_LINES).join('\n');
+    return runVerify({ command: verify, cwd: realWorktree, timeoutMs: limit, custody });
+  });
+  // A verdict is the outcome as it stands; a check that did not run to an end is an execution failure, which the
+  // case treats as nothing proven.
+  const outcome = outcomeOfVerify(verified);
+  const passed = outcome === 'pass';
   const gate = {
     command: verify,
     passed,
-    status: result.status ?? null,
-    timedOut: result.timedOut === true,
-    durationMs: Date.now() - startedAt,
-    outputDigest: `sha256:${crypto.createHash('sha256').update(String(result.output ?? '')).digest('hex')}`,
+    status: verified.status,
+    timedOut: verified.infrastructure === 'timeout',
+    durationMs: verified.durationMs,
+    outputDigest: verified.outputDigest,
   };
+  const tail = verified.tail;
+  const seatResult = verifySeatResult(answerOfVerify(verified, 'Gate command', verify), 1);
 
   port.settle(admitted.reservationId, {
     caseId,
     outcome,
     unitRunId,
-    results: [{
-      seat: VERIFY_SEAT,
-      round: 1,
-      outcome,
-      findings: passed ? [] : [`Gate command ${how}: ${verify}${tail ? `\n${tail}` : ''}`],
-    }],
+    results: [seatResult],
     seatLaunchesUsed: 0,
     gate,
   });

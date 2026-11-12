@@ -19,7 +19,7 @@ import { bindableExecute } from '../helpers/work-seat-config.mjs';
 const executeAssignment = bindableExecute(executeAssignmentRaw);
 import { buildAssignment } from '../helpers/declared-assignment.mjs';
 import { interpretRunResult, validateRunResultV2 } from '../../src/runner/dispatch/run-result.mjs';
-import { normalizeProviderFamily } from '../../src/runner/dispatch/provider-adapter.mjs';
+import { familyOf } from '../../src/runner/dispatch/provider-adapter.mjs';
 import { readRunSnapshot } from '../../src/verbs/dispatch/show-run.mjs';
 import { watchRunUseCase } from '../../src/verbs/dispatch/watch.mjs';
 import { reconcilePlanUseCase, DispatchReconcileError } from '../../src/verbs/dispatch/reconcile.mjs';
@@ -39,18 +39,17 @@ function runFgos(args, options = {}) {
 // ─── 2. F5: Declared Vendor Precedence Over CLI Harness ──────────
 
 test('F5: declared vendor takes precedence over CLI harness; cross-vendor executor needs opt-in, same-family is allowed', async () => {
-  // 2a. Unit tests for normalizeProviderFamily: declared vendor takes precedence over command
-  assert.equal(normalizeProviderFamily('deepseek', 'pi'), 'deepseek', 'pi harness running deepseek must be deepseek');
-  assert.equal(normalizeProviderFamily('openai', 'pi'), 'openai-codex', 'pi harness running openai must normalize to openai-codex');
-  assert.equal(normalizeProviderFamily('openai-codex', 'pi'), 'openai-codex');
-  assert.equal(normalizeProviderFamily('z-ai', 'claude'), 'z-ai', 'claude harness running GLM/z-ai must be z-ai');
-  assert.equal(normalizeProviderFamily('glm', 'claude'), 'z-ai');
-  assert.equal(normalizeProviderFamily('claude', 'codex'), 'claude', 'declared claude takes precedence over codex command');
+  // 2a. Unit tests for familyOf: declared vendor takes precedence over command
+  assert.equal(familyOf('deepseek', 'pi'), 'deepseek', 'pi harness running deepseek must be deepseek');
+  assert.equal(familyOf('openai', 'pi'), 'openai', 'pi harness running openai must normalize to openai');
+  assert.equal(familyOf('z-ai', 'claude'), 'z-ai', 'claude harness running GLM/z-ai must be z-ai');
+  assert.equal(familyOf('glm', 'claude'), 'z-ai');
+  assert.equal(familyOf('claude', 'codex'), 'claude', 'declared claude takes precedence over codex command');
   // Fallback to command when no providerModel/provider is declared:
-  assert.equal(normalizeProviderFamily(undefined, 'codex'), 'openai-codex');
-  assert.equal(normalizeProviderFamily(undefined, 'claude'), 'claude');
-  assert.equal(normalizeProviderFamily(undefined, 'pi'), 'pi');
-  assert.equal(normalizeProviderFamily(undefined, 'agy'), 'gemini');
+  assert.equal(familyOf(undefined, 'codex'), 'openai');
+  assert.equal(familyOf(undefined, 'claude'), 'claude');
+  assert.equal(familyOf(undefined, 'pi'), 'pi');
+  assert.equal(familyOf(undefined, 'agy'), 'gemini');
 
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-f5-regression-'));
   const workerScript = path.join(tmp, 'worker.mjs');
@@ -163,7 +162,7 @@ test('F5: declared vendor takes precedence over CLI harness; cross-vendor execut
       cwd: tmp,
       options: { disallowedProviders: ['openai'] },
     }),
-    (err) => err instanceof RunnerConfigError && /governance gate rejected provider "openai-codex"/.test(err.message),
+    (err) => err instanceof RunnerConfigError && /governance gate rejected provider "openai"/.test(err.message),
   );
 
   fs.rmSync(tmp, { recursive: true, force: true });

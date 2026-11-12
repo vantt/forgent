@@ -8,6 +8,7 @@ import { patternHistoryOutcome } from './loops/history-outcome.mjs';
 import { VALID_OUTCOMES } from './loops/panel.mjs';
 import { seatsOfRecord, collaborationOfRecord } from './legacy-seat-read.mjs';
 import { seatKind, VERIFY_SEAT } from './seat-resolver.mjs';
+import { shippedCatalog } from '../dispatch/shipped-catalog.mjs';
 
 // Version 2: every seat carries an owner-written kind, and a finished unit whose pattern was never
 // recorded is published as UNDETERMINED_OUTCOME instead of being derived as if it were solo. Each
@@ -71,7 +72,7 @@ export function buildUnitSummary(unitDir, { legacyCompletion = null } = {}) {
   // --pattern was never kept), so the pattern stays unknown rather than defaulting to solo.
   const pin = record.collaboration;
   const pattern = record.pattern ?? record.unit?.pattern ?? null;
-  const decoded = (pin || pattern === null) ? null : collaborationOfRecord(record);
+  const decoded = (pin || pattern === null) ? null : collaborationOfRecord(record, { shipped: shippedCatalog() });
   const loop = pin?.effective?.loop ?? (decoded?.recognized ? decoded.effective.loop : null);
   const params = pin?.effective?.params ?? decoded?.effective?.params ?? {};
   const cfg = record.configSnapshot?.runner ?? {};

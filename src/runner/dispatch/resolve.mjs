@@ -9,6 +9,7 @@
 // barrel. See `docs/history/dispatch-activation-and-handoff-redesign/
 // CONTEXT.md` D7 for the split rationale.
 
+import { familyOf } from './provider-adapter.mjs';
 import { EXECUTOR_CARRIES, CLAUDE_CLI_COMMANDS, EXECUTOR_MISSING_MESSAGE, normalizePreferCandidates } from './config.mjs';
 import { RunnerConfigError } from './runner-config-error.mjs';
 import { credentialStoreOf } from './provider-capacity.mjs';
@@ -129,30 +130,6 @@ export function resolveCapabilityDetailsFromHints({
   const anchorCapability = requiredAnchors[0] ?? policyAnchors.sort()[0] ?? null;
 
   return { capability, anchorCapability };
-}
-
-/**
- * Derive a executor's PROVIDER FAMILY (tsk-2uf-1, Phase 00 R6, fixes H2a):
- * the executor's own declared `providerModel` field wins, then `provider`,
- * then a Claude-CLI-command inference, then the resolved command literal
- * itself. Extracted (pure move, byte-identical for every existing caller)
- * from `resolveExecutorConfig`'s own inline derivation below so a second
- * caller (the dispatch policy's pre-spawn policy resolution, which has
- * no resolved `executor.command` yet) reads the SAME rule instead of a
- * third, independently-drifting copy of it — `resolvedCommand` defaults to
- * `'claude'` for that caller, which resolves through the
- * `CLAUDE_CLI_COMMANDS` branch to `'claude'`, matching R6's own simpler
- * rule ("default to claude only when the executor is registered but names
- * no providerModel of its own").
- */
-export function deriveProviderFamily(executorEntry, resolvedCommand = 'claude') {
-  return typeof executorEntry?.providerModel === 'string' && executorEntry.providerModel.trim()
-    ? executorEntry.providerModel
-    : typeof executorEntry?.provider === 'string' && executorEntry.provider.trim()
-      ? executorEntry.provider
-      : CLAUDE_CLI_COMMANDS.includes(resolvedCommand)
-        ? 'claude'
-        : resolvedCommand;
 }
 
 /**
@@ -438,7 +415,7 @@ export function resolveExecutorConfig(cfg, tier, executorId, fgosDir, contentCar
   };
   const isEnvUrlOverride = typeof envTarget === 'string' && envTarget.trim().length > 0 && !isAnthropicApiHost(envTarget);
 
-  const providerFamily = deriveProviderFamily(executorEntry, executor.command);
+  const providerFamily = familyOf(executorEntry, executor.command);
 
   const egressTarget = isEnvUrlOverride ? envTarget : executor.command;
 
