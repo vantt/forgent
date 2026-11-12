@@ -4,7 +4,7 @@
 Document type: BA-grade subcomponent specification
 Audience: Human reviewer, maintainer, implementation agent, documentation agent
 Purpose: Define how a project run by fgOS places every piece of maintained documentation in a space of axes, so that a writer finds the document that already holds what it wants to write before it may create a new one, and so that the space improves itself over time
-Design status: Draft for owner review, revised 2026-11-12 with the owner's decisions of that day (section 17). Not signed. Questions 1, 2, 3, 5, 6 and 7 of section 13 are decided; 4 and 8 are open.
+Design status: Draft for owner review, revised 2026-11-12 with the owner's decisions of that day (section 17). Not signed. Questions 1 to 7 of section 13 are decided; 8 waits for signing.
 Implementation: Not started. Axis values for the fgOS repository are measured on 2026-11-12; the search view, the locate verb, the write-door refusal and the observer do not exist yet
 Canonical: No (becomes canonical when signed)
 Provenance: Written by the DOCOS lead after the owner asked for a dedicated spec on 2026-11-12, from the documentation area draft, the 2026-08 identity-axis discussion, measurements of docs/doc-registry.json and the maintained corpus, and a locate prototype run on 2026-11-12
@@ -129,7 +129,7 @@ Why a section and not a whole document: a spec of 200 KB answers many questions,
 
 | Axis | Kind | Values per section | Value set | Who sets it | Tier that holds the values |
 |---|---|---|---|---|---|
-| `area` | locating | exactly one | closed, opened by admission | derived from path; for new content, from what the change touches | project instance (rules in 5.7) |
+| `area` | locating | exactly one | closed, opened by admission | derived from path; for new content, chosen by the writer from the closed list | project instance (rules in 5.7) |
 | `question` | locating | exactly one | closed | writer, checked against the document kind | core (5.4) |
 | `audience` | surface, not identity | one or more | closed, subdivided per project | derived from root and document kind | core (5.5), subdivisions in the instance |
 | `identifiers` | narrowing | many | open, but every value must resolve | extracted by the indexer | kinds in core (5.6) and profiles (6), values in registers |
@@ -214,7 +214,7 @@ Rules:
 - **Closed, opened by admission.** A new value comes with an overview document that says what the area covers. For a software project that document is the area spec; for a business it can be a short area overview.
 - **Seeded at setup.** A new project does not start empty. `fgos setup` proposes a starter set from what already exists: the code tree or component map for software; product lines, functions and channels for a business; the domain profile's starter areas when nothing exists yet. The owner approves the starter set once.
 - **No catch-all.** There is no `general` or `misc` value. Content that fits no area is a signal for the observer (section 8.5.2), not a place.
-- **Proposed from the change.** For new content, locate proposes `area` from what the change touches (for software, through a path-to-area table, section 13 question 4). The writer may override it with a reason.
+- **Chosen by the writer from the closed list.** For new content, the writer picks `area` from the project's value list, using each value's one-line description (table 7.1 for fgOS); locate checks only that the value exists. A wrong pick is caught by the `outside-region` rule of 8.1. There is no table that maps code paths or other changed things to areas in this version (section 13, question 4).
 - **Sub-areas.** An area may carry one closed second level, never a third. A sub-area is opened like an area, with its own overview document and admission; the observer proposes it when an area grows too large (8.5.2), a writer never creates one. For software, sub-areas follow existing subcomponent boundaries where they exist (the fgOS runner area has 8). A user-document slot is then (area, sub-area, question), for example the path docs/knowledge/runner/worktree/pitfall.md.
 
 ## 6. Domain Profiles
@@ -362,9 +362,9 @@ Input: the change the writer intends (its diff when there is one, and a short st
 
 Steps:
 
-1. **Propose locating values.** `area` from what the change touches; `question` from the writer, checked against table 5.4.
+1. **Take locating values** from the writer: `area` and `question`, each checked against its closed list. A writer that cannot choose between two areas gives both.
 2. **Extract narrowing values** from the diff and the statement, with the same extractor the indexer uses.
-3. **Filter** sections by `area` and `question`. A change that touches several areas proposes each of them. If nothing matches, widen once to the same `question` in all areas, then to the same `area` in all questions, and say which widening was used. A section outside the region whose identifier score is above threshold is still returned, marked `outside-region`, because the region can be guessed wrong (example 8.6.2).
+3. **Filter** sections by `area` and `question`; a writer that gave two areas filters on both. If nothing matches, widen once to the same `question` in all areas, then to the same `area` in all questions, and say which widening was used. A section outside the region whose identifier score is above threshold is still returned, marked `outside-region`, because the writer can choose the wrong region (example 8.6.2).
 4. **Rank** the filtered sections by weighted identifier overlap (5.6), then by full-text score as a tiebreak and as the fallback when the change names no identifier.
 5. **Return** coordinates, the top candidates with their overlap and score, and a verdict: `owner-found` (one candidate above threshold), `ambiguous` (two or more above threshold), `none-above-threshold`.
 6. **Log** the query identifiers, the region, the verdict and the candidates to the locate log. When the writer finishes, the section it actually grew or created is added to the same entry.
@@ -436,7 +436,7 @@ The locate log lives in the observe area's records, not in a new store.
 |---|---|---|---|
 | Area too large | section count or size above threshold (fgOS `agent-coordination`: 429 documents) | split into sub-areas, cut along clusters of identifiers that occur together | reviewer, inside the area |
 | Repeated misses | repeated `none-above-threshold` in one area with the same identifier cluster | open an area or sub-area for that cluster | owner for a top-level area; reviewer for a sub-area |
-| Frequent `outside-region` | content guessed for area A keeps being owned in area B | move the sections, or fix the path-to-area table | reviewer within budget; owner beyond |
+| Frequent `outside-region` | content guessed for area A keeps being owned in area B | move the sections, or sharpen the two areas' descriptions | reviewer within budget; owner beyond |
 | Duplicates | two sections in different documents share many identifiers | merge into one owner; the other links | reviewer |
 | Dead area | not matched or grown for a long period | merge into the nearest area or retire | owner |
 
@@ -466,7 +466,7 @@ The situation: an agent fixed a bug where a worktree with live uncommitted work 
 | Step | Input or result |
 |---|---|
 | Touched code | `src/runner/worktree.mjs` |
-| Locating values | `area = runner` (from the path), `question = pitfall` (from the writer) |
+| Locating values | `area = runner`, `question = pitfall` (both from the writer) |
 | Narrowing values | `path:src/runner/worktree.mjs` (in 29 sections, weight 5.27), `symbol:reclaimOrphanedCheckout` (6 sections, 6.85), `symbol:isCheckoutDirty` (7 sections, 6.69), `cli-verb:fgos approve` (74 sections, 4.33) |
 | Region | 3057 of 5636 sections, because user documents are unset; 91 of them share at least one value |
 
@@ -493,7 +493,7 @@ The situation: commit `df7b73490` made `fgos workflow propose` read each closed 
 | Step | Input or result |
 |---|---|
 | Touched code | `src/workflow/case-inherit.mjs`, `src/workflow/propose-classify.mjs`, `src/runner/dispatch/write-scope.mjs` |
-| Locating values | `area = workflow` (most touched paths), `question = current-truth` |
+| Locating values | `area = workflow`, `question = current-truth` (both from the writer) |
 | Narrowing values | `cli-verb:fgos workflow propose` (3 sections, weight 7.54), `path:src/runner/dispatch/write-scope.mjs` (6 sections, 6.85); `globsMeet`, `inheritableMilestones` and the two workflow paths appear in no section yet |
 | Region | 3105 sections; 3 share a value |
 
@@ -510,7 +510,7 @@ What it shows:
 
 - `area` and `question` alone name the right document, the workflow spec. Inside it, three sections tie on one shared verb. The tie is broken by full text, or by the writer reading three sections, not three hundred.
 - New symbols carry no weight because no document mentions them yet. That is the normal case for new behavior: the writer grows the best-ranked section and names the new symbols, which the indexer then picks up.
-- The "one glob engine" part of the change is owned elsewhere: the git spec's rule RUL84 says there is one write-scope matcher. The region guessed from paths (`workflow`) would have hidden it. This is why locate proposes every touched area and returns strong matches marked `outside-region` (8.1, step 3). The change also touched the runner area, so proposing every touched area would have added `runner` to the region; RUL84 lives in `git`, which only the `outside-region` rule catches.
+- The "one glob engine" part of the change is owned elsewhere: the git spec's rule RUL84 says there is one write-scope matcher. The region the writer chose (`workflow`) would have hidden it, and so would `runner`, the other area the code lives in: RUL84 lives in `git`. Only the `outside-region` rule (8.1, step 3) catches it. This is also why this version needs no code-path-to-area table: even a correct table would have pointed at `workflow` and `runner`.
 
 ## 9. Rules And Invariants
 
@@ -557,7 +557,7 @@ What it shows:
 1. **Engine for the view.** *Decided 2026-11-12: (a).* (a) SQLite through the `rusqlite` crate, bundled build with FTS5: matches L3's "SQLite as view", and later views can share it. (b) `tantivy`, a Rust search engine: stronger ranking, but a second store kind that does only search. Recommendation: (a), confirmed by a Rust probe that FTS5 is present in the bundled build before the plan. Either way it is a new dependency and registers in setup and doctor.
 2. **Replace the open `purpose` axis of user documents with `area`.** *Decided 2026-11-12: yes.* This changes the identity and layout decisions D-tsk28x-1, 4 and 5 (purpose as the folder, `docs/<purpose>/<role>.md`), which the signed [knowledge-registry contract](../../../work-state/contracts/knowledge-registry.md) carries. Recommendation: yes; the measurement in section 2 is the new evidence. Existing topics stay readable; regrouping them becomes observer proposals.
 3. **Frame defaults for the reviewer.** *Decided 2026-11-12: as recommended.* Recommendation: up to 5 new topics or sub-areas per week inside existing areas, up to 20 section moves per week, register value additions unlimited but listed in the weekly digest; everything else goes to the owner in one batch.
-4. **Path-to-area table** (coding profile). No mechanical map from code path to area exists in the fgOS repository (`docs/architecture-manifest.json` maps 356 files to layers, not areas). Most `packages/<name>` and `src/<name>` folders match an area name. Recommendation: one table in the project instance, checked so every tracked source path maps to exactly one area.
+4. **Code-path-to-area table.** *Decided 2026-11-12: not in this version.* The only candidate sources were checked: `component-boundary.md` is a hand-written prose document imported in H1, still marked draft, edited in passing by many lanes, and nothing checks that its code mentions are complete (22 of 47 top-level code folders map to exactly one area there); `docs/architecture-manifest.json` is machine-readable and kept true by `test/architecture.test.mjs`, but maps files to layers, not areas. Building on the first would rest identity on the kind of document this spec is meant to fix. The writer picks `area` from the closed list, and `outside-region` catches a wrong pick (example 8.6.2 shows even a correct table would have missed the real owner). If the measurement of section 15 or the locate log shows wrong areas lowering recall, a table is proposed then, as one machine-readable file kept true by a test, on the model of the architecture manifest, never derived from prose.
 5. **Threshold, top-N and initial kind coefficients.** *Decided 2026-11-12: from the measurement.* Recommendation: set them from the measurement in section 15, not in advance.
 6. **A closed second level under `area`.** *Decided 2026-11-12: allowed, one level, as written in 5.7.* Without it, a user-document slot (area, question) holds one document per area, which grows large. Option: allow sub-areas, each opened like an area with its own overview (the fgOS runner area already has 8 subcomponents). Recommendation: allow it.
 7. **Where domain profiles live.** *Decided 2026-11-12: the standard profiles stay in this spec so the model reads as one document; extensions and new domains go under `domains/<domain>/` (section 6).*
@@ -565,7 +565,7 @@ What it shows:
 
 ## 14. Implementation Alignment
 
-Nothing is implemented. Reused when built: doc-health (extraction and checks), the dead-verb and dead-path rules (first two coding kinds), Convention classify, the knowledge registry (slots, lifecycle, split, merge, rename, path-move, lineage), the decision index and id minting, `fgos tool query`, the governance holder table, the observe area's records. New: the view component, the locate verb, the refusal at the write door, the observer, the path-to-area table, the `fgos doctor` freshness check, starter-area seeding in `fgos setup`. The documentation spec's statement that slice 1 adds no store and no new `fgos doc` verb no longer holds once this spec is signed; that is a deliberate change for the owner to accept.
+Nothing is implemented. Reused when built: doc-health (extraction and checks), the dead-verb and dead-path rules (first two coding kinds), Convention classify, the knowledge registry (slots, lifecycle, split, merge, rename, path-move, lineage), the decision index and id minting, `fgos tool query`, the governance holder table, the observe area's records. New: the view component, the locate verb, the refusal at the write door, the observer, the `fgos doctor` freshness check, starter-area seeding in `fgos setup`. The documentation spec's statement that slice 1 adds no store and no new `fgos doc` verb no longer holds once this spec is signed; that is a deliberate change for the owner to accept.
 
 No component-boundary change until the view component and the observer are placed; the plan states their rows.
 
@@ -609,3 +609,4 @@ After implementation: one owning proof per behavior at the lowest layer: extract
   - self-improvement for both areas and identifiers: an observer proposes items, a reviewer decides inside a frame, the owner decides the rest in batches.
 - 2026-11-12, owner, answers to section 13: question 1, the view uses SQLite through `rusqlite` with FTS5, after a Rust probe; question 2, `area` replaces the open `purpose` axis of user documents; question 3, the reviewer frame defaults as recommended; question 5, threshold, top-N and kind coefficients come from the measurement in section 15.
 - 2026-11-12, owner: question 6, one closed sub-area level is allowed; question 7, the standard domain profiles stay in this spec, because splitting them out from the start makes the model hard to read, and `domains/<domain>/` carries extensions and new domains.
+- 2026-11-12, owner: question 4, no code-path-to-area table in this version; the writer picks `area` from the closed list, and a table comes later only if measurement shows it is needed, built as a test-kept machine-readable file, never from prose such as `component-boundary.md`.
