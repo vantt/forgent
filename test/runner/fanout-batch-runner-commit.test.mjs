@@ -251,7 +251,8 @@ test('fanout batch: the batch runs its candidates concurrently -- each worker se
     fs.writeFileSync('output.txt', 'produced\\n');
     process.stdout.write('sawPeer=' + (inFlight() >= 2) + '\\n');
   `);
-  const { repoRoot, fgosDir } = setupExecutors({ 'fgos-coding-implement': worker }, [{ id: 'cand1' }, { id: 'cand2' }]);
+  // The worker's own declared env (read from the runner's at launch), the one way a variable reaches a seat.
+  const { repoRoot, fgosDir } = setupExecutors({ 'fgos-coding-implement': { ...worker, env: { FGOS_TEST_ASSIGNMENTS: '${FGOS_TEST_ASSIGNMENTS}' } } }, [{ id: 'cand1' }, { id: 'cand2' }]);
   const prior = process.env.FGOS_TEST_ASSIGNMENTS;
   process.env.FGOS_TEST_ASSIGNMENTS = path.join(fgosDir, 'assignments');
   let result;

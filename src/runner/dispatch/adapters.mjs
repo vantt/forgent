@@ -6,6 +6,7 @@
 // names during runner config loading) and transport.mjs (which imports
 // RunnerConfigError from the dispatch config).
 
+import fs from 'node:fs';
 import { resolveStateRoot } from '../../holder-lock/state-root.mjs';
 
 export const DEFAULT_ADAPTER = 'cli-spawn';
@@ -98,50 +99,32 @@ export function currentDispatchDepth() {
 }
 
 /**
- * The environment an executor-launched agent starts from: the caller's own, minus the Rust host's
- * recursion guard and any parent OMP/Pi profile overrides (`OMPCODE`, `OMP_PROFILE`, `PI_PROFILE`,
- * `PI_CONFIG_FILES`). The agent's hooks call the project shim, and a nested host refuses (exit 1)
- * whenever that guard is inherited; an inherited `OMP_PROFILE`/`PI_PROFILE` makes a child `omp`
- * ignore its own `PI_CODING_AGENT_DIR` (private home), and `OMPCODE=1` disables `herdr-omp-agent-state`.
+ * The ambient variables an executor-launched agent may start with, each with its reason, are named by one
+ * versioned contract (`worker-env-allowlist.v1.json`). Everything else of the caller's environment stays
+ * behind: a seat is not its controller, so the controller's session markers, messaging credentials
+ * (`CLAUDE_CODE_*`), API keys, tokens, host and lock authority, case authority and herdr cockpit never cross.
+ * A provider variable reaches a seat through the executor's declared `env` or its credential store.
+ */
+const ALLOWLIST = JSON.parse(fs.readFileSync(new URL('../../../packages/run-supervisor/contracts/worker-env-allowlist.v1.json', import.meta.url), 'utf8'));
+const WORKER_ENV_NAMES = new Set(ALLOWLIST.names.map(({ name }) => name));
+const WORKER_ENV_PREFIXES = ALLOWLIST.prefixes.map(({ prefix }) => prefix);
+
+/**
+ * The environment an executor-launched agent starts from: the names the allowlist contract lists, nothing else,
+ * plus the pinned state root. An allowlist, not a denylist: a name added to the caller's environment
+ * tomorrow does not reach a seat until someone names it here.
  *
- * No session id crosses either: `FGOS_SESSION_ID`, `CLAUDE_CODE_SESSION_ID`, `CODEX_THREAD_ID` and `PI_SESSION_ID` (with
- * `PI_SESSION_FILE`, which pi and omp both export) name the caller, and a worker that inherited one would write as its parent. The worker's own writer id is
- * minted from its attempt id (`mintAttemptWriterId`) and set by whoever launches it.
- *
- * Case authority is no more inherited than identity: `FGOS_CASE_ID` and `FGOS_CASE_RESERVATION` are
- * dropped here and set again only from the reservation the door admitted for this very launch.
- *
- * Host authority is not inherited either: `FGOS_HOST_BIN` is dropped, so a worker cannot point its
- * parent's next seat binding at another host binary.
- *
- * Lock authority never crosses this boundary: `FGOS_LOCK_FD` (a borrowed description's slot, useless
- * without the description and wrong if believed), `FGOS_LOCK_JOB` (a borrow job's name, only meaningful
- * inside that job) and `FGOS_MAIN_LOCK_HOLDER_PID` are dropped. The
- * state root is pinned to this process's own resolved root (`FGOS_STATE_ROOT`), so a worker with a
+ * The state root is pinned to this process's own resolved root (`FGOS_STATE_ROOT`), so a worker with a
  * sandbox HOME still shares the machine-scope locks of its parent instead of moving them; when no
- * host can resolve that root the pin is left out rather than failing the spawn.
+ * host can resolve that root the pin is left out rather than failing the spawn. The worker's own writer id
+ * is minted from its attempt id (`mintAttemptWriterId`) and set by whoever launches it; the case it names
+ * is set from the reservation the door admitted for this very launch (`caseContextEnv`).
  */
 export function workerBaseEnv(baseEnv = process.env) {
-  const {
-    FGOS_RUST_HOST_RECURSION_GUARD: _guard,
-    OMPCODE: _ompcode,
-    OMP_PROFILE: _ompProfile,
-    PI_PROFILE: _piProfile,
-    PI_CONFIG_FILES: _piConfigFiles,
-    FGOS_LOCK_FD: _lockFd,
-    FGOS_LOCK_JOB: _lockJob,
-    FGOS_MAIN_LOCK_HOLDER_PID: _mainLockHolderPid,
-    FGOS_STATE_ROOT: _inheritedStateRoot,
-    FGOS_HOST_BIN: _hostBin,
-    FGOS_SESSION_ID: _sessionId,
-    FGOS_CASE_ID: _caseId,
-    FGOS_CASE_RESERVATION: _caseReservation,
-    CLAUDE_CODE_SESSION_ID: _claudeSessionId,
-    CODEX_THREAD_ID: _codexThreadId,
-    PI_SESSION_ID: _piSessionId,
-    PI_SESSION_FILE: _piSessionFile,
-    ...rest
-  } = baseEnv;
+  const rest = {};
+  for (const [name, value] of Object.entries(baseEnv)) {
+    if (typeof value === 'string' && (WORKER_ENV_NAMES.has(name) || WORKER_ENV_PREFIXES.some((prefix) => name.startsWith(prefix)))) rest[name] = value;
+  }
   let stateRoot;
   try {
     stateRoot = resolveStateRoot().stateRoot;

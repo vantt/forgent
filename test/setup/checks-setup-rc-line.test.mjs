@@ -58,7 +58,7 @@ test('setup from a copy of fgos that is not in a git checkout declines the rc wr
   fs.mkdirSync(copyRoot, { recursive: true });
   const repoRoot = path.resolve(__dirname, '../..');
   // The parts of the npm package `setup` reads; the tier ladder contract loads with the runner config the config doctor rows with the registry and the exit-code table with the shell entry.
-  for (const entry of ['bin', 'src', 'scripts', 'domains', 'packages/seat-binding/contracts', 'packages/config/contracts/doctor-rows.v1.json', 'packages/host-runtime/contracts/exit-codes.v1.json', 'package.json']) {
+  for (const entry of ['bin', 'src', 'scripts', 'domains', 'packages/seat-binding/contracts', 'packages/config/contracts/doctor-rows.v1.json', 'packages/host-runtime/contracts/exit-codes.v1.json', 'packages/run-supervisor/contracts/worker-env-allowlist.v1.json', 'package.json']) {
     fs.mkdirSync(path.dirname(path.join(copyRoot, entry)), { recursive: true });
     fs.cpSync(path.join(repoRoot, entry), path.join(copyRoot, entry), { recursive: true });
   }

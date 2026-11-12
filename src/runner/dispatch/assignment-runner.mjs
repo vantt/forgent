@@ -91,7 +91,7 @@ import { adoptRun } from '../../run-supervisor/client.mjs';
 import { register as registerDeliveredAttempt, unregister as unregisterDeliveredAttempt, beginLaunch as beginAttemptLaunch, endLaunch as endAttemptLaunch } from '../../run-supervisor/cancel-registry.mjs';
 import { watchWritesOutsideWorkspace } from '../../run-supervisor/stray-writes.mjs';
 import { prepareTerminalAttempt, followPaneScreen, withoutPaneEnv, PANE_IDLE_TIMEOUT_MS, ORPHAN_SETTLE_MS } from './herdr-round.mjs';
-import { resolveHerdrBin, workLabelOf } from './terminal-slot.mjs';
+import { resolveHerdrBin, workLabelOf, herdrEndpointEnv } from './terminal-slot.mjs';
 import { retainFailedPaneMsOf } from '../../terminal-control/config.mjs';
 import { finalizeAttemptHome, prepareConfinementForLaunch } from './confinement/authority.mjs';
 import { CREDENTIAL_HOME_KEPT } from './confinement/cleanup.mjs';
@@ -985,7 +985,8 @@ async function buildLaunch(attempt, ctx) {
       tier: effectivePolicy.tier,
       model: effectivePolicy.model,
       herdrBin: resolveHerdrBin(opts.herdrBin),
-      fullEnv: { ...workerBaseEnv(), ...resolveExecutorEnv(resolvedCmd.env) },
+      // The controller's own view: the worker's allowed names plus the herdr endpoint it dials (never given to the seat).
+      fullEnv: { ...workerBaseEnv(), ...herdrEndpointEnv(), ...resolveExecutorEnv(resolvedCmd.env) },
       attemptEnv: prepResult.attempt.secretEnv,
       confinement: resolvedCmd.confinement,
       permissionMode: resolvedCmd.permissionMode,

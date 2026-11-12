@@ -352,17 +352,17 @@ test('spawnWorker threads a dispatch depth of 1 into a fresh worker, and refuses
   }
 });
 
-test('spawnWorker does not hand the Rust host recursion guard to the worker, and keeps the rest of the environment', async () => {
-  const guardEcho = writeScript(scriptDir(), 'guard', `import fs from 'node:fs';\nfs.writeFileSync('ran.txt', 'ran\\n'); process.stdout.write('guard ' + JSON.stringify({ guard: process.env.FGOS_RUST_HOST_RECURSION_GUARD ?? null, kept: process.env.FGOS_GUARD_TEST_KEPT ?? null }));\n`);
+test('spawnWorker does not hand the Rust host recursion guard to the worker, and keeps an allowed name of it', async () => {
+  const guardEcho = writeScript(scriptDir(), 'guard', `import fs from 'node:fs';\nfs.writeFileSync('ran.txt', 'ran\\n'); process.stdout.write('guard ' + JSON.stringify({ guard: process.env.FGOS_RUST_HOST_RECURSION_GUARD ?? null, kept: process.env.LC_GUARD_TEST_KEPT ?? null }));\n`);
   const fx = fixture(baseConfig([guardEcho]));
-  const prior = { guard: process.env.FGOS_RUST_HOST_RECURSION_GUARD, kept: process.env.FGOS_GUARD_TEST_KEPT };
+  const prior = { guard: process.env.FGOS_RUST_HOST_RECURSION_GUARD, kept: process.env.LC_GUARD_TEST_KEPT };
   process.env.FGOS_RUST_HOST_RECURSION_GUARD = '1';
-  process.env.FGOS_GUARD_TEST_KEPT = 'yes';
+  process.env.LC_GUARD_TEST_KEPT = 'yes';
   try {
     const result = await fx.run();
     assert.deepEqual(echoed(result.stdout), { guard: null, kept: 'yes' });
   } finally {
-    for (const [key, value] of [['FGOS_RUST_HOST_RECURSION_GUARD', prior.guard], ['FGOS_GUARD_TEST_KEPT', prior.kept]]) {
+    for (const [key, value] of [['FGOS_RUST_HOST_RECURSION_GUARD', prior.guard], ['LC_GUARD_TEST_KEPT', prior.kept]]) {
       if (value !== undefined) process.env[key] = value;
       else delete process.env[key];
     }

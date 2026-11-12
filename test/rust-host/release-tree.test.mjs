@@ -155,6 +155,10 @@ test('R1 & R2: Release tree builder stages release tree and produces canonical m
       fs.existsSync(path.join(legacyNodeDir, 'packages', 'host-runtime', 'contracts', 'exit-codes.v1.json')),
       'The exit-code table the shell entry loads must be staged in legacy-node',
     );
+    assert.ok(
+      fs.existsSync(path.join(legacyNodeDir, 'packages', 'run-supervisor', 'contracts', 'worker-env-allowlist.v1.json')),
+      'The worker environment allowlist every seat starts from must be staged in legacy-node',
+    );
 
     // 6. Verify manifest.json and its required §5 fields
     const manifestPath = path.join(tempOut, 'manifest.json');

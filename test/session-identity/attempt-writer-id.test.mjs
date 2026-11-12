@@ -37,27 +37,8 @@ test('every shared vector mints to the same writer id through the door', needsHo
   }
 });
 
-test('workerBaseEnv drops every session id of the parent and keeps the rest', () => {
-  const env = workerBaseEnv({
-    PATH: '/usr/bin',
-    FGOS_SESSION_ID: 'parent-session',
-    CLAUDE_CODE_SESSION_ID: 'claude-parent',
-    CODEX_THREAD_ID: 'codex-parent',
-    PI_SESSION_ID: 'pi-parent',
-    PI_SESSION_FILE: '/sessions/pi-parent.jsonl',
-  });
-  assert.equal(env.FGOS_SESSION_ID, undefined);
-  assert.equal(env.CLAUDE_CODE_SESSION_ID, undefined);
-  assert.equal(env.CODEX_THREAD_ID, undefined);
-  assert.equal(env.PI_SESSION_ID, undefined);
-  assert.equal(env.PI_SESSION_FILE, undefined);
-  assert.equal(env.PATH, '/usr/bin');
-});
-
-test('workerBaseEnv drops an empty session id too, so it cannot shadow the minted one', () => {
-  const env = workerBaseEnv({ PATH: '/usr/bin', FGOS_SESSION_ID: '' });
-  assert.equal('FGOS_SESSION_ID' in env, false);
-});
+// What a worker's base environment drops (every parent session id, an empty `FGOS_SESSION_ID` too) is proved once, by the
+// allowlist test in test/runner/dispatch/worker-env-case-context.test.mjs.
 
 test('resuming the same attempt gives the same writer id and the same env digest', needsHost, () => {
   const build = () => {

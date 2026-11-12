@@ -1,0 +1,127 @@
+{
+  "contract": {
+    "id": "worker-env-allowlist",
+    "version": 1
+  },
+  "description": "The ambient environment variable names a seat may start with; every other name of its controller's environment stays behind. Read by workerBaseEnv (src/runner/dispatch/adapters.mjs); a launcher that builds a seat's environment elsewhere reads this same file. FGOS_STATE_ROOT is pinned by workerBaseEnv itself, not listed. A provider variable reaches a seat through the executor's declared env or its credential store, never the ambient environment.",
+  "names": [
+    {
+      "name": "PATH",
+      "reason": "finds the agent CLI and the project shim its hooks call"
+    },
+    {
+      "name": "HOME",
+      "reason": "the user's home: the CLI's default login home, the shim's store formula, the mailbox hook"
+    },
+    {
+      "name": "USER",
+      "reason": "the user identity a CLI and its shell report"
+    },
+    {
+      "name": "LOGNAME",
+      "reason": "the user identity a CLI and its shell report"
+    },
+    {
+      "name": "SHELL",
+      "reason": "the shell a CLI's bash tool starts"
+    },
+    {
+      "name": "TMPDIR",
+      "reason": "where temporary files go"
+    },
+    {
+      "name": "TZ",
+      "reason": "time zone"
+    },
+    {
+      "name": "LANG",
+      "reason": "locale"
+    },
+    {
+      "name": "LANGUAGE",
+      "reason": "locale"
+    },
+    {
+      "name": "TERM",
+      "reason": "terminal capability; a pane's own value replaces it"
+    },
+    {
+      "name": "COLORTERM",
+      "reason": "terminal capability; a pane's own value replaces it"
+    },
+    {
+      "name": "CLAUDE_CONFIG_DIR",
+      "reason": "login home of a launch with no credential store, read in place (a path, not a secret); a declared homeEnv wins"
+    },
+    {
+      "name": "CODEX_HOME",
+      "reason": "login home of a launch with no credential store, read in place (a path, not a secret); a declared homeEnv wins"
+    },
+    {
+      "name": "PI_CODING_AGENT_DIR",
+      "reason": "login home of a launch with no credential store, read in place (a path, not a secret); a declared homeEnv wins"
+    },
+    {
+      "name": "HTTP_PROXY",
+      "reason": "network route: passes although a proxy URL can carry credentials, because a seat cannot reach its provider without it behind a proxy or a private CA"
+    },
+    {
+      "name": "HTTPS_PROXY",
+      "reason": "network route: passes although a proxy URL can carry credentials, because a seat cannot reach its provider without it behind a proxy or a private CA"
+    },
+    {
+      "name": "NO_PROXY",
+      "reason": "network route: passes although a proxy URL can carry credentials, because a seat cannot reach its provider without it behind a proxy or a private CA"
+    },
+    {
+      "name": "http_proxy",
+      "reason": "network route: passes although a proxy URL can carry credentials, because a seat cannot reach its provider without it behind a proxy or a private CA"
+    },
+    {
+      "name": "https_proxy",
+      "reason": "network route: passes although a proxy URL can carry credentials, because a seat cannot reach its provider without it behind a proxy or a private CA"
+    },
+    {
+      "name": "no_proxy",
+      "reason": "network route: passes although a proxy URL can carry credentials, because a seat cannot reach its provider without it behind a proxy or a private CA"
+    },
+    {
+      "name": "SSL_CERT_FILE",
+      "reason": "private CA bundle location (a path): a seat cannot reach its provider without it behind a proxy or a private CA"
+    },
+    {
+      "name": "SSL_CERT_DIR",
+      "reason": "private CA bundle location (a path): a seat cannot reach its provider without it behind a proxy or a private CA"
+    },
+    {
+      "name": "NODE_EXTRA_CA_CERTS",
+      "reason": "private CA bundle location (a path): a seat cannot reach its provider without it behind a proxy or a private CA"
+    },
+    {
+      "name": "CARGO_HOME",
+      "reason": "toolchain home (a path): a seat that builds or tests fails with errors that look unrelated when it moves"
+    },
+    {
+      "name": "RUSTUP_HOME",
+      "reason": "toolchain home (a path): a seat that builds or tests fails with errors that look unrelated when it moves"
+    },
+    {
+      "name": "GOPATH",
+      "reason": "toolchain home (a path): a seat that builds or tests fails with errors that look unrelated when it moves"
+    },
+    {
+      "name": "GOROOT",
+      "reason": "toolchain home (a path): a seat that builds or tests fails with errors that look unrelated when it moves"
+    },
+    {
+      "name": "JAVA_HOME",
+      "reason": "toolchain home (a path): a seat that builds or tests fails with errors that look unrelated when it moves"
+    }
+  ],
+  "prefixes": [
+    {
+      "prefix": "LC_",
+      "reason": "locale categories"
+    }
+  ]
+}

@@ -15,6 +15,11 @@ export function resolveHerdrBin(optsHerdrBin, env = process.env) {
   return optsHerdrBin?.trim() || env.FGOS_HERDR_BIN?.trim() || 'herdr';
 }
 
+/** The herdr endpoint entries (`HERDR_*`) of `env`: how the controller reaches its herdr server, never what a seat receives. */
+export function herdrEndpointEnv(env = process.env) {
+  return Object.fromEntries(Object.entries(env ?? {}).filter(([name, value]) => name.startsWith('HERDR_') && typeof value === 'string'));
+}
+
 export class TerminalSlotError extends Error {
   constructor(code, message, details = {}) {
     super(message);
@@ -56,10 +61,7 @@ const clients = new Map();
  * HERDR_SOCKET_PATH of a confined round); only `HERDR_*` entries are sent.
  */
 export function createRoundTerminalControl({ herdrBin, herdrEnv, config, hostBin, timeoutMs } = {}) {
-  const env = {};
-  for (const [name, value] of Object.entries(herdrEnv ?? {})) {
-    if (name.startsWith('HERDR_') && typeof value === 'string') env[name] = value;
-  }
+  const env = herdrEndpointEnv(herdrEnv);
   const identity = JSON.stringify([hostBin ?? null, herdrBin ?? null, env, config ?? null, timeoutMs ?? null]);
   let client = clients.get(identity);
   if (!client) {

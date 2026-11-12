@@ -13,6 +13,7 @@ fs.writeFileSync(path.join(notes, 'agent-env.json'), JSON.stringify({
   pid: process.pid,
   argv: process.argv.slice(2),
   cwd: process.cwd(),
+  envNames: Object.keys(process.env).sort(),
   env: Object.fromEntries(['FGOS_SESSION_ID', 'FGOS_PARENT_WRITER_ID', 'CLAUDE_CODE_SESSION_ID', 'CODEX_THREAD_ID', 'HOME'].map((name) => [name, process.env[name] ?? null])),
 }));
 

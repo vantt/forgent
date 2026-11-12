@@ -24,7 +24,7 @@ import os from 'node:os';
 import { DispatchError } from '../../run-supervisor/dispatch-error.mjs';
 import { terminalRouteConfig } from '../../terminal-control/config.mjs';
 import { normalizeAgentName } from '../../native/proof-helpers.mjs';
-import { createRoundTerminalControl, portKey, slotDisplay, refusalError } from './terminal-slot.mjs';
+import { createRoundTerminalControl, portKey, slotDisplay, refusalError, herdrEndpointEnv } from './terminal-slot.mjs';
 import { briefPaths, renderBrief, renderPointer } from './brief.mjs';
 import { writeVisibility } from './visibility-session.mjs';
 import { createWorkerHome, removeWorkerHome, redactWorkerHome } from './worker-home.mjs';
@@ -404,7 +404,7 @@ export async function prepareTerminalAttempt(ctx) {
   // The herdr endpoint the pane lives behind: the session this round lives in.
   const endpointEnv = {
     ...(herdrBin ? { FGOS_HERDR_BIN: herdrBin } : {}),
-    ...Object.fromEntries(Object.entries(sessionEnv ?? {}).filter(([name, value]) => name.startsWith('HERDR_') && typeof value === 'string')),
+    ...herdrEndpointEnv(sessionEnv),
   };
   // Built inside the try below: the private home exists from here on, and a terminal config that cannot
   // build a control must give it back like every other failure of this function.

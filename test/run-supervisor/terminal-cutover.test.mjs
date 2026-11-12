@@ -57,14 +57,16 @@ test('a herdr-spawn seat runs as a terminal attempt: brief typed by the supervis
   assert.equal(fs.existsSync(path.join(attemptDir, 'controller', 'commands')), false, 'no launch-command record of the old herdr door');
 });
 
-test('the agent runs as the attempt: its writer id is minted from the attempt, the controller\'s session ids and pane variables never reach it', { skip: noHost, timeout: 180_000 }, async () => {
+test('the agent runs as the attempt: its writer id is minted from the attempt, the controller\'s session ids, pane variables and every name outside the worker allowlist never reach it', { skip: noHost, timeout: 180_000 }, async () => {
   const project = await newProject('ident');
-  const run = project.startController({ env: { CLAUDE_CODE_SESSION_ID: 'parent-session', CODEX_THREAD_ID: 'parent-thread', HERDR_PANE_ID: 'cockpit:p1', TERM: 'xterm-256color' } });
+  const run = project.startController({ env: { CLAUDE_CODE_SESSION_ID: 'parent-session', CODEX_THREAD_ID: 'parent-thread', HERDR_PANE_ID: 'cockpit:p1', TERM: 'xterm-256color', CANARY_SECRET: 'x', CLAUDE_CODE_MESSAGING_TOKEN: 'x', CLAUDE_CODE_CHILD_SESSION: '1', SOME_PROVIDER_API_KEY: 'x' } });
   const { exit } = await finishAttempt(project, run);
   assert.equal(exit.code, 0, JSON.stringify(run.output()));
 
   const envelope = readJson(path.join(project.attemptDir(), 'envelope.json'));
   const agent = project.agentEnv();
+  const canary = (names) => names.filter((name) => ['CANARY_SECRET', 'SOME_PROVIDER_API_KEY'].includes(name) || /^CLAUDE_CODE_|TOKEN$|_KEY$/.test(name));
+  assert.deepEqual(canary(agent.envNames), [], 'a pane seat starts from the allowlist, not from the controller environment');
   assert.equal(agent.env.FGOS_SESSION_ID, `att-${envelope.attemptId}`);
   assert.equal(agent.env.FGOS_SESSION_ID, envelope.identity.writerId);
   assert.ok(envelope.identity.parentWriterId, 'the controller\'s own writer id is the lineage');
@@ -75,6 +77,7 @@ test('the agent runs as the attempt: its writer id is minted from the attempt, t
   const side = readJson(envelope.sideFile) ?? { env: {} };
   for (const env of [envelope.launch.env, side.env]) {
     assert.deepEqual(Object.keys(env).filter((name) => name === 'TERM' || name.startsWith('HERDR_')), []);
+    assert.deepEqual(canary(Object.keys(env)), []);
   }
 });
 
