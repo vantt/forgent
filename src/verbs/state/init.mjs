@@ -7,6 +7,7 @@ import { writeCoexistenceManifest } from '../../install/coexist.mjs';
 import { inspectGit } from '../../runner/worktree.mjs';
 import { recoverGitOperations } from '../../git/status.mjs';
 import { initConfigFile } from '../../config/facade.mjs';
+import { settleLegacyConfig } from './settle-legacy-config.mjs';
 
 /**
  * Give the project and the machine their header-only `config.yaml` when a scope has no file (the config door's
@@ -28,7 +29,8 @@ export function createConfigFiles(projectRoot) {
 
 /**
  * Create the store of the project whose `.fgos` is `dir`, and settle what a fresh or upgraded machine needs around it:
- * the machine id and the locks directory (the store cannot open without them; both steps are idempotent, an existing
+ * the legacy JSON config an older release left (moved to the files the Config component reads, before anything reads
+ * config), the machine id and the locks directory (the store cannot open without them; both steps are idempotent, an existing
  * id is kept and a clone's own `fgos.machineId` still wins), the store itself, the harness coexistence manifest, the
  * headless-repository notice, the header-only config files and the recovery of an interrupted Git operation. Only the
  * first three can refuse; every later step is fail-safe, so a quirk there still leaves `.fgos/` initialized.
@@ -38,6 +40,7 @@ export function createConfigFiles(projectRoot) {
 export function initStoreUseCase({ dir }) {
   const root = path.dirname(dir);
   mintMachineId(resolveStateRoot().stateRoot);
+  settleLegacyConfig(root);
   fixEventStoreLockDirs(root);
   initStore(dir);
   let detectedHarnesses = [];
