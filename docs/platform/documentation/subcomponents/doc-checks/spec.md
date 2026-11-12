@@ -4,7 +4,7 @@
 Document type: BA-grade subcomponent specification
 Audience: Human reviewer, maintainer, implementation agent, documentation agent
 Purpose: Define the one command that checks maintained documentation, the body rules it runs, where it runs, and the commit gate that makes its refusal real
-Design status: Draft, split out of the documentation area spec on 2026-11-12. Not signed. Open questions in section 11.
+Design status: Draft, split out of the documentation area spec on 2026-11-12. Not signed. The questions of section 11 are decided (owner, 2026-11-12).
 Implementation: Partial. doc-health runs three body rules over the whole platform corpus; path input, the new rules, the staged-content read and the pre-commit wiring are not built
 Canonical: No (becomes canonical when signed)
 Provenance: Sections 6.2 to 6.5, 10, 11.1, 12 and 13 of the documentation area spec as of 2026-11-07, moved here when the owner split the area into subcomponents on 2026-11-12
@@ -184,8 +184,8 @@ Known findings to sweep when the rules land:
 
 ## 11. Open Questions
 
-1. **Age cutoff for `doc-provisional-aged`.** A policy choice, not a fix. Recommendation: 30 days, reported, not refusing.
-2. **The shell wrapper and `--`.** The `fgos` shell function appends `--dir <root>` after the arguments, so `fgos convention check -- <path>` receives `--dir` and the root as extra paths and fails. Passing `--dir` before `--` works around it. Recommendation: fix the wrapper to place `--dir` before a `--` separator, as its own item, because the hook and the write door will call `convention check` with paths.
+1. **Age cutoff for `doc-provisional-aged`.** *Decided 2026-11-12: as recommended.* A policy choice, not a fix. Recommendation: 30 days, reported, not refusing.
+2. **The shell wrapper and `--`.** *Decided 2026-11-12: as recommended, a separate item.* The `fgos` shell function appends `--dir <root>` after the arguments, so `fgos convention check -- <path>` receives `--dir` and the root as extra paths and fails. Passing `--dir` before `--` works around it. Recommendation: fix the wrapper to place `--dir` before a `--` separator, as its own item, because the hook and the write door will call `convention check` with paths.
 
 ## 12. Implementation Alignment
 
@@ -224,3 +224,4 @@ Done means: `npm test` and `cargo test --workspace` are green apart from tests t
 
 - 2026-11-06, owner, after the architecture panel: item `p-cd2ejz7wa5`, an honest commit gate for documentation checks, opened apart from the identity work. Documentation findings refuse the commit; a host error refuses it in an activated workspace.
 - 2026-11-12, owner: the documentation area is split into subcomponents; the checks become this spec, and their first phase comes first in the order.
+- 2026-11-12, owner: section 11 accepted: `doc-provisional-aged` reports after 30 days without refusing; the shell wrapper's `--dir` placement is fixed as its own item.

@@ -4,7 +4,7 @@
 Document type: BA-grade subcomponent specification
 Audience: Human reviewer, maintainer, implementation agent, documentation agent
 Purpose: Define how a change that opens or moves documentation authority is admitted: by an independent reviewer inside a frame the owner approved, with the owner asked only for what falls outside it
-Design status: Draft, split out of the documentation area spec on 2026-11-12 and rewritten from the per-topic owner approval of 2026-11-07 to a reviewer inside an approved frame. Not signed. Open questions in section 11.
+Design status: Draft, split out of the documentation area spec on 2026-11-12 and rewritten from the per-topic owner approval of 2026-11-07 to a reviewer inside an approved frame. Not signed. The questions of section 11 are decided (owner, 2026-11-12).
 Implementation: Not started. The doors it checks at exist (the registry store door, fgos doc reserve, doc promote, supersede, path-move); the reviewer run, the frame record and the checks do not
 Canonical: No (becomes canonical when signed)
 Provenance: Sections 6.7 and 6.8 of the documentation area spec as of 2026-11-07; the owner's objection the same day that asking him for every new topic is wrong; the frame defaults the owner approved on 2026-11-12 (document identity, section 13, question 3)
@@ -187,8 +187,8 @@ fgOS has no proof of a person: the Identity spec leaves out human accounts, and 
 
 ## 11. Open Questions
 
-1. **The area value list as a machine-readable file.** The effect "a top-level area is opened" needs a list the doors can check, and the 2026-11-12 decision on document identity question 4 says such lists are machine-readable and test-kept, never derived from prose. Recommendation: one small file in the project instance, owned by document identity, checked against the existence of each area's overview document.
-2. **Digest cadence and channel.** Recommendation: weekly, as one generated document plus a line in the owner's mailbox.
+1. **The area value list as a machine-readable file.** *Decided 2026-11-12: as recommended.* The effect "a top-level area is opened" needs a list the doors can check, and the 2026-11-12 decision on document identity question 4 says such lists are machine-readable and test-kept, never derived from prose. Recommendation: one small file in the project instance, owned by document identity, checked against the existence of each area's overview document.
+2. **Digest cadence and channel.** *Decided 2026-11-12: as recommended.* Recommendation: weekly, as one generated document plus a line in the owner's mailbox.
 
 ## 12. Implementation Alignment
 
@@ -223,3 +223,4 @@ fgOS has no proof of a person: the Identity spec leaves out human accounts, and 
 - 2026-11-07, lead draft: a new topic needs an approved owner answer naming it.
 - 2026-11-07, owner: asking him for every new topic is wrong. The lead proposed an independent reviewer inside an approved frame, with the owner asked only beyond it.
 - 2026-11-12, owner: frame defaults approved (document identity, question 3); the documentation area is split into subcomponents and admission becomes this spec, written to the reviewer-and-frame model.
+- 2026-11-12, owner: section 11 accepted: the area value list is one machine-readable file in the project instance, owned by document identity and checked against each area's overview document; the digest is weekly, as one generated document plus a line in the owner's mailbox.
