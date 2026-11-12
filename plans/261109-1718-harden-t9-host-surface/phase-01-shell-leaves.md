@@ -1,7 +1,7 @@
 ---
 phase: 01
 title: "Shell leaves: error leaf, registry store and landsWork fields replace five sets, lazy entry imports with an architecture guard, hook first, dead arms deleted"
-status: landed `39c0ebfbc` except Step 7 (the `version` arm waits for packaging P04)
+status: landed (`39c0ebfbc`; Step 7 with the exit-code table: `EXIT_CODES` in `src/cli/exit-codes.mjs` reading `packages/host-runtime/contracts/exit-codes.v1.json`, `categoryOf` stays beside `StoreError`, Node `version` arm deleted, registry entry kept `nativeOnly`)
 depends_on: []
 parallel: "starts now, beside P12-P15 and P02 (P02 reads no new field; P02's `main()` range `:5213-5223` is disjoint from P01's); the `version` arm step waits for packaging P04"
 effort: ~1d

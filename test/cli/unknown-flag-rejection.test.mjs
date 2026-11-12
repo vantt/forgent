@@ -58,6 +58,7 @@ test('--dir, the flag the fgos shell function appends to every call, is accepted
     }
   }
   const cwd = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-dir-flag-'));
+  // boundary: --dir is read by the shell entry before any verb runs, so only a real entry process proves it is accepted.
   const result = spawnSync(process.execPath, [FGOS, 'decision-index', '--dir', cwd], { cwd, encoding: 'utf8' });
   assert.equal(result.status, 0, result.stderr);
 });
