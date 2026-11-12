@@ -1,7 +1,8 @@
 import '../../../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { runSolo, PARAMS, VALID_OUTCOMES } from '../../../../src/runner/execution/loops/solo.mjs';
+import { runSolo, PARAMS } from '../../../../src/runner/execution/loops/solo.mjs';
+import { VALID_OUTCOMES } from '../../../../src/runner/execution/outcome.mjs';
 import { isVerifyResult } from '../../../../src/runner/execution/legacy-seat-read.mjs';
 import { patternHistoryOutcome } from '../../../../src/runner/execution/loops/history-outcome.mjs';
 

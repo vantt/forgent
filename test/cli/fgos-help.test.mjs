@@ -14,7 +14,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
 import { COMMAND_REGISTRY } from '../../src/cli/command-registry.mjs';
-import { OUTCOME_EXIT_CODES } from '../../src/runner/execution/outcome-exit.mjs';
+import { OUTCOME_EXIT_CODES } from '../../src/runner/execution/outcome.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const FGOS = path.resolve(__dirname, '../../bin/fgos.mjs');

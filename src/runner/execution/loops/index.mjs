@@ -51,15 +51,6 @@ export function paramTableOf(loop) {
   return PARAM_TABLES[name] ?? null;
 }
 
-export const VALID_OUTCOMES = Object.freeze([
-  'pass',
-  'findings',
-  'execution-failure',
-  'policy-refusal',
-  'provider-limit',
-  'blocked',
-]);
-
 /**
  * Run a collaboration loop for a unit.
  *

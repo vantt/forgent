@@ -5,7 +5,7 @@ import { publishMutableProjection } from '../../native/proof-helpers.mjs';
 import { readUnitRunSeats } from './unit-run-history.mjs';
 import { normalizeWorkflowLink } from './unit.mjs';
 import { patternHistoryOutcome } from './loops/history-outcome.mjs';
-import { VALID_OUTCOMES } from './loops/panel.mjs';
+import { VALID_OUTCOMES, UNDETERMINED_OUTCOME } from './outcome.mjs';
 import { seatsOfRecord, collaborationOfRecord } from './legacy-seat-read.mjs';
 import { seatKind, VERIFY_SEAT } from './seat-resolver.mjs';
 import { shippedCatalog } from '../dispatch/shipped-catalog.mjs';
@@ -17,7 +17,6 @@ import { shippedCatalog } from '../dispatch/shipped-catalog.mjs';
 export const UNIT_SUMMARY_CONTRACT = Object.freeze({ id: 'unit-summary', version: 2 });
 
 /** A finished unit whose outcome cannot be derived from its records; never a pass or a failure. */
-export const UNDETERMINED_OUTCOME = 'undetermined';
 
 
 

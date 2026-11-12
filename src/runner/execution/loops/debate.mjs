@@ -14,24 +14,9 @@
  */
 
 import { roleUnit } from './role-tasks.mjs';
+import { ERROR_OUTCOMES } from '../outcome.mjs';
 import { resolveSeats } from '../seat-resolver.mjs';
 import { createBindBarrier } from '../seat-ledger.mjs';
-
-export const VALID_OUTCOMES = Object.freeze([
-  'pass',
-  'findings',
-  'execution-failure',
-  'policy-refusal',
-  'provider-limit',
-  'blocked',
-]);
-
-const ERROR_OUTCOMES = Object.freeze([
-  'execution-failure',
-  'policy-refusal',
-  'provider-limit',
-  'blocked',
-]);
 
 export const DEFAULT_REBUTTAL = true;
 
