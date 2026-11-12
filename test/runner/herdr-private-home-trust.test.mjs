@@ -392,6 +392,8 @@ test('claude: trust is read from the real store and written to the private confi
   assert.deepEqual(shared, { root: path.join(home, '.claude.json'), target: path.join(home, '.claude.json') });
   const own = trustStorePaths({ trustStore: claude, fullEnv: {}, workerEnv: { CLAUDE_CONFIG_DIR: '/tmp/private/home' } });
   assert.deepEqual(own, { root: path.join(home, '.claude.json'), target: '/tmp/private/home/.claude.json' });
+  const operatorDir = trustStorePaths({ trustStore: claude, fullEnv: { CLAUDE_CONFIG_DIR: '/operator/cfg' }, workerEnv: { CLAUDE_CONFIG_DIR: '/tmp/private/home' } });
+  assert.deepEqual(operatorDir, { root: '/operator/cfg/.claude.json', target: '/tmp/private/home/.claude.json' }, 'an operator who moved claude\'s config directory vouches for a root there');
   const pinned = trustStorePaths({ trustStore: { kind: 'claude-json', path: '/pinned/.claude.json' }, fullEnv: {}, workerEnv: { CLAUDE_CONFIG_DIR: '/tmp/private/home' } });
   assert.deepEqual(pinned, { root: '/pinned/.claude.json', target: '/tmp/private/home/.claude.json' });
 });

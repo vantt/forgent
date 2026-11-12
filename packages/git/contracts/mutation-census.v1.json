@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "6143d37cb686a58c5f3ec974f67ea7ffce82b528dda4f929c2decb33e8e19006",
+  "payloadDigest": "5c4ab0e85548ae113bf6bda3d240050e53698e6b6f9dd356a5ac74adbbde8529",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -1018,7 +1018,7 @@
     "src/runner/dispatch/evidence-attribution.mjs": "e286beb61bc988049d44645db9a7a0900ba2431132ce694861ac7c43390b229f",
     "src/runner/dispatch/execution-contract.mjs": "a5b5160f4fb82aa885a961b8f6f66f353a8d455a0ab46a1bd2fe84f527e16e53",
     "src/runner/dispatch/executor-governance.mjs": "8e8f93d957741e107b0e38630d7b0816209019234c93c95140113b231e18f73e",
-    "src/runner/dispatch/herdr-round.mjs": "9815d3b18f0c1088c106a62a58c0a4b38064c9d6952cc225b9558705b1fba4d6",
+    "src/runner/dispatch/herdr-round.mjs": "02cd56c9f341f8e5428144332b861fbe0bbff3f0afb480b7abe79c95fa5a69d2",
     "src/runner/dispatch/hook.mjs": "59544dfae08bbf91692001b9038c43f3d201cff1d2cf9681ea502f512fb45fb6",
     "src/runner/dispatch/llm-accounts.mjs": "f8d1015b1e9adab52286ef2a871db21c66811ecb9b31c17f1074e34a75b63343",
     "src/runner/dispatch/mechanism.mjs": "8f272b51172f4b3f15418b43242d8b877ea4ed0ac974890bd7fd991ca3d87afe",
@@ -3416,7 +3416,7 @@
     {
       "path": "src/runner/dispatch/assignment-runner.mjs",
       "line": 976,
-      "spawn": "prepareTerminalAttempt -> src/runner/dispatch/herdr-round.mjs:394",
+      "spawn": "prepareTerminalAttempt -> src/runner/dispatch/herdr-round.mjs:395",
       "binary": "(env FGOS_HERDR_BIN)",
       "class": "configured-binary"
     },

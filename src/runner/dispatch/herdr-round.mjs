@@ -298,7 +298,8 @@ export function trustStorePaths({ trustStore, fullEnv, workerEnv, accountSource 
   }
   // claude reads its config from its own config directory when it has one, so a worker with a private config
   // directory gets its entries there and the operator's store only vouches for the root.
-  const real = trustStore.path ?? path.join(os.homedir(), '.claude.json');
+  // The operator's own store sits in their config directory when they moved it, else beside their home.
+  const real = trustStore.path ?? (fullEnv.CLAUDE_CONFIG_DIR ? path.join(fullEnv.CLAUDE_CONFIG_DIR, '.claude.json') : path.join(os.homedir(), '.claude.json'));
   const own = workerEnv?.CLAUDE_CONFIG_DIR && workerEnv.CLAUDE_CONFIG_DIR !== fullEnv.CLAUDE_CONFIG_DIR;
   return { root: real, target: own ? path.join(workerEnv.CLAUDE_CONFIG_DIR, '.claude.json') : real };
 }
