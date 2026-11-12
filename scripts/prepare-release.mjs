@@ -135,6 +135,24 @@ export function findRustVersionDrift(root, baseVersion) {
     .map(({ file }) => file);
 }
 
+// Every `plugins/<name>/.claude-plugin/plugin.json` carries the product's version, so a
+// plugin never reads as older or newer than the release it ships in.
+export function updatePluginManifestText(text, baseVersion) {
+  const parsed = JSON.parse(text);
+  parsed.version = baseVersion;
+  return `${JSON.stringify(parsed, null, 2)}\n`;
+}
+
+function pluginManifestFiles(root) {
+  const pluginsDir = path.join(root, 'plugins');
+  if (!fs.existsSync(pluginsDir)) return [];
+  return fs
+    .readdirSync(pluginsDir, { withFileTypes: true })
+    .filter((entry) => entry.isDirectory())
+    .map((entry) => path.join(pluginsDir, entry.name, '.claude-plugin', 'plugin.json'))
+    .filter((filePath) => fs.existsSync(filePath));
+}
+
 export function updateChangelogText(text, tag, date) {
   assertIsoDate(date);
 
@@ -212,6 +230,9 @@ export function prepareRelease({
   for (const { filePath, next } of rustVersionUpdates(root, baseVersion)) {
     updates.push([filePath, next]);
   }
+  for (const filePath of pluginManifestFiles(root)) {
+    updates.push([filePath, updatePluginManifestText(readText(filePath), baseVersion)]);
+  }
 
   if (!dryRun) {
     for (const [filePath, nextText] of updates) {
@@ -267,8 +288,8 @@ function parseArgs(argv) {
 function printHelp() {
   console.log(`Usage: node scripts/prepare-release.mjs <vX.Y.Z[-pre.N]> [--date YYYY-MM-DD] [--dry-run]
 
-Updates package.json, package-lock.json, CHANGELOG.md and the Rust crate versions
-(Cargo.toml, the Cargo.lock files) for a release.
+Updates package.json, package-lock.json, CHANGELOG.md, the Rust crate versions
+(Cargo.toml, the Cargo.lock files) and every plugins/*/.claude-plugin/plugin.json for a release.
 The script refuses a dirty working tree unless --skip-clean-check is passed.
 It never creates or pushes the git tag; it prints the exact commands to run next.`);
 }
