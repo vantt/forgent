@@ -115,7 +115,7 @@ fgos version        # bản cũ có thể chưa có --version
 fgos doctor
 ```
 
-Config không phải đưa lại: máy đã dùng `config.yaml`. Đi tiếp lại: `FGCTL_VERSION=<tag> fgctl upgrade`.
+Config không phải đưa lại: máy đã dùng `config.yaml`. Đi tiếp lại: `FGCTL_VERSION=<tag> fgctl upgrade`. Đã chạy thử đủ chuỗi này (mục 6).
 
 ### B. Về `v0.2.0-rc.5` (dự án phải quay lại bản JSON)
 
@@ -139,12 +139,24 @@ fgos version        # rc.5 không có --version
 fgos doctor
 ```
 
-Đi tiếp lại: cài `fgctl` của bản mới (`install.sh` của bản mới) rồi `FGCTL_VERSION=<tag> fgctl upgrade` trong từng dự án; lần nâng chuyển config lần nữa.
+Đi tiếp lại: cài `fgctl` của bản mới (`install.sh` của bản mới) rồi `FGCTL_VERSION=<tag> fgctl upgrade` trong từng dự án; lần nâng chuyển config lần nữa. Nếu quên cất hai tệp `config.yaml` ở bước 2, bước đi tiếp báo `config-legacy-shadowed` (cả hai tệp cùng tồn tại); cất chúng đi rồi chạy lại.
 
-**Đã chạy thử trong HOME tạm (ngày 2026-11-12):** xem mục 6 để biết kết quả từng bước.
+Sau khi về rc.5, `fgos doctor` của rc.5 vẫn đỏ vài dòng (12 dòng trên máy thử): đó là mức nền của chính rc.5, giống hệt rc.5 vừa cài xong, không phải do việc quay lại.
 
 Về cấu hình định tuyến khi quay lại bản trước ngày 2026-11-12: gỡ sáu ô `thehive` khỏi `~/.fgos/config.yaml` trước, theo hướng dẫn `guide-261112-0755` mục "Hoàn tác".
 
 ## 6. Kết quả chạy thử
 
-(Điền sau khi chạy trên bản cuối.)
+Chạy ngày 2026-11-12 trên fg-server2, trong HOME tạm (HOME, mọi `XDG_*`, `TMPDIR` chuyển hướng, `PATH` không có `~/.local/bin` thật, thư mục nằm trên ext4), bản phát hành dựng từ main `e182dec72`, dự án git rỗng. Nhật ký: `/dev/shm/p13-final-*.log`. Tệp thật của anh (`~/.local/bin`, `~/.claude`, `~/.fgos`, kho release) chỉ được đọc.
+
+| Bước | Kết quả |
+|---|---|
+| `install.sh`, `fgctl init` (máy không có CLI agent) | `Ready: fgOS <tag> active (ba3342e2ecbb)`, thoát 0. `fgctl init` không có `--yes`. |
+| `fgos doctor` | `ok: true`, 110 dòng, 0 hỏng, 7 cảnh báo; `--strict` thoát 0. |
+| `fgos run ... --json` khi không có CLI agent | thoát 4, `agent-cli-missing` kèm cách sửa. |
+| Quay về `v0.2.0-rc.5` bằng `fgctl repair` của bản mới | **bị từ chối**: `git-addon-missing` (cả `init --override-pin` cũng vậy). |
+| Quay về rc.5 bằng đường B (rc.5 `install.sh`, trả config, `fgctl repair`) | thoát 0; rc.5 chạy; `fgos version` và `fgos doctor` chạy, doctor đỏ đúng 12 dòng như rc.5 mới cài. |
+| Đi tiếp lại bản mới sau đường B | thoát 0, `fgctl verify` ok, `fgos --version` ok, doctor `ok: true`. |
+| Về bản main-build trước (đường A) rồi đi tiếp | `fgctl repair` thoát 0 (kèm danh sách check của bản cũ), `fgctl verify` ok, đi tiếp ok. |
+
+**Chưa chạy được:** một câu trả lời thật từ agent (`fgos run "Reply with exactly the word OK" --json` ở tầng rẻ nhất) trong HOME tạm. Chạy pi/deepseek thật tới được nhà cung cấp nhưng tài khoản OpenRouter báo hết credit (402); seat omp/gemini cần đúng cách bố trí HOME thật của máy và login có thể tự gia hạn, nên HARDEN không chép login của anh vào HOME tạm. Bước này anh (hoặc COOK) chạy một lần ngay sau khi kích hoạt, theo mục 3, trên máy đã có tài khoản.

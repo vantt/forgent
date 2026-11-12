@@ -77,7 +77,7 @@ Status words: `done` met and proven; `partial` met in part, the residual is name
 | CMD-11 | MUST | partial | One `fgos.v1` envelope; only doctor carries `ok` and `next`. `fgctl version --json` is a bare object and its other verbs print text. |
 | CMD-12 | SHOULD | done | Did-you-mean for verbs and native flags (`fgos-distribution::suggest`); the Node unknown-flag message lists valid flags but does not suggest. |
 | CMD-15 | MUST | done | `fgctl` and `fgos` with no arguments print "Get started" and an agent line, exit 0. |
-| CMD-16 | MUST | done | Every `fgctl` verb and the five guided `fgos` verbs (`init`, `doctor`, `config`, `run`, `uninstall`) carry changes, prerequisites, options with defaults, examples, exit codes and next step. `fgctl --help` lists exit codes 0, 1, 2 only; exit 4 (unreadable pin) is missing from it. |
+| CMD-16 | MUST | done | Every `fgctl` verb and the five guided `fgos` verbs (`init`, `doctor`, `config`, `run`, `uninstall`) carry changes, prerequisites, options with defaults, examples, exit codes and next step. `fgctl --help` lists exit codes 0, 1, 2 (usage error or not ready) and 4 (unreadable pin). |
 | CMD-17 | MUST | done | Nothing prompts without a terminal; `fgctl uninstall` asks only at a terminal. |
 | CMD-18 | MUST | done | Doctor rows carry `status` and, on a failing row, `fix`; `next[]` lists the commands once each (`runDoctor`, `src/setup/registrations.mjs`). |
 | CMD-19 | SHOULD | done | "Agents / automation" line in `fgos` and `fgctl` with no arguments. |
@@ -183,7 +183,7 @@ Not applicable: 85-service-daemon beyond the opt-in mailbox timer that `fgctl un
 
 ## Plan (tier-1 gaps first)
 
-1. Close the three `fgctl` defects found when the closing run read the new surface: `repair` writes `releaseVersion: null` into the pin, the "up to date" line prints a digest that is not the active release's, and `fgctl --help` omits exit 4.
+1. Owner decides two exit-code questions left by the close: `fgctl`'s exit 2 means both a usage error and "not ready" (backlog `p-xagoeec2i4`), and whether `fgctl` should activate a release that predates the Git addon (`p-yfpixqfmdq`).
 2. Owner picks from the ideas table in the closing report: `config edit` (UX-14), `paths --json` (CFG-03, INS-12), README extraction and an agent-native CI run (ONB-09, TST-04), doctor exit code (DOC-02), the `fgctl` refresh marker (UPD-01, PRN-04).
 3. Export `SOURCE_DATE_EPOCH` in the release workflow so `fgctl --version` carries the commit time (CMD-06 residual).
 4. Regenerate the how-to's doctor-check tables from `fgos doctor --json` (backlog row, documentation lane).

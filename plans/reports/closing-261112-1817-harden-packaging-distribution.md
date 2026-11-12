@@ -1,6 +1,6 @@
 # HARDEN packaging and distribution: closing report
 
-Date 2026-11-12 (Asia/Saigon). Sub-plan `plans/261109-1617-harden-packaging-distribution/plan.md`, owner decision 80. Phases P01 to P12 landed on main between 2026-11-09 and 2026-11-12; this report closes P13. Measured on main `6f3fdc2ba` plus the packaging fixes named under "Final tree" below, on fg-server2, in a scratch HOME (HOME, every `XDG_*`, `TMPDIR` redirected, `PATH` without the real `~/.local/bin`, no `/dev/shm`, see Findings).
+Date 2026-11-12 (Asia/Saigon). Sub-plan `plans/261109-1617-harden-packaging-distribution/plan.md`, owner decision 80. Phases P01 to P12 landed on main between 2026-11-09 and 2026-11-12; this report closes P13. Measured on the final tree: main `e182dec72` (it includes the three `fgctl` fixes of `plans/reports/lead-261112-1830-harden-pkg-fgctl-fixes.md`, main fix `1db1d44c9`), release assets built from it with `package-release-assets.mjs` (tag `v0.2.0-p13final`), on fg-server2, in a scratch HOME (HOME, every `XDG_*` and `TMPDIR` redirected, `PATH` without the real `~/.local/bin`, scratch on ext4 and not under `/dev/shm`, see Findings 2). The real `~/.local/bin`, `~/.claude/settings.json`, `~/.fgos` and the release store were only read (mtimes compared before and after).
 
 ## Outcome against the acceptance criteria
 
@@ -9,8 +9,8 @@ Date 2026-11-12 (Asia/Saigon). Sub-plan `plans/261109-1617-harden-packaging-dist
 | Install to first value in 3 commands | Met. `install.sh`, `fgctl init`, `fgos run "<prompt>"`; `init` ends `Ready:` and `Next: fgos run "<prompt>"`. | Timing table steps 2, 5; acceptance section. |
 | `init` ends `ok: true` with `Ready` and one runnable next step | Met on a clean machine with no agent CLI (doctor `ok: true`, 110 rows, 0 fail, 7 warn). | Step 5, 6. |
 | `fgos run` with no agent CLI exits with `agent-cli-missing` and a fix | Met: exit 4, names claude, codex, omp, pi and `fgos doctor`. | Step 10. |
-| No-op `init`, `repair`, `upgrade` about one doctor run, at most 4.5 s, saying `nothing to do` | Met for `init` and `upgrade` (4.1 s, 3.6 s, both `nothing to do`). `repair` is 4.95 s and prints `Ready` because it re-publishes (by design). Doctor alone 3.1 to 5.1 s on a loaded machine. | Steps 11, 12, 13. |
-| `--version`, `--help` exit 0 with the CMD-16 fields, on both binaries | Met. `fgctl --help` lists exit codes 0, 1, 2 only; `init` can also exit 4 (open fix, see Final tree). | Verify table rows 3 to 5. |
+| No-op `init`, `repair`, `upgrade` about one doctor run, at most 4.5 s, saying `nothing to do` | Met in kind, not reliably in seconds. `init` and `upgrade` say `nothing to do`; the tail is one doctor run plus about 0.5 s. Over three runs on this machine a no-op took 3.6 to 5.6 s while the doctor alone took 3.1 to 5.0 s, so the 4.5 s target held in the two quieter runs and was missed by about 1 s in the last. `repair` prints `Ready` because it re-publishes (by design). | Steps 11, 12, 13. |
+| `--version`, `--help` exit 0 with the CMD-16 fields, on both binaries | Met. `fgctl --help` now lists `0 ok, 1 failed, 2 usage error or not ready, 4 unreadable pin`. | Verify table rows 3 to 5. |
 | `fgctl uninstall --yes` leaves no hook, skill, activation; config and data stay; `--purge` removes the store | Met on the scratch project: hooks, activation gone, `config.yaml` and `distribution.json` kept, backups written. `--purge` proven by the phase's live run and unit tests, not re-run here. | Step 15; P08 report. |
 | `http://` (non-loopback) refused by `install.sh`, `install.ps1`, `fgctl`; installers in `SHA256SUMS` | Met (tests). `install.ps1` ran under PowerShell 7.4 only. | P09 report. |
 | Plugin version equals product version (test); release needs the suite; consumer proof upgrades from the previous tag | Met; upgrade proof ran live on Linux (rc.5 to candidate, exit 0). The workflow itself and the Windows leg have not run. | P11 report. |
@@ -18,24 +18,24 @@ Date 2026-11-12 (Asia/Saigon). Sub-plan `plans/261109-1617-harden-packaging-dist
 
 ## Before and after: the audit's 15-step run
 
-Audit 2026-11-09 on `eca97c5fe` (a `file://` mirror, no network) against this run on the final tree (a `file://` mirror of assets built from it, no network, so step 5 does not include a real download). Same machine, same method; load differs, so read seconds to about 1 s.
+Audit 2026-11-09 on `eca97c5fe` (a `file://` mirror, no network) against three runs on the final tree and its predecessor (a `file://` mirror of assets built from the tree, no network, so step 5 does not include a real download). Same machine, same method; the load average was 1 to 30 across the runs, so read the seconds to about 1 s and the "now" column as a range.
 
 | Step | Command | Audit (before) | Now (after) |
 |---|---|---|---|
 | 1 | `install.sh --help` | 0.03 s, help ignored, raw `curl: (37)`, exit 37 | 0.01 s, usage, exit 0 |
-| 2 | `install.sh` | 0.10 s; bare `fgctl init` printed | 0.08 s; prints `fgctl init` then `fgos run "<prompt>"` |
-| 3 | `FGCTL_VERSION` without `v` | failed | works, 0.09 s |
+| 2 | `install.sh` | 0.10 s; bare `fgctl init` printed | 0.16 s; prints `fgctl init` then `fgos run "<prompt>"` |
+| 3 | `FGCTL_VERSION` without `v` | failed | works, 0.18 s |
 | 4 | `fgctl --version` | usage, exit 1 | `fgctl 0.2.0 (unknown commit)`, exit 0; `version --json` |
-| 5 | `fgctl init` | 15.4 s, stdout empty, exit 0, 5 failing checks | 9.7 s, `Ready: fgOS <tag> active (<d12>)` and `Next:`, exit 0 |
-| 6 | `fgos doctor` | 3.7 s, 109 rows, 5 fail, exit 0 | 3.1 s, 110 rows, 0 fail, 7 warn, `ok: true`, `next: []` |
+| 5 | `fgctl init` | 15.4 s, stdout empty, exit 0, 5 failing checks | 9.7 to 13.9 s (first activation, `file://` mirror), `Ready: fgOS <tag> active (<d12>)` and `Next:`, exit 0 |
+| 6 | `fgos doctor` | 3.7 s, 109 rows, 5 fail, exit 0 | 3.1 to 5.0 s, 110 rows, 0 fail, 7 warn, `ok: true`, `next: []` |
 | 7 | `fgos setup` | README step 3; wrote two files | no longer a step; moved into `fgos init` |
-| 8 | `fgos doctor --fix` | 3.9 s, same 5 fail | 4.6 s, `ok: true` |
-| 9 | `fgos doctor --strict` | 3.6 s, exit 1 | 5.1 s, exit 0 |
+| 8 | `fgos doctor --fix` | 3.9 s, same 5 fail | 3.5 to 4.6 s, `ok: true` |
+| 9 | `fgos doctor --strict` | 3.6 s, exit 1 | 5.0 s, exit 0 |
 | 10 | `fgos run "Say hello in one word"` | 2.0 s, exit 11, cause only in `stderr.log` | 0.25 s, exit 4, `agent-cli-missing` with the CLIs and the fix (no agent CLI on PATH) |
-| 11 | `fgctl init` again | 8.9 s, silent | 4.1 s, `nothing to do: fgOS <tag> already active, doctor ok` |
-| 12 | `fgctl repair` / `verify` | 9.3 s silent / 0.07 s | 4.95 s `Ready` / 0.08 s `verified <d12>` |
-| 13 | `fgctl upgrade`, same release | 9.7 s, silent | 3.6 s, `nothing to do`, then `fgctl: up to date with the release (<digest>)` (digest is not the active one, open fix) |
-| 14 | teammate clone, digest-only pin | 0.01 s, no way out named | 0.02 s, three ways out named |
+| 11 | `fgctl init` again | 8.9 s, silent | 4.1 to 5.6 s, `nothing to do: fgOS <tag> already active, doctor ok` |
+| 12 | `fgctl repair` / `verify` | 9.3 s silent / 0.07 s | 5.0 to 5.7 s `Ready` / 0.08 s `verified <d12>` |
+| 13 | `fgctl upgrade`, same release | 9.7 s, silent | 3.6 to 5.4 s, `nothing to do`, then `fgctl: up to date with the release (<d12>)` (the active release's digest since the fix) |
+| 14 | teammate clone, digest-only pin | 0.01 s, no way out named | 0.02 s, three ways out named, exit 1 |
 | 15 | `fgctl uninstall --yes` | `fgos uninstall --yes` removed nothing a release install made | 0.4 s: reverses the wiring in five agent surfaces, removes the activation, keeps config and pin, names the rest |
 
 ## Verify table (SKILL.md, 12 rows) on the final tree
@@ -46,7 +46,7 @@ Audit 2026-11-09 on `eca97c5fe` (a `file://` mirror, no network) against this ru
 | 2 | INS-02/04 | pass | `tail -1 install.sh` is `main "$@"`; `set -eu` on line 9; `sh -n` clean; `--help` exits 0. |
 | 3 | CMD-06 | pass | `fgctl --version`, `fgctl version --json` (`{"name","version","commit","commitTime"}`), `fgos --version` (`fgos 0.2.0`). Commit is null in a build that exports neither `FGOS_BUILD_COMMIT` nor `GITHUB_SHA`; the commit time needs `SOURCE_DATE_EPOCH`, which the release workflow does not export. |
 | 4 | CMD-15/19 | pass | Both binaries print "Get started" (3 steps) and an agents line, exit 0. |
-| 5 | CMD-16 | pass | `fgctl init|upgrade|repair|stage|status|verify|uninstall --help` and `fgos init|doctor|uninstall --help` carry changes, prerequisites, options with defaults, examples, exit codes, next. `fgos update` does not exist. |
+| 5 | CMD-16 | pass | `fgctl init|upgrade|repair|stage|status|verify|uninstall --help` and `fgos init|doctor|uninstall --help` carry changes, prerequisites, options with defaults, examples, exit codes, next; `init` and `upgrade` name exit 2 for both a usage error and "not ready" and exit 4 for an unreadable pin. `fgos update` does not exist. |
 | 6 | CMD-08/12 | deviation | `fgctl --bogus` exit 2 with a hint; `fgos --bogus` exit 4, `fgos doctr` exit 4 with `did you mean fgos doctor?`. `fgos` keeps 4 (owner choice Q-A). |
 | 7 | CMD-03/09/11/17 | gap | `fgctl init --yes` exits 2 and `fgos init --yes --json` exits 4: `init` never prompts, so it has no `--yes`. `fgctl init` prints text, not an envelope; `fgos` JSON is the `fgos.v1` envelope without `ok`/`error`/`next` (doctor carries `ok` and `next`). |
 | 8 | CMD-02, DOC-02 | partial | `fgos doctor --json` read-only, rows carry `status` and `fix`, `next[]` runnable; exit 0 whatever the checks say, 1 with `--strict` (Q-B kept). |
@@ -111,6 +111,50 @@ The plan said this work adds first-contact surface the standard requires and tha
 - Deleted or moved out: the README npm and `setup` sections (-65 lines), the inline uninstall arm (-89), the npm removal verb and its spike test (-122), `apps/fgctl` did-you-mean copy (-45), the `setup` description prose, the `thehive` cells.
 
 Estimates were low for the same reason in every phase: they sized the code that closes a rule and not the proof that it holds. The next sub-plan should size tests at 1.5 to 2 times the code for a phase that adds a verb or a gate.
+
+## Manual acceptance on fg-server2
+
+Release assets built from `e182dec72` (`cargo build --locked --release --workspace`, `package-release-assets.mjs --version v0.2.0-p13final`), installed through `install.sh` from a `file://` mirror into a scratch HOME on ext4, an empty git project. Logs are in `/dev/shm/p13-final-*.log`.
+
+| Step | Result |
+|---|---|
+| `install.sh` then `fgctl init` (no agent CLI on `PATH`) | `Ready: fgOS v0.2.0-p13final active (ba3342e2ecbb)`, `Next: fgos run "<prompt>"`, exit 0. `fgctl init` has no `--yes`; none was used. |
+| `fgos doctor --json` | `ok: true`, 110 rows, 0 fail, 7 warn, `next: []`; `--strict` exits 0. |
+| `fgos run "Reply with exactly the word OK" --json </dev/null` with no agent CLI | exit 4, `agent-cli-missing` with the CLIs and the fix. |
+| Same run with a real agent CLI, cheapest tier (`nano`) | **Not completed in the scratch; the product path to the launch is proven, the answer is not.** Details below. |
+
+What the real runs showed, and why no run ended `pass` in the scratch:
+
+1. `fgos run ... --provider deepseek --override '{"tier":"nano"}'` with the machine's `pi` and its OpenRouter key copied into the scratch (copied, never linked): it bound `deepseek`, `nano`, `deepseek/deepseek-v4.1-flash`, launched the confined pi seat, reached the provider and got `402 This request requires more credits` from OpenRouter, so it ended `execution-failure` (exit 11). The OpenRouter account has no credit: an account matter, not a product defect.
+2. `--provider gemini` at `nano` (`gemini-3.8-flash-low` through `omp`, the owner's default route) with `omp`, its natives and one gemini login profile copied: the seat does not start in a scratch HOME. `omp` resolves from the real HOME layout (`~/.local/bin`, `~/.omp/natives`) and writes its runtime directory to `PI_CONFIG_DIR: "../../tmp/fgos-omp-config"` (`core/config-standard/runner.yaml`), a path relative to HOME that only reaches a writable `/tmp` when HOME is two levels below `/`. In scratch HOMEs at other depths it failed with `EROFS` or `agent omp did not start`; I stopped there rather than run against the real HOME or the real login stores (a copied OAuth login that renews can invalidate the owner's real one).
+3. With real CLIs on `PATH` a clean scratch cannot reach `ok: true` from `fgctl init` alone, which is expected: the README names the remaining steps (a claude seat login, a codex project trust entry). With only `omp` installed, `seat-binding-dry-bind` still fails and `confined-pane-accounts` fails for the `xai` executor (also served by `omp`) when only a gemini account exists. P11 relaxed the first only for a claude-only machine, so "one agent CLI is enough" holds for claude and not yet for omp.
+
+For the owner: the first real answer is the post-activation `fgos run "Reply with exactly the word OK" --json` in the guide, run on a machine whose agent accounts are already set up (fg-server2's own smoke runs through gemini). That is the one acceptance step this close could not run.
+
+## Rollback rehearsal
+
+Scratch HOME, the final release, `/dev/shm/p13-final-rc5.log` and `/dev/shm/p13-final-prev.log`.
+
+**To `v0.2.0-rc.5` (the release the owner's machines run before this upgrade).**
+
+| Step | Result |
+|---|---|
+| rc.5's `install.sh` (tag `v0.2.0-rc.5`), `fgctl init --from <rc.5 asset>` | rc.5 active, config is JSON (`~/.fgos/config.json` with the gateway token, project `.fgos/config.json`). |
+| New `install.sh`, `fgctl upgrade --from <final asset>` | exit 0, `Ready`, `Note: ~/.fgos/config.json moved; projects on an older release refuse until `fgctl upgrade``, `fgctl verify` ok, `fgos --version` `fgos 0.2.0`. |
+| New `fgctl repair`, and `fgctl init --override-pin <reason> --from <rc.5 asset>` | **refused**: `git-addon-missing: linux-x64 requires components.nativeAddon with git-wal-v1`. The new `fgctl` will not activate a release that predates the Git addon. |
+| rc.5's `install.sh` again (rc.5's own `fgctl`), restore the moved config from the `config-migrate` backups (global backup with `gateway.token` to `~/.fgos/config.json`, mode 600; project backup to `.fgos/config.json`; the two `config.yaml` files the migration wrote set aside), `fgctl repair` | exit 0, rc.5 active (`fgctl verify`: `verified active release sha256:51fee8e8...`). |
+| rc.5 `fgos version` and `fgos doctor` | both run. rc.5 has no `--version` flag, so `fgos version` is the command. Doctor: 107 rows, 12 failing, **the same 12 rows as rc.5 on a fresh project before the upgrade** (checked with a second scratch), so the rollback restored rc.5's own baseline. |
+| New `install.sh`, `fgctl upgrade --from <final asset>` | exit 0, `Ready`, config moved again, `fgctl verify` ok, `fgos --version` ok, doctor `ok: true`. Going forward works. |
+
+Without setting the two `config.yaml` files aside, the forward step fails (`config-legacy-shadowed`, both files in one scope); the guide's steps set them aside.
+
+**To the previous main build** (the release fg-server2 runs, `ed51feeafded`, staged into the scratch store by `fgctl init --from <its release directory>`, read only): upgrade to the final release, then `fgctl repair`. `repair` reactivates the previous release, `fgctl verify` prints `verified ed51feeafded`, `fgos version` runs, forward `fgctl upgrade` returns to the final release with doctor `ok: true`. The old build's own doctor then lists four failing rows (skills, trust store, accounts, codex trust) because it predates the "skip a CLI that is not installed" rule and the scratch has none of those; that is the old build's baseline, not a rollback defect.
+
+## Backlog rows opened by this close
+
+- `p-pvs4go2qei`: regenerate the how-to's doctor-check tables from `fgos doctor --json` (Documentation lane).
+- `p-yfpixqfmdq`: what `fgctl` does with a release that predates `git-wal-v1` (refuse with a next step that names rc.5's installer, allow with a flag, or document).
+- `p-xagoeec2i4`: `fgctl`'s exit 2 means both a usage error and "not ready", while the exit-code table gives usage errors 4; moving it changes a code scripts pin, so it is left for the owner after the release.
 
 ## Deviations from the plan
 
@@ -186,14 +230,17 @@ Authority items for T9 (what, where now, where it belongs):
 
 ## Findings made while closing
 
-1. **Rollback to `v0.2.0-rc.5` is not possible with the new `fgctl`.** `fgctl repair` and `fgctl init --override-pin` both stop with `git-addon-missing: linux-x64 requires components.nativeAddon with git-wal-v1`: rc.5 predates the Git addon the activation gate requires. The rollback target for a machine is the release it ran before (which has the addon) through `fgctl repair`. A project that must return to rc.5 needs rc.5's own `fgctl` and a restore of the config files the upgrade moved; the steps and what was rehearsed are in the guide.
-2. **A scratch HOME under `/dev/shm` fails doctor `confinement-probe-freshness` when `TMPDIR` points inside it** (the sandbox's private `/dev` hides the probe's host-side file). On ext4 the same run is `ok: true`. A real project under `/dev/shm` with a `TMPDIR` inside it would see the same; not fixed, not a first-contact case.
+1. **The new `fgctl` refuses to activate `v0.2.0-rc.5`.** `fgctl repair` and `fgctl init --override-pin` both stop with `git-addon-missing: linux-x64 requires components.nativeAddon with git-wal-v1`: rc.5 predates the Git addon the activation gate requires. The way back to rc.5 is rc.5's own installer and `fgctl` plus a restore of the config files the upgrade moved (rehearsed, above, and written into the guide); a rollback to a release that has the addon is one `fgctl repair`. The refusal text lives in the distribution crate, outside this phase's files, so it was not changed; `p-yfpixqfmdq` asks the owner whether the refusal should name the rc.5 installer, an override should exist, or the guide alone is enough.
+2. **A `TMPDIR` under `/dev/shm` fails doctor `confinement-probe-freshness`** (the sandbox's private `/dev` hides the probe's host-side file); a project on ext4 with `TMPDIR` in `/dev/shm` fails the same way, while `TMPDIR` unset (`/tmp`, a tmpfs here) and `TMPDIR` on ext4 pass. Only a path under `/dev` is affected, which is not a common `TMPDIR`, so no backlog row was opened.
 3. `fgctl status` prints `version: none` for a release whose tag the store did not record (CMD-05, SHOULD).
-4. `fgctl --version` carries the commit only through `FGOS_BUILD_COMMIT` or `GITHUB_SHA` and never the commit time; `release.yml` exports neither `SOURCE_DATE_EPOCH` nor `FGOS_BUILD_COMMIT` (CI sets `GITHUB_SHA` itself).
+4. The standard `omp` invocations set `PI_CONFIG_DIR: "../../tmp/fgos-omp-config"`, relative to HOME, which resolves to a writable `/tmp` only when HOME is two levels below `/` (the owner's layout). Layout-dependent; found only because the acceptance ran the gemini seat in a scratch HOME. Not filed: the owner's machines are not affected, and a clean user HOME such as `/home/<name>` matches.
+5. `fgctl --version` carries the commit only through `FGOS_BUILD_COMMIT` or `GITHUB_SHA` and never the commit time; `release.yml` exports neither `SOURCE_DATE_EPOCH` nor `FGOS_BUILD_COMMIT` (CI sets `GITHUB_SHA` itself).
 
 ## Lessons
 
 - Estimates counted the code that closes a rule and not its proof; every phase landed at two to four times its test estimate. Size tests separately.
 - The audit's own method (a scratch HOME on a tmpfs) is not safe for the sandbox: pick ext4 for scratch homes that run doctor.
-- A rollback claim in a guide must be rehearsed on the real previous release: the one named in the brief (rc.5) was not a valid target.
+- A rollback claim in a guide must be rehearsed on the real previous release: rc.5 is a valid target only through rc.5's own installer, and only with its config restored; the new `fgctl` refuses it. Rehearse both the refusal and the way around it.
+- A real agent run in a scratch HOME depends on the real HOME layout (binaries, natives, a HOME-relative config path) and on login stores that renew; plan the acceptance run on a machine whose accounts are already set up instead of copying logins.
+- `pkill -f` with a pattern that also matches the calling shell ends the shell; match a pid.
 - The packaging standard's Verify table has rows (`init --yes --json`) that describe a different archetype; record the deviation instead of adding a flag that does nothing.
