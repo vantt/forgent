@@ -1,7 +1,7 @@
 ---
 phase: 08
 title: "fgctl uninstall: reverse what fgOS wrote in the project, keep user config and data, --purge also removes the release store (Q3 a)"
-status: pending
+status: completed (2026-11-12)
 depends_on: ["P03 landed (fgctl main.rs)", "P04 landed (bin/fgos.mjs and command registry)", "in-flight (2) landed (to name its removal path)"]
 parallel: "group G4 with P10 and P11"
 effort: ~2d
