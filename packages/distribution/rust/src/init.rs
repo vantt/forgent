@@ -2363,6 +2363,7 @@ pub fn get_workspace_status(start_dir: &Path, store_root: &Path) -> Option<Fgctl
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::store::release_dir_name;
     use crate::verify::to_canonical_json;
     use sha2::{Digest, Sha256};
     use std::path::PathBuf;
@@ -2382,6 +2383,7 @@ mod tests {
     /// Recursive, sorted listing of every path under `root` -- the "nothing
     /// was written anywhere" witness the hostile-candidate test compares
     /// before and after preflight.
+    #[cfg(unix)]
     fn snapshot_tree(root: &Path) -> Vec<PathBuf> {
         let mut out = Vec::new();
         let mut stack = vec![root.to_path_buf()];
@@ -2651,7 +2653,7 @@ mod tests {
     #[test]
     fn pin_override_selects_a_staged_release_that_differs_from_the_pin() {
         let store = fresh_temp_root("pin_override_staged");
-        let staged = store.join("releases").join(OTHER);
+        let staged = store.join("releases").join(release_dir_name(OTHER));
         std::fs::create_dir_all(&staged).unwrap();
 
         let dir = staged_pin_override_candidate(&store, Some(&pin_for(PINNED)), OTHER).unwrap();
@@ -2665,7 +2667,7 @@ mod tests {
         // A quarantined release has been moved out of releases/, so it is
         // refused here the same way as one that was never staged.
         let store = fresh_temp_root("pin_override_unstaged");
-        std::fs::create_dir_all(store.join("quarantine").join(OTHER)).unwrap();
+        std::fs::create_dir_all(store.join("quarantine").join(release_dir_name(OTHER))).unwrap();
 
         let err = staged_pin_override_candidate(&store, Some(&pin_for(PINNED)), OTHER).unwrap_err();
         let msg = err.to_string();
@@ -2683,7 +2685,7 @@ mod tests {
     #[test]
     fn pin_override_refuses_when_there_is_no_pin_or_the_release_is_the_pinned_one() {
         let store = fresh_temp_root("pin_override_nothing_to_override");
-        std::fs::create_dir_all(store.join("releases").join(PINNED)).unwrap();
+        std::fs::create_dir_all(store.join("releases").join(release_dir_name(PINNED))).unwrap();
 
         let err = staged_pin_override_candidate(&store, None, PINNED).unwrap_err();
         assert!(
@@ -2787,6 +2789,7 @@ mod tests {
     /// The gate tests take locks and spawn processes: a fork on a parallel
     /// test thread copies every open description until its exec, so a probe
     /// right after a release could see a copy as a holder. One at a time.
+    #[cfg(unix)]
     static GATE_TESTS: std::sync::Mutex<()> = std::sync::Mutex::new(());
 
     /// The gate's running time is part of activation, with a target under one
@@ -2795,7 +2798,7 @@ mod tests {
     /// and the spec records a target per platform.
     #[cfg(target_os = "macos")]
     const GATE_BOUND_MS: f64 = 3000.0;
-    #[cfg(not(target_os = "macos"))]
+    #[cfg(all(unix, not(target_os = "macos")))]
     const GATE_BOUND_MS: f64 = 1000.0;
 
     #[cfg(unix)]
@@ -3037,18 +3040,22 @@ mod tests {
 
     #[test]
     fn run_command_is_bare_when_the_launcher_dir_is_on_path_and_absolute_otherwise() {
+        // The launcher file name is platform-specific (`fgos.cmd` on Windows), so the
+        // expected absolute form is built with the same platform path join.
+        let launcher = if cfg!(windows) { "fgos.cmd" } else { "fgos" };
+        let absolute = |dir: &Path| dir.join(launcher).display().to_string();
         let dir = Path::new("/opt/fgos/bin");
         let on_path = std::env::join_paths(["/usr/bin", "/opt/fgos/bin"]).unwrap();
         let off_path = std::env::join_paths(["/usr/bin"]).unwrap();
         assert_eq!(run_command(Some(dir), Some(&on_path)), "fgos");
-        assert_eq!(
-            run_command(Some(dir), Some(&off_path)),
-            "/opt/fgos/bin/fgos"
-        );
-        assert_eq!(run_command(Some(dir), None), "/opt/fgos/bin/fgos");
+        assert_eq!(run_command(Some(dir), Some(&off_path)), absolute(dir));
+        assert_eq!(run_command(Some(dir), None), absolute(dir));
         assert_eq!(run_command(None, Some(&off_path)), "fgos");
         let spaced = Path::new("/opt/my fgos/bin");
-        assert_eq!(run_command(Some(spaced), None), "\"/opt/my fgos/bin/fgos\"");
+        assert_eq!(
+            run_command(Some(spaced), None),
+            format!("\"{}\"", absolute(spaced))
+        );
     }
 
     #[test]

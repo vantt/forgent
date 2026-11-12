@@ -186,7 +186,6 @@ pub fn workspace_shims() -> Vec<WorkspaceShim> {
 pub fn write_workspace_shims(bin_dir: &Path) -> std::io::Result<()> {
     std::fs::create_dir_all(bin_dir)?;
     for shim in workspace_shims() {
-        let path = bin_dir.join(shim.name);
         let mode = if shim.windows_shell { 0o644 } else { 0o755 };
         fgos_durable_file::replace_durably_with_mode(
             bin_dir,
@@ -198,6 +197,7 @@ pub fn write_workspace_shims(bin_dir: &Path) -> std::io::Result<()> {
         #[cfg(unix)]
         if !shim.windows_shell {
             use std::os::unix::fs::PermissionsExt;
+            let path = bin_dir.join(shim.name);
             let _ = std::fs::set_permissions(&path, std::fs::Permissions::from_mode(0o755));
         }
     }
@@ -569,6 +569,7 @@ mod tests {
         panic!("{} stayed busy", shim.display())
     }
 
+    #[cfg(unix)]
     const PRETTY: &str = "{\n  \"status\": \"ready\",\n  \"releasePath\": \"RELEASE\",\n  \"shimVersion\": \"1\"\n}\n";
 
     #[cfg(unix)]

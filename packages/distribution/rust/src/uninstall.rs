@@ -113,6 +113,21 @@ fn owns_entry_name(kind: EntryKind, name: &str) -> bool {
     }
 }
 
+/// A path as comparable components. Windows paths are case-insensitive and `\\?\C:\x` names
+/// the same place as `C:\x`, so both fold away there; elsewhere components compare as they are.
+fn comparable(path: &Path) -> Vec<String> {
+    path.components()
+        .map(|c| {
+            let part = c.as_os_str().to_string_lossy();
+            if cfg!(windows) {
+                part.trim_start_matches(r"\\?\").to_lowercase()
+            } else {
+                part.into_owned()
+            }
+        })
+        .collect()
+}
+
 /// Refuses a state root no purge may act under: not absolute, a `..` in it, `/`, the home
 /// directory, or an ancestor of the home directory or of the project.
 pub fn guard_store_root(
@@ -135,10 +150,13 @@ pub fn guard_store_root(
     if root.parent().is_none() {
         return refuse("the state root is the filesystem root");
     }
-    if home.is_some_and(|h| root == h) {
+    let root_parts = comparable(root);
+    if home.is_some_and(|h| comparable(h) == root_parts) {
         return refuse("the state root is your home directory");
     }
-    if home.is_some_and(|h| h.starts_with(root)) || workspace_root.starts_with(root) {
+    if home.is_some_and(|h| comparable(h).starts_with(&root_parts))
+        || comparable(workspace_root).starts_with(&root_parts)
+    {
         return refuse("the state root contains your home directory or this project");
     }
     Ok(())
@@ -647,19 +665,51 @@ mod tests {
         dir
     }
 
+    /// Absolute on the running platform: Windows paths need a drive, so the same
+    /// shapes are written once and given a drive there.
+    fn abs(unix_shaped: &str) -> String {
+        if cfg!(windows) {
+            format!("C:{}", unix_shaped.replace('/', "\\"))
+        } else {
+            unix_shaped.to_string()
+        }
+    }
+
     #[test]
     fn purge_guard_refuses_root_home_relative_dotdot_and_ancestors() {
-        let home = PathBuf::from("/home/someone");
-        let project = PathBuf::from("/home/someone/work/app");
+        let home = PathBuf::from(abs("/home/someone"));
+        let project = PathBuf::from(abs("/home/someone/work/app"));
         let refused =
             |root: &str| guard_store_root(Path::new(root), Some(&home), &project).is_err();
-        assert!(refused("/"));
-        assert!(refused("/home/someone"));
-        assert!(refused("/home"), "an ancestor of the home directory");
+        assert!(refused(&abs("/")));
+        assert!(refused(&abs("/home/someone")));
+        assert!(refused(&abs("/home")), "an ancestor of the home directory");
         assert!(refused("relative/state/fgos"));
-        assert!(refused("/home/someone/.local/../../other"));
-        assert!(refused("/home/someone/work"), "an ancestor of the project");
-        assert!(!refused("/home/someone/.local/state/fgos"));
+        assert!(refused(&abs("/home/someone/.local/../../other")));
+        assert!(
+            refused(&abs("/home/someone/work")),
+            "an ancestor of the project"
+        );
+        assert!(!refused(&abs("/home/someone/.local/state/fgos")));
+    }
+
+    #[test]
+    #[cfg(windows)]
+    fn purge_guard_refuses_windows_drive_forms_and_case_or_verbatim_spellings_of_home() {
+        let home = PathBuf::from(r"C:\Users\Someone");
+        let project = PathBuf::from(r"C:\Users\Someone\work\app");
+        let refused =
+            |root: &str| guard_store_root(Path::new(root), Some(&home), &project).is_err();
+        assert!(refused(r"C:\"), "a drive root");
+        assert!(refused(r"C:"), "a drive-relative drive");
+        assert!(refused(r"C:state\fgos"), "a drive-relative path");
+        assert!(refused(r"\state\fgos"), "a path with no drive");
+        assert!(refused(r"\\?\C:\"), "a verbatim drive root");
+        assert!(refused(r"c:\users\someone"), "home in another case");
+        assert!(refused(r"\\?\C:\Users\Someone"), "home spelled verbatim");
+        assert!(refused(r"C:\USERS"), "an ancestor of home in another case");
+        assert!(refused(r"C:\Users\Someone\.local\..\..\other"));
+        assert!(!refused(r"C:\Users\Someone\AppData\Local\fgos"));
     }
 
     #[test]
@@ -694,7 +744,9 @@ mod tests {
     #[test]
     fn purge_removes_only_store_shaped_entries_and_keeps_the_rest_of_the_state_root() {
         let root = scratch("purge");
-        let release = root.join("releases").join(format!("sha256:{HEX}"));
+        let release = root
+            .join("releases")
+            .join(crate::store::release_dir_name(&format!("sha256:{HEX}")));
         std::fs::create_dir_all(release.join("bin")).unwrap();
         std::fs::write(release.join("bin").join("fgos"), "x").unwrap();
         std::fs::create_dir_all(root.join("releases").join("notes-of-mine")).unwrap();
