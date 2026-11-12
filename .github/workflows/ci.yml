@@ -343,6 +343,9 @@ jobs:
       - name: Build and package distribution assets
         run: node scripts/package-release-assets.mjs --version "v$(node -pe "require('./package.json').version")" --out dist
 
+      - name: Set up bubblewrap like a supported Linux machine
+        run: scripts/ci-setup-bwrap.sh
+
       - name: Run external consumer proof
         run: scripts/ci-external-consumer.sh --assets dist
         env:
