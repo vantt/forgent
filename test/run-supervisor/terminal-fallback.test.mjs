@@ -22,6 +22,7 @@ const newProject = async (name) => {
 };
 
 const LIMIT_SCREEN = "■ You've hit your usage limit. Upgrade to Pro or try again at 11:40 PM.\n";
+const OMP_FIXTURES = path.resolve('packages/agent-protocol/contracts/fixtures/terminal/omp');
 const SKIP = noHost || (!bwrapUsable() && 'bwrap with a pid namespace is not usable here');
 
 /** The n-th started command stops on the limit screen; the commands after it are healthy. */
@@ -32,9 +33,26 @@ function limitOnRuns(project, runs) {
   }
 }
 
+/**
+ * The n-th started command sits idle at its prompt after omp gave up on a provider wait: the screen is the
+ * recorded one under the brief's own first lines (a pane echoes the brief it took), and nothing is blocked.
+ */
+function giveUpOnRun(project, n) {
+  const echo = '# Brief 1\n\n- Brief file on disk (re-read after compaction or restart): brief-1.md\n';
+  fs.writeFileSync(path.join(project.herdrDir, `explain.run${n}.json`), JSON.stringify({ agent: 'omp', state: 'idle', visible_idle: true, visible_working: false, visible_blocker: false, matched_rule: { id: 'live_prompt_box', priority: 950, region: 'prompt_box_body', state: 'idle' } }));
+  fs.writeFileSync(path.join(project.herdrDir, `screen.run${n}.txt`), echo + fs.readFileSync(path.join(OMP_FIXTURES, 'provider-retry-gave-up.txt'), 'utf8'));
+}
+
+const briefsTyped = (project) => project.sent().filter((s) => typeof s.text === 'string' && /outbox\/result-1\.json/.test(s.text));
+async function waitForBrief(project, index) {
+  await waitUntil(() => briefsTyped(project).length > index, { what: `brief number ${index + 1} typed at a pane` });
+  return briefsTyped(project)[index].text;
+}
+
 /** Play the healthy candidate: brief taken, work done, result claimed, agent leaves. */
-async function finishHealthyAttempt(project, { writes = false } = {}) {
-  const brief = await project.waitBriefTyped();
+async function finishHealthyAttempt(project, { writes = false, skipBriefs = 0 } = {}) {
+  // A candidate that was briefed and then stopped has typed its brief already: the healthy one is the next.
+  const brief = skipBriefs ? await waitForBrief(project, skipBriefs) : await project.waitBriefTyped();
   project.briefTaken();
   const resultPath = /(\S*outbox\/result-1\.json)/.exec(brief)?.[1];
   assert.ok(resultPath, brief);
@@ -81,6 +99,18 @@ test('a limit screen moves the role to the next candidate in a new pane and clos
   assert.ok(limited, project.attemptDirs().join('\n'));
   assert.equal(readJson(path.join(limited, 'steps', 'release-slot.json')).detail.disposition, 'close');
   assert.equal(readJson(path.join(limited, 'result.json')).classification.failure.code, 'provider-limit');
+});
+
+test('a pane that sits idle after omp gave up on a provider wait moves the role to the next candidate without waiting for the timeout', { skip: SKIP, timeout: 240_000 }, async () => {
+  const project = await newProject('fbgaveup');
+  giveUpOnRun(project, 1);
+  const run = project.startFgosRun({ executorIds: ['alpha', 'beta'] });
+  await finishHealthyAttempt(project, { skipBriefs: 1 });
+  const exit = await run.exited;
+  assert.equal(exit.code, 0, run.output().stderr.slice(-1500) + run.output().stdout.slice(-800));
+  const attempts = unitRecord(project, answerOf(run)).bindings['producer/1'];
+  assert.deepEqual(attempts.map((a) => [a.binding.executor, a.outcome]), [['alpha', 'provider-limit'], ['beta', 'pass']]);
+  assert.equal(attempts[1].fallbackFrom.executor, 'alpha');
 });
 
 test('a fallback runs along a chain of three candidates, one pane each', { skip: SKIP, timeout: 300_000 }, async () => {
