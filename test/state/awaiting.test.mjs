@@ -11,7 +11,8 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { addWork, moveWork, putInAwaiting, answerAwaiting, listWork, categoryOf, rebuild } from '../../src/state/store.mjs';
+import { addWork, moveWork, putInAwaiting, answerAwaiting, listWork, rebuild } from '../../src/state/store.mjs';
+import { categoryOf } from '../../src/cli/exit-codes.mjs';
 import { appendEvent } from '../helpers/legacy-event-fixture.mjs';
 import { acquireClaim, readClaim } from '../../src/state/runtime-coordination.mjs';
 

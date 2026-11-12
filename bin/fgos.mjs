@@ -15,7 +15,7 @@
 // assumed to be an agent — so every outcome is a categorized exit code
 // (R4), and callers should branch on the code, never on the message text.
 //
-// Exit codes (R4): The canonical exit-code table lives in src/state/store-error.mjs's
+// Exit codes (R4): The canonical exit-code table lives in src/cli/exit-codes.mjs's
 // EXIT_CODES export (codes 2-5, 7-9 for store/preflight; 0=ok, 1=unexpected),
 // src/runner/execution/outcome-exit.mjs (execution outcomes: policy-refusal=4, provider-limit=10,
 // execution-failure=11, partial-writes=12, blocked=13, findings=14; RUL99),
@@ -31,7 +31,8 @@ import readline from 'node:readline';
 import { execFileSync, execSync, spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { addWork, moveWork, settleClaim, editWork, resolveParkReason, addDecision, addOutcome, recordFriction, listWork, readyWork, isDepsAndLineageReady, footprintConflicts, computedSchedule, readRawEvents, putInAwaiting, answerAwaiting, setFocus, goalFocusShow, assertAcceptanceEvidence, assertPlanEvidence, assertValidDocType, recordGateApprove, recordCall, recordCallReturn,      parseDecisionRelation, decisionTextLooksLikeSupersession, registerTopicStore, renameTopicStore, splitTopicStore, mergeTopicStore, retireTopicStore, reserveDocStore, registerDocStore, markDocRenderedStore, promoteDocStore, demoteDocStore, supersedeDocStore, retireDocStore, moveDocPathStore, attestDocStore } from '../src/state/store.mjs';
-import { StoreError, EXIT_CODES, categoryOf } from '../src/state/store-error.mjs';
+import { StoreError } from '../src/state/store-error.mjs';
+import { EXIT_CODES, categoryOf } from '../src/cli/exit-codes.mjs';
 import { exitCodeOf } from '../src/cli/verb-exit.mjs';
 import { resolveDocPath } from '../src/report/knowledge-resolver.mjs';
 import { resolveDocId } from '../src/state/knowledge-registry.mjs';
@@ -68,7 +69,6 @@ import { enableCancelOnSignal } from '../src/run-supervisor/cancel-opt-in.mjs';
 const PACKAGE_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 import { resolveInvocationRoot, fgosDirFromRoot } from '../src/runner/paths.mjs';
 import { resolveFgosFile, FGOS_FILE } from '../src/state/fgos-file-registry.mjs';
-import { resolveCliVersionInfo } from '../src/cli/version.mjs';
 import { hasRealVerify } from '../src/intake/discovery.mjs';
 import { replaceLockedDecisionsSection, resolveContentRoot } from '../src/intake/plan.mjs';
 import { findSourceCaptureIds } from '../src/report/enduser-index.mjs';
@@ -864,10 +864,6 @@ function submitWork(dir, text, opts = {}) {
 
 async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slice(3)) {
   switch (verb) {
-    case 'version': {
-      return resolveCliVersionInfo();
-    }
-
     case 'init': {
       const { initStoreUseCase } = await import('../src/verbs/state/init.mjs');
       return initStoreUseCase({ dir });
@@ -4056,7 +4052,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
     }
 
     default:
-      throw new StoreError('validation', `unknown verb "${verb ?? ''}". Usage: fgos <version|init|add|submit|discover|plan|move|retrospective|cleanup|compound|edit|item|ask|answer|decision|list|ready|rebuild|events|rollup|take|return|review|approve|sync-root|reject|catchup|triage|session|gateway|goal|tool|setup|doctor|lock|lock-status|git|main-checkout-reset> ...`);
+      throw new StoreError('validation', `unknown verb "${verb ?? ''}". Usage: fgos <init|add|submit|discover|plan|move|retrospective|cleanup|compound|edit|item|ask|answer|decision|list|ready|rebuild|events|rollup|take|return|review|approve|sync-root|reject|catchup|triage|session|gateway|goal|tool|setup|doctor|lock|lock-status|git|main-checkout-reset> ...`);
   }
 }
 

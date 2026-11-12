@@ -135,6 +135,7 @@ export const COMMAND_REGISTRY = [
     externalEffect: false,
     paginated: false,
     deprecated: null,
+    nativeOnly: true,
   },
   withSubcommands({
     name: 'metrics',

@@ -4,7 +4,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { resolveFgosFile, FGOS_FILE } from '../../../src/state/fgos-file-registry.mjs';
-import { addWork, EXIT_CODES, StoreError } from '../../../src/state/store.mjs';
+import { addWork, StoreError } from '../../../src/state/store.mjs';
+import { EXIT_CODES } from '../../../src/cli/exit-codes.mjs';
 import { approveUseCase } from '../../../src/verbs/merge/approve.mjs';
 import {
   REAL_REPO_ROOT,

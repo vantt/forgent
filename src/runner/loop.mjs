@@ -63,9 +63,8 @@ import {
   readRawEvents,
   addOutcome,
   recordFriction,
-  categoryOf,
-  EXIT_CODES,
 } from '../state/store.mjs';
+import { categoryOf, EXIT_CODES } from '../cli/exit-codes.mjs';
 import { readClaims, withMainState } from '../state/runtime-coordination.mjs';
 import { maintainEventStore } from '../event-store/maintenance.mjs';
 import { processSealCoalescer } from '../event-store/seal-coalescing.mjs';

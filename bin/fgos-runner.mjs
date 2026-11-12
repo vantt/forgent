@@ -11,7 +11,7 @@
 //   fgos-runner [--once] [--watch] [--poll-ms <ms>] [--dry-run]
 //
 // Exit codes (R4): The canonical exit-code table lives in src/state/store.mjs's
-// EXIT_CODES export (codes 2-5, 7-9; 0=ok, 1=unexpected) plus src/runner/loop.mjs's
+// EXIT_CODES export (src/cli/exit-codes.mjs; codes 2-5, 7-9; 0=ok, 1=unexpected) plus src/runner/loop.mjs's
 // EXIT_BUSY (code 6, runner-only state).
 //
 // The repo root is derived from the CURRENT WORKING DIRECTORY via git
@@ -20,7 +20,7 @@
 // worker/verify output is printed to the console only, never persisted to
 // a committed path.
 
-import { EXIT_CODES, categoryOf } from '../src/state/store.mjs';
+import { EXIT_CODES, categoryOf } from '../src/cli/exit-codes.mjs';
 import { loadRunnerConfigForDir } from '../src/runner/dispatch/config.mjs';
 import { resolveRepoRoot, runOnce, runWatch } from '../src/runner/loop.mjs';
 import { wrapEnvelope } from '../src/state/envelope.mjs';

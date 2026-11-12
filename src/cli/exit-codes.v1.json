@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "ok": 0,
+  "unexpected": 1,
+  "categories": {
+    "precondition": 2,
+    "conflict": 3,
+    "validation": 4,
+    "corrupt-log": 5,
+    "lock-timeout": 7,
+    "session-fail": 8,
+    "merge-fail": 9,
+    "not-found": 4
+  }
+}
