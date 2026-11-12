@@ -25,10 +25,14 @@ for (const rel of ['apps/fgos/src/main.rs', 'apps/fgctl/src/help.rs']) {
   });
 }
 
-// The README does not yet carry the `fgos run` step; the phase that rewrites its first-contact text adds it here.
-test('README.md shows the same install command and `fgctl init`', () => {
+// The README carries the same three steps, unescaped, and no longer offers `fgos setup` or the npm install.
+test('README.md shows the same three first-run commands and no retired step', () => {
   const text = read('README.md');
-  for (const command of SHARED_COMMANDS.slice(0, 2)) {
-    assert.ok(text.includes(command), `README.md lacks: ${command}`);
+  for (const command of SHARED_COMMANDS) {
+    const plain = command.replaceAll('\\"', '"');
+    assert.ok(text.includes(plain), `README.md lacks: ${plain}`);
+  }
+  for (const retired of ['fgos setup', 'npm install -g github:vantt/forgent#']) {
+    assert.ok(!text.includes(retired), `README.md still names the retired ${retired}`);
   }
 });

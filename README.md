@@ -10,119 +10,92 @@ Forgent (fgOS) is the platform layer for building and running agent applications
 
 ## Install
 
-fgOS is in alpha. The current alpha is
-[`v0.2.0-rc.2`](https://github.com/vantt/forgent/releases/tag/v0.2.0-rc.2), a
-GitHub pre-release. A pre-release is never "latest", so an alpha is installed by
-naming its tag in `FGCTL_VERSION`. Nothing needs a clone, npm or a Rust
-toolchain: the installer puts one small binary, `fgctl`, on your machine, and
-`fgctl init` downloads and checks the rest.
+From nothing to your first agent run in about 3 minutes. You need Node >= 18,
+git, curl and one agent CLI (claude, codex, omp or pi).
 
-### Alpha quick start: Linux (x86_64)
+### Quick start: Linux (x86_64)
 
 ```bash
-curl -fsSL https://github.com/vantt/forgent/releases/download/v0.2.0-rc.2/install.sh \
-  | FGCTL_VERSION=v0.2.0-rc.2 sh
+curl -fsSL https://github.com/vantt/forgent/releases/latest/download/install.sh | sh
 cd your-project                      # an existing git repository
-FGCTL_VERSION=v0.2.0-rc.2 fgctl init
-.fgos/installation/bin/fgos setup    # once per project: config defaults and hooks
-.fgos/installation/bin/fgos doctor
+fgctl init
+fgos run "<prompt>"
 ```
 
-`install.sh` puts `fgctl` in `~/.local/bin` (or `FGCTL_INSTALL_DIR`); add that
-directory to `PATH` if the installer says it is missing. The Linux build runs on
-glibc 2.35 and later (Ubuntu 22.04 and newer).
+1. `install.sh` puts one small binary, `fgctl`, in `~/.local/bin` (or
+   `FGCTL_INSTALL_DIR`); add that directory to `PATH` if the installer says it is
+   missing. Nothing needs a clone, npm or a Rust toolchain. The Linux build runs on
+   glibc 2.35 and later (Ubuntu 22.04 and newer).
+2. `fgctl init` downloads the latest release, checks it against the release's
+   `SHA256SUMS`, activates it in the project, wires the agent hooks and runs
+   `fgos doctor`. It ends with `Ready` and the next step, or with a numbered list
+   of the checks that need you and exit code 2.
+3. `fgos run "<prompt>"` runs one task through an agent CLI. With no agent CLI
+   installed it stops with `agent-cli-missing` and says which to install.
 
-### Alpha quick start: Windows 10 or later (x86_64)
+A claude seat that runs in the sandbox needs a login of its own, not your
+`~/.claude`; until it has one, `fgos doctor` fails `confined-pane-accounts`. The
+steps are in
+[How to install fgOS in a project and use fgos doctor](docs/how-to/install-fgos-in-a-project-and-use-doctor.md#531-a-claude-seat-in-the-sandbox-needs-its-own-login).
+
+Running `fgos` with no arguments prints these three steps again; `fgos --version`
+and `fgctl --version` print the version, and `fgos <command> --help` describes one
+command.
+
+### Quick start: Windows 10 or later (x86_64)
 
 Open PowerShell (no Git Bash, no WSL, no administrator rights):
 
 ```powershell
-$env:FGCTL_VERSION = 'v0.2.0-rc.2'
-irm https://github.com/vantt/forgent/releases/download/v0.2.0-rc.2/install.ps1 | iex
+irm https://github.com/vantt/forgent/releases/latest/download/install.ps1 | iex
 $env:Path = "$env:LOCALAPPDATA\fgos\bin;$env:Path"    # this session only
 cd your-project                      # an existing git repository
 fgctl init
-.\.fgos\installation\bin\fgos.cmd setup
-.\.fgos\installation\bin\fgos.cmd doctor
+fgos run "<prompt>"
 ```
 
 `install.ps1` installs `fgctl.exe` into `%LOCALAPPDATA%\fgos\bin` (or
 `FGCTL_INSTALL_DIR`), checks the download against the release's `SHA256SUMS` and
 changes nothing on your `PATH`: the `$env:Path` line above covers the current
 session, and the installer prints the command to make it permanent. `fgctl init`
-needs `curl.exe`, which ships with Windows 10 1803 and later. After `fgctl init`,
-put `.fgos\installation\bin` on `PATH` (or call `fgos.cmd` by path); it runs from
-PowerShell and `cmd.exe` alike. `fgctl init` must run inside a git repository, as on Linux.
+needs `curl.exe`, which ships with Windows 10 1803 and later, and must run inside a
+git repository, as on Linux.
 
-macOS and Windows on ARM are not supported in this alpha.
+macOS and Windows on ARM are not supported yet.
 
-### Stable releases and other options
+### Pre-releases and other sources
 
-Once a release is not a pre-release, `install.sh` installs it by default, with no
-`FGCTL_VERSION`:
-
-```bash
-curl -fsSL https://github.com/vantt/forgent/releases/latest/download/install.sh | sh
-```
-
-and on Windows `irm https://github.com/vantt/forgent/releases/latest/download/install.ps1 | iex`.
-Until the first release newer than `v0.1.0` is stable, "latest" is `v0.1.0`,
-which predates the Windows assets.
-
-Then initialize your project from inside its git repository. A plain
-`fgctl init` uses the release the project's committed `.fgos/distribution.json`
-pins; with no pin it downloads the latest release (through `curl`), checks it
-against the release's `SHA256SUMS`, and installs it. No tarball download by hand:
+A pre-release is never "latest", so install it by naming its tag, for the installer
+and again for `fgctl init`:
 
 ```bash
-fgctl init
-```
-
-To pick a different release:
-
-```bash
-FGCTL_VERSION=v0.2.0-rc.2 fgctl init         # an exact tag; needed for pre-releases
-FGCTL_FROM=./fgos-<tag>-x86_64-unknown-linux-gnu.tar.gz fgctl init   # a local build, build dir, or URL
-fgctl init --from <path-or-URL>              # same as FGCTL_FROM
+curl -fsSL https://github.com/vantt/forgent/releases/download/<tag>/install.sh \
+  | FGCTL_VERSION=<tag> sh
+FGCTL_VERSION=<tag> fgctl init
 ```
 
 A download writes its tag into the committed `.fgos/distribution.json`, so a
-teammate who clones the project and runs a plain `fgctl init` gets the same
-release downloaded (and checked) without being told which one.
+teammate who clones the project and runs a plain `fgctl init` gets the same release
+(downloaded and checked) without being told which one. Other sources:
+
+```bash
+FGCTL_FROM=./fgos-<tag>-x86_64-unknown-linux-gnu.tar.gz fgctl init   # a local build, build dir, or URL
+fgctl init --from <path-or-URL>                                      # same as FGCTL_FROM
+```
 
 Precedence: `--from` > `FGCTL_FROM` > `FGCTL_VERSION` > the project's pin > latest.
 A downloaded release is refused unless its entry in `SHA256SUMS` matches; a URL
 source needs a `SHA256SUMS` file in the same directory. A local path is used as
 is. `FGCTL_ASSET_BASE_URL` redirects downloads to a mirror, as for `install.sh`: it
-names the directory that holds the assets (so `install.sh` needs `FGCTL_VERSION` with
-it), and it must be `https://` or `file:///`; plain `http://` is refused except to a
-loopback host.
+names the directory that holds the assets (so `install.sh` needs `FGCTL_VERSION`
+with it), and it must be `https://` or `file:///`; plain `http://` is refused
+except to a loopback host. When the active release is not the one the committed pin
+names, `fgctl status` and `fgos doctor` say so (`active <d12> != pin <d12>`), and an
+unreadable pin makes `fgctl init` refuse; restore it from version control or run
+`fgctl upgrade`.
 
-`fgctl init` ends by running `fgos doctor --fix` and `fgos doctor`, which only run
-registered fixes: run `fgos setup` once in the project for the config defaults,
-hook wiring and Claude Code hook they do not write.
-
-`npm install -g github:vantt/forgent#v0.1.0` is kept as a documented
-compatibility channel for the Node host this platform is migrating away
-from — use it only if you specifically need the Node-hosted `fgos` CLI
-instead of the native `fgctl`/`fgos` binaries above.
-
-Replace `v0.1.0` with the [latest release tag](https://github.com/vantt/forgent/tags).
-See `docs/knowledge/how-to-cut-a-fgos-release-tag/cut-a-fgos-release-tag.md`
-for how tags get cut.
-
-Bleeding-edge (always resolves to whatever commit is currently on `main`,
-useful for contributors/early-adopters who want it):
-
-```bash
-npm install -g github:vantt/forgent
-```
-
-Then initialize your project:
-
-```bash
-fgos init
-```
+The npm install (`npm install -g github:vantt/forgent`) is retired: it ships no
+native host, so `fgos init` there refuses and points to `fgctl init`.
 
 ### Dev shell helpers
 
@@ -135,34 +108,19 @@ resolve the right `bin/*.mjs` automatically from any cwd inside the repo:
 source /path/to/forgent/scripts/fgos-shell-integration.sh
 ```
 
-### Setup
-
-`fgos setup` wires the shell-integration source line into every shell
-profile you actually have (bash and/or zsh) and creates a header-only
-`.fgos/config.yaml` when the project has no config file. It does the same
-for your global `~/.fgos/config.yaml` (optional, shared across every project
-— a value set there is used wherever a project doesn't set its own). It
-never writes default values into either file: the release ships the standard
-and your files hold only what you change. It always
-does the work and reports exactly what changed — running it again with
-nothing new to do says so plainly instead of repeating itself.
-
-```bash
-fgos setup
-fgos setup --pretty   # colored plain text instead of JSON
-```
-
 ### Doctor
 
-`fgos doctor` is a read-only diagnostic: Node/git availability, whether
-the shell-integration line is sourced, and whether your config file is
-missing any current default key. It never writes anything on its own, and it
-exits 0 whatever the checks say; add `--strict` to exit 1 when a check fails.
+`fgos doctor` answers one question: can fgOS run correctly on this machine and in
+this project. It prints a JSON report whose `ok` says yes or no and whose `next`
+lists the commands to run when it is no; `--pretty` prints colored text instead.
+It writes nothing on its own and exits 0 whatever the checks say, so a tail that
+runs it never reads a failed check as a crash; `--strict` exits 1 when a check
+fails (for scripts and CI).
 
 ```bash
 fgos doctor
-fgos doctor --fix     # runs every registered fix, then re-reports checks
-fgos doctor --strict  # same report, exit 1 if any check fails (for scripts/CI)
+fgos doctor --fix     # runs every registered readiness fix, then re-reports
+fgos doctor --strict  # same report, exit 1 if any check fails
 ```
 
 For the full onboarding order, what every doctor check means and which ones you
@@ -181,15 +139,16 @@ config problems and, with `--fix`, repairs the ones it names. Details:
 
 ### Uninstall
 
-`fgos uninstall` reverses `fgos setup`'s own wiring — unwiring the git
-hooks path and reporting (never deleting) any shell-rc source line it
-finds, since removing that line stays a manual, human step. It never
-touches `.fgos/` data or config. Requires `--yes`; refuses with no side
-effects otherwise.
+`fgctl uninstall` removes what fgOS installed in the project: its hook entries,
+generated skill directories, git hooks and the `.fgos/installation/` activation. It
+prints the plan first and applies it with `--yes`. Your config and data stay.
+`--purge` also removes the machine's release store. The `fgctl` binary and the
+`fgos` launcher beside it are named, never removed.
 
 ```bash
-fgos uninstall --yes
-fgos uninstall --yes --remove-package   # also runs: npm uninstall -g forgent
+fgctl uninstall --dry-run   # print the plan, change nothing
+fgctl uninstall --yes
+fgctl uninstall --yes --purge
 ```
 
 ### Contributing

@@ -4381,7 +4381,7 @@ async function main() {
     dir = resolveInvocationRoot({ cwd: process.cwd(), dir: flags.dir, policy: verb === 'init' ? 'strict-cwd' : 'caller-tree' }).fgosDir;
     const entry = COMMAND_REGISTRY.find((e) => e.name === verb);
     if (entry?.nativeOnly) {
-      process.stderr.write(`fgos: "${verb}" chỉ có ở Rust host.\n`);
+      process.stderr.write(`fgos: "${verb}" is only available in the native fgOS host. Install a release with "fgctl init" (https://github.com/vantt/forgent#install).\n`);
       process.exit(4);
     }
     // Whether this verb may touch the store from here (missing store, disconnected snapshot, `init` in a worktree, an

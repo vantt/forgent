@@ -43,7 +43,7 @@ The spec is written for current behavior and near-term accepted target behavior.
 | `fgctl repair` | Implemented preview | Repairs a workspace installation under the selected release model; current preview proof covers repair after activation. |
 | `.fgos/installation/bin/fgos` | Implemented preview | Stable workspace command surface after activation; current preview proof reports `host: "rust"` and the activated `artifactDigest`. |
 | `.fgos/installation/bin/fgos.cmd`, `fgos-runner.cmd` | Implemented preview | The same stable surface for PowerShell and `cmd.exe`, written by `fgctl init`/`repair` next to the `sh` pair and needing no POSIX shell; `fgctl verify` reports a missing or edited launcher and `fgctl repair` regenerates it. |
-| `npm install -g github:vantt/forgent` | Implemented legacy deprecated | Installs the legacy Node `fgos` and `fgos-runner` entry points; explicit deprecated escape hatch during the compatibility window, not the public/default posture. |
+| `npm install -g github:vantt/forgent` | Retired (3.2) | Not an install channel: it ships no native addon; `fgos init` there refuses and points to `fgctl init`. |
 | `scripts/fgos-shell-integration.sh` | Implemented | Contributor/dev helper that resolves fgOS command tiers from shell functions. |
 | local `fgos init` | Partial target | Adopts/materializes workspace state after `fgctl` publishes a ready activation. |
 | `fgos doctor` | Implemented | Answers whether fgOS can run on this machine and in this project (readiness only, RUL109 (doctor answers readiness only; incidents and repo rules live elsewhere)) without writing by default; a live incident is a read-only pointer row naming its component's own verb. |
@@ -52,14 +52,14 @@ The spec is written for current behavior and near-term accepted target behavior.
 
 ## 3. Install Channels
 
-**Release posture (coordinator decision, preview published 2026-09-18):** preview. External installs default `fgos` through the Rust host (3.1), and public docs may state the Rust host as the default installed runtime. The legacy Node channel (3.2) remains only as the settled, explicit deprecated escape hatch for 30 calendar days after the preview release publication date. Public preview tag `v0.1.0` was published on 2026-09-18, so the earliest removal date for this preview release is 2026-10-18 unless a later release decision replaces that support promise.
+**Release posture:** external installs run `fgos` through the Rust host (3.1), and public docs state the Rust host as the installed runtime. The legacy Node channel (3.2) is retired: its 30-day window after the `v0.1.0` preview (published 2026-09-18) ended on 2026-10-18.
 
 ## 3.1 Recommended Native Channel
 
 The README recommends the release install script:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/vantt/forgent/main/install.sh | sh
+curl -fsSL https://github.com/vantt/forgent/releases/latest/download/install.sh | sh
 ```
 
 This installs `fgctl`, then the user initializes a project with:
@@ -83,15 +83,9 @@ fgctl init
 
 Implementation evidence includes `packages/distribution/rust/src/fetch.rs`, `packages/distribution/rust/tests/fetch_download.rs`, the download tests in `test/rust-host/fgctl-init-download.test.mjs` and `test/rust-host/fgctl-init-download-sources.test.mjs`, `install.sh`, `.github/workflows/release.yml`, `.github/workflows/release-assets.yml`, `.github/workflows/ci.yml`, `test/install/install-sh.test.mjs`, `test/install/install-ps1.test.mjs`, `scripts/install.ps1`, `packages/distribution/rust/src/shim.rs`, `scripts/package-release-assets.mjs`, `scripts/check-glibc-ceiling.sh`, `scripts/ci-external-consumer.sh`, and `scripts/ci-external-consumer.ps1`.
 
-## 3.2 Legacy Node Compatibility Channel
+## 3.2 Legacy Node Channel (retired)
 
-The GitHub npm install path remains supported for compatibility:
-
-```bash
-npm install -g github:vantt/forgent#v0.1.0
-```
-
-This installs `fgos` and `fgos-runner` from `package.json` and `bin/*.mjs`. It is a compatibility channel, not the target architecture for project-local runtime identity.
+`npm install -g github:vantt/forgent` is no longer an install channel and the README no longer offers it. It ships no native addon, so on it `fgos init` refuses and points to `fgctl init`, and `fgos doctor` reports `git-addon-unavailable`. A verb that exists only in the Rust host answers with the same pointer. The `fgos` and `fgos-runner` entry points in `package.json` stay only for the dev checkout (3.3) and the legacy-node payload a release stages (`libexec/legacy-node/`).
 
 ## 3.3 Dev Checkout Channel
 
@@ -147,6 +141,8 @@ local fgos doctor --fix
 local fgos doctor
 ```
 
+`fgctl init` therefore wires the agent hooks (through the registered fixes of `doctor --fix`) and writes no config defaults of its own; `fgos setup` is not a step of onboarding. `fgctl init` ends on the last doctor report: `Ready: fgOS <tag> active (<digest12>)` plus `Next: fgos run "<prompt>"` with exit 0 when `ok` is true, otherwise `<N> checks need you:` and one numbered line per failing check (its fix command, or its message when only a person can fix it) with exit 2 (`precondition`); it has no `--yes` flag. The tail's own exit status stays 0 whatever the checks say, so a tail that crashes is told apart from one that found checks to fix.
+
 Current legacy `fgos setup` remains implemented and deprecated in the Node CLI and still:
 
 - wires shell/helper and hook support where applicable;
@@ -161,7 +157,8 @@ Current legacy `fgos setup` remains implemented and deprecated in the Node CLI a
 - runs registered checks;
 - answers readiness only: can fgOS run correctly here (RUL109 (doctor answers readiness only; incidents and repo rules live elsewhere));
 - does not write by default;
-- reports pass/fail and what to do next;
+- reports pass/fail and what to do next: `ok` (true only when no check fails) and `next` (the commands to run);
+- exits 0 whatever the checks say, and 1 with `--strict` when a check still fails;
 - carries at most one read-only pointer row per component with live incidents, naming the component's own verb.
 
 `fgos doctor --fix`:

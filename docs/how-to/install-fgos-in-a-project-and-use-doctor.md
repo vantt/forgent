@@ -65,7 +65,7 @@ refuses outside one).
 1. Install `fgctl` once per machine:
 
    ```bash
-   curl -fsSL https://raw.githubusercontent.com/vantt/forgent/main/install.sh | sh
+   curl -fsSL https://github.com/vantt/forgent/releases/latest/download/install.sh | sh
    ```
 
    It downloads `fgctl-<version>-<target>.tar.gz` from the release, verifies it
@@ -81,7 +81,7 @@ refuses outside one).
 
    ```bash
    fgctl init                              # no pin: downloads the latest release
-   FGCTL_VERSION=v0.2.0-rc.1 fgctl init    # an exact tag (pre-releases are never "latest")
+   FGCTL_VERSION=<tag> fgctl init           # an exact tag (pre-releases are never "latest")
    FGCTL_FROM=./fgos-<tag>-x86_64-unknown-linux-gnu.tar.gz fgctl init   # a non-release build
    ```
 
@@ -105,13 +105,18 @@ refuses outside one).
    .fgos/installation/bin/fgos doctor
    ```
 
-   If any tail command exits non-zero, `fgctl init` exits non-zero and the
-   install is recorded as `ready-degraded`. Note that `fgos doctor` exits 0
-   even when checks fail (see section 3; `--strict` changes that, but the tail
-   does not use it), so a green `fgctl init` does not mean a green doctor.
+   The tail writes the config defaults and wires the agent hooks (Claude Code,
+   Codex, agy, OMP and Pi) through `fgos doctor --fix`; no separate setup step is
+   needed. `fgctl init` then reads the last doctor report and ends with one of two
+   blocks. When `ok` is true it prints `Ready: fgOS <tag> active (<digest12>)` and
+   `Next: fgos run "<prompt>"`, and exits 0. Otherwise it prints `<N> checks need
+   you:` and one numbered line per failing check, `<id>: <fix command>` (the check's
+   message when only a person can fix it), and exits 2; the release stays activated
+   and the install is recorded as `ready-degraded`. `fgctl init` has no `--yes`
+   flag: it asks nothing. A tail command that itself fails exits 1.
 
-3. Read the doctor report yourself and clear everything the tool could not fix
-   (section 4 says which is which):
+3. Clear every check the closing block listed. To read the whole report
+   (section 4 says which check is which):
 
    ```bash
    .fgos/installation/bin/fgos doctor --pretty
@@ -119,15 +124,6 @@ refuses outside one).
 
 4. Do the owner steps in section 5 (trust in every agent CLI home, pools with
    enough provider families). No tool writes those for you.
-
-5. If config defaults or hooks are still reported as missing (the
-   `... -- run fgos setup` messages), run the legacy `fgos setup` once:
-
-   ```bash
-   .fgos/installation/bin/fgos setup
-   ```
-
-   See "What setup still does that doctor --fix does not" below.
 
 Later, to move the project to a newer release:
 
@@ -156,19 +152,17 @@ Check what is active with `fgctl status` (`--json` for machines).
 | `fgos doctor` | Runs every check and reports | nothing |
 | `fgos doctor --fix` | Runs every registered fix, then reports the checks again | the fixes listed in section 4 |
 | `fgos doctor --strict` | Same report; exits 1 when any check fails (also with `--fix`) | nothing |
-| `fgos setup` | Legacy. Wires shell integration, fills config defaults, wires git and Claude Code hooks, runs every registered fix, materializes skills | project and global config, rc files, hooks |
+| `fgos setup` | Deprecated. Kept only for the legacy shell-integration line and global config defaults; `fgctl init` already writes the config defaults and wires the hooks | project and global config, rc files, hooks |
+| `fgctl uninstall [--dry-run] [--yes] [--purge]` | Prints a plan, then removes fgOS's hook entries, generated skills, git hooks and `.fgos/installation/`; keeps config and data; `--purge` also removes the machine release store | the project, and the store with `--purge` |
 
 If the shim says `no active runtime -- run fgctl init` or
 `active runtime is not ready (...) -- run fgctl repair`, do what it says.
 
-### 2.2. What setup still does that doctor --fix does not
+### 2.2. The legacy `fgos setup`
 
-`fgos setup` is marked deprecated, but `fgctl init`, then `fgos doctor --fix`,
-then `fgos doctor` does not fill the config defaults. `doctor --fix` only runs
-the fixes in section 4; the check messages for missing config sections, the git
-hook and the Claude Code dispatch hook all still say "run fgos setup", and only
-`setup` writes them (its help now says so too). Run `fgos setup` once in the
-project when those checks are red. It never overwrites a value you already set.
+`fgos setup` is deprecated. `fgctl init` runs `fgos doctor --fix`, which writes the
+config defaults and wires the hooks, so a project onboarded with `fgctl init` does
+not need it.
 
 `fgos setup` also converts a project config file that still holds the retired
 collaboration keys (`runner.patterns.reviewed.maxRounds`,
@@ -191,8 +185,8 @@ fgos doctor --fix --json   # adds data.fixed: [{id, changed, message}] and re-re
 
 - Plain `doctor` and `doctor --fix` both exit 0 whatever the checks say: the
   `fgctl init|upgrade|repair` tail runs them and treats a non-zero exit as a
-  degraded install, and a project that has not run `fgos setup` always has red
-  checks. Read `passed`, or pass `--strict` (`fgos doctor --strict`,
+  crash of the tail itself. Read `ok` (true only when no check fails) and `next`
+  (the commands to run), or pass `--strict` (`fgos doctor --strict`,
   `fgos doctor --fix --strict`) to get exit 1 when any check fails, for scripts
   and CI. A check that reports `passed: true` with an "informational" note never
   trips `--strict`.
@@ -404,6 +398,36 @@ Use the exact root the check prints. If you use several codex homes or agy
 sub-HOMEs (one per account), repeat for each: the check lists them all.
 `agent-cli-project-trusted` verifies codex and agy; claude trust has no doctor
 check beyond `trust-store-readable`, so open it once yourself.
+
+### 5.3.1. A claude seat in the sandbox needs its own login
+
+A claude seat that runs confined (`claude-cli-bwrap`, `claude-herdr-bwrap`) starts
+in a private home and keeps its session transcript there. Its login must be a
+dedicated one, never your `~/.claude`: fgOS renews the login of a seat account, and
+a failed renewal would sign out every claude session of yours. Until the machine has
+such an account, `fgos doctor` fails `confined-pane-accounts` for both claude
+invocations and the seat starts logged out. A machine without the `claude` CLI skips
+this.
+
+Create the login once, in a directory fgOS owns, and sign in with the account the
+seat should use (it may be the same Anthropic account, as a separate sign-in):
+
+```bash
+mkdir -m 700 -p ~/.fgos/private/claude-login
+CLAUDE_CONFIG_DIR=~/.fgos/private/claude-login claude /login
+```
+
+Then declare it as the `main` claude account in the global config:
+
+```bash
+fgos config set runner.providers.claude.accounts.main '{label: claude-seat, credentialSources: {claude: {kind: home-files, home: "${HOME}/.fgos/private/claude-login", files: [".credentials.json"]}}}' --reason "claude seat uses its own login"
+```
+
+Only `.credentials.json` is copied into the seat's home. A seat refuses to start when
+the copy has less access-token time left than the seat's timeout, so it never renews
+inside its home; fgOS renews this login at the source before a run. Check with
+`fgos config check`, then `fgos doctor`: `confined-pane-accounts` should say each
+claude invocation "has its 1 credential file(s)".
 
 ### 5.4. Run from inside the project
 

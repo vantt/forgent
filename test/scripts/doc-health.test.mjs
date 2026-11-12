@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { execFileSync, spawnSync } from 'node:child_process';
+import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { checkDeadReferences, checkPlatformLinks, checkPlatformMetadata, governanceBaselineFields } from '../../scripts/doc-health.mjs';
 import { checkIdentityIdsUnique } from '../../scripts/identity-ids-unique.mjs';
@@ -151,16 +151,6 @@ test('the committed decisions index is a fixpoint of the generator over its own 
   const committed = fs.readFileSync(indexPathFor(REPO_ROOT), 'utf8');
   assert.equal(buildDecisionIndexMarkdown([], committed, { holderFor: narrativeHolderResolver(REPO_ROOT) }), committed,
     'run `fgos decision-index` and commit docs/decisions/index.md');
-});
-
-// Owns the README install pin: the tag the first-install command names was really cut.
-// CI fetches every tag; a checkout with no tags at all cannot answer, and says so by skipping.
-test('the install tag README.md pins exists in this checkout', (t) => {
-  const pinned = fs.readFileSync(path.join(REPO_ROOT, 'README.md'), 'utf8').match(/npm install -g github:[^#\s]+#(v\d+\.\d+\.\d+)/);
-  if (!pinned) return t.skip('README.md pins no tag in its install command');
-  const tags = execFileSync('git', ['tag', '-l'], { cwd: REPO_ROOT, encoding: 'utf8' }).split('\n').filter(Boolean);
-  if (tags.length === 0) return t.skip('this checkout lists no git tags (shallow clone)');
-  assert.ok(tags.includes(pinned[1]), `README.md recommends installing tag ${pinned[1]}, which does not exist: cut it per docs/knowledge/how-to-cut-a-fgos-release-tag/cut-a-fgos-release-tag.md or pin a tag that exists`);
 });
 
 // Owns the id registries: ids that travel between machines come from `fgos identity mint <kind>`,

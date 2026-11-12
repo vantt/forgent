@@ -414,7 +414,7 @@ export function describeNonGitShellIntegration(cwd) {
   }
   return {
     passed: false,
-    message: 'not inside a git checkout and no fgos bin reachable at any of the 3 tiers (dev-checkout, project-local, global PATH) -- run "npm install -g github:vantt/forgent"',
+    message: 'not inside a git checkout and no fgos bin reachable at any of the 3 tiers (dev-checkout, project-local, global PATH) -- install a release with "fgctl init" (https://github.com/vantt/forgent#install)',
   };
 }
 
