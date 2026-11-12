@@ -200,3 +200,14 @@ test('a linked skills root, a linked agent directory and a linked extensions dir
   assert.ok(result.keeps.some((line) => line.includes('.omp/extensions/fgos-hooks.ts') && line.includes('symbolic link')), result.keeps.join('\n'));
   assert.equal(exists(project, '.claude/skills/alpha'), false, 'the unlinked part is still reversed');
 });
+
+test('an empty skills directory behind a linked parent is not removed', () => {
+  const pkg = makePackage();
+  const project = mkTemp('uninstall-project-');
+  initFixtureRepo(project);
+  const outside = mkTemp('uninstall-outside-');
+  fs.mkdirSync(path.join(outside, 'agents', 'skills'), { recursive: true });
+  fs.symlinkSync(path.join(outside, 'agents'), path.join(project, '.agents'));
+  uninstallProject(project, { apply: true, packageRoot: pkg, home: mkTemp('uninstall-home-') });
+  assert.ok(fs.existsSync(path.join(outside, 'agents', 'skills')), 'the directory behind the link stays');
+});

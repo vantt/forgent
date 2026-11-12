@@ -21,6 +21,7 @@ import { uninstallAgentHooks } from './agent-hooks.mjs';
 import { mainCheckoutHookWired, uninstallGitHooks } from './git-hooks.mjs';
 import { fixMailboxSyncTimer } from './mailbox-sync-timer.mjs';
 import { detectRcFiles, hasSourceLine } from './shell-rc.mjs';
+import { firstSymlinkUnder } from '../util/refuse-symlink.mjs';
 import { createProjectSkillGuard, generatedSkillDirs, ownedSkillNames } from './skill-wrappers.mjs';
 
 /** What the project keeps, by path, for the plan to print. */
@@ -73,8 +74,10 @@ function planSkills(repoRoot, packageRoot, apply) {
     if (removeGeneratedDir(skillsRoot, dir, guard.forRoots(sourceRoot, skillsRoot), apply, kept)) removed.push(dir);
   }
   if (apply) {
-    for (const root of [path.join(repoRoot, '.claude', 'skills'), path.join(repoRoot, '.agents', 'skills')]) {
-      if (fs.existsSync(root) && !fs.lstatSync(root).isSymbolicLink() && fs.readdirSync(root).length === 0) fs.rmdirSync(root);
+    // An emptied root goes only when no component of its path is a link: rmdir would follow a parent link.
+    for (const rel of ['.claude/skills', '.agents/skills']) {
+      const root = path.join(repoRoot, rel);
+      if (fs.existsSync(root) && !firstSymlinkUnder(repoRoot, rel) && fs.readdirSync(root).length === 0) fs.rmdirSync(root);
     }
   }
   return { removed, kept, foreign, skipped: null };
