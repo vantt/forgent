@@ -44,9 +44,20 @@ fn write_release(dir: &Path, tag: &str, payload: &[u8], sums_hash: Option<String
     std::fs::write(dir.join("SHA256SUMS"), sums).unwrap();
 }
 
+/// A `file://` URL for a local directory. Windows paths have a drive and backslashes, which a
+/// URL spells `file:///C:/dir`; the transport gate refuses a raw backslash on purpose.
+fn file_url(dir: &Path) -> String {
+    let path = dir.display().to_string().replace('\\', "/");
+    if path.starts_with('/') {
+        format!("file://{path}")
+    } else {
+        format!("file:///{path}")
+    }
+}
+
 fn file_endpoint(dir: &Path) -> DownloadEndpoint {
     DownloadEndpoint {
-        asset_base_url: Some(format!("file://{}", dir.display())),
+        asset_base_url: Some(file_url(dir)),
         target: Some(TARGET.to_string()),
     }
 }
@@ -173,7 +184,7 @@ fn explicit_url_needs_a_sibling_checksum_entry() {
     )
     .unwrap();
 
-    let url = format!("file://{}/custom.tar.gz", dir.display());
+    let url = format!("{}/custom.tar.gz", file_url(&dir));
     let downloaded = fetch_url(&url).unwrap();
     assert_eq!(std::fs::read(&downloaded.tarball).unwrap(), payload);
     drop(downloaded);
