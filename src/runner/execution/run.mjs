@@ -413,6 +413,19 @@ function applyScopeRule({ unitRecord, mainRoot }, { outcome, results }) {
 }
 
 /**
+ * What a seat's session left: `transcriptPath` is the absolute path of the transcript Execution kept in the attempt's
+ * run directory, null when none was kept (the CLI wrote no session, or the seat has no credential store of its own).
+ * Turns and tool uses have no source yet and read as null.
+ */
+function activityOf({ unitRecord, assignmentsDir }, result) {
+  const assignmentId = unitRecord.bindings?.[`${result.seat}/${result.round ?? 1}`]?.at(-1)?.assignmentId;
+  const dir = assignmentId ? currentAttemptOf(assignmentsDir, assignmentId)?.dir : null;
+  let kept = null;
+  try { kept = JSON.parse(fs.readFileSync(path.join(dir, 'steps', 'finalize-home.json'), 'utf8')).detail?.transcriptPath ?? null; } catch { /* no step record: nothing was kept */ }
+  return { turns: null, toolUses: null, transcriptPath: kept ? path.join(dir, kept) : null };
+}
+
+/**
  * The one place the end of a Unit run becomes its record and its result: the scope rule and the verify round are
  * applied before the unit record settles, so the record, the case reservation and the caller read one outcome. A run
  * none of whose seats was given its brief did no work and ends `not-started`. Every fact is computed here, once; a
@@ -425,7 +438,11 @@ function finishUnit(ctx, { outcome, rounds, results = [], findings = [], ...rest
   const started = ruled.outcome !== 'pass' && noBriefDelivered(unitRecord)
     ? { value: false, reason: 'brief-not-delivered' }
     : { value: true, reason: null };
-  const attempts = results.map((result) => ({ ...result, infrastructure: isInfrastructure(result?.outcome) }));
+  const attempts = results.map((result) => ({
+    ...result,
+    infrastructure: isInfrastructure(result?.outcome),
+    ...(result?.runResult ? { runResult: { ...result.runResult, activity: activityOf(ctx, result) } } : {}),
+  }));
   const final = started.value ? ruled.outcome : NOT_STARTED_OUTCOME;
   return {
     unitRunId, outcome: final, rounds, results: attempts, findings,

@@ -1,0 +1,89 @@
+{
+  "id": "findings-out-of-scope",
+  "why": "A producer passed but wrote a path outside its declared writes: the scope rule makes the final outcome findings before anything settles, so the case ledger and the caller read the same value; it is a verdict, never infrastructure.",
+  "data": {
+    "unitRunId": "unit-run-1790000000000-00000003",
+    "rounds": 1,
+    "findings": [],
+    "infrastructure": false,
+    "outOfScope": [
+      "stray.txt"
+    ],
+    "outOfScopeOnBranch": [],
+    "evaluations": [],
+    "started": {
+      "value": true,
+      "reason": null
+    },
+    "launches": {
+      "ceiling": null,
+      "used": 1,
+      "ceilingHit": false
+    },
+    "settled": {
+      "unit": true,
+      "case": true
+    },
+    "warnings": [],
+    "outcome": "findings",
+    "results": [
+      {
+        "outcome": "pass",
+        "seat": "producer",
+        "role": "producer",
+        "posture": {
+          "readOnly": false,
+          "writer": true,
+          "forceOutOfProcess": false,
+          "stance": false,
+          "verdict": false
+        },
+        "round": 1,
+        "infrastructure": false,
+        "runResult": {
+          "contract": {
+            "id": "run-result",
+            "version": 3
+          },
+          "runId": "run-producer-1",
+          "assignmentId": "unit-run-1790000000000-00008/producer/1",
+          "classification": {
+            "execution": {
+              "status": "completed"
+            },
+            "assessment": {
+              "verdict": "pass"
+            },
+            "confidence": {
+              "level": "reported"
+            },
+            "policy": {
+              "disposition": "allow"
+            }
+          },
+          "activity": {
+            "turns": null,
+            "toolUses": null,
+            "transcriptPath": null
+          }
+        },
+        "binding": {
+          "executor": "alpha",
+          "model": "alpha-std",
+          "tier": "standard",
+          "invocation": "cli-default",
+          "leaseAccount": null
+        },
+        "commit": {
+          "status": "committed",
+          "files": [
+            "docs/a.md"
+          ],
+          "outOfScope": [
+            "stray.txt"
+          ]
+        }
+      }
+    ]
+  }
+}

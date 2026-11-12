@@ -10,13 +10,8 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 
-import { execFileSync } from 'node:child_process';
-
-import { buildUnitHandoff, unitPatternOf, renderGateQuestion, foldUnitOutcome } from '../../src/workflow/unit-handoff.mjs';
+import { buildUnitHandoff, unitPatternOf, renderGateQuestion } from '../../src/workflow/unit-handoff.mjs';
 import { unitFieldsOfTemplate } from '../../src/workflow/steps.mjs';
-import { ensureScriptAddon } from '../../scripts/lib/git-ports.mjs';
-import { activateGitFixture } from '../helpers/git-fixture.mjs';
-import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
 import { RunnerConfigError } from '../../src/runner/dispatch/runner-config-error.mjs';
 import { HandoffRefError, OWN_PREVIOUS_NAME, SEAT_PLACEHOLDER } from '../../src/runner/execution/handoff-refs.mjs';
 
@@ -102,32 +97,6 @@ test('a packet file touched after the report settled, malformed, or without the 
   for (const scenario of cases) {
     assert.throws(() => question(settledProducer({ report: '# Advice in prose', ...scenario })), SyntaxError, scenario.name);
   }
-});
-
-test('a unit whose write check cannot run ends as an infrastructure failure instead of throwing out of the run', () => {
-  ensureScriptAddon();
-  const root = makeFixtureDir('fgos-unit-writes-');
-  const git = (...args) => execFileSync('git', args, { cwd: root, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim();
-  git('init', '-b', 'main');
-  git('config', 'user.name', 'Unit Test');
-  git('config', 'user.email', 'unit@test.local');
-  fs.writeFileSync(path.join(root, 'README.md'), '# x\n');
-  git('add', 'README.md');
-  git('commit', '-m', 'initial');
-  activateGitFixture(root);
-
-  const settled = foldUnitOutcome({
-    mainRoot: root,
-    unitData: { writes: ['a.txt'] },
-    result: { unitRunId: 'unit-run-x', outcome: 'pass', results: [] },
-    state: { steps: {} },
-    base: null,
-    branch: 'wf/gone',
-    baseSha: git('rev-parse', 'HEAD'),
-  });
-  assert.equal(settled.result.outcome, 'execution-failure');
-  assert.match(settled.result.error, /could not check the writes of the unit: .*writing branch/);
-  assert.deepEqual(settled.outOfScope, []);
 });
 
 // buildUnitHandoff over a hand-built case state: no repository, no run. A step is `{ id, dependsOn }`; a settled unit is

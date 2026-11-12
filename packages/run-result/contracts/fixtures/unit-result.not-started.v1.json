@@ -1,0 +1,82 @@
+{
+  "id": "not-started",
+  "why": "No seat was given its brief: the run did no work, the launch slot is handed back and the unit ends not-started, which is infrastructure.",
+  "data": {
+    "unitRunId": "unit-run-1790000000000-00000008",
+    "rounds": 1,
+    "findings": [],
+    "infrastructure": true,
+    "outOfScope": [],
+    "outOfScopeOnBranch": [],
+    "evaluations": [],
+    "started": {
+      "value": false,
+      "reason": "brief-not-delivered"
+    },
+    "launches": {
+      "ceiling": 1,
+      "used": 1,
+      "ceilingHit": false
+    },
+    "settled": {
+      "unit": true,
+      "case": true
+    },
+    "warnings": [],
+    "outcome": "not-started",
+    "results": [
+      {
+        "outcome": "execution-failure",
+        "seat": "producer",
+        "role": "producer",
+        "posture": {
+          "readOnly": false,
+          "writer": true,
+          "forceOutOfProcess": false,
+          "stance": false,
+          "verdict": false
+        },
+        "round": 1,
+        "infrastructure": true,
+        "runResult": {
+          "contract": {
+            "id": "run-result",
+            "version": 3
+          },
+          "runId": "run-producer-1",
+          "assignmentId": "unit-run-1790000000000-00008/producer/1",
+          "classification": {
+            "execution": {
+              "status": "failed"
+            },
+            "assessment": {
+              "verdict": "inconclusive"
+            },
+            "confidence": {
+              "level": "failed"
+            },
+            "policy": {
+              "disposition": "allow"
+            },
+            "failure": {
+              "family": "resource",
+              "code": "abandoned-not-started"
+            }
+          },
+          "activity": {
+            "turns": null,
+            "toolUses": null,
+            "transcriptPath": null
+          }
+        },
+        "binding": {
+          "executor": "alpha",
+          "model": "alpha-std",
+          "tier": "standard",
+          "invocation": "cli-default",
+          "leaseAccount": null
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,82 @@
+{
+  "id": "provider-limit",
+  "why": "Every candidate of the seat hit a provider limit: the seat is bound again by a resume, but a provider limit is not the unit-level infrastructure outcome.",
+  "data": {
+    "unitRunId": "unit-run-1790000000000-00000006",
+    "rounds": 1,
+    "findings": [],
+    "infrastructure": false,
+    "outOfScope": [],
+    "outOfScopeOnBranch": [],
+    "evaluations": [],
+    "started": {
+      "value": true,
+      "reason": null
+    },
+    "launches": {
+      "ceiling": null,
+      "used": 1,
+      "ceilingHit": false
+    },
+    "settled": {
+      "unit": true,
+      "case": null
+    },
+    "warnings": [],
+    "outcome": "provider-limit",
+    "results": [
+      {
+        "outcome": "provider-limit",
+        "seat": "producer",
+        "role": "producer",
+        "posture": {
+          "readOnly": false,
+          "writer": true,
+          "forceOutOfProcess": false,
+          "stance": false,
+          "verdict": false
+        },
+        "round": 1,
+        "infrastructure": false,
+        "runResult": {
+          "contract": {
+            "id": "run-result",
+            "version": 3
+          },
+          "runId": "run-producer-1",
+          "assignmentId": "unit-run-1790000000000-00008/producer/1",
+          "classification": {
+            "execution": {
+              "status": "failed"
+            },
+            "assessment": {
+              "verdict": "inconclusive"
+            },
+            "confidence": {
+              "level": "failed"
+            },
+            "policy": {
+              "disposition": "allow"
+            },
+            "failure": {
+              "family": "provider",
+              "code": "provider-limit"
+            }
+          },
+          "activity": {
+            "turns": null,
+            "toolUses": null,
+            "transcriptPath": null
+          }
+        },
+        "binding": {
+          "executor": "alpha",
+          "model": "alpha-std",
+          "tier": "standard",
+          "invocation": "cli-default",
+          "leaseAccount": null
+        }
+      }
+    ]
+  }
+}

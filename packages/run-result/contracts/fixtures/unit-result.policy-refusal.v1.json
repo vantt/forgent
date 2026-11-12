@@ -1,0 +1,86 @@
+{
+  "id": "policy-refusal",
+  "why": "A seat was refused by policy before it ran: refused, not infrastructure, and not a verdict.",
+  "data": {
+    "unitRunId": "unit-run-1790000000000-00000005",
+    "rounds": 1,
+    "findings": [],
+    "infrastructure": false,
+    "outOfScope": [],
+    "outOfScopeOnBranch": [],
+    "evaluations": [],
+    "started": {
+      "value": true,
+      "reason": null
+    },
+    "launches": {
+      "ceiling": null,
+      "used": 1,
+      "ceilingHit": false
+    },
+    "settled": {
+      "unit": true,
+      "case": null
+    },
+    "warnings": [],
+    "outcome": "policy-refusal",
+    "results": [
+      {
+        "outcome": "policy-refusal",
+        "seat": "producer",
+        "role": "producer",
+        "posture": {
+          "readOnly": false,
+          "writer": true,
+          "forceOutOfProcess": false,
+          "stance": false,
+          "verdict": false
+        },
+        "round": 1,
+        "infrastructure": false,
+        "runResult": {
+          "contract": {
+            "id": "run-result",
+            "version": 3
+          },
+          "runId": "run-producer-1",
+          "assignmentId": "unit-run-1790000000000-00008/producer/1",
+          "classification": {
+            "execution": {
+              "status": "failed"
+            },
+            "assessment": {
+              "verdict": "inconclusive"
+            },
+            "confidence": {
+              "level": "failed"
+            },
+            "policy": {
+              "disposition": "refuse"
+            },
+            "failure": {
+              "family": "policy",
+              "code": "write-consent-refused"
+            }
+          },
+          "activity": {
+            "turns": null,
+            "toolUses": null,
+            "transcriptPath": null
+          }
+        },
+        "binding": {
+          "executor": "alpha",
+          "model": "alpha-std",
+          "tier": "standard",
+          "invocation": "cli-default",
+          "leaseAccount": null
+        },
+        "refused": {
+          "reason": "write-consent-refused",
+          "detail": "the case no longer allows this write"
+        }
+      }
+    ]
+  }
+}

@@ -8,7 +8,7 @@ import os from 'node:os';
 import path from 'node:path';
 import crypto from 'node:crypto';
 
-import { reportRefOf, reportRefsOf, resolveUnitInputs, copyHandoffsInto, refIsHiddenFromBlind, anonymousInputName, isSeatInput, HandoffRefError } from '../../../src/runner/execution/handoff-refs.mjs';
+import { reportDigest, reportRefOf, reportRefsOf, resolveUnitInputs, copyHandoffsInto, refIsHiddenFromBlind, anonymousInputName, isSeatInput, HandoffRefError } from '../../../src/runner/execution/handoff-refs.mjs';
 
 const resolveRefs = (inputs, root, options) => resolveUnitInputs(inputs, root, options).refs;
 const sha = (text) => crypto.createHash('sha256').update(text).digest('hex');
@@ -52,6 +52,17 @@ test('a report edited after settlement is refused', () => {
     () => reportRefOf({ role: 'producer', round: 1, runResult }, { mainRoot: root }),
     (err) => err instanceof HandoffRefError && err.reason === 'report-changed-after-settle',
   );
+});
+
+test('the report read of a seat names its absolute path, size and digest as the bytes lie now, edited after settlement or not', () => {
+  const root = makeRoot();
+  const { runDir } = settleAttempt(root, 'unit-run-a', 'producer', '1', { report: '# done\n' });
+  assert.deepEqual(reportDigest('unit-run-a', 'producer', root), { path: path.join(runDir, 'report.md'), bytes: 7, sha256: sha('# done\n') });
+  fs.writeFileSync(path.join(runDir, 'report.md'), '# edited\n');
+  assert.deepEqual(reportDigest('unit-run-a', 'producer', root), { path: path.join(runDir, 'report.md'), bytes: 9, sha256: sha('# edited\n') }, 'the caller decides whether an edit is accepted');
+  fs.rmSync(path.join(runDir, 'report.md'));
+  assert.throws(() => reportDigest('unit-run-a', 'producer', root), (err) => err instanceof HandoffRefError && err.reason === 'report-changed-after-settle', 'a report that is gone has no bytes to digest');
+  assert.throws(() => reportDigest('unit-run-a', 'nobody', root), (err) => err instanceof HandoffRefError && err.reason === 'no-such-role');
 });
 
 test('without a settled report the claim stands in for it', () => {

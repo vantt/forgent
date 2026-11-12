@@ -1,0 +1,135 @@
+{
+  "id": "findings",
+  "why": "A reviewed unit whose checker found problems: a verdict (findings), not infrastructure; the checker is one verdict evaluation.",
+  "data": {
+    "unitRunId": "unit-run-1790000000000-00000002",
+    "rounds": 1,
+    "findings": [
+      "the reviewer found a defect"
+    ],
+    "infrastructure": false,
+    "outOfScope": [],
+    "outOfScopeOnBranch": [],
+    "evaluations": [
+      {
+        "kind": "verdict",
+        "seat": "reviewer",
+        "round": 1,
+        "passed": false
+      }
+    ],
+    "started": {
+      "value": true,
+      "reason": null
+    },
+    "launches": {
+      "ceiling": null,
+      "used": 2,
+      "ceilingHit": false
+    },
+    "settled": {
+      "unit": true,
+      "case": null
+    },
+    "warnings": [],
+    "outcome": "findings",
+    "results": [
+      {
+        "outcome": "pass",
+        "seat": "producer",
+        "role": "producer",
+        "posture": {
+          "readOnly": false,
+          "writer": true,
+          "forceOutOfProcess": false,
+          "stance": false,
+          "verdict": false
+        },
+        "round": 1,
+        "infrastructure": false,
+        "runResult": {
+          "contract": {
+            "id": "run-result",
+            "version": 3
+          },
+          "runId": "run-producer-1",
+          "assignmentId": "unit-run-1790000000000-00008/producer/1",
+          "classification": {
+            "execution": {
+              "status": "completed"
+            },
+            "assessment": {
+              "verdict": "pass"
+            },
+            "confidence": {
+              "level": "reported"
+            },
+            "policy": {
+              "disposition": "allow"
+            }
+          },
+          "activity": {
+            "turns": null,
+            "toolUses": null,
+            "transcriptPath": null
+          }
+        },
+        "binding": {
+          "executor": "alpha",
+          "model": "alpha-std",
+          "tier": "standard",
+          "invocation": "cli-default",
+          "leaseAccount": null
+        }
+      },
+      {
+        "outcome": "findings",
+        "seat": "reviewer",
+        "role": "reviewer",
+        "posture": {
+          "readOnly": true,
+          "writer": false,
+          "forceOutOfProcess": true,
+          "stance": false,
+          "verdict": true
+        },
+        "round": 1,
+        "infrastructure": false,
+        "runResult": {
+          "contract": {
+            "id": "run-result",
+            "version": 3
+          },
+          "runId": "run-reviewer-1",
+          "assignmentId": "unit-run-1790000000000-00008/reviewer/1",
+          "classification": {
+            "execution": {
+              "status": "completed"
+            },
+            "assessment": {
+              "verdict": "findings"
+            },
+            "confidence": {
+              "level": "reported"
+            },
+            "policy": {
+              "disposition": "allow"
+            }
+          },
+          "activity": {
+            "turns": null,
+            "toolUses": null,
+            "transcriptPath": null
+          }
+        },
+        "binding": {
+          "executor": "beta",
+          "model": "beta-std",
+          "tier": "standard",
+          "invocation": "cli-default",
+          "leaseAccount": null
+        }
+      }
+    ]
+  }
+}

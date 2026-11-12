@@ -83,7 +83,10 @@ test('a brief lost twice in a row ends the seat as an execution failure', { skip
   const exit = await run.exited;
   assert.notEqual(exit.code, 0);
   const answer = answerOf(run);
-  assert.equal(answer.data.outcome, 'execution-failure', JSON.stringify(answer).slice(0, 1500));
+  // No seat was given its brief, so the run did no work: it ends not-started (infrastructure) and says so.
+  assert.equal(answer.data.outcome, 'not-started', JSON.stringify(answer).slice(0, 1500));
+  assert.deepEqual([answer.data.started, answer.data.infrastructure], [{ value: false, reason: 'brief-not-delivered' }, true]);
+  assert.equal(exit.code, 11, 'the exit code of an infrastructure ending');
   assert.equal(answer.data.results.at(-1).fallbackExhausted.reason, 'brief-not-delivered');
   const attempts = attemptsOf(project, answer);
   assert.deepEqual(attempts.map((a) => [a.binding.executor, a.briefNotDelivered === true]), [['alpha', true], ['alpha', true]]);

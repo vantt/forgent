@@ -428,7 +428,7 @@ test('a file dirty in scope before launch is not committed and is recorded as pr
   assert.deepEqual(attempt.commit.preExistingInScope, ['docs/wip.md']);
 });
 
-test('a producer writing in and out of scope gets only the in-scope file committed and still passes', async () => {
+test('a producer writing in and out of scope gets only the in-scope file committed and ends findings, naming the path outside', async () => {
   const { repoRoot, worktreeDir } = setupGitRepo();
   reviewedConfig(repoRoot, ['alpha']);
   writeScopedWorker(repoRoot, { files: { 'docs/in.md': 'i\n', 'src/out.txt': 'o\n' }, summary: 'feat(docs): add the page' });
@@ -436,7 +436,9 @@ test('a producer writing in and out of scope gets only the in-scope file committ
     unitData: { id: 'u-scope', objective: 'Write docs', capability: 'docs:write', writes: ['docs'] },
     repoRoot, cwd: worktreeDir, pattern: 'solo',
   });
-  assert.equal(res.outcome, 'pass');
+  assert.equal(res.outcome, 'findings');
+  assert.deepEqual(res.outOfScope, ['src/out.txt']);
+  assert.equal(res.results[0].outcome, 'pass', 'the seat finished its turn; the unit is judged by the scope rule');
   const commit = res.results[0].commit;
   assert.deepEqual(commit.files, ['docs/in.md']);
   assert.deepEqual(commit.outOfScope, ['src/out.txt']);
@@ -463,7 +465,9 @@ test('resume after a foreign index appeared mid-round only commits: the producer
 
   gitIn(worktreeDir, 'reset', '-q', 'foreign.txt');
   const resumed = await runUnit({ resumeUnitRunId: first.unitRunId, repoRoot, cwd: worktreeDir });
-  assert.equal(resumed.outcome, 'pass');
+  // The files the round saw change outside the scope (the foreign one and the worker's own signal files) make the unit findings; the commit is still made.
+  assert.equal(resumed.outcome, 'findings');
+  assert.deepEqual(resumed.outOfScope, ['.go', '.started', 'foreign.txt']);
   assert.equal(producerSpawns(repoRoot, first.unitRunId), 1, 'resume committed without spawning the producer again');
   assert.equal(resumed.results[0].commit.status, 'committed');
   assert.deepEqual(resumed.results[0].commit.files, ['docs/in.md']);
@@ -472,7 +476,7 @@ test('resume after a foreign index appeared mid-round only commits: the producer
   assert.equal(record.bindings['producer/1'].length, 1);
   assert.equal(record.bindings['producer/1'][0].commit.status, 'committed');
   assert.equal(record.bindings['producer/1'][0].outcome, 'pass');
-  assert.equal(record.settlement.outcome, 'pass');
+  assert.equal(record.settlement.outcome, 'findings');
 });
 
 test('resume after committed-set-mismatch refuses while the commit is on the branch', async () => {

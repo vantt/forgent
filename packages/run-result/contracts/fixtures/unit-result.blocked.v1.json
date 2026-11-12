@@ -1,0 +1,82 @@
+{
+  "id": "blocked",
+  "why": "A seat waited on a prompt only a person can answer: blocked, no verdict, not infrastructure.",
+  "data": {
+    "unitRunId": "unit-run-1790000000000-00000007",
+    "rounds": 1,
+    "findings": [],
+    "infrastructure": false,
+    "outOfScope": [],
+    "outOfScopeOnBranch": [],
+    "evaluations": [],
+    "started": {
+      "value": true,
+      "reason": null
+    },
+    "launches": {
+      "ceiling": null,
+      "used": 1,
+      "ceilingHit": false
+    },
+    "settled": {
+      "unit": true,
+      "case": null
+    },
+    "warnings": [],
+    "outcome": "blocked",
+    "results": [
+      {
+        "outcome": "blocked",
+        "seat": "producer",
+        "role": "producer",
+        "posture": {
+          "readOnly": false,
+          "writer": true,
+          "forceOutOfProcess": false,
+          "stance": false,
+          "verdict": false
+        },
+        "round": 1,
+        "infrastructure": false,
+        "runResult": {
+          "contract": {
+            "id": "run-result",
+            "version": 3
+          },
+          "runId": "run-producer-1",
+          "assignmentId": "unit-run-1790000000000-00008/producer/1",
+          "classification": {
+            "execution": {
+              "status": "failed"
+            },
+            "assessment": {
+              "verdict": "blocked"
+            },
+            "confidence": {
+              "level": "failed"
+            },
+            "policy": {
+              "disposition": "allow"
+            },
+            "failure": {
+              "family": "provider",
+              "code": "blocked"
+            }
+          },
+          "activity": {
+            "turns": null,
+            "toolUses": null,
+            "transcriptPath": null
+          }
+        },
+        "binding": {
+          "executor": "alpha",
+          "model": "alpha-std",
+          "tier": "standard",
+          "invocation": "cli-default",
+          "leaseAccount": null
+        }
+      }
+    ]
+  }
+}

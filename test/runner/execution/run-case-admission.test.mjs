@@ -583,6 +583,12 @@ test('runUnit launches critical reviewed seats with shipped floor when injected 
 });
 
 // What the Unit run settles with, for the case and for the caller: one final outcome and the facts it stands on.
+const goldenFacts = (id) => {
+  const { data } = JSON.parse(fs.readFileSync(new URL(`../../../packages/run-result/contracts/fixtures/unit-result.${id}.v1.json`, import.meta.url), 'utf8'));
+  const { outcome, infrastructure, outOfScope, outOfScopeOnBranch, evaluations, started, launches, settled } = data;
+  return { outcome, infrastructure, outOfScope, outOfScopeOnBranch, evaluations, started, launches, settled };
+};
+const factsOf = (data) => Object.fromEntries(Object.keys(goldenFacts('pass')).map((key) => [key, data[key]]));
 const settledOf = (port) => port.calls.find((c) => c[0] === 'settle')[2];
 const gitIn = (cwd, args) => execFileSync('git', args, { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim();
 
@@ -597,7 +603,10 @@ test('a Unit that wrote outside its scope ends findings for the case and for the
     assert.deepEqual(res.outOfScope, ['stray.txt']);
     assert.equal(res.infrastructure, false, 'a path outside the scope is a verdict, never infrastructure');
     assert.equal(unitJson(repoRoot, res.unitRunId).settlement.outcome, 'findings', 'the unit record settles with the final outcome');
-    if (caseRef) assert.deepEqual([settledOf(port).outcome, settledOf(port).outOfScope], ['findings', ['stray.txt']]);
+    if (caseRef) {
+      assert.deepEqual([settledOf(port).outcome, settledOf(port).outOfScope], ['findings', ['stray.txt']]);
+      assert.deepEqual(factsOf(res), goldenFacts('findings-out-of-scope'));
+    }
   }
 });
 
@@ -607,22 +616,13 @@ test('a Unit run hands up its final outcome with the facts it stands on: infrast
   const res = await runUnit({
     unitData: { ...WRITE_UNIT, objective: 'WRITE:docs/a.md', verify: 'true' }, caseAdmission: port, caseRef: { caseId: 'case-test', activity: 'build' }, repoRoot, cwd: worktreeDir, worktree: worktreeDir,
   });
-  const facts = (data) => ({
-    outcome: data.outcome, infrastructure: data.infrastructure, outOfScope: data.outOfScope, outOfScopeOnBranch: data.outOfScopeOnBranch,
-    evaluations: data.evaluations, started: data.started, launches: data.launches,
-  });
-  const expected = {
-    outcome: 'pass', infrastructure: false, outOfScope: [], outOfScopeOnBranch: [],
-    evaluations: [{ kind: 'verify', seat: 'verify', round: 1, passed: true }],
-    started: { value: true, reason: null }, launches: { ceiling: null, used: 1, ceilingHit: false },
-  };
-  assert.deepEqual(facts(res), expected);
+  assert.deepEqual(factsOf(res), goldenFacts('pass'));
   assert.deepEqual([res.settled, res.warnings], [{ unit: true, case: true }, []]);
   assert.deepEqual(res.results.map((r) => [r.seat, r.outcome, r.infrastructure]), [['producer', 'pass', false], ['verify', 'pass', false]]);
   // The port settles with the same shape, carrying its contract.
   const settle = settledOf(port);
   assert.deepEqual(settle.contract, { id: 'unit-run-result', version: 1 });
-  assert.deepEqual(facts(settle), expected);
+  assert.deepEqual({ ...factsOf(settle), settled: res.settled }, goldenFacts('pass'));
 });
 
 test('a reservation that cannot be settled is told to the caller: settled.case is false with the error, and a structured warning', async () => {

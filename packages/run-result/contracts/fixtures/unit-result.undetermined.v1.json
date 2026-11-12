@@ -1,0 +1,29 @@
+{
+  "id": "undetermined",
+  "why": "A finished unit whose pattern was never recorded: its summary reads undetermined, which is no verdict, never a pass and never infrastructure.",
+  "data": {
+    "unitRunId": "unit-run-1790000000000-00000009",
+    "rounds": 0,
+    "findings": [],
+    "infrastructure": false,
+    "outOfScope": [],
+    "outOfScopeOnBranch": [],
+    "evaluations": [],
+    "started": {
+      "value": true,
+      "reason": null
+    },
+    "launches": {
+      "ceiling": null,
+      "used": 0,
+      "ceilingHit": false
+    },
+    "settled": {
+      "unit": true,
+      "case": null
+    },
+    "warnings": [],
+    "outcome": "undetermined",
+    "results": []
+  }
+}

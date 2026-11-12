@@ -1,0 +1,92 @@
+{
+  "id": "crash-recovered",
+  "why": "The controller died while the producer seat was open, and the resume settled it: the seat that ended in error was bound again and passed, so the unit passed; the settled flags say both records were written by the resumed run.",
+  "data": {
+    "unitRunId": "unit-run-1790000000000-00000010",
+    "rounds": 1,
+    "findings": [],
+    "infrastructure": false,
+    "outOfScope": [],
+    "outOfScopeOnBranch": [],
+    "evaluations": [
+      {
+        "kind": "verify",
+        "seat": "verify",
+        "round": 1,
+        "passed": true
+      }
+    ],
+    "started": {
+      "value": true,
+      "reason": null
+    },
+    "launches": {
+      "ceiling": 2,
+      "used": 2,
+      "ceilingHit": false
+    },
+    "settled": {
+      "unit": true,
+      "case": true
+    },
+    "warnings": [],
+    "outcome": "pass",
+    "results": [
+      {
+        "outcome": "pass",
+        "seat": "producer",
+        "role": "producer",
+        "posture": {
+          "readOnly": false,
+          "writer": true,
+          "forceOutOfProcess": false,
+          "stance": false,
+          "verdict": false
+        },
+        "round": 1,
+        "infrastructure": false,
+        "runResult": {
+          "contract": {
+            "id": "run-result",
+            "version": 3
+          },
+          "runId": "run-producer-1",
+          "assignmentId": "unit-run-1790000000000-00008/producer/1",
+          "classification": {
+            "execution": {
+              "status": "completed"
+            },
+            "assessment": {
+              "verdict": "pass"
+            },
+            "confidence": {
+              "level": "reported"
+            },
+            "policy": {
+              "disposition": "allow"
+            }
+          },
+          "activity": {
+            "turns": null,
+            "toolUses": null,
+            "transcriptPath": null
+          }
+        },
+        "binding": {
+          "executor": "alpha",
+          "model": "alpha-std",
+          "tier": "standard",
+          "invocation": "cli-default",
+          "leaseAccount": null
+        }
+      },
+      {
+        "seat": "verify",
+        "round": 1,
+        "outcome": "pass",
+        "findings": [],
+        "infrastructure": false
+      }
+    ]
+  }
+}
