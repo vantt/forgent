@@ -1,5 +1,5 @@
 // The error-category exit codes live in one versioned JSON table (packages/host-runtime/contracts/exit-codes.v1.json). The Node shell reads
-// it through src/cli/exit-codes.mjs and the Rust host embeds the same file (apps/fgos/src/exit_codes.rs, whose own
+// it through src/cli/exit-codes.mjs and the Rust host embeds the same file (packages/host-runtime/rust/src/exit_codes.rs, whose own
 // test reads every category back). One table, two readers: this file owns the Node reader and the rule that the host
 // names no literal error exit status of its own.
 import { test } from 'node:test';
