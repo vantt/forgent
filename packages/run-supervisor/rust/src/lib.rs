@@ -8,7 +8,7 @@
 /// Envelope v3: reading, digest, side file.
 pub mod envelope;
 
-/// `fgos exec <cli>`: the door an external agent host starts instead of the agent CLI.
+/// `fgos internal exec <cli>`: the door an external agent host starts instead of the agent CLI.
 #[cfg(unix)]
 pub mod exec;
 

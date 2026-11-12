@@ -226,6 +226,16 @@ fn main() {
                 .collect();
             std::process::exit(fgos_seat_binding::route::main(&rest));
         }
+        // `exec <cli> [args...]`: the command an external agent host starts in place of the agent CLI.
+        // It replaces this process, so nothing here spawns first: the host's pipes reach the agent untouched.
+        #[cfg(unix)]
+        if args.get(2).is_some_and(|a| a == "exec") {
+            let rest: Vec<String> = args[3..]
+                .iter()
+                .map(|a| a.to_string_lossy().into_owned())
+                .collect();
+            std::process::exit(fgos_run_supervisor::exec::main(&rest));
+        }
         // The run supervisor's routes: supervise, gate, adopt, attempt-step.
         let rest: Vec<String> = args[2..]
             .iter()
@@ -239,10 +249,8 @@ fn main() {
         std::process::exit(fgos_holder_lock::route::main(&args[2..]));
     }
 
-    // `fgos exec <cli> [args...]`: the command an external agent host starts in place of the agent CLI.
-    // It replaces this process (exec), so it runs before the route table, the composition root and any
-    // spawn: the host's pipes must reach the agent untouched.
-    // Started as `fgos-exec-<cli>` (a link to this binary), it is `fgos exec <cli>`.
+    // Started as `fgos-exec-<cli>` (a link to this binary), it is `fgos internal exec <cli>`: an external
+    // agent host probes `<command> --version`, so the command it is given must be named for the CLI.
     #[cfg(unix)]
     if let Some(cli) = args
         .first()
@@ -254,15 +262,6 @@ fn main() {
             .collect();
         std::process::exit(fgos_run_supervisor::exec::main(&rest));
     }
-    #[cfg(unix)]
-    if args.get(1).is_some_and(|a| a == "exec") {
-        let rest: Vec<String> = args[2..]
-            .iter()
-            .map(|a| a.to_string_lossy().into_owned())
-            .collect();
-        std::process::exit(fgos_run_supervisor::exec::main(&rest));
-    }
-
     // `fgos --version` is `fgos version`: the one place the flag is mapped.
     let mut owned_args: Vec<std::ffi::OsString> = args.iter().skip(1).cloned().collect();
     if owned_args.first().is_some_and(|a| a == "--version") {

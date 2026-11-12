@@ -19,7 +19,7 @@ import { briefPaths, renderBrief } from './brief.mjs';
 
 /** The environment variable naming the paseo CLI; `paseo` on PATH when unset. */
 export const PASEO_BIN_ENV = 'FGOS_PASEO_BIN';
-/** The variable the gate's `fgos exec` reads its attempt directory from (packages/run-supervisor exec.rs). */
+/** The variable `fgos internal exec` reads its attempt directory from (packages/run-supervisor exec.rs). */
 export const ATTEMPT_DIR_ENV = 'FGOS_ATTEMPT_DIR';
 /** Linux refuses one argument longer than this (MAX_ARG_STRLEN), and the brief is one argument of `paseo run`. */
 export const MAX_PROMPT_BYTES = 128 * 1024 - 1;
@@ -49,7 +49,7 @@ export function execLinkPath(stateRoot, cli) {
 /**
  * Point `fgos-exec-<cli>` at the attempt's host binary, replacing it atomically. Paseo probes the provider
  * by running `<command> --version`, so the command must be the link itself, named for the CLI: the host
- * started under that name is `fgos exec <cli>` and passes the probe through to the CLI. A link to an older
+ * started under that name is `fgos internal exec <cli>` and passes the probe through to the CLI. A link to an older
  * release would still work (the gate execs the envelope's own host), but one whose release was removed
  * would not, so every launch refreshes it.
  */

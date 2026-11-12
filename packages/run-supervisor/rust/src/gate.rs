@@ -65,7 +65,7 @@ pub struct GateArgs {
     pub lock_fds: Vec<u32>,
     /// The attempt's named job (Windows): the gate opens it to be a second holder.
     pub job_name: Option<String>,
-    /// `external` mode: the arguments the external host gave `fgos exec`, which replace `launch.args`.
+    /// `external` mode: the arguments the external host gave `fgos internal exec`, which replace `launch.args`.
     pub agent_argv: Option<Vec<String>>,
 }
 
@@ -149,7 +149,7 @@ pub(crate) enum LaunchMode {
     Direct,
     /// The agent is a pane's interactive program; the GO channel is a socket.
     Terminal,
-    /// An external agent host started `fgos exec`: the agent keeps the host's stdio and the host speaks
+    /// An external agent host started `fgos internal exec`: the agent keeps the host's stdio and the host speaks
     /// the CLI's protocol directly; the GO channel is a socket.
     External,
 }

@@ -1,4 +1,4 @@
-//! `fgos exec <cli> [args...]`: the door an external agent host (paseo, an ACP client, the Claude Agent
+//! `fgos internal exec <cli> [args...]`: the door an external agent host (paseo, an ACP client, the Claude Agent
 //! SDK) is configured to start instead of the agent CLI itself.
 //!
 //! Without `FGOS_ATTEMPT_DIR` it becomes the CLI unchanged: a host probes its provider (`--version`, a
@@ -17,11 +17,12 @@ use std::path::{Path, PathBuf};
 use serde_json::Value;
 
 use crate::envelope;
+use crate::route::{EXIT_ENVELOPE_INVALID, EXIT_INTERNAL, EXIT_USAGE};
 
 /// The variable an external host sets per agent to name the attempt directory.
 pub const ATTEMPT_DIR_ENV: &str = "FGOS_ATTEMPT_DIR";
 
-/// The program-name prefix that selects this door: `fgos-exec-codex` is `fgos exec codex`.
+/// The program-name prefix that selects this door: `fgos-exec-codex` is `fgos internal exec codex`.
 pub const PROGRAM_PREFIX: &str = "fgos-exec-";
 
 /// The CLI a program name selects, when the host binary was started as `fgos-exec-<cli>`.
@@ -31,13 +32,8 @@ pub fn cli_from_program(argv0: &str) -> Option<&str> {
         .filter(|cli| !cli.is_empty())
 }
 
-/// Exit codes of a refusal (an `exec` that succeeded never returns).
-const EXIT_USAGE: i32 = 2;
-const EXIT_REFUSED: i32 = 65;
-const EXIT_EXEC_FAILED: i32 = 127;
-
 fn refuse(code: i32, why: &str) -> i32 {
-    eprintln!("fgos exec: {why}");
+    eprintln!("fgos internal exec: {why}");
     code
 }
 
@@ -132,10 +128,11 @@ fn exec(program: &str, argv: &[String]) -> std::io::Error {
     std::io::Error::last_os_error()
 }
 
-/// `fgos exec <cli> [args...]`. Returns an exit code only when it could not become the target.
+/// `fgos internal exec <cli> [args...]`. Returns an exit code (the route contract's) only when it could
+/// not become the target: usage, envelope-invalid when the attempt refuses it, internal when exec failed.
 pub fn main(args: &[String]) -> i32 {
     let Some((cli, rest)) = args.split_first() else {
-        return refuse(EXIT_USAGE, "usage: fgos exec <cli> [args...]");
+        return refuse(EXIT_USAGE, "usage: fgos internal exec <cli> [args...]");
     };
     let attempt_dir = std::env::var_os(ATTEMPT_DIR_ENV).map(PathBuf::from);
     let Some(dir) = attempt_dir else {
@@ -143,18 +140,18 @@ pub fn main(args: &[String]) -> i32 {
         let mut argv = vec![cli.clone()];
         argv.extend(rest.iter().cloned());
         let err = exec(cli, &argv);
-        return refuse(EXIT_EXEC_FAILED, &format!("{cli}: {err}"));
+        return refuse(EXIT_INTERNAL, &format!("{cli}: {err}"));
     };
     let launch = match attempt_launch(&dir, cli, rest) {
         Ok(launch) => launch,
-        Err(why) => return refuse(EXIT_REFUSED, &why),
+        Err(why) => return refuse(EXIT_ENVELOPE_INVALID, &why),
     };
     // The gate leads a process group of its own, so the supervisor's group domain is the gate's and
     // never the host's. A process that already leads one (a host that started it detached) keeps it.
     // SAFETY: setsid has no preconditions; it fails only for a process that already leads a group.
     unsafe { libc::setsid() };
     let err = exec(&launch.program, &launch.argv);
-    refuse(EXIT_EXEC_FAILED, &format!("{}: {err}", launch.program))
+    refuse(EXIT_INTERNAL, &format!("{}: {err}", launch.program))
 }
 
 #[cfg(test)]

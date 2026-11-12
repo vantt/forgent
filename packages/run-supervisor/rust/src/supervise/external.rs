@@ -1,5 +1,5 @@
 //! The supervisor's `external` launch mode: an external agent host (paseo, an ACP client) starts the
-//! agent CLI through `fgos exec`, which execs the gate. The host keeps the agent's stdio and speaks the
+//! agent CLI through `fgos internal exec`, which execs the gate. The host keeps the agent's stdio and speaks the
 //! CLI's protocol over it; the supervisor holds the attempt lock, the deadlines and the receipt, and
 //! never sees a byte of the agent's IO.
 //!

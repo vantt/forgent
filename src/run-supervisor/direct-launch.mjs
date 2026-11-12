@@ -200,7 +200,7 @@ export function removeAttemptIntent(runDir) {
  * Build the envelope v3 body (without digest) of one attempt.
  * `attemptId` is minted by the controller and equals the launch command id; `runDir` is the absolute
  * attempt directory (`runs/<NN>`); `attempt` is `prepareConfinementForLaunch(...).attempt`.
- * `terminal` (a pane) or `external` (an external host starts the gate through `fgos exec`) picks the
+ * `terminal` (a pane) or `external` (an external host starts the gate through `fgos internal exec`) picks the
  * mode; neither is `direct`.
  */
 export function buildEnvelope({ attemptId, unitRunId, runDir, host, cwd, mutating, attempt, timeoutMs, idleTimeoutMs, maxOutputBytes, cli, stepEnv, gateKillGraceMs, killWaitMs, cwdLeaseFile, cwdLeaseOwner, identity, terminal = null, external = null, extraSteps = [] }) {

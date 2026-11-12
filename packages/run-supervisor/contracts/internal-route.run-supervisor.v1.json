@@ -15,6 +15,12 @@
     "71": "supervise only: attempt-already-bound (supervisor-binding.json or receipt.json exists; nothing was touched, the attempt is left to adopt)"
     }
   },
+  "exec": {
+    "argv": "fgos internal exec <cli> [args...], or the host binary started as fgos-exec-<cli> [args...] (a link the controller keeps at <stateRoot>/bin)",
+    "use": "the command an external agent host (paseo) is given in place of the agent CLI; not a route of the routes table: no --protocol, no stdout, the host's arguments pass to the CLI unchanged",
+    "behaviour": "FGOS_ATTEMPT_DIR unset: execs <cli> [args...] (the host's probes). Set: reads <dir>/envelope.json, which must be mode external and agentProtocol.cli equal to <cli>, calls setsid and execs [containment.bwrapPrefix --] <hostBin> internal gate --protocol 1 --envelope <path> --go-socket <external.socketPath> --agent-argv <json of args>",
+    "exitCodes": "returns only when it could not exec: 2 usage (no <cli>), 65 envelope-invalid (missing or unverified envelope, not external, another CLI), 70 exec failed (stderr names the program)"
+  },
   "routes": {
     "supervise": {
       "argv": "fgos internal supervise --envelope <path> --protocol 1",
