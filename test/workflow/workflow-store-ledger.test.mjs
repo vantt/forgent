@@ -277,9 +277,9 @@ test('a unit that Execution says ended on infrastructure is rerunnable whatever 
   assert.notEqual(unitB({ outcome: 'execution-failure', infrastructure: false }).rerunnable, true, 'Execution said it did not end on infrastructure');
   const refusedSeat = foldOf(TWO_UNITS, [
     ...rows({ outcome: 'execution-failure', infrastructure: true }).slice(0, 3),
-    ['unit.complete', { stepId: 's1', unitId: 'b', unitRunId: 'run-b', outcome: 'execution-failure', infrastructure: true, results: [{ seat: 'producer', outcome: 'execution-failure', refused: { reason: 'policy', detail: 'x' } }] }],
+    ['unit.complete', { stepId: 's1', unitId: 'b', unitRunId: 'run-b', outcome: 'execution-failure', infrastructure: false, results: [{ seat: 'producer', outcome: 'policy-refusal', infrastructure: false, refused: { reason: 'policy', detail: 'x' } }] }],
   ]).steps.s1.units.b;
-  assert.notEqual(refusedSeat.rerunnable, true, 'a refused seat is Workflow\'s own verdict and stays terminal');
+  assert.notEqual(refusedSeat.rerunnable, true, 'Execution says a refused seat is not infrastructure, so the unit stays terminal');
 });
 
 test('a step started again after a verdict reopens nothing: refused, out-of-scope, findings and a settled seat verdict stay terminal', () => {
@@ -396,5 +396,18 @@ test('what a run was started with is on its start event and comes back from ever
   for (const key of ['seats', 'effort', 'timeoutMs', 'account']) {
     assert.equal(key in plainStart.payload, false, `start event: ${key}`);
     assert.equal(key in plain, false, `projection: ${key}`);
+  }
+});
+
+test('a step ended by an admission refusal reads as admission-refused, and an old ledger entry that names it refused reads the same', () => {
+  const failed = (outcome) => foldOf(TWO_UNITS, [
+    ['step.start', { stepId: 's1' }],
+    ['step.fail', { stepId: 's1', outcome, reason: 'unit b could not run' }],
+    ['workflow.fail', { outcome, stepId: 's1', reason: 'unit b could not run' }],
+  ]);
+  for (const outcome of ['admission-refused', 'refused']) {
+    const state = failed(outcome);
+    assert.equal(state.steps.s1.outcome, 'admission-refused', outcome);
+    assert.equal(state.outcome, 'admission-refused', outcome);
   }
 });

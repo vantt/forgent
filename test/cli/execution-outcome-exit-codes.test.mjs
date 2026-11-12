@@ -133,6 +133,15 @@ test('a unit ended on infrastructure only when nothing was written out of scope 
   assert.equal(infrastructure(undefined), false);
 });
 
+test('a seat that was refused is never infrastructure, at the attempt and at the unit, whatever the unit outcome says', () => {
+  const refused = { seat: 'producer/1', posture: { verdict: false }, outcome: 'policy-refusal', refused: { reason: 'foreign-staged-index', detail: 'x' } };
+  const crashed = { seat: 'reviewer/1', posture: { verdict: true }, outcome: 'execution-failure' };
+  assert.equal(infrastructure({ outcome: 'not-started', results: [refused] }), false, 'refused before any brief was delivered');
+  assert.equal(infrastructure({ outcome: 'execution-failure', results: [refused, crashed] }), false, 'one seat refused, another crashed');
+  assert.equal(infrastructure({ outcome: 'execution-failure', results: [crashed] }), true, 'the same unit without the refusal is infrastructure');
+  assert.equal(isInfrastructure(refused.outcome), false, 'a refusal is a policy outcome, so the attempt fact is false');
+});
+
 test('exitCodeForOutcome maps outcomes onto canonical exit codes', () => {
   assert.equal(exitCodeForOutcome('pass'), 0);
   assert.equal(exitCodeForOutcome('policy-refusal'), 4);

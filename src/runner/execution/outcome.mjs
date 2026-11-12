@@ -3,8 +3,8 @@
 // and the one table from an outcome to the process exit code. The loops, the unit summary, resume and the CLI
 // import from here and keep no copy. The Rust `run-result::derive_outcome` stays the category authority beneath it.
 //
-// Not Execution outcomes, so not in the table: Workflow's `refused` (its own acceptance value, decided in
-// src/workflow/runner.mjs) and `partial-writes` (a stop reason on `fallbackExhausted`/`retryStopped`, never the
+// Not Execution outcomes, so not in the table: Workflow's `admission-refused` (its own step outcome, decided in
+// src/workflow/runner.mjs; `refused` is only ever a seat's own fact, `{ reason, detail }`) and `partial-writes` (a stop reason on `fallbackExhausted`/`retryStopped`, never the
 // outcome of a seat; the seat that stops on it ends `provider-limit`). The same-named set in
 // src/runner/dispatch/confinement/attestation-store.mjs is a different domain.
 
@@ -48,13 +48,15 @@ export const rebindsOnResume = (seatOutcome) => ERROR_OUTCOMES.includes(seatOutc
 
 /**
  * Whether a unit ended on infrastructure, so a rerun can still produce the verdict: its outcome is infrastructure,
- * it wrote no path outside its declared scope, and no verdict seat of it reached a verdict.
+ * it wrote no path outside its declared scope, no seat of it was refused (`refused` names a policy decision a rerun
+ * would meet again, so a refused seat is never infrastructure, whatever the unit outcome says), and no verdict seat
+ * of it reached a verdict.
  *
  * @param {{ outcome?: string, outOfScope?: string[], results?: object[] }} unitResult
  */
 export function infrastructure(unitResult) {
   if (!isInfrastructure(unitResult?.outcome) || unitResult.outOfScope?.length) return false;
-  return !(unitResult.results ?? []).some((result) => isVerdictResult(result) && isVerdict(result.outcome));
+  return !(unitResult.results ?? []).some((result) => result?.refused || (isVerdictResult(result) && isVerdict(result.outcome)));
 }
 
 /**

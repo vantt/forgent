@@ -216,7 +216,7 @@ function refuseUnit(run, { step, u, error, attempt }) {
     return 'parked';
   }
   const note = cleanupFailure ? `; its worktree could not be removed: ${cleanupFailure.message}` : '';
-  run.failStep(step, 'refused', `unit ${u.id} could not run: admission refused ${refused.code}: ${refused.condition}${note}`, u.id);
+  run.failStep(step, 'admission-refused', `unit ${u.id} could not run: admission refused ${refused.code}: ${refused.condition}${note}`, u.id);
   return 'failed';
 }
 

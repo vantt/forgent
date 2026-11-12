@@ -8,6 +8,7 @@
 // *now* is computed by the caller and passed in, so replaying the same events with the same digests
 // always gives the same projection.
 
+import { NOT_STARTED_OUTCOME } from '../runner/execution/outcome.mjs';
 import { normalizeGuide } from './guide-schema.mjs';
 import { projectWorkflowState, readWorkflowEvents } from './store.mjs';
 import { playbookSubjectDigests } from './ref-digests.mjs';
@@ -172,7 +173,7 @@ function markStaleMilestones({ milestones }, currentDigests) {
 /** What the frame has spent and what is left of it. */
 function frameUse(frame, all, routes) {
   // A reservation given back (refunded, or its run never started) spends nothing of the frame.
-  const counting = all.filter((r) => !(r.settled && (r.outcome === 'refunded' || r.outcome === 'not-started')));
+  const counting = all.filter((r) => !(r.settled && (r.outcome === 'refunded' || r.outcome === NOT_STARTED_OUTCOME)));
   const used = {
     dispatches: counting.reduce((sum, r) => sum + (r.counters?.dispatches ?? 1), 0),
     mutatingDispatches: counting.reduce((sum, r) => sum + (r.counters?.mutatingDispatches ?? 0), 0),

@@ -7,7 +7,7 @@ import crypto from 'node:crypto';
 import { RunnerConfigError } from '../runner/dispatch/runner-config-error.mjs';
 import { runDirOf, runsRoot } from '../runner/execution/case-run-paths.mjs';
 import { installOnce } from '../native/door.mjs';
-import { legacyInfrastructureOf } from './legacy-ledger-read.mjs';
+import { legacyInfrastructureOf, legacyStepOutcomeOf } from './legacy-ledger-read.mjs';
 
 // Every ledger line is written while its writer holds the run's `advance` lock. The hold is the
 // proof: a hold made by `createAdvanceHold`, for this run, not yet released. Nothing else appends.
@@ -260,11 +260,10 @@ export function recoverWorkflowLedgerTail({ repoRoot, workflowRunId, hold }) {
 
 /**
  * Whether `resume` may run a completed unit again: Execution said it ended on infrastructure (the entry's
- * `infrastructure`, or for an entry written before that field existed the one legacy reader's answer), and no
- * seat of it was refused. `refused` is Workflow's own acceptance outcome, not one of Execution's, so a refused
- * seat is a verdict here and stays terminal.
+ * `infrastructure`, or for an entry written before that field existed the one legacy reader's answer). A unit with a
+ * refused seat is never infrastructure on either path, so it stays terminal without a check of its own here.
  */
-const isRerunnable = (p) => (p.infrastructure ?? legacyInfrastructureOf(p)) === true && !(p.results ?? []).some((result) => result?.refused);
+const isRerunnable = (p) => (p.infrastructure ?? legacyInfrastructureOf(p)) === true;
 
 /** The unit as `unit.scheduled` records it: running, with the worktree and base a writing unit was given. */
 const scheduledUnit = (p) => ({
@@ -371,14 +370,14 @@ const FOLD = {
 
   'step.fail': (fold, p) => {
     const step = fold.steps[p.stepId];
-    if (step) Object.assign(step, { status: 'failed', outcome: p.outcome || 'failed', reason: p.reason ?? null });
+    if (step) Object.assign(step, { status: 'failed', outcome: legacyStepOutcomeOf(p.outcome) || 'failed', reason: p.reason ?? null });
   },
 
   'workflow.worktrees': (fold, p) => {
     fold.worktrees = { removed: p.removed || [], kept: p.kept || [] };
   },
 
-  'workflow.fail': (fold, p) => Object.assign(fold, { status: 'failed', outcome: p.outcome || 'failed' }),
+  'workflow.fail': (fold, p) => Object.assign(fold, { status: 'failed', outcome: legacyStepOutcomeOf(p.outcome) || 'failed' }),
   'workflow.complete': (fold, p) => Object.assign(fold, { status: 'completed', outcome: p.outcome || 'pass' }),
 };
 
