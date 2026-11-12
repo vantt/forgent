@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v0.2.0-rc.6] - 2026-11-12
+
 - `fgctl repair` now keeps the release tag the project's pin (or the active release's activation) already names, instead of rewriting `.fgos/distribution.json` with `releaseVersion: null`; after a repair and a `--purge` the project can come back with a plain `fgctl init`.
 - `fgctl upgrade` to the release that is already active now prints `fgctl: up to date with the release (<digest12>)` with the active release's digest, the same twelve characters `fgctl status` and the closing block show, not the digest of the `fgctl` file.
 - `fgctl --help`, `fgctl init --help` and `fgctl upgrade --help` now list the exit codes the commands really return: 2 for a usage error or a release that is activated but not ready, 4 for an unreadable pin (`init`). `fgctl --help` and `init --help` are checked against `packages/host-runtime/contracts/exit-codes.v1.json`.
