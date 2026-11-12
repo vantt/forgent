@@ -756,6 +756,8 @@ config vẫn giữ precedence hiện hành. Doctor report phân biệt rõ `conf
 
 ### 13.1 Pane herdr bị confine cho agent không phải claude: công thức, lịch sử, vì sao từng bị quên
 
+*(Từ 2026-11-12 claude cũng theo công thức này: điểm 4.)*
+
 **Công thức (đã chạy thật, Request-to-Run P6):** một invocation `herdr-spawn` có `confinement.backend: bwrap` giữ trạng thái của agent trong một private home thay vì thư mục account thật (đang read-only dưới posture):
 
 1. `credentialStore: { use: <codex | pi | omp | claude>, homeEnv: <CODEX_HOME | PI_CODING_AGENT_DIR | CLAUDE_CONFIG_DIR>, files?: [...], sessionDir?: <thư mục session trong home> }` trên invocation (cùng dạng `codex-cli-bwrap`; runner.md RUL105 (an invocation declares the login store it reads)). Config viết trước field này (config toàn máy, project khác) vẫn khai `resourceBindings: [{ resource: 'private-home', target: { kind: 'env', name: <biến> } }]`; một hàm (`credentialStoreOf`) suy `credentialStore` từ đó, và nhánh suy này bị xoá khi các config ấy đã chuyển.
