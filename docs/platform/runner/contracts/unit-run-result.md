@@ -85,7 +85,7 @@ The new fields are optional and change no field's meaning, so every reader of ve
 
 `output.report.path` is an absolute path chosen by Execution. A caller reads that path and never infers the run directory layout. Seats with a pane write their report under `producer/1/runs/01/outbox`; headless seats without a pane (for example `pi-cli-bwrap`) write under `worker-output/outbox`, a split made on purpose on 2026-11-08. That difference stays an adapter detail behind `output.report.path`.
 
-`output.complete` is **declared** by the adapter that wrote the report, never detected afterwards. A headless report taken from the final message is `complete: false` with the reason `from-final-message`; the full answer may then sit only in `stdout.log`, as a seat observed on 2026-11-09 left it.
+`output.complete` is **declared**, never detected afterwards, and never null: `true` only when Dispatch settlement found a substantive report the seat wrote itself and the seat ended on its own (its claim was read, no timeout and no kill); otherwise `false`, so `false` means "not declared complete". `incompleteReason` is then one of `no-report` (the seat wrote no substantive report) or `seat-did-not-finish` (it timed out or was killed), and is null when `complete` is true. Both cli-spawn and herdr-spawn seats write `report-N.md` themselves and settlement reads it; no adapter takes a report from a seat's final message today, so no such reason exists. If one ever does, its reason is added here in the same change. The full answer of a headless seat may still sit only in `stdout.log`, as a seat observed on 2026-11-09 left it.
 
 ## 5. Outcome table, unknown values and old records
 
