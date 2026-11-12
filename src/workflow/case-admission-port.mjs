@@ -17,13 +17,14 @@ import path from 'node:path';
 import { appendWorkflowEvent, readWorkflowEvents } from './store.mjs';
 import { tryAcquireAdvanceLock } from './case-lock.mjs';
 import { applySettle, drainCaseInbox, writeSettlePending } from './case-runtime.mjs';
-import { isDeliveryMilestone, projectCase, readCaseProjection, receiptsFromResults } from './case-projection.mjs';
+import { isDeliveryMilestone, projectCase, readCaseProjection, receiptsFromEvaluations } from './case-projection.mjs';
 import { digestSubject, digestUnitRunReports } from './ref-digests.mjs';
 import { admitProposal, newReservationId, recheckReservation } from './case-admission.mjs';
 import { bindingsDir, bindWorktree, ensureBindingsSentinel, readBinding, SENTINEL_NAME } from './case-bindings.mjs';
 import { workflowCheckout } from './unit-handoff.mjs';
 import { CASE_ID_ENV, CASE_RESERVATION_ENV, currentDispatchDepth } from '../runner/dispatch/adapters.mjs';
 import { seatKeyOf } from '../runner/execution/legacy-seat-read.mjs';
+import { isVerdict } from '../runner/execution/outcome.mjs';
 import { isCaseId, runDirOf } from '../runner/execution/case-run-paths.mjs';
 
 /** Admission reads without `advance`, so it can meet an append in flight. */
@@ -67,8 +68,8 @@ function testedPathsDigest(reservation, mainRoot) {
 }
 
 function proposedAchievements({ mainRoot, projection, reservation, result }) {
-  const base = receiptsFromResults({ unitRunId: result.unitRunId ?? null, results: result.results ?? [] });
-  const produces = projection.kind === 'playbook' || !['pass', 'findings'].includes(result.outcome)
+  const base = receiptsFromEvaluations({ unitRunId: result.unitRunId ?? null, evaluations: result.evaluations });
+  const produces = projection.kind === 'playbook' || !isVerdict(result.outcome)
     ? []
     : (projection.guide?.activities.find((a) => a.id === reservation.activity)?.produces ?? []);
   if (produces.length === 0) return { achieved: [], receipts: base };
@@ -83,7 +84,7 @@ function proposedAchievements({ mainRoot, projection, reservation, result }) {
     const subjectDigest = delivery ? testedPathsDigest(reservation, mainRoot) : reports();
     if (subjectDigest === null) continue;
     achieved.push({ milestone, subjectDigest });
-    if (delivery) receipts.push(...receiptsFromResults({ unitRunId: result.unitRunId ?? null, results: result.results ?? [], milestone, subjectDigest }));
+    if (delivery) receipts.push(...receiptsFromEvaluations({ unitRunId: result.unitRunId ?? null, evaluations: result.evaluations, milestone, subjectDigest }));
   }
   // A receipt that names its milestone replaces the unnamed one it was made from.
   return { achieved, receipts: receipts.length > 0 ? receipts : base };

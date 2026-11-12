@@ -194,10 +194,10 @@ test('a delivery milestone is achieved only with a verify receipt for the paths 
   fs.mkdirSync(path.join(wt, 'src', 'a'), { recursive: true });
   fs.writeFileSync(path.join(wt, 'src', 'a', 'x.txt'), 'built\n');
   const port = createCaseAdmissionPort({ repoRoot: tmp, env: {} });
-  const attempt = (unitRunId, results) => {
+  const attempt = (unitRunId, results, evaluations = []) => {
     const admitted = port.admit({ unitRunId, caseRef: asRef(run, 'build-a'), activity: 'build-a', writes: ['src/a/**'], worktree: wt, readOnly: false, pattern: 'solo', seatLaunches: 1 });
     assert.equal(admitted.admitted, true, JSON.stringify(admitted));
-    port.settle(admitted.reservationId, { caseId: run.caseId, outcome: 'pass', unitRunId, results, seatLaunchesUsed: 1 });
+    port.settle(admitted.reservationId, { caseId: run.caseId, outcome: 'pass', unitRunId, results, evaluations, seatLaunchesUsed: 1 });
     return projectionOf(run);
   };
 
@@ -205,6 +205,11 @@ test('a delivery milestone is achieved only with a verify receipt for the paths 
   assert.equal(unproven.milestones['child-built'].state, 'unreached');
   assert.deepEqual(unproven.refusedAchievements.map((r) => [r.milestone, r.reason]), [['child-built', 'receipt-missing']]);
 
-  const proven = attempt('unit-run-proof', [{ role: 'implementer', outcome: 'pass', runResult: {} }, { role: 'verifier', outcome: 'pass' }]);
+  // The receipt comes from the evaluations Execution handed up; a verifier result with no evaluation behind it proves nothing here.
+  const verifierPass = [{ role: 'implementer', outcome: 'pass', runResult: {} }, { role: 'verifier', outcome: 'pass' }];
+  const unhanded = attempt('unit-run-unhanded', verifierPass);
+  assert.equal(unhanded.milestones['child-built'].state, 'unreached');
+
+  const proven = attempt('unit-run-proof', verifierPass, [{ kind: 'verify', seat: 'verifier', round: 1, passed: true }]);
   assert.equal(proven.milestones['child-built'].state, 'achieved');
 });

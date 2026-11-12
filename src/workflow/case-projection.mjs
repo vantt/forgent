@@ -11,7 +11,6 @@
 import { normalizeGuide } from './guide-schema.mjs';
 import { projectWorkflowState, readWorkflowEvents } from './store.mjs';
 import { playbookSubjectDigests } from './ref-digests.mjs';
-import { seatKeyOf, isVerdictResult, isVerifyResult } from '../runner/execution/legacy-seat-read.mjs';
 
 /** Who may name a receipt. Worker prose and a self-reported `verifiedSha` are never one. */
 export const RECEIPT_EVALUATORS = Object.freeze(['harness-verify', 'reviewer-verdict', 'gate-answer']);
@@ -287,18 +286,16 @@ export function projectCase(events, { currentDigests = {}, state: legacy = proje
 }
 
 /**
- * The receipts a Unit run's own results back, by named evaluators only: the harness's verify round and
- * a checker's verdict. What a worker wrote about itself is never read here.
+ * The receipts a Unit run's evaluations back: one per evaluation Execution handed up (the harness's verify round
+ * and a checker's verdict), a verify only when it passed. Which results are evaluations is Execution's answer;
+ * binding them to a milestone and a subject digest is Workflow's. What a worker wrote about itself is never one.
  */
-export function receiptsFromResults({ unitRunId, results = [], milestone = null, subjectDigest = null }) {
+export function receiptsFromEvaluations({ unitRunId, evaluations = [], milestone = null, subjectDigest = null }) {
   const receipts = [];
-  for (const result of results) {
-    const role = String(seatKeyOf(result) ?? '');
-    if (isVerifyResult(result) && result.outcome === 'pass') {
-      receipts.push({ kind: 'verify', evaluator: 'harness-verify', passed: true, unitRunId, role, milestone, subjectDigest });
-    } else if (isVerdictResult(result) && ['pass', 'findings'].includes(result.outcome)) {
-      receipts.push({ kind: 'verdict', evaluator: 'reviewer-verdict', passed: result.outcome === 'pass', unitRunId, role, milestone, subjectDigest });
-    }
+  for (const { kind, seat, passed } of evaluations) {
+    const role = String(seat ?? '');
+    if (kind === 'verify' && passed) receipts.push({ kind: 'verify', evaluator: 'harness-verify', passed: true, unitRunId, role, milestone, subjectDigest });
+    else if (kind === 'verdict') receipts.push({ kind: 'verdict', evaluator: 'reviewer-verdict', passed, unitRunId, role, milestone, subjectDigest });
   }
   return receipts;
 }

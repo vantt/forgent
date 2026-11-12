@@ -7,7 +7,7 @@ import crypto from 'node:crypto';
 import { RunnerConfigError } from '../runner/dispatch/runner-config-error.mjs';
 import { runDirOf, runsRoot } from '../runner/execution/case-run-paths.mjs';
 import { installOnce } from '../native/door.mjs';
-import { isVerdictResult } from '../runner/execution/legacy-seat-read.mjs';
+import { legacyInfrastructureOf } from './legacy-ledger-read.mjs';
 
 // Every ledger line is written while its writer holds the run's `advance` lock. The hold is the
 // proof: a hold made by `createAdvanceHold`, for this run, not yet released. Nothing else appends.
@@ -258,10 +258,13 @@ export function recoverWorkflowLedgerTail({ repoRoot, workflowRunId, hold }) {
   return { recovered: true, droppedBytes };
 }
 
-/** How a unit that failed on infrastructure ends: no seat of it reached a verdict, so `resume` may run it again. */
-const INFRASTRUCTURE_OUTCOMES = new Set(['execution-failure', 'not-started']);
-const reachedVerdict = (result) => Boolean(result?.refused) || (isVerdictResult(result) && ['pass', 'findings'].includes(result.outcome));
-const isRerunnable = (p) => INFRASTRUCTURE_OUTCOMES.has(p.outcome) && !p.outOfScope?.length && !(p.results ?? []).some(reachedVerdict);
+/**
+ * Whether `resume` may run a completed unit again: Execution said it ended on infrastructure (the entry's
+ * `infrastructure`, or for an entry written before that field existed the one legacy reader's answer), and no
+ * seat of it was refused. `refused` is Workflow's own acceptance outcome, not one of Execution's, so a refused
+ * seat is a verdict here and stays terminal.
+ */
+const isRerunnable = (p) => (p.infrastructure ?? legacyInfrastructureOf(p)) === true && !(p.results ?? []).some((result) => result?.refused);
 
 /** The unit as `unit.scheduled` records it: running, with the worktree and base a writing unit was given. */
 const scheduledUnit = (p) => ({

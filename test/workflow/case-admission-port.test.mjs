@@ -133,7 +133,7 @@ test('settle appends once and releases the binding its worktree holds on the led
   const wt = makeFixtureDir('fgos-port-settle-');
   const admitted = port.admit(proposal(run, { activity: 'build-a', caseRef: { caseId: run.caseId, activity: 'build-a' }, writes: ['src/a'], worktree: wt, readOnly: false }));
   assert.equal(admitted.admitted, true);
-  const result = { caseId: run.caseId, outcome: 'pass', unitRunId: 'unit-run-1', results: [{ role: 'verify', outcome: 'pass' }], seatLaunchesUsed: 3, frameExhausted: true };
+  const result = { caseId: run.caseId, outcome: 'pass', unitRunId: 'unit-run-1', results: [{ role: 'verify', outcome: 'pass' }], evaluations: [{ kind: 'verify', seat: 'verify', round: 1, passed: true }], seatLaunchesUsed: 3, frameExhausted: true };
   port.settle(admitted.reservationId, result);
   port.settle(admitted.reservationId, result);
   const settles = eventsOf(run).filter((e) => e.type === 'settle' && e.payload.reservationId === admitted.reservationId);

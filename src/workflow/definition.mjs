@@ -1,16 +1,18 @@
 // src/workflow/definition.mjs — Workflow definition contract and schema validator
-// Architecture guard: MUST NOT import src/state/** or src/runner/** (kernel layer). The exceptions are two
-// import-free leaves: src/runner/dispatch/write-scope.mjs, so a workflow and a unit read writes one way, and
-// src/runner/dispatch/run-timeout.mjs, so they check a unit's timeoutMs one way.
+// Architecture guard: MUST NOT import src/state/** or src/runner/** (kernel layer). The exceptions are three
+// pure leaves: src/runner/dispatch/write-scope.mjs, so a workflow and a unit read writes one way,
+// src/runner/dispatch/run-timeout.mjs, so they check a unit's timeoutMs one way, and
+// src/runner/execution/outcome.mjs, so which outcomes are verdicts is Execution's answer, not a second list.
 
 import path from 'node:path';
 import { canonicalizeWrites } from '../runner/dispatch/write-scope.mjs';
 import { runTimeoutProblem } from '../runner/dispatch/run-timeout.mjs';
+import { isVerdict } from '../runner/execution/outcome.mjs';
 import { GATE_MODES, GuideSchemaError, RIGOR_ORDER, normalizeGuide } from './guide-schema.mjs';
 import { dependencyOrder } from './steps.mjs';
 
-/** Thrown for a malformed Workflow definition. Kept free of runner imports (bar the import-free
- * write-scope and run-timeout leaves) so the Work-lifecycle kernel can read step data without depending on dispatch. */
+/** Thrown for a malformed Workflow definition. Kept free of runner imports (bar the pure
+ * write-scope, run-timeout and outcome leaves) so the Work-lifecycle kernel can read step data without depending on dispatch. */
 export class WorkflowDefinitionError extends Error {
   constructor(message) {
     super(message);
@@ -94,7 +96,7 @@ function normalizeStanceOptions(raw, label) {
 function normalizeAcceptOutcomes(raw, label) {
   const outcomes = raw === undefined ? ['pass'] : raw;
   if (!Array.isArray(outcomes) || !outcomes.length
-    || outcomes.some((outcome) => !['pass', 'findings'].includes(outcome)) || new Set(outcomes).size !== outcomes.length) {
+    || outcomes.some((outcome) => !isVerdict(outcome)) || new Set(outcomes).size !== outcomes.length) {
     fail(`${label}.acceptOutcomes requires a reviewed template and unique pass/findings outcomes`);
   }
   return outcomes;

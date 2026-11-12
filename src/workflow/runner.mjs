@@ -276,7 +276,7 @@ async function runStepUnit(run, { step, u, state, uState }) {
   } catch (error) {
     if (error instanceof CaseAdmissionRefusedError) return refuseUnit(run, { step, u, error, attempt });
     recordScheduled();
-    result = { unitRunId: attempt.resumeUnitRunId ?? attempt.unitRunId, outcome: 'execution-failure', results: [], error: String(error?.message ?? error) };
+    result = { unitRunId: attempt.resumeUnitRunId ?? attempt.unitRunId, outcome: 'execution-failure', infrastructure: true, results: [], error: String(error?.message ?? error) };
   }
 
   // Execution settled the outcome after the scope rule: the ledger records what it handed up, never a rewrite of it.
@@ -286,6 +286,7 @@ async function runStepUnit(run, { step, u, state, uState }) {
     unitId: u.id,
     unitRunId: result.unitRunId,
     outcome: result.outcome,
+    infrastructure: result.infrastructure,
     results: withoutEvidence(result.results || []),
     ...(outOfScope.length > 0 ? { outOfScope } : {}),
     ...(outOfScopeOnBranch.length > 0 ? { outOfScopeOnBranch } : {}),

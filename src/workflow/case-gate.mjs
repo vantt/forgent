@@ -16,6 +16,7 @@ import { assertRunTimeoutMs, loadRunnerConfigForDir } from '../runner/dispatch/c
 import { RunnerConfigError } from '../runner/dispatch/runner-config-error.mjs';
 import { answerOfVerify, outcomeOfVerify, runUnderCustody, runVerify } from '../runner/execution/custody-door.mjs';
 import { verifyCommandOf, verifySeatResult } from '../runner/execution/loops/verify.mjs';
+import { evaluationsOf } from '../runner/execution/outcome.mjs';
 import { CaseAdmissionRefusedError } from '../runner/execution/case-admission-port.mjs';
 import { createCaseAdmissionPort } from './case-admission-port.mjs';
 import { GATE_RUN_PREFIX } from './case-runtime.mjs';
@@ -115,6 +116,7 @@ export async function runCaseGate({
     outcome,
     unitRunId,
     results: [seatResult],
+    evaluations: evaluationsOf([seatResult]),
     seatLaunchesUsed: 0,
     gate,
   });

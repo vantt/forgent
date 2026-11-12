@@ -265,6 +265,23 @@ test('a step started again after it failed on infrastructure reopens the run and
   }
 });
 
+test('a unit that Execution says ended on infrastructure is rerunnable whatever its outcome string is, and one it says did not is terminal', () => {
+  const rows = (completeFacts) => [
+    ['step.start', { stepId: 's1' }],
+    ['unit.scheduled', { stepId: 's1', unitId: 'b' }],
+    ['unit.started', { stepId: 's1', unitId: 'b', unitRunId: 'run-b' }],
+    ['unit.complete', { stepId: 's1', unitId: 'b', unitRunId: 'run-b', results: [{ seat: 'producer', outcome: 'x', runResult: {} }], ...completeFacts }],
+  ];
+  const unitB = (facts) => foldOf(TWO_UNITS, rows(facts)).steps.s1.units.b;
+  assert.equal(unitB({ outcome: 'a-new-outcome', infrastructure: true }).rerunnable, true);
+  assert.notEqual(unitB({ outcome: 'execution-failure', infrastructure: false }).rerunnable, true, 'Execution said it did not end on infrastructure');
+  const refusedSeat = foldOf(TWO_UNITS, [
+    ...rows({ outcome: 'execution-failure', infrastructure: true }).slice(0, 3),
+    ['unit.complete', { stepId: 's1', unitId: 'b', unitRunId: 'run-b', outcome: 'execution-failure', infrastructure: true, results: [{ seat: 'producer', outcome: 'execution-failure', refused: { reason: 'policy', detail: 'x' } }] }],
+  ]).steps.s1.units.b;
+  assert.notEqual(refusedSeat.rerunnable, true, 'a refused seat is Workflow\'s own verdict and stays terminal');
+});
+
 test('a step started again after a verdict reopens nothing: refused, out-of-scope, findings and a settled seat verdict stay terminal', () => {
   const verdicts = [
     FAILED_ROWS('findings'),
