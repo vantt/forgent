@@ -1,6 +1,6 @@
 # Packaging P11: release correctness
 
-Branch `harden/pkg-p11-release-correctness` (rebased on `9d17cfee5`). State: **built and verified, not landed**. It waits for P06 and for the lead that makes the upgrade migrate legacy config (owner option 1), so the proof is green when it lands.
+Branch `harden/pkg-p11-release-correctness` (rebased on P06, `d9324ff13`). State: **built and verified, not landed**. It waits for P06 and for the lead that makes the upgrade migrate legacy config (owner option 1), so the proof is green when it lands.
 
 ## 1. What changed
 
@@ -31,7 +31,7 @@ cd proj && ../dl/fgctl init --from ../dl/fgos-*.tar.gz        # rc.5 writes $HOM
 CAND=<dir with the candidate fgctl and fgos asset, from: node scripts/package-release-assets.mjs --version v0.2.0-assets-check --out <dir>>
 $CAND/fgctl upgrade --from $CAND/fgos-*.tar.gz; echo $?
 ```
-Result: activation moves to the candidate, then `fgos: event-store-config: config-key-in-wrong-file global:config.json:4:5 gateway.token` / `Error: tail command 'init' failed with status 1`, exit 1. `fgos doctor --fix` clears it; afterwards doctor fails `config-format-legacy-json` for the project `.fgos/config.json` rc.5 wrote until `fgos config migrate`. The proof asserts exit 0 and no failing `config-*` row, so it is red until the migration lead lands. Note the `FGOS_STATE_HOME` directory needs mode 700 or the git driver refuses it.
+Result: activation moves to the candidate, then `fgos: event-store-config: config-key-in-wrong-file global:config.json:4:5 gateway.token` / `Error: tail command 'init' failed with status 1`, exit 1. `fgos doctor --fix` clears it; afterwards doctor fails `config-format-legacy-json` for the project `.fgos/config.json` rc.5 wrote until `fgos config migrate`. After the rebase onto P06 (`d9324ff13`) the same step still ends in exit 1 but the tail message is `fgos: event-store-config: config-legacy-shadowed .fgos/config.json` (log `/dev/shm/pkg-p11-proof5.log`); the doctor smoke before it passes. The proof asserts exit 0 and no failing `config-*` row, so it is red until the migration lead lands. Note the `FGOS_STATE_HOME` directory needs mode 700 or the git driver refuses it.
 
 ## 4. Net lines (measured, `git diff --numstat origin/main...HEAD`, census and CHANGELOG excluded)
 
