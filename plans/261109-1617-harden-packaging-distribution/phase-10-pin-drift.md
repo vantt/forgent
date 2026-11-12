@@ -1,7 +1,7 @@
 ---
 phase: 10
 title: "Activation-versus-pin drift: a doctor row, the same line in fgctl status and verify, a digest-only-pin error with three ways out, and a pin-bump step in the release process (Q4/5 a)"
-status: pending
+status: completed
 depends_on: ["P02 landed (registrations.mjs chain, doctor warn status)", "P06 landed (init.rs chain)"]
 parallel: "group G4 with P08 and P11"
 effort: ~0.75d

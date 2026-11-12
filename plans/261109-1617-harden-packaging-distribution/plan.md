@@ -60,7 +60,7 @@ Order follows the skill: tier 1 UX, tier 2 safety, tier 3 correctness, tier 4 sp
 | 12 | [Speed: no-op re-runs, download cap, release profile](phase-12-speed.md) | 4 | 10 (`init.rs`), 09 (`install.sh`, `fetch.rs`) | `init.rs`, `fetch.rs`, `install.sh`, `Cargo.toml` | 0.75d |
 | 13 | [Close: checklist re-run, Vietnamese guide, closing report](phase-13-close.md) | - | 01-12 | spec, verification doc, reports | 0.5d |
 
-Status of every row: pending, except P02, P03, P05 and P09 (completed, 2026-11-09), P04, P01 and P08 (completed, 2026-11-12), and P06 (completed, 2026-11-12; [report](../reports/lead-261112-1325-harden-pkg-p06-init-closing-block.md)).
+Status of every row: pending, except P02, P03, P05 and P09 (completed, 2026-11-09), P04, P01 and P08 (completed, 2026-11-12), P06 (completed, 2026-11-12; [report](../reports/lead-261112-1325-harden-pkg-p06-init-closing-block.md)), and P10 (completed, 2026-11-12; [report](../reports/lead-261112-1429-harden-pkg-p10-pin-drift.md)).
 
 ## Coverage: the 42 MUST fails
 
