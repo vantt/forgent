@@ -276,16 +276,16 @@ fn remove_installation(
             dir.display()
         )));
     }
+    let target_dir = workspace_root
+        .join(".fgos")
+        .join(format!("uninstall-backup-{}", timestamp()));
     let mut backup_dir = None;
     for record in ["activation.json", "root.json"] {
         let source = dir.join(record);
         if source.is_file() {
-            let target_dir = workspace_root
-                .join(".fgos")
-                .join(format!("uninstall-backup-{}", timestamp()));
             std::fs::create_dir_all(&target_dir)?;
             std::fs::copy(&source, target_dir.join(record))?;
-            backup_dir = Some(target_dir);
+            backup_dir = Some(target_dir.clone());
         }
     }
     std::fs::remove_dir_all(dir)?;
@@ -779,6 +779,7 @@ mod tests {
         let dir = installation_dir(&root);
         std::fs::create_dir_all(dir.join("bin")).unwrap();
         std::fs::write(dir.join("activation.json"), "{\"a\":1}").unwrap();
+        std::fs::write(dir.join("root.json"), "{\"r\":1}").unwrap();
         std::fs::write(dir.join("bin").join("fgos"), "#!/bin/sh").unwrap();
         std::fs::write(root.join(".fgos").join("config.yaml"), "keep").unwrap();
         std::fs::write(root.join(".fgos").join("distribution.json"), "keep").unwrap();
