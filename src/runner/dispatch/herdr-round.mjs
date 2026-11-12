@@ -29,7 +29,7 @@ import { briefPaths, renderBrief, renderPointer } from './brief.mjs';
 import { writeVisibility } from './visibility-session.mjs';
 import { createWorkerHome, removeWorkerHome, redactWorkerHome } from './worker-home.mjs';
 import {
-  seedTrust, seedClaudeConfigTrust, seedCodexTrust, seedAgyTrust, defaultAgySettingsPath,
+  seedTrust, seedClaudeConfigTrust, operatorClaudeStorePath, seedCodexTrust, seedAgyTrust, defaultAgySettingsPath,
   seedCodexHookTrust, trustRoots,
 } from '../../run-supervisor/trust-store.mjs';
 export { trustRoots };
@@ -299,7 +299,7 @@ export function trustStorePaths({ trustStore, fullEnv, workerEnv, accountSource 
   // claude reads its config from its own config directory when it has one, so a worker with a private config
   // directory gets its entries there and the operator's store only vouches for the root.
   // The operator's own store sits in their config directory when they moved it, else beside their home.
-  const real = trustStore.path ?? (fullEnv.CLAUDE_CONFIG_DIR ? path.join(fullEnv.CLAUDE_CONFIG_DIR, '.claude.json') : path.join(os.homedir(), '.claude.json'));
+  const real = operatorClaudeStorePath({ trustStore, env: fullEnv });
   const own = workerEnv?.CLAUDE_CONFIG_DIR && workerEnv.CLAUDE_CONFIG_DIR !== fullEnv.CLAUDE_CONFIG_DIR;
   return { root: real, target: own ? path.join(workerEnv.CLAUDE_CONFIG_DIR, '.claude.json') : real };
 }

@@ -611,8 +611,10 @@ export function credentialLayout(source) {
  * Why a seat may not start on a copy of this login, or null. A login whose layout must never refresh inside a
  * seat (`seatMustNotRefresh`: the copy carries the source's refresh token) needs more access-token life than the
  * seat's timeout; otherwise the CLI would refresh in the home and spend the source's token. Judged on the source
- * the copy is made from; unreadable or unjudgeable (no timeout) is the copy step's business, not a refusal here.
- * Names and numbers only, never a token.
+ * the copy is made from; unreadable is the copy step's business, not a refusal here. The caller passes the seat's
+ * timeout (the default one when the request names none). A seat allowed to run longer than the source's remaining
+ * life is refused even though refresh-ahead renews only inside its own window (60 min or the probe timeout plus a
+ * margin): a long timeout can be refused until the source renews. Names and numbers only, never a token.
  */
 export function loginLifeProblem(credentialSource, { timeoutMs, now = Date.now() } = {}) {
   const layout = LAYOUTS[credentialLayout(credentialSource)];

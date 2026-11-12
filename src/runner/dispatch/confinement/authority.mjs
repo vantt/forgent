@@ -5,10 +5,11 @@ import crypto from "node:crypto";
 import path from "node:path";
 import fs from "node:fs";
 import os from "node:os";
-import { claudeMcpApprovalArgs } from "../../../run-supervisor/trust-store.mjs";
+import { claudeMcpApprovalArgs, operatorClaudeStorePath } from "../../../run-supervisor/trust-store.mjs";
 import { DEFAULT_ADAPTER, resolveExecutorEnv, workerBaseEnv, currentDispatchDepth, DISPATCH_DEPTH_ENV } from "../adapters.mjs";
 import { DispatchError } from "../../../run-supervisor/dispatch-error.mjs";
 import { validateConfinementRequest, validateAssignmentLaunchContext } from "./request.mjs";
+import { DEFAULT_SEAT_TIMEOUT_MS } from "./resources.mjs";
 import {
   saveAttestationRecord,
   savePlanRecord,
@@ -748,7 +749,7 @@ export async function prepareConfinementForLaunch(request, opts = {}) {
       ? claudeMcpApprovalArgs({
         cwd: request.context.cwd,
         repoRoot: request.context.repoRoot ?? request.context.cwd,
-        storePath: claudeTrust.path ?? path.join(os.homedir(), '.claude.json'),
+        storePath: operatorClaudeStorePath({ trustStore: claudeTrust }),
       })
       : []),
   ];
@@ -806,7 +807,7 @@ export async function prepareConfinementForLaunch(request, opts = {}) {
       workerCommandDigest,
       stdin: 'ignore',
       encoding: 'utf8',
-      timeoutMs: request.context.timeoutMs || 900000,
+      timeoutMs: request.context.timeoutMs || DEFAULT_SEAT_TIMEOUT_MS,
       idleTimeoutMs: request.context.idleTimeoutMs || null,
       maxBuffer: request.context.maxBuffer || 10485760,
     },

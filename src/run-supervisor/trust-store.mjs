@@ -47,6 +47,16 @@ export class TrustStoreError extends Error {
   }
 }
 
+/**
+ * Where the operator's own claude store is: the declared path, else `.claude.json` in the config directory they
+ * moved claude to (`env.CLAUDE_CONFIG_DIR`), else the one beside their home. The one answer for the folder-trust
+ * reads of every caller.
+ */
+export function operatorClaudeStorePath({ trustStore, env = process.env } = {}) {
+  if (trustStore?.path) return trustStore.path;
+  return env.CLAUDE_CONFIG_DIR ? path.join(env.CLAUDE_CONFIG_DIR, '.claude.json') : path.join(os.homedir(), '.claude.json');
+}
+
 /** Read and parse the store, refusing loudly rather than inventing an empty one.
  * A missing file and an unparseable file are DIFFERENT failures: the first means
  * the CLI was never set up here, the second means something is wrong that a

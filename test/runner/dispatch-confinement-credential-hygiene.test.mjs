@@ -5,7 +5,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
 import { prepareBwrap } from '../../src/runner/dispatch/confinement/drivers/bwrap.mjs';
-import { resolveConfinementResources } from '../../src/runner/dispatch/confinement/resources.mjs';
+import { resolveConfinementResources, DEFAULT_SEAT_TIMEOUT_MS } from '../../src/runner/dispatch/confinement/resources.mjs';
 import {
   resolveConfinementTempRoot,
   ensurePrivateDir,
@@ -133,6 +133,11 @@ test('a claude login copy with less access-token life than the seat timeout is r
     const short = planFor(f.tempRoot, 'disp_claude_short');
     await assert.rejects(prepareBwrap(short, requestFor('disp_claude_short', 35 * 60 * 1000), backend), /login-expires-before-seat-timeout/);
     assert.equal(fs.existsSync(path.join(short.resources[0].hostTarget, '.credentials.json')), false, 'no login copy was made');
+
+    // No timeout in the request: the seat runs for the default timeout, which the guard judges against.
+    login(DEFAULT_SEAT_TIMEOUT_MS / 2 + Date.now());
+    const unset = planFor(f.tempRoot, 'disp_claude_unset');
+    await assert.rejects(prepareBwrap(unset, requestFor('disp_claude_unset', undefined), backend), /login-expires-before-seat-timeout/);
 
     login(Date.now() + 3 * 60 * 60 * 1000);
     const long = planFor(f.tempRoot, 'disp_claude_long');

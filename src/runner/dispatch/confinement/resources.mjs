@@ -26,6 +26,9 @@ import { machineLoginStores } from '../llm-accounts.mjs';
  * the mailbox record are listed, never all of `.fgos`: tracked files live there and would appear
  * deleted in the checkout status under a mask. The herdr sockets are machine-private (MACHINE_PRIVATE_ROOTS).
  */
+/** How long a seat may run when its request names no timeout. */
+export const DEFAULT_SEAT_TIMEOUT_MS = 900000;
+
 export const BLIND_HIDDEN_ROOTS = Object.freeze([
   '{fgosDir}/assignments',
   '{fgosDir}/workflow-runs',
