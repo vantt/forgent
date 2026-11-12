@@ -1,8 +1,8 @@
 # Hướng dẫn: giữ định tuyến riêng của owner khi bản chuẩn không còn nêu pool `thehive`
 
-Dành cho: owner, trên máy owner, fg-server và fg-server2. Người viết: HARDEN (packaging P01). Trạng thái: **đề xuất, chờ owner áp dụng**. HARDEN không tự sửa tệp cấu hình nào của owner (`~/.fgos/config.*` và `.fgos/config.*`).
+Dành cho: owner, trên máy owner, fg-server và fg-server2. Người viết: HARDEN (packaging P01, cập nhật 2026-11-12 sau quyết định 86 Q1 (a)). Trạng thái: **đề xuất, chờ owner áp dụng**. HARDEN không tự sửa tệp cấu hình nào của owner (`~/.fgos/config.*` và `.fgos/config.*`).
 
-> **Điều kiện trước hết:** chỉ kích hoạt bản phát hành kế tiếp trên một máy **sau khi** máy đó đã làm xong mục "Các dòng cần thêm" dưới đây (nếu máy đó còn muốn chạy qua `thehive`). fg-server2 làm ở bước của big lead.
+> **Điều kiện trước hết:** trên mỗi máy, làm theo thứ tự: (1) "Bước 0: kiểm tra pin", (2) "Các dòng cần thêm" vào `~/.fgos/config.yaml` (nếu máy đó còn muốn chạy qua `thehive`), (3) mới kích hoạt bản phát hành kế tiếp. fg-server2 làm ở bước của big lead.
 
 ## Chuyện gì thay đổi và vì sao
 
@@ -23,26 +23,29 @@ Ba thay đổi người dùng thấy:
 
 Không đổi: các chuỗi `prefer` (đã liệt kê đủ CLI; bộ lọc CLI-có-mặt tự quyết cái nào tính), khai kỹ năng `ak:cook` (đã chuyển sang cấu hình máy theo hướng dẫn [declare-cook-skill-in-machine-config](guide-261109-1837-declare-cook-skill-in-machine-config.md)), tệp tài khoản.
 
-## Vì sao sáu ô này không đặt được trong `~/.fgos/config.yaml`
+## Sáu ô nay đặt một lần trong `~/.fgos/config.yaml`
 
-Cấu hình toàn cục **không** giữ ô tier dạng danh sách hoặc `model@pool` (RUL102): bộ nạp bỏ ô đó kèm cảnh báo và dòng doctor `global-model-policies-portable` fail. Lý do gốc là bản cũ trên cùng máy đọc tệp toàn cục; owner đã quyết các máy nâng cấp cùng lúc nên lý do đó đã hết. Big lead đang hỏi owner có nới quy tắc này không; nếu nới thì có một phase riêng và hướng dẫn này được cập nhật. Owner đã chọn nới quy tắc này ở một phase sau; khi phase đó land, sáu ô chuyển sang `~/.fgos/config.yaml` và cách đặt trong tệp dự án dưới đây chỉ là tạm thời. **Cho đến lúc đó**, sáu ô nằm trong tệp **dự án** (`.fgos/config.yaml`), nơi mọi dạng ô đều được nhận.
+Quyết định 86 Q1 (a) (2026-11-12) nới RUL102: cấu hình toàn cục `~/.fgos/config.yaml` nhận ô tier dạng danh sách, `model@pool` và đối tượng như tệp dự án. Bộ nạp không còn bỏ ô đó và không còn cảnh báo; dòng doctor `global-model-policies-portable` đã bị xóa. Thứ tự ưu tiên giữ nguyên: bản chuẩn < toàn cục < dự án, từng ô một. Hồ sơ: D-ADR0075 trong `docs/platform/runner/decisions/h-36d872fbb0e5.md`.
 
-Khóa còn lại bạn cần cho máy (kỹ năng) vẫn đặt ở tệp toàn cục như hướng dẫn cook.
+Hệ quả: sáu ô `thehive` khai **một lần mỗi máy** ở tệp toàn cục, mọi dự án trên máy đó dùng chung; không cần chép vào từng tệp dự án nữa. Cách đặt trong tệp dự án (bản trước của hướng dẫn này) chỉ là tạm thời và được gỡ ở "Gỡ các ô tạm trong tệp dự án".
 
-## Các dòng cần thêm (tệp dự án: `.fgos/config.yaml`, mỗi dự án muốn giữ thehive)
+## Bước 0: kiểm tra pin trên từng máy (trước khi kích hoạt)
 
-Dự án nào của owner muốn z-ai và deepseek tiếp tục đi qua `thehive` trước thì thêm sáu ô. Dùng cửa cấu hình để có `@fgos:why`:
+Lý do: RUL102 cũ bảo vệ dự án ghim bản phát hành trước 2026-10-17, vì bản đó fail với ô danh sách và chạy `model@pool` như tên model. Quy tắc đã bỏ nên một dự án như vậy trên cùng máy sẽ hỏng khi đọc tệp toàn cục có ô danh sách. Không có dòng doctor nào còn canh việc này (bản phát hành không ghi ngày hay phiên bản, doctor không liệt kê được dự án khác), nên owner kiểm tay một lần:
 
 ```sh
-fgos config set runner.modelPolicies.z-ai.nano      '["thehive/zai-org/glm-5.3-flash@thehive","z-ai/glm-5.3-flash@openrouter"]' --reason "owner: thehive trước, OpenRouter dự phòng"
-fgos config set runner.modelPolicies.z-ai.standard  '["thehive/zai-org/glm-5.3-flash@thehive","z-ai/glm-5.3-flash@openrouter"]' --reason "owner: thehive trước, OpenRouter dự phòng"
-fgos config set runner.modelPolicies.z-ai.mini      '["thehive/zai-org/glm-5.3-flash@thehive","z-ai/glm-5.3-flash@openrouter"]' --reason "owner: thehive trước, OpenRouter dự phòng"
-fgos config set runner.modelPolicies.deepseek.nano     '["thehive/deepseek-ai/deepseek-v4.1-flash-1017@thehive","deepseek/deepseek-v4.1-flash@openrouter"]' --reason "owner: thehive trước, OpenRouter dự phòng"
-fgos config set runner.modelPolicies.deepseek.standard '["thehive/deepseek-ai/deepseek-v4.1-flash-1017@thehive","deepseek/deepseek-v4.1-flash@openrouter"]' --reason "owner: thehive trước, OpenRouter dự phòng"
-fgos config set runner.modelPolicies.deepseek.mini     '["thehive/deepseek-ai/deepseek-v4.1-flash-1017@thehive","deepseek/deepseek-v4.1-flash@openrouter"]' --reason "owner: thehive trước, OpenRouter dự phòng"
+# mỗi dự án có fgOS trên máy này (cd vào từng dự án)
+fgctl status                      # dòng activeArtifactDigest
+cat .fgos/installation/activation.json   # activatedAt, artifactDigest, pinSnapshot
 ```
 
-Hoặc viết tay (gộp vào khối `runner.modelPolicies` đã có, không tạo khối thứ hai):
+Đọc `activatedAt`: dự án kích hoạt từ 2026-10-17 trở đi đọc được ô danh sách. Dự án kích hoạt trước đó, hoặc ghim `exact-digest` vào một bản cũ (xem ngày dựng thư mục `~/.local/state/fgos/releases/<digest>`), phải nâng bản (`fgctl upgrade`) hoặc không dùng chung máy với tệp toàn cục có ô danh sách. Liệt kê dự án: các thư mục có `.fgos/installation/activation.json`, ví dụ `find ~ -maxdepth 6 -path '*/.fgos/installation/activation.json'`.
+
+Kết quả đã đo trên fg-server2 (2026-11-12): một dự án có activation, `forgent`, ghim `sha256:ed51feeafded...` kích hoạt 2026-11-09; không có pin nào trước 2026-10-17. Máy owner và fg-server: chưa đo.
+
+## Các dòng cần thêm (tệp toàn cục: `~/.fgos/config.yaml`, một lần mỗi máy)
+
+`fgos config set` không có cờ chọn tệp toàn cục: với khóa `runner.modelPolicies` nó ghi vào tệp **dự án** (chỉ khóa `global-only` mới vào tệp toàn cục). Vì vậy bước này là sửa tay `~/.fgos/config.yaml`. Gộp vào khối `runner.modelPolicies` đã có nếu có, đừng tạo khối thứ hai (máy này chưa có khối đó):
 
 ```yaml
 runner:
@@ -57,9 +60,35 @@ runner:
       mini: ["thehive/deepseek-ai/deepseek-v4.1-flash-1017@thehive", "deepseek/deepseek-v4.1-flash@openrouter"]
 ```
 
-Dự án `forgent` đã có sẵn ô `deepseek.advanced` đi qua thehive (ghi 2026-10-25); `advanced` không đổi trong bản chuẩn nên không cần thêm.
+Kiểm tra: `fgos config check` (không fail), `fgos config show --json`, đọc `data.value.runner.modelPolicies["z-ai"].standard` và `.deepseek.standard`: phải là danh sách có thehive, và `fgos dispatch explain --for execute` không đổi so với trước.
 
-Không có khai báo nào cần thêm vào `~/.fgos/config.yaml` cho thay đổi này. Nếu dự án không thêm sáu ô, z-ai và deepseek chạy qua OpenRouter, không qua thehive.
+Nếu muốn dùng lệnh thay vì sửa tay thì lệnh `fgos config set` dưới đây ghi vào tệp **dự án** (đây chính là cách tạm trước đây, dùng cho một dự án riêng muốn khác máy):
+
+```sh
+fgos config set runner.modelPolicies.z-ai.nano      '["thehive/zai-org/glm-5.3-flash@thehive","z-ai/glm-5.3-flash@openrouter"]' --reason "owner: thehive trước, OpenRouter dự phòng"
+fgos config set runner.modelPolicies.z-ai.standard  '["thehive/zai-org/glm-5.3-flash@thehive","z-ai/glm-5.3-flash@openrouter"]' --reason "owner: thehive trước, OpenRouter dự phòng"
+fgos config set runner.modelPolicies.z-ai.mini      '["thehive/zai-org/glm-5.3-flash@thehive","z-ai/glm-5.3-flash@openrouter"]' --reason "owner: thehive trước, OpenRouter dự phòng"
+fgos config set runner.modelPolicies.deepseek.nano     '["thehive/deepseek-ai/deepseek-v4.1-flash-1017@thehive","deepseek/deepseek-v4.1-flash@openrouter"]' --reason "owner: thehive trước, OpenRouter dự phòng"
+fgos config set runner.modelPolicies.deepseek.standard '["thehive/deepseek-ai/deepseek-v4.1-flash-1017@thehive","deepseek/deepseek-v4.1-flash@openrouter"]' --reason "owner: thehive trước, OpenRouter dự phòng"
+fgos config set runner.modelPolicies.deepseek.mini     '["thehive/deepseek-ai/deepseek-v4.1-flash-1017@thehive","deepseek/deepseek-v4.1-flash@openrouter"]' --reason "owner: thehive trước, OpenRouter dự phòng"
+```
+
+Dự án `forgent` còn ô `deepseek.advanced`, `flagship`, `frontier` và `z-ai` cao hơn đi qua thehive trong tệp dự án (ghi 2026-10-25 và 2026-11-09); chúng không đổi trong bản chuẩn nên không bắt buộc chuyển. Chuyển chúng sang tệp toàn cục là lựa chọn riêng của owner.
+
+## Gỡ các ô tạm trong tệp dự án
+
+Dự án nào đã thêm sáu ô theo bản trước của hướng dẫn này (cách tạm) thì sau khi tệp toàn cục đã có sáu ô và `fgos dispatch explain` cho kết quả như cũ, xóa chúng khỏi tệp dự án, mỗi dự án một commit riêng để dễ hoàn tác:
+
+```sh
+fgos config unset runner.modelPolicies.z-ai.nano
+fgos config unset runner.modelPolicies.z-ai.standard
+fgos config unset runner.modelPolicies.z-ai.mini
+fgos config unset runner.modelPolicies.deepseek.nano
+fgos config unset runner.modelPolicies.deepseek.standard
+fgos config unset runner.modelPolicies.deepseek.mini
+```
+
+(Ô có ghi chú `@fgos:why` cần thêm `--acknowledge-comment-loss`.) Không xóa `deepseek.advanced` và các ô khác của dự án `forgent`. Nếu một dự án giữ ô của riêng nó, ô đó vẫn thắng tệp toàn cục.
 
 ## Kiểm tra routing không đổi
 
@@ -75,13 +104,15 @@ diff /tmp/explain-execute-truoc.json /tmp/explain-execute-sau.json
 diff /tmp/explain-review-truoc.json /tmp/explain-review-sau.json
 ```
 
-Chỉ được khác: `generated_at`, `data_hash` và dòng định nghĩa tier (nay bằng tiếng Anh). `executor`, `model`, `tier`, `family` phải giữ nguyên. Với z-ai và deepseek: `fgos config show --json`, đọc `data.value.runner.modelPolicies["z-ai"].standard` và `.deepseek.standard`, phải là danh sách có thehive nếu bạn muốn giữ nó. Cuối cùng `fgos doctor`: `model-policy-pools` không cảnh báo, `global-model-policies-portable` pass.
+Chỉ được khác: `generated_at`, `data_hash` và dòng định nghĩa tier (nay bằng tiếng Anh). `executor`, `model`, `tier`, `family` phải giữ nguyên. Với z-ai và deepseek: đã nêu ở mục kiểm tra phía trên (ô phải là danh sách có thehive nếu bạn muốn giữ nó). Cuối cùng `fgos doctor`: `model-policy-pools` không cảnh báo (dòng `global-model-policies-portable` không còn).
 
 Máy chưa có CLI nào: `fgos run` thoát mã 4 với `agent-cli-missing: ... install one of claude, codex, omp, pi, then run "fgos doctor"`.
 
 ## Hoàn tác
 
-Xóa sáu ô vừa thêm (`fgos config unset runner.modelPolicies.z-ai.nano` ... hoặc xóa dòng) và kích hoạt lại bản trước (`fgctl repair` hoặc `fgctl init --override-pin`). Bản trước tự nêu thehive trong bản chuẩn, và các ô khai trong dự án gộp trùng khớp nên không xung đột.
+1. Xóa sáu ô khỏi `~/.fgos/config.yaml` (sửa tay), trên máy nào đã thêm. Việc này **bắt buộc trước** khi kích hoạt lại một bản trước 2026-11-12 hoặc một bản cũ hơn 2026-10-17: bản trước nới quy tắc bỏ ô danh sách trong tệp toàn cục và chạy `fgos doctor` fail dòng `global-model-policies-portable`; bản trước 2026-10-17 còn fail khi đọc ô danh sách.
+2. Kích hoạt lại bản trước (`fgctl repair` hoặc `fgctl init --override-pin`). Bản trước tự nêu thehive trong bản chuẩn, nên không cần gì thêm.
+3. Nếu đã gỡ các ô tạm trong tệp dự án: hoàn tác commit gỡ đó, hoặc thêm lại sáu ô bằng các lệnh `fgos config set` ở trên.
 
 ## Đã kiểm chứng trên nhánh (2026-11-12)
 
@@ -90,4 +121,4 @@ Xóa sáu ô vừa thêm (`fgos config unset runner.modelPolicies.z-ai.nano` ...
 
 ## Chưa kiểm chứng
 
-Chưa chạy trên máy owner và fg-server; chưa chạy `fgos doctor` thật sau khi thêm sáu ô (test của repo phủ hai dòng doctor và việc bỏ qua CLI vắng).
+Chưa chạy trên máy owner và fg-server (kể cả bước 0: pin của dự án ở hai máy đó chưa đo); chưa chạy `fgos doctor` thật sau khi thêm sáu ô vào tệp toàn cục (test của repo phủ hai dòng doctor, việc bỏ qua CLI vắng, và việc ô danh sách, `model@pool` và đối tượng trong tệp toàn cục được nạp nguyên và bị ô dự án ghi đè).
