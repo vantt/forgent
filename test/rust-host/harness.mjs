@@ -774,6 +774,10 @@ async function runMultiStepIsolatedWrite(entryA, entryB, testCase, options = {})
     const normCreatedB = normalizeCreatedFiles(deltaB.created);
 
     const differences = [...initComparison.differences, ...addComparison.differences];
+    // A failed step is only diagnosable from what it exited with and said.
+    for (const [step, a, b] of [["init", initResA, initResB], ["add", addResA, addResB]]) {
+      if (differences.length > 0) differences.push(`${step}: A exit ${a.exitCode} stderr ${JSON.stringify(a.stderrText.slice(0, 600))}; B exit ${b.exitCode} stderr ${JSON.stringify(b.stderrText.slice(0, 600))}`);
+    }
     if (JSON.stringify(normCreatedA) !== JSON.stringify(normCreatedB)) {
       differences.push(`Created delta mismatch: ${JSON.stringify(normCreatedA)} !== ${JSON.stringify(normCreatedB)}`);
     }
