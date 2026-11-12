@@ -53,6 +53,8 @@ test('every golden file carries every field Execution writes, with its shape', (
     for (const result of data.results) {
       assert.equal(typeof result.infrastructure, 'boolean', `${name} ${result.seat}`);
       if (result.runResult) assert.deepEqual(Object.keys(result.runResult.activity), ['turns', 'toolUses', 'transcriptPath'], `${name} ${result.seat}`);
+      if (result.runResult) assert.ok(result.runResult.durationMs === null || (Number.isInteger(result.runResult.durationMs) && result.runResult.durationMs >= 0), `${name} ${result.seat}: durationMs is a whole number of milliseconds or null`);
+      if (result.binding) assert.equal(typeof result.binding.family, 'string', `${name} ${result.seat}: a bound seat names its provider family`);
       if (result.runResult) assertOutputShape(result.output, `${name} ${result.seat}`);
       else assert.equal(result.output, undefined, `${name} ${result.seat}: a verify round has no seat output`);
     }

@@ -15,6 +15,11 @@ export function seatKeyOf(result) {
   return result?.seat ?? result?.role;
 }
 
+/** The provider family of a result whose binding carries no `family` (written before Seat Binding handed it up): the one its run policy named, else null. */
+export function legacyFamilyOf(result) {
+  return result?.runResult?.policy?.providerModel ?? null;
+}
+
 /** Whether a result carries a checker's verdict. Pre-fence results say so only through their role name. */
 export function isVerdictResult(result) {
   if (result?.posture) return result.posture.verdict === true;

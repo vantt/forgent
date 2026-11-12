@@ -622,6 +622,10 @@ test('a Unit run hands up its final outcome with the facts it stands on: infrast
   // The attempt keeps its RunResult accessors and gains the activity; nothing was kept for a seat with no session.
   const producerRun = res.results[0].runResult;
   assert.deepEqual(producerRun.activity, { turns: null, toolUses: null, transcriptPath: null });
+  // The attempt's wall time is Execution's own measure of the dispatch, kept on the attempt record; the seat's binding names its provider family.
+  assert.ok(Number.isInteger(producerRun.durationMs) && producerRun.durationMs >= 0, `durationMs ${producerRun.durationMs}`);
+  assert.equal(res.results[0].binding.family, 'okay');
+  assert.equal(unitJson(repoRoot, res.unitRunId).bindings['producer/1'][0].durationMs, producerRun.durationMs);
   assert.equal(typeof producerRun.confidence, 'string');
   // The transcript Execution kept in the attempt's run directory is named by its absolute path.
   const record = unitJson(repoRoot, res.unitRunId);
