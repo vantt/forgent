@@ -410,9 +410,9 @@ test('the dispatch policy attaches field-level provenance additively, without ch
     policy: { preferExecutor: 'pi' },
   });
   // The caller states a tier and a model: a seat the runner already bound is taken as given.
-  const cliOverride = { tier: 'frontier', model: 'bound-model' };
+  const binding = { tier: 'frontier', model: 'bound-model', provenance: { tier: { source: 'override' }, model: { source: 'tier-cell' } } };
 
-  const effective = effectiveDispatchPolicy({ assignment, cliOverride, runnerConfig: twoExecutorConfig() });
+  const effective = effectiveDispatchPolicy({ assignment, binding, runnerConfig: twoExecutorConfig() });
 
   // Flat fields still present, unchanged in shape.
   assert.equal(effective.role, 'reviewer');
@@ -422,7 +422,9 @@ test('the dispatch policy attaches field-level provenance additively, without ch
   // New provenance field, additive.
   assert.ok(effective.provenance);
   assert.equal(effective.provenance.tier.value, 'frontier');
-  assert.deepEqual(effective.provenance.tier.source, { scope: 'cliOverride' });
+  // Seat Binding's own label, passed through.
+  assert.deepEqual(effective.provenance.tier.source, { scope: 'seat-binding', id: 'override' });
+  assert.deepEqual(effective.provenance.model.source, { scope: 'seat-binding', id: 'tier-cell' });
   assert.equal(effective.provenance.executor.value, 'pi');
   assert.deepEqual(effective.provenance.executor.source, { scope: 'opPolicy', id: 'validate-plan' });
   assert.ok(Object.isFrozen(effective.provenance));
@@ -434,9 +436,9 @@ test('a policy with no runner config and no bound tier and model is refused by n
     () => policyOf({ assignment }),
     (err) => err instanceof RunnerConfigError && err.code === 'runner-config-missing',
   );
-  const bound = policyOf({ assignment, cliOverride: { tier: 'standard', model: 'bound-model' } });
+  const bound = policyOf({ assignment, binding: { tier: 'standard', model: 'bound-model', provenance: { model: { source: 'tier-cell' } } } });
   assert.equal(bound.model, 'bound-model');
-  assert.deepEqual(bound.provenance.model.source, { scope: 'cliOverride' });
+  assert.deepEqual(bound.provenance.model.source, { scope: 'seat-binding', id: 'tier-cell' });
   assert.deepEqual(bound.provenance.persona.source, { scope: 'default' });
 });
 // --- Phase 00 R8: pure provider capability validation ---

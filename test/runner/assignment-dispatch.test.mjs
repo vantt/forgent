@@ -917,7 +917,7 @@ test('tool executors bypass provider capacity selection even with matching provi
     repoRoot: tempDir,
     runnerConfig,
     // A tool executor is not an agent seat: Seat Binding chooses nothing for it, so the caller states the tier and model.
-    cliOverride: { tier: 'standard', model: 'gpt-test-standard' },
+    binding: { tier: 'standard', model: 'gpt-test-standard' },
     providerCapacityRuntimeDir: runtimeDir,
   });
 

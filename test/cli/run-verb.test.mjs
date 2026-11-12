@@ -329,3 +329,21 @@ test('fgos run keeps --timeout: it raises no tier', () => {
 });
 
 
+
+test('a run records tier and model with the source Seat Binding gave them, never the dispatch door\'s override label', () => {
+  const tmp = setupTestRepo();
+  const stdout = runCli(['Port the parser', '--capability', 'docs:write', '--timeout', '90m', '--dir', tmp], tmp);
+  assert.ok(stdout.includes('"outcome": "pass"'), stdout);
+  const unitRunId = /"unitRunId": "([^"]+)"/.exec(stdout)[1];
+  const plans = [];
+  const walk = (d) => { for (const e of fs.readdirSync(d, { withFileTypes: true })) { const p = path.join(d, e.name); if (e.isDirectory()) walk(p); else if (e.name === 'dispatch-plan.json') plans.push(p); } };
+  walk(path.join(tmp, '.fgos', 'assignments'));
+  assert.ok(plans.length > 0);
+  const bound = unitRecordOf(tmp, stdout).bindings['producer/1'][0].binding;
+  const recorded = plans.map((p) => JSON.parse(fs.readFileSync(p, 'utf8')).policy?.provenance).filter(Boolean);
+  assert.ok(recorded.length > 0, 'the run recorded a dispatch policy');
+  for (const provenance of recorded) {
+    assert.deepEqual(provenance.tier.source, { scope: 'seat-binding', id: bound.provenance.tier.source });
+    assert.deepEqual(provenance.model.source, { scope: 'seat-binding', id: bound.provenance.model.source });
+  }
+});

@@ -832,13 +832,8 @@ async function dispatchBound(ctx, role, { bound, assignmentId, assignmentDir, ob
     committedRunnerConfig: ctx.liveConfig(),
     providerCredentialProbe: createCredentialProbe(),
     providerCredentialRenew: createCredentialRenewal(),
-    cliOverride: {
-      preferExecutor: bound.executor, preferInvocation: bound.invocation, tier: bound.tier, model: bound.model,
-      // The lease takes exactly the account Seat Binding named in the pool that serves `model`.
-      ...(bound.pool ? { pool: bound.pool } : {}),
-      ...(bound.leaseAccount ? { leaseAccount: bound.leaseAccount, accountViewDigest: bound.bindingInput?.accountViewDigest ?? null } : {}),
-      ...(bound.reasoningEffort ? { reasoningEffort: bound.reasoningEffort } : {}),
-    },
+    // Seat Binding's own answer: Dispatch executes it and records its provenance as bound.
+    binding: bound,
     isReadOnlyMode: readOnly,
     ...(bound.timeoutMs ? { timeoutMs: bound.timeoutMs } : {}),
     session: role.session,
