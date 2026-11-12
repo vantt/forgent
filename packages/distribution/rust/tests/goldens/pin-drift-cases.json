@@ -1,35 +1,68 @@
 {
-  "note": "One comparison rule, read by the Rust pin_drift test and the doctor row test. activation is the activation record's artifactDigest and pinOverrideReason; pin is the committed pin's artifactDigest (null when there is no usable pin); line is the exact text both readers print, null when there is nothing to say.",
+  "note": "One comparison rule, read by the Rust pin_drift test and the doctor row test. activation is the activation record's artifactDigest and pinOverrideReason; pin is the committed pin's artifactDigest (null when there is no pin file, \"unreadable\" when the file exists but is not a pin); line is the exact text both readers print, null when there is nothing to say.",
   "cases": [
     {
       "name": "activation equals the pin",
-      "activation": { "artifactDigest": "sha256:aaaaaaaaaaaa1111", "pinOverrideReason": null },
-      "pin": { "artifactDigest": "sha256:aaaaaaaaaaaa1111" },
+      "activation": {
+        "artifactDigest": "sha256:aaaaaaaaaaaa1111",
+        "pinOverrideReason": null
+      },
+      "pin": {
+        "artifactDigest": "sha256:aaaaaaaaaaaa1111"
+      },
       "line": null
     },
     {
       "name": "no pin",
-      "activation": { "artifactDigest": "sha256:aaaaaaaaaaaa1111", "pinOverrideReason": null },
+      "activation": {
+        "artifactDigest": "sha256:aaaaaaaaaaaa1111",
+        "pinOverrideReason": null
+      },
       "pin": null,
       "line": null
     },
     {
       "name": "activation differs and an override reason explains it",
-      "activation": { "artifactDigest": "sha256:bbbbbbbbbbbb2222", "pinOverrideReason": "testing the next build" },
-      "pin": { "artifactDigest": "sha256:aaaaaaaaaaaa1111" },
+      "activation": {
+        "artifactDigest": "sha256:bbbbbbbbbbbb2222",
+        "pinOverrideReason": "testing the next build"
+      },
+      "pin": {
+        "artifactDigest": "sha256:aaaaaaaaaaaa1111"
+      },
       "line": "active bbbbbbbbbbbb != pin aaaaaaaaaaaa (override: testing the next build)"
     },
     {
       "name": "activation differs with no override",
-      "activation": { "artifactDigest": "sha256:bbbbbbbbbbbb2222", "pinOverrideReason": null },
-      "pin": { "artifactDigest": "sha256:aaaaaaaaaaaa1111" },
+      "activation": {
+        "artifactDigest": "sha256:bbbbbbbbbbbb2222",
+        "pinOverrideReason": null
+      },
+      "pin": {
+        "artifactDigest": "sha256:aaaaaaaaaaaa1111"
+      },
       "line": "active bbbbbbbbbbbb != pin aaaaaaaaaaaa (override: none)"
     },
     {
       "name": "a digest-only pin that differs is the same drift",
-      "activation": { "artifactDigest": "sha256:cccccccccccc3333", "pinOverrideReason": null },
-      "pin": { "artifactDigest": "sha256:dddddddddddd4444", "releaseVersion": null },
+      "activation": {
+        "artifactDigest": "sha256:cccccccccccc3333",
+        "pinOverrideReason": null
+      },
+      "pin": {
+        "artifactDigest": "sha256:dddddddddddd4444",
+        "releaseVersion": null
+      },
       "line": "active cccccccccccc != pin dddddddddddd (override: none)"
+    },
+    {
+      "name": "a pin file that is not a pin is reported unreadable, not absent",
+      "activation": {
+        "artifactDigest": "sha256:aaaaaaaaaaaa1111",
+        "pinOverrideReason": null
+      },
+      "pin": "unreadable",
+      "line": "the committed pin is unreadable: .fgos/distribution.json"
     }
   ]
 }

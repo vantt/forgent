@@ -22,7 +22,8 @@ function workspace(t, { activation, pin, rawPin }) {
     if (activation.pinOverrideReason) record.pinOverrideReason = activation.pinOverrideReason;
     fs.writeFileSync(path.join(root, '.fgos', 'installation', 'activation.json'), JSON.stringify(record));
   }
-  if (pin || rawPin !== undefined) {
+  if (pin === 'unreadable') rawPin = '{ "projectRuntime": {} }';
+  if ((pin && pin !== 'unreadable') || rawPin !== undefined) {
     fs.writeFileSync(path.join(root, '.fgos', 'distribution.json'),
       rawPin ?? JSON.stringify({ schemaVersion: 1, projectRuntime: { policy: 'exact-digest', ...pin } }));
   }
@@ -48,18 +49,25 @@ for (const c of cases) {
     }
     assert.equal(result.status, 'warn');
     assert.ok(result.message.startsWith(`warning: ${c.line}`), result.message);
-    assert.match(result.fix, /fgctl init/);
-    assert.match(result.fix, /fgctl upgrade/);
+    if (c.line.startsWith('active')) {
+      assert.match(result.fix, /fgctl init/);
+      assert.match(result.fix, /fgctl upgrade/);
+    }
     assert.deepEqual(doctor.next, [], 'a warning is not a next step');
   });
 }
 
-test('activation-matches-pin skips when there is no pin or no activation, and never fails on a pin it cannot read', async (t) => {
+test('activation-matches-pin skips when there is no pin or no activation, and never fails', async (t) => {
   const noPin = workspace(t, { activation: cases[0].activation });
   assert.equal((await runDoctor(noPin, { checks: [row()], fixes: [] })).checks[0].status, 'skip');
   const noActivation = workspace(t, { pin: cases[0].pin });
   assert.equal((await runDoctor(noActivation, { checks: [row()], fixes: [] })).checks[0].status, 'skip');
-  const garbage = workspace(t, { activation: cases[0].activation, rawPin: '{ not json' });
-  const result = (await runDoctor(garbage, { checks: [row()], fixes: [] })).checks[0];
-  assert.equal(result.status, 'skip');
+});
+
+test('activation-matches-pin warns that the committed pin is unreadable when the file is not valid JSON, even with no activation', async (t) => {
+  const garbage = workspace(t, { rawPin: '{ not json' });
+  const doctor = await runDoctor(garbage, { checks: [row()], fixes: [] });
+  assert.equal(doctor.ok, true);
+  assert.equal(doctor.checks[0].status, 'warn');
+  assert.match(doctor.checks[0].message, /^warning: the committed pin is unreadable: \.fgos\/distribution\.json/);
 });

@@ -1,7 +1,9 @@
 //! `pin_drift` against the shared golden the doctor row's test also reads: one
 //! comparison rule, two readers.
 
-use fgos_distribution::{pin_drift, TrackedDistributionPin, WorkspaceActivationBinding};
+use fgos_distribution::{
+    pin_drift, pin_note, PinFile, TrackedDistributionPin, WorkspaceActivationBinding,
+};
 use serde_json::{json, Value};
 
 const CASES: &str = include_str!("goldens/pin-drift-cases.json");
@@ -25,12 +27,18 @@ fn pin_of(case: &Value) -> Option<TrackedDistributionPin> {
     Some(serde_json::from_value(json!({ "schemaVersion": 1, "projectRuntime": runtime })).unwrap())
 }
 
+fn pin_file_of(case: &Value) -> PinFile {
+    if case["pin"] == "unreadable" {
+        return PinFile::Unreadable;
+    }
+    pin_of(case).map_or(PinFile::Absent, PinFile::Present)
+}
+
 #[test]
 fn pin_drift_says_exactly_what_the_shared_cases_say() {
     let cases: Value = serde_json::from_str(CASES).unwrap();
     for case in cases["cases"].as_array().unwrap() {
-        let drift = pin_drift(&activation_of(case), pin_of(case).as_ref());
-        let line = drift.as_ref().map(|d| d.to_string());
+        let line = pin_note(&activation_of(case), &pin_file_of(case));
         assert_eq!(line.as_deref(), case["line"].as_str(), "{}", case["name"]);
     }
 }

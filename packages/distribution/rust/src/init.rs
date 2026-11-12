@@ -2053,8 +2053,8 @@ pub fn verify_workspace(start_dir: &Path) -> Result<(), InitError> {
             check_workspace_shims(&installation_dir.join("bin"), cfg!(windows))
                 .map_err(InitError::Custom)?;
             println!("verified {}", short_digest(&active_digest));
-            if let Some(drift) = workspace_pin_drift(&workspace_root, &current_activation) {
-                println!("{drift}");
+            if let Some(note) = workspace_pin_note(&workspace_root, &current_activation) {
+                println!("{note}");
             }
             Ok(())
         }
@@ -2114,9 +2114,10 @@ pub struct FgctlWorkspaceStatus {
     pub previous_artifact_digest: Option<String>,
     #[serde(default, skip_serializing_if = "std::ops::Not::not")]
     pub quarantined: bool,
-    /// Set only when the committed pin names a different release than the active one.
+    /// The one line about the committed pin, set only when it is unreadable or
+    /// names a different release than the active one.
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub pin_drift: Option<PinDrift>,
+    pub pin_note: Option<String>,
     pub releases: Vec<ReleaseStatusEntry>,
 }
 
@@ -2161,15 +2162,47 @@ pub fn pin_drift(
     })
 }
 
-/// [`pin_drift`] of the workspace's own pin file; an unreadable pin is no pin.
-fn workspace_pin_drift(
+/// What `.fgos/distribution.json` holds: no file, a file that is not a pin, or a pin.
+pub enum PinFile {
+    Absent,
+    Unreadable,
+    Present(TrackedDistributionPin),
+}
+
+const PIN_FILE_RELATIVE: &str = ".fgos/distribution.json";
+
+fn read_pin_file(workspace_root: &Path) -> PinFile {
+    let path = workspace_root.join(".fgos").join("distribution.json");
+    if !path.exists() {
+        return PinFile::Absent;
+    }
+    match std::fs::read_to_string(&path)
+        .ok()
+        .and_then(|content| serde_json::from_str(&content).ok())
+    {
+        Some(pin) => PinFile::Present(pin),
+        None => PinFile::Unreadable,
+    }
+}
+
+/// The line `fgctl status`, `fgctl verify` and `fgos doctor` print about the
+/// pin: the drift, or that the pin file cannot be read. `None` when there is
+/// nothing to say.
+pub fn pin_note(activation: &WorkspaceActivationBinding, pin: &PinFile) -> Option<String> {
+    match pin {
+        PinFile::Absent => None,
+        PinFile::Unreadable => Some(format!(
+            "the committed pin is unreadable: {PIN_FILE_RELATIVE}"
+        )),
+        PinFile::Present(pin) => pin_drift(activation, Some(pin)).map(|d| d.to_string()),
+    }
+}
+
+fn workspace_pin_note(
     workspace_root: &Path,
     activation: &WorkspaceActivationBinding,
-) -> Option<PinDrift> {
-    let pin = read_tracked_pin(&workspace_root.join(".fgos").join("distribution.json"))
-        .ok()
-        .flatten();
-    pin_drift(activation, pin.as_ref())
+) -> Option<String> {
+    pin_note(activation, &read_pin_file(workspace_root))
 }
 
 /// The one line `fgctl status` ends with: the active release, or what to run.
@@ -2196,13 +2229,13 @@ pub fn get_workspace_status(start_dir: &Path, store_root: &Path) -> Option<Fgctl
     let activation: WorkspaceActivationBinding = serde_json::from_str(&content).ok()?;
     let releases = list_releases(store_root).unwrap_or_default();
 
-    let pin_drift = workspace_pin_drift(&workspace_root, &activation);
+    let pin_note = workspace_pin_note(&workspace_root, &activation);
 
     Some(FgctlWorkspaceStatus {
         active_artifact_digest: activation.artifact_digest,
         previous_artifact_digest: activation.previous_artifact_digest,
         quarantined: activation.status == "quarantined",
-        pin_drift,
+        pin_note,
         releases,
     })
 }
@@ -2795,7 +2828,7 @@ mod tests {
             active_artifact_digest: "sha256:0123456789abcdef".to_string(),
             previous_artifact_digest: None,
             quarantined,
-            pin_drift: None,
+            pin_note: None,
             releases: vec![],
         };
         assert_eq!(status_result_line(Some(&ws(false))), "active 0123456789ab");

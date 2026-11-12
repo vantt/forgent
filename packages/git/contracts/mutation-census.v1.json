@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "43ea7a07dd82a13f35fa0fc3ccc54055fc8374848ef7c565a1ce0dc2baa67145",
+  "payloadDigest": "b6087759ed90789c289b3da0407df0902f1f6975ef39b3a326cc9aa687583277",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -69,7 +69,7 @@
     ".githooks/pre-commit": "476f66f95261ff4c18cbd1f797bc492e638f2fafbbfb32286bf8c1ebcd2fe46b",
     "apps/fgctl/build.rs": "316b3d73c7472689532b7ffc164b15fe73f097e1c3e5f53545bc6283ac1c8183",
     "apps/fgctl/src/help.rs": "49c627d9313aea384129802e0eba50157ba7623b192d3e6226cfb71cc521afec",
-    "apps/fgctl/src/main.rs": "29acd933ca5d3c62db6d23d9b6253c21cf14092bd6741b238f034bcf0c10a321",
+    "apps/fgctl/src/main.rs": "f17f944dc2d98b233b388cbe21767c2a47764f4c57c534f09024be30874032aa",
     "apps/fgctl/tests/cli_surface.rs": "4fac02613fb636563d681db56dda353727856e4b9d3d19b641b04fc264bfb3c3",
     "apps/fgctl/tests/git_wal_activation_gate.rs": "29773e1594549ab92f94fd9bea9f5023663385d9bd9128128756225540780907",
     "apps/fgctl/tests/uninstall_surface.rs": "fed18f64c6c6181f2b3f942c9e55b5e76786ba26ea391f671564c93820b9e1e7",
@@ -274,7 +274,7 @@
     "packages/distribution/rust/src/fetch.rs": "371a4026f3fc9341bc939a0a738375ffad7d63fac6c0895047e866e5a45c7355",
     "packages/distribution/rust/src/fgctl_refresh.rs": "2248118bf1b3896cf9d87d49f944b2dea03572e900d963ada096ca1e4a8bf8cd",
     "packages/distribution/rust/src/git_gate.rs": "7d50addca54b78ca0b5d6b61c9d857b2de82016a1cc53faefc7c1038da163cba",
-    "packages/distribution/rust/src/init.rs": "527e05ff755c346b790e22e47d9b0e68e7b184b32838ed7e5f1196957aee5dda",
+    "packages/distribution/rust/src/init.rs": "8211481b5b7389a232c27a23fed34ff21b2d89caada85f260701e221e3b1c58f",
     "packages/distribution/rust/src/lib.rs": "2606ca37fcc561c271012139c4f7921129a141a6163f440ae7858a3d5edbb3dd",
     "packages/distribution/rust/src/lock.rs": "ee39bccc87c5b34a7799ee886fe3c4b9f59346f22c550c67123efa49f9681f8e",
     "packages/distribution/rust/src/manifest.rs": "7aa7f3d42c3ac708e44cb0bbf4be36c414eaf0b29f0bdafc5bb768901fb46bda",
@@ -288,8 +288,8 @@
     "packages/distribution/rust/tests/fetch_download.rs": "99609f9dbc19fc3636146b5602324db13f3eb4250aadf9b7c3cc7364c54d2af9",
     "packages/distribution/rust/tests/install_lock_multiprocess.rs": "790f1617f49d0a1efea555767705dba32c036e30bd897e0b01b09206342088cb",
     "packages/distribution/rust/tests/native_addon.rs": "b97d4d1fcc0d72c265cd8683d19134416f3506a54c212d5cf57e59fa27e1bb3f",
-    "packages/distribution/rust/tests/pin_drift.rs": "f6bf8e89354c13ff64286091a64e6b705c485a1004dea3f193074c176eb8cc7c",
-    "packages/distribution/rust/tests/schema_golden.rs": "7fe9a8c7a1f317860b7715b548122d32b57e0eeb6e52122516e53a6defbda2a0",
+    "packages/distribution/rust/tests/pin_drift.rs": "16fde0d240a0c482bd3cce19602b1d9d009b5fa806bcff997949f324ba02dca2",
+    "packages/distribution/rust/tests/schema_golden.rs": "5a819124370a21a3dea2590dddd03b7bc8285fc3031f4920025688378d77c2cf",
     "packages/durable-file/rust/src/beneath.rs": "000b825fddb954f1813e5801d4b91973c2e8c361b9e6dc158fde2f4aff08f413",
     "packages/durable-file/rust/src/lib.rs": "c9984d4a32aca5bc830bcf18d3d0e37a56ed8fee80cee441fa5085b6b19d1c47",
     "packages/durable-file/rust/tests/beneath.rs": "640a72d38f8b5360f3ba8ebf825877742b7f28c64d9c5fde4dcfd6f3bfcc4f59",
@@ -1150,7 +1150,7 @@
     "src/setup/model-pool-checks.mjs": "f686f00122bc1f43c5d0fe182f7879739f112ef4a361ccccf4a7d6a7ddf5bbd5",
     "src/setup/omp-natives-checks.mjs": "6f6faadb66ac09828741445c599dcbaee9462486157ab7074433e2dbcf4d9aad",
     "src/setup/project-launcher.mjs": "3153fdb9caad59eaeace759de1cd126c22f41585fcd1e15f00c1577ab0f9806b",
-    "src/setup/registrations.mjs": "9168aa3a274cadde47beb5f7382cdef0fa953262bfe8a61d4c9bf3a59b0ebe66",
+    "src/setup/registrations.mjs": "5b544e24d5c310a57d2911bb56cf429dee896b453db71a2b31b960edc50950ff",
     "src/setup/run-supervisor-checks.mjs": "dc0bb137dc4683b9f832437ed16f4d3a69c0b1b44bb2442f099a805361457bd9",
     "src/setup/runner-config-conversion.mjs": "6e2711a0a909265b82241901e7f9642889bdc3e9d1ab5a69fafd81b477a64ac6",
     "src/setup/seat-binding-checks.mjs": "8d8d9646baf6f0b234b66de782f099de9b89f49595b42eafec75041629ccb9e9",
@@ -2225,7 +2225,7 @@
     },
     {
       "path": "packages/distribution/rust/src/init.rs",
-      "line": 2560,
+      "line": 2593,
       "spawn": "Command::new",
       "binary": "sh",
       "class": "rust-test"
@@ -3595,42 +3595,42 @@
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 3454,
+      "line": 3462,
       "spawn": "checkBwrapAvailable -> src/setup/registrations.mjs:1286",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 3502,
+      "line": 3510,
       "spawn": "runAllConfinementProbes -> src/runner/dispatch/confinement/probes/harness.mjs:834",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 3543,
+      "line": 3551,
       "spawn": "checkBwrapAvailable -> src/setup/registrations.mjs:1286",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 3550,
+      "line": 3558,
       "spawn": "probePeerRunHidden -> src/runner/dispatch/confinement/probes/harness.mjs:525",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 3785,
+      "line": 3793,
       "spawn": "probeIdentity -> src/util/session-identity.mjs:56",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 3849,
+      "line": 3857,
       "spawn": "createSeatBindingClient -> src/seat-binding/client.mjs:142",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"

@@ -2926,7 +2926,7 @@ const shortDigest = (digest) => String(digest).replace(/^sha256:/, '').slice(0, 
 /**
  * The activation differs from the committed exact-digest pin: a warning, never a failure or a repair, because a
  * machine may run ahead of the pin on purpose. Reads the two files the way `pin_drift` in the distribution crate
- * does (an unusable pin is no pin) and prints the same line; both are tested against one golden.
+ * does (a pin file that is not a pin is reported unreadable, an absent one skips) and prints the same lines; both are tested against one golden.
  */
 export function checkActivationMatchesPin(cwd) {
   const root = resolveMainCheckoutRoot(cwd) ?? path.resolve(cwd);
@@ -2935,12 +2935,20 @@ export function checkActivationMatchesPin(cwd) {
       const file = doctorDriftPath(root, relative, true);
       return file ? JSON.parse(fs.readFileSync(file, 'utf8')) : null;
     };
-    let pin = null;
-    try { pin = readJson('.fgos/distribution.json'); } catch (error) {
-      if (error instanceof SyntaxError) pin = null; else throw error;
+    const pinFile = doctorDriftPath(root, '.fgos/distribution.json', true);
+    if (!pinFile) return { passed: true, status: 'skip', message: 'activation-matches-pin skipped: no committed pin' };
+    let pinned;
+    try { pinned = JSON.parse(fs.readFileSync(pinFile, 'utf8'))?.projectRuntime?.artifactDigest; } catch (error) {
+      if (!(error instanceof SyntaxError)) throw error;
     }
-    const pinned = pin?.projectRuntime?.artifactDigest;
-    if (typeof pinned !== 'string') return { passed: true, status: 'skip', message: 'activation-matches-pin skipped: no committed pin' };
+    // A pin file that exists but is not a pin is not the same as no pin: say so.
+    if (typeof pinned !== 'string') {
+      return {
+        passed: true,
+        message: 'warning: the committed pin is unreadable: .fgos/distribution.json',
+        fixCommand: 'restore .fgos/distribution.json from version control, or fgctl upgrade to write a new pin',
+      };
+    }
     const activation = readJson('.fgos/installation/activation.json');
     if (typeof activation?.artifactDigest !== 'string') return { passed: true, status: 'skip', message: 'activation-matches-pin skipped: no activation in this workspace' };
     if (activation.artifactDigest === pinned) return { passed: true, message: `active release matches the pin (${shortDigest(pinned)})` };
@@ -2961,7 +2969,7 @@ registerCheck({
   check: (cwd) => checkActivationMatchesPin(cwd),
 });
 
-// ─── Confinement Authority (Phase 01 R7,docs/platform/agent-confinement/README.md) ─
+// ─── Confinement Authority (Phase 01 R7, docs/platform/agent-confinement/README.md) ─
 
 export function checkConfinementPoliciesDeclared(cwd) {
   let runner;
