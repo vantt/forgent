@@ -29,12 +29,17 @@ test('the call is built per credential layout, pointing the CLI at the account h
   assert.equal(pi.command, 'pi');
   assert.equal(pi.env.PI_CODING_AGENT_DIR, '/home/someone/.pi/accounts/x');
 
-  // Claude Code reads its login under HOME, which the call is given as the account home.
-  const claude = credentialProbeCommand({ kind: 'home-files', home: '/home/someone/.claude-homes/x', files: ['.claude/.credentials.json'] }, { noTools: true });
+  // Claude Code reads its login from its config directory, which the call is pointed at.
+  const claude = credentialProbeCommand({ kind: 'home-files', home: '/home/someone/.claude-homes/x', files: ['.credentials.json'] }, { noTools: true });
   assert.equal(claude.command, 'claude');
   assert.equal(claude.home, '/home/someone/.claude-homes/x');
-  assert.deepEqual(claude.env, {});
+  assert.deepEqual(claude.env, { CLAUDE_CONFIG_DIR: '/home/someone/.claude-homes/x' });
   assert.deepEqual(claude.args, ['-p', 'Reply with the single word OK.', '--no-session-persistence', '--tools', ''], 'a renewal call gets no tools');
+
+  // A login kept under HOME is read through HOME, which the call is given as the account home.
+  const underHome = credentialProbeCommand({ kind: 'home-files', home: '/home/someone/.claude-homes/x', files: ['.claude/.credentials.json'] }, { noTools: true });
+  assert.equal(underHome.command, 'claude');
+  assert.deepEqual(underHome.env, {});
 });
 
 test('an omp profile (a store that carries agent.db) is probed with omp, and that wins over pi when both are listed', () => {

@@ -111,13 +111,13 @@ function readOmpRows(dir) {
 }
 const ompSource = (home) => ({ kind: 'home-files', home, files: ['agent.db'] });
 
-// claude: .claude/.credentials.json under the home, claudeAiOauth with expiresAt in ms
-const CLAUDE_LOGIN = path.join('.claude', '.credentials.json');
+// claude: `.credentials.json` in the config directory (CLAUDE_CONFIG_DIR is the login home), claudeAiOauth with expiresAt in ms
+const CLAUDE_LOGIN = '.credentials.json';
 const claudeDoc = (expiresMs, { access = FAKE.oldAccess, refresh = FAKE.oldRefresh } = {}) => ({
   claudeAiOauth: { accessToken: access, refreshToken: refresh, expiresAt: expiresMs, scopes: ['user:inference'], subscriptionType: 'max' },
   mcpOAuth: { kept: true },
 });
-const writeClaude = (dir, doc) => { fs.mkdirSync(path.join(dir, '.claude'), { recursive: true }); fs.writeFileSync(path.join(dir, CLAUDE_LOGIN), JSON.stringify(doc)); };
+const writeClaude = (dir, doc) => { fs.mkdirSync(dir, { recursive: true }); fs.writeFileSync(path.join(dir, CLAUDE_LOGIN), JSON.stringify(doc)); };
 const readClaude = (dir) => JSON.parse(fs.readFileSync(path.join(dir, CLAUDE_LOGIN), 'utf8'));
 const claudeSource = (home) => ({ kind: 'home-files', home, files: [CLAUDE_LOGIN] });
 
@@ -146,7 +146,7 @@ function renewHome(layoutName, dir, { expiresMs = Date.now() + 6 * HOUR } = {}) 
 function fakeSpawn({ layoutName, behaviour, output = 'OK', exitCode = 0, delayMs = 0, onStart } = {}) {
   const starts = [];
   const spawnFn = (command, args, options) => {
-    const homeDir = options.env.PI_CODING_AGENT_DIR ?? options.env.CODEX_HOME ?? options.env.HOME;
+    const homeDir = options.env.PI_CODING_AGENT_DIR ?? options.env.CODEX_HOME ?? options.env.CLAUDE_CONFIG_DIR ?? options.env.HOME;
     starts.push({ command, args, homeDir, pid: 424242 + starts.length });
     onStart?.(homeDir);
     const child = new EventEmitter();
@@ -241,16 +241,27 @@ test('claude expiry is read from the login file, never quoted, and the layout is
   const w = workspace();
   try {
     const now = Date.now();
-    const file = path.join(w.home, '.claude', '.credentials.json');
-    fs.mkdirSync(path.dirname(file), { recursive: true });
+    const file = path.join(w.home, '.credentials.json');
     fs.writeFileSync(file, JSON.stringify({ claudeAiOauth: { accessToken: FAKE.oldAccess, refreshToken: FAKE.other, expiresAt: now + HOUR } }));
-    const read = readCredentialExpiry('claude-credentials-json', w.home);
+    const read = readCredentialExpiry('claude-config-credentials-json', w.home);
     assert.deepEqual(read, { ok: true, entries: [{ key: 'claudeAiOauth', expiresMs: now + HOUR, dueMs: now + HOUR }] });
     assert.equal(JSON.stringify(read).includes('FAKE'), false);
 
     fs.writeFileSync(file, JSON.stringify({ claudeAiOauth: { accessToken: FAKE.oldAccess } }));
-    assert.deepEqual(readCredentialExpiry('claude-credentials-json', w.home), { ok: false, code: 'unexpected-shape' });
+    assert.deepEqual(readCredentialExpiry('claude-config-credentials-json', w.home), { ok: false, code: 'unexpected-shape' });
+    assert.equal(credentialLayout({ kind: 'home-files', home: w.home, files: ['.credentials.json'] }), 'claude-config-credentials-json');
+  } finally { w.cleanup(); }
+});
+
+test('a claude login kept under HOME (.claude/.credentials.json) is the same layout read at its own path', () => {
+  const w = workspace();
+  try {
+    const now = Date.now();
+    fs.mkdirSync(path.join(w.home, '.claude'));
+    fs.writeFileSync(path.join(w.home, '.claude', '.credentials.json'), JSON.stringify({ claudeAiOauth: { accessToken: FAKE.oldAccess, refreshToken: FAKE.other, expiresAt: now + HOUR } }));
     assert.equal(credentialLayout({ kind: 'home-files', home: w.home, files: ['.claude/.credentials.json'] }), 'claude-credentials-json');
+    assert.deepEqual(readCredentialExpiry('claude-credentials-json', w.home), { ok: true, entries: [{ key: 'claudeAiOauth', expiresMs: now + HOUR, dueMs: now + HOUR }] });
+    assert.deepEqual(readCredentialExpiry('claude-config-credentials-json', w.home), { ok: false, code: 'missing-file' });
   } finally { w.cleanup(); }
 });
 
@@ -860,7 +871,7 @@ test('a renewed login is never applied while its tokens name no account the prov
     copyCredentialFiles(dir, c.home, [CLAUDE_LOGIN]);
     renewHome('claude', dir);
     const target = credentialWriteBackTarget({ provider: 'xai', accountId: 'acct', credentialSource: claudeSource(c.home), runtimeDir: c.runtimeDir });
-    assert.equal(target.layout, 'claude-credentials-json');
+    assert.equal(target.layout, 'claude-config-credentials-json');
     assert.deepEqual(writeBackRenewedCredential(dir, target), { status: 'staged' });
     const { spawnFn, starts } = fakeSpawn({ layoutName: 'claude', behaviour: () => {} });
     await refreshAhead({ provider: 'xai', accountId: 'acct', credentialSource: claudeSource(c.home), runtimeDir: c.runtimeDir, spawnFn });
