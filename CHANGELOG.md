@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 - On Windows, `fgctl uninstall --purge` now refuses a state root that is your home directory, or an ancestor of it or of the project, whatever the letter case or `\\?\` spelling of the path; before, only an exact-case match was refused.
+- `fgos` now mints machine, work, backlog and project ids on macOS and Windows; before, every random id failed there with "native random identity driver unavailable" because only Linux had a random source. Ids now come from the kernel generator on every platform (`/dev/urandom` on unix, `BCryptGenRandom` on Windows), and a failing generator is an error, never an id made from time or pid.
 
 ## [v0.2.0-rc.6] - 2026-11-12
 
