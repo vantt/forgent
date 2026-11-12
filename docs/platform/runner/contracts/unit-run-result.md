@@ -108,7 +108,7 @@ No new input. The ceiling reaches Execution only through the case admission port
 
 One scenario, in two shapes. (a) Three separate `fgos run --json` calls started in parallel on three different executor families. (b) One `fgos run --pattern panel --params <three seats> --json` call, where the seats are `results[]` items. In both, one seat is forced into an infrastructure failure by a fixture executor registered in the conformance test's own config, never by a product flag or an environment switch. A script reads only fields named in this contract and must (1) report which executor and account ran each seat, (2) mark the failed seat as infrastructure and not as a vote, (3) find all answers by `output.report.path`, and (4) report duration and usage, or that they are `null`. If the script needs anything else, the contract is incomplete.
 
-Fixtures: one golden file per outcome under `packages/run-result/contracts/fixtures/`, read by both the Node and the Rust tests, as `packages/yaml-doc/contracts/fixtures/parse.v1.json` already is. Workflow tests take their results from these fixtures instead of building results by hand.
+Fixtures: one golden file per outcome in a new `contracts/fixtures` folder of the run-result package (not created yet), read by both the Node and the Rust tests, as `packages/yaml-doc/contracts/fixtures/parse.v1.json` already is. Workflow tests take their results from these fixtures instead of building results by hand.
 
 ## 9. Order of work (proposed; the code split awaits the owner)
 
