@@ -1643,6 +1643,7 @@ test('loops and patterns architecture manifest paths exist and all files on disk
 // is loaded with `await import()` inside its use, so the hook and the help paths do not pay for it.
 const ENTRY_LEAF_IMPORTS = [
   '../src/cli/command-registry.mjs',
+  '../src/cli/exit-codes.mjs',
   '../src/cli/parse-args.mjs',
   '../src/cli/verb-exit.mjs',
   '../src/state/envelope.mjs',
@@ -1651,7 +1652,6 @@ const ENTRY_LEAF_IMPORTS = [
 const ARM_STATIC_IMPORTS = [
   '../src/cli/deprecation.mjs',
   '../src/cli/flag-check.mjs',
-  '../src/cli/version.mjs',
   '../src/config/facade.mjs',
   '../src/event-store/maintenance.mjs',
   '../src/git/inspect.mjs',

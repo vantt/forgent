@@ -8,7 +8,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { EXIT_CODES, categoryOf } from '../../src/cli/exit-codes.mjs';
+import { EXIT_CODES } from '../../src/cli/exit-codes.mjs';
+import { categoryOf } from '../../src/state/store-error.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const table = JSON.parse(fs.readFileSync(path.join(ROOT, 'src', 'cli', 'exit-codes.v1.json'), 'utf8'));

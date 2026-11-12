@@ -27,8 +27,8 @@ import {
   assertAcceptanceEvidence,
   assertPlanEvidence,
   StoreError,
+  categoryOf,
 } from '../../state/store.mjs';
-import { categoryOf } from '../../cli/exit-codes.mjs';
 import { resolveRoot, isResolvedStatus } from '../../state/frontier.mjs';
 import { driftStatus } from '../../state/drift-status.mjs';
 import {

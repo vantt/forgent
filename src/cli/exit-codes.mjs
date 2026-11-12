@@ -10,11 +10,3 @@ import fs from 'node:fs';
 const table = JSON.parse(fs.readFileSync(new URL('./exit-codes.v1.json', import.meta.url), 'utf8'));
 
 export const EXIT_CODES = Object.freeze({ ...table.categories });
-
-/**
- * Classify an error by its own `.category` string rather than an instanceof chain, so a new error class only has to
- * set `.category` to take part. Anything without one is 'unexpected' (callers map that to exit 1).
- */
-export function categoryOf(err) {
-  return err && typeof err.category === 'string' ? err.category : 'unexpected';
-}

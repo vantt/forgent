@@ -7,8 +7,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { transitionStep } from '../../src/state/step-fsm.mjs';
 import { FsmError } from '../../src/state/status-fsm.mjs';
-import { addWork, moveStep, addDiscovery, listWork, readRawEvents } from '../../src/state/store.mjs';
-import { categoryOf } from '../../src/cli/exit-codes.mjs';
+import { addWork, moveStep, addDiscovery, listWork, categoryOf, readRawEvents } from '../../src/state/store.mjs';
 
 function work(workflowStep, overrides = {}) {
   return { id: 'w1', ...(workflowStep !== undefined ? { workflowStep } : {}), ...overrides };
