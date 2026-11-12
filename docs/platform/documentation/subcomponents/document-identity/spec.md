@@ -49,7 +49,7 @@ The model of the space is a **faceted classification with controlled vocabularie
 - **locating axes** (*trục định vị*): closed value sets, opened only through a reviewed door: the area the content is about and the kind of question it answers. They narrow the search and organise the corpus;
 - **narrowing axes** (*trục thu hẹp*): many values per unit, drawn from identifiers that resolve against a register: decision ids, rule ids, defined terms, feature names, and per domain CLI verbs, code symbols, campaigns or price plans. They add to the ranking and tell apart units that look alike; full text and meaning carry the ranking itself, because identifiers alone found the right unit in only 32% of cases.
 
-The model has three tiers, so it serves any project fgOS runs, not only fgOS itself (D-ADR0035):
+The model has three tiers, so it serves any project fgOS runs, not only fgOS itself (D-ADR0035 (the fgOS mission boundary)):
 
 1. a **core** shared by every project (section 5);
 2. a **domain profile** per kind of work: coding, marketing, sales, customer support (section 6);
@@ -203,8 +203,8 @@ Common kinds:
 
 | Kind | Example | Register | Register kept by fgOS today? |
 |---|---|---|---|
-| `decision` | `D-ADR0055`; the decision to drop the Basic plan | decision index, `state.decisions`; ids minted by `fgos identity mint d-adr` | yes |
-| `rule` | `RUL84`, `L3`, refund policy rule 3 | the holder document, through the governance holder table; laws fold in here | yes |
+| `decision` | D-ADR0055 (event log as sealed changesets on per-machine refs); the decision to drop the Basic plan | decision index, `state.decisions`; ids minted by `fgos identity mint d-adr` | yes |
+| `rule` | RUL84 (one write-scope matcher), `L3`, refund policy rule 3 | the holder document, through the governance holder table; laws fold in here | yes |
 | `term` | "churn", "seat", "claim" | the project glossary (Convention kind `vocabulary`) | the place exists, content does not |
 | `feature` | "automatic invoice export" | the feature list | no |
 | `metric` | MRR, locate hit rate | the metric catalog with definitions | no |
@@ -547,7 +547,7 @@ What it shows:
 
 - `area` and `question` alone name the right document, the workflow spec. Inside it, three sections tie on one shared verb. The tie is broken by full text, or by the writer reading three sections, not three hundred.
 - New symbols carry no weight because no document mentions them yet. That is the normal case for new behavior: the writer grows the best-ranked section and names the new symbols, which the indexer then picks up.
-- The "one glob engine" part of the change is owned elsewhere: the git spec's rule RUL84 says there is one write-scope matcher. The region the writer chose (`workflow`) would have hidden it, and so would `runner`, the other area the code lives in: RUL84 lives in `git`. Only the `outside-region` rule (8.1, step 3) catches it. This is also why this version needs no code-path-to-area table: even a correct table would have pointed at `workflow` and `runner`.
+- The "one glob engine" part of the change is owned elsewhere: the git spec's rule RUL84 (one write-scope matcher) says every "is this path in scope" question goes through it. The region the writer chose (`workflow`) would have hidden it, and so would `runner`, the other area the code lives in: RUL84 (one write-scope matcher) lives in `git`. Only the `outside-region` rule (8.1, step 3) catches it. This is also why this version needs no code-path-to-area table: even a correct table would have pointed at `workflow` and `runner`.
 
 ### 8.7. The retrospective writer adds evidence
 
