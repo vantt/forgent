@@ -27,7 +27,7 @@ A reader of the contract takes its results from these files instead of building 
 
 `data` holds every field of section 3 that Execution writes (`outcome`, `infrastructure`, `outOfScope`,
 `outOfScopeOnBranch`, `evaluations`, `started`, `launches`, `settled`, `warnings`) and, per attempt, `infrastructure`
-`runResult.activity` and `output` (`report`, `claim`, `complete`, `incompleteReason`; a verify round has none). Ids and paths are fixed values, so a reader compares facts, never bytes of a real run.
+`runResult.activity`, `runResult.durationMs` (whole milliseconds, `null` for a seat that never ran), `binding.family` and `output` (`report`, `claim`, `complete`, `incompleteReason`; a verify round has none). Ids and paths are fixed values, so a reader compares facts, never bytes of a real run.
 
 ## Owners
 

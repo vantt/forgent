@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "6d1693aa295473ad3d655bc459a78ecb6977d755a65bda6c7b4d68309d256bd3",
+  "payloadDigest": "64c95c168e0563f30e0f5f000528b0f899d176384a15a0abb4f441db2344107c",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -1065,7 +1065,7 @@
     "src/runner/execution/dry-bind.mjs": "94acf7f1b659f663e4d8727f4984d6a8fb577e984a79b69f158892eca6cbd07a",
     "src/runner/execution/explain.mjs": "9cdb1dca7c667feac6c3ae9989470b37f76046220816b0d3bea3fd13a127bf12",
     "src/runner/execution/handoff-refs.mjs": "ee8cc943132a9b25b6f2ea45efb9c462b5d591c8a93d6feabcf6dce107e3b318",
-    "src/runner/execution/legacy-seat-read.mjs": "556f47c7d86f1be3a7c67784e98b0144ab578f60a8d9fc1cc07a599d00aba63e",
+    "src/runner/execution/legacy-seat-read.mjs": "0199b8f8c48357c60180a58693f85d8da9cb4d0490648f29730e7fb715ce67e6",
     "src/runner/execution/loops/debate.mjs": "952e40f982ec2e0eae4888cd46b85b2a462a93b459b42830c39311500ab87720",
     "src/runner/execution/loops/history-outcome.mjs": "f6eb9a25db6fa1164010588537bf92988687b4189c66c82a018a209a07916901",
     "src/runner/execution/loops/index.mjs": "49254b0102d6c32aec04ff9feaa82b60985da7177ebca7d17d228922b10bb002",
@@ -1080,7 +1080,7 @@
     "src/runner/execution/patterns/catalog.mjs": "d95d8fc276930093c14d2a757b8cc5217cf20a21bd06b891f7c191ab905addce",
     "src/runner/execution/patterns/retired-keys.mjs": "c07f8407d169c7db410aba99db2b7bb1119f5a20ec7a7b63f8cb81d1324e0f40",
     "src/runner/execution/run-request.mjs": "e704b5658f03fae0ce279e31aaee560af3f9648e7f41d39863ce406a0bb03494",
-    "src/runner/execution/run.mjs": "cbd201f68c71b3070ff1618ddc148552eef9b4674d16d2a6701f7cf6ead797c3",
+    "src/runner/execution/run.mjs": "8ee299684b9a6a1f6166780114448e6daf267cd8ee3145eaf5745cc8167fdb3e",
     "src/runner/execution/seat-ledger.mjs": "e033ac97585dc96b22b35d69d361d96d04b2e2b84703bcde241442ec84e74680",
     "src/runner/execution/seat-policy.mjs": "6a0b9671a9ceb020be1e74d306ea2e277cb324244faf391e85feff10ee7d2eaf",
     "src/runner/execution/seat-resolver.mjs": "c8e35d90ea26588f0114f47876ac9798b68b6ea2b950f5bcf743828e86acfbe3",
@@ -1270,7 +1270,7 @@
     "src/workflow/propose.mjs": "1075dbe1c760cbf702bbe8fedb560d89ea0d232799b3e5c47d4cf7c3d2fca0cb",
     "src/workflow/ref-digests.mjs": "7379462ef6521267e12cb028c030a9292d6b6bb176419df9663ecf6547f5a09e",
     "src/workflow/runner.mjs": "f00ca2b91417d1c5fc9b8e0d42dcbfdbf5fa9414808665278ad3541a8685787a",
-    "src/workflow/seat-providers.mjs": "6562fb1390c44aa90735ee9bc08f6c1c8074498b51d7ecf51a18d75c7423f702",
+    "src/workflow/seat-providers.mjs": "57c40b761e3beacafbbc2cffc04d080360f5feff3b61f4fb9ce759b932d5ce29",
     "src/workflow/seats.mjs": "6dcc59baef66d7078de9273f1119e0dd8799a17749f9612738c529eab39c1870",
     "src/workflow/steps.mjs": "bc8a112e26d87bed526b7ca47ea991f77ca3a789b559a23f2afed7577786f4be",
     "src/workflow/store.mjs": "a22836f4560658fff5a76463157607e368201b01f6f6fff0c2554730aa40e908",
@@ -3464,14 +3464,14 @@
     },
     {
       "path": "src/runner/execution/run.mjs",
-      "line": 510,
+      "line": 516,
       "spawn": "runVerify -> src/runner/execution/custody-door.mjs:83",
       "binary": "(consumer verify command (cfg?.capabilities?.[unit?.capability]?.verify))",
       "class": "configured-binary"
     },
     {
       "path": "src/runner/execution/run.mjs",
-      "line": 510,
+      "line": 516,
       "spawn": "runVerify -> src/runner/execution/custody-door.mjs:83",
       "binary": "(consumer verify command (unit?.verify))",
       "class": "configured-binary"

@@ -67,10 +67,12 @@
             "turns": null,
             "toolUses": null,
             "transcriptPath": null
-          }
+          },
+          "durationMs": 3110
         },
         "binding": {
           "executor": "alpha",
+          "family": "openai",
           "model": "alpha-std",
           "tier": "standard",
           "invocation": "cli-default",

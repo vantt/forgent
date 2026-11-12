@@ -411,6 +411,12 @@ export function activityOf({ unitRecord, assignmentsDir }, result) {
   return { turns: null, toolUses: null, transcriptPath: kept ? path.join(dir, kept) : null };
 }
 
+/** The wall time of the seat's last attempt as Execution recorded it; null for an attempt that never ran and for a record written before it was kept. */
+function durationOf({ unitRecord }, result) {
+  const duration = unitRecord.bindings?.[`${result.seat}/${result.round ?? 1}`]?.at(-1)?.durationMs;
+  return Number.isInteger(duration) && duration >= 0 ? duration : null;
+}
+
 /**
  * What an attempt hands up of its work: the report it left (digest read by Execution), its claim, and whether the
  * report is complete, which only Dispatch settlement declares. An attempt settled before the declaration existed
@@ -440,7 +446,7 @@ function finishUnit(ctx, { outcome, rounds, results = [], findings = [], ...rest
     return {
       ...result,
       infrastructure: isInfrastructure(result?.outcome),
-      ...(result?.runResult ? { runResult: extendedRunResult(result.runResult, { activity: activityOf(ctx, result) }) } : {}),
+      ...(result?.runResult ? { runResult: extendedRunResult(result.runResult, { activity: activityOf(ctx, result), durationMs: durationOf(ctx, result) }) } : {}),
       ...(output ? { output } : {}),
     };
   });
@@ -804,7 +810,10 @@ async function runAttempt(ctx, role, { attempts, attemptNo, bound, preExistingIn
   delete attempt.outcome;
   ctx.persist();
   assertNotCancelled();
+  // The attempt's wall time: Execution's own span from handing the seat to Dispatch to getting its settled result back.
+  const dispatchedAt = performance.now();
   const result = await dispatchBound(ctx, role, { bound, assignmentId, assignmentDir, objective, admission });
+  attempt.durationMs = Math.max(0, Math.round(performance.now() - dispatchedAt));
 
   // The receipt lies where the worker can reach it: a pass stands only when the provider record agrees the
   // lease it names was granted, and a lease the record holds must show its receipt.
