@@ -236,7 +236,7 @@ Steps:
 
 1. **Propose locating values.** `area` from the touched paths (path-to-area table); `question` from the writer, checked against table 5.4.
 2. **Extract narrowing values** from the diff and the statement, with the same extractor the indexer uses.
-3. **Filter** sections by `area` and `question`. If nothing matches, widen once to the same `question` in all areas, then to the same `area` in all questions, and say which widening was used.
+3. **Filter** sections by `area` and `question`. If nothing matches, widen once to the same `question` in all areas, then to the same `area` in all questions, and say which widening was used. A change that touches several areas proposes each of them. A section outside the region whose identifier score is above threshold is still returned, marked `outside-region`, because the region can be guessed wrong (example 6.5.2).
 4. **Rank** the filtered sections by weighted identifier overlap, then by full-text score as a tiebreak and as the fallback when the change names no identifier.
 5. **Return** coordinates, the top candidates with their overlap and score, and a verdict: `owner-found` (one candidate above threshold), `ambiguous` (two or more above threshold), `none-above-threshold`.
 
@@ -267,6 +267,63 @@ The write door refuses to create a document, a registry topic or a slot when:
 The locate result is recorded on the creation, next to the admission record of documentation spec 6.8, so a later reviewer can see what was found and why creation still happened.
 
 Growing an existing section needs no admission and no refusal check beyond doc-health.
+
+### 6.5. Worked examples
+
+Both examples were run on 2026-11-12 with a throwaway prototype of section 6.1 over the 687 maintained documents, split into 5636 sections. The prototype extracts only `verb`, `path`, `symbol` and `rule` values from backticked text and weights each value by how rare it is: weight = ln(5636 / number of sections that carry it). User documents have no `area` or `question` today, so they count as matching any region (section 6.4). The numbers below are its real output.
+
+#### 6.5.1. A pitfall about reclaiming a worktree
+
+The situation: an agent fixed a bug where a worktree with live uncommitted work could be reclaimed. It wants to record the pitfall.
+
+| Step | Input or result |
+|---|---|
+| Touched code | `src/runner/worktree.mjs` |
+| Locating values | `area = runner` (from the path), `question = pitfall` (from the writer) |
+| Narrowing values | `path:src/runner/worktree.mjs` (in 29 sections, weight 5.27), `symbol:reclaimOrphanedCheckout` (6 sections, 6.85), `symbol:isCheckoutDirty` (7 sections, 6.69), `verb:fgos approve` (74 sections, 4.33) |
+| Region | 3057 of 5636 sections, because user documents are unset; 91 of them share at least one value |
+
+Top of the ranking:
+
+| Score | Section | Shared values |
+|---|---|---|
+| 16.45 | [`why-reclaimorphanedcheckout-refuses-a-live-session-worktree.md`](../../../../knowledge/why-reclaimorphanedcheckout-refuses-a-checkout-the-calling-s/why-reclaimorphanedcheckout-refuses-a-live-session-worktree.md), top | `reclaimOrphanedCheckout`, `fgos approve`, `src/runner/worktree.mjs` |
+| 13.54 | same document, "Root cause" | `reclaimOrphanedCheckout`, `isCheckoutDirty` |
+| 12.11 | [`orphaned-worktree-reclaim-must-check-for-live-uncommitted-work.md`](../../../../knowledge/why-reclaiming-an-orphaned-worktree-checkout-must-check-for/orphaned-worktree-reclaim-must-check-for-live-uncommitted-work.md), top | `reclaimOrphanedCheckout`, `src/runner/worktree.mjs` |
+| 11.96 | `docs/explanation/dispatch-execute-lost-uncommitted-paths-warning.md`, "What shipped" | `src/runner/worktree.mjs`, `isCheckoutDirty` |
+
+What it shows:
+
+- Two of the three 2026-08 worktree documents come first and third. Their prose and file names differ; the shared symbols find them. The writer grows one of them instead of writing a fourth.
+- The third 2026-08 document ([`why-session-claim-liveness-reuses-worktree-activity-not-pid-or-event-age.md`](../../../../knowledge/why-session-claim-liveness-measures-worktree-activity-not-pi/why-session-claim-liveness-reuses-worktree-activity-not-pid-or-event-age.md)) does not appear. It shares no identifier with this change: it is about claim liveness, a different subject. The ranking separates what the old file names had lumped together.
+- Without the `question` filter, `docs/platform/runner/subcomponents/h-6979005beaf7/spec.md`, "Business Rules", also scores 12.11. That spec section holds the rule itself (`current-truth`). The pitfall document owns the "what goes wrong" story and links to that rule; the filter keeps the two kinds apart without hiding the rule from a writer who asks for `current-truth`.
+- With `area` and `question` filled on user documents, the region would shrink from 3057 sections to the runner pitfalls only.
+
+#### 6.5.2. A change to `fgos workflow propose`
+
+The situation: commit `df7b73490` made `fgos workflow propose` read each closed case once and made propose and the write-scope check share one glob engine. The agent wants to record the new behavior.
+
+| Step | Input or result |
+|---|---|
+| Touched code | `src/workflow/case-inherit.mjs`, `src/workflow/propose-classify.mjs`, `src/runner/dispatch/write-scope.mjs` |
+| Locating values | `area = workflow` (most touched paths), `question = current-truth` |
+| Narrowing values | `verb:fgos workflow propose` (3 sections, weight 7.54), `path:src/runner/dispatch/write-scope.mjs` (6 sections, 6.85); `globsMeet`, `inheritableMilestones` and the two workflow paths appear in no section yet |
+| Region | 3105 sections; 3 share a value |
+
+Ranking:
+
+| Score | Section | Shared values |
+|---|---|---|
+| 7.54 | `docs/platform/workflow/spec.md`, 7.8 "Cửa vào của conductor" | `fgos workflow propose` |
+| 7.54 | same spec, 8 "Tác động lên `fgos run` và `fgos workflow start`" | `fgos workflow propose` |
+| 7.54 | same spec, 9 "Component, hợp đồng và ngân sách Node" | `fgos workflow propose` |
+| 6.85, outside the region | `docs/platform/git/spec.md`, 6 "N7 and RUL84 (one write-scope matcher)" | `src/runner/dispatch/write-scope.mjs` |
+
+What it shows:
+
+- `area` and `question` alone name the right document, the workflow spec. Inside it, three sections tie on one shared verb. The tie is broken by full text, or by the writer reading three sections, not three hundred.
+- New symbols carry no weight because no document mentions them yet. That is the normal case for new behavior: the writer grows the best-ranked section and names the new symbols, which the indexer then picks up.
+- The "one glob engine" part of the change is owned elsewhere: the git spec's rule RUL84 says there is one write-scope matcher. The region guessed from paths (`workflow`) would have hidden it. This is why locate proposes every touched area and returns strong matches marked `outside-region` (step 3 of 6.1).
 
 ### 6.4. Filling and checking the axes
 
