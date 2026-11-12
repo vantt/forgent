@@ -158,3 +158,32 @@ fn no_arguments_print_task_ordered_get_started_and_exit_zero() {
     assert!(init < run, "{stdout}");
     assert!(stdout.contains("fgos doctor --json"), "{stdout}");
 }
+
+#[test]
+fn a_digest_only_pin_with_nothing_staged_names_three_ways_out() {
+    let dir = Scratch::new("digest-only-pin");
+    // A bare repository skeleton is enough for the workspace root to resolve.
+    let git_dir = dir.path().join(".git");
+    for sub in ["objects", "refs"] {
+        std::fs::create_dir_all(git_dir.join(sub)).unwrap();
+    }
+    std::fs::write(git_dir.join("HEAD"), "ref: refs/heads/main\n").unwrap();
+    std::fs::create_dir_all(dir.path().join(".fgos")).unwrap();
+    std::fs::write(
+        dir.path().join(".fgos").join("distribution.json"),
+        r#"{"schemaVersion":1,"projectRuntime":{"policy":"exact-digest","artifactDigest":"sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"}}"#,
+    )
+    .unwrap();
+
+    let out = fgctl(dir.path(), &["init"]);
+    assert_eq!(out.status.code(), Some(1), "{}", text(&out.stderr));
+    let stderr = text(&out.stderr);
+    assert!(stderr.contains("0123456789ab"), "{stderr}");
+    for way in [
+        "fgctl init --from <release>",
+        "FGCTL_VERSION=<tag> fgctl init",
+        "fgctl init --override-pin <reason> --from <staged release>",
+    ] {
+        assert!(stderr.contains(way), "missing `{way}`:\n{stderr}");
+    }
+}
