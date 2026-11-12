@@ -16,30 +16,33 @@ import path from 'node:path';
 
 import { readCodexTrust, readAgyTrust, defaultAgySettingsPath } from '../run-supervisor/trust-store.mjs';
 import { findAgySubHomes, resolveSubHomePath } from './agy-permissions.mjs';
+import { isCommandAvailable } from '../runner/paths.mjs';
 
 /** The config.toml of every codex home a configured executor runs under, deduplicated, each with
  * the executors that use it. A home is declared either by an executor's `codex-toml` trust store
  * or by a `CODEX_HOME` in its env. */
-function codexConfigPaths(runnerConfig, homeDir) {
+function codexConfigPaths(runnerConfig, homeDir, notInstalled) {
   const found = new Map();
-  const note = (configPath, label) => {
+  // A CLI this machine does not have shows no trust prompt, so its home is nobody's to judge.
+  const note = (configPath, label, command) => {
+    if (typeof command === 'string' && !isCommandAvailable(command)) { notInstalled.add(path.basename(command)); return; }
     if (!found.has(configPath)) found.set(configPath, new Set());
     found.get(configPath).add(label);
   };
   const fromEnv = (env) => (typeof env?.CODEX_HOME === 'string' && env.CODEX_HOME.trim()
     ? path.join(path.resolve(resolveSubHomePath(env.CODEX_HOME.trim(), homeDir)), 'config.toml')
     : null);
-  const consider = (label, env, trustStore) => {
+  const consider = (label, env, trustStore, command) => {
     if (trustStore?.kind === 'codex-toml') {
-      note(trustStore.path ?? fromEnv(env) ?? path.join(homeDir, '.codex', 'config.toml'), label);
+      note(trustStore.path ?? fromEnv(env) ?? path.join(homeDir, '.codex', 'config.toml'), label, command);
     } else if (fromEnv(env)) {
-      note(fromEnv(env), label);
+      note(fromEnv(env), label, command);
     }
   };
   for (const [id, executor] of Object.entries(runnerConfig?.executors ?? {})) {
-    consider(id, executor?.env, executor?.interactiveMode?.trustStore);
+    consider(id, executor?.env, executor?.interactiveMode?.trustStore, executor?.command);
     for (const inv of executor?.invocations ?? []) {
-      consider(`${id}/${inv?.id ?? '?'}`, inv?.env ?? executor?.env, inv?.interactiveMode?.trustStore);
+      consider(`${id}/${inv?.id ?? '?'}`, inv?.env ?? executor?.env, inv?.interactiveMode?.trustStore, inv?.command ?? executor?.command);
     }
   }
   return found;
@@ -88,9 +91,17 @@ export function checkAgentCliProjectTrusted(cwd, { loadRunnerConfig, homeDir = o
 
   const variants = projectPathVariants(cwd);
   const root = variants[0];
-  const codexHomes = codexConfigPaths(runnerConfig, homeDir);
-  const agyHomes = findAgySubHomes(cwd, { homeDir, config: { runner: runnerConfig } });
+  const notInstalled = new Set();
+  const codexHomes = codexConfigPaths(runnerConfig, homeDir, notInstalled);
+  const agyHomes = findAgySubHomes(cwd, { homeDir, config: { runner: runnerConfig } }).filter(({ executorId }) => {
+    const command = runnerConfig?.executors?.[executorId]?.command;
+    if (typeof command === 'string' && !isCommandAvailable(command)) { notInstalled.add(path.basename(command)); return false; }
+    return true;
+  });
   if (codexHomes.size === 0 && agyHomes.length === 0) {
+    if (notInstalled.size > 0) {
+      return { passed: true, status: 'skip', message: `skipped: ${[...notInstalled].sort().join(', ')} not installed on this machine, so no trust prompt can stop a dispatch` };
+    }
     return { passed: true, message: 'not applicable: no codex or agy executor is configured' };
   }
 

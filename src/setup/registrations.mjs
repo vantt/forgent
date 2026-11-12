@@ -2420,7 +2420,9 @@ registerCheck({
 registerCheck({
   id: 'trust-store-readable',
   description: 'the agent folder-trust store is readable and carries a usable "projects" object, so a dispatch into a fresh worktree can be pre-trusted instead of stopping at a dialog',
-  check: () => checkTrustStoreWritable(),
+  check: () => (isCommandAvailable('claude')
+    ? checkTrustStoreWritable()
+    : { passed: true, status: 'skip', message: 'skipped: claude is not installed on this machine, so no trust dialog can stop a dispatch' }),
 });
 
 registerCheck({

@@ -5,7 +5,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
 import { writeAccountsFile, writeGlobalConfig, writeRawGlobalConfig } from '../helpers/config-fixture.mjs';
-import { seedStubAgentClis } from '../helpers/agent-clis.mjs';
+import { seedStubAgentClis, stubAgentCliDir } from '../helpers/agent-clis.mjs';
 import {
   checkTrustStoreWritable,
   checkExecutorConfinement,
@@ -290,6 +290,28 @@ function writeConfigContent(home, content) {
     writeGlobalConfig(home, { ...content, runner: rest });
   }
 }
+
+test('the registered trust-store-readable check is skipped when claude is not installed and still fails for a missing store when it is', () => {
+  const home = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-trust-row-home-'));
+  const entry = DOCTOR_CHECKS.find((c) => c.id === 'trust-store-readable');
+  const savedPath = process.env.PATH;
+  try {
+    const emptyBin = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-trust-row-bin-'));
+    process.env.PATH = emptyBin;
+    const skipped = withHome(home, () => entry.check(home));
+    assert.equal(skipped.passed, true, skipped.message);
+    assert.equal(skipped.status, 'skip');
+    assert.match(skipped.message, /claude is not installed/);
+    process.env.PATH = stubAgentCliDir('claude');
+    const failing = withHome(home, () => entry.check(home));
+    assert.equal(failing.passed, false, failing.message);
+    assert.match(failing.message, /unreadable/);
+    fs.rmSync(emptyBin, { recursive: true, force: true });
+  } finally {
+    process.env.PATH = savedPath;
+    fs.rmSync(home, { recursive: true, force: true });
+  }
+});
 
 test('the registered confined-pane-accounts check reads the global inventory from a directory with no project config', () => {
   const home = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-pane-accounts-home-'));

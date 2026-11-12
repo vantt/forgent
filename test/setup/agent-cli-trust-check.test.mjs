@@ -9,6 +9,9 @@ import { execFileSync } from 'node:child_process';
 import { DOCTOR_CHECKS } from '../../src/setup/checks.mjs';
 import { checkAgentCliProjectTrusted } from '../../src/setup/agent-cli-trust.mjs';
 import { moveMachineKeysTo, writeProjectConfig } from '../helpers/config-fixture.mjs';
+import { seedStubAgentClis } from '../helpers/agent-clis.mjs';
+
+seedStubAgentClis('codex');
 
 const SECRET_LINE = 'api_key = "sk-do-not-print-this-value"';
 
@@ -176,4 +179,19 @@ test('the registered check reads the project config and the overridden HOME, nev
     process.env.HOME = realHome;
     cleanup(fixture);
   }
+});
+
+test('a codex executor whose CLI is not installed is skipped, and a present CLI with no trust entry still fails', () => {
+  const fixture = mkFixture();
+  try {
+    const dir = codexHome(fixture.home, '.codex-cli-absent');
+    const withCommand = (command) => ({ openai: { ...codexExecutor(dir).openai, command } });
+    const absent = check(fixture, withCommand('/nonexistent-bin/codex'));
+    assert.equal(absent.passed, true, absent.message);
+    assert.equal(absent.status, 'skip');
+    assert.match(absent.message, /codex not installed/);
+    const present = check(fixture, withCommand(process.execPath));
+    assert.equal(present.passed, false, present.message);
+    assert.match(present.message, /has no entry/);
+  } finally { cleanup(fixture); }
 });
