@@ -9,7 +9,8 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 
-import { withRunDirReadAccess } from '../../../src/runner/dispatch/cli.mjs';
+import { withRunDirAccess } from '../../../src/runner/dispatch/cli.mjs';
+import { readStandardValue } from '../../../src/config/facade.mjs';
 import { makeFixtureDir } from '../../helpers/fixture-dir.mjs';
 
 const fixtureDir = (prefix) => makeFixtureDir(prefix);
@@ -28,13 +29,13 @@ test('Claude reads blind inputs without granting the assignment or store root, p
   fs.mkdirSync(inputsDir);
   const args = ['--add-dir', '/operator-approved', '--model', 'fixture'];
   const options = { adapter: 'herdr-spawn', interactiveMode: { kind: 'claude' }, args, runDir };
-  const granted = withRunDirReadAccess(options);
+  const granted = withRunDirAccess(options);
   assert.deepEqual(granted.slice(0, 4), ['--add-dir', runDir, inputsDir, '/operator-approved']);
   assert.ok(!granted.includes(assignment));
   assert.ok(!granted.includes(path.dirname(assignment)));
   assert.deepEqual(args, ['--add-dir', '/operator-approved', '--model', 'fixture']);
-  assert.equal(withRunDirReadAccess({ ...options, adapter: 'cli-spawn' }), args);
-  assert.equal(withRunDirReadAccess({ ...options, interactiveMode: { kind: 'codex' } }), args);
+  assert.equal(withRunDirAccess({ ...options, adapter: 'cli-spawn' }), args, 'a headless seat without an outbox is granted nothing');
+  assert.equal(withRunDirAccess({ ...options, interactiveMode: { kind: 'codex' } }), args);
 });
 
 test('Claude cross-repo handoffs grant only referenced report parents, not sibling assignments or store roots', () => {
@@ -50,9 +51,29 @@ test('Claude cross-repo handoffs grant only referenced report parents, not sibli
     contextRefs: [report, report, path.join(store, 'absent.md'), unrelated, 'unit-run:previous/producer', 'relative.md'],
   }));
   const args = ['--model', 'fixture'];
-  const granted = withRunDirReadAccess({ adapter: 'herdr-spawn', interactiveMode: { kind: 'claude' }, args, runDir });
+  const granted = withRunDirAccess({ adapter: 'herdr-spawn', interactiveMode: { kind: 'claude' }, args, runDir });
   assert.deepEqual(granted, [...args, '--add-dir', runDir, fs.realpathSync(reportDir)]);
   for (const dir of [store, assignment, path.dirname(reportDir), unrelated]) assert.ok(!granted.includes(dir));
   fs.writeFileSync(path.join(assignment, 'assignment.json'), '{broken');
-  assert.throws(() => withRunDirReadAccess({ adapter: 'herdr-spawn', interactiveMode: { kind: 'claude' }, args, runDir }), SyntaxError);
+  assert.throws(() => withRunDirAccess({ adapter: 'herdr-spawn', interactiveMode: { kind: 'claude' }, args, runDir }), SyntaxError);
+});
+
+test('a headless claude seat is granted its outbox directory only, beside the permission mode that lets it write there', () => {
+  const claude = readStandardValue('runner.executors.claude').value;
+  const outboxDir = path.join(fixtureDir('fgos-outbox-access-'), 'worker-output', 'outbox');
+  for (const id of ['claude-cli', 'claude-cli-bwrap']) {
+    const invocation = claude.invocations.find((inv) => inv.id === id);
+    const mode = invocation.args.indexOf('--permission-mode');
+    assert.equal(invocation.args[mode + 1], 'acceptEdits', `${id} carries acceptEdits`);
+    const granted = withRunDirAccess({ adapter: invocation.adapter, command: invocation.command, args: invocation.args, outboxDir });
+    assert.deepEqual(granted, [...invocation.args, '--add-dir', outboxDir]);
+  }
+  const args = ['-p', 'x'];
+  assert.equal(withRunDirAccess({ adapter: 'cli-spawn', command: '/usr/bin/codex', args, outboxDir }), args, 'only claude asks before writing outside its cwd');
+});
+
+test('a claude pane seat carries acceptEdits so its REPL writes the outbox without a human to answer', () => {
+  const pane = readStandardValue('runner.executors.claude').value.invocations.find((inv) => inv.id === 'claude-herdr-bwrap');
+  const mode = pane.args.indexOf('--permission-mode');
+  assert.equal(pane.args[mode + 1], 'acceptEdits');
 });

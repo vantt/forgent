@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "347041fc831172b47e6514f2627b22dc81e837c89dfcf18ea8c345de8c11142f",
+  "payloadDigest": "6d1693aa295473ad3d655bc459a78ecb6977d755a65bda6c7b4d68309d256bd3",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -1001,10 +1001,10 @@
     "src/runner/dispatch/agent-result-claim-contract.mjs": "9f49db7dee60837452d1ba57b97863cb391d56197080e7e7f256e513672f1bec",
     "src/runner/dispatch/assignment-layout.mjs": "a14f6f1b45e7942181b7ee05b9bb4086fcd705004e70a237fc8c2d11c7e272d9",
     "src/runner/dispatch/assignment-normalizer.mjs": "1e1a922ad6d9ef2c9d8f0e7f6fec77d2c8b83b27ce9adfc8eaf3ec69e200ce6b",
-    "src/runner/dispatch/assignment-runner.mjs": "cea782b440c28a7bb8204882800c699897bb31bcf949ebd13afe06947a3495b7",
+    "src/runner/dispatch/assignment-runner.mjs": "d6ecff37f9f159aacd0d10e9713dad3f4fb4627f04959c2ce541895b23b0d714",
     "src/runner/dispatch/assignment.mjs": "ae48427b5bc38db61d98b265e9ad7fd36d55f9a933085c988a8b695e5672501a",
     "src/runner/dispatch/brief.mjs": "c51d5398653cd6f839c2902134e627e57af7911b473fe16904478919c2d95e14",
-    "src/runner/dispatch/cli.mjs": "80a084560ac0b40a03071b64fb5d5a12a4d51e568fdac141585ba218932eba35",
+    "src/runner/dispatch/cli.mjs": "ecb48091a10029725230fac3d076a871f35ac3f3e5197f1124af8b75adc32596",
     "src/runner/dispatch/config.mjs": "92a0f513c49039134e40ade0d9cd3baf18a3b0c05458aef316c24790e6dee56f",
     "src/runner/dispatch/confinement/attestation-store.mjs": "25aeaef901e6c331ec84de3f4e072224d3f14c77775ba46fe6b91348ad795805",
     "src/runner/dispatch/confinement/authority.mjs": "2dc70a6d42306184aff303c8a1c565d6a30d87892f57427b5487a2944dd2a727",
@@ -3428,15 +3428,15 @@
     },
     {
       "path": "src/runner/dispatch/assignment-runner.mjs",
-      "line": 964,
+      "line": 965,
       "spawn": "prepareTerminalAttempt -> src/runner/dispatch/herdr-round.mjs:395",
       "binary": "(env FGOS_HERDR_BIN)",
       "class": "configured-binary"
     },
     {
       "path": "src/runner/dispatch/assignment-runner.mjs",
-      "line": 1458,
-      "spawn": "awaitBinding -> src/runner/dispatch/assignment-runner.mjs:1074",
+      "line": 1459,
+      "spawn": "awaitBinding -> src/runner/dispatch/assignment-runner.mjs:1075",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
     },

@@ -17,6 +17,7 @@ class StoreError extends Error {
 
 import { resolveRepoRoot, resolveMainCheckoutRoot, fgosDirFromRoot } from '../paths.mjs';
 import { loadRunnerConfigForDir } from './config.mjs';
+import { commandCli } from './provider-capacity.mjs';
 import { decideCommand } from './decide.mjs';
 import { executeAssignment } from './assignment-runner.mjs';
 import { adoptRun } from '../../run-supervisor/client.mjs';
@@ -83,16 +84,25 @@ export function resolveAgentTypeForTaskSpec(taskSpecHeader, agentDefs = [], curr
 
 
 /**
- * A claude REPL in a herdr pane is briefed with a pointer to a file in the run directory,
- * and the run directory lives under the store, which is outside the worker's cwd (its
- * worktree). Claude asks the human before reading outside its working directories, and
- * nobody is there to answer. Blind inputs are copied to assignmentDir/inputs,
- * beside runs/NN, so grant only that directory (when present) and the run
- * directory. This is claude's own prompt; the OS-level posture is unchanged.
+ * Claude asks the human before touching a path outside its working directories, and no human answers a
+ * seat. A seat's run directory lives under the store, outside its cwd (its worktree), so claude is told
+ * which directories it may use. This is claude's own prompt; the OS-level posture is unchanged.
+ *
+ * - A claude REPL in a herdr pane is briefed with a pointer to a file in the run directory and writes its
+ *   outbox there. Blind inputs are copied to assignmentDir/inputs, beside runs/NN, so it gets only that
+ *   directory (when present), the run directory and the parents of settled sibling reports.
+ * - A headless claude (cli-spawn) is handed its brief as the prompt and writes only its outbox, so it gets
+ *   that one directory (`outboxDir`) and nothing else.
+ *
+ * Writing there also needs the executor's permission mode (`acceptEdits`); a directory grant alone is refused.
  */
-export function withRunDirReadAccess({ adapter, interactiveMode, args, runDir }) {
-  if (adapter !== 'herdr-spawn' || interactiveMode?.kind !== 'claude' || !runDir) return args;
+export function withRunDirAccess({ adapter, interactiveMode, command, args, runDir, outboxDir }) {
   if (!Array.isArray(args)) return args;
+  if (adapter === 'cli-spawn') {
+    if (commandCli(command) !== 'claude' || !outboxDir) return args;
+    return withAddDirs(args, [path.resolve(outboxDir)]);
+  }
+  if (adapter !== 'herdr-spawn' || interactiveMode?.kind !== 'claude' || !runDir) return args;
   const run = path.resolve(runDir);
   const inputs = path.join(path.dirname(path.dirname(run)), 'inputs');
   const directories = [run, ...(fs.existsSync(inputs) ? [inputs] : [])];
@@ -107,6 +117,11 @@ export function withRunDirReadAccess({ adapter, interactiveMode, args, runDir })
       }
     }
   }
+  return withAddDirs(args, directories);
+}
+
+// Operator-approved `--add-dir` entries stay after the granted ones.
+function withAddDirs(args, directories) {
   const existing = args.indexOf('--add-dir');
   return existing < 0
     ? [...args, '--add-dir', ...directories]

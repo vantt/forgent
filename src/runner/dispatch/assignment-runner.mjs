@@ -51,7 +51,7 @@ import { RunnerConfigError } from './runner-config-error.mjs';
 import { resolveMainCheckoutRoot, resolveRepoRoot, fgosDirFromRoot } from '../paths.mjs';
 import { renderAssignmentPrompt, isReadOnlyAssignment } from './assignment.mjs';
 import { resolveAndRenderOperationPrompt } from './operation-prompt-templates.mjs';
-import { withRunDirReadAccess } from './cli.mjs';
+import { withRunDirAccess } from './cli.mjs';
 import { mintAttemptWriterId, resolveWriterIdentity } from '../../util/session-identity.mjs';
 import { resolveExecutorEnv, workerBaseEnv, caseContextEnv, CASE_ID_ENV, CASE_RESERVATION_ENV } from './adapters.mjs';
 import { compileDispatchPlan, launchPinOf } from './plan.mjs';
@@ -89,6 +89,7 @@ import {
 } from '../../run-supervisor/direct-launch.mjs';
 import { adoptRun } from '../../run-supervisor/client.mjs';
 import { register as registerDeliveredAttempt, unregister as unregisterDeliveredAttempt, beginLaunch as beginAttemptLaunch, endLaunch as endAttemptLaunch } from '../../run-supervisor/cancel-registry.mjs';
+import { attemptPaths } from '../../run-supervisor/direct-launch.mjs';
 import { watchWritesOutsideWorkspace } from '../../run-supervisor/stray-writes.mjs';
 import { prepareTerminalAttempt, followPaneScreen, withoutPaneEnv, PANE_IDLE_TIMEOUT_MS, ORPHAN_SETTLE_MS } from './herdr-round.mjs';
 import { resolveHerdrBin, workLabelOf, herdrEndpointEnv } from './terminal-slot.mjs';
@@ -404,12 +405,12 @@ const TERMINAL_CLIS = new Set(['claude', 'codex', 'agy', 'pi', 'omp']);
 
 /**
  * The argv an interactive agent starts with in a pane: the executor's own args without the prompt (the
- * supervisor types the brief at the prompt instead), the read access to the run directory a claude seat
- * needs to open the brief, and -- for codex, whose shell commands run under a shared daemon that does not
+ * supervisor types the brief at the prompt instead), the access to the run directory a claude seat
+ * needs to open the brief and write its outbox, and -- for codex, whose shell commands run under a shared daemon that does not
  * inherit the pane's environment -- the attempt's writer id as an explicit setting.
  */
 export function terminalAgentArgs({ resolvedCmd, prompt, model, runDir, writerId, caseContext = null }) {
-  const args = withRunDirReadAccess({
+  const args = withRunDirAccess({
     adapter: 'herdr-spawn',
     interactiveMode: resolvedCmd.interactiveMode,
     args: agentArgsWithoutPrompt({ argsTemplate: resolvedCmd.argsTemplate, args: resolvedCmd.args, prompt, model }),
@@ -883,7 +884,7 @@ async function buildLaunch(attempt, ctx) {
   const terminalSocket = attempt.terminal ? terminalSocketPath(attemptId) : null;
   const attemptArgs = attempt.terminal
     ? terminalAgentArgs({ resolvedCmd, prompt, model: effectivePolicy.model, runDir: attemptRunDir, writerId: attemptWriterId, caseContext: opts.caseContext ?? null })
-    : resolvedCmd.args;
+    : withRunDirAccess({ adapter: 'cli-spawn', command: resolvedCmd.command, args: resolvedCmd.args, outboxDir: attemptPaths(attemptRunDir, attemptId).outboxDir });
 
   const prepResult = await prepareConfinementForLaunch(buildConfinementRequest({
     capability: compiledPlan.capability || 'code:implement',
