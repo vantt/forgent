@@ -4,7 +4,7 @@
 Document type: BA-grade subcomponent specification
 Audience: Human reviewer, maintainer, implementation agent, documentation agent
 Purpose: Define how a project run by fgOS places every piece of maintained documentation in a space of axes, so that a writer finds the document that already holds what it wants to write before it may create a new one, and so that the space improves itself over time
-Design status: Draft for owner review, revised 2026-11-12 with the owner's decisions of that day (section 17). Not signed. Questions 1, 2, 3 and 5 of section 13 are decided; 4, 6, 7 and 8 are open.
+Design status: Draft for owner review, revised 2026-11-12 with the owner's decisions of that day (section 17). Not signed. Questions 1, 2, 3, 5, 6 and 7 of section 13 are decided; 4 and 8 are open.
 Implementation: Not started. Axis values for the fgOS repository are measured on 2026-11-12; the search view, the locate verb, the write-door refusal and the observer do not exist yet
 Canonical: No (becomes canonical when signed)
 Provenance: Written by the DOCOS lead after the owner asked for a dedicated spec on 2026-11-12, from the documentation area draft, the 2026-08 identity-axis discussion, measurements of docs/doc-registry.json and the maintained corpus, and a locate prototype run on 2026-11-12
@@ -104,7 +104,7 @@ This spec keeps the idea of several axes and fixes those points: locating axes a
 | Indexer (part of doc-health) | Read documents; extract narrowing values; rebuild the search view | Change document text |
 | Observer | Read the search view, the locate log and the registry; open proposal items | Apply a structural change itself |
 | Admission reviewer (documentation spec 6.8) | Decide creations and in-frame proposals; read the locate result attached | Admit a creation whose locate result names an owner above threshold without recording why; decide a proposal outside the frame |
-| Domain profile owner | Maintain one domain's identifier kinds and starter areas | Change the core |
+| Domain profile owner | Maintain a domain extension under `domains/<domain>/`: added kinds, starter areas, subdivisions | Change the core or a standard profile in this spec |
 | Owner | Change the core; approve frames; decide out-of-frame proposals in batches | — |
 
 ## 5. Core Model
@@ -114,7 +114,7 @@ This spec keeps the idea of several axes and fixes those points: locating axes a
 | Tier | Holds | Owned by | Changes when |
 |---|---|---|---|
 | Core | the axes, the `question` and `audience` value sets, the common identifier kinds, the rules | this spec | the owner decides |
-| Domain profile | identifier kinds and their registers for one kind of work, starter areas, audience subdivisions | one profile per domain (section 13, question 7) | a profile owner decides, or the observer proposes and the owner approves |
+| Domain profile | identifier kinds and their registers for one kind of work, starter areas, audience subdivisions | standard profiles in this spec (section 6); extensions and new domains under `domains/<domain>/` | a standard profile changes with this spec; an extension by its domain owner, or the observer proposes and the owner approves |
 | Project instance | the project's `area` values, the mapping from `question` to its document kinds, its registers' content | each project | through admission and the observer |
 
 A project uses the core, one or more domain profiles, and its own instance. The fgOS repository uses the core, the coding profile, and the instance in section 7.
@@ -215,11 +215,13 @@ Rules:
 - **Seeded at setup.** A new project does not start empty. `fgos setup` proposes a starter set from what already exists: the code tree or component map for software; product lines, functions and channels for a business; the domain profile's starter areas when nothing exists yet. The owner approves the starter set once.
 - **No catch-all.** There is no `general` or `misc` value. Content that fits no area is a signal for the observer (section 8.5.2), not a place.
 - **Proposed from the change.** For new content, locate proposes `area` from what the change touches (for software, through a path-to-area table, section 13 question 4). The writer may override it with a reason.
-- **Sub-areas.** Whether an area may carry a closed second level is open (section 13, question 6).
+- **Sub-areas.** An area may carry one closed second level, never a third. A sub-area is opened like an area, with its own overview document and admission; the observer proposes it when an area grows too large (8.5.2), a writer never creates one. For software, sub-areas follow existing subcomponent boundaries where they exist (the fgOS runner area has 8). A user-document slot is then (area, sub-area, question), for example the path docs/knowledge/runner/worktree/pitfall.md.
 
 ## 6. Domain Profiles
 
-A domain profile adds identifier kinds with their registers, starter areas, and audience subdivisions. The coding profile is measured; the other three are starter drafts, to be measured on a real project before they bind.
+A domain profile adds identifier kinds with their registers, starter areas, and audience subdivisions. The four profiles below are the **standard set** and live in this spec, so the model reads as one document. A project extends them, or adds a new domain, under `domains/<domain>/`; an extension adds kinds, starter areas or subdivisions and never removes or redefines a standard value. Values apply in this order: core, standard profile, domain extension, project instance; the project instance wins, as in configuration.
+
+The coding profile is measured; the other three are starter drafts, to be measured on a real project before they bind.
 
 ### 6.1. Coding
 
@@ -557,8 +559,8 @@ What it shows:
 3. **Frame defaults for the reviewer.** *Decided 2026-11-12: as recommended.* Recommendation: up to 5 new topics or sub-areas per week inside existing areas, up to 20 section moves per week, register value additions unlimited but listed in the weekly digest; everything else goes to the owner in one batch.
 4. **Path-to-area table** (coding profile). No mechanical map from code path to area exists in the fgOS repository (`docs/architecture-manifest.json` maps 356 files to layers, not areas). Most `packages/<name>` and `src/<name>` folders match an area name. Recommendation: one table in the project instance, checked so every tracked source path maps to exactly one area.
 5. **Threshold, top-N and initial kind coefficients.** *Decided 2026-11-12: from the measurement.* Recommendation: set them from the measurement in section 15, not in advance.
-6. **A closed second level under `area`.** Without it, a user-document slot (area, question) holds one document per area, which grows large. Option: allow sub-areas, each opened like an area with its own overview (the fgOS runner area already has 8 subcomponents). Recommendation: allow it.
-7. **Where domain profiles live.** Recommendation: beside the existing domain doctrine (`domains/<domain>/`), with the core here.
+6. **A closed second level under `area`.** *Decided 2026-11-12: allowed, one level, as written in 5.7.* Without it, a user-document slot (area, question) holds one document per area, which grows large. Option: allow sub-areas, each opened like an area with its own overview (the fgOS runner area already has 8 subcomponents). Recommendation: allow it.
+7. **Where domain profiles live.** *Decided 2026-11-12: the standard profiles stay in this spec so the model reads as one document; extensions and new domains go under `domains/<domain>/` (section 6).*
 8. **Relation to the documentation area spec.** This spec replaces its declared-subject matching (step 2.2 of 6.1 and section 6.6) and shrinks topic admission (6.8): with `area` closed, no writer mints a topic name. Recommendation: after signing, edit the documentation spec to point here and remove what this replaces in the same change.
 
 ## 14. Implementation Alignment
@@ -606,3 +608,4 @@ After implementation: one owning proof per behavior at the lowest layer: extract
   - identifiers: `verb` renamed `cli-verb`; a common set led by `decision`; domain profiles for coding, marketing, sales and customer support;
   - self-improvement for both areas and identifiers: an observer proposes items, a reviewer decides inside a frame, the owner decides the rest in batches.
 - 2026-11-12, owner, answers to section 13: question 1, the view uses SQLite through `rusqlite` with FTS5, after a Rust probe; question 2, `area` replaces the open `purpose` axis of user documents; question 3, the reviewer frame defaults as recommended; question 5, threshold, top-N and kind coefficients come from the measurement in section 15.
+- 2026-11-12, owner: question 6, one closed sub-area level is allowed; question 7, the standard domain profiles stay in this spec, because splitting them out from the start makes the model hard to read, and `domains/<domain>/` carries extensions and new domains.
