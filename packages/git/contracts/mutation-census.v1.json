@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "f9095da07788f119fcd59404140b0bc6bb0d8d557be79744721885a954099ce3",
+  "payloadDigest": "8fb83896586a7b92889a7507606883bb3e65a82a24d1cea9392cba3d405f8447",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -1239,10 +1239,10 @@
     "src/verbs/merge/review.mjs": "538e8087eed7befd51b7ef78a93d1b12fa13f0fff260ec40e50e7f8e019ac49a",
     "src/verbs/merge/sync-root.mjs": "81a4f2a88e187e748716c6df5430439849f55339b301b1214c63e7c66a53d732",
     "src/verbs/state/edit.mjs": "734029f844bf8eb4b9c50ff7698c59dda48bd2a6b3ec3ffe8b601f0a31571223",
-    "src/verbs/state/init.mjs": "b6a96096b4327266f43d4ebae4111fc072b52106f562efac54e953179c9c02e3",
+    "src/verbs/state/init.mjs": "4b41dd1f5bcc267a708be48f1d73da23d133d6e9fed5e9ed1ea2a5c9870ca2d2",
     "src/verbs/state/move.mjs": "d2be22ddac01830ec35469b5a895f2c0883dd14e0b63ec3ae2c5e44cc2a2350c",
     "src/verbs/state/read.mjs": "a49ff63f71318e7b6066059078273a6c224ad7ec10c8790f25fabd13cae5cd93",
-    "src/verbs/state/settle-legacy-config.mjs": "edf4801876f1b79cbcbd70ad2f64e3d1056548c411da9cffdae1d81c16e7edb6",
+    "src/verbs/state/settle-legacy-config.mjs": "8a4365757f03c413368d7609902930103ddcbb0de2ceb9232e1fc9cef651419d",
     "src/verbs/state/step.mjs": "ddebfcb5b53edfd67086ead35d886b86a1f49ad0ce18b98d7b637df239b059fb",
     "src/verbs/worktree/context.mjs": "e7e78be982562ee392a7378f881307def3eb87821dad8e4d62f39e7db8a61297",
     "src/verbs/worktree/create.mjs": "b09413339c4594efa3261433f827ee1d8dd7080d270fc1cf28e9d68e2b4ed261",

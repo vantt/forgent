@@ -35,12 +35,12 @@ export function createConfigFiles(projectRoot) {
  * headless-repository notice, the header-only config files and the recovery of an interrupted Git operation. Only the
  * first three can refuse; every later step is fail-safe, so a quirk there still leaves `.fgos/` initialized.
  *
- * @returns {{ dir: string, detectedHarnesses: object[], config: object, gitHeadless?: true, gitRecovery?: object, gitRecoveryWarning?: string }}
+ * @returns {{ dir: string, detectedHarnesses: object[], config: object, legacyConfig?: string[], legacyConfigNote?: string, legacyConfigWarning?: string, gitHeadless?: true, gitRecovery?: object, gitRecoveryWarning?: string }}
  */
 export function initStoreUseCase({ dir }) {
   const root = path.dirname(dir);
   mintMachineId(resolveStateRoot().stateRoot);
-  settleLegacyConfig(root);
+  const legacy = settleLegacyConfig(root);
   fixEventStoreLockDirs(root);
   initStore(dir);
   let detectedHarnesses = [];
@@ -71,6 +71,9 @@ export function initStoreUseCase({ dir }) {
   return {
     dir,
     detectedHarnesses,
+    ...(legacy.steps.length ? { legacyConfig: legacy.steps } : {}),
+    ...(legacy.note ? { legacyConfigNote: legacy.note } : {}),
+    ...(legacy.warning ? { legacyConfigWarning: legacy.warning } : {}),
     config,
     ...(gitHeadless ? { gitHeadless: true } : {}),
     ...(gitRecovery ? { gitRecovery } : {}),
