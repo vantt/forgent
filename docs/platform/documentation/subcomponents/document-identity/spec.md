@@ -4,7 +4,7 @@
 Document type: BA-grade subcomponent specification
 Audience: Human reviewer, maintainer, implementation agent, documentation agent
 Purpose: Define how a project run by fgOS places every piece of maintained documentation in a space of axes, so that a writer finds the document that already holds what it wants to write before it may create a new one, and so that the space improves itself over time
-Design status: Draft for owner review, revised 2026-11-12 with the owner's decisions of that day (section 17). Not signed. Questions 1 to 7 of section 13 are decided; 8 waits for signing.
+Design status: Draft for owner review, revised 2026-11-12 with the owner's decisions of that day (section 17). Not signed. All questions of section 13 are decided.
 Implementation: Not started. Axis values for the fgOS repository are measured on 2026-11-12; the search view, the locate verb, the write-door refusal and the observer do not exist yet
 Canonical: No (becomes canonical when signed)
 Provenance: Written by the DOCOS lead after the owner asked for a dedicated spec on 2026-11-12, from the documentation area draft, the 2026-08 identity-axis discussion, measurements of docs/doc-registry.json and the maintained corpus, and a locate prototype run on 2026-11-12
@@ -42,7 +42,7 @@ The model has three tiers, so it serves any project fgOS runs, not only fgOS its
 2. a **domain profile** per kind of work: coding, marketing, sales, customer support (section 6);
 3. a **project instance** with that project's real values (section 7 is the fgOS repository's).
 
-A writer must locate before it writes. Locate is a harness verb backed by a search view, not something the writer is trusted to remember (section 8.1). Creating a new document is refused unless locate ran and found no candidate above threshold, and the admission in [documentation spec 6.7](../../spec.md#67-admission-by-effect) passed.
+A writer must locate before it writes. Locate is a harness verb backed by a search view, not something the writer is trusted to remember (section 8.1). Creating a new document is refused unless locate ran and found no candidate above threshold, and [admission](../admission/spec.md) passed.
 
 The space is not fixed. An observer reads how locate and writes behave and proposes changes to areas and identifiers as work items, reviewed inside an approved frame (section 8.5). The writer never changes the structure to get past a refusal.
 
@@ -103,7 +103,7 @@ This spec keeps the idea of several axes and fixes those points: locating axes a
 | Locate verb | Read the search view and the axis tables; return coordinates and ranked candidates; append to the locate log | Write documents; grant creation |
 | Indexer (part of doc-health) | Read documents; extract narrowing values; rebuild the search view | Change document text |
 | Observer | Read the search view, the locate log and the registry; open proposal items | Apply a structural change itself |
-| Admission reviewer (documentation spec 6.8) | Decide creations and in-frame proposals; read the locate result attached | Admit a creation whose locate result names an owner above threshold without recording why; decide a proposal outside the frame |
+| Admission reviewer ([admission](../admission/spec.md)) | Decide creations and in-frame proposals; read the locate result attached | Admit a creation whose locate result names an owner above threshold without recording why; decide a proposal outside the frame |
 | Domain profile owner | Maintain a domain extension under `domains/<domain>/`: added kinds, starter areas, subdivisions | Change the core or a standard profile in this spec |
 | Owner | Change the core; approve frames; decide out-of-frame proposals in batches | — |
 
@@ -229,7 +229,7 @@ Measured over the fgOS repository's 687 maintained documents (platform, knowledg
 
 | Kind | Example | Register | Distinct values in docs | Documents using it | Status |
 |---|---|---|---|---|---|
-| `cli-verb` | `fgos run` | the CLI's command listing (`fgos --help --json`, 80 commands) | 100 | 420 | in; dead verbs already a doc-health rule (documentation spec 6.3) |
+| `cli-verb` | `fgos run` | the CLI's command listing (`fgos --help --json`, 80 commands) | 100 | 420 | in; dead verbs become a rule in [doc-checks 6.2](../doc-checks/spec.md#62-verb-reference-rule) |
 | `path` | `src/state/store.mjs` | `git ls-files`, or a pinned commit on the same line | 715 | 436 | in; dead paths already a doc-health rule |
 | `symbol` | `applyKnowledgeEvent` | code index (GitNexus where present, else a source scan) | 1749 | 495 | in |
 | `env` | `FGOS_HOST_BIN` | configuration and secrets registries | 36 | 46 | in |
@@ -393,7 +393,7 @@ The write door refuses to create a document, a registry topic or a slot when:
 - no locate result for this change is attached; or
 - the locate verdict is `owner-found` or `ambiguous`, and the request carries no reviewer reason for creating anyway.
 
-The locate result is recorded on the creation, next to the admission record of documentation spec 6.8. Growing an existing section needs no admission and no refusal check beyond doc-health. A refusal message never suggests changing an area, a kind or a register; it points to the candidates.
+The locate result is recorded on the creation, next to the admission record of [admission 6.5](../admission/spec.md#65-the-admission-record-and-the-checks-at-the-doors). Growing an existing section needs no admission and no refusal check beyond doc-health. A refusal message never suggests changing an area, a kind or a register; it points to the candidates.
 
 ### 8.4. Filling and checking the axes
 
@@ -540,7 +540,7 @@ What it shows:
 | `fgos tool query` | the `tool` register |
 | Knowledge-registry contract | lifecycle, slots, `topic split/merge/rename`, `doc path-move`, lineage |
 | Component boundary | the fgOS `area` value set |
-| Documentation spec 6.7 and 6.8 | admission of a creation and of in-frame proposals |
+| [Admission](../admission/spec.md) | admission of a creation and of observer proposals |
 | Observe area | the locate log |
 
 ## 12. Edge Cases
@@ -561,7 +561,7 @@ What it shows:
 5. **Threshold, top-N and initial kind coefficients.** *Decided 2026-11-12: from the measurement.* Recommendation: set them from the measurement in section 15, not in advance.
 6. **A closed second level under `area`.** *Decided 2026-11-12: allowed, one level, as written in 5.7.* Without it, a user-document slot (area, question) holds one document per area, which grows large. Option: allow sub-areas, each opened like an area with its own overview (the fgOS runner area already has 8 subcomponents). Recommendation: allow it.
 7. **Where domain profiles live.** *Decided 2026-11-12: the standard profiles stay in this spec so the model reads as one document; extensions and new domains go under `domains/<domain>/` (section 6).*
-8. **Relation to the documentation area spec.** This spec replaces its declared-subject matching (step 2.2 of 6.1 and section 6.6) and shrinks topic admission (6.8): with `area` closed, no writer mints a topic name. Recommendation: after signing, edit the documentation spec to point here and remove what this replaces in the same change.
+8. **Relation to the documentation area spec.** *Done 2026-11-12:* the area spec became a map of subcomponents; its declared-subject matching is replaced by locate here, its write steps moved to the [write door](../write-door/spec.md), and topic admission moved to [admission](../admission/spec.md), where no writer mints a topic name because `area` is closed.
 
 ## 14. Implementation Alignment
 
