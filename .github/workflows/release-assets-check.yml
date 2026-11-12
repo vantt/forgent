@@ -82,3 +82,13 @@ jobs:
           test/scripts/release-packaging.test.mjs
           test/setup/curl-check.test.mjs
           test/setup/project-launcher.test.mjs
+
+  debug-floor:
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+      - run: git --version; which git; which sh
+      - run: cargo test -p fgos-git debug_print_floor -- --nocapture 2>&1 | grep -E 'FLOORDEBUG|panicked|error' | head -20

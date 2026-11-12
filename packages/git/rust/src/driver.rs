@@ -3368,6 +3368,12 @@ mod tests {
         ));
     }
     #[test]
+    fn debug_print_floor() {
+        let state = Temp::new();
+        let driver = GitDriver::new(&state.0).unwrap();
+        eprintln!("FLOORDEBUG {:?}", driver.git_floor_verdict());
+    }
+    #[test]
     fn floor_and_all_repository_backends() {
         let state = Temp::new();
         let driver = GitDriver::new(&state.0).unwrap();
