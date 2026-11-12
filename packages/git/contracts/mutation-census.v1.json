@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "84c5dfe0e643c8f02d60a1d00df16d68a895984e9fbe35869502aef400982a8b",
+  "payloadDigest": "8072a7581de53a186f98930dcebd1d3118faec49af569c557ec820fcbb1841f5",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -922,7 +922,7 @@
     "src/event-store/consumers.mjs": "81cd05ec92cd75056954051715c0778daac2e620bfd578dc9e3a62d70d4057be",
     "src/event-store/index.mjs": "219b75a4178342a74ff24bb441e92ab6885639d7ddc0694b9b58c73fe38dea72",
     "src/event-store/maintenance.mjs": "bebb09783684dc019339be8e2e3f112ca50547e2f08ec9b8f7af1b17c1f47886",
-    "src/event-store/native.mjs": "196c265cb7c38ebb8c62fa51d5f1e47b56a635d6ab6bd3609abb7e0d584c1282",
+    "src/event-store/native.mjs": "093e3ca649da7c89122e136b0a28136e626162b01cf170292e01b10ca849b3c5",
     "src/event-store/seal-coalescing.mjs": "84eae01cdf29251f7e50e06ffbac46ea949457adb7b3f4ed20bda542448bd2c3",
     "src/evolve/iron-law.mjs": "c3dce0c23705a8fd1ec463a782fba000ee67f21889f47e7ff350043f7a7ff8d7",
     "src/git/config.mjs": "c630748f9c0b7f21d96d16211a829bc1c1fa4f50c735e7235e5995c62619b69a",
@@ -1241,7 +1241,7 @@
     "src/verbs/merge/review.mjs": "538e8087eed7befd51b7ef78a93d1b12fa13f0fff260ec40e50e7f8e019ac49a",
     "src/verbs/merge/sync-root.mjs": "81a4f2a88e187e748716c6df5430439849f55339b301b1214c63e7c66a53d732",
     "src/verbs/state/edit.mjs": "734029f844bf8eb4b9c50ff7698c59dda48bd2a6b3ec3ffe8b601f0a31571223",
-    "src/verbs/state/init.mjs": "4b41dd1f5bcc267a708be48f1d73da23d133d6e9fed5e9ed1ea2a5c9870ca2d2",
+    "src/verbs/state/init.mjs": "2b11eb62194d16cc51fbc106d9beae81add98b97ef0d02c10c575b2e77256989",
     "src/verbs/state/move.mjs": "d2be22ddac01830ec35469b5a895f2c0883dd14e0b63ec3ae2c5e44cc2a2350c",
     "src/verbs/state/read.mjs": "a49ff63f71318e7b6066059078273a6c224ad7ec10c8790f25fabd13cae5cd93",
     "src/verbs/state/settle-legacy-config.mjs": "8a4365757f03c413368d7609902930103ddcbb0de2ceb9232e1fc9cef651419d",
@@ -3124,7 +3124,7 @@
     {
       "path": "scripts/event-store/power-loss-driver.mjs",
       "line": 26,
-      "spawn": "openStore -> src/event-store/native.mjs:72",
+      "spawn": "openStore -> src/event-store/native.mjs:74",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
@@ -3138,7 +3138,7 @@
     {
       "path": "scripts/event-store/store-increment-worker.mjs",
       "line": 18,
-      "spawn": "openStore -> src/event-store/native.mjs:72",
+      "spawn": "openStore -> src/event-store/native.mjs:74",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },

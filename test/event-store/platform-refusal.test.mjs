@@ -12,7 +12,8 @@ test('every native facade entry refuses a non-Linux platform before resolving pa
     const api = await import(${JSON.stringify(url)});
     // An I/O trap after module loading proves refusal precedes disk access.
     fs.readFileSync = () => { throw new Error('unexpected disk access'); };
-    for (const name of Object.keys(api)) {
+    assert.equal(api.eventStorePlatformSupported(), false);
+    for (const name of Object.keys(api).filter(name => name !== 'eventStorePlatformSupported')) {
       assert.throws(() => api[name](), { code: 'event-store-unsupported-platform' }, name);
     }
   `;

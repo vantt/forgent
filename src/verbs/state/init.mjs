@@ -2,6 +2,7 @@ import path from 'node:path';
 import { mintMachineId } from '../../util/identity-mint.mjs';
 import { resolveStateRoot } from '../../holder-lock/state-root.mjs';
 import { fixEventStoreLockDirs } from '../../setup/event-store-fixes.mjs';
+import { eventStorePlatformSupported } from '../../event-store/native.mjs';
 import { initStore } from '../../state/store.mjs';
 import { writeCoexistenceManifest } from '../../install/coexist.mjs';
 import { inspectGit } from '../../runner/worktree.mjs';
@@ -37,12 +38,16 @@ export function createConfigFiles(projectRoot) {
  *
  * @returns {{ dir: string, detectedHarnesses: object[], config: object, legacyConfig?: string[], legacyConfigNote?: string, legacyConfigWarning?: string, gitHeadless?: true, gitRecovery?: object, gitRecoveryWarning?: string }}
  */
-export function initStoreUseCase({ dir }) {
+export function initStoreUseCase({ dir, workStore = eventStorePlatformSupported() }) {
   const root = path.dirname(dir);
   mintMachineId(resolveStateRoot().stateRoot);
   const legacy = settleLegacyConfig(root);
-  fixEventStoreLockDirs(root);
-  initStore(dir);
+  // The Work store is built on the Event Store, which exists on Linux only: elsewhere init settles the
+  // machine and the project around it and leaves the store out.
+  if (workStore) {
+    fixEventStoreLockDirs(root);
+    initStore(dir);
+  }
   let detectedHarnesses = [];
   try {
     detectedHarnesses = writeCoexistenceManifest(root, dir).detected_harnesses;

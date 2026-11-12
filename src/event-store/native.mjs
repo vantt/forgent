@@ -7,8 +7,10 @@ import { eventStoreConfig } from './config.mjs';
 import { registryFiles } from './consumers.mjs';
 
 function refusal(code) { return Object.assign(new Error(code), { code }); }
+/** Whether this platform has an Event Store (Linux only); the one answer every caller asks. */
+export function eventStorePlatformSupported() { return process.platform === 'linux'; }
 function available() {
-  if (process.platform !== 'linux') throw refusal('event-store-unsupported-platform');
+  if (!eventStorePlatformSupported()) throw refusal('event-store-unsupported-platform');
 }
 function ranksOf(heldRanks) {
   const ranks = typeof heldRanks?.holding === 'function' ? heldRanks.holding().map(lock => lock.rank) : heldRanks;
