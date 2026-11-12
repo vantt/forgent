@@ -108,7 +108,7 @@ import { inspectProviderCapacity, defaultProviderCapacityRuntimeDir, providerAcc
 import { inspectRetainedCredentialCopies, inspectPendingCopiesOverLimit, sweepInterruptedStagings, credentialWriteBackTarget, inventoryAccount, MAX_PENDING_COPIES } from '../runner/dispatch/provider-credential-renewal.mjs';
 import { resolveHerdrBin } from '../runner/dispatch/transport.mjs';
 import { createTerminalControl } from '../terminal-control/client.mjs';
-import { readCodexTrust, readAgyStore, defaultAgySettingsPath } from '../run-supervisor/trust-store.mjs';
+import { readCodexTrust, readAgyStore, defaultAgySettingsPath, operatorClaudeStorePath } from '../run-supervisor/trust-store.mjs';
 import { resolveFgosBin, refreshGlobalBinCache } from './bin-discovery.mjs';
 import { DEFAULT_WORKER_SLOT_CEILING } from '../state/worker-slots.mjs';
 import { eventStoreDoctorOf } from './event-store-checks.mjs';
@@ -2096,7 +2096,7 @@ registerCheck({
 
 /** The folder-trust store must be readable and well-formed, or every dispatch
  * into a fresh worktree stops at a trust dialog with nobody there to answer it. */
-export function checkTrustStoreWritable(storePath = path.join(os.homedir(), '.claude.json')) {
+export function checkTrustStoreWritable(storePath = operatorClaudeStorePath()) {
   let raw;
   try {
     raw = fs.readFileSync(storePath, 'utf8');

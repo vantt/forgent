@@ -96,6 +96,7 @@ import { retainFailedPaneMsOf } from '../../terminal-control/config.mjs';
 import { finalizeAttemptHome, prepareConfinementForLaunch } from './confinement/authority.mjs';
 import { CREDENTIAL_HOME_KEPT } from './confinement/cleanup.mjs';
 import { buildConfinementRequest } from './confinement/request.mjs';
+import { DEFAULT_SEAT_TIMEOUT_MS } from './confinement/resources.mjs';
 import { resolvePosture } from './confinement/policies.mjs';
 import { sha256FileSync } from '../../native/proof-helpers.mjs';
 import {
@@ -1267,7 +1268,7 @@ export async function executeAssignment(assignment, opts = {}) {
       cwd, executorId: resolvedExecutorId, capability: compiledPlan.capability,
     });
   }
-  const timeoutMs = opts.timeoutMs ?? cfg.timeoutMs ?? 900000;
+  const timeoutMs = opts.timeoutMs ?? cfg.timeoutMs ?? DEFAULT_SEAT_TIMEOUT_MS;
   const startedAt = new Date().toISOString();
 
   // Input identity, recorded runner-side before the worker runs: the sha256 of every file the Work layer pinned

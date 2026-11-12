@@ -17,6 +17,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { RunnerConfigError } from './runner-config-error.mjs';
 import { resolveMutatingCwdPosture } from './execution-contract.mjs';
+import { DEFAULT_SEAT_TIMEOUT_MS } from './confinement/resources.mjs';
 import { resolveMainCheckoutRoot, resolveRepoRoot } from '../paths.mjs';
 import { isReadOnlyAssignment } from './assignment.mjs';
 import { AGENT_RESULT_CLAIM_CONTRACT } from './agent-result-claim-contract.mjs';
@@ -252,7 +253,7 @@ export function buildEffectiveExecutionContract({
       ? assignment.budget.timeoutMs
       : (Number.isInteger(runnerConfig?.timeoutMs) && runnerConfig.timeoutMs > 0
         ? runnerConfig.timeoutMs
-        : 900000));
+        : DEFAULT_SEAT_TIMEOUT_MS));
 
   // Result claim
   const absRunDir = path.resolve(runDir);

@@ -6,6 +6,7 @@ import path from 'node:path';
 
 import { credentialStoreOf, credentialStoreProblem } from '../../src/runner/dispatch/provider-capacity.mjs';
 import { readMachineConfig } from '../../src/config/facade.mjs';
+import { DEFAULT_SEAT_TIMEOUT_MS } from '../../src/runner/dispatch/confinement/resources.mjs';
 import { credentialLayout } from '../../src/runner/dispatch/provider-credential-renewal.mjs';
 import { validateRunnerConfigShape } from '../../src/runner/dispatch/config.mjs';
 import { RunnerConfigError } from '../../src/runner/dispatch/runner-config-error.mjs';
@@ -112,4 +113,8 @@ test('the standard gives each confined claude invocation its own login store in 
     assert.equal(byId[id].env?.CLAUDE_CODE_FORCE_SESSION_PERSISTENCE, '1', `${id}: a seat started from a claude session still saves its transcript`);
   }
   assert.equal(credentialStoreOf({ ...byId['claude-cli'], command: 'claude' }), null);
+});
+
+test('the seat timeout a launch falls back to is the standard runner timeout, named once', () => {
+  assert.equal(readMachineConfig({ globalDir: path.join(os.tmpdir(), 'fgos-no-machine-config') }).value.runner.timeoutMs, DEFAULT_SEAT_TIMEOUT_MS);
 });

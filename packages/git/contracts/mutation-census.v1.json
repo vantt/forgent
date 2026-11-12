@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "6a7fc8e483fa1f6433daae165b2c1a7f1c6ab23fce50b586ab333f8fd85d8f35",
+  "payloadDigest": "ef9a19e34f8f91520948d661394ec2aeda9dadd57dbcf2ecf0c85f1f04076ca4",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -998,7 +998,7 @@
     "src/runner/dispatch/agent-result-claim-contract.mjs": "9f49db7dee60837452d1ba57b97863cb391d56197080e7e7f256e513672f1bec",
     "src/runner/dispatch/assignment-layout.mjs": "a14f6f1b45e7942181b7ee05b9bb4086fcd705004e70a237fc8c2d11c7e272d9",
     "src/runner/dispatch/assignment-normalizer.mjs": "1e1a922ad6d9ef2c9d8f0e7f6fec77d2c8b83b27ce9adfc8eaf3ec69e200ce6b",
-    "src/runner/dispatch/assignment-runner.mjs": "07c60d01032cef327ec9523aebb743aa2435eaa25e511d2fd4895d9f9f9ff3ad",
+    "src/runner/dispatch/assignment-runner.mjs": "9eaf1b1aeff7374c8aecdb301604f61b532125283c9aa06dff3cd0fcf1f3a3b4",
     "src/runner/dispatch/assignment.mjs": "ae48427b5bc38db61d98b265e9ad7fd36d55f9a933085c988a8b695e5672501a",
     "src/runner/dispatch/brief.mjs": "c51d5398653cd6f839c2902134e627e57af7911b473fe16904478919c2d95e14",
     "src/runner/dispatch/cli.mjs": "80a084560ac0b40a03071b64fb5d5a12a4d51e568fdac141585ba218932eba35",
@@ -1014,7 +1014,7 @@
     "src/runner/dispatch/confinement/request.mjs": "bc482597e942044773334ccd6233db827f342fb77750a8d8229e04b8d3ab9964",
     "src/runner/dispatch/confinement/resources.mjs": "0a2e77a0395b3b104eb1651fdaa8be811ccf534b204c4ebc619ac8dae0b4ea53",
     "src/runner/dispatch/decide.mjs": "7d9135efd6173bc8f31d08a3c905027a8f5dd41e8704c5e15d69cb42967758e5",
-    "src/runner/dispatch/effective-execution-contract.mjs": "9305aaa239acc2463932c9eb6dca4f56ec4d66fdd33055f68a1715129fc9277a",
+    "src/runner/dispatch/effective-execution-contract.mjs": "480db713d456636153c6b2c476ac57eac98dd908e1c3bf9434afc8bbdb37f669",
     "src/runner/dispatch/evidence-attribution.mjs": "e286beb61bc988049d44645db9a7a0900ba2431132ce694861ac7c43390b229f",
     "src/runner/dispatch/execution-contract.mjs": "a5b5160f4fb82aa885a961b8f6f66f353a8d455a0ab46a1bd2fe84f527e16e53",
     "src/runner/dispatch/executor-governance.mjs": "8e8f93d957741e107b0e38630d7b0816209019234c93c95140113b231e18f73e",
@@ -1145,7 +1145,7 @@
     "src/setup/model-pool-checks.mjs": "f686f00122bc1f43c5d0fe182f7879739f112ef4a361ccccf4a7d6a7ddf5bbd5",
     "src/setup/omp-natives-checks.mjs": "6f6faadb66ac09828741445c599dcbaee9462486157ab7074433e2dbcf4d9aad",
     "src/setup/project-launcher.mjs": "3153fdb9caad59eaeace759de1cd126c22f41585fcd1e15f00c1577ab0f9806b",
-    "src/setup/registrations.mjs": "f91abb54d5704151126a62acee00e31220e40bf4e2f51de7e4fdd6839e9ac4b8",
+    "src/setup/registrations.mjs": "7e8ec09e32ceb65c7229001d3cc4e2d4ba57935eaf5759011aea86b003da0530",
     "src/setup/run-supervisor-checks.mjs": "dc0bb137dc4683b9f832437ed16f4d3a69c0b1b44bb2442f099a805361457bd9",
     "src/setup/runner-config-conversion.mjs": "6e2711a0a909265b82241901e7f9642889bdc3e9d1ab5a69fafd81b477a64ac6",
     "src/setup/seat-binding-checks.mjs": "8d8d9646baf6f0b234b66de782f099de9b89f49595b42eafec75041629ccb9e9",
@@ -3415,15 +3415,15 @@
     },
     {
       "path": "src/runner/dispatch/assignment-runner.mjs",
-      "line": 976,
+      "line": 977,
       "spawn": "prepareTerminalAttempt -> src/runner/dispatch/herdr-round.mjs:395",
       "binary": "(env FGOS_HERDR_BIN)",
       "class": "configured-binary"
     },
     {
       "path": "src/runner/dispatch/assignment-runner.mjs",
-      "line": 1469,
-      "spawn": "awaitBinding -> src/runner/dispatch/assignment-runner.mjs:1085",
+      "line": 1470,
+      "spawn": "awaitBinding -> src/runner/dispatch/assignment-runner.mjs:1086",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
     },
