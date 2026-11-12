@@ -98,7 +98,7 @@ function world() {
   const loginHome = makeFixtureDir('mbx-login-');
   const login = path.join(loginHome, '.claude', '.credentials.json');
   fs.mkdirSync(path.dirname(login), { recursive: true });
-  fs.writeFileSync(login, '{"claudeAiOauth":{"accessToken":"SCRATCH-NOT-A-TOKEN","expiresAt":1}}\n', { mode: 0o600 });
+  fs.writeFileSync(login, `{"claudeAiOauth":{"accessToken":"SCRATCH-NOT-A-TOKEN","expiresAt":${Date.now() + 24 * 60 * 60 * 1000}}}\n`, { mode: 0o600 });
   // A project secret under the real home, as every project's is: inside this checkout's runtime scratch.
   const secret = path.join(REPO, '.fgos', 'runtime', `mbx-confined-secret-${process.pid}`, 'project', '.fgos', 'secrets.local.env');
   fs.mkdirSync(path.dirname(secret), { recursive: true });
