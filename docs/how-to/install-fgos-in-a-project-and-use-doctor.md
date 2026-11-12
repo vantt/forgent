@@ -109,7 +109,7 @@ refuses outside one).
    Codex, agy, OMP and Pi) through `fgos doctor --fix`; no separate setup step is
    needed. `fgctl init` then reads the last doctor report and ends with one of two
    blocks. When `ok` is true it prints `Ready: fgOS <tag> active (<digest12>)` and
-   `Next: fgos run "<prompt>"`, and exits 0. Otherwise it prints `<N> checks need
+   `Next: fgos run "<prompt>"`, and exits 0 (`nothing to do: fgOS <tag> already active, doctor ok` when the release was already active and the doctor is clean; a `Note:` line follows when `fgos init` moved a legacy config). Otherwise it prints `<N> checks need
    you:` and one numbered line per failing check, `<id>: <fix command>` (the check's
    message when only a person can fix it), and exits 2; the release stays activated
    and the install is recorded as `ready-degraded`. `fgctl init` has no `--yes`

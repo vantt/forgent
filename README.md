@@ -28,10 +28,25 @@ fgos run "<prompt>"
    glibc 2.35 and later (Ubuntu 22.04 and newer).
 2. `fgctl init` downloads the latest release, checks it against the release's
    `SHA256SUMS`, activates it in the project, wires the agent hooks and runs
-   `fgos doctor`. It ends with `Ready` and the next step, or with a numbered list
-   of the checks that need you and exit code 2.
+   `fgos doctor`. It ends with the block below, or with a numbered list of the
+   checks that need you and exit code 2.
 3. `fgos run "<prompt>"` runs one task through an agent CLI. With no agent CLI
    installed it stops with `agent-cli-missing` and says which to install.
+
+```text
+Ready: fgOS <tag> active (<12 hex digits of the release digest>)
+Next: fgos run "<prompt>"
+```
+
+Run again with nothing to change, `fgctl init` ends `nothing to do: fgOS <tag>
+already active, doctor ok`. When the machine still held a legacy `~/.fgos/config.json`,
+a `Note:` line says it was moved. A failing check is listed like this, with its fix
+command (or its message when only you can fix it):
+
+```text
+1 check needs you:
+  1. <check id>: <fix command or message>
+```
 
 A claude seat that runs in the sandbox needs a login of its own, not your
 `~/.claude`; until it has one, `fgos doctor` fails `confined-pane-accounts`. The
