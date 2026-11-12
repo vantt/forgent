@@ -589,6 +589,8 @@ pub struct ReadyFacts {
     /// How the user types `fgos`: bare, or the launcher's absolute path when
     /// its directory is not on PATH.
     pub run_command: String,
+    /// Lines the init step asked the user to see (`legacyConfigNote`, `legacyConfigWarning`).
+    pub notes: Vec<String>,
 }
 
 /// The closing block of init, upgrade and repair, and whether it reports a
@@ -631,6 +633,20 @@ pub fn run_command(launcher_dir: Option<&Path>, path_var: Option<&std::ffi::OsSt
     }
 }
 
+/// The lines `fgos init` put in its own result for the person running the upgrade; its stdout is
+/// otherwise dropped on success. Output that is not an init result gives none.
+pub fn init_notes(init_stdout: &[u8]) -> Vec<String> {
+    let Ok(value) = serde_json::from_slice::<serde_json::Value>(init_stdout) else {
+        return Vec::new();
+    };
+    let data = value.get("data").unwrap_or(&value);
+    ["legacyConfigNote", "legacyConfigWarning"]
+        .iter()
+        .filter_map(|key| data.get(*key).and_then(|v| v.as_str()))
+        .map(str::to_string)
+        .collect()
+}
+
 /// Builds the closing block from `fgos doctor --json` output: `Ready` plus one
 /// runnable next step when `ok`, otherwise a numbered list of the failing
 /// checks, each with its fix command (or its message when only a person can
@@ -650,6 +666,7 @@ pub fn closing_block(doctor_stdout: &str, facts: &ReadyFacts) -> Result<ClosingB
         .as_deref()
         .map(|t| format!("fgOS {t}"))
         .unwrap_or_else(|| "fgOS".to_string());
+    let notes: String = facts.notes.iter().map(|n| format!("Note: {n}\n")).collect();
     if ok {
         let first = if facts.already_current {
             format!("Ready: already up to date at {} ({tag})", facts.digest12)
@@ -657,7 +674,10 @@ pub fn closing_block(doctor_stdout: &str, facts: &ReadyFacts) -> Result<ClosingB
             format!("Ready: {tag} active ({})", facts.digest12)
         };
         return Ok(ClosingBlock {
-            text: format!("{first}\nNext: {} run \"<prompt>\"\n", facts.run_command),
+            text: format!(
+                "{first}\n{notes}Next: {} run \"<prompt>\"\n",
+                facts.run_command
+            ),
             ready: true,
         });
     }
@@ -690,6 +710,7 @@ pub fn closing_block(doctor_stdout: &str, facts: &ReadyFacts) -> Result<ClosingB
     for (i, line) in lines.iter().enumerate() {
         text.push_str(&format!("  {}. {line}\n", i + 1));
     }
+    text.push_str(&notes);
     Ok(ClosingBlock { text, ready: false })
 }
 
@@ -721,6 +742,7 @@ fn ready_facts(
         digest12: short_digest(&activation.artifact_digest),
         already_current: outcome == TailOutcome::AlreadyCurrent,
         run_command: run_command(launcher_dir.as_deref(), std::env::var_os("PATH").as_deref()),
+        notes: Vec::new(),
     })
 }
 
@@ -794,8 +816,9 @@ fn noop_block(facts: &ReadyFacts) -> String {
         .as_deref()
         .map(|t| format!("fgOS {t}"))
         .unwrap_or_else(|| "fgOS".to_string());
+    let notes: String = facts.notes.iter().map(|n| format!("Note: {n}\n")).collect();
     format!(
-        "nothing to do: {tag} already active, doctor ok\nNext: {} run \"<prompt>\"\n",
+        "nothing to do: {tag} already active, doctor ok\n{notes}Next: {} run \"<prompt>\"\n",
         facts.run_command
     )
 }
@@ -820,7 +843,7 @@ pub fn run_tail(
         .join("installs")
         .join(format!("{}.json", activation_id));
 
-    run_tail_step(workspace_root, shim_path, &tx_path, &["init"])?;
+    let init = run_tail_step(workspace_root, shim_path, &tx_path, &["init"])?;
     let mut doctor = run_tail_step(workspace_root, shim_path, &tx_path, &["doctor", "--json"])?;
     let clean = doctor_is_clean(&String::from_utf8_lossy(&doctor));
     if !clean {
@@ -828,9 +851,10 @@ pub fn run_tail(
         doctor = run_tail_step(workspace_root, shim_path, &tx_path, &["doctor", "--json"])?;
     }
 
-    let facts = ready_facts(workspace_root, store_root, outcome).inspect_err(|_| {
+    let mut facts = ready_facts(workspace_root, store_root, outcome).inspect_err(|_| {
         let _ = mark_transaction_status(&tx_path, "ready-degraded");
     })?;
+    facts.notes = init_notes(&init);
     if clean && outcome == TailOutcome::AlreadyCurrent {
         print!("{}", noop_block(&facts));
         let _ = std::io::stdout().flush();
@@ -2775,6 +2799,7 @@ mod tests {
             digest12: "0123456789ab".to_string(),
             already_current,
             run_command: "fgos".to_string(),
+            notes: Vec::new(),
         }
     }
 
@@ -2803,6 +2828,37 @@ mod tests {
             block.text,
             "Ready: fgOS v1.2.0 active (0123456789ab)\nNext: fgos run \"<prompt>\"\n"
         );
+    }
+
+    #[test]
+    fn init_notes_come_from_the_init_result_and_the_closing_block_prints_them() {
+        let init = serde_json::json!({
+            "contract": "fgos.v1",
+            "data": {
+                "legacyConfigNote": "~/.fgos/config.json moved; projects on an older release refuse until `fgctl upgrade`",
+                "legacyConfigWarning": "legacy config not moved: config-write-confined",
+                "dir": "x"
+            }
+        })
+        .to_string();
+        let notes = init_notes(init.as_bytes());
+        assert_eq!(notes.len(), 2);
+        assert!(init_notes(b"not json").is_empty());
+        assert!(init_notes(br#"{"data":{"dir":"x"}}"#).is_empty());
+
+        let mut f = facts(false);
+        f.notes = notes;
+        let ready = closing_block(&doctor_json(true, &[]), &f).unwrap();
+        assert_eq!(
+            ready.text,
+            "Ready: fgOS v1.2.0 active (0123456789ab)\nNote: ~/.fgos/config.json moved; projects on an older release refuse until `fgctl upgrade`\nNote: legacy config not moved: config-write-confined\nNext: fgos run \"<prompt>\"\n"
+        );
+        let failing =
+            closing_block(&doctor_json(false, &[("a", "fail", Some("fgos x"))]), &f).unwrap();
+        assert!(!failing.ready);
+        assert!(failing
+            .text
+            .ends_with("Note: legacy config not moved: config-write-confined\n"));
     }
 
     #[test]
