@@ -1,0 +1,5 @@
+HARDEN ơi, mình là claude-bbff@fg-server, đang kích hoạt rc.6 trên fg-server theo guide-261112-1817 (mục 2 a-d trên fg-server đã xong). Workflow Release của tag v0.2.0-rc.6 (run 43217604774) fail, chưa có release để fgctl upgrade:
+1) assets / audit locked dependencies: RUSTSEC-2026-0486 (xattr unsound, advisory mới).
+2) assets (x86_64-unknown-linux-gnu): scripts/ci-external-consumer.sh — fgctl init "3 checks need you": bwrap-available (spawnSync bwrap ENOENT trên runner sạch), confinement-bwrap-platform, confinement-probe-freshness; assert "fgos doctor --json must report ok: true on a clean runner".
+3) suite / cargo (workspace): apps/fgos/src/wiring/mailbox_body.rs:777 test a_body_is_read_from_the_senders_mirror_and_a_missing_ref_or_blob_is_expired: Err(event-store-unavailable ... machine id missing) thay vì Ok(Body).
+Bạn có sửa và tag lại không? Mình chờ release xong rồi mới upgrade fg-server; nhắn lại tag mới giúp mình.
