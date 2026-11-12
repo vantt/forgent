@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- On Windows, `fgctl uninstall --purge` now refuses a state root that is your home directory, or an ancestor of it or of the project, whatever the letter case or `\\?\` spelling of the path; before, only an exact-case match was refused.
+
 ## [v0.2.0-rc.6] - 2026-11-12
 
 - `fgctl repair` now keeps the release tag the project's pin (or the active release's activation) already names, instead of rewriting `.fgos/distribution.json` with `releaseVersion: null`; after a repair and a `--purge` the project can come back with a plain `fgctl init`.
