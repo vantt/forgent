@@ -441,10 +441,10 @@ test('a policy with no runner config and no bound tier and model is refused by n
     () => policyOf({ assignment }),
     (err) => err instanceof RunnerConfigError && err.code === 'runner-config-missing',
   );
-  const bound = policyOf({ assignment, binding: { tier: 'standard', model: 'bound-model', provenance: { model: { source: 'tier-cell' } } } });
+  const bound = policyOf({ assignment, binding: { tier: 'standard', model: 'bound-model', provenance: { model: { source: 'tier-cell' }, persona: { source: 'none' } } } });
   assert.equal(bound.model, 'bound-model');
   assert.deepEqual(bound.provenance.model.source, { scope: 'seat-binding', id: 'tier-cell' });
-  assert.deepEqual(bound.provenance.persona.source, { scope: 'default' });
+  assert.deepEqual(bound.provenance.persona, { value: null, source: { scope: 'seat-binding', id: 'none' } });
 });
 // --- Phase 00 R8: pure provider capability validation ---
 

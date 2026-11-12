@@ -127,24 +127,26 @@ export function effectiveDispatchPolicy({ assignment, runnerConfig, binding, cli
   // a level the seat runs at its invocation's own default.
   const explicitEffort = binding?.reasoningEffort ?? cliOverride.reasoningEffort ?? opPolicy.reasoningEffort;
   if (explicitEffort !== undefined) assertReasoningEffort(explicitEffort);
-  const reasoningEffortSource = explicitEffort === undefined
-    ? { scope: 'default' }
-    : binding?.reasoningEffort
-      ? bindingSource(binding, 'reasoningEffort')
+  const reasoningEffortSource = binding
+    ? bindingSource(binding, 'reasoningEffort')
+    : explicitEffort === undefined
+      ? { scope: 'default' }
       : cliOverride.reasoningEffort ? { scope: 'cliOverride' } : { scope: 'opPolicy', id: opId };
 
   // Persona.
-  const resolvedPersona =
-    cliOverride.preferPersona ??
-    opPolicy.preferPersona ??
-    (assignment.role === 'reviewer' ? 'code-reviewer' : undefined);
-  const personaSource = cliOverride.preferPersona
-    ? (cliOverride.policyProvenance?.persona ?? { scope: 'cliOverride' })
-    : opPolicy.preferPersona
-      ? { scope: 'opPolicy', id: opId }
-      : resolvedPersona
-        ? { scope: 'default', id: assignment.role }
-        : { scope: 'default' };
+  // A bound seat's persona is Seat Binding's answer, none included, with its source; any other caller names it itself.
+  const resolvedPersona = binding
+    ? (binding.persona ?? undefined)
+    : cliOverride.preferPersona ?? opPolicy.preferPersona ?? (assignment.role === 'reviewer' ? 'code-reviewer' : undefined);
+  const personaSource = binding
+    ? bindingSource(binding, 'persona')
+    : cliOverride.preferPersona
+      ? (cliOverride.policyProvenance?.persona ?? { scope: 'cliOverride' })
+      : opPolicy.preferPersona
+        ? { scope: 'opPolicy', id: opId }
+        : resolvedPersona
+          ? { scope: 'default', id: assignment.role }
+          : { scope: 'default' };
 
   // Executor, tier, model and effort. A caller that already bound the seat (a unit run) passes the tier and
   // the model and they are taken as given. Every other caller asks Seat Binding through `bind()`: a pinned
@@ -191,7 +193,7 @@ export function effectiveDispatchPolicy({ assignment, runnerConfig, binding, cli
   }
   const primaryExecutor = bound?.executor ?? pinnedExecutor ?? 'claude';
   const executorSource = namedExecutor
-    ? (binding?.executor ? { scope: 'seat-binding' } : cliOverride.preferExecutor ? (cliOverride.policyProvenance?.executor ?? { scope: 'cliOverride' }) : { scope: 'opPolicy', id: opId })
+    ? (binding?.executor ? bindingSource(binding, 'executor') : cliOverride.preferExecutor ? (cliOverride.policyProvenance?.executor ?? { scope: 'cliOverride' }) : { scope: 'opPolicy', id: opId })
     : { scope: 'default' };
   const { resolvedProvider, registeredExecutorEntry } = resolveExecutorProvider({ runnerConfig, primaryExecutor, options });
   const providerSource = registeredExecutorEntry
@@ -270,8 +272,8 @@ export function effectiveDispatchPolicy({ assignment, runnerConfig, binding, cli
       model: Object.freeze({ value: resolvedModel, source: Object.freeze(modelSource) }),
       rigor: Object.freeze({ value: effectiveRigor, source: Object.freeze(rigorSource) }),
       tier: Object.freeze({ value: effectiveTier, source: Object.freeze(tierSource) }),
-      reasoningEffort: Object.freeze({ value: reasoningEffort, source: Object.freeze(reasoningEffortSource) }),
-      persona: Object.freeze({ value: resolvedPersona, source: Object.freeze(personaSource) }),
+      reasoningEffort: Object.freeze({ value: binding ? (reasoningEffort ?? null) : reasoningEffort, source: Object.freeze(reasoningEffortSource) }),
+      persona: Object.freeze({ value: binding ? (resolvedPersona ?? null) : resolvedPersona, source: Object.freeze(personaSource) }),
       visibility: Object.freeze({ value: resolvedVisibility, source: Object.freeze(visibilitySource) }),
       repeatMode: Object.freeze({ value: resolvedRepeatMode ?? null, source: Object.freeze(repeatModeSource) }),
       constraints: Object.freeze({ value: constraints, source: Object.freeze(constraintsSource) }),

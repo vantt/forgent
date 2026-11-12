@@ -155,6 +155,33 @@ test('an account pin the caller asked to apply where it is served runs a unit no
   await assert.rejects(run(fx, solo('u-pin-mode'), { overrides: [{ account: 'beta/b1' }], accountPin: 'anywhere' }), /accountPin must be one of strict, where-served/);
 });
 
+// Seat Binding is the one writer of a seat's provenance: a fallback attempt and a seat whose account pin was
+// skipped carry what bind returned, and Dispatch records what each launch did under its own name.
+test('every attempt of a fallback walk and of a skipped account pin records the provenance bind returned, unchanged', { skip: SKIP }, async () => {
+  const fx = setup(
+    { alpha: { family: 'alpha', logins: { dead1: 'dead', live1: 'live' } }, beta: { family: 'beta', logins: { b1: 'live' } } },
+    { prefer: ['alpha'], recentlyUsed: { alpha: ['live1'] } },
+  );
+  const res = await run(fx, solo('u-provenance'), { overrides: [{ origin: 'human-cli', account: 'beta/b1' }], accountPin: 'where-served' });
+  assert.equal(res.outcome, 'pass', JSON.stringify(res.results[0]).slice(0, 1500));
+  const attempts = attemptsOf(fx.repoRoot, res);
+  assert.deepEqual(attempts.map((a) => a.fallbackFrom?.kind ?? null), [null, 'account-rotation']);
+  assert.equal(attempts[0].binding.provenance.account.skipped.reason, 'account-pin-other-pool');
+  assert.deepEqual(res.results.at(-1).binding, attempts[1].binding, 'the result carries the binding bind returned');
+  for (const [index, sub] of ['1', '1-fb1'].entries()) {
+    const { binding } = attempts[index];
+    const recorded = runFile(fx.repoRoot, res, sub, 'result.json').policy;
+    for (const field of ['executor', 'tier', 'model', 'reasoningEffort', 'persona']) {
+      const bound = binding.provenance[field];
+      if (!bound || recorded.provenance[field] === undefined) continue;
+      assert.deepEqual(recorded.provenance[field].source, { scope: 'seat-binding', id: bound.source }, `${sub} ${field} source`);
+      assert.equal(recorded.provenance[field].value, bound.value, `${sub} ${field} value`);
+      assert.deepEqual(Object.keys(recorded.provenance[field]).sort(), ['source', 'value'], `${sub} ${field} carries nothing bind did not write`);
+    }
+    assert.equal(recorded.provenance.modelDrift, undefined, `${sub}: a launch observation is not provenance`);
+  }
+});
+
 // A writing seat that already changed the worktree before its provider limit is not run again on top of its own
 // half-done work: the seat stops, and the attempt lists what changed (the decision itself is a case of the answer
 // table in account-rotation.test.mjs). A resume takes a new baseline, so work a person kept does not stop the next rotation.

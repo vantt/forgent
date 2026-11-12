@@ -667,21 +667,20 @@ function declaredScopeOf({ assignment, isReadOnly, settlementCwd, dirtyBeforeSna
 }
 
 /**
- * The policy a receipt records, plus what the launch itself did with it: the effort level as
- * the provider CLI's own flag (`provenance.reasoningEffort.rendered`) and every place the model
- * that ran differs from the one bound (`provenance.modelDrift`, provider-adapter.mjs's model
- * check). Unchanged when neither applies.
+ * The policy a receipt records, plus what the launch itself did with it, under `launch` (Dispatch's own
+ * facts, never `provenance`, which Seat Binding writes): the effort level as the provider CLI's own flag
+ * (`launch.effortRendered`) and every place the model that ran differs from the one bound
+ * (`launch.modelDrift`, provider-adapter.mjs's model check). Unchanged when neither applies.
  */
-function withLaunchProvenance(policy, { reasoningEffort, modelWarnings = [] } = {}) {
+function withLaunchFacts(policy, { reasoningEffort, modelWarnings = [] } = {}) {
   if (!reasoningEffort && modelWarnings.length === 0) return policy;
-  const provenance = { ...(policy.provenance ?? {}) };
-  if (reasoningEffort) {
-    provenance.reasoningEffort = { ...(provenance.reasoningEffort ?? {}), rendered: reasoningEffort };
-  }
-  if (modelWarnings.length > 0) {
-    provenance.modelDrift = { value: modelWarnings, source: 'launch-and-provider-output' };
-  }
-  return { ...policy, provenance };
+  return {
+    ...policy,
+    launch: {
+      ...(reasoningEffort ? { effortRendered: reasoningEffort } : {}),
+      ...(modelWarnings.length > 0 ? { modelDrift: modelWarnings } : {}),
+    },
+  };
 }
 
 /**
@@ -842,7 +841,7 @@ export async function settleRunOutcome({
       ...(Array.isArray(dispatchWarnings) ? dispatchWarnings : []),
     ],
     role: assignment?.role ?? null,
-    ...(effectivePolicy ? { policy: withLaunchProvenance(effectivePolicy, { reasoningEffort, modelWarnings }), executorRedirected } : {}),
+    ...(effectivePolicy ? { policy: withLaunchFacts(effectivePolicy, { reasoningEffort, modelWarnings }), executorRedirected } : {}),
     settledAt,
     durationMs: durationOrNull,
     // The pinned input digests taken at launch; a run settled by recovery reads them from the

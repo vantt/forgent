@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "0b4061feaa5e380f6ab326a05cf5cabd32f6a5d964d8a62136a7f40ffc4708ea",
+  "payloadDigest": "5207327c21b2a08dcffe19c51f21af6f11ef6e783438d149913ca0d19f891025",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -1027,7 +1027,7 @@
     "src/runner/dispatch/llm-accounts.mjs": "f8d1015b1e9adab52286ef2a871db21c66811ecb9b31c17f1074e34a75b63343",
     "src/runner/dispatch/mechanism.mjs": "8f272b51172f4b3f15418b43242d8b877ea4ed0ac974890bd7fd991ca3d87afe",
     "src/runner/dispatch/operation-prompt-templates.mjs": "f128377b2fd78aab9d9ac50a2fa1ff384ee92cb8b76724254fa8cabc6ab97261",
-    "src/runner/dispatch/plan.mjs": "2194ec22b63be1c092f60a0bbc622cbbc5e06ae746cd7a99187cc823d79340fd",
+    "src/runner/dispatch/plan.mjs": "7e0b46cc5a12c6a1fefeb024fd43281e6e2c4300f20e5a48439c6bcb4532f9b2",
     "src/runner/dispatch/provider-account-probe.mjs": "a03e323fc49fe2fc42c07e03d19c4a86a722435a0e343af55ff8ef52f6260295",
     "src/runner/dispatch/provider-adapter.mjs": "152397dc861d56dd0ed40d35d569401236979dd37eb989602a1dd472e57c3290",
     "src/runner/dispatch/provider-auth-failure.mjs": "ad3d07cc29e54f6758694ed861afbf66fa30e6568905e9f9383ac7b6943f19f7",
@@ -1043,7 +1043,7 @@
     "src/runner/dispatch/run-timeout.mjs": "9d0bb5adca999cf689b8a0c6dce0cfc28f122de1393785fcb620f6f669086d40",
     "src/runner/dispatch/runner-config-error.mjs": "9671bbf3bd275167e8611ae5abe909c87e699a6583e7b7e7c2d519ee013d1c0e",
     "src/runner/dispatch/runtime-inspection.mjs": "b536d9b4fdfd9480915b6c84b8035b5345c9007f94e5b213361230f98f3f94e1",
-    "src/runner/dispatch/settlement.mjs": "d7b3ba57e08800f667012ff2e58cba8630694fce5c78933ad3f0c04a0676b719",
+    "src/runner/dispatch/settlement.mjs": "2f2a97be3418252a48c584bcb3d24e2b78983be8b2a7f554772ff9cd61a42eb8",
     "src/runner/dispatch/shipped-catalog.mjs": "ceb40e02a773598eebe4fc8db48e7400bfb76ce938df20268ce166f0539b8025",
     "src/runner/dispatch/stop-processes-inside.mjs": "018abac624d8a4f10d5ad6209db9f765134ce4e304688897df076dfa99e2864e",
     "src/runner/dispatch/terminal-slot.mjs": "a997ce7a1f76c280776e9da30ff1431a537f16094ff89560cd079a8010bcfdd5",

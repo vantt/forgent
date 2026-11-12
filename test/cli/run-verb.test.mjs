@@ -346,6 +346,15 @@ test('fgos run keeps --timeout: it raises no tier', () => {
 
 
 
+test('--json hands the user each attempt\'s binding with the provenance Seat Binding recorded, unchanged', () => {
+  const tmp = setupTestRepo();
+  const out = JSON.parse(runCli(['Port the parser', '--capability', 'docs:write', '--json', '--dir', tmp], tmp));
+  const results = out.data.results;
+  assert.ok(results.length > 0);
+  const recorded = unitRecordOf(tmp, JSON.stringify(out.data, null, 2)).bindings['producer/1'].map((attempt) => attempt.binding);
+  assert.deepEqual(results.map((r) => r.binding.provenance), recorded.map((b) => b.provenance));
+});
+
 test('a run records tier and model with the source Seat Binding gave them, never the dispatch door\'s override label', () => {
   const tmp = setupTestRepo();
   const stdout = runCli(['Port the parser', '--capability', 'docs:write', '--timeout', '90m', '--dir', tmp], tmp);

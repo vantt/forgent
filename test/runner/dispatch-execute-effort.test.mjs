@@ -171,10 +171,10 @@ console.log('All good');
   assert.equal(result.status, 'done', JSON.stringify(result));
   const argv = spawnedArgv(root);
   assert.deepEqual(argv.slice(0, 5), ['exec', '-c', 'model_reasoning_effort=high', '--model', 'asked-model']);
-  // The receipt records what the launch did as provenance of the policy it ran under.
+  // The receipt records what the launch did under `launch`, beside the provenance of the policy it ran under.
   assert.equal(result.policy.provenance.reasoningEffort.value, 'high');
-  assert.equal(result.policy.provenance.reasoningEffort.rendered.native, 'high');
-  assert.deepEqual(result.policy.provenance.modelDrift.value.map((w) => w.code), ['model-reported-different']);
+  assert.equal(result.policy.launch.effortRendered.native, 'high');
+  assert.deepEqual(result.policy.launch.modelDrift.map((w) => w.code), ['model-reported-different']);
   assert.equal(result.reasoningEffort, undefined);
   assert.equal(result.modelWarnings, undefined);
 });
@@ -354,8 +354,8 @@ test('one settled run keeps effort and model drift provenance beside a correlate
   const stored = JSON.parse(fs.readFileSync(path.join(runDir, 'result.json'), 'utf8'));
   for (const r of [runResult, stored]) {
     assert.equal(r.policy.provenance.reasoningEffort.value, 'high');
-    assert.equal(r.policy.provenance.reasoningEffort.rendered, 'high');
-    assert.ok(r.policy.provenance.modelDrift, 'model drift recorded');
+    assert.equal(r.policy.launch.effortRendered, 'high');
+    assert.ok(r.policy.launch.modelDrift, 'model drift recorded');
     assert.ok(r.warnings.some((w) => w.code === 'read-only-mutation-correlated'));
     assert.equal(r.confinement, 'bwrap');
   }
