@@ -10,7 +10,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { computeArtifactDigest, hashFile } from '../../scripts/build-rust-distribution.mjs';
-import { useReleaseFixture, fixture, runFgctlRaw } from './fgctl-init-fixture.mjs';
+import { useReleaseFixture, fixture, runFgctl, runFgctlRaw } from './fgctl-init-fixture.mjs';
 
 useReleaseFixture();
 
@@ -178,5 +178,31 @@ test('status ends with one line naming the active release, or the command to run
     runFgctlRaw(['init', '--from', fixture.releaseDir], { cwd: proj, stateHome: state, env });
     const active = runFgctlRaw(['status'], { cwd: proj, stateHome: state, env });
     assert.equal(active.stdout.trim().split('\n').pop(), `active ${fixture.digest.slice(7, 19)}`);
+  });
+});
+
+test('repair keeps the release tag the committed pin already names', () => {
+  withProject(({ home, state, proj }) => {
+    const env = { HOME: home };
+    fs.mkdirSync(path.join(proj, '.fgos'), { recursive: true });
+    const pinPath = path.join(proj, '.fgos', 'distribution.json');
+    const pin = { schemaVersion: 1, projectRuntime: { policy: 'exact-digest', artifactDigest: fixture.digest, releaseVersion: 'v1.2.0', channel: null, allowPrerelease: false } };
+    fs.writeFileSync(pinPath, JSON.stringify(pin));
+    const init = runFgctl(['init', '--from', fixture.releaseDir], { cwd: proj, stateHome: state, env });
+    assert.equal(init.status, 0, init.stderr);
+    assert.equal(JSON.parse(fs.readFileSync(pinPath, 'utf8')).projectRuntime.releaseVersion, 'v1.2.0', 'precondition: init keeps the tag');
+    const repaired = runFgctl(['repair'], { cwd: proj, stateHome: state, env });
+    assert.equal(repaired.status, 0, repaired.stderr);
+    assert.deepEqual(JSON.parse(fs.readFileSync(pinPath, 'utf8')), pin, 'repair re-publishes the same release, so the pin stays as committed');
+  });
+});
+
+test('an upgrade to the release that is already active names the active release digest in its up-to-date line', () => {
+  withProject(({ home, state, proj }) => {
+    const env = { HOME: home };
+    runFgctl(['init', '--from', fixture.releaseDir], { cwd: proj, stateHome: state, env });
+    const res = runFgctl(['upgrade', '--from', fixture.releaseDir], { cwd: proj, stateHome: state, env });
+    assert.match(res.stderr, /^fgctl: up to date with the release \(/m, res.stderr);
+    assert.match(res.stderr, new RegExp(`^fgctl: up to date with the release \\(${fixture.digest.slice(7, 19)}\\)$`, 'm'), res.stderr);
   });
 });

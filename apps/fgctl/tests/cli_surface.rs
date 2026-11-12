@@ -94,6 +94,43 @@ fn every_verb_answers_help_on_stdout_with_exit_zero() {
     }
 }
 
+/// The status numbers of the one exit-code table every Rust door reads, taken
+/// from the file itself so the help text is checked against the table and not
+/// against a copy.
+fn exit_code_table() -> (i64, i64) {
+    let path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../packages/host-runtime/contracts/exit-codes.v1.json"
+    );
+    let table: serde_json::Value =
+        serde_json::from_str(&std::fs::read_to_string(path).expect("exit-code table"))
+            .expect("exit-code table json");
+    let code = |name: &str| table["categories"][name].as_i64().expect(name);
+    (code("precondition"), code("validation"))
+}
+
+#[test]
+fn help_names_the_exit_codes_the_table_gives_to_not_ready_and_an_unreadable_pin() {
+    let dir = Scratch::new("exit-codes");
+    let (precondition, validation) = exit_code_table();
+    let not_ready = format!("{precondition} usage error, or activated but not ready");
+    let unreadable_pin = format!("{validation} unreadable pin");
+
+    let overview = text(&fgctl(dir.path(), &["--help"]).stdout);
+    assert!(
+        overview.contains(&format!("{precondition} usage error or not ready")),
+        "{overview}"
+    );
+    assert!(overview.contains(&unreadable_pin), "{overview}");
+
+    let init = text(&fgctl(dir.path(), &["init", "--help"]).stdout);
+    assert!(init.contains(&not_ready), "{init}");
+    assert!(init.contains(&unreadable_pin), "{init}");
+
+    let upgrade = text(&fgctl(dir.path(), &["upgrade", "--help"]).stdout);
+    assert!(upgrade.contains(&not_ready), "{upgrade}");
+}
+
 #[test]
 fn unknown_verb_exits_two_and_suggests_the_closest_verb() {
     let dir = Scratch::new("unknown-verb");
