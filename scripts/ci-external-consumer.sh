@@ -169,6 +169,17 @@ if [ "$INIT_STATUS" -ne 0 ] && [ "$INIT_STATUS" -ne 2 ]; then
   exit 1
 fi
 
+# The release manifest's artifactDigest inside an fgos archive (empty when unreadable).
+archive_manifest_digest() {
+  (tar -xzf "$1" ./manifest.json -O 2>/dev/null || tar -xzf "$1" manifest.json -O 2>/dev/null) | node -e '
+    let d = "";
+    process.stdin.on("data", c => d += c);
+    process.stdin.on("end", () => {
+      try { console.log(JSON.parse(d).artifactDigest || ""); } catch { console.log(""); }
+    });
+  '
+}
+
 # fgos version --runtime-json and assertion
 VERSION_OUTPUT="$(
   cd "$TEMP_PROJECT" &&
@@ -214,13 +225,7 @@ fi
 # equal the SHA256SUMS record above -- it is compared against the same
 # archive's own manifest.json instead. This is only trustworthy because
 # Gate 1 already proved these archive bytes are authentic.
-MANIFEST_DIGEST="$( (tar -xzf "$FGOS_TARBALL" ./manifest.json -O 2>/dev/null || tar -xzf "$FGOS_TARBALL" manifest.json -O 2>/dev/null) | node -e '
-  let d = "";
-  process.stdin.on("data", c => d += c);
-  process.stdin.on("end", () => {
-    try { console.log(JSON.parse(d).artifactDigest || ""); } catch { console.log(""); }
-  });
-')"
+MANIFEST_DIGEST="$(archive_manifest_digest "$FGOS_TARBALL")"
 
 node -e '
   const versionJson = JSON.parse(process.argv[1]);
@@ -256,6 +261,25 @@ node -e '
   .fgos/installation/bin/fgos ready --json >/dev/null
 ) || {
   echo "Step failed: .fgos/installation/bin/fgos ready --json" >&2
+  exit 1
+}
+
+# fgos doctor --json on a clean runner (no agent CLI, no global config), with fgctl on PATH as
+# the installer tells a consumer to put it: the report must be ok. Warnings are allowed, a
+# failing row is not. The exit code stays 0, so read `data.ok`.
+DOCTOR_JSON="$(cd "$TEMP_PROJECT" && PATH="$TEMP_INSTALL_DIR:$PATH" .fgos/installation/bin/fgos doctor --json)" || {
+  echo "Step failed: .fgos/installation/bin/fgos doctor --json" >&2
+  exit 1
+}
+node -e '
+  const report = JSON.parse(process.argv[1]).data;
+  if (report?.ok !== true) {
+    const failing = (report?.checks || []).filter((row) => row.status === "fail").map((row) => `${row.id}: ${row.message}`);
+    console.error(`Assertion failed: fgos doctor --json data.ok is ${report?.ok}; failing rows: ${JSON.stringify(failing, null, 2)}; next: ${JSON.stringify(report?.next)}`);
+    process.exit(1);
+  }
+' "$DOCTOR_JSON" || {
+  echo "Step failed: fgos doctor --json must report ok: true on a clean runner" >&2
   exit 1
 }
 
@@ -302,6 +326,177 @@ fi
   echo "Step failed: fgctl verify" >&2
   exit 1
 }
+
+# ---- upgrade from the previous release ----------------------------------------------------
+# A real consumer upgrades from what they have installed, not from the same bytes. The previous
+# published release is resolved by semver (scripts/previous-release-tag.mjs), its own assets and
+# installer are downloaded, and the candidate built in this run upgrades a project on it.
+# Only a runner with no `gh` outside CI skips; in CI a resolution or download error fails the proof.
+if [ -z "${CI:-}" ] && ! command -v gh >/dev/null 2>&1; then
+  echo "Skipping the upgrade-from-previous-release proof: gh is not installed (CI always runs it)."
+else
+  PREV_STATUS=0
+  PREV_TAG="$(node "$SCRIPT_DIR/previous-release-tag.mjs" --candidate "$FGCTL_TAG")" || PREV_STATUS=$?
+  if [ "$PREV_STATUS" -eq 3 ]; then
+    echo "Skipping the upgrade-from-previous-release proof: no release earlier than $FGCTL_TAG exists."
+  elif [ "$PREV_STATUS" -ne 0 ] || [ -z "$PREV_TAG" ]; then
+    echo "Step failed: resolving the previous release (exit $PREV_STATUS)" >&2
+    exit 1
+  else
+    PREV_TARGET="x86_64-unknown-linux-gnu"
+    echo "Upgrade proof: previous release $PREV_TAG -> candidate $FGCTL_TAG"
+    if [ "$PREV_TAG" = "$FGCTL_TAG" ]; then
+      echo "Step failed: the previous release resolved to the candidate itself ($PREV_TAG)" >&2
+      exit 1
+    fi
+
+    PREV_DIR="$TMP_BASE/previous-release"
+    mkdir -p "$PREV_DIR"
+    set -- --dir "$PREV_DIR" \
+      --pattern "fgos-$PREV_TAG-$PREV_TARGET.tar.gz" --pattern "fgctl-$PREV_TAG-$PREV_TARGET.tar.gz" \
+      --pattern SHA256SUMS --pattern install.sh
+    if [ -n "${GITHUB_REPOSITORY:-}" ]; then set -- "$@" --repo "$GITHUB_REPOSITORY"; fi
+    gh release download "$PREV_TAG" "$@" || {
+      echo "Step failed: downloading the $PREV_TAG assets" >&2
+      exit 1
+    }
+    (cd "$PREV_DIR" && sha256sum --check --ignore-missing SHA256SUMS >/dev/null) || {
+      echo "Step failed: the downloaded $PREV_TAG assets do not match its SHA256SUMS" >&2
+      exit 1
+    }
+    PREV_FGOS_TARBALL="$PREV_DIR/fgos-$PREV_TAG-$PREV_TARGET.tar.gz"
+    PREV_MANIFEST_DIGEST="$(archive_manifest_digest "$PREV_FGOS_TARBALL")"
+    if [ -z "$PREV_MANIFEST_DIGEST" ] || [ "$PREV_MANIFEST_DIGEST" = "$MANIFEST_DIGEST" ]; then
+      echo "Step failed: the previous release ($PREV_TAG, '$PREV_MANIFEST_DIGEST') must be a different artifact from the candidate ('$MANIFEST_DIGEST')" >&2
+      exit 1
+    fi
+
+    # Install the previous fgctl with the previous release's own installer.
+    node "$SCRIPT_DIR/ci-asset-server.mjs" "$PREV_DIR" "$TMP_BASE/prev-port" &
+    PREV_SERVER_PID=$!
+    PREV_PORT=""
+    for _ in $(seq 1 50); do
+      if [ -s "$TMP_BASE/prev-port" ]; then PREV_PORT="$(head -n 1 "$TMP_BASE/prev-port")"; break; fi
+      sleep 0.1
+    done
+    [ -n "$PREV_PORT" ] || { kill "$PREV_SERVER_PID" 2>/dev/null || true; echo "Step failed: starting the previous-release asset server" >&2; exit 1; }
+    PREV_INSTALL_DIR="$TMP_BASE/prev-install"
+    mkdir -p "$PREV_INSTALL_DIR"
+    FGCTL_ASSET_BASE_URL="http://127.0.0.1:$PREV_PORT" FGCTL_INSTALL_DIR="$PREV_INSTALL_DIR" FGCTL_VERSION="$PREV_TAG" \
+      sh "$PREV_DIR/install.sh" || {
+      kill "$PREV_SERVER_PID" 2>/dev/null || true
+      echo "Step failed: install.sh of $PREV_TAG" >&2
+      exit 1
+    }
+    kill "$PREV_SERVER_PID" 2>/dev/null || true
+    wait "$PREV_SERVER_PID" 2>/dev/null || true
+
+    UPGRADE_PROJECT="$TMP_BASE/upgrade-project"
+    mkdir -p "$UPGRADE_PROJECT"
+    node "$SANDBOX_GIT" --root "$TMP_BASE" -- init -q "$UPGRADE_PROJECT" || {
+      echo "Step failed: git init in the upgrade project" >&2
+      exit 1
+    }
+    (cd "$UPGRADE_PROJECT" && "$PREV_INSTALL_DIR/fgctl" init --from "$PREV_FGOS_TARBALL") || {
+      echo "Step failed: $PREV_TAG fgctl init --from its own fgos asset" >&2
+      exit 1
+    }
+    UPGRADE_ACT="$UPGRADE_PROJECT/.fgos/installation/activation.json"
+    BEFORE_DIGEST="$(node -pe 'JSON.parse(fs.readFileSync(process.argv[1])).artifactDigest' "$UPGRADE_ACT")"
+    if [ "${BEFORE_DIGEST#sha256:}" != "${PREV_MANIFEST_DIGEST#sha256:}" ]; then
+      echo "Step failed: the project is not on the $PREV_TAG artifact (activation $BEFORE_DIGEST, asset $PREV_MANIFEST_DIGEST)" >&2
+      exit 1
+    fi
+
+    # The project's own config (the file the previous release's init wrote) must survive the
+    # upgrade byte for byte; a previous release that wrote none is a broken proof, not a skip.
+    UPGRADE_CONFIG=""
+    for name in config.yaml config.json; do
+      if [ -z "$UPGRADE_CONFIG" ] && [ -f "$UPGRADE_PROJECT/.fgos/$name" ]; then UPGRADE_CONFIG="$UPGRADE_PROJECT/.fgos/$name"; fi
+    done
+    if [ -z "$UPGRADE_CONFIG" ]; then
+      echo "Step failed: $PREV_TAG fgctl init left no .fgos/config.yaml or config.json to prove survival with" >&2
+      exit 1
+    fi
+    CONFIG_BEFORE="$(sha256sum "$UPGRADE_CONFIG" | awk '{ print $1 }')"
+
+    (cd "$UPGRADE_PROJECT" && "$FGCTL_BIN" upgrade --from "$FGOS_TARBALL") || {
+      echo "Step failed: candidate fgctl upgrade --from the candidate asset, on a $PREV_TAG project" >&2
+      exit 1
+    }
+    AFTER_DIGEST="$(node -pe 'JSON.parse(fs.readFileSync(process.argv[1])).artifactDigest' "$UPGRADE_ACT")"
+    AFTER_PREV="$(node -pe 'JSON.parse(fs.readFileSync(process.argv[1])).previousArtifactDigest ?? "null"' "$UPGRADE_ACT")"
+    if [ "${AFTER_DIGEST#sha256:}" != "${MANIFEST_DIGEST#sha256:}" ] || [ "$AFTER_DIGEST" = "$BEFORE_DIGEST" ]; then
+      echo "Step failed: upgrade from $PREV_TAG did not activate the candidate (before $BEFORE_DIGEST, after $AFTER_DIGEST, candidate $MANIFEST_DIGEST)" >&2
+      exit 1
+    fi
+    if [ "$AFTER_PREV" != "$BEFORE_DIGEST" ]; then
+      echo "Step failed: previousArtifactDigest after the upgrade is $AFTER_PREV, expected $BEFORE_DIGEST" >&2
+      exit 1
+    fi
+    CONFIG_AFTER="$(sha256sum "$UPGRADE_CONFIG" | awk '{ print $1 }')"
+    if [ "$CONFIG_BEFORE" != "$CONFIG_AFTER" ]; then
+      echo "Step failed: the project's $UPGRADE_CONFIG changed during the upgrade from $PREV_TAG" >&2
+      exit 1
+    fi
+    (cd "$UPGRADE_PROJECT" && .fgos/installation/bin/fgos version --runtime-json >/dev/null) || {
+      echo "Step failed: the upgraded project's fgos does not run" >&2
+      exit 1
+    }
+    (cd "$UPGRADE_PROJECT" && "$FGCTL_BIN" verify) || {
+      echo "Step failed: fgctl verify on the project upgraded from $PREV_TAG" >&2
+      exit 1
+    }
+    # The upgraded project reads its legacy config with no config row failing (no manual migration).
+    UPGRADE_DOCTOR="$(cd "$UPGRADE_PROJECT" && PATH="$TEMP_INSTALL_DIR:$PATH" .fgos/installation/bin/fgos doctor --json)" || {
+      echo "Step failed: fgos doctor --json on the project upgraded from $PREV_TAG" >&2
+      exit 1
+    }
+    node -e '
+      const failing = (JSON.parse(process.argv[1]).data?.checks || []).filter((row) => row.status === "fail" && /^config-/.test(row.id));
+      if (failing.length) {
+        console.error(`Assertion failed: config rows fail after the upgrade: ${failing.map((row) => `${row.id}: ${row.message}`).join(" | ")}`);
+        process.exit(1);
+      }
+    ' "$UPGRADE_DOCTOR" || {
+      echo "Step failed: the project upgraded from $PREV_TAG needs a manual config migration" >&2
+      exit 1
+    }
+    echo "Upgrade proof passed: $PREV_TAG ($BEFORE_DIGEST) -> $FGCTL_TAG ($AFTER_DIGEST), config kept."
+  fi
+fi
+
+# ---- uninstall ------------------------------------------------------------------------------
+# Last, because it takes the installation away. The plan changes nothing; --yes removes what
+# fgOS installed and keeps the project's config and data.
+(cd "$TEMP_PROJECT" && "$FGCTL_BIN" uninstall --dry-run >/dev/null) || {
+  echo "Step failed: fgctl uninstall --dry-run" >&2
+  exit 1
+}
+if [ ! -d "$TEMP_PROJECT/.fgos/installation" ]; then
+  echo "Step failed: fgctl uninstall --dry-run removed the installation" >&2
+  exit 1
+fi
+printf '# consumer proof config marker\n' >> "$TEMP_PROJECT/.fgos/config.yaml"
+(cd "$TEMP_PROJECT" && "$FGCTL_BIN" uninstall --yes) || {
+  echo "Step failed: fgctl uninstall --yes" >&2
+  exit 1
+}
+if [ -e "$TEMP_PROJECT/.fgos/installation" ]; then
+  echo "Step failed: .fgos/installation is still there after fgctl uninstall --yes" >&2
+  exit 1
+fi
+for kept in .fgos/config.yaml .fgos/distribution.json; do
+  if [ ! -f "$TEMP_PROJECT/$kept" ]; then
+    echo "Step failed: fgctl uninstall removed $kept, which it must keep" >&2
+    exit 1
+  fi
+done
+set -- "$TEMP_PROJECT"/.fgos/uninstall-backup-*/activation.json
+if [ ! -f "$1" ]; then
+  echo "Step failed: fgctl uninstall left no backup of the activation record" >&2
+  exit 1
+fi
 
 echo "All external consumer proof steps passed successfully."
 exit 0
