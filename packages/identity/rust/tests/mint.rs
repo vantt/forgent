@@ -19,7 +19,7 @@ fn scratch(label: &str) -> PathBuf {
         NEXT.fetch_add(1, Ordering::Relaxed)
     ));
     fs::create_dir_all(&dir).unwrap();
-    fs::canonicalize(dir).unwrap()
+    fgos_git::plain_path(&fs::canonicalize(dir).unwrap())
 }
 
 fn git(dir: &Path, args: &[&str]) -> String {
