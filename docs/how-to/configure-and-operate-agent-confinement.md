@@ -161,7 +161,7 @@ Output includes seven dedicated confinement checks:
 | Check ID | Description | Healthy Outcome | Remediation |
 |---|---|---|---|
 | `confinement-backend-registry-readable` | Machine backend registry exists and validates | `machine backend registry valid at ~/.fgos/confinement-backends.json` | Run `fgos doctor --fix` |
-| `confinement-bwrap-platform` | Linux host has a functional `bwrap` executable | `bwrap backend status: ready (Linux, binary "/usr/bin/bwrap" working, enabled)` | Install `bubblewrap` package (`apt install bubblewrap`) |
+| `confinement-bwrap-platform` | Linux host has a functional `bwrap` executable | `bwrap backend status: ready (Linux, binary "/usr/bin/bwrap" working, enabled)` | Install `bubblewrap` (`apt install bubblewrap`); on Ubuntu 24.04+ also allow unprivileged user namespaces, see the install guide section 4.4.1 |
 | `confinement-probe-freshness` | 8 falsification probes confirm allowed vs denied behaviors | `confinement probe freshness: all 8 local-bwrap-v1 probes passed (fresh)` | Run probes to refresh cached fingerprint |
 | `confinement-blind-read` | A blind unit can be enforced: a worker under `hostRead: blind` cannot read a peer run, home or process | `blind-read: pass (a blind worker cannot read a peer run, home or process)`; `blind-read: backend-unsupported (...)` when no bwrap backend is usable, so blind units are refused | Fix bwrap as for `confinement-bwrap-platform`; on `fail` the message shows what the worker could still read |
 | `confinement-policies-declared` | All referenced capability policies exist | `all capability confinement policies are declared` | Declare missing policy in `runner.confinementPolicies` |
