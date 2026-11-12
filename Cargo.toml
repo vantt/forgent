@@ -47,6 +47,8 @@ strip = "symbols"
 [workspace.package]
 version = "0.2.0"
 edition = "2021"
+# Cargo refuses an older compiler with a named error; keep in step with rust-toolchain.toml.
+rust-version = "1.99"
 
 [workspace.dependencies]
 tokio = { version = "=1.53.3", default-features = false, features = ["rt", "macros", "time"] }

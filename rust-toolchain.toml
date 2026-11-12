@@ -1,0 +1,8 @@
+# The one compiler every fgOS Rust build uses: local, CI, release assets and the owner machine.
+# rustup reads this file and installs the channel on first build. Cross triples (windows-msvc,
+# aarch64-apple-darwin) are added with `rustup` where a job needs them, not listed here.
+# Raise it together with `rust-version` in the root Cargo.toml.
+[toolchain]
+channel = "1.99.0"
+components = ["clippy", "rustfmt"]
+profile = "minimal"

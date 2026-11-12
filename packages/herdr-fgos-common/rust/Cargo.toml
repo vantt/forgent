@@ -2,6 +2,7 @@
 name = "herdr-fgos-common"
 version.workspace = true
 edition.workspace = true
+rust-version.workspace = true
 
 [lib]
 name = "herdr_fgos_common"

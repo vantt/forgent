@@ -2,6 +2,7 @@
 name = "fgos-distribution"
 version.workspace = true
 edition.workspace = true
+rust-version.workspace = true
 
 [dependencies]
 semver = "1"

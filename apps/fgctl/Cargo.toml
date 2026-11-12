@@ -2,6 +2,7 @@
 name = "fgctl"
 version.workspace = true
 edition.workspace = true
+rust-version.workspace = true
 
 [dependencies]
 fgos-distribution = { path = "../../packages/distribution/rust" }

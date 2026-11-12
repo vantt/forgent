@@ -2,6 +2,7 @@
 name = "fgos-observe"
 version.workspace = true
 edition.workspace = true
+rust-version.workspace = true
 
 [dependencies]
 fgos-host-runtime = { path = "../../host-runtime/rust" }

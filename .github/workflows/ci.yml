@@ -115,10 +115,11 @@ jobs:
   # not a shipped cross-platform artifact, so per-OS proof would buy nothing
   # for the runtime cost. Widen it the day the crate is actually distributed.
   #
-  # No toolchain action: ubuntu-latest ships a working Rust toolchain, so the
+  # No toolchain action: rust-toolchain.toml at the repo root pins the compiler
+  # and the runner's own rustup installs it (`rustup toolchain install`), so the
   # job needs no third-party action beyond the checkout this repo already
-  # trusts. `rustup show` fails loudly if that ever stops being true, instead
-  # of letting a missing toolchain read as a passing job.
+  # trusts. A failed install fails the step instead of letting a missing or
+  # older toolchain read as a passing job.
   selector-plan:
     name: selector-plan
     if: ${{ !inputs.release-gate }}
@@ -270,15 +271,18 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Show Rust toolchain
-        run: rustup show && cargo --version
+        run: |
+          rustup toolchain install
+          rustup show
+          cargo --version
 
       - name: cargo test
         run: cargo test --locked --manifest-path herdr-dashboard/Cargo.toml
 
   # One OS, no toolchain action, same reasoning as the herdr-plugin job just
-  # above: x86_64-unknown-linux-gnu is the only target this track's Decisions
-  # table covers (plan.md), and ubuntu-latest's preinstalled toolchain is
-  # trusted the same way herdr-plugin's job already trusts it.
+  # above: x86_64-unknown-linux-gnu is the only triple this track's Decisions
+  # table covers (plan.md), and the compiler is the one rust-toolchain.toml
+  # pins, installed by the runner's rustup.
   rust-workspace:
     name: cargo (workspace)
     runs-on: ubuntu-latest
@@ -287,7 +291,10 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Show Rust toolchain
-        run: rustup show && cargo --version
+        run: |
+          rustup toolchain install
+          rustup show
+          cargo --version
 
       - name: cargo fmt
         run: cargo fmt --all -- --check
@@ -314,7 +321,10 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Show Rust toolchain
-        run: rustup show && cargo --version
+        run: |
+          rustup toolchain install
+          rustup show
+          cargo --version
 
       - uses: actions/setup-node@v4
         with:

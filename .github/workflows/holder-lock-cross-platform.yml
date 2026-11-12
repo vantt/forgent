@@ -40,7 +40,10 @@ jobs:
           cache: npm
 
       - name: Rust toolchain
-        run: rustup show
+        run: |
+          rustup toolchain install
+          rustup show
+          cargo --version
 
       - name: Install dependencies
         run: npm install
@@ -101,7 +104,10 @@ jobs:
           node-version: '24'
 
       - name: Rust toolchain
-        run: rustup show
+        run: |
+          rustup toolchain install
+          rustup show
+          cargo --version
 
       - name: Build the host binary and the stress test
         run: |
