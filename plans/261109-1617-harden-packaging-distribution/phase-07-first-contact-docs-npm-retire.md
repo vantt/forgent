@@ -1,7 +1,7 @@
 ---
 phase: 07
 title: "First-contact docs: README promise and three-command quick start, Node note, the npm channel retired (H14), docs agree with the code"
-status: pending
+status: completed
 depends_on: ["P04, P06, P08, P10 landed (the text must match what the tools print)"]
 parallel: "group G5 with P12"
 effort: ~0.5d
