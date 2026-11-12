@@ -13,7 +13,8 @@ fn hash(bytes: &[u8]) -> String {
 }
 fn candidate(root: &Path, wal: bool) {
     use std::os::unix::fs::PermissionsExt;
-    let host = b"#!/bin/sh\nexit 0\n";
+    // The tail's last call, `doctor --json`, must answer with a doctor result.
+    let host = b"#!/bin/sh\ncase \"$*\" in *--json*) echo '{\"data\":{\"ok\":true,\"next\":[],\"checks\":[]}}';; esac\nexit 0\n";
     let legacy = b"console.log('fixture');\n";
     fs::create_dir_all(root.join("bin")).unwrap();
     fs::create_dir_all(root.join("libexec/legacy-node/bin")).unwrap();
