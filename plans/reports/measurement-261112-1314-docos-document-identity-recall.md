@@ -126,6 +126,28 @@ Paired: B right and A wrong in 6 cases, A right and B wrong in 1 (c09, where B g
 
 **Next measurement proposed:** arm C = arm B plus the write-door rule text, on the same 26 cases, to see how much of the remaining 7 errors the rule removes.
 
+## 8. Arm C: the same path plus the write-door rule (2026-11-12, evening)
+
+Arm C is arm B with four rule lines added to the brief: grow by default (a new wording, example, cause or follow-up fix is the same subject); create only with one sentence on why no candidate covers the subject; a different kind of question (why against how-to) may be a separate document if said so; never put a new subject into a large general specification for shared words. The agent also returns a reason and a `question_kind_differs` flag.
+
+| | A (grep) | B (pkm + OHS) | C (B + rule) |
+|---|---|---|---|
+| Duplicate cases right | 12 / 20 | 15 / 20 | 14 / 20 |
+| New cases right | 1 / 6 | 4 / 6 | 4 / 6 |
+| All right | 50% | **73%** | 69% (73% if the one case flagged as a different question kind is accepted) |
+| Tokens per run | 111,605 | 101,296 | 102,707 |
+| Wall time per run | 20.9 s | 24.8 s | 33.4 s |
+
+**The rule text added nothing measurable; it moved the errors.** "Found but created" fell, and "grew into a related but wrong document" rose: c09, c15 and c20 grew a neighbouring document after reading the rule's "a follow-up fix is the same subject".
+
+**Several remaining errors are arguable labels, not clear mistakes.** n04 (dark mode for the web dashboard) grew the dashboard document's visual-language section; n03 (a Python client) grew the participant contract that says how a non-Node client talks to fgOS; c12 split a "why" explanation from a "how-to". A reasonable reviewer could accept each. The trial has reached the limit of what one reviewer's labels can tell apart.
+
+**Conclusion of the three arms.**
+
+1. The measurable gain comes from locating through the one door (pkm with OHS): 50% to 73% right decisions, and about 10,000 fewer tokens per write.
+2. More rule prose in the brief does not raise it further. What remains is judgement on borderline subjects, which is the job of the independent reviewer in admission, and later of the observer's merge proposals; not of more instructions to the writer.
+3. Further synthetic trials need a second, independent labeller first, to know which remaining "errors" are real. The cheaper path is to build it and measure in use through the locate log (document identity, section 8.5).
+
 ## Appendix: gold set
 
 - g01: Merge blocked as fgos-write-rejected when a stale worker branch never touched .fgos/ but main changed it after the fork (the catchup/approve deadlock and the branchHeadAtTake trust fix).
