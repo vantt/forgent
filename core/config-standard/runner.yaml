@@ -40,6 +40,8 @@ runner:
             homeEnv: CLAUDE_CONFIG_DIR
             sessionDir: projects
             files: [".credentials.json"]
+          env:
+            CLAUDE_CODE_FORCE_SESSION_PERSISTENCE: "1"
           confinement:
             backend: bwrap
         - id: claude-herdr-bwrap
@@ -52,6 +54,8 @@ runner:
             homeEnv: CLAUDE_CONFIG_DIR
             sessionDir: projects
             files: [".credentials.json"]
+          env:
+            CLAUDE_CODE_FORCE_SESSION_PERSISTENCE: "1"
           confinement:
             backend: bwrap
           interactiveMode:

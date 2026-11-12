@@ -109,6 +109,7 @@ test('the standard gives each confined claude invocation its own login store in 
     assert.deepEqual(JSON.parse(JSON.stringify(store)), { use: 'claude', homeEnv: 'CLAUDE_CONFIG_DIR', sessionDir: 'projects', files: ['.credentials.json'] }, id);
     assert.equal(credentialStoreProblem(store), null, id);
     assert.equal(credentialLayout({ kind: 'home-files', home: '/h', files: store.files }), 'claude-config-credentials-json', `${id}: its login file is one a renewal can read`);
+    assert.equal(byId[id].env?.CLAUDE_CODE_FORCE_SESSION_PERSISTENCE, '1', `${id}: a seat started from a claude session still saves its transcript`);
   }
   assert.equal(credentialStoreOf({ ...byId['claude-cli'], command: 'claude' }), null);
 });
