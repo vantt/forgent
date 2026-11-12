@@ -1082,10 +1082,13 @@ test('verify passes but the worker changed nothing -> no commit, classified veri
 
 // --- spawn-fail: routed by the recovery matrix ----------------------------
 
-test('worker-spawn-fail: nonexistent executor -> retry per matrix, then park to blocked', async () => {
-  const { repoRoot, dir, worktreeDir } = setup();
+test('worker-spawn-fail: an executor the operating system cannot start -> retry per matrix, then park to blocked', async () => {
+  const { repoRoot, dir, scriptDir, worktreeDir } = setup();
   seedItem(dir, { id: 'item-nospawn' });
-  const config = DUMMY_CONFIG;
+  // An executable file whose interpreter is gone: bind finds the command, the operating system cannot start it.
+  const unstartable = path.join(scriptDir, 'unstartable');
+  fs.writeFileSync(unstartable, '#!/no/such/interpreter-xyz\n', { mode: 0o755 });
+  const config = { ...DUMMY_CONFIG, executor: { ...DUMMY_CONFIG.executor, command: unstartable } };
 
   const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
 

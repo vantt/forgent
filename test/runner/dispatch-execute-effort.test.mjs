@@ -286,12 +286,14 @@ test('fgos run --effort still reaches a role that a scoped --override does not n
   fs.writeFileSync(path.join(repo, '.gitignore'), '.fgos/\n');
   execFileSync('git', ['add', '.'], { cwd: repo });
   execFileSync('git', ['commit', '-q', '-m', 'initial'], { cwd: repo });
-  // No real CLI is ever launched: the effort check refuses before spawn, and the
-  // command does not exist if it were reached.
+  // No real CLI is ever launched: the effort check refuses before spawn, and the command is a stub that
+  // exits non-zero if it were reached.
+  const stub = path.join(makeFixtureDir('fgos-cli-effort-scoped-bin-'), 'claude');
+  fs.writeFileSync(stub, '#!/bin/sh\nexit 1\n', { mode: 0o755 });
   const runner = {
     defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
     modelPolicies: { claude: { standard: 'sonnet' } },
-    executors: { 'effort-agent': { kind: 'agent', providerModel: 'claude', supports: { reasoningEffort: ['low', 'medium', 'high'] }, invocations: [{ id: 'c', via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' }, command: '/nonexistent/claude', args: ['-p', '{prompt}'] }] } },
+    executors: { 'effort-agent': { kind: 'agent', providerModel: 'claude', supports: { reasoningEffort: ['low', 'medium', 'high'] }, invocations: [{ id: 'c', via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' }, command: stub, args: ['-p', '{prompt}'] }] } },
     capabilities: { 'docs:write': { prefer: [{ executor: 'effort-agent' }], rigor: 'standard', tier: 'standard' } },
   };
   fs.mkdirSync(path.join(repo, '.fgos'));

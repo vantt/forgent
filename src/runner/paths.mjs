@@ -261,6 +261,21 @@ export function findExecutableOnPath(candidateNames, pathEnv = process.env.PATH)
   return null;
 }
 
+/**
+ * Whether `command` can be started on this machine: a bare name resolves on PATH, a path (absolute or
+ * relative, any separator) names an executable file.
+ */
+export function isCommandAvailable(command, pathEnv = process.env.PATH) {
+  if (typeof command !== 'string' || command === '') return false;
+  if (!/[\\/]/.test(command)) return findExecutableOnPath([command], pathEnv) !== null;
+  try {
+    fs.accessSync(command, fs.constants.X_OK);
+    return !fs.statSync(command).isDirectory();
+  } catch {
+    return false;
+  }
+}
+
 export const DEFAULT_DOMAIN = 'coding';
 
 /** Resolve the file path for a task-spec (`specId`) belonging to `domain` (or `'core'`). */

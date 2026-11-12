@@ -10,9 +10,11 @@ import { ensureScriptAddon } from '../../../scripts/lib/git-ports.mjs';
 import { askFor, bind, BIND_CONTRACT_VERSION } from '../../../src/runner/execution/bind.mjs';
 import { createSeatLedger } from '../../../src/runner/execution/seat-ledger.mjs';
 import { seedFileLocalBwrapRegistry } from '../confinement-registry-fixture.helper.mjs';
+import { seedStubAgentClis } from '../agent-cli-fixture.helper.mjs';
 
 // posture filtering consults the machine backend registry; keep it file-local
 seedFileLocalBwrapRegistry();
+seedStubAgentClis('claude', 'codex', 'agy', 'duo', 'pi', 'omp', 'unknown-bin');
 ensureScriptAddon();
 
 function createMockRunnerConfig() {

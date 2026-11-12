@@ -13,7 +13,7 @@ import { AGENT_SKILL_DIRS } from '../util/agent-skill-dirs.mjs';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { resolveMainCheckoutRoot } from '../runner/paths.mjs';
+import { isCommandAvailable, resolveMainCheckoutRoot } from '../runner/paths.mjs';
 
 function loadOrExplain(cwd) {
   try {
@@ -48,11 +48,11 @@ export function checkExecutorFamilyUnique(cwd) {
 // only checked at project level.
 const CLI_USER_SKILL_DIRS = { claude: '.claude/skills', codex: '.agents/skills' };
 
-function invocationCliNames(entry) {
+function invocationCommands(entry) {
   const commands = Array.isArray(entry.invocations) && entry.invocations.length > 0
     ? entry.invocations.map(inv => inv?.command)
     : [entry.command];
-  return [...new Set(commands.filter(c => typeof c === 'string' && c !== '').map(c => path.basename(c)))];
+  return [...new Set(commands.filter(c => typeof c === 'string' && c !== ''))];
 }
 
 /** The state of one skill file: `ok` when it has content, `empty` when present with none, `missing` otherwise. */
@@ -80,11 +80,15 @@ export function checkExecutorSkillsInstalled(cwd) {
   const home = os.homedir();
   const missing = [];
   const unchecked = [];
+  const notInstalled = [];
   let checked = 0;
   for (const [id, entry] of Object.entries(runnerConfig.executors ?? {})) {
     const skills = entry?.supports?.skills;
     if (entry?.kind !== 'agent' || !Array.isArray(skills)) continue;
-    for (const cli of invocationCliNames(entry)) {
+    for (const command of invocationCommands(entry)) {
+      const cli = path.basename(command);
+      // A CLI this machine does not have is no runtime for its skills to be installed in.
+      if (!isCommandAvailable(command)) { notInstalled.push(`${id} (cli ${cli})`); continue; }
       const dir = AGENT_SKILL_DIRS[cli];
       if (!dir) { unchecked.push(`${id} (cli ${cli})`); continue; }
       for (const skill of skills) {
@@ -101,7 +105,8 @@ export function checkExecutorSkillsInstalled(cwd) {
     }
   }
   if (missing.length > 0) return { passed: false, message: missing.join('; ') };
-  const note = unchecked.length > 0 ? `; not checked, no known skill directory: ${unchecked.join(', ')}` : '';
+  const note = (unchecked.length > 0 ? `; not checked, no known skill directory: ${unchecked.join(', ')}` : '')
+    + (notInstalled.length > 0 ? `; skipped, CLI not installed: ${[...new Set(notInstalled)].join(', ')}` : '');
   return { passed: true, message: `${checked} declared executor skill(s) installed in the main checkout (a linked worktree gets skills only from worktreeSetup provisioning)${note}` };
 }
 

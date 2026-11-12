@@ -11,8 +11,10 @@ import path from 'node:path';
 
 import { bind } from '../../../src/runner/execution/bind.mjs';
 import { seedFileLocalBwrapRegistry } from '../confinement-registry-fixture.helper.mjs';
+import { seedStubAgentClis } from '../agent-cli-fixture.helper.mjs';
 
 seedFileLocalBwrapRegistry();
+seedStubAgentClis('claude', 'codex', 'omp', 'pi');
 
 // The project config names the pools its tier cells use; the account inventory that pays for
 // them lives in the machine-global config, so the test declares the one pool the cells name.

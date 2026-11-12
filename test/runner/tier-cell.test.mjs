@@ -14,8 +14,10 @@ import { RunnerConfigError } from '../../src/runner/dispatch/runner-config-error
 import { bind } from '../../src/runner/execution/bind.mjs';
 import { seedFileLocalBwrapRegistry } from './confinement-registry-fixture.helper.mjs';
 import { writeGlobalConfig, writeProjectConfig } from '../helpers/config-fixture.mjs';
+import { seedStubAgentClis } from './agent-cli-fixture.helper.mjs';
 
 seedFileLocalBwrapRegistry();
+seedStubAgentClis('claude', 'fam');
 
 test('a plain model is served by the pool named after its family', () => {
   assert.deepEqual(parseTierCell('sonnet', 'claude'), [{ model: 'sonnet', pool: 'claude', explicitPool: false }]);

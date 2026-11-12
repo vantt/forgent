@@ -90,7 +90,7 @@ import { shippedCatalog } from '../runner/dispatch/shipped-catalog.mjs';
 import { checkCatalog } from '../runner/execution/patterns/catalog.mjs';
 import { deepEqual } from '../runner/execution/patterns/catalog-entries.mjs';
 import { detectRetiredPatternKeys, RESERVED_PATTERN_NAMES, SEAT_BINDING_MARKER_PATH, formatRetiredKeySentence } from '../runner/execution/patterns/retired-keys.mjs';
-import { resolveMainCheckoutRoot } from '../runner/paths.mjs';
+import { isCommandAvailable, resolveMainCheckoutRoot } from '../runner/paths.mjs';
 import { capabilityEntriesOf, hasUsablePrefer } from '../runner/execution/seat-resolver.mjs';
 import { detectTrunk } from '../runner/worktree.mjs';
 import { listWork } from '../state/store.mjs';
@@ -2192,9 +2192,12 @@ export function checkConfinedPaneAccounts(runnerCfg = {}, providerInventory = un
   const notes = [];
   for (const [id, executor] of Object.entries(runnerCfg.executors ?? {})) {
     for (const inv of executor?.invocations ?? []) {
-      const store = credentialStoreOf(inv && { ...inv, command: inv.command ?? executor.command });
+      const command = inv?.command ?? executor.command;
+      const store = credentialStoreOf(inv && { ...inv, command });
       if (!store) continue;
       const label = `executor "${id}" invocation "${inv.id ?? '?'}"`;
+      // A CLI this machine does not have starts no pane, so its login is nobody's to find.
+      if (!isCommandAvailable(command)) { notes.push(`${label}: ${path.basename(command ?? '')} is not installed, not checked`); continue; }
       const provider = legacyStateKey(executor.providerModel ?? executor.provider);
       const providerEntry = Object.hasOwn(inventory, provider) ? inventory[provider] : undefined;
       const accountMap = providerEntry?.accounts;

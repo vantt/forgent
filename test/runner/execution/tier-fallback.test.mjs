@@ -10,8 +10,10 @@ import assert from 'node:assert/strict';
 
 import { bind, bindingIdentity, explainSeat } from '../../../src/runner/execution/bind.mjs';
 import { seedFileLocalBwrapRegistry } from '../confinement-registry-fixture.helper.mjs';
+import { seedStubAgentClis } from '../agent-cli-fixture.helper.mjs';
 
 seedFileLocalBwrapRegistry();
+seedStubAgentClis('alpha-bin', 'beta-bin', 'gamma-bin', 'delta-bin', 'claude', 'codex', 'omp', 'pi');
 
 const FAMILIES = ['alpha', 'beta', 'gamma', 'delta'];
 const executor = (family) => ({

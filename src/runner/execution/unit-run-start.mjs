@@ -22,6 +22,7 @@ import { AgentNotFoundError, resolveAgentDefinition } from '../agent-definitions
 import { validateUnit, normalizeWorkflowLink } from './unit.mjs';
 import { CaseAdmissionRefusedError, PORT_MISSING } from './case-admission-port.mjs';
 import { assertPinnedAccountsUsable } from './account-pin.mjs';
+import { agentCliMissingRefusal } from './bind.mjs';
 import { simulateUnitBindings } from './dry-bind.mjs';
 import { assertNoSeatTier, effectiveRigorOf, SeatResolutionError } from './seat-resolver.mjs';
 import { isSeatRecord, collaborationOfRecord } from './legacy-seat-read.mjs';
@@ -167,6 +168,8 @@ const ACCOUNT_PIN_MODES = ['strict', 'where-served'];
  * seat takes; `where-served` runs such a unit unpinned and each seat's provenance keeps why.
  */
 async function assertDoorChoicesBeforeRun(unit, runnerConfig, options, collaboration, herdrPresent) {
+  const noAgentCli = agentCliMissingRefusal(runnerConfig, options.session ?? {});
+  if (noAgentCli) throw new RunnerConfigError(`${noAgentCli.reason}: ${noAgentCli.detail}; ${noAgentCli.fix}`, { code: noAgentCli.reason, phase: 'pre-admission' });
   if (options.accountPin !== undefined && !ACCOUNT_PIN_MODES.includes(options.accountPin)) {
     throw new RunnerConfigError(`accountPin must be one of ${ACCOUNT_PIN_MODES.join(', ')}, got ${JSON.stringify(options.accountPin)}`, { phase: 'pre-admission' });
   }
