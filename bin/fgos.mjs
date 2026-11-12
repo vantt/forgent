@@ -3751,7 +3751,12 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
     // removes the activation and, with --purge, the release store.
     case 'uninstall': {
       const { uninstallProject } = await import('../src/setup/uninstall-project.mjs');
-      return uninstallProject(mainCheckoutRootOf(flags), { apply: flags.yes === true && flags['dry-run'] !== true, packageRoot: PACKAGE_ROOT });
+      const { integrationScriptPath } = await import('../src/setup/checks.mjs');
+      return uninstallProject(mainCheckoutRootOf(flags), {
+        apply: flags.yes === true && flags['dry-run'] !== true,
+        packageRoot: PACKAGE_ROOT,
+        shellIntegrationScript: integrationScriptPath(),
+      });
     }
 
     // The one opt-in door to a person's own agent config (src/setup/agent-wiring.mjs). Without --yes

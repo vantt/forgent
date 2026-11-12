@@ -237,6 +237,14 @@ fn installation_dir(workspace_root: &Path) -> PathBuf {
 }
 
 /// The installation directory when the project has one; a link in its place is refused.
+/// The project's own `fgos` launcher inside its installation: the one binary the Node half runs.
+fn project_shim(workspace_root: &Path) -> PathBuf {
+    tail_shim_path(
+        &installation_dir(workspace_root).join("bin").join("fgos"),
+        cfg!(windows),
+    )
+}
+
 fn find_installation(workspace_root: &Path) -> Result<Option<PathBuf>, UninstallError> {
     let dir = installation_dir(workspace_root);
     match std::fs::symlink_metadata(&dir) {
@@ -348,12 +356,8 @@ fn parse_reversal(stdout: &[u8]) -> Option<NodeReversal> {
 
 /// Runs `fgos uninstall` of the project's activated release (`--yes` when `apply`). A failed run
 /// that still answered with its result returns it, `failed` filled; one that did not answer is an error.
-fn run_node_reversal(
-    shim: &Path,
-    workspace_root: &Path,
-    apply: bool,
-) -> Result<NodeReversal, UninstallError> {
-    let mut command = Command::new(shim);
+fn run_node_reversal(workspace_root: &Path, apply: bool) -> Result<NodeReversal, UninstallError> {
+    let mut command = Command::new(project_shim(workspace_root));
     command.arg("uninstall").current_dir(workspace_root);
     if apply {
         command.arg("--yes");
@@ -475,14 +479,13 @@ pub fn run_uninstall(
 ) -> Result<(), UninstallError> {
     let workspace_root = resolve_workspace_root(cwd)?;
     let installation = find_installation(&workspace_root)?;
-    let shim = installation
-        .as_ref()
-        .map(|dir| tail_shim_path(&dir.join("bin").join("fgos"), cfg!(windows)));
-    let shim_runnable = shim.as_ref().is_some_and(|s| s.is_file());
+    let shim = project_shim(&workspace_root);
+    let shim_runnable = installation.is_some() && shim.is_file();
 
-    let reversal = match (&shim, shim_runnable) {
-        (Some(shim), true) => Some(run_node_reversal(shim, &workspace_root, false)?),
-        _ => None,
+    let reversal = if shim_runnable {
+        Some(run_node_reversal(&workspace_root, false)?)
+    } else {
+        None
     };
     let purge = if options.purge {
         guard_store_root(store_root, home_dir().as_deref(), &workspace_root)?;
@@ -494,7 +497,7 @@ pub fn run_uninstall(
     println!("fgctl uninstall: {}", workspace_root.display());
     if let Some(reversal) = &reversal {
         print_section("Will change in the project:", &reversal.changes);
-    } else if let Some(shim) = &shim {
+    } else if installation.is_some() {
         println!("Project wiring (hooks, generated skills, git hooks): cannot be read, {} is missing; run `fgctl repair` first", shim.display());
     }
     if let Some(dir) = &installation {
@@ -539,19 +542,18 @@ pub fn run_uninstall(
         return Ok(());
     }
     if installation.is_some() && !shim_runnable {
-        return Err(UninstallError::ShimMissing(shim.unwrap_or_default()));
+        return Err(UninstallError::ShimMissing(shim));
     }
 
     let outcomes = {
         let workspace = &workspace_root;
         let mut steps: Vec<Step<'_>> = Vec::new();
-        if let Some(shim) = shim.as_ref().filter(|_| shim_runnable) {
+        if shim_runnable {
             steps.push(Step {
                 name: "project wiring",
                 irreversible: false,
                 run: Box::new(move || {
-                    let done =
-                        run_node_reversal(shim, workspace, true).map_err(|e| e.to_string())?;
+                    let done = run_node_reversal(workspace, true).map_err(|e| e.to_string())?;
                     if !done.failed.is_empty() {
                         return Err(done.failed.join("; "));
                     }

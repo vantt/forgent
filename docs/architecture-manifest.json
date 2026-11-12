@@ -311,6 +311,7 @@
     "src/setup/mailbox-limits.mjs": "infra",
     "src/setup/mailbox-claude-accept.mjs": "infra",
     "src/setup/agent-wiring.mjs": "infra",
+    "src/setup/uninstall-project.mjs": "infra",
     "src/setup/mailbox-sync-timer.mjs": "infra",
     "src/setup/agy-permissions.mjs": "infra",
     "src/setup/holder-lock-checks.mjs": "infra",

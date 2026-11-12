@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "e3e86e423657dbae1946a10b0cae82f73b9b9be3ac0063e4fc661cacce160a21",
+  "payloadDigest": "aa124c6222520aa0d9750891533e863dd9dd77785af4f5fe1e3af5b9eb5495f8",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -116,7 +116,7 @@
     "apps/fgos/tests/windows_semantics_probe.rs": "ecb59690bbf1259baa1defb6417c24005138526bb565f216f9db3c2ad784d240",
     "apps/fgos/tests/windows_support/mod.rs": "2b8a17676526c87ea5ecfb2074a70a3511fbf9267f9de78a35dc355f272830fb",
     "bin/fgos-runner.mjs": "24fa9b497547a104912b90ab98b3d53fbbe0068a5977a7a04724789c8e717156",
-    "bin/fgos.mjs": "c6414337831c97fba871a1812ba16b8fd2ccf228f478159f393e6296545b60d4",
+    "bin/fgos.mjs": "18f33ad74e63ae1848401d9bd7c947a3e78462b7be946b7ea13b903b4381ebf3",
     "core/skills/_shared/capability-catalog.md": "4299584409592ac4ae9668cd0cb4dd0442edc1c78a42ccd9cfe0bae22bf11bc4",
     "core/skills/_shared/capability-matching.md": "eb67cde05d45c171c1d4803f9d2fbec5fc63565b9fd0a0549c866a7eb262521d",
     "core/skills/_shared/catchup-self-recovery.md": "3b77650c71a0225f00ffa8fe9524d7c0052977204f425c1999225b6f80802c69",
@@ -282,7 +282,7 @@
     "packages/distribution/rust/src/shim.rs": "079f026604885abc304381ed6fd9df4beb2eeeff718b8994dbe36137df0d6cd8",
     "packages/distribution/rust/src/store.rs": "1cdaf72bbdf7c4bc0ae3eafd1f37fecd6a358de60c8ce5851ccf9212149174de",
     "packages/distribution/rust/src/suggest.rs": "302d698667662b3544b0761cd53dd87c68594d6f1b1ce52d8b85032627d52182",
-    "packages/distribution/rust/src/uninstall.rs": "f6f37eefb068e7ef0bfd6599698cd3f127d59fffec76c4ad7eada01e56a3e9bc",
+    "packages/distribution/rust/src/uninstall.rs": "4e3c46e6e181b810a0c317073ef77e263cc687c58395985422dcd83b7215c32a",
     "packages/distribution/rust/src/verify.rs": "79a9f08e75d0c0ca8f5e04ad8443e4134a3dfbd85a38e01a448d53361463dc69",
     "packages/distribution/rust/src/workspace.rs": "fd91502f00f1de16a71d3c8bb386e5a840c46e7c10bf948a65b04ecdca6b594b",
     "packages/distribution/rust/tests/activation_lock_multiprocess.rs": "ff2818dd10b745ac29c1610effd95ac36552f4aace4525634c6b20f17f325fe0",
@@ -1157,7 +1157,7 @@
     "src/setup/shell-rc.mjs": "36c0eb600e6943d5c6ed94918d5d6a294d447fa8a6491076faaf525aa80807c0",
     "src/setup/skill-wrappers.mjs": "0babbffde31c66d04d0f8dbc2225d273af95a3527b8538681e264f242cc8210a",
     "src/setup/terminal-control-checks.mjs": "5dca8b2bf0c8bddbc55bcfad97700e65708a04822bf8065b484d5d6c251ce4aa",
-    "src/setup/uninstall-project.mjs": "f7a38264f8cce655b21247e44402b13b216d9f929764becdb399665f64080d03",
+    "src/setup/uninstall-project.mjs": "14855cd15943baf75e8d1e4adbf7425e8c86119eab81e2cf9baaf528b442542f",
     "src/setup/workflow-case-checks.mjs": "9b187678986f33683b456a75565026e0d86be858cc8281feb86e8b660a6e4ba1",
     "src/setup/workflow-catalog-reader.mjs": "7056fca651ea1ebafa0445449fb63722509104f09d3527ba4af5ee10f691c379",
     "src/state/awaiting-context.mjs": "656e9ba97160ea31b09160cccb7ba07d50072860b1ce908629ea382119fa4da9",
@@ -1278,22 +1278,7 @@
     "src/workflow/units-source.mjs": "fd7d7a3ed5db5f00c6244fc60da479aa739e1935e1ffaf02341f71f3a326e307",
     "scripts/lib/git-one-door-declarations.v1.json": "c06a8ee8c3164c54bfd3cd4401271c3e080ae3bb86e5a469cf7532d3fd60d3e9"
   },
-  "sites": [
-    {
-      "path": "packages/distribution/rust/src/uninstall.rs",
-      "line": 484,
-      "spawn": "Command::new <- packages/distribution/rust/src/uninstall.rs:356",
-      "binary": "? installation .as_ref() .map(|dir| tail_shim_path(&dir.join(\"bin\").join(\"fgos\"), ",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "packages/distribution/rust/src/uninstall.rs",
-      "line": 554,
-      "spawn": "Command::new <- packages/distribution/rust/src/uninstall.rs:356",
-      "binary": "? shim.as_ref().filter(|_| shim_runnable)",
-      "family": "unresolved-binary"
-    }
-  ],
+  "sites": [],
   "classes": [
     {
       "path": ".agents/skills/distill/scripts/distill.mjs",

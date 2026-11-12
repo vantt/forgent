@@ -86,10 +86,8 @@ function planGitHooks(repoRoot, apply) {
 }
 
 /** The rc files that still carry the fgOS source line; they are only ever named. */
-async function shellRcLines(home) {
-  const { integrationScriptPath } = await import('./registrations.mjs');
-  const scriptPath = integrationScriptPath();
-  if (scriptPath === null) return [];
+function shellRcLines(home, scriptPath) {
+  if (!scriptPath) return [];
   return detectRcFiles(home)
     .filter((rcFile) => hasSourceLine(rcFile, scriptPath))
     .map((rcFile) => ({ rcFile, sourceLine: `source "${scriptPath}"` }));
@@ -122,11 +120,12 @@ function backUp(files, now) {
 /**
  * Describes (`apply: false`) or does (`apply: true`) the project half of an uninstall.
  * @param {string} repoRoot the project (main checkout)
- * @param {{apply?: boolean, packageRoot: string, home?: string, now?: Date}} options
- * @returns {Promise<object>} `changes` and `keeps` as printable lines, the counts behind them, the
+ * @param {{apply?: boolean, packageRoot: string, shellIntegrationScript?: (string|null), home?: string, now?: Date}} options
+ *   `shellIntegrationScript` is the script the rc source line names (the caller knows it; null: none to look for)
+ * @returns {object} `changes` and `keeps` as printable lines, the counts behind them, the
  *   `backups` made, `failed` steps (a failure of one never stops the others), and what is left to the person.
  */
-export async function uninstallProject(repoRoot, { apply = false, packageRoot, home = os.homedir(), now = new Date() }) {
+export function uninstallProject(repoRoot, { apply = false, packageRoot, shellIntegrationScript = null, home = os.homedir(), now = new Date() }) {
   const failed = [];
   const attempt = (id, fn, fallback) => {
     try {
@@ -153,7 +152,7 @@ export async function uninstallProject(repoRoot, { apply = false, packageRoot, h
   const skills = attempt('skills', () => planSkills(repoRoot, packageRoot, apply), { removed: [], kept: [], foreign: [], skipped: null });
   const gitHooks = attempt('git-hooks', () => planGitHooks(repoRoot, apply), { unwired: false, skippedExisting: null });
   const timer = apply ? attempt('mailbox-timer', () => fixMailboxSyncTimer(repoRoot, { schedule: () => null }), null) : null;
-  const shellRcSourceLinesFound = await shellRcLines(home);
+  const shellRcSourceLinesFound = shellRcLines(home, shellIntegrationScript);
 
   const rel = (file) => path.relative(repoRoot, file) || file;
   const changes = [
