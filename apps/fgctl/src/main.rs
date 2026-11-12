@@ -232,6 +232,20 @@ fn main() {
                 std::process::exit(1);
             }
         }
+        "uninstall" => {
+            let options = fgos_distribution::uninstall::UninstallOptions {
+                yes: flags.has("--yes"),
+                dry_run: flags.has("--dry-run"),
+                purge: flags.has("--purge"),
+            };
+            let store_root = resolve_machine_release_store_root();
+            if let Err(err) =
+                fgos_distribution::uninstall::run_uninstall(&current_dir_or_exit(), &options, &store_root)
+            {
+                eprintln!("Error: {}", err);
+                std::process::exit(1);
+            }
+        }
         _ => unreachable!("every verb in the table has an arm"),
     }
 }

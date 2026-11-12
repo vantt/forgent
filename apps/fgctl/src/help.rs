@@ -202,6 +202,55 @@ Next:
 ",
     },
     Verb {
+        name: "uninstall",
+        summary: "Remove what fgOS installed in this project",
+        flags: &[switch("--dry-run"), switch("--yes"), switch("--purge")],
+        help: "\
+fgctl uninstall - remove what fgOS installed in this project, keep your config and data
+
+Changes on disk:
+  Prints the plan first. With --yes (or your yes at the prompt) it then:
+    1. has the project's fgos remove its hook entries from the agent configs
+       (.claude, .codex, .agents, .omp, .pi), its generated skill directories and
+       the git hooks it wired, and the project's mailbox sync timer;
+    2. removes .fgos/installation/ (the activation), after copying its records to
+       .fgos/uninstall-backup-<time>/.
+  Every agent config it rewrites is copied to <file>.pre-uninstall-<time> first.
+  If step 1 fails, step 2 and --purge do not run.
+  With --purge it also removes the release store under the machine state root
+  (releases/, quarantine/ and installs/ there; identity and locks stay). Other
+  projects pinned to those releases then need `fgctl init`.
+  Kept: .fgos data and config.yaml, the committed .fgos/distribution.json, any hook
+  entry or skill directory that is not fgOS's own, and your shell profile. Never
+  removed, only named: the fgctl binary, the fgos launcher beside it, a shell-rc
+  line, and global agent config changed by `fgos wire-agents` (with the commands to
+  undo it).
+
+Prerequisites:
+  Run inside a git repository. For step 1 the project's fgos must be runnable
+  (`fgctl repair` restores it).
+
+Options:
+  --yes                   Apply the plan without asking. Default: print it, and ask
+                          only at a terminal.
+  --dry-run               Print the plan and change nothing, even with --yes.
+  --purge                 Also remove the machine release store. Default: off.
+  -h, --help              Show this help.
+
+Examples:
+  fgctl uninstall
+  fgctl uninstall --yes
+  fgctl uninstall --yes --purge
+
+Exit codes:
+  0 planned or done   1 failed (the message names the step; nothing irreversible
+  ran after it)   2 usage error
+
+Next:
+  Remove the lines it lists by hand. To use fgOS here again: fgctl init.
+",
+    },
+    Verb {
         name: "stage",
         summary: "Copy a verified release into the machine store",
         flags: &[valued("--from")],
@@ -282,9 +331,9 @@ pub fn print_overview() {
     println!();
     println!("Commands:");
     for verb in VERBS {
-        println!("  {:<9}{}", verb.name, verb.summary);
+        println!("  {:<10}{}", verb.name, verb.summary);
     }
-    println!("  help     Show this overview, or `fgctl help <command>`");
+    println!("  help      Show this overview, or `fgctl help <command>`");
     println!();
     println!("Run `fgctl <command> --help` for what a command changes, its options, examples and exit codes.");
     println!("Exit codes: 0 ok, 1 failed, 2 usage error.");
