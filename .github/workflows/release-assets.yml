@@ -98,16 +98,22 @@ jobs:
       - name: External consumer proof (Linux)
         if: runner.os == 'Linux'
         run: scripts/ci-external-consumer.sh --assets dist
+        env:
+          GH_TOKEN: ${{ github.token }}
 
       - name: External consumer proof (Windows PowerShell 5.1)
         if: runner.os == 'Windows'
         shell: powershell
         run: ./scripts/ci-external-consumer.ps1 -Assets dist
+        env:
+          GH_TOKEN: ${{ github.token }}
 
       - name: External consumer proof (PowerShell 7)
         if: runner.os == 'Windows'
         shell: pwsh
         run: ./scripts/ci-external-consumer.ps1 -Assets dist
+        env:
+          GH_TOKEN: ${{ github.token }}
 
       - name: Upload release assets
         uses: actions/upload-artifact@v4

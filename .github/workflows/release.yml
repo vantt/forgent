@@ -33,9 +33,22 @@ jobs:
     with:
       version: ${{ github.ref_name }}
 
+  # A release publishes only from a tree whose whole suite is green. ci.yml's compare job
+  # declares issues: write, which a called workflow may only use if its caller grants it;
+  # the release gate skips that job, so the grant is never exercised.
+  suite:
+    name: suite
+    needs: check-version
+    permissions:
+      contents: read
+      issues: write
+    uses: ./.github/workflows/ci.yml
+    with:
+      release-gate: true
+
   publish:
     name: publish
-    needs: assets
+    needs: [assets, suite]
     runs-on: ubuntu-latest
     permissions:
       contents: write

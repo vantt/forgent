@@ -87,6 +87,25 @@ function New-Project([string]$Name) {
     return $dir
 }
 
+# The artifactDigest of the release manifest inside an fgos archive.
+function Get-ArchiveManifestDigest([string]$Archive, [string]$Name) {
+    $dir = Join-Path $tmpBase $Name
+    New-Item -ItemType Directory -Path $dir | Out-Null
+    $tarExe = Join-Path $env:SystemRoot 'System32\tar.exe'
+    $x = Invoke-Native $tarExe @('-xzf', $Archive, '-C', $dir) $null
+    Assert-True ($x.Code -eq 0) "extracting $Archive`: $($x.Text)"
+    return (Get-Content -LiteralPath (Join-Path $dir 'manifest.json') -Raw | ConvertFrom-Json).artifactDigest
+}
+
+# Fails unless the file's sha256 equals its line in the directory's SHA256SUMS.
+function Assert-ListedSha256([string]$Dir, [string]$File) {
+    $line = Get-Content -LiteralPath (Join-Path $Dir 'SHA256SUMS') | Where-Object { $_ -match ('\s\*?' + [regex]::Escape($File) + '$') } | Select-Object -First 1
+    Assert-True ([bool]$line) "SHA256SUMS lists no $File"
+    $expected = ($line -split '\s+')[0]
+    $actual = (Get-FileHash -LiteralPath (Join-Path $Dir $File) -Algorithm SHA256).Hash
+    Assert-True ($actual -ieq $expected) "$File sha256 $actual does not match SHA256SUMS ($expected)"
+}
+
 try {
     # An isolated profile and release store for the whole run.
     $tmpHome = Join-Path $tmpBase 'home'
@@ -207,9 +226,12 @@ try {
         Assert-True ($versionJson.data.artifactDigest -eq $manifest.artifactDigest) "reported digest $($versionJson.data.artifactDigest) != archive manifest $($manifest.artifactDigest)"
         Assert-True ($manifest.target.os -eq 'windows') "manifest target os must be windows, got $($manifest.target.os)"
 
-        Write-Host '--- fgos doctor (PowerShell) ---'
-        & fgos doctor
-        Write-Host "fgos doctor exit code: $LASTEXITCODE"
+        # A clean runner (no agent CLI, no global config), with fgctl on PATH as the installer tells a
+        # consumer: the doctor report must be ok. The exit code stays 0, so read data.ok.
+        $env:PATH = "$installDir;$env:PATH"
+        $doctor = ((& fgos doctor --json) -join "`n") | ConvertFrom-Json
+        $failingRows = @($doctor.data.checks | Where-Object { $_.status -eq 'fail' } | ForEach-Object { "$($_.id): $($_.message)" })
+        Assert-True ($doctor.data.ok -eq $true) "fgos doctor --json must report ok: true on a clean runner; failing rows: $($failingRows -join ' | ')"
 
         & fgos ready --json | Out-Null
         Assert-True ($LASTEXITCODE -eq 0) 'fgos ready --json from PowerShell'
@@ -266,6 +288,97 @@ try {
     Assert-True (Test-Path -LiteralPath (Join-Path $binDir 'fgos.cmd')) 'fgctl repair must regenerate fgos.cmd'
     $r = Invoke-Native $fgctl @('verify') $project
     Assert-True ($r.Code -eq 0) "fgctl verify after repair: $($r.Text)"
+
+    # ---- upgrade from the previous release --------------------------------------------
+    # The previous published release is resolved by semver (previous-release-tag.mjs), its own
+    # assets and installer are downloaded, and the candidate built in this run upgrades a project
+    # on it. Only a machine with no gh outside CI skips; in CI a resolution error fails the proof.
+    $resolver = Join-Path $PSScriptRoot 'previous-release-tag.mjs'
+    if ((-not $env:CI) -and (-not (Get-Command gh -ErrorAction SilentlyContinue))) {
+        Write-Host 'Skipping the upgrade-from-previous-release proof: gh is not installed (CI always runs it).'
+    } else {
+        $previousErrorAction = $ErrorActionPreference
+        $ErrorActionPreference = 'Continue'
+        $prevTag = ((& node $resolver --candidate $version) -join '').Trim()
+        $resolveCode = $LASTEXITCODE
+        $ErrorActionPreference = $previousErrorAction
+        if ($resolveCode -eq 3) {
+            Write-Host "Skipping the upgrade-from-previous-release proof: no release earlier than $version exists."
+        } else {
+            Assert-True ($resolveCode -eq 0 -and $prevTag) "resolving the previous release (exit $resolveCode)"
+            Assert-True ($prevTag -ne $version) "the previous release resolved to the candidate itself ($prevTag)"
+            Write-Host "Upgrade proof: previous release $prevTag -> candidate $version"
+            $target = 'x86_64-pc-windows-msvc'
+            $prevDir = Join-Path $tmpBase 'previous-release'
+            New-Item -ItemType Directory -Path $prevDir | Out-Null
+            $download = @('release', 'download', $prevTag, '--dir', $prevDir,
+                '--pattern', "fgos-$prevTag-$target.tar.gz", '--pattern', "fgctl-$prevTag-$target.tar.gz",
+                '--pattern', 'SHA256SUMS', '--pattern', 'install.ps1')
+            if ($env:GITHUB_REPOSITORY) { $download += @('--repo', $env:GITHUB_REPOSITORY) }
+            $r = Invoke-Native 'gh' $download $null
+            Assert-True ($r.Code -eq 0) "downloading the $prevTag assets: $($r.Text)"
+            foreach ($file in "fgos-$prevTag-$target.tar.gz", "fgctl-$prevTag-$target.tar.gz", 'install.ps1') {
+                Assert-ListedSha256 $prevDir $file
+            }
+            $prevFgosTar = Join-Path $prevDir "fgos-$prevTag-$target.tar.gz"
+            $prevDigest = Get-ArchiveManifestDigest $prevFgosTar 'previous-manifest'
+            Assert-True ($prevDigest -and $prevDigest -ne $manifest.artifactDigest) "the previous release ($prevTag, '$prevDigest') must be a different artifact from the candidate ('$($manifest.artifactDigest)')"
+
+            # Install the previous fgctl with the previous release's own installer.
+            $prevUrl = Start-AssetServer $prevDir 'previous'
+            $prevInstall = Join-Path $tmpBase 'prev-install'
+            $env:FGCTL_ASSET_BASE_URL = $prevUrl
+            $env:FGCTL_VERSION = $prevTag
+            $env:FGCTL_INSTALL_DIR = $prevInstall
+            $r = Invoke-Native $psExe @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', (Join-Path $prevDir 'install.ps1')) $null
+            Assert-True ($r.Code -eq 0) "install.ps1 of $prevTag`: $($r.Text)"
+            Remove-Item Env:FGCTL_VERSION, Env:FGCTL_ASSET_BASE_URL
+
+            $upProject = New-Project 'upgrade-project'
+            $r = Invoke-Native (Join-Path $prevInstall 'fgctl.exe') @('init', '--from', $prevFgosTar) $upProject
+            Assert-True ($r.Code -eq 0) "$prevTag fgctl init --from its own fgos asset: $($r.Text)"
+            $upActivation = Join-Path $upProject '.fgos\installation\activation.json'
+            $beforeAct = Get-Content -LiteralPath $upActivation -Raw | ConvertFrom-Json
+            Assert-True ($beforeAct.artifactDigest -eq $prevDigest) "the project is not on the $prevTag artifact (activation $($beforeAct.artifactDigest), asset $prevDigest)"
+
+            # The project's own config must survive the upgrade byte for byte.
+            $upConfig = @('config.yaml', 'config.json') | ForEach-Object { Join-Path $upProject ".fgos\$_" } | Where-Object { Test-Path -LiteralPath $_ } | Select-Object -First 1
+            Assert-True ([bool]$upConfig) "$prevTag fgctl init left no .fgos\config.yaml or config.json to prove survival with"
+            $configBefore = (Get-FileHash -LiteralPath $upConfig -Algorithm SHA256).Hash
+
+            $r = Invoke-Native $fgctl @('upgrade', '--from', $fgosTar.FullName) $upProject
+            Assert-True ($r.Code -eq 0) "candidate fgctl upgrade on a $prevTag project: $($r.Text)"
+            $afterAct = Get-Content -LiteralPath $upActivation -Raw | ConvertFrom-Json
+            Assert-True (($afterAct.artifactDigest -eq $manifest.artifactDigest) -and ($afterAct.artifactDigest -ne $beforeAct.artifactDigest)) "upgrade from $prevTag did not activate the candidate (before $($beforeAct.artifactDigest), after $($afterAct.artifactDigest), candidate $($manifest.artifactDigest))"
+            Assert-True ($afterAct.previousArtifactDigest -eq $beforeAct.artifactDigest) "previousArtifactDigest after the upgrade is $($afterAct.previousArtifactDigest), expected $($beforeAct.artifactDigest)"
+            Assert-True ((Get-FileHash -LiteralPath $upConfig -Algorithm SHA256).Hash -eq $configBefore) "the project's $upConfig changed during the upgrade from $prevTag"
+            $r = Invoke-Native $fgctl @('verify') $upProject
+            Assert-True ($r.Code -eq 0) "fgctl verify on the project upgraded from ${prevTag}: $($r.Text)"
+            # The upgraded project reads its legacy config with no config row failing (no manual migration).
+            Push-Location -LiteralPath $upProject
+            try {
+                $upDoctor = ((& (Join-Path $upProject '.fgos\installation\bin\fgos.cmd') doctor --json) -join "`n") | ConvertFrom-Json
+            } finally {
+                Pop-Location
+            }
+            $configFailing = @($upDoctor.data.checks | Where-Object { $_.status -eq 'fail' -and $_.id -like 'config-*' } | ForEach-Object { "$($_.id): $($_.message)" })
+            Assert-True ($configFailing.Count -eq 0) "the project upgraded from $prevTag needs a manual config migration: $($configFailing -join ' | ')"
+            Write-Host "Upgrade proof passed: $prevTag ($($beforeAct.artifactDigest)) -> $version ($($afterAct.artifactDigest)), config kept."
+        }
+    }
+
+    # ---- uninstall ---------------------------------------------------------------------
+    # Last, because it takes the installation away. The plan changes nothing; --yes removes what
+    # fgOS installed and keeps the project's config and data.
+    $r = Invoke-Native $fgctl @('uninstall', '--dry-run') $project
+    Assert-True ($r.Code -eq 0) "fgctl uninstall --dry-run: $($r.Text)"
+    Assert-True (Test-Path -LiteralPath (Join-Path $project '.fgos\installation')) 'fgctl uninstall --dry-run removed the installation'
+    $r = Invoke-Native $fgctl @('uninstall', '--yes') $project
+    Assert-True ($r.Code -eq 0) "fgctl uninstall --yes: $($r.Text)"
+    Assert-True (-not (Test-Path -LiteralPath (Join-Path $project '.fgos\installation'))) '.fgos\installation is still there after fgctl uninstall --yes'
+    Assert-True (Test-Path -LiteralPath (Join-Path $project '.fgos\distribution.json')) 'fgctl uninstall removed .fgos\distribution.json, which it must keep'
+    $backups = @(Get-ChildItem -LiteralPath (Join-Path $project '.fgos') -Directory -Filter 'uninstall-backup-*')
+    Assert-True ($backups.Count -ge 1 -and (Test-Path -LiteralPath (Join-Path $backups[0].FullName 'activation.json'))) 'fgctl uninstall left no backup of the activation record'
 
     Write-Host 'All Windows external consumer proof steps passed successfully.'
 } finally {

@@ -5,6 +5,13 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+  # release.yml runs the whole suite before it publishes. The selector jobs only tune
+  # pull-request feedback and the compare job writes issues, so a release skips them.
+  workflow_call:
+    inputs:
+      release-gate:
+        type: boolean
+        default: false
 
 jobs:
   test:
@@ -114,6 +121,7 @@ jobs:
   # of letting a missing toolchain read as a passing job.
   selector-plan:
     name: selector-plan
+    if: ${{ !inputs.release-gate }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     outputs:
@@ -198,7 +206,7 @@ jobs:
   compare:
     name: compare
     needs: [selector-plan, related, test]
-    if: always()
+    if: ${{ always() && !inputs.release-gate }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     permissions:
@@ -327,6 +335,8 @@ jobs:
 
       - name: Run external consumer proof
         run: scripts/ci-external-consumer.sh --assets dist
+        env:
+          GH_TOKEN: ${{ github.token }}
 
   addon-reproducibility:
     name: addon reproducibility

@@ -82,6 +82,18 @@ test('release workflows: publishing lives only in release.yml under the tag trig
   }
 });
 
+test('a release publishes only after the whole suite: publish needs the suite, which calls ci.yml with the release gate', () => {
+  const release = read('.github', 'workflows', 'release.yml');
+  assert.match(release, /suite:\n(?:.*\n)*?\s+uses: \.\/\.github\/workflows\/ci\.yml\n\s+with:\n\s+release-gate: true/);
+  assert.match(release, /publish:\n\s+name: publish\n\s+needs: \[assets, suite\]/);
+  const ci = read('.github', 'workflows', 'ci.yml');
+  assert.match(ci, /workflow_call:\n\s+inputs:\n\s+release-gate:/);
+  // The jobs a release skips are exactly the pull-request tuning ones; the suite itself always runs.
+  assert.match(ci, /selector-plan:\n\s+name: selector-plan\n\s+if: \$\{\{ !inputs\.release-gate \}\}/);
+  assert.match(ci, /compare:\n(?:.*\n)*?\s+if: \$\{\{ always\(\) && !inputs\.release-gate \}\}/);
+  assert.doesNotMatch(ci.slice(ci.indexOf('\n  test:'), ci.indexOf('\n  selector-plan:')), /release-gate/);
+});
+
 test('release assets workflow builds Linux on ubuntu-22.04 and Windows on windows-latest, never newer Linux', () => {
   const assets = read('.github', 'workflows', 'release-assets.yml');
   assert.match(assets, /os: ubuntu-22\.04\n\s+target: x86_64-unknown-linux-gnu/);
