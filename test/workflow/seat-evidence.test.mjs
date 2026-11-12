@@ -42,16 +42,20 @@ test('seat providers list who ran each seat and where a failover moved it from',
         units: {
           u1: {
             results: [
-              { seat: 'member-1', role: 'producer', round: 1, outcome: 'pass', binding: { executor: 'claude-herdr', invocation: 'i1', model: 'sonnet', persona: 'p' }, runResult: { policy: { providerModel: 'claude' } } },
-              { seat: 'member-2', role: 'producer', round: 1, outcome: 'pass', binding: { executor: 'glm', invocation: 'i2', model: 'glm', persona: 'q', provenance: { fallbackFrom: { executor: 'xai', kind: 'next-candidate', reason: 'provider-limit' } } }, runResult: { policy: { providerModel: 'z-ai' } } },
+              { seat: 'member-1', role: 'producer', round: 1, outcome: 'pass', binding: { executor: 'claude-herdr', invocation: 'i1', family: 'claude', model: 'sonnet', persona: 'p' } },
+              { seat: 'member-2', role: 'producer', round: 1, outcome: 'pass', binding: { executor: 'glm', invocation: 'i2', family: 'z-ai', model: 'glm', persona: 'q', provenance: { fallbackFrom: { executor: 'xai', kind: 'next-candidate', reason: 'provider-limit' } } } },
+              // A result with no `binding.family` (written before Seat Binding handed it up) reads as not known; no other field is a second source.
+              { seat: 'member-3', role: 'producer', round: 1, outcome: 'pass', binding: { executor: 'old', model: 'glm-5' }, runResult: { policy: { providerModel: 'z-ai' } } },
             ],
           },
         },
       },
     },
   });
-  assert.equal(rows.length, 2);
+  assert.equal(rows.length, 3);
+  assert.equal(rows[2].family, null);
   assert.deepEqual(rows[0], { step: 's1', unit: 'u1', seat: 'member-1', role: 'producer', round: 1, persona: 'p', executor: 'claude-herdr', invocation: 'i1', family: 'claude', model: 'sonnet', outcome: 'pass', account: null, movedFrom: null });
+  assert.equal(rows[1].family, 'z-ai');
   assert.deepEqual(rows[1].movedFrom, { executor: 'xai', kind: 'next-candidate', reason: 'provider-limit' });
 });
 

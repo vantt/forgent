@@ -6,8 +6,8 @@ import { seatKeyOf } from '../runner/execution/legacy-seat-read.mjs';
 // the seat to another account or another candidate), and a persona's text and the documents it was
 // given may therefore have reached a provider the owner did not expect. This reads the settled
 // results of a projected workflow state and lists, per unit and seat, the executor, the provider
-// family and the model that ran, the account the run pinned it to (or why the pin skipped it), and where a
-// failover moved it from. Pure: it reads only the state.
+// family (the one Seat Binding wrote on the binding; a result without it reads as not known) and the
+// model that ran, the account the run pinned it to (or why the pin skipped it), and where a failover moved it from. Pure: it reads only the state.
 
 /** The account a seat was pinned to as `pool/account`, else the reason the pin skipped it, else null (no pin). */
 function accountOf(binding) {
@@ -37,7 +37,7 @@ export function seatProviders(state) {
           persona: binding.persona ?? null,
           executor: binding.executor ?? result.runResult?.executorId ?? null,
           invocation: binding.invocation ?? null,
-          family: result.runResult?.policy?.providerModel ?? binding.familySpread?.value?.family ?? null,
+          family: binding.family ?? null,
           model: binding.model ?? null,
           outcome: result.outcome ?? null,
           account: accountOf(binding),
