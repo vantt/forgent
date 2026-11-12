@@ -102,6 +102,14 @@ function missingClisOf(runnerConfig, id, entry, session) {
   return [...new Set(commands.map((command) => path.basename(command)))];
 }
 
+/** The agent CLIs the configured executors run that are not installed here, by bare name, sorted. */
+function absentClisOf(runnerConfig, session) {
+  const names = Object.entries(executorsOf(runnerConfig))
+    .filter(([, entry]) => entry && typeof entry === 'object' && entry.kind !== 'tool')
+    .flatMap(([id, entry]) => missingClisOf(runnerConfig, id, entry, session) ?? []);
+  return [...new Set(names)].sort();
+}
+
 /**
  * The refusal for a machine on which no agent executor can start, or null when one can: every agent executor
  * of the config runs programs and none of them is installed. It names the programs that were looked for and
@@ -411,6 +419,7 @@ function refusalOf(refusal, { session, unit, runnerConfig }) {
   return {
     reason: refusal.reason,
     detail: refusal.detail,
+    ...(refusal.reason === 'cli-missing' ? { missingClis: absentClisOf(runnerConfig, session) } : {}),
     ...(refusal.config ? { config: refusal.config } : {}),
     ...(refusal.peers?.length ? { peers: refusal.peers } : {}),
     ...(refusal.rendered?.length ? { rendered: refusal.rendered } : {}),

@@ -2101,6 +2101,8 @@ export function checkTrustStoreWritable(storePath = operatorClaudeStorePath()) {
   try {
     raw = fs.readFileSync(storePath, 'utf8');
   } catch (err) {
+    // claude installed but never run has no store yet: normal for a new user, so a warning with the next step.
+    if (err.code === 'ENOENT') return { passed: true, message: `warning: no trust store at ${storePath} yet, claude creates it on first run; run \`claude\` once, then \`fgos doctor\`` };
     return { passed: false, message: `trust store at ${storePath} is unreadable: ${err.message}` };
   }
   try {

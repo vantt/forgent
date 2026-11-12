@@ -40,7 +40,14 @@ test('checkTrustStoreWritable passes for a readable store and fails by name for 
     assert.match(badResult.message, /not valid JSON|unreadable/i);
 
     const missing = path.join(dir, 'nope.json');
-    assert.equal(checkTrustStoreWritable(missing).passed, false);
+    // claude installed but never run has no store yet: a warning with the next step, not a failure.
+    const absent = checkTrustStoreWritable(missing);
+    assert.equal(absent.passed, true, absent.message);
+    assert.match(absent.message, /^warning: .*run `claude` once, then `fgos doctor`/);
+    // A store that exists but cannot be read is still a failure.
+    const unreadable = path.join(dir, 'a-directory.json');
+    fs.mkdirSync(unreadable);
+    assert.equal(checkTrustStoreWritable(unreadable).passed, false);
   } finally {
     fs.rmSync(dir, { recursive: true, force: true });
   }
@@ -291,7 +298,7 @@ function writeConfigContent(home, content) {
   }
 }
 
-test('the registered trust-store-readable check is skipped when claude is not installed and still fails for a missing store when it is', () => {
+test('the registered trust-store-readable check is skipped when claude is not installed and warns for a store claude has not made yet when it is', () => {
   const home = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-trust-row-home-'));
   const entry = DOCTOR_CHECKS.find((c) => c.id === 'trust-store-readable');
   const savedPath = process.env.PATH;
@@ -304,8 +311,8 @@ test('the registered trust-store-readable check is skipped when claude is not in
     assert.match(skipped.message, /claude is not installed/);
     process.env.PATH = stubAgentCliDir('claude');
     const failing = withHome(home, () => entry.check(home));
-    assert.equal(failing.passed, false, failing.message);
-    assert.match(failing.message, /unreadable/);
+    assert.equal(failing.passed, true, failing.message);
+    assert.match(failing.message, /^warning: .*run `claude` once/);
     fs.rmSync(emptyBin, { recursive: true, force: true });
   } finally {
     process.env.PATH = savedPath;

@@ -161,7 +161,7 @@ export async function checkSeatBindingDryBind(cwd, { payloadRoot, loadRunnerConf
             // Every candidate this seat could use runs a CLI the machine does not have: nothing to repair in the
             // config, so a warning that names what to install, never a failure.
             unserved.push(`${label}: seat ${seat.seat}`);
-            for (const [, cli] of seat.refused.detail.matchAll(/runs (\S+?), which is not installed/g)) missingClis.add(cli);
+            for (const cli of seat.refused.missingClis ?? []) missingClis.add(cli);
             continue;
           }
           if (seat.refused) {
@@ -178,7 +178,7 @@ export async function checkSeatBindingDryBind(cwd, { payloadRoot, loadRunnerConf
     }
   }
   const unservedWarning = unserved.length === 0 ? ''
-    : `warning: ${unserved.length} seat(s) have no candidate whose agent CLI is installed${missingClis.size > 0 ? `; install ${[...missingClis].sort().join(' or ')} (or another agent CLI the pool names) to bind them` : ''}: ${listed(unserved)}; `;
+    : `warning: ${unserved.length} seat(s) have no candidate whose agent CLI is installed${missingClis.size > 0 ? `; install one of ${[...missingClis].sort().join(', ')} to bind them` : ''}: ${listed(unserved)}; `;
   const coverage = posture.coverage.length > 0 ? `; posture: ${posture.coverage.join(', ')}` : '';
   const notes = `${coverage}${info.length > 0 ? `; info (${info.length}): ${listed(info)}` : ''}`;
   if (problems.length > 0) {

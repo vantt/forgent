@@ -484,7 +484,7 @@ test('with only claude installed, the committed config still binds: a CLI that i
     const result = await checkSeatBindingDryBind(root, { payloadRoot: root, loadRunnerConfig: loadRunnerConfigForDir });
     assert.equal(result.passed, true, result.message);
     // The seats no installed CLI can serve are a warning that names what to install.
-    assert.match(result.message, /^warning: \d+ seat\(s\) have no candidate whose agent CLI is installed; install .*\bpi\b/);
+    assert.match(result.message, /^warning: \d+ seat\(s\) have no candidate whose agent CLI is installed; install one of .*\bpi\b/);
   } finally {
     process.env.PATH = savedPath;
   }
