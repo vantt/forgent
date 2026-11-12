@@ -12,34 +12,41 @@ Bản chuẩn sau thay đổi này khai cho `claude-cli-bwrap` và `claude-herdr
 - file login `.credentials.json` được chép vào home đó (quyền 0600, thư mục 0700) từ tài khoản mà lease chọn, và xoá cùng home;
 - claude ghi session vào `projects/` của home đó, và `finalize-home` giữ thư mục này trong run directory (không chép file login).
 
-Một kho login cần một **tài khoản** trong kho tài khoản của máy: không có thì seat claude khởi động với home trống, chưa đăng nhập. Hàng doctor `confined-pane-accounts` (đã có) sẽ báo `fail` cho hai invocation claude cho tới khi có tài khoản dưới đây.
+Một kho login cần một **tài khoản** (login riêng ở trên) trong kho tài khoản của máy: không có thì seat claude khởi động với home trống, chưa đăng nhập. Hàng doctor `confined-pane-accounts` (đã có) sẽ báo `fail` cho hai invocation claude cho tới khi có tài khoản dưới đây.
 
 Login copy trong home attempt: nếu claude tự gia hạn token trong home, bản gia hạn được giữ ở `pending/` để owner xử lý tay (token claude không mang claim tài khoản ký nên fgOS không tự áp dụng, giống xai). Hàng doctor `credential-copies-retained` liệt kê chúng.
 
-## Các dòng cần thêm (tệp tài khoản `~/.fgos/private/accounts.yaml`)
+## Các dòng cần thêm: một login claude riêng của fgOS (không dùng `~/.claude`)
 
-Một tài khoản trong pool `claude`, dùng kho đăng nhập thật của người dùng (`~/.claude`). Theo dạng `runner.providers` mà các pool khác của máy đang dùng:
+`~/.claude` là login của người dùng và mang mọi phiên lead trên máy này. Không trỏ tài khoản của seat vào đó: fgOS gia hạn login của tài khoản (có thể tiêu refresh token), và một lần gia hạn hỏng sẽ đăng xuất cả các phiên lead. Tạo một login riêng, một lần, trong thư mục do fgOS sở hữu:
 
 ```sh
-fgos config set runner.providers.claude.accounts.main '{label: claude-main, credentialSources: {claude: {kind: home-files, home: "${HOME}/.claude", files: [".credentials.json"]}}}' --reason "owner: seat claude trong sandbox có login riêng để giữ transcript"
+mkdir -m 700 ~/.fgos/private/claude-login
+CLAUDE_CONFIG_DIR=~/.fgos/private/claude-login claude /login
 ```
 
-Hoặc sửa tay, thêm khối sau dưới `runner.providers` (cùng cấp với `openai`, `deepseek`...):
+Đăng nhập bằng tài khoản claude dành cho seat (có thể là cùng tài khoản Anthropic nhưng là một lần đăng nhập khác, nên refresh token riêng). Sau đó khai tài khoản trong `~/.fgos/private/accounts.yaml`, `home` luôn trỏ vào thư mục đó:
+
+```sh
+fgos config set runner.providers.claude.accounts.main '{label: claude-seat, credentialSources: {claude: {kind: home-files, home: "${HOME}/.fgos/private/claude-login", files: [".credentials.json"]}}}' --reason "owner: seat claude trong sandbox dùng login riêng của fgOS"
+```
+
+Hoặc sửa tay, thêm dưới `runner.providers`:
 
 ```yaml
     claude:
       accounts:
         main:
-          label: claude-main
+          label: claude-seat
           credentialSources:
             claude:
               kind: home-files
-              home: ${HOME}/.claude
+              home: ${HOME}/.fgos/private/claude-login
               files:
                 - .credentials.json
 ```
 
-Chỉ `.credentials.json` được chép. `~/.claude.json`, `settings.json`, `projects/`, `history.jsonl` của người dùng không vào home của seat.
+Chỉ `.credentials.json` được chép vào home của seat. Seat từ chối chạy nếu bản chép còn ít thời gian access token hơn timeout của seat (để seat không bao giờ tự gia hạn trong home); fgOS gia hạn login riêng này ở nguồn trước khi chạy.
 
 ## Thứ tự áp dụng
 
@@ -53,4 +60,4 @@ fgos dispatch probe-session claude   # category kept
 
 ## Máy khác
 
-Máy nào chạy seat claude trong sandbox đều cần cùng khối (đường dẫn `${HOME}/.claude` đúng với người dùng của máy đó). Máy không có CLI `claude` thì bỏ qua: bind và doctor bỏ qua executor có CLI chưa cài.
+Máy nào chạy seat claude trong sandbox đều cần login riêng và khối tài khoản của chính máy đó. Máy không có CLI `claude` thì bỏ qua: bind và doctor bỏ qua executor có CLI chưa cài.
