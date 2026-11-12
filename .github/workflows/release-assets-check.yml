@@ -92,3 +92,14 @@ jobs:
       - uses: actions/checkout@v4
       - run: git --version; which git; which sh
       - run: cargo test -p fgos-git debug_print_floor -- --nocapture 2>&1 | grep -E 'FLOORDEBUG|panicked|error' | head -20
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+      - run: npm ci
+      - run: cargo build --locked --release --workspace
+        env:
+          RUSTFLAGS: -C link-arg=/Brepro
+      - run: node scripts/package-release-assets.mjs --version v0.0.0-debug --out dist
+        env:
+          RUSTFLAGS: -C link-arg=/Brepro
