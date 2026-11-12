@@ -1,5 +1,7 @@
 # Hướng dẫn: khai tài khoản claude để seat claude trong sandbox có login riêng và giữ được transcript
 
+> **Bắt buộc trước khi kích hoạt bản phát hành này:** máy của owner, fg-server và mọi máy khác chạy seat claude trong sandbox phải có login claude riêng của fgOS (`~/.fgos/private/claude-login`) và khối tài khoản `claude` dưới đây **trước khi kích hoạt**, nếu không cả hai seat claude trong sandbox khởi động chưa đăng nhập. fg-server2 đã xong.
+
 Dành cho: owner. **Tiến độ: fg-server2 đã xong (owner đăng nhập vào `~/.fgos/private/claude-login`, big lead thêm `runner.providers.claude.accounts.main` vào `~/.fgos/private/accounts.yaml`, 2026-11-12). Máy owner và fg-server còn phải làm.** Người viết: HARDEN (T9 P27). Trạng thái: **đã áp dụng trên fg-server2; chưa áp dụng trên máy owner và fg-server**. HARDEN không tự sửa tệp cấu hình nào của owner (`~/.fgos/config.*`, `.fgos/config.*`, `~/.fgos/private/*`).
 
 ## Chuyện gì thay đổi và vì sao

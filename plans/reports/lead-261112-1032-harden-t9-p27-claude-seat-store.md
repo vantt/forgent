@@ -7,7 +7,7 @@ Branch `harden/t9-p27-claude-seat-store`; the land range is on the board line. O
 - `core/config-standard/runner.yaml`: `claude-cli-bwrap` and `claude-herdr-bwrap` declare `credentialStore: {use: claude, homeEnv: CLAUDE_CONFIG_DIR, files: [.credentials.json], sessionDir: projects}` and `env: CLAUDE_CODE_FORCE_SESSION_PERSISTENCE: "1"`. `repo-differences.v1.json` records the difference from the pinned authoring source.
 - `provider-credential-renewal.mjs`: one factory `claudeLayoutAt(name, file)` gives two layouts: `claude-config-credentials-json` (`.credentials.json`, login home is `CLAUDE_CONFIG_DIR`) and the old `claude-credentials-json` (`.claude/.credentials.json`, HOME), kept only because the live confined-mailbox harness keeps claude under HOME. `provider-credential-probe.mjs` probes the config-dir form with `CLAUDE_CONFIG_DIR`.
 - `trust-store.mjs` `seedClaudeConfigTrust` and `herdr-round.mjs` `trustStorePaths`: a pane with its own `CLAUDE_CONFIG_DIR` gets `.claude.json` (onboarding, theme, workspace trust) in that directory, derived from a root trusted in the real `~/.claude.json`, which is never edited (approved by the big lead).
-- Docs: agent-confinement 13.1 point 4, run-supervisor layout row and decision line, runner RUL105 text, CHANGELOG. Owner guide drafted, now on hold.
+- Docs: agent-confinement 13.1 point 4, run-supervisor layout row and decision line, runner RUL105 text, CHANGELOG. Owner guide `guide-261112-1032-declare-claude-seat-store.md`: applied on fg-server2; the owner machine, fg-server and any other machine running confined claude seats still need it before they activate this release.
 
 Reused: the credential-store copy and write-back path (`copyCredentialFiles`, `credentialWriteBackTarget`, finalize `sessionDir` copy from P26), the P05 claude layout and its "staged, never applied" rule, the codex/agy private-config seeding seam in `trustStorePaths`, `worker-home.mjs`'s onboarding file shape (prior art from `git log -S'CLAUDE_CONFIG_DIR'` and `-S'credentialStore'`). Missing and added: a config-dir spelling of the layout, the claude private-config seed, the env var below.
 
@@ -45,7 +45,7 @@ Rotation of Anthropic's refresh token stays unknown (no refresh was observed in 
   - before, real config: `claude-cli-bwrap` = `dir-undeclared`;
   - after: `claude-cli-bwrap` kept, 1 file, 579 510 B; `claude-herdr-bwrap` (pane) kept, 1 file, 694 162 B; files 0600, dirs 0700, no login file in `protected/session/`; no leftover home under `/tmp/fgos-confinement`; the confined seat does not see `~/.claude` (masked);
   - a confined claude writing seat wrote its file (the commit step failed only for the throwaway HOME's missing git identity).
-  The final probe on the real owner config waits for the account entry.
+  The probe on the real fg-server2 config, after the account entry, is in the section above (both kept).
 
 ## Refresh token (owner decision b)
 
