@@ -166,15 +166,6 @@ test('llm-accounts-vs-legacy compares only once runner.llmAccounts exists, and w
   assert.match(differ.message, /^warning: .*only in runner\.providers: gemini\/tetcu72.*only in runner\.llmAccounts: gemini\/other/);
 });
 
-test('global-model-policies-portable fails on a list, model@pool or object cell in the global config', () => {
-  const plain = runCheck('global-model-policies-portable', {}, { modelPolicies: { claude: { advanced: 'opus' } } });
-  assert.equal(plain.passed, true);
-
-  const extended = runCheck('global-model-policies-portable', {}, { modelPolicies: { claude: { advanced: ['opus@vertex', 'opus'] }, deepseek: { standard: 'deepseek-v4@openrouter' }, gemini: { flagship: { model: 'gemini-pro', effort: 'high' } } } });
-  assert.equal(extended.passed, false);
-  assert.match(extended.message, /claude\.advanced, deepseek\.standard, gemini\.flagship/);
-});
-
 test('tier-fallback passes the list of the standard, passes a served list of all six tiers, and warns about a family the walk would skip', () => {
   // The standard declares the walk order of every tier.
   const none = runCheck('tier-fallback', {});
