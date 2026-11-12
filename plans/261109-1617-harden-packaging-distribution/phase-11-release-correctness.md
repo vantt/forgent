@@ -1,7 +1,7 @@
 ---
 phase: 11
 title: "Release correctness: plugin version follows the product, a release needs the whole test suite, the consumer proof upgrades from the previous tag and runs doctor and uninstall"
-status: pending
+status: completed
 depends_on: ["P09 landed (consumer script variable lines)", "P06 landed (consumer init expectations)", "P08 landed for the uninstall smoke step only"]
 parallel: "group G4 with P08 and P10; sole writer of release.yml, prepare-release.mjs and the consumer scripts from here"
 effort: ~1d
