@@ -7,7 +7,7 @@ use fgos_event_store::{
     open_read,
     registry::Registry,
 };
-use fgos_git::{GitDriver, Inspect, RepoHandle, ResolveRepo};
+use fgos_git::{plain_path, GitDriver, Inspect, RepoHandle, ResolveRepo};
 use napi::{bindgen_prelude::External, Error, Result};
 use napi_derive::napi;
 use serde::Deserialize;
@@ -169,7 +169,9 @@ impl EventStoreRoot {
     #[napi(getter)]
     pub fn common_dir(&self) -> Result<String> {
         available()?;
-        Ok(self.repo.common_dir().to_string_lossy().into_owned())
+        Ok(plain_path(self.repo.common_dir())
+            .to_string_lossy()
+            .into_owned())
     }
     #[napi(getter)]
     pub fn machine_id(&self) -> Result<String> {

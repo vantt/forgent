@@ -3435,31 +3435,62 @@ mod tests {
     }
     #[test]
     fn a_path_reaches_the_addon_callers_only_through_the_plain_spelling() {
-        let keys = [
-            "\"commonDir\":",
-            "\"gitDir\":",
-            "\"worktreeRoot\":",
-            "\"trustedMainRoot\":",
+        fn rust_files(dir: &Path, out: &mut Vec<PathBuf>) {
+            for entry in fs::read_dir(dir).unwrap() {
+                let path = entry.unwrap().path();
+                if path.is_dir() {
+                    rust_files(&path, out);
+                } else if path.extension().is_some_and(|e| e == "rs") {
+                    out.push(path);
+                }
+            }
+        }
+        let root = Path::new(env!("CARGO_MANIFEST_DIR")).join("../node-addon/src");
+        let mut files = Vec::new();
+        rust_files(&root, &mut files);
+        let getters = [
+            "common_dir()",
+            "git_dir()",
+            "work_tree()",
+            "trusted_main_root()",
         ];
-        let mut seen = 0;
-        for source in [
-            include_str!("../../node-addon/src/git.rs"),
-            include_str!("../../node-addon/src/git/inspect.rs"),
-        ] {
-            for key in keys {
-                for (at, _) in source.match_indices(key) {
-                    let value = &source[at + key.len()..];
-                    let value = &value[..value.find(",\"").unwrap_or(value.len())];
-                    assert!(
-                        value.contains("plain_path"),
-                        "an addon result hands {key} out in the internal spelling: {value}"
-                    );
-                    seen += 1;
+        let sinks = ["json!", "to_string_lossy", ".display()", ".to_str()"];
+        let mut handed_out = 0;
+        for file in files {
+            let source = fs::read_to_string(&file).unwrap();
+            let lines: Vec<&str> = source.lines().collect();
+            for (n, line) in lines.iter().enumerate() {
+                // rustfmt may move the sink of a chain onto the next lines.
+                let mut statement = (*line).to_owned();
+                for next in &lines[n + 1..] {
+                    if !next.trim_start().starts_with('.') {
+                        break;
+                    }
+                    statement.push_str(next);
+                }
+                if !sinks.iter().any(|sink| statement.contains(sink)) {
+                    continue;
+                }
+                for getter in getters {
+                    for (at, _) in line.match_indices(getter) {
+                        handed_out += 1;
+                        let head = &line[..at];
+                        let wrapped = head.rfind("plain_path(").is_some_and(|i| {
+                            head[i + "plain_path(".len()..]
+                                .chars()
+                                .all(|c| c.is_alphanumeric() || c == '_' || c == '.')
+                        });
+                        assert!(
+                            wrapped || line[at + getter.len()..].starts_with(".map(plain_path)"),
+                            "{}: a repository path reaches a caller without plain_path: {line}",
+                            file.display()
+                        );
+                    }
                 }
             }
         }
         assert!(
-            seen >= 5,
+            handed_out >= 5,
             "the guard no longer sees the addon's path results"
         );
     }
