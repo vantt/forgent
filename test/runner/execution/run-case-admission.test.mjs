@@ -581,3 +581,98 @@ test('runUnit launches critical reviewed seats with shipped floor when injected 
     ['producer', 'reviewer', 'red-team', 'tester'],
   );
 });
+
+// What the Unit run settles with, for the case and for the caller: one final outcome and the facts it stands on.
+const settledOf = (port) => port.calls.find((c) => c[0] === 'settle')[2];
+const gitIn = (cwd, args) => execFileSync('git', args, { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim();
+
+test('a Unit that wrote outside its scope ends findings for the case and for the caller alike, standalone or in a case', async () => {
+  for (const caseRef of [{ caseId: 'case-test', activity: 'build' }, undefined]) {
+    const { repoRoot, worktreeDir } = setup();
+    const port = recordingPort();
+    const res = await runUnit({
+      unitData: { ...WRITE_UNIT, objective: 'WRITE:docs/a.md WRITE:stray.txt' }, caseAdmission: port, ...(caseRef ? { caseRef } : {}), repoRoot, cwd: worktreeDir, worktree: worktreeDir,
+    });
+    assert.equal(res.outcome, 'findings', JSON.stringify(res.results));
+    assert.deepEqual(res.outOfScope, ['stray.txt']);
+    assert.equal(res.infrastructure, false, 'a path outside the scope is a verdict, never infrastructure');
+    assert.equal(unitJson(repoRoot, res.unitRunId).settlement.outcome, 'findings', 'the unit record settles with the final outcome');
+    if (caseRef) assert.deepEqual([settledOf(port).outcome, settledOf(port).outOfScope], ['findings', ['stray.txt']]);
+  }
+});
+
+test('a Unit run hands up its final outcome with the facts it stands on: infrastructure, scope, evaluations, start, settles, launches', async () => {
+  const { repoRoot, worktreeDir } = setup();
+  const port = recordingPort();
+  const res = await runUnit({
+    unitData: { ...WRITE_UNIT, objective: 'WRITE:docs/a.md', verify: 'true' }, caseAdmission: port, caseRef: { caseId: 'case-test', activity: 'build' }, repoRoot, cwd: worktreeDir, worktree: worktreeDir,
+  });
+  const facts = (data) => ({
+    outcome: data.outcome, infrastructure: data.infrastructure, outOfScope: data.outOfScope, outOfScopeOnBranch: data.outOfScopeOnBranch,
+    evaluations: data.evaluations, started: data.started, launches: data.launches, warnings: data.warnings,
+  });
+  const expected = {
+    outcome: 'pass', infrastructure: false, outOfScope: [], outOfScopeOnBranch: [],
+    evaluations: [{ kind: 'verify', seat: 'verify', round: 1, passed: true }],
+    started: { value: true, reason: null }, launches: { ceiling: null, used: 1, ceilingHit: false }, warnings: [],
+  };
+  assert.deepEqual(facts(res), expected);
+  assert.deepEqual(res.settled, { unit: true, case: true });
+  assert.deepEqual(res.results.map((r) => [r.seat, r.outcome, r.infrastructure]), [['producer', 'pass', false], ['verify', 'pass', false]]);
+  // The port settles with the same shape, carrying its contract.
+  const settle = settledOf(port);
+  assert.deepEqual(settle.contract, { id: 'unit-run-result', version: 1 });
+  assert.deepEqual(facts(settle), expected);
+});
+
+test('a reservation that cannot be settled is told to the caller: settled.case is false with the error, and a structured warning', async () => {
+  const { repoRoot, worktreeDir } = setup();
+  const port = recordingPort({ onSettle: () => { throw new Error('ledger is read-only'); } });
+  const res = await runUnit({
+    unitData: { ...WRITE_UNIT, writes: [], objective: 'Read' }, caseAdmission: port, caseRef: { caseId: 'case-test', activity: 'scout' }, repoRoot, cwd: worktreeDir, worktree: worktreeDir,
+  });
+  assert.equal(res.outcome, 'pass');
+  assert.deepEqual(res.settled, { unit: true, case: false, settleError: 'ledger is read-only' });
+  assert.deepEqual(res.warnings.map((w) => w.code), ['case-settle-failed']);
+});
+
+test('a Unit whose branch carries paths outside its scope since its base ends findings, and a writer built on it inherits them', async () => {
+  const { repoRoot, worktreeDir } = setup();
+  const baseSha = gitIn(worktreeDir, ['rev-parse', 'HEAD']);
+  fs.writeFileSync(path.join(worktreeDir, 'other.txt'), 'carried\n');
+  gitIn(worktreeDir, ['add', 'other.txt']);
+  gitIn(worktreeDir, ['commit', '-m', 'producer commit outside the scope']);
+  const port = recordingPort();
+  const res = await runUnit({
+    unitData: { ...WRITE_UNIT, objective: 'WRITE:docs/a.md' }, caseAdmission: port, caseRef: { caseId: 'case-test', activity: 'build' }, repoRoot, cwd: worktreeDir, worktree: worktreeDir,
+    branchBase: { branch: 'wt-branch', baseSha, outOfScopeOnBranch: ['inherited.txt'] },
+  });
+  assert.equal(res.outcome, 'findings');
+  assert.deepEqual(res.outOfScopeOnBranch, ['inherited.txt', 'other.txt']);
+  assert.deepEqual(res.outOfScope, ['inherited.txt', 'other.txt']);
+  assert.deepEqual(unitJson(repoRoot, res.unitRunId).branchBase, { branch: 'wt-branch', baseSha, outOfScopeOnBranch: ['inherited.txt'] }, 'a resume reads the base back from the record');
+  assert.equal(settledOf(port).outcome, 'findings');
+});
+
+test('a write check that cannot run ends the Unit as an infrastructure failure instead of throwing out of the run', async () => {
+  const { repoRoot, worktreeDir } = setup();
+  const baseSha = gitIn(worktreeDir, ['rev-parse', 'HEAD']);
+  const port = recordingPort();
+  const res = await runUnit({
+    unitData: WRITE_UNIT, caseAdmission: port, caseRef: { caseId: 'case-test', activity: 'build' }, repoRoot, cwd: worktreeDir, worktree: worktreeDir,
+    branchBase: { branch: 'wf/gone', baseSha, outOfScopeOnBranch: [] },
+  });
+  assert.equal(res.outcome, 'execution-failure');
+  assert.match(res.error, /could not check the writes of the unit: .*writing branch/);
+  assert.deepEqual([res.infrastructure, res.outOfScope, settledOf(port).outcome], [true, [], 'execution-failure']);
+});
+
+test('a branch base that is not a branch, a commit and a list of paths is refused before any run exists', async () => {
+  const { repoRoot, worktreeDir } = setup();
+  for (const branchBase of [{}, { branch: '', baseSha: 'abc', outOfScopeOnBranch: [] }, { branch: 'b', baseSha: 'abc', outOfScopeOnBranch: 'x' }, 'wt-branch']) {
+    await assert.rejects(() => runUnit({
+      unitData: WRITE_UNIT, caseAdmission: recordingPort(), caseRef: { caseId: 'case-test', activity: 'build' }, repoRoot, cwd: worktreeDir, worktree: worktreeDir, branchBase,
+    }), /branchBase/);
+  }
+  assert.deepEqual(assignmentsOf(repoRoot), []);
+});
