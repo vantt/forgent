@@ -70,7 +70,7 @@ test('without apply the plan lists changes and keep-paths and changes nothing', 
   const result = uninstallProject(project, { packageRoot: pkg, home: mkTemp('uninstall-home-') });
   assert.equal(result.applied, false);
   assert.ok(result.changes.some((line) => line.includes('.claude/settings.json')), result.changes.join('\n'));
-  assert.ok(result.changes.some((line) => line.includes('.claude/skills/alpha')));
+  assert.ok(result.changes.some((line) => line.startsWith('.claude/skills: remove 2 generated skill directories (alpha, beta)')), result.changes.join('\n'));
   assert.ok(result.keeps.some((line) => line.startsWith('.fgos:')) && result.keeps.some((line) => line.startsWith('.fgos/distribution.json:')));
   assert.equal(read(project, '.claude/settings.json'), before);
   assert.ok(exists(project, '.claude/skills/alpha/SKILL.md') && exists(project, '.agents/skills/alpha/SKILL.md'));

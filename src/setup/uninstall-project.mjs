@@ -80,6 +80,13 @@ function planSkills(repoRoot, packageRoot, apply) {
   return { removed, kept, foreign, skipped: null };
 }
 
+/** One line per skills root: the count, and the names when there are few. */
+function skillsRemovalLines(dirs, rel) {
+  const byRoot = new Map();
+  for (const dir of dirs) byRoot.set(path.dirname(dir), [...(byRoot.get(path.dirname(dir)) ?? []), path.basename(dir)]);
+  return [...byRoot].map(([root, names]) => `${rel(root)}: remove ${names.length} generated skill director${names.length === 1 ? 'y' : 'ies'}${names.length <= 3 ? ` (${names.join(', ')})` : ''}`);
+}
+
 function planGitHooks(repoRoot, apply) {
   if (!apply) return { unwired: mainCheckoutHookWired(repoRoot), skippedExisting: null };
   return uninstallGitHooks(repoRoot);
@@ -157,7 +164,7 @@ export function uninstallProject(repoRoot, { apply = false, packageRoot, shellIn
   const rel = (file) => path.relative(repoRoot, file) || file;
   const changes = [
     ...hookChanges.flatMap((r) => r.removed.map((name) => `${r.label}: remove the fgOS hook ${name}`)),
-    ...skills.removed.map((dir) => `${rel(dir)}: remove the generated skill directory`),
+    ...skillsRemovalLines(skills.removed, rel),
     ...(gitHooks.unwired ? ['git: unset core.hooksPath (fgOS wired it) and remove the empty .githooks it left'] : []),
     ...(apply && timer?.fixed ? [timer.message] : []),
   ];

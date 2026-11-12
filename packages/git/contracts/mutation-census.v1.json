@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "aa124c6222520aa0d9750891533e863dd9dd77785af4f5fe1e3af5b9eb5495f8",
+  "payloadDigest": "d55a02491ed4b2d9626f0aea8660f806b992ef90afe021eb79b7ddf5d0f6d20e",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -1157,7 +1157,7 @@
     "src/setup/shell-rc.mjs": "36c0eb600e6943d5c6ed94918d5d6a294d447fa8a6491076faaf525aa80807c0",
     "src/setup/skill-wrappers.mjs": "0babbffde31c66d04d0f8dbc2225d273af95a3527b8538681e264f242cc8210a",
     "src/setup/terminal-control-checks.mjs": "5dca8b2bf0c8bddbc55bcfad97700e65708a04822bf8065b484d5d6c251ce4aa",
-    "src/setup/uninstall-project.mjs": "14855cd15943baf75e8d1e4adbf7425e8c86119eab81e2cf9baaf528b442542f",
+    "src/setup/uninstall-project.mjs": "f9c6561458ace0478b4486e27bf31d973bd869fc3dbd2dba09d623a52bca30ad",
     "src/setup/workflow-case-checks.mjs": "9b187678986f33683b456a75565026e0d86be858cc8281feb86e8b660a6e4ba1",
     "src/setup/workflow-catalog-reader.mjs": "7056fca651ea1ebafa0445449fb63722509104f09d3527ba4af5ee10f691c379",
     "src/state/awaiting-context.mjs": "656e9ba97160ea31b09160cccb7ba07d50072860b1ce908629ea382119fa4da9",
