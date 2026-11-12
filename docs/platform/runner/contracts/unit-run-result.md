@@ -4,8 +4,8 @@
 Document type: Contract
 Audience: Maintainer, implementer, agent that has only `fgos run --json`
 Purpose: Fix what the Execution layer hands up when a Unit run ends, so the Workflow layer and any caller read facts instead of re-deriving them
-Design status: Proposed. The owner has not approved it; nothing below is implemented yet
-Implementation: None. The "Today" column of each table says what exists now
+Design status: Sections 3 and 5 approved by the owner on 2026-11-12 (part A, so the single outcome module can start). Sections 4 and 6 to 9 are still proposed and await the owner. Parts of section 7 already landed (the custody door and the verify door in `src/runner/execution/custody-door.mjs`, seat transcript keeping, `accountPin`); the rest is not implemented
+Implementation: Partial, see Design status. The "Today" column of each table says what exists now
 Provenance: Owner direction 2026-11-09 (three layers; lower layer must stand alone; one authority per decision, in the lowest layer that can know it), a four-seat advisory run through `fgos run` only, HARDEN review of every "Today" cell against origin/main, HARDEN's cross-layer authority audit (plans/reports/audit-261109-1736-harden-authority-layers.md) and the retired-engine entity map (plans/reports/researcher-report-261109-1647-retired-engine-entity-map.md)
 Writer type: Agent draft writer (COOK), reviewed by HARDEN
 Canonical for: The result shape of one Unit run at the Execution to Workflow boundary, once approved
@@ -96,7 +96,7 @@ The new fields are optional and change no field's meaning, so every reader of ve
 
 ## 6. Unit input
 
-No new input. The ceiling reaches Execution only through the case admission port (`seatLaunchCeiling`), so a Unit input for it would be a second door. The Unit input gains `contract: { id: "unit", version }` and keeps the existing refusal of `executor`, `provider`, `model`, `tier`, `invocation`, `actors` and `overrides`, so the caller never pins who runs.
+No new input. The ceiling reaches Execution only through the case admission port (`seatLaunchCeiling`), so a Unit input for it would be a second door. The Unit input gains `contract: { id: "unit", version }` and keeps the existing refusal of `executor`, `provider`, `model`, `tier`, `invocation`, `actors` and `overrides`, so the caller never pins who runs. The account-pin mode (`accountPin: strict | where-served`, absent means `strict`) is an option of `runUnit` beside `overrides` and `workflowId`, never a Unit field and never an override key.
 
 ## 7. What each layer must do
 
@@ -132,4 +132,4 @@ The engine owned execution and orchestration in one block, grew a phase at a tim
 
 - Whether a case wall-time or concurrency ceiling is added to the case frame; outside this contract.
 - Close by quorum for a council step; outside this contract.
-- Whether the Unit-level facts are also stored (which bumps `unit-summary` to version 3) or only printed in `data`.
+- Decided 2026-11-12 (owner approved the recommendation): the Unit-level facts are only printed in `data`, so `unit-summary` stays at version 2. Store them later, with the Rust reader first, if a reader needs it.
