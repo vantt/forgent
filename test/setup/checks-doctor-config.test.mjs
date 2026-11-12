@@ -243,7 +243,7 @@ test('workflow-capabilities-configured names a capability a project Workflow use
   writeProjectWorkflow(cwd, ['mine:frame']);
   const { passed, message } = checkById('workflow-capabilities-configured').check(cwd);
   assert.equal(passed, false);
-  assert.match(message, /mine:frame \(mine\)/);
+  assert.match(message, /mine:frame \(mine from project\)/);
   assert.doesNotMatch(message, /marketing:write/, 'a registered capability must not be reported');
   fs.rmSync(cwd, { recursive: true, force: true });
 });
