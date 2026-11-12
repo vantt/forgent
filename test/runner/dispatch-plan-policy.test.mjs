@@ -12,7 +12,7 @@ import { resolveStrongerRigor } from '../../src/runner/rigor.mjs';
 import { workRigorFor } from '../../src/runner/work-dispatch.mjs';
 import { seedStubAgentClis } from '../helpers/agent-clis.mjs';
 
-seedStubAgentClis('claude', 'pi', 'glm', 'disallowed-provider');
+seedStubAgentClis('claude', 'codex', 'pi', 'glm', 'disallowed-provider');
 
 
 const ALL_TIER_MODELS = { nano: 'm', mini: 'm', standard: 'm', advanced: 'm', flagship: 'm', frontier: 'm' };

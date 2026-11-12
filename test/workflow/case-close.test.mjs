@@ -238,8 +238,8 @@ test('a Unit run that cannot be removed leaves the ledger to name what is still 
   const old = caseNaming(repoRoot, ['first', 'second'], { closedDaysAgo: 30 });
   const first = unitRun(repoRoot, 'first', old.caseId);
   const second = unitRun(repoRoot, 'second', old.caseId);
-  const stuck = path.join(second, 'outbox');
-  fs.chmodSync(stuck, 0o500);
+  // A read-only run directory refuses every entry in it, so the failed removal leaves the run whole whatever order the filesystem lists its files in.
+  fs.chmodSync(second, 0o500);
   try {
     // The one residual: a removal that fails midway leaves the ledger naming the run already gone.
     const result = pruneUnchecked(repoRoot, { apply: true });
@@ -249,12 +249,15 @@ test('a Unit run that cannot be removed leaves the ledger to name what is still 
     assert.equal(fs.existsSync(first), false);
     assert.equal(fs.existsSync(second), true);
   } finally {
-    fs.chmodSync(stuck, 0o700);
+    fs.chmodSync(second, 0o700);
   }
-  // The retry finds the first run gone; the second lost part of its record to the failed removal, so it stays and so does the ledger.
+  // A failed removal that did take part of the run with it: the run lost its record, so it stays and so does the ledger.
+  fs.rmSync(path.join(second, 'unit.json'));
   const retry = pruneUnchecked(repoRoot, { apply: true });
   assert.deepEqual(retry.cases, []);
-  assert.ok(['unsettled', 'unit-record-missing'].includes(ids(retry.kept).second));
+  assert.equal(ids(retry.kept).second, 'unit-record-missing');
+  assert.equal(ids(retry.kept)[old.caseId], 'unit-run-kept');
+  assert.equal(fs.existsSync(second), true);
 });
 
 test('concurrent prunes remove each directory once, finish, and report no failure', async () => {

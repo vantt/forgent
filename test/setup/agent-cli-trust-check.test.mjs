@@ -11,7 +11,7 @@ import { checkAgentCliProjectTrusted } from '../../src/setup/agent-cli-trust.mjs
 import { moveMachineKeysTo, writeProjectConfig } from '../helpers/config-fixture.mjs';
 import { seedStubAgentClis, stubAgentCliDir } from '../helpers/agent-clis.mjs';
 
-seedStubAgentClis('codex');
+seedStubAgentClis('codex', 'agy');
 
 const SECRET_LINE = 'api_key = "sk-do-not-print-this-value"';
 

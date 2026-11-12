@@ -20,6 +20,9 @@ import { parseEditFlags } from '../../src/verbs/state/edit.mjs';
 import { effectiveDispatchPolicy } from '../../src/runner/dispatch/plan.mjs';
 import { bindable } from '../helpers/work-seat-config.mjs';
 import { workRigorFor } from '../../src/runner/work-dispatch.mjs';
+import { seedStubAgentClis } from '../helpers/agent-clis.mjs';
+
+seedStubAgentClis('claude');
 
 function mkTempDir() {
   const repo = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-work-size-rigor-test-'));

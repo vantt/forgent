@@ -193,6 +193,11 @@ test('close.sh without herdr does nothing and exits 0', () => {
 });
 
 test('the plugin skills no longer call herdr pane rename or close', () => {
-  const out = spawnSync('rg', ['herdr pane (rename|close)', skills], { encoding: 'utf8' });
-  assert.equal(out.status, 1, out.stdout);
+  const hits = [];
+  for (const entry of fs.readdirSync(skills, { recursive: true, withFileTypes: true })) {
+    if (!entry.isFile()) continue;
+    const file = path.join(entry.parentPath, entry.name);
+    fs.readFileSync(file, 'utf8').split('\n').forEach((text, i) => { if (/herdr pane (rename|close)/.test(text)) hits.push(`${file}:${i + 1}: ${text}`); });
+  }
+  assert.deepEqual(hits, []);
 });
