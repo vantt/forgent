@@ -260,6 +260,11 @@ export function readRawGlobalConfig(home) {
   return fs.readFileSync(globalConfigPath(home), 'utf8');
 }
 
+/** The bytes of the retired JSON global config under `home`, exactly as on disk. */
+export function readRawLegacyGlobalConfig(home) {
+  return fs.readFileSync(path.join(home, '.fgos', 'config.json'), 'utf8');
+}
+
 /** The gateway token file of the global directory `globalDir` (`<globalDir>/private/gateway-token`). */
 export function gatewayTokenPath(globalDir) {
   return path.join(globalDir, 'private', 'gateway-token');

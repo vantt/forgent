@@ -440,6 +440,7 @@
     "src/state/step-fsm.mjs": "domain",
     "src/verbs/state/step.mjs": "use-case",
     "src/verbs/state/init.mjs": "use-case",
+    "src/verbs/state/settle-legacy-config.mjs": "use-case",
     "src/runner/operation-choice.mjs": "use-case",
     "src/runner/work-dispatch.mjs": "use-case",
     "src/event-store/consumers.mjs": "infra",

@@ -11,7 +11,7 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { initFixtureRepo } from '../helpers/git-fixture.mjs';
-import { writeRawLegacyGlobalConfig, writeRawLegacyProjectConfig, gatewayTokenPath, readGatewayToken } from '../helpers/config-fixture.mjs';
+import { writeRawLegacyGlobalConfig, writeRawLegacyProjectConfig, readRawLegacyGlobalConfig, gatewayTokenPath, readGatewayToken } from '../helpers/config-fixture.mjs';
 import { readConfig, checkConfig } from '../../src/config/facade.mjs';
 import { settleLegacyConfig } from '../../src/verbs/state/settle-legacy-config.mjs';
 
@@ -62,12 +62,9 @@ test('a private token that differs from the one in the old global file is never 
   const m = machine();
   fs.mkdirSync(path.join(m.home, '.fgos/private'), { recursive: true, mode: 0o700 });
   fs.writeFileSync(gatewayTokenPath(path.join(m.home, '.fgos')), `${OTHER}\n`, { mode: 0o600 });
-  const legacy = readRawGlobalConfigLegacy(m);
+  const legacy = readRawLegacyGlobalConfig(m.home);
   assert.throws(() => withEnv(m, () => settleLegacyConfig(m.project)), { code: 'config-migrate-destination-differs' });
   assert.ok(readGatewayToken(path.join(m.home, '.fgos')).trim() === OTHER);
-  assert.equal(readRawGlobalConfigLegacy(m), legacy);
+  assert.equal(readRawLegacyGlobalConfig(m.home), legacy);
 });
 
-function readRawGlobalConfigLegacy(m) {
-  return fs.readFileSync(path.join(m.home, '.fgos/config.json'), 'utf8');
-}
