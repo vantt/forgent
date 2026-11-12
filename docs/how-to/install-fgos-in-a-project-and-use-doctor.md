@@ -203,13 +203,15 @@ fgos doctor --fix --json   # adds data.fixed: [{id, changed, message}] and re-re
 Who fixes it:
 
 - **tool**: `fgos doctor --fix` repairs it.
-- **setup**: `fgos setup` repairs it (and `doctor --fix` does not).
+- **setup**: only the legacy `fgos setup` repairs it (and `doctor --fix` does not).
 - **you**: only the project owner can, by hand. fgOS never edits those files.
 - **wire-agents**: your own agent config outside the project (the Claude config dir, `~/.gemini`). `fgos init`, `setup` and `doctor --fix` never write it. Run `fgos wire-agents` to see what it would change, then `fgos wire-agents --yes`: it acts only on agent CLIs on this machine and backs up each file first as `<file>.pre-wire-agents-<time>`. A setting that widens an agent's permissions it only shows; you decide and edit it yourself.
 - **info**: informational, or only reports. No action required unless you care.
 
-The registered checks below come from `src/setup/registrations.mjs`
-(`src/setup/checks.mjs` re-exports it). Some read-only checks list the failing
+`fgos doctor --json` lists every row of the machine you run it on, with its id,
+message and, where one exists, its fix; the tables below explain the rows a
+project owner meets most. The registered checks come from
+`src/setup/registrations.mjs` (`src/setup/checks.mjs` re-exports it). Some read-only checks list the failing
 file or key in their message; the message always names the exact target.
 
 ### 4.1. Machine and installation
@@ -233,27 +235,22 @@ file or key in their message; the message always names the exact target.
 | Id | Checks | Typical failing message | Who | Fix |
 |---|---|---|---|---|
 | `runner-patterns-config` | The pattern catalog (`runner.patterns`) and the loop tuning (`runner.loops`) are well formed; no retired key remains; a project that sets `runner.loops.*` carries `runner.patterns.seatBinding.schema: 2` (a warning otherwise) | `<file>:<line>: runner.patterns.reviewed.maxRounds was retired; use runner.loops.reviewed.maxRounds instead.` | you | `fgos setup` converts the project YAML file (a backup is kept beside it); for a legacy JSON file edit the keys the message lists, then run `fgos config migrate` |
-| `runner-generated-paths` | `runner.generatedPaths` maps a generated source to its render targets with well-formed write-scope entries | `runner.generatedPaths missing -- write scopes are not widened to generated trees` | setup | `fgos setup` |
+| `runner-generated-paths` | `runner.generatedPaths` maps a generated source to its render targets with well-formed write-scope entries | `fgos doctor --pretty` names the key | you | Edit the key the message names, then `fgos config check` |
 | `executor-family-unique` | Each agent family has one executor | `one family, several executors: claude (claude, claude-herdr)` | you | Merge them: keep one executor and move the other's transports into it as invocations |
 | `executor-skills-installed` | Every skill an executor declares in `supports.skills` exists in the skill directory of each CLI the executor invokes (claude, codex, omp, pi, grok) in the main checkout | `claude declares ak:cook but .claude/skills/ak-cook/SKILL.md is missing in /path/repo` | you | Install the skill for that runtime, or remove it from `executors.<id>.supports.skills` |
 | `tier-fallback` | Every family `runner.tierFallback` lists for a tier has a `modelPolicies` cell at that tier and an agent executor | `warning: tier fallback entries the walk skips: advanced: z-ai has no modelPolicies cell at advanced` | you | Add the cell, or remove the family from that tier's list |
 | `model-policy-pools` | Every pool a tier cell names (`model@pool`) has accounts in `runner.llmAccounts` (the walk skips an entry whose pool has none) | `warning: tier cells name pools runner.llmAccounts does not declare: deepseek.standard@openrouter; the walk skips these entries until the pool has an enabled account holding a login store for the CLI of the invocation (fgos dispatch explain shows each)` | you | Declare the pool's accounts under `runner.llmAccounts` in `~/.fgos/config.json` |
 | `llm-accounts-shape` | `runner.llmAccounts` is in the global config only and well formed | `runner.llmAccounts.codex: "codex" is another spelling of the family "openai"` | you | Fix the named key (`fgos config explain <path>` says where it belongs) |
 | `llm-accounts-vs-legacy` | `runner.llmAccounts` and `runner.providers` list the same accounts and login directories (the lease reads `runner.llmAccounts` for a pool it declares and `runner.providers` for the rest) | `warning: the lease reads runner.llmAccounts for a pool it declares and runner.providers for the rest; only in runner.providers: gemini/tetcu72` | you | Add the missing account to the side that lacks it |
-| `advise-execute-capabilities-configured` | `runner.capabilities` declares `advise`, `execute`, `code:implement` | `runner.capabilities section missing -- run fgos setup` | setup | `fgos setup` |
-| `workflow-capabilities-configured` | Every capability a Workflow unit names is declared, and has a `prefer` pool | `no entry for Workflow capabilities: ...`; `warning: ... no "prefer" pool, so a headless run of those units is refused` | setup, you | `fgos setup` declares the capabilities. The `prefer` pool is yours to fill (section 5.2) |
-| `capability-serves-valid` | The `serves` sets are distinct and include `review` (their shape is `fgos config check`'s) | `runner.capabilities section missing -- run fgos setup` | setup | `fgos setup` |
-| `worker-slots-ceiling-usable` | `workerSlots.ceiling` is a positive integer or explicit `null` | `workerSlots section missing -- run fgos setup` | setup | `fgos setup`; set an integer (8 is recommended) to enforce a ceiling |
-| `invariant-checks-configured` | `invariantChecks.commands` has a runnable command | `invariantChecks section missing -- run fgos setup` | setup | `fgos setup`, then put your project's own check command there |
+| `workflow-capabilities-configured` | Every capability a Workflow unit names is declared, and has a `prefer` pool | `no entry for Workflow capabilities: ...`; `warning: ... no "prefer" pool, so a headless run of those units is refused` | you | Declare the capability under `runner.capabilities`; the `prefer` pool is yours to fill (section 5.2) |
+| `capability-serves-valid` | The `serves` sets are distinct and include `review` (their shape is `fgos config check`'s) | `fgos doctor --pretty` names the key | you | Edit the key the message names, then `fgos config check` |
+| `worker-slots-ceiling-usable` | `workerSlots.ceiling` is a positive integer or explicit `null` | `fgos doctor --pretty` names the key | you | Edit the key the message names, then `fgos config check` |
 | `worktree-setup-configured` | `worktreeSetup.commands` is a list of non-empty shell commands | names the bad entry | you | Edit `worktreeSetup.commands` |
 | `gate-bypass-configured` | `gateBypass.level` is one of off, light, standard, heavy | `gateBypass.level missing or not a recognized level ... -- run fgos doctor --fix` | tool | `fgos doctor --fix` |
 | `iron-law-configured` | `ironLaw.level` is ask or warn | `ironLaw.level missing ... -- run fgos doctor --fix` | tool | `fgos doctor --fix` |
 | `gateway-token-configured` | the machine files under `~/.fgos/private/` (accounts file, `gateway-token`) exist and are valid | the row names the missing or invalid file | tool | `fgos doctor --fix` (never rotates an existing token) |
-| `herdr-launcher-configured` | `herdrOrchestrator` toggles are present booleans | `herdrOrchestrator section missing -- run fgos setup` | setup | `fgos setup` |
-| `herdr-web-dashboard-configured` | `herdrWebDashboard.staticServing` is a boolean | `herdrWebDashboard section missing -- run fgos setup` | setup | `fgos setup` |
-| `doc-registry-enforce` | `docRegistry.enforce` is a boolean | `docRegistry section missing -- run fgos setup` | setup | `fgos setup` |
 | `main-checkout-hook-wired` | `core.hooksPath` points at `.githooks` (the main-checkout lock hook) | `core.hooksPath not wired to .githooks ... run fgos setup` | setup | `fgos setup` (never re-points a custom hooks path). Only meaningful when the project carries `.githooks` |
-| `dispatch-decide-hook-wired` | `.claude/settings.json` has the PreToolUse hook that forces `dispatch decide` before Agent/Task calls | `.claude/settings.json has no PreToolUse dispatch-decide hook wired ... run fgos setup` | setup | `fgos setup` |
+| `dispatch-decide-hook-wired` | `.claude/settings.json` has the PreToolUse hook that forces `dispatch decide` before Agent/Task calls | `.claude/settings.json has no PreToolUse dispatch-decide hook wired ... run fgos doctor --fix` | tool | `fgos doctor --fix` |
 
 ### 4.3. Agent CLIs, trust and Workflow readiness
 
