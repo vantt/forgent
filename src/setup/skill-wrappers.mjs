@@ -731,6 +731,35 @@ export function materializeSkillsIntoProject(packageRoot, targetRoot) {
 }
 
 /**
+ * The skill directories of a project that fgOS wrote, and the same-named ones it did not. A
+ * `.claude/skills` entry is ours when it carries the wrapper stamp, a `.agents/skills` entry when it
+ * carries the assembled header (or sits beside a stamped wrapper); a directory under an owned name
+ * without a stamp is another tool's and is listed in `foreign`, as is a link under an owned name.
+ * Anything else is the person's and is not named. Reads only.
+ */
+export function generatedSkillDirs(projectRoot, owned) {
+  const ours = [];
+  const foreign = [];
+  for (const [root, isStamped] of [
+    [path.join(projectRoot, '.claude', 'skills'), isGeneratedWrapper],
+    [path.join(projectRoot, '.agents', 'skills'), isOwnAgentsDir],
+  ]) {
+    if (!fs.existsSync(root)) continue;
+    for (const entry of fs.readdirSync(root, { withFileTypes: true })) {
+      if (isOwnTmpFile(entry.name)) continue;
+      const dir = path.join(root, entry.name);
+      if (entry.isSymbolicLink()) {
+        if (owned.has(entry.name)) foreign.push({ dir, why: 'a symbolic link' });
+      } else if (entry.isDirectory()) {
+        if (isStamped(dir)) ours.push(dir);
+        else if (owned.has(entry.name)) foreign.push({ dir, why: 'it carries no fgOS generated marker' });
+      }
+    }
+  }
+  return { ours, foreign };
+}
+
+/**
  * Renders this checkout's skill surfaces (`.agents/skills`, `.claude/skills`,
  * `plugins/fgOS/skills`) and instruction projections from their sources. The
  * owned names and the instruction projection are computed first, so any

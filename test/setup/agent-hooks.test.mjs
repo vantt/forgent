@@ -70,12 +70,12 @@ test('installClaudeHook writes canonical commands for every guard', () => {
   assert.equal(settings.hooks.PreToolUse[0].matcher, 'Agent|Task');
   assert.equal(
     settings.hooks.PreToolUse[0].hooks[0].command,
-    '"${CLAUDE_PROJECT_DIR}/.fgos/installation/bin/fgos" hook dispatch-decide',
+    'S="${CLAUDE_PROJECT_DIR}/.fgos/installation/bin/fgos"; [ -x "$S" ] || exit 0; "$S" hook dispatch-decide',
   );
   assert.equal(settings.hooks.PreToolUse[1].matcher, 'AskUserQuestion');
   assert.equal(
     settings.hooks.PreToolUse[1].hooks[0].command,
-    '"${CLAUDE_PROJECT_DIR}/.fgos/installation/bin/fgos" hook decision-question',
+    'S="${CLAUDE_PROJECT_DIR}/.fgos/installation/bin/fgos"; [ -x "$S" ] || exit 0; "$S" hook decision-question',
   );
   assert.equal(settings.hooks.PreToolUse[2].matcher, 'Bash');
   assert.match(settings.hooks.PreToolUse[2].hooks[0].command, /"\$S" hook main-checkout-delete-guard;; esac$/);
@@ -124,15 +124,48 @@ test('installClaudeHook migrates legacy script commands in-place without duplica
   assert.equal(migrated.hooks.PreToolUse.length, 4);
   assert.equal(
     migrated.hooks.PreToolUse[0].hooks[0].command,
-    '"${CLAUDE_PROJECT_DIR}/.fgos/installation/bin/fgos" hook dispatch-decide',
+    'S="${CLAUDE_PROJECT_DIR}/.fgos/installation/bin/fgos"; [ -x "$S" ] || exit 0; "$S" hook dispatch-decide',
   );
   assert.equal(migrated.hooks.PreToolUse[1].matcher, 'CustomTool');
   assert.equal(migrated.hooks.PreToolUse[1].hooks[0].command, 'node custom-audit.mjs');
   assert.equal(
     migrated.hooks.PreToolUse[2].hooks[0].command,
-    '"${CLAUDE_PROJECT_DIR}/.fgos/installation/bin/fgos" hook decision-question',
+    'S="${CLAUDE_PROJECT_DIR}/.fgos/installation/bin/fgos"; [ -x "$S" ] || exit 0; "$S" hook decision-question',
   );
 
+  fs.rmSync(repoRoot, { recursive: true, force: true });
+});
+
+test('Claude Code dispatch and decision-question guards let the call through when the shim is gone, and pass its verdict when present', () => {
+  const repoRoot = mkTempDir('agent-hooks-claude-guarded-');
+  installClaudeHook(repoRoot);
+  const settings = JSON.parse(fs.readFileSync(path.join(repoRoot, '.claude', 'settings.json'), 'utf8'));
+  const commands = settings.hooks.PreToolUse.slice(0, 2).map((entry) => entry.hooks[0].command);
+  const env = { ...process.env, CLAUDE_PROJECT_DIR: repoRoot };
+  for (const command of commands) {
+    const absent = spawnSync('/bin/sh', ['-c', command], { env, input: '{}' });
+    assert.equal(absent.status, 0, `no shim: ${command}`);
+    assert.equal(absent.stdout.length, 0);
+  }
+  const shim = getProjectShimPath(repoRoot);
+  fs.mkdirSync(path.dirname(shim), { recursive: true });
+  fs.writeFileSync(shim, '#!/bin/sh\nprintf "%s" "$*"; cat >/dev/null; exit 2\n', { mode: 0o755 });
+  const present = spawnSync('/bin/sh', ['-c', commands[0]], { env, input: '{}' });
+  assert.equal(present.status, 2, 'the shim\'s exit code passes through');
+  assert.equal(present.stdout.toString(), 'hook dispatch-decide');
+  fs.rmSync(repoRoot, { recursive: true, force: true });
+});
+
+test('installClaudeHook replaces the earlier unguarded dispatch and decision-question commands in place', () => {
+  const repoRoot = mkTempDir('agent-hooks-claude-unguarded-');
+  fs.mkdirSync(path.join(repoRoot, '.claude'), { recursive: true });
+  const old = (matcher, kind) => ({ matcher, hooks: [{ type: 'command', command: `"\${CLAUDE_PROJECT_DIR}/.fgos/installation/bin/fgos" hook ${kind}` }] });
+  fs.writeFileSync(path.join(repoRoot, '.claude', 'settings.json'), JSON.stringify({ hooks: { PreToolUse: [old('Agent|Task', 'dispatch-decide'), old('AskUserQuestion', 'decision-question')] } }));
+  installClaudeHook(repoRoot);
+  const { PreToolUse } = JSON.parse(fs.readFileSync(path.join(repoRoot, '.claude', 'settings.json'), 'utf8')).hooks;
+  assert.equal(PreToolUse.length, 3);
+  assert.match(PreToolUse[0].hooks[0].command, /\[ -x "\$S" \] \|\| exit 0; "\$S" hook dispatch-decide$/);
+  assert.match(PreToolUse[1].hooks[0].command, /\[ -x "\$S" \] \|\| exit 0; "\$S" hook decision-question$/);
   fs.rmSync(repoRoot, { recursive: true, force: true });
 });
 

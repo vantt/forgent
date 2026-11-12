@@ -12,7 +12,7 @@
 // 5. Runnable Probe: doctor checks verify both configuration presence AND that the shim is runnable
 //    with benign input via non-shell spawnSync with finite timeout.
 
-import { existsSync, mkdirSync, readFileSync, realpathSync, writeFileSync } from 'node:fs';
+import { existsSync, lstatSync, mkdirSync, readFileSync, readdirSync, realpathSync, rmdirSync, unlinkSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { mailboxHookTimeoutSec, mailboxOptIn, mailboxRefusalLine } from './mailbox-limits.mjs';
@@ -113,6 +113,11 @@ const CLAUDE_SHIM = '"${CLAUDE_PROJECT_DIR}/.fgos/installation/bin/fgos"';
 const claudeMailboxCommand = (event) =>
   `S=${CLAUDE_SHIM}; [ -x "$S" ] || exit 0; "$S" hook mailbox --cli claude --event ${event} || true`;
 
+/** Claude Code's dispatch and decision-question guards: a project whose shim is gone (removed by hand
+ * or by an uninstall) lets the call through instead of failing every Agent and AskUserQuestion call.
+ * With the shim present its verdict and exit code pass through unchanged. */
+const claudeGuardedHookCommand = (kind) => `S=${CLAUDE_SHIM}; [ -x "$S" ] || exit 0; "$S" hook ${kind}`;
+
 // ---------------------------------------------------------------------------
 // The delete guard's prefilter: the one keyword list every renderer reads
 // ---------------------------------------------------------------------------
@@ -186,8 +191,8 @@ const SESSION_REGISTER_TIMEOUT_SEC = 10;
  * `legacyMarkers` name older fgOS commands an install migrates in place.
  */
 const hookRows = (repoRoot) => [
-  { cli: 'claude', kind: HOOK_KINDS.DISPATCH, event: 'PreToolUse', matcher: 'Agent|Task', command: `${CLAUDE_SHIM} hook dispatch-decide`, legacyMarkers: ['dispatch-decide-hook.mjs'] },
-  { cli: 'claude', kind: HOOK_KINDS.DECISION, event: 'PreToolUse', matcher: 'AskUserQuestion', command: `${CLAUDE_SHIM} hook decision-question`, legacyMarkers: ['decision-question-hook.mjs'] },
+  { cli: 'claude', kind: HOOK_KINDS.DISPATCH, event: 'PreToolUse', matcher: 'Agent|Task', command: claudeGuardedHookCommand(HOOK_KINDS.DISPATCH), legacyMarkers: ['dispatch-decide-hook.mjs'] },
+  { cli: 'claude', kind: HOOK_KINDS.DECISION, event: 'PreToolUse', matcher: 'AskUserQuestion', command: claudeGuardedHookCommand(HOOK_KINDS.DECISION), legacyMarkers: ['decision-question-hook.mjs'] },
   // The main-checkout delete guard on every shell tool: Claude Code and Codex name it Bash (recorded
   // payloads), Codex's older shell tools are listed too; agy names it run_command.
   { cli: 'claude', kind: HOOK_KINDS.DELETE_GUARD, event: 'PreToolUse', matcher: 'Bash', command: CLAUDE_DELETE_GUARD_COMMAND, ownedPattern: CLAUDE_GUARD_PATTERN },
@@ -245,13 +250,13 @@ function mailboxNotice(repoRoot, cli, optIn) {
 
 /** Takes out the hook objects whose command is exactly a withheld row's, never a user's lookalike;
  * an entry or event they leave empty goes with them. Returns whether anything changed. */
-function removeNestedRow(hooks, row) {
+function removeNestedRow(hooks, row, owns = (h) => h?.command === row.command) {
   const entries = hooks[row.event];
   if (!Array.isArray(entries)) return false;
   let changed = false;
   for (const entry of entries) {
     if (!Array.isArray(entry?.hooks)) continue;
-    const kept = entry.hooks.filter((h) => h?.command !== row.command);
+    const kept = entry.hooks.filter((h) => !owns(h));
     if (kept.length !== entry.hooks.length) {
       entry.hooks = kept;
       changed = true;
@@ -665,4 +670,92 @@ export function checkAllAgentHooks(cwd) {
     omp: checkOmpHook(cwd),
     pi: checkPiHook(cwd),
   };
+}
+
+// ---------------------------------------------------------------------------
+// Reversal: what `installAllAgentHooks` wrote, taken out again
+// ---------------------------------------------------------------------------
+
+const SHIM_MENTION = '.fgos/installation/bin/fgos';
+
+const isLink = (file) => lstatSync(file).isSymbolicLink();
+
+/** Every command string a hook file still carries (nested `hooks.<Event>` entries, agy groups). */
+function remainingCommands(config) {
+  const found = [];
+  const walk = (node) => {
+    if (Array.isArray(node)) return node.forEach(walk);
+    if (!node || typeof node !== 'object') return;
+    for (const [key, value] of Object.entries(node)) {
+      if (key === 'command' && typeof value === 'string') found.push(value);
+      else walk(value);
+    }
+  };
+  walk(config);
+  return found;
+}
+
+/** Takes one CLI's JSON hook file back to what it was without fgOS: only the table's own entries
+ * (the same ownership test the installer replaces by) leave; an entry or event they empty goes with
+ * them; every other key and hook stays. A user entry that merely mentions the shim is named in
+ * `kept`. The file is rewritten only when `apply` is set and something left. */
+function uninstallJsonRows(repoRoot, cli, apply) {
+  const spec = HOOK_FILES[cli];
+  const file = path.join(repoRoot, spec.file);
+  if (!existsSync(file)) return null;
+  const base = { cli, file, label: spec.label, removed: [], kept: [] };
+  if (isLink(file)) return { ...base, state: 'symlink', kept: [`${spec.label} is a symbolic link: left as it is`] };
+  const config = readJsonSafe(file);
+  if (config === null || typeof config !== 'object') return { ...base, state: 'malformed', kept: [`${spec.label} is not valid JSON: left as it is`] };
+  for (const row of hookRows(repoRoot).filter((r) => r.cli === cli)) {
+    const name = row.group ?? `${row.kind}${row.args ? ` ${row.args}` : ''} (${row.event})`;
+    if (row.group) {
+      const entries = config[row.group]?.[row.event];
+      if (Array.isArray(entries) && entries.some((e) => isOwnedHook(e, row) || (Array.isArray(e?.hooks) && e.hooks.some((h) => isOwnedHook(h, row))))) {
+        delete config[row.group];
+        base.removed.push(name);
+      }
+    } else if (config.hooks && typeof config.hooks === 'object' && removeNestedRow(config.hooks, row, (h) => isOwnedHook(h, row))) {
+      base.removed.push(name);
+    }
+  }
+  if (config.hooks && typeof config.hooks === 'object' && Object.keys(config.hooks).length === 0) delete config.hooks;
+  base.kept = remainingCommands(config).filter((c) => c.includes(SHIM_MENTION)).map((c) => `${spec.label}: a hook of yours names the fgOS shim and stays: ${c.slice(0, 100)}`);
+  if (base.removed.length === 0) return { ...base, state: 'clean' };
+  if (apply) writeJsonPretty(file, config);
+  return { ...base, state: 'changed' };
+}
+
+/** The generated omp or pi extension, removed only when it is byte for byte what the installer
+ * writes (either mailbox form); an edited file is the person's and stays. */
+function uninstallExtension(repoRoot, dir, apply) {
+  const file = path.join(repoRoot, dir, 'extensions', 'fgos-hooks.ts');
+  if (!existsSync(file)) return null;
+  const label = `${dir}/extensions/fgos-hooks.ts`;
+  const base = { cli: dir.slice(1), file, label, removed: [], kept: [] };
+  if (isLink(file)) return { ...base, state: 'symlink', kept: [`${label} is a symbolic link: left as it is`] };
+  const cli = dir.slice(1);
+  const generated = [generateInProcessExtensionSource({ cli, mailbox: true }), generateInProcessExtensionSource({ cli, mailbox: false })];
+  if (!generated.includes(readFileSync(file, 'utf8'))) return { ...base, state: 'edited', kept: [`${label} differs from the generated extension: left as it is`] };
+  if (apply) {
+    unlinkSync(file);
+    // The directories it sat in go only when empty: rmdir refuses anything else.
+    for (const parent of [path.dirname(file), path.join(repoRoot, dir)]) {
+      if (readdirSync(parent).length === 0) rmdirSync(parent);
+    }
+  }
+  return { ...base, state: 'changed', removed: ['extension'] };
+}
+
+/**
+ * What `installAllAgentHooks` wrote into the project's agent configs, taken out: one result per
+ * agent file that exists. `apply: false` only describes; the files a change touches are named in
+ * `file` so the caller can back them up first.
+ */
+export function uninstallAgentHooks(repoRoot, { apply = false } = {}) {
+  return [
+    ...Object.keys(HOOK_FILES).map((cli) => uninstallJsonRows(repoRoot, cli, apply)),
+    uninstallExtension(repoRoot, '.omp', apply),
+    uninstallExtension(repoRoot, '.pi', apply),
+  ].filter(Boolean);
 }

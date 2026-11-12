@@ -20,12 +20,12 @@ import { firstOnPath } from './project-launcher.mjs';
 
 export const WIRE_AGENTS_COMMAND = 'fgos wire-agents';
 
-const CLAUDE_PLUGIN_MARKETPLACE_NAME = 'fgos-plugins';
+export const CLAUDE_PLUGIN_MARKETPLACE_NAME = 'fgos-plugins';
 // The plugin marketplace is added by its GitHub source, never a local path: an installed payload
 // does not ship `plugins/` or `.claude-plugin/`, so a local path works only from a checkout of this
 // repository. The check accepts an entry under this name from any source.
 const CLAUDE_PLUGIN_MARKETPLACE_GITHUB_SOURCE = 'vantt/forgent';
-const CLAUDE_PLUGIN_REF = `fgOS@${CLAUDE_PLUGIN_MARKETPLACE_NAME}`;
+export const CLAUDE_PLUGIN_REF = `fgOS@${CLAUDE_PLUGIN_MARKETPLACE_NAME}`;
 const WINDOWS = process.platform === 'win32';
 
 // The `claude` binary the check and this command run. Tests point FGOS_CLAUDE_COMMAND at a fake so
