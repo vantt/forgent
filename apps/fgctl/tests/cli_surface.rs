@@ -197,7 +197,11 @@ fn init_refuses_a_committed_pin_it_cannot_read_instead_of_treating_it_as_unpinne
     }
     std::fs::write(git_dir.join("HEAD"), "ref: refs/heads/main\n").unwrap();
     std::fs::create_dir_all(dir.path().join(".fgos")).unwrap();
-    std::fs::write(dir.path().join(".fgos").join("distribution.json"), "{ not json").unwrap();
+    std::fs::write(
+        dir.path().join(".fgos").join("distribution.json"),
+        "{ not json",
+    )
+    .unwrap();
 
     let out = fgctl(dir.path(), &["init"]);
     assert_eq!(out.status.code(), Some(4), "{}", text(&out.stderr));

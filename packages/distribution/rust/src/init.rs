@@ -159,6 +159,8 @@ pub enum InitError {
     TailFailed { cmd: String, status: i32 },
     #[error("not ready: the checks listed above need you")]
     NotReady,
+    #[error("the committed pin is unreadable: .fgos/distribution.json; restore it from version control, or run `fgctl upgrade` to write a new pin")]
+    PinUnreadable,
     #[error("{0}")]
     Fetch(#[from] crate::fetch::FetchError),
     #[error("io error: {0}")]
@@ -564,6 +566,7 @@ impl InitError {
     pub fn exit_status(&self) -> i32 {
         match self {
             InitError::NotReady => fgos_host_runtime::exit_codes::precondition(),
+            InitError::PinUnreadable => fgos_host_runtime::exit_codes::validation(),
             _ => 1,
         }
     }
@@ -700,7 +703,8 @@ fn ready_facts(
     let activation: WorkspaceActivationBinding = serde_json::from_str(&std::fs::read_to_string(
         fgos_dir.join("installation").join("activation.json"),
     )?)?;
-    let pin_tag = read_tracked_pin(&fgos_dir.join("distribution.json"))?
+    let pin_tag = read_tracked_pin(&fgos_dir.join("distribution.json"))
+        .present()
         .filter(|p| p.project_runtime.artifact_digest == activation.artifact_digest)
         .and_then(|p| p.project_runtime.release_version);
     let tag = match pin_tag {
@@ -825,14 +829,46 @@ fn is_release_staged(store_root: &Path, digest: &str) -> bool {
     release_dir_path(store_root, digest).exists()
 }
 
-/// Reads the committed `.fgos/distribution.json` pin. A missing file or one
-/// that does not parse as a pin is "no pin".
-fn read_tracked_pin(distribution_path: &Path) -> Result<Option<TrackedDistributionPin>, InitError> {
-    if !distribution_path.exists() {
-        return Ok(None);
+/// What `.fgos/distribution.json` holds: no file, a file that is not a pin, or a pin.
+pub enum PinFile {
+    Absent,
+    Unreadable,
+    Present(TrackedDistributionPin),
+}
+
+impl PinFile {
+    /// The pin when there is a readable one.
+    fn present(self) -> Option<TrackedDistributionPin> {
+        match self {
+            PinFile::Present(pin) => Some(pin),
+            _ => None,
+        }
     }
-    let content = std::fs::read_to_string(distribution_path)?;
-    Ok(serde_json::from_str(&content).ok())
+
+    /// The pin to resolve against: a file that exists but is not a pin
+    /// stops the caller instead of reading as "no pin".
+    fn require_readable(self) -> Result<Option<TrackedDistributionPin>, InitError> {
+        match self {
+            PinFile::Unreadable => Err(InitError::PinUnreadable),
+            other => Ok(other.present()),
+        }
+    }
+}
+
+const PIN_FILE_RELATIVE: &str = ".fgos/distribution.json";
+
+/// The one reader of the committed `.fgos/distribution.json` pin.
+fn read_tracked_pin(distribution_path: &Path) -> PinFile {
+    if !distribution_path.exists() {
+        return PinFile::Absent;
+    }
+    match std::fs::read_to_string(distribution_path)
+        .ok()
+        .and_then(|content| serde_json::from_str(&content).ok())
+    {
+        Some(pin) => PinFile::Present(pin),
+        None => PinFile::Unreadable,
+    }
 }
 
 /// The release `fgctl init --override-pin` may activate: one that differs
@@ -913,7 +949,8 @@ pub fn init_workspace_resolving(
 
     // Refuse outside a repository checkout before any network traffic.
     let workspace_root = resolve_workspace_root(start_dir)?;
-    let pin = read_tracked_pin(&workspace_root.join(".fgos").join("distribution.json"))?;
+    let pin = read_tracked_pin(&workspace_root.join(".fgos").join("distribution.json"))
+        .require_readable()?;
 
     match choose_source(inputs, pin.is_some()) {
         SourceChoice::Pinned => {
@@ -998,7 +1035,7 @@ fn init_workspace_tagged(
     let distribution_path = workspace_root.join(".fgos").join("distribution.json");
 
     // Read tracked .fgos/distribution.json if present (R3).
-    let tracked_pin = read_tracked_pin(&distribution_path)?;
+    let tracked_pin = read_tracked_pin(&distribution_path).require_readable()?;
 
     // Read current activation.json if present (R9 / Reviewer M2).
     let current_activation: Option<WorkspaceActivationBinding> = if activation_path.exists() {
@@ -2162,29 +2199,6 @@ pub fn pin_drift(
     })
 }
 
-/// What `.fgos/distribution.json` holds: no file, a file that is not a pin, or a pin.
-pub enum PinFile {
-    Absent,
-    Unreadable,
-    Present(TrackedDistributionPin),
-}
-
-const PIN_FILE_RELATIVE: &str = ".fgos/distribution.json";
-
-fn read_pin_file(workspace_root: &Path) -> PinFile {
-    let path = workspace_root.join(".fgos").join("distribution.json");
-    if !path.exists() {
-        return PinFile::Absent;
-    }
-    match std::fs::read_to_string(&path)
-        .ok()
-        .and_then(|content| serde_json::from_str(&content).ok())
-    {
-        Some(pin) => PinFile::Present(pin),
-        None => PinFile::Unreadable,
-    }
-}
-
 /// The line `fgctl status`, `fgctl verify` and `fgos doctor` print about the
 /// pin: the drift, or that the pin file cannot be read. `None` when there is
 /// nothing to say.
@@ -2202,7 +2216,10 @@ fn workspace_pin_note(
     workspace_root: &Path,
     activation: &WorkspaceActivationBinding,
 ) -> Option<String> {
-    pin_note(activation, &read_pin_file(workspace_root))
+    pin_note(
+        activation,
+        &read_tracked_pin(&workspace_root.join(".fgos").join("distribution.json")),
+    )
 }
 
 /// The one line `fgctl status` ends with: the active release, or what to run.
