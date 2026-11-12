@@ -189,6 +189,28 @@ fn a_digest_only_pin_with_nothing_staged_names_three_ways_out() {
 }
 
 #[test]
+fn init_refuses_a_committed_pin_it_cannot_read_instead_of_treating_it_as_unpinned() {
+    let dir = Scratch::new("unreadable-pin");
+    let git_dir = dir.path().join(".git");
+    for sub in ["objects", "refs"] {
+        std::fs::create_dir_all(git_dir.join(sub)).unwrap();
+    }
+    std::fs::write(git_dir.join("HEAD"), "ref: refs/heads/main\n").unwrap();
+    std::fs::create_dir_all(dir.path().join(".fgos")).unwrap();
+    std::fs::write(dir.path().join(".fgos").join("distribution.json"), "{ not json").unwrap();
+
+    let out = fgctl(dir.path(), &["init"]);
+    assert_eq!(out.status.code(), Some(4), "{}", text(&out.stderr));
+    let stderr = text(&out.stderr);
+    assert!(
+        stderr.contains("the committed pin is unreadable: .fgos/distribution.json"),
+        "{stderr}"
+    );
+    assert!(stderr.contains("fgctl upgrade"), "{stderr}");
+    assert!(out.stdout.is_empty(), "{}", text(&out.stdout));
+}
+
+#[test]
 fn status_names_the_drift_between_the_active_release_and_the_pin_before_its_result_line() {
     const ACTIVATION: &str = include_str!(
         "../../../packages/distribution/rust/tests/goldens/activation-binding-minimal.json"
