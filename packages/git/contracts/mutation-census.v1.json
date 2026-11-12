@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "4f2e6735328b5cc372b7b86facc4be2a3dba23f8d8c8ec5bdf56d60dfa185a9e",
+  "payloadDigest": "944c6024ff03f470a64daa14cbdaade950c7a2b12115bea66de673d3b143ff4c",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -503,8 +503,8 @@
     "packages/identity/rust/tests/directory.rs": "23a4e315960c947278a9863a435c281a7e94dae6ee5fac2a89eec351e5326eb8",
     "packages/identity/rust/tests/golden.rs": "42e3a4c98aaa1e336f0346b8ac2207c9b84726e399c214200297c463507ed49e",
     "packages/identity/rust/tests/machine.rs": "71e523943c205e1f439b1edd8c6f22d8fd2406f2d3d8df9ff06ec942e2a72de9",
-    "packages/identity/rust/tests/mint.rs": "de45aa4192debdc5583ac5d1c24775c23b27cf3272b5eb85cb456b9548ecf5a5",
-    "packages/identity/rust/tests/project.rs": "249f6ae7722be844d10de4130999cd322b182e2e4dc30b00290c4ee48da09b5e",
+    "packages/identity/rust/tests/mint.rs": "f0d531f6fccf16d4992222c7056421542cbfdbe32f015928a1b4f625c234efb4",
+    "packages/identity/rust/tests/project.rs": "397b24466ff0a4e17b4bc68df9f52f113b8a633c5f8a1cccbe54168bc6318900",
     "packages/identity/rust/tests/register_current.rs": "25d3f540487726d1e5ccb9d115c388b3187f869a27beaff68c7ad39a988189ea",
     "packages/identity/rust/tests/session.rs": "c90d501ef43f72d86b33cc357961e4f1f75886935c6a5b775e38a668cee0c5e5",
     "packages/identity/rust/tests/shared.rs": "3c0bcb1d94d1a0486cf1fbdb382b15107b256f42fa19cbb92c551f147436bc17",
@@ -2769,21 +2769,21 @@
       "path": "packages/identity/rust/tests/mint.rs",
       "line": 26,
       "spawn": "Command::new",
-      "binary": "/usr/bin/git",
+      "binary": "git",
       "class": "rust-test"
     },
     {
       "path": "packages/identity/rust/tests/mint.rs",
       "line": 350,
       "spawn": "Command::new",
-      "binary": "/usr/bin/git",
+      "binary": "git",
       "class": "rust-test"
     },
     {
       "path": "packages/identity/rust/tests/project.rs",
       "line": 26,
       "spawn": "Command::new",
-      "binary": "/usr/bin/git",
+      "binary": "git",
       "class": "rust-test"
     },
     {

@@ -23,7 +23,7 @@ fn scratch(label: &str) -> PathBuf {
 }
 
 fn git(dir: &Path, args: &[&str]) -> String {
-    let out = Command::new("/usr/bin/git")
+    let out = Command::new("git")
         .args([
             "-c",
             "user.name=t",
@@ -347,7 +347,7 @@ fn live_forge_two_machines_race_a_probe_counter() {
     sorted.sort_unstable();
     println!("live forge probe {counter}: two racing claims got {numbers:?}");
     // boundary: the probe ref lives on the real forge; deleting it is the cleanup of this test.
-    let cleanup = Command::new("/usr/bin/git")
+    let cleanup = Command::new("git")
         .current_dir(&machines[0])
         .args(["push", "origin", "--delete", &counter])
         .output()

@@ -23,7 +23,7 @@ fn scratch(label: &str) -> PathBuf {
 }
 
 fn git(dir: &Path, args: &[&str]) {
-    let out = Command::new("/usr/bin/git")
+    let out = Command::new("git")
         .args([
             "-c",
             "user.name=t",
