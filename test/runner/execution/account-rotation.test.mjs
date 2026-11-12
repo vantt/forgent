@@ -14,8 +14,10 @@ import { credentialFaultPools, inspectAccountRotation, keptBindingOf, mayRotateA
 import { quarantineProviderAccount } from '../../../src/runner/dispatch/provider-capacity.mjs';
 import { makeFixtureDir } from '../../helpers/fixture-dir.mjs';
 import { seedFileLocalBwrapRegistry } from '../confinement-registry-fixture.helper.mjs';
+import { seedStubAgentClis } from '../../helpers/agent-clis.mjs';
 
 seedFileLocalBwrapRegistry();
+seedStubAgentClis('alpha-bin', 'beta-bin', 'gamma-bin');
 
 const executor = (family) => ({
   kind: 'agent',

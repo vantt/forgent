@@ -2,6 +2,8 @@
 // the accounts of the pools on the walk. It binds through bind() and reads nothing else that decides.
 
 import '../../helpers/process-tmp-root.mjs';
+import { seedStubAgentClis } from '../../helpers/agent-clis.mjs';
+seedStubAgentClis('claude', 'codex', 'omp', 'pi', 'agy', 'glm', 'disallowed-provider');
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { explainCapability } from '../../../src/runner/execution/explain.mjs';

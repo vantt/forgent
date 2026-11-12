@@ -4,7 +4,6 @@ import assert from 'node:assert/strict';
 import {
   runLoop,
   paramTableOf,
-  VALID_OUTCOMES,
   loopRunsVerify,
   VERIFY_CAPABILITY,
 } from '../../../../src/runner/execution/loops/index.mjs';
@@ -139,14 +138,6 @@ test('loopRunsVerify reports verify capability per loop kind', () => {
   assert.equal(loopRunsVerify({ loop: 'solo' }), true);
   assert.equal(loopRunsVerify({ loop: 'panel' }), false);
   assert.equal(loopRunsVerify('unknown'), false);
-});
-
-test('VALID_OUTCOMES strictly contains allowed outcomes', () => {
-  assert.deepEqual(
-    [...VALID_OUTCOMES].sort(),
-    ['blocked', 'execution-failure', 'findings', 'pass', 'policy-refusal', 'provider-limit'].sort(),
-  );
-  assert.ok(!VALID_OUTCOMES.includes('failed'), 'failed must NEVER be an outcome');
 });
 
 test('paramTableOf returns the param table for each loop and null for unknown', () => {

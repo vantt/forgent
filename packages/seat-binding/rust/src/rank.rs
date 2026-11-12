@@ -712,6 +712,12 @@ fn judge(ctx: &Ctx, cand: &Cand, ignore_independence: bool) -> Result<Candidate,
             format!("governance rejected executor \"{id}\": {detail}"),
         ));
     }
+    if let Some(cli) = &facts.missing_cli {
+        return Err(rejection(
+            "cli-missing",
+            format!("executor \"{id}\" runs {cli}, which is not installed on this machine"),
+        ));
+    }
     if !ask.required_skills.is_empty() {
         let missing: Vec<&String> = ask
             .required_skills

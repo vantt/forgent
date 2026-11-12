@@ -1,7 +1,7 @@
 // verb-exit.mjs -- the exit code a verb's own result asks for. Verbs with an execution outcome read Execution's
-// outcome table (outcome-exit.mjs); the rest decide from their result shape. Every verb not named here exits 0.
+// outcome table (outcome.mjs); the rest decide from their result shape. Every verb not named here exits 0.
 // The error exit codes (a refused or failed call) are not here: they come from `EXIT_CODES` in src/cli/exit-codes.mjs.
-import { exitCodeForOutcome } from '../runner/execution/outcome-exit.mjs';
+import { exitCodeForOutcome } from '../runner/execution/outcome.mjs';
 
 // `data` is the verb's result; `ctx` is `{ positional, flags }` of the call.
 const EXIT_OF = {

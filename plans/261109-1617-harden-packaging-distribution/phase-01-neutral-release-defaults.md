@@ -1,7 +1,7 @@
 ---
 phase: 01
 title: "Neutral release defaults: route only to agent CLIs detected on the machine, owner routing moves to the global config, a clear error when none is detected"
-status: pending
+status: completed
 depends_on: ["in-flight (2) landed (for the two doctor-row edits only)", "T8-P11 landed (registrations.mjs)", "owner guide written first"]
 parallel: "group G2; YAML, bind filter, run error and guide start now; the two registrations.mjs rows wait their chain turn (after P02)"
 effort: ~1.5d

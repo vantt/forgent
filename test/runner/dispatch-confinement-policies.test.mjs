@@ -678,3 +678,27 @@ test('N2: ensureMachineBackendRegistryDefaults returns skipped contract on unpar
   }
 });
 
+
+test('a posture is carried only when the registered backend executable exists: a bare name resolves on the given PATH, a path must be an executable file', async () => {
+  const { resolvePostureInvocation } = await import('../../src/runner/dispatch/confinement/policies.mjs');
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-posture-exe-'));
+  try {
+    const bin = path.join(dir, 'bin');
+    fs.mkdirSync(bin);
+    fs.writeFileSync(path.join(bin, 'fake-bwrap'), '#!/bin/sh\nexit 0\n', { mode: 0o755 });
+    const registryFor = (executable) => {
+      const file = path.join(dir, `registry-${path.basename(executable)}.json`);
+      fs.writeFileSync(file, JSON.stringify({ contract: 'confinement-backend-registry.v1', confinementBackends: { bwrap: { type: 'bwrap', enabled: true, executable } } }));
+      return file;
+    };
+    const runnerConfig = { executors: { agent: { kind: 'agent', invocations: [{ id: 'cli', via: 'cli', adapter: 'cli-spawn', command: 'agent', confinement: { backend: 'bwrap' } }] } } };
+    const carries = (executable, envPath) => resolvePostureInvocation({ executor: 'agent', invocation: 'cli' }, 'read-only', { runnerConfig, registryPath: registryFor(executable), envPath }).ok;
+    assert.equal(carries('fake-bwrap', bin), true);
+    assert.equal(carries('fake-bwrap', dir), false, 'a bare name not on the PATH is not found');
+    assert.equal(carries(path.join(bin, 'fake-bwrap'), ''), true, 'an absolute path needs no PATH');
+    assert.equal(carries(path.join(dir, 'missing-bwrap'), bin), false);
+    assert.equal(carries(bin, bin), false, 'a directory is not an executable');
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});

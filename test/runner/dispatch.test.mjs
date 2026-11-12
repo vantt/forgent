@@ -1,5 +1,7 @@
 import { bindable } from '../helpers/work-seat-config.mjs';
 import '../helpers/process-tmp-root.mjs';
+import { seedStubAgentClis } from '../helpers/agent-clis.mjs';
+seedStubAgentClis('claude', 'codex', 'omp', 'pi', 'agy', 'glm', 'disallowed-provider');
 import { activateGitFixture } from '../helpers/git-fixture.mjs';
 import { initializeWorkRepository } from '../helpers/work-store-release.mjs';
 import { committedConfigDir, committedRunnerConfig } from '../helpers/committed-config.mjs';

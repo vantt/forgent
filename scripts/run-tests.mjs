@@ -22,7 +22,8 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { isMainModule } from './lib/is-main-module.mjs';
 import { CPU_LOG_ENV, readTestFileCpu, waitedCpuSeconds } from './lib/test-file-cpu.mjs';
 import { acquireFullSuiteQueue, QUEUE_HELD_ENV, QUEUE_SWITCH_ENV } from './lib/full-suite-queue.mjs';
-import { configEntries, repositoryDirs } from './lib/git-dir-layout.mjs';
+import { configEntries, repositoryDirs, worktreeRegistrationsUnder } from './lib/git-dir-layout.mjs';
+import { pruneMissingCheckouts } from './lib/git-ports.mjs';
 
 export { REPO_ROOT };
 export const DEFAULT_TEST_ROOT = path.join(REPO_ROOT, 'test');
@@ -208,7 +209,7 @@ const DEFAULT_WATCHDOG_POLL_MS = 5000;
  * itself. Returns `{ stop() -> [{file, elapsedMs, limitMs}] }`; `stop()` ends
  * the supervisor and reports every file it killed for running too long.
  */
-function startFileWatchdog({ files, env, fileTimeoutMs, pollMs, tempDir, cleanDirs, log }) {
+function startFileWatchdog({ files, env, fileTimeoutMs, pollMs, tempDir, cleanDirs, repo, log }) {
   if (process.platform === 'win32') {
     log('run-tests: warning: per-file time limit needs `ps`; not available on win32, running without it');
     return { stop: () => [] };
@@ -225,7 +226,7 @@ function startFileWatchdog({ files, env, fileTimeoutMs, pollMs, tempDir, cleanDi
   fs.writeFileSync(outFile, '');
   const child = spawnAsync(
     process.execPath,
-    [WATCHDOG_PATH, `--parent=${process.pid}`, `--poll-ms=${pollMs}`, `--limits=${limitsFile}`, `--out=${outFile}`, `--clean=${JSON.stringify(cleanDirs)}`],
+    [WATCHDOG_PATH, `--parent=${process.pid}`, `--poll-ms=${pollMs}`, `--limits=${limitsFile}`, `--out=${outFile}`, `--clean=${JSON.stringify(cleanDirs)}`, `--repo=${repo}`],
     { env, stdio: ['ignore', 'ignore', 'inherit'] },
   );
   child.on('error', (err) => log(`run-tests: warning: per-file time limit not running: ${err.message}`));
@@ -283,28 +284,6 @@ export function strayProcessesUnder(roots, { table = processTable, exclude = [] 
   if (names.length === 0) return [];
   const skip = new Set([process.pid, ...exclude]);
   return table().filter((proc) => !skip.has(proc.pid) && names.some((name) => proc.args.includes(name)));
-}
-
-/**
- * Linked-checkout registrations of the repository at `cwd` whose checkout lies under one of `roots`
- * (the run's own temp dirs): each outlives its deleted checkout and makes every later worktree add of
- * that repository refuse until it is pruned. Read from the registration files, like the identity check.
- */
-export function worktreeRegistrationsUnder(cwd, roots) {
-  const dirs = repositoryDirs(cwd);
-  const realRoots = roots.filter(Boolean).map((root) => { try { return fs.realpathSync(root); } catch { return path.resolve(root); } });
-  if (!dirs || realRoots.length === 0) return [];
-  const base = path.join(dirs.commonDir, 'worktrees');
-  let names;
-  try { names = fs.readdirSync(base); } catch { return []; }
-  const found = [];
-  for (const name of names.sort()) {
-    let gitdir;
-    try { gitdir = fs.readFileSync(path.join(base, name, 'gitdir'), 'utf8').trim(); } catch { continue; }
-    const checkout = path.dirname(gitdir);
-    if (realRoots.some((root) => checkout === root || checkout.startsWith(root + path.sep))) found.push({ name, checkout });
-  }
-  return found;
 }
 
 /** What changed between two `snapshotGitIdentity` results: `{ added, removed, changed }`. */
@@ -444,6 +423,8 @@ export function runSelectedTests(files, {
   watchdogPollMs = DEFAULT_WATCHDOG_POLL_MS,
   // Only a real spawnSync has child processes to supervise.
   watchdog = spawn === spawnSync,
+  // Removes one stray registration whose checkout is gone; the Worktree port by default.
+  pruneCheckout = undefined,
 } = {}) {
   const relFiles = files.map((file) => path.relative(cwd, file));
   const childEnv = buildTestEnv(env);
@@ -479,7 +460,7 @@ export function runSelectedTests(files, {
   let strayWorktrees = [];
   let strayProcesses = [];
   const supervisor = watchdog && runTemp
-    ? startFileWatchdog({ files: relFiles, env: childEnv, fileTimeoutMs, pollMs: watchdogPollMs, tempDir: runTemp, cleanDirs: env[KEEP_TMP_ENV] === '1' ? [] : [runTemp, fixtureRoot].filter(Boolean), log })
+    ? startFileWatchdog({ files: relFiles, env: childEnv, fileTimeoutMs, pollMs: watchdogPollMs, tempDir: runTemp, cleanDirs: env[KEEP_TMP_ENV] === '1' ? [] : [runTemp, fixtureRoot].filter(Boolean), repo: cwd, log })
     : null;
   const spawnLog = path.join(runTemp ?? fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-test-spy-')), 'git-spawn-spy.jsonl');
   childEnv[GIT_SPAWN_SPY_LOG_ENV] = spawnLog;
@@ -525,6 +506,9 @@ export function runSelectedTests(files, {
         }
       }
     }
+    // A registration whose checkout went with the run's dirs blocks every later worktree add on this
+    // machine; take it back now, as the stray processes above are stopped. The run still fails.
+    if (strayWorktrees.length) strayWorktrees = pruneMissingCheckouts(cwd, strayWorktrees, { env, prune: pruneCheckout });
   }
 
   result.timedOut = timedOut;
@@ -555,8 +539,9 @@ export function runSelectedTests(files, {
   result.strayWorktrees = strayWorktrees;
   if (strayWorktrees.length) {
     log('run-tests: ERROR: test suite left linked-checkout registrations in this repository whose checkouts were in its temp dir:');
-    for (const { name, checkout } of strayWorktrees) log(`  ${name}: ${checkout}`);
-    log('  Every later worktree add here refuses until they go: run `git worktree prune` in this checkout. A test that registers a checkout in the real repository must remove it.');
+    for (const { name, checkout, removed, reason } of strayWorktrees) log(`  ${name}: ${checkout} (${removed ? 'removed now' : `still registered: ${reason}`})`);
+    if (strayWorktrees.some((w) => !w.removed)) log('  Every later worktree add here refuses until the ones still registered go: run `git worktree prune` in this checkout.');
+    log('  A test that registers a checkout in the real repository must remove it.');
     result.status = result.status !== 0 ? result.status : 1;
   }
 

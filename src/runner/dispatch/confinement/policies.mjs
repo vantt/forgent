@@ -8,10 +8,9 @@
 //   - validateOverrideConfinementShape: checks that invocation overrides only narrow/harden posture
 //   - normalizeLegacyConfinement: converts legacy {privateHome, isolatedSession, ownWorktree} to v1 controls
 
-import fs from 'node:fs';
 import net from 'node:net';
-import path from 'node:path';
 import { loadMachineBackendRegistry } from './backend-registry.mjs';
+import { isCommandAvailable } from '../../paths.mjs';
 
 export class ConfinementPolicyError extends Error {
   constructor(message) {
@@ -666,20 +665,6 @@ export function resolvePosture(binding, ctx = {}) {
   };
 }
 
-function resolveExecutableOnPath(executable, envPath = process.env.PATH ?? '') {
-  const dirs = executable.includes('/') ? [''] : envPath.split(path.delimiter).filter(Boolean);
-  for (const dir of dirs) {
-    const full = dir ? path.join(dir, executable) : executable;
-    try {
-      fs.accessSync(full, fs.constants.X_OK);
-      return true;
-    } catch {
-      // try next PATH entry
-    }
-  }
-  return false;
-}
-
 function pickConfinedInvocation(executorEntry, invocationId, { herdrPresent = false } = {}) {
   const invocations = Array.isArray(executorEntry?.invocations) ? executorEntry.invocations : [];
   if (invocationId) {
@@ -743,7 +728,7 @@ export function resolvePostureInvocation(candidate, posture, ctx = {}) {
   }
   const instance = registry?.confinementBackends?.[backendId];
   if (!instance || instance.enabled === false || instance.type !== 'bwrap') return none;
-  if (!resolveExecutableOnPath(instance.executable || 'bwrap', ctx.envPath)) return none;
+  if (!isCommandAvailable(instance.executable || 'bwrap', ctx.envPath)) return none;
   return { ok: true, invocation: candidate.invocation ?? picked.inv?.id ?? null };
 }
 

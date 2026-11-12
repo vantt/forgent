@@ -17,7 +17,7 @@
 //
 // Exit codes (R4): The canonical exit-code table lives in src/cli/exit-codes.mjs's
 // EXIT_CODES export (codes 2-5, 7-9 for store/preflight; 0=ok, 1=unexpected),
-// src/runner/execution/outcome-exit.mjs (execution outcomes: policy-refusal=4, provider-limit=10,
+// src/runner/execution/outcome.mjs (execution outcomes: policy-refusal=4, provider-limit=10,
 // execution-failure=11, partial-writes=12, blocked=13, findings=14; RUL99),
 // plus src/runner/loop.mjs's EXIT_BUSY (code 6, runner-only state).
 //

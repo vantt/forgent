@@ -97,12 +97,12 @@ Rust chỉ sở hữu policy tĩnh của ghế; Execution Core Node giữ placem
 
 | Tier | Việc | Tự kiểm | Ví dụ |
 |---|---|---|---|
-| nano | cơ học, không suy luận | chỉ nhận ra hoặc biến đổi theo mẫu? | classify, extract, format, route, vote |
-| mini | suy luận nhẹ trên đầu vào cho sẵn, phạm vi hẹp | đủ thông tin, chỉ hiểu và tóm tắt? | tóm tắt, trả lời từ tài liệu cho, sửa nhỏ chính xác, review diff nhỏ |
-| standard | theo một kế hoạch có sẵn, nhiều bước | có kế hoạch và hướng dẫn chi tiết? | code theo plan, viết test, refactor theo mô tả |
-| advanced | tự tìm đường, không có đáp án sẵn | phải điều tra và quyết cách làm? | debug khó, code phức tạp, nhiều file không có plan |
-| flagship | phán đoán, thiết kế, phê bình | kết quả là một ý kiến hay một thiết kế? | review, red-team, thiết kế giải pháp, synthesis của panel |
-| frontier | quyết định đắt nhất | khó đảo, đắt nếu sai? | khoá kiến trúc, synthesis cuối của hội đồng quan trọng |
+| nano | mechanical, no reasoning | only recognizes or transforms by pattern? | classify, extract, format, route, vote |
+| mini | light reasoning over the given input, narrow scope | enough information, only understand and summarize? | summarize, answer from a given document, small exact fix, review a small diff |
+| standard | follows an existing plan, many steps | is there a plan with detailed instructions? | code to a plan, write tests, refactor as described |
+| advanced | finds its own way, no ready answer | must investigate and decide how? | hard debugging, complex code, many files with no plan |
+| flagship | judgment, design, critique | is the result an opinion or a design? | review, red-team, solution design, panel synthesis |
+| frontier | the costliest decisions | hard to reverse, costly if wrong? | architecture lock-in, final synthesis of an important council |
 
 Bảng là một file hợp đồng chung `packages/seat-binding/contracts/seat-binding.tier-ladder.v1.json` (tên tier, độ mạnh, định nghĩa); crate nhúng nó lúc build (`tier.rs`), loader config Node đọc cùng file đó cho `MODEL_POLICY_TIERS`, nên hai bên không thể lệch. Cách hiển thị đã đổi (xem mục 15, bản ghi cập nhật Config): thang nằm trong `description` của `modelPolicies`, `tierFallback`, `maxTier` ở `core/config-schema/runner.schema.yaml` và được hiển thị thành dòng `@fgos:doc` trong file config (docs/platform/config/spec.md mục 7); khoá `"$comment"` không còn được ghi hay đọc;  `explain` in định nghĩa tier của ghế. `$comment` bị gỡ trước khi validate và trước hash config ngữ nghĩa.
 
@@ -478,7 +478,7 @@ Lỗi sống ngoài spec này: `{objective}` rò vào `roleTasks` của checker 
 - Triển khai (con trỏ, logic nằm ở mã và ở spec này):
   - Crate `fgos-seat-binding`: `packages/seat-binding/rust` (hai stage thuần, `tier.rs` đọc file ladder chung), vector vàng `packages/seat-binding/contracts/seat-binding.golden.v1.json`.
   - Route host `fgos internal seat-binding bind|ladder --protocol 1` (`apps/fgos/src/main.rs`); client Node `src/seat-binding/client.mjs` (fail closed, host kích hoạt trong release đã kích hoạt, từ chối khi đang giữ state lock).
-  - Facade `src/runner/execution/bind.mjs` (`bind`, `explainSeat`, `askFor`; chỉ thu `launchView`, `accountView`; ngân sách Node tối đa 520 dòng, 590 sau HARDEN T5 vì `askFor` nằm ở đây; mục 15, cập nhật 2026-11-06), resolver ghế `seat-resolver.mjs`, ledger `seat-ledger.mjs`, đường đọc legacy `legacy-seat-read.mjs`, `dry-bind.mjs`.
+  - Facade `src/runner/execution/bind.mjs` (`bind`, `explainSeat`, `askFor`; chỉ thu `launchView`, `accountView`; ngân sách Node tối đa 520 dòng, 590 sau HARDEN T5 vì `askFor` nằm ở đây, 600 sau packaging P01 vì facade thu thêm sự kiện "CLI của executor có trên máy" (`missingCli`, lý do bỏ qua `cli-missing`, lời từ chối `agent-cli-missing`); mục 15, cập nhật 2026-11-06), resolver ghế `seat-resolver.mjs`, ledger `seat-ledger.mjs`, đường đọc legacy `legacy-seat-read.mjs`, `dry-bind.mjs`.
   - Lease `acquireNamedAccountLease` và `auditLeaseReceipt` trong `src/runner/dispatch/provider-capacity.mjs`; mã lỗi `provider-capacity-lease-conflict` (`run-result.mjs`).
   - Config: `src/runner/dispatch/config.mjs` (cross-field validation), `core/config-schema/runner.schema.yaml` (the ladder as `@fgos:doc`), doctor `seat-binding-route`, `seat-binding-dry-bind` (từ 2026-11-06 gồm cả điều kiện của `executor-posture-coverage` cũ) và `blind-steps-use-proven-pools` (`src/setup/seat-binding-checks.mjs`, `registrations.mjs`).
   - Ngân sách exec: mục 13 (số đo phase 04 và 08).

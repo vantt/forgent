@@ -5,6 +5,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
 import { writeAccountsFile, writeGlobalConfig, writeRawGlobalConfig } from '../helpers/config-fixture.mjs';
+import { seedStubAgentClis } from '../helpers/agent-clis.mjs';
 import {
   checkTrustStoreWritable,
   checkExecutorConfinement,
@@ -13,6 +14,8 @@ import {
   DOCTOR_CHECKS,
   checkHerdrExecutorKinds,
 } from '../../src/setup/registrations.mjs';
+
+seedStubAgentClis('codex', 'omp', 'pi', 'agy');
 
 // Phase 01 group D. These are the checks that turn "the machine is not set up for
 // interactive dispatch" from a runtime surprise into a doctor line.
@@ -193,6 +196,20 @@ test('checkConfinedPaneAccounts fails by name when an invocation that reads a st
   assert.match(r.message, /executor "openai" invocation "codex-herdr": no runner\.providers\.openai-codex\.accounts/);
   assert.doesNotMatch(r.message, /codex-cli/, 'only invocations that read a login store are checked');
   assert.match(r.message, /invocation "codex-bwrap": no runner\.providers/, 'a cli invocation is covered as well as a pane, and an older binding counts');
+});
+
+test('checkConfinedPaneAccounts does not judge an invocation whose CLI is not installed', () => {
+  const emptyPath = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-pane-no-cli-'));
+  const savedPath = process.env.PATH;
+  try {
+    process.env.PATH = emptyPath;
+    const r = checkConfinedPaneAccounts(paneExecutors());
+    assert.equal(r.passed, true, r.message);
+    assert.match(r.message, /codex is not installed, not checked/);
+  } finally {
+    process.env.PATH = savedPath;
+    fs.rmSync(emptyPath, { recursive: true, force: true });
+  }
 });
 
 test('checkConfinedPaneAccounts passes while some credential file of the store exists, and names the absent ones', () => {

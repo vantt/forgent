@@ -4,11 +4,14 @@
 // (through seat-policy.mjs). This module only collects what the crate must not read itself (the ask, the
 // launch view, the account view) and turns its answer into the binding; it never ranks or filters.
 
+import path from 'node:path';
+
 import { decideExecutorDispatchMechanism } from '../dispatch/mechanism.mjs';
 import { checkProviderDisallowed, familyOf, renderedEffortLevels } from '../dispatch/provider-adapter.mjs';
 import { canApplyPosture, resolvePostureInvocation } from '../dispatch/confinement/policies.mjs';
 import { MODEL_POLICY_TIERS, assertReasoningEffort, assertRunTimeoutMs } from '../dispatch/config.mjs';
 import { RunnerConfigError } from '../dispatch/runner-config-error.mjs';
+import { isCommandAvailable } from '../paths.mjs';
 import { credentialSourceForCli, credentialStoreOf, providerAccountInventory, readAccountStates } from '../dispatch/provider-capacity.mjs';
 import { parseTierCell } from '../dispatch/tier-cell.mjs';
 import { legacyStateKey } from '../dispatch/llm-accounts.mjs';
@@ -86,6 +89,37 @@ const runnerCommandOf = (runnerConfig) => runnerConfig.executor?.command ?? runn
 /** The command an invocation runs: its own, else the executor's, else the runner's default executor. */
 const commandOf = (runnerConfig, entry, invocation) => invocation.command ?? entry.command ?? runnerCommandOf(runnerConfig);
 
+/**
+ * The programs an executor starts, as bare names, when none of them is installed here; null when one is, or
+ * when the executor starts no program of its own (an agent the caller runs inside its own session, a tool).
+ */
+function missingClisOf(runnerConfig, id, entry, session) {
+  if (entry.kind === 'tool') return null;
+  if (decideExecutorDispatchMechanism(runnerConfig, id, { hasLiveTaskAccess: Boolean(session.hasNativeAgent) }) !== 'out-of-process') return null;
+  const invocations = Array.isArray(entry.invocations) && entry.invocations.length > 0 ? entry.invocations : [{}];
+  const commands = [...new Set(invocations.map((inv) => commandOf(runnerConfig, entry, inv)).filter((command) => typeof command === 'string' && command !== ''))];
+  if (commands.length === 0 || commands.some((command) => isCommandAvailable(command, session.pathEnv ?? process.env.PATH))) return null;
+  return [...new Set(commands.map((command) => path.basename(command)))];
+}
+
+/**
+ * The refusal for a machine on which no agent executor can start, or null when one can: every agent executor
+ * of the config runs programs and none of them is installed. It names the programs that were looked for and
+ * what to do, so a first run on a machine with no agent CLI reads as that, not as a routing failure.
+ */
+export function agentCliMissingRefusal(runnerConfig, session = {}) {
+  const missing = Object.entries(executorsOf(runnerConfig))
+    .filter(([, entry]) => entry && typeof entry === 'object' && entry.kind !== 'tool')
+    .map(([id, entry]) => missingClisOf(runnerConfig, id, entry, session));
+  if (missing.length === 0 || missing.includes(null)) return null;
+  const clis = [...new Set(missing.flat())].sort();
+  return {
+    reason: 'agent-cli-missing',
+    detail: `no agent CLI is installed on this machine (looked for ${clis.join(', ')} on PATH)`,
+    fix: `install one of ${clis.join(', ')}, then run "fgos doctor" to check it`,
+  };
+}
+
 /** Why governance disallows an executor, or undefined when it does not. */
 function disallowedReason(runnerConfig, id, entry, family) {
   const governance = runnerConfig.governance ?? runnerConfig.runner?.governance;
@@ -135,11 +169,13 @@ function executorFacts(id, entry, { runnerConfig, executors, session }) {
     defaultInvocation = 'command';
   }
   const disallowed = disallowedReason(runnerConfig, id, entry, family);
+  const missingCli = missingClisOf(runnerConfig, id, entry, session)?.join(' or ');
   return {
     kind: entry.kind === 'tool' ? 'tool' : 'agent',
     family,
     mechanism: mechanism === 'out-of-process' ? 'out-of-process' : 'in-process',
     ...(disallowed ? { disallowed } : {}),
+    ...(missingCli ? { missingCli } : {}),
     skills: Array.isArray(entry.supports?.skills) ? entry.supports.skills : [],
     invocations,
     ...(defaultInvocation ? { defaultInvocation } : {}),
@@ -365,7 +401,9 @@ function walkOf({ tried = [], excludePools = [], failedAccounts = [], continuity
 // ---- the binding --------------------------------------------------------------------------------
 
 /** A refusal in the runner's shape; the headless wording is the session's fact, not the crate's. */
-function refusalOf(refusal, { session, unit }) {
+function refusalOf(refusal, { session, unit, runnerConfig }) {
+  const noAgentCli = agentCliMissingRefusal(runnerConfig, session);
+  if (noAgentCli) return noAgentCli;
   const nothingConfigured = refusal.reason === 'no-candidate' && (refusal.configured ?? 0) === 0;
   if (nothingConfigured && session.headless) {
     return { reason: 'headless-no-executor', detail: `No candidate executor available in headless session for capability "${unit?.capability}"` };
@@ -419,10 +457,10 @@ function bindingOf({ out, prep, ask, ctx, walk }) {
   const { persona: personaChoice, matchingOverride, posture, isReadOnlyPosture, launchView } = prep;
   const { policy, ranked } = out;
   // Stage 1 refused (a tier no cell serves, a raise no door may make): there is nothing to rank.
-  if (!ranked) return { refused: refusalOf(out.refusal, { session, unit }) };
+  if (!ranked) return { refused: refusalOf(out.refusal, { session, unit, runnerConfig }) };
 
   const cand = ranked.candidates[0];
-  if (!cand) return { refused: refusalOf(out.refusal ?? { reason: 'no-candidate', detail: 'no candidate' }, { session, unit }) };
+  if (!cand) return { refused: refusalOf(out.refusal ?? { reason: 'no-candidate', detail: 'no candidate' }, { session, unit, runnerConfig }) };
   let timeout;
   try {
     timeout = timeoutOf(matchingOverride, unit);
@@ -531,7 +569,7 @@ export function bindWorkSeat({ runnerConfig, unit, role = 'producer', readOnly =
     { unit: { ...unit, writes: [] }, seat: 'producer', role, readOnly, overrides, raiseAuthorized: false },
     { runnerConfig, session: { headless: true, postureAtLaunch: true } },
   );
-  if (bound.refused) throw new RunnerConfigError(`${bound.refused.reason}: ${bound.refused.detail}`, { code: bound.refused.reason });
+  if (bound.refused) throw new RunnerConfigError(`${bound.refused.reason}: ${bound.refused.detail}${bound.refused.fix ? `; ${bound.refused.fix}` : ''}`, { code: bound.refused.reason });
   return bound;
 }
 

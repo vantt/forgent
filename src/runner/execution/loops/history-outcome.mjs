@@ -7,8 +7,7 @@
 import { reviewedHistoryOutcome } from './reviewed.mjs';
 import { verifyCommandOf } from './verify.mjs';
 import { VERIFY_SEAT } from '../seat-resolver.mjs';
-
-const ERROR_OUTCOMES = Object.freeze(['execution-failure', 'policy-refusal', 'provider-limit', 'blocked']);
+import { ERROR_OUTCOMES } from '../outcome.mjs';
 
 const seatResult = (history, seat, round = 1) => history.find((h) => h.seat === seat && (h.round ?? 1) === round);
 

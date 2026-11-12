@@ -7,7 +7,10 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync, spawnSync } from 'node:child_process';
 import { EXIT_CODES } from '../../src/cli/exit-codes.mjs';
-import { OUTCOME_EXIT_CODES, exitCodeForOutcome } from '../../src/runner/execution/outcome-exit.mjs';
+import {
+  OUTCOME_EXIT_CODES, exitCodeForOutcome, VALID_OUTCOMES, ERROR_OUTCOMES, outcomeClass,
+  isVerdict, isInfrastructure, rebindsOnResume, infrastructure,
+} from '../../src/runner/execution/outcome.mjs';
 import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
 import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
 import { capabilityServedBy, writeProjectConfig } from '../helpers/config-fixture.mjs';
@@ -85,6 +88,49 @@ test('OUTCOME_EXIT_CODES defines execution outcome codes 10-14 and policy-refusa
   // Error categories are distinct from outcome codes
   assert.equal(EXIT_CODES['execution-failure'], undefined);
   assert.equal(EXIT_CODES['partial-writes'], undefined);
+});
+
+// The closed table moved here from five loop copies; this file owns it with the exit codes (one module, one proof).
+test('the closed outcome table is the six seat outcomes, each in one class, and failed is never an outcome', () => {
+  assert.deepEqual(
+    [...VALID_OUTCOMES].sort(),
+    ['blocked', 'execution-failure', 'findings', 'pass', 'policy-refusal', 'provider-limit'].sort(),
+  );
+  assert.ok(!VALID_OUTCOMES.includes('failed'));
+  const classes = Object.fromEntries(['pass', 'findings', 'execution-failure', 'not-started', 'provider-limit', 'policy-refusal', 'blocked']
+    .map((outcome) => [outcome, outcomeClass(outcome)]));
+  assert.deepEqual(classes, {
+    pass: 'verdict', findings: 'verdict', 'execution-failure': 'infrastructure', 'not-started': 'infrastructure',
+    'provider-limit': 'provider', 'policy-refusal': 'policy', blocked: 'blocked',
+  });
+  for (const unknown of ['undetermined', 'refused', 'partial-writes', 'toString', '', null, undefined]) {
+    assert.equal(outcomeClass(unknown), null, `${String(unknown)} has no class`);
+    assert.equal(isVerdict(unknown), false);
+    assert.equal(rebindsOnResume(unknown), false);
+  }
+});
+
+test('the predicates split verdicts, infrastructure and the seats a resume binds again', () => {
+  assert.deepEqual(VALID_OUTCOMES.filter(isVerdict), ['pass', 'findings']);
+  assert.deepEqual(['execution-failure', 'not-started'].filter(isInfrastructure), ['execution-failure', 'not-started']);
+  assert.equal(isInfrastructure('provider-limit'), false);
+  assert.deepEqual([...ERROR_OUTCOMES], ['execution-failure', 'policy-refusal', 'provider-limit', 'blocked']);
+  assert.deepEqual(VALID_OUTCOMES.filter(rebindsOnResume).sort(), [...ERROR_OUTCOMES].sort());
+  assert.equal(rebindsOnResume('pass'), false);
+  assert.equal(rebindsOnResume('findings'), false);
+});
+
+test('a unit ended on infrastructure only when nothing was written out of scope and no verdict seat judged', () => {
+  const reviewer = (outcome) => ({ seat: 'reviewer/1', posture: { verdict: true }, outcome });
+  const producer = (outcome) => ({ seat: 'producer/1', posture: { verdict: false }, outcome });
+  assert.equal(infrastructure({ outcome: 'execution-failure', results: [producer('pass'), reviewer('execution-failure')] }), true);
+  assert.equal(infrastructure({ outcome: 'not-started', results: [] }), true);
+  assert.equal(infrastructure({ outcome: 'execution-failure' }), true);
+  assert.equal(infrastructure({ outcome: 'execution-failure', results: [reviewer('findings')] }), false);
+  assert.equal(infrastructure({ outcome: 'execution-failure', outOfScope: ['src/x.mjs'], results: [] }), false);
+  assert.equal(infrastructure({ outcome: 'provider-limit', results: [] }), false);
+  assert.equal(infrastructure({ outcome: 'pass', results: [] }), false);
+  assert.equal(infrastructure(undefined), false);
 });
 
 test('exitCodeForOutcome maps outcomes onto canonical exit codes', () => {
