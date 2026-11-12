@@ -54,6 +54,45 @@ Near misses (pairs that look alike but differ): with full text on whole document
 4. **The verdict cannot be automatic on full-text score.** Near misses rank high; `owner-found` needs the writer's reading, or an identifier match, not a score alone.
 5. **The 90% bar is not yet met for short queries.** The spec's own ladder says embeddings are proposed with the miss list as evidence. This report is that miss list. An embeddings trial on the same gold set is the next measurement.
 
+## 6. Second round: embeddings and the owner's OHS fork (2026-11-12, afternoon)
+
+The owner allowed local model downloads into the session scratch directory and confirmed that fgOS may use the `ohs-lang-vi` pack. A second independent agent wrote 30 Vietnamese queries in a developer's own words: 24 tied to gold groups, 6 on subjects with no document (checked by search). A third agent translated them literally into English without seeing the gold set.
+
+### 6.1. Hand-built hybrid with `multilingual-e5-small` (BM25 + embeddings, RRF)
+
+| Unit | Query | BM25 @3 | Semantic @3 | Fused @3 | Fused @10 |
+|---|---|---|---|---|---|
+| section | English short | 52.3% | 53.4% | 62.5% | 86.4% |
+| document | English short | 67.0% | 61.4% | 71.6% | 88.6% |
+| document | Vietnamese (about English docs) | 0% | 37.5% | 0% | 12.5% |
+
+Ranking whole documents beats ranking single sections for short queries. Plain BM25 is blind to Vietnamese queries over English documents, and RRF fusion then makes the semantic branch worse.
+
+gte-multilingual-base and EmbeddingGemma-300m runs were stopped: the owner's fork had already measured models for Vietnamese (report `vantt/reviews/semantic-eval-2026-11-02.md` in `vantt/obsidian-hybrid-search`): with the `vi` pack, e5-small (0.950 nDCG@5) matches e5-base, bge-m3 and halong on its 255-query set at the lowest cost; bge-m3 separates near-synonyms best.
+
+### 6.2. The owner's OHS fork, release `v0.17.2-vantt.9` linux-x64, e5-small + `ohs-lang-vi` 0.2.0, hybrid mode
+
+Index: 685 of 691 documents in about 7.5 minutes on CPU; 6 failed because their YAML frontmatter is invalid (a title starting with a backtick, unquoted), for example `docs/knowledge/fgos-triage-table-columns/triage-table-columns.md`. That is a documentation defect for doc-checks, not an OHS fault.
+
+| Query | @3 | @10 |
+|---|---|---|
+| English short (document opening) | 65.9% | 90.9% |
+| Vietnamese developer note, as written | 0% | 16.7% |
+| Same note, translated to English | **91.7%** | **95.8%** |
+| Vietnamese and English together (multi-query RRF) | 62.5% | 70.8% |
+
+Why Vietnamese fails as written: every Vietnamese query ranks the large Vietnamese-language platform specs first (`runner/operations/h-51f5cd7279fd.md`, `runner/decisions/h-36d872fbb0e5.md`, `spec.md` files). The `vi` pack matches Vietnamese to Vietnamese well, so in a mixed-language corpus the query's language outweighs its subject.
+
+No-match queries: top scores 0.74 to 1.00 (English translation) against a median of 0.956 for queries with a real owner. No score threshold separates "has an owner" from "has none".
+
+### 6.3. What this changes
+
+1. **Engine:** hybrid search (BM25 with the `vi` pack, plus `multilingual-e5-small`) reaches the 90% bar at top 3 for developer-style notes once the note is in the corpus's language (24 queries; a small sample). bge-m3 is not needed for this bar; it stays the option if the miss list grows.
+2. **Query language:** the writer translates its draft into the language of the documents it searches before locate. Sending both languages at once is worse than English alone.
+3. **Return the top 10;** the writer reads candidates. The verdict `owner-found` / `none-above-threshold` cannot come from a score.
+4. **Rank whole documents, then point to sections,** rather than ranking sections alone.
+5. **Mixed-language corpus:** the Vietnamese platform specs pull Vietnamese queries; an English query may in turn miss them. Not measured yet: a gold set of Vietnamese specs searched in English.
+
 ## Appendix: gold set
 
 - g01: Merge blocked as fgos-write-rejected when a stale worker branch never touched .fgos/ but main changed it after the fork (the catchup/approve deadlock and the branchHeadAtTake trust fix).
