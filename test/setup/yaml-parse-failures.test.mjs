@@ -13,7 +13,6 @@ import { fileURLToPath } from 'node:url';
 import { DOCTOR_CHECKS } from '../../src/setup/checks.mjs';
 import { checkBlindStepsUseProvenPools } from '../../src/setup/blind-steps-proven-pools.mjs';
 import { checkSeatBindingDryBind } from '../../src/setup/seat-binding-checks.mjs';
-import { readWorkflowDefinitionFiles } from '../../src/setup/workflow-definition-files.mjs';
 
 const FGOS = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..', 'bin', 'fgos.mjs');
 const PARSE_PROBLEM = /cannot be parsed: .* \(line \d+, column \d+\)/;
@@ -59,7 +58,7 @@ test('a malformed project workflow is a named problem in each check that reads w
   assert.equal(capabilities.passed, false);
   assert.match(capabilities.message, new RegExp(`core/workflows/broken\\.yaml: ${PARSE_PROBLEM.source}`));
 
-  const options = { packageRoot: path.join(root, 'elsewhere'), loadRunnerConfig: () => ({ executors: {}, capabilities: {} }) };
+  const options = { payloadRoot: path.join(root, 'elsewhere'), loadRunnerConfig: () => ({ executors: {}, capabilities: {} }) };
   for (const check of [checkSeatBindingDryBind, checkBlindStepsUseProvenPools]) {
     const result = await check(root, options);
     assert.equal(result.passed, false, check.name);
@@ -82,11 +81,25 @@ const ONE_FAMILY_CONFIG = () => ({
   capabilities: { 'fixture:draft': { prefer: [{ executor: 'alpha' }] } },
 });
 
+test('a project definition of a shipped id is the one the dry-bind row checks, and the message names it', async (t) => {
+  const { root, write } = makeProject(t);
+  const payload = makeProject(t);
+  payload.write('core/workflows/reviewed.yaml', REVIEWED_WORKFLOW.replace('pattern: reviewed', 'pattern: solo'));
+  write('core/workflows/reviewed.yaml', REVIEWED_WORKFLOW);
+  const options = { payloadRoot: payload.root, loadRunnerConfig: ONE_FAMILY_CONFIG };
+
+  const result = await checkSeatBindingDryBind(root, options);
+  assert.equal(result.passed, false, 'the shipped solo definition passes; the project reviewed one is what runs and fails');
+  assert.match(result.message, /reviewed-fixture\/build\/draft/);
+  assert.ok(result.message.includes(`project definition ${path.join(root, 'core/workflows/reviewed.yaml')}`), result.message);
+  assert.match(result.message, /reviewed-fixture: project definition .* replaces the shipped definition/);
+});
+
 test('one unparsable workflow does not stop the others from being evaluated, and fails the check', async (t) => {
   const { root, write } = makeProject(t);
   write('core/workflows/reviewed.yaml', REVIEWED_WORKFLOW);
   write('core/workflows/broken.yaml', MALFORMED_WORKFLOW);
-  const options = { packageRoot: path.join(root, 'elsewhere'), loadRunnerConfig: ONE_FAMILY_CONFIG };
+  const options = { payloadRoot: path.join(root, 'elsewhere'), loadRunnerConfig: ONE_FAMILY_CONFIG };
 
   const pools = await checkSeatBindingDryBind(root, options);
   assert.equal(pools.passed, false);
@@ -103,28 +116,6 @@ test('one unparsable workflow does not stop the others from being evaluated, and
   assert.equal(capabilities.passed, false);
   assert.match(capabilities.message, /no entry for Workflow capabilities: .*nowhere:declared/, 'the parsable workflow was evaluated');
   assert.match(capabilities.message, new RegExp(`core/workflows/broken\\.yaml: ${PARSE_PROBLEM.source}`));
-});
-
-test('the workflow reader tells a file that cannot be read from one that cannot be parsed, and names the root', (t) => {
-  const pkg = makeProject(t);
-  const project = makeProject(t);
-  pkg.write('core/workflows/ok.yaml', 'id: ok\nsteps: []\n');
-  pkg.write('core/workflows/bad.json', '{"id": ');
-  project.write('core/workflows/locked.yaml', 'id: locked\nsteps: []\n');
-  fs.chmodSync(path.join(project.root, 'core', 'workflows', 'locked.yaml'), 0o000);
-  // A directory that is not a packaged workflow (no `wf.<name>.yaml` inside) is not a Workflow file.
-  fs.mkdirSync(path.join(project.root, 'core', 'workflows', 'notes'), { recursive: true });
-  project.write('core/workflows/broken.yaml', MALFORMED_WORKFLOW);
-  const roots = [{ root: pkg.root, label: 'package' }, { root: project.root, label: 'project' }];
-  const { files, unreadable } = readWorkflowDefinitionFiles(roots);
-  assert.deepEqual(files.map((f) => f.fileId), ['ok']);
-  assert.equal(unreadable.length, 3);
-  assert.match(unreadable[0], /^package: core\/workflows\/bad\.json: cannot be parsed: /);
-  assert.match(unreadable[1], /^project: core\/workflows\/broken\.yaml: cannot be parsed: .* \(line \d+, column \d+\)$/);
-  assert.match(unreadable[2], /^project: core\/workflows\/locked\.yaml: cannot be read: /);
-
-  const single = readWorkflowDefinitionFiles([roots[1]]);
-  assert.match(single.unreadable[0], /^core\/workflows\/broken\.yaml: /, 'a single root needs no prefix');
 });
 
 test('a self-referencing workflow document is a named problem and does not hang the capability walk', async (t) => {

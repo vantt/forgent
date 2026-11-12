@@ -96,12 +96,12 @@ steps:
 `;
 
 async function run(workflowYaml, capabilities) {
-  const packageRoot = mkPackageRoot(workflowYaml);
+  const payloadRoot = mkPackageRoot(workflowYaml);
   const cwd = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-pool-independence-project-'));
   try {
-    return await checkSeatBindingDryBind(cwd, { packageRoot, loadRunnerConfig: () => runnerConfig(capabilities) });
+    return await checkSeatBindingDryBind(cwd, { payloadRoot, loadRunnerConfig: () => runnerConfig(capabilities) });
   } finally {
-    fs.rmSync(packageRoot, { recursive: true, force: true });
+    fs.rmSync(payloadRoot, { recursive: true, force: true });
     fs.rmSync(cwd, { recursive: true, force: true });
   }
 }
@@ -157,16 +157,16 @@ test('a capability with no prefer pool anywhere is information, not a failure', 
 });
 
 test('a runner config that cannot be loaded passes with a note instead of throwing', async () => {
-  const packageRoot = mkPackageRoot(PANEL_WORKFLOW);
+  const payloadRoot = mkPackageRoot(PANEL_WORKFLOW);
   try {
     const result = await checkSeatBindingDryBind(os.tmpdir(), {
-      packageRoot,
+      payloadRoot,
       loadRunnerConfig: () => { throw new Error('no such file'); },
     });
     assert.equal(result.passed, true);
     assert.match(result.message, /seats not bound: no such file/);
   } finally {
-    fs.rmSync(packageRoot, { recursive: true, force: true });
+    fs.rmSync(payloadRoot, { recursive: true, force: true });
   }
 });
 
@@ -210,41 +210,41 @@ test('a debate whose pool has only two families cannot seat an independent judge
 test('a seat with no allowed cell fails naming the config line to change, and one family with a cell is enough to pass', async () => {
   const config = runnerConfig({ 'fixture:draft': { ...prefer('alpha'), tier: 'frontier' } });
   config.modelPolicies.claude = { standard: 'm' };
-  const packageRoot = mkPackageRoot(SOLO_WORKFLOW);
+  const payloadRoot = mkPackageRoot(SOLO_WORKFLOW);
   try {
-    const result = await checkSeatBindingDryBind(os.tmpdir(), { packageRoot, loadRunnerConfig: () => config });
+    const result = await checkSeatBindingDryBind(os.tmpdir(), { payloadRoot, loadRunnerConfig: () => config });
     assert.equal(result.passed, false);
     assert.match(result.message, /seat producer refused for tier-cell-missing: .*frontier.*capabilities\."fixture:draft"\.prefer/);
     config.modelPolicies.claude.frontier = 'm';
-    assert.equal((await checkSeatBindingDryBind(os.tmpdir(), { packageRoot, loadRunnerConfig: () => config })).passed, true);
+    assert.equal((await checkSeatBindingDryBind(os.tmpdir(), { payloadRoot, loadRunnerConfig: () => config })).passed, true);
   } finally {
-    fs.rmSync(packageRoot, { recursive: true, force: true });
+    fs.rmSync(payloadRoot, { recursive: true, force: true });
   }
 });
 
 test('a tier lowered by maxTier is listed as information with the line that lowered it', async () => {
   const config = runnerConfig({ 'fixture:draft': { ...prefer('alpha'), tier: 'frontier' } });
   config.maxTier = 'advanced';
-  const packageRoot = mkPackageRoot(SOLO_WORKFLOW);
+  const payloadRoot = mkPackageRoot(SOLO_WORKFLOW);
   try {
-    const result = await checkSeatBindingDryBind(os.tmpdir(), { packageRoot, loadRunnerConfig: () => config });
+    const result = await checkSeatBindingDryBind(os.tmpdir(), { payloadRoot, loadRunnerConfig: () => config });
     assert.equal(result.passed, true, result.message);
     assert.match(result.message, /seat producer runs at advanced, lowered from frontier by max-tier-cap/);
   } finally {
-    fs.rmSync(packageRoot, { recursive: true, force: true });
+    fs.rmSync(payloadRoot, { recursive: true, force: true });
   }
 });
 
 test('a packaged workflow directory is read like a flat file', async () => {
-  const packageRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-dry-bind-packaged-'));
+  const payloadRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-dry-bind-packaged-'));
   try {
-    fs.mkdirSync(path.join(packageRoot, 'core', 'workflows', 'solo-fixture'), { recursive: true });
-    fs.writeFileSync(path.join(packageRoot, 'core', 'workflows', 'solo-fixture', 'wf.solo-fixture.yaml'), SOLO_WORKFLOW);
-    const result = await checkSeatBindingDryBind(os.tmpdir(), { packageRoot, loadRunnerConfig: () => runnerConfig({ 'fixture:draft': prefer('alpha') }) });
+    fs.mkdirSync(path.join(payloadRoot, 'core', 'workflows', 'solo-fixture'), { recursive: true });
+    fs.writeFileSync(path.join(payloadRoot, 'core', 'workflows', 'solo-fixture', 'wf.solo-fixture.yaml'), SOLO_WORKFLOW);
+    const result = await checkSeatBindingDryBind(os.tmpdir(), { payloadRoot, loadRunnerConfig: () => runnerConfig({ 'fixture:draft': prefer('alpha') }) });
     assert.equal(result.passed, true, result.message);
     assert.match(result.message, /1 seat\(s\) of 1 Workflow unit\(s\) bind/);
   } finally {
-    fs.rmSync(packageRoot, { recursive: true, force: true });
+    fs.rmSync(payloadRoot, { recursive: true, force: true });
   }
 });
 
@@ -253,7 +253,7 @@ test('a packaged workflow directory is read like a flat file', async () => {
 test('the committed forgentX config binds every seat of every shipped workflow', async () => {
   seedFileLocalBwrapRegistry();
   const root = path.resolve(import.meta.dirname, '../..');
-  const result = await checkSeatBindingDryBind(root, { packageRoot: root, loadRunnerConfig: loadRunnerConfigForDir });
+  const result = await checkSeatBindingDryBind(root, { payloadRoot: root, loadRunnerConfig: loadRunnerConfigForDir });
   assert.equal(result.passed, true, result.message);
 });
 
@@ -276,18 +276,18 @@ steps:
 test('a unit with a persona and blind is bound as the run starts it: the persona taste of the seat decides its tier', async () => {
   const config = runnerConfig({ 'fixture:draft': { ...prefer('alpha'), personas: { panelist: { tier: 'frontier' } } } });
   config.modelPolicies.claude = { standard: 'm' };
-  const packageRoot = mkPackageRoot(PERSONA_WORKFLOW);
+  const payloadRoot = mkPackageRoot(PERSONA_WORKFLOW);
   try {
-    const result = await checkSeatBindingDryBind(os.tmpdir(), { packageRoot, loadRunnerConfig: () => config });
+    const result = await checkSeatBindingDryBind(os.tmpdir(), { payloadRoot, loadRunnerConfig: () => config });
     assert.equal(result.passed, false, 'the persona raises the seat to a tier the family has no cell for');
     assert.match(result.message, /seat producer refused for tier-cell-missing: .*frontier/);
   } finally {
-    fs.rmSync(packageRoot, { recursive: true, force: true });
+    fs.rmSync(payloadRoot, { recursive: true, force: true });
   }
 });
 
 test('the doctor, --seats and the runner start the same unit from a template', async () => {
-  const { workflowUnitContract } = await import('../../src/setup/workflow-definition-files.mjs');
+  const { workflowUnitContract } = await import('../../src/setup/workflow-catalog-reader.mjs');
   const { unitFieldsOfTemplate } = await import('../../src/workflow/steps.mjs');
   const template = { capability: 'fixture:draft', pattern: 'panel', persona: 'panelist', blind: true, prefer: ['alpha'], seats: [], objective: 'o' };
   const unit = workflowUnitContract({ id: 'u', template });
@@ -328,11 +328,17 @@ test('dry bind accepts pre-resolved collaboration and binds project-declared pat
   assert.equal(fromPattern.seats[0].executor, 'alpha');
 });
 
-test('checkSeatBindingDryBind reports unknown pattern and invalid params in activity units of an activity-only guide', async () => {
+test('checkSeatBindingDryBind reports unknown pattern and invalid params in activity units of a guide that declares its own activities', async () => {
   const unknownPatternWorkflow = `
 id: activity-unknown-pattern-guide
+steps:
+  - id: s
+    units:
+      - id: u
+        template: { capability: fixture:draft, objective: o }
 activities:
   - id: act-unknown
+    effects: none
     unit:
       pattern: non-existent-pattern
 `;
@@ -343,13 +349,20 @@ activities:
 
   const badParamsWorkflow = `
 id: activity-bad-params-guide
+steps:
+  - id: s
+    units:
+      - id: u
+        template: { capability: fixture:draft, objective: o }
 activities:
   - id: act-bad-param
+    effects: none
     unit:
       pattern: solo
       params:
         unsupportedParam: 42
   - id: act-skipped
+    effects: none
     unit:
       step: some-step
       units:
@@ -372,13 +385,13 @@ const unconfinedAgent = (family) => ({ kind: 'agent', providerModel: family, com
 
 async function posture(config) {
   seedFileLocalBwrapRegistry();
-  const packageRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-posture-package-'));
-  fs.mkdirSync(path.join(packageRoot, 'core', 'workflows'), { recursive: true });
+  const payloadRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-posture-package-'));
+  fs.mkdirSync(path.join(payloadRoot, 'core', 'workflows'), { recursive: true });
   const cwd = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-posture-project-'));
   try {
-    return await checkSeatBindingDryBind(cwd, { packageRoot, loadRunnerConfig: () => ({ modelPolicies: POSTURE_POLICIES, ...config }) });
+    return await checkSeatBindingDryBind(cwd, { payloadRoot, loadRunnerConfig: () => ({ modelPolicies: POSTURE_POLICIES, ...config }) });
   } finally {
-    fs.rmSync(packageRoot, { recursive: true, force: true });
+    fs.rmSync(payloadRoot, { recursive: true, force: true });
     fs.rmSync(cwd, { recursive: true, force: true });
   }
 }

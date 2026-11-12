@@ -12,7 +12,7 @@
 
 import { explainSeat } from '../runner/execution/bind.mjs';
 import { simulateUnitBindings } from '../runner/execution/dry-bind.mjs';
-import { loadWorkflowDefinitions, withUnreadableDefinitions, workflowRoots, workflowUnitContract } from './workflow-definition-files.mjs';
+import { readWorkflowCatalog, sourceOf, withUnreadableDefinitions, workflowUnitContract } from './workflow-catalog-reader.mjs';
 
 /**
  * Pairs a live canary proved blind: a worker of that provider family, run through that transport
@@ -86,27 +86,28 @@ function candidatesForRole(unit, seat, runnerConfig, session) {
 }
 
 /**
- * @param {string} cwd Project root (its own core/ and domains/ workflows are checked too).
+ * @param {string} cwd Project root (its own core/ and domains/ workflows win over the shipped ones).
  * @param {object} options
- * @param {string} options.packageRoot Root holding the shipped core/ and domains/.
+ * @param {string} [options.payloadRoot] Root holding the shipped core/ and domains/; the running payload when absent.
  * @param {() => object} options.loadRunnerConfig Returns the project's runner config; may throw.
  * @returns {Promise<{ passed: boolean, message: string }>}
  */
-export async function checkBlindStepsUseProvenPools(cwd, { packageRoot, loadRunnerConfig }) {
+export async function checkBlindStepsUseProvenPools(cwd, { payloadRoot, loadRunnerConfig }) {
   let runnerConfig;
   try {
     runnerConfig = loadRunnerConfig(cwd);
   } catch (err) {
     return { passed: true, message: `runner config not loadable here, blind pools not evaluated: ${err.message}` };
   }
-  const loaded = loadWorkflowDefinitions(workflowRoots(cwd, packageRoot));
-  return withUnreadableDefinitions(await evaluateBlindPools(loaded.workflows, runnerConfig), loaded.unreadable);
+  const loaded = readWorkflowCatalog(cwd, { payloadRoot });
+  return withUnreadableDefinitions(await evaluateBlindPools(loaded.catalog, runnerConfig), loaded.unreadable);
 }
 
-async function evaluateBlindPools(workflows, runnerConfig) {
+async function evaluateBlindPools(catalog, runnerConfig) {
   const problems = [];
   let evaluated = 0;
-  for (const wf of workflows.values()) {
+  for (const entry of catalog.values()) {
+    const wf = entry.workflow;
     for (const step of wf.steps) {
       for (const u of step?.units ?? []) {
         const template = u?.template ?? {};
@@ -126,10 +127,10 @@ async function evaluateBlindPools(workflows, runnerConfig) {
             }
           }
           for (const c of unproven.values()) {
-            problems.push(`${label}: ${c.executor} via ${c.invocation} (family ${c.family}, ${c.transport}, confinement ${c.backend})`);
+            problems.push(`${label}: ${c.executor} via ${c.invocation} (family ${c.family}, ${c.transport}, confinement ${c.backend}) [${sourceOf(entry)}]`);
           }
         } catch (err) {
-          problems.push(`${label}: could not be evaluated (${err.message})`);
+          problems.push(`${label}: could not be evaluated (${err.message}) [${sourceOf(entry)}]`);
         }
       }
     }

@@ -60,12 +60,7 @@ import { checkMailboxClaudeAccept } from './mailbox-claude-accept.mjs';
 import { checkClaudePluginMarketplace } from './agent-wiring.mjs';
 import { checkMailboxSyncTimer, fixMailboxSyncTimer } from './mailbox-sync-timer.mjs';
 import { checkAgentCliProjectTrusted } from './agent-cli-trust.mjs';
-import {
-  loadWorkflowDefinitions,
-  readWorkflowDefinitionFiles,
-  withUnreadableDefinitions,
-  workflowRoots,
-} from './workflow-definition-files.mjs';
+import { declaredActivities, readWorkflowCatalog, withUnreadableDefinitions } from './workflow-catalog-reader.mjs';
 import {
   checkExecutorFamilyUnique,
   checkExecutorSkillsInstalled,
@@ -629,10 +624,9 @@ export function checkRunnerPatternsConfig(cwd, run) {
         }
       }
       try {
-        const packageRoot = resolveMainCheckoutRoot(cwd) ?? cwd;
-        const loaded = loadWorkflowDefinitions(workflowRoots(cwd, packageRoot));
-        for (const wf of loaded.workflows.values()) {
-          for (const activity of wf.activities ?? []) {
+        for (const entry of readWorkflowCatalog(cwd).catalog.values()) {
+          const wf = entry.workflow;
+          for (const activity of declaredActivities(entry)) {
             const u = activity?.unit;
             if (!u || typeof u !== 'object') continue;
             const patName = typeof u.pattern === 'string' ? u.pattern : null;
@@ -1884,15 +1878,15 @@ registerFix({
 // bind() resolves it (exact name, then the bare verb). One that does not has
 // no candidate pool, so that unit is refused at run time with no earlier signal.
 // A declared entry that carries no `prefer` pool (exact or bare verb) is reported too.
-// Definition files come from the one Workflow reader (readWorkflowDefinitionFiles) and every string
-// under a key named `capability`, at any depth, is a use. A file that cannot be read or parsed is
-// reported by name, never skipped.
-function workflowCapabilityUses(files) {
+// Definitions come from the Workflow loader's one catalog (readWorkflowCatalog): the one that runs for each
+// id, project before shipped. Every string under a key named `capability`, at any depth, is a use. A file
+// that cannot be read, parsed or validated is reported by name, never skipped.
+function workflowCapabilityUses(catalog) {
   const uses = new Map();
-  for (const { fileId, raw } of files) {
+  for (const [id, { raw, source }] of catalog) {
     for (const capability of capabilityValues(raw)) {
       if (!uses.has(capability)) uses.set(capability, new Set());
-      uses.get(capability).add(fileId);
+      uses.get(capability).add(`${id} from ${source.root}`);
     }
   }
   return uses;
@@ -1922,9 +1916,8 @@ function capabilityValues(root) {
 const RUNNER_LOOP_CAPABILITY_USES = Object.freeze([['code:implement', 'runner loop: coding executing step']]);
 
 function checkWorkflowCapabilitiesConfigured(cwd) {
-  const packageRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
-  const { files, unreadable } = readWorkflowDefinitionFiles(workflowRoots(cwd, packageRoot));
-  const uses = workflowCapabilityUses(files);
+  const { catalog, unreadable } = readWorkflowCatalog(cwd);
+  const uses = workflowCapabilityUses(catalog);
   for (const [capability, id] of RUNNER_LOOP_CAPABILITY_USES) {
     uses.set(capability, new Set([...(uses.get(capability) ?? []), id]));
   }
@@ -2483,7 +2476,6 @@ registerCheck({
   id: 'seat-binding-dry-bind',
   description: 'every seat of every Workflow unit, and every core capability (execute, code:implement, any capability declaring an agent pool) as a writing producer, binds under the committed config in a fixed headless session (no lease, nothing started); a policy refusal or a pool with no executor able to carry the confinement posture fails, no pool, account state, tier caps and shared families are information',
   check: (cwd) => checkSeatBindingDryBind(cwd, {
-    packageRoot: path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..'),
     loadRunnerConfig: loadRunnerConfigForDir,
   }),
 });
@@ -2492,7 +2484,6 @@ registerCheck({
   id: 'blind-steps-use-proven-pools',
   description: 'every blind Workflow unit can only bind executors whose provider family and transport were proven to keep a worker blind (read-only, no model call)',
   check: (cwd) => checkBlindStepsUseProvenPools(cwd, {
-    packageRoot: path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..'),
     loadRunnerConfig: loadRunnerConfigForDir,
   }),
 });

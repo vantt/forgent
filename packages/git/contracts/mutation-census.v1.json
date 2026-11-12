@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "556c8603ebab609bafc33de149e9275435e8943c6c3c3da51017869385c93b36",
+  "payloadDigest": "75a33e7e1ce2e1ab77c1b8506c04d4347f41c195b20232196b9e7bf69af73944",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -1121,7 +1121,7 @@
     "src/setup/agy-permissions.mjs": "ed40e05c846fbf499d0a0bfbe0e066f27ad060e144e55f8fa809b2b0e024df78",
     "src/setup/ansi.mjs": "02c0e971ac01c71fb7db8d6506debd3c35d55feedceeb93eac7843b83fa0d430",
     "src/setup/bin-discovery.mjs": "d7d3536129adcbe5c6fc5297ef1f6ba1fcdc86d5195b7e968c14480b10e77101",
-    "src/setup/blind-steps-proven-pools.mjs": "9844633859f85ed4df5007ef9a4a4ce3acc3d097c85b79e7407b080e099da788",
+    "src/setup/blind-steps-proven-pools.mjs": "b3da45e89da558eaa65990245ef6a39d7534b67be4e40e68544324734dc6dd66",
     "src/setup/checks.mjs": "a879e8fc73d87da4da5dc2cf8487eb37df24e5d757ff7592dd3ea939776b81ac",
     "src/setup/claude-code-hooks.mjs": "d9f4cdbe8c4cec4cb3ea7c67798d24b49e3c86a0d97a041b202dec8def2332fe",
     "src/setup/config-checks.mjs": "4373cc63e07461185d0cdde5c4a0970893a780a4bf25f2ba9acedf3976c09add",
@@ -1142,16 +1142,16 @@
     "src/setup/model-pool-checks.mjs": "98c33baf933d90ad62130a68aa999ea785389b0112784aba7cac98b052f6ccf1",
     "src/setup/omp-natives-checks.mjs": "6f6faadb66ac09828741445c599dcbaee9462486157ab7074433e2dbcf4d9aad",
     "src/setup/project-launcher.mjs": "3153fdb9caad59eaeace759de1cd126c22f41585fcd1e15f00c1577ab0f9806b",
-    "src/setup/registrations.mjs": "1a0259af3e63dfd3279c0410836963240ae25ffb7ceb055f8aabb3f47f6a9170",
+    "src/setup/registrations.mjs": "54bcead2902b2cb0ea0c357b3f9950998d4e32d93c23ae98b32c5750d450b9d0",
     "src/setup/run-supervisor-checks.mjs": "dc0bb137dc4683b9f832437ed16f4d3a69c0b1b44bb2442f099a805361457bd9",
     "src/setup/runner-config-conversion.mjs": "6e2711a0a909265b82241901e7f9642889bdc3e9d1ab5a69fafd81b477a64ac6",
-    "src/setup/seat-binding-checks.mjs": "31466fd0d56700e12de4b369f8592da7ecf009590c6767340cadc84efa70770f",
+    "src/setup/seat-binding-checks.mjs": "f4ebcd47fcba1c4468776cb0724938bc4ff8dc345a46b880bc7c0a7e64a2660e",
     "src/setup/session-keep-declared.mjs": "b97619a3524d7d87245220459863181c03dd6066cd738aed9bad5874e6686067",
     "src/setup/shell-rc.mjs": "36c0eb600e6943d5c6ed94918d5d6a294d447fa8a6491076faaf525aa80807c0",
     "src/setup/skill-wrappers.mjs": "bf09efa96950bda7224e71953e2c37ab73f53997ea9270f8c6e226ffee1dfef7",
     "src/setup/terminal-control-checks.mjs": "5dca8b2bf0c8bddbc55bcfad97700e65708a04822bf8065b484d5d6c251ce4aa",
     "src/setup/workflow-case-checks.mjs": "9b187678986f33683b456a75565026e0d86be858cc8281feb86e8b660a6e4ba1",
-    "src/setup/workflow-definition-files.mjs": "28372084fe8b77963cfa33b2eb709e4146d6b4c87bb64e8983d743b9b0fc7320",
+    "src/setup/workflow-catalog-reader.mjs": "7056fca651ea1ebafa0445449fb63722509104f09d3527ba4af5ee10f691c379",
     "src/state/awaiting-context.mjs": "656e9ba97160ea31b09160cccb7ba07d50072860b1ce908629ea382119fa4da9",
     "src/state/cleanup-harness.mjs": "1989dd1e49e5f6c5ee817fd96fb22d293e5f9fa86b18cc9419a151140c4689cd",
     "src/state/cleanup-pool.mjs": "46ce8b7bbd04d3da091cd9cb6a905c7d9149019028698587009b81d7d9444927",
@@ -1254,7 +1254,7 @@
     "src/workflow/dir-guard.mjs": "d8224116ef0781fe57fef08bf706c1d51f25619a2b0a641c696432bdd2973044",
     "src/workflow/guide-schema.mjs": "219f32c91c2f21bd21391ac35b0108f5fb5f953417f09755c50362475e55eaf7",
     "src/workflow/index.mjs": "8444bb260e66b4f02c26980b8e81f3791f6a52d00a05ce24dbe8da1a810a3614",
-    "src/workflow/loader.mjs": "df60ca58210bd0d2cccf5f7838751d6be4894e2b65da28c1b17e26c8df5ced26",
+    "src/workflow/loader.mjs": "338613bd22bbdcfdfec2659fa7698171711b31285121b3e73aaa5506fc873ac7",
     "src/workflow/propose-classify.mjs": "dabe9993d576e910d8adfd0019313e8f2aa481b87faa3cfff276630c020f56c3",
     "src/workflow/propose-frame.mjs": "455144c70e07f9ee862a052c56ceaca60c99c62b0828f6d67ba93840b6dd3e81",
     "src/workflow/propose-validate.mjs": "e9ba1b3601ddbf65eed592c447b79ecb97288f48b09f5a4685e25abf4b8e51f3",
@@ -3529,49 +3529,49 @@
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 1823,
+      "line": 1817,
       "spawn": "execFileSync",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 3428,
-      "spawn": "checkBwrapAvailable -> src/setup/registrations.mjs:1300",
+      "line": 3419,
+      "spawn": "checkBwrapAvailable -> src/setup/registrations.mjs:1294",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 3476,
+      "line": 3467,
       "spawn": "runAllConfinementProbes -> src/runner/dispatch/confinement/probes/harness.mjs:834",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 3517,
-      "spawn": "checkBwrapAvailable -> src/setup/registrations.mjs:1300",
+      "line": 3508,
+      "spawn": "checkBwrapAvailable -> src/setup/registrations.mjs:1294",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 3524,
+      "line": 3515,
       "spawn": "probePeerRunHidden -> src/runner/dispatch/confinement/probes/harness.mjs:525",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 3759,
+      "line": 3750,
       "spawn": "probeIdentity -> src/util/session-identity.mjs:56",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 3823,
+      "line": 3814,
       "spawn": "createSeatBindingClient -> src/seat-binding/client.mjs:142",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"

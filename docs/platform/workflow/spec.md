@@ -438,7 +438,7 @@ Workflow là **Node thuần, không chuyển Rust** (mục 5.6); Playbook propos
 | Conductor entry | biến mảnh thành một đề xuất cho owner; mở case dưới khung đã duyệt; nhận mốc case đã đóng; năm verb case | `fgos workflow propose|start|answer|resume|close|prune|gate|status`, một verb cho mỗi lệnh nhận `{ detached }` | `propose*`, `case-start`, `case-inherit`, `case-verbs` | 2 171 | ≤ 2 040 | 2 135 |
 | Playbook runner | thứ tự step của preset và `--units`, gate đậu, hand-off Unit, danh sách ghế | một vòng ngắn trên các bước có tên; một bộ so glob (`write-scope.mjs`); đường chạy qua cửa `fgos run` | `runner`, `unit-handoff`, `units-source`, `seats`, `seat-providers`, `dir-guard`, `index` | 1 556 | ≤ 1 300 | 1 309 |
 | Doors | phân tích đối số và advance tách tiến trình | nhánh `workflow` của `bin/fgos.mjs` (116 dòng) và `src/cli/command-registry.mjs` | — | ≈ 145 | ≤ 120 (+ `prune`) | 116 |
-| Doctor side | máy hay project cần gì để Workflow chạy | một hàng con trỏ mỗi component; hàng `workflow-case-bindings` do Workflow đọc | `src/setup/workflow-case-checks.mjs`, `workflow-definition-files.mjs` | 238 | ≤ 180 | 150 |
+| Doctor side | máy hay project cần gì để Workflow chạy | một hàng con trỏ mỗi component; hàng `workflow-case-bindings` do Workflow đọc | `src/setup/workflow-case-checks.mjs`, `workflow-catalog-reader.mjs` | 238 | ≤ 180 | 150 |
 
 Không function nào trong `src/workflow` dài quá 300 dòng; dài nhất là `createCaseAdmissionPort` 96 dòng, và `projectCase` (một hàm gấp cho mỗi loại event) còn 61 dòng so với ngân sách 120. Toàn `src/workflow` đo 7 349 dòng (gốc 7 288, ngân sách khoảng 6 900). Phần còn của Work step-machine (`phase`, `skill`, `operations`, `transitions`, `aliases`, `statusSkills`) nằm cuối `definition.mjs` thành các normalizer có tên cho `wf-coding-cutover` và không tính vào ngân sách.
 
@@ -703,6 +703,12 @@ Mỗi dòng: ai quyết, **tín hiệu quan sát được** sẽ mở lại, và
 | R1-relay | panelist 2, 3 | relay ghi lồng về host | owner chọn từ chối; relay là F16 |
 
 ## 17. Lịch sử quyết định
+
+### Một catalog định nghĩa Workflow (owner 2026-11-09 18:17, quyết định 83 của kế hoạch HARDEN, AU-21 a)
+
+- **Trạng thái:** Settled.
+- **Quyết định:** "id này chỉ định nghĩa nào" do loader Workflow trả lời một lần, bằng `workflowCatalog({projectRoot})` (`src/workflow/loader.mjs`): định nghĩa của project trước, định nghĩa payload đang chạy sau, mỗi id ghi nguồn (`project` hoặc `payload`). Project được ghi đè id đã ship và thêm id mới. `fgos workflow start`, setup và doctor đọc cùng catalog đó; bộ đọc riêng của setup (payload thắng) bị xoá. Doctrine của domain vẫn chỉ nằm ở payload (quyết định 79 Q4).
+- **Cái giá:** doctor giờ không qua một định nghĩa không nạp được (không đọc, không parse, không qua validate), kể cả khi cũ doctor bỏ qua; nó gọi tên file và nguồn.
 
 ### Đợt cuối T6 (owner 2026-11-08 21:00, quyết định 73) — thu nhỏ rồi đóng; settle thắng, dọn cả case, status cho mọi run
 
