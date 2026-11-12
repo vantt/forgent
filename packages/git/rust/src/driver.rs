@@ -1641,7 +1641,7 @@ impl GitDriver {
         };
         let fetch_marker_text = text(&fetch_marker)?;
         let transport_text = text(&transport)?;
-        if fetch_marker_text.contains('\'') {
+        if fetch_marker_text.contains('\'') || transport_text.contains('\'') {
             return Err(failure("unsupported-probe-path"));
         }
         fs::write(
@@ -1654,10 +1654,12 @@ impl GitDriver {
             use std::os::unix::fs::PermissionsExt;
             fs::set_permissions(&transport, fs::Permissions::from_mode(0o700)).map_err(io)?;
         }
+        // Quoted, because the shell splits the value at a space (a Windows user name has one).
+        let ssh_command = format!("'{transport_text}'");
         for args in [
             vec!["config", "remote.origin.promisor", "true"],
             vec!["config", "remote.origin.url", "ssh://example.invalid/repo"],
-            vec!["config", "core.sshCommand", &transport_text],
+            vec!["config", "core.sshCommand", &ssh_command],
         ] {
             if !run(&args)?.success {
                 return Err(failure("git-floor-probe-config"));
@@ -3382,6 +3384,14 @@ mod tests {
             "D:/a/state/transport"
         );
         assert_eq!(sh_path(r"/tmp/a\b/transport", false), r"/tmp/a\b/transport");
+    }
+    #[test]
+    fn floor_holds_when_the_state_root_has_a_space() {
+        let outer = Temp::new();
+        let state = outer.0.join("state root");
+        let driver = GitDriver::new(&state).unwrap();
+        let floor = driver.git_floor_verdict().unwrap();
+        assert!(floor.supported, "{floor:?}");
     }
     #[test]
     fn floor_and_all_repository_backends() {
