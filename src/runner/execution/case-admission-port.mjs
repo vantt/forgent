@@ -14,6 +14,7 @@
 // The core never writes the ledger itself and never between admit and settle.
 
 import { RunnerConfigError } from '../dispatch/runner-config-error.mjs';
+import { NOT_STARTED_OUTCOME } from './outcome.mjs';
 
 // How many seat launches a Unit plans is the seat resolver's answer, so admission counts the same seats
 // the run will bind.
@@ -24,6 +25,42 @@ export const SEAT_LAUNCH_CEILING = 'seat-launch-ceiling';
 
 /** The version shape every settle carries (docs/platform/runner/contracts/unit-run-result.md, section 2). */
 export const UNIT_RUN_RESULT_CONTRACT = Object.freeze({ id: 'unit-run-result', version: 1 });
+
+/**
+ * The settle a reservation takes when its Unit ended with `unit` facts (the Unit shape): the one place that
+ * message is made, for a Unit that ran and for a reservation released without a run.
+ */
+export function unitRunSettle({ caseId, unitRunId }, unit) {
+  return {
+    contract: UNIT_RUN_RESULT_CONTRACT,
+    caseId,
+    outcome: unit.outcome,
+    unitRunId: unit.started.value ? unitRunId : null,
+    infrastructure: unit.infrastructure,
+    outOfScope: unit.outOfScope,
+    outOfScopeOnBranch: unit.outOfScopeOnBranch,
+    evaluations: unit.evaluations,
+    started: unit.started,
+    launches: unit.launches,
+    results: unit.results,
+    seatLaunchesUsed: unit.launches.used,
+    frameExhausted: unit.launches.ceilingHit,
+  };
+}
+
+/** The settle of a reservation whose Unit run can no longer run and never reported: no seat was given a brief. */
+export function releasedUnitRunSettle(caseId) {
+  return unitRunSettle({ caseId, unitRunId: null }, {
+    outcome: NOT_STARTED_OUTCOME,
+    infrastructure: true,
+    outOfScope: [],
+    outOfScopeOnBranch: [],
+    evaluations: [],
+    started: { value: false, reason: 'reservation-released' },
+    launches: { ceiling: null, used: 0, ceilingHit: false },
+    results: [],
+  });
+}
 
 const OPERATIONS = Object.freeze(['resolveBinding', 'admit', 'settle', 'recheckEffect']);
 

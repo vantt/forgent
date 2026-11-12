@@ -12,6 +12,7 @@ import { createGitInspect, gitPortOptions } from '../git/inspect.mjs';
 import { createWorktreeCheckoutSync } from '../runner/repo-locks.mjs';
 import { removeWorktree, deleteBranchRef } from '../runner/worktree.mjs';
 import { worktreeAdminScope } from '../runner/execution/custody-door.mjs';
+import { unitRunFacts } from '../runner/execution/unit-run-record.mjs';
 
 import { RunnerConfigError } from '../runner/dispatch/runner-config-error.mjs';
 import { foldRunSetting } from '../runner/execution/run-request.mjs';
@@ -411,12 +412,7 @@ export function settleUnitWorktrees({ mainRoot, state }) {
 export function canResumeUnitRun(mainRoot, uState) {
   if (!uState.unitRunId) return false;
   if (uState.worktreePath && !fs.existsSync(uState.worktreePath)) return false;
-  try {
-    const record = JSON.parse(fs.readFileSync(path.join(mainRoot, '.fgos', 'assignments', uState.unitRunId, 'unit.json'), 'utf8'));
-    return typeof record.worktree === 'string' && fs.existsSync(record.worktree);
-  } catch {
-    return false;
-  }
+  return unitRunFacts(path.join(mainRoot, '.fgos'), uState.unitRunId).resumable;
 }
 
 /**

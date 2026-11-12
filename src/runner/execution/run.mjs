@@ -8,7 +8,7 @@ import { publishMutableProjection } from '../../native/proof-helpers.mjs';
 import { gitWriter, readRepoFacts } from '../../git/inspect.mjs';
 
 import {
-  assertCaseAdmissionPort, normalizeCaseRef, briefNeverReached, noBriefDelivered, seatLaunchesUsed, SEAT_LAUNCH_CEILING, UNIT_RUN_RESULT_CONTRACT,
+  assertCaseAdmissionPort, normalizeCaseRef, briefNeverReached, noBriefDelivered, seatLaunchesUsed, SEAT_LAUNCH_CEILING, unitRunSettle,
 } from './case-admission-port.mjs';
 import { partitionPaths } from '../dispatch/write-scope.mjs';
 import { askFor, bind } from './bind.mjs';
@@ -216,21 +216,7 @@ function settleAdmission(scope, result, failure) {
   admission.settled = true;
   const unit = result ?? failedUnitFacts(scope, admission);
   try {
-    admission.port.settle(admission.reservationId, {
-      contract: UNIT_RUN_RESULT_CONTRACT,
-      caseId: admission.caseId,
-      outcome: unit.outcome,
-      unitRunId: unit.started.value ? admission.unitRunId : null,
-      infrastructure: unit.infrastructure,
-      outOfScope: unit.outOfScope,
-      outOfScopeOnBranch: unit.outOfScopeOnBranch,
-      evaluations: unit.evaluations,
-      started: unit.started,
-      launches: unit.launches,
-      results: unit.results,
-      seatLaunchesUsed: unit.launches.used,
-      frameExhausted: unit.launches.ceilingHit,
-    });
+    admission.port.settle(admission.reservationId, unitRunSettle(admission, unit));
     scope.settled.case = true;
   } catch (error) {
     scope.settled.case = false;

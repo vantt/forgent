@@ -11,9 +11,10 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { RunnerConfigError } from '../runner/dispatch/runner-config-error.mjs';
 import { custodyHeld } from '../runner/execution/custody-door.mjs';
-import { assignmentDir } from '../runner/dispatch/assignment-layout.mjs';
 import { gateAnswerFile, runDirOf } from '../runner/execution/case-run-paths.mjs';
-import { unitControllerHeld } from '../runner/execution/unit-control.mjs';
+import { unitRunFacts } from '../runner/execution/unit-run-record.mjs';
+import { releasedUnitRunSettle } from '../runner/execution/case-admission-port.mjs';
+import { NOT_STARTED_OUTCOME } from '../runner/execution/outcome.mjs';
 import { appendWorkflowEvent, readWorkflowEvents } from './store.mjs';
 import { gateOfStep, projectCase } from './case-projection.mjs';
 import { repairCaseBindings, unbindWorktree } from './case-bindings.mjs';
@@ -72,18 +73,37 @@ function reservationDead(mainRoot, { worktree, unitRunId }) {
   const fgosDir = path.join(mainRoot, '.fgos');
   if (!worktree || !fs.existsSync(worktree) || custodyHeld(fgosDir, worktree)) return false;
   if (typeof unitRunId === 'string' && unitRunId.startsWith(GATE_RUN_PREFIX)) return true;
-  const unitDir = typeof unitRunId === 'string' ? assignmentDir(fgosDir, unitRunId) : null;
-  const record = unitDir && path.join(unitDir, 'unit.json');
-  if (!record || !fs.existsSync(record)) return true;
-  return readJson(record)?.execution?.status === 'settled' && !unitControllerHeld(unitDir);
+  const run = unitRunFacts(fgosDir, unitRunId);
+  return !run.exists || (run.settled && !run.controllerHeld);
 }
 
-/** Give back, as `not-started`, each live reservation proven dead, under the hold. @returns {boolean} whether any was */
+/**
+ * The ledger's settle record: what the Unit shape of a Unit run's end (`result`) and the achievements the
+ * Workflow accepted for it (`achieved`, `receipts`) become on the case's ledger.
+ */
+export function settleRecord({ reservation, result, achieved, receipts }) {
+  return {
+    reservationId: reservation.reservationId,
+    activity: reservation.activity,
+    unitId: reservation.unitId ?? null,
+    unitRunId: result.unitRunId ?? null,
+    outcome: result.outcome,
+    receipts,
+    achieved,
+    seatLaunchesUsed: result.seatLaunchesUsed ?? 0,
+    ...(result.frameExhausted ? { frameExhausted: true } : {}),
+    ...(result.gate ? { gate: result.gate } : {}),
+    blind: reservation.blind === true,
+    settledAt: new Date().toISOString(),
+  };
+}
+
+/** Give back, with Execution's settle for a run that never started, each live reservation proven dead, under the hold. @returns {boolean} whether any was */
 function releaseDeadReservations({ mainRoot, caseId, hold, events }) {
   if (!events.some((e) => e.type === 'reservation')) return false;
   const dead = projectCase(events).liveReservations.filter((r) => reservationDead(mainRoot, r));
-  for (const r of dead) {
-    const settle = { reservationId: r.reservationId, activity: r.activity, unitId: r.unitId ?? null, unitRunId: null, outcome: 'not-started', receipts: [], achieved: [], seatLaunchesUsed: 0, blind: r.blind === true, settledAt: new Date().toISOString() };
+  for (const reservation of dead) {
+    const settle = settleRecord({ reservation, result: releasedUnitRunSettle(caseId), achieved: [], receipts: [] });
     applySettle({ mainRoot, caseId, hold, settle, events });
   }
   return dead.length > 0;
@@ -109,7 +129,7 @@ export function writeSettlePending({ mainRoot, caseId, settle }) {
 export function applySettle({ mainRoot, caseId, hold, settle, events = null }) {
   const known = events ?? readWorkflowEvents({ repoRoot: mainRoot, workflowRunId: caseId });
   const earlier = known.filter((e) => e.type === 'settle' && e.payload?.reservationId === settle.reservationId);
-  const fresh = earlier.every((e) => e.payload.outcome === 'not-started') && (earlier.length === 0 || settle.outcome !== 'not-started');
+  const fresh = earlier.every((e) => e.payload.outcome === NOT_STARTED_OUTCOME) && (earlier.length === 0 || settle.outcome !== NOT_STARTED_OUTCOME);
   if (fresh) appendWorkflowEvent({ repoRoot: mainRoot, workflowRunId: caseId, event: { type: 'settle', payload: settle }, hold });
   const { worktree } = known.find((e) => e.type === 'reservation' && e.payload?.reservationId === settle.reservationId)?.payload ?? {};
   const held = worktree && earlier.length === 0 ? known.findLast((e) => e.type === 'binding' && e.payload?.worktreeRoot === worktree)?.payload : null;

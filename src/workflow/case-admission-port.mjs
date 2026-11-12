@@ -16,7 +16,7 @@ import path from 'node:path';
 
 import { appendWorkflowEvent, readWorkflowEvents } from './store.mjs';
 import { tryAcquireAdvanceLock } from './case-lock.mjs';
-import { applySettle, drainCaseInbox, writeSettlePending } from './case-runtime.mjs';
+import { applySettle, drainCaseInbox, settleRecord, writeSettlePending } from './case-runtime.mjs';
 import { isDeliveryMilestone, projectCase, readCaseProjection, receiptsFromEvaluations } from './case-projection.mjs';
 import { digestSubject, digestUnitRunReports } from './ref-digests.mjs';
 import { admitProposal, newReservationId, recheckReservation } from './case-admission.mjs';
@@ -312,20 +312,7 @@ export function createCaseAdmissionPort({ repoRoot, caseId = null, heldAdvance =
       const reservation = events.find((e) => e.type === 'reservation' && e.payload?.reservationId === reservationId)?.payload;
       if (!reservation) return;
       const { achieved, receipts } = proposedAchievements({ mainRoot, projection: projectCase(events), reservation, result });
-      const payload = {
-        reservationId,
-        activity: reservation.activity,
-        unitId: reservation.unitId,
-        unitRunId: result.unitRunId ?? null,
-        outcome: result.outcome,
-        receipts,
-        achieved,
-        seatLaunchesUsed: result.seatLaunchesUsed ?? 0,
-        ...(result.frameExhausted ? { frameExhausted: true } : {}),
-        ...(result.gate ? { gate: result.gate } : {}),
-        blind: reservation.blind === true,
-        settledAt: new Date().toISOString(),
-      };
+      const payload = settleRecord({ reservation, result, achieved, receipts });
       const done = underAdvance(id, (hold) => applySettle({ mainRoot, caseId: id, hold, settle: payload }), { drain: false });
       if (done === null) writeSettlePending({ mainRoot, caseId: id, settle: payload });
     },

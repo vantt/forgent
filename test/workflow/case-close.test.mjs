@@ -10,7 +10,6 @@ import { spawn } from 'node:child_process';
 import { pruneFinishedCases } from '../../src/workflow/case-close.mjs';
 import { bindingsDir } from '../../src/workflow/case-bindings.mjs';
 import { acquireAdvanceLock } from '../../src/workflow/case-lock.mjs';
-import { acquireDispatchCwdLock } from '../../src/run-supervisor/cwd-lock.mjs';
 import { acquireUnitControl } from '../../src/runner/execution/unit-control.mjs';
 import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
 import { isCaseId } from '../../src/runner/execution/case-run-paths.mjs';
@@ -154,23 +153,14 @@ test('a case a worktree binding names stays', () => {
   assert.equal(ids(result.kept)[old.caseId], 'binding-held');
 });
 
-test('a Unit run that is unsettled, controlled or in custody stays and keeps its ledger', () => {
+// Why a Unit run stays (unsettled, controlled, in custody, a link) is owned by test/runner/execution/unit-run-record.test.mjs;
+// here one blocking reason shows the case-level rule: the ledger and every other run of the case stay with it.
+test('a Unit run Execution keeps holds back its whole case: the ledger and its sibling runs stay', () => {
   const repoRoot = makeFixtureDir('fgos-prune-');
-  const worktree = path.join(repoRoot, 'wt');
-  fs.mkdirSync(worktree);
-  const cases = {
-    unsettled: caseNaming(repoRoot, ['u-unsettled', 'u-sibling'], { closedDaysAgo: 30 }),
-    controlled: caseNaming(repoRoot, ['u-controlled', 'u-both'], { closedDaysAgo: 30 }),
-    custody: caseNaming(repoRoot, ['u-custody'], { closedDaysAgo: 30 }),
-  };
-  unitRun(repoRoot, 'u-unsettled', cases.unsettled.caseId, { settled: false });
-  const controlledDir = unitRun(repoRoot, 'u-controlled', cases.controlled.caseId);
-  unitRun(repoRoot, 'u-custody', cases.custody.caseId, { worktree });
-  const siblingDir = unitRun(repoRoot, 'u-sibling', cases.unsettled.caseId);
-  const bothDir = unitRun(repoRoot, 'u-both', cases.controlled.caseId, { settled: false });
+  const held = caseNaming(repoRoot, ['u-controlled', 'u-sibling'], { closedDaysAgo: 30 });
+  const controlledDir = unitRun(repoRoot, 'u-controlled', held.caseId);
+  const siblingDir = unitRun(repoRoot, 'u-sibling', held.caseId);
   const control = acquireUnitControl(controlledDir, 'u-controlled');
-  const bothControl = acquireUnitControl(bothDir, 'u-both');
-  const custody = acquireDispatchCwdLock(path.join(repoRoot, '.fgos'), worktree);
   try {
     const dry = prune(repoRoot);
     const result = prune(repoRoot, { apply: true });
@@ -179,17 +169,12 @@ test('a Unit run that is unsettled, controlled or in custody stays and keeps its
     assert.deepEqual(dry.unitRuns, []);
     assert.deepEqual(dry.kept, result.kept);
     const kept = ids(result.kept);
-    assert.equal(kept['u-unsettled'], 'unsettled');
     assert.equal(kept['u-controlled'], 'controller-held');
-    assert.equal(kept['u-custody'], 'custody-held');
-    assert.equal(kept['u-both'], 'controller-held');
     assert.equal(kept['u-sibling'], 'case-kept');
+    assert.equal(kept[held.caseId], 'unit-run-kept');
     assert.equal(fs.existsSync(siblingDir), true);
-    for (const run of Object.values(cases)) assert.equal(kept[run.caseId], 'unit-run-kept');
   } finally {
     control.release();
-    bothControl.release();
-    custody.release();
   }
 });
 
@@ -205,22 +190,6 @@ test('a case whose advance is held stays', () => {
   } finally {
     hold.release();
   }
-});
-
-test('a symbolic link in place of a Unit run is kept and its target is untouched', () => {
-  const repoRoot = makeFixtureDir('fgos-prune-');
-  const old = caseNaming(repoRoot, ['linked'], { closedDaysAgo: 30 });
-  const target = makeFixtureDir('fgos-prune-target-');
-  fs.writeFileSync(path.join(target, 'precious.txt'), 'keep');
-  fs.writeFileSync(path.join(target, 'unit.json'), JSON.stringify({ workflow: { caseId: old.caseId } }));
-  fs.mkdirSync(assignmentsOf(repoRoot), { recursive: true });
-  fs.symlinkSync(target, path.join(assignmentsOf(repoRoot), 'linked'));
-
-  const result = prune(repoRoot, { apply: true });
-
-  assert.deepEqual(result.cases, []);
-  assert.equal(ids(result.kept).linked, 'link');
-  assert.equal(fs.readFileSync(path.join(target, 'precious.txt'), 'utf8'), 'keep');
 });
 
 test('a ledger that names a Unit run whose record names another case does not delete it', () => {
