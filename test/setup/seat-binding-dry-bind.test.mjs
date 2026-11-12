@@ -1,5 +1,5 @@
 import '../helpers/process-tmp-root.mjs';
-import { seedStubAgentClis } from '../helpers/agent-clis.mjs';
+import { seedStubAgentClis, stubAgentCliDir } from '../helpers/agent-clis.mjs';
 seedStubAgentClis('claude', 'codex', 'omp', 'pi', 'agy', 'glm', 'gemini', 'openai', 'unconfined', 'disallowed-provider');
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -473,4 +473,19 @@ test('a posture failure and a missing pool are reported together, each with its 
   assert.match(result.message, /executors lack required posture confinement: execute/);
   assert.match(result.message, /no candidate executor available for capabilities: code:implement/);
   assert.match(result.message, /runner\.capabilities\.<cap>\.prefer/);
+});
+
+test('with only claude installed, the committed config still binds: a CLI that is missing is no failure while another candidate serves the seat', async () => {
+  seedFileLocalBwrapRegistry();
+  const root = path.resolve(import.meta.dirname, '../..');
+  const savedPath = process.env.PATH;
+  try {
+    process.env.PATH = stubAgentCliDir('claude');
+    const result = await checkSeatBindingDryBind(root, { payloadRoot: root, loadRunnerConfig: loadRunnerConfigForDir });
+    assert.equal(result.passed, true, result.message);
+    // The seats no installed CLI can serve are a warning that names what to install.
+    assert.match(result.message, /^warning: \d+ seat\(s\) have no candidate whose agent CLI is installed; install .*\bpi\b/);
+  } finally {
+    process.env.PATH = savedPath;
+  }
 });

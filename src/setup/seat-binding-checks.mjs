@@ -108,6 +108,8 @@ export async function checkSeatBindingDryBind(cwd, { payloadRoot, loadRunnerConf
   const shipped = shippedCatalog();
   let units = 0;
   let bound = 0;
+  const unserved = [];
+  const missingClis = new Set();
   const posture = bindCapabilityPostures(runnerConfig);
   problems.push(...posture.problems);
   info.push(...posture.info);
@@ -155,6 +157,13 @@ export async function checkSeatBindingDryBind(cwd, { payloadRoot, loadRunnerConf
           continue;
         }
         for (const seat of seats) {
+          if (seat.refused?.reason === 'cli-missing') {
+            // Every candidate this seat could use runs a CLI the machine does not have: nothing to repair in the
+            // config, so a warning that names what to install, never a failure.
+            unserved.push(`${label}: seat ${seat.seat}`);
+            for (const [, cli] of seat.refused.detail.matchAll(/runs (\S+?), which is not installed/g)) missingClis.add(cli);
+            continue;
+          }
           if (seat.refused) {
             const kind = INFO_REFUSALS.get(seat.refused.reason);
             if (kind) info.push(`${label}: seat ${seat.seat} not bound, ${kind} (${seat.refused.reason})`);
@@ -168,6 +177,8 @@ export async function checkSeatBindingDryBind(cwd, { payloadRoot, loadRunnerConf
       }
     }
   }
+  const unservedWarning = unserved.length === 0 ? ''
+    : `warning: ${unserved.length} seat(s) have no candidate whose agent CLI is installed${missingClis.size > 0 ? `; install ${[...missingClis].sort().join(' or ')} (or another agent CLI the pool names) to bind them` : ''}: ${listed(unserved)}; `;
   const coverage = posture.coverage.length > 0 ? `; posture: ${posture.coverage.join(', ')}` : '';
   const notes = `${coverage}${info.length > 0 ? `; info (${info.length}): ${listed(info)}` : ''}`;
   if (problems.length > 0) {
@@ -176,5 +187,5 @@ export async function checkSeatBindingDryBind(cwd, { payloadRoot, loadRunnerConf
       : `${problems.length} problem(s) found`;
     return withUnreadableDefinitions({ passed: false, message: `${summary}: ${problems.join(' | ')}${notes}` }, loaded.unreadable);
   }
-  return withUnreadableDefinitions({ passed: true, message: units === 0 ? `no Workflow unit to bind${notes}` : `${bound} seat(s) of ${units} Workflow unit(s) bind${notes}` }, loaded.unreadable);
+  return withUnreadableDefinitions({ passed: true, message: `${unservedWarning}${units === 0 ? `no Workflow unit to bind${notes}` : `${bound} seat(s) of ${units} Workflow unit(s) bind${notes}`}` }, loaded.unreadable);
 }
