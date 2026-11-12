@@ -56,7 +56,17 @@ jobs:
         run: cargo test -p fgos-distribution
 
       - name: cargo test (identity crate)
+        if: runner.os != 'Windows'
         run: cargo test -p fgos-identity
+
+      # Minting a counter number goes through the Git write path (a clone of a file remote, a push), which
+      # Windows does not support yet (Windows runtime support), so the mint tests run on Linux only.
+      - name: cargo test (identity crate, without the mint tests)
+        if: runner.os == 'Windows'
+        run: >
+          cargo test -p fgos-identity --lib
+          --test attempt_writer_id --test directory --test golden --test machine --test project
+          --test register_current --test session --test shared --test signing
 
       # The writer-identity facade runs the real host binary on every platform (only its sh
       # stand-in and /proc cases skip on Windows). run-tests stages the addon and host the
