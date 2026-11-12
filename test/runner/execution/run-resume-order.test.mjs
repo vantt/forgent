@@ -1,4 +1,6 @@
 import '../../helpers/process-tmp-root.mjs';
+import { seedStubAgentClis } from '../../helpers/agent-clis.mjs';
+seedStubAgentClis('claude', 'codex', 'omp', 'pi', 'agy', 'glm', 'disallowed-provider');
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

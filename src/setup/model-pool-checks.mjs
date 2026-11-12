@@ -6,14 +6,13 @@
 
 import { loadRunnerConfigForDir, MODEL_POLICY_TIERS } from '../runner/dispatch/config.mjs';
 import { familyOf } from '../runner/dispatch/provider-adapter.mjs';
-import { parseTierCell, isExtendedTierCell } from '../runner/dispatch/tier-cell.mjs';
+import { parseTierCell } from '../runner/dispatch/tier-cell.mjs';
 import { readLlmAccounts, compareWithLegacyInventory, deriveLegacyInventory } from '../runner/dispatch/llm-accounts.mjs';
-import { isConfigRefusal, readMachineConfig } from '../config/facade.mjs';
 import { AGENT_SKILL_DIRS } from '../util/agent-skill-dirs.mjs';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { resolveMainCheckoutRoot } from '../runner/paths.mjs';
+import { isCommandAvailable, resolveMainCheckoutRoot } from '../runner/paths.mjs';
 
 function loadOrExplain(cwd) {
   try {
@@ -48,11 +47,11 @@ export function checkExecutorFamilyUnique(cwd) {
 // only checked at project level.
 const CLI_USER_SKILL_DIRS = { claude: '.claude/skills', codex: '.agents/skills' };
 
-function invocationCliNames(entry) {
+function invocationCommands(entry) {
   const commands = Array.isArray(entry.invocations) && entry.invocations.length > 0
     ? entry.invocations.map(inv => inv?.command)
     : [entry.command];
-  return [...new Set(commands.filter(c => typeof c === 'string' && c !== '').map(c => path.basename(c)))];
+  return [...new Set(commands.filter(c => typeof c === 'string' && c !== ''))];
 }
 
 /** The state of one skill file: `ok` when it has content, `empty` when present with none, `missing` otherwise. */
@@ -80,11 +79,15 @@ export function checkExecutorSkillsInstalled(cwd) {
   const home = os.homedir();
   const missing = [];
   const unchecked = [];
+  const notInstalled = [];
   let checked = 0;
   for (const [id, entry] of Object.entries(runnerConfig.executors ?? {})) {
     const skills = entry?.supports?.skills;
     if (entry?.kind !== 'agent' || !Array.isArray(skills)) continue;
-    for (const cli of invocationCliNames(entry)) {
+    for (const command of invocationCommands(entry)) {
+      const cli = path.basename(command);
+      // A CLI this machine does not have is no runtime for its skills to be installed in.
+      if (!isCommandAvailable(command)) { notInstalled.push(`${id} (cli ${cli})`); continue; }
       const dir = AGENT_SKILL_DIRS[cli];
       if (!dir) { unchecked.push(`${id} (cli ${cli})`); continue; }
       for (const skill of skills) {
@@ -101,7 +104,8 @@ export function checkExecutorSkillsInstalled(cwd) {
     }
   }
   if (missing.length > 0) return { passed: false, message: missing.join('; ') };
-  const note = unchecked.length > 0 ? `; not checked, no known skill directory: ${unchecked.join(', ')}` : '';
+  const note = (unchecked.length > 0 ? `; not checked, no known skill directory: ${unchecked.join(', ')}` : '')
+    + (notInstalled.length > 0 ? `; skipped, CLI not installed: ${[...new Set(notInstalled)].join(', ')}` : '');
   return { passed: true, message: `${checked} declared executor skill(s) installed in the main checkout (a linked worktree gets skills only from worktreeSetup provisioning)${note}` };
 }
 
@@ -187,35 +191,5 @@ export function checkLlmAccountsVsLegacy(cwd) {
   if (storeMismatch.length > 0) parts.push(`different login directories: ${storeMismatch.map((a) => `${a.pool}/${a.account}`).join(', ')}`);
   if (parts.length > 0) return { passed: true, message: `warning: the lease reads runner.llmAccounts for a pool it declares and runner.providers for the rest; ${parts.join('; ')}` };
   return { passed: true, message: 'runner.llmAccounts matches runner.providers' };
-}
-
-/**
- * Every fgOS release on the machine reads the global config; an older one fails on a list cell. The row judges the
- * global file's own cells (the standard holds list cells too), so it asks the snapshot which cells the global layer set.
- */
-export function checkGlobalModelPoliciesPortable() {
-  let snapshot;
-  try {
-    snapshot = readMachineConfig({ sections: ['runner'], origins: ['runner.modelPolicies'] });
-  } catch (err) {
-    if (!isConfigRefusal(err)) throw err;
-    return { passed: true, message: `global config not readable, not evaluated: ${err.message}` };
-  }
-  const globalCells = new Set();
-  for (const { path: at, layer } of snapshot.origins ?? []) {
-    const cell = layer === 'global' ? /^runner\.modelPolicies\.([^.[]+)\.([^.[]+)/.exec(at) : null;
-    if (cell) globalCells.add(`${cell[1]}.${cell[2]}`);
-  }
-  const extended = [...globalCells].filter((name) => {
-    const [family, tier] = name.split('.');
-    return isExtendedTierCell(snapshot.value.runner.modelPolicies?.[family]?.[tier]);
-  });
-  if (extended.length > 0) {
-    return {
-      passed: false,
-      message: `~/.fgos/config.json runner.modelPolicies has list, "model@pool" or object cells (${extended.join(', ')}); older fgOS releases on this machine fail on a list or an object and run "model@pool" as a model id, and this release ignores them -- move them to the project config`,
-    };
-  }
-  return { passed: true, message: 'global modelPolicies cells are plain model names' };
 }
 

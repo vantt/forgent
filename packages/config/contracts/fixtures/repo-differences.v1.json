@@ -34,7 +34,8 @@
   "/home/",
   "resourceBindings",
   "token",
-  "ak:cook"
+  "ak:cook",
+  "thehive"
  ],
  "differences": [
   {
@@ -185,6 +186,60 @@
     "supports"
    ],
    "reason": "the standard names no kit skill; the pinned authoring source declares the cook skill this executor loads, which a machine now declares in its own config"
+  },
+  {
+   "path": [
+    "runner",
+    "modelPolicies",
+    "z-ai",
+    "nano"
+   ],
+   "reason": "the standard names no account pool of one machine; the pinned authoring source serves this cell through the thehive pool first, which a machine declares in its own config"
+  },
+  {
+   "path": [
+    "runner",
+    "modelPolicies",
+    "z-ai",
+    "standard"
+   ],
+   "reason": "the standard names no account pool of one machine; the pinned authoring source serves this cell through the thehive pool first, which a machine declares in its own config"
+  },
+  {
+   "path": [
+    "runner",
+    "modelPolicies",
+    "z-ai",
+    "mini"
+   ],
+   "reason": "the standard names no account pool of one machine; the pinned authoring source serves this cell through the thehive pool first, which a machine declares in its own config"
+  },
+  {
+   "path": [
+    "runner",
+    "modelPolicies",
+    "deepseek",
+    "nano"
+   ],
+   "reason": "the standard names no account pool of one machine; the pinned authoring source serves this cell through the thehive pool first, which a machine declares in its own config"
+  },
+  {
+   "path": [
+    "runner",
+    "modelPolicies",
+    "deepseek",
+    "standard"
+   ],
+   "reason": "the standard names no account pool of one machine; the pinned authoring source serves this cell through the thehive pool first, which a machine declares in its own config"
+  },
+  {
+   "path": [
+    "runner",
+    "modelPolicies",
+    "deepseek",
+    "mini"
+   ],
+   "reason": "the standard names no account pool of one machine; the pinned authoring source serves this cell through the thehive pool first, which a machine declares in its own config"
   },
   {
    "path": [

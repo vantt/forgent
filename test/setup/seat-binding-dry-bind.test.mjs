@@ -1,4 +1,6 @@
 import '../helpers/process-tmp-root.mjs';
+import { seedStubAgentClis } from '../helpers/agent-clis.mjs';
+seedStubAgentClis('claude', 'codex', 'omp', 'pi', 'agy', 'glm', 'gemini', 'openai', 'unconfined', 'disallowed-provider');
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -442,6 +444,23 @@ test('a core capability with no pool is information that says where to declare i
   assert.equal(result.passed, true, result.message);
   assert.match(result.message, /no candidate executor available for capabilities: execute\. Fix: Declare runner\.capabilities\.<cap>\.prefer/);
   assert.doesNotMatch(result.message, /sandbox\.backend "bwrap"/);
+});
+
+test('a machine with no agent CLI is told so with the fix, never failed for a config that has nothing to bind yet', async () => {
+  const emptyPath = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-dry-bind-no-cli-'));
+  const savedPath = process.env.PATH;
+  try {
+    process.env.PATH = emptyPath;
+    const result = await posture({
+      executors: { claude: bwrapAgent('claude') },
+      capabilities: { execute: { prefer: 'claude' } },
+    });
+    assert.equal(result.passed, true, result.message);
+    assert.match(result.message, /no agent CLI is installed, so .*execute.* bind nothing yet\. Fix: install one of claude/);
+  } finally {
+    process.env.PATH = savedPath;
+    fs.rmSync(emptyPath, { recursive: true, force: true });
+  }
 });
 
 test('a posture failure and a missing pool are reported together, each with its own fix', async () => {

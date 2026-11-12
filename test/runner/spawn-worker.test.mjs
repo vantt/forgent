@@ -5,6 +5,8 @@
 // enforced by the cli-spawn launch every Unit run goes through.
 
 import '../helpers/process-tmp-root.mjs';
+import { seedStubAgentClis } from '../helpers/agent-clis.mjs';
+seedStubAgentClis('claude', 'codex', 'omp', 'pi', 'agy', 'glm', 'disallowed-provider');
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -232,9 +234,16 @@ test('spawnWorker throws worker-timeout past the time budget and keeps what the 
   });
 });
 
-test('spawnWorker throws worker-spawn-fail when the configured command does not exist', async () => {
+// An executable file whose interpreter is gone: bind finds the command, the operating system cannot start it.
+function unstartableCommand() {
+  const file = path.join(scriptDir(), 'unstartable');
+  fs.writeFileSync(file, '#!/no/such/interpreter-xyz\n', { mode: 0o755 });
+  return file;
+}
+
+test('spawnWorker throws worker-spawn-fail when the configured command cannot be started', async () => {
   const fx = fixture({
-    executor: { providerModel: 'claude', allowCrossProvider: true, command: '/no/such/executor-binary-xyz', args: ['{prompt}'] },
+    executor: { providerModel: 'claude', allowCrossProvider: true, command: unstartableCommand(), args: ['{prompt}'] },
     modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 20000,
   });

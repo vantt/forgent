@@ -8,14 +8,16 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { parseTierCell, isExtendedTierCell } from '../../src/runner/dispatch/tier-cell.mjs';
+import { parseTierCell } from '../../src/runner/dispatch/tier-cell.mjs';
 import { loadRunnerConfigForDir, supportsPolicyTier } from '../../src/runner/dispatch/config.mjs';
 import { RunnerConfigError } from '../../src/runner/dispatch/runner-config-error.mjs';
 import { bind } from '../../src/runner/execution/bind.mjs';
 import { seedFileLocalBwrapRegistry } from './confinement-registry-fixture.helper.mjs';
 import { writeGlobalConfig, writeProjectConfig } from '../helpers/config-fixture.mjs';
+import { seedStubAgentClis } from '../helpers/agent-clis.mjs';
 
 seedFileLocalBwrapRegistry();
+seedStubAgentClis('claude', 'fam');
 
 test('a plain model is served by the pool named after its family', () => {
   assert.deepEqual(parseTierCell('sonnet', 'claude'), [{ model: 'sonnet', pool: 'claude', explicitPool: false }]);
@@ -44,12 +46,6 @@ test('an empty list, a non-string entry, an empty model and an empty pool are re
   assert.throws(() => parseTierCell('', 'claude'), /non-empty string/);
   assert.throws(() => parseTierCell('@openrouter', 'claude'), /no model/);
   assert.throws(() => parseTierCell('sonnet@', 'claude'), /no pool/);
-});
-
-test('only the list and model@pool forms count as extended', () => {
-  assert.equal(isExtendedTierCell('sonnet'), false);
-  assert.equal(isExtendedTierCell('sonnet@claude'), true);
-  assert.equal(isExtendedTierCell(['sonnet']), true);
 });
 
 const policies = {
@@ -100,35 +96,34 @@ test('a project config with a malformed cell fails to load and names the cell', 
   assert.throws(() => loadWith({ claude: { standard: 'sonnet@' } }), /runner\.modelPolicies\.claude\.standard \(oneOf\)/);
 });
 
-test('the global config keeps plain strings but drops list, model@pool and object cells, naming each once', () => {
-  // Every fgOS release on the machine reads the global config; an older one fails on a list.
+test('the global config may write a list, model@pool and object cells, and none is dropped or warned about', () => {
   const { cfg, stderr } = loadWith(
     { claude: { standard: 'sonnet' } },
     { claude: { advanced: 'opus', flagship: ['opus@vertex', 'opus'], frontier: { model: 'opus', effort: 'high' } }, deepseek: { standard: 'deepseek-v4@openrouter' } },
   );
   assert.equal(cfg.modelPolicies.claude.standard, 'sonnet');
   assert.equal(cfg.modelPolicies.claude.advanced, 'opus');
-  // The dropped cells give way to the layer below (the standard's cell), never to the global value.
-  const below = loadWith({ claude: { standard: 'sonnet' } }).cfg.modelPolicies;
-  assert.deepEqual(cfg.modelPolicies.claude.flagship, below.claude.flagship);
-  assert.deepEqual(cfg.modelPolicies.claude.frontier, below.claude.frontier);
-  assert.deepEqual(cfg.modelPolicies.deepseek?.standard, below.deepseek?.standard);
-  assert.notDeepEqual(cfg.modelPolicies.claude.flagship, ['opus@vertex', 'opus']);
-  assert.match(stderr, /runner\.modelPolicies\.claude\.flagship/);
-  assert.match(stderr, /runner\.modelPolicies\.claude\.frontier/);
-  assert.match(stderr, /runner\.modelPolicies\.deepseek\.standard/);
+  assert.deepEqual(cfg.modelPolicies.claude.flagship, ['opus@vertex', 'opus']);
+  assert.deepEqual(cfg.modelPolicies.claude.frontier, { model: 'opus', effort: 'high' });
+  assert.equal(cfg.modelPolicies.deepseek.standard, 'deepseek-v4@openrouter');
+  assert.equal(stderr, '', 'nothing about a global cell is written to stderr');
 });
 
-test('a global extended cell over a standard cell gives the standard cell, and nothing where the standard has none', () => {
-  const standard = loadWith({ claude: { standard: 'sonnet' } }).cfg.modelPolicies.claude;
+test('a project cell overrides the global cell of the same tier, and the global cell stays where the project is silent', () => {
   const { cfg } = loadWith(
-    { claude: { standard: 'sonnet' } },
-    { claude: { advanced: ['opus@vertex', 'opus'], frontier: { model: 'opus', effort: 'high' } }, nofamily: { standard: 'x@pool' } },
+    { claude: { standard: 'sonnet', advanced: ['opus@vertex', 'opus'] } },
+    { claude: { advanced: ['other@pool'], flagship: 'opus@vertex' } },
   );
-  for (const tier of ['advanced', 'frontier']) {
-    assert.deepEqual(cfg.modelPolicies.claude[tier], standard[tier]);
-  }
-  assert.equal(cfg.modelPolicies.nofamily?.standard, undefined);
+  assert.deepEqual(cfg.modelPolicies.claude.advanced, ['opus@vertex', 'opus']);
+  assert.equal(cfg.modelPolicies.claude.flagship, 'opus@vertex');
+});
+
+test('a global cell reaches the binding: bind runs the first entry of a global list cell', () => {
+  const { cfg } = loadWith({ claude: { standard: 'sonnet' } }, { claude: { advanced: ['x@other', 'opus@f', 'sonnet'] } });
+  const runnerConfig = bindConfig(cfg.modelPolicies.claude.advanced);
+  const result = bind(ask, { runnerConfig, ...headless });
+  assert.ok(!result.refused, JSON.stringify(result.refused));
+  assert.equal(result.model, 'opus');
 });
 
 function bindConfig(cell) {
@@ -191,11 +186,6 @@ test('an object cell with no model, an unknown key, an empty pool or an effort o
   for (const effort of ['xhigh', 'minimal', 'off', 7, '']) {
     assert.throws(() => parseTierCell({ model: 'sonnet', effort }, 'claude'), /"effort" must be one of low\/medium\/high\/max/);
   }
-});
-
-test('an object cell counts as extended, so a release that reads one model string cannot take it', () => {
-  assert.equal(isExtendedTierCell({ model: 'sonnet' }), true);
-  assert.equal(isExtendedTierCell(null), false);
 });
 
 test('an object cell\'s effort reaches the binding as the cell\'s promise, and supportsPolicyTier sees the cell', () => {

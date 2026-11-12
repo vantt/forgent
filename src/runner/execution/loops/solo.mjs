@@ -6,15 +6,6 @@
 import { resolveSeats, VERIFY_SEAT } from '../seat-resolver.mjs';
 import { verifyCommandOf, verifySeatResult } from './verify.mjs';
 
-export const VALID_OUTCOMES = Object.freeze([
-  'pass',
-  'findings',
-  'execution-failure',
-  'policy-refusal',
-  'provider-limit',
-  'blocked',
-]);
-
 export const PARAMS = Object.freeze({
   seats: Object.freeze({
     type: 'seats',

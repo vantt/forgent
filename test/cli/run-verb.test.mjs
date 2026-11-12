@@ -6,7 +6,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
-import { execFileSync } from 'node:child_process';
+import { execFileSync, spawnSync } from 'node:child_process';
 import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
 
 seedFileLocalBwrapRegistry();
@@ -283,6 +283,22 @@ test('fgos run --override with a tier above the resolved tier is refused by name
   const out = failCli(['Check it', '--capability', 'docs:write', '--override', '{"tier":"frontier"}', '--dir', tmp], tmp);
   assert.match(out, /tier-escalation-unauthorized/);
   assert.match(out, /frontier/);
+  assert.deepEqual(unitRunsOf(tmp), []);
+});
+
+test('fgos run on a machine with no agent CLI is refused by name with the fix, and no unit run is left behind', () => {
+  const tmp = setupTestRepo();
+  // Every executor of the project and of the shipped standard starts a program this PATH does not hold.
+  setRunnerConfig(tmp, (runner) => {
+    const absent = '/no/such/agent-cli';
+    const { command: _command, ...executor } = runner.executors['test-node'];
+    return { ...runner, executors: { 'test-node': { ...executor, command: absent, invocations: [{ ...executor.invocations[0], command: absent }] } } };
+  });
+  const bin = makeFixtureDir('fgos-cli-run-bin-');
+  fs.symlinkSync(execFileSync('sh', ['-c', 'command -v git'], { encoding: 'utf8' }).trim(), path.join(bin, 'git'));
+  const result = spawnSync(process.execPath, [BIN_FGOS, 'run', 'Check it', '--capability', 'docs:write', '--dir', tmp], { cwd: tmp, encoding: 'utf8', env: { ...process.env, PATH: bin } });
+  assert.equal(result.status, 4, result.stderr);
+  assert.match(result.stderr, /agent-cli-missing: no agent CLI is installed on this machine .*install one of .*fgos doctor/);
   assert.deepEqual(unitRunsOf(tmp), []);
 });
 

@@ -426,6 +426,9 @@ pub struct ExecutorFacts {
     /// Set when governance disallows the executor; the text is the detail.
     #[serde(default)]
     pub disallowed: Option<String>,
+    /// Set when no CLI the executor runs is installed on this machine; the text names the missing CLI.
+    #[serde(default)]
+    pub missing_cli: Option<String>,
     #[serde(default)]
     pub skills: Vec<String>,
     #[serde(default)]

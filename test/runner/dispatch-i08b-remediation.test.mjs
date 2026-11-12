@@ -2,6 +2,8 @@
 // Dedicated regression test suite for Unit I08b remediation: F4, F5, F6, F7, F10.
 
 import '../helpers/process-tmp-root.mjs';
+import { seedStubAgentClis } from '../helpers/agent-clis.mjs';
+seedStubAgentClis('claude', 'codex', 'omp', 'pi', 'agy', 'glm', 'disallowed-provider');
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

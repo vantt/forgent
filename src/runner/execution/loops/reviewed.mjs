@@ -4,26 +4,10 @@
  */
 
 import { roleUnit } from './role-tasks.mjs';
+import { ERROR_OUTCOMES } from '../outcome.mjs';
 import { resolveSeats, requiresDistinctFamilies, VERIFY_SEAT } from '../seat-resolver.mjs';
 import { createBindBarrier } from '../seat-ledger.mjs';
 import { verifyCommandOf, hasVerifyCommand, verifySeatResult } from './verify.mjs';
-
-export const VALID_OUTCOMES = Object.freeze([
-  'pass',
-  'findings',
-  'execution-failure',
-  'policy-refusal',
-  'provider-limit',
-  'blocked',
-]);
-
-/** The outcomes of a seat that did not finish its job; `pass` and `findings` are completed judgments. */
-export const ERROR_OUTCOMES = Object.freeze([
-  'execution-failure',
-  'policy-refusal',
-  'provider-limit',
-  'blocked',
-]);
 
 /**
  * The round limit the caller resolved from `runner.loops.reviewed.maxRounds` (the standard holds its value, a

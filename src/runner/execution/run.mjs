@@ -19,7 +19,7 @@ import { createSeatLedger } from './seat-ledger.mjs';
 import { assertSeatId } from '../../convention/seat-id.mjs';
 import { runLoop, loopRunsVerify } from './loops/index.mjs';
 import { shippedCatalog } from '../dispatch/shipped-catalog.mjs';
-import { ERROR_OUTCOMES } from './loops/reviewed.mjs';
+import { rebindsOnResume, NOT_STARTED_OUTCOME } from './outcome.mjs';
 import { verifyCommandOf } from './loops/verify.mjs';
 import { answerOfVerify, runVerify } from './custody-door.mjs';
 import { executeAssignment } from '../dispatch/assignment-runner.mjs';
@@ -199,10 +199,10 @@ function settleAdmission(scope, result, failure) {
   if (!admission || admission.settled) return;
   if (failure instanceof RunCancelledError) return;
   admission.settled = true;
-  const ended = failure ? (admission.started ? 'execution-failure' : 'not-started') : result.outcome;
+  const ended = failure ? (admission.started ? 'execution-failure' : NOT_STARTED_OUTCOME) : result.outcome;
   // A run whose seats were never given their brief did no work: it settles as one that never started.
   const refunded = ended !== 'pass' && admission.started && scope.unitRecord && noBriefDelivered(scope.unitRecord);
-  const outcome = refunded ? 'not-started' : ended;
+  const outcome = refunded ? NOT_STARTED_OUTCOME : ended;
   try {
     admission.port.settle(admission.reservationId, {
       caseId: admission.caseId,
@@ -348,7 +348,7 @@ function seatStateOf({ options, unitRecord, mainRoot, scope }) {
   const rebindKeys = new Set(Object.entries(unitRecord.bindings)
     .filter(([, attempts]) => {
       const last = attempts.at(-1);
-      return options.resumeUnitRunId !== undefined && ERROR_OUTCOMES.includes(last?.outcome)
+      return options.resumeUnitRunId !== undefined && rebindsOnResume(last?.outcome)
         && !commitPending(last, unitRecord.worktree, mainRoot, scope.custody);
     })
     .map(([key]) => key));

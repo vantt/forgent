@@ -162,7 +162,6 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, with no repo
       'model-policy-pools',
       'llm-accounts-shape',
       'llm-accounts-vs-legacy',
-      'global-model-policies-portable',
     ].sort(),
   );
 });
