@@ -3871,10 +3871,13 @@ mod tests {
                 .count()
         };
         let repo = resolve(&driver, &dir.0);
+        // A command key in the machine's own config (the git-lfs filters on a CI image) makes
+        // config validation spend one scope listing per new stamp; it is not the policy's listing.
+        let validation = listings();
         assert!(driver.transport_policy(&repo).unwrap().is_empty());
         assert!(driver.transport_policy(&repo).unwrap().is_empty());
         assert_eq!(
-            listings(),
+            listings() - validation,
             1,
             "an unchanged stamp answers from the first listing"
         );
@@ -3883,7 +3886,11 @@ mod tests {
             driver.transport_policy(&repo).unwrap(),
             vec!["http.sslcainfo"]
         );
-        assert_eq!(listings(), 2, "a config write is seen at once");
+        assert_eq!(
+            listings() - validation,
+            2 + validation,
+            "a config write is seen at once"
+        );
         let linked = resolve(&driver, &linked);
         let before = listings();
         driver.transport_policy(&linked).unwrap();
