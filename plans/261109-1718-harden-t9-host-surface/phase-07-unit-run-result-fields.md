@@ -1,16 +1,16 @@
 ---
 phase: 07
-title: "PROPOSED - AWAITING OWNER APPROVAL: Execution applies the scope rule and the verify round before it settles, then writes the unit-run-result fields (final outcome, infrastructure, outOfScope, evaluations, report read) with a fixture per outcome"
-status: pending
+title: "Execution applies the scope rule and the verify round before it settles, then writes the unit-run-result fields (final outcome, infrastructure, outOfScope, evaluations, report read) with a fixture per outcome"
+status: completed
 depends_on: ["05 landed (verify door; unit-handoff.mjs and run.mjs writer order)", "20 landed (one outcome module: its predicates compute infrastructure)", "21 landed (run.mjs writer order)", "COOK's unit-run-result contract text (branch cook/unit-run-result, tip 444dd1b1b)", "owner approval of COOK's four-step split (decision 81)"]
 parallel: "T5 (Execution layer), last T5 phase; beside P22 if P22 is still open (file-disjoint); touches no bin/fgos.mjs range"
 effort: ~1.5d
 net_size: "Node: Execution about +90 (scope rule +40, fields and evaluations +40, report read +10), Workflow about -65 (foldUnitOutcome and outOfScopeWrites -45, report re-hash -20): about +25; Rust 0; tests about +40 fixtures, moved tests not grown (estimate)"
 ---
 
-# Phase 07 - Scope rule into Execution, then the result fields (COOK steps 1 and 3; authority audit AU-09, AU-10 High, AU-11, AU-14) - proposed - awaiting owner approval
+# Phase 07 - Scope rule into Execution, then the result fields (COOK steps 1 and 3; authority audit AU-09, AU-10 High, AU-11, AU-14)
 
-**Not started and not gating** until the owner approves COOK's split. The field names, their meanings and the per-outcome table come from COOK's text (`docs/platform/runner/contracts/unit-run-result.md` on branch `cook/unit-run-result`, §3-§5); this phase cites it and invents nothing. If the text and the code disagree, step 1 stops and reports.
+**Approved** (owner decision 85, and the owner approved the whole `unit-run-result` contract on 2026-11-12). The field names, their meanings and the per-outcome table come from COOK's text (`docs/platform/runner/contracts/unit-run-result.md`, §3-§5); this phase cites it and invents nothing. If the text and the code disagree, step 1 stops and reports.
 
 **Authority moved:** "writing outside the scope is not a pass" and the final outcome move from Workflow (`foldUnitOutcome`) into Execution, before it settles; Execution becomes the one writer of `infrastructure`, `outOfScope[]`, `evaluations[]` and the report digest read. Workflow reads them (P09).
 
