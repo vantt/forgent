@@ -55,8 +55,8 @@ jobs:
       - name: cargo test (distribution crate)
         run: cargo test -p fgos-distribution
 
-      - name: cargo test (session identity crate)
-        run: cargo test -p fgos-session-identity
+      - name: cargo test (identity crate)
+        run: cargo test -p fgos-identity
 
       # The writer-identity facade runs the real host binary on every
       # platform; only its sh stand-in and /proc cases skip on Windows.

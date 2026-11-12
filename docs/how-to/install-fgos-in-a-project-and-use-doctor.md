@@ -294,6 +294,26 @@ manual step.
 | `confinement-strict-readiness` | Strict confinement is possible (all capabilities have known policies, bwrap ready) | `warning: strict confinement disabled (capability "x" missing confinement policy ...)` | info | Declare a policy per capability if you want strict mode |
 | `confinement-herdr-maturity` | Reports how far herdr confinement has converged | never fails | info | none |
 
+#### 4.4.1. Linux host setup for the bwrap rows
+
+`bwrap-available`, `confinement-bwrap-platform` and `confinement-probe-freshness` pass only when
+`bwrap` is installed and a non-root user may create a user namespace with it. On a clean Ubuntu or
+Debian machine:
+
+```sh
+sudo apt-get install -y bubblewrap
+# Ubuntu 24.04 and later: AppArmor blocks unprivileged user namespaces by default, so bwrap
+# fails its smoke test even when installed. Allow them (add the line to a file under
+# /etc/sysctl.d/ to keep it across reboots); the key does not exist on older releases.
+sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+fgos doctor
+```
+
+A narrower alternative to the sysctl is an AppArmor profile that grants `userns` to
+`/usr/bin/bwrap` only. The release workflow (`.github/workflows/release-assets.yml`, step "Set up
+bubblewrap like a supported Linux machine") runs exactly these commands before the external
+consumer proof.
+
 ### 4.5. Work state, git and coordination hygiene
 
 Mostly relevant after the project has real work items.

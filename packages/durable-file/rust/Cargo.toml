@@ -12,11 +12,11 @@ sha2.workspace = true
 libc.workspace = true
 # Safe wrappers for openat2 / openat / mkdirat, so the no-follow open needs no `unsafe` here or in
 # fgos-config. Already in Cargo.lock (via xattr); `fs` is the only feature needed, `std` for io::Error.
-rustix = { version = "=1.1.4", default-features = false, features = ["std", "fs"] }
+rustix = { version = "=1.1.6", default-features = false, features = ["std", "fs"] }
 
 [target.'cfg(windows)'.dependencies]
 windows-sys.workspace = true
 
 [target.'cfg(unix)'.dev-dependencies]
 # Tests set the process umask through the safe wrapper.
-rustix = { version = "=1.1.4", default-features = false, features = ["std", "fs", "process"] }
+rustix = { version = "=1.1.6", default-features = false, features = ["std", "fs", "process"] }
