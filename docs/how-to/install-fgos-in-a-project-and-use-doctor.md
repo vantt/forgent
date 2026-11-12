@@ -310,9 +310,8 @@ fgos doctor
 ```
 
 A narrower alternative to the sysctl is an AppArmor profile that grants `userns` to
-`/usr/bin/bwrap` only. The release workflow (`.github/workflows/release-assets.yml`, step "Set up
-bubblewrap like a supported Linux machine") runs exactly these commands before the external
-consumer proof.
+`/usr/bin/bwrap` only. `scripts/ci-setup-bwrap.sh` runs exactly these commands before the
+external consumer proofs of the release and CI workflows.
 
 ### 4.5. Work state, git and coordination hygiene
 
