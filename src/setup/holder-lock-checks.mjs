@@ -100,7 +100,7 @@ export async function checkLockKernelSemantics(repoRoot) {
       continue;
     }
     if (!isDirectory(dir)) {
-      warnings.push(`${label} ${dir} does not exist yet, not measured (fgos setup creates it)`);
+      warnings.push(`${label} ${dir} does not exist yet, not measured (fgos doctor --fix creates it)`);
       continue;
     }
     let guarantee;

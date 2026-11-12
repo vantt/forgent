@@ -89,7 +89,7 @@ test('setup from a copy of fgos that is not in a git checkout declines the rc wr
 
   assert.equal(result.status, 0, `setup failed: ${result.stderr}`);
   const { data } = JSON.parse(result.stdout);
-  assert.equal(data.deprecation, 'since 2026-09-14; use fgctl init, then fgos doctor --fix (setup still writes the git hook and Claude Code hook that doctor --fix does not)');
+  assert.equal(data.deprecation, 'since 2026-09-14; use fgctl init, then fgos doctor --fix (setup still wires the git hooks path and the shell-integration line that doctor --fix does not)');
   assert.match(data.deprecationMessage, /fgos setup is legacy compatibility/);
   assert.deepEqual(data.rcFilesInserted, []);
   assert.deepEqual(data.rcFilesAlreadyConfigured, []);

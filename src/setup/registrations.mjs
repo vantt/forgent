@@ -1825,7 +1825,7 @@ function checkMailboxHook(cwd) {
   const optIn = mailboxOptIn(cwd);
   // The config rows already fail and name a refused config; this row only says why it cannot tell.
   if (optIn.state === 'refused') {
-    return { passed: true, message: `opt-in unknown: ${refusedConfigName(optIn)} is refused (${optIn.reason}${optIn.file ? ` in ${optIn.file}` : ''}); the config rows name it, and fgos setup leaves the mailbox hook rows as they are` };
+    return { passed: true, message: `opt-in unknown: ${refusedConfigName(optIn)} is refused (${optIn.reason}${optIn.file ? ` in ${optIn.file}` : ''}); the config rows name it, and fgos doctor --fix leaves the mailbox hook rows as they are` };
   }
   if (optIn.state === 'off') {
     return { passed: true, message: 'not enabled: mailbox.enabled is false in the config; set it to true (fgos config set), then run fgos doctor --fix, to install the mailbox hook rows' };
@@ -1924,7 +1924,7 @@ function evaluateWorkflowCapabilities(cwd, uses) {
     const list = missing.map(([cap, ids]) => `${cap} (${[...ids].join(', ')})`).join('; ');
     return {
       passed: false,
-      message: `runner.capabilities has no entry for Workflow capabilities: ${list} -- declare each under runner.capabilities (fgos setup adds every shipped Workflow's)`,
+      message: `runner.capabilities has no entry for Workflow capabilities: ${list} -- declare each under runner.capabilities`,
     };
   }
   // Declared is not enough: a seat needs a prefer pool, on the exact entry or its prefix entry

@@ -67,7 +67,7 @@ test('lock-kernel-semantics warns for a missing lock directory, then passes on t
   const root = workspace('semantics');
   const missing = await checkLockKernelSemantics(root);
   assert.equal(missing.passed, true);
-  assert.match(missing.message, /^warning: .*workspace .*\.fgos\/locks does not exist yet, not measured \(fgos setup creates it\)/);
+  assert.match(missing.message, /^warning: .*workspace .*\.fgos\/locks does not exist yet, not measured \(fgos doctor --fix creates it\)/);
   fixLockDirs(root);
   const res = await checkLockKernelSemantics(root);
   assert.equal(res.passed, true, res.message);

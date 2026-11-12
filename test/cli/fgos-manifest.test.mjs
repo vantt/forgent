@@ -156,7 +156,7 @@ test('fgos --help prints non-empty text listing every verb', () => {
 test('setup is marked deprecated with the fgctl init workspace-onboarding path', () => {
   const setupEntry = COMMAND_REGISTRY.find((entry) => entry.name === 'setup');
   assert.ok(setupEntry, 'COMMAND_REGISTRY is missing a "setup" entry');
-  assert.equal(setupEntry.deprecated, 'since 2026-09-14; use fgctl init, then fgos doctor --fix (setup still writes the git hook and Claude Code hook that doctor --fix does not)');
+  assert.equal(setupEntry.deprecated, 'since 2026-09-14; use fgctl init, then fgos doctor --fix (setup still wires the git hooks path and the shell-integration line that doctor --fix does not)');
 
   const cwd = tmpCwd();
   const manifestResult = run(cwd, ['--help', '--json']);
@@ -169,7 +169,7 @@ test('setup is marked deprecated with the fgctl init workspace-onboarding path',
   assert.match(helpResult.stdout, /DEPRECATED .*since 2026-09-14/);
   assert.match(helpResult.stdout, /fgctl init/);
   assert.match(helpResult.stdout, /fgos doctor --fix/);
-  assert.match(helpResult.stdout, /Claude Code hook/);
+  assert.match(helpResult.stdout, /git hooks path/);
 });
 
 test('deprecated help text handles legacy string metadata without undefined fields', () => {
