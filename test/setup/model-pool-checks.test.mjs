@@ -4,7 +4,12 @@
 import '../helpers/process-tmp-root.mjs';
 import { assert, checkById, fs, mkTemp, path, withHome } from './helpers/setup-checks-harness.mjs';
 import { test } from 'node:test';
+import os from 'node:os';
 import { moveMachineKeysTo, writeAccountsFile, writeGlobalConfig, writeProjectConfig } from '../helpers/config-fixture.mjs';
+import { seedStubAgentClis } from '../helpers/agent-clis.mjs';
+
+// The executors these checks judge name these CLIs; a CLI the machine lacks is skipped, so each is stated installed.
+seedStubAgentClis('claude', 'codex', 'omp', 'pi', 'odd');
 
 function agent(providerModel, command = providerModel) {
   return { kind: 'agent', providerModel, command, args: ['{prompt}'], invocations: [{ id: `${command}-cli`, via: 'cli', adapter: 'cli-spawn', command, args: ['{prompt}'] }] };
@@ -79,6 +84,20 @@ test('executor-skills-installed passes when the declared skill is installed and 
   assert.match(both.message, /not checked, no known skill directory: multi \(cli odd\)/);
 });
 
+test('executor-skills-installed skips an executor whose CLI is not installed instead of failing it', () => {
+  const emptyPath = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-skills-no-cli-'));
+  const savedPath = process.env.PATH;
+  try {
+    process.env.PATH = emptyPath;
+    const result = runCheck('executor-skills-installed', declared);
+    assert.equal(result.passed, true, result.message);
+    assert.match(result.message, /skipped, CLI not installed: .*claude \(cli claude\)/);
+  } finally {
+    process.env.PATH = savedPath;
+    fs.rmSync(emptyPath, { recursive: true, force: true });
+  }
+});
+
 test('executor-skills-installed accepts a user-level skill, refuses an empty skill file, and says a worktree is provisioned separately', () => {
   const standardDirs = ['.claude/skills', '.agents/skills', '.pi/skills', '.omp/skills'];
   const put = (base, d, text) => { fs.mkdirSync(path.join(base, d, 'ak-cook'), { recursive: true }); fs.writeFileSync(path.join(base, d, 'ak-cook', 'SKILL.md'), text); };
@@ -101,8 +120,8 @@ test('executor-skills-installed accepts a user-level skill, refuses an empty ski
 });
 
 test('model-policy-pools is quiet without a named pool and warns about a pool runner.llmAccounts lacks', () => {
-  // The standard's cells name the thehive and openrouter pools: with both declared nothing is left to warn about.
-  const pools = { thehive: { shared: { credentialStore: { pi: '/srv/pi-thehive' } } }, openrouter: { shared: { credentialStore: { pi: '/srv/pi-openrouter' } } } };
+  // The standard's cells name only the openrouter pool: with it declared nothing is left to warn about.
+  const pools = { openrouter: { shared: { credentialStore: { pi: '/srv/pi-openrouter' } } } };
   const plain = runCheck('model-policy-pools', {}, { llmAccounts: pools });
   assert.equal(plain.passed, true);
   assert.doesNotMatch(plain.message, /warning/);

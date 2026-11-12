@@ -14,7 +14,7 @@ import { RunnerConfigError } from '../../src/runner/dispatch/runner-config-error
 import { bind } from '../../src/runner/execution/bind.mjs';
 import { seedFileLocalBwrapRegistry } from './confinement-registry-fixture.helper.mjs';
 import { writeGlobalConfig, writeProjectConfig } from '../helpers/config-fixture.mjs';
-import { seedStubAgentClis } from './agent-cli-fixture.helper.mjs';
+import { seedStubAgentClis } from '../helpers/agent-clis.mjs';
 
 seedFileLocalBwrapRegistry();
 seedStubAgentClis('claude', 'fam');

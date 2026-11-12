@@ -10,7 +10,7 @@ import assert from 'node:assert/strict';
 import { bind } from '../../../src/runner/execution/bind.mjs';
 import { parseAccountPin, runnerConfigForBinding } from '../../../src/runner/execution/account-pin.mjs';
 import { seedFileLocalBwrapRegistry } from '../confinement-registry-fixture.helper.mjs';
-import { seedStubAgentClis } from '../agent-cli-fixture.helper.mjs';
+import { seedStubAgentClis } from '../../helpers/agent-clis.mjs';
 
 seedFileLocalBwrapRegistry();
 seedStubAgentClis('alpha-bin', 'beta-bin', 'delta-bin', 'gamma-bin', 'omp', 'agy');

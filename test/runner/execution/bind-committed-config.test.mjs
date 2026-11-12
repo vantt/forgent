@@ -11,7 +11,7 @@ import path from 'node:path';
 
 import { bind } from '../../../src/runner/execution/bind.mjs';
 import { seedFileLocalBwrapRegistry } from '../confinement-registry-fixture.helper.mjs';
-import { seedStubAgentClis } from '../agent-cli-fixture.helper.mjs';
+import { seedStubAgentClis, stubAgentCliDir } from '../../helpers/agent-clis.mjs';
 
 seedFileLocalBwrapRegistry();
 seedStubAgentClis('claude', 'codex', 'omp', 'pi');
@@ -162,4 +162,25 @@ test('every confined invocation with a login account declares its store, and the
       if (inv.credentialStore) assert.doesNotMatch(inv.id, named, `${executorId}/${inv.id}: an account is leased at launch, so the id does not carry its name`);
     }
   }
+});
+
+// Seat Binding routes only to an agent CLI the machine has. No other test varies PATH: the rest of this file
+// states every CLI installed.
+test('execute binds the CLIs the machine has: none is refused by name with a fix, claude alone binds claude, omp alone binds gemini through omp', () => {
+  const writing = ask('execute', ['x.txt']);
+  const bindOn = (...installed) => bind(writing, { runnerConfig, session: { ...headless, pathEnv: stubAgentCliDir(...installed) } });
+
+  const none = bindOn();
+  assert.equal(none.refused.reason, 'agent-cli-missing');
+  assert.match(none.refused.detail, /no agent CLI is installed/);
+  assert.match(none.refused.fix, /install one of .*claude.*omp.*fgos doctor/);
+
+  const onlyClaude = bindOn('claude');
+  assert.equal(onlyClaude.refused, undefined, JSON.stringify(onlyClaude.refused));
+  assert.equal(onlyClaude.executor, 'claude');
+
+  const onlyOmp = bindOn('omp');
+  assert.equal(onlyOmp.refused, undefined, JSON.stringify(onlyOmp.refused));
+  assert.equal(onlyOmp.executor, 'gemini');
+  assert.equal(onlyOmp.invocation, 'omp-cli-bwrap');
 });

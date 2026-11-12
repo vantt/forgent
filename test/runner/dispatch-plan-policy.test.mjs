@@ -10,7 +10,7 @@ import { resolveExecutorConfig } from '../../src/runner/dispatch/resolve.mjs';
 import { familyOf } from '../../src/runner/dispatch/provider-adapter.mjs';
 import { resolveStrongerRigor } from '../../src/runner/rigor.mjs';
 import { workRigorFor } from '../../src/runner/work-dispatch.mjs';
-import { seedStubAgentClis } from './agent-cli-fixture.helper.mjs';
+import { seedStubAgentClis } from '../helpers/agent-clis.mjs';
 
 seedStubAgentClis('claude', 'pi', 'glm', 'disallowed-provider');
 
