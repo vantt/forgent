@@ -1,16 +1,16 @@
 ---
 phase: 11
-title: "PROPOSED - AWAITING OWNER APPROVAL: architecture rule forbidding src/workflow from naming the worktree custody mechanisms; tier field per file; three-seat council acceptance test on contract fields only"
-status: pending
-depends_on: ["05 landed (custody door; the custody imports are gone)", "07 landed (result fields)", "09 landed (Workflow reads them)", "owner approval of COOK's four-step split (decision 81)"]
+title: "Architecture rule forbidding src/workflow from naming the worktree custody mechanisms; tier field per file; three-seat council acceptance test on contract fields only"
+status: landed
+depends_on: ["05 landed (custody door; the custody imports are gone)", "07 landed (result fields)", "09 landed (Workflow reads them)"]
 parallel: "T6 (Workflow layer), after P09; beside P23 (file-disjoint); touches no bin/fgos.mjs range; may land before P10"
 effort: ~0.75d
 net_size: "Node 0; Rust 0; tests about +45; manifest data about +360 lines if Requirement 3 is taken (estimate)"
 ---
 
-# Phase 11 - Architecture rule and acceptance (COOK step 5; authority audit AU-06, AU-23) - proposed - awaiting owner approval
+# Phase 11 - Architecture rule and acceptance (COOK step 5; authority audit AU-06, AU-23) - landed 2026-11-12 (approved by owner decision 85)
 
-**Not started and not gating.** The rule's wording and the acceptance scenario cite COOK's `unit-run-result` text (§7, §8 on branch `cook/unit-run-result`).
+**Landed.** The rule's wording and the acceptance scenario cite COOK's `unit-run-result` text (§7, §8 on branch `cook/unit-run-result`).
 
 **Authority guarded:** worktree custody is T4's; the rule keeps Workflow from taking it again. Tier map (Requirement 3) makes "an upper layer never decides a lower layer's fact" checkable in the manifest.
 
