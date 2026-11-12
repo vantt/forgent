@@ -92,6 +92,15 @@
     "runner",
     "executors",
     "claude",
+    "invocations"
+   ],
+   "reason": "the standard gives the two confined claude invocations their own login store (credentialStore: CLAUDE_CONFIG_DIR, the login file and the session folder Execution keeps before it removes the home); the pinned authoring source predates it"
+  },
+  {
+   "path": [
+    "runner",
+    "executors",
+    "claude",
     "supports",
     "skills"
    ],

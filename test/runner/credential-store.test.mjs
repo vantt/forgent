@@ -106,7 +106,7 @@ test('the standard gives each confined claude invocation its own login store in 
   const byId = Object.fromEntries(claude.invocations.map((inv) => [inv.id, inv]));
   for (const id of ['claude-cli-bwrap', 'claude-herdr-bwrap']) {
     const store = credentialStoreOf({ ...byId[id], command: 'claude' });
-    assert.deepEqual(store, { use: 'claude', homeEnv: 'CLAUDE_CONFIG_DIR', sessionDir: 'projects', files: ['.credentials.json'] }, id);
+    assert.deepEqual(JSON.parse(JSON.stringify(store)), { use: 'claude', homeEnv: 'CLAUDE_CONFIG_DIR', sessionDir: 'projects', files: ['.credentials.json'] }, id);
     assert.equal(credentialStoreProblem(store), null, id);
     assert.equal(credentialLayout({ kind: 'home-files', home: '/h', files: store.files }), 'claude-config-credentials-json', `${id}: its login file is one a renewal can read`);
   }

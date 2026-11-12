@@ -35,6 +35,11 @@ runner:
           adapter: cli-spawn
           command: claude
           args: ["-p", "{prompt}", "--model", "{model}"]
+          credentialStore:
+            use: claude
+            homeEnv: CLAUDE_CONFIG_DIR
+            sessionDir: projects
+            files: [".credentials.json"]
           confinement:
             backend: bwrap
         - id: claude-herdr-bwrap
@@ -42,6 +47,11 @@ runner:
           adapter: herdr-spawn
           command: claude
           args: ["--model", "{model}"]
+          credentialStore:
+            use: claude
+            homeEnv: CLAUDE_CONFIG_DIR
+            sessionDir: projects
+            files: [".credentials.json"]
           confinement:
             backend: bwrap
           interactiveMode:

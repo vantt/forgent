@@ -540,51 +540,58 @@ function ompAgentFilesCheck(home) {
   }
 }
 
-// Claude Code: `.claude/.credentials.json` under the home, whose `claudeAiOauth` carries the access token,
-// the refresh token and `expiresAt` (ms). Its tokens are opaque and name no account the provider signs, so a
-// login renewed inside a private home is staged and kept for the owner, never applied (applyAgentCopies);
-// a renewal fgOS makes itself in a scratch copy of the source is applied as for the other layouts.
-const CLAUDE_FILE = path.join('.claude', '.credentials.json');
-const claudeLayout = {
-  name: 'claude-credentials-json',
-  files: [CLAUDE_FILE],
-  identity: () => null,
-  read(home, { agent } = {}) {
-    const parsed = readJsonFile(path.join(home, CLAUDE_FILE), { agent });
-    if (!parsed.ok) return parsed;
-    const oauth = parsed.doc?.claudeAiOauth;
-    if (!isObject(oauth) || !Number.isFinite(oauth.expiresAt)) return fail('unexpected-shape');
-    const expiresMs = toMs(oauth.expiresAt);
-    return { ok: true, entries: [{ key: 'claudeAiOauth', owner: null, expiresMs, dueMs: expiresMs, refresh: refreshOf(oauth), value: oauth }], doc: parsed.doc, raw: parsed.raw };
-  },
-  // Only the scratch copy's `expiresAt` moves into the past, so claude renews it before its call; the
-  // refresh token is untouched.
-  markDue(home) {
-    const file = path.join(home, CLAUDE_FILE);
-    const parsed = readJsonFile(file);
-    if (!parsed.ok) throw new Error(parsed.code);
-    parsed.doc.claudeAiOauth.expiresAt = Date.now() - 60 * MINUTE_MS;
-    fs.writeFileSync(file, serializeJson(parsed.doc, parsed.raw), { mode: 0o600 });
-  },
-  apply(sourceHome, copyRead, { now, requireFuture }) {
-    const file = path.join(sourceHome, CLAUDE_FILE);
-    for (let attempt = 0; attempt < 3; attempt += 1) {
-      const source = claudeLayout.read(sourceHome);
-      if (!source.ok) throw new Error(source.code);
-      const next = copyRead.entries[0];
-      if (!next || !isReplacement(next, source.entries[0], { now, requireFuture })) return [];
-      source.doc.claudeAiOauth = next.value;
-      if (writeIfUnchanged(file, source.raw, serializeJson(source.doc, source.raw))) return ['claudeAiOauth'];
-    }
-    throw new Error('source-changing');
-  },
-  stage(copyHome, stagingDir) {
-    fs.mkdirSync(path.join(stagingDir, '.claude'), { mode: 0o700 });
-    stageCopyFile(path.join(copyHome, CLAUDE_FILE), path.join(stagingDir, CLAUDE_FILE));
-  },
-};
+// Claude Code: a `.credentials.json` whose `claudeAiOauth` carries the access token, the refresh token and
+// `expiresAt` (ms). It sits at `.credentials.json` when `CLAUDE_CONFIG_DIR` is the login home (the confined
+// seat's store), and at `.claude/.credentials.json` when `HOME` is. Its tokens are opaque and name no account
+// the provider signs, so a login renewed inside a private home is staged and kept for the owner, never applied
+// (applyAgentCopies); a renewal fgOS makes itself in a scratch copy of the source is applied as for the other
+// layouts.
+function claudeLayoutAt(name, file) {
+  const layout = {
+    name,
+    files: [file],
+    identity: () => null,
+    read(home, { agent } = {}) {
+      const parsed = readJsonFile(path.join(home, file), { agent });
+      if (!parsed.ok) return parsed;
+      const oauth = parsed.doc?.claudeAiOauth;
+      if (!isObject(oauth) || !Number.isFinite(oauth.expiresAt)) return fail('unexpected-shape');
+      const expiresMs = toMs(oauth.expiresAt);
+      return { ok: true, entries: [{ key: 'claudeAiOauth', owner: null, expiresMs, dueMs: expiresMs, refresh: refreshOf(oauth), value: oauth }], doc: parsed.doc, raw: parsed.raw };
+    },
+    // Only the scratch copy's `expiresAt` moves into the past, so claude renews it before its call; the
+    // refresh token is untouched.
+    markDue(home) {
+      const target = path.join(home, file);
+      const parsed = readJsonFile(target);
+      if (!parsed.ok) throw new Error(parsed.code);
+      parsed.doc.claudeAiOauth.expiresAt = Date.now() - 60 * MINUTE_MS;
+      fs.writeFileSync(target, serializeJson(parsed.doc, parsed.raw), { mode: 0o600 });
+    },
+    apply(sourceHome, copyRead, { now, requireFuture }) {
+      const target = path.join(sourceHome, file);
+      for (let attempt = 0; attempt < 3; attempt += 1) {
+        const source = layout.read(sourceHome);
+        if (!source.ok) throw new Error(source.code);
+        const next = copyRead.entries[0];
+        if (!next || !isReplacement(next, source.entries[0], { now, requireFuture })) return [];
+        source.doc.claudeAiOauth = next.value;
+        if (writeIfUnchanged(target, source.raw, serializeJson(source.doc, source.raw))) return ['claudeAiOauth'];
+      }
+      throw new Error('source-changing');
+    },
+    stage(copyHome, stagingDir) {
+      const dir = path.dirname(file);
+      if (dir !== '.') fs.mkdirSync(path.join(stagingDir, dir), { mode: 0o700 });
+      stageCopyFile(path.join(copyHome, file), path.join(stagingDir, file));
+    },
+  };
+  return layout;
+}
+const claudeConfigLayout = claudeLayoutAt('claude-config-credentials-json', '.credentials.json');
+const claudeHomeLayout = claudeLayoutAt('claude-credentials-json', path.join('.claude', '.credentials.json'));
 
-const LAYOUTS = Object.freeze({ [piLayout.name]: piLayout, [codexLayout.name]: codexLayout, [ompLayout.name]: ompLayout, [claudeLayout.name]: claudeLayout });
+const LAYOUTS = Object.freeze({ [piLayout.name]: piLayout, [codexLayout.name]: codexLayout, [ompLayout.name]: ompLayout, [claudeConfigLayout.name]: claudeConfigLayout, [claudeHomeLayout.name]: claudeHomeLayout });
 
 /** The layout name of a credential source (the same order the probe command uses), or null. */
 export function credentialLayout(source) {
@@ -592,7 +599,8 @@ export function credentialLayout(source) {
   if (source?.kind === 'home-files' && Array.isArray(source.files)) {
     if (source.files.includes('agent.db')) return ompLayout.name;
     if (source.files.includes('auth.json')) return piLayout.name;
-    if (source.files.includes(CLAUDE_FILE)) return claudeLayout.name;
+    if (source.files.includes(claudeConfigLayout.files[0])) return claudeConfigLayout.name;
+    if (source.files.includes(claudeHomeLayout.files[0])) return claudeHomeLayout.name;
   }
   return null;
 }

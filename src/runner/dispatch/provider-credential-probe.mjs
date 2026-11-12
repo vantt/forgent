@@ -8,9 +8,9 @@
 //
 // Only the credential layouts fgOS can name are probed: a Codex home, an omp profile directory (a
 // home-files source that carries the SQLite store `agent.db`), a pi account directory (a home-files
-// source that carries `auth.json`) and a Claude Code home (a home-files source that carries
-// `.claude/.credentials.json`). Any other layout answers "no probe", so the account stays locked for a
-// person to clear, exactly as before.
+// source that carries `auth.json`) and a Claude Code login (a home-files source that carries
+// `.credentials.json`, read through `CLAUDE_CONFIG_DIR`, or `.claude/.credentials.json`, read through HOME).
+// Any other layout answers "no probe", so the account stays locked for a person to clear, exactly as before.
 
 import { spawn } from 'node:child_process';
 import fs from 'node:fs';
@@ -72,14 +72,12 @@ export function credentialProbeCommand(credentialSource, { noTools = false } = {
       home,
     };
   }
-  // Claude Code reads its login from `$HOME/.claude/.credentials.json`; HOME is the login home (probeEnv).
-  if (credentialSource.kind === 'home-files' && Array.isArray(credentialSource.files) && credentialSource.files.includes(path.join('.claude', '.credentials.json'))) {
-    return {
-      command: 'claude',
-      args: ['-p', PROMPT, '--no-session-persistence', '--tools', noTools ? '' : 'Read'],
-      env: {},
-      home,
-    };
+  // Claude Code reads its login from `$CLAUDE_CONFIG_DIR/.credentials.json`, or `$HOME/.claude/.credentials.json`
+  // when the source keeps it under HOME (HOME is the login home either way, probeEnv).
+  const claudeArgs = ['-p', PROMPT, '--no-session-persistence', '--tools', noTools ? '' : 'Read'];
+  if (credentialSource.kind === 'home-files' && Array.isArray(credentialSource.files)) {
+    if (credentialSource.files.includes('.credentials.json')) return { command: 'claude', args: claudeArgs, env: { CLAUDE_CONFIG_DIR: home }, home };
+    if (credentialSource.files.includes(path.join('.claude', '.credentials.json'))) return { command: 'claude', args: claudeArgs, env: {}, home };
   }
   return null;
 }
