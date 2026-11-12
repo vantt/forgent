@@ -94,13 +94,13 @@ test('init ends on Ready and one runnable next step, exits 0 and completes the t
   }
 });
 
-test('init lists each failing check with its fix, exits 1 and marks the transaction degraded when doctor is not ok', () => {
+test('init lists each failing check with its fix, exits 2 (precondition) and marks the transaction degraded when doctor is not ok', () => {
   const release = releaseWithCannedDoctor();
   try {
     withProject(({ home, state, proj }) => {
       const env = { HOME: home, CANNED_DOCTOR: JSON.stringify(CANNED.failing) };
       const res = runFgctlRaw(['init', '--from', release.dir], { cwd: proj, stateHome: state, env });
-      assert.equal(res.status, 1);
+      assert.equal(res.status, 2, 'precondition, the exit-code table\'s code for a ready-later release');
       assert.equal(res.stdout, '2 checks need you:\n  1. needs-a-fix: fgos doctor --fix\n  2. needs-a-person: install the thing\n');
       assert.match(res.stderr, /not ready/);
       assert.equal(transactionStatus(state), 'ready-degraded');

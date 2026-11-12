@@ -58,7 +58,7 @@ export function runFgctlRaw(args, { cwd, stateHome, env = {} } = {}) {
 
 export function runFgctl(args, opts = {}) {
   const res = runFgctlRaw(args, opts);
-  if (res.status === 1 && ['init', 'upgrade', 'repair'].includes(args[0]) && NOT_READY.test(res.stderr)) {
+  if (res.status === 2 && ['init', 'upgrade', 'repair'].includes(args[0]) && NOT_READY.test(res.stderr)) {
     return { ...res, status: 0, notReady: true };
   }
   return res;

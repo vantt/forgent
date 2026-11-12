@@ -1,4 +1,4 @@
-//! The host's exit statuses, read from the one table the Node shell also reads
+//! The exit statuses of every Rust door (the host, `fgctl`), read from the one table the Node shell also reads
 //! (`packages/host-runtime/contracts/exit-codes.v1.json`). The host names no literal error status of
 //! its own: a category is looked up here, so the two doors cannot drift.
 
@@ -6,8 +6,7 @@ use serde::Deserialize;
 use std::collections::HashMap;
 use std::sync::OnceLock;
 
-const TABLE_JSON: &str =
-    include_str!("../../../packages/host-runtime/contracts/exit-codes.v1.json");
+const TABLE_JSON: &str = include_str!("../../contracts/exit-codes.v1.json");
 
 #[derive(Deserialize)]
 struct Table {
@@ -41,6 +40,11 @@ pub fn unexpected() -> i32 {
     table().unexpected
 }
 
+/// The tool needs something done first: a release that is active but not ready, a missing prerequisite.
+pub fn precondition() -> i32 {
+    code_of("precondition")
+}
+
 /// A usage error: an unknown verb, sub-command or flag, or an oversized stdin payload.
 pub fn validation() -> i32 {
     code_of("validation")
@@ -56,7 +60,7 @@ mod tests {
     fn table_on_disk() -> serde_json::Value {
         let path = concat!(
             env!("CARGO_MANIFEST_DIR"),
-            "/../../packages/host-runtime/contracts/exit-codes.v1.json"
+            "/../contracts/exit-codes.v1.json"
         );
         serde_json::from_str(&std::fs::read_to_string(path).expect("table file"))
             .expect("table json")
@@ -78,5 +82,6 @@ mod tests {
             table["unexpected"].as_i64().unwrap()
         );
         assert_eq!(validation(), code_of("validation"));
+        assert_eq!(precondition(), code_of("precondition"));
     }
 }

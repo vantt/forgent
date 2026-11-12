@@ -169,8 +169,8 @@ try {
     $env:FGCTL_VERSION = $version
     $r = Invoke-Native $fgctl @('init') $project
     Write-Host $r.Text
-    # Activation is what this proof needs; an init that activated but lists checks that still need the user exits 1.
-    Assert-True (($r.Code -eq 0) -or ($r.Text -match 'needs? you:')) 'fgctl init (download path)'
+    # Activation is what this proof needs; an init that activated but lists checks that still need the user exits 2 (precondition).
+    Assert-True (($r.Code -eq 0) -or ($r.Code -eq 2)) 'fgctl init (download path)'
     Assert-True ($r.Text -match 'x86_64-pc-windows-msvc') 'fgctl init must say it downloaded the Windows target asset'
     Remove-Item Env:FGCTL_VERSION, Env:FGCTL_ASSET_BASE_URL
 

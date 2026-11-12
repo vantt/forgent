@@ -10,10 +10,10 @@
 
 mod cli_presenter;
 mod cli_projector;
-mod exit_codes;
 mod legacy_exec;
 mod wiring;
 use fgos_distribution::suggest::suggest;
+use fgos_host_runtime::exit_codes;
 use fgos_host_runtime::invocation_service::NoopEventSink;
 use fgos_host_runtime::{build_snapshot, InvocationService, ProviderDescriptor, CATALOG};
 use serde::{Deserialize, Serialize};

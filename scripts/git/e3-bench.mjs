@@ -774,12 +774,12 @@ async function rollback(root, fgctl, descriptor, index, loader) {
     const t = performance.now();
     const r = spawnSync(fgctl, ['upgrade', '--from', from], { cwd: ws, env: { ...process.env, FGOS_STATE_ROOT: state }, encoding: 'utf8' });
     const detail = (r.stderr || '').trim().split('\n').pop();
-    const done = r.status === 0 || /needs? you:/.test(r.stdout);
+    const done = r.status === 0 || r.status === 2;
     return { ok: done, ms: performance.now() - t, code: done ? 'completed' : (detail.match(/git-[a-z-]+/)?.[0] ?? detail), detail };
   };
   const init = spawnSync(fgctl, ['init', '--from', oldRelease], { cwd: ws, env: { ...process.env, FGOS_STATE_ROOT: state }, encoding: 'utf8' });
-  // Exit 1 with the list of checks that need the user still means the release is activated.
-  if (init.status !== 0 && !/needs? you:/.test(init.stdout)) return { error: `fgctl init failed: ${init.stderr}` };
+  // Exit 2 (precondition) with the list of checks that need the user still means the release is activated.
+  if (init.status !== 0 && init.status !== 2) return { error: `fgctl init failed: ${init.stderr}` };
   const forward = controller(newRelease);
   if (!forward.ok) return { error: `upgrade to WAL release failed: ${forward.code}` };
   // The fence must be the one fgctl placed, never a fixture tombstone.

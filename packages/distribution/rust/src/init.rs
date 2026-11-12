@@ -557,6 +557,18 @@ pub fn publish_activation_file(
     Ok(())
 }
 
+impl InitError {
+    /// The process exit status for this error: `precondition` (2) when the
+    /// release is activated but `fgos doctor` still lists checks that need the
+    /// user, 1 for every other failure.
+    pub fn exit_status(&self) -> i32 {
+        match self {
+            InitError::NotReady => fgos_host_runtime::exit_codes::precondition(),
+            _ => 1,
+        }
+    }
+}
+
 /// Whether the release the tail runs for was just activated or was already
 /// the active one (the closing block says which).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -767,7 +779,9 @@ pub fn run_tail(
     run_tail_step(workspace_root, shim_path, &tx_path, &["doctor", "--fix"])?;
     let doctor = run_tail_step(workspace_root, shim_path, &tx_path, &["doctor", "--json"])?;
 
-    let facts = ready_facts(workspace_root, store_root, outcome)?;
+    let facts = ready_facts(workspace_root, store_root, outcome).inspect_err(|_| {
+        let _ = mark_transaction_status(&tx_path, "ready-degraded");
+    })?;
     let block = closing_block(&String::from_utf8_lossy(&doctor), &facts).map_err(|why| {
         let _ = mark_transaction_status(&tx_path, "ready-degraded");
         InitError::Custom(why)
@@ -2721,5 +2735,11 @@ mod tests {
         assert_eq!(status_result_line(Some(&ws(false))), "active 0123456789ab");
         assert!(status_result_line(Some(&ws(true))).contains("run fgctl repair"));
         assert!(status_result_line(None).contains("run fgctl init"));
+    }
+
+    #[test]
+    fn not_ready_exits_with_the_tables_precondition_code_and_other_errors_with_one() {
+        assert_eq!(InitError::NotReady.exit_status(), 2);
+        assert_eq!(InitError::Custom("x".to_string()).exit_status(), 1);
     }
 }

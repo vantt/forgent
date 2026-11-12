@@ -210,7 +210,7 @@ fn main() {
                 pin_override_reason.as_deref(),
             ) {
                 eprintln!("Error: {}", err);
-                std::process::exit(1);
+                std::process::exit(err.exit_status());
             }
         }
         "upgrade" => {
@@ -223,14 +223,14 @@ fn main() {
                     refresh_own_binary(&cwd);
                 }
                 eprintln!("Error: {}", err);
-                std::process::exit(1);
+                std::process::exit(err.exit_status());
             }
             refresh_own_binary(&cwd);
         }
         "repair" => {
             if let Err(err) = repair_workspace(&current_dir_or_exit()) {
                 eprintln!("Error: {}", err);
-                std::process::exit(1);
+                std::process::exit(err.exit_status());
             }
         }
         "verify" => {
