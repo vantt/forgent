@@ -52,11 +52,16 @@ with a scratch HOME holding the executor and a `codex` login store (the installe
 | 4 | Met. Run settled `pass`, adapter `paseo-spawn`, receipt `exited`, `outboxPresent`; doctor row tested with an injected daemon answer |
 | 5 | Met. Spec section 5.4, two known limits, decision entry; CHANGELOG |
 | 6 | Met. A steer sent during `sleep 90` was answered and quoted verbatim in the settled claim. A run whose agent was never requested ended `abandoned-not-started (start-refused:external-gate-silent)` after the 30 s hello limit |
-| 7 | Pending: full suites |
+| 7 | Met on c67af0ee0 + registry line (2026-11-12, fg-server, `TMPDIR=/var/tmp/fgt`, concurrency 4): `cargo test --workspace` 2163 pass, 2 fail that pass alone twice (`mailbox_routes::a_record_with_no_baseline…`, `spawn_mapped::a_detached_child_leads…`; `packages/process` untouched); `npm test` 8721 pass, 20 fail, none from this branch: `fgctl-upgrade`/`fgctl-init-download-sources`/`doc-health`/`mailbox-behaviour-v7n` fail the same on a clean origin/main, and the citation-drift finding is `document-identity/spec.md` from main's c39155b2d |
 
 Found live and fixed: `resolveStateRoot()` returns an object (`.stateRoot`); `permissionMode: bypass` is refused for a
 read-only Unit (it needs full confinement), and the Codex sandbox is a confinement matter, not a permission one, so the
 paseo mode follows confinement, as `-s danger-full-access` does for a cli invocation.
+
+## Review notes (HARDEN, by mailbox, 2026-11-12)
+
+- `fgos exec` became `fgos internal exec <cli>` (the `internal` precedent: it execs before any spawn), listed in the route contract under `exec` and in the spec's role table; exit codes are the route contract's (2, 65, 70), not the user-verb table.
+- Open: the external gate keeps the paseo daemon's whole environment under `launch.env`. HARDEN lands the worker environment allowlist as a contract next to the envelope first; this branch then filters the host's environment through the same file in the gate. OPC reviews `main.rs` and the run-supervisor crate before landing.
 
 ## Not in this plan
 
