@@ -28,7 +28,7 @@ Four terminal vectors (owning proof, `omp/vectors.json`, screen recorded from th
 - Also green: `supervise_terminal_fake_herdr` (12), `terminal-cutover`, `attempt-steps`, `contracts-terminal`, architecture, doc-health, census scan (0 undeclared), fmt, clippy `-D warnings`, `cargo check` for msvc and aarch64-apple-darwin.
 - Citation-drift real-repo test: known red (document-identity spec), not touched.
 - Real run: not done. No spare quota-bearing gemini account was named, and reproducing the incident means burning quota; the recorded real screen is the evidence.
-- Full `npm test`: see the result line at the end of this report.
+- Full `npm test` (614 s): 2 fails, both known reds (citation drift in document-identity, V7n addendum); zero ERROR lines; +1 test() call, 0 new spawn sites.
 
 ## Authority
 
