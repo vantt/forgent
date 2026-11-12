@@ -29,7 +29,7 @@ import { briefPaths, renderBrief, renderPointer } from './brief.mjs';
 import { writeVisibility } from './visibility-session.mjs';
 import { createWorkerHome, removeWorkerHome, redactWorkerHome } from './worker-home.mjs';
 import {
-  seedTrust, seedCodexTrust, seedAgyTrust, defaultAgySettingsPath,
+  seedTrust, seedClaudeConfigTrust, seedCodexTrust, seedAgyTrust, defaultAgySettingsPath,
   seedCodexHookTrust, trustRoots,
 } from '../../run-supervisor/trust-store.mjs';
 export { trustRoots };
@@ -233,6 +233,8 @@ export function seedWorkspaceTrust({ trustStore, round, cwd, repoRoot, fullEnv, 
         if (stores.target !== stores.root) seedHookTrust({ round, target: stores.target, projectPath, repoRoot: root, rootConfigPath: stores.root });
       } else if (trustStore.kind === 'agy' || trustStore.kind === 'agy-json') {
         wrote = seedAgyTrust(stores.target, { projectPath, repoRoot: root, rootSettingsPath: stores.root });
+      } else if (stores.target !== stores.root) {
+        wrote = seedClaudeConfigTrust(stores.target, { projectPath, repoRoot: root, rootStorePath: stores.root });
       } else {
         wrote = seedTrust(stores.target, { projectPath, repoRoot: root });
       }
@@ -294,8 +296,11 @@ export function trustStorePaths({ trustStore, fullEnv, workerEnv, accountSource 
     const real = trustStore.path ?? defaultAgySettingsPath(leased ?? fullEnv.HOME ?? os.homedir());
     return { root: real, target: own ? defaultAgySettingsPath(workerEnv.HOME) : real };
   }
+  // claude reads its config from its own config directory when it has one, so a worker with a private config
+  // directory gets its entries there and the operator's store only vouches for the root.
   const real = trustStore.path ?? path.join(os.homedir(), '.claude.json');
-  return { root: real, target: real };
+  const own = workerEnv?.CLAUDE_CONFIG_DIR && workerEnv.CLAUDE_CONFIG_DIR !== fullEnv.CLAUDE_CONFIG_DIR;
+  return { root: real, target: own ? path.join(workerEnv.CLAUDE_CONFIG_DIR, '.claude.json') : real };
 }
 
 /**

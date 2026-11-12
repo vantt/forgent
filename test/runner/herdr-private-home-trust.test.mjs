@@ -14,7 +14,7 @@ import { pathToFileURL } from 'node:url';
 
 import {
   seedCodexTrust, readCodexTrust, seedAgyTrust, readAgyTrust, removeCodexTrust, TrustStoreError,
-  codexHookTrustHash, seedCodexHookTrust,
+  codexHookTrustHash, seedCodexHookTrust, seedClaudeConfigTrust, readTrust,
 } from '../../src/run-supervisor/trust-store.mjs';
 import { trustRoots, trustStorePaths, seedWorkspaceTrust } from '../../src/runner/dispatch/herdr-round.mjs';
 
@@ -343,4 +343,72 @@ test('an unconfined claude pane\'s trust entry survives concurrent seeds, and fg
   } finally {
     if (previousHome === undefined) delete process.env.HOME; else process.env.HOME = previousHome;
   }
+});
+
+// A confined claude pane reads its own config from `$CLAUDE_CONFIG_DIR/.claude.json`, not from the operator's
+// `~/.claude.json`, and the private config directory starts with only the login. Without onboarding and trust
+// entries there the pane stops at its first-run wizard. The root is vouched for by the real store, which is
+// never edited.
+const realClaudeStore = (extra = {}) => {
+  const real = path.join(tmp('fgos-claude-real-'), '.claude.json');
+  const body = `${JSON.stringify({ theme: 'light', projects: { [ROOT]: { hasTrustDialogAccepted: true, allowedTools: [] } }, ...extra }, null, 2)}\n`;
+  fs.writeFileSync(real, body);
+  return { real, body };
+};
+
+test('claude: the private config gets onboarding and the workspace entry, derived from a root the real store trusts, which stays as it was', () => {
+  const { real, body } = realClaudeStore();
+  const privateConfig = path.join(tmp('fgos-claude-private-'), 'config', '.claude.json');
+
+  assert.equal(seedClaudeConfigTrust(privateConfig, { projectPath: WORKSPACE, repoRoot: ROOT, rootStorePath: real }), true);
+
+  const written = JSON.parse(fs.readFileSync(privateConfig, 'utf8'));
+  assert.equal(written.hasCompletedOnboarding, true);
+  assert.equal(typeof written.theme, 'string');
+  assert.equal(written.projects[WORKSPACE].hasTrustDialogAccepted, true);
+  assert.equal(written.projects[ROOT], undefined, 'only the workspace is trusted, not the root it was derived from');
+  assert.equal(readTrust(privateConfig, WORKSPACE), true);
+  assert.equal(fs.readFileSync(real, 'utf8'), body, 'the real store is not edited');
+  assert.equal(fs.statSync(privateConfig).mode & 0o777, 0o600, 'the private config is owner-only');
+  assert.equal(seedClaudeConfigTrust(privateConfig, { projectPath: WORKSPACE, repoRoot: ROOT, rootStorePath: real }), false, 'seeding twice changes nothing');
+});
+
+test('claude: a root the real store never trusted derives nothing, and the private config is not created', () => {
+  const real = path.join(tmp('fgos-claude-real-'), '.claude.json');
+  fs.writeFileSync(real, JSON.stringify({ projects: {} }));
+  const privateConfig = path.join(tmp('fgos-claude-private-'), '.claude.json');
+
+  assert.throws(
+    () => seedClaudeConfigTrust(privateConfig, { projectPath: WORKSPACE, repoRoot: ROOT, rootStorePath: real }),
+    (err) => err instanceof TrustStoreError && err.code === 'untrusted-root',
+  );
+  assert.equal(fs.existsSync(privateConfig), false);
+});
+
+test('claude: trust is read from the real store and written to the private config only when the worker has its own config directory', () => {
+  const claude = { kind: 'claude-json' };
+  const home = os.homedir();
+  const shared = trustStorePaths({ trustStore: claude, fullEnv: {}, workerEnv: null });
+  assert.deepEqual(shared, { root: path.join(home, '.claude.json'), target: path.join(home, '.claude.json') });
+  const own = trustStorePaths({ trustStore: claude, fullEnv: {}, workerEnv: { CLAUDE_CONFIG_DIR: '/tmp/private/home' } });
+  assert.deepEqual(own, { root: path.join(home, '.claude.json'), target: '/tmp/private/home/.claude.json' });
+  const pinned = trustStorePaths({ trustStore: { kind: 'claude-json', path: '/pinned/.claude.json' }, fullEnv: {}, workerEnv: { CLAUDE_CONFIG_DIR: '/tmp/private/home' } });
+  assert.deepEqual(pinned, { root: '/pinned/.claude.json', target: '/tmp/private/home/.claude.json' });
+});
+
+test('claude: a pane with its own config directory is seeded there and the operator store is left as it was', () => {
+  const { real, body } = realClaudeStore();
+  const privateDir = tmp('fgos-claude-private-dir-');
+  const notes = [];
+  const round = { trustWritten: false, note: (patch) => notes.push(patch) };
+
+  seedWorkspaceTrust({
+    trustStore: { kind: 'claude-json', path: real }, round, cwd: WORKSPACE, repoRoot: ROOT,
+    fullEnv: {}, workerEnv: { CLAUDE_CONFIG_DIR: privateDir },
+  });
+
+  assert.ok(!notes.some((n) => n.trustSeedFailed), `no seed failure expected, got ${JSON.stringify(notes)}`);
+  assert.equal(readTrust(path.join(privateDir, '.claude.json'), WORKSPACE), true);
+  assert.equal(fs.readFileSync(real, 'utf8'), body, 'the operator store is not edited');
+  assert.equal(round.trustWritten, false, 'a claude entry is never marked for removal');
 });

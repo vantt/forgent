@@ -249,6 +249,39 @@ export function seedTrust(storePath, { projectPath, repoRoot } = {}) {
   }
 }
 
+/**
+ * The config of a confined claude pane, in its private config directory (`$CLAUDE_CONFIG_DIR/.claude.json`).
+ * claude reads its first-run state and folder trust from there and not from the operator's `~/.claude.json`,
+ * and the directory starts with only the login, so without these entries the pane stops at its onboarding
+ * wizard. Trust is derived as in `seedTrust`: only for a `repoRoot` the person already trusts in
+ * `rootStorePath` (the operator's own store, never edited). The file is created owner-only when absent, and an
+ * existing one keeps every key it has. It is private to one attempt, so no lock is taken.
+ *
+ * Returns whether this call wrote anything.
+ */
+export function seedClaudeConfigTrust(configPath, { projectPath, repoRoot, rootStorePath } = {}) {
+  if (typeof projectPath !== 'string' || !path.isAbsolute(projectPath)) {
+    throw new TrustStoreError('invalid-path', `trust seed refused: projectPath must be an absolute path, got "${projectPath}".`, { projectPath });
+  }
+  if (readTrust(rootStorePath, repoRoot) !== true) {
+    throw new TrustStoreError(
+      'untrusted-root',
+      `trust seed refused for "${projectPath}": its repo root "${repoRoot}" is not trusted in "${rootStorePath}", so there is nothing to derive trust from.`,
+      { projectPath, repoRoot },
+    );
+  }
+  const config = fs.existsSync(configPath) ? readStore(configPath) : {};
+  const projects = config.projects === undefined ? {} : projectsOf(config, configPath);
+  if (config.hasCompletedOnboarding === true && projects[projectPath]?.hasTrustDialogAccepted === true) return false;
+  writeStoreAtomic(configPath, {
+    ...config,
+    hasCompletedOnboarding: true,
+    theme: typeof config.theme === 'string' ? config.theme : 'dark',
+    projects: { ...projects, [projectPath]: projects[projectPath]?.hasTrustDialogAccepted === true ? projects[projectPath] : trustedProjectEntry() },
+  });
+  return true;
+}
+
 // ---------------------------------------------------------------------------
 // The same policy, a second format.
 //
