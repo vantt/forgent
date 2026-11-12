@@ -294,7 +294,8 @@ test('P7: Local runtime tail failure leaves workspace in diagnosable state with 
     assert.equal(versionData.data.artifactDigest, newDigest);
   } finally {
     fs.rmSync(tempHome, { recursive: true, force: true });
-    fs.rmSync(tempState, { recursive: true, force: true });
+    // A process the failed tail left behind may still be writing its state directory as it is removed.
+    fs.rmSync(tempState, { recursive: true, force: true, maxRetries: 10, retryDelay: 100 });
     fs.rmSync(tempProj, { recursive: true, force: true });
     fs.rmSync(tailFailReleaseDir, { recursive: true, force: true });
   }
