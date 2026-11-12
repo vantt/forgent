@@ -9,6 +9,9 @@
 //       giờ được quét vào manifest) không phải câu hỏi về tầng.
 //   (c) domain-siloing (D12) — core (src/, bin/, core/) không import domain cụ thể
 //       (domains/<name>/); domain A không import domain B (cross-domain siloing).
+//   (d) tier-downward — mỗi file có một tier T0-T9 (manifest.tiers, khớp tiền tố dài nhất);
+//       file tier N chỉ import tier <= N, trừ các cặp cổng có tên trong manifest.tierExceptions.
+//   (e) src/workflow không gọi tên cơ chế giữ worktree (cwd-lock, scope unit-custody / workflow-worktree).
 import './helpers/process-tmp-root.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
@@ -194,6 +197,107 @@ test('tầng thấp không import Dispatch: native, state, holder-lock, run-supe
     }
   }
   assert.deepEqual(violations, []);
+});
+
+// ─── Tier rule: a file of tier N imports only tiers <= N, except the named ports ──────────────────
+// Tiers are the HARDEN layers T0-T9. `manifest.tiers` maps a directory (a key ending in "/") or one
+// file to its tier; the longest matching key wins, so a directory row holds a layer and a file row
+// moves one leaf to the layer its real imports put it in.
+
+/** The tier of `file`: its longest matching key in `tiers`, or null when no key names it. */
+export function tierOf(file, tiers) {
+  let best = null;
+  for (const key of Object.keys(tiers)) {
+    const hit = key.endsWith('/') ? file.startsWith(key) : file === key;
+    if (hit && (best === null || key.length > best.length)) best = key;
+  }
+  return best === null ? null : tiers[best];
+}
+
+/**
+ * Edges that import a higher tier and are not a named exception, as `from -> to` text. `edges` are
+ * `[from, to]` pairs of manifest files; `exceptions` are `{ from, to }`.
+ */
+export function findTierViolations(edges, tiers, exceptions = []) {
+  const allowed = new Set(exceptions.map((e) => `${e.from} -> ${e.to}`));
+  return edges
+    .filter(([from, to]) => tierOf(from, tiers) < tierOf(to, tiers) && !allowed.has(`${from} -> ${to}`))
+    .map(([from, to]) => `${from} (T${tierOf(from, tiers)}) -> ${to} (T${tierOf(to, tiers)})`);
+}
+
+function manifestEdges() {
+  const edges = [];
+  for (const file of inManifest) {
+    for (const target of resolvedRelativeImports(file, fs.readFileSync(path.join(root, file), 'utf8'))) {
+      if (target in manifest.files) edges.push([file, target]);
+    }
+  }
+  return edges;
+}
+
+test('tier: every file has one tier, every tier row names a file, every exception names two files', () => {
+  assert.ok(manifest.rules.includes('tier-downward'), 'cần rule tier-downward');
+  const names = Object.keys(manifest.tierNames);
+  assert.deepEqual(names, ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']);
+  for (const [key, tier] of Object.entries(manifest.tiers)) {
+    assert.ok(names.includes(String(tier)), `${key}: tier ${tier} không có trong tierNames`);
+    const named = key.endsWith('/') ? inManifest.some((f) => f.startsWith(key)) : inManifest.includes(key);
+    assert.ok(named, `${key}: row tier không khớp file nào`);
+  }
+  const untiered = inManifest.filter((file) => tierOf(file, manifest.tiers) === null);
+  assert.deepEqual(untiered, [], 'file không có tier');
+  for (const { from, to, reason } of manifest.tierExceptions) {
+    assert.ok(from in manifest.files && to in manifest.files, `${from} -> ${to}: ngoại lệ trỏ file không có trong manifest`);
+    assert.ok(typeof reason === 'string' && reason.length > 20, `${from} -> ${to}: ngoại lệ phải ghi lý do`);
+  }
+});
+
+test('tier: no file imports a higher tier, and every named exception is still a real upward import', () => {
+  const edges = manifestEdges();
+  assert.deepEqual(findTierViolations(edges, manifest.tiers, manifest.tierExceptions), []);
+  for (const { from, to } of manifest.tierExceptions) {
+    assert.ok(
+      edges.some(([a, b]) => a === from && b === to) && tierOf(from, manifest.tiers) < tierOf(to, manifest.tiers),
+      `${from} -> ${to}: no longer an upward import, drop it from tierExceptions`,
+    );
+  }
+});
+
+test('tier rule catches an upward import, takes a same-tier or downward one, and honours only the exact named pair', () => {
+  const tiers = { 'src/a/': 1, 'src/b/': 3, 'src/b/low.mjs': 0 };
+  assert.deepEqual(findTierViolations([['src/a/x.mjs', 'src/b/y.mjs']], tiers), ['src/a/x.mjs (T1) -> src/b/y.mjs (T3)']);
+  assert.deepEqual(findTierViolations([['src/b/y.mjs', 'src/a/x.mjs'], ['src/a/x.mjs', 'src/a/z.mjs']], tiers), []);
+  // A file row beats its directory row: low.mjs is T0, so a T1 file may import it.
+  assert.deepEqual(findTierViolations([['src/a/x.mjs', 'src/b/low.mjs']], tiers), []);
+  const port = [{ from: 'src/a/x.mjs', to: 'src/b/y.mjs', reason: 'a named port' }];
+  assert.deepEqual(findTierViolations([['src/a/x.mjs', 'src/b/y.mjs']], tiers, port), []);
+  assert.equal(findTierViolations([['src/a/x.mjs', 'src/b/other.mjs']], tiers, port).length, 1);
+  assert.equal(tierOf('src/c/none.mjs', tiers), null);
+});
+
+// ─── Workflow never takes worktree custody: that mechanism is Execution's door ─────────────────────
+// `src/workflow/case-lock.mjs` takes Workflow's own `advance` lock through holder-lock, which stays allowed.
+
+const CUSTODY_MECHANISMS = /cwd-lock|unit-custody|workflow-worktree/g;
+
+/** The custody mechanisms `source` names in code (comments are not code). */
+export function findCustodyNaming(source) {
+  return [...new Set(lexSource(source).code.match(CUSTODY_MECHANISMS) ?? [])];
+}
+
+test('src/workflow names no worktree custody mechanism: not cwd-lock, not the unit-custody or workflow-worktree scope', () => {
+  const hits = mjsFilesUnder('src/workflow').flatMap((file) =>
+    findCustodyNaming(fs.readFileSync(path.join(root, file), 'utf8')).map((name) => `${file}: ${name}`));
+  assert.deepEqual(hits, []);
+});
+
+test('the custody guard catches an import, a scope string and a dynamic load, and lets holder-lock and comments through', () => {
+  assert.deepEqual(findCustodyNaming("import { admit } from '../run-supervisor/cwd-lock.mjs';"), ['cwd-lock']);
+  assert.deepEqual(findCustodyNaming("createLockScope('unit-custody')"), ['unit-custody']);
+  assert.deepEqual(findCustodyNaming('const s = `workflow-worktree`;'), ['workflow-worktree']);
+  assert.deepEqual(findCustodyNaming("await import('../run-supervisor/cwd-lock.mjs')"), ['cwd-lock']);
+  assert.deepEqual(findCustodyNaming("import { createLockScope } from '../holder-lock/index.mjs'; createLockScope('advance');"), []);
+  assert.deepEqual(findCustodyNaming('// the custody door replaced cwd-lock here'), []);
 });
 
 test('domain-siloing: core không import/couple domain cụ thể, domain không import domain khác', () => {

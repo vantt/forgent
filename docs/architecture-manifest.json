@@ -10,7 +10,8 @@
   ],
   "rules": [
     "one-directional-layer",
-    "domain-siloing"
+    "domain-siloing",
+    "tier-downward"
   ],
   "components": [
     "packaging-distribution"
@@ -18,6 +19,77 @@
   "domains": [
     "coding",
     "marketing"
+  ],
+  "tierNames": {
+    "0": "process facts, native door and shared leaves",
+    "1": "holder-lock, identity, convention, config facade",
+    "2": "Git, terminal control, worktree and project-root paths",
+    "3": "agent protocol, Observe, Event Store",
+    "4": "Run Supervisor",
+    "5": "Execution: Dispatch, Execution Core, Seat Binding",
+    "6": "Workflow",
+    "7": "Work lifecycle",
+    "8": "Skill and Domain (no file today)",
+    "9": "host and surface: entry, CLI, verbs, setup, reports"
+  },
+  "tiers": {
+    "bin/": 9,
+    "src/cli/": 9,
+    "src/cli/exit-codes.mjs": 0,
+    "src/cli/parse-args.mjs": 0,
+    "src/config/": 1,
+    "src/convention/": 1,
+    "src/event-store/": 3,
+    "src/evolve/": 7,
+    "src/git/": 2,
+    "src/holder-lock/": 1,
+    "src/identity/": 1,
+    "src/install/": 9,
+    "src/intake/": 7,
+    "src/native/": 0,
+    "src/observe/": 3,
+    "src/report/": 9,
+    "src/report/knowledge-resolver.mjs": 7,
+    "src/run-supervisor/": 4,
+    "src/run-supervisor/attempt-step.mjs": 5,
+    "src/run-supervisor/payload-root.mjs": 0,
+    "src/run-supervisor/steps/": 5,
+    "src/runner/": 7,
+    "src/runner/agent-definitions.mjs": 5,
+    "src/runner/dispatch.mjs": 5,
+    "src/runner/dispatch/": 5,
+    "src/runner/execution/": 5,
+    "src/runner/goal-check.mjs": 1,
+    "src/runner/operation-capability.mjs": 0,
+    "src/runner/paths.mjs": 2,
+    "src/runner/repo-locks.mjs": 2,
+    "src/runner/rigor.mjs": 0,
+    "src/runner/worktree.mjs": 2,
+    "src/seat-binding/": 5,
+    "src/setup/": 9,
+    "src/state/": 7,
+    "src/state/fgos-file-registry.mjs": 0,
+    "src/terminal-control/": 2,
+    "src/util/": 0,
+    "src/verbs/": 9,
+    "src/workflow/": 6
+  },
+  "tierExceptions": [
+    {
+      "from": "src/runner/worktree.mjs",
+      "to": "src/state/store.mjs",
+      "reason": "worktree.mjs throws the StoreError class its callers catch and uses nothing else of the Work store; the class moves down with the Work batch"
+    },
+    {
+      "from": "src/identity/directory-store.mjs",
+      "to": "src/state/runtime-coordination.mjs",
+      "reason": "the identity directory rebuild finds the main .fgos directory through the Work state helper getMainFgosDir; it goes to the invocation-root door with the Work batch"
+    },
+    {
+      "from": "src/util/host-bin.mjs",
+      "to": "src/runner/paths.mjs",
+      "reason": "the host binary lookup needs the main checkout root and the .fgos directory that paths.mjs resolves through the Git port; the root resolver moves down when the project locator becomes one leaf"
+    }
   ],
   "files": {
     "src/git/index.mjs": "infra",
