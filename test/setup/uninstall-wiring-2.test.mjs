@@ -32,7 +32,7 @@ function initGitRepo(cwd) {
   initFixtureRepo(cwd);
 }
 
-test('uninstall with no --yes refuses (exit 4) and touches nothing', () => {
+test('uninstall with no --yes prints the plan (exit 0) and touches nothing', () => {
   const cwd = mkTemp('uninstall-cli-noyes-');
   const home = mkTemp('uninstall-cli-noyes-home-');
   initGitRepo(cwd);
@@ -45,11 +45,15 @@ test('uninstall with no --yes refuses (exit 4) and touches nothing', () => {
 
   const result = run(cwd, ['uninstall'], { HOME: home, USERPROFILE: home });
 
-  assert.equal(result.status, 4, `expected validation refusal, got status ${result.status}: ${result.stderr}`);
+  assert.equal(result.status, 0, `expected a plan, got status ${result.status}: ${result.stderr}`);
+  const data = JSON.parse(result.stdout).data;
+  assert.equal(data.applied, false);
+  assert.ok(data.changes.length > 0 && data.keeps.length > 0, 'the plan lists what it would change and what it keeps');
+  assert.ok(fs.existsSync(path.join(cwd, '.claude', 'settings.json')) && fs.readFileSync(path.join(cwd, '.claude', 'settings.json'), 'utf8').includes('hook dispatch-decide'), 'a plan leaves the hook entries');
   assert.equal(
     execFileSync('git', ['config', '--get', 'core.hooksPath'], { cwd, encoding: 'utf8' }).trim(),
     path.join(cwd, '.githooks'),
-    'a refused uninstall must not touch core.hooksPath',
+    'a plan must not touch core.hooksPath',
   );
   fs.rmSync(cwd, { recursive: true, force: true });
   fs.rmSync(home, { recursive: true, force: true });

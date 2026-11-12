@@ -3746,106 +3746,12 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       };
     }
 
-    // Reverses `setup`'s own wiring (tsk-4iv-1, docs/history/fgos-uninstall/
-    // CONTEXT.md D2-D4). Requires `--yes` (D3): with no flag, refuses before
-    // touching anything — destructive, unlike `setup`/`doctor`, which never
-    // ask. Two side effects, both mirroring `setup`'s own fill-only rules in
-    // the opposite direction:
-    //   - git hooks (D2): `uninstallGitHooks` unwires `core.hooksPath` and
-    //     deletes `.githooks/pre-commit` (+ the dir, if left empty) ONLY when
-    //     hooksPath is still exactly `.githooks` — a custom value the caller
-    //     repointed is left untouched, same as `installGitHooks` leaves one
-    //     alone when installing.
-    //   - shell-rc (D4): never edits an rc file — reuses `hasSourceLine`
-    //     read-only, the same primitive `deadSourceLines`/`doctor` already
-    //     use, to report which rc file(s) still carry the fgOS source line so
-    //     the caller can remove it by hand (docs/history/
-    //     shell-rc-dead-source-lines/CONTEXT.md D1: "deletion stays a human
-    //     act" — this item does not carve out an exception to that).
-    // Never touches `.fgos/` data or `.fgos/config.json` (pinned constraint,
-    // CONTEXT.md) — structurally true: this case never imports or calls any
-    // config-writing function (`initConfigFile`/`writeConfig`).
-    //
-    // Package removal (D1, tsk-4iv-2 SPIKE): opt-in via `--remove-package`,
-    // additive on top of tsk-4iv-1's already-shipped, already-documented
-    // default behavior (`--yes` alone stays wiring-only, byte-identical to
-    // before this flag existed — preserves that contract rather than
-    // silently widening it). Scoped narrowly per the spike's own locked
-    // scope: npm global installs only, Linux/macOS only — shells out to
-    // `npm uninstall -g forgent`, the officially-supported removal path,
-    // rather than hand-rolling file deletion. Runs LAST, after the
-    // confirmation gate and wiring reversal above, since removing the
-    // package first would strand the process mid-run before it could
-    // finish undoing its own wiring (plan.md's own ordering rationale).
-    // Never throws on failure — a failed removal is exactly the outcome
-    // this spike exists to measure, not a bug to crash on.
+    // The project half of an uninstall (src/setup/uninstall-project.mjs): without --yes (or with
+    // --dry-run) it prints the plan and changes nothing. `fgctl uninstall` runs this verb first, then
+    // removes the activation and, with --purge, the release store.
     case 'uninstall': {
-      if (!flags.yes) {
-        throw new StoreError(
-          'validation',
-          'fgos uninstall requires --yes to confirm — it unwires git hooks (core.hooksPath/.githooks) and reports (never deletes) the shell-rc source line. Rerun with --yes once ready.',
-        );
-      }
-      // tsk-2xj: same --dir resolution as `doctor`/`setup` above.
-      const repoRoot = mainCheckoutRootOf(flags);
-      const { integrationScriptPath } = await import('../src/setup/checks.mjs');
-      const { uninstallGitHooks } = await import('../src/setup/git-hooks.mjs');
-      const { detectRcFiles, hasSourceLine } = await import('../src/setup/shell-rc.mjs');
-      const scriptPath = integrationScriptPath();
-      const shellRcSourceLinesFound = scriptPath === null
-        ? []
-        : detectRcFiles(os.homedir())
-          .filter((rcFile) => hasSourceLine(rcFile, scriptPath))
-          .map((rcFile) => ({ rcFile, sourceLine: `source "${scriptPath}"` }));
-      const { unwired: hooksUnwired, skippedExisting: hooksSkippedExisting } = uninstallGitHooks(repoRoot);
-      let packageRemoval = { attempted: false, outcome: null };
-      if (flags['remove-package']) {
-        // tsk-652: `npm uninstall -g forgent` exits 0 and reports nothing
-        // wrong even when this copy was never npm-installed at all (a
-        // pnpm/yarn global install lives in a different store npm never
-        // touches) -- confirm npm's own global node_modules actually has
-        // this package BEFORE claiming success, the same "detected
-        // manager" scope tsk-4iv-2's own SPIKE locked (npm-only), never
-        // widened here to actually support pnpm/yarn removal.
-        let npmRootG = null;
-        const npmCmd = process.platform === 'win32' ? 'npm.cmd' : 'npm';
-        try {
-          npmRootG = execFileSync(npmCmd, ['root', '-g'], { encoding: 'utf8', shell: process.platform === 'win32' }).trim();
-        } catch {
-          npmRootG = null;
-        }
-        const npmInstalled = npmRootG !== null && npmRootG !== '' && fs.existsSync(path.join(npmRootG, 'forgent'));
-        if (!npmInstalled) {
-          packageRemoval = {
-            attempted: false,
-            outcome: 'skipped',
-            reason: npmRootG
-              ? `this copy of fgOS is not visible under npm's own global node_modules (${npmRootG}) -- --remove-package only supports npm global installs (tsk-4iv-2); if installed via pnpm/yarn, remove it with that tool's own global uninstall command instead`
-              : 'npm root -g did not resolve (npm not on PATH?) -- --remove-package only supports npm global installs (tsk-4iv-2), and could not confirm this is one',
-          };
-        } else {
-          try {
-            const output = execFileSync(npmCmd, ['uninstall', '-g', 'forgent'], { encoding: 'utf8', shell: process.platform === 'win32' });
-            packageRemoval = { attempted: true, outcome: 'removed', output };
-          } catch (err) {
-            packageRemoval = {
-              attempted: true,
-              outcome: 'failed',
-              error: err.message,
-              stderr: typeof err.stderr === 'string' ? err.stderr : (err.stderr?.toString() ?? null),
-            };
-          }
-        }
-      }
-      return {
-        shellRcSourceLinesFound,
-        packageRemoval,
-        shellRcRemovalInstructions: shellRcSourceLinesFound.length > 0
-          ? 'fgOS never edits your shell profile — remove the line(s) above by hand.'
-          : null,
-        hooksUnwired,
-        hooksSkippedExisting,
-      };
+      const { uninstallProject } = await import('../src/setup/uninstall-project.mjs');
+      return uninstallProject(mainCheckoutRootOf(flags), { apply: flags.yes === true && flags['dry-run'] !== true, packageRoot: PACKAGE_ROOT });
     }
 
     // The one opt-in door to a person's own agent config (src/setup/agent-wiring.mjs). Without --yes

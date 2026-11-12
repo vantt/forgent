@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 // Every hook registration that points at a gitignored `.claude/hooks/*.cjs`
-// must check the script exists before running it.
+// must check the script exists before running it, and so must every registration that runs the
+// project's own `.fgos/installation/bin/fgos` shim (a project whose install was removed by hand or
+// by `fgctl uninstall` must not fail every Agent call).
 //
 // The failure this guards against was measured in a live dispatch: a fresh
 // worktree gets `.claude/settings.json` (it is tracked) but none of the hook
@@ -12,8 +14,11 @@
 // The guard is one shell line per registration:
 //   P="${CLAUDE_PROJECT_DIR}/.claude/hooks/<name>.cjs"; [ -f "$P" ] || exit 0; exec node "$P"
 //
+// and for the shim:
+//   S="${CLAUDE_PROJECT_DIR}/.fgos/installation/bin/fgos"; [ -x "$S" ] || exit 0; "$S" hook <kind>
+//
 // Exits non-zero, naming the offenders, when any registration reaches a hooks
-// script without it.
+// script or the shim without it.
 
 import fs from 'node:fs';
 import path from 'node:path';
@@ -36,15 +41,27 @@ try {
 const offenders = [];
 let checked = 0;
 
+// A registration is checked when its command contains `needle`; it passes when `guarded` accepts it.
+const KINDS = [
+  {
+    needle: '.claude/hooks/',
+    guarded: (value) => /\|\|\s*exit 0/.test(value) && /\[\s*-f\s*"\$P"\s*\]/.test(value),
+  },
+  {
+    needle: '.fgos/installation/bin/fgos',
+    guarded: (value) => /\[\s*-x\s*"\$S"\s*\]\s*\|\|\s*(exit 0|\{)/.test(value),
+  },
+];
+
 const walk = (node) => {
   if (Array.isArray(node)) return node.forEach(walk);
   if (!node || typeof node !== 'object') return;
   for (const [key, value] of Object.entries(node)) {
-    if (key === 'command' && typeof value === 'string' && value.includes('.claude/hooks/')) {
+    if (key === 'command' && typeof value === 'string') {
+      const kind = KINDS.find((k) => value.includes(k.needle));
+      if (!kind) continue;
       checked += 1;
-      // Either the guard, or a path that is not the gitignored hooks dir at all.
-      const guarded = /\|\|\s*exit 0/.test(value) && /\[\s*-f\s*"\$P"\s*\]/.test(value);
-      if (!guarded) offenders.push(value.slice(0, 120));
+      if (!kind.guarded(value)) offenders.push(value.slice(0, 120));
     } else {
       walk(value);
     }
@@ -53,10 +70,10 @@ const walk = (node) => {
 walk(settings);
 
 if (offenders.length > 0) {
-  console.error(`${offenders.length} of ${checked} hook registrations reach .claude/hooks/ without checking the script exists:`);
+  console.error(`${offenders.length} of ${checked} hook registrations reach .claude/hooks/ or the project shim without checking it exists:`);
   for (const o of offenders) console.error(`  ${o}`);
   console.error('A dispatched agent in a fresh worktree gets settings.json but not the scripts, so each of these fails every turn.');
   process.exit(1);
 }
 
-console.log(`all ${checked} hook registrations pointing at .claude/hooks/ are guarded`);
+console.log(`all ${checked} hook registrations pointing at .claude/hooks/ or the project shim are guarded`);
