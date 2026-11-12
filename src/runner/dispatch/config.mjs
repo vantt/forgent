@@ -18,10 +18,10 @@ import { RIGOR_VALUES } from '../rigor.mjs';
 import { canonicalizeWriteEntry } from './write-scope.mjs';
 import { RunnerConfigError, commonDottedParent } from './runner-config-error.mjs';
 import { RUN_TIMEOUT_MAX_MS, RUN_TIMEOUT_MIN_MS, runTimeoutProblem } from './run-timeout.mjs';
-import { parseTierCell, isExtendedTierCell, REASONING_EFFORT_VALUES } from './tier-cell.mjs';
+import { parseTierCell, REASONING_EFFORT_VALUES } from './tier-cell.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
-import { ConfigDoorError, checkConfig, readConfig, readStandardValue } from '../../config/facade.mjs';
+import { ConfigDoorError, checkConfig, readConfig } from '../../config/facade.mjs';
 import { validateProviderAccountInventory, credentialStoreProblem } from './provider-capacity.mjs';
 import { detectRetiredPatternKeys, RESERVED_PATTERN_NAMES, formatRetiredKeySentence } from '../execution/patterns/retired-keys.mjs';
 import {
@@ -259,36 +259,6 @@ function refuseGlobalRigorToTier(origins) {
   );
 }
 
-const warnedGlobalExtendedCells = new Set();
-
-/**
- * Every fgOS release on the machine reads the global config; an older one fails on a list or an object cell and
- * passes `model@pool` to the CLI as a model id, so these forms belong in a project config until every release reads
- * them. A global cell written that way is dropped from the effective value (in memory, the file is never
- * rewritten) and named once per process on stderr. The layer that set a cell comes from the snapshot's provenance.
- */
-function dropGlobalExtendedTierCells(cfg, origins) {
-  const seen = new Set();
-  for (const { path: at, layer } of origins) {
-    const cell = layer === 'global' ? /^runner\.modelPolicies\.([^.[]+)\.([^.[]+)/.exec(at) : null;
-    if (!cell || seen.has(`${cell[1]}.${cell[2]}`)) continue;
-    seen.add(`${cell[1]}.${cell[2]}`);
-    const [, family, tier] = cell;
-    const tierMap = cfg.modelPolicies?.[family];
-    if (!tierMap || !isExtendedTierCell(tierMap[tier])) continue;
-    // The layer below the global one is the standard (the project sits above, accounts and detected hold no cell).
-    const below = readStandardValue(`runner.modelPolicies.${family}.${tier}`);
-    if (below.present) tierMap[tier] = below.value;
-    else delete tierMap[tier];
-    const cellName = `modelPolicies.${family}.${tier}`;
-    if (warnedGlobalExtendedCells.has(cellName)) continue;
-    warnedGlobalExtendedCells.add(cellName);
-    process.stderr.write(
-      `fgos: ignoring ~/.fgos/config.json runner.${cellName}: a list, "model@pool" or {model, pool?, effort?} cell belongs in the project config (older fgOS releases on this machine cannot read it)\n`,
-    );
-  }
-}
-
 /**
  * Maps a ConfigDoorError's refusals to a RunnerConfigError with code 'config-key-retired'
  * when the refusal path corresponds to a retired key. Calls checkConfig once on refusal.
@@ -361,7 +331,6 @@ export function loadRunnerConfigForDir(dir) {
   // keeps every key an own key, `__proto__` included).
   const cfg = JSON.parse(JSON.stringify(runner));
   refuseGlobalRigorToTier(origins);
-  dropGlobalExtendedTierCells(cfg, origins);
   try {
     validateRunnerConfigShape(cfg, `${path.join(dir, '.fgos')} runner`);
   } catch (err) {

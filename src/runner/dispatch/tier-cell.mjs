@@ -11,15 +11,6 @@ export const REASONING_EFFORT_VALUES = Object.freeze(['low', 'medium', 'high', '
 const OBJECT_ENTRY_KEYS = Object.freeze(['model', 'pool', 'effort']);
 
 /**
- * @param {unknown} cell
- * @returns {boolean} true when the cell uses the list, `@pool` or object form, which a
- *   release that only reads a single model string cannot understand.
- */
-export function isExtendedTierCell(cell) {
-  return Array.isArray(cell) || (typeof cell === 'string' && cell.includes('@')) || (cell !== null && typeof cell === 'object');
-}
-
-/**
  * Parse one tier cell into its ordered entries.
  *
  * @param {unknown} cell

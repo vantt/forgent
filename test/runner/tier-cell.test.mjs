@@ -119,7 +119,7 @@ test('a project cell overrides the global cell of the same tier, and the global 
 });
 
 test('a global cell reaches the binding: bind runs the first entry of a global list cell', () => {
-  const { cfg } = loadWith({ claude: { standard: 'sonnet' } }, { claude: { advanced: ['opus@claude', 'sonnet'] } });
+  const { cfg } = loadWith({ claude: { standard: 'sonnet' } }, { claude: { advanced: ['x@other', 'opus@f', 'sonnet'] } });
   const runnerConfig = bindConfig(cfg.modelPolicies.claude.advanced);
   const result = bind(ask, { runnerConfig, ...headless });
   assert.ok(!result.refused, JSON.stringify(result.refused));

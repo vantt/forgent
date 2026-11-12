@@ -68,7 +68,6 @@ import {
   checkModelPolicyPools,
   checkLlmAccountsShape,
   checkLlmAccountsVsLegacy,
-  checkGlobalModelPoliciesPortable,
 } from './model-pool-checks.mjs';
 import { checkBlindStepsUseProvenPools } from './blind-steps-proven-pools.mjs';
 import { checkAgyPermissionsConfigured, checkAgySubHomesConfigured } from './agy-permissions.mjs';
@@ -1138,13 +1137,6 @@ registerCheck({
   description: 'when runner.llmAccounts is declared, it carries the same accounts and login directories as runner.providers, which the lease still reads for a pool llmAccounts does not declare; warns otherwise',
   check: (cwd) => checkLlmAccountsVsLegacy(cwd),
 });
-
-registerCheck({
-  id: 'global-model-policies-portable',
-  description: 'runner.modelPolicies in the global config uses plain model names only, since every fgOS release on the machine reads it',
-  check: () => checkGlobalModelPoliciesPortable(),
-});
-
 
 // The definition tiers of a shipped release cannot change after build, so `npm test` judges them
 // (test/setup/packaged-definitions.test.mjs). A doctor row judges only what a project supplies: when the
