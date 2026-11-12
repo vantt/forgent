@@ -66,7 +66,11 @@ impl EntryKind {
     }
 }
 
-const STORE_KINDS: [EntryKind; 3] = [EntryKind::Release, EntryKind::Quarantine, EntryKind::Install];
+const STORE_KINDS: [EntryKind; 3] = [
+    EntryKind::Release,
+    EntryKind::Quarantine,
+    EntryKind::Install,
+];
 
 #[derive(Debug)]
 pub struct StoreScan {
@@ -99,11 +103,9 @@ fn is_digest_name(name: &str) -> bool {
 fn owns_entry_name(kind: EntryKind, name: &str) -> bool {
     match kind {
         EntryKind::Release => is_digest_name(name),
-        EntryKind::Quarantine => name
-            .rsplit_once('-')
-            .is_some_and(|(digest, stamp)| {
-                is_digest_name(digest) && !stamp.is_empty() && stamp.bytes().all(|b| b.is_ascii_digit())
-            }),
+        EntryKind::Quarantine => name.rsplit_once('-').is_some_and(|(digest, stamp)| {
+            is_digest_name(digest) && !stamp.is_empty() && stamp.bytes().all(|b| b.is_ascii_digit())
+        }),
         EntryKind::Install => name
             .strip_prefix("act_")
             .and_then(|rest| rest.strip_suffix(".json"))
@@ -256,7 +258,10 @@ fn timestamp() -> String {
 /// Copies the activation record and the root record to `.fgos/uninstall-backup-<time>/`, then
 /// removes the installation directory: the fixed path under the workspace root, asserted to be
 /// inside it, never a link. Returns the backup directory.
-fn remove_installation(workspace_root: &Path, dir: &Path) -> Result<Option<PathBuf>, UninstallError> {
+fn remove_installation(
+    workspace_root: &Path,
+    dir: &Path,
+) -> Result<Option<PathBuf>, UninstallError> {
     if dir != installation_dir(workspace_root) || !dir.starts_with(workspace_root) {
         return Err(UninstallError::Failed(format!(
             "refusing to remove {}: it is not the project's installation directory",
@@ -295,7 +300,11 @@ pub struct NodeReversal {
 fn strings(value: &serde_json::Value, key: &str) -> Vec<String> {
     value[key]
         .as_array()
-        .map(|a| a.iter().filter_map(|v| v.as_str().map(str::to_string)).collect())
+        .map(|a| {
+            a.iter()
+                .filter_map(|v| v.as_str().map(str::to_string))
+                .collect()
+        })
         .unwrap_or_default()
 }
 
@@ -310,7 +319,13 @@ fn parse_reversal(stdout: &[u8]) -> Option<NodeReversal> {
             .as_array()
             .map(|a| {
                 a.iter()
-                    .map(|b| format!("{} -> {}", b["file"].as_str().unwrap_or("?"), b["backup"].as_str().unwrap_or("?")))
+                    .map(|b| {
+                        format!(
+                            "{} -> {}",
+                            b["file"].as_str().unwrap_or("?"),
+                            b["backup"].as_str().unwrap_or("?")
+                        )
+                    })
                     .collect()
             })
             .unwrap_or_default(),
@@ -318,7 +333,13 @@ fn parse_reversal(stdout: &[u8]) -> Option<NodeReversal> {
             .as_array()
             .map(|a| {
                 a.iter()
-                    .map(|f| format!("{}: {}", f["id"].as_str().unwrap_or("?"), f["error"].as_str().unwrap_or("?")))
+                    .map(|f| {
+                        format!(
+                            "{}: {}",
+                            f["id"].as_str().unwrap_or("?"),
+                            f["error"].as_str().unwrap_or("?")
+                        )
+                    })
                     .collect()
             })
             .unwrap_or_default(),
@@ -327,7 +348,11 @@ fn parse_reversal(stdout: &[u8]) -> Option<NodeReversal> {
 
 /// Runs `fgos uninstall` of the project's activated release (`--yes` when `apply`). A failed run
 /// that still answered with its result returns it, `failed` filled; one that did not answer is an error.
-fn run_node_reversal(shim: &Path, workspace_root: &Path, apply: bool) -> Result<NodeReversal, UninstallError> {
+fn run_node_reversal(
+    shim: &Path,
+    workspace_root: &Path,
+    apply: bool,
+) -> Result<NodeReversal, UninstallError> {
     let mut command = Command::new(shim);
     command.arg("uninstall").current_dir(workspace_root);
     if apply {
@@ -404,12 +429,20 @@ fn left_binaries() -> Vec<String> {
     let Ok(exe) = std::env::current_exe() else {
         return Vec::new();
     };
-    let mut lines = vec![format!("fgctl: {} (remove it with `rm {}`)", exe.display(), exe.display())];
+    let mut lines = vec![format!(
+        "fgctl: {} (remove it with `rm {}`)",
+        exe.display(),
+        exe.display()
+    )];
     if let Some(dir) = exe.parent() {
         for name in ["fgos", "fgos.cmd"] {
             let launcher = dir.join(name);
             if launcher.is_file() {
-                lines.push(format!("fgos launcher: {} (remove it with `rm {}`)", launcher.display(), launcher.display()));
+                lines.push(format!(
+                    "fgos launcher: {} (remove it with `rm {}`)",
+                    launcher.display(),
+                    launcher.display()
+                ));
             }
         }
     }
@@ -420,7 +453,8 @@ fn confirmed() -> bool {
     print!("Apply this plan? [y/N] ");
     let _ = std::io::stdout().flush();
     let mut answer = String::new();
-    std::io::stdin().lock().read_line(&mut answer).is_ok() && matches!(answer.trim(), "y" | "Y" | "yes")
+    std::io::stdin().lock().read_line(&mut answer).is_ok()
+        && matches!(answer.trim(), "y" | "Y" | "yes")
 }
 
 fn print_section(title: &str, lines: &[String]) {
@@ -484,14 +518,24 @@ pub fn run_uninstall(
     } else {
         println!("Keeps:\n  .fgos: your fgOS data and config\n  .fgos/distribution.json: the committed release pin");
     }
-    let mut left = reversal.as_ref().map(|r| r.left_to_you.clone()).unwrap_or_default();
+    let mut left = reversal
+        .as_ref()
+        .map(|r| r.left_to_you.clone())
+        .unwrap_or_default();
     left.extend(left_binaries());
     print_section("Left to you (fgOS does not remove these):", &left);
 
     let interactive = std::io::stdin().is_terminal() && std::io::stdout().is_terminal();
     let go = !options.dry_run && (options.yes || (interactive && confirmed()));
     if !go {
-        println!("Nothing changed.{}", if options.dry_run || !interactive { " Re-run with --yes to apply this plan." } else { "" });
+        println!(
+            "Nothing changed.{}",
+            if options.dry_run || !interactive {
+                " Re-run with --yes to apply this plan."
+            } else {
+                ""
+            }
+        );
         return Ok(());
     }
     if installation.is_some() && !shim_runnable {
@@ -506,7 +550,8 @@ pub fn run_uninstall(
                 name: "project wiring",
                 irreversible: false,
                 run: Box::new(move || {
-                    let done = run_node_reversal(shim, workspace, true).map_err(|e| e.to_string())?;
+                    let done =
+                        run_node_reversal(shim, workspace, true).map_err(|e| e.to_string())?;
                     if !done.failed.is_empty() {
                         return Err(done.failed.join("; "));
                     }
@@ -524,10 +569,15 @@ pub fn run_uninstall(
                 name: "activation",
                 irreversible: true,
                 run: Box::new(move || {
-                    let _lock = InstallLockGuard::acquire(store_root).map_err(|e: LockError| e.to_string())?;
+                    let _lock = InstallLockGuard::acquire(store_root)
+                        .map_err(|e: LockError| e.to_string())?;
                     let backup = remove_installation(workspace, dir).map_err(|e| e.to_string())?;
                     Ok(match backup {
-                        Some(b) => format!("removed {}; records copied to {}", dir.display(), b.display()),
+                        Some(b) => format!(
+                            "removed {}; records copied to {}",
+                            dir.display(),
+                            b.display()
+                        ),
                         None => format!("removed {}", dir.display()),
                     })
                 }),
@@ -538,9 +588,13 @@ pub fn run_uninstall(
                 name: "release store",
                 irreversible: true,
                 run: Box::new(move || {
-                    let _lock = InstallLockGuard::acquire(store_root).map_err(|e: LockError| e.to_string())?;
+                    let _lock = InstallLockGuard::acquire(store_root)
+                        .map_err(|e: LockError| e.to_string())?;
                     let removed = purge_store(store_root, scan).map_err(|e| e.to_string())?;
-                    Ok(format!("removed {removed} store entr(ies) under {}", store_root.display()))
+                    Ok(format!(
+                        "removed {removed} store entr(ies) under {}",
+                        store_root.display()
+                    ))
                 }),
             });
         }
@@ -555,7 +609,9 @@ pub fn run_uninstall(
                 failed = true;
                 eprintln!("failed: {name}: {message}");
             }
-            StepOutcome::Skipped => eprintln!("skipped: {name}: an earlier step failed, so this irreversible step did not run"),
+            StepOutcome::Skipped => eprintln!(
+                "skipped: {name}: an earlier step failed, so this irreversible step did not run"
+            ),
         }
     }
     if failed {
@@ -574,7 +630,8 @@ mod tests {
     const HEX: &str = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
 
     fn scratch(name: &str) -> PathBuf {
-        let dir = std::env::temp_dir().join(format!("fgctl-uninstall-{name}-{}", std::process::id()));
+        let dir =
+            std::env::temp_dir().join(format!("fgctl-uninstall-{name}-{}", std::process::id()));
         let _ = std::fs::remove_dir_all(&dir);
         std::fs::create_dir_all(&dir).unwrap();
         dir
@@ -584,7 +641,8 @@ mod tests {
     fn purge_guard_refuses_root_home_relative_dotdot_and_ancestors() {
         let home = PathBuf::from("/home/someone");
         let project = PathBuf::from("/home/someone/work/app");
-        let refused = |root: &str| guard_store_root(Path::new(root), Some(&home), &project).is_err();
+        let refused =
+            |root: &str| guard_store_root(Path::new(root), Some(&home), &project).is_err();
         assert!(refused("/"));
         assert!(refused("/home/someone"));
         assert!(refused("/home"), "an ancestor of the home directory");
@@ -604,7 +662,11 @@ mod tests {
                 irreversible,
                 run: Box::new(move || {
                     ran.borrow_mut().push(name);
-                    if ok { Ok(String::new()) } else { Err("no".to_string()) }
+                    if ok {
+                        Ok(String::new())
+                    } else {
+                        Err("no".to_string())
+                    }
                 }),
             }
         };
@@ -626,9 +688,17 @@ mod tests {
         std::fs::create_dir_all(release.join("bin")).unwrap();
         std::fs::write(release.join("bin").join("fgos"), "x").unwrap();
         std::fs::create_dir_all(root.join("releases").join("notes-of-mine")).unwrap();
-        std::fs::create_dir_all(root.join("quarantine").join(format!("sha256-{HEX}-1700000000"))).unwrap();
+        std::fs::create_dir_all(
+            root.join("quarantine")
+                .join(format!("sha256-{HEX}-1700000000")),
+        )
+        .unwrap();
         std::fs::create_dir_all(root.join("installs")).unwrap();
-        std::fs::write(root.join("installs").join("act_000001a144188299.json"), "{}").unwrap();
+        std::fs::write(
+            root.join("installs").join("act_000001a144188299.json"),
+            "{}",
+        )
+        .unwrap();
         std::fs::create_dir_all(root.join("identity")).unwrap();
         std::fs::write(root.join("identity").join("session"), "keep").unwrap();
         std::fs::write(root.join("machine-id"), "keep").unwrap();
@@ -640,7 +710,10 @@ mod tests {
 
         assert!(!release.exists());
         assert!(!root.join("installs").exists() && !root.join("quarantine").exists());
-        assert!(root.join("releases").join("notes-of-mine").exists(), "a foreign entry stays, and so does its directory");
+        assert!(
+            root.join("releases").join("notes-of-mine").exists(),
+            "a foreign entry stays, and so does its directory"
+        );
         assert!(root.join("identity").join("session").exists() && root.join("machine-id").exists());
         let _ = std::fs::remove_dir_all(&root);
     }
@@ -652,7 +725,11 @@ mod tests {
         let outside = scratch("links-outside");
         std::fs::write(outside.join("precious"), "keep").unwrap();
         std::fs::create_dir_all(root.join("releases")).unwrap();
-        std::os::unix::fs::symlink(&outside, root.join("releases").join(format!("sha256:{HEX}"))).unwrap();
+        std::os::unix::fs::symlink(
+            &outside,
+            root.join("releases").join(format!("sha256:{HEX}")),
+        )
+        .unwrap();
         let scan = scan_store(&root).unwrap();
         assert_eq!(scan.release_count(), 0, "a link is not a store entry");
         assert_eq!(purge_store(&root, &scan).unwrap(), 0);
@@ -668,12 +745,27 @@ mod tests {
 
     #[test]
     fn entry_names_must_have_the_shape_fgos_gave_them() {
-        assert!(owns_entry_name(EntryKind::Release, &format!("sha256:{HEX}")));
-        assert!(owns_entry_name(EntryKind::Release, &format!("sha256-{HEX}")));
+        assert!(owns_entry_name(
+            EntryKind::Release,
+            &format!("sha256:{HEX}")
+        ));
+        assert!(owns_entry_name(
+            EntryKind::Release,
+            &format!("sha256-{HEX}")
+        ));
         assert!(!owns_entry_name(EntryKind::Release, "sha256:abc"));
-        assert!(!owns_entry_name(EntryKind::Release, &format!("sha256:{HEX}x")));
-        assert!(owns_entry_name(EntryKind::Quarantine, &format!("sha256-{HEX}-123")));
-        assert!(!owns_entry_name(EntryKind::Quarantine, &format!("sha256-{HEX}")));
+        assert!(!owns_entry_name(
+            EntryKind::Release,
+            &format!("sha256:{HEX}x")
+        ));
+        assert!(owns_entry_name(
+            EntryKind::Quarantine,
+            &format!("sha256-{HEX}-123")
+        ));
+        assert!(!owns_entry_name(
+            EntryKind::Quarantine,
+            &format!("sha256-{HEX}")
+        ));
         assert!(owns_entry_name(EntryKind::Install, "act_000001a1.json"));
         assert!(!owns_entry_name(EntryKind::Install, "act_.json"));
         assert!(!owns_entry_name(EntryKind::Install, "other.json"));
@@ -689,13 +781,26 @@ mod tests {
         std::fs::write(root.join(".fgos").join("config.yaml"), "keep").unwrap();
         std::fs::write(root.join(".fgos").join("distribution.json"), "keep").unwrap();
 
-        let found = find_installation(&root).unwrap().expect("installation present");
-        let backup = remove_installation(&root, &found).unwrap().expect("records copied");
+        let found = find_installation(&root)
+            .unwrap()
+            .expect("installation present");
+        let backup = remove_installation(&root, &found)
+            .unwrap()
+            .expect("records copied");
         assert!(!dir.exists());
-        assert_eq!(std::fs::read_to_string(backup.join("activation.json")).unwrap(), "{\"a\":1}");
-        assert!(root.join(".fgos").join("config.yaml").exists() && root.join(".fgos").join("distribution.json").exists());
+        assert_eq!(
+            std::fs::read_to_string(backup.join("activation.json")).unwrap(),
+            "{\"a\":1}"
+        );
+        assert!(
+            root.join(".fgos").join("config.yaml").exists()
+                && root.join(".fgos").join("distribution.json").exists()
+        );
 
-        assert!(remove_installation(&root, &root.join(".fgos")).is_err(), "only the installation directory may be removed");
+        assert!(
+            remove_installation(&root, &root.join(".fgos")).is_err(),
+            "only the installation directory may be removed"
+        );
         let _ = std::fs::remove_dir_all(&root);
     }
 
@@ -706,7 +811,10 @@ mod tests {
         let outside = scratch("linked-installation-outside");
         std::fs::create_dir_all(root.join(".fgos")).unwrap();
         std::os::unix::fs::symlink(&outside, installation_dir(&root)).unwrap();
-        assert!(matches!(find_installation(&root), Err(UninstallError::Symlink(_))));
+        assert!(matches!(
+            find_installation(&root),
+            Err(UninstallError::Symlink(_))
+        ));
         assert!(outside.exists());
         let _ = std::fs::remove_dir_all(&root);
         let _ = std::fs::remove_dir_all(&outside);

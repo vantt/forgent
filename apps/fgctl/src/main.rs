@@ -239,9 +239,11 @@ fn main() {
                 purge: flags.has("--purge"),
             };
             let store_root = resolve_machine_release_store_root();
-            if let Err(err) =
-                fgos_distribution::uninstall::run_uninstall(&current_dir_or_exit(), &options, &store_root)
-            {
+            if let Err(err) = fgos_distribution::uninstall::run_uninstall(
+                &current_dir_or_exit(),
+                &options,
+                &store_root,
+            ) {
                 eprintln!("Error: {}", err);
                 std::process::exit(1);
             }

@@ -10,7 +10,8 @@ struct Scratch(PathBuf);
 
 impl Scratch {
     fn new(name: &str) -> Self {
-        let dir = std::env::temp_dir().join(format!("fgctl-uninstall-{name}-{}", std::process::id()));
+        let dir =
+            std::env::temp_dir().join(format!("fgctl-uninstall-{name}-{}", std::process::id()));
         let _ = std::fs::remove_dir_all(&dir);
         std::fs::create_dir_all(&dir).expect("create scratch dir");
         Scratch(dir.canonicalize().expect("canonical scratch dir"))
@@ -50,7 +51,10 @@ impl World {
         std::fs::write(project.join(".fgos").join("config.yaml"), "keep\n").unwrap();
         std::fs::write(project.join(".fgos").join("distribution.json"), "{}\n").unwrap();
         std::fs::write(
-            project.join(".fgos").join("installation").join("activation.json"),
+            project
+                .join(".fgos")
+                .join("installation")
+                .join("activation.json"),
             "{}\n",
         )
         .unwrap();
@@ -152,15 +156,25 @@ fn without_yes_and_without_a_terminal_it_prints_the_plan_and_changes_nothing() {
     let out = world.run(&["uninstall"]);
     assert_eq!(out.status.code(), Some(0), "{}", text(&out.stderr));
     let stdout = text(&out.stdout);
-    assert!(stdout.contains("settings.json: remove the fgOS hook"), "{stdout}");
+    assert!(
+        stdout.contains("settings.json: remove the fgOS hook"),
+        "{stdout}"
+    );
     assert!(stdout.contains(".fgos/installation"), "{stdout}");
-    assert!(stdout.contains("Keeps:") && stdout.contains("Nothing changed"), "{stdout}");
+    assert!(
+        stdout.contains("Keeps:") && stdout.contains("Nothing changed"),
+        "{stdout}"
+    );
     assert!(stdout.contains("rc: remove the line by hand"), "{stdout}");
     assert!(world
         .project()
         .join(".fgos/installation/activation.json")
         .exists());
-    assert_eq!(world.calls(), vec!["uninstall"], "the plan is asked for without --yes");
+    assert_eq!(
+        world.calls(),
+        vec!["uninstall"],
+        "the plan is asked for without --yes"
+    );
 
     let dry = world.run(&["uninstall", "--yes", "--dry-run"]);
     assert_eq!(dry.status.code(), Some(0));
@@ -191,7 +205,11 @@ fn yes_reverses_the_wiring_then_removes_the_activation_and_keeps_config_data_and
                 .starts_with("uninstall-backup-")
         })
         .collect();
-    assert_eq!(backups.len(), 1, "the activation record is copied before it goes");
+    assert_eq!(
+        backups.len(),
+        1,
+        "the activation record is copied before it goes"
+    );
     assert!(backups[0].path().join("activation.json").exists());
     assert!(
         world.state().join("releases").exists(),

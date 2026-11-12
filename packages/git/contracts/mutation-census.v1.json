@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "459e170e2b8e4c225732aca903096288651755d7a71548e50ea1ea105c4eb542",
+  "payloadDigest": "e3e86e423657dbae1946a10b0cae82f73b9b9be3ac0063e4fc661cacce160a21",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -69,10 +69,10 @@
     ".githooks/pre-commit": "476f66f95261ff4c18cbd1f797bc492e638f2fafbbfb32286bf8c1ebcd2fe46b",
     "apps/fgctl/build.rs": "316b3d73c7472689532b7ffc164b15fe73f097e1c3e5f53545bc6283ac1c8183",
     "apps/fgctl/src/help.rs": "49c627d9313aea384129802e0eba50157ba7623b192d3e6226cfb71cc521afec",
-    "apps/fgctl/src/main.rs": "47b8429df67b37c95c9a3dc46bbe8c65acf58efef401c875a4c2b39de054092b",
+    "apps/fgctl/src/main.rs": "008fe96d515a37c26dac074ab6a6ab1e20545bc1370638712ff031746d772436",
     "apps/fgctl/tests/cli_surface.rs": "9156bf27f8e42fb16aeff1a09e97fc99e5fa996d24afa07187714eee51d18160",
     "apps/fgctl/tests/git_wal_activation_gate.rs": "cb4573d686b03639e3e78baca940a2c66cf02c81d645b5d0824ea4a33ece0160",
-    "apps/fgctl/tests/uninstall_surface.rs": "6f88bd2f339e4f47c5aeba94016016fefc62b608ed95605c2c0d3ee5f7379f5e",
+    "apps/fgctl/tests/uninstall_surface.rs": "fed18f64c6c6181f2b3f942c9e55b5e76786ba26ea391f671564c93820b9e1e7",
     "apps/fgctl/tests/windows_holder_lock_gate.rs": "c1bfc1a2b6992cfe70c59acf9350a6da5fcce08033bb76fc1720d2c5df1091fa",
     "apps/fgos-gateway/build.rs": "0109e37c64e9474009c71bb3f3220496fad07dfd77b28c796f1f828c9d2d5671",
     "apps/fgos-gateway/src/cf_access.rs": "91dd9c6789d96baaf89d7b740ec56280c671b30a9cac9776bafe79c3d9cfd2ee",
@@ -282,7 +282,7 @@
     "packages/distribution/rust/src/shim.rs": "079f026604885abc304381ed6fd9df4beb2eeeff718b8994dbe36137df0d6cd8",
     "packages/distribution/rust/src/store.rs": "1cdaf72bbdf7c4bc0ae3eafd1f37fecd6a358de60c8ce5851ccf9212149174de",
     "packages/distribution/rust/src/suggest.rs": "302d698667662b3544b0761cd53dd87c68594d6f1b1ce52d8b85032627d52182",
-    "packages/distribution/rust/src/uninstall.rs": "8d4ade8834fb293866c04e044ef716076aa3199bbc11744f07db7c7c554ae20b",
+    "packages/distribution/rust/src/uninstall.rs": "f6f37eefb068e7ef0bfd6599698cd3f127d59fffec76c4ad7eada01e56a3e9bc",
     "packages/distribution/rust/src/verify.rs": "79a9f08e75d0c0ca8f5e04ad8443e4134a3dfbd85a38e01a448d53361463dc69",
     "packages/distribution/rust/src/workspace.rs": "fd91502f00f1de16a71d3c8bb386e5a840c46e7c10bf948a65b04ecdca6b594b",
     "packages/distribution/rust/tests/activation_lock_multiprocess.rs": "ff2818dd10b745ac29c1610effd95ac36552f4aace4525634c6b20f17f325fe0",
@@ -1281,15 +1281,15 @@
   "sites": [
     {
       "path": "packages/distribution/rust/src/uninstall.rs",
-      "line": 450,
-      "spawn": "Command::new <- packages/distribution/rust/src/uninstall.rs:331",
+      "line": 484,
+      "spawn": "Command::new <- packages/distribution/rust/src/uninstall.rs:356",
       "binary": "? installation .as_ref() .map(|dir| tail_shim_path(&dir.join(\"bin\").join(\"fgos\"), ",
       "family": "unresolved-binary"
     },
     {
       "path": "packages/distribution/rust/src/uninstall.rs",
-      "line": 509,
-      "spawn": "Command::new <- packages/distribution/rust/src/uninstall.rs:331",
+      "line": 554,
+      "spawn": "Command::new <- packages/distribution/rust/src/uninstall.rs:356",
       "binary": "? shim.as_ref().filter(|_| shim_runnable)",
       "family": "unresolved-binary"
     }
@@ -1746,7 +1746,7 @@
     },
     {
       "path": "apps/fgctl/tests/uninstall_surface.rs",
-      "line": 44,
+      "line": 45,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"
