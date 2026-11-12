@@ -296,6 +296,12 @@ jobs:
           rustup show
           cargo --version
 
+      # The Git crate's fixture repositories commit, so they need an author on a bare runner.
+      - name: Configure git identity for fixture repos
+        run: |
+          git config --global user.email "ci@example.com"
+          git config --global user.name "CI"
+
       - name: cargo fmt
         run: cargo fmt --all -- --check
 
