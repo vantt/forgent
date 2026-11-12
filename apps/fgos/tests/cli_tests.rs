@@ -125,7 +125,7 @@ fn test_unlisted_selector_fails_closed_with_exit_4() {
 }
 
 #[test]
-fn version_flag_answers_like_the_version_verb() {
+fn version_flag_prints_one_line_with_the_version_the_verb_reports() {
     let flag = Command::new(fgos_bin())
         .arg("--version")
         .output()
@@ -136,12 +136,16 @@ fn version_flag_answers_like_the_version_verb() {
         .expect("failed to execute fgos");
 
     assert_eq!(flag.status.code(), Some(0), "--version must exit 0");
-    let data = |out: &std::process::Output| -> serde_json::Value {
-        let envelope: serde_json::Value =
-            serde_json::from_slice(&out.stdout).expect("version prints the envelope");
-        envelope["data"].clone()
-    };
-    assert_eq!(data(&flag), data(&verb));
+    let envelope: serde_json::Value =
+        serde_json::from_slice(&verb.stdout).expect("the version verb keeps the envelope");
+    let version = envelope["data"]["packageVersion"]
+        .as_str()
+        .expect("the version verb reports a version");
+    assert_eq!(
+        String::from_utf8_lossy(&flag.stdout),
+        format!("fgos {version}\n"),
+        "--version is one line, `fgos <version>`"
+    );
 }
 
 #[test]

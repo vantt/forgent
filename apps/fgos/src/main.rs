@@ -239,10 +239,12 @@ fn main() {
         std::process::exit(fgos_holder_lock::route::main(&args[2..]));
     }
 
-    // `fgos --version` is `fgos version`: the one place the flag is mapped.
-    let mut owned_args: Vec<std::ffi::OsString> = args.iter().skip(1).cloned().collect();
+    // `fgos --version` prints one line, `fgos <version>`, like `fgctl --version`; the `version`
+    // verb keeps the envelope for callers that read it.
+    let owned_args: Vec<std::ffi::OsString> = args.iter().skip(1).cloned().collect();
     if owned_args.first().is_some_and(|a| a == "--version") {
-        owned_args[0] = "version".into();
+        println!("fgos {}", env!("CARGO_PKG_VERSION"));
+        std::process::exit(exit_codes::ok());
     }
     let cli_args = &owned_args[..];
 
@@ -252,7 +254,7 @@ fn main() {
         std::process::exit(exit_codes::ok());
     }
 
-    // R1: No host-global options besides `--version` (mapped above) -- the first positional
+    // R1: No host-global options besides `--version` (answered above) -- the first positional
     // token is always the selector, dash-prefixed or not. `--help` and `-h`
     // are selectors in the route table like any verb (the manifest door);
     // every other dash-prefixed token has no route. Do NOT skip past a
