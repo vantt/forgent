@@ -1637,6 +1637,7 @@ fn identity_directory_registers_only_on_request_and_resolves_by_handle_and_role(
 /// one `identity.session-published` to the clone's Event Store, and `resolve`
 /// answers a session another machine published after one sync. The signature,
 /// fold and role rules are owned by the identity crate's shared tests.
+#[cfg(unix)]
 #[test]
 fn identity_register_publishes_and_resolve_answers_a_session_of_another_machine() {
     use fgos_event_store::{
@@ -1890,6 +1891,7 @@ fn identity_register_publishes_and_resolve_answers_a_session_of_another_machine(
 
 /// A repository created after the Event Store cutover carries no `.fgos/events` fence and has no
 /// store: the first identity registration still opens the log and mints the store.
+#[cfg(unix)]
 #[test]
 fn identity_register_in_a_repository_without_a_fence_or_a_store_mints_the_store() {
     use fgos_event_store::layout::{Layout, StreamId};
