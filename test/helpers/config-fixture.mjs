@@ -167,6 +167,11 @@ export function writeRawGlobalConfig(home, text) {
   writeRaw(globalConfigPath(home), text);
 }
 
+/** Write exactly `text` as the retired JSON global config under `home`, as a release before the Config component left it. */
+export function writeRawLegacyGlobalConfig(home, text) {
+  writeRaw(path.join(home, '.fgos', 'config.json'), text);
+}
+
 /**
  * Lays the machine keys the project fixture under `dir` was written with into the global config of `home`, for a test
  * that runs the product under a HOME of its own (a fixture's executors are the machine's, not the project file's).

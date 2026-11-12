@@ -26,9 +26,9 @@ const FIXES: [&str; 6] = [
     "refresh-docs",
     "remove-redundant",
     "chmod",
-    "create-machine-files",
-    "copy-to-destination",
     "move-under-private",
+    "copy-to-destination",
+    "create-machine-files",
 ];
 
 /// What `fix` did, by fix id and path; never a value.

@@ -14,7 +14,7 @@ import { fileURLToPath } from 'node:url';
 import { DOCTOR_CHECKS, FIX_REGISTRATIONS, createDoctorRun } from '../../src/setup/checks.mjs';
 import { CONFIG_CHECKS } from '../../src/setup/config-checks.mjs';
 import { nativeDoor } from '../../src/native/door.mjs';
-import { writeProjectConfig, writeRawProjectConfig, statGatewayToken, readGatewayToken } from '../helpers/config-fixture.mjs';
+import { writeProjectConfig, writeRawProjectConfig, writeRawLegacyGlobalConfig, statGatewayToken, readGatewayToken } from '../helpers/config-fixture.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const contract = JSON.parse(fs.readFileSync(path.join(REPO_ROOT, 'packages/config/contracts/doctor-rows.v1.json'), 'utf8'));
@@ -108,6 +108,16 @@ test('the gateway token row fails with the fix named, the fix creates the privat
     const before = readGatewayToken(path.join(home, '.fgos'));
     assert.equal(fix('gateway-token-configured').fix(project).changed, false);
     assert.equal(readGatewayToken(path.join(home, '.fgos')), before, 'an existing token is never rotated');
+  });
+});
+
+test('the doctor fixes in registered order keep the gateway token a legacy global file holds instead of generating a new one', () => {
+  withMachine(({ project, home }) => {
+    writeRawLegacyGlobalConfig(home, JSON.stringify({ gateway: { port: 4001, token: SECRET } }));
+    for (const entry of FIX_REGISTRATIONS.filter((registered) => /^config-|^gateway-token-configured$/.test(registered.id))) entry.fix(project);
+    assert.ok(readGatewayToken(path.join(home, '.fgos')).trim() === SECRET, 'the token the user had is the machine token');
+    const stillWrong = run(project)['config-key-in-wrong-file'];
+    assert.equal(stillWrong.passed, true, 'the copy stage leaves the source key as a warning, never a failure');
   });
 });
 

@@ -1,14 +1,14 @@
 {
   "version": 1,
-  "about": "Every doctor row of docs/platform/config/spec.md section 11, one source for Rust and Node. doctor and check are the severity per consumer (fail or warn); detailSeverity replaces them for a finding whose detail names the key; fix is an id of `fixes` or null; needsAcknowledgement marks a fix that drops a note. Descriptions are English; no row echoes a value.",
+  "about": "Every doctor row of docs/platform/config/spec.md section 11, one source for Rust and Node. doctor and check are the severity per consumer (fail or warn); detailSeverity replaces them for a finding whose detail names the key; fix is an id of `fixes` or null; `fixes` is also the order doctor applies them in (a copy of a key a legacy global file holds comes before a fresh machine file is created, so the user's own token is the one kept); needsAcknowledgement marks a fix that drops a note. Descriptions are English; no row echoes a value.",
   "staleBackupDays": 30,
   "fixes": [
     "refresh-docs",
     "remove-redundant",
     "chmod",
     "move-under-private",
-    "create-machine-files",
-    "copy-to-destination"
+    "copy-to-destination",
+    "create-machine-files"
   ],
   "rows": [
     {
