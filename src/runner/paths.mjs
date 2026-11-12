@@ -263,7 +263,8 @@ export function findExecutableOnPath(candidateNames, pathEnv = process.env.PATH)
 
 /**
  * Whether `command` can be started on this machine: a bare name resolves on PATH, a path (absolute or
- * relative, any separator) names an executable file.
+ * relative, any separator) names an executable file; a relative path resolves against the process's working
+ * directory, so a command in a config is an absolute path or a bare name.
  */
 export function isCommandAvailable(command, pathEnv = process.env.PATH) {
   if (typeof command !== 'string' || command === '') return false;
