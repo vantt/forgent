@@ -25,7 +25,7 @@ Không đổi: các chuỗi `prefer` (đã liệt kê đủ CLI; bộ lọc CLI-
 
 ## Vì sao sáu ô này không đặt được trong `~/.fgos/config.yaml`
 
-Cấu hình toàn cục **không** giữ ô tier dạng danh sách hoặc `model@pool` (RUL102): bộ nạp bỏ ô đó kèm cảnh báo và dòng doctor `global-model-policies-portable` fail. Lý do gốc là bản cũ trên cùng máy đọc tệp toàn cục; owner đã quyết các máy nâng cấp cùng lúc nên lý do đó đã hết. Big lead đang hỏi owner có nới quy tắc này không; nếu nới thì có một phase riêng và hướng dẫn này được cập nhật. **Cho đến lúc đó**, sáu ô nằm trong tệp **dự án** (`.fgos/config.yaml`), nơi mọi dạng ô đều được nhận.
+Cấu hình toàn cục **không** giữ ô tier dạng danh sách hoặc `model@pool` (RUL102): bộ nạp bỏ ô đó kèm cảnh báo và dòng doctor `global-model-policies-portable` fail. Lý do gốc là bản cũ trên cùng máy đọc tệp toàn cục; owner đã quyết các máy nâng cấp cùng lúc nên lý do đó đã hết. Big lead đang hỏi owner có nới quy tắc này không; nếu nới thì có một phase riêng và hướng dẫn này được cập nhật. Owner đã chọn nới quy tắc này ở một phase sau; khi phase đó land, sáu ô chuyển sang `~/.fgos/config.yaml` và cách đặt trong tệp dự án dưới đây chỉ là tạm thời. **Cho đến lúc đó**, sáu ô nằm trong tệp **dự án** (`.fgos/config.yaml`), nơi mọi dạng ô đều được nhận.
 
 Khóa còn lại bạn cần cho máy (kỹ năng) vẫn đặt ở tệp toàn cục như hướng dẫn cook.
 
