@@ -93,6 +93,39 @@ No-match queries: top scores 0.74 to 1.00 (English translation) against a median
 4. **Rank whole documents, then point to sections,** rather than ranking sections alone.
 5. **Mixed-language corpus:** the Vietnamese platform specs pull Vietnamese queries; an English query may in turn miss them. Not measured yet: a gold set of Vietnamese specs searched in English.
 
+## 7. End-to-end A/B trial: does a writer grow instead of create? (2026-11-12, late afternoon)
+
+**Design.** 26 cases, each run twice by a fresh agent (Claude Sonnet, same brief except the search tool), deciding `GROW <path>` or `CREATE` before writing:
+
+- 20 **duplicate** cases from the gold set: the later document of a group is the knowledge to record (first 1,500 characters); the corpus is a snapshot without that document and without every document added after it (original add time from `git log --follow`), so the earlier member is the right answer. A content edit made to the earlier member after that date is a leak common to both arms.
+- 6 **new** cases: the Vietnamese no-match queries, translated; no document covers them, so `CREATE` is right.
+- **Arm A (today):** `ls`, `grep`/`rg` and reading files in the snapshot.
+- **Arm B (proposed):** a `locate` command over the one-door path the owner named: `pkm related` (pkm built from `vantt/momentell` at `474ae36`, graph of 691 notes and 972 Markdown-link edges) seeded by OHS `v0.17.2-vantt.9` with `ohs-lang-vi`, top 10 after removing the case's excluded files; then reading files. No grep allowed.
+
+**Results.**
+
+| | Arm A (grep) | Arm B (pkm + OHS) |
+|---|---|---|
+| Duplicate cases decided right (grow the earlier document) | 12 / 20 | **15 / 20** |
+| ...of which the earlier document was opened at all | 19 / 20 | 18 / 20 |
+| New cases decided right (create) | 1 / 6 | **4 / 6** |
+| All cases right | 13 / 26 (50%) | **19 / 26 (73%)** |
+| Average tokens per run (whole agent context) | 111,605 | 101,296 |
+| Average wall time per run | 20.9 s | 24.8 s (pkm CLI starts OHS on each call) |
+
+Paired: B right and A wrong in 6 cases, A right and B wrong in 1 (c09, where B grew a wrong document). The direction is clear; with 26 cases it is not statistically settled (two-sided sign test p ≈ 0.13).
+
+**What the trial shows.**
+
+1. **Finding was not the main failure.** Arm A opened the right earlier document in 19 of 20 duplicate cases and still chose `CREATE` in 7 of them. The failure is the decision after finding: the writer judges the subject "different enough" and writes a new document. Arm B made that mistake 4 times (c12, c15, c17, c18).
+2. **Today's writer also over-grows.** On the 6 new subjects, arm A pushed 5 into large platform specs (`observe/spec.md`, `work-state/spec.md`, `host-invocation-routing/spec.md`, `vision.md`, a herdr dashboard document) rather than create. Arm B did that twice.
+3. **The proposed path is better on both errors and a little cheaper in tokens,** about 10,000 fewer per write; it is about 4 seconds slower because each `pkm related` call starts OHS (the MCP server keeps it running).
+4. **The rule matters as much as the search.** The remaining errors are judgement errors that a search engine cannot fix. They are what the write door's rule (grow by default; create only with a stated reason that no candidate covers the subject) and admission (an independent reviewer) are for. That rule was not in either brief.
+
+**Limits.** 26 cases, one run each; one reviewer chose the gold groups; the later document's own text is a strong query, closer to a full draft than to a one-line note; the new cases are short.
+
+**Next measurement proposed:** arm C = arm B plus the write-door rule text, on the same 26 cases, to see how much of the remaining 7 errors the rule removes.
+
 ## Appendix: gold set
 
 - g01: Merge blocked as fgos-write-rejected when a stale worker branch never touched .fgos/ but main changed it after the fork (the catchup/approve deadlock and the branchHeadAtTake trust fix).
