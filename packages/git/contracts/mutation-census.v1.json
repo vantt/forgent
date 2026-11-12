@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "c83c61c4f82c9a47bdfa2756aa1bd0b06aa44817e39160d75c1c748505051934",
+  "payloadDigest": "347041fc831172b47e6514f2627b22dc81e837c89dfcf18ea8c345de8c11142f",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -69,9 +69,9 @@
     ".githooks/pre-commit": "476f66f95261ff4c18cbd1f797bc492e638f2fafbbfb32286bf8c1ebcd2fe46b",
     "apps/fgctl/build.rs": "316b3d73c7472689532b7ffc164b15fe73f097e1c3e5f53545bc6283ac1c8183",
     "apps/fgctl/src/help.rs": "49c627d9313aea384129802e0eba50157ba7623b192d3e6226cfb71cc521afec",
-    "apps/fgctl/src/main.rs": "008fe96d515a37c26dac074ab6a6ab1e20545bc1370638712ff031746d772436",
+    "apps/fgctl/src/main.rs": "0430ca67d8d6eb5b207d7a5e9739dc192ce187ceed9d2e5a194130f1c4f0f8fb",
     "apps/fgctl/tests/cli_surface.rs": "9156bf27f8e42fb16aeff1a09e97fc99e5fa996d24afa07187714eee51d18160",
-    "apps/fgctl/tests/git_wal_activation_gate.rs": "cb4573d686b03639e3e78baca940a2c66cf02c81d645b5d0824ea4a33ece0160",
+    "apps/fgctl/tests/git_wal_activation_gate.rs": "29773e1594549ab92f94fd9bea9f5023663385d9bd9128128756225540780907",
     "apps/fgctl/tests/uninstall_surface.rs": "fed18f64c6c6181f2b3f942c9e55b5e76786ba26ea391f671564c93820b9e1e7",
     "apps/fgctl/tests/windows_holder_lock_gate.rs": "c1bfc1a2b6992cfe70c59acf9350a6da5fcce08033bb76fc1720d2c5df1091fa",
     "apps/fgos-gateway/build.rs": "0109e37c64e9474009c71bb3f3220496fad07dfd77b28c796f1f828c9d2d5671",
@@ -86,9 +86,8 @@
     "apps/fgos/examples/mailbox-ident-cost.rs": "694f216767532946846ecc69dc584fbb8bf28a7183f741a037ba05c7b4793bc9",
     "apps/fgos/src/cli_presenter.rs": "b93778742194566aac6e085536cbcbcc4ff709ac3d1bbaff8870a8cf2c43dada",
     "apps/fgos/src/cli_projector.rs": "08b12bf43cdccddff020c6b803988c2f9e905b45f18d5ea40ffab89516ffbda5",
-    "apps/fgos/src/exit_codes.rs": "de41bfb845b15792e706fc9bd3bad88f23494cac5683476e7c5954e0b8ee4e15",
     "apps/fgos/src/legacy_exec.rs": "bf2f790d202ad3a25735fc3f9c33feb7aeffdfb015b1e0aafa9282c8b8bcba40",
-    "apps/fgos/src/main.rs": "357aef4765b9d172853665ed8e06793b8e7a377c3a334ef0139fa5ccbc755a10",
+    "apps/fgos/src/main.rs": "ea353d224e163f9b28f050491aa1016180d35478eeb2887a3e441e46443e50fc",
     "apps/fgos/src/wiring/event_store_clone.rs": "923d718f7a6bd5705cbe6e4d4c8393672c1ef4a2142facc9ada314307a4d7574",
     "apps/fgos/src/wiring/identity_log.rs": "d7d9dd503ecbd84a5373aa27f6853996e6944aba2940d15e8284cd92c14eef7a",
     "apps/fgos/src/wiring/mailbox_body.rs": "5acd3ddf4ba2ae8cf53a48bb84ffe310f873fdef8593452b765a78cc3dec129e",
@@ -116,7 +115,7 @@
     "apps/fgos/tests/windows_semantics_probe.rs": "ecb59690bbf1259baa1defb6417c24005138526bb565f216f9db3c2ad784d240",
     "apps/fgos/tests/windows_support/mod.rs": "2b8a17676526c87ea5ecfb2074a70a3511fbf9267f9de78a35dc355f272830fb",
     "bin/fgos-runner.mjs": "24fa9b497547a104912b90ab98b3d53fbbe0068a5977a7a04724789c8e717156",
-    "bin/fgos.mjs": "18f33ad74e63ae1848401d9bd7c947a3e78462b7be946b7ea13b903b4381ebf3",
+    "bin/fgos.mjs": "ffa4002b571d7ca4d26fb1a577e5a6e01ef879d7fbeba5f0aeb5b4a88e494b8b",
     "core/skills/_shared/capability-catalog.md": "4299584409592ac4ae9668cd0cb4dd0442edc1c78a42ccd9cfe0bae22bf11bc4",
     "core/skills/_shared/capability-matching.md": "eb67cde05d45c171c1d4803f9d2fbec5fc63565b9fd0a0549c866a7eb262521d",
     "core/skills/_shared/catchup-self-recovery.md": "3b77650c71a0225f00ffa8fe9524d7c0052977204f425c1999225b6f80802c69",
@@ -275,7 +274,7 @@
     "packages/distribution/rust/src/fetch.rs": "371a4026f3fc9341bc939a0a738375ffad7d63fac6c0895047e866e5a45c7355",
     "packages/distribution/rust/src/fgctl_refresh.rs": "2248118bf1b3896cf9d87d49f944b2dea03572e900d963ada096ca1e4a8bf8cd",
     "packages/distribution/rust/src/git_gate.rs": "7d50addca54b78ca0b5d6b61c9d857b2de82016a1cc53faefc7c1038da163cba",
-    "packages/distribution/rust/src/init.rs": "08bcc2eb9203a4219814add0a03faf1ffd7ce9c184b95d911816dc5554edfd32",
+    "packages/distribution/rust/src/init.rs": "b3c4e3fb2d086bec1f4f34ce57cd10667da380a5fbbd9aefd45afbf32251455c",
     "packages/distribution/rust/src/lib.rs": "2606ca37fcc561c271012139c4f7921129a141a6163f440ae7858a3d5edbb3dd",
     "packages/distribution/rust/src/lock.rs": "ee39bccc87c5b34a7799ee886fe3c4b9f59346f22c550c67123efa49f9681f8e",
     "packages/distribution/rust/src/manifest.rs": "7aa7f3d42c3ac708e44cb0bbf4be36c414eaf0b29f0bdafc5bb768901fb46bda",
@@ -461,8 +460,9 @@
     "packages/host-runtime/rust/src/catalog.rs": "524dff2d9837611b8eb81394b0998d53854cba4c42acc6cbc4c41770d118ff5c",
     "packages/host-runtime/rust/src/civil_time.rs": "7f206726328eb334c91c8ca2592191d6dead76b91b68ffaf633e7cda40c3625f",
     "packages/host-runtime/rust/src/contracts.rs": "da9000674648a399cd32f628213a8d16cd1ce220eacb4e4896d9fad05c0af5cf",
+    "packages/host-runtime/rust/src/exit_codes.rs": "f161428fcaa8de111886461f9f0fd40279fe918ba3052dfd9f6502e2c1896368",
     "packages/host-runtime/rust/src/invocation_service.rs": "bd9602d7ae4849bb434d2fe92aaa098c28ce9225ab6ef30b61fbbdb1a197bd55",
-    "packages/host-runtime/rust/src/lib.rs": "1f25c007b30a9638c5c7571b040f80520a7a8a7277240ad4cd77e7c4ade73a3b",
+    "packages/host-runtime/rust/src/lib.rs": "3b05c8c94312efcc17dff0fe2826b9696a764abf70d19b46d308f48cfceb325c",
     "packages/host-runtime/rust/src/operation_provider_router.rs": "9302b28935144076ca5d07b0d57f6031edfd36e14746f4a23b81c465295692d3",
     "packages/host-runtime/rust/src/providers/builtin.rs": "d3dfc03eb1583f47a3a9c52d9c7b4ac1134a2fb31fabaa3904d81958d0110b70",
     "packages/host-runtime/rust/src/providers/external_process/adapter.rs": "d6aa6de61305b9838f0accd2f02085170ead85e858b39f143956c4c4e831f78f",
@@ -819,7 +819,7 @@
     "scripts/check-locked-decisions-heading-drift.mjs": "fa87a9f833b12c43cf60322aac482a8bd5e5e7cb889868ed4592816efc80b7f8",
     "scripts/check-undefined-names.mjs": "245c88e83a247f7c83e53bc71d5fe59a9848e8c919fee3e95acfa6edda8b100a",
     "scripts/ci-asset-server.mjs": "2de382cc02067014690b358d4c939149bf0c1b7977071896d9b12137526ff32a",
-    "scripts/ci-external-consumer.sh": "ff3a82b60c0031b9edb88934e2ae82d81fe15e388676a446c00fe878826c5afe",
+    "scripts/ci-external-consumer.sh": "cf1f068b549d8e8313116563dc57f7ce120e35624de099e440c18680e09ce2a3",
     "scripts/convention-conformance.mjs": "14ceed9e37eb8b914f50a6237b61a2bd9b2c591e2d3f611a8321544930e419ea",
     "scripts/decision-question-hook.mjs": "af83a0333f802f38696c818186887ba439cd47f1b4616dec7bd727c792346d14",
     "scripts/dispatch-decide-hook.mjs": "b2b5de35ffb2998a0beedeb581342ad1c0ed52b05244776789c55d14aa248206",
@@ -837,7 +837,7 @@
     "scripts/git-addon.mjs": "67532c2006d74a97cbc40814e82882da1de5d48b5d072670444489e2ed963d71",
     "scripts/git/e1-power-cut.mjs": "73da033846ea409abd7a8b36827aaf0a2caa6e6cd822878b5d332c536169ec9d",
     "scripts/git/e1-power-cut.sh": "be0500b7f99580694cf1ca7418c17ddf6bd70583f3a06686aaab923118e2d1fa",
-    "scripts/git/e3-bench.mjs": "8a168167f3e8a3a05e87166dd0e8ea8734c91da3f941e5fc10eda2bfdb61ae8e",
+    "scripts/git/e3-bench.mjs": "c1dc5a08724ee339049ea8541b6420eb969c034e3737e09b9b145d22ecf2c848",
     "scripts/git/p-release-checks.sh": "08bb9b3c32e7915b27f645f7aa68d42cba0dbddd2a7dc9adc45d43a75b4d0056",
     "scripts/git/p-space-resource.mjs": "31e12327e2782a769a341cb6819f7e1e24d63e78de732c1ad210e430433aad06",
     "scripts/git/p-space.sh": "ab11ec0d8fc8c5a0c32f0dcc1aa08d26c39356db710a4e395513f87af78decd3",
@@ -903,7 +903,7 @@
     "scripts/verify-fanout-overlap.mjs": "b74a0ac9f350c5d62a47f3e3bf0896e9d142e5cbba15284527383d1b529ea435",
     "scripts/write-test-marker.mjs": "d1faead7d8efbdcce888100b89f5cd2cc6546ddc3f2647118255f82f6c8e4171",
     "scripts/write-wrapper-script.mjs": "e9e76f2b72329bb4dee9ec980db7a5df7515da3ff339e232466049de259d5c50",
-    "src/cli/command-registry.mjs": "6fc288b6db70a021a3254c1ced17aa4a818ad8391baa97f9f6525b5857399b85",
+    "src/cli/command-registry.mjs": "a999ca7eea8172b955c8ed2226c32ce097d930357e0ab3ed655d5c4e68f54dc4",
     "src/cli/deprecation.mjs": "45e7d11ad8681fc89e4c99f4ef53b7c93a477f6b5fdd6708eddcf0b579dd3985",
     "src/cli/exit-codes.mjs": "55a68e5a0b03a38adced7ddc9bcfb60964db94b3b868e2c854b6a6a78fdb4964",
     "src/cli/flag-check.mjs": "336a0e94eaec59fa4c1f143b32a14334c1bd5f13d522ef8be4a5b570dc401b62",
@@ -1238,7 +1238,7 @@
     "src/verbs/merge/review.mjs": "538e8087eed7befd51b7ef78a93d1b12fa13f0fff260ec40e50e7f8e019ac49a",
     "src/verbs/merge/sync-root.mjs": "81a4f2a88e187e748716c6df5430439849f55339b301b1214c63e7c66a53d732",
     "src/verbs/state/edit.mjs": "734029f844bf8eb4b9c50ff7698c59dda48bd2a6b3ec3ffe8b601f0a31571223",
-    "src/verbs/state/init.mjs": "994cba066b6fb2dfa86423f90932b37839fa603187e9199523c696e68399c3d6",
+    "src/verbs/state/init.mjs": "60aaa7747ab233a5a40ce0f77f72baa44e7a1d514b5c23a8ea75a93e974977dc",
     "src/verbs/state/move.mjs": "d2be22ddac01830ec35469b5a895f2c0883dd14e0b63ec3ae2c5e44cc2a2350c",
     "src/verbs/state/read.mjs": "a49ff63f71318e7b6066059078273a6c224ad7ec10c8790f25fabd13cae5cd93",
     "src/verbs/state/step.mjs": "ddebfcb5b53edfd67086ead35d886b86a1f49ad0ce18b98d7b637df239b059fb",
@@ -1689,42 +1689,42 @@
     },
     {
       "path": "apps/fgctl/tests/git_wal_activation_gate.rs",
-      "line": 66,
+      "line": 67,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"
     },
     {
       "path": "apps/fgctl/tests/git_wal_activation_gate.rs",
-      "line": 76,
+      "line": 77,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"
     },
     {
       "path": "apps/fgctl/tests/git_wal_activation_gate.rs",
-      "line": 304,
+      "line": 305,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"
     },
     {
       "path": "apps/fgctl/tests/git_wal_activation_gate.rs",
-      "line": 332,
+      "line": 333,
       "spawn": "Command::new",
       "binary": "sh",
       "class": "rust-test"
     },
     {
       "path": "apps/fgctl/tests/git_wal_activation_gate.rs",
-      "line": 359,
+      "line": 360,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"
     },
     {
       "path": "apps/fgctl/tests/git_wal_activation_gate.rs",
-      "line": 402,
+      "line": 403,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"
@@ -2199,23 +2199,23 @@
     },
     {
       "path": "packages/distribution/rust/src/init.rs",
-      "line": 575,
+      "line": 735,
       "spawn": "Command::new",
       "binary": "bin",
       "class": "argv-runner",
-      "resolvedAt": "packages/distribution/rust/src/init.rs:1611"
+      "resolvedAt": "packages/distribution/rust/src/init.rs:1810"
     },
     {
       "path": "packages/distribution/rust/src/init.rs",
-      "line": 575,
+      "line": 735,
       "spawn": "Command::new",
       "binary": "fgos",
       "class": "argv-runner",
-      "resolvedAt": "packages/distribution/rust/src/init.rs:1611"
+      "resolvedAt": "packages/distribution/rust/src/init.rs:1810"
     },
     {
       "path": "packages/distribution/rust/src/init.rs",
-      "line": 1199,
+      "line": 1396,
       "spawn": "Command::new <- packages/process/rust/src/mapped.rs:226",
       "binary": "git",
       "class": "production-sandbox-probe",
@@ -2224,7 +2224,7 @@
     },
     {
       "path": "packages/distribution/rust/src/init.rs",
-      "line": 2283,
+      "line": 2495,
       "spawn": "Command::new",
       "binary": "sh",
       "class": "rust-test"
@@ -3267,35 +3267,35 @@
     {
       "path": "scripts/git/e3-bench.mjs",
       "line": 736,
-      "spawn": "rollback -> scripts/git/e3-bench.mjs:809",
+      "spawn": "rollback -> scripts/git/e3-bench.mjs:811",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "scripts/git/e3-bench.mjs",
       "line": 736,
-      "spawn": "rollback -> scripts/git/e3-bench.mjs:779",
+      "spawn": "rollback -> scripts/git/e3-bench.mjs:780",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
     },
     {
       "path": "scripts/git/e3-bench.mjs",
-      "line": 835,
-      "spawn": "rollback -> scripts/git/e3-bench.mjs:809",
+      "line": 837,
+      "spawn": "rollback -> scripts/git/e3-bench.mjs:811",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "scripts/git/e3-bench.mjs",
-      "line": 850,
+      "line": 852,
       "spawn": "createGitPublication -> src/git/index.mjs:9",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "scripts/git/e3-bench.mjs",
-      "line": 865,
-      "spawn": "rollbackOnly -> scripts/git/e3-bench.mjs:835",
+      "line": 867,
+      "spawn": "rollbackOnly -> scripts/git/e3-bench.mjs:837",
       "binary": "(command-line arguments)",
       "class": "configured-binary"
     },
