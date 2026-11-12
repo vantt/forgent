@@ -97,12 +97,12 @@ Rust chỉ sở hữu policy tĩnh của ghế; Execution Core Node giữ placem
 
 | Tier | Việc | Tự kiểm | Ví dụ |
 |---|---|---|---|
-| nano | cơ học, không suy luận | chỉ nhận ra hoặc biến đổi theo mẫu? | classify, extract, format, route, vote |
-| mini | suy luận nhẹ trên đầu vào cho sẵn, phạm vi hẹp | đủ thông tin, chỉ hiểu và tóm tắt? | tóm tắt, trả lời từ tài liệu cho, sửa nhỏ chính xác, review diff nhỏ |
-| standard | theo một kế hoạch có sẵn, nhiều bước | có kế hoạch và hướng dẫn chi tiết? | code theo plan, viết test, refactor theo mô tả |
-| advanced | tự tìm đường, không có đáp án sẵn | phải điều tra và quyết cách làm? | debug khó, code phức tạp, nhiều file không có plan |
-| flagship | phán đoán, thiết kế, phê bình | kết quả là một ý kiến hay một thiết kế? | review, red-team, thiết kế giải pháp, synthesis của panel |
-| frontier | quyết định đắt nhất | khó đảo, đắt nếu sai? | khoá kiến trúc, synthesis cuối của hội đồng quan trọng |
+| nano | mechanical, no reasoning | only recognizes or transforms by pattern? | classify, extract, format, route, vote |
+| mini | light reasoning over the given input, narrow scope | enough information, only understand and summarize? | summarize, answer from a given document, small exact fix, review a small diff |
+| standard | follows an existing plan, many steps | is there a plan with detailed instructions? | code to a plan, write tests, refactor as described |
+| advanced | finds its own way, no ready answer | must investigate and decide how? | hard debugging, complex code, many files with no plan |
+| flagship | judgment, design, critique | is the result an opinion or a design? | review, red-team, solution design, panel synthesis |
+| frontier | the costliest decisions | hard to reverse, costly if wrong? | architecture lock-in, final synthesis of an important council |
 
 Bảng là một file hợp đồng chung `packages/seat-binding/contracts/seat-binding.tier-ladder.v1.json` (tên tier, độ mạnh, định nghĩa); crate nhúng nó lúc build (`tier.rs`), loader config Node đọc cùng file đó cho `MODEL_POLICY_TIERS`, nên hai bên không thể lệch. Cách hiển thị đã đổi (xem mục 15, bản ghi cập nhật Config): thang nằm trong `description` của `modelPolicies`, `tierFallback`, `maxTier` ở `core/config-schema/runner.schema.yaml` và được hiển thị thành dòng `@fgos:doc` trong file config (docs/platform/config/spec.md mục 7); khoá `"$comment"` không còn được ghi hay đọc;  `explain` in định nghĩa tier của ghế. `$comment` bị gỡ trước khi validate và trước hash config ngữ nghĩa.
 

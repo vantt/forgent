@@ -2050,6 +2050,32 @@
       ]
     },
     {
+      "name": "an executor whose CLI is not installed is skipped",
+      "patch": {
+        "launchView": {
+          "executors": {
+            "claude": {
+              "missingCli": "claude"
+            }
+          }
+        }
+      },
+      "expected": {
+        "ok": true,
+        "ranked": {
+          "candidates": [
+            {
+              "executor": "openai"
+            }
+          ]
+        }
+      },
+      "skippedReasons": [
+        "tier-cell-missing",
+        "cli-missing"
+      ]
+    },
+    {
       "name": "a required skill the executor does not declare skips it",
       "patch": {
         "ask": {

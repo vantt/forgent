@@ -170,7 +170,7 @@ runner:
             backend: bwrap
     gemini:
       kind: agent
-      description: "Gemini provider via omp (oh-my-pi); Antigravity CLI (agy) invocations removed 2026-10-16 (agy not installed, owner chose omp). Invocations: omp-herdr (herdr pane), omp-cli-bwrap (headless). The confined account comes from runner.providers.gemini.accounts in the global config."
+      description: "Gemini provider via omp (oh-my-pi); Antigravity CLI (agy) invocations removed 2026-10-16. Invocations: omp-herdr (herdr pane), omp-cli-bwrap (headless). The confined account comes from runner.providers.gemini.accounts in the global config."
       allowCrossProvider: true
       providerModel: gemini
       invocations:
@@ -700,12 +700,12 @@ runner:
           prefer: [claude, openai]
   # @fgos:doc The model each family uses at each tier, by family then tier.
   # @fgos:doc Tier ladder, weakest first:
-  # @fgos:doc nano: cơ học, không suy luận; self-check: chỉ nhận ra hoặc biến đổi theo mẫu?; e.g. classify, extract, format, route, vote
-  # @fgos:doc mini: suy luận nhẹ trên đầu vào cho sẵn, phạm vi hẹp; self-check: đủ thông tin, chỉ hiểu và tóm tắt?; e.g. tóm tắt, trả lời từ tài liệu cho, sửa nhỏ chính xác, review diff nhỏ
-  # @fgos:doc standard: theo một kế hoạch có sẵn, nhiều bước; self-check: có kế hoạch và hướng dẫn chi tiết?; e.g. code theo plan, viết test, refactor theo mô tả
-  # @fgos:doc advanced: tự tìm đường, không có đáp án sẵn; self-check: phải điều tra và quyết cách làm?; e.g. debug khó, code phức tạp, nhiều file không có plan
-  # @fgos:doc flagship: phán đoán, thiết kế, phê bình; self-check: kết quả là một ý kiến hay một thiết kế?; e.g. review, red-team, thiết kế giải pháp, synthesis của panel
-  # @fgos:doc frontier: quyết định đắt nhất; self-check: khó đảo, đắt nếu sai?; e.g. khoá kiến trúc, synthesis cuối của hội đồng quan trọng
+  # @fgos:doc nano: mechanical, no reasoning; self-check: only recognizes or transforms by pattern?; e.g. classify, extract, format, route, vote
+  # @fgos:doc mini: light reasoning over the given input, narrow scope; self-check: enough information, only understand and summarize?; e.g. summarize, answer from a given document, small exact fix, review a small diff
+  # @fgos:doc standard: follows an existing plan, many steps; self-check: is there a plan with detailed instructions?; e.g. code to a plan, write tests, refactor as described
+  # @fgos:doc advanced: finds its own way, no ready answer; self-check: must investigate and decide how?; e.g. hard debugging, complex code, many files with no plan
+  # @fgos:doc flagship: judgment, design, critique; self-check: is the result an opinion or a design?; e.g. review, red-team, solution design, panel synthesis
+  # @fgos:doc frontier: the costliest decisions; self-check: hard to reverse, costly if wrong?; e.g. architecture lock-in, final synthesis of an important council
   modelPolicies:
     claude:
       nano: haiku
@@ -739,12 +739,12 @@ runner:
         model: gpt-6-luna
         effort: high
     z-ai:
-      nano: ["thehive/zai-org/glm-5.3-flash@thehive", "z-ai/glm-5.3-flash@openrouter"]
-      standard: ["thehive/zai-org/glm-5.3-flash@thehive", "z-ai/glm-5.3-flash@openrouter"]
+      nano: "z-ai/glm-5.3-flash@openrouter"
+      standard: "z-ai/glm-5.3-flash@openrouter"
       advanced: "z-ai/glm-5.3@openrouter"
       flagship: "z-ai/glm-5.3@openrouter"
       frontier: "z-ai/glm-5.3@openrouter"
-      mini: ["thehive/zai-org/glm-5.3-flash@thehive", "z-ai/glm-5.3-flash@openrouter"]
+      mini: "z-ai/glm-5.3-flash@openrouter"
     xai:
       nano: grok-4.3
       standard: grok-4.3
@@ -753,26 +753,20 @@ runner:
       frontier: grok-4.7
       mini: grok-4.3
     deepseek:
-      nano:
-        - "thehive/deepseek-ai/deepseek-v4.1-flash-1017@thehive"
-        - "deepseek/deepseek-v4.1-flash@openrouter"
-      standard:
-        - "thehive/deepseek-ai/deepseek-v4.1-flash-1017@thehive"
-        - "deepseek/deepseek-v4.1-flash@openrouter"
+      nano: "deepseek/deepseek-v4.1-flash@openrouter"
+      standard: "deepseek/deepseek-v4.1-flash@openrouter"
       advanced: "deepseek/deepseek-v4-pro@openrouter"
       flagship: "deepseek/deepseek-v4-pro@openrouter"
       frontier: "deepseek/deepseek-v4-pro@openrouter"
-      mini:
-        - "thehive/deepseek-ai/deepseek-v4.1-flash-1017@thehive"
-        - "deepseek/deepseek-v4.1-flash@openrouter"
+      mini: "deepseek/deepseek-v4.1-flash@openrouter"
   # @fgos:doc The families a seat walks after a failure, per tier and in order.
   # @fgos:doc Tier ladder, weakest first:
-  # @fgos:doc nano: cơ học, không suy luận; self-check: chỉ nhận ra hoặc biến đổi theo mẫu?; e.g. classify, extract, format, route, vote
-  # @fgos:doc mini: suy luận nhẹ trên đầu vào cho sẵn, phạm vi hẹp; self-check: đủ thông tin, chỉ hiểu và tóm tắt?; e.g. tóm tắt, trả lời từ tài liệu cho, sửa nhỏ chính xác, review diff nhỏ
-  # @fgos:doc standard: theo một kế hoạch có sẵn, nhiều bước; self-check: có kế hoạch và hướng dẫn chi tiết?; e.g. code theo plan, viết test, refactor theo mô tả
-  # @fgos:doc advanced: tự tìm đường, không có đáp án sẵn; self-check: phải điều tra và quyết cách làm?; e.g. debug khó, code phức tạp, nhiều file không có plan
-  # @fgos:doc flagship: phán đoán, thiết kế, phê bình; self-check: kết quả là một ý kiến hay một thiết kế?; e.g. review, red-team, thiết kế giải pháp, synthesis của panel
-  # @fgos:doc frontier: quyết định đắt nhất; self-check: khó đảo, đắt nếu sai?; e.g. khoá kiến trúc, synthesis cuối của hội đồng quan trọng
+  # @fgos:doc nano: mechanical, no reasoning; self-check: only recognizes or transforms by pattern?; e.g. classify, extract, format, route, vote
+  # @fgos:doc mini: light reasoning over the given input, narrow scope; self-check: enough information, only understand and summarize?; e.g. summarize, answer from a given document, small exact fix, review a small diff
+  # @fgos:doc standard: follows an existing plan, many steps; self-check: is there a plan with detailed instructions?; e.g. code to a plan, write tests, refactor as described
+  # @fgos:doc advanced: finds its own way, no ready answer; self-check: must investigate and decide how?; e.g. hard debugging, complex code, many files with no plan
+  # @fgos:doc flagship: judgment, design, critique; self-check: is the result an opinion or a design?; e.g. review, red-team, solution design, panel synthesis
+  # @fgos:doc frontier: the costliest decisions; self-check: hard to reverse, costly if wrong?; e.g. architecture lock-in, final synthesis of an important council
   tierFallback:
     # @fgos:doc Families tried in this order after the primary fails. Default: ["gemini","deepseek","z-ai","claude","openai"].
     nano: [gemini, deepseek, z-ai, claude, openai]

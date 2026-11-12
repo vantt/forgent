@@ -7,12 +7,12 @@ herdrOrchestrator:
   # @fgos:why [9548be33-0b94-4fe0-b02c-5d5eb0240a61] [migrate] carried over from config.json, reason never recorded
   autoDiscover: true
 # @fgos:doc The runner: executors, capabilities, model policies, tier fallback, patterns and run limits.
-# nano: cơ học, không suy luận; self-check: chỉ nhận ra hoặc biến đổi theo mẫu?; e.g. classify, extract, format, route, vote
-# mini: suy luận nhẹ trên đầu vào cho sẵn, phạm vi hẹp; self-check: đủ thông tin, chỉ hiểu và tóm tắt?; e.g. tóm tắt, trả lời từ tài liệu cho, sửa nhỏ chính xác, review diff nhỏ
-# standard: theo một kế hoạch có sẵn, nhiều bước; self-check: có kế hoạch và hướng dẫn chi tiết?; e.g. code theo plan, viết test, refactor theo mô tả
-# advanced: tự tìm đường, không có đáp án sẵn; self-check: phải điều tra và quyết cách làm?; e.g. debug khó, code phức tạp, nhiều file không có plan
-# flagship: phán đoán, thiết kế, phê bình; self-check: kết quả là một ý kiến hay một thiết kế?; e.g. review, red-team, thiết kế giải pháp, synthesis của panel
-# frontier: quyết định đắt nhất; self-check: khó đảo, đắt nếu sai?; e.g. khoá kiến trúc, synthesis cuối của hội đồng quan trọng
+# nano: mechanical, no reasoning; self-check: only recognizes or transforms by pattern?; e.g. classify, extract, format, route, vote
+# mini: light reasoning over the given input, narrow scope; self-check: enough information, only understand and summarize?; e.g. summarize, answer from a given document, small exact fix, review a small diff
+# standard: follows an existing plan, many steps; self-check: is there a plan with detailed instructions?; e.g. code to a plan, write tests, refactor as described
+# advanced: finds its own way, no ready answer; self-check: must investigate and decide how?; e.g. hard debugging, complex code, many files with no plan
+# flagship: judgment, design, critique; self-check: is the result an opinion or a design?; e.g. review, red-team, solution design, panel synthesis
+# frontier: the costliest decisions; self-check: hard to reverse, costly if wrong?; e.g. architecture lock-in, final synthesis of an important council
 runner:
   # @fgos:doc The default executor a run spawns when no capability names one; detected from PATH when the project names none.
   executor:
@@ -195,12 +195,12 @@ runner:
   timeoutMs: 2100000
   # @fgos:doc The highest tier any seat may run at; absent means no ceiling. Values: nano | mini | standard | advanced | flagship | frontier.
   # @fgos:doc Tier ladder, weakest first:
-  # @fgos:doc nano: cơ học, không suy luận; self-check: chỉ nhận ra hoặc biến đổi theo mẫu?; e.g. classify, extract, format, route, vote
-  # @fgos:doc mini: suy luận nhẹ trên đầu vào cho sẵn, phạm vi hẹp; self-check: đủ thông tin, chỉ hiểu và tóm tắt?; e.g. tóm tắt, trả lời từ tài liệu cho, sửa nhỏ chính xác, review diff nhỏ
-  # @fgos:doc standard: theo một kế hoạch có sẵn, nhiều bước; self-check: có kế hoạch và hướng dẫn chi tiết?; e.g. code theo plan, viết test, refactor theo mô tả
-  # @fgos:doc advanced: tự tìm đường, không có đáp án sẵn; self-check: phải điều tra và quyết cách làm?; e.g. debug khó, code phức tạp, nhiều file không có plan
-  # @fgos:doc flagship: phán đoán, thiết kế, phê bình; self-check: kết quả là một ý kiến hay một thiết kế?; e.g. review, red-team, thiết kế giải pháp, synthesis của panel
-  # @fgos:doc frontier: quyết định đắt nhất; self-check: khó đảo, đắt nếu sai?; e.g. khoá kiến trúc, synthesis cuối của hội đồng quan trọng
+  # @fgos:doc nano: mechanical, no reasoning; self-check: only recognizes or transforms by pattern?; e.g. classify, extract, format, route, vote
+  # @fgos:doc mini: light reasoning over the given input, narrow scope; self-check: enough information, only understand and summarize?; e.g. summarize, answer from a given document, small exact fix, review a small diff
+  # @fgos:doc standard: follows an existing plan, many steps; self-check: is there a plan with detailed instructions?; e.g. code to a plan, write tests, refactor as described
+  # @fgos:doc advanced: finds its own way, no ready answer; self-check: must investigate and decide how?; e.g. hard debugging, complex code, many files with no plan
+  # @fgos:doc flagship: judgment, design, critique; self-check: is the result an opinion or a design?; e.g. review, red-team, solution design, panel synthesis
+  # @fgos:doc frontier: the costliest decisions; self-check: hard to reverse, costly if wrong?; e.g. architecture lock-in, final synthesis of an important council
   # @fgos:why [9548be33-0b94-4fe0-b02c-5d5eb0240a61] [migrate] carried over from config.json, reason never recorded
   maxTier: flagship
   # @fgos:doc Generated trees a unit write scope widens to when it touches their source. Default: [].
@@ -216,12 +216,12 @@ runner:
   idleTimeoutMs: 5400000
   # @fgos:doc The model each family uses at each tier, by family then tier.
   # @fgos:doc Tier ladder, weakest first:
-  # @fgos:doc nano: cơ học, không suy luận; self-check: chỉ nhận ra hoặc biến đổi theo mẫu?; e.g. classify, extract, format, route, vote
-  # @fgos:doc mini: suy luận nhẹ trên đầu vào cho sẵn, phạm vi hẹp; self-check: đủ thông tin, chỉ hiểu và tóm tắt?; e.g. tóm tắt, trả lời từ tài liệu cho, sửa nhỏ chính xác, review diff nhỏ
-  # @fgos:doc standard: theo một kế hoạch có sẵn, nhiều bước; self-check: có kế hoạch và hướng dẫn chi tiết?; e.g. code theo plan, viết test, refactor theo mô tả
-  # @fgos:doc advanced: tự tìm đường, không có đáp án sẵn; self-check: phải điều tra và quyết cách làm?; e.g. debug khó, code phức tạp, nhiều file không có plan
-  # @fgos:doc flagship: phán đoán, thiết kế, phê bình; self-check: kết quả là một ý kiến hay một thiết kế?; e.g. review, red-team, thiết kế giải pháp, synthesis của panel
-  # @fgos:doc frontier: quyết định đắt nhất; self-check: khó đảo, đắt nếu sai?; e.g. khoá kiến trúc, synthesis cuối của hội đồng quan trọng
+  # @fgos:doc nano: mechanical, no reasoning; self-check: only recognizes or transforms by pattern?; e.g. classify, extract, format, route, vote
+  # @fgos:doc mini: light reasoning over the given input, narrow scope; self-check: enough information, only understand and summarize?; e.g. summarize, answer from a given document, small exact fix, review a small diff
+  # @fgos:doc standard: follows an existing plan, many steps; self-check: is there a plan with detailed instructions?; e.g. code to a plan, write tests, refactor as described
+  # @fgos:doc advanced: finds its own way, no ready answer; self-check: must investigate and decide how?; e.g. hard debugging, complex code, many files with no plan
+  # @fgos:doc flagship: judgment, design, critique; self-check: is the result an opinion or a design?; e.g. review, red-team, solution design, panel synthesis
+  # @fgos:doc frontier: the costliest decisions; self-check: hard to reverse, costly if wrong?; e.g. architecture lock-in, final synthesis of an important council
   modelPolicies:
     # @fgos:doc The tiers of one family; a tier it omits has no model.
     deepseek:
