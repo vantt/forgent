@@ -9,7 +9,7 @@ import { execFileSync } from 'node:child_process';
 import { DOCTOR_CHECKS } from '../../src/setup/checks.mjs';
 import { checkAgentCliProjectTrusted } from '../../src/setup/agent-cli-trust.mjs';
 import { moveMachineKeysTo, writeProjectConfig } from '../helpers/config-fixture.mjs';
-import { seedStubAgentClis } from '../helpers/agent-clis.mjs';
+import { seedStubAgentClis, stubAgentCliDir } from '../helpers/agent-clis.mjs';
 
 seedStubAgentClis('codex');
 
@@ -181,17 +181,24 @@ test('the registered check reads the project config and the overridden HOME, nev
   }
 });
 
-test('a codex executor whose CLI is not installed is skipped, and a present CLI with no trust entry still fails', () => {
+test('a codex executor is skipped when codex is not installed, even with its confinement wrapper present, and fails when codex is installed without a trust entry', () => {
   const fixture = mkFixture();
+  const savedPath = process.env.PATH;
   try {
     const dir = codexHome(fixture.home, '.codex-cli-absent');
-    const withCommand = (command) => ({ openai: { ...codexExecutor(dir).openai, command } });
-    const absent = check(fixture, withCommand('/nonexistent-bin/codex'));
+    // A wrapped invocation: the program it starts is the wrapper, the trust store is codex's.
+    const wrapped = { openai: { ...codexExecutor(dir).openai, command: 'bwrap' } };
+    process.env.PATH = stubAgentCliDir('bwrap');
+    const absent = check(fixture, wrapped);
     assert.equal(absent.passed, true, absent.message);
     assert.equal(absent.status, 'skip');
     assert.match(absent.message, /codex not installed/);
-    const present = check(fixture, withCommand(process.execPath));
+    process.env.PATH = stubAgentCliDir('bwrap', 'codex');
+    const present = check(fixture, wrapped);
     assert.equal(present.passed, false, present.message);
     assert.match(present.message, /has no entry/);
-  } finally { cleanup(fixture); }
+  } finally {
+    process.env.PATH = savedPath;
+    cleanup(fixture);
+  }
 });

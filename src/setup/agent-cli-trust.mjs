@@ -18,6 +18,12 @@ import { readCodexTrust, readAgyTrust, defaultAgySettingsPath } from '../run-sup
 import { findAgySubHomes, resolveSubHomePath } from './agy-permissions.mjs';
 import { isCommandAvailable } from '../runner/paths.mjs';
 
+// The guarded CLI is the agent the trust store belongs to (a codex-toml store or CODEX_HOME is codex's, an agy
+// sub-home is agy's), found by that name or, when the config declares a path to it, by that path. The program an
+// invocation starts may be a confinement wrapper such as bwrap, which says nothing about whether the agent exists.
+const cliInstalled = (name, declaredCommand) => isCommandAvailable(name)
+  || (typeof declaredCommand === 'string' && path.basename(declaredCommand) === name && isCommandAvailable(declaredCommand));
+
 /** The config.toml of every codex home a configured executor runs under, deduplicated, each with
  * the executors that use it. A home is declared either by an executor's `codex-toml` trust store
  * or by a `CODEX_HOME` in its env. */
@@ -25,7 +31,7 @@ function codexConfigPaths(runnerConfig, homeDir, notInstalled) {
   const found = new Map();
   // A CLI this machine does not have shows no trust prompt, so its home is nobody's to judge.
   const note = (configPath, label, command) => {
-    if (typeof command === 'string' && !isCommandAvailable(command)) { notInstalled.add(path.basename(command)); return; }
+    if (!cliInstalled('codex', command)) { notInstalled.add('codex'); return; }
     if (!found.has(configPath)) found.set(configPath, new Set());
     found.get(configPath).add(label);
   };
@@ -94,9 +100,9 @@ export function checkAgentCliProjectTrusted(cwd, { loadRunnerConfig, homeDir = o
   const notInstalled = new Set();
   const codexHomes = codexConfigPaths(runnerConfig, homeDir, notInstalled);
   const agyHomes = findAgySubHomes(cwd, { homeDir, config: { runner: runnerConfig } }).filter(({ executorId }) => {
-    const command = runnerConfig?.executors?.[executorId]?.command;
-    if (typeof command === 'string' && !isCommandAvailable(command)) { notInstalled.add(path.basename(command)); return false; }
-    return true;
+    if (cliInstalled('agy', runnerConfig?.executors?.[executorId]?.command)) return true;
+    notInstalled.add('agy');
+    return false;
   });
   if (codexHomes.size === 0 && agyHomes.length === 0) {
     if (notInstalled.size > 0) {

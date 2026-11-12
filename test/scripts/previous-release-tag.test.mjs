@@ -30,6 +30,20 @@ test('the previous release of the current tree is v0.2.0-rc.5, whatever the non-
   assert.equal(previousReleaseTag(REPO_TAGS, 'v0.2.0-rc.6'), 'v0.2.0-rc.5');
 });
 
+test('a release published later than the candidate is never its previous release', () => {
+  // A hotfix of an older line cut after v0.2.0, and a newer version, both published.
+  const published = ['v0.1.0', 'v0.1.5', 'v0.2.0', 'v0.3.0'];
+  assert.equal(previousReleaseTag(published, 'v0.2.0'), 'v0.1.5');
+  assert.equal(previousReleaseTag([...REPO_TAGS, 'v0.3.0', 'v0.2.1'], 'v0.2.0-assets-check'), 'v0.2.0-rc.5');
+  assert.equal(previousReleaseTag([...REPO_TAGS, 'v0.3.0'], 'v0.2.0-rc.3'), 'v0.2.0-rc.2');
+  assert.equal(previousReleaseTag(['v0.3.0'], 'v0.2.0'), null);
+});
+
+test('a candidate that is not a release version is refused', () => {
+  assert.throws(() => previousReleaseTag(REPO_TAGS, 'main'), /semver/);
+  assert.throws(() => previousReleaseTag(REPO_TAGS, ''), /semver/);
+});
+
 test('the candidate itself is never its own previous release', () => {
   assert.equal(previousReleaseTag([...REPO_TAGS, 'v0.2.0-rc.6'], 'v0.2.0-rc.6'), 'v0.2.0-rc.5');
 });
@@ -75,4 +89,7 @@ test('the command prints the previous tag; exit 3 means no earlier release; a fa
   assert.match(broken.stderr, /Cannot list the published releases.*HTTP 401/);
 
   assert.equal(runCli([], 'true').status, 1);
+  const refused = runCli(['--candidate', 'not-a-version'], 'printf "v0.2.0\\n"');
+  assert.equal(refused.status, 1);
+  assert.match(refused.stderr, /semver/);
 });

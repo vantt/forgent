@@ -341,17 +341,31 @@ try {
             $beforeAct = Get-Content -LiteralPath $upActivation -Raw | ConvertFrom-Json
             Assert-True ($beforeAct.artifactDigest -eq $prevDigest) "the project is not on the $prevTag artifact (activation $($beforeAct.artifactDigest), asset $prevDigest)"
 
-            # The project's own config must survive the upgrade byte for byte.
-            $upConfig = @('config.yaml', 'config.json') | ForEach-Object { Join-Path $upProject ".fgos\$_" } | Where-Object { Test-Path -LiteralPath $_ } | Select-Object -First 1
-            Assert-True ([bool]$upConfig) "$prevTag fgctl init left no .fgos\config.yaml or config.json to prove survival with"
-            $configBefore = (Get-FileHash -LiteralPath $upConfig -Algorithm SHA256).Hash
+            # The project's own config must keep its effective values across the upgrade, whichever file
+            # format holds them afterwards: one non-standard key the proof sets and one the previous
+            # release wrote, in that release's legacy project file, read back through the candidate's
+            # `fgos config show --json`.
+            $upConfig = Join-Path $upProject '.fgos\config.json'
+            Assert-True (Test-Path -LiteralPath $upConfig) "$prevTag fgctl init left no .fgos\config.json to set the proof's keys in"
+            $legacy = Get-Content -LiteralPath $upConfig -Raw | ConvertFrom-Json
+            Assert-True ($legacy.ironLaw -and ($legacy.ironLaw.level -is [string])) "no ironLaw.level in the $prevTag config"
+            $legacy | Add-Member -NotePropertyName gateBypass -NotePropertyValue ([pscustomobject]@{ level = 'light' }) -Force
+            [IO.File]::WriteAllText($upConfig, (($legacy | ConvertTo-Json -Depth 10) + "`n"))
+            $keysBefore = "gateBypass.level=light ironLaw.level=$($legacy.ironLaw.level)"
 
             $r = Invoke-Native $fgctl @('upgrade', '--from', $fgosTar.FullName) $upProject
             Assert-True ($r.Code -eq 0) "candidate fgctl upgrade on a $prevTag project: $($r.Text)"
             $afterAct = Get-Content -LiteralPath $upActivation -Raw | ConvertFrom-Json
             Assert-True (($afterAct.artifactDigest -eq $manifest.artifactDigest) -and ($afterAct.artifactDigest -ne $beforeAct.artifactDigest)) "upgrade from $prevTag did not activate the candidate (before $($beforeAct.artifactDigest), after $($afterAct.artifactDigest), candidate $($manifest.artifactDigest))"
             Assert-True ($afterAct.previousArtifactDigest -eq $beforeAct.artifactDigest) "previousArtifactDigest after the upgrade is $($afterAct.previousArtifactDigest), expected $($beforeAct.artifactDigest)"
-            Assert-True ((Get-FileHash -LiteralPath $upConfig -Algorithm SHA256).Hash -eq $configBefore) "the project's $upConfig changed during the upgrade from $prevTag"
+            Push-Location -LiteralPath $upProject
+            try {
+                $shown = ((& (Join-Path $upProject '.fgos\installation\bin\fgos.cmd') config show --json) -join "`n") | ConvertFrom-Json
+            } finally {
+                Pop-Location
+            }
+            $keysAfter = "gateBypass.level=$($shown.data.value.gateBypass.level) ironLaw.level=$($shown.data.value.ironLaw.level)"
+            Assert-True ($keysBefore -eq $keysAfter) "the project's config values changed during the upgrade from $prevTag (before $keysBefore, after $keysAfter)"
             $r = Invoke-Native $fgctl @('verify') $upProject
             Assert-True ($r.Code -eq 0) "fgctl verify on the project upgraded from ${prevTag}: $($r.Text)"
             # The upgraded project reads its legacy config with no config row failing (no manual migration).
@@ -363,7 +377,7 @@ try {
             }
             $configFailing = @($upDoctor.data.checks | Where-Object { $_.status -eq 'fail' -and $_.id -like 'config-*' } | ForEach-Object { "$($_.id): $($_.message)" })
             Assert-True ($configFailing.Count -eq 0) "the project upgraded from $prevTag needs a manual config migration: $($configFailing -join ' | ')"
-            Write-Host "Upgrade proof passed: $prevTag ($($beforeAct.artifactDigest)) -> $version ($($afterAct.artifactDigest)), config kept."
+            Write-Host "Upgrade proof passed: $prevTag ($($beforeAct.artifactDigest)) -> $version ($($afterAct.artifactDigest)), config values kept."
         }
     }
 

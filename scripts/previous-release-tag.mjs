@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 /**
  * Resolves the release the external-consumer proof upgrades from: the newest
- * published release other than the candidate. Only tags that parse as release
+ * published release that precedes the candidate (a release published later, such
+ * as a hotfix of an older line or a newer version, is never the one to upgrade from). Only tags that parse as release
  * versions count, so `archive/*`, phase markers and other non-release tags never
  * qualify. Prints the tag; the proof logs it, so a wrong pick is visible.
  *
@@ -45,9 +46,18 @@ const isReleaseTag = (name) => {
   }
 };
 
-/** The newest release tag in `tags` other than `candidate`, or `null` when there is none. */
+// A pull-request proof packages the product's own version as `v<version>-assets-check`, which is the
+// unreleased `v<version>` for ordering; every other candidate orders as itself.
+const ASSETS_CHECK_SUFFIX = /-assets-check$/;
+
+/**
+ * The newest release tag in `tags` that precedes `candidate`, or `null` when none does.
+ * Throws when `candidate` is not a release version.
+ */
 export function previousReleaseTag(tags, candidate) {
-  const earlier = tags.filter((tag) => isReleaseTag(tag) && tag !== candidate);
+  parseReleaseVersion(candidate);
+  const position = candidate.replace(ASSETS_CHECK_SUFFIX, '');
+  const earlier = tags.filter((tag) => isReleaseTag(tag) && tag !== candidate && compareReleases(tag, position) < 0);
   return earlier.sort(compareReleases).at(-1) ?? null;
 }
 

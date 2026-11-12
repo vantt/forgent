@@ -408,17 +408,27 @@ else
       exit 1
     fi
 
-    # The project's own config (the file the previous release's init wrote) must survive the
-    # upgrade byte for byte; a previous release that wrote none is a broken proof, not a skip.
-    UPGRADE_CONFIG=""
-    for name in config.yaml config.json; do
-      if [ -z "$UPGRADE_CONFIG" ] && [ -f "$UPGRADE_PROJECT/.fgos/$name" ]; then UPGRADE_CONFIG="$UPGRADE_PROJECT/.fgos/$name"; fi
-    done
-    if [ -z "$UPGRADE_CONFIG" ]; then
-      echo "Step failed: $PREV_TAG fgctl init left no .fgos/config.yaml or config.json to prove survival with" >&2
+    # The project's own config must keep its effective values across the upgrade, whichever file
+    # format holds them afterwards. The proof sets one non-standard key and reads one the previous
+    # release wrote, in the legacy project file that release's init created, then reads both back
+    # through the candidate's `fgos config show --json`.
+    UPGRADE_CONFIG="$UPGRADE_PROJECT/.fgos/config.json"
+    if [ ! -f "$UPGRADE_CONFIG" ]; then
+      echo "Step failed: $PREV_TAG fgctl init left no .fgos/config.json to set the proof's keys in" >&2
       exit 1
     fi
-    CONFIG_BEFORE="$(sha256sum "$UPGRADE_CONFIG" | awk '{ print $1 }')"
+    CONFIG_KEYS_BEFORE="$(node -e '
+      const fs = require("node:fs");
+      const file = process.argv[1];
+      const config = JSON.parse(fs.readFileSync(file, "utf8"));
+      config.gateBypass = { ...config.gateBypass, level: "light" };
+      if (typeof config.ironLaw?.level !== "string") { console.error("no ironLaw.level in the previous release config"); process.exit(1); }
+      fs.writeFileSync(file, JSON.stringify(config, null, 2) + "\n");
+      console.log(JSON.stringify({ "gateBypass.level": config.gateBypass.level, "ironLaw.level": config.ironLaw.level }));
+    ' "$UPGRADE_CONFIG")" || {
+      echo "Step failed: recording the project config values before the upgrade" >&2
+      exit 1
+    }
 
     (cd "$UPGRADE_PROJECT" && "$FGCTL_BIN" upgrade --from "$FGOS_TARBALL") || {
       echo "Step failed: candidate fgctl upgrade --from the candidate asset, on a $PREV_TAG project" >&2
@@ -434,9 +444,19 @@ else
       echo "Step failed: previousArtifactDigest after the upgrade is $AFTER_PREV, expected $BEFORE_DIGEST" >&2
       exit 1
     fi
-    CONFIG_AFTER="$(sha256sum "$UPGRADE_CONFIG" | awk '{ print $1 }')"
-    if [ "$CONFIG_BEFORE" != "$CONFIG_AFTER" ]; then
-      echo "Step failed: the project's $UPGRADE_CONFIG changed during the upgrade from $PREV_TAG" >&2
+    CONFIG_KEYS_AFTER="$(cd "$UPGRADE_PROJECT" && PATH="$TEMP_INSTALL_DIR:$PATH" .fgos/installation/bin/fgos config show --json | node -e '
+      let d = "";
+      process.stdin.on("data", (c) => (d += c));
+      process.stdin.on("end", () => {
+        const value = JSON.parse(d).data.value;
+        console.log(JSON.stringify({ "gateBypass.level": value.gateBypass?.level, "ironLaw.level": value.ironLaw?.level }));
+      });
+    ')" || {
+      echo "Step failed: fgos config show --json on the project upgraded from $PREV_TAG" >&2
+      exit 1
+    }
+    if [ "$CONFIG_KEYS_BEFORE" != "$CONFIG_KEYS_AFTER" ]; then
+      echo "Step failed: the project's config values changed during the upgrade from $PREV_TAG (before $CONFIG_KEYS_BEFORE, after $CONFIG_KEYS_AFTER)" >&2
       exit 1
     fi
     (cd "$UPGRADE_PROJECT" && .fgos/installation/bin/fgos version --runtime-json >/dev/null) || {
@@ -462,7 +482,7 @@ else
       echo "Step failed: the project upgraded from $PREV_TAG needs a manual config migration" >&2
       exit 1
     }
-    echo "Upgrade proof passed: $PREV_TAG ($BEFORE_DIGEST) -> $FGCTL_TAG ($AFTER_DIGEST), config kept."
+    echo "Upgrade proof passed: $PREV_TAG ($BEFORE_DIGEST) -> $FGCTL_TAG ($AFTER_DIGEST), config values kept."
   fi
 fi
 
