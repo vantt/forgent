@@ -28,7 +28,7 @@ pub use repository_config::{
 };
 pub mod wal;
 use driver::WalReader;
-pub use driver::{main_checkout_root, GitDriver};
+pub use driver::{main_checkout_root, plain_path, GitDriver};
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 

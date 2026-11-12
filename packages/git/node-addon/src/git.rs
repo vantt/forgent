@@ -143,7 +143,7 @@ impl GitPublication {
             }
         };
         match method.as_str() {
-            "resolveRepo" => Ok(json!({"commonDir": repo.common_dir(), "trustedMainRoot": repo.trusted_main_root(), "objectFormat": repo.object_format()})),
+            "resolveRepo" => Ok(json!({"commonDir": plain_path(repo.common_dir()), "trustedMainRoot": plain_path(repo.trusted_main_root()), "objectFormat": repo.object_format()})),
             "writeBlob" => Ok(json!(port.write_blob(repo, &serde_json::from_value::<Vec<u8>>(args["bytes"].clone()).map_err(error)?).map_err(operation)?)),
             "writeTree" => {
                 let entries = args["entries"].as_array().ok_or_else(|| error("expected entries"))?.iter().map(|e| Ok(TreeEntry { name: text(e,"name")?.as_bytes().to_vec(), mode: e["mode"].as_u64().and_then(|n| u32::try_from(n).ok()).ok_or_else(|| error("expected mode"))?, oid: oid(text(e,"oid")?)? })).collect::<Result<Vec<_>>>()?;
@@ -275,7 +275,7 @@ pub fn inspect_git(
     }
     native_locks.sort();
     Ok(
-        json!({"floor":floor,"commonDir":repo.common_dir(),"layout":format!("{:?}",repo.layout()),"journal":journal,"activationFence":activation_fence,"nativeLocks":native_locks,"untrustedTransportConfig":driver.untrusted_transport_config(&repo).map_err(operation)?,"reservedLegacyRefs":reserved_legacy_refs,"obsoleteFetchMapping":mappings.iter().any(|f| f.value == obsolete.as_bytes()),"fetchRefspecs":mappings.into_iter().map(|f| String::from_utf8_lossy(&f.value).into_owned()).collect::<Vec<_>>(),"durability":"process-crash; file and parent sync; stable media not certified"}),
+        json!({"floor":floor,"commonDir":plain_path(repo.common_dir()),"layout":format!("{:?}",repo.layout()),"journal":journal,"activationFence":activation_fence,"nativeLocks":native_locks,"untrustedTransportConfig":driver.untrusted_transport_config(&repo).map_err(operation)?,"reservedLegacyRefs":reserved_legacy_refs,"obsoleteFetchMapping":mappings.iter().any(|f| f.value == obsolete.as_bytes()),"fetchRefspecs":mappings.into_iter().map(|f| String::from_utf8_lossy(&f.value).into_owned()).collect::<Vec<_>>(),"durability":"process-crash; file and parent sync; stable media not certified"}),
     )
 }
 #[napi]

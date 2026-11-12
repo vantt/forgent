@@ -114,7 +114,7 @@ impl GitInspect {
                 )
                 .map_err(operation)?)),
             "resolveRepo" => Ok(
-                json!({"commonDir":repo.common_dir(),"gitDir":repo.git_dir(),"worktreeRoot":repo.work_tree(),"trustedMainRoot":repo.trusted_main_root(),"objectFormat":repo.object_format()}),
+                json!({"commonDir":plain_path(repo.common_dir()),"gitDir":plain_path(repo.git_dir()),"worktreeRoot":repo.work_tree().map(plain_path),"trustedMainRoot":plain_path(repo.trusted_main_root()),"objectFormat":repo.object_format()}),
             ),
             "resolveCommit" => Ok(json!(self
                 .driver
