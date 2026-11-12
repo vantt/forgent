@@ -350,6 +350,13 @@ else
       exit 1
     fi
 
+    # A consumer upgrading has only the previous release's home and state; the candidate flow above
+    # wrote its own, and the two must not share one.
+    PROOF_HOME="$HOME"
+    HOME="$TMP_BASE/upgrade-home"
+    mkdir -p "$HOME"
+    export HOME
+
     PREV_DIR="$TMP_BASE/previous-release"
     mkdir -p "$PREV_DIR"
     set -- --dir "$PREV_DIR" \
@@ -430,7 +437,7 @@ else
       exit 1
     }
 
-    (cd "$UPGRADE_PROJECT" && "$FGCTL_BIN" upgrade --from "$FGOS_TARBALL") || {
+    (cd "$UPGRADE_PROJECT" && PATH="$TEMP_INSTALL_DIR:$PATH" "$FGCTL_BIN" upgrade --from "$FGOS_TARBALL") || {
       echo "Step failed: candidate fgctl upgrade --from the candidate asset, on a $PREV_TAG project" >&2
       exit 1
     }
@@ -482,6 +489,8 @@ else
       echo "Step failed: the project upgraded from $PREV_TAG needs a manual config migration" >&2
       exit 1
     }
+    HOME="$PROOF_HOME"
+    export HOME
     echo "Upgrade proof passed: $PREV_TAG ($BEFORE_DIGEST) -> $FGCTL_TAG ($AFTER_DIGEST), config values kept."
   fi
 fi

@@ -309,6 +309,14 @@ try {
             Assert-True ($prevTag -ne $version) "the previous release resolved to the candidate itself ($prevTag)"
             Write-Host "Upgrade proof: previous release $prevTag -> candidate $version"
             $target = 'x86_64-pc-windows-msvc'
+            # A consumer upgrading has only the previous release's home and state; the candidate flow above
+            # wrote its own, and the two must not share one.
+            $proofHome = @{ HOME = $env:HOME; USERPROFILE = $env:USERPROFILE; FGOS_STATE_HOME = $env:FGOS_STATE_HOME }
+            $upgradeHome = Join-Path $tmpBase 'upgrade-home'
+            New-Item -ItemType Directory -Path $upgradeHome | Out-Null
+            $env:HOME = $upgradeHome
+            $env:USERPROFILE = $upgradeHome
+            $env:FGOS_STATE_HOME = Join-Path $tmpBase 'upgrade-state'
             $prevDir = Join-Path $tmpBase 'previous-release'
             New-Item -ItemType Directory -Path $prevDir | Out-Null
             $download = @('release', 'download', $prevTag, '--dir', $prevDir,
@@ -377,6 +385,9 @@ try {
             }
             $configFailing = @($upDoctor.data.checks | Where-Object { $_.status -eq 'fail' -and $_.id -like 'config-*' } | ForEach-Object { "$($_.id): $($_.message)" })
             Assert-True ($configFailing.Count -eq 0) "the project upgraded from $prevTag needs a manual config migration: $($configFailing -join ' | ')"
+            $env:HOME = $proofHome.HOME
+            $env:USERPROFILE = $proofHome.USERPROFILE
+            $env:FGOS_STATE_HOME = $proofHome.FGOS_STATE_HOME
             Write-Host "Upgrade proof passed: $prevTag ($($beforeAct.artifactDigest)) -> $version ($($afterAct.artifactDigest)), config values kept."
         }
     }
