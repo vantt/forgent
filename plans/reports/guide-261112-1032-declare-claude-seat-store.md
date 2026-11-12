@@ -1,6 +1,6 @@
 # Hướng dẫn: khai tài khoản claude để seat claude trong sandbox có login riêng và giữ được transcript
 
-Dành cho: owner, trên máy owner (fg-server2 trước, rồi fg-server). Người viết: HARDEN (T9 P27). Trạng thái: **TẠM DỪNG theo quyết định owner (b): chưa thêm tài khoản `claude` cho tới khi big lead báo kết luận về việc xoay refresh token (xem báo cáo P27, mục "Refresh token")**. HARDEN không tự sửa tệp cấu hình nào của owner (`~/.fgos/config.*`, `.fgos/config.*`, `~/.fgos/private/*`).
+Dành cho: owner. **Tiến độ: fg-server2 đã xong (owner đăng nhập vào `~/.fgos/private/claude-login`, big lead thêm `runner.providers.claude.accounts.main` vào `~/.fgos/private/accounts.yaml`, 2026-11-12). Máy owner và fg-server còn phải làm.** Người viết: HARDEN (T9 P27). Trạng thái: **đã áp dụng trên fg-server2; chưa áp dụng trên máy owner và fg-server**. HARDEN không tự sửa tệp cấu hình nào của owner (`~/.fgos/config.*`, `.fgos/config.*`, `~/.fgos/private/*`).
 
 ## Chuyện gì thay đổi và vì sao
 

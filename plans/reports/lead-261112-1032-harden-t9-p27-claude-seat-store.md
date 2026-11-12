@@ -1,6 +1,6 @@
-# HARDEN T9 P27 - Claude seat store (owner decision 86 Q2 (a)) - DRAFT, not landed
+# HARDEN T9 P27 - Claude seat store (owner decision 86 Q2 (a))
 
-Branch `harden/t9-p27-claude-seat-store` (pushed). Landing waits for OPC's MERGE and the owner's go on the account block.
+Branch `harden/t9-p27-claude-seat-store`; the land range is on the board line. OPC MERGE on the code; the owner chose a dedicated fgOS claude login (decision b then a) and the account block is in place on fg-server2.
 
 ## What changed
 
@@ -10,6 +10,31 @@ Branch `harden/t9-p27-claude-seat-store` (pushed). Landing waits for OPC's MERGE
 - Docs: agent-confinement 13.1 point 4, run-supervisor layout row and decision line, runner RUL105 text, CHANGELOG. Owner guide drafted, now on hold.
 
 Reused: the credential-store copy and write-back path (`copyCredentialFiles`, `credentialWriteBackTarget`, finalize `sessionDir` copy from P26), the P05 claude layout and its "staged, never applied" rule, the codex/agy private-config seeding seam in `trustStorePaths`, `worker-home.mjs`'s onboarding file shape (prior art from `git log -S'CLAUDE_CONFIG_DIR'` and `-S'credentialStore'`). Missing and added: a config-dir spelling of the layout, the claude private-config seed, the env var below.
+
+## Changes after review
+
+- Second guard (OPC): `loginLifeProblem` refuses a claude seat whose login has less access-token life than the seat timeout (`login-expires-before-seat-timeout`, `bwrap.mjs` before the copy). The mailbox live harness's scratch claude login carried `expiresAt: 1` and the guard rightly refused it; the fixture now has a day of life.
+- `DEFAULT_SEAT_TIMEOUT_MS` (`confinement/resources.mjs`) is the one code fallback for the seat timeout; the owner of the value is `runner.timeoutMs` in the standard, pinned equal by a test. Read by `authority.mjs`, `bwrap.mjs`, `assignment-runner.mjs`, `effective-execution-contract.mjs`.
+- `operatorClaudeStorePath` (`trust-store.mjs`) is the one answer for the operator's claude store, used by `trustStorePaths`, the MCP approval in `authority.mjs`, and doctor `checkTrustStoreWritable`.
+- Account on the machine: a dedicated login in `~/.fgos/private/claude-login`, `runner.providers.claude.accounts.main` in the accounts file (legacy form like the other pools; doctor `llm-accounts-vs-legacy` lists it as a warning like z-ai and deepseek, no `llmAccounts` entry needed).
+- Backlog row `p-ti7prrwace` (Execution, high): the pane seat inherits the runner env against the allowlist.
+
+## Real-config probe (fg-server2, after the account block)
+
+| Invocation | Model | Result | Files | Bytes | Modes |
+|---|---|---|---|---|---|
+| `claude-cli-bwrap` | haiku | `kept` | 1 | 556 945 | files 0600, dirs 0700 |
+| `claude-herdr-bwrap` (pane) | haiku | `kept` | 1 | 686 347 | files 0600, dirs 0700 |
+
+No login file or `.claude.json` in either `protected/session/`; no home left under `/tmp/fgos-confinement`. Doctor `confined-pane-accounts` passes: claude `main` "has its 1 credential file(s)". The operator's `~/.claude/.credentials.json` hash prefixes are unchanged by all runs (refresh `2f2854bf32`, access `246eb431e1`; 168 min of life left at the last read): nothing refreshed. The dedicated login hashes (refresh `f541d25125`, access `cb28d9186d`, 467 min left) are the baseline for its own first natural refresh.
+
+Rotation of Anthropic's refresh token stays unknown (no refresh was observed in this window); the account is a dedicated login, so a rotation can no longer sign the operator out.
+
+## Verification
+
+- `cargo test -p fgos-config` and `-p fgos` green.
+- Full `npm test` (8761 tests): fails were the known V7n addendum, the document-identity citation-drift check (not this change; routed by the big lead), and two mailbox-live-confined cases caused by the new guard against the harness's `expiresAt: 1` login (fixed; the file passes alone, 19/19); its per-file timeout and one leftover `fgos-tp-*` directory followed from that failure.
+- Focused set, architecture, doc-health, one-door scan (0 undeclared) green.
 
 ## Facts
 
@@ -33,13 +58,12 @@ Nothing consumed: no seat ran on an expired copy, no refresh was forced. All eig
 
 ## Authority
 
+- Seat timeout: owner is `runner.timeoutMs` in the standard; the code constant is its fallback (one name). Operator claude store path: owner is `operatorClaudeStorePath`. Backlog `p-ti7prrwace` places the seat-environment finding with Execution.
+
 - Execution keeps the transcript; Config standard holds the store; no authority moved.
 - Found: the pane seat inherits the runner's environment (including `CLAUDE_CODE_MESSAGING_TOKEN`) while the worker env is meant to be an allowlist (`workerBaseEnv`). Where the pane gets it was not traced (runner process environment reaches the herdr pane, not the herdr server's). It belongs to Execution (seat launch); not fixed here. I worked around the one effect that matters here by declaring the env var on the invocation.
 - Two spellings of one claude layout exist only for the live mailbox harness; they go when that harness moves claude to `CLAUDE_CONFIG_DIR`.
 
-## Open before landing
-
-OPC review (confinement and credentials), the owner's go on the account block, `cargo test -p fgos-config` and `-p fgos`, full `npm test`, the real-config probe for both invocations, cleanup of worktree, branch and Cargo target.
 
 ## Lessons
 
