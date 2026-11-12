@@ -550,6 +550,8 @@ function claudeLayoutAt(name, file) {
   const layout = {
     name,
     files: [file],
+    // A copy holds the source's own refresh token, so a seat that refreshed inside its home would spend it.
+    seatMustNotRefresh: true,
     identity: () => null,
     read(home, { agent } = {}) {
       const parsed = readJsonFile(path.join(home, file), { agent });
@@ -603,6 +605,23 @@ export function credentialLayout(source) {
     if (source.files.includes(claudeHomeLayout.files[0])) return claudeHomeLayout.name;
   }
   return null;
+}
+
+/**
+ * Why a seat may not start on a copy of this login, or null. A login whose layout must never refresh inside a
+ * seat (`seatMustNotRefresh`: the copy carries the source's refresh token) needs more access-token life than the
+ * seat's timeout; otherwise the CLI would refresh in the home and spend the source's token. Judged on the source
+ * the copy is made from; unreadable or unjudgeable (no timeout) is the copy step's business, not a refusal here.
+ * Names and numbers only, never a token.
+ */
+export function loginLifeProblem(credentialSource, { timeoutMs, now = Date.now() } = {}) {
+  const layout = LAYOUTS[credentialLayout(credentialSource)];
+  const home = expandCredentialHome(credentialSource?.home);
+  if (!layout?.seatMustNotRefresh || !home || !Number.isFinite(timeoutMs)) return null;
+  const read = layout.read(home);
+  if (!read.ok) return null;
+  const leftMs = Math.min(...read.entries.map((entry) => entry.expiresMs)) - now;
+  return leftMs < timeoutMs ? `login-expires-before-seat-timeout: the login has ${Math.max(0, Math.round(leftMs / 60000))} min of access-token life left and the seat may run ${Math.round(timeoutMs / 60000)} min, so the seat would refresh it inside its home` : null;
 }
 
 /**

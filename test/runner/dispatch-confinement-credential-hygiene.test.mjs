@@ -113,6 +113,35 @@ test('a leased login still reaches the private home while the machine-private di
   } finally { f.cleanup(); }
 });
 
+// A claude login copy holds the same refresh token as its source. A seat whose copy expires before the seat
+// ends would refresh inside its home and spend the source's token, so such a seat is not started.
+test('a claude login copy with less access-token life than the seat timeout is refused before the seat starts, and nothing is copied', async () => {
+  const f = fixture();
+  try {
+    const login = (expiresAt) => fs.writeFileSync(path.join(f.accountHome, '.credentials.json'), JSON.stringify({ claudeAiOauth: { accessToken: 'placeholder', refreshToken: 'placeholder', expiresAt } }), { mode: 0o600 });
+    const source = { kind: 'home-files', home: f.accountHome, files: ['.credentials.json'] };
+    const requestFor = (dispatchId, timeoutMs) => ({
+      dispatchId,
+      executorId: 'claude-bwrap',
+      invocation: { command: 'claude', args: [], env: {}, credentialStore: { use: 'claude', homeEnv: 'CLAUDE_CONFIG_DIR', files: ['.credentials.json'] } },
+      providerCapacity: { provider: 'claude', accountId: 'a', credentialSource: source },
+      context: { cwd: os.tmpdir(), runDir: os.tmpdir(), timeoutMs },
+    });
+    const backend = { id: 'bwrap', type: 'bwrap', config: {} };
+
+    login(Date.now() + 10 * 60 * 1000);
+    const short = planFor(f.tempRoot, 'disp_claude_short');
+    await assert.rejects(prepareBwrap(short, requestFor('disp_claude_short', 35 * 60 * 1000), backend), /login-expires-before-seat-timeout/);
+    assert.equal(fs.existsSync(path.join(short.resources[0].hostTarget, '.credentials.json')), false, 'no login copy was made');
+
+    login(Date.now() + 3 * 60 * 60 * 1000);
+    const long = planFor(f.tempRoot, 'disp_claude_long');
+    const prepared = await prepareBwrap(long, requestFor('disp_claude_long', 35 * 60 * 1000), backend);
+    assert.equal(fs.existsSync(path.join(long.resources[0].hostTarget, '.credentials.json')), true);
+    await prepared.cleanup();
+  } finally { f.cleanup(); }
+});
+
 test('cleanup removes the home and the now-empty <dispatchId> directory', async () => {
   const f = fixture();
   try {

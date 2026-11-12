@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "5c4ab0e85548ae113bf6bda3d240050e53698e6b6f9dd356a5ac74adbbde8529",
+  "payloadDigest": "cbaadf88820c2a355e7be31dd509db14026ebcf9f1aca7c997ee67cfae41ec22",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -1008,7 +1008,7 @@
     "src/runner/dispatch/confinement/backend-registry.mjs": "91e15d2902b8fa8fcf0087b69de714b6651f906713ebf2969b18e0644993d7cd",
     "src/runner/dispatch/confinement/bypass-pairing.mjs": "93fc1f7a32b1513cf08bf6812a0d52d4b3744884c139d8e9277cf87c19e2fe01",
     "src/runner/dispatch/confinement/cleanup.mjs": "cc2eb8a96e4c605b1b93fb119fa7cb9d0d6e47cd64d2c5ac596f1105515c0204",
-    "src/runner/dispatch/confinement/drivers/bwrap.mjs": "a91fe5385e9ca2a32d11fd03bd63fc44395fbda06251ea0ba04d36903a012ac5",
+    "src/runner/dispatch/confinement/drivers/bwrap.mjs": "c6e558c0078ed3bd5a443bd3016cb8172724130931316de3c894dfcedacf7758",
     "src/runner/dispatch/confinement/policies.mjs": "b5007c0c0293f860ff0e71fe5a5a8bd0f29c8e1380131a9ab46243882b5aeb20",
     "src/runner/dispatch/confinement/probes/harness.mjs": "7ea51a10a96a29a288c838b09b5c53c15c092e98e72719908a9107c4d27f1243",
     "src/runner/dispatch/confinement/request.mjs": "bc482597e942044773334ccd6233db827f342fb77750a8d8229e04b8d3ab9964",
@@ -1029,7 +1029,7 @@
     "src/runner/dispatch/provider-auth-failure.mjs": "ad3d07cc29e54f6758694ed861afbf66fa30e6568905e9f9383ac7b6943f19f7",
     "src/runner/dispatch/provider-capacity.mjs": "eb7afe49114cafe10b6c2609b728311a59077fc158289f905d40512c7555c8fd",
     "src/runner/dispatch/provider-credential-probe.mjs": "38d1672ee49b732ad02e38362e02e22afab9bb6788c90fd69c3ec6a4d7c65959",
-    "src/runner/dispatch/provider-credential-renewal.mjs": "24f24f24755ea18de40b5b1b2d7194444dc0bb93b14c9af50271e5018cd589ce",
+    "src/runner/dispatch/provider-credential-renewal.mjs": "9c86bdfc0cfeed3478120fb0685b2d51a325763f947f50df8972e41fa2dd1136",
     "src/runner/dispatch/provider-session-probe.mjs": "95dc5e6542c2086ba14482bcf3ab6c9f036e4b8a9619ca814d3026284ccfbdf1",
     "src/runner/dispatch/reconciliation-planner.mjs": "470b4cc079d13accf997044c96dd037da3bcf41d89cb79427a248284e03ccf06",
     "src/runner/dispatch/recovery-planner.mjs": "cebf66e9c7cb427dfb7c6800cd4f0790a7185d70d2ea54cf0942fefca2f7ccc4",

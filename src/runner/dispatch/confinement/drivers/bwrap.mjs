@@ -13,7 +13,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import * as cleanup from '../cleanup.mjs';
 import { cleanupConfinementResource, writeOwnershipMarker, ensurePrivateDir, writeAttemptHomeRecord } from '../cleanup.mjs';
-import { copyCredentialFiles, credentialWriteBackTarget } from '../../provider-credential-renewal.mjs';
+import { copyCredentialFiles, credentialWriteBackTarget, loginLifeProblem } from '../../provider-credential-renewal.mjs';
 import { commandCli, credentialStoreOf, expandCredentialHome } from '../../provider-capacity.mjs';
 import { resolveConfinementResources, isInsideRoot, requestIsBlind } from '../resources.mjs';
 import { assertAttestationStoreIsolated } from '../attestation-store.mjs';
@@ -82,6 +82,8 @@ function provisionSelectedCredential(privateHomeTarget, request) {
     throw credentialError(`unsupported provider credential source kind "${source.kind}"`);
   }
   files = store.files ?? files;
+  const lifeProblem = loginLifeProblem(source, { timeoutMs: request?.context?.timeoutMs });
+  if (lifeProblem) throw credentialError(`account "${capacity.accountId}": ${lifeProblem}`);
   if (copyHomeFiles(privateHomeTarget, home, files).length === 0) {
     throw credentialError(`credential-store-empty: account "${capacity.accountId}" has none of [${files.join(', ')}] of store "${store.use}" under ${home}`);
   }
