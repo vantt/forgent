@@ -71,6 +71,19 @@
           "tier": "standard",
           "invocation": "cli-default",
           "leaseAccount": null
+        },
+        "output": {
+          "report": {
+            "path": "/fixture/project/.fgos/assignments/unit-run-1790000000000-00000004/producer/1/runs/01/outbox/report-1.md",
+            "bytes": 18,
+            "sha256": "505375800e2edf19de2c12c28df04d37778e30b23e4ab93a0c0d1d348d111d71"
+          },
+          "claim": {
+            "status": "done",
+            "summary": "producer finished"
+          },
+          "complete": true,
+          "incompleteReason": null
         }
       },
       {

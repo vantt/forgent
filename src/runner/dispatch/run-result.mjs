@@ -13,6 +13,20 @@ import path from 'node:path';
 import { isAssessmentRequired } from './agent-result-claim-contract.mjs';
 import { nativeDoor } from '../../native/door.mjs';
 
+/**
+ * An extensible copy of a settled (frozen) result that keeps its accessors (`status`, `confidence`) and
+ * non-enumerable links, which an object spread would drop, and adds `fields`.
+ */
+export function extendedRunResult(result, fields = {}) {
+  const descriptors = Object.getOwnPropertyDescriptors(result);
+  for (const descriptor of Object.values(descriptors)) {
+    descriptor.configurable = true;
+    if ('value' in descriptor) descriptor.writable = true;
+  }
+  for (const [name, value] of Object.entries(fields)) descriptors[name] = { value, enumerable: true, writable: true, configurable: true };
+  return Object.create(Object.getPrototypeOf(result), descriptors);
+}
+
 export const RUN_RESULT_CONTRACT = Object.freeze({ id: 'assignment-run-result', version: 3 });
 const RUN_RESULT_CONTRACT_V2 = Object.freeze({ id: 'assignment-run-result', version: 2 });
 export const EXECUTION_STATUSES = Object.freeze(['completed', 'failed', 'cancelled', 'completion-unknown']);

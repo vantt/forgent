@@ -122,10 +122,28 @@ function resolveUnitRunRef(input, mainRoot, seat, accept) {
  */
 export function reportDigest(unitRunId, seat, mainRoot) {
   const subject = `${UNIT_RUN_PREFIX}${unitRunId}/${seat}`;
-  const file = resolveUnitRunRef(subject, mainRoot, undefined, 'any');
+  return digestOfFile(subject, resolveUnitRunRef(subject, mainRoot, undefined, 'any'));
+}
+
+function digestOfFile(subject, file) {
   let bytes;
   try { bytes = fs.readFileSync(file); } catch (err) { throw new HandoffRefError(subject, `unreadable: ${err.message}`); }
   return { path: file, bytes: bytes.length, sha256: crypto.createHash('sha256').update(bytes).digest('hex') };
+}
+
+/**
+ * The report one attempt record left, as `reportDigest` reads it, or null when that attempt left none (its own
+ * record, not the seat's latest round). A report that cannot be read is also null: the attempt output says what
+ * was kept, and the declaration beside it says whether it is complete.
+ */
+export function reportDigestOf(record, mainRoot) {
+  const subject = `seat "${seatKeyOf(record)}" round ${record?.round}`;
+  try {
+    return digestOfFile(subject, reportRefOf(record, { mainRoot, accept: 'any' }));
+  } catch (err) {
+    if (err instanceof HandoffRefError) return null;
+    throw err;
+  }
 }
 
 /** The neutral name (without extension) of the nth anonymized input: seat-A ... seat-Z, seat-AA, ... */

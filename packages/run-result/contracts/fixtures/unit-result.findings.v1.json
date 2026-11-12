@@ -80,6 +80,19 @@
           "tier": "standard",
           "invocation": "cli-default",
           "leaseAccount": null
+        },
+        "output": {
+          "report": {
+            "path": "/fixture/project/.fgos/assignments/unit-run-1790000000000-00000002/producer/1/runs/01/outbox/report-1.md",
+            "bytes": 18,
+            "sha256": "505375800e2edf19de2c12c28df04d37778e30b23e4ab93a0c0d1d348d111d71"
+          },
+          "claim": {
+            "status": "done",
+            "summary": "producer finished"
+          },
+          "complete": true,
+          "incompleteReason": null
         }
       },
       {
@@ -128,6 +141,22 @@
           "tier": "standard",
           "invocation": "cli-default",
           "leaseAccount": null
+        },
+        "output": {
+          "report": {
+            "path": "/fixture/project/.fgos/assignments/unit-run-1790000000000-00000002/reviewer/1/runs/01/outbox/report-1.md",
+            "bytes": 18,
+            "sha256": "73c78b3b74e8b107aec8f8b194de70d5de7903669707502651f4ea1f7c6f6b51"
+          },
+          "claim": {
+            "status": "failed",
+            "summary": "findings",
+            "assessment": {
+              "verdict": "findings"
+            }
+          },
+          "complete": true,
+          "incompleteReason": null
         }
       }
     ]

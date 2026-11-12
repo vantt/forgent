@@ -11,7 +11,7 @@ import { recordCustodyHandoff } from '../../run-supervisor/cwd-lock.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
 import { resolveWorkerArtifactPath } from '../../run-supervisor/worker-artifacts.mjs';
-import { readSettledResult } from './run-result.mjs';
+import { readSettledResult, extendedRunResult } from './run-result.mjs';
 import {
   commitRunSettlement,
   settleRefusedLease,
@@ -488,19 +488,6 @@ export function digestPinnedInputs(pinInputs, mainRoot) {
       return { path: p, root, rel, sha256: null, warning: 'pin-unreadable' };
     }
   });
-}
-
-/**
- * An extensible copy of a settled result that keeps its accessors (`status`, `confidence`) and
- * non-enumerable links (`runResult`), which an object spread would drop.
- */
-function unfrozenCopy(result) {
-  const descriptors = Object.getOwnPropertyDescriptors(result);
-  for (const descriptor of Object.values(descriptors)) {
-    descriptor.configurable = true;
-    if ('value' in descriptor) descriptor.writable = true;
-  }
-  return Object.create(Object.getPrototypeOf(result), descriptors);
 }
 
 /**
@@ -1148,7 +1135,7 @@ async function awaitBinding(attempt, { envelope, settings, onChunk, timeoutMs })
 /** Record the settled answer on the attempt and return the copy `closeAttempt` freezes after the custody handoff. */
 function settledBy(attempt, settled) {
   attempt.settled = true;
-  attempt.result = unfrozenCopy(settled);
+  attempt.result = extendedRunResult(settled);
   return attempt.result;
 }
 

@@ -79,6 +79,12 @@
         "refused": {
           "reason": "write-consent-refused",
           "detail": "the case no longer allows this write"
+        },
+        "output": {
+          "report": null,
+          "claim": null,
+          "complete": false,
+          "incompleteReason": "no-report"
         }
       }
     ]

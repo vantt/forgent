@@ -75,6 +75,12 @@
           "tier": "standard",
           "invocation": "cli-default",
           "leaseAccount": null
+        },
+        "output": {
+          "report": null,
+          "claim": null,
+          "complete": false,
+          "incompleteReason": "no-report"
         }
       }
     ]

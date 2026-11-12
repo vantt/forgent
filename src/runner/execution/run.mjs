@@ -26,13 +26,13 @@ import { executeAssignment } from '../dispatch/assignment-runner.mjs';
 import { buildUnitRunAssignment } from '../dispatch/assignment.mjs';
 import { createCredentialProbe } from '../dispatch/provider-credential-probe.mjs';
 import { accountInventoryConfigOf, auditLeaseReceipt, dropAssignmentRecord } from '../dispatch/provider-capacity.mjs';
-import { LEASE_CONFLICT_FAILURE_CODE } from '../dispatch/run-result.mjs';
+import { LEASE_CONFLICT_FAILURE_CODE, extendedRunResult } from '../dispatch/run-result.mjs';
 import { loadRunnerConfigForDir } from '../dispatch/config.mjs';
 import { RunnerConfigError } from '../dispatch/runner-config-error.mjs';
 import { commitOnBranch, commitUnitWork, foreignIndexDetail, preflightUnitWorktree, recheckWriteConsent, seatRoundCommitArgs, settleCommitOperation } from './commit-unit-work.mjs';
 import { assertSyncResumable, commitRoundWithSync, effectiveWriteScope, runPendingSync, syncBrief, syncSummary } from './unit-sync.mjs';
 import { recordCustodyHandoff } from '../../run-supervisor/cwd-lock.mjs';
-import { reportRefsOf, resolveUnitInputs, copyHandoffsInto, refIsHiddenFromBlind, plainInputName, isSeatInput } from './handoff-refs.mjs';
+import { reportDigestOf, reportRefsOf, resolveUnitInputs, copyHandoffsInto, refIsHiddenFromBlind, plainInputName, isSeatInput } from './handoff-refs.mjs';
 import { outcomeOfRunResult, readUnitRunHistory } from './unit-run-history.mjs';
 import { writeUnitSummary } from './unit-summary.mjs';
 import { createCredentialRenewal } from '../dispatch/provider-credential-renewal.mjs';
@@ -411,11 +411,16 @@ export function activityOf({ unitRecord, assignmentsDir }, result) {
   return { turns: null, toolUses: null, transcriptPath: kept ? path.join(dir, kept) : null };
 }
 
-/** The settled RunResult is frozen and carries accessors (`status`, `confidence`) a spread would drop: the copy keeps them and adds `activity`. */
-const withActivity = (runResult, activity) => Object.create(Object.getPrototypeOf(runResult), {
-  ...Object.getOwnPropertyDescriptors(runResult),
-  activity: { value: activity, enumerable: true, writable: true, configurable: true },
-});
+/**
+ * What an attempt hands up of its work: the report it left (digest read by Execution), its claim, and whether the
+ * report is complete, which only Dispatch settlement declares. An attempt settled before the declaration existed
+ * has none, and reads as not known (no `output`).
+ */
+function outputOf({ mainRoot }, result) {
+  const declaration = result?.runResult?.reportDeclaration;
+  if (!declaration) return null;
+  return { report: reportDigestOf(result, mainRoot), claim: result.runResult.agentClaim ?? null, complete: declaration.complete, incompleteReason: declaration.incompleteReason };
+}
 
 /**
  * The one place the end of a Unit run becomes its record and its result: the scope rule and the verify round are
@@ -430,11 +435,15 @@ function finishUnit(ctx, { outcome, rounds, results = [], findings = [], ...rest
   const started = ruled.outcome !== 'pass' && noBriefDelivered(unitRecord)
     ? { value: false, reason: 'brief-not-delivered' }
     : { value: true, reason: null };
-  const attempts = results.map((result) => ({
-    ...result,
-    infrastructure: isInfrastructure(result?.outcome),
-    ...(result?.runResult ? { runResult: withActivity(result.runResult, activityOf(ctx, result)) } : {}),
-  }));
+  const attempts = results.map((result) => {
+    const output = outputOf(ctx, result);
+    return {
+      ...result,
+      infrastructure: isInfrastructure(result?.outcome),
+      ...(result?.runResult ? { runResult: extendedRunResult(result.runResult, { activity: activityOf(ctx, result) }) } : {}),
+      ...(output ? { output } : {}),
+    };
+  });
   const final = started.value ? ruled.outcome : NOT_STARTED_OUTCOME;
   return {
     unitRunId, outcome: final, rounds, results: attempts, findings,

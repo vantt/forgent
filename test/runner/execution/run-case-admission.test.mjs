@@ -687,3 +687,14 @@ test('a branch base that is not a branch, a commit and a list of paths is refuse
   }
   assert.deepEqual(assignmentsOf(repoRoot), []);
 });
+
+test('each attempt of a Unit run hands up the report the seat left, its claim and whether Dispatch declared the report complete', async () => {
+  const { repoRoot, worktreeDir } = setup();
+  const res = await runUnit({ unitData: { ...WRITE_UNIT, writes: [], objective: 'Read' }, caseAdmission: recordingPort(), caseRef: { caseId: 'case-test', activity: 'scout' }, repoRoot, cwd: worktreeDir, worktree: worktreeDir });
+  const { output } = res.results.at(-1);
+  assert.equal(output.complete, res.results.at(-1).runResult.reportDeclaration.complete);
+  assert.equal(output.incompleteReason, res.results.at(-1).runResult.reportDeclaration.incompleteReason);
+  assert.deepEqual(output.claim, res.results.at(-1).runResult.agentClaim ?? null);
+  if (output.complete) assert.deepEqual(Object.keys(output.report).sort(), ['bytes', 'path', 'sha256']);
+  else assert.equal(output.report, null);
+});

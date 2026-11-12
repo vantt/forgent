@@ -30,6 +30,16 @@ test('every outcome a reader can meet has a golden file, and each file is named 
   assert.ok(fixtures.some((f) => f.id === 'crash-recovered'));
 });
 
+/** A seat's output: complete is never null, and a reason names exactly the incomplete reports. */
+function assertOutputShape(output, where) {
+  assert.deepEqual(Object.keys(output), ['report', 'claim', 'complete', 'incompleteReason'], where);
+  assert.equal(typeof output.complete, 'boolean', where);
+  assert.equal(output.incompleteReason, output.complete ? null : output.incompleteReason, where);
+  if (!output.complete) assert.ok(['no-report', 'seat-did-not-finish'].includes(output.incompleteReason), where);
+  if (output.incompleteReason === 'no-report') assert.equal(output.report, null, where);
+  if (output.report) assert.deepEqual(Object.keys(output.report), ['path', 'bytes', 'sha256'], where);
+}
+
 test('every golden file carries every field Execution writes, with its shape', () => {
   for (const { name, data } of fixtures) {
     assert.equal(typeof data.unitRunId, 'string', name);
@@ -43,6 +53,8 @@ test('every golden file carries every field Execution writes, with its shape', (
     for (const result of data.results) {
       assert.equal(typeof result.infrastructure, 'boolean', `${name} ${result.seat}`);
       if (result.runResult) assert.deepEqual(Object.keys(result.runResult.activity), ['turns', 'toolUses', 'transcriptPath'], `${name} ${result.seat}`);
+      if (result.runResult) assertOutputShape(result.output, `${name} ${result.seat}`);
+      else assert.equal(result.output, undefined, `${name} ${result.seat}: a verify round has no seat output`);
     }
   }
 });

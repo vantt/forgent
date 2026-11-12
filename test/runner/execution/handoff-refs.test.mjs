@@ -8,7 +8,7 @@ import os from 'node:os';
 import path from 'node:path';
 import crypto from 'node:crypto';
 
-import { reportDigest, reportRefOf, reportRefsOf, resolveUnitInputs, copyHandoffsInto, refIsHiddenFromBlind, anonymousInputName, isSeatInput, HandoffRefError } from '../../../src/runner/execution/handoff-refs.mjs';
+import { reportDigest, reportDigestOf, reportRefOf, reportRefsOf, resolveUnitInputs, copyHandoffsInto, refIsHiddenFromBlind, anonymousInputName, isSeatInput, HandoffRefError } from '../../../src/runner/execution/handoff-refs.mjs';
 
 const resolveRefs = (inputs, root, options) => resolveUnitInputs(inputs, root, options).refs;
 const sha = (text) => crypto.createHash('sha256').update(text).digest('hex');
@@ -388,4 +388,12 @@ test('an own-seat input names its failure: a seat the earlier run did not have, 
   assert.equal(reasonOf('unit-run:unit-run-nope/{seat}', 'panelist-1'), 'no-such-run');
   fs.writeFileSync(path.join(runDir, 'report.md'), 'changed\n');
   assert.equal(reasonOf('unit-run:unit-run-a/{seat}', 'panelist-1'), 'report-changed-after-settle');
+});
+
+test('the report read of one attempt record digests that attempt\'s own report, and is null when the attempt left none', () => {
+  const root = makeRoot();
+  const { runDir, runResult } = settleAttempt(root, 'unit-run-a', 'producer', '1', { report: '# done\n' });
+  assert.deepEqual(reportDigestOf({ seat: 'producer', round: 1, runResult }, root), { path: path.join(runDir, 'report.md'), bytes: 7, sha256: sha('# done\n') });
+  const bare = settleAttempt(root, 'unit-run-b', 'producer', '1', {});
+  assert.equal(reportDigestOf({ seat: 'producer', round: 1, runResult: bare.runResult }, root), null);
 });

@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "cf08af0518aa2d71570e1e7935471ad220b62ae3299d8cb06da7f8ed474c67e5",
+  "payloadDigest": "c83c61c4f82c9a47bdfa2756aa1bd0b06aa44817e39160d75c1c748505051934",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -1001,7 +1001,7 @@
     "src/runner/dispatch/agent-result-claim-contract.mjs": "9f49db7dee60837452d1ba57b97863cb391d56197080e7e7f256e513672f1bec",
     "src/runner/dispatch/assignment-layout.mjs": "a14f6f1b45e7942181b7ee05b9bb4086fcd705004e70a237fc8c2d11c7e272d9",
     "src/runner/dispatch/assignment-normalizer.mjs": "1e1a922ad6d9ef2c9d8f0e7f6fec77d2c8b83b27ce9adfc8eaf3ec69e200ce6b",
-    "src/runner/dispatch/assignment-runner.mjs": "11cdb2c9f04148cda823b1d409e3d8507aa2d28efa8fc9d99237953139ab3fe3",
+    "src/runner/dispatch/assignment-runner.mjs": "cea782b440c28a7bb8204882800c699897bb31bcf949ebd13afe06947a3495b7",
     "src/runner/dispatch/assignment.mjs": "ae48427b5bc38db61d98b265e9ad7fd36d55f9a933085c988a8b695e5672501a",
     "src/runner/dispatch/brief.mjs": "c51d5398653cd6f839c2902134e627e57af7911b473fe16904478919c2d95e14",
     "src/runner/dispatch/cli.mjs": "80a084560ac0b40a03071b64fb5d5a12a4d51e568fdac141585ba218932eba35",
@@ -1038,7 +1038,7 @@
     "src/runner/dispatch/recovery-planner.mjs": "cebf66e9c7cb427dfb7c6800cd4f0790a7185d70d2ea54cf0942fefca2f7ccc4",
     "src/runner/dispatch/resolve.mjs": "1c60e114a1d9a277a9e90f7d3a214804df3e1c435d07cea0c66c8309557cc64e",
     "src/runner/dispatch/run-admission.mjs": "66e85923397ad83807e92ce21523d84c474bdf741da6d8259a6e2cdf3c769eed",
-    "src/runner/dispatch/run-result.mjs": "125ffdd4805fc3795e9b167986cdac396bd41664ca9aee8e63494fe5d3e9dd80",
+    "src/runner/dispatch/run-result.mjs": "db3622dd62af58d5e77c62682cfcf4cca06836dbbe1efa574a4ae35a6a6006ca",
     "src/runner/dispatch/run-timeout.mjs": "9d0bb5adca999cf689b8a0c6dce0cfc28f122de1393785fcb620f6f669086d40",
     "src/runner/dispatch/runner-config-error.mjs": "9671bbf3bd275167e8611ae5abe909c87e699a6583e7b7e7c2d519ee013d1c0e",
     "src/runner/dispatch/runtime-inspection.mjs": "b536d9b4fdfd9480915b6c84b8035b5345c9007f94e5b213361230f98f3f94e1",
@@ -1064,7 +1064,7 @@
     "src/runner/execution/custody-door.mjs": "46da4de9b5e7bffc7848cfa27f7ffa2e5f2c4b89e3c9fd035468fb3e01f8f637",
     "src/runner/execution/dry-bind.mjs": "94acf7f1b659f663e4d8727f4984d6a8fb577e984a79b69f158892eca6cbd07a",
     "src/runner/execution/explain.mjs": "9cdb1dca7c667feac6c3ae9989470b37f76046220816b0d3bea3fd13a127bf12",
-    "src/runner/execution/handoff-refs.mjs": "e32126f58e730c4df7cf7eca81d29936ae4b03899007af0e26430f5d4a1cbb17",
+    "src/runner/execution/handoff-refs.mjs": "ee8cc943132a9b25b6f2ea45efb9c462b5d591c8a93d6feabcf6dce107e3b318",
     "src/runner/execution/legacy-seat-read.mjs": "556f47c7d86f1be3a7c67784e98b0144ab578f60a8d9fc1cc07a599d00aba63e",
     "src/runner/execution/loops/debate.mjs": "952e40f982ec2e0eae4888cd46b85b2a462a93b459b42830c39311500ab87720",
     "src/runner/execution/loops/history-outcome.mjs": "f6eb9a25db6fa1164010588537bf92988687b4189c66c82a018a209a07916901",
@@ -1080,7 +1080,7 @@
     "src/runner/execution/patterns/catalog.mjs": "d95d8fc276930093c14d2a757b8cc5217cf20a21bd06b891f7c191ab905addce",
     "src/runner/execution/patterns/retired-keys.mjs": "c07f8407d169c7db410aba99db2b7bb1119f5a20ec7a7b63f8cb81d1324e0f40",
     "src/runner/execution/run-request.mjs": "e704b5658f03fae0ce279e31aaee560af3f9648e7f41d39863ce406a0bb03494",
-    "src/runner/execution/run.mjs": "4cb55e4d2f7ef73987609b786e3703f9eb798dd42468536d05d23275ce0027cc",
+    "src/runner/execution/run.mjs": "cbd201f68c71b3070ff1618ddc148552eef9b4674d16d2a6701f7cf6ead797c3",
     "src/runner/execution/seat-ledger.mjs": "e033ac97585dc96b22b35d69d361d96d04b2e2b84703bcde241442ec84e74680",
     "src/runner/execution/seat-policy.mjs": "6a0b9671a9ceb020be1e74d306ea2e277cb324244faf391e85feff10ee7d2eaf",
     "src/runner/execution/seat-resolver.mjs": "c8e35d90ea26588f0114f47876ac9798b68b6ea2b950f5bcf743828e86acfbe3",
@@ -3428,15 +3428,15 @@
     },
     {
       "path": "src/runner/dispatch/assignment-runner.mjs",
-      "line": 977,
+      "line": 964,
       "spawn": "prepareTerminalAttempt -> src/runner/dispatch/herdr-round.mjs:395",
       "binary": "(env FGOS_HERDR_BIN)",
       "class": "configured-binary"
     },
     {
       "path": "src/runner/dispatch/assignment-runner.mjs",
-      "line": 1471,
-      "spawn": "awaitBinding -> src/runner/dispatch/assignment-runner.mjs:1087",
+      "line": 1458,
+      "spawn": "awaitBinding -> src/runner/dispatch/assignment-runner.mjs:1074",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
     },
@@ -3464,14 +3464,14 @@
     },
     {
       "path": "src/runner/execution/run.mjs",
-      "line": 501,
+      "line": 510,
       "spawn": "runVerify -> src/runner/execution/custody-door.mjs:83",
       "binary": "(consumer verify command (cfg?.capabilities?.[unit?.capability]?.verify))",
       "class": "configured-binary"
     },
     {
       "path": "src/runner/execution/run.mjs",
-      "line": 501,
+      "line": 510,
       "spawn": "runVerify -> src/runner/execution/custody-door.mjs:83",
       "binary": "(consumer verify command (unit?.verify))",
       "class": "configured-binary"
