@@ -66,7 +66,7 @@ jobs:
 
       - name: Node tests for installers, launchers and release packaging
         run: >
-          node --test
+          node scripts/run-tests.mjs
           test/install/install-ps1.test.mjs
           test/install/install-sh.test.mjs
           test/rust-host/fgctl-init.test.mjs
