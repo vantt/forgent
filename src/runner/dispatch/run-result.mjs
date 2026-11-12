@@ -360,6 +360,7 @@ export function normalizeRunResultV3({
   inputDigests,
   claimSha256,
   settleReports = [],
+  reportDeclaration = null,
   runtime = {},
   agentClaim = null,
   claimInvalid = false,
@@ -584,6 +585,7 @@ export function normalizeRunResultV3({
     ...(Array.isArray(inputDigests) && inputDigests.length ? { inputDigests } : {}),
     ...(claimSha256 ? { claimSha256 } : {}),
     settleReports: settleReports ?? [],
+    ...(reportDeclaration ? { reportDeclaration } : {}),
     classification,
     runtime: {
       exitCode,
@@ -931,6 +933,7 @@ export function interpretRunResult(input, options = {}) {
     ...(Array.isArray(rawObj.inputDigests) ? { inputDigests: rawObj.inputDigests } : {}),
     ...(rawObj.claimSha256 ? { claimSha256: rawObj.claimSha256 } : {}),
     settleReports: rawObj.settleReports ?? [],
+    ...(rawObj.reportDeclaration ? { reportDeclaration: rawObj.reportDeclaration } : {}),
     classification: derivedClassification,
     status: legacyStatus,
     confidence: legacyConfidence,

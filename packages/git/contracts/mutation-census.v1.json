@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "2ec9a7fdccc1027ff00ea8f79e53dd04b0c1e2bb43f6442d340a79e0008f953a",
+  "payloadDigest": "cf08af0518aa2d71570e1e7935471ad220b62ae3299d8cb06da7f8ed474c67e5",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -1038,11 +1038,11 @@
     "src/runner/dispatch/recovery-planner.mjs": "cebf66e9c7cb427dfb7c6800cd4f0790a7185d70d2ea54cf0942fefca2f7ccc4",
     "src/runner/dispatch/resolve.mjs": "1c60e114a1d9a277a9e90f7d3a214804df3e1c435d07cea0c66c8309557cc64e",
     "src/runner/dispatch/run-admission.mjs": "66e85923397ad83807e92ce21523d84c474bdf741da6d8259a6e2cdf3c769eed",
-    "src/runner/dispatch/run-result.mjs": "56cd35cfcfa3373e4992252a5574d9125af8896e8540d1a0b5384892d9d096f5",
+    "src/runner/dispatch/run-result.mjs": "125ffdd4805fc3795e9b167986cdac396bd41664ca9aee8e63494fe5d3e9dd80",
     "src/runner/dispatch/run-timeout.mjs": "9d0bb5adca999cf689b8a0c6dce0cfc28f122de1393785fcb620f6f669086d40",
     "src/runner/dispatch/runner-config-error.mjs": "9671bbf3bd275167e8611ae5abe909c87e699a6583e7b7e7c2d519ee013d1c0e",
     "src/runner/dispatch/runtime-inspection.mjs": "b536d9b4fdfd9480915b6c84b8035b5345c9007f94e5b213361230f98f3f94e1",
-    "src/runner/dispatch/settlement.mjs": "6da3be93e46030d2f6b647b52c1590d988be4c72038ecebece8012d38dc43702",
+    "src/runner/dispatch/settlement.mjs": "d7b3ba57e08800f667012ff2e58cba8630694fce5c78933ad3f0c04a0676b719",
     "src/runner/dispatch/shipped-catalog.mjs": "ceb40e02a773598eebe4fc8db48e7400bfb76ce938df20268ce166f0539b8025",
     "src/runner/dispatch/stop-processes-inside.mjs": "018abac624d8a4f10d5ad6209db9f765134ce4e304688897df076dfa99e2864e",
     "src/runner/dispatch/terminal-slot.mjs": "a997ce7a1f76c280776e9da30ff1431a537f16094ff89560cd079a8010bcfdd5",

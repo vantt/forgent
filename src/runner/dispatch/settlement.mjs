@@ -542,6 +542,17 @@ export function settleRefusedLease({ refusal, provider, runDir, runId, repoRoot,
   });
 }
 
+/**
+ * Whether the report a seat left is complete, declared here because settlement is what reads the worker's own
+ * report: complete when a substantive report exists and the seat ended on its own (it wrote its claim, after
+ * the report, and was neither timed out nor killed). Never unknown: false carries its reason.
+ */
+function declareReport({ settleReports, agentClaim, isTimeout, signal }) {
+  if (settleReports.length === 0) return { complete: false, incompleteReason: 'no-report' };
+  if (isTimeout || signal || agentClaim === null) return { complete: false, incompleteReason: 'seat-did-not-finish' };
+  return { complete: true, incompleteReason: null };
+}
+
 /** Reads the agent's result claim and report from the run directory; a claim that fails validation is recorded as invalid. */
 function readWorkerArtifacts({ runDir, root, givenResultPath, assignment }) {
   const agentReportPath = resolveRunWorkerArtifactPath(runDir, /^report-(\d+)\.md$/, 'agent-report.md');
@@ -839,6 +850,7 @@ export async function settleRunOutcome({
     ...((inputDigests ?? runMeta?.inputDigests)?.length ? { inputDigests: inputDigests ?? runMeta.inputDigests } : {}),
     ...(claimSha256 ? { claimSha256 } : {}),
     settleReports,
+    reportDeclaration: declareReport({ settleReports, agentClaim, isTimeout, signal }),
     operation: assignment?.operation,
     isReadOnlyOperation: isReadOnly,
     ...(evidenceFacts.execStatus ? { execStatusOverride: evidenceFacts.execStatus } : {}),
