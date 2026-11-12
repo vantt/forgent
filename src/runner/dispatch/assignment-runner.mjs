@@ -55,8 +55,7 @@ import { withRunDirReadAccess } from './cli.mjs';
 import { mintAttemptWriterId, resolveWriterIdentity } from '../../util/session-identity.mjs';
 import { resolveExecutorEnv, workerBaseEnv, caseContextEnv, CASE_ID_ENV, CASE_RESERVATION_ENV } from './adapters.mjs';
 import { compileDispatchPlan, launchPinOf } from './plan.mjs';
-import { deriveProviderFamily } from './resolve.mjs';
-import { normalizeProviderFamily } from './provider-adapter.mjs';
+import { familyOf } from './provider-adapter.mjs';
 import { refuseWorkItemInput } from './work-item-input.mjs';
 import { stampDeclaredAssignment } from './assignment-normalizer.mjs';
 import { extractProtocolOperationStamp, normalizeSavedPolicyTier, resolveMutatingCwdPosture } from './execution-contract.mjs';
@@ -606,7 +605,7 @@ async function leaseAccountForAttempt({ cfg, opts, compiledPlan, effectivePolicy
   const boundPool = pin.pool && pin.executor === executorId ? pin.pool : null;
   const provider = boundPool
     ? legacyStateKey(boundPool)
-    : normalizeProviderFamily(effectivePolicy.providerModel || deriveProviderFamily(cfg.executors?.[executorId] ?? cfg.executor));
+    : legacyStateKey(effectivePolicy.providerModel || familyOf(cfg.executors?.[executorId] ?? cfg.executor));
   const leaseCli = declaredStoreCli(cfg, executorId, pinnedInvocationId);
   if (compiledPlan.mechanism !== 'out-of-process' || cfg.executors?.[executorId]?.kind === 'tool' || !hasProviderAccounts(cfg, provider)) {
     return { provider, selection: null, evidence: null };

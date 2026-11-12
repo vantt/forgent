@@ -5,7 +5,7 @@
 // read beside the provider account inventory the lease still uses. These checks only read.
 
 import { loadRunnerConfigForDir, MODEL_POLICY_TIERS } from '../runner/dispatch/config.mjs';
-import { deriveProviderFamily } from '../runner/dispatch/resolve.mjs';
+import { familyOf } from '../runner/dispatch/provider-adapter.mjs';
 import { parseTierCell, isExtendedTierCell } from '../runner/dispatch/tier-cell.mjs';
 import { readLlmAccounts, compareWithLegacyInventory, deriveLegacyInventory } from '../runner/dispatch/llm-accounts.mjs';
 import { isConfigRefusal, readMachineConfig } from '../config/facade.mjs';
@@ -30,7 +30,7 @@ export function checkExecutorFamilyUnique(cwd) {
   const byFamily = new Map();
   for (const [id, entry] of Object.entries(runnerConfig.executors ?? {})) {
     if (entry?.kind !== 'agent') continue;
-    const family = deriveProviderFamily(entry);
+    const family = familyOf(entry);
     byFamily.set(family, [...(byFamily.get(family) ?? []), id]);
   }
   const shared = [...byFamily].filter(([, ids]) => ids.length > 1);
@@ -118,13 +118,13 @@ export function checkTierFallback(cwd) {
   if (declared.length === 0) return { passed: true, message: 'runner.tierFallback not declared; every tier walks its capability prefer order after a failure' };
   const served = new Set();
   for (const entry of Object.values(runnerConfig.executors ?? {})) {
-    if (entry?.kind === 'agent') served.add(deriveProviderFamily(entry));
+    if (entry?.kind === 'agent') served.add(familyOf(entry));
   }
   const problems = MODEL_POLICY_TIERS.filter((tier) => runnerConfig.tierFallback[tier] === undefined).map((tier) => `${tier}: no list, so a seat at ${tier} has no walk after a failure`);
   for (const [tier, families] of declared) {
     for (const family of families) {
       if (runnerConfig.modelPolicies?.[family]?.[tier] === undefined) problems.push(`${tier}: ${family} has no modelPolicies cell at ${tier}`);
-      else if (!served.has(family)) problems.push(`${tier}: no agent executor serves ${family}`);
+      else if (!served.has(familyOf(family))) problems.push(`${tier}: no agent executor serves ${family}`);
     }
   }
   if (problems.length > 0) return { passed: true, message: `warning: tier fallback entries the walk skips: ${problems.join('; ')}` };

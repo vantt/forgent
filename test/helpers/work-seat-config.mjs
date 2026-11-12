@@ -4,7 +4,7 @@
 // has nothing to pin and no `prefer`, so `bindable` gives it the families its executors serve as the tier list.
 
 import { MODEL_POLICY_TIERS, withDefaultExecutor } from '../../src/runner/dispatch/config.mjs';
-import { deriveProviderFamily } from '../../src/runner/dispatch/resolve.mjs';
+import { familyOf } from '../../src/runner/dispatch/provider-adapter.mjs';
 
 
 export function bindable(input) {
@@ -27,7 +27,7 @@ function poolOf(input, expanded) {
   const loaded = expanded || !input.executor ? withDefaultExecutor(config) : config;
   const base = expanded ? loaded : config;
   if (input.executor) return base; // the default executor is the pin
-  const families = [...new Set(Object.entries(loaded.executors ?? {}).filter(([, entry]) => entry?.kind !== 'tool').map(([id, entry]) => entry?.providerModel ?? deriveProviderFamily(entry, entry?.command ?? id)))];
+  const families = [...new Set(Object.entries(loaded.executors ?? {}).filter(([, entry]) => entry?.kind !== 'tool').map(([id, entry]) => familyOf(entry, entry?.command ?? id)))];
   return { ...base, tierFallback: Object.fromEntries(MODEL_POLICY_TIERS.map((tier) => [tier, families])) };
 }
 

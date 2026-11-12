@@ -10,7 +10,7 @@
 // (the pool a first binding and a quota fallback both choose from), so nothing is dispatched, written
 // or paid for.
 
-import { explainSeat, getProviderFamily } from '../runner/execution/bind.mjs';
+import { explainSeat } from '../runner/execution/bind.mjs';
 import { simulateUnitBindings } from '../runner/execution/dry-bind.mjs';
 import { loadWorkflowDefinitions, withUnreadableDefinitions, workflowRoots, workflowUnitContract } from './workflow-definition-files.mjs';
 
@@ -56,7 +56,7 @@ function describeCandidate(runnerConfig, bound) {
   return {
     executor: bound.executor,
     invocation: bound.invocation,
-    family: getProviderFamily(runnerConfig, bound.executor),
+    family: bound.family,
     transport: TRANSPORT_BY_ADAPTER[invocation?.adapter] ?? 'unknown',
     backend: invocation?.confinement?.backend ?? 'none',
   };
@@ -73,13 +73,14 @@ function candidatesForRole(unit, seat, runnerConfig, session) {
     { runnerConfig, session: { headless: true, ...session } },
     { chain: false },
   );
-  const named = (c) => ({ executor: c.executor, invocation: c.invocation ?? null });
+  const named = (c) => ({ executor: c.executor, invocation: c.invocation ?? null, family: launchView?.executors[c.executor]?.family });
   return [
     ...(ranked?.candidates ?? []).map(named),
     // A family with no cell is dropped before posture is judged, so the executor must itself carry it.
     ...(ranked?.skipped ?? []).filter((skip) => CONFIG_GAPS.has(skip.reason) && launchView?.executors[skip.executor]?.defaultInvocation && !launchView.executors[skip.executor].disallowed).map((skip) => ({
       executor: skip.executor,
       invocation: launchView?.executors[skip.executor]?.defaultInvocation ?? null,
+      family: launchView?.executors[skip.executor]?.family,
     })),
   ].map((candidate) => describeCandidate(runnerConfig, candidate));
 }

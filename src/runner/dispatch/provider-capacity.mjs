@@ -7,8 +7,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { replaceDurably } from '../../native/door.mjs';
 import { readMachineAccounts } from '../../config/facade.mjs';
-import { normalizeProviderFamily } from './provider-adapter.mjs';
-import { deriveLegacyInventory } from './llm-accounts.mjs';
+import { deriveLegacyInventory, legacyStateKey } from './llm-accounts.mjs';
 import { resolveHolderLiveness, selfRecord } from '../../native/process-identity.mjs';
 import { acquire, acquireSync, createLockScope, lockHolders, resolveLock, resolveLockRoot, runBorrowed } from '../../holder-lock/index.mjs';
 
@@ -70,7 +69,7 @@ export function validateProviderAccountInventory(runnerConfig, sourceLabel = 'ru
     if (!provider || typeof provider !== 'string') {
       throw new ProviderCapacityConfigError(`runner config (${sourceLabel}.providers) provider id must be a non-empty string.`);
     }
-    const canonicalProvider = normalizeProviderFamily(provider) || provider;
+    const canonicalProvider = legacyStateKey(provider);
     if (normalized[canonicalProvider] !== undefined) {
       throw new ProviderCapacityConfigError(
         `runner config (${sourceLabel}.providers) declares both "${rawToNormalized[canonicalProvider]}" and "${provider}", which normalize to the same provider family "${canonicalProvider}" -- consolidate their accounts under one key.`,

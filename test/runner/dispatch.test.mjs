@@ -391,7 +391,7 @@ test('resolveExecutorCommand resolves command/args/provider from invocations[0] 
   assert.equal(resolved.command, 'agy');
   assert.deepEqual(resolved.args, ['-p', 'hello', '--model', 'sonnet']);
   assert.equal(resolved.adapter, 'cli-spawn');
-  assert.equal(resolved.provider, 'agy');
+  assert.equal(resolved.provider, 'gemini');
 });
 
 test('resolveExecutorCommand picks the invocation whose "via" is "cli" even when it is not invocations[0] (D9 Gate B2 — never invocations[0] blindly)', () => {
@@ -3048,7 +3048,7 @@ test('compileDispatchPlan builds a canonical DispatchPlan for all four selector 
   // resolveExecutorConfig output, not an approximation -- proves the plan
   // reuses the same resolution execution actually goes through.
   assert.deepEqual(plan1.governance, {
-    providerFamily: 'agy',
+    providerFamily: 'gemini',
     egress: { kind: 'cross-provider', target: 'agy', content: 'repo-content' },
   });
   assert.ok(plan1.reasonCodes.includes('native-first.0033.cli-spawn-shaped'));
@@ -3197,7 +3197,7 @@ test('compileDispatchPlan merges tier/model/providerModel/provenance/policy for 
   assert.equal(plan.bindingSource, 'executor-id');
   assert.equal(plan.tier, 'standard');
   assert.equal(plan.model, 'sonnet');
-  assert.equal(plan.providerModel, 'agy');
+  assert.equal(plan.providerModel, 'gemini');
   assert.equal(plan.provenance.executor.value, 'agy');
   assert.equal(plan.policy.executorId, 'agy');
 });

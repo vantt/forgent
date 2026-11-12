@@ -95,7 +95,6 @@ import { shippedCatalog } from '../runner/dispatch/shipped-catalog.mjs';
 import { checkCatalog } from '../runner/execution/patterns/catalog.mjs';
 import { deepEqual } from '../runner/execution/patterns/catalog-entries.mjs';
 import { detectRetiredPatternKeys, RESERVED_PATTERN_NAMES, SEAT_BINDING_MARKER_PATH, formatRetiredKeySentence } from '../runner/execution/patterns/retired-keys.mjs';
-import { deriveProviderFamily } from '../runner/dispatch/resolve.mjs';
 import { resolveMainCheckoutRoot } from '../runner/paths.mjs';
 import { capabilityEntriesOf, hasUsablePrefer } from '../runner/execution/seat-resolver.mjs';
 import { detectTrunk } from '../runner/worktree.mjs';
@@ -110,8 +109,8 @@ import { firstOnPath, inspectLauncher, writeLauncher } from './project-launcher.
 import { readConfig, readMachineConfig } from '../config/facade.mjs';
 import { CONFIG_CHECKS, CONFIG_FIXES, checkConfigOnce, isConfigDoorFailure } from './config-checks.mjs';
 import { retiredJsonAdvice } from './runner-config-conversion.mjs';
+import { legacyStateKey } from '../runner/dispatch/llm-accounts.mjs';
 import { inspectProviderCapacity, defaultProviderCapacityRuntimeDir, providerAccountInventory, credentialStoreOf, credentialSourceForCli } from '../runner/dispatch/provider-capacity.mjs';
-import { normalizeProviderFamily } from '../runner/dispatch/provider-adapter.mjs';
 import { inspectRetainedCredentialCopies, inspectPendingCopiesOverLimit, sweepInterruptedStagings, credentialWriteBackTarget, inventoryAccount, MAX_PENDING_COPIES } from '../runner/dispatch/provider-credential-renewal.mjs';
 import { resolveHerdrBin } from '../runner/dispatch/transport.mjs';
 import { createTerminalControl } from '../terminal-control/client.mjs';
@@ -2203,7 +2202,7 @@ export function checkConfinedPaneAccounts(runnerCfg = {}, providerInventory = un
       const store = credentialStoreOf(inv && { ...inv, command: inv.command ?? executor.command });
       if (!store) continue;
       const label = `executor "${id}" invocation "${inv.id ?? '?'}"`;
-      const provider = normalizeProviderFamily(executor.providerModel ?? executor.provider);
+      const provider = legacyStateKey(executor.providerModel ?? executor.provider);
       const providerEntry = Object.hasOwn(inventory, provider) ? inventory[provider] : undefined;
       const accountMap = providerEntry?.accounts;
       const accounts = accountMap && typeof accountMap === 'object' ? Object.keys(accountMap).filter((key) => Object.hasOwn(accountMap, key)).map((key) => accountMap[key]) : [];
