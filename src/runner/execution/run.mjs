@@ -417,13 +417,19 @@ function applyScopeRule({ unitRecord, mainRoot }, { outcome, results }) {
  * run directory, null when none was kept (the CLI wrote no session, or the seat has no credential store of its own).
  * Turns and tool uses have no source yet and read as null.
  */
-function activityOf({ unitRecord, assignmentsDir }, result) {
+export function activityOf({ unitRecord, assignmentsDir }, result) {
   const assignmentId = unitRecord.bindings?.[`${result.seat}/${result.round ?? 1}`]?.at(-1)?.assignmentId;
   const dir = assignmentId ? currentAttemptOf(assignmentsDir, assignmentId)?.dir : null;
   let kept = null;
   try { kept = JSON.parse(fs.readFileSync(path.join(dir, 'steps', 'finalize-home.json'), 'utf8')).detail?.transcriptPath ?? null; } catch { /* no step record: nothing was kept */ }
   return { turns: null, toolUses: null, transcriptPath: kept ? path.join(dir, kept) : null };
 }
+
+/** The settled RunResult is frozen and carries accessors (`status`, `confidence`) a spread would drop: the copy keeps them and adds `activity`. */
+const withActivity = (runResult, activity) => Object.create(Object.getPrototypeOf(runResult), {
+  ...Object.getOwnPropertyDescriptors(runResult),
+  activity: { value: activity, enumerable: true, writable: true, configurable: true },
+});
 
 /**
  * The one place the end of a Unit run becomes its record and its result: the scope rule and the verify round are
@@ -441,7 +447,7 @@ function finishUnit(ctx, { outcome, rounds, results = [], findings = [], ...rest
   const attempts = results.map((result) => ({
     ...result,
     infrastructure: isInfrastructure(result?.outcome),
-    ...(result?.runResult ? { runResult: { ...result.runResult, activity: activityOf(ctx, result) } } : {}),
+    ...(result?.runResult ? { runResult: withActivity(result.runResult, activityOf(ctx, result)) } : {}),
   }));
   const final = started.value ? ruled.outcome : NOT_STARTED_OUTCOME;
   return {

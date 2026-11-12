@@ -10,7 +10,7 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 
 import { ensureScriptAddon } from '../../../scripts/lib/git-ports.mjs';
-import { runUnit } from '../../../src/runner/execution/run.mjs';
+import { runUnit, activityOf } from '../../../src/runner/execution/run.mjs';
 import { shippedCatalog } from '../../../src/runner/dispatch/shipped-catalog.mjs';
 import { runReviewed } from '../../../src/runner/execution/loops/reviewed.mjs';
 import { seatLaunchesOf, seatLaunchesUsed, briefNeverReached, noBriefDelivered, CaseAdmissionRefusedError } from '../../../src/runner/execution/case-admission-port.mjs';
@@ -619,6 +619,17 @@ test('a Unit run hands up its final outcome with the facts it stands on: infrast
   assert.deepEqual(factsOf(res), goldenFacts('pass'));
   assert.deepEqual([res.settled, res.warnings], [{ unit: true, case: true }, []]);
   assert.deepEqual(res.results.map((r) => [r.seat, r.outcome, r.infrastructure]), [['producer', 'pass', false], ['verify', 'pass', false]]);
+  // The attempt keeps its RunResult accessors and gains the activity; nothing was kept for a seat with no session.
+  const producerRun = res.results[0].runResult;
+  assert.deepEqual(producerRun.activity, { turns: null, toolUses: null, transcriptPath: null });
+  assert.equal(typeof producerRun.confidence, 'string');
+  // The transcript Execution kept in the attempt's run directory is named by its absolute path.
+  const record = unitJson(repoRoot, res.unitRunId);
+  const assignmentsDir = path.join(repoRoot, '.fgos', 'assignments');
+  const runDir = path.join(assignmentsDir, record.bindings['producer/1'][0].assignmentId, 'runs', '01');
+  fs.mkdirSync(path.join(runDir, 'steps'), { recursive: true });
+  fs.writeFileSync(path.join(runDir, 'steps', 'finalize-home.json'), JSON.stringify({ detail: { transcriptPath: 'protected/session' } }));
+  assert.equal(activityOf({ unitRecord: record, assignmentsDir }, res.results[0]).transcriptPath, path.join(runDir, 'protected', 'session'));
   // The port settles with the same shape, carrying its contract.
   const settle = settledOf(port);
   assert.deepEqual(settle.contract, { id: 'unit-run-result', version: 1 });
