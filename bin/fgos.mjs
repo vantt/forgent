@@ -114,7 +114,7 @@ import { DEFAULT_DOMAIN, getDomain, stepForPhase, domainSteps, effectiveStep, re
 import { MANIFEST_SCHEMA_VERSION, COMMAND_REGISTRY, declared } from '../src/cli/command-registry.mjs';
 import { recordInvocationFault } from '../src/observe/invocation-fault-log.mjs';
 import { computeAwaitingContext } from '../src/state/awaiting-context.mjs';
-import { readConfig, initConfigFile } from '../src/config/facade.mjs';
+import { readConfig } from '../src/config/facade.mjs';
 import { countWorkerSlots, hasWorkerSlotRoom } from '../src/state/worker-slots.mjs';
 import { assessCleanupReadiness, blockedItemsNowResolvable } from '../src/state/cleanup-harness.mjs';
 import { formatCheck, bold } from '../src/setup/ansi.mjs';
@@ -3685,12 +3685,6 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
           written: [],
         };
       }
-      // Each scope gets its header-only config file when it has none (a legacy config.json counts as
-      // present: it is migrated, never shadowed). Nothing else is written; the standard supplies every value.
-      const { created: configCreated, file: configFile } = initConfigFile({ projectRoot: repoRoot, target: 'project' });
-      const configPath = path.join(repoRoot, '.fgos', configFile);
-      const { created: globalConfigCreated, file: globalConfigFile } = initConfigFile({ projectRoot: repoRoot, target: 'global' });
-      const globalConfigPath = path.join(os.homedir(), '.fgos', globalConfigFile);
       // str65-6/str88: wires core.hooksPath the same way `npm run setup:hooks`
       // does — a second, non-npm-lifecycle-dependent activation path for the
       // main-checkout lock hook, since pnpm 10+ blocks `prepare` for a
@@ -3731,10 +3725,6 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         ...(rcWriteDeclinedReason !== null && { rcWriteDeclinedReason }),
         runnerPatternsConversion,
         ...(globalRetiredNotice && { globalRetiredNotice }),
-        configPath,
-        configCreated,
-        globalConfigPath,
-        globalConfigCreated,
         hooksWired,
         hooksSkippedExisting,
         dispatchDecideHookWired,
@@ -4213,9 +4203,6 @@ function renderPretty(verb, data) {
     if (data.rcWriteDeclinedReason) {
       lines.push(formatCheck(false, 'skipped shell-profile line', data.rcWriteDeclinedReason));
     }
-    lines.push(
-      formatCheck(true, data.configCreated ? 'created .fgos/config.yaml' : 'config already present', data.configPath),
-    );
     lines.push(
       formatCheck(
         data.hooksWired,

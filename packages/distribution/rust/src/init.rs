@@ -157,6 +157,8 @@ pub enum InitError {
     Preflight(String),
     #[error("tail command '{cmd}' failed with status {status}")]
     TailFailed { cmd: String, status: i32 },
+    #[error("not ready: the checks listed above need you")]
+    NotReady,
     #[error("{0}")]
     Fetch(#[from] crate::fetch::FetchError),
     #[error("io error: {0}")]
@@ -555,50 +557,227 @@ pub fn publish_activation_file(
     Ok(())
 }
 
-/// Runs the post-activation tail: `init`, `doctor --fix`, `doctor` (R8).
+/// Whether the release the tail runs for was just activated or was already
+/// the active one (the closing block says which).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum TailOutcome {
+    Activated,
+    AlreadyCurrent,
+}
+
+/// What the closing block says about the active release.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ReadyFacts {
+    pub tag: Option<String>,
+    pub digest12: String,
+    pub already_current: bool,
+    /// How the user types `fgos`: bare, or the launcher's absolute path when
+    /// its directory is not on PATH.
+    pub run_command: String,
+}
+
+/// The closing block of init, upgrade and repair, and whether it reports a
+/// ready workspace.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ClosingBlock {
+    pub text: String,
+    pub ready: bool,
+}
+
+/// First twelve characters of a digest, without its `sha256:` prefix.
+pub fn short_digest(digest: &str) -> String {
+    digest
+        .strip_prefix("sha256:")
+        .unwrap_or(digest)
+        .chars()
+        .take(12)
+        .collect()
+}
+
+/// The command a user types to run `fgos`: bare when the directory holding
+/// the launcher (beside `fgctl`) is on PATH, its absolute path otherwise.
+pub fn run_command(launcher_dir: Option<&Path>, path_var: Option<&std::ffi::OsStr>) -> String {
+    let name = if cfg!(windows) { "fgos.cmd" } else { "fgos" };
+    let Some(dir) = launcher_dir else {
+        return "fgos".to_string();
+    };
+    let same = |a: &Path, b: &Path| {
+        a == b || matches!((a.canonicalize(), b.canonicalize()), (Ok(x), Ok(y)) if x == y)
+    };
+    let on_path = path_var.is_some_and(|v| std::env::split_paths(v).any(|p| same(&p, dir)));
+    if on_path {
+        return "fgos".to_string();
+    }
+    let full = dir.join(name).display().to_string();
+    if full.contains(char::is_whitespace) {
+        format!("\"{full}\"")
+    } else {
+        full
+    }
+}
+
+/// Builds the closing block from `fgos doctor --json` output: `Ready` plus one
+/// runnable next step when `ok`, otherwise a numbered list of the failing
+/// checks, each with its fix command (or its message when only a person can
+/// fix it). Output that is not a doctor result is an error, never a guess.
+pub fn closing_block(doctor_stdout: &str, facts: &ReadyFacts) -> Result<ClosingBlock, String> {
+    let not_doctor =
+        |why: &str| format!("fgos doctor --json did not return a doctor result ({why})");
+    let value: serde_json::Value =
+        serde_json::from_str(doctor_stdout).map_err(|e| not_doctor(&e.to_string()))?;
+    let data = value.get("data").unwrap_or(&value);
+    let ok = data
+        .get("ok")
+        .and_then(|v| v.as_bool())
+        .ok_or_else(|| not_doctor("no boolean `ok`"))?;
+    let tag = facts
+        .tag
+        .as_deref()
+        .map(|t| format!("fgOS {t}"))
+        .unwrap_or_else(|| "fgOS".to_string());
+    if ok {
+        let first = if facts.already_current {
+            format!("Ready: already up to date at {} ({tag})", facts.digest12)
+        } else {
+            format!("Ready: {tag} active ({})", facts.digest12)
+        };
+        return Ok(ClosingBlock {
+            text: format!("{first}\nNext: {} run \"<prompt>\"\n", facts.run_command),
+            ready: true,
+        });
+    }
+    let checks = data
+        .get("checks")
+        .and_then(|v| v.as_array())
+        .ok_or_else(|| not_doctor("no `checks` list"))?;
+    let lines: Vec<String> = checks
+        .iter()
+        .filter(|c| c.get("status").and_then(|s| s.as_str()) == Some("fail"))
+        .map(|c| {
+            let id = c.get("id").and_then(|v| v.as_str()).unwrap_or("?");
+            let what = c
+                .get("fix")
+                .and_then(|v| v.as_str())
+                .or_else(|| c.get("message").and_then(|v| v.as_str()))
+                .unwrap_or("see fgos doctor");
+            format!("{id}: {}", what.lines().next().unwrap_or(what))
+        })
+        .collect();
+    if lines.is_empty() {
+        return Err(not_doctor("`ok` is false but no check fails"));
+    }
+    let head = if lines.len() == 1 {
+        "1 check needs you:".to_string()
+    } else {
+        format!("{} checks need you:", lines.len())
+    };
+    let mut text = format!("{head}\n");
+    for (i, line) in lines.iter().enumerate() {
+        text.push_str(&format!("  {}. {line}\n", i + 1));
+    }
+    Ok(ClosingBlock { text, ready: false })
+}
+
+/// Facts for the Ready line, read from what activation just wrote.
+fn ready_facts(
+    workspace_root: &Path,
+    store_root: &Path,
+    outcome: TailOutcome,
+) -> Result<ReadyFacts, InitError> {
+    let fgos_dir = workspace_root.join(".fgos");
+    let activation: WorkspaceActivationBinding = serde_json::from_str(&std::fs::read_to_string(
+        fgos_dir.join("installation").join("activation.json"),
+    )?)?;
+    let pin_tag = read_tracked_pin(&fgos_dir.join("distribution.json"))?
+        .filter(|p| p.project_runtime.artifact_digest == activation.artifact_digest)
+        .and_then(|p| p.project_runtime.release_version);
+    let tag = match pin_tag {
+        Some(t) => Some(t),
+        None => read_manifest_from_dir(&release_dir_path(store_root, &activation.artifact_digest))
+            .ok()
+            .and_then(|m| m.release_version),
+    };
+    let launcher_dir = std::env::current_exe()
+        .ok()
+        .and_then(|exe| exe.parent().map(Path::to_path_buf));
+    Ok(ReadyFacts {
+        tag: tag.map(|t| normalize_pin_tag(&t)),
+        digest12: short_digest(&activation.artifact_digest),
+        already_current: outcome == TailOutcome::AlreadyCurrent,
+        run_command: run_command(launcher_dir.as_deref(), std::env::var_os("PATH").as_deref()),
+    })
+}
+
+/// Runs one tail step through the workspace launcher and returns its stdout.
+/// A step that cannot start or exits non-zero marks the transaction degraded,
+/// shows what it printed on stderr and fails with its exit code.
+fn run_tail_step(
+    workspace_root: &Path,
+    shim_path: &Path,
+    tx_path: &Path,
+    args: &[&str],
+) -> Result<Vec<u8>, InitError> {
+    let cmd_name = args.join(" ");
+    // A Windows host runs the `.cmd` form: no `sh` is assumed there.
+    let launcher = tail_shim_path(shim_path, cfg!(windows));
+    let output = match Command::new(launcher)
+        .args(args)
+        .current_dir(workspace_root)
+        .output()
+    {
+        Ok(o) => o,
+        Err(e) => {
+            mark_transaction_status(tx_path, "ready-degraded")?;
+            eprintln!("Error executing shim tail '{}': {}", cmd_name, e);
+            return Err(InitError::TailFailed {
+                cmd: cmd_name,
+                status: 1,
+            });
+        }
+    };
+    if !output.status.success() {
+        mark_transaction_status(tx_path, "ready-degraded")?;
+        let mut err = std::io::stderr();
+        let _ = err.write_all(&output.stdout);
+        let _ = err.write_all(&output.stderr);
+        return Err(InitError::TailFailed {
+            cmd: cmd_name,
+            status: output.status.code().unwrap_or(1),
+        });
+    }
+    Ok(output.stdout)
+}
+
+/// Runs the post-activation tail: `init`, `doctor --fix`, then `doctor --json`
+/// whose result becomes the closing block on stdout (R8). The first two steps
+/// are plumbing; their output is shown on stderr only when they fail. A doctor
+/// result that is not ok ends the command with [`InitError::NotReady`].
 pub fn run_tail(
     workspace_root: &Path,
     shim_path: &Path,
     store_root: &Path,
     activation_id: &str,
+    outcome: TailOutcome,
 ) -> Result<(), InitError> {
-    let commands = [vec!["init"], vec!["doctor", "--fix"], vec!["doctor"]];
-
     let tx_path = store_root
         .join("installs")
         .join(format!("{}.json", activation_id));
 
-    for cmd_args in commands {
-        let cmd_name = cmd_args.join(" ");
-        // A Windows host runs the `.cmd` form: no `sh` is assumed there.
-        let launcher = tail_shim_path(shim_path, cfg!(windows));
-        let mut cmd = Command::new(launcher);
-        cmd.args(&cmd_args).current_dir(workspace_root);
+    run_tail_step(workspace_root, shim_path, &tx_path, &["init"])?;
+    run_tail_step(workspace_root, shim_path, &tx_path, &["doctor", "--fix"])?;
+    let doctor = run_tail_step(workspace_root, shim_path, &tx_path, &["doctor", "--json"])?;
 
-        let output = match cmd.output() {
-            Ok(o) => o,
-            Err(e) => {
-                mark_transaction_status(&tx_path, "ready-degraded")?;
-                eprintln!("Error executing shim tail '{}': {}", cmd_name, e);
-                return Err(InitError::TailFailed {
-                    cmd: cmd_name,
-                    status: 1,
-                });
-            }
-        };
-
-        if !output.status.success() {
-            mark_transaction_status(&tx_path, "ready-degraded")?;
-            let _ = std::io::stdout().write_all(&output.stdout);
-            let _ = std::io::stderr().write_all(&output.stderr);
-            let code = output.status.code().unwrap_or(1);
-            return Err(InitError::TailFailed {
-                cmd: cmd_name,
-                status: code,
-            });
-        }
+    let facts = ready_facts(workspace_root, store_root, outcome)?;
+    let block = closing_block(&String::from_utf8_lossy(&doctor), &facts).map_err(|why| {
+        let _ = mark_transaction_status(&tx_path, "ready-degraded");
+        InitError::Custom(why)
+    })?;
+    print!("{}", block.text);
+    let _ = std::io::stdout().flush();
+    if !block.ready {
+        mark_transaction_status(&tx_path, "ready-degraded")?;
+        return Err(InitError::NotReady);
     }
-
     mark_transaction_status(&tx_path, "complete")?;
     Ok(())
 }
@@ -875,6 +1054,7 @@ fn init_workspace_tagged(
                         &shim_fgos,
                         &store_root,
                         &current.activation_id,
+                        TailOutcome::AlreadyCurrent,
                     )?;
                     return Ok(());
                 }
@@ -928,6 +1108,7 @@ fn init_workspace_tagged(
                         &shim_fgos,
                         &store_root,
                         &current.activation_id,
+                        TailOutcome::AlreadyCurrent,
                     )?;
                     return Ok(());
                 }
@@ -978,6 +1159,7 @@ fn init_workspace_tagged(
                         &shim_fgos,
                         &store_root,
                         &current.activation_id,
+                        TailOutcome::AlreadyCurrent,
                     )?;
                     return Ok(());
                 }
@@ -1070,6 +1252,7 @@ fn init_workspace_tagged(
                 &shim_fgos,
                 &store_root,
                 &current.activation_id,
+                TailOutcome::AlreadyCurrent,
             )?;
             return Ok(());
         }
@@ -1345,6 +1528,7 @@ pub fn publish_and_tail(args: PublishArgs<'_>) -> Result<(), InitError> {
         &shim_fgos,
         args.store_root,
         &activation_id,
+        TailOutcome::Activated,
     )?;
 
     Ok(())
@@ -1525,6 +1709,7 @@ fn upgrade_workspace_tagged(
             &shim_fgos,
             &store_root,
             &current_activation.activation_id,
+            TailOutcome::AlreadyCurrent,
         )?;
         return Ok(());
     }
@@ -1613,6 +1798,7 @@ fn upgrade_workspace_tagged(
                 &shim_fgos,
                 &store_root,
                 &current.activation_id,
+                TailOutcome::AlreadyCurrent,
             )?;
             return Ok(());
         }
@@ -1848,7 +2034,7 @@ pub fn verify_workspace(start_dir: &Path) -> Result<(), InitError> {
             // `fgctl repair`) without quarantining a good release.
             check_workspace_shims(&installation_dir.join("bin"), cfg!(windows))
                 .map_err(InitError::Custom)?;
-            println!("verified active release {}", active_digest);
+            println!("verified {}", short_digest(&active_digest));
             Ok(())
         }
         Err(err_msg) => {
@@ -1908,6 +2094,18 @@ pub struct FgctlWorkspaceStatus {
     #[serde(default, skip_serializing_if = "std::ops::Not::not")]
     pub quarantined: bool,
     pub releases: Vec<ReleaseStatusEntry>,
+}
+
+/// The one line `fgctl status` ends with: the active release, or what to run.
+pub fn status_result_line(status: Option<&FgctlWorkspaceStatus>) -> String {
+    match status {
+        None => "no active release in this workspace; run fgctl init".to_string(),
+        Some(ws) if ws.quarantined => format!(
+            "active release {} is quarantined; run fgctl repair",
+            short_digest(&ws.active_artifact_digest)
+        ),
+        Some(ws) => format!("active {}", short_digest(&ws.active_artifact_digest)),
+    }
 }
 
 /// Resolves active workspace status alongside the machine release store releases.
@@ -2389,5 +2587,139 @@ mod tests {
         }
         let _ = std::fs::remove_dir_all(kept);
         let _ = std::fs::remove_dir_all(&root);
+    }
+
+    fn facts(already_current: bool) -> ReadyFacts {
+        ReadyFacts {
+            tag: Some("v1.2.0".to_string()),
+            digest12: "0123456789ab".to_string(),
+            already_current,
+            run_command: "fgos".to_string(),
+        }
+    }
+
+    fn doctor_json(ok: bool, checks: &[(&str, &str, Option<&str>)]) -> String {
+        let rows: Vec<serde_json::Value> = checks
+            .iter()
+            .map(|(id, status, fix)| {
+                serde_json::json!({
+                    "id": id,
+                    "status": status,
+                    "message": format!("{id} says no"),
+                    "fix": fix,
+                })
+            })
+            .collect();
+        serde_json::json!({ "contract": "fgos.v1", "data": { "ok": ok, "next": [], "checks": rows } })
+            .to_string()
+    }
+
+    #[test]
+    fn closing_block_of_an_ok_doctor_says_ready_and_names_the_next_step() {
+        let json = doctor_json(true, &[("a", "ok", None), ("b", "warn", None)]);
+        let block = closing_block(&json, &facts(false)).unwrap();
+        assert!(block.ready);
+        assert_eq!(
+            block.text,
+            "Ready: fgOS v1.2.0 active (0123456789ab)\nNext: fgos run \"<prompt>\"\n"
+        );
+    }
+
+    #[test]
+    fn closing_block_of_an_already_current_release_says_so() {
+        let json = doctor_json(true, &[]);
+        let block = closing_block(&json, &facts(true)).unwrap();
+        assert!(block.ready);
+        assert!(block
+            .text
+            .starts_with("Ready: already up to date at 0123456789ab (fgOS v1.2.0)\n"));
+    }
+
+    #[test]
+    fn closing_block_without_a_tag_leaves_the_tag_out() {
+        let mut f = facts(false);
+        f.tag = None;
+        let block = closing_block(&doctor_json(true, &[]), &f).unwrap();
+        assert!(block
+            .text
+            .starts_with("Ready: fgOS active (0123456789ab)\n"));
+    }
+
+    #[test]
+    fn closing_block_of_a_failing_doctor_numbers_each_failing_check_with_its_fix() {
+        let json = doctor_json(
+            false,
+            &[
+                ("fine", "ok", None),
+                (
+                    "agent-cli-missing",
+                    "fail",
+                    Some("install claude, codex or gemini"),
+                ),
+                ("trust-store-readable", "fail", None),
+                ("slow", "warn", Some("ignored")),
+            ],
+        );
+        let block = closing_block(&json, &facts(false)).unwrap();
+        assert!(!block.ready);
+        assert_eq!(
+            block.text,
+            "2 checks need you:\n  1. agent-cli-missing: install claude, codex or gemini\n  2. trust-store-readable: trust-store-readable says no\n"
+        );
+    }
+
+    #[test]
+    fn closing_block_of_one_failing_check_uses_the_singular() {
+        let json = doctor_json(false, &[("x", "fail", Some("fgos doctor --fix"))]);
+        let block = closing_block(&json, &facts(false)).unwrap();
+        assert!(block.text.starts_with("1 check needs you:\n"));
+    }
+
+    #[test]
+    fn closing_block_refuses_output_that_is_not_a_doctor_result() {
+        for bad in [
+            "",
+            "not json",
+            "{}",
+            "{\"data\":{\"ok\":false,\"checks\":[]}}",
+        ] {
+            let err = closing_block(bad, &facts(false)).unwrap_err();
+            assert!(err.contains("doctor"), "{bad:?} -> {err}");
+        }
+    }
+
+    #[test]
+    fn run_command_is_bare_when_the_launcher_dir_is_on_path_and_absolute_otherwise() {
+        let dir = Path::new("/opt/fgos/bin");
+        let on_path = std::env::join_paths(["/usr/bin", "/opt/fgos/bin"]).unwrap();
+        let off_path = std::env::join_paths(["/usr/bin"]).unwrap();
+        assert_eq!(run_command(Some(dir), Some(&on_path)), "fgos");
+        assert_eq!(
+            run_command(Some(dir), Some(&off_path)),
+            "/opt/fgos/bin/fgos"
+        );
+        assert_eq!(run_command(Some(dir), None), "/opt/fgos/bin/fgos");
+        assert_eq!(run_command(None, Some(&off_path)), "fgos");
+        let spaced = Path::new("/opt/my fgos/bin");
+        assert_eq!(run_command(Some(spaced), None), "\"/opt/my fgos/bin/fgos\"");
+    }
+
+    #[test]
+    fn short_digest_drops_the_algorithm_prefix_and_keeps_twelve_characters() {
+        assert_eq!(short_digest("sha256:0123456789abcdef0123"), "0123456789ab");
+        assert_eq!(short_digest("0123"), "0123");
+    }
+
+    #[test]
+    fn status_result_line_names_the_active_release_or_the_next_command() {
+        let ws = |quarantined| FgctlWorkspaceStatus {
+            active_artifact_digest: "sha256:0123456789abcdef".to_string(),
+            previous_artifact_digest: None,
+            quarantined,
+            releases: vec![],
+        };
+        assert_eq!(status_result_line(Some(&ws(false))), "active 0123456789ab");
+        assert!(status_result_line(Some(&ws(true))).contains("run fgctl repair"));
+        assert!(status_result_line(None).contains("run fgctl init"));
     }
 }

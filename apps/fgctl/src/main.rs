@@ -3,7 +3,8 @@ use fgos_distribution::store::{
     list_releases, resolve_machine_release_store_root, stage_release, StageOutcome,
 };
 use fgos_distribution::{
-    get_workspace_status, repair_workspace, upgrade_workspace_resolving, verify_workspace,
+    get_workspace_status, repair_workspace, status_result_line, upgrade_workspace_resolving,
+    verify_workspace,
 };
 use std::path::PathBuf;
 
@@ -169,6 +170,7 @@ fn main() {
                             r.created_at.as_deref().unwrap_or("none")
                         );
                     }
+                    println!("{}", status_result_line(Some(&ws)));
                 }
             } else {
                 match list_releases(&store_root) {
@@ -186,6 +188,7 @@ fn main() {
                                     r.created_at.as_deref().unwrap_or("none")
                                 );
                             }
+                            println!("{}", status_result_line(None));
                         }
                     }
                     Err(err) => {
