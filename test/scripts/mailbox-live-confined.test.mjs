@@ -281,7 +281,8 @@ test('ending a confined run leaves no process, whether it ignores SIGTERM or for
   for (const [runId, script] of [['run-trap', "trap '' TERM; while :; do sleep 1; done"], ['run-setsid', 'setsid sleep 600 & sleep 600']]) {
     const prepared = prepareConfinedRun({ base: w.base, runId, command: 'sh', args: ['-c', script], env: baseEnv(), masks: w.masks });
     const run = startConfinedRun(prepared);
-    await sleep(300);
+    // The sandbox takes as long to start as the machine is busy; wait for its processes instead of guessing a delay.
+    await waitFor(() => processesOfRun(prepared.paths.dir, run.entry.pidNs).length >= 2, LOADED_WAIT_MS);
     assert.ok(processesOfRun(prepared.paths.dir, run.entry.pidNs).length >= 2, `${runId} runs before the end`);
     const { left } = await endConfinedRun(run, { waitMs: LOADED_WAIT_MS });
     assert.deepEqual(left, [], runId);
