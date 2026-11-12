@@ -8,7 +8,8 @@
 //   resolveBinding  before anything exists: is the worktree free (`unbound`), or whose is it?
 //   admit           a Unit that names a case: may this activity run now? Holds the reservation.
 //   recheckEffect   before a writing round's commit: does the consent the admission stood on still hold?
-//   settle          once, after the pattern settled (or the run failed): receipts, launches used.
+//   settle          once, after the pattern settled (or the run failed): the Unit shape of the unit-run-result
+//                   contract (final outcome, infrastructure, scope, evaluations, start, launches).
 //
 // The core never writes the ledger itself and never between admit and settle.
 
@@ -20,6 +21,9 @@ export { seatLaunchesOf } from './seat-resolver.mjs';
 
 export const PORT_MISSING = 'case-admission-port-missing';
 export const SEAT_LAUNCH_CEILING = 'seat-launch-ceiling';
+
+/** The version shape every settle carries (docs/platform/runner/contracts/unit-run-result.md, section 2). */
+export const UNIT_RUN_RESULT_CONTRACT = Object.freeze({ id: 'unit-run-result', version: 1 });
 
 const OPERATIONS = Object.freeze(['resolveBinding', 'admit', 'settle', 'recheckEffect']);
 
@@ -34,7 +38,22 @@ const OPERATIONS = Object.freeze(['resolveBinding', 'admit', 'settle', 'recheckE
  * @typedef {object} CaseAdmissionPort
  * @property {(ask: { worktree: string, caseId?: string }) => { answer: string, record?: object }} resolveBinding
  * @property {(proposal: object) => { admitted: true, reservationId: string, caseId: string, seatLaunchCeiling: number | null } | { refused: { code: string, condition: string, violations?: object[] } }} admit
- * @property {(reservationId: string, result: object) => void} settle
+ * @property {(reservationId: string, result: UnitRunSettle) => void} settle
+ *
+ * @typedef {object} UnitRunSettle the Unit shape of the contract, plus what the ledger counts
+ * @property {{ id: string, version: number }} contract UNIT_RUN_RESULT_CONTRACT
+ * @property {string} caseId
+ * @property {string} outcome final: the scope rule, the verify round and the refund are applied; `not-started` when no seat was given its brief
+ * @property {string|null} unitRunId null when the run never started
+ * @property {boolean} infrastructure
+ * @property {string[]} outOfScope
+ * @property {string[]} outOfScopeOnBranch
+ * @property {Array<{ kind: 'verify'|'verdict', seat: string, round: number, passed: boolean }>} evaluations
+ * @property {{ value: boolean, reason: string|null }} started
+ * @property {{ ceiling: number|null, used: number, ceilingHit: boolean }} launches
+ * @property {object[]} results one item per attempt, in order
+ * @property {number} seatLaunchesUsed
+ * @property {boolean} frameExhausted
  * @property {(reservationId: string, ask: { caseId: string, paths: string[] }) => { ok: true } | { refused: { code: string, condition: string } }} recheckEffect
  */
 

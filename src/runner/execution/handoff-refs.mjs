@@ -113,6 +113,21 @@ function resolveUnitRunRef(input, mainRoot, seat, accept) {
   }
 }
 
+/**
+ * The report one seat of a Unit run left, as the bytes lie now (a settled report edited afterwards is read as it
+ * is; whether that edit is accepted is the caller's decision). `path` is absolute and chosen by Execution, so a
+ * caller never infers the run directory layout. A report that cannot be resolved or read throws `HandoffRefError`.
+ *
+ * @returns {{ path: string, bytes: number, sha256: string }}
+ */
+export function reportDigest(unitRunId, seat, mainRoot) {
+  const subject = `${UNIT_RUN_PREFIX}${unitRunId}/${seat}`;
+  const file = resolveUnitRunRef(subject, mainRoot, undefined, 'any');
+  let bytes;
+  try { bytes = fs.readFileSync(file); } catch (err) { throw new HandoffRefError(subject, `unreadable: ${err.message}`); }
+  return { path: file, bytes: bytes.length, sha256: crypto.createHash('sha256').update(bytes).digest('hex') };
+}
+
 /** The neutral name (without extension) of the nth anonymized input: seat-A ... seat-Z, seat-AA, ... */
 export function anonymousInputName(index) {
   let n = index;

@@ -609,15 +609,15 @@ test('a Unit run hands up its final outcome with the facts it stands on: infrast
   });
   const facts = (data) => ({
     outcome: data.outcome, infrastructure: data.infrastructure, outOfScope: data.outOfScope, outOfScopeOnBranch: data.outOfScopeOnBranch,
-    evaluations: data.evaluations, started: data.started, launches: data.launches, warnings: data.warnings,
+    evaluations: data.evaluations, started: data.started, launches: data.launches,
   });
   const expected = {
     outcome: 'pass', infrastructure: false, outOfScope: [], outOfScopeOnBranch: [],
     evaluations: [{ kind: 'verify', seat: 'verify', round: 1, passed: true }],
-    started: { value: true, reason: null }, launches: { ceiling: null, used: 1, ceilingHit: false }, warnings: [],
+    started: { value: true, reason: null }, launches: { ceiling: null, used: 1, ceilingHit: false },
   };
   assert.deepEqual(facts(res), expected);
-  assert.deepEqual(res.settled, { unit: true, case: true });
+  assert.deepEqual([res.settled, res.warnings], [{ unit: true, case: true }, []]);
   assert.deepEqual(res.results.map((r) => [r.seat, r.outcome, r.infrastructure]), [['producer', 'pass', false], ['verify', 'pass', false]]);
   // The port settles with the same shape, carrying its contract.
   const settle = settledOf(port);

@@ -148,7 +148,8 @@ test('a verify command that outlives runner.timeoutMs is an infrastructure failu
   assert.equal(res.outcome, 'execution-failure');
   const verified = res.results.find((r) => r.seat === 'verify');
   assert.equal(verified.outcome, 'execution-failure');
-  assert.equal(verified.infrastructure, 'timeout');
+  assert.equal(verified.infrastructure, true);
+  assert.equal(verified.infrastructureReason, 'timeout');
   assert.match(verified.error, /timed out after 4000ms/);
   assert.ok(Date.now() - started < VERIFY_CHILD_SLEEP_MS / 2, 'the run did not wait for the verify command to finish by itself');
 });
@@ -246,7 +247,8 @@ test('a solo verify that is killed settles as an infrastructure failure with no 
   const first = await runUnit({ repoRoot: fixture.repoRoot, cwd: fixture.worktreeDir, resumeUnitRunId: fixture.unitRunId });
   assert.equal(first.outcome, 'execution-failure');
   const killed = first.results.find((r) => r.seat === 'verify');
-  assert.equal(killed.infrastructure, 'not-run');
+  assert.equal(killed.infrastructure, true);
+  assert.equal(killed.infrastructureReason, 'not-run');
   assert.match(killed.error, /could not run/);
   assert.equal(first.results.filter((r) => r.seat === 'producer').length, 1);
 

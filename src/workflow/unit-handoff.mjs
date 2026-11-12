@@ -6,7 +6,6 @@
 // paths a Unit wrote outside its scope, and the worktrees left behind when a case ends.
 
 import fs from 'node:fs';
-import crypto from 'node:crypto';
 import path from 'node:path';
 import os from 'node:os';
 import { createGitInspect, gitPortOptions } from '../git/inspect.mjs';
@@ -15,8 +14,7 @@ import { removeWorktree, deleteBranchRef } from '../runner/worktree.mjs';
 import { worktreeAdminScope } from '../runner/execution/custody-door.mjs';
 
 import { RunnerConfigError } from '../runner/dispatch/runner-config-error.mjs';
-import { matchesWriteScope } from '../runner/dispatch/write-scope.mjs';
-import { anonymousInputName, OWN_PREVIOUS_NAME, SEAT_PLACEHOLDER, resolveUnitInputs } from '../runner/execution/handoff-refs.mjs';
+import { anonymousInputName, OWN_PREVIOUS_NAME, SEAT_PLACEHOLDER, reportDigest, resolveUnitInputs } from '../runner/execution/handoff-refs.mjs';
 import { seatKeyOf } from '../runner/execution/legacy-seat-read.mjs';
 import { stepSubjectDigest, unitRunsOf } from './ref-digests.mjs';
 
@@ -270,27 +268,6 @@ export function assertWriteChains(workflow) {
   }
 }
 
-/**
- * Paths a unit's producer changed outside the unit's write scope: those its commits report as out
- * of scope, and any path the unit's branch changed since its base outside the scope -- every
- * commit on it, a resumed round's or one the producer made itself included. Inspect returns
- * literal path bytes, so a name Git would quote (non-ASCII, spaces) is matched as it is. The scope is
- * the one the Unit run recorded (its `writes` widened to generated render targets).
- */
-export function outOfScopeWrites(mainRoot, { unitRunId, writes, results, branch, baseSha }) {
-  let scope = writes;
-  try {
-    scope = JSON.parse(fs.readFileSync(path.join(mainRoot, '.fgos', 'assignments', unitRunId, 'unit.json'), 'utf8')).writeScope ?? writes;
-  } catch { /* the template's writes are the scope the run started from */ }
-  const changed = branch && baseSha
-    ? workflowChangedPaths(mainRoot, baseSha, branch)
-    : results.flatMap((result) => result?.commit?.files ?? []);
-  // What the branch itself carries outside the scope: the part a writer built on it inherits.
-  const onBranch = changed.filter((file) => !matchesWriteScope(file, scope));
-  const reported = results.flatMap((result) => result?.commit?.outOfScope ?? []);
-  return { all: [...new Set([...reported, ...onBranch])].sort(), onBranch: [...new Set(onBranch)].sort() };
-}
-
 /** The writing unit a writer starts from, or null; a definition with more than one gets none (HEAD). */
 export function singleWriteBaseOf(workflow, stepId) {
   const base = writeBaseOf(workflow, stepId);
@@ -332,31 +309,6 @@ export function prepareUnitWorktree({ mainRoot, workflow, state, step, unitId, w
   }
 }
 
-/**
- * What a Unit run's result is in the ledger. Writing outside the unit's scope is a finding: the unit does
- * not pass and its branch is not integrated. A writer standing on a branch that itself carries such paths
- * carries them too, so they never reach the target through it; a path left uncommitted on the base is not on
- * its branch and holds nothing back. A write check that cannot run is the unit's failure, not a throw out of
- * the run.
- *
- * @returns {{ result: object, outOfScope: string[], outOfScopeOnBranch: string[] }}
- */
-export function foldUnitOutcome({ mainRoot, unitData, result, state, base, branch, baseSha }) {
-  let own = { all: [], onBranch: [] };
-  if (unitData.writes.length > 0 && result.unitRunId) {
-    try {
-      own = outOfScopeWrites(mainRoot, { unitRunId: result.unitRunId, writes: unitData.writes, results: result.results || [], branch, baseSha });
-    } catch (err) {
-      result = { ...result, outcome: result.outcome === 'pass' ? 'execution-failure' : result.outcome, error: result.error ?? `could not check the writes of the unit: ${err.message}` };
-    }
-  }
-  const inherited = base ? state.steps[base.stepId]?.units[base.unitId]?.outOfScopeOnBranch ?? [] : [];
-  const outOfScope = [...new Set([...own.all, ...inherited])].sort();
-  const outOfScopeOnBranch = [...new Set([...own.onBranch, ...inherited])].sort();
-  if (outOfScope.length > 0 && result.outcome === 'pass') result = { ...result, outcome: 'findings' };
-  return { result, outOfScope, outOfScopeOnBranch };
-}
-
 export function workflowInspect(cwd) {
   return createGitInspect(gitPortOptions(cwd));
 }
@@ -378,20 +330,6 @@ export function workflowCheckout(cwd) {
     cursor = page.nextCursor;
   } while (cursor);
   throw new RunnerConfigError('checkout registration not found');
-}
-
-function workflowChangedPaths(cwd, before, after) {
-  const inspect = workflowInspect(cwd);
-  const right = inspect.resolveCommit({ name: after });
-  if (!right) throw new RunnerConfigError('cannot resolve writing branch');
-  const paths = [];
-  let cursor;
-  do {
-    const page = inspect.diff({ before, after: right, cursor, maxEntries: 4096 });
-    paths.push(...page.entries.map(entry => Buffer.from(entry.path).toString()));
-    cursor = page.nextCursor;
-  } while (cursor);
-  return paths;
 }
 
 export function resolveIntegrationTarget({ repoRoot } = {}) {
@@ -506,9 +444,10 @@ export function approvedReportDigests({ events, state, workflow, mainRoot }) {
     const approval = [...events].reverse().find((e) => e.type === 'gate.answer' && e.payload?.stepId === step.id && e.payload.approved === true);
     const current = approval?.payload?.subjectDigest;
     if (!current || current !== stepSubjectDigest({ state, workflow, stepId: step.id, mainRoot })) continue;
-    const refs = unitRunsOf(state, step.dependsOn).flatMap(({ unitRunId, seats }) => seats.map((seat) => `unit-run:${unitRunId}/${seat}`));
     try {
-      for (const file of resolveUnitInputs(refs, mainRoot, { accept: 'any' }).refs) accepted.add(crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex'));
+      // All the step's reports or none: one that cannot be read leaves the whole step unaccepted.
+      const digests = unitRunsOf(state, step.dependsOn).flatMap(({ unitRunId, seats }) => seats.map((seat) => reportDigest(unitRunId, seat, mainRoot).sha256));
+      for (const digest of digests) accepted.add(digest);
     } catch {
       // A report that cannot be read is not accepted; the Unit that needs it is refused by name.
     }

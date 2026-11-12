@@ -8,7 +8,7 @@ import { publishMutableProjection } from '../../native/proof-helpers.mjs';
 import { gitWriter, readRepoFacts } from '../../git/inspect.mjs';
 
 import {
-  assertCaseAdmissionPort, normalizeCaseRef, briefNeverReached, noBriefDelivered, seatLaunchesUsed, SEAT_LAUNCH_CEILING,
+  assertCaseAdmissionPort, normalizeCaseRef, briefNeverReached, noBriefDelivered, seatLaunchesUsed, SEAT_LAUNCH_CEILING, UNIT_RUN_RESULT_CONTRACT,
 } from './case-admission-port.mjs';
 import { partitionPaths } from '../dispatch/write-scope.mjs';
 import { askFor, bind } from './bind.mjs';
@@ -19,7 +19,7 @@ import { createSeatLedger } from './seat-ledger.mjs';
 import { assertSeatId } from '../../convention/seat-id.mjs';
 import { runLoop, loopRunsVerify } from './loops/index.mjs';
 import { shippedCatalog } from '../dispatch/shipped-catalog.mjs';
-import { rebindsOnResume, NOT_STARTED_OUTCOME } from './outcome.mjs';
+import { rebindsOnResume, NOT_STARTED_OUTCOME, evaluationsOf, infrastructure, isInfrastructure, outcomeAfterScopeRule } from './outcome.mjs';
 import { verifyCommandOf } from './loops/verify.mjs';
 import { answerOfVerify, runVerify } from './custody-door.mjs';
 import { executeAssignment } from '../dispatch/assignment-runner.mjs';
@@ -42,12 +42,18 @@ import { cancelOnSignalEnabled } from '../../run-supervisor/cancel-opt-in.mjs';
 import { readCancelWaitMs } from '../../run-supervisor/gate-kill-grace.mjs';
 import { listGenerations } from '../../run-supervisor/run-lock.mjs';
 import { currentAttemptOf } from './unit-state.mjs';
-import { admitFreshUnit, leftByDeadController, loadResumedUnit, writesWorktree } from './unit-run-start.mjs';
+import { admitFreshUnit, branchPathsOutsideScope, leftByDeadController, loadResumedUnit, writesWorktree } from './unit-run-start.mjs';
 
-function publishUnitSummary(unitDir) {
+/** A problem the caller should know of, told on the result as a structured warning and on stderr for a person. */
+function warnUnit(scope, code, message) {
+  scope.warnings.push({ code, message });
+  console.warn(`fgos: ${message}`);
+}
+
+function publishUnitSummary(unitDir, scope) {
   try { writeUnitSummary(unitDir); }
   catch (error) {
-    console.warn(`fgos: could not write derived unit summary for "${path.basename(unitDir)}": ${error.message}`);
+    warnUnit(scope, 'unit-summary-not-written', `could not write derived unit summary for "${path.basename(unitDir)}": ${error.message}`);
   }
 }
 
@@ -166,7 +172,8 @@ function admissionIdentityFor(attempt, { unitRunId, assignmentId, worktree, assi
 export async function runUnit(options = {}) {
   assertNotCancelled();
   // `admission` is what the case admission port answered for this run; `settled` says it was handed back.
-  const scope = { control: null, custody: null, handedOff: false, admission: null, unitRecord: null };
+  // `settled` and `warnings` are the arrays and flags the result carries: what settles after it is built (the case reservation) reaches the caller too.
+  const scope = { control: null, custody: null, handedOff: false, admission: null, unitRecord: null, warnings: [], settled: { unit: false, case: null } };
   const uninstall = holdCancelOnSignal(options);
   let result;
   let failure = null;
@@ -179,7 +186,7 @@ export async function runUnit(options = {}) {
     throw error;
   } finally {
     try {
-      try { if (scope.handedOff) recordCustodyHandoff(scope.custody, result); }
+      try { if (scope.handedOff) noteCustodyHandoff(scope); }
       finally { scope.custody?.release(); }
     } finally {
       try { scope.control?.release(); } catch { /* a seat that cannot be released is taken over as a dead holder */ }
@@ -190,32 +197,69 @@ export async function runUnit(options = {}) {
   }
 }
 
+/** Hands the worktree's custody domain back; a failure to record that is a warning on the result, not an error. */
+function noteCustodyHandoff(scope) {
+  const handoff = {};
+  recordCustodyHandoff(scope.custody, handoff);
+  for (const { code, detail } of handoff.warnings ?? []) scope.warnings.push({ code, message: detail });
+}
+
 /**
- * Hand the reservation back, once, when the pattern settled or the run failed (a run with no unit directory
- * as `not-started`). A cancelled run is not settled: it stays live, and the resume carries on.
+ * Hand the reservation back, once, with the Unit shape of the result (the run that failed with no result as
+ * `execution-failure`, or `not-started` when no unit directory existed). A cancelled run is not settled: it stays
+ * live, and the resume carries on. A settle that fails is told on the result and as a warning, never thrown.
  */
 function settleAdmission(scope, result, failure) {
   const admission = scope.admission;
   if (!admission || admission.settled) return;
   if (failure instanceof RunCancelledError) return;
   admission.settled = true;
-  const ended = failure ? (admission.started ? 'execution-failure' : NOT_STARTED_OUTCOME) : result.outcome;
-  // A run whose seats were never given their brief did no work: it settles as one that never started.
-  const refunded = ended !== 'pass' && admission.started && scope.unitRecord && noBriefDelivered(scope.unitRecord);
-  const outcome = refunded ? NOT_STARTED_OUTCOME : ended;
+  const unit = result ?? failedUnitFacts(scope, admission);
   try {
     admission.port.settle(admission.reservationId, {
+      contract: UNIT_RUN_RESULT_CONTRACT,
       caseId: admission.caseId,
-      outcome,
-      unitRunId: admission.started && !refunded ? admission.unitRunId : null,
-      results: result?.results ?? [],
-      seatLaunchesUsed: scope.unitRecord ? seatLaunchesUsed(scope.unitRecord) : 0,
-      frameExhausted: scope.ceilingHit === true,
+      outcome: unit.outcome,
+      unitRunId: unit.started.value ? admission.unitRunId : null,
+      infrastructure: unit.infrastructure,
+      outOfScope: unit.outOfScope,
+      outOfScopeOnBranch: unit.outOfScopeOnBranch,
+      evaluations: unit.evaluations,
+      started: unit.started,
+      launches: unit.launches,
+      results: unit.results,
+      seatLaunchesUsed: unit.launches.used,
+      frameExhausted: unit.launches.ceilingHit,
     });
+    scope.settled.case = true;
   } catch (error) {
-    console.warn(`fgos: could not settle reservation "${admission.reservationId}" of case "${admission.caseId}": ${error.message}`);
+    scope.settled.case = false;
+    scope.settled.settleError = error.message;
+    warnUnit(scope, 'case-settle-failed', `could not settle reservation "${admission.reservationId}" of case "${admission.caseId}": ${error.message}`);
   }
 }
+
+/** The facts of a Unit run that ended in an error before it produced a result: nothing was judged, nothing is known to have been written. */
+function failedUnitFacts(scope, admission) {
+  const { unitRecord } = scope;
+  return {
+    outcome: admission.started ? 'execution-failure' : NOT_STARTED_OUTCOME,
+    infrastructure: true,
+    outOfScope: [],
+    outOfScopeOnBranch: [],
+    evaluations: [],
+    started: { value: admission.started, reason: admission.started ? null : 'failed-before-start' },
+    launches: launchesOf(scope, unitRecord),
+    results: [],
+  };
+}
+
+/** Seat launches (never retries) against the ceiling the case admission gave this run. */
+const launchesOf = (scope, unitRecord) => ({
+  ceiling: unitRecord?.seatLaunchCeiling ?? null,
+  used: unitRecord ? seatLaunchesUsed(unitRecord) : 0,
+  ceilingHit: scope.ceilingHit === true,
+});
 
 // A process that asked for it (`enableCancelOnSignal`) has Ctrl-C and SIGTERM cancel every attempt it delivered;
 // one handler serves all its units, installed with the first and removed with the last.
@@ -333,7 +377,69 @@ function settleUnitRun(ctx, outcome) {
   ctx.unitRecord.settlement = { outcome, settledAt: new Date().toISOString() };
   ctx.unitRecord.execution = { status: 'settled' };
   ctx.persist();
-  publishUnitSummary(ctx.unitDir);
+  ctx.scope.settled.unit = true;
+  publishUnitSummary(ctx.unitDir, ctx.scope);
+}
+
+/**
+ * The paths this Unit wrote outside its declared writes, and the outcome that follows (the rule "writing outside
+ * the scope is not a pass"): what its commits reported (this run's or an earlier one a resume stands on), what its
+ * branch carries since its base, and what the base Unit's branch already carried. A check that cannot run is an
+ * infrastructure failure of the unit, never a throw out of the run.
+ *
+ * @returns {{ outcome: string, error: string|null, outOfScope: string[], outOfScopeOnBranch: string[] }}
+ */
+function applyScopeRule({ unitRecord, mainRoot }, { outcome, results }) {
+  const inherited = unitRecord.branchBase?.outOfScopeOnBranch ?? [];
+  const reported = [
+    ...results.flatMap((result) => result?.commit?.outOfScope ?? []),
+    ...Object.values(unitRecord.bindings ?? {}).flat().flatMap((attempt) => attempt.commit?.outOfScope ?? []),
+  ];
+  let onBranch = [];
+  let error = null;
+  if (unitRecord.unit.writes.length > 0) {
+    try { onBranch = branchPathsOutsideScope(unitRecord, mainRoot); }
+    catch (err) { error = `could not check the writes of the unit: ${err.message}`; }
+  }
+  const sorted = (paths) => [...new Set(paths)].sort();
+  const outOfScope = sorted([...reported, ...onBranch, ...inherited]);
+  const ruled = outcomeAfterScopeRule(outcome, outOfScope);
+  return {
+    outcome: error && ruled === 'pass' ? 'execution-failure' : ruled,
+    error,
+    outOfScope,
+    outOfScopeOnBranch: sorted([...onBranch, ...inherited]),
+  };
+}
+
+/**
+ * The one place the end of a Unit run becomes its record and its result: the scope rule and the verify round are
+ * applied before the unit record settles, so the record, the case reservation and the caller read one outcome. A run
+ * none of whose seats was given its brief did no work and ends `not-started`. Every fact is computed here, once; a
+ * reader never derives it again.
+ */
+function finishUnit(ctx, { outcome, rounds, results = [], findings = [], ...rest }) {
+  const { unitRecord, unitRunId, scope } = ctx;
+  const ruled = applyScopeRule(ctx, { outcome, results });
+  settleUnitRun(ctx, ruled.outcome);
+  const started = ruled.outcome !== 'pass' && noBriefDelivered(unitRecord)
+    ? { value: false, reason: 'brief-not-delivered' }
+    : { value: true, reason: null };
+  const attempts = results.map((result) => ({ ...result, infrastructure: isInfrastructure(result?.outcome) }));
+  const final = started.value ? ruled.outcome : NOT_STARTED_OUTCOME;
+  return {
+    unitRunId, outcome: final, rounds, results: attempts, findings,
+    ...(ruled.error ? { error: ruled.error } : {}),
+    infrastructure: infrastructure({ outcome: final, outOfScope: ruled.outOfScope, results: attempts }),
+    outOfScope: ruled.outOfScope,
+    outOfScopeOnBranch: ruled.outOfScopeOnBranch,
+    evaluations: evaluationsOf(attempts),
+    started,
+    launches: launchesOf(scope, unitRecord),
+    settled: scope.settled,
+    warnings: scope.warnings,
+    ...rest,
+  };
 }
 
 /**
@@ -397,8 +503,7 @@ async function runCollaboration(ctx) {
     assertNotCancelled();
     const early = runPendingSync(unitRecord, mainRoot, ctx.persist, scope.custody);
     if (early) {
-      settleUnitRun(ctx, early.outcome);
-      return { unitRunId, outcome: early.outcome, rounds: 0, results: early.results ?? [], findings: [], sync: syncSummary(unitRecord.sync) };
+      return finishUnit(ctx, { outcome: early.outcome, rounds: 0, results: early.results, sync: syncSummary(unitRecord.sync) });
     }
   }
   const patternResult = await runLoop(effective, unit, ctx.runnerConfigForLoop ?? unitRecord.configSnapshot.runner, {
@@ -413,15 +518,14 @@ async function runCollaboration(ctx) {
     },
     shippedCheckersByRigor: shippedCatalog().loops?.reviewed?.checkersByRigor,
   });
-  settleUnitRun(ctx, patternResult.outcome);
   // A reviewed run with nothing to verify says so: a pass without a verify is not a verified pass.
   const verifyCmd = verifyCommandOf(unit, unitRecord.configSnapshot.runner);
   const unverified = (effective.loop === 'reviewed' && !verifyCmd) || (!loopRunsVerify(effective.loop) && Boolean(verifyCmd));
-  return {
-    unitRunId, outcome: patternResult.outcome, rounds: patternResult.rounds, results: patternResult.results, findings: patternResult.findings || [],
+  return finishUnit(ctx, {
+    outcome: patternResult.outcome, rounds: patternResult.rounds, results: patternResult.results, findings: patternResult.findings,
     ...(unitRecord.sync ? { sync: syncSummary(unitRecord.sync) } : {}),
     ...(unverified ? { verify: { ran: false, reason: 'no verify command: set unit.verify, pass --verify, or declare capabilities.<capability>.verify' } } : {}),
-  };
+  });
 }
 
 /** The directory segment and assignment-id tail of a seat's attempt `n` in `round`: `1`, then `1-fb1`, ... */

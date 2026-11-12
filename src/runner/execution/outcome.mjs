@@ -8,7 +8,7 @@
 // outcome of a seat; the seat that stops on it ends `provider-limit`). The same-named set in
 // src/runner/dispatch/confinement/attestation-store.mjs is a different domain.
 
-import { isVerdictResult } from './legacy-seat-read.mjs';
+import { isVerdictResult, isVerifyResult, seatKeyOf } from './legacy-seat-read.mjs';
 
 /** The closed table of seat outcomes, each with its class. `pass` and `findings` are completed judgments. */
 const SEAT_OUTCOME_CLASS = Object.freeze({
@@ -58,6 +58,33 @@ export function infrastructure(unitResult) {
 }
 
 /**
+ * The rule "writing outside the declared writes is not a pass": a unit that passed with paths outside its scope
+ * is a finding. Any other outcome stands.
+ *
+ * @param {string} outcome
+ * @param {string[]} outOfScope
+ */
+export const outcomeAfterScopeRule = (outcome, outOfScope) => (outcome === 'pass' && outOfScope.length > 0 ? 'findings' : outcome);
+
+/**
+ * One entry per evaluator result that reached a verdict: the harness's verify round and a checker's verdict.
+ * What a worker wrote about itself is never an evaluation, and an evaluator that did not finish (infrastructure,
+ * refusal, limit) judged nothing.
+ *
+ * @param {object[]} results the seat results of a Unit run
+ * @returns {Array<{ kind: 'verify'|'verdict', seat: string, round: number, passed: boolean }>}
+ */
+export function evaluationsOf(results = []) {
+  const evaluations = [];
+  for (const result of results) {
+    if (!isVerdict(result?.outcome)) continue;
+    const kind = isVerifyResult(result) ? 'verify' : isVerdictResult(result) ? 'verdict' : null;
+    if (kind) evaluations.push({ kind, seat: seatKeyOf(result), round: result.round ?? 1, passed: result.outcome === 'pass' });
+  }
+  return evaluations;
+}
+
+/**
  * Execution outcome codes of `fgos run` and foreground workflow runs (RUL99).
  * Separate from EXIT_CODES to prevent error categories from colliding with outcome names.
  * `partial-writes` is the code reserved for that stop reason; the CLI help documents it.
@@ -66,6 +93,7 @@ export const OUTCOME_EXIT_CODES = Object.freeze({
   'policy-refusal': 4,
   'provider-limit': 10,
   'execution-failure': 11,
+  [NOT_STARTED_OUTCOME]: 11,
   'partial-writes': 12,
   blocked: 13,
   findings: 14,

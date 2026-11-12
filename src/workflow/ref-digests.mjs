@@ -9,7 +9,7 @@
 import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
-import { resolveUnitInputs } from '../runner/execution/handoff-refs.mjs';
+import { reportDigest } from '../runner/execution/handoff-refs.mjs';
 import { seatKeyOf } from '../runner/execution/legacy-seat-read.mjs';
 
 const RUN_REF = /^(unit-run:|gate-answer:)/;
@@ -111,21 +111,23 @@ export function digestSubject(subject, root) {
 }
 
 /**
- * Digest of what Unit runs reported: the bytes of the report file of every named seat as they are now,
- * read through the one hand-off resolver. A report that cannot be resolved makes the digest unknown (null).
+ * Digest of what Unit runs reported: the bytes of the report file of every named seat as they are now, as
+ * Execution reads them (`reportDigest`). A report that cannot be read makes the digest unknown (null).
  *
  * @param {Array<{ unitRunId: string, seats: string[] }>} units
  */
 export function digestUnitRunReports(units, mainRoot) {
   try {
-    const refs = [];
-    for (const { unitRunId, seats } of [...units].sort((a, b) => a.unitRunId.localeCompare(b.unitRunId))) {
-      for (const seat of [...seats].sort()) refs.push(`unit-run:${unitRunId}/${seat}`);
-    }
     // The bytes that lie there now, whatever settlement recorded: a digest that went unknown when a report was
-    // edited could never be bound to an approval of the edited content.
-    const { refs: files } = resolveUnitInputs(refs, mainRoot, { accept: 'any' });
-    return sha256(JSON.stringify(files.map((file) => crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex'))));
+    // edited could never be bound to an approval of the edited content. A report two seats share counts once.
+    const byPath = new Map();
+    for (const { unitRunId, seats } of [...units].sort((a, b) => a.unitRunId.localeCompare(b.unitRunId))) {
+      for (const seat of [...seats].sort()) {
+        const report = reportDigest(unitRunId, seat, mainRoot);
+        byPath.set(report.path, report.sha256);
+      }
+    }
+    return sha256(JSON.stringify([...byPath.values()]));
   } catch {
     return null;
   }

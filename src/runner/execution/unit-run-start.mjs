@@ -12,7 +12,8 @@ import { parseYaml } from '../../util/yaml.mjs';
 import { createLockScope } from '../../holder-lock/index.mjs';
 import { adoptRun } from '../../run-supervisor/client.mjs';
 import { dispatchCwdHolder, dispatchInFlightError, admitSuccessor } from '../../run-supervisor/cwd-lock.mjs';
-import { expandGenerated } from '../dispatch/write-scope.mjs';
+import { expandGenerated, matchesWriteScope } from '../dispatch/write-scope.mjs';
+import { createGitInspect, gitPortOptions } from '../../git/inspect.mjs';
 import { shippedCatalog } from '../dispatch/shipped-catalog.mjs';
 import { resolveMutatingCwdPosture } from '../dispatch/execution-contract.mjs';
 import { declaredOperationFields } from '../dispatch/assignment.mjs';
@@ -147,6 +148,50 @@ function checkedPinInputs(pinInputs) {
   return [...new Set(pinInputs)];
 }
 
+/**
+ * The branch a writing Unit builds on, as its caller knows it: `{ branch, baseSha, outOfScopeOnBranch }`, where the
+ * paths are what the base Unit's own branch carries outside its scope (inherited by this one) and `branch` and
+ * `baseSha` are null when the caller has no base to compare with. Anything else is refused before the run.
+ */
+function checkedBranchBase(value) {
+  if (value === undefined) return null;
+  const named = (v) => typeof v === 'string' && v.trim() !== '';
+  const refuse = () => new RunnerConfigError('runUnit: branchBase must be { branch, baseSha, outOfScopeOnBranch } with branch and baseSha both names or both null', { phase: 'pre-admission' });
+  if (value === null || typeof value !== 'object' || Array.isArray(value)) throw refuse();
+  const { branch, baseSha, outOfScopeOnBranch } = value;
+  const paired = (named(branch) && named(baseSha)) || (branch === null && baseSha === null);
+  if (!paired || !Array.isArray(outOfScopeOnBranch) || !outOfScopeOnBranch.every(named)) throw refuse();
+  return { branch, baseSha, outOfScopeOnBranch: [...new Set(outOfScopeOnBranch)].sort() };
+}
+
+/**
+ * The paths the Unit's branch carries outside its write scope since its base: every commit on it counts, a resumed
+ * round's or one the producer made itself. Inspect returns literal path bytes, so a name Git would quote
+ * (non-ASCII, spaces) is matched as it is. The scope is the one the run recorded (`writes` widened to generated
+ * render targets). Throws when the branch cannot be compared with its base.
+ *
+ * @returns {string[]} sorted; empty when the Unit has no base to compare with
+ */
+export function branchPathsOutsideScope(unitRecord, mainRoot) {
+  const { branch, baseSha } = unitRecord.branchBase ?? {};
+  if (!branch || !baseSha) return [];
+  const inspect = createGitInspect(gitPortOptions(mainRoot));
+  const tip = inspect.resolveCommit({ name: branch });
+  if (!tip) throw new RunnerConfigError('cannot resolve writing branch');
+  const scope = unitRecord.writeScope ?? unitRecord.unit.writes;
+  const outside = new Set();
+  let cursor;
+  do {
+    const page = inspect.diff({ before: baseSha, after: tip, cursor, maxEntries: 4096 });
+    for (const entry of page.entries) {
+      const file = Buffer.from(entry.path).toString();
+      if (!matchesWriteScope(file, scope)) outside.add(file);
+    }
+    cursor = page.nextCursor;
+  } while (cursor);
+  return [...outside].sort();
+}
+
 const portMissing = () => new RunnerConfigError('runUnit: a Unit that writes (or names a case) needs the case admission port in options.caseAdmission; none was given', { code: PORT_MISSING });
 
 /** A standalone writing run needs the affirmative `unbound`; every other answer, a missing view included, refuses. */
@@ -256,6 +301,9 @@ export function loadResumedUnit({ options, scope, mainRoot, worktreePath, port, 
   scope.control = control;
   const unitRecord = readUnitRecord(unitRunId, unitJsonPath);
   assertRecordNotFromNewerRelease(unitRunId, unitRecord);
+  // The caller knows the base as it is now; a resume without one keeps what the run recorded.
+  const branchBase = checkedBranchBase(options.branchBase);
+  if (branchBase) unitRecord.branchBase = branchBase;
   let runnerConfigForLoop;
   if (unitRecord.collaboration) {
     assertCollaborationPinUsable(unitRunId, unitRecord.collaboration, unitRecord.configSnapshot, liveConfig());
@@ -359,6 +407,7 @@ export async function admitFreshUnit({ options, scope, mainRoot, worktreePath, c
   }
   const pinInputs = options.declared !== undefined ? checkedPinInputs(options.pinInputs) : [];
   const acceptedReports = checkedAcceptedReports(options.acceptedReports);
+  const branchBase = checkedBranchBase(options.branchBase);
   // A run timeout in an override is checked before the unit run exists (bind() checks it again).
   for (const ov of options.overrides ?? []) {
     if (ov && typeof ov === 'object' && ov.timeoutMs !== undefined) assertRunTimeoutMs(ov.timeoutMs, 'override timeoutMs');
@@ -431,6 +480,7 @@ export async function admitFreshUnit({ options, scope, mainRoot, worktreePath, c
     // Widened once to the render targets of generated sources; a resume reads it back, never recomputes it.
     writeScope: expandGenerated(unit.writes, configSnapshot.runner.generatedPaths ?? []),
     ...(personaPin ? { personaPin } : {}),
+    ...(branchBase ? { branchBase } : {}),
     resolvedInputs: resolved.refs,
     ...(acceptedReports.length > 0 ? { acceptedReports } : {}),
     // Which input each neutral name stands for; only the owner reads this, never a role.

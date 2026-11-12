@@ -26,7 +26,6 @@ import {
   workflowCommit,
   createWorkflowWorktree,
   cleanupWorkflowWorktree,
-  foldUnitOutcome,
   gateQuestionOf,
   prepareUnitWorktree,
   settleUnitWorktrees,
@@ -153,8 +152,12 @@ async function runUnitWithRecovery(run, { step, u, unitData, state, base, attemp
   const loopFn = (name) => loopOf(name, { effective: runnerConfig });
   assertUnitAcceptOutcomes(workflow, step, u, runnerConfig);
   const { prep } = attempt;
+  // What the unit's branch is compared with, and what the writing unit it builds on already carries outside its scope.
+  const inherited = base ? state.steps[base.stepId]?.units[base.unitId]?.outOfScopeOnBranch ?? [] : [];
+  const branchBaseOf = ({ branch, baseSha }) => ({ branch: branch && baseSha ? branch : null, baseSha: branch && baseSha ? baseSha : null, outOfScopeOnBranch: inherited });
   const runOptions = {
     unitData,
+    ...(unitData.writes.length > 0 ? { branchBase: branchBaseOf(prep) } : {}),
     acceptedReports: approvedReportDigests({ events: fresh.events, state: fresh.state, workflow, mainRoot }),
     repoRoot: mainRoot,
     cwd: prep.worktree,
@@ -183,7 +186,7 @@ async function runUnitWithRecovery(run, { step, u, unitData, state, base, attemp
     Object.assign(attempt, { prep: { worktree, branch, baseRef, baseSha, owned: true, created: true, error: null }, resumeUnitRunId: null, unitRunId: null });
     // The recovery checkout is admitted and bound by the run that starts in it.
     run.emit('unit.scheduled', { stepId: step.id, unitId: u.id, worktreePath: worktree, branch, baseRef, baseSha, recovery });
-    return runUnit({ ...runOptions, cwd: worktree, worktree, resumeUnitRunId: undefined, onCaseAdmitted: undefined, onUnitRunCreated: started });
+    return runUnit({ ...runOptions, cwd: worktree, worktree, branchBase: branchBaseOf(attempt.prep), resumeUnitRunId: undefined, onCaseAdmitted: undefined, onUnitRunCreated: started });
   }
 }
 
@@ -276,14 +279,14 @@ async function runStepUnit(run, { step, u, state, uState }) {
     result = { unitRunId: attempt.resumeUnitRunId ?? attempt.unitRunId, outcome: 'execution-failure', results: [], error: String(error?.message ?? error) };
   }
 
-  const folded = foldUnitOutcome({ mainRoot, unitData, result, state, base, branch: attempt.prep.branch, baseSha: attempt.prep.baseSha });
-  const { outOfScope, outOfScopeOnBranch } = folded;
+  // Execution settled the outcome after the scope rule: the ledger records what it handed up, never a rewrite of it.
+  const { outOfScope = [], outOfScopeOnBranch = [] } = result;
   run.emit('unit.complete', {
     stepId: step.id,
     unitId: u.id,
-    unitRunId: folded.result.unitRunId,
-    outcome: folded.result.outcome,
-    results: withoutEvidence(folded.result.results || []),
+    unitRunId: result.unitRunId,
+    outcome: result.outcome,
+    results: withoutEvidence(result.results || []),
     ...(outOfScope.length > 0 ? { outOfScope } : {}),
     ...(outOfScopeOnBranch.length > 0 ? { outOfScopeOnBranch } : {}),
   });
@@ -291,8 +294,8 @@ async function runStepUnit(run, { step, u, state, uState }) {
   run.reread();
 
   // Only explicitly accepted semantic outcomes proceed; execution failures never do.
-  if ((u.template.acceptOutcomes ?? ['pass']).includes(folded.result.outcome)) return undefined;
-  run.failStep(step, folded.result.outcome, unitFailureReason(u.id, { ...folded.result, results: folded.result.results || [] }, outOfScope), u.id);
+  if ((u.template.acceptOutcomes ?? ['pass']).includes(result.outcome)) return undefined;
+  run.failStep(step, result.outcome, unitFailureReason(u.id, { ...result, results: result.results || [] }, outOfScope), u.id);
   return 'failed';
 }
 
