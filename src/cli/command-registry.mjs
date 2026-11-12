@@ -2342,7 +2342,7 @@ export const COMMAND_REGISTRY = [
     store: 'open',
     externalEffect: false,
     paginated: false,
-    deprecated: 'since 2026-09-14; use fgctl init, then fgos doctor --fix (setup still writes the config defaults, git hook and Claude Code hook that doctor --fix does not)',
+    deprecated: 'since 2026-09-14; use fgctl init, then fgos doctor --fix (setup still writes the git hook and Claude Code hook that doctor --fix does not)',
   },
   {
     name: 'uninstall',

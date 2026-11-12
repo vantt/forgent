@@ -673,6 +673,10 @@ async function runMultiStepIsolatedWrite(entryA, entryB, testCase, options = {})
   const scratchB = path.join(os.tmpdir(), "fgos-iso-B-" + crypto.randomBytes(6).toString("hex"));
   fs.mkdirSync(scratchA, { recursive: true });
   fs.mkdirSync(scratchB, { recursive: true });
+  // `init` gives the machine its header-only config under HOME; the two entries run at once, so each gets its own
+  // HOME or whichever runs second would find the file the first made and report `created: false`.
+  const homeA = fs.mkdtempSync(path.join(os.tmpdir(), "fgos-iso-home-A-"));
+  const homeB = fs.mkdtempSync(path.join(os.tmpdir(), "fgos-iso-home-B-"));
 
   try {
     execFileSync("git", ["init"], { cwd: scratchA, stdio: "ignore" });
@@ -687,9 +691,10 @@ async function runMultiStepIsolatedWrite(entryA, entryB, testCase, options = {})
       args: ["init"],
       modes: ["semantic-json"],
       cwd: scratchA,
+      env: { HOME: homeA, USERPROFILE: homeA },
       ignoreChildren: true,
     };
-    const initCaseB = { ...initCaseA, cwd: scratchB };
+    const initCaseB = { ...initCaseA, cwd: scratchB, env: { HOME: homeB, USERPROFILE: homeB } };
     const [initResA, initResB] = await Promise.all([
       runCaseOnEntry(entryA, initCaseA, options),
       runCaseOnEntry(entryB, initCaseB, options),
@@ -784,6 +789,8 @@ async function runMultiStepIsolatedWrite(entryA, entryB, testCase, options = {})
   } finally {
     fs.rmSync(scratchA, { recursive: true, force: true });
     fs.rmSync(scratchB, { recursive: true, force: true });
+    fs.rmSync(homeA, { recursive: true, force: true });
+    fs.rmSync(homeB, { recursive: true, force: true });
   }
 }
 

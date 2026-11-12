@@ -1,7 +1,7 @@
 ---
 phase: 06
 title: "fgctl init closing block: Ready and the next step, or the numbered list of what needs the user; one result line for status, upgrade, repair, verify"
-status: pending
+status: completed
 depends_on: ["P02 landed (doctor ok and next)", "P09 landed on the consumer scripts if they need a line changed", "P01 landed for the clean-HOME acceptance run"]
 parallel: "group G3 with P04; first writer of init.rs"
 effort: ~0.75d

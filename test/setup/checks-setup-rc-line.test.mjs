@@ -30,7 +30,6 @@ import {
   spawnSync,
   withHome,
 } from './helpers/setup-checks-harness.mjs';
-import { projectConfigExists } from '../helpers/config-fixture.mjs';
 
 
 test('fgos setup --pretty prints plain text describing what it did, not JSON, with no ANSI escape when stdout is piped', () => {
@@ -42,7 +41,6 @@ test('fgos setup --pretty prints plain text describing what it did, not JSON, wi
   assert.throws(() => JSON.parse(result.stdout), 'expected --pretty output to NOT be valid JSON');
   assert.ok(result.stdout.includes('legacy compatibility command'), 'expected --pretty output to disclose setup deprecation');
   assert.ok(result.stdout.includes('fgctl init'), 'expected --pretty output to point at replacement onboarding');
-  assert.ok(result.stdout.includes('.fgos/config.yaml'), 'expected --pretty output to describe the config file it touched');
   fs.rmSync(cwd, { recursive: true, force: true });
   fs.rmSync(homeDir, { recursive: true, force: true });
 });
@@ -91,7 +89,7 @@ test('setup from a copy of fgos that is not in a git checkout declines the rc wr
 
   assert.equal(result.status, 0, `setup failed: ${result.stderr}`);
   const { data } = JSON.parse(result.stdout);
-  assert.equal(data.deprecation, 'since 2026-09-14; use fgctl init, then fgos doctor --fix (setup still writes the config defaults, git hook and Claude Code hook that doctor --fix does not)');
+  assert.equal(data.deprecation, 'since 2026-09-14; use fgctl init, then fgos doctor --fix (setup still writes the git hook and Claude Code hook that doctor --fix does not)');
   assert.match(data.deprecationMessage, /fgos setup is legacy compatibility/);
   assert.deepEqual(data.rcFilesInserted, []);
   assert.deepEqual(data.rcFilesAlreadyConfigured, []);
@@ -101,8 +99,6 @@ test('setup from a copy of fgos that is not in a git checkout declines the rc wr
   );
   // The whole point: nothing was appended to the profile.
   assert.equal(fs.readFileSync(rcFile, 'utf8'), 'echo hi\n');
-  // Setup's other work still happened.
-  assert.equal(projectConfigExists(copyRoot), true);
 
   fs.rmSync(releaseRoot, { recursive: true, force: true });
   fs.rmSync(homeDir, { recursive: true, force: true });
