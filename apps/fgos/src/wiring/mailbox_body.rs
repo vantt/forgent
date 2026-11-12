@@ -752,6 +752,8 @@ mod tests {
         let _ = std::fs::remove_dir_all(&dir);
         std::fs::create_dir_all(&dir).unwrap();
         git(&dir, &["init", "-q"], None);
+        // The reader's own id is the clone's configured one, so the test never reads this host's.
+        git(&dir, &["config", "fgos.machineid", "reader-abcdef"], None);
         let held = "held body";
         let hash = hex(held.as_bytes());
         let blob = git(&dir, &["hash-object", "-w", "--stdin"], Some(held));
