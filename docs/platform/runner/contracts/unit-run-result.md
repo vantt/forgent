@@ -4,7 +4,7 @@
 Document type: Contract
 Audience: Maintainer, implementer, agent that has only `fgos run --json`
 Purpose: Fix what the Execution layer hands up when a Unit run ends, so the Workflow layer and any caller read facts instead of re-deriving them
-Design status: Sections 3 and 5 approved by the owner on 2026-11-12 (part A, so the single outcome module can start). Sections 4 and 6 to 9 are still proposed and await the owner. Parts of section 7 already landed (the custody door and the verify door in `src/runner/execution/custody-door.mjs`, seat transcript keeping, `accountPin`); the rest is not implemented
+Design status: Approved by the owner on 2026-11-12 (sections 3 and 5 first, then the rest the same day). Parts of the work already landed (the custody door and the verify door in `src/runner/execution/custody-door.mjs`, seat transcript keeping, `accountPin`); the rest is not implemented
 Implementation: Partial, see Design status. The "Today" column of each table says what exists now
 Provenance: Owner direction 2026-11-09 (three layers; lower layer must stand alone; one authority per decision, in the lowest layer that can know it), a four-seat advisory run through `fgos run` only, HARDEN review of every "Today" cell against origin/main, HARDEN's cross-layer authority audit (plans/reports/audit-261109-1736-harden-authority-layers.md) and the retired-engine entity map (plans/reports/researcher-report-261109-1647-retired-engine-entity-map.md)
 Writer type: Agent draft writer (COOK), reviewed by HARDEN
@@ -77,7 +77,7 @@ The new fields are optional and change no field's meaning, so every reader of ve
 | provenance labels | Where each value came from. The labels are the vocabulary `binding.provenance` already uses (seen on 2026-11-09: `cliOverride`, `unit-prefer`, `registeredExecutor`, `assignment`, `governance`, `default`); the contract does not invent a second list. It states the rule: `bind` is the one authority that writes them, and a label is true only when that source supplied the value | **new rule**, not a new list. Two authorities write labels today: `run.mjs` hands bind's own model and tier to Dispatch as `cliOverride`, so Dispatch relabels them (the `claude` seat of the 2026-11-09 run read `cliOverride` for `model` and `tier` although only `--effort` was passed) |
 | `executorRedirected` | true when fallback moved the seat to another executor | present |
 | `durationMs`, `usage` | Wall time and token counts. An unknown value is `null`; the gap to close is filling them | present, only `?? null` in `run-result.mjs`; `null` in the results checked on 2026-11-09 |
-| `activity` | `{ turns, toolUses, transcriptPath }`. Execution keeps the seat's session transcript in the run directory (`protected/session/`, mode 0600) before it removes the attempt's private home, and `transcriptPath` points to it. It is `null` only when the CLI wrote no session. Only the `sessions/` part is kept, never the login copies in the home (owner decision, 2026-11-09: a seat's work must stay auditable after the run) | **new mechanism**. Today `finalize-home` removes the private home without copying anything (`authority.mjs`, `removeAttemptHome`), so a seat run in a pane leaves only about 4 KB of launcher text and the screen as it was when the seat exited; only a headless seat has its transcript, in `stdout.log`. The exact folder inside the home is inferred, not yet observed on a live run |
+| `activity` | `{ turns, toolUses, transcriptPath }`. Execution keeps the seat's session transcript in the run directory (`protected/session/`, mode 0600) before it removes the attempt's private home, and `transcriptPath` points to it. It is `null` only when the CLI wrote no session, and for confined claude seats until they get their own credential store (owner decision 86). The kept path is recorded run-relative as `detail.transcriptPath` in `steps/finalize-home.json`. Only the `sessions/` part is kept, never the login copies in the home (owner decision, 2026-11-09: a seat's work must stay auditable after the run) | **new mechanism**. Today `finalize-home` removes the private home without copying anything (`authority.mjs`, `removeAttemptHome`), so a seat run in a pane leaves only about 4 KB of launcher text and the screen as it was when the seat exited; only a headless seat has its transcript, in `stdout.log`. The exact folder inside the home is inferred, not yet observed on a live run |
 | `output` | `{ report: { path, bytes, sha256 } or null, claim, complete, incompleteReason }`, see below | **new mechanism** for `output.complete` and `incompleteReason`. A digest helper of `{ ref, sha256, bytes }` exists in `src/workflow/ref-digests.mjs`; it moves down to Execution and the Workflow copy is deleted |
 
 ### Output
@@ -93,6 +93,7 @@ The new fields are optional and change no field's meaning, so every reader of ve
 - A reader refuses an unknown major `contract.version` with a named error and accepts unknown extra fields.
 - A record written before the new fields exist, with no `infrastructure` or no `outOfScope`, reads as **not known**, never as a pass. One legacy module applies today's derivation to such records and is deleted one release later; there is no dual-read window between machines, because all machines upgrade together. Old records on disk keep a reader.
 - Workflow reads `infrastructure`; it no longer holds its own list of infrastructure outcomes.
+- `bind` skips an executor whose CLI is not on PATH and refuses with `agent-cli-missing` before a unit run exists, so a missing CLI never reaches a reader as a run outcome.
 
 ## 6. Unit input
 
@@ -110,7 +111,7 @@ One scenario, in two shapes. (a) Three separate `fgos run --json` calls started 
 
 Fixtures: one golden file per outcome in a new `contracts/fixtures` folder of the run-result package (not created yet), read by both the Node and the Rust tests, as `packages/yaml-doc/contracts/fixtures/parse.v1.json` already is. Workflow tests take their results from these fixtures instead of building results by hand.
 
-## 9. Order of work (proposed; the code split awaits the owner)
+## 9. Order of work (approved)
 
 1. Contract text and the fixtures.
 2. One outcome module; the five copies removed.
