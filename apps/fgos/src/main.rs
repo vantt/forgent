@@ -2,7 +2,8 @@
 //!
 //! Entry point for the fgOS platform host CLI.
 //!
-//! Scans arguments for host-global options (none recognized in R1), embeds
+//! Scans arguments for host-global options (only `--version`, mapped to the
+//! `version` verb), embeds
 //! the checked `command-routes.json` routing descriptor, delegates legacy-cli
 //! routes to `legacy_exec`, and routes native operations through the
 //! `fgos-host-runtime` `InvocationService` kernel pipeline.
@@ -11,6 +12,7 @@ mod cli_presenter;
 mod cli_projector;
 mod legacy_exec;
 mod wiring;
+use fgos_distribution::suggest::suggest;
 use fgos_host_runtime::invocation_service::NoopEventSink;
 use fgos_host_runtime::{
     build_snapshot, EchoProvider, InvocationService, ProviderDescriptor, CATALOG,
@@ -107,13 +109,51 @@ fn unknown_native_flag(
             if accepted.iter().any(|f| f == name) {
                 return None;
             }
+            let mut known: Vec<&str> = accepted.iter().map(String::as_str).collect();
+            known.sort_unstable();
+            let near = suggest(name, known.into_iter())
+                .map(|f| format!(" Did you mean --{f}?"))
+                .unwrap_or_default();
             Some(format!(
-                "fgos: unknown flag \"{token}\" for \"fgos {}\". Valid flags: {}. See \"fgos {} --help\".",
+                "fgos: unknown flag \"{token}\" for \"fgos {}\".{near} Valid flags: {}. See \"fgos {} --help\".",
                 route.selector,
                 accepted.iter().map(|f| format!("--{f}")).collect::<Vec<_>>().join(", "),
                 route.selector,
             ))
         })
+}
+
+/// Printed when `fgos` runs with no arguments: the three steps of a first run
+/// (the same three `fgctl` and the README print) and the agent path.
+const GET_STARTED: &str = "\
+fgos - the foundation for generative agents
+
+Get started:
+  1. Install fgctl:      curl -fsSL https://github.com/vantt/forgent/releases/latest/download/install.sh | sh
+  2. In your project:    fgctl init
+  3. Run a task:         fgos run \"<prompt>\"
+
+Agents / automation:
+  Run `fgctl init`, then `fgos doctor --json` and run each `next` command it lists.
+
+More: `fgos --help` lists every command, `fgos <command> --help` describes one,
+`fgos --version` prints the version.
+";
+
+/// Refuses an unlisted selector: the exit-4 usage error, with the nearest verb
+/// when the input looks like a typo of one.
+fn refuse_unknown_verb(selector: &str) -> ! {
+    eprintln!("fgos: unknown verb \"{selector}\". Usage: fgos <command> [args...]");
+    let mut verbs: Vec<&str> = command_routes()
+        .keys()
+        .map(String::as_str)
+        .filter(|name| !name.starts_with('-'))
+        .collect();
+    verbs.sort_unstable();
+    if let Some(near) = suggest(selector, verbs.into_iter()) {
+        eprintln!("did you mean `fgos {near}`?");
+    }
+    std::process::exit(4);
 }
 
 static ROUTES: OnceLock<HashMap<String, CommandRouteDescriptor>> = OnceLock::new();
@@ -202,9 +242,20 @@ fn main() {
         std::process::exit(fgos_holder_lock::route::main(&args[2..]));
     }
 
-    let cli_args = if args.len() > 1 { &args[1..] } else { &[] };
+    // `fgos --version` is `fgos version`: the one place the flag is mapped.
+    let mut owned_args: Vec<std::ffi::OsString> = args.iter().skip(1).cloned().collect();
+    if owned_args.first().is_some_and(|a| a == "--version") {
+        owned_args[0] = "version".into();
+    }
+    let cli_args = &owned_args[..];
 
-    // R1: No host-global options are recognized in R1 -- the first positional
+    // No arguments: the first-run guide, not an error.
+    if cli_args.is_empty() {
+        print!("{GET_STARTED}");
+        std::process::exit(0);
+    }
+
+    // R1: No host-global options besides `--version` (mapped above) -- the first positional
     // token is always the selector, dash-prefixed or not. `--help` and `-h`
     // are selectors in the route table like any verb (the manifest door);
     // every other dash-prefixed token has no route. Do NOT skip past a
@@ -214,28 +265,15 @@ fn main() {
     // fall through to whatever route the token after it happens to name.
     let selector = match cli_args.first().and_then(|a| a.to_str()) {
         Some(s) if !s.is_empty() => s,
-        _ => {
-            // R3: Unlisted or missing selector fails closed with EXIT_CODES.validation = 4.
-            let fallback_verb = cli_args.first().and_then(|a| a.to_str()).unwrap_or("");
-            eprintln!(
-                "fgos: unknown verb \"{}\". Usage: fgos <command> [args...]",
-                fallback_verb
-            );
-            std::process::exit(4);
-        }
+        // R3: an empty or non-UTF-8 selector fails closed with EXIT_CODES.validation = 4.
+        other => refuse_unknown_verb(other.unwrap_or("")),
     };
 
     let routes = command_routes();
     let route = match routes.get(selector) {
         Some(r) => r,
-        None => {
-            // R3: Unknown/unlisted selector fails closed with exit code 4.
-            eprintln!(
-                "fgos: unknown verb \"{}\". Usage: fgos <command> [args...]",
-                selector
-            );
-            std::process::exit(4);
-        }
+        // R3: Unknown/unlisted selector fails closed with exit code 4.
+        None => refuse_unknown_verb(selector),
     };
 
     // A kind the route table declares native (`hook mailbox`) runs here,

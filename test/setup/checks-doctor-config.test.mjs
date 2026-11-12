@@ -309,7 +309,7 @@ test('fgos doctor --fix (CLI e2e) creates the gateway token file through the rea
 // "broken". `renderPretty`'s doctor `fixed` lines must render green
 // regardless of `changed`, never key that color off `changed` the way a
 // `checks` line keys it off `passed`.
-test('fgos doctor --fix --pretty (CLI e2e) prints ANSI text, not JSON, and renders a fix line green even when the fix found nothing to change', () => {
+test('fgos doctor --fix --pretty (CLI e2e) prints plain text, not JSON, and marks a fix line passed even when the fix found nothing to change (no colour codes when piped)', () => {
   const cwd = mkTemp('doctor-cli-fix-pretty-noop-');
   const homeDir = mkTemp('doctor-cli-fix-pretty-noop-home-');
   const env = { ...NO_CLAUDE_ENV, HOME: homeDir, USERPROFILE: homeDir };
@@ -326,8 +326,9 @@ test('fgos doctor --fix --pretty (CLI e2e) prints ANSI text, not JSON, and rende
   const fixLine = lines.find((l) => l.includes('fix: gateway-token-configured'));
   assert.ok(fixLine, 'expected a "fix: gateway-token-configured" line in --pretty output');
   assert.match(fixLine, /0 repaired/, 'expected the second run to be the already-correct no-op case');
-  assert.ok(fixLine.includes('\x1b[32m'), `expected a green mark on an already-correct fix line, got: ${fixLine}`);
-  assert.ok(!fixLine.includes('\x1b[31m'), `expected no red mark on an already-correct fix line, got: ${fixLine}`);
+  assert.ok(fixLine.includes('✓'), `expected a passed mark on an already-correct fix line, got: ${fixLine}`);
+  assert.ok(!fixLine.includes('✗'), `expected no failed mark on an already-correct fix line, got: ${fixLine}`);
+  assert.ok(!second.stdout.includes('\x1b['), 'piped --pretty output must carry no ANSI escape codes');
   fs.rmSync(cwd, { recursive: true, force: true });
   fs.rmSync(homeDir, { recursive: true, force: true });
 });

@@ -33,12 +33,12 @@ import {
 import { projectConfigExists } from '../helpers/config-fixture.mjs';
 
 
-test('fgos setup --pretty prints colored ANSI text describing what it did, not JSON', () => {
+test('fgos setup --pretty prints plain text describing what it did, not JSON, with no ANSI escape when stdout is piped', () => {
   const cwd = mkTemp('setup-cli-pretty-');
   const homeDir = mkTemp('setup-cli-pretty-home-');
   const result = spawnSync(process.execPath, [FGOS, 'setup', '--pretty'], { cwd, encoding: 'utf8', env: { ...NO_CLAUDE_ENV, HOME: homeDir, USERPROFILE: homeDir } });
   assert.equal(result.status, 0, result.stderr);
-  assert.ok(result.stdout.includes('\x1b['), 'expected ANSI escape codes in --pretty output');
+  assert.ok(!result.stdout.includes('\x1b['), 'a piped --pretty output must carry no ANSI escape codes');
   assert.throws(() => JSON.parse(result.stdout), 'expected --pretty output to NOT be valid JSON');
   assert.ok(result.stdout.includes('legacy compatibility command'), 'expected --pretty output to disclose setup deprecation');
   assert.ok(result.stdout.includes('fgctl init'), 'expected --pretty output to point at replacement onboarding');
@@ -91,7 +91,7 @@ test('setup from a copy of fgos that is not in a git checkout declines the rc wr
 
   assert.equal(result.status, 0, `setup failed: ${result.stderr}`);
   const { data } = JSON.parse(result.stdout);
-  assert.equal(data.deprecation, 'since 2026-09-14; target workspace onboarding starts with fgctl init (plain fgctl init downloads the latest release when .fgos/distribution.json is absent), then .fgos/installation/bin/fgos doctor --fix and .fgos/installation/bin/fgos doctor; doctor --fix runs only the registered fixes, so run fgos setup once in the project for the config defaults, git hook and Claude Code hook it does not write; shell/global integration stays here until a compatibility-window decision retires it');
+  assert.equal(data.deprecation, 'since 2026-09-14; use fgctl init, then fgos doctor --fix (setup still writes the config defaults, git hook and Claude Code hook that doctor --fix does not)');
   assert.match(data.deprecationMessage, /fgos setup is legacy compatibility/);
   assert.deepEqual(data.rcFilesInserted, []);
   assert.deepEqual(data.rcFilesAlreadyConfigured, []);

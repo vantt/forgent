@@ -1,7 +1,7 @@
 ---
 phase: 04
 title: "fgos command surface: --version, Get started on no args, per-verb help, setup out of the help list, no ANSI off a TTY, did-you-mean"
-status: pending
+status: completed (2026-11-12)
 depends_on: ["in-flight (1) landed (apps/fgos/src/main.rs)", "in-flight (2) landed (command registry)", "P02 landed (bin/fgos.mjs chain)"]
 parallel: "group G3 with P06"
 effort: ~1d

@@ -62,7 +62,7 @@ test('manifest verb-name set equals the set of verbs runVerb() actually dispatch
 test('every registry entry has touchesState, externalEffect, paginated booleans, a store mode and the required keys', () => {
   const baseKeys = ['deprecated', 'description', 'examples', 'externalEffect', 'invoke', 'name', 'paginated', 'parameters', 'store', 'touchesState'];
   for (const entry of COMMAND_REGISTRY) {
-    const expectedKeys = [...baseKeys, ...(entry.nativeOnly !== undefined ? ['nativeOnly'] : []), ...(entry.subcommands !== undefined ? ['subcommands'] : []), ...(entry.retiredFlags !== undefined ? ['retiredFlags'] : []), ...['mutatesStore', 'landsWork', 'eventStoreChild'].filter((k) => entry[k] !== undefined)].sort();
+    const expectedKeys = [...baseKeys, ...(entry.nativeOnly !== undefined ? ['nativeOnly'] : []), ...(entry.subcommands !== undefined ? ['subcommands'] : []), ...(entry.guide !== undefined ? ['guide'] : []), ...(entry.retiredFlags !== undefined ? ['retiredFlags'] : []), ...['mutatesStore', 'landsWork', 'eventStoreChild'].filter((k) => entry[k] !== undefined)].sort();
     assert.deepEqual(
       Object.keys(entry).sort(),
       expectedKeys,
@@ -156,7 +156,7 @@ test('fgos --help prints non-empty text listing every verb', () => {
 test('setup is marked deprecated with the fgctl init workspace-onboarding path', () => {
   const setupEntry = COMMAND_REGISTRY.find((entry) => entry.name === 'setup');
   assert.ok(setupEntry, 'COMMAND_REGISTRY is missing a "setup" entry');
-  assert.equal(setupEntry.deprecated, 'since 2026-09-14; target workspace onboarding starts with fgctl init (plain fgctl init downloads the latest release when .fgos/distribution.json is absent), then .fgos/installation/bin/fgos doctor --fix and .fgos/installation/bin/fgos doctor; doctor --fix runs only the registered fixes, so run fgos setup once in the project for the config defaults, git hook and Claude Code hook it does not write; shell/global integration stays here until a compatibility-window decision retires it');
+  assert.equal(setupEntry.deprecated, 'since 2026-09-14; use fgctl init, then fgos doctor --fix (setup still writes the config defaults, git hook and Claude Code hook that doctor --fix does not)');
 
   const cwd = tmpCwd();
   const manifestResult = run(cwd, ['--help', '--json']);
@@ -168,8 +168,8 @@ test('setup is marked deprecated with the fgctl init workspace-onboarding path',
   assert.equal(helpResult.status, 0);
   assert.match(helpResult.stdout, /DEPRECATED .*since 2026-09-14/);
   assert.match(helpResult.stdout, /fgctl init/);
-  assert.match(helpResult.stdout, /\.fgos\/installation\/bin\/fgos doctor --fix/);
-  assert.match(helpResult.stdout, /shell\/global integration/);
+  assert.match(helpResult.stdout, /fgos doctor --fix/);
+  assert.match(helpResult.stdout, /Claude Code hook/);
 });
 
 test('deprecated help text handles legacy string metadata without undefined fields', () => {

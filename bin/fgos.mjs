@@ -4069,13 +4069,14 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
 // `--help --json`.
 
 function publicManifestEntries() {
-  return COMMAND_REGISTRY.map(({ name, invoke, description, parameters, examples, subcommands, touchesState, externalEffect, paginated, deprecated }) => ({
+  return COMMAND_REGISTRY.map(({ name, invoke, description, parameters, examples, subcommands, guide, touchesState, externalEffect, paginated, deprecated }) => ({
     name,
     invoke,
     description,
     parameters,
     examples,
     ...(subcommands ? { subcommands } : {}),
+    ...(guide ? { guide } : {}),
     touchesState,
     externalEffect,
     paginated,
@@ -4099,6 +4100,39 @@ function renderParameterLines(parameters, indent) {
   return lines;
 }
 
+// The flags one verb (or one sub-verb) reads, one line each, with the default
+// the schema declares; a description that names its default is left as written,
+// a switch otherwise defaults to off and a valued flag to unset.
+function renderFlagLines(parameters, indent) {
+  const positional = parameters?.positional || [];
+  return Object.entries(parameters?.properties || {})
+    .filter(([name]) => !positional.includes(name))
+    .map(([name, spec]) => {
+      const text = spec.description ?? '';
+      const dflt = spec.default ?? (spec.type === 'boolean' ? 'off' : 'unset');
+      const note = /default/i.test(text) ? '' : ` (default: ${dflt})`;
+      return `${indent}--${name}${spec.type === 'boolean' ? '' : ' <value>'}  ${text}${note}`;
+    });
+}
+
+// The registry `guide` of a verb, as the help sections a person needs before
+// running it: what it changes on disk, what it needs, every flag with its
+// default, examples, exit codes and the next command.
+function renderGuide(entry) {
+  const flags = entry.subcommands
+    ? Object.entries(entry.subcommands).flatMap(([sub, spec]) => [`        fgos ${entry.name} ${sub}`, ...renderFlagLines(spec.parameters, '            ')])
+    : renderFlagLines(entry.parameters, '        ');
+  const g = entry.guide;
+  return [
+    '    Changes on disk:', `        ${g.changes}`,
+    '    Prerequisites:', `        ${g.prerequisites}`,
+    '    Options:', ...flags, '        Every verb also takes --dir <root> (default: the project found from the current directory) and --json.',
+    '    Examples:', ...(entry.examples ?? []).map((example) => `        ${example}`),
+    '    Exit codes:', ...g.exitCodes.map((code) => `        ${code}`),
+    '    Next:', `        ${g.next}`,
+  ];
+}
+
 function renderHelpText(entries = publicManifestEntries()) {
   // Label for touchesState+externalEffect: 'read' (both false), 'write'
   // (touches only), 'external' (effect only), or 'write+external' (both true).
@@ -4109,7 +4143,10 @@ function renderHelpText(entries = publicManifestEntries()) {
     return 'read';
   };
   const lines = [`fgos — the fgOS work-item CLI (schema_version ${MANIFEST_SCHEMA_VERSION})`, ''];
-  for (const entry of entries) {
+  // The whole list names a deprecated verb once, under Compatibility; one verb's own help keeps its full entry.
+  const single = entries.length === 1;
+  const compatibility = single ? [] : entries.filter((entry) => entry.deprecated);
+  for (const entry of single ? entries : entries.filter((e) => !e.deprecated)) {
     const label = labelFor(entry.touchesState, entry.externalEffect);
     lines.push(`${entry.invoke} [${label}]`);
     lines.push(`    ${entry.description}`);
@@ -4119,10 +4156,16 @@ function renderHelpText(entries = publicManifestEntries()) {
       lines.push(`        ${spec.description}`);
       lines.push(...renderParameterLines(spec.parameters, '        '));
     }
+    if (single && entry.guide) lines.push(...renderGuide(entry));
     const deprecationText = formatDeprecation(entry.deprecated);
     if (deprecationText) {
       lines.push(`    DEPRECATED — ${deprecationText}`);
     }
+    lines.push('');
+  }
+  if (compatibility.length > 0) {
+    lines.push('Compatibility (deprecated, still callable; `fgos <verb> --help` has the detail):');
+    for (const entry of compatibility) lines.push(`    ${entry.invoke} — ${formatDeprecation(entry.deprecated)}`);
     lines.push('');
   }
   return `${lines.join('\n').trimEnd()}\n`;
