@@ -2942,6 +2942,7 @@ mod tests {
             "{}",
             not_ready.text
         );
+        assert!(noop_block(&f).contains("Note: Work is not available on this platform yet"));
     }
 
     #[test]
