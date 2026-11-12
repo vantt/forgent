@@ -3390,7 +3390,8 @@ mod tests {
         let outer = Temp::new();
         let state = outer.0.join("state root");
         let driver = GitDriver::new(&state).unwrap();
-        let floor = driver.git_floor_verdict().unwrap();
+        // The probe itself, not the process-wide verdict another test may have fixed already.
+        let floor = driver.probe_floor().unwrap();
         assert!(floor.supported, "{floor:?}");
     }
     #[test]
