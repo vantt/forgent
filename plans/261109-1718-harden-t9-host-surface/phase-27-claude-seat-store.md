@@ -1,7 +1,7 @@
 ---
 phase: 27
 title: "Claude seat store: confined claude seats get their own login store and keep their transcript (owner decision 86 Q2)"
-status: in-progress
+status: landed
 depends_on: ["phase 26 landed", "owner decision 86 Q2 (a)", "owner guide: declare-claude-seat-store"]
 parallel: "after the global tier cells phase (runner spec); files are the confinement and credential store, the claude trust seed in herdr-round, runner.yaml"
 effort: ~1d
