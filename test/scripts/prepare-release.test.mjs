@@ -148,6 +148,41 @@ test('the repository Rust crate versions equal package.json (a missed release bu
   assert.deepEqual(findRustVersionDrift(repoRoot, version), []);
 });
 
+const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
+const pluginManifestPaths = (root) =>
+  fs
+    .readdirSync(path.join(root, 'plugins'), { withFileTypes: true })
+    .filter((entry) => entry.isDirectory())
+    .map((entry) => path.join('plugins', entry.name, '.claude-plugin', 'plugin.json'))
+    .filter((file) => fs.existsSync(path.join(root, file)));
+
+test('the product version, the newest CHANGELOG release heading and every plugin manifest version agree', () => {
+  const { version } = JSON.parse(fs.readFileSync(path.join(repoRoot, 'package.json'), 'utf8'));
+  const heading = /^## \[(v[^\]]+)\]/m.exec(fs.readFileSync(path.join(repoRoot, 'CHANGELOG.md'), 'utf8'));
+  assert.ok(heading, 'CHANGELOG.md has a release heading');
+  assert.equal(parseReleaseVersion(heading[1]).baseVersion, version, 'newest CHANGELOG release heading');
+  const manifests = pluginManifestPaths(repoRoot);
+  assert.ok(manifests.length >= 2, 'the plugin manifests are found');
+  for (const file of manifests) {
+    assert.equal(JSON.parse(fs.readFileSync(path.join(repoRoot, file), 'utf8')).version, version, file);
+  }
+});
+
+test('prepareRelease moves every plugin manifest to the release base version and lists them in the add command', () => {
+  const root = tmpRepo();
+  for (const name of ['alpha', 'beta']) {
+    const dir = path.join(root, 'plugins', name, '.claude-plugin');
+    fs.mkdirSync(dir, { recursive: true });
+    fs.writeFileSync(path.join(dir, 'plugin.json'), `${JSON.stringify({ name, version: '1.2.0', author: { name: 'x' } }, null, 2)}\n`);
+  }
+  const result = prepareRelease({ repoRoot: root, version: 'v0.3.0-rc.1', date: '2026-09-18', skipCleanCheck: true });
+  const written = pluginManifestPaths(root).map((file) => JSON.parse(fs.readFileSync(path.join(root, file), 'utf8')));
+  assert.deepEqual(written.map((m) => m.version), ['0.3.0', '0.3.0']);
+  assert.deepEqual(written.map((m) => m.author), [{ name: 'x' }, { name: 'x' }], 'other plugin fields stay');
+  assert.ok(result.changedFiles.includes(path.join('plugins', 'alpha', '.claude-plugin', 'plugin.json')));
+  assert.match(result.nextCommands[0], /plugins\/alpha\/\.claude-plugin\/plugin\.json/);
+});
+
 test('prepareRelease refuses a repository whose status shows an untracked file', () => {
   const root = tmpRepo();
   initFixtureRepo(root, { ignore: '.fgos/locks/\npackage.json\npackage-lock.json\nCHANGELOG.md\n' });
