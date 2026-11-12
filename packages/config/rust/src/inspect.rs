@@ -6,7 +6,7 @@ use fgos_yaml_doc::{parse, CommentLoss, Profile, Segment};
 use serde_json::{json, Value};
 
 use crate::redact::render_for_display;
-use crate::schema::{json_at, runtime_key};
+use crate::schema::json_at;
 use crate::snapshot::{AccountsState, Context, Origin, Snapshot};
 use crate::standard::StandardFile;
 use crate::ConfigRefusal;
@@ -19,12 +19,24 @@ fn provenance(origin: &Origin) -> Value {
     })
 }
 
+/// The origins of every leaf at or under `path`, in snapshot order: the one rule `show` and
+/// `explain` share, so a list or a mapping (whose origins are its leaves) is found like a scalar.
+fn origins_under<'a>(
+    snapshot: &'a Snapshot,
+    path: &'a [Segment],
+) -> impl Iterator<Item = &'a Origin> {
+    snapshot
+        .origins
+        .iter()
+        .filter(move |o| o.path.starts_with(path))
+}
+
 /// The effective value (secrets as `<redacted>`) under `path`, where each leaf came from, the
 /// revision of each source and the notices; `path` empty shows everything.
 pub fn show(ctx: &Context, snapshot: &Snapshot, path: &[Segment]) -> Value {
     let shown = render_for_display(snapshot, ctx.schemas);
     let value = json_at(&shown, path);
-    let origins = snapshot.origins.iter().filter(|o| o.path.starts_with(path));
+    let origins = origins_under(snapshot, path);
     json!({
         "path": format_path(path),
         "present": value.is_some(),
@@ -40,12 +52,12 @@ pub fn show(ctx: &Context, snapshot: &Snapshot, path: &[Segment]) -> Value {
 }
 
 /// The schema node of `path` (description, type, bounds, scope, file, sensitivity, owner), its
-/// standard value (never for a secret) and, when a snapshot is given, where its value comes from.
-/// A path with no node is `described: false` and still names the file that holds it, unless it is
-/// a runtime key (answered from the runtime key list).
+/// standard value (never for a secret) and, when a snapshot is given, where its value comes from:
+/// the first origin at or under `path`, so a list or mapping names the layer of its first leaf.
+/// A path with no node is `described: false` and still names the file that holds it.
 pub fn explain(ctx: &Context, snapshot: Option<&Snapshot>, path: &[Segment]) -> Value {
     let resolved = ctx.schemas.resolve(path);
-    let origin = snapshot.and_then(|s| s.origins.iter().find(|o| o.path == path));
+    let origin = snapshot.and_then(|s| origins_under(s, path).next());
     let mut out = json!({
         "path": format_path(path),
         "described": resolved.is_some(),
@@ -91,26 +103,11 @@ pub fn explain(ctx: &Context, snapshot: Option<&Snapshot>, path: &[Segment]) -> 
     out
 }
 
-/// A path no schema node describes: a runtime key is answered from the runtime key list, anything
-/// else names the nearest keys it may have meant.
+/// A path no schema node describes: it names the nearest keys it may have meant.
 fn explain_unlisted(ctx: &Context, path: &[Segment], mut out: Value) -> Value {
-    let Some(map) = out.as_object_mut() else {
-        return out;
-    };
-    match runtime_key(path) {
-        Some(row) => {
-            map.insert("described".into(), json!(true));
-            map.insert("runtimeKey".into(), json!(true));
-            for key in ["description", "type", "minimum", "default", "owner"] {
-                map.insert(key.into(), row[key].clone());
-            }
-        }
-        None => {
-            let near = ctx.schemas.suggest(path);
-            if !near.is_empty() {
-                map.insert("didYouMean".into(), json!(near));
-            }
-        }
+    let near = ctx.schemas.suggest(path);
+    if let (false, Some(map)) = (near.is_empty(), out.as_object_mut()) {
+        map.insert("didYouMean".into(), json!(near));
     }
     out
 }

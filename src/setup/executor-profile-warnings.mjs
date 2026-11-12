@@ -9,7 +9,7 @@
 // Legacy executor ids remain fully accepted -- this only surfaces WHERE a
 // later migration target lives, per each warning's own `migrateTo` field.
 
-import { normalizeProviderFamily, extractPolicyShapedFlags } from '../runner/dispatch/provider-adapter.mjs';
+import { familyOf, extractPolicyShapedFlags } from '../runner/dispatch/provider-adapter.mjs';
 
 // Env var name patterns that look like they are trying to do Provider
 // Capacity Rotator's own job (account pool / credential home selection)
@@ -64,7 +64,7 @@ export function collectExecutorProfileWarnings(cfg) {
       });
     }
 
-    const flags = extractPolicyShapedFlags(args, normalizeProviderFamily(providerModel, command));
+    const flags = extractPolicyShapedFlags(args, familyOf(providerModel, command));
     if (flags.length > 0) {
       warnings.push({
         id: `executor.${executorId}.policy-shaped-flags`,

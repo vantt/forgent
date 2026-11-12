@@ -13,7 +13,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { readConfig, readMachineConfig } from '../../config/facade.mjs';
-import { normalizeProviderFamily } from './provider-adapter.mjs';
+import { familyOf } from './provider-adapter.mjs';
 import { credentialStoreOf, expandCredentialHome, validateProviderAccountInventory } from './provider-capacity.mjs';
 
 const ACCOUNT_KEYS = Object.freeze(['credentialStore', 'label', 'disabled']);
@@ -41,10 +41,10 @@ function configuredFamilies(runnerConfig) {
  */
 function aliasOf(pool, families) {
   if (families.has(pool)) return null;
-  const canonical = normalizeProviderFamily(pool);
+  const canonical = familyOf(pool);
   if (!canonical) return null;
   for (const family of families) {
-    if (normalizeProviderFamily(family) === canonical) return family;
+    if (familyOf(family) === canonical) return family;
   }
   return null;
 }
@@ -140,10 +140,12 @@ export function readLlmAccounts(runnerConfig) {
 
 /**
  * The key the lease's state uses for a pool while it still reads the old inventory: the old
- * inventory keyed providers by their normalized family (`openai` became `openai-codex`).
+ * inventory keyed providers by the CLI-derived name of their family (`openai` is `openai-codex`).
+ * The only place that spelling is made; every other reader names the family with `familyOf`.
  */
 export function legacyStateKey(pool) {
-  return normalizeProviderFamily(pool) || pool;
+  const family = familyOf(pool);
+  return family === 'openai' ? 'openai-codex' : (family || pool);
 }
 
 function legacyStores(account) {
@@ -210,7 +212,7 @@ function declaredStoreFiles(runnerConfig, poolKey) {
     map.set(use, list);
   };
   for (const executor of Object.values(runnerConfig?.executors ?? {})) {
-    const family = normalizeProviderFamily(executor?.providerModel ?? executor?.provider ?? '');
+    const family = legacyStateKey(executor?.providerModel ?? executor?.provider ?? '');
     for (const invocation of Array.isArray(executor?.invocations) ? executor.invocations : []) {
       const store = credentialStoreOf({ ...invocation, command: invocation.command ?? executor.command });
       if (!store?.files) continue;

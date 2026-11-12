@@ -2,20 +2,20 @@
 //!
 //! Entry point for the fgOS platform host CLI.
 //!
-//! Scans arguments for host-global options (none recognized in R1), embeds
+//! Scans arguments for host-global options (only `--version`, mapped to the
+//! `version` verb), embeds
 //! the checked `command-routes.json` routing descriptor, delegates legacy-cli
 //! routes to `legacy_exec`, and routes native operations through the
 //! `fgos-host-runtime` `InvocationService` kernel pipeline.
 
 mod cli_presenter;
 mod cli_projector;
+mod exit_codes;
 mod legacy_exec;
 mod wiring;
+use fgos_distribution::suggest::suggest;
 use fgos_host_runtime::invocation_service::NoopEventSink;
-use fgos_host_runtime::{
-    build_snapshot, EchoProvider, InvocationService, ProviderDescriptor, CATALOG,
-    ECHO_PROVIDER_DESCRIPTOR,
-};
+use fgos_host_runtime::{build_snapshot, InvocationService, ProviderDescriptor, CATALOG};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::sync::{Arc, OnceLock};
@@ -107,13 +107,51 @@ fn unknown_native_flag(
             if accepted.iter().any(|f| f == name) {
                 return None;
             }
+            let mut known: Vec<&str> = accepted.iter().map(String::as_str).collect();
+            known.sort_unstable();
+            let near = suggest(name, known.into_iter())
+                .map(|f| format!(" Did you mean --{f}?"))
+                .unwrap_or_default();
             Some(format!(
-                "fgos: unknown flag \"{token}\" for \"fgos {}\". Valid flags: {}. See \"fgos {} --help\".",
+                "fgos: unknown flag \"{token}\" for \"fgos {}\".{near} Valid flags: {}. See \"fgos {} --help\".",
                 route.selector,
                 accepted.iter().map(|f| format!("--{f}")).collect::<Vec<_>>().join(", "),
                 route.selector,
             ))
         })
+}
+
+/// Printed when `fgos` runs with no arguments: the three steps of a first run
+/// (the same three `fgctl` and the README print) and the agent path.
+const GET_STARTED: &str = "\
+fgos - the foundation for generative agents
+
+Get started:
+  1. Install fgctl:      curl -fsSL https://github.com/vantt/forgent/releases/latest/download/install.sh | sh
+  2. In your project:    fgctl init
+  3. Run a task:         fgos run \"<prompt>\"
+
+Agents / automation:
+  Run `fgctl init`, then `fgos doctor --json` and run each `next` command it lists.
+
+More: `fgos --help` lists every command, `fgos <command> --help` describes one,
+`fgos --version` prints the version.
+";
+
+/// Refuses an unlisted selector: the exit-4 usage error, with the nearest verb
+/// when the input looks like a typo of one.
+fn refuse_unknown_verb(selector: &str) -> ! {
+    eprintln!("fgos: unknown verb \"{selector}\". Usage: fgos <command> [args...]");
+    let mut verbs: Vec<&str> = command_routes()
+        .keys()
+        .map(String::as_str)
+        .filter(|name| !name.starts_with('-'))
+        .collect();
+    verbs.sort_unstable();
+    if let Some(near) = suggest(selector, verbs.into_iter()) {
+        eprintln!("did you mean `fgos {near}`?");
+    }
+    std::process::exit(exit_codes::validation());
 }
 
 static ROUTES: OnceLock<HashMap<String, CommandRouteDescriptor>> = OnceLock::new();
@@ -128,7 +166,6 @@ pub fn command_routes() -> &'static HashMap<String, CommandRouteDescriptor> {
 
 /// Static provider table for the composition root.
 static COMPOSITION_PROVIDERS: &[ProviderDescriptor] = &[
-    ECHO_PROVIDER_DESCRIPTOR,
     fgos_distribution::DISTRIBUTION_BUILD_SHOW_DESCRIPTOR,
     fgos_work_state::WORK_GATE_BYPASS_SHOW_DESCRIPTOR,
     fgos_observe::OBSERVE_METRICS_DESCRIPTOR,
@@ -202,9 +239,20 @@ fn main() {
         std::process::exit(fgos_holder_lock::route::main(&args[2..]));
     }
 
-    let cli_args = if args.len() > 1 { &args[1..] } else { &[] };
+    // `fgos --version` is `fgos version`: the one place the flag is mapped.
+    let mut owned_args: Vec<std::ffi::OsString> = args.iter().skip(1).cloned().collect();
+    if owned_args.first().is_some_and(|a| a == "--version") {
+        owned_args[0] = "version".into();
+    }
+    let cli_args = &owned_args[..];
 
-    // R1: No host-global options are recognized in R1 -- the first positional
+    // No arguments: the first-run guide, not an error.
+    if cli_args.is_empty() {
+        print!("{GET_STARTED}");
+        std::process::exit(exit_codes::ok());
+    }
+
+    // R1: No host-global options besides `--version` (mapped above) -- the first positional
     // token is always the selector, dash-prefixed or not. `--help` and `-h`
     // are selectors in the route table like any verb (the manifest door);
     // every other dash-prefixed token has no route. Do NOT skip past a
@@ -214,28 +262,15 @@ fn main() {
     // fall through to whatever route the token after it happens to name.
     let selector = match cli_args.first().and_then(|a| a.to_str()) {
         Some(s) if !s.is_empty() => s,
-        _ => {
-            // R3: Unlisted or missing selector fails closed with EXIT_CODES.validation = 4.
-            let fallback_verb = cli_args.first().and_then(|a| a.to_str()).unwrap_or("");
-            eprintln!(
-                "fgos: unknown verb \"{}\". Usage: fgos <command> [args...]",
-                fallback_verb
-            );
-            std::process::exit(4);
-        }
+        // R3: an empty or non-UTF-8 selector fails closed with the table's validation status.
+        other => refuse_unknown_verb(other.unwrap_or("")),
     };
 
     let routes = command_routes();
     let route = match routes.get(selector) {
         Some(r) => r,
-        None => {
-            // R3: Unknown/unlisted selector fails closed with exit code 4.
-            eprintln!(
-                "fgos: unknown verb \"{}\". Usage: fgos <command> [args...]",
-                selector
-            );
-            std::process::exit(4);
-        }
+        // R3: Unknown/unlisted selector fails closed with exit code 4.
+        None => refuse_unknown_verb(selector),
     };
 
     // A kind the route table declares native (`hook mailbox`) runs here,
@@ -252,7 +287,6 @@ fn main() {
     // Composition root: build snapshot and InvocationService.
     let snapshot = build_snapshot(CATALOG, COMPOSITION_PROVIDERS, "fgos-composition-root-v1");
     let service = InvocationService::new(snapshot);
-    service.register_provider(Arc::new(EchoProvider::new()));
     service.register_provider(Arc::new(fgos_distribution::BuildShowProvider::new()));
     service.register_provider(Arc::new(fgos_work_state::GateBypassShowProvider::new()));
     let observe_wiring = Arc::new(fgos_observe::ObserveWiring {
@@ -318,7 +352,7 @@ fn main() {
             // Check recursion guard immediately. Fails closed if already set.
             if let Err(err) = legacy_exec::check_recursion_guard() {
                 eprintln!("fgos: error: {}", err);
-                std::process::exit(1);
+                std::process::exit(exit_codes::unexpected());
             }
             // Delegate to legacy-cli lane.
             legacy_exec::execute_legacy_cli(selector, &tracker, cli_args);
@@ -331,7 +365,7 @@ fn main() {
                     .copied()
                     .unwrap_or_else(|| {
                         eprintln!("fgos: error: missing subcommand table for \"{selector}\"");
-                        std::process::exit(1);
+                        std::process::exit(exit_codes::unexpected());
                     });
                 let sub_opt = if cli_args.len() > 1 {
                     let s = cli_args[1].to_string_lossy();
@@ -352,7 +386,7 @@ fn main() {
                             sub,
                             available.join(", ")
                         );
-                        std::process::exit(4);
+                        std::process::exit(exit_codes::validation());
                     }
                     None => {
                         eprintln!(
@@ -360,14 +394,14 @@ fn main() {
                             name,
                             available.join(", ")
                         );
-                        std::process::exit(4);
+                        std::process::exit(exit_codes::validation());
                     }
                 }
             }
 
             if let Some(message) = unknown_native_flag(route, cli_args) {
                 eprintln!("{message}");
-                std::process::exit(4);
+                std::process::exit(exit_codes::validation());
             }
 
             let route_operation = route
@@ -377,7 +411,7 @@ fn main() {
             let op_id_owned = cli_projector::native_operation_id(route_operation, cli_args)
                 .unwrap_or_else(|err| {
                     eprintln!("fgos: error: {}", err);
-                    std::process::exit(1);
+                    std::process::exit(exit_codes::unexpected());
                 });
             let op_id_str = op_id_owned.as_str();
 
@@ -397,7 +431,7 @@ fn main() {
                         eprintln!(
                             "fgos: error: stdin payload exceeds 1 MiB limit [stdin-overflow]"
                         );
-                        std::process::exit(4);
+                        std::process::exit(exit_codes::validation());
                     }
                     if !buf.is_empty() {
                         Some(buf)
@@ -418,7 +452,7 @@ fn main() {
                 cli_projector::project_cli_invocation(op_id_str, cli_args, root, stdin_data)
                     .unwrap_or_else(|err| {
                         eprintln!("fgos: error: {}", err);
-                        std::process::exit(1);
+                        std::process::exit(exit_codes::unexpected());
                     });
             let rt = tokio::runtime::Builder::new_current_thread()
                 .enable_all()
@@ -452,7 +486,23 @@ fn main() {
                 "fgos: error: unsupported route_kind '{}' for selector '{}'",
                 other, selector
             );
-            std::process::exit(1);
+            std::process::exit(exit_codes::unexpected());
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn the_production_composition_carries_no_test_fixture_provider() {
+        for descriptor in COMPOSITION_PROVIDERS {
+            assert!(
+                !descriptor.operation_id.as_str().starts_with("test."),
+                "production composition wires fixture operation {}",
+                descriptor.operation_id.as_str()
+            );
         }
     }
 }

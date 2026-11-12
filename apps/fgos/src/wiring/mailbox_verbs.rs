@@ -22,6 +22,7 @@ use super::mailbox_identity::{
     address, handle_conflicts, is_alias, session_of, state_root, Addressed,
 };
 use super::mailbox_remote;
+use crate::exit_codes;
 use fgos_host_runtime::{
     EventSink, HostInvocation, InvocationControl, OperationProvider, OperationRequest,
     ProviderDescriptor, ProviderError, ProviderOutcome,
@@ -255,18 +256,13 @@ fn usage_answer(cause: &str) -> MailboxAnswer {
         text: String::new(),
         data: json!({ "ok": false, "usage": cause }),
         json: false,
-        exit: EXIT_USAGE,
+        exit: exit_codes::validation(),
         already_written: false,
         warning: Some(format!(
             "fgos: mailbox: {cause}. See \"fgos mailbox --help\"."
         )),
     }
 }
-
-/// Exit statuses (plan decision 2).
-const EXIT_DONE: i32 = 0;
-const EXIT_REFUSED: i32 = 1;
-const EXIT_USAGE: i32 = 4;
 
 fn now() -> Timestamp {
     let millis = SystemTime::now()
@@ -280,7 +276,7 @@ fn failed(text: String, json: bool, warning: Option<String>) -> MailboxAnswer {
         data: json!({ "ok": false, "text": text }),
         text,
         json,
-        exit: EXIT_REFUSED,
+        exit: exit_codes::unexpected(),
         already_written: false,
         warning,
     }
@@ -380,7 +376,7 @@ fn list(long: bool, json: bool) -> MailboxAnswer {
         data: json!({ "ok": true, "heads": data, "text": text }),
         text,
         json,
-        exit: EXIT_DONE,
+        exit: exit_codes::ok(),
         already_written: false,
         warning,
     }
@@ -583,7 +579,11 @@ fn status(json: bool) -> MailboxAnswer {
         data,
         text,
         json,
-        exit: if ok { EXIT_DONE } else { EXIT_REFUSED },
+        exit: if ok {
+            exit_codes::ok()
+        } else {
+            exit_codes::unexpected()
+        },
         already_written: false,
         warning,
     }
@@ -658,7 +658,11 @@ fn remote_answer(
         data: json!({ "ok": recorded, "recorded": recorded, "crossMachine": true, "text": text }),
         text,
         json,
-        exit: if recorded { EXIT_DONE } else { EXIT_REFUSED },
+        exit: if recorded {
+            exit_codes::ok()
+        } else {
+            exit_codes::unexpected()
+        },
         already_written: false,
         warning,
     }
@@ -779,9 +783,9 @@ pub fn answer(request: &MailboxRequest) -> MailboxAnswer {
                 text: sent.text,
                 json: *json,
                 exit: if sent.recorded {
-                    EXIT_DONE
+                    exit_codes::ok()
                 } else {
-                    EXIT_REFUSED
+                    exit_codes::unexpected()
                 },
                 already_written: false,
                 warning,
@@ -808,7 +812,7 @@ pub fn answer(request: &MailboxRequest) -> MailboxAnswer {
                     data: json!({ "ok": true, "text": text }),
                     text,
                     json: *json,
-                    exit: EXIT_DONE,
+                    exit: exit_codes::ok(),
                     already_written: false,
                     warning,
                 },
@@ -850,9 +854,9 @@ pub fn answer(request: &MailboxRequest) -> MailboxAnswer {
                     text: String::new(),
                     json: *json,
                     exit: if done.written {
-                        EXIT_DONE
+                        exit_codes::ok()
                     } else {
-                        EXIT_REFUSED
+                        exit_codes::unexpected()
                     },
                     already_written: true,
                     warning,

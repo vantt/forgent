@@ -235,7 +235,7 @@ test('side file gone: a live control writer means retry, a dead one lets the ste
 });
 
 /** A private home of the attempt with a login renewed inside it, and the finalization descriptor that lists it. */
-function homeOf(w, runDir, { marker = {}, renewed = true } = {}) {
+function homeOf(w, runDir, { marker = {}, renewed = true, sessionDir } = {}) {
   const source = path.join(w.root, 'source-home');
   const runtimeDir = path.join(w.root, 'runtime');
   writePi(source, piDoc(Date.now() + 10 * 60 * 1000, OLD));
@@ -251,7 +251,7 @@ function homeOf(w, runDir, { marker = {}, renewed = true } = {}) {
   }));
   const dir = path.join(runDir, 'protected', 'confinement-finalization');
   fs.mkdirSync(dir, { recursive: true });
-  fs.writeFileSync(path.join(dir, 'cmd-1.json'), JSON.stringify({ contract: 'confinement-finalization.v1', launchCommandId: 'cmd-1', resources: [{ pathRef: home, resourceId: 'private-home', credentialWriteBack }], cleanupState: 'pending', cleanupResult: null }));
+  fs.writeFileSync(path.join(dir, 'cmd-1.json'), JSON.stringify({ contract: 'confinement-finalization.v1', launchCommandId: 'cmd-1', resources: [{ pathRef: home, resourceId: 'private-home', credentialWriteBack, ...(sessionDir ? { sessionDir } : {}) }], cleanupState: 'pending', cleanupResult: null }));
   return { home, source, runtimeDir };
 }
 
@@ -277,6 +277,101 @@ test('finalize-home after a timeout stages the renewed login beside its account 
     const descriptor = JSON.parse(fs.readFileSync(path.join(runDir, 'protected', 'confinement-finalization', 'cmd-1.json'), 'utf8'));
     assert.equal(descriptor.cleanupState, 'cleaned');
     assert.equal((await run('finalize-home', w, runDir)).exit, 0, 'running it again is harmless');
+  } finally { w.cleanup(); }
+});
+
+const SESSION_TEXT = 'a prompt and a tool result that may hold a secret';
+const modeOf = (file) => fs.statSync(file).mode & 0o777;
+
+test('finalize-home keeps the declared session directory at 0600 under protected/session, never a login file, then removes the home', async () => {
+  const w = workspace();
+  try {
+    const { runDir } = attempt(w, { receipt: { outcome: 'exited', gateExit: gateExit() } });
+    const { home, runtimeDir } = homeOf(w, runDir, { sessionDir: 'sessions' });
+    fs.mkdirSync(path.join(home, 'sessions', '--work--'), { recursive: true });
+    fs.writeFileSync(path.join(home, 'sessions', '--work--', 's1.jsonl'), SESSION_TEXT);
+    const done = await run('finalize-home', w, runDir);
+    assert.equal(done.exit, 0, JSON.stringify(done.out));
+    assert.equal(done.out.detail.transcriptPath, 'protected/session');
+    const kept = path.join(runDir, 'protected', 'session');
+    assert.equal(fs.readFileSync(path.join(kept, '--work--', 's1.jsonl'), 'utf8'), SESSION_TEXT);
+    assert.equal(modeOf(path.join(kept, '--work--', 's1.jsonl')), 0o600);
+    assert.equal(modeOf(path.join(kept, '--work--')), 0o700);
+    assert.deepEqual(fs.readdirSync(kept), ['--work--'], 'only the session directory is copied, no login file beside it');
+    assert.equal(fs.existsSync(home), false);
+    assert.deepEqual(stagedRefreshes(runtimeDir), [NEW.refresh], 'the renewed login still goes back');
+  } finally { w.cleanup(); }
+});
+
+test('finalize-home names what the home held when the declared session directory is missing, and keeps nothing', async () => {
+  const w = workspace();
+  try {
+    const { runDir } = attempt(w, { receipt: { outcome: 'exited', gateExit: gateExit() } });
+    const { home } = homeOf(w, runDir, { sessionDir: 'sessions' });
+    fs.mkdirSync(path.join(home, 'agent', 'history'), { recursive: true });
+    fs.writeFileSync(path.join(home, 'agent', 'history', 'h.jsonl'), SESSION_TEXT);
+    const done = await run('finalize-home', w, runDir);
+    assert.equal(done.exit, 0, JSON.stringify(done.out));
+    assert.equal(done.out.detail.transcriptPath, null);
+    assert.deepEqual(done.out.detail.warnings.map((w2) => w2.code), ['session-not-written']);
+    const seen = done.out.detail.homeLayout.map((entry) => entry.path);
+    assert.ok(seen.includes('agent/history'), `the layout names where the CLI wrote: ${seen}`);
+    assert.equal(seen.includes('.fgos-confinement-owner.json'), false);
+    assert.equal(JSON.stringify(done.out.detail).includes(SESSION_TEXT), false, 'names and sizes only, never content');
+    assert.equal(fs.existsSync(home), false);
+  } finally { w.cleanup(); }
+});
+
+test('finalize-home keeps nothing and says so when the executor declares no session directory', async () => {
+  const w = workspace();
+  try {
+    const { runDir } = attempt(w, { receipt: { outcome: 'exited', gateExit: gateExit() } });
+    const { home } = homeOf(w, runDir);
+    fs.mkdirSync(path.join(home, 'sessions'));
+    fs.writeFileSync(path.join(home, 'sessions', 's1.jsonl'), SESSION_TEXT);
+    const done = await run('finalize-home', w, runDir);
+    assert.equal(done.exit, 0, JSON.stringify(done.out));
+    assert.equal(done.out.detail.transcriptPath, null);
+    assert.deepEqual(done.out.detail.warnings.map((w2) => w2.code), ['session-dir-undeclared']);
+    assert.equal(fs.existsSync(path.join(runDir, 'protected', 'session')), false);
+    assert.equal(fs.existsSync(home), false);
+  } finally { w.cleanup(); }
+});
+
+test('finalize-home refuses a symbolic link in the session directory, leaves no partial copy, and still removes the home and returns the login', async () => {
+  const w = workspace();
+  try {
+    const { runDir } = attempt(w, { receipt: { outcome: 'exited', gateExit: gateExit() } });
+    const { home, runtimeDir } = homeOf(w, runDir, { sessionDir: 'sessions' });
+    const outside = path.join(w.root, 'outside-secret.txt');
+    fs.writeFileSync(outside, 'not the agent\'s to hand over');
+    fs.mkdirSync(path.join(home, 'sessions'));
+    fs.writeFileSync(path.join(home, 'sessions', 'a.jsonl'), SESSION_TEXT);
+    fs.symlinkSync(outside, path.join(home, 'sessions', 'z-link.jsonl'));
+    const done = await run('finalize-home', w, runDir);
+    assert.equal(done.exit, 0, JSON.stringify(done.out));
+    assert.equal(done.out.detail.transcriptPath, null);
+    assert.deepEqual(done.out.detail.warnings.map((w2) => w2.code), ['session-copy-failed']);
+    assert.match(done.out.detail.warnings[0].message, /Symlink refused/);
+    assert.equal(fs.existsSync(path.join(runDir, 'protected', 'session', 'a.jsonl')), false, 'a copy that fails leaves nothing behind');
+    assert.equal(fs.existsSync(home), false);
+    assert.deepEqual(stagedRefreshes(runtimeDir), [NEW.refresh]);
+  } finally { w.cleanup(); }
+});
+
+test('finalize-home refuses a session directory that is itself a link out of the home', async () => {
+  const w = workspace();
+  try {
+    const { runDir } = attempt(w, { receipt: { outcome: 'exited', gateExit: gateExit() } });
+    const { home } = homeOf(w, runDir, { sessionDir: 'sessions' });
+    const elsewhere = path.join(w.root, 'elsewhere');
+    fs.mkdirSync(elsewhere);
+    fs.writeFileSync(path.join(elsewhere, 'x.jsonl'), SESSION_TEXT);
+    fs.symlinkSync(elsewhere, path.join(home, 'sessions'));
+    const done = await run('finalize-home', w, runDir);
+    assert.equal(done.exit, 0, JSON.stringify(done.out));
+    assert.deepEqual(done.out.detail.warnings.map((w2) => w2.code), ['session-copy-failed']);
+    assert.equal(fs.existsSync(path.join(runDir, 'protected', 'session')), false);
   } finally { w.cleanup(); }
 });
 

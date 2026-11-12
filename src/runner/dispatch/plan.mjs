@@ -32,27 +32,50 @@ function isKnownCapabilityName(cfg, name) {
 }
 
 
+/** The source Seat Binding recorded for one field of a bound seat, carried over as it is. */
+function bindingSource(binding, field) {
+  const id = binding.provenance?.[field]?.source;
+  return id === undefined ? { scope: 'seat-binding' } : { scope: 'seat-binding', id };
+}
+
+/**
+ * What a launch pins: the bound seat's executor, invocation, pool, account and model; a launch with no
+ * binding (the account probe) pins what its dispatch-door override names.
+ */
+export function launchPinOf({ binding, cliOverride } = {}) {
+  return {
+    executor: binding?.executor ?? cliOverride?.preferExecutor,
+    invocation: binding?.invocation ?? cliOverride?.preferInvocation ?? undefined,
+    pool: binding?.pool ?? cliOverride?.pool ?? undefined,
+    leaseAccount: binding?.leaseAccount ?? cliOverride?.leaseAccount,
+    accountViewDigest: binding?.leaseAccount ? (binding.bindingInput?.accountViewDigest ?? null) : (cliOverride?.accountViewDigest ?? null),
+    model: binding?.model ?? cliOverride?.model,
+  };
+}
+
 /**
  * The effective dispatch policy of an assignment: the executor and provider it runs on, the tier and
  * the model of that tier's cell, the persona, the visibility, the repeat mode, the constraints and the
  * governance verdict, each with where it came from.
  *
  * Nothing here chooses an executor, a tier or a model. A caller that already bound the seat (a unit run)
- * passes both as `cliOverride.tier` and `cliOverride.model` and they are taken as given. Every other
+ * passes the `binding`: its executor, tier, model and effort are taken as given, each carrying the source
+ * Seat Binding recorded for it (`{ scope: 'seat-binding', id }`), never relabelled. Every other
  * caller gets Seat Binding's answer through `bind()` (the same crate call a unit run makes): a pinned
  * executor, tier or effort is an override it judges, and the model is the one it names. With no runner
- * config and no bound tier and model the policy is refused (`runner-config-missing`). Rigor is recorded
+ * config and no binding the policy is refused (`runner-config-missing`). Rigor is recorded
  * as the demand it is (checker count, independence) and never moves the tier or the effort.
  *
  * @param {object} params
  * @param {object} params.assignment Assignment object (required). Its own `rigor` and `domain` are the
  *   caller's demand: the Work layer folds an item's rigor and risk into `rigor` before dispatch sees it.
  * @param {object} [params.runnerConfig] Runner configuration
+ * @param {object} [params.binding] The bound seat Seat Binding returned (executor, tier, model, effort, provenance)
  * @param {object} [params.cliOverride] Caller overrides (preferExecutor, preferInvocation, tier, model, ...)
  * @param {object} [params.options] Governance options (disallowedProviders, disallowedExecutors)
  * @returns {Readonly<object>} Effective dispatch policy
  */
-export function effectiveDispatchPolicy({ assignment, runnerConfig, cliOverride = {}, options = {} }) {
+export function effectiveDispatchPolicy({ assignment, runnerConfig, binding, cliOverride = {}, options = {} }) {
   refuseWorkItemInput(arguments[0], 'the dispatch policy');
   if (!assignment || typeof assignment !== 'object') {
     throw new RunnerConfigError('an effective dispatch policy needs an assignment object');
@@ -69,7 +92,7 @@ export function effectiveDispatchPolicy({ assignment, runnerConfig, cliOverride 
     throw new RunnerConfigError('workflow YAML cannot set explicit tier; declare the tier in the project config (capability, role, persona or seat), or set it at actor/assignment/CLI scope');
   }
   // A literal model name is accepted only from an assignment or the caller, never from workflow YAML.
-  if (opPolicy.model && !assignment._allowLiteralModel && !cliOverride.model && opPolicy._fromYaml) {
+  if (opPolicy.model && !assignment._allowLiteralModel && !cliOverride.model && !binding && opPolicy._fromYaml) {
     throw new RunnerConfigError('workflow YAML cannot pin literal model names; declare the cell in modelPolicies or name a persona');
   }
 
@@ -102,11 +125,13 @@ export function effectiveDispatchPolicy({ assignment, runnerConfig, cliOverride 
 
   // Reasoning effort: only an explicit level is rendered into the launch. Rigor never sets one; without
   // a level the seat runs at its invocation's own default.
-  const explicitEffort = cliOverride.reasoningEffort ?? opPolicy.reasoningEffort;
+  const explicitEffort = binding?.reasoningEffort ?? cliOverride.reasoningEffort ?? opPolicy.reasoningEffort;
   if (explicitEffort !== undefined) assertReasoningEffort(explicitEffort);
   const reasoningEffortSource = explicitEffort === undefined
     ? { scope: 'default' }
-    : cliOverride.reasoningEffort ? { scope: 'cliOverride' } : { scope: 'opPolicy', id: opId };
+    : binding?.reasoningEffort
+      ? bindingSource(binding, 'reasoningEffort')
+      : cliOverride.reasoningEffort ? { scope: 'cliOverride' } : { scope: 'opPolicy', id: opId };
 
   // Persona.
   const resolvedPersona =
@@ -126,28 +151,29 @@ export function effectiveDispatchPolicy({ assignment, runnerConfig, cliOverride 
   // executor (the caller's, else the operation's) is an override, a tier or effort stated by the assignment
   // or the caller is one too, and with no pin the capability's pool decides.
   // The executor the caller names, else the runner's default executor, reaches the crate as a pin.
-  const namedExecutor = cliOverride.preferExecutor ?? opPolicy.preferExecutor;
+  const namedExecutor = binding?.executor ?? cliOverride.preferExecutor ?? opPolicy.preferExecutor;
   // The default is registered under its command and under `claude` (withDefaultExecutor): pin the one the registry has.
   const defaultExecutor = runnerConfig?.executor
     ? [runnerConfig.executor.command, 'claude'].find((id) => id && (!runnerConfig.executors || runnerConfig.executors[id]))
     : undefined;
   const pinnedExecutor = namedExecutor ?? defaultExecutor;
-  const explicitTier = cliOverride.tier ?? opPolicy.tier;
+  const pinnedInvocation = launchPinOf({ binding, cliOverride }).invocation;
+  const explicitTier = binding?.tier ?? cliOverride.tier ?? opPolicy.tier;
   if (explicitTier !== undefined && !MODEL_POLICY_TIERS.includes(explicitTier)) {
     throw new RunnerConfigError(`invalid explicit tier "${explicitTier}". Valid tiers: [${MODEL_POLICY_TIERS.join(', ')}]`);
   }
   const tierProvenance = cliOverride.policyProvenance?.tier;
-  if (cliOverride.tier !== undefined && tierProvenance !== undefined && !['actor', 'assignment', 'cli', 'cliOverride'].includes(tierProvenance.scope)) {
+  if (!binding && cliOverride.tier !== undefined && tierProvenance !== undefined && !['actor', 'assignment', 'cli', 'cliOverride'].includes(tierProvenance.scope)) {
     throw new RunnerConfigError(`explicit tier provenance scope "${tierProvenance.scope}" is not allowed; tier may be explicit only at actor, assignment, or CLI scope`);
   }
-  const boundUpstream = cliOverride.tier !== undefined && cliOverride.model !== undefined;
+  const boundUpstream = binding?.tier !== undefined && binding?.model !== undefined;
   let bound = null;
   if (!boundUpstream) {
     if (!runnerConfig) {
       throw new RunnerConfigError('the dispatch policy needs the runner config to choose a tier and a model: pass it, or pass both the tier and the model', { code: 'runner-config-missing' });
     }
     const override = {
-      ...(pinnedExecutor ? { executor: pinnedExecutor, ...(cliOverride.preferInvocation ? { invocation: cliOverride.preferInvocation } : {}) } : {}),
+      ...(pinnedExecutor ? { executor: pinnedExecutor, ...(pinnedInvocation ? { invocation: pinnedInvocation } : {}) } : {}),
       ...(explicitTier !== undefined ? { tier: explicitTier } : {}),
       ...(explicitEffort !== undefined ? { reasoningEffort: explicitEffort } : {}),
     };
@@ -165,7 +191,7 @@ export function effectiveDispatchPolicy({ assignment, runnerConfig, cliOverride 
   }
   const primaryExecutor = bound?.executor ?? pinnedExecutor ?? 'claude';
   const executorSource = namedExecutor
-    ? (cliOverride.preferExecutor ? (cliOverride.policyProvenance?.executor ?? { scope: 'cliOverride' }) : { scope: 'opPolicy', id: opId })
+    ? (binding?.executor ? { scope: 'seat-binding' } : cliOverride.preferExecutor ? (cliOverride.policyProvenance?.executor ?? { scope: 'cliOverride' }) : { scope: 'opPolicy', id: opId })
     : { scope: 'default' };
   const { resolvedProvider, registeredExecutorEntry } = resolveExecutorProvider({ runnerConfig, primaryExecutor, options });
   const providerSource = registeredExecutorEntry
@@ -177,10 +203,10 @@ export function effectiveDispatchPolicy({ assignment, runnerConfig, cliOverride 
   let resolvedModel = null;
   let modelSource = { scope: 'default' };
   if (boundUpstream) {
-    effectiveTier = cliOverride.tier;
-    tierSource = tierProvenance ?? { scope: 'cliOverride' };
-    resolvedModel = cliOverride.model;
-    modelSource = { scope: 'cliOverride' };
+    effectiveTier = binding.tier;
+    tierSource = bindingSource(binding, 'tier');
+    resolvedModel = binding.model;
+    modelSource = bindingSource(binding, 'model');
   } else {
     effectiveTier = bound.tier;
     tierSource = { scope: 'seat-binding', id: bound.provenance.tier.source };
@@ -337,7 +363,7 @@ function mcpToolFor(executor, purpose) {
  * assignment never turns a working `decide` into a throw (except a seat binding route that does not answer);
  * the new fields are left null.
  */
-function policyForPlan({ cfg, executorId, capability, assignmentItem, assignmentArg, workHint, workIdArg, cliOverride, options }) {
+function policyForPlan({ cfg, executorId, capability, assignmentItem, assignmentArg, workHint, workIdArg, binding, cliOverride, options }) {
   const realAssignment = assignmentItem ?? (typeof assignmentArg === 'object' && assignmentArg ? assignmentArg : null);
   const syntheticPolicy = { preferExecutor: executorId };
   const capRigor = capabilityRigorOf(cfg, capability);
@@ -352,7 +378,7 @@ function policyForPlan({ cfg, executorId, capability, assignmentItem, assignment
   };
   let policy = null;
   try {
-    policy = effectiveDispatchPolicy({ assignment, runnerConfig: cfg, cliOverride, options });
+    policy = effectiveDispatchPolicy({ assignment, runnerConfig: cfg, binding, cliOverride, options });
   } catch (err) {
     if (realAssignment || err?.name === 'SeatBindingError') throw err;
     return { policy: null };
@@ -397,6 +423,7 @@ export function compileDispatchPlan(
     caller = { role: 'driver' },
     workHint,
     assignmentItem,
+    binding,
     cliOverride,
     options,
   } = {},
@@ -420,7 +447,7 @@ export function compileDispatchPlan(
   if (!executorId && assignmentArg) {
     const asgnObj = assignmentItem ?? (typeof assignmentArg === 'object' ? assignmentArg : null);
     if (asgnObj) {
-      executorId = effectiveDispatchPolicy({ assignment: asgnObj, runnerConfig: cfg, cliOverride, options }).executorId;
+      executorId = effectiveDispatchPolicy({ assignment: asgnObj, runnerConfig: cfg, binding, cliOverride, options }).executorId;
       assignmentResolved = resolveExecutorAndOverrides(cfg, executorId);
     }
   }
@@ -506,9 +533,8 @@ export function compileDispatchPlan(
   if (finalMechanism === 'out-of-process') {
     try {
       // A pinned invocation (bind() picks herdr-spawn vs cli-spawn that way) must be the one the plan describes.
-      const pinnedInvocation = typeof cliOverride?.preferInvocation === 'string' && cliOverride.preferInvocation.trim()
-        ? cliOverride.preferInvocation
-        : undefined;
+      const { invocation: pinnedInvocationId } = launchPinOf({ binding, cliOverride });
+      const pinnedInvocation = typeof pinnedInvocationId === 'string' && pinnedInvocationId.trim() ? pinnedInvocationId : undefined;
       resolvedForDispatch = resolveExecutorConfig(cfg, undefined, executorId, undefined, undefined, agentType, pinnedInvocation);
     } catch (err) {
       resolveError = err;
@@ -532,7 +558,7 @@ export function compileDispatchPlan(
     : null;
 
   const { policy: effectivePolicy, reasonCode } = policyForPlan({
-    cfg, executorId, capability, assignmentItem, assignmentArg, workHint, workIdArg, cliOverride, options,
+    cfg, executorId, capability, assignmentItem, assignmentArg, workHint, workIdArg, binding, cliOverride, options,
   });
   if (reasonCode) reasonCodes.push(reasonCode);
 

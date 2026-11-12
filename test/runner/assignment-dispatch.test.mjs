@@ -16,7 +16,7 @@ import { writeProjectConfig } from '../helpers/config-fixture.mjs';
 const executeAssignment = bindableExecute(executeAssignmentRaw);
 import { RunnerConfigError } from '../../src/runner/dispatch/runner-config-error.mjs';
 import { compileDispatchPlan } from '../../src/runner/dispatch/plan.mjs';
-import { decideExecutorCli } from '../../src/runner/dispatch/cli.mjs';
+import { decideExecutorCli } from '../../src/runner/dispatch/decide.mjs';
 import { acquireRunControl, releaseRunControl } from '../../src/run-supervisor/run-lock.mjs';
 import { canonicalJson, computeSha256Digest } from '../../src/native/proof-helpers.mjs';
 import { initStore, addWork, listWork, settleClaim } from '../../src/state/store.mjs';
@@ -917,7 +917,7 @@ test('tool executors bypass provider capacity selection even with matching provi
     repoRoot: tempDir,
     runnerConfig,
     // A tool executor is not an agent seat: Seat Binding chooses nothing for it, so the caller states the tier and model.
-    cliOverride: { tier: 'standard', model: 'gpt-test-standard' },
+    binding: { tier: 'standard', model: 'gpt-test-standard' },
     providerCapacityRuntimeDir: runtimeDir,
   });
 

@@ -7,8 +7,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { replaceDurably } from '../../native/door.mjs';
 import { readMachineAccounts } from '../../config/facade.mjs';
-import { normalizeProviderFamily } from './provider-adapter.mjs';
-import { deriveLegacyInventory } from './llm-accounts.mjs';
+import { deriveLegacyInventory, legacyStateKey } from './llm-accounts.mjs';
 import { resolveHolderLiveness, selfRecord } from '../../native/process-identity.mjs';
 import { acquire, acquireSync, createLockScope, lockHolders, resolveLock, resolveLockRoot, runBorrowed } from '../../holder-lock/index.mjs';
 
@@ -70,7 +69,7 @@ export function validateProviderAccountInventory(runnerConfig, sourceLabel = 'ru
     if (!provider || typeof provider !== 'string') {
       throw new ProviderCapacityConfigError(`runner config (${sourceLabel}.providers) provider id must be a non-empty string.`);
     }
-    const canonicalProvider = normalizeProviderFamily(provider) || provider;
+    const canonicalProvider = legacyStateKey(provider);
     if (normalized[canonicalProvider] !== undefined) {
       throw new ProviderCapacityConfigError(
         `runner config (${sourceLabel}.providers) declares both "${rawToNormalized[canonicalProvider]}" and "${provider}", which normalize to the same provider family "${canonicalProvider}" -- consolidate their accounts under one key.`,
@@ -154,7 +153,7 @@ function validateAccountId(accountId, label) {
 
 const CLI_KEY = /^[a-z0-9][a-z0-9_-]*$/;
 const ENV_NAME = /^[A-Za-z_][A-Za-z0-9_]*$/;
-const CREDENTIAL_STORE_KEYS = Object.freeze(['use', 'homeEnv', 'files']);
+const CREDENTIAL_STORE_KEYS = Object.freeze(['use', 'homeEnv', 'files', 'sessionDir']);
 
 function normalizeCredentialSource(credentialSource, label) {
   if (!isPlainObject(credentialSource)) {
@@ -231,7 +230,7 @@ export function expandCredentialHome(home) {
  * the config door and the confinement request door.
  */
 export function credentialStoreProblem(store) {
-  if (!isPlainObject(store)) return 'must be an object {use, homeEnv, files?}';
+  if (!isPlainObject(store)) return 'must be an object {use, homeEnv, files?, sessionDir?}';
   for (const key of Object.keys(store)) {
     if (!CREDENTIAL_STORE_KEYS.includes(key)) return `contains unknown key "${key}" (allowed: ${CREDENTIAL_STORE_KEYS.join(', ')})`;
   }
@@ -244,6 +243,10 @@ export function credentialStoreProblem(store) {
       return '"files" must be a non-empty list of relative paths without ".."';
     }
     if (new Set(files).size !== files.length) return '"files" must not repeat a path';
+  }
+  if (store.sessionDir !== undefined
+    && (typeof store.sessionDir !== 'string' || !store.sessionDir.trim() || path.isAbsolute(store.sessionDir) || store.sessionDir.split(/[\\/]/).includes('..'))) {
+    return '"sessionDir" must be a relative path without ".."';
   }
   return null;
 }

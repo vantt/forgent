@@ -2,9 +2,8 @@ import '../../../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  runReviewed,
+  runReviewed as runReviewedLoop,
   reviewedHistoryOutcome as historyOutcomeOf,
-  DEFAULT_MAX_ROUNDS,
   PARAMS,
 } from '../../../../src/runner/execution/loops/reviewed.mjs';
 import { verifyCommandOf } from '../../../../src/runner/execution/loops/verify.mjs';
@@ -15,10 +14,15 @@ import {
 import { shippedCatalog } from '../../../../src/runner/dispatch/shipped-catalog.mjs';
 
 const shippedCheckersByRigor = shippedCatalog().loops.reviewed.checkersByRigor;
+// The round limit the standard config resolves into every reviewed run; the loop keeps no number of its own.
+const STANDARD_MAX_ROUNDS = shippedCatalog().loops.reviewed.maxRounds;
+
+// Runs the loop with the params the catalog would hand it: the standard's round limit unless a case sets one.
+const runReviewed = (unit, cfg, hooks, params = {}) => runReviewedLoop(unit, cfg, hooks, { maxRounds: STANDARD_MAX_ROUNDS, ...params });
 
 // The history outcome of a reviewed unit is read over the seats the unit has.
 const reviewedHistoryOutcome = (unit, cfg, history, params = {}) =>
-  historyOutcomeOf(unit, cfg, history, params, resolveSeats({ loop: 'reviewed', params, unit, runnerConfig: cfg, shippedCheckersByRigor }));
+  historyOutcomeOf(unit, cfg, history, { maxRounds: STANDARD_MAX_ROUNDS, ...params }, resolveSeats({ loop: 'reviewed', params, unit, runnerConfig: cfg, shippedCheckersByRigor }));
 
 test('runReviewed passes on round 1 when all checkers pass', async () => {
   const calls = [];
@@ -534,8 +538,7 @@ test('reviewed at standard or low rigor keeps checkers independent of the produc
   }
 });
 
-test('reviewed module exports its param table and default max rounds', () => {
-  assert.equal(DEFAULT_MAX_ROUNDS, 2);
+test('reviewed module exports its param table', () => {
   assert.ok(PARAMS);
   assert.deepEqual(Object.keys(PARAMS).sort(), ['maxRounds', 'minCheckers', 'roleTasks', 'seats'].sort());
   assert.equal(PARAMS.maxRounds.type, 'integer');
@@ -565,8 +568,8 @@ test('runReviewed reads maxRounds from params and ignores cfg.loops.reviewed.max
   };
   const cfg = { loops: { reviewed: { maxRounds: 3 } } };
   const res = await runReviewed(unit, cfg, { runRole, shippedCheckersByRigor });
-  assert.equal(res.rounds, DEFAULT_MAX_ROUNDS);
-  assert.equal(roundCount, DEFAULT_MAX_ROUNDS);
+  assert.equal(res.rounds, STANDARD_MAX_ROUNDS);
+  assert.equal(roundCount, STANDARD_MAX_ROUNDS);
   assert.equal(res.outcome, 'findings');
 });
 
@@ -588,20 +591,11 @@ test('runReviewed params.maxRounds takes precedence over default rounds', async 
   assert.equal(res.outcome, 'findings');
 });
 
-test('runReviewed defaults maxRounds to DEFAULT_MAX_ROUNDS when params and cfg omit it', async () => {
-  const unit = { id: 'u-default-rounds', objective: 'Test default rounds', capability: 'docs:write' };
-  let roundCount = 0;
-  const runRole = async (opts) => {
-    if (opts.seat.seat === 'producer') roundCount = Math.max(roundCount, opts.round ?? 1);
-    return {
-      seat: opts.seat.seat,
-      outcome: opts.seat.seat === 'producer' ? 'pass' : 'findings',
-      finding: 'Needs rework',
-    };
-  };
-  const cfg = {};
-  const res = await runReviewed(unit, cfg, { runRole, shippedCheckersByRigor });
-  assert.equal(res.rounds, DEFAULT_MAX_ROUNDS);
-  assert.equal(roundCount, DEFAULT_MAX_ROUNDS);
-  assert.equal(res.outcome, 'findings');
+test('the reviewed loop refuses by name when no round limit reached it, instead of using a number of its own', async () => {
+  const unit = { id: 'u-no-rounds', objective: 'Test missing rounds', capability: 'docs:write' };
+  const hooks = { runRole: async (opts) => ({ seat: opts.seat.seat, outcome: 'pass' }), shippedCheckersByRigor };
+  for (const params of [{}, { maxRounds: 0 }, { maxRounds: '2' }]) {
+    await assert.rejects(runReviewedLoop(unit, {}, hooks, params), { code: 'reviewed-max-rounds-missing', message: /runner\.loops\.reviewed\.maxRounds/ });
+    assert.throws(() => historyOutcomeOf(unit, {}, [], params, []), { code: 'reviewed-max-rounds-missing' });
+  }
 });

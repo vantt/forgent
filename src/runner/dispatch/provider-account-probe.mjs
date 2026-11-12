@@ -15,7 +15,6 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 import { matchAuthFailureLine, matchQuotaLimitLine } from './provider-auth-failure.mjs';
-import { normalizeProviderFamily } from './provider-adapter.mjs';
 import { legacyStateKey } from './llm-accounts.mjs';
 import { accountCredentialSources, commandCli, expandCredentialHome, credentialSourceForCli, credentialStoreOf, providerAccountInventory } from './provider-capacity.mjs';
 import { runOutcome } from './run-result.mjs';
@@ -56,7 +55,7 @@ const CREDENTIAL_ENV = ['CODEX_HOME', 'PI_CODING_AGENT_DIR', 'HOME'];
  * Only `via: "cli"` invocations; `executorId` narrows to one executor.
  */
 export function accountInvocations(cfg, { provider, accountId, executorId = null } = {}) {
-  const family = normalizeProviderFamily(provider);
+  const family = legacyStateKey(provider);
   const account = providerAccountInventory(cfg)?.[family]?.accounts?.[accountId] ?? null;
   const homes = new Set(accountCredentialSources(account).map((source) => expandCredentialHome(source.home)).filter(Boolean));
   // An account with one store per CLI logs in exactly the CLIs it names; a single store logs in the CLI
@@ -65,7 +64,7 @@ export function accountInvocations(cfg, { provider, accountId, executorId = null
   const found = [];
   for (const [id, executor] of Object.entries(cfg?.executors ?? {})) {
     if (executorId && id !== executorId) continue;
-    if (!executorId && normalizeProviderFamily(executor?.providerModel ?? executor?.provider) !== family) continue;
+    if (!executorId && legacyStateKey(executor?.providerModel ?? executor?.provider) !== family) continue;
     for (const inv of Array.isArray(executor?.invocations) ? executor.invocations : []) {
       if (inv?.via !== 'cli' || !inv.id) continue;
       const confined = Boolean((inv.confinement ?? executor.confinement)?.backend);
@@ -85,10 +84,10 @@ export function accountInvocations(cfg, { provider, accountId, executorId = null
  * under whichever spelling the config declares it. Nothing else changes.
  */
 export function configPinnedToAccount(cfg, { provider, accountId }) {
-  const family = normalizeProviderFamily(provider);
+  const family = legacyStateKey(provider);
   const providers = {};
   for (const [key, entry] of Object.entries(cfg?.providers ?? {})) {
-    if (normalizeProviderFamily(key) !== family) providers[key] = entry;
+    if (legacyStateKey(key) !== family) providers[key] = entry;
     else if (entry?.accounts?.[accountId]) providers[key] = { ...entry, accounts: { [accountId]: entry.accounts[accountId] } };
   }
   // A pool declared in llmAccounts is the lease's source for that provider, so the pin narrows it too.

@@ -125,6 +125,83 @@ fn test_unlisted_selector_fails_closed_with_exit_4() {
 }
 
 #[test]
+fn version_flag_answers_like_the_version_verb() {
+    let flag = Command::new(fgos_bin())
+        .arg("--version")
+        .output()
+        .expect("failed to execute fgos");
+    let verb = Command::new(fgos_bin())
+        .arg("version")
+        .output()
+        .expect("failed to execute fgos");
+
+    assert_eq!(flag.status.code(), Some(0), "--version must exit 0");
+    let data = |out: &std::process::Output| -> serde_json::Value {
+        let envelope: serde_json::Value =
+            serde_json::from_slice(&out.stdout).expect("version prints the envelope");
+        envelope["data"].clone()
+    };
+    assert_eq!(data(&flag), data(&verb));
+}
+
+#[test]
+fn no_arguments_print_get_started_and_exit_0() {
+    let output = Command::new(fgos_bin())
+        .output()
+        .expect("failed to execute fgos");
+
+    assert_eq!(output.status.code(), Some(0));
+    let stdout = String::from_utf8_lossy(&output.stdout);
+    for needle in [
+        "Get started",
+        "curl -fsSL",
+        "fgctl init",
+        "fgos run",
+        "Agents / automation",
+        "fgos doctor --json",
+    ] {
+        assert!(stdout.contains(needle), "missing {needle:?} in: {stdout}");
+    }
+    assert!(output.stderr.is_empty(), "get started is stdout only");
+}
+
+#[test]
+fn a_near_miss_verb_is_refused_with_a_suggestion() {
+    let output = Command::new(fgos_bin())
+        .arg("doctr")
+        .output()
+        .expect("failed to execute fgos");
+
+    assert_eq!(output.status.code(), Some(4));
+    let stderr = String::from_utf8_lossy(&output.stderr);
+    assert!(stderr.contains("unknown verb \"doctr\""), "{stderr}");
+    assert!(stderr.contains("did you mean `fgos doctor`"), "{stderr}");
+}
+
+#[test]
+fn a_near_miss_native_flag_is_refused_with_a_suggestion() {
+    let output = Command::new(fgos_bin())
+        .args(["config", "show", "--pth", "x"])
+        .output()
+        .expect("failed to execute fgos");
+
+    assert_eq!(output.status.code(), Some(4));
+    let stderr = String::from_utf8_lossy(&output.stderr);
+    assert!(stderr.contains("Did you mean --path?"), "{stderr}");
+}
+
+#[test]
+fn a_verb_with_no_near_miss_gets_no_suggestion() {
+    let output = Command::new(fgos_bin())
+        .arg("not-a-real-selector")
+        .output()
+        .expect("failed to execute fgos");
+
+    let stderr = String::from_utf8_lossy(&output.stderr);
+    assert!(!stderr.contains("did you mean"), "{stderr}");
+}
+
+#[test]
 fn test_recursion_trap_fails_closed() {
     let output = Command::new(fgos_bin())
         .arg("add")

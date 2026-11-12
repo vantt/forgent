@@ -27,10 +27,13 @@
 //       store is absent, the record goes to the main checkout's existing
 //       store or nowhere.
 //
+// The record carries the shape of the call, never its values: the verb, the sub-verb, each flag name and the length
+// of every value (`argvShape`). The file is private to its owner (0600) and capped (`appendFaultRecord`).
+//
 // The log is `.fgos/`-resident but deliberately NOT a Work event: the Event
 // Store is the source of all Work state, and a pure-observability record has
 // no business in it. It is also gitignored — `.fgos/` is only partly ignored,
-// so without that entry every recorded argv would be committed and pushed.
+// so without that entry every recorded record would be committed and pushed.
 
 import fs from 'node:fs';
 import path from 'node:path';
@@ -38,6 +41,46 @@ import path from 'node:path';
 import { resolveWriterIdentity } from '../util/session-identity.mjs';
 import { resolveMainCheckoutRoot, fgosDirFromRoot } from '../runner/paths.mjs';
 import { resolveFgosFile, FGOS_FILE } from '../state/fgos-file-registry.mjs';
+
+/** Past this size the oldest half of the log is dropped. */
+export const FAULT_LOG_MAX_BYTES = 1024 * 1024;
+
+const FLAG_NAME = /^-{1,2}[A-Za-z][A-Za-z0-9-]{0,39}$/;
+
+/**
+ * The shape of a call: the verb (and `sub`, when the caller names the sub-verb) as typed, a flag by its name, and every
+ * other token, including a flag's value, by its length (`<12>`), so a secret passed as an argument never reaches the log.
+ */
+export function argvShape(argv, { sub } = {}) {
+  if (!Array.isArray(argv)) return [];
+  return argv.map((token, index) => {
+    const text = String(token);
+    if (index === 0 || (index === 1 && sub !== undefined && text === sub)) return text;
+    const [name, ...rest] = text.split('=');
+    if (FLAG_NAME.test(name)) return rest.length ? `${name}=<${rest.join('=').length}>` : name;
+    return `<${text.length}>`;
+  });
+}
+
+/**
+ * Append one JSON record to a fault log, a plain append (never the state lock). The file is created 0600; once it
+ * passes `FAULT_LOG_MAX_BYTES` the oldest half of its lines goes first. Throws on a write failure; the callers catch.
+ */
+export function appendFaultRecord(logPath, record) {
+  fs.mkdirSync(path.dirname(logPath), { recursive: true });
+  try {
+    if (fs.statSync(logPath).size > FAULT_LOG_MAX_BYTES) {
+      const lines = fs.readFileSync(logPath, 'utf8').split('\n').filter(Boolean);
+      const temp = `${logPath}.${process.pid}.tmp`;
+      fs.writeFileSync(temp, `${lines.slice(Math.ceil(lines.length / 2)).join('\n')}\n`, { mode: 0o600 });
+      fs.renameSync(temp, logPath);
+    }
+  } catch (error) {
+    if (error.code !== 'ENOENT') throw error;
+  }
+  fs.appendFileSync(logPath, `${JSON.stringify(record)}\n`, { mode: 0o600 });
+  fs.chmodSync(logPath, 0o600);
+}
 
 /**
  * Where a fault record would go, or null when there is nowhere to put it.
@@ -65,7 +108,7 @@ export function resolveFaultLogPath(fgosDir, cwd) {
  * the writer identity, the argv, and the cwd. No caller is asked to declare
  * anything, so no call site has to change to make this work.
  */
-export function recordInvocationFault({ fgosDir, cwd, verb, faultClass, message, argv }) {
+export function recordInvocationFault({ fgosDir, cwd, verb, sub, faultClass, message, argv }) {
   try {
     if (!faultClass) return null;
     const logPath = resolveFaultLogPath(fgosDir, cwd);
@@ -85,12 +128,11 @@ export function recordInvocationFault({ fgosDir, cwd, verb, faultClass, message,
       verb: verb ?? null,
       message,
       cwd,
-      argv,
+      argv: argvShape(argv, { sub }),
       writer,
       ...(writerError ? { writerError } : {}),
     };
-    fs.mkdirSync(path.dirname(logPath), { recursive: true });
-    fs.appendFileSync(logPath, `${JSON.stringify(record)}\n`);
+    appendFaultRecord(logPath, record);
     return logPath;
   } catch {
     return null;

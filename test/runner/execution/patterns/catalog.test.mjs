@@ -1228,11 +1228,12 @@ test('project-declared non-coding pattern and standard reviewed resolve through 
 
   const resReviewed = resolveCollaboration({
     selectors: { callerString: 'reviewed' },
-    runnerConfig: {},
+    runnerConfig: { loops: shipped.loops },
     shipped,
   });
   assert.equal(resReviewed.loop, 'reviewed');
-  assert.equal(resReviewed.params.maxRounds, 2);
+  assert.equal(resReviewed.params.maxRounds, shipped.loops.reviewed.maxRounds);
+  assert.equal(resReviewed.pin.provenance.params.maxRounds, 'config');
   assert.equal(resReviewed.pin.pattern.name, 'reviewed');
   assert.equal(resReviewed.pin.pattern.layer, 'shipped');
   assert.equal(resReviewed.pin.baseline.source, 'caller-string');
@@ -1298,6 +1299,7 @@ test('a global bad loop and a project promise report global for the offending fi
 test('parameter defaults chain resolves specific winners without leaking activity parameters across patterns', () => {
   const shipped = shippedCatalog();
   const config = {
+    loops: { reviewed: { maxRounds: 2 } },
     patterns: {
       'quick-review': {
         loop: 'reviewed',
@@ -1335,7 +1337,7 @@ test('parameter defaults chain resolves specific winners without leaking activit
     shipped,
   });
   assert.equal(resSwap.params.maxRounds, 2);
-  assert.equal(resSwap.pin.provenance.params.maxRounds, 'builtin');
+  assert.equal(resSwap.pin.provenance.params.maxRounds, 'config');
   assert.equal(resSwap.pin.baseline.source, 'activity');
   assert.equal(resSwap.pin.requested.pattern, 'reviewed');
 

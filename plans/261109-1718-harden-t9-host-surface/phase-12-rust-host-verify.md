@@ -1,7 +1,7 @@
 ---
 phase: 12
 title: "Rust host: stop hashing the running host from inside itself, read the addon once, drop the echo provider from production"
-status: pending
+status: landed (verify half `dc29c054f`; echo out of the production composition, host and mailbox verbs read the exit-code table)
 depends_on: ["`legacy_exec.rs` and `verify.rs` steps: none (start now)", "`apps/fgos/src/main.rs` step: shim-root on origin/main, then packaging P04 landed (writer chain); the exit-code table read also waits for P01 Step 7"]
 parallel: "host lane; file-disjoint from every Node phase; beside P13, P14, P15"
 effort: ~0.5d

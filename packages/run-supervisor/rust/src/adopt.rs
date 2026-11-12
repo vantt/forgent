@@ -83,6 +83,10 @@ pub struct Verdict {
     pub outcome: Option<String>,
     pub pending_step: Option<String>,
     pub reason: Option<String>,
+    /// Probe-only, `needs-adopt` lines: whether a call that adopts could run the attempt's steps.
+    pub adoptable: Option<bool>,
+    /// What the envelope binds the steps to that no longer exists (empty when adoptable).
+    pub gone: Vec<String>,
 }
 
 impl Verdict {
@@ -92,6 +96,18 @@ impl Verdict {
             outcome: None,
             pending_step: None,
             reason: None,
+            adoptable: None,
+            gone: Vec::new(),
+        }
+    }
+
+    /// A stuck attempt a probe found: adoptable unless the release that wrote its envelope is gone.
+    fn needs_adopt(reason: Option<String>, gone: Vec<String>) -> Self {
+        Verdict {
+            reason,
+            adoptable: Some(gone.is_empty()),
+            gone,
+            ..Verdict::state("needs-adopt")
         }
     }
 
@@ -111,6 +127,12 @@ impl Verdict {
         ] {
             if let Some(value) = value {
                 line[key] = Value::String(value.clone());
+            }
+        }
+        if let Some(adoptable) = self.adoptable {
+            line["adoptable"] = json!(adoptable);
+            if !self.gone.is_empty() {
+                line["gone"] = json!(self.gone);
             }
         }
         line
@@ -213,11 +235,14 @@ pub fn adopt_one(dir: &Path, args: &AdoptArgs) -> Verdict {
     };
     if args.probe_only {
         return match domain_state {
-            DomainState::Empty => match (&refusal, not_started) {
-                (Some(code), _) => Verdict::because("needs-adopt", format!("start-refused:{code}")),
-                (None, true) => Verdict::because("needs-adopt", NO_ENVELOPE),
-                (None, false) => Verdict::state("needs-adopt"),
-            },
+            DomainState::Empty => {
+                let reason = match (&refusal, not_started) {
+                    (Some(code), _) => Some(format!("start-refused:{code}")),
+                    (None, true) => Some(NO_ENVELOPE.to_string()),
+                    (None, false) => None,
+                };
+                Verdict::needs_adopt(reason, release_gone(envelope_json.as_ref()))
+            }
             _ => Verdict::because("running", "domain-not-empty"),
         };
     }
@@ -226,6 +251,28 @@ pub fn adopt_one(dir: &Path, args: &AdoptArgs) -> Verdict {
         return Verdict::because("running", "domain-not-empty");
     }
     adopt_locked(dir, &resource, binding.is_some(), agent, args)
+}
+
+/// What the envelope binds an attempt's steps to that no longer exists: the host binary, and the Node
+/// payload's step entry. The steps run only from those paths (never the active release), so adopt cannot
+/// close the attempt until they are back. Empty when the envelope is absent or unreadable: adopt judges that itself.
+fn release_gone(envelope: Option<&Value>) -> Vec<String> {
+    let Some(envelope) = envelope else {
+        return Vec::new();
+    };
+    let mut gone = Vec::new();
+    if let Some(host) = envelope["hostBin"].as_str().filter(|p| !p.is_empty()) {
+        if !Path::new(host).exists() {
+            gone.push(host.to_string());
+        }
+    }
+    if let Some(root) = envelope["payloadRoot"].as_str().filter(|p| !p.is_empty()) {
+        let entry = Path::new(root).join(crate::attempt_step::ENTRY);
+        if !entry.exists() {
+            gone.push(entry.to_string_lossy().into_owned());
+        }
+    }
+    gone
 }
 
 /// The attempt lock is held: an adopter's `adopting.json` tells it from the supervisor.

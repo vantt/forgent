@@ -10,7 +10,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { RunnerConfigError } from '../runner/dispatch/runner-config-error.mjs';
-import { dispatchCwdHolder } from '../run-supervisor/cwd-lock.mjs';
+import { custodyHeld } from '../runner/execution/custody-door.mjs';
 import { assignmentDir } from '../runner/dispatch/assignment-layout.mjs';
 import { gateAnswerFile, runDirOf } from '../runner/execution/case-run-paths.mjs';
 import { unitControllerHeld } from '../runner/execution/unit-control.mjs';
@@ -70,7 +70,7 @@ const listJson = (dir) => {
  */
 function reservationDead(mainRoot, { worktree, unitRunId }) {
   const fgosDir = path.join(mainRoot, '.fgos');
-  if (!worktree || !fs.existsSync(worktree) || dispatchCwdHolder(fgosDir, worktree) !== null) return false;
+  if (!worktree || !fs.existsSync(worktree) || custodyHeld(fgosDir, worktree)) return false;
   if (typeof unitRunId === 'string' && unitRunId.startsWith(GATE_RUN_PREFIX)) return true;
   const unitDir = typeof unitRunId === 'string' ? assignmentDir(fgosDir, unitRunId) : null;
   const record = unitDir && path.join(unitDir, 'unit.json');

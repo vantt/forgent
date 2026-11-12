@@ -16,7 +16,7 @@ import { writeRawProjectConfig } from '../helpers/config-fixture.mjs';
 import { initializeWorkRepository } from '../helpers/work-store-release.mjs';
 import { acquireSync, createLockScope } from '../../src/holder-lock/index.mjs';
 import { scan, signalByIdentity } from '../../src/native/process-identity.mjs';
-import { resolveFaultLogPath } from '../../src/cli/invocation-fault-log.mjs';
+import { resolveFaultLogPath } from '../../src/observe/invocation-fault-log.mjs';
 
 function workRepo(t, { remote = false } = {}) {
   const temp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-triggers-'));
@@ -225,6 +225,19 @@ test('a failing end trigger leaves a record, and the command it ended still succ
   assert.deepEqual(rest, []);
   assert.equal(record.faultClass, 'event-store-end-trigger');
   assert.equal(record.message, 'event-store-lock-dir-invalid');
+});
+
+test('a failing start trigger of a dispatched worker leaves a record before the verb runs, and the command still succeeds', (t) => {
+  const { repo, dir, store } = workRepo(t);
+  addAt(store, 3600);
+  refuseSeals(repo);
+  const env = { ...process.env, FGOS_DISPATCH_DEPTH: '1' };
+  const list = spawnSync(process.execPath, [BIN, 'list', '--dir', dir], { cwd: repo, encoding: 'utf8', env });
+  assert.equal(list.status, 0, list.stderr);
+  assert.deepEqual(
+    faultRecords(repo, dir).map((record) => [record.faultClass, record.message]),
+    [['event-store-start-trigger', 'event-store-lock-dir-invalid'], ['event-store-end-trigger', 'event-store-lock-dir-invalid']],
+  );
 });
 
 test('a detached seal or sync child that fails leaves a record and exits non-zero', (t) => {

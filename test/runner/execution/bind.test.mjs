@@ -412,6 +412,31 @@ test('bind spread: a family the same provider reaches through another executor c
   assert.equal(bind(spreadAsk([seatOn('member-1', 'native-agent')]), ctx).executor, 'codex');
 });
 
+test('bind: the binding names its provider family once, whatever spelling the executor declares', () => {
+  const runnerConfig = createMockRunnerConfig();
+  runnerConfig.executors.codex.provider = 'openai-codex';
+  runnerConfig.executors['codex-alias'] = { ...runnerConfig.executors.codex, provider: 'codex' };
+  runnerConfig.capabilities['docs:write'].prefer = [{ executor: 'codex-alias', invocation: 'codex-cli' }];
+  const unit = { id: 'u1', capability: 'docs:write', writes: [] };
+  const ctx = { runnerConfig, session: {} };
+  const bound = bind({ unit, role: 'producer', readOnly: true }, ctx);
+  assert.equal(bound.executor, 'codex-alias');
+  assert.equal(bound.family, 'openai');
+  assert.equal(bound.model, 'gpt-4o', 'the cell is the family\'s, not one keyed by the declared spelling');
+  // An executor that must differ from `codex` is not served by another spelling of the same family.
+  assert.equal(bind({ unit, role: 'producer', readOnly: true, independentOf: ['codex'] }, ctx).refused?.reason, 'independence-unsatisfiable');
+});
+
+test('bind: a modelPolicies cell written under another spelling of the family is found for it', () => {
+  const runnerConfig = createMockRunnerConfig();
+  runnerConfig.modelPolicies.codex = runnerConfig.modelPolicies.openai;
+  delete runnerConfig.modelPolicies.openai;
+  runnerConfig.executors.codex.provider = 'openai';
+  const bound = bind({ unit: { id: 'u1', capability: 'docs:write', writes: [] }, role: 'producer', readOnly: true }, { runnerConfig, session: {} });
+  assert.equal(bound.executor, 'codex');
+  assert.equal(bound.model, 'gpt-4o');
+});
+
 test('architecture guard: bind.mjs does NOT import src/state or src/runner/coordination', async () => {
   const fs = await import('node:fs/promises');
   const content = await fs.readFile(new URL('../../../src/runner/execution/bind.mjs', import.meta.url), 'utf8');

@@ -123,6 +123,28 @@ impl Fixture {
         serde_json::from_str(&fs::read_to_string(self.dir.join(name)).ok()?).ok()
     }
 
+    /// Bind the envelope's steps to `host` and `payload_root` (digest recomputed, so the envelope stays valid).
+    pub fn bind_release(&self, host: &Path, payload_root: &Path) {
+        let mut envelope = self.json("envelope.json").unwrap();
+        envelope["hostBin"] = json!(host);
+        envelope["payloadRoot"] = json!(payload_root);
+        envelope["digest"] = Value::String(envelope::digest(&envelope).unwrap());
+        fs::write(
+            self.path("envelope.json"),
+            serde_json::to_vec(&envelope).unwrap(),
+        )
+        .unwrap();
+    }
+
+    /// A payload root whose step entry exists, inside the attempt directory.
+    pub fn payload_with_entry(&self) -> PathBuf {
+        let root = self.path("payload");
+        let entry = root.join("src/run-supervisor/attempt-step.mjs");
+        fs::create_dir_all(entry.parent().unwrap()).unwrap();
+        fs::write(&entry, "").unwrap();
+        root
+    }
+
     /// How many times the fixture step ran.
     pub fn runs_of(&self, step: &str) -> usize {
         fs::read_to_string(self.dir.join(format!("ran-{step}"))).map_or(0, |t| t.lines().count())

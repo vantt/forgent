@@ -300,3 +300,35 @@ test('disconnected-worktree guard: "topic register" and "doc reserve" are refuse
     execFileSync('git', ['worktree', 'remove', '--force', wt], { cwd: main });
   }
 });
+
+// --- Invocation root: a subdirectory of the project acts on the project --
+
+test('invocation root: list from a subdirectory reads the real store, and no store appears under the subdirectory', () => {
+  const cwd = initGitCwdMainWithCommittedFgos();
+  assert.equal(run(cwd, ['submit', 'a task seen from docs', '--async']).status, 0);
+  const docs = path.join(cwd, 'docs');
+  fs.mkdirSync(docs);
+  const result = run(docs, ['list', '--json']);
+  assert.equal(result.status, 0, result.stderr);
+  assert.match(result.stdout, /a task seen from docs/);
+  assert.equal(fs.existsSync(path.join(docs, '.fgos')), false, 'no phantom store under the subdirectory');
+});
+
+test('invocation root: init from a subdirectory of a repository is refused naming the top level, creating nothing', () => {
+  const cwd = initGitCwdMainWithCommittedFgos();
+  const docs = path.join(cwd, 'docs');
+  fs.mkdirSync(docs);
+  const result = run(docs, ['init']);
+  assert.equal(result.status, 4, result.stderr);
+  assert.match(result.stderr, /top level/);
+  assert.match(result.stderr, new RegExp(fs.realpathSync(cwd).replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
+  assert.equal(fs.existsSync(path.join(docs, '.fgos')), false);
+});
+
+test('invocation root: main-checkout-reset --dir naming another repository is refused before anything is read', () => {
+  const main = initGitCwdMainWithCommittedFgos();
+  const other = initGitCwdMainWithCommittedFgos();
+  const result = run(main, ['main-checkout-reset', '--sha', 'HEAD', '--dir', other]);
+  assert.equal(result.status, 4, result.stderr);
+  assert.match(result.stderr, /not the main checkout/);
+});

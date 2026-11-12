@@ -54,9 +54,8 @@ import { resolveAndRenderOperationPrompt } from './operation-prompt-templates.mj
 import { withRunDirReadAccess } from './cli.mjs';
 import { mintAttemptWriterId, resolveWriterIdentity } from '../../util/session-identity.mjs';
 import { resolveExecutorEnv, workerBaseEnv, caseContextEnv, CASE_ID_ENV, CASE_RESERVATION_ENV } from './adapters.mjs';
-import { compileDispatchPlan } from './plan.mjs';
-import { deriveProviderFamily } from './resolve.mjs';
-import { normalizeProviderFamily } from './provider-adapter.mjs';
+import { compileDispatchPlan, launchPinOf } from './plan.mjs';
+import { familyOf } from './provider-adapter.mjs';
 import { refuseWorkItemInput } from './work-item-input.mjs';
 import { stampDeclaredAssignment } from './assignment-normalizer.mjs';
 import { extractProtocolOperationStamp, normalizeSavedPolicyTier, resolveMutatingCwdPosture } from './execution-contract.mjs';
@@ -339,7 +338,7 @@ function assertInlineMutatingAssignmentAuthorized(asgn, opts) {
         `executeAssignment: mutating unit-run assignment "${asgn.assignmentId}" binding mismatch: recomputed { executor: "${recomputed.executor}", pool: "${recomputed.pool ?? ''}", tier: "${recomputed.tier}", effort: "${recomputed.reasoningEffort ?? ''}", posture: "${recomputed.posture}" } does not match assignment { executor: "${asgnBinding.executor}", pool: "${asgnBinding.pool ?? ''}", tier: "${asgnBinding.tier}", effort: "${asgnBinding.reasoningEffort ?? ''}", posture: "${asgnBinding.posture}" } -- refused`,
       );
     }
-    const pinnedExecutor = asgn.policy?.preferExecutor ?? opts.cliOverride?.preferExecutor;
+    const pinnedExecutor = asgn.policy?.preferExecutor ?? launchPinOf(opts).executor;
     if (pinnedExecutor !== undefined && pinnedExecutor !== recomputed.executor) {
       throw new RunnerConfigError(
         `executeAssignment: mutating unit-run assignment "${asgn.assignmentId}" pins executor "${pinnedExecutor}" but the verified binding is "${recomputed.executor}" -- refused`,
@@ -602,10 +601,11 @@ function loadImmutableAssignment(assignment, { assignmentDir, cwd, opts }) {
  * @returns {Promise<{ provider?: string, selection: object|null, evidence: object|null }>}
  */
 async function leaseAccountForAttempt({ cfg, opts, compiledPlan, effectivePolicy, executorId, pinnedInvocationId, assignmentsDir, assignmentId, runId, runDir, repoRoot }) {
-  const boundPool = opts.cliOverride?.pool && opts.cliOverride.preferExecutor === executorId ? opts.cliOverride.pool : null;
+  const pin = launchPinOf(opts);
+  const boundPool = pin.pool && pin.executor === executorId ? pin.pool : null;
   const provider = boundPool
     ? legacyStateKey(boundPool)
-    : normalizeProviderFamily(effectivePolicy.providerModel || deriveProviderFamily(cfg.executors?.[executorId] ?? cfg.executor));
+    : legacyStateKey(effectivePolicy.providerModel || familyOf(cfg.executors?.[executorId] ?? cfg.executor));
   const leaseCli = declaredStoreCli(cfg, executorId, pinnedInvocationId);
   if (compiledPlan.mechanism !== 'out-of-process' || cfg.executors?.[executorId]?.kind === 'tool' || !hasProviderAccounts(cfg, provider)) {
     return { provider, selection: null, evidence: null };
@@ -636,12 +636,12 @@ async function leaseAccountForAttempt({ cfg, opts, compiledPlan, effectivePolicy
   try {
     // The account is named by the binding (Seat Binding ranked it); the lease only takes it. A launch with no
     // binding names none and cannot lease.
-    selection = opts.cliOverride?.leaseAccount
+    selection = pin.leaseAccount
       ? acquireNamedAccountLease({
         runnerConfig: cfg,
         provider,
-        accountId: opts.cliOverride.leaseAccount,
-        accountViewDigest: opts.cliOverride.accountViewDigest ?? null,
+        accountId: pin.leaseAccount,
+        accountViewDigest: pin.accountViewDigest,
         assignmentId,
         runId,
         runtimeDir: opts.providerCapacityRuntimeDir,
@@ -874,7 +874,7 @@ async function buildLaunch(attempt, ctx) {
   let resolvedCmd = resolveExecutorCommand(cfg, {
     prompt,
     model: effectivePolicy.model,
-    requestedModel: opts.cliOverride?.model,
+    requestedModel: launchPinOf(opts).model,
     reasoningEffort: effectivePolicy.reasoningEffort,
     tier: effectivePolicy.tier,
     executorId,
@@ -1191,7 +1191,7 @@ async function closeAttempt(attempt) {
  * Execute an assignment by dispatching a worker and recording the Run and its Run Result.
  *
  * @param {object} assignment Assignment object
- * @param {object} [opts] Options (`cwd`, `repoRoot`, `runnerConfig`, `cliOverride`, `timeoutMs`, `isReadOnlyMode`, ...)
+ * @param {object} [opts] Options (`cwd`, `repoRoot`, `runnerConfig`, `binding`, `cliOverride`, `timeoutMs`, `isReadOnlyMode`, ...)
  * @returns {Promise<Readonly<object>>} Stored RunResult object
  */
 export async function executeAssignment(assignment, opts = {}) {
@@ -1219,6 +1219,7 @@ export async function executeAssignment(assignment, opts = {}) {
     assignment: effectiveAssignment.assignmentId,
     assignmentItem: effectiveAssignment,
     hasLiveTaskAccess: opts.hasLiveTaskAccess ?? false,
+    binding: opts.binding,
     cliOverride: opts.cliOverride,
     options: opts.options,
   });
@@ -1243,9 +1244,8 @@ export async function executeAssignment(assignment, opts = {}) {
       : { mode: 'unconfined', policyId: null, policy: null };
 
   const resolvedExecutorId = effectivePolicy.executorId ?? 'claude';
-  const pinnedInvocationId = typeof opts.cliOverride?.preferInvocation === 'string' && opts.cliOverride.preferInvocation.trim()
-    ? opts.cliOverride.preferInvocation
-    : null;
+  const pinnedInvocation = launchPinOf(opts).invocation;
+  const pinnedInvocationId = typeof pinnedInvocation === 'string' && pinnedInvocation.trim() ? pinnedInvocation : null;
   let resolvedAdapter = compiledPlan?.invocation?.adapter || cfg.executors?.[resolvedExecutorId]?.adapter || cfg.executor?.adapter || 'cli-spawn';
   // The compiled plan describes the pinned invocation already; this only covers a pin
   // the plan could not see (a compiled plan that predates the pin on resume).

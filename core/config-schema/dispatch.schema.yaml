@@ -1,0 +1,18 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+$id: urn:fgos:config-schema:dispatch:v1
+$comment: "owner: run-supervisor"
+description: "Waits of the run supervisor when an agent or a controller is asked to stop."
+type: object
+properties:
+  gateKillGraceMs:
+    description: "Milliseconds between the SIGTERM and the SIGKILL of a launch gate that does not stop. In milliseconds."
+    type: integer
+    minimum: 1000
+    x-fgos-scope: both
+    x-fgos-file: config
+  cancelWaitMs:
+    description: "Milliseconds a controller stopped by Ctrl-C or SIGTERM waits for the receipts of its attempts; keep it at least gateKillGraceMs, or the controller leaves before the gate can finish stopping the agent. In milliseconds."
+    type: integer
+    minimum: 1000
+    x-fgos-scope: both
+    x-fgos-file: config

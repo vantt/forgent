@@ -60,7 +60,7 @@
       "id": "config-key-unknown",
       "origin": "spec",
       "section": "3, 6",
-      "meaning": "A write names a key that no section schema or runtime key describes; the refusal lists the nearest keys."
+      "meaning": "A write names a key that no section schema describes; the refusal lists the nearest keys."
     },
     {
       "id": "config-confinement-lowered",

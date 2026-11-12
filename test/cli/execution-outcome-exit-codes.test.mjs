@@ -6,7 +6,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync, spawnSync } from 'node:child_process';
-import { EXIT_CODES } from '../../src/state/store.mjs';
+import { EXIT_CODES } from '../../src/cli/exit-codes.mjs';
 import { OUTCOME_EXIT_CODES, exitCodeForOutcome } from '../../src/runner/execution/outcome-exit.mjs';
 import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
 import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';

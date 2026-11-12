@@ -280,7 +280,7 @@ export function assessBwrap(request, backend) {
   const coverage = {};
   const readiness = {};
 
-  const reqMode = request.requirement?.mode ?? 'unconfined';
+  const reqMode = request.requirement.mode;
 
   // Mode support: only required and unconfined in default v1 (spec §9.1)
   if (reqMode === 'preferred') {

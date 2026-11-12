@@ -12,7 +12,6 @@ export { runSolo } from './solo.mjs';
 export { runReviewed } from './reviewed.mjs';
 export { runPanel } from './panel.mjs';
 export { runDebate } from './debate.mjs';
-export { DEFAULT_MAX_ROUNDS } from './reviewed.mjs';
 export { DEFAULT_REBUTTAL } from './debate.mjs';
 
 const PARAM_TABLES = Object.freeze(Object.assign(Object.create(null), {

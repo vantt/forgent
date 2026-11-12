@@ -1,7 +1,7 @@
 ---
 phase: 04
 title: "Event Store lifecycle in one wrapper, fault logs below the shell and redacted, detached child below the shell, init as a use case"
-status: pending
+status: landed
 depends_on: ["03 landed"]
 parallel: "T3 layer; alone in its layer"
 effort: ~1.25d

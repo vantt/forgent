@@ -1,0 +1,24 @@
+{
+  "description": "One tree and the answer every reader of 'which project does this directory act on' must give for it. Paths are relative to the scratch base. 'project' is the nearest project store (null: none, refused); 'main' is the main checkout of the repository (null: no repository). Readers: the Node invocation-root door (test/rust-host/invocation-root-table.test.mjs), the Rust host walk (apps/fgos/src/cli_projector.rs tests) and the identity crate's main root (packages/identity/rust/tests/project.rs).",
+  "home": "home",
+  "steps": [
+    { "mkdir": "home/.fgos" },
+    { "mkdir": "home/proj/docs" },
+    { "write": "home/proj/docs/readme.md" },
+    { "git": ["home/proj", "init", "-q", "-b", "main"] },
+    { "git": ["home/proj", "add", "."] },
+    { "git": ["home/proj", "commit", "-q", "-m", "seed"] },
+    { "mkdir": "home/proj/.fgos" },
+    { "git": ["home/proj", "worktree", "add", "-q", "../wt", "-b", "wt"] },
+    { "mkdir": "outside/plain" },
+    { "mkdir": "outside/solo/.fgos" }
+  ],
+  "rows": [
+    { "name": "main root", "cwd": "home/proj", "project": "home/proj", "main": "home/proj" },
+    { "name": "subdirectory of the main checkout", "cwd": "home/proj/docs", "project": "home/proj", "main": "home/proj" },
+    { "name": "linked worktree, which carries no store", "cwd": "home/wt", "project": null, "main": "home/proj" },
+    { "name": "the home directory, whose .fgos is the global directory", "cwd": "home", "project": null, "main": null },
+    { "name": "no repository and no store", "cwd": "outside/plain", "project": null, "main": null },
+    { "name": "a store with no repository", "cwd": "outside/solo", "project": "outside/solo", "main": null }
+  ]
+}

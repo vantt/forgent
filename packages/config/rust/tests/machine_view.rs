@@ -29,7 +29,7 @@ fn a_global_value_wins_over_the_standard_and_a_standard_value_names_its_bundled_
     let ctx = context(&NoDetectors).unwrap();
     let snap = snapshot(&ctx, &global, SessionClass::Unconfined).unwrap();
     assert_eq!(snap.value["gateway"]["port"], 5555);
-    assert_eq!(snap.value["gateway"]["bind"], "0.0.0.0");
+    assert_eq!(snap.value["gateway"]["bind"], "127.0.0.1");
     let layer = |name: &str| {
         let wanted = [name.to_string()];
         let found = snap.origins.iter().find(|o| {

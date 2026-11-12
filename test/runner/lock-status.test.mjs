@@ -15,6 +15,7 @@ const { collectLockStatus, cutOverLockFiles, UNKNOWN_JUDGE_GRACE_MS } = await im
 const { fixLockDirs } = await import('../../src/setup/holder-lock-checks.mjs');
 const { fileHolders } = await import('../../src/holder-lock/index.mjs');
 const { observe, selfRecord } = await import('../../src/native/process-identity.mjs');
+const { writeBeacon } = await import('../../src/runner/main-checkout-activity.mjs');
 
 const STATE_ROOT = process.env.FGOS_STATE_ROOT;
 const GIT_ENV = { ...process.env, GIT_AUTHOR_NAME: 'checks', GIT_AUTHOR_EMAIL: 'checks@test', GIT_COMMITTER_NAME: 'checks', GIT_COMMITTER_EMAIL: 'checks@test' };
@@ -239,4 +240,15 @@ test('lock problems: a hot record naming a live pid in a foreign namespace is na
   assert.deepEqual(young, []);
   assert.match(old[0], /cannot be judged here/);
   assert.match(old[0], /fgos lock fence state/);
+});
+
+test('the commit-activity beacon is reported with its age, window and whether it is still active', () => {
+  const root = workspace('beacon');
+  const fgosDir = path.join(root, '.fgos');
+  assert.deepEqual(collectLockStatus({ fgosDir }).beacon, { status: 'none' });
+  writeBeacon(fgosDir, { writer: { id: 'w1' }, windowMs: 20_000, now: 1_000_000 });
+  assert.deepEqual(collectLockStatus({ fgosDir, now: 1_010_000 }).beacon, { status: 'present', writer: 'w1', ageMs: 10_000, windowMs: 20_000, active: true });
+  assert.equal(collectLockStatus({ fgosDir, now: 1_020_001 }).beacon.active, false);
+  fs.writeFileSync(path.join(fgosDir, 'runtime', 'main-checkout-activity.json'), '{not json');
+  assert.equal(collectLockStatus({ fgosDir }).beacon.status, 'corrupt');
 });

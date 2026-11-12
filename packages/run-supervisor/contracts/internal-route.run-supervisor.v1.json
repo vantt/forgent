@@ -67,7 +67,9 @@
         "state": { "enum": ["running", "being-adopted", "needs-adopt", "held", "adopted", "closed", "legacy-run", "open"] },
         "outcome": "receipt outcome when known",
         "pendingStep": "stepId the adopter could not finish (state open)",
-        "reason": "string or absent"
+        "reason": "string or absent",
+        "adoptable": "probe-only needs-adopt lines only: false when the envelope binds the steps to a host binary or payload step entry that no longer exists",
+        "gone": "probe-only, with adoptable false: the missing paths"
       },
       "stateMeaning": {
         "running": "the attempt lock is held and no adopting.json names the holder; on Windows also reason `starting`: lock free, no binding or receipt, envelope `createdAt` younger than 60 s on this boot (the supervisor takes the lock itself, so the lock is free between the controller letting go and the binding); a named run dir whose bound gate is not provably dead is also `running` with reason `gate-alive`, whatever the lock says",

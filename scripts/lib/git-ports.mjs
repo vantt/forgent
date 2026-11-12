@@ -7,7 +7,7 @@
 
 import crypto from 'node:crypto';
 import fs from 'node:fs';
-import { createGitInspect, gitPortOptions } from '../../src/git/inspect.mjs';
+import { createGitInspect, gitPortOptions, readRepoFacts } from '../../src/git/inspect.mjs';
 import { createGitScopedCommit } from '../../src/git/scoped-commit.mjs';
 import { createGitWorktree } from '../../src/git/worktree.mjs';
 import { loadNativeAddon } from '../../src/git/native.mjs';
@@ -68,7 +68,7 @@ export function pruneMissingCheckouts(cwd, registrations, { env = process.env, p
 
 /** The main checkout's root, from whichever checkout of the repository `cwd` sits in. */
 export function mainCheckoutRoot(cwd = process.cwd()) {
-  return inspectRepo(cwd).resolveRepo().trustedMainRoot;
+  return openPort(() => readRepoFacts(cwd).trustedMainRoot, process.env);
 }
 
 /** Every `status` entry, all pages, with `path` decoded to a string. */

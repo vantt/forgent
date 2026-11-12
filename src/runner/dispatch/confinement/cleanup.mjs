@@ -13,6 +13,8 @@ import path from 'node:path';
 import { stopProcessesInside } from '../stop-processes-inside.mjs';
 import { writeFileAtomic, writeBackRenewedCredential } from '../provider-credential-renewal.mjs';
 import { readAgentFileSync } from '../../../native/proof-helpers.mjs';
+import { refuseSymlink } from '../../../util/refuse-symlink.mjs';
+import { resolveHolderLiveness } from '../../../native/process-identity.mjs';
 
 export const OWNERSHIP_MARKER_FILE = '.fgos-confinement-owner.json';
 
@@ -262,6 +264,108 @@ export function removeAttemptHome(homeDir, dispatchId) {
 }
 
 /**
+ * Copy the session directory of an attempt home into `destDir` (mode 0700 for directories, 0600 for files) before the
+ * home is removed. Only that directory is read: `sessionDir` is a relative path inside the home, and no part of it may
+ * be a symbolic link, nor any entry under it, so a link the agent planted cannot pull a file from outside the home. A
+ * file already in `destDir` is never overwritten. When the copy fails, what this call created is removed again and
+ * the error is thrown.
+ *
+ * @returns {{found: boolean, files: number, bytes: number}} `found` is false when the home has no such directory
+ */
+export function keepSessionTranscript({ homeDir, sessionDir, destDir, root = destDir }) {
+  if (typeof sessionDir !== 'string' || sessionDir === '' || path.isAbsolute(sessionDir) || sessionDir.split(/[\\/]/).includes('..')) {
+    throw new Error(`session directory "${sessionDir}" must be a relative path without ".."`);
+  }
+  let source = homeDir;
+  for (const part of sessionDir.split(/[\\/]/).filter(Boolean)) {
+    source = path.join(source, part);
+    if (!refuseSymlink(source, 'the session directory of the attempt home', { optional: true })) return { found: false, files: 0, bytes: 0 };
+  }
+  if (!fs.lstatSync(source).isDirectory()) throw new Error(`${sessionDir} in the attempt home is not a directory`);
+  const createdFiles = [];
+  const createdDirs = [];
+  let bytes = 0;
+  const copyDir = (from, to) => {
+    if (!fs.existsSync(to)) {
+      ensurePrivateDir(to, { root });
+      createdDirs.push(to);
+    }
+    for (const name of fs.readdirSync(from)) {
+      const entry = path.join(from, name);
+      const stat = refuseSymlink(entry, 'the session directory of the attempt home');
+      const target = path.join(to, name);
+      if (stat.isDirectory()) { copyDir(entry, target); continue; }
+      if (!stat.isFile()) throw new Error(`${entry} is not a regular file`);
+      fs.copyFileSync(entry, target, fs.constants.COPYFILE_EXCL);
+      createdFiles.push(target);
+      fs.chmodSync(target, 0o600);
+      bytes += stat.size;
+    }
+  };
+  try {
+    copyDir(source, destDir);
+  } catch (err) {
+    for (const file of createdFiles) fs.rmSync(file, { force: true });
+    for (const dir of createdDirs.reverse()) { try { fs.rmdirSync(dir); } catch { /* not empty: it was there before */ } }
+    throw err;
+  }
+  return { found: true, files: createdFiles.length, bytes };
+}
+
+const HOME_LAYOUT_LIMIT = 60;
+
+/** Files and bytes under `dir`, never following a link. */
+function measureTree(dir) {
+  let files = 0;
+  let bytes = 0;
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    const entryPath = path.join(dir, entry.name);
+    if (entry.isDirectory()) {
+      const inner = measureTree(entryPath);
+      files += inner.files;
+      bytes += inner.bytes;
+    } else if (entry.isFile()) {
+      files += 1;
+      bytes += fs.lstatSync(entryPath).size;
+    }
+  }
+  return { files, bytes };
+}
+
+/**
+ * What an attempt home holds, by name and size only (never content): its top-level entries and the entries one level
+ * into each directory, at most HOME_LAYOUT_LIMIT of them. It says where a CLI wrote its session when the declared
+ * session directory is wrong. The ownership marker is left out.
+ *
+ * @returns {Array<{path: string, kind: 'dir'|'file'|'link'|'other', files: number, bytes: number}>}
+ */
+export function describeAttemptHome(homeDir) {
+  const layout = [];
+  const visit = (dir, prefix, depth) => {
+    let entries;
+    try { entries = fs.readdirSync(dir, { withFileTypes: true }).sort((a, b) => (a.name < b.name ? -1 : 1)); } catch { return; }
+    for (const entry of entries) {
+      if (layout.length >= HOME_LAYOUT_LIMIT) return;
+      if (prefix === '' && entry.name === OWNERSHIP_MARKER_FILE) continue;
+      const entryPath = path.join(dir, entry.name);
+      const rel = prefix === '' ? entry.name : `${prefix}/${entry.name}`;
+      try {
+        if (entry.isDirectory()) {
+          layout.push({ path: rel, kind: 'dir', ...measureTree(entryPath) });
+          if (depth < 1) visit(entryPath, rel, depth + 1);
+        } else if (entry.isFile()) {
+          layout.push({ path: rel, kind: 'file', files: 1, bytes: fs.lstatSync(entryPath).size });
+        } else {
+          layout.push({ path: rel, kind: entry.isSymbolicLink() ? 'link' : 'other', files: 0, bytes: 0 });
+        }
+      } catch { /* an entry that vanished while listing */ }
+    }
+  };
+  visit(homeDir, '', 0);
+  return layout;
+}
+
+/**
  * Delete a confinement directory of a dispatch outside the assignment door (the driver's cleanup and the
  * finalizer of a settled dispatch). Such a home is never written back: only an attempt opts in to credential
  * write-back, and an attempt home is removed only by adopt's finalize-home step. Nothing a home's own marker
@@ -383,4 +487,68 @@ export function settleHeldCredentialHomes({ tempRoots = [resolveConfinementTempR
  */
 export function canonicalRoot(root) {
   try { return fs.realpathSync(root); } catch { return path.resolve(root); }
+}
+
+/** How old an empty per-dispatch directory must be before it counts as left behind. */
+const EMPTY_SHELL_GRACE_MS = 600000;
+
+/**
+ * What confinement left behind under `roots`, judged here and nowhere else: `deadOwned` are resource dirs
+ * whose recorded dispatcher process is dead (a home held for its unstaged login is never one; it is reported
+ * as a kept credential home), `emptyShells` are per-dispatch dirs empty past the grace period, `loose` are
+ * roots we own that are readable beyond the owner. Read-only; a version 2 (attempt) marker is adopt's, not judged.
+ */
+export function judgeConfinementOrphans(roots, { now = Date.now() } = {}) {
+  const uid = typeof process.getuid === 'function' ? process.getuid() : null;
+  const deadOwned = [];
+  const emptyShells = [];
+  const loose = [];
+  for (const root of roots) {
+    try {
+      const st = fs.statSync(root);
+      if ((uid === null || st.uid === uid) && (st.mode & 0o077) !== 0) loose.push(root);
+    } catch { /* absent root: nothing to protect yet */ }
+    let entries = [];
+    try { entries = fs.readdirSync(root, { withFileTypes: true }); } catch { continue; }
+    for (const entry of entries) {
+      if (!entry.isDirectory()) continue;
+      const dispatchDir = path.join(root, entry.name);
+      const candidates = [dispatchDir];
+      try {
+        for (const sub of fs.readdirSync(dispatchDir, { withFileTypes: true })) {
+          if (sub.isDirectory()) candidates.push(path.join(dispatchDir, sub.name));
+        }
+        if (candidates.length === 1 && now - fs.statSync(dispatchDir).mtimeMs > EMPTY_SHELL_GRACE_MS
+          && fs.readdirSync(dispatchDir).length === 0) emptyShells.push(dispatchDir);
+      } catch { /* unreadable: nothing to count */ }
+      for (const dir of candidates) {
+        const marker = readOwnershipMarker(dir);
+        if (!marker) continue;
+        if ((marker.credentialKept?.attempts ?? 0) >= CREDENTIAL_KEEP_MAX_ATTEMPTS) continue;
+        const alive = Number.isInteger(marker.pid) && marker.pid > 0 && resolveHolderLiveness({ pid: marker.pid }) !== 'dead';
+        if (!alive) deadOwned.push({ dir, dispatchId: marker.dispatchId });
+      }
+    }
+  }
+  return { deadOwned, emptyShells, loose };
+}
+
+/**
+ * Remove what `judgeConfinementOrphans` named: tighten loose roots to 0700, remove dead-owned resources through
+ * the ownership-checked cleanup (one that cannot go stays), then rmdir the empty shells. Returns the counts.
+ */
+export function removeConfinementOrphans({ deadOwned, emptyShells, loose }) {
+  let tightened = 0;
+  for (const root of loose) {
+    try { fs.chmodSync(root, 0o700); tightened += 1; } catch { /* reported again by the judgement */ }
+  }
+  let removedHomes = 0;
+  for (const { dir, dispatchId } of deadOwned) {
+    try { if (cleanupConfinementResource(dir, dispatchId).cleaned) removedHomes += 1; } catch { /* kept */ }
+  }
+  let removedShells = 0;
+  for (const shell of emptyShells) {
+    try { fs.rmdirSync(shell); removedShells += 1; } catch { /* filled meanwhile or already removed with its home */ }
+  }
+  return { tightened, removedHomes, removedShells };
 }

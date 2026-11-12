@@ -6,7 +6,8 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
-import { addOutcome, addWork, EXIT_CODES, StoreError } from '../../../src/state/store.mjs';
+import { addOutcome, addWork, StoreError } from '../../../src/state/store.mjs';
+import { EXIT_CODES } from '../../../src/cli/exit-codes.mjs';
 import { catchupUseCase } from '../../../src/verbs/merge/catchup.mjs';
 import {
   addOk,

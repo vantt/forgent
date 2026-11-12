@@ -54,7 +54,15 @@
 // worktree carrying a frozen `.fgos/` copy. `landsWork` (true, or
 // `(positional) => boolean`) marks the verbs that run Land, so their end trigger
 // releases the candidates Work has recorded. Both default to false when absent.
+// `eventStoreChild` (`(positional, flags) => boolean`) marks the invocation that is a detached seal or publish child of
+// the Event Store lifecycle itself: it opens no start or end trigger (the child does one seal or one sync and nothing
+// around it) and a failure of it is always recorded, since nobody waits for it.
 // Every entry carries `store`, same discipline as `paginated` above.
+//
+// `guide` (optional, `{changes, prerequisites, exitCodes[], next}`) is what a person needs before
+// running a verb: what it changes on disk, what it needs, its exit codes and the next command.
+// `fgos <verb> --help` renders it with the verb's flags (and their defaults, from `parameters`) and
+// `examples`; the manifest carries it. test/cli/fgos-help.test.mjs checks each guided verb's help.
 
 // `subcommands` (optional) is set on a verb whose first positional is a
 // sub-verb: {<sub>: {description, parameters, examples}}, each sub-verb's
@@ -127,6 +135,7 @@ export const COMMAND_REGISTRY = [
     externalEffect: false,
     paginated: false,
     deprecated: null,
+    nativeOnly: true,
   },
   withSubcommands({
     name: 'metrics',
@@ -419,6 +428,16 @@ export const COMMAND_REGISTRY = [
     externalEffect: false,
     paginated: false,
     deprecated: null,
+    guide: {
+      changes: 'Creates .fgos/ in the current directory: the event log, an empty view and the coexistence manifest. Nothing outside the project. Safe to repeat.',
+      prerequisites: 'A git repository, run in its main checkout (a linked worktree is refused). Normally `fgctl init` runs this for you.',
+      exitCodes: [
+      '0 the store is ready',
+      '4 refused; the message names the cause',
+      '1 failed',
+      ],
+      next: 'fgos doctor, then fgos run "<prompt>".',
+    },
   },
   {
     name: 'add',
@@ -1224,6 +1243,16 @@ export const COMMAND_REGISTRY = [
     },
     examples: ['fgos config show --json', 'fgos config check', 'fgos config set gateBypass.level light --reason "light gates while the audit runs"', 'fgos config migrate --dry-run'],
     touchesState: true, store: 'none', externalEffect: false, paginated: false, deprecated: null, nativeOnly: true,
+    guide: {
+      changes: 'show, explain, standard and check read only. set, unset, patch, migrate and refresh-docs write one config file (the project .fgos/config.yaml, or the machine files with --global) in one transaction, with a required reason.',
+      prerequisites: 'A project for project config. Writes are refused for a confined session. Read verbs never print a secret value.',
+      exitCodes: [
+      '0 done',
+      '4 refused: unknown key, bad value or unknown option',
+      '1 failed; `check` exits non-zero when any finding is a fail',
+      ],
+      next: 'fgos config check after a change, then fgos doctor.',
+    },
   }),
   {
     name: 'gate-check',
@@ -1409,8 +1438,8 @@ export const COMMAND_REGISTRY = [
   }),
   withSubcommands({
     name: 'dispatch',
-    invoke: 'fgos dispatch <show-run|inspect|watch|recover|reconcile|decide|explain|probe-account> [args]',
-    description: 'Dispatch-owned reads and repairs; it runs no work itself (one task runs through `fgos run`, planned work through `fgos workflow start`). "decide" answers which mechanism and executor a dispatch resolves to; "explain" lays out why a capability binds to its family, tier, model and invocation; "show-run"/"watch"/"inspect" read Run state; "recover" observes or applies recovery of a STANDALONE Run; "reconcile" is a narrow, local CAS-guarded guard repair plus provider-capacity quarantine door that never recovers, launches, signals, or controls a Run; "probe-account" is a diagnostic over one provider account.',
+    invoke: 'fgos dispatch <show-run|inspect|watch|recover|reconcile|decide|explain|probe-account|probe-session> [args]',
+    description: 'Dispatch-owned reads and repairs; it runs no work itself (one task runs through `fgos run`, planned work through `fgos workflow start`). "decide" answers which mechanism and executor a dispatch resolves to; "explain" lays out why a capability binds to its family, tier, model and invocation; "show-run"/"watch"/"inspect" read Run state; "recover" observes or applies recovery of a STANDALONE Run; "reconcile" is a narrow, local CAS-guarded guard repair plus provider-capacity quarantine door that never recovers, launches, signals, or controls a Run; "probe-account" is a diagnostic over one provider account; "probe-session" is a diagnostic over one executor\'s session transcript.',
     subcommands: {
       'show-run': {
         description: 'Read one Run\'s recorded state.',
@@ -1565,6 +1594,21 @@ export const COMMAND_REGISTRY = [
         },
         examples: ['fgos dispatch probe-account --provider openai --account tetcu72'],
       },
+      'probe-session': {
+        description: 'Diagnostic: run one tiny read-only seat of one executor through the real dispatch door (weakest tier, so the cheapest model its family allows) and report where its CLI wrote the session in the attempt home, the folder `runner.yaml` declares, whether Execution kept it, where `transcriptPath` points and its size. Names the `runner.yaml` line to change when the declared folder is wrong. Prints paths, counts and sizes only, never session content. Exit 0 when the session was kept; otherwise exit 1 with the category in the JSON.',
+        parameters: {
+          type: 'object',
+          properties: {
+            executor: { type: 'string', description: 'Executor id (positional), e.g. gemini or deepseek.' },
+            invocation: { type: 'string', description: 'Invocation id to probe (default: the first confined cli invocation of the executor).' },
+            cwd: { type: 'string', description: 'Working directory the probe runs in (default: the current directory; --dir is accepted too).' },
+            'repo-root': { type: 'string', description: 'Main checkout repository root.' },
+          },
+          positional: ['executor'],
+          required: ['executor'],
+        },
+        examples: ['fgos dispatch probe-session gemini', 'fgos dispatch probe-session deepseek --invocation pi-herdr --json'],
+      },
     },
     examples: [
       'fgos dispatch decide --for general-purpose --has-live-task-access',
@@ -1574,7 +1618,7 @@ export const COMMAND_REGISTRY = [
     ],
     touchesState: true,
     // "reconcile"/"recover" write guard and Run state (touchesState: true);
-    // "probe-account" spawns provider CLIs (externalEffect: true). A verb with
+    // "probe-account" and "probe-session" spawn provider CLIs (externalEffect: true). A verb with
     // several sub-modes is classified by its most-privileged effect on each axis.
     store: 'none',
     mutatesStore: (positional, flags) => positional[0] === 'recover' && flags.action !== undefined,
@@ -1634,6 +1678,21 @@ export const COMMAND_REGISTRY = [
     externalEffect: true,
     paginated: false,
     deprecated: null,
+    guide: {
+      changes: 'Writes the run record under .fgos/assignments/<unitRunId>/ and runs an agent CLI headless, which spends that account\'s quota. Read-only for your files unless --writes: then it commits only those paths, in a linked worktree, after a passing round.',
+      prerequisites: 'At least one supported agent CLI installed and signed in (`fgos doctor` shows which). An activated project (`fgctl init`). --writes needs a linked worktree.',
+      exitCodes: [
+      '0 pass',
+      '1 failed for another reason',
+      '4 refused by policy or by a bad option',
+      '10 provider limit',
+      '11 execution failure',
+      '12 partial writes',
+      '13 blocked',
+      '14 findings',
+      ],
+      next: 'Read the result summary; after an infrastructure failure continue with `fgos run --resume <unitRunId>`.',
+    },
   },
   {
     name: 'rebuild',
@@ -1662,6 +1721,7 @@ export const COMMAND_REGISTRY = [
     touchesState: true,
     store: 'open',
     mutatesStore: (positional) => positional[0] === 'sync',
+    eventStoreChild: (positional, flags) => positional[0] === 'seal' || (positional[0] === 'sync' && flags.opportunistic === true),
     externalEffect: true,
     paginated: false,
     deprecated: null,
@@ -2269,7 +2329,7 @@ export const COMMAND_REGISTRY = [
   {
     name: 'setup',
     invoke: 'fgos setup',
-    description: 'Legacy compatibility command: insert the fgos shell-integration source line into detected shell rc file(s), ensure shared config defaults, wire support hooks, and run registered fixes. Target workspace onboarding is fgctl init (it needs --from <source> when .fgos/distribution.json is absent), then local fgos doctor --fix and fgos doctor; doctor --fix runs only the registered fixes, so run fgos setup once in the project for the config defaults, git hook and Claude Code hook it does not write. Shell/global setup compatibility stays here until a compatibility-window decision retires it.',
+    description: 'Legacy: inserts the fgos shell-integration source line, writes the shared config defaults and support hooks, and runs the registered fixes. Use `fgctl init`, then `fgos doctor --fix`.',
     parameters: {
       type: 'object',
       properties: {
@@ -2282,7 +2342,7 @@ export const COMMAND_REGISTRY = [
     store: 'open',
     externalEffect: false,
     paginated: false,
-    deprecated: 'since 2026-09-14; target workspace onboarding starts with fgctl init (plain fgctl init downloads the latest release when .fgos/distribution.json is absent), then .fgos/installation/bin/fgos doctor --fix and .fgos/installation/bin/fgos doctor; doctor --fix runs only the registered fixes, so run fgos setup once in the project for the config defaults, git hook and Claude Code hook it does not write; shell/global integration stays here until a compatibility-window decision retires it',
+    deprecated: 'since 2026-09-14; use fgctl init, then fgos doctor --fix (setup still writes the config defaults, git hook and Claude Code hook that doctor --fix does not)',
   },
   {
     name: 'uninstall',
@@ -2303,6 +2363,16 @@ export const COMMAND_REGISTRY = [
     externalEffect: false,
     paginated: false,
     deprecated: null,
+    guide: {
+      changes: 'Unwires core.hooksPath when it is still exactly .githooks. Reports, and never deletes, any fgos shell-rc source line. Never touches .fgos/ data or config.',
+      prerequisites: '--yes: without it the command refuses and changes nothing. Run it inside the project.',
+      exitCodes: [
+      '0 done',
+      '4 refused (for example no --yes)',
+      '1 failed',
+      ],
+      next: 'Remove any reported rc line by hand, then `fgos doctor` to see what is still wired.',
+    },
   },
   {
     name: 'wire-agents',
@@ -2342,6 +2412,16 @@ export const COMMAND_REGISTRY = [
     externalEffect: false,
     paginated: false,
     deprecated: null,
+    guide: {
+      changes: 'Read-only by default. With --fix it runs every registered fix: the project files they own (shared config defaults, git hook, hook wiring). It never writes your global agent config; `fgos wire-agents` is the one opt-in for that.',
+      prerequisites: 'Node >= 18 and git on PATH. Run it inside the project.',
+      exitCodes: [
+      '0 whatever the checks say',
+      '1 with --strict, when a check still fails',
+      '4 refused option',
+      ],
+      next: 'Run each `next` command the report lists; `fgos doctor --json` is the machine form.',
+    },
   },
   {
     name: 'unclaim',

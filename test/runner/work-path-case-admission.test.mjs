@@ -92,7 +92,10 @@ test('every production call of runUnit injects the case admission port, so no wr
       }
     }
   }
-  assert.equal(calls, 6, 'the six writing call sites of runUnit are the ones checked');
+  assert.equal(calls, 6, 'the five writing call sites of runUnit and the read-only session probe door are the ones checked');
+  // `fgos run` hands runUnit the request buildRunRequest made: the port is part of it, whenever the project root is known.
+  assert.match(fs.readFileSync(path.join(root, 'src/runner/execution/run-request.mjs'), 'utf8'), /portRoot \? \{ caseAdmission: roots\.caseAdmission\.createPort\(\{ repoRoot: portRoot \}\) \}/, 'buildRunRequest carries the port');
+  assert.match(fs.readFileSync(path.join(root, 'bin/fgos.mjs'), 'utf8'), /runUnit\(request\)/, 'the run arm hands runUnit the built request');
   // The only other place runUnit is defined or named is the Execution Core itself.
   const stray = ['src', 'bin'].flatMap((dir) => execFileSync('grep', ['-rl', '--include=*.mjs', 'runUnit(', path.join(root, dir)], { encoding: 'utf8' }).split('\n').filter(Boolean))
     .map((f) => path.relative(root, f)).filter((f) => !files.includes(f) && f !== 'src/runner/execution/run.mjs');

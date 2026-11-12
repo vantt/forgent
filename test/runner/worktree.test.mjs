@@ -29,6 +29,9 @@ import {
   checkoutDirtyPaths,
   realpathOrSelf,
   WorktreeError,
+  admitStoreAccess,
+  checkedOutBranch,
+  isSessionWorktree,
 } from '../../src/runner/worktree.mjs';
 
 // Every test here creates its own disposable git repo (git init in a
@@ -1492,4 +1495,97 @@ test('a failing worktreeSetup command throws WorktreeError naming the command an
   );
   const registered = execFileSync('git', ['worktree', 'list', '--porcelain'], { cwd: repoRoot, encoding: 'utf8' });
   assert.doesNotMatch(registered, /item-badsetup/);
+});
+
+// admitStoreAccess: one decision, whether a verb may touch the store at `dir` from `cwd`. Why no existing test proves it:
+// the CLI guard cases only see a spawned call's exit code and text; this owns each refusal and its tagged fault class.
+function mainWithCommittedFgos() {
+  const main = initTempRepo();
+  fs.mkdirSync(path.join(main, '.fgos'), { recursive: true });
+  fs.writeFileSync(path.join(main, '.fgos', 'events.jsonl'), '');
+  execFileSync('git', ['add', '.fgos/events.jsonl'], { cwd: main });
+  execFileSync('git', ['commit', '-q', '-m', 'store'], { cwd: main });
+  return main;
+}
+
+function linkedWorktreeOf(main, name) {
+  const wt = path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-admit-wt-')), name);
+  execFileSync('git', ['worktree', 'add', '-q', '--detach', wt, 'HEAD'], { cwd: main });
+  return wt;
+}
+
+const admit = (over) => admitStoreAccess({ verb: 'submit', store: 'require', mutates: true, explicitDir: false, ...over });
+const refusal = (fn) => { try { fn(); } catch (err) { return err; } return null; };
+
+test('admitStoreAccess: a required store that is missing is refused as store-missing with exit-4 category', () => {
+  const main = initTempRepo();
+  fs.rmSync(path.join(main, '.fgos'), { recursive: true, force: true });
+  const err = refusal(() => admit({ dir: path.join(main, '.fgos'), cwd: main }));
+  assert.equal(err?.category, 'validation');
+  assert.equal(err.faultClass, 'store-missing');
+  assert.match(err.message, /\.fgos\/ not found/);
+});
+
+test('admitStoreAccess: a store-mutating verb from a linked worktree holding a frozen .fgos snapshot is refused as disconnected-worktree-store', () => {
+  const main = mainWithCommittedFgos();
+  const wt = linkedWorktreeOf(main, 'adhoc');
+  const err = refusal(() => admit({ dir: path.join(wt, '.fgos'), cwd: wt }));
+  assert.equal(err?.faultClass, 'disconnected-worktree-store');
+  assert.match(err.message, /disconnected snapshot/);
+  assert.equal(err.category, 'validation');
+});
+
+test('admitStoreAccess: the main checkout, an explicit --dir, a read-only verb and a session worktree are all admitted', () => {
+  const main = mainWithCommittedFgos();
+  const wt = linkedWorktreeOf(main, 'adhoc');
+  assert.deepEqual(admit({ dir: path.join(main, '.fgos'), cwd: main }), { warning: null });
+  assert.deepEqual(admit({ dir: path.join(wt, '.fgos'), cwd: wt, explicitDir: true }), { warning: null });
+  assert.deepEqual(admit({ dir: path.join(wt, '.fgos'), cwd: wt, mutates: false }), { warning: null });
+  const session = linkedWorktreeOf(main, 'session');
+  fs.rmSync(path.join(session, '.fgos'), { recursive: true });
+  fs.symlinkSync(path.join(main, '.fgos'), path.join(session, '.fgos'), 'dir');
+  assert.deepEqual(admit({ dir: path.join(session, '.fgos'), cwd: session }), { warning: null });
+});
+
+test('admitStoreAccess: init inside a linked worktree is refused as init-in-worktree, and allowed at the main checkout', () => {
+  const main = mainWithCommittedFgos();
+  const wt = linkedWorktreeOf(main, 'adhoc');
+  fs.rmSync(path.join(wt, '.fgos'), { recursive: true });
+  const err = refusal(() => admitStoreAccess({ verb: 'init', store: 'open', mutates: false, dir: path.join(wt, '.fgos'), cwd: wt, explicitDir: false }));
+  assert.equal(err?.faultClass, 'init-in-worktree');
+  assert.doesNotThrow(() => admitStoreAccess({ verb: 'init', store: 'open', mutates: false, dir: path.join(main, '.fgos'), cwd: main, explicitDir: false }));
+});
+
+test('admitStoreAccess: a read verb with no .fgos from a linked worktree is admitted with a warning line, and from the main checkout without one', () => {
+  const main = mainWithCommittedFgos();
+  const wt = linkedWorktreeOf(main, 'adhoc');
+  fs.rmSync(path.join(wt, '.fgos'), { recursive: true });
+  const read = (over) => admitStoreAccess({ verb: 'list', store: 'read', mutates: false, explicitDir: false, ...over });
+  assert.match(read({ dir: path.join(wt, '.fgos'), cwd: wt }).warning, /this view may be empty/);
+  const bare = initTempRepo();
+  fs.rmSync(path.join(bare, '.fgos'), { recursive: true, force: true });
+  assert.equal(read({ dir: path.join(bare, '.fgos'), cwd: bare }).warning, null);
+});
+
+test('resyncWorktree without a branch refuses a detached checkout as a validation error, and checkedOutBranch names an attached one', () => {
+  const main = initTempRepo();
+  const attached = path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-resync-wt-')), 'attached');
+  execFileSync('git', ['worktree', 'add', '-q', '-b', 'feature/x', attached, 'HEAD'], { cwd: main });
+  assert.equal(checkedOutBranch(attached), 'feature/x');
+  const detached = linkedWorktreeOf(main, 'detached');
+  assert.equal(checkedOutBranch(detached), null);
+  const err = refusal(() => resyncWorktree(main, detached));
+  assert.equal(err?.category, 'validation');
+  assert.match(err.message, /no branch checked out/);
+});
+
+test('admitStoreAccess: a Git state that cannot be read refuses with its own fault class instead of an unlabeled error', () => {
+  const main = mainWithCommittedFgos();
+  const wt = linkedWorktreeOf(main, 'forged');
+  // A worktree whose gitdir pointer is garbage: Git refuses to trust it, so the identity read throws.
+  fs.writeFileSync(path.join(wt, String.fromCharCode(46) + 'git'), 'gitdir: /nonexistent/forged\n');
+  const err = refusal(() => admit({ dir: path.join(wt, '.fgos'), cwd: wt }));
+  assert.equal(err?.faultClass, 'worktree-identity-unreadable');
+  assert.equal(err.category, 'validation');
+  assert.equal(isSessionWorktree(wt), false);
 });

@@ -36,6 +36,12 @@ export function gitPortOptions(repoPath, { mutation = false, inspect } = {}) {
   return { ...seed, trustedMain: facts.trustedMainRoot, writer: gitWriter(path.join(facts.trustedMainRoot, '.fgos')) };
 }
 
+/** The repository facts of the checkout `cwd` sits in (`notARepository` when it sits in none); throws when Git cannot be read.
+ * The one read every root answer is built from. */
+export function readRepoFacts(cwd = process.cwd()) {
+  return createGitInspect(gitPortOptions(cwd)).resolveRepo();
+}
+
 /**
  * Whether `relativePath` names an entry at `revision`. A blob larger than the
  * read budget still exists; any other unreadable answer throws.

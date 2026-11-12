@@ -60,7 +60,10 @@ function runAdopt(args, { input, hostBin, killWaitMs } = {}) {
   return lines;
 }
 
-/** Judge one attempt directory (and adopt it unless `probeOnly`): `{attemptDir, state, outcome?, pendingStep?, reason?}`. */
+/**
+ * Judge one attempt directory (and adopt it unless `probeOnly`): `{attemptDir, state, outcome?, pendingStep?, reason?}`.
+ * A probe line with state `needs-adopt` (stuck) also carries `adoptable`, and `gone` (paths) when it is false.
+ */
 export function adoptRun(runDir, { probeOnly = false, ...options } = {}) {
   const lines = runAdopt(['--run-dir', path.resolve(runDir), ...(probeOnly ? ['--probe-only'] : [])], options);
   if (lines.length !== 1) {

@@ -6,7 +6,8 @@ import { effectiveDispatchPolicy as policyOf } from '../../src/runner/dispatch/p
 import { bindable } from '../helpers/work-seat-config.mjs';
 import { supportsPolicyTier } from '../../src/runner/dispatch/config.mjs';
 import { RunnerConfigError } from '../../src/runner/dispatch/runner-config-error.mjs';
-import { deriveProviderFamily, resolveExecutorConfig } from '../../src/runner/dispatch/resolve.mjs';
+import { resolveExecutorConfig } from '../../src/runner/dispatch/resolve.mjs';
+import { familyOf } from '../../src/runner/dispatch/provider-adapter.mjs';
 import { resolveStrongerRigor } from '../../src/runner/rigor.mjs';
 import { workRigorFor } from '../../src/runner/work-dispatch.mjs';
 
@@ -245,11 +246,12 @@ test('the dispatch policy fails closed (throws, never a silent null model) when 
 
 // --- Phase 00 R6: executor/provider truth (fixes H2a/H2b) ---
 
-test('deriveProviderFamily reads providerModel off the registered executor entry, not the executor id', () => {
-  assert.equal(deriveProviderFamily({ providerModel: 'z-ai' }), 'z-ai');
-  assert.equal(deriveProviderFamily({ provider: 'openai-codex' }), 'openai-codex');
-  assert.equal(deriveProviderFamily({}), 'claude');
-  assert.equal(deriveProviderFamily(undefined), 'claude');
+test('familyOf reads providerModel off the registered executor entry, not the executor id, and names a spelling once', () => {
+  assert.equal(familyOf({ providerModel: 'z-ai' }), 'z-ai');
+  assert.equal(familyOf({ provider: 'openai-codex' }), 'openai');
+  assert.equal(familyOf({ providerModel: 'codex' }), familyOf({ providerModel: 'openai' }));
+  assert.equal(familyOf({}), 'claude');
+  assert.equal(familyOf(undefined, 'codex'), 'openai');
 });
 
 test('the dispatch policy derives providerModel from the registered executor entry\'s own providerModel field, not the executor id string', () => {
@@ -291,7 +293,7 @@ test('the dispatch policy agrees with resolve.mjs\'s resolveExecutorConfig on pr
     executors,
     modelPolicies: {
       claude: { standard: 'claude-3-7-sonnet-20250219' },
-      codex: { standard: 'codex-default-model' },
+      openai: { standard: 'codex-default-model' },
     },
   };
   const assignment = buildAssignment({
@@ -302,11 +304,11 @@ test('the dispatch policy agrees with resolve.mjs\'s resolveExecutorConfig on pr
 
   const effective = effectiveDispatchPolicy({ assignment, runnerConfig });
 
-  // Pins the fix: a single-argument deriveProviderFamily call silently
+  // Pins the fix: a single-argument family call silently
   // defaults its resolvedCommand parameter to "claude", so before the fix
   // this asserted 'claude' instead of the executor's real command family.
-  assert.equal(effective.providerModel, 'codex');
-  assert.equal(effective.provenance.provider.value, 'codex');
+  assert.equal(effective.providerModel, 'openai');
+  assert.equal(effective.provenance.provider.value, 'openai');
   assert.notEqual(effective.providerModel, 'claude');
 
   // Cross-check against resolve.mjs's own resolveExecutorConfig (the
@@ -410,9 +412,9 @@ test('the dispatch policy attaches field-level provenance additively, without ch
     policy: { preferExecutor: 'pi' },
   });
   // The caller states a tier and a model: a seat the runner already bound is taken as given.
-  const cliOverride = { tier: 'frontier', model: 'bound-model' };
+  const binding = { tier: 'frontier', model: 'bound-model', provenance: { tier: { source: 'override' }, model: { source: 'tier-cell' } } };
 
-  const effective = effectiveDispatchPolicy({ assignment, cliOverride, runnerConfig: twoExecutorConfig() });
+  const effective = effectiveDispatchPolicy({ assignment, binding, runnerConfig: twoExecutorConfig() });
 
   // Flat fields still present, unchanged in shape.
   assert.equal(effective.role, 'reviewer');
@@ -422,7 +424,9 @@ test('the dispatch policy attaches field-level provenance additively, without ch
   // New provenance field, additive.
   assert.ok(effective.provenance);
   assert.equal(effective.provenance.tier.value, 'frontier');
-  assert.deepEqual(effective.provenance.tier.source, { scope: 'cliOverride' });
+  // Seat Binding's own label, passed through.
+  assert.deepEqual(effective.provenance.tier.source, { scope: 'seat-binding', id: 'override' });
+  assert.deepEqual(effective.provenance.model.source, { scope: 'seat-binding', id: 'tier-cell' });
   assert.equal(effective.provenance.executor.value, 'pi');
   assert.deepEqual(effective.provenance.executor.source, { scope: 'opPolicy', id: 'validate-plan' });
   assert.ok(Object.isFrozen(effective.provenance));
@@ -434,9 +438,9 @@ test('a policy with no runner config and no bound tier and model is refused by n
     () => policyOf({ assignment }),
     (err) => err instanceof RunnerConfigError && err.code === 'runner-config-missing',
   );
-  const bound = policyOf({ assignment, cliOverride: { tier: 'standard', model: 'bound-model' } });
+  const bound = policyOf({ assignment, binding: { tier: 'standard', model: 'bound-model', provenance: { model: { source: 'tier-cell' } } } });
   assert.equal(bound.model, 'bound-model');
-  assert.deepEqual(bound.provenance.model.source, { scope: 'cliOverride' });
+  assert.deepEqual(bound.provenance.model.source, { scope: 'seat-binding', id: 'tier-cell' });
   assert.deepEqual(bound.provenance.persona.source, { scope: 'default' });
 });
 // --- Phase 00 R8: pure provider capability validation ---

@@ -1,25 +1,14 @@
 // `dispatch.gateKillGraceMs`: how long the gate waits between SIGTERM and SIGKILL when it stops an
 // agent, and `dispatch.cancelWaitMs`: how long a controller asked to stop waits for the receipts of its
-// attempts (default: the grace plus a slack, so both keys have one reader). Read through the config
-// facade (project over global). Setup never writes either key (an older release that does not know a
-// key would refuse the whole file); an absent key is the default.
+// attempts. The `dispatch` section schema owns the type, the minimum and the standard value of both; this
+// module only reads the effective value through the config facade (project over global over standard).
+// Setup never writes either key (an older release that does not know a key would refuse the whole file).
 
 import path from 'node:path';
-import { isConfigRefusal, readConfig, readMachineConfig } from '../config/facade.mjs';
-
-/** A present but unusable value: a validation refusal, so the CLI exits with the validation code. */
-const refusal = (message, code) => Object.assign(new Error(message), { code, category: 'validation' });
+import { readConfig, readMachineConfig } from '../config/facade.mjs';
 
 export const GATE_KILL_GRACE_KEY = 'dispatch.gateKillGraceMs';
-export const DEFAULT_GATE_KILL_GRACE_MS = 10_000;
-/** Below one second a CLI agent cannot write its session before it is killed. */
-export const MIN_GATE_KILL_GRACE_MS = 1000;
-
-/** Why `value` is not a usable grace, or `null`. */
-export function gateKillGraceProblem(value) {
-  if (Number.isInteger(value) && value >= MIN_GATE_KILL_GRACE_MS) return null;
-  return `${GATE_KILL_GRACE_KEY} must be an integer of at least ${MIN_GATE_KILL_GRACE_MS} ms, got ${JSON.stringify(value)}`;
-}
+export const CANCEL_WAIT_KEY = 'dispatch.cancelWaitMs';
 
 /**
  * The `dispatch` section of the effective config with the layer of each key (`{ value, origins }`, as the
@@ -31,59 +20,22 @@ export function readDispatchConfig({ projectRoot, globalConfigPath } = {}) {
   return projectRoot ? readConfig({ projectRoot, ...options }) : readMachineConfig(options);
 }
 
-/** `{ value, source }` of a `dispatch` key a project or the machine set, else `undefined` (nothing sets a default for it). */
+/** `{ value, source }` of a `dispatch` key from a `readDispatchConfig` result; `source` is the layer that set it (`project`, `global` or `standard`). */
 function dispatchSetting(snapshot, key) {
-  const layer = snapshot?.origins?.find((origin) => origin.path === `dispatch.${key}`)?.layer;
-  return layer === 'project' || layer === 'global' ? { value: snapshot.value.dispatch[key], source: layer } : undefined;
+  const layer = snapshot.origins.find((origin) => origin.path === `dispatch.${key}`)?.layer;
+  const value = snapshot.value?.dispatch?.[key];
+  if (layer === undefined || value === undefined) throw new Error(`the config door returned no value for dispatch.${key}`);
+  return { value, source: layer };
 }
 
-/** The value and where it came from, from a `readDispatchConfig` result. */
-export function resolveGateKillGrace(snapshot) {
-  return dispatchSetting(snapshot, 'gateKillGraceMs') ?? { value: DEFAULT_GATE_KILL_GRACE_MS, source: 'default' };
-}
+/** The grace and where it came from, from a `readDispatchConfig` result. */
+export const resolveGateKillGrace = (snapshot) => dispatchSetting(snapshot, 'gateKillGraceMs');
 
-/** `resolve` applied to the effective `dispatch` config of `projectRoot`; a refused config file reads as "nothing configured" (doctor reports it). */
-function readOrUnset(projectRoot, resolve) {
-  let snapshot;
-  try {
-    snapshot = readDispatchConfig({ projectRoot });
-  } catch (err) {
-    if (!isConfigRefusal(err)) throw err;
-  }
-  return resolve(snapshot);
-}
+/** The cancel wait and where it came from, from a `readDispatchConfig` result. */
+export const resolveCancelWait = (snapshot) => dispatchSetting(snapshot, 'cancelWaitMs');
 
-/** The grace for the project at `projectRoot`; a present but unusable value throws a validation refusal (the doctor check's message). */
-export function readGateKillGraceMs({ projectRoot } = {}) {
-  const { value } = readOrUnset(projectRoot, resolveGateKillGrace);
-  const problem = gateKillGraceProblem(value);
-  if (problem) throw refusal(problem, 'invalid-gate-kill-grace');
-  return value;
-}
+/** The grace for the project at `projectRoot`; a config file the door refuses throws the door's refusal. */
+export const readGateKillGraceMs = ({ projectRoot } = {}) => resolveGateKillGrace(readDispatchConfig({ projectRoot })).value;
 
-export const CANCEL_WAIT_KEY = 'dispatch.cancelWaitMs';
-export const MIN_CANCEL_WAIT_MS = 1000;
-/** Slack past the kill grace: the supervisor's own domain sweep and the steps after the receipt. */
-const CANCEL_WAIT_SLACK_MS = 5000;
-
-/** Why `value` is not a usable cancel wait, or `null`. */
-export function cancelWaitProblem(value) {
-  if (Number.isInteger(value) && value >= MIN_CANCEL_WAIT_MS) return null;
-  return `${CANCEL_WAIT_KEY} must be an integer of at least ${MIN_CANCEL_WAIT_MS} ms, got ${JSON.stringify(value)}`;
-}
-
-/** The cancel wait and its source, from a `readDispatchConfig` result: the configured value, else the kill grace plus the slack (`grace` is the one used). */
-export function resolveCancelWait(snapshot) {
-  const grace = resolveGateKillGrace(snapshot).value;
-  const configured = dispatchSetting(snapshot, 'cancelWaitMs');
-  if (configured) return { ...configured, grace };
-  return { value: (Number.isInteger(grace) ? grace : DEFAULT_GATE_KILL_GRACE_MS) + CANCEL_WAIT_SLACK_MS, source: 'default', grace };
-}
-
-/** `dispatch.cancelWaitMs` of the project rooted at `projectRoot`; a present but unusable value throws. */
-export function readCancelWaitMs({ projectRoot } = {}) {
-  const { value } = readOrUnset(projectRoot, resolveCancelWait);
-  const problem = cancelWaitProblem(value);
-  if (problem) throw refusal(problem, 'invalid-cancel-wait');
-  return value;
-}
+/** `dispatch.cancelWaitMs` of the project rooted at `projectRoot`; a config file the door refuses throws the door's refusal. */
+export const readCancelWaitMs = ({ projectRoot } = {}) => resolveCancelWait(readDispatchConfig({ projectRoot })).value;

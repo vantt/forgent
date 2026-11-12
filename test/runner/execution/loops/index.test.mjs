@@ -48,7 +48,7 @@ test('runLoop dispatches reviewed loop with parameters', async () => {
   };
 
   const res = await runLoop(
-    { loop: 'reviewed', params: { minCheckers: ['reviewer', 'red-team'] } },
+    { loop: 'reviewed', params: { maxRounds: shippedCatalog().loops.reviewed.maxRounds, minCheckers: ['reviewer', 'red-team'] } },
     { id: 'u-2', objective: 'Reviewed task', capability: 'code:implement' },
     {},
     { runRole, shippedCheckersByRigor: shippedCatalog().loops.reviewed.checkersByRigor },

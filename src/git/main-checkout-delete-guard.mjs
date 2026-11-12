@@ -4,8 +4,15 @@
 //
 // The main checkout holds what git cannot restore: `.fgos` (installation, runtime, assignments,
 // locks), `.claude`, `target`, `node_modules`. One `xargs rm -rf` after a failed `cd` deletes all
-// of it. The guard is the last line of defence, so it errs toward refusing: false positives cost a
-// rephrased command, a missed wipe costs a day.
+// of it. The guard errs toward refusing: false positives cost a rephrased command, a missed wipe
+// costs a day. It is a net for the common accidents, not a sandbox, and it does not judge:
+//   - code run by an interpreter (`python -c`, `node -e`, `perl -e`, `ruby -e`) or by a script file;
+//   - `rsync --delete`, `mv` with a glob that sweeps a runtime directory, `shred`, `truncate`, or a
+//     `>` redirect over a file;
+//   - a deletion by git itself (`git rm -r`, `git checkout -- .`; main-checkout-reset has its own guard);
+//   - any command it cannot read as text (an alias, a function defined earlier, `eval` of a variable).
+// Keeping `.fgos` safe from these rests on the agent's own care and on `fgos worktree remove`, the one
+// door that deletes a worktree; more rules here would only grow the list of forms it half-knows.
 //
 // Refused forms, each judged in every directory the command may run in:
 //   - `git clean` with -x or -X inside a main checkout (`git -C` names the directory);

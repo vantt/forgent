@@ -12,6 +12,7 @@ pub mod lock;
 pub mod manifest;
 pub mod shim;
 pub mod store;
+pub mod suggest;
 pub mod verify;
 pub mod workspace;
 

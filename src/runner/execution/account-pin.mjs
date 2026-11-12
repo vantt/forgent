@@ -7,7 +7,7 @@
 // hard: a provider limit on it ends the seat (run.mjs) instead of rotating or walking away.
 // Architecture guard: MUST NOT import src/state/** or src/runner/coordination/**.
 
-import { inspectProviderCapacity } from '../dispatch/provider-capacity.mjs';
+import { accountQuarantineOf } from './bind.mjs';
 import { configPinnedToAccount } from '../dispatch/provider-account-probe.mjs';
 import { legacyStateKey } from '../dispatch/llm-accounts.mjs';
 import { RunnerConfigError } from '../dispatch/runner-config-error.mjs';
@@ -36,20 +36,17 @@ export function runnerConfigForBinding(runnerConfig, bound) {
 }
 
 /**
- * Refuse a pinned account that is quarantined now, naming until when it waits and why. Read from
- * the same capacity state the lease reads; the lease still refuses it on its own at dispatch.
+ * Refuse a pinned account that is quarantined now, naming until when it waits. Judged by Seat Binding's
+ * account view, the one the crate ranks accounts by; the lease still refuses it on its own at dispatch.
  *
  * @param {Array<{ role?: string, account?: { pool: string, id: string } }>} pins
  */
 export function assertPinnedAccountsUsable(pins, { runnerConfig, runtimeDir, what }) {
   for (const { account } of pins) {
     if (!account) continue;
-    const provider = legacyStateKey(account.pool);
-    const state = inspectProviderCapacity({ runnerConfig, provider, accountId: account.id, runtimeDir })
-      .providers[provider]?.accounts?.[account.id];
-    if (!state || state.healthy) continue;
-    const q = state.quarantine ?? {};
-    const until = q.until ? `until ${q.until}` : 'with no end time (cleared by hand)';
-    throw new RunnerConfigError(`${what}: account "${account.pool}/${account.id}" is quarantined ${until}${q.reasonCode ? ` (${q.reasonCode})` : ''}; pin another account, or wait`);
+    const until = accountQuarantineOf(runnerConfig, account, { runtimeDir });
+    if (until === null) continue;
+    const waits = until === Number.MAX_SAFE_INTEGER ? 'with no end time (cleared by hand)' : `until ${new Date(until).toISOString()}`;
+    throw new RunnerConfigError(`${what}: account "${account.pool}/${account.id}" is quarantined ${waits}; pin another account, or wait`);
   }
 }

@@ -16,7 +16,8 @@ import {
   checkRunAttemptsStuck,
   checkRunSupervisorConfig,
 } from '../../src/setup/run-supervisor-checks.mjs';
-import { readGateKillGraceMs, readCancelWaitMs, DEFAULT_GATE_KILL_GRACE_MS } from '../../src/run-supervisor/gate-kill-grace.mjs';
+import { readGateKillGraceMs, readCancelWaitMs } from '../../src/run-supervisor/gate-kill-grace.mjs';
+import { isConfigRefusal } from '../../src/config/facade.mjs';
 import { fileHolders } from '../../src/holder-lock/index.mjs';
 import { writeProjectConfig, writeGlobalConfig, globalConfigPath as globalConfigFile } from '../helpers/config-fixture.mjs';
 
@@ -158,38 +159,38 @@ test('runtime-socket-dir: a directory too long for a socket name fails and is no
 
 // ─── run-supervisor-config ──────────────────────────────────────────────
 
-test('run-supervisor-config: absent is the defaults, project overrides global, an unusable grace or cancel wait, or a wait shorter than the grace, fails', () => {
+test('run-supervisor-config: absent is the standard values, project overrides global, a value the door refuses, or a wait shorter than the grace, fails', () => {
   const root = workspace('config');
   const globalHome = path.join(scratch, 'config-home');
   const globalConfigPath = globalConfigFile(globalHome);
   const grace = (value, source) => `dispatch.gateKillGraceMs = ${value} (${source})`;
   const wait = (value, source) => `dispatch.cancelWaitMs = ${value} (${source})`;
-  assert.deepEqual(checkRunSupervisorConfig(root, { globalConfigPath }), { passed: true, message: `${grace(10000, 'default')}; ${wait(15000, 'default')}` });
+  assert.deepEqual(checkRunSupervisorConfig(root, { globalConfigPath }), { passed: true, message: `${grace(10000, 'standard')}; ${wait(15000, 'standard')}` });
 
   writeGlobalConfig(globalHome, { dispatch: { gateKillGraceMs: 4000 } });
-  assert.deepEqual(checkRunSupervisorConfig(root, { globalConfigPath }), { passed: true, message: `${grace(4000, 'global')}; ${wait(9000, 'default')}` });
+  assert.deepEqual(checkRunSupervisorConfig(root, { globalConfigPath }), { passed: true, message: `${grace(4000, 'global')}; ${wait(15000, 'standard')}` });
 
   writeProjectConfig(root, { dispatch: { gateKillGraceMs: 2500 } });
-  assert.deepEqual(checkRunSupervisorConfig(root, { globalConfigPath }), { passed: true, message: `${grace(2500, 'project')}; ${wait(7500, 'default')}` });
+  assert.deepEqual(checkRunSupervisorConfig(root, { globalConfigPath }), { passed: true, message: `${grace(2500, 'project')}; ${wait(15000, 'standard')}` });
 
   for (const bad of [999, 0, -5, 1500.5, '5000']) {
     writeProjectConfig(root, { dispatch: { gateKillGraceMs: bad } });
     const res = checkRunSupervisorConfig(root, { globalConfigPath });
     assert.equal(res.passed, false, `${JSON.stringify(bad)} is refused`);
-    assert.match(res.message, /dispatch\.gateKillGraceMs must be an integer of at least 1000 ms/);
+    assert.match(res.message, /unreadable: .*dispatch\.gateKillGraceMs/);
   }
 
   writeGlobalConfig(globalHome, { dispatch: { cancelWaitMs: 20000 } });
   writeProjectConfig(root, {});
-  assert.deepEqual(checkRunSupervisorConfig(root, { globalConfigPath }), { passed: true, message: `${grace(10000, 'default')}; ${wait(20000, 'global')}` });
+  assert.deepEqual(checkRunSupervisorConfig(root, { globalConfigPath }), { passed: true, message: `${grace(10000, 'standard')}; ${wait(20000, 'global')}` });
   writeProjectConfig(root, { dispatch: { cancelWaitMs: 12000 } });
-  assert.deepEqual(checkRunSupervisorConfig(root, { globalConfigPath }), { passed: true, message: `${grace(10000, 'default')}; ${wait(12000, 'project')}` });
+  assert.deepEqual(checkRunSupervisorConfig(root, { globalConfigPath }), { passed: true, message: `${grace(10000, 'standard')}; ${wait(12000, 'project')}` });
 
   for (const bad of [999, 0, 1500.5, '9000']) {
     writeProjectConfig(root, { dispatch: { cancelWaitMs: bad } });
     const res = checkRunSupervisorConfig(root, { globalConfigPath });
     assert.equal(res.passed, false, `${JSON.stringify(bad)} is refused`);
-    assert.match(res.message, /dispatch\.cancelWaitMs must be an integer of at least 1000 ms/);
+    assert.match(res.message, /unreadable: .*dispatch\.cancelWaitMs/);
   }
   writeProjectConfig(root, { dispatch: { cancelWaitMs: 5000 } });
   const short = checkRunSupervisorConfig(root, { globalConfigPath: path.join(scratch, 'config-home-empty', 'config.json') });
@@ -198,16 +199,16 @@ test('run-supervisor-config: absent is the defaults, project overrides global, a
 
   writeProjectConfig(root, { dispatch: { gateKillGraceMs: 10, cancelWaitMs: 10 } });
   const both = checkRunSupervisorConfig(root, { globalConfigPath: path.join(scratch, 'config-home-empty', 'config.json') });
-  assert.match(both.message, /dispatch\.gateKillGraceMs must be an integer.*; dispatch\.cancelWaitMs must be an integer/, 'one snapshot reports both keys');
+  assert.match(both.message, /dispatch\.gateKillGraceMs.*dispatch\.cancelWaitMs/, 'one refusal names both keys');
 });
 
 test('the gate kill grace reader follows the same merge and refuses an unusable value', () => {
   const root = workspace('grace-reader');
-  assert.equal(readGateKillGraceMs({ projectRoot: root }), DEFAULT_GATE_KILL_GRACE_MS);
+  assert.equal(readGateKillGraceMs({ projectRoot: root }), 10_000);
   writeProjectConfig(root, { dispatch: { gateKillGraceMs: 3000 } });
   assert.equal(readGateKillGraceMs({ projectRoot: root }), 3000);
   writeProjectConfig(root, { dispatch: { gateKillGraceMs: 10 } });
-  assert.throws(() => readGateKillGraceMs({ projectRoot: root }), { code: 'invalid-gate-kill-grace', message: /dispatch\.gateKillGraceMs must be an integer of at least 1000/ });
+  assert.throws(() => readGateKillGraceMs({ projectRoot: root }), (err) => isConfigRefusal(err) && /dispatch\.gateKillGraceMs/.test(err.message));
 });
 
 // ─── run-attempts-stuck ─────────────────────────────────────────────────
@@ -286,11 +287,11 @@ test('run-attempts-stuck: a held lock is a running attempt, not a finding', { sk
 
 test('the cancel wait reader shares the gate kill grace merge and refuses an unusable value', () => {
   const root = workspace('cancel-wait-reader');
-  assert.equal(readCancelWaitMs({ projectRoot: root }), DEFAULT_GATE_KILL_GRACE_MS + 5000);
+  assert.equal(readCancelWaitMs({ projectRoot: root }), 15_000);
   writeProjectConfig(root, { dispatch: { gateKillGraceMs: 3000 } });
-  assert.equal(readCancelWaitMs({ projectRoot: root }), 8000);
+  assert.equal(readCancelWaitMs({ projectRoot: root }), 15_000, 'the wait is a literal, not derived from the grace');
   writeProjectConfig(root, { dispatch: { cancelWaitMs: 10 } });
-  assert.throws(() => readCancelWaitMs({ projectRoot: root }), { code: 'invalid-cancel-wait', message: /dispatch\.cancelWaitMs must be an integer of at least 1000/ });
-  // The doctor check names the same key with the same words.
-  assert.match(checkRunSupervisorConfig(root, { globalConfigPath: path.join(scratch, 'no-global-config.json') }).message, /dispatch\.cancelWaitMs must be an integer of at least 1000/);
+  assert.throws(() => readCancelWaitMs({ projectRoot: root }), (err) => isConfigRefusal(err) && /dispatch\.cancelWaitMs/.test(err.message));
+  // The doctor check names the same key through the same refusal.
+  assert.match(checkRunSupervisorConfig(root, { globalConfigPath: path.join(scratch, 'no-global-config.json') }).message, /dispatch\.cancelWaitMs/);
 });

@@ -23,11 +23,15 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import cp from 'node:child_process';
 
 import {
   ensurePrivateDir,
   writeOwnershipMarkerV2,
   removeConfinementDir,
+  writeOwnershipMarker,
+  judgeConfinementOrphans,
+  removeConfinementOrphans,
 } from '../../src/runner/dispatch/confinement/cleanup.mjs';
 import { rewriteOwnershipMarker } from '../helpers/ownership-marker.mjs';
 
@@ -69,5 +73,49 @@ test('extending an attempt home marker keeps it a version 2 marker', () => {
     writeOwnershipMarkerV2(dir, { attemptId: 'att-1', runDir: path.join(w.tmp, 'runs', '01'), dispatchId: 'disp_v2' });
     rewriteOwnershipMarker(dir, { createdAt: new Date(Date.now() - 48 * 3600 * 1000).toISOString() });
     assert.equal(JSON.parse(fs.readFileSync(path.join(dir, '.fgos-confinement-owner.json'), 'utf8')).attemptId, 'att-1');
+  } finally { w.cleanup(); }
+});
+
+test('orphan judgement names a dead-owner home, an old empty shell and a loose root, and removal takes exactly those', () => {
+  const w = workspace();
+  try {
+    const dead = cp.spawnSync(process.execPath, ['-e', 'process.exit(0)']);
+    const orphan = path.join(w.root, 'disp_dead', 'home');
+    ensurePrivateDir(orphan, { root: w.root });
+    writeOwnershipMarker(orphan, { dispatchId: 'disp_dead', pid: dead.pid });
+    const live = path.join(w.root, 'disp_live', 'home');
+    ensurePrivateDir(live, { root: w.root });
+    writeOwnershipMarker(live, { dispatchId: 'disp_live', pid: process.pid });
+    const shell = path.join(w.root, 'disp_shell');
+    fs.mkdirSync(shell, { mode: 0o700 });
+    const longAgo = new Date(Date.now() - 2 * 3600 * 1000);
+    fs.utimesSync(shell, longAgo, longAgo);
+    const fresh = path.join(w.root, 'disp_fresh');
+    fs.mkdirSync(fresh, { mode: 0o700 });
+    fs.chmodSync(w.root, 0o775);
+
+    const judged = judgeConfinementOrphans([w.root]);
+    assert.deepEqual(judged.deadOwned, [{ dir: orphan, dispatchId: 'disp_dead' }]);
+    assert.deepEqual(judged.emptyShells, [shell]);
+    assert.deepEqual(judged.loose, [w.root]);
+    assert.equal(exists(orphan), true, 'judging removes nothing');
+
+    assert.deepEqual(removeConfinementOrphans(judged), { tightened: 1, removedHomes: 1, removedShells: 1 });
+    assert.equal(exists(orphan), false);
+    assert.equal(exists(shell), false);
+    assert.equal(exists(live), true, 'a home whose owner lives stays');
+    assert.equal(exists(fresh), true, 'a young empty dir may still be filled');
+    assert.equal(fs.statSync(w.root).mode & 0o777, 0o700);
+    assert.deepEqual(judgeConfinementOrphans([w.root]), { deadOwned: [], emptyShells: [], loose: [] });
+  } finally { w.cleanup(); }
+});
+
+test('orphan judgement leaves an attempt home (version 2 marker) to adopt', () => {
+  const w = workspace();
+  try {
+    const dir = path.join(w.root, 'disp_v2', 'home');
+    ensurePrivateDir(dir, { root: w.root });
+    writeOwnershipMarkerV2(dir, { attemptId: 'att-1', runDir: path.join(w.tmp, 'runs', '01'), dispatchId: 'disp_v2' });
+    assert.deepEqual(judgeConfinementOrphans([w.root]).deadOwned, []);
   } finally { w.cleanup(); }
 });

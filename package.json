@@ -20,6 +20,7 @@
     "packages/seat-binding/contracts/seat-binding.tier-ladder.v1.json",
     "packages/config/contracts/doctor-rows.v1.json",
     "packages/holder-lock/contracts/lock-registry.v1.json",
+    "packages/host-runtime/contracts/exit-codes.v1.json",
     ".agents/skills",
     "README.md",
     "LICENSE",

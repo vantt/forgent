@@ -6,7 +6,7 @@ import path from 'node:path';
 import { activateGitFixture } from '../helpers/git-fixture.mjs';
 import { fileURLToPath } from 'node:url';
 import { execFileSync, spawnSync } from 'node:child_process';
-import { fanoutBatchExecutorCli } from '../../src/runner/fanout-batch.mjs';
+import { fanoutBatchExecutorCli, resolveBinFgos } from '../../src/runner/fanout-batch.mjs';
 import { initStore, addWork, listWork } from '../../src/state/store.mjs';
 import { confinedRunnerConfig } from './loop-worker-fixture.helper.mjs';
 import { seedFileLocalBwrapRegistry } from './confinement-registry-fixture.helper.mjs';
@@ -267,5 +267,22 @@ test('fanout batch: the batch runs its candidates concurrently -- each worker se
     assert.equal(fired.outcome, 'pass', JSON.stringify(fired));
     const stdout = fs.readFileSync(path.join(fgosDir, 'assignments', fired.unitRunId, 'producer', '1', 'runs', '01', 'stdout.log'), 'utf8');
     assert.match(stdout, /sawPeer=true/, `${fired.id}'s worker saw the other run in flight`);
+  }
+});
+
+test('fanout batch resolves its fgos host for the root it is given, and refuses when that project has none', () => {
+  const root = mkTempDir();
+  const release = path.join(root, 'release');
+  fs.mkdirSync(path.join(release, 'bin'), { recursive: true });
+  fs.writeFileSync(path.join(release, 'bin', 'fgos'), '#!/bin/sh\n', { mode: 0o755 });
+  const original = process.env.FGOS_HOST_BIN;
+  try {
+    delete process.env.FGOS_HOST_BIN;
+    assert.throws(() => resolveBinFgos(root), (err) => err.message.includes(`no fgos host for ${root}`));
+    fs.mkdirSync(path.join(root, '.fgos', 'installation'), { recursive: true });
+    fs.writeFileSync(path.join(root, '.fgos', 'installation', 'activation.json'), JSON.stringify({ status: 'ready', releasePath: release }));
+    assert.equal(resolveBinFgos(root), path.join(release, 'bin', 'fgos'));
+  } finally {
+    if (original !== undefined) process.env.FGOS_HOST_BIN = original;
   }
 });
