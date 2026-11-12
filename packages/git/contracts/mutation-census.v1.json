@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "5207327c21b2a08dcffe19c51f21af6f11ef6e783438d149913ca0d19f891025",
+  "payloadDigest": "740bfc79af7ee020ba174e3484d3a9589ad6422f3246a2d4ceba383c5ab02df9",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -190,7 +190,7 @@
     "herdr-dashboard/src/ports.rs": "db6dfc823d3697b6f35fd8632fba6ea0b8c5e256d4bdd38487fa87a935faa179",
     "herdr-dashboard/src/ui.rs": "c112cef4793c0be65d8e48143e8575df8954436c972f7f3aec185cf222460b64",
     "herdr-dashboard/tests/render_smoke.rs": "068febb6148d9a441f9cd98cc7983b403a0232942866d932efb1336aec6c5d6b",
-    "packages/agent-protocol/rust/src/direct/mod.rs": "0d17b1f84196fcffbe568265a3a6b924bbb92387456be715d1690c517d048113",
+    "packages/agent-protocol/rust/src/direct/mod.rs": "39c874d172f4212a245e6d61622a3ac752cb0e42d48d45f6340371f4260bd37f",
     "packages/agent-protocol/rust/src/lib.rs": "37952b9d8bdca0433d049834e205da623e4fc5d2631754ac7f35bdd8c35697e7",
     "packages/agent-protocol/rust/src/outcome.rs": "868c09bb16f68428ffa8e3cc6defdf0a9d1219ab1db22154ffc2109032ce6111",
     "packages/agent-protocol/rust/src/port.rs": "e7114a49dc37bffd9e5cbaae36b4a8a7f22be5892d8062d4c63f96d09d402e43",

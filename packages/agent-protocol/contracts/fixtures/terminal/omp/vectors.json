@@ -414,6 +414,82 @@
       "source": "error line verbatim from a real omp 18.17.0 pane on herdr (gemini-4-argon over google-antigravity, 2026-11-06, provider route faults report); prompt and status line filled in around it; detector verdict copied from the recorded turn-finished screen"
     },
     {
+      "name": "omp-giving-up-on-a-provider-wait-longer-than-its-limit-is-blocked-usage-limit",
+      "step": "detect-completed",
+      "script": {
+        "frames": [
+          {
+            "at": 0,
+            "file": "provider-retry-gave-up"
+          }
+        ]
+      },
+      "expect": {
+        "outcome": "blocked",
+        "reason": "usage-limit"
+      },
+      "source": "screen from a real omp pane on herdr (gemini-3.8-flash over google-antigravity, 2026-11-12, quota-exhausted account): both error blocks verbatim, the first one more than twelve lines above the bottom; brief echo, status line and workspace path trimmed; detector verdict copied from the recorded provider-error screen"
+    },
+    {
+      "name": "omp-giving-up-on-a-retry-that-names-no-wait-is-blocked-provider-error",
+      "step": "detect-completed",
+      "script": {
+        "frames": [
+          {
+            "at": 0,
+            "screen": "\n Error: Retry failed after 3 attempts: Cloud Code Assist API error (503): { \"error\": { \"code\": 503 } }\n\n\n π > ◒ Gemini 3.8 Flash",
+            "inspection": {
+              "state": "idle"
+            }
+          }
+        ]
+      },
+      "expect": {
+        "outcome": "blocked",
+        "reason": "provider-error"
+      },
+      "source": "the give-up line with its wait wording replaced by a provider fault; synthesized from the recorded wording"
+    },
+    {
+      "name": "omp-retrying-a-rate-limit-within-its-limit-keeps-waiting",
+      "step": "detect-completed",
+      "script": {
+        "frames": [
+          {
+            "at": 0,
+            "screen": "\n Error: Cloud Code Assist API error (429): { \"error\": { \"code\": 429, \"status\": \"RESOURCE_EXHAUSTED\" } }\n\n Retrying in 12s (attempt 1/3)\n π > ◒ Gemini 3.8 Flash",
+            "inspection": {
+              "state": "working",
+              "visibleWorking": true
+            }
+          }
+        ]
+      },
+      "expect": {
+        "outcome": "none"
+      },
+      "source": "a retry in progress: the agent is working, so no error line on the screen settles it; synthesized from the recorded error wording"
+    },
+    {
+      "name": "the-retry-failed-wording-inside-agent-prose-keeps-waiting",
+      "step": "detect-completed",
+      "script": {
+        "frames": [
+          {
+            "at": 0,
+            "screen": "working...\nThe log says Error: Retry failed after 1 attempts: Provider requested 1800000ms wait, exceeds retry.maxDelayMs (300000ms).\n π > ◒ Gemini 3.8 Flash",
+            "inspection": {
+              "state": "idle"
+            }
+          }
+        ]
+      },
+      "expect": {
+        "outcome": "none"
+      },
+      "source": "agent prose quoting the give-up wording; only a line that starts with the error is the CLI speaking"
+    },
+    {
       "name": "an-api-error-the-agent-mentions-mid-sentence-keeps-waiting",
       "step": "detect-completed",
       "script": {

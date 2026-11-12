@@ -1,0 +1,23 @@
+ Reply with exactly one line: the model name you are running as.
+
+
+ Error: Cloud Code Assist API error (429): {
+   "error": {
+   "code": 429,
+   "message": "Resource has been exhausted (e.g. check quota).",
+   "status": "RESOURCE_EXHAUSTED"
+   }
+   }
+
+ Error: Retry failed after 1 attempts: Provider requested 1800000ms wait, exceeds retry.maxDelayMs (300000ms). Original error: Cloud Code Assist API error (429): {
+   "error": {
+     "code": 429,
+     "message": "Resource has been exhausted (e.g. check quota).",
+     "status": "RESOURCE_EXHAUSTED"
+   }
+ }
+
+
+
+ π > ◒ Gemini 3.8 Flash > 🗑 …/work/project > ▶────────2%────────────────────────────────────────────────
+╰─

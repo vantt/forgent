@@ -173,6 +173,21 @@ pub(crate) fn is_quota_limit(line: &str) -> bool {
         || rest.starts_with("usage limit has been reached")
         || rest.starts_with("individual quota reached")
         || out_of_credits(rest)
+        || retry_gave_up(rest).is_some_and(|why| why.starts_with("provider requested"))
+}
+
+/// omp's last words when its retry loop ends: `Error: Retry failed after <n> attempts: <why>`, with the
+/// text after the colon. The CLI itself says it gave up, so a screen that ends on it is a stop and not a
+/// wait. A provider that asked for a longer pause than omp's `retry.maxDelayMs` allows is a quota stop
+/// (`is_quota_limit`); any other give-up is the provider's fault (`is_provider_error`). `rest` is the
+/// lowercased line after its marker and `error` label, so a sentence that merely quotes the wording does
+/// not match.
+fn retry_gave_up(rest: &str) -> Option<&str> {
+    let (count, why) = rest
+        .strip_prefix("retry failed after ")?
+        .split_once(" attempt")?;
+    let why = why.trim_start_matches('s').strip_prefix(':')?;
+    (!count.is_empty() && count.bytes().all(|b| b.is_ascii_digit())).then(|| why.trim_start())
 }
 
 /// The provider refused the round with an HTTP error, as the CLI's last JSON event says: a pi-family
@@ -197,13 +212,17 @@ fn last_event_is_provider_error(stdout_tail: &str) -> bool {
             .is_some_and(|status| (400..600).contains(&status) && status != 401 && status != 403)
 }
 
-/// A provider's API error on a terminal screen, as omp draws it: `✘ Cloud Code Assist API error (404): {...`.
+/// A provider's API error on a terminal screen, as omp draws it: `✘ Cloud Code Assist API error (404): {...`,
+/// or the line that ends its retries (`retry_gave_up`).
 /// The line starts with the error (after a marker symbol and an `error` label), at most four words name the
 /// API before `api error (<status>)`, so the agent's own sentence that mentions one is not the CLI speaking.
 /// 401 and 403 are a login, never this.
 pub(crate) fn is_provider_error(line: &str) -> bool {
     let line = line.to_lowercase();
     let rest = strip_label(strip_marker(&line), &["error"]);
+    if retry_gave_up(rest).is_some() {
+        return true;
+    }
     let Some((api, after)) = rest.split_once("api error (") else {
         return false;
     };
