@@ -175,7 +175,7 @@ false-positive a heuristic check.
 content.** The error path does not wrap an envelope at all: diagnostics go
 to stderr, and the caller branches on the exit code's category, never on
 message text. The one source of truth for exit codes is
-`src/cli/exit-codes.v1.json`'s table (`EXIT_CODES`; `2` precondition · `3` conflict ·
+`packages/host-runtime/contracts/exit-codes.v1.json`'s table (`EXIT_CODES`; `2` precondition · `3` conflict ·
 `4` validation · `5` corrupt-log · `7` lock-timeout · `8` session-fail ·
 `9` merge-fail) plus `src/runner/loop.mjs`'s `EXIT_BUSY` (`6`, runner-only).
 `0` is success; `1` is "unclassified."

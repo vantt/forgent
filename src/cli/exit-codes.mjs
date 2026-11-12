@@ -7,6 +7,6 @@
 // refusal without changing any exit status.
 import fs from 'node:fs';
 
-const table = JSON.parse(fs.readFileSync(new URL('./exit-codes.v1.json', import.meta.url), 'utf8'));
+const table = JSON.parse(fs.readFileSync(new URL('../../packages/host-runtime/contracts/exit-codes.v1.json', import.meta.url), 'utf8'));
 
 export const EXIT_CODES = Object.freeze({ ...table.categories });

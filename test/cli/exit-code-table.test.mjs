@@ -1,4 +1,4 @@
-// The error-category exit codes live in one versioned JSON table (src/cli/exit-codes.v1.json). The Node shell reads
+// The error-category exit codes live in one versioned JSON table (packages/host-runtime/contracts/exit-codes.v1.json). The Node shell reads
 // it through src/cli/exit-codes.mjs and the Rust host embeds the same file (apps/fgos/src/exit_codes.rs, whose own
 // test reads every category back). One table, two readers: this file owns the Node reader and the rule that the host
 // names no literal error exit status of its own.
@@ -12,7 +12,7 @@ import { EXIT_CODES } from '../../src/cli/exit-codes.mjs';
 import { categoryOf } from '../../src/state/store-error.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
-const table = JSON.parse(fs.readFileSync(path.join(ROOT, 'src', 'cli', 'exit-codes.v1.json'), 'utf8'));
+const table = JSON.parse(fs.readFileSync(path.join(ROOT, 'packages', 'host-runtime', 'contracts', 'exit-codes.v1.json'), 'utf8'));
 
 test('the table is version 1 and the Node reader exposes every category it names, with the same code', () => {
   assert.equal(table.version, 1);

@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "33036850d49af896f1095f8d7a30f4aff9cda6b007c05b30603c61c7396260f6",
+  "payloadDigest": "12c6e7e62bab3ffd35e1e3cff00739f14221da4990afca5f7201d3345392e26b",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -85,7 +85,7 @@
     "apps/fgos/examples/mailbox-ident-cost.rs": "694f216767532946846ecc69dc584fbb8bf28a7183f741a037ba05c7b4793bc9",
     "apps/fgos/src/cli_presenter.rs": "b93778742194566aac6e085536cbcbcc4ff709ac3d1bbaff8870a8cf2c43dada",
     "apps/fgos/src/cli_projector.rs": "08b12bf43cdccddff020c6b803988c2f9e905b45f18d5ea40ffab89516ffbda5",
-    "apps/fgos/src/exit_codes.rs": "34628340630c299616ecc31052e9c25c4861cffcec8efb9096a5e731a9e82d59",
+    "apps/fgos/src/exit_codes.rs": "de41bfb845b15792e706fc9bd3bad88f23494cac5683476e7c5954e0b8ee4e15",
     "apps/fgos/src/legacy_exec.rs": "bf2f790d202ad3a25735fc3f9c33feb7aeffdfb015b1e0aafa9282c8b8bcba40",
     "apps/fgos/src/main.rs": "357aef4765b9d172853665ed8e06793b8e7a377c3a334ef0139fa5ccbc755a10",
     "apps/fgos/src/wiring/event_store_clone.rs": "923d718f7a6bd5705cbe6e4d4c8393672c1ef4a2142facc9ada314307a4d7574",
@@ -902,7 +902,7 @@
     "scripts/write-wrapper-script.mjs": "e9e76f2b72329bb4dee9ec980db7a5df7515da3ff339e232466049de259d5c50",
     "src/cli/command-registry.mjs": "c3e05fb75193f69a1a892e18ba4557984ec9f2cd743bc20e4f06211cfc060f27",
     "src/cli/deprecation.mjs": "45e7d11ad8681fc89e4c99f4ef53b7c93a477f6b5fdd6708eddcf0b579dd3985",
-    "src/cli/exit-codes.mjs": "c251c06ae32030b98b694e67a9e2cdcc3f6cd1c2752ea2d1541bf4bb53ac3649",
+    "src/cli/exit-codes.mjs": "55a68e5a0b03a38adced7ddc9bcfb60964db94b3b868e2c854b6a6a78fdb4964",
     "src/cli/flag-check.mjs": "336a0e94eaec59fa4c1f143b32a14334c1bd5f13d522ef8be4a5b570dc401b62",
     "src/cli/parse-args.mjs": "d4f71dbb91bc8d920995299b78d018efd1643328213a70d6e567a6b462163d66",
     "src/cli/verb-exit.mjs": "6d7015d6725e7ddce03addfed27667d6ff9e2a0e8ad4a90d24c2560c8215d9f6",

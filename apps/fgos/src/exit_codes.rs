@@ -1,12 +1,13 @@
 //! The host's exit statuses, read from the one table the Node shell also reads
-//! (`src/cli/exit-codes.v1.json`). The host names no literal error status of
+//! (`packages/host-runtime/contracts/exit-codes.v1.json`). The host names no literal error status of
 //! its own: a category is looked up here, so the two doors cannot drift.
 
 use serde::Deserialize;
 use std::collections::HashMap;
 use std::sync::OnceLock;
 
-const TABLE_JSON: &str = include_str!("../../../src/cli/exit-codes.v1.json");
+const TABLE_JSON: &str =
+    include_str!("../../../packages/host-runtime/contracts/exit-codes.v1.json");
 
 #[derive(Deserialize)]
 struct Table {
@@ -55,7 +56,7 @@ mod tests {
     fn table_on_disk() -> serde_json::Value {
         let path = concat!(
             env!("CARGO_MANIFEST_DIR"),
-            "/../../src/cli/exit-codes.v1.json"
+            "/../../packages/host-runtime/contracts/exit-codes.v1.json"
         );
         serde_json::from_str(&std::fs::read_to_string(path).expect("table file"))
             .expect("table json")
