@@ -1,7 +1,7 @@
 ---
 phase: 13
 title: "Close: re-run the skill checklist on the final tree, Vietnamese guide, closing report, spec and verification docs"
-status: pending
+status: completed
 depends_on: ["P01-P12 landed on main"]
 parallel: "group G6, last"
 effort: ~0.5d

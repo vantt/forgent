@@ -1,7 +1,7 @@
 ---
 title: "HARDEN packaging and distribution sub-plan: first contact, safe install and uninstall, correct releases, fast re-runs"
 description: "Closes the audit's remaining MUST fails under owner decision 80 (Q1 a, Q3 a, Q4/5 a): thirteen phases in the skill's order (UX, safety, correctness, speed), one writer per hot file, T9-aware."
-status: pending
+status: completed
 priority: P1
 effort: ~12d of lead work (12 phases plus a close); ~6d critical path; widest group 3 leads
 branch: main (plan only; each phase runs on its own track branch `harden/pkg-pNN-<slug>` in its own linked worktree from origin/main)
@@ -60,7 +60,7 @@ Order follows the skill: tier 1 UX, tier 2 safety, tier 3 correctness, tier 4 sp
 | 12 | [Speed: no-op re-runs, download cap, release profile](phase-12-speed.md) | 4 | 10 (`init.rs`), 09 (`install.sh`, `fetch.rs`) | `init.rs`, `fetch.rs`, `install.sh`, `Cargo.toml` | 0.75d |
 | 13 | [Close: checklist re-run, Vietnamese guide, closing report](phase-13-close.md) | - | 01-12 | spec, verification doc, reports | 0.5d |
 
-Status of every row: pending, except P02, P03, P05 and P09 (completed, 2026-11-09), P12 (completed, 2026-11-12; [report](../reports/lead-261112-1454-harden-pkg-p12-speed.md)), P04, P01 and P08 (completed, 2026-11-12), P06 (completed, 2026-11-12; [report](../reports/lead-261112-1325-harden-pkg-p06-init-closing-block.md)), P10 (completed, 2026-11-12; [report](../reports/lead-261112-1429-harden-pkg-p10-pin-drift.md)), P11 (completed, 2026-11-12; [report](../reports/lead-261112-1340-harden-pkg-p11-release-correctness.md)), and P07 (completed, 2026-11-12; [report](../reports/lead-261112-1802-harden-pkg-p07-first-contact-docs.md)); the three fgctl defects that phase found (repair pin tag, up-to-date digest, exit-code help) are fixed in [this report](../reports/lead-261112-1830-harden-pkg-fgctl-fixes.md).
+Status of every row: pending, except P02, P03, P05 and P09 (completed, 2026-11-09), P12 (completed, 2026-11-12; [report](../reports/lead-261112-1454-harden-pkg-p12-speed.md)), P04, P01 and P08 (completed, 2026-11-12), P06 (completed, 2026-11-12; [report](../reports/lead-261112-1325-harden-pkg-p06-init-closing-block.md)), P10 (completed, 2026-11-12; [report](../reports/lead-261112-1429-harden-pkg-p10-pin-drift.md)), P11 (completed, 2026-11-12; [report](../reports/lead-261112-1340-harden-pkg-p11-release-correctness.md)), P07 (completed, 2026-11-12; [report](../reports/lead-261112-1802-harden-pkg-p07-first-contact-docs.md)), and P13 (completed, 2026-11-12; [report](../reports/lead-261112-1816-harden-pkg-p13-close.md), [closing report](../reports/closing-261112-1817-harden-packaging-distribution.md), [owner guide](../reports/guide-261112-1817-owner-machine-packaging-close.md)).; the three fgctl defects that P07 found (repair pin tag, up-to-date digest, exit-code help) are fixed in [this report](../reports/lead-261112-1830-harden-pkg-fgctl-fixes.md). The sub-plan is closed.
 
 ## Coverage: the 42 MUST fails
 
