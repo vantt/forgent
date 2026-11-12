@@ -213,7 +213,8 @@ describe('install.sh e2e installer suite', { skip: process.platform === 'win32' 
   test('Case 6: every network call is bounded by a connect/total timeout and a size cap (no unbounded hang)', () => {
     const source = fs.readFileSync(installScript, 'utf8');
     assert.match(source, /CURL_TIMEOUT_ARGS="[^"]*--connect-timeout/, 'curl timeout args must set --connect-timeout');
-    assert.match(source, /CURL_TIMEOUT_ARGS="[^"]*--max-time/, 'curl timeout args must set --max-time');
+    assert.match(source, /CURL_TIMEOUT_ARGS="[^"]*--speed-limit 1024 --speed-time 30/, 'curl timeout args must cut a stalled transfer');
+    assert.match(source, /CURL_TIMEOUT_ARGS="[^"]*--max-time 900/, 'curl timeout args must set the 900 s total cap');
     assert.match(source, /WGET_TIMEOUT_ARGS="--timeout=/, 'wget timeout args must set --timeout=');
     // wget's --timeout is an IDLE timeout (resets on every byte received)
     // and it retries up to 20 times by default -- --tries=1 stops the
@@ -435,7 +436,7 @@ while [ $# -gt 0 ]; do
   case "$1" in
     -o) out="$2"; shift ;;
     -w) shift ;;
-    --connect-timeout|--max-time|--max-filesize|--proto|--proto-redir) shift ;;
+    --connect-timeout|--speed-limit|--speed-time|--max-time|--max-filesize|--proto|--proto-redir) shift ;;
     -*) ;;
     *) url="$1" ;;
   esac

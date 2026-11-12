@@ -764,10 +764,51 @@ fn run_tail_step(
     Ok(output.stdout)
 }
 
-/// Runs the post-activation tail: `init`, `doctor --fix`, then `doctor --json`
-/// whose result becomes the closing block on stdout (R8). The first two steps
-/// are plumbing; their output is shown on stderr only when they fail. A doctor
-/// result that is not ok ends the command with [`InitError::NotReady`].
+/// Whether a `fgos doctor --json` result needs no repair: `ok`, and no row
+/// that is not passing still names a fix (`doctor --fix` would have work to
+/// do). Anything that is not a doctor result is not clean.
+fn doctor_is_clean(doctor_stdout: &str) -> bool {
+    let Ok(value) = serde_json::from_str::<serde_json::Value>(doctor_stdout) else {
+        return false;
+    };
+    let data = value.get("data").unwrap_or(&value);
+    if data.get("ok").and_then(|v| v.as_bool()) != Some(true) {
+        return false;
+    }
+    let has_pending_fix = |row: &serde_json::Value| {
+        matches!(
+            row.get("status").and_then(|s| s.as_str()),
+            Some("warn" | "fail")
+        ) && row.get("fix").is_some_and(|f| !f.is_null())
+    };
+    !data
+        .get("checks")
+        .and_then(|v| v.as_array())
+        .is_some_and(|rows| rows.iter().any(has_pending_fix))
+}
+
+/// What a no-op run prints instead of the closing block's first line.
+fn noop_block(facts: &ReadyFacts) -> String {
+    let tag = facts
+        .tag
+        .as_deref()
+        .map(|t| format!("fgOS {t}"))
+        .unwrap_or_else(|| "fgOS".to_string());
+    format!(
+        "nothing to do: {tag} already active, doctor ok\nNext: {} run \"<prompt>\"\n",
+        facts.run_command
+    )
+}
+
+/// Runs the post-activation tail: `fgos init` (idempotent: it settles an
+/// interrupted Git operation, detects agent CLIs, migrates a legacy config and
+/// creates the machine id, lock directories and header files), then
+/// `doctor --json`. A clean result ends the run on the closing block built from
+/// it; otherwise `doctor --fix` runs and a second `doctor --json` becomes the
+/// closing block (R8). Plumbing output is shown on stderr only when a step
+/// fails. A doctor result that is not ok ends the command with
+/// [`InitError::NotReady`]. Re-running the release that is already active with
+/// nothing left to repair says `nothing to do`.
 pub fn run_tail(
     workspace_root: &Path,
     shim_path: &Path,
@@ -780,12 +821,22 @@ pub fn run_tail(
         .join(format!("{}.json", activation_id));
 
     run_tail_step(workspace_root, shim_path, &tx_path, &["init"])?;
-    run_tail_step(workspace_root, shim_path, &tx_path, &["doctor", "--fix"])?;
-    let doctor = run_tail_step(workspace_root, shim_path, &tx_path, &["doctor", "--json"])?;
+    let mut doctor = run_tail_step(workspace_root, shim_path, &tx_path, &["doctor", "--json"])?;
+    let clean = doctor_is_clean(&String::from_utf8_lossy(&doctor));
+    if !clean {
+        run_tail_step(workspace_root, shim_path, &tx_path, &["doctor", "--fix"])?;
+        doctor = run_tail_step(workspace_root, shim_path, &tx_path, &["doctor", "--json"])?;
+    }
 
     let facts = ready_facts(workspace_root, store_root, outcome).inspect_err(|_| {
         let _ = mark_transaction_status(&tx_path, "ready-degraded");
     })?;
+    if clean && outcome == TailOutcome::AlreadyCurrent {
+        print!("{}", noop_block(&facts));
+        let _ = std::io::stdout().flush();
+        mark_transaction_status(&tx_path, "complete")?;
+        return Ok(());
+    }
     let block = closing_block(&String::from_utf8_lossy(&doctor), &facts).map_err(|why| {
         let _ = mark_transaction_status(&tx_path, "ready-degraded");
         InitError::Custom(why)
@@ -2815,6 +2866,37 @@ mod tests {
             let err = closing_block(bad, &facts(false)).unwrap_err();
             assert!(err.contains("doctor"), "{bad:?} -> {err}");
         }
+    }
+
+    #[test]
+    fn doctor_is_clean_only_when_ok_and_no_unpassed_row_names_a_fix() {
+        let clean = doctor_json(
+            true,
+            &[
+                ("a", "ok", None),
+                ("b", "warn", None),
+                ("c", "skip", Some("fgos doctor --fix")),
+            ],
+        );
+        assert!(doctor_is_clean(&clean));
+        let warn_with_fix = doctor_json(true, &[("a", "warn", Some("fgos doctor --fix"))]);
+        assert!(!doctor_is_clean(&warn_with_fix));
+        assert!(!doctor_is_clean(&doctor_json(
+            false,
+            &[("a", "fail", Some("x"))]
+        )));
+        assert!(!doctor_is_clean("not json"));
+    }
+
+    #[test]
+    fn noop_block_says_nothing_to_do_and_names_the_next_step() {
+        assert_eq!(
+            noop_block(&facts(true)),
+            "nothing to do: fgOS v1.2.0 already active, doctor ok\nNext: fgos run \"<prompt>\"\n"
+        );
+        let mut f = facts(true);
+        f.tag = None;
+        assert!(noop_block(&f).starts_with("nothing to do: fgOS already active"));
     }
 
     #[test]

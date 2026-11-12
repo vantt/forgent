@@ -42,16 +42,21 @@ fn null_device() -> &'static str {
     }
 }
 
-/// Same bounds as `install.sh`: a server that connects but never finishes
-/// cannot hang `fgctl init` and TLS below 1.2 is refused. [`check_transport`]
+/// Same bounds as `install.sh` (change both together): a server that connects
+/// but stalls below 1 KiB/s for 30 s is cut off, whatever the link speed, and
+/// 900 s caps one transfer in total. TLS below 1.2 is refused. [`check_transport`]
 /// limits the first URL before curl runs and the URL curl ended at afterwards;
 /// [`redirect_protocols`] decides where a redirect may lead.
-const CURL_ARGS: [&str; 8] = [
+const CURL_ARGS: [&str; 12] = [
     "-fsSL",
     "--connect-timeout",
     "15",
+    "--speed-limit",
+    "1024",
+    "--speed-time",
+    "30",
     "--max-time",
-    "120",
+    "900",
     "--proto",
     "=https,http,file",
     "--tlsv1.2",
@@ -560,6 +565,17 @@ mod tests {
             env_from: from.map(String::from),
             env_version: version.map(String::from),
         }
+    }
+
+    #[test]
+    fn curl_stops_a_stalled_download_and_caps_the_total_at_900_seconds() {
+        let args = CURL_ARGS.join(" ");
+        assert!(
+            args.contains("--speed-limit 1024 --speed-time 30"),
+            "{args}"
+        );
+        assert!(args.contains("--max-time 900"), "{args}");
+        assert!(!args.contains("--max-time 120"), "{args}");
     }
 
     #[test]

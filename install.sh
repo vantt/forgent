@@ -66,10 +66,14 @@ cleanup() {
 
 # Bounds every network call below so a server that connects but never
 # finishes sending (or never responds at all) cannot hang this script
-# indefinitely. curl's --max-time is a true wall-clock total-transfer cap.
+# indefinitely. curl stops a transfer that stays below 1 KiB/s for 30 s
+# (--speed-limit/--speed-time), so a slow link that keeps moving can finish
+# and a stalled one is cut off; --max-time 900 is the wall-clock total cap.
+# The same values sit in CURL_ARGS in packages/distribution/rust/src/fetch.rs;
+# change both together.
 # wget has no such option -- its --timeout resets on every byte received
 # (an idle timeout, not a total one) and it retries up to 20 times by
-# default, so a slow-drip server could keep it alive far past 120s even
+# default, so a slow-drip server could keep it alive far past the cap even
 # with --tries capped. HARD_TIMEOUT_CMD wraps both with a real wall-clock
 # backstop via the external `timeout` command when available, so the wget
 # fallback path is genuinely bounded too, not just curl's own preferred path.
@@ -77,12 +81,12 @@ cleanup() {
 # curl is the hardened path: wget cannot restrict where a redirect leads, so
 # download_file lets it fetch https:// URLs only and caps its redirects.
 init_network_limits() {
-  CURL_TIMEOUT_ARGS="--connect-timeout 15 --max-time 120"
+  CURL_TIMEOUT_ARGS="--connect-timeout 15 --speed-limit 1024 --speed-time 30 --max-time 900"
   CURL_SAFE_ARGS="--proto =https,http --proto-redir =https --tlsv1.2"
   WGET_TIMEOUT_ARGS="--timeout=120 --tries=1 --max-redirect=5"
   HARD_TIMEOUT_CMD=""
   if command -v timeout >/dev/null 2>&1; then
-    HARD_TIMEOUT_CMD="timeout 130"
+    HARD_TIMEOUT_CMD="timeout 910"
   fi
 }
 

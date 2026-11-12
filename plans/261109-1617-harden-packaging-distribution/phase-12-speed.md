@@ -1,7 +1,7 @@
 ---
 phase: 12
 title: "Speed: a no-op init, repair or upgrade skips the tail and says so; the download cap stops stalls instead of capping total time; the release profile gets LTO if it pays"
-status: pending
+status: completed
 depends_on: ["P10 landed (init.rs chain)", "P09 landed (install.sh and fetch.rs chain)"]
 parallel: "group G5 with P07"
 effort: ~0.75d
