@@ -168,7 +168,7 @@ try {
     $fgctl = Join-Path $installDir 'fgctl.exe'
     Assert-True (Test-Path -LiteralPath $fgctl) "fgctl.exe not found at $fgctl"
     Assert-True ($r.Text -match 'is not in your PATH') 'install.ps1 must say how to put the install dir on PATH'
-    Assert-True ($r.Text -match 'fgctl init') 'install.ps1 must name the next step'
+    Assert-True ($r.Text -match 'fgctl(\.exe)? init') 'install.ps1 must name the next step'
     Assert-True (-not ((Get-ChildItem -LiteralPath $installDir -Force | Where-Object { $_.Name -like '.fgctl.*.tmp' }))) 'no temp file may be left in the install dir'
     $statusRun = Invoke-Native $fgctl @('status') $null
     Assert-True ($statusRun.Code -eq 0) "installed fgctl.exe must run: $($statusRun.Text)"
