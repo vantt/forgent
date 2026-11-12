@@ -548,6 +548,9 @@ lai (S2, STR14, STR17, STR8) **đã có chỗ ngồi vẽ sẵn**.
    (b) **đủ sổ**: mọi file `src/**` `bin/**` có row, một-một. Hai phép kiểm là hai
    mặt một test; v0.1 thiếu cả hai nên vừa sai chiều tầng vừa thiếu 5 module mà
    không ai thấy. Thêm module mới = thêm row manifest + row §6, không thì test đỏ.
+   Manifest còn khai `tiers` (T0-T9, theo thư mục, một row file đổi tier cho một
+   lá) và test giữ luật "file tier N chỉ import tier ≤ N"; cặp import lên có tên
+   và lý do nằm trong `tierExceptions`, không có ngoại lệ chung.
 4. **Một nhà duy nhất cho component; slice khai là slice.** Tranh cãi "X để đâu"
    giải bằng thần chú §0; một *component* thật sự cần hai nhà = tách nó làm hai;
    một *tính năng* chạm nhiều nhà = nó là slice, khai đúng loại row.
