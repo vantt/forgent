@@ -21,6 +21,7 @@ import {
 import { releaseBinaryPath } from '../../src/util/release-binary-path.mjs';
 import {
   FGCTL_BIN,
+  activated,
   releaseDirName,
   runFgctl,
   runShim,
@@ -188,7 +189,7 @@ test('R1, R2, R3, R6: A -> B upgrade then repair round-trips reported digest wit
     env: { ...withoutActiveRelease(process.env), FGOS_STATE_HOME: stateHome },
     encoding: 'utf8',
   });
-  assert.equal(upgradeRes.status, 0, `fgctl upgrade must succeed: ${upgradeRes.stderr}`);
+  assert.ok(activated(upgradeRes), `fgctl upgrade must activate: ${upgradeRes.stderr}`);
   assert.match(upgradeRes.stderr, /^fgctl: replaced .* with the release's fgctl \(sha256:[0-9a-f]{64}\); previous binary kept at .*\.prev$/m);
   assert.ok(fs.readFileSync(staleFgctl).equals(releaseFgctl), 'the machine fgctl now holds the release bytes');
   assert.ok(fs.readFileSync(`${staleFgctl}.prev`).equals(staleBytes), 'the replaced bytes are kept as .prev');

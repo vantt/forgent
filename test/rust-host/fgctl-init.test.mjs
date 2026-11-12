@@ -8,7 +8,7 @@ import { spawnSync, spawn, execFileSync } from 'node:child_process';
 import { REPO_ROOT, releaseOutputDir } from '../../scripts/build-rust-distribution.mjs';
 import { releaseBinaryPath } from '../../src/util/release-binary-path.mjs';
 import { holdLock } from './fgctl-lock-holder.mjs';
-import { useReleaseFixture, FGCTL_BIN, fixture, releaseDirName, runFgctl, runShim, waitForProcess, withoutActiveRelease } from './fgctl-init-fixture.mjs';
+import { activated, useReleaseFixture, FGCTL_BIN, fixture, releaseDirName, runFgctl, runShim, waitForProcess, withoutActiveRelease } from './fgctl-init-fixture.mjs';
 
 useReleaseFixture();
 
@@ -82,14 +82,14 @@ test('R11 & R1-R8, R10: fgctl init in a fresh git project publishes shims, root.
     const txPath = path.join(tempState, 'installs', `${activation.activationId}.json`);
     assert.ok(fs.existsSync(txPath), `transaction file must exist at ${txPath}`);
     const txRecord = JSON.parse(fs.readFileSync(txPath, 'utf8'));
-    assert.equal(txRecord.status, 'complete');
+    assert.equal(txRecord.status, res.notReady ? 'ready-degraded' : 'complete');
     assert.equal(txRecord.artifactDigest, fixture.digest);
     const statuses = txRecord.history.map((h) => h.status);
     assert.ok(statuses.includes('staging'));
     assert.ok(statuses.includes('verified'));
     assert.ok(statuses.includes('preparing'));
     assert.ok(statuses.includes('ready-published'));
-    assert.ok(statuses.includes('complete'));
+    assert.ok(statuses.includes(res.notReady ? 'ready-degraded' : 'complete'));
 
     // 8. version --runtime-json through the shim reports R10 fields with host: "rust"
     const versionRes = runShim(shimFgos, ['version', '--runtime-json'], {
@@ -333,8 +333,8 @@ test('Item 1: Concurrent fgctl init invocations against pre-staged pinned worksp
     );
 
     const results = await Promise.all(procs.map(waitForProcess));
-    const succeeded = results.filter((r) => r.code === 0);
-    const failed = results.filter((r) => r.code !== 0);
+    const succeeded = results.filter(activated);
+    const failed = results.filter((r) => !activated(r));
 
     assert.equal(succeeded.length, 1, 'Exactly one concurrent init must succeed');
     assert.equal(failed.length, procCount - 1, 'Every other concurrent init must fail');

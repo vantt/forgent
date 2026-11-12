@@ -28,7 +28,23 @@ export function withoutActiveRelease(env) {
   return rest;
 }
 
-export function runFgctl(args, { cwd, stateHome, env = {} } = {}) {
+// The one line init, upgrade and repair end with when the activation went through but `fgos doctor` still lists
+// checks that need the user.
+const NOT_READY = /not ready: the checks listed above need you/;
+
+/** True when an init, upgrade or repair run activated its release: it exited 0, or ended on "not ready". Takes a spawn result (`status`) or a waitForProcess result (`code`). */
+export function activated(run) {
+  return (run.status ?? run.code) === 0 || NOT_READY.test(run.stderr);
+}
+
+/**
+ * Runs fgctl (`runFgctlRaw` is the unadjusted run). These suites prove activation (stage, verify, publish, shims, pin, tail), which does not depend on
+ * whether the machine running them has agent CLIs, a trust store or a sandbox. An init, upgrade or repair that
+ * activated but ended on "not ready" is therefore reported with status 0 and `notReady: true`; the closing block and
+ * its exit code have their own proofs (the closing_block unit tests and `closing-block.test.mjs`). Every other
+ * failure keeps its real status.
+ */
+export function runFgctlRaw(args, { cwd, stateHome, env = {} } = {}) {
   return spawnSync(FGCTL_BIN, args, {
     cwd,
     env: {
@@ -38,6 +54,14 @@ export function runFgctl(args, { cwd, stateHome, env = {} } = {}) {
     },
     encoding: 'utf8',
   });
+}
+
+export function runFgctl(args, opts = {}) {
+  const res = runFgctlRaw(args, opts);
+  if (res.status === 1 && ['init', 'upgrade', 'repair'].includes(args[0]) && NOT_READY.test(res.stderr)) {
+    return { ...res, status: 0, notReady: true };
+  }
+  return res;
 }
 
 export function runShim(shimPath, args, opts = {}) {

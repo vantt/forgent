@@ -6,7 +6,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { spawnSync, spawn, execFileSync } from 'node:child_process';
 import http from 'node:http';
-import { useReleaseFixture, useInitializedWorkspace, FGCTL_BIN, fixture, runFgctl, waitForProcess, RELEASE_TARGET, makeDownloadProject, makeReleaseAssets, readActivation, withoutActiveRelease } from './fgctl-init-fixture.mjs';
+import { activated, useReleaseFixture, useInitializedWorkspace, FGCTL_BIN, fixture, runFgctl, waitForProcess, RELEASE_TARGET, makeDownloadProject, makeReleaseAssets, readActivation, withoutActiveRelease } from './fgctl-init-fixture.mjs';
 
 useReleaseFixture();
 // One real `fgctl init --from <fixture release>`, restored by the cases that start from it.
@@ -97,7 +97,7 @@ test('download: with no pin and nothing explicit, init resolves and installs the
       },
     });
     const { code, stderr } = await waitForProcess(proc);
-    assert.equal(code, 0, stderr);
+    assert.ok(activated({ code, stderr }), stderr);
     assert.match(stderr, /downloaded and verified fgos-v0\.0\.2-/);
     assert.equal(readActivation(t.proj).artifactDigest, fixture.digest);
     const pin = JSON.parse(fs.readFileSync(path.join(t.proj, '.fgos', 'distribution.json'), 'utf8'));

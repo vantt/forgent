@@ -218,6 +218,10 @@ fn main() {
             let inputs = fgos_distribution::fetch::SourceInputs::from_env(flags.value("--from"));
             let endpoint = fgos_distribution::fetch::DownloadEndpoint::from_env();
             if let Err(err) = upgrade_workspace_resolving(&cwd, &inputs, &endpoint) {
+                // Not ready still means the release is activated, so fgctl follows it.
+                if matches!(err, fgos_distribution::InitError::NotReady) {
+                    refresh_own_binary(&cwd);
+                }
                 eprintln!("Error: {}", err);
                 std::process::exit(1);
             }

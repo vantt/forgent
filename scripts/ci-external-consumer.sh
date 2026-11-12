@@ -154,14 +154,24 @@ SANDBOX_GIT="$SCRIPT_DIR/lib/sandbox-git.mjs"
   exit 1
 }
 
-# fgctl init --from <fgos tarball>
-(
+# fgctl init --from <fgos tarball>. This proof is about activation; an init that activated but ends
+# on the list of checks that still need the user (this runner's agent CLIs, trust stores) exits 1 and
+# is accepted, because the steps below read the activated release itself.
+INIT_STATUS=0
+INIT_OUTPUT="$(
   cd "$TEMP_PROJECT" &&
-  PATH="$TEMP_INSTALL_DIR:$PATH" "$FGCTL_BIN" init --from "$FGOS_TARBALL"
-) || {
-  echo "Step failed: fgctl init --from $FGOS_TARBALL" >&2
-  exit 1
-}
+  PATH="$TEMP_INSTALL_DIR:$PATH" "$FGCTL_BIN" init --from "$FGOS_TARBALL" 2>&1
+)" || INIT_STATUS=$?
+printf '%s\n' "$INIT_OUTPUT"
+if [ "$INIT_STATUS" -ne 0 ]; then
+  case "$INIT_OUTPUT" in
+    *"need you:"*|*"needs you:"*) ;;
+    *)
+      echo "Step failed: fgctl init --from $FGOS_TARBALL" >&2
+      exit 1
+      ;;
+  esac
+fi
 
 # fgos version --runtime-json and assertion
 VERSION_OUTPUT="$(
