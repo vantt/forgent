@@ -1634,15 +1634,24 @@ impl GitDriver {
         // lazy fetching ran. A missing object must fail without that transport.
         let fetch_marker = dir.join("fetch-ran");
         let transport = dir.join("transport");
-        if fetch_marker.to_string_lossy().contains('\'') {
+        // Git runs core.sshCommand through sh, which drops a backslash: on Windows both paths
+        // reach the shell with forward slashes, which Windows file APIs accept too.
+        let shell_path = |p: &Path| -> Result<String> {
+            let text = p.to_str().ok_or_else(|| failure("non-utf8-state-root"))?;
+            Ok(if cfg!(windows) {
+                text.replace('\\', "/")
+            } else {
+                text.to_owned()
+            })
+        };
+        let fetch_marker_text = shell_path(&fetch_marker)?;
+        let transport_text = shell_path(&transport)?;
+        if fetch_marker_text.contains('\'') {
             return Err(failure("unsupported-probe-path"));
         }
         fs::write(
             &transport,
-            format!(
-                "#!/bin/sh\nprintf ran > '{}'\nexit 1\n",
-                fetch_marker.display()
-            ),
+            format!("#!/bin/sh\nprintf ran > '{fetch_marker_text}'\nexit 1\n"),
         )
         .map_err(io)?;
         #[cfg(unix)]
@@ -1653,13 +1662,7 @@ impl GitDriver {
         for args in [
             vec!["config", "remote.origin.promisor", "true"],
             vec!["config", "remote.origin.url", "ssh://example.invalid/repo"],
-            vec![
-                "config",
-                "core.sshCommand",
-                transport
-                    .to_str()
-                    .ok_or_else(|| failure("non-utf8-state-root"))?,
-            ],
+            vec!["config", "core.sshCommand", &transport_text],
         ] {
             if !run(&args)?.success {
                 return Err(failure("git-floor-probe-config"));
