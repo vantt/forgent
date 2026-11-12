@@ -182,6 +182,11 @@ try {
     Assert-True ($r.Text -match 'checksum verification failed') "fgctl init mismatch message: $($r.Text)"
     Assert-True (-not (Test-Path -LiteralPath (Join-Path $badProject '.fgos\installation\activation.json'))) 'nothing may be activated after a checksum mismatch'
 
+    # init, upgrade and repair exit 0 when the runtime is ready and 2 when it is activated but doctor still lists
+    # checks (precondition). On Windows doctor is not ok yet (Windows runtime: Config, Event Store, confinement not
+    # supported yet), so activation is what these steps prove; a failure to activate exits with another code.
+    $activatedCodes = @(0, 2)
+
     # ---- fgctl init downloads and activates the Windows target ------------------------
     $project = New-Project 'project'
     $env:FGCTL_ASSET_BASE_URL = $goodUrl
@@ -189,7 +194,7 @@ try {
     $r = Invoke-Native $fgctl @('init') $project
     Write-Host $r.Text
     # Activation is what this proof needs; an init that activated but lists checks that still need the user exits 2 (precondition).
-    Assert-True (($r.Code -eq 0) -or ($r.Code -eq 2)) 'fgctl init (download path)'
+    Assert-True ($r.Code -in $activatedCodes) 'fgctl init (download path)'
     Assert-True ($r.Text -match 'x86_64-pc-windows-msvc') 'fgctl init must say it downloaded the Windows target asset'
     Remove-Item Env:FGCTL_VERSION, Env:FGCTL_ASSET_BASE_URL
 
@@ -274,7 +279,7 @@ try {
     # ---- upgrade is a no-op against the same asset ------------------------------------
     $before = Get-Content -LiteralPath $activationFile -Raw | ConvertFrom-Json
     $r = Invoke-Native $fgctl @('upgrade', '--from', $fgosTar.FullName) $project
-    Assert-True ($r.Code -eq 0) "fgctl upgrade --from: $($r.Text)"
+    Assert-True ($r.Code -in $activatedCodes) "fgctl upgrade --from: $($r.Text)"
     $after = Get-Content -LiteralPath $activationFile -Raw | ConvertFrom-Json
     Assert-True ($before.artifactDigest -eq $after.artifactDigest) 'upgrade to the same asset must keep the artifactDigest'
     Assert-True ($before.previousArtifactDigest -eq $after.previousArtifactDigest) 'upgrade to the same asset must keep previousArtifactDigest'
@@ -286,7 +291,7 @@ try {
     $r = Invoke-Native $fgctl @('verify') $project
     Assert-True ($r.Code -ne 0 -and $r.Text -match 'fgos\.cmd' -and $r.Text -match 'fgctl repair') "fgctl verify must name a missing shim: $($r.Text)"
     $r = Invoke-Native $fgctl @('repair') $project
-    Assert-True ($r.Code -eq 0) "fgctl repair: $($r.Text)"
+    Assert-True ($r.Code -in $activatedCodes) "fgctl repair: $($r.Text)"
     Assert-True (Test-Path -LiteralPath (Join-Path $binDir 'fgos.cmd')) 'fgctl repair must regenerate fgos.cmd'
     $r = Invoke-Native $fgctl @('verify') $project
     Assert-True ($r.Code -eq 0) "fgctl verify after repair: $($r.Text)"
@@ -346,7 +351,7 @@ try {
 
             $upProject = New-Project 'upgrade-project'
             $r = Invoke-Native (Join-Path $prevInstall 'fgctl.exe') @('init', '--from', $prevFgosTar) $upProject
-            Assert-True ($r.Code -eq 0) "$prevTag fgctl init --from its own fgos asset: $($r.Text)"
+            Assert-True ($r.Code -in $activatedCodes) "$prevTag fgctl init --from its own fgos asset: $($r.Text)"
             $upActivation = Join-Path $upProject '.fgos\installation\activation.json'
             $beforeAct = Get-Content -LiteralPath $upActivation -Raw | ConvertFrom-Json
             Assert-True ($beforeAct.artifactDigest -eq $prevDigest) "the project is not on the $prevTag artifact (activation $($beforeAct.artifactDigest), asset $prevDigest)"
@@ -364,7 +369,7 @@ try {
             $keysBefore = "gateBypass.level=light ironLaw.level=$($legacy.ironLaw.level)"
 
             $r = Invoke-Native $fgctl @('upgrade', '--from', $fgosTar.FullName) $upProject
-            Assert-True ($r.Code -eq 0) "candidate fgctl upgrade on a $prevTag project: $($r.Text)"
+            Assert-True ($r.Code -in $activatedCodes) "candidate fgctl upgrade on a $prevTag project: $($r.Text)"
             $afterAct = Get-Content -LiteralPath $upActivation -Raw | ConvertFrom-Json
             Assert-True (($afterAct.artifactDigest -eq $manifest.artifactDigest) -and ($afterAct.artifactDigest -ne $beforeAct.artifactDigest)) "upgrade from $prevTag did not activate the candidate (before $($beforeAct.artifactDigest), after $($afterAct.artifactDigest), candidate $($manifest.artifactDigest))"
             Assert-True ($afterAct.previousArtifactDigest -eq $beforeAct.artifactDigest) "previousArtifactDigest after the upgrade is $($afterAct.previousArtifactDigest), expected $($beforeAct.artifactDigest)"
