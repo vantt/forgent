@@ -1634,15 +1634,19 @@ impl GitDriver {
         // lazy fetching ran. A missing object must fail without that transport.
         let fetch_marker = dir.join("fetch-ran");
         let transport = dir.join("transport");
-        if fetch_marker.to_string_lossy().contains('\'') {
+        let text = |p: &Path| -> Result<String> {
+            p.to_str()
+                .map(|t| sh_path(t, cfg!(windows)))
+                .ok_or_else(|| failure("non-utf8-state-root"))
+        };
+        let fetch_marker_text = text(&fetch_marker)?;
+        let transport_text = text(&transport)?;
+        if fetch_marker_text.contains('\'') {
             return Err(failure("unsupported-probe-path"));
         }
         fs::write(
             &transport,
-            format!(
-                "#!/bin/sh\nprintf ran > '{}'\nexit 1\n",
-                fetch_marker.display()
-            ),
+            format!("#!/bin/sh\nprintf ran > '{fetch_marker_text}'\nexit 1\n"),
         )
         .map_err(io)?;
         #[cfg(unix)]
@@ -1653,13 +1657,7 @@ impl GitDriver {
         for args in [
             vec!["config", "remote.origin.promisor", "true"],
             vec!["config", "remote.origin.url", "ssh://example.invalid/repo"],
-            vec![
-                "config",
-                "core.sshCommand",
-                transport
-                    .to_str()
-                    .ok_or_else(|| failure("non-utf8-state-root"))?,
-            ],
+            vec!["config", "core.sshCommand", &transport_text],
         ] {
             if !run(&args)?.success {
                 return Err(failure("git-floor-probe-config"));
@@ -1686,6 +1684,16 @@ impl GitDriver {
                     .into(),
         });
         Ok(())
+    }
+}
+
+/// A path as the shell Git runs `core.sshCommand` through reads it: that shell drops a backslash,
+/// so on Windows the separators become forward slashes, which Windows file APIs accept too.
+fn sh_path(path: &str, windows: bool) -> String {
+    if windows {
+        path.replace('\\', "/")
+    } else {
+        path.to_owned()
     }
 }
 
@@ -3366,6 +3374,14 @@ mod tests {
             release(handle),
             fgos_holder_lock::Release::Released { .. }
         ));
+    }
+    #[test]
+    fn shell_paths_use_forward_slashes_only_on_windows() {
+        assert_eq!(
+            sh_path(r"D:\a\state\transport", true),
+            "D:/a/state/transport"
+        );
+        assert_eq!(sh_path(r"/tmp/a\b/transport", false), r"/tmp/a\b/transport");
     }
     #[test]
     fn floor_and_all_repository_backends() {
