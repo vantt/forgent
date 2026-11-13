@@ -485,7 +485,8 @@ fn supervise_agent(
         };
         let pid = child.id() as libc::pid_t;
         agent_pid = Some(pid);
-        agent_tuple = facts::identity_of(ProcId(child.id()));
+        // The agent may already have exited; unreaped, it still has its identity.
+        agent_tuple = facts::identity_of_child(ProcId(child.id()));
         // The Child handle is not used again: the gate reaps with waitpid(-1).
         std::mem::forget(child);
         let tuple = agent_tuple

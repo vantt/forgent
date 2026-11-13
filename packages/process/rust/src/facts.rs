@@ -295,6 +295,32 @@ pub fn identity_of(pid: ProcId) -> Option<ProcTuple> {
     platform::current().identity_of(pid)
 }
 
+/// The identity of a child this process spawned and has not reaped yet. A child that already
+/// exited is a zombie until it is reaped, and while it is one its pid cannot be reused, so its pid
+/// and start time still name exactly that process: a fast child keeps an identity even when it
+/// ended before it was read. `None` only when nothing is there at all.
+pub fn identity_of_child(pid: ProcId) -> Option<ProcTuple> {
+    if let Some(tuple) = identity_of(pid) {
+        return Some(tuple);
+    }
+    #[cfg(target_os = "linux")]
+    {
+        let relation = relation_of(pid).filter(|r| r.state != 'X')?;
+        let observer = observer();
+        Some(ProcTuple {
+            host: observer.host,
+            boot_id: observer.boot_id,
+            pid_ns: observer.pid_ns,
+            pid,
+            start_time: relation.start_ticks.to_string(),
+        })
+    }
+    #[cfg(not(target_os = "linux"))]
+    {
+        None
+    }
+}
+
 /// The identity of this process.
 pub fn self_identity() -> Option<ProcTuple> {
     identity_of(ProcId(std::process::id()))
@@ -640,6 +666,32 @@ pub use crate::platform::linux::{locked_fds, own_lock_token, proc_self_pid, Lock
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// No other test reads a child that already exited but is not reaped: `identity_of` says
+    /// nothing for it, and the spawner that reads it right after spawn would lose its identity.
+    #[cfg(target_os = "linux")]
+    #[test]
+    fn an_exited_child_not_yet_reaped_keeps_its_identity() {
+        let mut child = std::process::Command::new("true").spawn().unwrap();
+        let pid = ProcId(child.id());
+        let deadline = std::time::Instant::now() + std::time::Duration::from_secs(10);
+        while !relation_of(pid).is_some_and(|r| r.is_gone()) {
+            assert!(
+                std::time::Instant::now() < deadline,
+                "the child never exited"
+            );
+            std::thread::sleep(std::time::Duration::from_millis(5));
+        }
+        assert_eq!(identity_of(pid), None, "a zombie is not live");
+        let tuple = identity_of_child(pid).expect("an unreaped child keeps its identity");
+        assert_eq!(tuple.pid, pid);
+        assert_eq!(
+            tuple.start_time,
+            relation_of(pid).unwrap().start_ticks.to_string()
+        );
+        child.wait().unwrap();
+        assert_eq!(identity_of_child(pid), None, "a reaped child names nothing");
+    }
 
     #[cfg(target_os = "linux")]
     #[test]

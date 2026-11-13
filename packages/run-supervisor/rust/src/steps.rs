@@ -332,7 +332,7 @@ mod unix {
         // The step receives no lock description: the map is empty.
         let mut child =
             spawn_with_fds(cmd, &[]).map_err(|e| fail(format!("step did not start: {e}")))?;
-        let identity = facts::identity_of(ProcId(child.id()));
+        let identity = facts::identity_of_child(ProcId(child.id()));
         let pid = child.id() as libc::pid_t;
         let mut stdout = child.stdout.take().map(|s| s.take(STDOUT_LIMIT));
         let (text_tx, text_rx) = std::sync::mpsc::channel();
