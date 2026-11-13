@@ -10,11 +10,15 @@ import { seatsOfRecord, collaborationOfRecord } from './legacy-seat-read.mjs';
 import { seatKind, VERIFY_SEAT } from './seat-resolver.mjs';
 import { shippedCatalog } from '../dispatch/shipped-catalog.mjs';
 
+// Version 3 copies the infrastructure facts Execution stored on the unit record at settlement
+// (`infrastructure`, `infrastructureReason`, `refused`); a record settled before they were stored
+// reads as not known (`null`, `null`, `[]`), never as a pass. Version 2 files already on disk are
+// still read by the Rust reader.
 // Version 2: every seat carries an owner-written kind, and a finished unit whose pattern was never
 // recorded is published as UNDETERMINED_OUTCOME instead of being derived as if it were solo. Each
 // seat names its `seat` id and its canonical `role`; a record written before seats existed is read
 // through legacy-seat-read.mjs, which says what each directory name was.
-export const UNIT_SUMMARY_CONTRACT = Object.freeze({ id: 'unit-summary', version: 2 });
+export const UNIT_SUMMARY_CONTRACT = Object.freeze({ id: 'unit-summary', version: 3 });
 
 /** A finished unit whose outcome cannot be derived from its records; never a pass or a failure. */
 
@@ -146,6 +150,9 @@ export function buildUnitSummary(unitDir, { legacyCompletion = null } = {}) {
     pattern: pattern === null || typeof pattern === 'string' ? pattern : decoded?.selector ?? pattern.pattern ?? null,
     capability: record.unit?.capability ?? null,
     outcome,
+    infrastructure: typeof settlement?.infrastructure === 'boolean' ? settlement.infrastructure : null,
+    infrastructureReason: typeof settlement?.infrastructureReason === 'string' ? settlement.infrastructureReason : null,
+    refused: Array.isArray(settlement?.refused) ? settlement.refused : [],
     startedAt: timestamp(record.createdAt),
     settledAt: outcome === 'unknown' ? null
       : timestamp(settlement?.settledAt) ?? timestamp(legacy?.settledAt) ?? settlementTimes.at(-1) ?? null,

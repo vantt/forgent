@@ -21,6 +21,7 @@ import { runLoop, loopRunsVerify } from './loops/index.mjs';
 import { shippedCatalog } from '../dispatch/shipped-catalog.mjs';
 import { rebindsOnResume, NOT_STARTED_OUTCOME, evaluationsOf, infrastructure, isInfrastructure, outcomeAfterScopeRule } from './outcome.mjs';
 import { verifyCommandOf } from './loops/verify.mjs';
+import { VERIFY_SEAT } from './seat-resolver.mjs';
 import { answerOfVerify, runVerify } from './custody-door.mjs';
 import { executeAssignment } from '../dispatch/assignment-runner.mjs';
 import { buildUnitRunAssignment } from '../dispatch/assignment.mjs';
@@ -320,7 +321,7 @@ async function runUnitBody(options, scope) {
   } catch (error) {
     // A cancelled run is not a failed one. A settlement that cannot be recorded is reported beside the error, never instead.
     if (!ctx.settled && !(error instanceof RunCancelledError)) {
-      try { settleUnitRun(ctx, 'execution-failure'); }
+      try { settleUnitRun(ctx, { outcome: 'execution-failure', infrastructure: true, infrastructureReason: 'run-error', refused: [] }); }
       catch (settleError) {
         console.warn(`fgos: could not record the failed settlement of unit run "${ctx.unitRunId}": ${settleError.message}`);
       }
@@ -358,9 +359,10 @@ function openUnitRun(ctx) {
   };
 }
 
-function settleUnitRun(ctx, outcome) {
+/** The record keeps the facts finishUnit computed, so the unit summary copies them and never derives them again. */
+function settleUnitRun(ctx, { outcome, infrastructure, infrastructureReason, refused }) {
   ctx.settled = true;
-  ctx.unitRecord.settlement = { outcome, settledAt: new Date().toISOString() };
+  ctx.unitRecord.settlement = { outcome, infrastructure, infrastructureReason, refused, settledAt: new Date().toISOString() };
   ctx.unitRecord.execution = { status: 'settled' };
   ctx.persist();
   ctx.scope.settled.unit = true;
@@ -429,6 +431,24 @@ function outputOf({ mainRoot }, result) {
 }
 
 /**
+ * Why a unit that ended on infrastructure did: the first reason that applies, from the run's own facts. The
+ * vocabulary is named in the unit-run-result contract (section 3).
+ */
+function infrastructureReasonOf({ started, ruled, attempts }) {
+  if (!started.value) return 'not-started';
+  if (ruled.error) return 'scope-check-failed';
+  const failed = attempts.find((attempt) => isInfrastructure(attempt.outcome));
+  if (!failed) return 'execution-failure';
+  if (failed.seat === VERIFY_SEAT && failed.infrastructureReason) return `verify-${failed.infrastructureReason}`;
+  if (failed.commit?.status === 'failed') return `commit-failed:${failed.commit.reason ?? 'unknown'}`;
+  return failed.runResult?.classification?.outcome?.reason ?? 'execution-failure';
+}
+
+/** The seats a policy decision refused, from the results that carry `refused`; they have no run directory to read later. */
+const refusedSeatsOf = (attempts) => attempts.filter((attempt) => attempt.refused)
+  .map(({ seat, round, refused }) => ({ seat, round, reason: refused.reason, detail: refused.detail ?? '' }));
+
+/**
  * The one place the end of a Unit run becomes its record and its result: the scope rule and the verify round are
  * applied before the unit record settles, so the record, the case reservation and the caller read one outcome. A run
  * none of whose seats was given its brief did no work and ends `not-started`. Every fact is computed here, once; a
@@ -437,7 +457,6 @@ function outputOf({ mainRoot }, result) {
 function finishUnit(ctx, { outcome, rounds, results = [], findings = [], ...rest }) {
   const { unitRecord, unitRunId, scope } = ctx;
   const ruled = applyScopeRule(ctx, { outcome, results });
-  settleUnitRun(ctx, ruled.outcome);
   const started = ruled.outcome !== 'pass' && noBriefDelivered(unitRecord)
     ? { value: false, reason: 'brief-not-delivered' }
     : { value: true, reason: null };
@@ -451,10 +470,17 @@ function finishUnit(ctx, { outcome, rounds, results = [], findings = [], ...rest
     };
   });
   const final = started.value ? ruled.outcome : NOT_STARTED_OUTCOME;
+  const unitInfrastructure = infrastructure({ outcome: final, outOfScope: ruled.outOfScope, results: attempts });
+  settleUnitRun(ctx, {
+    outcome: ruled.outcome,
+    infrastructure: unitInfrastructure,
+    infrastructureReason: unitInfrastructure ? infrastructureReasonOf({ started, ruled, attempts }) : null,
+    refused: refusedSeatsOf(attempts),
+  });
   return {
     unitRunId, outcome: final, rounds, results: attempts, findings,
     ...(ruled.error ? { error: ruled.error } : {}),
-    infrastructure: infrastructure({ outcome: final, outOfScope: ruled.outOfScope, results: attempts }),
+    infrastructure: unitInfrastructure,
     outOfScope: ruled.outOfScope,
     outOfScopeOnBranch: ruled.outOfScopeOnBranch,
     evaluations: evaluationsOf(attempts),

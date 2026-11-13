@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "79cf67b284f05eb4e59df437459f29d6836bfa714d9d4196d032bcbe177d1533",
+  "payloadDigest": "c716b1c0d271336b4c489743e98c88839865301d4fb0a44a28ce8514fefcc874",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -658,7 +658,7 @@
     "packages/process/rust/tests/windows_job_domain.rs": "ef875f367c2bd361ba1e9743eb021bedfd7fac299781cc650e72fe06d6ba419c",
     "packages/process/rust/tests/windows_spawn.rs": "ac45d3b618d92790e926c41e7910f95f46440aab35ce1100e7f16c7a6b73fa97",
     "packages/run-result/rust/src/lib.rs": "55e1ac4cce85b1b897adba8dcc51c7fb11ef2c29eaf731cada25eaeb5f3ccad3",
-    "packages/run-result/rust/src/unit_summary.rs": "175e44b839255d969d8ee959f85f1e1c7f35f47d9cd795a6f767242cdb370c09",
+    "packages/run-result/rust/src/unit_summary.rs": "df87fdcb400430cfa000652bab55473fb136cab6a3b39c4821dd3da342186b8a",
     "packages/run-result/rust/tests/layout_fixture.rs": "3fa57f7b3ee9292dd3b1242a971b276659a7684d90e67daa62119c6c1a08acb6",
     "packages/run-result/rust/tests/unit_result_fixtures.rs": "27dde9cbedb4c47898a9ffc077b591caf221ff39bdbf188a44b0e5d7e2b39481",
     "packages/run-result/rust/tests/unit_summary.rs": "1d217b57cc351d13cb714b12ed998ab4a86fd4c6080a327bc8901bc0c5a43a14",
@@ -1084,7 +1084,7 @@
     "src/runner/execution/patterns/catalog.mjs": "d95d8fc276930093c14d2a757b8cc5217cf20a21bd06b891f7c191ab905addce",
     "src/runner/execution/patterns/retired-keys.mjs": "c07f8407d169c7db410aba99db2b7bb1119f5a20ec7a7b63f8cb81d1324e0f40",
     "src/runner/execution/run-request.mjs": "e704b5658f03fae0ce279e31aaee560af3f9648e7f41d39863ce406a0bb03494",
-    "src/runner/execution/run.mjs": "8ee299684b9a6a1f6166780114448e6daf267cd8ee3145eaf5745cc8167fdb3e",
+    "src/runner/execution/run.mjs": "0d3cf2384a572ffa5a4b4ccd80544d676d874c28ede3a66fa8a853812f2ec1cd",
     "src/runner/execution/seat-ledger.mjs": "e033ac97585dc96b22b35d69d361d96d04b2e2b84703bcde241442ec84e74680",
     "src/runner/execution/seat-policy.mjs": "6a0b9671a9ceb020be1e74d306ea2e277cb324244faf391e85feff10ee7d2eaf",
     "src/runner/execution/seat-resolver.mjs": "c8e35d90ea26588f0114f47876ac9798b68b6ea2b950f5bcf743828e86acfbe3",
@@ -1093,7 +1093,7 @@
     "src/runner/execution/unit-run-record.mjs": "3738c7f959e9fa0a370001b6aad006232b2510cc830a51678454861d0fe8dca7",
     "src/runner/execution/unit-run-start.mjs": "314bdbab0df7d4533566cd4cd2b4af13eb4cfb625d2c1843fe6d444ff3d323db",
     "src/runner/execution/unit-state.mjs": "70e84ac79254919aece01fb93088479fd62d58d2eda5100fc7df85f06791f9c3",
-    "src/runner/execution/unit-summary.mjs": "34a23312daacae104f263757170bd3d4b93b488bef82fb19bbfaf54ec7aaf07c",
+    "src/runner/execution/unit-summary.mjs": "179d1aad98c4f72006bdc80abeb6e9cb66b8696a86a5b1917d408eef2a552a82",
     "src/runner/execution/unit-sync.mjs": "cf26cb03c8913a2af63af6589424bbd1b68ab413be07c46a2e12467653f06031",
     "src/runner/execution/unit.mjs": "353d59b816712730aa77c61fe66b2ffe4b01110ce380a865e190237d6061439c",
     "src/runner/fanout-batch.mjs": "3764f2f7fe07664be359e1dba5f1703d443e0017a5b130e2ecf2dc0aa2f5223c",
@@ -3469,14 +3469,14 @@
     },
     {
       "path": "src/runner/execution/run.mjs",
-      "line": 516,
+      "line": 542,
       "spawn": "runVerify -> src/runner/execution/custody-door.mjs:83",
       "binary": "(consumer verify command (cfg?.capabilities?.[unit?.capability]?.verify))",
       "class": "configured-binary"
     },
     {
       "path": "src/runner/execution/run.mjs",
-      "line": 516,
+      "line": 542,
       "spawn": "runVerify -> src/runner/execution/custody-door.mjs:83",
       "binary": "(consumer verify command (unit?.verify))",
       "class": "configured-binary"

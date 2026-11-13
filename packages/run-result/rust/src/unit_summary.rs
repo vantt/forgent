@@ -9,8 +9,11 @@ use std::io::Read;
 use std::path::Path;
 
 pub const MAX_UNIT_SUMMARY_BYTES: u64 = 1024 * 1024;
-/// The only summary contract version this reader accepts; the Node writer owns the bump.
-pub const UNIT_SUMMARY_VERSION: u64 = 2;
+/// The summary contract versions this reader accepts; the Node writer owns the bump. Version 3 adds the
+/// stored infrastructure facts; version 2 files already on disk stay readable.
+pub const UNIT_SUMMARY_VERSIONS: [u64; 2] = [2, 3];
+/// The first version that stores `infrastructure`, `infrastructureReason` and `refused`.
+const INFRASTRUCTURE_FACTS_VERSION: u64 = 3;
 
 fn string(value: &Value) -> bool {
     value.as_str().is_some_and(|s| !s.trim().is_empty())
@@ -62,9 +65,32 @@ fn stance(value: &Value) -> bool {
     }
 }
 
+fn refused_seat(value: &Value) -> bool {
+    value.is_object()
+        && string(&value["seat"])
+        && value["round"].as_u64().is_some_and(|round| round > 0)
+        && string(&value["reason"])
+        && value["detail"].is_string()
+}
+
+/// What Execution stored of why the unit ended on infrastructure, and which seats were refused.
+fn infrastructure_facts(value: &Value) -> bool {
+    value
+        .get("infrastructure")
+        .is_some_and(|flag| flag.is_null() || flag.is_boolean())
+        && nullable_string(value.get("infrastructureReason"))
+        && value["refused"]
+            .as_array()
+            .is_some_and(|seats| seats.iter().all(refused_seat))
+}
+
 fn valid_summary(value: &Value, directory_name: &str) -> bool {
+    let version = value["contract"]["version"].as_u64();
     value["contract"]["id"] == "unit-summary"
-        && value["contract"]["version"] == UNIT_SUMMARY_VERSION
+        && version.is_some_and(|version| UNIT_SUMMARY_VERSIONS.contains(&version))
+        && version.is_some_and(|version| {
+            version < INFRASTRUCTURE_FACTS_VERSION || infrastructure_facts(value)
+        })
         && value["unitRunId"] == directory_name
         && nullable_string(value.get("startedAt"))
         && nullable_string(value.get("pattern"))
@@ -167,7 +193,7 @@ pub fn scan_unit_summaries(root: &Path, window: &Window) -> Result<UnitSummarySc
             if value["contract"]["id"] == "unit-summary"
                 && value["contract"]["version"]
                     .as_u64()
-                    .is_some_and(|version| version != UNIT_SUMMARY_VERSION)
+                    .is_some_and(|version| !UNIT_SUMMARY_VERSIONS.contains(&version))
             {
                 return Err("unsupported-version");
             }
