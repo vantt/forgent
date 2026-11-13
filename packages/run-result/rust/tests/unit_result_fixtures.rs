@@ -17,7 +17,8 @@ fn category_of(outcome: &str) -> &'static str {
         "findings" => "verdict",
         "blocked" => "blocked",
         "policy-refusal" => "policy",
-        "provider-limit" | "execution-failure" => "infra",
+        "provider-limit" => "provider",
+        "execution-failure" => "infra",
         other => panic!("{other} is not a seat outcome"),
     }
 }

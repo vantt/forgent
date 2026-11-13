@@ -662,6 +662,7 @@ mod tests {
                 json!({ "executor": "claude", "category": "verdict", "classification": verdict("inconclusive") }),
             ),
             run("r6", json!({ "executor": "claude", "category": "blocked" })),
+            run("r8", json!({ "executor": "claude", "category": "provider" })),
             // The producer always writes `category`; a record without one is unclassified.
             run(
                 "r7",
@@ -670,17 +671,18 @@ mod tests {
         ];
 
         let runs = compute_runs(&obs);
-        assert_eq!(runs.total, 7);
+        assert_eq!(runs.total, 8);
         assert_eq!(runs.overall.ok, 1);
         assert_eq!(runs.overall.exec_failed, 1);
         assert_eq!(runs.overall.verdict_fail, 1);
         assert_eq!(runs.overall.policy_refused, 1);
         assert_eq!(runs.overall.inconclusive, 1);
         assert_eq!(runs.overall.blocked, 1);
+        assert_eq!(runs.overall.provider_limited, 1);
         assert_eq!(runs.overall.unclassified, 1);
-        assert!((runs.unclassified_rate - (1.0 / 7.0)).abs() < 1e-6);
+        assert!((runs.unclassified_rate - (1.0 / 8.0)).abs() < 1e-6);
 
-        assert_eq!(runs.by_executor.get("claude").unwrap().total, 5);
+        assert_eq!(runs.by_executor.get("claude").unwrap().total, 6);
         assert_eq!(runs.by_executor.get("agy").unwrap().total, 2);
         assert_eq!(runs.by_adapter.get("herdr-spawn").unwrap().total, 2);
         assert_eq!(runs.by_role.get("implementer").unwrap().total, 1);

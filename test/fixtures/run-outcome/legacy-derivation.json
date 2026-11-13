@@ -4762,5 +4762,54 @@
       "satisfied": false,
       "infraFailure": true
     }
+  },
+  {
+    "id": "29-v3-provider-limit-recorded-infra-before-the-provider-category",
+    "record": {
+      "contract": {
+        "id": "assignment-run-result",
+        "version": 3
+      },
+      "runId": "run_unit-run-1794436407348-b2fc6cf2/producer/1_01",
+      "classification": {
+        "execution": {
+          "status": "failed",
+          "exitCode": 1
+        },
+        "assessment": {
+          "verdict": "not-applicable"
+        },
+        "confidence": {
+          "level": "failed",
+          "basis": [
+            "captured-stdout",
+            "failed-exit"
+          ]
+        },
+        "failure": {
+          "family": "provider",
+          "code": "provider-limit",
+          "cause": "provider"
+        },
+        "policy": {
+          "disposition": "needs-input",
+          "code": "provider-limit"
+        },
+        "delivery": {
+          "mode": "fresh"
+        },
+        "provenance": "native-v3",
+        "outcome": {
+          "category": "infra",
+          "reason": "infra-exec-failed"
+        }
+      }
+    },
+    "expected": {
+      "category": "provider",
+      "satisfied": false,
+      "infraFailure": true,
+      "reason": "provider-error"
+    }
   }
 ]

@@ -15,8 +15,12 @@ const refusedCapacity = () => ({
   },
 });
 
-test('a seat refused for provider capacity is a provider limit, so its pool moves on, never a pass', () => {
+test('a seat refused for provider capacity or stopped by a provider limit is a provider limit, so its pool moves on, never a pass', () => {
   assert.equal(outcomeOfRunResult(refusedCapacity()), 'provider-limit');
+  const stopped = refusedCapacity();
+  stopped.classification.failure = { family: 'provider', code: 'provider-limit', cause: 'quota' };
+  assert.equal(outcomeOfRunResult(stopped), 'provider-limit', 'derived as the provider category');
+  assert.equal(outcomeOfRunResult({ classification: { outcome: { category: 'provider', reason: 'provider-quota' } } }), 'provider-limit');
 });
 
 test('a seat whose named account could not be leased is a provider limit under its own failure code', () => {

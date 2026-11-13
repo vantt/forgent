@@ -78,6 +78,20 @@ test('validateRunResultV3: rejects spoofed category (checked cache invariant)', 
   assert.equal(validation.valid, false, 'Tampered category must fail validation');
   assert.equal(validation.corrupt, true);
   assert.ok(validation.reasons.some((r) => r.includes('does not match deriveOutcome')));
+
+  // The one split the Rust rule accepts: a provider limit recorded `infra` before the provider category existed.
+  const providerLimit = (category) => makeValidV3({
+    classification: {
+      execution: { status: 'failed', exitCode: 1 },
+      assessment: { verdict: 'not-applicable' },
+      confidence: { level: 'failed', basis: ['failed-exit'] },
+      failure: { family: 'provider', code: 'provider-limit', cause: 'quota' },
+      policy: { disposition: 'needs-input', code: 'provider-limit' },
+      outcome: { category, reason: 'recorded' },
+    },
+  });
+  assert.deepEqual(validateRunResultV3(providerLimit('infra')).reasons, []);
+  assert.equal(validateRunResultV3(providerLimit('verdict')).valid, false, 'any other category is still a lie');
 });
 
 test('interpretRunResult: branches cleanly across v1, v2, and v3 contracts', () => {

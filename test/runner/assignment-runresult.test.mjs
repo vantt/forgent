@@ -310,8 +310,11 @@ test('executeAssignment produces status: no-evidence when executor exits zero wi
     runnerConfig,
   });
 
-  // Must not mark success only because process exited zero!
-  assert.equal(runOutcome(result).category, 'verdict');
+  // Must not mark success only because process exited zero! A seat that left no claim and no report is infrastructure.
+  assert.equal(runOutcome(result).category, 'infra');
+  assert.deepEqual(result.classification.outcome, { category: 'infra', reason: 'infra-no-report' });
+  assert.deepEqual(result.classification.failure, { family: 'unknown', code: 'no-report' });
+  assert.equal(result.classification.execution.status, 'completed');
   assert.equal(runOutcome(result).satisfied, false);
   assert.equal(runOutcome(result).evidence, 'no-evidence');
   assert.equal(result.runtime.exitCode, 0);

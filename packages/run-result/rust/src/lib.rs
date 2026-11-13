@@ -73,6 +73,10 @@ pub fn derive_outcome(classification: &Value) -> Outcome {
     }
 }
 
+pub fn recorded_category_agrees(recorded: &str, derived: &str) -> bool {
+    recorded == derived
+}
+
 fn is_classification_valid(c: &serde_json::Map<String, Value>) -> bool {
     const EXECUTION_STATUSES: &[&str] = &["completed", "failed", "cancelled", "completion-unknown"];
     const ASSESSMENT_VERDICTS: &[&str] = &[
@@ -818,6 +822,64 @@ mod tests {
         assert_eq!(o.attrs.get("role").unwrap(), "reviewer");
 
         let _ = fs::remove_dir_all(&temp_dir);
+    }
+
+    #[test]
+    fn a_provider_limit_is_its_own_category_named_by_its_cause() {
+        let failed = |failure: Value| {
+            derive_outcome(&serde_json::json!({
+                "execution": { "status": "failed", "exitCode": 1 },
+                "assessment": { "verdict": "not-applicable" },
+                "confidence": { "level": "failed" },
+                "policy": { "disposition": "needs-input" },
+                "failure": failure,
+            }))
+        };
+        let of = |o: Outcome| (o.category, o.reason);
+        let pair = |c: &str, r: &str| (c.to_string(), r.to_string());
+        for (code, cause, reason) in [
+            ("provider-limit", Some("quota"), "provider-quota"),
+            ("provider-limit", Some("credential"), "provider-credential"),
+            ("paused-limit", Some("provider"), "provider-error"),
+            ("provider-limit", None, "provider-limit"),
+        ] {
+            let mut failure = serde_json::json!({ "family": "provider", "code": code });
+            if let Some(cause) = cause {
+                failure["cause"] = Value::from(cause);
+            }
+            assert_eq!(of(failed(failure)), pair("provider", reason), "{code} {cause:?}");
+        }
+        // No provider answered: a refused capacity and a lease conflict stay infrastructure.
+        for code in ["provider-capacity-refused", "provider-capacity-lease-conflict"] {
+            assert_eq!(
+                of(failed(serde_json::json!({ "family": "provider", "code": code }))),
+                pair("infra", "infra-exec-failed"),
+                "{code}"
+            );
+        }
+    }
+
+    #[test]
+    fn a_seat_that_exits_zero_with_no_claim_and_no_report_is_infrastructure() {
+        let outcome = derive_outcome(&serde_json::json!({
+            "execution": { "status": "completed", "exitCode": 0 },
+            "assessment": { "verdict": "inconclusive" },
+            "confidence": { "level": "no-evidence" },
+            "failure": { "family": "unknown", "code": "no-report" },
+        }));
+        assert_eq!(
+            (outcome.category.as_str(), outcome.reason.as_str()),
+            ("infra", "infra-no-report")
+        );
+    }
+
+    #[test]
+    fn a_recorded_category_agrees_only_when_equal_or_infra_recorded_before_the_provider_category() {
+        assert!(recorded_category_agrees("ok", "ok"));
+        assert!(recorded_category_agrees("infra", "provider"));
+        assert!(!recorded_category_agrees("provider", "infra"));
+        assert!(!recorded_category_agrees("ok", "infra"));
+        assert!(!recorded_category_agrees("infra", "verdict"));
     }
 
     #[test]
