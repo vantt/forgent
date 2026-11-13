@@ -29,7 +29,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { execFileSync, execSync, spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { addWork, moveWork, settleClaim, editWork, resolveParkReason, addDecision, addOutcome, recordFriction, listWork, readyWork, isDepsAndLineageReady, footprintConflicts, computedSchedule, readRawEvents, putInAwaiting, answerAwaiting, setFocus, goalFocusShow, assertAcceptanceEvidence, assertPlanEvidence, assertValidDocType, recordGateApprove, recordCall, recordCallReturn,      parseDecisionRelation, decisionTextLooksLikeSupersession, registerTopicStore, renameTopicStore, splitTopicStore, mergeTopicStore, retireTopicStore, reserveDocStore, registerDocStore, markDocRenderedStore, promoteDocStore, demoteDocStore, supersedeDocStore, retireDocStore, moveDocPathStore, attestDocStore } from '../src/state/store.mjs';
+import { addWork, moveWork, settleClaim, editWork, resolveParkReason, addDecision, addOutcome, recordFriction, listWork, readyWork, isDepsAndLineageReady, footprintConflicts, computedSchedule, readRawEvents, putInAwaiting, answerAwaiting, setFocus, goalFocusShow, assertAcceptanceEvidence, assertPlanEvidence, assertValidDocType, recordGateApprove, recordCall, recordCallReturn,      parseDecisionRelation, decisionTextLooksLikeSupersession, registerTopicStore, renameTopicStore, splitTopicStore, mergeTopicStore, retireTopicStore, reserveDocStore, registerDocStore, markDocRenderedStore, promoteDocStore, demoteDocStore, supersedeDocStore, retireDocStore, moveDocPathStore, attestDocStore, handoffCaptureStore } from '../src/state/store.mjs';
 import { StoreError, categoryOf, withFaultClass } from '../src/util/store-error.mjs';
 import { EXIT_CODES } from '../src/cli/exit-codes.mjs';
 import { exitCodeOf } from '../src/cli/verb-exit.mjs';
@@ -1424,7 +1424,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
     case 'knowledge': {
       const sub = positional[0];
       if (!sub) {
-        throw new StoreError('validation', 'knowledge requires a subcommand (status, attest).');
+        throw new StoreError('validation', 'knowledge requires a subcommand (status, attest, handoff).');
       }
       if (sub === 'status') {
         const view = listWork(dir);
@@ -1505,6 +1505,34 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         attestDocStore(dir, { docId: match.docId, topicId: match.topicId, role: match.role, captureId });
 
         return { attested: true, docId: match.docId, currentPath: match.currentPath, captureId };
+      } else if (sub === 'handoff') {
+        // docs/platform/work-state/contracts/knowledge-registry.md §7.5: the
+        // retrospective writer hands a claim no unit carries, with its
+        // material, to an admission request item. The long fields come from
+        // files so no drafted text is ever spliced into a shell command; the
+        // reducer owns every payload check.
+        const captureId = requireField(flags['capture-id'], 'knowledge handoff requires --capture-id');
+        const requestId = requireField(flags.request, 'knowledge handoff requires --request');
+        const claim = requireField(flags.claim, 'knowledge handoff requires --claim');
+        const materialFile = requireField(flags['material-file'], 'knowledge handoff requires --material-file');
+        const locateFile = requireField(flags['locate-file'], 'knowledge handoff requires --locate-file');
+        const readInput = (file, flag) => {
+          try {
+            return fs.readFileSync(path.resolve(file), 'utf8');
+          } catch (error) {
+            throw new StoreError('validation', `knowledge handoff: cannot read ${flag} '${file}': ${error.code ?? error.message}`);
+          }
+        };
+        const material = readInput(materialFile, '--material-file');
+        let locate;
+        try {
+          locate = JSON.parse(readInput(locateFile, '--locate-file'));
+        } catch (error) {
+          if (error instanceof StoreError) throw error;
+          throw new StoreError('validation', `knowledge handoff: --locate-file '${locateFile}' is not valid JSON: ${error.message}`);
+        }
+        handoffCaptureStore(dir, { captureId, requestId, claim, material, locate });
+        return { handedOff: true, captureId, requestId };
       } else {
         throw new StoreError('validation', `knowledge: unknown subcommand "${sub}".`);
       }

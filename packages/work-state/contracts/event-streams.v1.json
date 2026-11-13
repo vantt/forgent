@@ -2,6 +2,13 @@
   "v": 1,
   "types": [
     {
+      "type": "capture.handoff",
+      "domain": "capture",
+      "schemaVersion": 1,
+      "scope": "project",
+      "sealOnWrite": false
+    },
+    {
       "type": "decision",
       "domain": "decisions",
       "schemaVersion": 1,

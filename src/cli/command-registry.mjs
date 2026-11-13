@@ -2485,16 +2485,20 @@ export const COMMAND_REGISTRY = [
   {
     name: 'knowledge',
     invoke: 'fgos knowledge <subcommand>',
-    description: 'Knowledge ecosystem verbs: status (view summary plus `findings`, the registry lints: broken aliases, duplicate active docs, missing current paths, unreachable or unconserved sources, near-duplicate claims, aged provisional docs, oversized topics, underused roles) and attest (validate a doc path and record the required --capture-id linkage).',
+    description: 'Knowledge ecosystem verbs: status (view summary plus `findings`, the registry lints: broken aliases, duplicate active docs, missing current paths, unreachable or unconserved sources, near-duplicate claims, aged provisional docs, oversized topics, underused roles) attest (validate a doc path and record the required --capture-id linkage) and handoff (record that a retrospective claim no unit carries was handed, with its material, to an admission request item; the material and the locate result come from files).',
     parameters: {
       type: 'object',
       properties: {
         'doc-path': { type: 'string', description: "Doc path." },
-        'capture-id': { type: 'string', description: "Capture id (attest)." },
+        'capture-id': { type: 'string', description: "Capture id: the retrospective item (attest, handoff)." },
+        request: { type: 'string', description: "Admission request work item id that receives the material (handoff)." },
+        claim: { type: 'string', description: "The claim's one-sentence statement (handoff)." },
+        'material-file': { type: 'string', description: "File holding the drafted material, non-empty (handoff)." },
+        'locate-file': { type: 'string', description: "JSON file with the locate result: {query, candidates: [{path, section?, why_not}], places?} (handoff)." },
       },
       required: [],
     },
-    examples: ['fgos knowledge status', 'fgos knowledge attest --doc-path docs/worktree/guide.md --capture-id tsk-123'],
+    examples: ['fgos knowledge status', 'fgos knowledge attest --doc-path docs/worktree/guide.md --capture-id tsk-123', 'fgos knowledge handoff --capture-id tsk-123 --request tsk-456 --claim "Reclaim keeps the branch" --material-file material.md --locate-file locate.json'],
     // tsk-28x code review finding: `status`/`attest` both call `rebuild(dir)`,
     // which requires a real `.fgos` store -- `store: 'none'`
     // was wrong for both subcommands. `attest` also durably records a
@@ -2502,7 +2506,7 @@ export const COMMAND_REGISTRY = [
     // never unconditionally read-only.
     touchesState: true,
     store: 'require',
-    mutatesStore: ['attest'],
+    mutatesStore: ['attest', 'handoff'],
     externalEffect: false,
     paginated: false,
     deprecated: null,

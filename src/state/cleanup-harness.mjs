@@ -349,7 +349,9 @@ function checkAncestry(git, sha, targetRef, fallbackNote) {
  * `outcome.docType` + `outcome.docPath`, the file itself confirmed present
  * on disk under `repoRoot`), a knowledge-registry re-attest of an EXISTING
  * doc (tsk-555: `fgos knowledge attest`, the doc's `sourceCaptureIds`
- * includes `id`, that doc's `currentPath` file confirmed present), or at
+ * includes `id`, that doc's `currentPath` file confirmed present), a
+ * handoff of the item's material to an admission request item that still
+ * exists (`fgos knowledge handoff`), or at
  * least one decision record — rather than just a status flip, or a
  * claim-lifecycle artifact (`outcome.actual`/`outcome.predicted`, written
  * at claim/return time, unrelated to whether retrospective itself ever
@@ -419,6 +421,23 @@ function checkRetrospectiveContentForId(view, id, repoRoot) {
     return {
       ok: false,
       detail: `attests existing doc "${attestedDoc.docId ?? attestedDoc.currentPath}" at ${attestedDoc.currentPath}, but the file does not exist on disk — attested document is missing`,
+    };
+  }
+  // A claim no existing unit carries is not written as a new document by the
+  // retrospective writer: its material goes to an admission request item,
+  // recorded by `fgos knowledge handoff` (capture.handoff, knowledge-registry
+  // contract §7.5). That record is real reflection on the work, so it counts,
+  // as long as the request item it names still exists — a handoff into a
+  // request that is gone has left the material nowhere.
+  const handoffs = view?.handoffsByCapture?.[id] ?? [];
+  if (handoffs.length > 0) {
+    const live = handoffs.find((handoff) => view?.work?.[handoff.requestId]);
+    if (live) {
+      return { ok: true, detail: `retrospective material handed to admission request ${live.requestId}` };
+    }
+    return {
+      ok: false,
+      detail: `retrospective material was handed to admission request ${handoffs.map((h) => h.requestId).join(', ')}, but that request item no longer exists`,
     };
   }
   return {

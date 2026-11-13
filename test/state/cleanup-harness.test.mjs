@@ -659,6 +659,59 @@ test('checkRetrospectiveContent: not ok when other docs are attested but none ca
   assert.equal(result.ok, false);
 });
 
+// A claim no existing unit carries is handed, with its material, to an
+// admission request item instead of becoming a new document. The handoff
+// record is the item's only retrospective evidence, so it must open the gate
+// while the request item exists, and only then.
+function handoffView({ captureId, requestId, requestExists = true, extra = {} }) {
+  return {
+    work: { [captureId]: {}, ...(requestExists ? { [requestId]: { kind: 'task' } } : {}), ...extra.work },
+    handoffsByCapture: {
+      [captureId]: [{ requestId, claim: 'A claim no unit carries.', material: 'Drafted text.', locate: { query: 'claim words', candidates: [] } }],
+    },
+    ...(extra.decisionsById ? { decisionsById: extra.decisionsById } : {}),
+  };
+}
+
+test('checkRetrospectiveContent: ok when the item handed its material to an admission request item that still exists', () => {
+  const repoRoot = initRepo();
+  const view = handoffView({ captureId: 'material-only', requestId: 'admission-request' });
+  const result = checkRetrospectiveContent(view, 'material-only', repoRoot);
+  assert.equal(result.ok, true, 'a handoff is real retrospective evidence even with no decision, document or attestation');
+  assert.equal(result.detail, 'retrospective material handed to admission request admission-request');
+});
+
+test('checkRetrospectiveContent: NOT ok when the admission request item the material was handed to no longer exists', () => {
+  const repoRoot = initRepo();
+  const view = handoffView({ captureId: 'material-orphan', requestId: 'gone-request', requestExists: false });
+  const result = checkRetrospectiveContent(view, 'material-orphan', repoRoot);
+  assert.equal(result.ok, false, 'a handoff into a request that is gone left the material nowhere');
+  assert.match(result.detail, /gone-request, but that request item no longer exists/);
+});
+
+test('checkRetrospectiveContent: an item with only engine records stays refused when the handoff belongs to another item', () => {
+  const repoRoot = initRepo();
+  const view = handoffView({
+    captureId: 'other-item',
+    requestId: 'admission-request',
+    extra: {
+      work: { 'engine-only': {} },
+      decisionsById: { 'engine-only': [{ text: 'reached ceiling', source: 'driver-report', kind: 'engine' }] },
+    },
+  });
+  const result = checkRetrospectiveContent(view, 'engine-only', repoRoot);
+  assert.equal(result.ok, false, 'engine bookkeeping stays excluded and a handoff counts only for its own capture');
+  assert.match(result.detail, /no outcome docType\/docPath, decision record, or knowledge-registry attestation/);
+});
+
+test('checkRetrospectiveContent: a leaf inherits its root item handoff through the parent fallback', () => {
+  const repoRoot = initRepo();
+  const view = handoffView({ captureId: 'group-root', requestId: 'admission-request', extra: { work: { 'group-leaf': { parent: 'group-root' } } } });
+  const result = checkRetrospectiveContent(view, 'group-leaf', repoRoot);
+  assert.equal(result.ok, true);
+  assert.match(result.detail, /inherited from parent "group-root" \(retrospective material handed to admission request admission-request\)/);
+});
+
 // tsk-5fv (person's call 2026-09-11: fall back to the parent, over per-leaf
 // triage): a leaf's retrospective content is routinely recorded against its
 // ROOT id instead of the leaf's own id — the knowledge skill runs once per

@@ -26,7 +26,9 @@ import {
   supersedeDocStore,
   retireDocStore,
   attestDocStore,
+  handoffCaptureStore,
   moveDocPathStore,
+  addWork,
   rebuild,
 } from '../../src/state/store.mjs';
 
@@ -882,6 +884,45 @@ test('topic.split refuses a live doc left unassigned by every successor\'s roles
     assert.equal(view.topics.t1.status, 'retired');
     assert.equal(view.docs['d-guide'].topicId, 't2');
     assert.equal(view.docs['d-pitfall'].topicId, 't3');
+  } finally {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
+});
+
+test('capture.handoff records the material handed to an existing request item and refuses an incomplete or dangling record', () => {
+  const tmpDir = initializeWorkRepository(fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-knowledge-test-')));
+  try {
+    initStore(tmpDir);
+    addWork(tmpDir, { id: 'request-1', title: 'Admit a claim', kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'npm test' });
+    const locate = {
+      query: 'reclaim keeps the branch',
+      candidates: [{ path: 'docs/worktree/guide.md', section: 'Reclaim > Branches', why_not: 'covers deletion, not keeping' }],
+      places: ['docs/worktree/'],
+    };
+    const record = { captureId: 'retro-1', requestId: 'request-1', claim: 'Reclaim keeps the branch.', material: 'Drafted text.', locate };
+
+    for (const field of ['captureId', 'requestId', 'claim', 'material']) {
+      assert.throws(() => handoffCaptureStore(tmpDir, { ...record, [field]: '  ' }), new RegExp(`capture\\.handoff requires ${field}`));
+    }
+    assert.throws(() => handoffCaptureStore(tmpDir, { ...record, locate: { candidates: [] } }), /capture\.handoff requires locate\.query/);
+    assert.throws(() => handoffCaptureStore(tmpDir, { ...record, locate: undefined }), /capture\.handoff requires locate\.query/);
+    assert.throws(
+      () => handoffCaptureStore(tmpDir, { ...record, locate: { query: 'q', candidates: [{ path: 'docs/a.md' }] } }),
+      /locate\.candidates\[0\] requires why_not/,
+    );
+    assert.throws(() => handoffCaptureStore(tmpDir, { ...record, requestId: 'no-such-item' }), /request item 'no-such-item' is not an existing work item/);
+    assert.equal(rebuild(tmpDir).handoffsByCapture, undefined, 'a refused handoff writes nothing');
+
+    handoffCaptureStore(tmpDir, record);
+    handoffCaptureStore(tmpDir, { ...record, claim: 'A second claim.', locate: { query: 'second claim' } });
+    const handoffs = rebuild(tmpDir).handoffsByCapture['retro-1'];
+    assert.equal(handoffs.length, 2, 'one item may hand off several claims');
+    assert.deepEqual(
+      { requestId: handoffs[0].requestId, claim: handoffs[0].claim, material: handoffs[0].material, locate: handoffs[0].locate },
+      { requestId: 'request-1', claim: 'Reclaim keeps the branch.', material: 'Drafted text.', locate },
+      'section and places are kept as given',
+    );
+    assert.deepEqual(handoffs[1].locate, { query: 'second claim', candidates: [] }, 'an empty candidate list is valid with a query');
   } finally {
     fs.rmSync(tmpDir, { recursive: true, force: true });
   }

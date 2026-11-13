@@ -2062,6 +2062,10 @@ export function attestDocStore(dir, { docId, topicId, role, captureId }) {
   return appendKnowledgeEvent(dir, 'doc.attest', { docId, topicId, role, captureId });
 }
 
+export function handoffCaptureStore(dir, { captureId, requestId, claim, material, locate }) {
+  return appendKnowledgeEvent(dir, 'capture.handoff', { captureId, requestId, claim, material, locate });
+}
+
 export function moveDocPathStore(dir, { docId, topicId, role, newPath }) {
   return appendKnowledgeEvent(dir, 'doc.path-move', { docId, topicId, role, newPath });
 }

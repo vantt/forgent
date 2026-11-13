@@ -5,8 +5,8 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
-import { execSync } from 'node:child_process';
-import { initStore, rebuild } from '../../src/state/store.mjs';
+import { execSync, execFileSync } from 'node:child_process';
+import { initStore, rebuild, addWork } from '../../src/state/store.mjs';
 import { writeProjectConfig } from '../helpers/config-fixture.mjs';
 
 function setupGitRepoWithStore({ enforceRegistry = false } = {}) {
@@ -136,4 +136,25 @@ test('knowledge attest - with docRegistry.enforce off (fgos setup\'s own fresh-i
   assert.equal(parsedAttest.attested, true);
   const view = rebuild(path.join(tmpDir, '.fgos'));
   assert.ok(view.docs['t1:guide'].sourceCaptureIds.includes('tsk-registered'));
+});
+
+test('knowledge handoff reads the material and locate result from files and records them against an existing request item', () => {
+  const { tmpDir, fgosDir } = setupGitRepoWithStore();
+  const fgosBin = path.resolve('bin/fgos.mjs');
+  addWork(fgosDir, { id: 'request-1', title: 'Admit a claim', kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'npm test' });
+  const inputs = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-handoff-inputs-'));
+  const materialFile = path.join(inputs, 'material.md');
+  const locateFile = path.join(inputs, 'locate.json');
+  fs.writeFileSync(materialFile, "Drafted text with 'quotes' and $(no shell).\n", 'utf8');
+  const locate = { query: 'reclaim keeps the branch', candidates: [{ path: 'docs/worktree/guide.md', why_not: 'covers deletion only' }] };
+  fs.writeFileSync(locateFile, JSON.stringify(locate), 'utf8');
+
+  const out = execFileSync(process.execPath, [
+    fgosBin, 'knowledge', 'handoff', '--capture-id', 'retro-1', '--request', 'request-1',
+    '--claim', 'Reclaim keeps the branch.', '--material-file', materialFile, '--locate-file', locateFile,
+  ], { cwd: tmpDir, encoding: 'utf8' });
+  assert.deepEqual(JSON.parse(out).data, { handedOff: true, captureId: 'retro-1', requestId: 'request-1' });
+  const [handoff] = rebuild(fgosDir).handoffsByCapture['retro-1'];
+  assert.equal(handoff.material, "Drafted text with 'quotes' and $(no shell).\n");
+  assert.deepEqual(handoff.locate, locate);
 });

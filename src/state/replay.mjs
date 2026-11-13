@@ -726,7 +726,8 @@ function applyEvent(view, event) {
     case 'doc.supersede':
     case 'doc.retire':
     case 'doc.path-move':
-    case 'doc.attest': {
+    case 'doc.attest':
+    case 'capture.handoff': {
       applyKnowledgeEvent(view, event);
       break;
     }

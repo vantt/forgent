@@ -225,8 +225,44 @@ export function resolveDocId(view, { docId, topicId, role }) {
   return (live ?? matches[0]).docId;
 }
 
+function assertNonEmptyText(value, message) {
+  if (typeof value !== 'string' || !value.trim()) {
+    throw new KnowledgeValidationError(message);
+  }
+}
+
 /**
- * Apply a single knowledge event (topic.* or doc.*) onto view.
+ * The locate result a handoff carries: the query that was run, one line per
+ * candidate on why it does not carry the claim, and the optional `section`
+ * and `places` a search may return, kept as given. An empty candidate list
+ * is valid: the query itself is the record that nothing was found.
+ */
+function normalizeHandoffLocate(locate) {
+  if (!locate || typeof locate !== 'object' || Array.isArray(locate)) {
+    throw new KnowledgeValidationError('capture.handoff requires locate.query');
+  }
+  assertNonEmptyText(locate.query, 'capture.handoff requires locate.query');
+  const candidates = locate.candidates ?? [];
+  if (!Array.isArray(candidates)) {
+    throw new KnowledgeValidationError('capture.handoff: locate.candidates must be an array');
+  }
+  const kept = candidates.map((candidate, index) => {
+    if (!candidate || typeof candidate !== 'object' || Array.isArray(candidate)) {
+      throw new KnowledgeValidationError(`capture.handoff: locate.candidates[${index}] must be an object`);
+    }
+    assertNonEmptyText(candidate.path, `capture.handoff: locate.candidates[${index}] requires path`);
+    assertNonEmptyText(candidate.why_not, `capture.handoff: locate.candidates[${index}] requires why_not`);
+    return {
+      path: candidate.path,
+      ...(candidate.section === undefined ? {} : { section: candidate.section }),
+      why_not: candidate.why_not,
+    };
+  });
+  return { query: locate.query, candidates: kept, ...(locate.places === undefined ? {} : { places: locate.places }) };
+}
+
+/**
+ * Apply a single knowledge event (topic.*, doc.* or capture.handoff) onto view.
  * view = { topics: {...}, docs: {...}, ... }
  */
 export function applyKnowledgeEvent(view, event) {
@@ -766,6 +802,26 @@ export function applyKnowledgeEvent(view, event) {
         doc.sourceCaptureIds.push(captureId);
       }
       doc.updatedAt = event.ts ?? Date.now();
+      break;
+    }
+
+    // A retrospective claim that no existing unit carries: its material goes
+    // to an admission request item, and this record says so
+    // (docs/platform/work-state/contracts/knowledge-registry.md §7.5). The
+    // material lives once, here; the request item's text links to it. The
+    // view keeps every handoff per capture, because one item may hand off
+    // several claims.
+    case 'capture.handoff': {
+      const { captureId, requestId, claim, material, locate } = payload;
+      for (const [label, value] of [['captureId', captureId], ['requestId', requestId], ['claim', claim], ['material', material]]) {
+        assertNonEmptyText(value, `capture.handoff requires ${label}`);
+      }
+      if (!view.work?.[requestId]) {
+        throw new KnowledgeValidationError(`capture.handoff: request item '${requestId}' is not an existing work item`);
+      }
+      const record = { requestId, claim, material, locate: normalizeHandoffLocate(locate), ts: event.ts ?? Date.now() };
+      if (!view.handoffsByCapture) view.handoffsByCapture = {};
+      view.handoffsByCapture[captureId] = [...(view.handoffsByCapture[captureId] ?? []), record];
       break;
     }
 
