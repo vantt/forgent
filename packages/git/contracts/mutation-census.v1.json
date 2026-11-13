@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "12b1c32e292896174a6e6e0e0c4bc81ee6533d2f72c2fdc47bcec5f3d3f025b4",
+  "payloadDigest": "c1cba7cfed28f70c5325aeef29ce0812f8a781ba33d88e447ef87c2c62c8f3d1",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -1126,8 +1126,8 @@
     "src/runner/write-queue.mjs": "a816a82d6c4499cca921f2b105eaaafe646f1413ff202ce3f132c4b84ed7a2b3",
     "src/seat-binding/client.mjs": "206a9ecbbc301f2c3c9688535dbeb60fabbe67052b870a62e23e7481ae82fdd8",
     "src/setup/agent-cli-trust.mjs": "703431b417beeefd3e2ef07238c1d9694b8aa608c1e13d12a9778e705bf6bae4",
-    "src/setup/agent-hooks.mjs": "446a7232c143ea31fcbed3bd20f5400362932a2e1c372e6e67cb7b8f9ca12e2f",
-    "src/setup/agent-wiring.mjs": "6cb8fed58c999ecf625eca7e7f4ce0172bea19cc2667169e25c77a8e6c06255e",
+    "src/setup/agent-hooks.mjs": "112eca3e4191a1d38675cdb364517916deb90a5c6c56793da96d5fde1e49261f",
+    "src/setup/agent-wiring.mjs": "9a4149f24d2a934693f69fcb051e1beabc7a6e9feffb5360dc8513e2e36f73ab",
     "src/setup/agy-permissions.mjs": "ed40e05c846fbf499d0a0bfbe0e066f27ad060e144e55f8fa809b2b0e024df78",
     "src/setup/ansi.mjs": "9958f6c61351897a70bbcd3598c5f88f11028c584ea915d9c3cd6ff8af46bdfe",
     "src/setup/bin-discovery.mjs": "d7d3536129adcbe5c6fc5297ef1f6ba1fcdc86d5195b7e968c14480b10e77101",
@@ -1152,7 +1152,7 @@
     "src/setup/model-pool-checks.mjs": "f686f00122bc1f43c5d0fe182f7879739f112ef4a361ccccf4a7d6a7ddf5bbd5",
     "src/setup/omp-natives-checks.mjs": "6f6faadb66ac09828741445c599dcbaee9462486157ab7074433e2dbcf4d9aad",
     "src/setup/project-launcher.mjs": "3153fdb9caad59eaeace759de1cd126c22f41585fcd1e15f00c1577ab0f9806b",
-    "src/setup/registrations.mjs": "11f18750b944adab89282b11065ad7ad6efdbb9e05b55662c9dd7e82bc50cfb1",
+    "src/setup/registrations.mjs": "5295d705740a0a30690cdfb29afc04d430400ba8a086ee7220a9f027abb0688b",
     "src/setup/run-supervisor-checks.mjs": "dc0bb137dc4683b9f832437ed16f4d3a69c0b1b44bb2442f099a805361457bd9",
     "src/setup/runner-config-conversion.mjs": "6e2711a0a909265b82241901e7f9642889bdc3e9d1ab5a69fafd81b477a64ac6",
     "src/setup/seat-binding-checks.mjs": "61a2b752ec407709c25c5409ce00d595472d2acf4c99176300f3ecba3d539085",
@@ -3570,8 +3570,15 @@
     },
     {
       "path": "src/setup/agent-wiring.mjs",
-      "line": 38,
+      "line": 40,
       "spawn": "execFileSync",
+      "binary": "(env FGOS_CLAUDE_COMMAND)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/setup/agent-wiring.mjs",
+      "line": 69,
+      "spawn": "execFileAsync",
       "binary": "(env FGOS_CLAUDE_COMMAND)",
       "class": "configured-binary"
     },

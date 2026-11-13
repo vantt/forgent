@@ -983,8 +983,8 @@ function checkMainCheckoutHookWired(cwd) {
   return { passed: false, message: 'core.hooksPath not wired to .githooks — commits here are NOT guarded against concurrent-writer clobbering (str65) — run fgos setup' };
 }
 
-function checkDispatchDecideHookWired(cwd) {
-  return checkClaudeHook(cwd);
+function checkDispatchDecideHookWired(cwd, run) {
+  return checkClaudeHook(cwd, run);
 }
 
 // tsk-1dj (tool-registry-capability port), CONTEXT.md D1: reports the tool
@@ -1184,7 +1184,7 @@ registerCheck({
 registerCheck({
   id: 'dispatch-decide-hook-wired',
   description: '.claude/settings.json PreToolUse hooks enforce dispatch.mjs decide on every Agent/Task call, the decision-question template and the main-checkout delete guard on every Bash call',
-  check: (cwd) => checkDispatchDecideHookWired(cwd),
+  check: (cwd, run) => checkDispatchDecideHookWired(cwd, run),
 });
 
 registerFix({
@@ -1198,7 +1198,7 @@ registerFix({
 registerCheck({
   id: 'codex-hook-wired',
   description: '.codex/hooks.json PreToolUse hooks enforce dispatch.mjs decide, the decision-question template and the main-checkout delete guard',
-  check: (cwd) => checkCodexHook(cwd),
+  check: (cwd, run) => checkCodexHook(cwd, run),
 });
 
 registerFix({
@@ -1212,7 +1212,7 @@ registerFix({
 registerCheck({
   id: 'agy-hook-wired',
   description: '.agents/hooks.json PreToolUse hooks enforce dispatch.mjs decide, the decision-question template and the main-checkout delete guard',
-  check: (cwd) => checkAgyHook(cwd),
+  check: (cwd, run) => checkAgyHook(cwd, run),
 });
 
 registerFix({
@@ -1226,7 +1226,7 @@ registerFix({
 registerCheck({
   id: 'omp-hook-wired',
   description: '.omp/extensions/fgos-hooks.ts in-process extension enforces dispatch.mjs decide, the decision-question template and the main-checkout delete guard',
-  check: (cwd) => checkOmpHook(cwd),
+  check: (cwd, run) => checkOmpHook(cwd, run),
 });
 
 registerFix({
@@ -1240,7 +1240,7 @@ registerFix({
 registerCheck({
   id: 'pi-hook-wired',
   description: '.pi/extensions/fgos-hooks.ts in-process extension enforces dispatch.mjs decide, the decision-question template and the main-checkout delete guard',
-  check: (cwd) => checkPiHook(cwd),
+  check: (cwd, run) => checkPiHook(cwd, run),
 });
 
 registerFix({

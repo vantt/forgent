@@ -31,6 +31,7 @@ import {
   deleteGuardPrefilter,
   extensionSourceFor,
 } from '../../src/setup/agent-hooks.mjs';
+import { createDoctorRun } from '../../src/setup/registrations.mjs';
 
 function mkTempDir(prefix) {
   return fs.mkdtempSync(path.join(os.tmpdir(), prefix));
@@ -561,6 +562,25 @@ process.exit(process.argv[2] === 'hook' ? 0 : 1);
     if (saved === undefined) delete process.env.FGOS_RUST_HOST_RECURSION_GUARD;
     else process.env.FGOS_RUST_HOST_RECURSION_GUARD = saved;
   }
+});
+
+test('one doctor run probes each shim call once however many hook rows ask for it', () => {
+  const repoRoot = mkTempDir('agent-hooks-probe-once-');
+  const shimPath = getProjectShimPath(repoRoot);
+  const calls = path.join(repoRoot, 'shim-calls.log');
+  fs.mkdirSync(path.dirname(shimPath), { recursive: true });
+  fs.writeFileSync(shimPath, `#!/usr/bin/env node
+require('node:fs').appendFileSync(${JSON.stringify(calls)}, process.argv.slice(2).join(' ') + '\\n');
+process.exit(process.argv[2] === 'hook' ? 0 : 1);
+`, { mode: 0o755 });
+  installAllAgentHooks(repoRoot);
+  const run = createDoctorRun();
+  const results = checkAllAgentHooks(repoRoot, run);
+  for (const [cli, result] of Object.entries(results)) assert.equal(result.passed, true, `${cli}: ${result.message}`);
+  const lines = fs.readFileSync(calls, 'utf8').trim().split('\n');
+  assert.equal(lines.filter((l) => l === 'hook dispatch-decide').length, 1, 'dispatch probe runs once for five rows');
+  assert.equal(new Set(lines).size, lines.length, 'no probe of the same shim repeats within the run');
+  fs.rmSync(repoRoot, { recursive: true, force: true });
 });
 
 // ---------------------------------------------------------------------------
