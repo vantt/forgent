@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `unit-summary.json` is now version 3 and says whether a unit failed on infrastructure, why, and which seats were refused; version 2 files are still read.
 - Run receipts now carry `providerSignal` (HTTP status, status word, requested wait, reset hint) next to a provider-stop reason.
 - A quota quarantine now ends when the provider asked (for example "Provider requested 1800000ms wait" quarantines for 30 minutes), else at the reset it named, else after an hour, and never later than a day. Every provider fault leaves one line in `provider-capacity/audit.jsonl`, where manual clears and probe unlocks also go; `state.json` no longer keeps an `audit` list.
+- A dead login or used-up quota on an account probe or an unlock probe is now judged by the same Rust matcher a supervised run settles through; the duplicate Node wording list is gone.
 
 ## [v0.2.0-rc.8] - 2026-11-13
 
