@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "56dbe5b3d0d21ad9c6b4d0bef2408d9f25cfe3cede3978a052243bbab4000067",
+  "payloadDigest": "7f61456e71e6d4cae77fea63ca0d983685bb663947dc03076f05dd20aa64d2aa",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -190,7 +190,7 @@
     "herdr-dashboard/src/ports.rs": "db6dfc823d3697b6f35fd8632fba6ea0b8c5e256d4bdd38487fa87a935faa179",
     "herdr-dashboard/src/ui.rs": "c112cef4793c0be65d8e48143e8575df8954436c972f7f3aec185cf222460b64",
     "herdr-dashboard/tests/render_smoke.rs": "068febb6148d9a441f9cd98cc7983b403a0232942866d932efb1336aec6c5d6b",
-    "packages/agent-protocol/rust/src/direct/mod.rs": "74c481c53b80e29b9e7cd85488c8a9d64c8f21db29187c0c980e9c53d276d61d",
+    "packages/agent-protocol/rust/src/direct/mod.rs": "61da681e846eabbee4794b24e9103f527ac6bcc0a25d01335c87ecb34753f37f",
     "packages/agent-protocol/rust/src/lib.rs": "dd9d8764d9af4b9a503c2f1c5768b5b32829062d060767a64d19fff9faa21077",
     "packages/agent-protocol/rust/src/outcome.rs": "65ce7057bb4e1670a1db4891a8d1a5a131424b3bbbcafe2f595f04069853ec93",
     "packages/agent-protocol/rust/src/port.rs": "e7114a49dc37bffd9e5cbaae36b4a8a7f22be5892d8062d4c63f96d09d402e43",
@@ -201,7 +201,7 @@
     "packages/agent-protocol/rust/src/terminal/mod.rs": "dcaa996ec1f0bef48aa871b4fe6985be33bc7ca74e0bd24c3a3126cb6d1cc037",
     "packages/agent-protocol/rust/src/terminal/omp.rs": "16a2742fde44dbfdf2f4af46e43b6fbba424394c869280ef256bdc379db3e96f",
     "packages/agent-protocol/rust/src/terminal/pi.rs": "d8cf3ecd74a5a9ee026ae0cb95309bfc3f5d756715b2cc21dfd905cdc7f40943",
-    "packages/agent-protocol/rust/tests/direct_vectors.rs": "f03a7059bceddad88bcc8a298adca2bc8a03b0e3ff74a1a458469e18e22368b6",
+    "packages/agent-protocol/rust/tests/direct_vectors.rs": "46795640958ad1107609cc05c9c19fe6d26721dd45b11891000d51b0f6ab5e9d",
     "packages/agent-protocol/rust/tests/terminal_vectors.rs": "7ed4e55299dfa80d204c94783cddf6270494abf601b74d3ba2532d28f29b3644",
     "packages/canonical-json/rust/src/lib.rs": "e390b41a00319d727bd0f0d44ad7f6fda85218a53bae914186699f91a27b7944",
     "packages/config/rust/src/bundle.rs": "f25f156200e4203cdf5c3e8214f4c65dcef690dba79cca73a5a9cac52677dd25",

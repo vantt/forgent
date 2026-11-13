@@ -218,3 +218,17 @@ fn provider_signal_reads_only_the_named_fields_within_their_bounds() {
         Some(json!({ "status": 503, "requestedWaitMs": 300000 }))
     );
 }
+
+#[test]
+fn a_last_event_with_only_an_error_status_still_gives_a_signal() {
+    let adapter = adapter_for("omp");
+    let event = r#"{"type":"message_end","message":{"role":"assistant","stopReason":"error","errorStatus":429}}"#;
+    assert_eq!(
+        adapter
+            .provider_signal("", &format!("{event}\n"))
+            .map(|s| s.to_json()),
+        Some(json!({ "status": 429 }))
+    );
+    let working = r#"{"type":"message_end","message":{"role":"assistant","stopReason":"stop","errorStatus":429}}"#;
+    assert_eq!(adapter.provider_signal("", &format!("{working}\n")), None);
+}

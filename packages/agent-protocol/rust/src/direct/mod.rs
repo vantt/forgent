@@ -75,14 +75,14 @@ impl Direct {
             .and_then(|message| message["errorMessage"].as_str())
             .unwrap_or_default();
         lines.extend(body.lines().map(str::trim).filter(|line| !line.is_empty()));
-        let mut signal = provider_signal(&lines)?;
+        let mut signal = provider_signal(&lines).unwrap_or_default();
         signal.status = event
             .as_ref()
             .and_then(|message| message["errorStatus"].as_u64())
             .and_then(|status| u16::try_from(status).ok())
             .filter(|status| (100..600).contains(status))
             .or(signal.status);
-        Some(signal)
+        (!signal.is_empty()).then_some(signal)
     }
 }
 
