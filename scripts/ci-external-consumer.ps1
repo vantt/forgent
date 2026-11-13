@@ -314,9 +314,33 @@ try {
         } else {
             Assert-True ($resolveCode -eq 0 -and $prevTag) "resolving the previous release (exit $resolveCode)"
             Assert-True ($prevTag -ne $version) "the previous release resolved to the candidate itself ($prevTag)"
+            $target = 'x86_64-pc-windows-msvc'
+            # A release whose Windows assets were published under another name (v0.2.0-rc.8 shipped its
+            # assets-check build) has nothing a Windows consumer could install by its tag: the proof steps
+            # past it, says so, and starts from the next older release.
+            while ($prevTag) {
+                $sumsDir = Join-Path $tmpBase "sums-$prevTag"
+                New-Item -ItemType Directory -Path $sumsDir | Out-Null
+                $sumsArgs = @('release', 'download', $prevTag, '--dir', $sumsDir, '--pattern', 'SHA256SUMS')
+                if ($env:GITHUB_REPOSITORY) { $sumsArgs += @('--repo', $env:GITHUB_REPOSITORY) }
+                $r = Invoke-Native 'gh' $sumsArgs $null
+                Assert-True ($r.Code -eq 0) "downloading the $prevTag SHA256SUMS: $($r.Text)"
+                $ownAsset = "fgos-$prevTag-$target.tar.gz"
+                if (Get-Content -LiteralPath (Join-Path $sumsDir 'SHA256SUMS') | Where-Object { $_ -match ('\s\*?' + [regex]::Escape($ownAsset) + '$') }) { break }
+                Write-Host "Skipping $prevTag as the previous release: its SHA256SUMS lists no $ownAsset, so a Windows consumer cannot install it by its tag."
+                $ErrorActionPreference = 'Continue'
+                $olderTag = ((& node $resolver --candidate $prevTag) -join '').Trim()
+                $olderCode = $LASTEXITCODE
+                $ErrorActionPreference = $previousErrorAction
+                if ($olderCode -eq 3) { $prevTag = $null; break }
+                Assert-True ($olderCode -eq 0 -and $olderTag) "resolving the release before $prevTag (exit $olderCode)"
+                $prevTag = $olderTag
+            }
+            if (-not $prevTag) {
+                Write-Host "Skipping the upgrade-from-previous-release proof: no release earlier than $version has its own Windows assets."
+            } else {
             Write-Host "Upgrade proof: previous release $prevTag -> candidate $version"
             do {
-            $target = 'x86_64-pc-windows-msvc'
             # A consumer upgrading has only the previous release's home and state; the candidate flow above
             # wrote its own, and the two must not share one.
             $proofHome = @{ HOME = $env:HOME; USERPROFILE = $env:USERPROFILE; FGOS_STATE_HOME = $env:FGOS_STATE_HOME }
@@ -366,16 +390,17 @@ try {
             $beforeAct = Get-Content -LiteralPath $upActivation -Raw | ConvertFrom-Json
             Assert-True ($beforeAct.artifactDigest -eq $prevDigest) "the project is not on the $prevTag artifact (activation $($beforeAct.artifactDigest), asset $prevDigest)"
 
-            # The project's own config must keep its effective values across the upgrade, whichever file
-            # format holds them afterwards: one non-standard key the proof sets and one the previous
-            # release wrote, in that release's legacy project file, read back through the candidate's
-            # `fgos config show --json`.
+            # A previous release that wrote the legacy project file (.fgos\config.json) gets one
+            # non-standard key in it, so the upgrade meets a legacy file to carry over; a release whose
+            # init writes .fgos\config.yaml (or, with Config not yet supported on Windows, none) has
+            # nothing to edit here. The values themselves are asserted by the Linux proof only (see below).
             $upConfig = Join-Path $upProject '.fgos\config.json'
-            Assert-True (Test-Path -LiteralPath $upConfig) "$prevTag fgctl init left no .fgos\config.json to set the proof's keys in"
-            $legacy = Get-Content -LiteralPath $upConfig -Raw | ConvertFrom-Json
-            Assert-True ($legacy.ironLaw -and ($legacy.ironLaw.level -is [string])) "no ironLaw.level in the $prevTag config"
-            $legacy | Add-Member -NotePropertyName gateBypass -NotePropertyValue ([pscustomobject]@{ level = 'light' }) -Force
-            [IO.File]::WriteAllText($upConfig, (($legacy | ConvertTo-Json -Depth 10) + "`n"))
+            if (Test-Path -LiteralPath $upConfig) {
+                $legacy = Get-Content -LiteralPath $upConfig -Raw | ConvertFrom-Json
+                Assert-True ($legacy.ironLaw -and ($legacy.ironLaw.level -is [string])) "no ironLaw.level in the $prevTag config"
+                $legacy | Add-Member -NotePropertyName gateBypass -NotePropertyValue ([pscustomobject]@{ level = 'light' }) -Force
+                [IO.File]::WriteAllText($upConfig, (($legacy | ConvertTo-Json -Depth 10) + "`n"))
+            }
 
             $r = Invoke-Native $fgctl @('upgrade', '--from', $fgosTar.FullName) $upProject
             Assert-True ($r.Code -in $activatedCodes) "candidate fgctl upgrade on a $prevTag project: $($r.Text)"
@@ -392,6 +417,7 @@ try {
             $env:FGOS_STATE_HOME = $proofHome.FGOS_STATE_HOME
             Write-Host "Upgrade proof passed: $prevTag ($($beforeAct.artifactDigest)) -> $version ($($afterAct.artifactDigest))."
             } while ($false)
+            }
         }
     }
 
