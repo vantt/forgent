@@ -17,5 +17,7 @@ pub fn derive_outcome(classification: String) -> Result<Value> {
 #[napi(namespace = "runResult", js_name = "recordedCategoryAgrees")]
 pub fn recorded_category_agrees(recorded: String, derived: String) -> Result<bool> {
     check()?;
-    Ok(fgos_run_result::recorded_category_agrees(&recorded, &derived))
+    Ok(fgos_run_result::recorded_category_agrees(
+        &recorded, &derived,
+    ))
 }

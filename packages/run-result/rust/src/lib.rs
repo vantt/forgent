@@ -869,12 +869,21 @@ mod tests {
             if let Some(cause) = cause {
                 failure["cause"] = Value::from(cause);
             }
-            assert_eq!(of(failed(failure)), pair("provider", reason), "{code} {cause:?}");
+            assert_eq!(
+                of(failed(failure)),
+                pair("provider", reason),
+                "{code} {cause:?}"
+            );
         }
         // No provider answered: a refused capacity and a lease conflict stay infrastructure.
-        for code in ["provider-capacity-refused", "provider-capacity-lease-conflict"] {
+        for code in [
+            "provider-capacity-refused",
+            "provider-capacity-lease-conflict",
+        ] {
             assert_eq!(
-                of(failed(serde_json::json!({ "family": "provider", "code": code }))),
+                of(failed(
+                    serde_json::json!({ "family": "provider", "code": code })
+                )),
                 pair("infra", "infra-exec-failed"),
                 "{code}"
             );

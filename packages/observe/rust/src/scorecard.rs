@@ -666,7 +666,10 @@ mod tests {
                 json!({ "executor": "claude", "category": "verdict", "classification": verdict("inconclusive") }),
             ),
             run("r6", json!({ "executor": "claude", "category": "blocked" })),
-            run("r8", json!({ "executor": "claude", "category": "provider" })),
+            run(
+                "r8",
+                json!({ "executor": "claude", "category": "provider" }),
+            ),
             // The producer always writes `category`; a record without one is unclassified.
             run(
                 "r7",
