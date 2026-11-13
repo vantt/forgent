@@ -597,8 +597,7 @@ fn view_of(
     let cwd = fs::read_link(base.join("cwd"))
         .map_err(|err| note("cwd", err))
         .ok();
-    let cmdline = fs::read(base.join("cmdline"))
-        .map(|bytes| split_nul(&bytes))
+    let cmdline = read_cmdline(&base, exe.is_some())
         .map_err(|err| note("cmdline", err))
         .ok();
     let mut env_subset = BTreeMap::new();
@@ -626,6 +625,35 @@ fn view_of(
         env_subset,
         unreadable,
     }
+}
+
+/// How long a process that reads as having no arguments yet is given to
+/// finish `exec`: the window is microseconds on an idle host and tens of
+/// milliseconds when the new image is descheduled inside it.
+const EXEC_SETTLE: std::time::Duration = std::time::Duration::from_millis(250);
+
+/// The argv of a process. Inside `execve`, between the kernel closing the
+/// caller's close-on-exec descriptors (so a spawner has already returned) and
+/// the new image publishing its argument area, `/proc/<pid>/cmdline` reads
+/// empty for a live process. A process whose executable is readable yet whose
+/// argv is empty is in that window (a kernel thread has no readable
+/// executable), so the read is repeated until the arguments appear; one that
+/// never gets any (it cleared its own) is returned empty after `EXEC_SETTLE`.
+fn read_cmdline(base: &std::path::Path, exe_readable: bool) -> io::Result<Vec<String>> {
+    let path = base.join("cmdline");
+    let mut argv = split_nul(&fs::read(&path)?);
+    if argv.is_empty() && exe_readable {
+        let deadline = std::time::Instant::now() + EXEC_SETTLE;
+        while argv.is_empty() && std::time::Instant::now() < deadline {
+            std::thread::sleep(std::time::Duration::from_micros(200));
+            // A process that exited meanwhile has nothing left to read.
+            argv = match fs::read(&path) {
+                Ok(bytes) => split_nul(&bytes),
+                Err(_) => break,
+            };
+        }
+    }
+    Ok(argv)
 }
 
 fn split_nul(bytes: &[u8]) -> Vec<String> {
@@ -674,6 +702,28 @@ mod tests {
             fdinfo_locks("lock: 1: FLOCK ADVISORY WRITE 42 00:2f:98765 0 EOF").collect::<Vec<_>>();
         assert_eq!(entries[0].pid, 42);
         assert_eq!(entries[0].token, "00:2f:98765");
+    }
+
+    #[test]
+    fn an_argv_still_empty_inside_exec_is_read_again_until_it_appears() {
+        let dir = std::env::temp_dir().join(format!("fgos-cmdline-{}", std::process::id()));
+        fs::create_dir_all(&dir).unwrap();
+        fs::write(dir.join("cmdline"), b"").unwrap();
+        let late = dir.join("cmdline");
+        let writer = std::thread::spawn(move || {
+            std::thread::sleep(std::time::Duration::from_millis(30));
+            fs::write(late, b"fgos\0run\0").unwrap();
+        });
+        assert_eq!(read_cmdline(&dir, true).unwrap(), ["fgos", "run"]);
+        writer.join().unwrap();
+        // No readable executable (a kernel thread): empty is its real argv, read once.
+        fs::write(dir.join("cmdline"), b"").unwrap();
+        let started = std::time::Instant::now();
+        assert!(read_cmdline(&dir, false).unwrap().is_empty());
+        assert!(started.elapsed() < EXEC_SETTLE);
+        // An unreadable argv stays an error.
+        assert!(read_cmdline(&dir.join("gone"), true).is_err());
+        let _ = fs::remove_dir_all(&dir);
     }
 
     #[test]
