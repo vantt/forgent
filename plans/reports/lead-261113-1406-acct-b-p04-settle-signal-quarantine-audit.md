@@ -34,9 +34,9 @@ Branch `harden/acct-b-p04`, worktree `/home/vantt/projects/forgent-worktrees/acc
   - `writeState` takes everything queued in `state.audit` and appends it to `<runtimeDir>/audit.jsonl` (`providerCapacityStatePaths().auditPath`) before it writes `state.json`.
   - `state.json` no longer has an `audit` field.
   - A legacy array is moved once, on the next write.
-  - A record the log refuses (for example a full disk) stays queued in `state.json` with a stderr warning, so the audit can never block a lease.
-  - A crash between the append and the state write gives a duplicate line, never a lost one.
-  - The three existing writers (`readState` corrupt resets, `clearProviderAccountQuarantine`, `probeQuarantinedAccounts`) are unchanged at their call sites: they push to the queue, and the queue now ends up in the log. `readState`'s `Array.isArray(parsed.audit)` is the one reader kept, for legacy entries and entries the log refused.
+  - A record the log refuses (for example a full disk) is dropped with one stderr warning, and the state is written anyway: the log is evidence, not state, so the audit never blocks a lease (changed after forgent-6a's review; the first version kept refused records in `state.json` as a retry queue).
+  - A crash between the append and the state write moves an old `state.json` history again: a duplicate line, never a lost one.
+  - The three existing writers (`readState` corrupt resets, `clearProviderAccountQuarantine`, `probeQuarantinedAccounts`) are unchanged at their call sites: they push to the queue, and the queue now ends up in the log. `readState`'s `Array.isArray(parsed.audit)` is the one reader kept, for legacy entries only.
 - `inspectProviderCapacity` output is unchanged.
 - `appendFaultRecord` and `FAULT_LOG_MAX_BYTES` moved to the kernel leaf `src/util/capped-jsonl-log.mjs` (fs/path only), which is registered in `docs/architecture-manifest.json`. `invocation-fault-log.mjs`, `approve-fault-log.mjs` and `provider-capacity.mjs` all import it from there, and there is no re-export.
 
@@ -57,6 +57,7 @@ This is proved through the real `settle-attempt` entry in `attempt-steps.test.mj
 | one `fault` line per fault, no `audit` field in state.json | extended `a pane seat the supervisor stopped on a dead login quarantines …` (attempt-steps) |
 | dating order: wait > hint > default | rewritten `H1: a quota stop whose provider signal names no wait and no reset …`, `a quota quarantine lasts as long as the provider says …`, `a quota quarantine ends at the wait the provider requested before the reset it named …`, clock-time case (provider-capacity) |
 | 24 h bound, a non-number wait is ignored | new `a provider wait or reset longer than a day quarantines for a day …` (provider-capacity) |
+| an unwritable audit log drops its record with one warning; the state is still written, with no `audit` field | new `an audit log that cannot be written drops its record …` (provider-capacity), added after review; no test owned the earlier retry fallback, which is removed |
 | legacy array moved once | new `a fault history left in state.json moves to the audit log once …` (provider-capacity) |
 | capped append | unchanged, `test/observe/invocation-fault-log.test.mjs` (import path only) |
 

@@ -23,7 +23,8 @@ import {
   ProviderCapacityLockError,
   providerCapacityStatePaths,
   quarantineProviderAccount,
-    releaseProviderAccountLease,
+  recordProviderAccountFault,
+  releaseProviderAccountLease,
   validateProviderAccountInventory,
 } from '../../src/runner/dispatch/provider-capacity.mjs';
 import { reconcileProviderCapacityQuarantineUseCase } from '../../src/verbs/dispatch/reconcile.mjs';
@@ -644,6 +645,26 @@ test('a fault history left in state.json moves to the audit log once, on the nex
     assert.deepEqual(auditLines(), legacy, 'moved once, never twice');
     assert.equal('audit' in JSON.parse(fs.readFileSync(statePath, 'utf8')), false);
   }
+});
+
+test('an audit log that cannot be written drops its record with a warning and never blocks the state write', () => {
+  const runtimeDir = mkTempDir();
+  const { statePath, auditPath } = providerCapacityStatePaths(runtimeDir);
+  fs.mkdirSync(auditPath, { recursive: true }); // a directory where the log should be: every append fails
+  const warnings = [];
+  const realWrite = process.stderr.write;
+  process.stderr.write = (chunk) => { warnings.push(String(chunk)); return true; };
+  let quarantine;
+  try {
+    quarantine = recordProviderAccountFault({
+      provider: 'openai-codex', accountId: 'a', fault: { action: 'quarantine', reasonCode: 'auth-token', quarantineKind: 'manual-clear' }, runtimeDir,
+    });
+  } finally { process.stderr.write = realWrite; }
+  assert.equal(quarantine.reasonCode, 'auth-token');
+  const state = JSON.parse(fs.readFileSync(statePath, 'utf8'));
+  assert.equal(state.providers['openai-codex'].accounts.a.quarantine.kind, 'manual-clear');
+  assert.equal('audit' in state, false, 'a refused record is dropped, never kept in the state file');
+  assert.equal(warnings.filter((line) => /provider-capacity audit log not written/.test(line)).length, 1);
 });
 
 test('inventory: a home-files credential source lists relative files and is carried through to the selected account', () => {

@@ -298,9 +298,8 @@ export function hasProviderAccounts(runnerConfig, provider) {
   return Object.keys(providerAccountInventory(runnerConfig)?.[provider]?.accounts ?? {}).length > 0;
 }
 
-// `audit` is the queue of records this change adds to the audit log: `writeState` appends them and keeps
-// in state.json only what it could not append, so a fault history left there by an older release moves
-// to the log on the next write.
+// `audit` holds the records this change adds to the audit log; `writeState` appends them and never writes
+// the field, so a fault history left in state.json by an older release moves to the log on the next write.
 function emptyState() {
   return {
     contract: PROVIDER_CAPACITY_STATE_CONTRACT,
@@ -364,27 +363,22 @@ function readState(statePath) {
 }
 
 /**
- * Writes the state under the state lock (every caller holds it). The queued audit records go to the log
- * first; a record the log refused stays queued in state.json and is appended by the next write, so a full
- * disk never blocks a lease or loses history. A crash between the append and the state write appends the
- * queued records again on the next write: a duplicate line, never a lost one.
+ * Writes the state under the state lock (every caller holds it). The audit records go to the log first.
+ * The log is evidence, not state: a record it refuses (a full disk) is dropped with one warning, and the
+ * state is written either way, so the audit never blocks a lease. A crash between the append and the state
+ * write moves an old state.json history again on the next write: a duplicate line, never a lost one.
  */
 function writeState(statePath, state) {
   const dir = path.dirname(statePath);
   fs.mkdirSync(dir, { recursive: true });
   const { audit = [], ...rest } = state;
-  let appended = 0;
   try {
-    for (const record of audit) {
-      appendFaultRecord(providerCapacityStatePaths(dir).auditPath, record);
-      appended += 1;
-    }
+    for (const record of audit) appendFaultRecord(providerCapacityStatePaths(dir).auditPath, record);
   } catch (err) {
-    process.stderr.write(`fgos: warning: provider-capacity audit log not written (${err.message}); ${audit.length - appended} record(s) kept in state.json for the next write\n`);
+    process.stderr.write(`fgos: warning: provider-capacity audit log not written (${err.message}); its unwritten records are dropped\n`);
   }
-  state.audit = audit.slice(appended);
-  const persisted = state.audit.length > 0 ? { ...rest, audit: state.audit } : rest;
-  replaceDurably(dir, path.basename(statePath), `${JSON.stringify(persisted, null, 2)}\n`, 0o644);
+  state.audit = [];
+  replaceDurably(dir, path.basename(statePath), `${JSON.stringify(rest, null, 2)}\n`, 0o644);
 }
 
 export class ProviderCapacityLockError extends Error {
