@@ -243,7 +243,7 @@ impl ContainmentDriver for BwrapPidns {
         // --unshare-pid plus --as-pid-1 makes child-pid the namespace
         // init (not the waiting monitor). The monitor can reap it before
         // this read; a missing init proves the entire namespace has ended.
-        let root = match tuple_of(ProcId(gate_pid)) {
+        let root = match facts::identity_of_child(ProcId(gate_pid)) {
             Some(root) => root,
             None if matches!(facts::observe(ProcId(gate_pid)), facts::Observed::Absent) => {
                 let observer = facts::observer();
@@ -396,7 +396,7 @@ impl ContainmentDriver for LinuxPgroup {
         domain: &mut ContainmentDomain,
         spec: SpawnSpec,
     ) -> Result<Spawned, ContainmentError> {
-        let (child, root) = pgroup::spawn_leader(&spec, tuple_of)?;
+        let (child, root) = pgroup::spawn_leader(&spec, facts::identity_of_child)?;
         domain.seen.push(root.clone());
         domain.set_domain(Domain::LinuxPgroup(root.clone()));
         Ok(Spawned { child, root })
@@ -453,12 +453,6 @@ fn tuple_from(pid: u32, stat: &facts::Stat) -> ProcTuple {
         pid: ProcId(pid),
         start_time: stat.start_ticks.to_string(),
     }
-}
-
-/// The identity of `pid`, a zombie included: a gate that already ended still
-/// has the start time its record needs.
-fn tuple_of(pid: ProcId) -> Option<ProcTuple> {
-    read_stat(pid.0).ok().map(|stat| tuple_from(pid.0, &stat))
 }
 
 /// Whether the kernel knows no process with this pid.
@@ -639,21 +633,8 @@ mod tests {
     use super::*;
 
     #[test]
-    fn unreaped_fast_child_keeps_its_identity() {
-        let mut child = Command::new("/bin/true").spawn().unwrap();
-        assert!(wait_until(Duration::from_secs(5), || matches!(
-            facts::observe(ProcId(child.id())),
-            facts::Observed::Zombie
-        )));
-        let tuple = tuple_of(ProcId(child.id())).expect("zombie identity");
-        assert!(tuple.start_time.parse::<u64>().is_ok());
-        assert_eq!(facts::judge_here(&tuple.to_record()), Verdict::Dead);
-        assert!(child.wait().unwrap().success());
-    }
-
-    #[test]
     fn reaped_gate_tombstone_stays_empty_even_if_pid_is_live_again() {
-        let mut root = tuple_of(ProcId(std::process::id())).unwrap();
+        let mut root = facts::identity_of_child(ProcId(std::process::id())).unwrap();
         root.start_time = super::super::EXITED_GATE.into();
         let mut domain = ContainmentDomain::new("exited");
         domain.set_domain(Domain::LinuxGate(root));
@@ -701,7 +682,7 @@ mod tests {
             facts::observe(ProcId(child.id())),
             facts::Observed::Zombie
         )));
-        let leader = tuple_of(ProcId(child.id())).expect("zombie identity");
+        let leader = facts::identity_of_child(ProcId(child.id())).expect("zombie identity");
         child.wait().unwrap();
         let foreign = ProcTuple {
             host: "other-host".into(),

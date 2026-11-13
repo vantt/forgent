@@ -91,6 +91,14 @@ pub trait ProcessPlatform: Send + Sync {
         }
     }
 
+    /// The identity of a child this process spawned and has not reaped, a
+    /// zombie included: until it is reaped its pid cannot be reused, so its pid
+    /// and start time still name exactly that process. Platforms with no read
+    /// of an unreaped child answer for a live one only.
+    fn child_identity(&self, pid: ProcId) -> Option<ProcTuple> {
+        self.identity_of(pid)
+    }
+
     /// The full identity of a live `pid`; `None` when it is absent, a zombie
     /// or unreadable.
     fn identity_of(&self, pid: ProcId) -> Option<ProcTuple> {

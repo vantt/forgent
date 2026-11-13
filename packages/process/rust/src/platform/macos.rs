@@ -54,6 +54,17 @@ impl ProcessPlatform for Macos {
         }
     }
 
+    fn child_identity(&self, pid: ProcId) -> Option<ProcTuple> {
+        let info = bsd_info(pid).ok()?;
+        Some(ProcTuple {
+            host: self.host(),
+            boot_id: self.boot_id(),
+            pid_ns: self.pid_ns().id,
+            pid,
+            start_time: format!("{}.{:06}", info.pbi_start_tvsec, info.pbi_start_tvusec),
+        })
+    }
+
     fn observe(&self, pid: ProcId) -> Observed {
         let info = match bsd_info(pid) {
             Ok(info) => info,
@@ -102,19 +113,6 @@ impl ProcessPlatform for Macos {
     fn signal_by_identity(&self, tuple: &ProcTuple, sig: Signal) -> SignalOutcome {
         control::unix_signal_after_check(self, tuple, sig)
     }
-}
-
-/// Read start time even for an unreaped child; ordinary observations still
-/// classify zombies as dead.
-pub(crate) fn child_identity(pid: ProcId) -> Option<ProcTuple> {
-    let info = bsd_info(pid).ok()?;
-    Some(ProcTuple {
-        host: Macos.host(),
-        boot_id: Macos.boot_id(),
-        pid_ns: Macos.pid_ns().id,
-        pid,
-        start_time: format!("{}.{:06}", info.pbi_start_tvsec, info.pbi_start_tvusec),
-    })
 }
 
 fn bsd_info(pid: ProcId) -> Result<libc::proc_bsdinfo, Observed> {

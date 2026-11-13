@@ -40,7 +40,7 @@ impl ContainmentDriver for MacosTree {
         domain: &mut ContainmentDomain,
         spec: SpawnSpec,
     ) -> Result<Spawned, ContainmentError> {
-        let (child, root) = pgroup::spawn_leader(&spec, crate::platform::macos::child_identity)?;
+        let (child, root) = pgroup::spawn_leader(&spec, crate::facts::identity_of_child)?;
         domain.seen.push(root.clone());
         domain.set_domain(Domain::MacosTree(root.clone()));
         Ok(Spawned { child, root })

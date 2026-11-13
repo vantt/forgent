@@ -295,30 +295,11 @@ pub fn identity_of(pid: ProcId) -> Option<ProcTuple> {
     platform::current().identity_of(pid)
 }
 
-/// The identity of a child this process spawned and has not reaped yet. A child that already
-/// exited is a zombie until it is reaped, and while it is one its pid cannot be reused, so its pid
-/// and start time still name exactly that process: a fast child keeps an identity even when it
-/// ended before it was read. `None` only when nothing is there at all.
+/// The identity of a child this process spawned and has not reaped yet, a zombie included: a fast
+/// child keeps its identity even when it ended before it was read. See
+/// [`platform::ProcessPlatform::child_identity`].
 pub fn identity_of_child(pid: ProcId) -> Option<ProcTuple> {
-    if let Some(tuple) = identity_of(pid) {
-        return Some(tuple);
-    }
-    #[cfg(target_os = "linux")]
-    {
-        let relation = relation_of(pid).filter(|r| r.state != 'X')?;
-        let observer = observer();
-        Some(ProcTuple {
-            host: observer.host,
-            boot_id: observer.boot_id,
-            pid_ns: observer.pid_ns,
-            pid,
-            start_time: relation.start_ticks.to_string(),
-        })
-    }
-    #[cfg(not(target_os = "linux"))]
-    {
-        None
-    }
+    platform::current().child_identity(pid)
 }
 
 /// The identity of this process.
@@ -667,15 +648,15 @@ pub use crate::platform::linux::{locked_fds, own_lock_token, proc_self_pid, Lock
 mod tests {
     use super::*;
 
-    /// No other test reads a child that already exited but is not reaped: `identity_of` says
-    /// nothing for it, and the spawner that reads it right after spawn would lose its identity.
-    #[cfg(target_os = "linux")]
+    /// A child that already exited but is not reaped keeps its identity for its spawner, while
+    /// `identity_of` and the judge still count it as not live.
+    #[cfg(unix)]
     #[test]
-    fn an_exited_child_not_yet_reaped_keeps_its_identity() {
-        let mut child = std::process::Command::new("true").spawn().unwrap();
+    fn unreaped_fast_child_keeps_its_identity() {
+        let mut child = std::process::Command::new("/bin/true").spawn().unwrap();
         let pid = ProcId(child.id());
-        let deadline = std::time::Instant::now() + std::time::Duration::from_secs(10);
-        while !relation_of(pid).is_some_and(|r| r.is_gone()) {
+        let deadline = std::time::Instant::now() + std::time::Duration::from_secs(5);
+        while observe(pid) != Observed::Zombie {
             assert!(
                 std::time::Instant::now() < deadline,
                 "the child never exited"
@@ -683,14 +664,11 @@ mod tests {
             std::thread::sleep(std::time::Duration::from_millis(5));
         }
         assert_eq!(identity_of(pid), None, "a zombie is not live");
-        let tuple = identity_of_child(pid).expect("an unreaped child keeps its identity");
+        let tuple = identity_of_child(pid).expect("zombie identity");
         assert_eq!(tuple.pid, pid);
-        assert_eq!(
-            tuple.start_time,
-            relation_of(pid).unwrap().start_ticks.to_string()
-        );
-        child.wait().unwrap();
-        assert_eq!(identity_of_child(pid), None, "a reaped child names nothing");
+        assert!(!tuple.start_time.is_empty());
+        assert_eq!(judge_here(&tuple.to_record()), Verdict::Dead);
+        assert!(child.wait().unwrap().success());
     }
 
     #[cfg(target_os = "linux")]

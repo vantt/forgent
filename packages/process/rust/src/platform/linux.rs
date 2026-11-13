@@ -91,6 +91,17 @@ impl ProcessPlatform for Linux {
             .clone()
     }
 
+    fn child_identity(&self, pid: ProcId) -> Option<ProcTuple> {
+        let stat = read_stat(pid.0).ok()?;
+        Some(ProcTuple {
+            host: self.host(),
+            boot_id: self.boot_id(),
+            pid_ns: self.pid_ns().id,
+            pid,
+            start_time: stat.start_ticks.to_string(),
+        })
+    }
+
     fn observe(&self, pid: ProcId) -> Observed {
         let Some(raw) = as_pid_t(pid) else {
             return Observed::Absent;
