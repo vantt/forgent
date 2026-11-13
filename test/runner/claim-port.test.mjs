@@ -629,14 +629,16 @@ try {
     payload: { id: 'item-a', from: 'todo', to: 'blocked' },
   }], {}, 'racer', []);
 
-  await stateHolder.release();
-  const result = await new Promise((resolve, reject) => {
-    child.on('message', resolve);
-    child.on('error', reject);
-    child.on('exit', (code) => {
-      if (code !== 0) reject(new Error(`claimwork-race-child exited ${code} with no message`));
-    });
+  // Listen before releasing: the holder frees the lock as it leaves its transaction, before its process exits, so
+  // the child can claim and report while release() still waits for that exit; a listener attached afterwards
+  // misses the report and waits forever.
+  const reported = new Promise((resolve, reject) => {
+    child.once('message', resolve);
+    child.once('error', reject);
+    child.once('exit', (code) => reject(new Error(`claimwork-race-child exited ${code} with no message`)));
   });
+  await stateHolder.release();
+  const result = await reported;
 
   assert.equal(result.ok, false, 'a claim acquired on a status this call never actually observed must be refused, not silently written');
   assert.equal(result.category, 'conflict');
