@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "d84206f4eb1cbb533567d849fd004fd8e245ca295db7a722359b8d5d54291f2b",
+  "payloadDigest": "7a96ee51a241e875cc41a91e81befead5be024e872b7d4bbf7e822d129287edd",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -107,7 +107,7 @@
     "apps/fgos/src/wiring/mod.rs": "1ff390fd1ebcb3529669dfd028fdf9e2aafe4035328f4a9bc76b4d132ebf332b",
     "apps/fgos/tests/cli_tests.rs": "c9e14f85f9e283c8ea2191514df0265c2f2686e910c126c33d83b71b58a2504b",
     "apps/fgos/tests/internal_lock_routes.rs": "e8516f4876c8263b1baa1f997bcfbb01715e69d740aa508fd01a0d481fee309e",
-    "apps/fgos/tests/mailbox_routes.rs": "c0c677f712642ba166bbe4639f46462b8ddc101b92a4fb27f5503989e5c11ad6",
+    "apps/fgos/tests/mailbox_routes.rs": "dea1d453933dd24336c87484b367ec5dfd562a08edba115105278920c64c693d",
     "apps/fgos/tests/mailbox_sync_child.rs": "047e70662085d6f91fa786c9000eb494711f610d37cd63a24f29dc884116763d",
     "apps/fgos/tests/windows_borrow.rs": "4e77453a5386cf512a22db39e6a529e163c7dc930d8795c93ef05e60ba19c7b9",
     "apps/fgos/tests/windows_lock_hold_route.rs": "9cedd72a21ef501d00d37ce8fe1f52bb33cbfa799774470534c96dc59a4959aa",
@@ -2071,14 +2071,14 @@
     },
     {
       "path": "apps/fgos/tests/mailbox_routes.rs",
-      "line": 2738,
+      "line": 2765,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"
     },
     {
       "path": "apps/fgos/tests/mailbox_routes.rs",
-      "line": 2872,
+      "line": 2899,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"

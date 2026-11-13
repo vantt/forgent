@@ -2164,8 +2164,44 @@ fn two_machines() -> Cross {
     }
 }
 
+/// The pids of the detached `hook mailbox-sync` children running on `scene`'s main checkout.
+fn detached_sync_pids(scene: &Scene) -> Vec<u32> {
+    let main = scene.main();
+    let fgos_process::facts::Scan::Views(views) =
+        fgos_process::facts::scan(&fgos_process::facts::ScanFilter::default())
+    else {
+        panic!("this platform cannot list processes");
+    };
+    views
+        .into_iter()
+        .filter(|view| {
+            view.cmdline.as_ref().is_some_and(|argv| {
+                argv.windows(2)
+                    .any(|pair| pair[0] == "hook" && pair[1] == "mailbox-sync")
+                    && argv.iter().any(|arg| Path::new(arg) == main)
+            })
+        })
+        .map(|view| view.pid.0)
+        .collect()
+}
+
+/// Waits until no detached sync child of `scene` runs. A send that records starts one, and a
+/// foreground sync that finds it holding the seal skips, so a machine would read the remote before
+/// a push still in flight lands; once it has ended, the foreground run is the only sync there is.
+fn await_detached_syncs(scene: &Scene) {
+    let deadline = std::time::Instant::now() + std::time::Duration::from_secs(60);
+    while !detached_sync_pids(scene).is_empty() {
+        assert!(
+            std::time::Instant::now() < deadline,
+            "a detached sync child is still running after 60s"
+        );
+        std::thread::sleep(std::time::Duration::from_millis(20));
+    }
+}
+
 /// One run of `scene`'s detached sync child, in the foreground; what it says on stderr.
 fn sync_child_said(scene: &Scene) -> String {
+    await_detached_syncs(scene);
     let main = scene.main();
     let out = scene.run(
         &main,
@@ -2436,17 +2472,8 @@ fn a_wake_asked_from_another_machine_is_signed_as_version_two_and_takes_effect_o
         "a send without --wake is unchanged"
     );
 
-    // Each send started its own detached sync child, and a foreground run that finds one holding the
-    // sync lock skips: beta may fetch before alpha's last push lands, which only delays the mail, so
-    // the machines sync until the four messages are in or a bounded wait runs out.
-    for _ in 0..40 {
-        sync_child(&cross.alpha);
-        sync_child(&cross.beta);
-        if recorded_wakes(&cross.beta).len() == 4 {
-            break;
-        }
-        std::thread::sleep(std::time::Duration::from_millis(250));
-    }
+    sync_child(&cross.alpha);
+    sync_child(&cross.beta);
     assert_eq!(
         recorded_wakes(&cross.beta),
         vec![(true, true), (true, true), (true, false), (false, false)],
