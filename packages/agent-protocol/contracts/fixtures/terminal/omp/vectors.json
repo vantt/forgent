@@ -428,7 +428,57 @@
         "outcome": "blocked",
         "reason": "usage-limit"
       },
+      "expectSignal": {
+        "status": 429,
+        "statusWord": "RESOURCE_EXHAUSTED",
+        "requestedWaitMs": 1800000
+      },
       "source": "screen from a real omp pane on herdr (gemini-3.8-flash over google-antigravity, 2026-11-12, quota-exhausted account): both error blocks verbatim, the first one more than twelve lines above the bottom; brief echo, status line and workspace path trimmed; detector verdict copied from the recorded provider-error screen"
+    },
+    {
+      "name": "an-api-error-429-on-an-idle-screen-is-blocked-usage-limit",
+      "step": "detect-completed",
+      "script": {
+        "frames": [
+          {
+            "at": 0,
+            "file": "provider-429-idle"
+          }
+        ]
+      },
+      "expect": {
+        "outcome": "blocked",
+        "reason": "usage-limit"
+      },
+      "expectSignal": {
+        "status": 429,
+        "statusWord": "RESOURCE_EXHAUSTED"
+      },
+      "source": "first error block of the recorded provider-retry-gave-up screen (omp pane on herdr, gemini-3.8-flash over google-antigravity, 2026-11-12, quota-exhausted account), cut after the block; status line verbatim"
+    },
+    {
+      "name": "omp-giving-up-on-a-429-that-names-no-wait-is-blocked-usage-limit",
+      "step": "detect-completed",
+      "script": {
+        "frames": [
+          {
+            "at": 0,
+            "screen": "\n Error: Retry failed after 3 attempts: Cloud Code Assist API error (429): { \"error\": { \"code\": 429, \"status\": \"RESOURCE_EXHAUSTED\" } }\n\n\n π > ◒ Gemini 3.8 Flash",
+            "inspection": {
+              "state": "idle"
+            }
+          }
+        ]
+      },
+      "expect": {
+        "outcome": "blocked",
+        "reason": "usage-limit"
+      },
+      "expectSignal": {
+        "status": 429,
+        "statusWord": "RESOURCE_EXHAUSTED"
+      },
+      "source": "the give-up line of the 503 vector below with the fault replaced by the 429 body of the recorded quota-exhausted screen; synthesized from the recorded wordings"
     },
     {
       "name": "omp-giving-up-on-a-retry-that-names-no-wait-is-blocked-provider-error",

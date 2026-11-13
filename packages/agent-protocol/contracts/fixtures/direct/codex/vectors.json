@@ -66,6 +66,9 @@
       "expect": {
         "kind": "blocked",
         "reason": "usage-limit"
+      },
+      "expectSignal": {
+        "resetHint": "try again at 7:18 PM"
       }
     },
     {

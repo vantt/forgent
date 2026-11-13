@@ -298,6 +298,14 @@ fn terminal_every_cli_vector_resolves_as_recorded() {
                 want.as_object_mut().unwrap().remove("resultFile");
             }
             assert_eq!(got, want, "{name}");
+            if let Some(want) = vector.get("expectSignal") {
+                let signal = adapter.stop_signal(&pane.frame().screen);
+                assert_eq!(
+                    signal.map(|s| s.to_json()).as_ref(),
+                    Some(want),
+                    "{name}: signal"
+                );
+            }
             if let Some(count) = expect["sentTexts"].as_u64() {
                 assert_eq!(sent_texts(&pane) as u64, count, "{name}: typed brief count");
             }

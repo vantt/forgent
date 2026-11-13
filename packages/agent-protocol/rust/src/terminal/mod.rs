@@ -11,8 +11,10 @@ use std::time::SystemTime;
 
 use serde_json::Value;
 
-use crate::direct::{is_provider_error, is_quota_limit, newest_result, screen_login};
-use crate::outcome::BlockedReason;
+use crate::direct::{
+    is_provider_error, is_quota_limit, newest_result, provider_signal, screen_login,
+};
+use crate::outcome::{BlockedReason, ProviderSignal};
 use crate::port::{AgentIo, Inspection, IoError, SendInput};
 
 mod agy;
@@ -291,6 +293,13 @@ fn provider_stop_on(screen: &str) -> Option<BlockedReason> {
         .then_some(BlockedReason::ProviderError)
 }
 
+/// The provider's own signal in the bottom of a screen (`provider_stop_on`'s window).
+fn stop_signal_on(screen: &str) -> Option<ProviderSignal> {
+    let lines = lines_of_interest(screen);
+    let lines: Vec<&str> = lines.iter().map(String::as_str).collect();
+    provider_signal(&lines)
+}
+
 fn lines_of_interest(screen: &str) -> Vec<String> {
     bottom_lines(screen, 12)
         .lines()
@@ -345,6 +354,11 @@ impl Terminal {
             Some(reason) => Some(Readiness::Blocked(reason)),
             None => self.setup_line(screen).map(|_| Readiness::NeedsHuman),
         }
+    }
+
+    /// What the provider itself said at the bottom of the screen, to read next to `stop_reason`.
+    pub fn stop_signal(&self, screen: &str) -> Option<ProviderSignal> {
+        stop_signal_on(screen)
     }
 
     /// Why the agent has stopped on this screen: a blocking dialog, a dead login, a used-up

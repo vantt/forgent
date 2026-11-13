@@ -24,6 +24,47 @@ impl BlockedReason {
     }
 }
 
+/// What the provider itself said when it refused a round, as far as the CLI's last words show it.
+/// Every field is optional; a signal with none set is never built (`provider_signal` gives `None`).
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
+pub struct ProviderSignal {
+    /// HTTP status, 100-599.
+    pub status: Option<u16>,
+    /// The error body's own status word, `[A-Z_]{1,64}` (`RESOURCE_EXHAUSTED`).
+    pub status_word: Option<String>,
+    /// How long the provider asked the client to wait, in milliseconds.
+    pub requested_wait_ms: Option<u64>,
+    /// The CLI's own reset phrase, at most `RESET_HINT_MAX` characters.
+    pub reset_hint: Option<String>,
+}
+
+/// Longest reset phrase a signal keeps.
+pub const RESET_HINT_MAX: usize = 80;
+
+impl ProviderSignal {
+    pub fn is_empty(&self) -> bool {
+        *self == ProviderSignal::default()
+    }
+
+    /// The wire form: camelCase keys, a field that was not found left out.
+    pub fn to_json(&self) -> serde_json::Value {
+        let mut map = serde_json::Map::new();
+        if let Some(status) = self.status {
+            map.insert("status".into(), status.into());
+        }
+        if let Some(word) = &self.status_word {
+            map.insert("statusWord".into(), word.clone().into());
+        }
+        if let Some(wait) = self.requested_wait_ms {
+            map.insert("requestedWaitMs".into(), wait.into());
+        }
+        if let Some(hint) = &self.reset_hint {
+            map.insert("resetHint".into(), hint.clone().into());
+        }
+        serde_json::Value::Object(map)
+    }
+}
+
 /// How a `direct` run ended, named for the supervisor.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Outcome {

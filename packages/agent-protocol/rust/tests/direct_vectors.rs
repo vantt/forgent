@@ -3,7 +3,7 @@ use std::path::{Path, PathBuf};
 
 use fgos_agent_protocol::direct::{adapter_for, newest_result};
 use fgos_agent_protocol::{Activity, BlockedReason, ExitInfo, Outcome};
-use serde_json::Value;
+use serde_json::{json, Value};
 
 const CLIS: [&str; 5] = ["claude", "codex", "agy", "pi", "omp"];
 
@@ -60,6 +60,18 @@ fn every_cli_vector_classifies_as_recorded() {
                 "{cli}: {}",
                 vector["name"]
             );
+            if let Some(want) = vector.get("expectSignal") {
+                let signal = adapter.provider_signal(
+                    vector["captureTail"].as_str().unwrap(),
+                    vector["stdoutTail"].as_str().unwrap_or_default(),
+                );
+                assert_eq!(
+                    signal.map(|s| s.to_json()).as_ref(),
+                    Some(want),
+                    "{cli}: {} signal",
+                    vector["name"]
+                );
+            }
         }
     }
 }
@@ -167,5 +179,42 @@ fn later_api_key_wording_on_a_line_still_blocks() {
     assert_eq!(
         adapter.classify(ExitInfo { code: Some(1) }, tail, "", None),
         Outcome::Blocked(BlockedReason::Login)
+    );
+}
+
+#[test]
+fn provider_signal_reads_only_the_named_fields_within_their_bounds() {
+    use fgos_agent_protocol::provider_signal;
+    let signal = |lines: &[&str]| provider_signal(lines).map(|s| s.to_json());
+    assert_eq!(
+        signal(&["ERROR: usage limit reached, resets in 2 hours 30 min and counting."]),
+        Some(json!({ "resetHint": "resets in 2 hours 30 min" }))
+    );
+    assert_eq!(signal(&["resets in a while", "nothing here"]), None);
+    assert_eq!(
+        signal(&["Error: API error (99): x", "api error (600)"]),
+        None,
+        "a status outside 100-599 is not read"
+    );
+    assert_eq!(
+        signal(&[
+            "\"status\": \"lower\"",
+            &format!("\"status\": \"{}\"", "A".repeat(65))
+        ]),
+        None,
+        "a status word is 1-64 of A-Z and underscore"
+    );
+    let long = format!("resets in {}", "1 hour ".repeat(20));
+    assert_eq!(
+        signal(&[&long]),
+        None,
+        "a reset phrase over 80 characters is dropped"
+    );
+    assert_eq!(
+        signal(&[
+            "Provider requested 300000ms wait",
+            "Error: Foo API error (503): {"
+        ]),
+        Some(json!({ "status": 503, "requestedWaitMs": 300000 }))
     );
 }

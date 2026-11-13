@@ -90,7 +90,28 @@
         "kind": "blocked",
         "reason": "provider-error"
       },
+      "expectSignal": {
+        "status": 404,
+        "statusWord": "NOT_FOUND"
+      },
       "source": "`omp --mode json -p` event fields verbatim from a real gemini-4-argon run that got HTTP 404 (2026-11-06, provider route faults report); the event envelope is the pi-family message_end shape"
+    },
+    {
+      "name": "blocked-usage-limit-429-resource-exhausted",
+      "cli": "omp",
+      "exitCode": 1,
+      "captureTail": "",
+      "stdoutTail": "{\"type\":\"agent_end\",\"messages\":[{\"role\":\"assistant\",\"content\":[],\"api\":\"google-gemini-cli\",\"provider\":\"google-antigravity\",\"model\":\"gemini-3.8-flash\",\"stopReason\":\"error\",\"errorMessage\":\"Cloud Code Assist API error (429): {\\n  \\\"error\\\": {\\n    \\\"code\\\": 429,\\n    \\\"message\\\": \\\"Resource has been exhausted (e.g. check quota).\\\",\\n    \\\"status\\\": \\\"RESOURCE_EXHAUSTED\\\"\\n  }\\n}\\n\",\"errorStatus\":429,\"credentialId\":1}],\"isTerminal\":true}\n",
+      "resultFile": null,
+      "expect": {
+        "kind": "blocked",
+        "reason": "usage-limit"
+      },
+      "expectSignal": {
+        "status": 429,
+        "statusWord": "RESOURCE_EXHAUSTED"
+      },
+      "source": "last event of a real `omp --mode json -p` run on a quota-exhausted gemini-3.8-flash account (2026-11-13, account health research incident 7): agent_end with the final assistant message; usage, timestamps and the brief trimmed"
     },
     {
       "name": "an-http-401-in-the-last-json-event-is-not-a-provider-error",
