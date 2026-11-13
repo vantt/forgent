@@ -152,6 +152,7 @@ test('an unknown verb is rejected as validation, exit 4, printing no stdout enve
 
 test('the retired preflight verb is an unknown verb: exit 4 and no stdout envelope', () => {
   const cwd = tmpCwdFromTemplate();
+  // boundary: the host's verb routing answers an unknown verb; no lower layer sees the selector table.
   const result = run(cwd, ['preflight']);
   assert.equal(result.status, 4);
   assert.equal(result.stdout, '');
