@@ -10,6 +10,7 @@ import { readMachineAccounts } from '../../config/facade.mjs';
 import { deriveLegacyInventory, legacyStateKey } from './llm-accounts.mjs';
 import { resolveHolderLiveness, selfRecord } from '../../native/process-identity.mjs';
 import { acquire, acquireSync, createLockScope, lockHolders, resolveLock, resolveLockRoot, runBorrowed } from '../../holder-lock/index.mjs';
+import { appendFaultRecord } from '../../util/capped-jsonl-log.mjs';
 
 export const PROVIDER_CAPACITY_STATE_CONTRACT = 'provider-capacity-state.v1';
 export const PROVIDER_CAPACITY_SELECTION_CONTRACT = 'provider-capacity-selection.v1';
@@ -44,6 +45,8 @@ export function providerCapacityStatePaths(runtimeDir = defaultProviderCapacityR
   return {
     runtimeDir,
     statePath: path.join(runtimeDir, 'state.json'),
+    // Every account's history (faults, clears, state resets): a log beside the state, never a field of it (L1).
+    auditPath: path.join(runtimeDir, 'audit.jsonl'),
   };
 }
 
@@ -295,6 +298,9 @@ export function hasProviderAccounts(runnerConfig, provider) {
   return Object.keys(providerAccountInventory(runnerConfig)?.[provider]?.accounts ?? {}).length > 0;
 }
 
+// `audit` is the queue of records this change adds to the audit log: `writeState` appends them and keeps
+// in state.json only what it could not append, so a fault history left there by an older release moves
+// to the log on the next write.
 function emptyState() {
   return {
     contract: PROVIDER_CAPACITY_STATE_CONTRACT,
@@ -357,10 +363,28 @@ function readState(statePath) {
   };
 }
 
+/**
+ * Writes the state under the state lock (every caller holds it). The queued audit records go to the log
+ * first; a record the log refused stays queued in state.json and is appended by the next write, so a full
+ * disk never blocks a lease or loses history. A crash between the append and the state write appends the
+ * queued records again on the next write: a duplicate line, never a lost one.
+ */
 function writeState(statePath, state) {
   const dir = path.dirname(statePath);
   fs.mkdirSync(dir, { recursive: true });
-  replaceDurably(dir, path.basename(statePath), `${JSON.stringify(state, null, 2)}\n`, 0o644);
+  const { audit = [], ...rest } = state;
+  let appended = 0;
+  try {
+    for (const record of audit) {
+      appendFaultRecord(providerCapacityStatePaths(dir).auditPath, record);
+      appended += 1;
+    }
+  } catch (err) {
+    process.stderr.write(`fgos: warning: provider-capacity audit log not written (${err.message}); ${audit.length - appended} record(s) kept in state.json for the next write\n`);
+  }
+  state.audit = audit.slice(appended);
+  const persisted = state.audit.length > 0 ? { ...rest, audit: state.audit } : rest;
+  replaceDurably(dir, path.basename(statePath), `${JSON.stringify(persisted, null, 2)}\n`, 0o644);
 }
 
 export class ProviderCapacityLockError extends Error {
@@ -731,22 +755,68 @@ export function dropAssignmentRecord({ assignmentId, runtimeDir } = {}) {
   });
 }
 
+function setQuarantine(state, { provider, accountId, reasonCode, quarantineKind = 'temporary', until, detail }) {
+  state.providers[provider] ??= { accounts: {} };
+  const acct = accountState(state.providers[provider], accountId);
+  acct.lastFaultAt = new Date().toISOString();
+  acct.quarantine = {
+    kind: quarantineKind,
+    reasonCode,
+    ...(until ? { until } : {}),
+    ...(detail ? { detail } : {}),
+    quarantinedAt: acct.lastFaultAt,
+  };
+  return acct.quarantine;
+}
+
 export function quarantineProviderAccount({ provider, accountId, reasonCode, quarantineKind = 'temporary', until, runtimeDir, detail } = {}) {
   const { statePath } = providerCapacityStatePaths(runtimeDir);
   return withProviderStateLock(() => {
     const state = readState(statePath);
-    state.providers[provider] ??= { accounts: {} };
-    const acct = accountState(state.providers[provider], accountId);
-    acct.lastFaultAt = new Date().toISOString();
-    acct.quarantine = {
-      kind: quarantineKind,
-      reasonCode,
-      ...(until ? { until } : {}),
-      ...(detail ? { detail } : {}),
-      quarantinedAt: acct.lastFaultAt,
-    };
+    const quarantine = setQuarantine(state, { provider, accountId, reasonCode, quarantineKind, until, detail });
     writeState(statePath, state);
-    return acct.quarantine;
+    return quarantine;
+  });
+}
+
+/** The classified faults an account's history keeps: a stop the provider itself named. */
+const AUDITED_FAULTS = new Set(['quota-limit', 'auth-token', 'provider-error']);
+
+/**
+ * Records one classified provider fault on the account that ran the attempt: quarantines it when the
+ * classifier says so, and appends one `fault` line to the audit log, both under the state lock. Returns
+ * the quarantine set, or null. A fault that is no provider stop (low confidence, unknown provider)
+ * leaves nothing.
+ */
+export function recordProviderAccountFault({ provider, accountId, fault, providerSignal = null, runId = null, assignmentId = null, runtimeDir } = {}) {
+  if (!fault || (fault.action !== 'quarantine' && !AUDITED_FAULTS.has(fault.reasonCode))) return null;
+  const { statePath } = providerCapacityStatePaths(runtimeDir);
+  return withProviderStateLock(() => {
+    const state = readState(statePath);
+    const quarantine = fault.action === 'quarantine'
+      ? setQuarantine(state, {
+        provider,
+        accountId,
+        reasonCode: fault.reasonCode,
+        quarantineKind: fault.quarantineKind,
+        until: fault.until,
+        detail: { kind: 'provider-stop', runId, assignmentId },
+      })
+      : null;
+    state.audit.push({
+      contract: PROVIDER_CAPACITY_AUDIT_CONTRACT,
+      action: 'fault',
+      at: new Date().toISOString(),
+      provider,
+      accountId,
+      reasonCode: fault.reasonCode,
+      quarantine: quarantine ? { kind: quarantine.kind, ...(quarantine.until ? { until: quarantine.until } : {}) } : null,
+      providerSignal: providerSignal ?? null,
+      runId,
+      assignmentId,
+    });
+    writeState(statePath, state);
+    return quarantine;
   });
 }
 
@@ -912,14 +982,15 @@ export function inspectProviderCapacity({ runnerConfig, provider, accountId, run
   return { contract: 'provider-capacity-inspect.v1', providers };
 }
 
-// Pre-Phase-05 gate H1 / post-review-recut.md "Fault classifier correction":
-// "quota/rate-limit -> account quarantine with parsed reset window when
-// available, otherwise conservative long TTL". A quota quarantine must never
-// resolve to a missing `until` -- isQuarantined() above now also fails
-// closed on that case defensively, but the classifier is the one place that
-// actually KNOWS "no reset window was parseable" and should say so plainly
-// rather than lean on the defensive fallback silently.
-const DEFAULT_QUOTA_QUARANTINE_TTL_MS = 60 * 60 * 1000; // 1 hour, conservative default reset window.
+// A quota quarantine always ends: when no wait or reset is named, the conservative default holds the
+// account out for an hour rather than leave a quarantine with no end time (isQuarantined() also fails
+// closed on that case).
+const DEFAULT_QUOTA_QUARANTINE_TTL_MS = 60 * 60 * 1000;
+// The longest a quota stop holds an account out. The wait and the reset are read from the CLI's last words,
+// which the agent can also print, so a forged "Provider requested 99999999999ms wait" must not lock an
+// account for years. A day covers the longest window a provider resets on per request (a daily quota); a
+// longer limit (a weekly one) is met again on the next real run after the day and quarantines again.
+const MAX_QUOTA_QUARANTINE_MS = 24 * 60 * 60 * 1000;
 
 /**
  * The reset window a provider names in its own words: "resets in 2h", "Resets in 24m1s",
@@ -952,45 +1023,40 @@ export function parseQuotaResetClockTime(text, now) {
   return reset.getTime();
 }
 
-function quotaQuarantineUntil(text, now) {
-  const windowMs = parseQuotaResetWindowMs(text);
-  if (windowMs !== null) return new Date(now + windowMs).toISOString();
-  const clock = parseQuotaResetClockTime(text, now);
-  return new Date(clock ?? now + DEFAULT_QUOTA_QUARANTINE_TTL_MS).toISOString();
+/**
+ * When a quota stop's quarantine ends, from the provider signal the receipt carried: the wait the provider
+ * requested, else the reset its hint names (a window or a clock time), else the one-hour default; never
+ * past `MAX_QUOTA_QUARANTINE_MS`.
+ */
+function quotaQuarantineUntil(providerSignal, now) {
+  const requested = providerSignal?.requestedWaitMs;
+  const hint = typeof providerSignal?.resetHint === 'string' ? providerSignal.resetHint : '';
+  const waitMs = (typeof requested === 'number' && requested > 0 ? requested : null)
+    ?? parseQuotaResetWindowMs(hint)
+    ?? (parseQuotaResetClockTime(hint, now) ?? now + DEFAULT_QUOTA_QUARANTINE_TTL_MS) - now;
+  return new Date(now + Math.min(waitMs, MAX_QUOTA_QUARANTINE_MS)).toISOString();
 }
 
 /**
  * `stopCause` ('credential', 'quota' or 'provider') is the supervisor's verdict on why the provider stopped the
- * agent, taken from its receipt: it decides auth fault versus quota, and the text is never read for the class.
- * A 'provider' stop (the provider answered the call with an HTTP error) moves the walk on but says nothing
- * against the account, so it quarantines nothing.
- * `capacityEvidenceText` (a pane screen, which leaves no stderr) only dates a quota stop's reset time.
+ * agent, taken from its receipt: it decides auth fault versus quota. A 'provider' stop (the provider answered
+ * the call with an HTTP error) moves the walk on but says nothing against the account, so it quarantines
+ * nothing. `providerSignal` (the receipt's, see quotaQuarantineUntil) only dates a quota stop; no agent text
+ * is read here.
  */
-export function classifyProviderCapacityFault({ provider, stderr = '', adapterOutcome, structuredAgent, stopCause = null, capacityEvidenceText = '', now = Date.now() } = {}) {
-  // C2b: provider is now required -- the old `provider === undefined`
-  // wildcard classified stderr from ANY provider using openai's own
-  // vocabulary, which is exactly what let an unrelated syntax-error stderr
-  // (no provider identity attached at all) reach the auth-fault regex.
+export function classifyProviderCapacityFault({ provider, adapterOutcome, structuredAgent, stopCause = null, providerSignal = null, now = Date.now() } = {}) {
+  // Provider is required: a fault with no provider identity is never held against an account.
   if (!provider) {
     return { action: 'evidence-only', reasonCode: 'provider-unknown' };
   }
-  const text = typeof stderr === 'string' ? stderr : '';
   if (adapterOutcome === 'paused-limit' || adapterOutcome === 'provider-limit' || structuredAgent?.stopReason === 'paused-limit' || structuredAgent?.stopReason === 'provider-limit') {
     // A round that ended on a dead credential is not a quota hit: the account stays out until a
-    // person logs in again, and the reset-window rule below must not retry it in an hour. The supervisor's
-    // receipt names the cause; the text is never read for it.
+    // person logs in again, and the reset rule below must not retry it in an hour.
     if (stopCause === 'credential') {
       return { action: 'quarantine', reasonCode: 'auth-token', quarantineKind: 'manual-clear' };
     }
     if (stopCause === 'provider') return { action: 'evidence-only', reasonCode: 'provider-error' };
-    // The text carries the reset window when the provider named one; otherwise the
-    // conservative default, never an expiry-less quarantine.
-    return {
-      action: 'quarantine',
-      reasonCode: 'quota-limit',
-      quarantineKind: 'temporary',
-      until: quotaQuarantineUntil(`${text}\n${typeof capacityEvidenceText === 'string' ? capacityEvidenceText : ''}`, now),
-    };
+    return { action: 'quarantine', reasonCode: 'quota-limit', quarantineKind: 'temporary', until: quotaQuarantineUntil(providerSignal, now) };
   }
   return { action: 'evidence-only', reasonCode: 'unknown-or-low-confidence' };
 }

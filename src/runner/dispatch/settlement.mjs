@@ -40,7 +40,7 @@ import {
 } from '../../native/proof-helpers.mjs';
 import {
   classifyProviderCapacityFault,
-  quarantineProviderAccount,
+  recordProviderAccountFault,
   LEASE_CONFLICT_REASON,
 } from './provider-capacity.mjs';
 import { inspectEntries, inspectPath } from '../../util/git-paths.mjs';
@@ -605,16 +605,16 @@ function readWorkerArtifacts({ runDir, root, givenResultPath, assignment }) {
 }
 
 /**
- * Classifies a provider stop on the selected account, quarantines the account when the verdict says so, and
- * records the reason on the run's capacity selection file. Returns the fault the evidence carries, or null.
+ * Classifies a provider stop on the selected account, records it in the account's history (quarantining
+ * the account when the verdict says so), and records the reason on the run's capacity selection file.
+ * Returns the fault the evidence carries, or null.
  */
-function recordProviderCapacityFault({ selection, evidence, runDir, runMeta, assignment, stderrText, adapterOutcome, stopCause, capacityEvidenceText, agentClaim, runtimeDir }) {
+function recordProviderCapacityFault({ selection, evidence, runDir, runMeta, assignment, adapterOutcome, stopCause, providerSignal, agentClaim, runtimeDir }) {
   const fault = classifyProviderCapacityFault({
     provider: selection.provider,
-    stderr: stderrText,
     adapterOutcome,
     stopCause,
-    capacityEvidenceText,
+    providerSignal,
     structuredAgent: agentClaim,
   });
   if (!fault?.action || fault.action === 'none') return null;
@@ -625,17 +625,16 @@ function recordProviderCapacityFault({ selection, evidence, runDir, runMeta, ass
     reasonCode: fault.reasonCode,
     quarantineKind: fault.quarantineKind,
   };
-  if (fault.action === 'quarantine') {
-    recorded.quarantine = quarantineProviderAccount({
-      provider: selection.provider,
-      accountId: selection.accountId,
-      reasonCode: fault.reasonCode,
-      quarantineKind: fault.quarantineKind,
-      until: fault.until,
-      runtimeDir,
-      detail: { kind: 'provider-stderr-classifier', runId: runMeta?.runId, assignmentId: assignment?.assignmentId },
-    });
-  }
+  const quarantine = recordProviderAccountFault({
+    provider: selection.provider,
+    accountId: selection.accountId,
+    fault,
+    providerSignal,
+    runId: runMeta?.runId ?? null,
+    assignmentId: assignment?.assignmentId ?? null,
+    runtimeDir,
+  });
+  if (quarantine) recorded.quarantine = quarantine;
   if (evidence) {
     const updated = {
       ...evidence,
@@ -723,8 +722,9 @@ export async function settleRunOutcome({
   // Why a provider stopped the agent is the supervisor's verdict: `adapterOutcome`, and `providerStopCause`
   // ('credential', 'quota' or 'provider'). Settlement never re-reads the agent's text for it.
   providerStopCause = null,
-  // Text that only dates a quota stop's reset time for the capacity classifier (a pane screen); never judged.
-  capacityEvidenceText = '',
+  // The provider's own signal the receipt carried with that stop (status, status word, requested wait,
+  // reset hint): it rides on the failure and dates a quota quarantine; it never makes a stop.
+  providerSignal = null,
   agentResultPath: givenResultPath,
   attestation = null,
   // Correlated findings the launching door already made (the executor CLI door's
@@ -774,10 +774,9 @@ export async function settleRunOutcome({
       runDir,
       runMeta,
       assignment,
-      stderrText,
       adapterOutcome: adapterOutcome || (exitCode === 0 ? 'success' : 'failed'),
       stopCause: providerStopCause,
-      capacityEvidenceText,
+      providerSignal,
       agentClaim,
       runtimeDir: opts.providerCapacityRuntimeDir,
     })
@@ -862,7 +861,7 @@ export async function settleRunOutcome({
     // next candidate instead of retrying the same provider. One waiting on a prompt only
     // a person can answer is `blocked`: retrying or moving on does not clear it.
     ...(adapterOutcome === 'provider-limit' || adapterOutcome === 'paused-limit' || adapterOutcome === 'blocked'
-      ? { failureOverride: { family: 'provider', code: adapterOutcome, ...(providerStopCause ? { cause: providerStopCause } : {}) } }
+      ? { failureOverride: { family: 'provider', code: adapterOutcome, ...(providerStopCause ? { cause: providerStopCause } : {}), ...(providerSignal ? { providerSignal } : {}) } }
       : evidenceFacts.failure ? { failureOverride: evidenceFacts.failure } : {}),
     ...(evidenceFacts.policy ? { policyOverride: evidenceFacts.policy } : {}),
     runtime: {

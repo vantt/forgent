@@ -41,9 +41,7 @@ import path from 'node:path';
 import { resolveWriterIdentity } from '../util/session-identity.mjs';
 import { resolveMainCheckoutRoot, fgosDirFromRoot } from '../runner/paths.mjs';
 import { resolveFgosFile, FGOS_FILE } from '../state/fgos-file-registry.mjs';
-
-/** Past this size the oldest half of the log is dropped. */
-export const FAULT_LOG_MAX_BYTES = 1024 * 1024;
+import { appendFaultRecord } from '../util/capped-jsonl-log.mjs';
 
 const FLAG_NAME = /^-{1,2}[A-Za-z][A-Za-z0-9-]{0,39}$/;
 
@@ -60,26 +58,6 @@ export function argvShape(argv, { sub } = {}) {
     if (FLAG_NAME.test(name)) return rest.length ? `${name}=<${rest.join('=').length}>` : name;
     return `<${text.length}>`;
   });
-}
-
-/**
- * Append one JSON record to a fault log, a plain append (never the state lock). The file is created 0600; once it
- * passes `FAULT_LOG_MAX_BYTES` the oldest half of its lines goes first. Throws on a write failure; the callers catch.
- */
-export function appendFaultRecord(logPath, record) {
-  fs.mkdirSync(path.dirname(logPath), { recursive: true });
-  try {
-    if (fs.statSync(logPath).size > FAULT_LOG_MAX_BYTES) {
-      const lines = fs.readFileSync(logPath, 'utf8').split('\n').filter(Boolean);
-      const temp = `${logPath}.${process.pid}.tmp`;
-      fs.writeFileSync(temp, `${lines.slice(Math.ceil(lines.length / 2)).join('\n')}\n`, { mode: 0o600 });
-      fs.renameSync(temp, logPath);
-    }
-  } catch (error) {
-    if (error.code !== 'ENOENT') throw error;
-  }
-  fs.appendFileSync(logPath, `${JSON.stringify(record)}\n`, { mode: 0o600 });
-  fs.chmodSync(logPath, 0o600);
 }
 
 /**

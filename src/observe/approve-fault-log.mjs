@@ -18,7 +18,7 @@
 // needed here.
 
 import { resolveFgosFile, FGOS_FILE } from '../state/fgos-file-registry.mjs';
-import { appendFaultRecord } from './invocation-fault-log.mjs';
+import { appendFaultRecord } from '../util/capped-jsonl-log.mjs';
 
 /**
  * Append one record. Returns the path written, or `null` when nothing was

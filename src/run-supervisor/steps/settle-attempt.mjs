@@ -14,8 +14,6 @@ import { strayWriteWarning, watchWritesOutsideWorkspace } from '../stray-writes.
 import { createTerminalControl } from '../../terminal-control/client.mjs';
 import { readSideFile, StepError } from '../step-support.mjs';
 
-/** The last lines of a pane screen that may carry the reset time a provider printed. */
-const SCREEN_EVIDENCE_LINES = 15;
 const CAPTURE_TAIL_BYTES = 64 * 1024 * 1024;
 
 function readJson(file) {
@@ -82,6 +80,9 @@ function paneScreenOf(runDir, envelope) {
   } catch { return ''; }
 }
 
+/** The blocked names that are a provider stop, and the cause each names. */
+const PROVIDER_STOP_CAUSE = new Map([['usage-limit', 'quota'], ['login', 'credential'], ['provider-error', 'provider']]);
+
 /**
  * The provider stop a receipt reason names: the one table from the supervisor's name to an outcome.
  * `*:blocked:usage-limit`, `*:blocked:login` and `*:blocked:provider-error` are a provider limit, which
@@ -90,19 +91,19 @@ function paneScreenOf(runDir, envelope) {
  * an HTTP 404 for the model); every other blocked name, `terminal:needs-human` and `terminal:needs-setup` (a CLI's first-run setup) is a
  * person to wait for, never a success. A result in the outbox is judged as reported whatever else the
  * receipt says. The outcome stays the receipt's own: a deadline stop that names the provider is still
- * a timeout. A name this table does not know settles on the receipt outcome alone.
+ * a timeout. A name this table does not know settles on the receipt outcome alone. A provider stop carries
+ * the receipt's `providerSignal` (the provider's own status, requested wait and reset hint) as `signal`.
  */
 export function providerStopOf(receipt, claimed = Boolean(receipt.outboxResult)) {
   if (claimed) return null;
   const reason = receipt.reason ?? '';
   const blocked = /^(?:terminal|direct):blocked:(.+)$/.exec(reason);
+  const waiting = { adapterOutcome: 'blocked', cause: null, signal: null };
   if (blocked) {
-    if (blocked[1] === 'usage-limit') return { adapterOutcome: 'provider-limit', cause: 'quota' };
-    if (blocked[1] === 'login') return { adapterOutcome: 'provider-limit', cause: 'credential' };
-    if (blocked[1] === 'provider-error') return { adapterOutcome: 'provider-limit', cause: 'provider' };
-    return { adapterOutcome: 'blocked', cause: null };
+    const cause = PROVIDER_STOP_CAUSE.get(blocked[1]);
+    return cause ? { adapterOutcome: 'provider-limit', cause, signal: receipt.providerSignal ?? null } : waiting;
   }
-  return reason === 'terminal:needs-human' || reason === 'terminal:needs-setup' ? { adapterOutcome: 'blocked', cause: null } : null;
+  return reason === 'terminal:needs-human' || reason === 'terminal:needs-setup' ? waiting : null;
 }
 
 /**
@@ -221,7 +222,7 @@ export async function settleAttempt({ runDir, envelope }) {
       agentResultPath: claimPath,
       adapterOutcome: providerStop?.adapterOutcome ?? null,
       providerStopCause: providerStop?.cause ?? null,
-      capacityEvidenceText: screenText.split(/\r?\n/).slice(-SCREEN_EVIDENCE_LINES).join('\n'),
+      providerSignal: providerStop?.signal ?? null,
       effectiveCwd: envelope.cwd,
       gitBefore: baseline?.gitBefore ?? null,
       gitBeforeSource: baseline?.gitBeforeSource ?? 'pre-launch',
