@@ -8,7 +8,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 
-import { hostBinFromActivation, resolveActiveHostBin, routeEnv } from '../../src/util/host-bin-path.mjs';
+import { hostBinFromActivation, readActivationFile, resolveActiveHostBin, routeEnv } from '../../src/util/host-bin-path.mjs';
 
 function tmp(prefix) {
   return fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), prefix)));
@@ -116,4 +116,15 @@ test('a route child gets this environment minus the invocation record path, and 
   assert.deepEqual(routeEnv(env), { KEEP: '1' });
   assert.equal(env.FGOS_INVOCATION_RECORD_PATH, '/records.jsonl');
   assert.equal(routeEnv().FGOS_INVOCATION_RECORD_PATH, undefined);
+});
+
+test('the activation reader answers the record, null for no file, and throws for a file that is not JSON', () => {
+  const root = tmp('activation-reader-');
+  const file = path.join(root, 'activation.json');
+  assert.equal(readActivationFile(file), null);
+  fs.writeFileSync(file, JSON.stringify({ status: 'ready', releasePath: '/r' }));
+  assert.deepEqual(readActivationFile(file), { status: 'ready', releasePath: '/r' });
+  fs.writeFileSync(file, '{not json');
+  assert.throws(() => readActivationFile(file), SyntaxError);
+  assert.equal(hostBinFromActivation(root), null, 'the host lookup treats an unreadable record as no activation');
 });
