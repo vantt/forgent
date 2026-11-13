@@ -286,6 +286,24 @@ test('concurrent prunes remove each directory once, finish, and report no failur
   assert.deepEqual(fs.readdirSync(assignmentsOf(repoRoot)), []);
 });
 
+// A prune deletes a case only after renaming it off the case path, so a prune that stops midway leaves that renamed
+// directory behind; no test above can leave one, so this is its only proof.
+test('what a stopped prune left off the case path goes with the next applied prune, never with a dry run', () => {
+  const repoRoot = makeFixtureDir('fgos-prune-');
+  const recent = caseNaming(repoRoot, [], { closedDaysAgo: 1 });
+  const leftover = path.join(repoRoot, '.fgos', 'workflow-runs', `.${recent.caseId}.removing-4242-abc123`);
+  fs.mkdirSync(path.join(leftover, 'locks'), { recursive: true });
+  fs.writeFileSync(path.join(leftover, 'events.jsonl'), '');
+  const onlyRecent = [{ id: recent.caseId, reason: 'too-recent' }];
+  const dry = pruneUnchecked(repoRoot);
+  assert.deepEqual([dry.cases, dry.kept], [[], onlyRecent], 'the renamed directory is no case');
+  assert.equal(fs.existsSync(leftover), true);
+  const applied = pruneUnchecked(repoRoot, { apply: true });
+  assert.deepEqual([applied.cases, applied.kept], [[], onlyRecent]);
+  assert.equal(fs.existsSync(leftover), false);
+  assert.equal(fs.existsSync(caseDir(recent)), true, 'a live case next to it is untouched');
+});
+
 test('an age that is not a non-negative number is refused', () => {
   assert.throws(() => pruneFinishedCases({ mainRoot: makeFixtureDir('fgos-prune-'), olderThanMs: -1 }), { code: 'invalid-prune-age' });
 });

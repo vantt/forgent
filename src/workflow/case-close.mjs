@@ -194,10 +194,29 @@ function judgeCase({ mainRoot, caseId, ledger, namedElsewhere, kept }) {
   return { doomed, blocked };
 }
 
-// A concurrent prune that reaches a case this one is deleting takes its hold first, which writes into the directory
-// under deletion, so the delete can meet a directory that is not empty. Deleting is idempotent: go on until it is empty.
+/** A case directory a prune took off the case path and is deleting: `.<caseId>.removing-<pid>-<random>`. */
+const REMOVING = /^\..+\.removing-\d+-[a-z0-9]*$/;
+
+// The advance lock file lives inside the case directory. Deleting the directory in place unlinks that file while this
+// prune still holds it, so a concurrent prune could take a fresh lock on the half-deleted case, still read its ledger
+// and remove and report it a second time. The directory is first renamed, under the hold, to a name that is no case
+// id: from then on the case path is gone, and a prune that takes the hold there finds only the stub its own lock made.
+// Where the rename is refused (a platform that will not rename a directory with an open file), it is deleted in place.
 function removeCaseDir(mainRoot, caseId) {
-  fs.rmSync(runDirOf(mainRoot, caseId), { recursive: true, force: true, maxRetries: 10, retryDelay: 20 });
+  const dir = runDirOf(mainRoot, caseId);
+  const doomed = path.join(runsRoot(mainRoot), `.${caseId}.removing-${process.pid}-${Math.random().toString(36).slice(2)}`);
+  let target = dir;
+  try { fs.renameSync(dir, doomed); target = doomed; } catch (err) { if (err.code === 'ENOENT') return; }
+  fs.rmSync(target, { recursive: true, force: true, maxRetries: 10, retryDelay: 20 });
+}
+
+/** Removes what a prune that stopped midway left of a case it had already taken off the case path. */
+function sweepRemovedCases(mainRoot) {
+  let names;
+  try { names = fs.readdirSync(runsRoot(mainRoot)); } catch { return; }
+  for (const name of names.filter((n) => REMOVING.test(n))) {
+    try { fs.rmSync(path.join(runsRoot(mainRoot), name), { recursive: true, force: true, maxRetries: 10, retryDelay: 20 }); } catch { /* the next prune tries again */ }
+  }
 }
 
 /**
@@ -216,6 +235,7 @@ export function pruneFinishedCases({ mainRoot, olderThanMs, apply = false, now =
   const cache = new Map();
   const kept = [];
   const result = { cases: [], unitRuns: [], kept, bytes: 0 };
+  if (apply) sweepRemovedCases(mainRoot);
   let ledgers = scanLedgers(mainRoot, cache);
   const candidates = splitLedgers(ledgers, now - olderThanMs, kept);
   let namedElsewhere = protectCandidates({ mainRoot, ledgers, candidates, kept });

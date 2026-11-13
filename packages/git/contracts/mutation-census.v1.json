@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "04214f63e2736147ef35fead5bfbba67b8b7900fa03e0725d68d8d734145b248",
+  "payloadDigest": "ad34a7000444d4b291f856a095b3834abc69854397752c11fdd19416eacc87f7",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -1252,7 +1252,7 @@
     "src/workflow/case-admission-port.mjs": "b8a9d1eaf80ff031c344e61b5e5b628c9af75e2cdfb052de01adc89372feb176",
     "src/workflow/case-admission.mjs": "785f003695c1315f066f94f05c37acfe8c658fa565e3b8ea6ae17dcc26d6abf5",
     "src/workflow/case-bindings.mjs": "3198a30fc8179dd69cbacca4bbb375b3a11f2acdbf3eedd4a41f59b65f6b181e",
-    "src/workflow/case-close.mjs": "670ef4ab8af14b81029b8b3a15d54e398ffd39b0c02b1d0fd31cac7ca6f231df",
+    "src/workflow/case-close.mjs": "de9b07c45b1d1e09b6ce3d75643f01f4a90991d44191c267515fd01e846511e3",
     "src/workflow/case-frame.mjs": "27797b7dd8ecd3a9a52bf7c559d29e6dc9fab82c75505eee085fe9d937a52e4e",
     "src/workflow/case-gate.mjs": "52b93fea8d0db27cb27f9e46f54372ce0480ed336b692bd6fcbfe46c3f9bdcb6",
     "src/workflow/case-inherit.mjs": "5d2811d88258fcaddfb643ee9030377ed9e6c2e7f25c76f7be08e62a22a7f4fc",
