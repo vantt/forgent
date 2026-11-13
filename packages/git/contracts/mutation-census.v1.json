@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "7f61456e71e6d4cae77fea63ca0d983685bb663947dc03076f05dd20aa64d2aa",
+  "payloadDigest": "26f361d900f0fa18bd243cabb0bda22836b7be19a908aac20f77567305bbe072",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -821,7 +821,7 @@
     "scripts/check-locked-decisions-heading-drift.mjs": "fa87a9f833b12c43cf60322aac482a8bd5e5e7cb889868ed4592816efc80b7f8",
     "scripts/check-undefined-names.mjs": "245c88e83a247f7c83e53bc71d5fe59a9848e8c919fee3e95acfa6edda8b100a",
     "scripts/ci-asset-server.mjs": "2de382cc02067014690b358d4c939149bf0c1b7977071896d9b12137526ff32a",
-    "scripts/ci-external-consumer.sh": "02ecbff5393a46ab6121fb4186f4a20c5b4ba60936af0b5e3dc8e0e27d8c6a20",
+    "scripts/ci-external-consumer.sh": "ecee86502386051c6c31313da1230e62c8bcaf6a2439eb0245d5a4d91c5d0f41",
     "scripts/ci-setup-bwrap.sh": "04e07490fff85c7e2116f4fe8b9b78f300a4ee488c6475e37aadbaf1c15de9ce",
     "scripts/convention-conformance.mjs": "14ceed9e37eb8b914f50a6237b61a2bd9b2c591e2d3f611a8321544930e419ea",
     "scripts/decision-question-hook.mjs": "af83a0333f802f38696c818186887ba439cd47f1b4616dec7bd727c792346d14",

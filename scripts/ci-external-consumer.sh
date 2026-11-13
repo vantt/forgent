@@ -404,7 +404,9 @@ else
       echo "Step failed: git init in the upgrade project" >&2
       exit 1
     }
-    (cd "$UPGRADE_PROJECT" && "$PREV_INSTALL_DIR/fgctl" init --from "$PREV_FGOS_TARBALL") || {
+    # A consumer of the previous release has its fgctl directory on PATH, as its installer says;
+    # without it the previous doctor finds no place for the project launcher and init is not ready.
+    (cd "$UPGRADE_PROJECT" && PATH="$PREV_INSTALL_DIR:$PATH" "$PREV_INSTALL_DIR/fgctl" init --from "$PREV_FGOS_TARBALL") || {
       echo "Step failed: $PREV_TAG fgctl init --from its own fgos asset" >&2
       exit 1
     }
