@@ -150,6 +150,15 @@ test('an unknown verb is rejected as validation, exit 4, printing no stdout enve
 });
 
 
+test('the retired preflight verb is an unknown verb: exit 4 and no stdout envelope', () => {
+  const cwd = tmpCwdFromTemplate();
+  const result = run(cwd, ['preflight']);
+  assert.equal(result.status, 4);
+  assert.equal(result.stdout, '');
+  assert.match(result.stderr, /unknown verb "preflight"/);
+});
+
+
 test('GOLDEN request-class: running ready twice never appends an event, and the view file is untouched too', () => {
   const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'golden-a');

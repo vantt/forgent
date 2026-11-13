@@ -2439,22 +2439,6 @@ export const COMMAND_REGISTRY = [
     paginated: false,
     deprecated: null,
   },
-  {
-    name: 'preflight',
-    invoke: 'fgos preflight',
-    description: 'Runs fast preflight checks (mirror sync diff, decision citation drift, backlog reconciliation) against the current checkout to detect uncommitted drift before returning.',
-    parameters: {
-      type: 'object',
-      properties: {},
-      required: [],
-    },
-    examples: ['fgos preflight'],
-    touchesState: true,
-    store: 'none',
-    externalEffect: false,
-    paginated: false,
-    deprecated: null,
-  },
   withSubcommands({
     name: 'lock',
     invoke: 'fgos lock fence <name>',

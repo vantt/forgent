@@ -26,6 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Known gaps
 
 - On Windows fgOS installs and activates, but Config, Event Store/Work and confinement are not supported yet, so `fgos doctor` is not ok there; Linux is the supported runtime.
+- `fgos preflight` is retired and answers "unknown verb" like any other unknown verb. For this repository, `npm run check:before-merge` runs the same three checks (skill wrapper drift, decision citation drift, backlog reconciliation).
 
 ## [v0.2.0-rc.7] - 2026-11-13
 

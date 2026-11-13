@@ -1,48 +1,31 @@
 ---
-authoritative_for: fgos preflight verb aggregating 3 already-standalone-runnable checks (mirror-sync-diff, decision-citation-drift, backlog-reconciliation) so they run in seconds before return/merge instead of only surfacing after a full npm test; deliberately a driver-skill-invoked verb, never a blocking pre-commit hook, confirmed live via 2 same-day incidents
+authoritative_for: why the fgos preflight verb was added, and why it is retired from the product CLI (it stays a repo-only npm script)
 ---
 
-# Three checks that already ran fast, but only got read after the slow suite finished
+# `fgos preflight` is retired; the three checks stay as repo scripts
 
-`tsk-4e1` added `fgos preflight`, a new verb aggregating three checks that
-each already ran standalone in seconds, but were only ever discovered
-after `npm test` finished running everything else — a wait of tens of
-seconds to minutes, right before merge, when the cost of a caught error is
-highest.
+**Retired.** `fgos preflight` no longer exists: the verb answers "unknown verb" (exit 4).
+It ran `npm run build:skills` and two `scripts/` checks in whatever directory it stood in;
+inside a linked worktree that wrote `.fgos/instructions/effective/repo.json` and left the
+worktree stuck, and nothing outside its own test ever called it. The checks are about this
+repository's own files, so they belong in this repository's scripts, not in the product CLI.
 
-## Confirmed live, same day, both instances
+For this repository run `npm run check:before-merge`. It chains the three checks the verb ran:
 
-- **mirror-sync-diff** — `agy`'s own dispatch for `tsk-3av` synced only
-  `.agents/skills/fgos-fanout/SKILL.md`, missing
-  `plugins/fgOS/skills/fgos-fanout/SKILL.md` — one of three required
-  mirrors. Had to be manually caught and fixed with `build:skills` + a
-  manual copy.
-- **decision-citation-drift** — the same session bare-cited `"D5"` in skill
-  prose, violating the decision-citation-drift rule (decision 0017). This
-  was only caught AFTER the full `npm test` run finished, right at the
-  point of merge.
+- **mirror-sync-diff**: `npm run build:skills`; any uncommitted change under `.claude/skills/`
+  or `plugins/fgOS/skills/` afterwards is drift. The owning proof is `test/skills/fgos-mirror.test.mjs`.
+- **decision-citation-drift**: `scripts/check-decision-citation-drift.mjs`
+  (proof: `test/scripts/check-decision-citation-drift.test.mjs`).
+- **backlog-reconciliation**: `scripts/check-backlog-reconciliation.mjs`.
 
-`scripts/check-decision-citation-drift.mjs` and
-`scripts/check-backlog-reconciliation.mjs` were already independently
-runnable — no dependency on the full test suite to invoke them, just no
-single door surfacing them earlier.
+## Why the checks exist
 
-## What shipped
+`tsk-4e1` added the verb because the three checks each ran in seconds but were only
+read after the slow `npm test` finished, right before merge, when a caught error costs
+most. Two same-day incidents showed it: a skill sync that missed one of three required
+mirrors, and a bare `"D5"` citation that violated the decision-citation rule. The script
+chain keeps that early feedback without a product verb.
 
-A new `fgos preflight` verb (`bin/fgos.mjs` `case 'preflight'`,
-registered in `src/cli/command-registry.mjs`) runs all three checks —
-`mirror-sync-diff`, `decision-citation-drift`, `backlog-reconciliation` —
-via `spawnSync` against the current checkout's own git toplevel,
-aggregating results the same way the existing `doctor` verb aggregates its
-own checks. Any failure throws `StoreError('validation', ...)` for a real
-nonzero exit code.
-
-## Deliberately a driver-invoked verb, not a git hook
-
-The item's own description is explicit about this design choice: this
-verb is meant to be *called* by the driver skill (`fgos-coding-implement`),
-never wired in as a blocking pre-commit hook. A hard-blocking hook creates
-pressure to reach for `--no-verify`, which would open a new bypass door for
-all 5 `.fgos` invariants the pre-commit hook already protects — a strictly
-worse trade-off than an opt-in verb the driving skill calls proactively
-before `return`/merge.
+It was never meant to be a blocking git hook: a hard-blocking hook creates pressure to reach
+for `--no-verify`, which would open a bypass door for the `.fgos` invariants the pre-commit
+hook already protects.
