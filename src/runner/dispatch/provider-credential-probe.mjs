@@ -17,7 +17,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 
-import { matchAuthFailureLine, matchQuotaLimitLine } from './provider-auth-failure.mjs';
+import { nativeDoor } from '../../native/door.mjs';
 import { accountCredentialSources, credentialSourceForCli, expandCredentialHome } from './provider-capacity.mjs';
 
 const PROMPT = 'Reply with the single word OK.';
@@ -36,7 +36,7 @@ export function withKillTimeout(plan, timeoutMs, env = process.env) {
     try { fs.accessSync(candidate, fs.constants.X_OK); return fs.statSync(candidate).isFile(); } catch { return false; }
   });
   if (!timeoutBin) return plan;
-  return { ...plan, command: timeoutBin, args: ['--kill-after=5', String(Math.max(1, Math.ceil(timeoutMs / 1000))), plan.command, ...plan.args] };
+  return { ...plan, command: timeoutBin, args: ['--kill-after=5', String(Math.max(1, Math.ceil(timeoutMs / 1000))), plan.command, ...plan.args], cli: plan.cli ?? plan.command };
 }
 
 /**
@@ -84,14 +84,27 @@ export function credentialProbeCommand(credentialSource, { noTools = false } = {
 
 /**
  * Judge what the call printed. A zero exit is not enough: a dead login can still end the process
- * quietly, so the text is read for the wordings that mean a credential or a quota problem.
+ * quietly, so the CLI's last words are read through the agent protocol (the matcher a supervised run
+ * settles through): `output` is stdout and stderr merged, `stdout` the stdout alone, whose last JSON
+ * event can carry the provider's refusal. Only the final lines count; a wording far up a long output is
+ * something the agent said or ran.
  */
-export function judgeProbeOutput({ exitCode, timedOut, output }) {
+export function judgeProbeOutput({ exitCode, timedOut, cli, output, stdout = output }) {
   if (timedOut) return { ok: false, detail: 'the call did not finish in time' };
-  if (matchAuthFailureLine(output)) return { ok: false, detail: 'the login is still rejected' };
-  if (matchQuotaLimitLine(output) && exitCode !== 0) return { ok: false, detail: 'the account answers with a usage limit' };
+  const { reason, providerSignal } = nativeDoor().agentProtocol.classifyDirect(cli, exitCode ?? null, output, stdout);
+  if (reason === 'login') return { ok: false, detail: 'the login is still rejected' };
+  if (reason === 'usage-limit' && exitCode !== 0) return { ok: false, detail: `the account answers with a usage limit${describeSignal(providerSignal)}` };
+  if (reason === 'provider-error' && exitCode !== 0) return { ok: false, detail: `the provider refused the call${describeSignal(providerSignal)}` };
   if (exitCode !== 0) return { ok: false, detail: `the call exited with code ${exitCode}` };
   return { ok: true };
+}
+
+/** " (HTTP 429, wait 30s)" for what the provider said, "" for nothing. */
+function describeSignal(signal) {
+  const parts = [];
+  if (signal?.status !== undefined) parts.push(`HTTP ${signal.status}`);
+  if (signal?.requestedWaitMs !== undefined) parts.push(`wait ${Math.ceil(signal.requestedWaitMs / 1000)}s`);
+  return parts.length ? ` (${parts.join(', ')})` : '';
 }
 
 // What a probe call inherits from its runner: the shell basics only, never a token or a variable that points a
@@ -114,6 +127,7 @@ function probeEnv(env, plan) {
 export function runCredentialProbe(plan, { spawnFn = spawn, timeoutMs = DEFAULT_CREDENTIAL_PROBE_TIMEOUT_MS, env = process.env } = {}) {
   return new Promise((resolve) => {
     let output = '';
+    let stdout = '';
     let timedOut = false;
     let child;
     try {
@@ -125,7 +139,7 @@ export function runCredentialProbe(plan, { spawnFn = spawn, timeoutMs = DEFAULT_
     // The END of what the call printed is what says whether the login works: pi lists its loaded
     // skills first (tens of KB) and prints the refresh failure last, so the tail is kept.
     const collect = (chunk) => { output = (output + String(chunk)).slice(-OUTPUT_LIMIT); };
-    child.stdout?.on('data', collect);
+    child.stdout?.on('data', (chunk) => { stdout = (stdout + String(chunk)).slice(-OUTPUT_LIMIT); collect(chunk); });
     child.stderr?.on('data', collect);
     const timer = setTimeout(() => {
       timedOut = true;
@@ -139,7 +153,12 @@ export function runCredentialProbe(plan, { spawnFn = spawn, timeoutMs = DEFAULT_
     child.on('error', (err) => { clearTimeout(timer); resolve({ ok: false, detail: `could not run ${plan.command}: ${err.message}` }); });
     child.on('close', (exitCode) => {
       clearTimeout(timer);
-      const judged = judgeProbeOutput({ exitCode, timedOut, output });
+      let judged;
+      try {
+        judged = judgeProbeOutput({ exitCode, timedOut, cli: plan.cli ?? plan.command, output, stdout });
+      } catch (err) {
+        judged = { ok: false, detail: `could not judge the call: ${err.message}` };
+      }
       // A sweep that could not kill what the call left behind is the lock's own report; the answer of
       // the call itself stands either way.
       Promise.resolve(child.borrowed).catch(() => {}).then(() => resolve(judged));

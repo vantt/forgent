@@ -7,6 +7,7 @@ pub use git::{
     inspect_git_worktree_recovery, mint_git_loan, prepare_git_driver_directories,
     take_git_handover,
 };
+pub mod agent_protocol;
 pub mod canonical_json;
 pub mod config;
 pub mod durable_file;
@@ -43,7 +44,7 @@ pub fn versions() -> Result<Value> {
                 "addon": env!("CARGO_PKG_VERSION"), "git": fgos_git::VERSION, "eventStore": env!("CARGO_PKG_VERSION"), "napi": 8, "contracts": contracts,
                 "process": process::contract_version().map_err(|e| e.to_string())?,
                 // The crates carry the workspace version; the canonical vectors are the `canonical.v1` file.
-                "durableFile": env!("CARGO_PKG_VERSION"), "canonicalJson": 1, "holderLock": 2, "sessionIdentity": 2, "yaml": 1, "config": 3, "runResult": 1,
+                "durableFile": env!("CARGO_PKG_VERSION"), "canonicalJson": 1, "holderLock": 2, "sessionIdentity": 2, "yaml": 1, "config": 3, "runResult": 1, "agentProtocol": 1,
             }))
         })
         .clone()

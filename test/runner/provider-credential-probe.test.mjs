@@ -57,13 +57,31 @@ test('a layout fgOS cannot name, or a home that is not absolute, has no call', (
   assert.equal(credentialProbeCommand(undefined), null);
 });
 
-test('a call is judged by exit code and by what it printed, not by the exit code alone', () => {
-  assert.deepEqual(judgeProbeOutput({ exitCode: 0, timedOut: false, output: 'OK' }), { ok: true });
-  assert.equal(judgeProbeOutput({ exitCode: 0, timedOut: false, output: 'Error: OAuth refresh failed for xai' }).ok, false);
-  assert.equal(judgeProbeOutput({ exitCode: 1, timedOut: false, output: "You've hit your usage limit" }).ok, false);
-  assert.match(judgeProbeOutput({ exitCode: 1, timedOut: false, output: 'Error: 402: {"message":"This request requires more credits"}' }).detail, /usage limit/, 'every wording the classifier reads as a used-up quota is one here too');
-  assert.match(judgeProbeOutput({ exitCode: 1, timedOut: false, output: '' }).detail, /code 1/);
-  assert.match(judgeProbeOutput({ exitCode: null, timedOut: true, output: '' }).detail, /in time/);
+test('a call is judged by exit code and by the CLI\'s last words through the agent protocol, not by the exit code alone', () => {
+  const judge = (args) => judgeProbeOutput({ timedOut: false, cli: 'pi', ...args });
+  assert.deepEqual(judge({ exitCode: 0, output: 'OK' }), { ok: true });
+  assert.equal(judge({ exitCode: 0, output: 'Error: OAuth refresh failed for xai' }).ok, false);
+  assert.match(judge({ exitCode: 0, output: 'Error: OAuth refresh failed for xai' }).detail, /still rejected/);
+  assert.match(judge({ cli: 'codex', exitCode: 1, output: "You've hit your usage limit" }).detail, /usage limit/);
+  assert.match(judge({ exitCode: 1, output: 'Error: 402: {"message":"This request requires more credits"}' }).detail, /usage limit/, 'every wording the protocol reads as a used-up quota is one here too');
+  assert.deepEqual(judge({ cli: 'codex', exitCode: 0, output: "You've hit your usage limit" }), { ok: true }, 'a quota wording with a zero exit is not a failed call');
+  assert.match(judge({ exitCode: 1, output: '' }).detail, /code 1/);
+  assert.match(judge({ exitCode: null, timedOut: true, output: '' }).detail, /in time/);
+});
+
+test('the last JSON event of stdout names a refusal, and the provider\'s own status shows in the detail', () => {
+  const event = (errorStatus, errorMessage) => JSON.stringify({ type: 'message_end', message: { stopReason: 'error', errorStatus, errorMessage } });
+  const quota = judgeProbeOutput({ exitCode: 1, timedOut: false, cli: 'gemini', output: event(429, 'quota exhausted'), stdout: event(429, 'quota exhausted') });
+  assert.match(quota.detail, /usage limit \(HTTP 429\)/);
+  const refused = judgeProbeOutput({ exitCode: 1, timedOut: false, cli: 'pi', output: event(404, 'no such model'), stdout: event(404, 'no such model') });
+  assert.match(refused.detail, /provider refused the call \(HTTP 404\)/);
+  assert.match(judgeProbeOutput({ exitCode: 1, timedOut: false, cli: 'pi', output: event(401, 'bad key'), stdout: event(401, 'bad key') }).detail, /code 1/, 'a 401 is not read as a quota or a provider fault');
+});
+
+test('only the final lines of the output count: a login wording far up a long output is not a dead login', () => {
+  const longLog = ['Error: OAuth refresh failed for xai', ...Array.from({ length: 8 }, (_, i) => `working ${i}`)].join('\n');
+  assert.deepEqual(judgeProbeOutput({ exitCode: 0, timedOut: false, cli: 'pi', output: longLog }), { ok: true });
+  assert.equal(judgeProbeOutput({ exitCode: 0, timedOut: false, cli: 'pi', output: `${longLog}\nNo API key found for openrouter.` }).ok, false);
 });
 
 function fakeSpawn({ output = '', exitCode = 0, never = false } = {}) {

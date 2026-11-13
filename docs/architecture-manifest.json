@@ -149,7 +149,6 @@
     "src/runner/dispatch/provider-adapter.mjs": "infra",
     "src/runner/dispatch/llm-accounts.mjs": "infra",
     "src/runner/dispatch/provider-capacity.mjs": "infra",
-    "src/runner/dispatch/provider-auth-failure.mjs": "infra",
     "src/runner/dispatch/provider-credential-probe.mjs": "infra",
     "src/runner/dispatch/provider-account-probe.mjs": "infra",
     "src/runner/dispatch/provider-session-probe.mjs": "infra",

@@ -412,6 +412,7 @@ dependencies = [
 name = "fgos-node-addon"
 version = "0.2.0"
 dependencies = [
+ "fgos-agent-protocol",
  "fgos-canonical-json",
  "fgos-config",
  "fgos-durable-file",

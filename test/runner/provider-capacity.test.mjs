@@ -497,6 +497,15 @@ test('classifier quarantines only high-confidence stderr/provider outcomes', () 
   assert.equal(classifyProviderCapacityFault({ provider: 'openai', stderr: 'tests mention quota in a report' }).action, 'evidence-only');
 });
 
+test('a provider HTTP error stop moves the walk on but does not quarantine the account as quota or credential', () => {
+  // omp's last event on a refused model: stopReason "error" with errorStatus 404; the supervisor names it a
+  // provider stop with cause "provider", and the account itself is not known to be at fault.
+  const stderr = 'Cloud Code Assist API error (404): Requested entity was not found.';
+  const fault = classifyProviderCapacityFault({ provider: 'gemini', stderr, adapterOutcome: 'provider-limit', stopCause: 'provider' });
+  assert.equal(fault.action, 'evidence-only');
+  assert.equal(fault.reasonCode, 'provider-error');
+});
+
 // C2b (review probe): a plain test-suite failure whose stderr happens to
 // contain the words "token" (from a JS SyntaxError) and "failed" (from a
 // test runner summary) several lines apart used to be misclassified as

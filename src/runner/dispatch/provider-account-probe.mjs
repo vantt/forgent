@@ -6,15 +6,15 @@
 // answers). Diagnostic only: it picks nothing and schedules nothing.
 //
 // It reuses what exists instead of adding a second engine: the Assignment door itself (the same object a
-// Workflow unit dispatch hands it), the credential wordings of provider-auth-failure.mjs, the quota
-// wordings of the classifier, the herdr diagnosis a blocked round already writes, and the RUL75 renewal
-// opt-in. The account is pinned by handing the door a runner config whose inventory holds only that
-// account, so the lease cannot pick another one and a quarantine still refuses it, as it would for real.
+// Workflow unit dispatch hands it), the stop cause and provider signal the settled run carries (the agent
+// protocol judged the CLI's last words, this reads no wording of its own for a login or a quota), the herdr
+// diagnosis a blocked round already writes, and the RUL75 renewal opt-in. The account is pinned by handing
+// the door a runner config whose inventory holds only that account, so the lease cannot pick another one
+// and a quarantine still refuses it, as it would for real.
 
 import fs from 'node:fs';
 import path from 'node:path';
 
-import { matchAuthFailureLine, matchQuotaLimitLine } from './provider-auth-failure.mjs';
 import { legacyStateKey } from './llm-accounts.mjs';
 import { accountCredentialSources, commandCli, expandCredentialHome, credentialSourceForCli, credentialStoreOf, providerAccountInventory } from './provider-capacity.mjs';
 import { runOutcome } from './run-result.mjs';
@@ -133,32 +133,43 @@ function lineMatching(text, pattern) {
   return text.split(/\r?\n/).map((l) => l.trim()).find((l) => l && pattern.test(l)) ?? null;
 }
 
+/** What the provider itself said, as one short phrase; null when the run carried no signal. */
+function describeSignal(signal) {
+  if (!signal || typeof signal !== 'object') return null;
+  const parts = [];
+  if (signal.status !== undefined) parts.push(`HTTP ${signal.status}`);
+  if (signal.statusWord) parts.push(signal.statusWord);
+  if (signal.requestedWaitMs !== undefined) parts.push(`wait ${Math.ceil(signal.requestedWaitMs / 1000)}s`);
+  if (signal.resetHint) parts.push(signal.resetHint);
+  return parts.length ? parts.join(', ') : null;
+}
+
 /**
  * One outcome class and the line that shows it. `ok` is whether the dispatch settled; `text` is what it
- * printed and what the runner said about it; the run directory adds the herdr diagnosis a blocked round
- * wrote. Classes: ok, blocked-trust-prompt, auth, quota, sandbox, timeout, other.
+ * printed and what the runner said about it; `cause` and `providerSignal` are what the settled run says about
+ * a provider stop (`credential`, `quota` or `provider`: the agent protocol's verdict on the CLI's last words);
+ * the run directory adds the herdr diagnosis a blocked round wrote. Classes: ok, blocked-trust-prompt, auth,
+ * quota, sandbox, timeout, other.
  */
-export function classifyAccountProbe({ ok = false, text = '', failureCode = null, runDir = null } = {}) {
+export function classifyAccountProbe({ ok = false, text = '', failureCode = null, cause = null, providerSignal = null, runDir = null } = {}) {
   const diagnosis = runDir ? readJson(path.join(runDir, 'herdr-diagnosis.json')) : null;
   const visibility = runDir ? readJson(path.join(runDir, 'visibility.json')) : null;
   const explain = diagnosis?.explain ?? null;
   const screen = [diagnosis?.detectionScreen, explain?.promptText, visibility?.screen].filter(Boolean).join('\n');
   const all = [text, screen].filter(Boolean).join('\n');
 
-  if (ok) {
-    const auth = matchAuthFailureLine(all);
-    if (auth) return { outcome: 'auth', evidence: auth };
-    return { outcome: 'ok', evidence: lineMatching(text, /\bOK\b/) ?? lineMatching(text, /\S/) ?? 'settled' };
-  }
+  if (ok) return { outcome: 'ok', evidence: lineMatching(text, /\bOK\b/) ?? lineMatching(text, /\S/) ?? 'settled' };
   const matchedRule = explain?.matchedRule ?? null;
   const extra = matchedRule ? { matchedRule } : {};
   if ((matchedRule && /trust/i.test(matchedRule)) || TRUST_PATTERN.test(screen)) {
     return { outcome: 'blocked-trust-prompt', evidence: lineMatching(screen, /trust this folder/i) ?? lineMatching(screen, /trust/i) ?? `herdr rule ${matchedRule}`, ...extra };
   }
-  const auth = matchAuthFailureLine(all);
-  if (auth) return { outcome: 'auth', evidence: auth, ...extra };
-  const quota = matchQuotaLimitLine(all);
-  if (quota) return { outcome: 'quota', evidence: quota, ...extra };
+  if (failureCode === 'provider-limit') {
+    const signal = describeSignal(providerSignal);
+    if (cause === 'credential') return { outcome: 'auth', evidence: signal ?? 'the login is rejected', ...extra };
+    if (cause === 'quota') return { outcome: 'quota', evidence: signal ?? 'the account has used up its quota', ...extra };
+    if (cause === 'provider') return { outcome: 'other', evidence: signal ?? 'the provider refused the call', ...extra };
+  }
   const sandbox = lineMatching(all, SANDBOX_PATTERN);
   if (sandbox) return { outcome: 'sandbox', evidence: sandbox, ...extra };
   if (TIMEOUT_PATTERN.test(String(failureCode ?? '')) || lineMatching(all, /timed out/i)) {
@@ -230,6 +241,8 @@ export function readRunOutcome(runResult, { repoRoot }) {
     ok: outcome?.executed === 'completed' && !outcome.failure,
     text,
     failureCode: outcome?.failure?.code ?? null,
+    cause: outcome?.failure?.cause ?? null,
+    providerSignal: outcome?.failure?.providerSignal ?? null,
     runDir,
     runId: runResult?.runId ?? null,
     paneId: visibility?.paneId ?? null,

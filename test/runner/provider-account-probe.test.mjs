@@ -79,13 +79,16 @@ test('outcome classes come from what the run settled with, what it printed and t
   assert.match(trust.evidence, /Trust this folder/);
   assert.equal(trust.matchedRule, 'trust_directory');
 
-  const auth = classifyAccountProbe({ text: 'Error: OAuth refresh failed for openai: invalid_grant' });
-  assert.equal(auth.outcome, 'auth');
-  assert.match(auth.evidence, /invalid_grant/);
-  assert.equal(classifyAccountProbe({ ok: true, text: 'Please run /login' }).outcome, 'auth', 'a settled run that printed a dead login is not ok');
+  const stop = (cause, providerSignal = null) => classifyAccountProbe({ failureCode: 'provider-limit', cause, providerSignal, text: 'ended as provider-limit' });
+  assert.equal(stop('credential').outcome, 'auth');
+  assert.equal(stop('quota', { status: 429, requestedWaitMs: 30000 }).outcome, 'quota');
+  assert.match(stop('quota', { status: 429, requestedWaitMs: 30000 }).evidence, /HTTP 429, wait 30s/);
+  const refused = stop('provider', { status: 404 });
+  assert.equal(refused.outcome, 'other', 'a provider fault is neither the login nor the quota');
+  assert.match(refused.evidence, /HTTP 404/);
+  assert.equal(classifyAccountProbe({ failureCode: 'provider-limit', text: 'You\'ve hit your usage limit' }).outcome, 'other', 'wording the run did not settle with is not judged here');
+  assert.equal(classifyAccountProbe({ ok: true, text: 'Please run /login' }).outcome, 'ok', 'a settled run with a claim is ok whatever it printed');
 
-  assert.equal(classifyAccountProbe({ text: "You've hit your usage limit. Try again at 5pm." }).outcome, 'quota');
-  assert.equal(classifyAccountProbe({ text: 'Error: individual quota reached' }).outcome, 'quota', 'every wording the classifier reads as a used-up quota is one here too');
   assert.equal(classifyAccountProbe({ text: "EROFS: read-only file system, mkdir '/home/x/.pi/accounts/a/settings.json.lock'" }).outcome, 'sandbox');
   assert.equal(classifyAccountProbe({ text: 'herdr could not bring a "codex" agent to ready', failureCode: 'execution-timeout' }).outcome, 'timeout');
   assert.equal(classifyAccountProbe({ text: 'panic: unexpected' }).outcome, 'other');
@@ -250,4 +253,42 @@ test('each CLI is probed on the strongest model a tier cell names for the accoun
   });
   assert.equal('model' in overrides.at(-1), false, 'with no cell naming the pool the invocation default is probed');
   assert.deepEqual([plain.results[0].model, plain.results[0].modelSource], [null, 'invocation-default']);
+});
+
+test('a run settled as a provider limit is the account\'s login or quota by the cause the settlement recorded, with the provider\'s own signal as evidence', async () => {
+  const repoRoot = tmp('fgos-account-probe-cause-');
+  const settledWith = (failure) => async (assignment) => {
+    const dir = path.join(repoRoot, '.fgos', 'assignments', assignment.assignmentId, 'runs', '01');
+    fs.mkdirSync(dir, { recursive: true });
+    fs.writeFileSync(path.join(dir, 'stdout.log'), 'nothing a wording list could read\n');
+    return {
+      contract: { id: 'assignment-run-result', version: 2 },
+      runId: `run_${assignment.assignmentId}`,
+      status: 'failed',
+      confidence: 'failed',
+      runtime: { stdoutLog: path.relative(repoRoot, path.join(dir, 'stdout.log')) },
+      classification: {
+        policy: { disposition: 'allow' }, delivery: { mode: 'fresh' }, provenance: 'native-v2',
+        execution: { status: 'failed', exitCode: 1 },
+        assessment: { verdict: 'not-applicable' },
+        confidence: { level: 'failed', basis: ['captured-stdout'] },
+        failure: { family: 'provider', code: 'provider-limit', ...failure },
+      },
+    };
+  };
+  const probe = (failure) => runAccountProbe({
+    cfg, provider: 'openai', accountId: 'acct', invocationIds: ['pi-cli-bwrap-acct'], repoRoot,
+    createAssignment: (contract) => Object.freeze({ assignmentId: `asgn_cause_${failure.cause}`, provenance: { kind: 'inline', contract } }),
+    dispatch: settledWith(failure),
+    closePane: () => false,
+  });
+
+  const login = (await probe({ cause: 'credential' })).results[0];
+  assert.equal(login.outcome, 'auth');
+  const quota = (await probe({ cause: 'quota', providerSignal: { status: 429, requestedWaitMs: 60000 } })).results[0];
+  assert.equal(quota.outcome, 'quota');
+  assert.match(quota.evidence, /HTTP 429, wait 60s/);
+  const refused = (await probe({ cause: 'provider', providerSignal: { status: 404 } })).results[0];
+  assert.equal(refused.outcome, 'other');
+  assert.match(refused.evidence, /HTTP 404/);
 });
