@@ -38,7 +38,7 @@ A reader of `result.json` / `unit-summary.json` can tell quota from harness in b
 | P03 | [Run Result: `provider` category, no-report is infra](phase-03-run-result-provider-category-no-report.md) | - | 0.75d | landed |
 | P04 | [Settle: signal on the failure, quarantine dated from it, audit line per fault](phase-04-settle-signal-quarantine-audit.md) | P02, P03 | 0.75d | pending |
 | P05 | [Retire the Node wording list](phase-05-retire-node-wording-list.md) | P01, P04 | 0.5d | pending |
-| P06 | [Unit summary v3: infra facts persisted](phase-06-unit-summary-v3.md) | - | 0.75d | pending |
+| P06 | [Unit summary v3: infra facts persisted](phase-06-unit-summary-v3.md) | - | 0.75d | landed |
 
 **Parallel (file-disjoint):** wave 1 = P01, P03, P06 together; P02 starts when P01 is pushed; P04 after P02 and P03; P05 last. P03 and P04 share `src/runner/dispatch/settlement.mjs` (P03 owns `classifyEvidenceToOutcomeFacts`, P04 the rest), so they are serial. P03 and P06 share the `fgos-run-result` crate but not a file (`lib.rs` + `tests/unit_result_fixtures.rs` vs `unit_summary.rs` + `tests/unit_summary.rs`). P03 and P05 share the addon crate but not a file (`run_result.rs` vs `agent_protocol.rs`, `lib.rs`, `Cargo.toml`). P05 and P04 both touch `test/runner/provider-capacity.test.mjs` and are serial.
 
