@@ -1,15 +1,17 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "unit-summary.read.v2",
-  "title": "Execution-owned Unit Summary Read Contract v2",
-  "description": "Read only direct .fgos/assignments/unit-run-*/unit-summary.json files, at most 1 MiB each. Never recurse into unit directories or read results, workflow events, transcripts, protected data or outboxes. Skip symlink state roots and unit directories. Each real direct unit directory contributes once to summaryDirsSeen: an in-window observation, summariesMissing, summariesUnusable, or summariesOutsideWindow. Structural diagnostics are root-wide, not window-filtered: missing summaries can belong to active units and undated/unusable summaries cannot be assigned to a time window. summariesSkippedByReason partitions only summariesUnusable (unreadable, oversized, symlink, nonregular, invalid-json, unsupported-version, invalid-contract, missing-timestamp, invalid-timestamp). unsupported-version is a unit-summary of any other contract version, checked before the timestamp so an undated older summary is also unsupported-version (v1 lacked owner seat kinds and derived pattern-less records as solo); scripts/backfill-unit-summaries.mjs --regenerate rewrites such summaries from the unit records. summariesMissing counts units with no summary whether they are still running or were abandoned: the reader has no owner liveness signal and never reads unit.json to guess. Outside-window counts include only otherwise valid summaries with valid owner-owned RFC3339 settledAt. unitRunId must equal the directory name. Compare timestamp windows temporally in UTC milliseconds with inclusive bounds, never lexicographically; bounds accept RFC3339 or YYYY-MM-DD (UTC midnight), and invalid/reversed bounds are named errors. Emit source unit-summary, kind unit.settled, subject kind run with id unit-run:<unitRunId>. This distinct kind does not increase run.settled totals. Outcome, seat kind and final selection are owned by the Node writer using unit-run-history; Rust never derives or selects attempts.",
+  "$id": "unit-summary.read.v3",
+  "title": "Execution-owned Unit Summary Read Contract v3",
+  "description": "Version 3 stores the infrastructure facts Execution settled the unit with (infrastructure, infrastructureReason, refused); version 2 files already on disk are still read, without those fields, and any other version is unsupported-version. Read only direct .fgos/assignments/unit-run-*/unit-summary.json files, at most 1 MiB each. Never recurse into unit directories or read results, workflow events, transcripts, protected data or outboxes. Skip symlink state roots and unit directories. Each real direct unit directory contributes once to summaryDirsSeen: an in-window observation, summariesMissing, summariesUnusable, or summariesOutsideWindow. Structural diagnostics are root-wide, not window-filtered: missing summaries can belong to active units and undated/unusable summaries cannot be assigned to a time window. summariesSkippedByReason partitions only summariesUnusable (unreadable, oversized, symlink, nonregular, invalid-json, unsupported-version, invalid-contract, missing-timestamp, invalid-timestamp). unsupported-version is a unit-summary of any other contract version, checked before the timestamp so an undated older summary is also unsupported-version (v1 lacked owner seat kinds and derived pattern-less records as solo); scripts/backfill-unit-summaries.mjs --regenerate rewrites such summaries from the unit records. summariesMissing counts units with no summary whether they are still running or were abandoned: the reader has no owner liveness signal and never reads unit.json to guess. Outside-window counts include only otherwise valid summaries with valid owner-owned RFC3339 settledAt. unitRunId must equal the directory name. Compare timestamp windows temporally in UTC milliseconds with inclusive bounds, never lexicographically; bounds accept RFC3339 or YYYY-MM-DD (UTC midnight), and invalid/reversed bounds are named errors. Emit source unit-summary, kind unit.settled, subject kind run with id unit-run:<unitRunId>. This distinct kind does not increase run.settled totals. Outcome, seat kind and final selection are owned by the Node writer using unit-run-history; Rust never derives or selects attempts.",
   "type": "object",
   "required": ["contract", "unitRunId", "workflow", "pattern", "capability", "outcome", "startedAt", "settledAt", "seats", "stanceOptions"],
+  "if": {"properties": {"contract": {"properties": {"version": {"const": 3}}}}},
+  "then": {"required": ["infrastructure", "infrastructureReason", "refused"]},
   "properties": {
     "contract": {
       "type": "object",
       "required": ["id", "version"],
-      "properties": {"id": {"const": "unit-summary"}, "version": {"const": 2}}
+      "properties": {"id": {"const": "unit-summary"}, "version": {"enum": [2, 3], "description": "The version the writer emits is 3; the reader accepts 2 as well. A v3 summary must carry the three infrastructure fields below; a v2 one does not."}}
     },
     "unitRunId": {"type": "string", "pattern": "^unit-run-.+"},
     "workflow": {
@@ -29,6 +31,22 @@
     "pattern": {"$ref": "#/definitions/nullableString", "description": "The pattern the owner recorded; null for a legacy unit record that never stored one."},
     "capability": {"$ref": "#/definitions/nullableString"},
     "outcome": {"type": "string", "minLength": 1, "description": "Execution-owned unit outcome. pass counts as a passing unit. undetermined marks a finished unit whose outcome its records cannot establish (a legacy record without a recorded pattern and no owner completion): it counts in unitRuns and unitsUndetermined, never as passed or failed, and stays out of the passRate denominator. Other values are failures and remain visible."},
+    "infrastructure": {"type": ["boolean", "null"], "description": "Version 3. Whether the unit ended on infrastructure (a rerun can still produce the verdict), copied from the unit record Execution settled; null when the record was settled before the fact was stored (not known, never a pass)."},
+    "infrastructureReason": {"$ref": "#/definitions/nullableString", "description": "Version 3. Why the unit ended on infrastructure, null when infrastructure is false or not known: not-started, scope-check-failed, verify-timeout, verify-not-run, commit-failed:<commit reason>, the failed attempt's run-result outcome reason (for example infra-exec-failed), execution-failure, or run-error (the run threw before it produced a result)."},
+    "refused": {
+      "type": "array",
+      "description": "Version 3. The seats a policy decision refused; refused seats have no run directory, so Execution records them at settlement. Empty when none, and for a record settled before they were stored.",
+      "items": {
+        "type": "object",
+        "required": ["seat", "round", "reason", "detail"],
+        "properties": {
+          "seat": {"type": "string", "minLength": 1},
+          "round": {"type": "integer", "minimum": 1},
+          "reason": {"type": "string", "minLength": 1},
+          "detail": {"type": "string"}
+        }
+      }
+    },
     "startedAt": {"$ref": "#/definitions/nullableString", "description": "Unit creation time, used only for duration; never a substitute for settlement."},
     "settledAt": {"type": "string", "minLength": 1, "description": "Required owner settlement time; historical null timestamps are skipped, never creation-derived."},
     "stanceOptions": {"type": "array", "items": {"type": "string", "minLength": 1}},
