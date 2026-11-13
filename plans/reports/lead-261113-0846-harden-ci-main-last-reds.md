@@ -53,6 +53,16 @@ both prunes finish: empty. B reports `cases: []`, `kept: []` (log `/dev/shm/cilr
 Proof: case-close 5/5, workflow and CLI focused set 173/173, full `npm test` 8861 tests 0 fail, no
 run-tests ERROR lines.
 
+## Third landing: reds on db5441e06
+
+| # | Run | Test | Cause | Fix |
+|---|-----|------|-------|-----|
+| 6 | Release assets check 43372931325, `focused tests (ubuntu-22.04)`, distribution crate | `fetch_download` `downloads_exact_tag_and_verifies_checksum` (NotFound) and `checksum_mismatch_is_refused` (read "no checksum entry ... v1", the SHA256SUMS of the parallel missing-entry proof) | `fetch.rs` `ScratchDir` named the dir by pid and clock nanos and made it with `create_dir_all`: two downloads in one process that read the same time shared it | `b0ae0afee`: exclusive `DirBuilder` create, mode 0o700 on unix, per-process counter in the name, retry on AlreadyExists; unit proof `scratch_dirs_created_at_once_in_one_process_are_never_shared` |
+| 7 | CI 43372931317, `test (ubuntu-latest)` | `claim-port.test.mjs` killed at 600 s in "claimWork re-validates preClaimStatus against a FRESH durable read" | Test race: `holdStateLockInChild.release()` awaits the holder's exit, but the lock is free once the holder leaves its transaction; the child's report arrived during that await, before the result listener existed | `96a72e355`: the listener is attached before release. Forced repro (holder exit delayed 3 s): old order times out, new passes |
+
+Full npm test on the branch: 8861 tests, 1 fail, `mailbox-live-confined` (listed known load flake; 19/19 alone).
+Branch runs green: CI 43378173930, Release assets check 43378173932.
+
 ## Backlog rows opened
 
 - `p-5zazr53vd2`: the exec-window retry is per process and the scan is serial (N x 250 ms); bound it
@@ -81,5 +91,8 @@ run-tests ERROR lines.
 - A green PR CI is only as fresh as its base: the first landing passed on a base without the
   documentation lane's next commit, which brought a citation-drift red to main. Rebase-and-rerun the
   CI test job when main moved by more than docs you have read.
+- Every red today was intermittent and each landing surfaced the next: CI and Release assets check
+  run about an hour, so batching every visible red per run, and reading every failed job of the
+  landed commit before calling it green, is what bounds the cycle count.
 - An earlier fix (7980b494e) patched one cleanup site with an inline retry; the same failure then hit a
   sibling file. Fix the class through one helper on the first occurrence.
