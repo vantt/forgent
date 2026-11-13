@@ -722,14 +722,22 @@ mod tests {
         let dir = std::env::temp_dir().join(format!("fgos-cmdline-{}", std::process::id()));
         fs::create_dir_all(&dir).unwrap();
         fs::write(dir.join("cmdline"), b"").unwrap();
-        let late = dir.join("cmdline");
+        fs::write(dir.join("environ"), b"").unwrap();
+        let (late_argv, late_env) = (dir.join("cmdline"), dir.join("environ"));
         let writer = std::thread::spawn(move || {
             std::thread::sleep(std::time::Duration::from_millis(30));
-            fs::write(late, b"fgos\0run\0").unwrap();
+            fs::write(late_argv, b"fgos\0run\0").unwrap();
+            // The environment is published just after the arguments.
+            std::thread::sleep(std::time::Duration::from_millis(30));
+            fs::write(late_env, b"XDG_RUNTIME_DIR=/run/user/1\0").unwrap();
         });
         assert_eq!(
             read_settled(&dir.join("cmdline"), true).unwrap(),
             ["fgos", "run"]
+        );
+        assert_eq!(
+            read_settled(&dir.join("environ"), true).unwrap(),
+            ["XDG_RUNTIME_DIR=/run/user/1"]
         );
         writer.join().unwrap();
         // No readable executable (a kernel thread): empty is its real argv, read once.
