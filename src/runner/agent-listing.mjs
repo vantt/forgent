@@ -60,24 +60,18 @@ function readQuietly(file) {
   }
 }
 
-// An installed definition the project's own folder hides. A project that ships `domains/` (or
-// `core/agents/`) is read there instead of the install, so every shipped name that folder lacks is
-// invisible to a seat lookup. The project-side scan cannot see them; the install root is scanned
-// separately and only when the two roots differ.
+// An installed definition the project's own folder hides. A project that ships `core/agents/` is read
+// there instead of the install, so every shipped core name that folder lacks is invisible to a seat
+// lookup. Domain personas are the install's alone (a project's `domains/` is never read), so none hides.
 function maskedByProject(projectRoot, installRoot, visibleNames) {
   if (path.resolve(projectRoot) === path.resolve(installRoot)) return [];
-  const masked = [];
-  for (const rel of ['domains', 'core/agents']) {
-    if (!fs.existsSync(path.join(projectRoot, rel))) continue;
-    const hidden = scanAgentTiers({ projectRoot: installRoot, installRoot })
-      .filter((tier) => (rel === 'domains' ? tier.tier === 'domain' : tier.tier === 'core'))
-      .flatMap((tier) => tier.entries.map((entry) => ({ ...entry, tier: tier.tier, label: tier.label })));
-    for (const entry of hidden) {
-      if (visibleNames.has(entry.name)) continue;
-      masked.push({ name: entry.name, tier: entry.tier, source: entry.rel, hiddenBy: `${rel}/ of this project` });
-    }
-  }
-  return masked;
+  if (!fs.existsSync(path.join(projectRoot, 'core/agents'))) return [];
+  const hidden = scanAgentTiers({ projectRoot: installRoot, installRoot })
+    .filter((tier) => tier.tier === 'core')
+    .flatMap((tier) => tier.entries.map((entry) => ({ ...entry, tier: tier.tier })));
+  return hidden
+    .filter((entry) => !visibleNames.has(entry.name))
+    .map((entry) => ({ name: entry.name, tier: entry.tier, source: entry.rel, hiddenBy: 'core/agents/ of this project' }));
 }
 
 /**
