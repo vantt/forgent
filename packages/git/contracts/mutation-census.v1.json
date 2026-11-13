@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "c1cba7cfed28f70c5325aeef29ce0812f8a781ba33d88e447ef87c2c62c8f3d1",
+  "payloadDigest": "6bc0ee6cc9a248df2d3522e0c317f07783f2be2f69a13937eef25d5f6303e674",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -1148,7 +1148,7 @@
     "src/setup/instruction-registry.mjs": "525bdc05438191f6c02b0b071b577ad84cb9f2c5cfa8e6efe0ed82f60ae9b17c",
     "src/setup/mailbox-claude-accept.mjs": "bee986781b57262527be6964cc46d07944dfc3c6fd1fcc18e6779d665963237a",
     "src/setup/mailbox-limits.mjs": "4d5342b6631a38e00edc30b8d8a4966f7d94f6848e2b68c45529822d4fdd9068",
-    "src/setup/mailbox-sync-timer.mjs": "6628ebdd706138f32b9733bba2880b075c9d5c701695b85bf55347e47d3756ef",
+    "src/setup/mailbox-sync-timer.mjs": "eaf3981af3a4081912d265b21e149b2ce3ae37b65642a22be7027878acf1789a",
     "src/setup/model-pool-checks.mjs": "f686f00122bc1f43c5d0fe182f7879739f112ef4a361ccccf4a7d6a7ddf5bbd5",
     "src/setup/omp-natives-checks.mjs": "6f6faadb66ac09828741445c599dcbaee9462486157ab7074433e2dbcf4d9aad",
     "src/setup/project-launcher.mjs": "3153fdb9caad59eaeace759de1cd126c22f41585fcd1e15f00c1577ab0f9806b",
