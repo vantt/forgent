@@ -10,7 +10,7 @@
   },
   "results": {
     "ready": "terminal: the CLI shows an empty prompt and can take the brief",
-    "blocked": { "reason": { "enum": ["trust-dialog", "login", "usage-limit", "provider-error"] }, "meaning": "the CLI waits for something only a person can do, or its provider refused the round (provider-error: an HTTP 4xx/5xx other than 401/403, from the last JSON event in direct mode or an `api error (<status>)` line on a terminal screen)" },
+    "blocked": { "reason": { "enum": ["trust-dialog", "login", "usage-limit", "provider-error"] }, "meaning": "the CLI waits for something only a person can do, or its provider refused the round (provider-error: an HTTP 4xx/5xx other than 401/403/429, from the last JSON event in direct mode or an `api error (<status>)` line on a terminal screen; usage-limit also covers a 429 or a `RESOURCE_EXHAUSTED` error body, from the same two places and from an omp give-up whose reason is a 429)" },
     "delivered": "terminal: the brief is confirmed submitted (not merely visible)",
     "delivery-unknown": "terminal: could not confirm; never resend blind",
     "completed": { "resultPath": "absolute path of outbox/result-<N>.json", "meaning": "the agent finished and its result file exists" },
@@ -22,9 +22,19 @@
     "decides": [
       "activity source for idle: growth of the stdout capture (any new text, a JSON event line included)",
       "completion: agent exited and outbox/result-<N>.json exists -> completed; exited without it -> exited(code) unless a blocked/needs-human pattern was read",
-      "named blocked results from known output patterns on the stderr tail (login prompt, usage limit), and provider-error from the stdout tail's last JSON event (stopReason error with an errorStatus of 4xx/5xx other than 401/403)",
+      "named blocked results from known output patterns on the stderr tail (login prompt, usage limit), and usage-limit or provider-error from the stdout tail's last JSON event (stopReason error: an errorStatus of 429 or a `RESOURCE_EXHAUSTED` error body is usage-limit; an errorStatus of 4xx/5xx other than 401/403 is provider-error)",
       "the supervisor puts a blocked result in the receipt's `reason` as `direct:blocked:<reason>` (only for a non-zero exit with no outbox result); the settle step maps it to an outcome"
     ]
+  },
+  "providerSignal": {
+    "meaning": "a pure read of the CLI's last words that adds facts to a stop already named; never a verdict. None when no field is found. Direct: Direct::provider_signal(stderrTail, stdoutTail) over the same 5-line tails and last-event rule as classify; terminal: Terminal::stop_signal(screen) over the bottom 12 lines",
+    "fields": {
+      "status": "integer 100-599, from errorStatus or `api error (<n>)`",
+      "statusWord": "string [A-Z_]{1,64}, from the error body's `status`",
+      "requestedWaitMs": "integer, from `provider requested <n>ms wait`",
+      "resetHint": "string of at most 80 characters, the matched `resets in <dur>` or `try again at <h:mm am|pm>` phrase"
+    },
+    "wire": "camelCase keys, a field not found is left out"
   },
   "matrix": {
     "rows": ["claude", "codex", "agy", "pi", "omp"],
@@ -38,5 +48,5 @@
     },
     "unknownCli": "direct: an unknown CLI gets the generic adapter name, and its last words are read for a dead login or a used-up quota like any other (an executor can wrap any program); terminal: an envelope naming a CLI without a terminal adapter is refused before launch (agent-protocol-unsupported)"
   },
-  "vectors": "fixtures per cell live under packages/agent-protocol/contracts/fixtures/<mode>/<cli>/vectors.json (direct and terminal cells exist; terminal vectors replay recorded screens on a virtual clock)"
+  "vectors": "an optional `expectSignal` on a vector asserts the provider signal; fixtures per cell live under packages/agent-protocol/contracts/fixtures/<mode>/<cli>/vectors.json (direct and terminal cells exist; terminal vectors replay recorded screens on a virtual clock)"
 }
