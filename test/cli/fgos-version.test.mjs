@@ -1,6 +1,6 @@
-// The build's own version record (package version, commit, verb set) is what the `cli-version-visible` doctor check
-// and the host's `version` verb read. The `fgos version` verb itself is a native route (apps/fgos/tests/cli_tests.rs
-// owns its output through the host); this file owns the record's contents.
+// The record of the running version (package version, commit) is what the `cli-version-visible` doctor check reads.
+// The `fgos version` verb is a native route: apps/fgos/tests/cli_tests.rs owns its output and its verb list
+// through the host; this file owns the record's contents.
 import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -8,7 +8,7 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
-import { resolveCliVersionInfo } from '../../src/cli/version.mjs';
+import { resolveCliVersionInfo } from '../../src/setup/version-info.mjs';
 
 const REAL_REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 
@@ -16,14 +16,6 @@ test('the version record carries this build\'s package version without reading a
   const info = resolveCliVersionInfo();
   assert.equal(typeof info.packageVersion, 'string');
   assert.ok(info.packageVersion.length > 0);
-});
-
-test('the version record lists the current verb set, including "plan" but never "decompose" (tsk-403 rename retired the verb, only the stage alias survives)', () => {
-  const { verbs } = resolveCliVersionInfo();
-  assert.ok(Array.isArray(verbs));
-  assert.ok(verbs.includes('plan'));
-  assert.ok(verbs.includes('version'));
-  assert.ok(!verbs.includes('decompose'));
 });
 
 test('the version record reports this checkout\'s own real git commit', () => {

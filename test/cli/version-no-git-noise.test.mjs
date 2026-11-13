@@ -10,7 +10,7 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
-const VERSION_MODULE = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..', 'src', 'cli', 'version.mjs');
+const VERSION_MODULE = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..', 'src', 'setup', 'version-info.mjs');
 
 test('resolving the version of an install that is not a git checkout prints nothing and reports no commit', () => {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-version-nogit-'));
