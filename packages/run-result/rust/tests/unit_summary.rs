@@ -350,6 +350,28 @@ fn reader_reports_root_wide_missing_and_unusable_summaries_without_reconstructio
         .unwrap()
         .remove("settledAt");
     root.summary(&old_version_untimed);
+    // Version 2 stays readable beside 3; a v3 summary carries the stored infrastructure facts.
+    let mut v3 = unit("unit-run-v3", &[]);
+    v3["contract"]["version"] = json!(3);
+    v3["infrastructure"] = json!(true);
+    v3["infrastructureReason"] = json!("commit-failed:hook-refused");
+    v3["refused"] = json!([{"seat": "producer", "round": 1, "reason": "consent-stale", "detail": "the plan changed"}]);
+    root.summary(&v3);
+    let mut v3_not_known = unit("unit-run-v3-unknown", &[]);
+    v3_not_known["contract"]["version"] = json!(3);
+    v3_not_known["infrastructure"] = Value::Null;
+    v3_not_known["infrastructureReason"] = Value::Null;
+    v3_not_known["refused"] = json!([]);
+    root.summary(&v3_not_known);
+    let mut v3_bad_refused = unit("unit-run-v3-bad", &[]);
+    v3_bad_refused["contract"]["version"] = json!(3);
+    v3_bad_refused["infrastructure"] = json!(false);
+    v3_bad_refused["infrastructureReason"] = Value::Null;
+    v3_bad_refused["refused"] = json!("x");
+    root.summary(&v3_bad_refused);
+    let mut future = unit("unit-run-future", &[]);
+    future["contract"]["version"] = json!(4);
+    root.summary(&future);
     let malformed = root.summary(&unit("unit-run-malformed", &[]));
     fs::write(malformed, "{").unwrap();
     let oversized = root.summary(&unit("unit-run-oversized", &[]));
@@ -381,22 +403,22 @@ fn reader_reports_root_wide_missing_and_unusable_summaries_without_reconstructio
     )
     .unwrap();
     for (args, observed, outside) in [
-        (vec![], 1, 0),
-        (vec!["--since=2026-10-06"], 0, 1),
-        (vec!["--until", "2026-10-04"], 0, 1),
+        (vec![], 3, 0),
+        (vec!["--since=2026-10-06"], 0, 3),
+        (vec!["--until", "2026-10-04"], 0, 3),
     ] {
         let report = root.metrics(&args);
         assert_eq!(report["totals"]["unitRuns"], observed);
         assert_eq!(report["summaryDiagnosticsScope"], "root-wide");
-        assert_eq!(report["summaryDirsSeen"], 12);
+        assert_eq!(report["summaryDirsSeen"], 16);
         assert_eq!(report["summariesMissing"], 1);
-        assert_eq!(report["summariesUnusable"], 10);
+        assert_eq!(report["summariesUnusable"], 12);
         assert_eq!(report["summariesOutsideWindow"], outside);
         assert_eq!(
             report["summariesSkippedByReason"],
             json!({
-                "missing-timestamp": 1, "invalid-timestamp": 1, "invalid-contract": 3,
-                "unsupported-version": 2, "invalid-json": 1, "oversized": 1, "nonregular": 1
+                "missing-timestamp": 1, "invalid-timestamp": 1, "invalid-contract": 4,
+                "unsupported-version": 3, "invalid-json": 1, "oversized": 1, "nonregular": 1
             })
         );
         let skipped: u64 = report["summariesSkippedByReason"]

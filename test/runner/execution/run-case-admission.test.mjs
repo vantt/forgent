@@ -278,6 +278,9 @@ test('the write gate asks the same port before the commit, and a refusal commits
   assert.equal(res.outcome, 'policy-refusal');
   assert.equal(res.results[0].refused.reason, 'consent-stale');
   assert.match(res.results[0].refused.detail, /approved plan changed/);
+  const { settlement } = unitJson(repoRoot, res.unitRunId);
+  assert.deepEqual([settlement.outcome, settlement.infrastructure, settlement.infrastructureReason], ['policy-refusal', false, null]);
+  assert.deepEqual(settlement.refused, [{ seat: res.results[0].seat, round: res.results[0].round, reason: 'consent-stale', detail: res.results[0].refused.detail }]);
   const check = port.calls.find((c) => c[0] === 'recheckEffect');
   assert.deepEqual({ reservationId: check[1], caseId: check[2].caseId, paths: check[2].paths }, { reservationId: 'rsv-test', caseId: 'case-test', paths: ['docs/a.md'] });
   const log = execFileSync('git', ['log', '--oneline'], { cwd: worktreeDir, encoding: 'utf8' }).trim().split('\n');
@@ -680,6 +683,8 @@ test('a write check that cannot run ends the Unit as an infrastructure failure i
   assert.equal(res.outcome, 'execution-failure');
   assert.match(res.error, /could not check the writes of the unit: .*writing branch/);
   assert.deepEqual([res.infrastructure, res.outOfScope, settledOf(port).outcome], [true, [], 'execution-failure']);
+  const { settlement } = unitJson(repoRoot, res.unitRunId);
+  assert.deepEqual([settlement.infrastructure, settlement.infrastructureReason, settlement.refused], [true, 'scope-check-failed', []], 'the record keeps the facts the result printed');
 });
 
 test('a branch base that is not a branch, a commit and a list of paths is refused before any run exists', async () => {

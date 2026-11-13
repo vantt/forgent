@@ -38,7 +38,8 @@ test('complete summary uses owner workflow/outcome and only exposes measurement 
   result(dir, 'panelist-1', '1', '01');
   result(dir, 'synthesizer', '1', '01', { agentClaim: {} });
   const summary = buildUnitSummary(dir);
-  assert.deepEqual(summary.contract, { id: 'unit-summary', version: 2 });
+  assert.deepEqual(summary.contract, { id: 'unit-summary', version: 3 });
+  assert.deepEqual([summary.infrastructure, summary.infrastructureReason, summary.refused], [null, null, []], 'a record settled before the facts were stored reads as not known, never as a pass');
   assert.deepEqual(summary.workflow, { caseId: 'wf-synthetic', activity: 'step', reservationId: null }, 'a record from before cases reads as the same link, without a reservation');
   assert.equal(summary.startedAt, startedAt);
   assert.equal(summary.settledAt, settledAt);
@@ -67,12 +68,14 @@ test('final and history share highest fallback/latest resume selection; every at
 });
 
 test('failed seat maps classification without altering original run; no workflow stays null', (t) => {
-  const { dir } = fixture(t, { settlement: { outcome: 'execution-failure', settledAt } });
+  const refused = [{ seat: 'panelist-2', round: 1, reason: 'consent-stale', detail: 'the plan changed' }];
+  const { dir } = fixture(t, { settlement: { outcome: 'execution-failure', settledAt, infrastructure: true, infrastructureReason: 'commit-failed:git-error', refused } });
   result(dir, 'panelist-1', '1', '01', { classification: { outcome: { category: 'infra' } } });
   const original = fs.readFileSync(path.join(dir, 'panelist-1', '1', 'runs', '01', 'result.json'), 'utf8');
   const summary = writeUnitSummary(dir).summary;
   assert.equal(summary.workflow, null);
   assert.equal(summary.outcome, 'execution-failure');
+  assert.deepEqual([summary.infrastructure, summary.infrastructureReason, summary.refused], [true, 'commit-failed:git-error', refused], 'the summary copies the settlement facts');
   assert.equal(summary.seats[0].final.outcome, 'execution-failure');
   assert.equal(fs.readFileSync(path.join(dir, 'panelist-1', '1', 'runs', '01', 'result.json'), 'utf8'), original);
 });
@@ -410,7 +413,7 @@ test('backfill keeps stored summaries by default and regenerate rewrites stale o
   assert.equal(fs.readFileSync(file, 'utf8'), stale, 'dry-run writes nothing');
   assert.equal(backfillUnitSummaries({ repoRoot: root, regenerate: true }).changed, 1);
   const rewritten = JSON.parse(fs.readFileSync(file, 'utf8'));
-  assert.deepEqual(rewritten.contract, { id: 'unit-summary', version: 2 });
+  assert.deepEqual(rewritten.contract, { id: 'unit-summary', version: 3 });
   assert.equal(rewritten.outcome, 'undetermined');
   const before = fs.statSync(file).mtimeMs;
   const again = backfillUnitSummaries({ repoRoot: root, regenerate: true });

@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "29ec688ab0d1ff7e3d765b183efd0234d1bccc61b3b6d8a76d98ea78422e7199",
+  "payloadDigest": "79cf67b284f05eb4e59df437459f29d6836bfa714d9d4196d032bcbe177d1533",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -661,7 +661,7 @@
     "packages/run-result/rust/src/unit_summary.rs": "175e44b839255d969d8ee959f85f1e1c7f35f47d9cd795a6f767242cdb370c09",
     "packages/run-result/rust/tests/layout_fixture.rs": "3fa57f7b3ee9292dd3b1242a971b276659a7684d90e67daa62119c6c1a08acb6",
     "packages/run-result/rust/tests/unit_result_fixtures.rs": "27dde9cbedb4c47898a9ffc077b591caf221ff39bdbf188a44b0e5d7e2b39481",
-    "packages/run-result/rust/tests/unit_summary.rs": "ae411edda54151b8b400760e7df0f8e457c72b779027828456ed17361f2bd606",
+    "packages/run-result/rust/tests/unit_summary.rs": "1d217b57cc351d13cb714b12ed998ab4a86fd4c6080a327bc8901bc0c5a43a14",
     "packages/run-supervisor/rust/examples/gate_agent.rs": "91486ceb4f500a9b8b06975c3cf98ebcdc65cdb8629b863304520c14240e80fd",
     "packages/run-supervisor/rust/examples/gate_harness.rs": "7412bfe67e635bdc37b2c100b0498670209bd54faa2714830929ce346b603742",
     "packages/run-supervisor/rust/examples/internal_harness.rs": "8801bb6f1b52e89a113be1b1392b577d7db603c407e903038a4199a9fdf0e76e",

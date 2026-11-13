@@ -88,6 +88,8 @@ test('a brief lost twice in a row ends the seat as an execution failure', { skip
   assert.deepEqual([answer.data.started, answer.data.infrastructure], [{ value: false, reason: 'brief-not-delivered' }, true]);
   assert.equal(exit.code, 11, 'the exit code of an infrastructure ending');
   assert.equal(answer.data.results.at(-1).fallbackExhausted.reason, 'brief-not-delivered');
+  const { settlement } = readJson(path.join(project.repoDir, '.fgos', 'assignments', answer.data.unitRunId, 'unit.json'));
+  assert.deepEqual([settlement.infrastructure, settlement.infrastructureReason], [true, 'not-started']);
   const attempts = attemptsOf(project, answer);
   assert.deepEqual(attempts.map((a) => [a.binding.executor, a.briefNotDelivered === true]), [['alpha', true], ['alpha', true]]);
   assert.equal(tabsOpened(project), 2, 'no third launch');

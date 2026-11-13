@@ -245,6 +245,8 @@ test('a worker that passes with markers left gets no commit; fixing them and res
   assert.equal(first.results[0].commit.status, 'failed');
   assert.equal(first.results[0].commit.reason, 'conflict-markers');
   assert.deepEqual(first.results[0].commit.paths, ['README.md']);
+  const { settlement } = unitRecordOf(repoRoot, first.unitRunId);
+  assert.deepEqual([settlement.infrastructure, settlement.infrastructureReason, settlement.refused], [true, 'commit-failed:conflict-markers', []], 'the record says the commit failed, not only that the unit did');
   assert.equal(headOf(worktree), before, 'nothing committed');
   assert.equal(mergeHeadOf(worktree), headOf(repoRoot), 'the merge is kept for the resume');
   assert.equal(unitRecordOf(repoRoot, first.unitRunId).sync.status, 'conflicted');
