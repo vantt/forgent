@@ -110,3 +110,49 @@ test('a unit file without the marker is never removed, even under this project\'
   assert.equal(result.fixed, false);
   assert.ok(fs.existsSync(path.join(units, `${stem}.timer`)));
 });
+
+test('a unit is never written with "%", a newline or another control character in the project root, the binary or the remote', () => {
+  const stem = 'fgos-mailbox-sync-x';
+  const ok = { stem, bin: '/b/fgos', projectRoot: '/p', remote: 'origin', intervalSec: 60 };
+  for (const render of [renderSystemd, renderLaunchd]) {
+    assert.doesNotThrow(() => render(ok));
+    for (const field of ['bin', 'projectRoot', 'remote']) {
+      for (const bad of ['/x%h', '/x\nExecStartPost=/bin/sh', '/x\u0007', '/x\u007f']) {
+        assert.throws(() => render({ ...ok, [field]: bad }), new RegExp(`refuses ${field}`), `${render.name} ${field} ${JSON.stringify(bad)}`);
+      }
+    }
+  }
+});
+
+test('an unsafe project path leaves the timer unwritten and doctor says why, as a warning', () => {
+  const w = world();
+  const dir = path.join(w.home, 'proj%x');
+  const check = checkMailboxSyncTimer(dir, { schedule: on, scheduler: w.scheduler, bin, run: w.run });
+  assert.equal(check.passed, true);
+  assert.match(check.message, /^warning: no mailbox sync timer: .*projectRoot/);
+  const fix = fixMailboxSyncTimer(dir, { schedule: on, scheduler: w.scheduler, bin, run: w.run });
+  assert.equal(fix.fixed, false);
+  assert.equal(fs.existsSync(path.join(w.home, 'units')), false, 'nothing was written');
+});
+
+test('without the project shim the timer names only the activated release host, never a checkout script, a project-local install or PATH', () => {
+  const w = world();
+  const project = fs.mkdtempSync(path.join(os.tmpdir(), 'sync-timer-proj-'));
+  fs.mkdirSync(path.join(project, 'bin'), { recursive: true });
+  fs.writeFileSync(path.join(project, 'bin', 'fgos.mjs'), '');
+  fs.mkdirSync(path.join(project, 'node_modules', '.bin'), { recursive: true });
+  fs.writeFileSync(path.join(project, 'node_modules', '.bin', 'fgos'), '#!/bin/sh\n', { mode: 0o755 });
+  const none = checkMailboxSyncTimer(project, { schedule: on, scheduler: w.scheduler, run: w.run });
+  assert.equal(none.passed, true);
+  assert.match(none.message, /no activated fgos host resolves here/);
+  const release = path.join(project, 'release');
+  fs.mkdirSync(path.join(release, 'bin'), { recursive: true });
+  fs.writeFileSync(path.join(release, 'bin', 'fgos'), '#!/bin/sh\n', { mode: 0o755 });
+  fs.mkdirSync(path.join(project, '.fgos', 'installation'), { recursive: true });
+  fs.writeFileSync(path.join(project, '.fgos', 'installation', 'activation.json'), JSON.stringify({ status: 'ready', releasePath: release }));
+  assert.equal(fixMailboxSyncTimer(project, { schedule: on, scheduler: w.scheduler, run: w.run }).fixed, true);
+  const text = fs.readdirSync(path.join(w.home, 'units')).map((name) => fs.readFileSync(path.join(w.home, 'units', name), 'utf8')).join('\n');
+  assert.ok(text.includes(path.join(release, 'bin', 'fgos')));
+  assert.ok(!text.includes('fgos.mjs') && !text.includes('node_modules'));
+  fs.rmSync(project, { recursive: true, force: true });
+});

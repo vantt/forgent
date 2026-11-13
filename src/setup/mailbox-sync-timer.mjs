@@ -15,7 +15,7 @@ import os from 'node:os';
 import path from 'node:path';
 
 import { isConfigRefusal, readConfig } from '../config/facade.mjs';
-import { resolveFgosBin } from './bin-discovery.mjs';
+import { resolveWorkspaceInstallationBin } from './bin-discovery.mjs';
 
 /** The project's cross-machine settings; `null` when the project does not use cross-machine mail. */
 export function crossMachineSchedule(projectRoot) {
@@ -41,10 +41,21 @@ export function unitStem(projectRoot) {
 /** The line every unit file this module writes carries; a file without it is not ours to remove. */
 export const MARKER = 'fgos-managed: mailbox-sync-timer';
 
+/** A unit file is read by a scheduler that expands `%` (systemd specifiers) and ends a line at a control
+ * character, so a value holding either would change what the unit runs. The values are refused, never escaped. */
+export function refuseUnsafeUnitValues(values) {
+  for (const [name, value] of Object.entries(values)) {
+    if (/[%\u0000-\u001f\u007f]/.test(String(value))) {
+      throw new Error(`the mailbox sync timer refuses ${name}: it holds "%" or a control character`);
+    }
+  }
+}
+
 const quote = (text) => `"${String(text).replace(/(["\\])/g, '\\$1')}"`;
 
 /** The two systemd user units. The service runs the child once; the timer repeats it. */
 export function renderSystemd({ stem, bin, projectRoot, remote, intervalSec }) {
+  refuseUnsafeUnitValues({ bin, projectRoot, remote });
   return {
     [`${stem}.service`]: [
       `# ${MARKER}`,
@@ -76,6 +87,7 @@ const xml = (text) => String(text).replace(/&/g, '&amp;').replace(/</g, '&lt;').
 
 /** The launchd agent: the same child on a fixed interval. */
 export function renderLaunchd({ stem, bin, projectRoot, remote, intervalSec }) {
+  refuseUnsafeUnitValues({ bin, projectRoot, remote });
   const args = [bin, 'hook', 'mailbox-sync', '--dir', path.resolve(projectRoot), '--remote', remote];
   return {
     [`dev.fgos.${stem}.plist`]: [
@@ -190,6 +202,13 @@ function ownedUnits(scheduler, stem) {
   });
 }
 
+/** The host binary of the release this project has activated; never a checkout script, a project-local
+ * install or whatever `fgos` the PATH holds. */
+function activatedHostBin(cwd) {
+  const found = resolveWorkspaceInstallationBin(cwd);
+  return found ? { path: found } : null;
+}
+
 function plan(cwd, { schedule, scheduler, bin }) {
   const found = schedule();
   if (!found) {
@@ -203,20 +222,25 @@ function plan(cwd, { schedule, scheduler, bin }) {
   // The project's installation shim outlives an upgrade; a release path would not.
   const shim = path.join(cwd, '.fgos', 'installation', 'bin', 'fgos');
   const resolved = isExecutable(shim) ? { path: shim } : bin(cwd);
-  if (!resolved) return { skip: 'no fgos binary resolves here, so the timer cannot name one' };
+  if (!resolved) return { skip: 'no activated fgos host resolves here, so the timer cannot name one' };
   const stem = unitStem(cwd);
-  return { chosen, stem, files: chosen.render({ stem, bin: resolved.path, projectRoot: cwd, ...found }), found };
+  try {
+    return { chosen, stem, files: chosen.render({ stem, bin: resolved.path, projectRoot: cwd, ...found }), found };
+  } catch (err) {
+    return { refused: err.message };
+  }
 }
 
 export function checkMailboxSyncTimer(
   cwd,
-  { schedule = () => crossMachineSchedule(cwd), scheduler = () => schedulerFor(), bin = (dir) => resolveFgosBin(dir), run = defaultRun } = {},
+  { schedule = () => crossMachineSchedule(cwd), scheduler = () => schedulerFor(), bin = activatedHostBin, run = defaultRun } = {},
 ) {
   const p = plan(cwd, { schedule, scheduler, bin });
   if (p.orphan) {
     return { passed: false, message: `${p.orphan.chosen.kind} timer ${p.orphan.stem} is still installed but cross-machine mail is off here (fgos doctor --fix removes it; only files with the ${MARKER} marker are touched)` };
   }
   if (p.skip) return { passed: true, message: p.skip };
+  if (p.refused) return { passed: true, message: `warning: no mailbox sync timer: ${p.refused}` };
   const state = stateOf({ scheduler: p.chosen, files: p.files, stem: p.stem, run });
   if (state === 'ok') {
     return { passed: true, message: `${p.chosen.kind} timer ${p.stem} takes mail every ${p.found.intervalSec} s, even when no session is running a tool` };
@@ -230,11 +254,12 @@ export function checkMailboxSyncTimer(
 /** Writes the unit files and enables them; leaves any other unit as it was. */
 export function fixMailboxSyncTimer(
   cwd,
-  { schedule = () => crossMachineSchedule(cwd), scheduler = () => schedulerFor(), bin = (dir) => resolveFgosBin(dir), run = defaultRun } = {},
+  { schedule = () => crossMachineSchedule(cwd), scheduler = () => schedulerFor(), bin = activatedHostBin, run = defaultRun } = {},
 ) {
   const p = plan(cwd, { schedule, scheduler, bin });
   if (p.orphan) return removeOwned(p.orphan, run);
   if (p.skip) return { fixed: false, message: `skipped: ${p.skip}` };
+  if (p.refused) return { fixed: false, message: `skipped: ${p.refused}` };
   fs.mkdirSync(p.chosen.dir, { recursive: true });
   for (const [name, text] of Object.entries(p.files)) {
     const file = path.join(p.chosen.dir, name);
