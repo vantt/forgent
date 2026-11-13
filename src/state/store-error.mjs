@@ -13,6 +13,25 @@ export class StoreError extends Error {
 }
 
 /**
+ * Runs `fn` and, when it throws (or its promise rejects) an error that names no fault class of its own, marks that
+ * error with `faultClass`: the class of the malformed-call stage `fn` is, recorded where the fault is detected
+ * instead of by a position the shell tracks. An error that already carries a class keeps it; a null class marks
+ * nothing.
+ */
+export function withFaultClass(faultClass, fn) {
+  const mark = (err) => {
+    if (faultClass && err !== null && typeof err === 'object' && !err.faultClass) err.faultClass = faultClass;
+    return err;
+  };
+  try {
+    const result = fn();
+    return result instanceof Promise ? result.catch((err) => { throw mark(err); }) : result;
+  } catch (err) {
+    throw mark(err);
+  }
+}
+
+/**
  * Classify an error by its own `.category` string rather than an instanceof chain, so a new error class only has to
  * set `.category` to take part. Anything without one is 'unexpected' (callers map that to exit 1).
  */

@@ -31,7 +31,7 @@ import readline from 'node:readline';
 import { execFileSync, execSync, spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { addWork, moveWork, settleClaim, editWork, resolveParkReason, addDecision, addOutcome, recordFriction, listWork, readyWork, isDepsAndLineageReady, footprintConflicts, computedSchedule, readRawEvents, putInAwaiting, answerAwaiting, setFocus, goalFocusShow, assertAcceptanceEvidence, assertPlanEvidence, assertValidDocType, recordGateApprove, recordCall, recordCallReturn,      parseDecisionRelation, decisionTextLooksLikeSupersession, registerTopicStore, renameTopicStore, splitTopicStore, mergeTopicStore, retireTopicStore, reserveDocStore, registerDocStore, markDocRenderedStore, promoteDocStore, demoteDocStore, supersedeDocStore, retireDocStore, moveDocPathStore, attestDocStore } from '../src/state/store.mjs';
-import { StoreError, categoryOf } from '../src/state/store-error.mjs';
+import { StoreError, categoryOf, withFaultClass } from '../src/state/store-error.mjs';
 import { EXIT_CODES } from '../src/cli/exit-codes.mjs';
 import { exitCodeOf } from '../src/cli/verb-exit.mjs';
 import { resolveDocPath } from '../src/report/knowledge-resolver.mjs';
@@ -4197,15 +4197,11 @@ async function main() {
     return;
   }
 
-  // tsk-5z0: which pre-handler fault the code is currently exposed to, so the
-  // catch below can tell a malformed CALL apart from a verb's own refusal
-  // without reading `err.message` (that would couple this to ~73 hand-written
-  // strings and misclassify the moment one is reworded). Each assignment
-  // names what the very next statement can throw; `null` means "past the
-  // pre-handler region — whatever fails now is the verb answering correctly".
-  // `parseArgs` sits inside the try for exactly this reason: outside it, an
-  // arg-parse fault never reached this catch at all and could not be recorded.
-  let faultClass = 'arg-parse';
+  // tsk-5z0: the catch below tells a malformed CALL apart from a verb's own refusal without reading `err.message`: an
+  // error that carries a `faultClass` is a malformed call of that class, anything else is the verb answering
+  // correctly. Each pre-handler stage marks its own errors through `withFaultClass` (a StoreError may also carry the
+  // class from where it is thrown). `parseArgs` sits inside the try for exactly this reason: outside it, an arg-parse
+  // fault never reached this catch at all and could not be recorded.
   let dir;
   // Set once the verb is known: whether it is itself a seal or publish child, and its sub-verb (the only argument the
   // fault record keeps by value).
@@ -4213,21 +4209,21 @@ async function main() {
   let sub;
   const { currentDispatchDepth } = await import('../src/runner/dispatch/adapters.mjs');
   try {
-    const { flags, positional } = parseArgs(rest);
+    const { flags, positional } = withFaultClass('arg-parse', () => parseArgs(rest));
 
     // Same rule as the Rust host: any exact `--help`/`-h` token asks for help,
     // even where the parser took it as the previous flag's value.
-    if ((rest.includes('--help') || rest.includes('-h')) && handleVerbHelp(verb, flags, positional)) {
+    if (withFaultClass('arg-parse', () => (rest.includes('--help') || rest.includes('-h')) && handleVerbHelp(verb, flags, positional))) {
       return;
     }
 
-    faultClass = 'unknown-flag';
     const flagEntry = COMMAND_REGISTRY.find((e) => e.name === verb);
-    const unknownFlag = flagEntry && !flagEntry.nativeOnly ? unknownFlagMessage(flagEntry, flags, positional) : null;
-    if (unknownFlag) throw new StoreError('validation', unknownFlag);
+    withFaultClass('unknown-flag', () => {
+      const unknownFlag = flagEntry && !flagEntry.nativeOnly ? unknownFlagMessage(flagEntry, flags, positional) : null;
+      if (unknownFlag) throw new StoreError('validation', unknownFlag);
+    });
 
-    faultClass = 'dir-invalid';
-    dir = resolveInvocationRoot({ cwd: process.cwd(), dir: flags.dir, policy: verb === 'init' ? 'strict-cwd' : 'caller-tree' }).fgosDir;
+    dir = withFaultClass('dir-invalid', () => resolveInvocationRoot({ cwd: process.cwd(), dir: flags.dir, policy: verb === 'init' ? 'strict-cwd' : 'caller-tree' }).fgosDir);
     const entry = COMMAND_REGISTRY.find((e) => e.name === verb);
     if (entry?.nativeOnly) {
       process.stderr.write(`fgos: "${verb}" is only available in the native fgOS host. Install a release with "fgctl init" (https://github.com/vantt/forgent#install).\n`);
@@ -4235,23 +4231,22 @@ async function main() {
     }
     // Whether this verb may touch the store from here (missing store, disconnected snapshot, `init` in a worktree, an
     // empty-looking view) is one decision, `admitStoreAccess`; its refusals carry their own fault class.
-    const { warning } = admitStoreAccess({
+    const { warning } = withFaultClass('dir-invalid', () => admitStoreAccess({
       verb, store: entry?.store, mutates: declared(entry?.mutatesStore, positional, flags), dir, cwd: process.cwd(), explicitDir: flags.dir !== undefined,
-    });
+    }));
     if (warning) process.stderr.write(warning);
     // Past this line the verb's own handler runs, and its refusals ("work X
     // not found", an Iron Law trip, a held lock) are correct answers rather
     // than misuse — so nothing there is recorded. The one exception is an
-    // unknown verb: its error is thrown deep inside `runVerb`, where position
-    // alone would file it as an ordinary refusal, but the registry lookup
-    // above already answers it without new machinery. The error itself still
+    // unknown verb: its error is thrown deep inside `runVerb`, where nothing
+    // else would file it as a malformed call, but the registry lookup above
+    // already answers it, so the stage below marks it. The error itself still
     // comes from `runVerb` unchanged.
-    faultClass = entry ? null : 'unknown-verb';
     // The Event Store lifecycle (spec §16) wraps the verb, its answer and its exit code; the verb's own registry entry
     // says whether it opens the store, ran Land, or is itself a seal or publish child.
     eventStoreChild = declared(entry?.eventStoreChild, positional, flags);
     sub = entry?.subcommands && Object.hasOwn(entry.subcommands, positional[0]) ? positional[0] : undefined;
-    await runWithEventStoreLifecycle({
+    await withFaultClass(entry ? null : 'unknown-verb', () => runWithEventStoreLifecycle({
       cwd: path.dirname(dir),
       // Resolved only for a verb that opens the store, and only once: it runs Git.
       trustedMain: () => mainCheckoutRootAt(path.dirname(dir)),
@@ -4282,7 +4277,7 @@ async function main() {
       // The exit code is the verb's own call (`exitCodeOf` (src/cli/verb-exit.mjs)): outcome verbs map to the canonical execution
       // codes (RUL99), `plan-lint` exits 1 on a hard finding, `doctor --strict` on a failing check. The default is 0.
       process.exitCode = exitCodeOf(verb, data, { positional, flags });
-    });
+    }));
   } catch (err) {
     // tsk-5z0: record before reporting, and only say the record exists when
     // one actually landed — `recordInvocationFault` returns null when the
@@ -4295,7 +4290,7 @@ async function main() {
       verb,
       sub,
       // The detached children have no caller to read their error, so a child that fails leaves a record whatever the verb's own classification is.
-      faultClass: err.faultClass ?? faultClass ?? (eventStoreChild ? 'event-store-child' : null),
+      faultClass: err.faultClass ?? (eventStoreChild ? 'event-store-child' : null),
       message: err.message,
       argv: process.argv.slice(2),
     });
