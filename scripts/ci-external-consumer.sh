@@ -419,25 +419,46 @@ else
 
     # The project's own config must keep its effective values across the upgrade, whichever file
     # format holds them afterwards. The proof sets one non-standard key and reads one the previous
-    # release wrote, in the legacy project file that release's init created, then reads both back
-    # through the candidate's `fgos config show --json`.
+    # release wrote, in the project file that release's init created, then reads both back
+    # through the candidate's `fgos config show --json`. A release that writes the legacy
+    # .fgos/config.json is edited in place; one that already writes .fgos/config.yaml is changed
+    # and read through its own `fgos config` door.
+    PROOF_KEYS_READER='
+      let d = "";
+      process.stdin.on("data", (c) => (d += c));
+      process.stdin.on("end", () => {
+        const value = JSON.parse(d).data.value;
+        if (typeof value.ironLaw?.level !== "string") { console.error("no ironLaw.level in the effective config"); process.exit(1); }
+        console.log(JSON.stringify({ "gateBypass.level": value.gateBypass?.level, "ironLaw.level": value.ironLaw.level }));
+      });
+    '
     UPGRADE_CONFIG="$UPGRADE_PROJECT/.fgos/config.json"
-    if [ ! -f "$UPGRADE_CONFIG" ]; then
-      echo "Step failed: $PREV_TAG fgctl init left no .fgos/config.json to set the proof's keys in" >&2
+    if [ -f "$UPGRADE_CONFIG" ]; then
+      CONFIG_KEYS_BEFORE="$(node -e '
+        const fs = require("node:fs");
+        const file = process.argv[1];
+        const config = JSON.parse(fs.readFileSync(file, "utf8"));
+        config.gateBypass = { ...config.gateBypass, level: "light" };
+        if (typeof config.ironLaw?.level !== "string") { console.error("no ironLaw.level in the previous release config"); process.exit(1); }
+        fs.writeFileSync(file, JSON.stringify(config, null, 2) + "\n");
+        console.log(JSON.stringify({ "gateBypass.level": config.gateBypass.level, "ironLaw.level": config.ironLaw.level }));
+      ' "$UPGRADE_CONFIG")" || {
+        echo "Step failed: recording the project config values before the upgrade" >&2
+        exit 1
+      }
+    elif [ -f "$UPGRADE_PROJECT/.fgos/config.yaml" ]; then
+      (cd "$UPGRADE_PROJECT" && PATH="$PREV_INSTALL_DIR:$PATH" .fgos/installation/bin/fgos config set gateBypass.level light --reason "upgrade proof sets a non-standard value" >/dev/null) || {
+        echo "Step failed: $PREV_TAG fgos config set gateBypass.level on the project before the upgrade" >&2
+        exit 1
+      }
+      CONFIG_KEYS_BEFORE="$(cd "$UPGRADE_PROJECT" && PATH="$PREV_INSTALL_DIR:$PATH" .fgos/installation/bin/fgos config show --json | node -e "$PROOF_KEYS_READER")" || {
+        echo "Step failed: recording the project config values before the upgrade" >&2
+        exit 1
+      }
+    else
+      echo "Step failed: $PREV_TAG fgctl init left neither .fgos/config.json nor .fgos/config.yaml to set the proof's keys in" >&2
       exit 1
     fi
-    CONFIG_KEYS_BEFORE="$(node -e '
-      const fs = require("node:fs");
-      const file = process.argv[1];
-      const config = JSON.parse(fs.readFileSync(file, "utf8"));
-      config.gateBypass = { ...config.gateBypass, level: "light" };
-      if (typeof config.ironLaw?.level !== "string") { console.error("no ironLaw.level in the previous release config"); process.exit(1); }
-      fs.writeFileSync(file, JSON.stringify(config, null, 2) + "\n");
-      console.log(JSON.stringify({ "gateBypass.level": config.gateBypass.level, "ironLaw.level": config.ironLaw.level }));
-    ' "$UPGRADE_CONFIG")" || {
-      echo "Step failed: recording the project config values before the upgrade" >&2
-      exit 1
-    }
 
     (cd "$UPGRADE_PROJECT" && PATH="$TEMP_INSTALL_DIR:$PATH" "$FGCTL_BIN" upgrade --from "$FGOS_TARBALL") || {
       echo "Step failed: candidate fgctl upgrade --from the candidate asset, on a $PREV_TAG project" >&2
@@ -453,14 +474,7 @@ else
       echo "Step failed: previousArtifactDigest after the upgrade is $AFTER_PREV, expected $BEFORE_DIGEST" >&2
       exit 1
     fi
-    CONFIG_KEYS_AFTER="$(cd "$UPGRADE_PROJECT" && PATH="$TEMP_INSTALL_DIR:$PATH" .fgos/installation/bin/fgos config show --json | node -e '
-      let d = "";
-      process.stdin.on("data", (c) => (d += c));
-      process.stdin.on("end", () => {
-        const value = JSON.parse(d).data.value;
-        console.log(JSON.stringify({ "gateBypass.level": value.gateBypass?.level, "ironLaw.level": value.ironLaw?.level }));
-      });
-    ')" || {
+    CONFIG_KEYS_AFTER="$(cd "$UPGRADE_PROJECT" && PATH="$TEMP_INSTALL_DIR:$PATH" .fgos/installation/bin/fgos config show --json | node -e "$PROOF_KEYS_READER")" || {
       echo "Step failed: fgos config show --json on the project upgraded from $PREV_TAG" >&2
       exit 1
     }
