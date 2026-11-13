@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "c2e8216fcff0f244dd5b39cefeebb3d529673ffc7ad2510d06118577155b8839",
+  "payloadDigest": "b5590280a1501af64e9feeb5a12fa859b1e4bd7d36de974847af88b43cfffb6d",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -448,7 +448,7 @@
     "packages/holder-lock/rust/src/semantics.rs": "cfb5e67d996db60f4493678cf1dbb2898c4d1028f6e6102d3c026dddd6763e91",
     "packages/holder-lock/rust/src/state_root.rs": "e1f212f2486da09f62ea68fff9ed08a42788319601946ed8fa3347f7f8539b6f",
     "packages/holder-lock/rust/src/tombstone.rs": "c83051cd8c7d405264deb827fb09997060edabeeee57ef6c1347bfc27b7ecd21",
-    "packages/holder-lock/rust/tests/borrow_git.rs": "2848998d6bbf07b6bbcc5ce7e42000c2bdf438c042a1bc639b777a8202f8e540",
+    "packages/holder-lock/rust/tests/borrow_git.rs": "6df71f9e1d364f60b144745b5aaadd6919f14299638f284b86fb0e0dbe0006a1",
     "packages/holder-lock/rust/tests/borrow_io.rs": "73c1bf13cd2ba16d31d9c91ccb4cc3c8dda7d9e699acf5713eea4fc3e0b26f9f",
     "packages/holder-lock/rust/tests/common/mod.rs": "33bb3a00037e8a57732ad4d5963529a75c50701e3ad8d54fd6f9f185b1693c87",
     "packages/holder-lock/rust/tests/multiprocess.rs": "560966d064bc2a119b6524eb7f20a04239fdc3d91f57ff8647cfdf726a6fa80c",
@@ -2725,7 +2725,7 @@
     },
     {
       "path": "packages/holder-lock/rust/tests/borrow_git.rs",
-      "line": 143,
+      "line": 153,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"

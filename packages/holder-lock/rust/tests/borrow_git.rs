@@ -124,6 +124,16 @@ fn control_without_the_gc_switch_leaks_the_lock_to_background_gc() {
         .status()
         .unwrap();
     assert!(st.success());
+    // git's detached auto maintenance on a repository this small ends in tens of milliseconds, so
+    // it could leave before the probe and the control read Free. Its pre-auto-gc hook runs inside
+    // that detached process, which keeps the description open while the hook sleeps.
+    {
+        use std::os::unix::fs::PermissionsExt;
+        let hook = repo.join(".git/hooks/pre-auto-gc");
+        fs::create_dir_all(hook.parent().unwrap()).unwrap();
+        fs::write(&hook, "#!/bin/sh\nsleep 2\n").unwrap();
+        fs::set_permissions(&hook, fs::Permissions::from_mode(0o755)).unwrap();
+    }
     add_loose_objects(git(), &repo).unwrap();
     let res = resource(&dir, "control");
     // This is intentionally below Handle: its Drop and release now settle
