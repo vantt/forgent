@@ -5,7 +5,7 @@ Document type: BA-grade subcomponent specification
 Audience: Human reviewer, maintainer, implementation agent, documentation agent
 Purpose: Define the one door through which any agent writes, changes, moves or retires maintained documentation, and the steps it follows
 Design status: Signed by the owner on 2026-11-12. A change is recorded as a new entry in section 15, decision history.
-Implementation: Not started. The doors it calls exist (Convention, the knowledge registry, doc-health, the decision index); the skill, the pointer line and the live templates do not
+Implementation: Partial. The retrospective writer (6.4) is implemented in the `fgos-coding-knowledge` skill. The doors it calls exist (Convention, the knowledge registry, doc-health, the decision index); the skill, the pointer line and the live templates do not
 Canonical: Yes
 Provenance: Sections 3, 4, 6.1, 7 and the template concept of the documentation area spec as of 2026-11-07, moved here when the owner split the area into subcomponents on 2026-11-12
 Writer type: Agent draft writer
@@ -165,7 +165,7 @@ Condition before it ships: a retrospective item whose knowledge fits no section 
 | Skill and pointer line | planned | write-door phase |
 | Live templates | planned | move and fix headers |
 | Locate step | planned | after document identity's view and verb |
-| Retrospective writer adds evidence to claim units | planned, first phase | item `p-ixrbglli5o` |
+| Retrospective writer adds evidence to claim units | implemented in the skill: `fgos-coding-knowledge` follows 6.4 (claims, interim ripgrep locate, grow with an evidence line and attest, or hand off to an admission request); the cleanup gate's handoff kind lands with `fgos knowledge handoff` | item `p-ixrbglli5o`: gate kind and handoff verb; `fgos doc locate` replaces the interim search |
 
 ## 13. Verification
 
