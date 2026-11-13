@@ -4,7 +4,8 @@
 use std::collections::{BTreeSet, HashMap};
 use std::fs::{self, File};
 use std::io::{self, Read};
-use std::os::fd::{AsRawFd, FromRawFd};
+use std::os::fd::FromRawFd;
+use std::os::unix::fs::FileExt;
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 use std::sync::{LazyLock, Mutex};
@@ -30,6 +31,8 @@ const DIAGNOSTIC_STDERR_BYTES: u64 = 4096;
 const DIAGNOSTIC_TIMEOUT: Duration = Duration::from_secs(2);
 /// The longest wait for bwrap to report the gate's pid.
 const INFO_TIMEOUT: Duration = Duration::from_secs(10);
+/// How often the report file is read while bwrap sets the namespace up.
+const INFO_POLL: Duration = Duration::from_micros(500);
 
 /// The driver for this machine: `bwrap-pidns` when bwrap can make a pid
 /// namespace, else `linux-pgroup`.
@@ -191,8 +194,11 @@ impl ContainmentDriver for BwrapPidns {
         if spec.argv.is_empty() {
             return Err(ContainmentError::SpawnFailed("empty gate command".into()));
         }
-        // bwrap reports the gate's host pid on this pipe once the namespace stands.
-        let (read_end, write_end) = cloexec_pipe()?;
+        // bwrap reports the gate's host pid into this file once the namespace
+        // stands. A file, never a pipe: bwrap releases the namespace's init only
+        // after the report is written, and a write to a pipe nobody reads (the
+        // caller ended first) kills bwrap there, stranding the init for good.
+        let info = info_file()?;
         let info_slot = spec
             .fd_map
             .iter()
@@ -212,12 +218,11 @@ impl ContainmentDriver for BwrapPidns {
             .iter()
             .map(|(slot, file)| (*slot, file))
             .collect();
-        mapped.push((FdSlot(info_slot), &write_end));
+        mapped.push((FdSlot(info_slot), &info));
         let mut child = spawn_mapped(&request, &mapped)
             .map_err(|err| ContainmentError::SpawnFailed(err.to_string()))?;
-        drop(write_end);
 
-        let gate_pid = match read_child_pid(read_end) {
+        let gate_pid = match read_child_pid(&info, &mut child) {
             Ok(pid) => pid,
             Err(why) => {
                 end_failed_spawn(&mut child);
@@ -574,53 +579,51 @@ pub(crate) fn pgroup_kill(
     pgroup::kill(members as ListFn, leader, seen, empty_wait)
 }
 
-fn cloexec_pipe() -> io::Result<(File, File)> {
-    let mut fds = [0 as libc::c_int; 2];
-    // SAFETY: pipe2 fills two descriptors on success.
-    if unsafe { libc::pipe2(fds.as_mut_ptr(), libc::O_CLOEXEC) } != 0 {
+/// The file bwrap reports into: anonymous, close-on-exec in the caller, and
+/// mapped into bwrap by its slot.
+fn info_file() -> io::Result<File> {
+    // SAFETY: memfd_create with a NUL-terminated name and a flag; the descriptor it returns is owned here.
+    let fd = unsafe { libc::memfd_create(c"fgos-bwrap-info".as_ptr(), libc::MFD_CLOEXEC) };
+    if fd < 0 {
         return Err(io::Error::last_os_error());
     }
-    // SAFETY: both descriptors were just created and are owned here.
-    Ok(unsafe { (File::from_raw_fd(fds[0]), File::from_raw_fd(fds[1])) })
+    // SAFETY: the descriptor was just created and is owned here.
+    Ok(unsafe { File::from_raw_fd(fd) })
 }
 
-/// Read bwrap's `--info-fd` report until it parses: `{"child-pid": N}`.
-fn read_child_pid(mut read_end: File) -> Result<u32, String> {
-    let start = Instant::now();
+/// Everything bwrap has written into the report file so far. The copy bwrap
+/// writes through shares the file's offset, so this reads by position.
+fn written_report(info: &File) -> Result<Vec<u8>, String> {
     let mut text = Vec::new();
+    let mut chunk = [0u8; 256];
     loop {
-        let left = INFO_TIMEOUT.saturating_sub(start.elapsed());
-        if left.is_zero() {
-            return Err("bwrap reported no gate pid in time".into());
+        let read = info
+            .read_at(&mut chunk, text.len() as u64)
+            .map_err(|err| err.to_string())?;
+        if read == 0 {
+            return Ok(text);
         }
-        let mut pfd = libc::pollfd {
-            fd: read_end.as_raw_fd(),
-            events: libc::POLLIN,
-            revents: 0,
-        };
-        // SAFETY: poll on one valid pollfd.
-        let ready = unsafe {
-            libc::poll(
-                &mut pfd,
-                1,
-                left.as_millis().min(i32::MAX as u128) as libc::c_int,
-            )
-        };
-        if ready < 0 && io::Error::last_os_error().kind() != io::ErrorKind::Interrupted {
-            return Err(io::Error::last_os_error().to_string());
-        }
-        if ready <= 0 {
-            continue;
-        }
-        let mut chunk = [0u8; 256];
-        let read = read_end.read(&mut chunk).map_err(|err| err.to_string())?;
         text.extend_from_slice(&chunk[..read]);
-        if let Some(pid) = parse_child_pid(&text) {
+    }
+}
+
+/// Read bwrap's `--info-fd` report until it parses: `{"child-pid": N}`. The
+/// file has no writer to hang up on, so bwrap ending first is read off `child`.
+fn read_child_pid(info: &File, child: &mut GateChild) -> Result<u32, String> {
+    let start = Instant::now();
+    loop {
+        if let Some(pid) = parse_child_pid(&written_report(info)?) {
             return Ok(pid);
         }
-        if read == 0 {
-            return Err(format!("{NO_GATE_PID} (user namespaces unavailable?)"));
+        if child.try_wait().map_err(|err| err.to_string())?.is_some() {
+            // Whatever bwrap wrote before it ended is in the file by now.
+            return parse_child_pid(&written_report(info)?)
+                .ok_or_else(|| format!("{NO_GATE_PID} (user namespaces unavailable?)"));
         }
+        if start.elapsed() >= INFO_TIMEOUT {
+            return Err("bwrap reported no gate pid in time".into());
+        }
+        std::thread::sleep(INFO_POLL);
     }
 }
 

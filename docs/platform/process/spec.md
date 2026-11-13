@@ -154,6 +154,8 @@ Added by the run supervisor ([run-supervisor spec](../run-supervisor/spec.md)); 
 
 2026-10-24: contained children start without forking the caller: every driver's `spawn_in` on unix goes through `mapped::spawn_mapped` (`posix_spawn` on Linux with glibc, the bwrap `--info-fd` slot and the caller's stdio files as its file actions, `POSIX_SPAWN_SETSID` for the session the `linux-pgroup` gate leads), so its cost no longer grows with the caller's memory; macOS and other non-glibc unix take the same door's `Command` fallback, which still forks.
 
+2026-11-13: bwrap's `--info-fd` report goes into an anonymous file (`memfd`), never a pipe. bwrap writes the report before it releases the namespace's init, and a write to a pipe nobody reads (the caller was killed in the few milliseconds before the report) kills bwrap with SIGPIPE there; the init then waits for that release for good, a stranded `bwrap ... -- git ...` that no tuple names, with or without `--die-with-parent`. With a file the write cannot fail, the namespace starts and `direct` mode's rule holds: it outlives its caller. The driver reads the file by position until the pid parses and reads bwrap's exit from the child handle, so bwrap ending first is still `bwrap ended without reporting a gate pid`.
+
 Driver selection: Linux uses `bwrap-pidns` when bwrap with user and PID namespaces works (probed once per process and path), else `linux-pgroup`; Windows `windows-job`; macOS `macos-tree`; anything else `unsupported-platform`. Port errors have stable names: `unsupported-platform`, `driver-unavailable`, `spawn-failed`, `namespace-unavailable`, `invalid-bwrap-prefix`, `io`.
 
 | Driver | Mechanism | `is_empty` | Level | Named escapes |

@@ -136,6 +136,48 @@ fn containment_supervisor_helper() {
     let _ = spawned.child.wait();
 }
 
+/// Role of the process the late-report test ends: it starts a gate through a
+/// bwrap that reports late, and is gone before the report.
+#[test]
+fn containment_late_report_helper() {
+    let Ok(dir) = std::env::var("FGOS_CONTAINMENT_LATE_DIR") else {
+        return;
+    };
+    let dir = PathBuf::from(dir);
+    let driver = BwrapPidns::new(PathBuf::from(fixture("bwrap-delayed-start.sh")));
+    let mut domain = driver.create("attempt-late-report").unwrap();
+    let script = fixture("heartbeat-grandchild.sh");
+    let launch = spec(
+        &["sh", &script, &dir.join("beat").display().to_string()],
+        StartMode::Direct,
+    );
+    fs::write(dir.join("spawning"), "1").unwrap();
+    let _ = driver.spawn_in(&mut domain, launch);
+}
+
+/// Ends every process whose command line names `dir`, whatever state it is in.
+struct NamingCleanup(PathBuf);
+impl Drop for NamingCleanup {
+    fn drop(&mut self) {
+        let needle = self.0.display().to_string();
+        for entry in fs::read_dir("/proc").unwrap().flatten() {
+            let Some(pid) = entry
+                .file_name()
+                .to_str()
+                .and_then(|n| n.parse::<i32>().ok())
+            else {
+                continue;
+            };
+            let named = fs::read(format!("/proc/{pid}/cmdline"))
+                .is_ok_and(|bytes| String::from_utf8_lossy(&bytes).contains(&needle));
+            if named && pid != std::process::id() as i32 {
+                // SAFETY: SIGKILL to a process named by this test's own scratch directory.
+                unsafe { libc::kill(pid, libc::SIGKILL) };
+            }
+        }
+    }
+}
+
 struct GateCleanup(ProcTuple);
 impl Drop for GateCleanup {
     fn drop(&mut self) {
@@ -197,6 +239,38 @@ fn containment_terminal_gate_dies_with_a_killed_supervisor() {
         "a terminal attempt dies with its supervisor"
     );
     drop(gate);
+}
+
+/// A caller that ends before bwrap reports must not strand the namespace: with
+/// nobody reading `--info-fd`, bwrap used to die on the broken report channel
+/// before releasing its init, which then waited for that release forever.
+#[test]
+fn containment_direct_gate_runs_on_when_its_caller_ends_before_bwrap_reports() {
+    if bwrap_driver("late-report").is_none() {
+        return;
+    }
+    let dir = scratch("late-report");
+    let _cleanup = NamingCleanup(dir.clone());
+    let mut helper = Command::new(std::env::current_exe().unwrap())
+        .args([
+            "--exact",
+            "containment_late_report_helper",
+            "--nocapture",
+            "--test-threads=1",
+        ])
+        .env("FGOS_CONTAINMENT_LATE_DIR", &dir)
+        .stdout(Stdio::null())
+        .stderr(Stdio::null())
+        .spawn()
+        .unwrap();
+    wait_for(&dir.join("spawning"));
+    sleep(Duration::from_millis(150));
+    helper.kill().unwrap();
+    helper.wait().unwrap();
+    assert!(
+        wait_for(&dir.join("beat")).contains('x'),
+        "the namespace started although its caller was gone before bwrap reported"
+    );
 }
 
 #[test]
