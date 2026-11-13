@@ -22,36 +22,36 @@ function setupGitRepoWithStore() {
   return { tmpDir, fgosDir };
 }
 
-test('fgos-coding-knowledge skill flow - end to end sequence', async () => {
+// The skill's default path: a unit that already carries the claim gains one
+// evidence line and an attestation; the writer opens no topic and reserves no
+// slot. Reserve, mark-rendered and promote keep their own proofs in
+// test/cli/knowledge-verbs.test.mjs; here they only build the existing unit.
+test('fgos-coding-knowledge grows an existing unit with an evidence line and attests it, without opening a topic or slot', async () => {
   const { tmpDir, fgosDir } = setupGitRepoWithStore();
   const fgosBin = path.resolve('bin/fgos.mjs');
 
-  // 1. Topic register
-  execSync(`node "${fgosBin}" topic register t1 --purpose-slug worktree-reclaim`, { cwd: tmpDir });
-
-  // 2. Reserve doc slot
+  // The existing unit that already carries the claim.
   const docPath = 'docs/worktree-reclaim/guide.md';
+  execSync(`node "${fgosBin}" topic register t1 --purpose-slug worktree-reclaim`, { cwd: tmpDir });
   execSync(`node "${fgosBin}" doc reserve t1 guide ${docPath}`, { cwd: tmpDir });
-
-  // 3. Write & commit file at docPath
   const fullPath = path.join(tmpDir, docPath);
   fs.mkdirSync(path.dirname(fullPath), { recursive: true });
-  fs.writeFileSync(fullPath, `---\nframework: diataxis\nmode: how-to\n---\n# Guide\n`, 'utf8');
+  fs.writeFileSync(fullPath, '---\nframework: diataxis\nmode: how-to\n---\n# Guide\n\nReclaim a worktree only after its run has exited.\n', 'utf8');
   execSync(`git add ${docPath} && git commit -m "add guide"`, { cwd: tmpDir, stdio: 'ignore' });
+  const before = rebuild(fgosDir);
+  const topicsBefore = Object.keys(before.topics).length;
+  const docsBefore = Object.keys(before.docs).length;
 
-  // 4. Attest
+  // grow: append the evidence section, commit by pathspec, then attest.
+  fs.appendFileSync(fullPath, '\n## Evidence\n\n- 2026-11-13 tsk-skill-flow: reclaim refused while the run was still alive.\n', 'utf8');
+  execSync(`git commit -m "docs(knowledge): guide gains evidence" -- ${docPath}`, { cwd: tmpDir, stdio: 'ignore' });
   const attestResult = execSync(`node "${fgosBin}" knowledge attest --doc-path ${docPath} --capture-id tsk-skill-flow`, { cwd: tmpDir, encoding: 'utf8' });
   assert.ok(attestResult.includes('attested'));
-  let view = rebuild(fgosDir);
+
+  const view = rebuild(fgosDir);
   assert.ok(view.docs['t1:guide'].sourceCaptureIds.includes('tsk-skill-flow'));
-
-  // 5. Mark rendered -> provisional
-  execSync(`node "${fgosBin}" doc mark-rendered --topic-id t1 --role guide`, { cwd: tmpDir });
-  view = rebuild(fgosDir);
-  assert.equal(view.docs['t1:guide'].docLifecycle, 'provisional');
-
-  // 6. Promote -> active
-  execSync(`node "${fgosBin}" doc promote t1 guide`, { cwd: tmpDir });
-  view = rebuild(fgosDir);
-  assert.equal(view.docs['t1:guide'].docLifecycle, 'active');
+  assert.equal(Object.keys(view.topics).length, topicsBefore);
+  assert.equal(Object.keys(view.docs).length, docsBefore);
+  const committed = execSync(`git show HEAD:${docPath}`, { cwd: tmpDir, encoding: 'utf8' });
+  assert.match(committed, /^## Evidence\n\n- 2026-11-13 tsk-skill-flow: /m);
 });
