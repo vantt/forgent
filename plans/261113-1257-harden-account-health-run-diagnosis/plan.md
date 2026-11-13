@@ -35,7 +35,7 @@ A reader of `result.json` / `unit-summary.json` can tell quota from harness in b
 |---|---|---|---|---|
 | P01 | [Agent-protocol: 429 is a quota stop; provider signal extracted](phase-01-agent-protocol-429-and-signal.md) | - | 0.5d | landed |
 | P02 | [Receipt carries `providerSignal`](phase-02-receipt-provider-signal.md) | P01 | 0.5d | pending |
-| P03 | [Run Result: `provider` category, no-report is infra](phase-03-run-result-provider-category-no-report.md) | - | 0.75d | pending |
+| P03 | [Run Result: `provider` category, no-report is infra](phase-03-run-result-provider-category-no-report.md) | - | 0.75d | landed |
 | P04 | [Settle: signal on the failure, quarantine dated from it, audit line per fault](phase-04-settle-signal-quarantine-audit.md) | P02, P03 | 0.75d | pending |
 | P05 | [Retire the Node wording list](phase-05-retire-node-wording-list.md) | P01, P04 | 0.5d | pending |
 | P06 | [Unit summary v3: infra facts persisted](phase-06-unit-summary-v3.md) | - | 0.75d | pending |
