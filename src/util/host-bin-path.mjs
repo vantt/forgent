@@ -35,13 +35,27 @@ function insideRoot(file, root) {
   }
 }
 
+/** The activation record in `activationPath` (`<installationDir>/activation.json`): the parsed object, or
+ * null when no file is there. A file that cannot be read or parsed throws; each caller decides what that
+ * means (the host lookup treats it as no activation, doctor reports it). The one reader of the record. */
+export function readActivationFile(activationPath) {
+  let text;
+  try {
+    text = fs.readFileSync(activationPath, 'utf8');
+  } catch (error) {
+    if (error.code === 'ENOENT') return null;
+    throw error;
+  }
+  return JSON.parse(text);
+}
+
 /** Binary of the release `<installationDir>/activation.json` activates, or
  * null when there is no ready activation or its entry is not a usable file
  * inside the release. */
 export function hostBinFromActivation(installationDir) {
   let activation;
   try {
-    activation = JSON.parse(fs.readFileSync(path.join(installationDir, 'activation.json'), 'utf8'));
+    activation = readActivationFile(path.join(installationDir, 'activation.json'));
   } catch {
     return null;
   }

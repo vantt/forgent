@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "fbaaa329c9025c7471471c84e66940feec88b338545b8fd7ea47ed18c9732966",
+  "payloadDigest": "25134764479e93c8c2c2389c2e0552e25b9289f44c18b95bca0e8e287bc25263",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -1151,7 +1151,7 @@
     "src/setup/model-pool-checks.mjs": "f686f00122bc1f43c5d0fe182f7879739f112ef4a361ccccf4a7d6a7ddf5bbd5",
     "src/setup/omp-natives-checks.mjs": "6f6faadb66ac09828741445c599dcbaee9462486157ab7074433e2dbcf4d9aad",
     "src/setup/project-launcher.mjs": "3153fdb9caad59eaeace759de1cd126c22f41585fcd1e15f00c1577ab0f9806b",
-    "src/setup/registrations.mjs": "01bc89bd31eaa245ce0f057f00733cee3f2db8ad882a3dc31185e5b9e33b7efe",
+    "src/setup/registrations.mjs": "ac32c0ff1be4a76727151fe212efab436454767059b0fcbee5d1cc6461154ef6",
     "src/setup/run-supervisor-checks.mjs": "31942f9b9dec0bdd009c05199f2fc1a2afe7e6b18f58c50c94d7aa18b0ad0421",
     "src/setup/runner-config-conversion.mjs": "6e2711a0a909265b82241901e7f9642889bdc3e9d1ab5a69fafd81b477a64ac6",
     "src/setup/seat-binding-checks.mjs": "61a2b752ec407709c25c5409ce00d595472d2acf4c99176300f3ecba3d539085",
@@ -1209,7 +1209,7 @@
     "src/util/format-duration.mjs": "aa3d4629659f6b635267965013716b45e71120cce5282f6b2a4503148c616ce9",
     "src/util/format-lock-duration.mjs": "87e069a71d25348768de8fe5116d2ac3759a2c1e775433a6511750491f874b3e",
     "src/util/git-paths.mjs": "fbb0b5af5b149853b9d5279062d417cee88a24ce161f782b5ae6dec3d10f1941",
-    "src/util/host-bin-path.mjs": "3c250abf554d7d7eb92ccbf687d836e1e22010dc1788d5da9da1ddd07fed4418",
+    "src/util/host-bin-path.mjs": "e9e0d4921a2a837f9a0e7aab9910b208d8c69273116b563e63d12421cf74c75e",
     "src/util/host-bin.mjs": "feea58b739293d12a06740b3f5c18bfe018d006381511d53816513d97f9683b1",
     "src/util/identity-mint.mjs": "533825271188a6e5dfba4c55e46d2ef69c07c07ae3150bda2872d0ea24a77159",
     "src/util/normalize-path.mjs": "e1519327a67834d6309a0e92e69d5fb46bb671a7ddfbe9ef5c36acc22fc3062a",
@@ -3605,42 +3605,42 @@
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 3390,
+      "line": 3389,
       "spawn": "checkBwrapAvailable -> src/setup/registrations.mjs:1285",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 3438,
+      "line": 3437,
       "spawn": "runAllConfinementProbes -> src/runner/dispatch/confinement/probes/harness.mjs:834",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 3479,
+      "line": 3478,
       "spawn": "checkBwrapAvailable -> src/setup/registrations.mjs:1285",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 3486,
+      "line": 3485,
       "spawn": "probePeerRunHidden -> src/runner/dispatch/confinement/probes/harness.mjs:525",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 3721,
+      "line": 3720,
       "spawn": "probeIdentity -> src/util/session-identity.mjs:56",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 3785,
+      "line": 3784,
       "spawn": "createSeatBindingClient -> src/seat-binding/client.mjs:142",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"

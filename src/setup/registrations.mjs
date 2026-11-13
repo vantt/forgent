@@ -115,7 +115,7 @@ import { fixEventStoreLockDirs } from './event-store-fixes.mjs';
 import { foldEvents } from '../state/replay.mjs';
 import { discoverProjectPromptTemplates, TemplateResolutionError } from '../runner/dispatch/operation-prompt-templates.mjs';
 import { resolveHostBin, invokeHost } from '../util/host-bin.mjs';
-import { resolveActiveHostBin } from '../util/host-bin-path.mjs';
+import { readActivationFile, resolveActiveHostBin } from '../util/host-bin-path.mjs';
 import { probeIdentity } from '../util/session-identity.mjs';
 import { createSeatBindingClient, resolveSeatBindingHost } from '../seat-binding/client.mjs';
 import { checkSeatBindingDryBind } from './seat-binding-checks.mjs';
@@ -2574,12 +2574,12 @@ function resolveActiveReleaseForDoctor(dir, scope = {}) {
     return { releasePath, manifestPath: null, manifest: null };
   }
 
-  // 2. Workspace activation binding (.fgos/installation/activation.json)
+  // 2. Workspace activation binding (.fgos/installation/activation.json), through the one activation reader
   for (const candidate of candidateDirs) {
     const activationPath = path.join(candidate, '.fgos', 'installation', 'activation.json');
     if (fs.existsSync(activationPath)) {
       try {
-        const act = JSON.parse(fs.readFileSync(activationPath, 'utf8'));
+        const act = readActivationFile(activationPath);
         if (act.releasePath) {
           const manifestPath = path.join(act.releasePath, 'manifest.json');
           if (fs.existsSync(manifestPath)) {
@@ -2592,6 +2592,8 @@ function resolveActiveReleaseForDoctor(dir, scope = {}) {
     }
   }
 
+  // 3-5 are the development door's cases (`npm run fgos:dev`, a staged or dev-built release with no activation);
+  // an activated project never reaches them.
   // 3. Staged release manifest in candidate dirs
   for (const candidate of candidateDirs) {
     const rootManifest = path.join(candidate, 'manifest.json');
@@ -2767,7 +2769,7 @@ function doctorDriftPath(base, relative = '.', optional = false) {
 function doctorDriftActivation(checkout) {
   const activationPath = doctorDriftPath(checkout, '.fgos/installation/activation.json', true);
   if (!activationPath) return null;
-  const activation = JSON.parse(fs.readFileSync(activationPath, 'utf8'));
+  const activation = readActivationFile(activationPath);
   if (!activation || typeof activation.releasePath !== 'string' || !path.isAbsolute(activation.releasePath)) {
     throw new Error(`Invalid activation releasePath in ${activationPath}; an absolute release path is required`);
   }
@@ -2934,10 +2936,6 @@ const shortDigest = (digest) => String(digest).replace(/^sha256:/, '').slice(0, 
 export function checkActivationMatchesPin(cwd) {
   const root = resolveMainCheckoutRoot(cwd) ?? path.resolve(cwd);
   try {
-    const readJson = (relative) => {
-      const file = doctorDriftPath(root, relative, true);
-      return file ? JSON.parse(fs.readFileSync(file, 'utf8')) : null;
-    };
     const pinFile = doctorDriftPath(root, '.fgos/distribution.json', true);
     if (!pinFile) return { passed: true, status: 'skip', message: 'activation-matches-pin skipped: no committed pin' };
     let pinned;
@@ -2952,7 +2950,8 @@ export function checkActivationMatchesPin(cwd) {
         fixCommand: 'restore .fgos/distribution.json from version control, or fgctl upgrade to write a new pin',
       };
     }
-    const activation = readJson('.fgos/installation/activation.json');
+    const activationFile = doctorDriftPath(root, '.fgos/installation/activation.json', true);
+    const activation = activationFile ? readActivationFile(activationFile) : null;
     if (typeof activation?.artifactDigest !== 'string') return { passed: true, status: 'skip', message: 'activation-matches-pin skipped: no activation in this workspace' };
     if (activation.artifactDigest === pinned) return { passed: true, message: `active release matches the pin (${shortDigest(pinned)})` };
     const reason = typeof activation.pinOverrideReason === 'string' ? activation.pinOverrideReason : 'none';
