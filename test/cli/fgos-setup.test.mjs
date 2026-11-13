@@ -178,17 +178,6 @@ test('setup inside a .fgos/-less linked worktree still succeeds (setup never tou
 // tsk-5hi: setup now also runs every registered fix (`runFixes()`, the same
 // call `doctor --fix` already makes) instead of leaving a person to
 // separately discover and run `doctor --fix`.
-test('setup runs every registered fix and reports them under "fixed"', () => {
-  const cwd = rawTmpCwd();
-  const tmpHome2 = rawTmpCwd();
-  const result = run(cwd, ['setup'], { HOME: tmpHome2, USERPROFILE: tmpHome2 });
-  assert.equal(result.status, 0, `setup unexpectedly failed: ${result.stderr}`);
-  const data = envelopeData(result.stdout);
-  assert.ok(Array.isArray(data.fixed), 'setup result missing a "fixed" array');
-  const byId = Object.fromEntries(data.fixed.map((entry) => [entry.id, entry]));
-  assert.ok('gateway-token-configured' in byId, 'setup did not run the gateway-token-configured fix');
-});
-
 // The persisted view without its cursor. The cursor records which commits were certified when the view was written;
 // every command seals after it writes, so it differs between two reads of the same folded history, while the fold
 // and its revision do not.

@@ -12,13 +12,20 @@ Branch `harden/t9-p10` (rebased on origin/main, pushed, not landed: main is froz
 - **Use cases.** `setupUseCase` (`src/setup/setup-use-case.mjs`) and `wireAgentsUseCase`; arms hold flags, one call, print.
 
 ## Tests
-Retired: `fgos-preflight.test.mjs` (behaviour removed; checks owned by the mirror test, the citation test and the script); three doctor orphan cases (loose root, empty shell, attempt home) and the intent half of the legacy stuck case, owned by `dispatch-confinement-reaper-fence.test.mjs` and the run-supervisor adopt tests. Added: probe-once, parallel claude calls, timer refusals and host-only naming, activation reader, host-cannot-answer row, unknown preflight, wire-agents plan.
+Retired: `fgos-preflight.test.mjs` (behaviour removed; checks owned by the mirror test, the citation test and the script); three doctor orphan cases (loose root, empty shell, attempt home) and the intent half of the legacy stuck case, owned by `dispatch-confinement-reaper-fence.test.mjs` and the run-supervisor adopt tests. Added: in-process setup cases, probe-once, parallel claude calls, timer refusals and host-only naming, activation reader, host-cannot-answer row, unknown preflight, wire-agents plan.
 
 ## Gates
 Full `npm test`: 8858 tests, 0 fail, no ERROR lines. architecture, doc-health, citation drift green; census scan 0 undeclared; fmt, clippy, msvc and aarch64-apple-darwin check on `fgos-distribution` (comment-only Rust change).
 
+## Doctor speed (measured)
+Same machine, load average 1.1 to 1.3, `runDoctor` in process against the main checkout, three runs each, interleaved (a spawned `npm run fgos:dev -- doctor --json` is 55 s of host start-up around it and hides the row cost, so the rows were timed directly). origin/main: 2123, 2026, 2052 ms, median **2052 ms**. This branch: 1450, 1483, 1371 ms, median **1450 ms** (-29%). Rows 110 in both.
+Shim probes, on a scratch project with all five hook files and a shim: origin/main **14**, this branch **6** (each distinct probe once: dispatch, delete guard, and the mailbox probe per CLI). `claude` calls per run: 3 in both, in series on main, together on this branch. Counted by wrapping `child_process` spawn calls for the shim path and `claude`.
+
+## Setup test move
+Five spawned-CLI cases became in-process cases in `test/setup/setup-use-case.test.mjs`, each owned there: core.hooksPath wired absolute (was checks-setup-config), no `.git` (checks-setup-hookspath), custom hooksPath untouched (checks-setup-hookspath), rc line written once with no declined reason (checks-setup-idempotent, now also proves a second run adds nothing), every registered fix runs (fgos-setup). The three emptied files are deleted. Kept as CLI wiring proofs: envelope shape, `--pretty`, the non-checkout copy declining the rc write, and setup inside a linked worktree (it proves the arm's `--dir` resolution, not the use case). Test files: -3, spawned setup cases: -5 +0.
+
 ## Not done
-Spawned-CLI setup cases were not moved into unit tests (they pass; the planned -140 tests saving is not taken). Doctor timing before/after not measured. MAIL (timer) and DOC (explanation page) not yet told.
+MAIL (timer) and DOC (explanation page) are not yet told; HARDEN does it at landing.
 
 ## Authority
 Nothing held in two layers found beyond the three AU-07 rows and AU-02, now moved.
