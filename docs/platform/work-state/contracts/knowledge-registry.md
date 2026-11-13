@@ -229,6 +229,34 @@ mode: explanation
 
 `docPath` in new attestations must equal the document's `currentPath`. Old capture events remain unchanged and are resolved through aliases.
 
+### 7.5 Handoff
+
+A handoff records that a retrospective item stated a claim no existing unit carries, and that the claim's material went to an admission request work item instead of a new document. It is the completion path [write door §6.4](../../documentation/subcomponents/write-door/spec.md#64-the-retrospective-writer) names. The event is `capture.handoff`, written by `fgos knowledge handoff --capture-id <id> --request <requestId> --claim <text> --material-file <path> --locate-file <path>`; the material and the locate result come from files, so no drafted text is spliced into a shell command.
+
+A handoff records:
+
+```yaml
+captureId: tsk-123          # the retrospective item
+requestId: tsk-456          # the admission request work item
+claim: Reclaim keeps the branch of a merged worktree.
+material: <the drafted text the writer would have written>
+locate:
+  query: reclaim keeps branch
+  candidates:
+    - path: docs/worktree-reclaim/guide.md
+      section: Reclaim > Branches   # optional, kept as given
+      why_not: covers deletion, not keeping
+  places: [docs/worktree-reclaim/]  # optional, kept as given
+```
+
+Rules:
+
+1. The reducer refuses a missing or empty `captureId`, `requestId`, `claim`, `material` or `locate.query`, a candidate without `path` or `why_not`, and a `requestId` that is not an existing work item.
+2. An empty candidate list is valid: the query is the record that the search found nothing.
+3. The material lives once, in this event; the request item's text links to it.
+4. One item may hand off several claims. The view keeps every handoff per capture under `handoffsByCapture`.
+5. The cleanup gate accepts a handoff as retrospective content while its request item still exists. A handoff whose request item is gone is not accepted.
+
 ## 8. Producer Enforcement
 
 The producer door must enforce registry membership in code. Skill prose is not enough.
