@@ -38,7 +38,7 @@ Scans run on the stacked branch (`harden/t9-p16-close`, 2026-11-13):
 2. **Doors, scanned.**
    - `agy` in `bin/fgos.mjs`: one hit, the usage text of `hook` (`--format=standard|agy`); no inline hook branch. Met.
    - `resolveMainCheckoutRoot(...) ?? ` in `bin/fgos.mjs`: none. Met.
-   - `faultClass = `: **four hits remain** (`bin/fgos.mjs:4208, 4224, 4229, 4249`, the argument-parse path of `main()`). The fault log itself moved to `src/observe` (P04), but the arm still names the class. Not met as written; see section 6.
+   - `faultClass = `: none in `bin/fgos.mjs`. The four sites of the argument-parse path were replaced on `harden/t9-fault-class` (`478681a9a`, stacked on `harden/t9-p25`): each pre-handler stage runs through `withFaultClass` (`src/state/store-error.mjs`, beside `StoreError`'s own `faultClass`), so the error carries its class and `main()` tracks no position. Owner of the parse-fault classes: `test/observe/invocation-fault-log.test.mjs` (unknown-verb, dir-invalid, unknown-flag cases and the `withFaultClass` unit case). Met once that branch lands (after P25).
    - `preflight` under `bin src scripts packages/host-runtime/contracts`: no verb, arm, registry entry or route; remaining hits are the Git port's own `preflight` operation, the Workflow seat preflight, `preflightUnitWorktree`, and two comments (`bin/fgos.mjs:19`, `:3411`). Met for the verb; the criterion's "nothing" is too strict for the other meanings of the word.
    - `bin/fgos.mjs` in the gateway and dashboard Rust sources: comments only. Met.
    - `src/event-store`, `src/workflow`, `src/observe`, `src/verbs`, `src/setup` import nothing from `src/cli`: no hit, and the exception list in `test/architecture.test.mjs` is empty (P10).
@@ -71,7 +71,7 @@ Untouched, as the plan required. They stay listed in `plans/reports/council-2611
 
 ## 6. Deviations and open questions
 
-- `faultClass` in `main()` (criterion 2): move into the fault-log door or accept the arm naming it. Owner: HARDEN.
+- `faultClass` in `main()` (criterion 2): closed on `harden/t9-fault-class`; lands after P25.
 - Criterion 7's "no new row" held until P25; the retired row is a decision, not a drift.
 - Host overhead stays above 30 ms (32 ms measured after P12); the cache question is the owner's.
 
