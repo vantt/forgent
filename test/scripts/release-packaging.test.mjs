@@ -67,6 +67,40 @@ test('the release assembly keeps one SHA256SUMS entry per file when every target
   assert.ok(release.includes('grep -q "  $installer\\$" dist/SHA256SUMS'), 'both installers must have an entry before publishing');
 });
 
+// The release run calls the assets workflow twice (its own assets and the suite's reproducibility proof); both used
+// to upload the same artifact names, and publish shipped the suite's assets-check build under the tag.
+test('a release publishes only assets named for its tag, and the suite assets carry a prefix of their own', { skip: process.platform === 'win32' }, () => {
+  const release = read('.github', 'workflows', 'release.yml');
+  assert.match(release, /pattern: release-assets-\*/);
+  const ci = read('.github', 'workflows', 'ci.yml');
+  assert.match(ci, /addon-reproducibility:\n(?:.*\n)*?\s+uses: \.\/\.github\/workflows\/release-assets\.yml\n(?:\s+#.*\n)*\s+with:\n\s+artifact-prefix: suite\n/);
+  const assets = read('.github', 'workflows', 'release-assets.yml');
+  assert.match(assets, /name: \$\{\{ inputs\.artifact-prefix \}\}-assets-\$\{\{ matrix\.target \}\}/);
+  assert.match(assets, /artifact-prefix:\n(?:.*\n)*?\s+default: release\n/);
+  // Run publish's own name check on a dist holding one asset of the tag and one of an assets-check build.
+  const start = release.indexOf('          # Every asset carries the tag');
+  const end = release.indexOf('          done\n', start) + '          done\n'.length;
+  assert.ok(start > 0 && end > start, 'publish has the tag-name check');
+  const check = release.slice(start, end).replace(/^ {10}/gm, '');
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-publish-names-'));
+  try {
+    fs.mkdirSync(path.join(dir, 'dist'));
+    const run = (names) => {
+      for (const name of fs.readdirSync(path.join(dir, 'dist'))) fs.rmSync(path.join(dir, 'dist', name));
+      for (const name of names) fs.writeFileSync(path.join(dir, 'dist', name), '');
+      return spawnSync('bash', ['-euc', check], { cwd: dir, env: { ...process.env, GITHUB_REF_NAME: 'v0.2.0-rc.8' }, encoding: 'utf8' });
+    };
+    const own = ['fgos-v0.2.0-rc.8-x86_64-unknown-linux-gnu.tar.gz', 'fgctl-v0.2.0-rc.8-x86_64-pc-windows-msvc.tar.gz'];
+    assert.equal(run(own).status, 0);
+    const mixed = run([...own, 'fgos-v0.2.0-assets-check-x86_64-pc-windows-msvc.tar.gz']);
+    assert.notEqual(mixed.status, 0);
+    assert.match(mixed.stderr, /fgos-v0\.2\.0-assets-check-x86_64-pc-windows-msvc\.tar\.gz is not named for v0\.2\.0-rc\.8/);
+    assert.notEqual(run(['fgctl-v0.2.0-rc.80-x86_64-unknown-linux-gnu.tar.gz']).status, 0, 'a longer tag is another tag');
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});
+
 test('release workflows: publishing lives only in release.yml under the tag trigger', () => {
   const release = read('.github', 'workflows', 'release.yml');
   assert.match(release, /tags:\s*\n\s*- "v\*"/);

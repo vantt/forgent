@@ -65,6 +65,18 @@ jobs:
           mkdir -p dist
           cp parts/*/fgos-*.tar.gz parts/*/fgctl-*.tar.gz dist/
 
+          # Every asset carries the tag it is published under; one built for another version (an
+          # assets-check build of the suite) never ships under this tag.
+          for asset in dist/fgos-*.tar.gz dist/fgctl-*.tar.gz; do
+            case "$(basename "$asset")" in
+              fgos-"$GITHUB_REF_NAME"-*.tar.gz|fgctl-"$GITHUB_REF_NAME"-*.tar.gz) ;;
+              *)
+                echo "Error: $(basename "$asset") is not named for $GITHUB_REF_NAME" >&2
+                exit 1
+                ;;
+            esac
+          done
+
           # Every target ships the same installers; refuse a release where they differ.
           for installer in install.sh install.ps1; do
             first=""

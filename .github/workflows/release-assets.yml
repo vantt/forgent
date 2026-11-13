@@ -14,6 +14,13 @@ on:
         description: Release tag the assets are named for (for example v0.2.0-rc.2). Empty means v<package.json version>-assets-check.
         type: string
         default: ""
+      artifact-prefix:
+        description: >-
+          Prefix of every artifact this workflow uploads. A run that calls this workflow twice (the
+          release: its own assets and the suite's reproducibility proof) gives each call its own
+          prefix, so publish can never download the other call's assets.
+        type: string
+        default: release
 
 permissions:
   contents: read
@@ -94,7 +101,7 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: shipped-addon-${{ matrix.target }}
+          name: ${{ inputs.artifact-prefix }}-shipped-addon-${{ matrix.target }}
           path: addon-digest.txt
           if-no-files-found: error
 
@@ -127,7 +134,7 @@ jobs:
       - name: Upload release assets
         uses: actions/upload-artifact@v4
         with:
-          name: release-assets-${{ matrix.target }}
+          name: ${{ inputs.artifact-prefix }}-assets-${{ matrix.target }}
           path: |
             dist/fgos-*.tar.gz
             dist/fgctl-*.tar.gz
@@ -166,7 +173,7 @@ jobs:
         run: node --input-type=module -e "import fs from 'node:fs'; import {hashFile,nativeAddonLibraryName} from './scripts/build-rust-distribution.mjs'; fs.writeFileSync('addon-digest.txt',hashFile('target/release/'+nativeAddonLibraryName())+'\n');"
       - uses: actions/upload-artifact@v4
         with:
-          name: independent-addon-${{ matrix.target }}
+          name: ${{ inputs.artifact-prefix }}-independent-addon-${{ matrix.target }}
           path: addon-digest.txt
           if-no-files-found: error
 
@@ -177,12 +184,14 @@ jobs:
     steps:
       - uses: actions/download-artifact@v4
         with:
-          pattern: '*addon-*'
+          pattern: ${{ inputs.artifact-prefix }}-*addon-*
           path: addon-digests
       - name: Compare both published targets
         shell: bash
+        env:
+          PREFIX: ${{ inputs.artifact-prefix }}
         run: |
           set -eu
           for triple in x86_64-unknown-linux-gnu x86_64-pc-windows-msvc; do
-            cmp "addon-digests/shipped-addon-$triple/addon-digest.txt" "addon-digests/independent-addon-$triple/addon-digest.txt"
+            cmp "addon-digests/$PREFIX-shipped-addon-$triple/addon-digest.txt" "addon-digests/$PREFIX-independent-addon-$triple/addon-digest.txt"
           done

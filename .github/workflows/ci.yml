@@ -360,3 +360,7 @@ jobs:
   addon-reproducibility:
     name: addon reproducibility
     uses: ./.github/workflows/release-assets.yml
+    # A release runs this suite next to its own assets job; a prefix of its own keeps these
+    # assets-check artifacts out of the release's publish download.
+    with:
+      artifact-prefix: suite
