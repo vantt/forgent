@@ -19,9 +19,10 @@ Related:
 - docs/platform/documentation/subcomponents/doc-checks/spec.md
 - docs/platform/documentation/subcomponents/admission/spec.md
 - docs/platform/work-state/contracts/knowledge-registry.md
+- docs/platform/documentation/operations/how-a-document-is-written.md
 ```
 
-Read with: [documentation area spec](../../spec.md) (the map), [document identity](../document-identity/spec.md), [doc-checks](../doc-checks/spec.md), [admission](../admission/spec.md), [knowledge-registry contract](../../../work-state/contracts/knowledge-registry.md).
+Read with: [documentation area spec](../../spec.md) (the map), [document identity](../document-identity/spec.md), [doc-checks](../doc-checks/spec.md), [admission](../admission/spec.md), [knowledge-registry contract](../../../work-state/contracts/knowledge-registry.md). Worked procedure and examples: [how a document is written](../../operations/how-a-document-is-written.md).
 
 ## 1. Current Summary
 
