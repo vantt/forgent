@@ -47,6 +47,23 @@ pub fn derive_outcome(classification: &Value) -> Outcome {
     if failure_family == Some("provider") && failure_code == Some("blocked") {
         return outcome("blocked", "provider-blocked".to_string());
     }
+    // A provider answered with a stop (quota, login, its own error): its own category, named by the cause.
+    // A refused capacity or a lease conflict is not this: no provider answered, so it stays infrastructure.
+    if failure_family == Some("provider")
+        && matches!(failure_code, Some("provider-limit" | "paused-limit"))
+    {
+        let reason = match text("failure", "cause") {
+            Some("quota") => "provider-quota",
+            Some("credential") => "provider-credential",
+            Some("provider") => "provider-error",
+            _ => "provider-limit",
+        };
+        return outcome("provider", reason.to_string());
+    }
+    // A seat that ended without its claim and without a report: the harness lost the result.
+    if failure_code == Some("no-report") {
+        return outcome("infra", "infra-no-report".to_string());
+    }
     // An execution that did not complete, for an infrastructure cause or none named.
     if matches!(exec_status, "failed" | "cancelled" | "completion-unknown")
         && matches!(
@@ -73,8 +90,11 @@ pub fn derive_outcome(classification: &Value) -> Outcome {
     }
 }
 
+/// Whether a version-3 record's recorded category agrees with the one its classification derives: equal, or a
+/// provider limit recorded `infra` before the `provider` category existed. The one compatibility rule both
+/// readers (this crate and Node, through the addon) apply.
 pub fn recorded_category_agrees(recorded: &str, derived: &str) -> bool {
-    recorded == derived
+    recorded == derived || (recorded == "infra" && derived == "provider")
 }
 
 fn is_classification_valid(c: &serde_json::Map<String, Value>) -> bool {
@@ -172,7 +192,8 @@ pub fn derive_legacy_outcome(record: &Value) -> Outcome {
         if version == Some(2) {
             return derived;
         }
-        // A version-3 outcome is a checked cache: kept as recorded when the classification derives its category.
+        // A version-3 outcome is a checked cache: kept as recorded when the classification derives its category;
+        // a record written before the derivation split a category reads as it derives today.
         let recorded = c.get("outcome");
         return match recorded
             .and_then(|o| o.get("category"))
@@ -186,6 +207,7 @@ pub fn derive_legacy_outcome(record: &Value) -> Outcome {
                     .unwrap_or("recorded-outcome")
                     .to_string(),
             },
+            Some(category) if recorded_category_agrees(category, &derived.category) => derived,
             Some(_) => corrupt("outcome-contradicts-classification"),
             None => corrupt("missing-outcome"),
         };

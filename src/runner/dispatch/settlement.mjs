@@ -374,11 +374,13 @@ function classifyEvidenceToOutcomeFacts({
     };
   }
 
+  // Exit 0 with no claim and no report is `no-report`: the result never reached the harness, whether the write
+  // was refused or never tried. A structural fact, not a verdict.
   return {
     execStatus: 'completed',
     confidenceLevel: 'no-evidence',
     verdict: 'inconclusive',
-    failure: null,
+    failure: agentClaim || hasWorkerReport ? null : { family: 'unknown', code: 'no-report' },
     policy: null,
   };
 }

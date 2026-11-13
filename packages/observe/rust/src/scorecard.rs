@@ -35,6 +35,9 @@ pub struct RunStatusBuckets {
     pub inconclusive: u64,
     pub blocked: u64,
     pub policy_refused: u64,
+    /// A provider stopped the run (quota, login, its own error); scorecards written before it read 0.
+    #[serde(default)]
+    pub provider_limited: u64,
     pub unclassified: u64,
 }
 
@@ -213,6 +216,7 @@ pub fn compute_runs(observations: &[Observation]) -> RunsSection {
                 Some("infra" | "corrupt") => b.exec_failed += 1,
                 Some("policy") => b.policy_refused += 1,
                 Some("blocked") => b.blocked += 1,
+                Some("provider") => b.provider_limited += 1,
                 Some("verdict") if verdict == "inconclusive" => b.inconclusive += 1,
                 Some("verdict") => b.verdict_fail += 1,
                 _ => b.unclassified += 1,

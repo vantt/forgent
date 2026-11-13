@@ -12,8 +12,8 @@ function compareRunNames(a, b) {
 
 /**
  * Map a settled RunResult onto the outcome vocabulary the collaboration patterns use.
- * A provider limit is an infra failure carrying its own code, so a caller can tell
- * "this provider has no quota" from any other infrastructure failure.
+ * A provider limit has its own category (a refused capacity is infra carrying its own code), so a caller can
+ * tell "this provider has no quota" from any other infrastructure failure.
  */
 export function outcomeOfRunResult(runResult) {
   // A record without a classification is read like any other settled record; one that cannot be
@@ -28,7 +28,9 @@ export function outcomeOfRunResult(runResult) {
   if (category === 'blocked') return 'blocked';
   if (category === 'policy') return 'policy-refusal';
   // A provider whose capacity is exhausted or quarantined is the same situation as a provider limit hit
-  // mid-run: the seat moves to the next candidate of the pool instead of counting as done.
+  // mid-run: the seat moves to the next candidate of the pool instead of counting as done. A record settled
+  // before the provider category existed carries the limit as `infra` with its failure code.
+  if (category === 'provider') return 'provider-limit';
   if (category === 'infra' && (failureCode === 'provider-limit' || failureCode === 'paused-limit' || failureCode === 'provider-capacity-refused' || failureCode === LEASE_CONFLICT_FAILURE_CODE)) return 'provider-limit';
   return 'execution-failure';
 }

@@ -275,6 +275,19 @@ v2 interpretation and read-only Dispatch runtime inspection while preserving
   derived once, by the Run Result crate (`derive_outcome`), which Node calls
   through the combined addon. Execution, assessment, confidence, failure,
   policy, delivery and provenance stay separate.
+- Categories: `ok`, `verdict`, `blocked`, `policy`, `infra`, `provider`,
+  `corrupt`. A provider stop (`failure {family: provider, code: provider-limit
+  | paused-limit}`) is `provider`, its reason named by `failure.cause`
+  (`provider-quota`, `provider-credential`, `provider-error`, else
+  `provider-limit`); a refused capacity or a lease conflict stays `infra`. A
+  seat that exits 0 with no claim and no report settles `failure {family:
+  unknown, code: no-report}`, category `infra`, reason `infra-no-report`.
+- A v3 record's recorded category must agree with the derived one through the
+  crate's one rule (`recorded_category_agrees`, addon
+  `runResult.recordedCategoryAgrees`): equal, or `infra` recorded where the
+  classification now derives `provider` (written before that category
+  existed). Such a record reads as it derives today, never `contract-corrupt`,
+  and is never settled again.
 - Historical v1 results are interpreted deterministically as `legacy-derived`
   and are not rewritten on read.
 - A v2 result whose compatibility `status`/`confidence` disagrees with its

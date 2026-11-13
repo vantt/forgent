@@ -688,7 +688,7 @@ test('executeAssignment does not count pre-existing dirty files as run evidence 
 
   assert.ok(!result.evidence.changedFiles.includes('preexisting-dirty.txt'),
     'pre-existing dirty file must not be counted as run evidence');
-  assert.equal(runOutcome(result).category, 'verdict');
+  assert.equal(runOutcome(result).category, 'infra', 'no claim and no report: the seat left nothing behind');
   assert.equal(runOutcome(result).satisfied, false);
   assert.equal(runOutcome(result).evidence, 'no-evidence');
   // R6/G3: an unchanged pre-existing dirty file must correctly derive an
@@ -1062,7 +1062,7 @@ test('executeAssignment with no-op executor and pre-existing dirty file must pro
   assert.ok(!result.evidence.changedFiles.includes('preexisting.txt'),
     'pre-existing dirty file must NOT appear in changedFiles');
   assert.equal(runOutcome(result).evidence, 'no-evidence');
-  assert.equal(runOutcome(result).category, 'verdict');
+  assert.equal(runOutcome(result).category, 'infra', 'no claim and no report: the seat left nothing behind');
   assert.equal(runOutcome(result).satisfied, false);
 });
 

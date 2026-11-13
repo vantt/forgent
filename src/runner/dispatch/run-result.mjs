@@ -286,7 +286,7 @@ export function validateRunResultV2(result, { expectedRunId } = {}) {
  * @param {object} result
  * @param {object} [options]
  * @param {string} [options.expectedRunId]
- * @returns {{ valid: boolean, corrupt: boolean, reasons: string[] }}
+ * @returns {{ valid: boolean, corrupt: boolean, reasons: string[], derivedOutcome: {category: string, reason: string}|null }}
  */
 export function validateRunResultV3(result, { expectedRunId } = {}) {
   const reasons = [];
@@ -332,12 +332,17 @@ export function validateRunResultV3(result, { expectedRunId } = {}) {
     reasons.push(`classification.confidence.level must be one of [${CONFIDENCE_LEVELS.join(', ')}]`);
   }
 
-  // The recorded category is a checked cache: a record whose classification derives another category is corrupt.
+  // The recorded category is a checked cache: a record whose classification derives a category the Run Result
+  // crate's compatibility rule does not accept is corrupt.
+  let derived = null;
   if (!c.outcome || typeof c.outcome !== 'object') {
     reasons.push('classification.outcome must be an object in contract v3');
   } else {
-    const derived = deriveOutcome(c).category;
-    if (c.outcome.category !== derived) reasons.push(`classification.outcome.category "${c.outcome.category}" does not match deriveOutcome "${derived}"`);
+    derived = deriveOutcome(c);
+    const recorded = c.outcome.category;
+    if (typeof recorded !== 'string' || !nativeDoor().runResult.recordedCategoryAgrees(recorded, derived.category)) {
+      reasons.push(`classification.outcome.category "${recorded}" does not match deriveOutcome "${derived.category}"`);
+    }
   }
 
   const isValid = reasons.length === 0;
@@ -345,6 +350,7 @@ export function validateRunResultV3(result, { expectedRunId } = {}) {
     valid: isValid,
     corrupt: !isValid,
     reasons,
+    derivedOutcome: derived,
   };
 }
 
@@ -774,7 +780,13 @@ export function interpretRunResult(input, options = {}) {
         corruptionReasons: validation.reasons,
       };
     }
-    return withLegacyView({ ...rawObj });
+    // A record whose recorded category the compatibility rule accepted but no longer derives (a provider limit
+    // recorded `infra`) reads as it derives today, as the Run Result crate reads it.
+    const { derivedOutcome } = validation;
+    const classification = derivedOutcome.category === rawObj.classification.outcome.category
+      ? rawObj.classification
+      : { ...rawObj.classification, outcome: derivedOutcome };
+    return withLegacyView({ ...rawObj, classification });
   }
 
   if (rawObj.contract?.version === 2 && rawObj.contract?.id === RUN_RESULT_CONTRACT.id) {
@@ -977,7 +989,7 @@ export function readSettledResult(runDir, runId) {
  * The outcome `{category, reason}` of a classification. The Run Result crate owns the rules; this is its door.
  *
  * @param {object} classification
- * @returns {{category: 'ok'|'infra'|'verdict'|'policy'|'blocked'|'corrupt', reason: string}}
+ * @returns {{category: 'ok'|'infra'|'provider'|'verdict'|'policy'|'blocked'|'corrupt', reason: string}}
  */
 export function deriveOutcome(classification) {
   return nativeDoor().runResult.deriveOutcome(JSON.stringify(classification ?? null));
@@ -1042,7 +1054,7 @@ function deriveEvidenceFloor(evidenceFloor) {
  * @param {object} [options]
  * @param {object} [options.evidenceFloor]
  * @returns {Readonly<{
- *   category: 'ok'|'infra'|'verdict'|'policy'|'blocked'|'corrupt',
+ *   category: 'ok'|'infra'|'provider'|'verdict'|'policy'|'blocked'|'corrupt',
  *   executed: 'completed'|'failed'|'cancelled'|'unknown',
  *   verdict: 'pass'|'findings'|'blocked'|'inconclusive'|'not-applicable',
  *   refused: boolean,
@@ -1111,7 +1123,7 @@ export function runOutcome(resultOrPath, { evidenceFloor } = {}) {
   const verdict = result.classification?.assessment?.verdict ?? 'inconclusive';
   const refused = category === 'policy' || result.classification?.policy?.disposition === 'refuse';
   const satisfied = category === 'ok';
-  const infraFailure = category === 'infra' || category === 'corrupt';
+  const infraFailure = category === 'infra' || category === 'provider' || category === 'corrupt';
   const failure = result.classification?.failure ?? null;
 
   return Object.freeze({
