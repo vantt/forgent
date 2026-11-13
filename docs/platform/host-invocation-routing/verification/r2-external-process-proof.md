@@ -21,7 +21,7 @@ Supersedes: The mapped source location; source provenance is retained
 Superseded by: None recorded
 ```
 
-Correction — checked route snapshot (2026-10-13): `packages/host-runtime/contracts/command-routes.json` has 75 selectors: 70 `legacy-cli` and five native (`convention`, `friction`, `gate-bypass`, `metrics`, `version`). This recount supersedes current-count wording; dated proof records remain historical.
+Correction — checked route snapshot (2026-11-13): `packages/host-runtime/contracts/command-routes.json` has 82 selectors: 74 `legacy-cli` and eight native (`config`, `convention`, `friction`, `gate-bypass`, `identity`, `mailbox`, `metrics`, `version`; `preflight` was retired on 2026-11-13). This recount supersedes current-count wording; dated proof records remain historical.
 
 ## 1. Required Proof
 

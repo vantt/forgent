@@ -25,7 +25,7 @@ Supersedes: The mapped source location; source provenance is retained
 Superseded by: None recorded
 ```
 
-Correction — checked route snapshot (2026-10-13): `packages/host-runtime/contracts/command-routes.json` has 75 selectors: 70 `legacy-cli` and five native (`convention`, `friction`, `gate-bypass`, `metrics`, `version`). This recount supersedes current-count wording; dated proof records remain historical.
+Correction — checked route snapshot (2026-11-13): `packages/host-runtime/contracts/command-routes.json` has 82 selectors: 74 `legacy-cli` and eight native (`config`, `convention`, `friction`, `gate-bypass`, `identity`, `mailbox`, `metrics`, `version`; `preflight` was retired on 2026-11-13). This recount supersedes current-count wording; dated proof records remain historical.
 
 ## 1. Reading Rule
 
@@ -114,7 +114,7 @@ Open item here means the migration preserved the question instead of answering i
 
 | Item | Kind | Why it remains open | Owner |
 | --- | --- | --- | --- |
-| R1 route matrix | Code-verified current snapshot | The current route table is 75 selectors: 70 `legacy-cli`, five native selectors: `convention`, `friction`, `gate-bypass`, `metrics`, `version`. | Host invocation. |
+| R1 route matrix | Code-verified current snapshot | The current route table is 82 selectors: 74 `legacy-cli`, eight native selectors: `config`, `convention`, `friction`, `gate-bypass`, `identity`, `mailbox`, `metrics`, `version`. | Host invocation. |
 | Stable/default graduation | Product / release decision | Preview posture is approved and external installs default to Rust host; stable/default graduation remains undecided. | Packaging-distribution stream / release owner. |
 | Legacy Node fallback removal timing | Product / support decision | Explicit deprecated escape hatch is approved for 30 calendar days after preview release publication. | Packaging-distribution stream plus host invocation. |
 | Native `OperationId` descriptors beyond `distribution.build.show` | Code-verified current snapshot | Carriage note: the five production native selector mappings are `convention -> convention.query`, `friction -> observe.friction`, `gate-bypass -> work.gate-bypass.show`, `metrics -> observe.metrics`, `version -> distribution.build.show`; `test.fixture.echo` is a test fixture. | Host invocation; reopen when adding another native route. |

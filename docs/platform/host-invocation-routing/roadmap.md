@@ -23,7 +23,7 @@ Related:
 - docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md
 ```
 
-Correction — checked route snapshot (2026-10-13): `packages/host-runtime/contracts/command-routes.json` has 75 selectors: 70 `legacy-cli` and five native (`convention`, `friction`, `gate-bypass`, `metrics`, `version`). This recount supersedes current-count wording; dated proof records remain historical.
+Correction — checked route snapshot (2026-11-13): `packages/host-runtime/contracts/command-routes.json` has 82 selectors: 74 `legacy-cli` and eight native (`config`, `convention`, `friction`, `gate-bypass`, `identity`, `mailbox`, `metrics`, `version`; `preflight` was retired on 2026-11-13). This recount supersedes current-count wording; dated proof records remain historical.
 
 ## 1. Current Baseline
 
@@ -37,8 +37,8 @@ release-owner decision.
 | --- | --- |
 | [apps/fgos](../../../apps/fgos/) | Rust CLI host code exists. |
 | [packages/host-runtime/rust](../../../packages/host-runtime/rust/) | Host runtime crate implements kernel contracts, router, registry, authority gate, providers, and invocation service. |
-| [packages/host-runtime/contracts/command-routes.json](../../../packages/host-runtime/contracts/command-routes.json) | Current route matrix has 75 selectors: 70 `legacy-cli`, five native. |
-| [apps/fgos/src/cli_projector.rs](../../../apps/fgos/src/cli_projector.rs) | Carriage note: native CLI routes project the five selectors as `convention -> convention.query`, `friction -> observe.friction`, `gate-bypass -> work.gate-bypass.show`, `metrics -> observe.metrics`, `version -> distribution.build.show`. |
+| [packages/host-runtime/contracts/command-routes.json](../../../packages/host-runtime/contracts/command-routes.json) | Current route matrix has 82 selectors: 74 `legacy-cli`, eight native. |
+| [apps/fgos/src/cli_projector.rs](../../../apps/fgos/src/cli_projector.rs) | Carriage note: native CLI routes project the eight selectors as `convention -> convention.query`, `friction -> observe.friction`, `gate-bypass -> work.gate-bypass.show`, `metrics -> observe.metrics`, `version -> distribution.build.show`, `config -> config.read | config.write`, `identity -> identity.writer | identity.read | identity.write` and `mailbox -> the mailbox send, inbox, inbox-claim, list and status operations`. |
 | [packages/distribution/rust/src/lib.rs](../../../packages/distribution/rust/src/lib.rs) | `distribution.build.show` provider exists. |
 | `cargo test -p fgos-host-runtime -p fgos --quiet` | Passed on 2026-09-14 during code scan and local Phase A proof refresh. |
 | `node --test test/rust-host/command-routes.test.mjs` | Passed on 2026-09-14 during local Phase A proof refresh. |
@@ -95,13 +95,13 @@ gateway routes remain on `VerbGateway` per the
 
 | Front | Status | What is done | What remains |
 | --- | --- | --- | --- |
-| R1 Rust CLI host | `implemented preview` | Installed/default preview proof shows external `fgos` enters the Rust host; Carriage note: the current five native selectors are `convention`, `friction`, `gate-bypass`, `metrics`, `version`. | Stable/default graduation remains a release-owner decision. |
-| Route matrix | `current partial` | 75 selectors are described: 70 `legacy-cli`, five native. | Migrate additional selectors only at complete operation/use-case boundaries. |
+| R1 Rust CLI host | `implemented preview` | Installed/default preview proof shows external `fgos` enters the Rust host; Carriage note: the current eight native selectors are `config`, `convention`, `friction`, `gate-bypass`, `identity`, `mailbox`, `metrics`, `version`. | Stable/default graduation remains a release-owner decision. |
+| Route matrix | `current partial` | 82 selectors are described: 74 `legacy-cli`, eight native. | Migrate additional selectors only at complete operation/use-case boundaries. |
 | Invocation kernel | `current partial` | `OperationRequest`, `ProviderOutcome`, router, registry snapshot, two-stage authority, and `InvocationService` are proven for the current Rust slice. | Declared replacement resolution, broader native providers, and future host kinds still need proof. |
 | R2 external process provider | `implemented preview` | `fixture.echo.echo` proves manifest discovery, derived registry/linker, frame codec, supervisor, and router integration. | Production provider ecosystem work: marketplace/signatures, WASM, persisted cache/lock, non-fixture shipped providers. |
 | R3 remote peer | `implemented preview` | `GET /v1/runtime` invokes `distribution.build.show` through the shared kernel without `VerbGateway`, CLI shelling, or `fgos.v1` parsing. | Every other gateway route remains legacy; future remote-route migrations are separate work. |
 | Chat host | `planned` | No current adapter or contract is claimed. | Define admission, interruption, parking, presentation, and proof contract. |
-| Legacy Node retirement | `blocked by migration/release gates` | Node is still the compatibility payload for 70 selectors. | Requires zero `legacy-cli` routes, release policy closure, and packaging rollback/fallback agreement. |
+| Legacy Node retirement | `blocked by migration/release gates` | Node is still the compatibility payload for 74 selectors. | Requires zero `legacy-cli` routes, release policy closure, and packaging rollback/fallback agreement. |
 
 ## 4. Phase A: Close Local R1 Host Proof
 
@@ -110,7 +110,7 @@ Goal: make the current Rust-host code slice mechanically verifiable as the host-
 Host-invocation tasks:
 
 - Keep [command-routes.json](../../../packages/host-runtime/contracts/command-routes.json) as the route matrix source of truth.
-- Verify the matrix count in tests: 75 selectors, 70 `legacy-cli`, five native selectors: `convention`, `friction`, `gate-bypass`, `metrics`, `version`.
+- Verify the matrix count in tests: 82 selectors, 74 `legacy-cli`, eight native selectors: `config`, `convention`, `friction`, `gate-bypass`, `identity`, `mailbox`, `metrics`, `version`.
 - Ensure every route has owner path and compatibility tests.
 - Keep native `version` proof: no Node child process, valid `fgos.v1` presentation, `distribution.build.show` typed provider output.
 - Keep legacy passthrough proof: one Node child process, manifest-based legacy payload resolution, recursion guard, one lifecycle record.
@@ -301,7 +301,7 @@ Done when:
 
 | Order | Action | Owner | Packaging dependency |
 | --- | --- | --- | --- |
-| 1 | Keep preview proof green: route matrix stays at 75 selectors / 70 `legacy-cli` / five native until a new migration intentionally changes it. | Host invocation | No |
+| 1 | Keep preview proof green: route matrix stays at 82 selectors / 74 `legacy-cli` / eight native until a new migration intentionally changes it. | Host invocation | No |
 | 2 | Decide whether the next frontier is another native read route, another remote read route, or the chat-host contract. Do not treat R2/R3 closeout as whole-component migration. | Host invocation | No, unless the chosen route touches release/runtime selection. |
 | 3 | Keep stable/default graduation parked with the release owner; enforce the settled 30-day legacy fallback escape-hatch window for preview. | Packaging-distribution / release owner | Yes |
 | 4 | For external providers, choose whether to harden the preview mechanism (persisted cache/lock, shipped provider packaging, marketplace/signatures, WASM) before accepting non-fixture providers. | Host invocation plus Packaging-Distribution where artifacts ship | Maybe |
