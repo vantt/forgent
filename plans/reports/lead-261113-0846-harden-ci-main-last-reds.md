@@ -63,6 +63,14 @@ run-tests ERROR lines.
 Full npm test on the branch: 8861 tests, 1 fail, `mailbox-live-confined` (listed known load flake; 19/19 alone).
 Branch runs green: CI 43378173930, Release assets check 43378173932.
 
+## Fourth landing: red on 316b810ec
+
+| # | Run | Test | Cause | Fix |
+|---|-----|------|-------|-----|
+| 8 | CI 43382951290, `cargo (workspace)` | holder-lock `borrow_git` `control_without_the_gc_switch_leaks_the_lock_to_background_gc`, left Free right Held | Timing window in the negative control: git 2.53's commit starts `git maintenance run --auto --detach`, which on that tiny repo keeps the inherited description about 30 ms (27-38 ms measured with a flock probe) | `1eb26a3c7`: the fixture adds `.git/hooks/pre-auto-gc` sleeping 2 s; the hook runs inside the detached process, which then holds the description about 4 s; 10/10 in the clean env; OPC MERGE |
+
+`holder-lock-cross-platform` (Windows and macOS crates) is red on main before and after this lane; it is not a release gate and is tracked under the Windows/macOS rows.
+
 ## Backlog rows opened
 
 - `p-5zazr53vd2`: the exec-window retry is per process and the scan is serial (N x 250 ms); bound it
