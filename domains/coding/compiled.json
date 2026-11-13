@@ -1,4 +1,8 @@
 {
+  "contract": {
+    "id": "domain-compiled",
+    "version": 1
+  },
   "registry": {
     "roleGraph": {
       "roles": [

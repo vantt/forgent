@@ -12,10 +12,10 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 import { readAgentDefinition } from './agent-definitions.mjs';
-import { listDomainDirs } from '../util/domain-dirs.mjs';
+import { domainCatalog } from '../util/domain-dirs.mjs';
 
 /**
- * Every real agent-type's `{name, skills}` across `core/agents/`,
+ * Every real agent-type's `{name, skills}` across the payload's `core/agents/`,
  * `domains/<name>/agents/`, and the legacy `agents/` (D24/D33 precedence:
  * core, then domains in sorted order, then legacy last, first occurrence
  * of a name wins -- same order `registrations.mjs`'s own
@@ -28,7 +28,7 @@ import { listDomainDirs } from '../util/domain-dirs.mjs';
  *
  * @returns {{ defs: Array<{ name: string, skills: string[] }>, problems: string[] }}
  */
-export function loadAgentRoster(cwd) {
+export function loadAgentRoster(cwd, { payloadRoot } = {}) {
   const files = [];
   const seen = new Set();
 
@@ -43,16 +43,17 @@ export function loadAgentRoster(cwd) {
     }
   };
 
-  scanDir(path.join(cwd, 'core', 'agents'));
-  const domainsDir = path.join(cwd, 'domains');
-  for (const domain of listDomainDirs(domainsDir)) scanDir(path.join(domainsDir, domain, 'agents'));
+  // Core and domain agents are the running payload's doctrine; only the legacy `agents/` is the project's own.
+  const catalog = domainCatalog({ payloadRoot });
+  scanDir(path.join(catalog.root, 'core', 'agents'));
+  for (const { agentsDir } of catalog.domains) scanDir(agentsDir);
   scanDir(path.join(cwd, 'agents'));
 
   const defs = [];
   const problems = [];
   const namesSeen = new Set();
   for (const filePath of files) {
-    const rel = path.relative(cwd, filePath).split(path.sep).join('/');
+    const rel = path.relative(filePath.startsWith(catalog.root + path.sep) ? catalog.root : cwd, filePath).split(path.sep).join('/');
     let text;
     try {
       text = fs.readFileSync(filePath, 'utf8');

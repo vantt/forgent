@@ -20,7 +20,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { createGitInspect, gitPortOptions } from '../git/inspect.mjs';
 import { inspectEntries, inspectPath } from '../util/git-paths.mjs';
-import { listDomainDirs } from '../util/domain-dirs.mjs';
+import { domainCatalog } from '../util/domain-dirs.mjs';
 import { firstSymlinkUnder, refuseSymlink } from '../util/refuse-symlink.mjs';
 import { computeInstructionProjection, materializeInstructionProjection } from './instruction-projections.mjs';
 
@@ -390,10 +390,9 @@ export function mirrorDevSkillsIntoPlugin(agentsSkillsRoot, pluginSkillsRoot, ow
  * `domains/<domain>/skills`. The one walk discovery and assembly share. */
 function skillSourceRoots(projectRoot) {
   const roots = [{ dir: path.join(projectRoot, 'core', 'skills'), authority: 'core', domain: null, label: 'core' }];
-  const domainsRoot = path.join(projectRoot, 'domains');
-  for (const domain of listDomainDirs(domainsRoot)) {
+  for (const { name: domain, skillsDir } of domainCatalog({ payloadRoot: projectRoot }).domains) {
     if (isOwnTmpFile(domain) || domain.startsWith('.')) continue;
-    roots.push({ dir: path.join(domainsRoot, domain, 'skills'), authority: 'domain', domain, label: `domains/${domain}` });
+    roots.push({ dir: skillsDir, authority: 'domain', domain, label: `domains/${domain}` });
   }
   return roots;
 }

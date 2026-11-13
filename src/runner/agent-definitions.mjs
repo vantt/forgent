@@ -17,7 +17,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { describeYamlError, parseYaml } from '../util/yaml.mjs';
-import { listDomainDirs } from '../util/domain-dirs.mjs';
+import { domainCatalog } from '../util/domain-dirs.mjs';
 import { RunnerConfigError } from './dispatch/runner-config-error.mjs';
 import { definitionFileName } from '../convention/definition-names.mjs';
 
@@ -40,10 +40,9 @@ export function agentTierDirs({ projectRoot, installRoot = INSTALL_ROOT }) {
   if (typeof projectRoot !== 'string' || projectRoot === '') throw new RunnerConfigError('agent definition lookup requires a project root');
   const rootFor = (rel) => (fs.existsSync(path.join(projectRoot, rel)) ? projectRoot : installRoot);
 
-  const domainsRoot = rootFor('domains');
-  const domainsDir = path.join(domainsRoot, 'domains');
-  const domainDirs = listDomainDirs(domainsDir)
-    .map((domain) => ({ dir: path.join(domainsDir, domain, 'agents'), relDir: `domains/${domain}/agents` }));
+  // Domain doctrine is the running payload's, never the project's own domains/ directory.
+  const domainDirs = domainCatalog({ payloadRoot: installRoot }).domains
+    .map(({ name, agentsDir }) => ({ dir: agentsDir, relDir: `domains/${name}/agents` }));
 
   return [
     { tier: 'workspace', label: TIER_LABELS.workspace, dirs: [{ dir: path.join(projectRoot, 'fgos', 'agents'), relDir: 'fgos/agents' }] },

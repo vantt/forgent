@@ -6,8 +6,8 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
 import os from 'node:os';
-import { DOCTOR_CHECKS } from '../../src/setup/checks.mjs';
-import { compileAllDomains, compileDomain } from '../../scripts/build-domain-registry.mjs';
+import { checkDomainRegistryCompiled } from '../../src/setup/registrations.mjs';
+import { compileAllDomains, compileDomain } from '../../src/util/domain-compile.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 
@@ -30,7 +30,7 @@ test('the domain registry loads from compiled.json using only its own few source
   // vendored parser), and load it in a child process.
   const tmp = fs.mkdtempSync(path.join(root, '..', 'fgos-registry-nodeps-'));
   try {
-    for (const rel of ['src/state/domain-registry.mjs', 'src/workflow/definition.mjs', 'src/workflow/guide-schema.mjs', 'src/runner/dispatch/write-scope.mjs', 'src/runner/dispatch/run-timeout.mjs', 'src/runner/execution/outcome.mjs', 'src/runner/execution/legacy-seat-read.mjs', 'src/workflow/steps.mjs', 'domains/coding/compiled.json']) {
+    for (const rel of ['src/state/domain-registry.mjs', 'src/util/domain-dirs.mjs', 'src/workflow/definition.mjs', 'src/workflow/guide-schema.mjs', 'src/runner/dispatch/write-scope.mjs', 'src/runner/dispatch/run-timeout.mjs', 'src/runner/execution/outcome.mjs', 'src/runner/execution/legacy-seat-read.mjs', 'src/workflow/steps.mjs', 'domains/coding/compiled.json']) {
       fs.mkdirSync(path.dirname(path.join(tmp, rel)), { recursive: true });
       fs.copyFileSync(path.join(root, rel), path.join(tmp, rel));
     }
@@ -45,7 +45,7 @@ test('the domain registry loads from compiled.json using only its own few source
 
 // The doctor check compiles from the YAML with the build's own function, so a stale or unparsable
 // source is named per domain.
-const compiledCheck = DOCTOR_CHECKS.find((check) => check.id === 'domain-registry-compiled').check;
+const compiledCheck = (project) => checkDomainRegistryCompiled({ payloadRoot: project });
 
 function makeDomainProject(t) {
   const project = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-domain-compiled-'));
@@ -85,6 +85,14 @@ test('the doctor check names a domain workflow that cannot be parsed, with line 
   assert.match(result.message, /domains\/demo\/workflows\/main\.yaml: cannot be parsed: .* \(line \d+, column \d+\)/);
 });
 
+test('the doctor check names a compiled.json written before the contract was versioned', async (t) => {
+  const { project, write } = makeDomainProject(t);
+  write('domains/demo/compiled.json', '{"registry":{"defaultWorkflow":"main"},"workflows":{}}\n');
+  const result = await compiledCheck(project);
+  assert.equal(result.passed, false);
+  assert.match(result.message, /domains\/demo\/compiled\.json has no domain-compiled version 1 contract — run npm run build:domains/);
+});
+
 test('the doctor check still names a missing or unreadable compiled.json', async (t) => {
   const { project, write, compile } = makeDomainProject(t);
   const missing = await compiledCheck(project);
@@ -92,15 +100,4 @@ test('the doctor check still names a missing or unreadable compiled.json', async
   compile();
   write('domains/demo/compiled.json', '{not json');
   assert.match((await compiledCheck(project)).message, /domains\/demo\/compiled\.json is unreadable/);
-});
-
-test('fgos doctor lists every check when a domain workflow cannot be parsed', (t) => {
-  const { project, write, compile } = makeDomainProject(t);
-  compile();
-  write('domains/demo/workflows/main.yaml', 'id: demo/main\nsteps: [\n');
-  const run = spawnSync(process.execPath, [path.join(root, 'bin', 'fgos.mjs'), 'doctor', '--json'], { cwd: project, encoding: 'utf8' });
-  assert.equal(run.status, 0, run.stderr);
-  const checks = JSON.parse(run.stdout).data.checks;
-  assert.deepEqual(checks.map((c) => c.id), DOCTOR_CHECKS.map((c) => c.id));
-  assert.match(checks.find((c) => c.id === 'domain-registry-compiled').message, /domains\/demo\/workflows\/main\.yaml: cannot be parsed/);
 });

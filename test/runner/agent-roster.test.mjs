@@ -24,7 +24,7 @@ test('the roster lists name and skills of each agent in block, flow and quoted s
   write('core/agents/a.yaml', 'name: a\ndescription: x\nskills:\n  - one\n  - two\n');
   write('domains/d/agents/b.yaml', 'name: "b"\nskills: [three, four]\n');
   const root = write('agents/c.yml', 'description: no declared name\nskills: []\n');
-  const { defs, problems } = loadAgentRoster(root);
+  const { defs, problems } = loadAgentRoster(root, { payloadRoot: root });
   assert.deepEqual(defs, [
     { name: 'a', skills: ['one', 'two'] },
     { name: 'b', skills: ['three', 'four'] },
@@ -37,7 +37,7 @@ test('an agent file that is not valid YAML is left out and named, and the others
   const write = makeRoot(t);
   write('core/agents/good.yaml', 'name: good\nskills: [x]\n');
   const root = write('core/agents/bad.yaml', 'name: bad\ndescription: a: b\nskills: [y]\n');
-  const { defs, problems } = loadAgentRoster(root);
+  const { defs, problems } = loadAgentRoster(root, { payloadRoot: root });
   assert.deepEqual(defs, [{ name: 'good', skills: ['x'] }]);
   assert.equal(problems.length, 1);
   assert.match(problems[0], /^core\/agents\/bad\.yaml: cannot be parsed: .* \(line 2, column \d+\)$/);
@@ -47,5 +47,16 @@ test('a numeric name is coerced to text and the first file of a name wins', (t) 
   const write = makeRoot(t);
   write('core/agents/first.yaml', 'name: 123\nskills: [a]\n');
   const root = write('agents/second.yaml', 'name: "123"\nskills: [b]\n');
-  assert.deepEqual(loadAgentRoster(root).defs, [{ name: '123', skills: ['a'] }]);
+  assert.deepEqual(loadAgentRoster(root, { payloadRoot: root }).defs, [{ name: '123', skills: ['a'] }]);
+});
+
+test('a project\'s own domains/ directory is not roster doctrine: only the payload\'s core and domain agents and the project\'s legacy agents/ are read', (t) => {
+  const write = makeRoot(t);
+  write('core/agents/a.yaml', 'name: a\nskills: [one]\n');
+  const project = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-agent-roster-project-'));
+  t.after(() => fs.rmSync(project, { recursive: true, force: true }));
+  fs.mkdirSync(path.join(project, 'domains', 'mine', 'agents'), { recursive: true });
+  fs.writeFileSync(path.join(project, 'domains', 'mine', 'agents', 'p.yaml'), 'name: p\nskills: []\n');
+  const payload = write('domains/d/agents/b.yaml', 'name: b\nskills: []\n');
+  assert.deepEqual(loadAgentRoster(project, { payloadRoot: payload }).defs.map((def) => def.name), ['a', 'b']);
 });

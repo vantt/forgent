@@ -11,8 +11,8 @@
 // (also kernel) but nothing above it.
 
 import fs from 'node:fs';
-import path from 'node:path';
 import { validateWorkflow } from '../workflow/definition.mjs';
+import { domainCatalog, readCompiledDomain } from '../util/domain-dirs.mjs';
 import {
   walkableSteps,
   stepForPhase as workflowStepForPhase,
@@ -65,21 +65,15 @@ function freezeRegistryData(registryData) {
 // compiled file that is stale or whose YAML does not parse.
 function loadDomainsFromDisk() {
   const domains = {};
-  const repoRoot = path.resolve(import.meta.dirname, '../../');
-  const domainsDir = path.join(repoRoot, 'domains');
-  if (!fs.existsSync(domainsDir)) return domains;
-
-  for (const entry of fs.readdirSync(domainsDir, { withFileTypes: true })) {
-    if (!entry.isDirectory()) continue;
-    const compiledPath = path.join(domainsDir, entry.name, 'compiled.json');
+  for (const { name, compiledPath } of domainCatalog().domains) {
     if (!fs.existsSync(compiledPath)) continue;
 
-    const { registry: registryData = {}, workflows: rawWorkflows = {} } = JSON.parse(fs.readFileSync(compiledPath, 'utf8'));
+    const { registry: registryData = {}, workflows: rawWorkflows = {} } = readCompiledDomain(compiledPath);
     const workflows = {};
-    for (const [name, raw] of Object.entries(rawWorkflows)) workflows[name] = validateWorkflow(raw);
+    for (const [workflowName, raw] of Object.entries(rawWorkflows)) workflows[workflowName] = validateWorkflow(raw);
 
     freezeRegistryData(registryData);
-    domains[entry.name] = Object.freeze({
+    domains[name] = Object.freeze({
       ...registryData,
       workflows: Object.freeze(workflows),
       defaultWorkflow: registryData.defaultWorkflow || 'feature',

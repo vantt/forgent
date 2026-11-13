@@ -53,12 +53,16 @@ test('the packaged domain and core operation prompt templates validate', () => {
   }
 });
 
-test('doctor rows skip the release source and leave its tiers to npm test', () => {
-  for (const id of ['agent-claims-resolve', 'domain-registry-compiled']) {
-    const result = doctorRow(id).check(INSTALL_ROOT);
-    assert.equal(result.passed, true, `${id}: ${result.message}`);
-    assert.match(result.message, /release source; npm test judges/, id);
-  }
+test('the claims row skips the release source and leaves its tiers to npm test', () => {
+  const result = doctorRow('agent-claims-resolve').check(INSTALL_ROOT);
+  assert.equal(result.passed, true, result.message);
+  assert.match(result.message, /release source; npm test judges/);
+});
+
+test('the domain registry row judges the running payload\'s compiled domains, in the release source too', () => {
+  const result = doctorRow('domain-registry-compiled').check(INSTALL_ROOT);
+  assert.equal(result.passed, true, result.message);
+  assert.match(result.message, /domain registr(y|ies) compiled, readable and in step/);
 });
 
 test('the agent-type row judges no tier read from inside the release, so a plain project passes with nothing to judge', () => {

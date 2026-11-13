@@ -28,7 +28,7 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { RunnerConfigError } from './runner-config-error.mjs';
-import { listDomainDirs } from '../../util/domain-dirs.mjs';
+import { domainCatalog } from '../../util/domain-dirs.mjs';
 import { PROTOCOL_OPERATION_STAMP_PREFIX } from './execution-contract.mjs';
 
 const THIS_DIR = path.dirname(fileURLToPath(import.meta.url));
@@ -218,9 +218,8 @@ export function discoverOperationPromptTemplates({ cwd = process.cwd(), packageR
   }
 
   // 2. Domain tier
-  const domainsRoot = path.join(packageRoot, 'domains');
-  for (const domainName of listDomainDirs(domainsRoot)) {
-    const domainDir = path.join(domainsRoot, domainName, DOMAIN_PROMPT_TEMPLATES_SEGMENT);
+  for (const { name: domainName, dir } of domainCatalog({ payloadRoot: packageRoot }).domains) {
+    const domainDir = path.join(dir, DOMAIN_PROMPT_TEMPLATES_SEGMENT);
     const entries = scanTier('domain', domainDir, `domain:${domainName}`, packageRoot);
     for (const entry of entries) {
       if (domainTiers.has(entry.id) && domainTiers.get(entry.id) !== domainName) {
@@ -287,10 +286,9 @@ export function loadOperationPromptTemplate(templateId, options = {}) {
     }
   } else {
     // If no target domain, scan all domains
-    const domainsRoot = path.join(packageRoot, 'domains');
     let matchedDomainEntry = null;
-    for (const domainName of listDomainDirs(domainsRoot)) {
-      const domainDir = path.join(domainsRoot, domainName, DOMAIN_PROMPT_TEMPLATES_SEGMENT);
+    for (const { name: domainName, dir } of domainCatalog({ payloadRoot: packageRoot }).domains) {
+      const domainDir = path.join(dir, DOMAIN_PROMPT_TEMPLATES_SEGMENT);
       if (!fs.existsSync(domainDir)) continue;
       const domainEntries = scanTier('domain', domainDir, `domain:${domainName}`, packageRoot);
       const found = domainEntries.find((e) => e.id === templateId);

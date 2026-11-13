@@ -36,12 +36,12 @@ test('the workspace layer shadows an owning domain, which shadows core, as a who
   const { root, write } = makeProject(t);
   write('core/agents/planner.yaml', definition('planner', 'role: core-only-field\n'));
   write('domains/finance/agents/planner.yaml', definition('planner', 'role: domain-field\n'));
-  assert.equal(resolveAgentDefinition('planner', { projectRoot: root, workflow: finance }).tier, 'domain');
-  assert.equal(resolveAgentDefinition('planner', { projectRoot: root, workflow: finance }).source, 'domains/finance/agents/planner.yaml');
+  assert.equal(resolveAgentDefinition('planner', { projectRoot: root, installRoot: root, workflow: finance }).tier, 'domain');
+  assert.equal(resolveAgentDefinition('planner', { projectRoot: root, installRoot: root, workflow: finance }).source, 'domains/finance/agents/planner.yaml');
 
   const own = definition('planner', 'persona:\n  voice: the customer voice\n');
   write('fgos/agents/planner.yaml', own);
-  const found = resolveAgentDefinition('planner', { projectRoot: root });
+  const found = resolveAgentDefinition('planner', { projectRoot: root, installRoot: root });
   assert.equal(found.tier, 'workspace');
   assert.equal(found.source, 'fgos/agents/planner.yaml');
   assert.equal(found.text, own, 'the file is taken whole, never merged with a lower tier');
@@ -70,13 +70,21 @@ test('the listing still reports one name defined by two domains, though each loo
   const { root, write } = makeProject(t);
   write('domains/finance/agents/dup.yaml', definition('dup'));
   write('domains/hr/agents/dup.yaml', definition('dup'));
-  assert.deepEqual(findAgentDuplicates(scanAgentTiers({ projectRoot: root })).map((d) => [d.tier, d.name, d.files]), [
+  assert.deepEqual(findAgentDuplicates(scanAgentTiers({ projectRoot: root, installRoot: root })).map((d) => [d.tier, d.name, d.files]), [
     ['domain', 'dup', ['domains/finance/agents/dup.yaml', 'domains/hr/agents/dup.yaml']],
   ]);
-  assert.equal(resolveAgentDefinition('dup', { projectRoot: root, workflow: finance }).source, 'domains/finance/agents/dup.yaml');
-  assert.equal(resolveAgentDefinition('dup', { projectRoot: root, workflow: { owningDomain: 'hr' } }).source, 'domains/hr/agents/dup.yaml');
+  assert.equal(resolveAgentDefinition('dup', { projectRoot: root, installRoot: root, workflow: finance }).source, 'domains/finance/agents/dup.yaml');
+  assert.equal(resolveAgentDefinition('dup', { projectRoot: root, installRoot: root, workflow: { owningDomain: 'hr' } }).source, 'domains/hr/agents/dup.yaml');
   write('fgos/agents/dup.yaml', definition('dup'));
-  assert.equal(resolveAgentDefinition('dup', { projectRoot: root, workflow: finance }).tier, 'workspace');
+  assert.equal(resolveAgentDefinition('dup', { projectRoot: root, installRoot: root, workflow: finance }).tier, 'workspace');
+});
+
+test('a project\'s own domains/ directory is not a domain tier: lookups read the installed payload\'s domains only', (t) => {
+  const { root, write } = makeProject(t);
+  write('domains/finance/agents/mine.yaml', definition('mine'));
+  assert.throws(() => resolveAgentDefinition('mine', { projectRoot: root, workflow: finance }), /not found/);
+  const tiers = scanAgentTiers({ projectRoot: root });
+  assert.ok(!tiers.find((tier) => tier.tier === 'domain').entries.some((entry) => entry.file.startsWith(root)));
 });
 
 test('an unknown name names every tier searched and never falls back', (t) => {
@@ -84,7 +92,7 @@ test('an unknown name names every tier searched and never falls back', (t) => {
   write('core/agents/other.yaml', definition('other'));
   write('domains/finance/agents/other-domain.yaml', definition('other-domain'));
   assert.throws(
-    () => resolveAgentDefinition('nobody', { projectRoot: root, workflow: finance }),
+    () => resolveAgentDefinition('nobody', { projectRoot: root, installRoot: root, workflow: finance }),
     (error) => error.message.startsWith('persona "nobody" not found; searched fgos/agents (')
       && error.message.includes(path.join(root, 'fgos', 'agents'))
       && error.message.includes(`domains/finance/agents (${path.join(root, 'domains', 'finance', 'agents')})`)
@@ -182,26 +190,26 @@ test('an adjacent persona shadows only its own workflow, ahead of the domain and
   const audit = { owningDomain: 'finance', workflowDir: path.join(root, 'domains/finance/workflows/audit') };
   const other = { owningDomain: 'finance', workflowDir: path.join(root, 'domains/finance/workflows/close') };
 
-  const adjacent = resolveAgentDefinition('critic', { projectRoot: root, workflow: audit });
+  const adjacent = resolveAgentDefinition('critic', { projectRoot: root, installRoot: root, workflow: audit });
   assert.equal(adjacent.tier, 'workflow');
   assert.equal(adjacent.source, 'domains/finance/workflows/audit/agent.critic.yaml');
   assert.equal(adjacent.identity, 'workflow:domains/finance/workflows/audit/critic');
-  assert.equal(resolveAgentDefinition('critic', { projectRoot: root, workflow: other }).identity, 'domain:domains/finance/agents/critic');
-  assert.equal(resolveAgentDefinition('critic', { projectRoot: root }).identity, 'core:core/agents/critic');
+  assert.equal(resolveAgentDefinition('critic', { projectRoot: root, installRoot: root, workflow: other }).identity, 'domain:domains/finance/agents/critic');
+  assert.equal(resolveAgentDefinition('critic', { projectRoot: root, installRoot: root }).identity, 'core:core/agents/critic');
   // The workspace still wins over everything beside a workflow.
   write('fgos/agents/critic.yaml', definition('critic', 'role: workspace\n'));
-  assert.equal(resolveAgentDefinition('critic', { projectRoot: root, workflow: audit }).identity, 'workspace:fgos/agents/critic');
+  assert.equal(resolveAgentDefinition('critic', { projectRoot: root, installRoot: root, workflow: audit }).identity, 'workspace:fgos/agents/critic');
 });
 
 test('a domain persona is invisible to another domain, to core workflows and to a lookup with no workflow', (t) => {
   const { root, write } = makeProject(t);
   write('core/agents/shared.yaml', definition('shared'));
   write('domains/finance/agents/ledger-keeper.yaml', definition('ledger-keeper'));
-  assert.equal(resolveAgentDefinition('ledger-keeper', { projectRoot: root, workflow: finance }).tier, 'domain');
+  assert.equal(resolveAgentDefinition('ledger-keeper', { projectRoot: root, installRoot: root, workflow: finance }).tier, 'domain');
   for (const workflow of [{ owningDomain: 'hr', workflowDir: null }, { owningDomain: null, workflowDir: null }, undefined]) {
-    assert.throws(() => resolveAgentDefinition('ledger-keeper', { projectRoot: root, workflow }), /not found/);
+    assert.throws(() => resolveAgentDefinition('ledger-keeper', { projectRoot: root, installRoot: root, workflow }), /not found/);
     // A workflow of another domain still resolves its core persona.
-    assert.equal(resolveAgentDefinition('shared', { projectRoot: root, workflow }).tier, 'core');
+    assert.equal(resolveAgentDefinition('shared', { projectRoot: root, installRoot: root, workflow }).tier, 'core');
   }
 });
 

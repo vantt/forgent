@@ -276,6 +276,7 @@
     "src/util/agent-skill-dirs.mjs": "kernel",
     "src/util/capped-jsonl-log.mjs": "kernel",
     "src/util/domain-dirs.mjs": "kernel",
+    "src/util/domain-compile.mjs": "infra",
     "src/util/format-bytes.mjs": "kernel",
     "src/util/format-duration.mjs": "kernel",
     "src/util/format-lock-duration.mjs": "kernel",
