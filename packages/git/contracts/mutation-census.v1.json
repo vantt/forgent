@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "c716b1c0d271336b4c489743e98c88839865301d4fb0a44a28ce8514fefcc874",
+  "payloadDigest": "26ff1993b9b49a03fbe5e24dfc3093911bbce9e0bf734dda1c86ab5f71c9c1ad",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -701,9 +701,9 @@
     "packages/run-supervisor/rust/tests/steps_runner.rs": "0b1c712a4bcc8af7ced04740e3395bfa898818b0f9e005987e769e08cc87f4c9",
     "packages/run-supervisor/rust/tests/supervise_crash.rs": "41d0a0e75d6129e32cf5430ff046c6b113ccaf05097824831645b85fe5186882",
     "packages/run-supervisor/rust/tests/supervise_guard.rs": "d79b6760183e60ae29306ad0bf0a80918be8767fc03a7ae267ca80536e225839",
-    "packages/run-supervisor/rust/tests/supervise_lifecycle.rs": "b68e87d8a8ea55d3e991d3473fe195375b1192650ee1b1b0c7ccd703b2350d2f",
+    "packages/run-supervisor/rust/tests/supervise_lifecycle.rs": "fcdea6680ec038373bbb6635071a51cde121d0ffd2c880bdfd34856192250427",
     "packages/run-supervisor/rust/tests/supervise_portable.rs": "0f667d7d6e87a540194a2619710f88981bdf4e43a8b65ca0bd8b98d7f7341cc3",
-    "packages/run-supervisor/rust/tests/supervise_terminal_fake_herdr.rs": "4f2855deb018aae548e380b1adc59f82b121315289cf8a8de3eed606130fe482",
+    "packages/run-supervisor/rust/tests/supervise_terminal_fake_herdr.rs": "d3723fd5485d74ecdc0adb59bf2933f123f1e9fe4fb4d51f42d1ef0d35f4b906",
     "packages/run-supervisor/rust/tests/support/adopt_fixture.rs": "7c29a0b1cc2d131e7b1c0c4c0f35d576669c8482404601660685666cd9f4b6f9",
     "packages/run-supervisor/rust/tests/support/herdr.rs": "2e0517015a00e1e40c4a0cb7c8dcf572a65f5332812936be33269605d5c10cee",
     "packages/run-supervisor/rust/tests/support/mod.rs": "728910e2ab68b8f0e1c541da067dfb5d6e0916f7d431c21497ca469d04353404",
@@ -3074,7 +3074,7 @@
     },
     {
       "path": "packages/run-supervisor/rust/tests/supervise_terminal_fake_herdr.rs",
-      "line": 643,
+      "line": 658,
       "spawn": "Command::new",
       "binary": "? internal_harness()",
       "class": "rust-test"

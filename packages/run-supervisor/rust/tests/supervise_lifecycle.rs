@@ -115,17 +115,25 @@ fn a_direct_agent_that_exits_on_a_provider_stop_names_it_in_the_receipt_unless_i
     assert_eq!(dead_login["outcome"], "exited");
     assert_eq!(dead_login["reason"], "direct:blocked:login");
     assert_eq!(dead_login["outboxResult"], serde_json::Value::Null);
+    // The provider's own reset phrase rides next to the reason; a login wording carries no signal.
+    assert!(dead_login.get("providerSignal").is_none(), "{dead_login}");
+    let limited = direct_receipt("dquota", &format!("{quota}; exit 1")).unwrap();
+    assert_eq!(limited["reason"], "direct:blocked:usage-limit");
     assert_eq!(
-        direct_receipt("dquota", &format!("{quota}; exit 1")).unwrap()["reason"],
-        "direct:blocked:usage-limit"
+        limited["providerSignal"],
+        json!({"resetHint": "try again at 7:18 PM"})
     );
     // The provider's API error is read from the last JSON event on stdout, where a json-mode CLI writes it.
     let api_error =
         r#"echo '{"type":"message_end","message":{"stopReason":"error","errorStatus":404}}'"#;
-    assert_eq!(
-        direct_receipt("dapi", &format!("{api_error}; exit 1")).unwrap()["reason"],
-        "direct:blocked:provider-error"
-    );
+    let api = direct_receipt("dapi", &format!("{api_error}; exit 1")).unwrap();
+    assert_eq!(api["reason"], "direct:blocked:provider-error");
+    assert_eq!(api["providerSignal"], json!({"status": 404}));
+    // A 429 in the last event is a usage limit and keeps the status the provider sent.
+    let exhausted = r#"echo '{"type":"agent_end","messages":[{"role":"assistant","stopReason":"error","errorMessage":"Cloud Code Assist API error (429)","errorStatus":429}],"isTerminal":true}'"#;
+    let quota_429 = direct_receipt("d429", &format!("{exhausted}; exit 1")).unwrap();
+    assert_eq!(quota_429["reason"], "direct:blocked:usage-limit");
+    assert_eq!(quota_429["providerSignal"]["status"], 429);
     // A result in the outbox wins over whatever the agent printed last.
     let reported = direct_receipt(
         "dwon",
@@ -133,12 +141,12 @@ fn a_direct_agent_that_exits_on_a_provider_stop_names_it_in_the_receipt_unless_i
     )
     .unwrap();
     assert!(reported.get("reason").is_none(), "{reported}");
+    assert!(reported.get("providerSignal").is_none(), "{reported}");
     assert_eq!(reported["outboxResult"], "result-2.json");
     // A clean exit never yields a reason, even when the last words quote a provider wording.
-    assert!(direct_receipt("dclean", &format!("{login}; exit 0"))
-        .unwrap()
-        .get("reason")
-        .is_none());
+    let clean = direct_receipt("dclean", &format!("{quota}; exit 0")).unwrap();
+    assert!(clean.get("reason").is_none(), "{clean}");
+    assert!(clean.get("providerSignal").is_none(), "{clean}");
     // Ordinary failure output names no provider.
     assert!(direct_receipt("dplain", "echo 'tests failed' >&2; exit 1")
         .unwrap()

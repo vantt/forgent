@@ -543,6 +543,10 @@ fn a_deadline_stop_names_a_provider_stop_on_the_screen_and_keeps_the_timeout_out
             "dapierror",
             "working...\n\u{2718} Cloud Code Assist API error (404): { \"error\": { \"code\": 404,\n".to_string(),
         ),
+        (
+            "d429",
+            "working...\n\u{2718} Cloud Code Assist API error (429): { \"error\": { \"code\": 429,\n".to_string(),
+        ),
         // The agent may have been working: its own prose about a rate limit, or a dialog, names nothing.
         (
             "dprose",
@@ -561,8 +565,19 @@ fn a_deadline_stop_names_a_provider_stop_on_the_screen_and_keeps_the_timeout_out
     assert_eq!(receipts[0]["reason"], "terminal:blocked:usage-limit");
     assert_eq!(receipts[1]["reason"], "terminal:blocked:login");
     assert_eq!(receipts[2]["reason"], "terminal:blocked:provider-error");
-    assert!(receipts[3].get("reason").is_none(), "{}", receipts[3]);
-    assert!(receipts[4].get("reason").is_none(), "{}", receipts[4]);
+    assert_eq!(receipts[3]["reason"], "terminal:blocked:usage-limit");
+    // The signal is read from the same screen as the reason.
+    assert_eq!(
+        receipts[0]["providerSignal"],
+        json!({"resetHint": "try again at 7:18 PM"})
+    );
+    assert!(receipts[1].get("providerSignal").is_none(), "{}", receipts[1]);
+    assert_eq!(receipts[2]["providerSignal"], json!({"status": 404}));
+    assert_eq!(receipts[3]["providerSignal"], json!({"status": 429}));
+    for quiet in &receipts[4..] {
+        assert!(quiet.get("reason").is_none(), "{quiet}");
+        assert!(quiet.get("providerSignal").is_none(), "{quiet}");
+    }
 }
 
 #[test]
