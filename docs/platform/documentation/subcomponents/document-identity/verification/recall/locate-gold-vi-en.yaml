@@ -1,0 +1,152 @@
+format: 1
+cases:
+  - id: "vi-en-01-g01"
+    query: "Approve keeps reporting that it is blocked because the worker branch has changes in .fgos, but in fact the worker never touched it; main only changed the config after the branch was split off. After running catchup and approving again, the exact same old error comes back, looping forever without getting out."
+    expect:
+      - {path: "docs/explanation/fgos-write-rejected-structural-deadlock.md", section: ["## The mechanism"]}
+      - {path: "docs/explanation/write-rejected-trust-branchheadattake.md", section: ["# A worker branch that never touched `.fgos/` still got blocked as if it had"]}
+      - {path: "docs/explanation/write-rejected-no-diff-check.md", section: ["## The gap blob-equality couldn't cover"]}
+  - id: "vi-en-02-g02"
+    query: "Items are lost again: yesterday the list still showed them, but now grep in the event log file finds no lines. Suspect some session ran stash or reset in the main checkout while other sessions were still writing to it."
+    expect:
+      - {path: "docs/explanation/events-jsonl-concurrent-data-loss-investigation.md", section: ["## The evidence: not a one-off"]}
+      - {path: "docs/explanation/events-jsonl-opportunistic-truncation-check.md", section: ["## Detect-and-warn wasn't enough to actually recover — `tsk-46v` added the remediation path"]}
+      - {path: "docs/knowledge/how-to-respond-when-fgos-doctor-reports-a-shared-fgos-events/resolve-an-events-jsonl-truncation.md", section: ["## Why this is different from a merge-conflict break"]}
+      - {path: "docs/knowledge/how-to-reconstruct-fgos-tracking-state-after-an-operator-mis/reconstruct-fgos-tracking-state-after-an-operator-mistake-discards-events-jsonl.md", section: ["# How to reconstruct fgOS tracking state after an operator mistake discards `.fgos/events.jsonl` mid-session"]}
+  - id: "vi-en-03-g04"
+    query: "pick is refused with exit 7 because the lock on the main checkout is being held. Before deleting the lock, check whether the holder is still alive, whether it has expired yet, or whether to just wait for it to finish."
+    expect:
+      - {path: "docs/knowledge/how-to-clear-a-stuck-fgos-main-checkout-lock/clear-a-stuck-main-checkout-lock.md", section: ["## Steps"]}
+      - {path: "docs/knowledge/how-to-check-main-checkout-lock-status-before-retrying/check-main-checkout-lock-status-before-retrying.md", section: ["## Steps"]}
+      - {path: "docs/knowledge/how-to-wait-out-a-genuinely-active-main-checkout-lock-holder/wait-out-an-active-main-checkout-lock-holder.md", section: ["## Steps"]}
+  - id: "vi-en-04-g06"
+    query: "After every commit, the main lock stays hung for several more minutes because the pre-commit hook does not release it, making other sessions wait unnecessarily."
+    expect:
+      - {path: "docs/knowledge/why-acquiremaincheckoutlock-s-release-on-exit-is-opt-in-neve/main-checkout-lock-release-on-exit-opt-in.md", section: ["## The two callers, and why they disagree"]}
+      - {path: "docs/knowledge/why-the-pre-commit-hook-got-its-own-shorter-main-checkout-lo/why-the-pre-commit-hook-got-its-own-shorter-lock-ttl.md", section: ["## The real cost of one shared TTL"]}
+      - {path: "docs/explanation/main-checkout-lock-release-early-compound-cleanup.md", section: ["## Root cause, confirmed via code trace"]}
+  - id: "vi-en-05-g07"
+    query: "While inside a worktree, running an fgos run command containing $(cat file prompt) gets blocked by the Bash guard, which says the command is too complex to verify. The way around it is to write a wrapper script and then call that script."
+    expect:
+      - {path: "docs/how-to/handle-worktree-guard-refusal-of-compound-dispatch-command.md", section: ["## The mitigation"]}
+      - {path: "docs/how-to/write-wrapper-script-for-worktree-guard-refusal.md", section: ["## When to use it"]}
+  - id: "vi-en-06-g09"
+    query: "Returning to the item's worktree, the branch has been moved elsewhere because the child was merged into the root branch, and the index in the worktree is now completely out of line. How can I tell whether this is a stale index or real uncommitted changes?"
+    expect:
+      - {path: "docs/knowledge/how-to-tell-a-stale-worktree-index-apart-from-real-uncommitt/tell-a-stale-worktree-index-apart-from-real-uncommitted-work.md", section: ["## Before you start"]}
+      - {path: "docs/explanation/driving-loop-worktree-resync-on-reentry.md", section: ["## Confirmed live and 100% reproducible"]}
+  - id: "vi-en-07-g11"
+    query: "merge-loop reported there was nothing left to merge; it turned out this was because the command was run from inside a worktree, so it could not find the real .fgos store."
+    expect:
+      - {path: "docs/knowledge/why-fgos-merge-now-refuses-outside-the-main-checkout/why-fgos-merge-now-refuses-outside-the-main-checkout.md", section: ["# Why `fgos merge` now refuses outside the main checkout"]}
+      - "docs/knowledge/how-to-recover-fgos-approve-fgos-sync-root-from-inside-a-wor/recover-approve-sync-root-from-inside-a-worktree-with-trust-dir.md"
+      - {path: "docs/knowledge/how-to-run-a-state-writing-fgos-verb-from-inside-a-picked-wo/run-a-state-verb-from-inside-a-worktree.md", section: ["## A fourth case: `STORE_MISSING_WARNING_VERBS` missing an entry can silently return the WRONG safety answer, not just an empty one"]}
+  - id: "vi-en-08-g12"
+    query: "Two branches took the same next decision number at the same time, so when the second one was approved it conflicted in the decisions index file."
+    expect:
+      - {path: "docs/knowledge/how-to-resolve-an-fgos-approve-merge-conflict-caused-by-two/resolve-a-decision-id-collision-merge-conflict-on-approve.md", section: ["# How to resolve an `fgos approve` merge-conflict caused by two branches claiming the same decision ID"]}
+      - {path: "docs/knowledge/why-the-decision-id-collision-auto-resolver-only-trusts-a-sh/merge-auto-resolves-decision-id-collision.md", section: ["## The shape being auto-resolved"]}
+  - id: "vi-en-09-g13"
+    query: "My changes pass all their own tests when run separately, but approve is blocked because after the merge the test suite is red in an unrelated place. I need a way to diagnose it and retry following the correct process."
+    expect:
+      - {path: "docs/knowledge/how-to-diagnose-an-fgos-approve-blocked-by-verify-fail-post/diagnose-a-verify-fail-post-merge-block-on-approve.md", section: ["## Steps"]}
+      - {path: "docs/knowledge/why-merge-loop-self-diagnoses-only-verify-fail-post-merge-ne/merge-loop-self-diagnoses-verify-fail-post-merge.md", section: ["## The request this traces to"]}
+      - {path: "docs/knowledge/why-the-verify-fail-post-merge-playbook-s-retry-step-moves-a/why-the-verify-fail-post-merge-playbook-retries-through-awaiting-approval-not-proposed.md", section: ["# Why the verify-fail-post-merge playbook retries through `awaiting-approval`, not `proposed`"]}
+  - id: "vi-en-10-g15"
+    query: "The code of several child items is marked done and merged into the root branch, but looking on main it is nowhere to be seen, as if it were lost. The root has not been pushed up to main, so the two sides are out of sync without anyone knowing."
+    expect:
+      - {path: "docs/knowledge/why-fgos-added-sync-root-and-drift-detection/why-fgos-added-sync-root-and-drift-detection.md", section: ["# Why fgOS added `sync-root` and drift detection"]}
+      - {path: "docs/knowledge/fgos-sync-root-s-real-guards-and-outcome-shape/fgos-sync-root-outcome-shape.md", section: ["## The locked contract: status/stage stays untouched on success"]}
+  - id: "vi-en-11-g16"
+    query: "A worker running out-of-process exited with a timeout error, printing no sign that it finished or was blocked at all, yet the system still treats it as having run fine."
+    expect:
+      - {path: "docs/explanation/dispatch-execute-unsignaled-outcome.md", section: ["## Confirmed live, three separate times"]}
+      - {path: "docs/explanation/unsignaled-detection-backtick-false-positive.md", section: ["# The `[DONE]`/`[BLOCKED]` detector had a false-positive hole — closed by cross-provider proof-testing"]}
+      - {path: "docs/explanation/worker-prompt-inline-completion-signal.md", section: ["## Confirmed live 4 times, 2 distinct root causes"]}
+  - id: "vi-en-12-g18"
+    query: "When I want to call the Agent tool to hand off a sub-task, a hook blocks it and requires asking decide first about how to run it. Record why this rule is enforced by a hook rather than being just a convention."
+    expect:
+      - {path: "docs/knowledge/why-every-agent-task-tool-dispatch-is-enforced-through-a-pre/why-dispatch-decide-is-a-hard-hook-enforced-gate-not-a-convention.md", section: ["## The evidence that prose alone doesn't work"]}
+      - {path: "docs/knowledge/how-to-wire-a-skill-through-the-dispatch-decision/wire-a-skill-through-the-native-vs-cli-spawn-dispatch-decision.md", section: ["# How to wire a skill through the dispatch decision"]}
+  - id: "vi-en-13-g19"
+    query: "The executor declares its command as claude, but actually, through an environment variable, it sends the prompt to OpenRouter, so data leaves for a different provider and the control gate does not detect it."
+    expect:
+      - {path: "docs/explanation/cross-provider-egress-governance.md", section: ["## The gap"]}
+      - {path: "docs/knowledge/executor-cross-provider-governance/executor-cross-provider-governance.md", section: ["## What \"non-Claude\" means"]}
+  - id: "vi-en-14-g20"
+    query: "The work board on the herdr dashboard should split into tabs by status, have a priority column, and sort by priority number in ascending order."
+    expect:
+      - {path: "docs/knowledge/herdr-plugin-dashboard-layout-work-items-panel-action-queue/herdr-dashboard-layout-and-action-queues.md", section: ["## Left panel: Work Items"]}
+      - {path: "docs/knowledge/why-herdr-s-dashboard-lists-became-real-tables-and-why-in-pr/herdr-dashboard-table-view-scope-and-sort.md", section: ["## Why the sort order is a two-tier scheme, not one flat rule"]}
+  - id: "vi-en-15-g21"
+    query: "When a herdr pane is opened automatically for a worker, the pane label has not been written in time, so the next time the check finds nobody there and opens again into the same pane. The label must be set first, and only then should claude be run."
+    expect:
+      - {path: "docs/knowledge/why-auto-launched-herdr-panes-must-be-labeled-before-spawnin/why-auto-launched-herdr-panes-must-be-labeled-before-spawning-claude.md", section: ["## Why the same ordering breaks for an unattended, auto-launched pane"]}
+      - {path: "docs/knowledge/why-herdr-cockpit-stacked-worker-launches-into-a-single-reus/why-herdr-cockpit-stacked-worker-launches-into-one-pane.md", section: ["# Why herdr cockpit stacked worker launches into one pane"]}
+  - id: "vi-en-16-g22"
+    query: "I want the confirmation step in the skill to approve on its own for small tasks. How do I set the level in the config file, and how do those levels differ from each other?"
+    expect:
+      - {path: "docs/knowledge/gate-bypass-config/gate-bypass-config.md", section: ["## `.fgos/gate-bypass.json`"]}
+      - {path: "docs/knowledge/why-gate-bypass-is-shaped-the-way-it-is/gate-bypass-design.md", section: ["## Why there's still a human-set ceiling anyway (D5)"]}
+  - id: "vi-en-17-g23"
+    query: "An item that only mentions the file name AUDIT.md in its description is also treated as high-risk work and is not allowed to be approved on its own."
+    expect:
+      - {path: "docs/explanation/gate-bypass-keyword-floor-false-positives.md", section: ["## 1. A file-path citation triggered the hard-gate"]}
+      - {path: "docs/knowledge/why-heavy-keywords-matching-moved-from-substring-to-word-bou/why-heavy-keywords-matching-moved-to-word-boundaries.md", section: ["## A third consumer was missed (`tsk-1gj`): `gate-bypass.mjs` never migrated"]}
+  - id: "vi-en-18-g26"
+    query: "Some coding skills are as long as five or six hundred lines and too hard to read. So the step-by-step detail should be split out into a separate file to keep the main file under three hundred lines."
+    expect:
+      - {path: "docs/explanation/skill-prose-cleanup-design.md", section: ["## The three defects, and the fix for each"]}
+      - {path: "docs/knowledge/why-fgos-s-coding-domain-skills-were-rewritten-to-a-300-line/why-fgos-skills-split-into-skillmd-plus-references-under-300-lines.md", section: ["# Why fgOS skills split into `SKILL.md` + `references/`, under 300 lines each"]}
+      - {path: "docs/explanation/skill-prose-cleanup-fgos-coding-planning.md", section: ["# `fgos-coding-planning`'s skill-prose cleanup"]}
+      - {path: "docs/explanation/skill-prose-cleanup-fgos-coding-validating.md", section: ["# `fgos-coding-validating`'s skill-prose cleanup"]}
+      - {path: "docs/explanation/skill-prose-cleanup-fgos-coding-exploring.md", section: ["# `fgos-coding-exploring`'s skill-prose cleanup"]}
+  - id: "vi-en-19-g27"
+    query: "To uninstall fgOS from the machine, you must clean up the hooks that were attached and the source line in the shell rc file; whether it can also delete the package itself is not certain."
+    expect:
+      - {path: "docs/knowledge/why-fgos-uninstall-shipped-as-two-pieces/fgos-uninstall-feature-overview.md", section: ["## Why it split into two items instead of one"]}
+      - {path: "docs/knowledge/reverse-fgos-setup-s-wiring-with-fgos-uninstall/uninstall-fgos-wiring.md", section: ["# Reverse `fgos setup`'s wiring with `fgos uninstall`"]}
+      - {path: "docs/knowledge/whether-fgos-uninstall-remove-package-can-reliably-remove-it/fgos-self-uninstall-package-removal-spike.md", section: ["# Can fgOS reliably remove its own installed package?"]}
+  - id: "vi-en-20-g28"
+    query: "After installing fgos globally with npm, in another project any slash command fails because the skill looks for bin/fgos.mjs in the project directory."
+    expect:
+      - {path: "docs/knowledge/why-plugin-skills-need-a-cli-path-fallback/plugin-skill-cli-path-resolution-fallback.md", section: ["## The gap (tsk-1no)"]}
+      - {path: "docs/knowledge/why-fgos-install-setup-resolves-the-fgos-binary-through-a-3/why-fgos-bin-and-skill-distribution-needed-a-3-tier-self-healing-resolution.md", section: ["## Two real, silent failures found together (2026-08-13)"]}
+  - id: "vi-en-21-g29"
+    query: "return reports red with the error /bin/sh not found; it turns out the item's verify field still holds Vietnamese placeholder text, so the shell ran it as a command."
+    expect:
+      - {path: "docs/knowledge/explanation-fgos-return-runs-verify-as-a-literal-shell-comma/fgos-return-executes-verify-as-a-literal-shell-command.md", section: ["## What happened (tsk-iun)"]}
+      - {path: "docs/knowledge/how-to-fix-a-verify-command-that-mixes-prose-with-a-real-com/fix-a-verify-command-broken-by-mixed-in-prose.md", section: ["# How to fix a verify command that mixes prose with a real command"]}
+  - id: "vi-en-22-g30"
+    query: "The dependency item has already moved to wontfix, yet the next item is still stuck waiting, because the check only treats the done status as complete."
+    expect:
+      - {path: "docs/knowledge/why-wontfix-had-to-join-done-at-every-is-this-resolved-check/wontfix-terminal-status-filter-consistency.md", section: ["## The gap was a real deadlock, not a cosmetic inconsistency"]}
+      - {path: "docs/knowledge/why-isdepsandlineageready-uses-resolved-statuses-not-just-do/why-isdepsandlineageready-uses-resolved-statuses-not-just-done.md", section: ["# Why `isDepsAndLineageReady` uses `RESOLVED_STATUSES`, not just `done`"]}
+  - id: "vi-en-23-g32"
+    query: "The tests run too slowly, and narrowing the verify scope does not make it any faster at all."
+    expect:
+      - {path: "docs/explanation/test-suite-wallclock-file-split.md", section: ["## Measured, not assumed"]}
+      - {path: "docs/knowledge/why-splitting-test-files-hits-a-floor-and-why-narrowing-veri/why-splitting-test-files-hits-a-floor-and-narrowing-verify-never-helped.md", section: ["## Consequence: narrowing verify scope cannot make verify faster"]}
+  - id: "vi-en-24-g37"
+    query: "I want to compare two ways of organizing a discussion against each other using a blind judge who scores by a set of quality criteria, to find out which setup gives better results."
+    expect:
+      - {path: "docs/how-to/compare-discussion-setups-with-metrics-eval.md", section: ["# Compare discussion setups with metrics eval"]}
+      - {path: "docs/reference/discussion-quality-rubric.md", section: ["## Recording and comparison"]}
+  - id: "vi-en-25-none"
+    query: "We need to export fgos run data to Prometheus to draw charts in Grafana, tracking the number of workers currently running and the time for each run."
+    expect: []
+  - id: "vi-en-26-none"
+    query: "When an item has been blocked for too long, an email should be sent to the project owner via SMTP."
+    expect: []
+  - id: "vi-en-27-none"
+    query: "Write a Python library to call fgos from a script, so there is no need to shell out to the CLI."
+    expect: []
+  - id: "vi-en-28-none"
+    query: "The gateway's web dashboard needs a dark-mode toggle button; at night it is too glaring on the eyes."
+    expect: []
+  - id: "vi-en-29-none"
+    query: "The CLI's error messages should have a Vietnamese version, with the language selectable in the config."
+    expect: []
+  - id: "vi-en-30-none"
+    query: "Consider selling a commercial edition: issue license keys and split paid plans by seat count."
+    expect: []

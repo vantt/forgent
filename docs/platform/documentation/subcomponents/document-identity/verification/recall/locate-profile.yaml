@@ -1,0 +1,52 @@
+profile: fgos-docs
+version: 1
+format: 1
+requires: {schema: ">=4"}
+vault:
+  include: ["docs/**/*.md"]
+  read: {body_edges: true}
+  header: {fence: txt}
+  types: [{path: "docs/**", type: document}]
+  writes: none
+facets:
+  area:
+    kind: locating
+    required: true
+    from: [{path: "docs/platform/{value}/**"}, {frontmatter: area}]
+    home: "docs/platform/{value}/"
+    values:
+      agent-confinement: "agent-confinement"
+      agent-coordination: "agent-coordination"
+      agent-mailbox: "agent-mailbox"
+      agent-protocol: "agent-protocol"
+      claude-plugin: "claude-plugin"
+      coexistence: "coexistence"
+      config: "config"
+      convention: "convention"
+      decision-citation-drift: "decision-citation-drift"
+      distillery: "distillery"
+      documentation: "documentation"
+      domainization: "domainization"
+      event-store: "event-store"
+      git: "git"
+      herdr-web-dashboard: "herdr-web-dashboard"
+      holder-lock: "holder-lock"
+      host-invocation-routing: "host-invocation-routing"
+      identity: "identity"
+      observe: "observe"
+      packaging-distribution: "packaging-distribution"
+      process: "process"
+      proposals: "proposals"
+      run-supervisor: "run-supervisor"
+      runner: "runner"
+      seat-binding: "seat-binding"
+      secrets: "secrets"
+      system-architecture: "system-architecture"
+      system-overview: "system-overview"
+      terminal-control: "terminal-control"
+      ui-spec: "ui-spec"
+      work-state: "work-state"
+      workflow: "workflow"
+      yaml-document: "yaml-document"
+observe:
+  sink: jsonl
