@@ -71,10 +71,34 @@ Branch runs green: CI 43378173930, Release assets check 43378173932.
 
 `holder-lock-cross-platform` (Windows and macOS crates) is red on main before and after this lane; it is not a release gate and is tracked under the Windows/macOS rows.
 
+## rc.7 cut and the reds it surfaced
+
+Main 03ed517d0 was green on both workflows (CI 43391162894, Release assets check 43391163012, every
+"Show Rust toolchain" job on rustc/cargo 1.99.0, Linux and Windows). `chore: prepare v0.2.0-rc.7`
+(e25203919, CHANGELOG rc.7 section plus a Known gaps line for Windows) was green on both workflows
+(CI 43396870457, Release assets check 43396870372) and tagged `v0.2.0-rc.7`. The Release run
+43404840222 on the tag failed; one rerun of its failed jobs failed again on another test; by the big
+lead's decision there were no further reruns, rc.7 stays where it is (unpublished), and rc.8 (owner
+approved) is cut from a main that carries the fixes below.
+
+| # | Run | Test | Cause | Fix |
+|---|-----|------|-------|-----|
+| 9 | Release 43404840222 cargo | holder-lock gc control: probe Free, background holders [] | Product-relevant: `init_repo` (src, the production borrow vectors' setup, the gate behind doctor and activate) made its base commit with gc.auto=0, which still spawns a detached `git maintenance run --auto` holding objects/maintenance.lock for a moment; a later commit that meets the lock starts no gc, so a gc vector could pass vacuously and the control saw no holder. Forced repro: with maintenance.lock present the eligible commit leaves the description free. | `562929346`: base commit also passes `maintenance.auto=false`; borrow_git 10/10; OPC MERGE |
+| 10 | Release 43404840222 test (ubuntu) | run-tests ERROR, suite left `bwrap --unshare-pid --as-pid-1 ... --info-fd 3 -- /usr/bin/git ...` | Product race in process containment: bwrap writes its --info-fd report before releasing the namespace init; with a pipe whose reader was killed in the ms before the report, SIGPIPE killed bwrap and the init waited forever (ppid 1). Forced repro: closing the reader at spawn stranded 100/100 inits (one such init had lived 19 days on this machine). Which test triggered it on rc.7 is not proven. | `000d84d7c`: the report goes to a memfd read by position; same repro 0/100; new proof `containment_direct_gate_runs_on_when_its_caller_ends_before_bwrap_reports`; process spec settled fact; OPC MERGE |
+| 11 | Release rerun, cargo | run-supervisor `gate_go` `a_correct_go_runs_the_agent_and_reports_its_tuple`: AGENT tuple without pid | Product race: the gate read the agent identity with `identity_of` right after spawn; a fast agent was already an unreaped zombie, which `identity_of` does not count, so the AGENT frame and the end-of-domain kill had no tuple; steps had the same race | `dee739e7b` + `719660c7d`: one `ProcessPlatform::child_identity` door (Linux stat, macOS bsd info, else identity_of) behind `facts::identity_of_child`; Linux `tuple_of` and `macos::child_identity` deleted; gate, steps and both spawn_leader callers use it; owning proof `unreaped_fast_child_keeps_its_identity` in facts; gate_go 20/20; OPC MERGE after one CHANGES round |
+
+| 12 | branch CI 43440714011, cargo | mailbox `nudge` `a_claude_head_is_written_when_the_accept_is_in_its_user_settings...`: Err("runtime-dir-unknown") | Same exec-window class as #3: the kernel publishes a new image's environment just after its argv, so a view read right after spawn had the argv and an empty environ | `06543c0c0` + `0b66c6df2`: the settle (`read_settled`) covers environ too; the unit proof drives a late argv and a late environment; nudge 20/20; OPC MERGE |
+| 13 | branch CI 43416449319 and main 7a7c7ee6e, `test (ubuntu-latest)` | run-tests ERROR "left temporary directories behind: fgos-tp-*: 1", fail 0 | Not found: pre-existing (seen before the memfd commit), about 3 in 8 runs, never reproduced locally, and nothing named the owning file | `25fafc278`: diagnostic only: each process temp root carries `.owner`, the removal error is printed instead of swallowed, run-tests lists each leftover with its owner and top-level entries and mtimes; the ERROR still fails the run; OPC MERGE. A leftover marked "(no .owner)" means a late writer recreated the root; a removal-error line means rmSync failed. |
+
+Full npm test on the branch (b506e5505 before rebase): 8862 tests, 0 fail, no ERROR lines. Branch runs green: CI 43446917944, Release assets check 43446917930.
+`process-containment` and `holder-lock-cross-platform` stay red on Windows/macOS as on main before; they
+are not release gates.
+
 ## Backlog rows opened
 
 - `p-5zazr53vd2`: the exec-window retry is per process and the scan is serial (N x 250 ms); bound it
   with one per-scan deadline or a second pass.
+- To add when the freeze lifts: p-5zazr53vd2 also covers `env -i` processes when env keys are requested; p-xqkchdr6iy's policy also applies to the environment marker; a new row for a bwrap pidfd wake instead of the 500 us report poll (OPC).
 - `p-xqkchdr6iy`: a live same-user process whose argv cannot be read counts as not fgOS in the quiesce
   gate; gate-contract change (packages/process spec plus the quiesce route reading it as unreadable).
 
@@ -102,5 +126,8 @@ Branch runs green: CI 43378173930, Release assets check 43378173932.
 - Every red today was intermittent and each landing surfaced the next: CI and Release assets check
   run about an hour, so batching every visible red per run, and reading every failed job of the
   landed commit before calling it green, is what bounds the cycle count.
+- A tag is cut from a commit whose CI was green once; the Release run repeats the whole suite, so an
+  intermittent red there blocks the release. Three of the four Release reds were real product races, not
+  test noise: treat an intermittent red as a product race until a forced repro says otherwise.
 - An earlier fix (7980b494e) patched one cleanup site with an inline retry; the same failure then hit a
   sibling file. Fix the class through one helper on the first occurrence.
