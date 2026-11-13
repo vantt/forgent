@@ -6,7 +6,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { spawnSync, spawn, execFileSync } from 'node:child_process';
 import http from 'node:http';
-import { activated, useReleaseFixture, useInitializedWorkspace, FGCTL_BIN, fixture, runFgctl, waitForProcess, RELEASE_TARGET, makeDownloadProject, makeReleaseAssets, readActivation, withoutActiveRelease } from './fgctl-init-fixture.mjs';
+import { activated, useReleaseFixture, useInitializedWorkspace, FGCTL_BIN, fixture, runFgctl, waitForProcess, RELEASE_TARGET, makeDownloadProject, makeReleaseAssets, readActivation, withoutActiveRelease, removeTree } from './fgctl-init-fixture.mjs';
 
 useReleaseFixture();
 // One real `fgctl init --from <fixture release>`, restored by the cases that start from it.
@@ -29,7 +29,7 @@ test('download: --from beats FGCTL_FROM beats FGCTL_VERSION (the losing sources 
     assert.equal(viaFlag.status, 0, viaFlag.stderr);
     assert.ok(!/downloading/.test(viaFlag.stderr), 'a local --from must not download');
   } finally {
-    fs.rmSync(t.root, { recursive: true, force: true });
+    removeTree(t.root);
   }
 
   const t2 = makeDownloadProject('dl-precedence-env');
@@ -49,7 +49,7 @@ test('download: --from beats FGCTL_FROM beats FGCTL_VERSION (the losing sources 
     assert.ok(!/downloading/.test(viaEnv.stderr), 'FGCTL_FROM must not download');
     assert.equal(readActivation(t2.proj).artifactDigest, fixture.digest);
   } finally {
-    fs.rmSync(t2.root, { recursive: true, force: true });
+    removeTree(t2.root);
   }
 });
 
@@ -104,7 +104,7 @@ test('download: with no pin and nothing explicit, init resolves and installs the
     assert.equal(pin.projectRuntime.releaseVersion, 'v0.0.2', 'the resolved latest tag is recorded in the pin');
   } finally {
     await new Promise((resolve) => server.close(resolve));
-    fs.rmSync(t.root, { recursive: true, force: true });
+    removeTree(t.root);
   }
 });
 
@@ -176,8 +176,8 @@ test('the cmd launcher runs the activated fgos from a plain Windows shell', { sk
     assert.equal(info.data.host, 'rust');
     assert.equal(info.data.artifactDigest, fixture.digest);
   } finally {
-    fs.rmSync(tempHome, { recursive: true, force: true });
-    fs.rmSync(tempState, { recursive: true, force: true });
-    fs.rmSync(tempProj, { recursive: true, force: true });
+    removeTree(tempHome);
+    removeTree(tempState);
+    removeTree(tempProj);
   }
 });

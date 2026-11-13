@@ -29,6 +29,7 @@ import {
   withoutActiveRelease,
   pathWithGcLeakingGit,
   processesUnder,
+  removeTree,
 } from './fgctl-init-fixture.mjs';
 
 const FGOS_BIN = releaseBinaryPath(releaseOutputDir(), 'fgos');
@@ -134,10 +135,10 @@ before(() => {
 
 after(() => {
   if (releaseDirA && fs.existsSync(releaseDirA)) {
-    fs.rmSync(releaseDirA, { recursive: true, force: true });
+    removeTree(releaseDirA);
   }
   if (releaseDirB && fs.existsSync(releaseDirB)) {
-    fs.rmSync(releaseDirB, { recursive: true, force: true });
+    removeTree(releaseDirB);
   }
 });
 
@@ -193,7 +194,7 @@ test('R1, R2, R3, R6: A -> B upgrade then repair round-trips reported digest wit
   assert.match(upgradeRes.stderr, /^fgctl: replaced .* with the release's fgctl \(sha256:[0-9a-f]{64}\); previous binary kept at .*\.prev$/m);
   assert.ok(fs.readFileSync(staleFgctl).equals(releaseFgctl), 'the machine fgctl now holds the release bytes');
   assert.ok(fs.readFileSync(`${staleFgctl}.prev`).equals(staleBytes), 'the replaced bytes are kept as .prev');
-  fs.rmSync(machineBin, { recursive: true, force: true });
+  removeTree(machineBin);
 
   // Step 4: Verify upgraded activation
   const versionResB = runFgos(['version', '--runtime-json'], { cwd: projDir, stateHome });
@@ -327,7 +328,7 @@ for (const [side, stateSchemas, releaseVersion, code] of [
       const activationContentAfter = fs.readFileSync(activationPath, 'utf8');
       assert.equal(activationContentAfter, activationContentBefore, 'activation.json must be byte-for-byte unchanged');
     } finally {
-      fs.rmSync(candidate.dir, { recursive: true, force: true });
+      removeTree(candidate.dir);
     }
   });
 }
@@ -502,8 +503,8 @@ test('P7: Repair failure when no runtime is active refuses with clear message', 
     assert.notEqual(repairRes.status, 0, 'repair must fail when no runtime is active');
     assert.match(repairRes.stderr, /no active runtime found in workspace -- run 'fgctl init' first/);
   } finally {
-    fs.rmSync(projDir, { recursive: true, force: true });
-    fs.rmSync(stateHome, { recursive: true, force: true });
+    removeTree(projDir);
+    removeTree(stateHome);
   }
 });
 
@@ -534,8 +535,8 @@ test('P7: Upgrade failure when no runtime is active refuses with clear message',
     assert.notEqual(upgRes.status, 0, 'upgrade must fail when no runtime is active');
     assert.match(upgRes.stderr, /no active runtime found in workspace -- run 'fgctl init' first/);
   } finally {
-    fs.rmSync(projDir, { recursive: true, force: true });
-    fs.rmSync(stateHome, { recursive: true, force: true });
+    removeTree(projDir);
+    removeTree(stateHome);
   }
 });
 
@@ -558,7 +559,7 @@ test('P7: Upgrade candidate preflight failure refuses upgrade and leaves existin
     const activationContentAfter = fs.readFileSync(activationPath, 'utf8');
     assert.equal(activationContentAfter, activationContentBefore, 'activation.json must remain byte-for-byte untouched');
   } finally {
-    fs.rmSync(badCandidate.dir, { recursive: true, force: true });
+    removeTree(badCandidate.dir);
   }
 });
 
@@ -604,7 +605,7 @@ test('P7: Upgrade candidate local tail failure leaves workspace in diagnosable s
     assert.equal(versionData.data.artifactDigest, newDigest);
     assert.equal(versionData.data.previousArtifactDigest, digestA);
   } finally {
-    fs.rmSync(candidate.dir, { recursive: true, force: true });
+    removeTree(candidate.dir);
   }
 });
 
@@ -658,9 +659,9 @@ test('P7: Repair local tail failure leaves workspace in diagnosable state with r
     assert.equal(versionData.data.host, 'rust');
     assert.equal(versionData.data.artifactDigest, newDigest);
   } finally {
-    fs.rmSync(projDir, { recursive: true, force: true });
-    fs.rmSync(stateHome, { recursive: true, force: true });
-    fs.rmSync(candidate.dir, { recursive: true, force: true });
+    removeTree(projDir);
+    removeTree(stateHome);
+    removeTree(candidate.dir);
   }
 });
 
@@ -743,7 +744,7 @@ test('download: fgctl upgrade downloads the target release, verifies SHA256SUMS,
     const actTeammate = JSON.parse(fs.readFileSync(path.join(projB, '.fgos', 'installation', 'activation.json'), 'utf8'));
     assert.equal(actTeammate.artifactDigest, digestB);
   } finally {
-    fs.rmSync(root, { recursive: true, force: true });
+    removeTree(root);
   }
 });
 
@@ -774,6 +775,6 @@ test('holder-lock gate: a git that leaves a background gc while it borrows a loc
     left = holders();
     if (left !== null) assert.deepEqual(left, [], 'after repair the escaped gc is gone and no process holds a lock file');
   } finally {
-    fs.rmSync(root, { recursive: true, force: true });
+    removeTree(root);
   }
 });

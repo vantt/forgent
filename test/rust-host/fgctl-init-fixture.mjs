@@ -16,6 +16,16 @@ export const FGCTL_BIN = releaseBinaryPath(releaseOutputDir(), 'fgctl');
 
 export const releaseDirName = (digest) => (process.platform === 'win32' ? digest.replace(':', '-') : digest);
 
+/**
+ * Removes a fixture tree. On Windows a release `bin` whose executables just ran can stay
+ * delete-pending for a moment after the process exits (a closing image handle or an on-access
+ * scan), so the removal of its directory fails with ENOTEMPTY or EBUSY; the removal is retried
+ * and still throws when the tree cannot be removed.
+ */
+export function removeTree(dir) {
+  fs.rmSync(dir, { recursive: true, force: true, maxRetries: 10, retryDelay: 100 });
+}
+
 // Filled by the before() hook that useReleaseFixture() registers.
 export const fixture = { releaseDir: null, digest: null };
 
@@ -83,7 +93,7 @@ export function useReleaseFixture() {
 
   after(() => {
     if (fixture.releaseDir && fs.existsSync(fixture.releaseDir)) {
-      fs.rmSync(fixture.releaseDir, { recursive: true, force: true });
+      removeTree(fixture.releaseDir);
     }
   });
 }
@@ -121,13 +131,13 @@ export function useInitializedWorkspace(releaseDir, { tag = 'initialized', ownHo
   });
   ws.restore = () => {
     for (const name of savedNames(ws)) {
-      fs.rmSync(path.join(ws.root, name), { recursive: true, force: true });
+      removeTree(path.join(ws.root, name));
       fs.cpSync(path.join(saved, name), path.join(ws.root, name), { recursive: true, preserveTimestamps: true, verbatimSymlinks: true });
     }
     return ws;
   };
   after(() => {
-    if (ws.root) fs.rmSync(ws.root, { recursive: true, force: true });
+    if (ws.root) removeTree(ws.root);
   });
   return ws;
 }

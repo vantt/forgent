@@ -7,7 +7,7 @@ import path from 'node:path';
 import { spawnSync, execFileSync } from 'node:child_process';
 import { computeArtifactDigest, hashFile } from '../../scripts/build-rust-distribution.mjs';
 import { holdLock } from './fgctl-lock-holder.mjs';
-import { useReleaseFixture, releaseDirName, fixture, runFgctl, runShim, pathWithGcLeakingGit, processesUnder, withoutActiveRelease } from './fgctl-init-fixture.mjs';
+import { useReleaseFixture, releaseDirName, fixture, runFgctl, runShim, pathWithGcLeakingGit, processesUnder, withoutActiveRelease, removeTree } from './fgctl-init-fixture.mjs';
 
 useReleaseFixture();
 
@@ -56,10 +56,10 @@ test('P7: Candidate preflight failure refuses init before publishing activation 
     const distPin = path.join(tempProj, '.fgos', 'distribution.json');
     assert.ok(!fs.existsSync(distPin), 'distribution.json must not be created on preflight failure');
   } finally {
-    fs.rmSync(tempHome, { recursive: true, force: true });
-    fs.rmSync(tempState, { recursive: true, force: true });
-    fs.rmSync(tempProj, { recursive: true, force: true });
-    fs.rmSync(badPreflightDir, { recursive: true, force: true });
+    removeTree(tempHome);
+    removeTree(tempState);
+    removeTree(tempProj);
+    removeTree(badPreflightDir);
   }
 });
 
@@ -162,11 +162,11 @@ test('P7 (red-team HIGH): a hostile candidate that passes every static preflight
     assert.ok(!fs.existsSync(path.join(installDir, 'activation.json')), 'no activation may be published');
     assert.ok(!fs.existsSync(path.join(tempProj, '.fgos', 'distribution.json')), 'no pin may be written');
   } finally {
-    fs.rmSync(tempHome, { recursive: true, force: true });
-    fs.rmSync(tempState, { recursive: true, force: true });
-    fs.rmSync(tempProj, { recursive: true, force: true });
-    fs.rmSync(hostileReleaseDir, { recursive: true, force: true });
-    fs.rmSync(outsideDir, { recursive: true, force: true });
+    removeTree(tempHome);
+    removeTree(tempState);
+    removeTree(tempProj);
+    removeTree(hostileReleaseDir);
+    removeTree(outsideDir);
   }
 });
 
@@ -209,9 +209,9 @@ test('P7: Atomic activation publish ensures valid activation.json without partia
     const remaining = fs.readdirSync(installDir);
     assert.ok(!remaining.some((f) => f.startsWith('activation.json.tmp.')), 'No tmp files should remain');
   } finally {
-    fs.rmSync(tempHome, { recursive: true, force: true });
-    fs.rmSync(tempState, { recursive: true, force: true });
-    fs.rmSync(tempProj, { recursive: true, force: true });
+    removeTree(tempHome);
+    removeTree(tempState);
+    removeTree(tempProj);
   }
 });
 
@@ -293,11 +293,10 @@ test('P7: Local runtime tail failure leaves workspace in diagnosable state with 
     assert.equal(versionData.data.host, 'rust');
     assert.equal(versionData.data.artifactDigest, newDigest);
   } finally {
-    fs.rmSync(tempHome, { recursive: true, force: true });
-    // A process the failed tail left behind may still be writing its state directory as it is removed.
-    fs.rmSync(tempState, { recursive: true, force: true, maxRetries: 10, retryDelay: 100 });
-    fs.rmSync(tempProj, { recursive: true, force: true });
-    fs.rmSync(tailFailReleaseDir, { recursive: true, force: true });
+    removeTree(tempHome);
+    removeTree(tempState);
+    removeTree(tempProj);
+    removeTree(tailFailReleaseDir);
   }
 });
 
@@ -326,7 +325,7 @@ test('holder-lock gate: a git that leaves a background gc while it borrows a loc
     const left = processesUnder([path.join(tempTmp, 'fgos-borrow-vectors-'), path.join(tempProj, '.fgos', 'locks'), path.join(tempState, 'locks')]);
     if (left !== null) assert.deepEqual(left, [], 'the escaped gc is gone and no process holds a lock file');
   } finally {
-    fs.rmSync(root, { recursive: true, force: true });
+    removeTree(root);
   }
 });
 
@@ -347,6 +346,6 @@ test('holder-lock gate: init with the real git passes the gate and checks both l
     assert.ok(fs.statSync(path.join(tempState, 'locks')).isDirectory(), 'lock root probed');
     assert.deepEqual(fs.readdirSync(path.join(tempState, 'locks')).filter((f) => f.startsWith('.semantics-probe-')), [], 'probe files removed');
   } finally {
-    fs.rmSync(root, { recursive: true, force: true });
+    removeTree(root);
   }
 });
