@@ -90,22 +90,22 @@ function writeFakeClaude(dir, initialState) {
   return { scriptPath, statePath };
 }
 
-function withFakeClaude(scriptPath, fn) {
+async function withFakeClaude(scriptPath, fn) {
   const prev = process.env.FGOS_CLAUDE_COMMAND;
   process.env.FGOS_CLAUDE_COMMAND = scriptPath;
   try {
-    return fn();
+    return await fn();
   } finally {
     if (prev === undefined) delete process.env.FGOS_CLAUDE_COMMAND;
     else process.env.FGOS_CLAUDE_COMMAND = prev;
   }
 }
 
-test('check passes without touching claude when the claude binary is not on PATH', () => {
+test('check passes without touching claude when the claude binary is not on PATH', async () => {
   const prev = process.env.FGOS_CLAUDE_COMMAND;
   process.env.FGOS_CLAUDE_COMMAND = '/nonexistent/fgos-test-claude-binary';
   try {
-    const { passed, message } = checkById('claude-plugin-marketplace').check(process.cwd());
+    const { passed, message } = await checkById('claude-plugin-marketplace').check(process.cwd());
     assert.equal(passed, true);
     assert.match(message, /not found on PATH/);
   } finally {
@@ -114,55 +114,84 @@ test('check passes without touching claude when the claude binary is not on PATH
   }
 });
 
-test('check warns, never fails, and names fgos wire-agents when the marketplace is not configured at all', () => {
+test('check warns, never fails, and names fgos wire-agents when the marketplace is not configured at all', async () => {
   const dir = mkTempDir();
   const { scriptPath } = writeFakeClaude(dir, { marketplaces: [], plugins: [] });
-  withFakeClaude(scriptPath, () => {
-    const { passed, message } = checkById('claude-plugin-marketplace').check(process.cwd());
+  await withFakeClaude(scriptPath, async () => {
+    const { passed, message } = await checkById('claude-plugin-marketplace').check(process.cwd());
     assert.equal(passed, true);
     assert.match(message, /^warning: Claude Code marketplace "fgos-plugins" not configured.*run fgos wire-agents/);
   });
   fs.rmSync(dir, { recursive: true, force: true });
 });
 
-test('check warns when the marketplace is configured but the fgOS plugin is not enabled', () => {
+test('check warns when the marketplace is configured but the fgOS plugin is not enabled', async () => {
   const dir = mkTempDir();
   const { scriptPath } = writeFakeClaude(dir, {
     marketplaces: [{ name: 'fgos-plugins', source: 'directory', path: '/some/repo' }],
     plugins: [],
   });
-  withFakeClaude(scriptPath, () => {
-    const { passed, message } = checkById('claude-plugin-marketplace').check(process.cwd());
+  await withFakeClaude(scriptPath, async () => {
+    const { passed, message } = await checkById('claude-plugin-marketplace').check(process.cwd());
     assert.equal(passed, true);
     assert.match(message, /^warning: fgOS Claude Code plugin not installed\/enabled.*run fgos wire-agents/);
   });
   fs.rmSync(dir, { recursive: true, force: true });
 });
 
-test('check accepts a directory-sourced marketplace entry (dev-checkout self-hosting), not just a github one', () => {
+test('check accepts a directory-sourced marketplace entry (dev-checkout self-hosting), not just a github one', async () => {
   const dir = mkTempDir();
   const { scriptPath } = writeFakeClaude(dir, {
     marketplaces: [{ name: 'fgos-plugins', source: 'directory', path: '/some/repo' }],
     plugins: [{ id: 'fgOS@fgos-plugins', enabled: true }],
   });
-  withFakeClaude(scriptPath, () => {
-    const { passed, message } = checkById('claude-plugin-marketplace').check(process.cwd());
+  await withFakeClaude(scriptPath, async () => {
+    const { passed, message } = await checkById('claude-plugin-marketplace').check(process.cwd());
     assert.equal(passed, true);
     assert.match(message, /fgOS plugin enabled/);
   });
   fs.rmSync(dir, { recursive: true, force: true });
 });
 
-test('check treats a disabled fgOS plugin entry as not enabled and warns', () => {
+test('check treats a disabled fgOS plugin entry as not enabled and warns', async () => {
   const dir = mkTempDir();
   const { scriptPath } = writeFakeClaude(dir, {
     marketplaces: [{ name: 'fgos-plugins', source: 'github', repo: 'vantt/forgent' }],
     plugins: [{ id: 'fgOS@fgos-plugins', enabled: false }],
   });
-  withFakeClaude(scriptPath, () => {
-    const { passed, message } = checkById('claude-plugin-marketplace').check(process.cwd());
+  await withFakeClaude(scriptPath, async () => {
+    const { passed, message } = await checkById('claude-plugin-marketplace').check(process.cwd());
     assert.equal(passed, true);
     assert.match(message, /^warning: fgOS Claude Code plugin not installed\/enabled.*run fgos wire-agents/);
   });
+  fs.rmSync(dir, { recursive: true, force: true });
+});
+
+test('the three claude calls of the row overlap instead of running one after another', async () => {
+  const dir = mkTempDir();
+  const spans = path.join(dir, 'spans.log');
+  const scriptPath = path.join(dir, 'slow-claude.mjs');
+  fs.writeFileSync(scriptPath, `#!/usr/bin/env node
+import fs from 'node:fs';
+const start = Date.now();
+await new Promise((resolve) => setTimeout(resolve, 400));
+fs.appendFileSync(${JSON.stringify(spans)}, start + ' ' + Date.now() + '\\n');
+const args = process.argv.slice(2);
+process.stdout.write(args[0] === '--version' ? '1.0.0' : '[]');
+`);
+  fs.chmodSync(scriptPath, 0o755);
+  const command = process.platform === 'win32' ? (() => {
+    const cmd = path.join(dir, 'slow-claude.cmd');
+    fs.writeFileSync(cmd, `@node "${scriptPath}" %*`);
+    return cmd;
+  })() : scriptPath;
+  await withFakeClaude(command, async () => {
+    await checkById('claude-plugin-marketplace').check(process.cwd());
+  });
+  const rows = fs.readFileSync(spans, 'utf8').trim().split('\n').map((line) => line.split(' ').map(Number));
+  assert.equal(rows.length, 3, 'the row asks claude three questions');
+  const lastStart = Math.max(...rows.map(([start]) => start));
+  const firstEnd = Math.min(...rows.map(([, end]) => end));
+  assert.ok(lastStart < firstEnd, 'every call started before the first one finished');
   fs.rmSync(dir, { recursive: true, force: true });
 });

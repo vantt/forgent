@@ -11,7 +11,8 @@
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { execFileSync } from 'node:child_process';
+import { execFile, execFileSync } from 'node:child_process';
+import { promisify } from 'node:util';
 
 import { AGY_PERMISSIONS_DEFAULT, agySettingsPath, checkAgyPermissionsConfigured } from './agy-permissions.mjs';
 import { claudeUserSettings, readAccept } from './mailbox-claude-accept.mjs';
@@ -27,6 +28,7 @@ export const CLAUDE_PLUGIN_MARKETPLACE_NAME = 'fgos-plugins';
 const CLAUDE_PLUGIN_MARKETPLACE_GITHUB_SOURCE = 'vantt/forgent';
 export const CLAUDE_PLUGIN_REF = `fgOS@${CLAUDE_PLUGIN_MARKETPLACE_NAME}`;
 const WINDOWS = process.platform === 'win32';
+const execFileAsync = promisify(execFile);
 
 // The `claude` binary the check and this command run. Tests point FGOS_CLAUDE_COMMAND at a fake so
 // no suite run ever calls the real `claude`; production leaves it unset.
@@ -61,17 +63,36 @@ function claudePluginJson(args, env) {
 const hasMarketplace = (marketplaces) => marketplaces.some((m) => m?.name === CLAUDE_PLUGIN_MARKETPLACE_NAME);
 const pluginEnabled = (plugins) => plugins.some((p) => typeof p?.id === 'string' && p.id.startsWith('fgOS@') && p.enabled === true);
 
+/** The same call as `runClaude`, started without waiting: the doctor row asks `claude` three questions
+ * that do not depend on one another, and each start-up costs about half a second. */
+async function runClaudeAsync(args, env) {
+  const { stdout } = await execFileAsync(claudeCommand(env), args, { encoding: 'utf8', env: { ...process.env, ...env }, shell: WINDOWS });
+  return stdout;
+}
+
+async function claudePluginJsonAsync(args, env) {
+  try {
+    const parsed = JSON.parse(await runClaudeAsync(args, env));
+    return Array.isArray(parsed) ? parsed : null;
+  } catch {
+    return null;
+  }
+}
+
 /** Doctor row `claude-plugin-marketplace`: reports, never writes. A missing plugin is a choice the person may
  * make (global agent config is opt-in), so it warns and names `fgos wire-agents`; only a `claude` that
- * cannot answer its own plugin listing fails. */
-export function checkClaudePluginMarketplace({ env = process.env } = {}) {
-  if (!claudePresent(env)) return { passed: true, message: 'claude CLI not found on PATH — nothing to check (Claude Code plugin surface not applicable here)' };
-  const marketplaces = claudePluginJson(['plugin', 'marketplace', 'list', '--json'], env);
+ * cannot answer its own plugin listing fails. The three `claude` calls run together. */
+export async function checkClaudePluginMarketplace({ env = process.env } = {}) {
+  const [present, marketplaces, plugins] = await Promise.all([
+    runClaudeAsync(['--version'], env).then(() => true, () => false),
+    claudePluginJsonAsync(['plugin', 'marketplace', 'list', '--json'], env),
+    claudePluginJsonAsync(['plugin', 'list', '--json'], env),
+  ]);
+  if (!present) return { passed: true, message: 'claude CLI not found on PATH — nothing to check (Claude Code plugin surface not applicable here)' };
   if (marketplaces === null) return { passed: false, message: '"claude plugin marketplace list --json" failed to run or parse' };
   if (!hasMarketplace(marketplaces)) {
     return { passed: true, message: `warning: Claude Code marketplace "${CLAUDE_PLUGIN_MARKETPLACE_NAME}" not configured, so the /fgOS:* plugin skills are missing; installing it is your choice: run ${WIRE_AGENTS_COMMAND} (opt-in: it changes your Claude config, backs it up first)` };
   }
-  const plugins = claudePluginJson(['plugin', 'list', '--json'], env);
   if (plugins === null) return { passed: false, message: '"claude plugin list --json" failed to run or parse' };
   if (!pluginEnabled(plugins)) {
     return { passed: true, message: `warning: fgOS Claude Code plugin not installed/enabled, so the /fgOS:* plugin skills are missing; installing it is your choice: run ${WIRE_AGENTS_COMMAND} (opt-in: it changes your Claude config, backs it up first)` };

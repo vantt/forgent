@@ -73,7 +73,9 @@ function commandIsKind(command, row) {
   return new RegExp(`^${SHIM_PREFIX} ${args}(?: --format=agy)?\\s*$`).test(command);
 }
 
-export function isShimRunnable(repoRoot, { mailboxCli = null } = {}) {
+/** `run` is the doctor run's memo door (`createDoctorRun`): each distinct probe of one shim runs once per
+ * run however many rows ask for it. Without a run every call probes afresh. */
+export function isShimRunnable(repoRoot, { mailboxCli = null, run = null } = {}) {
   const shim = getProjectShimPath(repoRoot);
   if (!existsSync(shim)) return { runnable: false, reason: 'shim-missing' };
   // Probe the way an agent calls the hook: from a fresh process, not as a
@@ -90,14 +92,22 @@ export function isShimRunnable(repoRoot, { mailboxCli = null } = {}) {
   // The mailbox kind with benign input: `{}` is no payload of any CLI, so the hook stays quiet, opens
   // no record and writes nothing; it must exit 0 with nothing on stdout.
   if (mailboxCli) probes.push({ kind: `${HOOK_KINDS.MAILBOX} (${mailboxCli})`, args: ['hook', 'mailbox', '--cli', mailboxCli, '--event', 'post-tool-use'], quietStdout: true });
+  const probeOnce = (probe) => {
+    const runProbe = () => {
+      try {
+        const res = spawnSync(shim, probe.args, { input: '{}', timeout: 3000, env, cwd: repoRoot });
+        if (res.status !== 0) return { runnable: false, reason: `${probe.kind}: exit-${res.status}` };
+        if (probe.quietStdout && res.stdout?.length) return { runnable: false, reason: `${probe.kind}: printed on stdout` };
+      } catch (err) {
+        return { runnable: false, reason: `${probe.kind}: ${err.message}` };
+      }
+      return { runnable: true, reason: null };
+    };
+    return run ? run.once(`shim-probe:${shim}:${probe.args.join(' ')}`, runProbe) : runProbe();
+  };
   for (const probe of probes) {
-    try {
-      const res = spawnSync(shim, probe.args, { input: '{}', timeout: 3000, env, cwd: repoRoot });
-      if (res.status !== 0) return { runnable: false, reason: `${probe.kind}: exit-${res.status}` };
-      if (probe.quietStdout && res.stdout?.length) return { runnable: false, reason: `${probe.kind}: printed on stdout` };
-    } catch (err) {
-      return { runnable: false, reason: `${probe.kind}: ${err.message}` };
-    }
+    const verdict = probeOnce(probe);
+    if (!verdict.runnable) return verdict;
   }
   return { runnable: true, reason: null };
 }
@@ -379,7 +389,7 @@ function rowInWrongShape(config, row) {
   return Array.isArray(entries) && entries.some((e) => !Array.isArray(e?.hooks) && e?.command === row.command);
 }
 
-function checkRows(cwd, cli) {
+function checkRows(cwd, cli, run = null) {
   const spec = HOOK_FILES[cli];
   const filePath = path.join(cwd, spec.file);
   if (spec.optional && !existsSync(path.join(cwd, spec.dir)) && !existsSync(filePath)) {
@@ -396,7 +406,7 @@ function checkRows(cwd, cli) {
     return { passed: false, message: `${spec.label} missing canonical hook(s): ${[...new Set(names)].join(', ')}${wrongShape} — run fgos doctor --fix` };
   }
   const mailboxCli = rows.some((row) => row.kind === HOOK_KINDS.MAILBOX) ? cli : null;
-  const probe = isShimRunnable(cwd, { mailboxCli });
+  const probe = isShimRunnable(cwd, { mailboxCli, run });
   if (!probe.runnable) {
     return { passed: false, message: `${spec.name} hooks wired but local shim not runnable (${probe.reason})` };
   }
@@ -418,24 +428,24 @@ export function isClaudeHookConfigured(cwd) {
       entry.hooks.some((h) => h?.type === 'command' && isOwnedHook(h, row))));
 }
 
-export function checkClaudeHook(cwd) {
-  return checkRows(cwd, 'claude');
+export function checkClaudeHook(cwd, run = null) {
+  return checkRows(cwd, 'claude', run);
 }
 
 export function installCodexHook(repoRoot) {
   return installRows(repoRoot, 'codex');
 }
 
-export function checkCodexHook(cwd) {
-  return checkRows(cwd, 'codex');
+export function checkCodexHook(cwd, run = null) {
+  return checkRows(cwd, 'codex', run);
 }
 
 export function installAgyHook(repoRoot) {
   return installRows(repoRoot, 'agy');
 }
 
-export function checkAgyHook(cwd) {
-  return checkRows(cwd, 'agy');
+export function checkAgyHook(cwd, run = null) {
+  return checkRows(cwd, 'agy', run);
 }
 
 // ---------------------------------------------------------------------------
@@ -603,7 +613,7 @@ function installExtension(repoRoot, dir) {
  * one the installer generates, so an edited or stale file (one that no longer
  * loads) fails here instead of passing on its guard names.
  */
-function checkExtension(cwd, dir, label) {
+function checkExtension(cwd, dir, label, run = null) {
   const extPath = path.join(cwd, dir, 'extensions', 'fgos-hooks.ts');
   const shown = `${dir}/extensions/fgos-hooks.ts`;
   if (!existsSync(path.join(cwd, dir)) && !existsSync(extPath)) {
@@ -621,7 +631,7 @@ function checkExtension(cwd, dir, label) {
   if (!accepted.includes(readFileSync(extPath, 'utf8'))) {
     return { passed: false, message: `${shown} differs from the generated extension — run fgos doctor --fix` };
   }
-  const probe = isShimRunnable(cwd, { mailboxCli: optIn.state === 'on' ? cli : null });
+  const probe = isShimRunnable(cwd, { mailboxCli: optIn.state === 'on' ? cli : null, run });
   if (!probe.runnable) {
     return { passed: false, message: `${label} extension present but local shim not runnable (${probe.reason})` };
   }
@@ -632,8 +642,8 @@ export function installOmpHook(repoRoot) {
   return installExtension(repoRoot, '.omp');
 }
 
-export function checkOmpHook(cwd) {
-  return checkExtension(cwd, '.omp', 'OMP');
+export function checkOmpHook(cwd, run = null) {
+  return checkExtension(cwd, '.omp', 'OMP', run);
 }
 
 // ---------------------------------------------------------------------------
@@ -644,8 +654,8 @@ export function installPiHook(repoRoot) {
   return installExtension(repoRoot, '.pi');
 }
 
-export function checkPiHook(cwd) {
-  return checkExtension(cwd, '.pi', 'Pi');
+export function checkPiHook(cwd, run = null) {
+  return checkExtension(cwd, '.pi', 'Pi', run);
 }
 
 // ---------------------------------------------------------------------------
@@ -663,13 +673,13 @@ export function installAllAgentHooks(repoRoot) {
   return results;
 }
 
-export function checkAllAgentHooks(cwd) {
+export function checkAllAgentHooks(cwd, run = null) {
   return {
-    claude: checkClaudeHook(cwd),
-    codex: checkCodexHook(cwd),
-    agy: checkAgyHook(cwd),
-    omp: checkOmpHook(cwd),
-    pi: checkPiHook(cwd),
+    claude: checkClaudeHook(cwd, run),
+    codex: checkCodexHook(cwd, run),
+    agy: checkAgyHook(cwd, run),
+    omp: checkOmpHook(cwd, run),
+    pi: checkPiHook(cwd, run),
   };
 }
 
