@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v0.2.0-rc.8] - 2026-11-13
+
+- rc.8 replaces rc.7, whose release run did not publish; it adds these fixes on top of rc.7:
+- On Linux a contained git whose caller is killed just as it starts no longer leaves a stuck `bwrap ... git` process behind for good: bwrap now reports the namespace's pid into a file instead of a pipe.
+- A fast agent or step that exits right after it starts now still has its process identity recorded by the run gate, so its end is settled by identity.
+- The lock borrow vectors behind `fgos doctor` and activation now set up their test repository without a background git maintenance, so their gc check always exercises a real background gc instead of passing without one.
+- Process scans that read environment keys (the mailbox nudge) no longer miss a just-started process whose environment is not yet published.
+
+### Known gaps
+
+- On Windows fgOS installs and activates, but Config, Event Store/Work and confinement are not supported yet, so `fgos doctor` is not ok there; Linux is the supported runtime.
+
 ## [v0.2.0-rc.7] - 2026-11-13
 
 - On Linux the quiesce check before `fgctl init`, `upgrade` and `repair` no longer misses an fgOS process that is still starting: a process read in the middle of `exec` showed no arguments, was judged not fgOS, and the workspace was reported quiet.
