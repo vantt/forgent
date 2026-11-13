@@ -608,14 +608,14 @@ fn view_of(
     let cwd = fs::read_link(base.join("cwd"))
         .map_err(|err| note("cwd", err))
         .ok();
-    let cmdline = read_cmdline(&base, exe.is_some())
+    let cmdline = read_settled(&base.join("cmdline"), exe.is_some())
         .map_err(|err| note("cmdline", err))
         .ok();
     let mut env_subset = BTreeMap::new();
     if !filter.env_keys.is_empty() {
-        match fs::read(base.join("environ")) {
-            Ok(bytes) => {
-                for entry in split_nul(&bytes) {
+        match read_settled(&base.join("environ"), exe.is_some()) {
+            Ok(entries) => {
+                for entry in entries {
                     if let Some((key, value)) = entry.split_once('=') {
                         if filter.env_keys.iter().any(|wanted| wanted == key) {
                             env_subset.insert(key.to_string(), value.to_string());
@@ -643,28 +643,30 @@ fn view_of(
 /// milliseconds when the new image is descheduled inside it.
 const EXEC_SETTLE: std::time::Duration = std::time::Duration::from_millis(250);
 
-/// The argv of a process. Inside `execve`, between the kernel closing the
-/// caller's close-on-exec descriptors (so a spawner has already returned) and
-/// the new image publishing its argument area, `/proc/<pid>/cmdline` reads
-/// empty for a live process. A process whose executable is readable yet whose
-/// argv is empty is in that window (a kernel thread has no readable
-/// executable), so the read is repeated until the arguments appear; one that
-/// never gets any (it cleared its own) is returned empty after `EXEC_SETTLE`.
-fn read_cmdline(base: &std::path::Path, exe_readable: bool) -> io::Result<Vec<String>> {
-    let path = base.join("cmdline");
-    let mut argv = split_nul(&fs::read(&path)?);
-    if argv.is_empty() && exe_readable {
+/// The NUL-separated argv or environment of a process. Inside `execve`,
+/// between the kernel closing the caller's close-on-exec descriptors (so a
+/// spawner has already returned) and the new image publishing its argument
+/// and environment areas, `/proc/<pid>/cmdline` and `/proc/<pid>/environ`
+/// read empty for a live process, and the environment is published just after
+/// the arguments. A process whose executable is readable yet whose area is
+/// empty is in that window (a kernel thread has no readable executable), so
+/// the read is repeated until the area appears; one that never gets any (it
+/// cleared its own, or runs with an empty environment) is returned empty
+/// after `EXEC_SETTLE`.
+fn read_settled(path: &std::path::Path, exe_readable: bool) -> io::Result<Vec<String>> {
+    let mut parts = split_nul(&fs::read(path)?);
+    if parts.is_empty() && exe_readable {
         let deadline = std::time::Instant::now() + EXEC_SETTLE;
-        while argv.is_empty() && std::time::Instant::now() < deadline {
+        while parts.is_empty() && std::time::Instant::now() < deadline {
             std::thread::sleep(std::time::Duration::from_micros(200));
             // A process that exited meanwhile has nothing left to read.
-            argv = match fs::read(&path) {
+            parts = match fs::read(path) {
                 Ok(bytes) => split_nul(&bytes),
                 Err(_) => break,
             };
         }
     }
-    Ok(argv)
+    Ok(parts)
 }
 
 fn split_nul(bytes: &[u8]) -> Vec<String> {
@@ -716,7 +718,7 @@ mod tests {
     }
 
     #[test]
-    fn an_argv_still_empty_inside_exec_is_read_again_until_it_appears() {
+    fn an_argv_or_environment_still_empty_inside_exec_is_read_again_until_it_appears() {
         let dir = std::env::temp_dir().join(format!("fgos-cmdline-{}", std::process::id()));
         fs::create_dir_all(&dir).unwrap();
         fs::write(dir.join("cmdline"), b"").unwrap();
@@ -725,15 +727,20 @@ mod tests {
             std::thread::sleep(std::time::Duration::from_millis(30));
             fs::write(late, b"fgos\0run\0").unwrap();
         });
-        assert_eq!(read_cmdline(&dir, true).unwrap(), ["fgos", "run"]);
+        assert_eq!(
+            read_settled(&dir.join("cmdline"), true).unwrap(),
+            ["fgos", "run"]
+        );
         writer.join().unwrap();
         // No readable executable (a kernel thread): empty is its real argv, read once.
         fs::write(dir.join("cmdline"), b"").unwrap();
         let started = std::time::Instant::now();
-        assert!(read_cmdline(&dir, false).unwrap().is_empty());
+        assert!(read_settled(&dir.join("cmdline"), false)
+            .unwrap()
+            .is_empty());
         assert!(started.elapsed() < EXEC_SETTLE);
         // An unreadable argv stays an error.
-        assert!(read_cmdline(&dir.join("gone"), true).is_err());
+        assert!(read_settled(&dir.join("gone").join("cmdline"), true).is_err());
         let _ = fs::remove_dir_all(&dir);
     }
 
