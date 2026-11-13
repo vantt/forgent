@@ -949,8 +949,8 @@ export function checkAgentTypeNamesUnique(cwd, { projectTiersOnly = false, insta
   }
   for (const rel of workspace.ignored) problems.push(`${rel} is ignored: only .yaml files are read`);
 
-  // A project that ships its own domains/ or core/agents/ is read there instead of the install, so the
-  // installed definitions it lacks cannot be seated; this is reported, not failed, because a project may
+  // A project that ships its own core/agents/ is read there instead of the install, so the
+  // installed core definitions it lacks cannot be seated; this is reported, not failed, because a project may
   // choose that.
   for (const hidden of listAgents({ projectRoot: cwd }).masked) {
     notes.push(`installed persona "${hidden.name}" (${hidden.source}) is hidden by ${hidden.hiddenBy}; copy it there or into fgos/agents to seat it`);

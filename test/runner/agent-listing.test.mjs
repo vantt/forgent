@@ -72,18 +72,18 @@ test('the listing reports tier, shadowed lower copies and shape problems', (t) =
   assert.deepEqual(listing.masked, [], 'a project that is its own install hides nothing');
 });
 
-test('a project domains folder hides the installed domain personas it lacks', (t) => {
+test('a project core agents folder hides the installed core personas it lacks, and a project domains folder hides nothing', (t) => {
   const project = makeRoot(t, 'fgos-agent-list-project-');
   const install = makeRoot(t, 'fgos-agent-list-install-');
+  install.write('core/agents/council-critic.yaml', definition('council-critic'));
   install.write('domains/marketing/agents/offer-critic.yaml', definition('offer-critic'));
-  install.write('domains/finance/agents/close-controller.yaml', definition('close-controller'));
-  project.write('domains/finance/agents/close-controller.yaml', definition('close-controller', 'role: own\n'));
+  project.write('core/agents/own-core.yaml', definition('own-core'));
   project.write('domains/legal/agents/clause-reader.yaml', definition('clause-reader'));
 
   const listing = listAgents({ projectRoot: project.root, installRoot: install.root });
-  assert.deepEqual(listing.masked.map((m) => m.name), ['offer-critic']);
-  assert.equal(listing.masked[0].source, 'domains/marketing/agents/offer-critic.yaml');
-  assert.ok(listing.agents.some((agent) => agent.name === 'clause-reader'));
+  assert.deepEqual(listing.masked.map((m) => m.name), ['council-critic']);
+  assert.ok(listing.agents.some((agent) => agent.name === 'offer-critic' && agent.tier === 'domain'), 'installed domain personas stay visible');
+  assert.ok(!listing.agents.some((agent) => agent.name === 'clause-reader'), 'a project domains folder is not read');
 });
 
 test('a project without its own domains folder hides nothing from the install', (t) => {

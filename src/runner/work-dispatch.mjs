@@ -62,7 +62,7 @@ function warnRosterProblemOnce(cwd, problem) {
  * today (agy, claude, codex, pi) has its own real `command`, so this never
  * changes their dispatch.
  */
-export function resolveAgentTypeForWork(work, cwd, stage) {
+export function resolveAgentTypeForWork(work, cwd, stage, { payloadRoot } = {}) {
   const domainName = resolveDomainName(work?.domain);
   const domainObj = getDomain(work?.domain, { onUnrecognized: () => {} });
   const targetStep = stage ?? effectiveStep(work ?? {}, domainObj);
@@ -73,7 +73,7 @@ export function resolveAgentTypeForWork(work, cwd, stage) {
   const taskSpecPath = resolveTaskSpecPath(domainName, taskSpec, { cwd });
   const header = readTaskSpecHeader(taskSpecPath);
   if (Object.keys(header).length === 0) return null;
-  const { defs, problems } = loadAgentRoster(cwd);
+  const { defs, problems } = loadAgentRoster(cwd, { payloadRoot });
   // An agent file that cannot be parsed is left out of the roster; say so on stderr rather than letting
   // the agent vanish without a trace. `fgos doctor` names it too.
   for (const problem of problems) warnRosterProblemOnce(cwd, problem);

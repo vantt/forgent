@@ -75,11 +75,11 @@ does not govern the delegated architecture route, which keeps the hook table of
      a role to act ("act as the CFO") and not a standard or a fact the person
      did not give. An entry may instead be `@name`, a named persona that
      applies to that seat only. Before you use one, run `fgos agents list`: it
-     reads the project's own definitions (`fgos/agents/`), then `domains/*/agents/`,
-     then `core/agents/`, falling back to the installed set when the project has
-     none of its own, and prints each name with its tier and description. Use only
-     names it lists; a name under `masked` is hidden by the project's own folder and
-     cannot be seated. Read each description and `decision_boundary`, pick a
+     reads the project's own definitions (`fgos/agents/`), then the installed
+     `domains/*/agents/`, then `core/agents/` (the project's own `core/agents/`
+     replaces the installed one when it has one), and prints each name with its
+     tier and description. Use only names it lists; a name under `masked` is hidden
+     by the project's own `core/agents/` and cannot be seated. Read each description and `decision_boundary`, pick a
      persona only when it plainly fits the person's concern, and write its name
      exactly as listed, without
      `.yaml`. Never invent or guess a name, never write a persona file, and
