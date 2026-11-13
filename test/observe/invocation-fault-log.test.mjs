@@ -15,6 +15,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync, spawnSync } from 'node:child_process';
+import { StoreError, withFaultClass } from '../../src/state/store-error.mjs';
 import { argvShape, appendFaultRecord, recordInvocationFault, FAULT_LOG_MAX_BYTES } from '../../src/observe/invocation-fault-log.mjs';
 import { recordApprovePostSuccessFault } from '../../src/observe/approve-fault-log.mjs';
 
@@ -97,6 +98,28 @@ test('a bare --dir (nothing to resolve a store from) is recorded as an input fau
   const records = faultRecords(cwd);
   assert.equal(records.length, 1);
   assert.equal(records[0].faultClass, 'dir-invalid');
+});
+
+test('an unknown flag is recorded as an unknown-flag fault', () => {
+  const cwd = tmpGitCwd();
+  const result = run(cwd, ['list', '--no-such-flag']);
+
+  assert.equal(result.status, 4);
+  const records = faultRecords(cwd);
+  assert.equal(records.length, 1, `expected exactly one record, got: ${JSON.stringify(records)}`);
+  assert.equal(records[0].faultClass, 'unknown-flag');
+});
+
+test('withFaultClass marks an error that names no class, keeps one that has it, and marks nothing for a null class', async () => {
+  const plain = new Error('x');
+  assert.throws(() => withFaultClass('arg-parse', () => { throw plain; }), (err) => err === plain && err.faultClass === 'arg-parse');
+  const named = new StoreError('validation', 'y', { faultClass: 'store-missing' });
+  assert.throws(() => withFaultClass('dir-invalid', () => { throw named; }), (err) => err.faultClass === 'store-missing');
+  const unmarked = new Error('z');
+  assert.throws(() => withFaultClass(null, () => { throw unmarked; }), (err) => err.faultClass === undefined);
+  await assert.rejects(withFaultClass('unknown-verb', async () => { throw new Error('late'); }), (err) => err.faultClass === 'unknown-verb');
+  assert.equal(withFaultClass('arg-parse', () => 7), 7);
+  assert.throws(() => withFaultClass('arg-parse', () => { throw 'a string'; }), (err) => err === 'a string');
 });
 
 test("a verb's own refusal is not a malformed call and is never recorded", () => {

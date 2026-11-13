@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "a80fe73ba65cc395f35ed4553c41b13e4dd8c122c37a89d4ad8322d962138339",
+  "payloadDigest": "b3b76736cd59e2e0fe52923801dc4774af75572875de5f0081403ce8064e2493",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -115,7 +115,7 @@
     "apps/fgos/tests/windows_semantics_probe.rs": "ecb59690bbf1259baa1defb6417c24005138526bb565f216f9db3c2ad784d240",
     "apps/fgos/tests/windows_support/mod.rs": "2b8a17676526c87ea5ecfb2074a70a3511fbf9267f9de78a35dc355f272830fb",
     "bin/fgos-runner.mjs": "24fa9b497547a104912b90ab98b3d53fbbe0068a5977a7a04724789c8e717156",
-    "bin/fgos.mjs": "46072eb6bffd7e4d0f4f257ce04e39954a2d8451a45f368de50fb028e1542f8b",
+    "bin/fgos.mjs": "aee78de15341aa2a560865174481c61936c2de1fae82d3d45f394d0dd257cadf",
     "core/skills/_shared/capability-catalog.md": "4299584409592ac4ae9668cd0cb4dd0442edc1c78a42ccd9cfe0bae22bf11bc4",
     "core/skills/_shared/capability-matching.md": "eb67cde05d45c171c1d4803f9d2fbec5fc63565b9fd0a0549c866a7eb262521d",
     "core/skills/_shared/catchup-self-recovery.md": "3b77650c71a0225f00ffa8fe9524d7c0052977204f425c1999225b6f80802c69",
@@ -1196,7 +1196,7 @@
     "src/state/runtime-coordination.mjs": "e546b13c02a8ae1c903fe5a0bb0974dcc41f85526a82111b8d82f0c925bb8ca5",
     "src/state/status-fsm.mjs": "5ce5ea8447ccdc0b4f00f13eca95de69a38effa139b788035fcd5e04b4330a1c",
     "src/state/step-fsm.mjs": "bf1e935a355d2fbb7b8a5f0927138dea21b21c6226fe5a442c22bd1875445625",
-    "src/state/store-error.mjs": "079ad030aceef5f711db18a613b8a08542d06394fa95512e0b48f582fce89a31",
+    "src/state/store-error.mjs": "4ff10c58db82886694c78ca3d1ffe577c752b1a7f28c55e2c531e3c2f73bc343",
     "src/state/store.mjs": "9c12cdc33b77fd861084639c36f2f26b0644909b3d57729f226da4e19d6ac224",
     "src/state/tool-registry.mjs": "8fc084a5d0390ebd3dc786e67b8791dbf44bae89c1ee3236e38dc84f82d1d9a9",
     "src/state/work-event-store.mjs": "a1e9476269ed8da9af7defe9d4b8201232276b15d75a7619e7bbabf022cdf22e",
