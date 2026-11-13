@@ -256,14 +256,20 @@ test('run-attempts-stuck: an attempt whose release was removed is named with wha
   assert.doesNotMatch(checkRunAttemptsStuck(root).message, /was removed/);
 });
 
-test('run-attempts-stuck: a run from before the supervisor has no envelope or intent and is nothing to adopt', () => {
+test('run-attempts-stuck: a run from before the supervisor is nothing to adopt (the run-supervisor crate judges which directories are attempts)', () => {
   const root = workspace('stuck-legacy');
   const dir = path.join(root, '.fgos', 'assignments', 'legacy', 'runs', '01');
   fs.mkdirSync(dir, { recursive: true });
   fs.writeFileSync(path.join(dir, 'run.json'), '{}');
   assert.equal(checkRunAttemptsStuck(root).message, 'no attempt waits to be closed');
-  fs.writeFileSync(path.join(dir, 'attempt-intent.json'), '{}');
-  assert.match(checkRunAttemptsStuck(root).message, /^warning: 1 attempt\(s\) have no holder/, 'the intent a controller left when it died before writing an envelope counts');
+});
+
+test('run-attempts-stuck: a host that cannot answer is a warning, never a failure', () => {
+  const root = workspace('stuck-no-host');
+  attemptDir(root, 'free');
+  const res = checkRunAttemptsStuck(root, { hostBin: path.join(scratch, 'no-such-host') });
+  assert.equal(res.passed, true);
+  assert.match(res.message, /^warning: the run supervisor could not say which attempts are stuck/);
 });
 
 test('run-attempts-stuck: a held lock is a running attempt, not a finding', { skip: !HAS_FLOCK && 'util-linux flock missing' }, async () => {

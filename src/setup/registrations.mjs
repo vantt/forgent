@@ -1,5 +1,4 @@
 import { createGitInspect, gitPortOptions } from '../git/inspect.mjs';
-import { resolveHolderLiveness } from '../native/process-identity.mjs';
 import { checkGit, gitFloor, fixGitWal, fixGitFetchMapping, fixGitDriverDirectories } from './git-checks.mjs';
 import { checkWorkflowCaseBindingSentinel, checkWorkflowCaseBindings, fixWorkflowCaseBindings } from './workflow-case-checks.mjs';
 // registrations.mjs — the doctor-check / fix registry (CONTEXT.md D1/D2,
@@ -81,7 +80,7 @@ import {
   credentialScanRoots,
 } from '../runner/dispatch/confinement/backend-registry.mjs';
 import { runAllConfinementProbes, probePeerRunHidden } from '../runner/dispatch/confinement/probes/harness.mjs';
-import { readOwnershipMarker, readAttemptOwnershipMarker, cleanupConfinementResource, canonicalRoot, listKeptCredentialHomes, settleHeldCredentialHomes, CREDENTIAL_KEEP_MAX_ATTEMPTS } from '../runner/dispatch/confinement/cleanup.mjs';
+import { readAttemptOwnershipMarker, canonicalRoot, listKeptCredentialHomes, settleHeldCredentialHomes, judgeConfinementOrphans, removeConfinementOrphans, CREDENTIAL_KEEP_MAX_ATTEMPTS } from '../runner/dispatch/confinement/cleanup.mjs';
 
 import { MODEL_POLICY_TIERS, validateGeneratedPathsShape, validateRunnerLoopsShape, attributeRunnerConfigError } from '../runner/dispatch/config.mjs';
 import { RunnerConfigError } from '../runner/dispatch/runner-config-error.mjs';
@@ -3124,108 +3123,33 @@ registerFix({
 
 export { defaultConfinementTempRoots, credentialScanRoots };
 
-/** Temp roots we own whose mode is not owner-only: a private home under one
- * holds a copy of an account login, so a group- or world-readable root is a
- * finding in its own right (counts only; never reads the contents). */
-function looseConfinementRoots(roots) {
-  const uid = typeof process.getuid === 'function' ? process.getuid() : null;
-  const loose = [];
-  for (const root of roots) {
-    try {
-      const st = fs.statSync(root);
-      if ((uid === null || st.uid === uid) && (st.mode & 0o077) !== 0) loose.push(root);
-    } catch { /* absent root: nothing to protect yet */ }
-  }
-  return loose;
-}
-
 export function checkConfinementOrphanedResourcesReaped() {
-  // Read-only. A home of a dispatch outside the assignment door removes itself when that dispatch
-  // settles; one whose process died is left for `doctor --fix`, since no sweep judges it. An attempt home
-  // (version 2 marker) is adopt's and is named by `run-attempts-stuck`.
+  // Read-only. Confinement judges its own leftovers (`judgeConfinementOrphans`); this row shows the counts. A home
+  // of a dispatch outside the assignment door removes itself when that dispatch settles; one whose process died is
+  // left for `doctor --fix`, since no sweep judges it. An attempt home (version 2 marker) is adopt's and is named by
+  // `run-attempts-stuck`.
   const roots = defaultConfinementTempRoots();
-  const deadOwned = deadOwnedConfinementDirs(roots).length;
-  const loose = looseConfinementRoots(roots);
-  const emptyShells = emptyDispatchShells(roots).length;
-  if (deadOwned === 0 && emptyShells === 0 && loose.length === 0) return { passed: true, message: 'no orphaned confinement resources found under ' + roots.join(', ') };
+  const { deadOwned, emptyShells, loose } = judgeConfinementOrphans(roots);
+  if (deadOwned.length === 0 && emptyShells.length === 0 && loose.length === 0) return { passed: true, message: 'no orphaned confinement resources found under ' + roots.join(', ') };
   const problems = [];
-  if (emptyShells > 0) problems.push(`${emptyShells} empty per-dispatch dir(s) left behind across ${roots.join(', ')}`);
-  if (deadOwned > 0) problems.push(`${deadOwned} confinement resource dir(s) owned by a dead process across ${roots.join(', ')}`);
+  if (emptyShells.length > 0) problems.push(`${emptyShells.length} empty per-dispatch dir(s) left behind across ${roots.join(', ')}`);
+  if (deadOwned.length > 0) problems.push(`${deadOwned.length} confinement resource dir(s) owned by a dead process across ${roots.join(', ')}`);
   if (loose.length > 0) problems.push(`confinement root(s) readable beyond the owner (should be 0700): ${loose.join(', ')}`);
   return { passed: false, message: `${problems.join('; ')} -- run "fgos doctor --fix"` };
 }
 
-/** How old an empty per-dispatch directory must be before it counts as left behind. */
-const EMPTY_SHELL_GRACE_MS = 600000;
-
-/** Empty per-dispatch directories old enough that no dispatch can still be about to fill them. */
-function emptyDispatchShells(roots) {
-  const found = [];
-  for (const tempRoot of roots) {
-    try {
-      for (const entry of fs.readdirSync(tempRoot, { withFileTypes: true })) {
-        if (!entry.isDirectory()) continue;
-        const dir = path.join(tempRoot, entry.name);
-        if (fs.readdirSync(dir).length === 0 && Date.now() - fs.statSync(dir).mtimeMs > EMPTY_SHELL_GRACE_MS) found.push(dir);
-      }
-    } catch {
-      // an unreadable or missing root has nothing to count
-    }
-  }
-  return found;
-}
-
-function deadOwnedConfinementDirs(roots) {
-  const found = [];
-  for (const tempRoot of roots) {
-    let entries = [];
-    try { entries = fs.readdirSync(tempRoot, { withFileTypes: true }); } catch { continue; }
-    for (const entry of entries) {
-      if (!entry.isDirectory()) continue;
-      const dispatchDir = path.join(tempRoot, entry.name);
-      const candidates = [dispatchDir];
-      try {
-        for (const sub of fs.readdirSync(dispatchDir, { withFileTypes: true })) {
-          if (sub.isDirectory()) candidates.push(path.join(dispatchDir, sub.name));
-        }
-      } catch {}
-      for (const cand of candidates) {
-        // Only a marker of this module's own first version names a process owner.
-        const marker = readOwnershipMarker(cand);
-        if (!marker) continue;
-        // A home held for its unstaged login is never removed; credential-copies-retained reports it.
-        if ((marker.credentialKept?.attempts ?? 0) >= CREDENTIAL_KEEP_MAX_ATTEMPTS) continue;
-        const alive = Number.isInteger(marker.pid) && marker.pid > 0 && resolveHolderLiveness({ pid: marker.pid }) !== 'dead';
-        if (!alive) found.push({ dir: cand, dispatchId: marker.dispatchId });
-      }
-    }
-  }
-  return found;
-}
-
 export function fixConfinementOrphanedResourcesReaped() {
-  const roots = defaultConfinementTempRoots();
-  const tightened = looseConfinementRoots(roots);
-  for (const root of tightened) {
-    try { fs.chmodSync(root, 0o700); } catch { /* reported again by the check */ }
-  }
-  // A home whose recorded dispatcher process is dead holds a login copy nobody will remove: the owner's
-  // explicit --fix is the one place that judges it, by that pid alone. A home that cannot go (a login
-  // that could not be staged) stays and is counted by credential-copies-retained.
-  let removedHomes = 0;
-  for (const { dir, dispatchId } of deadOwnedConfinementDirs(roots)) {
-    try { if (cleanupConfinementResource(dir, dispatchId).cleaned) removedHomes += 1; } catch { /* kept */ }
-  }
-  let removedShells = 0;
-  for (const shell of emptyDispatchShells(roots)) {
-    try { fs.rmdirSync(shell); removedShells += 1; } catch { /* filled meanwhile */ }
-  }
+  // The owner's explicit --fix removes what the judgement above names: a home whose recorded dispatcher process is
+  // dead holds a login copy nobody will remove. A home that cannot go (a login that could not be staged) stays and
+  // is counted by credential-copies-retained.
+  const judged = judgeConfinementOrphans(defaultConfinementTempRoots());
+  const { tightened, removedHomes, removedShells } = removeConfinementOrphans(judged);
   return {
-    changed: removedHomes > 0 || removedShells > 0 || tightened.length > 0,
+    changed: removedHomes > 0 || removedShells > 0 || tightened > 0,
     message: [
       removedHomes > 0 ? `removed ${removedHomes} home(s) left by a dead dispatch` : '',
       removedShells > 0 ? `removed ${removedShells} empty per-dispatch dir(s)` : 'no empty per-dispatch dirs to remove',
-      tightened.length > 0 ? `set ${tightened.join(', ')} to 0700` : '',
+      tightened > 0 ? `set ${judged.loose.join(', ')} to 0700` : '',
     ].filter(Boolean).join('; '),
   };
 }
