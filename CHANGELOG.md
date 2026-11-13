@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - A provider 429 or `RESOURCE_EXHAUSTED` now ends a run as a usage limit instead of a provider error, so the account is quarantined; the agent protocol also reads the provider's own status, requested wait and reset phrase.
 - `fgos metrics runs` and run results now name a provider limit as its own category (`provider`), and a seat that ended without writing its result or report is counted as an infrastructure failure (`infra-no-report`), not as an inconclusive verdict. Run results written before keep reading as they did, never as corrupt.
+- `unit-summary.json` is now version 3 and says whether a unit failed on infrastructure, why, and which seats were refused; version 2 files are still read.
 
 ## [v0.2.0-rc.8] - 2026-11-13
 
