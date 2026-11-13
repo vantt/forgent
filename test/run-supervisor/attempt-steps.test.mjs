@@ -487,7 +487,7 @@ test('the entry reports a missing step variable and a payload the release manife
 });
 
 test('the receipt reason names the provider stop and one table turns the name into the outcome; a result in the outbox wins', () => {
-  const stop = (adapterOutcome, cause = null) => ({ adapterOutcome, cause });
+  const stop = (adapterOutcome, cause = null, signal = null) => ({ adapterOutcome, cause, signal });
   for (const prefix of ['terminal', 'direct']) {
     assert.deepEqual(providerStopOf({ reason: `${prefix}:blocked:usage-limit` }), stop('provider-limit', 'quota'));
     assert.deepEqual(providerStopOf({ reason: `${prefix}:blocked:login` }), stop('provider-limit', 'credential'));
@@ -501,6 +501,10 @@ test('the receipt reason names the provider stop and one table turns the name in
   // A stop that is not the provider's names no adapter outcome.
   for (const reason of ['terminal:delivery-unknown', 'terminal:result-unreadable', 'start-refused:lock-held', undefined]) assert.equal(providerStopOf({ reason }), null, String(reason));
   assert.equal(providerStopOf({ reason: 'direct:blocked:login', outboxResult: 'result-2.json' }), null);
+  // The provider's own signal rides on a provider stop only; a person to wait for carries none.
+  const providerSignal = { status: 429, statusWord: 'RESOURCE_EXHAUSTED', requestedWaitMs: 1800000 };
+  assert.deepEqual(providerStopOf({ reason: 'terminal:blocked:usage-limit', providerSignal }), stop('provider-limit', 'quota', providerSignal));
+  assert.deepEqual(providerStopOf({ reason: 'terminal:blocked:trust-dialog', providerSignal }), stop('blocked'));
 });
 
 test('a stopped pane seat names the remedy for its own reason, never the trust remedy for every stop', () => {
@@ -521,18 +525,31 @@ test('a stopped pane seat names the remedy for its own reason, never the trust r
   assert.equal(remedy('terminal:delivery-unknown'), 'the agent was stopped: terminal:delivery-unknown. Its screen ended with: last line on screen.');
 });
 
-test('a pane seat stopped at its deadline whose receipt names the provider settles as a provider limit and stays a timeout', async () => {
+test('a pane seat stopped at its deadline whose receipt names the provider settles as a provider limit carrying its signal, stays a timeout, and is quarantined for the wait the provider asked', async () => {
   const w = workspace();
   try {
+    // A gemini pane that gave up on a 429 and printed "Provider requested 1800000ms wait".
+    const providerSignal = { status: 429, statusWord: 'RESOURCE_EXHAUSTED', requestedWaitMs: 1800000 };
     const { runDir } = attempt(w, {
       terminal: true,
-      receipt: { outcome: 'timeout', reason: 'terminal:blocked:usage-limit', gateExit: gateExit({ exitCode: null, signal: 'SIGTERM', stoppedBy: 'soft-deadline', cause: 'soft-deadline' }) },
+      receipt: { outcome: 'timeout', reason: 'terminal:blocked:usage-limit', providerSignal, gateExit: gateExit({ exitCode: null, signal: 'SIGTERM', stoppedBy: 'soft-deadline', cause: 'soft-deadline' }) },
     });
+    const capacityDir = path.join(w.root, 'capacity');
+    fs.writeFileSync(path.join(runDir, 'controller', 'settle-context.json'), JSON.stringify({
+      providerCapacitySelection: { status: 'selected', provider: 'gemini', accountId: 'tetcu72' },
+      providerCapacityRuntimeDir: capacityDir,
+    }));
+    const before = Date.now();
     assert.equal((await run('settle-attempt', w, runDir)).exit, 0);
+    const after = Date.now();
     const result = resultOf(runDir);
     const { family, code, cause } = result.classification.failure;
     assert.deepEqual({ family, code, cause }, { family: 'provider', code: 'provider-limit', cause: 'quota' });
+    assert.deepEqual(result.classification.failure.providerSignal, providerSignal);
     assert.equal(JSON.parse(fs.readFileSync(path.join(runDir, 'exit.json'), 'utf8')).timedOut, true, 'the outcome stays a timeout');
+    const state = JSON.parse(fs.readFileSync(providerCapacityStatePaths(capacityDir).statePath, 'utf8'));
+    const until = Date.parse(state.providers.gemini.accounts.tetcu72.quarantine.until);
+    assert.ok(until >= before + 30 * 60 * 1000 && until <= after + 30 * 60 * 1000, `quarantined for 30 minutes, got ${until - before} ms`);
   } finally { w.cleanup(); }
 });
 
@@ -560,9 +577,19 @@ test('a pane seat the supervisor stopped on a dead login quarantines its leased 
       providerCapacityRuntimeDir: capacityDir,
     }));
     assert.equal((await run('settle-attempt', w, runDir)).exit, 0);
-    const state = JSON.parse(fs.readFileSync(providerCapacityStatePaths(capacityDir).statePath, 'utf8'));
-    const record = JSON.stringify(state);
-    assert.match(record, /auth-token/);
-    assert.match(record, /manual-clear/);
+    const { statePath, auditPath } = providerCapacityStatePaths(capacityDir);
+    const state = JSON.parse(fs.readFileSync(statePath, 'utf8'));
+    assert.equal(state.providers.xai.accounts['acct-1'].quarantine.kind, 'manual-clear');
+    assert.equal(state.providers.xai.accounts['acct-1'].quarantine.reasonCode, 'auth-token');
+    assert.equal('audit' in state, false, 'the fault history is a log, not a field of the state file');
+    // Every provider fault leaves one line in the account's fault history.
+    const lines = fs.readFileSync(auditPath, 'utf8').split('\n').filter(Boolean).map((line) => JSON.parse(line));
+    assert.equal(lines.length, 1);
+    const { at, ...line } = lines[0];
+    assert.ok(Number.isFinite(Date.parse(at)));
+    assert.deepEqual(line, {
+      contract: 'provider-capacity-audit.v1', action: 'fault', provider: 'xai', accountId: 'acct-1', reasonCode: 'auth-token',
+      quarantine: { kind: 'manual-clear' }, providerSignal: null, runId: 'run-1', assignmentId: 'asg-1',
+    });
   } finally { w.cleanup(); }
 });

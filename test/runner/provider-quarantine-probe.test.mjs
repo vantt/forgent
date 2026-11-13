@@ -52,9 +52,9 @@ test('an account locked for a dead credential is unlocked by one successful call
   assert.equal(quarantineOf(ctx, 'a'), null);
   const lease = acquireNamedAccountLease({ runnerConfig: ctx.runnerConfig, provider: PROVIDER, accountId: 'a', runId: 'run-1', runtimeDir: ctx.runtimeDir });
   assert.equal(lease.status, 'selected');
-  const state = JSON.parse(fs.readFileSync(providerCapacityStatePaths(ctx.runtimeDir).statePath, 'utf8'));
-  assert.equal(state.audit.at(-1).action, 'clear-quarantine');
-  assert.equal(state.audit.at(-1).actor, 'fgos provider-capacity probe');
+  const audit = fs.readFileSync(providerCapacityStatePaths(ctx.runtimeDir).auditPath, 'utf8').trim().split('\n').map((line) => JSON.parse(line));
+  assert.equal(audit.at(-1).action, 'clear-quarantine');
+  assert.equal(audit.at(-1).actor, 'fgos provider-capacity probe');
 });
 
 test('no call is made while any account of the provider is still usable', async () => {

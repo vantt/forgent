@@ -179,6 +179,7 @@ test('dispatch reconcile provider-capacity clear-quarantine validates the machin
   assert.equal(cleared.accountId, 'tetnu');
   const state = JSON.parse(fs.readFileSync(providerCapacityStatePaths(runtimeDir).statePath, 'utf8'));
   assert.equal(state.providers['openai-codex'].accounts.tetnu.quarantine, null);
-  assert.equal(state.audit.at(-1).action, 'clear-quarantine');
-  assert.equal(state.audit.at(-1).actor, 'test-operator');
+  const audit = fs.readFileSync(providerCapacityStatePaths(runtimeDir).auditPath, 'utf8').trim().split('\n').map((line) => JSON.parse(line));
+  assert.equal(audit.at(-1).action, 'clear-quarantine');
+  assert.equal(audit.at(-1).actor, 'test-operator');
 });

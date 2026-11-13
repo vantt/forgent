@@ -2357,7 +2357,8 @@ test('a dispatch whose only account is locked for a dead login tries one real ca
   assert.notEqual(result.classification?.failure?.code, 'provider-capacity-lease-conflict');
   const state = JSON.parse(fs.readFileSync(providerCapacityStatePaths(runtimeDir).statePath, 'utf8'));
   assert.equal(state.providers.claude.accounts['claude-acct'].quarantine, null);
-  assert.equal(state.audit.at(-1).actor, 'fgos provider-capacity probe');
+  const audit = fs.readFileSync(providerCapacityStatePaths(runtimeDir).auditPath, 'utf8').trim().split('\n').map((line) => JSON.parse(line));
+  assert.equal(audit.at(-1).actor, 'fgos provider-capacity probe');
 });
 
 test('a dispatch whose locked account still fails the call is refused as before, and the next dispatch within the cooldown makes no new call', async () => {

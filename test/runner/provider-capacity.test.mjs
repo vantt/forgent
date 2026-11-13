@@ -548,25 +548,16 @@ test('H1: paused-limit adapter/structured-agent outcomes always carry a conserva
   assert.ok(byStructured.until, 'structuredAgent.stopReason: paused-limit must always produce a conservative until');
 });
 
-test('H1: a quota message with no parseable reset window still gets a conservative until, not an expiry-less quarantine', () => {
-  const withoutResetWindow = classifyProviderCapacityFault({
-    provider: 'openai',
-    stderr: 'ERROR: usage limit has been reached.',
-    adapterOutcome: 'provider-limit',
-    stopCause: 'quota',
-  });
-  assert.equal(withoutResetWindow.reasonCode, 'quota-limit');
-  assert.equal(withoutResetWindow.quarantineKind, 'temporary');
-  assert.ok(withoutResetWindow.until, 'missing reset text must not silently omit until');
-  assert.ok(Date.parse(withoutResetWindow.until) > Date.now());
-
+test('H1: a quota stop whose provider signal names no wait and no reset still gets the conservative one-hour until, never an expiry-less quarantine', () => {
   const now = Date.parse('2026-09-16T00:00:00.000Z');
+  for (const providerSignal of [undefined, null, { status: 429, statusWord: 'RESOURCE_EXHAUSTED' }]) {
+    const fault = classifyProviderCapacityFault({ provider: 'openai', adapterOutcome: 'provider-limit', stopCause: 'quota', providerSignal, now });
+    assert.equal(fault.reasonCode, 'quota-limit');
+    assert.equal(fault.quarantineKind, 'temporary');
+    assert.equal(fault.until, new Date(now + 60 * 60 * 1000).toISOString(), JSON.stringify(providerSignal));
+  }
   const withResetWindow = classifyProviderCapacityFault({
-    provider: 'openai',
-    stderr: "You've hit your usage limit. It resets in 3h.",
-    adapterOutcome: 'provider-limit',
-    stopCause: 'quota',
-    now,
+    provider: 'openai', adapterOutcome: 'provider-limit', stopCause: 'quota', providerSignal: { resetHint: 'resets in 3h' }, now,
   });
   assert.equal(withResetWindow.until, new Date(now + 3 * 60 * 60 * 1000).toISOString(), 'a real parsed reset window is used verbatim, not overridden by the conservative default');
 });
@@ -638,6 +629,23 @@ test('manual clear refuses unknown and non-quarantined accounts unless forced, t
   assert.equal(inspectProviderCapacity({ runnerConfig: runnerConfig(), runtimeDir }).providers['openai-codex'].accounts.a.quarantine, null);
 });
 
+test('a fault history left in state.json moves to the audit log once, on the next state write, and the state file drops it', () => {
+  const runtimeDir = mkTempDir();
+  const { statePath, auditPath } = providerCapacityStatePaths(runtimeDir);
+  fs.mkdirSync(runtimeDir, { recursive: true });
+  const legacy = [
+    { contract: 'provider-capacity-audit.v1', action: 'clear-quarantine', status: 'cleared', provider: 'openai-codex', accountId: 'a' },
+    { contract: 'provider-capacity-audit.v1', action: 'state-reset', status: 'corrupt-state-reset' },
+  ];
+  fs.writeFileSync(statePath, JSON.stringify({ contract: 'provider-capacity-state.v1', providers: {}, assignments: {}, audit: legacy }));
+  const auditLines = () => fs.readFileSync(auditPath, 'utf8').split('\n').filter(Boolean).map((line) => JSON.parse(line));
+  for (const runId of ['run-legacy-1', 'run-legacy-2']) {
+    assert.equal(acquireNamedAccountLease({ accountId: 'b', runnerConfig: runnerConfig(), provider: 'openai-codex', runId, runtimeDir }).status, 'selected');
+    assert.deepEqual(auditLines(), legacy, 'moved once, never twice');
+    assert.equal('audit' in JSON.parse(fs.readFileSync(statePath, 'utf8')), false);
+  }
+});
+
 test('inventory: a home-files credential source lists relative files and is carried through to the selected account', () => {
   const inventory = validateProviderAccountInventory({
     providers: { xai: { accounts: { vantt: { credentialSource: { kind: 'home-files', home: '/home/u/.pi/accounts/x', files: ['auth.json', 'bin/fd'] } } } } },
@@ -660,8 +668,8 @@ test('a quota quarantine lasts as long as the provider says, in hours, minutes a
   const now = Date.parse('2026-10-05T10:00:00.000Z');
   const fromScreen = classifyProviderCapacityFault({
     provider: 'gemini',
-    stderr: 'executor ended as provider-limit: Last line on screen: ⚠ Individual quota reached. Please upgrade your subscription to increase your limits. Resets in 24m1s.',
     adapterOutcome: 'provider-limit',
+    providerSignal: { resetHint: 'Resets in 24m1s' },
     now,
   });
   assert.equal(fromScreen.reasonCode, 'quota-limit');
@@ -670,29 +678,39 @@ test('a quota quarantine lasts as long as the provider says, in hours, minutes a
   assert.equal(parseQuotaResetWindowMs('no window named here'), null);
 });
 
-// A pane seat leaves no stderr: the supervisor's receipt names why the provider stopped it, and the
-// settlement hands that stop to the classifier as typed input; the screen is only reset-time evidence.
-test('a pane seat stopped on a dead login quarantines the account as an auth fault, whatever its stderr says', () => {
+// The supervisor's receipt names why the provider stopped the seat, and the settlement hands that stop to
+// the classifier as typed input; the provider signal only dates a quota stop.
+test('a seat stopped on a dead login quarantines the account as an auth fault until a person clears it, whatever reset its signal names', () => {
   const fault = classifyProviderCapacityFault({
     provider: 'xai',
-    stderr: '',
     adapterOutcome: 'provider-limit',
     stopCause: 'credential',
-    capacityEvidenceText: 'working...\nNot logged in · Please run /login',
+    providerSignal: { resetHint: 'resets in 2h' },
   });
   assert.equal(fault.reasonCode, 'auth-token');
   assert.equal(fault.quarantineKind, 'manual-clear');
   assert.equal(fault.until, undefined);
 });
 
-test('a pane seat stopped on a used-up quota ends its quarantine at the reset time its screen printed', () => {
+test('a quota quarantine ends at the wait the provider requested before the reset it named, and the signal never makes a stop', () => {
   const now = Date.parse('2026-10-05T10:00:00.000Z');
-  const screen = '■ You\'ve hit your usage limit. Upgrade to Pro. Resets in 24m1s.';
-  const fault = classifyProviderCapacityFault({ provider: 'openai-codex', stderr: '', adapterOutcome: 'provider-limit', stopCause: 'quota', capacityEvidenceText: screen, now });
+  const providerSignal = { status: 429, requestedWaitMs: 1800000, resetHint: 'resets in 2h' };
+  const fault = classifyProviderCapacityFault({ provider: 'gemini', adapterOutcome: 'provider-limit', stopCause: 'quota', providerSignal, now });
   assert.equal(fault.reasonCode, 'quota-limit');
-  assert.equal(fault.until, new Date(now + (24 * 60 + 1) * 1000).toISOString());
-  // The evidence text only dates a stop the supervisor named; it never makes one.
-  assert.equal(classifyProviderCapacityFault({ provider: 'openai-codex', stderr: '', adapterOutcome: 'failed', capacityEvidenceText: screen, now }).action, 'evidence-only');
+  assert.equal(fault.until, new Date(now + 30 * 60 * 1000).toISOString());
+  // The signal only dates a stop the supervisor named; it never makes one.
+  assert.equal(classifyProviderCapacityFault({ provider: 'gemini', adapterOutcome: 'failed', providerSignal, now }).action, 'evidence-only');
+});
+
+test('a provider wait or reset longer than a day quarantines for a day, so text on a screen cannot shut an account out for years', () => {
+  const now = Date.parse('2026-10-05T10:00:00.000Z');
+  const day = new Date(now + 24 * 60 * 60 * 1000).toISOString();
+  const quota = (providerSignal) => classifyProviderCapacityFault({ provider: 'gemini', adapterOutcome: 'provider-limit', stopCause: 'quota', providerSignal, now }).until;
+  assert.equal(quota({ requestedWaitMs: 99_999_999_999 }), day);
+  assert.equal(quota({ resetHint: 'resets in 9999h' }), day);
+  // A wait that is no positive number is no wait: the reset hint, else the default, dates the stop.
+  assert.equal(quota({ requestedWaitMs: 0, resetHint: 'resets in 2h' }), new Date(now + 2 * 60 * 60 * 1000).toISOString());
+  assert.equal(quota({ requestedWaitMs: '1800000' }), new Date(now + 60 * 60 * 1000).toISOString());
 });
 
 test('an owner-set quarantine keeps the account out of selection until its end time', () => {
@@ -728,8 +746,8 @@ test('the clock time codex prints ("try again at 6:02 PM") becomes the next such
   const nextDay = new Date(parseQuotaResetClockTime('try again at 9:30 AM', now));
   assert.equal(nextDay.getDate(), 10, 'a time already past today means tomorrow');
   assert.equal(parseQuotaResetClockTime('no reset named here', now), null);
-  const classified = classifyProviderCapacityFault({ provider: 'openai', stderr: "You've hit your usage limit. try again at 6:02 PM.", adapterOutcome: 'provider-limit', stopCause: 'quota', now });
-  assert.equal(new Date(classified.until).getHours(), 18);
+  const classified = classifyProviderCapacityFault({ provider: 'openai', adapterOutcome: 'provider-limit', stopCause: 'quota', providerSignal: { resetHint: 'try again at 6:02 PM' }, now });
+  assert.deepEqual([new Date(classified.until).getHours(), new Date(classified.until).getMinutes()], [18, 2]);
 });
 
 // --- Account lock: one per provider account, separate from the state lock ---
