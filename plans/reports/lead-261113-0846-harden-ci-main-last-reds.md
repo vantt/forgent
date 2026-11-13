@@ -35,6 +35,24 @@ masked by red 1 on 321b32c3b (internal_lock_routes runs before mailbox_routes; i
   90/90; full `npm test` 8860 tests, 0 fail, 31 skipped, no run-tests ERROR lines.
 - CI on the branch: CI 43354315374, Release assets check 43354315390 (PR) and 43354372432 (dispatch), all green. Main runs: see the board.
 
+## Second landing: reds on the first landed commit
+
+Main e95f4171b: Release assets check green (run 43361559343); CI red (run 43361559236), job
+`test (ubuntu-latest)`, two failures, neither from the first landing:
+
+| # | Test | Cause | Fix |
+|---|------|-------|-----|
+| 4 | `check-decision-citation-drift` "CLI run against the real repo root" | `document-identity/spec.md` lines 142 and 684 cited "pkm D14", a D-local id, added by the documentation lane (f9bf62e30, 292f45f17) | `5acc28f8e`: the spec names "pkm's structure spec" instead of the id |
+| 5 | `case-close` "concurrent prunes remove each directory once" listed one case twice | Production race: the advance lock file lives inside the case directory, so prune A's in-place `rmSync` unlinked the lock A still held; prune B took a fresh lock on the half-deleted case, still read its ledger, removed and reported it again. Forced repro (hold the case, unlink its lock file, run prune B): B removed and reported the held case. | `bbd08a59b`: `removeCaseDir` renames the case directory under the hold to `.<caseId>.removing-<pid>-<rand>` (no case id), then deletes it; an applied prune sweeps such leftovers (new proof "what a stopped prune left off the case path ..."). Same repro after the fix: B removes and reports nothing. |
+
+Stub check (asked by the big lead): with B made to pass its existence check and A renaming the case away
+right before B locks, B's lock recreates the case path as a stub holding only `locks/advance.lock`; B
+finds no fresh ledger there and removes it. Runs root after B: only A's `.removing-` directory; after
+both prunes finish: empty. B reports `cases: []`, `kept: []` (log `/dev/shm/cilr-stub-proof.log`).
+
+Proof: case-close 5/5, workflow and CLI focused set 173/173, full `npm test` 8861 tests 0 fail, no
+run-tests ERROR lines.
+
 ## Backlog rows opened
 
 - `p-5zazr53vd2`: the exec-window retry is per process and the scan is serial (N x 250 ms); bound it
@@ -60,5 +78,8 @@ masked by red 1 on 321b32c3b (internal_lock_routes runs before mailbox_routes; i
   state the caller assumes" (detached sync still pushing, Windows image handle still closing, argv not
   yet published). A forced repro (SIGSTOP, argv blanking) proved each in minutes where natural loops
   never failed; reach for it first.
+- A green PR CI is only as fresh as its base: the first landing passed on a base without the
+  documentation lane's next commit, which brought a citation-drift red to main. Rebase-and-rerun the
+  CI test job when main moved by more than docs you have read.
 - An earlier fix (7980b494e) patched one cleanup site with an inline retry; the same failure then hit a
   sibling file. Fix the class through one helper on the first occurrence.
