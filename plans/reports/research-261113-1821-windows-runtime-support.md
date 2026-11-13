@@ -298,3 +298,12 @@ The ssh-keygen regex (step 7) touches no lower layer and can land at any time as
 6. Lifting Q6 (`git-lockscope-unavailable-windows`) changes a recorded owner decision. Does it need a new decision ID in the Git spec's decision history, or is it the planned activation the spec already anticipates ("until the Windows handoff exists")?
 7. Is the `fgctl` `uninstall_surface` failure (`os error 267` at line 82) a test fixture bug or an uninstall bug on Windows? It is red on main and was not diagnosed here.
 8. Where should the platform-support table that D1(a) proposes live: the packaging-distribution spec, or next to the registry in `src/setup/`?
+
+## Owner answers (2026-11-13 18:3x, relayed by the HARDEN lead)
+
+- **D2 (a):** the tier is "runs agents", plus worktree and the Event Store. The Event Store publishes through the Git write ports, so this lifts Q6 (`require_lock_scope_platform`, `packages/git/rust/src/lib.rs:642`). The plan must record that as a superseding decision in the Git spec's decision history, never as an edit in place.
+- **D1 (a):** on Windows, the rows of Linux-only parts report skip with a plain message. One platform-support table lists those rows. Where that table lives (Q8) is for the plan to settle.
+- **D3 (a):** Windows runs unconfined with a warning. A 2-3 day AppContainer feasibility probe comes first, then the choice between restricted token (b) and AppContainer (c).
+- **D5 (a):** macOS rides along in the process scan and the WAL directory abstraction only.
+- **D4 (b), decided by the HARDEN lead:** each step adds its crates to a per-crate Windows job, plus one nightly full run. It is not a required check.
+- **Queue:** the work comes after account-health A, account-health C and the branch cleanup, so there is no plan yet. This report lands with the held board lines after the rc.8 tag.
