@@ -132,8 +132,20 @@ pub fn init_repo(git: &Path, repo: &Path) -> Result<(), String> {
     let mut add = git_plain(git, repo);
     add.args(["add", "base.txt"]);
     run_plain(add, "git add")?;
+    // A commit starts a detached `git maintenance run --auto` even with gc.auto=0, and that process
+    // holds objects/maintenance.lock for a moment; a later commit that meets the lock starts no
+    // background gc at all. The base commit therefore starts none.
     let mut commit = git_plain(git, repo);
-    commit.args(["-c", "gc.auto=0", "commit", "-q", "-m", "base"]);
+    commit.args([
+        "-c",
+        "gc.auto=0",
+        "-c",
+        "maintenance.auto=false",
+        "commit",
+        "-q",
+        "-m",
+        "base",
+    ]);
     run_plain(commit, "git commit")?;
     Ok(())
 }
