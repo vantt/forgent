@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- A provider 429 or `RESOURCE_EXHAUSTED` now ends a run as a usage limit instead of a provider error, so the account is quarantined; the agent protocol also reads the provider's own status, requested wait and reset phrase.
+
 ## [v0.2.0-rc.8] - 2026-11-13
 
 - rc.8 replaces rc.7, whose release run did not publish; it adds these fixes on top of rc.7:
