@@ -22,7 +22,7 @@ Supersedes: The mapped source location; source provenance is retained
 Superseded by: None recorded
 ```
 
-Correction — checked route snapshot (2026-10-13): `packages/host-runtime/contracts/command-routes.json` has 75 selectors: 70 `legacy-cli` and five native (`convention`, `friction`, `gate-bypass`, `metrics`, `version`). This recount supersedes current-count wording; dated proof records remain historical.
+Correction — checked route snapshot (2026-11-13): `packages/host-runtime/contracts/command-routes.json` has 82 selectors: 74 `legacy-cli` and eight native (`config`, `convention`, `friction`, `gate-bypass`, `identity`, `mailbox`, `metrics`, `version`; `preflight` was retired on 2026-11-13). This recount supersedes current-count wording; dated proof records remain historical.
 
 ## 1. Release Boundaries
 
@@ -36,7 +36,7 @@ Correction — checked route snapshot (2026-10-13): `packages/host-runtime/contr
 
 | Decision | Status | Owner |
 | --- | --- | --- |
-| Current R1 route matrix | `current partial` | Code snapshot: 75 selectors, 70 `legacy-cli`, five native selectors: `convention`, `friction`, `gate-bypass`, `metrics`, `version`. |
+| Current R1 route matrix | `current partial` | Code snapshot: 82 selectors, 74 `legacy-cli`, eight native selectors: `config`, `convention`, `friction`, `gate-bypass`, `identity`, `mailbox`, `metrics`, `version`. |
 | First public R1 preview vs stable default | `preview approved; stable undecided` | Packaging-distribution stream. |
 | Compatibility-window duration for R1 Node fallback | explicit escape hatch approved; 30 calendar days after preview release publication; for `v0.1.0`, earliest removal is 2026-10-18 | Packaging-distribution stream plus host invocation. |
 

@@ -188,6 +188,7 @@ Bản ghi mới gọi id **bằng tên**, không có trường `runId` trần: `
 
 - Hàng **Workflow** của [component-boundary.md](../component-boundary.md) ghi authority guide, ledger case, admission và binding worktree; hàng **Work Lifecycle** ghi "Does not own stage or sequencing"; hàng **Execution Core**: authority cho ai làm/model/persona/cơ chế, cửa chạy duy nhất, posture confinement, cổng ghi kiểm chứng được.
 - **Authority admission nằm ở Workflow** (mục 5.2). Item coding vẫn do claim + step FSM tới cutover coding; hook `dispatch-decide` chỉ quyết *cơ chế*.
+- Workflow đọc kết quả một Unit run qua [hợp đồng unit-run-result](../runner/contracts/unit-run-result.md) (`outcome` cuối cùng, `infrastructure`, `evaluations[]`, `binding.family`) và không tự suy lại điều nào trong đó; các bản đọc cũ còn lại nằm trong một module legacy (`src/workflow/legacy-ledger-read.mjs`).
 - Liên kết `workflow` trong `unit.json` là provenance: cửa không đọc nó để cho hay từ chối gì. Chỉ `fgos workflow prune` đọc nó, để biết một Unit run có thuộc đúng case đang dọn không (RUL-WF-40).
 
 ### 5.2 Sau (điều spec khoá)
