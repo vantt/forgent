@@ -82,6 +82,7 @@ test('a workflow resolves personas from its own folder and domain, and never fro
 
   const identityFor = (id) => resolveAgentDefinition('critic', {
     projectRoot: root,
+    installRoot: root,
     workflow: workflowPersonaScope(id, { packageRoot: root }),
   }).identity;
   assert.equal(identityFor('finance/audit'), 'workflow:domains/finance/workflows/audit/critic');

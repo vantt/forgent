@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Domain doctrine is read only from the installed fgOS: agent definitions, the agent roster, prompt templates, `fgos doctor` and the Work registry no longer read a project's own `domains/` directory. Each `compiled.json` now carries a `domain-compiled` contract version and the reader refuses an unknown one by name; `npm run build:domains` rewrites them.
 - `fgos preflight` is retired and answers "unknown verb" like any other unknown verb. For this repository, `npm run check:before-merge` runs the same three checks (skill wrapper drift, decision citation drift, backlog reconciliation).
 - The cross-machine mail sync timer (`fgos doctor --fix`) now names only this project's installation shim or the host of its activated release, never a checkout script, a project-local install or whatever `fgos` the PATH holds, and refuses a project path, binary or remote that holds `%` or a control character.
 - `fgos doctor` probes each hook shim call once per run and asks `claude` its three plugin questions together, so the run is faster; the rows and their conditions are unchanged.

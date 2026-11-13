@@ -8,7 +8,7 @@ import { describeYamlError, parseYaml } from '../util/yaml.mjs';
 import { validateWorkflowChecked as validateWorkflow } from './checked.mjs';
 import { RunnerConfigError } from '../runner/dispatch/runner-config-error.mjs';
 import { definitionNameOf } from '../convention/definition-names.mjs';
-import { listDomainDirs } from '../util/domain-dirs.mjs';
+import { domainCatalog } from '../util/domain-dirs.mjs';
 import { OWN_PAYLOAD_ROOT } from '../run-supervisor/payload-root.mjs';
 
 /** The raw definition a workflow file's text holds: JSON for `.json`, the YAML door otherwise. */
@@ -26,9 +26,7 @@ export function workflowDirs(root) {
   const dirs = [];
   const coreDir = path.join(root, 'core', 'workflows');
   if (fs.existsSync(coreDir)) dirs.push({ dir: coreDir, owningDomain: null });
-  const domainsDir = path.join(root, 'domains');
-  for (const domain of listDomainDirs(domainsDir)) {
-    const dir = path.join(domainsDir, domain, 'workflows');
+  for (const { name: domain, workflowsDir: dir } of domainCatalog({ payloadRoot: root }).domains) {
     if (fs.existsSync(dir)) dirs.push({ dir, owningDomain: domain });
   }
   return dirs;

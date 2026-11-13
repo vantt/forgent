@@ -17,7 +17,7 @@ import { findWorkflowStageOperationProblems, checkTaskSpecsResolve, checkDomainW
 import { writeGlobalConfig, writeProjectConfig, writeRawLegacyProjectConfig } from '../helpers/config-fixture.mjs';
 
 import { nativeDoor } from '../../src/native/door.mjs';
-import { checkAgentClaimsResolve, runDoctor } from '../../src/setup/registrations.mjs';
+import { checkAgentClaimsResolve, checkAgentTypeNamesUnique, runDoctor } from '../../src/setup/registrations.mjs';
 
 // The claude-plugin-marketplace row runs the `claude` CLI when it is on PATH.
 // FGOS_CLAUDE_COMMAND (the row's test-only seam, mirroring bin/fgos.mjs's
@@ -189,19 +189,20 @@ test('agent-type-names-unique doctor check fails on a duplicate within one tier 
       fs.mkdirSync(path.join(tempDir, path.dirname(rel)), { recursive: true });
       fs.writeFileSync(path.join(tempDir, rel), `name: ${name}\ndescription: a persona\n`);
     };
-    const entry = DOCTOR_CHECKS.find((c) => c.id === 'agent-type-names-unique');
+    // The fixture directory is both the project and the installed payload whose domains are read.
+    const check = () => checkAgentTypeNamesUnique(tempDir, { projectTiersOnly: true, installRoot: tempDir });
 
     // A name in core, a domain and the workspace is three tiers replacing one another, not a duplicate.
     write('core/agents/dup-agent.yaml', 'dup-agent');
     write('domains/coding/agents/dup-agent.yaml', 'dup-agent');
     write('fgos/agents/dup-agent.yaml', 'dup-agent');
-    const shadowing = entry.check(tempDir);
+    const shadowing = check();
     assert.equal(shadowing.passed, true, shadowing.message);
     assert.match(shadowing.message, /dup-agent \(replaces domains\/coding\/agents\/dup-agent\.yaml\)/);
 
     // The same name in two domains is one tier defining it twice.
     write('domains/finance/agents/dup-agent.yaml', 'dup-agent');
-    const sameTier = entry.check(tempDir);
+    const sameTier = check();
     assert.equal(sameTier.passed, false);
     assert.match(sameTier.message, /duplicate agent-type name "dup-agent" in domains\/\*\/agents/);
     assert.match(sameTier.message, /domains\/coding\/agents\/dup-agent\.yaml, domains\/finance\/agents\/dup-agent\.yaml/);

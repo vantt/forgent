@@ -27,12 +27,12 @@ import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
 import { detectRcFiles, hasSourceLine, deadSourceLines, probeShellIntegrationInvocation } from './shell-rc.mjs';
-import { listDomainDirs } from '../util/domain-dirs.mjs';
+import { domainCatalog } from '../util/domain-dirs.mjs';
 import { refuseSymlink } from '../util/refuse-symlink.mjs';
 import { releaseBinaryPath } from '../util/release-binary-path.mjs';
 import { RELEASE_TARGETS, releaseTargetForHost } from '../util/release-targets.mjs';
 import { hashFile, listLegacyNodeSourceFiles } from '../../scripts/build-rust-distribution.mjs';
-import { checkCompiledDomains } from '../../scripts/build-domain-registry.mjs';
+import { checkCompiledDomains } from '../util/domain-compile.mjs';
 import { mainCheckoutHookWired } from './git-hooks.mjs';
 import { loadRunnerConfigForDir } from '../runner/dispatch/config.mjs';
 import { checkSessionKeepDeclared } from './session-keep-declared.mjs';
@@ -745,9 +745,7 @@ export function checkRunnerPatternsConfig(cwd, run) {
 
 function allTaskSpecs(cwd) {
   const specs = [];
-  const root = path.join(cwd, 'domains');
-  for (const domain of listDomainDirs(root)) {
-    const taskSpecsDir = path.join(root, domain, 'task-specs');
+  for (const { name: domain, taskSpecsDir } of domainCatalog({ payloadRoot: cwd }).domains) {
     if (!fs.existsSync(taskSpecsDir)) continue;
     for (const file of fs.readdirSync(taskSpecsDir)) {
       if (file.endsWith('.md')) {
@@ -818,9 +816,7 @@ export function allAgentYamlFiles(cwd) {
       }
     }
   }
-  const domainsDir = path.join(cwd, 'domains');
-  for (const domain of listDomainDirs(domainsDir)) {
-    const domainAgentsDir = path.join(domainsDir, domain, 'agents');
+  for (const { name: domain, agentsDir: domainAgentsDir } of domainCatalog({ payloadRoot: cwd }).domains) {
     if (fs.existsSync(domainAgentsDir)) {
       for (const f of sortedReaddir(domainAgentsDir)) {
         if (f.endsWith('.yaml') || f.endsWith('.yml')) {
@@ -924,8 +920,8 @@ export function checkAgentClaimsResolve(cwd) {
 // lower one by whole-file replacement (RUL13). The customer's own tier is also checked for shape.
 // `projectTiersOnly` leaves out every tier read from inside the release (a project without its own
 // domains/ or core/agents/ reads the installed ones); npm test judges those with the option off.
-export function checkAgentTypeNamesUnique(cwd, { projectTiersOnly = false } = {}) {
-  const fullScan = scanAgentTiers({ projectRoot: cwd });
+export function checkAgentTypeNamesUnique(cwd, { projectTiersOnly = false, installRoot } = {}) {
+  const fullScan = scanAgentTiers({ projectRoot: cwd, ...(installRoot && { installRoot }) });
   const scan = projectTiersOnly
     ? fullScan.filter((tier) => !tier.dirs.some((dir) => isWithinDir(INSTALL_ROOT, dir)))
     : fullScan;
@@ -1154,18 +1150,16 @@ registerCheck({
 // one (YAML edited, not rebuilt) silently serves old steps; a YAML file that cannot be parsed
 // cannot be compiled at all. This check names each of those per domain, compiling from the YAML
 // with the same function the build uses.
-export function checkDomainRegistryCompiled(cwd) {
-  const domainsDir = path.join(cwd, 'domains');
-  if (!fs.existsSync(domainsDir)) return { passed: true, message: 'no domains/ directory here — nothing to check' };
-  const { checked, problems } = checkCompiledDomains(domainsDir);
+export function checkDomainRegistryCompiled({ payloadRoot } = {}) {
+  const { checked, problems } = checkCompiledDomains(payloadRoot);
   if (problems.length > 0) return { passed: false, message: problems.join('; ') };
   return { passed: true, message: `${checked} domain registr${checked === 1 ? 'y' : 'ies'} compiled, readable and in step with their YAML` };
 }
 
 registerCheck({
   id: 'domain-registry-compiled',
-  description: "every compiled.json of a project's own domains/ (the form the Work lifecycle reads) exists, parses and matches its registry and workflow YAML; the release's own are judged by npm test",
-  check: (cwd) => (isReleaseSource(cwd) ? releaseSourceNote('domain registries') : checkDomainRegistryCompiled(cwd)),
+  description: "every compiled.json of the running fgOS's domains (the form the Work lifecycle reads) exists, parses, carries the contract this fgOS reads and matches its registry and workflow YAML",
+  check: () => checkDomainRegistryCompiled(),
 });
 
 registerCheck({
