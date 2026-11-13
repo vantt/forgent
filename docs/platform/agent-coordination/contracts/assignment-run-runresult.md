@@ -279,7 +279,10 @@ v2 interpretation and read-only Dispatch runtime inspection while preserving
   `corrupt`. A provider stop (`failure {family: provider, code: provider-limit
   | paused-limit}`) is `provider`, its reason named by `failure.cause`
   (`provider-quota`, `provider-credential`, `provider-error`, else
-  `provider-limit`); a refused capacity or a lease conflict stays `infra`. A
+  `provider-limit`); it may carry `failure.providerSignal`, the receipt's
+  provider signal (`status`, `statusWord`, `requestedWaitMs`, `resetHint`;
+  additive, v3 unchanged, never read for the category). A refused capacity or
+  a lease conflict stays `infra`. A
   seat that exits 0 with no claim and no report settles `failure {family:
   unknown, code: no-report}`, category `infra`, reason `infra-no-report`.
 - A v3 record's recorded category must agree with the derived one through the
