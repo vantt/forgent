@@ -299,24 +299,40 @@ fn validate_tag(tag: &str) -> Result<(), FetchError> {
 #[derive(Debug)]
 struct ScratchDir(PathBuf);
 
+/// Tells apart the scratch directories one process creates, which a clock read alone does not:
+/// two downloads in the same process can read the same time.
+static NEXT_SCRATCH: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
+
 impl ScratchDir {
+    /// Creates a directory of its own: the create is exclusive, so a name that already exists is
+    /// never shared with whoever made it, and another name is tried instead.
     fn create() -> std::io::Result<Self> {
+        let parent = std::env::temp_dir().join("fgos-work");
+        std::fs::create_dir_all(&parent)?;
         let nanos = SystemTime::now()
             .duration_since(UNIX_EPOCH)
             .map(|d| d.as_nanos())
             .unwrap_or(0);
-        let dir = std::env::temp_dir().join("fgos-work").join(format!(
-            "fgctl-fetch-{}-{}",
-            std::process::id(),
-            nanos
-        ));
-        std::fs::create_dir_all(&dir)?;
+        let mut builder = std::fs::DirBuilder::new();
         #[cfg(unix)]
         {
-            use std::os::unix::fs::PermissionsExt;
-            std::fs::set_permissions(&dir, std::fs::Permissions::from_mode(0o700))?;
+            use std::os::unix::fs::DirBuilderExt;
+            builder.mode(0o700);
         }
-        Ok(ScratchDir(dir))
+        loop {
+            let n = NEXT_SCRATCH.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+            let dir = parent.join(format!(
+                "fgctl-fetch-{}-{}-{}",
+                std::process::id(),
+                nanos,
+                n
+            ));
+            match builder.create(&dir) {
+                Ok(()) => return Ok(ScratchDir(dir)),
+                Err(err) if err.kind() == std::io::ErrorKind::AlreadyExists => continue,
+                Err(err) => return Err(err),
+            }
+        }
     }
 }
 
@@ -565,6 +581,28 @@ mod tests {
             env_from: from.map(String::from),
             env_version: version.map(String::from),
         }
+    }
+
+    /// Downloads running at once in one process each get a directory of their own; two that
+    /// shared one overwrote each other's SHA256SUMS and removed each other's tarball.
+    #[test]
+    fn scratch_dirs_created_at_once_in_one_process_are_never_shared() {
+        let start = std::sync::Arc::new(std::sync::Barrier::new(16));
+        let dirs: Vec<ScratchDir> = (0..16)
+            .map(|_| {
+                let start = start.clone();
+                std::thread::spawn(move || {
+                    start.wait();
+                    ScratchDir::create().unwrap()
+                })
+            })
+            .collect::<Vec<_>>()
+            .into_iter()
+            .map(|t| t.join().unwrap())
+            .collect();
+        let names: std::collections::BTreeSet<&Path> = dirs.iter().map(|d| d.0.as_path()).collect();
+        assert_eq!(names.len(), dirs.len());
+        assert!(dirs.iter().all(|d| d.0.is_dir()));
     }
 
     #[test]
