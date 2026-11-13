@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- `fgos preflight` is retired and answers "unknown verb" like any other unknown verb. For this repository, `npm run check:before-merge` runs the same three checks (skill wrapper drift, decision citation drift, backlog reconciliation).
+
 ## [v0.2.0-rc.7] - 2026-11-13
 
 - On Linux the quiesce check before `fgctl init`, `upgrade` and `repair` no longer misses an fgOS process that is still starting: a process read in the middle of `exec` showed no arguments, was judged not fgOS, and the workspace was reported quiet.
