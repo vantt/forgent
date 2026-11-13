@@ -341,7 +341,7 @@ section 3.1; this section holds only what is about domain data and doctrine.
   compile of its YAML byte for byte, and no two workflow files of one domain define
   the same key (`x.yaml` and `x.yml` make the build fail naming both).
 - **Skill names in task-specs resolve to owned skills.** A `requires-skill` claim
-  passes `agent-claims-resolve` only when an agent provides the skill and the name is
+  passes `checkAgentClaimsResolve` (judged by `npm test`) only when an agent provides the skill and the name is
   an owned skill source; the retired name `fgos-coding-compounding` is gone from skill
   text, task-specs and agent definitions in favour of `fgos-coding-knowledge`.
 - **Persona projection.** `scripts/project-agents.mjs` (run by hand; it has no package

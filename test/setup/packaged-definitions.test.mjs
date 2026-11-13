@@ -1,6 +1,6 @@
 // packaged-definitions.test.mjs - the release's own definition tiers are judged here, by npm test,
 // and never by `fgos doctor`: a shipped release cannot change after build. Doctor rows judge only the
-// tiers a project supplies, and skip the directory that is the release source itself.
+// tiers a project supplies.
 import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -51,12 +51,6 @@ test('the packaged domain and core operation prompt templates validate', () => {
   } finally {
     fs.rmSync(emptyProject, { recursive: true, force: true });
   }
-});
-
-test('the claims row skips the release source and leaves its tiers to npm test', () => {
-  const result = doctorRow('agent-claims-resolve').check(INSTALL_ROOT);
-  assert.equal(result.passed, true, result.message);
-  assert.match(result.message, /release source; npm test judges/);
 });
 
 test('the domain registry row judges the running payload\'s compiled domains, in the release source too', () => {

@@ -321,9 +321,8 @@ This table is selective for the Event Store: it lists the one row a project owne
 
 | Id | Checks | Typical failing message | Who | Fix |
 |---|---|---|---|---|
-| `agent-claims-resolve` | Every task spec a project supplies names agents and skills that exist | names the unresolved claim | you | The fgOS release's own task specs are judged by `npm test`; a plain project has none and passes |
-| `domain-registry-compiled` | Every `compiled.json` of a project's own `domains/` exists, parses and matches its YAML | `... -- run npm run build:domains` | you | `npm run build:domains`. The release's own domains are judged by `npm test`; in the fgOS source checkout the row skips |
-| `agent-type-names-unique` | Agent type names are unique within each tier the project supplies (`fgos/agents`, its own `domains/*/agents`, `core/agents`) | names the duplicate | you | Rename one. Tiers read from the installed release are judged by `npm test` |
+| `domain-registry-compiled` | Every `compiled.json` of the installed fgOS's domains exists, parses, carries the contract this fgOS reads and matches its YAML | `... -- run npm run build:domains` | you | `npm run build:domains` in the fgOS source; elsewhere reinstall fgOS. The row judges the installed fgOS, not the project |
+| `agent-type-names-unique` | Agent type names are unique within each tier the project supplies (`fgos/agents`, and `core/agents` when it ships one) | names the duplicate | you | Rename one. Tiers read from the installed release are judged by `npm test` |
 | `work-classification-vocabulary` | Open items' risk and kind match their domain's vocabulary | `N open item(s) outside their domain's classification` | you | Re-classify the named items |
 | `work-step-vocabulary` | No open item is stranded on a retired step | `2 open item(s) at a step their domain no longer registers` | you | Drain the named items; no verb relabels a live item's step |
 | `work-recorded-conflicts` | The Work view holds no recorded cross-machine conflicts | `warning: 1 recorded cross-machine conflict(s) on 1 item(s): build-cli` | you | Never fails. Run `fgos show <id>` to list the conflicts of an item: each is a change acknowledged on one machine that another machine's concurrent change kept from applying. Nothing resolves it automatically |

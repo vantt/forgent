@@ -221,11 +221,10 @@ Minimum checks:
 - duplicate canonical skill names across `core/skills` and `domains/*/skills`;
 - shared fragment collision across component-owned sources.
 
-Doctor rows that judge skills, after the hardening of 2026-11-09 (ids and count unchanged; each judges more than before):
+Doctor rows that judge skills, after the hardening of 2026-11-09 (each judges more than before; the claims check a task-spec `requires-skill` is no longer a doctor row since 2026-11-13: it passes only when an agent provides the skill and the name is an owned skill, and `npm test` judges it through `checkAgentClaimsResolve`):
 
 | Row | Judges |
 | --- | --- |
-| `agent-claims-resolve` | a task-spec `requires-skill` claim passes only when an agent provides the skill **and** the name is an owned skill (an owned source under `core/skills` or `domains/<domain>/skills`); the message names the failing side |
 | `executor-skills-installed` | every skill an executor declares in `supports.skills` is a non-empty `SKILL.md` in the project-level or user-level skill directory of each CLI the executor invokes (roots from `AGENT_SKILL_DIRS`); it judges the main checkout only, and a linked worktree gets foreign skills from provisioning (section 3.1) |
 | `domain-registry-compiled` | the same function as `npm run build:domains -- --check` (`checkCompiledDomains`): every `compiled.json` has a `registry.yaml`, equals its compile byte for byte, and no two workflow files share a key |
 

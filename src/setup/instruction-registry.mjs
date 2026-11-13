@@ -15,7 +15,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { parseYaml } from '../util/yaml.mjs';
-import { listDomainDirs } from '../util/domain-dirs.mjs';
+import { domainCatalog } from '../util/domain-dirs.mjs';
 import { buildDecisionIndexMarkdown, narrativeHolderResolver } from '../report/decision-index.mjs';
 import { listWork } from '../state/store.mjs';
 
@@ -583,14 +583,13 @@ export class InstructionRegistry extends Array {
  * from within projectRoot. Allowed component and domain owners are authoritatively
  * resolved from docs/architecture-manifest.json. Unregistered default roots are rejected.
  *
- * Custom roots (coreRoot, componentsRoot, domainsRoot) are test-only/internal options
+ * Custom roots (coreRoot, componentsRoot) are test-only/internal options
  * intended solely for test harness fixture isolation and cannot be used by production
  * default discovery.
  *
  * Options:
  *   - coreRoot: (internal/test-only) custom path to core/instructions/
  *   - componentsRoot: (internal/test-only) custom path to components/
- *   - domainsRoot: (internal/test-only) custom path to domains/
  *   - manifestPath: (internal/test-only) custom path to architecture manifest
  *   - knownOwners: Set or Array of valid owner names (internal/test-only override)
  *   - allowDuplicates: boolean (default false, throws on duplicate id)
@@ -598,7 +597,6 @@ export class InstructionRegistry extends Array {
 export function discoverInstructionSources(projectRoot, options = {}) {
   const coreRoot = options.coreRoot ?? path.join(projectRoot, 'core', 'instructions');
   const componentsRoot = options.componentsRoot ?? path.join(projectRoot, 'components');
-  const domainsRoot = options.domainsRoot ?? path.join(projectRoot, 'domains');
 
   // Discover or use provided known owners
   let knownOwners = null;
@@ -676,22 +674,24 @@ export function discoverInstructionSources(projectRoot, options = {}) {
   }
 
   // 3. Domain instructions
-  for (const domainName of listDomainDirs(domainsRoot)) {
+  // The instructions composed here are this project's own effective instructions: the domains are the
+  // catalog's, walked from the project root being composed (its source paths and ledger are project-relative).
+  for (const { name: domainName, dir: domainDir } of domainCatalog({ payloadRoot: projectRoot }).domains) {
     if (domainName.startsWith('.')) continue;
 
     if (!knownOwners.has(domainName)) {
       throw new InstructionRegistryError(
         `Unknown domain owner "${domainName}" in domains directory. Known owners are: ${[...knownOwners].sort().join(', ')}`,
         {
-          filePath: toPosixPath(path.relative(projectRoot, path.join(domainsRoot, domainName))),
+          filePath: toPosixPath(path.relative(projectRoot, domainDir)),
           code: 'UNKNOWN_OWNER',
         },
       );
     }
 
-    const instructionsDir = path.join(domainsRoot, domainName, 'instructions');
+    const instructionsDir = path.join(domainDir, 'instructions');
     if (fs.existsSync(instructionsDir)) {
-      const files = scanMarkdownFiles(instructionsDir, options.domainsRoot ? domainsRoot : projectRoot);
+      const files = scanMarkdownFiles(instructionsDir, projectRoot);
       for (const fullPath of files) {
         const sourcePath = toPosixPath(path.relative(projectRoot, fullPath));
         const content = fs.readFileSync(fullPath, 'utf8');
