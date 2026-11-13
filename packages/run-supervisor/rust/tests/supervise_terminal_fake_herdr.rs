@@ -571,7 +571,11 @@ fn a_deadline_stop_names_a_provider_stop_on_the_screen_and_keeps_the_timeout_out
         receipts[0]["providerSignal"],
         json!({"resetHint": "try again at 7:18 PM"})
     );
-    assert!(receipts[1].get("providerSignal").is_none(), "{}", receipts[1]);
+    assert!(
+        receipts[1].get("providerSignal").is_none(),
+        "{}",
+        receipts[1]
+    );
     assert_eq!(receipts[2]["providerSignal"], json!({"status": 404}));
     assert_eq!(receipts[3]["providerSignal"], json!({"status": 429}));
     for quiet in &receipts[4..] {

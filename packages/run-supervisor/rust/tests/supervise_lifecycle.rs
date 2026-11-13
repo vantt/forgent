@@ -124,8 +124,7 @@ fn a_direct_agent_that_exits_on_a_provider_stop_names_it_in_the_receipt_unless_i
         json!({"resetHint": "try again at 7:18 PM"})
     );
     // The provider's API error is read from the last JSON event on stdout, where a json-mode CLI writes it.
-    let api_error =
-        r#"echo '{"type":"message_end","message":{"stopReason":"error","errorStatus":404}}'"#;
+    let api_error = r#"echo '{"type":"message_end","message":{"stopReason":"error","errorMessage":"Cloud Code Assist API error (404)","errorStatus":404}}'"#;
     let api = direct_receipt("dapi", &format!("{api_error}; exit 1")).unwrap();
     assert_eq!(api["reason"], "direct:blocked:provider-error");
     assert_eq!(api["providerSignal"], json!({"status": 404}));

@@ -508,11 +508,18 @@ impl Sup<'_> {
 
     /// Ask the gate to stop through the normal path; the cause the contract names stays `cancel`.
     fn begin_stop(&mut self, cause: &str, reason: Option<&str>) {
+        self.begin_provider_stop(cause, reason, None);
+    }
+
+    /// [`Self::begin_stop`] with the provider's own signal read from the screen that gave the reason.
+    /// The first reason wins, and the signal belongs to it.
+    fn begin_provider_stop(&mut self, cause: &str, reason: Option<&str>, signal: Option<Value>) {
         if self.stopped.is_some() {
             return;
         }
         if self.end.reason.is_none() {
             self.end.reason = reason.map(String::from);
+            self.end.provider_signal = signal;
         }
         self.stopped = Some(Instant::now());
         request_stop(self.watch, &mut self.go, &self.gate, cause);
@@ -562,12 +569,12 @@ impl Sup<'_> {
                 None
             };
             if let Some(cause) = cause {
-                let reason = if matches!(cause, "soft-deadline" | "idle") {
-                    self.provider_stop_reason(core, key)
+                let (reason, signal) = if matches!(cause, "soft-deadline" | "idle") {
+                    self.provider_stop_reason(core, key).unzip()
                 } else {
-                    None
+                    (None, None)
                 };
-                self.begin_stop(cause, reason.as_deref());
+                self.begin_provider_stop(cause, reason.as_deref(), signal.flatten());
             }
         } else if let Some(at) = self.stopped {
             let domain = &self.domain;
@@ -579,12 +586,15 @@ impl Sup<'_> {
     /// A deadline stop reads the screen once and names the provider when it ends on a dead login, a used-up
     /// quota or a provider's API error, so the caller moves to another account. The outcome stays `timeout`.
     /// A trust dialog or any other screen names nothing: the agent may simply have been working.
-    fn provider_stop_reason(&self, core: &Core, key: &str) -> Option<String> {
+    fn provider_stop_reason(&self, core: &Core, key: &str) -> Option<(String, Option<Value>)> {
         let screen = core.read(key, None, Some("visible")).ok()?;
         match self.adapter.stop_reason(&screen)? {
             reason @ (BlockedReason::Login
             | BlockedReason::UsageLimit
-            | BlockedReason::ProviderError) => TerminalOutcome::Blocked(reason).receipt_reason(),
+            | BlockedReason::ProviderError) => Some((
+                TerminalOutcome::Blocked(reason).receipt_reason()?,
+                self.adapter.stop_signal(&screen).map(|s| s.to_json()),
+            )),
             BlockedReason::TrustDialog => None,
         }
     }
@@ -928,10 +938,10 @@ fn drive(plan: &Plan, core: &Core, sup: &mut Sup) {
                 .and_then(|screen| adapter.setup_line(&screen))
             {
                 eprintln!("fgos internal supervise: the agent shows a setup screen only a person can finish: {line}");
-                return end_early(&mut io, Some(REASON_NEEDS_SETUP.to_string()));
+                return end_early(&mut io, Some(REASON_NEEDS_SETUP.to_string()), None);
             }
         }
-        return end_early(&mut io, readiness.outcome().receipt_reason());
+        return end_on_outcome(&mut io, &adapter, &readiness.outcome());
     }
 
     let delivery = adapter.deliver_brief(&mut io, &plan.brief, &mut outbox);
@@ -939,7 +949,7 @@ fn drive(plan: &Plan, core: &Core, sup: &mut Sup) {
         return;
     }
     if delivery != TerminalOutcome::Delivered {
-        return end_early(&mut io, delivery.receipt_reason());
+        return end_on_outcome(&mut io, &adapter, &delivery);
     }
     // Once, and the connection stays open: the gate reads an early close as a dead supervisor.
     if write_frame(&mut io.sup.go, &json!({"type": "BRIEF_DELIVERED"})).is_err() {
@@ -955,7 +965,7 @@ fn drive(plan: &Plan, core: &Core, sup: &mut Sup) {
         if let Some(outcome) = adapter.detect_completed(&mut io, &mut outbox) {
             match outcome {
                 TerminalOutcome::Completed { .. } => return ask_to_leave(plan, &adapter, &mut io),
-                other => return end_early(&mut io, other.receipt_reason()),
+                other => return end_on_outcome(&mut io, &adapter, &other),
             }
         }
         let file = outbox.newest_unreadable(&mut io);
@@ -976,12 +986,29 @@ fn drive(plan: &Plan, core: &Core, sup: &mut Sup) {
 
 /// An early end, named by its receipt reason (an adapter outcome's, or one the supervisor names). A pane that vanished
 /// is the better explanation for an agent that stopped answering, so the carrier is looked at first.
-fn end_early(io: &mut TermIo, reason: Option<String>) {
+fn end_early(io: &mut TermIo, reason: Option<String>, signal: Option<Value>) {
     io.sup.carrier_check(io.core, io.key);
     if io.sup.finished() {
         return;
     }
-    io.sup.begin_stop("cancel", reason.as_deref());
+    io.sup
+        .begin_provider_stop("cancel", reason.as_deref(), signal);
+}
+
+/// [`end_early`] for an adapter outcome. A provider stop (`Blocked`) also carries the provider's own signal, read once from
+/// the screen; a screen that cannot be read gives no signal, never an error.
+fn end_on_outcome(io: &mut TermIo, adapter: &Terminal, outcome: &TerminalOutcome) {
+    let signal = match outcome {
+        TerminalOutcome::Blocked(
+            BlockedReason::Login | BlockedReason::UsageLimit | BlockedReason::ProviderError,
+        ) => io
+            .screen()
+            .ok()
+            .and_then(|screen| adapter.stop_signal(&screen))
+            .map(|signal| signal.to_json()),
+        _ => None,
+    };
+    end_early(io, outcome.receipt_reason(), signal);
 }
 
 /// The result is in: type the exit command, give the agent a short time to leave, then stop it.

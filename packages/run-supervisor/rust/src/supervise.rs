@@ -155,13 +155,14 @@ fn capture_tail(path: &Path) -> String {
 
 /// The provider stop a direct agent's last words name, as the receipt's `reason`: a login or quota wording on
 /// stderr, or a provider's API error in its last JSON event on stdout. Only an agent that exited non-zero
-/// with no result in the outbox is read; a result in the outbox always wins.
+/// with no result in the outbox is read; a result in the outbox always wins. The provider's own signal is read
+/// from the same two tails.
 fn direct_reason(
     envelope: &Value,
     gate_exit: Option<&Value>,
     outbox_result: Option<&str>,
     outcome: &str,
-) -> Option<String> {
+) -> Option<(String, Option<Value>)> {
     let code = gate_exit?["exitCode"]
         .as_i64()
         .filter(|code| *code != 0 && outcome == "exited" && outbox_result.is_none())?;
@@ -176,7 +177,7 @@ fn direct_reason(
             .as_str()
             .unwrap_or_default(),
     );
-    adapter
+    let reason = adapter
         .classify(
             ExitInfo {
                 code: i32::try_from(code).ok(),
@@ -185,7 +186,11 @@ fn direct_reason(
             &stdout,
             None,
         )
-        .receipt_reason()
+        .receipt_reason()?;
+    let signal = adapter
+        .provider_signal(&stderr, &stdout)
+        .map(|signal| signal.to_json());
+    Some((reason, signal))
 }
 
 /// The most a `gate-exit.json` may hold; a larger file reads as absent.
@@ -213,6 +218,8 @@ pub(crate) struct TerminalEnd {
     pub carrier_lost: bool,
     /// `terminal:<outcome>` when an adapter outcome ended the run early.
     pub reason: Option<String>,
+    /// What the provider said on the screen that gave `reason`; set only together with it.
+    pub provider_signal: Option<Value>,
 }
 
 /// Publish `receipt.json` once and return the outcome of whichever receipt is there, for either author. `not_started`: the attempt was never
@@ -290,8 +297,15 @@ pub(crate) fn publish_receipt_with(
                 None
             }
         };
-        if let Some(reason) = end.reason.clone().or_else(direct) {
+        let ended = match end.reason.clone() {
+            Some(reason) => Some((reason, end.provider_signal.clone())),
+            None => direct(),
+        };
+        if let Some((reason, signal)) = ended {
             receipt["reason"] = json!(reason);
+            if let Some(signal) = signal {
+                receipt["providerSignal"] = signal;
+            }
         }
     }
     publish_once(
