@@ -98,7 +98,7 @@ import { postLandDrift } from '../state/postland-drift.mjs';
 import { isResolvedStatus } from '../state/frontier.mjs';
 import { getDomain, resolveDomainName, effectiveStep, domainSteps, skillForStep } from '../state/domain-registry.mjs';
 import { readLocalStatus, classifyRegistryPosture, toolsFromExecutors } from '../state/tool-registry.mjs';
-import { resolveCliVersionInfo } from '../cli/version.mjs';
+import { resolveCliVersionInfo } from './version-info.mjs';
 import { firstOnPath, inspectLauncher, writeLauncher } from './project-launcher.mjs';
 import { readConfig, readMachineConfig } from '../config/facade.mjs';
 import { CONFIG_CHECKS, CONFIG_FIXES, checkConfigOnce, isConfigDoorFailure } from './config-checks.mjs';
@@ -372,11 +372,11 @@ export function integrationScriptPath() {
 // directly (blocked by this repo's own scout-block hook).
 function checkCliVersionVisible() {
   const info = resolveCliVersionInfo();
-  if (!info.packageVersion || !Array.isArray(info.verbs) || info.verbs.length === 0) {
-    return { passed: false, message: 'fgos version did not resolve a packageVersion/verbs -- src/cli/version.mjs is broken' };
+  if (!info.packageVersion) {
+    return { passed: false, message: 'the build did not resolve a packageVersion -- src/setup/version-info.mjs is broken' };
   }
   const commitPart = info.gitCommit ? ` (${info.gitCommit})` : ' (no git commit -- not a git checkout)';
-  return { passed: true, message: `fgos ${info.packageVersion}${commitPart} — ${info.verbs.length} verbs` };
+  return { passed: true, message: `fgos ${info.packageVersion}${commitPart}` };
 }
 
 function checkNodeAndGit(cwd, run) {
@@ -1034,7 +1034,7 @@ registerCheck({
 
 registerCheck({
   id: 'cli-version-visible',
-  description: 'this build\'s own package version/commit/verb-set resolve cleanly via `fgos version`',
+  description: 'the running fgOS\'s own package version and git commit resolve cleanly',
   check: () => checkCliVersionVisible(),
 });
 

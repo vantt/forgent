@@ -1623,7 +1623,7 @@ test('Event Store keeps consumer boundaries and one native export importer', () 
 
 // A lower layer defines its own conventions and never knows the shell: these folders import nothing from `src/cli`.
 // The one named exception reads the CLI version for a doctor row and goes when that row reads the version at its owner.
-const CLI_IMPORT_EXCEPTIONS = ['src/setup/registrations.mjs'];
+const CLI_IMPORT_EXCEPTIONS = [];
 const NO_CLI_IMPORT_DIRS = ['src/event-store/', 'src/workflow/', 'src/observe/', 'src/verbs/', 'src/setup/'];
 
 export function cliImportsOf(file, source) {
@@ -1632,7 +1632,7 @@ export function cliImportsOf(file, source) {
     .filter((target) => target === 'src/cli' || target.startsWith('src/cli/'));
 }
 
-test('event-store, workflow, observe, verbs and setup import nothing from src/cli beyond the one named exception', () => {
+test('event-store, workflow, observe, verbs and setup import nothing from src/cli', () => {
   const violations = [];
   for (const file of onDisk.filter((f) => NO_CLI_IMPORT_DIRS.some((dir) => f.startsWith(dir)) && !CLI_IMPORT_EXCEPTIONS.includes(f))) {
     for (const target of cliImportsOf(file, fs.readFileSync(path.join(root, file), 'utf8'))) violations.push(`${file} -> ${target}`);

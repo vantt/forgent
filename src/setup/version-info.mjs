@@ -1,19 +1,13 @@
-// version.mjs — resolves the running fgOS build's own package version, git
-// commit, and dispatched verb set. Shared by the `fgos version` verb
-// (bin/fgos.mjs) and the `cli-version-visible` doctor check
-// (src/setup/registrations.mjs) so neither can drift from the other
-// (tsk-2ej: closes the friction of having no hook-safe, scriptable way to
-// tell an old globally-installed build from a current checkout).
-//
-// Pure data resolution only — this module never imports verb logic, only
-// reads its own package.json and asks Git Inspect for its own commit.
+// version-info.mjs — resolves the running fgOS build's own package version and git commit for the
+// `cli-version-visible` doctor check. The `fgos version` verb is native (the host answers it, verb
+// list included), so this module knows nothing of verbs: it only reads its own package.json and
+// asks Git Inspect for its own commit.
 
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { createGitInspect, gitPortOptions } from '../git/inspect.mjs';
-import { COMMAND_REGISTRY } from './command-registry.mjs';
 
 const PACKAGE_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 
@@ -30,6 +24,5 @@ export function resolveCliVersionInfo({ packageRoot = PACKAGE_ROOT } = {}) {
     // Not a git checkout (a real npm/tarball install has no .git) -- no
     // commit to report, never thrown as an error.
   }
-  const verbs = COMMAND_REGISTRY.map((entry) => entry.name).sort();
-  return { packageVersion, gitCommit, verbs };
+  return { packageVersion, gitCommit };
 }

@@ -116,7 +116,7 @@ impl RuntimeIdentityInfo {
 
 /// Typed outcome for `distribution.build.show`.
 ///
-/// Matches `src/cli/version.mjs`'s `resolveCliVersionInfo()` shape field-for-field.
+/// The native `version` verb's record: package version, git commit and the verb set the host routes.
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct BuildShowOutcome {
@@ -206,7 +206,7 @@ pub fn resolve_verbs() -> Vec<String> {
     verbs
 }
 
-/// Resolves the full build show info matching `resolveCliVersionInfo()` in `src/cli/version.mjs`.
+/// Resolves the full build show info for the `version` verb.
 pub fn resolve_cli_version_info() -> BuildShowOutcome {
     BuildShowOutcome {
         package_version: resolve_package_version(),
