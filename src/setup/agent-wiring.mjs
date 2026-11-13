@@ -160,6 +160,12 @@ export function planAgentWiring(cwd, { env = process.env, home = os.homedir() } 
   return { agents, absent, files };
 }
 
+/** What `fgos wire-agents` answers: the plan, and with `apply` its result (without it `applied: false`). */
+export function wireAgentsUseCase(cwd, { apply = false } = {}) {
+  const plan = planAgentWiring(cwd);
+  return { ...plan, ...(apply ? applyAgentWiring(plan) : { applied: false }) };
+}
+
 function backupStamp(now) {
   return now.toISOString().replace(/[-:.]/g, '');
 }

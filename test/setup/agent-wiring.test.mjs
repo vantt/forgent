@@ -15,7 +15,7 @@ import { fileURLToPath } from 'node:url';
 
 import { initFixtureRepo } from '../helpers/git-fixture.mjs';
 import { writeProjectConfig } from '../helpers/config-fixture.mjs';
-import { applyAgentWiring, planAgentWiring } from '../../src/setup/agent-wiring.mjs';
+import { applyAgentWiring, planAgentWiring, wireAgentsUseCase } from '../../src/setup/agent-wiring.mjs';
 
 const FGOS = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../bin/fgos.mjs');
 const WINDOWS = process.platform === 'win32';
@@ -253,4 +253,16 @@ test('wire-agents has nothing to change once the plugin is installed, and report
   assert.match(result.failed[0].error, /claude plugin install fgOS@fgos-plugins.*failed/s);
   assert.deepEqual(failing.state().marketplaces, [{ name: 'fgos-plugins', source: 'github', repo: 'vantt/forgent' }], 'the step that ran is kept');
   fs.rmSync(work, { recursive: true, force: true });
+});
+
+test('wire-agents without apply only plans: the plan comes back with applied false and no file is touched', () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-wire-use-case-'));
+  try {
+    const result = wireAgentsUseCase(dir);
+    assert.equal(result.applied, false);
+    assert.ok(Array.isArray(result.agents) && Array.isArray(result.absent) && Array.isArray(result.files));
+    assert.deepEqual(fs.readdirSync(dir), []);
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
 });
