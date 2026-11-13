@@ -13,7 +13,7 @@ HARDEN và COOK không tự sửa tệp cấu hình nào của anh (các tệp t
 | **rc.7: Rust 1.99.0** (ghim từ rc.6, rc.7 xác nhận trên CI Ubuntu và Windows) | Chỉ máy tự build từ source cần `rustup`; người chỉ cài bản phát hành thì không cần Rust (mục 2a). |
 | **rc.7: Windows cài và kích hoạt được** | `fgctl init` và `fgctl upgrade` chạy trên Windows tới bước kích hoạt. Config, Event Store/Work và confinement **chưa hỗ trợ** trên Windows, nên `fgos doctor` ở đó chưa `ok`. Linux là nền được hỗ trợ. |
 | **rc.7: sửa lỗi nền** | Kiểm tra "máy đang yên" trước `fgctl init`, `upgrade`, `repair` không bỏ sót tiến trình fgOS đang khởi động (Linux); id máy, work, backlog, project sinh được trên macOS và Windows; `fgctl uninstall --purge` từ chối thư mục state trùng HOME bất kể kiểu chữ hoa thường (Windows); kiểm tra Git trên Windows không còn đánh trượt Git hợp lệ. |
-| **rc.8: các sửa nền** (cắt từ main hiện tại: rc.7 cộng các sửa CI, không thêm tính năng) | Bộ test chạy ổn định hơn và hai lỗi nền được vá, anh không phải làm gì thêm. Mục 4. |
+| **rc.8: các sửa nền** (cắt từ main hiện tại: rc.7 cộng các sửa CI, không thêm tính năng) | Bộ test chạy ổn định hơn và vài lỗi nền được vá, anh không phải làm gì thêm. Mục 4. |
 
 ### Known gaps (nguyên văn từ CHANGELOG, HARDEN cung cấp)
 
