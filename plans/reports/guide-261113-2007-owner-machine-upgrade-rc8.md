@@ -13,8 +13,7 @@ HARDEN và COOK không tự sửa tệp cấu hình nào của anh (các tệp t
 | **rc.7: Rust 1.99.0** (ghim từ rc.6, rc.7 xác nhận trên CI Ubuntu và Windows) | Chỉ máy tự build từ source cần `rustup`; người chỉ cài bản phát hành thì không cần Rust (mục 2a). |
 | **rc.7: Windows cài và kích hoạt được** | `fgctl init` và `fgctl upgrade` chạy trên Windows tới bước kích hoạt. Config, Event Store/Work và confinement **chưa hỗ trợ** trên Windows, nên `fgos doctor` ở đó chưa `ok`. Linux là nền được hỗ trợ. |
 | **rc.7: sửa lỗi nền** | Kiểm tra "máy đang yên" trước `fgctl init`, `upgrade`, `repair` không bỏ sót tiến trình fgOS đang khởi động (Linux); id máy, work, backlog, project sinh được trên macOS và Windows; `fgctl uninstall --purge` từ chối thư mục state trùng HOME bất kể kiểu chữ hoa thường (Windows); kiểm tra Git trên Windows không còn đánh trượt Git hợp lệ. |
-| **rc.8: các sửa của HARDEN T9** (nếu nằm trong tag) | `fgos preflight` đã gỡ (dùng `npm run check:before-merge` trong repo này); `fgos doctor` nhanh hơn; timer mailbox chỉ dùng shim dự án hoặc host của bản đang kích hoạt; `fgos agents list` chỉ đọc persona domain của bản đã cài. Chi tiết ở mục 4. |
-| **rc.8: B, ghi nhận quota và lỗi hạ tầng** (chỉ khi B đã land trước tag) | Mỗi lần chạy tự nói bên nào hỏng: 429 là dừng do quota (tài khoản bị cách ly đến hết giờ nhà cung cấp yêu cầu), seat thoát 0 không báo cáo là lỗi hạ tầng, `unit-summary` lên v3. Mục 4. |
+| **rc.8: các sửa nền** (cắt từ main hiện tại: rc.7 cộng các sửa CI, không thêm tính năng) | Bộ test chạy ổn định hơn và hai lỗi nền được vá, anh không phải làm gì thêm. Mục 4. |
 
 ### Known gaps (nguyên văn từ CHANGELOG, HARDEN cung cấp)
 
@@ -24,7 +23,7 @@ Nói gọn: **chỉ Linux được chứng minh đầy đủ.** macOS chưa hỗ
 
 ## 1. Thứ tự
 
-1. **Ba máy cùng nâng một đợt:** fg-server2, fg-server và máy của anh. Đừng để một máy chạy bản mới còn máy kia chạy bản cũ lâu. **Mới:** nếu B có trong bản này, `unit-summary` mới (v3) mà bản cũ không đọc được là lý do thêm để không trộn bản.
+1. **Ba máy cùng nâng một đợt:** fg-server2, fg-server và máy của anh. Đừng để một máy chạy bản mới còn máy kia chạy bản cũ lâu.
 2. **Trên mỗi máy, nâng mọi dự án cùng lúc.** Liệt kê dự án trước: `find ~ -maxdepth 6 -path '*/.fgos/installation/activation.json'`. Máy đang chạy `v0.2.0-rc.6` hoặc `rc.7` thì cấu hình đã là `config.yaml`, việc nâng không chuyển cấu hình nữa; chỉ máy còn `rc.5` trở xuống mới bị chuyển `config.json` sang `config.yaml`, và dự án chưa nâng sẽ từ chối chạy (xem rc.6, mục 1.2).
 3. **Mỗi máy làm đủ mục 2 trước, rồi mới kích hoạt (mục 3).**
 
@@ -66,18 +65,16 @@ Kiểm định tuyến không đổi (trước và sau, cùng dự án): `fgos d
 
 Chạy thật một lần ngay sau khi kích hoạt, trên máy đã có tài khoản: `fgos run "Reply with exactly the word OK" --json </dev/null`. Bước này chưa từng chạy được trong HOME tạm (không có tài khoản thật), nên **phải chạy trên máy thật**.
 
-## 4. Anh sẽ thấy gì (chỉ phần mới từ rc.6)
+## 4. Anh sẽ thấy gì
 
-- **`fgos preflight` đã gỡ:** lệnh trả "unknown verb" (mã 4). Trong repo này dùng `npm run check:before-merge`.
-- **`fgos doctor` nhanh hơn:** đo trong tiến trình, trung vị 2052 ms trước và 1450 ms sau. Số dòng doctor đổi từ 110 xuống 109: dòng `agent-claims-resolve` đã bỏ vì dự án không còn cung cấp task-spec hay agent domain.
-- **Persona domain:** `fgos agents list` và seat chỉ đọc persona domain của bản đã cài, bỏ qua thư mục `domains/` của dự án. Mục `masked` chỉ còn persona core bị `core/agents` của dự án che.
-- **Timer mailbox:** `fgos doctor --fix` ghi timer chỉ dùng shim của dự án hoặc host của bản đang kích hoạt; đường dẫn dự án chứa `%` hoặc ký tự điều khiển thì dòng doctor cảnh báo và không ghi timer.
-- **`compiled.json` của domain** có phiên bản hợp đồng; bản đọc từ chối phiên bản lạ và nêu tên.
-- **Hook agy:** từ chối khi cấu hình dự án không dùng được (như Claude), không còn cho qua.
-- **Chạy từ thư mục con:** lệnh đọc kho của dự án đang đứng, không tạo kho ma; `fgos init` chỉ chạy ở đỉnh repo.
-- **B, nếu có trong tag:** 429 hoặc `RESOURCE_EXHAUSTED` kết thúc vòng là dừng do quota (`blocked(usage-limit)`); tài khoản bị cách ly đến hết thời gian nhà cung cấp yêu cầu (ví dụ 30 phút), mặc định 1 giờ; mỗi lỗi nhà cung cấp thêm một dòng vào `provider-capacity/audit.jsonl` trong thư mục runtime của capacity; seat thoát 0 mà không có báo cáo là lỗi hạ tầng (`no-report`); `provider-limit` có nhóm riêng `provider`; `unit-summary.json` lên v3 (bản đọc nhận cả v2 và v3). **Nếu B chưa land khi cắt tag, xóa dòng này khỏi hướng dẫn.**
+Bản rc.8 được cắt từ main hiện tại, nên hành vi người dùng nhìn thấy **giống rc.7**. Khác rc.7 chỉ là các sửa nền sau, không có lệnh hay dòng doctor mới:
 
-Phần còn lại giống rc.6 (khối `Ready`, `N checks need you`, mã thoát, `fgctl uninstall`, cảnh báo pin lệch).
+- **Lỗi lặt của bộ test vị trí khóa (holder-lock):** fixture của bài kiểm tra mượn Git sửa cho ổn định; không đổi sản phẩm.
+- **Đua pid của cổng khi agent thoát rất nhanh:** sửa cuộc đua pid ở cổng với một agent thoát gần như ngay lúc vừa chạy (tên sửa theo HARDEN; chi tiết ở báo cáo CI của HARDEN).
+- **bwrap ghi báo cáo qua memfd:** khi tiến trình gọi bị giết trước khi bwrap kịp báo cáo, namespace con không còn bị bỏ rơi.
+- **Mồ côi của Git trong vùng cách ly (chỉ khi bản sửa đã land trước tag):** tiến trình Git con trong sandbox không còn thành tiến trình mồ côi. **Nếu chưa land khi cắt tag, xóa dòng này.**
+
+Từ rc.6 đã có (nhắc lại cho máy chưa lên rc.6): gateway mặc định chỉ nghe `127.0.0.1` (mục 2e); hook agy từ chối khi cấu hình dự án không dùng được, như Claude; một lệnh chạy từ thư mục con của dự án đọc kho của dự án đó và `fgos init` chỉ chạy ở đỉnh repo; khối `Ready`, `N checks need you`, mã thoát, `fgctl uninstall` và cảnh báo pin lệch (xem hướng dẫn rc.6).
 
 ## 5. Quay lại
 
@@ -90,7 +87,7 @@ fgctl verify
 fgos doctor
 ```
 
-Config không phải đưa lại (đã là `config.yaml`). Đi tiếp lại: `FGCTL_VERSION=v0.2.0-rc.8 fgctl upgrade`. **Lưu ý B:** `unit-summary.json` v3 do rc.8 ghi mà bản trước không đọc được thì `fgos metrics` của bản trước bỏ qua các tệp đó (mất số liệu, không mất dữ liệu); đừng xóa chúng.
+Config không phải đưa lại (đã là `config.yaml`). Đi tiếp lại: `FGCTL_VERSION=v0.2.0-rc.8 fgctl upgrade`.
 
 Về `v0.2.0-rc.5`: `fgctl` mới từ chối kích hoạt (thiếu addon Git, backlog `p-yfpixqfmdq`); đường quay về rc.5 vẫn là đường B trong `guide-261112-1817-owner-machine-packaging-close.md` mục 5, chỉ dùng khi thật sự phải về rc.5.
 
@@ -100,5 +97,4 @@ Chưa có cho rc.8. Điền sau khi chạy trên fg-server2 (HARDEN) và hai má
 
 ## Câu hỏi còn mở cho anh
 
-1. Có giữ máy macOS hoặc Windows trong đợt này không? Known gaps nói chưa hỗ trợ ghi Git ở đó.
-2. B có vào rc.8 không? Hướng dẫn đang viết có điều kiện.
+1. Có máy Windows nào trong đợt này không? Known gaps nói Windows mới chứng minh bộ cài và đóng gói trên CI, chưa chứng minh ghi Git. (Đã chốt: không có máy macOS, và B không có trong rc.8.)
