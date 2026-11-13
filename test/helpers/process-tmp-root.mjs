@@ -56,13 +56,20 @@ function installProcessTempRoot() {
   } catch {
     return null; // Unusable temp dir: let the test's own mkdtemp fail with the real error.
   }
+  // The test file that owns this root, so a root left behind names its file (scripts/run-tests.mjs reads it).
+  try { fs.writeFileSync(path.join(root, '.owner'), `${process.argv[1] ?? '(unknown)'}\n`); } catch { /* naming only */ }
   process.env.TMPDIR = root;
   process.env.TMP = root;
   process.env.TEMP = root;
   const removeRoot = () => {
     waitForSealChildren(root);
     if (process.env.FGOS_KEEP_TEST_FIXTURES) return;
-    try { fs.rmSync(root, { recursive: true, force: true, maxRetries: 3 }); } catch { /* best effort at exit */ }
+    try {
+      fs.rmSync(root, { recursive: true, force: true, maxRetries: 3 });
+    } catch (err) {
+      // Still best effort at exit, but say why: scripts/run-tests.mjs fails the run on the leftover.
+      process.stderr.write(`process-tmp-root: could not remove ${root} (${process.argv[1]}): ${err?.code ?? ''} ${err?.message ?? err}\n`);
+    }
   };
   process.on('exit', removeRoot);
   // A signal's default action ends the process without running exit handlers, so cleanup has to run

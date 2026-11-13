@@ -8,7 +8,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { spawn, spawnSync, execFileSync } from 'node:child_process';
 import { setTimeout as delay } from 'node:timers/promises';
 import { parseEtime, parsePs, treeOf, findOverdue, reapRunDirs } from '../../scripts/lib/test-file-watchdog.mjs';
-import { discoverTestFiles, buildTestArgv, GIT_CONFIG_GUARD_PATH, GIT_SPAWN_SPY_PATH, snapshotGitIdentity, diffGitIdentity, buildTestEnv, runTests, runChosenTests, runSelectedTests, KEEP_TMP_ENV, REPO_ROOT, DEFAULT_TEST_ROOT, snapshotFgos, diffFgosSnapshots, SENSITIVE_FGOS_FILES, leftoverTempPrefixes } from '../../scripts/run-tests.mjs';
+import { discoverTestFiles, buildTestArgv, GIT_CONFIG_GUARD_PATH, GIT_SPAWN_SPY_PATH, snapshotGitIdentity, diffGitIdentity, buildTestEnv, runTests, runChosenTests, runSelectedTests, KEEP_TMP_ENV, REPO_ROOT, DEFAULT_TEST_ROOT, snapshotFgos, diffFgosSnapshots, SENSITIVE_FGOS_FILES, leftoverTempPrefixes, describeLeftoverTemps } from '../../scripts/run-tests.mjs';
 import { writeRawProjectConfig } from '../helpers/config-fixture.mjs';
 
 function tmpFixtureRoot() {
@@ -555,6 +555,25 @@ test('a run fails when a process it started still runs in its temp dir, names it
 test('leftoverTempPrefixes groups by prefix without the random suffix and tolerates a missing root', () => {
   assert.deepEqual(leftoverTempPrefixes('/nope', () => ['fgos-cli-AAAAAA', 'fgos-cli-BBBBBB', 'x']), { 'fgos-cli-': 2 });
   assert.deepEqual(leftoverTempPrefixes('/nope', () => { throw new Error('ENOENT'); }), {});
+});
+
+// A leftover count alone cannot say which file left the tree; no other test reads the owner marker.
+test('a leftover process temp root names the test file that owns it and its top-level entries', () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-describe-'));
+  try {
+    const owned = path.join(root, 'fgos-tp-AAAAAA');
+    fs.mkdirSync(path.join(owned, 'repo'), { recursive: true });
+    fs.writeFileSync(path.join(owned, '.owner'), '/x/test/a.test.mjs\n');
+    fs.mkdirSync(path.join(root, 'fgos-tp-BBBBBB'));
+    fs.mkdirSync(path.join(root, 'fgos-cli-CCCCCC'));
+    const described = describeLeftoverTemps(root).sort((a, b) => a.name.localeCompare(b.name));
+    assert.deepEqual(described.map(({ name, owner }) => [name, owner]), [['fgos-tp-AAAAAA', '/x/test/a.test.mjs'], ['fgos-tp-BBBBBB', null]]);
+    assert.match(described[0].entries.join(), /^repo@\d{4}-/);
+    assert.deepEqual(described[1].entries, []);
+    assert.deepEqual(describeLeftoverTemps(path.join(root, 'missing')), []);
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
 });
 
 test('a test process that imports process-tmp-root.mjs keeps its temp files in a private dir and removes it at exit', () => {

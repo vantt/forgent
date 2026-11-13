@@ -323,6 +323,30 @@ export function leftoverTempPrefixes(root, readdir = fs.readdirSync) {
   return counts;
 }
 
+/**
+ * What a run can say about each `fgos-tp-*` tree left under `root`: the test file that owns it (the
+ * `.owner` file test/helpers/process-tmp-root.mjs writes into it) and its top-level entries with their
+ * modification times, so a leftover names its file and shows whether something wrote into it late.
+ */
+export function describeLeftoverTemps(root) {
+  let names = [];
+  try { names = fs.readdirSync(root); } catch { return []; }
+  return names.filter((name) => name.startsWith('fgos-tp-')).map((name) => {
+    const dir = path.join(root, name);
+    let owner = null;
+    try { owner = fs.readFileSync(path.join(dir, '.owner'), 'utf8').trim(); } catch { /* not written */ }
+    let entries = [];
+    try {
+      entries = fs.readdirSync(dir).filter((entry) => entry !== '.owner').slice(0, 20).map((entry) => {
+        let mtime = '?';
+        try { mtime = fs.lstatSync(path.join(dir, entry)).mtime.toISOString(); } catch { /* gone meanwhile */ }
+        return `${entry}@${mtime}`;
+      });
+    } catch { /* unreadable */ }
+    return { name, owner, entries };
+  });
+}
+
 export const SENSITIVE_FGOS_FILES = new Set(['secrets.local.env', 'secrets.env']);
 
 // Derived files that any read of the live store may rewrite: the state view is a cache folded
@@ -457,6 +481,7 @@ export function runSelectedTests(files, {
   let result;
   let timedOut = [];
   const tempLeftovers = {};
+  const tempLeftoverDetails = [];
   let strayWorktrees = [];
   let strayProcesses = [];
   const supervisor = watchdog && runTemp
@@ -483,6 +508,7 @@ export function runSelectedTests(files, {
     for (const root of [runTemp, fixtureRoot]) {
       if (!root) continue;
       for (const [prefix, count] of Object.entries(leftoverTempPrefixes(root))) tempLeftovers[prefix] = (tempLeftovers[prefix] || 0) + count;
+      tempLeftoverDetails.push(...describeLeftoverTemps(root));
     }
     strayWorktrees = worktreeRegistrationsUnder(cwd, [runTemp, fixtureRoot]);
     // The per-file supervisor is still exiting from its SIGTERM; it is this run's own, not a test's.
@@ -524,6 +550,9 @@ export function runSelectedTests(files, {
   if (Object.keys(tempLeftovers).length) {
     log('run-tests: ERROR: test suite left temporary directories behind (name prefix: count):');
     for (const [prefix, count] of Object.entries(tempLeftovers).sort()) log(`  ${prefix}*: ${count}`);
+    for (const { name, owner, entries } of tempLeftoverDetails) {
+      log(`  ${name}: owner ${owner ?? '(no .owner)'}; entries ${entries.length ? entries.join(', ') : '(none)'}`);
+    }
     log('  A test file must import test/helpers/process-tmp-root.mjs first; a killed file leaves its own tree.');
     result.status = result.status !== 0 ? result.status : 1;
   }
