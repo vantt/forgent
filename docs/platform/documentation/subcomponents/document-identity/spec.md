@@ -396,9 +396,9 @@ Steps:
 1. **Write the draft in the corpus's language.** The writer translates its draft into the language most of the corpus is written in (English for fgOS) before calling. Measured: Vietnamese notes over English documents put a right unit in the top 3 for 0% of queries as written and 91.7% after translation; sending both languages at once scored 62.5%, worse than English alone.
 2. **Search through the one door:** pkm's search over OHS, hybrid (BM25 with `ohs-lang-vi`, plus `multilingual-e5-small` embeddings), ranked at the **document** level with the best sections kept, then expanded through the graph to the units the hits link to. Document-level ranking beat section-level ranking for short queries (71.6% against 62.5% at top 3).
 3. **Filter or flag by locating axes.** With `area` and `question` given, candidates outside them are kept but marked `outside-region`, because the writer can choose the wrong region (example 8.6.2).
-4. **Boost by narrowing values** extracted from the draft and the diff (5.6).
+4. **Boost by narrowing values** extracted from the draft and the diff (5.6). pkm defers this boost until its `locate eval` shows a gain of at least 3 points of recall at 3 on the gold set, or at least 30% of misses are look-alike pairs (8.2).
 5. **Return the top 10** with path, title, best sections and their heading paths, axis values and per-branch scores. Reading ten titles is cheap; the writer opens one to three.
-6. **Log** the draft's identifiers, the region, the candidates, and, when the writer finishes, the unit it grew or the creation it requested.
+6. **Log** the draft's identifiers, the region, the candidates, and, when the writer finishes, its decision (`grow`, `ask`, `create`, `no-place`) with the unit it grew or the creation it requested.
 
 There is **no verdict from the score**. Queries about subjects with no unit scored as high as queries with one (0.74 to 1.00 against a median of 0.956). The writer reads the candidates and decides: grow the unit that carries the claim; ask with the decision-question template when two candidates fit; request creation from admission, with one sentence on why no candidate carries the claim, when none fits.
 
@@ -414,6 +414,13 @@ fgOS does not build its own search engine. It uses two components:
 **pkm is linked, not called** (owner, 2026-11-12, with a licence to link and distribute pkm inside fgOS releases). fgOS ships it in its own binary, so no project installs pkm separately. fgOS exposes its own verbs (`fgos doc locate` and the observer's reads), behind a locate port with pkm as the adapter (design principle 3); it never re-exports pkm's CLI as `fgos pkm ...`, which would be a second door beside the `pkm` CLI. When OHS is absent the port reports itself degraded and falls back to full-text search over the files. Raising the pinned pkm tag is its own change and reruns the regression set of section 15. pkm brings `rusqlite` with bundled SQLite; one binary holds one SQLite build, so any later SQLite use in fgOS takes the same `rusqlite` version.
 
 Both indexes are caches rebuilt from the documents, never truth, as platform-foundations L3 clauses 2 and 3 require. They live under `.fgos/runtime/`, never in the document tree, and a `fgos doctor` check reports their freshness and OHS's presence, as the install/setup/doctor gate requires. What fgOS needs from pkm to embed it this way (the OHS index path and settings passed as typed configuration, no output or panics from the library, the OHS child owned by the session) is tracked in [`vantt/pkm` issue 1](https://github.com/vantt/pkm/issues/1).
+
+pkm answered with [its structure spec](https://github.com/vantt/pkm/blob/13aae03/docs/structure.md) (2026-11-12). What fgOS builds on:
+
+- **Locate finds sections; coordinates stay per document.** Locate ranks documents and returns each one's best section with its heading path and an excerpt; a locating value such as `area` is one per document. Per-section coordinates (`question` by heading, 5.3) wait for an OHS patch that returns several sections per note, and come when its `locate eval` shows that at least 20% of misses come from a document whose region differs from the right section's. Until then fgOS carries `question` per document, from the document kind; a claim unit (5.2) is a whole user note, so it loses nothing.
+- **One call, several parts.** Locate takes one paragraph per claim and returns, per part, candidates (path, section, excerpt, `match`, unset or `outside-region`) and `places`: counts of the candidates' locating values with each value's home folder. Across parts it returns a `group` hint (same home, or split). Scores appear only on request. When nothing carries a claim, the writer creates at a home chosen from the closed list, usually the first of `places`, through admission (6.4 of the write door).
+- **Deferred with a measurable condition:** the identifier boost (8.1 step 4), SKOS-shaped registers, the `audience` and `lifecycle` facets, and proposal kinds other than `split-value` and `near-pairs`.
+- **Its order:** retire its Python reference, embedding (typed OHS configuration, no env, no output, OHS status without starting it, no orphaned process), a check of Markdown links as edges, locate with a minimal profile and `locate eval`, then overview and the observer. fgOS measures on its own corpus from the locate step; build step 3 of the [area map](../../spec.md#4-build-order) waits for it.
 
 Choices, from the measurements and the owner's fork's own model evaluation (its report V22, 2026-11-02):
 
@@ -474,7 +481,7 @@ The locate log lives in the observe area's records, not in a new store.
 | Signal | Evidence | Proposal | Decided by |
 |---|---|---|---|
 | Area too large | section count or size above threshold (fgOS `agent-coordination`: 429 documents) | split into sub-areas, cut along clusters of identifiers that occur together | reviewer, inside the area |
-| Repeated misses | repeated `none-above-threshold` in one area with the same identifier cluster | open an area or sub-area for that cluster | owner for a top-level area; reviewer for a sub-area |
+| Repeated misses | repeated `create` or `no-place` decisions in the locate log for one area with the same identifier cluster | open an area or sub-area for that cluster | owner for a top-level area; reviewer for a sub-area |
 | Frequent `outside-region` | content guessed for area A keeps being owned in area B | move the sections, or sharpen the two areas' descriptions | reviewer within budget; owner beyond |
 | Duplicates | two sections in different documents share many identifiers | merge into one owner; the other links | reviewer |
 | Dead area | not matched or grown for a long period | merge into the nearest area or retire | owner |
@@ -611,7 +618,7 @@ For each work item, the retrospective writer states the one to three claims the 
 | Part | Status | Where | Next action |
 |---|---|---|---|
 | Hybrid search (BM25 with `ohs-lang-vi`, e5-small embeddings) | exists outside fgOS, measured on the fgOS corpus | OHS fork, release `v0.17.2-vantt.9` | register as a tool provider; doctor freshness check |
-| Search door, graph, pairs, zones, proposals | exists outside fgOS | `vantt/pkm`, release 0.1.0 (split out of momentell on 2026-11-12; crates `pkm-core`, `pkm-cli`, `pkm-mcp`, `pkm-lifecycle`) | link `pkm-core` into the `fgos` host (decided 2026-11-12); the gaps are the [requirements to pkm](../../../../../plans/reports/requirements-261112-1533-fgos-to-pkm-structure-mechanism.md) R1 to R9 |
+| Search door, graph, pairs, zones, proposals | exists outside fgOS | `vantt/pkm`, release 0.1.0 (split out of momentell on 2026-11-12; crates `pkm-core`, `pkm-cli`, `pkm-mcp`, `pkm-lifecycle`) | link `pkm-core` into the `fgos` host (decided 2026-11-12); the gaps are the [requirements to pkm](../../../../../plans/reports/requirements-261112-1533-fgos-to-pkm-structure-mechanism.md) R1 to R10; pkm's answer and order are in 8.2 |
 | Retrospective writer adds evidence to claim units (stop 1) | not started | `fgos-coding-knowledge`, cleanup gate | first phase: it cuts the largest source of new documents without new technology |
 | Locate door in fgOS (draft translation, top 10, log) | not started | write door | after the pkm locate call (R5) |
 | Admission ceiling and reviewer (stop 3) | specified | [admission](../admission/spec.md) | admission phase |
@@ -674,3 +681,4 @@ The non-coding profiles (6.2 to 6.4) bind only after the same measurement on a r
 - 2026-11-12 evening, after the measurements of section 15: four stops (claim units with evidence, locate through pkm with OHS, admission with a weekly ceiling, closed axes with an observer); identifiers become a boost; the writer translates its draft and reads ten candidates; no verdict from a score; the model is a faceted classification with SKOS-shaped vocabularies; composite documents are not split.
 - 2026-11-12 night, owner: pkm is compiled into the `fgos` host as a library and fgOS may distribute it; fgOS exposes `fgos doc` verbs through a locate port, not a `fgos pkm` passthrough; `rusqlite` with bundled SQLite stays the SQLite binding (8.2).
 - 2026-11-12, owner: spec signed.
+- 2026-11-13, after pkm's structure spec: locate returns no verdict anywhere in the documentation area; the writer's decision (`grow`, `ask`, `create`, `no-place`) is what the write door, admission and the observer use. Coordinates are per document until pkm's per-section condition is met (8.2).

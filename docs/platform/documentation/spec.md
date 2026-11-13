@@ -56,10 +56,10 @@ Owned outside this area and consumed here:
 ## 3. How A Write Flows
 
 ```txt
-request ──► write door ──► locate (document identity)
+request ──► write door ──► locate (document identity) ──► the writer reads the candidates
                               │
             ┌─────────────────┼──────────────────────┐
-       owner-found        ambiguous          none-above-threshold
+          grow               ask             create / no-place
             │                 │                       │
         grow section      ask the person      admission request ──► reviewer (in frame) ─► admit / refuse
             │                                         │                     │

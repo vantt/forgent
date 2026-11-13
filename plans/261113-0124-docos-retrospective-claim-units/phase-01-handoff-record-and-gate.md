@@ -11,7 +11,7 @@
    - `requestId`: the admission request item;
    - `claim`: the claim's one-sentence statement;
    - `material`: the drafted text the writer would have written (non-empty);
-   - `locate`: `{ query, candidates: [{ path, why_not }] }`, the locate result and one line per candidate on why it does not carry the claim; an empty candidate list is allowed only with `query` present.
+   - `locate`: `{ query, candidates: [{ path, section?, why_not }], places? }`, the locate result and one line per candidate on why it does not carry the claim; an empty candidate list is allowed only with `query` present. `section` (heading path) and `places` are kept as given when the search returns them, so the record keeps the same shape when pkm's locate replaces the interim search.
    The reducer refuses a missing or empty `captureId`, `requestId`, `claim`, `material` or `locate.query`, and a `requestId` that is not an existing work item. The material lives once, in this event (L1: log); the request item's text links to it.
 2. **A verb** `fgos knowledge handoff --capture-id <id> --request <requestId> --claim <text> --material-file <path> --locate-file <path>` writing that event through the store facade, mirroring `knowledge attest` (files for the long fields, so no raw text is spliced into shell).
 3. **The gate's fourth kind**, inside `checkRetrospectiveContentForId` after the attestation branch: ok when a `capture.handoff` exists for `id` and its `requestId` still names an existing item; detail `retrospective material handed to admission request <requestId>`. A handoff whose request item no longer exists is `ok:false` with that reason. Engine-record exclusion and the three existing kinds are unchanged. The parent fallback applies as for the other kinds.

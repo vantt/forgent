@@ -78,24 +78,25 @@ Afterwards / side effects: generated projections are regenerated through their e
 ```
 
 1. **State what the change asserts**, and choose `area` and `question` for it from their closed lists ([document identity 5.4 and 5.7](../document-identity/spec.md#5-core-model)).
-2. **Locate** ([document identity 8.1](../document-identity/spec.md#81-locate-before-every-write)). Read the top one to three candidates.
-   - `owner-found`: grow that section.
-   - `ambiguous`: ask with the decision-question template.
-   - `none-above-threshold`: a creation may be requested from admission; locate never grants it.
+2. **Locate** ([document identity 8.1](../document-identity/spec.md#81-locate-before-every-write)) and read the candidates, opening one to three. Locate gives no verdict; the writer decides, and the decision is logged:
+   - `grow`: a candidate section carries the claim; grow it.
+   - `ask`: two candidates fit; ask with the decision-question template.
+   - `create`: no candidate carries the claim; a creation may be requested from admission, with the locate result and one sentence on why no candidate carries it. Locate never grants it.
+   - `no-place`: no value of the closed `area` list fits; the writer never opens a value, and the request goes to admission the same way.
 3. **Choose the disposition** (6.2). Grow is the default.
 4. **Get the path** from Convention for a platform document, or from `fgos doc reserve` for a user document. Never construct a path by hand.
 5. **Copy the live template** when creating (6.3).
 6. **Edit.** When growing a section, name the identifiers the change introduces, so the indexer picks them up.
 7. **Run the check command** ([doc-checks 6.1](../doc-checks/spec.md#61-the-check-command)) on the changed paths.
 8. **Regenerate projections**, and preview when required. A surface for another audience links to the owner, or is regenerated from it.
-9. **Report** the disposition, the locate verdict and the check output.
+9. **Report** the disposition, the writer's locate decision and the check output.
 
 ### 6.2. Dispositions
 
 | Disposition | When | Door |
 |---|---|---|
 | Grow | locate found the owner, or the writer grows the best-ranked section for new behavior | edit + check |
-| Create | locate returned `none-above-threshold` and admission passed | admission, then `fgos doc reserve` or Convention path, template, edit, check |
+| Create | the writer found no candidate that carries the claim (`create` or `no-place`) and admission passed | admission, then `fgos doc reserve` or Convention path, template, edit, check |
 | Promote | a person accepts a provisional user document | `fgos doc promote` |
 | Supersede | a new document replaces one; the successor must already be `active` | registry `doc supersede` |
 | Retire | the content no longer holds | registry retire, with successor or reason |
@@ -124,7 +125,7 @@ Condition before it ships: a retrospective item whose knowledge fits no section 
 1. **One door.** Maintained documentation is written through the documentation skill; the always-loaded line points to it and holds no rules itself (proposal 4.4, L8).
 2. **Locate before write.** No write skips locate.
 3. **Grow by default; create only when admitted.** A lookup that finds no owner is never, by itself, permission to create.
-4. **Ask, never guess.** When locate is `ambiguous`, the door asks.
+4. **Ask, never guess.** When two candidates fit, the door asks.
 5. **Paths come from their owners.** Convention or `fgos doc reserve`, never by hand.
 6. **Surfaces are linked or generated.** Never a hand copy of an owned section.
 
@@ -189,3 +190,4 @@ Condition before it ships: a retrospective item whose knowledge fits no section 
 - 2026-11-12, owner: the documentation area is split into subcomponents; the owner-finding step becomes locate from document identity.
 - 2026-11-12, owner: the pointer line is a fifth instruction seed, documentation-door.md under core/instructions; a retrospective item with material only hands it to an admission request, and the cleanup gate accepts that request as evidence, as a contract change owned by work state.
 - 2026-11-12, owner: spec signed.
+- 2026-11-13: the locate step's three verdicts (`owner-found`, `ambiguous`, `none-above-threshold`) are replaced by the writer's decision after reading (`grow`, `ask`, `create`, `no-place`), matching document identity 8.1 and pkm's locate, which give no verdict from a score.

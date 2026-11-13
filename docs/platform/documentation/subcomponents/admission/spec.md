@@ -50,7 +50,7 @@ Growing an existing section needs no admission.
 
 | Trigger | Entry |
 |---|---|
-| The write door requests a creation after locate returned `none-above-threshold` | an admission request with the locate result attached |
+| The write door requests a creation after the writer read the locate candidates and none carries the claim (`create`), or no `area` value fits (`no-place`) | an admission request with the locate result attached |
 | The observer opens a proposal item | an admission request with the proposal's evidence attached |
 | A door that records an effect receives a write | the check of 6.5 |
 
