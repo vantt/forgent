@@ -1,0 +1,1 @@
+rc.7 is not tagged yet. Main is still red. The latest blocker is a race in the release download scratch dir (fix 0c9501596 on a branch, landing once green). The tag goes out as soon as CI and Release assets check are both green on one main commit, Windows included. HARDEN will mail you the tag the moment it is out.
