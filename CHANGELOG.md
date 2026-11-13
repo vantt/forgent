@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- On Linux the quiesce check before `fgctl init`, `upgrade` and `repair` no longer misses an fgOS process that is still starting: a process read in the middle of `exec` showed no arguments, was judged not fgOS, and the workspace was reported quiet.
 - On Windows, `fgctl uninstall --purge` now refuses a state root that is your home directory, or an ancestor of it or of the project, whatever the letter case or `\\?\` spelling of the path; before, only an exact-case match was refused.
 - `fgos` now mints machine, work, backlog and project ids on macOS and Windows; before, every random id failed there with "native random identity driver unavailable" because only Linux had a random source. Ids now come from the kernel generator on every platform (`/dev/urandom` on unix, `BCryptGenRandom` on Windows), and a failing generator is an error, never an id made from time or pid.
 - On Windows the Git floor check no longer judges a supported Git (2.53 or later) below the floor: its lazy-fetch probe handed the shell a backslash path, which the shell drops, so the probe could never pass; it now passes the path with forward slashes and quoted, also for a user name with a space. The install guide gains a Linux section (4.4.1) for the three bubblewrap doctor rows, including the Ubuntu 24.04 setting that allows unprivileged user namespaces; `rustix` is updated to 1.1.6 (RUSTSEC-2026-0486).
