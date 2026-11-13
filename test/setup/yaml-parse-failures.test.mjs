@@ -33,16 +33,6 @@ function makeProject(t) {
 const checkById = (id) => DOCTOR_CHECKS.find((check) => check.id === id).check;
 const MALFORMED_WORKFLOW = 'id: broken\nsteps:\n  - id: a\n   units: [\n';
 
-test('an agent file that is not valid YAML is a named problem in the agent-claims check', async (t) => {
-  const { root, write } = makeProject(t);
-  write('agents/ok.yaml', 'name: ok\nskills: [a]\n');
-  write('agents/broken.yaml', 'name: broken\ndescription: a: b\n');
-  const result = await checkById('agent-claims-resolve')(root);
-  assert.equal(result.passed, false);
-  assert.match(result.message, /agents\/broken\.yaml: cannot be parsed: .* \(line 2, column \d+\)/);
-  assert.doesNotMatch(result.message, /ok\.yaml/);
-});
-
 test('a malformed workspace agent is named by the agent-names check with line and column', async (t) => {
   const { root, write } = makeProject(t);
   write('fgos/agents/broken.yaml', 'name: broken\ndescription: a: b\n');
@@ -126,16 +116,14 @@ test('a self-referencing workflow document is a named problem and does not hang 
   assert.match(result.message, /core\/workflows\/loop\.yaml: cannot be parsed: node limit \(line 3, column \d+\)/);
 });
 
-test('fgos doctor still runs and lists every check when agent and workflow files are malformed', (t) => {
+test('fgos doctor still runs and lists every check when a workflow file is malformed', (t) => {
   const { root, write } = makeProject(t);
   write('core/workflows/broken.yaml', MALFORMED_WORKFLOW);
-  write('agents/broken.yaml', 'name: broken\ndescription: a: b\n');
   // boundary: the loop that runs every registered row and survives a failing one belongs to the doctor verb; no lower layer runs the whole list.
   const run = spawnSync(process.execPath, [FGOS, 'doctor', '--json'], { cwd: root, encoding: 'utf8' });
   assert.equal(run.status, 0, run.stderr);
   const checks = JSON.parse(run.stdout).data.checks;
   assert.deepEqual(checks.map((c) => c.id), DOCTOR_CHECKS.map((c) => c.id), 'every registered check ran');
   const byId = Object.fromEntries(checks.map((c) => [c.id, c]));
-  assert.match(byId['agent-claims-resolve'].message, /agents\/broken\.yaml: cannot be parsed/);
   assert.match(byId['workflow-capabilities-configured'].message, /core\/workflows\/broken\.yaml: cannot be parsed/);
 });

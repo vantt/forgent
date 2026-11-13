@@ -1134,16 +1134,8 @@ registerCheck({
 });
 
 // The definition tiers of a shipped release cannot change after build, so `npm test` judges them
-// (test/setup/packaged-definitions.test.mjs). A doctor row judges only what a project supplies: when the
-// project directory is the release source itself, its tiers are the release's and are skipped.
-const isReleaseSource = (cwd) => isWithinDir(INSTALL_ROOT, cwd) && isWithinDir(cwd, INSTALL_ROOT);
-const releaseSourceNote = (what) => ({ passed: true, message: `this directory is the release source; npm test judges its ${what}` });
-
-registerCheck({
-  id: 'agent-claims-resolve',
-  description: 'every task-spec a project supplies (domains/*/task-specs, core/task-specs) names real agents and skills (agents/*.yaml); the release\'s own are judged by npm test',
-  check: (cwd) => (isReleaseSource(cwd) ? releaseSourceNote('task-spec claims') : checkAgentClaimsResolve(cwd)),
-});
+// (test/setup/packaged-definitions.test.mjs, test/setup/registrations.test.mjs). No doctor row judges task-spec
+// claims: a project supplies no task-specs or domain agents (decision 79 Q4), only `fgos/agents`.
 
 // The Work lifecycle reads each domain's compiled.json (scripts/build-domain-registry.mjs) at
 // import time. A missing or unreadable file breaks every command that resolves a domain; a stale
@@ -1164,7 +1156,7 @@ registerCheck({
 
 registerCheck({
   id: 'agent-type-names-unique',
-  description: 'agent definition names are unique within each tier a project supplies (fgos/agents, domains/*/agents, core/agents); a higher tier replaces a lower one whole, and fgos/agents files have the shape the renderer needs; tiers read from the release itself are judged by npm test',
+  description: 'agent definition names are unique in the project\'s own tiers (fgos/agents, and core/agents when the project ships one); a higher tier replaces a lower one whole, and fgos/agents files have the shape the renderer needs; the installed fgOS\'s own tiers (domains/*/agents, core/agents) are judged by npm test',
   check: (cwd) => checkAgentTypeNamesUnique(cwd, { projectTiersOnly: true }),
 });
 
