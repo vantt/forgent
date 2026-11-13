@@ -33,7 +33,7 @@ None.
 
 ## Authority and deviations
 - `mutation-census.v1.json` is changed in my commits: every Rust file of the declared product is digested, so the pre-commit hook refuses any Rust edit without a regenerated census. The landing must regenerate it (`--write-census`) on the rebased tree and discard my version, never merge it by hand.
-- Test fixture string is `commit-failed:hook-refused` in the Rust test: a literal containing "git" there would not matter to the digest, but kept neutral anyway.
+- Rust test fixture uses `commit-failed:hook-refused` as its sample reason (any valid string reads the same).
 - `finishUnit` now settles after it builds the attempts (the settlement needs `infrastructure`, which needs them); nothing read between the old and new position depends on the settlement.
 - Documentation: also added a 2026-11-13 decided line to the contract section 11.
 
