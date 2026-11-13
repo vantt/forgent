@@ -18,7 +18,7 @@ import os from 'node:os';
 import path from 'node:path';
 
 import { nativeDoor } from '../../native/door.mjs';
-import { accountCredentialSources, credentialSourceForCli, expandCredentialHome } from './provider-capacity.mjs';
+import { accountCredentialSources, credentialSourceForCli, describeProviderSignal, expandCredentialHome } from './provider-capacity.mjs';
 
 const PROMPT = 'Reply with the single word OK.';
 const OUTPUT_LIMIT = 16 * 1024;
@@ -82,6 +82,9 @@ export function credentialProbeCommand(credentialSource, { noTools = false } = {
   return null;
 }
 
+/** " (HTTP 429, wait 30s)" for what the provider said, "" for nothing. */
+const said = (signal) => { const phrase = describeProviderSignal(signal); return phrase ? ` (${phrase})` : ''; };
+
 /**
  * Judge what the call printed. A zero exit is not enough: a dead login can still end the process
  * quietly, so the CLI's last words are read through the agent protocol (the matcher a supervised run
@@ -93,18 +96,10 @@ export function judgeProbeOutput({ exitCode, timedOut, cli, output, stdout = out
   if (timedOut) return { ok: false, detail: 'the call did not finish in time' };
   const { reason, providerSignal } = nativeDoor().agentProtocol.classifyDirect(cli, exitCode ?? null, output, stdout);
   if (reason === 'login') return { ok: false, detail: 'the login is still rejected' };
-  if (reason === 'usage-limit' && exitCode !== 0) return { ok: false, detail: `the account answers with a usage limit${describeSignal(providerSignal)}` };
-  if (reason === 'provider-error' && exitCode !== 0) return { ok: false, detail: `the provider refused the call${describeSignal(providerSignal)}` };
+  if (reason === 'usage-limit' && exitCode !== 0) return { ok: false, detail: `the account answers with a usage limit${said(providerSignal)}` };
+  if (reason === 'provider-error' && exitCode !== 0) return { ok: false, detail: `the provider refused the call${said(providerSignal)}` };
   if (exitCode !== 0) return { ok: false, detail: `the call exited with code ${exitCode}` };
   return { ok: true };
-}
-
-/** " (HTTP 429, wait 30s)" for what the provider said, "" for nothing. */
-function describeSignal(signal) {
-  const parts = [];
-  if (signal?.status !== undefined) parts.push(`HTTP ${signal.status}`);
-  if (signal?.requestedWaitMs !== undefined) parts.push(`wait ${Math.ceil(signal.requestedWaitMs / 1000)}s`);
-  return parts.length ? ` (${parts.join(', ')})` : '';
 }
 
 // What a probe call inherits from its runner: the shell basics only, never a token or a variable that points a

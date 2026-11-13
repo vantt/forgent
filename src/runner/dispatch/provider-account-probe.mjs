@@ -16,7 +16,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 import { legacyStateKey } from './llm-accounts.mjs';
-import { accountCredentialSources, commandCli, expandCredentialHome, credentialSourceForCli, credentialStoreOf, providerAccountInventory } from './provider-capacity.mjs';
+import { accountCredentialSources, commandCli, describeProviderSignal, expandCredentialHome, credentialSourceForCli, credentialStoreOf, providerAccountInventory } from './provider-capacity.mjs';
 import { runOutcome } from './run-result.mjs';
 import { MODEL_POLICY_TIERS } from './config.mjs';
 import { parseTierCell } from './tier-cell.mjs';
@@ -133,17 +133,6 @@ function lineMatching(text, pattern) {
   return text.split(/\r?\n/).map((l) => l.trim()).find((l) => l && pattern.test(l)) ?? null;
 }
 
-/** What the provider itself said, as one short phrase; null when the run carried no signal. */
-function describeSignal(signal) {
-  if (!signal || typeof signal !== 'object') return null;
-  const parts = [];
-  if (signal.status !== undefined) parts.push(`HTTP ${signal.status}`);
-  if (signal.statusWord) parts.push(signal.statusWord);
-  if (signal.requestedWaitMs !== undefined) parts.push(`wait ${Math.ceil(signal.requestedWaitMs / 1000)}s`);
-  if (signal.resetHint) parts.push(signal.resetHint);
-  return parts.length ? parts.join(', ') : null;
-}
-
 /**
  * One outcome class and the line that shows it. `ok` is whether the dispatch settled; `text` is what it
  * printed and what the runner said about it; `cause` and `providerSignal` are what the settled run says about
@@ -165,7 +154,7 @@ export function classifyAccountProbe({ ok = false, text = '', failureCode = null
     return { outcome: 'blocked-trust-prompt', evidence: lineMatching(screen, /trust this folder/i) ?? lineMatching(screen, /trust/i) ?? `herdr rule ${matchedRule}`, ...extra };
   }
   if (failureCode === 'provider-limit') {
-    const signal = describeSignal(providerSignal);
+    const signal = describeProviderSignal(providerSignal);
     if (cause === 'credential') return { outcome: 'auth', evidence: signal ?? 'the login is rejected', ...extra };
     if (cause === 'quota') return { outcome: 'quota', evidence: signal ?? 'the account has used up its quota', ...extra };
     if (cause === 'provider') return { outcome: 'other', evidence: signal ?? 'the provider refused the call', ...extra };

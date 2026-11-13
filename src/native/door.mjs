@@ -29,7 +29,7 @@ function ownRelease(bin) {
   } catch { return null; }
 }
 /** Whether `versions()` of an addon names every namespace this payload calls, each at the version it needs: `config` 3 is
- * the first with `snapshot`, `init` and `standardValue`, so an addon from before them fails by name instead of at its first call; `holderLock` 2 and `sessionIdentity` 2 add `killWaitMs` and `sharedDirectory`. */
+ * the first with `snapshot`, `init` and `standardValue`, so an addon from before them fails by name instead of at its first call; `holderLock` 2 and `sessionIdentity` 2 add `killWaitMs` and `sharedDirectory`; `agentProtocol` 1 is the first with `classifyDirect`. */
 export const combinedAbiMatches = (v, napiVersion) => v.napi === napiVersion && typeof v.git === 'string' && typeof v.eventStore === 'string'
   && typeof v.process === 'number' && typeof v.durableFile === 'string' && typeof v.canonicalJson === 'number' && v.holderLock >= 2
   && v.sessionIdentity >= 2 && typeof v.yaml === 'number' && v.config >= 3 && typeof v.runResult === 'number' && typeof v.agentProtocol === 'number';

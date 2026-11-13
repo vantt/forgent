@@ -26,9 +26,10 @@ Base: origin/harden/acct-b-p04 (f144848c7). Not landed; main is frozen until rc.
 Deleted module 69 lines + test; added ~30 Rust, ~45 Node src; tests rewritten (see diff stat).
 
 ## Retired tests and owners
-`provider-auth-failure.test.mjs` retired. Owners per the plan table: agent-protocol direct vectors (pi login, quoted key, far-up wording, codex usage limit, 402, quoted/far-up quota, quota transcript with old login); `provider-capacity.test.mjs` (the provider HTTP error case moved there as one test; default-until case exists); `attempt-steps.test.mjs` for settlement-from-caller. New proofs: credential probe "judged ... through the agent protocol", "last JSON event of stdout", "only the final lines count"; account probe "classes ... settled", "run settled as a provider limit ... cause". Behaviour removed: a settled run with a claim that printed a dead login is no longer reported auth (protocol rule 1: outbox wins).
+`provider-auth-failure.test.mjs` retired. Owners per the plan table: agent-protocol direct vectors (pi login, quoted key, far-up wording, codex usage limit, 402, quoted/far-up quota, quota transcript with old login); `provider-capacity.test.mjs` (the provider HTTP error case moved there as one test; default-until case exists); `attempt-steps.test.mjs` for settlement-from-caller. New proofs: credential probe "judged ... through the agent protocol", "last JSON event of stdout", "only the final lines count"; account probe "classes ... settled", "run settled as a provider limit ... cause". Behaviour removed on purpose: a settled run with a claim that printed a dead login is no longer reported auth. A text re-read after settlement can contradict the receipt; protocol rule 1 says the outbox claim wins. Owning proof: `outcome classes come from what the run settled with...` in `provider-account-probe.test.mjs` (`ok: true, text: 'Please run /login'` is `ok`).
 
 ## Deviations
+- `describeProviderSignal` lives once in `provider-capacity.mjs` (imported by both probes); the door.mjs ABI comment names `agentProtocol` 1 / `classifyDirect`.
 - Touched `src/native/door.mjs` and `test/git/native-load.test.mjs` (not in the file list) for the ABI marker and its versions assertion.
 - `Cargo.lock` gained the `fgos-agent-protocol` edge for the addon; unavoidable with `--locked`. Landing may regenerate it.
 

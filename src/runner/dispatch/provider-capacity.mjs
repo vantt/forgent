@@ -1017,6 +1017,17 @@ export function parseQuotaResetClockTime(text, now) {
   return reset.getTime();
 }
 
+/** What the provider itself said, as one short phrase ("HTTP 429, RESOURCE_EXHAUSTED, wait 30s"); null when the signal carries nothing. */
+export function describeProviderSignal(signal) {
+  if (!signal || typeof signal !== 'object') return null;
+  const parts = [];
+  if (signal.status !== undefined) parts.push(`HTTP ${signal.status}`);
+  if (signal.statusWord) parts.push(signal.statusWord);
+  if (signal.requestedWaitMs !== undefined) parts.push(`wait ${Math.ceil(signal.requestedWaitMs / 1000)}s`);
+  if (signal.resetHint) parts.push(signal.resetHint);
+  return parts.length ? parts.join(', ') : null;
+}
+
 /**
  * When a quota stop's quarantine ends, from the provider signal the receipt carried: the wait the provider
  * requested, else the reset its hint names (a window or a clock time), else the one-hour default; never
