@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "25134764479e93c8c2c2389c2e0552e25b9289f44c18b95bca0e8e287bc25263",
+  "payloadDigest": "c6aa81d0a42d881a6c529acda82417de30c8fda5d897abc24a173a768b33c0db",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -115,7 +115,7 @@
     "apps/fgos/tests/windows_semantics_probe.rs": "ecb59690bbf1259baa1defb6417c24005138526bb565f216f9db3c2ad784d240",
     "apps/fgos/tests/windows_support/mod.rs": "2b8a17676526c87ea5ecfb2074a70a3511fbf9267f9de78a35dc355f272830fb",
     "bin/fgos-runner.mjs": "24fa9b497547a104912b90ab98b3d53fbbe0068a5977a7a04724789c8e717156",
-    "bin/fgos.mjs": "bfc0270c3eeec23573b6673aa69fc4ad8da5245a700beba93c5269c8b121359c",
+    "bin/fgos.mjs": "46072eb6bffd7e4d0f4f257ce04e39954a2d8451a45f368de50fb028e1542f8b",
     "core/skills/_shared/capability-catalog.md": "4299584409592ac4ae9668cd0cb4dd0442edc1c78a42ccd9cfe0bae22bf11bc4",
     "core/skills/_shared/capability-matching.md": "eb67cde05d45c171c1d4803f9d2fbec5fc63565b9fd0a0549c866a7eb262521d",
     "core/skills/_shared/catchup-self-recovery.md": "3b77650c71a0225f00ffa8fe9524d7c0052977204f425c1999225b6f80802c69",
@@ -1126,7 +1126,7 @@
     "src/seat-binding/client.mjs": "206a9ecbbc301f2c3c9688535dbeb60fabbe67052b870a62e23e7481ae82fdd8",
     "src/setup/agent-cli-trust.mjs": "703431b417beeefd3e2ef07238c1d9694b8aa608c1e13d12a9778e705bf6bae4",
     "src/setup/agent-hooks.mjs": "112eca3e4191a1d38675cdb364517916deb90a5c6c56793da96d5fde1e49261f",
-    "src/setup/agent-wiring.mjs": "9a4149f24d2a934693f69fcb051e1beabc7a6e9feffb5360dc8513e2e36f73ab",
+    "src/setup/agent-wiring.mjs": "8ff79836aa04e9829d5eb396967cf73eb502810261003d6ec92e6371bb555b9c",
     "src/setup/agy-permissions.mjs": "ed40e05c846fbf499d0a0bfbe0e066f27ad060e144e55f8fa809b2b0e024df78",
     "src/setup/ansi.mjs": "9958f6c61351897a70bbcd3598c5f88f11028c584ea915d9c3cd6ff8af46bdfe",
     "src/setup/bin-discovery.mjs": "d7d3536129adcbe5c6fc5297ef1f6ba1fcdc86d5195b7e968c14480b10e77101",
@@ -1156,6 +1156,7 @@
     "src/setup/runner-config-conversion.mjs": "6e2711a0a909265b82241901e7f9642889bdc3e9d1ab5a69fafd81b477a64ac6",
     "src/setup/seat-binding-checks.mjs": "61a2b752ec407709c25c5409ce00d595472d2acf4c99176300f3ecba3d539085",
     "src/setup/session-keep-declared.mjs": "b97619a3524d7d87245220459863181c03dd6066cd738aed9bad5874e6686067",
+    "src/setup/setup-use-case.mjs": "3ba56a73b56b3989928040545239c956a9696b36dd29c4d1bf58f60263332a91",
     "src/setup/shell-rc.mjs": "36c0eb600e6943d5c6ed94918d5d6a294d447fa8a6491076faaf525aa80807c0",
     "src/setup/skill-wrappers.mjs": "658e6476867f4cb2eda08a766c403498d3dfbb3877a0caa5be8533535652b8f1",
     "src/setup/terminal-control-checks.mjs": "5dca8b2bf0c8bddbc55bcfad97700e65708a04822bf8065b484d5d6c251ce4aa",
