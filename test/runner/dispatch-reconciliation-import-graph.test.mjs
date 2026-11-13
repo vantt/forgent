@@ -227,6 +227,9 @@ const EXPECTED_CLOSURE = [
   'src/holder-lock/lock-scope.mjs',
   'src/holder-lock/state-root.mjs',
   'src/util/host-bin-path.mjs',
+  // ... and the capped log append provider-capacity.mjs writes its audit log through (node:fs and
+  // node:path only; no process control).
+  'src/util/capped-jsonl-log.mjs',
   // The per-cwd dispatch lock the planner reports on (holder list or probe
   // through the door; no process control of its own) and the leaf error type
   // its acquire raises.
