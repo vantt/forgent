@@ -1766,7 +1766,16 @@ test('the shell entry loads dispatch depth, the Land release and the decision ci
 
 const DOOR_ROOTS = ['bin', 'src', 'scripts', 'apps', 'packages', '.githooks', 'core', 'domains'];
 const DOOR_EXTENSIONS = new Set(['.mjs', '.js', '.cjs', '.rs', '.sh', '.ps1']);
-const DOOR_PRUNED_DIRS = new Set(['test', 'tests', 'fixtures', 'third-party', 'upstreams', 'node_modules', 'target']);
+const DOOR_PRUNED_DIRS = new Set(['test', 'tests', 'upstreams', 'node_modules', 'target']);
+// Vendored and fixture trees are skipped only outside bin/ and src/, where a copied parser or a signal
+// in a directory of those names would be a real leak the YAML and process rows must still see.
+const DOOR_PRUNED_OUTSIDE_PRODUCT = new Set(['fixtures', 'third-party']);
+
+/** True when the walk must not enter directory `name` found at `rel` (its own path relative to the repo root). */
+export function doorDirPruned(rel, name) {
+  if (DOOR_PRUNED_DIRS.has(name)) return true;
+  return DOOR_PRUNED_OUTSIDE_PRODUCT.has(name) && !/^(?:bin|src)\//.test(rel);
+}
 
 /** Product files under the door roots, relative to the repo root; excluded directories are never entered. */
 function doorFiles() {
@@ -1775,7 +1784,7 @@ function doorFiles() {
     for (const entry of fs.readdirSync(path.join(root, dir), { withFileTypes: true })) {
       const rel = `${dir}/${entry.name}`;
       if (entry.isDirectory()) {
-        if (!DOOR_PRUNED_DIRS.has(entry.name)) walk(rel);
+        if (!doorDirPruned(rel, entry.name)) walk(rel);
       } else if (entry.isFile() && DOOR_EXTENSIONS.has(path.extname(entry.name)) && !entry.name.endsWith('.test.mjs')) {
         out.push(rel);
       }
@@ -1930,7 +1939,9 @@ test('door check: a pattern that does not compile fails', () => {
   assert.match(checkDoors([{ job: 'bad', kind: 'door', patterns: ['('], allowed: [] }], new Map()).join('\n'), /\[bad\] pattern "\(" does not compile/);
 });
 
-// The process, lock, canonical-JSON and YAML rows keep what their retired one-off guards proved. Each case
+// The process, lock, canonical-JSON and YAML rows keep what their retired one-off guards proved: the deleted
+// test/process/one-door.test.mjs (any `/proc/` text, process signals, the second lock taker) and the old YAML
+// rule (no src/util/third-party/js-yaml.mjs, no `loadAll` definition outside the door). Each case
 // runs the real manifest row over a fixture file that does the job outside its door (or names it harmlessly).
 const doorRow = (job) => manifest.doors.find((row) => row.job === job);
 const outsideDoor = (job, file, text) => checkDoors([{ ...doorRow(job), allowed: [], debt: [] }], new Map([[file, text]]));
@@ -1940,11 +1951,23 @@ test('door rows catch a process signal, a /proc read and a second lock taker, an
   assert.equal(outsideDoor('process control: signal a process or group', 'packages/p/rust/src/x.rs', 'unsafe { libc::killpg(pid, 9) };\n').length, 1);
   assert.equal(outsideDoor('process facts: read /proc', 'src/x.mjs', "fs.readFileSync('/proc/net/unix', 'utf8');\n").length, 1);
   assert.equal(outsideDoor('process facts: read /proc', 'src/x.mjs', "fs.readdirSync('/proc');\n").length, 1);
+  assert.equal(outsideDoor('process facts: read /proc', 'src/x.mjs', "fs.readFileSync('/proc/' + pid + '/stat');\n").length, 1);
+  assert.equal(outsideDoor('process facts: read /proc', 'src/x.mjs', "fs.readFileSync('/proc/cpuinfo');\n").length, 1);
   assert.equal(outsideDoor('take a holder lock from Node', 'src/x.mjs', 'nativeDoor().holderLock.take();\n').length, 1);
   assert.equal(outsideDoor('kernel lock primitive', 'packages/p/rust/src/x.rs', 'unsafe { libc::flock(fd, 2) };\n').length, 1);
   assert.deepEqual(outsideDoor('process control: signal a process or group', 'src/x.mjs', '// process.kill(pid, 15)\n'), []);
   assert.deepEqual(outsideDoor('process facts: read /proc', 'src/x.mjs', '/* reads /proc/self/stat */\n'), []);
   assert.deepEqual(outsideDoor('kernel lock primitive', 'packages/p/rust/src/x.rs', '// LockFileEx is what Windows offers\nstruct LockFileExDriver;\n'), []);
+});
+
+test('the door walk prunes vendored and fixture trees only outside bin and src', () => {
+  assert.equal(doorDirPruned('src/util/third-party', 'third-party'), false);
+  assert.equal(doorDirPruned('src/util/fixtures', 'fixtures'), false);
+  assert.equal(doorDirPruned('bin/fixtures', 'fixtures'), false);
+  assert.equal(doorDirPruned('packages/x/third-party', 'third-party'), true);
+  assert.equal(doorDirPruned('scripts/fixtures', 'fixtures'), true);
+  assert.equal(doorDirPruned('src/test', 'test'), true);
+  assert.equal(doorDirPruned('src/node_modules', 'node_modules'), true);
 });
 
 test('door row for YAML parser loads catches each single-line way to load a parser and ignores comments and other packages', () => {
