@@ -103,6 +103,120 @@
       ],
       "debt": [],
       "reason": "the registry module owns the one projection of the verb manifest; the generator and the help print only call it"
+    },
+    {
+      "job": "kernel lock primitive",
+      "kind": "door",
+      "patterns": ["libc::flock", "\\bLockFileEx\\b", "F_OFD_SETLK", "F_SETLK", "CreateMutexW", "File::lock\\(", "\\.try_lock_(?:shared|exclusive)\\("],
+      "allowed": [
+        "packages/holder-lock/rust/src/driver/flock.rs",
+        "packages/holder-lock/rust/src/driver/windows.rs"
+      ],
+      "debt": [
+        { "path": "packages/git/node-addon/src/single_load.rs", "reason": "takes a kernel lock of its own (Windows mutex, Unix flock) for the single-load marker instead of a holder-lock resource" }
+      ],
+      "reason": "a kernel lock is taken only inside the holder-lock drivers; every other lock goes through its Resource"
+    },
+    {
+      "job": "take a holder lock from Node",
+      "kind": "door",
+      "patterns": ["holderLock\\.take\\("],
+      "allowed": ["src/holder-lock/driver.mjs"],
+      "debt": [],
+      "reason": "the native holder-lock capability is taken once per process, by the driver the facade uses; a second taker is refused at run time by holder-lock-already-taken"
+    },
+    {
+      "job": "process control: signal a process or group",
+      "kind": "door",
+      "patterns": ["process\\.kill\\(", "libc::kill(?:pg)?\\(", "\\bkillpg\\(", "GenerateConsoleCtrlEvent", "\\bTerminateProcess\\(", "Command::new\\(\"(?:kill|taskkill|pkill)\"\\)"],
+      "allowed": [
+        "packages/process/rust/src/**",
+        "packages/run-supervisor/rust/src/gate/unix.rs",
+        "packages/run-supervisor/rust/src/gate/windows.rs",
+        "packages/run-supervisor/rust/src/steps.rs",
+        "packages/holder-lock/rust/src/driver/flock.rs",
+        "packages/holder-lock/rust/src/port.rs",
+        "src/holder-lock/index.mjs",
+        "src/runner/dispatch/provider-credential-probe.mjs",
+        { "path": "scripts/run-rust-dev-host.mjs", "reason": "re-raises the signal that ended its own child on itself" },
+        { "path": "scripts/stress-test-files.mjs", "reason": "kills the process group of the test child it just spawned" },
+        { "path": "scripts/test-select-coverage-map.mjs", "reason": "kills the process group of the test child it just spawned" }
+      ],
+      "debt": [
+        { "path": "packages/git/rust/src/driver.rs", "reason": "the match is inside a test function, but the test-region brace counter ends the test module early (a brace in a string or char literal), so the check reads it as product code" },
+        { "path": "scripts/run-tests.mjs", "reason": "kills stray processes by a bare pid taken from its own /proc scan, with no identity check; pid reuse could hit another process" },
+        { "path": "scripts/lib/test-file-watchdog.mjs", "reason": "judges liveness with kill(pid, 0) and kills by bare pid, a second judge and a second killer beside fgos-process" },
+        { "path": "scripts/lib/mailbox-live-confined.mjs", "reason": "kills a probe process by bare pid" }
+      ],
+      "retiredBy": "each Node own-child group kill goes when the code that spawns that child moves to Rust",
+      "reason": "signalling by identity goes through fgos-process; the launch gate, holder-lock and two Node modules signal only the group of a child they just spawned"
+    },
+    {
+      "job": "process facts: read /proc",
+      "kind": "door",
+      "patterns": ["/proc/(?:self|sys|net|\\{|\\$|\\d|loadavg|meminfo)", "[\"']/proc[\"']"],
+      "allowed": [
+        "packages/process/rust/src/platform/linux.rs",
+        "packages/process/rust/src/containment/linux.rs",
+        "packages/holder-lock/rust/src/driver/flock.rs",
+        "packages/git/rust/src/wal.rs",
+        "packages/mailbox/rust/store/examples/mailbox-record-cost.rs",
+        "src/run-supervisor/runtime-dir.mjs",
+        "src/runner/dispatch/confinement/drivers/bwrap.mjs",
+        "src/runner/dispatch/confinement/probes/harness.mjs",
+        { "path": "scripts/ci-setup-bwrap.sh", "reason": "reads the AppArmor user-namespace switch to set up the sandbox on CI" }
+      ],
+      "debt": [
+        { "path": "packages/holder-lock/rust/src/route.rs", "reason": "reads /proc/<pid> metadata for the owner uid, a process fact read outside fgos-process" },
+        { "path": "packages/holder-lock/rust/src/origin.rs", "reason": "reads /proc/<pid>/comm, a process fact read outside fgos-process" },
+        { "path": "packages/holder-lock/rust/src/borrow_vectors.rs", "reason": "a vector module compiled into the crate whose shell snippet reads /proc/$!/winpid to learn a Windows pid" },
+        { "path": "packages/git/rust/src/worktree.rs", "reason": "reads /proc/<pid>/comm after observing a pid" },
+        { "path": "packages/git/node-addon/src/single_load.rs", "reason": "reads /proc/self/stat for this process start time, a third start-time reader" },
+        { "path": "packages/terminal-control/rust/src/driver/herdr.rs", "reason": "opens /proc/<pid>/fd/0 to find a pane's tty" },
+        { "path": "scripts/run-tests.mjs", "reason": "scans /proc for stray processes of the test run" },
+        { "path": "scripts/lib/test-file-watchdog.mjs", "reason": "scans /proc to judge a test file's processes" },
+        { "path": "scripts/lib/test-file-cpu.mjs", "reason": "reads /proc/self/stat for waited CPU seconds" },
+        { "path": "scripts/lib/mailbox-live-cli.mjs", "reason": "live probe reads /proc/meminfo" },
+        { "path": "scripts/lib/mailbox-live-confined.mjs", "reason": "live probe reads /proc/<pid> files of its own processes" },
+        { "path": "scripts/record-mailbox-hook-fixtures.mjs", "reason": "fixture recorder reads /proc/<pid> files and the pid namespace link" },
+        { "path": "scripts/git/e3-bench.mjs", "reason": "bench counts visible processes in /proc" },
+        { "path": "scripts/git/p-space-resource.mjs", "reason": "bench counts its own open descriptors in /proc/self/fd" }
+      ],
+      "retiredBy": "the Node socket-table read and the bwrap probe arguments go when the run-supervisor directory and the confinement probes move to Rust",
+      "reason": "only fgos-process judges a process; holder-lock reads fdinfo for lock holders, the Git WAL names an open file, and bwrap arguments are not reads of process facts"
+    },
+    {
+      "job": "canonical JSON bytes",
+      "kind": "door",
+      "patterns": ["(?:function|fn)\\s+(?:canonicalJson|stableStringify|sortedJson|canonical_json|to_canonical_json)\\b"],
+      "allowed": [
+        "packages/canonical-json/rust/src/lib.rs",
+        "packages/git/node-addon/src/canonical_json.rs",
+        "src/native/door.mjs",
+        "packages/run-supervisor/rust/src/envelope.rs",
+        "src/runner/dispatch/recovery-planner.mjs",
+        "src/runner/dispatch/effective-execution-contract.mjs",
+        "src/run-supervisor/trust-store.mjs",
+        { "path": "scripts/build-rust-distribution.mjs", "reason": "producer half of the release-manifest pair kept together with its verifier" },
+        "packages/distribution/rust/src/verify.rs"
+      ],
+      "debt": [
+        { "path": "src/runner/execution/seat-policy.mjs", "reason": "its own canonicalJson sorts keys by Array.sort and prints numbers with JSON.stringify, so it equals RFC 8785 only by luck; it is not an accepted exception" }
+      ],
+      "retiredBy": "the exceptions the component-boundary row names go when their stated reasons end (the release-manifest pair moves as one; the others when their contracts change)",
+      "reason": "RFC 8785 bytes come from one crate; each allowed exception is named with its reason in the component-boundary row for Canonical JSON"
+    },
+    {
+      "job": "YAML parser loads",
+      "kind": "door",
+      "patterns": [
+        "(?:\\bfrom\\s*|(?<![\\w$.])import\\s*\\(?\\s*|\\brequire\\(\\s*|\\bcreateRequire\\([^)]*\\)\\s*\\(\\s*)(['\"`])(?:(?:js-)?yaml(?:/[^'\"`]*)?|(?:[^'\"`]*/)?third-party/js-yaml\\.mjs)\\1",
+        "\\bfunction\\s+loadAll\\s*\\(",
+        "saphyr_parser::", "serde_yaml::", "yaml_rust::"
+      ],
+      "allowed": ["packages/yaml-doc/rust/src/backend.rs"],
+      "debt": [],
+      "reason": "only fgos-yaml-doc decides what YAML means; no file loads a YAML library by import, import(), require() or createRequire, and no pasted copy of a parser (found by its loadAll entry point) exists. Per-line match: an alias bound to createRequire on another line, or a load split over lines, is not seen"
     }
   ],
   "files": {

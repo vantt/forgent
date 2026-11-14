@@ -185,7 +185,6 @@
     "test/parity/read-parity.test.mjs": 7.7,
     "test/parity/step-parity.test.mjs": 19,
     "test/plugins/terminal-skill-attach.test.mjs": 2.1,
-    "test/process/one-door.test.mjs": 0.2,
     "test/process/process-facts-vectors.test.mjs": 0.3,
     "test/report/authoritative-match.test.mjs": 10.2,
     "test/report/capability-plan-lint.test.mjs": 1.1,
