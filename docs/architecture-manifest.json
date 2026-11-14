@@ -310,6 +310,31 @@
       ],
       "debt": [],
       "reason": "only src/util/yaml.mjs readFrontmatter cuts and parses a frontmatter block; a second cutter or parser names one of the retired helpers or carries a fence regex (`^---` followed by an optional CR and a newline, whitespace or end of line). Per-line match on code and string text: a cut written another way (split on a fence) is not seen"
+    },
+    {
+      "job": "writer and session id environment",
+      "kind": "door",
+      "patterns": ["FGOS_SESSION_ID", "FGOS_PARENT_WRITER_ID", "CODEX_THREAD_ID", "PI_SESSION_ID", "PI_SESSION_FILE", "CLAUDE_CODE_SESSION_ID"],
+      "allowed": [
+        "packages/identity/rust/src/launcher.rs",
+        "packages/identity/rust/src/resolve.rs",
+        "packages/identity/rust/src/session.rs",
+        "src/util/session-identity.mjs",
+        "src/cli/command-registry.mjs",
+        { "path": "src/setup/agent-hooks.mjs", "reason": "the generated pi/omp extension runs in the agent process and cannot import the addon; its attempt-id prefix is pinned to the crate's by a test" },
+        { "path": "src/setup/registrations.mjs", "reason": "doctor detects a harness shell by these variables; it does not resolve or hand out a writer" },
+        { "path": "apps/fgos/examples/mailbox-ident-cost.rs", "reason": "a cost probe example names one source variable as its input; it decides nothing" },
+        { "path": "scripts/event-store/settle-host-proof.mjs", "reason": "a proof script sets its own writer id for the process it runs" },
+        { "path": "scripts/event-store/v-spawn-bench.mjs", "reason": "a benchmark clears inherited session ids and sets its own writer ids for the commands it times" },
+        { "path": "scripts/lib/mailbox-behaviour-run.mjs", "reason": "a test harness gives each simulated sender its own writer id" },
+        { "path": "scripts/lib/mailbox-live-cli.mjs", "reason": "the live mailbox harness lists the variables it clears to run as a chosen sender" },
+        { "path": "scripts/record-mailbox-hook-fixtures.mjs", "reason": "the fixture recorder captures which of these variables a real hook sees" },
+        { "path": "scripts/regenerate-observe-fixtures.mjs", "reason": "the fixture generator pins one session id for a reproducible recording" },
+        { "path": "scripts/stress-test-files.mjs", "reason": "the stress runner removes the harness session id from the env of the tests it starts" }
+      ],
+      "debt": [],
+      "retiredBy": "S7: the Node facade and its Node readers retire with the Node payload",
+      "reason": "only fgos-identity resolves a writer and decides the launcher environment; the Node facade asks it through the addon, and the files listed read or set these names for their own process"
     }
   ],
   "files": {

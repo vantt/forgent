@@ -32,6 +32,7 @@ import {
 } from '../../src/setup/agent-hooks.mjs';
 import { PROJECT_SHIM_RELATIVE, projectShimPath } from '../../src/util/host-bin-path.mjs';
 import { createDoctorRun } from '../../src/setup/registrations.mjs';
+import { mintAttemptWriterId } from '../../src/util/session-identity.mjs';
 
 function mkTempDir(prefix) {
   return fs.mkdtempSync(path.join(os.tmpdir(), prefix));
@@ -444,6 +445,16 @@ test('the extension stays inert for a runner worker and never writes the process
     else process.env.FGOS_SESSION_ID = saved;
   }
   assert.deepEqual({ ...process.env }, before, 'the process environment is unchanged');
+  fs.rmSync(repoRoot, { recursive: true, force: true });
+});
+
+test('the generated extension treats exactly the minted attempt prefix as a runner worker', () => {
+  // The extension runs in the agent process and cannot ask the crate; its literal must equal the crate's prefix.
+  const attemptId = 'probe-1';
+  const prefix = mintAttemptWriterId(attemptId).slice(0, -attemptId.length);
+  const repoRoot = mkTempDir('agent-hooks-attempt-prefix-');
+  writeMailboxOptIn(repoRoot, true);
+  assert.ok(extensionSourceFor(repoRoot, 'pi').includes(`.startsWith('${prefix}')`));
   fs.rmSync(repoRoot, { recursive: true, force: true });
 });
 

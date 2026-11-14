@@ -3,8 +3,6 @@
 //! env it hands the agent, so the agent's writer id is the attempt's minted
 //! id and never a parent's id leaking through an inherited variable.
 
-use std::collections::BTreeMap;
-
 /// Variables the agent must not inherit: another session's id would outrank
 /// or confuse the minted one (resolve order is `FGOS_SESSION_ID`, then
 /// `CODEX_THREAD_ID`, then `PI_SESSION_ID`, then `CLAUDE_CODE_SESSION_ID`).
@@ -31,24 +29,29 @@ impl std::fmt::Display for EmptyWriterId {
 
 impl std::error::Error for EmptyWriterId {}
 
-/// Drop the inherited session ids from `env`, then set `FGOS_SESSION_ID` to
-/// `writer_id` and `FGOS_PARENT_WRITER_ID` to `parent` (left out when `None`
-/// or empty). An empty `FGOS_SESSION_ID` already in `env` is overwritten, not
-/// kept, so it can never reach the agent.
-pub fn scrub_and_set(
-    env: &mut BTreeMap<String, String>,
-    writer_id: &str,
-    parent: Option<&str>,
-) -> Result<(), EmptyWriterId> {
+/// What a launcher does to the env it hands an agent: `unset` names are dropped, then `set` pairs are written
+/// (`unset` never lists a name `set` writes, and the order of `set` is stable).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct LauncherEnv {
+    pub set: Vec<(String, String)>,
+    pub unset: Vec<&'static str>,
+}
+
+/// The decision for one agent: drop the inherited session ids, set `FGOS_SESSION_ID` to `writer_id` and
+/// `FGOS_PARENT_WRITER_ID` to `parent` (left out when `None` or empty). An empty `FGOS_SESSION_ID` already in the
+/// env is overwritten by the set, never kept, so it can never reach the agent.
+pub fn launcher_env(writer_id: &str, parent: Option<&str>) -> Result<LauncherEnv, EmptyWriterId> {
     if writer_id.is_empty() {
         return Err(EmptyWriterId);
     }
-    for name in SCRUBBED {
-        env.remove(name);
+    let mut set = vec![("FGOS_SESSION_ID".to_string(), writer_id.to_string())];
+    let parent = parent.filter(|p| !p.is_empty());
+    if let Some(parent) = parent {
+        set.push(("FGOS_PARENT_WRITER_ID".to_string(), parent.to_string()));
     }
-    env.insert("FGOS_SESSION_ID".into(), writer_id.into());
-    if let Some(parent) = parent.filter(|p| !p.is_empty()) {
-        env.insert("FGOS_PARENT_WRITER_ID".into(), parent.into());
-    }
-    Ok(())
+    let unset = SCRUBBED
+        .into_iter()
+        .filter(|name| !(parent.is_some() && *name == "FGOS_PARENT_WRITER_ID"))
+        .collect();
+    Ok(LauncherEnv { set, unset })
 }

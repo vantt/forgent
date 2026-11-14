@@ -36,7 +36,7 @@ the worker allowlist and cleared by the gate; this phase removes the second deci
 5. `src/setup/agent-hooks.mjs:484` (`startsWith('att-')` in the generated pi/omp extension, which cannot import the addon):
    leave it; one test in `test/setup/agent-hooks.test.mjs` that the template's prefix equals the prefix of `mintAttemptWriterId()`.
    `src/setup/registrations.mjs:425` detects a harness shell, not a writer: allowed with that reason.
-6. `doors` row (new, `kind: door`): `{ job: "writer and session id environment", patterns: ["FGOS_SESSION_ID", "FGOS_PARENT_WRITER_ID", "CODEX_THREAD_ID", "PI_SESSION_ID", "CLAUDE_CODE_SESSION_ID"], allowed: [...], retiredBy: "S7: the Node facade and its Node readers retire with the Node payload", reason: "only fgos-identity resolves a writer and decides the launcher environment" }`.
+6. `doors` row (new, `kind: door`): `{ job: "writer and session id environment", patterns: ["FGOS_SESSION_ID", "FGOS_PARENT_WRITER_ID", "CODEX_THREAD_ID", "PI_SESSION_ID", "PI_SESSION_FILE", "CLAUDE_CODE_SESSION_ID"], allowed: [...], retiredBy: "S7: the Node facade and its Node readers retire with the Node payload", reason: "only fgos-identity resolves a writer and decides the launcher environment" }`.
    The check applies every row to every file and refuses a row that allows `.mjs` and `.rs` without `retiredBy`; a Node facade
    over a crate does retire with the Node payload, so the `retiredBy` is true, not a workaround. `allowed` exactly as the check
    finds it (expected about 21 files): the identity crate files, `src/util/session-identity.mjs`, `src/cli/command-registry.mjs`
