@@ -873,7 +873,9 @@ function submitWork(dir, text, opts = {}) {
   return event.payload;
 }
 
-async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slice(3)) {
+// `eventStoreChild` is main()'s one reading of the registry: whether this invocation is a detached seal or publish
+// child of the Event Store. A verb that needs it reads it here and never asks the registry again.
+async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slice(3), { eventStoreChild = false } = {}) {
   switch (verb) {
     case 'init': {
       const { initStoreUseCase } = await import('../src/verbs/state/init.mjs');
@@ -2630,8 +2632,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
     // own validation and refusals. The Event Store is Linux-only, so every one of them refuses elsewhere.
     case 'events': {
       const sub = positional[0];
-      const detached = declared(COMMAND_REGISTRY.find((e) => e.name === 'events')?.eventStoreChild, positional, flags);
-      const ctx = eventStoreContext(dir, { detached });
+      const ctx = eventStoreContext(dir, { detached: eventStoreChild });
       if (sub === 'sync') {
         const { syncUseCase } = await import('../src/verbs/events/sync.mjs');
         return syncUseCase(ctx, { remote: flags.remote, noPush: flags['no-push'], opportunistic: flags.opportunistic });
@@ -4272,7 +4273,7 @@ async function main() {
         for (const warning of releaseRecordedLand(trustedMain).warnings) process.stderr.write(`fgos: warning: Land candidate release: ${warning}\n`);
       },
     }, async () => {
-      const data = await runVerb(verb, flags, positional, dir, rest);
+      const data = await runVerb(verb, flags, positional, dir, rest, { eventStoreChild });
       if (flags.pretty && (verb === 'setup' || verb === 'doctor')) {
         process.stdout.write(renderPretty(verb, data));
       } else if (verb === 'plan-lint' && !flags.json) {
