@@ -20,7 +20,7 @@ HARDEN và COOK không tự sửa tệp cấu hình nào của anh (`~/.fgos/`, 
 1. **Sau khi nâng bản (mục 3 của guide rc.8), chạy `fgos doctor` ở mỗi dự án.** Mong đợi 109 dòng, `ok: true`. Không còn dòng `agent-claims-resolve`.
 2. **Máy nào đang chạy timer đồng bộ mail** (cài bằng `fgos doctor --fix` ở lần trước): chạy `fgos doctor` rồi `fgos doctor --fix` một lần để unit được ghi lại theo quy tắc mới. Nếu doctor báo cảnh báo về timer, đọc dòng đó: nó nêu đúng giá trị bị từ chối.
 3. **Tìm chỗ còn gọi `fgos preflight`** trong script hoặc ghi chú của anh: `grep -rn "fgos preflight" ~/<thư mục script của anh>`. Đổi sang `npm run check:before-merge` nếu là repo fgOS, còn lại bỏ.
-4. **Dự án nào có `domains/<tên>/AGENTS.md` hay `domains/*/agents` riêng** sẽ không còn được đọc. Kiểm: `ls <dự án>/domains 2>/dev/null`. Nếu có và anh đang dựa vào nó thì báo HARDEN trước khi nâng; đây là thay đổi hành vi có chủ đích (một dự án không tự đưa doctrine của domain), không phải lỗi.
+4. **`domains/` riêng của dự án:** anh đã xác nhận (2026-11-14) không có dự án nào dùng, nên không có gì phải làm; thay đổi này không ảnh hưởng máy nào.
 
 ## 3. Quay lại
 
@@ -32,4 +32,4 @@ Chưa có. Điền sau khi bản phát hành chứa T9 được kích hoạt tr�
 
 ## Câu hỏi còn mở cho anh
 
-1. Có dự án nào của anh dựa vào `domains/` riêng (mục 2.4) không? Nếu có, HARDEN cần biết trước khi cắt bản phát hành.
+Không còn. Câu hỏi về `domains/` riêng đã được anh trả lời: không có dự án nào dùng.
