@@ -29,9 +29,11 @@ import {
   readAccountCredential,
   readPiAccountCredential,
   settleCopy,
+  parentOf,
   processesOfRun,
   settleLoginCopy,
   startConfinedRun,
+  stateOf,
   sweepOrphans,
 } from '../../scripts/lib/mailbox-live-confined.mjs';
 import { ROTATED_AUTH, removeRunDir } from '../../scripts/lib/codex-auth-guard.mjs';
@@ -64,14 +66,7 @@ async function processesGone(dir, pidNs, limitMs = 15_000) {
 
 /** Each remaining pid with its /proc state letter and parent pid, for a failure message. */
 function describeLeft(pids) {
-  return pids.map((pid) => {
-    try {
-      const [state, ppid] = fs.readFileSync(`/proc/${pid}/stat`, 'utf8').split(') ')[1].split(' ');
-      return `${pid}(state ${state}, ppid ${ppid})`;
-    } catch {
-      return `${pid}(gone)`;
-    }
-  }).join(', ');
+  return pids.map((pid) => (stateOf(pid) ? `${pid}(state ${stateOf(pid)}, ppid ${parentOf(pid)})` : `${pid}(gone)`)).join(', ');
 }
 
 let shimBytes = null;
