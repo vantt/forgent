@@ -3810,7 +3810,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
     }
 
     default:
-      throw new StoreError('validation', `unknown verb "${verb ?? ''}". Usage: fgos <command> [args...]`);
+      throw new StoreError('validation', `unknown verb "${verb ?? ''}". Usage: fgos <${COMMAND_REGISTRY.map((e) => e.name).join('|')}> ...`);
   }
 }
 

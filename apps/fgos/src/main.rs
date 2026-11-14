@@ -62,7 +62,10 @@ More: `fgos --help` lists every command, `fgos <command> --help` describes one,
 /// Refuses an unlisted selector: the exit-4 usage error, with the nearest verb
 /// when the input looks like a typo of one, and the fault record of a malformed call.
 fn refuse_unknown_verb(selector: &str, cli_args: &[std::ffi::OsString]) -> ! {
-    let message = format!("unknown verb \"{selector}\". Usage: fgos <command> [args...]");
+    let message = format!(
+        "unknown verb \"{selector}\". Usage: fgos <{}> ...",
+        help::verb_names().join("|")
+    );
     eprintln!("fgos: {message}");
     let mut verbs: Vec<&str> = command_routes().keys().map(String::as_str).collect();
     verbs.sort_unstable();

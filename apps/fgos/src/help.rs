@@ -39,6 +39,14 @@ fn commands() -> &'static [Value] {
         .expect("embedded command-manifest.json lists commands")
 }
 
+/// The verbs of the surface in the registry's order, as the manifest lists them: what an unknown-verb usage line names.
+pub fn verb_names() -> Vec<&'static str> {
+    commands()
+        .iter()
+        .filter_map(|entry| entry.get("name").and_then(Value::as_str))
+        .collect()
+}
+
 /// `fgos --help|-h [<verb> [<sub>]] [--json]`: `args` is everything after the
 /// leading help token. The whole manifest, or one verb's entry; anything else
 /// on the line is refused rather than ignored.
@@ -805,5 +813,20 @@ mod tests {
         assert_eq!(effect_label(true, false), "write");
         assert_eq!(effect_label(false, true), "external");
         assert_eq!(effect_label(true, true), "write+external");
+    }
+
+    #[test]
+    fn the_verbs_of_the_usage_line_are_the_route_table_verbs_in_registry_order() {
+        let mut named: Vec<&str> = verb_names();
+        assert!(
+            named.iter().position(|v| *v == "review") < named.iter().position(|v| *v == "approve")
+        );
+        named.sort_unstable();
+        let mut routes: Vec<&str> = crate::routing::command_routes()
+            .keys()
+            .map(String::as_str)
+            .collect();
+        routes.sort_unstable();
+        assert_eq!(named, routes);
     }
 }

@@ -47,7 +47,7 @@ for (const command of manifest.commands) {
 }
 
 // Refusals and leniencies the Node payload has today; the host must answer the same bytes and exit code.
-// An unknown verb: both doors print the host's text (`Usage: fgos <command> [args...]`), never a verb list that goes stale.
+// An unknown verb: both doors name the verbs of the surface in the registry's order, each from its own copy of the one manifest.
 cases.push(helpCase("refusal-unknown-verb", ["bogus-verb-probe", "--help"], 4));
 cases.push(helpCase("refusal-unknown-sub", ["metrics", "bogus", "--help"], 4));
 cases.push(helpCase("refusal-unknown-sub-json", ["dispatch", "bogus", "--help", "--json"], 4));

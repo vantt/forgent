@@ -145,8 +145,10 @@ test('an unknown verb is rejected as validation, exit 4, printing no stdout enve
   // go to stderr only, so a consumer can trust "stdout parses" as "success".
   assert.equal(result.stdout, '', 'a failing verb prints no stdout envelope');
   assert.throws(() => JSON.parse(result.stdout), 'stdout is not parseable JSON on the error path');
-  assert.match(result.stderr, /review\|approve\|sync-root\|reject/);
-  assert.match(result.stderr, /catchup/);
+  // The usage line names every verb of the surface (the route table's selectors), not a hand-kept subset.
+  const listed = /Usage: fgos <([^>]*)> \.\.\./.exec(result.stderr)?.[1].split('|') ?? [];
+  const routes = JSON.parse(fs.readFileSync(new URL('../../packages/host-runtime/contracts/command-routes.json', import.meta.url), 'utf8'));
+  assert.deepEqual([...listed].sort(), Object.keys(routes).sort());
 });
 
 

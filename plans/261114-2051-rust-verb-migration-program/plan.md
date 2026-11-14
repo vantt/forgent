@@ -320,6 +320,11 @@ depends on a remote ref fails offline, in shallow CI and in worktrees with stale
 outside `allowed` and `debt` fails; (b) a stale `debt` entry fails; (c) new debt is a reviewed manifest diff with a
 required reason. The file list comes from a filesystem walk, not `git ls-files`.
 
+## Amendment — phase 08 hand-off (2026-11-15)
+
+- `packages/distribution/rust/src/uninstall.rs` no longer carries its own home lookup into F0: the one-door-debt plan's phase 04 moved it (it now calls holder-lock's `home_for_state_root()`). The "global fgOS directory" row of the `doors` table therefore has no entry for it, and nothing in F0 or S4 owns that item.
+- The two home rules (the state root's, HOME first on every platform; Config's `machine::global_dir`, USERPROFILE on Windows) are an open question outside F0, filed as backlog row `p-n22bigucgp`; the row keeps the state root's rule as visible debt.
+
 ## Validation Log
 
 ### Verification Results
