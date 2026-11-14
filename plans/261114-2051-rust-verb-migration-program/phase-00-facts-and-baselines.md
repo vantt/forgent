@@ -30,7 +30,7 @@ the numbers F0's exit criteria compare against. Writes only its report.
 - Research report: `git show origin/research/rust-verb-migration:plans/reports/research-261114-1142-rust-verb-migration-assessment.md`.
 - Host: `apps/fgos/src/main.rs` (route table embed line 38, help to legacy 341-350, native kinds 73-80 and 282-287).
 - Generator: `scripts/export-command-selectors.mjs`; registry `src/cli/command-registry.mjs` (`declared` line 101, `HELP_SELECTORS` line 80).
-- Node doors in `bin/fgos.mjs` `main()` (4193-4321): `resolveInvocationRoot`, `admitStoreAccess` (`src/runner/worktree.mjs:547`), `runWithEventStoreLifecycle` (`src/event-store/maintenance.mjs`), `recordInvocationFault` (`src/observe/invocation-fault-log.mjs:94`).
+- Node doors in `bin/fgos.mjs` `main()` (4193-4321): `resolveInvocationRoot`, `admitStoreAccess` (`src/runner/worktree.mjs:547`), `runWithEventStoreLifecycle` (`src/event-store/maintenance.mjs`), `recordInvocationFault` (`src/observe/invocation-fault-log.mjs:89`).
 
 ## Tasks
 
@@ -38,7 +38,7 @@ the numbers F0's exit criteria compare against. Writes only its report.
    - `git log -S'native_kinds' --oneline` (expect `4cde1feee`, the mailbox hook lane).
    - `git log -S'HELP_SELECTORS'` and `3a479738c` (help sent to the legacy-node payload on purpose, 2026-10-14).
    - `git log -S"mutatesStore: (positional"` and `-S'nativeOnly'`: when predicates and `nativeOnly` came in, and why.
-   - `git log -S'admitStoreAccess'`, `-S'maintainEventStore'`, `-S'recordInvocationFault'` (tsk-5z0).
+   - `git log -S'admitStoreAccess'`, `-S'maintainEventStore'`, `-S'recordInvocationFault'` (tsk-5z0), `-S'resolve_target_root'`, `-S'parseArgs'`.
    - Any earlier Rust help renderer, store admission or lifecycle code: `git log --all -G'render_help|admit_store|seal_if_due\(' -- apps packages`.
    - Say for each: what existed, which change removed or moved it, intended or not.
 2. **Open facts** (each answered with `file:line`):
@@ -49,7 +49,15 @@ the numbers F0's exit criteria compare against. Writes only its report.
    - U5: the exact way to run one harness case set node-vs-host through `scripts/run-tests.mjs` (it filters env to `TEST_ENV_KEYS`, so `FGOS_HARNESS_ENTRY_*` does not pass).
    - U6: does `fgos_config` expose `eventStore.seal.intervalSec`, `eventStore.sync.intervalSec` and the remote the way `src/event-store/config.mjs` `readEventStoreConfig` reads them?
    - U7: a store-free legacy invocation that still spawns Node, to replace `add --help` in `apps/fgos/tests/cli_tests.rs` (272, 513, 2355) once help is native (`workflow list` is the harness's choice).
+   - U8: the root policies of `resolveInvocationRoot` (`src/runner/paths.mjs:145-182`: `caller-tree`, `main-checkout`,
+     `main-checkout-only`, `strict-cwd`, the `found` flag, the Git ceiling, the home `.fgos` exclusion) against the host walk
+     `cli_projector::resolve_target_root` (`apps/fgos/src/cli_projector.rs:17-58`): list every difference.
    - Also: does `scripts/explain-command-route.mjs` read the help selectors or `native_kinds`?
+   - Also: every product and test file that runs `bin/fgos.mjs` (or `FGOS` from the CLI harness) with a help token:
+     `rg -n "bin/fgos\.mjs|\bFGOS\b" test scripts src | rg -- "--help|'-h'"` plus the files phase 09 already names.
+     List them with `file:line`; phase 09 moves each.
+   - Also: the host's existing sync-due rule and detached child for the mailbox (`apps/fgos/src/wiring/mailbox_hook.rs:186-224`,
+     `mailbox_sync.rs:179-198`, stamp file) against Node's `syncDue` (`src/event-store/maintenance.mjs:12-15`): same job or not, with evidence.
 3. **Baselines** (numbers, commands, machine load at the time):
    - `node scripts/git-one-door-scan.mjs --root .` summary count.
    - Route counts from `packages/host-runtime/contracts/command-routes.json` (82 total, 74 legacy, 8 native, 2 help).
@@ -59,7 +67,7 @@ the numbers F0's exit criteria compare against. Writes only its report.
 
 ## Acceptance
 
-- Report lists every prior-art answer and U1-U7 with `file:line`, plus the baseline numbers.
+- Report lists every prior-art answer and U1-U8 with `file:line`, plus the baseline numbers.
 - Any fact that contradicts a later phase's design is sent to the F0 lead before wave B starts, with
   the phase and the line it changes.
 

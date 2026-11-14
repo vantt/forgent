@@ -36,23 +36,32 @@ the big lead for landing.
    - `docs/platform/packaging-distribution/spec.md` 865-873 (the help paragraph): help is the host's, from the
      generated manifest; no help selectors in the route table.
    - Decision history ("Lịch sử quyết định") in the owning specs, one entry each: help door moved into the host
-     (extends `3a479738c`); one native declaration field; store admission owned by Git; invocation-fault record
-     owned by Observe; Event Store maintain policy owned by the Event Store. Mint any decision number with
+     (extends `3a479738c`); one native declaration field; invocation root and store admission owned by Git;
+     the invocation-fault record and the argument parser kept as twins with shared vectors until S7 (and why);
+     Event Store maintain policy owned by the Event Store, its config section by Config; the `doors` one-door guard. Mint any decision number with
      `fgos identity mint d-adr` only if the holder table asks for one.
    - `AGENTS.md` "Legacy-Node CLI Ownership Boundary": one sentence that help is served by the host only.
-   - `docs/reading-map.md` row for `src/cli/command-registry.mjs` (line 144): mentions `native`, `publicManifest`, no `HELP_SELECTORS`.
+   - `docs/reading-map.md` row for `src/cli/command-registry.mjs` (line 144): mentions `native`, `publicManifest`, no `HELP_SELECTORS`;
+     rows for the new source paths (`apps/fgos/src/help.rs`, `routing.rs`, `invocation_doors.rs`,
+     `packages/host-runtime/rust/src/cli_args.rs`, `packages/git/rust/src/invocation_root.rs`, `store_admission.rs`,
+     `packages/observe/rust/src/invocation_fault.rs`, `packages/event-store/rust/src/lifecycle.rs`, the `fgos-config` eventStore module).
+   - `docs/platform/observe/spec.md` and `docs/platform/observe/decisions/observe-component-architecture.md`: `nativeOnly` mentions
+     become the registry `native` field; the Observe spec names the two invocation-fault writers and their shared vectors.
+   - `docs/architecture-manifest.json` is code-owned by phases 01/08/09; here only check that `contract`/`map` docs
+     (`docs/platform/architecture-map.md`) describe the `doors` table in one paragraph.
 2. **Proof consolidation:** in `test/cli/fgos-disconnected-worktree-guard.test.mjs`, retire the cases whose only
    claim is an admission rule now owned by `packages/git/rust/src/store_admission.rs` tests, keeping one CLI
    refusal case, one explicit `--dir` case and the session-worktree case as wiring. Name each retired test and its owner.
 3. **Gates on the integration head** (all green, numbers in the report): `npm test`; `cargo test --workspace`;
    `cargo fmt --all --check`; `cargo clippy --workspace --all-targets -- -D warnings`;
-   `cargo check -p fgos -p fgos-git -p fgos-observe -p fgos-event-store -p fgos-node-addon -p fgos-process -p fgos-holder-lock -p fgos-run-supervisor --target x86_64-pc-windows-msvc` and the same for `aarch64-apple-darwin`;
+   `cargo check -p fgos -p fgos-host-runtime -p fgos-config -p fgos-git -p fgos-observe -p fgos-event-store -p fgos-node-addon -p fgos-process -p fgos-holder-lock -p fgos-run-supervisor --target x86_64-pc-windows-msvc` and the same for `aarch64-apple-darwin`;
    `node scripts/run-tests.mjs test/scripts/doc-health.test.mjs test/scripts/check-decision-citation-drift.test.mjs`;
    `node scripts/git-one-door-scan.mjs --root .` (count not above phase 00's baseline; regenerate the census);
-   `node scripts/export-command-selectors.mjs --check`.
+   `node scripts/export-command-selectors.mjs --check`; `test/architecture.test.mjs` with every `doors` row green
+   (and a grep of `nativeOnly|native_kinds|HELP_SELECTORS|resolve_target_root|nearestStoreRoot` in `docs/` showing only history records).
 4. **Measurements** against phase 00: `fgos --help --json`, `fgos add --help`, `fgos config show --json` medians.
 5. **Hand-off:** the user-visible `CHANGELOG.md` lines (help served by the host and faster; direct `node bin/fgos.mjs --help`
-   refused with a pointer; malformed calls to native verbs now recorded) go to the big lead in the report, not into the file.
+   forwarded to the host, or refused with a pointer when there is none; malformed calls to native verbs now recorded) go to the big lead in the report, not into the file.
    Confirm the F0 file set in `plan.md` matches `git diff --stat origin/main...HEAD` (add anything missing to plan.md).
 
 ## Files

@@ -52,11 +52,14 @@ Reuses `test/rust-host/harness.mjs`; builds no second harness.
    phase brings the file back with its own table). The loader stays, proven by `harness.test.mjs`.
 4. Close MEDIUM-B for future write tables: differential child-process evidence compares only what both
    entries can observe (the PATH shim log), and a harness self-test in `harness.test.mjs` proves a grandchild
-   `git` spawned by either entry is seen the same way. Update the comment block at 20-29.
+   `git` spawned by either entry is seen the same way. Add `node` to `PATH_SHIM_COMMANDS` (47) so a host entry that
+   forwards to the legacy payload shows up in its evidence. Update the comment block at 20-29.
 5. `run()` follows the route table: the host (`FGOS_HOST_BIN`, with the env `run-tests` gives) when any exact
    `--help`/`-h` token is present, the selector's `route_kind` is `native`, or its first positional is in
    `native_subcommands`; otherwise `node bin/fgos.mjs` as today. A host-bound call with no `FGOS_HOST_BIN`
-   throws with a message naming `run-tests`. The routing data is read from the generated file, never restated.
+   throws with a message saying a focused run needs `node scripts/run-tests.mjs <file>`; the harness header says
+   the same. The routing data is read from the generated file, never restated. Direct spawns of `FGOS` or
+   `bin/fgos.mjs` elsewhere are not changed here (phase 09 moves the help ones phase 00 listed).
 
 ## Files
 

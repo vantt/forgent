@@ -5,6 +5,7 @@ status: pending
 effort: 2d
 wave: B
 blockedBy: [0, 1]
+landsAfter: [10]
 ---
 
 # Phase 02: Host help door
@@ -43,6 +44,9 @@ this phase, and the help case table compares the two).
    JSON exactly as the Node functions above do (same line order, labels, `DEPRECATED —` and Compatibility
    section, guide sections, default notes). The JSON forms print the manifest bytes or one entry
    (narrowed to one sub-verb) with the same serializer settings Node uses (2-space, key order as in the file).
+1b. Help words come from `fgos_host_runtime::cli_args::parse_args` (phase 10), as Node takes them from `parseArgs`:
+   `[flags.help when it is a string, ...positional]` without `-h` (`bin/fgos.mjs:3999-4006`); top-level help filters
+   `--dir`, `--json` and help tokens as `handleHelp` does (3965-3992). Develop against phase 10's branch; land after it.
 2. `main.rs`: a first token `--help`/`-h` is answered by `help.rs` before the route lookup; for a listed
    selector, any exact help token after it is answered by `help.rs` for every route kind, including `hook`
    and native kinds. Delete the legacy help routing branch (341-350) and the help fall-through comment at 278-281.
@@ -60,6 +64,9 @@ this phase, and the help case table compares the two).
   them to the store-free legacy invocation phase 00 named, U7), `apps/fgos/tests/mailbox_routes.rs`
   (the case at 283-299 "help for the native kind reaches legacy" becomes "help for the native kind is
   answered by the host and starts no legacy payload").
+- Also in `cli_tests.rs`: one test, reusing the PATH `node` wrapper spy already in that file (255-262), that runs every
+  help form (top level text and JSON, `<verb> --help`, `-h`, `<verb> <sub> --help --json`, `hook mailbox --help`, a native
+  verb, a legacy verb) and asserts zero `node` starts. This is the proof that help needs no Node.
 - Delete: none.
 - Tests retired: none (Node help tests still pass: the direct Node channel still renders help until phase 09).
 - Net size: about +450 Rust (half tests), -15 in `main.rs`.
@@ -82,5 +89,5 @@ this phase, and the help case table compares the two).
 ## Risk and rollback
 
 - Byte drift in the text renderer (M x H): unit tests over every manifest entry plus the node-vs-host help cases.
-- Help token inside a value (`--title --help`): keep the existing exact-token rule; unit test it.
+- Help token inside a value (`--title --help`) or a flag value before the sub-verb (`session --dir /x start --help`): keep the exact-token rule and take words from `parse_args`; unit test both.
 - Rollback: revert the phase; help returns to the legacy door.

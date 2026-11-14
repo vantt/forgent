@@ -38,9 +38,12 @@ One data source says which invocation the host serves natively, per verb or per 
 
 1. Registry: replace `nativeOnly: true` with `native: true`; `hook` gets `native: ['mailbox', 'mailbox-sync']`.
    `native` is `true` (whole verb) or a non-empty list of first positionals. Update the header comment.
-2. Registry: every predicate becomes data: `true`, or a list of invocation shapes, each `'<first positional>'`
-   or `'<first positional> --<flag>'` (the flag present). `declared(field, positional, flags)` keeps its
-   signature and matches the data; no function values remain in any registry field.
+2. Registry: every predicate becomes data: `true`, or a list of invocation shapes over the `parseArgs` result:
+   `'<first positional>'`; `'<first positional> --<flag>'` = the parsed flag is defined (any value: `dispatch recover --action`);
+   `'<first positional> --<flag>=true'` = the parsed flag is exactly boolean `true` (`events sync --opportunistic=true`,
+   matching today's `flags.opportunistic === true`). `declared(field, positional, flags = {})` keeps its signature,
+   tolerates a missing `flags` (the `landsWork` call at `bin/fgos.mjs:4269` passes none) and matches the data;
+   no function values remain in any registry field.
 3. Generator derives `route_kind` from `native` (`true` -> `native`; list -> `legacy-cli` + `native_subcommands`
    sorted), and refuses `route_kind`/`native_kinds` in the annotations as stale. Annotations keep
    `operation_id`, `owner_path`, `compatibility_tests`, `subcommands`.
@@ -52,21 +55,23 @@ One data source says which invocation the host serves natively, per verb or per 
    one-line comment naming the reason (no phase id).
 6. For native sub-verbs of a verb that has `subcommands`, emit `subcommand_flags` for those subs only
    (reuse `nativeFlagProjection`).
-7. Node: one direct-channel refusal reads the registry: a whole-native verb or a native first positional
-   is refused with the existing pointer text style (`bin/fgos.mjs:4241-4244` and `handleHook`'s native
-   kind message merge into one); `NATIVE_HOOK_KINDS` is deleted. The refusal sits where the `nativeOnly`
+7. Node: both direct-channel refusals read the registry `native` field and keep their behaviour: `handleHook`
+   (`bin/fgos.mjs:4167-4168`, before `parseArgs`, exit 1, its message, pinned by
+   `test/cli/dispatch-retired-doors.test.mjs:157`) for a native hook kind, and the verb refusal (`4241-4244`, exit 4)
+   for a whole-native verb or a native first positional. `NATIVE_HOOK_KINDS` is deleted; no second list remains. The refusal sits where the `nativeOnly`
    refusal sits today, after the help branch, so `node bin/fgos.mjs <native verb> --help` still prints help
    until phase 09 (the help table compares it).
 8. Shared vectors: `test/rust-host/fixtures/store-declaration-vectors.json` lists `{verb, argv, mutates, landsWork, eventStoreChild}`
-   rows covering every shape above; `test/cli/fgos-manifest.test.mjs` reads it through `declared()`.
-   Phase 08's Rust matcher reads the same file.
+   rows; each row's `argv` goes through `parseArgs` then `declared()` in `test/cli/fgos-manifest.test.mjs`, and through
+   phase 10's `parse_args` then phase 08's Rust matcher. Rows cover the true and false side of every shape, flags before
+   the sub-verb (`--dir /x start`), `--opportunistic=false`, `--opportunistic x`, `--action` as a value.
 
 ## Files
 
 - Create: `test/rust-host/fixtures/store-declaration-vectors.json`.
 - Modify: `src/cli/command-registry.mjs`, `scripts/export-command-selectors.mjs`,
   `packages/host-runtime/contracts/command-route-annotations.json`, `packages/host-runtime/contracts/command-routes.json` (regenerated),
-  `bin/fgos.mjs` (refusal from `native`; `nativeOnly` reads), `src/runner/hook.mjs` (delete `NATIVE_HOOK_KINDS`),
+  `bin/fgos.mjs` (both refusals read `native`; `nativeOnly` reads), `src/runner/hook.mjs` (delete `NATIVE_HOOK_KINDS`),
   `test/rust-host/command-routes.test.mjs` (the `native_kinds` case at 93-106 becomes the derived
   `native_subcommands` case plus the stale-annotation refusal and the lands-work refusal),
   `test/cli/fgos-manifest.test.mjs` (key list; "true or a predicate" at 94 becomes "true or shapes" over the vectors),
@@ -75,16 +80,17 @@ One data source says which invocation the host serves natively, per verb or per 
 - Regenerate: `command-manifest.json` (bytes must not change), the census.
 - Delete: none.
 - Tests retired: in `test/cli/fgos-disconnected-worktree-guard.test.mjs`, the per-invocation classification
-  cases (158 onward: session, goal, gateway, knowledge and the other predicate verbs) whose only claim is
-  "this sub-verb counts as mutating". New owner: the vector rows in `store-declaration-vectors.json`
-  through `test/cli/fgos-manifest.test.mjs` (and phase 08's Rust test). Keep one CLI refusal case and the
-  read-sub "unaffected" case as the CLI wiring proof. Name each retired test in the commit body.
+  cases (158 onward) whose only claim is "this sub-verb counts as mutating", except one CLI case per shape kind
+  (a sub-only shape such as `session start` with its read sibling `session list`, and the flag shape
+  `dispatch recover --action`), which stay as the CLI wiring proof that registry data reaches the guard.
+  New owner of the rest: the vector rows through `test/cli/fgos-manifest.test.mjs` (and phase 08's Rust test).
+  Name each retired test in the commit body.
 - Net size: about -40 (predicates and duplicated cases out), +60 (vectors, generator checks).
 
 ## Gates
 
 - `node scripts/export-command-selectors.mjs --check`
-- `node scripts/run-tests.mjs test/rust-host/command-routes.test.mjs test/cli/fgos-manifest.test.mjs test/cli/unknown-flag-rejection.test.mjs test/cli/subcommand-flag-drift.test.mjs test/cli/fgos-disconnected-worktree-guard.test.mjs test/rust-host/help-routes.test.mjs test/scripts/dispatch-decide-hook.test.mjs test/architecture.test.mjs test/scripts/doc-health.test.mjs test/setup/git-mutation-census.test.mjs`
+- `node scripts/run-tests.mjs test/rust-host/command-routes.test.mjs test/cli/fgos-manifest.test.mjs test/cli/unknown-flag-rejection.test.mjs test/cli/subcommand-flag-drift.test.mjs test/cli/fgos-disconnected-worktree-guard.test.mjs test/rust-host/help-routes.test.mjs test/scripts/dispatch-decide-hook.test.mjs test/cli/dispatch-retired-doors.test.mjs test/architecture.test.mjs test/scripts/doc-health.test.mjs test/setup/git-mutation-census.test.mjs`
 - `cargo test -p fgos --test mailbox_routes` (the hook mailbox lane still reads `native_kinds`).
 - One-door scan count not above baseline.
 

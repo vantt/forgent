@@ -1,82 +1,93 @@
 ---
 phase: 6
-title: "Event Store lifecycle authority"
+title: "Event Store maintain and config authority"
 status: pending
-effort: 1.5d
+effort: 2.5d
 wave: B
 blockedBy: [0]
 ---
 
-# Phase 06: Event Store lifecycle authority
+# Phase 06: Event Store maintain and config authority
 
 The maintain policy of Event Store spec §16 (seal what is due, seal all on shutdown, decide whether a
-publish is due) moves into `fgos-event-store` (tier 3). Node's `maintainEventStore` delegates to it
-through the addon; the host calls it in phase 08. The per-command wrapper that decides *when* the
-triggers run stays where each process runs its verb (Node's `runWithEventStoreLifecycle`, the host's
-door in phase 08): it is three booleans and a callback, owned per lane until the last Node verb with a
-store leaves (S7).
+publish is due), the store construction it needs, and the `eventStore` config reading with its refusal
+rule each get one Rust owner: `fgos-event-store` (tier 3) for maintain and construction, `fgos-config`
+(tier 1) for the config section. Node's `maintainEventStore` and `readEventStoreConfig` become adapters;
+the addon and the host call the same functions. The per-command wrapper that decides *when* triggers run
+stays per process (Node `runWithEventStoreLifecycle`, host door in phase 08): three booleans and a callback.
 
 ## Phase-lead rules (every F0 phase)
 
 - Repo `/home/vantt/projects/forgent` on fg-server2. Read `AGENTS.md`, `docs/reading-map.md`, then this file.
 - Worktree: `/usr/bin/git worktree add -b rust-verb-migration-program/f0-p06 /home/vantt/projects/forgent-worktrees/rvm-f0-p06 origin/rust-verb-migration-program/f0`. Assert it is in `git worktree list`.
 - `export CARGO_TARGET_DIR=/home/vantt/projects/forgent-worktrees/rvm-f0-p06-target` (ext4, never `/tmp`). Delete it when the phase lands.
-- Tests: `node scripts/run-tests.mjs <file.test.mjs> ...` (focused). Ask the F0 lead before `npm test` or `cargo test --workspace`.
+- Tests: `node scripts/run-tests.mjs <file.test.mjs> ...` (focused). Ask the F0 lead before `npm test` or `cargo test --workspace`. Also run every test that imports or reads a file you change (`rg -l "maintainEventStore|readEventStoreConfig|eventStoreConfig|prepareStore" test`).
 - No plan ids, phase numbers or finding codes in code, test names or commits. No env switch or test-only branch.
 - Before each commit: `/usr/bin/git diff --cached --stat`; explain any large deletion. Stage explicit paths. Never `git stash`.
 - Push the phase branch at least every 30 minutes. Never push to `main`. Do not edit `CHANGELOG.md` or `Cargo.lock` (a new dependency edge means stop and ask).
-- Report: `fgos convention path --kind report --type phase --slug f0-p06-lifecycle --plan 261114-2051-rust-verb-migration-program --json`. End with `Status / Summary / Concerns`.
+- Report: `fgos convention path --kind report --type phase --slug f0-p06-maintain --plan 261114-2051-rust-verb-migration-program --json`. End with `Status / Summary / Concerns`.
 
 ## Context
 
-- Node policy today: `maintainEventStore(cwd, {trustedMain, shutdown, end, dispatched})` in
-  `src/event-store/maintenance.mjs:38-58`: resolve main, read config (`readEventStoreConfig`), `prepareStore`,
-  read `maintenance` facts, `sealAll` on shutdown else `sealIfDue` per stream with `seal.intervalSec`,
-  then on `end && !dispatched` a publish when `syncDue` (12-15: interval > 0 and no attempt, another
-  remote, or the last attempt older than the interval), handed to a detached `fgos events sync --opportunistic`
-  child. Every step is attempted; the first error is returned as `{error}`; nothing throws.
-- Callers keep the signature: `src/event-store/maintenance.mjs:85` (the wrapper), `src/runner/gateway-control.mjs`,
-  `src/runner/loop.mjs`, `src/runner/session.mjs` (not edited here).
-- Rust primitives: `packages/event-store/rust/src/diagnostics.rs:56` (`maintenance`), `seal.rs:554` (`seal_all`),
-  `seal.rs:596` (`seal_if_due`). Addon namespace `eventStore`: `packages/git/node-addon/src/event_store.rs`.
-- Phase 00 answers U1 (seal coalescer), U2 (what `prepareStore` adds), U6 (config values in Rust).
+- Node policy: `maintainEventStore(cwd, {trustedMain, shutdown, end, dispatched})` (`src/event-store/maintenance.mjs:38-58`):
+  main root, config, `prepareStore`, `maintenance` facts, `sealAll` on shutdown else `sealIfDue` per stream with
+  `seal.intervalSec`, then on `end && !dispatched` a publish when `syncDue` (12-15), handed to a detached
+  `fgos events sync --opportunistic` child. Every step is attempted; the first error is returned; nothing throws.
+  Callers keep the signature: the wrapper (85), `src/runner/gateway-control.mjs:359`, `src/runner/session.mjs:387`,
+  `src/runner/loop.mjs:1788` (they pass `trustedMain` as a value or a function; the adapter resolves it before calling Rust).
+- Store construction lives in the addon today: `driver_for`, repo resolution, machine id, state root, `detached`, held
+  ranks and hot-lock depth (`packages/git/node-addon/src/event_store.rs:183-209, 308-345`; Node `src/event-store/native.mjs:12, 52-72, 121-127`).
+  `sealIfDue` has a second, Work-side caller: `src/state/consumer-event-gate.mjs:85` (not changed here).
+- Config: Node `eventStoreConfig`/`readEventStoreConfig` (`src/event-store/config.mjs:8-47`) apply minimums and a refusal
+  rule (a refused config not naming `eventStore` gives `sync.intervalSec = 0`; one naming an `eventStore` value throws).
+  The host reads one raw value in `apps/fgos/src/wiring/mailbox_config.rs:104-118` (phase 08 switches it).
+  Standard defaults: `core/config-standard/eventStore.yaml`.
+- Platform: the Event Store runs on Linux only (`eventStorePlatformSupported`, `src/event-store/native.mjs`).
+- Phase 00 answers U1 (seal coalescer), U2 (`prepareStore`), U6 (config in Rust) and whether the mailbox sync child's
+  stamp rule (`apps/fgos/src/wiring/mailbox_hook.rs:186-224`) is the same job as `syncDue`.
 - Behaviour tests: `test/event-store/triggers.test.mjs` (11), `test/event-store/lifecycle.test.mjs` (7, the wrapper).
 
 ## Requirements
 
-1. `packages/event-store/rust/src/lifecycle.rs`: `maintain(cwd, trusted_main, config {seal_interval_sec,
-   sync_interval_sec, remote}, policy {shutdown, end, dispatched}, now) -> MaintainOutcome { error: Option<String>, sync_due: bool }`.
-   Same step order, the same "attempt each step, keep the first error" rule, the same sync-due rule;
-   `sync_due` is true only when `end && !dispatched` and a publish is due. The caller spawns the child.
-2. Addon: expose `maintain` in `packages/git/node-addon/src/event_store.rs` (existing namespace).
-3. Node: `maintainEventStore` keeps its signature and return; it reads the config as today, calls the addon,
-   and spawns the sync child (`spawnDetachedCli`) when `sync_due`. Delete `syncDue` and the seal loop from Node.
-4. The wrapper `runWithEventStoreLifecycle` is unchanged.
+1. `fgos-config`: one module reading the `eventStore` section into a typed value with Node's minimums and refusal rule;
+   exposed through the addon's existing `config` namespace (`packages/git/node-addon/src/config.rs`). Node
+   `readEventStoreConfig`/`eventStoreConfig` become adapters with the same signatures and errors.
+2. `fgos-event-store`: the store constructor (driver, repo, machine id, state root, `detached`) moves from the addon into
+   the crate; the addon calls it. No new crate edge (the crate already depends on `fgos-git`, `fgos-identity`, `fgos-holder-lock`).
+3. `packages/event-store/rust/src/lifecycle.rs`: `maintain(cwd, trusted_main, config, policy {shutdown, end, dispatched}, held_ranks, now) -> { error: Option<String>, sync_due: bool }`
+   with Node's step order, "attempt each step, keep the first error", and the sync-due rule; `sync_due` only when
+   `end && !dispatched`. The caller spawns the child. Plus `platform_supported()` as the one answer to "does the Event Store run here".
+4. Sync-due ownership: if phase 00 found the mailbox stamp rule is the same job, make `lifecycle` the one owner and record
+   the switch for phase 08; if it is a different job (mail take vs event publish), write the evidence into the report and
+   into the `doors` row reason phase 08 adds.
+5. Node `maintainEventStore` keeps signature and return; it calls the addon and spawns `spawnDetachedCli` when `sync_due`.
+   Delete `syncDue` and the seal loop from Node. The wrapper `runWithEventStoreLifecycle` is unchanged.
 
 ## Files
 
-- Create: `packages/event-store/rust/src/lifecycle.rs` (+ unit tests: seal only streams older than the interval;
-  shutdown seals all; sync due/not due/other remote/interval 0; a dispatched worker never gets `sync_due`;
-  an unreadable store is an error code, never a panic; a failing step does not stop the next).
-- Modify: `packages/event-store/rust/src/lib.rs`, `packages/git/node-addon/src/event_store.rs`,
-  `src/event-store/maintenance.mjs`, `test/event-store/triggers.test.mjs`.
+- Create: `packages/event-store/rust/src/lifecycle.rs` (+ the constructor module if it is not placed in `lifecycle.rs`),
+  one `fgos-config` module for the `eventStore` section (name it in the report).
+- Modify: `packages/event-store/rust/src/lib.rs`, `packages/config/rust/src/lib.rs`, `packages/git/node-addon/src/event_store.rs`,
+  `packages/git/node-addon/src/config.rs`, `src/event-store/maintenance.mjs`, `src/event-store/config.mjs`,
+  `test/event-store/triggers.test.mjs`, the Node test that owns `eventStoreConfig` today (find with `rg -l eventStoreConfig test`).
 - Delete: none.
-- Tests retired: in `test/event-store/triggers.test.mjs`, "a trigger seals only streams older than the seal
-  interval and everything on shutdown" (47) and "a store that cannot be opened is reported as a code" (133)
-  move to `lifecycle.rs` unit tests. The rest stay as Node wiring proofs (child hand-off, no second child in
-  flight, CLI records, Land sweep). `test/event-store/lifecycle.test.mjs` is untouched.
-- Net size: Node about -25, Rust about +200 (half tests).
+- Unit tests (Rust): seal only streams older than the interval; shutdown seals all; sync due / not due / other remote /
+  interval 0 / dispatched never; unreadable store is an error code; a failing step does not stop the next; config minimums
+  and both refusal outcomes.
+- Tests retired: in `triggers.test.mjs`, "seals only streams older than the seal interval and everything on shutdown" (47)
+  and "a store that cannot be opened is reported as a code" (133) → `lifecycle.rs`; the Node config-rule cases → the
+  `fgos-config` module tests. The rest stay as Node wiring proofs (child hand-off, no second child in flight, CLI records, Land sweep).
+- Net size: Node about -60, Rust about +400 (half tests).
 
 ## Gates
 
-- `cargo fmt --all --check`; `cargo clippy -p fgos-event-store -p fgos-node-addon --all-targets -- -D warnings`; `cargo test -p fgos-event-store`
-- `cargo check -p fgos-event-store -p fgos-node-addon --target x86_64-pc-windows-msvc` and `--target aarch64-apple-darwin`
-- `node scripts/run-tests.mjs test/event-store/triggers.test.mjs test/event-store/lifecycle.test.mjs test/event-store/background-seal.test.mjs test/architecture.test.mjs test/setup/git-mutation-census.test.mjs`
-  (also every hit of `rg -l "maintainEventStore|runWithEventStoreLifecycle" test`).
+- `cargo fmt --all --check`; `cargo clippy -p fgos-event-store -p fgos-config -p fgos-node-addon --all-targets -- -D warnings`; `cargo test -p fgos-event-store -p fgos-config`
+- `cargo check -p fgos-event-store -p fgos-config -p fgos-node-addon --target x86_64-pc-windows-msvc` and `--target aarch64-apple-darwin`
+- `node scripts/run-tests.mjs test/event-store/triggers.test.mjs test/event-store/lifecycle.test.mjs test/event-store/background-seal.test.mjs test/architecture.test.mjs test/setup/git-mutation-census.test.mjs` plus every hit of the `rg` in the rules above.
 - One-door scan count not above baseline.
 
 ## Risk and rollback
 
-- A sync-due difference publishes twice or never (M x H): table-driven Rust tests on the rule; the Node
-  "no second child in flight" case stays.
+- A sync-due difference publishes twice or never (M x H): table-driven Rust tests; the Node "no second child in flight" case stays.
+- Moving the constructor changes lock ranks or hot-lock depth handling (M x H): the addon passes them through unchanged; `consumer-event-gate` keeps its call.
 - Rollback: revert the phase.
