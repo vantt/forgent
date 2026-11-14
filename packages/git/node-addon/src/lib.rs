@@ -44,9 +44,13 @@ fn driver_for(state_root: &str, detached: Option<bool>) -> Result<fgos_git::GitD
     }
 }
 
-/// A Git operation's refusal as the addon's error: its code and cause, for the caller to branch on.
+/// A Git operation's refusal as the addon's error, with every field the driver reports (code,
+/// cause, retryable, operation id, receipt, exit code, signal, stderr, detail): the one mapping
+/// every addon door uses, so a caller sees the same error contract from any of them.
 pub(crate) fn operation(e: fgos_git::OperationError) -> Error {
-    error(json!({"code": e.code, "cause": e.cause}))
+    error(
+        json!({"code": e.code, "cause": e.cause, "retryable": e.retryable, "operationId": e.operation_id, "receipt": e.receipt, "exitCode": e.exit_code, "signal": e.signal, "stderr": e.stderr, "detail": e.detail}),
+    )
 }
 #[napi]
 pub fn versions() -> Result<Value> {
