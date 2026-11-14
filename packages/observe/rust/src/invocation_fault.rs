@@ -26,8 +26,11 @@ use crate::time::now_iso;
 /// Past this size the oldest half of the log is dropped.
 pub const LOG_MAX_BYTES: u64 = 1024 * 1024;
 
-const LOG_DIR: &str = "logs";
-const LOG_FILE: &str = "invocation-faults.jsonl";
+/// The log's path under a store directory (`.fgos/`).
+pub fn store_log_path(store: &Path) -> PathBuf {
+    store.join("logs").join("invocation-faults.jsonl")
+}
+
 const FLAG_NAME_MAX_TAIL: usize = 39;
 
 /// What a caller knows at the point of failure. The fault class comes from the
@@ -92,39 +95,35 @@ pub fn argv_shape(argv: &[String], sub: Option<&str>) -> Vec<String> {
         .collect()
 }
 
-/// One whitespace-delimited word of a message, with a `--name=value` core reduced
-/// to `--name=<len>` and any wrapping quote or trailing punctuation kept.
-fn redact_word(word: &str) -> String {
-    const WRAP: &[char] = &['"', '\'', '`', '(', '[', '<'];
-    const TAIL: &[char] = &['"', '\'', '`', ')', ']', '>', ',', ';', ':', '.'];
-    let lead = word.len() - word.trim_start_matches(WRAP).len();
-    let core = word[lead..].trim_end_matches(TAIL);
-    match core.contains('=').then(|| shape_flag(core)).flatten() {
-        Some(shaped) => format!("{}{shaped}{}", &word[..lead], &word[lead + core.len()..]),
-        None => word.to_owned(),
-    }
-}
-
-/// `message` with every `--name=value` word reduced to `--name=<len>`. The
-/// unknown-flag message carries the whole token the caller typed, so without this
-/// the record would hold an argument value the argv rule keeps out.
-fn redact_message(message: &str) -> String {
+/// `message` with every appearance of a call token that [`argv_shape`] changes
+/// replaced by that token's shape, longest token first. The unknown-flag message
+/// quotes the whole token the caller typed, so without this the record would hold
+/// an argument value the argv rule keeps out. Cleaning against the argv, not
+/// against the message's own words, also covers malformed tokens no word rule
+/// recognizes (`--api_key=x`, `--=x`, an over-long name).
+fn redact_message(message: &str, argv: &[String], sub: Option<&str>) -> String {
+    let shapes = argv_shape(argv, sub);
+    let mut swaps: Vec<(&str, &str)> = argv
+        .iter()
+        .zip(&shapes)
+        .skip(1)
+        .filter(|(token, shape)| !token.is_empty() && token != shape)
+        .map(|(token, shape)| (token.as_str(), shape.as_str()))
+        .collect();
+    swaps.sort_by_key(|(token, _)| std::cmp::Reverse(token.len()));
     let mut out = String::with_capacity(message.len());
-    let mut word_start = None;
-    for (index, ch) in message.char_indices() {
-        match (ch.is_whitespace(), word_start) {
-            (false, None) => word_start = Some(index),
-            (true, Some(start)) => {
-                out.push_str(&redact_word(&message[start..index]));
-                word_start = None;
-                out.push(ch);
+    let mut rest = message;
+    while let Some(ch) = rest.chars().next() {
+        match swaps.iter().find(|(token, _)| rest.starts_with(token)) {
+            Some((token, shape)) => {
+                out.push_str(shape);
+                rest = &rest[token.len()..];
             }
-            (true, None) => out.push(ch),
-            (false, Some(_)) => {}
+            None => {
+                out.push(ch);
+                rest = &rest[ch.len_utf8()..];
+            }
         }
-    }
-    if let Some(start) = word_start {
-        out.push_str(&redact_word(&message[start..]));
     }
     out
 }
@@ -141,7 +140,7 @@ pub fn log_path(fgos_dir: Option<&Path>, cwd: &Path) -> Option<PathBuf> {
             fallback.exists().then_some(fallback)?
         }
     };
-    Some(store.join(LOG_DIR).join(LOG_FILE))
+    Some(store_log_path(&store))
 }
 
 /// Drops the oldest half of the log's lines once it is past [`LOG_MAX_BYTES`].
@@ -198,11 +197,18 @@ fn make_private(_log: &Path) -> io::Result<()> {
 }
 
 /// Appends one whole line to the log: the file is created 0600 and, past the cap,
-/// loses its oldest half first. Takes no lock; one `write` of a whole line under
-/// `O_APPEND` keeps concurrent writers from tearing a line.
+/// loses its oldest half first. Takes no lock: one `write` of a whole line under
+/// `O_APPEND` keeps concurrent appends from tearing a line, but the halving
+/// (read, temp file, rename) can drop an append made while it runs. A lost
+/// diagnostic line past the cap is accepted, as on the Node side.
 fn append_capped(log: &Path, record: &Value) -> io::Result<()> {
     if let Some(parent) = log.parent() {
-        fs::create_dir_all(parent)?;
+        // `create_dir`, not `create_dir_all`: a store that vanished since the
+        // check must not be recreated here.
+        match fs::create_dir(parent) {
+            Err(err) if err.kind() != io::ErrorKind::AlreadyExists => return Err(err),
+            _ => {}
+        }
     }
     halve_if_over_cap(log)?;
     let mut line = serde_json::to_vec(record).map_err(io::Error::other)?;
@@ -210,7 +216,9 @@ fn append_capped(log: &Path, record: &Value) -> io::Result<()> {
     private(OpenOptions::new().append(true).create(true))
         .open(log)?
         .write_all(&line)?;
-    make_private(log)
+    // The line has landed; a failed chmod must not report it as lost.
+    let _ = make_private(log);
+    Ok(())
 }
 
 /// Appends one fault record. Answers the path written, or `None` when nothing was
@@ -228,7 +236,7 @@ pub fn record(input: &FaultInput<'_>) -> Option<PathBuf> {
         "ts": now_iso(),
         "faultClass": input.fault_class,
         "verb": input.verb,
-        "message": redact_message(input.message),
+        "message": redact_message(input.message, input.argv, input.sub),
         "cwd": input.cwd.to_string_lossy(),
         "argv": argv_shape(input.argv, input.sub),
         "writer": resolve_current(store),
@@ -349,17 +357,57 @@ mod tests {
 
     #[test]
     fn a_flag_value_in_the_message_keeps_only_its_length() {
-        assert_eq!(
-            redact_message("unknown flag --key=secret for verb list"),
-            "unknown flag --key=<6> for verb list"
-        );
-        assert_eq!(
-            redact_message("unknown flag \"--key=secret\"."),
-            "unknown flag \"--key=<6>\"."
-        );
-        assert_eq!(redact_message("bad --dir"), "bad --dir");
-        assert_eq!(redact_message("a=b is not a flag"), "a=b is not a flag");
-        assert_eq!(redact_message("  spaced\t--k=v  "), "  spaced\t--k=<1>  ");
+        let argv =
+            |tokens: &[&str]| -> Vec<String> { tokens.iter().map(|t| t.to_string()).collect() };
+        let cases: [(&[&str], &str, &str); 9] = [
+            (
+                &["list", "--key=secret"],
+                "unknown flag --key=secret for verb list",
+                "unknown flag --key=<6> for verb list",
+            ),
+            (
+                &["list", "--key=secret"],
+                "unknown flag \"--key=secret\".",
+                "unknown flag \"--key=<6>\".",
+            ),
+            (&["list", "--dir"], "bad --dir", "bad --dir"),
+            (&["list", "a=b"], "a=b is not a flag", "<3> is not a flag"),
+            (
+                &["list", "--k=v"],
+                "  spaced\t--k=v  ",
+                "  spaced\t--k=<1>  ",
+            ),
+            (
+                &["list", "--token=abc def ghi"],
+                "unknown flag \"--token=abc def ghi\"",
+                "unknown flag \"--token=<11>\"",
+            ),
+            (
+                &["list", "--api_key=XYZ123"],
+                "unknown flag --api_key=XYZ123",
+                "unknown flag <16>",
+            ),
+            (
+                &["list", "--=XYZ123"],
+                "unknown flag --=XYZ123",
+                "unknown flag <9>",
+            ),
+            (
+                &[
+                    "list",
+                    "--aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa=XYZ123",
+                ],
+                "unknown flag --aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa=XYZ123",
+                "unknown flag <56>",
+            ),
+        ];
+        for (tokens, message, expected) in cases {
+            assert_eq!(
+                redact_message(message, &argv(tokens), None),
+                expected,
+                "{message}"
+            );
+        }
     }
 
     #[test]

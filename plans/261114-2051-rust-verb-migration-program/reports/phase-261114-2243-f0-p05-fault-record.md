@@ -15,7 +15,8 @@ Branch `rust-verb-migration-program/f0-p05`, base `286017771` (head of `rust-ver
 - Same record and key order as Node: `ts, faultClass, verb, message, cwd, argv, writer`.
 - Path: the resolved store if it exists, else the main checkout's existing `.fgos` (read from disk through `fgos_git::main_checkout_root`, no Git process), else `None`. Never creates `.fgos/`; only `logs/` below an existing store.
 - Appends one whole line under `O_APPEND`, file 0600 (created 0600 and re-chmodded on unix; no-op elsewhere). Past 1 MiB the oldest half of the lines goes through a 0600 temp file and a rename.
-- `message` has every `--name=value` word reduced to `--name=<len>` (quote and trailing punctuation around the word are kept). The Node writer does not do this; that leak stays the separate item named in the plan.
+- `message` is cleaned against the argv the caller passes: every argv token (index 1 and up) whose shape differs from the token is replaced by its shape wherever it appears, longest token first. This covers malformed tokens (`--api_key=x`, `--=x`, an over-long name, a value with spaces). The Node writer does not do this; that leak stays the separate item named in the plan.
+- Review fixes: the log path is one pub item (`store_log_path`) shared with the observation source; the log directory is created with `create_dir`, never recreating a vanished store; a chmod failure after a landed write is ignored; the concurrency comment states that the halving can lose a concurrent append.
 - Lengths count UTF-16 code units, as Node does, and a vector row pins it.
 
 ## Where the facts changed the phase text

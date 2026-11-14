@@ -28,10 +28,7 @@ impl ObservationSource for InvocationFaultsSource {
     }
 
     fn observations(&self, root: &Path, w: &Window) -> Result<Vec<Observation>, SourceError> {
-        let log_path = root
-            .join(".fgos")
-            .join("logs")
-            .join("invocation-faults.jsonl");
+        let log_path = crate::invocation_fault::store_log_path(&root.join(".fgos"));
         if !log_path.exists() {
             return Ok(Vec::new());
         }
