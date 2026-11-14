@@ -322,7 +322,7 @@
         { "path": "packages/observe/rust/src/invocation_fault.rs", "reason": "judges whether a recorded token has the shape of a flag name; it parses no call" }
       ],
       "debt": [
-        { "path": "apps/fgos/src/cli_projector.rs", "reason": "the native verbs' request projectors (convention, config, identity) read their own `--flag value` and `--flag=value` tokens; the host parser has no `--flag=value` form, so they move onto it only with the owner's answer on `--dir=<path>`" },
+        { "path": "apps/fgos/src/cli_projector.rs", "reason": "the native verbs' request projectors (convention, config, identity) read their own `--flag value` and `--flag=value` tokens; the host parser has no `--flag=value` form, so they stay until their step moves them: each native verb drops its own parser when its S-step moves it onto the shared parser" },
         { "path": "apps/fgos/src/wiring/mailbox_verbs.rs", "reason": "project_mailbox_request reads the mailbox verbs' flags, `--flag=value` and a bare `--` separator included; the mailbox grammar differs from the host parser's" },
         { "path": "packages/observe/rust/src/flags.rs", "reason": "the Observe verbs' one grammar (`--key value`, `--key=value`, switches, one positional); the flag-drift test reads the flag literals from it" },
         { "path": "packages/holder-lock/rust/src/route.rs", "reason": "reads typed execution-root flags (`--dir`, `--worktree`, `--cwd`, `-C`) out of a worker's argv to judge workspace containment; it parses another program's arguments, not the host's" },
