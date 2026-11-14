@@ -12,8 +12,9 @@
 //! A `read` verb with no `.fgos/` from a linked worktree is admitted with a warning line: the view may be empty.
 //!
 //! Git is read lazily, through the one reader of the invocation-root door, and at most once: only a path that needs
-//! the worktree identity asks for it. A verb that needs no store, a call that named `--dir`, and a read of a store
-//! that exists all succeed when Git cannot be read.
+//! the worktree identity asks for it. A verb that needs no store and does not mutate, a call that named `--dir`,
+//! and a read of a store that exists all succeed when Git cannot be read. A mutating verb that needs no store
+//! (`session start`, `dispatch recover --action`) is judged like any other mutating verb once a `.fgos/` exists.
 use crate::invocation_root::{read_repo_facts, realpath_or_self, FactsReader, Refusal, RepoFacts};
 use std::cell::OnceCell;
 use std::path::Path;
@@ -285,6 +286,30 @@ mod tests {
         assert_eq!(refusal.fault_class, DISCONNECTED_WORKTREE_STORE);
         assert!(refusal.message.contains("disconnected snapshot"));
         assert!(refusal.message.starts_with("\"submit\" refused: "));
+    }
+
+    #[test]
+    fn a_store_mutating_verb_that_needs_no_store_is_refused_from_a_frozen_worktree_too() {
+        let world = World::new("disconnected-none");
+        let wt = world.linked("adhoc");
+        let store = wt.join(".fgos");
+        let session = AdmitRequest {
+            verb: "session",
+            store_mode: StoreMode::None,
+            ..submit(&store, &wt)
+        };
+        let refusal = world.admit(session).unwrap_err();
+        assert_eq!(refusal.fault_class, DISCONNECTED_WORKTREE_STORE);
+        assert!(refusal.message.starts_with("\"session\" refused: "));
+        let read_only = AdmitRequest {
+            mutates: false,
+            ..session
+        };
+        assert_eq!(
+            world.admit(read_only).unwrap(),
+            Admitted { warning: None },
+            "the non-mutating shape of the same verb is unaffected"
+        );
     }
 
     #[test]
