@@ -29,6 +29,25 @@ fn check() -> Result<()> {
 fn error(e: impl std::fmt::Display) -> Error {
     Error::from_reason(e.to_string())
 }
+/// What a detached seal or publish child fails with when the state root it was started for is gone.
+const STATE_ROOT_GONE: &str = "state-root-gone";
+/// The driver on `state_root`. A detached child never rebuilds a root its owner tore down: it fails
+/// `state-root-gone` and its caller skips quietly. Every other caller creates an absent root.
+fn driver_for(state_root: &str, detached: Option<bool>) -> Result<fgos_git::GitDriver> {
+    let root = std::path::Path::new(state_root);
+    if detached.unwrap_or(false) {
+        fgos_git::GitDriver::new_if_root_exists(root)
+            .map_err(operation)?
+            .ok_or_else(|| error(STATE_ROOT_GONE))
+    } else {
+        fgos_git::GitDriver::new(root).map_err(operation)
+    }
+}
+
+/// A Git operation's refusal as the addon's error: its code and cause, for the caller to branch on.
+pub(crate) fn operation(e: fgos_git::OperationError) -> Error {
+    error(json!({"code": e.code, "cause": e.cause}))
+}
 #[napi]
 pub fn versions() -> Result<Value> {
     check()?;

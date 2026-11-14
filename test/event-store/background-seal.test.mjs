@@ -4,6 +4,7 @@ import '../helpers/process-tmp-root.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import { spawn, spawnSync } from 'node:child_process';
 import { initGitCwd, addViaCli, run } from '../cli/helpers/fgos-cli-harness.mjs';
@@ -130,4 +131,21 @@ test('a dispatched worker seals inline: the command returns sealed and starts no
   assert.equal(w.receipt(), w.total(), 'the seal was done by the command itself');
   await sleep(300);
   assert.deepEqual(w.sealChildren(), []);
+});
+
+test('a detached seal or publish child skips quietly when its state root is gone and never rebuilds it', async () => {
+  const w = workspace();
+  const stateRoot = path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'bs-state-')), 'state');
+  const env = { ...w.env, FGOS_STATE_ROOT: stateRoot };
+  assert.equal(spawnSync(process.execPath, [BIN, 'move', 'bs-1', '--to', 'blocked'], { cwd: w.cwd, env, encoding: 'utf8' }).status, 0);
+  assert.ok(fs.existsSync(stateRoot), 'a foreground Work command creates its state root');
+  await waitFor('every child of the command to end', () => scan({}).every((view) => !/ events (?:seal|sync) /.test(` ${[view.cmdline].flat().join(' ')} `) || !String(view.cmdline).includes(w.cwd) || (view.tuple !== null && judge(view.tuple) === 'dead')));
+  fs.rmSync(stateRoot, { recursive: true, force: true });
+  for (const args of [['events', 'sync', '--opportunistic', '--dir', w.cwd], ['events', 'seal', '--stream', 'project', '--dir', w.cwd]]) {
+    const child = spawnSync(process.execPath, [BIN, ...args], { cwd: w.cwd, env, encoding: 'utf8' });
+    assert.equal(child.status, 0, `${args[1]}: ${child.stderr}`);
+    assert.equal(child.stderr, '', `${args[1]} is quiet`);
+    assert.equal(JSON.parse(child.stdout).data.skipped, 'state root gone', `${args[1]} reports why it skipped: ${child.stdout}`);
+    assert.equal(fs.existsSync(stateRoot), false, `${args[1]} left the gone state root gone`);
+  }
 });

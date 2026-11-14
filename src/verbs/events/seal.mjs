@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { eventsContext } from './context.mjs';
+import { eventsContext, STATE_ROOT_GONE } from './context.mjs';
 
 const STREAM = /^[a-z][a-z0-9-]*$/;
 const refusal = (message) => Object.assign(new Error(message), { code: 'validation', category: 'validation' });
@@ -7,12 +7,15 @@ const refusal = (message) => Object.assign(new Error(message), { code: 'validati
 /**
  * Seal the open batch of one stream now, waiting for the seal lock (a bounded wait, never try-and-skip), so the
  * events certified here include every append that finished before this call. Nothing open: returns at once. A lock
- * still held after the wait answers `{ busy: true }`, not a failure.
+ * still held after the wait answers `{ busy: true }`, not a failure. A state root that is gone is skipped
+ * (`STATE_ROOT_GONE`): the seal is a detached child and never rebuilds a root its owner tore down.
  * `history` names the consumer's history checkpoint the seal extends; it must be a file under the main `.fgos/cache`.
  */
 export function sealUseCase(ctx, { stream, history } = {}) {
   if (typeof stream !== 'string' || !STREAM.test(stream)) throw refusal('events seal requires --stream <name>');
-  const { store, heldRanks, facts } = eventsContext(ctx);
+  const context = eventsContext(ctx, { detached: true });
+  if (!context) return STATE_ROOT_GONE;
+  const { store, heldRanks, facts } = context;
   let checkpointPath;
   if (history !== undefined) {
     const cacheDir = path.join(facts.trustedMain, '.fgos', 'cache') + path.sep;

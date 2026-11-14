@@ -1218,3 +1218,26 @@ fn listing_one_namespace_returns_exactly_its_refs_and_pages_the_same_way() {
     assert_eq!(names("refs/tags/foo", 100), vec![vec!["refs/tags/foo"]]);
     let _ = fs::remove_dir_all(&root);
 }
+#[test]
+fn a_driver_for_a_detached_child_never_creates_a_gone_state_root() {
+    use std::os::unix::fs::PermissionsExt;
+    let root = std::env::temp_dir().join(format!("fgos-detached-root-{}", std::process::id()));
+    let _ = fs::remove_dir_all(&root);
+    fs::create_dir(&root).unwrap();
+    fs::set_permissions(&root, fs::Permissions::from_mode(0o700)).unwrap();
+
+    // The owner tore the root down: nothing is rebuilt and nothing is left behind.
+    let gone = root.join("state/fgos");
+    assert!(GitDriver::new_if_root_exists(&gone).unwrap().is_none());
+    assert!(
+        fs::symlink_metadata(root.join("state")).is_err(),
+        "no directory of the gone root was created"
+    );
+
+    // An existing root is used as it stands, and its own subdirectories are still made.
+    fs::create_dir_all(&gone).unwrap();
+    fs::set_permissions(&gone, fs::Permissions::from_mode(0o700)).unwrap();
+    assert!(GitDriver::new_if_root_exists(&gone).unwrap().is_some());
+    assert!(gone.join("git-empty-hooks").is_dir());
+    let _ = fs::remove_dir_all(&root);
+}
