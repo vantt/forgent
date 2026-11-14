@@ -10,43 +10,20 @@
 
 import crypto from 'node:crypto';
 import { bindSeat } from '../../seat-binding/client.mjs';
+import { bindingTasteOf } from './capability-config.mjs';
 
 /** The runner config keys seat choice reads; everything else in `runner` is not part of the digest. */
 const SEAT_CONFIG_KEYS = Object.freeze(['defaults', 'maxTier', 'tierFallback', 'modelPolicies']);
-const SCOPE_GROUPS = Object.freeze(['roles', 'personas', 'seats']);
 const MAX_CACHED = 2000;
 
 const isObject = (value) => value !== null && typeof value === 'object' && !Array.isArray(value);
-
-/** `prefer` in the shape the crate reads: a list of executor ids and `{executor, invocation}` pins. */
-const preferList = (prefer) => (typeof prefer === 'string' ? [prefer] : prefer);
-
-function scopeOf(entry) {
-  const out = {};
-  if (entry.tier !== undefined) out.tier = entry.tier;
-  if (entry.prefer !== undefined) out.prefer = preferList(entry.prefer);
-  return out;
-}
-
-function capabilityOf(entry) {
-  const out = {};
-  for (const key of ['tier', 'maxTier']) if (entry[key] !== undefined) out[key] = entry[key];
-  if (entry.prefer !== undefined) out.prefer = preferList(entry.prefer);
-  for (const group of SCOPE_GROUPS) {
-    if (!isObject(entry[group])) continue;
-    out[group] = Object.fromEntries(Object.entries(entry[group]).filter(([, scope]) => isObject(scope)).map(([name, scope]) => [name, scopeOf(scope)]));
-  }
-  return out;
-}
 
 /** The slice of a runner config the crate reads: tier vocabulary, cells, fallback order and the per-capability taste. */
 export function seatConfigOf(runnerConfig) {
   const runner = runnerConfig?.runner && !runnerConfig.modelPolicies ? runnerConfig.runner : (runnerConfig ?? {});
   const config = {};
   for (const key of SEAT_CONFIG_KEYS) if (runner[key] !== undefined) config[key] = runner[key];
-  config.capabilities = Object.fromEntries(
-    Object.entries(runner.capabilities ?? {}).filter(([, entry]) => isObject(entry)).map(([name, entry]) => [name, capabilityOf(entry)]),
-  );
+  config.capabilities = bindingTasteOf(runner);
   return config;
 }
 

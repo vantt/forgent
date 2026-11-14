@@ -1,6 +1,8 @@
 // Canonical operation -> dispatch capability derivation.
 // Leaf module shared by coordination binding and assignment policy resolution.
 
+import { hasCapabilityEntry } from './execution/capability-config.mjs';
+
 /**
  * Derive an operation's canonical dispatch capability.
  * Declared policy wins. Work-product operations require the facade's primary
@@ -21,9 +23,8 @@ export function deriveOperationCapability(operation, facts = {}, runnerConfig) {
     return { name: null, source: 'unbound' };
   }
 
-  const capabilities = runnerConfig?.capabilities;
   const domainCapability = facts.domain ? `${facts.domain}:review` : undefined;
-  if (domainCapability && capabilities && typeof capabilities === 'object' && capabilities[domainCapability]) {
+  if (domainCapability && hasCapabilityEntry(runnerConfig, domainCapability)) {
     return { name: domainCapability, source: 'domain-review-fallback' };
   }
   return { name: 'review', source: 'generic-review-fallback' };

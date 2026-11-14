@@ -15,7 +15,8 @@ import { isCommandAvailable } from '../paths.mjs';
 import { credentialSourceForCli, credentialStoreOf, providerAccountInventory, readAccountStates } from '../dispatch/provider-capacity.mjs';
 import { parseTierCell } from '../dispatch/tier-cell.mjs';
 import { legacyStateKey } from '../dispatch/llm-accounts.mjs';
-import { PRODUCER_POSTURE, capabilityEntriesOf, effectiveRigorOf, workflowTierOf } from './seat-resolver.mjs';
+import { PRODUCER_POSTURE, effectiveRigorOf, workflowTierOf } from './seat-resolver.mjs';
+import { capabilityPersonaOf } from './capability-config.mjs';
 import { seatBinding } from './seat-policy.mjs';
 
 export const BIND_CONTRACT_VERSION = 'v1alpha1';
@@ -59,7 +60,7 @@ function executorFamily(runnerConfig, executorId) {
  * `base` is the same chain without the persona an override named, which is what the tier is judged
  * against before the selection (an override persona that lifts the tier is a raise).
  */
-function resolvePersona({ ask, unit, matchingOverride, capEntries }) {
+function resolvePersona({ ask, unit, matchingOverride, capPersona }) {
   const { persona: seatPersona = null, lockedPersona = null } = ask ?? {};
   const unitPersona = typeof unit?.persona === 'string' && unit.persona ? unit.persona : null;
   if (lockedPersona && unitPersona && unitPersona !== lockedPersona) {
@@ -68,12 +69,11 @@ function resolvePersona({ ask, unit, matchingOverride, capEntries }) {
   if (matchingOverride?.persona && lockedPersona && matchingOverride.persona !== lockedPersona) {
     return { refused: { reason: 'locked-persona', detail: `Cannot override locked persona "${lockedPersona}" with "${matchingOverride.persona}"` } };
   }
-  const capDefault = capEntries.find(({ entry }) => entry.persona);
   const chain = (skip) => {
     if (seatPersona) return { persona: seatPersona, source: 'seat' };
     if (unitPersona && unitPersona !== skip) return { persona: unitPersona, source: 'unit' };
     if (lockedPersona) return { persona: lockedPersona, source: 'locked-persona' };
-    if (capDefault) return { persona: capDefault.entry.persona, source: `capability:${capDefault.key}` };
+    if (capPersona) return { persona: capPersona.persona, source: `capability:${capPersona.key}` };
     return { persona: null, source: 'none' };
   };
   const selected = matchingOverride?.persona ?? null;
@@ -356,7 +356,7 @@ function requestOf(ask, ctx, walk) {
       return { refused: { reason: 'reasoning-effort', detail: err.message } };
     }
   }
-  const persona = resolvePersona({ ask, unit, matchingOverride, capEntries: capabilityEntriesOf(runnerConfig, unit?.capability) });
+  const persona = resolvePersona({ ask, unit, matchingOverride, capPersona: capabilityPersonaOf(runnerConfig, unit?.capability) });
   if (persona.refused) return { refused: persona.refused };
 
   const selectors = persona.selected ? { persona: persona.selected } : {};

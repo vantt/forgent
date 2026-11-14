@@ -15,7 +15,8 @@ import { resolveExecutorProvider, resolveExecutorGovernance } from './executor-g
 import { REPEAT_MODE_VALUES } from './execution-contract.mjs';
 import { RIGOR_VALUES, resolveStrongerRigor } from '../rigor.mjs';
 import { deriveOperationCapability } from '../operation-capability.mjs';
-import { SEAT_ROLES, capabilityRigorOf, effectiveRigorOf } from '../execution/seat-resolver.mjs';
+import { SEAT_ROLES, effectiveRigorOf } from '../execution/seat-resolver.mjs';
+import { capabilityRigorOf } from '../execution/capability-config.mjs';
 import { isReadOnlyAssignment } from './assignment.mjs';
 import { bindWorkSeat } from '../execution/bind.mjs';
 

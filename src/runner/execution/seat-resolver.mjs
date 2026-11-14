@@ -9,7 +9,8 @@
 //            stance (a panel member's passive stance measurement), verdict (a checker's verdict).
 
 import { assertSeatId } from '../../convention/seat-id.mjs';
-import { RIGOR_VALUES, RIGOR_RANK, resolveStrongerRigor } from '../rigor.mjs';
+import { RIGOR_RANK, resolveStrongerRigor } from '../rigor.mjs';
+import { capabilityRigorOf, minCheckersOf } from './capability-config.mjs';
 
 export const SEAT_ROLES = Object.freeze(['producer', 'synthesizer', 'reviewer', 'red-team', 'judge']);
 export const LOOP_NAMES = Object.freeze(['solo', 'reviewed', 'panel', 'debate']);
@@ -87,15 +88,6 @@ export function hasUsablePrefer(entry) {
   return typeof prefer === 'string' ? prefer.trim() !== '' : Array.isArray(prefer) && prefer.length > 0;
 }
 
-/** The rigor a capability declares: its exact entry, else the `<prefix>:*` entry's. */
-export function capabilityRigorOf(runnerConfig, capability) {
-  const rigor = capabilityEntriesOf(runnerConfig, capability).map(({ entry }) => entry.rigor).find((r) => r !== undefined);
-  if (rigor !== undefined && !RIGOR_VALUES.includes(rigor)) {
-    throw new RangeError(`invalid capability rigor "${rigor}" for "${capability}". Valid rigors: [${RIGOR_VALUES.join(', ')}]`);
-  }
-  return rigor;
-}
-
 /**
  * The rigor a unit runs at: the stronger of its own and its capability's. `undefined` when neither
  * says one, unless `fallback` names the rigor to read in that case.
@@ -136,13 +128,13 @@ export function checkerPlanOf(unit, runnerConfig, options = {}) {
 
   // 2. The capability's minCheckers (exact key, then `<prefix>:*`; the first defined wins, [] clears the
   // default), else the shipped default.
-  const capEntry = capabilityEntriesOf(runnerConfig, unit?.capability).find((e) => e.entry?.minCheckers !== undefined);
-  if (capEntry) {
-    const min = capEntry.entry.minCheckers;
-    for (const seat of (Array.isArray(min) ? min : (min ? [min] : []))) add(seat, `capability:${capEntry.key}`);
+  const own = minCheckersOf(runnerConfig, unit?.capability);
+  if (own) {
+    const min = own.minCheckers;
+    for (const seat of (Array.isArray(min) ? min : (min ? [min] : []))) add(seat, `capability:${own.key}`);
   } else {
-    const defaultEntry = capabilityEntriesOf(DEFAULT_CAPABILITY_CONFIG, unit?.capability).find((e) => e.entry?.minCheckers !== undefined);
-    for (const seat of defaultEntry?.entry.minCheckers ?? []) add(seat, 'code:default-red-team');
+    const shipped = minCheckersOf(DEFAULT_CAPABILITY_CONFIG, unit?.capability);
+    for (const seat of shipped?.minCheckers ?? []) add(seat, 'code:default-red-team');
   }
 
   // 3. Floors: { minCheckers: [{ name, source }] }

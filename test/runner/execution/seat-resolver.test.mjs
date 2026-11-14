@@ -3,7 +3,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 
 import {
-  SEAT_ROLES, resolveSeats, checkDeclaredSeats, SeatResolutionError, effectiveRigorOf, capabilityRigorOf,
+  SEAT_ROLES, resolveSeats, checkDeclaredSeats, SeatResolutionError, effectiveRigorOf,
   requiresDistinctFamilies, seatLaunchesOf, seatKind, assertNoSeatTier, bindSeatOf, PRODUCER_POSTURE,
   checkerPlanOf, RESERVED_SEAT_IDS, DEFAULT_CAPABILITY_MIN_CHECKERS, CHECKER_SEATS,
 } from '../../../src/runner/execution/seat-resolver.mjs';
@@ -61,8 +61,6 @@ test('effective rigor is the stronger of the unit and the capability, the capabi
   assert.equal(effectiveRigorOf({ capability: 'docs:write', rigor: 'low' }, cfg), 'high');
   assert.equal(effectiveRigorOf({ capability: 'docs:write', rigor: 'critical' }, cfg), 'critical');
   assert.equal(effectiveRigorOf({ capability: 'code:implement' }, cfg), 'critical', 'the prefix entry covers a capability with no entry of its own');
-  assert.equal(capabilityRigorOf(cfg, 'docs:other'), undefined);
-  assert.equal(capabilityRigorOf(cfg, 'x:review'), undefined, 'the bare verb of a capability is not consulted');
   assert.equal(effectiveRigorOf({ capability: 'none:none' }, cfg), undefined);
   assert.equal(effectiveRigorOf({ capability: 'none:none' }, cfg, { fallback: 'standard' }), 'standard');
   assert.equal(requiresDistinctFamilies({ capability: 'docs:write' }, cfg), true);

@@ -13,7 +13,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-import { registeredCapabilityOf } from '../runner/dispatch/config.mjs';
+import { registeredCapabilityOf } from '../runner/execution/capability-config.mjs';
 import { globsMeet } from '../runner/dispatch/write-scope.mjs';
 import { RIGOR_ORDER } from './guide-schema.mjs';
 import { normalizeWrite } from './propose-classify.mjs';
