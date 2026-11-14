@@ -202,7 +202,6 @@
         { "path": "packages/holder-lock/rust/src/borrow_vectors.rs", "reason": "a vector module compiled into the crate whose shell snippet reads /proc/$!/winpid to learn a Windows pid" },
         { "path": "packages/git/rust/src/worktree.rs", "reason": "reads /proc/<pid>/comm after observing a pid" },
         { "path": "packages/git/node-addon/src/single_load.rs", "reason": "reads /proc/self/stat for this process start time, a third start-time reader" },
-        { "path": "packages/terminal-control/rust/src/driver/herdr.rs", "reason": "opens /proc/<pid>/fd/0 to find a pane's tty" },
         { "path": "scripts/run-tests.mjs", "reason": "scans /proc for stray processes of the test run" },
         { "path": "scripts/lib/test-file-watchdog.mjs", "reason": "scans /proc to judge a test file's processes" },
         { "path": "scripts/lib/test-file-cpu.mjs", "reason": "reads /proc/self/stat for waited CPU seconds" },

@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "cf0d283e08c96007a609d16dd387288f7547a29e9dc6103702a7ad945104e3de",
+  "payloadDigest": "c96df17b5406db8869b4097c76df084444bb0bffe6319420dc3f31c61ef0131c",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -733,7 +733,7 @@
     "packages/secrets/rust/tests/no_stdin.rs": "f5a93caf19c759dad53c486e13d953b3f3e3304863cb9ece42bb4e9dcf58f22c",
     "packages/secrets/rust/tests/resolver.rs": "bfa7437b4749119b415a7cce89cb36321f98831aa6c4b0a3e17f0933a445e1a2",
     "packages/terminal-control/rust/src/core.rs": "34c50b92e35bd4614e31a7dd0c67211ebf9c2dc15128d4c13ec022e338d125cc",
-    "packages/terminal-control/rust/src/driver/herdr.rs": "e657ded2bf7a54cd484b5435c735f5d18c95cadb5369a6a58d46a9aa345abea4",
+    "packages/terminal-control/rust/src/driver/herdr.rs": "a0278aa50a09553628f74f3ff6fe32654e98e64cad459085397de99b44b57445",
     "packages/terminal-control/rust/src/driver/mod.rs": "6206e5b17dc512c20437d4ab9ba4ffd608028f79cce76a2b78f52b5804dcf4aa",
     "packages/terminal-control/rust/src/identity.rs": "0f691e1b201d6d12e0d1f2a99f9acc318f3008acea56b5043ceb85dac6062cf6",
     "packages/terminal-control/rust/src/lib.rs": "f420d65492eb50bf458a3ab331d5483707ee4326db490ab440a6aab0fb9ba263",
