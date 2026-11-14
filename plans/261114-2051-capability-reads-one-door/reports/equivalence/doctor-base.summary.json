@@ -1,0 +1,40 @@
+{
+ "base": "781537524",
+ "rows": {
+  "runner-patterns-config": {
+   "status": "ok",
+   "passed": true,
+   "messageDigest": "sha256:50523c4a1ef9991d6814bb2b44245fba0f5c0736407feb190380631a5fa9f9f3"
+  },
+  "workflow-capabilities-configured": {
+   "status": "ok",
+   "passed": true,
+   "messageDigest": "sha256:56829dcc1c89faac6b69f7278663b0569433f2c8296ed33013041da4f4908f3e"
+  },
+  "capability-serves-valid": {
+   "status": "ok",
+   "passed": true,
+   "messageDigest": "sha256:ddf38f4898c757cdfb7c3246afc4b5cbf9112b42f5bd201d84653e9250138b53"
+  },
+  "confinement-policies-declared": {
+   "status": "ok",
+   "passed": true,
+   "messageDigest": "sha256:05b43996309f0c29b88000f3e8c948a45cdd018a23fcd0a4ff08f7b86935df74"
+  },
+  "confinement-strict-readiness": {
+   "status": "warn",
+   "passed": true,
+   "messageDigest": "sha256:4ea5361bac11f001d110514e390d3c32d2f6b3fa350f2d046798f82e2fc32eb8"
+  },
+  "seat-binding-dry-bind": {
+   "status": "ok",
+   "passed": true,
+   "messageDigest": "sha256:226aa97615e88aef36ba0dbecfa1206da93ce7480625ff6e4260bd32cf688434"
+  },
+  "seat-binding-route": {
+   "status": "ok",
+   "passed": true,
+   "messageDigest": "sha256:9b8fa6fedd18cf9ed6b8ebe1a11abb8e37c91fa5719dbc188486711fb75bd528"
+  }
+ }
+}

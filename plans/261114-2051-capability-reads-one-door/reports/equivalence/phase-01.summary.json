@@ -1,0 +1,1305 @@
+{
+  "run": "phase-01",
+  "failures": 0,
+  "notes": 0,
+  "inputs": {
+    "standard": {
+      "seatConfigDigest": {
+        "base": "sha256:1241e4aa6a5da7f5919192b73e2e5c180763de9c74afdb3fbd9d5fed7dca5f29",
+        "head": "sha256:1241e4aa6a5da7f5919192b73e2e5c180763de9c74afdb3fbd9d5fed7dca5f29",
+        "allowlisted": []
+      },
+      "snapshotHash": {
+        "base": "sha256:be61c3d5fc1540f9c022b3d2e7cca1a2e51e2806c10ea6b33277531c5dbf75f9",
+        "head": "sha256:be61c3d5fc1540f9c022b3d2e7cca1a2e51e2806c10ea6b33277531c5dbf75f9",
+        "allowlisted": []
+      },
+      "validateShape": {
+        "base": "sha256:1025507233e81ac0885449d20670f5fa8f7bc3f383e28f9d1865f14ede4e9eb4",
+        "head": "sha256:1025507233e81ac0885449d20670f5fa8f7bc3f383e28f9d1865f14ede4e9eb4",
+        "allowlisted": []
+      },
+      "lint": {
+        "base": "sha256:f5273f84ce6b0fe1d8a021ad414f9bfa0788c539e69df5f2c965e499aa862e9d",
+        "head": "sha256:f5273f84ce6b0fe1d8a021ad414f9bfa0788c539e69df5f2c965e499aa862e9d",
+        "allowlisted": []
+      },
+      "proposal": {
+        "base": "sha256:adc0373af37508e48fcbe7a15732ff22f96efdcd01886d1624dabbc752da35de",
+        "head": "sha256:adc0373af37508e48fcbe7a15732ff22f96efdcd01886d1624dabbc752da35de",
+        "allowlisted": []
+      },
+      "effectiveRigor": {
+        "base": "sha256:5560bf0bbf41128ab7534b9acc0ac9d2db385ed13f9f62d0b05091363c6835ef",
+        "head": "sha256:5560bf0bbf41128ab7534b9acc0ac9d2db385ed13f9f62d0b05091363c6835ef",
+        "allowlisted": []
+      },
+      "checkerPlan": {
+        "base": "sha256:da87239e323ae07c09387f8d1c80184155e2b870854e1efe29b20f6b572ef047",
+        "head": "sha256:da87239e323ae07c09387f8d1c80184155e2b870854e1efe29b20f6b572ef047",
+        "allowlisted": []
+      },
+      "registeredCapability": {
+        "base": "sha256:da4b81cdeacdf45db7ab729e25ca4ff4aa9fa1de47375fe51eb8fa1121b79ccd",
+        "head": "sha256:da4b81cdeacdf45db7ab729e25ca4ff4aa9fa1de47375fe51eb8fa1121b79ccd",
+        "allowlisted": []
+      },
+      "verifyCommand": {
+        "base": "sha256:345f71963a63ba6b7f988eae607fb781952f43f28729163cf93bc2389f5dc902",
+        "head": "sha256:345f71963a63ba6b7f988eae607fb781952f43f28729163cf93bc2389f5dc902",
+        "allowlisted": []
+      },
+      "executorAndOverrides": {
+        "base": "sha256:77285360466244eb1f8a6176dd66d2f8f693950ac80a105eaeaa1e43b32756cf",
+        "head": "sha256:77285360466244eb1f8a6176dd66d2f8f693950ac80a105eaeaa1e43b32756cf",
+        "allowlisted": []
+      },
+      "capabilityDetailsExecutor": {
+        "base": "sha256:f7c24fb3ffe7386cda1bbfe4459dd244163150b8187ffa6e220b6b3f7bc90d89",
+        "head": "sha256:f7c24fb3ffe7386cda1bbfe4459dd244163150b8187ffa6e220b6b3f7bc90d89",
+        "allowlisted": []
+      },
+      "capabilityDetailsCandidate": {
+        "base": "sha256:3ddec4bfc34edfbc1d23d66c8fa4bf3f09b44ca4c0fca4ebb06911d4cf7974d5",
+        "head": "sha256:3ddec4bfc34edfbc1d23d66c8fa4bf3f09b44ca4c0fca4ebb06911d4cf7974d5",
+        "allowlisted": []
+      },
+      "confinement": {
+        "base": "sha256:8d1ba260c3bde03fd94f616f8ba2dc1dfa723f5fb05e3dd7f0a68c5a3cf3a403",
+        "head": "sha256:8d1ba260c3bde03fd94f616f8ba2dc1dfa723f5fb05e3dd7f0a68c5a3cf3a403",
+        "allowlisted": []
+      },
+      "dispatchPlan": {
+        "base": "sha256:922dc375f07e1952c5af58b023fd4a35ca562c494e431e10314cdcb7d42ca088",
+        "head": "sha256:922dc375f07e1952c5af58b023fd4a35ca562c494e431e10314cdcb7d42ca088",
+        "allowlisted": []
+      },
+      "legacyChecker": {
+        "base": "sha256:607e59a4c28a1a761863d405716331a97ff3f4af8dc307254e37d1956726764e",
+        "head": "sha256:607e59a4c28a1a761863d405716331a97ff3f4af8dc307254e37d1956726764e",
+        "allowlisted": []
+      },
+      "proposalRefusals": {
+        "base": "sha256:36101d9b4031dbc6388362af4ba3d5fe0d797c0a3f877c117e7cac6924101379",
+        "head": "sha256:36101d9b4031dbc6388362af4ba3d5fe0d797c0a3f877c117e7cac6924101379",
+        "allowlisted": []
+      },
+      "bind": {
+        "base": "sha256:4df12ac5295b192eb86368bab4b7153d27dc1089d55204f4b9471e5331491bcd",
+        "head": "sha256:4df12ac5295b192eb86368bab4b7153d27dc1089d55204f4b9471e5331491bcd",
+        "allowlisted": []
+      },
+      "operationCapability": {
+        "base": "sha256:cf9237e8b74a9a501b7105ee8f8347f9933f8eac0458c23e8f2e8d4318100b55",
+        "head": "sha256:cf9237e8b74a9a501b7105ee8f8347f9933f8eac0458c23e8f2e8d4318100b55",
+        "allowlisted": []
+      }
+    },
+    "repo": {
+      "seatConfigDigest": {
+        "base": "sha256:8f2fe253519471542be2b7c10934717b9ce5a10eee5da2622fe3eb448b059557",
+        "head": "sha256:8f2fe253519471542be2b7c10934717b9ce5a10eee5da2622fe3eb448b059557",
+        "allowlisted": []
+      },
+      "snapshotHash": {
+        "base": "sha256:7b35135b80b8c0a06775800eecb3fcc998b7d963c72eab531ea7347533e18014",
+        "head": "sha256:7b35135b80b8c0a06775800eecb3fcc998b7d963c72eab531ea7347533e18014",
+        "allowlisted": []
+      },
+      "validateShape": {
+        "base": "sha256:1025507233e81ac0885449d20670f5fa8f7bc3f383e28f9d1865f14ede4e9eb4",
+        "head": "sha256:1025507233e81ac0885449d20670f5fa8f7bc3f383e28f9d1865f14ede4e9eb4",
+        "allowlisted": []
+      },
+      "lint": {
+        "base": "sha256:f5273f84ce6b0fe1d8a021ad414f9bfa0788c539e69df5f2c965e499aa862e9d",
+        "head": "sha256:f5273f84ce6b0fe1d8a021ad414f9bfa0788c539e69df5f2c965e499aa862e9d",
+        "allowlisted": []
+      },
+      "proposal": {
+        "base": "sha256:adc0373af37508e48fcbe7a15732ff22f96efdcd01886d1624dabbc752da35de",
+        "head": "sha256:adc0373af37508e48fcbe7a15732ff22f96efdcd01886d1624dabbc752da35de",
+        "allowlisted": []
+      },
+      "effectiveRigor": {
+        "base": "sha256:5560bf0bbf41128ab7534b9acc0ac9d2db385ed13f9f62d0b05091363c6835ef",
+        "head": "sha256:5560bf0bbf41128ab7534b9acc0ac9d2db385ed13f9f62d0b05091363c6835ef",
+        "allowlisted": []
+      },
+      "checkerPlan": {
+        "base": "sha256:da87239e323ae07c09387f8d1c80184155e2b870854e1efe29b20f6b572ef047",
+        "head": "sha256:da87239e323ae07c09387f8d1c80184155e2b870854e1efe29b20f6b572ef047",
+        "allowlisted": []
+      },
+      "registeredCapability": {
+        "base": "sha256:da4b81cdeacdf45db7ab729e25ca4ff4aa9fa1de47375fe51eb8fa1121b79ccd",
+        "head": "sha256:da4b81cdeacdf45db7ab729e25ca4ff4aa9fa1de47375fe51eb8fa1121b79ccd",
+        "allowlisted": []
+      },
+      "verifyCommand": {
+        "base": "sha256:345f71963a63ba6b7f988eae607fb781952f43f28729163cf93bc2389f5dc902",
+        "head": "sha256:345f71963a63ba6b7f988eae607fb781952f43f28729163cf93bc2389f5dc902",
+        "allowlisted": []
+      },
+      "executorAndOverrides": {
+        "base": "sha256:32a961817de871f4013646e0440400f2a066831c66610ad26751e74c2231d5e6",
+        "head": "sha256:32a961817de871f4013646e0440400f2a066831c66610ad26751e74c2231d5e6",
+        "allowlisted": []
+      },
+      "capabilityDetailsExecutor": {
+        "base": "sha256:f7c24fb3ffe7386cda1bbfe4459dd244163150b8187ffa6e220b6b3f7bc90d89",
+        "head": "sha256:f7c24fb3ffe7386cda1bbfe4459dd244163150b8187ffa6e220b6b3f7bc90d89",
+        "allowlisted": []
+      },
+      "capabilityDetailsCandidate": {
+        "base": "sha256:3ddec4bfc34edfbc1d23d66c8fa4bf3f09b44ca4c0fca4ebb06911d4cf7974d5",
+        "head": "sha256:3ddec4bfc34edfbc1d23d66c8fa4bf3f09b44ca4c0fca4ebb06911d4cf7974d5",
+        "allowlisted": []
+      },
+      "confinement": {
+        "base": "sha256:8d1ba260c3bde03fd94f616f8ba2dc1dfa723f5fb05e3dd7f0a68c5a3cf3a403",
+        "head": "sha256:8d1ba260c3bde03fd94f616f8ba2dc1dfa723f5fb05e3dd7f0a68c5a3cf3a403",
+        "allowlisted": []
+      },
+      "dispatchPlan": {
+        "base": "sha256:14b2a5a12012eb094338db8605623c20df88237bdb4a909f6514a864389f427d",
+        "head": "sha256:14b2a5a12012eb094338db8605623c20df88237bdb4a909f6514a864389f427d",
+        "allowlisted": []
+      },
+      "legacyChecker": {
+        "base": "sha256:607e59a4c28a1a761863d405716331a97ff3f4af8dc307254e37d1956726764e",
+        "head": "sha256:607e59a4c28a1a761863d405716331a97ff3f4af8dc307254e37d1956726764e",
+        "allowlisted": []
+      },
+      "proposalRefusals": {
+        "base": "sha256:36101d9b4031dbc6388362af4ba3d5fe0d797c0a3f877c117e7cac6924101379",
+        "head": "sha256:36101d9b4031dbc6388362af4ba3d5fe0d797c0a3f877c117e7cac6924101379",
+        "allowlisted": []
+      },
+      "bind": {
+        "base": "sha256:874a4b388824cb08c516057396514c8cdc03cc077792560dbfc6d9a0144d24ef",
+        "head": "sha256:874a4b388824cb08c516057396514c8cdc03cc077792560dbfc6d9a0144d24ef",
+        "allowlisted": []
+      },
+      "operationCapability": {
+        "base": "sha256:cf9237e8b74a9a501b7105ee8f8347f9933f8eac0458c23e8f2e8d4318100b55",
+        "head": "sha256:cf9237e8b74a9a501b7105ee8f8347f9933f8eac0458c23e8f2e8d4318100b55",
+        "allowlisted": []
+      }
+    },
+    "m-verify": {
+      "seatConfigDigest": {
+        "base": "sha256:a299fc65760366693460babdb8cb493d413d1ce1face737020f8c2c54db9f13a",
+        "head": "sha256:a299fc65760366693460babdb8cb493d413d1ce1face737020f8c2c54db9f13a",
+        "allowlisted": []
+      },
+      "snapshotHash": {
+        "base": "sha256:75100cfacca9c35e2a282e2607b724dfca1ff9d08b328233413c50237790fac0",
+        "head": "sha256:75100cfacca9c35e2a282e2607b724dfca1ff9d08b328233413c50237790fac0",
+        "allowlisted": []
+      },
+      "validateShape": {
+        "base": "sha256:1025507233e81ac0885449d20670f5fa8f7bc3f383e28f9d1865f14ede4e9eb4",
+        "head": "sha256:1025507233e81ac0885449d20670f5fa8f7bc3f383e28f9d1865f14ede4e9eb4",
+        "allowlisted": []
+      },
+      "lint": {
+        "base": "sha256:c4141e0d6dcdf4c18dbb1a7988aa27bd41c5f1cad60af794f338f5c2390ab04d",
+        "head": "sha256:c4141e0d6dcdf4c18dbb1a7988aa27bd41c5f1cad60af794f338f5c2390ab04d",
+        "allowlisted": []
+      },
+      "proposal": {
+        "base": "sha256:f52a7112400605916575f9d6aeaa7deada0a70904d49467986c34259c4e08761",
+        "head": "sha256:f52a7112400605916575f9d6aeaa7deada0a70904d49467986c34259c4e08761",
+        "allowlisted": []
+      },
+      "effectiveRigor": {
+        "base": "sha256:9a80003300662aa7143903366192d71b64617079d8b5d270642c432a8924d974",
+        "head": "sha256:9a80003300662aa7143903366192d71b64617079d8b5d270642c432a8924d974",
+        "allowlisted": []
+      },
+      "checkerPlan": {
+        "base": "sha256:b1b0ed89e6f7aab43a8e5b8b831321d12272805176d6cfe8e50b21508543edde",
+        "head": "sha256:b1b0ed89e6f7aab43a8e5b8b831321d12272805176d6cfe8e50b21508543edde",
+        "allowlisted": []
+      },
+      "registeredCapability": {
+        "base": "sha256:f5e2f3b40f6a8a813976fb6a1ebdd99afd0d2fc639274ab8a8ec0e0268dad344",
+        "head": "sha256:f5e2f3b40f6a8a813976fb6a1ebdd99afd0d2fc639274ab8a8ec0e0268dad344",
+        "allowlisted": []
+      },
+      "verifyCommand": {
+        "base": "sha256:3b34bc2496f40ba8aaa4c5150f37a9e497a6e05f99c79cb47357acf5fdd7a738",
+        "head": "sha256:3b34bc2496f40ba8aaa4c5150f37a9e497a6e05f99c79cb47357acf5fdd7a738",
+        "allowlisted": []
+      },
+      "executorAndOverrides": {
+        "base": "sha256:dd14cb645ca6cc8737bcb589e21f888a12dc82b976ed513673ed5fdfbbdb27f3",
+        "head": "sha256:dd14cb645ca6cc8737bcb589e21f888a12dc82b976ed513673ed5fdfbbdb27f3",
+        "allowlisted": []
+      },
+      "capabilityDetailsExecutor": {
+        "base": "sha256:6ff2cbf6adc7aeaddafd907b20d22fd4d92d03310deb105d8228f068a8e4ab45",
+        "head": "sha256:6ff2cbf6adc7aeaddafd907b20d22fd4d92d03310deb105d8228f068a8e4ab45",
+        "allowlisted": []
+      },
+      "capabilityDetailsCandidate": {
+        "base": "sha256:5e435f3e3ce5062555def3a66760e95f5b96946b1951f56f52064ad9c683a074",
+        "head": "sha256:5e435f3e3ce5062555def3a66760e95f5b96946b1951f56f52064ad9c683a074",
+        "allowlisted": []
+      },
+      "confinement": {
+        "base": "sha256:4448ac8ccd2f5735e1a5f652a62dd1cc9b4c1ec5da3d3a7bdc357d998363aa76",
+        "head": "sha256:4448ac8ccd2f5735e1a5f652a62dd1cc9b4c1ec5da3d3a7bdc357d998363aa76",
+        "allowlisted": []
+      },
+      "dispatchPlan": {
+        "base": "sha256:81fc7c982386c7499310fdf5d3402c0fb7ac9daee4daa8f4ee02a7a81d1b9300",
+        "head": "sha256:81fc7c982386c7499310fdf5d3402c0fb7ac9daee4daa8f4ee02a7a81d1b9300",
+        "allowlisted": []
+      },
+      "legacyChecker": {
+        "base": "sha256:5ef70d841875410706285edb7a9b4d83077f5646896e566c405db931e24369a7",
+        "head": "sha256:5ef70d841875410706285edb7a9b4d83077f5646896e566c405db931e24369a7",
+        "allowlisted": []
+      },
+      "proposalRefusals": {
+        "base": "sha256:9e7d5350347d7ca06eeb18733b35074d1e898b616e0d276bd16e1be99ae721c1",
+        "head": "sha256:9e7d5350347d7ca06eeb18733b35074d1e898b616e0d276bd16e1be99ae721c1",
+        "allowlisted": []
+      },
+      "bind": {
+        "base": "sha256:b75d34efd1794f2759994af52ea3ab19f25a651bc52e85f820392cef6035323a",
+        "head": "sha256:b75d34efd1794f2759994af52ea3ab19f25a651bc52e85f820392cef6035323a",
+        "allowlisted": []
+      },
+      "operationCapability": {
+        "base": "sha256:90a17169215ee2a2f881247dc0e8c7f3e56e57857e8cb597b3808d6c39240f29",
+        "head": "sha256:90a17169215ee2a2f881247dc0e8c7f3e56e57857e8cb597b3808d6c39240f29",
+        "allowlisted": []
+      }
+    },
+    "m-nested": {
+      "seatConfigDigest": {
+        "base": "sha256:a299fc65760366693460babdb8cb493d413d1ce1face737020f8c2c54db9f13a",
+        "head": "sha256:a299fc65760366693460babdb8cb493d413d1ce1face737020f8c2c54db9f13a",
+        "allowlisted": []
+      },
+      "snapshotHash": {
+        "base": "sha256:60d9aed8e052dee0e3a9564bd735636878d70f7712ca439f9bdb0beb0a78c6a0",
+        "head": "sha256:60d9aed8e052dee0e3a9564bd735636878d70f7712ca439f9bdb0beb0a78c6a0",
+        "allowlisted": []
+      },
+      "validateShape": {
+        "base": "sha256:1025507233e81ac0885449d20670f5fa8f7bc3f383e28f9d1865f14ede4e9eb4",
+        "head": "sha256:1025507233e81ac0885449d20670f5fa8f7bc3f383e28f9d1865f14ede4e9eb4",
+        "allowlisted": []
+      },
+      "lint": {
+        "base": "sha256:d4dca91fe1ce2542674654d6f753233c7a502d207895e757ab227399dfd4f84b",
+        "head": "sha256:d4dca91fe1ce2542674654d6f753233c7a502d207895e757ab227399dfd4f84b",
+        "allowlisted": []
+      },
+      "proposal": {
+        "base": "sha256:ae27179678e981a49af4859000d2c8971e72dd30e3ace62ac4324162df1cc5e6",
+        "head": "sha256:ae27179678e981a49af4859000d2c8971e72dd30e3ace62ac4324162df1cc5e6",
+        "allowlisted": []
+      },
+      "effectiveRigor": {
+        "base": "sha256:9a80003300662aa7143903366192d71b64617079d8b5d270642c432a8924d974",
+        "head": "sha256:9a80003300662aa7143903366192d71b64617079d8b5d270642c432a8924d974",
+        "allowlisted": []
+      },
+      "checkerPlan": {
+        "base": "sha256:b1b0ed89e6f7aab43a8e5b8b831321d12272805176d6cfe8e50b21508543edde",
+        "head": "sha256:b1b0ed89e6f7aab43a8e5b8b831321d12272805176d6cfe8e50b21508543edde",
+        "allowlisted": []
+      },
+      "registeredCapability": {
+        "base": "sha256:f5e2f3b40f6a8a813976fb6a1ebdd99afd0d2fc639274ab8a8ec0e0268dad344",
+        "head": "sha256:f5e2f3b40f6a8a813976fb6a1ebdd99afd0d2fc639274ab8a8ec0e0268dad344",
+        "allowlisted": []
+      },
+      "verifyCommand": {
+        "base": "sha256:809fa6eade4e14157a23251088357c7e2252652a0e0b2f0d51dc9efa67effa42",
+        "head": "sha256:809fa6eade4e14157a23251088357c7e2252652a0e0b2f0d51dc9efa67effa42",
+        "allowlisted": []
+      },
+      "executorAndOverrides": {
+        "base": "sha256:0ff046fb378e31082385aa06f09b8e03e2b111c310ef7bbe2ccf988e1bfe66f1",
+        "head": "sha256:0ff046fb378e31082385aa06f09b8e03e2b111c310ef7bbe2ccf988e1bfe66f1",
+        "allowlisted": []
+      },
+      "capabilityDetailsExecutor": {
+        "base": "sha256:450bba131b2033630296551c02bd5f9338467984c0775ae954f4200ed64d0c28",
+        "head": "sha256:450bba131b2033630296551c02bd5f9338467984c0775ae954f4200ed64d0c28",
+        "allowlisted": []
+      },
+      "capabilityDetailsCandidate": {
+        "base": "sha256:450bba131b2033630296551c02bd5f9338467984c0775ae954f4200ed64d0c28",
+        "head": "sha256:450bba131b2033630296551c02bd5f9338467984c0775ae954f4200ed64d0c28",
+        "allowlisted": []
+      },
+      "confinement": {
+        "base": "sha256:0a2075cba6f9679546c60cb2909552670db9793a3538df406eddbed6a09c9c59",
+        "head": "sha256:0a2075cba6f9679546c60cb2909552670db9793a3538df406eddbed6a09c9c59",
+        "allowlisted": []
+      },
+      "dispatchPlan": {
+        "base": "sha256:9a68da11c5f4c1c2ba728fc8b243cde45e9d56de40c0a17d65d821f34fb773bb",
+        "head": "sha256:9a68da11c5f4c1c2ba728fc8b243cde45e9d56de40c0a17d65d821f34fb773bb",
+        "allowlisted": []
+      },
+      "legacyChecker": {
+        "base": "sha256:5ef70d841875410706285edb7a9b4d83077f5646896e566c405db931e24369a7",
+        "head": "sha256:5ef70d841875410706285edb7a9b4d83077f5646896e566c405db931e24369a7",
+        "allowlisted": []
+      },
+      "proposalRefusals": {
+        "base": "sha256:2d805716c4cfb72237bb83bcf942e83ad70082b1ee83a54254a2ba310f7a18cf",
+        "head": "sha256:2d805716c4cfb72237bb83bcf942e83ad70082b1ee83a54254a2ba310f7a18cf",
+        "allowlisted": []
+      },
+      "bind": {
+        "base": "sha256:b75d34efd1794f2759994af52ea3ab19f25a651bc52e85f820392cef6035323a",
+        "head": "sha256:b75d34efd1794f2759994af52ea3ab19f25a651bc52e85f820392cef6035323a",
+        "allowlisted": []
+      },
+      "operationCapability": {
+        "base": "sha256:c84079be35b3a89ca11676eb4b68e25ebd26e1d171015499f8c5b7c269a7af14",
+        "head": "sha256:c84079be35b3a89ca11676eb4b68e25ebd26e1d171015499f8c5b7c269a7af14",
+        "allowlisted": []
+      }
+    },
+    "m-both": {
+      "seatConfigDigest": {
+        "base": "sha256:1eacedca8d0d5b6dae71f56a3550be51431171be033bf7b1ddb78d5042e3743e",
+        "head": "sha256:1eacedca8d0d5b6dae71f56a3550be51431171be033bf7b1ddb78d5042e3743e",
+        "allowlisted": []
+      },
+      "snapshotHash": {
+        "base": "sha256:facfad884f93489d5a22717a9c92a09483d4f9c2820557e7c5e6a09a849b4ad1",
+        "head": "sha256:facfad884f93489d5a22717a9c92a09483d4f9c2820557e7c5e6a09a849b4ad1",
+        "allowlisted": []
+      },
+      "validateShape": {
+        "base": "sha256:1025507233e81ac0885449d20670f5fa8f7bc3f383e28f9d1865f14ede4e9eb4",
+        "head": "sha256:1025507233e81ac0885449d20670f5fa8f7bc3f383e28f9d1865f14ede4e9eb4",
+        "allowlisted": []
+      },
+      "lint": {
+        "base": "sha256:f3ad09ba4ad25e3819f01992526c0f35cfc3c620ed67c7e2bccf93069fd81b39",
+        "head": "sha256:f3ad09ba4ad25e3819f01992526c0f35cfc3c620ed67c7e2bccf93069fd81b39",
+        "allowlisted": []
+      },
+      "proposal": {
+        "base": "sha256:adc0373af37508e48fcbe7a15732ff22f96efdcd01886d1624dabbc752da35de",
+        "head": "sha256:adc0373af37508e48fcbe7a15732ff22f96efdcd01886d1624dabbc752da35de",
+        "allowlisted": []
+      },
+      "effectiveRigor": {
+        "base": "sha256:287d422b3a63be6eab445c6da67c83a6c74f081611c3f030d201947ec50a01d2",
+        "head": "sha256:287d422b3a63be6eab445c6da67c83a6c74f081611c3f030d201947ec50a01d2",
+        "allowlisted": []
+      },
+      "checkerPlan": {
+        "base": "sha256:37709f9f633ff9ae0d64a5a8a8a17359ccb9733d11b1baf22976728acaa4ed4d",
+        "head": "sha256:37709f9f633ff9ae0d64a5a8a8a17359ccb9733d11b1baf22976728acaa4ed4d",
+        "allowlisted": []
+      },
+      "registeredCapability": {
+        "base": "sha256:b70310fb4d6e9f1e6966c45047ba25b0e9d4c48fc8d124a3d743891f62a18484",
+        "head": "sha256:b70310fb4d6e9f1e6966c45047ba25b0e9d4c48fc8d124a3d743891f62a18484",
+        "allowlisted": []
+      },
+      "verifyCommand": {
+        "base": "sha256:d5ff8e604e0615878ce080d758432b9b4d55ea85b75c2f047ade2c51080b78a6",
+        "head": "sha256:d5ff8e604e0615878ce080d758432b9b4d55ea85b75c2f047ade2c51080b78a6",
+        "allowlisted": []
+      },
+      "executorAndOverrides": {
+        "base": "sha256:bc7667a929e8148976050b473f3dc528c1e6e63b5f23037f4cbfc71bdd5afb0c",
+        "head": "sha256:bc7667a929e8148976050b473f3dc528c1e6e63b5f23037f4cbfc71bdd5afb0c",
+        "allowlisted": []
+      },
+      "capabilityDetailsExecutor": {
+        "base": "sha256:475c9ae8584381e0658c647f09c7cabeb718b73b457494b94d061da3e58f547c",
+        "head": "sha256:475c9ae8584381e0658c647f09c7cabeb718b73b457494b94d061da3e58f547c",
+        "allowlisted": []
+      },
+      "capabilityDetailsCandidate": {
+        "base": "sha256:475c9ae8584381e0658c647f09c7cabeb718b73b457494b94d061da3e58f547c",
+        "head": "sha256:475c9ae8584381e0658c647f09c7cabeb718b73b457494b94d061da3e58f547c",
+        "allowlisted": []
+      },
+      "confinement": {
+        "base": "sha256:34a81c0b2089d7e72c1f4fd326d8c0c423095a088127348c73aa7793d3d5c17f",
+        "head": "sha256:34a81c0b2089d7e72c1f4fd326d8c0c423095a088127348c73aa7793d3d5c17f",
+        "allowlisted": []
+      },
+      "dispatchPlan": {
+        "base": "sha256:9e6aeaec139d96ff67ed54e33f0778797f45e929c521db75ab755d002c773c09",
+        "head": "sha256:9e6aeaec139d96ff67ed54e33f0778797f45e929c521db75ab755d002c773c09",
+        "allowlisted": []
+      },
+      "legacyChecker": {
+        "base": "sha256:b7664f485f378673bd1cba91550531e02ec85cbfbe0f3fc771f449cca2327642",
+        "head": "sha256:b7664f485f378673bd1cba91550531e02ec85cbfbe0f3fc771f449cca2327642",
+        "allowlisted": []
+      },
+      "proposalRefusals": {
+        "base": "sha256:9d5b3df2ff372920e133fc40053c5291c3b10300d50c2b335d68cc9dd0aa6d02",
+        "head": "sha256:9d5b3df2ff372920e133fc40053c5291c3b10300d50c2b335d68cc9dd0aa6d02",
+        "allowlisted": []
+      },
+      "bind": {
+        "base": "sha256:7208111334408405e8acc2a5219cc391a09dcb36f2fad2a4fc702cdf3d031e23",
+        "head": "sha256:7208111334408405e8acc2a5219cc391a09dcb36f2fad2a4fc702cdf3d031e23",
+        "allowlisted": []
+      },
+      "operationCapability": {
+        "base": "sha256:167c2f63677c2f787fc33bbbbcf4e76fcf5ed8825fa1bf789307610ce4b2fb57",
+        "head": "sha256:167c2f63677c2f787fc33bbbbcf4e76fcf5ed8825fa1bf789307610ce4b2fb57",
+        "allowlisted": []
+      }
+    },
+    "m-persona-minc": {
+      "seatConfigDigest": {
+        "base": "sha256:deb84aaaf16af299c782a5fe80981c0ed998e673e58c7ecc514f78196aebb8de",
+        "head": "sha256:deb84aaaf16af299c782a5fe80981c0ed998e673e58c7ecc514f78196aebb8de",
+        "allowlisted": []
+      },
+      "snapshotHash": {
+        "base": "sha256:61a334b410f6f4ccc44dace19ef6b73821bed0964c05fa3e4884b862ef4f4aac",
+        "head": "sha256:61a334b410f6f4ccc44dace19ef6b73821bed0964c05fa3e4884b862ef4f4aac",
+        "allowlisted": []
+      },
+      "validateShape": {
+        "base": "sha256:1025507233e81ac0885449d20670f5fa8f7bc3f383e28f9d1865f14ede4e9eb4",
+        "head": "sha256:1025507233e81ac0885449d20670f5fa8f7bc3f383e28f9d1865f14ede4e9eb4",
+        "allowlisted": []
+      },
+      "lint": {
+        "base": "sha256:6c308c96c6c7f67b44b43d68c00935f136d010692983521d1caf3c93ffe7485e",
+        "head": "sha256:6c308c96c6c7f67b44b43d68c00935f136d010692983521d1caf3c93ffe7485e",
+        "allowlisted": []
+      },
+      "proposal": {
+        "base": "sha256:adc0373af37508e48fcbe7a15732ff22f96efdcd01886d1624dabbc752da35de",
+        "head": "sha256:adc0373af37508e48fcbe7a15732ff22f96efdcd01886d1624dabbc752da35de",
+        "allowlisted": []
+      },
+      "effectiveRigor": {
+        "base": "sha256:448bd73b5a8b15453cd83c9efe39b7f6d4dc59e836124ad759ecd25fc82fd9d7",
+        "head": "sha256:448bd73b5a8b15453cd83c9efe39b7f6d4dc59e836124ad759ecd25fc82fd9d7",
+        "allowlisted": []
+      },
+      "checkerPlan": {
+        "base": "sha256:f0ca51333155d4c7d94d1b34b1495c82c93b699439b99bf46410f71a4c702e60",
+        "head": "sha256:f0ca51333155d4c7d94d1b34b1495c82c93b699439b99bf46410f71a4c702e60",
+        "allowlisted": []
+      },
+      "registeredCapability": {
+        "base": "sha256:968837b4db9f5770c3609371c8f8c68951e4fe765f9789b9558769bf7df9f4d2",
+        "head": "sha256:968837b4db9f5770c3609371c8f8c68951e4fe765f9789b9558769bf7df9f4d2",
+        "allowlisted": []
+      },
+      "verifyCommand": {
+        "base": "sha256:f149f431284895a904148cd06df56704046da4c79f98731c529b080df0239fba",
+        "head": "sha256:f149f431284895a904148cd06df56704046da4c79f98731c529b080df0239fba",
+        "allowlisted": []
+      },
+      "executorAndOverrides": {
+        "base": "sha256:59da220b7b9582304910ac658160fdc9571faed15e77dabfd7c351ac5717e3c5",
+        "head": "sha256:59da220b7b9582304910ac658160fdc9571faed15e77dabfd7c351ac5717e3c5",
+        "allowlisted": []
+      },
+      "capabilityDetailsExecutor": {
+        "base": "sha256:5ca1d4a8c2a0de80cf890978637ff7d2bd9afe93d39daff6f9ffe3181d0e430e",
+        "head": "sha256:5ca1d4a8c2a0de80cf890978637ff7d2bd9afe93d39daff6f9ffe3181d0e430e",
+        "allowlisted": []
+      },
+      "capabilityDetailsCandidate": {
+        "base": "sha256:ec4e3a2829ea87a5f1b807d96523618e88b8bb9f7b1bbe87e03ce17b804ef1b1",
+        "head": "sha256:ec4e3a2829ea87a5f1b807d96523618e88b8bb9f7b1bbe87e03ce17b804ef1b1",
+        "allowlisted": []
+      },
+      "confinement": {
+        "base": "sha256:c38035f44b3017579e0d7703d36bdd9b0bbdb92bf5a14df049e6816eaf381d27",
+        "head": "sha256:c38035f44b3017579e0d7703d36bdd9b0bbdb92bf5a14df049e6816eaf381d27",
+        "allowlisted": []
+      },
+      "dispatchPlan": {
+        "base": "sha256:834b5de4c6465dd766afdd6c119017021d1987a7e9e5784ece746c95d212ccb4",
+        "head": "sha256:834b5de4c6465dd766afdd6c119017021d1987a7e9e5784ece746c95d212ccb4",
+        "allowlisted": []
+      },
+      "legacyChecker": {
+        "base": "sha256:a01133781b51c27789fa06bf6fb802441c6ae9012c68799a08ea79a4268dc677",
+        "head": "sha256:a01133781b51c27789fa06bf6fb802441c6ae9012c68799a08ea79a4268dc677",
+        "allowlisted": []
+      },
+      "proposalRefusals": {
+        "base": "sha256:3f61dd3513dfa659221e03648584842ab9a99f53224118ea05c1e2d4a62ce706",
+        "head": "sha256:3f61dd3513dfa659221e03648584842ab9a99f53224118ea05c1e2d4a62ce706",
+        "allowlisted": []
+      },
+      "bind": {
+        "base": "sha256:a0b2e1bba4695c1bfa7d1d21a15d72499d91bb964afc9499a2ca4bb1a58696f9",
+        "head": "sha256:a0b2e1bba4695c1bfa7d1d21a15d72499d91bb964afc9499a2ca4bb1a58696f9",
+        "allowlisted": []
+      },
+      "operationCapability": {
+        "base": "sha256:cf9237e8b74a9a501b7105ee8f8347f9933f8eac0458c23e8f2e8d4318100b55",
+        "head": "sha256:cf9237e8b74a9a501b7105ee8f8347f9933f8eac0458c23e8f2e8d4318100b55",
+        "allowlisted": []
+      }
+    },
+    "m-prefer": {
+      "seatConfigDigest": {
+        "base": "sha256:1a7e9ede29d444f0f7be96530fe946515cf8e9cc050f049c1291ebf578dde735",
+        "head": "sha256:1a7e9ede29d444f0f7be96530fe946515cf8e9cc050f049c1291ebf578dde735",
+        "allowlisted": []
+      },
+      "snapshotHash": {
+        "base": "sha256:d64c503c41b9f159a7bb243499afd8b7f0eea7fc9e9c48f8625d20cbe5b0f4a0",
+        "head": "sha256:d64c503c41b9f159a7bb243499afd8b7f0eea7fc9e9c48f8625d20cbe5b0f4a0",
+        "allowlisted": []
+      },
+      "validateShape": {
+        "base": "sha256:1025507233e81ac0885449d20670f5fa8f7bc3f383e28f9d1865f14ede4e9eb4",
+        "head": "sha256:1025507233e81ac0885449d20670f5fa8f7bc3f383e28f9d1865f14ede4e9eb4",
+        "allowlisted": []
+      },
+      "lint": {
+        "base": "sha256:906712adf1a59122e3affa0fb02eaee69d8dcac90e7674fe02e4e34745943590",
+        "head": "sha256:906712adf1a59122e3affa0fb02eaee69d8dcac90e7674fe02e4e34745943590",
+        "allowlisted": []
+      },
+      "proposal": {
+        "base": "sha256:adc0373af37508e48fcbe7a15732ff22f96efdcd01886d1624dabbc752da35de",
+        "head": "sha256:adc0373af37508e48fcbe7a15732ff22f96efdcd01886d1624dabbc752da35de",
+        "allowlisted": []
+      },
+      "effectiveRigor": {
+        "base": "sha256:fbaa9f9c04e2c68a9e9c9d32aaa078d68f39d0b340a847fac147ed53ed81245c",
+        "head": "sha256:fbaa9f9c04e2c68a9e9c9d32aaa078d68f39d0b340a847fac147ed53ed81245c",
+        "allowlisted": []
+      },
+      "checkerPlan": {
+        "base": "sha256:bb3937a2933c10496f66c406f76468db9e5954f2fda0038622d689cdd5fae6a2",
+        "head": "sha256:bb3937a2933c10496f66c406f76468db9e5954f2fda0038622d689cdd5fae6a2",
+        "allowlisted": []
+      },
+      "registeredCapability": {
+        "base": "sha256:4cc6e9abc3a4cc5e46c2b37e358a349cdd0ccfed190c3b6615cc0eab615714a3",
+        "head": "sha256:4cc6e9abc3a4cc5e46c2b37e358a349cdd0ccfed190c3b6615cc0eab615714a3",
+        "allowlisted": []
+      },
+      "verifyCommand": {
+        "base": "sha256:eb89cf779da13ea728a9fbb6c09a2133570b731bd05f7650ef7f1a46dfa7cb92",
+        "head": "sha256:eb89cf779da13ea728a9fbb6c09a2133570b731bd05f7650ef7f1a46dfa7cb92",
+        "allowlisted": []
+      },
+      "executorAndOverrides": {
+        "base": "sha256:5776dc73efb9c119cddbdfac014a476e07b1559a765971a23a662ce071cafc95",
+        "head": "sha256:5776dc73efb9c119cddbdfac014a476e07b1559a765971a23a662ce071cafc95",
+        "allowlisted": []
+      },
+      "capabilityDetailsExecutor": {
+        "base": "sha256:837945cfdfff84ade0342eb577fa83a9bd500d70875a0bc9526aee7fa832ad70",
+        "head": "sha256:837945cfdfff84ade0342eb577fa83a9bd500d70875a0bc9526aee7fa832ad70",
+        "allowlisted": []
+      },
+      "capabilityDetailsCandidate": {
+        "base": "sha256:be6b07959c32c3bda6193352ffb2cacb13dd14b8266661676b5385c73a299058",
+        "head": "sha256:be6b07959c32c3bda6193352ffb2cacb13dd14b8266661676b5385c73a299058",
+        "allowlisted": []
+      },
+      "confinement": {
+        "base": "sha256:91f3f2b3ca130d47ff72eabe099d7e8bdd81971a00368646444e9506a5d4db7a",
+        "head": "sha256:91f3f2b3ca130d47ff72eabe099d7e8bdd81971a00368646444e9506a5d4db7a",
+        "allowlisted": []
+      },
+      "dispatchPlan": {
+        "base": "sha256:1405341dc5509c849d9ae73b097c67dcc3b4e297f7b7f48011ce213a45ed8365",
+        "head": "sha256:1405341dc5509c849d9ae73b097c67dcc3b4e297f7b7f48011ce213a45ed8365",
+        "allowlisted": []
+      },
+      "legacyChecker": {
+        "base": "sha256:f4dc48ad3d28cd10eea5326eed14d722531085cc1150df932b73be25adce8f42",
+        "head": "sha256:f4dc48ad3d28cd10eea5326eed14d722531085cc1150df932b73be25adce8f42",
+        "allowlisted": []
+      },
+      "proposalRefusals": {
+        "base": "sha256:302081587d90361197c3a3150fe83c68ba8742c77244210d4a5d0abcaa5f9526",
+        "head": "sha256:302081587d90361197c3a3150fe83c68ba8742c77244210d4a5d0abcaa5f9526",
+        "allowlisted": []
+      },
+      "bind": {
+        "base": "sha256:c41cccd13ab731a08ead8db5b9c0579831f27ca469a8de46267b78ddfeeacf2e",
+        "head": "sha256:c41cccd13ab731a08ead8db5b9c0579831f27ca469a8de46267b78ddfeeacf2e",
+        "allowlisted": []
+      },
+      "operationCapability": {
+        "base": "sha256:f20342c585bae95cd05d1f6b8a71ad140a00ba9ba72e5dab26b4a84c8c5570a4",
+        "head": "sha256:f20342c585bae95cd05d1f6b8a71ad140a00ba9ba72e5dab26b4a84c8c5570a4",
+        "allowlisted": []
+      }
+    },
+    "m-prefer-blank": {
+      "seatConfigDigest": {
+        "base": "sha256:0a509b032424a448f30ce9b32186a57012218a96affc1a89f38ff4237f696a0b",
+        "head": "sha256:0a509b032424a448f30ce9b32186a57012218a96affc1a89f38ff4237f696a0b",
+        "allowlisted": []
+      },
+      "snapshotHash": {
+        "base": "sha256:1b2d69638d2bc9e10bd7af612b207bda0dc0f7f709f92305bde96a47d352f334",
+        "head": "sha256:1b2d69638d2bc9e10bd7af612b207bda0dc0f7f709f92305bde96a47d352f334",
+        "allowlisted": []
+      },
+      "validateShape": {
+        "base": "sha256:14d20b98c994c36276a505147390deea24e387cfc8871a234fda156f64d2792e",
+        "head": "sha256:14d20b98c994c36276a505147390deea24e387cfc8871a234fda156f64d2792e",
+        "allowlisted": []
+      },
+      "lint": {
+        "base": "sha256:cfb4f57f3655d0e16ed208d690fa22028b82633dedcb8b8032b01ff4ee2b98b4",
+        "head": "sha256:cfb4f57f3655d0e16ed208d690fa22028b82633dedcb8b8032b01ff4ee2b98b4",
+        "allowlisted": []
+      },
+      "proposal": {
+        "base": "sha256:adc0373af37508e48fcbe7a15732ff22f96efdcd01886d1624dabbc752da35de",
+        "head": "sha256:adc0373af37508e48fcbe7a15732ff22f96efdcd01886d1624dabbc752da35de",
+        "allowlisted": []
+      },
+      "effectiveRigor": {
+        "base": "sha256:970f8400aab1ed3a0d4073742ae9203063c5041bd89b40a7b54affe9ce3eb806",
+        "head": "sha256:970f8400aab1ed3a0d4073742ae9203063c5041bd89b40a7b54affe9ce3eb806",
+        "allowlisted": []
+      },
+      "checkerPlan": {
+        "base": "sha256:cea3580ca61393e52c492c03124fc0d60334e9d9004513e80ec80645b8250a35",
+        "head": "sha256:cea3580ca61393e52c492c03124fc0d60334e9d9004513e80ec80645b8250a35",
+        "allowlisted": []
+      },
+      "registeredCapability": {
+        "base": "sha256:d82103c52f57ef3ec6f68c07722e69efa2cede7db9a665bd1bf53f78575698f2",
+        "head": "sha256:d82103c52f57ef3ec6f68c07722e69efa2cede7db9a665bd1bf53f78575698f2",
+        "allowlisted": []
+      },
+      "verifyCommand": {
+        "base": "sha256:cf9cd9c3025f46d53654fd04451aecafd185a93380901ac5d1cf4765779c5354",
+        "head": "sha256:cf9cd9c3025f46d53654fd04451aecafd185a93380901ac5d1cf4765779c5354",
+        "allowlisted": []
+      },
+      "executorAndOverrides": {
+        "base": "sha256:956bf7abd61b8839441c1cd258687a2c12b28faa8571676c23452c5e0aa1ff8b",
+        "head": "sha256:956bf7abd61b8839441c1cd258687a2c12b28faa8571676c23452c5e0aa1ff8b",
+        "allowlisted": []
+      },
+      "capabilityDetailsExecutor": {
+        "base": "sha256:908d4d9f5a87b47691e1f0059ce34e259478619dfb26c456a01422bf228a3776",
+        "head": "sha256:908d4d9f5a87b47691e1f0059ce34e259478619dfb26c456a01422bf228a3776",
+        "allowlisted": []
+      },
+      "capabilityDetailsCandidate": {
+        "base": "sha256:6aef7849a67984202a4aefd400149df74cf178d9ccb8d6f2a146e49e78db8396",
+        "head": "sha256:6aef7849a67984202a4aefd400149df74cf178d9ccb8d6f2a146e49e78db8396",
+        "allowlisted": []
+      },
+      "confinement": {
+        "base": "sha256:d839a89f5cab8092491e0b543559b359db7fc79573f673530c53bf820d2a0bf9",
+        "head": "sha256:d839a89f5cab8092491e0b543559b359db7fc79573f673530c53bf820d2a0bf9",
+        "allowlisted": []
+      },
+      "dispatchPlan": {
+        "base": "sha256:6c177c3c98fe6d233cb3da1b4feb59b6ea01fcf31a1bd1ca23dd91258873f13a",
+        "head": "sha256:6c177c3c98fe6d233cb3da1b4feb59b6ea01fcf31a1bd1ca23dd91258873f13a",
+        "allowlisted": []
+      },
+      "legacyChecker": {
+        "base": "sha256:4b36470d7f81ec60a9d9c41cb2010c771af7f73998ac12a36f2962a8508ab660",
+        "head": "sha256:4b36470d7f81ec60a9d9c41cb2010c771af7f73998ac12a36f2962a8508ab660",
+        "allowlisted": []
+      },
+      "proposalRefusals": {
+        "base": "sha256:0cab44693a974f8fa6629dc8c3b7746b2cd82cd171ff7204e20a196d381e910b",
+        "head": "sha256:0cab44693a974f8fa6629dc8c3b7746b2cd82cd171ff7204e20a196d381e910b",
+        "allowlisted": []
+      },
+      "bind": {
+        "base": "sha256:47a9b3bffcdca564ec03a4988e6b2830d7824cdaa561a1d764ae74f1204c68c8",
+        "head": "sha256:47a9b3bffcdca564ec03a4988e6b2830d7824cdaa561a1d764ae74f1204c68c8",
+        "allowlisted": []
+      },
+      "operationCapability": {
+        "base": "sha256:f20342c585bae95cd05d1f6b8a71ad140a00ba9ba72e5dab26b4a84c8c5570a4",
+        "head": "sha256:f20342c585bae95cd05d1f6b8a71ad140a00ba9ba72e5dab26b4a84c8c5570a4",
+        "allowlisted": []
+      }
+    },
+    "m-entries": {
+      "seatConfigDigest": {
+        "base": "sha256:46a6ac56d212d29c8cc3266e5deb0e4513236c5c80f23e98e739e7108274e324",
+        "head": "sha256:46a6ac56d212d29c8cc3266e5deb0e4513236c5c80f23e98e739e7108274e324",
+        "allowlisted": []
+      },
+      "snapshotHash": {
+        "base": "sha256:7545e31e2d0d90d38df3d1666577a04a1f7a21b9a80b1af333dfa5f8b47c5101",
+        "head": "sha256:7545e31e2d0d90d38df3d1666577a04a1f7a21b9a80b1af333dfa5f8b47c5101",
+        "allowlisted": []
+      },
+      "validateShape": {
+        "base": "sha256:ba0a5b0d0229147d5cf9c33a9517959e1548a42649ea882a1ef11f9d41145d20",
+        "head": "sha256:ba0a5b0d0229147d5cf9c33a9517959e1548a42649ea882a1ef11f9d41145d20",
+        "allowlisted": []
+      },
+      "lint": {
+        "base": "sha256:ecc9e63219ccdc778eb1d09f530230b8b14833264cee4ad7adc4f1d36030d46e",
+        "head": "sha256:ecc9e63219ccdc778eb1d09f530230b8b14833264cee4ad7adc4f1d36030d46e",
+        "allowlisted": []
+      },
+      "proposal": {
+        "base": "sha256:adc0373af37508e48fcbe7a15732ff22f96efdcd01886d1624dabbc752da35de",
+        "head": "sha256:adc0373af37508e48fcbe7a15732ff22f96efdcd01886d1624dabbc752da35de",
+        "allowlisted": []
+      },
+      "effectiveRigor": {
+        "base": "sha256:91464e0ebc721146e161cd6116fee43bf6894d2633c28389b8fbaaa61ad59cc9",
+        "head": "sha256:91464e0ebc721146e161cd6116fee43bf6894d2633c28389b8fbaaa61ad59cc9",
+        "allowlisted": []
+      },
+      "checkerPlan": {
+        "base": "sha256:37bbc1c5c69825dd017e196311d069afd20dcc8cd89463f3a21c17fc0ed8c5e0",
+        "head": "sha256:37bbc1c5c69825dd017e196311d069afd20dcc8cd89463f3a21c17fc0ed8c5e0",
+        "allowlisted": []
+      },
+      "registeredCapability": {
+        "base": "sha256:ed4d312fc3a3cedb958c2ac15b6d2746e4e499a31f7928ee30cbed3c0c33a0c7",
+        "head": "sha256:5ca775f93b2cd90ba7a9d67c8f0bfd6aae5221c648b4e17ba423bb4dde5faeb1",
+        "allowlisted": [
+          "non-object-entry"
+        ]
+      },
+      "verifyCommand": {
+        "base": "sha256:54861d4448dbcc12a53e19a2262df01196db3375d93cc1a61f5f5fcd960c9bd9",
+        "head": "sha256:54861d4448dbcc12a53e19a2262df01196db3375d93cc1a61f5f5fcd960c9bd9",
+        "allowlisted": []
+      },
+      "executorAndOverrides": {
+        "base": "sha256:b75da6ab97ac5457b0836d14bd0110fc766667d92c3619f364bfae66255e814e",
+        "head": "sha256:b75da6ab97ac5457b0836d14bd0110fc766667d92c3619f364bfae66255e814e",
+        "allowlisted": []
+      },
+      "capabilityDetailsExecutor": {
+        "base": "sha256:dce051be12a3caf59b588aaab0c501d82027c014230143f3df1fb450abcb64c5",
+        "head": "sha256:dce051be12a3caf59b588aaab0c501d82027c014230143f3df1fb450abcb64c5",
+        "allowlisted": []
+      },
+      "capabilityDetailsCandidate": {
+        "base": "sha256:2ed519dda7bbc454f8ed2372980e12892b07e9957ac5a5bc919f61de1ca99b1a",
+        "head": "sha256:2ed519dda7bbc454f8ed2372980e12892b07e9957ac5a5bc919f61de1ca99b1a",
+        "allowlisted": []
+      },
+      "confinement": {
+        "base": "sha256:a6cccf663e0bf2aa129812bfb1135be35f3f4d288f6f15814fea43e927f884f4",
+        "head": "sha256:a6cccf663e0bf2aa129812bfb1135be35f3f4d288f6f15814fea43e927f884f4",
+        "allowlisted": []
+      },
+      "dispatchPlan": {
+        "base": "sha256:9b253e2377b57bbcbc26d21292c8d8db8a89cacb26854507b221f9199699e62f",
+        "head": "sha256:9b253e2377b57bbcbc26d21292c8d8db8a89cacb26854507b221f9199699e62f",
+        "allowlisted": []
+      },
+      "legacyChecker": {
+        "base": "sha256:0fd63578b1f9195bb48755eaa612933a6e8a17c56a23160b81468eef2cbd70aa",
+        "head": "sha256:0fd63578b1f9195bb48755eaa612933a6e8a17c56a23160b81468eef2cbd70aa",
+        "allowlisted": []
+      },
+      "proposalRefusals": {
+        "base": "sha256:f71a1585c3773a192072279df4b91b81f459bcabb2c753d6f779a193432081a6",
+        "head": "sha256:f01076907c94cc17f424bd84d5f24ca6da67c1552e29ca8b94ba3ec783c5133b",
+        "allowlisted": [
+          "non-object-entry"
+        ]
+      },
+      "bind": {
+        "base": "sha256:ce40dccb68720213ff562e20e14685d9744b56ab4e081f5e4f6851482dd8e769",
+        "head": "sha256:ce40dccb68720213ff562e20e14685d9744b56ab4e081f5e4f6851482dd8e769",
+        "allowlisted": []
+      },
+      "operationCapability": {
+        "base": "sha256:0df7f7786e3d8789603a630c5c7320fce543a15b9f18bfadae82e033747b9219",
+        "head": "sha256:8c8e20e46fb915c2ab03912f0248a6aa7d9d2b3091d3e7ba3ba1002340f53f47",
+        "allowlisted": [
+          "non-object-entry"
+        ]
+      }
+    },
+    "m-aliases": {
+      "seatConfigDigest": {
+        "base": "sha256:dab8bd1d934c8cde7648cdd0009c50faccf54e901a1c79d3d93100e8560511ba",
+        "head": "sha256:dab8bd1d934c8cde7648cdd0009c50faccf54e901a1c79d3d93100e8560511ba",
+        "allowlisted": []
+      },
+      "snapshotHash": {
+        "base": "sha256:aa54f39dbc3ef88b4dd78fdf22cec2d0ba8b191ae8555ffda503f95b00286199",
+        "head": "sha256:aa54f39dbc3ef88b4dd78fdf22cec2d0ba8b191ae8555ffda503f95b00286199",
+        "allowlisted": []
+      },
+      "validateShape": {
+        "base": "sha256:1025507233e81ac0885449d20670f5fa8f7bc3f383e28f9d1865f14ede4e9eb4",
+        "head": "sha256:1025507233e81ac0885449d20670f5fa8f7bc3f383e28f9d1865f14ede4e9eb4",
+        "allowlisted": []
+      },
+      "lint": {
+        "base": "sha256:3ad34eb27f0a26f5a6bb4914b0a0f3dd0ff82b437a666538abd1c19d0e3a2b01",
+        "head": "sha256:3ad34eb27f0a26f5a6bb4914b0a0f3dd0ff82b437a666538abd1c19d0e3a2b01",
+        "allowlisted": []
+      },
+      "proposal": {
+        "base": "sha256:adc0373af37508e48fcbe7a15732ff22f96efdcd01886d1624dabbc752da35de",
+        "head": "sha256:adc0373af37508e48fcbe7a15732ff22f96efdcd01886d1624dabbc752da35de",
+        "allowlisted": []
+      },
+      "effectiveRigor": {
+        "base": "sha256:8afa5f187e95815076822cfe0a07b1c05004ea1495b32afe1dbb07ffbb3472a5",
+        "head": "sha256:8afa5f187e95815076822cfe0a07b1c05004ea1495b32afe1dbb07ffbb3472a5",
+        "allowlisted": []
+      },
+      "checkerPlan": {
+        "base": "sha256:9a6f3bca9d92b04ae2b45e9170c6b8cf05fa78e03165001aab757a1c71939b5f",
+        "head": "sha256:9a6f3bca9d92b04ae2b45e9170c6b8cf05fa78e03165001aab757a1c71939b5f",
+        "allowlisted": []
+      },
+      "registeredCapability": {
+        "base": "sha256:99634c0c500a6f54d1af58ab04f827bc5dd1890ac0e0d26267dad55ab19ec309",
+        "head": "sha256:8ac93ef07fc2bf46b96e0e9534a9c820a77559561ffd76abbe9a173a1bf37ff8",
+        "allowlisted": [
+          "string-aliases"
+        ]
+      },
+      "verifyCommand": {
+        "base": "sha256:165aa37e133faa04e458b7b2d31a7946e00ddb40759333deb6e59943f70e09bd",
+        "head": "sha256:165aa37e133faa04e458b7b2d31a7946e00ddb40759333deb6e59943f70e09bd",
+        "allowlisted": []
+      },
+      "executorAndOverrides": {
+        "base": "sha256:5310dc8b79932e86d14deaa608b367e2a215ca36d123bfcd2cf7e03641ff6d60",
+        "head": "sha256:5310dc8b79932e86d14deaa608b367e2a215ca36d123bfcd2cf7e03641ff6d60",
+        "allowlisted": []
+      },
+      "capabilityDetailsExecutor": {
+        "base": "sha256:42604569d34082f2fc12e4352c25aa2e0f78f10f7459b39656e28de3e72ae447",
+        "head": "sha256:42604569d34082f2fc12e4352c25aa2e0f78f10f7459b39656e28de3e72ae447",
+        "allowlisted": []
+      },
+      "capabilityDetailsCandidate": {
+        "base": "sha256:d7dbef5b80975e3a5986b4a2c64b4ad94a18320e8e949e51638e11cf0d8ee778",
+        "head": "sha256:d7dbef5b80975e3a5986b4a2c64b4ad94a18320e8e949e51638e11cf0d8ee778",
+        "allowlisted": []
+      },
+      "confinement": {
+        "base": "sha256:e5a2f2fe3beada15c87d0f2e30bdfdb85b844adcd4a09a1a4222fad1ee8c23f1",
+        "head": "sha256:e5a2f2fe3beada15c87d0f2e30bdfdb85b844adcd4a09a1a4222fad1ee8c23f1",
+        "allowlisted": []
+      },
+      "dispatchPlan": {
+        "base": "sha256:477913baffb1ee9001ce044254bc04abc999fbeffd0b7e727fec5d6adae83ddb",
+        "head": "sha256:477913baffb1ee9001ce044254bc04abc999fbeffd0b7e727fec5d6adae83ddb",
+        "allowlisted": []
+      },
+      "legacyChecker": {
+        "base": "sha256:2734c513b59f01fccbffaccfe328a36623a081f38cc9453dd4b90afb1a4b8d13",
+        "head": "sha256:2734c513b59f01fccbffaccfe328a36623a081f38cc9453dd4b90afb1a4b8d13",
+        "allowlisted": []
+      },
+      "proposalRefusals": {
+        "base": "sha256:949f627a215b85d7535ec279bc4f2cc8e97331fedf2ebb3f1bfcecbdae681c89",
+        "head": "sha256:56ce9100e3925f5fd3b8a9232bd444bad77664cdfd6fae2f2d620d44658c741b",
+        "allowlisted": [
+          "string-aliases"
+        ]
+      },
+      "bind": {
+        "base": "sha256:1c7d87e5050e5da80315eea7aed6b709d1aa816c2e6ed044d65047752b16da79",
+        "head": "sha256:1c7d87e5050e5da80315eea7aed6b709d1aa816c2e6ed044d65047752b16da79",
+        "allowlisted": []
+      },
+      "operationCapability": {
+        "base": "sha256:9b0354efa3142452568f39463fe353876856d04b0ca4c0eb3757f50e3d511615",
+        "head": "sha256:9b0354efa3142452568f39463fe353876856d04b0ca4c0eb3757f50e3d511615",
+        "allowlisted": []
+      }
+    },
+    "m-nocolon": {
+      "seatConfigDigest": {
+        "base": "sha256:b4768452b8a35b5bd43375a84e4740bca86f31d0f1cccdc1f615ea55713a9c5d",
+        "head": "sha256:b4768452b8a35b5bd43375a84e4740bca86f31d0f1cccdc1f615ea55713a9c5d",
+        "allowlisted": []
+      },
+      "snapshotHash": {
+        "base": "sha256:04edbf1984b4ad6a757d06b407e87ed06d0decbebec8c9a9c1b88f90898bf810",
+        "head": "sha256:04edbf1984b4ad6a757d06b407e87ed06d0decbebec8c9a9c1b88f90898bf810",
+        "allowlisted": []
+      },
+      "validateShape": {
+        "base": "sha256:1025507233e81ac0885449d20670f5fa8f7bc3f383e28f9d1865f14ede4e9eb4",
+        "head": "sha256:1025507233e81ac0885449d20670f5fa8f7bc3f383e28f9d1865f14ede4e9eb4",
+        "allowlisted": []
+      },
+      "lint": {
+        "base": "sha256:60f1ddf5d7b67b480f55bdd3aee32a0eeb032212fe6ec4b71eba649464faaf61",
+        "head": "sha256:60f1ddf5d7b67b480f55bdd3aee32a0eeb032212fe6ec4b71eba649464faaf61",
+        "allowlisted": []
+      },
+      "proposal": {
+        "base": "sha256:adc0373af37508e48fcbe7a15732ff22f96efdcd01886d1624dabbc752da35de",
+        "head": "sha256:adc0373af37508e48fcbe7a15732ff22f96efdcd01886d1624dabbc752da35de",
+        "allowlisted": []
+      },
+      "effectiveRigor": {
+        "base": "sha256:85c44034ddb9b7838ad8d07867af1a2218c5d2c33699c0f53307156a86b8d868",
+        "head": "sha256:85c44034ddb9b7838ad8d07867af1a2218c5d2c33699c0f53307156a86b8d868",
+        "allowlisted": []
+      },
+      "checkerPlan": {
+        "base": "sha256:3a841de90f883a936a21944ef002347299ad262b588ba4b5091bd1fb8e31ef02",
+        "head": "sha256:3a841de90f883a936a21944ef002347299ad262b588ba4b5091bd1fb8e31ef02",
+        "allowlisted": []
+      },
+      "registeredCapability": {
+        "base": "sha256:6d9b1356eac59d9ddfa393c9aab5261fc04e737a84299bd5c4d72380d81b1e62",
+        "head": "sha256:6d9b1356eac59d9ddfa393c9aab5261fc04e737a84299bd5c4d72380d81b1e62",
+        "allowlisted": []
+      },
+      "verifyCommand": {
+        "base": "sha256:4d5b877999ba991820383f050c23c2e77a756cf749fd816d3438adcd832f3968",
+        "head": "sha256:4d5b877999ba991820383f050c23c2e77a756cf749fd816d3438adcd832f3968",
+        "allowlisted": []
+      },
+      "executorAndOverrides": {
+        "base": "sha256:08c5d24126c2c0ae77906d97f089f1977b58a81b0162e513485d93217df724d7",
+        "head": "sha256:08c5d24126c2c0ae77906d97f089f1977b58a81b0162e513485d93217df724d7",
+        "allowlisted": []
+      },
+      "capabilityDetailsExecutor": {
+        "base": "sha256:442285528fb06ca6a077ef98806dadf41ef0f8498f6a55539a3fdde4a8cef10b",
+        "head": "sha256:442285528fb06ca6a077ef98806dadf41ef0f8498f6a55539a3fdde4a8cef10b",
+        "allowlisted": []
+      },
+      "capabilityDetailsCandidate": {
+        "base": "sha256:d398a1d093a21719f3137837bc874175c360b3af0423468d2a5423a20f0a7a6b",
+        "head": "sha256:d398a1d093a21719f3137837bc874175c360b3af0423468d2a5423a20f0a7a6b",
+        "allowlisted": []
+      },
+      "confinement": {
+        "base": "sha256:31f9121fbdd94c190e97a913567b2bdecebb50f4c247fddb0744031681cb8acd",
+        "head": "sha256:31f9121fbdd94c190e97a913567b2bdecebb50f4c247fddb0744031681cb8acd",
+        "allowlisted": []
+      },
+      "dispatchPlan": {
+        "base": "sha256:0f7a660c51f1c020d47e71bcffa1a8d6216e26676da264f2f0f46113da88cf41",
+        "head": "sha256:0f7a660c51f1c020d47e71bcffa1a8d6216e26676da264f2f0f46113da88cf41",
+        "allowlisted": []
+      },
+      "legacyChecker": {
+        "base": "sha256:e2f10b05ba932a355cab734475dd9fac3921d7bf0b9e1b102c07303240fb2705",
+        "head": "sha256:e2f10b05ba932a355cab734475dd9fac3921d7bf0b9e1b102c07303240fb2705",
+        "allowlisted": []
+      },
+      "proposalRefusals": {
+        "base": "sha256:2b6ba360a891b22d03a129d3ce7c95ff422c225f90c0cbe78606c71deb55f501",
+        "head": "sha256:2b6ba360a891b22d03a129d3ce7c95ff422c225f90c0cbe78606c71deb55f501",
+        "allowlisted": []
+      },
+      "bind": {
+        "base": "sha256:d4d95047e6d096f839c16f10d85236e9a1157ec80298edfc3573109b0f2628ef",
+        "head": "sha256:d4d95047e6d096f839c16f10d85236e9a1157ec80298edfc3573109b0f2628ef",
+        "allowlisted": []
+      },
+      "operationCapability": {
+        "base": "sha256:9189201c56827bb048cc00f7453283edefdc2dfd903f97c5310162b8bd9ec790",
+        "head": "sha256:9189201c56827bb048cc00f7453283edefdc2dfd903f97c5310162b8bd9ec790",
+        "allowlisted": []
+      }
+    },
+    "m-proto-own": {
+      "seatConfigDigest": {
+        "base": "sha256:1aea7858d3b572f60899a86985a87c14076393ed829efcdef994265b8b41771f",
+        "head": "sha256:1aea7858d3b572f60899a86985a87c14076393ed829efcdef994265b8b41771f",
+        "allowlisted": []
+      },
+      "snapshotHash": {
+        "base": "sha256:87850f51d6c13afd776eb56e47aae3e0102b8c760eb68c0e9f4bf87cc7e07e65",
+        "head": "sha256:87850f51d6c13afd776eb56e47aae3e0102b8c760eb68c0e9f4bf87cc7e07e65",
+        "allowlisted": []
+      },
+      "validateShape": {
+        "base": "sha256:1025507233e81ac0885449d20670f5fa8f7bc3f383e28f9d1865f14ede4e9eb4",
+        "head": "sha256:1025507233e81ac0885449d20670f5fa8f7bc3f383e28f9d1865f14ede4e9eb4",
+        "allowlisted": []
+      },
+      "lint": {
+        "base": "sha256:200d322519de0bb612ff3989d73b683e97f994d53b76391547ae5f70eba72116",
+        "head": "sha256:200d322519de0bb612ff3989d73b683e97f994d53b76391547ae5f70eba72116",
+        "allowlisted": []
+      },
+      "proposal": {
+        "base": "sha256:adc0373af37508e48fcbe7a15732ff22f96efdcd01886d1624dabbc752da35de",
+        "head": "sha256:adc0373af37508e48fcbe7a15732ff22f96efdcd01886d1624dabbc752da35de",
+        "allowlisted": []
+      },
+      "effectiveRigor": {
+        "base": "sha256:5560bf0bbf41128ab7534b9acc0ac9d2db385ed13f9f62d0b05091363c6835ef",
+        "head": "sha256:5560bf0bbf41128ab7534b9acc0ac9d2db385ed13f9f62d0b05091363c6835ef",
+        "allowlisted": []
+      },
+      "checkerPlan": {
+        "base": "sha256:da87239e323ae07c09387f8d1c80184155e2b870854e1efe29b20f6b572ef047",
+        "head": "sha256:da87239e323ae07c09387f8d1c80184155e2b870854e1efe29b20f6b572ef047",
+        "allowlisted": []
+      },
+      "registeredCapability": {
+        "base": "sha256:fb73e274580645d651d9df8bd67c90db91b2d9dd3fb8d4ebb9ee6abf0d1d6334",
+        "head": "sha256:fb73e274580645d651d9df8bd67c90db91b2d9dd3fb8d4ebb9ee6abf0d1d6334",
+        "allowlisted": []
+      },
+      "verifyCommand": {
+        "base": "sha256:345f71963a63ba6b7f988eae607fb781952f43f28729163cf93bc2389f5dc902",
+        "head": "sha256:345f71963a63ba6b7f988eae607fb781952f43f28729163cf93bc2389f5dc902",
+        "allowlisted": []
+      },
+      "executorAndOverrides": {
+        "base": "sha256:77285360466244eb1f8a6176dd66d2f8f693950ac80a105eaeaa1e43b32756cf",
+        "head": "sha256:77285360466244eb1f8a6176dd66d2f8f693950ac80a105eaeaa1e43b32756cf",
+        "allowlisted": []
+      },
+      "capabilityDetailsExecutor": {
+        "base": "sha256:2eccfd584a53d8ca59f206803919cbe1cddb7495917d6e555f968acfef3b6c58",
+        "head": "sha256:2eccfd584a53d8ca59f206803919cbe1cddb7495917d6e555f968acfef3b6c58",
+        "allowlisted": []
+      },
+      "capabilityDetailsCandidate": {
+        "base": "sha256:3ddec4bfc34edfbc1d23d66c8fa4bf3f09b44ca4c0fca4ebb06911d4cf7974d5",
+        "head": "sha256:3ddec4bfc34edfbc1d23d66c8fa4bf3f09b44ca4c0fca4ebb06911d4cf7974d5",
+        "allowlisted": []
+      },
+      "confinement": {
+        "base": "sha256:8d1ba260c3bde03fd94f616f8ba2dc1dfa723f5fb05e3dd7f0a68c5a3cf3a403",
+        "head": "sha256:8d1ba260c3bde03fd94f616f8ba2dc1dfa723f5fb05e3dd7f0a68c5a3cf3a403",
+        "allowlisted": []
+      },
+      "dispatchPlan": {
+        "base": "sha256:922dc375f07e1952c5af58b023fd4a35ca562c494e431e10314cdcb7d42ca088",
+        "head": "sha256:922dc375f07e1952c5af58b023fd4a35ca562c494e431e10314cdcb7d42ca088",
+        "allowlisted": []
+      },
+      "legacyChecker": {
+        "base": "sha256:607e59a4c28a1a761863d405716331a97ff3f4af8dc307254e37d1956726764e",
+        "head": "sha256:607e59a4c28a1a761863d405716331a97ff3f4af8dc307254e37d1956726764e",
+        "allowlisted": []
+      },
+      "proposalRefusals": {
+        "base": "sha256:9942039d50b8841d2566e78015d00653cf17bf18477ce0fb93f3b041f10ccb15",
+        "head": "sha256:9942039d50b8841d2566e78015d00653cf17bf18477ce0fb93f3b041f10ccb15",
+        "allowlisted": []
+      },
+      "bind": {
+        "base": "sha256:d91315ab3d2820f4d7b80ef911d50234e22cc46811ac15c2c45c0f4fb3e1c94c",
+        "head": "sha256:d91315ab3d2820f4d7b80ef911d50234e22cc46811ac15c2c45c0f4fb3e1c94c",
+        "allowlisted": []
+      },
+      "operationCapability": {
+        "base": "sha256:cf9237e8b74a9a501b7105ee8f8347f9933f8eac0458c23e8f2e8d4318100b55",
+        "head": "sha256:cf9237e8b74a9a501b7105ee8f8347f9933f8eac0458c23e8f2e8d4318100b55",
+        "allowlisted": []
+      }
+    },
+    "m-proto-absent": {
+      "seatConfigDigest": {
+        "base": "sha256:1241e4aa6a5da7f5919192b73e2e5c180763de9c74afdb3fbd9d5fed7dca5f29",
+        "head": "sha256:1241e4aa6a5da7f5919192b73e2e5c180763de9c74afdb3fbd9d5fed7dca5f29",
+        "allowlisted": []
+      },
+      "snapshotHash": {
+        "base": "sha256:be61c3d5fc1540f9c022b3d2e7cca1a2e51e2806c10ea6b33277531c5dbf75f9",
+        "head": "sha256:be61c3d5fc1540f9c022b3d2e7cca1a2e51e2806c10ea6b33277531c5dbf75f9",
+        "allowlisted": []
+      },
+      "validateShape": {
+        "base": "sha256:1025507233e81ac0885449d20670f5fa8f7bc3f383e28f9d1865f14ede4e9eb4",
+        "head": "sha256:1025507233e81ac0885449d20670f5fa8f7bc3f383e28f9d1865f14ede4e9eb4",
+        "allowlisted": []
+      },
+      "lint": {
+        "base": "sha256:f5273f84ce6b0fe1d8a021ad414f9bfa0788c539e69df5f2c965e499aa862e9d",
+        "head": "sha256:f5273f84ce6b0fe1d8a021ad414f9bfa0788c539e69df5f2c965e499aa862e9d",
+        "allowlisted": []
+      },
+      "proposal": {
+        "base": "sha256:adc0373af37508e48fcbe7a15732ff22f96efdcd01886d1624dabbc752da35de",
+        "head": "sha256:adc0373af37508e48fcbe7a15732ff22f96efdcd01886d1624dabbc752da35de",
+        "allowlisted": []
+      },
+      "effectiveRigor": {
+        "base": "sha256:5560bf0bbf41128ab7534b9acc0ac9d2db385ed13f9f62d0b05091363c6835ef",
+        "head": "sha256:5560bf0bbf41128ab7534b9acc0ac9d2db385ed13f9f62d0b05091363c6835ef",
+        "allowlisted": []
+      },
+      "checkerPlan": {
+        "base": "sha256:da87239e323ae07c09387f8d1c80184155e2b870854e1efe29b20f6b572ef047",
+        "head": "sha256:da87239e323ae07c09387f8d1c80184155e2b870854e1efe29b20f6b572ef047",
+        "allowlisted": []
+      },
+      "registeredCapability": {
+        "base": "sha256:da4b81cdeacdf45db7ab729e25ca4ff4aa9fa1de47375fe51eb8fa1121b79ccd",
+        "head": "sha256:da4b81cdeacdf45db7ab729e25ca4ff4aa9fa1de47375fe51eb8fa1121b79ccd",
+        "allowlisted": []
+      },
+      "verifyCommand": {
+        "base": "sha256:345f71963a63ba6b7f988eae607fb781952f43f28729163cf93bc2389f5dc902",
+        "head": "sha256:345f71963a63ba6b7f988eae607fb781952f43f28729163cf93bc2389f5dc902",
+        "allowlisted": []
+      },
+      "executorAndOverrides": {
+        "base": "sha256:77285360466244eb1f8a6176dd66d2f8f693950ac80a105eaeaa1e43b32756cf",
+        "head": "sha256:77285360466244eb1f8a6176dd66d2f8f693950ac80a105eaeaa1e43b32756cf",
+        "allowlisted": []
+      },
+      "capabilityDetailsExecutor": {
+        "base": "sha256:f7c24fb3ffe7386cda1bbfe4459dd244163150b8187ffa6e220b6b3f7bc90d89",
+        "head": "sha256:f7c24fb3ffe7386cda1bbfe4459dd244163150b8187ffa6e220b6b3f7bc90d89",
+        "allowlisted": []
+      },
+      "capabilityDetailsCandidate": {
+        "base": "sha256:3ddec4bfc34edfbc1d23d66c8fa4bf3f09b44ca4c0fca4ebb06911d4cf7974d5",
+        "head": "sha256:3ddec4bfc34edfbc1d23d66c8fa4bf3f09b44ca4c0fca4ebb06911d4cf7974d5",
+        "allowlisted": []
+      },
+      "confinement": {
+        "base": "sha256:8d1ba260c3bde03fd94f616f8ba2dc1dfa723f5fb05e3dd7f0a68c5a3cf3a403",
+        "head": "sha256:8d1ba260c3bde03fd94f616f8ba2dc1dfa723f5fb05e3dd7f0a68c5a3cf3a403",
+        "allowlisted": []
+      },
+      "dispatchPlan": {
+        "base": "sha256:922dc375f07e1952c5af58b023fd4a35ca562c494e431e10314cdcb7d42ca088",
+        "head": "sha256:922dc375f07e1952c5af58b023fd4a35ca562c494e431e10314cdcb7d42ca088",
+        "allowlisted": []
+      },
+      "legacyChecker": {
+        "base": "sha256:607e59a4c28a1a761863d405716331a97ff3f4af8dc307254e37d1956726764e",
+        "head": "sha256:607e59a4c28a1a761863d405716331a97ff3f4af8dc307254e37d1956726764e",
+        "allowlisted": []
+      },
+      "proposalRefusals": {
+        "base": "sha256:36101d9b4031dbc6388362af4ba3d5fe0d797c0a3f877c117e7cac6924101379",
+        "head": "sha256:36101d9b4031dbc6388362af4ba3d5fe0d797c0a3f877c117e7cac6924101379",
+        "allowlisted": []
+      },
+      "bind": {
+        "base": "sha256:4df12ac5295b192eb86368bab4b7153d27dc1089d55204f4b9471e5331491bcd",
+        "head": "sha256:4df12ac5295b192eb86368bab4b7153d27dc1089d55204f4b9471e5331491bcd",
+        "allowlisted": []
+      },
+      "operationCapability": {
+        "base": "sha256:cf9237e8b74a9a501b7105ee8f8347f9933f8eac0458c23e8f2e8d4318100b55",
+        "head": "sha256:cf9237e8b74a9a501b7105ee8f8347f9933f8eac0458c23e8f2e8d4318100b55",
+        "allowlisted": []
+      }
+    },
+    "m-rigor": {
+      "seatConfigDigest": {
+        "base": "sha256:afe213d252ca16ca4074a23d659d9cb72a8fbfc2446fdf7093563f706bbd37e0",
+        "head": "sha256:afe213d252ca16ca4074a23d659d9cb72a8fbfc2446fdf7093563f706bbd37e0",
+        "allowlisted": []
+      },
+      "snapshotHash": {
+        "base": "sha256:f569654fa5e3e31f3cba280f43e4cbe6113737689f40b08b442e7ec73086ad83",
+        "head": "sha256:f569654fa5e3e31f3cba280f43e4cbe6113737689f40b08b442e7ec73086ad83",
+        "allowlisted": []
+      },
+      "validateShape": {
+        "base": "sha256:1025507233e81ac0885449d20670f5fa8f7bc3f383e28f9d1865f14ede4e9eb4",
+        "head": "sha256:1025507233e81ac0885449d20670f5fa8f7bc3f383e28f9d1865f14ede4e9eb4",
+        "allowlisted": []
+      },
+      "lint": {
+        "base": "sha256:60f1ddf5d7b67b480f55bdd3aee32a0eeb032212fe6ec4b71eba649464faaf61",
+        "head": "sha256:60f1ddf5d7b67b480f55bdd3aee32a0eeb032212fe6ec4b71eba649464faaf61",
+        "allowlisted": []
+      },
+      "proposal": {
+        "base": "sha256:adc0373af37508e48fcbe7a15732ff22f96efdcd01886d1624dabbc752da35de",
+        "head": "sha256:adc0373af37508e48fcbe7a15732ff22f96efdcd01886d1624dabbc752da35de",
+        "allowlisted": []
+      },
+      "effectiveRigor": {
+        "base": "sha256:fd99a12daabf4bda21a30b84b62be66a893f4cba34b311df9202323ba51a40e7",
+        "head": "sha256:fd99a12daabf4bda21a30b84b62be66a893f4cba34b311df9202323ba51a40e7",
+        "allowlisted": []
+      },
+      "checkerPlan": {
+        "base": "sha256:0081e6f6ef932bb0842f088fd3a8e42b294437ceb2129f11ee757e21e1934ebd",
+        "head": "sha256:0081e6f6ef932bb0842f088fd3a8e42b294437ceb2129f11ee757e21e1934ebd",
+        "allowlisted": []
+      },
+      "registeredCapability": {
+        "base": "sha256:956f5752554a022385cab0375febc416c0cb25ecf829732f525db5183addbfca",
+        "head": "sha256:956f5752554a022385cab0375febc416c0cb25ecf829732f525db5183addbfca",
+        "allowlisted": []
+      },
+      "verifyCommand": {
+        "base": "sha256:986b5d040c95145fd17eea8454c2cbb5d4d48aca1570edae46f2fc5dd7637fff",
+        "head": "sha256:986b5d040c95145fd17eea8454c2cbb5d4d48aca1570edae46f2fc5dd7637fff",
+        "allowlisted": []
+      },
+      "executorAndOverrides": {
+        "base": "sha256:098f4a3634dfcbe34f408d4237aad58bf2f6efc690387cfe7d8f48c15f8f9a5f",
+        "head": "sha256:098f4a3634dfcbe34f408d4237aad58bf2f6efc690387cfe7d8f48c15f8f9a5f",
+        "allowlisted": []
+      },
+      "capabilityDetailsExecutor": {
+        "base": "sha256:e9765694729587b7772558d98d2b416b74215482a4fff35287dfb443b2e2e45f",
+        "head": "sha256:e9765694729587b7772558d98d2b416b74215482a4fff35287dfb443b2e2e45f",
+        "allowlisted": []
+      },
+      "capabilityDetailsCandidate": {
+        "base": "sha256:b347cb031c32dd3c20896b9619bb76a70eba49fd59d286efbba3a1df5c17952f",
+        "head": "sha256:b347cb031c32dd3c20896b9619bb76a70eba49fd59d286efbba3a1df5c17952f",
+        "allowlisted": []
+      },
+      "confinement": {
+        "base": "sha256:17c58ba07cb9fec698a64b162f1a2afb987b43e2cb97f1402e3e8de24a5d3c26",
+        "head": "sha256:17c58ba07cb9fec698a64b162f1a2afb987b43e2cb97f1402e3e8de24a5d3c26",
+        "allowlisted": []
+      },
+      "dispatchPlan": {
+        "base": "sha256:b14254c449ad526c4694306f533943c4c5be44d28308771401eb1b39a7ce51d8",
+        "head": "sha256:b14254c449ad526c4694306f533943c4c5be44d28308771401eb1b39a7ce51d8",
+        "allowlisted": []
+      },
+      "legacyChecker": {
+        "base": "sha256:bb1c2dfaface415de95c3a87c44200723f95f028ea813a4bb7a54801af6a46cd",
+        "head": "sha256:bb1c2dfaface415de95c3a87c44200723f95f028ea813a4bb7a54801af6a46cd",
+        "allowlisted": []
+      },
+      "proposalRefusals": {
+        "base": "sha256:007f9fe4b8bb5e3e7d1f39ddf478f41b3870632e237ec0229235f6b49c94acb3",
+        "head": "sha256:007f9fe4b8bb5e3e7d1f39ddf478f41b3870632e237ec0229235f6b49c94acb3",
+        "allowlisted": []
+      },
+      "bind": {
+        "base": "sha256:986114da7bcba04783d79cf51a0f5a6846aa63bee3042da641af597f9f77919b",
+        "head": "sha256:986114da7bcba04783d79cf51a0f5a6846aa63bee3042da641af597f9f77919b",
+        "allowlisted": []
+      },
+      "operationCapability": {
+        "base": "sha256:27859799a759d3fa54087e9c1d7a3e7124966ce54f0157b51a6d407969185a25",
+        "head": "sha256:27859799a759d3fa54087e9c1d7a3e7124966ce54f0157b51a6d407969185a25",
+        "allowlisted": []
+      }
+    }
+  }
+}
