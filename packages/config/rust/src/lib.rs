@@ -27,6 +27,7 @@ pub mod docs;
 #[cfg(unix)]
 pub mod doctor;
 pub mod error;
+pub mod event_store;
 pub mod files;
 pub mod grammar;
 pub mod inspect;
