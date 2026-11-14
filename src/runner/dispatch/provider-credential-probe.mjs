@@ -42,14 +42,16 @@ export function withKillTimeout(plan, timeoutMs, env = process.env) {
 /**
  * The command that makes one call with this credential, or null when the layout is not one fgOS can probe.
  * `noTools`: the call gets no tools at all (a renewal of a copy needs none).
+ * `model`: ask for this model instead of the login's default (codex `-m`, the others `--model`).
  */
-export function credentialProbeCommand(credentialSource, { noTools = false } = {}) {
+export function credentialProbeCommand(credentialSource, { noTools = false, model = null } = {}) {
   const home = expandCredentialHome(credentialSource?.home);
   if (!home) return null;
+  const modelArgs = model ? ['--model', model] : [];
   if (credentialSource.kind === 'codex-home') {
     return {
       command: 'codex',
-      args: ['exec', '--skip-git-repo-check', '-s', 'read-only', PROMPT],
+      args: ['exec', '--skip-git-repo-check', '-s', 'read-only', ...(model ? ['-m', model] : []), PROMPT],
       env: { CODEX_HOME: home },
       home,
     };
@@ -59,7 +61,7 @@ export function credentialProbeCommand(credentialSource, { noTools = false } = {
   if (credentialSource.kind === 'home-files' && Array.isArray(credentialSource.files) && credentialSource.files.includes('agent.db')) {
     return {
       command: 'omp',
-      args: ['-p', PROMPT, '--mode', 'json', ...(noTools ? ['--no-tools'] : ['--tools', 'read'])],
+      args: ['-p', PROMPT, '--mode', 'json', ...modelArgs, ...(noTools ? ['--no-tools'] : ['--tools', 'read'])],
       env: { PI_CODING_AGENT_DIR: home },
       home,
     };
@@ -67,14 +69,14 @@ export function credentialProbeCommand(credentialSource, { noTools = false } = {
   if (credentialSource.kind === 'home-files' && Array.isArray(credentialSource.files) && credentialSource.files.includes('auth.json')) {
     return {
       command: 'pi',
-      args: ['-p', PROMPT, '--mode', 'json', ...(noTools ? ['--no-tools'] : ['--tools', 'read', '--approve'])],
+      args: ['-p', PROMPT, '--mode', 'json', ...modelArgs, ...(noTools ? ['--no-tools'] : ['--tools', 'read', '--approve'])],
       env: { PI_CODING_AGENT_DIR: home },
       home,
     };
   }
   // Claude Code reads its login from `$CLAUDE_CONFIG_DIR/.credentials.json`, or `$HOME/.claude/.credentials.json`
   // when the source keeps it under HOME (HOME is the login home either way, probeEnv).
-  const claudeArgs = ['-p', PROMPT, '--no-session-persistence', '--tools', noTools ? '' : 'Read'];
+  const claudeArgs = ['-p', PROMPT, '--no-session-persistence', ...modelArgs, '--tools', noTools ? '' : 'Read'];
   if (credentialSource.kind === 'home-files' && Array.isArray(credentialSource.files)) {
     if (credentialSource.files.includes('.credentials.json')) return { command: 'claude', args: claudeArgs, env: { CLAUDE_CONFIG_DIR: home }, home };
     if (credentialSource.files.includes(path.join('.claude', '.credentials.json'))) return { command: 'claude', args: claudeArgs, env: {}, home };
@@ -93,13 +95,14 @@ const said = (signal) => { const phrase = describeProviderSignal(signal); return
  * something the agent said or ran.
  */
 export function judgeProbeOutput({ exitCode, timedOut, cli, output, stdout = output }) {
-  if (timedOut) return { ok: false, detail: 'the call did not finish in time' };
+  if (timedOut) return { ok: false, detail: 'the call did not finish in time', reason: null, providerSignal: null };
   const { reason, providerSignal } = nativeDoor().agentProtocol.classifyDirect(cli, exitCode ?? null, output, stdout);
-  if (reason === 'login') return { ok: false, detail: 'the login is still rejected' };
-  if (reason === 'usage-limit' && exitCode !== 0) return { ok: false, detail: `the account answers with a usage limit${said(providerSignal)}` };
-  if (reason === 'provider-error' && exitCode !== 0) return { ok: false, detail: `the provider refused the call${said(providerSignal)}` };
-  if (exitCode !== 0) return { ok: false, detail: `the call exited with code ${exitCode}` };
-  return { ok: true };
+  const signal = providerSignal ?? null;
+  if (reason === 'login') return { ok: false, detail: 'the login is still rejected', reason, providerSignal: signal };
+  if (reason === 'usage-limit' && exitCode !== 0) return { ok: false, detail: `the account answers with a usage limit${said(providerSignal)}`, reason, providerSignal: signal };
+  if (reason === 'provider-error' && exitCode !== 0) return { ok: false, detail: `the provider refused the call${said(providerSignal)}`, reason, providerSignal: signal };
+  if (exitCode !== 0) return { ok: false, detail: `the call exited with code ${exitCode}`, reason: null, providerSignal: null };
+  return { ok: true, reason: null, providerSignal: null };
 }
 
 // What a probe call inherits from its runner: the shell basics only, never a token or a variable that points a
@@ -125,6 +128,7 @@ export function runCredentialProbe(plan, { spawnFn = spawn, timeoutMs = DEFAULT_
     let stdout = '';
     let timedOut = false;
     let child;
+    const startedAt = Date.now();
     try {
       child = spawnFn(plan.command, plan.args, { env: probeEnv(env, plan), cwd: plan.home, stdio: ['ignore', 'pipe', 'pipe'], detached: true });
     } catch (err) {
@@ -154,6 +158,7 @@ export function runCredentialProbe(plan, { spawnFn = spawn, timeoutMs = DEFAULT_
       } catch (err) {
         judged = { ok: false, detail: `could not judge the call: ${err.message}` };
       }
+      judged = { ...judged, exitCode: exitCode ?? null, timedOut, elapsedMs: Date.now() - startedAt };
       // A sweep that could not kill what the call left behind is the lock's own report; the answer of
       // the call itself stands either way.
       Promise.resolve(child.borrowed).catch(() => {}).then(() => resolve(judged));
@@ -166,11 +171,11 @@ export function runCredentialProbe(plan, { spawnFn = spawn, timeoutMs = DEFAULT_
  * holds the lock. `spawnFn` replaces that spawn (tests inject a fake).
  */
 export function createCredentialProbe({ spawnFn = null, timeoutMs = DEFAULT_CREDENTIAL_PROBE_TIMEOUT_MS, env = process.env } = {}) {
-  return async function probeCredential({ account, cli = null, spawnHolding }) {
+  return async function probeCredential({ account, cli = null, model = null, spawnHolding }) {
     // An account with one store per CLI is probed through the store of the CLI the dispatch runs; when
     // that CLI is not known (or has no store), through the first store it declares.
     const source = credentialSourceForCli(account, cli) ?? accountCredentialSources(account)[0] ?? null;
-    const plan = withKillTimeout(credentialProbeCommand(source), timeoutMs, env);
+    const plan = withKillTimeout(credentialProbeCommand(source, { model }), timeoutMs, env);
     if (!plan) return { ok: false, detail: 'no probe exists for this credential layout' };
     return runCredentialProbe(plan, { spawnFn: spawnFn ?? spawnHolding ?? spawn, timeoutMs, env });
   };
