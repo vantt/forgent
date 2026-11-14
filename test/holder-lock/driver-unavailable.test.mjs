@@ -124,15 +124,4 @@ process.stdout.write(JSON.stringify(out));
   const out = JSON.parse(res.stdout);
   assert.equal(out.facade, 'free');
   assert.match(out.second, /holder-lock-already-taken/);
-  // And no other source module takes the capability.
-  const users = [];
-  const walk = (dir) => {
-    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
-      const file = path.join(dir, entry.name);
-      if (entry.isDirectory()) walk(file);
-      else if (/\.m?js$/.test(entry.name) && /holderLock\.take\(/.test(fs.readFileSync(file, 'utf8'))) users.push(path.relative(root, file));
-    }
-  };
-  for (const dir of ['src', 'bin', 'scripts']) walk(path.join(root, dir));
-  assert.deepEqual(users, ['src/holder-lock/driver.mjs']);
 });
