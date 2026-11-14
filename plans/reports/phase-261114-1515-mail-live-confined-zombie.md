@@ -9,4 +9,8 @@ Base: origin/main 3bb5979aa merged with origin/harden/ci-mlc (4ef103586), no his
 
 ## Verification
 `node scripts/run-tests.mjs test/scripts/mailbox-live-confined.test.mjs`: 20 pass, 0 fail.
-Not shown: that the new test fails on the old code (not run, to spare the loaded machine); the test asserts the zombie still shows its namespace link, which is the precondition.
+- RED: with the Z/X skip removed (temporary local edit, reverted, never committed), only the new zombie test ran: 1 test, 0 pass, 1 fail ("the zombie is not" counted).
+- GREEN: with the fix restored, the whole file: 20 tests, 20 pass, 0 fail, 0 skipped.
+
+## One /proc stat parser
+`stateOf` and `parentOf` are exported from the script, both over one private `statFields` reader; the test's `describeLeft` uses them instead of its own parser.

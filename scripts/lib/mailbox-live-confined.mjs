@@ -375,14 +375,20 @@ const readLink = (p) => {
   }
 };
 
-/** The state letter of `/proc/<pid>/stat` (`Z` for a zombie), or null when the pid is gone. */
-const stateOf = (pid) => {
+/** The fields of `/proc/<pid>/stat` after the command name (state, ppid, ...), or null when the pid is gone. */
+const statFields = (pid) => {
   try {
-    return fs.readFileSync(`/proc/${pid}/stat`, 'utf8').split(') ')[1].split(' ')[0];
+    return fs.readFileSync(`/proc/${pid}/stat`, 'utf8').split(') ')[1].split(' ');
   } catch {
     return null;
   }
 };
+
+/** The state letter of `/proc/<pid>/stat` (`Z` for a zombie), or null when the pid is gone. */
+export const stateOf = (pid) => statFields(pid)?.[0] ?? null;
+
+/** The parent pid of `/proc/<pid>/stat`, or null when the pid is gone. */
+export const parentOf = (pid) => statFields(pid)?.[1] ?? null;
 
 /** The host pid of the sandbox's pid 1: the child of bwrap. Polls up to `waitMs`; null once bwrap has exited. */
 export function sandboxInit(bwrapPid, waitMs = 5000) {
