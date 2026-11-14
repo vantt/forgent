@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- The Rust host now owns the invocation front door for every verb: root and store admission, the caller-tree root walk (one Git read per native call), the fault record writer, Event Store maintain, the config reader and argument parsing. An unknown verb prints a usage text that lists every verb in registry order.
+- A missing `HOME` is now one refusal, `config-io` / `HomeUnset`, with the message "set HOME"; fgOS no longer falls back to the passwd home. Publishing a corrupt open event stream now reports the corruption instead of continuing.
+- Help for every verb is answered by the Rust host. Help through a direct `node bin/fgos.mjs` and shell-integration tiers 1 to 3 therefore needs a host (an activation or `FGOS_HOST_BIN`); without one, the doctor probe reports "fgos --help fails".
+
 ## [v0.2.0-rc.9] - 2026-11-14
 
 - rc.9 follows rc.8 and adds: account health (the account probe with its direct leg, the scheduled probe timer, run diagnosis that tells an account fault from an infrastructure one), the host and surface layer (`fgos preflight` retired, a faster doctor, one domain catalog), the release publish fix, and fixes for races in the test and process layers (Event Store append recovery, holder-lock borrow vectors, the spawned child's descriptors, watched-run tokens, state-home removal).
