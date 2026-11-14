@@ -116,7 +116,7 @@ pub struct Holder {
 }
 
 fn comm_of(pid: u32) -> Option<String> {
-    std::fs::read_to_string(format!("/proc/{pid}/comm")).ok()
+    facts::command_name_of(fgos_process::ProcId(pid))
 }
 
 fn parent_of(pid: u32) -> Option<u32> {

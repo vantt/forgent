@@ -94,33 +94,13 @@ mod keeper {
     use std::sync::Arc;
     use std::time::Duration;
 
+    use fgos_process::facts::open_verified;
     use fgos_process::{job_view, Domain, DomainState};
-    use windows_sys::Win32::Foundation::{CloseHandle, FILETIME, HANDLE, WAIT_OBJECT_0};
-    use windows_sys::Win32::Storage::FileSystem::SYNCHRONIZE;
-    use windows_sys::Win32::System::Threading::{
-        GetProcessTimes, OpenProcess, WaitForSingleObject, PROCESS_QUERY_LIMITED_INFORMATION,
-    };
 
     use super::EXIT_USAGE;
     use crate::predecessor;
 
     const POLL: Duration = Duration::from_millis(50);
-
-    struct Owned(HANDLE);
-
-    impl Drop for Owned {
-        fn drop(&mut self) {
-            // SAFETY: a handle this struct opened and owns.
-            unsafe { CloseHandle(self.0) };
-        }
-    }
-
-    impl Owned {
-        fn ended(&self) -> bool {
-            // SAFETY: a zero wait polls an open handle.
-            unsafe { WaitForSingleObject(self.0, 0) == WAIT_OBJECT_0 }
-        }
-    }
 
     fn args_of(args: &[OsString]) -> Option<(String, std::path::PathBuf)> {
         match args {
@@ -131,25 +111,6 @@ mod keeper {
             }
             _ => None,
         }
-    }
-
-    /// The recorded holder, opened for waiting; `None` when it is gone or is
-    /// not the process the record names.
-    fn open_holder(pid: u32, start_time: &str) -> Option<Owned> {
-        // SAFETY: OpenProcess takes plain values and returns a handle or null.
-        let raw = unsafe { OpenProcess(SYNCHRONIZE | PROCESS_QUERY_LIMITED_INFORMATION, 0, pid) };
-        if raw.is_null() {
-            return None;
-        }
-        let holder = Owned(raw);
-        // SAFETY: four valid out-pointers for a handle with query access.
-        let created = unsafe {
-            let (mut c, mut e, mut k, mut u): (FILETIME, FILETIME, FILETIME, FILETIME) =
-                std::mem::zeroed();
-            (GetProcessTimes(holder.0, &mut c, &mut e, &mut k, &mut u) != 0)
-                .then(|| (u64::from(c.dwHighDateTime) << 32) | u64::from(c.dwLowDateTime))
-        };
-        (created.map(|c| c.to_string()).as_deref() == Some(start_time)).then_some(holder)
     }
 
     pub(super) fn job_keeper(args: &[OsString]) -> i32 {
@@ -172,7 +133,7 @@ mod keeper {
             eprintln!("job-keeper: the record names another job");
             return 1;
         }
-        let Some(holder) = open_holder(domain.holder.pid.0, &domain.holder.start_time) else {
+        let Some(holder) = open_verified(&domain.holder) else {
             eprintln!("job-keeper: the recorded holder is not running");
             return 1;
         };
@@ -205,7 +166,7 @@ mod keeper {
         }
         loop {
             std::thread::sleep(POLL);
-            if (finished.load(Ordering::SeqCst) || holder.ended())
+            if (finished.load(Ordering::SeqCst) || holder.ended().unwrap_or(false))
                 && view.is_empty() == DomainState::Empty
             {
                 return 0;

@@ -446,19 +446,16 @@ mod win {
     use std::os::windows::io::AsRawHandle;
     use std::time::Duration;
 
+    use fgos_process::facts::{self, StartTime, WaitHandle};
+    use fgos_process::ProcId;
     use windows_sys::Win32::Foundation::{
-        CloseHandle, SetHandleInformation, FILETIME, HANDLE, HANDLE_FLAG_INHERIT,
-        INVALID_HANDLE_VALUE, WAIT_OBJECT_0,
+        CloseHandle, SetHandleInformation, HANDLE, HANDLE_FLAG_INHERIT, INVALID_HANDLE_VALUE,
     };
-    use windows_sys::Win32::Storage::FileSystem::SYNCHRONIZE;
     use windows_sys::Win32::System::Diagnostics::ToolHelp::{
         CreateToolhelp32Snapshot, Process32FirstW, Process32NextW, PROCESSENTRY32W,
         TH32CS_SNAPPROCESS,
     };
-    use windows_sys::Win32::System::Threading::{
-        GetCurrentProcess, GetCurrentProcessId, GetProcessTimes, OpenProcess, WaitForSingleObject,
-        PROCESS_QUERY_LIMITED_INFORMATION,
-    };
+    use windows_sys::Win32::System::Threading::GetCurrentProcessId;
 
     struct Owned(HANDLE);
 
@@ -466,31 +463,6 @@ mod win {
         fn drop(&mut self) {
             // SAFETY: a handle this struct opened and owns.
             unsafe { CloseHandle(self.0) };
-        }
-    }
-
-    impl Owned {
-        /// Whether the process behind this handle has ended, waiting up to
-        /// `tick` for that. A method, so a closure that calls it captures the
-        /// whole owner (and its `Drop`), never just the raw handle inside.
-        fn ended_within(&self, tick: Duration) -> bool {
-            // SAFETY: waiting on an open handle with a bounded timeout.
-            unsafe { WaitForSingleObject(self.0, tick.as_millis() as u32) == WAIT_OBJECT_0 }
-        }
-    }
-
-    fn creation_time(process: HANDLE) -> Option<u64> {
-        // SAFETY: four valid out-pointers for a handle with query access.
-        unsafe {
-            let (mut created, mut exited, mut kernel, mut user): (
-                FILETIME,
-                FILETIME,
-                FILETIME,
-                FILETIME,
-            ) = std::mem::zeroed();
-            (GetProcessTimes(process, &mut created, &mut exited, &mut kernel, &mut user) != 0).then(
-                || (u64::from(created.dwHighDateTime) << 32) | u64::from(created.dwLowDateTime),
-            )
         }
     }
 
@@ -544,25 +516,24 @@ mod win {
         let ppid = parent_pid().ok_or_else(|| {
             "cannot read this process's parent from the process snapshot".to_string()
         })?;
-        // SAFETY: OpenProcess takes plain values and returns a handle or null.
-        let raw = unsafe { OpenProcess(SYNCHRONIZE | PROCESS_QUERY_LIMITED_INFORMATION, 0, ppid) };
-        if raw.is_null() {
-            return Err(format!(
-                "OpenProcess on parent pid {ppid} failed: {}",
-                std::io::Error::last_os_error()
-            ));
-        }
-        let parent = Owned(raw);
-        // SAFETY: the pseudo handle of this process is always valid.
-        let own = creation_time(unsafe { GetCurrentProcess() });
-        if let (Some(parent_created), Some(own_created)) = (creation_time(parent.0), own) {
-            if parent_created > own_created {
+        let parent = WaitHandle::open(ProcId(ppid))
+            .map_err(|err| format!("cannot open parent pid {ppid}: {err}"))?;
+        match (parent.start_time(), facts::self_start_time()) {
+            (Ok(Some(StartTime::FileTime(parent_created))), Some(StartTime::FileTime(own)))
+                if parent_created > own =>
+            {
                 return Err(format!(
                     "parent pid {ppid} was created after this process: the pid was reused"
                 ));
             }
+            (Err(err), _) => {
+                return Err(format!(
+                    "cannot read the creation time of parent pid {ppid}: {err}"
+                ));
+            }
+            _ => {}
         }
-        Ok(move |tick: Duration| parent.ended_within(tick))
+        Ok(move |tick: Duration| parent.wait(tick).unwrap_or(false))
     }
 }
 

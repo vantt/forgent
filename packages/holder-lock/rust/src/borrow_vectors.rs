@@ -433,11 +433,9 @@ fn vector(name: &str, git: &Path, helper: &HelperExe, dir: &Path) -> VectorResul
 /// reachable by git for the vectors to mean anything.
 #[cfg(windows)]
 fn background_pids_ended(pidfile: &Path) -> Result<usize, String> {
-    use windows_sys::Win32::Foundation::{
-        CloseHandle, GetLastError, ERROR_INVALID_PARAMETER, WAIT_OBJECT_0,
-    };
-    use windows_sys::Win32::Storage::FileSystem::SYNCHRONIZE;
-    use windows_sys::Win32::System::Threading::{OpenProcess, WaitForSingleObject};
+    use fgos_process::facts::WaitHandle;
+    use fgos_process::ProcId;
+    use windows_sys::Win32::Foundation::ERROR_INVALID_PARAMETER;
 
     let text = fs::read_to_string(pidfile).unwrap_or_default();
     let pids: Vec<u32> = text.lines().filter_map(|l| l.trim().parse().ok()).collect();
@@ -445,21 +443,17 @@ fn background_pids_ended(pidfile: &Path) -> Result<usize, String> {
         return Err("no background process wrote its pid: `sh` did not run the vector's command (git must find Git for Windows' sh)".to_string());
     }
     for pid in &pids {
-        // SAFETY: OpenProcess takes plain values and returns a handle or null.
-        let handle = unsafe { OpenProcess(SYNCHRONIZE, 0, *pid) };
-        if handle.is_null() {
-            // SAFETY: reads the calling thread's last error.
-            let err = unsafe { GetLastError() };
-            if err == ERROR_INVALID_PARAMETER {
-                continue;
+        let ended = match WaitHandle::open(ProcId(*pid)) {
+            Ok(handle) => handle
+                .ended()
+                .map_err(|err| format!("cannot judge background pid {pid} ({err})"))?,
+            Err(err) if err.raw_os_error() == Some(ERROR_INVALID_PARAMETER as i32) => continue,
+            Err(err) => {
+                return Err(format!(
+                    "cannot open background pid {pid} to judge it ({err})"
+                ))
             }
-            return Err(format!(
-                "cannot open background pid {pid} to judge it (Win32 error {err})"
-            ));
-        }
-        // SAFETY: a zero wait polls an open handle, which is closed right after.
-        let ended = unsafe { WaitForSingleObject(handle, 0) == WAIT_OBJECT_0 };
-        unsafe { CloseHandle(handle) };
+        };
         if !ended {
             return Err(format!(
                 "background pid {pid} is still running after run_borrowed returned"

@@ -693,8 +693,7 @@ pub(crate) fn drain_description(
 /// Read-only local Linux domain facts; no process-control policy lives here.
 #[cfg(target_os = "linux")]
 fn parent_and_group(pid: u32) -> Option<(u32, u32)> {
-    let stat = std::fs::read_to_string(format!("/proc/{pid}/stat")).ok()?;
-    let relation = fgos_process::facts::parse_relation(fgos_process::ProcId(pid), &stat)?;
+    let relation = fgos_process::facts::relation_of(fgos_process::ProcId(pid))?;
     Some((relation.parent, relation.group))
 }
 
