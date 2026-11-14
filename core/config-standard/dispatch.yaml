@@ -1,8 +1,12 @@
 # @fgos:v1
 # see: fgos config standard
-# @fgos:doc Waits of the run supervisor when an agent or a controller is asked to stop.
+# @fgos:doc Waits of the run supervisor when an agent or a controller is asked to stop, and the schedule of the account probe sweep.
 dispatch:
   # @fgos:doc Milliseconds between the SIGTERM and the SIGKILL of a launch gate that does not stop. In milliseconds. Minimum: 1000. Default: 10000.
   gateKillGraceMs: 10000
   # @fgos:doc Milliseconds a controller stopped by Ctrl-C or SIGTERM waits for the receipts of its attempts; keep it at least gateKillGraceMs, or the controller leaves before the gate can finish stopping the agent. In milliseconds. Minimum: 1000. Default: 15000.
   cancelWaitMs: 15000
+  # @fgos:doc The scheduled account probe: an OS timer that runs fgos dispatch probe-account --all --record --leg direct.
+  probeAccount:
+    # @fgos:doc Seconds between sweeps of the scheduled account probe; 0 turns the timer off. Minimum: 0. Default: 0.
+    intervalSec: 0

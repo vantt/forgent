@@ -107,6 +107,7 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, with no repo
       'mailbox-hook',
       'mailbox-claude-accept',
       'mailbox-sync-timer',
+      'account-probe-timer',
       'agent-claims-resolve',
       'agent-type-names-unique',
       'domain-registry-compiled',

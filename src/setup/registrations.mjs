@@ -58,7 +58,7 @@ import { checkExecutorProfileWarnings } from './executor-profile-warnings.mjs';
 import { crossMachineNote, mailboxOptIn, refusedConfigName } from './mailbox-limits.mjs';
 import { checkMailboxClaudeAccept } from './mailbox-claude-accept.mjs';
 import { checkClaudePluginMarketplace } from './agent-wiring.mjs';
-import { checkMailboxSyncTimer, fixMailboxSyncTimer } from './mailbox-sync-timer.mjs';
+import { ACCOUNT_PROBE, MAILBOX_SYNC, checkManagedTimer, fixManagedTimer } from './managed-timer.mjs';
 import { checkAgentCliProjectTrusted } from './agent-cli-trust.mjs';
 import { declaredActivities, readWorkflowCatalog, withUnreadableDefinitions } from './workflow-catalog-reader.mjs';
 import {
@@ -1858,12 +1858,23 @@ registerCheck({
 registerCheck({
   id: 'mailbox-sync-timer',
   description: 'agent mailbox: when cross-machine mail is on, an OS timer runs the mailbox sync child every eventStore.sync.intervalSec, so mail is taken on a machine where no session runs a tool',
-  check: (cwd) => checkMailboxSyncTimer(cwd),
+  check: (cwd) => checkManagedTimer(MAILBOX_SYNC, cwd),
 });
 
 registerFix({
   id: 'mailbox-sync-timer',
-  fix: (cwd) => fixMailboxSyncTimer(cwd),
+  fix: (cwd) => fixManagedTimer(MAILBOX_SYNC, cwd),
+});
+
+registerCheck({
+  id: 'account-probe-timer',
+  description: 'account health: when dispatch.probeAccount.intervalSec is set, an OS timer runs fgos dispatch probe-account --all --record --leg direct every that many seconds, so an exhausted or logged-out account is found between runs; off (0) by default',
+  check: (cwd) => checkManagedTimer(ACCOUNT_PROBE, cwd),
+});
+
+registerFix({
+  id: 'account-probe-timer',
+  fix: (cwd) => fixManagedTimer(ACCOUNT_PROBE, cwd),
 });
 
 // Every capability a core/domain Workflow unit names must resolve the way
