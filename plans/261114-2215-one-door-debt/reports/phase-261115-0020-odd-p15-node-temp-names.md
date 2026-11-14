@@ -61,8 +61,8 @@ check: putting `${logPath}.${process.pid}.tmp` back makes `test/architecture.tes
 
 ## Open
 
-`test/runner/dispatch-reconciliation-import-graph.test.mjs` pins the exact static closure of reconcile; `hold-transport.mjs`
-importing the tier-0 `unique-tmp-tag.mjs` adds one leaf to it. The file is outside this phase's list; asked the big lead.
+Resolved with approval: `test/runner/dispatch-reconciliation-import-graph.test.mjs` pins the exact static closure of reconcile; `hold-transport.mjs`
+importing the tier-0 `unique-tmp-tag.mjs` added one leaf to it; the leaf is now in the pinned closure list (not in the child_process exemption list).
 
 ## Lessons
 
