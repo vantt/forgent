@@ -101,14 +101,64 @@ test('a probe that throws counts as a failed call, never as an unlock and never 
   assert.notEqual(quarantineOf(ctx, 'a'), null);
 });
 
-test('only a dead-credential lock is probed: quota limits and other manual locks are left alone', async () => {
-  const ctx = setup(['a', 'b']);
-  quarantineProviderAccount({ provider: PROVIDER, accountId: 'a', reasonCode: 'quota-limit', quarantineKind: 'temporary', until: new Date(Date.now() + 3600_000).toISOString(), runtimeDir: ctx.runtimeDir });
-  quarantineProviderAccount({ provider: PROVIDER, accountId: 'b', reasonCode: 'operator-hold', quarantineKind: 'manual-clear', runtimeDir: ctx.runtimeDir });
-  const { probe, calls } = recordingProbe({ a: { ok: true }, b: { ok: true } });
+test('a quota lock is probed only when its reset was unknown, once per run; other manual locks are left alone', async () => {
+  const future = () => new Date(Date.now() + 3600_000).toISOString();
+  const past = () => new Date(Date.now() - 60_000).toISOString();
+  const quota = (ctx, accountId, until, resetKnown) => {
+    quarantineProviderAccount({ provider: PROVIDER, accountId, reasonCode: 'quota-limit', until, resetKnown, runtimeDir: ctx.runtimeDir });
+  };
 
-  assert.deepEqual(await probeQuarantinedAccounts({ ...ctx, provider: PROVIDER, probe }), []);
-  assert.deepEqual(calls, []);
+  // A quota lock with a named reset, a lock with no marker (written before the marker) and another manual lock: never called.
+  const known = setup(['a', 'b', 'c']);
+  quota(known, 'a', future(), true);
+  quota(known, 'b', future(), undefined);
+  quarantineProviderAccount({ provider: PROVIDER, accountId: 'c', reasonCode: 'operator-hold', quarantineKind: 'manual-clear', runtimeDir: known.runtimeDir });
+  const none = recordingProbe({ a: { ok: true }, b: { ok: true }, c: { ok: true } });
+  assert.deepEqual(await probeQuarantinedAccounts({ ...known, provider: PROVIDER, probe: none.probe, runKey: 'run-1', accountId: 'a' }), []);
+  assert.deepEqual(none.calls, []);
+
+  // Active guessed lock: tried when no account is usable, once per run key, and a success releases it.
+  const active = setup(['a']);
+  quota(active, 'a', future(), false);
+  const failing = recordingProbe({ a: { ok: false, detail: 'still exhausted' } });
+  assert.equal((await probeQuarantinedAccounts({ ...active, provider: PROVIDER, probe: failing.probe, runKey: 'run-1' })).length, 1);
+  assert.equal(quarantineOf(active, 'a').probe.runKey, 'run-1');
+  assert.deepEqual(await probeQuarantinedAccounts({ ...active, provider: PROVIDER, probe: failing.probe, runKey: 'run-1' }), []);
+  assert.deepEqual(failing.calls, ['a'], 'the same run does not call twice');
+  const next = recordingProbe({ a: { ok: true } });
+  assert.equal((await probeQuarantinedAccounts({ ...active, provider: PROVIDER, probe: next.probe, runKey: 'run-2' }))[0].unlocked, true);
+  assert.equal(quarantineOf(active, 'a'), null);
+
+  // No run key: no quota call. With a usable sibling an active lock is left alone.
+  const sibling = setup(['a', 'b']);
+  quota(sibling, 'a', future(), false);
+  const idle = recordingProbe({ a: { ok: true } });
+  assert.deepEqual(await probeQuarantinedAccounts({ ...sibling, provider: PROVIDER, probe: idle.probe, accountId: 'a' }), []);
+  assert.deepEqual(await probeQuarantinedAccounts({ ...sibling, provider: PROVIDER, probe: idle.probe, runKey: 'run-1', accountId: 'a' }), []);
+  assert.deepEqual(idle.calls, []);
+
+  // Expired guessed lock: tried for the named account only, even though a sibling is usable.
+  const expired = setup(['a', 'b']);
+  quota(expired, 'a', past(), false);
+  const named = recordingProbe({ a: { ok: true }, b: { ok: true } });
+  assert.deepEqual(await probeQuarantinedAccounts({ ...expired, provider: PROVIDER, probe: named.probe, runKey: 'run-1', accountId: 'b' }), []);
+  const tried = await probeQuarantinedAccounts({ ...expired, provider: PROVIDER, probe: named.probe, runKey: 'run-1', accountId: 'a', model: 'm-1' });
+  assert.deepEqual(named.calls, ['a']);
+  assert.equal(tried[0].unlocked, true);
+  assert.equal(quarantineOf(expired, 'a'), null);
+});
+
+test('a quota stop the probe finds again re-dates the lock and keeps the run from calling twice', async () => {
+  const ctx = setup(['a']);
+  quarantineProviderAccount({ provider: PROVIDER, accountId: 'a', reasonCode: 'quota-limit', until: new Date(Date.now() + 3600_000).toISOString(), resetKnown: false, runtimeDir: ctx.runtimeDir });
+  const probe = async () => ({ ok: false, reason: 'usage-limit', exitCode: 1, providerSignal: { requestedWaitMs: 600_000 }, detail: 'exhausted' });
+
+  await probeQuarantinedAccounts({ ...ctx, provider: PROVIDER, probe, runKey: 'run-1' });
+
+  const lock = quarantineOf(ctx, 'a');
+  assert.equal(lock.resetKnown, true, 'the provider named a wait this time, so the guess is gone');
+  assert.equal(lock.probe.runKey, 'run-1');
+  assert.equal(lock.probe.status, 'failed');
 });
 
 test('with several locked accounts it stops at the first that answers, to spend one call', async () => {

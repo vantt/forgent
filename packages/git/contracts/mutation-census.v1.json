@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "baa7710c85aea5fd22506ec5bb1a50a7bda223828619d1e3cabb0c6c43835fbd",
+  "payloadDigest": "40c6b83965735d699055faf17ecb038f3628c6c80cfac5a8364336bd589f61d2",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -1034,7 +1034,7 @@
     "src/runner/dispatch/plan.mjs": "7e0b46cc5a12c6a1fefeb024fd43281e6e2c4300f20e5a48439c6bcb4532f9b2",
     "src/runner/dispatch/provider-account-probe.mjs": "bb9ac3b6701e73a3144bf83c59114d251d1746f74f1322bf8f7670238d5ac9f7",
     "src/runner/dispatch/provider-adapter.mjs": "152397dc861d56dd0ed40d35d569401236979dd37eb989602a1dd472e57c3290",
-    "src/runner/dispatch/provider-capacity.mjs": "d1dbe969983fd3f5c62ac97de7bd83b0759ebf42e40016a6938411ffc6c5dfe0",
+    "src/runner/dispatch/provider-capacity.mjs": "da1f745c88901f16fc4bc4584aff8f953ffb5da6b1f2b0ed85b2c3a76e57da7d",
     "src/runner/dispatch/provider-credential-probe.mjs": "e8df7e4b480aca672a4b416a924004350460cb6341605cfd0a4b71a71cd7a60a",
     "src/runner/dispatch/provider-credential-renewal.mjs": "232faa9e8569f9e857961055d738dfc063ce46ead942e567a0de1b098c8c36b3",
     "src/runner/dispatch/provider-session-probe.mjs": "95dc5e6542c2086ba14482bcf3ab6c9f036e4b8a9619ca814d3026284ccfbdf1",
