@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "c7daf7d94cc027efc69eaf936c436f67b747146d5ee150fb0775e22ee98ad79b",
+  "payloadDigest": "4e41d6565cf5b26c971fd1c0cfbee4df889e16f03f5ee6f414be380a7fcc5b20",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -1006,7 +1006,7 @@
     "src/runner/dispatch/agent-result-claim-contract.mjs": "9f49db7dee60837452d1ba57b97863cb391d56197080e7e7f256e513672f1bec",
     "src/runner/dispatch/assignment-layout.mjs": "a14f6f1b45e7942181b7ee05b9bb4086fcd705004e70a237fc8c2d11c7e272d9",
     "src/runner/dispatch/assignment-normalizer.mjs": "1e1a922ad6d9ef2c9d8f0e7f6fec77d2c8b83b27ce9adfc8eaf3ec69e200ce6b",
-    "src/runner/dispatch/assignment-runner.mjs": "d6ecff37f9f159aacd0d10e9713dad3f4fb4627f04959c2ce541895b23b0d714",
+    "src/runner/dispatch/assignment-runner.mjs": "5a60c093f8b0213e542dd494b086ffa6aba1d4efa3e420686630084602e84fd5",
     "src/runner/dispatch/assignment.mjs": "ae48427b5bc38db61d98b265e9ad7fd36d55f9a933085c988a8b695e5672501a",
     "src/runner/dispatch/brief.mjs": "c51d5398653cd6f839c2902134e627e57af7911b473fe16904478919c2d95e14",
     "src/runner/dispatch/cli.mjs": "85095ed5fc709db37af99aea1aa4f74ffb51fec27989530497f41b5a13deac3c",
@@ -3434,15 +3434,15 @@
     },
     {
       "path": "src/runner/dispatch/assignment-runner.mjs",
-      "line": 965,
+      "line": 973,
       "spawn": "prepareTerminalAttempt -> src/runner/dispatch/herdr-round.mjs:395",
       "binary": "(env FGOS_HERDR_BIN)",
       "class": "configured-binary"
     },
     {
       "path": "src/runner/dispatch/assignment-runner.mjs",
-      "line": 1459,
-      "spawn": "awaitBinding -> src/runner/dispatch/assignment-runner.mjs:1075",
+      "line": 1467,
+      "spawn": "awaitBinding -> src/runner/dispatch/assignment-runner.mjs:1083",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
     },
