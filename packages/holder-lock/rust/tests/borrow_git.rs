@@ -98,6 +98,25 @@ fn gc_vector_fails_as_not_exercised_when_auto_gc_never_runs() {
     let _ = fs::remove_dir_all(&dir);
 }
 
+/// A caller whose environment carries config that turns off auto gc (as `git -c gc.auto=0` passes
+/// down to its children) does not reach the vector's own git: the unswitched control still starts a
+/// gc and the vector passes, instead of reporting "not exercised" on a safe machine.
+#[test]
+fn config_the_caller_environment_carries_does_not_reach_the_vector_git() {
+    let _serial = serial();
+    let previous = std::env::var_os("GIT_CONFIG_PARAMETERS");
+    std::env::set_var("GIT_CONFIG_PARAMETERS", "'gc.auto'='0'");
+    let only = ["gc-auto-loose-objects".to_string()];
+    let report = borrow_vectors::run(git(), &helper(), &only, false);
+    match previous {
+        Some(value) => std::env::set_var("GIT_CONFIG_PARAMETERS", value),
+        None => std::env::remove_var("GIT_CONFIG_PARAMETERS"),
+    }
+    let report = report.expect("vectors run");
+    let v = &report.vectors[0];
+    assert!(v.pass, "{v:?}");
+}
+
 #[test]
 fn an_unknown_vector_name_is_a_usage_error() {
     let _serial = serial();
