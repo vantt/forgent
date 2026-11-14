@@ -3,7 +3,7 @@ title: "Rust verb migration program (F0 through S7)"
 description: "Move the legacy-Node CLI verbs onto the Rust host, foundations first, one layer at a time, retiring each Node path in the same change."
 status: pending
 priority: P1
-effort: 19d (F0 only; S1-S7 sized when each starts)
+effort: 22d (F0 only; S1-S7 sized when each starts)
 branch: plan/rust-verb-migration-program
 tags: [refactor, infra, host, rust, migration]
 blockedBy: []
@@ -33,20 +33,26 @@ before Q2 is answered at S4.
 
 ## One-door guard (every step)
 
-Only Git has a mechanical one-door guard today (`scripts/git-one-door-scan.mjs` and its census). F0
-phase 01 adds a general one: a `doors` table in `docs/architecture-manifest.json`, checked by
-`test/architecture.test.mjs` (no new tool). Each row names a job, the text patterns that do that job
-(a function name, a file name, a literal), and the only product files allowed to contain them. The test
-scans every product file in Node, Rust and scripts (`bin/`, `src/`, `scripts/`, `apps/`, `packages/`,
-`.githooks/`; test files, `tests/` directories and fixtures excluded) and fails when a pattern appears
-outside its allowed files (a second path, now or later) or when an allowed file no longer matches (a
-stale row). A row with no allowed file marks a retired name. A row allowing a Node and a Rust file at
-once (a twin kept during the migration) must carry its reason and the step that retires it.
+Besides the Git scan (`scripts/git-one-door-scan.mjs` and its census), three partial guards exist today: process facts
+(`test/process/one-door.test.mjs`), YAML (`test/architecture.test.mjs:1278-1332`) and the holder-lock capability scan
+(`test/holder-lock/driver-unavailable.test.mjs:110-140`); none scans `scripts/` or Rust (door census, section 3). F0
+replaces the three with **one mechanism**: a `doors` table in `docs/architecture-manifest.json`, checked by
+`test/architecture.test.mjs` (no new tool), and retires the old checks in the same change (L10).
 
-**Exit criterion of every step F0-S7:** the step's jobs have `doors` rows that fail on any other path
-in the repository, including the old Node path the step retired; Git jobs stay on the Git scan, whose
-count must not rise. F0's concrete rows are written in phase 01 (the mechanism and its first row) and
-phase 08 (the rest); phase 09 adds the retired help names.
+Row shape (phase 01): `job`, `kind` (`door` or `ratchet`), `patterns`, `allowed` (paths or globs; every `scripts/` entry
+carries a reason), `debt` (known leaks, visible, checked for staleness like `tierExceptions`, and allowed only to shrink
+against the merge base), `reason`, `retiredBy` (for a Node/Rust twin). The scan covers every product file in Node, Rust
+and scripts (`bin/`, `src/`, `scripts/`, `apps/`, `packages/`, `.githooks/`); comment lines and Rust `#[cfg(test)] mod`
+blocks do not count. A `ratchet` row (verb-wide patterns such as `renameSync(`, `Command::new(`, `child_process`) only
+stops growth: it is never cited as proof of one path, here or in any later step.
+
+**Exit criterion of every step F0-S7:** each job the step owns has a `door` row that fails on any other path in the
+repository, including the old Node path the step retired; any leak the step does not fix is in that row's `debt` with
+its reason, and the step leaves no row's debt larger; Git jobs stay on the Git scan, whose count must not rise. F0's rows:
+phase 01 (mechanism and the manifest-projection row), phase 00 part B (kernel lock primitive, holder-lock take, process
+control, process facts `/proc`, canonical JSON bytes, YAML parser loads, replacing the three old guards), phase 08 (help,
+lane, root, global directory, admission, fault record, argument parser, Event Store maintain and config), phase 09
+(retired help names).
 
 ## Order (owner-approved, do not reorder)
 
@@ -67,7 +73,7 @@ already moved.
 
 | Step | Goal | Verbs | Main files (today) | Entry | Exit | Depends on | Owner question |
 |---|---|---|---|---|---|---|---|
-| **F0** host foundations | Host owns help; route data names a native sub-verb; parity lane; the cross-cutting doors (invocation root, argument parse, store admission, fault record, Event Store maintain) have one Rust owner or a proven twin; one-door guard exists | none flipped (help door moves) | see "F0 file set" | this plan approved | see "F0 exit" | T9 `main()` doors settled (on main) | none |
+| **F0** host foundations | Host owns help; route data names a native sub-verb; parity lane; the cross-cutting doors (invocation root, global directory, argument parse, store admission, fault record, Event Store maintain) have one Rust owner or a proven twin; one one-door guard mechanism with first-tier rows | none flipped (help door moves) | see "F0 file set" | this plan approved | see "F0 exit" | T9 `main()` doors settled (on main) | none |
 | **S1** hook verdicts | `hook decision-question` and `hook main-checkout-delete-guard` run natively | `hook` kinds | `src/runner/hook.mjs`, `src/state/decision-question.mjs`, `scripts/main-checkout-delete-guard-hook.mjs`, `src/git/main-checkout-delete-guard.mjs` | F0 landed; **Q1 answered yes** | both kinds in the registry `native` list of `hook`; Node verdict code deleted; shared vector file read by Rust tests; `doors` rows for both verdicts | F0 | **Q1 asked here** |
 | **S2** T0-T2 verbs | `lock`, `lock-status`, `git`, `worktree` native | 4 | `src/runner/lock-status.mjs`, `src/runner/lock-fence.mjs`, `src/git/status.mjs`, `src/verbs/worktree/*` | F0 landed | each verb native; Node arm, use case and their tests retired; the first store-touching native verb proves the F0 doors through the binary; `doors` rows per verb | F0 | none |
 | **S3** T3 verbs | `events`, `session`, `gateway`, `agents` native | 4 | `src/verbs/events/*`, `src/runner/session.mjs`, `src/runner/gateway-control.mjs`, `src/runner/agent-listing.mjs` | F0 landed; runs beside S2 with a file split agreed in both plans | as S2 | F0 | none |
@@ -85,29 +91,30 @@ waits: both touch `apps/fgos/src/main.rs` and `routing.rs`.
 
 | # | Phase | Wave | Blocked by | Effort | File |
 |---|---|---|---|---|---|
-| 00 | Facts and baselines | A | - | 0.5d | [phase-00-facts-and-baselines.md](phase-00-facts-and-baselines.md) |
-| 01 | Manifest artifact and one-door guard | A | - | 1d | [phase-01-manifest-artifact.md](phase-01-manifest-artifact.md) |
+| 00 | Facts and baselines (part A); first-tier door rows, old guards retired (part B) | A; B | - ; part B after 01 | 0.5d + 1d | [phase-00-facts-and-baselines.md](phase-00-facts-and-baselines.md) |
+| 01 | Manifest artifact and one-door guard mechanism | A | - | 1.5d | [phase-01-manifest-artifact.md](phase-01-manifest-artifact.md) |
 | 02 | Host help door | B | 00, 01; lands after 10 | 2d | [phase-02-host-help-door.md](phase-02-host-help-door.md) |
 | 03 | Native and store declarations as data | B | 00, 01 | 1.5d | [phase-03-native-and-store-declarations.md](phase-03-native-and-store-declarations.md) |
-| 04 | Worktree-tier doors: invocation root and store admission | B | 00 | 2.5d | [phase-04-store-admission-authority.md](phase-04-store-admission-authority.md) |
+| 04 | Worktree-tier doors: invocation root (three walks to one) and store admission | B | 00 | 3d | [phase-04-store-admission-authority.md](phase-04-store-admission-authority.md) |
 | 05 | Invocation-fault record: Rust writer, shared contract | B | 00 | 1d | [phase-05-invocation-fault-authority.md](phase-05-invocation-fault-authority.md) |
-| 06 | Event Store maintain and config authority | B | 00 | 2.5d | [phase-06-event-store-lifecycle-authority.md](phase-06-event-store-lifecycle-authority.md) |
+| 06 | Event Store maintain, config authority and the global directory | B | 00 | 3.5d | [phase-06-event-store-lifecycle-authority.md](phase-06-event-store-lifecycle-authority.md) |
 | 07 | Parity lane | B | 00, 01; lands after 03 | 1.5d | [phase-07-parity-lane.md](phase-07-parity-lane.md) |
 | 10 | Rust argument parser, shared contract | B | 00 | 1d | [phase-10-rust-argument-parser.md](phase-10-rust-argument-parser.md) |
 | 08 | Host routing, doors and F0 guard rows | C | 02, 03, 04, 05, 06, 10 | 3d | [phase-08-host-routing-and-doors.md](phase-08-host-routing-and-doors.md) |
 | 09 | Node help retirement | D | 07, 08 | 1.5d | [phase-09-node-help-retirement.md](phase-09-node-help-retirement.md) |
 | 11 | F0 close: docs, proof consolidation, gates | E | all | 1d | [phase-11-f0-close.md](phase-11-f0-close.md) |
 
-Critical path: 01 -> 02 -> 08 -> 09 -> 11, about 8.5 lead-days. Total work about 19 lead-days (the
-research said 11.5; the difference is that each door's authority moves instead of being copied, and the
-root and argument-parse doors the research counted as shared are not equivalent yet).
+Critical path: 00 (part A) -> 06 -> 08 -> 09 -> 11, about 9.5 lead-days (0.5 + 3.5 + 3 + 1.5 + 1); the next longest
+is 01 -> 02 -> 08 at 3.5 days before 08. Total work about 22 lead-days (the research said 11.5; the difference is that
+each door's authority moves instead of being copied, the root and argument-parse doors the research counted as shared
+are not equivalent yet, and the big lead's review added the guard shape, the first-tier rows and census leak rank 4).
 
 ### Parallel map
 
 ```text
-Wave A:  [00 facts] [01 manifest + guard]                                        (start together)
-Wave B:  [02 help] [03 decl] [04 root+admit] [05 fault] [06 maintain] [07 parity] [10 argv]
-         (04/05/06/10 need only 00; 02/03/07 need 00+01; 02 lands after 10; 07 lands after 03)
+Wave A:  [00 part A facts] [01 manifest + guard mechanism]                       (start together)
+Wave B:  [00 part B rows] [02 help] [03 decl] [04 root+admit] [05 fault] [06 maintain+global dir] [07 parity] [10 argv]
+         (04/05/06/10 need only 00A; 00B/02/03/07 need 00A+01; 02 lands after 10; 07 lands after 03)
 Wave C:  [08 routing + doors + F0 guard rows]
 Wave D:  [09 Node help retirement]
 Wave E:  [11 close]
@@ -125,13 +132,15 @@ Hot files, one writer at a time, in this order:
 | `packages/host-runtime/contracts/command-manifest.json` (generated, new) | 01 (03 and 08 regenerate; bytes must not change) |
 | `test/rust-host/command-routes.test.mjs` | 01 -> 03 -> 08 -> 09 |
 | `bin/fgos.mjs` | 01 -> 03 -> 09 |
-| `docs/architecture-manifest.json` | 01 -> 08 -> 09 |
-| `test/architecture.test.mjs` | 01 -> 09 |
+| `docs/architecture-manifest.json` | 01 -> 00 (part B) -> 08 -> 09 |
+| `test/architecture.test.mjs` | 01 -> 00 (part B) -> 09 |
+| `test/suite-baseline.json` | 00 (part B) -> 09 |
 | `test/cli/fgos-manifest.test.mjs` | 01 -> 03 -> 09 |
 | `test/rust-host/harness.mjs` | 07 -> 09 |
 | `test/rust-host/help-routes.test.mjs` | 08 -> 09 |
 | `test/cli/fgos-disconnected-worktree-guard.test.mjs` | 03 -> 11 |
 | `packages/git/node-addon/src/*.rs` | `git.rs`: 04 only; `event_store.rs`, `config.rs`: 06 only |
+| `src/config/facade.mjs` and the five global-directory callers | 06 only |
 | `packages/git/contracts/mutation-census.v1.json` (generated) | every phase regenerates its own; on rebase never hand-merge, rerun `node scripts/git-one-door-scan.mjs --root . --write-census` |
 
 ### Integration and landing
@@ -173,9 +182,9 @@ Create:
 
 Modify:
 - `apps/fgos/src/main.rs`, `apps/fgos/src/cli_projector.rs`, `apps/fgos/src/wiring/mailbox_hook.rs`, `apps/fgos/src/wiring/mailbox_config.rs`, `apps/fgos/tests/cli_tests.rs`, `apps/fgos/tests/mailbox_routes.rs`
-- `packages/host-runtime/rust/src/lib.rs`, `packages/distribution/rust/src/lib.rs`
+- `packages/host-runtime/rust/src/lib.rs`, `packages/distribution/rust/src/lib.rs`, `packages/work-state/rust/src/lib.rs` (its root walk)
 - `packages/git/rust/src/lib.rs`, `packages/git/node-addon/src/git.rs`, `packages/git/node-addon/src/event_store.rs`, `packages/git/node-addon/src/config.rs`
-- `packages/observe/rust/src/lib.rs`, `packages/event-store/rust/src/lib.rs`, `packages/config/rust/src/lib.rs`
+- `packages/observe/rust/src/lib.rs`, `packages/event-store/rust/src/lib.rs`, `packages/config/rust/src/lib.rs`, `packages/config/rust/src/machine.rs`
 - `packages/host-runtime/contracts/command-routes.json` (generated), `packages/host-runtime/contracts/command-route-annotations.json`
 - `packages/git/contracts/mutation-census.v1.json` (generated)
 - `scripts/export-command-selectors.mjs`, `scripts/test-proof-inventory.mjs` (`cliCost` help probe), `scripts/explain-command-route.mjs` (only if phase 00 finds it reads the help selectors or `native_kinds`)
@@ -183,28 +192,35 @@ Modify:
 - `src/runner/hook.mjs` (one constant), `src/runner/worktree.mjs` (`admitStoreAccess`, `isSessionWorktree`), `src/runner/paths.mjs` (`resolveInvocationRoot` becomes an adapter)
 - `src/observe/invocation-fault-log.mjs` (only if a shared vector row shows Node disagrees)
 - `src/event-store/maintenance.mjs`, `src/event-store/config.mjs`
-- tests: `test/architecture.test.mjs`, `test/rust-host/command-routes.test.mjs`, `test/rust-host/help-routes.test.mjs`, `test/rust-host/harness.mjs`, `test/rust-host/harness.test.mjs`, `test/rust-host/internal-routes.test.mjs`, `test/rust-host/invocation-root-table.test.mjs`, `test/rust-host/fixtures/invocation-root-table.json` (rows for the policies), `test/cli/helpers/fgos-cli-harness.mjs`, `test/cli/fgos-manifest.test.mjs`, `test/cli/unknown-flag-rejection.test.mjs`, `test/cli/subcommand-flag-drift.test.mjs`, `test/cli/fgos-disconnected-worktree-guard.test.mjs`, `test/cli/dispatch-retired-doors.test.mjs` (only if the hook refusal text changes), `test/cli/fgos-claim-2.test.mjs`, `test/cli/fgos-gateway.test.mjs`, `test/cli/dispatch-operability.test.mjs`, `test/cli/run-verb.test.mjs`, `test/cli/command-registry.test.mjs` and `test/rust-host/release-tree.test.mjs` (only where they read help through Node), `test/runner/worktree.test.mjs`, `test/runner/session.test.mjs`, `test/event-store/triggers.test.mjs`, the Event Store config test phase 06 names, `test/observe/invocation-fault-log.test.mjs`, `test/suite-baseline.json` (rows of the two deleted test files)
-- docs (phase 11 only): `docs/platform/host-invocation-routing/spec.md`, `.../contracts/command-route-descriptor.md`, `.../contracts/legacy-payload.md`, `docs/platform/agent-mailbox/spec.md`, `docs/platform/packaging-distribution/spec.md`, `docs/platform/observe/spec.md` and `docs/platform/observe/decisions/observe-component-architecture.md` (`nativeOnly` mentions), the Event Store, Observe, Config and Git area specs' decision-history sections, `AGENTS.md` (the "Legacy-Node CLI Ownership Boundary" paragraph only), `docs/reading-map.md` (line 144 and rows for the new source paths), `docs/platform/architecture-map.md` (one paragraph on the `doors` table), `scripts/check-decision-citation-drift.baseline.json` (only if the drift check asks)
+- global-directory choosers (phase 06): `src/config/facade.mjs`, `src/setup/bin-discovery.mjs`, `src/setup/runner-config-conversion.mjs`, `src/runner/dispatch/confinement/backend-registry.mjs`, `src/runner/dispatch/confinement/resources.mjs`, `src/runner/dispatch/provider-capacity.mjs`
+- tests: `test/architecture.test.mjs`, `test/holder-lock/driver-unavailable.test.mjs` (source-scan part out), `test/rust-host/command-routes.test.mjs`, `test/rust-host/help-routes.test.mjs`, `test/rust-host/harness.mjs`, `test/rust-host/harness.test.mjs`, `test/rust-host/internal-routes.test.mjs`, `test/rust-host/invocation-root-table.test.mjs`, `test/rust-host/fixtures/invocation-root-table.json` (rows for the policies), `test/cli/helpers/fgos-cli-harness.mjs`, `test/cli/fgos-manifest.test.mjs`, `test/cli/unknown-flag-rejection.test.mjs`, `test/cli/subcommand-flag-drift.test.mjs`, `test/cli/fgos-disconnected-worktree-guard.test.mjs`, `test/cli/dispatch-retired-doors.test.mjs` (only if the hook refusal text changes), `test/cli/fgos-claim-2.test.mjs`, `test/cli/fgos-gateway.test.mjs`, `test/cli/dispatch-operability.test.mjs`, `test/cli/run-verb.test.mjs`, `test/cli/command-registry.test.mjs` and `test/rust-host/release-tree.test.mjs` (only where they read help through Node), `test/runner/worktree.test.mjs`, `test/runner/session.test.mjs`, `test/event-store/triggers.test.mjs`, the Event Store config test phase 06 names, `test/observe/invocation-fault-log.test.mjs`, `test/suite-baseline.json` (rows of the two deleted test files)
+- docs: `docs/platform/component-boundary.md` (phase 00 part B: the lines naming the retired guard tests); phase 11 only: `docs/platform/host-invocation-routing/spec.md`, `.../contracts/command-route-descriptor.md`, `.../contracts/legacy-payload.md`, `docs/platform/agent-mailbox/spec.md`, `docs/platform/packaging-distribution/spec.md`, `docs/platform/observe/spec.md` and `docs/platform/observe/decisions/observe-component-architecture.md` (`nativeOnly` mentions), the Event Store, Observe, Config and Git area specs' decision-history sections, `AGENTS.md` (the "Legacy-Node CLI Ownership Boundary" paragraph only), `docs/reading-map.md` (line 144 and rows for the new source paths), `docs/platform/architecture-map.md` (one paragraph on the `doors` table), `scripts/check-decision-citation-drift.baseline.json` (only if the drift check asks)
 
 Delete:
 - `src/cli/deprecation.mjs` (its last reader is the Node help code)
 - `test/cli/fgos-help.test.mjs`, `test/cli/fgos-verb-help-json.test.mjs` (owners named in phase 09)
 - `test/rust-host/parity-cases/help.cases.mjs`, `test/rust-host/verb-parity.test.mjs` (created in 07, deleted in 09 with Node help; S2 re-adds the test file with its own table)
+- `test/process/one-door.test.mjs` (phase 00 part B; owner: the two process rows of the `doors` table)
 
 Read-only checks (not edited): `src/setup/registrations.mjs:467-472` and `src/setup/shell-rc.mjs:122`
 (the doctor probe runs `fgos --help`, which keeps working through the Node forwarder of phase 09).
 
 ### Collision risk (with `plans/261114-2051-capability-reads-one-door`)
 
-F0 touches **no file under `src/runner/execution/`, `src/runner/dispatch/` or `src/setup/`.**
-Checked against `origin/plan/capability-reads-one-door` (its plan.md file-ownership table and phase
-files). Shared or possibly shared files, each with the hunk F0 changes:
+Checked against `origin/plan/capability-reads-one-door` at `023b35130` (its plan.md and every phase file's
+Modify list). F0 edits no file in that plan's Modify sets except the shared ones below. F0 does touch five files
+under `src/setup/` and `src/runner/dispatch/` (phase 06, global directory: `bin-discovery.mjs`,
+`runner-config-conversion.mjs`, `confinement/backend-registry.mjs`, `confinement/resources.mjs`, `provider-capacity.mjs`);
+none is in the other plan's Modify sets (`provider-capacity.mjs` is only named there as prose). F0 does not edit
+`src/setup/registrations.mjs` or `src/runner/execution/seat-policy.mjs`, which the other plan modifies; both appear
+in F0 only as `debt` entries of `doors` rows. Shared or possibly shared files:
 
 | File | F0 change | The other plan | Mitigation |
 |---|---|---|---|
 | `bin/fgos.mjs` | help code deleted (3817-4006, `main()` help branches) and replaced by a forwarder, `nativeOnly` refusal, `publicManifestEntries` import | its phase 05 ports the `plan-lint` arm (2358-2359, 2399) | different hunks; rebase |
 | `test/architecture.test.mjs` | phase 01 adds the `doors` check; phase 09 drops `src/cli/deprecation.mjs` from `ARM_STATIC_IMPORTS` (1757) | its phase 06 adds a guard | different hunks; rebase |
-| `docs/architecture-manifest.json` | `doors` key (01, 08, 09); drop the `src/cli/deprecation.mjs` row (09) | its phase 01 adds rows for new `.mjs` files, retiers `src/runner/operation-capability.mjs` | different keys and rows; rebase |
+| `docs/architecture-manifest.json` | `doors` mechanism (01) and rows (00, 08, 09); drop the `src/cli/deprecation.mjs` file row (09) | its phase 01 adds file rows and retiers `src/runner/operation-capability.mjs`; its phase 07 adds four `doors` rows in F0's shape | additive rows; whoever lands second rebases and re-runs the check; its rows wait for F0 phase 01's shape |
+| `doors` debt entries naming its files | `src/runner/execution/seat-policy.mjs` (canonical JSON debt), `src/setup/registrations.mjs` (global directory debt) | it rewrites both files | if its change removes the leak, the debt entry turns stale and the check fails: whoever lands second removes the entry (the check names it) |
 | `docs/reading-map.md` | phase 11 edits line 144 and adds rows for new source paths | its phase 06 edits line 158 | different rows; rebase |
 | `src/runner/hook.mjs`, `src/runner/worktree.mjs`, `src/runner/paths.mjs` | one constant; the admission and root functions become adapters | not in its file set (none reads `runner.capabilities`) | none needed |
 | `src/cli/command-registry.mjs` | `nativeOnly` -> `native`, predicates -> data, `HELP_SELECTORS` out, `publicManifest()` in | not in its file set; but descriptions at 1377, 2585, 2687 name `runner.capabilities` | if it later edits those strings, regenerate `command-manifest.json` |
@@ -226,8 +242,10 @@ files). Shared or possibly shared files, each with the hunk F0 changes:
    shared vector file read by both languages, both retired at S7.
 5. `run()` of the CLI test harness follows the route table; the help case table ran node-vs-host green
    before Node help was deleted.
-6. `doors` rows exist for every F0 job and pass on the integration head; the check's own unit cases show
-   that a pattern outside its allowed files, and a stale allowed file, both fail.
+6. One one-door mechanism besides the Git scan: the three old guards are retired and their rules are rows. `doors`
+   rows exist for every F0 job and the first-tier census jobs and pass on the integration head; the check's own unit
+   cases show that a match outside `allowed`/`debt`, a stale entry, grown debt, a comment-only match and a
+   `#[cfg(test)]`-only match each behave as specified. No ratchet row is cited as proof of one path.
 7. Gates green on the integration head: `npm test`, `cargo test --workspace`, clippy `-D warnings`,
    `cargo fmt --all --check`, msvc and darwin checks, doc-health, decision-citation drift; the Git
    one-door scan count is not above phase 00's baseline.
@@ -241,7 +259,7 @@ files). Shared or possibly shared files, each with the hunk F0 changes:
 | Two lanes judging one invocation differently during the window | M x H | one Rust owner for root and admission; shared vectors for the parser and the store declarations |
 | Parallel phases colliding on generated files | H x L | generated files are regenerated, never hand-merged (table above) |
 | Doors wired in the host with no native consumer until S2 | M x M | module-level Rust proofs in 08; S2's first store verb adds the binary wiring proof |
-| One door regressing after F0 | M x H | `doors` rows in `test/architecture.test.mjs`, extended by every step |
+| One door regressing after F0 | M x H | `doors` rows in `test/architecture.test.mjs`, extended by every step; debt may only shrink |
 | F0 slips the rc.9 cut | M x M | rc.9 waits for both plans; F0 lands as one series |
 
 Rollback: F0 lands as one series; revert the series. No data format changes: the fault log, Event
@@ -282,6 +300,20 @@ separate item), direct help spawners listed by phase 00, docs consumers of remov
 - Reconciled stale references: the `invocation-fault` internal route, the `invokeHost` client and the
   old phase 10 removed everywhere; `spawn_detached` Windows text replaced; Node door order corrected.
 - Unresolved contradictions: 0.
+
+## Amendment — big lead review of `3509d10f3` (2026-11-14)
+
+Source: `git show origin/research/one-door-census:plans/reports/research-261114-2201-one-door-census-existing-doors.md` (sections 3, 4.4, 6, 7).
+
+| # | Decision | Applied to |
+|---|---|---|
+| 1 | Row shape gains `debt` (stale-checked, shrink-only against the merge base), Rust `#[cfg(test)] mod` blocks skipped, `scripts/` entries carry a reason, globs in `allowed`, comment lines ignored, `kind: "ratchet"` never cited as proof | phase 01 |
+| 2 | The three existing guards become rows in the one table; their old checks retired in the same change, each naming its owner | phase 00 part B |
+| 3 | Census leak rank 4: the work-state root walk joins the root door (phase 04); the global directory goes to phase 06, the owner of the Config crate and the addon `config` file (in 04 it would put two wave-B phases on that file); two choosers stay as debt with reasons (`registrations.mjs` is edited by the capability plan; `uninstall.rs` needs a crate edge and moves with S4) | phases 04, 06, 08 |
+| 4 | Phase 00 lands the first-tier rows (kernel lock primitive, process control, process facts `/proc`, canonical JSON bytes) with debt lists after phase 01's mechanism exists: phase 00 becomes part A (wave A) and part B (wave B) | phase 00, wave map |
+
+Consistency sweep after the amendment: plan.md, phases 00, 01, 04, 06, 08 reread; deltas checked 4; stale references
+reconciled (effort, waves, hot files, file set, collision table, exit criterion 6); unresolved contradictions 0.
 
 ## Validation Log
 

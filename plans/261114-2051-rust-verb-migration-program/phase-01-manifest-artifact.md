@@ -2,7 +2,7 @@
 phase: 1
 title: "Manifest artifact and one-door guard"
 status: pending
-effort: 1d
+effort: 1.5d
 wave: A
 blockedBy: []
 ---
@@ -51,20 +51,43 @@ Two things the rest of F0 builds on:
 ### One-door guard
 
 5. `docs/architecture-manifest.json` gets a `doors` array. Each row:
-   `{ "job": "<plain words>", "patterns": ["<regex source>", ...], "allowed": ["<repo path>", ...], "reason": "<why these files>", "retiredBy": "<step, only for a twin>" }`.
-   `allowed: []` marks a retired name: it may appear in no product file.
+   ```json
+   { "job": "<plain words>", "kind": "door" | "ratchet",
+     "patterns": ["<regex source>", ...],
+     "allowed": ["<repo path or glob>", { "path": "<repo path or glob>", "reason": "<why>" }, ...],
+     "debt": [{ "path": "<repo path>", "reason": "<what leaks, which step or item moves it>" }, ...],
+     "reason": "<why the allowed files own the job>", "retiredBy": "<step, only for a twin>" }
+   ```
+   - `allowed: []` marks a retired name: it may appear in no product file.
+   - `allowed` takes globs (`packages/process/rust/src/**`); a glob is stale when no file under it matches a pattern.
+   - Any `scripts/` path (dev tooling) must be an object with a `reason`, in `allowed` or `debt`; nothing under
+     `scripts/` is skipped or allowed silently.
+   - `debt` lists known leaks: files that still do the job outside the door. They stay visible and fail nothing,
+     but each is checked for staleness like `tierExceptions` (an entry that no longer matches must be removed) and
+     a row's debt may only shrink: the check compares each row with the same row in the manifest at the merge base
+     with `origin/main` and fails when a row present there gained a debt path. A new row may start with debt.
+   - `kind: "ratchet"` is for verb-wide patterns (`renameSync(`, `Command::new(`, `child_process` imports) that cannot
+     prove one path; its `allowed` entries carry a per-file match ceiling (`{ "path", "max" }`), a count may fall and
+     never rise, and no doc, report or exit criterion may cite a ratchet row as proof of one path.
 6. `test/architecture.test.mjs` gains one check over the rows. Product files: tracked files under `bin/`, `src/`,
-   `scripts/`, `apps/`, `packages/`, `.githooks/` with extensions `.mjs .js .cjs .rs .sh .ps1`, excluding
-   `*.test.mjs`, any `tests/` or `test/` directory, `fixtures/` and `third-party/`. Read the file list through
-   `git ls-files` the way the existing checks list files (reuse their lister; do not add a second one). Fails when:
-   (a) a pattern matches a product file not in `allowed`; (b) a path in `allowed` does not exist or no longer
-   matches any of the row's patterns (stale row); (c) a row allowing both an `.mjs` and an `.rs` file has no `retiredBy`.
-   Messages name the row's `job`, the file and the line.
-7. Unit cases for the check itself (in the same test file, beside the tier rule's own cases at 266): a match outside
-   `allowed` fails, a stale `allowed` fails, a twin without `retiredBy` fails, a retired name found anywhere fails.
-8. This phase's own row: job "verb manifest projection", pattern `\bpublicManifest\(`, allowed
-   `src/cli/command-registry.mjs`, `scripts/export-command-selectors.mjs`, `bin/fgos.mjs` (until phase 09 deletes
-   Node help; phase 09 removes it from `allowed`).
+   `scripts/`, `apps/`, `packages/`, `.githooks/` with extensions `.mjs .js .cjs .rs .sh .ps1`, excluding `*.test.mjs`,
+   any `test/` or `tests/` directory, `fixtures/`, `third-party/`, `upstreams/`. List them through `git ls-files` the
+   way the existing checks list files (reuse their lister). Before matching: drop comment lines (`//`, `/*`, `*` lines
+   in `.mjs .js .cjs .rs`; `#` lines in `.sh .ps1`), and drop Rust test code: a `#[cfg(test)]` attribute followed by a
+   `mod` item, up to its matching closing brace (brace count outside string literals). State the heuristic's limits in
+   the check's header. Fails when: (a) a pattern matches outside `allowed` and `debt`; (b) an `allowed` path or glob, or
+   a `debt` path, no longer matches (stale); (c) a row allowing both an `.mjs` and an `.rs` file has no `retiredBy`;
+   (d) a `scripts/` entry has no reason; (e) a row's debt grew against the merge base; (f) a ratchet count rose.
+   Messages name the row's `job`, the file and the line. The merge-base manifest is read through the Git read the suite
+   already uses for repository facts (no new spawn helper); in a checkout without `origin/main` the check (e) says so
+   by name and fails, it is never skipped.
+7. Unit cases for the check (beside the tier rule's own cases at 266), on in-memory rows and file texts: a match outside
+   `allowed` fails; a match in `debt` passes; stale `allowed`, stale glob and stale `debt` fail; grown debt fails; a twin
+   without `retiredBy` fails; a retired name anywhere fails; a match only in a comment line passes; a match only inside a
+   `#[cfg(test)] mod` block passes and one after that block's closing brace fails; a ratchet count rise fails and a fall passes.
+8. This phase's own row: job "verb manifest projection", kind `door`, pattern `\bpublicManifest\(`, allowed
+   `src/cli/command-registry.mjs`, `scripts/export-command-selectors.mjs` (with its reason), `bin/fgos.mjs` (until phase 09
+   deletes Node help; phase 09 removes it from `allowed`).
 
 ## Files
 
@@ -74,7 +97,7 @@ Two things the rest of F0 builds on:
   `test/cli/fgos-manifest.test.mjs` (anchor only), `docs/architecture-manifest.json` (`doors`), `test/architecture.test.mjs` (the check + its unit cases).
 - Regenerate: `packages/git/contracts/mutation-census.v1.json`.
 - Delete: none. Tests retired: none.
-- Net size: about +140 (check and cases about 90), -20.
+- Net size: about +260 (check about 120, cases about 120), -20.
 
 ## Gates
 

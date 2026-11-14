@@ -1,13 +1,13 @@
 ---
 phase: 6
-title: "Event Store maintain and config authority"
+title: "Event Store maintain, config authority and the global directory"
 status: pending
-effort: 2.5d
+effort: 3.5d
 wave: B
 blockedBy: [0]
 ---
 
-# Phase 06: Event Store maintain and config authority
+# Phase 06: Event Store maintain, config authority and the global directory
 
 The maintain policy of Event Store spec §16 (seal what is due, seal all on shutdown, decide whether a
 publish is due), the store construction it needs, and the `eventStore` config reading with its refusal
@@ -15,6 +15,10 @@ rule each get one Rust owner: `fgos-event-store` (tier 3) for maintain and const
 (tier 1) for the config section. Node's `maintainEventStore` and `readEventStoreConfig` become adapters;
 the addon and the host call the same functions. The per-command wrapper that decides *when* triggers run
 stays per process (Node `runWithEventStoreLifecycle`, host door in phase 08): three booleans and a callback.
+
+It also takes the global-directory half of door-census leak rank 4: where `~/.fgos` is, decided once by Config
+(`packages/config/rust/src/machine.rs`, `docs/platform/config/spec.md`) and reached from Node through the addon's
+`config` namespace, which this phase already owns.
 
 ## Phase-lead rules (every F0 phase)
 
@@ -60,15 +64,29 @@ stays per process (Node `runWithEventStoreLifecycle`, host door in phase 08): th
 4. Sync-due ownership: if phase 00 found the mailbox stamp rule is the same job, make `lifecycle` the one owner and record
    the switch for phase 08; if it is a different job (mail take vs event publish), write the evidence into the report and
    into the `doors` row reason phase 08 adds.
-5. Node `maintainEventStore` keeps signature and return; it calls the addon and spawns `spawnDetachedCli` when `sync_due`.
+5. **Global directory.** `fgos-config` answers "where is the global fgOS directory" in one function next to
+   `machine::home_dir` (101), and the addon `config` namespace exposes it. Node gets one door,
+   `globalFgosDir()` exported from `src/config/facade.mjs`, which asks the addon (it reads `HOME` at call time, as
+   the facade's own comment at 34 requires); the facade's default at 36 uses it. Move these Node choosers onto it:
+   `src/setup/bin-discovery.mjs:85`, `src/setup/runner-config-conversion.mjs:290`,
+   `src/runner/dispatch/confinement/backend-registry.mjs:190`, `src/runner/dispatch/confinement/resources.mjs:636`,
+   `src/runner/dispatch/provider-capacity.mjs:41` (each keeps its own env override, for example
+   `FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH`, and the file name under the directory). Two stay as recorded debt in the
+   phase 08 row, with reasons: `src/setup/registrations.mjs:517` (the concurrent capability-reads plan edits that file;
+   whichever lands second moves it) and `packages/distribution/rust/src/uninstall.rs:445` (`fgos-distribution` does not
+   depend on `fgos-config`, an edge would change `Cargo.lock`; it moves with `uninstall` in S4).
+6. Node `maintainEventStore` keeps signature and return; it calls the addon and spawns `spawnDetachedCli` when `sync_due`.
    Delete `syncDue` and the seal loop from Node. The wrapper `runWithEventStoreLifecycle` is unchanged.
 
 ## Files
 
 - Create: `packages/event-store/rust/src/lifecycle.rs` (+ the constructor module if it is not placed in `lifecycle.rs`),
   one `fgos-config` module for the `eventStore` section (name it in the report).
-- Modify: `packages/event-store/rust/src/lib.rs`, `packages/config/rust/src/lib.rs`, `packages/git/node-addon/src/event_store.rs`,
-  `packages/git/node-addon/src/config.rs`, `src/event-store/maintenance.mjs`, `src/event-store/config.mjs`,
+- Modify: `packages/event-store/rust/src/lib.rs`, `packages/config/rust/src/lib.rs`, `packages/config/rust/src/machine.rs`,
+  `packages/git/node-addon/src/event_store.rs`, `packages/git/node-addon/src/config.rs`, `src/event-store/maintenance.mjs`,
+  `src/event-store/config.mjs`, `src/config/facade.mjs`, `src/setup/bin-discovery.mjs`, `src/setup/runner-config-conversion.mjs`,
+  `src/runner/dispatch/confinement/backend-registry.mjs`, `src/runner/dispatch/confinement/resources.mjs`,
+  `src/runner/dispatch/provider-capacity.mjs` (none of these seven Node files is in the capability-reads plan's set at `023b35130`),
   `test/event-store/triggers.test.mjs`, the Node test that owns `eventStoreConfig` today (find with `rg -l eventStoreConfig test`).
 - Delete: none.
 - Unit tests (Rust): seal only streams older than the interval; shutdown seals all; sync due / not due / other remote /
@@ -77,13 +95,13 @@ stays per process (Node `runWithEventStoreLifecycle`, host door in phase 08): th
 - Tests retired: in `triggers.test.mjs`, "seals only streams older than the seal interval and everything on shutdown" (47)
   and "a store that cannot be opened is reported as a code" (133) → `lifecycle.rs`; the Node config-rule cases → the
   `fgos-config` module tests. The rest stay as Node wiring proofs (child hand-off, no second child in flight, CLI records, Land sweep).
-- Net size: Node about -60, Rust about +400 (half tests).
+- Net size: Node about -70, Rust about +430 (half tests).
 
 ## Gates
 
 - `cargo fmt --all --check`; `cargo clippy -p fgos-event-store -p fgos-config -p fgos-node-addon --all-targets -- -D warnings`; `cargo test -p fgos-event-store -p fgos-config`
 - `cargo check -p fgos-event-store -p fgos-config -p fgos-node-addon --target x86_64-pc-windows-msvc` and `--target aarch64-apple-darwin`
-- `node scripts/run-tests.mjs test/event-store/triggers.test.mjs test/event-store/lifecycle.test.mjs test/event-store/background-seal.test.mjs test/architecture.test.mjs test/setup/git-mutation-census.test.mjs` plus every hit of the `rg` in the rules above.
+- `node scripts/run-tests.mjs test/event-store/triggers.test.mjs test/event-store/lifecycle.test.mjs test/event-store/background-seal.test.mjs test/architecture.test.mjs test/setup/git-mutation-census.test.mjs` plus every hit of the `rg` in the rules above and of `rg -l "facade.mjs|bin-discovery|runner-config-conversion|backend-registry|confinement/resources|provider-capacity" test`.
 - One-door scan count not above baseline.
 
 ## Risk and rollback

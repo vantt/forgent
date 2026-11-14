@@ -2,7 +2,7 @@
 phase: 4
 title: "Worktree-tier doors: invocation root and store admission"
 status: pending
-effort: 2.5d
+effort: 3d
 wave: B
 blockedBy: [0]
 ---
@@ -15,7 +15,13 @@ worktree and project-root facts), the lowest layer that knows a linked worktree 
 2. **Whether it may touch that store from here** (`admitStoreAccess`).
 
 Node's functions become adapters over the addon; the host calls the same functions in phase 08 and
-deletes its own walk (`cli_projector::resolve_target_root`). The authority moves; nothing is copied.
+deletes its own walk (`cli_projector::resolve_target_root`). The third walk, `resolve_workspace_root` in
+`packages/work-state/rust/src/lib.rs:55-66` (no home stop, no Git bound; door census leak rank 4), moves onto the
+same function here. The authority moves; nothing is copied.
+
+The other half of census leak rank 4, the global `~/.fgos` directory chosen in nine places, is Config's door, not the
+root's: it goes to phase 06, which owns the Config crate and the addon's `config` namespace file (giving it to this phase
+would put two wave-B phases on `packages/git/node-addon/src/config.rs`).
 
 ## Phase-lead rules (every F0 phase)
 
@@ -61,11 +67,16 @@ deletes its own walk (`cli_projector::resolve_target_root`). The authority moves
    `validationError`; `admitStoreAccess` maps to `StoreError('validation', message, {faultClass})`. Delete from Node:
    `nearestStoreRoot`, `repoFactsOrRefuse` (if no other caller), `isSessionWorktree`, `STORE_MISSING`.
 5. Same answers as today for every table row and every admission case, including the "must not refuse" cases.
+6. `packages/work-state/rust/src/lib.rs`: delete `resolve_workspace_root` and call `fgos_git::invocation_root` with
+   `caller-tree` at its caller (118); the crate already depends on `fgos-git` (`Cargo.toml:9`), so no new edge. The
+   answer for the native `gate-bypass` verb now stops at the Git top level and skips the home `.fgos`, like every other
+   verb; say so in the report (user-visible only for a cwd outside any project, which now gets the door's `found: false` answer).
 
 ## Files
 
 - Create: `packages/git/rust/src/invocation_root.rs`, `packages/git/rust/src/store_admission.rs` (each with unit tests).
 - Modify: `packages/git/rust/src/lib.rs`, `packages/git/node-addon/src/git.rs`, `src/runner/paths.mjs`,
+  `packages/work-state/rust/src/lib.rs`,
   `src/runner/worktree.mjs`, `test/rust-host/fixtures/invocation-root-table.json`, `test/rust-host/invocation-root-table.test.mjs`,
   `test/runner/worktree.test.mjs`, `test/runner/session.test.mjs`.
 - Delete: none (functions removed inside the two Node files).
@@ -82,8 +93,8 @@ deletes its own walk (`cli_projector::resolve_target_root`). The authority moves
 
 ## Gates
 
-- `cargo fmt --all --check`; `cargo clippy -p fgos-git -p fgos-node-addon --all-targets -- -D warnings`; `cargo test -p fgos-git`
-- `cargo check -p fgos-git -p fgos-node-addon --target x86_64-pc-windows-msvc` and `--target aarch64-apple-darwin`
+- `cargo fmt --all --check`; `cargo clippy -p fgos-git -p fgos-node-addon -p fgos-work-state --all-targets -- -D warnings`; `cargo test -p fgos-git -p fgos-work-state`
+- `cargo check -p fgos-git -p fgos-node-addon -p fgos-work-state --target x86_64-pc-windows-msvc` and `--target aarch64-apple-darwin`
 - `node scripts/run-tests.mjs test/runner/worktree.test.mjs test/runner/session.test.mjs test/rust-host/invocation-root-table.test.mjs test/cli/fgos-disconnected-worktree-guard.test.mjs test/cli/fgos-setup.test.mjs test/observe/invocation-fault-log.test.mjs test/architecture.test.mjs test/scripts/doc-health.test.mjs test/setup/git-mutation-census.test.mjs`
   plus every hit of `rg -l "init-in-worktree|store-missing|disconnected-worktree-store|resolveInvocationRoot" test`.
 - One-door scan count not above baseline (the functions spawn no Git: facts come through the crate driver).

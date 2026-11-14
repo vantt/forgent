@@ -72,15 +72,17 @@ job are added here, so a second path for any of them fails `test/architecture.te
    `HELP_SELECTORS` and the count/`starts_with('-')` assumptions); regenerate. `packages/distribution/rust/src/lib.rs`
    (198-205, 412-418, 457) drops the help-selector filter and keeps "no verb starts with `-`" as a fact about the table.
 5. Today's native verbs behave as before apart from a fault record for their malformed calls (all are `store: none`).
-6. **`doors` rows** in `docs/architecture-manifest.json` (phase 01's mechanism). Each must pass now and would fail on a
-   second path; narrow a pattern only to cover the same job more exactly, and say so in the report:
+6. **`doors` rows** in `docs/architecture-manifest.json` (phase 01's shape: `kind`, `allowed` with globs and reasons,
+   `debt`). All are `kind: "door"`. Each must pass now and would fail on a second path; narrow a pattern only to cover
+   the same job more exactly, and say so in the report. Phase 00 part B already landed the first-tier rows; add these:
 
-| Job | Patterns | Allowed files |
+| Job | Patterns | Allowed files (debt in brackets) |
 |---|---|---|
 | render CLI help from the manifest | `command-manifest\.json` | `scripts/export-command-selectors.mjs`, `apps/fgos/src/help.rs` |
 | retired native declarations | `\bnativeOnly\b`, `\bnative_kinds\b`, `\bNATIVE_HOOK_KINDS\b`, `\bHELP_SELECTORS\b` | none |
 | decide the lane of an invocation | `\bnative_subcommands\b` | `scripts/export-command-selectors.mjs`, `apps/fgos/src/routing.rs`, `apps/fgos/src/main.rs` |
-| resolve the invocation root | `\bnearestStoreRoot\b`, `\bresolve_target_root\b`, `fn resolve_invocation_root` | `packages/git/rust/src/invocation_root.rs` |
+| resolve the invocation root | `\bnearestStoreRoot\b`, `\bresolve_target_root\b`, `\bresolve_workspace_root\b`, `fn resolve_invocation_root`, `join\("\.fgos"\)\.is_dir\(\)` | `packages/git/rust/src/invocation_root.rs` (no debt: phase 04 moved the work-state walk) |
+| global fgOS directory | `homedir\(\)\s*,\s*['"]\.fgos['"]`, `fn home_dir\(`, `fn global_dir\(` (the name phase 06 chose), `export function globalFgosDir` | `packages/config/rust/src/machine.rs`, `src/config/facade.mjs` (the Node door asks the addon) [`src/setup/registrations.mjs` (capability-reads plan edits it; whoever lands second moves it), `packages/distribution/rust/src/uninstall.rs` (needs a crate edge; moves with `uninstall` in S4)] |
 | admit store access | `disconnected-worktree-store`, `init-in-worktree`, `worktree-identity-unreadable`, `\bisSessionWorktree\b`, `fn is_session_worktree` | `packages/git/rust/src/store_admission.rs` (after phase 04 the literals at `src/runner/worktree.mjs:540-569` are gone; any Node file that must still branch on one of these classes by name is listed with its reason) |
 | record a malformed call (twin) | `invocation-faults\.jsonl`, `\bargvShape\b`, `fn argv_shape` | `packages/observe/rust/src/invocation_fault.rs`, `src/observe/invocation-fault-log.mjs`, `src/state/fgos-file-registry.mjs`; `retiredBy: S7` |
 | parse CLI arguments (twin) | `export function parseArgs`, `pub fn parse_args` | `src/cli/parse-args.mjs`, `packages/host-runtime/rust/src/cli_args.rs`; `retiredBy: S7` |
