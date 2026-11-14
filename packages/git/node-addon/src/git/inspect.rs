@@ -1,11 +1,11 @@
 //! Mechanical Node-API marshaling. All reads and validation stay in Rust.
 use super::{operation, text};
-use crate::{check, error};
+use crate::{check, driver_for, error};
 use fgos_git::*;
 use napi::Result;
 use napi_derive::napi;
 use serde_json::{json, Value};
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 
 #[napi]
 pub struct GitInspect {
@@ -16,10 +16,15 @@ pub struct GitInspect {
 #[napi]
 impl GitInspect {
     #[napi(constructor)]
-    pub fn new(state_root: String, repo_path: String, trusted_main: String) -> Result<Self> {
+    pub fn new(
+        state_root: String,
+        repo_path: String,
+        trusted_main: String,
+        detached: Option<bool>,
+    ) -> Result<Self> {
         check()?;
         Ok(Self {
-            driver: GitDriver::new(Path::new(&state_root)).map_err(operation)?,
+            driver: driver_for(&state_root, detached)?,
             path: repo_path.into(),
             main: trusted_main.into(),
         })

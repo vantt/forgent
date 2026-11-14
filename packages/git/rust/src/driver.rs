@@ -269,6 +269,19 @@ impl GitDriver {
         if fs::symlink_metadata(state_root).is_err() {
             Self::prepare_directories(state_root)?;
         }
+        Self::build(state_root)
+    }
+    /// The driver of a detached child (a background seal or publish): the root
+    /// belongs to whoever set it up, so a root that is gone stays gone and
+    /// answers `None`; the subdirectories of an existing root are still made.
+    pub fn new_if_root_exists(state_root: &Path) -> Result<Option<Self>> {
+        match fs::symlink_metadata(state_root) {
+            Ok(_) => Self::build(state_root).map(Some),
+            Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(None),
+            Err(e) => Err(io(e)),
+        }
+    }
+    fn build(state_root: &Path) -> Result<Self> {
         let state_root = fs::canonicalize(state_root).map_err(io)?;
         trusted_directory(&state_root)?;
         let hooks = state_root.join("git-empty-hooks");

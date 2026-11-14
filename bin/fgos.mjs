@@ -99,7 +99,7 @@ import { recoverObserveUseCase, recoverApplyUseCase } from '../src/verbs/dispatc
 import { branchNameFor, branchExists, resyncWorktree, detectTrunk, isMainWorktree, admitStoreAccess, currentHead, realpathOrSelf as realpathOr, inspectGit, resolveRefSha, createVerifyCheckout, removeWorktree } from '../src/runner/worktree.mjs';
 import { claimWork, ClaimError, readWorkerSlotCeiling } from '../src/runner/claim-port.mjs';
 import { isReclaimEligible } from '../src/runner/claim-liveness.mjs';
-import { commitAt, pathExistsAt } from '../src/git/inspect.mjs';
+import { commitAt, pathExistsAt, readRepoFacts } from '../src/git/inspect.mjs';
 import { readGitStatus, readMergeHead, recoverGitOperations } from '../src/git/status.mjs';
 import { HolderLockError } from '../src/holder-lock/index.mjs';
 import { collectLockStatus } from '../src/runner/lock-status.mjs';
@@ -139,8 +139,19 @@ function mainCheckoutRootAt(cwd) {
 }
 
 // What an Event Store verb reads: the project the `.fgos` `dir` belongs to, and the main checkout that owns the store.
-function eventStoreContext(dir) {
-  return { cwd: path.dirname(dir), trustedMain: mainCheckoutRootAt(path.dirname(dir)) };
+// A detached seal or publish child (`detached`) never rebuilds a state root its owner tore down: when it is gone the
+// context says `stateRootGone` and the verb skips.
+function eventStoreContext(dir, { detached = false } = {}) {
+  const cwd = path.dirname(dir);
+  if (!detached) return { cwd, trustedMain: mainCheckoutRootAt(cwd) };
+  let facts;
+  try {
+    facts = readRepoFacts(cwd, { detached });
+  } catch (error) {
+    if (error.code === 'state-root-gone') return { cwd, stateRootGone: true };
+    throw error;
+  }
+  return { cwd, trustedMain: resolveInvocationRoot({ cwd, policy: 'main-checkout', facts }).root };
 }
 
 // `currentHead`/`resolveRefSha` live in src/runner/worktree.mjs (tsk-49i
@@ -2619,7 +2630,8 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
     // own validation and refusals. The Event Store is Linux-only, so every one of them refuses elsewhere.
     case 'events': {
       const sub = positional[0];
-      const ctx = eventStoreContext(dir);
+      const detached = declared(COMMAND_REGISTRY.find((e) => e.name === 'events')?.eventStoreChild, positional, flags);
+      const ctx = eventStoreContext(dir, { detached });
       if (sub === 'sync') {
         const { syncUseCase } = await import('../src/verbs/events/sync.mjs');
         return syncUseCase(ctx, { remote: flags.remote, noPush: flags['no-push'], opportunistic: flags.opportunistic });

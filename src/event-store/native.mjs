@@ -49,8 +49,9 @@ function historical(result, key) {
   return { ...result, [key]: result[key].map(record => ({ ...record, event: JSON.parse(record.raw) })) };
 }
 const prepared = new Map();
-/** Resolve before acquiring a hot mutex; pass the result as prefetched.eventStore. */
-export function prepareStore(cwd, { stateRoot, trustedMain, loaderOptions, config } = {}) {
+/** Resolve before acquiring a hot mutex; pass the result as prefetched.eventStore.
+ * `detached` marks a background seal or publish child: it never creates a state root that is gone (error code `state-root-gone`). */
+export function prepareStore(cwd, { stateRoot, trustedMain, loaderOptions, config, detached = false } = {}) {
   available();
   const settings = eventStoreConfig(config);
   outsideState();
@@ -59,9 +60,9 @@ export function prepareStore(cwd, { stateRoot, trustedMain, loaderOptions, confi
   const trusted = path.resolve(trustedMain);
   const state = stateRoot ?? resolveStateRoot().stateRoot;
   const native = loadNativeAddon(loaderOptions);
-  const key = JSON.stringify([root, trusted, state, loaderOptions ?? null, settings.remote]);
+  const key = JSON.stringify([root, trusted, state, loaderOptions ?? null, settings.remote, detached]);
   if (prepared.has(key)) return prepared.get(key);
-  const resolved = call(() => native.resolveEventStore(root, state, trusted));
+  const resolved = call(() => native.resolveEventStore(root, state, trusted, detached));
   const store = openStore(resolved, resolved.machineId, registryFiles(), loaderOptions, settings.remote);
   prepared.set(key, store);
   return store;
@@ -154,11 +155,11 @@ export function openStore(resolvedRoot, machineId, files, loaderOptions, remote 
   return Object.freeze(facade);
 }
 
-/** Read facts without requiring a machine id or creating a store. */
-export function eventStoreFacts(cwd, { stateRoot, trustedMain = cwd, remote = 'origin', loaderOptions } = {}) {
+/** Read facts without requiring a machine id or creating a store. `detached` as for `prepareStore`. */
+export function eventStoreFacts(cwd, { stateRoot, trustedMain = cwd, remote = 'origin', loaderOptions, detached = false } = {}) {
   available();
   outsideState();
-  return call(() => loadNativeAddon(loaderOptions).eventStoreFacts(cwd, stateRoot ?? resolveStateRoot().stateRoot, trustedMain, remote));
+  return call(() => loadNativeAddon(loaderOptions).eventStoreFacts(cwd, stateRoot ?? resolveStateRoot().stateRoot, trustedMain, remote, detached));
 }
 export function eventStoreAddonAvailable(loaderOptions) {
   available();

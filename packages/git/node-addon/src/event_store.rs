@@ -1,5 +1,5 @@
 //! Marshaling only: the Event Store owns validation, locking and persistence.
-use crate::{check, error};
+use crate::{check, driver_for, error, operation};
 use fgos_event_store::{
     append,
     identity::StoreIdentity,
@@ -184,9 +184,10 @@ pub fn resolve_event_store(
     cwd: String,
     state_root: String,
     trusted_main: String,
+    detached: Option<bool>,
 ) -> Result<EventStoreRoot> {
     available()?;
-    let driver = GitDriver::new(Path::new(&state_root)).map_err(operation)?;
+    let driver = driver_for(&state_root, detached)?;
     let repo = match driver
         .resolve_repo(Path::new(&cwd), Path::new(&trusted_main))
         .map_err(operation)?
@@ -534,19 +535,16 @@ impl EventStore {
     }
 }
 
-fn operation(e: fgos_git::OperationError) -> Error {
-    error(json!({"code": e.code, "cause":e.cause}))
-}
-
 #[napi]
 pub fn event_store_facts(
     cwd: String,
     state_root: String,
     trusted_main: String,
     remote: String,
+    detached: Option<bool>,
 ) -> Result<Value> {
     available()?;
-    let driver = GitDriver::new(Path::new(&state_root)).map_err(operation)?;
+    let driver = driver_for(&state_root, detached)?;
     let repo = match driver
         .resolve_repo(Path::new(&cwd), Path::new(&trusted_main))
         .map_err(operation)?

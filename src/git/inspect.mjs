@@ -7,10 +7,17 @@ import { loadNativeAddon } from './native.mjs';
 function outsideGate() {
   if (hotLockDepth() > 0) throw Object.assign(new Error('exec-under-hot-lock: Git Inspect'), { code: 'exec-under-hot-lock' });
 }
+/** `options.detached` marks a background seal or publish child: it never creates a state root that is gone, and fails with code `state-root-gone`. */
 export function createGitInspect(options, loaderOptions) {
   outsideGate();
   const native = loadNativeAddon(loaderOptions);
-  const port = new native.GitInspect(options.stateRoot, options.repoPath, options.trustedMain);
+  let port;
+  try {
+    port = new native.GitInspect(options.stateRoot, options.repoPath, options.trustedMain, options.detached ?? false);
+  } catch (error) {
+    if (error.message === 'state-root-gone') error.code = 'state-root-gone';
+    throw error;
+  }
   const facade = {};
   for (const method of ['lastPathCommitTime', 'mergeTree', 'listTree', 'attributes', 'firstAncestryMerge', 'compareCommits', 'listBranches', 'checkoutFacts', 'remoteTracking', 'resolveCommit', 'resolveRepo', 'resolveRef', 'resolveLiteralRef', 'resolveTrunk', 'status', 'diff', 'diffText', 'ancestry', 'readObjects', 'pathsAtRevision', 'listWorktrees', 'compareContent', 'snapshotWrites', 'commitTime', 'countCommits', 'unmatchedCommitCount', 'trackedPaths', 'remoteUrl']) {
     facade[method] = (args = {}) => { outsideGate(); return port.call(method, args); };
@@ -26,10 +33,10 @@ export function gitWriter(fgosDir) {
 
 /** Mutation options resolve the repository once; a caller that already holds an inspect port for
  * `repoPath` passes it as `inspect` so that resolution is not repeated. */
-export function gitPortOptions(repoPath, { mutation = false, inspect } = {}) {
+export function gitPortOptions(repoPath, { mutation = false, inspect, detached = false } = {}) {
   outsideGate();
   const stateRoot = resolveStateRoot().stateRoot;
-  const seed = { stateRoot, repoPath, trustedMain: repoPath };
+  const seed = { stateRoot, repoPath, trustedMain: repoPath, detached };
   if (!mutation) return seed;
   const facts = (inspect ?? createGitInspect(seed)).resolveRepo();
   if (facts.notARepository) return seed;
@@ -38,8 +45,8 @@ export function gitPortOptions(repoPath, { mutation = false, inspect } = {}) {
 
 /** The repository facts of the checkout `cwd` sits in (`notARepository` when it sits in none); throws when Git cannot be read.
  * The one read every root answer is built from. */
-export function readRepoFacts(cwd = process.cwd()) {
-  return createGitInspect(gitPortOptions(cwd)).resolveRepo();
+export function readRepoFacts(cwd = process.cwd(), { detached = false } = {}) {
+  return createGitInspect(gitPortOptions(cwd, { detached })).resolveRepo();
 }
 
 /**
