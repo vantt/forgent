@@ -16,7 +16,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
 import { replaceDurably } from '../native/door.mjs';
-import { hostBinFromActivation } from '../util/host-bin-path.mjs';
+import { hostBinFromActivation, installationDir } from '../util/host-bin-path.mjs';
 
 /**
  * Tier 0: the Rust host binary the workspace's fgctl activation runs, by the
@@ -26,7 +26,7 @@ import { hostBinFromActivation } from '../util/host-bin-path.mjs';
  * symlink escaping it is refused).
  */
 export function resolveWorkspaceInstallationBin(cwd) {
-  return hostBinFromActivation(path.join(cwd, '.fgos', 'installation'));
+  return hostBinFromActivation(installationDir(cwd));
 }
 
 /**

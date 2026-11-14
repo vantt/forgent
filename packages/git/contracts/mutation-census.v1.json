@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "37a2e3c3b860d37e9eaf42aa5c603887ddac77907250f64fe9d611c28a34d54d",
+  "payloadDigest": "74e1f26cdcb8082b831ce168de8f08dcc575351a6d81c493ae614024e98d922c",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -1131,7 +1131,7 @@
     "src/setup/agent-wiring.mjs": "8ff79836aa04e9829d5eb396967cf73eb502810261003d6ec92e6371bb555b9c",
     "src/setup/agy-permissions.mjs": "ed40e05c846fbf499d0a0bfbe0e066f27ad060e144e55f8fa809b2b0e024df78",
     "src/setup/ansi.mjs": "9958f6c61351897a70bbcd3598c5f88f11028c584ea915d9c3cd6ff8af46bdfe",
-    "src/setup/bin-discovery.mjs": "d7d3536129adcbe5c6fc5297ef1f6ba1fcdc86d5195b7e968c14480b10e77101",
+    "src/setup/bin-discovery.mjs": "86a8cd75c0c2d8594b653c89860d6a035baa3b3aa13f3a340178f1a1dc846c6f",
     "src/setup/blind-steps-proven-pools.mjs": "b3da45e89da558eaa65990245ef6a39d7534b67be4e40e68544324734dc6dd66",
     "src/setup/checks.mjs": "a879e8fc73d87da4da5dc2cf8487eb37df24e5d757ff7592dd3ea939776b81ac",
     "src/setup/claude-code-hooks.mjs": "d9f4cdbe8c4cec4cb3ea7c67798d24b49e3c86a0d97a041b202dec8def2332fe",
@@ -1214,7 +1214,7 @@
     "src/util/format-duration.mjs": "aa3d4629659f6b635267965013716b45e71120cce5282f6b2a4503148c616ce9",
     "src/util/format-lock-duration.mjs": "87e069a71d25348768de8fe5116d2ac3759a2c1e775433a6511750491f874b3e",
     "src/util/git-paths.mjs": "fbb0b5af5b149853b9d5279062d417cee88a24ce161f782b5ae6dec3d10f1941",
-    "src/util/host-bin-path.mjs": "1610078534d0f33fbc9e204c7f9537a476740be4ec0d3d29acd49f483b79a366",
+    "src/util/host-bin-path.mjs": "5a3b994348e6830f4b869f0a30de17fc48fd4d2cfb551282606d8d8a4a4e20c2",
     "src/util/host-bin.mjs": "feea58b739293d12a06740b3f5c18bfe018d006381511d53816513d97f9683b1",
     "src/util/identity-mint.mjs": "533825271188a6e5dfba4c55e46d2ef69c07c07ae3150bda2872d0ea24a77159",
     "src/util/normalize-path.mjs": "e1519327a67834d6309a0e92e69d5fb46bb671a7ddfbe9ef5c36acc22fc3062a",

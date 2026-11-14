@@ -12,7 +12,8 @@
 ## Doors row, final lists (re-run with the real check)
 
 - allowed: `src/util/host-bin-path.mjs`; `packages/distribution/rust/src/{init,lib,shim,uninstall,fgctl_refresh}.rs`; `apps/fgctl/src/help.rs`; `src/setup/project-launcher.mjs`; with reasons: `bin/fgos.mjs` (error text names the shim, never builds or reads it), `scripts/check-hook-registrations-guarded.mjs`, `scripts/ci-external-consumer.{sh,ps1}`, `scripts/fgos-shell-integration.sh`, `scripts/lib/mailbox-behaviour-run.mjs`, `scripts/lib/mailbox-live-confined.mjs`, `scripts/record-mailbox-hook-fixtures.mjs`.
-- debt: `src/setup/registrations.mjs` (doctor rows read activation.json; moves after the capability plan rewrites the file).
+- debt: `src/setup/registrations.mjs` (doctor rows read activation.json; moves after the capability plan rewrites the file); `packages/herdr-fgos-common/rust/src/fgos.rs` (builds the shim path itself; moving it needs a dependency on the distribution crate, which changes Cargo.lock, so it moves with the Rust shim-path owner in the host foundations step).
+- Patterns also catch the Node `'.fgos', 'installation'` spelling and the Rust `.join("installation")` form. The markdown copy in `core/skills/_shared/fgos-cli-fallback.md` is named in the row reason.
 - Not in the row: `apps/fgos/src/legacy_exec.rs` (matches only in comments/test code, so listing it was stale) and `src/setup/bin-discovery.mjs` (already reads through `hostBinFromActivation`; only a comment names the file, so its planned debt entry was stale).
 - `agent-hooks.mjs` and `managed-timer.mjs` do not match.
 

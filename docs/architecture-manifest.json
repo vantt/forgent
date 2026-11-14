@@ -221,7 +221,7 @@
     {
       "job": "installation shim and activation record location",
       "kind": "door",
-      "patterns": ["activation\\.json", "['\"]installation['\"],\\s*['\"]bin['\"]", "\\.fgos/installation/bin"],
+      "patterns": ["activation\\.json", "['\"]installation['\"],\\s*['\"]bin['\"]", "\\.fgos/installation/bin", "['\"]\\.fgos['\"],\\s*['\"]installation['\"]", "\\.join\\(\"installation\"\\)"],
       "allowed": [
         "src/util/host-bin-path.mjs",
         "packages/distribution/rust/src/init.rs",
@@ -241,10 +241,11 @@
         { "path": "scripts/record-mailbox-hook-fixtures.mjs", "reason": "the fixture recorder spawns the shim of the workspace it builds" }
       ],
       "debt": [
-        { "path": "src/setup/registrations.mjs", "reason": "doctor rows read activation.json directly; moved after the capability plan rewrites the file" }
+        { "path": "src/setup/registrations.mjs", "reason": "doctor rows read activation.json directly; moved after the capability plan rewrites the file" },
+        { "path": "packages/herdr-fgos-common/rust/src/fgos.rs", "reason": "builds the shim path itself; the crate cannot depend on the distribution crate without a lockfile change, so it moves with the Rust shim-path owner in the host foundations step" }
       ],
       "retiredBy": "S7: the Node reader retires with the Node payload; distribution keeps writing",
-      "reason": "distribution writes the record and the shim, the host reads them; in Node only host-bin-path knows where they are"
+      "reason": "distribution writes the record and the shim, the host reads them; in Node only host-bin-path knows where they are; core/skills/_shared/fgos-cli-fallback.md names the shim path in prose as a known markdown copy"
     }
   ],
   "files": {

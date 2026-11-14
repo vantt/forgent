@@ -15,7 +15,14 @@ import path from 'node:path';
 
 const INSTALLATION = path.join('.fgos', 'installation');
 
-/** The project's installation shim, which outlives an upgrade (a release path would not). */
+/** The installation directory of the project at `root`. */
+export function installationDir(root) {
+  return path.join(root, INSTALLATION);
+}
+
+/** The project's installation shim, which outlives an upgrade (a release path would not). The parts stay
+ * literal here rather than reusing INSTALLATION: the Git one-door scan evaluates this path to resolve the
+ * binary spawned from it, and a computed part makes it report an unresolved binary. */
 export function projectShimPath(root) {
   return path.join(root, '.fgos', 'installation', 'bin', 'fgos');
 }
