@@ -90,14 +90,20 @@ earlier statements are linked below rather than copied.
    - **Execution** runs one Unit reliably.
    - **Workflow** coordinates many Units.
    - **Domain** holds each field's doctrine and its business cases.
-2. **Workflow has features, but only generic coordination mechanisms, never a
-   specific business case.** Examples of mechanisms: fan-out/fan-in; seats in
-   parallel or in series; back-and-forth review loops; quorum; an arbiter that
-   settles and keeps dissent; gates and human stops; resume after
-   interruption; retry on infrastructure faults; passing one step's result
-   into the next; budgets and round limits. Workflow is the skeleton that lets
-   the soul (the agent) run a flow reliably, precisely and flexibly, without
-   boxing it in.
+2. **A Unit is one atomically settled piece of work, and Workflow has only
+   generic coordination mechanisms, never a specific business case.** A Unit
+   has one write scope, one worktree custody, one outcome and one commit.
+   Inside it, one or more seats coordinate through one of four loops: solo (one
+   seat, the default), reviewed, panel, debate. Seats in parallel or in series
+   and back-and-forth review loops inside a Unit belong to Execution, as
+   D-ADR0073 in the [Workflow spec](workflow/spec.md) fixes. Workflow owns
+   coordination across Units: fan-out/fan-in; quorum over Units; loop-until;
+   parallel ready steps (they run serially today); an independence guard across
+   Units; an arbiter that settles and keeps dissent; gates and human stops;
+   resume after interruption; retry on infrastructure faults; passing one
+   step's result into the next; budgets and round limits. Workflow is the
+   skeleton that lets the soul (the agent) run a flow reliably, precisely and
+   flexibly, without boxing it in.
 3. **Business cases live in Domain.** A coding flow, a council, a marketing
    flow and a financial flow are each a composition of Workflow mechanisms plus
    the field's doctrine. With every coordination mechanism already in
@@ -107,12 +113,26 @@ earlier statements are linked below rather than copied.
    already build and run its own council, workflow-style. Workflow adds
    reliability on top, but it must not bloat.
 5. **Work is not a foundation layer.** Work (lifecycle, human touch points,
-   per-domain apps) is a surface or orchestration layer that runs beside or
-   above Domain. Address it only when needed.
+   per-domain apps) sits above Domain and reads Domain only as data. Address
+   it only when needed. This layer direction supersedes the older "Work as a
+   shared spine" reading in the base-lifecycle vision further down this file,
+   which is left as written.
 6. **Placement test.** If a change in Workflow names or encodes a specific
-   business case (council, panel, coding, marketing, and so on), it is in the
-   wrong layer and belongs in Domain. If it is a coordination mechanism several
-   cases can share, it belongs in Workflow.
+   business case (council-lite, architecture-advisory, coding, marketing, and
+   so on), it is in the wrong layer and belongs in Domain. If it is a
+   coordination mechanism several cases can share, it belongs in Workflow.
+   `panel` is the name of a mechanism (fan-out to independent seats, then a
+   synthesizer), not a business case.
+7. **Gates and human stops split by mechanism and policy.** Workflow owns the
+   mechanism: gate modes consent and input, the parked state, the answer verb,
+   the human-consent guard, the question record, and the decision-question
+   shape checker. Work and Domain own the policy: gate-bypass (when a question
+   may be skipped), batching questions into one ask, and presentation. Work's
+   `awaiting-human` state folds into the Workflow park at the coding cutover,
+   leaving one park. This reconciles the 2026-11-09 Work vision, whose gate
+   items are policy and presentation, with this direction.
+8. **Order.** The coding cutover comes first, then the cross-Unit Workflow
+   mechanisms. The hard-independent panel arbiter can land at any time.
 
 Where this direction is already stated or applied:
 
@@ -128,11 +148,27 @@ Known gaps against this direction:
 
 - The code tiers in `docs/architecture-manifest.json` put Work lifecycle at
   tier 7 and Skill and Domain at tier 8, so Domain sits above Work. Point 5
-  places Work beside or above Domain. The manifest is unchanged; this is an
+  places Work above Domain. The tier change goes with the coding cutover,
+  because until then Work's step machine drives coding's progress. This is an
   open gap, not a decision.
 - The same manifest also has a `layers` list (`entry`, `use-case`, `infra`,
   `domain`, `kernel`), the per-file ranks of its one-directional import rule.
   Its `domain` rank does not mean the Domain layer above.
+- Business names have leaked into generic code and must move to Domain: the
+  hardcoded research-fan-out branch in `src/runner/execution/seat-resolver.mjs`,
+  the code-change and rfc recipes in the generic catalog, and council names in
+  error and help text.
+- The decision-question shape checker lives in `src/state/decision-question.mjs`
+  and moves down to the Workflow layer later.
+- Question batching (point 7) has no code yet.
+- The hard-independent panel arbiter is a small parameter change from
+  `preferIndependentOf` to `independentOf` in
+  `src/runner/execution/loops/panel.mjs`. Today independence is a soft
+  preference.
+- The councils in `core/workflows` move into a named domain. Open question,
+  under discussion with the owner and not decided: are the business-named
+  capability rows in `core/config-standard/runner.yaml` generic job-shape names,
+  or rows each domain ships?
 
 ## 7. Related Anchors
 
