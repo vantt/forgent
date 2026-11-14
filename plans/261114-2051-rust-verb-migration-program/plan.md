@@ -40,15 +40,15 @@ replaces the three with **one mechanism**: a `doors` table in `docs/architecture
 `test/architecture.test.mjs` (no new tool), and retires the old checks in the same change (L10).
 
 Row shape (phase 01): `job`, `kind` (`door` or `ratchet`), `patterns`, `allowed` (paths or globs; every `scripts/` entry
-carries a reason), `debt` (known leaks, visible, checked for staleness like `tierExceptions`, and allowed only to shrink
-against the merge base), `reason`, `retiredBy` (for a Node/Rust twin). The scan covers every product file in Node, Rust
+carries a reason), `debt` (known leaks, visible; an entry that no longer matches fails as stale, so a fixed leak must
+be removed; every entry needs a reason, and adding one is a manifest diff that review catches), `reason`, `retiredBy` (for a Node/Rust twin). The scan covers every product file in Node, Rust
 and scripts (`bin/`, `src/`, `scripts/`, `apps/`, `packages/`, `.githooks/`); comment lines and Rust `#[cfg(test)] mod`
 blocks do not count. A `ratchet` row (verb-wide patterns such as `renameSync(`, `Command::new(`, `child_process`) only
 stops growth: it is never cited as proof of one path, here or in any later step.
 
 **Exit criterion of every step F0-S7:** each job the step owns has a `door` row that fails on any other path in the
 repository, including the old Node path the step retired; any leak the step does not fix is in that row's `debt` with
-its reason, and the step leaves no row's debt larger; Git jobs stay on the Git scan, whose count must not rise. F0's rows:
+its reason, and any debt the step fixed is removed (the stale check enforces it); Git jobs stay on the Git scan, whose count must not rise. F0's rows:
 phase 01 (mechanism and the manifest-projection row), phase 00 part B (kernel lock primitive, holder-lock take, process
 control, process facts `/proc`, canonical JSON bytes, YAML parser loads, replacing the three old guards), phase 08 (help,
 lane, root, global directory, admission, fault record, argument parser, Event Store maintain and config), phase 09
@@ -244,7 +244,7 @@ in F0 only as `debt` entries of `doors` rows. Shared or possibly shared files:
    before Node help was deleted.
 6. One one-door mechanism besides the Git scan: the three old guards are retired and their rules are rows. `doors`
    rows exist for every F0 job and the first-tier census jobs and pass on the integration head; the check's own unit
-   cases show that a match outside `allowed`/`debt`, a stale entry, grown debt, a comment-only match and a
+   cases show that a match outside `allowed`/`debt`, a stale entry, a debt entry without a reason, a comment-only match and a
    `#[cfg(test)]`-only match each behave as specified. No ratchet row is cited as proof of one path.
 7. Gates green on the integration head: `npm test`, `cargo test --workspace`, clippy `-D warnings`,
    `cargo fmt --all --check`, msvc and darwin checks, doc-health, decision-citation drift; the Git
@@ -259,7 +259,7 @@ in F0 only as `debt` entries of `doors` rows. Shared or possibly shared files:
 | Two lanes judging one invocation differently during the window | M x H | one Rust owner for root and admission; shared vectors for the parser and the store declarations |
 | Parallel phases colliding on generated files | H x L | generated files are regenerated, never hand-merged (table above) |
 | Doors wired in the host with no native consumer until S2 | M x M | module-level Rust proofs in 08; S2's first store verb adds the binary wiring proof |
-| One door regressing after F0 | M x H | `doors` rows in `test/architecture.test.mjs`, extended by every step; debt may only shrink |
+| One door regressing after F0 | M x H | `doors` rows in `test/architecture.test.mjs`, extended by every step; stale debt fails, new debt needs a reason and shows in review |
 | F0 slips the rc.9 cut | M x M | rc.9 waits for both plans; F0 lands as one series |
 
 Rollback: F0 lands as one series; revert the series. No data format changes: the fault log, Event
@@ -307,13 +307,18 @@ Source: `git show origin/research/one-door-census:plans/reports/research-261114-
 
 | # | Decision | Applied to |
 |---|---|---|
-| 1 | Row shape gains `debt` (stale-checked, shrink-only against the merge base), Rust `#[cfg(test)] mod` blocks skipped, `scripts/` entries carry a reason, globs in `allowed`, comment lines ignored, `kind: "ratchet"` never cited as proof | phase 01 |
+| 1 | Row shape gains `debt` (stale-checked, reason required; no comparison with another revision and no Git call in the check, per the follow-up review of `f7c5aa506`), Rust `#[cfg(test)] mod` blocks skipped, `scripts/` entries carry a reason, globs in `allowed`, comment lines ignored, `kind: "ratchet"` never cited as proof | phase 01 |
 | 2 | The three existing guards become rows in the one table; their old checks retired in the same change, each naming its owner | phase 00 part B |
 | 3 | Census leak rank 4: the work-state root walk joins the root door (phase 04); the global directory goes to phase 06, the owner of the Config crate and the addon `config` file (in 04 it would put two wave-B phases on that file); two choosers stay as debt with reasons (`registrations.mjs` is edited by the capability plan; `uninstall.rs` needs a crate edge and moves with S4) | phases 04, 06, 08 |
 | 4 | Phase 00 lands the first-tier rows (kernel lock primitive, process control, process facts `/proc`, canonical JSON bytes) with debt lists after phase 01's mechanism exists: phase 00 becomes part A (wave A) and part B (wave B) | phase 00, wave map |
 
 Consistency sweep after the amendment: plan.md, phases 00, 01, 04, 06, 08 reread; deltas checked 4; stale references
 reconciled (effort, waves, hot files, file set, collision table, exit criterion 6); unresolved contradictions 0.
+
+Follow-up review of `f7c5aa506`: the "debt may only shrink against the merge base" rule is dropped (a result that
+depends on a remote ref fails offline, in shallow CI and in worktrees with stale refs). The check is local: (a) a match
+outside `allowed` and `debt` fails; (b) a stale `debt` entry fails; (c) new debt is a reviewed manifest diff with a
+required reason. The file list comes from a filesystem walk, not `git ls-files`.
 
 ## Validation Log
 

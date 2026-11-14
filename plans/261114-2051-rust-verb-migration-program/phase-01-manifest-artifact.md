@@ -63,26 +63,26 @@ Two things the rest of F0 builds on:
    - Any `scripts/` path (dev tooling) must be an object with a `reason`, in `allowed` or `debt`; nothing under
      `scripts/` is skipped or allowed silently.
    - `debt` lists known leaks: files that still do the job outside the door. They stay visible and fail nothing,
-     but each is checked for staleness like `tierExceptions` (an entry that no longer matches must be removed) and
-     a row's debt may only shrink: the check compares each row with the same row in the manifest at the merge base
-     with `origin/main` and fails when a row present there gained a debt path. A new row may start with debt.
+     but each is checked for staleness like `tierExceptions`: an entry that no longer matches fails, so a fixed leak
+     must be removed from the list. Adding a debt entry is a visible manifest diff that review catches; the row
+     documentation says new debt needs a reason line, and the check enforces that every `debt` entry has a non-empty
+     `reason`. The check compares nothing with any other revision.
    - `kind: "ratchet"` is for verb-wide patterns (`renameSync(`, `Command::new(`, `child_process` imports) that cannot
      prove one path; its `allowed` entries carry a per-file match ceiling (`{ "path", "max" }`), a count may fall and
      never rise, and no doc, report or exit criterion may cite a ratchet row as proof of one path.
 6. `test/architecture.test.mjs` gains one check over the rows. Product files: tracked files under `bin/`, `src/`,
    `scripts/`, `apps/`, `packages/`, `.githooks/` with extensions `.mjs .js .cjs .rs .sh .ps1`, excluding `*.test.mjs`,
-   any `test/` or `tests/` directory, `fixtures/`, `third-party/`, `upstreams/`. List them through `git ls-files` the
-   way the existing checks list files (reuse their lister). Before matching: drop comment lines (`//`, `/*`, `*` lines
+   any `test/` or `tests/` directory, `fixtures/`, `third-party/`, `upstreams/`, `node_modules/` and `target/`. List them
+   with a filesystem walk, extending the file's existing walker (`mjsFilesUnder`, `test/architecture.test.mjs:32`) to these
+   roots and extensions; the check makes no Git call and reads nothing but the working tree and the manifest. Before matching: drop comment lines (`//`, `/*`, `*` lines
    in `.mjs .js .cjs .rs`; `#` lines in `.sh .ps1`), and drop Rust test code: a `#[cfg(test)]` attribute followed by a
    `mod` item, up to its matching closing brace (brace count outside string literals). State the heuristic's limits in
    the check's header. Fails when: (a) a pattern matches outside `allowed` and `debt`; (b) an `allowed` path or glob, or
    a `debt` path, no longer matches (stale); (c) a row allowing both an `.mjs` and an `.rs` file has no `retiredBy`;
-   (d) a `scripts/` entry has no reason; (e) a row's debt grew against the merge base; (f) a ratchet count rose.
-   Messages name the row's `job`, the file and the line. The merge-base manifest is read through the Git read the suite
-   already uses for repository facts (no new spawn helper); in a checkout without `origin/main` the check (e) says so
-   by name and fails, it is never skipped.
+   (d) a `scripts/` entry or any `debt` entry has no reason; (e) a ratchet count rose above its ceiling.
+   Messages name the row's `job`, the file and the line.
 7. Unit cases for the check (beside the tier rule's own cases at 266), on in-memory rows and file texts: a match outside
-   `allowed` fails; a match in `debt` passes; stale `allowed`, stale glob and stale `debt` fail; grown debt fails; a twin
+   `allowed` fails; a match in `debt` passes; stale `allowed`, stale glob and stale `debt` fail; a `debt` entry without a reason fails; a twin
    without `retiredBy` fails; a retired name anywhere fails; a match only in a comment line passes; a match only inside a
    `#[cfg(test)] mod` block passes and one after that block's closing brace fails; a ratchet count rise fails and a fall passes.
 8. This phase's own row: job "verb manifest projection", kind `door`, pattern `\bpublicManifest\(`, allowed
