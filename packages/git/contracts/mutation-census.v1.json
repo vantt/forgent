@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "bbfe9590d5f60be584c43bc0e82d57bebe63fdf2ef5f84fed25285373b6fff55",
+  "payloadDigest": "3f8d9214c1a77ddabee3cc5f45354d44b72e35229d088d5be42ba8d9e08f68cf",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -871,13 +871,13 @@
     "scripts/lib/mailbox-behaviour-v7i.mjs": "0059548c4a97e93061c0951d87c4b156d19211b4e05ae47cde089bb6f456aff9",
     "scripts/lib/mailbox-behaviour-v7j.mjs": "5b65f8e7db99ef19ca4a62cacadacd29f8de6b95021916c4809f97cabd217707",
     "scripts/lib/mailbox-live-cli.mjs": "084b02bbadd408f0cecb4888ba37cf760005931887b5ec31f5ba2d6e1c0ba484",
-    "scripts/lib/mailbox-live-confined.mjs": "ea6931c73f0662ba182e99a1cd7b7d442385b55488bd4bc0d08db9a1a98bc591",
+    "scripts/lib/mailbox-live-confined.mjs": "c86f97d2b65c91b55953946f104d2e031ffaa9b9fc5afac49e7264f0f239f8a7",
     "scripts/lib/mailbox-role-recorder.mjs": "b45702d191ab0ce223c9be0795fd9b573d73ff5a88a89007457de1da24f4c8ae",
     "scripts/lib/mailbox-wake-probe.mjs": "bdba8f043335de5c70149d48ed656e3c359531426b2f98c1c4037cc0b6970085",
     "scripts/lib/rust-source.mjs": "c4b3e57b99f377e182742d1540c9f88e3a028863e005485d0485fdf830edb7bf",
     "scripts/lib/sandbox-git.mjs": "c45bc75afc8e5666e13d70f9ea65c6ff4e79243aeca7bae5046d4ea3e914088f",
     "scripts/lib/test-file-cpu.mjs": "f54eb34a6f6f01607c123fbeb04d1a8be61805c7fe687f7887a0adac2068e4a7",
-    "scripts/lib/test-file-watchdog.mjs": "19cb651630d7ab85a8e820cedfdb83048f42f0a22a66a8d6921e848dd60fe93a",
+    "scripts/lib/test-file-watchdog.mjs": "90fe256c808c268d8039136a225b4517a9cc1290a530fa503158f6ba2bcb7211",
     "scripts/lib/test-git-config-guard.mjs": "e9bc333d889985d94b847fd80fbfed7e6dcfa1e9b2ffffc97a14e7be326153d1",
     "scripts/list-doc-anchors.mjs": "fe4d901d266dc9d93e8a405051b618210f17808cc10f29663d48ad55a13e253f",
     "scripts/main-checkout-delete-guard-hook.mjs": "1441b87ef8661132314d89ec1d534a6049cfcf2bc088ca789e5a50fd68ec02be",
@@ -892,7 +892,7 @@
     "scripts/regenerate-observe-fixtures.mjs": "e1ab4a029ae9aecf5485393a3f6e967f1e338862391a6b1701ed1954c57b40ee",
     "scripts/run-rust-dev-host.mjs": "54108fe41cb34a3bf60c01a98ab42368e12c0772dcdb707eea9cd28251d66289",
     "scripts/run-test-canary.mjs": "ef25e2f8237ffefddbf707c68289c0fe00ee95bd10da6a51a80fd965b30c42ba",
-    "scripts/run-tests.mjs": "6998785c0417e1167cfb9c69b8e0f9d4f775ab7b73f518e3b34f8249ee911bb5",
+    "scripts/run-tests.mjs": "1e286bb2ecec08cf7d2b08cd787e21987be78aa284edc5c8d34ebdc81002c459",
     "scripts/stress-test-files.mjs": "1c9298587bae21b5971c2e1eba5effd3c2a0c85ba94372936fa5e0c1d70d4f4e",
     "scripts/test-ownership-lint.mjs": "1917bcc0ec0387e43d4e09dc3bc1e6a5923e30b4c3848cf480df9eb0c2c042e2",
     "scripts/test-proof-inventory.mjs": "77b8de2723057778114ef9457669261ca2b6d02e33dd0c9b0f7a4e88898d133c",
@@ -1045,7 +1045,7 @@
     "src/runner/dispatch/runtime-inspection.mjs": "b536d9b4fdfd9480915b6c84b8035b5345c9007f94e5b213361230f98f3f94e1",
     "src/runner/dispatch/settlement.mjs": "c17e494e117c60d5fa823b33ba358f4c464d8efe6e6d5f7fd3f9251e1baa9f5d",
     "src/runner/dispatch/shipped-catalog.mjs": "ceb40e02a773598eebe4fc8db48e7400bfb76ce938df20268ce166f0539b8025",
-    "src/runner/dispatch/stop-processes-inside.mjs": "018abac624d8a4f10d5ad6209db9f765134ce4e304688897df076dfa99e2864e",
+    "src/runner/dispatch/stop-processes-inside.mjs": "255f7cedcb61ad8c3992b6068bb1951ce437f7e98acffac382f6ade7e943c234",
     "src/runner/dispatch/terminal-slot.mjs": "a997ce7a1f76c280776e9da30ff1431a537f16094ff89560cd079a8010bcfdd5",
     "src/runner/dispatch/tier-cell.mjs": "91024f5f01c60fba321325214d08b4773535d538374f6cfad4b2ccb16b1c2436",
     "src/runner/dispatch/transport.mjs": "ff8519a280890bc45f5bdd3403dff25721b553ea0afb9e39d55d4dc0ec9c751a",
@@ -3379,6 +3379,13 @@
       "line": 1330,
       "spawn": "cmdRun -> scripts/record-mailbox-hook-fixtures.mjs:315",
       "binary": "(command-line arguments)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "scripts/run-tests.mjs",
+      "line": 139,
+      "spawn": "loadNativeAddon -> src/git/index.mjs:10",
+      "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {

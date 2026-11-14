@@ -257,7 +257,8 @@ function startFileWatchdog({ files, env, fileTimeoutMs, pollMs, tempDir, cleanDi
     { env, stdio: ['ignore', 'ignore', 'inherit'] },
   );
   child.on('error', (err) => log(`run-tests: warning: per-file time limit not running: ${err.message}`));
-  const journal = () => fs.readFileSync(outFile, 'utf8').split('\n').filter(Boolean).map((line) => JSON.parse(line));
+  // A line the watchdog is still writing does not parse yet; it is read again at the next look.
+  const journal = () => fs.readFileSync(outFile, 'utf8').split('\n').filter(Boolean).flatMap((line) => { try { return [JSON.parse(line)]; } catch { return []; } });
   // The launcher blocks in spawnSync, so no process event reaches it: the watchdog says `ready` (after it proved the
   // door works) or `failed` in its journal, and no test starts before one of them. A run without its time limit fails.
   const deadline = Date.now() + WATCHDOG_READY_MS;
@@ -316,6 +317,8 @@ const STRAY_ENV_KEYS = ['TMPDIR', 'FGOS_TEST_FIXTURE_ROOT'];
  * could not be read, one still alive after the kill, a refused signal and an unavailable door are, each with a next step.
  */
 export function stopStrays(roots, { env, exclude = [], stop = stopProcessesInside } = {}) {
+  // The door cannot scan on Windows: nothing is known to run there, as before.
+  if (process.platform === 'win32') return { strays: [], refusals: [] };
   const strays = new Map();
   const refusals = new Set();
   let views;

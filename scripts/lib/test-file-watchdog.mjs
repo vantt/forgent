@@ -134,7 +134,7 @@ function snapshot() {
 
 /**
  * Kills the tree under `rootPid` that `procs` showed. Every member is observed first (its identity), then the table is
- * read again: only a member still in the tree, with the command line it had, is signalled, and by the identity
+ * read again: only a member still in the tree, with the command line it had (and the root with its parent), is signalled, and by the identity
  * observed, so a pid that went to another process in between receives nothing. Returns the refusals as advice lines.
  */
 function killTree(procs, rootPid) {
@@ -144,6 +144,8 @@ function killTree(procs, rootPid) {
   const refused = [];
   for (const { pid, view } of seen) {
     if (still.get(pid) === undefined || still.get(pid) !== procs.find((p) => p.pid === pid)?.args) continue;
+    // The root keeps its parent: a pid reused for another process would almost surely have a different one.
+    if (pid === rootPid && after.find((p) => p.pid === pid)?.ppid !== procs.find((p) => p.pid === pid)?.ppid) continue;
     const outcome = signalByIdentity(view, 'kill');
     if (!['sent', 'not-found', 'identity-mismatch'].includes(outcome)) refused.push(refusalAdvice(pid, `the kill was refused (${outcome})`));
   }

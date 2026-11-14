@@ -21,6 +21,8 @@ run-tests, architecture, doc-health, git-mutation-census, process-facts-vectors,
 - Item 7 (cap polling on repeated `unknown`) not done: stopping the watchdog would silently drop the time limit, and the refusal path above already covers the door being unavailable.
 - The door now loads at the end of every run (the scan needs it), not only when a kill is needed.
 - A stray is now matched by env/cwd/exe, not by its command line naming the dir.
+- `stillThere` in `stop-processes-inside.mjs` treats `unknown` as gone; that predates this phase and is left unchanged.
+- Review follow-ups applied: `killTree` also requires the root's ppid unchanged, `stopStrays` returns early on win32, the ready-wait skips a half-written journal line.
 - No CHANGELOG line.
 
 ## Lessons
