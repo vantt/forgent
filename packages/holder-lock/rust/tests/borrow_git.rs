@@ -76,6 +76,28 @@ fn the_four_borrow_vectors_and_the_sibling_check_are_green() {
     assert!(report.pass(), "{report:#?}");
 }
 
+/// A git that never runs auto gc (config in the environment beats the repository's): the borrowed
+/// gc vector would still read Free, so only the unborrowed control can tell it was not exercised.
+#[test]
+fn gc_vector_fails_as_not_exercised_when_auto_gc_never_runs() {
+    use std::os::unix::fs::PermissionsExt;
+    let _serial = serial();
+    let dir = temp_dir("gc-skip");
+    let wrapper = dir.join("git-no-auto-gc");
+    fs::write(
+        &wrapper,
+        "#!/bin/sh\nGIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=gc.auto GIT_CONFIG_VALUE_0=0 exec git \"$@\"\n",
+    )
+    .unwrap();
+    fs::set_permissions(&wrapper, fs::Permissions::from_mode(0o755)).unwrap();
+    let only = ["gc-auto-loose-objects".to_string()];
+    let report = borrow_vectors::run(&wrapper, &helper(), &only, false).expect("vectors run");
+    let v = &report.vectors[0];
+    assert!(!v.pass, "{v:?}");
+    assert!(v.detail.contains("vector not exercised"), "{v:?}");
+    let _ = fs::remove_dir_all(&dir);
+}
+
 #[test]
 fn an_unknown_vector_name_is_a_usage_error() {
     let _serial = serial();

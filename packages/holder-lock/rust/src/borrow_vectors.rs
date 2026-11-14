@@ -234,6 +234,37 @@ pub fn add_loose_objects(git: &Path, repo: &Path) -> Result<usize, String> {
     }
 }
 
+/// How long the control commit's detached auto gc gets to reach its hook.
+const CONTROL_DEADLINE: std::time::Duration = std::time::Duration::from_secs(15);
+
+/// The control's `pre-auto-gc` hook writes this marker; the vector's unborrowed
+/// commit must produce it, or the borrowed vector's free lock proves nothing.
+fn install_gc_marker_hook(control: &Path) -> Result<PathBuf, String> {
+    let marker = control.join(".git").join("gc-fired");
+    let quoted = marker.to_string_lossy().replace('\\', "/");
+    write_hook(
+        control,
+        "pre-auto-gc",
+        &format!("#!/bin/sh\n: > '{quoted}'\nexit 0\n"),
+    )?;
+    Ok(marker)
+}
+
+/// Poll for the marker until the deadline; the detached auto gc is asynchronous.
+fn wait_for_gc_marker(marker: &Path) -> Result<(), String> {
+    let deadline = Instant::now() + CONTROL_DEADLINE;
+    while !marker.exists() {
+        if Instant::now() >= deadline {
+            return Err(format!(
+                "an unswitched commit started no auto gc within {} s (no pre-auto-gc marker)",
+                CONTROL_DEADLINE.as_secs()
+            ));
+        }
+        std::thread::sleep(std::time::Duration::from_millis(20));
+    }
+    Ok(())
+}
+
 struct Borrowing<'a> {
     git: &'a Path,
     helper: &'a HelperExe,
@@ -335,6 +366,19 @@ fn vector(name: &str, git: &Path, helper: &HelperExe, dir: &Path) -> VectorResul
                 (k, p, n, false)
             }
             "gc-auto-loose-objects" => {
+                // The vector means something only while an unswitched commit in the same kind
+                // of repository really starts auto gc; otherwise a green result is vacuous.
+                let control = dir.join("gc-control");
+                init_repo(git, &control)?;
+                config(git, &control, "gc.auto", "1")?;
+                add_loose_objects(git, &control)?;
+                let marker = install_gc_marker_hook(&control)?;
+                let mut unswitched = git_plain(git, &control);
+                unswitched.args(["commit", "-q", "--allow-empty", "-m", "control"]);
+                run_plain(unswitched, "control git commit")?;
+                if let Err(why) = wait_for_gc_marker(&marker) {
+                    return Ok((false, format!("vector not exercised: {why}")));
+                }
                 config(git, &repo, "gc.auto", "1")?;
                 let loose = add_loose_objects(git, &repo)?;
                 let (k, p, mut n) =

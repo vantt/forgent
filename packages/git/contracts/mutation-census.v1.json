@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "d48aad36966f0167c5e8522dc2d4ca103c68623cb6d9d4a7c932dc9c2e28c13d",
+  "payloadDigest": "b0b3d15cc603ae2675d7535422c84ed31e620fcae99fca31b195dbb500844d91",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -433,7 +433,7 @@
     "packages/herdr-fgos-common/rust/src/lib.rs": "a27bb70798915e8f27a33500b384aea536cc43554bcedba01e67623a5bbe54d1",
     "packages/herdr-fgos-common/rust/src/ports.rs": "45c92b4f8a06e62a79a09655fe9c484a85dc9745049cfea6849245b886f4913f",
     "packages/herdr-fgos-common/rust/src/settings.rs": "2825ad403920455192fe52a64aa976bcc788e6cc907cf38a1df7632102b3eb97",
-    "packages/holder-lock/rust/src/borrow_vectors.rs": "944f6ef3d108d2191a5bc4690c0c52020c22d6e52ca19d30269fe200ba3d1f3a",
+    "packages/holder-lock/rust/src/borrow_vectors.rs": "302fdc3ef34d7c93c1bd4cf726d97554c57fbe9c7261b85004875deb0da0b4cd",
     "packages/holder-lock/rust/src/borrow_windows.rs": "8ae1a53fcb7a1a05ff6a94db8425bbe152f4e3ee3764ef19df18ad0bb8d01475",
     "packages/holder-lock/rust/src/driver/flock.rs": "02f5e75c471360fb3880304fc4efd66f8044232cf8b6e49869a130e0c1ef22d2",
     "packages/holder-lock/rust/src/driver/mod.rs": "450b05d8d0616b73c2ed8356913e8cc88767d14c0a35f2a33b981398baef0da1",
@@ -449,7 +449,7 @@
     "packages/holder-lock/rust/src/semantics.rs": "cfb5e67d996db60f4493678cf1dbb2898c4d1028f6e6102d3c026dddd6763e91",
     "packages/holder-lock/rust/src/state_root.rs": "e1f212f2486da09f62ea68fff9ed08a42788319601946ed8fa3347f7f8539b6f",
     "packages/holder-lock/rust/src/tombstone.rs": "c83051cd8c7d405264deb827fb09997060edabeeee57ef6c1347bfc27b7ecd21",
-    "packages/holder-lock/rust/tests/borrow_git.rs": "6df71f9e1d364f60b144745b5aaadd6919f14299638f284b86fb0e0dbe0006a1",
+    "packages/holder-lock/rust/tests/borrow_git.rs": "44b0ecf7913059d5bcbe23f025d3428444cc062376622bd742bf2f784449f2d4",
     "packages/holder-lock/rust/tests/borrow_io.rs": "73c1bf13cd2ba16d31d9c91ccb4cc3c8dda7d9e699acf5713eea4fc3e0b26f9f",
     "packages/holder-lock/rust/tests/common/mod.rs": "33bb3a00037e8a57732ad4d5963529a75c50701e3ad8d54fd6f9f185b1693c87",
     "packages/holder-lock/rust/tests/multiprocess.rs": "560966d064bc2a119b6524eb7f20a04239fdc3d91f57ff8647cfdf726a6fa80c",
@@ -2689,7 +2689,7 @@
     },
     {
       "path": "packages/holder-lock/rust/src/borrow_vectors.rs",
-      "line": 540,
+      "line": 584,
       "spawn": "Command::new",
       "binary": "? git of run",
       "class": "production-sandbox-probe",
@@ -2722,14 +2722,14 @@
     },
     {
       "path": "packages/holder-lock/rust/tests/borrow_git.rs",
-      "line": 119,
+      "line": 141,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"
     },
     {
       "path": "packages/holder-lock/rust/tests/borrow_git.rs",
-      "line": 153,
+      "line": 175,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"
