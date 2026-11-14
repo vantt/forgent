@@ -395,28 +395,46 @@ test('two heads in two sandboxes share one record, and each receives the other\'
   const ws = path.join(workspace, 'ws');
   const installation = path.join(ws, '.fgos', 'installation');
   const prompt = (me, peer) => `1. Run: ls\n2. Run: until [ -f go.txt ]; do sleep 0.2; done; fgos mailbox send --to "$(cat peer-${me}.txt)" -- "MBX-FROM-${me}"; touch sent-${me}.txt\n3. Run: until [ -f sent-${peer}.txt ]; do sleep 0.2; done\n`;
+  // Each head makes one hook call before it waits, and that call registers it. A hook that finds the mailbox
+  // lock held longer than its wait skips its drain until its next call, which neither head makes before the other
+  // is registered; with the shipped 100 ms, a registering hold that outlasts it on a slow disk loses the head for
+  // good. The wait is this project's own setting here, so the proof covers two heads sharing a record and not the
+  // hook's skip budget, which the hook's own proofs own.
+  const PAIR_CONFIG = { mailbox: { enabled: true, hook: { lockWaitMs: 5000 } } };
   const runs = {};
-  for (const [me, peer] of [['A', 'B'], ['B', 'A']]) {
+  const ended = new Set();
+  const end = async (me) => {
+    ended.add(me);
+    return (await endConfinedRun(runs[me], { waitMs: LOADED_WAIT_MS })).left;
+  };
+  const startHead = (me, peer) => {
     const runId = `run-pair-${me}`;
     const settings = path.join(w.base, 'settings', `${runId}.json`);
     const prepared = prepareConfinedRun({ base: w.base, runId, workspace, command: process.execPath, args: [STUB, 'claude', '-p', '--settings', settings, prompt(me, peer)], env: baseEnv({ PATH: `${path.join(installation, 'bin')}:${process.env.PATH}` }), masks: w.masks, readOnly: [installation] });
-    if (me === 'A') layOutRunProject(prepared.paths, { cli: 'claude', release: w.release, shim: shim() });
+    if (me === 'A') layOutRunProject(prepared.paths, { cli: 'claude', release: w.release, shim: shim(), config: PAIR_CONFIG });
     else fs.copyFileSync(path.join(w.base, 'settings', 'run-pair-A.json'), settings);
     runs[me] = startConfinedRun(prepared);
     runs[me].prepared = prepared;
     runs[me].child.stdout.resume();
     runs[me].child.stderr.resume();
-  }
-  const bindings = await waitFor(() => { const b = Object.values(snapshotOf(ws)?.bindings ?? {}); return b.length === 2 ? b : null; });
-  assert.ok(bindings, 'both heads registered');
-  const nameOf = (me) => bindings.find((b) => JSON.parse(b.head).pidNs === runs[me].entry.pidNs)?.name;
-  assert.ok(nameOf('A') && nameOf('B') && nameOf('A') !== nameOf('B'), JSON.stringify(bindings));
-  fs.writeFileSync(path.join(ws, 'peer-A.txt'), nameOf('B'));
-  fs.writeFileSync(path.join(ws, 'peer-B.txt'), nameOf('A'));
-  fs.writeFileSync(path.join(ws, 'go.txt'), '');
-  for (const me of ['A', 'B']) {
-    assert.equal((await runs[me].exited).code, 0, me);
-    assert.deepEqual((await endConfinedRun(runs[me], { waitMs: LOADED_WAIT_MS })).left, [], me);
+  };
+  try {
+    startHead('A', 'B');
+    startHead('B', 'A');
+    const bindings = await waitFor(() => { const b = Object.values(snapshotOf(ws)?.bindings ?? {}); return b.length === 2 ? b : null; });
+    assert.ok(bindings, 'both heads registered');
+    const nameOf = (me) => bindings.find((b) => JSON.parse(b.head).pidNs === runs[me].entry.pidNs)?.name;
+    assert.ok(nameOf('A') && nameOf('B') && nameOf('A') !== nameOf('B'), JSON.stringify(bindings));
+    fs.writeFileSync(path.join(ws, 'peer-A.txt'), nameOf('B'));
+    fs.writeFileSync(path.join(ws, 'peer-B.txt'), nameOf('A'));
+    fs.writeFileSync(path.join(ws, 'go.txt'), '');
+    for (const me of ['A', 'B']) {
+      assert.equal((await runs[me].exited).code, 0, me);
+      assert.deepEqual(await end(me), [], me);
+    }
+  } finally {
+    // A failed wait must not leave the heads waiting for a file nobody writes: they would hold the file open.
+    for (const me of Object.keys(runs)) if (!ended.has(me)) await end(me);
   }
   const messages = snapshotOf(ws).messages;
   assert.equal(messages.length, 2);
