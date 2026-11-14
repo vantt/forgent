@@ -182,8 +182,15 @@ fn background(pidfile: &Path) -> String {
 }
 
 /// Make `gc --auto` eligible under `gc.auto=1`: more than one loose object
-/// in `objects/17`, the directory git samples.
+/// in `objects/17`, the directory git samples. Newer git (2.56.1 does, 2.53
+/// does not) defaults `git maintenance run --auto` to the geometric strategy,
+/// which runs no `gc` task and no pre-auto-gc hook, so the detached maintenance
+/// a commit starts would exit at once and leave nothing behind to catch. The
+/// repository therefore asks for the `gc` task explicitly; older git ignores
+/// the geometric key and already runs `gc` by default.
 pub fn add_loose_objects(git: &Path, repo: &Path) -> Result<usize, String> {
+    config(git, repo, "maintenance.gc.enabled", "true")?;
+    config(git, repo, "maintenance.geometric-repack.enabled", "false")?;
     let blobs = repo.join(".git/fgos-blobs");
     fs::create_dir_all(&blobs).map_err(|e| e.to_string())?;
     let sample = repo.join(".git/objects/17");
