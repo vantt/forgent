@@ -12,7 +12,7 @@ parallel_with: [02, 03, 05]
 ## Context
 
 Port exists (phase 01). Read `plan.md` census rows 2, 3, 22-27. Doctor rows are reporters: each message
-must stay byte-identical for the same config (checked by the equivalence run in phase 07 and by the row
+must stay byte-identical for the same config (checked by the equivalence run in phase 08 and by the row
 tests). AGENTS.md install/setup/doctor gate: no new row, no new key, no new fix in this phase.
 Impact analysis (as phase 01) on `checkRunnerPatternsConfig`, `evaluateWorkflowCapabilities`,
 `checkCapabilityServesValid`, the two confinement row functions, `bindCapabilityPostures`,

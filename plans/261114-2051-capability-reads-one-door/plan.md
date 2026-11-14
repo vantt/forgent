@@ -3,7 +3,7 @@ title: "Capability reads through one door (step 1 of the capability-rows decisio
 description: "Every reader of runner.capabilities goes through bind() or one named read port next to it, enforced by an architecture test; config, bindings and reads stay identical."
 status: pending
 priority: P2
-effort: 19.5h
+effort: 24.5h
 branch: plan/capability-reads-one-door
 tags: [runner, seat-binding, config, refactor, one-door]
 blockedBy: []
@@ -32,9 +32,13 @@ Base: `origin/main` 781537524. All `file:line` below are at that commit.
 - Choosing an executor for a purpose goes through `bind()` (`purposeSeatOf` in `src/runner/dispatch/plan.mjs`);
   the first-`prefer` chooser in `resolveExecutorAndOverrides` and the string-only reverse `prefer` match are
   deleted (big lead decision 2026-11-14: a second chooser is a worse one-door violation than a field reader).
+- A tool purpose (a capability some `kind: tool` executor serves through `for`) has one way to ask:
+  `toolProvidersOf` (`src/runner/dispatch/tool-providers.mjs`) reads every `for` entry and probes presence and
+  staleness live; `fgos dispatch decide --for` and `fgos doctor` both use it. `fgos tool query`, `fgos tool check`
+  and the local status overlay are deleted (owner decision Q1 "one path", 2026-11-14 22:4x).
 - Rows in the one-door `doors` table (`docs/architecture-manifest.json`, checked by `test/architecture.test.mjs`,
-  added by F0 phase 01) fail any other file that reads `runner.capabilities` or picks an executor from `prefer`,
-  and name the door to use. It lands in the same change as the last reader move (the integration branch lands on main once),
+  added by F0 phase 01) fail any other file that reads `runner.capabilities`, picks an executor from `prefer`, or
+  reads an executor's `for` / probes a tool, and name the door to use. It lands in the same change as the last reader move (the integration branch lands on main once),
   so it never starts red and nothing can regress afterwards.
 
 ## Constraints / non-goals
@@ -45,8 +49,9 @@ Base: `origin/main` 781537524. All `file:line` below are at that commit.
 - No new field on the binding (`BIND_CONTRACT_VERSION` stays `v1alpha1`, `bind.mjs:21`).
 - Not in scope: step 2 (rows removal, per-persona/per-role table), tool registry, terminal-control
   capabilities, execution-contract capability hints (Census, out of scope).
-- Do not edit `main`, `CHANGELOG.md`, `Cargo.lock`. Phases 01-05 and 07 change nothing a user sees; phase 06 changes
-  what `fgos dispatch decide --for` answers in the cases of Q2 (the big lead decides the CHANGELOG line at landing).
+- Do not edit `main`, `CHANGELOG.md`, `Cargo.lock`. Phases 01-05 and 08 change nothing a user sees; phase 06 changes
+  what `fgos dispatch decide --for` answers (Q1, Q2) and phase 07 removes `fgos tool`; phase 07's report proposes the
+  CHANGELOG line, the big lead writes it at landing.
 
 ## Facts and prior art (answered before design)
 
@@ -154,14 +159,17 @@ launch-time confinement) and adding them would change the recorded binding contr
 crate: the crate's scope is agent seats only (spec §1, §3); a host exec per confinement or alias read would add
 cost on every launch (spec §13 budget); every reader is Node today. When Execution moves to Rust the port moves whole.
 
-## Intended deltas (each recorded, tested in its owning file and allowlisted in the equivalence run; the three marked Q reach real config shapes and wait for the owner)
+## Intended deltas (each recorded, tested in its owning file and allowlisted in the equivalence run; the rows marked Q reach real config shapes and are decided by the owner/big lead)
 
 | Delta | Today | After | Why no real input is affected |
 |---|---|---|---|
 | Capability named after an `Object.prototype` member (`constructor`, `toString`, `valueOf`, `hasOwnProperty`, `__proto__`, …) | truthy lookups (`resolve.mjs:40,113`, `operation-capability.mjs:26`, `seat-resolver.mjs:80`) treat it as declared | not declared (`Object.hasOwn`) | config comes from JSON/YAML: inherited names are never declared keys; makes purpose and confinement selection prototype-safe |
-| (Q1) Tool-only purpose | `prefer[0]` of the row | the `kind: tool` executor whose `for` names it; none -> unconfigured | real shape: owner question Q1 |
-| (Q2) Purpose whose first `prefer` entry cannot run here | `decide`/Work name `prefer[0]` | `bind()`'s executor, or `unavailable` with the refusal; bound invocation; `bindingSource: 'seat-binding'` | real shape: owner question Q2 |
-| (Q3) String `prefer` naming an executor without a matching `for` | that capability becomes a candidate | it does not | real shape: owner question Q3 |
+| (Q1, decided) Tool purpose: `decide --for <cap>` where a tool executor's `for` names `<cap>` | `prefer[0]` of the row, never probed (`pane-labeling`: `unavailable`, no `prefer` in the standard row; `impact-analysis`: `in-process` mcp handback) | first provider by live status: `present` -> `in-process` + `mcpTool`/`command`; `stale` -> `in-process` + `stale: true`; `missing`/`unknown` -> `unavailable`; `providers` listed. On fg-server2: `pane-labeling` -> in-process (herdr); `impact-analysis` -> unavailable (no `.gitnexus` in the main checkout) | real shape; owner decided "one path" |
+| (Q1, decided) An executor with several `for` entries | `tool query` saw only `for[0]` | every entry serves | real shape; same decision |
+| (Q1, decided) `fgos tool query`, `fgos tool check`, `.fgos/runtime/tool-status.local.json` | exist | removed; `decide` answers; the file is inert | same decision; CHANGELOG proposed in phase 07 |
+| (Q1, decided) Doctor `tool-registry-configured` | posture from the overlay ("never checked" counts as degraded) | posture from the live probe; warning when a tool-served capability's row declares `prefer` (ignored) | same decision |
+| (Q2, A) Agent purpose whose first `prefer` entry cannot run here | `decide`/Work name `prefer[0]` | `bind()`'s executor, or `unavailable` with the refusal; bound invocation; `bindingSource: 'seat-binding'` | real shape; decided A (big lead, owner did not object) |
+| (Q3, A) String `prefer` naming an executor without a matching `for` | that capability becomes a hint candidate | it does not | real shape; decided A |
 | Non-object entry (`foo: null`, `foo: "x"`) | some sites treat it as declared, others not | one rule: declared only when a non-null object (arrays count, as the doctor rows do today) | schema refuses a non-object entry at load (`additionalProperties.$ref capability`, `type: object`) |
 | `bindCapabilityPostures` given `{runner:{capabilities}}` | reads the nested section (`seat-binding-checks.mjs:37`) | flat only | its one caller passes the flat section from `loadRunnerConfig` (`seat-binding-checks.mjs:98-113`) |
 | String-valued `aliases` | `registeredCapabilityOf` substring-matches (`config.mjs:378`); `resolveAlias` ignores it | ignored (`Array.isArray`) | schema: `aliases` is an array |
@@ -178,32 +186,35 @@ Everything else is byte-identical, including the proposal's truthy `verify` chec
 | [03](phase-03-dispatch-readers.md) | Dispatch readers: purpose resolution, confinement request, plan, load validator | 3h | 01 | pending |
 | [04](phase-04-setup-doctor-readers.md) | Setup/doctor readers; delete old seat-resolver lookups | 2h | 01 | pending |
 | [05](phase-05-workflow-report-cli-readers.md) | Workflow proposal, plan-lint, CLI | 1.5h | 01 | pending |
-| [06](phase-06-purpose-executor-through-bind.md) | Purpose -> executor through `bind()`; first-prefer chooser and reverse match deleted | 6h | 01, 03; owner answers Q1-Q3 | pending |
-| [07](phase-07-guard-docs-equivalence.md) | The door made mechanical: rows in the `doors` table, docs, final equivalence | 2h | 02, 04, 05, 06; F0 phase 01 on main | pending |
+| [06](phase-06-purpose-executor-through-bind.md) | Purpose -> executor: agents through `bind()`, tools through one probing `toolProvidersOf`; first-prefer chooser and reverse match deleted | 7h | 01, 03 | pending |
+| [07](phase-07-retire-tool-verb.md) | Retire `fgos tool` and the overlay; doctor probes live; AGENTS.md, coding skills and terminal skill ask `decide` | 4h | 04, 05, 06 | pending |
+| [08](phase-08-guard-docs-equivalence.md) | The door made mechanical: rows in the `doors` table, docs, final equivalence | 2h | 02-07; F0 phase 01 on main | pending |
 
 ## Parallel map
 
 ```
-01 ──┬── 02 ───────────────┐
-     ├── 03 ── 06 (Q1-Q3) ─┤
-     ├── 04 ───────────────┼── 07 ── land
-     └── 05 ───────────────┘    ▲
-                                │
-     F0 phase 01 (doors table) on main
+01 ──┬── 02 ───────────────────────────┐
+     ├── 03 ── 06 ──┐                  │
+     ├── 04 ────────┼── 07 ────────────┼── 08 ── land
+     └── 05 ────────┘                  │    ▲
+                                       │    │
+                F0 phase 01 (doors table) on main
 ```
 
 - 01 alone first (it creates the port every other phase imports and moves helpers with all their importers).
 - 02, 03, 04, 05 run at the same time: file sets are disjoint (checked below).
-- 06 starts when 03 is merged (same files: `resolve.mjs`, `plan.mjs`, `work-dispatch.mjs`) and the owner has
-  answered Q1-Q3; it runs beside 02, 04, 05 (disjoint from them). Its questions block only 06; 01-05 go ahead.
-- 07 last, after 02, 04, 05, 06 are merged and F0 phase 01
+- 06 starts when 03 is merged (same files: `resolve.mjs`, `plan.mjs`, `config.mjs`, `work-dispatch.mjs`); it runs beside
+  02, 04 and 05 (disjoint from them).
+- 07 starts when 04 (`registrations.mjs`), 05 (`bin/fgos.mjs`) and 06 (`toolProvidersOf`) are merged, and only if 06's
+  probe measurement met its budget; it runs beside 02.
+- 08 last, after 02-07 are merged and F0 phase 01
   (`plans/261114-2051-rust-verb-migration-program/phase-01-manifest-artifact.md`, the `doors` table) is on main;
-  rebase the integration branch on main first. 07 builds no guard: it adds rows to F0's table.
-- Landing: each phase merges into the integration branch `capability-reads-one-door` (01; 02-05 in any order; 06
-  after 03; 07). After every merge the big lead runs the union of the merged phases' focused gates plus
-  `test/architecture.test.mjs`. The branch lands on main once, so the rows and the last reader move land in the
-  same change. Interim (01 merged, 04 not): `capabilityEntriesOf`/`hasUsablePrefer` exist in both the port
-  (private) and seat-resolver; 04 deletes the seat-resolver copy. Nothing lands on main in between.
+  rebase the integration branch on main first. 08 builds no guard: it adds rows to F0's table.
+- Landing: each phase merges into the integration branch `capability-reads-one-door` in dependency order. After every
+  merge the big lead runs the union of the merged phases' focused gates plus `test/architecture.test.mjs`. The branch
+  lands on main once, so the rows and the last reader move land in the same change. Interims on the integration
+  branch only: (01 merged, 04 not) the lookup helpers exist in the port and seat-resolver; (06 merged, 07 not) the
+  probe and `normalizeCapability` exist in `tool-providers.mjs` and `tool-registry.mjs`. 04 and 07 delete the old copies.
 - Port changes after 01: a phase that needs one stops and asks the big lead, who grants one writer at a time for
   `capability-config.mjs` and its test; never two phases at once.
 
@@ -213,60 +224,74 @@ Hot files, one writer at a time (serial by dependency, never parallel):
 |---|---|
 | `src/runner/execution/capability-config.mjs` + its test | 01 (later only via the big lead's one-writer grant) |
 | `src/runner/execution/seat-resolver.mjs` | 01, then 04 |
-| `src/runner/dispatch/config.mjs` | 01, then 03 |
+| `src/runner/dispatch/config.mjs` | 01, then 03, then 06 (line 527) |
 | `src/runner/dispatch/plan.mjs` | 01 (import line), then 03, then 06 |
 | `src/runner/dispatch/resolve.mjs`, `src/runner/work-dispatch.mjs` | 03, then 06 |
-| `src/runner/dispatch/mechanism.mjs` | 06 only |
-| `src/setup/registrations.mjs` | 04 only |
-| `docs/architecture-manifest.json` | 01 (file row), then 07 (`doors` rows) |
-| `plans/.../reports/equivalence/compare-capability-reads.mjs` | 01, then 06 (allowlist and probes; 07 runs it) |
+| `src/runner/dispatch/mechanism.mjs`, `src/runner/dispatch/decide.mjs` | 06 only |
+| `src/setup/registrations.mjs` | 04, then 07 |
+| `bin/fgos.mjs` | 05, then 07 |
+| `src/cli/command-registry.mjs`, `packages/host-runtime/contracts/command-routes.json`, `src/state/fgos-file-registry.mjs`, `src/setup/executor-profile-warnings.mjs`, `AGENTS.md`, `domains/coding/skills/*/references/*`, `plugins/fgOS/skills/**`, `.agents/skills/**`, `test/architecture.test.mjs` | 07 only |
+| `docs/architecture-manifest.json` | 01 (file row), 06 (file row), 07 (delete a row), then 08 (`doors` rows) |
+| `plans/.../reports/equivalence/compare-capability-reads.mjs` | 01, then 06 (allowlist and probes; 08 runs it) |
 
 File-disjointness of the parallel set (Modify sets): 02 {loops/verify.mjs, legacy-seat-read.mjs, run.mjs};
-03 then 06 {resolve.mjs, plan.mjs, confinement/request.mjs (03), config.mjs (03), work-dispatch.mjs, mechanism.mjs (06)};
+03 then 06 {resolve.mjs, plan.mjs, config.mjs, work-dispatch.mjs, confinement/request.mjs (03), mechanism.mjs, decide.mjs, tool-providers.mjs (06)};
 04 {registrations.mjs, seat-binding-checks.mjs, seat-resolver.mjs};
-05 {propose.mjs, capability-plan-lint.mjs, bin/fgos.mjs}. No overlap between 02, 04, 05 and the 03->06 chain.
-`work-dispatch.mjs` (tier 7, Work) is written only by 03 (comment) and 06 (one call site); no other phase touches it.
+05 {propose.mjs, capability-plan-lint.mjs, bin/fgos.mjs};
+07 {bin/fgos.mjs, registrations.mjs, command-registry.mjs, tool-registry.mjs, AGENTS.md, skills, docs} runs after 04, 05, 06,
+beside 02 only. No overlap between any two phases that run at the same time.
+`work-dispatch.mjs` (tier 7, Work) is written only by 03 (comment) and 06 (one call site).
 
 ## Collision risk (with plans/261114-2051-rust-verb-migration-program, step F0)
 
-Read from `origin/plan/rust-verb-migration-program` 3509d10f3 (phase 01 only; other F0 phases' file lists are the big lead's to cross-check).
+Checked against `origin/plan/rust-verb-migration-program` f7c5aa506 (all F0 phases; later head eb2e29d2f changes the
+doors check's rules, not its file list). Every F0 phase lists `AGENTS.md` and `bin/fgos.mjs` at least as reading.
 
-| File | Phase here | F0 | Handling |
+| File | Phase here | F0 phases that write it | Handling |
 |---|---|---|---|
-| `docs/architecture-manifest.json` | 01 (file row), 07 (`doors` rows) | F0 phase 01 adds the `doors` array and its first row; later F0 phases add rows | 07 waits for F0 phase 01 on main; both edits are additive rows |
-| `test/architecture.test.mjs` | none | F0 phase 01 adds the `doors` check | this plan no longer edits it |
-| `bin/fgos.mjs` | 05 | F0 phase 01 edits `publicManifestEntries`/`handleHelp` (`bin/fgos.mjs:3825-3989`) | 05 edits only the `plan-lint` case (2324-2405); rebase first |
-| `src/setup/registrations.mjs` | 04 | not in F0 phase 01 | big lead checks later F0 phases |
-| `docs/platform/seat-binding/spec.md`, `docs/platform/vision.md` | 07 | not in F0 phase 01 | additive lines |
+| `docs/architecture-manifest.json` | 01, 06 (file rows), 07 (delete a row), 08 (`doors` rows) | 00, 01 (`doors` array), 08, 09, 11 | additive rows; 08 waits for F0 01 on main; rebase before each |
+| `test/architecture.test.mjs` | 07 (one `ARM_STATIC_IMPORTS` line removed) | 00-11 (the `doors` check; F0 also shrinks `ARM_STATIC_IMPORTS`) | one-line deletion; rebase first; whoever lands second re-applies |
+| `bin/fgos.mjs` | 05 (`plan-lint` case), 07 (`tool` case, import) | 00-04, 07-11 (manifest, help, routing) | line-local; 07's deletion also shrinks the host's route list |
+| `src/cli/command-registry.mjs`, `packages/host-runtime/contracts/command-routes.json` (+ `command-manifest.json` after F0 01) | 07 (delete the `tool` entry, regenerate) | 01, 03, 08, 11 (and their regenerations) | generated files are regenerated, never merged by hand; the big lead orders 07 against F0 01/03/08 |
+| `AGENTS.md` | 07 (impact-analysis gate prose) | 11 ("Legacy-Node CLI Ownership Boundary" sentence) | different sections; the gate is above the GitNexus block, which neither plan touches |
+| `domains/coding/skills/*/references/*`, generated `.agents/skills/**`, `plugins/fgOS/skills/**` | 07 | none found in F0 | rebuild with `npm run build:skills` after rebase |
+| `src/setup/registrations.mjs` | 04, 07 | 06, 08, 09 (F0 08's doors row names it: "capability-reads plan edits it; whoever lands second moves it") | line-local; follow F0 08's note |
+| `docs/platform/seat-binding/spec.md`, `docs/platform/vision.md` | 08 | none | additive lines |
 
 Mitigation: rebase before each phase; edits line-local and additive; one writer per file inside this plan; the
-big lead orders landings if F0 writes the same files.
+big lead orders landings where F0 writes the same files.
 
 ## Acceptance criteria
 
-1. Mechanical door (phase 07, rows in F0's `doors` table): no product file except
+1. Mechanical door (phase 08, rows in F0's `doors` table): no product file except
    `src/runner/execution/capability-config.mjs` reads the `capabilities` property of a runner config; executor
    choice from `prefer` happens only in the seat-binding crate (`preferOf`/`normalizePreferCandidates`/`bindingTasteOf`
    called only from their listed files); `resolveExecutorAndOverrides` and `capability.prefer` appear nowhere;
    `catalogOf` only in the port, `run.mjs` and `registrations.mjs`. A violation fails naming the row's job (the door
    to use), the file and the line.
-1b. Purpose choice (phase 06): `fgos dispatch decide --for`, `decide --work`, a positional row name and the Work unit
+1b. One way to ask about a tool (phases 06-07): `fgos tool` is an unknown verb; `decide --for <tool capability>`
+   answers from `toolProvidersOf` with a live probe; doctor `tool-registry-configured` uses the same function; the
+   `doors` rows refuse any other reader of `for` and any trace of the old registry or overlay.
+1c. Purpose choice (phase 06): `fgos dispatch decide --for`, `decide --work`, a positional row name and the Work unit
    build get their executor from `bind()` (`purposeSeatOf`); `decide --for <label> --needs-soul --has-live-task-access`
    for a label with no own pool stays `in-process`.
-2. Equivalence (phases 01, 06 and 07): `compare-capability-reads.mjs` runs base (781537524) and head each in its own
+2. Equivalence (phases 01, 06 and 08): `compare-capability-reads.mjs` runs base (781537524) and head each in its own
    child process over the shipped standard config, this repo's config and a synthetic edge matrix (phase 01),
    and reports zero differences outside the Intended deltas allowlist (including the Q1-Q3 deltas); doctor rows (phase 01 list) print the
    same messages at base and head. Committed evidence is digests and diff summaries only.
 3. Owning proof: `test/runner/execution/capability-config.test.mjs` proves each lookup rule and each intended
    delta once.
 4. `npm test` and `cargo test --workspace` green on the integration branch (big lead, at landing).
-5. No change in `core/config-standard/`, `core/config-schema/`, `packages/`, `apps/`, `CHANGELOG.md`, `Cargo.lock`.
-6. Docs: seat-binding spec states the one-door rule, its §15 records step 1, §16 points at the port; vision bullet records step 1 landed.
+5. No change in `core/config-standard/`, `core/config-schema/`, `apps/`, `CHANGELOG.md`, `Cargo.lock`, nor in `packages/`
+   except the regenerated command route contract(s) (phase 07).
+6. Docs: seat-binding spec states the one-door rule, its §15 records step 1 (incl. the tool lookup and D5's narrowing), §16 points at
+   the port, `purposeSeatOf` and `toolProvidersOf`; vision bullet records step 1 landed; AGENTS.md's gate and the coding
+   and terminal skills ask `decide`.
 
 ## Rollback
 
-Before landing: revert merges on the integration branch in reverse order (07; 06; 05, 04, 03, 02 in any order with 06
-before 03; then 01); 01 cannot be reverted while any of 02-06 is merged. After landing: revert the single landing merge on main.
+Before landing: revert merges on the integration branch in reverse dependency order (08; 07; 06; then 05, 04, 03, 02,
+with 07 before 04 and 05 and 06 before 03; then 01); 01 cannot be reverted while any later phase is merged. After landing: revert the single landing merge on main.
 No data, config or record format changes (the run-record hash is proven identical).
 
 ## What step 1 leaves ready for step 2
@@ -274,6 +299,8 @@ No data, config or record format changes (the run-record hash is proven identica
 - One module lists every question asked of a capability row; removing rows means changing answers in one place
   and the crate slice, not hunting 18 files; the `doors` rows keep new readers out.
 - No executor chooser outside the crate is left (phase 06), so step 2 changes rows, not choosers.
+- Tool rows keep a readable but ignored `prefer` (`impact-analysis: prefer: gitnexus` in this repo's
+  `.fgos/config.yaml`; check other projects' configs): step 2 removes them; doctor warns until then.
 - Leftovers for step 2: the nested `{runner:{capabilities}}` tolerance of `entriesOf`; the `fgos-coding-implement`
   indirection (a Work step skill that is itself a capability row, resolved through `purposeSeatOf` and handed to
   the unit as a soft `prefer`); `DEFAULT_CAPABILITY_SLOTS` (below).
@@ -298,83 +325,20 @@ No data, config or record format changes (the run-record hash is proven identica
   (`registrations.mjs:3017,3524`) accept `Object.prototype` names as policy ids (pre-existing; schema pattern `\S`).
 - `bind.mjs` is 607 lines against the 600 budget in seat-binding spec §16.
 
+## Owner decisions (2026-11-14 22:4x)
+
+- **Q1 (tool purposes): "one path".** Implemented as one probing lookup, `toolProvidersOf`, used by `decide` and doctor;
+  `fgos tool query`/`check` and the overlay are retired (phases 06-07). This narrows the 2026-08 D5 rule ("only
+  `prefer` binds a purpose") for tool executors; phase 08 records it.
+- **Q2 (decide names what `bind()` would run): A** — decided by the big lead inside the frame; the owner did not object.
+- **Q3 (reverse `prefer` match): A, delete** — same.
+
+The question texts as asked are kept in the phase 06 commit history (`023b35130`).
+
 ## Owner questions
 
-Three questions, all from phase 06 (the purpose chooser). They block only phase 06; phases 01-05 run without them.
-Each says what a yes authorizes.
-
-### Q1. Which door answers a purpose served only by a tool executor (`impact-analysis`, `pane-labeling`)?
-
-- **What is happening:** `fgos dispatch decide --for impact-analysis` answers `gitnexus` today by taking the first
-  `prefer` entry of the row (`resolve.mjs:237-262`). Phase 06 deletes that chooser, and `bind()` cannot take its
-  place for these purposes: the seat-binding crate refuses a seat whose candidates are all tool executors
-  (`not-an-agent-seat`, `packages/seat-binding/rust/src/rank.rs:228-244`; spec §1 limits Seat Binding to agent seats).
-- **Cause:** checked the crate, the spec scope and both configs. This repo's and the global config already declare
-  the same fact a second way: each tool executor names its capability in `for` (`gitnexus: for: [impact-analysis]`,
-  `herdr: for: [pane-labeling]`), which the tool registry (`src/state/tool-registry.mjs:93-115`, `fgos tool query
-  --capability`) already uses. A 2026-08 decision (D5, `docs/history/capability-capacity-remodel/CONTEXT.md`, quoted in
-  `resolve.mjs:210-223`) said an executor's own `for` never binds a purpose, only `prefer` does; it was written for
-  agent executors (`agy`), but its text covers tools too.
-- **Options:**
-  - A. Tool purposes resolve through the tool registry's `for`: when `bind()` refuses `not-an-agent-seat`, the first
-    `kind: tool` executor whose `for` names the purpose. Gain: one fact in one place (the tool registry already owns
-    "which tool serves X"); no Rust change; step 2 can drop `prefer` from tool rows. Harm: narrows D5 for tool
-    executors; a project whose tool executor lacks `for` but whose row has `prefer` gets `unconfigured` (here and in
-    the global config every tool declares `for`). Cost: ~15 lines in `plan.mjs`, 2 test cases.
-  - B. Extend the seat-binding crate to answer tool-only seats with the first tool candidate. Gain: literally one
-    chooser for everything. Harm: widens a recorded authority (D-ADR0072 scope, spec §1/§3) and needs a new D-ADR;
-    a Rust change with fmt, clippy, msvc and aarch64-apple-darwin gates. Cost: ~60 lines Rust plus golden vectors,
-    spec edits, about 1 day.
-  - C. Keep a tool-only `prefer[0]` reader as the one named exception in the `doors` row. Gain: no behaviour change.
-    Harm: a second chooser stays, against the big lead's decision. Cost: ~10 lines.
-- **Recommendation:** A. It removes a duplicate fact instead of adding authority, and matches step 2's direction
-  (tool rows remain as abilities; the generic jobs keep the agent pools).
-- **Scope of the answer:** a yes to A authorizes phase 06 requirement 2's tool branch and recording D5's narrowing in
-  seat-binding spec §15. It does not authorize removing `prefer` from tool rows (step 2) or touching the crate.
-
-### Q2. May `decide` and the Work unit build name the executor `bind()` would actually run, instead of the row's first `prefer` entry?
-
-- **What is happening:** after phase 06 a purpose's executor is `bind()`'s answer. For real configs this differs
-  from today when the first `prefer` entry cannot run on this machine or at this tier: its CLI is not installed, its
-  family has no cell at the row's tier, its accounts are quarantined, governance disallows it, or it cannot carry
-  the posture. Today `decide` names that executor anyway, and its tier/model policy is silently dropped as
-  `policy.executor-mismatch-ignored` (`plan.mjs:388-393`); after, it names the next usable one, or answers
-  `unavailable` with the refusal. Also: the reported invocation becomes the bound one (for example the herdr
-  invocation when herdr is present, where an unpinned first entry reports none today); `bindingSource` becomes
-  `seat-binding` instead of `capability.prefer`; the Work unit's soft `prefer` (`work-dispatch.mjs:502`) becomes the
-  bound executor.
-- **Cause:** traced every caller (phase 06 table). The standard `execute` and `fgos-coding-implement` rows start
-  with `gemini`, so a machine without its CLI is a real case.
-- **Options:**
-  - A. Accept: `decide` answers what will run. Gain: one chooser; `decide` stops naming executors that cannot
-    start; tier, model and executor agree. Harm: `decide --for` now depends on machine state (CLIs, accounts), as
-    `fgos run` already does; tests need fake CLIs on PATH. Cost: inside phase 06's 6h.
-  - B. Keep `prefer[0]`. Gain: no change. Harm: the second chooser stays (the big lead rejected this). Cost: none.
-- **Recommendation:** A.
-- **Scope of the answer:** a yes authorizes the listed `decide`/Work answer changes and a CHANGELOG line at landing
-  (the big lead writes it). It does not change how `fgos run` or workflows bind (already `bind()`).
-
-### Q3. The reverse `prefer` match: delete it, or make it match list-shaped `prefer`?
-
-- **What is happening:** `resolveCapabilityDetailsFromHints` adds every capability whose `prefer` equals the
-  executor id as a candidate capability (`resolve.mjs:66-71`), but only a string `prefer` can match. The big lead
-  asked for it to be fixed.
-- **Cause:** a list-aware fix would make every row that lists an executor a candidate: about 30 standard rows list
-  `claude`. The rules then pick the first candidate with required confinement (`resolve.mjs:89-96`), so a
-  Work-driven dispatch with no explicit purpose would get `advise` or `review` (both `confinement: required`) as its
-  capability. Today the match fires only for this repo's `impact-analysis: prefer: gitnexus`, and `gitnexus`
-  declares `for: [impact-analysis]`, which the tool branch (`resolve.mjs:57-63`) already adds. The match infers a
-  capability from an executor, which the same function forbids for agent executors (`resolve.mjs:55-56`).
-- **Options:**
-  - A. Delete it. Gain: no capability inferred from `prefer`; one reader less; nothing changes for this repo or the
-    standard config. Harm: a project with a string `prefer` naming an executor that lacks a matching `for` loses that
-    candidate (a schema-valid, real shape). Cost: −7 lines, 1 test case.
-  - B. Match any list entry. Gain: literal fix. Harm: Work-driven capability identity changes broadly on real
-    configs (above); confinement anchors move. Cost: ~5 lines, plus re-proving every Work dispatch's capability.
-  - C. Keep string-only. Harm: the asymmetry stays (rejected by the big lead).
-- **Recommendation:** A.
-- **Scope of the answer:** a yes authorizes phase 06 requirement 5 and its delta row; nothing else in capability
-  identity resolution changes.
+None open. One conditional stop is written into the plan: if phase 06's probe measurement adds more than 10 ms at p95
+to `decide`, phase 07 does not delete the overlay and the big lead decides.
 
 ## Red Team Review
 
@@ -411,6 +375,14 @@ is deleted (Q3; the list-aware fix was analysed and is option B); (3) `DEFAULT_C
 the reason (What step 1 leaves ready); (4) the guard covers executor choice from `prefer`; (5) the real-shape deltas
 are owner questions Q1-Q3. Second amendment: the guard is rows in F0's `doors` table (phase 07), not a mechanism of
 its own; the earlier receiver-level self-check is dropped (F0's check owns its proof).
+
+### Amendment — 2026-11-14 22:4x (owner decisions Q1-Q3)
+
+Applied: phase 06 gains `toolProvidersOf` (every `for` entry, live probe, `present`/`stale`/`missing`) as the one tool
+lookup used by `decide` and doctor, and the overlay facts (not needed: in-process probe, live staleness); new phase 07
+retires `fgos tool` and the overlay and moves AGENTS.md, the coding skills and the terminal skill to `decide`; tool rows'
+`prefer` stays readable but ignored with a doctor warning; old phase 07 becomes 08 with two more `doors` rows; parallel
+map, hot files, collisions (F0 f7c5aa506) and intended deltas updated.
 
 ### Whole-Plan Consistency Sweep
 
