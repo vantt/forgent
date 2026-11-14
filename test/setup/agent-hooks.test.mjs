@@ -25,12 +25,12 @@ import {
   checkPiHook,
   installAllAgentHooks,
   checkAllAgentHooks,
-  getProjectShimPath,
   isShimRunnable,
   agentHookRows,
   deleteGuardPrefilter,
   extensionSourceFor,
 } from '../../src/setup/agent-hooks.mjs';
+import { PROJECT_SHIM_RELATIVE, projectShimPath } from '../../src/util/host-bin-path.mjs';
 import { createDoctorRun } from '../../src/setup/registrations.mjs';
 
 function mkTempDir(prefix) {
@@ -45,7 +45,7 @@ function writeMailboxOptIn(repoRoot, enabled) {
 }
 
 function mockRunnableShim(repoRoot) {
-  const shimPath = getProjectShimPath(repoRoot);
+  const shimPath = projectShimPath(repoRoot);
   fs.mkdirSync(path.dirname(shimPath), { recursive: true });
   // Write a minimal mock node script that handles `hook dispatch-decide`
   const mockScript = `#!/usr/bin/env node
@@ -148,7 +148,7 @@ test('Claude Code dispatch and decision-question guards let the call through whe
     assert.equal(absent.status, 0, `no shim: ${command}`);
     assert.equal(absent.stdout.length, 0);
   }
-  const shim = getProjectShimPath(repoRoot);
+  const shim = projectShimPath(repoRoot);
   fs.mkdirSync(path.dirname(shim), { recursive: true });
   fs.writeFileSync(shim, '#!/bin/sh\nprintf "%s" "$*"; cat >/dev/null; exit 2\n', { mode: 0o755 });
   const present = spawnSync('/bin/sh', ['-c', commands[0]], { env, input: '{}' });
@@ -339,15 +339,15 @@ for (const [cli, install, check] of [['omp', installOmpHook, checkOmpHook], ['pi
     // The delete guard: a bash tool call goes to the shim in the Claude Code payload shape, and an
     // exit 2 blocks it with the shim's reason.
     const log = path.join(repoRoot, 'guard-log');
-    fs.mkdirSync(path.dirname(getProjectShimPath(repoRoot)), { recursive: true });
-    fs.writeFileSync(getProjectShimPath(repoRoot), `#!/bin/sh\nprintf '%s\\n' "$*" >> '${log}.argv'\ncat >> '${log}.stdin'\necho refused-by-guard >&2\nexit 2\n`, { mode: 0o755 });
+    fs.mkdirSync(path.dirname(projectShimPath(repoRoot)), { recursive: true });
+    fs.writeFileSync(projectShimPath(repoRoot), `#!/bin/sh\nprintf '%s\\n' "$*" >> '${log}.argv'\ncat >> '${log}.stdin'\necho refused-by-guard >&2\nexit 2\n`, { mode: 0o755 });
     const handlers = await loadedHandlers(repoRoot, cli);
     assert.equal(await handlers.tool_call({ toolName: 'bash', input: { command: 'ls -la && npm test' } }, { cwd: repoRoot }), undefined);
     assert.equal(fs.existsSync(`${log}.argv`), false, 'a command with no mass-delete word never starts the shim');
     assert.deepEqual(await handlers.tool_call({ toolName: 'bash', input: { command: 'git clean -fdx' } }, { cwd: repoRoot }), { block: true, reason: 'refused-by-guard\n' });
     assert.equal(fs.readFileSync(`${log}.argv`, 'utf8'), 'hook main-checkout-delete-guard\n');
     assert.deepEqual(JSON.parse(fs.readFileSync(`${log}.stdin`, 'utf8')), { tool_name: 'Bash', tool_input: { command: 'git clean -fdx' }, cwd: repoRoot });
-    fs.rmSync(getProjectShimPath(repoRoot));
+    fs.rmSync(projectShimPath(repoRoot));
 
     assert.equal(check(repoRoot).passed, false, 'without a runnable shim the check fails');
     mockRunnableShim(repoRoot);
@@ -411,7 +411,7 @@ test('the extension stays inert for a runner worker and never writes the process
   writeMailboxOptIn(repoRoot, true);
   installPiHook(repoRoot);
   const log = path.join(repoRoot, 'shim-log');
-  recordingShim(getProjectShimPath(repoRoot), log, '{"inject":"MBX-FRAME","method":"tool-result"}');
+  recordingShim(projectShimPath(repoRoot), log, '{"inject":"MBX-FRAME","method":"tool-result"}');
   const handlers = await loadedHandlers(repoRoot, 'pi');
   const real = [{ type: 'text', text: 'readme.txt' }];
   const before = { ...process.env };
@@ -452,7 +452,7 @@ test('the extension refuses a shim another user owns', async () => {
   writeMailboxOptIn(repoRoot, true);
   installOmpHook(repoRoot);
   const log = path.join(repoRoot, 'shim-log');
-  recordingShim(getProjectShimPath(repoRoot), log, '{"inject":"MBX-FRAME","method":"tool-result"}');
+  recordingShim(projectShimPath(repoRoot), log, '{"inject":"MBX-FRAME","method":"tool-result"}');
   const handlers = await loadedHandlers(repoRoot, 'omp');
   const real = [{ type: 'text', text: 'x' }];
   const getuid = process.getuid;
@@ -472,7 +472,7 @@ test('a hook that hangs holds the CLI no longer than the hook timeout, and the t
   const repoRoot = mkTempDir('agent-hooks-pi-hang-');
   writeMailboxOptIn(repoRoot, true);
   installPiHook(repoRoot);
-  const shim = getProjectShimPath(repoRoot);
+  const shim = projectShimPath(repoRoot);
   fs.mkdirSync(path.dirname(shim), { recursive: true });
   fs.writeFileSync(shim, '#!/bin/sh\ncat > /dev/null\nexec sleep 120\n', { mode: 0o755 });
   const handlers = await loadedHandlers(repoRoot, 'pi');
@@ -488,7 +488,7 @@ test('the extension finds the shim from a subdirectory and refuses a group-writa
   const repoRoot = mkTempDir('agent-hooks-omp-walk-');
   writeMailboxOptIn(repoRoot, true);
   installOmpHook(repoRoot);
-  const shim = getProjectShimPath(repoRoot);
+  const shim = projectShimPath(repoRoot);
   const log = path.join(repoRoot, 'shim-log');
   recordingShim(shim, log, '{"inject":"MBX-FRAME","method":"tool-result"}');
   const handlers = await loadedHandlers(repoRoot, 'omp');
@@ -508,7 +508,7 @@ test('the extension finds the shim from a subdirectory and refuses a group-writa
   // The nearest candidate decides: an unusable shim below never falls through to one above.
   fs.rmSync(shim);
   fs.renameSync(`${shim}.real`, shim);
-  const inner = getProjectShimPath(deep);
+  const inner = projectShimPath(deep);
   recordingShim(inner, path.join(repoRoot, 'inner-log'), '{"inject":"INNER","method":"tool-result"}');
   fs.chmodSync(inner, 0o777);
   assert.equal(await handlers.tool_result({ content: real }, stubCtx(deep)), undefined);
@@ -547,7 +547,7 @@ test('installAllAgentHooks configures all 5 agents and checkAllAgentHooks verifi
 
 test('the runnable probe works when doctor itself runs inside the fgos host (recursion guard set)', () => {
   const repoRoot = mkTempDir('agent-hooks-guard-');
-  const shimPath = getProjectShimPath(repoRoot);
+  const shimPath = projectShimPath(repoRoot);
   fs.mkdirSync(path.dirname(shimPath), { recursive: true });
   // Like the real host: refuse when its recursion guard is inherited.
   fs.writeFileSync(shimPath, `#!/usr/bin/env node
@@ -566,7 +566,7 @@ process.exit(process.argv[2] === 'hook' ? 0 : 1);
 
 test('one doctor run probes each shim call once however many hook rows ask for it', () => {
   const repoRoot = mkTempDir('agent-hooks-probe-once-');
-  const shimPath = getProjectShimPath(repoRoot);
+  const shimPath = projectShimPath(repoRoot);
   const calls = path.join(repoRoot, 'shim-calls.log');
   fs.mkdirSync(path.dirname(shimPath), { recursive: true });
   fs.writeFileSync(shimPath, `#!/usr/bin/env node
@@ -783,8 +783,8 @@ test('the claude mailbox command is guarded and never execs', () => {
 test('the claude delete guard command passes a shell call without a mass-delete word in the shell and hands the rest to the shim', () => {
   const repoRoot = mkTempDir('agent-hooks-delete-guard-');
   const log = path.join(repoRoot, 'guard-log');
-  fs.mkdirSync(path.dirname(getProjectShimPath(repoRoot)), { recursive: true });
-  fs.writeFileSync(getProjectShimPath(repoRoot), `#!/bin/sh\nprintf '%s\\n' "$*" >> '${log}.argv'\ncat >> '${log}.stdin'\nexit 2\n`, { mode: 0o755 });
+  fs.mkdirSync(path.dirname(projectShimPath(repoRoot)), { recursive: true });
+  fs.writeFileSync(projectShimPath(repoRoot), `#!/bin/sh\nprintf '%s\\n' "$*" >> '${log}.argv'\ncat >> '${log}.stdin'\nexit 2\n`, { mode: 0o755 });
   const { command } = agentHookRows(repoRoot).find((r) => r.cli === 'claude' && r.kind === 'main-checkout-delete-guard');
   const run = (shellCommand) => spawnSync('/bin/sh', ['-c', command], { input: JSON.stringify({ tool_name: 'Bash', permission_mode: 'bypassPermissions', tool_input: { command: shellCommand } }), env: { ...process.env, CLAUDE_PROJECT_DIR: repoRoot }, encoding: 'utf8' });
   assert.equal(run('ls -la && npm test').status, 0);
@@ -794,7 +794,7 @@ test('the claude delete guard command passes a shell call without a mass-delete 
   }
   assert.equal(fs.readFileSync(`${log}.argv`, 'utf8'), 'hook main-checkout-delete-guard\n'.repeat(5));
   assert.ok(fs.readFileSync(`${log}.stdin`, 'utf8').endsWith('{"tool_name":"Bash","permission_mode":"bypassPermissions","tool_input":{"command":"find . -delete"}}'), 'the payload reaches the shim unchanged');
-  fs.rmSync(getProjectShimPath(repoRoot));
+  fs.rmSync(projectShimPath(repoRoot));
   assert.equal(run('git clean -fdx').status, 0, 'a missing shim lets the call through; doctor reports it');
   fs.rmSync(repoRoot, { recursive: true, force: true });
 });
@@ -803,7 +803,7 @@ test('the claude delete guard command passes a shell call without a mass-delete 
 function runDeleteGuardRow(repoRoot, row, shellCommand, { shim = true } = {}) {
   const log = path.join(repoRoot, 'guard-log');
   fs.rmSync(`${log}.argv`, { force: true });
-  const shimPath = getProjectShimPath(repoRoot);
+  const shimPath = projectShimPath(repoRoot);
   if (shim) {
     fs.mkdirSync(path.dirname(shimPath), { recursive: true });
     fs.writeFileSync(shimPath, `#!/bin/sh\nprintf '%s\\n' "$*" >> '${log}.argv'\ncat > /dev/null\necho refused >&2\nexit 2\n`, { mode: 0o755 });
@@ -848,6 +848,7 @@ test('the omp and pi extensions carry the same prefilter and skip the shim for a
   const source = extensionSourceFor(repoRoot, 'omp');
   assert.ok(source.includes(deleteGuardPrefilter.regExpSource), 'the extension embeds the shared keyword list');
   assert.equal(source, extensionSourceFor(repoRoot, 'pi').replace("MAILBOX_CLI = 'pi'", "MAILBOX_CLI = 'omp'"), 'omp and pi render the same guard');
+  assert.ok(source.includes(`path.join(cwd, ${PROJECT_SHIM_RELATIVE.split('/').map((part) => `'${part}'`).join(', ')})`), 'the extension names the shim by the door\'s relative form');
   const embedded = new RegExp(deleteGuardPrefilter.regExpSource);
   for (const command of PREFILTER_SKIPPED) assert.equal(embedded.test(command), false, command);
   for (const command of PREFILTER_STARTS_GUARD) assert.equal(embedded.test(command), true, command);
@@ -859,7 +860,7 @@ test('a codex or agy delete guard in its earlier plain form, or wrapped around a
   const repoRoot = path.join(base, 'project');
   fs.mkdirSync(oldRoot, { recursive: true });
   fs.mkdirSync(repoRoot, { recursive: true });
-  const oldShim = getProjectShimPath(oldRoot);
+  const oldShim = projectShimPath(oldRoot);
   const guard = (root, cli) => agentHookRows(root).find((r) => r.cli === cli && r.kind === 'main-checkout-delete-guard');
   fs.mkdirSync(path.join(repoRoot, '.codex'), { recursive: true });
   fs.mkdirSync(path.join(repoRoot, '.agents'), { recursive: true });
@@ -994,7 +995,7 @@ test('a wrong file shape is skipped silently and reported by check', () => {
 
 test('the doctor probe runs the mailbox kind with benign input and requires exit 0 and empty stdout', () => {
   const repoRoot = mkTempDir('agent-hooks-probe-');
-  const shimPath = getProjectShimPath(repoRoot);
+  const shimPath = projectShimPath(repoRoot);
   const log = path.join(repoRoot, 'argv.log');
   fs.mkdirSync(path.dirname(shimPath), { recursive: true });
   const shim = (mailboxStdout) => `#!/usr/bin/env node

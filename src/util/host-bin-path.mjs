@@ -15,6 +15,15 @@ import path from 'node:path';
 
 const INSTALLATION = path.join('.fgos', 'installation');
 
+/** The project's installation shim, which outlives an upgrade (a release path would not). */
+export function projectShimPath(root) {
+  return path.join(root, '.fgos', 'installation', 'bin', 'fgos');
+}
+
+/** The project shim relative to the project root, with forward slashes: the form shell commands, hook
+ * tables and generated extension text carry. */
+export const PROJECT_SHIM_RELATIVE = projectShimPath('').split(path.sep).join('/');
+
 function isExecutableFile(file) {
   try {
     if (!fs.statSync(file).isFile()) return false;

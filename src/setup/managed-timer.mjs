@@ -17,6 +17,7 @@ import path from 'node:path';
 
 import { isConfigRefusal, readConfig } from '../config/facade.mjs';
 import { resolveWorkspaceInstallationBin } from './bin-discovery.mjs';
+import { projectShimPath } from '../util/host-bin-path.mjs';
 
 function configValue(projectRoot, sections) {
   try {
@@ -302,7 +303,7 @@ function plan(cwd, { schedule, scheduler, bin, found: lookup }) {
   const chosen = scheduler();
   if (!chosen) return { skip: `no supported scheduler on ${process.platform}; ${schedule.words.noScheduler}` };
   // The project's installation shim outlives an upgrade; a release path would not.
-  const shim = path.join(cwd, '.fgos', 'installation', 'bin', 'fgos');
+  const shim = projectShimPath(cwd);
   const resolved = isExecutable(shim) ? { path: shim } : bin(cwd);
   if (!resolved) return { skip: 'no activated fgos host resolves here, so the timer cannot name one' };
   const stem = unitStem(cwd, schedule);

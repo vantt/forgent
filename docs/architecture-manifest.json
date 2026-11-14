@@ -217,6 +217,34 @@
       "allowed": ["packages/yaml-doc/rust/src/backend.rs"],
       "debt": [],
       "reason": "only fgos-yaml-doc decides what YAML means; no file loads a YAML library by import, import(), require() or createRequire, and no pasted copy of a parser (found by its loadAll entry point) exists. Per-line match: an alias bound to createRequire on another line, or a load split over lines, is not seen"
+    },
+    {
+      "job": "installation shim and activation record location",
+      "kind": "door",
+      "patterns": ["activation\\.json", "['\"]installation['\"],\\s*['\"]bin['\"]", "\\.fgos/installation/bin"],
+      "allowed": [
+        "src/util/host-bin-path.mjs",
+        "packages/distribution/rust/src/init.rs",
+        "packages/distribution/rust/src/lib.rs",
+        "packages/distribution/rust/src/shim.rs",
+        "packages/distribution/rust/src/uninstall.rs",
+        "packages/distribution/rust/src/fgctl_refresh.rs",
+        "apps/fgctl/src/help.rs",
+        "src/setup/project-launcher.mjs",
+        { "path": "bin/fgos.mjs", "reason": "an error message tells the user the shim path to run; it never builds or reads the path" },
+        { "path": "scripts/check-hook-registrations-guarded.mjs", "reason": "the check looks for the shim text inside hook commands, which is the string the hooks carry" },
+        { "path": "scripts/ci-external-consumer.sh", "reason": "the external-consumer proof runs the installed shim the way a consumer's shell does, outside any Node module" },
+        { "path": "scripts/ci-external-consumer.ps1", "reason": "the external-consumer proof asserts the record is absent after a refused install, outside any Node module" },
+        { "path": "scripts/fgos-shell-integration.sh", "reason": "a shell script the user sources: tests for the shim in the project before it names fgos" },
+        { "path": "scripts/lib/mailbox-behaviour-run.mjs", "reason": "the behaviour harness spawns the shim of the workspace it builds" },
+        { "path": "scripts/lib/mailbox-live-confined.mjs", "reason": "the live harness writes the activation record of the confined workspace it builds" },
+        { "path": "scripts/record-mailbox-hook-fixtures.mjs", "reason": "the fixture recorder spawns the shim of the workspace it builds" }
+      ],
+      "debt": [
+        { "path": "src/setup/registrations.mjs", "reason": "doctor rows read activation.json directly; moved after the capability plan rewrites the file" }
+      ],
+      "retiredBy": "S7: the Node reader retires with the Node payload; distribution keeps writing",
+      "reason": "distribution writes the record and the shim, the host reads them; in Node only host-bin-path knows where they are"
     }
   ],
   "files": {
