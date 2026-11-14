@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "b35efc8937ed637e12abc16290a8e73d63034b90393c69beaf244d43686b8c08",
+  "payloadDigest": "ee2bae3ba159900216135afba9de6313127cc50c7db1377e147197539e6fa1ba",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -394,8 +394,9 @@
     "packages/git/node-addon/tests/yaml_parts.rs": "835efdf2a4183cd1197385f318bfb370db8804ae9f4e8e500548c75fd6a3462f",
     "packages/git/rust/src/driver.rs": "3a63b6f4217e122a9b43fc0db6976db89beb14436cd576e39065af11f261c562",
     "packages/git/rust/src/inspect.rs": "f01f4b4709058650ef9643c8331aa20ab69eef7353abca9769eacb8b829fa2e7",
+    "packages/git/rust/src/invocation_root.rs": "4a1d568e804770e25a4b6c794a3efbc1f81e731b1c1647ce19876f307b352c7b",
     "packages/git/rust/src/land.rs": "3397a76d1f4c00b4d1ca20a3394f445b129d59f59a031c5c9cd419665f684803",
-    "packages/git/rust/src/lib.rs": "931a1c26fea195a780dc99336c3fdd40206202cf047861d9bf85ff7d422e5608",
+    "packages/git/rust/src/lib.rs": "f51b330d9f207020f8adbfaccd9fe5fb44190e1cc945b3476625f0ea0a5edd7a",
     "packages/git/rust/src/native_lock.rs": "49758dea6b6d2f2abae425b31b937817b8c15174a83bf10ce33dd9046cc5139a",
     "packages/git/rust/src/objects.rs": "835dcdc093cbbdad82eb25b82fd28df9de6942789751a57b571f24e389cf23ec",
     "packages/git/rust/src/publication.rs": "2197f50540e53b98b6e62961fe37eaf5f860d6f79fd2559084909d67dca9cd92",
@@ -406,6 +407,7 @@
     "packages/git/rust/src/restore.rs": "c55f72fc71c397e7efa44ae20b4f916d158999825c9fcc151856f4dc9f82c964",
     "packages/git/rust/src/scoped_commit.rs": "4d185965fc75c9bf7052e2533c1fda78f541065db2076746b53b80f28e10ac32",
     "packages/git/rust/src/sequence.rs": "00ab99823a85eae69ed8acf06d1da968b016cb5ae40464394adf2aa78d015295",
+    "packages/git/rust/src/store_admission.rs": "71de393a2e9a5391f6549b47eb8a1380cc8129d314e1a3da80a4eae4ce1c9da6",
     "packages/git/rust/src/sync.rs": "1eb485368c46ee609573fadeff4e9e2bb8f19c0d17956e4e0ef14f6ca8280cb2",
     "packages/git/rust/src/wal.rs": "daa876a880327f92bd7eb43f7c00f0c155c209342abca17132e8cacdebdcf6ff",
     "packages/git/rust/src/worktree.rs": "136b707b72a4c0cbe6489d6163a75622ab03a734efaa40d35ed84a378a4f1d2d",
@@ -2440,6 +2442,13 @@
     {
       "path": "packages/git/rust/src/driver.rs",
       "line": 3396,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/git/rust/src/invocation_root.rs",
+      "line": 322,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"
