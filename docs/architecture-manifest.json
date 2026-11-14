@@ -266,10 +266,10 @@
     {
       "job": "retired Node help renderer",
       "kind": "door",
-      "patterns": ["\\brenderHelpText\\b", "\\bhandleVerbHelp\\b", "\\bpublicManifestEntries\\b", "\\bformatDeprecation\\b"],
+      "patterns": ["\\brenderHelpText\\b", "\\brenderGuide\\b", "\\bprintVerbHelp\\b", "\\bhandleVerbHelp\\b", "\\bhandleHelp\\b", "\\brefuseHelp\\b", "\\bformatDeprecation\\b"],
       "allowed": [],
       "debt": [],
-      "reason": "the host renders every help form from the committed manifest file (help.rs) and the Node channel only forwards a help token to it; the four old names are retired and no file may bring one back"
+      "reason": "the host renders every help form from the committed manifest file (help.rs) and the Node channel only forwards a help token to it; the seven old names are retired and no file may bring one back"
     },
     {
       "job": "decide the lane of an invocation",

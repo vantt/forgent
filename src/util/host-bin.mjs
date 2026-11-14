@@ -1,3 +1,4 @@
+import os from 'node:os';
 import path from 'node:path';
 import { execFileSync, spawnSync } from 'node:child_process';
 import { resolveMainCheckoutRoot, fgosDirFromRoot } from '../runner/paths.mjs';
@@ -32,7 +33,9 @@ export function runHostInherited(args, { dir = process.cwd() } = {}) {
   if (!hostBin) return { code: 'host-unavailable' };
   const child = spawnSync(hostBin, args, { stdio: 'inherit' });
   if (child.error) return { code: 'host-exec-error', message: child.error.message };
-  return { status: child.status ?? 1 };
+  // A host killed by a signal exits the way a shell reports it: 128 plus the signal number.
+  const signalNumber = child.signal ? os.constants.signals[child.signal] : undefined;
+  return { status: child.status ?? (signalNumber === undefined ? 1 : 128 + signalNumber) };
 }
 
 /**

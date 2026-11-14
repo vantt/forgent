@@ -29,6 +29,7 @@ import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { inspectRepo } from './lib/git-ports.mjs';
+import { resolveActiveHostBin } from '../src/util/host-bin-path.mjs';
 
 // Not imported from run-tests.mjs: that module imports this one for the summary it prints.
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -694,7 +695,13 @@ if (process.argv[1] === __filename) {
     }
     for (const { title, files } of report.shared) console.log(`title ${title}: ${files.join(', ')}`);
   } else if (args[0] === '--cli-cost') {
-    const cost = cliCost();
+    // FGOS_HOST_BIN first, then the activation above the current directory: the one host lookup.
+    const { bin: hostBin } = resolveActiveHostBin({ cwd: process.cwd() });
+    if (!hostBin) {
+      console.error('cli-cost times help on the host binary: set FGOS_HOST_BIN, or run from a project with an activated release');
+      process.exit(1);
+    }
+    const cost = cliCost({ hostBin });
     console.log(`cli-cost: fgos --help ${cost.helpMs} ms, fgos list ${cost.listMs} ms (median of ${cost.runs}, load ${cost.load})`);
   } else if (args[0] === '--check') {
     const scopeIdx = args.indexOf('--scope');

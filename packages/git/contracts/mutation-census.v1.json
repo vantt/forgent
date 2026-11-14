@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "360c1d0d5394387c6bff5b2f89b56fe7d757d81c3290628a7d00b27e3b8f0343",
+  "payloadDigest": "871ba4652dd3b307411a95c7f5cf2fe977c7b2154a7dfa8db5b0204fbb668b53",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -907,7 +907,7 @@
     "scripts/run-tests.mjs": "6998785c0417e1167cfb9c69b8e0f9d4f775ab7b73f518e3b34f8249ee911bb5",
     "scripts/stress-test-files.mjs": "1c9298587bae21b5971c2e1eba5effd3c2a0c85ba94372936fa5e0c1d70d4f4e",
     "scripts/test-ownership-lint.mjs": "1917bcc0ec0387e43d4e09dc3bc1e6a5923e30b4c3848cf480df9eb0c2c042e2",
-    "scripts/test-proof-inventory.mjs": "724966075113d8ea55ddf9a6ec3be0a60f684ce76ad90135fb0584d96d057379",
+    "scripts/test-proof-inventory.mjs": "002c3b089c9eb270dfbfb5505840b212784de1d83ef4d1be6c033df0b6ef9803",
     "scripts/test-select-compare.mjs": "45ec5c8f1b192430431127a06133376cd5e5d2a50f8e6865472c1ae341ae1329",
     "scripts/test-select-coverage-map.mjs": "b313d02cce6c8fa7f03dae8acdfd14a37b8f3a04b330ae9b2c144d0287b08e85",
     "scripts/test-select-mutate.mjs": "77d8bc7ae624453d5c50d6f83d3136ef41803f69452cef41c8fd14587cd4df39",
@@ -1223,7 +1223,7 @@
     "src/util/format-lock-duration.mjs": "87e069a71d25348768de8fe5116d2ac3759a2c1e775433a6511750491f874b3e",
     "src/util/git-paths.mjs": "fbb0b5af5b149853b9d5279062d417cee88a24ce161f782b5ae6dec3d10f1941",
     "src/util/host-bin-path.mjs": "5a3b994348e6830f4b869f0a30de17fc48fd4d2cfb551282606d8d8a4a4e20c2",
-    "src/util/host-bin.mjs": "206f3b92331540022dba1cc7b2d76d80d8d2dec687d0b6c53f397fb00a46b896",
+    "src/util/host-bin.mjs": "76b7a94d42dedd4b74ae264c832e67c9c458add63581de451a14da478cd7a194",
     "src/util/identity-mint.mjs": "533825271188a6e5dfba4c55e46d2ef69c07c07ae3150bda2872d0ea24a77159",
     "src/util/normalize-path.mjs": "e1519327a67834d6309a0e92e69d5fb46bb671a7ddfbe9ef5c36acc22fc3062a",
     "src/util/refuse-symlink.mjs": "d159c2a509be27fe199675e37d5cb255eb44c1622e806de8a52916366f1cbffa",
@@ -3422,8 +3422,15 @@
     },
     {
       "path": "scripts/test-proof-inventory.mjs",
-      "line": 665,
-      "spawn": "median -> scripts/test-proof-inventory.mjs:660",
+      "line": 666,
+      "spawn": "median -> scripts/test-proof-inventory.mjs:661",
+      "binary": "(env FGOS_HOST_BIN)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "scripts/test-proof-inventory.mjs",
+      "line": 704,
+      "spawn": "cliCost -> scripts/test-proof-inventory.mjs:666",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
     },
@@ -3730,14 +3737,14 @@
     },
     {
       "path": "src/util/host-bin.mjs",
-      "line": 33,
+      "line": 34,
       "spawn": "spawnSync",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
     },
     {
       "path": "src/util/host-bin.mjs",
-      "line": 66,
+      "line": 69,
       "spawn": "execFileSync",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"

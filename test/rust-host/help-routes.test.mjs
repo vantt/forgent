@@ -262,3 +262,27 @@ test('the direct-node channel hands every help form to the host unchanged, and s
   assert.match(none.stderr, /installed `fgos`/);
   assert.match(none.stderr, /npm run fgos:dev -- <verb> --help/);
 });
+
+// The older-host case: a host that forwards help to Node (as the release installed before the host answered help
+// itself does) must not start a Node/host cycle. The stub is such a host; it counts its runs and caps them itself.
+test('a host that forwards help back to Node is refused on the second hop, not looped', { skip: process.platform === 'win32' }, () => {
+  const cwd = emptyCwd('older-host');
+  const counter = path.join(scratch, 'older-host-runs');
+  const stub = path.join(scratch, 'older-host-stub');
+  fs.writeFileSync(
+    stub,
+    `#!/bin/sh
+echo run >> "${counter}"
+if [ "$(wc -l < "${counter}")" -gt 5 ]; then echo "stub: run cap reached" >&2; exit 99; fi
+if [ -n "\${FGOS_RUST_HOST_RECURSION_GUARD-}" ]; then echo "stub: recursion guard triggered" >&2; exit 1; fi
+FGOS_RUST_HOST_RECURSION_GUARD=1 FGOS_HOST_BIN="$0" exec "${process.execPath}" "${path.join(REPO_ROOT, 'bin/fgos.mjs')}" "$@"
+`,
+    { mode: 0o755 },
+  );
+  const env = { ...process.env, FGOS_HOST_BIN: stub };
+  for (const key of ['CLAUDE_CODE_SESSION_ID', 'FGOS_RUST_HOST_RECURSION_GUARD']) delete env[key];
+  const result = spawnSync(process.execPath, [path.join(REPO_ROOT, 'bin/fgos.mjs'), '--help'], { cwd, encoding: 'utf8', env, timeout: 30000 });
+  assert.equal(result.status, 1, `${result.stdout}${result.stderr}`);
+  assert.match(result.stderr, /recursion guard triggered/);
+  assert.equal(fs.readFileSync(counter, 'utf8').trim().split('\n').length, 2, 'the stub ran exactly twice');
+});
