@@ -2379,6 +2379,36 @@ test('a dispatch whose locked account still fails the call is refused as before,
   assert.deepEqual(calls, ['claude-acct'], 'one call in the cooldown, however many dispatches ask');
 });
 
+test('a launch probes a named account whose quota stop named no reset once per unit run, and a still-exhausted answer refuses the lease', async () => {
+  const tempDir = mkTempDir();
+  const { runnerConfig, runtimeDir } = buildFallbackFixture(tempDir, { primaryQuarantined: false, fallbackQuarantined: false });
+  const { statePath } = providerCapacityStatePaths(runtimeDir);
+  const state = JSON.parse(fs.readFileSync(statePath, 'utf8'));
+  state.providers.claude = { accounts: { 'claude-acct': { quarantine: {
+    kind: 'temporary', reasonCode: 'quota-limit', resetKnown: false, quarantinedAt: new Date(Date.now() - 7_200_000).toISOString(), until: new Date(Date.now() - 3_600_000).toISOString(),
+  } } } };
+  fs.writeFileSync(statePath, JSON.stringify(state));
+  const calls = [];
+  let answer = { ok: false, reason: 'usage-limit', exitCode: 1, detail: 'still out of quota' };
+  const probe = async ({ accountId, model }) => { calls.push({ accountId, model }); return answer; };
+  const dispatch = (id, unitRunId) => executeAssignment(
+    { ...buildAssignment({ work: { id, status: 'todo', workflowStep: 'planning', domain: 'coding' }, stage: 'planning', operation: 'shape-plan' }), unitRunId },
+    { cwd: tempDir, repoRoot: tempDir, runnerConfig, cliOverride: { leaseAccount: 'claude-acct', model: 'sonnet' }, providerCapacityRuntimeDir: runtimeDir, providerCredentialProbe: probe },
+  );
+
+  const first = await dispatch('tsk-self-probe-1', 'ur-one');
+  const sameRun = await dispatch('tsk-self-probe-2', 'ur-one');
+  answer = { ok: true };
+  const otherRun = await dispatch('tsk-self-probe-3', 'ur-two');
+
+  assert.equal(first.classification.failure.code, 'provider-capacity-lease-conflict');
+  assert.equal(sameRun.classification.failure.code, 'provider-capacity-lease-conflict');
+  assert.notEqual(otherRun.classification?.failure?.code, 'provider-capacity-lease-conflict');
+  assert.deepEqual(calls, [{ accountId: 'claude-acct', model: 'sonnet' }, { accountId: 'claude-acct', model: 'sonnet' }], 'one call per unit run, none for a repeat of the same run');
+  const after = JSON.parse(fs.readFileSync(statePath, 'utf8'));
+  assert.equal(after.providers.claude.accounts['claude-acct'].quarantine, null);
+});
+
 test('without a probe function a locked account is refused and nothing is called', async () => {
   const tempDir = mkTempDir();
   const { runnerConfig, runtimeDir } = buildFallbackFixture(tempDir, { primaryQuarantined: true, fallbackQuarantined: false });
