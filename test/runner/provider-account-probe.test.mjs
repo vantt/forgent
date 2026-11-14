@@ -1,6 +1,7 @@
-// The account probe starts every CLI of one provider account at once through the dispatch door and
-// tells an account fault from a CLI fault. Everything here runs against fixtures: the Assignment
-// door, the id claim and the pane close are injected.
+// The account probe calls each login of an account directly, then starts every CLI of the account at once
+// through the dispatch door, and tells an account fault from a harness fault. Everything here runs against
+// fixtures: the direct call, the account lock, the Assignment door, the id claim, the pane close and the
+// capacity record are injected.
 
 import '../helpers/process-tmp-root.mjs';
 import { test, after } from 'node:test';
@@ -10,8 +11,9 @@ import os from 'node:os';
 import path from 'node:path';
 
 import {
-  accountInvocations, classifyAccountProbe, accountProbeVerdict, configPinnedToAccount, runAccountProbe,
+  accountInvocations, classifyAccountProbe, accountProbeVerdict, configPinnedToAccount, runAccountProbe, runAccountSweep,
 } from '../../src/runner/dispatch/provider-account-probe.mjs';
+import { runDispatchCli } from '../../src/runner/dispatch/cli.mjs';
 
 const dirs = [];
 const tmp = (prefix) => {
@@ -94,28 +96,37 @@ test('outcome classes come from what the run settled with, what it printed and t
   assert.equal(classifyAccountProbe({ text: 'panic: unexpected' }).outcome, 'other');
 });
 
-test('the verdict says account fault only when every CLI failed the same account-level way', () => {
-  const sandboxed = (outcome) => ({ outcome, confined: true });
-  assert.equal(accountProbeVerdict([sandboxed('ok'), sandboxed('ok')]), 'healthy');
-  assert.equal(accountProbeVerdict([sandboxed('auth'), sandboxed('quota')]), 'account-fault');
-  assert.equal(accountProbeVerdict([sandboxed('ok'), sandboxed('blocked-trust-prompt')]), 'cli-fault');
-  assert.equal(accountProbeVerdict([sandboxed('sandbox'), sandboxed('auth')]), 'mixed');
+test('the verdict names who failed from both legs: healthy, account-fault, harness-fault or mixed', () => {
+  const direct = (outcome) => ({ leg: 'direct', outcome });
+  const harness = (outcome, extra = {}) => ({ leg: 'harness', outcome, inVerdict: true, ...extra });
+  assert.equal(accountProbeVerdict([direct('ok'), harness('ok'), harness('ok')]), 'healthy');
+  assert.equal(accountProbeVerdict([direct('auth'), direct('quota'), harness('auth')]), 'account-fault');
+  assert.equal(accountProbeVerdict([direct('ok'), harness('ok'), harness('blocked-trust-prompt')]), 'harness-fault');
+  assert.equal(accountProbeVerdict([direct('ok'), harness('sandbox')]), 'harness-fault');
+  assert.equal(accountProbeVerdict([direct('ok'), direct('auth'), harness('ok')]), 'mixed');
+  assert.equal(accountProbeVerdict([direct('other'), harness('ok')]), 'mixed');
+  assert.equal(accountProbeVerdict([direct('auth'), harness('ok')]), 'account-fault', 'every direct row is an account stop, whatever the harness leg says');
+  assert.equal(accountProbeVerdict([direct('ok')]), 'healthy', 'with no counted harness row the direct leg alone decides');
+  assert.equal(accountProbeVerdict([direct('quota')]), 'account-fault');
+  assert.equal(accountProbeVerdict([harness('auth'), harness('quota')]), 'account-fault', 'with no direct row the harness leg alone decides');
+  assert.equal(accountProbeVerdict([harness('ok'), harness('sandbox')]), 'mixed');
   assert.equal(accountProbeVerdict([]), 'nothing-to-probe');
 });
 
-test('the verdict reads only the invocations that declare their own sandbox', () => {
+test('the verdict reads only counted rows: confined harness invocations and direct rows a call exists for', () => {
   // The read-only door confines every probe round. An invocation that declares no sandbox has no private
   // home either, so its CLI meets its own login directory mounted read-only and stops on EROFS before it
-  // answers: the shape of a real openai/tetcu72 probe, where every sandboxed invocation answered.
+  // answers: the shape of a real openai/tetcu72 probe, where every sandboxed invocation answered. A round the
+  // account's quarantine refused, and a store layout no call exists for, say nothing about either leg.
   const rows = [
-    { outcome: 'ok', confined: true },
-    { outcome: 'ok', confined: true },
-    { outcome: 'sandbox', confined: false },
-    { outcome: 'sandbox', confined: false },
+    { leg: 'direct', outcome: 'ok' },
+    { leg: 'direct', outcome: 'no-probe' },
+    { leg: 'harness', outcome: 'ok', inVerdict: true },
+    { leg: 'harness', outcome: 'sandbox', inVerdict: false },
+    { leg: 'harness', outcome: 'quarantined', inVerdict: false },
   ];
   assert.equal(accountProbeVerdict(rows), 'healthy');
-  assert.equal(accountProbeVerdict([{ outcome: 'auth', confined: true }, { outcome: 'sandbox', confined: false }]), 'account-fault');
-  assert.equal(accountProbeVerdict([{ outcome: 'sandbox', confined: false }]), 'no-confined-cli');
+  assert.equal(accountProbeVerdict([{ leg: 'direct', outcome: 'no-probe' }, { leg: 'harness', outcome: 'sandbox', inVerdict: false }]), 'nothing-to-probe');
 });
 
 test('the door gets a config pinned to the one account, and other providers and accounts are left alone', () => {
@@ -197,13 +208,18 @@ test('every CLI starts before any finishes, each under a read-only posture bindi
       confidence: { level: verdict === 'pass' ? 'reported' : 'no-evidence', basis: ['captured-stdout'] },
     }, verdict === 'pass' ? 'done' : 'no-evidence');
   };
+  const events = [];
   const report = await runAccountProbe({
     cfg, provider: 'openai', accountId: 'acct', repoRoot, timeoutMs: 1000,
     createAssignment: (contract) => Object.freeze({ assignmentId: `asgn_probe_${++n}`, provenance: { kind: 'inline', contract } }),
-    dispatch,
+    dispatch: async (...args) => { if (calls.length === 0) events.push('first-dispatch'); return dispatch(...args); },
     closePane: (ref) => { closed.push(ref); return true; },
+    acquireLock: async (ref) => { events.push(`lock ${ref.provider}/${ref.accountId}`); return { spawnHolding: 'held', release: () => events.push('release') }; },
+    probe: async (request) => { events.push(`probe ${request.cli} ${request.spawnHolding}`); return { ok: true, reason: null, providerSignal: null, exitCode: 0, elapsedMs: 7 }; },
   });
 
+  assert.deepEqual(events.slice(0, 4), ['lock openai-codex/acct', 'probe codex held', 'release', 'first-dispatch'], 'the direct call runs under the account lock and finishes before the harness leg starts');
+  assert.deepEqual(report.results.filter((r) => r.leg === 'direct').map((r) => [r.cli, r.outcome, r.store, r.elapsedMs]), [['codex', 'ok', '/homes/codex-acct', 7]]);
   assert.equal(calls.length, 4);
   for (const { assignment, runnerConfig, cliOverride } of calls) {
     assert.equal(assignment.binding.posture, 'read-only');
@@ -214,11 +230,13 @@ test('every CLI starts before any finishes, each under a read-only posture bindi
   }
   assert.deepEqual(closed, [{ paneId: 'p-1', herdrSession: 'fgos-workers', terminalKey: 'k-1' }]);
   const row = report.results.find((r) => r.invocationId === 'codex-herdr-static');
+  assert.equal(row.leg, 'harness');
   assert.equal(row.outcome, 'blocked-trust-prompt');
   assert.equal(row.pane, 'closed-by-probe');
-  assert.equal(report.results.filter((r) => r.outcome === 'ok').length, 3);
-  assert.deepEqual(report.results.filter((r) => r.inVerdict).map((r) => r.invocationId).sort(), ['codex-herdr-static', 'pi-cli-bwrap-acct']);
-  assert.equal(report.verdict, 'cli-fault');
+  const harness = report.results.filter((r) => r.leg === 'harness');
+  assert.equal(harness.filter((r) => r.outcome === 'ok').length, 3);
+  assert.deepEqual(harness.filter((r) => r.inVerdict).map((r) => r.invocationId).sort(), ['codex-herdr-static', 'pi-cli-bwrap-acct']);
+  assert.equal(report.verdict, 'harness-fault', 'the login answers directly, a confined CLI stops at a trust prompt');
 });
 
 test('each CLI is probed on the strongest model a tier cell names for the account\'s pool, and the row says which', async () => {
@@ -235,7 +253,7 @@ test('each CLI is probed on the strongest model a tier cell names for the accoun
   const repoRoot = tmp('fgos-account-probe-model-');
   const overrides = [];
   const probe = (provider, accountId) => runAccountProbe({
-    cfg: geminiCfg, provider, accountId, repoRoot,
+    cfg: geminiCfg, provider, accountId, repoRoot, leg: 'harness',
     createAssignment: (contract) => Object.freeze({ assignmentId: `asgn_model_${overrides.length}`, provenance: { kind: 'inline', contract } }),
     dispatch: async (_assignment, { cliOverride }) => { overrides.push(cliOverride); return null; },
     closePane: () => false,
@@ -246,7 +264,7 @@ test('each CLI is probed on the strongest model a tier cell names for the accoun
   assert.deepEqual([flagship.results[0].model, flagship.results[0].modelSource], ['gemini-argon-high', 'gemini.flagship']);
 
   const plain = await runAccountProbe({
-    cfg: { ...geminiCfg, modelPolicies: {} }, provider: 'gemini', accountId: 'acct', repoRoot,
+    cfg: { ...geminiCfg, modelPolicies: {} }, provider: 'gemini', accountId: 'acct', repoRoot, leg: 'harness',
     createAssignment: (contract) => Object.freeze({ assignmentId: 'asgn_model_default', provenance: { kind: 'inline', contract } }),
     dispatch: async (_assignment, { cliOverride }) => { overrides.push(cliOverride); return null; },
     closePane: () => false,
@@ -277,7 +295,7 @@ test('a run settled as a provider limit is the account\'s login or quota by the 
     };
   };
   const probe = (failure) => runAccountProbe({
-    cfg, provider: 'openai', accountId: 'acct', invocationIds: ['pi-cli-bwrap-acct'], repoRoot,
+    cfg, provider: 'openai', accountId: 'acct', invocationIds: ['pi-cli-bwrap-acct'], repoRoot, leg: 'harness',
     createAssignment: (contract) => Object.freeze({ assignmentId: `asgn_cause_${failure.cause}`, provenance: { kind: 'inline', contract } }),
     dispatch: settledWith(failure),
     closePane: () => false,
@@ -291,4 +309,132 @@ test('a run settled as a provider limit is the account\'s login or quota by the 
   const refused = (await probe({ cause: 'provider', providerSignal: { status: 404 } })).results[0];
   assert.equal(refused.outcome, 'other');
   assert.match(refused.evidence, /HTTP 404/);
+});
+
+test('a store with a login is called on the harness model of its CLI; a layout with no call is no-probe and takes no lock', async () => {
+  const omp = { id: 'omp-cli-bwrap', via: 'cli', adapter: 'cli-spawn', command: 'omp', args: [], confinement: { backend: 'bwrap' }, credentialStore: { use: 'omp', homeEnv: 'PI_CODING_AGENT_DIR' } };
+  const perCli = {
+    providers: {
+      gemini: {
+        accounts: {
+          acct: {
+            label: 'acct',
+            credentialSources: {
+              omp: { kind: 'home-files', home: '/homes/omp-acct', files: ['agent.db'] },
+              odd: { kind: 'home-files', home: '/homes/odd-acct', files: ['mystery.bin'] },
+            },
+          },
+        },
+      },
+    },
+    modelPolicies: { gemini: { flagship: 'gemini-argon-high' } },
+    executors: { gemini: { kind: 'agent', providerModel: 'gemini', invocations: [omp] } },
+  };
+  const locks = [];
+  const asked = [];
+  const report = await runAccountProbe({
+    cfg: perCli, provider: 'gemini', accountId: 'acct', repoRoot: tmp('fgos-account-probe-direct-'), leg: 'direct',
+    acquireLock: async () => { locks.push('lock'); return { spawnHolding: null, release() {} }; },
+    probe: async ({ cli, model, account }) => {
+      asked.push([cli, model, Object.keys(account.credentialSources)]);
+      return { ok: false, detail: 'the login is still rejected', reason: 'login', providerSignal: { status: 401 }, exitCode: 1, elapsedMs: 3 };
+    },
+  });
+  assert.deepEqual(asked, [['omp', 'gemini-argon-high', ['omp', 'odd']]]);
+  assert.equal(locks.length, 1);
+  assert.deepEqual(report.results.map((r) => [r.cli, r.outcome, r.reason, r.model, r.modelSource]), [
+    ['omp', 'auth', 'login', 'gemini-argon-high', 'gemini.flagship'],
+    ['odd', 'no-probe', null, null, 'invocation-default'],
+  ]);
+  assert.equal(report.verdict, 'account-fault');
+});
+
+test('a harness round the account\'s quarantine refused is quarantined and stays out of the verdict', async () => {
+  const repoRoot = tmp('fgos-account-probe-quarantined-');
+  const refused = async (assignment) => {
+    const dir = path.join(repoRoot, '.fgos', 'assignments', assignment.assignmentId, 'runs', '01');
+    fs.mkdirSync(dir, { recursive: true });
+    fs.writeFileSync(path.join(dir, 'stdout.log'), '');
+    return {
+      contract: { id: 'assignment-run-result', version: 2 },
+      runId: `run_${assignment.assignmentId}`,
+      status: 'failed',
+      confidence: 'failed',
+      runtime: { stdoutLog: path.relative(repoRoot, path.join(dir, 'stdout.log')) },
+      classification: {
+        policy: { disposition: 'allow' }, delivery: { mode: 'fresh' }, provenance: 'native-v2',
+        execution: { status: 'failed', exitCode: null },
+        assessment: { verdict: 'not-applicable' },
+        confidence: { level: 'failed', basis: ['captured-stdout'] },
+        failure: { family: 'provider', code: 'provider-capacity-lease-conflict' },
+      },
+    };
+  };
+  const report = await runAccountProbe({
+    cfg, provider: 'openai', accountId: 'acct', invocationIds: ['pi-cli-bwrap-acct'], repoRoot,
+    createAssignment: (contract) => Object.freeze({ assignmentId: 'asgn_quarantined', provenance: { kind: 'inline', contract } }),
+    dispatch: refused,
+    closePane: () => false,
+    acquireLock: async () => ({ spawnHolding: null, release() {} }),
+    probe: async () => ({ ok: true }),
+  });
+  const row = report.results.find((r) => r.leg === 'harness');
+  assert.deepEqual([row.outcome, row.inVerdict], ['quarantined', false]);
+  assert.equal(report.verdict, 'healthy');
+});
+
+test('probe-account --all sweeps enabled accounts in declared order, --record writes the direct rows once per account, --leg picks the leg', async () => {
+  const root = tmp('fgos-account-probe-all-');
+  const sweepCfg = {
+    llmAccounts: {
+      openai: {
+        first: { credentialStore: { codex: '/homes/first' } },
+        idle: { credentialStore: { codex: '/homes/idle' }, disabled: true },
+        second: { credentialStore: { codex: '/homes/second' } },
+      },
+    },
+    executors: { openai: { kind: 'agent', providerModel: 'openai', invocations: [{ id: 'unrelated', via: 'cli', adapter: 'cli-spawn', command: process.execPath, args: ['{prompt}'] }] } },
+  };
+  const probed = [];
+  const recorded = [];
+  const doors = {
+    cfg: sweepCfg,
+    acquireLock: async () => ({ spawnHolding: null, release() {} }),
+    probe: async ({ accountId }) => { probed.push(accountId); return accountId === 'second' ? { ok: false, detail: 'the login is still rejected', reason: 'login', providerSignal: null, exitCode: 1, elapsedMs: 2 } : { ok: true, elapsedMs: 1 }; },
+    recordProbe: (entry) => { recorded.push(entry); },
+  };
+  const run = (...flags) => runDispatchCli(['probe-account', ...flags, '--cwd', root, '--repo-root', root], { returnResult: true, accountProbeDoors: doors });
+
+  const swept = await run('--all', '--leg', 'direct');
+  assert.deepEqual(probed, ['first', 'second']);
+  assert.deepEqual(swept.accounts.map((a) => [a.accountId, a.skipped ?? a.verdict]), [['first', 'healthy'], ['idle', 'disabled'], ['second', 'account-fault']]);
+  assert.deepEqual(recorded, [], 'without --record nothing is written');
+
+  await run('--all', '--leg', 'direct', '--record');
+  assert.deepEqual(recorded.map((r) => [r.accountId, r.provider, r.verdict, r.source, r.direct.map((d) => [d.cli, d.ok, d.reason])]), [
+    ['first', 'openai-codex', 'healthy', 'probe-account', [['codex', true, null]]],
+    ['second', 'openai-codex', 'account-fault', 'probe-account', [['codex', false, 'login']]],
+  ]);
+
+  probed.length = 0;
+  const harnessOnly = await run('--provider', 'openai', '--account', 'first', '--leg', 'harness');
+  assert.deepEqual(probed, [], '--leg harness makes no direct call');
+  assert.equal(harnessOnly.verdict, 'nothing-to-probe');
+
+  for (const narrowing of [['--provider', 'openai'], ['--account', 'first'], ['--executor', 'openai'], ['--invocation', 'x']]) {
+    await assert.rejects(run('--all', ...narrowing), new RegExp(`cannot be narrowed by ${narrowing[0]}`));
+  }
+  await assert.rejects(run('--provider', 'openai', '--account', 'first', '--leg', 'sideways'), /--leg must be one of direct, harness, both/);
+  await assert.rejects(run(), /requires --provider <provider> --account <accountId>, or --all/);
+});
+
+test('a sweep goes on past an account whose probe throws and reports it', async () => {
+  const accountCfg = { providers: { openai: { accounts: { a: { credentialSource: { kind: 'codex-home', home: '/homes/a' } }, b: { credentialSource: { kind: 'codex-home', home: '/homes/b' } } } } }, executors: {} };
+  const swept = await runAccountSweep({
+    cfg: accountCfg, repoRoot: tmp('fgos-account-probe-sweep-'), leg: 'direct', record: true,
+    acquireLock: async () => ({ spawnHolding: null, release() {} }),
+    probe: async () => ({ ok: true }),
+    recordProbe: ({ accountId }) => { if (accountId === 'a') throw new Error('state is locked'); },
+  });
+  assert.deepEqual(swept.accounts.map((a) => [a.accountId, a.verdict, a.recorded, a.recordError ?? null]), [['a', 'healthy', false, 'state is locked'], ['b', 'healthy', true, null]]);
 });
