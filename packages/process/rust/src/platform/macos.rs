@@ -9,7 +9,7 @@ use std::process::{Child, Command};
 use super::{as_pid_t, unix_hostname, ProcessPlatform};
 use crate::control::{self, Signal, SignalOutcome};
 use crate::facts::{
-    Holders, Observed, PidNs, ProcTuple, Relation, Scan, ScanFilter, UnreadableCause,
+    Holders, Observed, PidNs, ProcTuple, Relation, Scan, ScanFilter, StartTime, UnreadableCause,
 };
 use crate::{FdSlot, ProcId};
 
@@ -61,7 +61,7 @@ impl ProcessPlatform for Macos {
             boot_id: self.boot_id(),
             pid_ns: self.pid_ns().id,
             pid,
-            start_time: format!("{}.{:06}", info.pbi_start_tvsec, info.pbi_start_tvusec),
+            start_time: start_time_of_info(&info).to_string(),
         })
     }
 
@@ -74,8 +74,12 @@ impl ProcessPlatform for Macos {
             return Observed::Zombie;
         }
         Observed::Live {
-            start_time: format!("{}.{:06}", info.pbi_start_tvsec, info.pbi_start_tvusec),
+            start_time: start_time_of_info(&info).to_string(),
         }
+    }
+
+    fn start_time_of(&self, pid: ProcId) -> Option<StartTime> {
+        bsd_info(pid).ok().map(|info| start_time_of_info(&info))
     }
 
     fn relation_of(&self, pid: ProcId) -> Option<Relation> {
@@ -115,6 +119,13 @@ impl ProcessPlatform for Macos {
     }
 }
 
+fn start_time_of_info(info: &libc::proc_bsdinfo) -> StartTime {
+    StartTime::Timeval {
+        sec: info.pbi_start_tvsec,
+        usec: info.pbi_start_tvusec,
+    }
+}
+
 fn bsd_info(pid: ProcId) -> Result<libc::proc_bsdinfo, Observed> {
     let raw = as_pid_t(pid).ok_or(Observed::Absent)?;
     // SAFETY: plain data, filled within its allocated size by proc_pidinfo.
@@ -149,5 +160,13 @@ mod tests {
         let relation = Macos.relation_of(me).expect("this process is readable");
         assert_eq!(relation.parent, std::os::unix::process::parent_id());
         assert_eq!(relation.pid, me);
+    }
+
+    #[test]
+    fn typed_start_time_of_this_process_equals_its_string_form() {
+        let me = ProcId(std::process::id());
+        let parts = Macos.start_time_of(me).expect("readable");
+        assert!(matches!(parts, StartTime::Timeval { .. }));
+        assert_eq!(parts.to_string(), Macos.identity_of(me).unwrap().start_time);
     }
 }

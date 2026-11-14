@@ -11,7 +11,7 @@ use super::{as_pid_t, unix_hostname, ProcessPlatform};
 use crate::control::{self, Signal, SignalOutcome};
 use crate::facts::{
     self, CreationMark, Holders, Observed, PidNs, ProcTuple, ProcView, Relation, Scan, ScanFilter,
-    UnreadableCause, Verdict,
+    StartTime, UnreadableCause, Verdict,
 };
 use crate::{FdSlot, ProcId};
 
@@ -169,6 +169,25 @@ impl ProcessPlatform for Linux {
             pid,
             &fs::read_to_string(format!("/proc/{}/stat", pid.0)).ok()?,
         )
+    }
+
+    fn start_time_of(&self, pid: ProcId) -> Option<StartTime> {
+        read_stat(pid.0)
+            .ok()
+            .map(|stat| StartTime::Ticks(stat.start_ticks))
+    }
+
+    fn proc_dir_owner_uid(&self, pid: ProcId) -> Option<u32> {
+        use std::os::unix::fs::MetadataExt;
+        fs::metadata(format!("/proc/{}", pid.0))
+            .ok()
+            .map(|meta| meta.uid())
+    }
+
+    fn stdin_tty_of(&self, pid: ProcId) -> Option<PathBuf> {
+        fs::read_link(format!("/proc/{}/fd/0", pid.0))
+            .ok()
+            .filter(|target| target.starts_with("/dev/"))
     }
 
     fn command_name_of(&self, pid: ProcId) -> Option<String> {
@@ -815,5 +834,92 @@ mod tests {
         let ns = Linux.pid_ns();
         assert!(ns.id.starts_with("pid:[") || ns.id == "unknown");
         assert_eq!(ns.is_initial, ns.id == INIT_PID_NS);
+    }
+
+    #[test]
+    fn proc_dir_owner_of_a_non_dumpable_child_stays_its_user_while_its_files_turn_root() {
+        // SAFETY: geteuid has no preconditions.
+        let me = unsafe { libc::geteuid() };
+        if me == 0 {
+            return; // root owns every /proc entry: the difference cannot show
+        }
+        // SAFETY: the child calls only async-signal-safe functions (prctl, pause) and never returns.
+        let child = unsafe { libc::fork() };
+        assert!(child >= 0, "fork failed");
+        if child == 0 {
+            unsafe {
+                libc::prctl(libc::PR_SET_DUMPABLE, 0, 0, 0, 0);
+                loop {
+                    libc::pause();
+                }
+            }
+        }
+        let pid = ProcId(child as u32);
+        let file_owner = |pid: ProcId| {
+            use std::os::unix::fs::MetadataExt;
+            fs::metadata(format!("/proc/{}/environ", pid.0))
+                .ok()
+                .map(|meta| meta.uid())
+        };
+        // The child sets its flag after the fork: wait until its files show it.
+        let mut files = file_owner(pid);
+        for _ in 0..200 {
+            if files == Some(0) {
+                break;
+            }
+            std::thread::sleep(std::time::Duration::from_millis(10));
+            files = file_owner(pid);
+        }
+        let owner = Linux.proc_dir_owner_uid(pid);
+        let filter = ScanFilter {
+            env_keys: Vec::new(),
+            include_self: true,
+        };
+        let effective = Linux.view_of(pid, &filter).and_then(|v| v.effective_uid);
+        // SAFETY: reaping the child this test forked.
+        unsafe {
+            libc::kill(child, libc::SIGKILL);
+            libc::waitpid(child, std::ptr::null_mut(), 0);
+        }
+        assert_eq!(
+            files,
+            Some(0),
+            "the child is non-dumpable: its files are root's"
+        );
+        assert_eq!(owner, Some(me), "the directory stays its user's");
+        assert_eq!(effective, Some(me), "its effective uid is the user");
+    }
+
+    #[test]
+    fn proc_dir_owner_of_this_process_is_its_user() {
+        // SAFETY: geteuid has no preconditions.
+        let me = unsafe { libc::geteuid() };
+        assert_eq!(
+            Linux.proc_dir_owner_uid(ProcId(std::process::id())),
+            Some(me)
+        );
+        assert_eq!(Linux.proc_dir_owner_uid(ProcId(u32::MAX)), None);
+    }
+
+    #[test]
+    fn stdin_tty_of_a_child_reading_a_pipe_is_none() {
+        let mut child = std::process::Command::new("sleep")
+            .arg("5")
+            .stdin(std::process::Stdio::piped())
+            .spawn()
+            .unwrap();
+        let tty = Linux.stdin_tty_of(ProcId(child.id()));
+        child.kill().unwrap();
+        child.wait().unwrap();
+        assert_eq!(tty, None);
+    }
+
+    #[test]
+    fn typed_start_time_of_this_process_equals_its_string_form() {
+        let me = ProcId(std::process::id());
+        let parts = Linux.start_time_of(me).expect("this process is readable");
+        assert!(matches!(parts, StartTime::Ticks(_)));
+        let tuple = Linux.identity_of(me).expect("this process is live");
+        assert_eq!(parts.to_string(), tuple.start_time);
     }
 }

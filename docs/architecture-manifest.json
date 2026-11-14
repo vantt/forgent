@@ -130,6 +130,24 @@
       "reason": "a kernel lock is taken only inside the holder-lock drivers; every other lock goes through its Resource. The patterns cannot see std file.lock(), try_lock() or lock_shared(), whose names are too common to match without false hits"
     },
     {
+      "job": "process identity: start time of a process",
+      "kind": "door",
+      "patterns": ["GetProcessTimes", "\\bOpenProcess\\(", "ns_last_pid", "pbi_start"],
+      "allowed": [
+        "packages/process/rust/src/platform/linux.rs",
+        "packages/process/rust/src/platform/macos.rs",
+        "packages/process/rust/src/platform/windows.rs",
+        "packages/process/rust/src/platform/windows_job.rs"
+      ],
+      "debt": [
+        { "path": "packages/holder-lock/rust/src/helper.rs", "reason": "moves onto fgos-process: opens the holder and reads its creation time itself instead of open_verified" },
+        { "path": "packages/holder-lock/rust/src/route/hold.rs", "reason": "moves onto fgos-process: watch_parent opens and times the parent itself instead of open_verified" },
+        { "path": "packages/holder-lock/rust/src/borrow_vectors.rs", "reason": "moves onto fgos-process: reads creation times through its own OpenProcess/GetProcessTimes" },
+        { "path": "packages/git/node-addon/src/single_load.rs", "reason": "moves onto fgos-process: builds the single-load marker from its own start-time read instead of start_time_of" }
+      ],
+      "reason": "one reader of a process start time per platform: the fgos-process drivers; every other crate asks them"
+    },
+    {
       "job": "take a holder lock from Node",
       "kind": "door",
       "patterns": ["holderLock\\.take\\("],
