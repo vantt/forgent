@@ -33,7 +33,6 @@ impl std::fmt::Display for Invalid {
 
 impl std::error::Error for Invalid {}
 
-/// Largest integer a JavaScript number holds exactly: the bound a numeric key shares with the Node readers.
 /// Why the section could not be had: no home directory to find the global files in, a value of the section that
 /// breaks its rule, or a config file the snapshot refused or could not read.
 #[derive(Debug)]
@@ -58,6 +57,7 @@ impl ReadError {
     }
 }
 
+/// Largest integer a JavaScript number holds exactly: the bound a numeric key shares with the Node readers.
 const MAX_SAFE_INTEGER: f64 = 9_007_199_254_740_991.0;
 
 fn invalid(name: &str) -> Invalid {

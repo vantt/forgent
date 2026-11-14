@@ -186,7 +186,7 @@ pub fn spawn_mapped(request: &MappedSpawn, fd_map: &[(FdSlot, &File)]) -> io::Re
 /// Start `argv` as a child nobody waits for: it leads its own session, reads
 /// `/dev/null`, writes its output to `log` (opened append, created `0o600`,
 /// close-on-exec in the caller) or to `/dev/null` without one, and keeps the
-/// caller's environment. Returns the child's pid and drops the handle at once.
+/// caller's environment, minus the variables named in `env_remove` and plus `env`. Returns the child's pid and drops the handle at once.
 ///
 /// The child is never reaped, so the caller must be short-lived (a hook or a
 /// one-shot verb), never a gateway or a supervisor: a long-lived caller would
@@ -195,6 +195,7 @@ pub fn spawn_detached(
     argv: &[OsString],
     cwd: &std::path::Path,
     env: &[(OsString, OsString)],
+    env_remove: &[&str],
     log: Option<&std::path::Path>,
 ) -> io::Result<u32> {
     use std::os::unix::fs::OpenOptionsExt;
@@ -208,10 +209,22 @@ pub fn spawn_detached(
         })
         .transpose()?;
     let sink = log.as_ref().map_or(MappedStdio::Null, MappedStdio::File);
+    // Removing a name means starting from an empty environment and handing on every other variable.
+    let (env, clear_env) = if env_remove.is_empty() {
+        (env.to_vec(), false)
+    } else {
+        let kept = std::env::vars_os().filter(|(key, _)| {
+            !env_remove
+                .iter()
+                .any(|name| key == std::ffi::OsStr::new(name))
+                && !env.iter().any(|(set, _)| set == key)
+        });
+        (kept.chain(env.iter().cloned()).collect(), true)
+    };
     let request = MappedSpawn {
         argv: argv.to_vec(),
-        env: env.to_vec(),
-        clear_env: false,
+        env,
+        clear_env,
         cwd: Some(cwd.to_path_buf()),
         lead: MappedLead::Session,
         stdio: [MappedStdio::Null, sink, sink],

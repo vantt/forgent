@@ -33,7 +33,10 @@ Also changed: the manifest-projection row's `bin/fgos.mjs` reason now reads "unt
 ## Where the code differs from the phase text
 
 - Admission runs for every native call, as Node's does (a `store: none` call with a mutating shape still reaches it); the phase text says "when `store != none`".
-- A root the Git door refuses (untrusted checkout, relative worktree, empty `--dir`) stops a verb that declares a store, but only reaches a `store: none` verb as the project reader's not-a-project answer. Reason: `mailbox_routes.rs` pins two behaviours the door would otherwise change for today's native verbs (the submodule `unsupported-checkout` answer and a relative worktree reading its main checkout), and the phase says today's native verbs behave as before. No test was weakened; a test now also pins the split.
+- A root the Git door refuses (untrusted checkout, relative worktree, empty `--dir`) is `dir-invalid` for every verb, as in Node. The one exception is a named list of today's eight native verbs (`LENIENT_ROOT_VERBS` in `invocation_doors.rs`, marked as debt in code): for them the refusal reaches only a project reader's not-a-project answer. Reason: `mailbox_routes.rs` pins two behaviours the door would otherwise change for them (the submodule `unsupported-checkout` answer and a relative worktree reading its main checkout), and the phase says today's native verbs behave as before. A verb is never added to the list; a test fails if an unlisted store-less verb takes that arm or a listed name is no longer a store-less native route. (The first version keyed the exception on `store: none`, which would have let `git`, `worktree` and later verbs lose the refusal.)
+- Store-less native verbs now find the root by the Git door's caller-tree walk: it stops at the work-tree top as Node does, returns the real path, and costs one disk-only Git read per native call, `version` included. The latency numbers below were measured from `/tmp`, where no repository exists, so they do not include a real Git read.
+- `fgos_process::mapped::spawn_detached` takes a list of variable names to remove (empty keeps the caller's environment); the publish child uses it for the recursion guard, with a process-crate test that the named variable is gone, the others kept and the given ones set.
+- The host still prints `did you mean` for a near-miss verb and Node does not. Decision: the host's text is authoritative (the host is the door users reach; Node's direct channel is a fallback), so no near-typo parity case; the parity case uses a word with no near match.
 - Sub-command word and the `--dir` source keep the host's old rule for now (the first token after the verb, not a flag; `--dir <p>` or `--dir=<p>`), because the native projectors read their own argv the same way. Flags and declarations use the parser. Owner question below.
 - `mailbox_hook.rs` has no shared sync-due owner (phase 06 found a different job), so only its comment changed.
 - The state root's home functions named in the coordinator's note do not exist at this head as `home_from`; the row matches `get("HOME")` in `state_root.rs` instead.
@@ -93,7 +96,7 @@ New proofs: `routing.rs` (store-declaration rows, every native sub-command has a
 
 ## Proposed `[Unreleased]` line
 
-- Native `fgos` verbs (`config`, `convention`, `friction`, `metrics`, `mailbox`, `identity`, `gate-bypass`, `version`) now record a malformed call (unknown flag, bad sub-command, refused root) in `.fgos/logs/invocation-faults.jsonl` and say so; an unknown verb lists the verbs of the surface; a missing home directory is refused as `config-io` "set HOME" by the mailbox config too.
+- Native `fgos` verbs (`config`, `convention`, `friction`, `metrics`, `mailbox`, `identity`, `gate-bypass`, `version`) now record a malformed call (unknown flag, bad sub-command, refused root) in `.fgos/logs/invocation-faults.jsonl` and say so, and find their project with the same walk as the Node CLI (it stops at the repository top and costs one disk-only Git read per call); an unknown verb lists the verbs of the surface; a missing home directory is refused as `config-io` "set HOME" by the mailbox config too.
 
 ## Lessons
 
@@ -105,4 +108,4 @@ New proofs: `routing.rs` (store-declaration rows, every native sub-command has a
 
 Status: DONE_WITH_CONCERNS
 Summary: Routing, doors and the F0 guard rows are in on the branch with all focused gates green; head pushed, not landed.
-Concerns/Blockers: (1) the root-door refusal is fatal only for store-declaring verbs, to keep today's native verbs unchanged; (2) `--dir` and sub-command reading keep the host's old rule pending the owner question above; (3) one line of `bin/fgos.mjs` changed outside the phase's hot-file order (different hunk from phase 09's deletions); (4) full `npm test` and `cargo test --workspace` not run.
+Concerns/Blockers: (1) the root-door refusal is skipped only for a named list of today's eight native verbs (debt, tested); (2) `--dir` and sub-command reading keep the host's old rule pending the owner question above; (3) one line of `bin/fgos.mjs` changed outside the phase's hot-file order (different hunk from phase 09's deletions); (4) full `npm test` and `cargo test --workspace` not run.

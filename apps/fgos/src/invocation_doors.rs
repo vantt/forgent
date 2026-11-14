@@ -20,6 +20,20 @@ use fgos_observe::invocation_fault::{record, FaultInput};
 use std::ffi::OsString;
 use std::path::{Path, PathBuf};
 
+/// Debt: the native verbs that answer from where they are called when the root door refuses the call, as they did
+/// before the doors existed. A verb leaves this list when it is judged by the door like every other verb; a verb
+/// is never added.
+const LENIENT_ROOT_VERBS: [&str; 8] = [
+    "config",
+    "convention",
+    "friction",
+    "gate-bypass",
+    "identity",
+    "mailbox",
+    "metrics",
+    "version",
+];
+
 /// The fault class of a trigger that failed at the start of an invocation.
 const START_TRIGGER: &str = "event-store-start-trigger";
 /// The fault class of a trigger that failed at the end of an invocation.
@@ -95,28 +109,17 @@ fn sync_child_args(main: &Path) -> Vec<OsString> {
     ]
 }
 
-/// The publish child's environment: the caller's, without the recursion guard (a host started under a legacy
-/// payload inherits it, and the child, an `events` call served by that payload, would end at once).
-fn sync_child_env(vars: impl Iterator<Item = (OsString, OsString)>) -> Vec<(OsString, OsString)> {
-    vars.filter(|(key, _)| key != RECURSION_GUARD_VAR).collect()
-}
+/// The variables the publish child must not inherit: the recursion guard (a host started under a legacy payload
+/// inherits it, and the child, an `events` call served by that payload, would end at once).
+const SYNC_CHILD_ENV_REMOVE: [&str; 1] = [RECURSION_GUARD_VAR];
 
 /// Starts the one detached child that publishes for this clone. Only reached where the Event Store runs.
 #[cfg(unix)]
 fn spawn_sync_child(main: &Path) -> std::io::Result<()> {
-    use fgos_process::mapped::{spawn_mapped, MappedLead, MappedSpawn, MappedStdio};
     let exe = std::env::current_exe()?;
     let mut argv = vec![exe.into_os_string()];
     argv.extend(sync_child_args(main));
-    let request = MappedSpawn {
-        argv,
-        env: sync_child_env(std::env::vars_os()),
-        clear_env: true,
-        cwd: Some(main.to_path_buf()),
-        lead: MappedLead::Session,
-        stdio: [MappedStdio::Null; 3],
-    };
-    spawn_mapped(&request, &[]).map(drop)
+    fgos_process::mapped::spawn_detached(&argv, main, &[], &SYNC_CHILD_ENV_REMOVE, None).map(drop)
 }
 
 /// No detached spawn off Unix: the Event Store does not run there, so no trigger reaches this.
@@ -295,22 +298,26 @@ impl<'a> Doors<'a> {
             policy,
             home: self.home.as_deref(),
         });
-        // A root the Git door refuses stops a verb that declares a store. A verb that declares none acts on no
-        // store, so the refusal reaches only an operation that reads a project (as its not-a-project answer):
-        // today's native verbs keep answering from wherever they are called.
+        // A root the Git door refuses (untrusted or submodule checkout, `--dir ""`) is `dir-invalid` for every
+        // verb, as in the Node CLI. Debt: the eight native verbs of today keep answering from wherever they are
+        // called (their documented answers, e.g. the mailbox's `unsupported-checkout`), so for exactly these the
+        // refusal reaches only an operation that reads a project, as its not-a-project answer. Any other verb,
+        // whatever its store value, is refused.
         let (root, project) = match asked {
             Ok(root) => {
                 let project = project_root(dir.as_deref(), &root, &self.cwd, self.home.as_deref());
                 (root, project)
             }
-            Err(refusal) if store_mode == StoreMode::None => (
-                InvocationRoot {
-                    root: self.cwd.clone(),
-                    fgos_dir: self.cwd.join(".fgos"),
-                    found: false,
-                },
-                Err(format!("{} [not-in-project]", refusal.message)),
-            ),
+            Err(refusal) if store_mode == StoreMode::None && LENIENT_ROOT_VERBS.contains(&verb) => {
+                (
+                    InvocationRoot {
+                        root: self.cwd.clone(),
+                        fgos_dir: self.cwd.join(".fgos"),
+                        found: false,
+                    },
+                    Err(format!("{} [not-in-project]", refusal.message)),
+                )
+            }
             Err(refusal) => {
                 return Err(self.refuse(None, sub.as_deref(), refusal.fault_class, refusal.message))
             }
@@ -749,7 +756,7 @@ mod tests {
         let argv = args(&["--dir", ""]);
         let call = Call::new(&argv);
         let lifecycle = Recorder::new(true);
-        let none = route(serde_json::json!({"store": "none"}));
+        let none = route(serde_json::json!({"selector": "config", "store": "none"}));
         let entered = doors(&none, &call, &argv, &base.join("main"), false, &lifecycle)
             .enter()
             .expect("a verb with no store still runs");
@@ -771,19 +778,45 @@ mod tests {
     }
 
     #[test]
-    fn the_publish_child_gets_the_callers_environment_without_the_recursion_guard() {
-        let vars = vec![
-            (OsString::from("PATH"), OsString::from("/bin")),
-            (OsString::from(RECURSION_GUARD_VAR), OsString::from("1")),
-            (OsString::from("HOME"), OsString::from("/h")),
-        ];
-        let env = sync_child_env(vars.into_iter());
+    fn only_the_listed_native_verbs_take_the_lenient_root_arm() {
+        let base = scratch();
+        repository(&base, false);
+        let argv = args(&["--dir", ""]);
+        let call = Call::new(&argv);
+        let lifecycle = Recorder::new(true);
+        // A store-less verb that is not on the list is refused by the door like any other.
+        let other = route(serde_json::json!({"selector": "git", "store": "none"}));
+        let refused = doors(&other, &call, &argv, &base.join("main"), false, &lifecycle)
+            .enter()
+            .unwrap_err();
+        assert!(
+            refused.message.contains("non-empty path"),
+            "{}",
+            refused.message
+        );
+        assert_eq!(
+            records(&base.join("main/.fgos"))[0]["faultClass"],
+            "dir-invalid"
+        );
+        // The list holds only verbs that are native routes without a store today, so a stale name shows here.
+        for verb in LENIENT_ROOT_VERBS {
+            let route = &crate::routing::command_routes()[verb];
+            assert_eq!(route.route_kind, "native", "{verb}");
+            assert_eq!(route.store.as_deref().unwrap_or("none"), "none", "{verb}");
+        }
+        std::fs::remove_dir_all(&base).unwrap();
+    }
+
+    #[test]
+    fn the_publish_child_is_started_without_the_recursion_guard_and_with_its_own_arguments() {
+        // The spawn door removes the named variables from a cleared environment (proved in the process crate's
+        // `a_detached_child_gets_the_callers_environment_without_the_named_variables`); this pins what the host
+        // names and hands on.
+        assert_eq!(SYNC_CHILD_ENV_REMOVE, [RECURSION_GUARD_VAR]);
         assert_eq!(
             sync_child_args(Path::new("/p")),
             ["events", "sync", "--opportunistic", "--dir", "/p"]
         );
-        let names: Vec<&OsString> = env.iter().map(|(key, _)| key).collect();
-        assert_eq!(names, [&OsString::from("PATH"), &OsString::from("HOME")]);
     }
 
     #[test]

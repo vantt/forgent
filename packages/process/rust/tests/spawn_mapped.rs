@@ -258,7 +258,7 @@ fn a_detached_child_leads_its_own_session_logs_privately_and_is_not_waited_for()
     let argv = vec!["sh".into(), "-c".into(), script.into()];
     let env = vec![("MAPPED_PROBE".into(), "yes".into())];
     let log = dir.join("child.log");
-    let pid = spawn_detached(&argv, &dir, &env, Some(&log)).expect("spawn");
+    let pid = spawn_detached(&argv, &dir, &env, &[], Some(&log)).expect("spawn");
     // The call returned while the child still waits for its go file.
     assert!(!dir.join("go").exists());
     assert!(
@@ -293,5 +293,34 @@ fn a_detached_child_leads_its_own_session_logs_privately_and_is_not_waited_for()
         .collect();
     // 0-2 and the directory `ls` itself opens: nothing the caller holds survives.
     assert!(fds.iter().filter(|fd| **fd >= 3).count() <= 1, "{fds:?}");
+    fs::remove_dir_all(dir).ok();
+}
+
+#[test]
+fn a_detached_child_gets_the_callers_environment_without_the_named_variables() {
+    let dir = temp_dir("detached-env");
+    // SAFETY: this test is the only one that reads these two names, and both are set before the spawn.
+    unsafe {
+        std::env::set_var("MAPPED_DROP_ME", "1");
+        std::env::set_var("MAPPED_KEEP_ME", "kept");
+    }
+    let script = "echo \"drop=${MAPPED_DROP_ME-unset} keep=${MAPPED_KEEP_ME-unset} set=${MAPPED_SET-unset}\"";
+    let argv = vec!["sh".into(), "-c".into(), script.into()];
+    let log = dir.join("child.log");
+    let set = vec![("MAPPED_SET".into(), "yes".into())];
+    spawn_detached(&argv, &dir, &set, &["MAPPED_DROP_ME"], Some(&log)).expect("spawn");
+    let start = std::time::Instant::now();
+    let text = loop {
+        let text = fs::read_to_string(&log).unwrap_or_default();
+        if text.ends_with('\n') {
+            break text;
+        }
+        assert!(
+            start.elapsed() < std::time::Duration::from_secs(10),
+            "{text:?}"
+        );
+        std::thread::sleep(std::time::Duration::from_millis(5));
+    };
+    assert_eq!(text, "drop=unset keep=kept set=yes\n");
     fs::remove_dir_all(dir).ok();
 }
