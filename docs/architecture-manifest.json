@@ -93,6 +93,18 @@
   ],
   "doors": [
     {
+      "job": "civil date arithmetic",
+      "kind": "door",
+      "patterns": ["719_?468", "\\bfn (?:civil_from_days|days_from_civil)\\b"],
+      "allowed": [
+        { "path": "packages/host-runtime/rust/src/civil_time.rs", "reason": "owner-kept pair (identity spec)" },
+        { "path": "packages/identity/rust/src/text.rs", "reason": "owner-kept pair (identity spec)" },
+        { "path": "apps/fgctl/build.rs", "reason": "build script; reaching the runtime crates would add a build edge" }
+      ],
+      "debt": [],
+      "reason": "dates are computed by the two helpers the owner kept; the patterns catch the days-from-civil algorithm, not a year-by-year loop like the removed event-store copy"
+    },
+    {
       "job": "verb manifest projection",
       "kind": "door",
       "patterns": ["\\bpublicManifest\\("],

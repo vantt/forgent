@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "74e1f26cdcb8082b831ce168de8f08dcc575351a6d81c493ae614024e98d922c",
+  "payloadDigest": "c4561f8a41eaa82320a5ed2681f5086a1c5ecce6265a53f530de14a069183b77",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -316,7 +316,7 @@
     "packages/event-store/rust/src/open_read.rs": "0f348c1d2aad6e2fcbcbf2a36c5c37a1f255ff843a563b53aa773427c45d0102",
     "packages/event-store/rust/src/order.rs": "3f474bd2d008e33692e0a3064ce169a4b4ec0797ebb99664a809e644b73a022c",
     "packages/event-store/rust/src/promote.rs": "1aef1a9a66de1f1fe8c112baaff5491bf2d9e6cf41b23d7bca74088e828aae92",
-    "packages/event-store/rust/src/publish.rs": "0071535631226889304e0229a6551885d82af835f37657924eb940276ca71ef3",
+    "packages/event-store/rust/src/publish.rs": "4bb583906eecf722ec51263a555c2c96cddb7742b4caf42ccb934477540e9454",
     "packages/event-store/rust/src/read.rs": "41e881f87116b93291d33468d3696ef6518c0bcfe18db41021ab21f704fa4cb3",
     "packages/event-store/rust/src/receipt.rs": "9c9f25ece26274d210898401a1089f97a30ebd9dd94cd5eef50c73f7ab101170",
     "packages/event-store/rust/src/reconcile.rs": "31016bcb05e3d8bd85ab849a43602027a1a988f2052132c5ea8c35e0c0984a2f",
