@@ -5,6 +5,7 @@ status: pending
 effort: 3h
 depends_on: [01]
 parallel_with: [02, 04, 05]
+blocks: [06]
 ---
 
 # Phase 03 — Dispatch readers
@@ -12,9 +13,9 @@ parallel_with: [02, 04, 05]
 ## Context
 
 Port exists (phase 01). Read `plan.md` census rows 15-21 and "What step 1 leaves ready for step 2".
-This phase changes where values are read, never what is decided: `resolveExecutorAndOverrides` keeps
-choosing a purpose's executor from the first `prefer` entry, and the reverse match keeps comparing a raw
-`prefer` with `===` (a list-shaped `prefer` never matches, as today). Both are recorded leftovers for step 2.
+This phase changes where values are read, never what is decided. The two `prefer` readers in `resolve.mjs`
+(the purpose chooser in `resolveExecutorAndOverrides` and the reverse match at 66-71) are not touched here:
+phase 06 removes them after this phase, in the same files.
 Impact analysis (as phase 01) on `resolveCapabilityDetailsFromHints`, `resolveExecutorAndOverrides`,
 `buildConfinementRequest`, `validateRunnerConfigShape`, `compileDispatchPlan`.
 
@@ -24,13 +25,11 @@ Impact analysis (as phase 01) on `resolveCapabilityDetailsFromHints`, `resolveEx
    `capabilities` object.
    - `resolveAlias(name)`: non-string passes through; else `registeredCapabilityOf(cfg, name) ?? name`.
      Differs only for the plan.md Intended deltas (prototype names, non-object entries, string `aliases`).
-   - Capabilities preferring this executor (66-71): `capabilityNamesOf(cfg)` filtered by
-     `const p = preferOf(cfg, name); p && (p === executorId || (resolvedExecutor && cfg?.executors?.[p] === resolvedExecutor))`
-     — same predicate, same iteration order.
+   - Leave the reverse `prefer` match (66-71) as it is: phase 06 deletes it (owner question Q3).
    - Confinement filters (90-130): `capabilityConfinementOf(cfg, c)` (`?.mode === 'required'`, truthiness).
    - Registered filter (113): `hasCapabilityEntry(cfg, c)`.
-2. `resolve.mjs:237-238` `resolveExecutorAndOverrides`: `const preferred = preferOf(cfg, executorIdOrPurpose);`.
-   Rest unchanged (still `normalizePreferCandidates` from `config.mjs`).
+2. Leave `resolveExecutorAndOverrides` (`resolve.mjs:195-266`) as it is: phase 06 splits it (lookup stays, the
+   purpose chooser goes through `bind()`).
 3. `src/runner/dispatch/plan.mjs:22-32`: delete `isKnownCapabilityName` and its comment; the `capability.unknown`
    check (line 492) becomes `registeredCapabilityOf(cfg, purpose) === undefined` (own key or array alias;
    differs only for the Intended deltas).
@@ -100,7 +99,7 @@ src: −~30 (alias/known-name copies, `preferSitesOf` and the name set deleted; 
 | `config.mjs` gains an import the import-graph test pins | M x M | `dispatch-reconciliation-import-graph.test.mjs`; the port is a leaf with one kernel import |
 | Alias/own-key semantics drift in purpose resolution | L x H | harness compares `resolveCapabilityDetailsFromHints`, `resolveExecutorAndOverrides`, `compileDispatchPlan` for every name, executor and prototype probe; only allowlisted deltas pass |
 | Validator prefer labels change | M x M | label strings rebuilt in the same order; `dispatch-config-patterns.test.mjs`, `tier-fallback-config.test.mjs`, harness error-text compare |
-| Someone "fixes" the string-only reverse match here | M x H | requirement 1 states it is kept; the fix is step 2's (behaviour change) |
+| This phase and 06 both edit `resolve.mjs`/`plan.mjs`/`work-dispatch.mjs` | M x M | 06 starts only after this phase is merged (plan.md parallel map) |
 
 ## Rollback
 

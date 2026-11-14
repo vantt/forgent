@@ -99,7 +99,7 @@ stale, say so and cross-check with `rg`.
    - Full outputs go to `.fgos/runtime/tmp/capability-equivalence/`; committed evidence is only
      `reports/equivalence/<run>.summary.json`: per input and question, the digest at base and head and the
      allowlisted delta names. No binding body, account or path is committed.
-10. Base doctor evidence for phases 04/06: at base run `npm run fgos:dev -- doctor --json` (base checkout) and save
+10. Base doctor evidence for phases 04/07: at base run `npm run fgos:dev -- doctor --json` (base checkout) and save
     the messages of rows `runner-patterns-config`, `workflow-capabilities-configured`, `capability-serves-valid`,
     `confinement-policies-declared`, `confinement-strict-readiness`, `seat-binding-dry-bind`, `seat-binding-route`
     to `.fgos/runtime/tmp/capability-equivalence/doctor-base.json` and their digests to
@@ -179,7 +179,7 @@ src: +~130 (port) −~35 (moved/inlined) ≈ +95; tests: +~130, −2 assertions;
 
 ## Rollback
 
-Revert the phase merge on the integration branch only while 02-05 are not merged (plan.md Rollback).
+Revert the phase merge on the integration branch only while 02-06 are not merged (plan.md Rollback).
 
 ## Success criteria
 
