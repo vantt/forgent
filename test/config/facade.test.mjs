@@ -71,7 +71,7 @@ test('the global directory is .fgos under the home of the environment now, and a
     assert.equal(globalFgosDir(), '/home/second/.fgos', 'asked again when the home changes');
     for (const blank of ['', '  ']) {
       process.env.HOME = blank;
-      assert.throws(() => globalFgosDir(), (err) => err instanceof ConfigDoorError && err.code === 'config-io' && err.refusals[0].keyword === 'HomeUnset');
+      assert.throws(() => globalFgosDir(), (err) => err instanceof ConfigDoorError && err.code === 'config-io' && err.refusals[0].keyword === 'HomeUnset' && /set HOME/.test(err.message) && /set HOME/.test(err.refusals[0].message));
     }
     delete process.env.HOME;
     assert.throws(() => globalFgosDir(), (err) => err.code === 'config-io', 'there is no passwd fallback');

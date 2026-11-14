@@ -213,8 +213,12 @@ fn path_arg(text: &str) -> Result<Vec<Segment>, Refusal> {
 fn roots(root: &Path) -> Result<SnapshotRequest, Refusal> {
     let global_dir = machine::global_dir(|key| std::env::var(key).ok()).ok_or_else(|| {
         refuse(
-            "home-unset",
-            format!("{HOME_VAR} is not set; the global directory is ~/.fgos"),
+            machine::HOME_UNSET_ID,
+            format!(
+                "{}: {}",
+                machine::HOME_UNSET_KEYWORD,
+                machine::home_unset_message()
+            ),
         )
     })?;
     let canonical = |p: &Path| {

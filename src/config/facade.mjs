@@ -17,7 +17,7 @@ export class ConfigDoorError extends Error {
   constructor({ id, keyword, refusals = [], ...own }) {
     const list = refusals.length > 0 ? refusals : [{ id, keyword, ...own }];
     const where = (r) => [r.file ? `${r.file}${Number.isInteger(r.line) ? `:${r.line}:${r.column}` : ''}` : '', r.path ?? ''].filter(Boolean).join(' ');
-    super(list.map((r) => [r.id, where(r), r.keyword ? `(${r.keyword})` : ''].filter(Boolean).join(' ')).join('; '));
+    super(list.map((r) => [r.id, where(r), r.keyword ? `(${r.keyword})` : '', r.message ?? ''].filter(Boolean).join(' ')).join('; '));
     Object.assign(this, { name: 'ConfigDoorError', code: id, refusals: list });
   }
 }

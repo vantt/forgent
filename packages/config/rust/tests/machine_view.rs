@@ -140,6 +140,16 @@ fn a_project_snapshot_finds_the_global_directory_and_class_from_the_environment_
 }
 
 #[test]
+fn a_missing_home_is_refused_by_one_id_that_names_the_variable_to_set() {
+    use fgos_config::machine::{home_unset_message, HOME_UNSET_ID, HOME_UNSET_KEYWORD, HOME_VAR};
+    assert_eq!(
+        (HOME_UNSET_ID, HOME_UNSET_KEYWORD),
+        ("config-io", "HomeUnset")
+    );
+    assert!(home_unset_message().contains(&format!("set {HOME_VAR}")));
+}
+
+#[test]
 fn the_global_directory_is_dot_fgos_under_the_home_the_lookup_names() {
     use fgos_config::machine::{global_dir, HOME_VAR};
     let home =

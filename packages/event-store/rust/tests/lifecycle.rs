@@ -296,3 +296,33 @@ fn a_failing_seal_does_not_stop_the_publish_decision() {
         "the trigger itself never publishes"
     );
 }
+
+#[test]
+fn a_trigger_never_looks_at_the_remote_so_a_bad_remote_reaches_the_publish_child() {
+    let w = World::new();
+    let git = |args: &[&str]| {
+        let out = std::process::Command::new("git")
+            .arg("-C")
+            .arg(&w.repo.root)
+            .args(args)
+            .output()
+            .unwrap();
+        assert!(out.status.success());
+    };
+    git(&["remote", "add", "origin", "/nonexistent/remote.git"]);
+    let outcome = w.run(
+        &timers(300, 300),
+        Policy {
+            end: true,
+            ..TRIGGER
+        },
+    );
+    assert_eq!(
+        outcome,
+        Outcome {
+            error: None,
+            sync_due: true
+        },
+        "the trigger reads only the sync record and the open streams, never a ref or the remote"
+    );
+}

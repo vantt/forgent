@@ -363,8 +363,16 @@ pub fn event_store_entry(args: Value) -> Result<String> {
 pub fn global_dir_entry(args: Value) -> Result<String> {
     entry(args, |a| {
         let env = a.env.unwrap_or_default();
-        let dir = machine::global_dir(|name| env.get(name).cloned())
-            .ok_or_else(|| failure("config-io", "HomeUnset"))?;
+        let dir = machine::global_dir(|name| env.get(name).cloned()).ok_or_else(|| {
+            detailed(
+                machine::HOME_UNSET_ID,
+                More {
+                    keyword: Some(machine::HOME_UNSET_KEYWORD.into()),
+                    message: Some(machine::home_unset_message()),
+                    ..More::default()
+                },
+            )
+        })?;
         Ok(Value::String(dir.to_string_lossy().into_owned()))
     })
 }

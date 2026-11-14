@@ -104,6 +104,14 @@ pub fn home_dir(lookup: impl Fn(&str) -> Option<String>) -> Option<PathBuf> {
         .map(PathBuf::from)
 }
 
+/// The one refusal for a missing home: the id every reader reports, the keyword under it, and the message that
+/// names the fix. There is no passwd fallback; a process without a home refuses by this name.
+pub const HOME_UNSET_ID: &str = "config-io";
+pub const HOME_UNSET_KEYWORD: &str = "HomeUnset";
+pub fn home_unset_message() -> String {
+    format!("{HOME_VAR} is not set; set {HOME_VAR} (the global directory is ~/.fgos)")
+}
+
 /// The directory of the machine-wide fgOS files: `<home>/.fgos`, with the home of `home_dir`; `None` when the home
 /// is unset or blank. The one answer to "where is the global fgOS directory" for Rust and, through the addon, for Node.
 pub fn global_dir(lookup: impl Fn(&str) -> Option<String>) -> Option<PathBuf> {

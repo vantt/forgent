@@ -47,7 +47,9 @@ function countNativeCalls(names, fn) {
 }
 const projectAge = (store) => store.maintenance([]).streams.find((row) => row.stream === 'project').oldestUnsealedAgeSec;
 
-test('every trigger mode runs the crate policy once and never reads the integrity status', (t) => {
+// Wiring only: the native entry is called once per trigger and the JS side makes no integrity-status call. That the policy itself
+// reads no ref or remote is owned by packages/event-store/rust/tests/lifecycle.rs (a_trigger_never_looks_at_the_remote_...).
+test('every trigger mode calls the crate maintain entry once and makes no status call from JS', (t) => {
   const { repo, store } = workRepo(t, { remote: true });
   addAt(store, 3600);
   const calls = countNativeCalls(['status', 'maintainEventStore'], () => {

@@ -139,14 +139,15 @@ export function refreshGlobalBinCache({ globalDir = globalFgosDir() } = {}) {
  * fallback so a cold cache never hard-fails). Returns `{ tier, path }` or
  * `null` when nothing resolves at any tier.
  */
-export function resolveFgosBin(cwd, { globalDir = globalFgosDir() } = {}) {
+export function resolveFgosBin(cwd, { globalDir } = {}) {
   const workspaceBin = resolveWorkspaceInstallationBin(cwd);
   if (workspaceBin) return { tier: 0, path: workspaceBin };
   const devBin = resolveDevCheckoutBin(cwd);
   if (devBin) return { tier: 1, path: devBin };
   const projectLocalBin = resolveProjectLocalBin(cwd);
   if (projectLocalBin) return { tier: 2, path: projectLocalBin };
-  const cached = cachedGlobalBin({ globalDir });
+  // The global directory is read only here: tiers 0-2 never touch it, so they resolve with no HOME and no addon.
+  const cached = cachedGlobalBin({ globalDir: globalDir ?? globalFgosDir() });
   if (cached) return { tier: 3, path: cached };
   const live = probeGlobalBin();
   if (live) return { tier: 3, path: live };
