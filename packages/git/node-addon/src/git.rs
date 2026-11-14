@@ -185,6 +185,107 @@ impl GitPublication {
     }
 }
 
+/// The Git facts a caller already read (the shape `resolveRepo` answers), as the reader both worktree-tier
+/// decisions take; with none given the decision reads Git itself.
+fn given_facts(request: &Value) -> Option<fgos_git::invocation_root::RepoFacts> {
+    use fgos_git::invocation_root::RepoFacts;
+    let facts = request.get("facts").filter(|facts| facts.is_object())?;
+    let path = |key: &str| {
+        facts
+            .get(key)
+            .and_then(Value::as_str)
+            .filter(|text| !text.is_empty())
+            .map(std::path::PathBuf::from)
+    };
+    Some(
+        if facts.get("notARepository").and_then(Value::as_bool) == Some(true) {
+            RepoFacts::NotARepository
+        } else {
+            RepoFacts::Repository {
+                work_tree: path("worktreeRoot"),
+                trusted_main: path("trustedMainRoot"),
+            }
+        },
+    )
+}
+
+fn refused(refusal: fgos_git::invocation_root::Refusal) -> Value {
+    json!({"refused": {"faultClass": refusal.fault_class, "message": refusal.message}})
+}
+
+/// Which project, and which `.fgos`, an invocation acts on: `{root, fgosDir, found}`, or `{refused}`.
+/// Request: `{cwd, dir?, policy, home?, facts?}`; the policy and every refusal text live in `fgos-git`.
+#[allow(dead_code)] // exported through N-API
+#[napi]
+pub fn resolve_invocation_root(request: Value) -> Result<Value> {
+    use fgos_git::invocation_root::*;
+    check()?;
+    let policy = text(&request, "policy")?;
+    let Some(policy) = RootPolicy::parse(policy) else {
+        return Ok(refused(Refusal {
+            fault_class: DIR_INVALID,
+            message: format!("unknown root policy \"{policy}\""),
+        }));
+    };
+    let cwd = std::path::PathBuf::from(text(&request, "cwd")?);
+    let home = request
+        .get("home")
+        .and_then(Value::as_str)
+        .map(std::path::PathBuf::from);
+    let dir = request.get("dir").and_then(Value::as_str);
+    let given = given_facts(&request);
+    let read = |path: &Path| match &given {
+        Some(facts) => Ok(facts.clone()),
+        None => read_repo_facts(path),
+    };
+    Ok(
+        match resolve_invocation_root_with(
+            &RootRequest {
+                cwd: &cwd,
+                dir,
+                policy,
+                home: home.as_deref(),
+            },
+            &read,
+        ) {
+            Ok(root) => {
+                json!({"root": root.root.to_string_lossy(), "fgosDir": root.fgos_dir.to_string_lossy(), "found": root.found})
+            }
+            Err(refusal) => refused(refusal),
+        },
+    )
+}
+
+/// Whether a verb may touch the store from where it runs: `{warning}` or `{refused}`.
+/// Request: `{verb, store, mutates, creates, explicitDir, dir, cwd}`.
+#[allow(dead_code)] // exported through N-API
+#[napi]
+pub fn admit_store_access(request: Value) -> Result<Value> {
+    use fgos_git::store_admission::*;
+    check()?;
+    let flag = |key: &str| request.get(key).and_then(Value::as_bool).unwrap_or(false);
+    let (dir, cwd) = (
+        std::path::PathBuf::from(text(&request, "dir")?),
+        std::path::PathBuf::from(text(&request, "cwd")?),
+    );
+    Ok(
+        match admit_store_access(&AdmitRequest {
+            verb: text(&request, "verb")?,
+            store_mode: StoreMode::parse(
+                request.get("store").and_then(Value::as_str).unwrap_or(""),
+            ),
+            mutates: flag("mutates"),
+            creates: flag("creates"),
+            explicit_dir: flag("explicitDir"),
+            dir: &dir,
+            cwd: &cwd,
+        }) {
+            Ok(admitted) => json!({"warning": admitted.warning}),
+            Err(refusal) => refused(refusal),
+        },
+    )
+}
+
 /// Inspection never acquires event-seal or initializes a repository WAL.
 #[napi]
 pub fn inspect_git(

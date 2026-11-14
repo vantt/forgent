@@ -9,6 +9,9 @@ pub use work_source::{
     WorkEntropySignals, WorkOutcomesReport, WorkSource, DOMAIN_ENTRY_STAGES_JSON, FINAL_STATUSES,
 };
 
+use fgos_git::invocation_root::{
+    read_repo_facts, resolve_invocation_root_with, FactsReader, RootPolicy, RootRequest,
+};
 use fgos_host_runtime::contracts::{
     ContractRef, HostInvocation, OperationId, OperationRequest, ProviderDescriptor, ProviderError,
     ProviderLifecycle, ProviderOutcome,
@@ -51,18 +54,6 @@ pub const WORK_GATE_BYPASS_SHOW_DESCRIPTOR: ProviderDescriptor = ProviderDescrip
     concurrency: None,
     health: None,
 };
-
-fn resolve_workspace_root(start: &Path) -> PathBuf {
-    let mut current = start.to_path_buf();
-    loop {
-        if current.join(".fgos").is_dir() {
-            return current;
-        }
-        if !current.pop() {
-            return start.to_path_buf();
-        }
-    }
-}
 
 fn valid_level(value: &str) -> bool {
     LEVELS.contains(&value)
@@ -115,9 +106,31 @@ fn gate_bypass_level(root: &Path, lookup: impl Fn(&str) -> Option<String>) -> St
 
 pub fn resolve_gate_bypass_show() -> GateBypassShowOutcome {
     let cwd = std::env::current_dir().unwrap_or_else(|_| PathBuf::from("."));
-    let root = resolve_workspace_root(&cwd);
+    let lookup = |name: &str| std::env::var(name).ok();
+    let home = fgos_config::machine::home_dir(lookup);
     GateBypassShowOutcome {
-        level: read_gate_bypass_level(&root),
+        level: level_for_directory(&cwd, home.as_deref(), &read_repo_facts, lookup),
+    }
+}
+
+/// The level of the project `cwd` acts on: the one every verb acts on, the nearest store below the Git top level,
+/// never the machine's global directory under `home`. A checkout Git will not trust is refused, which reads as
+/// the default level.
+fn level_for_directory(
+    cwd: &Path,
+    home: Option<&Path>,
+    read: FactsReader,
+    lookup: impl Fn(&str) -> Option<String>,
+) -> String {
+    let request = RootRequest {
+        cwd,
+        dir: None,
+        policy: RootPolicy::CallerTree,
+        home,
+    };
+    match resolve_invocation_root_with(&request, read) {
+        Ok(project) => gate_bypass_level(&project.root, lookup),
+        Err(_) => DEFAULT_LEVEL.to_string(),
     }
 }
 
@@ -255,6 +268,82 @@ mod tests {
         assert_eq!(level("legacy", &[legacy], true), "light");
         let set = ("config.yaml", "gateBypass:\n  level: heavy\n");
         assert_eq!(level("config-wins", &[set, legacy], true), "heavy");
+    }
+
+    /// The machine's global directory holds a legacy level file; a plain directory below home has no project of
+    /// its own and Git reports no repository. The global directory is never the project, so its legacy file
+    /// is not read as one.
+    #[test]
+    fn test_level_never_reads_the_global_directory_as_the_project() {
+        let dir = std::env::temp_dir().join(format!(
+            "fgos-work-state-gate-bypass-home-{}",
+            std::process::id()
+        ));
+        let _ = std::fs::remove_dir_all(&dir);
+        let (home, plain) = (
+            dir.join("home"),
+            dir.join("home").join("work").join("plain"),
+        );
+        std::fs::create_dir_all(home.join(".fgos")).unwrap();
+        std::fs::create_dir_all(&plain).unwrap();
+        std::fs::write(
+            home.join(".fgos").join("gate-bypass.json"),
+            r#"{"level":"light"}"#,
+        )
+        .unwrap();
+        let home_text = home.to_string_lossy().into_owned();
+        let lookup = |k: &str| (k == fgos_config::machine::HOME_VAR).then(|| home_text.clone());
+        let no_repository = |_: &Path| Ok(fgos_git::invocation_root::RepoFacts::NotARepository);
+        assert_eq!(
+            level_for_directory(&plain, Some(&home), &no_repository, lookup),
+            "off"
+        );
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn test_level_is_read_from_the_project_a_subdirectory_belongs_to() {
+        let dir = std::env::temp_dir().join(format!(
+            "fgos-work-state-gate-bypass-sub-{}",
+            std::process::id()
+        ));
+        let _ = std::fs::remove_dir_all(&dir);
+        let (project, deeper) = (dir.join("project"), dir.join("project").join("a").join("b"));
+        std::fs::create_dir_all(project.join(".fgos")).unwrap();
+        std::fs::create_dir_all(&deeper).unwrap();
+        std::fs::write(
+            project.join(".fgos").join("config.yaml"),
+            "gateBypass:\n  level: standard\n",
+        )
+        .unwrap();
+        std::fs::create_dir_all(dir.join("home")).unwrap();
+        let home_text = dir.join("home").to_string_lossy().into_owned();
+        let lookup = |k: &str| (k == fgos_config::machine::HOME_VAR).then(|| home_text.clone());
+        let top = std::fs::canonicalize(&project).unwrap();
+        let repository = |_: &Path| {
+            Ok(fgos_git::invocation_root::RepoFacts::Repository {
+                work_tree: Some(top.clone()),
+                trusted_main: Some(top.clone()),
+            })
+        };
+        assert_eq!(
+            level_for_directory(&deeper, Some(&dir.join("home")), &repository, lookup),
+            "standard"
+        );
+        // Below the Git top level of a nested repository the project above is not reached.
+        let nested = deeper.clone();
+        let nested_top = std::fs::canonicalize(&deeper).unwrap();
+        let nested_repository = |_: &Path| {
+            Ok(fgos_git::invocation_root::RepoFacts::Repository {
+                work_tree: Some(nested_top.clone()),
+                trusted_main: Some(nested_top.clone()),
+            })
+        };
+        assert_eq!(
+            level_for_directory(&nested, Some(&dir.join("home")), &nested_repository, lookup),
+            "off"
+        );
+        let _ = std::fs::remove_dir_all(&dir);
     }
 
     #[tokio::test]

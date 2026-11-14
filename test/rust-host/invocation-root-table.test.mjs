@@ -1,5 +1,5 @@
 import '../helpers/process-tmp-root.mjs';
-import { test } from 'node:test';
+import { test, after } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
@@ -29,8 +29,9 @@ const base = build();
 const at = (relative) => (relative === null ? null : path.join(base, relative));
 const home = at(table.home);
 
-test('the Node door answers the shared root table the way the host walk and the identity crate do', { concurrency: false }, (t) => {
-  t.after(() => fs.rmSync(base, { recursive: true, force: true }));
+after(() => fs.rmSync(base, { recursive: true, force: true }));
+
+test('the Node door answers the shared root table the way the host walk and the identity crate do', { concurrency: false }, () => {
   for (const row of table.rows) {
     const cwd = at(row.cwd);
     const walked = resolveInvocationRoot({ cwd, policy: 'caller-tree', home });
@@ -38,6 +39,20 @@ test('the Node door answers the shared root table the way the host walk and the 
     assert.equal(resolveMainCheckoutRoot(cwd), at(row.main), `main checkout of "${row.name}"`);
     if (row.main !== null) {
       assert.equal(resolveInvocationRoot({ cwd, policy: 'main-checkout' }).root, at(row.main), `main-checkout policy of "${row.name}"`);
+    }
+  }
+});
+
+test('the Node door carries every policy row of the shared table to the door and maps its refusals', { concurrency: false }, () => {
+  for (const row of table.policyRows) {
+    const dir = row.dir === undefined ? undefined : row.dirIsRelativeToBase ? at(row.dir) : row.dir;
+    const ask = () => resolveInvocationRoot({ cwd: at(row.cwd), dir, policy: row.policy, home });
+    if (row.refusal !== undefined) {
+      const expected = row.refusal.replaceAll('{base}', base);
+      assert.throws(ask, (err) => err.category === 'validation' && err.message.includes(expected), row.name);
+    } else {
+      const got = ask();
+      assert.deepEqual({ root: got.root, found: got.found, fgosDir: got.fgosDir }, { root: at(row.root), found: row.found, fgosDir: path.join(at(row.root), '.fgos') }, row.name);
     }
   }
 });

@@ -5,6 +5,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
+import { pathToFileURL } from 'node:url';
 
 import {
   resolveRepoRoot,
@@ -78,102 +79,12 @@ test('resolveSkillRoot joins FGOS_NESTED_PREFIX when set, matching the SKILL.md 
   );
 });
 
-// The invocation-root door: which project, and which .fgos, a command acts on. Retires the strict-cwd
-// cases of resolveRepoRoot/resolveFgosDir (the strict-cwd policy below owns that behaviour).
+// The invocation-root door: which project, and which .fgos, a command acts on. The decision, its four policies and
+// every refusal belong to fgos-git; its behaviour cases live in packages/git/rust/src/invocation_root.rs over the shared
+// table (test/rust-host/fixtures/invocation-root-table.json), whose Node wiring proof is
+// test/rust-host/invocation-root-table.test.mjs. These cases own only what the adapter itself does.
 
 const real = (target) => fs.realpathSync.native(target);
-
-function projectWithStore() {
-  const repo = real(mkTempDir('paths-door-'));
-  initGitRepo(repo);
-  fs.mkdirSync(path.join(repo, '.fgos'));
-  fs.mkdirSync(path.join(repo, 'docs', 'deeper'), { recursive: true });
-  return repo;
-}
-
-test('the door reads the project store from a subdirectory of the project, not a phantom one under it', () => {
-  const repo = projectWithStore();
-  const found = resolveInvocationRoot({ cwd: path.join(repo, 'docs', 'deeper'), home: '/nonexistent-home' });
-  assert.deepEqual({ root: found.root, fgosDir: found.fgosDir, found: found.found }, { root: repo, fgosDir: path.join(repo, '.fgos'), found: true });
-  fs.rmSync(repo, { recursive: true, force: true });
-});
-
-test('the door never takes a store above the Git top level of the checkout', () => {
-  const outer = real(mkTempDir('paths-door-outer-'));
-  fs.mkdirSync(path.join(outer, '.fgos'));
-  const inner = path.join(outer, 'nested');
-  fs.mkdirSync(inner);
-  initGitRepo(inner);
-  const found = resolveInvocationRoot({ cwd: inner, home: '/nonexistent-home' });
-  assert.deepEqual({ root: found.root, found: found.found }, { root: inner, found: false }, 'the nested repository owns its own store path');
-  fs.rmSync(outer, { recursive: true, force: true });
-});
-
-test('the door never takes the global .fgos of the home directory as a project store', () => {
-  const home = real(mkTempDir('paths-door-home-'));
-  fs.mkdirSync(path.join(home, '.fgos'));
-  const work = path.join(home, 'work', 'plain');
-  fs.mkdirSync(work, { recursive: true });
-  const found = resolveInvocationRoot({ cwd: work, home });
-  assert.equal(found.found, false);
-  assert.equal(resolveInvocationRoot({ cwd: home, home }).found, false);
-  fs.rmSync(home, { recursive: true, force: true });
-});
-
-test('a linked worktree carries no store: the door finds none and names where one would be created', () => {
-  const repo = projectWithStore();
-  const worktree = path.join(real(mkTempDir('paths-door-wt-')), 'wt');
-  execFileSync('git', ['worktree', 'add', '-q', worktree, '-b', 'wt'], { cwd: repo });
-  const found = resolveInvocationRoot({ cwd: worktree, home: '/nonexistent-home' });
-  assert.deepEqual({ root: found.root, found: found.found }, { root: real(worktree), found: false });
-  fs.rmSync(path.dirname(worktree), { recursive: true, force: true });
-  fs.rmSync(repo, { recursive: true, force: true });
-});
-
-test('main-checkout policy resolves the main root from a subdirectory and from a linked worktree', () => {
-  const repo = projectWithStore();
-  const worktree = path.join(real(mkTempDir('paths-door-main-wt-')), 'wt');
-  execFileSync('git', ['worktree', 'add', '-q', worktree, '-b', 'wt'], { cwd: repo });
-  for (const cwd of [path.join(repo, 'docs'), worktree]) {
-    assert.equal(resolveInvocationRoot({ cwd, policy: 'main-checkout' }).root, repo);
-  }
-  fs.rmSync(path.dirname(worktree), { recursive: true, force: true });
-  fs.rmSync(repo, { recursive: true, force: true });
-});
-
-test('main-checkout-only policy refuses a --dir that is another repository, and accepts the main root itself', () => {
-  const repo = projectWithStore();
-  const other = real(mkTempDir('paths-door-other-'));
-  initGitRepo(other);
-  assert.throws(
-    () => resolveInvocationRoot({ cwd: repo, dir: other, policy: 'main-checkout-only' }),
-    (err) => err.category === 'validation' && err.message.includes(repo),
-  );
-  assert.equal(resolveInvocationRoot({ cwd: path.join(repo, 'docs'), dir: repo, policy: 'main-checkout-only' }).root, repo);
-  assert.equal(resolveInvocationRoot({ cwd: repo, dir: other, policy: 'main-checkout' }).root, other, 'main-checkout takes a named project as given');
-  fs.rmSync(other, { recursive: true, force: true });
-  fs.rmSync(repo, { recursive: true, force: true });
-});
-
-test('caller-tree takes --dir as given, and an empty --dir is refused', () => {
-  const dir = real(mkTempDir('paths-door-dir-'));
-  assert.equal(resolveInvocationRoot({ cwd: '/', dir }).fgosDir, path.join(dir, '.fgos'));
-  assert.throws(() => resolveInvocationRoot({ cwd: dir, dir: ' ' }), (err) => err.category === 'validation');
-  fs.rmSync(dir, { recursive: true, force: true });
-});
-
-test('strict-cwd policy is cwd itself, and refuses a subdirectory of a repository naming its top level', () => {
-  const repo = projectWithStore();
-  assert.equal(resolveInvocationRoot({ cwd: repo, policy: 'strict-cwd' }).fgosDir, path.join(repo, '.fgos'));
-  assert.throws(
-    () => resolveInvocationRoot({ cwd: path.join(repo, 'docs'), policy: 'strict-cwd' }),
-    (err) => err.category === 'validation' && err.message.includes(repo),
-  );
-  const plain = real(mkTempDir('paths-door-plain-'));
-  assert.equal(resolveInvocationRoot({ cwd: plain, policy: 'strict-cwd' }).root, plain);
-  fs.rmSync(plain, { recursive: true, force: true });
-  fs.rmSync(repo, { recursive: true, force: true });
-});
 
 test('facts passed in are the only Git answer the door and resolveMainCheckoutRoot use (one read per invocation)', () => {
   const plain = real(mkTempDir('paths-door-facts-'));
@@ -183,55 +94,43 @@ test('facts passed in are the only Git answer the door and resolveMainCheckoutRo
   fs.rmSync(plain, { recursive: true, force: true });
 });
 
-test('a checkout whose gitfile does not point back to the repository it names is refused, never acted on as its cwd', () => {
-  const repo = projectWithStore();
+test("a refusal of the door is a validation error carrying the door's own text, for an untrusted checkout and for a blank --dir", () => {
+  const repo = mkTempDir('paths-door-refusal-');
+  initGitRepo(repo);
   const forged = real(mkTempDir('paths-door-forged-'));
   fs.writeFileSync(path.join(forged, '.git'), `gitdir: ${path.join(repo, '.git')}\n`);
-  for (const policy of ['caller-tree', 'main-checkout', 'strict-cwd']) {
-    assert.throws(
-      () => resolveInvocationRoot({ cwd: forged, policy, home: '/nonexistent-home' }),
-      (err) => err.category === 'validation' && err.message.includes('cannot trust'),
-      policy,
-    );
-  }
+  assert.throws(
+    () => resolveInvocationRoot({ cwd: forged, policy: 'caller-tree', home: '/nonexistent-home' }),
+    (err) => err.category === 'validation' && err.message.includes('cannot trust'),
+  );
+  assert.throws(
+    () => resolveInvocationRoot({ cwd: repo, dir: ' ' }),
+    (err) => err.category === 'validation' && err.message === '--dir requires a non-empty path value',
+  );
+  assert.throws(
+    () => resolveInvocationRoot({ cwd: repo, dir: true }),
+    (err) => err.category === 'validation' && err.message === '--dir requires a non-empty path value',
+    'a flag given without a value',
+  );
   fs.rmSync(forged, { recursive: true, force: true });
   fs.rmSync(repo, { recursive: true, force: true });
 });
 
-test('an unreadable Git answer refuses by name under every policy but caller-tree, and the destructive policy also refuses a non-repository', () => {
-  const plain = real(mkTempDir('paths-door-unreadable-'));
-  const broken = () => { throw new Error('git below the floor'); };
-  const asked = (policy, extra = {}) => () => resolveInvocationRoot({ cwd: plain, policy, home: '/nonexistent-home', readFacts: broken, ...extra });
-  const refused = (err) => err.category === 'validation' && err.message.includes('cannot establish the main checkout');
-  assert.throws(asked('main-checkout-only'), refused, 'main-checkout-only without --dir');
-  assert.throws(asked('main-checkout-only', { dir: plain }), refused, 'main-checkout-only with --dir never opens the gate');
-  assert.throws(asked('main-checkout'), refused, 'main-checkout');
-  assert.throws(asked('strict-cwd'), refused, 'strict-cwd');
-  assert.equal(asked('caller-tree')().found, false, 'caller-tree reads an unreadable answer as no repository');
-  const noDoor = () => { throw Object.assign(new Error('addon not shipped'), { code: 'git-addon-unavailable' }); };
-  assert.equal(resolveInvocationRoot({ cwd: plain, policy: 'main-checkout', readFacts: noDoor }).root, plain, 'an install with no Git door has no repository to refuse on');
-  assert.throws(
-    () => resolveInvocationRoot({ cwd: plain, dir: plain, policy: 'main-checkout-only', readFacts: noDoor }),
-    refused,
-    'the destructive policy has no exception for a missing Git door',
-  );
-  const notARepo = () => ({ notARepository: true });
-  assert.equal(resolveInvocationRoot({ cwd: plain, policy: 'main-checkout', readFacts: notARepo }).root, plain, 'a genuine non-repository falls back to cwd');
-  assert.throws(
-    () => resolveInvocationRoot({ cwd: plain, dir: plain, policy: 'main-checkout-only', readFacts: notARepo }),
-    (err) => err.category === 'validation' && err.message.includes('not inside a Git repository'),
-  );
-  fs.rmSync(plain, { recursive: true, force: true });
-});
-
-test('the trust refusal is matched on the structured cause of the Git error, not on its message text', () => {
-  const plain = real(mkTempDir('paths-door-cause-'));
-  const trust = () => { throw new Error(JSON.stringify({ cause: 'untrusted-worktree', stderr: [] })); };
-  assert.throws(
-    () => resolveInvocationRoot({ cwd: plain, policy: 'caller-tree', home: '/nonexistent-home', readFacts: trust }),
-    (err) => err.message.includes('cannot trust'),
-  );
-  const noise = () => { throw new Error('mentions untrusted-worktree only in text'); };
-  assert.equal(resolveInvocationRoot({ cwd: plain, policy: 'caller-tree', home: '/nonexistent-home', readFacts: noise }).found, false);
+test('an install with no Git door answers the directory itself for every policy but the destructive one, which refuses', () => {
+  const plain = real(mkTempDir('paths-door-no-door-'));
+  fs.mkdirSync(path.join(plain, '.fgos'));
+  const module = pathToFileURL(path.resolve('src/runner/paths.mjs')).href;
+  const ask = (request) => {
+    const script = `import {resolveInvocationRoot} from ${JSON.stringify(module)};
+      try { console.log(JSON.stringify(resolveInvocationRoot(${JSON.stringify(request)}))); } catch (e) { console.log(JSON.stringify({ category: e.category, message: e.message })); }`;
+    const env = { ...process.env, FGOS_ACTIVE_RELEASE_PATH: '', FGOS_ACTIVE_MANIFEST_PATH: '', FGOS_HOST_BIN: '' };
+    return JSON.parse(execFileSync(process.execPath, ['--input-type=module', '-e', script], { cwd: plain, encoding: 'utf8', env }));
+  };
+  for (const policy of ['caller-tree', 'main-checkout', 'strict-cwd']) {
+    assert.deepEqual(ask({ cwd: plain, policy }), { root: plain, fgosDir: path.join(plain, '.fgos'), found: true }, policy);
+  }
+  const refused = ask({ cwd: plain, policy: 'main-checkout-only' });
+  assert.equal(refused.category, 'validation');
+  assert.match(refused.message, /cannot establish the main checkout of .*git-addon-/);
   fs.rmSync(plain, { recursive: true, force: true });
 });

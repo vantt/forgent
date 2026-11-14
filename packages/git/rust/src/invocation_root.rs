@@ -5,7 +5,7 @@
 //! sits in, and the trusted main checkout of its repository. Both come from the one driver read
 //! ([`read_repo_facts`]); a caller that already holds those facts passes them through the reader it gives
 //! [`resolve_invocation_root_with`], so one invocation reads Git once for every answer it needs.
-use crate::{plain_path, GitDriver, ResolveRepo};
+use crate::{plain_path, GitDriver};
 use std::path::{Component, Path, PathBuf};
 
 /// Fault class every refusal of this door is recorded under.
@@ -316,6 +316,7 @@ pub(crate) fn realpath_or_self(path: &Path) -> PathBuf {
 #[cfg(test)]
 pub(crate) mod test_support {
     use super::*;
+    use crate::ResolveRepo;
     use std::process::Command;
 
     pub fn git(dir: &Path, args: &[&str]) {

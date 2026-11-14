@@ -11,8 +11,7 @@
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { createGitInspect, gitPortOptions, readRepoFacts } from '../git/inspect.mjs';
-import { nativeError } from '../git/native.mjs';
+import { NO_GIT_DOOR_CODES, createGitInspect, gitPortOptions, readRepoFacts, worktreeDoor } from '../git/inspect.mjs';
 import { branchNameFor, checkoutPathForBranch, realpathOrSelf } from './worktree.mjs';
 
 function validationError(message) {
@@ -29,37 +28,6 @@ function repoFactsOrNone(cwd, facts) {
   } catch {
     return { notARepository: true };
   }
-}
-
-// No Git door on this install (no addon, no host to run the lock driver): nothing that reads a repository can run,
-// as for an unactivated package install being uninstalled, so it reads as no repository.
-const NO_GIT_DOOR_CODES = new Set(['git-addon-unavailable', 'lock-driver-unavailable']);
-const TRUST_CAUSES = new Set(['untrusted-worktree', 'trusted-main-gitfile-unsupported']);
-
-/**
- * The facts the invocation-root door judges. A repository Git refuses to trust (a `.git` file whose `gitdir`
- * does not point back, say) is a refusal under every policy. An unreadable answer reads as no repository only
- * under `caller-tree`, or when the install has no Git door at all; every other policy acts on a checkout, so it refuses by name rather than act on `cwd`.
- * `needRepository` also refuses a genuine "not a repository" answer (the destructive policy).
- */
-function repoFactsOrRefuse(cwd, facts, { lenient = false, needRepository = false, read = readRepoFacts } = {}) {
-  let answer = facts;
-  if (!answer) {
-    try {
-      answer = read(cwd);
-    } catch (err) {
-      const cause = nativeError(err).cause ?? err.message;
-      if (TRUST_CAUSES.has(cause)) throw validationError(`"${cwd}" is inside a Git repository fgOS cannot trust: ${cause}`);
-      if (needRepository || !(lenient || NO_GIT_DOOR_CODES.has(err?.code))) {
-        throw validationError(`cannot establish the main checkout of "${cwd}": ${cause}`);
-      }
-      answer = { notARepository: true };
-    }
-  }
-  if (needRepository && (answer.notARepository || !answer.trustedMainRoot)) {
-    throw validationError(`cannot establish the main checkout of "${cwd}": it is not inside a Git repository`);
-  }
-  return answer;
 }
 
 /** Resolve the repo root: the checkout `cwd` sits in, asked of Git Inspect
@@ -113,72 +81,33 @@ const isDirectory = (target) => {
   }
 };
 
-/** The nearest directory at or above `start`, never above `ceiling` and never `home`, holding a `.fgos` directory. */
-function nearestStoreRoot(start, ceiling, home) {
-  for (let dir = start; ; dir = path.dirname(dir)) {
-    if (dir === home) return null;
-    if (isDirectory(path.join(dir, '.fgos'))) return dir;
-    if (dir === ceiling || path.dirname(dir) === dir) return null;
-  }
+// An install with no Git door has no repository to judge: the answer is the named directory itself, never a walk,
+// because the Git ceiling of a walk is something only the door knows. The destructive policy has no such exception.
+function rootWithoutGitDoor({ cwd, dir, policy }, cause) {
+  if (policy === 'main-checkout-only') throw validationError(`cannot establish the main checkout of "${cwd}": ${cause}`);
+  const root = path.resolve(typeof dir === 'string' && dir.trim() ? dir : cwd);
+  return { root, fgosDir: fgosDirFromRoot(root), found: isDirectory(path.join(root, '.fgos')) };
 }
 
 /**
- * Which project, and which `.fgos`, an invocation acts on: `{ root, fgosDir, found }`.
+ * Which project, and which `.fgos`, an invocation acts on: `{ root, fgosDir, found }`. The decision, its four policies
+ * (`caller-tree`, `main-checkout`, `main-checkout-only`, `strict-cwd`) and every refusal text belong to `fgos-git`
+ * (`packages/git/rust/src/invocation_root.rs`); this is the adapter that carries the request and maps a refusal to a
+ * `validation` error.
  *
- * Policies:
- * - `caller-tree` (default): the nearest `.fgos` directory walking up from `cwd`,
- *   never above the Git top level of `cwd`'s checkout and never the home directory's
- *   own `.fgos` (the machine's global directory). `found` is false when none exists;
- *   `root` is then the Git top level (or `cwd` outside a repository), where a store
- *   would be created.
- * - `main-checkout`: the trusted main checkout root of `cwd`'s repository, from any
- *   of its worktrees (`cwd` itself outside a repository).
- * - `main-checkout-only`: `main-checkout` for a verb that destroys state: a `--dir` must be that main root.
- * - `strict-cwd`: `cwd` itself; refused inside a repository unless `cwd` is its top level,
- *   so a store is never created in a subdirectory.
- *
- * `readFacts` replaces the Git read (default `readRepoFacts`).
- *
- * `dir` is the caller's request for the root. It is validated, never walked; under
- * `main-checkout-only` it must be the main checkout root of `cwd`'s repository.
+ * `dir` is the caller's request for the root. `facts` are Git facts the caller already read: when passed, they are the only
+ * Git answer the door uses (one read per invocation).
  */
-export function resolveInvocationRoot({ cwd = process.cwd(), dir, policy = 'caller-tree', home = os.homedir(), facts, readFacts } = {}) {
-  const read = readFacts ?? readRepoFacts;
-  const answer = (root, found) => ({ root, fgosDir: fgosDirFromRoot(root), found });
-  if (dir !== undefined) {
-    if (typeof dir !== 'string' || !dir.trim()) {
-      throw validationError('--dir requires a non-empty path value');
-    }
-    const requested = path.resolve(dir);
-    if (policy === 'main-checkout-only') {
-      const main = resolveMainCheckoutRoot(cwd, { facts: repoFactsOrRefuse(cwd, facts, { needRepository: true, read }) });
-      if (main && realpathOrSelf(requested) !== main) {
-        throw validationError(
-          `--dir "${dir}" is not the main checkout of the repository at "${cwd}" ("${main}"); this command acts on the main checkout only -- pass --dir "${main}" or run it from there.`,
-        );
-      }
-    }
-    return answer(requested, isDirectory(path.join(requested, '.fgos')));
+export function resolveInvocationRoot({ cwd = process.cwd(), dir, policy = 'caller-tree', home = os.homedir(), facts } = {}) {
+  let answer;
+  try {
+    answer = worktreeDoor('resolveInvocationRoot', { cwd, dir: dir === undefined ? null : typeof dir === 'string' ? dir : '', policy, home, facts: facts ?? null });
+  } catch (err) {
+    if (!NO_GIT_DOOR_CODES.has(err?.code)) throw err;
+    return rootWithoutGitDoor({ cwd, dir, policy }, err.message);
   }
-  const repo = repoFactsOrRefuse(cwd, facts, { lenient: policy === 'caller-tree', needRepository: policy === 'main-checkout-only', read });
-  if (policy === 'main-checkout' || policy === 'main-checkout-only') {
-    const main = resolveMainCheckoutRoot(cwd, { facts: repo });
-    return answer(main ?? path.resolve(cwd), main !== null && isDirectory(path.join(main, '.fgos')));
-  }
-  const here = realpathOrSelf(path.resolve(cwd));
-  const top = repo.notARepository || !repo.worktreeRoot ? null : realpathOrSelf(repo.worktreeRoot);
-  if (policy === 'strict-cwd') {
-    if (top && top !== here) {
-      throw validationError(
-        `"${cwd}" is inside the repository whose top level is "${top}" -- run this command from "${top}", or pass --dir <project root>.`,
-      );
-    }
-    return answer(path.resolve(cwd), isDirectory(path.join(cwd, '.fgos')));
-  }
-  if (policy !== 'caller-tree') throw validationError(`unknown root policy "${policy}"`);
-  const homeReal = home ? realpathOrSelf(path.resolve(home)) : null;
-  const found = nearestStoreRoot(here, top, homeReal);
-  return found ? answer(found, true) : answer(top ?? path.resolve(cwd), false);
+  if (answer.refused) throw validationError(answer.refused.message);
+  return answer;
 }
 
 /** Join an already-resolved repo root onto `.fgos` — the single place that
