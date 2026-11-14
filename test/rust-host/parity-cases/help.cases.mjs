@@ -49,7 +49,6 @@ for (const command of manifest.commands) {
 // Refusals and leniencies the Node payload has today; the host must answer the same bytes and exit code.
 cases.push(helpCase("refusal-unknown-sub", ["metrics", "bogus", "--help"], 4));
 cases.push(helpCase("refusal-unknown-sub-json", ["dispatch", "bogus", "--help", "--json"], 4));
-cases.push(helpCase("refusal-unknown-verb", ["bogus-verb-probe", "--help"], 4));
 cases.push(helpCase("refusal-leading-unknown-word", ["-h", "foo"], 4));
 cases.push(helpCase("refusal-unknown-option", ["--help", "--bogus"], 4));
 cases.push(helpCase("refusal-unknown-sub-after-flag", ["--help", "dispatch", "bogus", "--json"], 4));

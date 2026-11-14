@@ -25,6 +25,7 @@ import {
   generateCoverageFloorCases,
   runParitySuite,
 } from "./harness.mjs";
+import { cliEntryFor, run as cliRun } from "../cli/helpers/fgos-cli-harness.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const FIXTURES_DIR = path.join(__dirname, "fixtures");
@@ -517,4 +518,30 @@ test("a parity table loads by name and an unknown or path-shaped name fails nami
   assert.equal(new Set(table.map((c) => c.id)).size, table.length, "case ids are unique");
   await assert.rejects(() => loadParityTable("no-such-table"), /no-such-table/);
   await assert.rejects(() => loadParityTable("../harness"), /\.\.\/harness/);
+});
+
+test("a CLI test call goes to the host for a help token, a native verb or a native sub-verb, and to Node otherwise", () => {
+  const routes = JSON.parse(fs.readFileSync(ROUTES_PATH, "utf8"));
+  const native = Object.keys(routes).find((selector) => routes[selector].route_kind === "native");
+  const legacy = Object.keys(routes).find((selector) => routes[selector].route_kind === "legacy-cli" && !selector.startsWith("-"));
+  assert.ok(native && legacy, "the route file has both a native and a legacy verb");
+
+  assert.equal(cliEntryFor([legacy, "--help"]), "host");
+  assert.equal(cliEntryFor(["-h", legacy, "--json"]), "host");
+  assert.equal(cliEntryFor(["--help"]), "host");
+  assert.equal(cliEntryFor([native, "list"]), "host");
+  assert.equal(cliEntryFor([legacy, "list"]), "node");
+  assert.equal(cliEntryFor([]), "node");
+
+  const partlyNative = { ...routes, [legacy]: { ...routes[legacy], native_subcommands: ["fast"] } };
+  assert.equal(cliEntryFor([legacy, "fast", "--json"], partlyNative), "host");
+  assert.equal(cliEntryFor([legacy, "slow"], partlyNative), "node");
+  assert.equal(cliEntryFor(["--json", legacy], partlyNative), "node");
+});
+
+test("a host-bound CLI test call without FGOS_HOST_BIN throws and says to use run-tests", () => {
+  assert.throws(
+    () => cliRun(os.tmpdir(), ["--help"], { FGOS_HOST_BIN: undefined }),
+    /FGOS_HOST_BIN[\s\S]*node scripts\/run-tests\.mjs <file>/,
+  );
 });
