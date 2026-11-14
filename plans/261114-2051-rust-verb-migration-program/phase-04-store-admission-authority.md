@@ -72,8 +72,8 @@ The authority moves; nothing is copied.
 
 - `cargo fmt --all --check`; `cargo clippy -p fgos-git -p fgos-node-addon --all-targets -- -D warnings`; `cargo test -p fgos-git`
 - `cargo check -p fgos-git -p fgos-node-addon --target x86_64-pc-windows-msvc` and `--target aarch64-apple-darwin`
-- `node scripts/run-tests.mjs test/runner/worktree.test.mjs test/cli/fgos-disconnected-worktree-guard.test.mjs test/cli/fgos-init-worktree-guard.test.mjs test/observe/invocation-fault-log.test.mjs test/architecture.test.mjs test/scripts/doc-health.test.mjs test/setup/git-mutation-census.test.mjs`
-  (drop any file that does not exist; grep `rg -l "init-in-worktree|store-missing|disconnected-worktree-store" test` and run every hit).
+- `node scripts/run-tests.mjs test/runner/worktree.test.mjs test/cli/fgos-disconnected-worktree-guard.test.mjs test/cli/fgos-setup.test.mjs test/observe/invocation-fault-log.test.mjs test/architecture.test.mjs test/scripts/doc-health.test.mjs test/setup/git-mutation-census.test.mjs`
+  (grep `rg -l "init-in-worktree|store-missing|disconnected-worktree-store" test` and run every hit).
 - One-door scan count not above baseline (the function spawns no Git: facts come through the crate driver).
 
 ## Risk and rollback

@@ -71,7 +71,7 @@ store leaves (S7).
 
 - `cargo fmt --all --check`; `cargo clippy -p fgos-event-store -p fgos-node-addon --all-targets -- -D warnings`; `cargo test -p fgos-event-store`
 - `cargo check -p fgos-event-store -p fgos-node-addon --target x86_64-pc-windows-msvc` and `--target aarch64-apple-darwin`
-- `node scripts/run-tests.mjs test/event-store/triggers.test.mjs test/event-store/lifecycle.test.mjs test/cli/fgos-events.test.mjs test/architecture.test.mjs test/setup/git-mutation-census.test.mjs`
+- `node scripts/run-tests.mjs test/event-store/triggers.test.mjs test/event-store/lifecycle.test.mjs test/event-store/background-seal.test.mjs test/architecture.test.mjs test/setup/git-mutation-census.test.mjs`
   (also every hit of `rg -l "maintainEventStore|runWithEventStoreLifecycle" test`).
 - One-door scan count not above baseline.
 

@@ -32,11 +32,11 @@ Phase 08's report shows the help table node-vs-host green with case counts. If n
 
 1. `bin/fgos.mjs`: delete `publicManifestEntries`, `renderParameterLines`, `renderFlagLines`, `renderGuide`,
    `renderHelpText`, `refuseHelp`, `printVerbHelp`, `handleHelp`, `handleVerbHelp`, the `formatDeprecation`
-   import and the help branches in `main()` (4196-4212, 4227-4231) and in `handleHook` (4160-4166). A help
+   import and the help branches in `main()` (4196-4212, 4227-4231) and the help branch of `handleHook` (4159-4164). A help
    token on the direct Node channel exits 4 with one stderr line pointing to the installed `fgos` and to
    `npm run fgos:dev -- <verb> --help` (same style as the native-verb refusal). The Node fallback window
    (host spec §6, 30 days from 2026-09-18) has passed, so the direct channel losing help is in scope.
-2. Delete `src/cli/deprecation.mjs` (no reader left). Keep `publicManifest()` in the registry (the generator reads it).
+2. Delete `src/cli/deprecation.mjs` (no reader left) and its row in `docs/architecture-manifest.json` (line 225). Keep `publicManifest()` in the registry (the generator reads it).
 3. Move each help test to its owner, by behaviour:
 
 | Test today | New owner |
@@ -51,16 +51,16 @@ Phase 08's report shows the help table node-vs-host green with case counts. If n
 | `test/rust-host/harness.mjs` `coverage-help-*` floor cases, `test/rust-host/parity-cases/help.cases.mjs`, the help table in `verb-parity.test.mjs` | `help.rs` + `help-routes.test.mjs` (the Node side no longer exists) |
 | `fgos-claim-2.test.mjs` (233, 301, 357), `fgos-gateway.test.mjs` (72), `dispatch-operability.test.mjs` (109, 123), `run-verb.test.mjs` (89, 268), `rust-host/internal-routes.test.mjs` (47) read registry content through help | read `packages/host-runtime/contracts/command-manifest.json` (lowest layer that holds it) or call `run()`, which reaches the host |
 
-4. Check `test/suite-baseline.json` and `test/scripts/test-proof-inventory.test.mjs` for entries naming
-   the deleted test files; update them in the same commit if they do.
+4. `test/suite-baseline.json` names both deleted files (lines 29, 63): remove those rows in the same commit;
+   check `test/scripts/test-proof-inventory.test.mjs` for anything else that lists them.
 
 ## Files
 
-- Modify: `bin/fgos.mjs`, `test/cli/fgos-manifest.test.mjs`, `test/rust-host/help-routes.test.mjs`,
+- Modify: `bin/fgos.mjs`, `docs/architecture-manifest.json`, `test/cli/fgos-manifest.test.mjs`, `test/rust-host/help-routes.test.mjs`,
   `test/rust-host/harness.mjs`, `test/rust-host/harness.test.mjs`,
   `test/rust-host/command-routes.test.mjs`, `test/cli/fgos-claim-2.test.mjs`, `test/cli/fgos-gateway.test.mjs`,
   `test/cli/dispatch-operability.test.mjs`, `test/cli/run-verb.test.mjs`, `test/rust-host/internal-routes.test.mjs`,
-  `apps/fgos/src/help.rs` (only to add any case a retired Node test covered that it lacks), `test/suite-baseline.json` (if needed).
+  `apps/fgos/src/help.rs` (only to add any case a retired Node test covered that it lacks), `test/suite-baseline.json`.
 - Delete: `src/cli/deprecation.mjs`, `test/cli/fgos-help.test.mjs`, `test/cli/fgos-verb-help-json.test.mjs`,
   `test/rust-host/parity-cases/help.cases.mjs`, `test/rust-host/verb-parity.test.mjs` (its last table is gone).
 - Net size: about -650 (Node help ~200, two test files ~350, cases), + small Rust test additions.

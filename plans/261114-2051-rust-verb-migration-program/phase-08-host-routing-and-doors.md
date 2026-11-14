@@ -35,7 +35,8 @@ selectors leave the route table; the transitional `native_kinds` field goes.
   shared vectors `test/rust-host/fixtures/store-declaration-vectors.json`.
 - Rust owners: `fgos_git::store_admission`, `fgos_observe::invocation_fault` (`record`, `route_main`),
   `fgos_event_store::lifecycle::maintain`. Detached spawn: `fgos_process::mapped::spawn_detached`
-  (`packages/process/rust/src/mapped.rs:194`). Dispatched signal: phase 00 U3. Config values: phase 00 U6.
+  (`packages/process/rust/src/mapped.rs:194`), which is `#[cfg(unix)]` (`lib.rs:15-16`); Windows spawns go
+  through `fgos_process::platform::windows_spawn` (`creation_flags`, `windows_spawn.rs:61`). Dispatched signal: phase 00 U3. Config values: phase 00 U6.
 - Node's order of doors (`bin/fgos.mjs:4223-4321`): root, help, unknown flag, native-only refusal,
   admission (+ warning), lifecycle wrapper (start trigger if dispatched, verb, end trigger, Land release),
   fault record on pre-handler faults with `faultClass`, stderr line `invocation fault recorded to <path>`.
@@ -56,7 +57,9 @@ selectors leave the route table; the transitional `native_kinds` field goes.
    `store != none`; the start trigger runs when dispatched and the invocation opens the store and is not
    `event_store_child`; the end trigger runs after the outcome is presented and before exit, recording a
    trigger error as `event-store-start-trigger` / `event-store-end-trigger`; a due publish spawns
-   `fgos events sync --opportunistic --dir <main>` detached from the host's own executable. A native
+   `fgos events sync --opportunistic --dir <main>` detached from the host's own executable. On Windows,
+   if `fgos-process` has no detached door yet, add it there (the lowest layer that owns spawning, next to
+   `spawn_detached`), never a spawn inside `apps/fgos`; that adds `packages/process/rust/src/` files to this phase. A native
    invocation whose `lands_work` matches is impossible (phase 03 refuses it at generation); assert it.
 3. `main.rs`: uses `routing.rs` and `invocation_doors.rs`; the descriptor gains the new fields and loses
    `native_kinds`; delete `native_kind`, `unknown_native_flag`; mount `fgos internal invocation-fault` →
@@ -90,7 +93,7 @@ selectors leave the route table; the transitional `native_kinds` field goes.
 ## Gates
 
 - `cargo fmt --all --check`; `cargo clippy -p fgos -p fgos-distribution --all-targets -- -D warnings`; `cargo test -p fgos -p fgos-distribution`
-- `cargo check -p fgos -p fgos-distribution --target x86_64-pc-windows-msvc` and `--target aarch64-apple-darwin`
+- `cargo check -p fgos -p fgos-distribution -p fgos-process --target x86_64-pc-windows-msvc` and `--target aarch64-apple-darwin`
 - `node scripts/export-command-selectors.mjs --check`
 - `node scripts/run-tests.mjs test/rust-host/verb-parity.test.mjs test/rust-host/command-routes.test.mjs test/rust-host/help-routes.test.mjs test/rust-host/harness.test.mjs test/rust-host/envelope-contract.test.mjs test/rust-host/internal-routes.test.mjs test/rust-host/dev-host.test.mjs test/rust-host/release-tree.test.mjs test/cli/first-run-guide.test.mjs test/cli/exit-code-table.test.mjs test/cli/unknown-flag-rejection.test.mjs test/scripts/dispatch-decide-hook.test.mjs test/observe/invocation-fault-log.test.mjs test/architecture.test.mjs test/scripts/doc-health.test.mjs test/setup/git-mutation-census.test.mjs`
 - One-door scan count not above baseline. `cargo test -p fgos --test mailbox_routes` (hook lane through the new field).
@@ -101,5 +104,5 @@ selectors leave the route table; the transitional `native_kinds` field goes.
   table plus the existing envelope and route tests.
 - End trigger delaying a native verb's exit (L x M): the trigger reads maintenance facts only (no ref walk);
   measure `fgos config show --json` before/after, record in the report.
-- Host spawning itself for the sync child on Windows (M x M): reuse `spawn_detached`; msvc check.
+- Host spawning itself for the sync child on Windows (M x M): one detached door in `fgos-process` per platform; msvc check of `fgos-process`.
 - Rollback: revert the phase (02-06 stand on their own).

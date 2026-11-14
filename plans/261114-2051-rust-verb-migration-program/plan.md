@@ -149,15 +149,16 @@ Modify:
 - `packages/distribution/rust/src/lib.rs`
 - `packages/git/rust/src/lib.rs`, `packages/git/node-addon/src/git.rs`, `packages/git/node-addon/src/event_store.rs`
 - `packages/observe/rust/src/lib.rs`, `packages/event-store/rust/src/lib.rs`
+- `packages/process/rust/src/` (only if phase 08 must add a Windows detached-spawn door beside `mapped::spawn_detached`)
 - `packages/host-runtime/contracts/command-routes.json` (generated), `packages/host-runtime/contracts/command-route-annotations.json`
 - `packages/git/contracts/mutation-census.v1.json` (generated)
 - `scripts/export-command-selectors.mjs`, `scripts/explain-command-route.mjs` (only if phase 08 finds it reads the help selectors or `native_kinds`)
-- `src/cli/command-registry.mjs`, `bin/fgos.mjs`
+- `src/cli/command-registry.mjs`, `bin/fgos.mjs`, `docs/architecture-manifest.json` (phase 09: drop the `src/cli/deprecation.mjs` row)
 - `src/runner/hook.mjs` (delete one constant), `src/runner/worktree.mjs` (`admitStoreAccess`, `isSessionWorktree`)
 - `src/observe/invocation-fault-log.mjs`, `src/state/fgos-file-registry.mjs` (only if the fault-log path loses its last Node reader)
 - `src/event-store/maintenance.mjs`
-- tests: `test/rust-host/command-routes.test.mjs`, `test/rust-host/help-routes.test.mjs`, `test/rust-host/harness.mjs`, `test/rust-host/harness.test.mjs`, `test/rust-host/internal-routes.test.mjs`, `test/cli/helpers/fgos-cli-harness.mjs`, `test/cli/fgos-manifest.test.mjs`, `test/cli/unknown-flag-rejection.test.mjs`, `test/cli/subcommand-flag-drift.test.mjs`, `test/cli/fgos-disconnected-worktree-guard.test.mjs`, `test/cli/fgos-claim-2.test.mjs`, `test/cli/fgos-gateway.test.mjs`, `test/cli/dispatch-operability.test.mjs`, `test/cli/run-verb.test.mjs`, `test/runner/worktree.test.mjs`, `test/event-store/triggers.test.mjs`, `test/event-store/lifecycle.test.mjs`, `test/observe/invocation-fault-log.test.mjs`, `test/state/fgos-logs-bucket.test.mjs` (only with the registry entry above)
-- docs (phase 11 only): `docs/platform/host-invocation-routing/spec.md`, `.../contracts/command-route-descriptor.md`, `.../contracts/legacy-payload.md`, `docs/platform/agent-mailbox/spec.md`, `docs/platform/packaging-distribution/spec.md`, the Event Store, Observe and Git area specs' decision-history sections, `AGENTS.md` (the "Legacy-Node CLI Ownership Boundary" paragraph only), `scripts/check-decision-citation-drift.baseline.json` (only if the drift check asks)
+- tests: `test/rust-host/command-routes.test.mjs`, `test/rust-host/help-routes.test.mjs`, `test/rust-host/harness.mjs`, `test/rust-host/harness.test.mjs`, `test/rust-host/internal-routes.test.mjs`, `test/cli/helpers/fgos-cli-harness.mjs`, `test/cli/fgos-manifest.test.mjs`, `test/cli/unknown-flag-rejection.test.mjs`, `test/cli/subcommand-flag-drift.test.mjs`, `test/cli/fgos-disconnected-worktree-guard.test.mjs`, `test/cli/fgos-claim-2.test.mjs`, `test/cli/fgos-gateway.test.mjs`, `test/cli/dispatch-operability.test.mjs`, `test/cli/run-verb.test.mjs`, `test/runner/worktree.test.mjs`, `test/event-store/triggers.test.mjs`, `test/event-store/lifecycle.test.mjs`, `test/observe/invocation-fault-log.test.mjs`, `test/state/fgos-logs-bucket.test.mjs` (only with the registry entry above), `test/suite-baseline.json` (rows of the two deleted test files), `test/event-store/background-seal.test.mjs` (run, edit only if it reads the moved policy)
+- docs (phase 11 only): `docs/platform/host-invocation-routing/spec.md`, `.../contracts/command-route-descriptor.md`, `.../contracts/legacy-payload.md`, `docs/platform/agent-mailbox/spec.md`, `docs/platform/packaging-distribution/spec.md`, the Event Store, Observe and Git area specs' decision-history sections, `AGENTS.md` (the "Legacy-Node CLI Ownership Boundary" paragraph only), `docs/reading-map.md` (line 144), `scripts/check-decision-citation-drift.baseline.json` (only if the drift check asks)
 
 Delete:
 - `src/cli/deprecation.mjs` (its last reader is the Node help code)
@@ -174,8 +175,15 @@ Possible shared files, each with the hunk F0 changes:
 | `src/runner/hook.mjs` | delete `NATIVE_HOOK_KINDS` (line 19) and its use | under `src/runner/`; it does not read `runner.capabilities` today | different hunk; rebase |
 | `src/runner/worktree.mjs` | `admitStoreAccess` (547-578) becomes an adapter, `isSessionWorktree` (519-530) deleted | under `src/runner/`; does not read capabilities | different hunk; rebase |
 | `src/cli/command-registry.mjs` | `nativeOnly` -> `native`, predicate fields -> data, `HELP_SELECTORS` removed, `publicManifest()` added | `plan-lint`, `workflow propose` and `workflow gate` descriptions name `runner.capabilities` (lines 1377, 2585, 2687) | different hunks; after either lands, regenerate `command-manifest.json` (its bytes carry those descriptions) |
-| `bin/fgos.mjs` | help code deleted (3817-4006, main() help branches), `nativeOnly` refusal | the `plan-lint` arm reads `runner.capabilities`; `loadRunnerConfigForDir` import (line 53) | different hunks; rebase |
+| `bin/fgos.mjs` | help code deleted (3817-4006, main() help branches), `nativeOnly` refusal, `publicManifestEntries` import | its phase 05 ports the `plan-lint` arm (2358-2359, 2399) | different hunks; rebase |
+| `docs/architecture-manifest.json` | phase 09 deletes the `src/cli/deprecation.mjs` row (line 225) | its phase 01 adds rows for new `.mjs` files and retiers `src/runner/operation-capability.mjs` | different rows; rebase |
+| `docs/reading-map.md` | phase 11 edits the `command-registry.mjs` row (line 144) | its phase 06 edits the seat-binding row (line 158) | different rows; rebase |
 | `packages/git/contracts/mutation-census.v1.json` | regenerated | regenerated by any product-file change | regenerate after the second landing |
+
+Checked against `origin/plan/capability-reads-one-door` (its plan.md file-ownership table and phase files):
+its only F0-shared code file is `bin/fgos.mjs` (`plan-lint` arm, lines 2358-2359 and 2399); it does not
+touch `src/cli/command-registry.mjs`, `src/runner/worktree.mjs` or `src/runner/hook.mjs`. It edits
+`test/architecture.test.mjs`, which F0 only runs.
 
 ## F0 exit criteria (measurable)
 
