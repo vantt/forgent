@@ -38,7 +38,7 @@ Five CLI cases in `test/cli/fgos-disconnected-worktree-guard.test.mjs` (goal set
 
 - Before: "served natively" was declared in three layers (`nativeOnly` in the registry, `route_kind`/`native_kinds` in annotations, `NATIVE_HOOK_KINDS` in the runner), and store declarations lived only as JS closures. Now the registry `native` field and shape lists are the single declaration; the route table is generated from them.
 - Still two readers of one list, on purpose and temporary: the host reads `native_kinds` (same values as `native_subcommands`) until the host-routing step moves it; that step deletes `native_kinds` from the generator and `apps/fgos/src/main.rs`. The doc comment at `apps/fgos/src/wiring/mailbox_hook.rs:3` names `native_kinds` and moves with it.
-- Drift noticed, not changed (outside this phase's files): the `hook` `kind` enum in the registry lists `mailbox` but not `mailbox-sync` or `main-checkout-delete-guard`'s sibling kinds consistently with the native list; the manifest bytes are pinned, so fixing the enum is a separate decision.
+- Drift noticed, not changed (manifest bytes are pinned, so it is a separate decision): the `hook` `kind` enum in the registry lists `dispatch-decide`, `decision-question`, `main-checkout-delete-guard` and `mailbox`, but not `mailbox-sync`, which `native` names.
 
 ## Lessons
 
