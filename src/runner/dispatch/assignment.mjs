@@ -649,7 +649,7 @@ function renderPersonaSection(personaRef, options = {}) {
   try {
     const text = typeof pinned === 'string'
       ? pinned
-      : resolveAgentDefinition(personaRef, { projectRoot: root, workflow: options.workflow ?? null }).text;
+      : resolveAgentDefinition(personaRef, { projectRoot: root }).text;
     const parsed = parseYaml(text, { filename: `${personaRef}.yaml` });
     const [nonText] = nonTextPersonaValues(parsed);
     if (nonText) parseFailure = `Persona "${personaRef}" cannot be rendered: ${nonText}`;

@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 // project-agents.mjs -- projects forgent's own platform-agnostic agent
-// definitions (core/agents/*.yaml, domains/<name>/agents/*.yaml) into Claude Code's adapter format
+// definitions (fgos/agents/*.yaml, domains/<name>/agents/*.yaml, core/agents/*.yaml) into Claude Code's adapter format
 // (.claude/agents/<name>.md). tsk-slq / D24 / D33.
 //
 // Canonical root location (D5, D24, docs/history/agent-executor-agent-definitions/CONTEXT.md):
-// lives at core/agents/ and domains/<name>/agents/ (with legacy fallback to agents/) --
+// lives at core/agents/ and domains/<name>/agents/ (the tiers the agent-definitions door reads) --
 // NOT under .fgos/. .fgos/ is reserved exclusively for the runner's own
 // state store: src/runner/worktree.mjs's createWorktree() unconditionally
 // wipes .fgos/ from every freshly-created worktree (ADR0020), and

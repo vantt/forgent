@@ -572,7 +572,7 @@ test('pinned persona text that parses is read by the parser, and wins over the f
 
 // ─── persona definitions are found through the agent-definitions door ────────
 
-function tierPrompt(files, { workflow } = {}) {
+function tierPrompt(files) {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-persona-tiers-'));
   try {
     for (const [rel, text] of Object.entries(files)) {
@@ -582,7 +582,6 @@ function tierPrompt(files, { workflow } = {}) {
     const assignment = buildAssignment({ workId: 'tsk-tiers', stage: 'planning', operation: 'validate-plan' });
     return renderAssignmentPrompt(assignment, {
       repoRoot: root,
-      ...(workflow ? { workflow: workflow(root) } : {}),
       persona: { value: 'critic', source: { scope: 'default', id: 'reviewer' } },
     });
   } finally {
@@ -594,19 +593,6 @@ test('an unpinned persona that lives only in the workspace tier renders its text
   const prompt = tierPrompt({ 'fgos/agents/critic.yaml': 'name: critic\ndescription: Workspace critic\npersona:\n  voice: calm\n' });
   assert.match(prompt, /^Description: Workspace critic$/m);
   assert.match(prompt, /^Voice: calm$/m);
-});
-
-test('an unpinned persona in a domain tier renders only when the workflow context names the owning domain', () => {
-  const render = (workflow) => {
-    const assignment = buildAssignment({ workId: 'tsk-tiers', stage: 'planning', operation: 'validate-plan' });
-    return renderAssignmentPrompt(assignment, {
-      repoRoot: os.tmpdir(),
-      ...(workflow ? { workflow } : {}),
-      persona: { value: 'offer-pricing-critic', source: { scope: 'default', id: 'reviewer' } },
-    });
-  };
-  assert.doesNotMatch(render(null), /^Description:/m);
-  assert.match(render({ owningDomain: 'marketing' }), /^Description: /m);
 });
 
 test('a persona that names a model taste renders one failure line instead of throwing', () => {

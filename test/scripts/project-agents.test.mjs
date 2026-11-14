@@ -138,7 +138,7 @@ test('findAgentYamlFiles lists the workspace, domain and core tiers the agent-de
   }
 });
 
-test('resolveAgentFiles still throws AgentDefinitionError when two non-legacy sources collide (D33)', () => {
+test('resolveAgentFiles still throws AgentDefinitionError when two sources collide (D33)', () => {
   const dir = mkTempDir();
   try {
     const coreDir = path.join(dir, 'core', 'agents');
