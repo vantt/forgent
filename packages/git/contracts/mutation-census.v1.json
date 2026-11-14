@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "4bb96ee98de5017392ab98d8038ca40baaedcfb5d173b1e800c520b4c124b760",
+  "payloadDigest": "c49340d888c858e65075c7fd0fefdaceb606b9ad2021b342b77a3dd48e00413d",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -86,8 +86,9 @@
     "apps/fgos/examples/mailbox-ident-cost.rs": "694f216767532946846ecc69dc584fbb8bf28a7183f741a037ba05c7b4793bc9",
     "apps/fgos/src/cli_presenter.rs": "b93778742194566aac6e085536cbcbcc4ff709ac3d1bbaff8870a8cf2c43dada",
     "apps/fgos/src/cli_projector.rs": "08b12bf43cdccddff020c6b803988c2f9e905b45f18d5ea40ffab89516ffbda5",
+    "apps/fgos/src/help.rs": "06bfe76d7e68faf6f1eb04c3999ac3d5f9c66f383433b3a6c224677d54c83403",
     "apps/fgos/src/legacy_exec.rs": "bf2f790d202ad3a25735fc3f9c33feb7aeffdfb015b1e0aafa9282c8b8bcba40",
-    "apps/fgos/src/main.rs": "bff44518ac4b38732e2bc428370efe29605a71e0dc7ecd6b593e13622e1839f6",
+    "apps/fgos/src/main.rs": "ef8693aa511c872e7a84359e8a99f3a6ef556365c2dea469399782dae673c415",
     "apps/fgos/src/wiring/event_store_clone.rs": "923d718f7a6bd5705cbe6e4d4c8393672c1ef4a2142facc9ada314307a4d7574",
     "apps/fgos/src/wiring/identity_log.rs": "d7d9dd503ecbd84a5373aa27f6853996e6944aba2940d15e8284cd92c14eef7a",
     "apps/fgos/src/wiring/mailbox_body.rs": "1d1a1c76ac24e5cb1d9e55a7b54ed35cc7be7656ded86ac52e58dd767b3079ca",

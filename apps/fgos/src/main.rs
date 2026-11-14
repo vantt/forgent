@@ -10,6 +10,7 @@
 
 mod cli_presenter;
 mod cli_projector;
+mod help;
 mod legacy_exec;
 mod wiring;
 use fgos_distribution::suggest::suggest;
@@ -65,7 +66,7 @@ pub struct CommandRouteDescriptor {
 }
 
 /// Whether an exact `--help` or `-h` token follows the selector: a help
-/// request, which the legacy-node payload answers from the verb manifest.
+/// request, which the host answers from the verb manifest (`help.rs`).
 fn wants_help_token(cli_args: &[std::ffi::OsString]) -> bool {
     cli_args.iter().skip(1).any(|a| a == "--help" || a == "-h")
 }
@@ -152,6 +153,25 @@ fn refuse_unknown_verb(selector: &str) -> ! {
         eprintln!("did you mean `fgos {near}`?");
     }
     std::process::exit(exit_codes::validation());
+}
+
+/// Prints a help answer and ends the process: the text on stdout and exit 0,
+/// or one stderr line and exit 4 with nothing on stdout.
+fn answer_help(answer: Result<String, help::Refusal>) -> ! {
+    match answer {
+        Ok(text) => {
+            use std::io::Write;
+            // A closed pipe (`fgos --help | head`) is the reader's choice, not a failure.
+            let mut stdout = std::io::stdout().lock();
+            let _ = stdout.write_all(text.as_bytes());
+            let _ = stdout.flush();
+            std::process::exit(exit_codes::ok());
+        }
+        Err(help::Refusal(message)) => {
+            eprintln!("fgos: {message}");
+            std::process::exit(exit_codes::validation());
+        }
+    }
 }
 
 static ROUTES: OnceLock<HashMap<String, CommandRouteDescriptor>> = OnceLock::new();
@@ -268,6 +288,12 @@ fn main() {
         other => refuse_unknown_verb(other.unwrap_or("")),
     };
 
+    // `fgos --help|-h [<verb> [<sub>]] [--json]`: the manifest door, answered
+    // here before any route lookup, composition or spawn.
+    if selector == "--help" || selector == "-h" {
+        answer_help(help::top_level(&cli_args[1..]));
+    }
+
     let routes = command_routes();
     let route = match routes.get(selector) {
         Some(r) => r,
@@ -275,11 +301,19 @@ fn main() {
         None => refuse_unknown_verb(selector),
     };
 
+    // `fgos <verb> [<sub>] --help|-h [--json]` for a listed selector, whatever
+    // its route kind (`hook` and the native kinds included): the verb's
+    // manifest entry, never the operation. Only an exact help token counts,
+    // even where the verb's own parser would take it as a flag value.
+    if wants_help_token(cli_args) {
+        answer_help(help::for_verb(cli_args));
+    }
+
     // A kind the route table declares native (`hook mailbox`) runs here,
     // before the composition root: the hook protocol needs exact stdout
     // bytes, exit 0 on every path, and no snapshot or async runtime on its
-    // hot path. A help request falls through to legacy, which owns help.
-    if native_kind(route, cli_args) && !wants_help_token(cli_args) {
+    // hot path.
+    if native_kind(route, cli_args) {
         match cli_args.get(1).and_then(|a| a.to_str()) {
             Some("mailbox-sync") => wiring::mailbox_sync::main(&cli_args[2..]),
             _ => wiring::mailbox_hook::main(&cli_args[2..]),
@@ -338,18 +372,7 @@ fn main() {
     }
     let tracker = service.tracker();
 
-    // Help is answered by the legacy-node payload, which owns the verb
-    // manifest (src/cli/command-registry.mjs): `fgos <native-verb> ... --help`
-    // returns that verb's manifest entry instead of running the operation.
-    // Only an exact `--help`/`-h` token after the selector counts.
-    let wants_help = wants_help_token(cli_args);
-    let route_kind = if wants_help {
-        "legacy-cli"
-    } else {
-        route.route_kind.as_str()
-    };
-
-    match route_kind {
+    match route.route_kind.as_str() {
         "legacy-cli" => {
             // Check recursion guard immediately. Fails closed if already set.
             if let Err(err) = legacy_exec::check_recursion_guard() {
