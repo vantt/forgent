@@ -41,6 +41,8 @@ Final `allowed` (each with reason, single-process tooling): `scripts/git-one-doo
 `scripts/run-rust-dev-host.mjs`. `store-increment-worker.mjs:62` (`.${index}.tmp`) matches no pattern, so not listed. Negative
 check: putting `${logPath}.${process.pid}.tmp` back makes `test/architecture.test.mjs` fail on that line.
 
+Unique temp names mean a crash between write and rename leaves its own `*.tmp-<tag>`: fine for the per-hold work dirs, but `~/.fgos/logs` (`capped-jsonl-log`), `main-checkout-activity` and the managed-timer unit files have no sweep; a backlog row tracks it.
+
 ## Re-check of the big lead's three writers
 
 - `generator writeAtomic`: real leak (pid + clock temp, `.gitignore` coupled to the name). Fixed.
