@@ -80,7 +80,61 @@ Humans should stay present for judgment, review, and direction. They should not 
 - Treat generated docs as projections, not new authority.
 - Keep work restartable by a stranger agent with no chat history.
 
-## 6. Related Anchors
+## 6. Layer Direction: Execution, Workflow, Domain
+
+Status: direction, not a locked law and not proof of current code. Owner
+direction (2026-11-14), restating a view the owner has given before; the
+earlier statements are linked below rather than copied.
+
+1. **Three layers.**
+   - **Execution** runs one Unit reliably.
+   - **Workflow** coordinates many Units.
+   - **Domain** holds each field's doctrine and its business cases.
+2. **Workflow has features, but only generic coordination mechanisms, never a
+   specific business case.** Examples of mechanisms: fan-out/fan-in; seats in
+   parallel or in series; back-and-forth review loops; quorum; an arbiter that
+   settles and keeps dissent; gates and human stops; resume after
+   interruption; retry on infrastructure faults; passing one step's result
+   into the next; budgets and round limits. Workflow is the skeleton that lets
+   the soul (the agent) run a flow reliably, precisely and flexibly, without
+   boxing it in.
+3. **Business cases live in Domain.** A coding flow, a council, a marketing
+   flow and a financial flow are each a composition of Workflow mechanisms plus
+   the field's doctrine. With every coordination mechanism already in
+   Workflow, a council in the Domain layer becomes very easy, ready to use, and
+   stable.
+4. **Execution is the foundation.** If Execution is solid, an agent can
+   already build and run its own council, workflow-style. Workflow adds
+   reliability on top, but it must not bloat.
+5. **Work is not a foundation layer.** Work (lifecycle, human touch points,
+   per-domain apps) is a surface or orchestration layer that runs beside or
+   above Domain. Address it only when needed.
+6. **Placement test.** If a change in Workflow names or encodes a specific
+   business case (council, panel, coding, marketing, and so on), it is in the
+   wrong layer and belongs in Domain. If it is a coordination mechanism several
+   cases can share, it belongs in Workflow.
+
+Where this direction is already stated or applied:
+
+| Need | Read |
+| --- | --- |
+| Layer names, and which layer owns which decision at the Execution to Workflow boundary | [Unit Run Result Contract, section 1](runner/contracts/unit-run-result.md#1-layers-and-who-decides-what) |
+| Hard outside, soft inside: the skeleton and the soul | [System Vision: Trong Mem Ngoai Cung](system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md) |
+| Workflow vocabulary: workflow, case, unit, loop, pattern, seat | [Workflow spec](workflow/spec.md) |
+| Domain doctrine placement | [Domainization](domainization/architecture/domainization.md) |
+| Code tiers and the import rule that enforces them | `docs/architecture-manifest.json` (`tierNames`, `tiers`), checked by `test/architecture.test.mjs` |
+
+Known gaps against this direction:
+
+- The code tiers in `docs/architecture-manifest.json` put Work lifecycle at
+  tier 7 and Skill and Domain at tier 8, so Domain sits above Work. Point 5
+  places Work beside or above Domain. The manifest is unchanged; this is an
+  open gap, not a decision.
+- The same manifest also has a `layers` list (`entry`, `use-case`, `infra`,
+  `domain`, `kernel`), the per-file ranks of its one-directional import rule.
+  Its `domain` rank does not mean the Domain layer above.
+
+## 7. Related Anchors
 
 | Need | Read |
 | --- | --- |
