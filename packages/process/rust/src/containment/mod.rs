@@ -35,14 +35,26 @@ pub use windows::WindowsJobDriver;
 /// descendant of the child.
 pub const WATCH_ENV: &str = "FGOS_BORROW_WATCH";
 
-/// Unique token for a watched run, inherited by child descendants.
+/// Unique token for a watched run, inherited by child descendants. The clock
+/// alone cannot make it unique: two runs started in one clock tick of the same
+/// process (a coarse virtual-machine clock, parallel threads) would share a
+/// token, and each run's survivor scan would count the other's live children as
+/// escapees. The per-process sequence keeps every call distinct.
 pub fn watch_token() -> String {
-    format!(
-        "{}-{}",
-        std::process::id(),
+    token_at(
         std::time::SystemTime::now()
             .duration_since(std::time::UNIX_EPOCH)
-            .map_or(0, |d| d.as_nanos())
+            .map_or(0, |d| d.as_nanos()),
+    )
+}
+
+fn token_at(nanos: u128) -> String {
+    static SEQUENCE: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
+    format!(
+        "{}-{}-{}",
+        std::process::id(),
+        nanos,
+        SEQUENCE.fetch_add(1, std::sync::atomic::Ordering::Relaxed)
     )
 }
 /// How the attempt is started. `Direct` must outlive its supervisor; a
@@ -332,5 +344,18 @@ mod empty_wait_tests {
         assert_eq!(domain.empty_wait(), DEFAULT_EMPTY_WAIT);
         domain.set_empty_wait(Duration::from_millis(1_234));
         assert_eq!(domain.empty_wait(), Duration::from_millis(1_234));
+    }
+}
+
+#[cfg(test)]
+mod watch_token_tests {
+    use super::*;
+
+    #[test]
+    fn two_runs_started_in_the_same_clock_tick_get_different_tokens() {
+        assert_ne!(
+            token_at(1_794_633_933_682_400_000),
+            token_at(1_794_633_933_682_400_000)
+        );
     }
 }
