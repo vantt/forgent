@@ -94,6 +94,25 @@ Full npm test on the branch (b506e5505 before rebase): 8862 tests, 0 fail, no ER
 `process-containment` and `holder-lock-cross-platform` stay red on Windows/macOS as on main before; they
 are not release gates.
 
+## rc.8 and the publish fix
+
+Main d9d0d817b was green on both workflows (CI 43456812136, Release assets check 43456812171, Rust 1.99.0
+on every toolchain job). `chore: prepare v0.2.0-rc.8` (88e4cb651) was green (CI 43465323950, Release
+assets check 43465323802), tagged `v0.2.0-rc.8`; Release run 43475029626 green and published
+https://github.com/vantt/forgent/releases/tag/v0.2.0-rc.8. rc.8 is active on fg-server2 (digest
+9d52c6af3310, pin committed c4bfbd99e); doctor `lock-borrow-vectors` ok, `activation-matches-pin` ok;
+`fgos run "Reply with exactly the word OK"` passed.
+
+Defect found after publishing: the release run calls release-assets.yml twice (its own assets and the
+suite's reproducibility proof), both uploaded `release-assets-<target>`, and publish took the suite's
+`v0.2.0-assets-check` build for Windows. Owner decision: rc.8 stays as published; fix the workflow, then
+cut rc.9. This landing: the assets workflow takes an artifact prefix (`suite` for the suite's call),
+publish refuses any asset not named for its tag (owning proof in release-packaging.test.mjs runs that
+check from release.yml), and the PowerShell upgrade proof steps past a previous release with no Windows
+asset under its own tag, printing one line (today rc.8, then rc.5 hits the existing install.ps1 skip).
+The Linux proof's PATH and YAML config fixes landed separately on main (762532f57, d7fba0a04).
+Dispatched Release assets check on the branch, Windows included: green (43535999586).
+
 ## Backlog rows opened
 
 - `p-5zazr53vd2`: the exec-window retry is per process and the scan is serial (N x 250 ms); bound it
