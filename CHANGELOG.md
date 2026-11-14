@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- `dispatch.probeAccount.intervalSec` schedules `probe-account --all --record --leg direct`; `fgos doctor --fix` writes the timer (off by default).
 - An account whose last quota stop named no reset time is checked with one real call, at most once per run, before a seat uses it again: a still-exhausted account stays out, a recovered one is released early.
 - `fgos dispatch probe-account` now also calls each login of the account directly (no sandbox, no pane) and says whether the account, the harness, both or neither failed (`healthy`, `account-fault`, `harness-fault`, `mixed`); `--all` probes every account and `--record` writes what the direct call found to the capacity state and its audit log.
 - A provider 429 or `RESOURCE_EXHAUSTED` now ends a run as a usage limit instead of a provider error, so the account is quarantined; the agent protocol also reads the provider's own status, requested wait and reset phrase.
