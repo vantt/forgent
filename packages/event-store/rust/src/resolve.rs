@@ -46,21 +46,26 @@ pub struct Resolved {
     pub machine: String,
 }
 
+/// The Git driver on `state_root`. `detached` marks a background child (a seal or publish): it never creates a state
+/// root that is gone, and every other caller creates an absent root.
+pub fn driver(state_root: &Path, detached: bool) -> Result<GitDriver, ResolveError> {
+    if detached {
+        GitDriver::new_if_root_exists(state_root)
+            .map_err(ResolveError::Git)?
+            .ok_or(ResolveError::StateRootGone)
+    } else {
+        GitDriver::new(state_root).map_err(ResolveError::Git)
+    }
+}
+
 /// The driver on `state_root` and the repository of `cwd` (`trusted_main` is the main checkout's root).
-/// `detached` marks a background child: it never creates a state root that is gone.
 pub fn resolve_repo(
     cwd: &Path,
     state_root: &Path,
     trusted_main: &Path,
     detached: bool,
 ) -> Result<(GitDriver, RepoHandle), ResolveError> {
-    let driver = if detached {
-        GitDriver::new_if_root_exists(state_root)
-            .map_err(ResolveError::Git)?
-            .ok_or(ResolveError::StateRootGone)?
-    } else {
-        GitDriver::new(state_root).map_err(ResolveError::Git)?
-    };
+    let driver = driver(state_root, detached)?;
     match driver
         .resolve_repo(cwd, trusted_main)
         .map_err(ResolveError::Git)?

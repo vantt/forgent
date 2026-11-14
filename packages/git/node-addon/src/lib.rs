@@ -1,6 +1,8 @@
 //! One Node-API load for both foundations. No protocol decisions live here.
 mod event_store;
-pub use event_store::{event_store_branch_key, event_store_facts, open_store, resolve_event_store};
+pub use event_store::{
+    event_store_branch_key, event_store_facts, maintain_event_store, open_store, resolve_event_store,
+};
 mod git;
 pub use git::{
     close_git_loan, ensure_git_fetch_mapping, git_fetch_mappings, initialize_git_wal, inspect_git,
@@ -29,18 +31,18 @@ fn check() -> Result<()> {
 fn error(e: impl std::fmt::Display) -> Error {
     Error::from_reason(e.to_string())
 }
-/// What a detached seal or publish child fails with when the state root it was started for is gone.
-const STATE_ROOT_GONE: &str = "state-root-gone";
-/// The driver on `state_root`. A detached child never rebuilds a root its owner tore down: it fails
-/// `state-root-gone` and its caller skips quietly. Every other caller creates an absent root.
+/// The driver on `state_root`; the Event Store owns the rule for a detached child whose root is gone.
 fn driver_for(state_root: &str, detached: Option<bool>) -> Result<fgos_git::GitDriver> {
-    let root = std::path::Path::new(state_root);
-    if detached.unwrap_or(false) {
-        fgos_git::GitDriver::new_if_root_exists(root)
-            .map_err(operation)?
-            .ok_or_else(|| error(STATE_ROOT_GONE))
-    } else {
-        fgos_git::GitDriver::new(root).map_err(operation)
+    fgos_event_store::resolve::driver(std::path::Path::new(state_root), detached.unwrap_or(false))
+        .map_err(resolve_failure)
+}
+/// A refusal to build a store's authority as the addon's error: the one mapping every door shares.
+pub(crate) fn resolve_failure(e: fgos_event_store::resolve::ResolveError) -> Error {
+    use fgos_event_store::resolve::ResolveError;
+    match e {
+        ResolveError::StateRootGone | ResolveError::NoRepository => error(e.code()),
+        ResolveError::Git(e) => operation(e),
+        ResolveError::Machine(e) => error(e),
     }
 }
 
@@ -67,7 +69,7 @@ pub fn versions() -> Result<Value> {
                 "addon": env!("CARGO_PKG_VERSION"), "git": fgos_git::VERSION, "eventStore": env!("CARGO_PKG_VERSION"), "napi": 8, "contracts": contracts,
                 "process": process::contract_version().map_err(|e| e.to_string())?,
                 // The crates carry the workspace version; the canonical vectors are the `canonical.v1` file.
-                "durableFile": env!("CARGO_PKG_VERSION"), "canonicalJson": 1, "holderLock": 2, "sessionIdentity": 2, "yaml": 1, "config": 3, "runResult": 1, "agentProtocol": 1,
+                "durableFile": env!("CARGO_PKG_VERSION"), "canonicalJson": 1, "holderLock": 2, "sessionIdentity": 2, "yaml": 1, "config": 4, "runResult": 1, "agentProtocol": 1,
             }))
         })
         .clone()

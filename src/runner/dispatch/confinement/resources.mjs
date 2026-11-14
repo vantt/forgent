@@ -13,6 +13,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
+import { globalFgosDir } from '../../../config/facade.mjs';
 import { resolveConfinementTempRoot } from './cleanup.mjs';
 import { createGitInspect, gitPortOptions } from '../../../git/inspect.mjs';
 import { userRuntimeDir } from '../../../run-supervisor/runtime-dir.mjs';
@@ -633,7 +634,7 @@ export function resolveConfinementResources({
     const credsPath =
       providerSources.credentialsPath ||
       providerSources.credentialsDir ||
-      path.join(os.homedir(), '.fgos', 'credentials');
+      path.join(globalFgosDir(), 'credentials');
 
     if (fs.existsSync(credsPath)) {
       const parentRoot = path.dirname(credsPath);

@@ -287,7 +287,7 @@ export function formatGlobalRetiredNotice(notice) {
  */
 export function inspectGlobalRunnerConfig(options = {}) {
   const projectRoot = options.projectRoot ?? process.cwd();
-  const globalDir = options.globalDir ?? path.join(os.homedir(), '.fgos');
+  const globalDir = options.globalDir ?? facade.globalFgosDir();
 
   if (!fs.existsSync(globalDir)) return null;
 

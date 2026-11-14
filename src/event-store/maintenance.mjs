@@ -3,16 +3,8 @@
 // oldest unsealed age and the last push attempt), never the integrity status: no ref walk and no legacy read, so
 // it costs a directory listing and a few first-line reads on every command.
 import { spawnDetachedCli } from '../util/spawn-detached-fgos.mjs';
-import { prepareStore, readEventStoreConfig } from './index.mjs';
+import { maintainStore, readEventStoreConfig } from './index.mjs';
 import { processSealCoalescer } from './seal-coalescing.mjs';
-
-/** A sync is due when none was attempted yet, the last one went to another remote, or the last attempt is older than
- * the interval. An attempt is any sync that ran, including one that failed before its push (an offline fetch), so an
- * offline machine tries once per interval, not once per command. */
-function syncDue(config, lastAttempt, nowSec) {
-  if (config.sync.intervalSec <= 0) return false;
-  return !lastAttempt || lastAttempt.remote !== config.remote || nowSec - lastAttempt.time >= config.sync.intervalSec;
-}
 
 /** Start the one detached child that publishes for this clone; a spawn that cannot start is the trigger's error. */
 function handSyncToChild(root) {
@@ -44,16 +36,11 @@ export function maintainEventStore(cwd, { trustedMain = cwd, shutdown = false, e
   if (!main) return { error };
   const config = attempt(() => readEventStoreConfig(main));
   if (!config) return { error };
-  const store = attempt(() => prepareStore(cwd, { trustedMain: main, config: { eventStore: config } }));
-  if (!store) return { error };
-  const facts = attempt(() => store.maintenance([]));
-  if (!facts) return { error };
-  const streams = facts.streams.map((row) => row.stream);
-  if (shutdown) attempt(() => store.sealAll(streams, []));
-  else for (const stream of streams) attempt(() => store.sealIfDue(stream, config.seal.intervalSec, []));
-  if (end && !dispatched && syncDue(config, facts.lastAttempt, Date.now() / 1000)) {
-    attempt(() => handSyncToChild(main));
-  }
+  // The crate runs the policy (seal what is due, everything on shutdown, whether a publish is due); only the child is started here.
+  const outcome = attempt(() => maintainStore(cwd, { trustedMain: main, config, shutdown, end, dispatched }));
+  if (!outcome) return { error };
+  error ??= outcome.error;
+  if (outcome.syncDue) attempt(() => handSyncToChild(main));
   return { error };
 }
 

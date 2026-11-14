@@ -6,8 +6,8 @@
 // (trust boundary §6.2.1, error confinement-backend-registry-forbidden).
 
 import fs from 'node:fs';
-import os from 'node:os';
 import path from 'node:path';
+import { globalFgosDir } from '../../../config/facade.mjs';
 import { bwrapDriver } from './drivers/bwrap.mjs';
 import { resolveConfinementTempRoot, canonicalRoot } from './cleanup.mjs';
 
@@ -187,7 +187,7 @@ export function rejectProjectBackendOverride(projectConfig, label = 'project con
 export function resolveMachineBackendRegistryPath() {
   return (
     process.env.FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH ||
-    path.join(os.homedir(), '.fgos', 'confinement-backends.json')
+    path.join(globalFgosDir(), 'confinement-backends.json')
   );
 }
 

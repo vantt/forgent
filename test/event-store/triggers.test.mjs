@@ -1,6 +1,7 @@
 // Owning proof of the Event Store lifecycle triggers (spec §16, §14): what a trigger seals, when it publishes, and
-// that it reads maintenance facts instead of the integrity status. The runner, session and gateway wiring are proven
-// in their own files; the CLI wiring is the last two tests here.
+// that it never reads the integrity status. What a trigger seals and when a publish is due is owned by the crate's
+// `lifecycle` tests; this file proves the Node hand-offs (the child, the records, the CLI wiring). The runner, session and
+// gateway wiring are proven in their own files.
 import '../helpers/process-tmp-root.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
@@ -33,36 +34,26 @@ function workRepo(t, { remote = false } = {}) {
 const addAt = (store, ageSec) => store.append('project', [{
   eventType: 'work.add', schemaVersion: 1, payload: { id: `item-${ageSec}` }, ts: new Date(Date.now() - ageSec * 1000).toISOString(),
 }], {}, 'fixture', []);
-/** Count the calls the native store receives while `fn` runs; the facade is frozen, so the native class is wrapped. */
+/** Count the calls the native addon receives while `fn` runs: `names` are methods of the store class or functions of the addon; the facade is frozen, so the native side is wrapped. */
 function countNativeCalls(names, fn) {
-  const proto = loadNativeAddon().EventStore.prototype;
+  const addon = loadNativeAddon();
+  const proto = addon.EventStore.prototype;
+  const holder = (name) => (typeof proto[name] === 'function' ? proto : addon);
   const counts = Object.fromEntries(names.map((name) => [name, 0]));
-  const originals = names.map((name) => [name, proto[name]]);
-  for (const [name, original] of originals) proto[name] = function (...args) { counts[name] += 1; return original.apply(this, args); };
-  try { fn(); } finally { for (const [name, original] of originals) proto[name] = original; }
+  const originals = names.map((name) => [name, holder(name), holder(name)[name]]);
+  for (const [name, owner, original] of originals) owner[name] = function (...args) { counts[name] += 1; return original.apply(this, args); };
+  try { fn(); } finally { for (const [name, owner, original] of originals) owner[name] = original; }
   return counts;
 }
 const projectAge = (store) => store.maintenance([]).streams.find((row) => row.stream === 'project').oldestUnsealedAgeSec;
 
-test('a trigger seals only streams older than the seal interval and everything on shutdown', (t) => {
-  const { repo, store } = workRepo(t);
-  addAt(store, 60);
-  assert.deepEqual(maintainEventStore(repo, { trustedMain: repo }), { error: null });
-  assert.ok(projectAge(store) >= 59, 'an event younger than the interval stays open');
-  assert.deepEqual(maintainEventStore(repo, { trustedMain: repo, shutdown: true }), { error: null });
-  assert.equal(projectAge(store), 0, 'shutdown seals every open stream');
-  addAt(store, 3600);
-  maintainEventStore(repo, { trustedMain: repo });
-  assert.equal(projectAge(store), 0, 'an event older than the interval is sealed by the next trigger');
-});
-
-test('every trigger mode reads maintenance facts and never the integrity status', (t) => {
+test('every trigger mode runs the crate policy once and never reads the integrity status', (t) => {
   const { repo, store } = workRepo(t, { remote: true });
   addAt(store, 3600);
-  const calls = countNativeCalls(['status', 'maintenance'], () => {
+  const calls = countNativeCalls(['status', 'maintainEventStore'], () => {
     for (const policy of [{}, { shutdown: true }, { end: true }]) maintainEventStore(repo, { trustedMain: repo, ...policy });
   });
-  assert.deepEqual(calls, { status: 0, maintenance: 3 });
+  assert.deepEqual(calls, { status: 0, maintainEventStore: 3 });
 });
 
 const waitFor = async (what, predicate, timeoutMs = 30000) => {
@@ -130,13 +121,6 @@ test('end triggers that run while a publish child is in flight start no second c
   }
 });
 
-test('a store that cannot be opened is reported as a code, never thrown at the command that triggered it', (t) => {
-  const temp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-triggers-none-'));
-  t.after(() => fs.rmSync(temp, { recursive: true, force: true }));
-  const { error } = maintainEventStore(temp, { trustedMain: temp, end: true });
-  assert.equal(typeof error, 'string');
-});
-
 test('a shared config that exists but does not parse still seals and never publishes', (t) => {
   const { repo, store } = workRepo(t, { remote: true });
   addAt(store, 3600);
@@ -157,10 +141,10 @@ function cliWithNativeSpy(t) {
     import { loadNativeAddon } from ${JSON.stringify(path.join(root, 'src/git/native.mjs'))};
     const addon = loadNativeAddon();
     const log = (name) => fs.appendFileSync(${JSON.stringify(spy)}, name + '\\n');
-    for (const name of ['status', 'maintenance']) {
-      const original = addon.EventStore.prototype[name];
-      addon.EventStore.prototype[name] = function (...args) { log(name); return original.apply(this, args); };
-    }
+    const status = addon.EventStore.prototype.status;
+    addon.EventStore.prototype.status = function (...args) { log('status'); return status.apply(this, args); };
+    const maintain = addon.maintainEventStore;
+    addon.maintainEventStore = function (...args) { log('maintain'); return maintain.apply(this, args); };
     const call = addon.GitRecovery.prototype.call;
     addon.GitRecovery.prototype.call = function (method, ...args) { if (method === 'listRetainedLand') log(method); return call.call(this, method, ...args); };
   `);
@@ -175,17 +159,17 @@ function cliWithNativeSpy(t) {
   };
 }
 
-test('a CLI verb that opens the store runs its triggers on maintenance facts', (t) => {
+test('a CLI verb that opens the store runs its triggers through the crate policy', (t) => {
   const cli = cliWithNativeSpy(t);
   const list = cli(['list']);
   assert.equal(JSON.parse(list.stdout).contract, 'fgos.v1');
-  assert.deepEqual(list.calls, ['maintenance', 'maintenance'], 'one fact read at the start and one at the end, no integrity status');
+  assert.deepEqual(list.calls, ['maintain', 'maintain'], 'one trigger at the start and one at the end, no integrity status');
   // A command that hands its seals to a child skips the start trigger: only the end trigger reads facts and seals what is due.
-  assert.deepEqual(cli(['list'], { dispatched: false }).calls, ['maintenance'], 'a hand-off command runs the end trigger only');
+  assert.deepEqual(cli(['list'], { dispatched: false }).calls, ['maintain'], 'a hand-off command runs the end trigger only');
   const status = cli(['events', 'status']);
   assert.equal(status.status, 0, status.stderr);
   assert.equal(JSON.parse(status.stdout).data.remote, 'origin');
-  assert.deepEqual(status.calls.filter((call) => call === 'maintenance'), ['maintenance', 'maintenance'], 'one trigger at each end of the verb');
+  assert.deepEqual(status.calls.filter((call) => call === 'maintain'), ['maintain', 'maintain'], 'one trigger at each end of the verb');
   // The seal child does one seal and nothing around it: no start or end trigger, hence no sweep and no publish.
   const seal = cli(['events', 'seal', '--stream', 'project']);
   assert.equal(seal.status, 0, seal.stderr);

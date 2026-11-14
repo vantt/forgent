@@ -1,5 +1,5 @@
 //! Marshaling only: the Event Store owns validation, locking and persistence.
-use crate::{check, driver_for, error, operation};
+use crate::{check, error, resolve_failure};
 use fgos_event_store::{
     append,
     identity::StoreIdentity,
@@ -7,7 +7,7 @@ use fgos_event_store::{
     open_read,
     registry::Registry,
 };
-use fgos_git::{plain_path, GitDriver, Inspect, RepoHandle, ResolveRepo};
+use fgos_git::{plain_path, GitDriver, RepoHandle};
 use napi::{bindgen_prelude::External, Error, Result};
 use napi_derive::napi;
 use serde::Deserialize;
@@ -19,8 +19,8 @@ use std::{
 
 fn available() -> Result<()> {
     check()?;
-    if !cfg!(target_os = "linux") {
-        return Err(error("event-store-unsupported-platform"));
+    if !fgos_event_store::lifecycle::platform_supported() {
+        return Err(error(fgos_event_store::lifecycle::UNSUPPORTED_PLATFORM));
     }
     Ok(())
 }
@@ -187,25 +187,17 @@ pub fn resolve_event_store(
     detached: Option<bool>,
 ) -> Result<EventStoreRoot> {
     available()?;
-    let driver = driver_for(&state_root, detached)?;
-    let repo = match driver
-        .resolve_repo(Path::new(&cwd), Path::new(&trusted_main))
-        .map_err(operation)?
-    {
-        ResolveRepo::Repository(repo) => repo,
-        ResolveRepo::NotARepository => return Err(error("event-store-no-repository")),
-    };
-    let config = driver.machine_id(&repo).map_err(operation)?;
-    let config = config
-        .as_ref()
-        .map(|f| std::str::from_utf8(&f.value).map_err(error))
-        .transpose()?;
-    let machine =
-        fgos_event_store::identity::machine_id(config, Path::new(&state_root)).map_err(error)?;
+    let resolved = fgos_event_store::resolve::resolve(
+        Path::new(&cwd),
+        Path::new(&state_root),
+        Path::new(&trusted_main),
+        detached.unwrap_or(false),
+    )
+    .map_err(resolve_failure)?;
     Ok(EventStoreRoot {
-        driver: Arc::new(driver),
-        repo: Arc::new(repo),
-        machine,
+        driver: resolved.driver,
+        repo: resolved.repo,
+        machine: resolved.machine,
     })
 }
 #[napi]
@@ -544,14 +536,13 @@ pub fn event_store_facts(
     detached: Option<bool>,
 ) -> Result<Value> {
     available()?;
-    let driver = driver_for(&state_root, detached)?;
-    let repo = match driver
-        .resolve_repo(Path::new(&cwd), Path::new(&trusted_main))
-        .map_err(operation)?
-    {
-        ResolveRepo::Repository(repo) => repo,
-        ResolveRepo::NotARepository => return Err(error("event-store-no-repository")),
-    };
+    let (driver, repo) = fgos_event_store::resolve::resolve_repo(
+        Path::new(&cwd),
+        Path::new(&state_root),
+        Path::new(&trusted_main),
+        detached.unwrap_or(false),
+    )
+    .map_err(resolve_failure)?;
     fgos_event_store::diagnostics::facts(&driver, &repo, Path::new(&state_root), &remote)
         .map_err(error)
 }
@@ -616,4 +607,59 @@ impl EventStore {
 pub fn event_store_branch_key(branch: String) -> Result<String> {
     available()?;
     fgos_event_store::layout::branch_key(&branch).map_err(error)
+}
+
+#[napi(object)]
+pub struct MaintainRequest {
+    pub cwd: String,
+    pub trusted_main: String,
+    pub state_root: String,
+    /// The `eventStore` timers the caller read through the config door.
+    pub remote: String,
+    pub seal_interval_sec: f64,
+    pub sync_interval_sec: f64,
+    pub shutdown: bool,
+    pub end: bool,
+    pub dispatched: bool,
+    pub held_ranks: Vec<u32>,
+    pub hot_lock_depth: u32,
+}
+
+fn seconds(value: f64, what: &str) -> Result<u64> {
+    if value.is_finite() && value >= 0.0 && value.fract() == 0.0 && value <= 9007199254740991.0 {
+        Ok(value as u64)
+    } else {
+        Err(error(format!("event-store-config: invalid {what}")))
+    }
+}
+
+/// The lifecycle trigger of one store: seals what is due (everything on shutdown) and says whether a publish is due.
+/// `{ error, syncDue }`; `error` is the code of the first step that failed, and the caller starts the publish child.
+#[napi]
+pub fn maintain_event_store(request: MaintainRequest) -> Result<Value> {
+    check()?;
+    let timers = fgos_event_store::lifecycle::Timers {
+        remote: request.remote,
+        seal_interval_sec: seconds(request.seal_interval_sec, "seal.intervalSec")?,
+        sync_interval_sec: seconds(request.sync_interval_sec, "sync.intervalSec")?,
+    };
+    let now_sec = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .map_err(error)?
+        .as_secs_f64();
+    let outcome = fgos_event_store::lifecycle::maintain(&fgos_event_store::lifecycle::Request {
+        cwd: Path::new(&request.cwd),
+        trusted_main: Path::new(&request.trusted_main),
+        state_root: Path::new(&request.state_root),
+        timers: &timers,
+        policy: fgos_event_store::lifecycle::Policy {
+            shutdown: request.shutdown,
+            end: request.end,
+            dispatched: request.dispatched,
+        },
+        held_ranks: &request.held_ranks,
+        hot_lock_depth: request.hot_lock_depth,
+        now_sec,
+    });
+    Ok(json!({"error": outcome.error, "syncDue": outcome.sync_due}))
 }

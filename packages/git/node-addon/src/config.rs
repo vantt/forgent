@@ -12,6 +12,7 @@ use std::sync::{Mutex, PoisonError};
 
 use fgos_config::cache::{machine_cached, snapshot_cached, SnapshotCache};
 use fgos_config::detect::{Detectors, NoDetectors, PathDetectors};
+use fgos_config::event_store::{EventStoreConfig, Invalid};
 use fgos_config::machine::{self, accounts};
 use fgos_config::snapshot::{AccountsState, Context, SessionClass, Snapshot};
 use fgos_config::snapshot::{SnapshotError, SnapshotRequest};
@@ -45,6 +46,12 @@ struct Request {
     acknowledge: bool,
     target: Option<String>,
     path: Option<String>,
+    /// `eventStoreConfig`: the config object whose `eventStore` section is validated.
+    config: Option<Value>,
+    /// `eventStore`: a refused config file reaches the caller instead of degrading to a config that never publishes.
+    strict: bool,
+    /// `globalDir`: the home variables of the caller's environment.
+    env: Option<std::collections::HashMap<String, String>>,
 }
 
 fn detailed(id: &str, more: More) -> Failure {
@@ -228,6 +235,16 @@ type Slot = ((SnapshotRequest, bool), SnapshotCache);
 /// cache, the least recently used slot out first. A slot is one request; the cache itself keys on what the
 /// files and the detectors read, so a hit is never stale.
 fn cached(req: &SnapshotRequest, machine: bool, ctx: &Context, a: &Request) -> Res<Value> {
+    with_snapshot(req, machine, ctx, |held| render(held.map_err(Failure::from)?, a))
+}
+
+/// `read` over the snapshot the cache holds for `req`, or the error reading it gave.
+fn with_snapshot<T>(
+    req: &SnapshotRequest,
+    machine: bool,
+    ctx: &Context,
+    read: impl FnOnce(std::result::Result<&Snapshot, SnapshotError>) -> Res<T>,
+) -> Res<T> {
     static CACHE: Mutex<Vec<Slot>> = Mutex::new(Vec::new());
     let mut slots = CACHE.lock().unwrap_or_else(PoisonError::into_inner);
     let key = (req.clone(), machine);
@@ -245,7 +262,7 @@ fn cached(req: &SnapshotRequest, machine: bool, ctx: &Context, a: &Request) -> R
     } else {
         snapshot_cached(cache, ctx, req)
     };
-    render(held.map_err(Failure::from)?, a)
+    read(held)
 }
 
 /// The effective value now. With a project root: project over global over standard (accounts when
@@ -283,6 +300,70 @@ pub fn accounts_entry(args: Value) -> Result<String> {
         Ok(
             json!({ "present": view.present, "state": accounts_name(view.state), "revision": view.revision, "runner": view.value.get("runner") }),
         )
+    })
+}
+
+fn event_store_json(config: &EventStoreConfig) -> Value {
+    json!({
+        "remote": config.remote,
+        "seal": { "intervalSec": config.seal_interval_sec, "coalesceSec": config.seal_coalesce_sec },
+        "sync": { "intervalSec": config.sync_interval_sec },
+        "rebuild": { "maxAttempts": config.rebuild_max_attempts },
+    })
+}
+
+impl From<Invalid> for Failure {
+    fn from(Invalid(name): Invalid) -> Failure {
+        failure("event-store-config", name)
+    }
+}
+
+/// The `eventStore` section of an in-memory config object, validated over the bundled standard: `{ config }`, the
+/// object whose `eventStore` key is read (absent means every default). Answers every key of the section.
+#[napi(namespace = "config", js_name = "eventStoreConfig")]
+pub fn event_store_config_entry(args: Value) -> Result<String> {
+    entry(args, |a| {
+        let ctx = context(&NoDetectors)?;
+        let config = a.config.as_ref().ok_or_else(|| invalid("config"))?;
+        Ok(event_store_json(&EventStoreConfig::from_section(
+            config.get("eventStore"),
+            &ctx,
+        )?))
+    })
+}
+
+/// The `eventStore` section the config files of a project give: `{ projectRoot, globalDir, class, strict? }`. A refused
+/// file never yields the defaults for a publish decision: a `strict` caller, or a refusal that names an `eventStore`
+/// value, gets the refusal; any other caller gets a config that never publishes (`sync.intervalSec` 0).
+#[napi(namespace = "config", js_name = "eventStore")]
+pub fn event_store_entry(args: Value) -> Result<String> {
+    entry(args, |a| {
+        a.project()?;
+        let detectors = on_path();
+        let ctx = context(&detectors)?;
+        let roots = a.roots(true)?;
+        with_snapshot(&roots, false, &ctx, |held| match held {
+            Ok(snapshot) => Ok(event_store_json(&EventStoreConfig::from_section(
+                snapshot.value.get("eventStore"),
+                &ctx,
+            )?)),
+            Err(error) => match EventStoreConfig::when_refused(&error, a.strict, &ctx) {
+                Some(degraded) => Ok(event_store_json(&degraded)),
+                None => Err(error.into()),
+            },
+        })
+    })
+}
+
+/// Where the global fgOS directory is: `{ env }`, the caller's home variables (`HOME`, `USERPROFILE`); the crate decides
+/// which one counts. A home that is unset or blank is `config-io` with the keyword `HomeUnset`.
+#[napi(namespace = "config", js_name = "globalDir")]
+pub fn global_dir_entry(args: Value) -> Result<String> {
+    entry(args, |a| {
+        let env = a.env.unwrap_or_default();
+        let dir = machine::global_dir(|name| env.get(name).cloned())
+            .ok_or_else(|| failure("config-io", "HomeUnset"))?;
+        Ok(Value::String(dir.to_string_lossy().into_owned()))
     })
 }
 

@@ -28,11 +28,11 @@ function ownRelease(bin) {
       && fs.realpathSync(path.join(found.releaseRoot, payload)) === fs.realpathSync(OWN_PAYLOAD_ROOT) ? found : null;
   } catch { return null; }
 }
-/** Whether `versions()` of an addon names every namespace this payload calls, each at the version it needs: `config` 3 is
- * the first with `snapshot`, `init` and `standardValue`, so an addon from before them fails by name instead of at its first call; `holderLock` 2 and `sessionIdentity` 2 add `killWaitMs` and `sharedDirectory`; `agentProtocol` 1 is the first with `classifyDirect`. */
+/** Whether `versions()` of an addon names every namespace this payload calls, each at the version it needs: `config` 4 is
+ * the first with `eventStore`, `eventStoreConfig` and `globalDir` (3 added `snapshot`, `init` and `standardValue`), so an addon from before them fails by name instead of at its first call; `holderLock` 2 and `sessionIdentity` 2 add `killWaitMs` and `sharedDirectory`; `agentProtocol` 1 is the first with `classifyDirect`. */
 export const combinedAbiMatches = (v, napiVersion) => v.napi === napiVersion && typeof v.git === 'string' && typeof v.eventStore === 'string'
   && typeof v.process === 'number' && typeof v.durableFile === 'string' && typeof v.canonicalJson === 'number' && v.holderLock >= 2
-  && v.sessionIdentity >= 2 && typeof v.yaml === 'number' && v.config >= 3 && typeof v.runResult === 'number' && typeof v.agentProtocol === 'number';
+  && v.sessionIdentity >= 2 && typeof v.yaml === 'number' && v.config >= 4 && typeof v.runResult === 'number' && typeof v.agentProtocol === 'number';
 /** Load the addon named by `descriptor`, else this payload's own release: FGOS_HOST_BIN, then the cwd's activation.
  * `hostBin: null` skips the host lookups. A second, different file in one process is refused by name. */
 export function loadNativeAddon({ hostBin, descriptor } = {}) {
