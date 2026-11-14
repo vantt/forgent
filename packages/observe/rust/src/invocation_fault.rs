@@ -15,7 +15,7 @@
 //!   so a record goes to the resolved store, else to the main checkout's existing
 //!   store, else nowhere.
 
-use fgos_identity::resolve_current;
+use fgos_identity::{resolve_current, WriterIdentity};
 use serde_json::{json, Value};
 use std::fs::{self, OpenOptions};
 use std::io::{self, Write};
@@ -228,6 +228,16 @@ fn append_capped(log: &Path, record: &Value) -> io::Result<()> {
 /// The writer identity comes from the identity crate and cannot fail here, so the
 /// record never carries the Node side's `writerError`.
 pub fn record(input: &FaultInput<'_>) -> Option<PathBuf> {
+    record_with(input, &resolve_current)
+}
+
+/// [`record`] with the writer identity taken from `identify`, which receives the
+/// resolved store. The production door passes [`resolve_current`]; a caller that
+/// must not depend on the process environment passes its own resolution.
+pub fn record_with(
+    input: &FaultInput<'_>,
+    identify: &dyn Fn(Option<&Path>) -> WriterIdentity,
+) -> Option<PathBuf> {
     if input.fault_class.is_empty() {
         return None;
     }
@@ -240,7 +250,7 @@ pub fn record(input: &FaultInput<'_>) -> Option<PathBuf> {
         "message": redact_message(input.message, input.argv, input.sub),
         "cwd": input.cwd.to_string_lossy(),
         "argv": argv_shape(input.argv, input.sub),
-        "writer": resolve_current(store),
+        "writer": identify(store),
     });
     append_capped(&log, &record).ok()?;
     Some(log)
@@ -249,7 +259,17 @@ pub fn record(input: &FaultInput<'_>) -> Option<PathBuf> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use fgos_identity::{resolve, ProcStat, ProcessTree};
     use std::sync::atomic::{AtomicU32, Ordering};
+
+    /// A process table with no processes: the identity under test comes from the
+    /// injected lookup alone, never from the machine running the test.
+    struct NoProcesses;
+    impl ProcessTree for NoProcesses {
+        fn stat(&self, _pid: u32) -> Option<ProcStat> {
+            None
+        }
+    }
 
     fn vectors() -> Value {
         let path = Path::new(env!("CARGO_MANIFEST_DIR"))
@@ -335,15 +355,26 @@ mod tests {
         let root = scratch();
         fs::create_dir_all(root.join(".fgos")).unwrap();
         let argv = ["work", "add", "--api-key", "sk-live-0123456789abcdef"].map(String::from);
-        let written = record(&FaultInput {
-            fgos_dir: Some(&root.join(".fgos")),
-            cwd: &root,
-            verb: Some("work"),
-            sub: Some("add"),
-            fault_class: "arg-parse",
-            message: "bad call",
-            argv: &argv,
-        })
+        let identify = |dir: Option<&Path>| {
+            resolve(
+                &|key| (key == "CLAUDE_CODE_SESSION_ID").then(|| "session-under-test".to_string()),
+                &NoProcesses,
+                1,
+                dir,
+            )
+        };
+        let written = record_with(
+            &FaultInput {
+                fgos_dir: Some(&root.join(".fgos")),
+                cwd: &root,
+                verb: Some("work"),
+                sub: Some("add"),
+                fault_class: "arg-parse",
+                message: "bad call",
+                argv: &argv,
+            },
+            &identify,
+        )
         .expect("the store exists, so the record lands");
         let text = fs::read_to_string(&written).unwrap();
         assert!(!text.contains("sk-live"));
@@ -351,8 +382,10 @@ mod tests {
         let keys: Vec<String> = value.keys().cloned().collect();
         assert_eq!(keys, strings(&vectors()["recordKeyOrder"]));
         assert_eq!(value["argv"], json!(["work", "add", "--api-key", "<24>"]));
-        assert!(value["writer"]["id"].is_string());
-        assert!(value["writer"]["source"].is_string());
+        assert_eq!(
+            value["writer"],
+            json!({"id": "session-under-test", "source": "env"})
+        );
         fs::remove_dir_all(&root).unwrap();
     }
 
