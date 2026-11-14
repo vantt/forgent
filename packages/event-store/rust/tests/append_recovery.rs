@@ -469,6 +469,41 @@ fn vanished_closed_segment_is_recorded_and_gate_requires_catch_up() {
     );
 }
 #[test]
+fn append_recovery_survives_a_seal_that_removes_the_newest_closed_segment_after_it_was_listed() {
+    struct Seal<'a>(&'a Repo);
+    impl FileSystem for Seal<'_> {
+        fn checkpoint(&self, p: Point) -> io::Result<()> {
+            let paths = self.0.layout.stream(&self.0.stream);
+            let segment = paths.segment(1, 3).unwrap();
+            if p == Point::AfterClosedList && segment.exists() {
+                // Seal's order without the append lock: durable receipt, then delete.
+                hint(&paths.sealed(), 3);
+                fs::remove_file(segment)?;
+            }
+            Ok(())
+        }
+    }
+    let r = Repo::new();
+    r.append(3);
+    rotate(&r.layout, "test-aa2345", &r.stream, &[]).unwrap();
+    let appended = append_with_fs(
+        &r.layout,
+        &r.registry,
+        AppendRequest {
+            stream: &r.stream,
+            events: &inputs(1),
+            cursor: &Positions::new(),
+            writer: "writer",
+            machine: "test-aa2345",
+            held_ranks: &[],
+        },
+        &Seal(&r),
+    )
+    .unwrap();
+    assert_eq!(appended.ack.first_seq, 4);
+}
+
+#[test]
 fn one_batch_write_contains_marker_and_a_short_write_never_acknowledges() {
     use std::io::Write;
     struct Short(std::cell::Cell<usize>);
