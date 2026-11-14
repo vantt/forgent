@@ -1,0 +1,389 @@
+{
+  "description": "argv vectors for the CLI argument parser. Each row: the tokens after the binary name, the flags and positionals every parser must return. Readers: the Node parser (test/cli/parse-args-vectors.test.mjs) and the Rust parser (packages/host-runtime/rust/src/cli_args.rs tests). A flag maps to true (bare), a string, or a list (the repeatable flags context-ref and param).",
+  "rows": [
+    {
+      "name": "flag before the sub-verb with a value",
+      "argv": [
+        "--dir",
+        "/x",
+        "start"
+      ],
+      "flags": {
+        "dir": "/x"
+      },
+      "positional": [
+        "start"
+      ]
+    },
+    {
+      "name": "a bare-looking flag before the sub-verb takes it as its value",
+      "argv": [
+        "--json",
+        "start"
+      ],
+      "flags": {
+        "json": "start"
+      },
+      "positional": []
+    },
+    {
+      "name": "boolean flag swallows nothing when the next token is a flag",
+      "argv": [
+        "--json",
+        "--dir",
+        "/x",
+        "start"
+      ],
+      "flags": {
+        "json": true,
+        "dir": "/x"
+      },
+      "positional": [
+        "start"
+      ]
+    },
+    {
+      "name": "equals form is part of the flag name and still takes the next token",
+      "argv": [
+        "--dir=/x",
+        "start"
+      ],
+      "flags": {
+        "dir=/x": "start"
+      },
+      "positional": []
+    },
+    {
+      "name": "valued flag whose value looks like a sub-verb",
+      "argv": [
+        "--dir",
+        "start",
+        "status"
+      ],
+      "flags": {
+        "dir": "start"
+      },
+      "positional": [
+        "status"
+      ]
+    },
+    {
+      "name": "help word after --help is its value",
+      "argv": [
+        "--help",
+        "start"
+      ],
+      "flags": {
+        "help": "start"
+      },
+      "positional": []
+    },
+    {
+      "name": "bare --help",
+      "argv": [
+        "--help"
+      ],
+      "flags": {
+        "help": true
+      },
+      "positional": []
+    },
+    {
+      "name": "short help is a positional",
+      "argv": [
+        "-h"
+      ],
+      "flags": {},
+      "positional": [
+        "-h"
+      ]
+    },
+    {
+      "name": "short help as a flag value",
+      "argv": [
+        "--dir",
+        "-h"
+      ],
+      "flags": {
+        "dir": "-h"
+      },
+      "positional": []
+    },
+    {
+      "name": "short help after a verb",
+      "argv": [
+        "start",
+        "-h"
+      ],
+      "flags": {},
+      "positional": [
+        "start",
+        "-h"
+      ]
+    },
+    {
+      "name": "bare --opportunistic",
+      "argv": [
+        "--opportunistic"
+      ],
+      "flags": {
+        "opportunistic": true
+      },
+      "positional": []
+    },
+    {
+      "name": "opportunistic equals false is a separate name",
+      "argv": [
+        "--opportunistic=false"
+      ],
+      "flags": {
+        "opportunistic=false": true
+      },
+      "positional": []
+    },
+    {
+      "name": "opportunistic with a word takes it as value",
+      "argv": [
+        "--opportunistic",
+        "x"
+      ],
+      "flags": {
+        "opportunistic": "x"
+      },
+      "positional": []
+    },
+    {
+      "name": "action as a value",
+      "argv": [
+        "--dir",
+        "--action",
+        "x"
+      ],
+      "flags": {
+        "dir": true,
+        "action": "x"
+      },
+      "positional": []
+    },
+    {
+      "name": "action flag with value",
+      "argv": [
+        "workflow",
+        "--action",
+        "go"
+      ],
+      "flags": {
+        "action": "go"
+      },
+      "positional": [
+        "workflow"
+      ]
+    },
+    {
+      "name": "trailing --dir is boolean",
+      "argv": [
+        "start",
+        "--dir"
+      ],
+      "flags": {
+        "dir": true
+      },
+      "positional": [
+        "start"
+      ]
+    },
+    {
+      "name": "empty dir equals form takes the next token",
+      "argv": [
+        "--dir=",
+        "start"
+      ],
+      "flags": {
+        "dir=": "start"
+      },
+      "positional": []
+    },
+    {
+      "name": "empty string value is taken",
+      "argv": [
+        "--dir",
+        "",
+        "start"
+      ],
+      "flags": {
+        "dir": ""
+      },
+      "positional": [
+        "start"
+      ]
+    },
+    {
+      "name": "empty string token is positional",
+      "argv": [
+        "",
+        "start"
+      ],
+      "flags": {},
+      "positional": [
+        "",
+        "start"
+      ]
+    },
+    {
+      "name": "double dash alone is the empty flag name",
+      "argv": [
+        "--",
+        "a"
+      ],
+      "flags": {
+        "": "a"
+      },
+      "positional": []
+    },
+    {
+      "name": "double dash at the end is the empty flag name",
+      "argv": [
+        "a",
+        "--"
+      ],
+      "flags": {
+        "": true
+      },
+      "positional": [
+        "a"
+      ]
+    },
+    {
+      "name": "repeated flag last wins",
+      "argv": [
+        "--dir",
+        "/a",
+        "--dir",
+        "/b"
+      ],
+      "flags": {
+        "dir": "/b"
+      },
+      "positional": []
+    },
+    {
+      "name": "repeated flag last bare wins over value",
+      "argv": [
+        "--dir",
+        "/a",
+        "--dir"
+      ],
+      "flags": {
+        "dir": true
+      },
+      "positional": []
+    },
+    {
+      "name": "repeatable context-ref collects",
+      "argv": [
+        "--context-ref",
+        "a",
+        "--context-ref",
+        "b"
+      ],
+      "flags": {
+        "context-ref": [
+          "a",
+          "b"
+        ]
+      },
+      "positional": []
+    },
+    {
+      "name": "repeatable param collects bare and valued",
+      "argv": [
+        "--param",
+        "k=v",
+        "--param",
+        "--json"
+      ],
+      "flags": {
+        "param": [
+          "k=v",
+          true
+        ],
+        "json": true
+      },
+      "positional": []
+    },
+    {
+      "name": "no arguments",
+      "argv": [],
+      "flags": {},
+      "positional": []
+    },
+    {
+      "name": "positionals keep order",
+      "argv": [
+        "a",
+        "--x",
+        "1",
+        "b",
+        "c"
+      ],
+      "flags": {
+        "x": "1"
+      },
+      "positional": [
+        "a",
+        "b",
+        "c"
+      ]
+    },
+    {
+      "name": "single dash value is taken",
+      "argv": [
+        "--n",
+        "-1"
+      ],
+      "flags": {
+        "n": "-1"
+      },
+      "positional": []
+    },
+    {
+      "name": "unicode token",
+      "argv": [
+        "--name",
+        "héllo",
+        "ünï"
+      ],
+      "flags": {
+        "name": "héllo"
+      },
+      "positional": [
+        "ünï"
+      ]
+    },
+    {
+      "name": "proto key is not a flag",
+      "argv": [
+        "--__proto__",
+        "x",
+        "y"
+      ],
+      "flags": {},
+      "positional": [
+        "y"
+      ]
+    },
+    {
+      "name": "equals form at the end stays boolean",
+      "argv": [
+        "start",
+        "--dir=/x"
+      ],
+      "flags": {
+        "dir=/x": true
+      },
+      "positional": [
+        "start"
+      ]
+    }
+  ]
+}
