@@ -19,7 +19,7 @@ const piSource = { kind: 'home-files', home: '/home/someone/.pi/accounts/x', fil
 const ompSource = { kind: 'home-files', home: '/home/someone/.omp/profiles/x/agent', files: ['agent.db', 'config.yml'] };
 const agySource = { kind: 'home-files', home: '/home/someone/.agy-homes/x', files: ['.gemini/antigravity-cli/antigravity-oauth-token'] };
 
-test('the call is built per credential layout, pointing the CLI at the account home', () => {
+test('the call is built per credential layout, pointing the CLI at the account home and asking for the named model', () => {
   const codex = credentialProbeCommand(codexSource);
   assert.equal(codex.command, 'codex');
   assert.equal(codex.env.CODEX_HOME, path.join(os.homedir(), '.codex-test'));
@@ -40,6 +40,17 @@ test('the call is built per credential layout, pointing the CLI at the account h
   const underHome = credentialProbeCommand({ kind: 'home-files', home: '/home/someone/.claude-homes/x', files: ['.claude/.credentials.json'] }, { noTools: true });
   assert.equal(underHome.command, 'claude');
   assert.deepEqual(underHome.env, {});
+
+  // A named model is asked for in each CLI's own spelling; none leaves the call as it was.
+  const withModel = (source, options) => credentialProbeCommand(source, { model: 'm-1', ...options }).args;
+  assert.deepEqual(withModel(codexSource).slice(0, 6), ['exec', '--skip-git-repo-check', '-s', 'read-only', '-m', 'm-1']);
+  assert.deepEqual(withModel(piSource).slice(2, 5), ['--mode', 'json', '--model']);
+  assert.ok(withModel(piSource).includes('m-1'));
+  assert.deepEqual(withModel(ompSource).slice(4, 6), ['--model', 'm-1']);
+  const claudeSource = { kind: 'home-files', home: '/home/someone/.claude-homes/x', files: ['.credentials.json'] };
+  assert.deepEqual(withModel(claudeSource, { noTools: true }), ['-p', 'Reply with the single word OK.', '--no-session-persistence', '--model', 'm-1', '--tools', '']);
+  assert.ok(!credentialProbeCommand(codexSource).args.includes('-m'));
+  assert.ok(!credentialProbeCommand(piSource).args.includes('--model'));
 });
 
 test('an omp profile (a store that carries agent.db) is probed with omp, and that wins over pi when both are listed', () => {
@@ -59,12 +70,18 @@ test('a layout fgOS cannot name, or a home that is not absolute, has no call', (
 
 test('a call is judged by exit code and by the CLI\'s last words through the agent protocol, not by the exit code alone', () => {
   const judge = (args) => judgeProbeOutput({ timedOut: false, cli: 'pi', ...args });
-  assert.deepEqual(judge({ exitCode: 0, output: 'OK' }), { ok: true });
+  assert.deepEqual(judge({ exitCode: 0, output: 'OK' }), { ok: true, reason: null, providerSignal: null });
+  assert.equal(judge({ exitCode: 0, output: 'Error: OAuth refresh failed for xai' }).reason, 'login');
+  const limited = judge({ cli: 'codex', exitCode: 1, output: "You've hit your usage limit" });
+  assert.equal(limited.reason, 'usage-limit');
+  assert.ok('providerSignal' in limited);
+  assert.equal(judge({ exitCode: 1, output: '' }).reason, null, 'a plain exit code names no reason');
+  assert.equal(judge({ exitCode: null, timedOut: true, output: '' }).reason, null);
   assert.equal(judge({ exitCode: 0, output: 'Error: OAuth refresh failed for xai' }).ok, false);
   assert.match(judge({ exitCode: 0, output: 'Error: OAuth refresh failed for xai' }).detail, /still rejected/);
   assert.match(judge({ cli: 'codex', exitCode: 1, output: "You've hit your usage limit" }).detail, /usage limit/);
   assert.match(judge({ exitCode: 1, output: 'Error: 402: {"message":"This request requires more credits"}' }).detail, /usage limit/, 'every wording the protocol reads as a used-up quota is one here too');
-  assert.deepEqual(judge({ cli: 'codex', exitCode: 0, output: "You've hit your usage limit" }), { ok: true }, 'a quota wording with a zero exit is not a failed call');
+  assert.deepEqual(judge({ cli: 'codex', exitCode: 0, output: "You've hit your usage limit" }), { ok: true, reason: null, providerSignal: null }, 'a quota wording with a zero exit is not a failed call');
   assert.match(judge({ exitCode: 1, output: '' }).detail, /code 1/);
   assert.match(judge({ exitCode: null, timedOut: true, output: '' }).detail, /in time/);
 });
@@ -73,6 +90,8 @@ test('the last JSON event of stdout names a refusal, and the provider\'s own sta
   const event = (errorStatus, errorMessage) => JSON.stringify({ type: 'message_end', message: { stopReason: 'error', errorStatus, errorMessage } });
   const quota = judgeProbeOutput({ exitCode: 1, timedOut: false, cli: 'gemini', output: event(429, 'quota exhausted'), stdout: event(429, 'quota exhausted') });
   assert.match(quota.detail, /usage limit \(HTTP 429\)/);
+  assert.equal(quota.reason, 'usage-limit');
+  assert.equal(quota.providerSignal?.status, 429);
   const refused = judgeProbeOutput({ exitCode: 1, timedOut: false, cli: 'pi', output: event(404, 'no such model'), stdout: event(404, 'no such model') });
   assert.match(refused.detail, /provider refused the call \(HTTP 404\)/);
   assert.match(judgeProbeOutput({ exitCode: 1, timedOut: false, cli: 'pi', output: event(401, 'bad key'), stdout: event(401, 'bad key') }).detail, /code 1/, 'a 401 is not read as a quota or a provider fault');
@@ -80,7 +99,7 @@ test('the last JSON event of stdout names a refusal, and the provider\'s own sta
 
 test('only the final lines of the output count: a login wording far up a long output is not a dead login', () => {
   const longLog = ['Error: OAuth refresh failed for xai', ...Array.from({ length: 8 }, (_, i) => `working ${i}`)].join('\n');
-  assert.deepEqual(judgeProbeOutput({ exitCode: 0, timedOut: false, cli: 'pi', output: longLog }), { ok: true });
+  assert.deepEqual(judgeProbeOutput({ exitCode: 0, timedOut: false, cli: 'pi', output: longLog }), { ok: true, reason: null, providerSignal: null });
   assert.equal(judgeProbeOutput({ exitCode: 0, timedOut: false, cli: 'pi', output: `${longLog}\nNo API key found for openrouter.` }).ok, false);
 });
 
@@ -105,7 +124,8 @@ test('the probe runs the planned command with the account home in its environmen
 
   const result = await probe({ account: { credentialSource: piSource } });
 
-  assert.deepEqual(result, { ok: true });
+  assert.deepEqual({ ...result, elapsedMs: undefined }, { ok: true, reason: null, providerSignal: null, exitCode: 0, timedOut: false, elapsedMs: undefined });
+  assert.ok(Number.isInteger(result.elapsedMs) && result.elapsedMs >= 0, 'the call is timed');
   assert.equal(seen[0].command, 'pi');
   assert.equal(seen[0].env.PI_CODING_AGENT_DIR, '/home/someone/.pi/accounts/x');
   assert.equal(seen[0].env.PATH, '/nonexistent-dir');
@@ -122,7 +142,7 @@ test('the omp call is started with no stdin, because omp waits for end of input 
     return child;
   };
   const result = await createCredentialProbe({ spawnFn, env: {} })({ account: { credentialSource: ompSource } });
-  assert.deepEqual(result, { ok: true });
+  assert.equal(result.ok, true);
   assert.equal(seen[0][0], 'ignore');
 });
 
@@ -180,7 +200,7 @@ test('the unlock probe call is wrapped so it ends on its own, and runs unwrapped
 
     const wrapped = fakeSpawn({ output: 'OK' });
     const result = await createCredentialProbe({ spawnFn: wrapped.spawnFn, timeoutMs: 90_500, env: { PATH: dir } })({ account: { credentialSource: piSource } });
-    assert.deepEqual(result, { ok: true });
+    assert.equal(result.ok, true);
     assert.equal(wrapped.seen[0].command, bin);
     assert.deepEqual(wrapped.seen[0].args.slice(0, 3), ['--kill-after=5', '91', 'pi']);
     assert.equal(wrapped.seen[0].env.PI_CODING_AGENT_DIR, '/home/someone/.pi/accounts/x');
