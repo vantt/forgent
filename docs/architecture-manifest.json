@@ -115,7 +115,7 @@
       "debt": [
         { "path": "packages/git/node-addon/src/single_load.rs", "reason": "takes a kernel lock of its own (Windows mutex, Unix flock) for the single-load marker instead of a holder-lock resource" }
       ],
-      "reason": "a kernel lock is taken only inside the holder-lock drivers; every other lock goes through its Resource"
+      "reason": "a kernel lock is taken only inside the holder-lock drivers; every other lock goes through its Resource. The patterns cannot see std file.lock(), try_lock() or lock_shared(), whose names are too common to match without false hits"
     },
     {
       "job": "take a holder lock from Node",
@@ -154,7 +154,7 @@
     {
       "job": "process facts: read /proc",
       "kind": "door",
-      "patterns": ["/proc/(?:self|sys|net|\\{|\\$|\\d|loadavg|meminfo)", "[\"']/proc[\"']"],
+      "patterns": ["/proc/(?:self|sys|net|\\{|\\$|\\d|loadavg|meminfo)", "[\"']/proc[\"']", "[\"'`]/proc/"],
       "allowed": [
         "packages/process/rust/src/platform/linux.rs",
         "packages/process/rust/src/containment/linux.rs",
@@ -204,7 +204,7 @@
         { "path": "src/runner/execution/seat-policy.mjs", "reason": "its own canonicalJson sorts keys by Array.sort and prints numbers with JSON.stringify, so it equals RFC 8785 only by luck; it is not an accepted exception" }
       ],
       "retiredBy": "the exceptions the component-boundary row names go when their stated reasons end (the release-manifest pair moves as one; the others when their contracts change)",
-      "reason": "RFC 8785 bytes come from one crate; each allowed exception is named with its reason in the component-boundary row for Canonical JSON"
+      "reason": "RFC 8785 bytes come from one crate; each allowed exception except run-supervisor envelope.rs (its envelope digest, not named in that row) is named with its reason in the component-boundary row for Canonical JSON"
     },
     {
       "job": "YAML parser loads",

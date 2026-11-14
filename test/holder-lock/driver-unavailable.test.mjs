@@ -107,7 +107,8 @@ test('a lock directory on a network filesystem is refused by name (guarantee non
   }
 });
 
-test('no module but the facade can take the lock door', { skip: NEEDS_HOST }, () => {
+// The static half (no Node code but the facade takes the lock) is owned by the doors row "take a holder lock from Node".
+test('a second take of the lock capability is refused by name', { skip: NEEDS_HOST }, () => {
   // The facade takes the capability on its first use; a second take, by anything else in the process, is refused by name.
   const script = `
 import * as lock from ${JSON.stringify(FACADE_URL)};
