@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "ce91de49e6e0c7a7d9821450df0e05a377b6142758b4c9786a16002338267c57",
+  "payloadDigest": "9ab55d1d051261955edf21ceba3f9c9161e62f2e66cc802e297c788539ddc913",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -94,7 +94,7 @@
     "apps/fgos/src/wiring/mailbox_config.rs": "76e56398f1ca0ccf5f794dd307729622aa247d160f2d7adaf29a8455720211cd",
     "apps/fgos/src/wiring/mailbox_hook.rs": "e58291e3e8a2cbb9a8914f56b74fcb1454565a2fb7171f3cee4dc2c68945fe53",
     "apps/fgos/src/wiring/mailbox_hook_unsupported.rs": "42f2aa9df8c530b5a1534696b2dba99e8410552598691748a6518ede830d674e",
-    "apps/fgos/src/wiring/mailbox_identity.rs": "27d48554c2c047fde3cbdb8299a12dccbcd753e5d9cd6612e101b781c9ca6676",
+    "apps/fgos/src/wiring/mailbox_identity.rs": "d3b555d77cb34d68d51d04418e578540fdaf35d56a2f2e34c2d3f99028abfe21",
     "apps/fgos/src/wiring/mailbox_ingest.rs": "7c774fd3d8a7bfdc48861dc09830f8dab949ec57c8af66a2cdf6ece50a0e8e14",
     "apps/fgos/src/wiring/mailbox_remote.rs": "f83151946e4da2566306dba622d103d5ecc2764a4b8666f5c8baa5c301353b62",
     "apps/fgos/src/wiring/mailbox_root.rs": "e04f92eaa95d71cd1273b529163f0f903b4f11f4a4de45daecdffb8748d9dbc6",
@@ -507,7 +507,7 @@
     "packages/identity/rust/tests/mint.rs": "7d6b8d12f56a4a6d01f3f88f83807efe73b9879d896d6d62038f60fd0a8c7d21",
     "packages/identity/rust/tests/project.rs": "25a1b4cc6ac4f0c3986487e3faa5d80af82260d079a9aecbc537722a422eed02",
     "packages/identity/rust/tests/register_current.rs": "25d3f540487726d1e5ccb9d115c388b3187f869a27beaff68c7ad39a988189ea",
-    "packages/identity/rust/tests/session.rs": "c90d501ef43f72d86b33cc357961e4f1f75886935c6a5b775e38a668cee0c5e5",
+    "packages/identity/rust/tests/session.rs": "465dab66fe06ed7779e25e903220a644b9fa67b6e87f2e5609eed03da42bf361",
     "packages/identity/rust/tests/shared.rs": "3c0bcb1d94d1a0486cf1fbdb382b15107b256f42fa19cbb92c551f147436bc17",
     "packages/identity/rust/tests/signing.rs": "f446d326b152189b65e11976be3bfa8902bf7f65a79db355c08514e7df3edea2",
     "packages/mailbox/rust/core/src/ack.rs": "d3b51fb0bbc5d8514f63aed9365500965fff4b0a622efb0379201b830b4f9fbc",

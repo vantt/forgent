@@ -361,11 +361,22 @@ mod tests {
             std::fs::create_dir_all(&dir).unwrap();
             let bin = dir.join("omp");
             std::os::unix::fs::symlink("/bin/sh", &bin).unwrap();
-            let child = std::process::Command::new(&bin)
-                .args(["-c", "read _"])
+            let mut child = std::process::Command::new(&bin)
+                .args(["-c", "echo up; read _"])
                 .stdin(std::process::Stdio::piped())
+                .stdout(std::process::Stdio::piped())
                 .spawn()
                 .unwrap();
+            // `spawn` returns while the child may still be the image it was forked
+            // from, named as its parent; the kernel names the new image only inside
+            // exec. The first line proves the shell runs, so its name is `omp` from here.
+            let mut up = String::new();
+            std::io::BufRead::read_line(
+                &mut std::io::BufReader::new(child.stdout.as_mut().unwrap()),
+                &mut up,
+            )
+            .unwrap();
+            assert_eq!(up, "up\n");
             Self(child, dir)
         }
 
