@@ -14,7 +14,7 @@ Landing lead for HARDEN account health B (plan `plans/261113-1257-harden-account
 | P06 unit summary v3 | `0799bd187..661148e5e` | [43515105905](https://github.com/vantt/forgent/actions/runs/43515105905) Windows assets only | [43515105924](https://github.com/vantt/forgent/actions/runs/43515105924) Windows assets only |
 | P02 receipt carries `providerSignal` | `661148e5e..77642a4cc` | [43522174684](https://github.com/vantt/forgent/actions/runs/43522174684) Windows assets only | [43522174553](https://github.com/vantt/forgent/actions/runs/43522174553) Windows assets only |
 | P04 settle: signal on the failure, quarantine dated, capacity audit log | `77642a4cc..0e951a5f0` | [43529564017](https://github.com/vantt/forgent/actions/runs/43529564017) Windows assets only | [43529563908](https://github.com/vantt/forgent/actions/runs/43529563908) Windows assets only |
-| P05 provider probes judge through the agent protocol; Node wording list retired | `0e951a5f0..` this push (report and board line ride with it) | see the board line after this landing | see the board line after this landing |
+| P05 provider probes judge through the agent protocol; Node wording list retired | `c9be6c950..032518f9b` (main also took `c4bfbd99e` rc.8 pin and two OPC board lines after P04; docs and `.fgos/distribution.json` only) | in forgent-6a report | in forgent-6a report |
 
 Every phase was replayed from its own commits only (P04 and P05 without the merge commits of P01-P03), census regenerated with `git-one-door-scan.mjs --write-census` on every census conflict (the only conflict in every pick and rebase), CHANGELOG line from the lead report under `## [Unreleased]`, plan row marked `landed`; plan `status: completed` with P05.
 
