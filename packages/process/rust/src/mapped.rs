@@ -512,14 +512,20 @@ mod posix {
                 libc::posix_spawn_file_actions_adddup2(&mut actions.0, source.as_raw_fd(), *slot)
             })?;
         }
-        // Everything else that would survive exec is closed in the child.
-        for fd in crate::control::inheritable_fds()
-            .into_iter()
-            .filter(|fd| !slots.contains(fd))
-        {
-            // SAFETY: closing a number in the child only.
-            check(unsafe { libc::posix_spawn_file_actions_addclose(&mut actions.0, fd) })?;
+        // Everything but stdio and the slots is closed by the child itself,
+        // after the dup2 actions above: the gaps below the highest slot one
+        // by one, every number above it in one `closefrom`. The set is fixed
+        // by the child's own descriptor table at that moment, not by a list
+        // read here, so a descriptor another thread of this process opens
+        // without close-on-exec while the spawn is under way cannot reach the
+        // program. The duplicated sources sit above every slot and go too.
+        for gap in (3..above).filter(|fd| !slots.contains(fd)) {
+            // SAFETY: closing a number in the child only; glibc ignores a
+            // number that is not open.
+            check(unsafe { libc::posix_spawn_file_actions_addclose(&mut actions.0, gap) })?;
         }
+        // SAFETY: the actions object is initialised; glibc 2.34 and later.
+        check(unsafe { libc::posix_spawn_file_actions_addclosefrom_np(&mut actions.0, above) })?;
         if let Some(cwd) = &request.cwd {
             let cwd = cstring(cwd.clone().into_os_string().into_vec())?;
             // SAFETY: NUL-terminated path; glibc copies it.
