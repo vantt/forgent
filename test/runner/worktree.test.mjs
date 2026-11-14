@@ -8,6 +8,7 @@ import { landRunnerItem } from '../../src/runner/merge.mjs';
 import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
+import { pathToFileURL } from 'node:url';
 import { writeProjectConfig } from '../helpers/config-fixture.mjs';
 import {
   createWorktree,
@@ -1535,6 +1536,26 @@ test('admitStoreAccess: a verb that may run is admitted, and the warning line of
   fs.rmSync(path.join(wt, '.fgos'), { recursive: true });
   const { warning } = admitStoreAccess({ verb: 'list', store: 'read', dir: path.join(wt, '.fgos'), cwd: wt });
   assert.match(warning, /^fgos: warning: .*this view may be empty/);
+});
+
+test('admitStoreAccess: an install with no Git door admits a verb that needs no store and refuses every other by name', () => {
+  const plain = fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-admit-no-door-')));
+  fs.mkdirSync(path.join(plain, '.fgos'));
+  const module = pathToFileURL(path.resolve('src/runner/worktree.mjs')).href;
+  const ask = (request) => {
+    const script = `import {admitStoreAccess} from ${JSON.stringify(module)};
+      try { console.log(JSON.stringify(admitStoreAccess(${JSON.stringify({ ...request, dir: path.join(plain, '.fgos'), cwd: plain })}))); } catch (e) { console.log(JSON.stringify({ category: e.category, faultClass: e.faultClass, message: e.message })); }`;
+    const env = { ...process.env, FGOS_ACTIVE_RELEASE_PATH: '', FGOS_ACTIVE_MANIFEST_PATH: '', FGOS_HOST_BIN: '' };
+    return JSON.parse(execFileSync(process.execPath, ['--input-type=module', '-e', script], { cwd: plain, encoding: 'utf8', env }));
+  };
+  assert.deepEqual(ask({ verb: 'help', store: 'none' }), { warning: null });
+  for (const request of [{ verb: 'list', store: 'read' }, { verb: 'submit', store: 'require', mutates: true }]) {
+    const refused = ask(request);
+    assert.equal(refused.category, 'validation', request.verb);
+    assert.equal(refused.faultClass, 'worktree-identity-unreadable', request.verb);
+    assert.match(refused.message, /git-addon-/, request.verb);
+  }
+  fs.rmSync(plain, { recursive: true, force: true });
 });
 
 test('resyncWorktree without a branch refuses a detached checkout as a validation error, and checkedOutBranch names an attached one', () => {

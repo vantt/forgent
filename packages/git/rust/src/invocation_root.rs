@@ -93,13 +93,13 @@ pub struct FactsFault {
 /// The Git read a decision makes: a directory in, its facts or a fault out.
 pub type FactsReader<'a> = &'a dyn Fn(&Path) -> Result<RepoFacts, FactsFault>;
 
-/// The repository facts of the checkout `path` sits in, through a driver on this process's fgOS state root.
+/// The repository facts of the checkout `path` sits in, through the disk-only topology check (no Git child).
 /// This is the one read both this door and store admission are built from.
 pub fn read_repo_facts(path: &Path) -> Result<RepoFacts, FactsFault> {
     let fault = |e: crate::OperationError| FactsFault { cause: e.cause };
-    Ok(match GitDriver::open_at(path).map_err(fault)? {
+    Ok(match GitDriver::topology_at(path).map_err(fault)? {
         None => RepoFacts::NotARepository,
-        Some((_driver, repo)) => RepoFacts::Repository {
+        Some(repo) => RepoFacts::Repository {
             work_tree: repo.work_tree().map(plain_path),
             trusted_main: Some(plain_path(repo.trusted_main_root())),
         },

@@ -354,6 +354,15 @@ impl GitDriver {
     pub fn trusted_root_at(path: &Path) -> Result<Option<PathBuf>> {
         Self::new(&fgos_holder_lock::state_root::state_root().0)?.trusted_root(path)
     }
+    /// The checkout facts of `path` from the disk-only topology check, with no Git child and no config or format
+    /// probe: the top level it sits in and the trusted main checkout. `None` outside a repository.
+    pub fn topology_at(path: &Path) -> Result<Option<RepoHandle>> {
+        let driver = Self::new(&fgos_holder_lock::state_root::state_root().0)?;
+        Ok(match driver.resolve_topology(path, path)? {
+            ResolveRepo::Repository(repo) => Some(repo),
+            ResolveRepo::NotARepository => None,
+        })
+    }
     pub(crate) fn trusted_root(&self, path: &Path) -> Result<Option<PathBuf>> {
         Ok(match self.resolve_topology(path, path)? {
             ResolveRepo::Repository(repo) => Some(repo.trusted_main_root),

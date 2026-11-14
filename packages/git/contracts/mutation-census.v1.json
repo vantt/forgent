@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "533f5645647ae1679823d26a19d45f0ef8734ec225c56db3180963cf471f7f4c",
+  "payloadDigest": "06537f9ab5e50c0ce78838957756726dfb11cf997a94799eedbca4dc3eb8c3f1",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -392,9 +392,9 @@
     "packages/git/node-addon/src/single_load.rs": "91190bfaa1e0476b3e65559318f7fd3475844070afaca38d72d0c3018da6d825",
     "packages/git/node-addon/src/yaml.rs": "cdb0ecd0b330966e5fd3c8e41e2069bf87722f1ac16df8363e514e9441d4432c",
     "packages/git/node-addon/tests/yaml_parts.rs": "835efdf2a4183cd1197385f318bfb370db8804ae9f4e8e500548c75fd6a3462f",
-    "packages/git/rust/src/driver.rs": "3a63b6f4217e122a9b43fc0db6976db89beb14436cd576e39065af11f261c562",
+    "packages/git/rust/src/driver.rs": "64d576d5c426860ef2dd48ca67e4fbdedc544614f723c2981990eb75a351ab90",
     "packages/git/rust/src/inspect.rs": "f01f4b4709058650ef9643c8331aa20ab69eef7353abca9769eacb8b829fa2e7",
-    "packages/git/rust/src/invocation_root.rs": "219d843b9e1b4773b65e4e19210b837dfcc659ef6299322f93897050e89d8d70",
+    "packages/git/rust/src/invocation_root.rs": "20a391b48f3c271b1661eb002e5493b6ed39960b49de1c65f8796551e3a9cd1e",
     "packages/git/rust/src/land.rs": "3397a76d1f4c00b4d1ca20a3394f445b129d59f59a031c5c9cd419665f684803",
     "packages/git/rust/src/lib.rs": "f51b330d9f207020f8adbfaccd9fe5fb44190e1cc945b3476625f0ea0a5edd7a",
     "packages/git/rust/src/native_lock.rs": "49758dea6b6d2f2abae425b31b937817b8c15174a83bf10ce33dd9046cc5139a",
@@ -2427,21 +2427,21 @@
     },
     {
       "path": "packages/git/rust/src/driver.rs",
-      "line": 1338,
+      "line": 1347,
       "spawn": "Command::new <- packages/process/rust/src/mapped.rs:226",
       "binary": "? path.to_str() .map(|text| plain_drive_path(text).unwrap_or(text).to_owned()) .ok",
       "class": "git-driver"
     },
     {
       "path": "packages/git/rust/src/driver.rs",
-      "line": 3085,
+      "line": 3094,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"
     },
     {
       "path": "packages/git/rust/src/driver.rs",
-      "line": 3396,
+      "line": 3405,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"
