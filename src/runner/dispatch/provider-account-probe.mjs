@@ -183,7 +183,9 @@ const ACCOUNT_FAULTS = new Set(['auth', 'quota']);
  * finds its own login directory mounted read-only and stops before it answers) that the account was not
  * quarantined for.
  * - healthy: every counted row answered;
- * - account-fault: every direct row is a login or quota stop (with no direct row, every counted harness row);
+ * - account-fault: every direct row is a login or quota stop and no counted harness row answered (with no direct
+ *   row, every counted harness row is a login or quota stop); a harness row that answered against dead direct
+ *   rows means the legs contradict, which is `mixed`;
  * - harness-fault: every direct row answered, some counted harness row did not;
  * - mixed: anything else; nothing-to-probe: neither leg has a row.
  */
@@ -193,7 +195,7 @@ export function accountProbeVerdict(rows) {
   const counted = [...direct, ...harness];
   if (!counted.length) return 'nothing-to-probe';
   if (counted.every((r) => r.outcome === 'ok')) return 'healthy';
-  if (direct.length ? direct.every((r) => ACCOUNT_FAULTS.has(r.outcome)) : harness.every((r) => ACCOUNT_FAULTS.has(r.outcome))) return 'account-fault';
+  if (direct.length ? direct.every((r) => ACCOUNT_FAULTS.has(r.outcome)) && !harness.some((r) => r.outcome === 'ok') : harness.every((r) => ACCOUNT_FAULTS.has(r.outcome))) return 'account-fault';
   if (direct.length && direct.every((r) => r.outcome === 'ok')) return 'harness-fault';
   return 'mixed';
 }
