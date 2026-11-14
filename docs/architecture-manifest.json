@@ -91,6 +91,20 @@
       "reason": "the host binary lookup needs the main checkout root and the .fgos directory that paths.mjs resolves through the Git port; the root resolver moves down when the project locator becomes one leaf"
     }
   ],
+  "doors": [
+    {
+      "job": "verb manifest projection",
+      "kind": "door",
+      "patterns": ["\\bpublicManifest\\("],
+      "allowed": [
+        "src/cli/command-registry.mjs",
+        { "path": "scripts/export-command-selectors.mjs", "reason": "the generator writes and drift-checks the committed manifest file from the registry projection" },
+        { "path": "bin/fgos.mjs", "reason": "the Node help prints the projection until the help verb moves to the host and this entry is removed" }
+      ],
+      "debt": [],
+      "reason": "the registry module owns the one projection of the verb manifest; the generator and the help print only call it"
+    }
+  ],
   "files": {
     "src/git/index.mjs": "infra",
     "src/git/inspect.mjs": "infra",

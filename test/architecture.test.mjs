@@ -11,6 +11,7 @@
 //       (domains/<name>/); domain A không import domain B (cross-domain siloing).
 //   (d) tier-downward — mỗi file có một tier T0-T9 (manifest.tiers, khớp tiền tố dài nhất);
 //       file tier N chỉ import tier <= N, trừ các cặp cổng có tên trong manifest.tierExceptions.
+//   (f) doors — mỗi job một cửa: tên/mẫu của job chỉ xuất hiện ở file `allowed` hoặc `debt` của row (xem checkDoors).
 //   (e) src/workflow không gọi tên cơ chế giữ worktree (cwd-lock, scope unit-custody / workflow-worktree).
 import './helpers/process-tmp-root.mjs';
 import test from 'node:test';
@@ -20,6 +21,7 @@ import { execFileSync } from 'node:child_process';
 import os from 'node:os';
 import { parseYaml } from '../src/util/yaml.mjs';
 import { lexSource } from '../scripts/lib/js-source-lexer.mjs';
+import { lexRust, rustTestRanges } from '../scripts/lib/rust-source.mjs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
@@ -1844,4 +1846,184 @@ test('the shell entry loads dispatch depth, the Land release and the decision ci
   assert.deepEqual(eager, []);
   const source = fs.readFileSync(path.join(root, 'bin/fgos.mjs'), 'utf8');
   assert.doesNotMatch(source, /^import\s[^;]*\breleaseRecordedLand\b[^;]*from/ms);
+});
+
+// ─── One door per job: manifest.doors ──────────────────────────────────────────────────────────────
+// Each row names a job, the regex patterns that mark code doing it, and the files that own it. A hit
+// anywhere else fails; `debt` lists known leaks (visible, never failing, but stale once fixed);
+// `allowed: []` retires a name; a `ratchet` row bounds a verb-wide pattern by a per-file match ceiling
+// that may only fall (a count below the ceiling is stale, so a fall lowers the ceiling in the same change).
+// The Git-spawn job is owned by scripts/git-one-door-scan.mjs and its census: no regex row duplicates it.
+//
+// Matching heuristic and its limits: product files are walked from the working tree (no Git call).
+// Patterns are JS RegExp source without flags, matched per line, so a call split across lines is missed.
+// `.mjs/.js/.cjs` text is lexed (lexSource): comments are blanked, string contents stay so an import
+// specifier can be a pattern. `.rs` text has comments blanked (lexRust) and each `#[cfg(test)]` mod/fn
+// blanked (rustTestRanges), whose brace count is fooled by a brace inside a string literal in that
+// region. `.sh/.ps1` drop lines that start with `#`. A pattern that does not compile fails the check.
+
+const DOOR_ROOTS = ['bin', 'src', 'scripts', 'apps', 'packages', '.githooks', 'core', 'domains'];
+const DOOR_EXTENSIONS = new Set(['.mjs', '.js', '.cjs', '.rs', '.sh', '.ps1']);
+const DOOR_PRUNED_DIRS = new Set(['test', 'tests', 'fixtures', 'third-party', 'upstreams', 'node_modules', 'target']);
+
+/** Product files under the door roots, relative to the repo root; excluded directories are never entered. */
+function doorFiles() {
+  const out = [];
+  const walk = (dir) => {
+    for (const entry of fs.readdirSync(path.join(root, dir), { withFileTypes: true })) {
+      const rel = `${dir}/${entry.name}`;
+      if (entry.isDirectory()) {
+        if (!DOOR_PRUNED_DIRS.has(entry.name)) walk(rel);
+      } else if (entry.isFile() && DOOR_EXTENSIONS.has(path.extname(entry.name)) && !entry.name.endsWith('.test.mjs')) {
+        out.push(rel);
+      }
+    }
+  };
+  for (const dir of DOOR_ROOTS) if (fs.existsSync(path.join(root, dir))) walk(dir);
+  return out.sort();
+}
+
+/** `source` with comments (and Rust test code) blanked, same length and line numbers as the input. */
+export function doorText(file, source) {
+  const ext = path.extname(file);
+  if (ext === '.rs') {
+    const code = lexRust(source).split('');
+    for (const [from, to] of rustTestRanges(code.join(''))) {
+      for (let k = from; k <= to && k < code.length; k++) if (code[k] !== '\n') code[k] = ' ';
+    }
+    return code.join('');
+  }
+  if (ext === '.sh' || ext === '.ps1') return source.split('\n').map((line) => (line.trimStart().startsWith('#') ? '' : line)).join('\n');
+  return lexSource(source).code;
+}
+
+function globRegex(glob) {
+  const body = glob.split(/(\*\*|\*)/).map((part) => (part === '**' ? '.*' : part === '*' ? '[^/]*' : part.replace(/[.+?^${}()|[\]\\]/g, '\\$&'))).join('');
+  return new RegExp(`^${body}$`);
+}
+
+const entryOf = (raw) => (typeof raw === 'string' ? { path: raw } : raw);
+
+/**
+ * Failures of `rows` over `files` (a Map of repo path to file text). Pure: reads nothing itself.
+ * Every message names the row's job, and the file and line where there is one.
+ */
+export function checkDoors(rows, files) {
+  const failures = [];
+  const texts = new Map([...files].map(([name, text]) => [name, doorText(name, text)]));
+  for (const row of rows) {
+    const job = row.job;
+    const fail = (message) => failures.push(`[${job}] ${message}`);
+    const regexes = [];
+    for (const source of row.patterns ?? []) {
+      try { regexes.push(new RegExp(source, 'g')); } catch (err) { fail(`pattern ${JSON.stringify(source)} does not compile: ${err.message}`); }
+    }
+    const ratchet = row.kind === 'ratchet';
+    const allowed = (row.allowed ?? []).map(entryOf);
+    const debt = (row.debt ?? []).map(entryOf);
+    const matchers = (entries) => entries.map((entry) => ({ entry, test: entry.path.includes('*') ? globRegex(entry.path) : null }));
+    const allowedM = matchers(allowed);
+    const debtM = matchers(debt);
+    const covers = ({ entry, test }, name) => (test ? test.test(name) : entry.path === name);
+
+    for (const { entry } of [...allowedM, ...debtM]) {
+      if (typeof entry.path !== 'string' || !entry.path) fail('an entry has no path');
+    }
+    for (const entry of debt) if (!entry.reason?.trim()) fail(`debt entry ${entry.path} has no reason`);
+    for (const entry of allowed) {
+      if (entry.path.startsWith('scripts/') && !entry.reason?.trim()) fail(`allowed scripts entry ${entry.path} has no reason`);
+      if (ratchet && !Number.isInteger(entry.max)) fail(`ratchet entry ${entry.path} has no integer max`);
+    }
+    for (const entry of debt) if (entry.path.startsWith('scripts/') && !entry.reason?.trim()) fail(`debt scripts entry ${entry.path} has no reason`);
+
+    const used = new Set();
+    const allowedExts = new Set();
+    for (const [name, text] of texts) {
+      const hits = [];
+      text.split('\n').forEach((line, index) => {
+        let count = 0;
+        for (const re of regexes) { re.lastIndex = 0; count += [...line.matchAll(re)].length; }
+        if (count) hits.push({ line: index + 1, count });
+      });
+      if (!hits.length) continue;
+      const total = hits.reduce((n, h) => n + h.count, 0);
+      const a = allowedM.find((m) => covers(m, name));
+      const d = debtM.find((m) => covers(m, name));
+      if (a) {
+        used.add(a);
+        allowedExts.add(path.extname(name));
+        if (ratchet && Number.isInteger(a.entry.max)) {
+          if (total > a.entry.max) fail(`${name}:${hits[0].line} ${total} matches, ceiling is ${a.entry.max}`);
+          else if (total < a.entry.max) fail(`${name} has ${total} matches, below the ceiling ${a.entry.max}: lower the ceiling (stale)`);
+        }
+      } else if (d) {
+        used.add(d);
+      } else {
+        fail(`${name}:${hits[0].line} does the job outside its door${allowed.length ? '' : ' (retired name)'}`);
+      }
+    }
+    for (const m of [...allowedM, ...debtM]) {
+      if (typeof m.entry.path === 'string' && !used.has(m)) fail(`${m.entry.path} no longer matches (stale): drop it from the row`);
+    }
+    if (allowedExts.has('.mjs') && allowedExts.has('.rs') && !row.retiredBy) fail('allows both an .mjs and an .rs file but names no retiredBy');
+  }
+  return failures;
+}
+
+test('every door row holds: patterns appear only in allowed or debt files, and no entry is stale', () => {
+  const files = new Map(doorFiles().map((file) => [file, fs.readFileSync(path.join(root, file), 'utf8')]));
+  assert.deepEqual(checkDoors(manifest.doors ?? [], files), []);
+});
+
+test('door check: a match outside allowed fails, in debt passes, and a retired name fails anywhere', () => {
+  const row = { job: 'j', kind: 'door', patterns: ['\\bfoo\\('], allowed: ['src/a.mjs'], debt: [{ path: 'src/b.mjs', reason: 'still leaks' }] };
+  const a = 'foo(1);\n';
+  assert.equal(checkDoors([row], new Map([['src/a.mjs', a], ['src/b.mjs', a]])).length, 0);
+  const out = checkDoors([row], new Map([['src/a.mjs', a], ['src/b.mjs', a], ['src/c.mjs', 'x\nfoo(2);\n']]));
+  assert.equal(out.length, 1);
+  assert.match(out[0], /\[j\] src\/c\.mjs:2/);
+  const retired = { job: 'old', kind: 'door', patterns: ['oldName'], allowed: [] };
+  assert.match(checkDoors([retired], new Map([['src/a.mjs', 'oldName();']]))[0], /\[old\] src\/a\.mjs:1.*retired name/);
+});
+
+test('door check: a stale allowed path, stale glob and stale debt entry each fail', () => {
+  const text = new Map([['src/a.mjs', 'foo(1);']]);
+  const base = { job: 'j', kind: 'door', patterns: ['foo\\('] };
+  assert.match(checkDoors([{ ...base, allowed: ['src/a.mjs', 'src/gone.mjs'] }], text).join('\n'), /src\/gone\.mjs no longer matches/);
+  assert.match(checkDoors([{ ...base, allowed: ['src/a.mjs', 'lib/**'] }], text).join('\n'), /lib\/\*\* no longer matches/);
+  assert.deepEqual(checkDoors([{ ...base, allowed: ['src/**'] }], text), []);
+  assert.match(checkDoors([{ ...base, allowed: ['src/a.mjs'], debt: [{ path: 'src/fixed.mjs', reason: 'was leaking' }] }], text).join('\n'), /src\/fixed\.mjs no longer matches/);
+});
+
+test('door check: a debt entry or a scripts entry without a reason fails, and a twin needs retiredBy', () => {
+  const base = { job: 'j', kind: 'door', patterns: ['foo\\('] };
+  const text = new Map([['src/a.mjs', 'foo(1);'], ['scripts/s.mjs', 'foo(1);']]);
+  assert.match(checkDoors([{ ...base, allowed: ['src/a.mjs'], debt: [{ path: 'scripts/s.mjs', reason: '' }] }], text).join('\n'), /debt entry scripts\/s\.mjs has no reason/);
+  assert.match(checkDoors([{ ...base, allowed: ['src/a.mjs', 'scripts/s.mjs'] }], text).join('\n'), /allowed scripts entry scripts\/s\.mjs has no reason/);
+  assert.deepEqual(checkDoors([{ ...base, allowed: ['src/a.mjs', { path: 'scripts/s.mjs', reason: 'dev tool' }] }], text), []);
+  const twin = new Map([['src/a.mjs', 'foo(1);'], ['src/a.rs', 'foo(1);']]);
+  assert.match(checkDoors([{ ...base, allowed: ['src/a.mjs', 'src/a.rs'] }], twin).join('\n'), /no retiredBy/);
+  assert.deepEqual(checkDoors([{ ...base, allowed: ['src/a.mjs', 'src/a.rs'], retiredBy: 'a later step' }], twin), []);
+});
+
+test('door check: a match in a comment passes, and a Rust test module passes while code after its closing brace fails', () => {
+  const row = { job: 'j', kind: 'door', patterns: ['foo\\('], allowed: [] };
+  assert.deepEqual(checkDoors([row], new Map([['src/a.mjs', '// foo(1)\n/* foo(2) */\n'], ['src/a.rs', '// foo(1)\n'], ['bin/a.sh', '# foo(1)\n']])), []);
+  const rs = '#[cfg(test)]\nmod tests {\n    fn t() { foo(1); }\n}\n';
+  assert.deepEqual(checkDoors([row], new Map([['src/a.rs', rs]])), []);
+  const after = checkDoors([row], new Map([['src/a.rs', `${rs}fn real() { foo(2); }\n`]]));
+  assert.equal(after.length, 1);
+  assert.match(after[0], /src\/a\.rs:5/);
+});
+
+test('door check: a ratchet count above its ceiling fails, below it is stale, and equal passes', () => {
+  const row = (max) => ({ job: 'r', kind: 'ratchet', patterns: ['foo\\('], allowed: [{ path: 'src/a.mjs', max }] });
+  const text = new Map([['src/a.mjs', 'foo(1);\nfoo(2); foo(3);\n']]);
+  assert.deepEqual(checkDoors([row(3)], text), []);
+  assert.match(checkDoors([row(2)], text).join('\n'), /3 matches, ceiling is 2/);
+  assert.match(checkDoors([row(4)], text).join('\n'), /below the ceiling 4/);
+});
+
+test('door check: a pattern that does not compile fails', () => {
+  assert.match(checkDoors([{ job: 'bad', kind: 'door', patterns: ['('], allowed: [] }], new Map()).join('\n'), /\[bad\] pattern "\(" does not compile/);
 });

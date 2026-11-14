@@ -111,7 +111,7 @@ import { createSession, endSession, listSessions, reclaimOrphanedSessions, sessi
 import { visitCount } from '../src/runner/anti-loop.mjs';
 import { DEFAULTS } from '../src/state/work.mjs';
 import { DEFAULT_DOMAIN, getDomain, stepForPhase, domainSteps, effectiveStep, resolveDomainName } from '../src/state/domain-registry.mjs';
-import { MANIFEST_SCHEMA_VERSION, COMMAND_REGISTRY, declared } from '../src/cli/command-registry.mjs';
+import { MANIFEST_SCHEMA_VERSION, COMMAND_REGISTRY, declared, publicManifest } from '../src/cli/command-registry.mjs';
 import { recordInvocationFault } from '../src/observe/invocation-fault-log.mjs';
 import { computeAwaitingContext } from '../src/state/awaiting-context.mjs';
 import { readConfig } from '../src/config/facade.mjs';
@@ -3815,28 +3815,12 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
 }
 
 // ─── --help / --help --json: machine-readable verb manifest (P37 deliverable
-// b) — mirrors `.bee/bin/bee.mjs`'s publicManifestEntries/renderHelpText/
+// b) — mirrors `.bee/bin/bee.mjs`'s manifest/renderHelpText/
 // handleHelp exactly. The manifest itself is NEVER wrapped in the fgos.v1
 // envelope (wrapEnvelope) — this is CTR001's documented exception for the
 // verb manifest: metadata about the CLI's own verb surface, not a verb's
 // data payload, the same distinction bee.mjs draws for its own
 // `--help --json`.
-
-function publicManifestEntries() {
-  return COMMAND_REGISTRY.map(({ name, invoke, description, parameters, examples, subcommands, guide, touchesState, externalEffect, paginated, deprecated }) => ({
-    name,
-    invoke,
-    description,
-    parameters,
-    examples,
-    ...(subcommands ? { subcommands } : {}),
-    ...(guide ? { guide } : {}),
-    touchesState,
-    externalEffect,
-    paginated,
-    deprecated,
-  }));
-}
 
 // A required param that can be supplied positionally (mixed) or ONLY
 // positionally (e.g. submit's text, session's sub) is never a real `--flag`
@@ -3887,7 +3871,7 @@ function renderGuide(entry) {
   ];
 }
 
-function renderHelpText(entries = publicManifestEntries()) {
+function renderHelpText(entries = publicManifest().commands) {
   // Label for touchesState+externalEffect: 'read' (both false), 'write'
   // (touches only), 'external' (effect only), or 'write+external' (both true).
   const labelFor = (touchesState, externalEffect) => {
@@ -3939,7 +3923,7 @@ function refuseHelp(message) {
 // One verb's help: its manifest entry, narrowed to one sub-verb when `sub` is
 // given. Returns false when the request is refused (already reported).
 function printVerbHelp(verb, sub, json) {
-  const entry = publicManifestEntries().find((e) => e.name === verb);
+  const entry = publicManifest().commands.find((e) => e.name === verb);
   if (!entry) {
     refuseHelp(`unknown verb "${verb}". Usage: fgos --help [<verb> [<sub>]] [--json]`);
     return false;
@@ -3984,8 +3968,7 @@ function handleHelp(args) {
     return;
   }
   if (json) {
-    const manifest = { schema_version: MANIFEST_SCHEMA_VERSION, commands: publicManifestEntries() };
-    process.stdout.write(`${JSON.stringify(manifest, null, 2)}\n`);
+    process.stdout.write(`${JSON.stringify(publicManifest(), null, 2)}\n`);
   } else {
     process.stdout.write(renderHelpText());
   }
