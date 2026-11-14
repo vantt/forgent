@@ -494,7 +494,7 @@
     "test/setup/instruction-projections.test.mjs": 0.4,
     "test/setup/instruction-registry.test.mjs": 1.8,
     "test/setup/mailbox-claude-accept.test.mjs": 0.1,
-    "test/setup/mailbox-sync-timer.test.mjs": 0.1,
+    "test/setup/managed-timer.test.mjs": 0.1,
     "test/setup/model-pool-checks.test.mjs": 2.4,
     "test/setup/observe-doctor-checks.test.mjs": 0.7,
     "test/setup/omp-natives-check.test.mjs": 0.2,
