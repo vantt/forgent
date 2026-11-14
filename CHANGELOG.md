@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v0.2.0-rc.9] - 2026-11-14
+
+- rc.9 follows rc.8 and adds: account health (the account probe with its direct leg, the scheduled probe timer, run diagnosis that tells an account fault from an infrastructure one), the host and surface layer (`fgos preflight` retired, a faster doctor, one domain catalog), the release publish fix, and fixes for races in the test and process layers (Event Store append recovery, holder-lock borrow vectors, the spawned child's descriptors, watched-run tokens, state-home removal).
+- Event Store append recovery no longer fails with an I/O error when a seal removes the newest closed segment while an append is recovering; a closed segment that vanished with no seal covering it is refused as corruption (`closed segment vanished above receipt`) instead of being skipped.
 - `dispatch.probeAccount.intervalSec` schedules `probe-account --all --record --leg direct`; `fgos doctor --fix` writes the timer (off by default).
 - An account whose last quota stop named no reset time is checked with one real call, at most once per run, before a seat uses it again: a still-exhausted account stays out, a recovered one is released early.
 - `fgos dispatch probe-account` now also calls each login of the account directly (no sandbox, no pane) and says whether the account, the harness, both or neither failed (`healthy`, `account-fault`, `harness-fault`, `mixed`); `--all` probes every account and `--record` writes what the direct call found to the capacity state and its audit log.
@@ -21,6 +25,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `fgos preflight` is retired and answers "unknown verb" like any other unknown verb. For this repository, `npm run check:before-merge` runs the same three checks (skill wrapper drift, decision citation drift, backlog reconciliation).
 - The cross-machine mail sync timer (`fgos doctor --fix`) now names only this project's installation shim or the host of its activated release, never a checkout script, a project-local install or whatever `fgos` the PATH holds, and refuses a project path, binary or remote that holds `%` or a control character.
 - `fgos doctor` probes each hook shim call once per run and asks `claude` its three plugin questions together, so the run is faster; the rows and their conditions are unchanged.
+
+### Known gaps
+
+- On Windows fgOS installs and activates, but Config, Event Store/Work and confinement are not supported yet, so `fgos doctor` is not ok there; Linux is the supported runtime.
 
 ## [v0.2.0-rc.8] - 2026-11-13
 
