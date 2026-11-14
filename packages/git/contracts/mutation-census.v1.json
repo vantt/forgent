@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "895e50f1df5d5687f63ee1db3a1fb66c2b7f2deb2a5bc2ddb8aee8abfbe24ace",
+  "payloadDigest": "87ca2c39e13d1ae5d9209de65791cf3fb06968e94c9db6d2b7b4e428e592fd38",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -388,7 +388,7 @@
     "packages/git/node-addon/src/process.rs": "58d672646727a218add432c4ba8b6e389448b56d7c13405187b2f8cb87015a2a",
     "packages/git/node-addon/src/run_result.rs": "109e68b5e695dc1bb85223e5a1db1c9837bc0c66a2e026d74f8f925eff5d46d4",
     "packages/git/node-addon/src/session_identity.rs": "c1bc366752bb49f4806fb03e0843fae645400c748f4116275faa5c6faabc1fa5",
-    "packages/git/node-addon/src/single_load.rs": "91190bfaa1e0476b3e65559318f7fd3475844070afaca38d72d0c3018da6d825",
+    "packages/git/node-addon/src/single_load.rs": "23fe7cc00220b39b3f7265806e6be0f01bc9e38b3a95c9582c72d4fccf96d313",
     "packages/git/node-addon/src/yaml.rs": "cdb0ecd0b330966e5fd3c8e41e2069bf87722f1ac16df8363e514e9441d4432c",
     "packages/git/node-addon/tests/yaml_parts.rs": "835efdf2a4183cd1197385f318bfb370db8804ae9f4e8e500548c75fd6a3462f",
     "packages/git/rust/src/driver.rs": "3a63b6f4217e122a9b43fc0db6976db89beb14436cd576e39065af11f261c562",
@@ -407,7 +407,7 @@
     "packages/git/rust/src/sequence.rs": "00ab99823a85eae69ed8acf06d1da968b016cb5ae40464394adf2aa78d015295",
     "packages/git/rust/src/sync.rs": "1eb485368c46ee609573fadeff4e9e2bb8f19c0d17956e4e0ef14f6ca8280cb2",
     "packages/git/rust/src/wal.rs": "daa876a880327f92bd7eb43f7c00f0c155c209342abca17132e8cacdebdcf6ff",
-    "packages/git/rust/src/worktree.rs": "136b707b72a4c0cbe6489d6163a75622ab03a734efaa40d35ed84a378a4f1d2d",
+    "packages/git/rust/src/worktree.rs": "98bbe52c4ceef242e727d8abd981c93afea7d95f669dea790e2df222b2232cb2",
     "packages/git/rust/tests/borrow_deadline.rs": "6a0db6afad96b62ded1253324e862a29a88129e115bd133292ee30ac5482fa07",
     "packages/git/rust/tests/contracts.rs": "d893e9b4cff68230f19dbe8624c051c318bd0bc3f7600ca7ab4b7a5713ea794d",
     "packages/git/rust/tests/head_in_listing.rs": "985434cfe8345d943e16e89188dd4202546c0b3a3e2ad69b36626e11c47adc72",
@@ -2447,7 +2447,7 @@
     },
     {
       "path": "packages/git/rust/src/worktree.rs",
-      "line": 1887,
+      "line": 1882,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"

@@ -1,3 +1,4 @@
+use fgos_process::facts::StartTime;
 use std::sync::OnceLock;
 static MARKER: OnceLock<Result<Marker, String>> = OnceLock::new();
 #[cfg(target_os = "linux")]
@@ -16,17 +17,31 @@ pub fn check() -> Result<(), String> {
         .map(|_| ())
         .map_err(Clone::clone)
 }
+
+/// The name part that tells this process from a reused pid, built from the typed start time so every
+/// platform keeps its own form: ticks on Linux, FILETIME high and low words on Windows, seconds and
+/// microseconds unpadded on macOS.
+fn marker_id(pid: u32, start: StartTime) -> String {
+    match start {
+        StartTime::Ticks(ticks) => format!("{pid}-{ticks}"),
+        StartTime::FileTime(filetime) => {
+            format!("{pid}-{}-{}", filetime >> 32, filetime & 0xffff_ffff)
+        }
+        StartTime::Timeval { sec, usec } => format!("{pid}-{sec}-{usec}"),
+    }
+}
+
+fn own_marker_id() -> Result<String, String> {
+    let start =
+        fgos_process::facts::self_start_time().ok_or("git-addon-unavailable: process identity")?;
+    Ok(marker_id(std::process::id(), start))
+}
+
 #[cfg(target_os = "linux")]
 fn register() -> Result<Marker, String> {
     use std::os::linux::net::SocketAddrExt;
     use std::os::unix::net::{SocketAddr, UnixListener};
-    // /proc/self/stat starttime survives exec but is different for a reused pid.
-    let stat = std::fs::read_to_string("/proc/self/stat").map_err(|e| e.to_string())?;
-    let start = stat
-        .rsplit_once(')')
-        .and_then(|(_, s)| s.split_whitespace().nth(19))
-        .ok_or("git-addon-unavailable: process identity")?;
-    let name = format!("fgos-combined-addon-{}-{start}", std::process::id());
+    let name = format!("fgos-combined-addon-{}", own_marker_id()?);
     let addr = SocketAddr::from_abstract_name(name.as_bytes()).map_err(|e| e.to_string())?;
     // std's socket uses CLOEXEC; no marker can leak into a Git child.
     UnixListener::bind_addr(&addr).map_err(|e| format!("git-addon-second-load: {e}"))
@@ -39,37 +54,15 @@ fn register() -> Result<Marker, String> {
 #[cfg(windows)]
 fn register() -> Result<Marker, String> {
     use windows_sys::Win32::{
-        Foundation::{CloseHandle, GetLastError, ERROR_ALREADY_EXISTS, FILETIME},
-        System::Threading::{CreateMutexW, GetCurrentProcess, GetProcessTimes},
+        Foundation::{CloseHandle, GetLastError, ERROR_ALREADY_EXISTS},
+        System::Threading::CreateMutexW,
     };
-    // Mutex handle is deliberately retained for the process lifetime and is not inheritable.
-    unsafe {
-        let mut created = FILETIME {
-            dwLowDateTime: 0,
-            dwHighDateTime: 0,
-        };
-        let mut exit = created;
-        let mut kernel = created;
-        let mut user = created;
-        if GetProcessTimes(
-            GetCurrentProcess(),
-            &mut created,
-            &mut exit,
-            &mut kernel,
-            &mut user,
-        ) == 0
-        {
-            return Err("git-addon-unavailable: process identity".into());
-        }
-        let name: Vec<u16> = format!(
-            "Local\\fgos-combined-addon-{}-{}-{}",
-            std::process::id(),
-            created.dwHighDateTime,
-            created.dwLowDateTime
-        )
+    let name: Vec<u16> = format!("Local\\fgos-combined-addon-{}", own_marker_id()?)
         .encode_utf16()
         .chain(Some(0))
         .collect();
+    // Mutex handle is deliberately retained for the process lifetime and is not inheritable.
+    unsafe {
         let handle = CreateMutexW(std::ptr::null(), 0, name.as_ptr());
         if handle.is_null() {
             return Err("git-addon-unavailable: marker".into());
@@ -107,22 +100,7 @@ fn register() -> Result<Marker, String> {
     {
         return Err("git-addon-unavailable: unsafe marker directory".into());
     }
-    let mut info = std::mem::MaybeUninit::<libc::proc_bsdinfo>::uninit();
-    let size = std::mem::size_of::<libc::proc_bsdinfo>() as i32;
-    let pid = std::process::id();
-    if unsafe {
-        libc::proc_pidinfo(
-            pid as i32,
-            libc::PROC_PIDTBSDINFO,
-            0,
-            info.as_mut_ptr().cast(),
-            size,
-        )
-    } != size
-    {
-        return Err("git-addon-unavailable: process identity".into());
-    }
-    let info = unsafe { info.assume_init() };
+    let id = own_marker_id()?;
     let file = OpenOptions::new()
         .read(true)
         .write(true)
@@ -130,10 +108,7 @@ fn register() -> Result<Marker, String> {
         .truncate(false)
         .mode(0o600)
         .custom_flags(libc::O_CLOEXEC | libc::O_NOFOLLOW)
-        .open(run.join(format!(
-            "combined-addon-{pid}-{}-{}.lock",
-            info.pbi_start_tvsec, info.pbi_start_tvusec
-        )))
+        .open(run.join(format!("combined-addon-{id}.lock")))
         .map_err(|e| e.to_string())?;
     let metadata = file.metadata().map_err(|e| e.to_string())?;
     if !metadata.is_file()
@@ -147,4 +122,42 @@ fn register() -> Result<Marker, String> {
         return Err("git-addon-second-load".into());
     }
     Ok(file)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn linux_marker_keeps_the_pid_and_tick_form() {
+        assert_eq!(marker_id(42, StartTime::Ticks(9001)), "42-9001");
+    }
+
+    #[test]
+    fn windows_marker_splits_the_filetime_into_high_and_low_words() {
+        let filetime = (0x01db_a1b2_u64 << 32) | 0x0000_00ff;
+        assert_eq!(
+            marker_id(7, StartTime::FileTime(filetime)),
+            format!("7-{}-255", 0x01db_a1b2_u64)
+        );
+    }
+
+    #[test]
+    fn macos_marker_keeps_seconds_and_unpadded_microseconds() {
+        assert_eq!(
+            marker_id(
+                7,
+                StartTime::Timeval {
+                    sec: 1_700_000_000,
+                    usec: 42
+                }
+            ),
+            "7-1700000000-42"
+        );
+    }
+
+    #[test]
+    fn this_process_names_the_same_marker_twice() {
+        assert_eq!(own_marker_id(), own_marker_id());
+    }
 }
