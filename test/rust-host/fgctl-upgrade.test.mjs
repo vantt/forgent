@@ -29,7 +29,7 @@ import {
   withoutActiveRelease,
   pathWithGcLeakingGit,
   processesUnder,
-  removeTree,
+  removeTree, removeStateHome,
 } from './fgctl-init-fixture.mjs';
 
 const FGOS_BIN = releaseBinaryPath(releaseOutputDir(), 'fgos');
@@ -504,7 +504,7 @@ test('P7: Repair failure when no runtime is active refuses with clear message', 
     assert.match(repairRes.stderr, /no active runtime found in workspace -- run 'fgctl init' first/);
   } finally {
     removeTree(projDir);
-    removeTree(stateHome);
+    removeStateHome(stateHome);
   }
 });
 
@@ -536,7 +536,7 @@ test('P7: Upgrade failure when no runtime is active refuses with clear message',
     assert.match(upgRes.stderr, /no active runtime found in workspace -- run 'fgctl init' first/);
   } finally {
     removeTree(projDir);
-    removeTree(stateHome);
+    removeStateHome(stateHome);
   }
 });
 
@@ -660,7 +660,7 @@ test('P7: Repair local tail failure leaves workspace in diagnosable state with r
     assert.equal(versionData.data.artifactDigest, newDigest);
   } finally {
     removeTree(projDir);
-    removeTree(stateHome);
+    removeStateHome(stateHome);
     removeTree(candidate.dir);
   }
 });
@@ -744,7 +744,7 @@ test('download: fgctl upgrade downloads the target release, verifies SHA256SUMS,
     const actTeammate = JSON.parse(fs.readFileSync(path.join(projB, '.fgos', 'installation', 'activation.json'), 'utf8'));
     assert.equal(actTeammate.artifactDigest, digestB);
   } finally {
-    removeTree(root);
+    removeStateHome(root);
   }
 });
 
@@ -775,6 +775,6 @@ test('holder-lock gate: a git that leaves a background gc while it borrows a loc
     left = holders();
     if (left !== null) assert.deepEqual(left, [], 'after repair the escaped gc is gone and no process holds a lock file');
   } finally {
-    removeTree(root);
+    removeStateHome(root);
   }
 });

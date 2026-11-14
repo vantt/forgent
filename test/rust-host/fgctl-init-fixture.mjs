@@ -22,13 +22,19 @@ export const releaseDirName = (digest) => (process.platform === 'win32' ? digest
  * delete-pending for a moment after the process exits (a closing image handle or an on-access
  * scan), so the removal of its directory fails with ENOTEMPTY or EBUSY; the removal is retried
  * and still throws when the tree cannot be removed.
- * On every platform a CLI run in the tree (an `fgctl init` tail) hands its event-store publish to a detached
- * `fgos events sync` child that outlives the command and writes into the state home; the removal first
- * waits, through the process door and bounded, for the children that name `dir`.
  */
 export function removeTree(dir) {
-  waitForSealChildrenOf(dir);
   fs.rmSync(dir, { recursive: true, force: true, maxRetries: 10, retryDelay: 100 });
+}
+
+/**
+ * Removes a state home (or a root holding one) that an `fgctl init`, upgrade or repair ran against. Its runtime tail
+ * hands the event-store publish to a detached `fgos events sync` child that outlives the command and keeps writing
+ * into the state home, so the removal first waits for that child, through the process door's bounded wait.
+ */
+export function removeStateHome(dir) {
+  waitForSealChildrenOf(dir);
+  removeTree(dir);
 }
 
 // Filled by the before() hook that useReleaseFixture() registers.
@@ -136,13 +142,13 @@ export function useInitializedWorkspace(releaseDir, { tag = 'initialized', ownHo
   });
   ws.restore = () => {
     for (const name of savedNames(ws)) {
-      removeTree(path.join(ws.root, name));
+      removeStateHome(path.join(ws.root, name));
       fs.cpSync(path.join(saved, name), path.join(ws.root, name), { recursive: true, preserveTimestamps: true, verbatimSymlinks: true });
     }
     return ws;
   };
   after(() => {
-    if (ws.root) removeTree(ws.root);
+    if (ws.root) removeStateHome(ws.root);
   });
   return ws;
 }

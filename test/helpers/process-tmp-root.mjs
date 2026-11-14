@@ -11,6 +11,7 @@ import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { processesInside } from '../../src/runner/dispatch/stop-processes-inside.mjs';
 
 const PRIVATE_ROOT_PREFIX = 'fgos-tp-';
 const SEAL_CHILD_WAIT_MS = 20000;
@@ -27,12 +28,18 @@ const watchedRoots = new Set();
 /** Also wait, at exit, for the seal children that name `dir`. */
 export function watchSealChildrenOf(dir) { watchedRoots.add(dir); }
 
+// The seal/sync child reads its state root from these (FGOS_STATE_ROOT, which git-fixture.mjs points inside the test
+// root, or FGOS_STATE_HOME), creating `<stateRoot>/locks/...` with a recursive mkdir that rebuilds a removed parent.
+// A child whose repository lies outside the directory names the directory only there, never in its argv.
+const STATE_ENV_KEYS = ['FGOS_STATE_ROOT', 'FGOS_STATE_HOME'];
+
 function sealChildrenOf(root) {
-  const views = processDoor.scan({});
+  const views = processDoor.scan({ envKeys: STATE_ENV_KEYS });
   if (views === 'unsupported') return [];
+  const byState = new Set(processesInside(root, { envKeys: STATE_ENV_KEYS, views }));
   return views.filter((view) => {
     const args = Array.isArray(view.cmdline) ? view.cmdline.join(' ') : String(view.cmdline ?? '');
-    return view.pid !== process.pid && args.includes(root + path.sep) && / events (?:seal|sync) /.test(` ${args} `);
+    return view.pid !== process.pid && (args.includes(root + path.sep) || byState.has(view)) && / events (?:seal|sync) /.test(` ${args} `);
   });
 }
 
