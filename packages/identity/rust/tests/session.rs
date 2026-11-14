@@ -384,9 +384,20 @@ fn a_hook_carried_pi_key_with_a_head_pid_gives_the_handle_the_env_path_gives_tha
     let bin = root.join("omp");
     std::os::unix::fs::symlink("/bin/sh", &bin).unwrap();
     let mut child = std::process::Command::new(&bin)
-        .args(["-c", "sleep 5; true"])
+        .args(["-c", "echo up; sleep 5; true"])
+        .stdout(std::process::Stdio::piped())
         .spawn()
         .unwrap();
+    // `spawn` returns while the child may still be the image it was forked from, named and
+    // argv'd as its parent; the kernel names the new image only inside exec. The child's
+    // first line proves the shell runs, so its name is `omp` for every read that follows.
+    let mut up = String::new();
+    std::io::BufRead::read_line(
+        &mut std::io::BufReader::new(child.stdout.as_mut().unwrap()),
+        &mut up,
+    )
+    .unwrap();
+    assert_eq!(up, "up\n");
     let head = child.id();
     let key = WriterKey {
         source: "PI_SESSION_ID",
