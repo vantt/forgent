@@ -12,7 +12,6 @@ import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
 import {
-  extractFrontmatter,
   generateWrapperContent,
   generateAllSkillWrappers,
   assembleSkills,
@@ -42,15 +41,6 @@ function everyNameIn(skillsRoot) {
 }
 
 const SAMPLE_FRONTMATTER = '---\nname: sample-skill\ndescription: A sample skill for testing.\n---\n';
-
-test('extractFrontmatter returns the --- fenced block verbatim, including both fences', () => {
-  const content = `${SAMPLE_FRONTMATTER}\n# Body\nSome instructions.\n`;
-  assert.equal(extractFrontmatter(content), SAMPLE_FRONTMATTER);
-});
-
-test('extractFrontmatter returns an empty string when the content has no frontmatter block', () => {
-  assert.equal(extractFrontmatter('# Just a heading\nNo frontmatter here.\n'), '');
-});
 
 test('generateWrapperContent keeps the source frontmatter byte-identical', () => {
   const sourceContent = `${SAMPLE_FRONTMATTER}\n# Body\nSome real instructions here.\n`;
@@ -209,6 +199,37 @@ test('materializeSkillsIntoProject keeps a project skill file that is newer than
     '.claude/skills/held/SKILL.md',
     '.claude/skills/held/references/guide.md',
   ]);
+});
+
+test('a skill whose frontmatter is not valid YAML still gets its wrapper and assembled copy, byte for byte', () => {
+  const frontmatter = '---\nname: loose\ndescription: Use when: the user asks for X\n---\n';
+  assert.ok(generateWrapperContent(`${frontmatter}\n# Body\n`, '../../.agents/skills/loose/SKILL.md').startsWith(frontmatter));
+  const packageRoot = mkTempDir('skill-wrappers-loose-pkg-');
+  writeSkill(path.join(packageRoot, 'core', 'skills'), 'loose', frontmatter, '# Body\n');
+  const targetRoot = mkTempDir('skill-wrappers-loose-target-');
+  const { wrappersWritten } = materializeSkillsIntoProject(packageRoot, targetRoot);
+  assert.equal(wrappersWritten.length, 1);
+  assert.ok(fs.readFileSync(path.join(targetRoot, '.claude', 'skills', 'loose', 'SKILL.md'), 'utf8').startsWith(frontmatter));
+  assert.ok(fs.readFileSync(path.join(targetRoot, '.agents', 'skills', 'loose', 'SKILL.md'), 'utf8').startsWith(frontmatter));
+});
+
+test('materializeSkillsIntoProject compares skill versions as dotted numbers (1.10 is after 1.9) and ignores an unquoted version', () => {
+  const wrapperStamp = '\nThis is a generated thin wrapper (tsk-1qi) -- do not edit directly, edit the source instead.\n';
+  const skillMd = (version, body, stamp = '') => `---\nname: sample\ndescription: d\nmetadata:\n  version: ${version}\n---\n${stamp}${body}\n`;
+  const packageRoot = mkTempDir('skill-wrappers-version-pkg-');
+  for (const name of ['tenth', 'unquoted']) {
+    fs.mkdirSync(path.join(packageRoot, 'core', 'skills', name), { recursive: true });
+    fs.writeFileSync(path.join(packageRoot, 'core', 'skills', name, 'SKILL.md'), skillMd('"1.9"', `release ${name}`));
+  }
+  const targetRoot = mkTempDir('skill-wrappers-version-target-');
+  const put = (rel, content) => {
+    fs.mkdirSync(path.dirname(path.join(targetRoot, rel)), { recursive: true });
+    fs.writeFileSync(path.join(targetRoot, rel), content);
+  };
+  put('.claude/skills/tenth/SKILL.md', skillMd('"1.10"', 'project tenth', wrapperStamp));
+  put('.claude/skills/unquoted/SKILL.md', skillMd('1.10', 'project unquoted', wrapperStamp));
+  const { skipped } = materializeSkillsIntoProject(packageRoot, targetRoot);
+  assert.deepEqual(skipped, ['.claude/skills/tenth/SKILL.md']);
 });
 
 test('materializeSkillsIntoProject is a no-op when packageRoot has no .agents/skills at all', () => {

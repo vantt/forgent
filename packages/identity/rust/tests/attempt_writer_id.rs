@@ -3,8 +3,8 @@
 //! resolves as an env id; every invalid case is refused by the mint.
 
 use fgos_identity::{
-    env_identity, is_attempt_writer_id, mint_attempt_writer_id, scrub_and_set, Source, WriterId,
-    ATTEMPT_PREFIX, MAX_ATTEMPT_ID_LENGTH, MAX_ID_LENGTH,
+    env_identity, is_attempt_writer_id, launcher_env, mint_attempt_writer_id, LauncherEnv, Source,
+    WriterId, ATTEMPT_PREFIX, MAX_ATTEMPT_ID_LENGTH, MAX_ID_LENGTH,
 };
 use serde_json::Value;
 use std::collections::BTreeMap;
@@ -109,8 +109,15 @@ fn env_of(pairs: &[(&str, &str)]) -> BTreeMap<String, String> {
         .collect()
 }
 
+fn apply(env: &mut BTreeMap<String, String>, answer: LauncherEnv) {
+    for name in answer.unset {
+        env.remove(name);
+    }
+    env.extend(answer.set);
+}
+
 #[test]
-fn scrub_and_set_keeps_no_inherited_session_id_and_sets_the_minted_one() {
+fn launcher_env_keeps_no_inherited_session_id_and_sets_the_minted_one() {
     let mut env = env_of(&[
         ("PATH", "/usr/bin"),
         ("FGOS_SESSION_ID", "parent-session"),
@@ -120,7 +127,7 @@ fn scrub_and_set_keeps_no_inherited_session_id_and_sets_the_minted_one() {
         ("PI_SESSION_FILE", "/sessions/pi-parent.jsonl"),
         ("FGOS_PARENT_WRITER_ID", "grandparent"),
     ]);
-    scrub_and_set(&mut env, "att-a1", Some("ctl-1")).unwrap();
+    apply(&mut env, launcher_env("att-a1", Some("ctl-1")).unwrap());
     assert_eq!(
         env.get("FGOS_SESSION_ID").map(String::as_str),
         Some("att-a1")
@@ -139,7 +146,7 @@ fn scrub_and_set_keeps_no_inherited_session_id_and_sets_the_minted_one() {
 #[test]
 fn an_empty_inherited_session_id_does_not_survive() {
     let mut env = env_of(&[("FGOS_SESSION_ID", ""), ("FGOS_PARENT_WRITER_ID", "old")]);
-    scrub_and_set(&mut env, "att-a1", None).unwrap();
+    apply(&mut env, launcher_env("att-a1", None).unwrap());
     assert_eq!(
         env.get("FGOS_SESSION_ID").map(String::as_str),
         Some("att-a1")
@@ -153,8 +160,6 @@ fn an_empty_inherited_session_id_does_not_survive() {
 }
 
 #[test]
-fn an_empty_writer_id_is_refused_and_leaves_env_untouched() {
-    let mut env = env_of(&[("CODEX_THREAD_ID", "t")]);
-    assert!(scrub_and_set(&mut env, "", None).is_err());
-    assert_eq!(env, env_of(&[("CODEX_THREAD_ID", "t")]));
+fn an_empty_writer_id_is_refused() {
+    assert!(launcher_env("", None).is_err());
 }

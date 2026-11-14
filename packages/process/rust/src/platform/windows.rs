@@ -7,10 +7,13 @@ use std::ffi::c_void;
 use std::fs::File;
 use std::io;
 use std::process::{Child, Command};
+use std::time::Duration;
 
 use super::ProcessPlatform;
 use crate::control::{self, Signal, SignalOutcome};
-use crate::facts::{Holders, Observed, PidNs, ProcTuple, Scan, ScanFilter, UnreadableCause};
+use crate::facts::{
+    Holders, Observed, PidNs, ProcTuple, Scan, ScanFilter, StartTime, UnreadableCause,
+};
 use crate::{FdSlot, ProcId};
 
 type Handle = *mut c_void;
@@ -68,16 +71,23 @@ impl ProcessHandle {
         }
     }
 
+    /// Wait up to `millis` for the process object to be signalled: `true` when the process has ended.
+    fn wait(&self, millis: Dword) -> io::Result<bool> {
+        // SAFETY: waiting on an open handle this struct owns.
+        match unsafe { WaitForSingleObject(self.0, millis) } {
+            WAIT_TIMEOUT => Ok(false),
+            WAIT_OBJECT_0 => Ok(true),
+            _ => Err(io::Error::last_os_error()),
+        }
+    }
+
     /// `Ok(None)` when the process has exited; the creation time otherwise.
     /// Exit is read from the process object being signalled, never from its
     /// exit code (a process may exit with the code that means "still
     /// active").
     fn creation_time(&self) -> io::Result<Option<u64>> {
-        // SAFETY: the handle is open; a zero wait only polls its state.
-        match unsafe { WaitForSingleObject(self.0, 0) } {
-            WAIT_TIMEOUT => {}
-            WAIT_OBJECT_0 => return Ok(None),
-            _ => return Err(io::Error::last_os_error()),
+        if self.wait(0)? {
+            return Ok(None);
         }
         let mut creation = FileTime::default();
         let mut exit = FileTime::default();
@@ -98,6 +108,55 @@ impl Drop for ProcessHandle {
         unsafe {
             CloseHandle(self.0);
         }
+    }
+}
+
+/// A process opened for waiting. While it is open the pid cannot be reused, so a start time read
+/// from it and a wait on it always concern the same process.
+pub struct WaitHandle(ProcessHandle);
+
+// SAFETY: a process handle is a kernel object reference that any thread may poll, wait on or close.
+unsafe impl Send for WaitHandle {}
+
+impl WaitHandle {
+    /// Open `pid` for waiting, with query access when the OS grants it so [`WaitHandle::start_time`]
+    /// can read; a process that refuses it is opened for waiting alone. `Err` carries the OS error:
+    /// `ERROR_INVALID_PARAMETER` (87) means no such process.
+    pub fn open(pid: ProcId) -> io::Result<WaitHandle> {
+        match ProcessHandle::open(pid, PROCESS_QUERY_LIMITED_INFORMATION) {
+            Err(err) if err.raw_os_error() == Some(ERROR_ACCESS_DENIED) => {
+                ProcessHandle::open(pid, 0).map(WaitHandle)
+            }
+            other => other.map(WaitHandle),
+        }
+    }
+
+    /// The creation time of the process; `Ok(None)` when it has ended. `Err` when the handle was
+    /// opened for waiting alone.
+    pub fn start_time(&self) -> io::Result<Option<StartTime>> {
+        Ok(self.0.creation_time()?.map(StartTime::FileTime))
+    }
+
+    /// Whether the process has ended.
+    pub fn ended(&self) -> io::Result<bool> {
+        self.0.wait(0)
+    }
+
+    /// Wait up to `timeout` for the process to end; `true` when it has.
+    pub fn wait(&self, timeout: Duration) -> io::Result<bool> {
+        self.0
+            .wait(Dword::try_from(timeout.as_millis()).unwrap_or(Dword::MAX - 1))
+    }
+}
+
+/// Open the process `tuple` names for waiting: one handle opened, its creation time checked
+/// against `tuple.start_time` on that handle, and returned. `None` when the process is gone,
+/// unreadable, or is not the one the tuple names (a reused pid).
+pub fn open_verified(tuple: &ProcTuple) -> Option<WaitHandle> {
+    let handle = WaitHandle::open(tuple.pid).ok()?;
+    match handle.start_time() {
+        Ok(Some(start)) if start.to_string() == tuple.start_time => Some(handle),
+        _ => None,
     }
 }
 
@@ -136,11 +195,16 @@ impl ProcessPlatform for Windows {
         };
         match handle.creation_time() {
             Ok(Some(creation)) => Observed::Live {
-                start_time: creation.to_string(),
+                start_time: StartTime::FileTime(creation).to_string(),
             },
             Ok(None) => Observed::Zombie,
             Err(err) => unreadable(&err),
         }
+    }
+
+    fn start_time_of(&self, pid: ProcId) -> Option<StartTime> {
+        let handle = ProcessHandle::open(pid, PROCESS_QUERY_LIMITED_INFORMATION).ok()?;
+        handle.creation_time().ok()?.map(StartTime::FileTime)
     }
 
     fn lock_holders(&self, _dev: u64, _ino: u64) -> Holders {
@@ -192,5 +256,56 @@ impl ProcessPlatform for Windows {
             };
         }
         SignalOutcome::Sent
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn me() -> ProcTuple {
+        crate::facts::self_identity().expect("this process is readable")
+    }
+
+    #[test]
+    fn open_verified_refuses_a_wrong_start_time_and_waits_on_a_matching_one() {
+        let mut wrong = me();
+        wrong.start_time = "1".to_string();
+        assert!(open_verified(&wrong).is_none());
+        let handle = open_verified(&me()).expect("this process matches its own tuple");
+        assert!(!handle.ended().unwrap());
+        assert!(!handle.wait(Duration::from_millis(10)).unwrap());
+    }
+
+    #[test]
+    fn a_verified_handle_sees_its_child_end() {
+        let mut child = Command::new("cmd")
+            .args(["/C", "ping -n 30 127.0.0.1 >NUL"])
+            .spawn()
+            .unwrap();
+        let tuple = Windows
+            .child_identity(ProcId(child.id()))
+            .expect("the child is live");
+        let handle = open_verified(&tuple).expect("the tuple names the child");
+        child.kill().unwrap();
+        assert!(handle.wait(Duration::from_secs(5)).unwrap());
+        assert_eq!(handle.start_time().unwrap(), None);
+        let _ = child.wait();
+    }
+
+    #[test]
+    fn a_pid_that_names_nothing_is_not_opened() {
+        let err = WaitHandle::open(ProcId(u32::MAX - 3))
+            .err()
+            .expect("no such process");
+        assert_eq!(err.raw_os_error(), Some(ERROR_INVALID_PARAMETER));
+    }
+
+    #[test]
+    fn typed_start_time_of_this_process_equals_its_string_form() {
+        let tuple = me();
+        let parts = Windows.start_time_of(tuple.pid).expect("readable");
+        assert!(matches!(parts, StartTime::FileTime(_)));
+        assert_eq!(parts.to_string(), tuple.start_time);
     }
 }

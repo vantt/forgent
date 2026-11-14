@@ -43,7 +43,7 @@ pub use current::{
     MachineInfo, SessionInfo,
 };
 pub use errors::Error;
-pub use launcher::{scrub_and_set, EmptyWriterId};
+pub use launcher::{launcher_env, EmptyWriterId, LauncherEnv};
 #[cfg(feature = "directory")]
 pub use mint::{claim_counter, claim_sequence, release_sequence, Claim, MAX_CLAIM_ATTEMPTS};
 pub use mint::{random, Kind, RandomKind, SequenceKind, KIND_NAMES, RANDOM_CHARS};

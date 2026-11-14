@@ -277,3 +277,12 @@ test('CLI: authoritative-match never mutates state: the Work history and state.j
   assert.deepEqual(readRawEvents(fgosDir), historyBefore, 'the Work history must be untouched');
   assert.equal(fs.readFileSync(viewPath, 'utf8'), viewBefore, 'state.json must be untouched');
 });
+
+test('fgos authoritative-match refuses a quadrant doc whose frontmatter is not valid YAML, naming the file, and exits non-zero', () => {
+  const cwd = initCwd();
+  writeDoc(cwd, 'docs/how-to', 'ok.md', 'claiming a work item');
+  writeDoc(cwd, 'docs/how-to', 'bad.md', 'claim: an item');
+  const res = run(cwd, ['authoritative-match', '--quadrant', 'docs/how-to', '--topic', 'claiming a work item']);
+  assert.notEqual(res.status, 0);
+  assert.match(`${res.stdout}${res.stderr}`, /docs\/how-to\/bad\.md/);
+});

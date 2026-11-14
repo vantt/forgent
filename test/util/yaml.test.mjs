@@ -7,7 +7,7 @@
 import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { YamlParseError, describeYamlError, parseYaml } from '../../src/util/yaml.mjs';
+import { YamlParseError, describeYamlError, parseYaml, readFrontmatter, cutFrontmatter } from '../../src/util/yaml.mjs';
 
 test('a document reaches JavaScript as plain values, own __proto__ keys and restored non-finite floats', () => {
   assert.deepEqual(parseYaml('a: 1\nb: [x, .nan]\nc:\n  - d: true\n  - null\n'), { a: 1, b: ['x', NaN], c: [{ d: true }, null] });
@@ -42,4 +42,42 @@ test('adversarial input is a named refusal and the process keeps running', () =>
   for (let i = 1; i < 9; i++) bomb.push(`l${i}: &l${i} [${Array(9).fill(`*l${i - 1}`).join(', ')}]`);
   assert.throws(() => parseYaml(`${bomb.join('\n')}\n`), (err) => err instanceof YamlParseError && /^(alias-limit|expanded-too-large|node-limit)$/.test(err.rule));
   assert.deepEqual(parseYaml('still: alive'), { still: 'alive' });
+});
+
+test('readFrontmatter returns an empty meta and the whole text when there is no frontmatter block', () => {
+  const text = '# Just a heading\nNo frontmatter here.\n';
+  assert.deepEqual(readFrontmatter(text, 'a.md'), { meta: {}, body: text, block: '' });
+  const unclosed = '---\ntitle: x\n# no closing fence\n';
+  assert.deepEqual(readFrontmatter(unclosed, 'a.md'), { meta: {}, body: unclosed, block: '' });
+});
+
+test('readFrontmatter parses a block into typed values and returns the fenced source and the body, CRLF included', () => {
+  const block = '---\ntype: decision\ntags: [a, "b c"]\nstatus: accepted\ndate: 2026-11-14\nnested:\n  ok: true\n---\n';
+  const read = readFrontmatter(`${block}\n# Body\n`, 'a.md');
+  assert.deepEqual(read.meta, { type: 'decision', tags: ['a', 'b c'], status: 'accepted', date: '2026-11-14', nested: { ok: true } });
+  assert.equal(read.block, block);
+  assert.equal(read.body, '\n# Body\n');
+  const crlf = readFrontmatter('---\r\ntitle: x\r\n---\r\nbody\r\n', 'a.md');
+  assert.deepEqual(crlf.meta, { title: 'x' });
+  assert.equal(crlf.block, '---\r\ntitle: x\r\n---\r\n');
+  assert.equal(readFrontmatter('---\n\n---\nbody\n', 'a.md').meta.constructor, Object);
+  assert.deepEqual(readFrontmatter('---\n\n---\nbody\n', 'a.md').meta, {});
+});
+
+test('readFrontmatter refuses a block that is not valid YAML or not a mapping, naming the file', () => {
+  assert.throws(() => readFrontmatter('---\ntitle: a: b\n---\n', 'docs/bad.md'), (err) => err instanceof YamlParseError && err.file === 'docs/bad.md');
+  assert.throws(() => readFrontmatter('---\n- a\n- b\n---\n', 'docs/list.md'), (err) => err instanceof YamlParseError && err.file === 'docs/list.md' && err.rule === 'frontmatter-not-a-mapping');
+  assert.throws(() => readFrontmatter('---\njust text\n---\n', 'docs/scalar.md'), (err) => err instanceof YamlParseError && err.file === 'docs/scalar.md');
+});
+
+test('readFrontmatter reads an ADR-shaped block with a list of ids', () => {
+  const { meta } = readFrontmatter('---\ntitle: T\ndate: 2026-11-14\nstatus: accepted\nsupersedes: [D-ADR0001, D-ADR0002]\n---\n', 'a.md');
+  assert.deepEqual(meta.supersedes, ['D-ADR0001', 'D-ADR0002']);
+});
+
+test('cutFrontmatter cuts the fenced block without parsing it, so a block that is not YAML still yields its bytes', () => {
+  const text = '---\ndescription: Use when: the user asks\n---\nbody\n';
+  assert.deepEqual(cutFrontmatter(text), { block: '---\ndescription: Use when: the user asks\n---\n', source: 'description: Use when: the user asks', body: 'body\n' });
+  assert.deepEqual(cutFrontmatter('no block\n'), { block: '', source: '', body: 'no block\n' });
+  assert.throws(() => readFrontmatter(text, 'bad.md'), YamlParseError);
 });

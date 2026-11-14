@@ -1,0 +1,74 @@
+---
+phase: 2
+title: "Agent definitions are found only through the agent-definitions door"
+status: pending
+effort: 1d
+leak: "census rank 2 (three of four choosers; the doctor chooser is phase 16)"
+startAfter: ["F0 wave A on main"]
+landAfter: []
+---
+
+# Phase 02: Agent definitions only through their door
+
+<!-- Red team 2026-11-14: domain-tier claim corrected, every RunnerConfigError mapped, agent-listing:68 added, the YAML parse-back check moved to Ideas, patterns widened. -->
+
+Rules: `phase-lead-rules.md`. pNN = `p02`; report slug `odd-p02-persona-tiers`; no Rust. Facts: `phase-00-facts.md` "Leak 2".
+
+## Outcome
+
+`src/runner/agent-definitions.mjs` is the only module that knows the tier directories and their order. The assignment
+renderer, the Work roster and the `.claude/agents` generator ask it. The doctor chooser in `src/setup/registrations.mjs`
+stays as one visible debt entry until phase 16 (the capability plan rewrites that file first).
+
+## Requirements
+
+1. `src/runner/dispatch/assignment.mjs` `renderPersonaSection` (:631-689): when no text is pinned, read the persona with
+   `resolveAgentDefinition(ref, { projectRoot: root })` (its `installRoot` default) instead of building `<root>/core/agents/<ref>.yaml`.
+   Pass the workflow context (`{ workflowDir, owningDomain }`) when the caller has it (read the two call sites,
+   `assignment.mjs:748,760`, and what the assignment carries); without it the door reads the workspace and core tiers only
+   (`agent-definitions.mjs:203-205`: no domain, no `domains/`), which is still the door's answer for that input. Keep today's
+   output when the persona is missing (`AgentNotFoundError` -> the same section text as a missing file today) and render every
+   other `RunnerConfigError` the door throws (bad name, file over the size cap, name mismatch, model taste, empty description;
+   `agent-definitions.mjs:191-198,252-268`) as today's parse-failure line naming the reason. The assignment render never throws
+   where it rendered before.
+2. `src/runner/agent-roster.mjs` `loadAgentRoster`: build the roster from `scanAgentTiers({ projectRoot: cwd })` in the door's
+   order (first tier wins, as `listAgents` does), reading each file with `readAgentDefinition`. Drop the legacy `cwd/agents`
+   scan and the core-first order (phase 00: undocumented, and an agent the door cannot resolve cannot run). Keep the exported
+   shape `work-dispatch.mjs:76` reads.
+3. `scripts/project-agents.mjs` `findAgentYamlFiles` (~:100-137): enumerate through `scanAgentTiers` (drop its own core/domains/legacy
+   walk; keep its validation). The generated `.claude/agents/**` must not change: run the generator and require an empty diff;
+   if the workspace tier adds files in this repo, stop and ask the big lead.
+4. `src/runner/agent-listing.mjs:68` re-reads `<project>/core/agents` itself to compute masking: take the directory from
+   `agentTierDirs` instead. (The `project-agents.mjs` YAML writer at :170-175 is not touched: it is in plan.md Ideas, Q1.)
+5. `doors` row (new, `kind: door`):
+   `{ job: "agent definition tier directories", patterns: ["['\"]core['\"],\\s*['\"]agents['\"]", "['\"]fgos['\"],\\s*['\"]agents['\"]", "core/agents", "\\.agentsDir\\b", ",\\s*['\"]agents['\"]\\)"], allowed: ["src/runner/agent-definitions.mjs"], debt: [{ path: "src/setup/registrations.mjs", reason: "doctor claims/skills walk (allAgentYamlFiles, readAgentSkills) re-walks the tiers and reads the project's own domains/; moved after the capability plan rewrites the file" }], reason: "one module knows the tier directories and their order" }`.
+   Re-run the patterns: every other match must be gone or be a different job (then narrow the pattern and say why; message text
+   naming `core/agents` is allowed with its reason). `agent-listing.mjs` must not match after requirement 4. The module that
+   defines `agentsDir` in the domain catalog is allowed: it defines the domain layout the door reads.
+
+## Files
+
+- Modify: `src/runner/dispatch/assignment.mjs` (`renderPersonaSection` only), `src/runner/agent-roster.mjs`, `scripts/project-agents.mjs` (walk only),
+  `src/runner/agent-listing.mjs` (:68 only),
+  `docs/architecture-manifest.json` (the row).
+- Tests: extend `test/runner/assignment.test.mjs` (:160-200): an unpinned persona present only in the workspace tier renders its
+  text (new behaviour; why new: no test covers tier lookup in the renderer); a persona in a domain tier renders when the
+  workflow context is passed; a persona carrying `tier:` (model taste) renders the failure line instead of throwing; a missing
+  persona keeps today's text.
+  `test/runner/agent-roster.test.mjs`: cases that assert core-first order or the legacy `agents/` directory are retired
+  (behaviour removed); one case that a workspace definition shadows core (owner: the door's order, proven in
+  `test/runner/agent-definitions.test.mjs`; the roster keeps one wiring case). `test/scripts/project-agents.test.mjs` unchanged
+  (generated bytes equal).
+- Delete: none.
+- Net size: src about -40, tests about +30 -40.
+
+## Gates
+
+`node scripts/run-tests.mjs test/runner/assignment.test.mjs test/runner/agent-roster.test.mjs test/runner/agent-definitions.test.mjs test/runner/agent-listing.test.mjs test/scripts/project-agents.test.mjs test/architecture.test.mjs test/scripts/doc-health.test.mjs test/setup/git-mutation-census.test.mjs`
+plus `rg -l "agent-roster|renderPersonaSection|work-dispatch" test`; `node scripts/project-agents.mjs` (or its npm script) gives no diff.
+
+## Risk and rollback
+
+- Eligibility changes for a project that relied on `agents/` or core-first shadowing (L x M): such an agent already failed at
+  dispatch resolve; record in the report and propose the `## [Unreleased]` line.
+- Rollback: revert the phase.

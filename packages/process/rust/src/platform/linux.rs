@@ -11,7 +11,7 @@ use super::{as_pid_t, unix_hostname, ProcessPlatform};
 use crate::control::{self, Signal, SignalOutcome};
 use crate::facts::{
     self, CreationMark, Holders, Observed, PidNs, ProcTuple, ProcView, Relation, Scan, ScanFilter,
-    UnreadableCause, Verdict,
+    StartTime, UnreadableCause, Verdict,
 };
 use crate::{FdSlot, ProcId};
 
@@ -169,6 +169,31 @@ impl ProcessPlatform for Linux {
             pid,
             &fs::read_to_string(format!("/proc/{}/stat", pid.0)).ok()?,
         )
+    }
+
+    fn start_time_of(&self, pid: ProcId) -> Option<StartTime> {
+        read_stat(pid.0)
+            .ok()
+            .map(|stat| StartTime::Ticks(stat.start_ticks))
+    }
+
+    fn stdin_window_size(&self, pid: ProcId) -> Option<(u16, u16)> {
+        use std::os::fd::AsRawFd;
+        use std::os::unix::fs::OpenOptionsExt;
+        let tty = fs::OpenOptions::new()
+            .read(true)
+            .custom_flags(libc::O_NOCTTY | libc::O_NONBLOCK)
+            .open(format!("/proc/{}/fd/0", pid.0))
+            .ok()?;
+        // SAFETY: isatty only inspects an open descriptor.
+        if unsafe { libc::isatty(tty.as_raw_fd()) } != 1 {
+            return None;
+        }
+        // SAFETY: an all-zero winsize is valid plain data.
+        let mut size: libc::winsize = unsafe { std::mem::zeroed() };
+        // SAFETY: `size` is a valid winsize for TIOCGWINSZ; the descriptor is open.
+        let rc = unsafe { libc::ioctl(tty.as_raw_fd(), libc::TIOCGWINSZ, &mut size) };
+        (rc == 0 && size.ws_col > 0 && size.ws_row > 0).then_some((size.ws_col, size.ws_row))
     }
 
     fn command_name_of(&self, pid: ProcId) -> Option<String> {
@@ -815,5 +840,66 @@ mod tests {
         let ns = Linux.pid_ns();
         assert!(ns.id.starts_with("pid:[") || ns.id == "unknown");
         assert_eq!(ns.is_initial, ns.id == INIT_PID_NS);
+    }
+
+    #[test]
+    fn stdin_window_size_is_the_pty_size_and_none_for_a_pipe_or_dev_null() {
+        let mut master = 0;
+        let mut slave = 0;
+        let size = libc::winsize {
+            ws_row: 24,
+            ws_col: 80,
+            ws_xpixel: 0,
+            ws_ypixel: 0,
+        };
+        // SAFETY: valid out-pointers; the name and termios arguments may be null.
+        let rc = unsafe {
+            libc::openpty(
+                &mut master,
+                &mut slave,
+                std::ptr::null_mut(),
+                std::ptr::null(),
+                &size,
+            )
+        };
+        assert_eq!(rc, 0, "openpty failed");
+        // SAFETY: slave is a descriptor this test just opened and now hands to the child.
+        let slave_file = unsafe { <File as std::os::fd::FromRawFd>::from_raw_fd(slave) };
+        let mut on_pty = std::process::Command::new("sleep")
+            .arg("5")
+            .stdin(slave_file)
+            .spawn()
+            .unwrap();
+        let mut piped = std::process::Command::new("sleep")
+            .arg("5")
+            .stdin(std::process::Stdio::piped())
+            .spawn()
+            .unwrap();
+        let mut null = std::process::Command::new("sleep")
+            .arg("5")
+            .stdin(std::process::Stdio::null())
+            .spawn()
+            .unwrap();
+        let answers = (
+            Linux.stdin_window_size(ProcId(on_pty.id())),
+            Linux.stdin_window_size(ProcId(piped.id())),
+            Linux.stdin_window_size(ProcId(null.id())),
+        );
+        for child in [&mut on_pty, &mut piped, &mut null] {
+            child.kill().unwrap();
+            child.wait().unwrap();
+        }
+        // SAFETY: closing the master this test opened.
+        unsafe { libc::close(master) };
+        assert_eq!(answers, (Some((80, 24)), None, None));
+    }
+
+    #[test]
+    fn typed_start_time_of_this_process_equals_its_string_form() {
+        let me = ProcId(std::process::id());
+        let parts = Linux.start_time_of(me).expect("this process is readable");
+        assert!(matches!(parts, StartTime::Ticks(_)));
+        let tuple = Linux.identity_of(me).expect("this process is live");
+        assert_eq!(parts.to_string(), tuple.start_time);
     }
 }

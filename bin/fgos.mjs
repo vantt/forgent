@@ -43,7 +43,7 @@ import { renderLockedDecisionsTable } from '../src/report/context-render.mjs';
 import { runFourDoorChecks } from '../src/state/retrospective-doors.mjs';
 import { findAuthoritativeMatch, findDuplicateAuthoritativeClaims } from '../src/report/authoritative-match.mjs';
 import { checkVerifyForC4 } from '../src/intake/verify-pattern-check.mjs';
-import { parseFrontmatter } from '../src/report/frontmatter.mjs';
+import { describeYamlError, readFrontmatter, YamlParseError } from '../src/util/yaml.mjs';
 import { checkTools, queryTools } from '../src/state/tool-registry.mjs';
 import { EventLogError } from '../src/state/event-log.mjs';
 import { foldEvents, conflictsFor } from '../src/state/replay.mjs';
@@ -2760,6 +2760,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       const repoRoot = path.dirname(dir);
       const absQuadrantDir = path.join(repoRoot, quadrantDir);
       const candidates = [];
+      const refused = [];
       let entries = [];
       // tsk-1lv round-2 review, M1: a bad/typo'd --quadrant used to
       // degrade silently to candidateCount:0, match:null -- exit 0,
@@ -2780,8 +2781,18 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         if (!entry.isFile() || !entry.name.endsWith('.md')) continue;
         const relPath = path.posix.join(quadrantDir, entry.name);
         const content = fs.readFileSync(path.join(absQuadrantDir, entry.name), 'utf8');
-        const { meta } = parseFrontmatter(content);
+        let meta;
+        try {
+          ({ meta } = readFrontmatter(content, relPath));
+        } catch (err) {
+          if (!(err instanceof YamlParseError)) throw err;
+          refused.push(`${relPath}: ${describeYamlError(err)}`);
+          continue;
+        }
         candidates.push({ path: relPath, authoritativeFor: meta.authoritative_for });
+      }
+      if (refused.length > 0) {
+        throw new StoreError('validation', `authoritative-match: frontmatter refused by the YAML door:\n${refused.map((line) => `  ${line}`).join('\n')}`);
       }
       if (flags['check-duplicates'] !== undefined) {
         const duplicates = findDuplicateAuthoritativeClaims(candidates);

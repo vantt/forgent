@@ -695,10 +695,10 @@ duy nhất của linkage vẫn là nhật ký capture, tra qua `fgos doc-sources
   lệch mà không đụng đĩa. Nhánh `doc-sources` vẫn ở `repo/bin/fgos.mjs` (gom nguồn của một
   đường dẫn qua `findSourceCaptureIds` + `listWork`); đăng ký cả hai verb ở
   `repo/src/cli/command-registry.mjs` với quyền `read`.
-- Bộ đọc/ghi đầu-mô-tả (không I/O, không phụ thuộc thư viện ngoài): `repo/src/report/frontmatter.mjs`
-  — `parseFrontmatter`/`renderFrontmatter`; đây là cơ chế đọc/ghi khối mô tả riêng của
-  từng tài liệu (mục "Đầu-mô-tả riêng của mỗi tài liệu" ở trên), tách biệt với bộ sinh
-  chỉ mục.
+- Bộ đọc đầu-mô-tả: `readFrontmatter` trong `repo/src/util/yaml.mjs` — cắt và đọc khối
+  mô tả riêng của từng tài liệu (mục "Đầu-mô-tả riêng của mỗi tài liệu" ở trên) qua cửa
+  YAML, tách biệt với bộ sinh chỉ mục; bộ đọc/ghi viết tay src/report/frontmatter.mjs
+  đã bị xoá cùng công cụ di trú một lần.
 - Manifest sinh ra: `repo/docs/enduser-docs-index.json`.
 - Vị trí chính + vị trí thay thế trên đĩa: `repo/docs/how-to/`, `repo/docs/explanation/`
   (chính, ngăn `explanation`), `repo/docs/decisions/` (thay thế đã khai cho ngăn
@@ -707,5 +707,5 @@ duy nhất của linkage vẫn là nhật ký capture, tra qua `fgos doc-sources
   `QUADRANT_META`/`QUADRANT_DIR_ALIASES` làm nguồn ánh xạ duy nhất.
 - Kiểm thử: `repo/test/report/enduser-index.test.mjs` (chạy verb thật trên cây `docs/`
   thật và đọc manifest sinh ra, không dùng proxy — gồm cả `findSourceCaptureIds` đa-kết-
-  quả và vị trí thay thế của ngăn `explanation`); `repo/test/report/frontmatter.test.mjs`
-  (đầu-mô-tả, round-trip); hành vi verb `doc-sources` ở `repo/test/cli/fgos.test.mjs`.
+  quả và vị trí thay thế của ngăn `explanation`); `repo/test/util/yaml.test.mjs`
+  (`readFrontmatter`); hành vi verb `doc-sources` ở `repo/test/cli/fgos.test.mjs`.

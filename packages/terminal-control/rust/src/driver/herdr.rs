@@ -981,26 +981,11 @@ fn peer_pid(_path: &str) -> DriverResult<u32> {
     ))
 }
 
-/// The pty window size behind a shell's stdin, read from `/proc` (same user).
-#[cfg(target_os = "linux")]
+/// The pty window size behind a shell's stdin, read through `fgos-process`.
 fn pty_size(shell_pid: u32) -> Option<PtySize> {
-    use std::os::fd::AsRawFd;
-    use std::os::unix::fs::OpenOptionsExt;
-    let tty = std::fs::OpenOptions::new()
-        .read(true)
-        .custom_flags(libc::O_NOCTTY | libc::O_NONBLOCK)
-        .open(format!("/proc/{shell_pid}/fd/0"))
-        .ok()?;
-    let mut size: libc::winsize = unsafe { std::mem::zeroed() };
-    // SAFETY: `size` is a valid winsize for TIOCGWINSZ; the fd is open.
-    let rc = unsafe { libc::ioctl(tty.as_raw_fd(), libc::TIOCGWINSZ, &mut size) };
-    (rc == 0 && size.ws_col > 0 && size.ws_row > 0).then(|| PtySize {
-        cols: u32::from(size.ws_col),
-        rows: u32::from(size.ws_row),
+    let (cols, rows) = fgos_process::facts::stdin_window_size(fgos_process::ProcId(shell_pid))?;
+    Some(PtySize {
+        cols: u32::from(cols),
+        rows: u32::from(rows),
     })
-}
-
-#[cfg(not(target_os = "linux"))]
-fn pty_size(_shell_pid: u32) -> Option<PtySize> {
-    None
 }

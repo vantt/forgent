@@ -8,7 +8,8 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { parseFrontmatter } from '../src/report/frontmatter.mjs';
+import { ensureAddonForScript } from './lib/git-addon-stage.mjs';
+import { readFrontmatter, YamlParseError } from '../src/util/yaml.mjs';
 import { isMainModule } from './lib/is-main-module.mjs';
 
 const ID_PATTERN = /^\d{4}$/;
@@ -119,8 +120,8 @@ function loadRecords(decisionsDir) {
   const files = fs.readdirSync(decisionsDir).filter((f) => /^\d{4}-.*\.md$/.test(f));
   return files.map((file) => {
     const id = file.slice(0, 4);
-    const content = fs.readFileSync(path.join(decisionsDir, file), 'utf8');
-    const { meta } = parseFrontmatter(content);
+    const filePath = path.join(decisionsDir, file);
+    const { meta } = readFrontmatter(fs.readFileSync(filePath, 'utf8'), filePath);
     return { id, meta, file };
   });
 }
@@ -171,5 +172,12 @@ function runCli(argv, cwd) {
 }
 
 if (isMainModule(import.meta.url)) {
-  process.exitCode = runCli(process.argv.slice(2), process.cwd());
+  ensureAddonForScript();
+  try {
+    process.exitCode = runCli(process.argv.slice(2), process.cwd());
+  } catch (err) {
+    if (!(err instanceof YamlParseError)) throw err;
+    console.error(`check-decision-supersession: ${err.message}`);
+    process.exitCode = 1;
+  }
 }

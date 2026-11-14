@@ -1,5 +1,5 @@
 ---
-authoritative_for: fgOS's knowledge/document registry redesign (tsk-28x) — replacing the single Diataxis-quadrant axis with two orthogonal axes (identity: purpose/role/entity; writing: framework/mode), a registered topic/doc lifecycle with cardinality invariant activeDoc(topicId,role)<=1, and the compound->knowledge boundary rename this whole retro-loop session's own synthesis tooling (fgos-coding-knowledge, fgos topic/doc/knowledge verbs) runs on
+authoritative_for: "fgOS's knowledge/document registry redesign (tsk-28x) — replacing the single Diataxis-quadrant axis with two orthogonal axes (identity: purpose/role/entity; writing: framework/mode), a registered topic/doc lifecycle with cardinality invariant activeDoc(topicId,role)<=1, and the compound->knowledge boundary rename this whole retro-loop session's own synthesis tooling (fgos-coding-knowledge, fgos topic/doc/knowledge verbs) runs on"
 ---
 
 # The registry this session's own retrospective synthesis runs on, decided here

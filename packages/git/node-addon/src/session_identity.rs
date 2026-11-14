@@ -1,7 +1,7 @@
 //! Writer identity marshaling: the rule and the attempt-id contract live in `fgos-identity`.
 use crate::{check, error};
 use fgos_identity::{
-    mint_attempt_writer_id, random, resolve_current, InvalidAttemptId, RandomKind,
+    launcher_env, mint_attempt_writer_id, random, resolve_current, InvalidAttemptId, RandomKind,
 };
 use napi::Result;
 use napi_derive::napi;
@@ -32,6 +32,16 @@ pub fn shared_directory(main_root: String) -> Result<Value> {
 pub fn mint_attempt(attempt: String) -> Result<String> {
     check()?;
     mint_attempt_writer_id(&attempt).map_err(|InvalidAttemptId| error(InvalidAttemptId::NAME))
+}
+
+/// What a launcher does to an agent's env: `{ set: [[name, value], ...], unset: [name, ...] }`. An empty `writer_id`
+/// fails with a message that starts with `empty-writer-id`; an absent or empty `parent` sets no parent id.
+#[napi(namespace = "sessionIdentity", js_name = "launcherEnv")]
+pub fn launcher_env_for(writer_id: String, parent: Option<String>) -> Result<Value> {
+    check()?;
+    let answer = launcher_env(&writer_id, parent.as_deref())
+        .map_err(|_| error("empty-writer-id: the agent's writer id must not be empty"))?;
+    Ok(json!({ "set": answer.set, "unset": answer.unset }))
 }
 
 /// A new random id: `tsk-<10 base32>` for `work`, `p-<10 base32>` for `backlog`. A sequence kind is not random and

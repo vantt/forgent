@@ -498,6 +498,52 @@ pub fn command_name_of(pid: ProcId) -> Option<String> {
     platform::current().command_name_of(pid)
 }
 
+/// The start time of a process in the parts its OS keeps, so a caller can name a process by them
+/// without parsing the string form in [`ProcTuple::start_time`] or inventing a third one. `Display`
+/// is that string form, exactly: decimal ticks, decimal FILETIME, or `"{sec}.{usec:06}"`.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum StartTime {
+    /// Linux: `starttime` of `/proc/<pid>/stat`, in clock ticks since boot.
+    Ticks(u64),
+    /// Windows: the process creation FILETIME (100 ns units).
+    FileTime(u64),
+    /// macOS: wall-clock start as seconds and microseconds.
+    Timeval { sec: u64, usec: u64 },
+}
+
+impl std::fmt::Display for StartTime {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            StartTime::Ticks(ticks) => write!(f, "{ticks}"),
+            StartTime::FileTime(filetime) => write!(f, "{filetime}"),
+            StartTime::Timeval { sec, usec } => write!(f, "{sec}.{usec:06}"),
+        }
+    }
+}
+
+/// The typed start time of `pid`; `None` where the platform cannot read it or
+/// `pid` is gone. Linux answers a zombie like a live process (the stat read
+/// does); Windows answers `None` once the process has been signalled.
+pub fn start_time_of(pid: ProcId) -> Option<StartTime> {
+    platform::current().start_time_of(pid)
+}
+
+/// The typed start time of this process.
+pub fn self_start_time() -> Option<StartTime> {
+    start_time_of(ProcId(std::process::id()))
+}
+
+/// The terminal window size `(cols, rows)` behind the standard input of `pid` (Linux): `/proc/<pid>/fd/0` is
+/// opened without becoming a controlling terminal, must be a terminal, and is asked `TIOCGWINSZ`. `None` when
+/// stdin is a pipe, a file or `/dev/null`, the size is zero, the process is gone or unreadable, or the platform
+/// has no such read.
+pub fn stdin_window_size(pid: ProcId) -> Option<(u16, u16)> {
+    platform::current().stdin_window_size(pid)
+}
+
+#[cfg(windows)]
+pub use crate::platform::windows::{open_verified, WaitHandle};
+
 /// The pid of `pid` in each PID namespace it is visible in, outermost first (Linux `NSpid`): one entry when
 /// it lives in this namespace alone, more when it sits inside namespaces of its own, where the last entry is its
 /// pid there. `None` where the platform has no such read or `pid` is gone.
@@ -646,6 +692,23 @@ pub use crate::platform::linux::{locked_fds, own_lock_token, proc_self_pid, Lock
 
 #[cfg(test)]
 mod tests {
+    #[test]
+    fn start_time_displays_the_string_form_each_platform_keeps() {
+        assert_eq!(StartTime::Ticks(12345).to_string(), "12345");
+        assert_eq!(
+            StartTime::FileTime(133_000_000_000_000_000).to_string(),
+            "133000000000000000"
+        );
+        assert_eq!(
+            StartTime::Timeval {
+                sec: 1_700_000_000,
+                usec: 42
+            }
+            .to_string(),
+            "1700000000.000042"
+        );
+    }
+
     use super::*;
 
     /// A child that already exited but is not reaped keeps its identity for its spawner, while

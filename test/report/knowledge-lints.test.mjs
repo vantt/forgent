@@ -260,3 +260,17 @@ test('knowledge lints - doc-alias-broken judges the aliases a real Work store fo
     fs.rmSync(tmpDir, { recursive: true, force: true });
   }
 });
+
+test('knowledgeFindings reports a doc whose frontmatter the YAML door refuses, by file name, and still reads the other docs', () => {
+  const { tmpDir, fgosDir } = setupGitRepoWithStore();
+  fs.mkdirSync(path.join(tmpDir, 'docs', 'how-to'), { recursive: true });
+  fs.writeFileSync(path.join(tmpDir, 'docs', 'how-to', 'bad.md'), '---\nauthoritative_for: claim: an item\n---\n# Bad\n');
+  fs.writeFileSync(path.join(tmpDir, 'docs', 'how-to', 'a.md'), '---\nauthoritative_for: claiming a work item\n---\n# A\n');
+  fs.writeFileSync(path.join(tmpDir, 'docs', 'how-to', 'b.md'), '---\nauthoritative_for: Claiming a work item!\n---\n# B\n');
+  const findings = findingsOf(tmpDir, fgosDir);
+  const refused = lint(findings, 'doc-frontmatter-refused');
+  assert.equal(refused.level, 'fail');
+  assert.equal(refused.items.length, 1);
+  assert.match(refused.items[0], /^docs\/how-to\/bad\.md: /);
+  assert.deepEqual(lint(findings, 'doc-near-duplicate').items, ['docs/how-to/a.md ~ docs/how-to/b.md']);
+});

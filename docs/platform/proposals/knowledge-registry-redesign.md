@@ -652,7 +652,7 @@ This proves the writer is registry-first. Migration tooling proves folding. They
 - Current compounding skill: `domains/coding/skills/fgos-coding-knowledge/SKILL.md`.
 - Current producer command: `bin/fgos.mjs`, legacy `compound` branch.
 - Current authoritative-topic helper: `src/report/authoritative-match.mjs`.
-- Current frontmatter helper: `src/report/frontmatter.mjs`.
+- Frontmatter reader (the hand-written `src/report/frontmatter.mjs` was removed on 2026-11-14): `readFrontmatter` in `src/util/yaml.mjs`.
 - Current index helpers: `src/report/enduser-index.mjs` and `src/report/enduser-index-generate.mjs`.
 
 ## 18. Implementation Tasks

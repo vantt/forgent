@@ -1,7 +1,7 @@
 ---
 topic: compound-engineering
 date: 2026-07-13
-redived: 2026-07-21 (delta beehive 94b4a31→05a131f: capture được thêm kênh THỨ BA — khai quật từ phiên CRASH; state-vs-log có răng ở tầng ghi)
+redived: "2026-07-21 (delta beehive 94b4a31→05a131f: capture được thêm kênh THỨ BA — khai quật từ phiên CRASH; state-vs-log có răng ở tầng ghi)"
 based_on: [beehive@05a131f, repository-harness@0a79bbe, marketing-cockpit@588d800, symphony@2f0b257]
 entries: [repository-harness:growth-rule-friction, repository-harness:proposal-lifecycle-explicit, repository-harness:audit-propose-pipeline, beehive:friction-backlog-outcome-loop, beehive:evolving-loop-two-gates, beehive:entropy-score-trend, beehive:settlement-capture-unprompted, beehive:event-sourced-decisions, beehive:state-vs-log-two-physics, beehive:grooming-project-first, beehive:chain-integrity-guard-tail, beehive:crash-transcript-recovery-mining, marketing-cockpit:four-memory-types, marketing-cockpit:procedural-memory-reinforcement]
 ---

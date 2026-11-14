@@ -137,7 +137,7 @@ test('CLI run over a fixture directory prints findings and exits 1 when gaps exi
   fs.writeFileSync(path.join(fixtureDir, '0002-x.md'), '---\nstatus: accepted\n---\n# 0002\n');
   fs.writeFileSync(
     path.join(fixtureDir, '0012-x.md'),
-    '---\nsupersedes: [0002]\n---\n# 0012\n',
+    '---\nsupersedes: ["0002"]\n---\n# 0012\n',
   );
 
   const result = spawnSync(process.execPath, [scriptPath, '--dir', fixtureDir], {
@@ -157,11 +157,11 @@ test('CLI run over a fixture directory with both pointers present exits 0', () =
   );
   fs.writeFileSync(
     path.join(fixtureDir, '0002-x.md'),
-    '---\nstatus: accepted\nsuperseded_by: 0012\n---\n# 0002\n',
+    '---\nstatus: accepted\nsuperseded_by: "0012"\n---\n# 0002\n',
   );
   fs.writeFileSync(
     path.join(fixtureDir, '0012-x.md'),
-    '---\nsupersedes: [0002]\n---\n# 0012\n',
+    '---\nsupersedes: ["0002"]\n---\n# 0012\n',
   );
 
   const result = spawnSync(process.execPath, [scriptPath, '--dir', fixtureDir], {

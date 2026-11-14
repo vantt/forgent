@@ -118,29 +118,42 @@ pub(crate) fn event_commit_input(
     }
 }
 
-/// Whole Unix seconds; callers clamp only when constructing a Git commit date.
+/// Whole Unix seconds of an event date. The envelope owns which dates are valid; the identity
+/// helper owns the date arithmetic. A date before 1970 has no unsigned form and reads as 0, the
+/// value a Git commit date is clamped to anyway.
 pub(crate) fn timestamp_seconds(ts: &str) -> Result<i64, Error> {
     if !crate::envelope::valid_timestamp(ts) {
         return Err(invalid("invalid event date"));
     }
-    let n = |a: usize, b: usize| ts[a..b].parse::<i64>().unwrap();
-    let y = n(0, 4);
-    let leaps = |year: i64| year.div_euclid(4) - year.div_euclid(100) + year.div_euclid(400);
-    let mut days = (y - 1970) * 365 + leaps(y - 1) - leaps(1969);
-    let leap = y % 4 == 0 && (y % 100 != 0 || y % 400 == 0);
-    for month in 1..n(5, 7) {
-        days += match month {
-            2 => {
-                if leap {
-                    29
-                } else {
-                    28
-                }
-            }
-            4 | 6 | 9 | 11 => 30,
-            _ => 31,
-        };
+    Ok(fgos_identity::text::iso_utc_secs(ts).map_or(0, |secs| secs as i64))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::timestamp_seconds;
+
+    #[test]
+    fn an_event_date_reads_as_unix_seconds_and_a_date_the_envelope_refuses_is_refused() {
+        for (ts, secs) in [
+            ("1970-01-01T00:00:00.000Z", 0),
+            ("1970-03-01T00:00:00.000Z", 59 * 86_400),
+            ("1999-12-31T23:59:59.999Z", 946_684_799),
+            ("2000-02-29T23:59:59.000Z", 951_868_799),
+            ("2038-01-19T03:14:08.500Z", 2_147_483_648),
+            ("2100-03-01T00:00:00.000Z", 4_107_542_400),
+            ("1969-12-31T23:59:59.000Z", 0),
+        ] {
+            assert_eq!(timestamp_seconds(ts).unwrap(), secs, "{ts}");
+        }
+        for bad in [
+            "2023-02-29T00:00:00.000Z",
+            "2024-04-31T00:00:00.000Z",
+            "2024-01-01T00:00:60.000Z",
+            "2024-01-01T00:00:00Z",
+            "2024-01-01 00:00:00.000Z",
+            "",
+        ] {
+            assert!(timestamp_seconds(bad).is_err(), "{bad}");
+        }
     }
-    days += n(8, 10) - 1;
-    Ok(days * 86400 + n(11, 13) * 3600 + n(14, 16) * 60 + n(17, 19))
 }

@@ -93,6 +93,18 @@
   ],
   "doors": [
     {
+      "job": "civil date arithmetic",
+      "kind": "door",
+      "patterns": ["719_?468", "\\bfn (?:civil_from_days|days_from_civil)\\b"],
+      "allowed": [
+        { "path": "packages/host-runtime/rust/src/civil_time.rs", "reason": "owner-kept pair (identity spec)" },
+        { "path": "packages/identity/rust/src/text.rs", "reason": "owner-kept pair (identity spec)" },
+        { "path": "apps/fgctl/build.rs", "reason": "build script; reaching the runtime crates would add a build edge" }
+      ],
+      "debt": [],
+      "reason": "dates are computed by the two helpers the owner kept; the patterns catch the days-from-civil algorithm, not a year-by-year loop like the removed event-store copy"
+    },
+    {
       "job": "verb manifest projection",
       "kind": "door",
       "patterns": ["\\bpublicManifest\\("],
@@ -116,6 +128,23 @@
         { "path": "packages/git/node-addon/src/single_load.rs", "reason": "takes a kernel lock of its own (Windows mutex, Unix flock) for the single-load marker instead of a holder-lock resource" }
       ],
       "reason": "a kernel lock is taken only inside the holder-lock drivers; every other lock goes through its Resource. The patterns cannot see std file.lock(), try_lock() or lock_shared(), whose names are too common to match without false hits"
+    },
+    {
+      "job": "process identity: start time of a process",
+      "kind": "door",
+      "patterns": ["GetProcessTimes", "\\bOpenProcess\\(", "ns_last_pid", "pbi_start"],
+      "allowed": [
+        "packages/process/rust/src/platform/linux.rs",
+        "packages/process/rust/src/platform/macos.rs",
+        "packages/process/rust/src/platform/windows.rs",
+        "packages/process/rust/src/platform/windows_job.rs"
+      ],
+      "debt": [
+        { "path": "packages/holder-lock/rust/src/helper.rs", "reason": "moves onto fgos-process: opens the holder and reads its creation time itself instead of open_verified" },
+        { "path": "packages/holder-lock/rust/src/route/hold.rs", "reason": "moves onto fgos-process: watch_parent opens and times the parent itself instead of open_verified" },
+        { "path": "packages/holder-lock/rust/src/borrow_vectors.rs", "reason": "moves onto fgos-process: only asks whether a pid has ended through its own OpenProcess; reads no start time" }
+      ],
+      "reason": "one reader of a process start time per platform: the fgos-process drivers; every other crate asks them"
     },
     {
       "job": "take a holder lock from Node",
@@ -170,9 +199,6 @@
         { "path": "packages/holder-lock/rust/src/route.rs", "reason": "reads /proc/<pid> metadata for the owner uid, a process fact read outside fgos-process" },
         { "path": "packages/holder-lock/rust/src/origin.rs", "reason": "reads /proc/<pid>/comm, a process fact read outside fgos-process" },
         { "path": "packages/holder-lock/rust/src/borrow_vectors.rs", "reason": "a vector module compiled into the crate whose shell snippet reads /proc/$!/winpid to learn a Windows pid" },
-        { "path": "packages/git/rust/src/worktree.rs", "reason": "reads /proc/<pid>/comm after observing a pid" },
-        { "path": "packages/git/node-addon/src/single_load.rs", "reason": "reads /proc/self/stat for this process start time, a third start-time reader" },
-        { "path": "packages/terminal-control/rust/src/driver/herdr.rs", "reason": "opens /proc/<pid>/fd/0 to find a pane's tty" },
         { "path": "scripts/run-tests.mjs", "reason": "scans /proc for stray processes of the test run" },
         { "path": "scripts/lib/test-file-watchdog.mjs", "reason": "scans /proc to judge a test file's processes" },
         { "path": "scripts/lib/test-file-cpu.mjs", "reason": "reads /proc/self/stat for waited CPU seconds" },
@@ -360,6 +386,98 @@
       "debt": [],
       "retiredBy": "S7: the Node adapter retires with the Node payload",
       "reason": "the section, its minimums, its defaults and what a refused file means are read once, by fgos-config; the Node reader is an adapter over the addon"
+    },
+    {
+      "job": "installation shim and activation record location",
+      "kind": "door",
+      "patterns": ["activation\\.json", "['\"]installation['\"],\\s*['\"]bin['\"]", "\\.fgos/installation/bin", "['\"]\\.fgos['\"],\\s*['\"]installation['\"]", "\\.join\\(\"installation\"\\)"],
+      "allowed": [
+        "src/util/host-bin-path.mjs",
+        "packages/distribution/rust/src/init.rs",
+        "packages/distribution/rust/src/lib.rs",
+        "packages/distribution/rust/src/shim.rs",
+        "packages/distribution/rust/src/uninstall.rs",
+        "packages/distribution/rust/src/fgctl_refresh.rs",
+        "apps/fgctl/src/help.rs",
+        "src/setup/project-launcher.mjs",
+        { "path": "bin/fgos.mjs", "reason": "an error message tells the user the shim path to run; it never builds or reads the path" },
+        { "path": "scripts/check-hook-registrations-guarded.mjs", "reason": "the check looks for the shim text inside hook commands, which is the string the hooks carry" },
+        { "path": "scripts/ci-external-consumer.sh", "reason": "the external-consumer proof runs the installed shim the way a consumer's shell does, outside any Node module" },
+        { "path": "scripts/ci-external-consumer.ps1", "reason": "the external-consumer proof asserts the record is absent after a refused install, outside any Node module" },
+        { "path": "scripts/fgos-shell-integration.sh", "reason": "a shell script the user sources: tests for the shim in the project before it names fgos" },
+        { "path": "scripts/lib/mailbox-behaviour-run.mjs", "reason": "the behaviour harness spawns the shim of the workspace it builds" },
+        { "path": "scripts/lib/mailbox-live-confined.mjs", "reason": "the live harness writes the activation record of the confined workspace it builds" },
+        { "path": "scripts/record-mailbox-hook-fixtures.mjs", "reason": "the fixture recorder spawns the shim of the workspace it builds" }
+      ],
+      "debt": [
+        { "path": "src/setup/registrations.mjs", "reason": "doctor rows read activation.json directly; moved after the capability plan rewrites the file" },
+        { "path": "packages/herdr-fgos-common/rust/src/fgos.rs", "reason": "builds the shim path itself; no step owns the move yet, see backlog row p-rypvkc3kai (a move onto the distribution crate would add a crate edge)" }
+      ],
+      "retiredBy": "S7: the Node reader retires with the Node payload; distribution keeps writing",
+      "reason": "distribution writes the record and the shim, the host reads them; in Node only host-bin-path knows where they are; core/skills/_shared/fgos-cli-fallback.md names the shim path in prose as a known markdown copy"
+    },
+    {
+      "job": "agent definition tier directories",
+      "kind": "door",
+      "patterns": [
+        "['\"]core['\"],\\s*['\"]agents['\"]",
+        "['\"]fgos['\"],\\s*['\"]agents['\"]",
+        "fgos/agents",
+        "core/agents",
+        "\\bagentsDir\\b",
+        "join\\((?![^)]*\\.claude)[^)]*,\\s*['\"]agents['\"]\\s*[,)]"
+      ],
+      "allowed": [
+        "src/runner/agent-definitions.mjs",
+        { "path": "src/util/domain-dirs.mjs", "reason": "defines the domain layout (a domain's agents/ folder) that the door reads" },
+        { "path": "src/cli/command-registry.mjs", "reason": "help text naming the tiers a persona is looked up in; no directory is read" }
+      ],
+      "debt": [
+        { "path": "src/setup/registrations.mjs", "reason": "doctor claims/skills walk (allAgentYamlFiles, readAgentSkills) re-walks the tiers and reads the project's own domains/; moved after the capability plan rewrites the file" }
+      ],
+      "reason": "one module knows the tier directories and their order"
+    },
+    {
+      "job": "read a YAML frontmatter block",
+      "kind": "door",
+      "patterns": [
+        "\\b(?:parseFrontmatter|renderFrontmatter|extractFrontmatter)\\b",
+        "\\bFRONTMATTER_PATTERN\\b",
+        "report/frontmatter\\.mjs",
+        "\\^---(?:\\\\r\\?)?(?:\\\\n|\\\\s|\\$)"
+      ],
+      "allowed": [
+        "src/util/yaml.mjs",
+        { "path": "core/skills/distill/scripts/distill.mjs", "reason": "standalone shipped skill script; runs in user projects without the fgOS addon" },
+        { "path": "core/skills/instruction-audit/scripts/instruction-audit.mjs", "reason": "standalone shipped skill script; runs in user projects without the fgOS addon" }
+      ],
+      "debt": [],
+      "reason": "only src/util/yaml.mjs readFrontmatter cuts and parses a frontmatter block; a second cutter or parser names one of the retired helpers or carries a fence regex (`^---` followed by an optional CR and a newline, whitespace or end of line). Per-line match on code and string text: a cut written another way (split on a fence) is not seen"
+    },
+    {
+      "job": "writer and session id environment",
+      "kind": "door",
+      "patterns": ["FGOS_SESSION_ID", "FGOS_PARENT_WRITER_ID", "CODEX_THREAD_ID", "PI_SESSION_ID", "PI_SESSION_FILE", "CLAUDE_CODE_SESSION_ID"],
+      "allowed": [
+        "packages/identity/rust/src/launcher.rs",
+        "packages/identity/rust/src/resolve.rs",
+        "packages/identity/rust/src/session.rs",
+        "src/util/session-identity.mjs",
+        "src/cli/command-registry.mjs",
+        { "path": "src/setup/agent-hooks.mjs", "reason": "the generated pi/omp extension runs in the agent process and cannot import the addon; its attempt-id prefix is pinned to the crate's by a test" },
+        { "path": "src/setup/registrations.mjs", "reason": "doctor detects a harness shell by these variables; it does not resolve or hand out a writer" },
+        { "path": "apps/fgos/examples/mailbox-ident-cost.rs", "reason": "a cost probe example names one source variable as its input; it decides nothing" },
+        { "path": "scripts/event-store/settle-host-proof.mjs", "reason": "a proof script sets its own writer id for the process it runs" },
+        { "path": "scripts/event-store/v-spawn-bench.mjs", "reason": "a benchmark clears inherited session ids and sets its own writer ids for the commands it times" },
+        { "path": "scripts/lib/mailbox-behaviour-run.mjs", "reason": "a test harness gives each simulated sender its own writer id" },
+        { "path": "scripts/lib/mailbox-live-cli.mjs", "reason": "the live mailbox harness lists the variables it clears to run as a chosen sender" },
+        { "path": "scripts/record-mailbox-hook-fixtures.mjs", "reason": "the fixture recorder captures which of these variables a real hook sees" },
+        { "path": "scripts/regenerate-observe-fixtures.mjs", "reason": "the fixture generator pins one session id for a reproducible recording" },
+        { "path": "scripts/stress-test-files.mjs", "reason": "the stress runner removes the harness session id from the env of the tests it starts" }
+      ],
+      "debt": [],
+      "retiredBy": "S7: the Node facade and its Node readers retire with the Node payload",
+      "reason": "only fgos-identity resolves a writer and decides the launcher environment; the Node facade asks it through the addon, and the files listed read or set these names for their own process"
     }
   ],
   "files": {
@@ -506,7 +624,6 @@
     "src/report/decision-index.mjs": "infra",
     "src/report/capability-plan-lint.mjs": "infra",
     "src/report/context-render.mjs": "domain",
-    "src/report/frontmatter.mjs": "domain",
     "src/report/authoritative-match.mjs": "domain",
     "src/evolve/iron-law.mjs": "domain",
     "src/holder-lock/index.mjs": "infra",

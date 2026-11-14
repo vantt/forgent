@@ -50,3 +50,43 @@ export function describeYamlError(error) {
   const where = Number.isInteger(error.line) && Number.isInteger(error.column) ? ` (line ${error.line}, column ${error.column})` : '';
   return `${error.rule.replaceAll('-', ' ')}${where}`;
 }
+
+const FRONTMATTER_BLOCK = /^---\r?\n([\s\S]*?)\r?\n---\r?\n/;
+
+/**
+ * Cuts the leading `---` fenced block off a document without parsing it: for a caller that only copies or skips
+ * the block's bytes and must not fail on a block that is not valid YAML.
+ *
+ * @param {string} text
+ * @returns {{ block: string, source: string, body: string }} `block` is the fenced text as written, fences
+ *   included; `source` is the text between the fences; `body` follows the block. No block gives empty `block`
+ *   and `source`, and the whole text as `body`.
+ */
+export function cutFrontmatter(text) {
+  const match = typeof text === 'string' ? FRONTMATTER_BLOCK.exec(text) : null;
+  if (!match) return { block: '', source: '', body: text };
+  return { block: match[0], source: match[1], body: text.slice(match[0].length) };
+}
+
+/**
+ * Cuts the leading `---` fenced block off a document and parses it with the YAML door: the one place that decides
+ * what a frontmatter block is.
+ *
+ * - No block (or no closing fence) returns `{ meta: {}, body: text, block: '' }`; an empty block returns an empty meta.
+ * - `block` is the fenced source as written, both fences included; `body` is the text after it.
+ * - A block the parser refuses, or one that is not a mapping, throws a YamlParseError naming `file`.
+ *
+ * @param {string} text
+ * @param {string} [file] named in refusals
+ * @returns {{ meta: Record<string, unknown>, body: string, block: string }}
+ */
+export function readFrontmatter(text, file) {
+  const { block, source, body } = cutFrontmatter(text);
+  if (!block) return { meta: {}, body, block };
+  const parsed = parseYaml(source, { filename: file });
+  if (parsed === null) return { meta: {}, body, block };
+  if (typeof parsed !== 'object' || Array.isArray(parsed)) {
+    throw new YamlParseError({ id: 'frontmatter-not-a-mapping', file: file ?? 'YAML input', line: 2, column: 1 });
+  }
+  return { meta: parsed, body, block };
+}

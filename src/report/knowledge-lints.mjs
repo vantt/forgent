@@ -9,7 +9,7 @@ import { commitAt, pathExistsAt } from '../git/inspect.mjs';
 import { resolveDocPath } from './knowledge-resolver.mjs';
 import { isLiveDocLifecycle } from '../state/knowledge-registry.mjs';
 import { findDuplicateAuthoritativeClaims } from './authoritative-match.mjs';
-import { parseFrontmatter } from './frontmatter.mjs';
+import { describeYamlError, readFrontmatter, YamlParseError } from '../util/yaml.mjs';
 
 const PROVISIONAL_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000;
 const DEFAULT_TOPIC_MAX_DOCS = 10;
@@ -50,22 +50,32 @@ function activeDuplicates(view) {
 }
 
 // Walks the whole docs/ tree, reads each file's frontmatter, and hands findDuplicateAuthoritativeClaims the
-// `{path, authoritativeFor}` candidate array it expects.
-function nearDuplicates(root) {
+// `{path, authoritativeFor}` candidate array it expects. A doc whose frontmatter the YAML door refuses is named in
+// `refused`, never read as a doc without frontmatter.
+function scanDocFrontmatter(root) {
   const docsDir = path.join(root, 'docs');
-  if (!fs.existsSync(docsDir)) return [];
+  if (!fs.existsSync(docsDir)) return { duplicates: [], refused: [] };
   const candidates = [];
+  const refused = [];
   for (const relPath of fs.readdirSync(docsDir, { recursive: true })) {
     if (!relPath.endsWith('.md')) continue;
     const absPath = path.join(docsDir, relPath);
     if (!fs.statSync(absPath).isFile()) continue;
-    const { meta } = parseFrontmatter(fs.readFileSync(absPath, 'utf8'));
+    let meta;
+    try {
+      ({ meta } = readFrontmatter(fs.readFileSync(absPath, 'utf8'), absPath));
+    } catch (err) {
+      if (!(err instanceof YamlParseError)) throw err;
+      refused.push(`${path.join('docs', relPath)}: ${describeYamlError(err)}`);
+      continue;
+    }
     const authoritativeFor = Array.isArray(meta.authoritative_for) ? meta.authoritative_for[0] : meta.authoritative_for;
     if (typeof authoritativeFor === 'string' && authoritativeFor.trim()) {
       candidates.push({ path: path.join('docs', relPath), authoritativeFor });
     }
   }
-  return findDuplicateAuthoritativeClaims(candidates).map((group) => group.map((c) => c.path).join(' ~ '));
+  const duplicates = findDuplicateAuthoritativeClaims(candidates).map((group) => group.map((c) => c.path).join(' ~ '));
+  return { duplicates, refused };
 }
 
 function provisionalAged(view, now) {
@@ -192,12 +202,14 @@ function sourceConservation(view, root) {
  * absent. `role-underused` is information only (`warn`); the others are `fail`.
  */
 export function knowledgeFindings(view, { root, now = Date.now(), topicMaxDocs = DEFAULT_TOPIC_MAX_DOCS }) {
+  const frontmatter = scanDocFrontmatter(root);
   const lints = [
     ['doc-alias-broken', 'fail', aliasBroken(view)],
     ['doc-active-duplicate', 'fail', activeDuplicates(view)],
     ['doc-current-path-missing', 'fail', currentPathMissing(view, root)],
     ['doc-source-unreachable', 'fail', sourceUnreachable(view)],
-    ['doc-near-duplicate', 'fail', nearDuplicates(root)],
+    ['doc-near-duplicate', 'fail', frontmatter.duplicates],
+    ['doc-frontmatter-refused', 'fail', frontmatter.refused],
     ['doc-provisional-aged', 'fail', provisionalAged(view, now)],
     ['doc-topic-oversized', 'fail', topicsOversized(view, topicMaxDocs)],
     ['doc-role-underused', 'warn', rolesUnderused(view)],

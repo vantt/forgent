@@ -442,13 +442,6 @@ pub fn execute_steps(steps: Vec<Step<'_>>) -> Vec<(&'static str, StepOutcome)> {
 // The verb
 // ---------------------------------------------------------------------------
 
-fn home_dir() -> Option<PathBuf> {
-    std::env::var_os("HOME")
-        .or_else(|| std::env::var_os("USERPROFILE"))
-        .filter(|h| !h.is_empty())
-        .map(PathBuf::from)
-}
-
 fn megabytes(bytes: u64) -> String {
     format!("{:.1} MB", bytes as f64 / 1_048_576.0)
 }
@@ -514,7 +507,11 @@ pub fn run_uninstall(
         None
     };
     let purge = if options.purge {
-        guard_store_root(store_root, home_dir().as_deref(), &workspace_root)?;
+        guard_store_root(
+            store_root,
+            fgos_holder_lock::state_root::home_for_state_root().as_deref(),
+            &workspace_root,
+        )?;
         Some(scan_store(store_root)?)
     } else {
         None
@@ -691,6 +688,24 @@ mod tests {
             "an ancestor of the project"
         );
         assert!(!refused(&abs("/home/someone/.local/state/fgos")));
+    }
+
+    #[test]
+    fn purge_guard_refuses_a_store_root_equal_to_the_home_the_state_root_rule_picks() {
+        let home = abs("/home/someone");
+        let other = abs("/home/other");
+        let env = |key: &str| match key {
+            "HOME" => Some(home.clone()),
+            "USERPROFILE" => Some(other.clone()),
+            _ => None,
+        };
+        let (picked, _) = fgos_holder_lock::state_root::home_from(env).unwrap();
+        let project = PathBuf::from(abs("/srv/app"));
+        assert!(guard_store_root(Path::new(&home), Some(&picked), &project).is_err());
+        assert!(
+            guard_store_root(Path::new(&other), Some(&picked), &project).is_ok(),
+            "the other variable is not the state root's home"
+        );
     }
 
     #[test]

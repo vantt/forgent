@@ -42,7 +42,7 @@ export function isLiveDocLifecycle(docLifecycle) {
 // A single safe path SEGMENT: no '/' or '\', can't start with '.' (rules
 // out '.', '..', and hidden-file-style segments in one regex), non-empty.
 // topicId/purposeSlug/role all become filesystem path segments downstream
-// (scripts/knowledge-migration.mjs builds `docs/${purposeSlug}/${role}.md`
+// (the one-shot knowledge migration, since removed, built `docs/${purposeSlug}/${role}.md`
 // directly from registry-accepted values) -- nothing before this validated
 // that, so `purposeSlug: '../../evil'` or `role: '../escape'` reached the
 // reducer, and from there the filesystem, unchecked.

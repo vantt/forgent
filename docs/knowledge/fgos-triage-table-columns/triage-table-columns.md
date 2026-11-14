@@ -1,6 +1,6 @@
 ---
 type: reference
-title: `/fgOS:triage` table columns
+title: "`/fgOS:triage` table columns"
 tags: []
 timestamp: 2026-07-30T00:59:26.000Z
 source_capture_ids: [tsk-dus]

@@ -1,7 +1,6 @@
 // ansi.mjs — hand-rolled ANSI color helpers for `fgos doctor`/`fgos setup`
 // (per CONTEXT.md D5: no new dependency — this codebase already ships zero
-// external deps, same rationale as report/entropy.mjs and
-// report/frontmatter.mjs). PURE: string in, string out — no
+// external deps, same rationale as report/entropy.mjs). PURE: string in, string out — no
 // console usage here; callers own printing (the colour gate only reads
 // whether stdout is a terminal).
 

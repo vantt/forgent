@@ -15,7 +15,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { replaceDurably } from '../native/door.mjs';
-import { hostBinFromActivation } from '../util/host-bin-path.mjs';
+import { hostBinFromActivation, installationDir } from '../util/host-bin-path.mjs';
 import { globalFgosDir } from '../config/facade.mjs';
 
 /**
@@ -26,7 +26,7 @@ import { globalFgosDir } from '../config/facade.mjs';
  * symlink escaping it is refused).
  */
 export function resolveWorkspaceInstallationBin(cwd) {
-  return hostBinFromActivation(path.join(cwd, '.fgos', 'installation'));
+  return hostBinFromActivation(installationDir(cwd));
 }
 
 /**

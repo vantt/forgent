@@ -123,7 +123,7 @@ D-tsk28x-8 (2026-08-25) set one engine with two tiers, a human tier that accepts
 ## 7. Known Area-Wide Gaps
 
 - `src/report/enduser-index.mjs` and `enduser-index-generate.mjs` emit user-document entries without lifecycle, so a reader of the index cannot tell provisional from active. Owner: reading surfaces.
-- `scripts/knowledge-classifier.mjs` (`sanitizeRole`) maps to `recipe`, `concept`, `walkthrough` and `guide`, outside the admitted roles; its new-write callers are mapped onto `question` values or retired in the write-door phase.
+- scripts/knowledge-classifier.mjs (`sanitizeRole`; removed on 2026-11-14 with the frontmatter helper, its only consumer was the finished knowledge migration) mapped to `recipe`, `concept`, `walkthrough` and `guide`, outside the admitted roles; its new-write callers are mapped onto `question` values or retired in the write-door phase.
 - The cause of 479 topics for 479 documents is not proven. The bootstrap script registering documents directly active is a confirmed source; the per-item retrospective writer is a suspected one.
 - Cross-project reach (B6) for platform-profile rules waits for the Convention project overlay (Convention Q13); document identity's tiers serve other projects for user documents.
 

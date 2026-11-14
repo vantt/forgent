@@ -17,6 +17,7 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { mailboxHookTimeoutSec, mailboxOptIn, mailboxRefusalLine } from './mailbox-limits.mjs';
 import { firstSymlinkUnder } from '../util/refuse-symlink.mjs';
+import { PROJECT_SHIM_RELATIVE, projectShimPath } from '../util/host-bin-path.mjs';
 
 export const SUPPORTED_AGENTS = ['claude', 'codex', 'agy', 'omp', 'pi'];
 
@@ -42,10 +43,6 @@ function writeJsonPretty(filePath, data) {
   writeFileSync(filePath, `${JSON.stringify(data, null, 2)}\n`, 'utf8');
 }
 
-export function getProjectShimPath(repoRoot) {
-  return path.join(repoRoot, '.fgos', 'installation', 'bin', 'fgos');
-}
-
 /** The shim as a shell command: an absolute, single-quoted path, so it runs whatever directory the
  * agent starts the hook in (agy runs it outside the project; codex uses the session directory). */
 function shimCommand(repoRoot, args) {
@@ -56,12 +53,20 @@ function shimCommand(repoRoot, args) {
 function shimOperand(repoRoot) {
   let root = path.resolve(repoRoot);
   try { root = realpathSync(root); } catch { /* not created yet: the resolved path is what there is */ }
-  return `'${getProjectShimPath(root).replace(/'/g, `'\\''`)}'`;
+  return `'${projectShimPath(root).replace(/'/g, `'\\''`)}'`;
+}
+
+/** `text` as a regular expression source that matches it literally. */
+function regExpSource(text) {
+  return text.replace(/[.*+?^${}()|[\]\\/]/g, '\\$&');
 }
 
 /** The shim path forms an fgOS hook command starts with: single-quoted absolute (the codex and agy
  * form, `'\''` escapes inside), the Claude Code project variable form, or an older bare path. */
-const SHIM_PREFIX = String.raw`(?:'(?:[^']|'\\'')*\/\.fgos\/installation\/bin\/fgos'|"\$\{CLAUDE_PROJECT_DIR\}\/\.fgos\/installation\/bin\/fgos"|(?:[^\s'"]*\/)?\.fgos\/installation\/bin\/fgos)`;
+/** The shim's relative parts as `path.join` arguments in the generated extension text. */
+const SHIM_PATH_ARGS = PROJECT_SHIM_RELATIVE.split('/').map((part) => `'${part}'`).join(', ');
+const SHIM_RELATIVE_SOURCE = regExpSource(PROJECT_SHIM_RELATIVE);
+const SHIM_PREFIX = String.raw`(?:'(?:[^']|'\\'')*\/${SHIM_RELATIVE_SOURCE}'|"\$\{CLAUDE_PROJECT_DIR\}\/${SHIM_RELATIVE_SOURCE}"|(?:[^\s'"]*\/)?${SHIM_RELATIVE_SOURCE})`;
 
 /** Whether `command` runs the project shim's `hook <kind>` with exactly this row's arguments (agy
  * format, mailbox `--cli`/`--event`), judged from the start of the command, so a user hook that only
@@ -76,7 +81,7 @@ function commandIsKind(command, row) {
 /** `run` is the doctor run's memo door (`createDoctorRun`): each distinct probe of one shim runs once per
  * run however many rows ask for it. Without a run every call probes afresh. */
 export function isShimRunnable(repoRoot, { mailboxCli = null, run = null } = {}) {
-  const shim = getProjectShimPath(repoRoot);
+  const shim = projectShimPath(repoRoot);
   if (!existsSync(shim)) return { runnable: false, reason: 'shim-missing' };
   // Probe the way an agent calls the hook: from a fresh process, not as a
   // child of the host that runs doctor. The host's recursion guard would
@@ -116,7 +121,7 @@ export function isShimRunnable(repoRoot, { mailboxCli = null, run = null } = {})
 // 1-3. The hook table: Claude Code, Codex CLI and AGY (JSON hook files)
 // ---------------------------------------------------------------------------
 
-const CLAUDE_SHIM = '"${CLAUDE_PROJECT_DIR}/.fgos/installation/bin/fgos"';
+const CLAUDE_SHIM = `"\${CLAUDE_PROJECT_DIR}/${PROJECT_SHIM_RELATIVE}"`;
 
 /** Claude Code's mailbox command: guarded, so a project without the shim or with a not-ready
  * activation never shows an error, and never `exec`, so the shell stays between Claude Code and the
@@ -184,7 +189,7 @@ function wrappedDeleteGuard(repoRoot, args, allow) {
  * an install replaces it in place instead of adding a second guard beside it. */
 const AGY_ALLOW = '{"decision":"allow"}';
 const wrappedGuardPattern = (suffix) => new RegExp(`^/bin/sh -c '[^']* hook ${HOOK_KINDS.DELETE_GUARD}${suffix};[^']*' sh ${SHIM_PREFIX}\\s*$`);
-const CLAUDE_GUARD_PATTERN = new RegExp(`^S="\\$\\{CLAUDE_PROJECT_DIR\\}/\\.fgos/installation/bin/fgos"; \\[ -x "\\$S" \\] \\|\\| exit 0; P=\\$\\(cat\\); case "\\$P" in [^]* "\\$S" hook ${HOOK_KINDS.DELETE_GUARD};; esac$`);
+const CLAUDE_GUARD_PATTERN = new RegExp(`^S="\\$\\{CLAUDE_PROJECT_DIR\\}/${SHIM_RELATIVE_SOURCE}"; \\[ -x "\\$S" \\] \\|\\| exit 0; P=\\$\\(cat\\); case "\\$P" in [^]* "\\$S" hook ${HOOK_KINDS.DELETE_GUARD};; esac$`);
 
 /** Claude Code's delete guard runs before every Bash call under `sh`, so the command is the prefiltered script itself. */
 const CLAUDE_DELETE_GUARD_COMMAND = deleteGuardScript(CLAUDE_SHIM, HOOK_KINDS.DELETE_GUARD);
@@ -473,7 +478,7 @@ const MAILBOX_TIMEOUT_MS = ${timeoutMs};
 
 function mailboxShim(dir: string): string | null {
   for (let at = path.resolve(dir); ; at = path.dirname(at)) {
-    const shim = path.join(at, '.fgos', 'installation', 'bin', 'fgos');
+    const shim = path.join(at, ${SHIM_PATH_ARGS});
     const st = lstatSync(shim, { throwIfNoEntry: false });
     if (st) return st.isFile() && st.uid === process.getuid?.() && (st.mode & 0o022) === 0 ? shim : null;
     if (path.dirname(at) === at) return null;
@@ -543,7 +548,7 @@ export default function (api: any) {
     try {
       const toolName = event?.toolName || '';
       const cwd = ctx?.cwd || process.cwd();
-      const shim = path.join(cwd, '.fgos', 'installation', 'bin', 'fgos');
+      const shim = path.join(cwd, ${SHIM_PATH_ARGS});
 
       if (toolName === 'task') {
         const res = spawnSync(shim, ['hook', 'dispatch-decide'], {
@@ -687,7 +692,7 @@ export function checkAllAgentHooks(cwd, run = null) {
 // Reversal: what `installAllAgentHooks` wrote, taken out again
 // ---------------------------------------------------------------------------
 
-const SHIM_MENTION = '.fgos/installation/bin/fgos';
+const SHIM_MENTION = PROJECT_SHIM_RELATIVE;
 
 /** Every command string a hook file still carries (nested `hooks.<Event>` entries, agy groups). */
 function remainingCommands(config) {

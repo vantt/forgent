@@ -78,7 +78,11 @@ impl World {
             std::fs::set_permissions(&shim, std::fs::Permissions::from_mode(0o755)).unwrap();
         }
         let state = home.join("state").join("fgos");
-        let release = state.join("releases").join(format!("sha256:{HEX}"));
+        let release = state
+            .join("releases")
+            .join(fgos_distribution::release_dir_name(&format!(
+                "sha256:{HEX}"
+            )));
         std::fs::create_dir_all(&release).unwrap();
         std::fs::write(release.join("manifest.json"), "{}").unwrap();
         std::fs::create_dir_all(state.join("identity")).unwrap();

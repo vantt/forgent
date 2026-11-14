@@ -576,15 +576,10 @@ impl GitDriver {
                         if !matches!(observe(row.pid), Observed::Absent | Observed::Zombie)
                             && warned.insert(row.pid.0)
                         {
-                            #[cfg(target_os = "linux")]
-                            let comm = std::fs::read_to_string(format!("/proc/{}/comm", row.pid))
-                                .unwrap_or_else(|_| "unknown".into());
-                            #[cfg(not(target_os = "linux"))]
-                            let comm = row
-                                .cmdline
-                                .as_ref()
-                                .and_then(|args| args.first())
-                                .cloned()
+                            let comm = fgos_process::facts::command_name_of(row.pid)
+                                .or_else(|| {
+                                    row.cmdline.as_ref().and_then(|args| args.first()).cloned()
+                                })
                                 .unwrap_or_else(|| "unknown".into());
                             eprintln!(
                                 "warning: worktree-cwd-unreadable pid={} comm={:?}",

@@ -8,7 +8,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 
-import { hostBinFromActivation, readActivationFile, resolveActiveHostBin, routeEnv } from '../../src/util/host-bin-path.mjs';
+import { PROJECT_SHIM_RELATIVE, hostBinFromActivation, projectShimPath, readActivationFile, resolveActiveHostBin, routeEnv } from '../../src/util/host-bin-path.mjs';
 
 function tmp(prefix) {
   return fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), prefix)));
@@ -127,4 +127,9 @@ test('the activation reader answers the record, null for no file, and throws for
   fs.writeFileSync(file, '{not json');
   assert.throws(() => readActivationFile(file), SyntaxError);
   assert.equal(hostBinFromActivation(root), null, 'the host lookup treats an unreadable record as no activation');
+});
+
+test('the project shim lives at the installation bin under the project root, in one relative form', () => {
+  assert.equal(PROJECT_SHIM_RELATIVE, '.fgos/installation/bin/fgos');
+  assert.equal(projectShimPath(path.join(path.sep, 'work', 'proj')), path.join(path.sep, 'work', 'proj', '.fgos', 'installation', 'bin', 'fgos'));
 });

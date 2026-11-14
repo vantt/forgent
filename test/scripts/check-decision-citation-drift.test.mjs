@@ -180,11 +180,11 @@ test(
 
     fs.writeFileSync(
       path.join(decisionsDir, '0002-x.md'),
-      '---\nsuperseded_by: 0012\n---\n# 0002\n',
+      '---\nsuperseded_by: "0012"\n---\n# 0002\n',
     );
     fs.writeFileSync(
       path.join(decisionsDir, '0012-x.md'),
-      '---\nsupersedes: [0002]\n---\n# 0012\n',
+      '---\nsupersedes: ["0002"]\n---\n# 0012\n',
     );
     fs.writeFileSync(
       path.join(dir, 'backlog.md'),
@@ -225,11 +225,11 @@ test(
 
     fs.writeFileSync(
       path.join(decisionsDir, '0002-x.md'),
-      '---\nsuperseded_by: 0012\n---\n# 0002\n',
+      '---\nsuperseded_by: "0012"\n---\n# 0002\n',
     );
     fs.writeFileSync(
       path.join(decisionsDir, '0012-x.md'),
-      '---\nsupersedes: [0002]\n---\n# 0012\n',
+      '---\nsupersedes: ["0002"]\n---\n# 0012\n',
     );
     fs.writeFileSync(
       path.join(dir, 'backlog.md'),

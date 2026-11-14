@@ -6,8 +6,7 @@
 // creating a second doc for the same subject under a differently-guessed
 // name. Pure: no fs, no imports — candidates are plain `{path,
 // authoritativeFor}` records the caller already read off disk (via
-// `parseFrontmatter`, `frontmatter.mjs`), matching that module's own
-// zero-import purity discipline.
+// `readFrontmatter`, `src/util/yaml.mjs`); this module stays pure.
 //
 // Port/adapter shape (D12), mirroring `src/runner/dispatch.mjs`'s C9 v2
 // executor interface: match logic sits behind a named adapter in a

@@ -46,7 +46,7 @@ import { resolveTaskSpecPath } from '../paths.mjs';
 
 import { RunnerConfigError } from './runner-config-error.mjs';
 import { describeYamlError, parseYaml } from '../../util/yaml.mjs';
-import { nonTextPersonaValues, projectPersona } from '../agent-definitions.mjs';
+import { AgentNotFoundError, nonTextPersonaValues, projectPersona, resolveAgentDefinition } from '../agent-definitions.mjs';
 import {
   NORMALIZER_VERSION,
   READ_ONLY_ROLES,
@@ -628,24 +628,34 @@ function buildInlineAssignment({ provenance, workId, createdBy, options = {} }) 
   return Object.freeze(assignment);
 }
 
+/** The one visible line for a persona that was found but cannot be rendered; the door's own reason, without its name and path prefix. */
+function personaFailureLine(personaRef, error) {
+  if (!(error instanceof RunnerConfigError)) return `Persona "${personaRef}" could not be parsed: ${describeYamlError(error)}`;
+  const reason = error.message.replace(/^persona "[^"]*" \([^)]*\) /, '');
+  const parsePrefix = 'cannot be parsed: ';
+  return reason.startsWith(parsePrefix)
+    ? `Persona "${personaRef}" could not be parsed: ${reason.slice(parsePrefix.length)}`
+    : `Persona "${personaRef}" cannot be rendered: ${reason}`;
+}
+
 function renderPersonaSection(personaRef, options = {}) {
   const root = options.repoRoot ?? options.cwd ?? process.cwd();
-  const personaFile = path.join(root, 'core', 'agents', `${personaRef}.yaml`);
   let content = null;
   let parseFailure = null;
   // Text a caller pinned when it bound the persona wins over any file: the same definition
-  // reaches every attempt and every resume, whatever the file says by then.
+  // reaches every attempt and every resume, whatever the file says by then. Otherwise the
+  // agent-definitions door finds the file; a persona it does not find renders as the bare section.
   const pinned = options.persona?.pinnedText;
-  if (typeof pinned === 'string' || fs.existsSync(personaFile)) {
-    try {
-      const text = typeof pinned === 'string' ? pinned : fs.readFileSync(personaFile, 'utf8');
-      const parsed = parseYaml(text, { filename: `${personaRef}.yaml` });
-      const [nonText] = nonTextPersonaValues(parsed);
-      if (nonText) parseFailure = `Persona "${personaRef}" cannot be rendered: ${nonText}`;
-      else content = projectPersona(parsed);
-    } catch (error) {
-      parseFailure = `Persona "${personaRef}" could not be parsed: ${describeYamlError(error)}`;
-    }
+  try {
+    const text = typeof pinned === 'string'
+      ? pinned
+      : resolveAgentDefinition(personaRef, { projectRoot: root }).text;
+    const parsed = parseYaml(text, { filename: `${personaRef}.yaml` });
+    const [nonText] = nonTextPersonaValues(parsed);
+    if (nonText) parseFailure = `Persona "${personaRef}" cannot be rendered: ${nonText}`;
+    else content = projectPersona(parsed);
+  } catch (error) {
+    if (!(error instanceof AgentNotFoundError)) parseFailure = personaFailureLine(personaRef, error);
   }
 
   const lines = [

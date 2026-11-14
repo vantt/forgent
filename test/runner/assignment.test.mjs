@@ -569,3 +569,40 @@ test('pinned persona text that parses is read by the parser, and wins over the f
   assert.match(prompt, /^Voice: calm$/m);
   assert.doesNotMatch(prompt, /from the file/);
 });
+
+// ─── persona definitions are found through the agent-definitions door ────────
+
+function tierPrompt(files) {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-persona-tiers-'));
+  try {
+    for (const [rel, text] of Object.entries(files)) {
+      fs.mkdirSync(path.dirname(path.join(root, rel)), { recursive: true });
+      fs.writeFileSync(path.join(root, rel), text);
+    }
+    const assignment = buildAssignment({ workId: 'tsk-tiers', stage: 'planning', operation: 'validate-plan' });
+    return renderAssignmentPrompt(assignment, {
+      repoRoot: root,
+      persona: { value: 'critic', source: { scope: 'default', id: 'reviewer' } },
+    });
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+}
+
+test('an unpinned persona that lives only in the workspace tier renders its text', () => {
+  const prompt = tierPrompt({ 'fgos/agents/critic.yaml': 'name: critic\ndescription: Workspace critic\npersona:\n  voice: calm\n' });
+  assert.match(prompt, /^Description: Workspace critic$/m);
+  assert.match(prompt, /^Voice: calm$/m);
+});
+
+test('a persona that names a model taste renders one failure line instead of throwing', () => {
+  const prompt = tierPrompt({ 'core/agents/critic.yaml': 'name: critic\ndescription: Blunt\ntier: strong\n' });
+  assert.match(prompt, /^Persona "critic" cannot be rendered: persona-model-taste-not-allowed: "tier"/m);
+  assert.doesNotMatch(prompt, /^Description:/m);
+});
+
+test('a persona found in no tier keeps the bare persona section', () => {
+  const prompt = tierPrompt({ 'core/agents/other.yaml': 'name: other\ndescription: x\n' });
+  assert.match(prompt, /^# Persona$/m);
+  assert.doesNotMatch(prompt, /could not be parsed|cannot be rendered|Description:/);
+});

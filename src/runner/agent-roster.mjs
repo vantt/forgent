@@ -1,5 +1,4 @@
-// agent-roster.mjs — reads the real agent-type roster (core/agents/ +
-// domains/<name>/agents/ + legacy agents/) and a task-spec's own header
+// agent-roster.mjs — reads the real agent-type roster (the agent-definitions door's tiers) and a task-spec's own header
 // fields, for docs/history/core-foundation-domain-boundary/DISCUSSION.md's D20/D22
 // eligibility-inversion resolution (resolveAgentTypeForTaskSpec, src/runner/dispatch/cli.mjs). LAYER: infra
 // (same tier as dispatch/cli.mjs, which is the runtime consumer this
@@ -11,65 +10,40 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-import { readAgentDefinition } from './agent-definitions.mjs';
-import { domainCatalog } from '../util/domain-dirs.mjs';
+import { readAgentDefinition, scanAgentTiers } from './agent-definitions.mjs';
 
 /**
- * Every real agent-type's `{name, skills}` across the payload's `core/agents/`,
- * `domains/<name>/agents/`, and the legacy `agents/` (D24/D33 precedence:
- * core, then domains in sorted order, then legacy last, first occurrence
- * of a name wins -- same order `registrations.mjs`'s own
- * `allAgentYamlFiles` uses). Sorted directory scans throughout (D32,
- * review finding M2) so the roster is identical on every machine/run.
- * Never throws on a malformed individual file: a file that is unreadable or
- * not valid YAML is left out of the roster and named in `problems`
- * (`<file>: cannot be parsed: <reason> (line L, column C)`), so the caller
- * can surface it instead of losing the agent silently.
+ * Every real agent-type's `{name, skills}` in the agent-definitions door's tier order (workspace
+ * `fgos/agents`, domains, core); the first definition of a name wins, as a lookup would find it.
+ * Never throws on a malformed individual file: a file that is unreadable or not valid YAML is left
+ * out of the roster and named in `problems` (`<file>: cannot be parsed: <reason> (line L, column C)`),
+ * so the caller can surface it instead of losing the agent silently.
  *
  * @returns {{ defs: Array<{ name: string, skills: string[] }>, problems: string[] }}
  */
 export function loadAgentRoster(cwd, { payloadRoot } = {}) {
-  const files = [];
-  const seen = new Set();
-
-  const scanDir = (dir) => {
-    if (!fs.existsSync(dir)) return;
-    for (const name of fs.readdirSync(dir).sort((a, b) => a.localeCompare(b))) {
-      if (!name.endsWith('.yaml') && !name.endsWith('.yml')) continue;
-      const filePath = path.join(dir, name);
-      if (seen.has(filePath)) continue;
-      seen.add(filePath);
-      files.push(filePath);
-    }
-  };
-
-  // Core and domain agents are the running payload's doctrine; only the legacy `agents/` is the project's own.
-  const catalog = domainCatalog({ payloadRoot });
-  scanDir(path.join(catalog.root, 'core', 'agents'));
-  for (const { agentsDir } of catalog.domains) scanDir(agentsDir);
-  scanDir(path.join(cwd, 'agents'));
-
   const defs = [];
   const problems = [];
   const namesSeen = new Set();
-  for (const filePath of files) {
-    const rel = path.relative(filePath.startsWith(catalog.root + path.sep) ? catalog.root : cwd, filePath).split(path.sep).join('/');
-    let text;
-    try {
-      text = fs.readFileSync(filePath, 'utf8');
-    } catch (error) {
-      problems.push(`${rel}: cannot be read (${error.message})`);
-      continue;
+  for (const { entries } of scanAgentTiers({ projectRoot: cwd, ...(payloadRoot ? { installRoot: payloadRoot } : {}) })) {
+    for (const { file, rel } of entries) {
+      let text;
+      try {
+        text = fs.readFileSync(file, 'utf8');
+      } catch (error) {
+        problems.push(`${rel}: cannot be read (${error.message})`);
+        continue;
+      }
+      const { error, name: declared, skills } = readAgentDefinition(text, { filename: rel });
+      if (error) {
+        problems.push(`${rel}: ${error}`);
+        continue;
+      }
+      const name = declared ?? path.basename(file).replace(/\.ya?ml$/, '');
+      if (namesSeen.has(name)) continue;
+      namesSeen.add(name);
+      defs.push({ name, skills });
     }
-    const { error, name: declared, skills } = readAgentDefinition(text, { filename: rel });
-    if (error) {
-      problems.push(`${rel}: ${error}`);
-      continue;
-    }
-    const name = declared ?? path.basename(filePath).replace(/\.ya?ml$/, '');
-    if (namesSeen.has(name)) continue; // first occurrence wins, D33's own precedence
-    namesSeen.add(name);
-    defs.push({ name, skills });
   }
   return { defs, problems };
 }

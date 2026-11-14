@@ -47,6 +47,18 @@ export function mintAttemptWriterId(attemptId) {
   }
 }
 
+/** What a launcher does to an agent's environment, decided by the Rust crate: `{ set: [[name, value], ...], unset: [name, ...] }`. */
+export function launcherEnv(writerId, parent = null) {
+  const bad = (value) => typeof value !== 'string' || value.includes('\0');
+  if (bad(writerId) || (parent != null && bad(parent))) throw new WriterIdentityError('invalid-writer-id', 'the writer id and its parent must be strings without NUL');
+  try {
+    return identityDoor().launcherEnv(writerId, parent ?? null);
+  } catch (err) {
+    if (String(err.message).startsWith('empty-writer-id')) throw new WriterIdentityError('empty-writer-id', "the agent's writer id must not be empty");
+    throw err;
+  }
+}
+
 /** Doctor's probe: asks host binary `bin` (`fgos identity`) for this process's answer. Codes: host-missing, host-version-mismatch, host-error. */
 export function probeIdentity(bin, fgosDir) {
   const env = routeEnv();

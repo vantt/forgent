@@ -16,6 +16,7 @@ import { admitSuccessor } from './cwd-lock.mjs';
 import { DispatchError } from './dispatch-error.mjs';
 import { computeSha256Digest, openAgentFileSync, publishImmutableProof, publishMutableProjection } from '../native/proof-helpers.mjs';
 import { selfRecord } from '../native/process-identity.mjs';
+import { launcherEnv } from '../util/session-identity.mjs';
 import { adoptRun, resolveRouteHostBin, RunSupervisorError } from './client.mjs';
 import { readGateKillGraceMs } from './gate-kill-grace.mjs';
 import { ensureRuntimeSocketDir } from './runtime-dir.mjs';
@@ -143,14 +144,15 @@ export function attemptStepEnv({ env = process.env } = {}) {
 }
 
 /**
- * `env` with the attempt's writer id applied (`FGOS_SESSION_ID` set, `FGOS_PARENT_WRITER_ID` set or removed),
+ * `env` with the attempt's writer id applied as fgos-identity decides (inherited session ids dropped, the attempt's id and its controller set),
  * so what the controller carried never reaches the agent. Both env sources of an attempt go through here.
  */
 export function withIdentityEnv(env, identity) {
   if (!identity) return env;
+  const { set, unset } = launcherEnv(identity.writerId, identity.parentWriterId);
   const out = { ...env };
-  delete out.FGOS_PARENT_WRITER_ID;
-  return { ...out, FGOS_SESSION_ID: identity.writerId, ...(identity.parentWriterId ? { FGOS_PARENT_WRITER_ID: identity.parentWriterId } : {}) };
+  for (const name of unset) delete out[name];
+  return { ...out, ...Object.fromEntries(set) };
 }
 
 /** The steps an attempt runs after its receipt, in order: the one list the envelope and the intent both carry. */

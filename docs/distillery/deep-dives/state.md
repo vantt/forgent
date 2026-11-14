@@ -1,7 +1,7 @@
 ---
 topic: state
 date: 2026-07-13
-redived: 2026-07-15 (delta beehive af4840c→55cf3a4: state-shape thành đa-pipeline + producer-not-settable; beehive rời single-writer); 2026-07-21 (delta beehive 94b4a31→05a131f: ghi vào state nay khoá đặt-tên chéo tiến trình; beehive tự có một dạng "durability gate" như symphony; cell store tách hot/archive)
+redived: "2026-07-15 (delta beehive af4840c→55cf3a4: state-shape thành đa-pipeline + producer-not-settable; beehive rời single-writer); 2026-07-21 (delta beehive 94b4a31→05a131f: ghi vào state nay khoá đặt-tên chéo tiến trình; beehive tự có một dạng \"durability gate\" như symphony; cell store tách hot/archive)"
 based_on: [beehive@05a131f, repository-harness@0a79bbe, symphony@2f0b257, marketing-cockpit@588d800]
 entries: [beehive:state-vs-log-two-physics, beehive:phase-machine-cli-owned, beehive:cell-status-lifecycle, beehive:policy-vs-ops-split, beehive:docs-history-per-feature, beehive:lane-scoped-pipelines, beehive:cross-session-atomic-claims, beehive:chain-integrity-guard-tail, beehive:store-lock-named-mutex, beehive:worktree-merge-staged-verify-gate, beehive:cell-archiving-transaction, repository-harness:durable-sqlite-layer, repository-harness:changeset-event-sourcing, repository-harness:story-status-single-door, repository-harness:epoch-fence-migration-guard, repository-harness:policy-vs-durable-separation, symphony:run-and-queue-state-machine, symphony:run-artifact-durability-split, symphony:changeset-content-sha-immutability, symphony:board-state-precedence-derivation, marketing-cockpit:four-memory-types, marketing-cockpit:procedural-memory-reinforcement, marketing-cockpit:four-zone-storage-separation, marketing-cockpit:task-signal-state-machines]
 ---

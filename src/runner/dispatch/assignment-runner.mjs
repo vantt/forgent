@@ -52,7 +52,7 @@ import { resolveMainCheckoutRoot, resolveRepoRoot, fgosDirFromRoot } from '../pa
 import { renderAssignmentPrompt, isReadOnlyAssignment } from './assignment.mjs';
 import { resolveAndRenderOperationPrompt } from './operation-prompt-templates.mjs';
 import { withRunDirAccess } from './cli.mjs';
-import { mintAttemptWriterId, resolveWriterIdentity } from '../../util/session-identity.mjs';
+import { launcherEnv, mintAttemptWriterId, resolveWriterIdentity } from '../../util/session-identity.mjs';
 import { resolveExecutorEnv, workerBaseEnv, caseContextEnv, CASE_ID_ENV, CASE_RESERVATION_ENV } from './adapters.mjs';
 import { compileDispatchPlan, launchPinOf } from './plan.mjs';
 import { familyOf } from './provider-adapter.mjs';
@@ -416,12 +416,11 @@ export function terminalAgentArgs({ resolvedCmd, prompt, model, runDir, writerId
     args: agentArgsWithoutPrompt({ argsTemplate: resolvedCmd.argsTemplate, args: resolvedCmd.args, prompt, model }),
     runDir,
   });
+  if (commandCli(resolvedCmd.command) !== 'codex') return args;
   // The case the attempt was admitted into travels beside the writer id: a codex shell command does not
   // get the pane's environment, so the nested `fgos` call would otherwise carry no case at all.
-  const settings = [`FGOS_SESSION_ID="${writerId}"`, ...(caseContext ? [`${CASE_ID_ENV}="${caseContext.caseId}"`, `${CASE_RESERVATION_ENV}="${caseContext.reservationId}"`] : [])];
-  return commandCli(resolvedCmd.command) === 'codex'
-    ? [...args, '-c', `shell_environment_policy.set={${settings.join(',')}}`]
-    : args;
+  const settings = [...launcherEnv(writerId).set.map(([name, value]) => `${name}="${value}"`), ...(caseContext ? [`${CASE_ID_ENV}="${caseContext.caseId}"`, `${CASE_RESERVATION_ENV}="${caseContext.reservationId}"`] : [])];
+  return [...args, '-c', `shell_environment_policy.set={${settings.join(',')}}`];
 }
 
 // The seat a unit-run assignment fills: a unit running a Work step operation stamps the

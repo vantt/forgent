@@ -8,7 +8,7 @@ use std::process::{Child, Command};
 use crate::control::{Signal, SignalOutcome};
 use crate::facts::{
     CreationMark, Holders, Observed, Observer, PidNs, ProcTuple, ProcView, Relation, Scan,
-    ScanFilter,
+    ScanFilter, StartTime,
 };
 use crate::{FdSlot, ProcId};
 
@@ -54,6 +54,14 @@ pub trait ProcessPlatform: Send + Sync {
     /// The kernel's short command name of `pid` (Linux `comm`); `None` where
     /// the OS has no such read or the process is gone.
     fn command_name_of(&self, _pid: ProcId) -> Option<String> {
+        None
+    }
+    /// See [`crate::facts::start_time_of`].
+    fn start_time_of(&self, _pid: ProcId) -> Option<StartTime> {
+        None
+    }
+    /// See [`crate::facts::stdin_window_size`].
+    fn stdin_window_size(&self, _pid: ProcId) -> Option<(u16, u16)> {
         None
     }
     /// The pid of `pid` in each PID namespace it is visible in, outermost first (Linux `NSpid`); `None` where the OS
