@@ -15,17 +15,14 @@ mod refs;
 mod worktree;
 pub use worktree::inspect_git_worktree_recovery;
 mod remote;
-use crate::{check, error};
+use crate::{check, error, operation};
 use fgos_git::{HolderAuthority, *};
 use fgos_holder_lock::{Acquire, Handle, Mode, Resource, Wait, DEFAULT_KILL_WAIT_MS};
-use napi::{Error, Result};
+use napi::Result;
 use napi_derive::napi;
 use serde_json::{json, Value};
 use std::path::Path;
 
-fn operation(e: OperationError) -> Error {
-    Error::from_reason(json!({"code": e.code, "cause": e.cause, "retryable": e.retryable, "operationId": e.operation_id, "receipt": e.receipt, "exitCode": e.exit_code, "signal": e.signal, "stderr": e.stderr, "detail": e.detail}).to_string())
-}
 fn text<'a>(v: &'a Value, key: &str) -> Result<&'a str> {
     v.get(key)
         .and_then(Value::as_str)

@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "db02b92341ab5ff88c681d17cd548b58b08125d20f5b7c947cd867044d6e9b17",
+  "payloadDigest": "39276c6e8f1e844a0550daaaa4769519a5e6e586ed00a13d2017e1612ddb3731",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -369,7 +369,7 @@
     "packages/git/node-addon/src/config.rs": "e5ae550bb0a924fb3400db97eb20e6175d6c0e2f4bf4161b6184b8f2cd575d86",
     "packages/git/node-addon/src/durable_file.rs": "92d33582a588824a105683b230a694f3b103657b1b1520fc0b86bac079c490e1",
     "packages/git/node-addon/src/event_store.rs": "815beaa79b5f250d8f6380d46d93ebd7fa564a5b9cb707f9a7adb5c5abc3cbf6",
-    "packages/git/node-addon/src/git.rs": "7941c048124ba455a8cad3d075e421809a28e1f05d7afbe84551fccf6cc45153",
+    "packages/git/node-addon/src/git.rs": "c7d861c76b7475066ef39ef25d153cb783483b80a7d542be630a73e3dedce3f1",
     "packages/git/node-addon/src/git/config.rs": "063357ef31bcf3abe4f73040f2ccb326ffc09ed60eaa57ac9ecb4c413e4b0b7f",
     "packages/git/node-addon/src/git/handover.rs": "7df66e505c41a90315bcaa389491059922e76689265efbd725b177cd3a62eb9f",
     "packages/git/node-addon/src/git/inspect.rs": "2bcf968c2dc4b472f653bd81723101f3861d47521169113add28e7e86f44d789",
@@ -383,7 +383,7 @@
     "packages/git/node-addon/src/git/worktree.rs": "ecafcfc15690c8d22348c949555f4e93539709554268464c0b11d5f61eab8273",
     "packages/git/node-addon/src/git/write_scope.rs": "657f168ae337fac9315cd39fc8681bc069c16b5ff7ce2dd607dfef39dc9ce5ee",
     "packages/git/node-addon/src/holder_lock.rs": "584c0d1940eac18b569d7015e5e083a6026a660307e767f977a08516b657b00d",
-    "packages/git/node-addon/src/lib.rs": "99643b2c35f80a98dc13eba9de10be8617b6964a4c827c46d0368ab39596f201",
+    "packages/git/node-addon/src/lib.rs": "2ec3dfe80a6aa5d157a5dfe697ca5502e5a4608cde88e1758d0327f97b256174",
     "packages/git/node-addon/src/marshal.rs": "9c577023964196ed960f127b3817814b2d27b877298abc112428feb37a83a5a2",
     "packages/git/node-addon/src/process.rs": "58d672646727a218add432c4ba8b6e389448b56d7c13405187b2f8cb87015a2a",
     "packages/git/node-addon/src/run_result.rs": "109e68b5e695dc1bb85223e5a1db1c9837bc0c66a2e026d74f8f925eff5d46d4",

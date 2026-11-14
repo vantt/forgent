@@ -71,6 +71,27 @@ test('Inspect marshals real byte paths, explicit absence, reads, pages and snaps
 
 // A session with no env id resolves to a process (`source: pid`, an integer id); every Git port's
 // writer is a string, so the door that hands the writer to a port must give text for that answer.
+// The constructor maps the driver's refusal through the addon's one operation() mapping; no other test reads the
+// fields of a constructor error.
+test('a GitInspect constructor refusal carries every field of the driver error', () => {
+  const temp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-inspect-ctor-'));
+  try {
+    const repoPath = path.join(temp, 'repo'); fs.mkdirSync(repoPath);
+    execFileSync('git', ['-C', repoPath, 'init', '-q']);
+    const stateRoot = path.join(temp, 'state-root-is-a-file');
+    fs.writeFileSync(stateRoot, 'not a directory');
+    let refusal = null;
+    try { createGitInspect({ stateRoot, repoPath, trustedMain: repoPath }, loader); } catch (error) { refusal = error; }
+    assert.ok(refusal, 'a state root that is a file is refused');
+    const fields = JSON.parse(refusal.message);
+    for (const key of ['code', 'cause', 'retryable', 'operationId', 'receipt', 'exitCode', 'signal', 'stderr', 'detail']) {
+      assert.ok(Object.hasOwn(fields, key), `${key} in ${refusal.message}`);
+    }
+  } finally {
+    fs.rmSync(temp, { recursive: true, force: true });
+  }
+});
+
 test('a Git port writer is text when the session identity is a process id', () => {
   const temp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-git-writer-'));
   const repoPath = path.join(temp, 'repo'); fs.mkdirSync(repoPath);
