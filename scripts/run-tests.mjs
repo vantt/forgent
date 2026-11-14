@@ -24,6 +24,10 @@ import { CPU_LOG_ENV, readTestFileCpu, waitedCpuSeconds } from './lib/test-file-
 import { acquireFullSuiteQueue, QUEUE_HELD_ENV, QUEUE_SWITCH_ENV } from './lib/full-suite-queue.mjs';
 import { configEntries, repositoryDirs, worktreeRegistrationsUnder } from './lib/git-dir-layout.mjs';
 import { pruneMissingCheckouts } from './lib/git-ports.mjs';
+import { refusalAdvice } from './lib/test-file-watchdog.mjs';
+import { loadNativeAddon, nativeDoor } from '../src/native/door.mjs';
+import { scan, selfRecord } from '../src/native/process-identity.mjs';
+import { processesInside, stopProcessesInside } from '../src/runner/dispatch/stop-processes-inside.mjs';
 
 export { REPO_ROOT };
 export const DEFAULT_TEST_ROOT = path.join(REPO_ROOT, 'test');
@@ -124,6 +128,19 @@ function stageDoorManifest(childEnv) {
   }
 }
 
+// This process loads the same staged addon its children use, from the manifest `stageDoorManifest` wrote into
+// `childEnv` (the process's own environment is never changed). Loaded once, when the watchdog starts or the run
+// looks for strays; no other loader of a staged manifest exists for a script's own process.
+let runnerDoorLoaded = false;
+function loadRunnerDoor(childEnv) {
+  if (runnerDoorLoaded) return;
+  const manifestPath = childEnv.FGOS_ACTIVE_MANIFEST_PATH;
+  // Without a staged manifest (staging failed for this caller's environment) the process's own door is the only one there is.
+  if (manifestPath) loadNativeAddon({ descriptor: { manifest: JSON.parse(fs.readFileSync(manifestPath, 'utf8')), releaseRoot: REPO_ROOT } });
+  else nativeDoor();
+  runnerDoorLoaded = true;
+}
+
 // Windows names are matched without case, as Windows reads them.
 const TEST_ENV_KEYS = new Set([
   'PATH', 'HOME', 'USER', 'LOGNAME', 'SHELL', 'LANG', 'LANGUAGE', 'TZ', 'TERM', 'TMPDIR', 'TMP', 'TEMP', 'XDG_RUNTIME_DIR',
@@ -202,17 +219,20 @@ export const DEFAULT_FILE_TIMEOUT_MS = 10 * 60 * 1000;
 export const FILE_TIMEOUT_OVERRIDES_MS = {};
 const WATCHDOG_PATH = fileURLToPath(new URL('./lib/test-file-watchdog.mjs', import.meta.url));
 const DEFAULT_WATCHDOG_POLL_MS = 5000;
+// How long the launcher waits for the watchdog to prove it can kill before it gives up on starting the run.
+const WATCHDOG_READY_MS = 20_000;
 
 /**
  * Starts the per-file time limit supervisor (see lib/test-file-watchdog.mjs)
  * as a sibling process -- the caller blocks in spawnSync, so it cannot watch
- * itself. Returns `{ stop() -> [{file, elapsedMs, limitMs}] }`; `stop()` ends
- * the supervisor and reports every file it killed for running too long.
+ * itself. Returns `{ failure() -> string|null, stop() -> [{file, elapsedMs, limitMs, refused}] }`:
+ * `failure()` says why no time limit is running (the caller must not start a test then); `stop()` ends
+ * the supervisor and reports every file that outran its limit, with the kills the door refused.
  */
 function startFileWatchdog({ files, env, fileTimeoutMs, pollMs, tempDir, cleanDirs, repo, log }) {
   if (process.platform === 'win32') {
     log('run-tests: warning: per-file time limit needs `ps`; not available on win32, running without it');
-    return { stop: () => [] };
+    return { stop: () => [], failure: () => null };
   }
   const limits = {};
   for (const file of files) {
@@ -220,21 +240,46 @@ function startFileWatchdog({ files, env, fileTimeoutMs, pollMs, tempDir, cleanDi
     // carries that same string as its last argv element.
     limits[file] = FILE_TIMEOUT_OVERRIDES_MS[file.split(path.sep).join('/')] ?? fileTimeoutMs;
   }
+  let parentRecord;
+  try {
+    loadRunnerDoor(env);
+    parentRecord = selfRecord();
+  } catch (err) {
+    return { stop: () => [], failure: () => `the process door is unavailable: ${err.message}` };
+  }
   const limitsFile = path.join(tempDir, 'file-limits.json');
   const outFile = path.join(tempDir, 'file-timeouts.jsonl');
   fs.writeFileSync(limitsFile, JSON.stringify(limits));
   fs.writeFileSync(outFile, '');
   const child = spawnAsync(
     process.execPath,
-    [WATCHDOG_PATH, `--parent=${process.pid}`, `--poll-ms=${pollMs}`, `--limits=${limitsFile}`, `--out=${outFile}`, `--clean=${JSON.stringify(cleanDirs)}`, `--repo=${repo}`],
+    [WATCHDOG_PATH, `--parent=${process.pid}`, `--parent-record=${JSON.stringify(parentRecord)}`, `--poll-ms=${pollMs}`, `--limits=${limitsFile}`, `--out=${outFile}`, `--clean=${JSON.stringify(cleanDirs)}`, `--repo=${repo}`],
     { env, stdio: ['ignore', 'ignore', 'inherit'] },
   );
   child.on('error', (err) => log(`run-tests: warning: per-file time limit not running: ${err.message}`));
+  const journal = () => fs.readFileSync(outFile, 'utf8').split('\n').filter(Boolean).map((line) => JSON.parse(line));
+  // The launcher blocks in spawnSync, so no process event reaches it: the watchdog says `ready` (after it proved the
+  // door works) or `failed` in its journal, and no test starts before one of them. A run without its time limit fails.
+  const deadline = Date.now() + WATCHDOG_READY_MS;
+  let entries = journal();
+  while (!entries.some((entry) => entry.ready || entry.failed) && Date.now() < deadline) {
+    Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 25);
+    entries = journal();
+  }
+  const failed = entries.find((entry) => entry.failed)?.failed
+    ?? (entries.some((entry) => entry.ready) ? null : `the watchdog did not report ready within ${WATCHDOG_READY_MS / 1000}s`);
+  if (failed) child.kill('SIGTERM');
   return {
     pid: child.pid,
+    failure: () => failed,
     stop() {
       child.kill('SIGTERM');
-      return fs.readFileSync(outFile, 'utf8').split('\n').filter(Boolean).map((line) => JSON.parse(line));
+      const hits = [];
+      for (const entry of journal()) {
+        if (entry.refused) hits.find((hit) => hit.pid === entry.pid)?.refused.push(...entry.refused);
+        else if (!entry.ready && !entry.failed) hits.push({ ...entry, refused: [] });
+      }
+      return hits;
     },
   };
 }
@@ -259,31 +304,41 @@ export function snapshotGitIdentity(cwd) {
   return lines.sort();
 }
 
-/**
- * Processes still running after the suite whose command line names one of `roots` (the run's own temp dirs):
- * a fixture's child the test never stopped, about to lose the directory it runs in.
- */
-/** Every process's pid and command line, read from /proc without starting a process (Linux; elsewhere none). */
-function processTable() {
-  let entries;
-  try { entries = fs.readdirSync('/proc'); } catch { return []; }
-  const procs = [];
-  for (const entry of entries) {
-    if (!/^\d+$/.test(entry)) continue;
-    try { procs.push({ pid: Number(entry), args: fs.readFileSync(`/proc/${entry}/cmdline`, 'utf8').split('\0').join(' ').trim() }); } catch { /* gone */ }
-  }
-  return procs;
-}
+// The temp roots every test process of a run inherits: a process that still holds one of the run's dirs is its own.
+const STRAY_ENV_KEYS = ['TMPDIR', 'FGOS_TEST_FIXTURE_ROOT'];
 
-export function strayProcessesUnder(roots, { table = processTable, exclude = [] } = {}) {
-  const names = roots.filter(Boolean).flatMap((root) => {
-    let real = root;
-    try { real = fs.realpathSync(root); } catch { /* already gone */ }
-    return [...new Set([root, real])].map((dir) => dir + path.sep);
-  });
-  if (names.length === 0) return [];
-  const skip = new Set([process.pid, ...exclude]);
-  return table().filter((proc) => !skip.has(proc.pid) && names.some((name) => proc.args.includes(name)));
+/**
+ * Stops what still runs for the run's own temp dirs `roots` (a fixture's child the test never stopped, about to lose
+ * the directory it runs in): a process whose executable, working directory or inherited temp root is inside one.
+ * The door's scan reads each identity before its other facts and the stop signals that identity, so a pid reused in
+ * between receives nothing. `exclude` names pids that are the run's own (its watchdog, still exiting).
+ * Returns `{ strays: [{pid, args}], refusals: [line] }`. A stray that is gone is not a refusal; one whose identity
+ * could not be read, one still alive after the kill, a refused signal and an unavailable door are, each with a next step.
+ */
+export function stopStrays(roots, { env, exclude = [], stop = stopProcessesInside } = {}) {
+  const strays = new Map();
+  const refusals = new Set();
+  let views;
+  try {
+    loadRunnerDoor(env);
+    views = scan({ envKeys: STRAY_ENV_KEYS });
+  } catch (err) {
+    return { strays: [], refusals: [`the process door is unavailable, so no stray could be looked for: ${err.message}`] };
+  }
+  if (views === 'unsupported') return { strays: [], refusals: [] };
+  views = views.filter((view) => !exclude.includes(view.pid));
+  for (const root of roots.filter(Boolean)) {
+    for (const view of processesInside(root, { envKeys: STRAY_ENV_KEYS, views })) strays.set(view.pid, { pid: view.pid, args: (view.cmdline ?? []).join(' ') });
+    try {
+      for (const view of stop(root, { envKeys: STRAY_ENV_KEYS, views, graceMs: 500 }).left) {
+        const why = view.tuple === null ? `its identity could not be read${view.unreadable ? ` (${JSON.stringify(view.unreadable)})` : ''}` : 'it is still running after the kill';
+        refusals.add(refusalAdvice(view.pid, why));
+      }
+    } catch (err) {
+      refusals.add(`${err.message}; check \`ps -o pid,lstart,args\` for what runs in ${root}, then stop it`);
+    }
+  }
+  return { strays: [...strays.values()], refusals: [...refusals] };
 }
 
 /** What changed between two `snapshotGitIdentity` results: `{ added, removed, changed }`. */
@@ -449,6 +504,10 @@ export function runSelectedTests(files, {
   watchdog = spawn === spawnSync,
   // Removes one stray registration whose checkout is gone; the Worktree port by default.
   pruneCheckout = undefined,
+  // Stops what runs inside one dir by the door's identities (`stopProcessesInside`); a seam for a refusal.
+  stopInside = stopProcessesInside,
+  // Starts the per-file time limit; a seam for a watchdog that cannot start.
+  startWatchdog = startFileWatchdog,
 } = {}) {
   const relFiles = files.map((file) => path.relative(cwd, file));
   const childEnv = buildTestEnv(env);
@@ -484,8 +543,9 @@ export function runSelectedTests(files, {
   const tempLeftoverDetails = [];
   let strayWorktrees = [];
   let strayProcesses = [];
+  let strayRefusals = [];
   const supervisor = watchdog && runTemp
-    ? startFileWatchdog({ files: relFiles, env: childEnv, fileTimeoutMs, pollMs: watchdogPollMs, tempDir: runTemp, cleanDirs: env[KEEP_TMP_ENV] === '1' ? [] : [runTemp, fixtureRoot].filter(Boolean), repo: cwd, log })
+    ? startWatchdog({ files: relFiles, env: childEnv, fileTimeoutMs, pollMs: watchdogPollMs, tempDir: runTemp, cleanDirs: env[KEEP_TMP_ENV] === '1' ? [] : [runTemp, fixtureRoot].filter(Boolean), repo: cwd, log })
     : null;
   const spawnLog = path.join(runTemp ?? fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-test-spy-')), 'git-spawn-spy.jsonl');
   childEnv[GIT_SPAWN_SPY_LOG_ENV] = spawnLog;
@@ -493,16 +553,21 @@ export function runSelectedTests(files, {
   childEnv[CPU_LOG_ENV] = cpuLog;
   let gitSpawns = [];
   try {
-    const started = Date.now();
-    const cpuBefore = waitedCpuSeconds();
-    const spawnResult = spawn(execPath, buildTestArgv(relFiles, forwardedArgs), { cwd, env: childEnv, stdio });
-    const cpuAfter = waitedCpuSeconds();
-    result = {
-      status: spawnResult.status ?? 1, files: relFiles, runTemp, wallSeconds: (Date.now() - started) / 1000,
-      cpuSeconds: cpuBefore === null || cpuAfter === null ? null : cpuAfter - cpuBefore,
-      fileCpu: readTestFileCpu(cpuLog, cwd, relFiles),
-    };
-    gitSpawns = readGitSpawnLog(spawnLog);
+    if (supervisor?.failure()) {
+      // No time limit means a hang can hold the run for hours: refuse before any test starts.
+      result = { status: 1, files: relFiles, runTemp, wallSeconds: 0, cpuSeconds: null, fileCpu: [] };
+    } else {
+      const started = Date.now();
+      const cpuBefore = waitedCpuSeconds();
+      const spawnResult = spawn(execPath, buildTestArgv(relFiles, forwardedArgs), { cwd, env: childEnv, stdio });
+      const cpuAfter = waitedCpuSeconds();
+      result = {
+        status: spawnResult.status ?? 1, files: relFiles, runTemp, wallSeconds: (Date.now() - started) / 1000,
+        cpuSeconds: cpuBefore === null || cpuAfter === null ? null : cpuAfter - cpuBefore,
+        fileCpu: readTestFileCpu(cpuLog, cwd, relFiles),
+      };
+      gitSpawns = readGitSpawnLog(spawnLog);
+    }
   } finally {
     if (supervisor) timedOut = supervisor.stop();
     for (const root of [runTemp, fixtureRoot]) {
@@ -512,8 +577,7 @@ export function runSelectedTests(files, {
     }
     strayWorktrees = worktreeRegistrationsUnder(cwd, [runTemp, fixtureRoot]);
     // The per-file supervisor is still exiting from its SIGTERM; it is this run's own, not a test's.
-    try { strayProcesses = strayProcessesUnder([runTemp, fixtureRoot], { exclude: supervisor ? [supervisor.pid] : [] }); } catch { strayProcesses = []; }
-    for (const { pid } of strayProcesses) { try { process.kill(pid, 'SIGKILL'); } catch { /* already gone */ } }
+    ({ strays: strayProcesses, refusals: strayRefusals } = stopStrays([runTemp, fixtureRoot], { env: childEnv, exclude: supervisor?.pid ? [supervisor.pid] : [], stop: stopInside }));
     if (fixtureRoot) {
       try {
         fs.rmSync(fixtureRoot, { recursive: true, force: true, maxRetries: 3 });
@@ -539,9 +603,10 @@ export function runSelectedTests(files, {
 
   result.timedOut = timedOut;
   if (timedOut.length) {
-    log('run-tests: ERROR: test file(s) exceeded the per-file time limit and were killed (process tree):');
-    for (const { file, elapsedMs, limitMs } of timedOut) {
+    log('run-tests: ERROR: test file(s) exceeded the per-file time limit (the watchdog stops their process tree):');
+    for (const { file, elapsedMs, limitMs, refused } of timedOut) {
       log(`  ${file}: timed out after ${Math.round(elapsedMs / 1000)}s (limit ${Math.round(limitMs / 1000)}s)`);
+      for (const line of refused) log(`    the kill was refused, ${line}`);
     }
     result.status = result.status !== 0 ? result.status : 1;
   }
@@ -562,6 +627,18 @@ export function runSelectedTests(files, {
     log('run-tests: ERROR: test suite left processes running in its temp dir (killed now):');
     for (const { pid, args } of strayProcesses) log(`  ${pid}: ${args.slice(0, 200)}`);
     log('  A test that starts a process must stop it, and wait for it, before it removes the fixture the process runs in.');
+    result.status = result.status !== 0 ? result.status : 1;
+  }
+  result.strayRefusals = strayRefusals;
+  if (strayRefusals.length) {
+    log('run-tests: ERROR: a process that ran for this suite could not be stopped, and may still be running:');
+    for (const line of strayRefusals) log(`  ${line}`);
+    result.status = result.status !== 0 ? result.status : 1;
+  }
+  const limitFailure = supervisor?.failure() ?? null;
+  result.limitFailure = limitFailure;
+  if (limitFailure) {
+    log(`run-tests: ERROR: no test was run: the per-file time limit could not start: ${limitFailure}`);
     result.status = result.status !== 0 ? result.status : 1;
   }
 

@@ -13,12 +13,19 @@
 //
 // Needs `ps` (Linux/macOS); on a platform without it the caller skips the
 // watchdog and says so.
+//
+// Process facts: the `ps -A` table is a reader the process door cannot replace (its views carry no parent
+// pid or elapsed time, and its scan is Linux-only). Every signal goes through the door, to an identity read
+// before the signal, never to a bare pid; a refusal is printed once, with a next step, and the file stays a
+// timeout the next poll retries.
 
 import fs from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { worktreeRegistrationsUnder } from './git-dir-layout.mjs';
 import { pruneMissingCheckouts } from './git-ports.mjs';
+import { judge, observe, scan, signalByIdentity } from '../../src/native/process-identity.mjs';
+import { stopProcessesInside } from '../../src/runner/dispatch/stop-processes-inside.mjs';
 
 // ps prints whole seconds from a clock sampled per process, so a child may
 // read a little older than its parent; the ceiling applies when the parent is
@@ -87,37 +94,31 @@ export function findOverdue(procs, rootPid, limits) {
   return overdue;
 }
 
-function isAlive(pid) {
-  try {
-    process.kill(pid, 0);
-    return true;
-  } catch (err) {
-    return err.code === 'EPERM';
-  }
-}
+/** Whether the launcher's recorded identity may still be running ('unknown' counts: only a proven death ends the run). */
+const isAlive = (record) => judge(record) !== 'dead';
+
+/** What to do about a process the door would not stop: the line every refusal message ends with. */
+export const refusalAdvice = (pid, why) => `pid ${pid}: ${why}; check \`ps -o pid,lstart,args -p ${pid}\`, then stop it`;
 
 /**
- * A run's own dirs after its launcher was killed: SIGKILL every process whose environment names one of
- * `dirs` as its temp root or fixture root (only this run's tests inherit those), then remove the dirs.
- * Another run has dirs of its own, so it is never matched. Without /proc (macOS) only the removal happens.
- * A linked checkout of `repo` that a test registered inside those dirs leaves a registration behind once
- * the dirs go, and every later worktree add there refuses; it is pruned through the Worktree port.
- * Returns those registrations, each with `removed` (and `reason` when it stayed).
+ * A run's own dirs after its launcher was killed: stop, by the identity the door's scan read, every process whose
+ * environment names one of `dirs` as its temp root or fixture root (only this run's tests inherit those), then remove the dirs.
+ * Another run has dirs of its own, so it is never matched. Where the door cannot scan (macOS) only the removal happens.
+ * A refused stop is printed with a next step. A linked checkout of `repo` that a test registered inside those dirs
+ * leaves a registration behind once the dirs go, and every later worktree add there refuses; it is pruned through
+ * the Worktree port. Returns those registrations, each with `removed` (and `reason` when it stayed).
  */
-export function reapRunDirs(dirs, { procRoot = '/proc', repo = null, prune = undefined } = {}) {
-  const own = new Set(dirs);
-  let entries = [];
-  try { entries = fs.readdirSync(procRoot); } catch { /* no /proc */ }
-  for (const entry of entries) {
-    if (!/^\d+$/.test(entry) || Number(entry) === process.pid) continue;
-    let environ;
-    try { environ = fs.readFileSync(`${procRoot}/${entry}/environ`, 'utf8'); } catch { continue; }
-    const mine = environ.split('\0').some((kv) => {
-      const m = /^(TMPDIR|FGOS_TEST_FIXTURE_ROOT)=(.*)$/.exec(kv);
-      return m !== null && own.has(m[2]);
-    });
-    if (!mine) continue;
-    try { process.kill(Number(entry), 'SIGKILL'); } catch { /* already gone */ }
+export function reapRunDirs(dirs, { repo = null, prune = undefined } = {}) {
+  const envKeys = ['TMPDIR', 'FGOS_TEST_FIXTURE_ROOT'];
+  let views;
+  try { views = scan({ envKeys }); } catch (err) { views = 'unsupported'; console.error(`test-file-watchdog: cannot scan the process table: ${err.message}`); }
+  for (const dir of dirs) {
+    try {
+      const { left } = stopProcessesInside(dir, { envKeys, views, graceMs: 500 });
+      for (const view of left) console.error(`test-file-watchdog: ${refusalAdvice(view.pid, 'still running after the stop')}`);
+    } catch (err) {
+      console.error(`test-file-watchdog: ${err.message}`);
+    }
   }
   // Read before the dirs go: the roots are compared by their real paths.
   const registrations = repo ? worktreeRegistrationsUnder(repo, dirs) : [];
@@ -131,14 +132,22 @@ function snapshot() {
   return parsePs(execFileSync('ps', ['-A', '-o', 'pid=,ppid=,etime=,args='], { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 }));
 }
 
-function killTree(procs, pid) {
-  for (const id of treeOf(procs, pid)) {
-    try {
-      process.kill(id, 'SIGKILL');
-    } catch {
-      // already gone
-    }
+/**
+ * Kills the tree under `rootPid` that `procs` showed. Every member is observed first (its identity), then the table is
+ * read again: only a member still in the tree, with the command line it had, is signalled, and by the identity
+ * observed, so a pid that went to another process in between receives nothing. Returns the refusals as advice lines.
+ */
+function killTree(procs, rootPid) {
+  const seen = treeOf(procs, rootPid).map((pid) => ({ pid, view: observe(pid) })).filter(({ view }) => view.kind === 'live');
+  const after = snapshot();
+  const still = new Map(treeOf(after, rootPid).map((pid) => [pid, after.find((p) => p.pid === pid)?.args]));
+  const refused = [];
+  for (const { pid, view } of seen) {
+    if (still.get(pid) === undefined || still.get(pid) !== procs.find((p) => p.pid === pid)?.args) continue;
+    const outcome = signalByIdentity(view, 'kill');
+    if (!['sent', 'not-found', 'identity-mismatch'].includes(outcome)) refused.push(refusalAdvice(pid, `the kill was refused (${outcome})`));
   }
+  return refused;
 }
 
 function main(argv) {
@@ -146,6 +155,9 @@ function main(argv) {
     argv.map((a) => /^--([a-z-]+)=(.*)$/.exec(a)).filter(Boolean).map((m) => [m[1], m[2]]),
   );
   const parentPid = Number(opts.parent);
+  // The launcher's own identity, taken by the launcher: a pid alone cannot say it is still that process.
+  let parentRecord = null;
+  try { parentRecord = JSON.parse(opts['parent-record'] ?? 'null'); } catch { /* refused below */ }
   const pollMs = Number(opts['poll-ms']);
   // The run dirs to remove if the launcher is killed; absent when the caller keeps them.
   const cleanDirs = opts.clean ? JSON.parse(opts.clean) : [];
@@ -157,12 +169,23 @@ function main(argv) {
     process.exit(0);
   };
   const limits = JSON.parse(fs.readFileSync(opts.limits, 'utf8'));
-  if (!Number.isInteger(parentPid) || !(pollMs > 0) || !opts.out) {
-    console.error('test-file-watchdog: need --parent=<pid> --poll-ms=<n> --limits=<json> --out=<file>');
+  if (!Number.isInteger(parentPid) || !(pollMs > 0) || !opts.out || parentRecord?.pid !== parentPid) {
+    console.error('test-file-watchdog: need --parent=<pid> --parent-record=<json> --poll-ms=<n> --limits=<json> --out=<file>');
     process.exit(2);
   }
+  // A time limit that cannot kill is not a time limit: refuse to start where the door is unavailable.
+  try { judge(parentRecord); } catch (err) {
+    const failed = `process door unavailable, no time limit would hold: ${err.message}`;
+    console.error(`test-file-watchdog: ${failed}`);
+    fs.appendFileSync(opts.out, `${JSON.stringify({ failed })}\n`);
+    process.exit(2);
+  }
+  // The launcher waits for this line before it starts a single test.
+  fs.appendFileSync(opts.out, `${JSON.stringify({ ready: true })}\n`);
+  const reported = new Set();
+  const told = new Set();
   const timer = setInterval(() => {
-    if (!isAlive(parentPid)) launcherGone();
+    if (!isAlive(parentRecord)) launcherGone();
     let procs;
     try {
       procs = snapshot();
@@ -173,15 +196,24 @@ function main(argv) {
     for (const hit of findOverdue(procs, parentPid, limits)) {
       // Killing the file can finish node --test immediately. Publish first:
       // its caller stops us, reads this journal, and removes the temp dir.
-      fs.appendFileSync(opts.out, `${JSON.stringify(hit)}\n`);
-      killTree(procs, hit.pid);
+      // A file whose kill was refused stays overdue; it is published once and retried each poll.
+      if (!reported.has(hit.pid)) {
+        reported.add(hit.pid);
+        fs.appendFileSync(opts.out, `${JSON.stringify(hit)}\n`);
+      }
+      let refused;
+      try { refused = killTree(procs, hit.pid); } catch (err) { refused = [refusalAdvice(hit.pid, `the kill failed (${err.message})`)]; }
+      // Each refusal is said once, to the console and to the journal; the file stays overdue and is tried again next poll.
+      const fresh = refused.filter((line) => !told.has(line));
+      for (const line of fresh) { told.add(line); console.error(`test-file-watchdog: ${line}`); }
+      if (fresh.length) fs.appendFileSync(opts.out, `${JSON.stringify({ pid: hit.pid, refused: fresh })}\n`);
     }
   }, pollMs);
   // The launcher stops this process with SIGTERM while it is still alive; a signal sent to the whole
   // group (or SIGINT/SIGHUP from a terminal) also reaches here after the launcher is dead.
   process.on('SIGTERM', () => {
     clearInterval(timer);
-    if (isAlive(parentPid)) process.exit(0);
+    if (isAlive(parentRecord)) process.exit(0);
     launcherGone();
   });
   for (const signal of ['SIGINT', 'SIGHUP']) process.on(signal, () => { clearInterval(timer); launcherGone(); });

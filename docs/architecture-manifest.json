@@ -172,10 +172,7 @@
         { "path": "scripts/test-select-coverage-map.mjs", "reason": "kills the process group of the test child it just spawned" }
       ],
       "debt": [
-        { "path": "packages/git/rust/src/driver.rs", "reason": "the match is inside a test function, but the test-region brace counter ends the test module early (a brace in a string or char literal), so the check reads it as product code" },
-        { "path": "scripts/run-tests.mjs", "reason": "kills stray processes by a bare pid taken from its own /proc scan, with no identity check; pid reuse could hit another process" },
-        { "path": "scripts/lib/test-file-watchdog.mjs", "reason": "judges liveness with kill(pid, 0) and kills by bare pid, a second judge and a second killer beside fgos-process" },
-        { "path": "scripts/lib/mailbox-live-confined.mjs", "reason": "kills a probe process by bare pid" }
+        { "path": "packages/git/rust/src/driver.rs", "reason": "the match is inside a test function, but the test-region brace counter ends the test module early (a brace in a string or char literal), so the check reads it as product code" }
       ],
       "retiredBy": "each Node own-child group kill goes when the code that spawns that child moves to Rust",
       "reason": "signalling by identity goes through fgos-process; the launch gate, holder-lock and two Node modules signal only the group of a child they just spawned"
@@ -193,20 +190,18 @@
         "src/run-supervisor/runtime-dir.mjs",
         "src/runner/dispatch/confinement/drivers/bwrap.mjs",
         "src/runner/dispatch/confinement/probes/harness.mjs",
-        { "path": "scripts/ci-setup-bwrap.sh", "reason": "reads the AppArmor user-namespace switch to set up the sandbox on CI" }
+        { "path": "scripts/ci-setup-bwrap.sh", "reason": "reads the AppArmor user-namespace switch to set up the sandbox on CI" },
+        { "path": "scripts/lib/test-file-cpu.mjs", "reason": "reads /proc/self/stat for waited CPU seconds of the test run, a measurement and not a process judgement" },
+        { "path": "scripts/lib/mailbox-live-cli.mjs", "reason": "live probe reads /proc/meminfo and scans /proc/*/cmdline for the heavy-gate check, machine measurements and not process judgements" },
+        { "path": "scripts/lib/mailbox-live-confined.mjs", "reason": "live probe reads the pid-namespace link and the children of the sandbox it launched, observations the door does not carry" },
+        { "path": "scripts/record-mailbox-hook-fixtures.mjs", "reason": "fixture recorder reads /proc/<pid> files and the pid namespace link of the CLI it records" },
+        { "path": "scripts/git/e3-bench.mjs", "reason": "bench counts visible processes in /proc, a measurement and not a process judgement" },
+        { "path": "scripts/git/p-space-resource.mjs", "reason": "bench counts its own open descriptors in /proc/self/fd and its thread count in /proc/self/status, measurements and not process judgements" }
       ],
       "debt": [
         { "path": "packages/holder-lock/rust/src/route.rs", "reason": "reads /proc/<pid> metadata for the owner uid, a process fact read outside fgos-process" },
         { "path": "packages/holder-lock/rust/src/origin.rs", "reason": "reads /proc/<pid>/comm, a process fact read outside fgos-process" },
-        { "path": "packages/holder-lock/rust/src/borrow_vectors.rs", "reason": "a vector module compiled into the crate whose shell snippet reads /proc/$!/winpid to learn a Windows pid" },
-        { "path": "scripts/run-tests.mjs", "reason": "scans /proc for stray processes of the test run" },
-        { "path": "scripts/lib/test-file-watchdog.mjs", "reason": "scans /proc to judge a test file's processes" },
-        { "path": "scripts/lib/test-file-cpu.mjs", "reason": "reads /proc/self/stat for waited CPU seconds" },
-        { "path": "scripts/lib/mailbox-live-cli.mjs", "reason": "live probe reads /proc/meminfo" },
-        { "path": "scripts/lib/mailbox-live-confined.mjs", "reason": "live probe reads /proc/<pid> files of its own processes" },
-        { "path": "scripts/record-mailbox-hook-fixtures.mjs", "reason": "fixture recorder reads /proc/<pid> files and the pid namespace link" },
-        { "path": "scripts/git/e3-bench.mjs", "reason": "bench counts visible processes in /proc" },
-        { "path": "scripts/git/p-space-resource.mjs", "reason": "bench counts its own open descriptors in /proc/self/fd" }
+        { "path": "packages/holder-lock/rust/src/borrow_vectors.rs", "reason": "a vector module compiled into the crate whose shell snippet reads /proc/$!/winpid to learn a Windows pid" }
       ],
       "retiredBy": "the Node socket-table read and the bwrap probe arguments go when the run-supervisor directory and the confinement probes move to Rust",
       "reason": "only fgos-process judges a process; holder-lock reads fdinfo for lock holders, the Git WAL names an open file, and bwrap arguments are not reads of process facts"
