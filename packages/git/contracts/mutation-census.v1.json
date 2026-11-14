@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "4e41d6565cf5b26c971fd1c0cfbee4df889e16f03f5ee6f414be380a7fcc5b20",
+  "payloadDigest": "f0bb420f4cfff89906de07de95da732eca503338ddac80b4266820e2d1b4bc9d",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -1032,7 +1032,7 @@
     "src/runner/dispatch/mechanism.mjs": "8f272b51172f4b3f15418b43242d8b877ea4ed0ac974890bd7fd991ca3d87afe",
     "src/runner/dispatch/operation-prompt-templates.mjs": "f128377b2fd78aab9d9ac50a2fa1ff384ee92cb8b76724254fa8cabc6ab97261",
     "src/runner/dispatch/plan.mjs": "7e0b46cc5a12c6a1fefeb024fd43281e6e2c4300f20e5a48439c6bcb4532f9b2",
-    "src/runner/dispatch/provider-account-probe.mjs": "f173356d9d66c6ad7efab0e47789d865dd97a096fb73c3e6bb3f9fe0c989fd7e",
+    "src/runner/dispatch/provider-account-probe.mjs": "bce7964d667a5a653bc61fd0a214da410b76e00e5e11f625027312b36eeb0f28",
     "src/runner/dispatch/provider-adapter.mjs": "152397dc861d56dd0ed40d35d569401236979dd37eb989602a1dd472e57c3290",
     "src/runner/dispatch/provider-capacity.mjs": "da1f745c88901f16fc4bc4584aff8f953ffb5da6b1f2b0ed85b2c3a76e57da7d",
     "src/runner/dispatch/provider-credential-probe.mjs": "e8df7e4b480aca672a4b416a924004350460cb6341605cfd0a4b71a71cd7a60a",
