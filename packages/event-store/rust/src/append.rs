@@ -86,16 +86,25 @@ pub(crate) fn recover(
 ) -> Result<crate::open_read::Framed, Error> {
     let bytes = read_optional(&paths.active())?.unwrap_or_default();
     let active = decode(&bytes, origin, stream, false)?;
+    let listed = segments(paths)?;
+    point(fs, Point::AfterClosedList)?;
+    // Seal removes a segment only after its receipt is durable, and it runs without the append lock. The newest
+    // segment is therefore read before the receipt: a segment that vanished (or a range listed before it was
+    // removed) is then always covered by the receipt read afterwards, never a gap above a stale one.
+    let newest = match listed.last() {
+        Some((_, _, path)) => read_optional(path)?,
+        None => None,
+    };
     let receipt = read_last_seq(&paths.sealed())?.unwrap_or(0);
     let mut high = receipt;
-    let listed = segments(paths)?;
-    for (index, (first, last, path)) in listed.iter().enumerate() {
+    for (index, (first, last, _)) in listed.iter().enumerate() {
         let (first, last) = (*first, *last);
         // Immutable ranges supply sequence recovery; seal verifies every segment.
         // Strictly verify the newest segment before trusting its range.
         if index + 1 == listed.len() {
-            let bytes = std::fs::read(path).map_err(io)?;
-            closed(&bytes, origin, stream, first, last)?;
+            if let Some(bytes) = &newest {
+                closed(bytes, origin, stream, first, last)?;
+            }
         }
         if last <= receipt {
             continue;
