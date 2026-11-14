@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "6f47a84059c101d2b3e224aa790df0412cae9940bf55d61c9aa203750cb7153f",
+  "payloadDigest": "360c1d0d5394387c6bff5b2f89b56fe7d757d81c3290628a7d00b27e3b8f0343",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -86,7 +86,7 @@
     "apps/fgos/examples/mailbox-ident-cost.rs": "694f216767532946846ecc69dc584fbb8bf28a7183f741a037ba05c7b4793bc9",
     "apps/fgos/src/cli_presenter.rs": "b93778742194566aac6e085536cbcbcc4ff709ac3d1bbaff8870a8cf2c43dada",
     "apps/fgos/src/cli_projector.rs": "11c19bc121a9f94dd0a91c3456796c221fdc656dc9a4f59c736d315a91e3f1b3",
-    "apps/fgos/src/help.rs": "a0442e76aa3d0835ae4e1d790509279c7f1b05bb4ac4f42b0cd6bf276745574d",
+    "apps/fgos/src/help.rs": "8b44487769fcdd10f110d8ad996b9721ae3ce37a5c5f29aafa67eb2c10586420",
     "apps/fgos/src/invocation_doors.rs": "f5cf3e37808406c62cd574151da62c9744437f41578c4bf4b59dcfa6cd11fcf0",
     "apps/fgos/src/legacy_exec.rs": "bf2f790d202ad3a25735fc3f9c33feb7aeffdfb015b1e0aafa9282c8b8bcba40",
     "apps/fgos/src/main.rs": "a00911993e476971d46690382f44ef5dffc4f61b6422e3ce5f576ffda5b4a616",
@@ -118,7 +118,7 @@
     "apps/fgos/tests/windows_semantics_probe.rs": "ecb59690bbf1259baa1defb6417c24005138526bb565f216f9db3c2ad784d240",
     "apps/fgos/tests/windows_support/mod.rs": "2b8a17676526c87ea5ecfb2074a70a3511fbf9267f9de78a35dc355f272830fb",
     "bin/fgos-runner.mjs": "24fa9b497547a104912b90ab98b3d53fbbe0068a5977a7a04724789c8e717156",
-    "bin/fgos.mjs": "a1a6c45fe8af2b69952b4074f539bc280106ebe9de127289a8b2f2006855b742",
+    "bin/fgos.mjs": "f99003499c231ad12e7d09b841b74a57a92c44cbcef7b9982cab75bca047ac4f",
     "core/skills/_shared/capability-catalog.md": "4299584409592ac4ae9668cd0cb4dd0442edc1c78a42ccd9cfe0bae22bf11bc4",
     "core/skills/_shared/capability-matching.md": "eb67cde05d45c171c1d4803f9d2fbec5fc63565b9fd0a0549c866a7eb262521d",
     "core/skills/_shared/catchup-self-recovery.md": "3b77650c71a0225f00ffa8fe9524d7c0052977204f425c1999225b6f80802c69",
@@ -907,7 +907,7 @@
     "scripts/run-tests.mjs": "6998785c0417e1167cfb9c69b8e0f9d4f775ab7b73f518e3b34f8249ee911bb5",
     "scripts/stress-test-files.mjs": "1c9298587bae21b5971c2e1eba5effd3c2a0c85ba94372936fa5e0c1d70d4f4e",
     "scripts/test-ownership-lint.mjs": "1917bcc0ec0387e43d4e09dc3bc1e6a5923e30b4c3848cf480df9eb0c2c042e2",
-    "scripts/test-proof-inventory.mjs": "77b8de2723057778114ef9457669261ca2b6d02e33dd0c9b0f7a4e88898d133c",
+    "scripts/test-proof-inventory.mjs": "724966075113d8ea55ddf9a6ec3be0a60f684ce76ad90135fb0584d96d057379",
     "scripts/test-select-compare.mjs": "45ec5c8f1b192430431127a06133376cd5e5d2a50f8e6865472c1ae341ae1329",
     "scripts/test-select-coverage-map.mjs": "b313d02cce6c8fa7f03dae8acdfd14a37b8f3a04b330ae9b2c144d0287b08e85",
     "scripts/test-select-mutate.mjs": "77d8bc7ae624453d5c50d6f83d3136ef41803f69452cef41c8fd14587cd4df39",
@@ -919,8 +919,7 @@
     "scripts/verify-fanout-overlap.mjs": "b74a0ac9f350c5d62a47f3e3bf0896e9d142e5cbba15284527383d1b529ea435",
     "scripts/write-test-marker.mjs": "d1faead7d8efbdcce888100b89f5cd2cc6546ddc3f2647118255f82f6c8e4171",
     "scripts/write-wrapper-script.mjs": "e9e76f2b72329bb4dee9ec980db7a5df7515da3ff339e232466049de259d5c50",
-    "src/cli/command-registry.mjs": "44f266bc47eea1dfc07383077ded2377d77b4f1a5bfbbeff4259a6421f25b7d6",
-    "src/cli/deprecation.mjs": "45e7d11ad8681fc89e4c99f4ef53b7c93a477f6b5fdd6708eddcf0b579dd3985",
+    "src/cli/command-registry.mjs": "604497bf997054dc1f28817e77ebe98c84665711fc3a4d7e3d7a9cd1a420ebd6",
     "src/cli/exit-codes.mjs": "55a68e5a0b03a38adced7ddc9bcfb60964db94b3b868e2c854b6a6a78fdb4964",
     "src/cli/flag-check.mjs": "336a0e94eaec59fa4c1f143b32a14334c1bd5f13d522ef8be4a5b570dc401b62",
     "src/cli/parse-args.mjs": "d4f71dbb91bc8d920995299b78d018efd1643328213a70d6e567a6b462163d66",
@@ -1224,7 +1223,7 @@
     "src/util/format-lock-duration.mjs": "87e069a71d25348768de8fe5116d2ac3759a2c1e775433a6511750491f874b3e",
     "src/util/git-paths.mjs": "fbb0b5af5b149853b9d5279062d417cee88a24ce161f782b5ae6dec3d10f1941",
     "src/util/host-bin-path.mjs": "5a3b994348e6830f4b869f0a30de17fc48fd4d2cfb551282606d8d8a4a4e20c2",
-    "src/util/host-bin.mjs": "feea58b739293d12a06740b3f5c18bfe018d006381511d53816513d97f9683b1",
+    "src/util/host-bin.mjs": "206f3b92331540022dba1cc7b2d76d80d8d2dec687d0b6c53f397fb00a46b896",
     "src/util/identity-mint.mjs": "533825271188a6e5dfba4c55e46d2ef69c07c07ae3150bda2872d0ea24a77159",
     "src/util/normalize-path.mjs": "e1519327a67834d6309a0e92e69d5fb46bb671a7ddfbe9ef5c36acc22fc3062a",
     "src/util/refuse-symlink.mjs": "d159c2a509be27fe199675e37d5cb255eb44c1622e806de8a52916366f1cbffa",
@@ -2148,14 +2147,14 @@
     },
     {
       "path": "bin/fgos.mjs",
-      "line": 3164,
+      "line": 3163,
       "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:180",
       "binary": "(config door value (readConfig({ projectRoot: repoRoot, sections: ['invariantChecks'] })))",
       "class": "configured-binary"
     },
     {
       "path": "bin/fgos.mjs",
-      "line": 3308,
+      "line": 3307,
       "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:180",
       "binary": "(config door value (readConfig({ projectRoot: repoRoot, sections: ['invariantChecks'] })))",
       "class": "configured-binary"
@@ -3422,6 +3421,13 @@
       "class": "configured-binary"
     },
     {
+      "path": "scripts/test-proof-inventory.mjs",
+      "line": 665,
+      "spawn": "median -> scripts/test-proof-inventory.mjs:660",
+      "binary": "(env FGOS_HOST_BIN)",
+      "class": "configured-binary"
+    },
+    {
       "path": "src/git/index.mjs",
       "line": 10,
       "spawn": "Command::new <- packages/holder-lock/rust/src/semantics.rs:124",
@@ -3724,7 +3730,14 @@
     },
     {
       "path": "src/util/host-bin.mjs",
-      "line": 50,
+      "line": 33,
+      "spawn": "spawnSync",
+      "binary": "(env FGOS_HOST_BIN)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/util/host-bin.mjs",
+      "line": 66,
       "spawn": "execFileSync",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"

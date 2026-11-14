@@ -5,6 +5,7 @@ import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import { spawn } from 'node:child_process';
 import { holdLockInChild } from '../helpers/hold-lock-in-child.mjs';
+import { commandManifest } from '../helpers/command-manifest.mjs';
 import {
   ADD_BAD_FLAG_CASES,
   FGOS,
@@ -230,10 +231,10 @@ test('unlock is gone: an unknown verb, and no manifest entry', () => {
   assert.equal(result.status, 4, result.stderr);
   assert.match(result.stderr, /unknown verb "unlock"/);
 
-  const manifest = JSON.parse(run(cwd, ['--help', '--json']).stdout);
+  const manifest = commandManifest();
   assert.equal(manifest.commands.find((c) => c.name === 'unlock'), undefined);
   const lock = manifest.commands.find((c) => c.name === 'lock');
-  assert.ok(lock, 'lock entry missing from --help --json manifest');
+  assert.ok(lock, 'lock entry missing from the command manifest');
   assert.equal(lock.touchesState, true);
   assert.equal(lock.externalEffect, true);
 });
@@ -296,13 +297,9 @@ test('lock-status: a merge slot held for one ref is listed as an instance of the
 });
 
 
-test('lock-status: registered in the --help --json manifest as read-only (touchesState/externalEffect both false)', () => {
-  const cwd = tmpCwdFast();
-  const result = run(cwd, ['--help', '--json']);
-  assert.equal(result.status, 0, result.stderr);
-  const manifest = JSON.parse(result.stdout);
-  const entry = manifest.commands.find((c) => c.name === 'lock-status');
-  assert.ok(entry, 'lock-status entry missing from --help --json manifest');
+test('lock-status: registered in the command manifest as read-only (touchesState/externalEffect both false)', () => {
+  const entry = commandManifest().commands.find((c) => c.name === 'lock-status');
+  assert.ok(entry, 'lock-status entry missing from the command manifest');
   assert.equal(entry.touchesState, false);
   assert.equal(entry.externalEffect, false);
 });
@@ -352,14 +349,11 @@ test('take --wait rejects a value above the 900000ms (15 min) cap -- tsk-2rf D3'
 });
 
 
-test('take/pick/approve are documented in the --help --json manifest with wait/no-wait properties', () => {
-  const cwd = tmpCwdFast();
-  const result = run(cwd, ['--help', '--json']);
-  assert.equal(result.status, 0, result.stderr);
-  const manifest = JSON.parse(result.stdout);
+test('take/pick/approve are documented in the command manifest with wait/no-wait properties', () => {
+  const manifest = commandManifest();
   for (const name of ['take', 'pick', 'approve']) {
     const entry = manifest.commands.find((c) => c.name === name);
-    assert.ok(entry, `${name} entry missing from --help --json manifest`);
+    assert.ok(entry, `${name} entry missing from the command manifest`);
     assert.ok(entry.parameters.properties.wait, `${name} manifest entry missing "wait" property`);
     assert.ok(entry.parameters.properties['no-wait'], `${name} manifest entry missing "no-wait" property`);
   }

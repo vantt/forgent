@@ -1658,7 +1658,6 @@ const ENTRY_LEAF_IMPORTS = [
   '../src/state/store-error.mjs',
 ];
 const ARM_STATIC_IMPORTS = [
-  '../src/cli/deprecation.mjs',
   '../src/cli/flag-check.mjs',
   '../src/config/facade.mjs',
   '../src/event-store/maintenance.mjs',

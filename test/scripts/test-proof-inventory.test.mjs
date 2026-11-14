@@ -231,13 +231,17 @@ test('suiteChange counts test() lines added and removed under test/ and the CLI 
   assert.deepEqual(suiteChange({ baseRef: 'base', readPatch: () => patch }), { added: 2, removed: 1, spawns: 2, unexplained: 1 });
 });
 
-test('cliCost runs fgos --help and fgos list the asked number of times in the checkout and reports each median', () => {
+test('cliCost times fgos --help on the host binary and fgos list on the checkout, the asked number of times, and reports each median', () => {
   const calls = [];
-  const cost = cliCost({ cwd: '/repo', runs: 3, spawn: (cmd, argv, opts) => { calls.push([argv.slice(1).join(' '), opts.cwd]); } });
-  assert.deepEqual(calls.map(([argv]) => argv), ['--help', '--help', '--help', 'list', 'list', 'list']);
-  assert.ok(calls.every(([, cwd]) => cwd === '/repo'));
+  const cost = cliCost({ cwd: '/repo', runs: 3, hostBin: '/host/fgos', spawn: (cmd, argv, opts) => { calls.push([cmd, argv, opts.cwd]); } });
+  assert.deepEqual(calls.map(([cmd, argv]) => [cmd === process.execPath ? 'node' : cmd, argv.slice(cmd === process.execPath ? 1 : 0).join(' ')]), [
+    ['/host/fgos', '--help'], ['/host/fgos', '--help'], ['/host/fgos', '--help'],
+    ['node', 'list'], ['node', 'list'], ['node', 'list'],
+  ]);
+  assert.ok(calls.every(([, , cwd]) => cwd === '/repo'));
   assert.equal(cost.runs, 3);
   assert.ok(Number.isInteger(cost.helpMs) && Number.isInteger(cost.listMs));
+  assert.throws(() => cliCost({ cwd: '/repo', runs: 1, hostBin: '', spawn: () => {} }), /FGOS_HOST_BIN/);
 });
 
 test('addedLinesFromGitDiff returns [] for an empty scope without touching git at all', () => {

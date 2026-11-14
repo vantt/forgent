@@ -110,11 +110,10 @@
       "patterns": ["\\bpublicManifest\\("],
       "allowed": [
         "src/cli/command-registry.mjs",
-        { "path": "scripts/export-command-selectors.mjs", "reason": "the generator writes and drift-checks the committed manifest file from the registry projection" },
-        { "path": "bin/fgos.mjs", "reason": "the Node help prints the projection until the Node help renderer is deleted" }
+        { "path": "scripts/export-command-selectors.mjs", "reason": "the generator writes and drift-checks the committed manifest file from the registry projection" }
       ],
       "debt": [],
-      "reason": "the registry module owns the one projection of the verb manifest; the generator and the help print only call it"
+      "reason": "the registry module owns the one projection of the verb manifest; the generator only calls it"
     },
     {
       "job": "kernel lock primitive",
@@ -263,6 +262,14 @@
       "allowed": [],
       "debt": [],
       "reason": "the registry `native` field is the only declaration of what the host serves natively, and the help words are answered before any route lookup; the four old names are retired and no file may bring one back"
+    },
+    {
+      "job": "retired Node help renderer",
+      "kind": "door",
+      "patterns": ["\\brenderHelpText\\b", "\\bhandleVerbHelp\\b", "\\bpublicManifestEntries\\b", "\\bformatDeprecation\\b"],
+      "allowed": [],
+      "debt": [],
+      "reason": "the host renders every help form from the committed manifest file (help.rs) and the Node channel only forwards a help token to it; the four old names are retired and no file may bring one back"
     },
     {
       "job": "decide the lane of an invocation",
@@ -611,7 +618,6 @@
     "src/intake/plan-verdict-from-plan-md.mjs": "use-case",
     "src/intake/verify-pattern-check.mjs": "kernel",
     "src/cli/command-registry.mjs": "kernel",
-    "src/cli/deprecation.mjs": "kernel",
     "src/cli/exit-codes.mjs": "kernel",
     "src/cli/flag-check.mjs": "kernel",
     "src/cli/parse-args.mjs": "kernel",

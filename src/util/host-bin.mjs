@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { execFileSync } from 'node:child_process';
+import { execFileSync, spawnSync } from 'node:child_process';
 import { resolveMainCheckoutRoot, fgosDirFromRoot } from '../runner/paths.mjs';
 import { resolveActiveHostBin } from './host-bin-path.mjs';
 
@@ -17,6 +17,22 @@ export function resolveHostBin(dir = process.cwd()) {
   const cleanDir = typeof dir === 'string' && dir.endsWith('.fgos') ? path.dirname(dir) : dir;
   const mainRoot = resolveMainCheckoutRoot(cleanDir) || cleanDir;
   return resolveActiveHostBin({ fgosDir: fgosDirFromRoot(mainRoot), cwd: cleanDir }).bin;
+}
+
+/**
+ * Hands `args` to the host unchanged, with the terminal and the whole environment inherited, for a call the host
+ * answers itself (help). The environment keeps the recursion guard of a host that started this process: a host
+ * too old to answer help itself forwards it back to Node, and with the guard still set it refuses the second hop
+ * instead of starting Node again without end. A host that answers help never reads the guard. Returns `{ status }`
+ * with the host's exit code, `{ code: 'host-unavailable' }` when no host resolves, or
+ * `{ code: 'host-exec-error', message }` when it cannot run.
+ */
+export function runHostInherited(args, { dir = process.cwd() } = {}) {
+  const hostBin = resolveHostBin(dir);
+  if (!hostBin) return { code: 'host-unavailable' };
+  const child = spawnSync(hostBin, args, { stdio: 'inherit' });
+  if (child.error) return { code: 'host-exec-error', message: child.error.message };
+  return { status: child.status ?? 1 };
 }
 
 /**

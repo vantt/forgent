@@ -254,21 +254,9 @@ test("R4: Wall-clock timing report written to scratch JSON path (never committed
   fs.unlinkSync(scratchReportPath);
 });
 
-test("R5: Coverage floor enumerates all selectors from command-routes.json", () => {
+test("R5: Coverage floor covers every exit category and input channel, and leaves help for every selector to help-routes", () => {
   const cases = generateCoverageFloorCases();
-  const routes = JSON.parse(fs.readFileSync(ROUTES_PATH, "utf8"));
-  const selectors = Object.keys(routes).sort();
-
-  // Derived from the routes file itself, never a fresh hardcoded literal --
-  // a verb addition or removal moves both sides together.
-  const helpCases = cases.filter((c) => c.id.startsWith("coverage-help-"));
-  assert.equal(helpCases.length, selectors.length, `Must generate exactly ${selectors.length} help cases (one per selector)`);
-
-  for (const sel of selectors) {
-    const matching = helpCases.find((c) => c.id === `coverage-help-${sel}`);
-    assert.ok(matching, `Coverage floor missing help case for selector: ${sel}`);
-    assert.deepEqual(matching.args, [sel, "--help"]);
-  }
+  assert.deepEqual(cases.filter((c) => c.id.startsWith("coverage-help-")), [], "help is owned by help.rs and help-routes.test.mjs");
 
   // Check presence of required special cases
   assert.ok(cases.some((c) => c.id === "coverage-exit-category-stdout-zero"));
@@ -507,17 +495,24 @@ test("a grandchild git started through a Node child is recorded the same way for
   assert.deepEqual(viaNode, viaBin, "both entry kinds must record the same child chain");
 });
 
-test("a parity table loads by name and an unknown or path-shaped name fails naming it", async () => {
-  const table = await loadParityTable("help");
-  assert.ok(Array.isArray(table) && table.length > 0, "help table is a non-empty case list");
-  assert.ok(fs.existsSync(path.join(PARITY_CASES_DIR, "help.cases.mjs")));
-  for (const testCase of table) {
-    assert.equal(typeof testCase.id, "string");
-    assert.ok(Array.isArray(testCase.args), `${testCase.id} names its args`);
+test("a parity table loads by name from its directory and an unknown or path-shaped name fails naming it", async () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "fgos-parity-tables-"));
+  try {
+    fs.writeFileSync(
+      path.join(dir, "sample.cases.mjs"),
+      'export const cases = [{ id: "sample-one", args: ["a"] }, { id: "sample-two", args: ["b", "--json"] }];\n',
+    );
+    fs.writeFileSync(path.join(dir, "empty.cases.mjs"), "export const cases = [];\n");
+    const table = await loadParityTable("sample", dir);
+    assert.deepEqual(table.map((c) => c.id), ["sample-one", "sample-two"]);
+    for (const testCase of table) assert.ok(Array.isArray(testCase.args), `${testCase.id} names its args`);
+    await assert.rejects(() => loadParityTable("empty", dir), /empty/);
+    await assert.rejects(() => loadParityTable("no-such-table", dir), /no-such-table/);
+    await assert.rejects(() => loadParityTable("../harness", dir), /\.\.\/harness/);
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
   }
-  assert.equal(new Set(table.map((c) => c.id)).size, table.length, "case ids are unique");
-  await assert.rejects(() => loadParityTable("no-such-table"), /no-such-table/);
-  await assert.rejects(() => loadParityTable("../harness"), /\.\.\/harness/);
+  assert.equal(path.basename(PARITY_CASES_DIR), "parity-cases", "the default table directory");
 });
 
 test("a CLI test call goes to the host for a help token, a native verb or a native sub-verb, and to Node otherwise", () => {

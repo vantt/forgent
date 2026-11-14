@@ -829,4 +829,170 @@ mod tests {
         routes.sort_unstable();
         assert_eq!(named, routes);
     }
+
+    fn flags_of(parameters: Option<&Value>) -> Vec<String> {
+        let positional: Vec<&str> = parameters
+            .and_then(|p| p.get("positional"))
+            .and_then(Value::as_array)
+            .map(|a| a.iter().filter_map(Value::as_str).collect())
+            .unwrap_or_default();
+        parameters
+            .and_then(|p| p.get("properties"))
+            .and_then(Value::as_object)
+            .map(|m| {
+                m.keys()
+                    .filter(|k| !positional.contains(&k.as_str()))
+                    .cloned()
+                    .collect()
+            })
+            .unwrap_or_default()
+    }
+
+    #[test]
+    fn one_verbs_help_prints_only_that_verbs_block_and_narrowing_drops_the_other_sub_verbs() {
+        for entry in commands() {
+            let name = entry["name"].as_str().unwrap();
+            let text = verb(name, None, false).unwrap();
+            for other in commands().iter().filter(|e| e["name"] != entry["name"]) {
+                let line = format!("\n{} [", other["invoke"].as_str().unwrap());
+                assert!(
+                    !text.contains(&line),
+                    "{name} help leaked {}",
+                    other["name"]
+                );
+            }
+            let subs: Vec<&String> = entry
+                .get("subcommands")
+                .and_then(Value::as_object)
+                .map(|m| m.keys().collect())
+                .unwrap_or_default();
+            for sub in &subs {
+                let narrowed = verb(name, Some(sub.as_str()), false).unwrap();
+                for other in subs.iter().filter(|o| *o != sub) {
+                    assert!(
+                        !narrowed.contains(&format!("\n    fgos {name} {other}\n")),
+                        "{name} {sub} help leaked {other}"
+                    );
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn the_whole_list_names_every_live_verb_with_its_effect_label() {
+        let text = top_level(&[]).unwrap();
+        for entry in commands().iter().filter(|e| !truthy(e.get("deprecated"))) {
+            let label = effect_label(
+                truthy(entry.get("touchesState")),
+                truthy(entry.get("externalEffect")),
+            );
+            let line = format!("{} [{label}]\n", entry["invoke"].as_str().unwrap());
+            assert!(text.contains(&line), "missing {line:?}");
+        }
+        assert!(
+            text.contains("[write+external]\n    ") && text.contains("fgos dispatch <show-run|inspect|watch|recover|reconcile|decide|explain|probe-account|probe-session> [args] [write+external]\n"),
+            "dispatch line"
+        );
+    }
+
+    #[test]
+    fn a_guided_verb_names_every_flag_example_and_exit_code_of_its_entry() {
+        let guided: Vec<&Value> = commands()
+            .iter()
+            .filter(|e| e.get("guide").is_some())
+            .collect();
+        assert!(
+            guided.len() >= 5,
+            "init doctor config uninstall run at least"
+        );
+        for entry in guided {
+            let name = entry["name"].as_str().unwrap();
+            let text = verb(name, None, false).unwrap();
+            let flags: Vec<String> = match entry.get("subcommands").and_then(Value::as_object) {
+                Some(subs) => subs
+                    .values()
+                    .flat_map(|s| flags_of(s.get("parameters")))
+                    .collect(),
+                None => flags_of(entry.get("parameters")),
+            };
+            for flag in flags {
+                assert!(
+                    text.contains(&format!("--{flag}")),
+                    "{name} help omits --{flag}"
+                );
+            }
+            for example in entry["examples"].as_array().unwrap() {
+                assert!(
+                    text.contains(example.as_str().unwrap()),
+                    "{name} omits an example"
+                );
+            }
+            for code in entry["guide"]["exitCodes"].as_array().unwrap() {
+                assert!(
+                    text.contains(code.as_str().unwrap()),
+                    "{name} omits an exit code"
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn the_shipped_manifest_renders_positional_only_and_mixed_arguments_in_their_own_idiom() {
+        let block_of = |name: &str| {
+            top_level(&[])
+                .unwrap()
+                .split("\n\n")
+                .find(|b| b.starts_with(&format!("fgos {name} ")))
+                .unwrap_or_else(|| panic!("no {name} block"))
+                .to_string()
+        };
+        let submit = block_of("submit");
+        assert!(
+            submit.contains("positional: text") && !submit.contains("required: --text"),
+            "{submit}"
+        );
+        let mv = block_of("move");
+        assert!(
+            mv.contains("positional: id") && mv.contains("required: --to") && !mv.contains("--id"),
+            "{mv}"
+        );
+        let dispatch = verb("dispatch", None, false).unwrap();
+        assert!(dispatch.contains("    positional: sub\n"), "{dispatch}");
+        let show_run = dispatch
+            .split("    fgos dispatch ")
+            .find(|b| b.starts_with("show-run\n"))
+            .expect("show-run block");
+        assert!(show_run.contains("positional: run-id"), "{show_run}");
+    }
+
+    #[test]
+    fn every_deprecated_verb_prints_a_plain_notice_alone_and_setup_is_listed_under_compatibility() {
+        for entry in commands().iter().filter(|e| truthy(e.get("deprecated"))) {
+            let name = entry["name"].as_str().unwrap();
+            let text = verb(name, None, false).unwrap();
+            assert!(text.contains("DEPRECATED — "), "{name}");
+            assert!(
+                !text.contains("undefined") && !text.contains("[object Object]"),
+                "{name}: {text}"
+            );
+        }
+        let setup = verb("setup", None, false).unwrap();
+        for part in ["fgctl init", "fgos doctor --fix", "git hooks path"] {
+            assert!(setup.contains(part), "setup notice lacks {part}");
+        }
+        let whole = top_level(&[]).unwrap();
+        let (verbs, compatibility) = whole
+            .split_once("Compatibility (")
+            .expect("a Compatibility section");
+        assert!(
+            !verbs.contains("\nfgos setup ["),
+            "setup is listed among the verbs"
+        );
+        assert!(
+            compatibility
+                .lines()
+                .any(|l| l.contains("fgos setup") && l.contains("fgctl init")),
+            "{compatibility}"
+        );
+    }
 }

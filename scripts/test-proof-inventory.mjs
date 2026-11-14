@@ -645,21 +645,24 @@ export function buildSuiteBaseline({ files, cwd = REPO_ROOT, sha, wallSeconds, r
 
 /**
  * Median wall time of one `fgos --help` and one `fgos list` in `cwd`, each run `runs` times: the cost every
- * CLI-spawning test pays per call. Run it on the base and on the branch to see what a change adds.
+ * CLI-spawning test pays per call. Help is answered by the host, so it is timed on the host binary itself
+ * (`FGOS_HOST_BIN`), not through the Node channel's forwarding hop. Run it on the base and on the branch to see
+ * what a change adds.
  */
-export function cliCost({ cwd = REPO_ROOT, runs = 5, spawn = spawnSync } = {}) {
+export function cliCost({ cwd = REPO_ROOT, runs = 5, spawn = spawnSync, hostBin = process.env.FGOS_HOST_BIN } = {}) {
+  if (!hostBin) throw new Error('cliCost times help on the host binary: set FGOS_HOST_BIN to a built host');
   const bin = path.join(cwd, 'bin', 'fgos.mjs');
   const env = { ...process.env };
-  const median = (argv) => {
+  const median = (command, argv) => {
     const times = [];
     for (let i = 0; i < runs; i += 1) {
       const started = process.hrtime.bigint();
-      spawn(process.execPath, [bin, ...argv], { cwd, env, stdio: 'ignore' });
+      spawn(command, argv, { cwd, env, stdio: 'ignore' });
       times.push(Number(process.hrtime.bigint() - started) / 1e6);
     }
     return Math.round(times.sort((a, b) => a - b)[Math.floor(times.length / 2)]);
   };
-  return { helpMs: median(['--help']), listMs: median(['list']), runs, load: Number(os.loadavg()[0].toFixed(1)) };
+  return { helpMs: median(hostBin, ['--help']), listMs: median(process.execPath, [bin, 'list']), runs, load: Number(os.loadavg()[0].toFixed(1)) };
 }
 
 // -- CLI entrypoint --

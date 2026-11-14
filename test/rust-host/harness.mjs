@@ -124,14 +124,15 @@ export function parseEntry(entrySpec, repoRoot = REPO_ROOT) {
 }
 
 /**
- * Loads one parity case table by name: `parity-cases/<name>.cases.mjs` exports `cases`, a list in
- * the case shape `runDifferentialCase` takes. The name is a bare file stem, never a path.
+ * Loads one parity case table by name: `<dir>/<name>.cases.mjs` exports `cases`, a list in
+ * the case shape `runDifferentialCase` takes. The name is a bare file stem, never a path; `dir` is
+ * `parity-cases/` unless a test names another.
  */
-export async function loadParityTable(name) {
+export async function loadParityTable(name, dir = PARITY_CASES_DIR) {
   if (typeof name !== "string" || !/^[a-z0-9][a-z0-9-]*$/.test(name)) {
-    throw new Error(`Invalid parity table name "${name}": expected a bare name such as "help"`);
+    throw new Error(`Invalid parity table name "${name}": expected a bare name such as "mailbox"`);
   }
-  const file = path.join(PARITY_CASES_DIR, `${name}.cases.mjs`);
+  const file = path.join(dir, `${name}.cases.mjs`);
   if (!fs.existsSync(file)) {
     throw new Error(`No parity table named "${name}" (expected ${file})`);
   }
@@ -841,32 +842,18 @@ export function writeTimingReport(caseResults, reportPath = null) {
 }
 
 /**
- * Builds the complete coverage floor case set (R5) using command-routes.json.
+ * Builds the coverage floor case set (R5): one case per exit category, input channel and flag override.
  */
-export function generateCoverageFloorCases(options = {}) {
-  const routesPath = options.routesPath ?? ROUTES_PATH;
+export function generateCoverageFloorCases() {
   // Work reads open the Event Store of the repository they run in, which must have been set up for it. The
   // checkout under test is not such a repository, so the read cases run against a prepared scratch one.
   const readRepo = fs.mkdtempSync(path.join(os.tmpdir(), "fgos-harness-read-"));
   execFileSync("git", ["init", "-q", "-b", "main"], { cwd: readRepo });
   activateGitFixture(readRepo);
-  const routes = JSON.parse(fs.readFileSync(routesPath, "utf8"));
-  const selectors = Object.keys(routes).sort();
 
   const cases = [];
 
-  // 1. 73 selectors: recognition/help for every one
-  for (const sel of selectors) {
-    cases.push({
-      id: `coverage-help-${sel}`,
-      args: [sel, "--help"],
-      modes: ["exact-bytes"],
-      expectedExitCode: 0,
-      ignoreChildren: true,
-    });
-  }
-
-  // 2. Exit categories:
+  // 1. Exit categories (help for every selector is owned by help.rs and help-routes.test.mjs):
   // - stdout zero
   cases.push({
     id: "coverage-exit-category-stdout-zero",

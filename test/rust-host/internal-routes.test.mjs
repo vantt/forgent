@@ -11,6 +11,7 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { canonicalJson, computeSha256Digest } from '../../src/native/proof-helpers.mjs';
+import { commandManifest } from '../helpers/command-manifest.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const ROUTES = JSON.parse(fs.readFileSync(path.join(REPO_ROOT, 'packages/host-runtime/contracts/command-routes.json'), 'utf8'));
@@ -39,14 +40,10 @@ function line(result) {
   return parsed;
 }
 
-test('internal is neither a route nor in the help manifest', () => {
+test('internal is neither a route nor in the command manifest', () => {
   assert.equal(ROUTES.internal, undefined);
   assert.ok(!Object.values(ROUTES).some((r) => r.selector === 'internal'));
-  const env = { ...process.env };
-  delete env.CLAUDE_CODE_SESSION_ID;
-  const help = spawnSync(process.execPath, [path.join(REPO_ROOT, 'bin/fgos.mjs'), '--help', '--json'], { cwd: scratch, encoding: 'utf8', env, maxBuffer: 64 * 1024 * 1024 });
-  assert.equal(help.status, 0, help.stderr);
-  const names = JSON.parse(help.stdout).commands.map((c) => c.name);
+  const names = commandManifest().commands.map((c) => c.name);
   assert.ok(names.length > 0);
   assert.ok(!names.includes('internal'), 'help lists internal');
   assert.ok(!names.includes('terminal-control'), 'help lists terminal-control');

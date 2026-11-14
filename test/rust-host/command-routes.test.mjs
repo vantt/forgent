@@ -7,12 +7,13 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
-import { COMMAND_REGISTRY } from '../../src/cli/command-registry.mjs';
+import { COMMAND_REGISTRY, MANIFEST_SCHEMA_VERSION } from '../../src/cli/command-registry.mjs';
 import {
   DEFAULT_ANNOTATIONS_PATH,
   DEFAULT_ROUTES_PATH,
   DEFAULT_MANIFEST_PATH,
   checkCommandManifest,
+  formatCommandManifestJson,
   generateCommandRoutes,
   checkCommandRoutes,
   loadAnnotations,
@@ -205,10 +206,15 @@ test('drift detection: mutated copy of committed file fails --check', () => {
   }
 });
 
-test('the committed command manifest is the exact stdout of `fgos --help --json`, and a stale copy fails --check naming that file', () => {
-  const help = execFileSync('node', [path.join(REPO_ROOT, 'bin/fgos.mjs'), '--help', '--json'], { cwd: REPO_ROOT, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
+test('the committed command manifest is the registry projection, unwrapped, naming every verb, and a stale copy fails --check naming that file', () => {
+  const help = formatCommandManifestJson();
   assert.equal(fs.readFileSync(DEFAULT_MANIFEST_PATH, 'utf8'), help);
   assert.equal(checkCommandManifest({ manifestPath: DEFAULT_MANIFEST_PATH }).clean, true);
+  // Not wrapped in the fgos.v1 envelope: it is metadata about the verb surface, not a verb's data.
+  const committed = JSON.parse(help);
+  assert.deepEqual(Object.keys(committed).sort(), ['commands', 'schema_version']);
+  assert.equal(committed.schema_version, MANIFEST_SCHEMA_VERSION);
+  assert.deepEqual(committed.commands.map((c) => c.name), COMMAND_REGISTRY.map((c) => c.name));
 
   const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'manifest-drift-test-'));
   try {

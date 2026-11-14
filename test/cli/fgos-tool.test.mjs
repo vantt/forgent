@@ -5,7 +5,7 @@
 // through the event log). Mirrors take-pick-claim-eligibility.test.mjs's
 // self-contained harness shape (own tmpCwd/run/envelopeData) rather than
 // growing the already-large fgos.test.mjs, the same topic-scoped split
-// fgos-manifest.test.mjs/fgos-help.test.mjs already use in this directory.
+// fgos-manifest.test.mjs already uses in this directory.
 import '../helpers/process-tmp-root.mjs';
 import { initializeWorkRepository } from '../helpers/work-store-release.mjs';
 import { test } from 'node:test';

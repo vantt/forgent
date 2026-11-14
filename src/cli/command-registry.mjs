@@ -65,7 +65,7 @@
 // `guide` (optional, `{changes, prerequisites, exitCodes[], next}`) is what a person needs before
 // running a verb: what it changes on disk, what it needs, its exit codes and the next command.
 // `fgos <verb> --help` renders it with the verb's flags (and their defaults, from `parameters`) and
-// `examples`; the manifest carries it. test/cli/fgos-help.test.mjs checks each guided verb's help.
+// `examples`; the manifest carries it. apps/fgos/src/help.rs checks each guided verb's help.
 
 // `subcommands` (optional) is set on a verb whose first positional is a
 // sub-verb: {<sub>: {description, parameters, examples}}, each sub-verb's

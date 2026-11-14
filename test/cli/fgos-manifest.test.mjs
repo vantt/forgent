@@ -10,7 +10,8 @@ import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
 import { COMMAND_REGISTRY, MANIFEST_SCHEMA_VERSION, declared } from '../../src/cli/command-registry.mjs';
 import { parseArgs } from '../../src/cli/parse-args.mjs';
-import { formatDeprecation } from '../../src/cli/deprecation.mjs';
+import { OUTCOME_EXIT_CODES } from '../../src/runner/execution/outcome.mjs';
+import { commandManifest, manifestEntry } from '../helpers/command-manifest.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const FGOS = path.resolve(__dirname, '../../bin/fgos.mjs');
@@ -167,105 +168,59 @@ test('no duplicate verb names in the registry', () => {
   assert.deepEqual(names, [...new Set(names)]);
 });
 
-test('fgos --help --json parses to {schema_version, commands:[...]} matching the registry', () => {
-  const cwd = tmpCwd();
-  const result = run(cwd, ['--help', '--json']);
-  assert.equal(result.status, 0);
-  const manifest = JSON.parse(result.stdout);
-  assert.deepEqual(Object.keys(manifest).sort(), ['commands', 'schema_version']);
-  assert.equal(manifest.schema_version, MANIFEST_SCHEMA_VERSION);
-  assert.equal(manifest.commands.length, COMMAND_REGISTRY.length);
-  assert.deepEqual(
-    manifest.commands.map((c) => c.name).sort(),
-    COMMAND_REGISTRY.map((c) => c.name).sort(),
-  );
-});
-
-test('fgos --help --json manifest is not wrapped in the fgos.v1 envelope', () => {
-  const cwd = tmpCwd();
-  const result = run(cwd, ['--help', '--json']);
-  const manifest = JSON.parse(result.stdout);
-  assert.equal(manifest.contract, undefined);
-  assert.equal(manifest.data, undefined);
-});
-
-test('fgos --help prints non-empty text listing every verb', () => {
-  const cwd = tmpCwd();
-  const result = run(cwd, ['--help']);
-  assert.equal(result.status, 0);
-  assert.ok(result.stdout.length > 0);
-  for (const entry of COMMAND_REGISTRY) {
-    assert.ok(result.stdout.includes(entry.invoke), `--help text is missing "${entry.invoke}"`);
-  }
-});
-
 test('setup is marked deprecated with the fgctl init workspace-onboarding path', () => {
   const setupEntry = COMMAND_REGISTRY.find((entry) => entry.name === 'setup');
   assert.ok(setupEntry, 'COMMAND_REGISTRY is missing a "setup" entry');
   assert.equal(setupEntry.deprecated, 'since 2026-09-14; use fgctl init, then fgos doctor --fix (setup still wires the git hooks path and the shell-integration line that doctor --fix does not)');
-
-  const cwd = tmpCwd();
-  const manifestResult = run(cwd, ['--help', '--json']);
-  assert.equal(manifestResult.status, 0);
-  const setupManifestEntry = JSON.parse(manifestResult.stdout).commands.find((entry) => entry.name === 'setup');
-  assert.deepEqual(setupManifestEntry.deprecated, setupEntry.deprecated);
-
-  const helpResult = run(cwd, ['setup', '--help']);
-  assert.equal(helpResult.status, 0);
-  assert.match(helpResult.stdout, /DEPRECATED .*since 2026-09-14/);
-  assert.match(helpResult.stdout, /fgctl init/);
-  assert.match(helpResult.stdout, /fgos doctor --fix/);
-  assert.match(helpResult.stdout, /git hooks path/);
 });
 
-test('deprecated help text handles legacy string metadata without undefined fields', () => {
-  const cwd = tmpCwd();
-  for (const entry of COMMAND_REGISTRY.filter((command) => command.deprecated)) {
-    const result = run(cwd, [entry.name, '--help']);
-    assert.equal(result.status, 0);
-    assert.match(result.stdout, /DEPRECATED/);
-    assert.ok(!result.stdout.includes('undefined'), `deprecated help leaked undefined fields for ${entry.name}:\n${result.stdout}`);
-    assert.ok(!result.stdout.includes('[object Object]'), `deprecated help leaked object formatting for ${entry.name}:\n${result.stdout}`);
+test('manifest entries of multi-sub-verb verbs carry subcommands whose keys match the sub enum', () => {
+  const manifest = commandManifest();
+  assert.equal(manifest.schema_version, MANIFEST_SCHEMA_VERSION);
+  const withSubs = manifest.commands.filter((c) => c.subcommands);
+  const names = withSubs.map((c) => c.name).sort();
+  for (const required of ['agents', 'dispatch', 'gateway', 'goal', 'merge', 'session', 'tool', 'workflow']) {
+    assert.ok(names.includes(required), `${required} has no subcommands in the manifest`);
+  }
+  for (const command of withSubs) {
+    assert.deepEqual(command.parameters.properties.sub.enum, Object.keys(command.subcommands), `${command.name}: sub enum != subcommands keys`);
+    assert.deepEqual(command.parameters.required, ['sub'], `${command.name}: sub must be required`);
+    for (const [sub, spec] of Object.entries(command.subcommands)) {
+      assert.equal(typeof spec.description, 'string', `${command.name} ${sub}: description`);
+      assert.ok(spec.description.length > 0, `${command.name} ${sub}: empty description`);
+      assert.equal(spec.parameters?.type, 'object', `${command.name} ${sub}: parameters.type`);
+      assert.ok(Array.isArray(spec.parameters.required), `${command.name} ${sub}: parameters.required`);
+      assert.equal(typeof spec.parameters.properties, 'object', `${command.name} ${sub}: parameters.properties`);
+      for (const name of spec.parameters.required) {
+        assert.ok(Object.hasOwn(spec.parameters.properties, name), `${command.name} ${sub}: required "${name}" has no property`);
+      }
+      assert.ok(Array.isArray(spec.examples) && spec.examples.length > 0, `${command.name} ${sub}: examples`);
+      for (const example of spec.examples) {
+        assert.ok(example.startsWith(`fgos ${command.name} ${sub}`), `${command.name} ${sub}: example "${example}" does not run that sub-verb`);
+      }
+    }
   }
 });
 
-test('formatDeprecation handles structured metadata without object leaks', () => {
-  assert.equal(
-    formatDeprecation({ since: '2026-09-14', use_instead: 'fgctl init' }),
-    'since 2026-09-14; use fgctl init',
-  );
-  assert.equal(formatDeprecation({ note: 'legacy' }), '{"note":"legacy"}');
+test('run and workflow entries say which door one task and planned work take, with runnable examples', () => {
+  const runEntry = COMMAND_REGISTRY.find((e) => e.name === 'run');
+  const workflowEntry = COMMAND_REGISTRY.find((e) => e.name === 'workflow');
+  assert.match(runEntry.description, /fgos workflow start/);
+  assert.match(workflowEntry.description, /fgos run "<prompt>"/);
+  assert.ok(runEntry.examples.some((e) => /^fgos run "[^"]+"$/.test(e)), 'run needs a bare one-liner example');
+  assert.ok(workflowEntry.subcommands.start.examples.some((e) => e.includes('--units')), 'workflow start needs a --units example');
+  assert.ok(workflowEntry.subcommands.start.examples.some((e) => /^fgos workflow start [a-z]/.test(e)), 'workflow start needs a preset example');
 });
 
-// STR77: submit's `text` is read only from `positional[0]` (bin/fgos.mjs's
-// `case 'submit':`) — it never falls back to `flags.text` the way id-style
-// params do. The manifest previously rendered every name in
-// `parameters.required` as `--name`, so `fgos --help` printed the
-// impossible-to-use `required: --text` for submit. It must now render the
-// positional usage instead, and never the `--text` flag hint.
-test('fgos --help renders submit\'s positional text arg, not "required: --text"', () => {
-  const cwd = tmpCwd();
-  const result = run(cwd, ['--help']);
-  assert.equal(result.status, 0);
-  const submitBlock = result.stdout.split(/\n(?=fgos [a-z])/).find((block) => block.startsWith('fgos submit '));
-  assert.ok(submitBlock, '--help output is missing a "fgos submit" block');
-  assert.ok(!submitBlock.includes('required: --text'), `submit's --help block still prints "required: --text":\n${submitBlock}`);
-  assert.ok(submitBlock.includes('positional: text'), `submit's --help block is missing "positional: text":\n${submitBlock}`);
-});
-
-// Same root cause, mixed-mode case: move's `id` is read as
-// `positional[0] ?? flags.id` (both forms work) while `to` is read only from
-// `flags.to`. The two must render distinctly — `id` as positional, `to` as
-// a real `--to` flag — proving the fix generalizes past the positional-only
-// case above instead of special-casing submit alone.
-test('fgos --help renders move\'s mixed positional/flag args distinctly', () => {
-  const cwd = tmpCwd();
-  const result = run(cwd, ['--help']);
-  const moveBlock = result.stdout.split(/\n(?=fgos [a-z])/).find((block) => block.startsWith('fgos move '));
-  assert.ok(moveBlock, '--help output is missing a "fgos move" block');
-  assert.ok(moveBlock.includes('positional: id'), `move's --help block is missing "positional: id":\n${moveBlock}`);
-  assert.ok(moveBlock.includes('required: --to'), `move's --help block is missing "required: --to":\n${moveBlock}`);
-  assert.ok(!moveBlock.includes('--id'), `move's --help block should not render id as a --flag:\n${moveBlock}`);
+test('run lists the exit code of every execution outcome and names the flags it reads', () => {
+  const runEntry = manifestEntry('run');
+  const codes = runEntry.guide.exitCodes.map((line) => Number(line.split(' ')[0]));
+  for (const [outcome, code] of Object.entries(OUTCOME_EXIT_CODES)) {
+    assert.ok(codes.includes(code), `run help lacks exit code ${code} (${outcome})`);
+  }
+  for (const flag of ['unit', 'input', 'verify']) {
+    assert.ok(Object.hasOwn(runEntry.parameters.properties, flag), `run lacks --${flag}`);
+  }
 });
 
 // str51-llm-assist-classify D2: submit's --tier/--kind/--risk overrides must
