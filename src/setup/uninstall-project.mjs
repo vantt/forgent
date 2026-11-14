@@ -1,6 +1,6 @@
 // uninstall-project.mjs — what `fgos uninstall` (and the Node half of `fgctl uninstall`) takes out of
 // one project: the hook entries and extensions the installers wrote into the agent configs, the
-// generated skill directories, the git hooks `fgos setup` wired and the mailbox sync timer. It keeps
+// generated skill directories, the git hooks `fgos setup` wired and the mailbox sync and account probe timers. It keeps
 // everything that is the person's: `.fgos` data and config, the committed pin, any hook entry or skill
 // directory without fgOS's own mark, and every shell profile (reported, never edited).
 //
@@ -19,7 +19,7 @@ import path from 'node:path';
 import { CLAUDE_PLUGIN_MARKETPLACE_NAME, CLAUDE_PLUGIN_REF, WIRE_AGENTS_COMMAND } from './agent-wiring.mjs';
 import { uninstallAgentHooks } from './agent-hooks.mjs';
 import { mainCheckoutHookWired, uninstallGitHooks } from './git-hooks.mjs';
-import { fixMailboxSyncTimer } from './mailbox-sync-timer.mjs';
+import { ACCOUNT_PROBE, MAILBOX_SYNC, fixManagedTimer } from './managed-timer.mjs';
 import { detectRcFiles, hasSourceLine } from './shell-rc.mjs';
 import { firstSymlinkUnder } from '../util/refuse-symlink.mjs';
 import { createProjectSkillGuard, generatedSkillDirs, ownedSkillNames } from './skill-wrappers.mjs';
@@ -161,7 +161,9 @@ export function uninstallProject(repoRoot, { apply = false, packageRoot, shellIn
   }
   const skills = attempt('skills', () => planSkills(repoRoot, packageRoot, apply), { removed: [], kept: [], foreign: [], skipped: null });
   const gitHooks = attempt('git-hooks', () => planGitHooks(repoRoot, apply), { unwired: false, skippedExisting: null });
-  const timer = apply ? attempt('mailbox-timer', () => fixMailboxSyncTimer(repoRoot, { schedule: () => null }), null) : null;
+  const timers = apply
+    ? [MAILBOX_SYNC, ACCOUNT_PROBE].map((schedule) => attempt(`${schedule.name}-timer`, () => fixManagedTimer(schedule, repoRoot, { found: () => null }), null))
+    : [];
   const shellRcSourceLinesFound = shellRcLines(home, shellIntegrationScript);
 
   const rel = (file) => path.relative(repoRoot, file) || file;
@@ -169,7 +171,7 @@ export function uninstallProject(repoRoot, { apply = false, packageRoot, shellIn
     ...hookChanges.flatMap((r) => r.removed.map((name) => `${r.label}: remove the fgOS hook ${name}`)),
     ...skillsRemovalLines(skills.removed, rel),
     ...(gitHooks.unwired ? ['git: unset core.hooksPath (fgOS wired it) and remove the empty .githooks it left'] : []),
-    ...(apply && timer?.fixed ? [timer.message] : []),
+    ...timers.filter((timer) => timer?.fixed).map((timer) => timer.message),
   ];
   const keeps = [
     ...KEPT_PATHS.map(([file, why]) => `${file}: ${why}`),

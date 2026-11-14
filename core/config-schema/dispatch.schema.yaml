@@ -1,7 +1,7 @@
 $schema: https://json-schema.org/draft/2020-12/schema
 $id: urn:fgos:config-schema:dispatch:v1
 $comment: "owner: run-supervisor"
-description: "Waits of the run supervisor when an agent or a controller is asked to stop."
+description: "Waits of the run supervisor when an agent or a controller is asked to stop, and the schedule of the account probe sweep."
 type: object
 properties:
   gateKillGraceMs:
@@ -16,3 +16,13 @@ properties:
     minimum: 1000
     x-fgos-scope: both
     x-fgos-file: config
+  probeAccount:
+    description: "The scheduled account probe: an OS timer that runs fgos dispatch probe-account --all --record --leg direct."
+    type: object
+    properties:
+      intervalSec:
+        description: "Seconds between sweeps of the scheduled account probe; 0 turns the timer off."
+        type: integer
+        minimum: 0
+        x-fgos-scope: both
+        x-fgos-file: config

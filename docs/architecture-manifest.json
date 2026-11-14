@@ -314,7 +314,7 @@
     "src/setup/uninstall-project.mjs": "infra",
     "src/setup/setup-use-case.mjs": "use-case",
     "src/setup/version-info.mjs": "infra",
-    "src/setup/mailbox-sync-timer.mjs": "infra",
+    "src/setup/managed-timer.mjs": "infra",
     "src/setup/agy-permissions.mjs": "infra",
     "src/setup/holder-lock-checks.mjs": "infra",
     "src/setup/git-checks.mjs": "infra",
