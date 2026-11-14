@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "f5a1e6fa832b17f626275a29c3055dfcbfd4d0f4434e2ca3bf0747846253fe0e",
+  "payloadDigest": "cc62d1435403eaa5c61ce14f3f13e34bd4a3d867187ea1201e720a73b08d9b50",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -873,7 +873,7 @@
     "scripts/lib/mailbox-behaviour-v7i.mjs": "0059548c4a97e93061c0951d87c4b156d19211b4e05ae47cde089bb6f456aff9",
     "scripts/lib/mailbox-behaviour-v7j.mjs": "5b65f8e7db99ef19ca4a62cacadacd29f8de6b95021916c4809f97cabd217707",
     "scripts/lib/mailbox-live-cli.mjs": "084b02bbadd408f0cecb4888ba37cf760005931887b5ec31f5ba2d6e1c0ba484",
-    "scripts/lib/mailbox-live-confined.mjs": "ea6931c73f0662ba182e99a1cd7b7d442385b55488bd4bc0d08db9a1a98bc591",
+    "scripts/lib/mailbox-live-confined.mjs": "2022a9fd8fecb531178f69ff44aa9a61bb6b1a16c4a558275211c98f45b66763",
     "scripts/lib/mailbox-role-recorder.mjs": "b45702d191ab0ce223c9be0795fd9b573d73ff5a88a89007457de1da24f4c8ae",
     "scripts/lib/mailbox-wake-probe.mjs": "bdba8f043335de5c70149d48ed656e3c359531426b2f98c1c4037cc0b6970085",
     "scripts/lib/sandbox-git.mjs": "c45bc75afc8e5666e13d70f9ea65c6ff4e79243aeca7bae5046d4ea3e914088f",

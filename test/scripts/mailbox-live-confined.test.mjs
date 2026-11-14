@@ -62,6 +62,18 @@ async function processesGone(dir, pidNs, limitMs = 15_000) {
   return processesOfRun(dir, pidNs);
 }
 
+/** Each remaining pid with its /proc state letter and parent pid, for a failure message. */
+function describeLeft(pids) {
+  return pids.map((pid) => {
+    try {
+      const [state, ppid] = fs.readFileSync(`/proc/${pid}/stat`, 'utf8').split(') ')[1].split(' ');
+      return `${pid}(state ${state}, ppid ${ppid})`;
+    } catch {
+      return `${pid}(gone)`;
+    }
+  }).join(', ');
+}
+
 let shimBytes = null;
 /** The workspace shim exactly as this branch's `fgctl` writes it (its generator's output). */
 function shim() {
@@ -280,14 +292,35 @@ test('ending a confined run leaves no process, whether it ignores SIGTERM or for
   const w = world();
   for (const [runId, script] of [['run-trap', "trap '' TERM; while :; do sleep 1; done"], ['run-setsid', 'setsid sleep 600 & sleep 600']]) {
     const prepared = prepareConfinedRun({ base: w.base, runId, command: 'sh', args: ['-c', script], env: baseEnv(), masks: w.masks });
-    const run = startConfinedRun(prepared);
+    const run = startConfinedRun(prepared, { waitMs: LOADED_WAIT_MS });
     // The sandbox takes as long to start as the machine is busy; wait for its processes instead of guessing a delay.
     await waitFor(() => processesOfRun(prepared.paths.dir, run.entry.pidNs).length >= 2, LOADED_WAIT_MS);
     assert.ok(processesOfRun(prepared.paths.dir, run.entry.pidNs).length >= 2, `${runId} runs before the end`);
     const { left } = await endConfinedRun(run, { waitMs: LOADED_WAIT_MS });
-    assert.deepEqual(left, [], runId);
-    assert.deepEqual(await processesGone(prepared.paths.dir, run.entry.pidNs), [], runId);
+    assert.deepEqual(left, [], `${runId}: ${describeLeft(left)}`);
+    const remaining = await processesGone(prepared.paths.dir, run.entry.pidNs);
+    assert.deepEqual(remaining, [], `${runId}: ${describeLeft(remaining)}`);
     assert.ok(JSON.parse(fs.readFileSync(prepared.paths.ledger, 'utf8')).endedAt);
+  }
+});
+
+test('a killed process its parent has not reaped is not counted as a process of the run, while a live one in the same namespace is', async () => {
+  // `true` exits at once; the shell then execs `sleep`, which never waits, so `true` stays a zombie child of it.
+  const parent = cp.spawn('sh', ['-c', 'true & exec sleep 600'], { stdio: 'ignore' });
+  try {
+    const childrenFile = `/proc/${parent.pid}/task/${parent.pid}/children`;
+    const zombie = await waitFor(() => {
+      const pid = Number(fs.readFileSync(childrenFile, 'utf8').trim().split(/\s+/)[0]);
+      return pid > 0 && fs.readFileSync(`/proc/${pid}/stat`, 'utf8').split(') ')[1].split(' ')[0] === 'Z' ? pid : null;
+    });
+    assert.ok(zombie, 'the unreaped child is a zombie');
+    const ns = fs.readlinkSync('/proc/self/ns/pid');
+    assert.equal(fs.readlinkSync(`/proc/${zombie}/ns/pid`), ns, 'the zombie still shows its namespace, which is why it used to match');
+    const found = processesOfRun(os.tmpdir(), ns);
+    assert.ok(found.includes(parent.pid), 'a live process of the namespace is counted');
+    assert.ok(!found.includes(zombie), 'the zombie is not');
+  } finally {
+    parent.kill('SIGKILL');
   }
 });
 

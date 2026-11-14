@@ -420,6 +420,8 @@ export function processesOfRun(dir, pidNs) {
     if (!/^\d+$/.test(entry)) continue;
     const pid = Number(entry);
     if (pid === process.pid || pid === process.ppid) continue;
+    // A killed process its parent has not yet reaped (Z) keeps its namespace link but runs nothing; it is no leftover.
+    if (['Z', 'X'].includes(stateOf(pid))) continue;
     const ns = readLink(`/proc/${pid}/ns/pid`);
     if ((pidNs && ns === pidNs) || inside(readLink(`/proc/${pid}/cwd`), dir) || inside(readLink(`/proc/${pid}/exe`), dir)) pids.push(pid);
   }
@@ -451,16 +453,17 @@ function killRunProcesses(dir, pidNs, waitMs) {
 /**
  * Starts a prepared run. The ledger entry is written before the spawn (so a crash right
  * after it still leaves a trace) and completed with the bwrap pid, the sandbox's pid 1 (by
- * its host pid), their start times and the pid namespace once the sandbox is up.
+ * its host pid), their start times and the pid namespace once the sandbox is up. `waitMs` is how long
+ * to wait for the sandbox's pid 1 (give it the run's end window on a loaded machine).
  */
-export function startConfinedRun(prepared, { stdio = ['ignore', 'pipe', 'pipe'] } = {}) {
+export function startConfinedRun(prepared, { stdio = ['ignore', 'pipe', 'pipe'], waitMs = 5000 } = {}) {
   const { paths } = prepared;
   // The login copy and its snapshot let the orphan sweep settle the copy of a run it ends.
   const entry = { runId: paths.runId, dir: paths.dir, startedAt: new Date().toISOString(), ...prepared.launch, login: prepared.copy ? { copy: prepared.copy, snapshot: prepared.snapshot, digest: prepared.digest ?? 'bytes' } : null };
   writeJson(paths.ledger, entry);
   // `prepared.command` is always BWRAP (the driver's configured executable); the program is named here.
   const child = spawn(BWRAP, prepared.args, { cwd: paths.ws, env: prepared.env, stdio });
-  const pid1 = sandboxInit(child.pid);
+  const pid1 = sandboxInit(child.pid, waitMs);
   Object.assign(entry, {
     bwrapPid: child.pid,
     bwrapStart: startTime(child.pid),
