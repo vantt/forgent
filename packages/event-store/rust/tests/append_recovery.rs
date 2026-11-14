@@ -504,6 +504,39 @@ fn append_recovery_survives_a_seal_that_removes_the_newest_closed_segment_after_
 }
 
 #[test]
+fn a_newest_closed_segment_that_vanishes_with_no_seal_above_the_receipt_refuses_loudly() {
+    struct Lose<'a>(&'a Repo);
+    impl FileSystem for Lose<'_> {
+        fn checkpoint(&self, p: Point) -> io::Result<()> {
+            let paths = self.0.layout.stream(&self.0.stream);
+            let segment = paths.segment(1, 3).unwrap();
+            if p == Point::AfterClosedList && segment.exists() {
+                // An outside delete: no receipt covers the segment's range.
+                fs::remove_file(segment)?;
+            }
+            Ok(())
+        }
+    }
+    let r = Repo::new();
+    r.append(3);
+    rotate(&r.layout, "test-aa2345", &r.stream, &[]).unwrap();
+    let err = append_with_fs(
+        &r.layout,
+        &r.registry,
+        AppendRequest {
+            stream: &r.stream,
+            events: &inputs(1),
+            cursor: &Positions::new(),
+            writer: "writer",
+            machine: "test-aa2345",
+            held_ranks: &[],
+        },
+        &Lose(&r),
+    )
+    .unwrap_err();
+    code(err, "event-store-seq-recovery-conflict");
+}
+#[test]
 fn one_batch_write_contains_marker_and_a_short_write_never_acknowledges() {
     use std::io::Write;
     struct Short(std::cell::Cell<usize>);

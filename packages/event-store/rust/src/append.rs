@@ -96,6 +96,13 @@ pub(crate) fn recover(
         None => None,
     };
     let receipt = read_last_seq(&paths.sealed())?.unwrap_or(0);
+    // A newest segment that vanished is trusted only when the receipt, read after it, covers its range: that is a
+    // seal that finished. Gone with the receipt below it, the segment was lost without a seal and its events with it.
+    if let (None, Some((_, last, _))) = (&newest, listed.last()) {
+        if *last > receipt {
+            return Err(conflict("closed segment vanished above receipt"));
+        }
+    }
     let mut high = receipt;
     for (index, (first, last, _)) in listed.iter().enumerate() {
         let (first, last) = (*first, *last);
