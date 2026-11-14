@@ -100,7 +100,8 @@ pub fn argv_shape(argv: &[String], sub: Option<&str>) -> Vec<String> {
 /// quotes the whole token the caller typed, so without this the record would hold
 /// an argument value the argv rule keeps out. Cleaning against the argv, not
 /// against the message's own words, also covers malformed tokens no word rule
-/// recognizes (`--api_key=x`, `--=x`, an over-long name).
+/// recognizes (`--api_key=x`, `--=x`, an over-long name). A very short value also replaces unrelated matches of that
+/// text in the message: that garbles the message but cannot leak, the side to err on.
 fn redact_message(message: &str, argv: &[String], sub: Option<&str>) -> String {
     let shapes = argv_shape(argv, sub);
     let mut swaps: Vec<(&str, &str)> = argv

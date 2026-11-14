@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "d781cd7604ce93a9f63e59a37ce0ff57d165468937ff8a34c874659ad5b67b7b",
+  "payloadDigest": "b35efc8937ed637e12abc16290a8e73d63034b90393c69beaf244d43686b8c08",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -602,7 +602,7 @@
     "packages/observe/rust/src/flags.rs": "0fb8c095ed7a36987d4d8cc2a80977c421a72eca41e9c080509cef05d43de7fe",
     "packages/observe/rust/src/friction.rs": "e58a457d592c94f116c447433b03cf28458330d6f7f3e7ef7cde3166f03db067",
     "packages/observe/rust/src/friction_cli.rs": "6d8ea429c7e8905b2065665b9d3788350eae8239b791b09387b5b5ba4718b0cd",
-    "packages/observe/rust/src/invocation_fault.rs": "93e6e2a415176652b235fc72c8f973d3a7babf17bb386afad47ca7c727ee7f70",
+    "packages/observe/rust/src/invocation_fault.rs": "eb70b737a6c26af9e691343146254a6816f4812c81bd8388a9a1aaa7dc6f5e6c",
     "packages/observe/rust/src/lib.rs": "881b74e9903b76c068307101c50d5226de540ad065dbaa0eb28e2b228d3f4dbd",
     "packages/observe/rust/src/metrics_cli/case.rs": "d46174dd491a0fa890a228804e03f36d16aa73b1ab2321d182144ec264f36d7c",
     "packages/observe/rust/src/metrics_cli/coverage.rs": "9037c702523af9f42f70c10dc588b3db8bf7f44651b87545c41be73b62f9d02b",
