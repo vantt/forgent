@@ -73,6 +73,8 @@ If a design changes whole-system structure, do all of the following:
 3. Update this architecture map when the structural reading path changes.
 4. Link proof or record `No component-boundary change`.
 
+One-door guard. Each job the system does exactly one way (read the manifest projection, take a lock, resolve the invocation root, admit store access, parse CLI arguments, and so on) has one row in the `doors` table of `docs/architecture-manifest.json`, which `test/architecture.test.mjs` checks against every product file in Node, Rust and `scripts/`. A row names the job, its `patterns`, the `allowed` paths (a `scripts/` entry carries a reason), the known leaks as `debt` (each with a reason; an entry that no longer matches fails as stale, so a fixed leak must be deleted), and, for a Node and Rust twin, `retiredBy`, the step that deletes the Node side. A `ratchet` row only stops growth and is never proof of one path. Adding or moving a door means adding or editing its row in the same change.
+
 ## 5. Legacy Source
 
 The component and contract registry content is retained below; use its exact sections for those definitions.

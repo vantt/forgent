@@ -62,6 +62,7 @@ Observe được chuyển trọn gói sang Rust trong kế hoạch `archive/plan
 - **Một cửa shard** (`packages/observe/rust/src/shard.rs`) cho cả bốn store (friction, cases, evals, snapshots): thư mục `.fgos`, `observe` và store phải là thư mục thật (không đi qua symlink); shard mở no-follow, chỉ file thường; dưới lock, đuôi dòng bị đứt (writer chết giữa dòng) được chữa (friction, case, snapshot: xuống dòng mới rồi ghi tiếp) hoặc bị từ chối (eval) rồi ghi đúng một `write_all`; reader có chặn trên 1 MiB mỗi dòng, gọi tên và bỏ qua dòng hỏng (không UTF-8, không JSON, quá dài) thay vì dừng cả store, cảnh báo ở stderr dạng `fgos: warning: observe <store>: skipped <file>:<line>: <reason>` (eval tự báo dòng invalid của nó nên không in). Trên Windows, shard mở qua `fgos-durable-file` (từ chối reparse point ở file cuối). Giới hạn đã biết: kiểm tra thư mục và `open` là hai lời gọi riêng nên thư mục bị tráo giữa hai lời gọi vẫn có thể bị đi theo; shard `pid-<N>` không bao giờ settle ở cùng một instant (xem § Friction).
 - **Root của store**: verb ghi (`friction record|resolve|migrate`, `metrics case open|close`, `eval record`, `snapshot`) ghi vào main checkout, tức root tin cậy của Git (linked worktree ghi vào store của main checkout); resolver lỗi trả `observe-root-unresolved:` chứ không lặng lẽ ghi sang store khác. Verb đọc giữ root được yêu cầu: resolve tốn ba lần spawn Git, chỉ verb ghi cần chắc về đích.
 - **Envelope chuẩn**: CLI native luôn trả về envelope `fgos.v1`.
+- **Bản ghi lệnh gọi sai** (`.fgos/logs/invocation-faults.jsonl`, mỗi dòng `ts, faultClass, verb, message, cwd, argv, writer`): có **hai writer** vì có hai cửa vào, writer Rust `packages/observe/rust/src/invocation_fault.rs` (verb native của host, `apps/fgos/src/invocation_doors.rs`) và writer Node `src/observe/invocation-fault-log.mjs` (verb legacy). Hợp đồng chung là file vector `test/rust-host/fixtures/invocation-fault-vectors.json` (hình argv, chọn đường dẫn log, thứ tự khoá); Rust đọc nó trong unit test của module, Node đọc nó trong `test/observe/invocation-fault-log.test.mjs`; lệch giữa hai bên được sửa ở bên sai. Cả hai ghi vào store đã resolve, nếu chưa có thì vào `.fgos` sẵn có của main checkout, không bao giờ tạo `.fgos`; file 0600, quá 1 MiB thì bỏ nửa dòng cũ nhất (một append đồng thời có thể mất). Khác biệt đã biết: writer Rust che `message` theo argv, writer Node chưa che (ghi trong lý do của row `doors` "record a malformed call"). Hai writer là một cặp `retiredBy` trong bảng `doors`; writer Node nghỉ cùng verb Node cuối cùng.
 
 ## 4. Commands & Routing
 
@@ -70,7 +71,7 @@ Observe được chuyển trọn gói sang Rust trong kế hoạch `archive/plan
 
 Mọi verb `metrics` đọc cờ qua một ngữ pháp (`packages/observe/rust/src/flags.rs`): `--k v` và `--k=v`, `--json` được nhận và không làm gì (đầu ra luôn là envelope JSON); cờ lạ, thiếu giá trị, đối số thừa hay số sai là lỗi có tên `metrics <verb>: <lý do>`.
 
-Node legacy CLI cắm cờ `nativeOnly: true` cho `metrics` và `friction`, từ chối chạy trực tiếp với exit 4.
+Registry CLI (`src/cli/command-registry.mjs`) đánh dấu `native: true` cho `metrics` và `friction`: Node legacy CLI từ chối chạy trực tiếp với exit 4. Đó là trường khai báo duy nhất của "native"; bảng route sinh từ nó.
 Mọi component Node hoặc ngôn ngữ ngoài gọi qua helper `src/util/host-bin.mjs` (`invokeHost`).
 
 ## 5. Mục theo làn (Sub-spec sections)

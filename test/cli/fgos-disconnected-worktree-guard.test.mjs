@@ -9,13 +9,15 @@
 // mutatesStore: true verb run there without `--dir` would silently
 // read/write that disconnected snapshot instead of the live main store.
 //
-// Five scenarios, matching this investigation's own acceptance criteria:
-// main checkout (unaffected), a linked worktree with a real disconnected
-// `.fgos/` (refused), explicit `--dir` (bypasses the guard, writes land in
-// the real store), the legitimate pick/return/approve cycle (unaffected --
-// proven by the existing fgos-claim*/fgos-approve*/fgos-post-merge*
-// suites staying green, not duplicated here), and a genuine `fgos session
-// start` worktree (unaffected -- `isSessionWorktree` admits it).
+// The admission rule itself (which calls from which checkout are admitted or
+// refused, and why) is owned by the tests of
+// `packages/git/rust/src/store_admission.rs`; which invocation of which verb
+// mutates the store is owned by `test/rust-host/fixtures/store-declaration-vectors.json`
+// (read by `test/cli/fgos-manifest.test.mjs` and `apps/fgos/src/routing.rs`).
+// This file keeps the wiring through the real CLI: one refusal from a linked
+// worktree carrying a frozen `.fgos/` copy, one explicit `--dir` that bypasses
+// it, one genuine `fgos session start` worktree that is admitted, and the
+// invocation-root cases below.
 
 import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
@@ -61,15 +63,7 @@ function addDisconnectedAdHocWorktree(cwd, branch) {
   return worktreePath;
 }
 
-// --- Scenario 1: main checkout -----------------------------------------
-
-test('disconnected-worktree guard: a mutatesStore: true verb succeeds normally from the real main checkout', () => {
-  const cwd = initGitCwdMainWithCommittedFgos();
-  const result = run(cwd, ['submit', 'a task from main', '--async']);
-  assert.equal(result.status, 0, result.stderr);
-});
-
-// --- Scenario 2: linked worktree with a real disconnected .fgos/ -------
+// --- Refusal from a linked worktree with a real disconnected .fgos/ ----
 
 test('disconnected-worktree guard: refuses a mutatesStore: true verb from an ad-hoc worktree carrying a real disconnected .fgos copy', () => {
   const main = initGitCwdMainWithCommittedFgos();
@@ -89,18 +83,7 @@ test('disconnected-worktree guard: refuses a mutatesStore: true verb from an ad-
   }
 });
 
-test('disconnected-worktree guard: a non-mutatesStore: true verb (list) is unaffected by the guard from the same disconnected worktree', () => {
-  const main = initGitCwdMainWithCommittedFgos();
-  const wt = addDisconnectedAdHocWorktree(main, 'adhoc-disconnected-branch-read');
-  try {
-    const result = run(wt, ['list']);
-    assert.equal(result.status, 0, result.stderr);
-  } finally {
-    execFileSync('git', ['worktree', 'remove', '--force', wt], { cwd: main });
-  }
-});
-
-// --- Scenario 3: explicit --dir bypasses the guard ----------------------
+// --- Explicit --dir bypasses the guard -----------------------------------
 
 test('disconnected-worktree guard: --dir <mainRoot> bypasses the guard and the event lands in the real main store, not the worktree copy', () => {
   const main = initGitCwdMainWithCommittedFgos();
@@ -115,13 +98,7 @@ test('disconnected-worktree guard: --dir <mainRoot> bypasses the guard and the e
   }
 });
 
-// --- Scenario 4: pick/return/approve -- see file header. No new test here;
-// the existing fgos-claim*.test.mjs / fgos-approve*.test.mjs /
-// fgos-post-merge*.test.mjs suites already drive the real pick -> work ->
-// return -> approve cycle end to end through `createWorktree` (ADR0020-
-// stripped) and are run unchanged as this change's own regression proof.
-
-// --- Scenario 5: concurrent/session invocation --------------------------
+// --- A genuine session worktree is admitted ------------------------------
 
 test('disconnected-worktree guard: a mutatesStore: true verb succeeds from a genuine "fgos session start" worktree', () => {
   const main = initGitCwdMainWithCommittedFgos();
@@ -131,88 +108,6 @@ test('disconnected-worktree guard: a mutatesStore: true verb succeeds from a gen
     assert.equal(result.status, 0, result.stderr);
   } finally {
     endSession(main, sess.sessionId, { force: true });
-  }
-});
-
-// --- `return` explicitly, since the master prompt's own acceptance
-// criteria name it by verb ("pick/return/approve") -- deliberately NOT
-// added to mutatesStore: true (see that set's own doc comment): its case
-// block already has its own, more permissive, already-tested worktree
-// guard (registered-session-aware, ~line 3862) predating this guard
-// entirely. This test only pins that this guard's own message never fires
-// for "return" -- return's pre-existing behavior is covered by
-// test/cli/fgos-return.test.mjs, not duplicated here. ---------------------
-
-test('disconnected-worktree guard: "return" is unaffected by this guard (it already has its own worktree check)', () => {
-  const main = initGitCwdMainWithCommittedFgos();
-  const wt = addDisconnectedAdHocWorktree(main, 'adhoc-disconnected-return');
-  try {
-    const result = run(wt, ['return', 'tsk-doesnotmatter']);
-    assert.notEqual(result.status, 0, result.stderr); // still refused -- by return's OWN guard
-    assert.doesNotMatch(result.stderr, /disconnected snapshot/, "this guard's own message must never fire for return");
-  } finally {
-    execFileSync('git', ['worktree', 'remove', '--force', wt], { cwd: main });
-  }
-});
-
-// --- mutatesStore shapes: per-invocation classification ------
-// Refusal happens BEFORE the verb's own handler runs (this guard sits ahead
-// of `runVerb` in main()), so the mutating-subcommand cases below are safe
-// and cheap to exercise for real even for verbs whose real handler would
-// otherwise have side effects (spawn a process, open a session) -- the
-// handler is never reached. The read-subcommand cases run to real
-// completion, since they are expected to succeed unaffected.
-
-test('disconnected-worktree guard: "session start"/"session end"/"session gc" are refused, "session list" is unaffected', () => {
-  const main = initGitCwdMainWithCommittedFgos();
-  const wt = addDisconnectedAdHocWorktree(main, 'adhoc-disconnected-session');
-  try {
-    for (const sub of ['start', 'end', 'gc']) {
-      const args = sub === 'end' ? ['session', 'end', 'some-session-id'] : ['session', sub];
-      const result = run(wt, args);
-      assert.equal(result.status, 4, `session ${sub}: ${result.stderr}`);
-      assert.match(result.stderr, /disconnected snapshot/);
-    }
-    const listResult = run(wt, ['session', 'list']);
-    assert.equal(listResult.status, 0, listResult.stderr);
-  } finally {
-    execFileSync('git', ['worktree', 'remove', '--force', wt], { cwd: main });
-  }
-});
-
-test('disconnected-worktree guard: "dispatch recover --action" is refused, "dispatch recover" without --action is unaffected', () => {
-  const main = initGitCwdMainWithCommittedFgos();
-  const wt = addDisconnectedAdHocWorktree(main, 'adhoc-disconnected-dispatch');
-  try {
-    // boundary: the guard runs in the shell before any handler, and only a spawned call from a real disconnected worktree reaches it.
-    const recoverResult = run(wt, ['dispatch', 'recover', 'run_does_not_exist', '--action', 'x']);
-    assert.equal(recoverResult.status, 4, recoverResult.stderr);
-    assert.match(recoverResult.stderr, /disconnected snapshot/);
-
-    // The bare observe form reaches its own read-only handler, which answers for its own reason.
-    // boundary: same guard, the read-only shape must not trip it.
-    assert.doesNotMatch(run(wt, ['dispatch', 'recover', 'run_does_not_exist']).stderr, /disconnected snapshot/);
-  } finally {
-    execFileSync('git', ['worktree', 'remove', '--force', wt], { cwd: main });
-  }
-});
-
-// --- Whole-verb additions with their own subcommands (every subcommand
-// mutates, so the guard applies to the bare verb name, not per-subcommand)
-
-test('disconnected-worktree guard: "topic register" and "doc reserve" are refused (every subcommand of these two verbs mutates)', () => {
-  const main = initGitCwdMainWithCommittedFgos();
-  const wt = addDisconnectedAdHocWorktree(main, 'adhoc-disconnected-topic-doc');
-  try {
-    const topicResult = run(wt, ['topic', 'register', 'some-topic', '--purpose-slug', 'x']);
-    assert.equal(topicResult.status, 4, topicResult.stderr);
-    assert.match(topicResult.stderr, /disconnected snapshot/);
-
-    const docResult = run(wt, ['doc', 'reserve', 'some-topic', 'explanation', 'docs/x.md']);
-    assert.equal(docResult.status, 4, docResult.stderr);
-    assert.match(docResult.stderr, /disconnected snapshot/);
-  } finally {
-    execFileSync('git', ['worktree', 'remove', '--force', wt], { cwd: main });
   }
 });
 

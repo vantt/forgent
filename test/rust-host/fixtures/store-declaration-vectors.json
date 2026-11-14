@@ -43,6 +43,9 @@
     {"verb":"goal","argv":["set","tsk-1"],"mutates":true,"landsWork":false,"eventStoreChild":false},
     {"verb":"goal","argv":["show"],"mutates":false,"landsWork":false,"eventStoreChild":false},
     {"verb":"lock","argv":["fence","some-lock"],"mutates":true,"landsWork":false,"eventStoreChild":false},
-    {"verb":"lock","argv":["status"],"mutates":false,"landsWork":false,"eventStoreChild":false}
+    {"verb":"lock","argv":["status"],"mutates":false,"landsWork":false,"eventStoreChild":false},
+    {"verb":"topic","argv":["register","some-topic","--purpose-slug","x"],"mutates":true,"landsWork":false,"eventStoreChild":false},
+    {"verb":"doc","argv":["reserve","some-topic","explanation","docs/x.md"],"mutates":true,"landsWork":false,"eventStoreChild":false},
+    {"verb":"return","argv":["tsk-1"],"mutates":false,"landsWork":false,"eventStoreChild":false}
   ]
 }
