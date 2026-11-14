@@ -1,7 +1,8 @@
 //! One Node-API load for both foundations. No protocol decisions live here.
 mod event_store;
 pub use event_store::{
-    event_store_branch_key, event_store_facts, maintain_event_store, open_store, resolve_event_store,
+    event_store_branch_key, event_store_facts, maintain_event_store, open_store,
+    resolve_event_store,
 };
 mod git;
 pub use git::{

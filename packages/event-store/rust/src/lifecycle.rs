@@ -148,7 +148,9 @@ pub fn maintain(request: &Request) -> Outcome {
         }
     }
     if request.policy.end && !request.policy.dispatched {
-        let last = attempt.as_ref().map(|(time, remote)| (*time, remote.as_str()));
+        let last = attempt
+            .as_ref()
+            .map(|(time, remote)| (*time, remote.as_str()));
         outcome.sync_due = sync_due(request.timers, last, request.now_sec);
     }
     outcome

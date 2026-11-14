@@ -36,47 +36,67 @@ fn invalid(name: &str) -> Invalid {
     Invalid(name.into())
 }
 
-/// An integer key: the value, else the standard's; at least `minimum`, at most the safe-integer bound.
-fn number(section: &Value, standard: &Value, key: &str, name: &str, minimum: u64) -> Result<u64, Invalid> {
-    let value = section.get(key).unwrap_or_else(|| &standard[key]);
-    let number = value.as_f64().filter(|n| n.fract() == 0.0 && n.abs() <= MAX_SAFE_INTEGER);
-    match number {
-        Some(n) if n >= minimum as f64 => Ok(n as u64),
-        _ => Err(invalid(name)),
+/// The integer keys `keys` (`(key, minimum)`) of one sub-section: absent is empty, anything else that is no object breaks
+/// the rule; each value is the section's, else the standard's, a whole number from its minimum to the safe-integer bound.
+fn numbers<const N: usize>(
+    input: &Value,
+    standard: &Value,
+    section: &str,
+    keys: [(&str, u64); N],
+) -> Result<[u64; N], Invalid> {
+    static ABSENT: Value = Value::Null;
+    let own = match input.get(section) {
+        None => &ABSENT,
+        Some(value) if value.is_object() => value,
+        Some(_) => return Err(invalid(section)),
+    };
+    let mut out = [0; N];
+    for (slot, (key, minimum)) in out.iter_mut().zip(keys) {
+        let value = own.get(key).unwrap_or(&standard[section][key]);
+        let whole = value
+            .as_f64()
+            .filter(|n| n.fract() == 0.0 && n.abs() <= MAX_SAFE_INTEGER);
+        *slot = match whole {
+            Some(n) if n >= minimum as f64 => n as u64,
+            _ => return Err(Invalid(format!("{section}.{key}"))),
+        };
     }
-}
-
-/// A sub-section object: absent is empty, anything else that is not an object breaks the rule.
-fn object<'a>(parent: &'a Value, key: &str) -> Result<&'a Value, Invalid> {
-    static EMPTY: Value = Value::Null;
-    match parent.get(key) {
-        None => Ok(&EMPTY),
-        Some(value) if value.is_object() => Ok(value),
-        Some(_) => Err(invalid(key)),
-    }
+    Ok(out)
 }
 
 impl EventStoreConfig {
     /// The section value `section` (`None` when the key is absent) over the bundled standard: a key left unset
     /// takes the standard's value. Keys are checked in the order seal, sync, rebuild, remote.
     pub fn from_section(section: Option<&Value>, ctx: &Context) -> Result<Self, Invalid> {
-        let standard = ctx.standard.value().get("eventStore").unwrap_or(&Value::Null);
+        let standard = ctx
+            .standard
+            .value()
+            .get("eventStore")
+            .unwrap_or(&Value::Null);
         let empty = Value::Object(Default::default());
         let input = match section {
             None => &empty,
             Some(value) if value.is_object() => value,
             Some(_) => return Err(invalid("eventStore")),
         };
-        let (seal, sync, rebuild) = (object(input, "seal")?, object(input, "sync")?, object(input, "rebuild")?);
+        let [seal_interval_sec, seal_coalesce_sec] = numbers(
+            input,
+            standard,
+            "seal",
+            [("intervalSec", 1), ("coalesceSec", 1)],
+        )?;
+        let [sync_interval_sec] = numbers(input, standard, "sync", [("intervalSec", 0)])?;
+        let [rebuild_max_attempts] = numbers(input, standard, "rebuild", [("maxAttempts", 0)])?;
+        let remote = match input.get("remote").unwrap_or(&standard["remote"]) {
+            Value::String(remote) if !remote.is_empty() => remote.clone(),
+            _ => return Err(invalid("remote")),
+        };
         let config = Self {
-            seal_interval_sec: number(seal, &standard["seal"], "intervalSec", "seal.intervalSec", 1)?,
-            seal_coalesce_sec: number(seal, &standard["seal"], "coalesceSec", "seal.coalesceSec", 1)?,
-            sync_interval_sec: number(sync, &standard["sync"], "intervalSec", "sync.intervalSec", 0)?,
-            rebuild_max_attempts: number(rebuild, &standard["rebuild"], "maxAttempts", "rebuild.maxAttempts", 0)?,
-            remote: match input.get("remote").unwrap_or(&standard["remote"]) {
-                Value::String(remote) if !remote.is_empty() => remote.clone(),
-                _ => return Err(invalid("remote")),
-            },
+            remote,
+            seal_interval_sec,
+            seal_coalesce_sec,
+            sync_interval_sec,
+            rebuild_max_attempts,
         };
         Ok(config)
     }

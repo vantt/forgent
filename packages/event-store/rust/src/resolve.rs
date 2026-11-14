@@ -92,8 +92,7 @@ pub fn resolve(
             })
         })
         .transpose()?;
-    let machine =
-        crate::identity::machine_id(config, state_root).map_err(ResolveError::Machine)?;
+    let machine = crate::identity::machine_id(config, state_root).map_err(ResolveError::Machine)?;
     Ok(Resolved {
         driver: Arc::new(driver),
         repo: Arc::new(repo),

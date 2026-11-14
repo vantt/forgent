@@ -142,8 +142,20 @@ fn a_project_snapshot_finds_the_global_directory_and_class_from_the_environment_
 #[test]
 fn the_global_directory_is_dot_fgos_under_the_home_the_lookup_names() {
     use fgos_config::machine::{global_dir, HOME_VAR};
-    let home = |value: &'static str| move |name: &str| (name == HOME_VAR).then(|| value.to_string());
-    assert_eq!(global_dir(home("/home/someone")), Some("/home/someone/.fgos".into()));
-    assert_eq!(global_dir(home("  ")), None, "a blank home names no directory");
-    assert_eq!(global_dir(|_| None), None, "an unset home names no directory");
+    let home =
+        |value: &'static str| move |name: &str| (name == HOME_VAR).then(|| value.to_string());
+    assert_eq!(
+        global_dir(home("/home/someone")),
+        Some("/home/someone/.fgos".into())
+    );
+    assert_eq!(
+        global_dir(home("  ")),
+        None,
+        "a blank home names no directory"
+    );
+    assert_eq!(
+        global_dir(|_| None),
+        None,
+        "an unset home names no directory"
+    );
 }

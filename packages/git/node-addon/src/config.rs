@@ -235,7 +235,9 @@ type Slot = ((SnapshotRequest, bool), SnapshotCache);
 /// cache, the least recently used slot out first. A slot is one request; the cache itself keys on what the
 /// files and the detectors read, so a hit is never stale.
 fn cached(req: &SnapshotRequest, machine: bool, ctx: &Context, a: &Request) -> Res<Value> {
-    with_snapshot(req, machine, ctx, |held| render(held.map_err(Failure::from)?, a))
+    with_snapshot(req, machine, ctx, |held| {
+        render(held.map_err(Failure::from)?, a)
+    })
 }
 
 /// `read` over the snapshot the cache holds for `req`, or the error reading it gave.
