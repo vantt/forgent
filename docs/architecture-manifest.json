@@ -304,7 +304,7 @@
         "\\b(?:parseFrontmatter|renderFrontmatter|extractFrontmatter)\\b",
         "\\bFRONTMATTER_PATTERN\\b",
         "report/frontmatter\\.mjs",
-        "\\^---\\\\r\\?\\\\n"
+        "\\^---(?:\\\\r\\?)?(?:\\\\n|\\\\s|\\$)"
       ],
       "allowed": [
         "src/util/yaml.mjs",
@@ -312,7 +312,7 @@
         { "path": "core/skills/instruction-audit/scripts/instruction-audit.mjs", "reason": "standalone shipped skill script; runs in user projects without the fgOS addon" }
       ],
       "debt": [],
-      "reason": "only src/util/yaml.mjs readFrontmatter cuts and parses a frontmatter block; a second cutter or parser names one of the retired helpers or carries the fence regex. Per-line match on code and string text: a cut written another way (split on a fence) is not seen"
+      "reason": "only src/util/yaml.mjs readFrontmatter cuts and parses a frontmatter block; a second cutter or parser names one of the retired helpers or carries a fence regex (`^---` followed by an optional CR and a newline, whitespace or end of line). Per-line match on code and string text: a cut written another way (split on a fence) is not seen"
     }
   ],
   "files": {

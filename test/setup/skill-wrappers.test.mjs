@@ -201,6 +201,18 @@ test('materializeSkillsIntoProject keeps a project skill file that is newer than
   ]);
 });
 
+test('a skill whose frontmatter is not valid YAML still gets its wrapper and assembled copy, byte for byte', () => {
+  const frontmatter = '---\nname: loose\ndescription: Use when: the user asks for X\n---\n';
+  assert.ok(generateWrapperContent(`${frontmatter}\n# Body\n`, '../../.agents/skills/loose/SKILL.md').startsWith(frontmatter));
+  const packageRoot = mkTempDir('skill-wrappers-loose-pkg-');
+  writeSkill(path.join(packageRoot, 'core', 'skills'), 'loose', frontmatter, '# Body\n');
+  const targetRoot = mkTempDir('skill-wrappers-loose-target-');
+  const { wrappersWritten } = materializeSkillsIntoProject(packageRoot, targetRoot);
+  assert.equal(wrappersWritten.length, 1);
+  assert.ok(fs.readFileSync(path.join(targetRoot, '.claude', 'skills', 'loose', 'SKILL.md'), 'utf8').startsWith(frontmatter));
+  assert.ok(fs.readFileSync(path.join(targetRoot, '.agents', 'skills', 'loose', 'SKILL.md'), 'utf8').startsWith(frontmatter));
+});
+
 test('materializeSkillsIntoProject compares skill versions as dotted numbers (1.10 is after 1.9) and ignores an unquoted version', () => {
   const wrapperStamp = '\nThis is a generated thin wrapper (tsk-1qi) -- do not edit directly, edit the source instead.\n';
   const skillMd = (version, body, stamp = '') => `---\nname: sample\ndescription: d\nmetadata:\n  version: ${version}\n---\n${stamp}${body}\n`;

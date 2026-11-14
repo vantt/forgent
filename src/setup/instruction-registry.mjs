@@ -14,7 +14,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { readFrontmatter } from '../util/yaml.mjs';
+import { cutFrontmatter, parseYaml } from '../util/yaml.mjs';
 import { domainCatalog } from '../util/domain-dirs.mjs';
 import { buildDecisionIndexMarkdown, narrativeHolderResolver } from '../report/decision-index.mjs';
 import { listWork } from '../state/store.mjs';
@@ -150,22 +150,31 @@ export function extractInstructionFrontmatter(rawContent, filePath = '') {
     });
   }
 
-  let parsed;
+  const { block, source, body } = cutFrontmatter(rawContent);
+  if (!block) {
+    throw new InstructionRegistryError(
+      'Instruction file is missing YAML frontmatter block (--- ... ---)',
+      { filePath, code: 'INVALID_METADATA' },
+    );
+  }
+
+  let meta;
   try {
-    parsed = readFrontmatter(rawContent, filePath);
+    meta = parseYaml(source, { filename: filePath });
   } catch (err) {
     throw new InstructionRegistryError(
       `Failed to parse YAML frontmatter: ${err.message}`,
       { filePath, code: 'INVALID_METADATA', cause: err },
     );
   }
-  if (!parsed.block) {
+
+  if (!meta || typeof meta !== 'object' || Array.isArray(meta)) {
     throw new InstructionRegistryError(
-      'Instruction file is missing YAML frontmatter block (--- ... ---)',
+      'Instruction frontmatter must be a key-value object',
       { filePath, code: 'INVALID_METADATA' },
     );
   }
-  const { meta, body } = parsed;
+
   return { meta, body, rawContent };
 }
 

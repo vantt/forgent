@@ -9,8 +9,6 @@ import { generateWrapperContent, ownedSkillNames } from '../../src/setup/skill-w
 import { readFrontmatter } from '../../src/util/yaml.mjs';
 import { ownedFileSet } from '../../scripts/lib/git-ports.mjs';
 
-const extractFrontmatter = (content) => readFrontmatter(content).block;
-
 // tsk-1qi (D5/D7, docs/history/install-setup-external-project-reliability/
 // CONTEXT.md): `.agents/skills` is the assembled, orchestrator-neutral
 // projection of `core/skills` and `domains/*/skills`; `.claude/skills/<name>/SKILL.md` is a GENERATED thin
@@ -135,8 +133,8 @@ test('every .claude/skills/<name>/SKILL.md wrapper carries the exact same frontm
     const wrapperContent = fs.readFileSync(path.join(CLAUDE_SKILLS_ROOT, name, 'SKILL.md'), 'utf8').replaceAll('\r\n', '\n');
     const sourceContent = fs.readFileSync(path.join(AGENTS_SKILLS_ROOT, name, 'SKILL.md'), 'utf8').replaceAll('\r\n', '\n');
     assert.equal(
-      extractFrontmatter(wrapperContent),
-      extractFrontmatter(sourceContent),
+      readFrontmatter(wrapperContent).block,
+      readFrontmatter(sourceContent).block,
       `${name}/SKILL.md's frontmatter drifted from its .agents/skills source`,
     );
   }
@@ -248,7 +246,7 @@ test('every fgos-* dev-skill source in .agents/skills carries user-invocable: fa
   for (const name of listFgosSkillDirs(AGENTS_SKILLS_ROOT)) {
     const sourceContent = fs.readFileSync(path.join(AGENTS_SKILLS_ROOT, name, 'SKILL.md'), 'utf8');
     assert.match(
-      extractFrontmatter(sourceContent),
+      readFrontmatter(sourceContent).block,
       /^user-invocable: false$/m,
       `${name}/SKILL.md is missing "user-invocable: false" in its frontmatter`,
     );
@@ -258,20 +256,20 @@ test('every fgos-* dev-skill source in .agents/skills carries user-invocable: fa
 test('every fgos-* dev-skill wrapper in .claude/skills inherits user-invocable: false from its source (frontmatter is copied verbatim)', () => {
   for (const name of listFgosSkillDirs(CLAUDE_SKILLS_ROOT)) {
     const wrapperContent = fs.readFileSync(path.join(CLAUDE_SKILLS_ROOT, name, 'SKILL.md'), 'utf8');
-    assert.match(extractFrontmatter(wrapperContent), /^user-invocable: false$/m);
+    assert.match(readFrontmatter(wrapperContent).block, /^user-invocable: false$/m);
   }
 });
 
 test('every fgos-* dev-skill mirrored into plugins/fgOS/skills also carries user-invocable: false (kept byte-identical to its .agents/skills source)', () => {
   for (const name of listFgosSkillDirs(AGENTS_SKILLS_ROOT)) {
     const pluginContent = fs.readFileSync(path.join(PLUGIN_SKILLS_ROOT, name, 'SKILL.md'), 'utf8');
-    assert.match(extractFrontmatter(pluginContent), /^user-invocable: false$/m);
+    assert.match(readFrontmatter(pluginContent).block, /^user-invocable: false$/m);
   }
 });
 
 test('distill (the one non-fgos-* skill mirrored in .agents/skills and .claude/skills) does NOT carry user-invocable: false — only the 14 dev-skills are in scope for D6', () => {
   const distillSource = fs.readFileSync(path.join(AGENTS_SKILLS_ROOT, 'distill', 'SKILL.md'), 'utf8');
-  assert.doesNotMatch(extractFrontmatter(distillSource), /user-invocable/);
+  assert.doesNotMatch(readFrontmatter(distillSource).block, /user-invocable/);
 });
 
 // `.gitignore` cannot compute the owned set, so its per-name allowlist is

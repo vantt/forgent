@@ -7,7 +7,7 @@
 import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { YamlParseError, describeYamlError, parseYaml, readFrontmatter } from '../../src/util/yaml.mjs';
+import { YamlParseError, describeYamlError, parseYaml, readFrontmatter, cutFrontmatter } from '../../src/util/yaml.mjs';
 
 test('a document reaches JavaScript as plain values, own __proto__ keys and restored non-finite floats', () => {
   assert.deepEqual(parseYaml('a: 1\nb: [x, .nan]\nc:\n  - d: true\n  - null\n'), { a: 1, b: ['x', NaN], c: [{ d: true }, null] });
@@ -73,4 +73,11 @@ test('readFrontmatter refuses a block that is not valid YAML or not a mapping, n
 test('readFrontmatter reads an ADR-shaped block with a list of ids', () => {
   const { meta } = readFrontmatter('---\ntitle: T\ndate: 2026-11-14\nstatus: accepted\nsupersedes: [D-ADR0001, D-ADR0002]\n---\n', 'a.md');
   assert.deepEqual(meta.supersedes, ['D-ADR0001', 'D-ADR0002']);
+});
+
+test('cutFrontmatter cuts the fenced block without parsing it, so a block that is not YAML still yields its bytes', () => {
+  const text = '---\ndescription: Use when: the user asks\n---\nbody\n';
+  assert.deepEqual(cutFrontmatter(text), { block: '---\ndescription: Use when: the user asks\n---\n', source: 'description: Use when: the user asks', body: 'body\n' });
+  assert.deepEqual(cutFrontmatter('no block\n'), { block: '', source: '', body: 'no block\n' });
+  assert.throws(() => readFrontmatter(text, 'bad.md'), YamlParseError);
 });

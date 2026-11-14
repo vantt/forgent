@@ -46,7 +46,7 @@ test('a missing key (undefined) classifies as "none"', () => {
 test('a superseded record missing both backward pointers reports two findings', () => {
   const records = [
     { id: '0002', meta: {} },
-    { id: '0012', meta: { supersedes: ["0002"] } },
+    { id: '0012', meta: { supersedes: ['0002'] } },
   ];
   const indexContent = '| [0002](0002-x.md) | ... |\n| [0012](0012-x.md) | ... |\n';
 
@@ -59,8 +59,8 @@ test('a superseded record missing both backward pointers reports two findings', 
 
 test('a superseded record with both pointers present reports zero findings', () => {
   const records = [
-    { id: '0002', meta: { superseded_by: "0012" } },
-    { id: '0012', meta: { supersedes: ["0002"] } },
+    { id: '0002', meta: { superseded_by: '0012' } },
+    { id: '0012', meta: { supersedes: ['0002'] } },
   ];
   const indexContent = '| [0002](0002-x.md) | ...supersede boi 0012... |\n| [0012](0012-x.md) | ... |\n';
 
@@ -106,8 +106,8 @@ test('supersedes naming an id with no matching record reports "unknown-target"',
 
 test('a target with no row in the index at all reports "missing-index-row"', () => {
   const records = [
-    { id: '0002', meta: { superseded_by: "0012" } },
-    { id: '0012', meta: { supersedes: ["0002"] } },
+    { id: '0002', meta: { superseded_by: '0012' } },
+    { id: '0012', meta: { supersedes: ['0002'] } },
   ];
   const findings = findSupersessionFindings(records, '| [0012](0012-x.md) | ... |\n');
   assert.equal(findings.length, 1);

@@ -4,13 +4,13 @@ Branch `one-door-debt/p01`, cut from origin/main 3cd0b8c41. Worktree `/home/vant
 
 ## What changed
 
-- `src/util/yaml.mjs` gains `readFrontmatter(text, file)` -> `{ meta, body, block }`. It is the one fence cut and the one parse. No block: `{ meta: {}, body: text, block: '' }`. Empty block: empty meta. Refused block or non-mapping block: `YamlParseError` naming the file (rule `frontmatter-not-a-mapping` for the second).
+- `src/util/yaml.mjs` gains `cutFrontmatter(text)` -> `{ block, source, body }` (cut only, never throws) and `readFrontmatter(text, file)` (cut, then parse) -> `{ meta, body, block }`. It is the one fence cut and the one parse. No block: `{ meta: {}, body: text, block: '' }`. Empty block: empty meta. Refused block or non-mapping block: `YamlParseError` naming the file (rule `frontmatter-not-a-mapping` for the second).
 - Readers moved: `bin/fgos.mjs` (`authoritative-match`), `src/report/enduser-index-generate.mjs`, `src/report/knowledge-lints.mjs`, `scripts/check-decision-citation-drift.mjs`, `scripts/check-decision-supersession.mjs`, `src/setup/skill-wrappers.mjs`, `src/setup/instruction-registry.mjs`, `scripts/lib/git-spawn-match.mjs`.
 - Refusals are reported by file, never read as "no frontmatter":
   - `fgos authoritative-match`: validation refusal (exit 4) listing every refused file.
   - `enumerateDocEntries` (so `fgos docs-index`): throws one error listing every refused file, so no partial index is written.
   - `knowledge-lints`: new `doc-frontmatter-refused` lint (level `fail`).
-  - skill-wrappers: `carriesStamp` treats a refused foreign file as "not ours"; `skillVersion` warns on stderr naming the file and ignores that version. `metadata.version` is read as before (the old regex matched the indented line); a non-string version (unquoted `1.10`) is ignored with a warning that asks to quote it. Test pins `"1.10"` newer than `"1.9"` and the unquoted case.
+  - skill-wrappers: `generateWrapperContent`, `withGeneratedHeader` and `carriesStamp` use `cutFrontmatter` only (they copy bytes, so a user skill whose frontmatter is not YAML, such as `description: Use when: ...`, still gets its wrapper; a test pins it); `skillVersion` warns on stderr naming the file and ignores that version. `metadata.version` is read as before (the old regex matched the indented line); a non-string version (unquoted `1.10`) is ignored with a warning that asks to quote it. Test pins `"1.10"` newer than `"1.9"` and the unquoted case.
 - The two check scripts call `ensureAddonForScript()` only inside their main-only entry (never at module scope: `bin/fgos.mjs` imports the drift module). They print a refusal and exit 1 on a `YamlParseError`.
 - Deleted: `src/report/frontmatter.mjs`, `scripts/knowledge-migration.mjs`, `scripts/knowledge-classifier.mjs`, and their three test files. Importer check before deleting: only each other plus comments in `knowledge-canary.mjs` and `knowledge-registry.mjs` (fixed) and one fixture jsonl that merely contains the words.
 - Rows and registrations removed: `ARM_STATIC_IMPORTS` line, manifest file row, `test-ownership` row, three `suite-baseline` rows. `ARM_STATIC_IMPORTS` gained `../src/util/yaml.mjs` (the shell entry now imports the door statically for `authoritative-match`).
@@ -49,11 +49,15 @@ Not green here, not caused by this change:
 
 ## Behaviour notes for the reviewer
 
-- Check-script fixtures now quote ids (`supersedes: ["0002"]`): YAML types an unquoted `0002` as a number, which the supersession check reports as "not a clean list of ids" and the drift check skips (it only accepts the string form). The decision corpus these scripts targeted is retired, so no real file is affected.
+- `instruction-registry` keeps its own parse and its three refusals (missing block, parse failure, empty or non-mapping block); it only takes the cut from `cutFrontmatter`.
+- The doors row fence pattern is `\^---(?:\\r\?)?(?:\\n|\\s|\$)`, which also catches `/^---\n/`, `/^---\s*\n/` and `/^---$/m`.
+- Check-script fixtures (YAML strings only) now quote ids (`supersedes: ["0002"]`): YAML types an unquoted `0002` as a number, which the supersession check reports as "not a clean list of ids" and the drift check skips (it only accepts the string form). The decision corpus these scripts targeted is retired, so no real file is affected.
 - `readFrontmatter` returns `body` from the original text (CRLF kept); the old helper returned an LF-normalised body. No caller used `body` except skill-wrappers, which needs the original bytes (wrapper output unchanged, `build:skills` diff empty).
 
-## CHANGELOG line for the big lead (`## [Unreleased]`)
+## CHANGELOG lines for the big lead (`## [Unreleased]`)
 
+- An unquoted `metadata.version` (such as `1.10`) in a project skill no longer protects it from being overwritten by `fgos setup`; a warning names the file and asks to quote the version.
+- Removed: `scripts/knowledge-migration.mjs` and `scripts/knowledge-classifier.mjs`, finished one-shot migration tools that shipped in the payload.
 - A document whose frontmatter is not valid YAML is now reported by file name by `fgos docs-index`, `fgos authoritative-match` and `fgos knowledge status` instead of being read as having no frontmatter.
 
 ## Authority
