@@ -8,7 +8,7 @@ import { spawnSync, spawn, execFileSync } from 'node:child_process';
 import { REPO_ROOT, releaseOutputDir } from '../../scripts/build-rust-distribution.mjs';
 import { releaseBinaryPath } from '../../src/util/release-binary-path.mjs';
 import { holdLock } from './fgctl-lock-holder.mjs';
-import { activated, useReleaseFixture, FGCTL_BIN, fixture, releaseDirName, runFgctl, runShim, waitForProcess, withoutActiveRelease } from './fgctl-init-fixture.mjs';
+import { activated, useReleaseFixture, FGCTL_BIN, fixture, releaseDirName, runFgctl, runShim, waitForProcess, withoutActiveRelease, removeStateHome } from './fgctl-init-fixture.mjs';
 
 useReleaseFixture();
 
@@ -149,7 +149,7 @@ test('R11 & R1-R8, R10: fgctl init in a fresh git project publishes shims, root.
     );
   } finally {
     fs.rmSync(tempHome, { recursive: true, force: true });
-    fs.rmSync(tempState, { recursive: true, force: true });
+    removeStateHome(tempState);
     fs.rmSync(tempProj, { recursive: true, force: true });
   }
 });
@@ -173,7 +173,7 @@ test('a leftover v1 .fgos/main-checkout.lock file is never read: init passes ove
     assert.equal(res.status, 0, `init must not read the v1 file: ${res.stderr}`);
   } finally {
     fs.rmSync(tempHome, { recursive: true, force: true });
-    fs.rmSync(tempState, { recursive: true, force: true });
+    removeStateHome(tempState);
     fs.rmSync(tempProj, { recursive: true, force: true });
   }
 });
@@ -203,7 +203,7 @@ test('main checkout held through the kernel lock refuses init; once the Node hol
     assert.equal(res.status, 0, `init must pass once nobody holds the main checkout: ${res.stderr}`);
   } finally {
     fs.rmSync(tempHome, { recursive: true, force: true });
-    fs.rmSync(tempState, { recursive: true, force: true });
+    removeStateHome(tempState);
     fs.rmSync(tempProj, { recursive: true, force: true });
   }
 });
@@ -227,7 +227,7 @@ test('a tombstone directory at .fgos/main-checkout.lock has no effect on init', 
     assert.ok(fs.statSync(tombstone).isDirectory(), 'init leaves the tombstone in place');
   } finally {
     fs.rmSync(tempHome, { recursive: true, force: true });
-    fs.rmSync(tempState, { recursive: true, force: true });
+    removeStateHome(tempState);
     fs.rmSync(tempProj, { recursive: true, force: true });
   }
 });
@@ -255,7 +255,7 @@ test('R1 & R11: Non-git directory refuses init with clear error and no .fgos/ins
     );
   } finally {
     fs.rmSync(tempHome, { recursive: true, force: true });
-    fs.rmSync(tempState, { recursive: true, force: true });
+    removeStateHome(tempState);
     fs.rmSync(tempNonGit, { recursive: true, force: true });
   }
 });
@@ -355,7 +355,7 @@ test('Item 1: Concurrent fgctl init invocations against pre-staged pinned worksp
     assert.ok(!fs.existsSync(oldLock) || fs.statSync(oldLock).isDirectory());
   } finally {
     fs.rmSync(tempHome, { recursive: true, force: true });
-    fs.rmSync(tempState, { recursive: true, force: true });
+    removeStateHome(tempState);
     fs.rmSync(tempProj, { recursive: true, force: true });
   }
 });
@@ -429,7 +429,7 @@ test('Item 2: Pinned workspace reconciles with matching --from source when unsta
     fs.rmSync(mismatchDir, { recursive: true, force: true });
   } finally {
     fs.rmSync(tempHome, { recursive: true, force: true });
-    fs.rmSync(tempState, { recursive: true, force: true });
+    removeStateHome(tempState);
     fs.rmSync(tempProj, { recursive: true, force: true });
   }
 });
@@ -490,7 +490,7 @@ test('init --override-pin activates a staged release other than the pinned one, 
     assert.ok(fs.readFileSync(path.join(other, '.fgos', 'distribution.json')).equals(pinBytes));
   } finally {
     fs.rmSync(tempHome, { recursive: true, force: true });
-    fs.rmSync(tempState, { recursive: true, force: true });
+    removeStateHome(tempState);
     fs.rmSync(tempRoot, { recursive: true, force: true });
   }
 });

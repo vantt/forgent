@@ -10,7 +10,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { computeArtifactDigest, hashFile } from '../../scripts/build-rust-distribution.mjs';
-import { useReleaseFixture, fixture, runFgctl, runFgctlRaw } from './fgctl-init-fixture.mjs';
+import { useReleaseFixture, fixture, runFgctl, runFgctlRaw, removeStateHome } from './fgctl-init-fixture.mjs';
 
 useReleaseFixture();
 
@@ -63,7 +63,8 @@ function withProject(fn) {
     execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: proj });
     return fn({ home, state, proj });
   } finally {
-    for (const d of [home, state, proj]) fs.rmSync(d, { recursive: true, force: true });
+    removeStateHome(state);
+    for (const d of [home, proj]) fs.rmSync(d, { recursive: true, force: true });
   }
 }
 
