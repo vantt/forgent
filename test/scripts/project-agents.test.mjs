@@ -113,7 +113,7 @@ test('an unrecognized rigor is refused rather than silently falling through to u
 // shape directly, silently ignoring `modelPolicies` (the shape this repo's
 // own committed .fgos/config.json now uses) with no error. -------------
 
-test('findAgentYamlFiles scans core/agents/ and domains/*/agents/ (D24)', () => {
+test('findAgentYamlFiles lists the workspace, domain and core tiers the agent-definitions door reads (D24)', () => {
   const dir = mkTempDir();
   try {
     const coreDir = path.join(dir, 'core', 'agents');
@@ -123,45 +123,17 @@ test('findAgentYamlFiles scans core/agents/ and domains/*/agents/ (D24)', () => 
 
     fs.writeFileSync(path.join(coreDir, 'fgos-placeholder.yaml'), VALID_YAML);
     fs.writeFileSync(path.join(codingDir, 'coder.yaml'), VALID_YAML);
+    fs.mkdirSync(path.join(dir, 'fgos', 'agents'), { recursive: true });
+    fs.writeFileSync(path.join(dir, 'fgos', 'agents', 'mine.yaml'), VALID_YAML);
+    fs.mkdirSync(path.join(dir, 'agents'), { recursive: true });
+    fs.writeFileSync(path.join(dir, 'agents', 'legacy.yaml'), VALID_YAML);
 
     const files = findAgentYamlFiles(dir);
-    assert.equal(files.length, 2);
+    assert.equal(files.length, 3);
+    assert.ok(files.some((f) => f.name === 'mine' && f.source === 'fgos/agents'));
     assert.ok(files.some((f) => f.name === 'fgos-placeholder' && f.source === 'core/agents'));
     assert.ok(files.some((f) => f.name === 'coder' && f.source === 'domains/coding/agents'));
   } finally {
-    fs.rmSync(dir, { recursive: true, force: true });
-  }
-});
-
-test('resolveAgentFiles deprioritizes legacy agents/ on name collision with core/agents/ (D33 graceful loss)', () => {
-  const dir = mkTempDir();
-  const warnings = [];
-  const originalWarn = console.warn;
-  console.warn = (...args) => warnings.push(args.join(' '));
-  try {
-    const coreDir = path.join(dir, 'core', 'agents');
-    const legacyDir = path.join(dir, 'agents');
-    fs.mkdirSync(coreDir, { recursive: true });
-    fs.mkdirSync(legacyDir, { recursive: true });
-
-    const coreYaml = VALID_YAML.replace('name: test-agent', 'name: colliding-agent');
-    const legacyYaml = VALID_YAML.replace('name: test-agent', 'name: colliding-agent');
-
-    fs.writeFileSync(path.join(coreDir, 'colliding-agent.yaml'), coreYaml);
-    fs.writeFileSync(path.join(legacyDir, 'colliding-agent.yaml'), legacyYaml);
-
-    const files = findAgentYamlFiles(dir);
-    assert.equal(files.length, 2);
-
-    const resolved = resolveAgentFiles(files, dir);
-    assert.equal(resolved.length, 1);
-    assert.equal(resolved[0].source, 'core/agents');
-    assert.equal(resolved[0].relPath, path.join('core', 'agents', 'colliding-agent.yaml'));
-    assert.equal(warnings.length, 1);
-    assert.match(warnings[0], /legacy agents\/ entry/);
-    assert.match(warnings[0], /skipped due to duplicate agent-type name "colliding-agent"/);
-  } finally {
-    console.warn = originalWarn;
     fs.rmSync(dir, { recursive: true, force: true });
   }
 });

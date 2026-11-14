@@ -34,17 +34,11 @@ import { RIGOR_VALUES } from '../src/runner/rigor.mjs';
 import { isMainModule } from './lib/is-main-module.mjs';
 import { ensureAddonForScript } from './lib/git-addon-stage.mjs';
 import { parseYaml } from '../src/util/yaml.mjs';
-import { domainCatalog } from '../src/util/domain-dirs.mjs';
+import { scanAgentTiers } from '../src/runner/agent-definitions.mjs';
 import { identifierProblem } from '../src/convention/identifier-rules.mjs';
 
 const REPO_ROOT = path.resolve(import.meta.dirname, '..');
 const TARGET_DIR = path.join(REPO_ROOT, '.claude', 'agents');
-
-// The exact sourceLabel findAgentYamlFiles gives its legacy agents/ scan
-// (below) -- shared as a constant, not a bare 'agents' string literal
-// re-typed independently in resolveAgentFiles, so the two can never drift
-// apart and silently stop matching each other.
-const LEGACY_AGENTS_SOURCE = 'agents';
 
 const FORBIDDEN_PLATFORM_NAMES = ['claude', 'codex', 'anthropic'];
 
@@ -96,47 +90,16 @@ function validateDefinition(name, def) {
 }
 
 /**
- * Scans core/agents/, domains/<name>/agents/, and agents/ (legacy) under repoRoot
- * for agent-definition YAML files (D24).
+ * Every agent-definition YAML file the agent-definitions door lists (workspace `fgos/agents`, the
+ * domains' `agents/`, core `agents/`) under repoRoot.
  */
 export function findAgentYamlFiles(repoRoot) {
-  const files = [];
-  const seenPaths = new Set();
-
-  const scanDir = (dir, sourceLabel) => {
-    if (!fs.existsSync(dir)) return;
-    // D32 "deterministic, never random": readdirSync's own order is
-    // filesystem-dependent (directory-hash order on ext4, not lexical),
-    // not a stable ordering guarantee -- sorted here so the duplicate-name
-    // scan below (and the write loop that follows it) processes entries in
-    // the same order on every machine/run (review finding M2).
-    const entries = fs.readdirSync(dir, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name));
-    for (const entry of entries) {
-      if (!entry.isFile()) continue;
-      if (entry.name.endsWith('.yaml') || entry.name.endsWith('.yml')) {
-        const filePath = path.join(dir, entry.name);
-        if (!seenPaths.has(filePath)) {
-          seenPaths.add(filePath);
-          files.push({
-            source: sourceLabel,
-            filePath,
-            fileName: entry.name,
-            name: entry.name.replace(/\.yaml$|\.yml$/, ''),
-          });
-        }
-      }
-    }
-  };
-
-  scanDir(path.join(repoRoot, 'core', 'agents'), 'core/agents');
-
-  for (const { name: domain, agentsDir } of domainCatalog({ payloadRoot: repoRoot }).domains) {
-    scanDir(agentsDir, `domains/${domain}/agents`);
-  }
-
-  scanDir(path.join(repoRoot, 'agents'), LEGACY_AGENTS_SOURCE);
-
-  return files;
+  return scanAgentTiers({ projectRoot: repoRoot, installRoot: repoRoot }).flatMap(({ entries }) => entries.map(({ name, file, rel }) => ({
+    source: path.posix.dirname(rel),
+    filePath: file,
+    fileName: path.basename(file),
+    name,
+  })));
 }
 
 /** Pure: source yaml text -> generated adapter markdown text. */
@@ -199,9 +162,7 @@ export function projectAgentMarkdown(name, sourceYamlText, sourcePath = `agents/
 
 /**
  * D33: Resolves duplicate agent-type names globally across all sources.
- * Deprioritizes legacy agents/ source when a non-legacy source (core/agents or
- * domains/<name>/agents) collides with it (logs warning, legacy is skipped).
- * Throws AgentDefinitionError if two non-legacy sources collide.
+ * Throws AgentDefinitionError if two sources define the same name.
  */
 export function resolveAgentFiles(agentFiles, repoRoot = REPO_ROOT) {
   const nameToEntries = new Map();
@@ -224,28 +185,12 @@ export function resolveAgentFiles(agentFiles, repoRoot = REPO_ROOT) {
 
   const resolved = [];
   for (const [agentName, entries] of nameToEntries.entries()) {
-    if (entries.length === 1) {
-      resolved.push(entries[0]);
-      continue;
-    }
-
-    const nonLegacy = entries.filter((e) => e.source !== LEGACY_AGENTS_SOURCE);
-    const legacy = entries.filter((e) => e.source === LEGACY_AGENTS_SOURCE);
-
-    if (nonLegacy.length === 1 && legacy.length > 0) {
-      const winner = nonLegacy[0];
-      for (const leg of legacy) {
-        console.warn(
-          `warning: legacy agents/ entry "${leg.relPath}" skipped due to duplicate agent-type name "${agentName}" in ${winner.relPath} (D33)`
-        );
-      }
-      resolved.push(winner);
-    } else {
-      const paths = entries.map((e) => e.relPath);
+    if (entries.length > 1) {
       throw new AgentDefinitionError(
-        `duplicate agent-type name "${agentName}" found in multiple files: ${paths.join(', ')} (D33)`
+        `duplicate agent-type name "${agentName}" found in multiple files: ${entries.map((e) => e.relPath).join(', ')} (D33)`
       );
     }
+    resolved.push(entries[0]);
   }
 
   return resolved;

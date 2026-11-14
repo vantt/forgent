@@ -14,6 +14,7 @@ import {
   BOUNDARY_KEYS,
   INSTALL_ROOT,
   PERSONA_KEYS,
+  agentTierDirs,
   findAgentDuplicates,
   isPlainObject,
   readAgentDefinition,
@@ -65,13 +66,16 @@ function readQuietly(file) {
 // lookup. Domain personas are the install's alone (a project's `domains/` is never read), so none hides.
 function maskedByProject(projectRoot, installRoot, visibleNames) {
   if (path.resolve(projectRoot) === path.resolve(installRoot)) return [];
-  if (!fs.existsSync(path.join(projectRoot, 'core/agents'))) return [];
+  // The door reads the project's core tier when that folder exists there, the install's otherwise.
+  const coreTier = agentTierDirs({ projectRoot, installRoot }).find(({ tier }) => tier === 'core');
+  const coreDir = coreTier.dirs[0].dir;
+  if (path.relative(projectRoot, coreDir).startsWith('..') || !fs.existsSync(coreDir)) return [];
   const hidden = scanAgentTiers({ projectRoot: installRoot, installRoot })
     .filter((tier) => tier.tier === 'core')
     .flatMap((tier) => tier.entries.map((entry) => ({ ...entry, tier: tier.tier })));
   return hidden
     .filter((entry) => !visibleNames.has(entry.name))
-    .map((entry) => ({ name: entry.name, tier: entry.tier, source: entry.rel, hiddenBy: 'core/agents/ of this project' }));
+    .map((entry) => ({ name: entry.name, tier: entry.tier, source: entry.rel, hiddenBy: `${coreTier.label}/ of this project` }));
 }
 
 /**
