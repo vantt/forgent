@@ -165,10 +165,21 @@ Known gaps against this direction:
   `preferIndependentOf` to `independentOf` in
   `src/runner/execution/loops/panel.mjs`. Today independence is a soft
   preference.
-- The councils in `core/workflows` move into a named domain. Open question,
-  under discussion with the owner and not decided: are the business-named
-  capability rows in `core/config-standard/runner.yaml` generic job-shape names,
-  or rows each domain ships?
+- The councils in `core/workflows` move into a named domain.
+- Capability rows, decided by the owner on 2026-11-14 in two steps. First,
+  every reader of `runner.capabilities` goes through `bind()` or its result;
+  today about 27 files under `src/` read the config directly. The config does
+  not change in this step. Second, the 37 business-named rows in
+  `core/config-standard/runner.yaml` go away and travel with the councils'
+  move. What remains is the real tool abilities (such as `impact-analysis`) and
+  the generic jobs `execute`, `review` and `advise`. A workflow step declares
+  the tier and rigor it needs, and a project with no capability rows still
+  runs. A project still customizes through `modelPolicies`, `tierFallback`, a
+  per-persona and per-role table, and an optional row that overrides one job.
+  Each kind of customization has exactly one place. Persona files still carry
+  no model fields (D-ADR0072). The family of the agent that is currently
+  running never changes the order, because the config is the only authority
+  over it.
 
 ## 7. Related Anchors
 
