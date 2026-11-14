@@ -10,8 +10,9 @@ import { fileURLToPath } from "node:url";
 import {
   REPO_ROOT,
   ROUTES_PATH,
-  SPY_PATH,
   parseEntry,
+  loadParityTable,
+  PARITY_CASES_DIR,
   resolveEntries,
   snapshotDirectory,
   diffDirectorySnapshots,
@@ -188,7 +189,7 @@ test("R3: Filesystem snapshot and delta capture", () => {
   }
 });
 
-test("R3 & R5: Stdin passthrough and child process spy execution", async () => {
+test("R3 & R5: Stdin passthrough and child process evidence", async () => {
   const stdinFixture = parseEntry(`node:${path.join(FIXTURES_DIR, "stdin-echo.mjs")}`);
   const stdinRes = await runCaseOnEntry(stdinFixture, {
     id: "stdin-test",
@@ -198,7 +199,7 @@ test("R3 & R5: Stdin passthrough and child process spy execution", async () => {
   assert.equal(stdinRes.stdoutText, "stdin:ping-payload-42");
   assert.equal(stdinRes.exitCode, 0);
 
-  // Child process spy check
+  // Child process evidence check
   const childFixture = parseEntry(`node:${path.join(FIXTURES_DIR, "divergent-child-process.mjs")}`);
   const childRes = await runCaseOnEntry(childFixture, {
     id: "child-spy-test",
@@ -206,6 +207,7 @@ test("R3 & R5: Stdin passthrough and child process spy execution", async () => {
     modes: ["exact-bytes"],
   });
   assert.equal(childRes.spawnedChildren.length, 1);
+  assert.equal(childRes.spawnedChildren[0].cmd, "node");
   assert.equal(childRes.spawnedChildren[0].args[1], "process.exit(0)");
 });
 
@@ -471,7 +473,7 @@ test("HIGH-1 regression: a launch failure is an unconditional hard difference, n
   assert.ok(oneFailed.differences.some((d) => d.includes("Launch failure")));
 });
 
-test("HIGH-2 regression: bin: entries get child-process evidence via the PATH shim, node: entries are not double-counted", { skip: process.platform === 'win32' }, async () => {
+test("a bin: entry gets child-process evidence via the PATH shim and a node: entry's git call is recorded once", { skip: process.platform === 'win32' }, async () => {
   const binEntry = parseEntry(`bin:${path.join(FIXTURES_DIR, "bin-git-caller.sh")}`);
   const binResult = await runCaseOnEntry(binEntry, { id: "bin-shim-regression", args: [] });
   assert.equal(binResult.launchError, null, `bin: fixture must launch cleanly, got: ${JSON.stringify(binResult.launchError)}`);
@@ -480,16 +482,39 @@ test("HIGH-2 regression: bin: entries get child-process evidence via the PATH sh
     `Expected the PATH shim to record a git call for the bin: entry, got: ${JSON.stringify(binResult.spawnedChildren)}`
   );
 
-  // node: entries must NOT double-count: the same real git invocation is
-  // reachable through both child-process-spy.cjs (in-process monkeypatch)
-  // and the PATH shim (OS-exec boundary) unless the spy's own
-  // FGOS_HARNESS_SHIMMED_COMMANDS skip is working. The fixture starts git once.
+  // The fixture starts git once; the shim is the only recorder, so it is counted once.
   const nodeEntry = parseEntry(`node:${path.join(FIXTURES_DIR, "node-git-caller.mjs")}`);
-  const nodeResult = await runCaseOnEntry(nodeEntry, { id: "node-no-double-count-regression", args: [] });
+  const nodeResult = await runCaseOnEntry(nodeEntry, { id: "node-single-count-regression", args: [] });
   const gitCallsRecorded = nodeResult.spawnedChildren.filter((c) => path.basename(c.cmd) === "git").length;
   assert.equal(
     gitCallsRecorded,
     1,
-    `Expected exactly one recorded git call for a node: entry (spy+shim must not double-count), got ${gitCallsRecorded}: ${JSON.stringify(nodeResult.spawnedChildren)}`
+    `Expected exactly one recorded git call for a node: entry, got ${gitCallsRecorded}: ${JSON.stringify(nodeResult.spawnedChildren)}`
   );
+});
+
+test("a grandchild git started through a Node child is recorded the same way for a node: and a bin: entry", { skip: process.platform === 'win32' }, async () => {
+  const evidence = async (spec) => {
+    const result = await runCaseOnEntry(parseEntry(spec), { id: "grandchild-evidence", args: [] });
+    assert.equal(result.launchError, null, `fixture must launch cleanly, got: ${JSON.stringify(result.launchError)}`);
+    assert.equal(result.exitCode, 0);
+    return result.spawnedChildren.map((c) => ({ cmd: path.basename(c.cmd), args: c.args }));
+  };
+  const viaNode = await evidence(`node:${path.join(FIXTURES_DIR, "node-grandchild-caller.mjs")}`);
+  const viaBin = await evidence(`bin:${path.join(FIXTURES_DIR, "bin-grandchild-caller.sh")}`);
+  assert.deepEqual(viaNode.map((c) => c.cmd), ["node", "git"], `grandchild chain seen by the node: entry: ${JSON.stringify(viaNode)}`);
+  assert.deepEqual(viaNode, viaBin, "both entry kinds must record the same child chain");
+});
+
+test("a parity table loads by name and an unknown or path-shaped name fails naming it", async () => {
+  const table = await loadParityTable("help");
+  assert.ok(Array.isArray(table) && table.length > 0, "help table is a non-empty case list");
+  assert.ok(fs.existsSync(path.join(PARITY_CASES_DIR, "help.cases.mjs")));
+  for (const testCase of table) {
+    assert.equal(typeof testCase.id, "string");
+    assert.ok(Array.isArray(testCase.args), `${testCase.id} names its args`);
+  }
+  assert.equal(new Set(table.map((c) => c.id)).size, table.length, "case ids are unique");
+  await assert.rejects(() => loadParityTable("no-such-table"), /no-such-table/);
+  await assert.rejects(() => loadParityTable("../harness"), /\.\.\/harness/);
 });

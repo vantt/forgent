@@ -1,33 +1,23 @@
 /**
  * Parity Harness for fgOS (Rust vs Node differential verification).
  *
- * Child-process evidence mechanism (two complementary layers, same log format):
- * 1. `node:` entries: NODE_OPTIONS="--require <path>/child-process-spy.cjs" preload that
- *    monkeypatches node:child_process methods (spawn, spawnSync, execFile, execFileSync,
- *    fork, exec, execSync) and appends { cmd, args } JSON lines to a per-case log file
- *    named by the FGOS_HARNESS_SPY_LOG environment variable.
- * 2. `bin:` entries (and `node:` entries too, as a second net): a PATH shim
- *    (`buildPathShim`) generates a small wrapper script per name in
- *    PATH_SHIM_COMMANDS (currently just `git` -- the only command this harness
- *    has seen a real fgos invocation spawn; NOT a general child-process
- *    interceptor), placed in a scratch directory prepended to PATH. Each
- *    wrapper appends the SAME { cmd, args } JSON line format to FGOS_HARNESS_SPY_LOG,
- *    then execs the real binary (resolved once via `command -v` before the shim
- *    directory is prepended to PATH, so it never resolves back to itself). This is
- *    the only mechanism that can observe a Rust binary's own subprocess spawns,
- *    since there is no in-process monkeypatch hook for a compiled binary the way
- *    there is for `node:child_process`.
+ * Run it through `node scripts/run-tests.mjs <file>`: that is what stages the host binary and its
+ * release manifest and passes `FGOS_HOST_BIN`. A focused `node --test` run has neither.
  *
- *    KNOWN ASYMMETRY (MEDIUM-B, not yet closed): a `node:` entry still sees a
- *    deeper process tree than a `bin:` entry can, for two reasons the
- *    all-read-verb coverage floor happens not to exercise today. First, a
- *    `node:` entry's own NODE_OPTIONS preload is inherited by any grandchild
- *    Node process it spawns, giving `node:` visibility a `bin:` entry has no
- *    equivalent for. Second, PATH_SHIM_COMMANDS covers only `git` -- any other
- *    command a future selector spawns is invisible to a `bin:` entry until
- *    added to that list. Extend PATH_SHIM_COMMANDS, and revisit the
- *    NODE_OPTIONS-inheritance gap, before this harness is trusted for a
- *    write-verb or subprocess-heavy Rust-vs-Node comparison (P07+).
+ * Child-process evidence has one mechanism, so both entry kinds see the same thing: a PATH shim
+ * (`buildPathShim`) generates a small wrapper script per name in PATH_SHIM_COMMANDS (`git`, `npm`
+ * and `node`), placed in a scratch directory prepended to PATH. Each wrapper appends a
+ * { cmd, args } JSON line to the file named by FGOS_HARNESS_SPY_LOG, then execs the real binary
+ * (resolved once via `command -v` before the shim directory is prepended to PATH, so it never
+ * resolves back to itself). It works for a compiled `bin:` entry, which has no in-process hook, and
+ * for a `node:` entry alike.
+ *
+ * What the evidence covers: a child started by one of those names through PATH, at any depth. What
+ * it cannot see, for either entry kind: a child started by absolute path, or by any other name.
+ * A `node:` entry gets no in-process preload, because a preload is inherited by grandchild Node
+ * processes and would show a `node:` entry a deeper tree than a `bin:` entry can show. `node` is
+ * shimmed so a host entry that forwards to the legacy payload shows up in its evidence. Add a name to
+ * PATH_SHIM_COMMANDS before trusting a comparison of a verb that spawns it.
  */
 
 import fs from "node:fs";
@@ -35,21 +25,20 @@ import os from "node:os";
 import path from "node:path";
 import crypto from "node:crypto";
 import { spawn, execFileSync } from "node:child_process";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import { activateGitFixture } from "../helpers/git-fixture.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 export const REPO_ROOT = path.resolve(__dirname, "../..");
-export const SPY_PATH = path.join(__dirname, "fixtures/child-process-spy.cjs");
+export const PARITY_CASES_DIR = path.join(__dirname, "parity-cases");
 export const ROUTES_PATH = path.join(REPO_ROOT, "packages/host-runtime/contracts/command-routes.json");
 
-/** Commands this harness has empirically observed a real `fgos` invocation spawn. */
-const PATH_SHIM_COMMANDS = ["git", "npm"];
+/** Commands whose spawns the PATH shim records. `node` is the legacy payload a host entry forwards to. */
+const PATH_SHIM_COMMANDS = ["git", "npm", "node"];
 
 /**
  * Builds a PATH-shim directory: one wrapper script per name in `PATH_SHIM_COMMANDS`
- * that logs `{cmd, args}` to `spyLogPath` (same format `child-process-spy.cjs` uses)
- * then execs the real binary. Always returns the shim directory path (never
+ * that logs `{cmd, args}` to `spyLogPath` then execs the real binary. Always returns the shim directory path (never
  * `null`, LOW-2) -- if a command in the list cannot be resolved on the current
  * PATH, that ONE command is silently left unshimmed (fails open: a missing
  * shimmable command is not fatal to the case under test), the directory
@@ -67,6 +56,8 @@ function buildPathShim(shimDir, spyLogPath) {
       continue; // not resolvable on this machine -- skip shimming it, don't fail the case
     }
     if (!realPath) continue;
+    // The logger runs under the harness's own Node by absolute path: a bare `node` here would resolve
+    // to the `node` shim and log (or recurse) forever.
     const shimScript = [
       "#!/bin/sh",
       // "--" (MEDIUM-A) forces node to treat every "$@" element as a script
@@ -74,7 +65,7 @@ function buildPathShim(shimDir, spyLogPath) {
       // with a leading node-flag-shaped arg (e.g. `git --version`) would be
       // consumed by `node` itself, the logger would never run, and `node`'s
       // own stdout (its version string) would leak into the child's stdout.
-      `node -e 'const fs=require("node:fs");try{fs.appendFileSync(process.env.FGOS_HARNESS_SPY_LOG, JSON.stringify({cmd:${JSON.stringify(name)},args:process.argv.slice(1)})+"\\n")}catch(e){}' -- "$@"`,
+      `${JSON.stringify(process.execPath)} -e 'const fs=require("node:fs");try{fs.appendFileSync(process.env.FGOS_HARNESS_SPY_LOG, JSON.stringify({cmd:${JSON.stringify(name)},args:process.argv.slice(1)})+"\\n")}catch(e){}' -- "$@"`,
       `exec ${JSON.stringify(realPath)} "$@"`,
       "",
     ].join("\n");
@@ -130,6 +121,25 @@ export function parseEntry(entrySpec, repoRoot = REPO_ROOT) {
   } else {
     throw new Error(`Unknown entry prefix in "${entrySpec}". Expected "node:<path>" or "bin:<path>"`);
   }
+}
+
+/**
+ * Loads one parity case table by name: `parity-cases/<name>.cases.mjs` exports `cases`, a list in
+ * the case shape `runDifferentialCase` takes. The name is a bare file stem, never a path.
+ */
+export async function loadParityTable(name) {
+  if (typeof name !== "string" || !/^[a-z0-9][a-z0-9-]*$/.test(name)) {
+    throw new Error(`Invalid parity table name "${name}": expected a bare name such as "help"`);
+  }
+  const file = path.join(PARITY_CASES_DIR, `${name}.cases.mjs`);
+  if (!fs.existsSync(file)) {
+    throw new Error(`No parity table named "${name}" (expected ${file})`);
+  }
+  const { cases } = await import(pathToFileURL(file).href);
+  if (!Array.isArray(cases) || cases.length === 0) {
+    throw new Error(`Parity table "${name}" exports no cases`);
+  }
+  return cases;
 }
 
 /**
@@ -248,23 +258,10 @@ export async function runCaseOnEntry(entry, testCase, options = {}) {
 
   const env = { ...process.env, ...(testCase.env ?? {}) };
   env.FGOS_HARNESS_SPY_LOG = spyLogPath;
-  if (entry.type === "node") {
-    // Quoted (LOW-3): an unquoted path breaks silently under NODE_OPTIONS
-    // parsing when the checkout lives under a path containing a space --
-    // the preload then never loads and child-process evidence becomes
-    // vacuously empty instead of erroring.
-    // On Windows, backslashes in NODE_OPTIONS are treated as escape characters;
-    // normalize to forward slashes so Node.js resolves the path correctly.
-    const normalizedSpyPath = SPY_PATH.replaceAll("\\", "/");
-    env.NODE_OPTIONS = (env.NODE_OPTIONS ? env.NODE_OPTIONS + " " : "") + `--require "${normalizedSpyPath}"`;
-  }
-  // PATH shim: the only child-process evidence mechanism a bin: (compiled) entry
-  // can get, and a second net for node: entries too (see header comment).
-  // FGOS_HARNESS_SHIMMED_COMMANDS tells child-process-spy.cjs to skip recording
-  // these same commands itself, so a node: entry is never double-counted.
+  // PATH shim: the one child-process evidence mechanism, the same for a node: and a bin: entry
+  // (see header comment). No NODE_OPTIONS preload, so a node: entry sees no deeper tree than a bin: one.
   const shimDir = buildPathShim(path.join(scratchBase, "path-shim"), spyLogPath);
   env.PATH = shimDir + path.delimiter + (env.PATH ?? "");
-  env.FGOS_HARNESS_SHIMMED_COMMANDS = PATH_SHIM_COMMANDS.join(",");
 
   const spawnCmd = entry.executable;
   const spawnArgs = entry.type === "node" ? [entry.target, ...(testCase.args ?? [])] : [...(entry.argsPrefix ?? []), ...(testCase.args ?? [])];
