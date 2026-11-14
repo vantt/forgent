@@ -77,11 +77,6 @@
 
 export const MANIFEST_SCHEMA_VERSION = '3.0';
 
-// Top-level tokens the Rust host routes to the legacy-node payload as the
-// manifest door (`fgos --help [<verb>] [--json]`), next to the verb
-// selectors: scripts/export-command-selectors.mjs writes a route for each.
-export const HELP_SELECTORS = ['--help', '-h'];
-
 function withSubcommands(entry) {
   return {
     ...entry,

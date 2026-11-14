@@ -99,7 +99,7 @@
       "allowed": [
         "src/cli/command-registry.mjs",
         { "path": "scripts/export-command-selectors.mjs", "reason": "the generator writes and drift-checks the committed manifest file from the registry projection" },
-        { "path": "bin/fgos.mjs", "reason": "the Node help prints the projection until the help verb moves to the host and this entry is removed" }
+        { "path": "bin/fgos.mjs", "reason": "the Node help prints the projection until the Node help renderer is deleted" }
       ],
       "debt": [],
       "reason": "the registry module owns the one projection of the verb manifest; the generator and the help print only call it"
@@ -217,6 +217,149 @@
       "allowed": ["packages/yaml-doc/rust/src/backend.rs"],
       "debt": [],
       "reason": "only fgos-yaml-doc decides what YAML means; no file loads a YAML library by import, import(), require() or createRequire, and no pasted copy of a parser (found by its loadAll entry point) exists. Per-line match: an alias bound to createRequire on another line, or a load split over lines, is not seen"
+    },
+    {
+      "job": "render CLI help from the manifest",
+      "kind": "door",
+      "patterns": ["command-manifest\\.json"],
+      "allowed": [
+        { "path": "scripts/export-command-selectors.mjs", "reason": "the generator writes and drift-checks the committed manifest file" },
+        "apps/fgos/src/help.rs"
+      ],
+      "debt": [],
+      "retiredBy": "S7: the generator is not a twin; it stays as the only writer while the Node renderer is deleted",
+      "reason": "the host renders every help form from the one committed manifest; no other product file reads the file"
+    },
+    {
+      "job": "retired native declarations",
+      "kind": "door",
+      "patterns": ["\\bnativeOnly\\b", "\\bnative_kinds\\b", "\\bNATIVE_HOOK_KINDS\\b", "\\bHELP_SELECTORS\\b"],
+      "allowed": [],
+      "debt": [],
+      "reason": "the registry `native` field is the only declaration of what the host serves natively, and the help words are answered before any route lookup; the four old names are retired and no file may bring one back"
+    },
+    {
+      "job": "decide the lane of an invocation",
+      "kind": "door",
+      "patterns": ["\\bnative_subcommands\\b"],
+      "allowed": [
+        { "path": "scripts/export-command-selectors.mjs", "reason": "the generator writes the field from the registry `native` list" },
+        "apps/fgos/src/routing.rs"
+      ],
+      "debt": [],
+      "retiredBy": "S7: the generator is not a twin; it stays as the only writer of the route table",
+      "reason": "which first positionals a legacy selector serves natively is read from the route table in one pure module (routing.rs), never re-listed"
+    },
+    {
+      "job": "resolve the invocation root",
+      "kind": "door",
+      "patterns": ["\\bnearestStoreRoot\\b", "\\bresolve_target_root\\b", "fn resolve_workspace_root", "fn resolve_invocation_root", "pub fn mailbox_fgos_dir", "export function isMainWorktree", "for \\(let dir = path\\.resolve\\(cwd\\); ; dir = path\\.dirname\\(dir\\)\\)", "join\\(\"\\.fgos\"\\)\\.is_dir\\(\\)"],
+      "allowed": [
+        "packages/git/rust/src/invocation_root.rs",
+        { "path": "packages/git/node-addon/src/git.rs", "reason": "the addon entry that carries the door to Node; it decides nothing" }
+      ],
+      "debt": [
+        { "path": "packages/distribution/rust/src/workspace.rs", "reason": "a second root decision: the trusted main checkout read for fgctl, init and doctor, through GitDriver::trusted_root_at without the policies, home exclusion or --dir rules; moves with packaging (S4)" },
+        { "path": "apps/fgos/src/wiring/mailbox_root.rs", "reason": "the mailbox picks its record root (the main checkout from CLAUDE_PROJECT_DIR or the cwd) separately from the invocation root, so a hook call needs no Git process; one door once the mailbox verbs move" },
+        { "path": "src/util/host-bin-path.mjs", "reason": "walks up from cwd for .fgos/installation/activation.json with no Git ceiling and no home exclusion, a root decision of its own for finding the host binary" },
+        { "path": "src/runner/worktree.mjs", "reason": "isMainWorktree asks 'is this the main checkout' in Node while fgos-git store_admission asks it in Rust; six other Node callers (resolveMainCheckoutRoot and friends) keep it until their verbs move" }
+      ],
+      "reason": "which project and which .fgos a call acts on is decided once, in fgos-git, for Node (through the addon) and the host. Patterns name the definitions of a root decision, not their callers (narrowed from the call names, to cover the same job exactly)"
+    },
+    {
+      "job": "global fgOS directory",
+      "kind": "door",
+      "patterns": ["homedir\\(\\)\\s*,\\s*['\\\"]\\.fgos['\\\"]", "\\b(?:homeDir|home)\\s*,\\s*['\\\"]\\.fgos['\\\"]", "\\bhome\\.join\\(\\\"\\.fgos\\\"\\)", "pub fn home_dir\\(", "fn global_dir\\(", "export function globalFgosDir", "get\\(\\\"HOME\\\"\\)"],
+      "allowed": [
+        "packages/config/rust/src/machine.rs",
+        "src/config/facade.mjs"
+      ],
+      "debt": [
+        { "path": "src/setup/registrations.mjs", "reason": "checkRunnerPatternsConfig derives ~/.fgos from os.homedir() itself; the capability-reads plan edits this file, so whoever lands second moves it to globalFgosDir()" },
+        { "path": "src/runner/dispatch/llm-accounts.mjs", "reason": "machineLoginStores takes a homeDir parameter (default os.homedir()) and joins .fgos itself, so a caller can name a home the global directory door does not know" },
+        { "path": "src/runner/dispatch/confinement/probes/harness.mjs", "reason": "the probe harness builds ~/.fgos/private from its own home value" },
+        { "path": "src/setup/setup-use-case.mjs", "reason": "takes a homeDir parameter and joins .fgos itself for the retired-config notice" },
+        { "path": "apps/fgos-gateway/src/gateway.rs", "reason": "load_gateway_config takes an explicit home_dir (a test seam) where machine::global_dir takes an environment lookup, so the join stays here; one door once the gateway reads the lookup form" },
+        { "path": "packages/holder-lock/rust/src/state_root.rs", "reason": "the state root's home rule, HOME first on every platform; Config uses USERPROFILE on Windows, so under Git Bash the two can resolve under different homes; backlog row p-n22bigucgp" }
+      ],
+      "retiredBy": "S7: the Node facade retires with the Node payload",
+      "reason": "where the machine-wide ~/.fgos is is decided once, by fgos-config (machine::global_dir); the Node facade asks the addon. The extra patterns find the places that still join .fgos onto a home themselves"
+    },
+    {
+      "job": "admit store access",
+      "kind": "door",
+      "patterns": ["disconnected-worktree-store", "init-in-worktree", "worktree-identity-unreadable", "\\bisSessionWorktree\\b", "fn is_session_worktree"],
+      "allowed": [
+        "packages/git/rust/src/store_admission.rs",
+        { "path": "src/runner/worktree.mjs", "reason": "the adapter names one class itself: with no Git door loaded nothing can tell a linked worktree from the main checkout, so it refuses by `worktree-identity-unreadable` without asking the addon that carries the decision" }
+      ],
+      "debt": [],
+      "retiredBy": "S7: the Node adapter retires with the Node payload",
+      "reason": "whether a verb may touch the store from where it was called, and the fault class of each refusal, are decided once, in fgos-git"
+    },
+    {
+      "job": "record a malformed call (twin)",
+      "kind": "door",
+      "patterns": ["invocation-faults\\.jsonl", "\\bargvShape\\b", "fn argv_shape", "export function appendFaultRecord", "fn append_capped"],
+      "allowed": [
+        "packages/observe/rust/src/invocation_fault.rs",
+        "src/observe/invocation-fault-log.mjs",
+        "src/state/fgos-file-registry.mjs",
+        "src/util/capped-jsonl-log.mjs"
+      ],
+      "debt": [],
+      "retiredBy": "S7: the Node twin retires with the last Node verb",
+      "reason": "the fault record has a Rust writer for the host and a Node writer for the Node CLI, which must also record a missing host; one vector file (test/rust-host/fixtures/invocation-fault-vectors.json) is read by both. The capped append has the same two owners (two other Node callers, approve-fault-log and provider-capacity, move with S7 and S6a). Known gap kept visible: the Node writer does not redact `message` (an unknown-flag message quotes the typed token, value included), which the Rust writer does"
+    },
+    {
+      "job": "parse CLI arguments (twin)",
+      "kind": "door",
+      "patterns": ["export function parseArgs", "pub fn parse_args", "(?:starts_with|strip_prefix)\\(\\\"--\\\"\\)", "\\\"--dir\\\" \\| \\\"--worktree\\\""],
+      "allowed": [
+        "src/cli/parse-args.mjs",
+        "packages/host-runtime/rust/src/cli_args.rs",
+        { "path": "apps/fgos/src/routing.rs", "reason": "reads the `--flag` part of a store-declaration shape from the registry, not a call" },
+        { "path": "packages/observe/rust/src/invocation_fault.rs", "reason": "judges whether a recorded token has the shape of a flag name; it parses no call" }
+      ],
+      "debt": [
+        { "path": "apps/fgos/src/cli_projector.rs", "reason": "the native verbs' request projectors (convention, config, identity) read their own `--flag value` and `--flag=value` tokens; the host parser has no `--flag=value` form, so they move onto it only with the owner's answer on `--dir=<path>`" },
+        { "path": "apps/fgos/src/wiring/mailbox_verbs.rs", "reason": "project_mailbox_request reads the mailbox verbs' flags, `--flag=value` and a bare `--` separator included; the mailbox grammar differs from the host parser's" },
+        { "path": "packages/observe/rust/src/flags.rs", "reason": "the Observe verbs' one grammar (`--key value`, `--key=value`, switches, one positional); the flag-drift test reads the flag literals from it" },
+        { "path": "packages/holder-lock/rust/src/route.rs", "reason": "reads typed execution-root flags (`--dir`, `--worktree`, `--cwd`, `-C`) out of a worker's argv to judge workspace containment; it parses another program's arguments, not the host's" },
+        { "path": "packages/run-supervisor/rust/src/route.rs", "reason": "the supervisor routes' internal flag reader (an `fgos internal` route, not a verb)" },
+        { "path": "packages/run-supervisor/rust/src/adopt.rs", "reason": "its own parse_args for the adopt internal route" },
+        { "path": "packages/run-supervisor/rust/src/supervise.rs", "reason": "its own parse_args for the supervise internal route" },
+        { "path": "packages/terminal-control/rust/src/route.rs", "reason": "the terminal-control internal route's argument reader" },
+        { "path": "apps/fgctl/src/help.rs", "reason": "fgctl is a separate CLI with its own help words" },
+        { "path": "scripts/write-test-marker.mjs", "reason": "a test-runner script with its own flags, not the CLI's parser" }
+      ],
+      "retiredBy": "S7: the Node twin retires with the last Node verb",
+      "reason": "one parser per language while both CLIs run, proven equal by test/rust-host/fixtures/parse-args-vectors.json. Other readers of `--flag` tokens are debt: each predates the parser and reads its own grammar"
+    },
+    {
+      "job": "Event Store maintain policy",
+      "kind": "door",
+      "patterns": ["\\bsyncDue\\b", "fn sync_due", "fn maintain\\("],
+      "allowed": [
+        "packages/event-store/rust/src/lifecycle.rs",
+        { "path": "packages/git/node-addon/src/event_store.rs", "reason": "the addon entry that answers the crate's outcome to Node" },
+        { "path": "src/event-store/maintenance.mjs", "reason": "starts the detached publish child when the crate says a publish is due" }
+      ],
+      "debt": [],
+      "retiredBy": "S7: the Node adapter retires with the Node payload",
+      "reason": "whether a trigger seals and a publish is due is decided once, in fgos-event-store, from the `eventStore` section fgos-config reads. The host mailbox hook keeps its own stamp schedule (apps/fgos/src/wiring/mailbox_hook.rs): it decides when to take mail, a different job from publishing events, and shares only the interval and remote reads"
+    },
+    {
+      "job": "read the Event Store config section",
+      "kind": "door",
+      "patterns": ["export function (?:readEventStoreConfig|eventStoreConfig)\\b", "\\.get\\(\\\"eventStore\\\"\\)"],
+      "allowed": [
+        "src/event-store/config.mjs",
+        "packages/config/rust/src/event_store.rs"
+      ],
+      "debt": [],
+      "retiredBy": "S7: the Node adapter retires with the Node payload",
+      "reason": "the section, its minimums, its defaults and what a refused file means are read once, by fgos-config; the Node reader is an adapter over the addon"
     }
   ],
   "files": {

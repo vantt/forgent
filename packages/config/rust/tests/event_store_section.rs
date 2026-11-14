@@ -138,3 +138,29 @@ fn a_refusal_that_names_the_section_or_reaches_a_strict_caller_is_the_callers() 
         "an operating-system error is no refusal of a file"
     );
 }
+
+#[test]
+fn a_project_is_read_from_its_files_over_the_global_directory_and_a_missing_home_is_refused() {
+    use fgos_config::event_store::ReadError;
+    let base =
+        std::env::temp_dir().join(format!("fgos_event_store_project_{}", std::process::id()));
+    let _ = std::fs::remove_dir_all(&base);
+    let (home, project) = (base.join("home"), base.join("project"));
+    std::fs::create_dir_all(home.join(".fgos")).unwrap();
+    std::fs::create_dir_all(project.join(".fgos")).unwrap();
+    let lookup =
+        |key: &str| (key == machine::HOME_VAR).then(|| home.to_string_lossy().into_owned());
+
+    let config = EventStoreConfig::read_project(&project, lookup, false).unwrap();
+    assert_eq!(
+        config,
+        read(None).unwrap(),
+        "no file sets a key: the standard"
+    );
+
+    match EventStoreConfig::read_project(&project, |_| None, false) {
+        Err(ReadError::HomeUnset) => {}
+        other => panic!("a missing home must be refused by name, got {other:?}"),
+    }
+    let _ = std::fs::remove_dir_all(&base);
+}

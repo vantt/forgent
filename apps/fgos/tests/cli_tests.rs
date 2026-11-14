@@ -105,23 +105,66 @@ fn ensure_dev_manifest() -> PathBuf {
 
 #[test]
 fn test_unlisted_selector_fails_closed_with_exit_4() {
+    for args in [vec!["not-a-real-selector"], vec!["nosuch", "--help"]] {
+        let output = Command::new(fgos_bin())
+            .args(&args)
+            .output()
+            .expect("failed to execute fgos");
+
+        assert_eq!(
+            output.status.code(),
+            Some(4),
+            "unlisted selector must fail closed with exit code 4: {args:?}"
+        );
+
+        let stderr = String::from_utf8_lossy(&output.stderr);
+        assert!(
+            stderr.contains(&format!("unknown verb \"{}\"", args[0])),
+            "stderr must name the unknown verb, got: {}",
+            stderr
+        );
+    }
+}
+
+#[test]
+fn an_unknown_flag_on_a_native_verb_writes_one_record_in_the_callers_store_and_names_it() {
+    let base = std::env::temp_dir().join(format!("fgos-doors-cli-{}", std::process::id()));
+    let _ = fs::remove_dir_all(&base);
+    let (project, other) = (base.join("project"), base.join("other"));
+    for dir in [&project, &other] {
+        fs::create_dir_all(dir.join(".git")).unwrap();
+        fs::create_dir_all(dir.join(".fgos")).unwrap();
+    }
     let output = Command::new(fgos_bin())
-        .arg("not-a-real-selector")
+        .current_dir(&project)
+        .env("HOME", &base)
+        .args(["config", "show", "--bogus", "--dir"])
+        .arg(&other)
         .output()
         .expect("failed to execute fgos");
-
-    assert_eq!(
-        output.status.code(),
-        Some(4),
-        "unlisted selector must fail closed with exit code 4"
-    );
-
+    assert_eq!(output.status.code(), Some(4));
+    let log = fs::canonicalize(&project)
+        .unwrap()
+        .join(".fgos/logs/invocation-faults.jsonl");
     let stderr = String::from_utf8_lossy(&output.stderr);
     assert!(
-        stderr.contains("unknown verb \"not-a-real-selector\""),
-        "stderr must name the unknown verb, got: {}",
-        stderr
+        stderr.ends_with(&format!(
+            "fgos: invocation fault recorded to {}\n",
+            log.display()
+        )),
+        "{stderr}"
     );
+    let records = fs::read_to_string(&log).unwrap();
+    assert_eq!(records.lines().count(), 1, "{records}");
+    assert!(
+        records.contains("\"faultClass\":\"unknown-flag\""),
+        "{records}"
+    );
+    assert!(
+        !other.join(".fgos/logs").exists(),
+        "the project --dir names never receives the record of a call that failed before it was read"
+    );
+    let _ = fs::remove_dir_all(&base);
 }
 
 #[test]

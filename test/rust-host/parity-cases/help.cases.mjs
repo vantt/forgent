@@ -10,9 +10,9 @@ const contracts = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..
 const routes = JSON.parse(fs.readFileSync(path.join(contracts, "command-routes.json"), "utf8"));
 const manifest = JSON.parse(fs.readFileSync(path.join(contracts, "command-manifest.json"), "utf8"));
 
-const HELP_FLAGS = new Set(["--help", "-h"]);
-const selectors = Object.keys(routes).sort();
-const verbs = selectors.filter((selector) => !HELP_FLAGS.has(selector));
+// The help words are no routes: the host answers them before any route lookup.
+const HELP_FLAGS = ["--help", "-h"];
+const verbs = Object.keys(routes).sort();
 
 // Help reads no store, so every case runs from a directory that holds none.
 const cwd = os.tmpdir();
@@ -27,7 +27,7 @@ const helpCase = (id, args, expectedExitCode) => ({
 
 const cases = [];
 
-for (const flag of selectors.filter((selector) => HELP_FLAGS.has(selector))) {
+for (const flag of HELP_FLAGS) {
   cases.push(helpCase(`${flag}`, [flag], 0));
   cases.push(helpCase(`${flag}-json`, [flag, "--json"], 0));
 }
@@ -47,9 +47,8 @@ for (const command of manifest.commands) {
 }
 
 // Refusals and leniencies the Node payload has today; the host must answer the same bytes and exit code.
-// Missing on purpose: `bogus-verb-probe --help` (exit 4, unknown verb). Node prints the full verb list after "Usage:" (325-byte
-// first line, plus an invocation-fault line), the host prints "Usage: fgos <command> [args...]" (71 bytes). Which text wins is an
-// open decision; the case is added once it is made (host routing and doors phase, full-help-table step).
+// An unknown verb: both doors print the host's text (`Usage: fgos <command> [args...]`), never a verb list that goes stale.
+cases.push(helpCase("refusal-unknown-verb", ["bogus-verb-probe", "--help"], 4));
 cases.push(helpCase("refusal-unknown-sub", ["metrics", "bogus", "--help"], 4));
 cases.push(helpCase("refusal-unknown-sub-json", ["dispatch", "bogus", "--help", "--json"], 4));
 cases.push(helpCase("refusal-leading-unknown-word", ["-h", "foo"], 4));

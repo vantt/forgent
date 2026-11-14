@@ -1,24 +1,4 @@
 {
-  "--help": {
-    "selector": "--help",
-    "route_kind": "legacy-cli",
-    "legacy_payload": "legacy-node",
-    "owner_path": "src/cli/command-registry.mjs",
-    "compatibility_tests": [
-      "test/rust-host/command-routes.test.mjs",
-      "test/rust-host/help-routes.test.mjs"
-    ]
-  },
-  "-h": {
-    "selector": "-h",
-    "route_kind": "legacy-cli",
-    "legacy_payload": "legacy-node",
-    "owner_path": "src/cli/command-registry.mjs",
-    "compatibility_tests": [
-      "test/rust-host/command-routes.test.mjs",
-      "test/rust-host/help-routes.test.mjs"
-    ]
-  },
   "add": {
     "selector": "add",
     "route_kind": "legacy-cli",
@@ -557,10 +537,6 @@
       "test/rust-host/command-routes.test.mjs"
     ],
     "native_subcommands": [
-      "mailbox",
-      "mailbox-sync"
-    ],
-    "native_kinds": [
       "mailbox",
       "mailbox-sync"
     ],

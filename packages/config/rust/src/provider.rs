@@ -26,7 +26,7 @@ use serde_json::{json, Value};
 
 use crate::detect::PathDetectors;
 use crate::inspect;
-use crate::machine::{self, HOME_VAR};
+use crate::machine;
 use crate::session::session_class;
 use crate::snapshot::{snapshot, Context, SnapshotError, SnapshotRequest};
 

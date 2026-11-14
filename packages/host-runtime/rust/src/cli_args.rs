@@ -41,6 +41,31 @@ impl ParsedArgs {
     }
 }
 
+/// Whether `name` is a JavaScript array index (a canonical whole number below 2^32 - 1), the keys an object lists
+/// before every other name.
+fn is_array_index(name: &str) -> bool {
+    let canonical = name == "0" || (!name.starts_with('0') && !name.is_empty());
+    canonical
+        && name.bytes().all(|b| b.is_ascii_digit())
+        && name.parse::<u64>().is_ok_and(|n| n < u64::from(u32::MAX))
+}
+
+impl ParsedArgs {
+    /// The flag names in the order `Object.keys` lists them for the Node parser's `flags` object: whole-number names
+    /// ascending first, then every other name by first appearance. Picking "the first unknown flag" in this order
+    /// names the same flag the Node CLI names.
+    pub fn names_in_node_order(&self) -> Vec<&str> {
+        let (mut indexes, others): (Vec<&str>, Vec<&str>) = self
+            .flags
+            .iter()
+            .map(|(name, _)| name.as_str())
+            .partition(|name| is_array_index(name));
+        indexes.sort_by_key(|name| name.parse::<u64>().unwrap_or(u64::MAX));
+        indexes.extend(others);
+        indexes
+    }
+}
+
 #[derive(Debug, thiserror::Error, PartialEq, Eq)]
 pub enum ParseArgsError {
     #[error("argument {index} is not valid UTF-8: {lossy:?}")]
@@ -149,6 +174,13 @@ mod tests {
                 row["positional"],
                 "row {name:?} positional"
             );
+            if let Some(keys) = row.get("keys") {
+                assert_eq!(
+                    json!(parsed.names_in_node_order()),
+                    *keys,
+                    "row {name:?} key order"
+                );
+            }
         }
     }
 

@@ -20,5 +20,6 @@ for (const row of rows) {
   test(`parseArgs: ${row.name}`, () => {
     const { flags, positional } = parseArgs(row.argv);
     assert.deepEqual({ flags: { ...flags }, positional }, { flags: row.flags, positional: row.positional }, `row "${row.name}" argv ${JSON.stringify(row.argv)}`);
+    if (row.keys) assert.deepEqual(Object.keys(flags), row.keys, `row "${row.name}" key order`);
   });
 }

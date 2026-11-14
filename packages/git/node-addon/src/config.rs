@@ -12,7 +12,7 @@ use std::sync::{Mutex, PoisonError};
 
 use fgos_config::cache::{machine_cached, snapshot_cached, SnapshotCache};
 use fgos_config::detect::{Detectors, NoDetectors, PathDetectors};
-use fgos_config::event_store::{EventStoreConfig, Invalid};
+use fgos_config::event_store::{EventStoreConfig, Invalid, ReadError};
 use fgos_config::machine::{self, accounts};
 use fgos_config::snapshot::{AccountsState, Context, SessionClass, Snapshot};
 use fgos_config::snapshot::{SnapshotError, SnapshotRequest};
@@ -314,6 +314,28 @@ fn event_store_json(config: &EventStoreConfig) -> Value {
     })
 }
 
+/// The one refusal for a missing home: `config-io`, keyword `HomeUnset`, the message that names the variable to set.
+fn home_unset() -> Failure {
+    detailed(
+        machine::HOME_UNSET_ID,
+        More {
+            keyword: Some(machine::HOME_UNSET_KEYWORD.into()),
+            message: Some(machine::home_unset_message()),
+            ..More::default()
+        },
+    )
+}
+
+impl From<ReadError> for Failure {
+    fn from(error: ReadError) -> Failure {
+        match error {
+            ReadError::Invalid(invalid) => invalid.into(),
+            ReadError::Snapshot(error) => error.into(),
+            ReadError::HomeUnset => home_unset(),
+        }
+    }
+}
+
 impl From<Invalid> for Failure {
     fn from(Invalid(name): Invalid) -> Failure {
         failure("event-store-config", name)
@@ -327,9 +349,8 @@ pub fn event_store_config_entry(args: Value) -> Result<String> {
     entry(args, |a| {
         let ctx = context(&NoDetectors)?;
         let config = a.config.as_ref().ok_or_else(|| invalid("config"))?;
-        Ok(event_store_json(&EventStoreConfig::from_section(
-            config.get("eventStore"),
-            &ctx,
+        Ok(event_store_json(&EventStoreConfig::from_config(
+            config, &ctx,
         )?))
     })
 }
@@ -344,15 +365,10 @@ pub fn event_store_entry(args: Value) -> Result<String> {
         let detectors = on_path();
         let ctx = context(&detectors)?;
         let roots = a.roots(true)?;
-        with_snapshot(&roots, false, &ctx, |held| match held {
-            Ok(snapshot) => Ok(event_store_json(&EventStoreConfig::from_section(
-                snapshot.value.get("eventStore"),
-                &ctx,
-            )?)),
-            Err(error) => match EventStoreConfig::when_refused(&error, a.strict, &ctx) {
-                Some(degraded) => Ok(event_store_json(&degraded)),
-                None => Err(error.into()),
-            },
+        with_snapshot(&roots, false, &ctx, |held| {
+            Ok(event_store_json(&EventStoreConfig::from_snapshot(
+                held, a.strict, &ctx,
+            )?))
         })
     })
 }
@@ -363,16 +379,7 @@ pub fn event_store_entry(args: Value) -> Result<String> {
 pub fn global_dir_entry(args: Value) -> Result<String> {
     entry(args, |a| {
         let env = a.env.unwrap_or_default();
-        let dir = machine::global_dir(|name| env.get(name).cloned()).ok_or_else(|| {
-            detailed(
-                machine::HOME_UNSET_ID,
-                More {
-                    keyword: Some(machine::HOME_UNSET_KEYWORD.into()),
-                    message: Some(machine::home_unset_message()),
-                    ..More::default()
-                },
-            )
-        })?;
+        let dir = machine::global_dir(|name| env.get(name).cloned()).ok_or_else(home_unset)?;
         Ok(Value::String(dir.to_string_lossy().into_owned()))
     })
 }

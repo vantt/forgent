@@ -1,6 +1,6 @@
 //! `fgos hook mailbox --cli <claude|codex|pi|omp> --event <stop|post-tool-use>`:
 //! the mailbox's checkpoint, served natively before the composition root
-//! (the route table's `native_kinds` of `hook`). A thin, straight-line
+//! (the route table's `native_subcommands` of `hook`). A thin, straight-line
 //! wiring of the store's hook shell to the real process: no logic, and
 //! exit 0 on every path, a usage error and a panic included (spec §6.1, §8
 //! item 7: exit 2 from a `Stop` hook blocks the stop in Claude Code), with

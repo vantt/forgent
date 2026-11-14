@@ -17,7 +17,6 @@ import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { HELP_SELECTORS } from '../../src/cli/command-registry.mjs';
 import { buildRustDistribution, nativeAddonLibraryName } from '../../scripts/build-rust-distribution.mjs';
 import { ensureGitAddon } from '../helpers/git-addon.mjs';
 
@@ -87,13 +86,6 @@ function emptyCwd(name) {
   fs.mkdirSync(dir);
   return dir;
 }
-
-test('--help and -h are legacy-node routes generated next to the verb selectors', () => {
-  for (const selector of HELP_SELECTORS) {
-    assert.equal(ROUTES[selector]?.route_kind, 'legacy-cli', selector);
-    assert.equal(ROUTES[selector].legacy_payload, 'legacy-node', selector);
-  }
-});
 
 test('fgos --help --json through the host is the whole manifest, byte-identical to the Node payload', () => {
   const cwd = emptyCwd('top-level');

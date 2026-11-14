@@ -2,7 +2,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { COMMAND_REGISTRY, HELP_SELECTORS, parseShape, publicManifest } from '../src/cli/command-registry.mjs';
+import { COMMAND_REGISTRY, parseShape, publicManifest } from '../src/cli/command-registry.mjs';
 import { acceptedFlags } from '../src/cli/flag-check.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -189,25 +189,21 @@ export function loadAnnotations(input) {
  * Assert that all COMMAND_REGISTRY selectors end up with a route in the output.
  * R5: any COMMAND_REGISTRY selector ends up with no route in the output (unlisted selector)
  */
-export function assertAllSelectorsListed(routes, registry = COMMAND_REGISTRY, helpSelectors = HELP_SELECTORS) {
+export function assertAllSelectorsListed(routes, registry = COMMAND_REGISTRY) {
   // Object.hasOwn, not index truthiness: a selector literally named
   // "__proto__" would otherwise resolve through the prototype chain to a
   // real (truthy, but meaningless) object and silently pass this guard.
-  for (const selector of [...registry.map((cmd) => cmd.name), ...helpSelectors]) {
+  for (const selector of registry.map((cmd) => cmd.name)) {
     if (!Object.hasOwn(routes, selector)) {
       throw new Error(`Unlisted selector: selector "${selector}" has no route in generated output`);
     }
   }
 
-  const expected = registry.length + helpSelectors.length;
-  if (Object.keys(routes).length !== expected) {
-    throw new Error(`Route count mismatch: expected ${expected}, got ${Object.keys(routes).length}`);
+  if (Object.keys(routes).length !== registry.length) {
+    throw new Error(`Route count mismatch: expected ${registry.length}, got ${Object.keys(routes).length}`);
   }
 }
 
-// The help door (`fgos --help|-h [<verb>] [--json]`) is answered by the
-// legacy-node payload, which owns the manifest. Only these exact tokens are
-// routed; any other leading option still has no route (R3 fails closed).
 // What the registry `native` field says: undefined (nothing native), true (the whole verb) or the sorted first positionals.
 function nativeDeclaration(cmd) {
   const { name: selector, native } = cmd;
@@ -242,16 +238,6 @@ function assertNoNativeLanding(cmd, native, landsWork) {
   if (lands) throw new Error(`Selector "${cmd.name}" declares native but lands work, which has no Rust owner`);
 }
 
-function helpRoute(selector) {
-  return {
-    selector,
-    route_kind: 'legacy-cli',
-    legacy_payload: 'legacy-node',
-    owner_path: 'src/cli/command-registry.mjs',
-    compatibility_tests: ['test/rust-host/command-routes.test.mjs', 'test/rust-host/help-routes.test.mjs'],
-  };
-}
-
 function nativeFlagProjection(cmd, onlySubs) {
   const sorted = (set) => [...set].sort();
   if (cmd.subcommands) {
@@ -262,10 +248,12 @@ function nativeFlagProjection(cmd, onlySubs) {
   return { accepted_flags: sorted(acceptedFlags(cmd)) };
 }
 
+const ANNOTATION_FIELDS = ['selector', 'operation_id', 'owner_path', 'subcommands', 'legacy_payload', 'compatibility_tests'];
+
 /**
  * Generate CommandRouteDescriptor map from registry and annotations.
  */
-export function generateCommandRoutes({ registry = COMMAND_REGISTRY, annotations = null, helpSelectors = HELP_SELECTORS } = {}) {
+export function generateCommandRoutes({ registry = COMMAND_REGISTRY, annotations = null } = {}) {
   const annotationsMap = annotations instanceof Map
     ? annotations
     : (annotations ? loadAnnotations(annotations) : loadAnnotations(DEFAULT_ANNOTATIONS_PATH));
@@ -278,11 +266,12 @@ export function generateCommandRoutes({ registry = COMMAND_REGISTRY, annotations
       throw new Error(`Stale annotation: selector "${sel}" is absent from COMMAND_REGISTRY`);
     }
   }
-  // The registry `native` field decides the route; an annotation that still says so would be a second authority.
+  // The registry `native` field decides the route and what is served natively; an annotation can only name what the
+  // registry cannot hold (operation, owner, payload, tests), so any other field is a second authority and is refused.
   for (const [sel, ann] of annotationsMap) {
-    for (const field of ['route_kind', 'route_kinds', 'native_kinds']) {
-      if (ann[field] !== undefined) {
-        throw new Error(`Stale annotation field "${field}" on selector "${sel}": the registry native field decides`);
+    for (const field of Object.keys(ann)) {
+      if (!ANNOTATION_FIELDS.includes(field)) {
+        throw new Error(`Unknown annotation field "${field}" on selector "${sel}": the registry decides the route and what is native`);
       }
     }
   }
@@ -340,8 +329,6 @@ export function generateCommandRoutes({ registry = COMMAND_REGISTRY, annotations
       // A legacy-cli selector may name first positionals the host serves natively before the composition root; every
       // other one still reaches the legacy payload.
       ...(Array.isArray(native) ? { native_subcommands: native } : {}),
-      // Transitional: the host still reads this name for the same list until its routing moves to native_subcommands.
-      ...(Array.isArray(native) ? { native_kinds: native } : {}),
       // The Rust host validates a native verb's flags itself (the legacy-node
       // payload does it for every other verb), from this projection of the
       // registry: one list of valid flags, two enforcement points.
@@ -356,15 +343,8 @@ export function generateCommandRoutes({ registry = COMMAND_REGISTRY, annotations
     routes[selector] = descriptor;
   }
 
-  for (const selector of helpSelectors) {
-    if (Object.hasOwn(routes, selector)) {
-      throw new Error(`Help selector "${selector}" collides with a COMMAND_REGISTRY verb`);
-    }
-    routes[selector] = helpRoute(selector);
-  }
-
   // R5: Fail if any COMMAND_REGISTRY selector ends up with no route in output (unlisted selector)
-  assertAllSelectorsListed(routes, registry, helpSelectors);
+  assertAllSelectorsListed(routes, registry);
 
   return routes;
 }

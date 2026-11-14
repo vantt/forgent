@@ -14,6 +14,8 @@
 //! again: that question costs a sandboxed Git process per step, paid on every
 //! tool call.
 use fgos_config::detect::NoDetectors;
+use fgos_config::event_store::EventStoreConfig;
+use fgos_config::machine;
 use fgos_config::schema::Schemas;
 use fgos_config::session::session_class;
 use fgos_config::snapshot::{snapshot, Context, SnapshotError, SnapshotRequest};
@@ -85,7 +87,9 @@ pub struct CrossMachine {
 impl CrossMachine {
     /// Every value comes from the snapshot, whose bundled standard layer holds
     /// each key: a missing or mistyped one is a refusal, never a default here.
-    fn read(snapshot: &Value) -> Result<Self, ConfigFailure> {
+    /// The Event Store's schedule is the config crate's reading of its section
+    /// (`event_store`), never a second read of those keys.
+    fn read(snapshot: &Value, event_store: &EventStoreConfig) -> Result<Self, ConfigFailure> {
         let refused = |path: &[&str], what: &str| ConfigFailure::Refused {
             code: "config-schema",
             detail: format!("{} is not {what}", path.join(".")),
@@ -100,8 +104,6 @@ impl CrossMachine {
                 .ok_or_else(|| refused(path, "a boolean"))
         };
         let lifetime = ["mailbox", "remote", "bodyLifetimeSec"];
-        let remote = ["eventStore", "remote"];
-        let interval = ["eventStore", "sync", "intervalSec"];
         Ok(Self {
             enabled: flag(&["mailbox", "crossMachine", "enabled"])?,
             require_confirmed: flag(&["mailbox", "remote", "requireConfirmed"])?,
@@ -110,13 +112,8 @@ impl CrossMachine {
                 .and_then(Value::as_u64)
                 .filter(|sec| *sec >= MIN_BODY_LIFETIME_SEC)
                 .ok_or_else(|| refused(&lifetime, "a whole number of at least 86700"))?,
-            remote: at(&remote)
-                .and_then(Value::as_str)
-                .ok_or_else(|| refused(&remote, "text"))?
-                .to_owned(),
-            sync_interval_sec: at(&interval)
-                .and_then(Value::as_u64)
-                .ok_or_else(|| refused(&interval, "a whole number"))?,
+            remote: event_store.remote.clone(),
+            sync_interval_sec: event_store.sync_interval_sec,
         })
     }
 }
@@ -128,8 +125,8 @@ pub fn project_limits(fgos_dir: &Path) -> Result<Loaded, ConfigFailure> {
 
 /// The limits and the cross-machine settings of one snapshot of the project.
 pub fn project_mailbox(fgos_dir: &Path) -> Result<(Loaded, CrossMachine), ConfigFailure> {
-    let snapshot = effective_snapshot(fgos_dir)?;
-    let cross = CrossMachine::read(&snapshot)?;
+    let (snapshot, event_store) = effective_snapshot(fgos_dir)?;
+    let cross = CrossMachine::read(&snapshot, &event_store)?;
     let config = snapshot
         .get(SECTION)
         .cloned()
@@ -138,18 +135,22 @@ pub fn project_mailbox(fgos_dir: &Path) -> Result<(Loaded, CrossMachine), Config
     Ok((loaded, cross))
 }
 
+/// The `eventStore` section of `snapshot` as the config crate reads it; a value of the section that breaks
+/// its rule is a refusal under the section's own code.
+fn event_store_of(snapshot: &Value, ctx: &Context) -> Result<EventStoreConfig, ConfigFailure> {
+    EventStoreConfig::from_config(snapshot, ctx).map_err(|invalid| ConfigFailure::Refused {
+        code: "event-store-config",
+        detail: invalid.to_string(),
+    })
+}
+
 /// The effective config of one snapshot of the project whose main checkout's
-/// `.fgos` is `fgos_dir` (project over global over the bundled standard).
-fn effective_snapshot(fgos_dir: &Path) -> Result<Value, ConfigFailure> {
+/// `.fgos` is `fgos_dir` (project over global over the bundled standard), and its
+/// Event Store section.
+fn effective_snapshot(fgos_dir: &Path) -> Result<(Value, EventStoreConfig), ConfigFailure> {
     let refused = |code: &'static str, detail: String| ConfigFailure::Refused { code, detail };
-    let home = std::env::var_os("HOME")
-        .filter(|home| !home.is_empty())
-        .ok_or_else(|| {
-            refused(
-                "home-unset",
-                "HOME is not set; the global directory is ~/.fgos".into(),
-            )
-        })?;
+    let global_dir = machine::global_dir(|key| std::env::var(key).ok())
+        .ok_or_else(|| refused(machine::HOME_UNSET_ID, machine::home_unset_message()))?;
     let main = fgos_dir.parent().unwrap_or(fgos_dir);
     let root = std::fs::canonicalize(main).map_err(|e| {
         refused(
@@ -168,11 +169,12 @@ fn effective_snapshot(fgos_dir: &Path) -> Result<Value, ConfigFailure> {
     let request = SnapshotRequest {
         project_root: root.clone(),
         trusted_root: root,
-        global_dir: Path::new(&home).join(".fgos"),
+        global_dir,
         class: session_class(|key| std::env::var(key).ok()),
     };
     let snap = snapshot(&ctx, &request).map_err(from_snapshot)?;
-    Ok(snap.value)
+    let event_store = event_store_of(&snap.value, &ctx)?;
+    Ok((snap.value, event_store))
 }
 
 /// A refused snapshot as the mailbox names it: the first refusal's code, every
@@ -196,7 +198,9 @@ fn from_snapshot(error: SnapshotError) -> ConfigFailure {
 
 #[cfg(test)]
 mod tests {
-    use super::CrossMachine;
+    use super::{event_store_of, ConfigFailure, CrossMachine};
+    use fgos_config::detect::NoDetectors;
+    use fgos_config::machine;
     use fgos_config::schema::Schemas;
     use fgos_config::standard::Standard;
     use serde_json::Value;
@@ -233,6 +237,10 @@ mod tests {
     #[test]
     fn the_cross_machine_settings_are_read_from_the_snapshot_and_a_missing_or_mistyped_key_is_refused(
     ) {
+        let read = |snapshot: &Value| -> Result<CrossMachine, ConfigFailure> {
+            let ctx = machine::context(&NoDetectors).unwrap();
+            CrossMachine::read(snapshot, &event_store_of(snapshot, &ctx)?)
+        };
         let snapshot = |enabled: Value, interval: Value| {
             serde_json::json!({
                 "mailbox": { "crossMachine": { "enabled": enabled }, "remote": { "requireConfirmed": true, "bodyRef": true, "bodyLifetimeSec": 604800 } },
@@ -240,7 +248,7 @@ mod tests {
             })
         };
         assert_eq!(
-            CrossMachine::read(&snapshot(true.into(), 0.into())),
+            read(&snapshot(true.into(), 0.into())),
             Ok(CrossMachine {
                 enabled: true,
                 require_confirmed: true,
@@ -255,7 +263,7 @@ mod tests {
             value["mailbox"]["remote"]["bodyLifetimeSec"] = sec.into();
             value
         };
-        assert!(CrossMachine::read(&lifetime(86_700)).is_ok());
+        assert!(read(&lifetime(86_700)).is_ok());
         for bad in [
             lifetime(0),
             lifetime(86_699),
@@ -263,7 +271,7 @@ mod tests {
             snapshot(true.into(), "soon".into()),
             serde_json::json!({}),
         ] {
-            assert!(CrossMachine::read(&bad).is_err(), "{bad}");
+            assert!(read(&bad).is_err(), "{bad}");
         }
     }
 }

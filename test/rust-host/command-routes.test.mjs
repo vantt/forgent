@@ -7,7 +7,7 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
-import { COMMAND_REGISTRY, HELP_SELECTORS } from '../../src/cli/command-registry.mjs';
+import { COMMAND_REGISTRY } from '../../src/cli/command-registry.mjs';
 import {
   DEFAULT_ANNOTATIONS_PATH,
   DEFAULT_ROUTES_PATH,
@@ -33,13 +33,10 @@ test('all COMMAND_REGISTRY selectors appear exactly once in generated output', (
   // Derived from COMMAND_REGISTRY.length itself, never a fresh hardcoded
   // literal -- a verb addition or removal moves both sides together instead
   // of needing this assertion edited every time the registry changes size.
-  // Plus the help door's option selectors (--help, -h), routed to legacy-node.
-  const expectedCount = COMMAND_REGISTRY.length + HELP_SELECTORS.length;
-  assert.equal(routeKeys.length, expectedCount, `command-routes.json must contain exactly ${expectedCount} selectors (COMMAND_REGISTRY + HELP_SELECTORS)`);
-  for (const selector of HELP_SELECTORS) {
-    assert.equal(routes[selector]?.route_kind, 'legacy-cli', `help selector "${selector}" must route to legacy-node`);
-  }
-  assert.deepEqual(routeKeys.filter((k) => k.startsWith('-')).sort(), [...HELP_SELECTORS].sort(), 'no option selector other than the help door may have a route');
+  // The help words are answered by the host before any route lookup, so no option token has a route.
+  const expectedCount = COMMAND_REGISTRY.length;
+  assert.equal(routeKeys.length, expectedCount, `command-routes.json must contain exactly ${expectedCount} selectors (COMMAND_REGISTRY)`);
+  assert.deepEqual(routeKeys.filter((k) => k.startsWith('-')), [], 'no selector may start with a dash: option tokens have no route');
 
   // Lexicographical sort check
   const sortedKeys = [...routeKeys].sort();
@@ -98,31 +95,27 @@ test('a verb whose registry native list names first positionals routes to the le
   assert.deepEqual(listed.map((e) => e.name), ['hook']);
   assert.deepEqual(routes.hook.native_subcommands, ['mailbox', 'mailbox-sync']);
   assert.equal(routes.hook.route_kind, 'legacy-cli', 'every other hook kind still reaches the legacy payload');
-  // The host reads native_kinds until its routing moves to native_subcommands.
-  assert.deepEqual(routes.hook.native_kinds, routes.hook.native_subcommands);
   const withNativeSubs = Object.values(routes).filter((r) => r.native_subcommands !== undefined).map((r) => r.selector);
   assert.deepEqual(withNativeSubs, ['hook']);
   const nativeRoutes = COMMAND_REGISTRY.filter((e) => e.native === true).map((e) => e.name).sort();
   assert.deepEqual(Object.values(routes).filter((r) => r.route_kind === 'native').map((r) => r.selector).sort(), nativeRoutes, 'route_kind native is exactly the registry native: true set');
   const sample = (patch) => [{ ...COMMAND_REGISTRY.find((e) => e.name === 'list'), ...patch }];
-  assert.throws(() => generateCommandRoutes({ registry: sample({ native: [] }), annotations: {}, helpSelectors: [] }), /native on selector "list" must be true or a non-empty list/);
-  assert.throws(() => generateCommandRoutes({ registry: sample({ native: 'x' }), annotations: {}, helpSelectors: [] }), /native on selector "list" must be true or a non-empty list/);
+  assert.throws(() => generateCommandRoutes({ registry: sample({ native: [] }), annotations: {} }), /native on selector "list" must be true or a non-empty list/);
+  assert.throws(() => generateCommandRoutes({ registry: sample({ native: 'x' }), annotations: {} }), /native on selector "list" must be true or a non-empty list/);
 });
 
-test('annotations that carry route_kind or native_kinds are refused as stale', () => {
-  assert.throws(
-    () => generateCommandRoutes({ annotations: { hook: { route_kind: 'legacy-cli' } } }),
-    /Stale annotation field "route_kind" on selector "hook": the registry native field decides/,
-  );
-  assert.throws(
-    () => generateCommandRoutes({ annotations: { hook: { native_kinds: ['mailbox'] } } }),
-    /Stale annotation field "native_kinds" on selector "hook": the registry native field decides/,
-  );
+test('an annotation field the registry owns is refused', () => {
+  for (const field of ['route_kind', 'route_kinds', 'native_subcommands']) {
+    assert.throws(
+      () => generateCommandRoutes({ annotations: { hook: { [field]: 'x' } } }),
+      new RegExp(`Unknown annotation field "${field}" on selector "hook": the registry decides the route and what is native`),
+    );
+  }
 });
 
 test('a native declaration on an invocation that lands work is refused', () => {
   const merge = COMMAND_REGISTRY.find((e) => e.name === 'merge');
-  const generate = (patch) => generateCommandRoutes({ registry: [{ ...merge, ...patch }], annotations: { merge: { operation_id: 'x.y', owner_path: 'packages/x' } }, helpSelectors: [] });
+  const generate = (patch) => generateCommandRoutes({ registry: [{ ...merge, ...patch }], annotations: { merge: { operation_id: 'x.y', owner_path: 'packages/x' } } });
   assert.throws(() => generate({ native: true }), /Selector "merge" declares native but lands work/);
   assert.throws(() => generate({ native: ['next'] }), /Selector "merge" declares native but lands work/);
   assert.doesNotThrow(() => generate({ native: ['list'] }));
@@ -141,7 +134,7 @@ test('every registry selector carries its store mode and the store declarations 
   assert.deepEqual(routes.events.event_store_child, ['seal', 'sync --opportunistic=true']);
   assert.deepEqual(routes.dispatch.mutates_store, ['recover --action']);
   assert.equal(routes.decision.mutates_store, true);
-  assert.equal(routes['--help'].store, undefined, 'help selectors have no registry entry');
+  assert.equal(routes['--help'], undefined, 'the help words are no routes');
 });
 
 test('the mailbox selector is native with send, inbox, list and status and their flags', () => {
@@ -347,7 +340,7 @@ test('native route without an explicit owner_path fails the build', () => {
 
   assert.throws(
     () => {
-      generateCommandRoutes({ registry: COMMAND_REGISTRY.filter((e) => e.name === 'version'), annotations: badAnnotations, helpSelectors: [] });
+      generateCommandRoutes({ registry: COMMAND_REGISTRY.filter((e) => e.name === 'version'), annotations: badAnnotations });
     },
     /Native route for selector "version" requires an explicit owner_path/
   );

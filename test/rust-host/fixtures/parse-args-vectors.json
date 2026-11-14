@@ -1,5 +1,5 @@
 {
-  "description": "argv vectors for the CLI argument parser. Each row: the tokens after the verb (what Node passes as `rest`), the flags and positionals every parser must return. Readers: the Node parser (test/cli/parse-args-vectors.test.mjs) and the Rust parser (packages/host-runtime/rust/src/cli_args.rs tests). A flag maps to true (bare), a string, or a list (the repeatable flags context-ref and param).",
+  "description": "argv vectors for the CLI argument parser. Each row: the tokens after the verb (what Node passes as `rest`), the flags and positionals every parser must return. Readers: the Node parser (test/cli/parse-args-vectors.test.mjs) and the Rust parser (packages/host-runtime/rust/src/cli_args.rs tests). A flag maps to true (bare), a string, or a list (the repeatable flags context-ref and param). A row may also carry `keys`: the flag names in the order JavaScript lists an object's keys (whole-number names ascending first, then every other name by first appearance), which is the order the first unknown flag is picked in. The tokens are always those after the verb: a verb name given here is an ordinary positional.",
   "rows": [
     {
       "name": "flag before the sub-verb with a value",
@@ -383,6 +383,78 @@
       },
       "positional": [
         "start"
+      ]
+    },
+    {
+      "name": "the verb is not part of the tokens: a verb name given here is a positional",
+      "argv": [
+        "config",
+        "show",
+        "--json"
+      ],
+      "flags": {
+        "json": true
+      },
+      "positional": [
+        "config",
+        "show"
+      ]
+    },
+    {
+      "name": "whole-number flag names come first in key order",
+      "argv": [
+        "--zzz",
+        "--2",
+        "--1"
+      ],
+      "flags": {
+        "zzz": true,
+        "2": true,
+        "1": true
+      },
+      "positional": [],
+      "keys": [
+        "1",
+        "2",
+        "zzz"
+      ]
+    },
+    {
+      "name": "a name with a leading zero is not a whole number and keeps its place",
+      "argv": [
+        "--b",
+        "--01",
+        "--7"
+      ],
+      "flags": {
+        "b": true,
+        "01": true,
+        "7": true
+      },
+      "positional": [],
+      "keys": [
+        "7",
+        "b",
+        "01"
+      ]
+    },
+    {
+      "name": "an equals token keeps its place among the other names",
+      "argv": [
+        "--dir=/x",
+        "--3",
+        "--a"
+      ],
+      "flags": {
+        "dir=/x": true,
+        "3": true,
+        "a": true
+      },
+      "positional": [],
+      "keys": [
+        "3",
+        "dir=/x",
+        "a"
       ]
     }
   ]
