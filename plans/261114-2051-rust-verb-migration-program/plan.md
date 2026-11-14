@@ -1,7 +1,7 @@
 ---
 title: "Rust verb migration program (F0 through S7)"
 description: "Move the legacy-Node CLI verbs onto the Rust host, foundations first, one layer at a time, retiring each Node path in the same change."
-status: pending
+status: in-progress
 priority: P1
 effort: 22d (F0 only; S1-S7 sized when each starts)
 branch: plan/rust-verb-migration-program
@@ -201,6 +201,14 @@ Delete:
 - `test/cli/fgos-help.test.mjs`, `test/cli/fgos-verb-help-json.test.mjs` (owners named in phase 09)
 - `test/rust-host/parity-cases/help.cases.mjs`, `test/rust-host/verb-parity.test.mjs` (created in 07, deleted in 09 with Node help; S2 re-adds the test file with its own table)
 - `test/process/one-door.test.mjs` (phase 00 part B; owner: the two process rows of the `doors` table)
+
+Added during execution (found by the phase 11 comparison of `git diff --stat origin/main...HEAD` with this list; each was needed by the phase that touched it, none is owned by another plan's collision table):
+- Event Store and Config: `packages/event-store/rust/src/resolve.rs`, `packages/event-store/rust/tests/lifecycle.rs`, `src/event-store/index.mjs`, `src/event-store/native.mjs`, `test/event-store/verbs.test.mjs`; `packages/config/rust/src/event_store.rs`, `packages/config/rust/src/provider.rs`, `packages/config/rust/tests/event_store_section.rs`, `packages/config/rust/tests/machine_view.rs`, `test/config/config-door.test.mjs`, `test/config/facade.test.mjs`
+- Addon and its Node loader: `packages/git/node-addon/src/lib.rs`, `packages/git/node-addon/src/marshal.rs`, `packages/git/rust/src/driver.rs` (disk-only topology read), `src/native/door.mjs`, `src/git/inspect.mjs`, `test/git/native-load.test.mjs`
+- Host: `apps/fgos/src/wiring/mailbox_sync.rs`, `packages/process/rust/src/mapped.rs`, `packages/process/rust/tests/spawn_mapped.rs` (publish child without the recursion guard), `packages/observe/rust/src/sources/invocation_faults.rs`
+- Node help forwarder and its proofs: `src/util/host-bin.mjs`, `test/helpers/command-manifest.mjs`, `test/rust-host/fixtures/` (spy and caller fixtures), `test/scripts/test-proof-inventory.test.mjs`, `test/cli/fgos-post-merge-2.test.mjs`, `test/cli/fgos-tool.test.mjs`, `test/runner/paths.test.mjs`, `test/setup/bin-discovery.test.mjs`
+- Docs, phase 11: `docs/platform/config/spec.md`, `docs/platform/event-store/spec.md`, `docs/platform/git/spec.md`, the descriptor and legacy-payload contracts, three packaging verification docs
+- `package.json` (one line: `check:before-merge` passes `--skills-dir plugins/fgOS/skills` to the drift check), `packages/git/rust/src/store_admission.rs` (a store-less mutating case)
 
 Read-only checks (not edited): `src/setup/registrations.mjs:467-472` and `src/setup/shell-rc.mjs:122`
 (the doctor probe runs `fgos --help`, which keeps working through the Node forwarder of phase 09).
