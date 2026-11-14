@@ -619,7 +619,9 @@ export function readAccountStates({ provider, assignmentId, runtimeDir, now = Da
     out[accountId] = {
       sticky: stickyId === accountId,
       quarantinedUntil: !quarantine ? null : (quarantine.kind === 'manual-clear' || never ? Number.MAX_SAFE_INTEGER : until),
-      probeable: quarantine?.kind === 'manual-clear' && quarantine.reasonCode === 'auth-token' && !(Number.isFinite(lastProbe) && now - lastProbe < cooldownMs),
+      // A real call may lift a dead login (after its cooldown) or a quota lock whose end fgOS guessed.
+      probeable: (quarantine?.kind === 'manual-clear' && quarantine.reasonCode === 'auth-token' && !(Number.isFinite(lastProbe) && now - lastProbe < cooldownMs))
+        || (quarantine?.reasonCode === 'quota-limit' && quarantine.resetKnown === false && !never && until > now),
       probeFailed: quarantine?.probe?.status === 'failed',
     };
   }
@@ -749,7 +751,7 @@ export function dropAssignmentRecord({ assignmentId, runtimeDir } = {}) {
   });
 }
 
-function setQuarantine(state, { provider, accountId, reasonCode, quarantineKind = 'temporary', until, detail }) {
+function setQuarantine(state, { provider, accountId, reasonCode, quarantineKind = 'temporary', until, resetKnown, detail }) {
   state.providers[provider] ??= { accounts: {} };
   const acct = accountState(state.providers[provider], accountId);
   acct.lastFaultAt = new Date().toISOString();
@@ -757,17 +759,19 @@ function setQuarantine(state, { provider, accountId, reasonCode, quarantineKind 
     kind: quarantineKind,
     reasonCode,
     ...(until ? { until } : {}),
+    // Whether the end came from the provider's own words; a record without the field reads as known.
+    ...(typeof resetKnown === 'boolean' ? { resetKnown } : {}),
     ...(detail ? { detail } : {}),
     quarantinedAt: acct.lastFaultAt,
   };
   return acct.quarantine;
 }
 
-export function quarantineProviderAccount({ provider, accountId, reasonCode, quarantineKind = 'temporary', until, runtimeDir, detail } = {}) {
+export function quarantineProviderAccount({ provider, accountId, reasonCode, quarantineKind = 'temporary', until, resetKnown, runtimeDir, detail } = {}) {
   const { statePath } = providerCapacityStatePaths(runtimeDir);
   return withProviderStateLock(() => {
     const state = readState(statePath);
-    const quarantine = setQuarantine(state, { provider, accountId, reasonCode, quarantineKind, until, detail });
+    const quarantine = setQuarantine(state, { provider, accountId, reasonCode, quarantineKind, until, resetKnown, detail });
     writeState(statePath, state);
     return quarantine;
   });
@@ -782,36 +786,68 @@ const AUDITED_FAULTS = new Set(['quota-limit', 'auth-token', 'provider-error']);
  * the quarantine set, or null. A fault that is no provider stop (low confidence, unknown provider)
  * leaves nothing.
  */
-export function recordProviderAccountFault({ provider, accountId, fault, providerSignal = null, runId = null, assignmentId = null, runtimeDir } = {}) {
+export function recordProviderAccountFault({ provider, accountId, fault, providerSignal = null, runId = null, assignmentId = null, source = 'run', runtimeDir } = {}) {
   if (!fault || (fault.action !== 'quarantine' && !AUDITED_FAULTS.has(fault.reasonCode))) return null;
   const { statePath } = providerCapacityStatePaths(runtimeDir);
   return withProviderStateLock(() => {
     const state = readState(statePath);
-    const quarantine = fault.action === 'quarantine'
-      ? setQuarantine(state, {
-        provider,
-        accountId,
-        reasonCode: fault.reasonCode,
-        quarantineKind: fault.quarantineKind,
-        until: fault.until,
-        detail: { kind: 'provider-stop', runId, assignmentId },
-      })
-      : null;
-    state.audit.push({
-      contract: PROVIDER_CAPACITY_AUDIT_CONTRACT,
-      action: 'fault',
-      at: new Date().toISOString(),
-      provider,
-      accountId,
-      reasonCode: fault.reasonCode,
-      quarantine: quarantine ? { kind: quarantine.kind, ...(quarantine.until ? { until: quarantine.until } : {}) } : null,
-      providerSignal: providerSignal ?? null,
-      runId,
-      assignmentId,
-    });
+    const quarantine = applyFault(state, { provider, accountId, fault, providerSignal, runId, assignmentId, source });
     writeState(statePath, state);
     return quarantine;
   });
+}
+
+/** The fault write, on a state the caller holds the lock for: the quarantine and its one `fault` line. */
+function applyFault(state, { provider, accountId, fault, providerSignal, runId, assignmentId, source }) {
+  const quarantine = fault.action === 'quarantine'
+    ? setQuarantine(state, {
+      provider,
+      accountId,
+      reasonCode: fault.reasonCode,
+      quarantineKind: fault.quarantineKind,
+      until: fault.until,
+      resetKnown: fault.resetKnown,
+      detail: { kind: 'provider-stop', runId, assignmentId },
+    })
+    : null;
+  state.audit.push({
+    contract: PROVIDER_CAPACITY_AUDIT_CONTRACT,
+    action: 'fault',
+    at: new Date().toISOString(),
+    provider,
+    accountId,
+    reasonCode: fault.reasonCode,
+    quarantine: quarantine
+      ? { kind: quarantine.kind, ...(quarantine.until ? { until: quarantine.until } : {}), ...(typeof quarantine.resetKnown === 'boolean' ? { resetKnown: quarantine.resetKnown } : {}) }
+      : null,
+    providerSignal: providerSignal ?? null,
+    runId,
+    assignmentId,
+    // A run's stop is the default and carries no marker; only a probe's is marked.
+    ...(source === 'probe' ? { source } : {}),
+  });
+  return quarantine;
+}
+
+/** The clear write, on a state the caller holds the lock for: drops the quarantine and appends its one line. */
+function applyClear(state, { provider, accountId, reason, caller }) {
+  const previous = state.providers?.[provider]?.accounts?.[accountId]?.quarantine ?? null;
+  state.providers[provider] ??= { accounts: {} };
+  accountState(state.providers[provider], accountId).quarantine = null;
+  const record = {
+    contract: PROVIDER_CAPACITY_AUDIT_CONTRACT,
+    action: 'clear-quarantine',
+    status: 'cleared',
+    clearedAt: new Date().toISOString(),
+    provider,
+    accountId,
+    previousQuarantine: previous,
+    reason: reason || null,
+    caller,
+    actor: caller,
+  };
+  state.audit.push(record);
+  return record;
 }
 
 export function clearProviderAccountQuarantine({ runnerConfig, provider, accountId, reason, force = false, runtimeDir, caller = process.env.USER || null } = {}) {
@@ -827,22 +863,7 @@ export function clearProviderAccountQuarantine({ runnerConfig, provider, account
     if (!previous && !force) {
       throw new ProviderCapacityConfigError(`provider-capacity clear-quarantine refused: account ${provider}/${accountId} is not quarantined`);
     }
-    state.providers[provider] ??= { accounts: {} };
-    const target = accountState(state.providers[provider], accountId);
-    target.quarantine = null;
-    const record = {
-      contract: PROVIDER_CAPACITY_AUDIT_CONTRACT,
-      action: 'clear-quarantine',
-      status: 'cleared',
-      clearedAt: new Date().toISOString(),
-      provider,
-      accountId,
-      previousQuarantine: previous,
-      reason: reason || null,
-      caller,
-      actor: caller,
-    };
-    state.audit.push(record);
+    const record = applyClear(state, { provider, accountId, reason, caller });
     writeState(statePath, state);
     return record;
   });
@@ -855,21 +876,100 @@ export function clearProviderAccountQuarantine({ runnerConfig, provider, account
 // first so that a second dispatch, or a crash, does not repeat it before the cooldown is over.
 export const DEFAULT_QUARANTINE_PROBE_COOLDOWN_MS = 30 * 60 * 1000;
 
+const PROBE_SOURCES = new Set(['probe-account', 'self']);
+const ACCOUNT_FAULT_REASONS = { login: 'credential', 'usage-limit': 'quota' };
+const CLEARABLE_BY_PROBE = new Set(['quota-limit', 'auth-token']);
+
+/** A direct row that proves the account itself is at fault: the CLI named a login or quota stop and exited non-zero. */
+const isAccountFaultRow = (row) => row?.ok !== true && row?.reason in ACCOUNT_FAULT_REASONS
+  && typeof row.exitCode === 'number' && row.exitCode !== 0;
+
+/** The account-side verdict one leg alone can give: `healthy`, `account-fault`, or null when it is inconclusive. */
+const directVerdict = (rows) => {
+  if (rows.length > 0 && rows.every((row) => row?.ok === true)) return 'healthy';
+  if (rows.length > 0 && rows.every(isAccountFaultRow)) return 'account-fault';
+  return null;
+};
+
+/** The probe write, on a state the caller holds the lock for. See `recordAccountProbe`. */
+function applyAccountProbe(state, { provider, accountId, direct, verdict, source, now }) {
+  state.audit.push({
+    contract: PROVIDER_CAPACITY_AUDIT_CONTRACT,
+    action: 'probe',
+    at: new Date(now).toISOString(),
+    provider,
+    accountId,
+    verdict,
+    direct: direct.map((row) => ({
+      cli: row.cli ?? null, ok: row.ok === true, reason: row.reason ?? null, providerSignal: row.providerSignal ?? null, elapsedMs: row.elapsedMs ?? null,
+    })),
+    source,
+  });
+  const faultRow = direct.find(isAccountFaultRow);
+  if (faultRow) {
+    const fault = classifyProviderCapacityFault({
+      provider, adapterOutcome: 'provider-limit', stopCause: ACCOUNT_FAULT_REASONS[faultRow.reason], providerSignal: faultRow.providerSignal ?? null, now,
+    });
+    applyFault(state, { provider, accountId, fault, providerSignal: faultRow.providerSignal ?? null, runId: null, assignmentId: null, source: 'probe' });
+    return;
+  }
+  const held = state.providers?.[provider]?.accounts?.[accountId]?.quarantine;
+  if (direct.length > 0 && direct.every((row) => row.ok === true) && held && CLEARABLE_BY_PROBE.has(held.reasonCode)) {
+    applyClear(state, {
+      provider, accountId, reason: 'a direct call answered', caller: source === 'self' ? 'fgos provider-capacity probe' : 'fgos dispatch probe-account',
+    });
+  }
+}
+
 /**
- * Try to unlock the `auth-token` quarantined accounts of `provider`, but only when no account of the
- * provider is usable. At most one real call per account per cooldown; stops after the first account
- * that answers. Never throws for a failed probe: that is recorded and the account stays quarantined.
+ * Records what a direct call to an account found, in one state-lock section: a login or quota stop
+ * quarantines the account through the fault door, a call that answered on every login store lifts a quota or
+ * login quarantine, and one `probe` line says what was seen either way (the history that tells when an
+ * account was last seen healthy). A timeout or other failure only leaves the `probe` line.
  *
  * @param {object} options
- * @param {(request: {provider: string, accountId: string, account: object}) => Promise<{ok: boolean, detail?: string}>} options.probe
+ * @param {Array<{cli?: string, ok: boolean, reason?: string|null, providerSignal?: object|null, exitCode?: number|null, elapsedMs?: number}>} options.direct
+ * @param {'probe-account'|'self'} [options.source]
+ */
+export function recordAccountProbe({ provider, accountId, direct, verdict = null, source = 'probe-account', runtimeDir, now = Date.now() } = {}) {
+  if (!provider || !accountId || !Array.isArray(direct)) {
+    throw new ProviderCapacityConfigError('provider-capacity record-account-probe refused: provider, accountId and a direct row list are required');
+  }
+  if (!PROBE_SOURCES.has(source)) {
+    throw new ProviderCapacityConfigError(`provider-capacity record-account-probe refused: unknown source ${source}`);
+  }
+  const { statePath } = providerCapacityStatePaths(runtimeDir);
+  return withProviderStateLock(() => {
+    const state = readState(statePath);
+    applyAccountProbe(state, { provider, accountId, direct, verdict, source, now });
+    writeState(statePath, state);
+    return state.providers?.[provider]?.accounts?.[accountId]?.quarantine ?? null;
+  });
+}
+
+/**
+ * Try the quarantined accounts of `provider` with one real call each, and stop at the first that answers.
+ * Two kinds of account are tried:
+ *  - an `auth-token` lock, only when no account of the provider is usable, at most once per cooldown;
+ *  - a `quota-limit` lock whose reset the provider never named (`resetKnown: false`, the end is a guess), at
+ *    most once per `runKey`: while it is active and no account is usable, or after it expired when it is
+ *    `accountId`, the account the seat is about to use.
+ * Never throws for a failed probe: the answer goes through `recordAccountProbe`'s rules (a login or quota
+ * stop re-dates the lock, any other failure leaves it) and the attempt is stamped on the lock.
+ *
+ * @param {object} options
+ * @param {(request: {provider: string, accountId: string, account: object, cli: string|null, model: string|null, spawnHolding: Function}) => Promise<{ok: boolean, detail?: string, reason?: string|null, providerSignal?: object|null, exitCode?: number|null, elapsedMs?: number}>} options.probe
  *   one real, cheap call made with that account's credential
+ * @param {string|null} [options.accountId] the account the caller is about to use (an expired quota lock is only tried for it)
+ * @param {string|null} [options.runKey] the run asking; a quota lock already tried by this run is not tried again
+ * @param {string|null} [options.model] handed to `probe` as is
  * @returns {Promise<Array<{accountId: string, unlocked: boolean, detail: string|null}>>} what was tried
  */
 export async function probeQuarantinedAccounts({
   // `cli`: the CLI the dispatch is expected to run; an account with one store per CLI is probed through
   // that CLI's store (the probe receives it), so the call checks the login the dispatch would use.
-  runnerConfig, provider, runtimeDir, probe, cli = null, now = Date.now(), cooldownMs = DEFAULT_QUARANTINE_PROBE_COOLDOWN_MS,
-  accountLockWaitMs = 120_000,
+  runnerConfig, provider, runtimeDir, probe, cli = null, model = null, accountId: namedAccountId = null, runKey = null,
+  now = Date.now(), cooldownMs = DEFAULT_QUARANTINE_PROBE_COOLDOWN_MS, accountLockWaitMs = 120_000,
 } = {}) {
   if (typeof probe !== 'function' || !provider) return [];
   const accounts = providerAccountInventory(runnerConfig)[provider]?.accounts;
@@ -881,15 +981,21 @@ export async function probeQuarantinedAccounts({
     const state = readState(statePath);
     const providerState = state.providers?.[provider];
     const enabled = Object.keys(accounts).filter((accountId) => accounts[accountId].disabled !== true);
-    const isUsable = (accountId) => !isQuarantined(providerState?.accounts?.[accountId] ?? {}, now);
-    if (enabled.some(isUsable)) return [];
+    const quarantineOf = (accountId) => providerState?.accounts?.[accountId]?.quarantine;
+    const noneUsable = !enabled.some((accountId) => !isQuarantined(providerState?.accounts?.[accountId] ?? {}, now));
     const picked = [];
     for (const accountId of enabled) {
-      const quarantine = providerState?.accounts?.[accountId]?.quarantine;
-      if (quarantine?.kind !== 'manual-clear' || quarantine.reasonCode !== 'auth-token') continue;
-      const last = Date.parse(quarantine.probe?.attemptedAt ?? '');
-      if (Number.isFinite(last) && now - last < cooldownMs) continue;
-      quarantine.probe = { attemptedAt, status: 'running' };
+      const quarantine = quarantineOf(accountId);
+      if (!quarantine) continue;
+      const active = isQuarantined(providerState.accounts[accountId], now);
+      if (quarantine.kind === 'manual-clear' && quarantine.reasonCode === 'auth-token') {
+        const last = Date.parse(quarantine.probe?.attemptedAt ?? '');
+        if (!noneUsable || (Number.isFinite(last) && now - last < cooldownMs)) continue;
+      } else if (quarantine.reasonCode === 'quota-limit' && quarantine.resetKnown === false) {
+        if (!runKey || quarantine.probe?.runKey === runKey) continue;
+        if (active ? !noneUsable : accountId !== namedAccountId) continue;
+      } else continue;
+      quarantine.probe = { attemptedAt, status: 'running', ...(runKey ? { runKey } : {}) };
       picked.push({ accountId, quarantinedAt: quarantine.quarantinedAt });
     }
     if (picked.length > 0) writeState(statePath, state);
@@ -905,7 +1011,7 @@ export async function probeQuarantinedAccounts({
     try {
       accountLock = await acquireAccountLock({ runtimeDir, provider, accountId, waitMs: accountLockWaitMs });
       // The probe starts its call through the lock, so a dead holder with a live call keeps the lock.
-      result = await probe({ provider, accountId, account: accounts[accountId], cli, spawnHolding: accountLock.spawnHolding });
+      result = await probe({ provider, accountId, account: accounts[accountId], cli, model, spawnHolding: accountLock.spawnHolding });
     } catch (err) {
       result = { ok: false, detail: err?.message ?? String(err) };
     } finally {
@@ -913,29 +1019,17 @@ export async function probeQuarantinedAccounts({
     }
     const ok = result?.ok === true;
     const detail = result?.detail ? String(result.detail).slice(0, 300) : null;
+    const row = {
+      cli, ok, reason: result?.reason ?? null, providerSignal: result?.providerSignal ?? null, exitCode: result?.exitCode ?? null, elapsedMs: result?.elapsedMs ?? null,
+    };
     withProviderStateLock(() => {
       const state = readState(statePath);
       const target = state.providers?.[provider]?.accounts?.[accountId];
       // A person may have cleared or replaced the quarantine while the call ran: leave that alone.
       if (!target?.quarantine || target.quarantine.quarantinedAt !== quarantinedAt) return;
-      if (ok) {
-        const previous = target.quarantine;
-        target.quarantine = null;
-        state.audit.push({
-          contract: PROVIDER_CAPACITY_AUDIT_CONTRACT,
-          action: 'clear-quarantine',
-          status: 'cleared',
-          clearedAt: new Date().toISOString(),
-          provider,
-          accountId,
-          previousQuarantine: previous,
-          reason: 'one real call succeeded',
-          caller: 'fgos provider-capacity probe',
-          actor: 'fgos provider-capacity probe',
-        });
-      } else {
-        target.quarantine.probe = { attemptedAt, status: 'failed', ...(detail ? { detail } : {}) };
-      }
+      applyAccountProbe(state, { provider, accountId, direct: [row], verdict: directVerdict([row]), source: 'self', now });
+      // Whatever lock is left (the same one, or a newer one a login or quota stop just wrote) carries the attempt.
+      if (!ok && target.quarantine) target.quarantine.probe = { attemptedAt, status: 'failed', ...(detail ? { detail } : {}), ...(runKey ? { runKey } : {}) };
       writeState(statePath, state);
     });
     tried.push({ accountId, unlocked: ok, detail });
@@ -1031,15 +1125,16 @@ export function describeProviderSignal(signal) {
 /**
  * When a quota stop's quarantine ends, from the provider signal the receipt carried: the wait the provider
  * requested, else the reset its hint names (a window or a clock time), else the one-hour default; never
- * past `MAX_QUOTA_QUARANTINE_MS`.
+ * past `MAX_QUOTA_QUARANTINE_MS`. `resetKnown` is false only for the default, an end fgOS guessed.
  */
 function quotaQuarantineUntil(providerSignal, now) {
   const requested = providerSignal?.requestedWaitMs;
   const hint = typeof providerSignal?.resetHint === 'string' ? providerSignal.resetHint : '';
-  const waitMs = (typeof requested === 'number' && requested > 0 ? requested : null)
+  const named = (typeof requested === 'number' && requested > 0 ? requested : null)
     ?? parseQuotaResetWindowMs(hint)
-    ?? (parseQuotaResetClockTime(hint, now) ?? now + DEFAULT_QUOTA_QUARANTINE_TTL_MS) - now;
-  return new Date(now + Math.min(waitMs, MAX_QUOTA_QUARANTINE_MS)).toISOString();
+    ?? ((at) => (at === null ? null : at - now))(parseQuotaResetClockTime(hint, now));
+  const waitMs = named ?? DEFAULT_QUOTA_QUARANTINE_TTL_MS;
+  return { until: new Date(now + Math.min(waitMs, MAX_QUOTA_QUARANTINE_MS)).toISOString(), resetKnown: named !== null };
 }
 
 /**
@@ -1061,7 +1156,7 @@ export function classifyProviderCapacityFault({ provider, adapterOutcome, struct
       return { action: 'quarantine', reasonCode: 'auth-token', quarantineKind: 'manual-clear' };
     }
     if (stopCause === 'provider') return { action: 'evidence-only', reasonCode: 'provider-error' };
-    return { action: 'quarantine', reasonCode: 'quota-limit', quarantineKind: 'temporary', until: quotaQuarantineUntil(providerSignal, now) };
+    return { action: 'quarantine', reasonCode: 'quota-limit', quarantineKind: 'temporary', ...quotaQuarantineUntil(providerSignal, now) };
   }
   return { action: 'evidence-only', reasonCode: 'unknown-or-low-confidence' };
 }

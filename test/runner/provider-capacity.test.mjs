@@ -23,6 +23,7 @@ import {
   ProviderCapacityLockError,
   providerCapacityStatePaths,
   quarantineProviderAccount,
+  recordAccountProbe,
   recordProviderAccountFault,
   releaseProviderAccountLease,
   validateProviderAccountInventory,
@@ -565,11 +566,13 @@ test('H1: a quota stop whose provider signal names no wait and no reset still ge
     assert.equal(fault.reasonCode, 'quota-limit');
     assert.equal(fault.quarantineKind, 'temporary');
     assert.equal(fault.until, new Date(now + 60 * 60 * 1000).toISOString(), JSON.stringify(providerSignal));
+    assert.equal(fault.resetKnown, false, 'a guessed end is marked, so a real call may check it before the account is used again');
   }
   const withResetWindow = classifyProviderCapacityFault({
     provider: 'openai', adapterOutcome: 'provider-limit', stopCause: 'quota', providerSignal: { resetHint: 'resets in 3h' }, now,
   });
   assert.equal(withResetWindow.until, new Date(now + 3 * 60 * 60 * 1000).toISOString(), 'a real parsed reset window is used verbatim, not overridden by the conservative default');
+  assert.equal(withResetWindow.resetKnown, true);
 });
 
 test('H1: a temporary quarantine with no until (a malformed/legacy state record) is never healthy/selectable -- fails closed like manual-clear', () => {
@@ -728,6 +731,7 @@ test('a quota quarantine ends at the wait the provider requested before the rese
   const fault = classifyProviderCapacityFault({ provider: 'gemini', adapterOutcome: 'provider-limit', stopCause: 'quota', providerSignal, now });
   assert.equal(fault.reasonCode, 'quota-limit');
   assert.equal(fault.until, new Date(now + 30 * 60 * 1000).toISOString());
+  assert.equal(fault.resetKnown, true);
   // The signal only dates a stop the supervisor named; it never makes one.
   assert.equal(classifyProviderCapacityFault({ provider: 'gemini', adapterOutcome: 'failed', providerSignal, now }).action, 'evidence-only');
 });
@@ -982,4 +986,34 @@ test('the unlock probe starts its call through the account lock, so the call hol
   const free = tryAcquireAccountLock({ runtimeDir, provider: 'openai-codex', accountId: tried[0].accountId });
   assert.ok(free, 'released after the call');
   free.release();
+});
+
+test('a probe result is recorded: a login or quota stop quarantines through the fault door, an answer lifts the lock, and every probe leaves one line', () => {
+  const runtimeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-record-probe-'));
+  const now = Date.parse('2026-11-14T10:00:00.000Z');
+  const audit = () => fs.readFileSync(providerCapacityStatePaths(runtimeDir).auditPath, 'utf8').trim().split('\n').map((line) => JSON.parse(line));
+  const quarantineOf = () => inspectProviderCapacity({
+    runnerConfig: { providers: { gemini: { accounts: { a: { label: 'a', credentialSource: { kind: 'codex-home', home: '/tmp/a' } } } } } }, runtimeDir,
+  }).providers.gemini.accounts.a.quarantine;
+  const base = { provider: 'gemini', accountId: 'a', runtimeDir, now };
+
+  recordAccountProbe({ ...base, verdict: 'account-fault', direct: [{ cli: 'gemini', ok: false, reason: 'usage-limit', exitCode: 1, providerSignal: { status: 429, requestedWaitMs: 1800000 }, elapsedMs: 900 }] });
+  assert.equal(quarantineOf().reasonCode, 'quota-limit');
+  assert.equal(quarantineOf().resetKnown, true);
+  assert.deepEqual(audit().map((line) => [line.action, line.source]), [['probe', 'probe-account'], ['fault', 'probe']]);
+
+  // A timeout is no account fault: it leaves the lock and one more probe line.
+  recordAccountProbe({ ...base, verdict: null, direct: [{ cli: 'gemini', ok: false, reason: null, exitCode: null, elapsedMs: 90000 }] });
+  assert.equal(quarantineOf().reasonCode, 'quota-limit');
+  assert.deepEqual(audit().map((line) => line.action), ['probe', 'fault', 'probe']);
+
+  recordAccountProbe({ ...base, verdict: 'healthy', source: 'self', direct: [{ cli: 'gemini', ok: true, reason: null, exitCode: 0, elapsedMs: 700 }] });
+  assert.equal(quarantineOf(), null);
+  assert.deepEqual(audit().map((line) => line.action), ['probe', 'fault', 'probe', 'probe', 'clear-quarantine']);
+  assert.equal(audit().at(-2).source, 'self');
+
+  // A healthy account with nothing to lift still leaves its line.
+  recordAccountProbe({ ...base, verdict: 'healthy', direct: [{ cli: 'gemini', ok: true, exitCode: 0 }] });
+  assert.equal(audit().at(-1).action, 'probe');
+  assert.throws(() => recordAccountProbe({ ...base, source: 'cron', direct: [] }), /unknown source/);
 });
