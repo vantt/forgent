@@ -1,0 +1,122 @@
+{
+  "description": "The invocation-fault record contract held by both writers: the Node writer (src/observe/invocation-fault-log.mjs) and the Rust writer (packages/observe/rust/src/invocation_fault.rs). Both test suites read this file; a row that one writer fails is fixed in the writer, never in the row.",
+  "recordKeyOrder": ["ts", "faultClass", "verb", "message", "cwd", "argv", "writer"],
+  "argvShape": [
+    {
+      "name": "verb and sub-verb stay, flag names stay, every value keeps only its length",
+      "argv": ["workflow", "propose", "--request", "sk-live-0123456789abcdef", "--token=hunter2", "--json", "free text"],
+      "sub": "propose",
+      "expectedArgvShape": ["workflow", "propose", "--request", "<24>", "--token=<7>", "--json", "<9>"]
+    },
+    {
+      "name": "no sub-verb named: only the verb is kept",
+      "argv": ["nosuchverb", "--whatever"],
+      "sub": null,
+      "expectedArgvShape": ["nosuchverb", "--whatever"]
+    },
+    {
+      "name": "a second token is a value unless the caller names it as the sub-verb",
+      "argv": ["x", "propose"],
+      "sub": null,
+      "expectedArgvShape": ["x", "<7>"]
+    },
+    {
+      "name": "a second token that differs from the named sub-verb is a value",
+      "argv": ["x", "other"],
+      "sub": "propose",
+      "expectedArgvShape": ["x", "<5>"]
+    },
+    {
+      "name": "the first token is kept as typed even when it looks like a flag value",
+      "argv": ["--secret=abc"],
+      "sub": null,
+      "expectedArgvShape": ["--secret=abc"]
+    },
+    {
+      "name": "a flag name too long to be one is a value",
+      "argv": ["x", "--aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"],
+      "sub": null,
+      "expectedArgvShape": ["x", "<62>"]
+    },
+    {
+      "name": "a flag name of the longest allowed length stays a flag name",
+      "argv": ["x", "--aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa=v"],
+      "sub": null,
+      "expectedArgvShape": ["x", "--aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa=<1>"]
+    },
+    {
+      "name": "an empty value after the equals sign has length zero",
+      "argv": ["x", "--a="],
+      "sub": null,
+      "expectedArgvShape": ["x", "--a=<0>"]
+    },
+    {
+      "name": "only the first equals sign splits the name from the value",
+      "argv": ["x", "--a=b=c"],
+      "sub": null,
+      "expectedArgvShape": ["x", "--a=<3>"]
+    },
+    {
+      "name": "a short flag keeps its name",
+      "argv": ["x", "-v", "-k=secret"],
+      "sub": null,
+      "expectedArgvShape": ["x", "-v", "-k=<6>"]
+    },
+    {
+      "name": "a bare double dash and a name that starts with a digit are values",
+      "argv": ["x", "--", "--9a", "---a"],
+      "sub": null,
+      "expectedArgvShape": ["x", "<2>", "<4>", "<4>"]
+    },
+    {
+      "name": "a plain token that holds an equals sign is a value",
+      "argv": ["x", "key=value"],
+      "sub": null,
+      "expectedArgvShape": ["x", "<9>"]
+    },
+    {
+      "name": "length counts UTF-16 code units, so a character outside the basic plane counts two",
+      "argv": ["x", "😀", "--name=😀", "é"],
+      "sub": null,
+      "expectedArgvShape": ["x", "<2>", "--name=<2>", "<1>"]
+    }
+  ],
+  "pathChoice": [
+    {
+      "name": "the store the caller resolved is used when it exists",
+      "layout": { "repository": "main", "stores": ["main"], "linkedWorktree": null },
+      "call": { "fgosDir": "main/.fgos", "cwd": "main" },
+      "expected": "main/.fgos/logs/invocation-faults.jsonl"
+    },
+    {
+      "name": "an absent store falls back to the main checkout's existing store",
+      "layout": { "repository": "main", "stores": ["main"], "linkedWorktree": null },
+      "call": { "fgosDir": "gone/.fgos", "cwd": "main" },
+      "expected": "main/.fgos/logs/invocation-faults.jsonl"
+    },
+    {
+      "name": "no store argument at all falls back to the main checkout's existing store",
+      "layout": { "repository": "main", "stores": ["main"], "linkedWorktree": null },
+      "call": { "fgosDir": null, "cwd": "main" },
+      "expected": "main/.fgos/logs/invocation-faults.jsonl"
+    },
+    {
+      "name": "a linked worktree records into the main checkout, never into itself",
+      "layout": { "repository": "main", "stores": ["main"], "linkedWorktree": "wt" },
+      "call": { "fgosDir": "wt/.fgos", "cwd": "wt" },
+      "expected": "main/.fgos/logs/invocation-faults.jsonl"
+    },
+    {
+      "name": "a repository whose main checkout has no store records nowhere",
+      "layout": { "repository": "main", "stores": [], "linkedWorktree": null },
+      "call": { "fgosDir": "main/.fgos", "cwd": "main" },
+      "expected": null
+    },
+    {
+      "name": "outside a repository with no store records nowhere",
+      "layout": { "repository": null, "stores": [], "linkedWorktree": null },
+      "call": { "fgosDir": null, "cwd": "plain" },
+      "expected": null
+    }
+  ]
+}

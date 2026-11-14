@@ -9,6 +9,7 @@ pub mod eval_journal;
 pub mod flags;
 pub mod friction;
 pub mod friction_cli;
+pub mod invocation_fault;
 pub mod metrics_cli;
 pub mod provider;
 pub mod scorecard;
