@@ -48,15 +48,18 @@
 //             lives elsewhere (an empty-looking view would pass for a real one).
 //   'require' refuses when `.fgos/` does not exist yet, so a write cannot create a
 //             phantom store (the worktree hazard); opens the Event Store.
-// `mutatesStore` (true, or `(positional, flags) => boolean` for a verb with a
-// read-only shape beside a mutating one) marks the invocations that write the
-// shared store; the disconnected-worktree guard refuses them from a linked
-// worktree carrying a frozen `.fgos/` copy. `landsWork` (true, or
-// `(positional) => boolean`) marks the verbs that run Land, so their end trigger
-// releases the candidates Work has recorded. Both default to false when absent.
-// `eventStoreChild` (`(positional, flags) => boolean`) marks the invocation that is a detached seal or publish child of
-// the Event Store lifecycle itself: it opens no start or end trigger (the child does one seal or one sync and nothing
-// around it) and a failure of it is always recorded, since nobody waits for it.
+// `native` (true, or a non-empty list of first positionals) marks what the Rust host serves itself: `true` is the whole
+// verb (the Node channel refuses it), a list names the sub-verbs or hook kinds served natively while every other first
+// positional still reaches the Node payload. It is the one place "native" is declared; the route table derives from it.
+// `mutatesStore`, `landsWork` and `eventStoreChild` are `true` or a list of invocation shapes over the parsed argv, so
+// the host can read them as data: `'<first positional>'`, `'<first positional> --<flag>'` (the flag is given, with any
+// value) or `'<first positional> --<flag>=true'` (the flag is given bare, the boolean `true`); `declared()` resolves one
+// invocation. `mutatesStore` marks the invocations that write the shared store; the disconnected-worktree guard refuses
+// them from a linked worktree carrying a frozen `.fgos/` copy. `landsWork` marks the invocations that run Land, so their
+// end trigger releases the candidates Work has recorded. `eventStoreChild` marks the invocation that is a detached seal
+// or publish child of the Event Store lifecycle itself: it opens no start or end trigger (the child does one seal or one
+// sync and nothing around it) and a failure of it is always recorded, since nobody waits for it. All three default to
+// false when absent. test/rust-host/fixtures/store-declaration-vectors.json holds the shared rows both readers resolve.
 // Every entry carries `store`, same discipline as `paginated` above.
 //
 // `guide` (optional, `{changes, prerequisites, exitCodes[], next}`) is what a person needs before
@@ -97,9 +100,29 @@ function withSubcommands(entry) {
   };
 }
 
-/** A registry field that is `true` or a per-invocation predicate, resolved for one invocation; absent is false. */
-export function declared(field, ...args) {
-  return typeof field === 'function' ? !!field(...args) : field === true;
+const SHAPE = /^([a-z][a-z0-9-]*)(?: --([a-z][a-z0-9-]*)(=true)?)?$/;
+
+/** One invocation shape of a store declaration, split: `{sub, flag?, exactlyTrue}`; null when it is not a shape. */
+export function parseShape(shape) {
+  const match = typeof shape === 'string' ? SHAPE.exec(shape) : null;
+  return match ? { sub: match[1], ...(match[2] ? { flag: match[2], exactlyTrue: match[3] !== undefined } : {}) } : null;
+}
+
+/** A registry store declaration (`true`, or a list of shapes) resolved for one parseArgs result; absent is false. */
+export function declared(field, positional = [], flags = {}) {
+  if (field === true) return true;
+  if (!Array.isArray(field)) return false;
+  return field.some((shape) => {
+    const parsed = parseShape(shape);
+    if (!parsed || positional[0] !== parsed.sub) return false;
+    if (!parsed.flag) return true;
+    return parsed.exactlyTrue ? flags[parsed.flag] === true : flags[parsed.flag] !== undefined;
+  });
+}
+
+/** Whether the registry marks this invocation as served only by the native host (the whole verb, or its first positional). */
+export function isNativeInvocation(entry, positional = []) {
+  return entry?.native === true || (Array.isArray(entry?.native) && entry.native.includes(positional[0]));
 }
 
 export const COMMAND_REGISTRY = [
@@ -135,7 +158,7 @@ export const COMMAND_REGISTRY = [
     externalEffect: false,
     paginated: false,
     deprecated: null,
-    nativeOnly: true,
+    native: true,
   },
   withSubcommands({
     name: 'metrics',
@@ -263,7 +286,7 @@ export const COMMAND_REGISTRY = [
     externalEffect: false,
     paginated: false,
     deprecated: null,
-    nativeOnly: true,
+    native: true,
   }),
   withSubcommands({
     name: 'friction',
@@ -346,7 +369,7 @@ export const COMMAND_REGISTRY = [
     externalEffect: false,
     paginated: false,
     deprecated: null,
-    nativeOnly: true,
+    native: true,
   }),
   withSubcommands({
     name: 'convention',
@@ -415,7 +438,7 @@ export const COMMAND_REGISTRY = [
     externalEffect: false,
     paginated: false,
     deprecated: null,
-    nativeOnly: true,
+    native: true,
   }),
   {
     name: 'init',
@@ -879,6 +902,7 @@ export const COMMAND_REGISTRY = [
     externalEffect: false,
     paginated: false,
     deprecated: null,
+    native: ['mailbox', 'mailbox-sync'],
   },
   {
     name: 'decision',
@@ -1045,7 +1069,7 @@ export const COMMAND_REGISTRY = [
     externalEffect: false,
     paginated: false,
     deprecated: null,
-    nativeOnly: true,
+    native: true,
   },
   withSubcommands({
     name: 'identity',
@@ -1162,7 +1186,7 @@ export const COMMAND_REGISTRY = [
     externalEffect: false,
     paginated: false,
     deprecated: null,
-    nativeOnly: true,
+    native: true,
   }),
   withSubcommands({
     name: 'mailbox',
@@ -1224,7 +1248,7 @@ export const COMMAND_REGISTRY = [
     externalEffect: false,
     paginated: false,
     deprecated: null,
-    nativeOnly: true,
+    native: true,
   }),
   withSubcommands({
     name: 'config',
@@ -1242,7 +1266,7 @@ export const COMMAND_REGISTRY = [
       'refresh-docs': { description: 'Rewrite the @fgos:doc lines that differ from what the schema and standard render, in the project file (or, with --global, the machine files); values and @fgos:why lines stay. A second run prints nothing to do.', parameters: { type: 'object', properties: { global: { type: 'boolean', description: 'Refresh the global and accounts files instead of the project file.' } }, required: [] }, examples: ['fgos config refresh-docs'] },
     },
     examples: ['fgos config show --json', 'fgos config check', 'fgos config set gateBypass.level light --reason "light gates while the audit runs"', 'fgos config migrate --dry-run'],
-    touchesState: true, store: 'none', externalEffect: false, paginated: false, deprecated: null, nativeOnly: true,
+    touchesState: true, store: 'none', externalEffect: false, paginated: false, deprecated: null, native: true,
     guide: {
       changes: 'show, explain, standard and check read only. set, unset, patch, migrate and refresh-docs write one config file (the project .fgos/config.yaml, or the machine files with --global) in one transaction, with a required reason.',
       prerequisites: 'A project for project config. Writes are refused for a confined session. Read verbs never print a secret value.',
@@ -1430,8 +1454,8 @@ export const COMMAND_REGISTRY = [
     // --dir) folds silently into an empty-but-valid ready/waiting/conflicts
     // result instead of refusing, the false negative this item closes.
     store: 'require',
-    mutatesStore: (positional) => positional[0] === 'next',
-    landsWork: (positional) => positional[0] === 'next',
+    mutatesStore: ['next'],
+    landsWork: ['next'],
     externalEffect: false,
     paginated: false,
     deprecated: null,
@@ -1624,7 +1648,7 @@ export const COMMAND_REGISTRY = [
     // "probe-account" and "probe-session" spawn provider CLIs (externalEffect: true). A verb with
     // several sub-modes is classified by its most-privileged effect on each axis.
     store: 'none',
-    mutatesStore: (positional, flags) => positional[0] === 'recover' && flags.action !== undefined,
+    mutatesStore: ['recover --action'],
     externalEffect: true,
     paginated: false,
     deprecated: null,
@@ -1723,8 +1747,8 @@ export const COMMAND_REGISTRY = [
     examples: ['fgos events status', 'fgos events sync --no-push', 'fgos events export --out ./export'],
     touchesState: true,
     store: 'open',
-    mutatesStore: (positional) => positional[0] === 'sync',
-    eventStoreChild: (positional, flags) => positional[0] === 'seal' || (positional[0] === 'sync' && flags.opportunistic === true),
+    mutatesStore: ['sync'],
+    eventStoreChild: ['seal', 'sync --opportunistic=true'],
     externalEffect: true,
     paginated: false,
     deprecated: null,
@@ -2144,7 +2168,7 @@ export const COMMAND_REGISTRY = [
     // never unconditionally read-only.
     touchesState: true,
     store: 'require',
-    mutatesStore: (positional) => positional[0] === 'attest',
+    mutatesStore: ['attest'],
     externalEffect: false,
     paginated: false,
     deprecated: null,
@@ -2208,7 +2232,7 @@ export const COMMAND_REGISTRY = [
     examples: ['fgos session start', 'fgos session end <session-id>', 'fgos session list', 'fgos session gc'],
     touchesState: true,
     store: 'none',
-    mutatesStore: (positional) => ['start', 'end', 'gc'].includes(positional[0]),
+    mutatesStore: ['start', 'end', 'gc'],
     externalEffect: false,
     paginated: false,
     deprecated: null,
@@ -2237,7 +2261,7 @@ export const COMMAND_REGISTRY = [
     examples: ['fgos gateway start', 'fgos gateway status', 'fgos gateway stop'],
     touchesState: true,
     store: 'none',
-    mutatesStore: (positional) => ['start', 'stop'].includes(positional[0]),
+    mutatesStore: ['start', 'stop'],
     externalEffect: true,
     paginated: false,
     deprecated: null,
@@ -2266,7 +2290,7 @@ export const COMMAND_REGISTRY = [
     examples: ['fgos goal set <id>', 'fgos goal show'],
     touchesState: true,
     store: 'require',
-    mutatesStore: (positional) => positional[0] === 'set',
+    mutatesStore: ['set'],
     externalEffect: false,
     paginated: false,
     deprecated: null,
@@ -2466,7 +2490,7 @@ export const COMMAND_REGISTRY = [
     examples: ['fgos lock fence main-checkout', 'fgos lock fence merge-slot --param ref=refs%2Fheads%2Fmain --yes'],
     touchesState: true,
     store: 'require',
-    mutatesStore: (positional) => positional[0] === 'fence',
+    mutatesStore: ['fence'],
     externalEffect: true,
     paginated: false,
     deprecated: null,

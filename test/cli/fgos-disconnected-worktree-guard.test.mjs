@@ -155,7 +155,7 @@ test('disconnected-worktree guard: "return" is unaffected by this guard (it alre
   }
 });
 
-// --- mutatesStore predicates: per-invocation classification ------
+// --- mutatesStore shapes: per-invocation classification ------
 // Refusal happens BEFORE the verb's own handler runs (this guard sits ahead
 // of `runVerb` in main()), so the mutating-subcommand cases below are safe
 // and cheap to exercise for real even for verbs whose real handler would
@@ -180,81 +180,11 @@ test('disconnected-worktree guard: "session start"/"session end"/"session gc" ar
   }
 });
 
-test('disconnected-worktree guard: "goal set" is refused, "goal show" is unaffected', () => {
+test('disconnected-worktree guard: "dispatch recover --action" is refused, "dispatch recover" without --action is unaffected', () => {
   const main = initGitCwdMainWithCommittedFgos();
-  const wt = addDisconnectedAdHocWorktree(main, 'adhoc-disconnected-goal');
-  try {
-    const setResult = run(wt, ['goal', 'set', 'tsk-doesnotmatter']);
-    assert.equal(setResult.status, 4, setResult.stderr);
-    assert.match(setResult.stderr, /disconnected snapshot/);
-
-    const showResult = run(wt, ['goal', 'show']);
-    assert.equal(showResult.status, 0, showResult.stderr);
-  } finally {
-    execFileSync('git', ['worktree', 'remove', '--force', wt], { cwd: main });
-  }
-});
-
-test('disconnected-worktree guard: "gateway start"/"gateway stop" are refused, "gateway status" is unaffected', () => {
-  const main = initGitCwdMainWithCommittedFgos();
-  const wt = addDisconnectedAdHocWorktree(main, 'adhoc-disconnected-gateway');
-  try {
-    for (const sub of ['start', 'stop']) {
-      const result = run(wt, ['gateway', sub]);
-      assert.equal(result.status, 4, `gateway ${sub}: ${result.stderr}`);
-      assert.match(result.stderr, /disconnected snapshot/);
-    }
-    const statusResult = run(wt, ['gateway', 'status']);
-    assert.equal(statusResult.status, 0, statusResult.stderr);
-  } finally {
-    execFileSync('git', ['worktree', 'remove', '--force', wt], { cwd: main });
-  }
-});
-
-test('disconnected-worktree guard: "knowledge attest" is refused, "knowledge status" is unaffected', () => {
-  const main = initGitCwdMainWithCommittedFgos();
-  const wt = addDisconnectedAdHocWorktree(main, 'adhoc-disconnected-knowledge');
-  try {
-    const attestResult = run(wt, ['knowledge', 'attest']);
-    assert.equal(attestResult.status, 4, attestResult.stderr);
-    assert.match(attestResult.stderr, /disconnected snapshot/);
-
-    const statusResult = run(wt, ['knowledge', 'status']);
-    assert.equal(statusResult.status, 0, statusResult.stderr);
-  } finally {
-    execFileSync('git', ['worktree', 'remove', '--force', wt], { cwd: main });
-  }
-});
-
-test('disconnected-worktree guard: "events sync" and "rebuild" are refused, "events status"/"events export" are unaffected', () => {
-  const main = initGitCwdMainWithCommittedFgos();
-  const wt = addDisconnectedAdHocWorktree(main, 'adhoc-disconnected-events');
-  try {
-    for (const args of [['events', 'sync'], ['rebuild']]) {
-      const result = run(wt, args);
-      assert.equal(result.status, 4, `${args.join(' ')}: ${result.stderr}`);
-      assert.match(result.stderr, /disconnected snapshot/);
-    }
-    // The read verbs reach their own handlers, which answer for their own reasons (here: a store that is not
-    // set up for the Event Store), never this guard's message.
-    for (const args of [['events', 'status'], ['events', 'export', '--out', 'export-dir']]) {
-      assert.doesNotMatch(run(wt, args).stderr, /disconnected snapshot/, args.join(' '));
-    }
-  } finally {
-    execFileSync('git', ['worktree', 'remove', '--force', wt], { cwd: main });
-  }
-});
-
-test('disconnected-worktree guard: "lock fence" and "dispatch recover --action" are refused, "dispatch recover" without --action is unaffected', () => {
-  const main = initGitCwdMainWithCommittedFgos();
-  const wt = addDisconnectedAdHocWorktree(main, 'adhoc-disconnected-lock-dispatch');
+  const wt = addDisconnectedAdHocWorktree(main, 'adhoc-disconnected-dispatch');
   try {
     // boundary: the guard runs in the shell before any handler, and only a spawned call from a real disconnected worktree reaches it.
-    const fenceResult = run(wt, ['lock', 'fence', 'some-lock']);
-    assert.equal(fenceResult.status, 4, fenceResult.stderr);
-    assert.match(fenceResult.stderr, /disconnected snapshot/);
-
-    // boundary: same guard, the mutating shape of a verb that also has a read-only shape.
     const recoverResult = run(wt, ['dispatch', 'recover', 'run_does_not_exist', '--action', 'x']);
     assert.equal(recoverResult.status, 4, recoverResult.stderr);
     assert.match(recoverResult.stderr, /disconnected snapshot/);
@@ -262,21 +192,6 @@ test('disconnected-worktree guard: "lock fence" and "dispatch recover --action" 
     // The bare observe form reaches its own read-only handler, which answers for its own reason.
     // boundary: same guard, the read-only shape must not trip it.
     assert.doesNotMatch(run(wt, ['dispatch', 'recover', 'run_does_not_exist']).stderr, /disconnected snapshot/);
-  } finally {
-    execFileSync('git', ['worktree', 'remove', '--force', wt], { cwd: main });
-  }
-});
-
-test('disconnected-worktree guard: "merge next" is refused, "merge list" is unaffected', () => {
-  const main = initGitCwdMainWithCommittedFgos();
-  const wt = addDisconnectedAdHocWorktree(main, 'adhoc-disconnected-merge');
-  try {
-    const nextResult = run(wt, ['merge', 'next']);
-    assert.equal(nextResult.status, 4, nextResult.stderr);
-    assert.match(nextResult.stderr, /disconnected snapshot/);
-
-    const listResult = run(wt, ['merge', 'list']);
-    assert.equal(listResult.status, 0, listResult.stderr);
   } finally {
     execFileSync('git', ['worktree', 'remove', '--force', wt], { cwd: main });
   }

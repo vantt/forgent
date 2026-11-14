@@ -193,8 +193,8 @@ function subRegions(verb, caseText, subs) {
   return { regions, shared };
 }
 
-const MULTI = COMMAND_REGISTRY.filter((entry) => entry.subcommands && !entry.nativeOnly);
-const NATIVE = COMMAND_REGISTRY.filter((entry) => entry.subcommands && entry.nativeOnly);
+const MULTI = COMMAND_REGISTRY.filter((entry) => entry.subcommands && entry.native !== true);
+const NATIVE = COMMAND_REGISTRY.filter((entry) => entry.subcommands && entry.native === true);
 
 test('the drift scan covers the verbs that branch on a positional sub-verb', () => {
   assert.deepEqual(MULTI.map((e) => e.name).sort(), ['agents', 'dispatch', 'events', 'gateway', 'git', 'goal', 'lock', 'merge', 'session', 'tool', 'workflow', 'worktree']);

@@ -111,7 +111,7 @@ import { createSession, endSession, listSessions, reclaimOrphanedSessions, sessi
 import { visitCount } from '../src/runner/anti-loop.mjs';
 import { DEFAULTS } from '../src/state/work.mjs';
 import { DEFAULT_DOMAIN, getDomain, stepForPhase, domainSteps, effectiveStep, resolveDomainName } from '../src/state/domain-registry.mjs';
-import { MANIFEST_SCHEMA_VERSION, COMMAND_REGISTRY, declared, publicManifest } from '../src/cli/command-registry.mjs';
+import { MANIFEST_SCHEMA_VERSION, COMMAND_REGISTRY, declared, isNativeInvocation, publicManifest } from '../src/cli/command-registry.mjs';
 import { recordInvocationFault } from '../src/observe/invocation-fault-log.mjs';
 import { computeAwaitingContext } from '../src/state/awaiting-context.mjs';
 import { readConfig } from '../src/config/facade.mjs';
@@ -4137,7 +4137,7 @@ const DELETE_GUARD_HOOK_KIND = 'main-checkout-delete-guard';
 
 async function handleHook(rest) {
   const [kind, ...flags] = rest;
-  const { IN_PROCESS_HOOK_KINDS, NATIVE_HOOK_KINDS, serveHook } = await import('../src/runner/hook.mjs');
+  const { IN_PROCESS_HOOK_KINDS, serveHook } = await import('../src/runner/hook.mjs');
   const allowedKinds = [...IN_PROCESS_HOOK_KINDS, DELETE_GUARD_HOOK_KIND];
   if (!kind || kind === '--help' || kind === '-h') {
     process.stdout.write(
@@ -4147,7 +4147,7 @@ async function handleHook(rest) {
     process.exit(0);
   }
 
-  if (NATIVE_HOOK_KINDS.includes(kind)) {
+  if (isNativeInvocation(COMMAND_REGISTRY.find((e) => e.name === 'hook'), [kind])) {
     process.stderr.write(`Error: hook kind "${kind}" is served by the native fgos host; this direct-node channel does not run it. Run it through the project shim (.fgos/installation/bin/fgos hook ${kind}).\n`);
     process.exit(1);
   }
@@ -4215,14 +4215,15 @@ async function main() {
 
     const flagEntry = COMMAND_REGISTRY.find((e) => e.name === verb);
     withFaultClass('unknown-flag', () => {
-      const unknownFlag = flagEntry && !flagEntry.nativeOnly ? unknownFlagMessage(flagEntry, flags, positional) : null;
+      const unknownFlag = flagEntry && flagEntry.native !== true ? unknownFlagMessage(flagEntry, flags, positional) : null;
       if (unknownFlag) throw new StoreError('validation', unknownFlag);
     });
 
     dir = withFaultClass('dir-invalid', () => resolveInvocationRoot({ cwd: process.cwd(), dir: flags.dir, policy: verb === 'init' ? 'strict-cwd' : 'caller-tree' }).fgosDir);
     const entry = COMMAND_REGISTRY.find((e) => e.name === verb);
-    if (entry?.nativeOnly) {
-      process.stderr.write(`fgos: "${verb}" is only available in the native fgOS host. Install a release with "fgctl init" (https://github.com/vantt/forgent#install).\n`);
+    if (isNativeInvocation(entry, positional)) {
+      const served = entry.native === true ? verb : `${verb} ${positional[0]}`;
+      process.stderr.write(`fgos: "${served}" is only available in the native fgOS host. Install a release with "fgctl init" (https://github.com/vantt/forgent#install).\n`);
       process.exit(4);
     }
     // Whether this verb may touch the store from here (missing store, disconnected snapshot, `init` in a worktree, an

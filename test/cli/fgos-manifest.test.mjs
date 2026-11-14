@@ -8,7 +8,8 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
-import { COMMAND_REGISTRY, MANIFEST_SCHEMA_VERSION } from '../../src/cli/command-registry.mjs';
+import { COMMAND_REGISTRY, MANIFEST_SCHEMA_VERSION, declared } from '../../src/cli/command-registry.mjs';
+import { parseArgs } from '../../src/cli/parse-args.mjs';
 import { formatDeprecation } from '../../src/cli/deprecation.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -55,14 +56,14 @@ const EARLY_PATH_VERBS = new Set(['hook']);
 
 test('manifest verb-name set equals the set of verbs runVerb() actually dispatches', () => {
   const dispatched = [...new Set(dispatchedVerbs())].sort();
-  const registered = COMMAND_REGISTRY.filter((entry) => !entry.nativeOnly && !EARLY_PATH_VERBS.has(entry.name)).map((entry) => entry.name).sort();
+  const registered = COMMAND_REGISTRY.filter((entry) => entry.native !== true && !EARLY_PATH_VERBS.has(entry.name)).map((entry) => entry.name).sort();
   assert.deepEqual(registered, dispatched);
 });
 
 test('every registry entry has touchesState, externalEffect, paginated booleans, a store mode and the required keys', () => {
   const baseKeys = ['deprecated', 'description', 'examples', 'externalEffect', 'invoke', 'name', 'paginated', 'parameters', 'store', 'touchesState'];
   for (const entry of COMMAND_REGISTRY) {
-    const expectedKeys = [...baseKeys, ...(entry.nativeOnly !== undefined ? ['nativeOnly'] : []), ...(entry.subcommands !== undefined ? ['subcommands'] : []), ...(entry.guide !== undefined ? ['guide'] : []), ...(entry.retiredFlags !== undefined ? ['retiredFlags'] : []), ...['mutatesStore', 'landsWork', 'eventStoreChild'].filter((k) => entry[k] !== undefined)].sort();
+    const expectedKeys = [...baseKeys, ...(entry.native !== undefined ? ['native'] : []), ...(entry.subcommands !== undefined ? ['subcommands'] : []), ...(entry.guide !== undefined ? ['guide'] : []), ...(entry.retiredFlags !== undefined ? ['retiredFlags'] : []), ...['mutatesStore', 'landsWork', 'eventStoreChild'].filter((k) => entry[k] !== undefined)].sort();
     assert.deepEqual(
       Object.keys(entry).sort(),
       expectedKeys,
@@ -91,13 +92,58 @@ test('every registry entry has touchesState, externalEffect, paginated booleans,
   }
 });
 
-test('mutatesStore, landsWork and eventStoreChild are true or a predicate, and sit only on a verb that touches state', () => {
+const STORE_FIELDS = ['mutatesStore', 'landsWork', 'eventStoreChild'];
+const SHAPE = /^[a-z][a-z0-9-]*( --[a-z][a-z0-9-]*(=true)?)?$/;
+const VECTORS = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../rust-host/fixtures/store-declaration-vectors.json'), 'utf8')).rows;
+
+test('mutatesStore, landsWork and eventStoreChild are true or a list of invocation shapes, and sit only on a verb that touches state', () => {
   // Why no existing test proves it: the key-set test above only checks which keys exist, not their shape.
   for (const entry of COMMAND_REGISTRY) {
-    for (const key of ['mutatesStore', 'landsWork', 'eventStoreChild']) {
-      if (entry[key] === undefined) continue;
-      assert.ok(entry[key] === true || typeof entry[key] === 'function', `entry "${entry.name}" has invalid ${key}`);
+    for (const key of STORE_FIELDS) {
+      const value = entry[key];
+      if (value === undefined) continue;
+      const shapes = Array.isArray(value) && value.length > 0 && value.every((shape) => typeof shape === 'string' && SHAPE.test(shape));
+      assert.ok(value === true || shapes, `entry "${entry.name}" has invalid ${key}`);
       assert.ok(entry.touchesState, `entry "${entry.name}" declares ${key} without touchesState`);
+    }
+  }
+});
+
+test('native is true or a non-empty list of first positionals, and no registry field holds a function', () => {
+  for (const entry of COMMAND_REGISTRY) {
+    for (const [key, value] of Object.entries(entry)) assert.notEqual(typeof value, 'function', `entry "${entry.name}" field ${key} is a function`);
+    if (entry.native === undefined || entry.native === true) continue;
+    assert.ok(Array.isArray(entry.native) && entry.native.length > 0 && entry.native.every((sub) => typeof sub === 'string' && sub), `entry "${entry.name}" has invalid native`);
+  }
+});
+
+test('store declarations resolve every shared vector row the way the shell reads them', () => {
+  // Owns the true and false side of every shape; the host matcher reads the same rows.
+  for (const row of VECTORS) {
+    const entry = COMMAND_REGISTRY.find((e) => e.name === row.verb);
+    assert.ok(entry, `vector names unknown verb "${row.verb}"`);
+    const { flags, positional } = parseArgs(row.argv);
+    const label = `${row.verb} ${row.argv.join(' ')}`;
+    assert.equal(declared(entry.mutatesStore, positional, flags), row.mutates, `${label}: mutatesStore`);
+    assert.equal(declared(entry.landsWork, positional, flags), row.landsWork, `${label}: landsWork`);
+    assert.equal(declared(entry.eventStoreChild, positional, flags), row.eventStoreChild, `${label}: eventStoreChild`);
+  }
+  assert.equal(declared(undefined, [], undefined), false);
+  assert.equal(declared(['next'], ['next']), true, 'a call without flags still matches a sub-only shape');
+});
+
+test('every shape list has vector rows on its true and its false side', () => {
+  const rowsOf = (verb) => VECTORS.filter((row) => row.verb === verb);
+  const column = { mutatesStore: 'mutates', landsWork: 'landsWork', eventStoreChild: 'eventStoreChild' };
+  for (const entry of COMMAND_REGISTRY) {
+    for (const key of STORE_FIELDS) {
+      if (!Array.isArray(entry[key])) continue;
+      const sides = new Set(rowsOf(entry.name).map((row) => row[column[key]]));
+      assert.deepEqual([...sides].sort(), [false, true], `${entry.name} ${key} needs vector rows for both sides`);
+      for (const shape of entry[key]) {
+        const [sub] = shape.split(' ');
+        assert.ok(rowsOf(entry.name).some((row) => row[column[key]] && parseArgs(row.argv).positional[0] === sub), `${entry.name} ${key} shape "${shape}" has no true row`);
+      }
     }
   }
 });
