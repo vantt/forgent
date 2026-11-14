@@ -25,6 +25,7 @@ import { spawn } from 'node:child_process';
 import { HolderLockError, PROTOCOL, parseRouteLine } from './protocol.mjs';
 import { routeLineOrThrow } from './driver.mjs';
 import { observe, resolveHolderLiveness } from '../native/process-identity.mjs';
+import { uniqueTmpTag } from '../util/unique-tmp-tag.mjs';
 
 const WORK_PREFIX = 'fgos-lock-hold-';
 const READY_POLL_MS = 2;
@@ -226,7 +227,7 @@ export function releaseHold(hold) {
 function writeRequest(hold, body) {
   hold.requests += 1;
   const n = hold.requests;
-  const tmp = path.join(hold.work, `req-${n}.json.tmp`);
+  const tmp = path.join(hold.work, `req-${n}.json.tmp-${uniqueTmpTag()}`);
   fs.writeFileSync(tmp, JSON.stringify(body));
   fs.renameSync(tmp, path.join(hold.work, `req-${n}.json`));
   return n;

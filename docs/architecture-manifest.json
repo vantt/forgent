@@ -344,6 +344,23 @@
       ],
       "debt": [],
       "reason": "fgos-durable-file orders temp, fsync, install and directory fsync; each other file does a different job, named in its reason"
+    },
+    {
+      "job": "temp file name of a Node write-then-rename",
+      "kind": "door",
+      "patterns": [
+        "\\}\\.tmp-\\$\\{process\\.pid\\}",
+        "\\$\\{process\\.pid\\}\\.tmp",
+        "\\.tmp\\.\\$\\{process\\.pid\\}",
+        "req-\\$\\{[^}]+\\}\\.json\\.tmp(?!-)"
+      ],
+      "allowed": [
+        { "path": "scripts/git-one-door-scan.mjs", "reason": "single-process tooling writing its own census file; no second thread shares the name" },
+        { "path": "scripts/lib/git-addon-stage.mjs", "reason": "single-process build tooling staging the addon, host and digest files; no second thread shares the name" },
+        { "path": "scripts/run-rust-dev-host.mjs", "reason": "single-process dev tooling materialising the dev host; no second thread shares the name" }
+      ],
+      "debt": [],
+      "reason": "every temp name of a Node write-then-rename comes from uniqueTmpTag so two threads or two calls never share one; there is no shared write helper (each module keeps its own, see the Durable file row of docs/platform/component-boundary.md). The patterns catch the hand-built forms (a pid-only suffix, a pid plus clock, the request-file temp); a directory staging or an mkdtemp prefix is another job and does not match"
     }
   ],
   "files": {

@@ -4,6 +4,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { COMMAND_REGISTRY, HELP_SELECTORS, publicManifest } from '../src/cli/command-registry.mjs';
 import { acceptedFlags } from '../src/cli/flag-check.mjs';
+import { uniqueTmpTag } from '../src/util/unique-tmp-tag.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');
@@ -371,10 +372,10 @@ export function formatCommandManifestJson(manifest = publicManifest()) {
 // Same directory as `target` (never os.tmpdir()): fs.renameSync is only
 // atomic within one filesystem, and /tmp is commonly a separate mount from
 // the checkout. A crash mid-write can still leave a tmp file behind, so
-// .gitignore covers its exact naming pattern.
+// .gitignore covers its naming pattern.
 function writeAtomic(target, content) {
   fs.mkdirSync(path.dirname(target), { recursive: true });
-  const tmpPath = `${target}.tmp.${process.pid}.${Date.now()}`;
+  const tmpPath = `${target}.tmp-${uniqueTmpTag()}`;
   fs.writeFileSync(tmpPath, content, 'utf8');
   fs.renameSync(tmpPath, target);
 }

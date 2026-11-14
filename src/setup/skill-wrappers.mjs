@@ -23,11 +23,14 @@ import { inspectEntries, inspectPath } from '../util/git-paths.mjs';
 import { domainCatalog } from '../util/domain-dirs.mjs';
 import { cutFrontmatter, readFrontmatter, YamlParseError } from '../util/yaml.mjs';
 import { firstSymlinkUnder, refuseSymlink } from '../util/refuse-symlink.mjs';
+import { uniqueTmpTag } from '../util/unique-tmp-tag.mjs';
 import { computeInstructionProjection, materializeInstructionProjection } from './instruction-projections.mjs';
 
 // A copy goes through tmp-then-rename (`atomicCopyFileSync`) so a concurrent reader of the same
 // destination never sees a partial file (tsk-25b).
-const ATOMIC_TMP_SUFFIX_PATTERN = /\.tmp-\d+-\d+-[a-z0-9]+$/;
+// Two forms: `.tmp-<pid>-<ts>-<rand>` of older releases still on disk, and `.tmp-<uniqueTmpTag()>`
+// (`<pid>-<threadId>-<ts>-<hex>`).
+const ATOMIC_TMP_SUFFIX_PATTERN = /\.tmp-\d+-(?:\d+-){1,2}[a-z0-9]+$/;
 const WINDOWS_RESERVED_BASENAMES = new Set(
   'con prn aux nul com1 com2 com3 com4 com5 com6 com7 com8 com9 lpt1 lpt2 lpt3 lpt4 lpt5 lpt6 lpt7 lpt8 lpt9'.split(' '),
 );
@@ -57,7 +60,7 @@ function atomicCopyFileSync(sourcePath, targetPath) {
   refuseSymlink(sourcePath, SKILL_PATH, { optional: true });
   refuseSymlink(targetPath, SKILL_PATH, { optional: true });
   if (readIfFile(targetPath)?.equals(fs.readFileSync(sourcePath))) return;
-  const tmpPath = `${targetPath}.tmp-${process.pid}-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+  const tmpPath = `${targetPath}.tmp-${uniqueTmpTag()}`;
   fs.copyFileSync(sourcePath, tmpPath);
   try {
     fs.renameSync(tmpPath, targetPath);
@@ -67,7 +70,7 @@ function atomicCopyFileSync(sourcePath, targetPath) {
   }
 }
 
-// An in-flight `*.tmp-<pid>-<ts>-<rand>` file of a concurrent writer is invisible to every walk
+// An in-flight `*.tmp-<tag>` file of a concurrent writer is invisible to every walk
 // below, as it is to the writer's own rename (tsk-25b).
 function isOwnTmpFile(name) {
   return ATOMIC_TMP_SUFFIX_PATTERN.test(name);
@@ -579,7 +582,7 @@ function copyAssembledFile(projectRoot, sourcePath, targetPath) {
   const sourceRelativePath = path.relative(projectRoot, sourcePath).replaceAll('\\', '/');
   const content = withGeneratedHeader(fs.readFileSync(sourcePath, 'utf8'), sourceRelativePath);
   if (readIfFile(targetPath)?.equals(Buffer.from(content))) return;
-  const tmpPath = `${targetPath}.tmp-${process.pid}-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+  const tmpPath = `${targetPath}.tmp-${uniqueTmpTag()}`;
   try {
     fs.writeFileSync(tmpPath, content);
     fs.renameSync(tmpPath, targetPath);
