@@ -8,6 +8,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { spawnSync, execFileSync } from 'node:child_process';
 import crypto from 'node:crypto';
+import { waitForSealChildrenOf } from '../helpers/process-tmp-root.mjs';
 import { releaseBinaryPath } from '../../src/util/release-binary-path.mjs';
 import { releaseTargetForHost } from '../../src/util/release-targets.mjs';
 import { REPO_ROOT, buildRustDistribution, releaseOutputDir } from '../../scripts/build-rust-distribution.mjs';
@@ -21,8 +22,12 @@ export const releaseDirName = (digest) => (process.platform === 'win32' ? digest
  * delete-pending for a moment after the process exits (a closing image handle or an on-access
  * scan), so the removal of its directory fails with ENOTEMPTY or EBUSY; the removal is retried
  * and still throws when the tree cannot be removed.
+ * On every platform a CLI run in the tree (an `fgctl init` tail) hands its event-store publish to a detached
+ * `fgos events sync` child that outlives the command and writes into the state home; the removal first
+ * waits, through the process door and bounded, for the children that name `dir`.
  */
 export function removeTree(dir) {
+  waitForSealChildrenOf(dir);
   fs.rmSync(dir, { recursive: true, force: true, maxRetries: 10, retryDelay: 100 });
 }
 

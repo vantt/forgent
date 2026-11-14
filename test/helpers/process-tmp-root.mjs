@@ -36,10 +36,15 @@ function sealChildrenOf(root) {
   });
 }
 
-function waitForSealChildren(root) {
+/**
+ * Waits, bounded, until no seal or sync child naming one of `dirs` is alive. A test that removes a fixture
+ * before the process ends (a state home an fgctl run just wrote) calls this first: the child it drove
+ * runs from the release under that state home and is still writing into it.
+ */
+export function waitForSealChildrenOf(...dirs) {
   if (!processDoor) return;
   const deadline = Date.now() + SEAL_CHILD_WAIT_MS;
-  const pendingSealChildren = () => [root, ...watchedRoots].flatMap((dir) => sealChildrenOf(dir));
+  const pendingSealChildren = () => dirs.flatMap((dir) => sealChildrenOf(dir));
   try {
     for (let running = pendingSealChildren(); running.length && Date.now() < deadline; running = pendingSealChildren()) {
       const alive = running.filter((view) => view.tuple !== null && processDoor.judge(view.tuple) !== 'dead');
@@ -62,7 +67,7 @@ function installProcessTempRoot() {
   process.env.TMP = root;
   process.env.TEMP = root;
   const removeRoot = () => {
-    waitForSealChildren(root);
+    waitForSealChildrenOf(root, ...watchedRoots);
     if (process.env.FGOS_KEEP_TEST_FIXTURES) return;
     try {
       fs.rmSync(root, { recursive: true, force: true, maxRetries: 3 });
