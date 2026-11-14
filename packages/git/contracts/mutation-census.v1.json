@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "5bd9e35fdc8b3b44baad449498276747415bea03be294f888bc691d30f632c04",
+  "payloadDigest": "bbfe9590d5f60be584c43bc0e82d57bebe63fdf2ef5f84fed25285373b6fff55",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -274,7 +274,7 @@
     "packages/distribution/rust/src/fetch.rs": "0de7abcd5b6057fcc4632637e34c0aafcde121ebbb9dc878682b68bb9c984573",
     "packages/distribution/rust/src/fgctl_refresh.rs": "0dbc9856da60bcc36af414dedba195a7a85bd4ed4def2cb4bd644e1e898337a3",
     "packages/distribution/rust/src/git_gate.rs": "7d50addca54b78ca0b5d6b61c9d857b2de82016a1cc53faefc7c1038da163cba",
-    "packages/distribution/rust/src/init.rs": "e8bc36986d5f158674283d228c1ebb06032d277f72a73c605ae14143f2efd245",
+    "packages/distribution/rust/src/init.rs": "9f49761e1f87c3b9f0e1cec4ac8f63bac7d720e762048ce791ece901df078e57",
     "packages/distribution/rust/src/lib.rs": "fd935ba58547ccd94c001c3cb2281adbdeb19aaa7018dd51f846c2ee66aab667",
     "packages/distribution/rust/src/lock.rs": "ee39bccc87c5b34a7799ee886fe3c4b9f59346f22c550c67123efa49f9681f8e",
     "packages/distribution/rust/src/manifest.rs": "7aa7f3d42c3ac708e44cb0bbf4be36c414eaf0b29f0bdafc5bb768901fb46bda",
@@ -291,10 +291,10 @@
     "packages/distribution/rust/tests/pin_drift.rs": "16fde0d240a0c482bd3cce19602b1d9d009b5fa806bcff997949f324ba02dca2",
     "packages/distribution/rust/tests/schema_golden.rs": "5a819124370a21a3dea2590dddd03b7bc8285fc3031f4920025688378d77c2cf",
     "packages/durable-file/rust/src/beneath.rs": "000b825fddb954f1813e5801d4b91973c2e8c361b9e6dc158fde2f4aff08f413",
-    "packages/durable-file/rust/src/lib.rs": "c9984d4a32aca5bc830bcf18d3d0e37a56ed8fee80cee441fa5085b6b19d1c47",
+    "packages/durable-file/rust/src/lib.rs": "e0ba7f8adbe4d3e40b78865d7fd54299624bfb2f161f2b8a24f2c531165e0f77",
     "packages/durable-file/rust/tests/beneath.rs": "640a72d38f8b5360f3ba8ebf825877742b7f28c64d9c5fde4dcfd6f3bfcc4f59",
     "packages/durable-file/rust/tests/creation_modes.rs": "eaa469ec9d3091c882e3801243b4c7901878ec0243bfb101ea8d42ba9e97e4a7",
-    "packages/durable-file/rust/tests/install.rs": "96c695200ff51256788f0655cf49130420cac48091de1df2d11a9b8d85ac647b",
+    "packages/durable-file/rust/tests/install.rs": "9117ad49f4abb7279c39b4661240126fc27eda2d603e9c6da1e1e6555d930ebc",
     "packages/event-store/rust/build.rs": "e4044e37a23a7776c0a417e384a78276e19f19d8145dc74631caadc86ef62d65",
     "packages/event-store/rust/examples/distribution_digest_audit.rs": "3793a8a4d92cfc469eb3b6220d15b709b662990c801d082870ad1c7fc289f089",
     "packages/event-store/rust/src/append.rs": "bd5d1e59822f6c63b6363f960f7931eedaae1d161655f3263126960356db5670",
@@ -307,7 +307,7 @@
     "packages/event-store/rust/src/export.rs": "ab1df39e8599c8e07bb1c9d9074edf2fb3f3a93f11123c0ee43491d75e0ffc0b",
     "packages/event-store/rust/src/fence.rs": "4e3d66a595506f17e4ca550678290654add6a2d2d4ccc127bc23425a528d69a6",
     "packages/event-store/rust/src/fsio.rs": "a55012db39b1173ced4bb544de964b88e8f3db194927e5e6405100201a3ccdd8",
-    "packages/event-store/rust/src/identity.rs": "2d74d1ed7ad5d5e5eed918cc750aee9323fa13c33efa2257f5e9575a373ce8dc",
+    "packages/event-store/rust/src/identity.rs": "7f1ea9d6a94f891d38e6ce9caa53ac04d35a67c2dadee5a2ae566ed99b19e665",
     "packages/event-store/rust/src/layout.rs": "63a715edf633be8382f1eb1a78740d1403cc9d62b5f2a57430b5027c08b95fc1",
     "packages/event-store/rust/src/legacy.rs": "acd6ea10650e7f962a3f008ba313e3f9c48fb761a96ed40d575839c3cdc68e83",
     "packages/event-store/rust/src/legacy_import.rs": "b71faa2ea980c85836cbf0ca89d8e6880797fda2466d304fb4876b84203296b7",
@@ -328,7 +328,7 @@
     "packages/event-store/rust/src/sync.rs": "9b0fb2973da6205f9aedb3b38049a32f30bc6aed63fa43cb58e461524906f7b3",
     "packages/event-store/rust/src/validation.rs": "9410d9665f97aeadff6eafe8855a92a36f189f3ae5523e39c8e4ece57a266390",
     "packages/event-store/rust/src/walk.rs": "fe1a416da430004395cd486dfcd9a9a0a652c8558f2f8945308e65b5157a6dd8",
-    "packages/event-store/rust/tests/append_recovery.rs": "fa857ceeb7fba8af65f9cc3c73cc9c4e4bcb0f2a4da02a6652b6dcd00ec0c0c3",
+    "packages/event-store/rust/tests/append_recovery.rs": "725fb32795bcbe86266079d5cef2842cac599d183de160e693c2dcd7f2fab63e",
     "packages/event-store/rust/tests/branch_local_refs.rs": "a139b6034b7b9a5fc6fe97592b68d995791157ee9cb39ff3f597e85696132bf8",
     "packages/event-store/rust/tests/checkpoint.rs": "2e326ce391c3feffedc3165cd3b6d792642a6a66883138c8c1f650c2177e6a62",
     "packages/event-store/rust/tests/common/mod.rs": "28583b422378df66aac7a7720dc6e7491bb8e9725570a1061ebb2b2cc139c260",
@@ -2205,23 +2205,23 @@
     },
     {
       "path": "packages/distribution/rust/src/init.rs",
-      "line": 761,
+      "line": 772,
       "spawn": "Command::new",
       "binary": "bin",
       "class": "argv-runner",
-      "resolvedAt": "packages/distribution/rust/src/init.rs:1948"
+      "resolvedAt": "packages/distribution/rust/src/init.rs:1959"
     },
     {
       "path": "packages/distribution/rust/src/init.rs",
-      "line": 761,
+      "line": 772,
       "spawn": "Command::new",
       "binary": "fgos",
       "class": "argv-runner",
-      "resolvedAt": "packages/distribution/rust/src/init.rs:1948"
+      "resolvedAt": "packages/distribution/rust/src/init.rs:1959"
     },
     {
       "path": "packages/distribution/rust/src/init.rs",
-      "line": 1534,
+      "line": 1545,
       "spawn": "Command::new <- packages/process/rust/src/mapped.rs:226",
       "binary": "git",
       "class": "production-sandbox-probe",
@@ -2230,7 +2230,7 @@
     },
     {
       "path": "packages/distribution/rust/src/init.rs",
-      "line": 2767,
+      "line": 2844,
       "spawn": "Command::new",
       "binary": "sh",
       "class": "rust-test"

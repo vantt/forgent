@@ -335,6 +335,26 @@
       "debt": [],
       "retiredBy": "S7: the Node facade and its Node readers retire with the Node payload",
       "reason": "only fgos-identity resolves a writer and decides the launcher environment; the Node facade asks it through the addon, and the files listed read or set these names for their own process"
+    },
+    {
+      "job": "fsync a file or directory from Rust",
+      "kind": "door",
+      "patterns": ["\\bsync_(?:all|data)\\b", "\\blibc::f(?:data)?sync\\b", "F_FULLFSYNC", "FlushFileBuffers", "RENAME_EXCHANGE"],
+      "allowed": [
+        "packages/durable-file/rust/src/lib.rs",
+        { "path": "packages/git/rust/src/restore.rs", "reason": "Git writes the restored worktree files with Git's own durability, behind the Git door" },
+        { "path": "packages/git/rust/src/native_lock.rs", "reason": "Git's own lock file, behind the Git door" },
+        { "path": "packages/git/rust/src/sequence.rs", "reason": "Git's own sequence file, behind the Git door" },
+        { "path": "packages/git/rust/src/repository_config.rs", "reason": "Git's own repository config file, behind the Git door" },
+        { "path": "packages/event-store/rust/src/rotate.rs", "reason": "renames an existing segment; Durable File has no move primitive, and the directory sync goes through the door" },
+        { "path": "packages/event-store/rust/src/identity.rs", "reason": "syncs the ancestors of the store directory before the store identity is installed (the door leaves ancestors to its caller); Event Store keeps its own directory-sync calls at the same points" },
+        { "path": "packages/event-store/rust/src/fsio.rs", "reason": "the trait default of sync_file fsyncs an appended segment through an injectable seam; the door installs whole files" },
+        { "path": "packages/holder-lock/rust/src/tombstone.rs", "reason": "exchanges two directories with RENAME_EXCHANGE; holder-lock is not a Durable File client and the door has no exchange" },
+        { "path": "packages/observe/rust/src/shard.rs", "reason": "appends lines to an existing shard file and syncs it; the door installs whole files" },
+        { "path": "packages/run-supervisor/rust/src/gate.rs", "reason": "rewrites an existing gate-exit file in place because a file bind-mounted read-only into the sandbox cannot be renamed; the door installs by rename" }
+      ],
+      "debt": [],
+      "reason": "fgos-durable-file orders temp, fsync, install and directory fsync; each other file does a different job, named in its reason"
     }
   ],
   "files": {

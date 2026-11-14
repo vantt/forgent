@@ -69,27 +69,17 @@ impl StoreIdentity {
     /// Recovery only: caller must hold event-append and exclude live initializers.
     /// Phase 02 calls this before initialization, never concurrently with publication.
     pub fn sweep_temps_under_append_lock(layout: &Layout) -> Result<(), Error> {
+        fgos_durable_file::sweep_stale_temps(&layout.root).map_err(io)?;
+        let mut removed = false;
         let entries = match fs::read_dir(&layout.root) {
             Ok(entries) => entries,
             Err(e) if e.kind() == std::io::ErrorKind::NotFound => return Ok(()),
             Err(e) => return Err(io(e)),
         };
-        let mut removed = false;
         for entry in entries {
             let entry = entry.map_err(io)?;
-            let name = entry.file_name();
-            if name.to_str().is_some_and(|n| {
-                n.strip_prefix(".durable-file-")
-                    .and_then(|n| n.strip_suffix(".tmp"))
-                    .is_some_and(|n| {
-                        n.split_once('-').is_some_and(|(pid, seq)| {
-                            !pid.is_empty()
-                                && !seq.is_empty()
-                                && pid.bytes().all(|b| b.is_ascii_digit())
-                                && seq.bytes().all(|b| b.is_ascii_digit())
-                        })
-                    })
-            }) || name
+            if entry
+                .file_name()
                 .to_str()
                 .and_then(|n| n.strip_prefix("store."))
                 .and_then(|n| n.strip_suffix(".tmp"))

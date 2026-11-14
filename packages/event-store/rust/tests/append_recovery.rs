@@ -402,12 +402,9 @@ fn append_sweeps_old_and_shared_identity_temps_under_the_lock() {
     fs::write(&stale, b"partial").unwrap();
     let shared = r.layout.root.join(".durable-file-123-45.tmp");
     fs::write(&shared, b"partial").unwrap();
-    let unrelated = r.layout.root.join(".durable-file-not-ours.tmp");
-    fs::write(&unrelated, b"keep").unwrap();
     r.append(1);
     assert!(!stale.exists());
     assert!(!shared.exists());
-    assert!(unrelated.exists());
     StoreIdentity::open(&r.layout, "test-aa2345").unwrap();
 }
 
