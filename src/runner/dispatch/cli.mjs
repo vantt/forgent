@@ -21,7 +21,7 @@ import { commandCli } from './provider-capacity.mjs';
 import { decideCommand } from './decide.mjs';
 import { executeAssignment } from './assignment-runner.mjs';
 import { adoptRun } from '../../run-supervisor/client.mjs';
-import { runAccountProbe } from './provider-account-probe.mjs';
+import { ACCOUNT_PROBE_LEGS, runAccountProbe, runAccountSweep } from './provider-account-probe.mjs';
 import { runSessionProbe } from './provider-session-probe.mjs';
 import { createCredentialRenewal } from './provider-credential-renewal.mjs';
 import { createRoundTerminalControl } from './terminal-slot.mjs';
@@ -133,10 +133,10 @@ function withAddDirs(args, directories) {
  * Body of `node src/runner/dispatch.mjs <decide|probe-account|reconcile> ...`, called from the
  * barrel's script guard; `fgos dispatch decide|probe-account` reach it with `returnResult`.
  * `resolveWork` is the Work lookup `decide --work` needs, handed in by bin; without it
- * `decide --work` refuses. `executionDoor` is the execution door `probe-session` runs its seat through, handed in by bin
+ * `decide --work` refuses. `accountProbeDoors` replaces `probe-account`'s direct call, account lock, capacity record and runner config (tests). `executionDoor` is the execution door `probe-session` runs its seat through, handed in by bin
  * for the same reason (Dispatch sits below Execution and never imports it); without it `probe-session` refuses.
  */
-export async function runDispatchCli(argv = process.argv.slice(2), { returnResult = false, resolveWork, executionDoor } = {}) {
+export async function runDispatchCli(argv = process.argv.slice(2), { returnResult = false, resolveWork, executionDoor, accountProbeDoors = {} } = {}) {
   const [subcommand, ...afterSubcommand] = argv;
   // Purpose-based binding (tsk-2c1): a caller with no pre-registered
   // executorId to name (a gather branch) passes `--for <purpose>` instead
@@ -185,12 +185,21 @@ export async function runDispatchCli(argv = process.argv.slice(2), { returnResul
       break;
     }
     case 'probe-account': {
-      // Diagnostic: every CLI of one provider account at the same moment, through the real dispatch door.
+      // Diagnostic: the account's own login called directly, then every CLI of one provider account at the
+      // same moment through the real dispatch door; `--all` does that for every enabled account.
       try {
         const provider = flagValue('--provider');
         const accountId = flagValue('--account');
-        if (!provider || !accountId) {
-          throw new StoreError('validation', 'dispatch probe-account requires --provider <provider> --account <accountId>');
+        const all = rest.includes('--all');
+        if (all) {
+          const narrowed = ['--provider', '--account', '--executor', '--invocation'].filter((name) => rest.includes(name));
+          if (narrowed.length) throw new StoreError('validation', `dispatch probe-account --all probes every account and cannot be narrowed by ${narrowed.join(', ')}`);
+        } else if (!provider || !accountId) {
+          throw new StoreError('validation', 'dispatch probe-account requires --provider <provider> --account <accountId>, or --all');
+        }
+        const leg = flagValue('--leg') ?? 'both';
+        if (!ACCOUNT_PROBE_LEGS.includes(leg)) {
+          throw new StoreError('validation', `dispatch probe-account --leg must be one of ${ACCOUNT_PROBE_LEGS.join(', ')}, got ${JSON.stringify(leg)}`);
         }
         const cwd = path.resolve(flagValue('--cwd') ?? flagValue('--dir') ?? process.cwd());
         const repoRoot = path.resolve(flagValue('--repo-root') ?? resolveMainCheckoutRoot(cwd) ?? resolveRepoRoot(cwd));
@@ -198,12 +207,11 @@ export async function runDispatchCli(argv = process.argv.slice(2), { returnResul
         const fgosDir = fgosDirFromRoot(repoRoot);
         const invocationFlag = flagValue('--invocation');
         const herdrBin = resolveHerdrBin();
-        const result = await runAccountProbe({
-          cfg: loadRunnerConfigForDir(repoRoot),
-          provider,
-          accountId,
-          executorId: flagValue('--executor') ?? null,
-          invocationIds: invocationFlag ? invocationFlag.split(',').map((s) => s.trim()).filter(Boolean) : null,
+        const { cfg: injectedCfg, ...injectedDoors } = accountProbeDoors;
+        const probeDoors = {
+          ...injectedDoors,
+          leg,
+          record: rest.includes('--record'),
           repoRoot,
           timeoutMs: positiveIntFlag('--timeout-ms'),
           createAssignment: (contract) => claimAssignmentId(() => buildAssignment({
@@ -234,7 +242,18 @@ export async function runDispatchCli(argv = process.argv.slice(2), { returnResul
             } catch { /* a pane that cannot be closed stays open */ }
             return closed;
           },
-        });
+        };
+        const cfg = injectedCfg ?? loadRunnerConfigForDir(repoRoot);
+        const result = all
+          ? await runAccountSweep({ cfg, ...probeDoors })
+          : await runAccountProbe({
+            cfg,
+            provider,
+            accountId,
+            executorId: flagValue('--executor') ?? null,
+            invocationIds: invocationFlag ? invocationFlag.split(',').map((s) => s.trim()).filter(Boolean) : null,
+            ...probeDoors,
+          });
         if (returnResult) return result;
         process.stdout.write(`${JSON.stringify(result)}\n`);
       } catch (err) {
@@ -293,7 +312,7 @@ export async function runDispatchCli(argv = process.argv.slice(2), { returnResul
       break;
     }
     default: {
-      const msg = `unknown subcommand ${JSON.stringify(subcommand)}. Usage: node src/runner/dispatch.mjs decide <executorId> [--has-live-task-access] | decide --for <purpose> [--needs-soul] [--has-live-task-access] | decide --needs-soul [--has-live-task-access] | reconcile <runDir> | probe-account --provider <provider> --account <accountId> [--executor <id>] [--invocation <id,...>] [--timeout-ms <ms>] | probe-session <executorId> [--invocation <id>]. To run a task: fgos run "<prompt>"; decide --work: fgos dispatch decide --work <workId>\n`;
+      const msg = `unknown subcommand ${JSON.stringify(subcommand)}. Usage: node src/runner/dispatch.mjs decide <executorId> [--has-live-task-access] | decide --for <purpose> [--needs-soul] [--has-live-task-access] | decide --needs-soul [--has-live-task-access] | reconcile <runDir> | probe-account (--provider <provider> --account <accountId> [--executor <id>] [--invocation <id,...>] | --all) [--leg direct|harness|both] [--record] [--timeout-ms <ms>] | probe-session <executorId> [--invocation <id>]. To run a task: fgos run "<prompt>"; decide --work: fgos dispatch decide --work <workId>\n`;
       if (returnResult) throw new StoreError('validation', msg.trim());
       process.stderr.write(msg);
       process.exitCode = 1;
