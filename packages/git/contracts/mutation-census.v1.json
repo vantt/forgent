@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "c4561f8a41eaa82320a5ed2681f5086a1c5ecce6265a53f530de14a069183b77",
+  "payloadDigest": "2153cc38f504921e5827d9cf6ed5e5d4d5b95186066a9efca2d4dda7a3f89324",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -281,7 +281,7 @@
     "packages/distribution/rust/src/shim.rs": "28c0bacf1c2b9b29c157a6a5d0c4538db4ccbec8eddeb72235911dd6cab15a9c",
     "packages/distribution/rust/src/store.rs": "1cdaf72bbdf7c4bc0ae3eafd1f37fecd6a358de60c8ce5851ccf9212149174de",
     "packages/distribution/rust/src/suggest.rs": "302d698667662b3544b0761cd53dd87c68594d6f1b1ce52d8b85032627d52182",
-    "packages/distribution/rust/src/uninstall.rs": "1aed5db959f670494481c4d558852fa56cc579f97ba380f9a1fc16683fc6bd02",
+    "packages/distribution/rust/src/uninstall.rs": "9e8e8e3a1fed5f0f297ef959be5398bc60cea023ef37a2fe842484eb96c9e515",
     "packages/distribution/rust/src/verify.rs": "79a9f08e75d0c0ca8f5e04ad8443e4134a3dfbd85a38e01a448d53361463dc69",
     "packages/distribution/rust/src/workspace.rs": "fd91502f00f1de16a71d3c8bb386e5a840c46e7c10bf948a65b04ecdca6b594b",
     "packages/distribution/rust/tests/activation_lock_multiprocess.rs": "ff2818dd10b745ac29c1610effd95ac36552f4aace4525634c6b20f17f325fe0",
@@ -447,7 +447,7 @@
     "packages/holder-lock/rust/src/route/hold.rs": "6e20ff0d4242c310b07858fc399fb7701ea986568eb94a4a07e32f3b0b2b34d7",
     "packages/holder-lock/rust/src/scope.rs": "5a0801ddce1254184c408c1f2d95b30450b0e065d12bbace30b1b70fa2507a07",
     "packages/holder-lock/rust/src/semantics.rs": "cfb5e67d996db60f4493678cf1dbb2898c4d1028f6e6102d3c026dddd6763e91",
-    "packages/holder-lock/rust/src/state_root.rs": "e1f212f2486da09f62ea68fff9ed08a42788319601946ed8fa3347f7f8539b6f",
+    "packages/holder-lock/rust/src/state_root.rs": "3495be27ddd89e8fed9e05053bf1731a87054da8c472a6772cf8f51fc1b3e94a",
     "packages/holder-lock/rust/src/tombstone.rs": "c83051cd8c7d405264deb827fb09997060edabeeee57ef6c1347bfc27b7ecd21",
     "packages/holder-lock/rust/tests/borrow_git.rs": "f073459db20415fb10aad535ee84e41d13e6b6e94cdf01b1ba437a9b29bcf5bf",
     "packages/holder-lock/rust/tests/borrow_io.rs": "73c1bf13cd2ba16d31d9c91ccb4cc3c8dda7d9e699acf5713eea4fc3e0b26f9f",

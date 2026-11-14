@@ -44,6 +44,21 @@ pub fn state_root() -> (PathBuf, Source) {
     state_root_from(|key| std::env::var(key).ok())
 }
 
+/// The home directory the state root falls back to: `HOME`, then `USERPROFILE`, on every
+/// platform, with the input that supplied it. `HOME` set to the empty string is set.
+/// Anything that must protect or sit beside the state root uses this rule, not its own.
+pub fn home_from(get: impl Fn(&str) -> Option<String>) -> Option<(PathBuf, Source)> {
+    if let Some(home) = get("HOME") {
+        return Some((PathBuf::from(home), Source::Home));
+    }
+    get("USERPROFILE").map(|profile| (PathBuf::from(profile), Source::Userprofile))
+}
+
+/// [`home_from`] over this process's environment, without the source.
+pub fn home_for_state_root() -> Option<PathBuf> {
+    home_from(|key| std::env::var(key).ok()).map(|(home, _)| home)
+}
+
 /// Creates the state root (and any missing parent) when absent, owner-only on
 /// Unix whatever the process umask, so the Git door's trust check accepts it.
 /// An existing directory is left exactly as it is.
@@ -78,14 +93,8 @@ pub fn state_root_from(get: impl Fn(&str) -> Option<String>) -> (PathBuf, Source
     if let Some(xdg) = non_blank("XDG_STATE_HOME") {
         return (PathBuf::from(xdg).join("fgos"), Source::XdgStateHome);
     }
-    if let Some(home) = get("HOME") {
-        return (PathBuf::from(home).join(".local/state/fgos"), Source::Home);
-    }
-    if let Some(profile) = get("USERPROFILE") {
-        return (
-            PathBuf::from(profile).join(".local/state/fgos"),
-            Source::Userprofile,
-        );
+    if let Some((home, source)) = home_from(&get) {
+        return (home.join(".local/state/fgos"), source);
     }
     (PathBuf::from(".local/state/fgos"), Source::RelativeFallback)
 }
