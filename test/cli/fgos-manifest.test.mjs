@@ -41,8 +41,8 @@ function dispatchedVerbs() {
   // Bounded to runVerb's own body (up to the next top-level function) so a
   // `case '<verb>':` label elsewhere in the file can never register as a
   // phantom dispatched verb.
-  const switchEnd = source.indexOf('\nfunction publicManifestEntries(', switchStart);
-  assert.ok(switchEnd > switchStart, 'publicManifestEntries() not found after runVerb() — drift guard bound moved.');
+  const switchEnd = source.indexOf('\nfunction renderPlanLintReport(', switchStart);
+  assert.ok(switchEnd > switchStart, 'renderPlanLintReport() not found after runVerb() — drift guard bound moved.');
   const body = source.slice(switchStart, switchEnd);
   const verbs = [...body.matchAll(/^\s{4}case '([a-z0-9-]+)':/gm)].map((m) => m[1]);
   assert.ok(verbs.length > 0, 'no `case \'<verb>\':` lines found — drift guard regex needs updating.');

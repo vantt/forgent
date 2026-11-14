@@ -11,6 +11,8 @@ import { COMMAND_REGISTRY, HELP_SELECTORS } from '../../src/cli/command-registry
 import {
   DEFAULT_ANNOTATIONS_PATH,
   DEFAULT_ROUTES_PATH,
+  DEFAULT_MANIFEST_PATH,
+  checkCommandManifest,
   generateCommandRoutes,
   checkCommandRoutes,
   loadAnnotations,
@@ -169,6 +171,35 @@ test('drift detection: mutated copy of committed file fails --check', () => {
         return true;
       }
     );
+  } finally {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
+});
+
+test('the committed command manifest is the exact stdout of `fgos --help --json`, and a stale copy fails --check naming that file', () => {
+  const help = execFileSync('node', [path.join(REPO_ROOT, 'bin/fgos.mjs'), '--help', '--json'], { cwd: REPO_ROOT, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
+  assert.equal(fs.readFileSync(DEFAULT_MANIFEST_PATH, 'utf8'), help);
+  assert.equal(checkCommandManifest({ manifestPath: DEFAULT_MANIFEST_PATH }).clean, true);
+
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'manifest-drift-test-'));
+  try {
+    const stale = path.join(tmpDir, 'command-manifest.json');
+    const manifest = JSON.parse(help);
+    manifest.commands[0].description = 'stale';
+    fs.writeFileSync(stale, JSON.stringify(manifest, null, 2) + '\n', 'utf8');
+    assert.equal(checkCommandManifest({ manifestPath: stale }).clean, false);
+    assert.throws(
+      () => execFileSync('node', [EXPORT_SCRIPT, '--check', '--manifest', stale], { cwd: REPO_ROOT, encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'] }),
+      (err) => {
+        assert.notEqual(err.status, 0);
+        assert.match(err.stderr, /Command manifest drift detected/);
+        assert.ok(err.stderr.includes(stale), 'the drifted file is named');
+        assert.doesNotMatch(err.stderr, /Command routes drift detected/);
+        return true;
+      },
+    );
+    const missing = path.join(tmpDir, 'absent.json');
+    assert.match(checkCommandManifest({ manifestPath: missing }).summary, /does not exist/);
   } finally {
     fs.rmSync(tmpDir, { recursive: true, force: true });
   }

@@ -2731,3 +2731,26 @@ export const COMMAND_REGISTRY = [
     deprecated: null,
   }),
 ];
+
+/**
+ * The public verb manifest: the registry projected to the fields `fgos --help --json` prints. It is
+ * never wrapped in the fgos.v1 envelope; it describes the CLI's own verb surface, not a verb's data.
+ */
+export function publicManifest() {
+  return {
+    schema_version: MANIFEST_SCHEMA_VERSION,
+    commands: COMMAND_REGISTRY.map(({ name, invoke, description, parameters, examples, subcommands, guide, touchesState, externalEffect, paginated, deprecated }) => ({
+      name,
+      invoke,
+      description,
+      parameters,
+      examples,
+      ...(subcommands ? { subcommands } : {}),
+      ...(guide ? { guide } : {}),
+      touchesState,
+      externalEffect,
+      paginated,
+      deprecated,
+    })),
+  };
+}
