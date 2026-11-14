@@ -23,6 +23,7 @@ Impact analysis (as phase 01) on `resolveCapabilityDetailsFromHints`, `resolveEx
 1. `src/runner/dispatch/resolve.mjs` `resolveCapabilityDetailsFromHints` (lines 28-133): drop the local
    `capabilities` object.
    - `resolveAlias(name)`: non-string passes through; else `registeredCapabilityOf(cfg, name) ?? name`.
+     Differs only for the plan.md Intended deltas (prototype names, non-object entries, string `aliases`).
    - Capabilities preferring this executor (66-71): `capabilityNamesOf(cfg)` filtered by
      `const p = preferOf(cfg, name); p && (p === executorId || (resolvedExecutor && cfg?.executors?.[p] === resolvedExecutor))`
      — same predicate, same iteration order.
@@ -31,14 +32,25 @@ Impact analysis (as phase 01) on `resolveCapabilityDetailsFromHints`, `resolveEx
 2. `resolve.mjs:237-238` `resolveExecutorAndOverrides`: `const preferred = preferOf(cfg, executorIdOrPurpose);`.
    Rest unchanged (still `normalizePreferCandidates` from `config.mjs`).
 3. `src/runner/dispatch/plan.mjs:22-32`: delete `isKnownCapabilityName` and its comment; the `capability.unknown`
-   check (line 492) becomes `registeredCapabilityOf(cfg, purpose) === undefined` (identical predicate:
-   own key or alias).
+   check (line 492) becomes `registeredCapabilityOf(cfg, purpose) === undefined` (own key or array alias;
+   differs only for the Intended deltas).
 4. `src/runner/dispatch/confinement/request.mjs:315-337`: `capConfinement`, `skillConfinement` and the fallback
    anchor read through `capabilityConfinementOf(cfg, …)`. Error texts unchanged.
-5. `src/runner/dispatch/config.mjs` load validator: `checkPreferTargets` (701), `checkConfinementAgainstPolicies`
-   (732-756) and `validateRunnerConfigShape` (769-773) iterate `Object.entries(catalogOf(cfg))`. It stays the
-   Config load check (shape only); it acts on no field's meaning. Error texts unchanged.
-6. `src/runner/work-dispatch.mjs:448-452`: rewrite the stale comment ("bind() falls back to the bare verb…"; the
+5. `src/runner/dispatch/config.mjs` load validator asks the port, never the section (no `catalogOf`):
+   - `checkCapabilityEntry` (562-570): taste keys from `bindingTasteOf(cfg)[name].{roles,personas,seats}` keys;
+     confinement shape from `capabilityConfinementOf(cfg, name)`. Iterate `capabilityNamesOf(cfg)`.
+   - the capability name set (769-773) is gone: `tools` keys and `for` entries are checked with
+     `registeredCapabilityOf(cfg, x) !== undefined` (same membership: key or alias).
+   - `checkPreferTargets` (699-721): prefer sites from `bindingTasteOf(cfg)` (capability `prefer`, then each
+     `roles`/`personas`/`seats` scope `prefer`, same order and the same label strings as `preferSitesOf`);
+     `preferSitesOf` is deleted. `normalizePreferCandidates` stays in `config.mjs` (it normalizes a value, it reads
+     no section).
+   - `checkConfinementAgainstPolicies` (732-756): names from `capabilityNamesOf`, values from `capabilityConfinementOf`;
+     the strict "no capabilities declared" test is `capabilityNamesOf(cfg).length === 0`.
+   - Error texts unchanged. The config door has already refused every schema violation before this runs
+     (`config.mjs:759-763`), so for every input it can see the reads are identical; the harness feeds this
+     validator only schema-valid inputs (standard, repo, schema-valid part of the matrix) and says so.
+6. `src/runner/work-dispatch.mjs:449-453`: rewrite the stale comment ("bind() falls back to the bare verb…"; the
    fallback was removed in 3133ed474): say the qualified name is what the Workflow units declare, and a config
    that declares only the bare verb has no entry for it. Comment only, no code change.
 
@@ -65,7 +77,7 @@ node scripts/run-tests.mjs test/runner/dispatch.test.mjs test/runner/dispatch-pl
   test/runner/dispatch-confinement-p04.test.mjs test/runner/dispatch-confinement-p05.test.mjs \
   test/runner/dispatch-confinement-backend-p03.test.mjs test/runner/dispatch-confinement-blind.test.mjs \
   test/runner/dispatch-confinement-machine-private.test.mjs test/runner/dispatch-confinement-policies.test.mjs \
-  test/runner/dispatch-config-patterns.test.mjs test/runner/cli-spawn-reconciliation.test.mjs \
+  test/runner/dispatch-config-patterns.test.mjs test/runner/tier-fallback-config.test.mjs test/setup/runner-config-conversion.test.mjs test/runner/cli-spawn-reconciliation.test.mjs \
   test/runner/credential-store.test.mjs test/runner/provider-per-cli-credential-sources.test.mjs \
   test/runner/work-unit-for.test.mjs test/runner/spawn-worker.test.mjs test/runner/operation-choice.test.mjs \
   test/runner/assignment-provenance.test.mjs test/runner/assignment-dispatch.test.mjs test/runner/work-path-case-admission.test.mjs \
@@ -79,19 +91,20 @@ Rust: not touched.
 
 ## Net size
 
-src: −~20 (local alias/known-name copies deleted, inline reads become calls). Tests: 0.
+src: −~30 (alias/known-name copies, `preferSitesOf` and the name set deleted; inline reads become calls). Tests: 0.
 
 ## Risks
 
 | Risk | L x I | Mitigation |
 |---|---|---|
 | `config.mjs` gains an import the import-graph test pins | M x M | `dispatch-reconciliation-import-graph.test.mjs`; the port is a leaf with one kernel import |
-| Alias/own-key semantics drift in purpose resolution | L x H | identical predicate; equivalence script compares `resolveCapabilityDetailsFromHints` and `resolveExecutorAndOverrides` for every name and executor |
+| Alias/own-key semantics drift in purpose resolution | L x H | harness compares `resolveCapabilityDetailsFromHints`, `resolveExecutorAndOverrides`, `compileDispatchPlan` for every name, executor and prototype probe; only allowlisted deltas pass |
+| Validator prefer labels change | M x M | label strings rebuilt in the same order; `dispatch-config-patterns.test.mjs`, `tier-fallback-config.test.mjs`, harness error-text compare |
 | Someone "fixes" the string-only reverse match here | M x H | requirement 1 states it is kept; the fix is step 2's (behaviour change) |
 
 ## Rollback
 
-Revert the phase commit.
+Revert the phase merge (plan.md Rollback).
 
 ## Success criteria
 

@@ -11,31 +11,27 @@ parallel_with: [02, 03, 04]
 
 ## Context
 
-Port exists (phase 01). Read `plan.md` census rows 28-31. `verifyCommandOf` (`src/runner/execution/loops/verify.mjs:17`)
-keeps its name and signature in phase 02, so this phase may call it while 02 runs.
+Port exists (phase 01). Read `plan.md` census rows 28-31 and Intended deltas.
 `bin/fgos.mjs` static imports are pinned by `test/architecture.test.mjs:1743-1839` (`ARM_STATIC_IMPORTS`, a list
 that only shrinks): bin must load the port with `await import()` inside the `plan-lint` case (`runVerb` is async,
 `bin/fgos.mjs:878`), never a new static import.
-Impact analysis (as phase 01) on `proposeCase` (or the function holding `propose.mjs:449`),
+Impact analysis (as phase 01) on the function holding `propose.mjs:449`,
 `lintPhaseUnits`, `lintPlanCapabilityAnnotations`, `isCapabilityDeclared` (plan-lint's local one).
 
 ## Requirements
 
-1. `src/workflow/propose.mjs:449`: `!verifyCommandOf({ capability: 'code:implement' }, runnerConfig)` (import from
-   `../runner/execution/loops/verify.mjs`). The proposal now asks the same reader the gate it predicts uses
-   (`src/workflow/case-gate.mjs:66`). Intended edge change, recorded in the report: a whitespace-only
-   `verify` was "declared" for the proposal but refused by the gate; now both refuse it with `gate-command-missing`.
-   No shipped or repo config declares `verify`, so the equivalence run is unaffected.
+1. `src/workflow/propose.mjs:449`: `!capabilityVerifyOf(runnerConfig, 'code:implement')` — the same truthy test as
+   today (a whitespace-only `verify` still counts as declared here; aligning it with the gate is an idea in
+   plan.md, not this step).
 2. `src/report/capability-plan-lint.mjs`:
    - local `isCapabilityDeclared(cap, catalog)` (135-143): the list/Set branch stays (it checks a caller's name
-     list, not the config); the object branch becomes `isCapabilityDeclared(config, cap) || registeredCapabilityOf(config, cap) !== undefined`
-     from the port (exact, `<prefix>:*`, alias — same rule). Rename the local function if the name clashes.
-   - 478: drop the three-way `catalog` expression; with a config object, ask the port (`catalogOf` precedence
-     `capabilities` then `runner.capabilities` equals today's for every caller: bin passes the flat runner
-     section, tests pass `{ runner: { capabilities } }`); with no config, skip the check as today. The branch
-     that treated a config with neither key as a raw catalog has no caller (bin always passes the merged
-     runner section, which carries the standard's `capabilities`); delete it and say so in the report.
-   - 631: `options.registeredCapabilities ?? (options.config ? capabilityNamesOf(options.config) : [])`.
+     list, not the config); the object branch becomes `isCapabilityDeclared(runner, cap) || registeredCapabilityOf(runner, cap) !== undefined`
+     from the port (exact, `<prefix>:*`, alias; differs only for the Intended deltas). Rename the local function if the name clashes.
+   - 478: `const runner = config?.runner ?? config` (no `.capabilities` touch; `runner` wins when both exist, as
+     today); check registration through the port when `config` is a non-null object, skip when absent (as today).
+     The raw-catalog branch is deleted (plan.md Intended deltas, with the caller evidence). Record in the report
+     that `{runner:{}}` (no catalog) now flags every unit instead of skipping; no caller passes it.
+   - 631: `options.registeredCapabilities ?? (options.config ? capabilityNamesOf(options.config) : [])` (flat, as today).
 3. `bin/fgos.mjs` `plan-lint` (2358-2359, 2399): inside the case,
    `const { capabilityNamesOf, capabilityDescriptionOf } = await import('../src/runner/execution/capability-config.mjs');`
    `registered = capabilityNamesOf(cfg)`; unit `description: capabilityDescriptionOf(cfg, cap)` for a non-null
@@ -61,7 +57,7 @@ node scripts/run-tests.mjs test/workflow/propose.test.mjs test/workflow/propose-
   test/architecture.test.mjs
 node scripts/doc-health.mjs
 node scripts/check-decision-citation-drift.mjs
-npm run fgos:dev -- plan-lint plans/261114-2051-capability-reads-one-door --json   # same units/descriptions as base
+npm run fgos:dev -- plan-lint plans/261001-0327-request-to-run-p2-runnable-plans --json   # exists at base too; JSON equal to the base run
 ```
 Plus `rg -l "workflow/propose.mjs|capability-plan-lint.mjs|bin/fgos.mjs" test`.
 Rust: not touched.
@@ -80,9 +76,9 @@ src: −~10. Tests: 0.
 
 ## Rollback
 
-Revert the phase commit.
+Revert the phase merge (plan.md Rollback).
 
 ## Success criteria
 
 `rg "\.capabilities\b" src/workflow src/report bin` finds no runner-config read; gates green; plan-lint JSON
-identical to base for this plan directory.
+identical to base for `plans/261001-0327-request-to-run-p2-runnable-plans`.

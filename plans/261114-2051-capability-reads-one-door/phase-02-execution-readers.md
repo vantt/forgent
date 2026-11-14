@@ -23,11 +23,10 @@ prefix inheritance), a blank command is no command. Impact analysis as in phase 
 1. `src/runner/execution/loops/verify.mjs:17-20` `verifyCommandOf(unit, cfg)`:
    `const command = unit?.verify || capabilityVerifyOf(cfg, unit?.capability);` — rest unchanged. Export name
    and signature unchanged (phase 05 and `case-gate.mjs` call it).
-2. `src/runner/execution/legacy-seat-read.mjs:47`: `...(capabilityMinCheckersOf(cfg, unit?.capability, { inherit: false })?.minCheckers || [])`.
+2. `src/runner/execution/legacy-seat-read.mjs:47`: `...(ownMinCheckersOf(cfg, unit?.capability) || [])`.
    The decoder reads a stored snapshot (`configSnapshot.runner`), exact key only, as today.
-3. `src/runner/execution/run.mjs:100` `snapshotRunnerConfig`: `capabilities: catalogOf(cfg)`. The recorded
-   object and its hash must be byte-identical for any config the loader returns (`cfg.capabilities || {}` vs
-   `catalogOf`: both give the declared object, `{}` when absent).
+3. `src/runner/execution/run.mjs:100` `snapshotRunnerConfig`: `capabilities: catalogOf(cfg) || {}`. The recorded
+   object and its hash must be byte-identical for any config the loader returns (`catalogOf(cfg) || {}` is `cfg.capabilities || {}`: `catalogOf` returns the raw value).
 
 ## Files
 
@@ -64,12 +63,12 @@ src: ~0 (three expressions swap, three import lines added). Tests: 0.
 
 | Risk | L x I | Mitigation |
 |---|---|---|
-| Snapshot hash changes and old records look drifted | L x H | `config-snapshot-hash.test.mjs`; equivalence script compares the record hash of both configs (phase 06 run) |
-| Prefix inheritance creeps into verify | L x M | `capabilityVerifyOf` is exact-key by contract (phase 01 test) |
+| Snapshot hash changes and old records look drifted | L x H | `config-snapshot-hash.test.mjs`; the harness compares the `snapshotRunnerConfig` hash for every input (phase 01 req 9) |
+| Prefix or nested inheritance creeps into the host-run verify | L x H | `capabilityVerifyOf` is exact-key and flat-only by contract (phase 01 test); harness matrix has `verify` on `code:*` and nested |
 
 ## Rollback
 
-Revert the phase commit; nothing persisted changes shape.
+Revert the phase merge (plan.md Rollback); nothing persisted changes shape.
 
 ## Success criteria
 

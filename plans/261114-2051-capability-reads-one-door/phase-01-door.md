@@ -1,8 +1,8 @@
 ---
 phase: 01
-title: "Door: the capability read port, crate slice, persona, rigor, minCheckers, aliases"
+title: "Door: the capability read port, crate slice, persona, rigor, minCheckers, aliases; equivalence harness"
 status: pending
-effort: 3h
+effort: 4h
 depends_on: []
 ---
 
@@ -10,107 +10,139 @@ depends_on: []
 
 ## Context
 
-Read first: `plan.md` (census, field table), `docs/platform/seat-binding/spec.md` §3, §6.2-6.4, §16;
-`src/runner/execution/bind.mjs`, `seat-resolver.mjs:70-160`, `seat-policy.mjs`; `src/runner/dispatch/config.mjs:370-380`.
+Read first: `plan.md` (Facts, Census, Field ownership, Section rule, Intended deltas);
+`docs/platform/seat-binding/spec.md` §3, §6.2-6.4, §16; `src/runner/execution/bind.mjs`,
+`seat-resolver.mjs:70-160`, `seat-policy.mjs`; `src/runner/dispatch/config.mjs:370-380`.
 Worktree: linked worktree on branch `capability-reads-one-door` from `origin/main` (the big lead creates it).
-Impact analysis: run `fgos tool query --capability impact-analysis --status present`; if present, run
-`impact` upstream on `capabilityEntriesOf`, `capabilityRigorOf`, `registeredCapabilityOf`, `seatConfigOf`,
-`deriveOperationCapability` and record blast radius in the phase report; if inactive or stale, say so and
-cross-check with `rg`.
+Impact analysis: `fgos tool query --capability impact-analysis --status present`; if present, run `impact`
+upstream on `capabilityEntriesOf`, `capabilityRigorOf`, `registeredCapabilityOf`, `seatConfigOf`,
+`resolvePersona`, `deriveOperationCapability` and record the blast radius in the phase report; if inactive or
+stale, say so and cross-check with `rg`.
 
 ## Requirements
 
-1. New module `src/runner/execution/capability-config.mjs`: pure (no I/O, no clock), header
-   `// Architecture guard: pure. The only module that reads runner.capabilities.`; imports only
-   `../rigor.mjs`. It is the one reader of every capability field (plan.md "Field ownership").
-2. Exports (each replaces existing inline code; no other export):
+1. New module `src/runner/execution/capability-config.mjs`: pure (no I/O, no clock), header comment
+   `// Architecture guard: pure. The only module that reads runner.capabilities; it answers per field and never
+   returns an entry object.` It imports only `../rigor.mjs`. The header names the two section rules (below).
+2. Section rules (plan.md "Section rule"):
+   - flat: `runner.capabilities`, own keys only (`Object.hasOwn`). Used by every function except the five below.
+   - `entriesOf(cfg, cap)` (private; today's `capabilityEntriesOf`, moved verbatim incl. its
+     `cfg.capabilities ?? cfg.runner?.capabilities` tolerance, own keys, non-null object values): exact, then
+     `<prefix>:*` (text before the first colon; no prefix line without a colon; never the bare verb).
+     Used by `capabilityPersonaOf`, `capabilityRigorOf`, `minCheckersOf`, `isCapabilityDeclared`, `hasPreferPool`.
+3. Exports (each replaces existing inline code; no other export):
 
-| Export | Semantics (must equal today's) | Replaces |
+| Export | Semantics | Replaces |
 |---|---|---|
-| `catalogOf(cfg)` | `cfg.capabilities ?? cfg.runner?.capabilities`; `{}` when not a plain object | section access in the validator and the run record (callers switch in 03, 02) |
-| `capabilityNamesOf(cfg)` | `Object.keys(catalogOf(cfg))` | enumeration sites (03, 04, 05) |
-| `hasCapabilityEntry(cfg, name)` | own key with a truthy value | `operation-capability.mjs:26`, `resolve.mjs:113` |
-| `isCapabilityDeclared(cfg, cap)` | exact or `<prefix>:*` object entry exists | `registrations.mjs:1919` |
-| `registeredCapabilityOf(cfg, name)` | moved verbatim from `config.mjs:375-379` | — |
-| `capabilityPersonaOf(cfg, cap)` | first of exact, `<prefix>:*` with a truthy `persona` -> `{ persona, key }`, else `null` | `bind.mjs:72` |
+| `catalogOf(runner)` | raw `runner?.capabilities` value (may be undefined or any value) | `run.mjs:100` (as `catalogOf(cfg) \|\| {}`, byte-identical to `cfg.capabilities \|\| {}`); presence test of doctor rows 25-26 |
+| `capabilityNamesOf(runner)` | own keys of the flat section; `[]` when it is not a non-null object | enumeration sites |
+| `hasCapabilityEntry(runner, name)` | own key whose value is a non-null object (arrays count, as the doctor rows treat them today) | `operation-capability.mjs:26`, `resolve.mjs:113`, doctor rows 25-26 skip/malformed test |
+| `isCapabilityDeclared(cfg, cap)` | `entriesOf(cfg, cap).length > 0` | `registrations.mjs:1919`; plan-lint (with `registeredCapabilityOf`) |
+| `registeredCapabilityOf(runner, name)` | `name` when `hasCapabilityEntry`, else the first key (insertion order) whose entry has `Array.isArray(aliases) && aliases.includes(name)`, else `undefined` | moved from `config.mjs:375-379`; replaces `resolveAlias`, `isKnownCapabilityName`, the validator's name set |
+| `capabilityPersonaOf(cfg, cap)` | first of `entriesOf` with a truthy `persona` -> `{ persona, key }`, else `null` | `bind.mjs:72` |
 | `capabilityRigorOf(cfg, cap)` | moved verbatim from `seat-resolver.mjs:91-97` (RangeError text unchanged) | — |
-| `capabilityMinCheckersOf(cfg, cap, { inherit = true })` | inherit: first of exact, prefix with `minCheckers !== undefined` -> `{ key, minCheckers }`; `inherit:false`: exact entry only; else `null` | `seat-resolver.mjs:139,144`, `legacy-seat-read.mjs:47`, `registrations.mjs:696-705` |
-| `capabilityVerifyOf(cfg, cap)` | exact entry's `verify`, raw | `loops/verify.mjs:18` |
-| `capabilityConfinementOf(cfg, cap)` | exact entry's `confinement`, raw | `request.mjs:315-337`, `resolve.mjs:90-130`, `registrations.mjs:2999-3013,3514-3528` |
-| `capabilityServesOf(cfg, name)` | exact entry's `serves`, raw | `registrations.mjs:1960-1962` |
-| `capabilityDescriptionOf(cfg, cap)` | exact `description` ?? prefix `description` ?? `null` | `bin/fgos.mjs:2399` |
-| `preferOf(cfg, cap)` | exact entry's `prefer`, raw (string, list or undefined) | `resolve.mjs:67,238`, `seat-binding-checks.mjs:41-42` |
-| `hasPreferPool(cfg, cap, { inherit = true })` | inherit: exact or prefix entry has a usable `prefer` (non-blank string or non-empty list; today's `hasUsablePrefer`); `inherit:false`: the exact entry only | `registrations.mjs:1931` (inherit), `seat-binding-checks.mjs:41` (exact) |
-| `bindingTasteOf(runner)` | the crate slice moved from `seat-policy.mjs:23-49` (`scopeOf`, `capabilityOf`, object filter) | `seatConfigOf`'s capability part |
+| `minCheckersOf(cfg, cap)` | first of `entriesOf` with `minCheckers !== undefined` -> `{ key, minCheckers }`, else `null` | `seat-resolver.mjs:139,144` |
+| `ownMinCheckersOf(runner, name)` | the exact entry's `minCheckers` (raw, `undefined` when absent) | `legacy-seat-read.mjs:47`, `registrations.mjs:696-705` |
+| `capabilityVerifyOf(runner, cap)` | the exact entry's `verify`, raw | `loops/verify.mjs:18`, `propose.mjs:449` |
+| `capabilityConfinementOf(runner, cap)` | the exact entry's `confinement`, raw | `request.mjs:315-337`, `resolve.mjs:90-130`, validator, doctor rows 25-26 |
+| `capabilityServesOf(runner, name)` | the exact entry's `serves`, raw | `registrations.mjs:1960-1962` |
+| `capabilityDescriptionOf(runner, cap)` | exact `description` ?? `<prefix>:*` `description` ?? `null` (flat) | `bin/fgos.mjs:2399` |
+| `preferOf(runner, cap)` | the exact entry's `prefer`, raw (string, list or undefined) | `resolve.mjs:67,238`, `seat-binding-checks.mjs:41-42` |
+| `hasPreferPool(cfg, cap)` | some of `entriesOf` has a usable `prefer` (non-blank string or non-empty list; today's `hasUsablePrefer`) | `registrations.mjs:1931` |
+| `hasOwnPreferPool(runner, name)` | the exact entry has a usable `prefer` | `seat-binding-checks.mjs:41` |
+| `bindingTasteOf(runner)` | the crate slice moved from `seat-policy.mjs:23-49` (`scopeOf`, `capabilityOf`, non-null object filter) over the flat section | `seatConfigOf`'s capability part; validator taste keys and prefer sites (phase 03) |
 
-   Private helpers: `entriesOf` (today's `capabilityEntriesOf`), `hasUsablePrefer`. Own-key lookups use
-   `Object.hasOwn`; this differs from today only for a capability literally named `__proto__` (today it
-   matches `Object.prototype`); record that in the report as an intended change.
-3. Switch the door's own files now: `seat-policy.mjs` `seatConfigOf` calls `bindingTasteOf(runner)` (the
-   `SEAT_CONFIG_KEYS` part stays); `bind.mjs` `resolvePersona` takes `capabilityPersonaOf(runnerConfig, unit?.capability)`
-   instead of `capEntries` (source string stays `capability:${key}`); `seat-resolver.mjs` imports
-   `capabilityRigorOf`, `capabilityMinCheckersOf` from the port, deletes its own `capabilityRigorOf`, and
-   `checkerPlanOf` uses `capabilityMinCheckersOf` for both the config and `DEFAULT_CAPABILITY_CONFIG`.
-   Keep `capabilityEntriesOf` and `hasUsablePrefer` exported from seat-resolver for now (only
-   `registrations.mjs` and `seat-binding-checks.mjs` still import them); phase 04 deletes them.
-4. Move `registeredCapabilityOf` out of `config.mjs` into the port; update its importers
-   `src/runner/dispatch/decide.mjs:10` and `src/workflow/propose-validate.mjs:16` (import line only).
-5. `src/runner/dispatch/plan.mjs:18`: import `capabilityRigorOf` from the port (import line only).
-6. `src/runner/operation-capability.mjs:24-26`: `hasCapabilityEntry(runnerConfig, domainCapability)`.
-   Retier it in `docs/architecture-manifest.json` from `0` to `5` (its importers are tier 5 `plan.mjs` and
-   tier 7 `work-dispatch.mjs`; a tier-0 file cannot import tier 5). Add the manifest row
-   `src/runner/execution/capability-config.mjs: kernel`.
-7. Equivalence evidence script (not a test): `plans/261114-2051-capability-reads-one-door/reports/equivalence/compare-capability-reads.mjs`
-   with `--base <checkout> --head <checkout> --out <file>`. For each checkout it imports that checkout's
-   modules and, for two configs — the effective runner section of a fresh temp project (shipped standard)
-   and of this repo (`loadRunnerConfigForDir`, dev host via `FGOS_HOST_BIN`) — records for every name in the
-   union of declared names plus probes (`code:review`, `review`, each alias, `nope:x`):
-   `seatConfigDigestOf(cfg).digest`; `effectiveRigorOf({capability}, cfg)`; `checkerPlanOf` for each rigor
-   with the shipped `checkersByRigor`; `registeredCapabilityOf` (base: `config.mjs`, head: port);
-   `verifyCommandOf({capability}, cfg)`; `resolveExecutorAndOverrides(cfg, name)` (result or error text);
-   `resolveCapabilityDetailsFromHints` for each executor id and for `hints.candidates = [name]`;
-   `deriveOperationCapability` for each prefix domain; `buildConfinementRequest` requirement (anchor, mode,
-   policy) or error text; `bind()` of a producer seat `{unit:{id, capability:name, writes:[]}}` with session
-   `{headless:true, postureAtLaunch:true}` minus `bindingInput.hostVersion`. Errors are recorded as text,
-   never thrown. Output is canonical JSON; the script prints a diff count and exits 1 on any difference.
-   Questions whose function does not exist yet at a checkout are skipped with a note (none expected).
-   This is the reproducible equivalence proof; it stays in the reports directory.
+   "Exact entry" = own key of the flat section with a non-null object value (`hasCapabilityEntry`). Every
+   intended delta of plan.md follows from these definitions; nothing else may differ.
+4. Switch the door's own files now:
+   - `seat-policy.mjs` `seatConfigOf`: keeps its runner unwrap and `SEAT_CONFIG_KEYS`; `config.capabilities = bindingTasteOf(runner)`.
+   - `bind.mjs` `resolvePersona`: takes `capabilityPersonaOf(runnerConfig, unit?.capability)` instead of
+     `capEntries` (source string stays `capability:${key}`); drop `capabilityEntriesOf` from the import at `bind.mjs:19`.
+   - `seat-resolver.mjs`: imports `capabilityRigorOf`, `minCheckersOf` from the port, deletes its own
+     `capabilityRigorOf`; `checkerPlanOf` uses `minCheckersOf` for the config and for `DEFAULT_CAPABILITY_CONFIG`.
+     Keep `capabilityEntriesOf` and `hasUsablePrefer` exported for now (only `registrations.mjs` and
+     `seat-binding-checks.mjs` still import them); phase 04 deletes them.
+5. Move `registeredCapabilityOf` out of `config.mjs` into the port; update importers `src/runner/dispatch/decide.mjs:10`
+   and `src/workflow/propose-validate.mjs:16` (import line only).
+6. `src/runner/dispatch/plan.mjs:18`: import `capabilityRigorOf` from the port (import line only).
+7. `src/runner/operation-capability.mjs:24-26`: `hasCapabilityEntry(runnerConfig, domainCapability)`.
+8. `docs/architecture-manifest.json`: file row `src/runner/execution/capability-config.mjs: kernel` and tier
+   override `"src/runner/execution/capability-config.mjs": 0` (as `src/runner/rigor.mjs` has), so tier-0
+   `operation-capability.mjs` may import it. No other row changes.
+9. Equivalence harness (evidence, not a test):
+   `plans/261114-2051-capability-reads-one-door/reports/equivalence/compare-capability-reads.mjs`
+   `--base <path> --head <path> --out <dir>`.
+   - Refuses unless both paths appear in `git worktree list` (or are the main checkout).
+   - Runs each side in its own child process (`node` with that checkout's modules, `FGOS_HOST_BIN` set to the
+     same activated host binary for both) and compares canonical JSON.
+   - Inputs: (a) effective runner section of a fresh temp project (shipped standard) and (b) of this repo, both via
+     that side's `loadRunnerConfigForDir`; (c) a synthetic matrix built in the script from (a): `verify` on
+     `code:implement`, on `code:*`, whitespace-only, nested under `{runner:{capabilities}}`; `persona` and
+     `minCheckers` on an exact and a prefix entry, `minCheckers: []`; string, list, pinned and blank `prefer`;
+     a `null` and a string entry; string `aliases`; alias collision; a capability with no colon; prototype names
+     (`constructor`, `toString`, `hasOwnProperty`, `__proto__`) as capability and executor ids; both
+     `capabilities` and `runner.capabilities` present.
+   - Questions per name (union of declared names, every alias, `code:review`, `review`, `nope:x` and the
+     prototype names): `seatConfigDigestOf(cfg).digest`; `effectiveRigorOf`; `checkerPlanOf` for each rigor with
+     the shipped `checkersByRigor`; `registeredCapabilityOf` (base `config.mjs`, head port); `verifyCommandOf`;
+     `resolveExecutorAndOverrides`; `resolveCapabilityDetailsFromHints` per executor id and for
+     `hints.candidates=[name]`; `deriveOperationCapability` per prefix domain; `buildConfinementRequest`
+     (anchor, mode, policy); `compileDispatchPlan` with `purpose: name` (reasonCodes, executorId);
+     `snapshotRunnerConfig` hash; the legacy checker decoder (through `legacy-seat-read.mjs`'s exported reader);
+     `validateRunnerConfigShape` (pass, or error text); `lintPhaseUnits` on a unit list naming every probe;
+     the proposal refusal list for one writing slice; `bind()` of a producer seat
+     `{unit:{id, capability:name, writes:[]}}`, session `{headless:true, postureAtLaunch:true}`, minus
+     `bindingInput.hostVersion`. Every error is recorded as text, never thrown.
+   - A question missing at head is a failure; missing at base is skipped with a note. Differences listed in
+     plan.md "Intended deltas" are matched by an explicit allowlist in the script (each entry names the delta row);
+     anything else is a failure. Exit 1 on any failure.
+   - Full outputs go to `.fgos/runtime/tmp/capability-equivalence/`; committed evidence is only
+     `reports/equivalence/<run>.summary.json`: per input and question, the digest at base and head and the
+     allowlisted delta names. No binding body, account or path is committed.
+10. Base doctor evidence for phases 04/06: at base run `npm run fgos:dev -- doctor --json` (base checkout) and save
+    the messages of rows `runner-patterns-config`, `workflow-capabilities-configured`, `capability-serves-valid`,
+    `confinement-policies-declared`, `confinement-strict-readiness`, `seat-binding-dry-bind`, `seat-binding-route`
+    to `.fgos/runtime/tmp/capability-equivalence/doctor-base.json` and their digests to
+    `reports/equivalence/doctor-base.summary.json`.
 
 ## Files
 
-- Create: `src/runner/execution/capability-config.mjs` (~120 lines), `test/runner/execution/capability-config.test.mjs`,
-  `plans/261114-2051-capability-reads-one-door/reports/equivalence/compare-capability-reads.mjs`
+- Create: `src/runner/execution/capability-config.mjs` (~130 lines), `test/runner/execution/capability-config.test.mjs`,
+  `plans/261114-2051-capability-reads-one-door/reports/equivalence/compare-capability-reads.mjs`,
+  `reports/equivalence/phase-01.summary.json`, `reports/equivalence/doctor-base.summary.json`
 - Modify: `src/runner/execution/seat-policy.mjs`, `src/runner/execution/seat-resolver.mjs`,
   `src/runner/execution/bind.mjs`, `src/runner/dispatch/config.mjs` (delete `registeredCapabilityOf` only),
   `src/runner/dispatch/decide.mjs` (import), `src/workflow/propose-validate.mjs` (import),
   `src/runner/dispatch/plan.mjs` (import line 18 only), `src/runner/operation-capability.mjs`,
-  `docs/architecture-manifest.json`, `test/runner/execution/seat-resolver.test.mjs` (move rigor cases out)
+  `docs/architecture-manifest.json`, `test/runner/execution/seat-resolver.test.mjs` (import line 6 and the two
+  moved assertions)
 - Delete: none
 
 ## Tests
 
-- New owning proof `test/runner/execution/capability-config.test.mjs` — one test per lookup rule, each title
-  naming its behaviour: exact before prefix; a capability with no colon has no prefix line; the bare verb is
-  never consulted; alias resolves to its key, own key wins; `hasCapabilityEntry` own keys only; string and
-  list `prefer` and blank string for `hasPreferPool`, with and without inherit; `minCheckers: []` is defined (clears); inherit off
-  reads the exact entry only; absent section and `{runner:{capabilities}}` nesting; `bindingTasteOf` keeps
-  only `tier, maxTier, prefer, roles, personas, seats` and normalizes a string `prefer` to a list;
-  invalid rigor throws the same RangeError text. Fixture: a frozen JS object in the test with the shapes of
-  this repo's `.fgos/config.yaml` (string `prefer` on `impact-analysis`, list with invocation pins, aliases,
-  confinement, `code:*` with `roles`/`seats`/`minCheckers`, `persona`, `verify`, `serves`). Why no
-  existing test proves it: these rules were spread over five modules with no common proof.
-- Retired: the two `capabilityRigorOf` assertions in `test/runner/execution/seat-resolver.test.mjs:64-65` (inside the effective-rigor test, which stays) -> owned by
-  `capability-config.test.mjs` (same assertions, moved). `effectiveRigorOf` cases stay in seat-resolver.test.
-- Unchanged owners re-run: seat-policy, bind, explain, seat-resolver, checker plan, dispatch decide.
+- New owning proof `test/runner/execution/capability-config.test.mjs`, one test per rule, each title naming its
+  behaviour: exact before prefix, no prefix line without a colon, bare verb never consulted; nested section read
+  only by the exact-then-prefix lookups, never by `capabilityVerifyOf`/`capabilityConfinementOf`/`preferOf`;
+  alias resolves to its key, own key wins, string `aliases` ignored; prototype names are not declared; a `null`
+  or string entry is not an entry, an array entry is; string, list and blank `prefer` for both pool functions;
+  `minCheckers: []` is defined (clears); `ownMinCheckersOf` ignores the prefix entry; `bindingTasteOf` keeps only
+  `tier, maxTier, prefer, roles, personas, seats` and normalizes a string `prefer` to a list; invalid rigor
+  throws the same RangeError text. Fixture: a frozen object in the test with the shapes of this repo's
+  `.fgos/config.yaml` (string `prefer` on `impact-analysis`, list with invocation pins, aliases, confinement,
+  `code:*` with `roles`/`seats`/`minCheckers`, `persona`, `verify`, `serves`). Why no existing test proves it:
+  these rules were spread over five modules with no common proof.
+- Retired: the two `capabilityRigorOf` assertions in `test/runner/execution/seat-resolver.test.mjs:64-65` (inside
+  the effective-rigor test, which stays) -> owned by `capability-config.test.mjs` (same assertions, moved).
+- Unchanged owners re-run: seat-policy (slice and digest), bind, explain, seat-resolver, checker plan, dispatch decide.
 
 ## Steps
 
-1. Run the equivalence script's base side once on the untouched branch to make sure it executes (base = head).
+1. Write the harness; run it with `--base` = `--head` = the untouched worktree (must report 0 failures); save
+   the doctor base (req 10).
 2. Write the port and its test (test first: red, then green).
 3. Switch seat-policy, bind, seat-resolver, operation-capability; move `registeredCapabilityOf`; fix imports.
-4. Manifest rows; `node scripts/run-tests.mjs test/architecture.test.mjs`.
-5. Run the focused gate list; run `compare-capability-reads.mjs --base <781537524 worktree> --head .`;
-   save `reports/equivalence/phase-01.json` and the printed diff count (must be 0).
+4. Manifest row; `node scripts/run-tests.mjs test/architecture.test.mjs`.
+5. Focused gates; run the harness `--base <781537524 worktree> --head .`; commit `phase-01.summary.json`.
 6. `git diff --stat` before commit: only the files listed above. Commit, push the branch.
 
 ## Gates
@@ -123,31 +155,33 @@ node scripts/run-tests.mjs test/runner/execution/capability-config.test.mjs test
   test/workflow/core-workflow-seats.test.mjs test/runner/runner-schema-vocabulary.test.mjs \
   test/runner/dispatch.test.mjs test/runner/dispatch-plan-policy.test.mjs test/runner/assignment-dispatch.test.mjs \
   test/runner/dispatch-reconciliation-import-graph.test.mjs test/runner/operation-choice.test.mjs \
-  test/workflow/propose.test.mjs test/setup/seat-binding-dry-bind.test.mjs test/architecture.test.mjs
+  test/workflow/propose.test.mjs test/workflow/propose-validate.test.mjs test/setup/seat-binding-dry-bind.test.mjs \
+  test/architecture.test.mjs
 node scripts/doc-health.mjs
 node scripts/check-decision-citation-drift.mjs
 ```
-Plus every other test that imports a touched file (`rg -l "seat-policy.mjs|seat-resolver.mjs|bind.mjs|dispatch/config.mjs|decide.mjs|propose-validate.mjs|dispatch/plan.mjs|operation-capability.mjs" test`).
+Plus every other test importing a touched file (`rg -l "seat-policy.mjs|seat-resolver.mjs|bind.mjs|dispatch/config.mjs|decide.mjs|propose-validate.mjs|dispatch/plan.mjs|operation-capability.mjs" test`).
 Rust: not touched.
 
 ## Net size
 
-src: +~120 (port) −~35 (moved/inlined code) ≈ +85; tests: +~110, −7.
+src: +~130 (port) −~35 (moved/inlined) ≈ +95; tests: +~130, −2 assertions; harness ~250 (plan reports, not shipped).
 
 ## Risks
 
 | Risk | L x I | Mitigation |
 |---|---|---|
-| A moved lookup subtly changes (nesting, own-key) | M x H | owning test per rule; equivalence script diff 0 over both configs incl. `bind()` |
-| `bind.mjs` persona source string changes provenance | L x M | keep `capability:${key}`; explain tests cover it |
-| Tier/layer guard refuses the new import | L x L | port is kernel, imports only `rigor.mjs`; retier `operation-capability.mjs` |
-| Import graph test pins `config.mjs` imports | L x M | run `dispatch-reconciliation-import-graph.test.mjs`; `config.mjs` gains no import in this phase |
+| A moved lookup subtly changes | M x H | owning test per rule; harness over standard, repo and edge matrix, two processes, allowlisted deltas only |
+| `bind.mjs` persona provenance string changes | L x M | keep `capability:${key}`; explain tests |
+| Tier/layer guard refuses an import | L x L | port kernel layer, tier override 0, imports only `rigor.mjs` |
+| Import graph test pins module imports | L x M | `dispatch-reconciliation-import-graph.test.mjs`; `config.mjs` gains no import in this phase |
+| Harness leaks machine facts into git | L x M | only digests committed; full output under `.fgos/runtime/tmp` |
 
 ## Rollback
 
-Revert the phase commit on the integration branch; no data or config written.
+Revert the phase merge on the integration branch only while 02-05 are not merged (plan.md Rollback).
 
 ## Success criteria
 
-All gates green; equivalence diff 0 (report saved); port is the only definer of the listed functions
-(`rg "function registeredCapabilityOf|function capabilityRigorOf"` finds only the port).
+All gates green; harness 0 failures (summary committed); `rg "function registeredCapabilityOf|function capabilityRigorOf" src`
+finds only the port.
