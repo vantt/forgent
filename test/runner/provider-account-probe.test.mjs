@@ -105,7 +105,8 @@ test('the verdict names who failed from both legs: healthy, account-fault, harne
   assert.equal(accountProbeVerdict([direct('ok'), harness('sandbox')]), 'harness-fault');
   assert.equal(accountProbeVerdict([direct('ok'), direct('auth'), harness('ok')]), 'mixed');
   assert.equal(accountProbeVerdict([direct('other'), harness('ok')]), 'mixed');
-  assert.equal(accountProbeVerdict([direct('auth'), harness('ok')]), 'account-fault', 'every direct row is an account stop, whatever the harness leg says');
+  assert.equal(accountProbeVerdict([direct('auth'), harness('sandbox')]), 'account-fault', 'every direct row is an account stop and no counted harness row answered');
+  assert.equal(accountProbeVerdict([direct('auth'), direct('quota'), harness('ok'), harness('auth')]), 'mixed', 'a harness row answered against dead direct rows: the legs contradict');
   assert.equal(accountProbeVerdict([direct('ok')]), 'healthy', 'with no counted harness row the direct leg alone decides');
   assert.equal(accountProbeVerdict([direct('quota')]), 'account-fault');
   assert.equal(accountProbeVerdict([harness('auth'), harness('quota')]), 'account-fault', 'with no direct row the harness leg alone decides');
