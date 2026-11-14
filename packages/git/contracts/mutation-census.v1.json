@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "68c854018b994a069da3286d3796ef2cd4235a605e5c39686a1eb17c9f68656e",
+  "payloadDigest": "4bb96ee98de5017392ab98d8038ca40baaedcfb5d173b1e800c520b4c124b760",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -461,7 +461,7 @@
     "packages/host-runtime/rust/src/authority_gate.rs": "ad3c0a21cc5b98ec3d8d321d0b700d1378a35fe3a8531b7ed32ccabbf2e4fe17",
     "packages/host-runtime/rust/src/catalog.rs": "524dff2d9837611b8eb81394b0998d53854cba4c42acc6cbc4c41770d118ff5c",
     "packages/host-runtime/rust/src/civil_time.rs": "7f206726328eb334c91c8ca2592191d6dead76b91b68ffaf633e7cda40c3625f",
-    "packages/host-runtime/rust/src/cli_args.rs": "fea805974b2d5b2d93c23f8ee6b01b30611520417aeb46d6ecb5d4aac4b0cb68",
+    "packages/host-runtime/rust/src/cli_args.rs": "a11832d081bb48b0614e0ae3bb30d6db8f62940b4a51bed0c40104e4750d6936",
     "packages/host-runtime/rust/src/contracts.rs": "da9000674648a399cd32f628213a8d16cd1ce220eacb4e4896d9fad05c0af5cf",
     "packages/host-runtime/rust/src/exit_codes.rs": "f161428fcaa8de111886461f9f0fd40279fe918ba3052dfd9f6502e2c1896368",
     "packages/host-runtime/rust/src/invocation_service.rs": "bd9602d7ae4849bb434d2fe92aaa098c28ce9225ab6ef30b61fbbdb1a197bd55",

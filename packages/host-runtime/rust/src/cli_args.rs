@@ -47,7 +47,7 @@ pub enum ParseArgsError {
     NonUtf8 { index: usize, lossy: String },
 }
 
-/// Reads `args` (the tokens after the binary name) with Node's rules. A token that is not UTF-8 is refused by
+/// Reads `args` (the tokens after the verb, Node's `rest`) with Node's rules. A token that is not UTF-8 is refused by
 /// position, never lossily converted.
 pub fn parse_args(args: &[OsString]) -> Result<ParsedArgs, ParseArgsError> {
     let tokens = args

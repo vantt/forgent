@@ -1,5 +1,5 @@
 {
-  "description": "argv vectors for the CLI argument parser. Each row: the tokens after the binary name, the flags and positionals every parser must return. Readers: the Node parser (test/cli/parse-args-vectors.test.mjs) and the Rust parser (packages/host-runtime/rust/src/cli_args.rs tests). A flag maps to true (bare), a string, or a list (the repeatable flags context-ref and param).",
+  "description": "argv vectors for the CLI argument parser. Each row: the tokens after the verb (what Node passes as `rest`), the flags and positionals every parser must return. Readers: the Node parser (test/cli/parse-args-vectors.test.mjs) and the Rust parser (packages/host-runtime/rust/src/cli_args.rs tests). A flag maps to true (bare), a string, or a list (the repeatable flags context-ref and param).",
   "rows": [
     {
       "name": "flag before the sub-verb with a value",
