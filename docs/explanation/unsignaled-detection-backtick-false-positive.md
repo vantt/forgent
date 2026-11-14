@@ -1,5 +1,5 @@
 ---
-authoritative_for: [DONE]/[BLOCKED] backtick-quoted false-positive signal detection, agy/gemini-3.6-flash-medium proof-test finding, executeExecutorCli strips backtick spans
+authoritative_for: "[DONE]/[BLOCKED] backtick-quoted false-positive signal detection, agy/gemini-3.6-flash-medium proof-test finding, executeExecutorCli strips backtick spans"
 ---
 
 # The `[DONE]`/`[BLOCKED]` detector had a false-positive hole — closed by cross-provider proof-testing

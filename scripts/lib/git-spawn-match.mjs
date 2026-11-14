@@ -5,7 +5,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { YamlParseError, parseYaml } from '../../src/util/yaml.mjs';
+import { YamlParseError, readFrontmatter } from '../../src/util/yaml.mjs';
 
 /** The spawn-option key the sandbox door sets to its sandbox root; nothing else may set it. */
 export const SANDBOX_DOOR = Symbol.for('fgos.git.sandbox-door');
@@ -82,9 +82,8 @@ export function standaloneSkillOf(file, stop) {
 function readStandaloneDeclaration(manifest) {
   let text;
   try { text = fs.readFileSync(manifest, 'utf8'); } catch { return undefined; }
-  const block = /^---\r?\n([\s\S]*?)\r?\n---\r?\n/.exec(text)?.[1];
   let meta = null;
-  try { meta = block === undefined ? null : parseYaml(block, { filename: manifest }); } catch (err) { if (err instanceof YamlParseError) return null; throw err; }
+  try { ({ meta } = readFrontmatter(text, manifest)); } catch (err) { if (err instanceof YamlParseError) return null; throw err; }
   return meta?.metadata?.oneDoor === 'standalone' ? String(meta.name ?? path.basename(path.dirname(manifest))) : null;
 }
 

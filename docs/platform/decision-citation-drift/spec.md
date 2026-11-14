@@ -123,8 +123,9 @@ an agent doing grooming/scribing).
   (`loadSupersededById`, `loadSourceFiles`, `runCli`).
 - `test/scripts/check-decision-citation-drift.test.mjs` — 9 tests covering
   the rules and edge cases above.
-- `src/report/frontmatter.mjs` — reused to read a decision record's
-  `superseded_by` front-matter field.
+- `readFrontmatter` in `src/util/yaml.mjs` — reused to read a decision record's
+  `superseded_by` front-matter field. The script stages the native addon in its
+  main-only entry (`ensureAddonForScript`), so it runs from a checkout.
 - `scripts/check-decision-supersession.mjs` — the sibling check this one
   mirrors in structure; it checks a decision record's own internal
   backward-pointer instead of backlog/spec citations (a different area).

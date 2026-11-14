@@ -14,7 +14,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { parseYaml } from '../util/yaml.mjs';
+import { readFrontmatter } from '../util/yaml.mjs';
 import { domainCatalog } from '../util/domain-dirs.mjs';
 import { buildDecisionIndexMarkdown, narrativeHolderResolver } from '../report/decision-index.mjs';
 import { listWork } from '../state/store.mjs';
@@ -88,10 +88,6 @@ const AUTHORITY_SCOPE_RULES = Object.freeze({
   domain: new Set(['domain', 'workspace', 'project', 'command', 'skill', 'host', 'session']),
 });
 
-/**
- * Pattern for extracting YAML frontmatter fenced by `---`.
- */
-const FRONTMATTER_PATTERN = /^---\r?\n([\s\S]*?)\r?\n---\r?\n/;
 const DECISION_ID_PATTERN = /^D-ADR\d{4}$/;
 const DECISION_ID_PREFIX_PATTERN = /^\s*(D-ADR\d{4})\b/;
 const VERIFIED_SUPERSESSION_UNITS = new WeakSet();
@@ -154,32 +150,22 @@ export function extractInstructionFrontmatter(rawContent, filePath = '') {
     });
   }
 
-  const match = FRONTMATTER_PATTERN.exec(rawContent);
-  if (!match) {
-    throw new InstructionRegistryError(
-      'Instruction file is missing YAML frontmatter block (--- ... ---)',
-      { filePath, code: 'INVALID_METADATA' },
-    );
-  }
-
-  let meta;
+  let parsed;
   try {
-    meta = parseYaml(match[1], { filename: filePath });
+    parsed = readFrontmatter(rawContent, filePath);
   } catch (err) {
     throw new InstructionRegistryError(
       `Failed to parse YAML frontmatter: ${err.message}`,
       { filePath, code: 'INVALID_METADATA', cause: err },
     );
   }
-
-  if (!meta || typeof meta !== 'object' || Array.isArray(meta)) {
+  if (!parsed.block) {
     throw new InstructionRegistryError(
-      'Instruction frontmatter must be a key-value object',
+      'Instruction file is missing YAML frontmatter block (--- ... ---)',
       { filePath, code: 'INVALID_METADATA' },
     );
   }
-
-  const body = rawContent.slice(match[0].length);
+  const { meta, body } = parsed;
   return { meta, body, rawContent };
 }
 

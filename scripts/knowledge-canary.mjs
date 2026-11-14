@@ -13,8 +13,8 @@ export function runKnowledgeCanary(repoRoot) {
   // (see the test: a throwaway tmpdir with no fgOS install of its own) by
   // driving it with the REAL project's `bin/fgos.mjs` -- the binary and
   // the target repo are deliberately different things here, unlike
-  // knowledge-migration.mjs/knowledge-bootstrap.mjs, which always operate
-  // on their own containing project. `path.resolve('bin/fgos.mjs')`
+  // knowledge-bootstrap.mjs, which always operates on its own containing
+  // project (knowledge-migration.mjs was removed with its one-shot run). `path.resolve('bin/fgos.mjs')`
   // (the previous shape) got this right only by accident, by depending on
   // the CALLING process's cwd already being this project's root -- true
   // for `node --test`, but not guaranteed for any other caller. Resolving

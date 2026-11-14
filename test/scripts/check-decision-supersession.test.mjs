@@ -46,7 +46,7 @@ test('a missing key (undefined) classifies as "none"', () => {
 test('a superseded record missing both backward pointers reports two findings', () => {
   const records = [
     { id: '0002', meta: {} },
-    { id: '0012', meta: { supersedes: ['0002'] } },
+    { id: '0012', meta: { supersedes: ["0002"] } },
   ];
   const indexContent = '| [0002](0002-x.md) | ... |\n| [0012](0012-x.md) | ... |\n';
 
@@ -59,8 +59,8 @@ test('a superseded record missing both backward pointers reports two findings', 
 
 test('a superseded record with both pointers present reports zero findings', () => {
   const records = [
-    { id: '0002', meta: { superseded_by: '0012' } },
-    { id: '0012', meta: { supersedes: ['0002'] } },
+    { id: '0002', meta: { superseded_by: "0012" } },
+    { id: '0012', meta: { supersedes: ["0002"] } },
   ];
   const indexContent = '| [0002](0002-x.md) | ...supersede boi 0012... |\n| [0012](0012-x.md) | ... |\n';
 
@@ -106,8 +106,8 @@ test('supersedes naming an id with no matching record reports "unknown-target"',
 
 test('a target with no row in the index at all reports "missing-index-row"', () => {
   const records = [
-    { id: '0002', meta: { superseded_by: '0012' } },
-    { id: '0012', meta: { supersedes: ['0002'] } },
+    { id: '0002', meta: { superseded_by: "0012" } },
+    { id: '0012', meta: { supersedes: ["0002"] } },
   ];
   const findings = findSupersessionFindings(records, '| [0012](0012-x.md) | ... |\n');
   assert.equal(findings.length, 1);
@@ -137,7 +137,7 @@ test('CLI run over a fixture directory prints findings and exits 1 when gaps exi
   fs.writeFileSync(path.join(fixtureDir, '0002-x.md'), '---\nstatus: accepted\n---\n# 0002\n');
   fs.writeFileSync(
     path.join(fixtureDir, '0012-x.md'),
-    '---\nsupersedes: [0002]\n---\n# 0012\n',
+    '---\nsupersedes: ["0002"]\n---\n# 0012\n',
   );
 
   const result = spawnSync(process.execPath, [scriptPath, '--dir', fixtureDir], {
@@ -157,11 +157,11 @@ test('CLI run over a fixture directory with both pointers present exits 0', () =
   );
   fs.writeFileSync(
     path.join(fixtureDir, '0002-x.md'),
-    '---\nstatus: accepted\nsuperseded_by: 0012\n---\n# 0002\n',
+    '---\nstatus: accepted\nsuperseded_by: "0012"\n---\n# 0002\n',
   );
   fs.writeFileSync(
     path.join(fixtureDir, '0012-x.md'),
-    '---\nsupersedes: [0002]\n---\n# 0012\n',
+    '---\nsupersedes: ["0002"]\n---\n# 0012\n',
   );
 
   const result = spawnSync(process.execPath, [scriptPath, '--dir', fixtureDir], {

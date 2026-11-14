@@ -5,8 +5,11 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { generateWrapperContent, extractFrontmatter, ownedSkillNames } from '../../src/setup/skill-wrappers.mjs';
+import { generateWrapperContent, ownedSkillNames } from '../../src/setup/skill-wrappers.mjs';
+import { readFrontmatter } from '../../src/util/yaml.mjs';
 import { ownedFileSet } from '../../scripts/lib/git-ports.mjs';
+
+const extractFrontmatter = (content) => readFrontmatter(content).block;
 
 // tsk-1qi (D5/D7, docs/history/install-setup-external-project-reliability/
 // CONTEXT.md): `.agents/skills` is the assembled, orchestrator-neutral

@@ -8,7 +8,7 @@ import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
 import { buildEnduserIndex, findSourceCaptureId, findSourceCaptureIds, QUADRANT_META, QUADRANTS } from '../../src/report/enduser-index.mjs';
 import { enumerateDocEntries } from '../../src/report/enduser-index-generate.mjs';
-import { parseFrontmatter } from '../../src/report/frontmatter.mjs';
+import { readFrontmatter } from '../../src/util/yaml.mjs';
 import { makeDocsIndexStateFixture, REAL_DEMO_OUTCOME_ID, REAL_DEMO_DOC_PATH } from './helpers/docs-index-state-fixture.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -369,13 +369,13 @@ test('fgos docs-index is idempotent — re-running yields the same entries, no d
 // (fgos decision-index), which keeps this same invariant alive under its
 // own `type: explanation` frontmatter (src/report/decision-index.mjs).
 
-test('every repo/docs/decisions/*.md file parses with parseFrontmatter to a non-empty meta.type', () => {
+test('every repo/docs/decisions/*.md file parses with readFrontmatter to a non-empty meta.type', () => {
   const decisionsDir = path.join(REPO_ROOT, 'docs', 'decisions');
   const files = fs.readdirSync(decisionsDir).filter((f) => f.endsWith('.md'));
   assert.ok(files.length > 0, 'expected at least one .md file under docs/decisions/ (today: the generated index.md)');
   for (const file of files) {
     const content = fs.readFileSync(path.join(decisionsDir, file), 'utf8');
-    const { meta } = parseFrontmatter(content);
+    const { meta } = readFrontmatter(content, file);
     assert.ok(meta.type && meta.type.length > 0, `${file} must have a non-empty frontmatter type`);
     assert.equal(meta.type, 'explanation', `${file}'s frontmatter type must be 'explanation'`);
   }
@@ -383,7 +383,7 @@ test('every repo/docs/decisions/*.md file parses with parseFrontmatter to a non-
 
 test("docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md's frontmatter has a non-empty type and links source_capture_ids to doc-fgos-rollup-howto", () => {
   const content = fs.readFileSync(path.join(REPO_ROOT, 'docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md'), 'utf8');
-  const { meta } = parseFrontmatter(content);
+  const { meta } = readFrontmatter(content, 'check-rollup-progress.md');
   assert.ok(meta.type && meta.type.length > 0);
   assert.equal(meta.type, 'how-to');
   assert.ok(Array.isArray(meta.source_capture_ids));
@@ -465,3 +465,12 @@ test('enumerateDocEntries safely skips docs/knowledge files with no mode or inva
 });
 
 
+
+test('enumerateDocEntries refuses a docs/knowledge file whose frontmatter is not valid YAML, naming the file, instead of dropping it', () => {
+  const cwd = tmpFixtureCwd();
+  const slugDir = path.join(cwd, 'docs', 'knowledge', 'sample-purpose');
+  fs.mkdirSync(slugDir, { recursive: true });
+  fs.writeFileSync(path.join(slugDir, 'ok.md'), '---\nmode: how-to\n---\n# Fine\n');
+  fs.writeFileSync(path.join(slugDir, 'bad.md'), '---\nmode: how-to\ntitle: a: b\n---\n# Bad\n');
+  assert.throws(() => enumerateDocEntries(cwd), (err) => /docs\/knowledge\/sample-purpose\/bad\.md/.test(err.message) && !/ok\.md/.test(err.message));
+});

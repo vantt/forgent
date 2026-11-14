@@ -10,7 +10,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { buildEnduserIndex, QUADRANTS, QUADRANT_DIR_ALIASES } from './enduser-index.mjs';
-import { parseFrontmatter } from './frontmatter.mjs';
+import { describeYamlError, readFrontmatter, YamlParseError } from '../util/yaml.mjs';
 import { listWork } from '../state/store.mjs';
 
 // Scans one on-disk dir for `.md` files and pushes each as a docEntry
@@ -41,8 +41,8 @@ function scanDirAsQuadrant(repoRoot, quadrantDir, quadrant, docEntries) {
 // each as a docEntry tagged with `quadrant` determined from the file's own
 // frontmatter `mode` field (mapping singular `tutorial` -> `tutorials`).
 // Missing directories or invalid mode fields are skipped cleanly (ENOENT),
-// never a crash.
-function scanKnowledgeDirsAsQuadrant(repoRoot, docEntries) {
+// never a crash; a frontmatter block the YAML door refuses is added to `refused`.
+function scanKnowledgeDirsAsQuadrant(repoRoot, docEntries, refused) {
   const knowledgeDir = path.join(repoRoot, 'docs', 'knowledge');
   let purposeEntries;
   try {
@@ -65,7 +65,14 @@ function scanKnowledgeDirsAsQuadrant(repoRoot, docEntries) {
       if (!file.isFile() || !file.name.endsWith('.md')) continue;
       const absPath = path.join(purposeDir, file.name);
       const content = fs.readFileSync(absPath, 'utf8');
-      const { meta } = parseFrontmatter(content);
+      let meta;
+      try {
+        ({ meta } = readFrontmatter(content, absPath));
+      } catch (err) {
+        if (!(err instanceof YamlParseError)) throw err;
+        refused.push(`${path.relative(repoRoot, absPath).split(path.sep).join('/')}: ${describeYamlError(err)}`);
+        continue;
+      }
       let quadrant = meta.mode;
       if (quadrant === 'tutorial') quadrant = 'tutorials';
       if (typeof quadrant !== 'string' || !QUADRANTS.includes(quadrant)) continue;
@@ -91,7 +98,12 @@ export function enumerateDocEntries(repoRoot) {
       scanDirAsQuadrant(repoRoot, path.join(repoRoot, 'docs', alias), quadrant, docEntries);
     }
   }
-  scanKnowledgeDirsAsQuadrant(repoRoot, docEntries);
+  const refused = [];
+  scanKnowledgeDirsAsQuadrant(repoRoot, docEntries, refused);
+  // An unreadable frontmatter block is never "no frontmatter": the index would silently lose the doc.
+  if (refused.length > 0) {
+    throw new Error(`end-user doc frontmatter refused by the YAML door:\n${refused.map((line) => `  ${line}`).join('\n')}`);
+  }
   docEntries.sort((a, b) => (a.quadrant === b.quadrant ? (a.docPath < b.docPath ? -1 : 1) : (a.quadrant < b.quadrant ? -1 : 1)));
   return docEntries;
 }

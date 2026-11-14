@@ -37,9 +37,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { isMainModule } from './lib/is-main-module.mjs';
 import { ownedFileSet } from './lib/git-ports.mjs';
-import {
-  parseFrontmatter,
-} from '../src/report/frontmatter.mjs';
+import { ensureAddonForScript } from './lib/git-addon-stage.mjs';
+import { readFrontmatter, YamlParseError } from '../src/util/yaml.mjs';
 
 const DECISION_ID_PATTERN = /^\d{4}$/;
 const DEFAULT_BASELINE_PATH =
@@ -232,7 +231,7 @@ function loadSupersededById(decisionsDir) {
     const id = file.slice(0, 4);
     const full = path.join(decisionsDir, file);
     const content = fs.readFileSync(full, 'utf8');
-    const { meta } = parseFrontmatter(content);
+    const { meta } = readFrontmatter(content, full);
     const sb = meta.superseded_by;
     if (
       typeof sb === 'string' &&
@@ -501,8 +500,13 @@ export function runCli(argv, cwd, log = console.log) {
 }
 
 if (isMainModule(import.meta.url)) {
-  process.exitCode = runCli(
-    process.argv.slice(2),
-    process.cwd(),
-  );
+  // Staged here, never at module scope: bin/fgos.mjs imports this file and must not build Rust on every start.
+  ensureAddonForScript();
+  try {
+    process.exitCode = runCli(process.argv.slice(2), process.cwd());
+  } catch (err) {
+    if (!(err instanceof YamlParseError)) throw err;
+    console.error(`check-decision-citation-drift: ${err.message}`);
+    process.exitCode = 1;
+  }
 }

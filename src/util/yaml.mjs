@@ -50,3 +50,28 @@ export function describeYamlError(error) {
   const where = Number.isInteger(error.line) && Number.isInteger(error.column) ? ` (line ${error.line}, column ${error.column})` : '';
   return `${error.rule.replaceAll('-', ' ')}${where}`;
 }
+
+const FRONTMATTER_BLOCK = /^---\r?\n([\s\S]*?)\r?\n---\r?\n/;
+
+/**
+ * Cuts the leading `---` fenced block off a document and parses it with the YAML door: the one place that decides
+ * what a frontmatter block is.
+ *
+ * - No block (or no closing fence) returns `{ meta: {}, body: text, block: '' }`; an empty block returns an empty meta.
+ * - `block` is the fenced source as written, both fences included; `body` is the text after it.
+ * - A block the parser refuses, or one that is not a mapping, throws a YamlParseError naming `file`.
+ *
+ * @param {string} text
+ * @param {string} [file] named in refusals
+ * @returns {{ meta: Record<string, unknown>, body: string, block: string }}
+ */
+export function readFrontmatter(text, file) {
+  const match = typeof text === 'string' ? FRONTMATTER_BLOCK.exec(text) : null;
+  if (!match) return { meta: {}, body: text, block: '' };
+  const parsed = parseYaml(match[1], { filename: file });
+  if (parsed === null) return { meta: {}, body: text.slice(match[0].length), block: match[0] };
+  if (typeof parsed !== 'object' || Array.isArray(parsed)) {
+    throw new YamlParseError({ id: 'frontmatter-not-a-mapping', file: file ?? 'YAML input', line: 2, column: 1 });
+  }
+  return { meta: parsed, body: text.slice(match[0].length), block: match[0] };
+}

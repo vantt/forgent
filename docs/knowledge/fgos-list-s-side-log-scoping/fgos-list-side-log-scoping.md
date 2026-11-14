@@ -1,6 +1,6 @@
 ---
 type: reference
-title: `fgos list`'s side-log scoping
+title: "`fgos list`'s side-log scoping"
 tags: [list, pagination, cli]
 timestamp: 2026-08-11T11:50:00.000Z
 source_capture_ids: [tsk-483]

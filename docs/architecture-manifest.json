@@ -296,6 +296,23 @@
         { "path": "src/setup/registrations.mjs", "reason": "doctor claims/skills walk (allAgentYamlFiles, readAgentSkills) re-walks the tiers and reads the project's own domains/; moved after the capability plan rewrites the file" }
       ],
       "reason": "one module knows the tier directories and their order"
+    },
+    {
+      "job": "read a YAML frontmatter block",
+      "kind": "door",
+      "patterns": [
+        "\\b(?:parseFrontmatter|renderFrontmatter|extractFrontmatter)\\b",
+        "\\bFRONTMATTER_PATTERN\\b",
+        "report/frontmatter\\.mjs",
+        "\\^---\\\\r\\?\\\\n"
+      ],
+      "allowed": [
+        "src/util/yaml.mjs",
+        { "path": "core/skills/distill/scripts/distill.mjs", "reason": "standalone shipped skill script; runs in user projects without the fgOS addon" },
+        { "path": "core/skills/instruction-audit/scripts/instruction-audit.mjs", "reason": "standalone shipped skill script; runs in user projects without the fgOS addon" }
+      ],
+      "debt": [],
+      "reason": "only src/util/yaml.mjs readFrontmatter cuts and parses a frontmatter block; a second cutter or parser names one of the retired helpers or carries the fence regex. Per-line match on code and string text: a cut written another way (split on a fence) is not seen"
     }
   ],
   "files": {
@@ -442,7 +459,6 @@
     "src/report/decision-index.mjs": "infra",
     "src/report/capability-plan-lint.mjs": "infra",
     "src/report/context-render.mjs": "domain",
-    "src/report/frontmatter.mjs": "domain",
     "src/report/authoritative-match.mjs": "domain",
     "src/evolve/iron-law.mjs": "domain",
     "src/holder-lock/index.mjs": "infra",
