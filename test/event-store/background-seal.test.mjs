@@ -148,4 +148,9 @@ test('a detached seal or publish child skips quietly when its state root is gone
     assert.equal(JSON.parse(child.stdout).data.skipped, 'state root gone', `${args[1]} reports why it skipped: ${child.stdout}`);
     assert.equal(fs.existsSync(stateRoot), false, `${args[1]} left the gone state root gone`);
   }
+  // The verb takes the child decision from main()'s one reading of the registry: the same sync run in the
+  // foreground (no --opportunistic) is no child, so it does not skip and creates the root as setup would.
+  const foreground = spawnSync(process.execPath, [BIN, 'events', 'sync', '--no-push', '--dir', w.cwd], { cwd: w.cwd, env, encoding: 'utf8' });
+  assert.notEqual(JSON.parse(foreground.stdout || '{}').data?.skipped, 'state root gone', `${foreground.stdout} ${foreground.stderr}`);
+  assert.equal(fs.existsSync(stateRoot), true, 'a foreground sync creates its state root');
 });
