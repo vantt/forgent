@@ -91,10 +91,15 @@ fn git_plain(git: &Path, repo: &Path) -> Command {
     cmd
 }
 
-/// Environment of every vector git call: no user or system config, fixed identity.
+/// Environment of every vector git call: no user or system config, no config
+/// the caller's environment carries (`git -c` and `GIT_CONFIG_COUNT` pass it
+/// down to children, and a caller's `gc.auto=0` would make the control start no
+/// gc and the borrowed run try none), fixed identity.
 pub fn git_env() -> BTreeMap<String, String> {
     [
         ("GIT_CONFIG_NOSYSTEM", "1"),
+        ("GIT_CONFIG_PARAMETERS", ""),
+        ("GIT_CONFIG_COUNT", "0"),
         (
             "GIT_CONFIG_GLOBAL",
             if cfg!(windows) { "NUL" } else { "/dev/null" },
