@@ -10,6 +10,8 @@ landAfter: ["capability plan on main (bin/fgos.mjs, test/architecture.test.mjs, 
 
 # Phase 01: YAML frontmatter through the YAML door
 
+<!-- Red team 2026-11-14: parseYaml call shape, addon loading for checkout scripts, standalone skill scripts, version type, specs naming the deleted tools. -->
+
 Rules: `phase-lead-rules.md` (this directory). pNN = `p01`; report slug `odd-p01-yaml-frontmatter`; no Rust.
 Facts: `phase-00-facts.md` "Leak 1".
 
@@ -22,7 +24,7 @@ tools that were its only writer. No flat subset survives (census Q4 settled in p
 ## Requirements
 
 1. `src/util/yaml.mjs` gains one export, `readFrontmatter(text, file)` -> `{ meta, body }`: no block gives
-   `{ meta: {}, body: text }` (today's `parseFrontmatter` answer); a block is parsed with `parseYaml(blockText, file)`; a
+   `{ meta: {}, body: text }` (today's `parseFrontmatter` answer); a block is parsed with `parseYaml(blockText, { filename: file })`; a
    refusal throws `YamlParseError` naming the file. CRLF is handled as `frontmatter.mjs` handles it today (`13315c352`).
    A block that parses to a non-mapping is a `YamlParseError`.
 2. Move every reader to it, file by file, keeping each caller's output:
@@ -32,10 +34,23 @@ tools that were its only writer. No flat subset survives (census Q4 settled in p
      per file and report it naming the file (a lint finding in `knowledge-lints`; a refusal line for the generator and the verb).
      Never treat an unparseable block as "no frontmatter".
    - The block cutters: `src/setup/skill-wrappers.mjs` (`FRONTMATTER_PATTERN` :27, `extractFrontmatter` :86 and its four
-     callers; the `version:` line regex at :241 reads `meta.version` from `readFrontmatter` instead),
+     callers; the `version:` line regex at :241 reads `meta.version` from `readFrontmatter` instead; an unquoted
+     `version: 1.10` arrives as the number 1.1, so a non-string version is treated exactly as a missing version line is today
+     and a warning names the file and asks to quote it; test the `1.10` vs `1.9` vector),
      `src/setup/instruction-registry.mjs:94,167`, `scripts/lib/git-spawn-match.mjs:85-87`. Where a caller needs the raw fenced
      text (skill-wrappers copies the block into a generated wrapper), add `block` (the fenced source, fences included) to the
-     result of `readFrontmatter` rather than keeping a second regex. One cut rule, one place.
+     result of `readFrontmatter` rather than keeping a second regex. One cut rule, one place in product code.
+   - Scripts that now read YAML from a checkout must load the addon the way the existing YAML scripts do: call
+     `ensureAddonForScript()` (`scripts/lib/git-addon-stage.mjs:83-86`) inside the script's main-only entry, never at module
+     scope (`src/state/retrospective-doors.mjs:23` imports `check-decision-citation-drift.mjs`, and `bin/fgos.mjs:43` imports
+     that module: a module-scope call would build Rust on every `fgos` start). This applies to
+     `check-decision-citation-drift.mjs` and `check-decision-supersession.mjs`. Product callers (`bin/`, `src/`) run inside a
+     release and need nothing. Gate: run `node scripts/check-decision-citation-drift.mjs` in a fresh linked worktree with no
+     `FGOS_*` variables set; it must pass (cost: one incremental `cargo build -p fgos-node-addon`, state it in the report).
+   - Shipped standalone skill scripts are outside the one-door boundary (skills marked `oneDoor: standalone`, owner decision
+     2026-10-20) and cannot reach the payload's addon in a user's project: `core/skills/distill/scripts/distill.mjs:93-188`
+     (own `parseFrontmatter`) and `core/skills/instruction-audit/scripts/instruction-audit.mjs:90-91` (own cut) stay, named in
+     the row's `allowed` with that reason.
 3. Fix the docs whose frontmatter is not YAML (phase 00 list): quote the scalar or use a block scalar so the parsed value is
    the text the flat parser returned. Confirm the full list by running `readFrontmatter` over every tracked `*.md` under
    `docs/`, `core/`, `domains/` and recording the refused files in the report; fix each one. `docs/distillery/deep-dives/fgos-harness-architecture.md:7`
@@ -47,10 +62,16 @@ tools that were its only writer. No flat subset survives (census Q4 settled in p
    `docs/platform/governance.md#decision-scope-to-holder-table` (expected: the YAML Document spec's decision-history section),
    add the entry (mint any number with `fgos identity mint d-adr` if the holder numbers its entries) citing the census and the
    owner approval of 2026-11-14, and point `docs/platform/packaging-distribution/spec.md:827` and
-   `docs/platform/yaml-document/spec.md:43,177` at it. Update the other doc mentions (phase 00 list) to the door.
+   `docs/platform/yaml-document/spec.md:43,177` at it. Update the other doc mentions (phase 00 list) to the door, and the
+   specs and comments that still describe the deleted migration tools as live: `docs/platform/git/spec.md:724,726`
+   (knowledge-migration in the ScopedCommit census mapping), `docs/platform/documentation/spec.md:126` (classifier),
+   `src/state/knowledge-registry.mjs:45`, `scripts/knowledge-canary.mjs:16` (comments): say they were removed with the helper.
 6. `doors` row (new, `kind: door`), no debt:
-   `{ job: "read a YAML frontmatter block", patterns: ["\\b(?:parseFrontmatter|renderFrontmatter|extractFrontmatter)\\b", "\\bFRONTMATTER_PATTERN\\b", "report/frontmatter\\.mjs"], allowed: [], reason: "only src/util/yaml.mjs readFrontmatter cuts and parses a frontmatter block" }`
-   plus `src/util/yaml.mjs` must not match (the new name differs). If a pattern also catches an unrelated use, narrow it and say so.
+   `{ job: "read a YAML frontmatter block", patterns: ["\\b(?:parseFrontmatter|renderFrontmatter|extractFrontmatter)\\b", "\\bFRONTMATTER_PATTERN\\b", "report/frontmatter\\.mjs"], allowed: [{path:"core/skills/distill/scripts/distill.mjs", reason:"standalone shipped skill script; runs in user projects without the fgOS addon"}], reason: "only src/util/yaml.mjs readFrontmatter cuts and parses a frontmatter block" }`
+   plus a pattern for an inline frontmatter cut regex (a `^---` regex source) if the check's JS lexer keeps regex-literal text;
+   if it blanks it, say so in the row reason (the limit is known). `src/util/yaml.mjs` holds the one cut and is `allowed` if
+   that pattern catches it; `instruction-audit.mjs` likewise with the standalone reason. If a pattern catches an unrelated use,
+   narrow it and say so.
 
 ## Files
 
@@ -60,6 +81,7 @@ tools that were its only writer. No flat subset survives (census Q4 settled in p
   `scripts/lib/git-spawn-match.mjs`, the docs of requirement 3, the spec/doc lines of requirement 5,
   `scripts/check-decision-citation-drift.baseline.json` (only if the drift check asks), `docs/architecture-manifest.json`
   (file row of the deleted module at :238; the new `doors` row), `test/architecture.test.mjs` (`ARM_STATIC_IMPORTS` line :1775),
+  `docs/platform/git/spec.md`, `docs/platform/documentation/spec.md`, `src/state/knowledge-registry.mjs` (comment), `scripts/knowledge-canary.mjs` (comment),
   `test/test-ownership.mjs:49`, `test/suite-baseline.json` (rows of deleted test files), `docs/reading-map.md:170`.
 - Delete: `src/report/frontmatter.mjs`, `scripts/knowledge-migration.mjs`, `scripts/knowledge-classifier.mjs`,
   `test/report/frontmatter.test.mjs`, `test/scripts/knowledge-migration.test.mjs`, `test/scripts/knowledge-classifier.test.mjs`.

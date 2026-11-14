@@ -10,6 +10,8 @@ landAfter: []
 
 # Phase 13: Raw config read through the facade
 
+<!-- Red team 2026-11-14: retiredBy instead of a language split, which the check cannot express. -->
+
 Rules: `phase-lead-rules.md`. pNN = `p13`; report slug `odd-p13-config-raw-read`; no Rust.
 Facts: `phase-00-facts.md` "Leak 10".
 
@@ -29,8 +31,9 @@ keys keeps its raw read (the validating door refuses such files on purpose), but
    `allowed` exactly as the check finds it, each non-reader with its reason (census 4.9: `src/runner/dispatch/config.mjs`
    display names, `src/setup/seat-binding-checks.mjs`, `src/verbs/merge/iron-law-level.mjs`, `src/verbs/state/settle-legacy-config.mjs`,
    `apps/fgctl/src/help.rs`, the `packages/config/rust/src` files, `scripts/ci-external-consumer.sh` CI). If a file other than
-   these reads a config file, stop and report it (do not add debt silently). If the row would need both `.mjs` and `.rs` without
-   being a twin, split it by language.
+   these reads a config file, stop and report it (do not add debt silently). The row allows `.mjs` and `.rs` files, so it carries
+   `retiredBy: "S7: the Node facade retires with the Node payload"` (the check applies every row to every file; a split by
+   language cannot pass).
 
 ## Files
 

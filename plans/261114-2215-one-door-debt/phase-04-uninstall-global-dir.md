@@ -1,51 +1,62 @@
 ---
 phase: 4
-title: "Uninstall finds the global directory through Config"
+title: "Uninstall's purge guard uses the state root's own home rule"
 status: pending
 effort: 0.5d
 leak: "census rank 4, the uninstall.rs part (F0 phase 08 records it as debt for step S4)"
-startAfter: ["F0 wave A on main", "F0 phase 06 on main (the Config global-directory function exists)"]
+startAfter: ["F0 wave A on main"]
 landAfter: []
-cargoLock: "one line: fgos-distribution gains fgos-config; needs the big lead's approval before starting"
 ---
 
-# Phase 04: Uninstall through Config's global directory
+# Phase 04: Uninstall's purge guard through the state-root home rule
 
-Rules: `phase-lead-rules.md`. pNN = `p04`; report slug `odd-p04-uninstall-global-dir`; crates `fgos-distribution`, `fgctl`.
+<!-- Red team 2026-11-14: rewritten. uninstall.rs home_dir() is not a global-directory chooser; it feeds the purge guard,
+which must use the same home rule as the state root it protects. No fgos-config edge, no Cargo.lock change. -->
+
+Rules: `phase-lead-rules.md`. pNN = `p04`; report slug `odd-p04-uninstall-home-guard`; crates `fgos-holder-lock`, `fgos-distribution`, `fgctl`.
 Facts: `phase-00-facts.md` "Leak 4 remainder".
 
-Split with the other plans: F0 phase 04 moves the work-state root walk; F0 phase 06 builds the Config function, `globalFgosDir()`
-in Node and moves five Node choosers; phase 16 here moves `src/setup/registrations.mjs:517`. This phase moves the last Rust
-chooser, `packages/distribution/rust/src/uninstall.rs:445-449`, which F0 assigned to S4 only because of the crate edge. S4 then
-has nothing left to move for it; the big lead tells the F0 lead.
+Split with the other plans: F0 phase 04 moves the work-state root walk; F0 phase 06 builds Config's global-directory function and
+moves five Node choosers; phase 16 here moves `src/setup/registrations.mjs:517`. This phase removes the last private home reader,
+`packages/distribution/rust/src/uninstall.rs:445-449`, which F0 left as debt for S4. S4 then has nothing left to move for it.
+
+## Context
+
+- `home_dir()` (HOME, then USERPROFILE, on every platform) has one caller: `guard_store_root(store_root, home_dir().as_deref(), ...)`
+  at `uninstall.rs:517`, which refuses `--purge` when the store root equals or contains home (`uninstall.rs:133-161`).
+- The store root comes from `resolve_machine_release_store_root()` -> `fgos_holder_lock::state_root::state_root()`
+  (`packages/distribution/rust/src/store.rs:66-70`), whose rule is HOME, then USERPROFILE, on every platform
+  (`packages/holder-lock/rust/src/state_root.rs:70-90`). The guard must use that same rule; Config's rule
+  (`packages/config/rust/src/machine.rs:95-106`, USERPROFILE only on Windows) would let a Git Bash `HOME` under the store root pass.
+- `fgos-distribution` already depends on `fgos-holder-lock`: no new edge, no `Cargo.lock` change.
 
 ## Requirements
 
-1. Add `fgos-config` to `packages/distribution/rust/Cargo.toml` (path dependency, the same feature set other crates use for
-   `fgos-config`; cycle-free, phase 00). Update `Cargo.lock` by `cargo` itself (expect exactly one added line in the
-   `fgos-distribution` entry); show the lock diff to the big lead before committing.
-2. Delete `uninstall.rs` `home_dir()` and call the Config function F0 phase 06 named for the global directory (read its name
-   from F0's phase 06 report or `packages/config/rust/src/machine.rs`). Uninstall now uses Config's home rule (HOME on unix,
-   USERPROFILE on Windows, whitespace rejected) instead of "HOME then USERPROFILE everywhere": user-visible only on Windows
-   with `HOME` set (Git Bash); propose the `## [Unreleased]` line.
-3. `doors`: if F0's "global fgOS directory" row is on your base, remove its `uninstall.rs` debt entry. If not, follow the
-   rules file (fix only, report it).
+1. `state_root.rs`: expose the home rule it already applies as one public function (for example `home_for_state_root()`),
+   and make `state_root_from` call it. Nothing is copied: the reading code moves into the function.
+2. `uninstall.rs`: delete `home_dir()`; the guard calls the holder-lock function.
+3. `doors`: if F0's "global fgOS directory" row is on your base and lists `uninstall.rs` as debt, remove the entry (its pattern
+   `fn home_dir\(` no longer matches). If the row's pattern would match the new holder-lock function name, name it in `allowed`
+   with the reason "the state root's home rule; Config's global directory is a different rule". If the row is not on your base,
+   follow the rules file.
+4. Record in the report, as an item for the big lead (not fixed here): two home rules exist on purpose or by accident
+   (`state_root.rs` HOME-first everywhere; `machine.rs` USERPROFILE on Windows). Which one is right is a separate question.
 
 ## Files
 
-- Modify: `packages/distribution/rust/Cargo.toml`, `Cargo.lock` (approved, one line), `packages/distribution/rust/src/uninstall.rs`,
-  `docs/architecture-manifest.json` (debt entry removal, if the row exists).
-- Tests: the uninstall tests that build a fake home (`rg -n "HOME|USERPROFILE" packages/distribution/rust apps/fgctl/tests`) keep
-  passing; add one case only if none sets `HOME` for uninstall (owner: Config's home rule tests in `machine.rs`).
-- Net size: src about -8, manifest -1.
+- Modify: `packages/holder-lock/rust/src/state_root.rs`, `packages/distribution/rust/src/uninstall.rs`, `docs/architecture-manifest.json` (if the row exists).
+- Tests: one uninstall test that sets the state root equal to `HOME` while `USERPROFILE` differs and asserts `--purge` is refused
+  (why new: no test pins the guard to the state root's rule); the home-rule cases stay owned by `state_root.rs` tests.
+- Delete: none. Cargo.lock: unchanged.
+- Net size: Rust about -5, tests +20.
 
 ## Gates
 
-`cargo fmt --all --check`; `cargo clippy -p fgos-distribution -p fgctl --all-targets -- -D warnings`; `cargo test -p fgos-distribution -p fgctl`;
-`cargo check -p fgos-distribution -p fgctl --target x86_64-pc-windows-msvc` and `--target aarch64-apple-darwin`;
-`node scripts/run-tests.mjs test/architecture.test.mjs test/scripts/doc-health.test.mjs test/setup/git-mutation-census.test.mjs`.
+`cargo fmt --all --check`; `cargo clippy -p fgos-holder-lock -p fgos-distribution -p fgctl --all-targets -- -D warnings`;
+`cargo test -p fgos-holder-lock -p fgos-distribution -p fgctl`; `cargo check -p fgos-holder-lock -p fgos-distribution -p fgctl --target x86_64-pc-windows-msvc` and `--target aarch64-apple-darwin`;
+`node scripts/run-tests.mjs test/architecture.test.mjs test/scripts/doc-health.test.mjs test/setup/git-mutation-census.test.mjs test/holder-lock/*.test.mjs`.
 
 ## Risk and rollback
 
-- Windows home differs for Git Bash users (L x M): documented change, Config's rule is the product rule.
-- Rollback: revert the phase (including the lock line).
+- The purge guard weakens (L x H): the guard keeps the exact rule of the root it protects; the new test pins it.
+- Rollback: revert the phase; if F0's row has landed without the debt entry by then, the revert adds the entry back in the same commit.

@@ -26,6 +26,11 @@ binding; a phase file may tighten a rule, never loosen it.
   re-run of the pattern finds nothing. Row shape is the one in `test/architecture.test.mjs` `checkDoors` (job, kind, patterns,
   allowed as path/glob strings or `{path, reason}`, debt as `{path, reason}`, reason, retiredBy for a Node/Rust twin);
   `scripts/` entries always carry a reason; JS string contents are matched, comments and Rust `#[cfg(test)]` code are not.
+  Every row is applied to every product file (there is no per-row file scope), and a row allowing both `.mjs` and `.rs` needs
+  `retiredBy`. For a Node facade over a crate write the true retirement: `"S7: the Node facade retires with the Node payload"`.
+  Never split a row by language: it cannot pass.
+- Revert: a phase that landed before the other plan's row existed has no debt entry in that row; reverting it must add the
+  debt entry back (with its reason) in the same revert commit, or main's architecture test goes red.
 - One owning proof per behaviour (design principle 8). A retired test names its new owner, or says the behaviour was removed,
   in the commit message. No env switch, flag or test-only branch to make a test pass.
 - No plan ids, phase numbers or finding codes in code, comments, test names or commit messages.

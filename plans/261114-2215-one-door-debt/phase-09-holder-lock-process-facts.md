@@ -10,6 +10,8 @@ landAfter: []
 
 # Phase 09: Holder-lock through fgos-process
 
+<!-- Red team 2026-11-14: verify-and-wait on one handle via open_verified; same_user keeps the /proc owner meaning. -->
+
 Rules: `phase-lead-rules.md`. pNN = `p09`; report slug `odd-p09-holder-lock-process-facts`; crate `fgos-holder-lock`.
 Facts: `phase-00-facts.md` "Leak 8"; phase 08's report (which function answers which read).
 
@@ -18,8 +20,8 @@ Facts: `phase-00-facts.md` "Leak 8"; phase 08's report (which function answers w
 1. Replace the reads with the crate's functions named in phase 08's table: `route.rs:652-660` (`same_user`), `origin.rs:118-119`
    (`comm`), `driver/flock.rs:694-700` (parent and group; it already parses with `fgos_process::facts::parse_relation` but reads
    `/proc/<pid>/stat` itself), and the Windows start-time reads in `helper.rs:101-149`, `route/hold.rs:459-548`,
-   `borrow_vectors.rs:440-449`. A `SYNCHRONIZE` handle held to wait on a process stays (a different job): name it in the
-   start-time row's `allowed` with that reason if the pattern still matches.
+   `borrow_vectors.rs:440-449`: each opens, verifies and waits through `open_verified` from phase 08 (one handle; never a
+   pid-based check followed by a second `OpenProcess`). `same_user` uses the `/proc` owner function, not `effective_uid`.
 2. `driver/flock.rs` keeps its holder discovery (`/proc/self/fd`, `/proc/<pid>/fdinfo`, the `/proc` scan): the holder-lock
    spec makes "who holds it as the kernel reports" its own job; it stays `allowed` in the `/proc` row.
 3. `doors`: remove the debt entries of these files from the start-time row (phase 08) and, if F0's `/proc` row is on your base,

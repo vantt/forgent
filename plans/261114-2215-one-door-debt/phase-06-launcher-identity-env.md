@@ -1,57 +1,59 @@
 ---
 phase: 6
-title: "Launcher identity environment comes from fgos-identity"
+title: "Launcher identity environment decided once, in fgos-identity"
 status: pending
-effort: 1d
+effort: 0.75d
 leak: "census rank 6"
 startAfter: ["F0 wave A on main"]
 landAfter: []
 ---
 
-# Phase 06: Launcher identity environment from fgos-identity
+# Phase 06: Launcher identity environment decided once
+
+<!-- Red team 2026-11-14: recast. The child env is already allowlisted (adapters.mjs:108-128) and env_clear'ed by the gate
+(gate/unix.rs:654-657); terminal-cutover.test.mjs:74 already proves CLAUDE_CODE_SESSION_ID does not reach the agent. This is a
+one-door refactor with no behaviour change, not a security fix. -->
 
 Rules: `phase-lead-rules.md`. pNN = `p06`; report slug `odd-p06-launcher-identity-env`; crates `fgos-identity`, `fgos-node-addon`.
 Facts: `phase-00-facts.md` "Leak 6".
 
 ## Outcome
 
-Which session variables a launched agent loses and which writer variables it gets is decided once, in
-`packages/identity/rust/src/launcher.rs` (today dead code). Node asks it through the addon; the Node copy
-(`withIdentityEnv`) and the hand-spelled codex policy string derive from that one answer. The child env now matches the
-contract (`packages/identity/contracts/attempt-writer-id.v1.json:20`): the four other session variables are scrubbed too.
+Which writer variables a launched agent gets, and which session variables it must not carry, is decided in one place,
+`packages/identity/rust/src/launcher.rs` (today dead code). Node asks it through the addon; `withIdentityEnv` and the codex
+policy string derive from that answer and hold no variable names. Behaviour does not change: the child env is still built from
+the worker allowlist and cleared by the gate; this phase removes the second decision, it does not add protection.
 
 ## Requirements
 
-1. `launcher.rs`: expose the decision as data the addon can return without an `std::env` mutation, for example
-   `launcher_env(writer_id, parent) -> { set: [(name, value)], unset: [name] }`, and keep `scrub_and_set` as its one applier
-   (or delete it if no Rust caller remains after this phase; its tests then test `launcher_env`). No new crate edge.
-2. Addon `packages/git/node-addon/src/session_identity.rs`: one export (`launcherEnv`) in the existing namespace, the same
-   pattern as `mintAttempt`. Facade `src/util/session-identity.mjs`: one export `launcherEnv(writerId, parent)`.
-3. `src/run-supervisor/direct-launch.mjs:149-153` `withIdentityEnv` applies the facade's answer (delete `unset`, set `set`) and
-   holds no variable names of its own. Callers (:222, `src/runner/dispatch/assignment-runner.mjs:1063`) unchanged.
-4. `assignment-runner.mjs:421`: build codex's `shell_environment_policy.set` entries from the same answer's `set` list.
-5. `src/setup/agent-hooks.mjs:484` (`startsWith('att-')` inside the generated pi/omp extension): leave the template, add one test
-   that the template's prefix equals the prefix of `mintAttemptWriterId()` from the facade (the generated text cannot import the
-   addon; the test keeps the twin honest). `src/setup/registrations.mjs:425` (harness detection) is not writer resolution: allowed with reason.
-6. `doors` row (new, `kind: door`):
-   `{ job: "writer and session id environment", patterns: ["FGOS_SESSION_ID", "FGOS_PARENT_WRITER_ID", "CODEX_THREAD_ID", "PI_SESSION_ID", "CLAUDE_CODE_SESSION_ID"], allowed: [...], retiredBy?: no, reason: "only fgos-identity resolves a writer and builds the launcher environment" }`.
-   Allowed core: `packages/identity/rust/src/{launcher,resolve,session,directory}.rs` (as the check finds them),
-   `src/util/session-identity.mjs`, `src/cli/command-registry.mjs` (help text) with reasons; mailbox heads
-   (`packages/mailbox/rust/store/src/hook/resolve.rs` etc.) with reason "process-boundary read, then fgos-identity resolves";
-   `src/setup/agent-hooks.mjs` (generated extension text, prefix pinned by test); `src/setup/registrations.mjs` (harness
-   detection); `scripts/*` files that set or clear these for a test or bench run, each with a reason. A row allowing `.mjs` and
-   `.rs` needs `retiredBy` only for a twin; these are a facade over a crate, not twins: if the check insists, split into a
-   Node row and a Rust row rather than inventing a `retiredBy`. Nothing may remain in `direct-launch.mjs` or `assignment-runner.mjs`.
+1. `launcher.rs`: expose the decision as data, for example `launcher_env(writer_id, parent) -> { set: [(name, value)], unset: [name] }`;
+   `scrub_and_set` becomes its applier, or is deleted with its tests moved to `launcher_env` if no Rust caller remains. No new crate edge.
+2. Addon `packages/git/node-addon/src/session_identity.rs`: one export `launcherEnv`, same pattern as `mintAttempt`. Facade
+   `src/util/session-identity.mjs`: one export `launcherEnv(writerId, parent)`.
+3. `src/run-supervisor/direct-launch.mjs:149-153` `withIdentityEnv` applies the answer and names no variable. Callers (:222,
+   `src/runner/dispatch/assignment-runner.mjs:1063`) unchanged.
+4. `assignment-runner.mjs:421`: codex's `shell_environment_policy.set` entries come from the answer's `set`.
+5. `src/setup/agent-hooks.mjs:484` (`startsWith('att-')` in the generated pi/omp extension, which cannot import the addon):
+   leave it; one test in `test/setup/agent-hooks.test.mjs` that the template's prefix equals the prefix of `mintAttemptWriterId()`.
+   `src/setup/registrations.mjs:425` detects a harness shell, not a writer: allowed with that reason.
+6. `doors` row (new, `kind: door`): `{ job: "writer and session id environment", patterns: ["FGOS_SESSION_ID", "FGOS_PARENT_WRITER_ID", "CODEX_THREAD_ID", "PI_SESSION_ID", "CLAUDE_CODE_SESSION_ID"], allowed: [...], retiredBy: "S7: the Node facade and its Node readers retire with the Node payload", reason: "only fgos-identity resolves a writer and decides the launcher environment" }`.
+   The check applies every row to every file and refuses a row that allows `.mjs` and `.rs` without `retiredBy`; a Node facade
+   over a crate does retire with the Node payload, so the `retiredBy` is true, not a workaround. `allowed` exactly as the check
+   finds it (expected about 21 files): the identity crate files, `src/util/session-identity.mjs`, `src/cli/command-registry.mjs`
+   (help text), the mailbox heads (process-boundary read, then fgos-identity resolves), `src/runner/dispatch/adapters.mjs` and the
+   worker allowlist readers if they name these variables (the allowlist decides what may pass, a different job: reason),
+   `src/setup/agent-hooks.mjs` (generated extension, prefix pinned by test), `src/setup/registrations.mjs` (harness detection),
+   and each `scripts/` file with its reason. `direct-launch.mjs` and `assignment-runner.mjs` must not match.
 
 ## Files
 
 - Modify: `packages/identity/rust/src/launcher.rs` (+ `lib.rs` re-export if needed), `packages/identity/rust/tests/attempt_writer_id.rs`,
   `packages/git/node-addon/src/session_identity.rs`, `src/util/session-identity.mjs`, `src/run-supervisor/direct-launch.mjs`,
-  `src/runner/dispatch/assignment-runner.mjs` (the policy hunk only), `docs/architecture-manifest.json` (row), `test/setup/agent-hooks.test.mjs`.
-- Tests: owner of the scrub list stays `attempt_writer_id.rs` (moved to `launcher_env`); one Node wiring case in
-  `test/run-supervisor/terminal-cutover.test.mjs` that the child env lacks `CLAUDE_CODE_SESSION_ID` and has `FGOS_SESSION_ID`
-  (why new: the Node copy never scrubbed it, so no test could); `test/run-supervisor/contracts-terminal.test.mjs:87` unchanged.
-- Net size: Node about -10, Rust about +20, tests +20.
+  `src/runner/dispatch/assignment-runner.mjs` (policy hunk only), `docs/architecture-manifest.json` (row), `test/setup/agent-hooks.test.mjs`.
+- Tests: the scrub list stays owned by `attempt_writer_id.rs` (moved to `launcher_env`); the child-env behaviour stays owned by
+  `test/run-supervisor/terminal-cutover.test.mjs:62,74` (no new copy); codex policy by `test/runner/dispatch/worker-env-case-context.test.mjs`.
+- Net size: Node about -10, Rust about +15.
+- No `## [Unreleased]` line (no user-visible change).
 
 ## Gates
 
@@ -62,6 +64,5 @@ plus `rg -l "withIdentityEnv|session-identity" test`.
 
 ## Risk and rollback
 
-- An agent CLI that needs the parent's session variable loses it (L x M): the contract says it must not have it; the mailbox
-  resolves `FGOS_SESSION_ID` first. Propose the `## [Unreleased]` line.
-- Rollback: revert the phase.
+- Env drift between the crate's answer and today's Node set (L x M): the existing tests above must pass unchanged.
+- Rollback: revert the phase (revert phase 12 first only if it later edits `session-identity.mjs`; it does not after the red-team rewrite).

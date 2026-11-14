@@ -10,6 +10,8 @@ landAfter: []
 
 # Phase 03: Activation record through Durable File
 
+<!-- Red team 2026-11-14: installed-but-unsynced keeps writing the pin; the durable temp sweep moves into the crate instead of a second copy. -->
+
 Rules: `phase-lead-rules.md`. pNN = `p03`; report slug `odd-p03-activation-durable`; Rust crates `fgos-distribution`.
 Facts: `phase-00-facts.md` "Leak 3" and "Leak 9" (Rust list). Census Q3 is answered there: a missed migration.
 
@@ -24,11 +26,14 @@ Facts: `phase-00-facts.md` "Leak 3" and "Leak 9" (Rust list). Census Q3 is answe
    `fgos_durable_file::replace_durably_with_mode(dir, "activation.json", bytes, mode)`, choosing `mode` so the installed file's
    permission equals today's (default 0o666 under the process umask). Read `packages/durable-file/rust/tests/creation_modes.rs`
    to learn whether the door applies the umask; prove the result with a test, not by reasoning. Map `InstallError` to the
-   function's `io::Error` the way `shim.rs:~190` does. Behaviour change, accepted: a parent-directory fsync failure is now an
-   error (the door's rule; today it is ignored), same as the shim.
-2. Stale temps: `cleanup_stale_activation_tmp_files` (:279-290) keeps removing `activation.json.tmp.*` (left by older releases)
-   and also removes the door's own leftover temp names for this directory if Durable File does not clean them itself (check
-   the crate first: if it exports a sweep, call it; do not copy `packages/event-store/rust/src/identity.rs:~85-100`).
+   function's `io::Error`, but by its `installed` field: if the rename has happened and only the directory fsync failed, the
+   record is in place, so init continues (writes the pin, `init.rs:1623-1639`) and prints one warning naming the fsync failure;
+   any earlier failure is an error as today. Never leave a new `activation.json` beside an old pin because of a late fsync error.
+2. Stale temps: Durable File keeps its temp on a failure (`lib.rs:294-295`) and exports no sweep, while event-store sweeps
+   `.durable-file-*.tmp` with its own copy (`packages/event-store/rust/src/identity.rs:~71-100`). Move that sweep into the crate
+   as one function (for example `sweep_stale_temps(dir)`; the code moves, the event-store copy is deleted and event-store calls
+   the crate). `cleanup_stale_activation_tmp_files` (:279-290) keeps removing `activation.json.tmp.*` (left by older releases)
+   and calls the crate's sweep for the installation directory.
 3. `doors` row (new, `kind: door`), no debt:
    `{ job: "fsync a file or directory from Rust", patterns: ["\\.sync_all\\(\\)", "\\.sync_data\\(\\)", "RENAME_EXCHANGE"], allowed: [...], reason: "fgos-durable-file orders temp, fsync, install and directory fsync; each other file does a different job, named below" }`
    with `allowed` exactly as the check finds it on your base, each with a reason, starting from:
@@ -45,17 +50,20 @@ Facts: `phase-00-facts.md` "Leak 3" and "Leak 9" (Rust list). Census Q3 is answe
 
 ## Files
 
-- Modify: `packages/distribution/rust/src/init.rs`, `docs/platform/component-boundary.md` (row :88 only), `docs/architecture-manifest.json` (the row).
+- Modify: `packages/distribution/rust/src/init.rs`, `packages/durable-file/rust/src/lib.rs` (the moved sweep), `packages/event-store/rust/src/identity.rs`
+  (its sweep replaced by the call), `docs/platform/component-boundary.md` (row :88 only), `docs/architecture-manifest.json` (the row).
 - Tests: in `init.rs`'s test module (:2363), one test that `publish_activation_file` installs the bytes with today's mode and
-  leaves no temp; the crash/recovery behaviour stays owned by `packages/distribution/rust/tests/activation_lock_multiprocess.rs`,
+  leaves no temp, one that an installed-but-unsynced result still writes the pin (fault injected through the door's existing
+  test seam if it has one; if not, say so and rely on the mapping's unit test), and the sweep's cases move with it from event-store
+  to the durable-file tests (owner moves, no copy); the crash/recovery behaviour stays owned by `packages/distribution/rust/tests/activation_lock_multiprocess.rs`,
   `pin_drift.rs`, `schema_golden.rs` and `apps/fgctl/tests/cli_surface.rs` (run them, do not copy them).
 - Delete: none. Cargo.lock: unchanged (distribution already depends on durable-file).
 - Net size: src about -25, tests about +25, manifest about +20.
 
 ## Gates
 
-`cargo fmt --all --check`; `cargo clippy -p fgos-distribution -p fgctl --all-targets -- -D warnings`;
-`cargo test -p fgos-distribution -p fgctl`; `cargo check -p fgos-distribution -p fgctl --target x86_64-pc-windows-msvc` and
+`cargo fmt --all --check`; `cargo clippy -p fgos-distribution -p fgctl -p fgos-durable-file -p fgos-event-store --all-targets -- -D warnings`;
+`cargo test -p fgos-distribution -p fgctl -p fgos-durable-file -p fgos-event-store`; `cargo check -p fgos-distribution -p fgctl -p fgos-durable-file -p fgos-event-store --target x86_64-pc-windows-msvc` and
 `--target aarch64-apple-darwin`; `node scripts/run-tests.mjs test/architecture.test.mjs test/scripts/doc-health.test.mjs test/setup/git-mutation-census.test.mjs`
 plus `rg -l "activation.json" test` (the Node readers' tests must still pass).
 

@@ -10,6 +10,8 @@ landAfter: []
 
 # Phase 10: Git and the addon through fgos-process
 
+<!-- Red team 2026-11-14: marker built from typed parts with per-platform golden tests. -->
+
 Rules: `phase-lead-rules.md`. pNN = `p10`; report slug `odd-p10-git-process-facts`; crates `fgos-git`, `fgos-node-addon`.
 Facts: `phase-00-facts.md` "Leak 8"; phase 08's report.
 
@@ -17,9 +19,9 @@ Facts: `phase-00-facts.md` "Leak 8"; phase 08's report.
 
 1. `packages/git/rust/src/worktree.rs:578-582` (`/proc/<pid>/comm` after `observe(pid)`): use `command_name_of`.
 2. `packages/git/node-addon/src/single_load.rs:21-35,43-70,~125-135` (start time of this process on three platforms, for the
-   single-load marker name): use `fgos_process` `self_identity` (or the phase 08 function) so the marker name is built from the
-   crate's start time. The marker name must not change form (two releases never run together, but a stale marker left by the
-   previous release must still be recognised as stale): prove with a unit test against today's form.
+   single-load marker name): build the marker from the typed start-time parts phase 08 exposes, so the name keeps today's exact
+   form per platform (`{pid}-{high}-{low}` Windows, `{pid}-{sec}-{usec}` macOS, Linux ticks) without parsing a string. Two addon
+   copies loaded into one process must still collide on the marker: golden test per platform (Linux run, msvc and darwin checks).
 3. Out of scope, recorded: `single_load.rs:73,146` takes a kernel lock outside holder-lock (census 4.3, F0's kernel-lock row
    debt). Not one of the ten; leave it and its debt entry.
 4. `doors`: remove the debt entries of both files from the start-time row and (if present) F0's `/proc` row.
@@ -27,8 +29,8 @@ Facts: `phase-00-facts.md` "Leak 8"; phase 08's report.
 ## Files
 
 - Modify: `packages/git/rust/src/worktree.rs` (that read only), `packages/git/node-addon/src/single_load.rs`, `docs/architecture-manifest.json`.
-- Tests: existing owners (`cargo test -p fgos-git`, `test/git/native-load.test.mjs` for single load); one unit test for the
-  marker-name form (why new: the start-time source changes underneath it).
+- Tests: existing owners (`cargo test -p fgos-git`, `test/git/native-load.test.mjs` for single load); golden marker-name tests per platform
+  (why new: the start-time source changes underneath it).
 - Net size: Rust about -50.
 
 ## Gates

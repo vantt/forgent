@@ -25,9 +25,15 @@ Nothing here needs executing; phases cite it.
   reads `version:` with a line regex, i.e. a second YAML reader), `src/setup/instruction-registry.mjs:94` (cut, then `parseYaml` :167),
   `scripts/lib/git-spawn-match.mjs:85` (cut, then `parseYaml` :87). No shared cut function exists.
 - YAML door: `src/util/yaml.mjs:29` `parseYaml` -> `nativeDoor().yaml.parse` (addon, no JS fallback). It needs a release or dev
-  manifest (`src/native/door.mjs:38-40`, `git-addon-not-shipped`). `scripts/run-tests.mjs:117-125` stages it for tests; the main
-  checkout has an activation; `check:before-merge` (`package.json:56`) runs in the main checkout. The pre-commit hook already reaches
-  `parseYaml` through `git-spawn-match.mjs`, so scripts on this door are not new.
+  manifest whose payload is the running code (`src/native/door.mjs:22-29` `ownRelease`, refusal :38-40 `git-addon-not-shipped`).
+  **Corrected by the red team:** a plain `node scripts/x.mjs` in a checkout (main included: its activation points at an installed
+  release) is refused. Scripts that read YAML today call `ensureAddonForScript()` (`scripts/lib/git-addon-stage.mjs:83-86`;
+  `build-skill-wrappers.mjs`, `project-agents.mjs`, `build-domain-registry.mjs`, `git-one-door-scan.mjs`). `scripts/run-tests.mjs:117-125`
+  stages it for test children only. `src/state/retrospective-doors.mjs:23` imports `check-decision-citation-drift.mjs` and
+  `bin/fgos.mjs:43` imports that module, so a staging call there must sit in the script's main-only entry.
+- Standalone skill scripts with their own frontmatter code: `core/skills/distill/scripts/distill.mjs:93-188` (`parseFrontmatter`),
+  `core/skills/instruction-audit/scripts/instruction-audit.mjs:90-91` (cut). They ship into user projects without the addon
+  (`oneDoor: standalone`, owner decision 2026-10-20): allowed, not moved.
 - No emitter: `src/util/yaml.mjs` exports only `parseYaml`, `YamlParseError`, `describeYamlError`; the addon `yaml` namespace exposes
   only `parse` (`packages/git/node-addon/src/yaml.rs:65-66`).
 - **Q4 settled by evidence.** The tool profile types only `true/false/null/~`, numbers, `.inf/.nan`
@@ -93,7 +99,12 @@ Nothing here needs executing; phases cite it.
   five Node choosers. Left by F0 as debt: `src/setup/registrations.mjs:517` (display label in `checkRunnerPatternsConfig`) and
   `packages/distribution/rust/src/uninstall.rs:445-449` (own `home_dir()`: HOME then USERPROFILE on every platform; config's
   `packages/config/rust/src/machine.rs:101-106` uses HOME on unix, USERPROFILE on Windows, rejects whitespace).
-- `fgos-distribution` does not depend on `fgos-config`; adding it is cycle-free (config's closure: durable-file, holder-lock,
+- **Corrected by the red team:** `uninstall.rs` `home_dir()` is not a global-directory chooser. Its only caller is the `--purge`
+  guard (`uninstall.rs:517`, `guard_store_root` :133-161), which must use the same home rule as the store root it protects:
+  `fgos_holder_lock::state_root` (HOME, then USERPROFILE, everywhere; `state_root.rs:70-90`, via `store.rs:66-70`). Config's rule
+  would weaken the guard on Windows with Git Bash. Phase 04 uses holder-lock's rule (already a dependency). Two home rules exist
+  (state root vs Config): an item for the big lead.
+- (Superseded) `fgos-distribution` does not depend on `fgos-config`; adding it is cycle-free (config's closure: durable-file, holder-lock,
   canonical-json, identity, git, host-runtime, yaml-doc) and changes one line in `Cargo.lock` (`Cargo.lock:290-302`, the
   fgos-distribution entry). Prior art: `456eb901c` (2026-10-29) "one home-directory rule for every snapshot builder";
   `uninstall.rs:445` came later (`c5cea8e25`, 2026-11-12) without reusing it.
@@ -114,6 +125,10 @@ Nothing here needs executing; phases cite it.
 - Rust `packages/identity/rust/src/launcher.rs:13-54` `scrub_and_set` (scrubs 5 names, sets `FGOS_SESSION_ID`, optional
   `FGOS_PARENT_WRITER_ID`) has **no production caller** (only `packages/identity/rust/tests/attempt_writer_id.rs:113-158`) and is
   not exposed by the addon (`packages/git/node-addon/src/session_identity.rs:13-68`).
+- **Corrected by the red team:** no leak reaches the child. The worker env starts from an allowlist with none of the session
+  names (`src/runner/dispatch/adapters.mjs:108-128`, `packages/run-supervisor/contracts/worker-env-allowlist.v1.json`) and the gate
+  clears the env (`packages/run-supervisor/rust/src/gate/unix.rs:654-657`); `test/run-supervisor/terminal-cutover.test.mjs:62,74`
+  proves it. Leak 6 is a second decision of the same list, a one-door refactor with no behaviour change.
 - The live path is Node: `src/run-supervisor/direct-launch.mjs:149-153` `withIdentityEnv` (used :222 and
   `src/runner/dispatch/assignment-runner.mjs:1063`); it deletes only `FGOS_PARENT_WRITER_ID` and leaves the four other names the
   contract scrubs (`packages/identity/contracts/attempt-writer-id.v1.json:20`). `assignment-runner.mjs:421` spells
@@ -135,7 +150,10 @@ Nothing here needs executing; phases cite it.
   writes, own bounded lifetime); documented as allowed, no code move (a supervisor API would be a new mechanism, RUL104).
 - `scripts/run-tests.mjs:269-273` (`/proc/*/cmdline` scan), `:516` bare `process.kill(pid,'SIGKILL')`;
   `scripts/lib/test-file-watchdog.mjs:92-99` (`kill(pid,0)`), `:107-125` (environ scan, SIGKILL), `:129-143` (`ps -A`, `killTree`);
-  `scripts/lib/mailbox-live-confined.mjs:432` bare-pid SIGKILL. The process door is reachable from scripts:
+  `scripts/lib/mailbox-live-confined.mjs:432` bare-pid SIGKILL. **Corrected by the red team:** the door's `scan`/`observe` views
+  carry no parent pid or elapsed time and `scan` is Linux-only (`packages/process/rust/src/platform/{macos.rs:105,windows.rs:150}`),
+  so the watchdog's `ps -A` tree reader cannot move; and staging writes only `childEnv`, so the runner process must load the door
+  itself. The process door is reachable from scripts:
   `src/native/process-identity.mjs` exports `judge`, `observe`, `selfRecord`, `signalByIdentity`, `selfChain`, `scan`;
   `scripts/lib/git-addon-stage.mjs:37-44,84-86` `ensureAddonForScript`; run-tests exports the staging env to children
   (`run-tests.mjs:122-123,679`). `packages/process/rust/src/control.rs:103` `signal_by_identity` uses pidfd on Linux.
@@ -148,6 +166,11 @@ Nothing here needs executing; phases cite it.
   hold a `SYNCHRONIZE` handle for waiting; `borrow_vectors.rs` is product code, `pub mod` at `lib.rs:15`);
   `packages/git/node-addon/src/single_load.rs:21-35,43-70,~125-135` (self start time, three platforms);
   `packages/git/rust/src/worktree.rs:578-582` (`comm`); `packages/terminal-control/rust/src/driver/herdr.rs:990-993` (`/proc/<pid>/fd/0` tty).
+- **Corrected by the red team:** holder-lock's Windows readers verify the start time and wait on the same handle
+  (`helper.rs:137-153`); a pid-based check then a second open would reopen a reuse race. `same_user` reads the owner of
+  `/proc/<pid>` (root for a non-dumpable process), which is not `effective_uid` (`facts.rs:593`). Start-time forms differ:
+  crate Windows decimal FILETIME, macOS `"{sec}.{usec:06}"` (`platform/windows.rs:139`, `macos.rs:64`); single-load marker
+  `{pid}-{high}-{low}` / `{pid}-{sec}-{usec}` (`single_load.rs:62-68,125-127`).
 - `fgos-process` exposes `identity_of`/`self_identity` (`facts.rs:294-306`), `relation_of`, `command_name_of` (:490-500),
   `effective_uid` (:592); Windows `relation_of`/`command_name_of` return `None` (`platform/mod.rs:51,56`); no tty-of-fd function.
 - All four crates already depend on `fgos-process` (`holder-lock/rust/Cargo.toml:8`, `git/rust/Cargo.toml:14`,
@@ -188,6 +211,9 @@ Nothing here needs executing; phases cite it.
   shim-path export. Activation readers outside the door: `src/setup/bin-discovery.mjs:24`, `src/setup/registrations.mjs:2576,2767,2950,3703`.
   `FGOS_ACTIVE_MANIFEST_PATH`: owner `src/run-supervisor/payload-root.mjs:28` (its comment), also read at
   `registrations.mjs:2561,2794,2807` and `apps/fgos/src/legacy_exec.rs:103`.
+- **Decided after red team:** the route clients differ in protocol, version rule and error code (`session-identity.mjs:60`,
+  `seat-binding/client.mjs:69-88`, `holder-lock/driver.mjs:99-114`) and all choose the binary through `resolveActiveHostBin`:
+  legitimate per-protocol adapters, not moved.
 - Five route clients repeat host lookup and translation: `src/holder-lock/driver.mjs:55-116`, `src/seat-binding/client.mjs:~60-117`,
   `src/terminal-control/client.mjs:33-80`, `src/run-supervisor/client.mjs:22-60`, `src/util/session-identity.mjs:~51-75`, beside
   `src/util/host-bin.mjs` `invokeHost` (envelope verbs, appends `--dir`; not usable for line-JSON `internal` routes). Each keeps
