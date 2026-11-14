@@ -227,6 +227,85 @@ fn test_recursion_trap_fails_closed() {
     );
 }
 
+/// A temporary directory holding a `node` wrapper that logs one `SPY_PID:` line per start and then runs the
+/// real `node`; returns the directory, its log file and a `PATH` that finds the wrapper first.
+#[cfg(unix)]
+fn node_spy_dir(prefix: &str) -> (PathBuf, PathBuf, String) {
+    use std::os::unix::fs::PermissionsExt;
+    let temp_dir = std::env::temp_dir().join(format!("{prefix}_{}", std::process::id()));
+    fs::create_dir_all(&temp_dir).unwrap();
+    let spy_log = temp_dir.join("spy_log.txt");
+    let _ = fs::remove_file(&spy_log);
+    let which_out = Command::new("which")
+        .arg("node")
+        .output()
+        .expect("which node must succeed");
+    let real_node = String::from_utf8_lossy(&which_out.stdout)
+        .trim()
+        .to_string();
+    let spy_script = temp_dir.join("node");
+    let script_content = format!(
+        "#!/bin/sh\necho \"SPY_PID:$$\" >> \"{}\"\nexec \"{real_node}\" \"$@\"\n",
+        spy_log.display(),
+    );
+    fs::write(&spy_script, script_content).unwrap();
+    let mut perms = fs::metadata(&spy_script).unwrap().permissions();
+    perms.set_mode(0o755);
+    fs::set_permissions(&spy_script, perms).unwrap();
+    let original_path = std::env::var("PATH").unwrap_or_default();
+    let modified_path = format!("{}:{}", temp_dir.display(), original_path);
+    (temp_dir, spy_log, modified_path)
+}
+
+// Help needs no Node: every help form is answered by the host from its embedded manifest, so the `node`
+// wrapper on PATH is never started, for a legacy verb, a native verb and the `hook` raw-argv verb alike, and
+// no release or payload has to be named.
+#[cfg(unix)]
+#[test]
+fn test_every_help_form_starts_no_node() {
+    let (temp_dir, spy_log, path) = node_spy_dir("fgos_test_help_spy");
+    let forms: &[&[&str]] = &[
+        &["--help"],
+        &["-h"],
+        &["--help", "--json"],
+        &["-h", "--json"],
+        &["--help", "dispatch", "decide", "--json"],
+        &["add", "--help"],
+        &["add", "-h", "--json"],
+        &["dispatch", "decide", "--help", "--json"],
+        &["config", "--help"],
+        &["config", "show", "-h", "--json"],
+        &["metrics", "--help", "--json"],
+        &["hook", "mailbox", "--help"],
+        &["hook", "mailbox", "--help", "--json"],
+        &["workflow", "--help"],
+    ];
+    for args in forms {
+        let output = Command::new(fgos_bin())
+            .args(*args)
+            .env("PATH", &path)
+            .env_remove("FGOS_ACTIVE_RELEASE_PATH")
+            .env_remove("FGOS_ACTIVE_MANIFEST_PATH")
+            .output()
+            .expect("failed to execute fgos");
+        assert_eq!(
+            output.status.code(),
+            Some(0),
+            "{args:?}: {}",
+            String::from_utf8_lossy(&output.stderr)
+        );
+        assert!(!output.stdout.is_empty(), "{args:?} printed no help");
+        assert!(
+            output.stderr.is_empty(),
+            "{args:?}: {}",
+            String::from_utf8_lossy(&output.stderr)
+        );
+        let starts = fs::read_to_string(&spy_log).unwrap_or_default();
+        assert!(starts.is_empty(), "{args:?} started node: {starts}");
+    }
+    let _ = fs::remove_dir_all(&temp_dir);
+}
+
 // Unix only: the spy is a `sh` wrapper script and symlinks need no privilege.
 #[cfg(unix)]
 #[test]
@@ -235,41 +314,10 @@ fn test_one_node_child_process_spy() {
     let root = repo_root();
 
     // Create a temporary directory containing a spy `node` wrapper script.
-    let temp_dir = std::env::temp_dir().join(format!("fgos_test_spy_{}", std::process::id()));
-    fs::create_dir_all(&temp_dir).unwrap();
-
-    let spy_log = temp_dir.join("spy_log.txt");
-    let real_node = {
-        let which_out = Command::new("which")
-            .arg("node")
-            .output()
-            .expect("which node must succeed");
-        let path_str = String::from_utf8_lossy(&which_out.stdout)
-            .trim()
-            .to_string();
-        PathBuf::from(path_str)
-    };
-
-    let spy_script = temp_dir.join("node");
-    #[cfg(unix)]
-    {
-        use std::os::unix::fs::PermissionsExt;
-        let script_content = format!(
-            "#!/bin/sh\necho \"SPY_PID:$$\" >> \"{}\"\nexec \"{}\" \"$@\"\n",
-            spy_log.display(),
-            real_node.display()
-        );
-        fs::write(&spy_script, script_content).unwrap();
-        let mut perms = fs::metadata(&spy_script).unwrap().permissions();
-        perms.set_mode(0o755);
-        fs::set_permissions(&spy_script, perms).unwrap();
-    }
-
-    let original_path = std::env::var("PATH").unwrap_or_default();
-    let modified_path = format!("{}:{}", temp_dir.display(), original_path);
+    let (temp_dir, spy_log, modified_path) = node_spy_dir("fgos_test_spy");
 
     let output = Command::new(fgos_bin())
-        .args(["add", "--help"])
+        .args(["workflow", "list"])
         .env("PATH", modified_path)
         .env("FGOS_ACTIVE_RELEASE_PATH", &root)
         .env("FGOS_ACTIVE_MANIFEST_PATH", &manifest_path)
@@ -510,7 +558,7 @@ fn test_legacy_exec_invocation_record_sink() {
     let _ = fs::remove_file(&record_file);
 
     let output = Command::new(fgos_bin())
-        .args(["add", "--help"])
+        .args(["workflow", "list"])
         .env("FGOS_ACTIVE_RELEASE_PATH", &root)
         .env("FGOS_ACTIVE_MANIFEST_PATH", &manifest_path)
         .env("FGOS_INVOCATION_RECORD_PATH", &record_file)
@@ -530,7 +578,7 @@ fn test_legacy_exec_invocation_record_sink() {
     let parsed: serde_json::Value =
         serde_json::from_str(lines[0]).expect("record must be valid JSON");
     assert_eq!(parsed["host_kind"], "cli");
-    assert_eq!(parsed["operation_id"], "cli.legacy.add");
+    assert_eq!(parsed["operation_id"], "cli.legacy.workflow");
     assert_eq!(parsed["provider_id"], "legacy-node");
     assert_eq!(parsed["terminal_state"], "succeeded");
     assert_eq!(parsed["dispatched"], true);
@@ -2352,7 +2400,7 @@ fn host_pins_the_state_root_for_the_node_payload() {
     );
     let run = |pinned: Option<&str>| {
         let mut cmd = Command::new(fgos_bin());
-        cmd.args(["add", "--help"])
+        cmd.args(["workflow", "list"])
             .env("PATH", &path)
             .env("FGOS_ACTIVE_RELEASE_PATH", repo_root())
             .env("FGOS_ACTIVE_MANIFEST_PATH", &manifest_path)

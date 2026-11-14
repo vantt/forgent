@@ -280,7 +280,8 @@ fn other_hook_kinds_still_reach_the_legacy_payload() {
     let starts = fs::read_to_string(&log).unwrap_or_default().lines().count();
     assert_eq!(starts, 1, "the legacy payload ran once: {out:?}");
 
-    // A help request for the native kind is answered by legacy, which owns help.
+    // A help request for the native kind is answered by the host from its manifest: it
+    // starts no legacy payload, and prints the `hook` entry instead of running the hook.
     let out = scene
         .command(&scene.main(), None)
         .env(
@@ -296,7 +297,12 @@ fn other_hook_kinds_still_reach_the_legacy_payload() {
         .output()
         .unwrap();
     let starts = fs::read_to_string(&log).unwrap_or_default().lines().count();
-    assert_eq!(starts, 2, "help reached the legacy payload: {out:?}");
+    assert_eq!(starts, 1, "help started the legacy payload: {out:?}");
+    assert_eq!(out.status.code(), Some(0), "{out:?}");
+    assert!(
+        String::from_utf8_lossy(&out.stdout).starts_with("fgos — the fgOS work-item CLI"),
+        "{out:?}"
+    );
 }
 
 /// A development manifest naming the checkout's legacy-node entry.

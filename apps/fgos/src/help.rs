@@ -26,7 +26,8 @@ static MANIFEST: OnceLock<Value> = OnceLock::new();
 
 fn manifest() -> &'static Value {
     MANIFEST.get_or_init(|| {
-        serde_json::from_str(MANIFEST_JSON).expect("embedded command-manifest.json must be valid JSON")
+        serde_json::from_str(MANIFEST_JSON)
+            .expect("embedded command-manifest.json must be valid JSON")
     })
 }
 
@@ -42,7 +43,10 @@ fn commands() -> &'static [Value] {
 /// leading help token. The whole manifest, or one verb's entry; anything else
 /// on the line is refused rather than ignored.
 pub fn top_level(args: &[OsString]) -> Result<String, Refusal> {
-    let args: Vec<String> = args.iter().map(|a| a.to_string_lossy().into_owned()).collect();
+    let args: Vec<String> = args
+        .iter()
+        .map(|a| a.to_string_lossy().into_owned())
+        .collect();
     let json = args.iter().any(|a| a == "--json");
     // `--dir <root>` is the global store flag (the `fgos` shell function
     // appends it to every call); help reads no store, so it is accepted and
@@ -51,9 +55,7 @@ pub fn top_level(args: &[OsString]) -> Result<String, Refusal> {
         .iter()
         .enumerate()
         .filter(|(i, a)| {
-            !(*a == "--dir"
-                || a.starts_with("--dir=")
-                || (*i > 0 && args[*i - 1] == "--dir"))
+            !(*a == "--dir" || a.starts_with("--dir=") || (*i > 0 && args[*i - 1] == "--dir"))
         })
         .map(|(_, a)| a.as_str())
         .filter(|a| !matches!(*a, "--json" | "--help" | "-h"))
@@ -88,7 +90,10 @@ pub fn top_level(args: &[OsString]) -> Result<String, Refusal> {
 /// asks for help. `hook` keeps the agent's raw argv: only an exact `--json`
 /// token counts there.
 pub fn for_verb(cli_args: &[OsString]) -> Result<String, Refusal> {
-    let name = cli_args.first().map(|a| a.to_string_lossy().into_owned()).unwrap_or_default();
+    let name = cli_args
+        .first()
+        .map(|a| a.to_string_lossy().into_owned())
+        .unwrap_or_default();
     // Arguments reach Node as lossily decoded strings; decode the same way so a
     // non-UTF-8 token reads as it always did instead of being refused.
     let rest: Vec<OsString> = cli_args
@@ -123,7 +128,9 @@ pub fn for_verb(cli_args: &[OsString]) -> Result<String, Refusal> {
 /// One verb's help: its manifest entry, narrowed to one sub-verb when `sub` is
 /// given.
 pub fn verb(name: &str, sub: Option<&str>, json: bool) -> Result<String, Refusal> {
-    let Some(entry) = commands().iter().find(|e| e.get("name").and_then(Value::as_str) == Some(name))
+    let Some(entry) = commands()
+        .iter()
+        .find(|e| e.get("name").and_then(Value::as_str) == Some(name))
     else {
         return Err(Refusal(format!("unknown verb \"{name}\". {TOP_USAGE}")));
     };
@@ -181,7 +188,13 @@ fn js_text(value: Option<&Value>) -> String {
         // Array.prototype.toString: elements joined by commas, null as empty.
         Some(Value::Array(items)) => items
             .iter()
-            .map(|item| if item.is_null() { String::new() } else { js_text(Some(item)) })
+            .map(|item| {
+                if item.is_null() {
+                    String::new()
+                } else {
+                    js_text(Some(item))
+                }
+            })
             .collect::<Vec<_>>()
             .join(","),
         Some(Value::Object(_)) => "[object Object]".to_string(),
@@ -201,20 +214,14 @@ fn js_trim_end(text: &str) -> &str {
     text.trim_end_matches(|c: char| {
         matches!(
             c,
-            '\t' | '\n'
-                | '\u{b}'
-                | '\u{c}'
-                | '\r'
-                | ' '
-                | '\u{a0}'
-                | '\u{1680}'
-                | '\u{2000}'..='\u{200a}'
-                | '\u{2028}'
-                | '\u{2029}'
-                | '\u{202f}'
-                | '\u{205f}'
-                | '\u{3000}'
-                | '\u{feff}'
+            '\t' | '\n' | '\u{b}' | '\u{c}' | '\r' | ' ' | '\u{a0}' | '\u{1680}' | '\u{2000}'
+                ..='\u{200a}'
+                    | '\u{2028}'
+                    | '\u{2029}'
+                    | '\u{202f}'
+                    | '\u{205f}'
+                    | '\u{3000}'
+                    | '\u{feff}'
         )
     })
 }
@@ -278,7 +285,9 @@ fn render_parameter_lines(parameters: Option<&Value>, indent: &str) -> Vec<Strin
 /// written, a switch otherwise defaults to off and a valued flag to unset.
 fn render_flag_lines(parameters: Option<&Value>, indent: &str) -> Vec<String> {
     let positional = string_list(parameters.and_then(|p| p.get("positional")));
-    let Some(properties) = parameters.and_then(|p| p.get("properties")).and_then(Value::as_object)
+    let Some(properties) = parameters
+        .and_then(|p| p.get("properties"))
+        .and_then(Value::as_object)
     else {
         return Vec::new();
     };
@@ -288,7 +297,10 @@ fn render_flag_lines(parameters: Option<&Value>, indent: &str) -> Vec<String> {
         .map(|(name, spec)| {
             let text = js_text_or(spec.get("description"), "");
             let is_boolean = spec.get("type").and_then(Value::as_str) == Some("boolean");
-            let default = js_text_or(spec.get("default"), if is_boolean { "off" } else { "unset" });
+            let default = js_text_or(
+                spec.get("default"),
+                if is_boolean { "off" } else { "unset" },
+            );
             let note = if text.to_ascii_lowercase().contains("default") {
                 String::new()
             } else {
@@ -360,7 +372,10 @@ fn effect_label(touches_state: bool, external_effect: bool) -> &'static str {
 
 fn render_help_text(entries: &[Value]) -> String {
     let schema_version = js_text(manifest().get("schema_version"));
-    let mut lines = vec![format!("fgos — the fgOS work-item CLI (schema_version {schema_version})"), String::new()];
+    let mut lines = vec![
+        format!("fgos — the fgOS work-item CLI (schema_version {schema_version})"),
+        String::new(),
+    ];
     // The whole list names a deprecated verb once, under Compatibility; one
     // verb's own help keeps its full entry.
     let single = entries.len() == 1;
@@ -449,16 +464,35 @@ mod tests {
         for entry in commands() {
             let name = entry["name"].as_str().unwrap();
             let text = verb(name, None, false).unwrap();
-            assert!(text.starts_with("fgos — the fgOS work-item CLI (schema_version "), "{name}");
-            assert!(text.contains(&format!("{} [", entry["invoke"].as_str().unwrap())), "{name}");
+            assert!(
+                text.starts_with("fgos — the fgOS work-item CLI (schema_version "),
+                "{name}"
+            );
+            assert!(
+                text.contains(&format!("{} [", entry["invoke"].as_str().unwrap())),
+                "{name}"
+            );
             let shown: Value = serde_json::from_str(&verb(name, None, true).unwrap()).unwrap();
             assert_eq!(&shown, entry, "{name}");
-            for sub in entry.get("subcommands").and_then(Value::as_object).into_iter().flat_map(|m| m.keys()) {
-                let narrowed: Value = serde_json::from_str(&verb(name, Some(sub), true).unwrap()).unwrap();
-                assert_eq!(narrowed["subcommands"].as_object().unwrap().len(), 1, "{name} {sub}");
+            for sub in entry
+                .get("subcommands")
+                .and_then(Value::as_object)
+                .into_iter()
+                .flat_map(|m| m.keys())
+            {
+                let narrowed: Value =
+                    serde_json::from_str(&verb(name, Some(sub), true).unwrap()).unwrap();
+                assert_eq!(
+                    narrowed["subcommands"].as_object().unwrap().len(),
+                    1,
+                    "{name} {sub}"
+                );
                 assert!(narrowed["subcommands"].get(sub).is_some(), "{name} {sub}");
                 let text = verb(name, Some(sub), false).unwrap();
-                assert!(text.contains(&format!("    fgos {name} {sub}\n")), "{name} {sub}");
+                assert!(
+                    text.contains(&format!("    fgos {name} {sub}\n")),
+                    "{name} {sub}"
+                );
             }
         }
     }
@@ -476,7 +510,10 @@ mod tests {
             .map(String::as_str)
             .filter(|s| !s.starts_with('-'))
             .collect();
-        let mut names: Vec<&str> = commands().iter().map(|e| e["name"].as_str().unwrap()).collect();
+        let mut names: Vec<&str> = commands()
+            .iter()
+            .map(|e| e["name"].as_str().unwrap())
+            .collect();
         selectors.sort_unstable();
         names.sort_unstable();
         assert_eq!(selectors, names);
@@ -488,25 +525,49 @@ mod tests {
         assert!(text.starts_with("fgos — the fgOS work-item CLI (schema_version 3.0)\n\n"));
         assert!(text.ends_with("\n") && !text.ends_with("\n\n"));
         let compat = text.split("Compatibility (deprecated, still callable; `fgos <verb> --help` has the detail):\n").nth(1).unwrap();
-        assert!(compat.lines().all(|l| l.starts_with("    ") && l.contains(" — ")), "{compat}");
-        assert_eq!(compat.lines().count(), commands().iter().filter(|e| truthy(e.get("deprecated"))).count());
+        assert!(
+            compat
+                .lines()
+                .all(|l| l.starts_with("    ") && l.contains(" — ")),
+            "{compat}"
+        );
+        assert_eq!(
+            compat.lines().count(),
+            commands()
+                .iter()
+                .filter(|e| truthy(e.get("deprecated")))
+                .count()
+        );
         for entry in commands().iter().filter(|e| truthy(e.get("deprecated"))) {
-            assert!(!text.contains(&format!("{} [", entry["invoke"].as_str().unwrap())), "{}", entry["name"]);
+            assert!(
+                !text.contains(&format!("{} [", entry["invoke"].as_str().unwrap())),
+                "{}",
+                entry["name"]
+            );
         }
     }
 
     #[test]
     fn a_deprecated_verb_keeps_its_full_entry_when_asked_for_alone() {
         let text = verb("setup", None, false).unwrap();
-        assert!(text.contains("    DEPRECATED — since 2026-09-14; use fgctl init"), "{text}");
+        assert!(
+            text.contains("    DEPRECATED — since 2026-09-14; use fgctl init"),
+            "{text}"
+        );
         assert!(!text.contains("Compatibility ("));
     }
 
     #[test]
     fn help_words_may_follow_json_and_dir_and_a_repeated_help_token() {
         let plain = top_level(&os(&["config"])).unwrap();
-        assert_eq!(top_level(&os(&["--dir", "/x", "config", "--json"])).unwrap(), verb("config", None, true).unwrap());
-        assert_eq!(top_level(&os(&["--dir=/x", "config", "-h", "--help"])).unwrap(), plain);
+        assert_eq!(
+            top_level(&os(&["--dir", "/x", "config", "--json"])).unwrap(),
+            verb("config", None, true).unwrap()
+        );
+        assert_eq!(
+            top_level(&os(&["--dir=/x", "config", "-h", "--help"])).unwrap(),
+            plain
+        );
         assert_eq!(
             top_level(&os(&["config", "--dir", "--json"])).unwrap(),
             verb("config", None, true).unwrap(),
@@ -538,10 +599,19 @@ mod tests {
             assert_eq!(for_verb(&os(&args)).unwrap(), whole, "{args:?}");
         }
         // a verb without sub-verbs ignores its own words
-        assert_eq!(for_verb(&os(&["init", "whatever", "--help"])).unwrap(), verb("init", None, false).unwrap());
+        assert_eq!(
+            for_verb(&os(&["init", "whatever", "--help"])).unwrap(),
+            verb("init", None, false).unwrap()
+        );
         // `--json` takes the next word as its value, and is still JSON
-        assert_eq!(for_verb(&os(&["config", "--json", "show", "--help"])).unwrap(), verb("config", None, true).unwrap());
-        assert_eq!(for_verb(&os(&["config", "show", "--help", "--json"])).unwrap(), verb("config", Some("show"), true).unwrap());
+        assert_eq!(
+            for_verb(&os(&["config", "--json", "show", "--help"])).unwrap(),
+            verb("config", None, true).unwrap()
+        );
+        assert_eq!(
+            for_verb(&os(&["config", "show", "--help", "--json"])).unwrap(),
+            verb("config", Some("show"), true).unwrap()
+        );
         assert_eq!(
             refusal(for_verb(&os(&["config", "nope", "--help"]))),
             refusal(verb("config", Some("nope"), false))
@@ -551,10 +621,22 @@ mod tests {
     #[test]
     fn hook_help_keeps_the_raw_argv_and_reads_only_an_exact_json_token() {
         let whole = verb("hook", None, false).unwrap();
-        assert_eq!(for_verb(&os(&["hook", "mailbox", "--help"])).unwrap(), whole);
-        assert_eq!(for_verb(&os(&["hook", "-h", "--format", "agy"])).unwrap(), whole);
-        assert_eq!(for_verb(&os(&["hook", "mailbox", "--help", "--json"])).unwrap(), verb("hook", None, true).unwrap());
-        assert_eq!(for_verb(&os(&["hook", "--json=1", "--help"])).unwrap(), whole);
+        assert_eq!(
+            for_verb(&os(&["hook", "mailbox", "--help"])).unwrap(),
+            whole
+        );
+        assert_eq!(
+            for_verb(&os(&["hook", "-h", "--format", "agy"])).unwrap(),
+            whole
+        );
+        assert_eq!(
+            for_verb(&os(&["hook", "mailbox", "--help", "--json"])).unwrap(),
+            verb("hook", None, true).unwrap()
+        );
+        assert_eq!(
+            for_verb(&os(&["hook", "--json=1", "--help"])).unwrap(),
+            whole
+        );
     }
 
     #[test]
@@ -575,10 +657,18 @@ mod tests {
             refusal(top_level(&os(&["init", "start"]))),
             "init takes no sub-verb (got \"start\"). Usage: fgos init --help [--json]"
         );
-        let known: Vec<&str> = entry_named("config")["subcommands"].as_object().unwrap().keys().map(String::as_str).collect();
+        let known: Vec<&str> = entry_named("config")["subcommands"]
+            .as_object()
+            .unwrap()
+            .keys()
+            .map(String::as_str)
+            .collect();
         assert_eq!(
             refusal(top_level(&os(&["config", "nope"]))),
-            format!("unknown config sub-verb \"nope\" (known: {}).", known.join(", "))
+            format!(
+                "unknown config sub-verb \"nope\" (known: {}).",
+                known.join(", ")
+            )
         );
     }
 
@@ -591,9 +681,15 @@ mod tests {
         });
         assert_eq!(
             render_parameter_lines(Some(&parameters), "  "),
-            vec!["  positional: text, kind".to_string(), "  required: --title".to_string()]
+            vec![
+                "  positional: text, kind".to_string(),
+                "  required: --title".to_string()
+            ]
         );
-        assert!(render_parameter_lines(Some(&json!({"required": [], "properties": {}})), "  ").is_empty());
+        assert!(
+            render_parameter_lines(Some(&json!({"required": [], "properties": {}})), "  ")
+                .is_empty()
+        );
         assert!(render_parameter_lines(None, "  ").is_empty());
     }
 
@@ -626,28 +722,56 @@ mod tests {
     fn deprecation_is_a_string_or_structured_metadata() {
         assert_eq!(format_deprecation(None), None);
         assert_eq!(format_deprecation(Some(&Value::Null)), None);
-        assert_eq!(format_deprecation(Some(&json!("use x"))), Some("use x".into()));
+        assert_eq!(
+            format_deprecation(Some(&json!("use x"))),
+            Some("use x".into())
+        );
         assert_eq!(
             format_deprecation(Some(&json!({"since": "1.0", "use_instead": "fgos y"}))),
             Some("since 1.0; use fgos y".into())
         );
-        assert_eq!(format_deprecation(Some(&json!({"use_instead": "fgos y"}))), Some("use fgos y".into()));
-        assert_eq!(format_deprecation(Some(&json!({"note": "n"}))), Some("{\"note\":\"n\"}".into()));
+        assert_eq!(
+            format_deprecation(Some(&json!({"use_instead": "fgos y"}))),
+            Some("use fgos y".into())
+        );
+        assert_eq!(
+            format_deprecation(Some(&json!({"note": "n"}))),
+            Some("{\"note\":\"n\"}".into())
+        );
     }
 
     #[test]
     fn a_guided_verb_prints_its_sections_in_order_and_only_when_shown_alone() {
-        let guided: Vec<&Value> = commands().iter().filter(|e| e.get("guide").is_some()).collect();
+        let guided: Vec<&Value> = commands()
+            .iter()
+            .filter(|e| e.get("guide").is_some())
+            .collect();
         assert!(!guided.is_empty());
         for entry in guided {
             let name = entry["name"].as_str().unwrap();
             let text = verb(name, None, false).unwrap();
-            let at = |label: &str| text.find(label).unwrap_or_else(|| panic!("{name} lacks {label}"));
-            let order = ["    Changes on disk:\n", "    Prerequisites:\n", "    Options:\n", "    Examples:\n", "    Exit codes:\n", "    Next:\n"];
+            let at = |label: &str| {
+                text.find(label)
+                    .unwrap_or_else(|| panic!("{name} lacks {label}"))
+            };
+            let order = [
+                "    Changes on disk:\n",
+                "    Prerequisites:\n",
+                "    Options:\n",
+                "    Examples:\n",
+                "    Exit codes:\n",
+                "    Next:\n",
+            ];
             assert!(order.windows(2).all(|w| at(w[0]) < at(w[1])), "{name}");
-            assert!(text.contains("        Every verb also takes --dir <root>"), "{name}");
+            assert!(
+                text.contains("        Every verb also takes --dir <root>"),
+                "{name}"
+            );
             let listing = top_level(&[]).unwrap();
-            assert!(!listing.contains("    Changes on disk:"), "the whole list carries no guide sections");
+            assert!(
+                !listing.contains("    Changes on disk:"),
+                "the whole list carries no guide sections"
+            );
         }
     }
 
@@ -663,8 +787,14 @@ mod tests {
             "guide": {"changes": "nothing", "prerequisites": "none", "exitCodes": ["0 ok"], "next": "stop"}
         });
         let text = render_help_text(std::slice::from_ref(&entry));
-        assert!(text.contains("fgos demo <sub> [write+external]\n    d\n"), "{text}");
-        assert!(text.contains("    fgos demo one\n        first\n        required: --id\n"), "{text}");
+        assert!(
+            text.contains("fgos demo <sub> [write+external]\n    d\n"),
+            "{text}"
+        );
+        assert!(
+            text.contains("    fgos demo one\n        first\n        required: --id\n"),
+            "{text}"
+        );
         assert!(text.contains("    Options:\n        fgos demo one\n            --id <value>  the id (default: unset)\n"), "{text}");
         assert!(text.ends_with("    Next:\n        stop\n"), "{text}");
     }
