@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "2153cc38f504921e5827d9cf6ed5e5d4d5b95186066a9efca2d4dda7a3f89324",
+  "payloadDigest": "048f488e5fd8c5d861d989c050eb7fd21fb6abd05c953e25a778daf375b3c26e",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -72,7 +72,7 @@
     "apps/fgctl/src/main.rs": "2316bf86e4d6857374ab610dd16f7dd3adb8ff2600bf573438d8ef0f567b08b2",
     "apps/fgctl/tests/cli_surface.rs": "8a6a59d003f0047289840a8cecc5ab101e724d41b2d322d6253c605671a255c5",
     "apps/fgctl/tests/git_wal_activation_gate.rs": "29773e1594549ab92f94fd9bea9f5023663385d9bd9128128756225540780907",
-    "apps/fgctl/tests/uninstall_surface.rs": "fed18f64c6c6181f2b3f942c9e55b5e76786ba26ea391f671564c93820b9e1e7",
+    "apps/fgctl/tests/uninstall_surface.rs": "9b2f2e233d5ac29cdc78c8dac1e6d2352ed4fbba84530e7cf9ad34648e91cf20",
     "apps/fgctl/tests/windows_holder_lock_gate.rs": "c1bfc1a2b6992cfe70c59acf9350a6da5fcce08033bb76fc1720d2c5df1091fa",
     "apps/fgos-gateway/build.rs": "0109e37c64e9474009c71bb3f3220496fad07dfd77b28c796f1f828c9d2d5671",
     "apps/fgos-gateway/src/cf_access.rs": "91dd9c6789d96baaf89d7b740ec56280c671b30a9cac9776bafe79c3d9cfd2ee",
