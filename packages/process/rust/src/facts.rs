@@ -521,9 +521,9 @@ impl std::fmt::Display for StartTime {
     }
 }
 
-/// The typed start time of the live process `pid`; `None` where the platform
-/// cannot read it or `pid` is gone. Zombies are answered like live processes,
-/// as the stat read does.
+/// The typed start time of `pid`; `None` where the platform cannot read it or
+/// `pid` is gone. Linux answers a zombie like a live process (the stat read
+/// does); Windows answers `None` once the process has been signalled.
 pub fn start_time_of(pid: ProcId) -> Option<StartTime> {
     platform::current().start_time_of(pid)
 }
@@ -533,21 +533,16 @@ pub fn self_start_time() -> Option<StartTime> {
     start_time_of(ProcId(std::process::id()))
 }
 
-/// The user id that owns the directory `/proc/<pid>` (Linux); `None` elsewhere or when `pid` is
-/// gone. It is read from the directory itself, whose mode is world-readable, so the kernel keeps
-/// it owned by the process's user even for a process that made itself non-dumpable (ssh-agent,
-/// gpg-agent): only the files inside, such as `stat` and `environ`, turn root-owned. Checked by a
-/// test against a non-dumpable child.
-pub fn proc_dir_owner_uid(pid: ProcId) -> Option<u32> {
-    platform::current().proc_dir_owner_uid(pid)
+/// The terminal window size `(cols, rows)` behind the standard input of `pid` (Linux): `/proc/<pid>/fd/0` is
+/// opened without becoming a controlling terminal, must be a terminal, and is asked `TIOCGWINSZ`. `None` when
+/// stdin is a pipe, a file or `/dev/null`, the size is zero, the process is gone or unreadable, or the platform
+/// has no such read.
+pub fn stdin_window_size(pid: ProcId) -> Option<(u16, u16)> {
+    platform::current().stdin_window_size(pid)
 }
 
-/// The terminal device behind the standard input of `pid` (Linux: the target of `/proc/<pid>/fd/0`
-/// when it is under `/dev/`); `None` when stdin is a pipe or a file, the process is gone or its
-/// descriptors are unreadable, or the platform has no such read.
-pub fn stdin_tty_of(pid: ProcId) -> Option<PathBuf> {
-    platform::current().stdin_tty_of(pid)
-}
+#[cfg(windows)]
+pub use crate::platform::windows::{open_verified, WaitHandle};
 
 /// The pid of `pid` in each PID namespace it is visible in, outermost first (Linux `NSpid`): one entry when
 /// it lives in this namespace alone, more when it sits inside namespaces of its own, where the last entry is its

@@ -16,8 +16,6 @@ pub mod facts;
 pub mod mapped;
 pub mod platform;
 
-#[cfg(windows)]
-pub use platform::windows::{open_verified, WaitHandle};
 pub use platform::ProcessPlatform;
 
 use facts::{ProcTuple, Verdict};

@@ -11,12 +11,13 @@ landAfter: []
 # Phase 11: Terminal control through fgos-process
 
 Rules: `phase-lead-rules.md`. pNN = `p11`; report slug `odd-p11-terminal-control-tty`; crate `fgos-terminal-control`.
-Facts: `phase-00-facts.md` "Leak 8"; phase 08's report (the fd-0 tty function).
+Facts: `phase-00-facts.md` "Leak 8"; phase 08's report (`stdin_window_size`).
 
 ## Requirements
 
-1. `packages/terminal-control/rust/src/driver/herdr.rs:990-993` (opens `/proc/<shell_pid>/fd/0`): call the phase 08 function.
-   Same answer for a pane shell (a tty path) and the same `None`/error path when the process is gone.
+1. `packages/terminal-control/rust/src/driver/herdr.rs:990-993` (opens `/proc/<shell_pid>/fd/0`): call `fgos_process::facts::stdin_window_size`, which opens
+   `/proc/<pid>/fd/0` with `O_NOCTTY|O_NONBLOCK`, checks `isatty` and runs `TIOCGWINSZ`, and returns `(cols, rows)`.
+   Same answer for a pane shell (its pty size) and the same `None`/error path when the process is gone.
 2. `doors`: remove the file's debt entry from F0's `/proc` row if present; else follow the rules file.
 
 ## Files

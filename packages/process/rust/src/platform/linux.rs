@@ -177,17 +177,23 @@ impl ProcessPlatform for Linux {
             .map(|stat| StartTime::Ticks(stat.start_ticks))
     }
 
-    fn proc_dir_owner_uid(&self, pid: ProcId) -> Option<u32> {
-        use std::os::unix::fs::MetadataExt;
-        fs::metadata(format!("/proc/{}", pid.0))
-            .ok()
-            .map(|meta| meta.uid())
-    }
-
-    fn stdin_tty_of(&self, pid: ProcId) -> Option<PathBuf> {
-        fs::read_link(format!("/proc/{}/fd/0", pid.0))
-            .ok()
-            .filter(|target| target.starts_with("/dev/"))
+    fn stdin_window_size(&self, pid: ProcId) -> Option<(u16, u16)> {
+        use std::os::fd::AsRawFd;
+        use std::os::unix::fs::OpenOptionsExt;
+        let tty = fs::OpenOptions::new()
+            .read(true)
+            .custom_flags(libc::O_NOCTTY | libc::O_NONBLOCK)
+            .open(format!("/proc/{}/fd/0", pid.0))
+            .ok()?;
+        // SAFETY: isatty only inspects an open descriptor.
+        if unsafe { libc::isatty(tty.as_raw_fd()) } != 1 {
+            return None;
+        }
+        // SAFETY: an all-zero winsize is valid plain data.
+        let mut size: libc::winsize = unsafe { std::mem::zeroed() };
+        // SAFETY: `size` is a valid winsize for TIOCGWINSZ; the descriptor is open.
+        let rc = unsafe { libc::ioctl(tty.as_raw_fd(), libc::TIOCGWINSZ, &mut size) };
+        (rc == 0 && size.ws_col > 0 && size.ws_row > 0).then_some((size.ws_col, size.ws_row))
     }
 
     fn command_name_of(&self, pid: ProcId) -> Option<String> {
@@ -837,81 +843,55 @@ mod tests {
     }
 
     #[test]
-    fn proc_dir_owner_of_a_non_dumpable_child_stays_its_user_while_its_files_turn_root() {
-        // SAFETY: geteuid has no preconditions.
-        let me = unsafe { libc::geteuid() };
-        if me == 0 {
-            return; // root owns every /proc entry: the difference cannot show
-        }
-        // SAFETY: the child calls only async-signal-safe functions (prctl, pause) and never returns.
-        let child = unsafe { libc::fork() };
-        assert!(child >= 0, "fork failed");
-        if child == 0 {
-            unsafe {
-                libc::prctl(libc::PR_SET_DUMPABLE, 0, 0, 0, 0);
-                loop {
-                    libc::pause();
-                }
-            }
-        }
-        let pid = ProcId(child as u32);
-        let file_owner = |pid: ProcId| {
-            use std::os::unix::fs::MetadataExt;
-            fs::metadata(format!("/proc/{}/environ", pid.0))
-                .ok()
-                .map(|meta| meta.uid())
+    fn stdin_window_size_is_the_pty_size_and_none_for_a_pipe_or_dev_null() {
+        let mut master = 0;
+        let mut slave = 0;
+        let size = libc::winsize {
+            ws_row: 24,
+            ws_col: 80,
+            ws_xpixel: 0,
+            ws_ypixel: 0,
         };
-        // The child sets its flag after the fork: wait until its files show it.
-        let mut files = file_owner(pid);
-        for _ in 0..200 {
-            if files == Some(0) {
-                break;
-            }
-            std::thread::sleep(std::time::Duration::from_millis(10));
-            files = file_owner(pid);
-        }
-        let owner = Linux.proc_dir_owner_uid(pid);
-        let filter = ScanFilter {
-            env_keys: Vec::new(),
-            include_self: true,
+        // SAFETY: valid out-pointers; the name and termios arguments may be null.
+        let rc = unsafe {
+            libc::openpty(
+                &mut master,
+                &mut slave,
+                std::ptr::null_mut(),
+                std::ptr::null(),
+                &size,
+            )
         };
-        let effective = Linux.view_of(pid, &filter).and_then(|v| v.effective_uid);
-        // SAFETY: reaping the child this test forked.
-        unsafe {
-            libc::kill(child, libc::SIGKILL);
-            libc::waitpid(child, std::ptr::null_mut(), 0);
-        }
-        assert_eq!(
-            files,
-            Some(0),
-            "the child is non-dumpable: its files are root's"
-        );
-        assert_eq!(owner, Some(me), "the directory stays its user's");
-        assert_eq!(effective, Some(me), "its effective uid is the user");
-    }
-
-    #[test]
-    fn proc_dir_owner_of_this_process_is_its_user() {
-        // SAFETY: geteuid has no preconditions.
-        let me = unsafe { libc::geteuid() };
-        assert_eq!(
-            Linux.proc_dir_owner_uid(ProcId(std::process::id())),
-            Some(me)
-        );
-        assert_eq!(Linux.proc_dir_owner_uid(ProcId(u32::MAX)), None);
-    }
-
-    #[test]
-    fn stdin_tty_of_a_child_reading_a_pipe_is_none() {
-        let mut child = std::process::Command::new("sleep")
+        assert_eq!(rc, 0, "openpty failed");
+        // SAFETY: slave is a descriptor this test just opened and now hands to the child.
+        let slave_file = unsafe { <File as std::os::fd::FromRawFd>::from_raw_fd(slave) };
+        let mut on_pty = std::process::Command::new("sleep")
+            .arg("5")
+            .stdin(slave_file)
+            .spawn()
+            .unwrap();
+        let mut piped = std::process::Command::new("sleep")
             .arg("5")
             .stdin(std::process::Stdio::piped())
             .spawn()
             .unwrap();
-        let tty = Linux.stdin_tty_of(ProcId(child.id()));
-        child.kill().unwrap();
-        child.wait().unwrap();
-        assert_eq!(tty, None);
+        let mut null = std::process::Command::new("sleep")
+            .arg("5")
+            .stdin(std::process::Stdio::null())
+            .spawn()
+            .unwrap();
+        let answers = (
+            Linux.stdin_window_size(ProcId(on_pty.id())),
+            Linux.stdin_window_size(ProcId(piped.id())),
+            Linux.stdin_window_size(ProcId(null.id())),
+        );
+        for child in [&mut on_pty, &mut piped, &mut null] {
+            child.kill().unwrap();
+            child.wait().unwrap();
+        }
+        // SAFETY: closing the master this test opened.
+        unsafe { libc::close(master) };
+        assert_eq!(answers, (Some((80, 24)), None, None));
     }
 
     #[test]

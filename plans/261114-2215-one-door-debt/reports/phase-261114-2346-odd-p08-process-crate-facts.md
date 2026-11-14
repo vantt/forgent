@@ -4,31 +4,32 @@
 
 | Reader | Answered by | Status |
 |---|---|---|
-| `same_user` (`holder-lock route.rs:652`) | new `facts::proc_dir_owner_uid` | added |
+| `same_user` (`holder-lock route.rs:652`) | existing `ProcView.effective_uid` (status Uid field 2), already in the scan loop | no new function |
 | `comm` (`origin.rs:118`, `git worktree.rs:578`) | existing `command_name_of` | exact |
 | parent, group (`driver/flock.rs:694`) | existing `relation_of` | exact |
-| fd-0 tty (`terminal-control herdr.rs:990`) | new `facts::stdin_tty_of` (Linux; target of `/proc/<pid>/fd/0` under `/dev/`) | added; herdr opens the proc path itself for ioctl, phase 11 may open the returned device path |
-| Windows holder open+verify+wait (`helper.rs open_holder`, `hold.rs watch_parent`) | new `open_verified(&ProcTuple) -> Option<WaitHandle>` (`ended`, `wait`) in `platform/windows.rs`, one handle: open, creation time on it, return | added |
-| self start time for the single-load marker | new `facts::StartTime` (`Ticks`, `FileTime`, `Timeval{sec,usec}`), `start_time_of`, `self_start_time` | added |
-| `borrow_vectors.rs` creation times | `start_time_of` / `open_verified` | phase 09-11 |
+| pty size of a shell's stdin (`terminal-control herdr.rs:990`) | new `facts::stdin_window_size(pid) -> Option<(u16,u16)>`: open `/proc/<pid>/fd/0` with `O_NOCTTY|O_NONBLOCK`, `isatty`, `TIOCGWINSZ` | added; `/dev/null` and pipes answer `None` |
+| Windows holder open+verify+wait (`helper.rs`, `route/hold.rs`) | `open_verified(&ProcTuple)`, a thin wrapper over `WaitHandle::open(pid)` + `start_time()` | added |
+| `borrow_vectors.rs` "has this pid ended" | `WaitHandle::open(pid)` + `ended()` (87 = gone) or `observe(pid)` | phase 09 |
+| self start time for the single-load marker | new `facts::StartTime`, `start_time_of`, `self_start_time` | added |
 
-`StartTime`'s `Display` is the crate's existing string form (decimal ticks, decimal FILETIME, `"{sec}.{usec:06}"`); macOS and Windows
-`observe` now format through it, so the typed and string forms share one source. A test per platform pins typed == string for self.
+`StartTime`'s `Display` is the crate's string form; macOS and Windows `observe` format through it, and a test per platform pins
+typed == string for self. `identity_of` on Linux, `containment/linux.rs` and Windows `signal_by_identity` still format their own
+strings, so the claim is only "`Display` equals the existing form", not a single source.
+`WaitHandle` is built on the crate's `ProcessHandle` (`windows.rs`); `windows_job.rs` keeps its own `open_for_wait` /
+`creation_time`, not merged here (a separate item if wanted). `ended` and `wait` return `io::Result<bool>`.
 
 ## Finding that corrects the plan
 
-The premise "`/proc/<pid>` is owned by root for a non-dumpable process" is false for the directory. Measured here (kernel 7.0, child with
-`prctl(PR_SET_DUMPABLE, 0)`): `/proc/<pid>` stays owned by the user (mode 0555), while `/proc/<pid>/stat`, `status`, `environ`,
-`cmdline` turn root-owned. The kernel applies the dumpable owner only to entries that are not world-readable-and-searchable directories.
-So today's `same_user` never excludes ssh-agent/gpg-agent; its comment is wrong. `proc_dir_owner_uid` keeps today's exact meaning (no
-behaviour change for phases 09-11) and its doc and test state the measured fact. If the scan should exclude non-dumpable processes, the
-reader must look at a file inside (for example `environ`), a behaviour change for the owner to decide.
+The premise "`/proc/<pid>` is owned by root for a non-dumpable process" is false for the directory (kernel 7.0 measured with a
+`prctl(PR_SET_DUMPABLE, 0)` child; only entries inside, such as `stat` and `environ`, turn root-owned). The owner of `/proc/<pid>`
+is the process's status Uid field 2, so no separate function exists; phase 09 compares `effective_uid` and fixes the wrong
+comment in `same_user`.
 
 ## Doors row
 
 New row "process identity: start time of a process", patterns as in the phase file, `allowed`: the four crate platform files
 (`linux.rs`, `macos.rs`, `windows.rs`, `windows_job.rs`), `debt`: `helper.rs`, `route/hold.rs`, `borrow_vectors.rs`, `single_load.rs`
-(each "moves onto fgos-process"). The check passed with exactly these (a stale or missing entry fails it). Phases 09-11 delete the debt
+(each "moves onto fgos-process"; `borrow_vectors.rs` reads no start time, it only matches `OpenProcess(`). The check passed with exactly these (a stale or missing entry fails it). Phases 09-11 delete the debt
 entries.
 
 ## Gates
@@ -36,8 +37,8 @@ entries.
 fmt, `clippy -p fgos-process --all-targets -D warnings`, `cargo test -p fgos-process` (48 lib tests plus the suites), `cargo check` for
 x86_64-pc-windows-msvc and aarch64-apple-darwin: green. `architecture`, `doc-health`, `git-mutation-census` tests: 65 pass.
 `check-decision-citation-drift`: no new findings. `git-one-door-scan`: 0 undeclared; census regenerated (line shifts only).
-Windows tests (`open_verified`, typed start time) and the macOS test compile under the check targets but were not run here.
-Windows clippy with `-D warnings` fails in untouched `windows_job.rs` and `windows_spawn.rs` (not a required gate; not in this phase).
+Windows tests (`open_verified`, child-ends wait, typed start time) compile under `cargo check --all-targets` for msvc but were not run here; the macOS test is not compiled by the check.
+Windows clippy with `-D warnings` fails in untouched `windows_job.rs` and `windows_spawn.rs` (not a required gate). Not done: Linux stat-field-22 door patterns (`scripts/lib/mailbox-live-confined.mjs:364`, `scripts/record-mailbox-hook-fixtures.mjs:437,:897` read it themselves) are left for OPC to file as an item.
 
 ## Changelog
 
@@ -52,7 +53,6 @@ None: no user-visible change.
 
 ## Authority
 
-`fgos-process` is the one reader of a process start time per platform (doors row), and the one source of the start-time string form
-(`StartTime`).
+`fgos-process` is the one reader of a process start time per platform (doors row).
 
 Status: DONE_WITH_CONCERNS

@@ -3,7 +3,6 @@
 
 use std::fs::File;
 use std::io;
-use std::path::PathBuf;
 use std::process::{Child, Command};
 
 use crate::control::{Signal, SignalOutcome};
@@ -61,12 +60,8 @@ pub trait ProcessPlatform: Send + Sync {
     fn start_time_of(&self, _pid: ProcId) -> Option<StartTime> {
         None
     }
-    /// See [`crate::facts::proc_dir_owner_uid`].
-    fn proc_dir_owner_uid(&self, _pid: ProcId) -> Option<u32> {
-        None
-    }
-    /// See [`crate::facts::stdin_tty_of`].
-    fn stdin_tty_of(&self, _pid: ProcId) -> Option<PathBuf> {
+    /// See [`crate::facts::stdin_window_size`].
+    fn stdin_window_size(&self, _pid: ProcId) -> Option<(u16, u16)> {
         None
     }
     /// The pid of `pid` in each PID namespace it is visible in, outermost first (Linux `NSpid`); `None` where the OS
