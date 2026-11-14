@@ -2,7 +2,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { COMMAND_REGISTRY, HELP_SELECTORS } from '../src/cli/command-registry.mjs';
+import { COMMAND_REGISTRY, HELP_SELECTORS, publicManifest } from '../src/cli/command-registry.mjs';
 import { acceptedFlags } from '../src/cli/flag-check.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -16,6 +16,11 @@ export const DEFAULT_ANNOTATIONS_PATH = path.join(
 export const DEFAULT_ROUTES_PATH = path.join(
   REPO_ROOT,
   'packages/host-runtime/contracts/command-routes.json'
+);
+
+export const DEFAULT_MANIFEST_PATH = path.join(
+  REPO_ROOT,
+  'packages/host-runtime/contracts/command-manifest.json'
 );
 
 /**
@@ -358,24 +363,44 @@ export function formatCommandRoutesJson(routes) {
   return JSON.stringify(sortedObj, null, 2) + '\n';
 }
 
+/** The bytes `fgos --help --json` prints: the verb manifest, two-space JSON and a final newline. */
+export function formatCommandManifestJson(manifest = publicManifest()) {
+  return JSON.stringify(manifest, null, 2) + '\n';
+}
+
+// Same directory as `target` (never os.tmpdir()): fs.renameSync is only
+// atomic within one filesystem, and /tmp is commonly a separate mount from
+// the checkout. A crash mid-write can still leave a tmp file behind, so
+// .gitignore covers its exact naming pattern.
+function writeAtomic(target, content) {
+  fs.mkdirSync(path.dirname(target), { recursive: true });
+  const tmpPath = `${target}.tmp.${process.pid}.${Date.now()}`;
+  fs.writeFileSync(tmpPath, content, 'utf8');
+  fs.renameSync(tmpPath, target);
+}
+
 export function exportCommandRoutes({
   routesPath = DEFAULT_ROUTES_PATH,
+  manifestPath = DEFAULT_MANIFEST_PATH,
   annotationsPath = DEFAULT_ANNOTATIONS_PATH,
   registry = COMMAND_REGISTRY,
 } = {}) {
   const routes = generateCommandRoutes({ registry, annotations: annotationsPath });
   const content = formatCommandRoutesJson(routes);
+  writeAtomic(manifestPath, formatCommandManifestJson());
 
-  fs.mkdirSync(path.dirname(routesPath), { recursive: true });
-  // Same directory as routesPath (never os.tmpdir()): fs.renameSync is only
-  // atomic within one filesystem, and /tmp is commonly a separate mount from
-  // the checkout. A crash mid-write can still leave this file behind, so
-  // .gitignore covers its exact naming pattern (see the ignore entry added
-  // alongside this generator).
-  const tmpPath = `${routesPath}.tmp.${process.pid}.${Date.now()}`;
-  fs.writeFileSync(tmpPath, content, 'utf8');
-  fs.renameSync(tmpPath, routesPath);
+  writeAtomic(routesPath, content);
   return { routes, content };
+}
+
+/** Whether the committed manifest file holds exactly the bytes the registry projects to. */
+export function checkCommandManifest({ manifestPath = DEFAULT_MANIFEST_PATH } = {}) {
+  if (!fs.existsSync(manifestPath)) {
+    return { clean: false, summary: `Target manifest file does not exist: ${manifestPath}` };
+  }
+  const actual = fs.readFileSync(manifestPath, 'utf8').replace(/\r\n/g, '\n');
+  if (actual === formatCommandManifestJson()) return { clean: true, summary: '' };
+  return { clean: false, summary: `Committed file ${manifestPath} differs from the registry projection` };
 }
 
 export function checkCommandRoutes({
@@ -441,6 +466,7 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.a
 
   let annotationsPath = DEFAULT_ANNOTATIONS_PATH;
   let routesPath = DEFAULT_ROUTES_PATH;
+  let manifestPath = DEFAULT_MANIFEST_PATH;
 
   for (let i = 0; i < args.length; i++) {
     if (args[i] === '--annotations' && args[i + 1]) {
@@ -449,21 +475,28 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.a
     } else if (args[i] === '--routes' && args[i + 1]) {
       routesPath = path.resolve(args[i + 1]);
       i++;
+    } else if (args[i] === '--manifest' && args[i + 1]) {
+      manifestPath = path.resolve(args[i + 1]);
+      i++;
     }
   }
 
   try {
     if (isCheck) {
-      const result = checkCommandRoutes({ routesPath, annotationsPath });
-      if (result.clean) {
-        process.exit(0);
-      } else {
+      const routes = checkCommandRoutes({ routesPath, annotationsPath });
+      const manifest = checkCommandManifest({ manifestPath });
+      if (routes.clean && manifest.clean) process.exit(0);
+      if (!routes.clean) {
         console.error('Command routes drift detected:');
-        console.error(result.summary);
-        process.exit(1);
+        console.error(routes.summary);
       }
+      if (!manifest.clean) {
+        console.error('Command manifest drift detected:');
+        console.error(manifest.summary);
+      }
+      process.exit(1);
     } else {
-      exportCommandRoutes({ routesPath, annotationsPath });
+      exportCommandRoutes({ routesPath, manifestPath, annotationsPath });
       process.exit(0);
     }
   } catch (err) {
