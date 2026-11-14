@@ -6,7 +6,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { spawnSync, spawn, execFileSync } from 'node:child_process';
 import { holdLock } from './fgctl-lock-holder.mjs';
-import { useReleaseFixture, releaseDirName, fixture, runFgctl } from './fgctl-init-fixture.mjs';
+import { useReleaseFixture, releaseDirName, fixture, runFgctl, removeStateHome } from './fgctl-init-fixture.mjs';
 
 useReleaseFixture();
 
@@ -42,7 +42,7 @@ test('Item 3: Idempotent re-run skips stage_release entirely (does not contend f
   } finally {
     if (holder) await holder.kill();
     fs.rmSync(tempHome, { recursive: true, force: true });
-    fs.rmSync(tempState, { recursive: true, force: true });
+    removeStateHome(tempState);
     fs.rmSync(tempProj, { recursive: true, force: true });
   }
 });
@@ -93,7 +93,7 @@ test('Item 5: Staged release whose manifest.json digest mismatches pin is refuse
     assert.ok(!fs.existsSync(path.join(tempProj, '.fgos', 'installation')));
   } finally {
     fs.rmSync(tempHome, { recursive: true, force: true });
-    fs.rmSync(tempState, { recursive: true, force: true });
+    removeStateHome(tempState);
     fs.rmSync(tempProj, { recursive: true, force: true });
   }
 });
@@ -146,7 +146,7 @@ test('Item 5 (widened): a tampered staged release is refused on the pin+matching
     assert.ok(!fs.existsSync(path.join(tempProj, '.fgos', 'installation')));
   } finally {
     fs.rmSync(tempHome, { recursive: true, force: true });
-    fs.rmSync(tempState, { recursive: true, force: true });
+    removeStateHome(tempState);
     fs.rmSync(tempProj, { recursive: true, force: true });
   }
 });
@@ -185,7 +185,7 @@ test('Item 6: Stale activation.json.tmp.* files left from crash are cleaned up o
     assert.ok(fs.existsSync(path.join(installDir, 'activation.json')), 'activation.json must exist');
   } finally {
     fs.rmSync(tempHome, { recursive: true, force: true });
-    fs.rmSync(tempState, { recursive: true, force: true });
+    removeStateHome(tempState);
     fs.rmSync(tempProj, { recursive: true, force: true });
   }
 });
@@ -218,7 +218,7 @@ test('a killed activation holder frees the lock at once: the next init takes it,
     assert.ok(fs.existsSync(path.join(installDir, 'activation.json')), 'activation.json must be published');
   } finally {
     fs.rmSync(tempHome, { recursive: true, force: true });
-    fs.rmSync(tempState, { recursive: true, force: true });
+    removeStateHome(tempState);
     fs.rmSync(tempProj, { recursive: true, force: true });
   }
 });
@@ -245,7 +245,7 @@ test('a live activation holder refuses init and nothing under installation/ chan
     }
   } finally {
     fs.rmSync(tempHome, { recursive: true, force: true });
-    fs.rmSync(tempState, { recursive: true, force: true });
+    removeStateHome(tempState);
     fs.rmSync(tempProj, { recursive: true, force: true });
   }
 });
