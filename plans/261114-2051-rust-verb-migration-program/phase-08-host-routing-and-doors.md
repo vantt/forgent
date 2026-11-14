@@ -91,6 +91,11 @@ job are added here, so a second path for any of them fails `test/architecture.te
 
 7. Run the full help table node-vs-host (`test/rust-host/verb-parity.test.mjs`) green; record counts in the report. Add a
    parity vector: `fgos add --bogus --dir <other project>` records its fault in `cwd`'s main checkout, not in `<other project>`.
+8. Close the unknown-verb gap in the help table: decide the unknown-verb stderr text (Node
+   `fgos: unknown verb "<x>". Usage: fgos <init|add|...>`, first line 325 bytes for `bogus-verb-probe`, then a second
+   invocation-fault line; host `fgos: unknown verb "<x>". Usage: fgos <command> [args...]`, 71 bytes), then add
+   `bogus-verb-probe --help` (exit 4, exact-bytes) to `test/rust-host/parity-cases/help.cases.mjs`. Phase 07 left it out
+   because the two texts differ today and the choice is a decision, not a harness matter.
 
 ## Files
 

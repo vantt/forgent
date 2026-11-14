@@ -66,7 +66,8 @@ Reuses `test/rust-host/harness.mjs`; builds no second harness.
 - Create: `test/rust-host/parity-cases/help.cases.mjs`, `test/rust-host/verb-parity.test.mjs`.
 - Modify: `test/rust-host/harness.mjs` (table loader, evidence symmetry, comment), `test/rust-host/harness.test.mjs`
   (self-tests: loader, symmetric grandchild evidence), `test/cli/helpers/fgos-cli-harness.mjs` (`run()` routing).
-- Delete: none. Tests retired: none.
+- Delete: `child-process-spy.cjs`, `SPY_PATH` and `FGOS_HARNESS_SHIMMED_COMMANDS` (beyond "none"): the PATH shim is now the one
+  child-process evidence mechanism for both entry kinds, so the second mechanism goes in the same change. Tests retired: none.
 - Net size: about +220 tests/helpers.
 
 ## Steps

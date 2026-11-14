@@ -47,6 +47,9 @@ for (const command of manifest.commands) {
 }
 
 // Refusals and leniencies the Node payload has today; the host must answer the same bytes and exit code.
+// Missing on purpose: `bogus-verb-probe --help` (exit 4, unknown verb). Node prints the full verb list after "Usage:" (325-byte
+// first line, plus an invocation-fault line), the host prints "Usage: fgos <command> [args...]" (71 bytes). Which text wins is an
+// open decision; the case is added once it is made (host routing and doors phase, full-help-table step).
 cases.push(helpCase("refusal-unknown-sub", ["metrics", "bogus", "--help"], 4));
 cases.push(helpCase("refusal-unknown-sub-json", ["dispatch", "bogus", "--help", "--json"], 4));
 cases.push(helpCase("refusal-leading-unknown-word", ["-h", "foo"], 4));
