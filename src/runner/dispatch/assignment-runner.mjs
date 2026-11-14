@@ -232,7 +232,7 @@ function assertInlineMutatingAssignmentAuthorized(asgn, opts) {
 
   // A unit run's mutating gate: its worktree and its replayed binding.
   if (asgn.provenance?.kind === 'unit-run' || asgn.unitRunId) {
-    const unitRunId = asgn.unitRunId || asgn.provenance?.unitRunId || asgn.assignmentId?.split('/')[0];
+    const unitRunId = unitRunIdOf(asgn);
     if (!unitRunId) {
       throw new RunnerConfigError(
         `executeAssignment: mutating unit-run assignment "${asgn.assignmentId}" has unresolvable unitRunId -- refused`,
@@ -589,7 +589,12 @@ function loadImmutableAssignment(assignment, { assignmentDir, cwd, opts }) {
  *
  * @returns {Promise<{ provider?: string, selection: object|null, evidence: object|null }>}
  */
-async function leaseAccountForAttempt({ cfg, opts, compiledPlan, effectivePolicy, executorId, pinnedInvocationId, assignmentsDir, assignmentId, runId, runDir, repoRoot }) {
+// The unit run an assignment belongs to: its declared id, else the prefix of its assignment id.
+function unitRunIdOf(asgn) {
+  return asgn.unitRunId || asgn.provenance?.unitRunId || asgn.assignmentId?.split('/')[0];
+}
+
+async function leaseAccountForAttempt({ cfg, opts, compiledPlan, effectivePolicy, executorId, pinnedInvocationId, assignmentsDir, assignmentId, unitRunId, runId, runDir, repoRoot }) {
   const pin = launchPinOf(opts);
   const boundPool = pin.pool && pin.executor === executorId ? pin.pool : null;
   const provider = boundPool
@@ -599,8 +604,8 @@ async function leaseAccountForAttempt({ cfg, opts, compiledPlan, effectivePolicy
   if (compiledPlan.mechanism !== 'out-of-process' || cfg.executors?.[executorId]?.kind === 'tool' || !hasProviderAccounts(cfg, provider)) {
     return { provider, selection: null, evidence: null };
   }
-  // When no account of the provider is usable only because a login died, one real call may show the owner
-  // has logged in again. A probe problem never blocks the dispatch: the selection decides.
+  // One real call may show a dead login was renewed, or that a quota stop whose end fgOS only guessed is over:
+  // the first lease of a unit run checks the account the seat is about to use. A probe problem never blocks the dispatch: the selection decides.
   if (typeof opts.providerCredentialProbe === 'function') {
     try {
       await probeQuarantinedAccounts({
@@ -609,6 +614,9 @@ async function leaseAccountForAttempt({ cfg, opts, compiledPlan, effectivePolicy
         runtimeDir: opts.providerCapacityRuntimeDir,
         probe: opts.providerCredentialProbe,
         cli: launchCandidateClis(cfg, executorId, pinnedInvocationId)[0] ?? null,
+        model: pin.model ?? effectivePolicy.model ?? null,
+        accountId: pin.leaseAccount ?? null,
+        runKey: unitRunId || assignmentId,
       });
     } catch { /* the selection below reports what is unusable */ }
   }
@@ -1353,7 +1361,7 @@ export async function executeAssignment(assignment, opts = {}) {
 
     const lease = await leaseAccountForAttempt({
       cfg, opts, compiledPlan, effectivePolicy, executorId: resolvedExecutorId, pinnedInvocationId, assignmentsDir,
-      assignmentId: effectiveAssignment.assignmentId, runId, runDir, repoRoot: root,
+      assignmentId: effectiveAssignment.assignmentId, unitRunId: unitRunIdOf(effectiveAssignment), runId, runDir, repoRoot: root,
     });
     if (lease.selection?.status === 'refused') {
       return settleRefusedLease({
