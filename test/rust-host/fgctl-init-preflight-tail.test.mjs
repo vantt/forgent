@@ -7,7 +7,7 @@ import path from 'node:path';
 import { spawnSync, execFileSync } from 'node:child_process';
 import { computeArtifactDigest, hashFile } from '../../scripts/build-rust-distribution.mjs';
 import { holdLock } from './fgctl-lock-holder.mjs';
-import { useReleaseFixture, releaseDirName, fixture, runFgctl, runShim, pathWithGcLeakingGit, processesUnder, withoutActiveRelease, removeTree } from './fgctl-init-fixture.mjs';
+import { useReleaseFixture, releaseDirName, fixture, runFgctl, runShim, pathWithGcLeakingGit, processesUnder, withoutActiveRelease, removeTree, removeStateHome } from './fgctl-init-fixture.mjs';
 
 useReleaseFixture();
 
@@ -57,7 +57,7 @@ test('P7: Candidate preflight failure refuses init before publishing activation 
     assert.ok(!fs.existsSync(distPin), 'distribution.json must not be created on preflight failure');
   } finally {
     removeTree(tempHome);
-    removeTree(tempState);
+    removeStateHome(tempState);
     removeTree(tempProj);
     removeTree(badPreflightDir);
   }
@@ -163,7 +163,7 @@ test('P7 (red-team HIGH): a hostile candidate that passes every static preflight
     assert.ok(!fs.existsSync(path.join(tempProj, '.fgos', 'distribution.json')), 'no pin may be written');
   } finally {
     removeTree(tempHome);
-    removeTree(tempState);
+    removeStateHome(tempState);
     removeTree(tempProj);
     removeTree(hostileReleaseDir);
     removeTree(outsideDir);
@@ -210,7 +210,7 @@ test('P7: Atomic activation publish ensures valid activation.json without partia
     assert.ok(!remaining.some((f) => f.startsWith('activation.json.tmp.')), 'No tmp files should remain');
   } finally {
     removeTree(tempHome);
-    removeTree(tempState);
+    removeStateHome(tempState);
     removeTree(tempProj);
   }
 });
@@ -294,7 +294,7 @@ test('P7: Local runtime tail failure leaves workspace in diagnosable state with 
     assert.equal(versionData.data.artifactDigest, newDigest);
   } finally {
     removeTree(tempHome);
-    removeTree(tempState);
+    removeStateHome(tempState);
     removeTree(tempProj);
     removeTree(tailFailReleaseDir);
   }
@@ -325,7 +325,7 @@ test('holder-lock gate: a git that leaves a background gc while it borrows a loc
     const left = processesUnder([path.join(tempTmp, 'fgos-borrow-vectors-'), path.join(tempProj, '.fgos', 'locks'), path.join(tempState, 'locks')]);
     if (left !== null) assert.deepEqual(left, [], 'the escaped gc is gone and no process holds a lock file');
   } finally {
-    removeTree(root);
+    removeStateHome(root);
   }
 });
 
@@ -346,6 +346,6 @@ test('holder-lock gate: init with the real git passes the gate and checks both l
     assert.ok(fs.statSync(path.join(tempState, 'locks')).isDirectory(), 'lock root probed');
     assert.deepEqual(fs.readdirSync(path.join(tempState, 'locks')).filter((f) => f.startsWith('.semantics-probe-')), [], 'probe files removed');
   } finally {
-    removeTree(root);
+    removeStateHome(root);
   }
 });

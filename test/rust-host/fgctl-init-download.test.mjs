@@ -5,7 +5,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import http from 'node:http';
 import { pathToFileURL } from 'node:url';
-import { useReleaseFixture, fixture, runFgctl, RELEASE_TARGET, makeDownloadProject, makeReleaseAssets, readActivation, writePinFor, removeTree } from './fgctl-init-fixture.mjs';
+import { useReleaseFixture, fixture, runFgctl, RELEASE_TARGET, makeDownloadProject, makeReleaseAssets, readActivation, writePinFor, removeStateHome } from './fgctl-init-fixture.mjs';
 
 useReleaseFixture();
 
@@ -31,7 +31,7 @@ test('download: FGCTL_VERSION installs that exact tag from the asset base, verif
     assert.equal(pin.projectRuntime.releaseVersion, 'v0.0.1-rc.1', 'the downloaded tag is recorded in the pin');
     assert.equal(pin.projectRuntime.artifactDigest, fixture.digest);
   } finally {
-    removeTree(t.root);
+    removeStateHome(t.root);
   }
 });
 
@@ -64,8 +64,8 @@ test('download: a pin with a tag re-acquires that release on an empty machine st
     assert.match(res.stderr, /pinned release v0\.0\.3 is not staged on this machine; downloading it/);
     assert.equal(readActivation(second.proj).artifactDigest, fixture.digest);
   } finally {
-    removeTree(first.root);
-    removeTree(second.root);
+    removeStateHome(first.root);
+    removeStateHome(second.root);
   }
 });
 
@@ -101,7 +101,7 @@ test('download: a pinned tag whose download does not match the pinned digest is 
     assert.match(res.stderr, /pin-mismatch/);
     assert.ok(!fs.existsSync(path.join(t.proj, '.fgos', 'installation')), 'nothing may be activated');
   } finally {
-    removeTree(t.root);
+    removeStateHome(t.root);
   }
 });
 
@@ -121,7 +121,7 @@ test('download: a pin tag without the leading v is normalized to the v-prefixed 
     assert.match(res.stderr, /downloaded and verified fgos-v0\.0\.5-/);
     assert.equal(readActivation(t.proj).artifactDigest, fixture.digest);
   } finally {
-    removeTree(t.root);
+    removeStateHome(t.root);
   }
 });
 
@@ -139,7 +139,7 @@ test('download: a pinned tag that cannot be downloaded says so and names FGCTL_V
     assert.match(res.stderr, /FGCTL_VERSION/);
     assert.match(res.stderr, /FGCTL_FROM/);
   } finally {
-    removeTree(t.root);
+    removeStateHome(t.root);
   }
 });
 
@@ -167,7 +167,7 @@ for (const [mode, expected] of [
       assert.ok(!fs.existsSync(path.join(t.proj, '.fgos', 'installation')), 'no installation may be created');
       assert.ok(!fs.existsSync(path.join(t.proj, '.fgos', 'distribution.json')), 'no pin may be written');
     } finally {
-      removeTree(t.root);
+      removeStateHome(t.root);
     }
   });
 }
