@@ -9,7 +9,7 @@ Node's `bind.mjs` builds the crate request (launch view, account view, persona c
 checks), calls the crate through the host route, and shapes the binding and the walk chain (F1). This phase moves that
 composition into `fgos-execution`, so there is one `bind` (program exit). Inputs follow D3 and D4: the runner section
 comes from the caller's request when the caller holds a run's snapshot (Node S6a callers) or from the Config crate
-when the host answers a native verb (phase 09 adapter); lease state is Dispatch's and arrives as an optional overlay.
+when the host answers a native verb (phase 09 adapter); account state comes from the port's Node adapter (`provider-capacity`) as an optional overlay.
 
 ## Requirements
 
@@ -18,7 +18,8 @@ when the host answers a native verb (phase 09 adapter); lease state is Dispatch'
    `bind.v1.json`. It does what `bind.mjs` :63-554 does today: family-keyed sections (`familyKeyed` :299), persona
    chain (:63-82, now reading 03's tables), override validation (tier names, effort, timeout bounds from the contract),
    launch view from the executor model (04), account view = declared inventory from the runner section
-   (`llmAccounts`/`providers`) plus `accountState` when present (quarantine, sticky, probe failed; the liftable rule
+   (`llmAccounts`/`providers`, as `provider-capacity.mjs:290 providerAccountInventory` and `llm-accounts.mjs:59 readLlmAccounts`;
+   both stay in Node for the lease, declared twins, D7) plus `accountState` when present (quarantine, sticky, probe failed; the liftable rule
    :231-243), crate call (`fgos_seat_binding::bind`), binding and provenance (:463-554), refusals including
    `agent-cli-missing` (:118-129) and `headless-no-executor` (:416-418), `fallbackFrom` (:454-461).
 2. `src/explain.rs`: the walk chain (`explainSeat` :591-607) and the `dispatch explain` answer (`explain.mjs:58-121`,

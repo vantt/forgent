@@ -26,7 +26,8 @@ deletes their Node arms and use cases (L10). `dispatch` stays a `legacy-cli` rou
      bridge for the Work hint (D6): one new bridge operation `work-dispatch-hint` (`src/setup/doctor-bridge.mjs`, its
      contract `packages/distribution/contracts/doctor-bridge.v1.json`, request `{workId, stage, dir}`, answer the
      `workDispatchHint` fields, `src/runner/work-dispatch.mjs:279-306`), shaped like S4's `work-store-init` (re-read
-     item 2); deleted with the bridge at S7. Node missing: `--work` fails with the bridge's named cause, other
+     item 2) and called through the bridge function in `apps/fgos/src/wiring/doctor/bridge.rs` (S4's "Node rows
+     bridge" door row lets only that file start Node; this adapter spawns nothing itself); deleted with the bridge at S7. Node missing: `--work` fails with the bridge's named cause, other
      selectors are unaffected.
    - `explain`: config through `fgos-config` without defaults (as the arm today, `bin/fgos.mjs:2447-2452`), session
      headless with herdr presence from the 09 adapter.

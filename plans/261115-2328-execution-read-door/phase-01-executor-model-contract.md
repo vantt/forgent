@@ -23,7 +23,7 @@ that stays until S6a reads the same vectors (D7).
      `bind.mjs:118-129,412-427`), the walk chain, the explain answer (`explain.mjs:58-121`), the decide answer
      (`decide.mjs:215-240`) and the hook verdict (`dispatch/hook.mjs:41-75`);
    - who decides what: Seat Binding ranks (unchanged); Execution derives executor facts and composes the bind;
-     Dispatch owns lease state and launch (it hands the account-state overlay to bind, D4);
+     Dispatch owns launch and the account-state adapter of Seat Binding's port (`provider-capacity`; it hands its read to bind as an overlay, D4);
    - the version: the binding keeps `contractVersion` `v1alpha1` (its consumers read it from run records); the route
      request gains protocol 2 (phase 09).
 2. `packages/execution/contracts/executor-model.v1.json`: `version`, `about`, then `vectors` for each derived fact

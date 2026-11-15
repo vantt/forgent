@@ -22,7 +22,7 @@ capability rows of the capability-reads plan (F4) still name Node modules as the
      `setup/seat-binding-checks.mjs` and `setup/blind-steps-proven-pools.mjs` (reason "doctor row bridge:S6b").
    - **"derive executor facts"**: patterns for the derivations (`\bfamilyOf\b`, `\bcredentialStoreOf\b`,
      `\brenderedEffortLevels\b`, `\bresolvePostureInvocation\b`, `\beffectiveRigorOf\b`, `\bdetectHerdrPresent\b`,
-     `\bvalidateGeneratedPathsShape\b`, `\bloadMachineBackendRegistry\b`, the agent-listing functions); allowed
+     `\bvalidateGeneratedPathsShape\b`, `\bloadMachineBackendRegistry\b`, `\bproviderAccountInventory\b`, `\breadLlmAccounts\b`, the agent-listing functions); allowed
      `packages/execution/rust/src/**`; each Node twin as `debt` with reason "launch-time twin, same vectors as the
      contract" and `retiredBy: "S6a"` (D7).
    - **"decide a dispatch"**: `\bcompileDispatchPlan\b` decision internals and `decideExecutorCli`; allowed the crate's

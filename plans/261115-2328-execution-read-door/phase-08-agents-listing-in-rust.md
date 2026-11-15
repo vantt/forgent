@@ -1,6 +1,6 @@
 # Phase 08: the agent-definition listing in Rust
 
-Start after: 04 landed. Wave 3, parallel with 06 and 07. Rules: [phase-lead-rules.md](phase-lead-rules.md). Facts: F2.
+Start after: 04 and 03 landed (the persona-taste message is 03's). Wave 3, parallel with 06 and 07. Rules: [phase-lead-rules.md](phase-lead-rules.md). Facts: F2.
 Worktree `erd-p08`, report slug `erd-p08-agents`. Effort: 1.5d.
 
 ## Context

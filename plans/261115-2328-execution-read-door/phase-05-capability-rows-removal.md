@@ -10,7 +10,7 @@ Step 2 of the owner's 2026-11-14 decision (`docs/platform/vision.md` section 6):
 wildcards of `runner.capabilities` (F6) go; what remains is the tool abilities (`impact-analysis`, `pane-labeling`)
 and the generic jobs (`execute`, `review`, `advise`); "a project with no capability rows still runs". 02 moved the
 councils' tier and rigor into their workflows; 03 moved role taste to `runner.roles`. Today three consumers refuse a
-capability without a row (F6): `src/workflow/propose-validate.mjs:159`, `src/workflow/capability-plan-lint.mjs:499`,
+capability without a row (F6): `src/workflow/propose-validate.mjs:159`, `src/report/capability-plan-lint.mjs:492-498,713`,
 doctor `workflow-capabilities-configured` (`registrations.mjs:1903`, `bridge:S6b`).
 
 ## Requirements
@@ -21,7 +21,7 @@ doctor `workflow-capabilities-configured` (`registrations.mjs:1903`, `bridge:S6b
    the `code:*` rows repeated). No other row changes.
 2. D9, capability names are labels: a capability with no row binds through the job-less defaults (Seat Binding:
    `roles`/`personas` tables, workflow seat tier, `tierFallback`). `propose-validate.mjs:159` and
-   `capability-plan-lint.mjs:499` stop refusing an unregistered name; they still refuse a tool ability whose tool
+   `src/report/capability-plan-lint.mjs:492-498,713` stop refusing an unregistered name; they still refuse a tool ability whose tool
    executor is absent (the rule for `kind: tool`, unchanged). Doctor `workflow-capabilities-configured` (Node body,
    still `bridge:S6b`): fails only for a tool ability without a tool executor; the "no prefer pool" warning goes
    (with no rows it would warn on every step). Wording names labels, not "unregistered capability".
@@ -41,7 +41,7 @@ doctor `workflow-capabilities-configured` (`registrations.mjs:1903`, `bridge:S6b
 
 ## Files
 
-- Modify: `core/config-standard/runner.yaml`, `src/workflow/propose-validate.mjs`, `src/workflow/capability-plan-lint.mjs`,
+- Modify: `core/config-standard/runner.yaml`, `src/workflow/propose-validate.mjs`, `src/report/capability-plan-lint.mjs`,
   `src/setup/registrations.mjs` (the `workflow-capabilities-configured` body only), the doctrine files of Req 3,
   generated skill renders, their tests (`test/setup/checks-doctor-config.test.mjs:260-302`, the plan-lint and
   propose-validate tests `rg -l "capability-plan-lint|propose-validate" test` lists, `test/helpers/config-fixture.mjs:56-107`

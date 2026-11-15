@@ -149,7 +149,7 @@ S4 fixtures (00 report section 4 lists volatile rows).
 - Persona rule (D-ADR0072, seat-binding spec :232, :445): persona files never carry `tier`/`prefer`; guard
   `src/runner/agent-definitions.mjs:233-240 personaModelTasteProblem` refuses only `tier` and `prefer` and its message
   points at `capabilities.<cap>.personas.<name>`.
-- Consumers that require a row today: `src/workflow/propose-validate.mjs:159`, `capability-plan-lint.mjs:499` refuse
+- Consumers that require a row today: `src/workflow/propose-validate.mjs:159`, `src/report/capability-plan-lint.mjs:492-498,713` refuse
   unregistered names; doctor `workflow-capabilities-configured` (`registrations.mjs:1903`, `bridge:S6b`) fails a
   Workflow capability without an entry (:1883-1885) and warns without `prefer` (:1896). `capability-serves-valid`
   compares `serves` sets (:1916-1942).

@@ -24,8 +24,7 @@ can delete the rows without changing what a council seat binds to, except the pe
    phase 05 and its fate is Q2.
 3. `domains/council/` gets what `domain-compile.mjs` needs (no `registry.yaml` required, F7) and a short `AGENTS.md`
    stating the domain's doctrine in one paragraph (councils are compositions of Workflow mechanisms; no business case
-   in `src/workflow`). Regenerate `domains/council/compiled.json` with the repository's command (`rg -n "compiled.json"
-   scripts package.json` to find it); never hand-write it.
+   in `src/workflow`). Regenerate `domains/council/compiled.json` with `scripts/build-domain-registry.mjs`; never hand-write it.
 4. Update every reference to `core/workflows/<council>.yaml` (`rg -n "core/workflows" bin src scripts core domains docs test .claude`):
    docs, skills (then `npm run build:skills` for the render surfaces), tests' fixture paths. Persona lookup: council
    personas stay in `core/agents` (visible to every domain); `advisor` stays unresolved as today (F7), named in the report.
