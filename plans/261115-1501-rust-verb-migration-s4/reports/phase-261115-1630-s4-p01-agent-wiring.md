@@ -123,4 +123,4 @@ Status: DONE_WITH_CONCERNS
 - Phase 07's file lists the deferrals (live harness import, extension runtime cases, launcher digest test, debt entries).
 - `test/setup/project-launcher.test.mjs` pins the Node launcher bodies to `launcher-digests.json`; spec text for the `mailbox.enabled` reader
   fixed in `docs/platform/agent-mailbox/spec.md`; redundant `set_permissions` removed from `launcher.rs`.
-- Pending: cherry-pick of p02's corrected spawn commits over `abc80cef5` and `cf78c3189` when the step lead sends the shas.
+- Spawn: the branch carries p02's three corrected commits in order (`4cab0cb29` spawn, `a6cb41064` fgos-process lock line, `ea4c968a8` process group and bounded collection; resolved onto this base, they drop out when p02 lands). The `fgos-config` lock line is folded into the commit that adds the Cargo.toml edge, so every commit builds with `--locked`; drop it if p02 lands the same line first. Callers needed no change.
