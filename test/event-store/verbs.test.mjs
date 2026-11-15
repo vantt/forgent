@@ -73,7 +73,7 @@ test('JSONL export writes canonical reader order, cursors and refuses existing o
 test('an unset eventStore key takes the bundled standard value', () => {
   assert.deepEqual(eventStoreConfig({}), JSON.parse(JSON.stringify(readStandardValue('eventStore').value)));
 });
-test('config merges project over global and validates integer boundaries; the Work consumer rebuilds its cache', async t => {
+test('config merges project over global and refuses a bad value by code; the Work consumer rebuilds its cache', async t => {
   const f = fixture(t);
   fs.writeFileSync(f.ctx.globalConfigPath, JSON.stringify({ eventStore: { seal: { intervalSec: 10 }, sync: { intervalSec: 20 }, remote: 'backup' } }));
   writeProjectConfig(f.repo, { eventStore: { seal: { intervalSec: 30 }, remote: 'origin' } });
@@ -85,8 +85,10 @@ test('config merges project over global and validates integer boundaries; the Wo
   assert.throws(() => readEventStoreConfig(f.repo, f.ctx.globalConfigPath, { strict: true }), /event-store-config: config-parse/);
   writeProjectConfig(f.repo, { unrelated: { broken: true }, eventStore: { sync: { intervalSec: -1 } } });
   assert.throws(() => readEventStoreConfig(f.repo, f.ctx.globalConfigPath), /event-store-config/);
+  // The minimums and the shape rules of each key are the config crate's (`event_store_section.rs`); the adapter's
+  // refusal is proven above, with a value the crate refuses.
+  assert.throws(() => eventStoreConfig({ eventStore: { seal: { intervalSec: 0 } } }), /event-store-config: invalid seal\.intervalSec/);
   writeProjectConfig(f.repo, {});
-  for (const eventStore of [{ seal: { intervalSec: 0 } }, { seal: { coalesceSec: 0 } }, { seal: { coalesceSec: 1.5 } }, { seal: { coalesceSec: '30' } }, { sync: { intervalSec: -1 } }, { rebuild: { maxAttempts: 1.5 } }, { remote: '' }]) assert.throws(() => eventStoreConfig({ eventStore }), /event-store-config/);
   const { rebuilt } = await rebuildStoreUseCase(f.ctx);
   // A summary, never the view: the size of each collection, the view's revision, and what its cache covers.
   assert.deepEqual(rebuilt.map(({ consumer, counts }) => ({ consumer, counts })), [{ consumer: 'work', counts: { work: 0, decisions: 0 } }, { consumer: 'porting', counts: { porting: 0 } }, { consumer: 'identity', counts: { entries: 0, dropped: 0 } }]);

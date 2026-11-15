@@ -85,12 +85,6 @@ function setupTestRepo() {
   return tmp;
 }
 
-test('fgos run --help describes the command', () => {
-  const out = execFileSync(process.execPath, [BIN_FGOS, 'run', '--help'], { encoding: 'utf8' });
-  assert.ok(out.includes('fgos run'));
-  assert.ok(out.includes('--unit'));
-});
-
 test('fgos run executes read-only unit from file', () => {
   const tmp = setupTestRepo();
   const unitFile = path.join(tmp, 'my-unit.yaml');
@@ -262,12 +256,6 @@ test('fgos run --sync <ref> without a prompt makes a sync-only unit that passes 
   assert.equal(record.unit.syncOnly, true);
   assert.equal(record.sync.status, 'up-to-date');
   assert.equal(record.settlement.outcome, 'pass');
-});
-
-test('fgos run help names --input and --verify', () => {
-  const out = execFileSync(process.execPath, [BIN_FGOS, 'run', '--help'], { encoding: 'utf8' });
-  assert.ok(out.includes('--input'), out);
-  assert.ok(out.includes('--verify'), out);
 });
 
 // The raise doors: no door of this release can attest a person, so `fgos run` raises nothing. A tier above the

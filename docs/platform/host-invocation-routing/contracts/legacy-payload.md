@@ -42,6 +42,8 @@ It must not resolve the payload through PATH, caller cwd, a hardcoded source pat
 
 Node payload tests may spawn `bin/fgos.mjs` directly because they test the payload. Production runtime call sites should route through their single resolver and, after R1, prefer workspace shim tier 0.
 
+The payload does not answer help. It has no help renderer: the host answers every help form from the generated manifest (`apps/fgos/src/help.rs`), and an exact `--help` or `-h` token that reaches `bin/fgos.mjs` directly is forwarded to the host (`runHostInherited` in `src/util/host-bin.mjs`, host from `resolveHostBin`), keeping the recursion guard in the environment so an older host that still forwards help to Node refuses the second hop. With no host found it prints one stderr line pointing at the installed `fgos` and `npm run fgos:dev -- <verb> --help`, and exits 4.
+
 ## 4. Implementation Alignment
 
 | Design claim | Implementation status | Evidence | Gap / next action |
@@ -49,6 +51,7 @@ Node payload tests may spawn `bin/fgos.mjs` directly because they test the paylo
 | Source payload file remains unmoved. | `legacy-current` | [../../../../bin/fgos.mjs](../../../../bin/fgos.mjs) | Keep until zero legacy routes and removal gates pass. |
 | Release manifest locates payload. | `implemented preview` | [release manifest contract](../../packaging-distribution/contracts/release-manifest.md), [../../packaging-distribution/reports/track-closeout.md](../../packaging-distribution/reports/track-closeout.md), [../verification/r1-rust-host-proof.md](../verification/r1-rust-host-proof.md) | Keep manifest-owned legacy payload resolution until zero legacy routes and removal gates pass. |
 | `fgos-runner` remains public Node entry until migrated. | `legacy-current` | [../../../../package.json](../../../../package.json) | Include in R1 runtime inventory. |
+| The payload answers no help; the host does. | `implemented preview` | [../../../../apps/fgos/src/help.rs](../../../../apps/fgos/src/help.rs), [../../../../test/rust-host/help-routes.test.mjs](../../../../test/rust-host/help-routes.test.mjs) | None. |
 
 ## 5. Related Files
 

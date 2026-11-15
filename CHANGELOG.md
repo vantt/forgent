@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- `fgos mailbox status` now shows how many mailbox hook calls skipped their drain because the mailbox lock was busy (a line, only when the count is above zero), kept in `runtime/mailbox/hook-lock-busy.json`; a skipped call leaves its mail pending for the next call. The count may undercount when two skips race.
+- A document whose frontmatter is not valid YAML is now reported by file name by `fgos docs-index`, `fgos authoritative-match` and `fgos knowledge status`, instead of being read as having no frontmatter. Frontmatter is parsed by the one YAML door; `fgos setup` still copies a project skill whose frontmatter is not valid YAML without failing.
+- An unquoted `metadata.version` in a project skill (for example `version: 1.10`, read as a number) no longer protects the skill from being overwritten by `fgos setup`; a warning asks to quote it.
+- Removed `scripts/knowledge-migration.mjs` and `scripts/knowledge-classifier.mjs` from the payload; the one-time knowledge migration they ran is done.
+- A project without its own `core/agents` now gets the installed core persona in the assignment prompt instead of an empty persona section, and a persona missing `name:` or a description renders a failure line instead of a bare section.
+- An executor's `env:` no longer passes `PI_SESSION_FILE`, `PI_SESSION_ID`, `CODEX_THREAD_ID` or `CLAUDE_CODE_SESSION_ID` to the agent; each attempt gets its own session.
+- The Rust host now owns the invocation front door for every verb: root and store admission, the caller-tree root walk (one Git read per native call), the fault record writer, Event Store maintain, the config reader and argument parsing. An unknown verb prints a usage text that lists every verb in registry order.
+- A missing `HOME` is now one refusal, `config-io` / `HomeUnset`, with the message "set HOME"; fgOS no longer falls back to the passwd home. Publishing a corrupt open event stream now reports the corruption instead of continuing.
+- Help for every verb is answered by the Rust host. Help through a direct `node bin/fgos.mjs` and shell-integration tiers 1 to 3 therefore needs a host (an activation or `FGOS_HOST_BIN`); without one, the doctor probe reports "fgos --help fails".
+
 ## [v0.2.0-rc.9] - 2026-11-14
 
 - rc.9 follows rc.8 and adds: account health (the account probe with its direct leg, the scheduled probe timer, run diagnosis that tells an account fault from an infrastructure one), the host and surface layer (`fgos preflight` retired, a faster doctor, one domain catalog), the release publish fix, and fixes for races in the test and process layers (Event Store append recovery, holder-lock borrow vectors, the spawned child's descriptors, watched-run tokens, state-home removal).

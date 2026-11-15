@@ -9,6 +9,7 @@ pub use restore::{RestorePreview, RestoreRequest, RestoreResult};
 mod land;
 pub use land::{LandCandidate, LandEvidence, LandFile, LandRequest, LandSession};
 mod inspect;
+pub mod invocation_root;
 mod objects;
 mod refs;
 mod worktree;
@@ -17,6 +18,7 @@ pub use worktree::{
 };
 mod remote;
 mod sequence;
+pub mod store_admission;
 pub use inspect::*;
 pub use remote::{RefMapping, RemoteRef};
 pub use sequence::{sequence_ref, SequenceHome, SequencePush, SequenceTip};

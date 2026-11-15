@@ -34,7 +34,7 @@ Store lock đổi từ file `O_EXCL` có pid/TTL sang kernel lock `<fgosDir>/loc
 - **Subject tầng nền**: Subject đo lường là các thực thể tầng nền (`run`, `session`, `executor`, `case`); Work Item là source quan sát tuỳ chọn, không phải trung tâm đo lường.
 - **Friction rời Work**: Lưu trữ friction tách rời khỏi `work.friction` trong Work event store; chuyển thành append-only shards trong `.fgos/observe/friction/<writerId>.jsonl`.
 - **Writer Rust duy nhất**: Mọi component ghi friction hoặc metrics đều gọi qua native CLI của Rust host. Recursion guard chỉ còn cho `legacy-cli`.
-- **`nativeOnly`**: Các verb `metrics` và `friction` được đánh dấu `nativeOnly: true` trong command registry, Node legacy CLI từ chối trực tiếp với exit 4.
+- **`native`** (trước là `nativeOnly`, đổi tên 2026-11-14 khi gom về một trường khai báo): Các verb `metrics` và `friction` được đánh dấu `native: true` trong command registry, Node legacy CLI từ chối trực tiếp với exit 4.
 - **Không backward compat**: Supersede luật "Preserve current commands" của `node-to-rust-migration.md` đối với `check/faults/dispatch-report/evolve`; chuyển hẳn sang `metrics` và `friction`.
 - **Single path**: Một con đường thực thi duy nhất qua host router native.
 - **Store Observe tracked, shard theo writer**: Lưu trữ dưới `.fgos/observe/<store>/<writerId>.jsonl` được git theo dõi; migration theo cursor `(src, seq)`.
@@ -52,3 +52,9 @@ Phiên chốt `plans/reports/council-261024-1947-harden-t3a-arbitration.md` §2 
 - **Thay thế (quyết định chủ 31)**: câu "Hermetic consumer invariant" về Node eligibility projection độc lập, dòng "Observe độc lập" ở § 1 theo nghĩa đó, và dòng doctor cũ (so eligible unique count với projection của Node) không còn hiệu lực. Fixture dùng chung `test/fixtures/run-layout/expected.json` là bằng chứng duy nhất về admission; doctor kiểm accounting của host và so số thư mục, không admit lại run ở Node. Lý do: một bản admission thứ hai ở Node kéo chậm doctor (khoảng 1,5 giây mỗi lần) và là bản sao phải sửa cùng lúc với Rust.
 - Friction: migration tường minh, settle so instant (§ Friction); verb ghi dùng root main checkout.
 - Phương án bị loại: áp luật root main checkout cho cả verb đọc (thêm khoảng 20 đến 25 ms mỗi lần gọi, chỉ verb ghi cần).
+
+### 2026-11-15 — Bản ghi lệnh gọi sai: hai writer, một file vector
+
+- Host Rust ghi lệnh gọi sai của verb native (`packages/observe/rust/src/invocation_fault.rs`), Node vẫn ghi cho verb legacy (`src/observe/invocation-fault-log.mjs`). Giữ hai writer cho đến khi verb Node cuối cùng chuyển sang host; lý do: Node phải ghi được một lỗi ngay cả khi host không với tới được (`src/observe/friction-client.mjs` ghi `friction-write-failed` khi `invokeHost` thất bại), còn host phải ghi lỗi của chính nó mà không dựng một tiến trình Node.
+- Hợp đồng là `test/rust-host/fixtures/invocation-fault-vectors.json`, hai bên cùng đọc; mỗi hành vi có đúng một bằng chứng sở hữu (bảng vector), phía còn lại chỉ nối dây.
+- Writer Rust che `message` theo argv; writer Node chưa (việc riêng, không sửa trong đợt này). Cặp writer có row `retiredBy` trong bảng `doors`.

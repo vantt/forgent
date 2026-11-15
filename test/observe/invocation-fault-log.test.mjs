@@ -16,7 +16,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync, spawnSync } from 'node:child_process';
 import { StoreError, withFaultClass } from '../../src/state/store-error.mjs';
-import { argvShape, recordInvocationFault } from '../../src/observe/invocation-fault-log.mjs';
+import { argvShape, recordInvocationFault, resolveFaultLogPath } from '../../src/observe/invocation-fault-log.mjs';
 import { appendFaultRecord, FAULT_LOG_MAX_BYTES } from '../../src/util/capped-jsonl-log.mjs';
 import { recordApprovePostSuccessFault } from '../../src/observe/approve-fault-log.mjs';
 
@@ -224,16 +224,47 @@ test('the fault log is gitignored in this repo — recorded argv must never be c
   );
 });
 
+// The vector file is the contract both writers keep: the Rust writer reads it too
+// (packages/observe/rust/src/invocation_fault.rs). A row this writer fails is fixed in the writer.
+const VECTORS = JSON.parse(fs.readFileSync(path.join(REPO_ROOT, 'test', 'rust-host', 'fixtures', 'invocation-fault-vectors.json'), 'utf8'));
+
 test('a recorded call keeps the verb, sub-verb and flag names and only the length of every value', () => {
-  const secret = 'sk-live-0123456789abcdef';
-  assert.deepEqual(
-    argvShape(['workflow', 'propose', '--request', secret, '--token=hunter2', '--json', 'free text'], { sub: 'propose' }),
-    ['workflow', 'propose', '--request', `<${secret.length}>`, '--token=<7>', '--json', '<9>'],
-  );
-  assert.deepEqual(argvShape(['nosuchverb', '--whatever']), ['nosuchverb', '--whatever']);
-  assert.deepEqual(argvShape(['x', 'propose']), ['x', '<7>'], 'a second token is a value unless the caller names it as the sub-verb');
-  assert.deepEqual(argvShape(['x', `--${'a'.repeat(60)}`]), ['x', '<62>'], 'a flag name that is too long to be one is a value');
-  assert.deepEqual(argvShape(undefined), []);
+  for (const row of VECTORS.argvShape) {
+    assert.deepEqual(argvShape(row.argv, { sub: row.sub ?? undefined }), row.expectedArgvShape, row.name);
+  }
+  assert.deepEqual(argvShape(undefined), [], 'a call without an argv array has no shape');
+});
+
+test('the fault log goes where the vector rows say: the resolved store, else the main checkout store, else nowhere', () => {
+  for (const row of VECTORS.pathChoice) {
+    const root = fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-fault-path-')));
+    const { repository, stores, linkedWorktree } = row.layout;
+    if (repository) {
+      // The fixture helper plants a store, which would hide the "main checkout has no store" row.
+      const main = path.join(root, repository);
+      fs.mkdirSync(main);
+      execFileSync('git', ['init', '-q', '-b', 'main'], { cwd: main });
+      if (linkedWorktree) {
+        execFileSync('git', ['-c', 'user.email=t@example.com', '-c', 'user.name=T', 'commit', '-q', '--allow-empty', '-m', 'seed'], { cwd: main });
+        execFileSync('git', ['worktree', 'add', '-q', '-b', 'fault-path-vector', path.join(root, linkedWorktree)], { cwd: main });
+      }
+    } else {
+      fs.mkdirSync(path.join(root, 'plain'));
+    }
+    for (const store of stores) fs.mkdirSync(path.join(root, store, '.fgos'), { recursive: true });
+    const fgosDir = row.call.fgosDir === null ? undefined : path.join(root, row.call.fgosDir);
+    const expected = row.expected === null ? null : path.join(root, row.expected);
+    assert.equal(resolveFaultLogPath(fgosDir, path.join(root, row.call.cwd)), expected, row.name);
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test('a fault record keeps the key order the vector file names', () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-fault-keys-'));
+  fs.mkdirSync(path.join(root, '.fgos'));
+  const logPath = recordInvocationFault({ fgosDir: path.join(root, '.fgos'), cwd: root, verb: 'work', faultClass: 'arg-parse', message: 'bad call', argv: ['work'] });
+  assert.deepEqual(Object.keys(JSON.parse(fs.readFileSync(logPath, 'utf8'))), VECTORS.recordKeyOrder);
+  fs.rmSync(root, { recursive: true, force: true });
 });
 
 test('a secret passed to a bad call never reaches the fault log file, which is private to its owner', () => {

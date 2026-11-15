@@ -1,7 +1,7 @@
 ---
 title: "Rust verb migration program (F0 through S7)"
 description: "Move the legacy-Node CLI verbs onto the Rust host, foundations first, one layer at a time, retiring each Node path in the same change."
-status: pending
+status: in-progress
 priority: P1
 effort: 22d (F0 only; S1-S7 sized when each starts)
 branch: plan/rust-verb-migration-program
@@ -58,7 +58,7 @@ lane, root, global directory, admission, fault record, argument parser, Event St
 
 ```text
 F0 host foundations
- -> S2 (lock, lock-status, git, worktree)  ||  S3 (events, session, gateway, agents)
+ -> S2 (lock, lock-status, git)  ||  S3 (events, session, gateway)
  -> S4 packaging (retire setup; port wire-agents, uninstall, init, doctor)
  -> S5 bind / dispatch decide / tool
  -> S6a Execution (tier 5) -> S6b Workflow (tier 6) -> S7 Work (tier 7)
@@ -75,13 +75,15 @@ already moved.
 |---|---|---|---|---|---|---|---|
 | **F0** host foundations | Host owns help; route data names a native sub-verb; parity lane; the cross-cutting doors (invocation root, global directory, argument parse, store admission, fault record, Event Store maintain) have one Rust owner or a proven twin; one one-door guard mechanism with first-tier rows | none flipped (help door moves) | see "F0 file set" | this plan approved | see "F0 exit" | T9 `main()` doors settled (on main) | none |
 | **S1** hook verdicts | `hook decision-question` and `hook main-checkout-delete-guard` run natively | `hook` kinds | `src/runner/hook.mjs`, `src/state/decision-question.mjs`, `scripts/main-checkout-delete-guard-hook.mjs`, `src/git/main-checkout-delete-guard.mjs` | F0 landed; **Q1 answered yes** | both kinds in the registry `native` list of `hook`; Node verdict code deleted; shared vector file read by Rust tests; `doors` rows for both verdicts | F0 | **Q1 asked here** |
-| **S2** T0-T2 verbs | `lock`, `lock-status`, `git`, `worktree` native | 4 | `src/runner/lock-status.mjs`, `src/runner/lock-fence.mjs`, `src/git/status.mjs`, `src/verbs/worktree/*` | F0 landed | each verb native; Node arm, use case and their tests retired; the first store-touching native verb proves the F0 doors through the binary; `doors` rows per verb | F0 | none |
-| **S3** T3 verbs | `events`, `session`, `gateway`, `agents` native | 4 | `src/verbs/events/*`, `src/runner/session.mjs`, `src/runner/gateway-control.mjs`, `src/runner/agent-listing.mjs` | F0 landed; runs beside S2 with a file split agreed in both plans | as S2 | F0 | none |
+| **S2** T0-T2 verbs | `lock`, `lock-status`, `git` native | 3 | `src/runner/lock-status.mjs`, `src/runner/lock-fence.mjs`, `src/git/status.mjs` | F0 landed | each verb native; Node arm, use case and their tests retired; the first store-touching native verb proves the F0 doors through the binary; every ported verb removes its own argv-parser entry from the `parse` row's debt (the last verb's step decides whether `--flag=value` stays accepted everywhere or goes away everywhere, an owner question); `doors` rows per verb | F0 | none |
+| **S3** T3 verbs | `events`, `session`, `gateway` native | 3 | `src/verbs/events/*`, `src/runner/session.mjs`, `src/runner/gateway-control.mjs` | F0 landed; runs beside S2 with a file split agreed in both plans | as S2 | F0 | none |
 | **S4** packaging | retire `setup`; native `wire-agents`, `uninstall`, `init`, `doctor` | 5 | `src/setup/setup-use-case.mjs`, `src/setup/agent-wiring.mjs`, `src/setup/uninstall-project.mjs`, `src/verbs/state/init.mjs`, `src/setup/checks.mjs`, `src/setup/registrations.mjs`, `packages/distribution/rust/src/init.rs` | S2+S3 landed; **Q2, Q3 answered** | `setup` gone; the other four native or hybrid per Q3; `requires.node` per Q2 with its doctor row; `doors` rows (doctor row registry, init steps) | S2, S3 | **Q2, Q3 asked here** |
-| **S5** Execution read door | `bind()` and the executor model in Rust; `dispatch decide`/`explain`, `hook dispatch-decide`, `tool` native | 3 | `src/runner/execution/bind.mjs`, `src/runner/dispatch/decide.mjs`, `src/runner/dispatch/config.mjs`, `src/state/tool-registry.mjs`, `src/runner/dispatch/hook.mjs` | S4 landed; executor-model contract written (Execution owns it) | one `bind()`; a `doors` row allowing only the Rust `bind` plus the remaining Node callers, named with S6a as their owner | S4 | none (S6 scope follows Q2) |
-| **S6a** Execution | runner core, remaining `dispatch` subs, `run`, `fgos-runner` entry | 3 | `src/runner/execution/**`, `src/runner/dispatch/**`, `src/run-supervisor/**` (Node side) | S5 landed | tier-5 Node deleted; `doors` rows retire every tier-5 Node name | S5 | scope per Q2 |
+| **S5** Execution read door | `bind()` and the executor model in Rust; `dispatch decide`/`explain`, `hook dispatch-decide`, `tool`, `agents` native | 4 | `src/runner/agent-listing.mjs`, `src/runner/execution/bind.mjs`, `src/runner/dispatch/decide.mjs`, `src/runner/dispatch/config.mjs`, `src/state/tool-registry.mjs`, `src/runner/dispatch/hook.mjs` | S4 landed; executor-model contract written (Execution owns it) | one `bind()`; a `doors` row allowing only the Rust `bind` plus the remaining Node callers, named with S6a as their owner | S4 | none (S6 scope follows Q2) |
+| **S6a** Execution | runner core, remaining `dispatch` subs, `run`, `worktree`, `fgos-runner` entry | 4 | `src/verbs/worktree/*`, `src/runner/execution/**`, `src/runner/dispatch/**`, `src/run-supervisor/**` (Node side) | S5 landed | tier-5 Node deleted; `doors` rows retire every tier-5 Node name | S5 | scope per Q2 |
 | **S6b** Workflow | `workflow` | 1 | `src/workflow/**` | S6a landed | tier-6 Node deleted; `doors` rows | S6a | none |
 | **S7** Work | Work core (replay first, writers with the §11 gates), about 52 Work and Knowledge arms, tier-7 rest of `src/runner` (`work-dispatch.mjs`, `fanout-batch.mjs`, `work-compat.mjs`, `merge.mjs`, ...), knowledge/docs verbs | ~52 | `src/state/**`, `src/intake/**`, `src/report/**`, `src/verbs/state/**`, `src/runner/*.mjs` tier 7 | S6b landed; Work council (decision 78) held | zero `legacy-cli` routes; migration doc §12 removal gates; every F0 twin row (argument parse, invocation fault) retired | S6b | Work council |
+
+S2 and S3 detailed plan (one plan, file split, parallel map, owner questions Q1 and Q2): [`plans/261115-0759-rust-verb-migration-s2-s3/plan.md`](../261115-0759-rust-verb-migration-s2-s3/plan.md).
 
 S1 is the one step allowed to run beside another: its files (`hook` registry entry, hook verdict
 modules, a new host hook handler) do not overlap S2-S7. If S1 starts while F0's phase 08 is open, it
@@ -202,6 +204,14 @@ Delete:
 - `test/rust-host/parity-cases/help.cases.mjs`, `test/rust-host/verb-parity.test.mjs` (created in 07, deleted in 09 with Node help; S2 re-adds the test file with its own table)
 - `test/process/one-door.test.mjs` (phase 00 part B; owner: the two process rows of the `doors` table)
 
+Added during execution (found by the phase 11 comparison of `git diff --stat origin/main...HEAD` with this list; each was needed by the phase that touched it, none is owned by another plan's collision table):
+- Event Store and Config: `packages/event-store/rust/src/resolve.rs`, `packages/event-store/rust/tests/lifecycle.rs`, `src/event-store/index.mjs`, `src/event-store/native.mjs`, `test/event-store/verbs.test.mjs`; `packages/config/rust/src/event_store.rs`, `packages/config/rust/src/provider.rs`, `packages/config/rust/tests/event_store_section.rs`, `packages/config/rust/tests/machine_view.rs`, `test/config/config-door.test.mjs`, `test/config/facade.test.mjs`
+- Addon and its Node loader: `packages/git/node-addon/src/lib.rs`, `packages/git/node-addon/src/marshal.rs`, `packages/git/rust/src/driver.rs` (disk-only topology read), `src/native/door.mjs`, `src/git/inspect.mjs`, `test/git/native-load.test.mjs`
+- Host: `apps/fgos/src/wiring/mailbox_sync.rs`, `packages/process/rust/src/mapped.rs`, `packages/process/rust/tests/spawn_mapped.rs` (publish child without the recursion guard), `packages/observe/rust/src/sources/invocation_faults.rs`
+- Node help forwarder and its proofs: `src/util/host-bin.mjs`, `test/helpers/command-manifest.mjs`, `test/rust-host/fixtures/` (spy and caller fixtures), `test/scripts/test-proof-inventory.test.mjs`, `test/cli/fgos-post-merge-2.test.mjs`, `test/cli/fgos-tool.test.mjs`, `test/runner/paths.test.mjs`, `test/setup/bin-discovery.test.mjs`
+- Docs, phase 11: `docs/platform/config/spec.md`, `docs/platform/event-store/spec.md`, `docs/platform/git/spec.md`, the descriptor and legacy-payload contracts, three packaging verification docs
+- `package.json` (one line: `check:before-merge` passes `--skills-dir plugins/fgOS/skills` to the drift check), `packages/git/rust/src/store_admission.rs` (a store-less mutating case)
+
 Read-only checks (not edited): `src/setup/registrations.mjs:467-472` and `src/setup/shell-rc.mjs:122`
 (the doctor probe runs `fgos --help`, which keeps working through the Node forwarder of phase 09).
 
@@ -319,6 +329,15 @@ Follow-up review of `f7c5aa506`: the "debt may only shrink against the merge bas
 depends on a remote ref fails offline, in shallow CI and in worktrees with stale refs). The check is local: (a) a match
 outside `allowed` and `debt` fails; (b) a stale `debt` entry fails; (c) new debt is a reviewed manifest diff with a
 required reason. The file list comes from a filesystem walk, not `git ls-files`.
+
+## Amendment — phase 08 hand-off (2026-11-15)
+
+- `packages/distribution/rust/src/uninstall.rs` no longer carries its own home lookup into F0: the one-door-debt plan's phase 04 moved it (it now calls holder-lock's `home_for_state_root()`). The "global fgOS directory" row of the `doors` table therefore has no entry for it, and nothing in F0 or S4 owns that item.
+- The two home rules (the state root's, HOME first on every platform; Config's `machine::global_dir`, USERPROFILE on Windows) are an open question outside F0, filed as backlog row `p-n22bigucgp`; the row keeps the state root's rule as visible debt.
+
+## Amendment — S2/S3 owner answers (2026-11-15)
+
+Decision log, owner via HARDEN, 2026-11-15 08:41: S23-Q1 = (b) `worktree` moves to S6a and `agents` to S5 (S2/S3 now 3 verbs each); S23-Q2 = (a) `--flag=value` and `--dir=<path>` go away everywhere, phase 13 of the S2/S3 plan; S23-Q3 = (b) `lock fence` without `--yes` lists and refuses (`lock-fence-not-confirmed`, exit 2). S23-Q4 waits on fact F11. Detail: `plans/261115-0759-rust-verb-migration-s2-s3/plan.md`.
 
 ## Validation Log
 

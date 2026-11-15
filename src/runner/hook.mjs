@@ -15,8 +15,6 @@ import { decisionQuestionHookVerdict } from '../state/decision-question.mjs';
 
 /** Hook kinds this module judges. */
 export const IN_PROCESS_HOOK_KINDS = Object.freeze(['dispatch-decide', 'decision-question']);
-/** Kinds the native host serves; the Node entry is reached for them only on the unsupported direct-node channel. */
-export const NATIVE_HOOK_KINDS = Object.freeze(['mailbox', 'mailbox-sync']);
 
 const allow = Object.freeze({ blocked: false });
 const isText = (value) => typeof value === 'string' && value.trim() !== '';

@@ -37,3 +37,6 @@ pub mod diagnostics;
 pub mod export;
 
 pub mod legacy_import;
+
+pub mod lifecycle;
+pub mod resolve;

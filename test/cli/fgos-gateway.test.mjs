@@ -16,6 +16,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { commandManifest } from '../helpers/command-manifest.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const FGOS = path.resolve(__dirname, '../../bin/fgos.mjs');
@@ -67,12 +68,8 @@ test('fgos gateway start on a repo with no apps/fgos-gateway/ directory is a rea
   assert.match(result.stderr, /no apps\/fgos-gateway\/ directory found/);
 });
 
-test('fgos --help --json lists gateway with its start|stop|status sub-verb enum', () => {
-  const cwd = tmpCwd();
-  const result = run(cwd, ['--help', '--json']);
-  assert.equal(result.status, 0, result.stderr);
-  const manifest = JSON.parse(result.stdout);
-  const entry = manifest.commands.find((c) => c.name === 'gateway');
-  assert.ok(entry, 'gateway missing from --help --json manifest');
+test('the command manifest lists gateway with its start|stop|status sub-verb enum', () => {
+  const entry = commandManifest().commands.find((c) => c.name === 'gateway');
+  assert.ok(entry, 'gateway missing from the command manifest');
   assert.deepEqual(entry.parameters.properties.sub.enum, ['start', 'stop', 'status']);
 });

@@ -19,7 +19,7 @@ const FGOS = path.join(REPO_ROOT, 'bin/fgos.mjs');
 const BOGUS = 'no-such-flag-xyz';
 
 // `hook` forwards its raw argv to a guard script, never through the flag parser.
-const LEGACY = COMMAND_REGISTRY.filter((e) => !e.nativeOnly && e.name !== 'hook');
+const LEGACY = COMMAND_REGISTRY.filter((e) => e.native !== true && e.name !== 'hook');
 const NATIVE_ROUTES = Object.values(JSON.parse(fs.readFileSync(path.join(REPO_ROOT, 'packages/host-runtime/contracts/command-routes.json'), 'utf8')))
   .filter((r) => r.route_kind === 'native');
 

@@ -104,6 +104,20 @@ pub fn home_dir(lookup: impl Fn(&str) -> Option<String>) -> Option<PathBuf> {
         .map(PathBuf::from)
 }
 
+/// The one refusal for a missing home: the id every reader reports, the keyword under it, and the message that
+/// names the fix. There is no passwd fallback; a process without a home refuses by this name.
+pub const HOME_UNSET_ID: &str = "config-io";
+pub const HOME_UNSET_KEYWORD: &str = "HomeUnset";
+pub fn home_unset_message() -> String {
+    format!("{HOME_VAR} is not set; set {HOME_VAR} (the global directory is ~/.fgos)")
+}
+
+/// The directory of the machine-wide fgOS files: `<home>/.fgos`, with the home of `home_dir`; `None` when the home
+/// is unset or blank. The one answer to "where is the global fgOS directory" for Rust and, through the addon, for Node.
+pub fn global_dir(lookup: impl Fn(&str) -> Option<String>) -> Option<PathBuf> {
+    home_dir(lookup).map(|home| home.join(".fgos"))
+}
+
 /// The effective value for one project, for an in-process reader that holds only its root and the
 /// process environment (`lookup`, like `session_class`): the global directory is `<home>/.fgos` and the
 /// class comes from the confined marker. The root is also the trusted root: the caller passes the
@@ -112,12 +126,12 @@ pub fn project_snapshot(
     root: &Path,
     lookup: impl Fn(&str) -> Option<String>,
 ) -> Result<Snapshot, SnapshotError> {
-    let home =
-        home_dir(&lookup).ok_or_else(|| std::io::Error::other(format!("{HOME_VAR} is not set")))?;
+    let global_dir = global_dir(&lookup)
+        .ok_or_else(|| std::io::Error::other(format!("{HOME_VAR} is not set")))?;
     let req = SnapshotRequest {
         project_root: root.into(),
         trusted_root: root.into(),
-        global_dir: home.join(".fgos"),
+        global_dir,
         class: session_class(lookup),
     };
     crate::snapshot::snapshot(&context(&NoDetectors)?, &req)

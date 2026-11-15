@@ -55,7 +55,7 @@ job are added here, so a second path for any of them fails `test/architecture.te
    A test asserts every `native_subcommands` entry of the embedded table has a server (hook handler or operation).
 2. `apps/fgos/src/invocation_doors.rs`, around a `Native` invocation, in Node's order: unknown flag / missing or unknown
    sub (recorded `unknown-flag` / `arg-parse` against `cwd`'s store, before the root), root through `invocation_root`
-   (`caller-tree`; a refusal is `dir-invalid`), admission when `store != none` (refusals recorded with their class), then
+   (`caller-tree`; a refusal is `dir-invalid`), admission for every native call, as Node does at `bin/fgos.mjs:4231` (it reads Git only for a mutating shape against an existing store; refusals recorded with their class), then
    the invocation. Records go through `invocation_fault::record`; the `invocation fault recorded to <path>` line is
    printed only when a record landed. Event Store triggers run only when `lifecycle::platform_supported()`: start trigger
    when dispatched, the invocation opens the store and is not `event_store_child`; end trigger after the outcome is
@@ -91,6 +91,11 @@ job are added here, so a second path for any of them fails `test/architecture.te
 
 7. Run the full help table node-vs-host (`test/rust-host/verb-parity.test.mjs`) green; record counts in the report. Add a
    parity vector: `fgos add --bogus --dir <other project>` records its fault in `cwd`'s main checkout, not in `<other project>`.
+8. Close the unknown-verb gap in the help table: decide the unknown-verb stderr text (Node
+   `fgos: unknown verb "<x>". Usage: fgos <init|add|...>`, first line 325 bytes for `bogus-verb-probe`, then a second
+   invocation-fault line; host `fgos: unknown verb "<x>". Usage: fgos <command> [args...]`, 71 bytes), then add
+   `bogus-verb-probe --help` (exit 4, exact-bytes) to `test/rust-host/parity-cases/help.cases.mjs`. Phase 07 left it out
+   because the two texts differ today and the choice is a decision, not a harness matter.
 
 ## Files
 

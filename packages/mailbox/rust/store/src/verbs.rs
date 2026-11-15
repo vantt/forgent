@@ -345,14 +345,19 @@ pub fn status(fgos_dir: &std::path::Path, now: Timestamp, limits: &Limits) -> St
         };
     };
     let outcome = hook_outcome(fgos_dir);
+    let lock_busy = crate::hook::outcome_log::lock_busy_skips(&crate::record::Paths::new(fgos_dir));
     let signals = signals(&existing.state, now);
-    let json = serde_json::json!({
+    let mut json = serde_json::json!({
         "record": "ok",
         "recordBytes": existing.snapshot_bytes,
         "heads": live_heads(&existing.state).len(),
         "signals": signals,
         "hookOutcome": outcome,
     });
+    if let Some(skips) = lock_busy {
+        json["hookLockBusy"] =
+            serde_json::json!({ "count": skips.count, "lastAtMs": skips.last_at_ms });
+    }
     StatusAnswer {
         text: status_text(&json),
         json,
@@ -531,7 +536,7 @@ fn status_text(json: &serde_json::Value) -> String {
             },
         );
     let outcome = &json["hookOutcome"];
-    [
+    let mut lines = vec![
         "record: ok".to_string(),
         format!("record bytes: {}", json["recordBytes"]),
         format!("heads: {}", json["heads"]),
@@ -558,8 +563,13 @@ fn status_text(json: &serde_json::Value) -> String {
             "last hook outcome: {}",
             outcome["reason"].as_str().unwrap_or("none")
         ),
-    ]
-    .join("\n")
+    ];
+    if let Some(count) = json["hookLockBusy"]["count"].as_u64() {
+        lines.push(format!(
+            "hook drains skipped on a busy lock: {count} (mail stays pending until the next call)"
+        ));
+    }
+    lines.join("\n")
 }
 
 /// The acknowledgement counts as one operator line, naming the overdue ids.

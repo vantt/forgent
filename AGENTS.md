@@ -108,7 +108,9 @@ process, lock and identity verbs: the in-process door loads only the addon of
 the activated release whose payload is running, so from a checkout those verbs
 refuse by name (`process-door-not-shipped`, `lock-driver-unavailable` with
 reason `addon-not-shipped`, `host-missing`). Run working-tree code through
-`npm run fgos:dev -- <verb>` instead. Every state write resolves the writer
+`npm run fgos:dev -- <verb>` instead. Help is served by the host only: the
+payload renders none, and an exact `--help` or `-h` token reaching it is
+forwarded to the host (exit 4 with a pointer when no host is found). Every state write resolves the writer
 identity through the Rust host (`docs/platform/identity/spec.md`), so these
 channels write only inside an activated project or with `FGOS_HOST_BIN` set to
 a host binary. The git hook is a cold client of the activated host and is

@@ -1,5 +1,5 @@
 {
-  "description": "One tree and the answer every reader of 'which project does this directory act on' must give for it. Paths are relative to the scratch base. 'project' is the nearest project store (null: none, refused); 'main' is the main checkout of the repository (null: no repository). Readers: the Node invocation-root door (test/rust-host/invocation-root-table.test.mjs), the Rust host walk (apps/fgos/src/cli_projector.rs tests) and the identity crate's main root (packages/identity/rust/tests/project.rs).",
+  "description": "One tree and the answer every reader of 'which project does this directory act on' must give for it. Paths are relative to the scratch base. 'project' is the nearest project store (null: none, refused); 'main' is the main checkout of the repository (null: no repository). Readers: the Node invocation-root door (test/rust-host/invocation-root-table.test.mjs), the Rust host walk (apps/fgos/src/cli_projector.rs tests) and the identity crate's main root (packages/identity/rust/tests/project.rs). 'policyRows' go beyond the walk: each names a policy and an optional --dir (absolute from the base when 'dirIsRelativeToBase', else as written) and expects either a root with 'found' or a refusal whose message contains 'refusal' ({base} stands for the scratch base). Readers: the Rust door (packages/git/rust/src/invocation_root.rs tests) and its Node adapter (the Node test above); the host walk and the identity crate read 'rows' only.",
   "home": "home",
   "steps": [
     { "mkdir": "home/.fgos" },
@@ -11,7 +11,10 @@
     { "mkdir": "home/proj/.fgos" },
     { "git": ["home/proj", "worktree", "add", "-q", "../wt", "-b", "wt"] },
     { "mkdir": "outside/plain" },
-    { "mkdir": "outside/solo/.fgos" }
+    { "mkdir": "outside/solo/.fgos" },
+    { "mkdir": "home/proj/vendor/inner" },
+    { "git": ["home/proj/vendor/inner", "init", "-q", "-b", "main"] },
+    { "mkdir": "home/plain" }
   ],
   "rows": [
     { "name": "main root", "cwd": "home/proj", "project": "home/proj", "main": "home/proj" },
@@ -20,5 +23,26 @@
     { "name": "the home directory, whose .fgos is the global directory", "cwd": "home", "project": null, "main": null },
     { "name": "no repository and no store", "cwd": "outside/plain", "project": null, "main": null },
     { "name": "a store with no repository", "cwd": "outside/solo", "project": "outside/solo", "main": null }
+  ],
+  "policyRows": [
+    { "name": "caller-tree: a nested repository never takes the store of the project above it", "cwd": "home/proj/vendor/inner", "policy": "caller-tree", "root": "home/proj/vendor/inner", "found": false },
+    { "name": "caller-tree: a plain directory below home never takes the global .fgos of home", "cwd": "home/plain", "policy": "caller-tree", "root": "home/plain", "found": false },
+    { "name": "caller-tree: --dir is taken as given, even home", "cwd": "home", "policy": "caller-tree", "dir": "home", "dirIsRelativeToBase": true, "root": "home", "found": true },
+    { "name": "caller-tree: --dir naming a plain directory", "cwd": "home/proj", "policy": "caller-tree", "dir": "outside/plain", "dirIsRelativeToBase": true, "root": "outside/plain", "found": false },
+    { "name": "caller-tree: an empty --dir is refused", "cwd": "home/proj", "policy": "caller-tree", "dir": "", "refusal": "--dir requires a non-empty path value" },
+    { "name": "caller-tree: a blank --dir is refused", "cwd": "home/proj", "policy": "caller-tree", "dir": "  ", "refusal": "--dir requires a non-empty path value" },
+    { "name": "main-checkout: from a linked worktree the main root", "cwd": "home/wt", "policy": "main-checkout", "root": "home/proj", "found": true },
+    { "name": "main-checkout: --dir names another project and is taken as given", "cwd": "home/proj", "policy": "main-checkout", "dir": "outside/solo", "dirIsRelativeToBase": true, "root": "outside/solo", "found": true },
+    { "name": "main-checkout: outside any repository the directory itself, whose store is not looked for", "cwd": "outside/solo", "policy": "main-checkout", "root": "outside/solo", "found": false },
+    { "name": "main-checkout-only: the main root as --dir", "cwd": "home/proj/docs", "policy": "main-checkout-only", "dir": "home/proj", "dirIsRelativeToBase": true, "root": "home/proj", "found": true },
+    { "name": "main-checkout-only: from a linked worktree the main root", "cwd": "home/wt", "policy": "main-checkout-only", "root": "home/proj", "found": true },
+    { "name": "main-checkout-only: another repository as --dir is refused", "cwd": "home/proj", "policy": "main-checkout-only", "dir": "home/proj/vendor/inner", "dirIsRelativeToBase": true, "refusal": "is not the main checkout of the repository at" },
+    { "name": "main-checkout-only: outside a repository is refused", "cwd": "outside/plain", "policy": "main-checkout-only", "refusal": "it is not inside a Git repository" },
+    { "name": "main-checkout-only: outside a repository with --dir is refused too", "cwd": "outside/plain", "policy": "main-checkout-only", "dir": "outside/plain", "dirIsRelativeToBase": true, "refusal": "it is not inside a Git repository" },
+    { "name": "strict-cwd: the top level of a repository", "cwd": "home/proj", "policy": "strict-cwd", "root": "home/proj", "found": true },
+    { "name": "strict-cwd: a subdirectory of a repository is refused naming its top level", "cwd": "home/proj/docs", "policy": "strict-cwd", "refusal": "is inside the repository whose top level is \"{base}/home/proj\"" },
+    { "name": "strict-cwd: the top level of a linked worktree, which carries no store", "cwd": "home/wt", "policy": "strict-cwd", "root": "home/wt", "found": false },
+    { "name": "strict-cwd: a directory outside any repository", "cwd": "outside/plain", "policy": "strict-cwd", "root": "outside/plain", "found": false },
+    { "name": "strict-cwd: a directory holding a store outside any repository", "cwd": "outside/solo", "policy": "strict-cwd", "root": "outside/solo", "found": true }
   ]
 }

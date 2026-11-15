@@ -155,6 +155,30 @@ export function openStore(resolvedRoot, machineId, files, loaderOptions, remote 
   return Object.freeze(facade);
 }
 
+/**
+ * The lifecycle trigger of the store of `cwd`, run by the crate: seals each open stream older than `config.seal.intervalSec`
+ * (every stream on `shutdown`) and says whether a publish is due (`syncDue`, only for an `end` trigger that is not `dispatched`).
+ * Never throws for a store's own failure: `error` is the code of the first step that failed, and later steps still ran.
+ * `config` is the validated `eventStore` section; the caller starts the detached publish child when `syncDue`.
+ */
+export function maintainStore(cwd, { trustedMain, stateRoot, config, shutdown = false, end = false, dispatched = false, loaderOptions } = {}) {
+  available();
+  const native = call(() => loadNativeAddon(loaderOptions));
+  return call(() => native.maintainEventStore({
+    cwd: path.resolve(cwd),
+    trustedMain: path.resolve(trustedMain),
+    stateRoot: stateRoot ?? resolveStateRoot().stateRoot,
+    remote: config.remote,
+    sealIntervalSec: config.seal.intervalSec,
+    syncIntervalSec: config.sync.intervalSec,
+    shutdown,
+    end,
+    dispatched,
+    heldRanks: [],
+    hotLockDepth: hotLockDepth(),
+  }));
+}
+
 /** Read facts without requiring a machine id or creating a store. `detached` as for `prepareStore`. */
 export function eventStoreFacts(cwd, { stateRoot, trustedMain = cwd, remote = 'origin', loaderOptions, detached = false } = {}) {
   available();
@@ -166,7 +190,7 @@ export function eventStoreAddonAvailable(loaderOptions) {
   outsideState();
   const native = call(() => loadNativeAddon(loaderOptions));
   return typeof native.resolveEventStore === 'function' && typeof native.openStore === 'function'
-    && typeof native.eventStoreFacts === 'function'
+    && typeof native.eventStoreFacts === 'function' && typeof native.maintainEventStore === 'function'
     && typeof native.eventStoreBranchKey === 'function'
     && ['read', 'append', 'admitWrites', 'promote', 'sync', 'maintenance', 'status', 'exportJsonl', 'legacyLayout'].every(name => typeof native.EventStore?.prototype?.[name] === 'function');
 }

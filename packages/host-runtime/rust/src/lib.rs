@@ -5,6 +5,7 @@
 pub mod authority_gate;
 pub mod catalog;
 pub mod civil_time;
+pub mod cli_args;
 pub mod contracts;
 pub mod exit_codes;
 pub mod invocation_service;

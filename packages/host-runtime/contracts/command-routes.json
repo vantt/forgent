@@ -1,24 +1,4 @@
 {
-  "--help": {
-    "selector": "--help",
-    "route_kind": "legacy-cli",
-    "legacy_payload": "legacy-node",
-    "owner_path": "src/cli/command-registry.mjs",
-    "compatibility_tests": [
-      "test/rust-host/command-routes.test.mjs",
-      "test/rust-host/help-routes.test.mjs"
-    ]
-  },
-  "-h": {
-    "selector": "-h",
-    "route_kind": "legacy-cli",
-    "legacy_payload": "legacy-node",
-    "owner_path": "src/cli/command-registry.mjs",
-    "compatibility_tests": [
-      "test/rust-host/command-routes.test.mjs",
-      "test/rust-host/help-routes.test.mjs"
-    ]
-  },
   "add": {
     "selector": "add",
     "route_kind": "legacy-cli",
@@ -26,7 +6,9 @@
     "owner_path": "src/cli/command-registry.mjs",
     "compatibility_tests": [
       "test/rust-host/command-routes.test.mjs"
-    ]
+    ],
+    "store": "require",
+    "mutates_store": true
   },
   "agents": {
     "selector": "agents",
@@ -35,7 +17,8 @@
     "owner_path": "src/cli/command-registry.mjs",
     "compatibility_tests": [
       "test/rust-host/command-routes.test.mjs"
-    ]
+    ],
+    "store": "none"
   },
   "answer": {
     "selector": "answer",
@@ -44,7 +27,9 @@
     "owner_path": "src/cli/command-registry.mjs",
     "compatibility_tests": [
       "test/rust-host/command-routes.test.mjs"
-    ]
+    ],
+    "store": "require",
+    "mutates_store": true
   },
   "approve": {
     "selector": "approve",
@@ -53,7 +38,9 @@
     "owner_path": "src/cli/command-registry.mjs",
     "compatibility_tests": [
       "test/rust-host/command-routes.test.mjs"
-    ]
+    ],
+    "store": "require",
+    "lands_work": true
   },
   "ask": {
     "selector": "ask",
@@ -62,7 +49,9 @@
     "owner_path": "src/cli/command-registry.mjs",
     "compatibility_tests": [
       "test/rust-host/command-routes.test.mjs"
-    ]
+    ],
+    "store": "require",
+    "mutates_store": true
   },
   "authoritative-match": {
     "selector": "authoritative-match",
@@ -71,7 +60,8 @@
     "owner_path": "src/cli/command-registry.mjs",
     "compatibility_tests": [
       "test/rust-host/command-routes.test.mjs"
-    ]
+    ],
+    "store": "none"
   },
   "catchup": {
     "selector": "catchup",
@@ -80,7 +70,8 @@
     "owner_path": "src/cli/command-registry.mjs",
     "compatibility_tests": [
       "test/rust-host/command-routes.test.mjs"
-    ]
+    ],
+    "store": "require"
   },
   "cleanup": {
     "selector": "cleanup",
@@ -89,7 +80,9 @@
     "owner_path": "src/cli/command-registry.mjs",
     "compatibility_tests": [
       "test/rust-host/command-routes.test.mjs"
-    ]
+    ],
+    "store": "require",
+    "mutates_store": true
   },
   "compound": {
     "selector": "compound",
@@ -98,7 +91,9 @@
     "owner_path": "src/cli/command-registry.mjs",
     "compatibility_tests": [
       "test/rust-host/command-routes.test.mjs"
-    ]
+    ],
+    "store": "require",
+    "mutates_store": true
   },
   "config": {
     "selector": "config",
@@ -176,7 +171,8 @@
         "path",
         "reason"
       ]
-    }
+    },
+    "store": "none"
   },
   "conflicts": {
     "selector": "conflicts",
@@ -185,7 +181,8 @@
     "owner_path": "src/cli/command-registry.mjs",
     "compatibility_tests": [
       "test/rust-host/command-routes.test.mjs"
-    ]
+    ],
+    "store": "read"
   },
   "context-render": {
     "selector": "context-render",
@@ -194,7 +191,8 @@
     "owner_path": "src/cli/command-registry.mjs",
     "compatibility_tests": [
       "test/rust-host/command-routes.test.mjs"
-    ]
+    ],
+    "store": "none"
   },
   "convention": {
     "selector": "convention",
@@ -238,7 +236,8 @@
         "slug",
         "type"
       ]
-    }
+    },
+    "store": "none"
   },
   "decision": {
     "selector": "decision",
@@ -247,7 +246,9 @@
     "owner_path": "src/cli/command-registry.mjs",
     "compatibility_tests": [
       "test/rust-host/command-routes.test.mjs"
-    ]
+    ],
+    "store": "require",
+    "mutates_store": true
   },
   "decision-index": {
     "selector": "decision-index",
@@ -256,7 +257,8 @@
     "owner_path": "src/cli/command-registry.mjs",
     "compatibility_tests": [
       "test/rust-host/command-routes.test.mjs"
-    ]
+    ],
+    "store": "open"
   },
   "discover": {
     "selector": "discover",
@@ -265,7 +267,9 @@
     "owner_path": "src/cli/command-registry.mjs",
     "compatibility_tests": [
       "test/rust-host/command-routes.test.mjs"
-    ]
+    ],
+    "store": "require",
+    "mutates_store": true
   },
   "dispatch": {
     "selector": "dispatch",
@@ -274,6 +278,10 @@
     "owner_path": "src/cli/command-registry.mjs",
     "compatibility_tests": [
       "test/rust-host/command-routes.test.mjs"
+    ],
+    "store": "none",
+    "mutates_store": [
+      "recover --action"
     ]
   },
   "doc": {
@@ -283,7 +291,9 @@
     "owner_path": "src/cli/command-registry.mjs",
     "compatibility_tests": [
       "test/rust-host/command-routes.test.mjs"
-    ]
+    ],
+    "store": "require",
+    "mutates_store": true
   },
   "doc-registry": {
     "selector": "doc-registry",
@@ -292,7 +302,8 @@
     "owner_path": "src/cli/command-registry.mjs",
     "compatibility_tests": [
       "test/rust-host/command-routes.test.mjs"
-    ]
+    ],
+    "store": "none"
   },
   "doc-sources": {
     "selector": "doc-sources",
@@ -301,7 +312,8 @@
     "owner_path": "src/cli/command-registry.mjs",
     "compatibility_tests": [
       "test/rust-host/command-routes.test.mjs"
-    ]
+    ],
+    "store": "read"
   },
   "docs-index": {
     "selector": "docs-index",
@@ -310,7 +322,8 @@
     "owner_path": "src/cli/command-registry.mjs",
     "compatibility_tests": [
       "test/rust-host/command-routes.test.mjs"
-    ]
+    ],
+    "store": "open"
   },
   "doctor": {
     "selector": "doctor",
@@ -319,7 +332,8 @@
     "owner_path": "src/cli/command-registry.mjs",
     "compatibility_tests": [
       "test/rust-host/command-routes.test.mjs"
-    ]
+    ],
+    "store": "none"
   },
   "edit": {
     "selector": "edit",
@@ -328,7 +342,9 @@
     "owner_path": "src/cli/command-registry.mjs",
     "compatibility_tests": [
       "test/rust-host/command-routes.test.mjs"
-    ]
+    ],
+    "store": "require",
+    "mutates_store": true
   },
   "events": {
     "selector": "events",
@@ -337,6 +353,14 @@
     "owner_path": "src/cli/command-registry.mjs",
     "compatibility_tests": [
       "test/rust-host/command-routes.test.mjs"
+    ],
+    "store": "open",
+    "mutates_store": [
+      "sync"
+    ],
+    "event_store_child": [
+      "seal",
+      "sync --opportunistic=true"
     ]
   },
   "friction": {
@@ -396,7 +420,8 @@
         "json",
         "subject"
       ]
-    }
+    },
+    "store": "none"
   },
   "gate-approve": {
     "selector": "gate-approve",
@@ -405,7 +430,9 @@
     "owner_path": "src/cli/command-registry.mjs",
     "compatibility_tests": [
       "test/rust-host/command-routes.test.mjs"
-    ]
+    ],
+    "store": "require",
+    "mutates_store": true
   },
   "gate-bypass": {
     "selector": "gate-bypass",
@@ -419,7 +446,8 @@
       "dir",
       "help",
       "json"
-    ]
+    ],
+    "store": "none"
   },
   "gate-check": {
     "selector": "gate-check",
@@ -428,7 +456,8 @@
     "owner_path": "src/cli/command-registry.mjs",
     "compatibility_tests": [
       "test/rust-host/command-routes.test.mjs"
-    ]
+    ],
+    "store": "none"
   },
   "gateway": {
     "selector": "gateway",
@@ -437,6 +466,11 @@
     "owner_path": "src/cli/command-registry.mjs",
     "compatibility_tests": [
       "test/rust-host/command-routes.test.mjs"
+    ],
+    "store": "none",
+    "mutates_store": [
+      "start",
+      "stop"
     ]
   },
   "git": {
@@ -446,7 +480,8 @@
     "owner_path": "src/cli/command-registry.mjs",
     "compatibility_tests": [
       "test/rust-host/command-routes.test.mjs"
-    ]
+    ],
+    "store": "none"
   },
   "goal": {
     "selector": "goal",
@@ -455,6 +490,10 @@
     "owner_path": "src/cli/command-registry.mjs",
     "compatibility_tests": [
       "test/rust-host/command-routes.test.mjs"
+    ],
+    "store": "require",
+    "mutates_store": [
+      "set"
     ]
   },
   "graph": {
@@ -464,7 +503,8 @@
     "owner_path": "src/cli/command-registry.mjs",
     "compatibility_tests": [
       "test/rust-host/command-routes.test.mjs"
-    ]
+    ],
+    "store": "read"
   },
   "handoff": {
     "selector": "handoff",
@@ -473,7 +513,9 @@
     "owner_path": "src/cli/command-registry.mjs",
     "compatibility_tests": [
       "test/rust-host/command-routes.test.mjs"
-    ]
+    ],
+    "store": "require",
+    "mutates_store": true
   },
   "handoff-return": {
     "selector": "handoff-return",
@@ -482,7 +524,9 @@
     "owner_path": "src/cli/command-registry.mjs",
     "compatibility_tests": [
       "test/rust-host/command-routes.test.mjs"
-    ]
+    ],
+    "store": "require",
+    "mutates_store": true
   },
   "hook": {
     "selector": "hook",
@@ -492,10 +536,11 @@
     "compatibility_tests": [
       "test/rust-host/command-routes.test.mjs"
     ],
-    "native_kinds": [
+    "native_subcommands": [
       "mailbox",
       "mailbox-sync"
-    ]
+    ],
+    "store": "none"
   },
   "identity": {
     "selector": "identity",
@@ -567,7 +612,8 @@
         "json",
         "pid"
       ]
-    }
+    },
+    "store": "none"
   },
   "init": {
     "selector": "init",
@@ -576,7 +622,8 @@
     "owner_path": "src/cli/command-registry.mjs",
     "compatibility_tests": [
       "test/rust-host/command-routes.test.mjs"
-    ]
+    ],
+    "store": "open"
   },
   "knowledge": {
     "selector": "knowledge",
@@ -585,6 +632,10 @@
     "owner_path": "src/cli/command-registry.mjs",
     "compatibility_tests": [
       "test/rust-host/command-routes.test.mjs"
+    ],
+    "store": "require",
+    "mutates_store": [
+      "attest"
     ]
   },
   "list": {
@@ -594,7 +645,8 @@
     "owner_path": "src/cli/command-registry.mjs",
     "compatibility_tests": [
       "test/rust-host/command-routes.test.mjs"
-    ]
+    ],
+    "store": "read"
   },
   "lock": {
     "selector": "lock",
@@ -603,6 +655,10 @@
     "owner_path": "src/cli/command-registry.mjs",
     "compatibility_tests": [
       "test/rust-host/command-routes.test.mjs"
+    ],
+    "store": "require",
+    "mutates_store": [
+      "fence"
     ]
   },
   "lock-status": {
@@ -612,7 +668,8 @@
     "owner_path": "src/cli/command-registry.mjs",
     "compatibility_tests": [
       "test/rust-host/command-routes.test.mjs"
-    ]
+    ],
+    "store": "read"
   },
   "mailbox": {
     "selector": "mailbox",
@@ -652,7 +709,8 @@
         "help",
         "json"
       ]
-    }
+    },
+    "store": "none"
   },
   "main-checkout-reset": {
     "selector": "main-checkout-reset",
@@ -661,7 +719,8 @@
     "owner_path": "src/cli/command-registry.mjs",
     "compatibility_tests": [
       "test/rust-host/command-routes.test.mjs"
-    ]
+    ],
+    "store": "none"
   },
   "merge": {
     "selector": "merge",
@@ -670,6 +729,13 @@
     "owner_path": "src/cli/command-registry.mjs",
     "compatibility_tests": [
       "test/rust-host/command-routes.test.mjs"
+    ],
+    "store": "require",
+    "mutates_store": [
+      "next"
+    ],
+    "lands_work": [
+      "next"
     ]
   },
   "metrics": {
@@ -764,7 +830,8 @@
         "help",
         "json"
       ]
-    }
+    },
+    "store": "none"
   },
   "move": {
     "selector": "move",
@@ -773,7 +840,9 @@
     "owner_path": "src/cli/command-registry.mjs",
     "compatibility_tests": [
       "test/rust-host/command-routes.test.mjs"
-    ]
+    ],
+    "store": "require",
+    "mutates_store": true
   },
   "pick": {
     "selector": "pick",
@@ -782,7 +851,9 @@
     "owner_path": "src/cli/command-registry.mjs",
     "compatibility_tests": [
       "test/rust-host/command-routes.test.mjs"
-    ]
+    ],
+    "store": "require",
+    "mutates_store": true
   },
   "plan": {
     "selector": "plan",
@@ -791,7 +862,9 @@
     "owner_path": "src/cli/command-registry.mjs",
     "compatibility_tests": [
       "test/rust-host/command-routes.test.mjs"
-    ]
+    ],
+    "store": "require",
+    "mutates_store": true
   },
   "plan-lint": {
     "selector": "plan-lint",
@@ -800,7 +873,8 @@
     "owner_path": "src/cli/command-registry.mjs",
     "compatibility_tests": [
       "test/rust-host/command-routes.test.mjs"
-    ]
+    ],
+    "store": "none"
   },
   "promote-to-component": {
     "selector": "promote-to-component",
@@ -809,7 +883,9 @@
     "owner_path": "src/cli/command-registry.mjs",
     "compatibility_tests": [
       "test/rust-host/command-routes.test.mjs"
-    ]
+    ],
+    "store": "require",
+    "lands_work": true
   },
   "ready": {
     "selector": "ready",
@@ -818,7 +894,8 @@
     "owner_path": "src/cli/command-registry.mjs",
     "compatibility_tests": [
       "test/rust-host/command-routes.test.mjs"
-    ]
+    ],
+    "store": "read"
   },
   "rebuild": {
     "selector": "rebuild",
@@ -827,7 +904,9 @@
     "owner_path": "src/cli/command-registry.mjs",
     "compatibility_tests": [
       "test/rust-host/command-routes.test.mjs"
-    ]
+    ],
+    "store": "require",
+    "mutates_store": true
   },
   "recheck-blocked": {
     "selector": "recheck-blocked",
@@ -836,7 +915,8 @@
     "owner_path": "src/cli/command-registry.mjs",
     "compatibility_tests": [
       "test/rust-host/command-routes.test.mjs"
-    ]
+    ],
+    "store": "read"
   },
   "reject": {
     "selector": "reject",
@@ -845,7 +925,9 @@
     "owner_path": "src/cli/command-registry.mjs",
     "compatibility_tests": [
       "test/rust-host/command-routes.test.mjs"
-    ]
+    ],
+    "store": "require",
+    "mutates_store": true
   },
   "report": {
     "selector": "report",
@@ -854,7 +936,9 @@
     "owner_path": "src/cli/command-registry.mjs",
     "compatibility_tests": [
       "test/rust-host/command-routes.test.mjs"
-    ]
+    ],
+    "store": "require",
+    "mutates_store": true
   },
   "resolve-park-reason": {
     "selector": "resolve-park-reason",
@@ -863,7 +947,9 @@
     "owner_path": "src/cli/command-registry.mjs",
     "compatibility_tests": [
       "test/rust-host/command-routes.test.mjs"
-    ]
+    ],
+    "store": "require",
+    "mutates_store": true
   },
   "resync-worktree": {
     "selector": "resync-worktree",
@@ -872,7 +958,8 @@
     "owner_path": "src/cli/command-registry.mjs",
     "compatibility_tests": [
       "test/rust-host/command-routes.test.mjs"
-    ]
+    ],
+    "store": "none"
   },
   "retrospective": {
     "selector": "retrospective",
@@ -881,7 +968,9 @@
     "owner_path": "src/cli/command-registry.mjs",
     "compatibility_tests": [
       "test/rust-host/command-routes.test.mjs"
-    ]
+    ],
+    "store": "require",
+    "mutates_store": true
   },
   "return": {
     "selector": "return",
@@ -890,7 +979,8 @@
     "owner_path": "src/cli/command-registry.mjs",
     "compatibility_tests": [
       "test/rust-host/command-routes.test.mjs"
-    ]
+    ],
+    "store": "require"
   },
   "review": {
     "selector": "review",
@@ -899,7 +989,8 @@
     "owner_path": "src/cli/command-registry.mjs",
     "compatibility_tests": [
       "test/rust-host/command-routes.test.mjs"
-    ]
+    ],
+    "store": "none"
   },
   "rollup": {
     "selector": "rollup",
@@ -908,7 +999,8 @@
     "owner_path": "src/cli/command-registry.mjs",
     "compatibility_tests": [
       "test/rust-host/command-routes.test.mjs"
-    ]
+    ],
+    "store": "read"
   },
   "run": {
     "selector": "run",
@@ -917,7 +1009,8 @@
     "owner_path": "src/cli/command-registry.mjs",
     "compatibility_tests": [
       "test/rust-host/command-routes.test.mjs"
-    ]
+    ],
+    "store": "none"
   },
   "schedule": {
     "selector": "schedule",
@@ -926,7 +1019,8 @@
     "owner_path": "src/cli/command-registry.mjs",
     "compatibility_tests": [
       "test/rust-host/command-routes.test.mjs"
-    ]
+    ],
+    "store": "read"
   },
   "session": {
     "selector": "session",
@@ -935,6 +1029,12 @@
     "owner_path": "src/cli/command-registry.mjs",
     "compatibility_tests": [
       "test/rust-host/command-routes.test.mjs"
+    ],
+    "store": "none",
+    "mutates_store": [
+      "start",
+      "end",
+      "gc"
     ]
   },
   "setup": {
@@ -944,7 +1044,8 @@
     "owner_path": "src/cli/command-registry.mjs",
     "compatibility_tests": [
       "test/rust-host/command-routes.test.mjs"
-    ]
+    ],
+    "store": "open"
   },
   "show": {
     "selector": "show",
@@ -953,7 +1054,8 @@
     "owner_path": "src/cli/command-registry.mjs",
     "compatibility_tests": [
       "test/rust-host/command-routes.test.mjs"
-    ]
+    ],
+    "store": "read"
   },
   "slots": {
     "selector": "slots",
@@ -962,7 +1064,8 @@
     "owner_path": "src/cli/command-registry.mjs",
     "compatibility_tests": [
       "test/rust-host/command-routes.test.mjs"
-    ]
+    ],
+    "store": "none"
   },
   "stale": {
     "selector": "stale",
@@ -971,7 +1074,8 @@
     "owner_path": "src/cli/command-registry.mjs",
     "compatibility_tests": [
       "test/rust-host/command-routes.test.mjs"
-    ]
+    ],
+    "store": "read"
   },
   "submit": {
     "selector": "submit",
@@ -980,7 +1084,9 @@
     "owner_path": "src/cli/command-registry.mjs",
     "compatibility_tests": [
       "test/rust-host/command-routes.test.mjs"
-    ]
+    ],
+    "store": "require",
+    "mutates_store": true
   },
   "sync-root": {
     "selector": "sync-root",
@@ -989,7 +1095,9 @@
     "owner_path": "src/cli/command-registry.mjs",
     "compatibility_tests": [
       "test/rust-host/command-routes.test.mjs"
-    ]
+    ],
+    "store": "require",
+    "lands_work": true
   },
   "take": {
     "selector": "take",
@@ -998,7 +1106,9 @@
     "owner_path": "src/cli/command-registry.mjs",
     "compatibility_tests": [
       "test/rust-host/command-routes.test.mjs"
-    ]
+    ],
+    "store": "require",
+    "mutates_store": true
   },
   "topic": {
     "selector": "topic",
@@ -1007,7 +1117,9 @@
     "owner_path": "src/cli/command-registry.mjs",
     "compatibility_tests": [
       "test/rust-host/command-routes.test.mjs"
-    ]
+    ],
+    "store": "require",
+    "mutates_store": true
   },
   "triage": {
     "selector": "triage",
@@ -1016,7 +1128,8 @@
     "owner_path": "src/cli/command-registry.mjs",
     "compatibility_tests": [
       "test/rust-host/command-routes.test.mjs"
-    ]
+    ],
+    "store": "read"
   },
   "unclaim": {
     "selector": "unclaim",
@@ -1025,7 +1138,8 @@
     "owner_path": "src/cli/command-registry.mjs",
     "compatibility_tests": [
       "test/rust-host/command-routes.test.mjs"
-    ]
+    ],
+    "store": "require"
   },
   "uninstall": {
     "selector": "uninstall",
@@ -1034,7 +1148,8 @@
     "owner_path": "src/cli/command-registry.mjs",
     "compatibility_tests": [
       "test/rust-host/command-routes.test.mjs"
-    ]
+    ],
+    "store": "none"
   },
   "version": {
     "selector": "version",
@@ -1049,7 +1164,8 @@
       "help",
       "json",
       "runtime-json"
-    ]
+    ],
+    "store": "none"
   },
   "wire-agents": {
     "selector": "wire-agents",
@@ -1058,7 +1174,8 @@
     "owner_path": "src/cli/command-registry.mjs",
     "compatibility_tests": [
       "test/rust-host/command-routes.test.mjs"
-    ]
+    ],
+    "store": "none"
   },
   "workflow": {
     "selector": "workflow",
@@ -1067,7 +1184,8 @@
     "owner_path": "src/cli/command-registry.mjs",
     "compatibility_tests": [
       "test/rust-host/command-routes.test.mjs"
-    ]
+    ],
+    "store": "none"
   },
   "worktree": {
     "selector": "worktree",
@@ -1076,6 +1194,7 @@
     "owner_path": "src/cli/command-registry.mjs",
     "compatibility_tests": [
       "test/rust-host/command-routes.test.mjs"
-    ]
+    ],
+    "store": "none"
   }
 }

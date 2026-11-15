@@ -21,7 +21,6 @@ import { releaseBinaryPath } from '../../src/util/release-binary-path.mjs';
 import {
   generateCoverageFloorCases,
   runParitySuite,
-  ROUTES_PATH,
 } from './harness.mjs';
 
 import { DOCTOR_CHECKS } from '../../src/setup/checks.mjs';
@@ -264,18 +263,9 @@ test('R3: Staged release tree runs P02 harness from outside checkout with cleane
       process.env.FGOS_HARNESS_ENTRY = `bin:${stagedBinary}`;
       for (const key of ACTIVE_RELEASE_KEYS) delete process.env[key];
 
-      // Generate the coverage-floor cases. `<verb> --help` prints the manifest
-      // entry for every route kind, native included, so it is exact bytes.
-      // `gate-bypass --help` may route through a JSON envelope or a help-text
-      // path depending on the staged config, so it allows semantic JSON when
-      // present and exact bytes otherwise.
-      const rawCases = generateCoverageFloorCases({ repoRoot: REPO_ROOT, routesPath: ROUTES_PATH });
-      const cases = rawCases.map((c) => {
-        if (c.id === 'coverage-help-gate-bypass') {
-          return { ...c, modes: ['semantic-json-or-exact-bytes'] };
-        }
-        return c;
-      });
+      // Generate the coverage-floor cases: the staged binary answers every exit category and input channel
+      // the same on both sides, from outside the checkout. Help for every selector is proven in help-routes.
+      const cases = generateCoverageFloorCases();
 
       const reportPath = path.join(os.tmpdir(), `harness-report-staged-${Date.now()}.json`);
       const suiteResult = await runParitySuite(cases, {
@@ -292,7 +282,8 @@ test('R3: Staged release tree runs P02 harness from outside checkout with cleane
         `Staged binary harness run had ${suiteResult.failedCount} failures: ${JSON.stringify(suiteResult.failedResults)}`
       );
       assert.equal(suiteResult.passed, true, 'Harness suite must pass');
-      assert.ok(suiteResult.total >= 80, `Expected at least 80 coverage-floor cases, ran ${suiteResult.total}`);
+      assert.equal(suiteResult.total, cases.length, 'every coverage-floor case ran');
+      assert.ok(suiteResult.total >= 10, `Expected the coverage-floor cases, ran ${suiteResult.total}`);
 
       if (fs.existsSync(reportPath)) {
         fs.unlinkSync(reportPath);

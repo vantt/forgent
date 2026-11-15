@@ -14,9 +14,9 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import os from 'node:os';
 import { replaceDurably } from '../native/door.mjs';
 import { hostBinFromActivation, installationDir } from '../util/host-bin-path.mjs';
+import { globalFgosDir } from '../config/facade.mjs';
 
 /**
  * Tier 0: the Rust host binary the workspace's fgctl activation runs, by the
@@ -82,7 +82,6 @@ export function probeGlobalBin() {
 
 const BIN_CACHE_DIR = 'runtime';
 const BIN_CACHE_NAME = 'bin-cache.json';
-const defaultGlobalDir = () => path.join(os.homedir(), '.fgos');
 const binCachePath = (globalDir) => path.join(globalDir, BIN_CACHE_DIR, BIN_CACHE_NAME);
 
 /** The cached path, or null when the cache is absent, unreadable or not a path string: a cache never fails its reader. */
@@ -100,7 +99,7 @@ function readBinCache(globalDir) {
  * disk. Never spawns a subprocess -- a stale/missing cache resolves to
  * `null` here, letting the caller fall back to `probeGlobalBin`.
  */
-export function cachedGlobalBin({ globalDir = defaultGlobalDir() } = {}) {
+export function cachedGlobalBin({ globalDir = globalFgosDir() } = {}) {
   const cached = readBinCache(globalDir);
   return cached && fs.existsSync(cached) ? cached : null;
 }
@@ -117,7 +116,7 @@ export function cachedGlobalBin({ globalDir = defaultGlobalDir() } = {}) {
  * already cached (`fgos setup` runs every registered fix unconditionally,
  * so an unconditional write would break its idempotency guarantee).
  */
-export function refreshGlobalBinCache({ globalDir = defaultGlobalDir() } = {}) {
+export function refreshGlobalBinCache({ globalDir = globalFgosDir() } = {}) {
   const resolved = probeGlobalBin();
   if ((resolved ?? null) === readBinCache(globalDir)) {
     return { resolved, changed: false };
@@ -140,14 +139,15 @@ export function refreshGlobalBinCache({ globalDir = defaultGlobalDir() } = {}) {
  * fallback so a cold cache never hard-fails). Returns `{ tier, path }` or
  * `null` when nothing resolves at any tier.
  */
-export function resolveFgosBin(cwd, { globalDir = defaultGlobalDir() } = {}) {
+export function resolveFgosBin(cwd, { globalDir } = {}) {
   const workspaceBin = resolveWorkspaceInstallationBin(cwd);
   if (workspaceBin) return { tier: 0, path: workspaceBin };
   const devBin = resolveDevCheckoutBin(cwd);
   if (devBin) return { tier: 1, path: devBin };
   const projectLocalBin = resolveProjectLocalBin(cwd);
   if (projectLocalBin) return { tier: 2, path: projectLocalBin };
-  const cached = cachedGlobalBin({ globalDir });
+  // The global directory is read only here: tiers 0-2 never touch it, so they resolve with no HOME and no addon.
+  const cached = cachedGlobalBin({ globalDir: globalDir ?? globalFgosDir() });
   if (cached) return { tier: 3, path: cached };
   const live = probeGlobalBin();
   if (live) return { tier: 3, path: live };

@@ -1,53 +1,38 @@
 {
   "config": {
-    "route_kind": "native",
     "operation_id": "config.read",
     "owner_path": "packages/config/rust",
     "subcommands": true
   },
   "convention": {
-    "route_kind": "native",
     "operation_id": "convention.query",
     "owner_path": "packages/convention/rust",
     "subcommands": true
   },
   "friction": {
-    "route_kind": "native",
     "operation_id": "observe.friction",
     "owner_path": "packages/observe/rust",
     "subcommands": true
   },
   "gate-bypass": {
-    "route_kind": "native",
     "operation_id": "work.gate-bypass.show",
     "owner_path": "packages/work-state/rust"
   },
-  "hook": {
-    "route_kind": "legacy-cli",
-    "native_kinds": [
-      "mailbox",
-      "mailbox-sync"
-    ]
-  },
   "identity": {
-    "route_kind": "native",
     "operation_id": "identity.writer",
     "owner_path": "packages/identity/rust"
   },
   "mailbox": {
-    "route_kind": "native",
     "operation_id": "mailbox.inbox",
     "owner_path": "packages/mailbox/rust",
     "subcommands": true
   },
   "metrics": {
-    "route_kind": "native",
     "operation_id": "observe.metrics",
     "owner_path": "packages/observe/rust",
     "subcommands": true
   },
   "version": {
-    "route_kind": "native",
     "operation_id": "distribution.build.show",
     "owner_path": "packages/distribution/rust"
   }

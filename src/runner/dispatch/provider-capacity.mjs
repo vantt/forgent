@@ -6,7 +6,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { replaceDurably } from '../../native/door.mjs';
-import { readMachineAccounts } from '../../config/facade.mjs';
+import { globalFgosDir, readMachineAccounts } from '../../config/facade.mjs';
 import { deriveLegacyInventory, legacyStateKey } from './llm-accounts.mjs';
 import { resolveHolderLiveness, selfRecord } from '../../native/process-identity.mjs';
 import { acquire, acquireSync, createLockScope, lockHolders, resolveLock, resolveLockRoot, runBorrowed } from '../../holder-lock/index.mjs';
@@ -38,7 +38,7 @@ export class ProviderCapacityConfigError extends Error {
 }
 
 export function defaultProviderCapacityRuntimeDir() {
-  return path.join(os.homedir(), '.fgos', 'runtime', 'provider-capacity');
+  return path.join(globalFgosDir(), 'runtime', 'provider-capacity');
 }
 
 export function providerCapacityStatePaths(runtimeDir = defaultProviderCapacityRuntimeDir()) {

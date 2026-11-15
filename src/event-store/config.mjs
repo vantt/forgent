@@ -1,50 +1,40 @@
 import path from 'node:path';
-import { isConfigRefusal, readConfig, readStandardValue } from '../config/facade.mjs';
+import { ConfigDoorError, isConfigRefusal, readEventStoreSection, validateEventStoreSection } from '../config/facade.mjs';
 
-// Phase 09 extends the existing eventStore registration with this ONE shape.
-// The defaults are the bundled standard's `eventStore` section, read through the config door when a key is unset.
-const defaults = () => readStandardValue('eventStore').value;
-const invalid = name => Object.assign(new Error(`event-store-config: invalid ${name}`), { code: 'event-store-config' });
+// The Event Store config section is read and validated by the config crate (its minimums, its defaults from the bundled
+// standard, its refusal rule); the two functions below keep their signatures and error shape for every caller.
+/** `event-store-config`: the one error code of a config that breaks the section's rules or is refused. */
+function configError(error) {
+  if (!(error instanceof ConfigDoorError) || !isConfigRefusal(error)) return error;
+  const [first] = error.refusals;
+  const message = first.id === 'event-store-config' ? `event-store-config: invalid ${first.keyword}` : `event-store-config: ${error.message}`;
+  return Object.assign(new Error(message), { code: 'event-store-config' });
+}
+/** The door's answer as plain objects, in the order every caller has always seen the keys. */
+const plain = ({ seal, sync, rebuild, remote }) => ({ seal: { ...seal }, sync: { ...sync }, rebuild: { ...rebuild }, remote });
+/** The section of `config.eventStore` (every key set) over the bundled standard; throws `event-store-config` for a value that breaks a rule. */
 export function eventStoreConfig(config = {}) {
-  const input = config.eventStore === undefined ? {} : config.eventStore;
-  if (!input || typeof input !== 'object' || Array.isArray(input)) throw invalid('eventStore');
-  const result = {};
-  const standard = defaults();
-  // Every numeric key with its minimum; a section holds one or more keys.
-  for (const [name, keys] of [['seal', { intervalSec: 1, coalesceSec: 1 }], ['sync', { intervalSec: 0 }], ['rebuild', { maxAttempts: 0 }]]) {
-    const section = input[name] === undefined ? {} : input[name];
-    if (!section || typeof section !== 'object' || Array.isArray(section)) throw invalid(name);
-    result[name] = {};
-    for (const [key, minimum] of Object.entries(keys)) {
-      const value = section[key] === undefined ? standard[name][key] : section[key];
-      if (!Number.isSafeInteger(value) || value < minimum) throw invalid(`${name}.${key}`);
-      result[name][key] = value;
-    }
+  try {
+    return plain(validateEventStoreSection(config));
+  } catch (error) {
+    throw configError(error);
   }
-  result.remote = input.remote === undefined ? standard.remote : input.remote;
-  // The remote's alphabet is Git's rule: the crate refuses a bad name where it first uses it.
-  if (typeof result.remote !== 'string' || result.remote === '') throw invalid('remote');
-  return result;
 }
 /**
  * The Event Store config of the project at `root`, read through the config door; `globalConfigPath` names a global config
  * file whose directory replaces `~/.fgos`.
  *
- * Config files are hand edited, so a half-typed edit is an ordinary state, and the door refuses a file as a whole. A
- * refused file never yields the defaults for a publish decision: a caller that reports on or acts for the user (`strict`:
- * the `events` verbs, doctor) gets the `event-store-config` error with the door's message; any other caller (the write
- * path and the lifecycle triggers) gets a config that never pushes (`sync.intervalSec` 0) when the refusal is not about
- * the `eventStore` section, so a trigger still seals and never publishes against the user's real setting. A refusal that
- * names an `eventStore` value throws for every caller.
+ * A refused config file never yields the defaults for a publish decision: a caller that reports on or acts for the user
+ * (`strict`: the `events` verbs, doctor) gets the `event-store-config` error with the door's message; any other caller (the
+ * write path and the lifecycle triggers) gets a config that never pushes (`sync.intervalSec` 0) when the refusal is not
+ * about the `eventStore` section. A refusal that names an `eventStore` value throws for every caller. The rule itself is
+ * the config crate's.
  */
 export function readEventStoreConfig(root, globalConfigPath, { strict = false } = {}) {
   const globalDir = globalConfigPath ? path.dirname(globalConfigPath) : undefined;
   try {
-    return eventStoreConfig(readConfig({ projectRoot: root, globalDir, sections: ['eventStore'] }).value);
+    return plain(readEventStoreSection({ projectRoot: root, globalDir, strict }));
   } catch (error) {
-    if (!isConfigRefusal(error)) throw error;
-    const aboutEventStore = error.refusals.some(({ path: at }) => typeof at === 'string' && (at === 'eventStore' || at.startsWith('eventStore.')));
-    if (strict || aboutEventStore) throw Object.assign(new Error(`event-store-config: ${error.message}`), { code: 'event-store-config' });
-    return { ...eventStoreConfig({}), sync: { intervalSec: 0 } };
+    throw configError(error);
   }
 }

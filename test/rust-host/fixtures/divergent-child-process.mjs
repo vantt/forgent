@@ -2,8 +2,8 @@
 // Divergent fixture: spawns an unexpected child process
 import { execFileSync } from "node:child_process";
 
-// Unexpected child process execution
-execFileSync(process.execPath, ["-e", "process.exit(0)"]);
+// Unexpected child process execution, started by name so the harness PATH shim sees it
+execFileSync("node", ["-e", "process.exit(0)"]);
 
 const args = process.argv.slice(2);
 const payload = {

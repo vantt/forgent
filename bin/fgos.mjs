@@ -52,7 +52,6 @@ import { wrapEnvelope } from '../src/state/envelope.mjs';
 import { loadRunnerConfigForDir } from '../src/runner/dispatch/config.mjs';
 import { RunnerConfigError } from '../src/runner/dispatch/runner-config-error.mjs';
 import { checkDispatchAttestation } from '../src/runner/attestation-guard.mjs';
-import { formatDeprecation } from '../src/cli/deprecation.mjs';
 import { checkDirDiffersFromCwd, attachDirWarning } from '../src/workflow/dir-guard.mjs';
 import { lintPlanCapabilityAnnotations, lintPhaseUnits } from '../src/report/capability-plan-lint.mjs';
 import { appendWorkerLog } from '../src/runner/worker-log.mjs';
@@ -110,7 +109,7 @@ import { createSession, endSession, listSessions, reclaimOrphanedSessions, sessi
 import { visitCount } from '../src/runner/anti-loop.mjs';
 import { DEFAULTS } from '../src/state/work.mjs';
 import { DEFAULT_DOMAIN, getDomain, stepForPhase, domainSteps, effectiveStep, resolveDomainName } from '../src/state/domain-registry.mjs';
-import { MANIFEST_SCHEMA_VERSION, COMMAND_REGISTRY, declared, publicManifest } from '../src/cli/command-registry.mjs';
+import { COMMAND_REGISTRY, declared, isNativeInvocation } from '../src/cli/command-registry.mjs';
 import { recordInvocationFault } from '../src/observe/invocation-fault-log.mjs';
 import { computeAwaitingContext } from '../src/state/awaiting-context.mjs';
 import { readConfig } from '../src/config/facade.mjs';
@@ -3643,11 +3642,10 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       const { setupUseCase } = await import('../src/setup/setup-use-case.mjs');
       const result = setupUseCase(mainCheckoutRootOf(flags), { packageRoot: PACKAGE_ROOT });
       const deprecation = COMMAND_REGISTRY.find((entry) => entry.name === 'setup')?.deprecated ?? null;
-      const deprecationText = formatDeprecation(deprecation);
       return {
         deprecation,
-        deprecationMessage: deprecationText
-          ? `fgos setup is legacy compatibility; ${deprecationText}.`
+        deprecationMessage: deprecation
+          ? `fgos setup is legacy compatibility; ${deprecation}.`
           : undefined,
         ...result,
       };
@@ -3793,182 +3791,29 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
     }
 
     default:
-      throw new StoreError('validation', `unknown verb "${verb ?? ''}". Usage: fgos <init|add|submit|discover|plan|move|retrospective|cleanup|compound|edit|item|ask|answer|decision|list|ready|rebuild|events|rollup|take|return|review|approve|sync-root|reject|catchup|triage|session|gateway|goal|tool|setup|doctor|lock|lock-status|git|main-checkout-reset> ...`);
+      throw new StoreError('validation', `unknown verb "${verb ?? ''}". Usage: fgos <${COMMAND_REGISTRY.map((e) => e.name).join('|')}> ...`);
   }
 }
 
-// ─── --help / --help --json: machine-readable verb manifest (P37 deliverable
-// b) — mirrors `.bee/bin/bee.mjs`'s manifest/renderHelpText/
-// handleHelp exactly. The manifest itself is NEVER wrapped in the fgos.v1
-// envelope (wrapEnvelope) — this is CTR001's documented exception for the
-// verb manifest: metadata about the CLI's own verb surface, not a verb's
-// data payload, the same distinction bee.mjs draws for its own
-// `--help --json`.
+// ─── --help: the host answers it, this channel only hands the call over ─────────────────────────────────
+// The verb manifest is rendered once, by the native host (apps/fgos/src/help.rs, from
+// packages/host-runtime/contracts/command-manifest.json). An exact `--help` or `-h` token anywhere on the line is
+// help, even where the parser would take it as a flag's value, and help never runs a verb. Without a host this
+// direct-node channel has nothing to render, so it refuses with a pointer instead of printing a second copy.
+const HELP_TOKENS = ['--help', '-h'];
 
-// A required param that can be supplied positionally (mixed) or ONLY
-// positionally (e.g. submit's text, session's sub) is never a real `--flag`
-// on the command line — printing it as `required: --name` would be actively
-// wrong for the positional-only case (STR77) and misleading for the mixed
-// case. Split required into the two shapes so each renders in its own idiom;
-// only the flag-only remainder still gets the `--name` form.
-function renderParameterLines(parameters, indent) {
-  const lines = [];
-  const required = parameters?.required || [];
-  const positional = parameters?.positional || [];
-  const flagRequired = required.filter((r) => !positional.includes(r));
-  if (positional.length) lines.push(`${indent}positional: ${positional.join(', ')}`);
-  if (flagRequired.length) lines.push(`${indent}required: ${flagRequired.map((r) => `--${r}`).join(', ')}`);
-  return lines;
-}
-
-// The flags one verb (or one sub-verb) reads, one line each, with the default
-// the schema declares; a description that names its default is left as written,
-// a switch otherwise defaults to off and a valued flag to unset.
-function renderFlagLines(parameters, indent) {
-  const positional = parameters?.positional || [];
-  return Object.entries(parameters?.properties || {})
-    .filter(([name]) => !positional.includes(name))
-    .map(([name, spec]) => {
-      const text = spec.description ?? '';
-      const dflt = spec.default ?? (spec.type === 'boolean' ? 'off' : 'unset');
-      const note = /default/i.test(text) ? '' : ` (default: ${dflt})`;
-      return `${indent}--${name}${spec.type === 'boolean' ? '' : ' <value>'}  ${text}${note}`;
-    });
-}
-
-// The registry `guide` of a verb, as the help sections a person needs before
-// running it: what it changes on disk, what it needs, every flag with its
-// default, examples, exit codes and the next command.
-function renderGuide(entry) {
-  const flags = entry.subcommands
-    ? Object.entries(entry.subcommands).flatMap(([sub, spec]) => [`        fgos ${entry.name} ${sub}`, ...renderFlagLines(spec.parameters, '            ')])
-    : renderFlagLines(entry.parameters, '        ');
-  const g = entry.guide;
-  return [
-    '    Changes on disk:', `        ${g.changes}`,
-    '    Prerequisites:', `        ${g.prerequisites}`,
-    '    Options:', ...flags, '        Every verb also takes --dir <root> (default: the project found from the current directory) and --json.',
-    '    Examples:', ...(entry.examples ?? []).map((example) => `        ${example}`),
-    '    Exit codes:', ...g.exitCodes.map((code) => `        ${code}`),
-    '    Next:', `        ${g.next}`,
-  ];
-}
-
-function renderHelpText(entries = publicManifest().commands) {
-  // Label for touchesState+externalEffect: 'read' (both false), 'write'
-  // (touches only), 'external' (effect only), or 'write+external' (both true).
-  const labelFor = (touchesState, externalEffect) => {
-    if (touchesState && externalEffect) return 'write+external';
-    if (touchesState) return 'write';
-    if (externalEffect) return 'external';
-    return 'read';
-  };
-  const lines = [`fgos — the fgOS work-item CLI (schema_version ${MANIFEST_SCHEMA_VERSION})`, ''];
-  // The whole list names a deprecated verb once, under Compatibility; one verb's own help keeps its full entry.
-  const single = entries.length === 1;
-  const compatibility = single ? [] : entries.filter((entry) => entry.deprecated);
-  for (const entry of single ? entries : entries.filter((e) => !e.deprecated)) {
-    const label = labelFor(entry.touchesState, entry.externalEffect);
-    lines.push(`${entry.invoke} [${label}]`);
-    lines.push(`    ${entry.description}`);
-    lines.push(...renderParameterLines(entry.parameters, '    '));
-    for (const [sub, spec] of Object.entries(entry.subcommands ?? {})) {
-      lines.push(`    fgos ${entry.name} ${sub}`);
-      lines.push(`        ${spec.description}`);
-      lines.push(...renderParameterLines(spec.parameters, '        '));
-    }
-    if (single && entry.guide) lines.push(...renderGuide(entry));
-    const deprecationText = formatDeprecation(entry.deprecated);
-    if (deprecationText) {
-      lines.push(`    DEPRECATED — ${deprecationText}`);
-    }
-    lines.push('');
-  }
-  if (compatibility.length > 0) {
-    lines.push('Compatibility (deprecated, still callable; `fgos <verb> --help` has the detail):');
-    for (const entry of compatibility) lines.push(`    ${entry.invoke} — ${formatDeprecation(entry.deprecated)}`);
-    lines.push('');
-  }
-  return `${lines.join('\n').trimEnd()}\n`;
-}
-
-// Help is the manifest door: metadata about the CLI's own verb surface, never
-// a verb's data payload, so it is NEVER wrapped in the fgos.v1 envelope
-// (CTR001's documented exception, the same distinction bee.mjs draws for its
-// own `--help --json`), and it never runs a verb (no side effects, e.g.
-// `init --help` must never call initStore). A refused help request writes one
-// stderr line and exits 4 (validation), with nothing on stdout.
-function refuseHelp(message) {
-  process.stderr.write(`fgos: ${message}\n`);
-  process.exitCode = 4;
-}
-
-// One verb's help: its manifest entry, narrowed to one sub-verb when `sub` is
-// given. Returns false when the request is refused (already reported).
-function printVerbHelp(verb, sub, json) {
-  const entry = publicManifest().commands.find((e) => e.name === verb);
-  if (!entry) {
-    refuseHelp(`unknown verb "${verb}". Usage: fgos --help [<verb> [<sub>]] [--json]`);
-    return false;
-  }
-  let shown = entry;
-  if (sub !== undefined) {
-    if (!entry.subcommands) {
-      refuseHelp(`${verb} takes no sub-verb (got "${sub}"). Usage: fgos ${verb} --help [--json]`);
-      return false;
-    }
-    if (!Object.hasOwn(entry.subcommands, sub)) {
-      refuseHelp(`unknown ${verb} sub-verb "${sub}" (known: ${Object.keys(entry.subcommands).join(', ')}).`);
-      return false;
-    }
-    shown = { ...entry, subcommands: { [sub]: entry.subcommands[sub] } };
-  }
-  process.stdout.write(json ? `${JSON.stringify(shown, null, 2)}\n` : renderHelpText([shown]));
-  return true;
-}
-
-// `fgos --help|-h [<verb> [<sub>]] [--json]`: the whole manifest, or one
-// verb's entry. Anything else on the line is refused rather than ignored.
-function handleHelp(args) {
-  const json = args.includes('--json');
-  // `--dir <root>` is the global store flag (the `fgos` shell function appends
-  // it to every call); help reads no store, so it is accepted and unused. A
-  // repeated help token (`fgos -h --help`) asks the same thing.
-  const words = args
-    .filter((a, i) => !(a === '--dir' || a.startsWith('--dir=') || (i > 0 && args[i - 1] === '--dir')))
-    .filter((a) => a !== '--json' && a !== '--help' && a !== '-h');
-  const option = words.find((a) => a.startsWith('-'));
-  if (option !== undefined) {
-    refuseHelp(`unknown option "${option}" for --help. Usage: fgos --help [<verb> [<sub>]] [--json]`);
-    return;
-  }
-  if (words.length > 2) {
-    refuseHelp(`too many words for --help: "${words.join(' ')}". Usage: fgos --help [<verb> [<sub>]] [--json]`);
-    return;
-  }
-  if (words.length > 0) {
-    printVerbHelp(words[0], words[1], json);
-    return;
-  }
-  if (json) {
-    process.stdout.write(`${JSON.stringify(publicManifest(), null, 2)}\n`);
+async function forwardHelp() {
+  const { runHostInherited } = await import('../src/util/host-bin.mjs');
+  const result = runHostInherited(process.argv.slice(2));
+  if (result.status !== undefined) {
+    process.exitCode = result.status;
+  } else if (result.code === 'host-unavailable') {
+    process.stderr.write('fgos: help is served by the native fgOS host, which was not found. Use the installed `fgos`, or `npm run fgos:dev -- <verb> --help` from a checkout.\n');
+    process.exitCode = 4;
   } else {
-    process.stdout.write(renderHelpText());
+    process.stderr.write(`fgos: could not run the native fgOS host for help: ${result.message}\n`);
+    process.exitCode = 4;
   }
-}
-
-// Per-verb `fgos <verb> [<sub>] --help|-h [--json]` (STR79/D3): the same door
-// one level down. For a verb with sub-verbs, the first positional names the
-// sub-verb to narrow to; any other verb's positionals are its own arguments
-// (e.g. run's prompt) and are ignored. An unknown verb returns null so the
-// normal dispatch path still produces its usual "unknown verb" error.
-function handleVerbHelp(verb, flags, positional) {
-  const entry = COMMAND_REGISTRY.find((e) => e.name === verb);
-  if (!entry) return null;
-  // `--help <word>` hands the word to the flag as its value.
-  const words = [...(typeof flags.help === 'string' ? [flags.help] : []), ...positional].filter((w) => w !== '-h');
-  printVerbHelp(verb, entry.subcommands ? words[0] : undefined, flags.json !== undefined);
-  return true;
 }
 
 // `--pretty` rendering (D7): ONLY for `setup`/`doctor`, and only when the
@@ -4120,9 +3965,9 @@ const DELETE_GUARD_HOOK_KIND = 'main-checkout-delete-guard';
 
 async function handleHook(rest) {
   const [kind, ...flags] = rest;
-  const { IN_PROCESS_HOOK_KINDS, NATIVE_HOOK_KINDS, serveHook } = await import('../src/runner/hook.mjs');
+  const { IN_PROCESS_HOOK_KINDS, serveHook } = await import('../src/runner/hook.mjs');
   const allowedKinds = [...IN_PROCESS_HOOK_KINDS, DELETE_GUARD_HOOK_KIND];
-  if (!kind || kind === '--help' || kind === '-h') {
+  if (!kind) {
     process.stdout.write(
       `Usage: fgos hook <${allowedKinds.join('|')}> [--format=standard|agy]\n\n` +
         'Execute managed hook guards for supported coding agents (Claude, Codex, AGY, OMP, Pi).\n',
@@ -4130,7 +3975,7 @@ async function handleHook(rest) {
     process.exit(0);
   }
 
-  if (NATIVE_HOOK_KINDS.includes(kind)) {
+  if (isNativeInvocation(COMMAND_REGISTRY.find((e) => e.name === 'hook'), [kind])) {
     process.stderr.write(`Error: hook kind "${kind}" is served by the native fgos host; this direct-node channel does not run it. Run it through the project shim (.fgos/installation/bin/fgos hook ${kind}).\n`);
     process.exit(1);
   }
@@ -4160,19 +4005,13 @@ async function main() {
   const [, , verb, ...rest] = process.argv;
   // This process is a controller: Ctrl-C and SIGTERM cancel the attempts it started (the library asks for it, never assumes it).
   enableCancelOnSignal();
-  // `hook` keeps the agent's raw argv, but its help is still the manifest door.
-  if (verb === 'hook' && (rest.includes('--help') || rest.includes('-h'))) {
-    handleVerbHelp(verb, { help: true, ...(rest.includes('--json') ? { json: true } : {}) }, []);
+  // Same rule as the Rust host: any exact `--help`/`-h` token asks for help, `hook` included.
+  if (verb === '--help' || verb === '-h' || HELP_TOKENS.some((token) => rest.includes(token))) {
+    await forwardHelp();
     return;
   }
   if (verb === 'hook') {
     await handleHook(rest);
-    return;
-  }
-
-
-  if (verb === '--help' || verb === '-h') {
-    handleHelp(rest);
     return;
   }
 
@@ -4190,22 +4029,17 @@ async function main() {
   try {
     const { flags, positional } = withFaultClass('arg-parse', () => parseArgs(rest));
 
-    // Same rule as the Rust host: any exact `--help`/`-h` token asks for help,
-    // even where the parser took it as the previous flag's value.
-    if (withFaultClass('arg-parse', () => (rest.includes('--help') || rest.includes('-h')) && handleVerbHelp(verb, flags, positional))) {
-      return;
-    }
-
     const flagEntry = COMMAND_REGISTRY.find((e) => e.name === verb);
     withFaultClass('unknown-flag', () => {
-      const unknownFlag = flagEntry && !flagEntry.nativeOnly ? unknownFlagMessage(flagEntry, flags, positional) : null;
+      const unknownFlag = flagEntry && flagEntry.native !== true ? unknownFlagMessage(flagEntry, flags, positional) : null;
       if (unknownFlag) throw new StoreError('validation', unknownFlag);
     });
 
     dir = withFaultClass('dir-invalid', () => resolveInvocationRoot({ cwd: process.cwd(), dir: flags.dir, policy: verb === 'init' ? 'strict-cwd' : 'caller-tree' }).fgosDir);
     const entry = COMMAND_REGISTRY.find((e) => e.name === verb);
-    if (entry?.nativeOnly) {
-      process.stderr.write(`fgos: "${verb}" is only available in the native fgOS host. Install a release with "fgctl init" (https://github.com/vantt/forgent#install).\n`);
+    if (isNativeInvocation(entry, positional)) {
+      const served = entry.native === true ? verb : `${verb} ${positional[0]}`;
+      process.stderr.write(`fgos: "${served}" is only available in the native fgOS host. Install a release with "fgctl init" (https://github.com/vantt/forgent#install).\n`);
       process.exit(4);
     }
     // Whether this verb may touch the store from here (missing store, disconnected snapshot, `init` in a worktree, an

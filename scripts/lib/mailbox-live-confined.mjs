@@ -40,8 +40,6 @@ import { installClaudeHook, installCodexHook, installOmpHook, installPiHook } fr
 import { writeProjectConfig } from '../../test/helpers/config-fixture.mjs';
 import { loginDigest, setAsideChangedCopy } from './codex-auth-guard.mjs';
 import { sandboxGit } from './sandbox-git.mjs';
-import { observe, scan, signalByIdentity } from '../../src/native/process-identity.mjs';
-import { processesInside } from '../../src/runner/dispatch/stop-processes-inside.mjs';
 
 export const BWRAP = '/usr/bin/bwrap';
 
@@ -360,9 +358,27 @@ export function prepareConfinedRun({ base, runId, command, args = [], env = {}, 
 
 // ---------------------------------------------------------------- processes
 
+/** `/proc/<pid>/stat` start time, or null when the pid is gone. */
+export function startTime(pid) {
+  try {
+    return fs.readFileSync(`/proc/${pid}/stat`, 'utf8').split(') ')[1].split(' ')[19];
+  } catch {
+    return null;
+  }
+}
+
 const readLink = (p) => {
   try {
     return fs.readlinkSync(p);
+  } catch {
+    return null;
+  }
+};
+
+/** The state letter of `/proc/<pid>/stat` (`Z` for a zombie), or null when the pid is gone. */
+const stateOf = (pid) => {
+  try {
+    return fs.readFileSync(`/proc/${pid}/stat`, 'utf8').split(') ')[1].split(' ')[0];
   } catch {
     return null;
   }
@@ -372,7 +388,7 @@ const readLink = (p) => {
 export function sandboxInit(bwrapPid, waitMs = 5000) {
   const deadline = Date.now() + waitMs;
   while (Date.now() < deadline) {
-    if (observe(bwrapPid).kind !== 'live') return null;
+    if ([null, 'Z', 'X'].includes(stateOf(bwrapPid))) return null;
     let tasks = [];
     try {
       tasks = fs.readdirSync(`/proc/${bwrapPid}/task`);
@@ -395,41 +411,41 @@ export function sandboxInit(bwrapPid, waitMs = 5000) {
 }
 
 /**
- * The door's views of the processes that belong to a run: in its pid namespace `pidNs`, or with a working
- * directory or executable inside `dir`. Never this process or its parent. A view's identity is read by the scan
- * before its namespace link, so a pid reused in between is signalled by nothing: its identity no longer matches.
+ * The host pids of processes that belong to a run: in its pid namespace `pidNs`, or with a
+ * working directory or executable inside `dir`. Never this process or its parent.
  */
-function viewsOfRun(dir, pidNs) {
-  const views = scan({});
-  if (views === 'unsupported') return [];
-  const inDir = new Set(processesInside(dir, { views }).map((view) => view.pid));
-  return views.filter((view) => view.pid !== process.pid && view.pid !== process.ppid
-    && (inDir.has(view.pid) || (pidNs && readLink(`/proc/${view.pid}/ns/pid`) === pidNs)));
+export function processesOfRun(dir, pidNs) {
+  const pids = [];
+  for (const entry of fs.readdirSync('/proc')) {
+    if (!/^\d+$/.test(entry)) continue;
+    const pid = Number(entry);
+    if (pid === process.pid || pid === process.ppid) continue;
+    const ns = readLink(`/proc/${pid}/ns/pid`);
+    if ((pidNs && ns === pidNs) || inside(readLink(`/proc/${pid}/cwd`), dir) || inside(readLink(`/proc/${pid}/exe`), dir)) pids.push(pid);
+  }
+  return pids;
 }
 
-/** The host pids of processes that belong to a run (see `viewsOfRun`). */
-export const processesOfRun = (dir, pidNs) => viewsOfRun(dir, pidNs).map((view) => view.pid);
-
-/** SIGKILL the process recorded at launch as `pid` with start time `start`, only while it still is that process. */
 const killIfSame = (pid, start) => {
-  if (!pid || !start) return;
-  const seen = observe(pid);
-  if (seen.kind === 'live' && seen.startTime === start) signalByIdentity(seen, 'kill');
+  if (pid && start && startTime(pid) === start) {
+    try {
+      process.kill(pid, 'SIGKILL');
+    } catch {
+      // gone between the check and the kill
+    }
+  }
 };
 
-/**
- * SIGKILL to every process of the run, each by the identity its scan read, until none is left or `waitMs` passes;
- * returns the pids left (a process whose identity could not be read or whose kill was refused stays in it).
- */
+/** SIGKILL to every process of the run until none is left or `waitMs` passes; returns what is left. */
 function killRunProcesses(dir, pidNs, waitMs) {
   const deadline = Date.now() + waitMs;
-  let left = viewsOfRun(dir, pidNs);
+  let left = processesOfRun(dir, pidNs);
   while (left.length && Date.now() < deadline) {
-    for (const view of left) if (view.tuple) signalByIdentity(view.tuple, 'kill');
+    for (const pid of left) killIfSame(pid, startTime(pid));
     sleepSync(50);
-    left = viewsOfRun(dir, pidNs);
+    left = processesOfRun(dir, pidNs);
   }
-  return left.map((view) => view.pid);
+  return left;
 }
 
 /**
@@ -447,9 +463,9 @@ export function startConfinedRun(prepared, { stdio = ['ignore', 'pipe', 'pipe'] 
   const pid1 = sandboxInit(child.pid);
   Object.assign(entry, {
     bwrapPid: child.pid,
-    bwrapStart: observe(child.pid).startTime ?? null,
+    bwrapStart: startTime(child.pid),
     pid1,
-    pid1Start: pid1 ? (observe(pid1).startTime ?? null) : null,
+    pid1Start: pid1 ? startTime(pid1) : null,
     pidNs: pid1 ? readLink(`/proc/${pid1}/ns/pid`) : null,
   });
   writeJson(paths.ledger, entry);
@@ -496,7 +512,7 @@ export function sweepOrphans(base, { waitMs = 5000 } = {}) {
     const file = path.join(dir, name);
     const entry = readJson(file);
     if (entry.endedAt) continue;
-    const pidNs = entry.pid1 && observe(entry.pid1).startTime === entry.pid1Start ? entry.pidNs : null;
+    const pidNs = entry.pid1 && startTime(entry.pid1) === entry.pid1Start ? entry.pidNs : null;
     killIfSame(entry.pid1, entry.pid1Start);
     killIfSame(entry.bwrapPid, entry.bwrapStart);
     const still = killRunProcesses(entry.dir, pidNs, waitMs);

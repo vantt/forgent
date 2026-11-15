@@ -15,7 +15,7 @@ import { createLockScope, HolderLockError, acquireSync } from '../holder-lock/in
 import { resolveStateRoot } from '../holder-lock/state-root.mjs';
 import { addWorktreeSync } from './repo-locks.mjs';
 import crypto from 'node:crypto';
-import { gitPortOptions, createGitInspect } from '../git/inspect.mjs';
+import { gitPortOptions, createGitInspect, worktreeDoor, NO_GIT_DOOR_CODES } from '../git/inspect.mjs';
 import { createGitWorktree } from '../git/worktree.mjs';
 import { createGitRefs } from '../git/refs.mjs';
 import { createGitRemote } from '../git/remote.mjs';
@@ -510,71 +510,25 @@ export function isMainWorktree(repoRoot, facts = inspectGit(repoRoot).resolveRep
 }
 
 /**
- * Whether `repoRoot` is a genuine `fgos session`-created worktree: its `.fgos` is a symbolic link (never a checked-out
- * copy) whose realpath equals the trusted main checkout's own `.fgos`. A bare symlink check is forgeable (a worktree can
- * carry a `.fgos` link to anywhere), so both conditions are required; the main root comes from Git Inspect, which a
- * worktree-local link cannot redirect. Unlike `isMainWorktree` this separates a legitimate session worktree from an
- * ad-hoc one. Never throws: a filesystem error or a non-repository means "not a session worktree".
- */
-export function isSessionWorktree(repoRoot, knownFacts) {
-  const linkPath = path.join(repoRoot, '.fgos');
-  try {
-    if (!fs.lstatSync(linkPath).isSymbolicLink()) return false;
-    const facts = knownFacts ?? inspectGit(repoRoot).resolveRepo();
-    if (facts.notARepository || !facts.trustedMainRoot) return false;
-    return pathsEqual(fs.realpathSync.native(linkPath), fs.realpathSync.native(path.join(realpathOrSelf(facts.trustedMainRoot), '.fgos')));
-  } catch {
-    return false;
-  }
-}
-
-const STORE_MISSING = (dir) =>
-  `.fgos/ not found at "${dir}" -- run "fgos init" here first, or check you are not inside a linked worktree (worktrees never carry .fgos/, per ADR0020: docs/platform/runner/decisions/h-36d872fbb0e5.md#0020--chặn-fgos-khỏi-worktree-worker-không-khóa-không-cô-lập).`;
-
-/**
- * Whether a verb may touch the store at `dir` from `cwd`, driven by its registry `store` field. Refusals are
- * `StoreError('validation')` carrying `faultClass`, so the shell records them without a hand-set label. Returns
- * `{ warning }` (a line for stderr, or null) when the verb may run.
- *
- *   store-missing                a `require` verb with no `.fgos/` at `dir` (the phantom-store hazard)
- *   disconnected-worktree-store  a store-mutating verb from a linked worktree whose `.fgos/` is a real, frozen snapshot,
- *                                unless `--dir` named the root (`explicitDir`) or it is a `fgos session` worktree
- *   init-in-worktree             `init` inside a linked worktree (worktrees never carry `.fgos/`, ADR0020)
- *   warning                      a `read` verb with no `.fgos/` from a linked worktree: the view may be empty
- *
- * One Git read serves every check that needs the worktree identity.
+ * Whether a verb may touch the store at `dir` from `cwd`, driven by its registry `store` field. The decision, its
+ * refusal texts and their fault classes belong to `fgos-git` (`packages/git/rust/src/store_admission.rs`); this is
+ * the adapter: a refusal becomes `StoreError('validation')` carrying `faultClass`, so the shell records it without a
+ * hand-set label. Returns `{ warning }` (a line for stderr, or null) when the verb may run.
  */
 export function admitStoreAccess({ verb, store, mutates = false, dir, cwd, explicitDir = false }) {
-  const refuse = (faultClass, message) => new StoreError('validation', message, { faultClass });
-  let facts;
-  const isMain = () => {
-    try {
-      return isMainWorktree(cwd, (facts ??= inspectGit(cwd).resolveRepo()));
-    } catch (err) {
-      throw new StoreError('validation', `"${verb}" refused: the Git state of "${cwd}" could not be read: ${err.message}`, { faultClass: 'worktree-identity-unreadable' });
-    }
-  };
-  const storeExists = fs.existsSync(dir);
-  if (store === 'require' && !storeExists) throw refuse('store-missing', STORE_MISSING(dir));
-  // `fgos session start` from a `.fgos/`-less ADR0020-stripped worktree is the legitimate case that verb serves, hence the existence check.
-  if (!explicitDir && mutates && storeExists && !isMain() && !isSessionWorktree(cwd, facts)) {
-    throw refuse(
-      'disconnected-worktree-store',
-      `"${verb}" refused: "${cwd}" is a linked worktree whose .fgos/ at "${dir}" is a real but disconnected snapshot, never the shared store outside "fgos pick"/"fgos take" (ADR0020-stripped) or "fgos session start" (symlinked) -- pass --dir <mainRoot> to reach the real store explicitly, e.g. ` +
-        '`--dir "$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)"`.',
-    );
+  let answer;
+  try {
+    // `init` is the verb that creates the store.
+    answer = worktreeDoor('admitStoreAccess', { verb, store: store ?? 'none', mutates, creates: verb === 'init', explicitDir, dir, cwd });
+  } catch (err) {
+    if (!NO_GIT_DOOR_CODES.has(err?.code)) throw err;
+    // No Git door: nothing can tell a linked worktree from the main checkout. A verb that needs no store is admitted as it
+    // always was; any other refuses by name.
+    if (!mutates && (store === undefined || store === 'none')) return { warning: null };
+    throw new StoreError('validation', `"${verb}" refused: the Git state of "${cwd}" could not be read: ${err.message}`, { faultClass: 'worktree-identity-unreadable' });
   }
-  if (verb === 'init' && !isMain()) {
-    throw refuse(
-      'init-in-worktree',
-      `"fgos init" refused inside a linked worktree ("${cwd}") -- worktrees never carry .fgos/ by design (ADR0020); run "fgos init" from the main checkout instead.`,
-    );
-  }
-  // A stderr line, not a JSON field: `ready`/`triage` can return a bare array, so a `data` field would change that shape.
-  const warning = store === 'read' && !storeExists && !isMain()
-    ? `fgos: warning: .fgos/ not found at "${dir}" -- this view may be empty because the real store lives elsewhere (worktrees never carry .fgos/, per ADR0020); pass --dir <mainRoot> to read it.\n`
-    : null;
-  return { warning };
+  if (answer.refused) throw new StoreError('validation', answer.refused.message, { faultClass: answer.refused.faultClass });
+  return { warning: answer.warning };
 }
 
 // Push a runner item's branch to origin unless it already tracks an upstream.

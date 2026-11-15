@@ -29,6 +29,7 @@ import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { inspectRepo } from './lib/git-ports.mjs';
+import { resolveActiveHostBin } from '../src/util/host-bin-path.mjs';
 
 // Not imported from run-tests.mjs: that module imports this one for the summary it prints.
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -645,21 +646,24 @@ export function buildSuiteBaseline({ files, cwd = REPO_ROOT, sha, wallSeconds, r
 
 /**
  * Median wall time of one `fgos --help` and one `fgos list` in `cwd`, each run `runs` times: the cost every
- * CLI-spawning test pays per call. Run it on the base and on the branch to see what a change adds.
+ * CLI-spawning test pays per call. Help is answered by the host, so it is timed on the host binary itself
+ * (`FGOS_HOST_BIN`), not through the Node channel's forwarding hop. Run it on the base and on the branch to see
+ * what a change adds.
  */
-export function cliCost({ cwd = REPO_ROOT, runs = 5, spawn = spawnSync } = {}) {
+export function cliCost({ cwd = REPO_ROOT, runs = 5, spawn = spawnSync, hostBin = process.env.FGOS_HOST_BIN } = {}) {
+  if (!hostBin) throw new Error('cliCost times help on the host binary: set FGOS_HOST_BIN to a built host');
   const bin = path.join(cwd, 'bin', 'fgos.mjs');
   const env = { ...process.env };
-  const median = (argv) => {
+  const median = (command, argv) => {
     const times = [];
     for (let i = 0; i < runs; i += 1) {
       const started = process.hrtime.bigint();
-      spawn(process.execPath, [bin, ...argv], { cwd, env, stdio: 'ignore' });
+      spawn(command, argv, { cwd, env, stdio: 'ignore' });
       times.push(Number(process.hrtime.bigint() - started) / 1e6);
     }
     return Math.round(times.sort((a, b) => a - b)[Math.floor(times.length / 2)]);
   };
-  return { helpMs: median(['--help']), listMs: median(['list']), runs, load: Number(os.loadavg()[0].toFixed(1)) };
+  return { helpMs: median(hostBin, ['--help']), listMs: median(process.execPath, [bin, 'list']), runs, load: Number(os.loadavg()[0].toFixed(1)) };
 }
 
 // -- CLI entrypoint --
@@ -691,7 +695,13 @@ if (process.argv[1] === __filename) {
     }
     for (const { title, files } of report.shared) console.log(`title ${title}: ${files.join(', ')}`);
   } else if (args[0] === '--cli-cost') {
-    const cost = cliCost();
+    // FGOS_HOST_BIN first, then the activation above the current directory: the one host lookup.
+    const { bin: hostBin } = resolveActiveHostBin({ cwd: process.cwd() });
+    if (!hostBin) {
+      console.error('cli-cost times help on the host binary: set FGOS_HOST_BIN, or run from a project with an activated release');
+      process.exit(1);
+    }
+    const cost = cliCost({ hostBin });
     console.log(`cli-cost: fgos --help ${cost.helpMs} ms, fgos list ${cost.listMs} ms (median of ${cost.runs}, load ${cost.load})`);
   } else if (args[0] === '--check') {
     const scopeIdx = args.indexOf('--scope');

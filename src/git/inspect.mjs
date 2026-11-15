@@ -43,6 +43,22 @@ export function gitPortOptions(repoPath, { mutation = false, inspect, detached =
   return { ...seed, trustedMain: facts.trustedMainRoot, writer: gitWriter(path.join(facts.trustedMainRoot, '.fgos')) };
 }
 
+/** The codes of a Git door that is not there at all (no addon shipped, or none that loads), as opposed to one that answered with a refusal. */
+export const NO_GIT_DOOR_CODES = new Set(['git-addon-unavailable', 'git-addon-not-shipped']);
+
+/**
+ * One worktree-tier decision of the addon (`resolveInvocationRoot`, `admitStoreAccess`): the request in, the answer or `{ refused: { faultClass, message } }` out.
+ * Policy, refusal texts and fault classes live in `fgos-git`; this only carries the request, outside any hot lock.
+ */
+export function worktreeDoor(door, request) {
+  outsideGate();
+  const native = loadNativeAddon();
+  if (typeof native[door] !== 'function') {
+    throw Object.assign(new Error(`git-addon-unavailable: this addon predates ${door}; restage the active release with fgctl init`), { code: 'git-addon-unavailable' });
+  }
+  return native[door](request);
+}
+
 /** The repository facts of the checkout `cwd` sits in (`notARepository` when it sits in none); throws when Git cannot be read.
  * The one read every root answer is built from. */
 export function readRepoFacts(cwd = process.cwd(), { detached = false } = {}) {

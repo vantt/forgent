@@ -11,7 +11,7 @@ import { spawnSync } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
 import { CONFINED_MARKER_ENV as DRIVER_MARKER } from '../../src/runner/dispatch/confinement/drivers/bwrap.mjs';
 import {
-  CONFINED_MARKER_ENV, ConfigDoorError, checkConfig, initConfigFile, isConfigRefusal, projectConfigPresent, readConfig, readMachineAccounts, readMachineConfig, readStandardValue,
+  CONFINED_MARKER_ENV, ConfigDoorError, checkConfig, globalFgosDir, initConfigFile, isConfigRefusal, projectConfigPresent, readConfig, readMachineAccounts, readMachineConfig, readProjectConfigSource, readStandardValue,
 } from '../../src/config/facade.mjs';
 
 process.env.FGOS_STATE_HOME = fs.mkdtempSync(path.join(os.tmpdir(), 'config-facade-state-'));
@@ -60,6 +60,22 @@ test('the global directory and the session class are read per call, never frozen
   process.env[CONFINED_MARKER_ENV] = '1';
   try { assert.equal(readMachineConfig({ globalDir: one.global, sections: [] }).accounts, 'unavailable-confined'); } finally { delete process.env[CONFINED_MARKER_ENV]; }
   assert.equal(readMachineConfig({ globalDir: one.global, class: 'confined', sections: [] }).accounts, 'unavailable-confined', 'an argument overrides the marker');
+});
+
+test('the global directory is .fgos under the home of the environment now, and an unset or blank home is refused by id', () => {
+  const home = process.env.HOME;
+  try {
+    process.env.HOME = '/home/first';
+    assert.equal(globalFgosDir(), '/home/first/.fgos');
+    process.env.HOME = '/home/second';
+    assert.equal(globalFgosDir(), '/home/second/.fgos', 'asked again when the home changes');
+    for (const blank of ['', '  ']) {
+      process.env.HOME = blank;
+      assert.throws(() => globalFgosDir(), (err) => err instanceof ConfigDoorError && err.code === 'config-io' && err.refusals[0].keyword === 'HomeUnset' && /set HOME/.test(err.message) && /set HOME/.test(err.refusals[0].message));
+    }
+    delete process.env.HOME;
+    assert.throws(() => globalFgosDir(), (err) => err.code === 'config-io', 'there is no passwd fallback');
+  } finally { process.env.HOME = home; }
 });
 
 test('a broken file throws one error type naming file, line, column and path and never an input value', () => {
@@ -143,4 +159,16 @@ test('a platform that cannot read config files refuses by name and warns once th
     process.off('warning', onWarning);
     config.snapshot = real;
   }
+});
+
+test('the raw project config source is the YAML file over a legacy JSON one, text unvalidated, or null', () => {
+  const dir = fixture();
+  assert.equal(readProjectConfigSource(dir.project), null);
+  assert.equal(readProjectConfigSource(path.join(dir.root, 'missing')), null);
+  const json = path.join(dir.project, '.fgos/config.json');
+  lay(json, '{"runner":{"patterns":{"retired":1}}}');
+  assert.deepEqual(readProjectConfigSource(dir.project), { path: json, format: 'json', text: '{"runner":{"patterns":{"retired":1}}}' });
+  const yaml = path.join(dir.project, '.fgos/config.yaml');
+  lay(yaml, 'runner:\n  patterns:\n    retired: 1\n');
+  assert.deepEqual(readProjectConfigSource(dir.project), { path: yaml, format: 'yaml', text: 'runner:\n  patterns:\n    retired: 1\n' });
 });

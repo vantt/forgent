@@ -26,7 +26,7 @@ use serde_json::{json, Value};
 
 use crate::detect::PathDetectors;
 use crate::inspect;
-use crate::machine::{self, HOME_VAR};
+use crate::machine;
 use crate::session::session_class;
 use crate::snapshot::{snapshot, Context, SnapshotError, SnapshotRequest};
 
@@ -211,10 +211,14 @@ fn path_arg(text: &str) -> Result<Vec<Segment>, Refusal> {
 
 /// The roots of a verb: the project, its trusted main checkout, `~/.fgos` and the session class.
 fn roots(root: &Path) -> Result<SnapshotRequest, Refusal> {
-    let home = machine::home_dir(|key| std::env::var(key).ok()).ok_or_else(|| {
+    let global_dir = machine::global_dir(|key| std::env::var(key).ok()).ok_or_else(|| {
         refuse(
-            "home-unset",
-            format!("{HOME_VAR} is not set; the global directory is ~/.fgos"),
+            machine::HOME_UNSET_ID,
+            format!(
+                "{}: {}",
+                machine::HOME_UNSET_KEYWORD,
+                machine::home_unset_message()
+            ),
         )
     })?;
     let canonical = |p: &Path| {
@@ -231,7 +235,7 @@ fn roots(root: &Path) -> Result<SnapshotRequest, Refusal> {
     Ok(SnapshotRequest {
         project_root,
         trusted_root,
-        global_dir: home.join(".fgos"),
+        global_dir,
         class,
     })
 }

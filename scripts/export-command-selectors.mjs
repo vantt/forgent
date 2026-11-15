@@ -2,7 +2,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { COMMAND_REGISTRY, HELP_SELECTORS, publicManifest } from '../src/cli/command-registry.mjs';
+import { COMMAND_REGISTRY, parseShape, publicManifest } from '../src/cli/command-registry.mjs';
 import { acceptedFlags } from '../src/cli/flag-check.mjs';
 import { uniqueTmpTag } from '../src/util/unique-tmp-tag.mjs';
 
@@ -172,7 +172,6 @@ export function loadAnnotations(input) {
       if (annotationsMap.has(sel)) {
         throw new Error(`Double-bound selector: selector "${sel}" declared more than once in annotations`);
       }
-      checkRouteKind(sel, item);
       annotationsMap.set(sel, item);
     }
   } else if (typeof parsed === 'object' && parsed !== null) {
@@ -180,7 +179,6 @@ export function loadAnnotations(input) {
       if (!item || typeof item !== 'object') {
         throw new Error(`Annotation for selector "${sel}" must be an object`);
       }
-      checkRouteKind(sel, item);
       annotationsMap.set(sel, { selector: sel, ...item });
     }
   }
@@ -188,75 +186,75 @@ export function loadAnnotations(input) {
   return annotationsMap;
 }
 
-function checkRouteKind(sel, item) {
-  if (Array.isArray(item.route_kind) && item.route_kind.length > 1) {
-    throw new Error(`Double-bound selector: selector "${sel}" declares more than one route_kind`);
-  }
-  if (Array.isArray(item.route_kinds) && item.route_kinds.length > 1) {
-    throw new Error(`Double-bound selector: selector "${sel}" declares more than one route_kind`);
-  }
-  if (item.route_kind && item.route_kinds) {
-    throw new Error(`Double-bound selector: selector "${sel}" declares both route_kind and route_kinds`);
-  }
-}
-
 /**
  * Assert that all COMMAND_REGISTRY selectors end up with a route in the output.
  * R5: any COMMAND_REGISTRY selector ends up with no route in the output (unlisted selector)
  */
-export function assertAllSelectorsListed(routes, registry = COMMAND_REGISTRY, helpSelectors = HELP_SELECTORS) {
+export function assertAllSelectorsListed(routes, registry = COMMAND_REGISTRY) {
   // Object.hasOwn, not index truthiness: a selector literally named
   // "__proto__" would otherwise resolve through the prototype chain to a
   // real (truthy, but meaningless) object and silently pass this guard.
-  for (const selector of [...registry.map((cmd) => cmd.name), ...helpSelectors]) {
+  for (const selector of registry.map((cmd) => cmd.name)) {
     if (!Object.hasOwn(routes, selector)) {
       throw new Error(`Unlisted selector: selector "${selector}" has no route in generated output`);
     }
   }
 
-  const expected = registry.length + helpSelectors.length;
-  if (Object.keys(routes).length !== expected) {
-    throw new Error(`Route count mismatch: expected ${expected}, got ${Object.keys(routes).length}`);
+  if (Object.keys(routes).length !== registry.length) {
+    throw new Error(`Route count mismatch: expected ${registry.length}, got ${Object.keys(routes).length}`);
   }
 }
 
-// The help door (`fgos --help|-h [<verb>] [--json]`) is answered by the
-// legacy-node payload, which owns the manifest. Only these exact tokens are
-// routed; any other leading option still has no route (R3 fails closed).
-function nativeKinds(selector, routeKind, kinds) {
-  if (routeKind !== 'legacy-cli') {
-    throw new Error(`native_kinds on selector "${selector}" needs route_kind legacy-cli, not ${routeKind}`);
+// What the registry `native` field says: undefined (nothing native), true (the whole verb) or the sorted first positionals.
+function nativeDeclaration(cmd) {
+  const { name: selector, native } = cmd;
+  if (native === undefined || native === true) return native;
+  if (!Array.isArray(native) || native.length === 0 || !native.every((sub) => typeof sub === 'string' && sub)) {
+    throw new Error(`native on selector "${selector}" must be true or a non-empty list of first positionals`);
   }
-  if (!Array.isArray(kinds) || kinds.length === 0 || !kinds.every((k) => typeof k === 'string' && k)) {
-    throw new Error(`native_kinds on selector "${selector}" must be a non-empty array of kind names`);
+  for (const sub of native) {
+    if (cmd.subcommands && !Object.hasOwn(cmd.subcommands, sub)) {
+      throw new Error(`native on selector "${selector}" names "${sub}", which is not one of its sub-verbs`);
+    }
   }
-  return [...kinds].sort();
+  return [...native].sort();
 }
 
-function helpRoute(selector) {
-  return {
-    selector,
-    route_kind: 'legacy-cli',
-    legacy_payload: 'legacy-node',
-    owner_path: 'src/cli/command-registry.mjs',
-    compatibility_tests: ['test/rust-host/command-routes.test.mjs', 'test/rust-host/help-routes.test.mjs'],
-  };
+// A store declaration is `true` or a non-empty list of invocation shapes the host can match; the data goes out verbatim.
+function storeDeclaration(cmd, field) {
+  const value = cmd[field];
+  if (value === undefined || value === true) return value;
+  if (!Array.isArray(value) || value.length === 0 || !value.every((shape) => parseShape(shape))) {
+    throw new Error(`${field} on selector "${cmd.name}" must be true or a non-empty list of invocation shapes`);
+  }
+  return value;
 }
 
-function nativeFlagProjection(cmd) {
+// Land release has no Rust owner yet, so no invocation that lands work may be declared native.
+function assertNoNativeLanding(cmd, native, landsWork) {
+  if (native === undefined || landsWork === undefined) return;
+  const lands = native === true
+    || landsWork === true
+    || landsWork.some((shape) => native.includes(parseShape(shape).sub));
+  if (lands) throw new Error(`Selector "${cmd.name}" declares native but lands work, which has no Rust owner`);
+}
+
+function nativeFlagProjection(cmd, onlySubs) {
   const sorted = (set) => [...set].sort();
   if (cmd.subcommands) {
     const subcommand_flags = {};
-    for (const sub of Object.keys(cmd.subcommands).sort()) subcommand_flags[sub] = sorted(acceptedFlags(cmd, [sub]));
+    for (const sub of onlySubs ?? Object.keys(cmd.subcommands).sort()) subcommand_flags[sub] = sorted(acceptedFlags(cmd, [sub]));
     return { subcommand_flags };
   }
   return { accepted_flags: sorted(acceptedFlags(cmd)) };
 }
 
+const ANNOTATION_FIELDS = ['selector', 'operation_id', 'owner_path', 'subcommands', 'legacy_payload', 'compatibility_tests'];
+
 /**
  * Generate CommandRouteDescriptor map from registry and annotations.
  */
-export function generateCommandRoutes({ registry = COMMAND_REGISTRY, annotations = null, helpSelectors = HELP_SELECTORS } = {}) {
+export function generateCommandRoutes({ registry = COMMAND_REGISTRY, annotations = null } = {}) {
   const annotationsMap = annotations instanceof Map
     ? annotations
     : (annotations ? loadAnnotations(annotations) : loadAnnotations(DEFAULT_ANNOTATIONS_PATH));
@@ -267,6 +265,15 @@ export function generateCommandRoutes({ registry = COMMAND_REGISTRY, annotations
   for (const sel of annotationsMap.keys()) {
     if (!registrySelectors.has(sel)) {
       throw new Error(`Stale annotation: selector "${sel}" is absent from COMMAND_REGISTRY`);
+    }
+  }
+  // The registry `native` field decides the route and what is served natively; an annotation can only name what the
+  // registry cannot hold (operation, owner, payload, tests), so any other field is a second authority and is refused.
+  for (const [sel, ann] of annotationsMap) {
+    for (const field of Object.keys(ann)) {
+      if (!ANNOTATION_FIELDS.includes(field)) {
+        throw new Error(`Unknown annotation field "${field}" on selector "${sel}": the registry decides the route and what is native`);
+      }
     }
   }
 
@@ -283,40 +290,30 @@ export function generateCommandRoutes({ registry = COMMAND_REGISTRY, annotations
     const selector = cmd.name;
     const ann = annotationsMap.get(selector);
 
-    let route_kind;
+    const native = nativeDeclaration(cmd);
+    const mutatesStore = storeDeclaration(cmd, 'mutatesStore');
+    const landsWork = storeDeclaration(cmd, 'landsWork');
+    const eventStoreChild = storeDeclaration(cmd, 'eventStoreChild');
+    assertNoNativeLanding(cmd, native, landsWork);
+    const route_kind = native === true ? 'native' : 'legacy-cli';
     let operation_id;
     let legacy_payload;
     let owner_path;
-    let compatibility_tests;
 
-    if (ann) {
-      route_kind = Array.isArray(ann.route_kind) ? ann.route_kind[0] : ann.route_kind;
-      if (!route_kind) {
-        throw new Error(`Annotation for selector "${selector}" is missing route_kind`);
+    if (route_kind === 'native') {
+      operation_id = ann?.operation_id;
+      if (!operation_id) {
+        throw new Error(`Native route for selector "${selector}" requires operation_id`);
       }
-      if (route_kind === 'native') {
-        operation_id = ann.operation_id;
-        if (!operation_id) {
-          throw new Error(`Native route for selector "${selector}" requires operation_id`);
-        }
-        owner_path = ann.owner_path;
-        if (!owner_path) {
-          throw new Error(`Native route for selector "${selector}" requires an explicit owner_path`);
-        }
-      } else if (route_kind === 'legacy-cli') {
-        legacy_payload = ann.legacy_payload ?? 'legacy-node';
-        owner_path = ann.owner_path ?? 'src/cli/command-registry.mjs';
-      } else {
-        throw new Error(`Invalid route_kind "${route_kind}" for selector "${selector}"`);
+      owner_path = ann.owner_path;
+      if (!owner_path) {
+        throw new Error(`Native route for selector "${selector}" requires an explicit owner_path`);
       }
-      compatibility_tests = ann.compatibility_tests ?? ['test/rust-host/command-routes.test.mjs'];
     } else {
-      // Default to legacy-cli
-      route_kind = 'legacy-cli';
-      legacy_payload = 'legacy-node';
-      owner_path = 'src/cli/command-registry.mjs';
-      compatibility_tests = ['test/rust-host/command-routes.test.mjs'];
+      legacy_payload = ann?.legacy_payload ?? 'legacy-node';
+      owner_path = ann?.owner_path ?? 'src/cli/command-registry.mjs';
     }
+    const compatibility_tests = ann?.compatibility_tests ?? ['test/rust-host/command-routes.test.mjs'];
 
     if (!Array.isArray(compatibility_tests) || compatibility_tests.length === 0) {
       throw new Error(`Selector "${selector}" has empty compatibility_tests`);
@@ -330,27 +327,25 @@ export function generateCommandRoutes({ registry = COMMAND_REGISTRY, annotations
       owner_path,
       compatibility_tests,
       ...(ann?.subcommands !== undefined ? { subcommands: Boolean(ann.subcommands) } : {}),
-      // A legacy-cli selector may name kinds (its first positional) the host
-      // serves natively before the composition root; every other kind still
-      // reaches the legacy payload.
-      ...(ann?.native_kinds !== undefined ? { native_kinds: nativeKinds(selector, route_kind, ann.native_kinds) } : {}),
+      // A legacy-cli selector may name first positionals the host serves natively before the composition root; every
+      // other one still reaches the legacy payload.
+      ...(Array.isArray(native) ? { native_subcommands: native } : {}),
       // The Rust host validates a native verb's flags itself (the legacy-node
       // payload does it for every other verb), from this projection of the
       // registry: one list of valid flags, two enforcement points.
-      ...(route_kind === 'native' ? nativeFlagProjection(cmd) : {}),
+      ...(native === true ? nativeFlagProjection(cmd) : {}),
+      ...(Array.isArray(native) && cmd.subcommands ? nativeFlagProjection(cmd, native) : {}),
+      // The store declarations the shell reads, as data the host can read too (the registry holds them once).
+      store: cmd.store,
+      ...(mutatesStore !== undefined ? { mutates_store: mutatesStore } : {}),
+      ...(landsWork !== undefined ? { lands_work: landsWork } : {}),
+      ...(eventStoreChild !== undefined ? { event_store_child: eventStoreChild } : {}),
     };
     routes[selector] = descriptor;
   }
 
-  for (const selector of helpSelectors) {
-    if (Object.hasOwn(routes, selector)) {
-      throw new Error(`Help selector "${selector}" collides with a COMMAND_REGISTRY verb`);
-    }
-    routes[selector] = helpRoute(selector);
-  }
-
   // R5: Fail if any COMMAND_REGISTRY selector ends up with no route in output (unlisted selector)
-  assertAllSelectorsListed(routes, registry, helpSelectors);
+  assertAllSelectorsListed(routes, registry);
 
   return routes;
 }

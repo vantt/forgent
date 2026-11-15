@@ -25,6 +25,9 @@ pub struct More {
     pub path: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub keyword: Option<String>,
+    /// A fix the caller can act on, for a refusal that has one (an unset home names the variable to set).
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub message: Option<String>,
     #[serde(skip_serializing_if = "Vec::is_empty")]
     pub refusals: Vec<Failure>,
 }

@@ -3,7 +3,7 @@
 // comes from the fgos-config crate (project over global over standard, the accounts layer when unconfined, `command`
 // values from the main checkout), never from a JavaScript merge, a cache or a validator in this module. A process
 // that cannot load the addon fails every call with the door's own named error; there is no JavaScript fallback.
-import os from 'node:os';
+import fs from 'node:fs';
 import path from 'node:path';
 import { fromDoorJson, nativeDoor } from '../native/door.mjs';
 
@@ -18,7 +18,7 @@ export class ConfigDoorError extends Error {
   constructor({ id, keyword, refusals = [], ...own }) {
     const list = refusals.length > 0 ? refusals : [{ id, keyword, ...own }];
     const where = (r) => [r.file ? `${r.file}${Number.isInteger(r.line) ? `:${r.line}:${r.column}` : ''}` : '', r.path ?? ''].filter(Boolean).join(' ');
-    super(list.map((r) => [r.id, where(r), r.keyword ? `(${r.keyword})` : ''].filter(Boolean).join(' ')).join('; '));
+    super(list.map((r) => [r.id, where(r), r.keyword ? `(${r.keyword})` : '', r.message ?? ''].filter(Boolean).join(' ')).join('; '));
     Object.assign(this, { name: 'ConfigDoorError', code: id, refusals: list });
   }
 }
@@ -32,9 +32,24 @@ let platformWarned = false;
 
 const sessionClass = () => (process.env[CONFINED_MARKER_ENV] === '1' ? 'confined' : 'unconfined');
 
-/** One door call. The defaults are computed here, per call: tests and callers override `HOME` after this module loaded. */
-function call(entry, { globalDir = path.join(os.homedir(), '.fgos'), class: sessionKind = sessionClass(), ...fields }) {
-  const request = { globalDir, class: sessionKind, ...Object.fromEntries(Object.entries(fields).filter(([, value]) => value !== undefined)) };
+/** The variables the home directory comes from; the crate decides which one counts on this platform. */
+const HOME_KEYS = ['HOME', 'USERPROFILE'];
+let lastHome = null;
+
+/**
+ * The global fgOS directory (`~/.fgos`): where it is is decided once, by the config crate, from the home variables of
+ * the environment read now (a caller may change `HOME` after this module loaded). Asked again only when one of them changes.
+ * An unset or blank home is a `config-io` refusal; there is no passwd fallback.
+ */
+export function globalFgosDir() {
+  const env = Object.fromEntries(HOME_KEYS.filter((key) => process.env[key] !== undefined).map((key) => [key, process.env[key]]));
+  const key = JSON.stringify(env);
+  if (lastHome?.key !== key) lastHome = { key, dir: door('globalDir', { env }) };
+  return lastHome.dir;
+}
+
+/** One door call: the request as given, the door's answer parsed, a refusal as a ConfigDoorError. */
+function door(entry, request) {
   let text;
   try {
     text = nativeDoor().config[entry](request);
@@ -49,6 +64,11 @@ function call(entry, { globalDir = path.join(os.homedir(), '.fgos'), class: sess
     throw new ConfigDoorError(failure);
   }
   return fromDoorJson(text, { nullPrototype: true });
+}
+
+/** A door call with roots: the defaults are computed here, per call, since tests and callers override `HOME` after this module loaded. */
+function call(entry, { globalDir = globalFgosDir(), class: sessionKind = sessionClass(), ...fields }) {
+  return door(entry, { globalDir, class: sessionKind, ...Object.fromEntries(Object.entries(fields).filter(([, value]) => value !== undefined)) });
 }
 
 /**
@@ -68,8 +88,26 @@ export const readMachineConfig = (options = {}) => call('snapshot', options);
 /** Whether `projectRoot` has a project config file: a YAML file or a legacy JSON one. A migration tombstone is no source. */
 export const projectConfigPresent = (projectRoot, options = {}) => readConfig({ ...options, projectRoot, sections: [] }).revisions.project !== 'absent';
 
+/**
+ * The raw project config file of `dir`, unvalidated: `{ path, format: 'yaml'|'json', text }`, or `null` when `.fgos` holds
+ * none or the file cannot be read. A YAML file wins over a legacy JSON one. This is the one read that goes around the
+ * validating door, for the conversion of keys the door refuses on purpose; everything else asks the door.
+ */
+export function readProjectConfigSource(dir) {
+  const fgosDir = path.join(dir, '.fgos');
+  try {
+    const entries = fs.readdirSync(fgosDir);
+    const file = ['config.yaml', 'config.json'].find((name) => entries.includes(name));
+    if (!file) return null;
+    const filePath = path.join(fgosDir, file);
+    return { path: filePath, format: file.endsWith('.json') ? 'json' : 'yaml', text: fs.readFileSync(filePath, 'utf8') };
+  } catch {
+    return null;
+  }
+}
+
 /** The bundled standard's value at a dotted path (`runner.modelPolicies.claude.advanced`), reading no file: `{ present, value }`. */
-export const readStandardValue = (path) => call('standardValue', { path });
+export const readStandardValue = (path) => door('standardValue', { path });
 
 /** The account pools alone, valid with no usable project or global file: `{ present, state, revision, runner }`. */
 export const readMachineAccounts = (options = {}) => call('accounts', options);
@@ -82,3 +120,9 @@ export const fixConfig = (options) => call('fix', options);
 
 /** Creates the header-only config file of `target` (`'project'` or `'global'`) when that scope has none: `{ created, file, revision }`, `file` being the name the scope holds now (`config.yaml`, or a legacy `config.json` left alone). */
 export const initConfigFile = (options) => call('init', options);
+
+/** The `eventStore` section of a project, every key set: `{ remote, seal: { intervalSec, coalesceSec }, sync: { intervalSec }, rebuild: { maxAttempts } }`. A refused file reaches a `strict` caller, and any caller when the refusal names an `eventStore` value; otherwise the answer is a config that never publishes (`sync.intervalSec` 0). */
+export const readEventStoreSection = (options) => call('eventStore', options);
+
+/** The `eventStore` section of an in-memory config object over the bundled standard, with the section's minimums: the same shape as `readEventStoreSection`; a value that breaks a rule is a `ConfigDoorError` with code `event-store-config` and the dotted key as `refusals[0].keyword`. */
+export const validateEventStoreSection = (config) => door('eventStoreConfig', { config });

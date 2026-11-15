@@ -194,7 +194,7 @@ pub fn spawn(main: &Path, paths: &Paths, remote: &str) {
         .parent()
         .is_some_and(Path::is_dir)
         .then_some(log.as_path());
-    let _ = spawn_detached(&argv, main, &[], log);
+    let _ = spawn_detached(&argv, main, &[], &[], log);
 }
 
 /// Publishes each live head of this project's mailbox record that Identity

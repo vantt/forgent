@@ -67,7 +67,7 @@ Status words: `done` met and proven; `partial` met in part, the residual is name
 | CMD-01 | MUST | partial | The header-only config files moved from `setup` to `fgos init`; `setup` still wires the git hooks path and the shell line, which no registered fix repairs. |
 | CMD-02 | MUST | done | Doctor is read-only by default. |
 | CMD-03 | MUST | done with deviation | `init`, `upgrade`, `repair` end on `Ready` or `nothing to do` and re-run in about 4 s (`init.rs` `doctor_is_clean`; `closing-block.test.mjs`). Deviation: `init` takes no `--yes` because it never prompts; `fgctl init --yes` exits 2 with a usage message. |
-| CMD-04 | MUST | done | `setup` is collapsed into one "Compatibility" line of `fgos --help` (`test/cli/fgos-help.test.mjs`). |
+| CMD-04 | MUST | done | `setup` is collapsed into one "Compatibility" line of `fgos --help` (`apps/fgos/src/help.rs`, test `every_deprecated_verb_prints_a_plain_notice_alone_and_setup_is_listed_under_compatibility`). |
 | CMD-05 | SHOULD | gap | No fast `status` with one next command; `fgctl status` prints `version: none` for a release whose tag the store did not record. |
 | CMD-06 | MUST | done | `fgctl --version`, `fgctl version [--json]`, `fgos --version`, `fgos version`. `fgctl` carries the commit only when the build exports `FGOS_BUILD_COMMIT` or `GITHUB_SHA`; the commit time needs `SOURCE_DATE_EPOCH`, which the release workflow does not export yet (`unknown commit` in a local build). |
 | CMD-07 | MUST | gap | `--json` is a no-op on some verbs; no `--dry-run`, `-q`, `-v` on every verb. ANSI is off a TTY and `NO_COLOR` is honoured (`src/setup/ansi.mjs`). Owner idea: global flag parity. |

@@ -1,7 +1,7 @@
 ---
 phase: 11
 title: "F0 close: docs, proof consolidation, gates"
-status: pending
+status: done
 effort: 1d
 wave: E
 blockedBy: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]

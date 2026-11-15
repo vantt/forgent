@@ -148,6 +148,22 @@ test('resolveFgosBin prefers tier 1 (dev-checkout) over tier 2 and tier 3', () =
   assert.equal(result.path, path.join(dir, 'bin', 'fgos.mjs'));
 });
 
+test('resolveFgosBin resolves tiers 0, 1 and 2 without a home directory', () => {
+  const saved = Object.fromEntries(['HOME', 'USERPROFILE'].map((key) => [key, process.env[key]]));
+  const dir = mkTempDir('bin-discovery-no-home-');
+  writeStub(path.join(dir, 'bin', 'fgos.mjs'));
+  const local = mkTempDir('bin-discovery-no-home-local-');
+  writeStub(path.join(local, 'node_modules', '.bin', 'fgos'));
+  try {
+    delete process.env.HOME;
+    delete process.env.USERPROFILE;
+    assert.equal(resolveFgosBin(dir).tier, 1);
+    assert.equal(resolveFgosBin(local).tier, 2);
+  } finally {
+    for (const [key, value] of Object.entries(saved)) if (value !== undefined) process.env[key] = value;
+  }
+});
+
 test('resolveFgosBin prefers tier 2 (project-local) over tier 3 when tier 1 is absent', () => {
   const dir = mkTempDir('bin-discovery-priority-2-');
   writeStub(path.join(dir, 'node_modules', '.bin', 'fgos'));

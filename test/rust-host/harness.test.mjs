@@ -10,8 +10,9 @@ import { fileURLToPath } from "node:url";
 import {
   REPO_ROOT,
   ROUTES_PATH,
-  SPY_PATH,
   parseEntry,
+  loadParityTable,
+  PARITY_CASES_DIR,
   resolveEntries,
   snapshotDirectory,
   diffDirectorySnapshots,
@@ -24,6 +25,7 @@ import {
   generateCoverageFloorCases,
   runParitySuite,
 } from "./harness.mjs";
+import { cliEntryFor, run as cliRun } from "../cli/helpers/fgos-cli-harness.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const FIXTURES_DIR = path.join(__dirname, "fixtures");
@@ -188,7 +190,7 @@ test("R3: Filesystem snapshot and delta capture", () => {
   }
 });
 
-test("R3 & R5: Stdin passthrough and child process spy execution", async () => {
+test("R3 & R5: Stdin passthrough and child process evidence", async () => {
   const stdinFixture = parseEntry(`node:${path.join(FIXTURES_DIR, "stdin-echo.mjs")}`);
   const stdinRes = await runCaseOnEntry(stdinFixture, {
     id: "stdin-test",
@@ -198,7 +200,7 @@ test("R3 & R5: Stdin passthrough and child process spy execution", async () => {
   assert.equal(stdinRes.stdoutText, "stdin:ping-payload-42");
   assert.equal(stdinRes.exitCode, 0);
 
-  // Child process spy check
+  // Child process evidence check
   const childFixture = parseEntry(`node:${path.join(FIXTURES_DIR, "divergent-child-process.mjs")}`);
   const childRes = await runCaseOnEntry(childFixture, {
     id: "child-spy-test",
@@ -206,6 +208,7 @@ test("R3 & R5: Stdin passthrough and child process spy execution", async () => {
     modes: ["exact-bytes"],
   });
   assert.equal(childRes.spawnedChildren.length, 1);
+  assert.equal(childRes.spawnedChildren[0].cmd, "node");
   assert.equal(childRes.spawnedChildren[0].args[1], "process.exit(0)");
 });
 
@@ -251,21 +254,9 @@ test("R4: Wall-clock timing report written to scratch JSON path (never committed
   fs.unlinkSync(scratchReportPath);
 });
 
-test("R5: Coverage floor enumerates all selectors from command-routes.json", () => {
+test("R5: Coverage floor covers every exit category and input channel, and leaves help for every selector to help-routes", () => {
   const cases = generateCoverageFloorCases();
-  const routes = JSON.parse(fs.readFileSync(ROUTES_PATH, "utf8"));
-  const selectors = Object.keys(routes).sort();
-
-  // Derived from the routes file itself, never a fresh hardcoded literal --
-  // a verb addition or removal moves both sides together.
-  const helpCases = cases.filter((c) => c.id.startsWith("coverage-help-"));
-  assert.equal(helpCases.length, selectors.length, `Must generate exactly ${selectors.length} help cases (one per selector)`);
-
-  for (const sel of selectors) {
-    const matching = helpCases.find((c) => c.id === `coverage-help-${sel}`);
-    assert.ok(matching, `Coverage floor missing help case for selector: ${sel}`);
-    assert.deepEqual(matching.args, [sel, "--help"]);
-  }
+  assert.deepEqual(cases.filter((c) => c.id.startsWith("coverage-help-")), [], "help is owned by help.rs and help-routes.test.mjs");
 
   // Check presence of required special cases
   assert.ok(cases.some((c) => c.id === "coverage-exit-category-stdout-zero"));
@@ -471,7 +462,7 @@ test("HIGH-1 regression: a launch failure is an unconditional hard difference, n
   assert.ok(oneFailed.differences.some((d) => d.includes("Launch failure")));
 });
 
-test("HIGH-2 regression: bin: entries get child-process evidence via the PATH shim, node: entries are not double-counted", { skip: process.platform === 'win32' }, async () => {
+test("a bin: entry gets child-process evidence via the PATH shim and a node: entry's git call is recorded once", { skip: process.platform === 'win32' }, async () => {
   const binEntry = parseEntry(`bin:${path.join(FIXTURES_DIR, "bin-git-caller.sh")}`);
   const binResult = await runCaseOnEntry(binEntry, { id: "bin-shim-regression", args: [] });
   assert.equal(binResult.launchError, null, `bin: fixture must launch cleanly, got: ${JSON.stringify(binResult.launchError)}`);
@@ -480,16 +471,72 @@ test("HIGH-2 regression: bin: entries get child-process evidence via the PATH sh
     `Expected the PATH shim to record a git call for the bin: entry, got: ${JSON.stringify(binResult.spawnedChildren)}`
   );
 
-  // node: entries must NOT double-count: the same real git invocation is
-  // reachable through both child-process-spy.cjs (in-process monkeypatch)
-  // and the PATH shim (OS-exec boundary) unless the spy's own
-  // FGOS_HARNESS_SHIMMED_COMMANDS skip is working. The fixture starts git once.
+  // The fixture starts git once; the shim is the only recorder, so it is counted once.
   const nodeEntry = parseEntry(`node:${path.join(FIXTURES_DIR, "node-git-caller.mjs")}`);
-  const nodeResult = await runCaseOnEntry(nodeEntry, { id: "node-no-double-count-regression", args: [] });
+  const nodeResult = await runCaseOnEntry(nodeEntry, { id: "node-single-count-regression", args: [] });
   const gitCallsRecorded = nodeResult.spawnedChildren.filter((c) => path.basename(c.cmd) === "git").length;
   assert.equal(
     gitCallsRecorded,
     1,
-    `Expected exactly one recorded git call for a node: entry (spy+shim must not double-count), got ${gitCallsRecorded}: ${JSON.stringify(nodeResult.spawnedChildren)}`
+    `Expected exactly one recorded git call for a node: entry, got ${gitCallsRecorded}: ${JSON.stringify(nodeResult.spawnedChildren)}`
+  );
+});
+
+test("a grandchild git started through a Node child is recorded the same way for a node: and a bin: entry", { skip: process.platform === 'win32' }, async () => {
+  const evidence = async (spec) => {
+    const result = await runCaseOnEntry(parseEntry(spec), { id: "grandchild-evidence", args: [] });
+    assert.equal(result.launchError, null, `fixture must launch cleanly, got: ${JSON.stringify(result.launchError)}`);
+    assert.equal(result.exitCode, 0);
+    return result.spawnedChildren.map((c) => ({ cmd: path.basename(c.cmd), args: c.args }));
+  };
+  const viaNode = await evidence(`node:${path.join(FIXTURES_DIR, "node-grandchild-caller.mjs")}`);
+  const viaBin = await evidence(`bin:${path.join(FIXTURES_DIR, "bin-grandchild-caller.sh")}`);
+  assert.deepEqual(viaNode.map((c) => c.cmd), ["node", "git"], `grandchild chain seen by the node: entry: ${JSON.stringify(viaNode)}`);
+  assert.deepEqual(viaNode, viaBin, "both entry kinds must record the same child chain");
+});
+
+test("a parity table loads by name from its directory and an unknown or path-shaped name fails naming it", async () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "fgos-parity-tables-"));
+  try {
+    fs.writeFileSync(
+      path.join(dir, "sample.cases.mjs"),
+      'export const cases = [{ id: "sample-one", args: ["a"] }, { id: "sample-two", args: ["b", "--json"] }];\n',
+    );
+    fs.writeFileSync(path.join(dir, "empty.cases.mjs"), "export const cases = [];\n");
+    const table = await loadParityTable("sample", dir);
+    assert.deepEqual(table.map((c) => c.id), ["sample-one", "sample-two"]);
+    for (const testCase of table) assert.ok(Array.isArray(testCase.args), `${testCase.id} names its args`);
+    await assert.rejects(() => loadParityTable("empty", dir), /empty/);
+    await assert.rejects(() => loadParityTable("no-such-table", dir), /no-such-table/);
+    await assert.rejects(() => loadParityTable("../harness", dir), /\.\.\/harness/);
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+  assert.equal(path.basename(PARITY_CASES_DIR), "parity-cases", "the default table directory");
+});
+
+test("a CLI test call goes to the host for a help token, a native verb or a native sub-verb, and to Node otherwise", () => {
+  const routes = JSON.parse(fs.readFileSync(ROUTES_PATH, "utf8"));
+  const native = Object.keys(routes).find((selector) => routes[selector].route_kind === "native");
+  const legacy = Object.keys(routes).find((selector) => routes[selector].route_kind === "legacy-cli" && !selector.startsWith("-"));
+  assert.ok(native && legacy, "the route file has both a native and a legacy verb");
+
+  assert.equal(cliEntryFor([legacy, "--help"]), "host");
+  assert.equal(cliEntryFor(["-h", legacy, "--json"]), "host");
+  assert.equal(cliEntryFor(["--help"]), "host");
+  assert.equal(cliEntryFor([native, "list"]), "host");
+  assert.equal(cliEntryFor([legacy, "list"]), "node");
+  assert.equal(cliEntryFor([]), "node");
+
+  const partlyNative = { ...routes, [legacy]: { ...routes[legacy], native_subcommands: ["fast"] } };
+  assert.equal(cliEntryFor([legacy, "fast", "--json"], partlyNative), "host");
+  assert.equal(cliEntryFor([legacy, "slow"], partlyNative), "node");
+  assert.equal(cliEntryFor(["--json", legacy], partlyNative), "node");
+});
+
+test("a host-bound CLI test call without FGOS_HOST_BIN throws and says to use run-tests", () => {
+  assert.throws(
+    () => cliRun(os.tmpdir(), ["--help"], { FGOS_HOST_BIN: undefined }),
+    /FGOS_HOST_BIN[\s\S]*node scripts\/run-tests\.mjs <file>/,
   );
 });
