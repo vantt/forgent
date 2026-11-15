@@ -94,6 +94,106 @@
   ],
   "doors": [
     {
+      "job": "agent hook table",
+      "kind": "door",
+      "patterns": [
+        "\\.claude/settings\\.json",
+        "\\.codex/hooks\\.json",
+        "\\.agents/hooks\\.json",
+        "fgos-hooks\\.ts",
+        "['\"]\\.claude['\"],\\s*['\"]settings\\.json['\"]",
+        "['\"]\\.codex['\"],\\s*['\"]hooks\\.json['\"]",
+        "['\"]\\.agents['\"],\\s*['\"]hooks\\.json['\"]",
+        "['\"]extensions['\"],\\s*['\"]fgos-hooks\\.ts['\"]",
+        "\\[\"\\.claude\", \"settings\\.json\"\\]",
+        "\\[\"\\.codex\", \"hooks\\.json\"\\]",
+        "\\[\"\\.agents\", \"hooks\\.json\"\\]"
+      ],
+      "allowed": [
+        "packages/distribution/rust/src/agent_hooks.rs",
+        {
+          "path": "src/run-supervisor/trust-store.mjs",
+          "reason": "reads and hashes the Codex hook file's bytes to trust its entries; it writes no hook"
+        },
+        {
+          "path": "scripts/check-hook-registrations-guarded.mjs",
+          "reason": "reads the project's Claude Code settings to check the registered commands; it writes no hook"
+        },
+        {
+          "path": "scripts/record-mailbox-hook-fixtures.mjs",
+          "reason": "the fixture recorder writes its own agy hook file into the workspace it builds, to record what a real CLI sends"
+        },
+        {
+          "path": "scripts/lib/mailbox-live-cli.mjs",
+          "reason": "the live harness lists the agy hook file of a workspace to learn what a CLI sees; it reads only"
+        },
+        {
+          "path": "src/runner/dispatch/worker-home.mjs",
+          "reason": "writes a worker's own settings.json in the worker's home (bypass acceptance), not a project hook file"
+        },
+        {
+          "path": "core/skills/instruction-audit/scripts/instruction-audit.mjs",
+          "reason": "a standalone skill script that audits instruction files, Claude Code's settings among them; it reads only"
+        }
+      ],
+      "debt": [
+        {
+          "path": "src/setup/agent-hooks.mjs",
+          "reason": "the earlier Node table, kept until the packaging rows and verbs that import it move to the host; agent_hooks.rs is the owner and the recorded vectors pin both"
+        },
+        {
+          "path": "src/setup/registrations.mjs",
+          "reason": "row descriptions name the hook files; the doctor registry contract carries them once the rows move"
+        },
+        {
+          "path": "scripts/lib/mailbox-live-confined.mjs",
+          "reason": "frozen live measurement harness; it lifts the hook rows out of the project and imports the Node table until the host's hook fixes own that call"
+        }
+      ],
+      "retiredBy": "S4: the packaging verbs and doctor rows move to the host and the Node table goes with its last importer",
+      "reason": "the hook files of the five agent CLIs and the omp/pi extension are rendered, checked and removed from one table (fgos-distribution agent_hooks.rs); the patterns match the file names whole and built in parts. A reader that only reads or hashes a hook file, or writes a worker's own settings, is allowed with its reason"
+    },
+    {
+      "job": "person's agent config writes",
+      "kind": "door",
+      "patterns": [
+        "pre-wire-agents",
+        "['\"]marketplace['\"],\\s*['\"]add['\"]",
+        "['\"]plugin['\"],\\s*['\"]install['\"]",
+        "toolPermission"
+      ],
+      "allowed": [
+        {
+          "path": "packages/distribution/rust/src/agent_config.rs",
+          "reason": "builds the wire-agents plan: the claude plugin steps and the settings it shows and never writes; the writes themselves are the wire-agents verb's"
+        }
+      ],
+      "debt": [
+        {
+          "path": "src/setup/agent-wiring.mjs",
+          "reason": "the earlier Node plan and writer of wire-agents; it goes with the verb"
+        },
+        {
+          "path": "src/setup/agy-permissions.mjs",
+          "reason": "the earlier Node agy settings reader and the default it shows; it goes with its doctor rows"
+        },
+        {
+          "path": "src/setup/registrations.mjs",
+          "reason": "a row description names the agy setting a person may choose"
+        },
+        {
+          "path": "src/cli/command-registry.mjs",
+          "reason": "the wire-agents description names the settings it never sets"
+        },
+        {
+          "path": "src/setup/uninstall-project.mjs",
+          "reason": "the uninstall notice names the backup suffix wire-agents leaves beside a person's config"
+        }
+      ],
+      "retiredBy": "S4: wire-agents and uninstall move to the host and the Node wiring goes with them",
+      "reason": "fgOS changes a person's own agent config only through the opt-in wire-agents verb (RUL111); init and doctor --fix write only the project and ~/.fgos. The patterns catch the backup suffix, the claude plugin calls and the agy permission setting that only that verb applies"
+    },
+    {
       "job": "civil date arithmetic",
       "kind": "door",
       "patterns": ["719_?468", "\\bfn (?:civil_from_days|days_from_civil)\\b"],
@@ -660,6 +760,7 @@
         { "path": "packages/distribution/rust/src/timer.rs", "reason": "names the project shim, or the activated release host, that a managed timer runs; never a checkout script or a PATH lookup" },
         "apps/fgctl/src/help.rs",
         "src/setup/project-launcher.mjs",
+        { "path": "packages/distribution/rust/src/launcher.sh", "reason": "the launcher body the launcher module writes beside fgctl: it reads the nearest activation record from the shell" },
         { "path": "bin/fgos.mjs", "reason": "an error message tells the user the shim path to run; it never builds or reads the path" },
         { "path": "scripts/check-hook-registrations-guarded.mjs", "reason": "the check looks for the shim text inside hook commands, which is the string the hooks carry" },
         { "path": "scripts/ci-external-consumer.sh", "reason": "the external-consumer proof runs the installed shim the way a consumer's shell does, outside any Node module" },
@@ -722,6 +823,7 @@
         "src/util/session-identity.mjs",
         "src/cli/command-registry.mjs",
         { "path": "src/setup/agent-hooks.mjs", "reason": "the generated pi/omp extension runs in the agent process and cannot import the addon; its attempt-id prefix is pinned to the crate's by a test" },
+        { "path": "packages/distribution/rust/src/agent_hooks.rs", "reason": "the generated pi/omp extension runs in the agent process and cannot import the identity crate; its attempt-id prefix is data in agent-hooks.v1.json, which a test pins to the crate's prefix" },
         { "path": "src/setup/registrations.mjs", "reason": "doctor detects a harness shell by these variables; it does not resolve or hand out a writer" },
         { "path": "apps/fgos/examples/mailbox-ident-cost.rs", "reason": "a cost probe example names one source variable as its input; it decides nothing" },
         { "path": "scripts/event-store/settle-host-proof.mjs", "reason": "a proof script sets its own writer id for the process it runs" },

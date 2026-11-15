@@ -5,7 +5,11 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { judgeDeleteCommand } from '../../src/git/main-checkout-delete-guard.mjs';
-import { deleteGuardPrefilter } from '../../src/setup/agent-hooks.mjs';
+
+// The prefilter keyword list is data, read by the hook renderer and by this test alike.
+const prefilter = JSON.parse(fs.readFileSync(new URL('../../packages/distribution/contracts/delete-guard-prefilter.v1.json', import.meta.url), 'utf8'));
+const prefilterMatches = (command) => prefilter.substrings.some((kw) => command.includes(kw))
+  || prefilter.words.some((kw) => new RegExp(`(?:^|[^A-Za-z0-9])${kw}`).test(command));
 
 // The guard reads the checkout layout from the filesystem: a main checkout has a `.git` directory
 // and a `.fgos` directory, a linked worktree has a `.git` file. The fixture builds exactly that.
@@ -25,7 +29,7 @@ function layout() {
 // starts the guard: a refused command the prefilter would skip is a wipe the guard never sees.
 const judge = (command, cwd, env = {}) => {
   const verdict = judgeDeleteCommand(command, { cwd, env: { HOME: '/nonexistent-home', ...env } });
-  if (verdict.blocked) assert.equal(deleteGuardPrefilter.matches(command), true, `the prefilter would skip a refused command: ${command}`);
+  if (verdict.blocked) assert.equal(prefilterMatches(command), true, `the prefilter would skip a refused command: ${command}`);
   return verdict;
 };
 

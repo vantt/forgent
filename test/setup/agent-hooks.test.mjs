@@ -29,6 +29,7 @@ import {
   agentHookRows,
   deleteGuardPrefilter,
   extensionSourceFor,
+  uninstallAgentHooks,
 } from '../../src/setup/agent-hooks.mjs';
 import { PROJECT_SHIM_RELATIVE, projectShimPath } from '../../src/util/host-bin-path.mjs';
 import { createDoctorRun } from '../../src/setup/registrations.mjs';
@@ -1035,4 +1036,72 @@ process.exit(0);
   fs.writeFileSync(shimPath, `#!/bin/sh\n[ "$2" = main-checkout-delete-guard ] && exit 1\nexit 0\n`, { mode: 0o755 });
   assert.match(checkCodexHook(repoRoot).message, /main-checkout-delete-guard: exit-1/);
   fs.rmSync(repoRoot, { recursive: true, force: true });
+});
+
+// ---------------------------------------------------------------------------
+// The vectors the Rust hook table (packages/distribution/rust/src/agent_hooks.rs) is proved against
+// ---------------------------------------------------------------------------
+
+const VECTORS = JSON.parse(fs.readFileSync(new URL('../../packages/distribution/contracts/agent-hooks.v1.json', import.meta.url), 'utf8'));
+const INSTALL_BY_CLI = { claude: installClaudeHook, codex: installCodexHook, agy: installAgyHook, omp: installOmpHook, pi: installPiHook };
+const CHECK_BY_CLI = { claude: checkClaudeHook, codex: checkCodexHook, agy: checkAgyHook, omp: checkOmpHook, pi: checkPiHook };
+
+test('the generated extension names the attempt prefix of the vector data, and the data equals the minted prefix', () => {
+  const attemptId = 'probe-1';
+  assert.equal(mintAttemptWriterId(attemptId).slice(0, -attemptId.length), VECTORS.attemptIdPrefix);
+});
+
+test('this module installs, checks and uninstalls every recorded vector exactly as recorded', () => {
+  const home = mkTempDir('agent-hooks-vectors-home-');
+  const savedHome = process.env.HOME;
+  const savedProfile = process.env.USERPROFILE;
+  process.env.HOME = home;
+  delete process.env.USERPROFILE;
+  try {
+    for (const vector of VECTORS.cases) {
+      const base = fs.realpathSync(mkTempDir('agent-hooks-vector-'));
+      const root = path.join(base, vector.rootName ?? 'project');
+      fs.mkdirSync(root, { recursive: true });
+      const placeholders = (text) => text.split(root).join('<ROOT>').split(base).join('<BASE>');
+      const tree = () => {
+        const out = {};
+        const walk = (dir) => {
+          for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+            const full = path.join(dir, entry.name);
+            const rel = path.relative(root, full).split(path.sep).join('/');
+            if (rel === '.fgos/installation') continue;
+            if (entry.isDirectory()) walk(full);
+            else out[rel] = placeholders(fs.readFileSync(full, 'utf8'));
+          }
+        };
+        walk(root);
+        return out;
+      };
+      const normalised = (value) => JSON.parse(placeholders(JSON.stringify(value)));
+      for (const [rel, text] of Object.entries(vector.before)) {
+        const file = path.join(root, rel);
+        fs.mkdirSync(path.dirname(file), { recursive: true });
+        fs.writeFileSync(file, text.split('<ROOT>').join(root).split('<BASE>').join(base));
+      }
+      if (vector.kind !== 'uninstall-only') {
+        assert.deepEqual(INSTALL_BY_CLI[vector.cli](root), vector.install.result, `${vector.id}: install result`);
+        assert.deepEqual(tree(), vector.install.files, `${vector.id}: files after install`);
+        assert.deepEqual(INSTALL_BY_CLI[vector.cli](root), vector.reinstall.result, `${vector.id}: second install`);
+        assert.deepEqual(tree(), vector.reinstall.files, `${vector.id}: files after second install`);
+        assert.deepEqual(CHECK_BY_CLI[vector.cli](root), vector.checkNoShim, `${vector.id}: check without shim`);
+        mockRunnableShim(root);
+        assert.deepEqual(CHECK_BY_CLI[vector.cli](root), vector.checkWithShim, `${vector.id}: check with shim`);
+        fs.rmSync(path.join(root, '.fgos', 'installation'), { recursive: true, force: true });
+      }
+      const mine = (results) => normalised(results.filter((r) => r.cli === vector.cli));
+      assert.deepEqual(mine(uninstallAgentHooks(root, { apply: false })), vector.uninstallDescribe, `${vector.id}: describe`);
+      assert.deepEqual(mine(uninstallAgentHooks(root, { apply: true })), vector.uninstall.results, `${vector.id}: uninstall results`);
+      assert.deepEqual(tree(), vector.uninstall.files, `${vector.id}: files after uninstall`);
+      fs.rmSync(base, { recursive: true, force: true });
+    }
+  } finally {
+    if (savedHome === undefined) delete process.env.HOME; else process.env.HOME = savedHome;
+    if (savedProfile !== undefined) process.env.USERPROFILE = savedProfile;
+    fs.rmSync(home, { recursive: true, force: true });
+  }
 });

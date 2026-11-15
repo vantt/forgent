@@ -2087,3 +2087,20 @@ test('door row for YAML parser loads catches each single-line way to load a pars
   ];
   for (const source of passed) assert.deepEqual(outsideDoor('YAML parser loads', 'src/x.mjs', `${source}\n`), [], source);
 });
+
+test('door rows for the agent hook table and a person\'s agent config catch a second table or writer and skip comments', () => {
+  const table = 'agent hook table';
+  assert.equal(outsideDoor(table, 'src/x.mjs', "const file = path.join(root, '.claude', 'settings.json');\n").length, 1);
+  assert.equal(outsideDoor(table, 'src/x.mjs', "const hooks = '.codex/hooks.json';\n").length, 1);
+  assert.equal(outsideDoor(table, 'packages/p/rust/src/x.rs', 'let file: &[&str] = &[".agents", "hooks.json"];\n').length, 1);
+  assert.equal(outsideDoor(table, 'packages/p/rust/src/x.rs', 'let ext = dir.join("fgos-hooks.ts");\n').length, 1);
+  assert.deepEqual(outsideDoor(table, 'src/x.mjs', "// writes .claude/settings.json\n"), []);
+  assert.deepEqual(outsideDoor(table, 'packages/p/rust/src/x.rs', 'let home_settings = home.join(".claude");\n'), [], 'a person\'s own Claude directory is the other row\'s');
+  const config = 'person\'s agent config writes';
+  assert.equal(outsideDoor(config, 'src/x.mjs', "fs.copyFileSync(file, `${file}.pre-wire-agents-${stamp}`);\n").length, 1);
+  assert.equal(outsideDoor(config, 'src/x.mjs', "run(['plugin', 'install', ref]);\n").length, 1);
+  assert.equal(outsideDoor(config, 'packages/p/rust/src/x.rs', 'let step = ["plugin", "marketplace", "add", source];\n').length, 1);
+  assert.equal(outsideDoor(config, 'src/x.mjs', "const s = { toolPermission: 'always-proceed' };\n").length, 1);
+  assert.deepEqual(outsideDoor(config, 'src/x.mjs', '// toolPermission is never written\n'), []);
+  assert.equal(outsideDoor('installation shim and activation record location', 'packages/p/rust/src/x.rs', 'let a = ".fgos/installation/bin/fgos";\n').length, 1);
+});
