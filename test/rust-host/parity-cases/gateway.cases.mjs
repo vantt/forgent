@@ -167,8 +167,19 @@ const FIXTURES = {
   },
 };
 
+/** The nearest `.fgos` above `scratch`, if any: a fixture with a store above it is not its own project (a call from
+ * a directory with no store of its own would act on that one, and a stop would write into it). */
+function storeAbove(scratch) {
+  for (let dir = path.dirname(scratch); dir !== path.dirname(dir); dir = path.dirname(dir)) {
+    if (fs.existsSync(path.join(dir, ".fgos"))) return path.join(dir, ".fgos");
+  }
+  return null;
+}
+
 /** Builds the fixture of `testCase` under `scratch` and the call to run: the `{REPO}` token of its args is filled in. */
 export function prepare(testCase, scratch) {
+  const before = storeAbove(scratch);
+  if (before) throw new Error(`${before} exists above the fixture ${scratch}: the fixture would not be its own project`);
   fs.mkdirSync(scratch, { recursive: true });
   const home = path.join(scratch, "home");
   fs.mkdirSync(home);
@@ -204,6 +215,8 @@ const listFiles = (root) => {
 
 /** What a call left behind, comparable between entries: the store's files, the fault records, the registry, the processes. */
 export function evidence(fixture) {
+  const after = storeAbove(fixture.scratch);
+  if (after) throw new Error(`the call left or found a store above the fixture: ${after}`);
   const dir = path.join(fixture.repo, ".fgos");
   const log = fs.existsSync(dir) ? resolveFaultLogPath(dir, fixture.repo) : null;
   const faults = log && fs.existsSync(log)

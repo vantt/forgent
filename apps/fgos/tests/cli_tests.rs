@@ -634,6 +634,10 @@ fn gateway_status_and_stop_of_a_fresh_project_start_no_node_and_answer_not_runni
         spied.lines().all(|line| !line.starts_with("SPY_PID:")),
         "gateway status and stop started node: {spied}"
     );
+    assert!(
+        !spy_dir.join(".fgos").exists(),
+        "the call wrote a store above its own project"
+    );
     let _ = fs::remove_dir_all(&spy_dir);
 }
 
