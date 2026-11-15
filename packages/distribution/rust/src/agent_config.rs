@@ -18,6 +18,9 @@ use serde_json::{json, Value};
 
 use crate::agent_hooks::{mailbox_opt_in, AgentHooksError, Env, MailboxOptIn, ProcessRunner};
 
+/// The environment key an executor's home is read from.
+const HOME_KEY: &str = "HOME";
+
 pub const WIRE_AGENTS_COMMAND: &str = "fgos wire-agents";
 pub const CLAUDE_PLUGIN_MARKETPLACE_NAME: &str = "fgos-plugins";
 /// The marketplace is added by its GitHub source, never a local path: an installed payload does not ship
@@ -44,7 +47,7 @@ fn lookup<'a>(env: &'a [(String, String)]) -> impl Fn(&str) -> Option<String> + 
 }
 
 /// The first executable `name` on the `PATH` of `env` (PATHEXT on Windows).
-pub fn first_on_path(name: &str, env: &[(String, String)]) -> Option<PathBuf> {
+pub fn program_on_path(name: &str, env: &[(String, String)]) -> Option<PathBuf> {
     let get = lookup(env);
     let pathext = get("PATHEXT").unwrap_or_else(|| ".EXE;.CMD;.BAT".to_string());
     fgos_process::spawn::resolve_program(name, &get("PATH")?, &pathext, cfg!(windows))
@@ -56,15 +59,14 @@ pub fn first_on_path(name: &str, env: &[(String, String)]) -> Option<PathBuf> {
 
 /// The `claude` binary the checks and the plan run; tests point `FGOS_CLAUDE_COMMAND` at a fake so no suite
 /// run ever calls the real one.
-fn claude_program(env: &[(String, String)]) -> std::ffi::OsString {
+fn claude_program(env: &[(String, String)], windows: bool) -> std::ffi::OsString {
     let get = lookup(env);
     let command = get("FGOS_CLAUDE_COMMAND")
         .filter(|c| !c.is_empty())
         .unwrap_or_else(|| "claude".to_string());
     let pathext = get("PATHEXT").unwrap_or_else(|| ".EXE;.CMD;.BAT".to_string());
-    let found = get("PATH").and_then(|path| {
-        fgos_process::spawn::resolve_program(&command, &path, &pathext, cfg!(windows))
-    });
+    let found = get("PATH")
+        .and_then(|path| fgos_process::spawn::resolve_program(&command, &path, &pathext, windows));
     found.map_or_else(|| command.into(), PathBuf::into_os_string)
 }
 
@@ -75,7 +77,14 @@ fn run_claude(
     runner: &dyn ProcessRunner,
 ) -> Option<String> {
     let args: Vec<String> = args.iter().map(|a| (*a).to_string()).collect();
-    match runner.run(&claude_program(env), &args, env, None, None, CLAUDE_TIMEOUT) {
+    match runner.run(
+        &claude_program(env, cfg!(windows)),
+        &args,
+        env,
+        None,
+        None,
+        CLAUDE_TIMEOUT,
+    ) {
         Ok(fgos_process::spawn::Outcome::Exited(out)) if out.status.success() => {
             Some(String::from_utf8_lossy(&out.stdout).into_owned())
         }
@@ -483,7 +492,11 @@ impl SubHomes<'_> {
         invocation: Option<&str>,
         command: Option<&str>,
     ) {
-        let Some(raw) = env_value.get("HOME").and_then(Value::as_str).map(str::trim) else {
+        let Some(raw) = env_value
+            .get(HOME_KEY)
+            .and_then(Value::as_str)
+            .map(str::trim)
+        else {
             return;
         };
         let is_agy = command == Some("agy")
@@ -760,7 +773,7 @@ pub fn plan_agent_wiring(
     } else {
         absent.push("claude".to_string());
     }
-    if first_on_path("agy", env).is_some() {
+    if program_on_path("agy", env).is_some() {
         agents.push(agy_entry(home));
     } else {
         absent.push("agy".to_string());
@@ -779,6 +792,49 @@ pub fn plan_agent_wiring(
         absent,
         files,
     })
+}
+
+#[cfg(test)]
+mod windows_resolution_tests {
+    use super::*;
+
+    #[test]
+    fn on_windows_claude_resolves_to_its_batch_file_through_pathext_and_a_named_command_is_taken_as_given(
+    ) {
+        let dir = std::env::temp_dir().join(format!("fgos-claude-cmd-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&dir);
+        std::fs::create_dir_all(&dir).unwrap();
+        std::fs::write(dir.join("claude.CMD"), "@exit /b 0\r\n").unwrap();
+        let env = vec![
+            (
+                "PATH".to_string(),
+                format!("{};{}", dir.display(), "/nowhere"),
+            ),
+            ("PATHEXT".to_string(), ".EXE;.CMD;.BAT".to_string()),
+        ];
+        assert_eq!(
+            claude_program(&env, true),
+            dir.join("claude.CMD").into_os_string()
+        );
+        // the same environment on another host finds no executable `claude`, so the bare name stays
+        assert_eq!(
+            claude_program(&env, false),
+            std::ffi::OsString::from("claude")
+        );
+        let named = [
+            env.clone(),
+            vec![(
+                "FGOS_CLAUDE_COMMAND".to_string(),
+                "/nonexistent/fgos-test-claude".to_string(),
+            )],
+        ]
+        .concat();
+        assert_eq!(
+            claude_program(&named, true),
+            std::ffi::OsString::from("/nonexistent/fgos-test-claude")
+        );
+        let _ = std::fs::remove_dir_all(dir);
+    }
 }
 
 #[cfg(all(test, unix))]

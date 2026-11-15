@@ -1,0 +1,61 @@
+@echo off
+rem fgos-project-launcher v1: runs the release the nearest enclosing project activated, from this machine's release store only.
+setlocal EnableExtensions DisableDelayedExpansion
+set "dir=%CD%"
+:loop
+if exist "%dir%\.fgos\installation\activation.json" goto found
+for %%I in ("%dir%\..") do set "parent=%%~fI"
+if /i "%parent%"=="%dir%" goto none
+set "dir=%parent%"
+goto loop
+:found
+if "%dir:~-1%"=="\" set "dir=%dir:~0,-1%"
+set "ACTIVATION=%dir%\.fgos\installation\activation.json"
+set "STORE="
+if defined FGOS_STATE_ROOT set "STORE=%FGOS_STATE_ROOT%"
+if not defined STORE if defined FGOS_STATE_HOME set "STORE=%FGOS_STATE_HOME%"
+if not defined STORE if defined XDG_STATE_HOME set "STORE=%XDG_STATE_HOME%\fgos"
+if not defined STORE if defined HOME set "STORE=%HOME%\.local\state\fgos"
+if not defined STORE if defined USERPROFILE set "STORE=%USERPROFILE%\.local\state\fgos"
+if not defined STORE set "STORE=.local\state\fgos"
+set "STATUS_LINE="
+set "DIGEST_LINE="
+for /f "usebackq delims=" %%L in (`findstr /r /c:"^ *.status.:" "%ACTIVATION%"`) do if not defined STATUS_LINE set "STATUS_LINE=%%L"
+for /f "usebackq delims=" %%L in (`findstr /r /c:"^ *.artifactDigest.:" "%ACTIVATION%"`) do if not defined DIGEST_LINE set "DIGEST_LINE=%%L"
+setlocal EnableDelayedExpansion
+set "WHY=status is not ready"
+if not defined STATUS_LINE goto refuse
+set "STATUS=!STATUS_LINE:*: =!"
+set "STATUS=!STATUS:"=!"
+if "!STATUS:~-1!"=="," set "STATUS=!STATUS:~0,-1!"
+if /i not "!STATUS!"=="ready" goto refuse
+set "WHY=artifactDigest is not sha256 and 64 lowercase hex digits"
+if not defined DIGEST_LINE goto refuse
+set "DIGEST=!DIGEST_LINE:*: =!"
+set "DIGEST=!DIGEST:"=!"
+if "!DIGEST:~-1!"=="," set "DIGEST=!DIGEST:~0,-1!"
+if not "!DIGEST:~0,7!"=="sha256:" goto refuse
+set "HEX=!DIGEST:~7!"
+if not defined HEX goto refuse
+if not "!HEX:~64!"=="" goto refuse
+if "!HEX:~63,1!"=="" goto refuse
+set "REST=!HEX!"
+for %%C in (0 1 2 3 4 5 6 7 8 9 a b c d e f) do set "REST=!REST:%%C=!"
+if defined REST goto refuse
+set "WHY=the state root !STORE! is not an absolute path (set USERPROFILE or FGOS_STATE_ROOT)"
+set "ABS="
+if "!STORE:~1,2!"==":\" set "ABS=1"
+if "!STORE:~0,2!"=="\\" set "ABS=1"
+if not defined ABS goto refuse
+set "ENTRY=!STORE!\releases\sha256-!HEX!\bin\fgos.exe"
+set "WHY=release !DIGEST! is not in this machine's release store !STORE!\releases"
+if not exist "!ENTRY!" goto refuse
+endlocal & set "FGOS_LAUNCH_ENTRY=%ENTRY%"
+"%FGOS_LAUNCH_ENTRY%" %*
+exit /b %errorlevel%
+:refuse
+>&2 echo fgos: refusing !ACTIVATION!: !WHY! -- fgos runs only a release fgctl installed on this machine -- run 'fgctl init' in the project to activate one, then 'fgctl verify'
+exit /b 126
+:none
+echo fgos: no .fgos\installation found above %CD% -- run "fgctl init" in the project 1>&2
+exit /b 127

@@ -11,6 +11,7 @@ pub mod fetch;
 pub mod fgctl_refresh;
 pub mod git_gate;
 pub mod init;
+pub mod launcher;
 pub mod lock;
 pub mod manifest;
 pub mod rc_lines;

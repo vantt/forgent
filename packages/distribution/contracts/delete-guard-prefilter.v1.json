@@ -1,5 +1,6 @@
 {
   "contract": "delete-guard-prefilter.v1",
+  "note": "The keyword list the main-checkout delete guard judges (substrings anywhere, words only at the start of a word). agent_hooks.rs renders the shell case patterns and the JavaScript regular expression of the omp and pi extensions from it; regExpSource, caseGlobs and vectors were recorded from the earlier Node renderer and pin both the Rust renderer and test/git/main-checkout-delete-guard.test.mjs, which reads substrings and words from here.",
   "substrings": [
     "xargs",
     "clean",
