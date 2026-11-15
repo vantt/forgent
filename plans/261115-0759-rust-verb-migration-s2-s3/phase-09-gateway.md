@@ -5,11 +5,16 @@ status: pending
 effort: 2d
 wave: B
 step: S3
-blockedBy: [0, "S23-Q4 if asked"]
+blockedBy: [0]
 flipAfter: [1]
 ---
 
 # Phase 09: `gateway` native
+
+> Note (2026-11-15, phase 00 decisions): the recursion-guard fix and the `--locked` cargo build are made outside this
+> port, on branch `cook/gateway-guard-fix`; this phase does not carry them (the guard text below is background only).
+> S23-Q4 is decided (b): `gateway start` is refused off Unix; the CHANGELOG line is "`fgos gateway start` is refused
+> off Unix with a message saying so; it never worked there."
 
 The one door for the gateway's lifecycle (AGENTS.md "Starting the fgos gateway", tsk-31v) moves from Node
 (`src/runner/gateway-control.mjs`, 400 lines, verb-only) into the host (D8). The gateway binary itself
@@ -42,15 +47,12 @@ Phase-lead rules: [plan.md](plan.md). Branch `rust-verb-migration-program/s3-p09
 1. `apps/fgos/src/wiring/gateway_control.rs`: `start`, `stop`, `status` with Node's outcomes and refusals (through D3,
    category validation, exit 4). The build runs `cargo build --release --bin fgos-gateway` in `apps/fgos-gateway`
    through the process door (00 F11: argv, env, the refusal when `cargo` is missing); the port from the machine config
-   through `fgos-config` (as `readMachineConfig`); the spawn through `spawn_detached` with the log file and
-   `FGOS_RUST_HOST_RECURSION_GUARD` removed (as `SYNC_CHILD_ENV_REMOVE`, `invocation_doors.rs:114`; a unit assertion);
+   through `fgos-config` (as `readMachineConfig`); the spawn through `spawn_detached` with the log file (the guard removal is done by `cook/gateway-guard-fix`, not here);
    the registry through Durable File (same shape); the probe a plain HTTP/1.1 `GET /v1/contract` over
    `std::net::TcpStream` with the 3 s timeout (unless 00 F11 finds a client the host already links); `stop` signals by
    identity, then the shutdown seal through `EventStoreLifecycle::trigger` with `Policy { shutdown: true, .. }` only
    (no publish: `end` stays false), outside the gateway lock, also when the stop fails (as Node's `finally`).
-2. Off Unix, per S23-Q4: (a) the process crate's `spawn_detached` gains its Windows half and `start` works; (b) `start`
-   refuses with a clear message and `stop`/`status` work. If S23-Q4 was not asked (00 F11: `start` does not work on
-   Windows today), (b) applies and the report says why.
+2. Off Unix, per S23-Q4 (b): `start` refuses with a clear message and `stop`/`status` work. The process crate is not touched.
 3. Host: operations `gateway.start|stop` (write) and `gateway.status` (read), projector (no flags), `NATIVE_SUBCOMMANDS`,
    annotation `{ owner_path: "apps/fgos" }`, `native: true`; `apps/fgos/Cargo.toml` gains `fgos-durable-file` if 08 has
    not landed it yet (the step lead commits `Cargo.lock`).
@@ -69,7 +71,6 @@ Phase-lead rules: [plan.md](plan.md). Branch `rust-verb-migration-program/s3-p09
 | Behaviour | Old proof | Owner now |
 |---|---|---|
 | status, stop, start, identity check, lock (19) | `test/runner/gateway-control.test.mjs` | `gateway_control.rs` unit tests (stub binary, local listener) |
-| the child carries no recursion guard | none | `gateway_control.rs` unit test (new: the behaviour was untested) |
 | no sub, unknown sub, fresh-repo status and stop, start refusal (5) | `test/cli/fgos-gateway.test.mjs` | `routing.rs` sub faults (generic) + one `cli_tests.rs` case (fresh-repo `status`) |
 | manifest sub enum | `fgos-gateway.test.mjs` | `fgos-manifest.test.mjs` (registry data) |
 
@@ -78,12 +79,12 @@ Phase-lead rules: [plan.md](plan.md). Branch `rust-verb-migration-program/s3-p09
 - Create: `apps/fgos/src/wiring/gateway_control.rs`, `gateway.cases.mjs` (deleted by 12).
 - Modify: `apps/fgos/src/wiring/mod.rs`, `apps/fgos/Cargo.toml` (D10, if first), host files per the recipe,
   `apps/fgos/tests/cli_tests.rs`, `bin/fgos.mjs`, `docs/architecture-manifest.json`, `test/suite-baseline.json`, census;
-  under S23-Q4 (a) `packages/process/rust/src/{lib.rs,mapped.rs}`.
+  the process crate is not touched (S23-Q4 = b).
 - Delete: `src/runner/gateway-control.mjs`, `test/runner/gateway-control.test.mjs`, `test/cli/fgos-gateway.test.mjs`.
 
 ## Gates
 
-- `cargo fmt --all --check`; `cargo clippy -p fgos --all-targets -- -D warnings` (and `-p fgos-process` under S23-Q4 a);
+- `cargo fmt --all --check`; `cargo clippy -p fgos --all-targets -- -D warnings`;
   `cargo test -p fgos`; msvc and darwin `cargo check -p fgos`
 - `node scripts/run-tests.mjs test/rust-host/verb-parity.test.mjs test/cli/fgos-manifest.test.mjs test/rust-host/command-routes.test.mjs test/cli/subcommand-flag-drift.test.mjs test/architecture.test.mjs test/setup/git-mutation-census.test.mjs`
 - `cargo test -p fgos-gateway`; manual once on fg-server2 through `npm run fgos:dev -- gateway start|status|stop`, plus a

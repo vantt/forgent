@@ -99,6 +99,8 @@ Phase-lead rules: [plan.md](plan.md). Branch `rust-verb-migration-program/s3-p07
   `test/distribution/source-payload.test.mjs` (only if it pins `OWN_CLI`'s use), `docs/architecture-manifest.json`, census.
 - Delete: `src/verbs/events/{sync,status,seal,export}.mjs`.
 
+Acceptance addition: a positive case where the state root is removed gives `skipped` and the root stays absent.
+
 ## Gates
 
 - `cargo fmt --all --check`; `cargo clippy -p fgos -p fgos-event-store --all-targets -- -D warnings`;
