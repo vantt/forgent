@@ -31,7 +31,7 @@ mod sweep;
 mod time;
 mod wake;
 
-pub use ack::{AckStage, AckWatch};
+pub use ack::{AckStage, AckWatch, RemoteAckFacts, RemoteOffer};
 pub use counters::{Account, BoundedCounters, CounterReason, Party, PartyKey, UNREGISTERED};
 pub use delivery::{
     AliasCandidate, AliasRefusal, Checkpoint, Claim, ClaimedItem, ClaimedWhat, Finished, MailFrom,
@@ -51,7 +51,7 @@ pub use limits::{
 };
 pub use names::{is_group, ResolveRefusal};
 pub use notices::{Notice, NoticeMark, NoticeReason, NoticeState};
-pub use policy::{LifetimeKey, RemoteSend};
+pub use policy::{LifetimeKey, RemoteAck, RemoteSend};
 pub use registry::{Binding, Liveness, RegisterRefusal, RegisterRequest, Registered, StoredHead};
 pub use remote::{Ingested, RemoteDrop, RemoteMail, RemoteWake, Settlement, Unsettled};
 pub use report::{

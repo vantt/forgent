@@ -46,7 +46,7 @@ use std::path::Path;
 
 /// `mailbox.remote.maxAgeSec` and `mailbox.remote.clockSkewSec` of the wire contract.
 pub(super) const MAX_AGE_SEC: u64 = 86_400;
-const CLOCK_SKEW_SEC: u64 = 300;
+pub(super) const CLOCK_SKEW_SEC: u64 = 300;
 
 /// Whether an event stamped `ts` is young enough for a record with no baseline to read: the same
 /// bound `verify` holds a message's signed `sentAt` to.

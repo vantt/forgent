@@ -2,6 +2,7 @@
 //! plan decision 4; the first that fails wins. A refused message is never
 //! recorded, but the attempt itself is counted first, so refused attempts
 //! count toward the session budget and the lifetime cap.
+use crate::ack::{AckStage, AckWatch};
 use crate::counters::Account;
 use crate::delivery::{Recipient, Refusal, SendRequest};
 use crate::envelope::{Header, MessageState};
@@ -46,6 +47,21 @@ pub struct RemoteSend<'a> {
     pub max_body_bytes: u64,
     /// The label counters use for the recipient, for example `name@machine`.
     pub to: &'a str,
+    /// The acknowledgement the sender asks for, if any.
+    pub ack: Option<RemoteAck<'a>>,
+}
+
+/// A request for an acknowledgement of a message bound for another machine:
+/// the sender watches it until the recipient's reply names it.
+pub struct RemoteAck<'a> {
+    pub within_sec: u64,
+    /// The recipient's session id on its own machine.
+    pub to: &'a WriterKey,
+    /// The recipient's machine.
+    pub machine: &'a str,
+    /// The message of this record the send answers, when it does: a reply
+    /// is never itself a request, as for a same-machine send.
+    pub reply_to: Option<&'a MessageId>,
 }
 
 /// What a send that passed every check records.
@@ -146,8 +162,33 @@ impl MailboxState {
                 .and_then(|()| self.check_budget(&account, limits))
                 .and_then(|()| self.check_lifetime(req.from, from_generation, limits))
         };
+        let verdict = verdict.and_then(|()| match req.ack.as_ref().and_then(|ack| ack.reply_to) {
+            Some(hint) if self.answers_ack_request(hint) => Err(Refusal::AckOnAck),
+            _ => Ok(()),
+        });
         match verdict {
-            Ok(()) => Ok(MessageId::mint(ids)),
+            Ok(()) => {
+                let id = MessageId::mint(ids);
+                if let Some(ack) = &req.ack {
+                    self.watch_ack(
+                        AckWatch {
+                            id: id.clone(),
+                            from: req.from.clone(),
+                            from_generation,
+                            to: ack.to.clone(),
+                            to_machine: Some(ack.machine.to_owned()),
+                            reply_by_sec: ack.within_sec,
+                            due: now.plus_secs(ack.within_sec),
+                            offered_at: None,
+                            stage: AckStage::Waiting,
+                            acked: false,
+                            changed_at: now,
+                        },
+                        limits,
+                    );
+                }
+                Ok(id)
+            }
             Err(refusal) => {
                 self.counters
                     .bump(refusal.reason(), account.as_str(), req.to, now, limits);
@@ -218,6 +259,13 @@ impl MailboxState {
         } else {
             Err(Refusal::ReplyToNotOffered)
         }
+    }
+
+    /// Whether the message `hint` names asked for an acknowledgement.
+    fn answers_ack_request(&self, hint: &MessageId) -> bool {
+        self.messages
+            .iter()
+            .any(|h| &h.id == hint && h.ack_within_sec.is_some())
     }
 
     /// Check 4b: a send that asks for an acknowledgement is not a reply to

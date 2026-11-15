@@ -2385,25 +2385,42 @@ fn a_send_to_a_session_on_another_machine_appends_one_signed_event_and_reports_r
 }
 
 #[test]
-fn need_ack_to_a_session_on_another_machine_is_refused_until_it_can_cross_machines() {
+fn need_ack_to_a_session_on_another_machine_signs_the_request_and_is_watched_until_the_answer() {
     let Cross {
         alpha,
         alpha_root,
         target,
         ..
     } = two_machines();
-    let out = alpha.run(
+    let send = |extra: &[&str]| {
+        let mut args = vec!["mailbox", "send", "--to", &target, "--need-ack"];
+        args.extend_from_slice(extra);
+        args.push("hello");
+        alpha.run(&alpha.main(), Some("sender-a"), &args, b"")
+    };
+    let out = send(&["--reply-by", "10m"]);
+    let text = String::from_utf8_lossy(&out.stdout).into_owned();
+    assert_eq!(out.status.code(), Some(0), "{text} {out:?}");
+    assert!(text.contains("Reply wanted within"), "{text}");
+    let events = sent_events(&alpha_root, &alpha.main());
+    assert_eq!(events.len(), 1);
+    assert_eq!(events[0]["ackWithinSec"], 600, "{events:?}");
+
+    let status = alpha.run(
         &alpha.main(),
         Some("sender-a"),
-        &["mailbox", "send", "--to", &target, "--need-ack", "hello"],
+        &["mailbox", "status", "--json"],
         b"",
     );
-    let text = String::from_utf8_lossy(&out.stdout).into_owned();
-    assert_eq!(out.status.code(), Some(1), "{text} {out:?}");
-    assert!(text.contains("not across machines yet"), "{text}");
-    assert!(
-        sent_events(&alpha_root, &alpha.main()).is_empty(),
-        "a refused request writes no event"
+    let status: serde_json::Value = serde_json::from_slice(&status.stdout).unwrap();
+    assert_eq!(
+        status["data"]["signals"]["ack"],
+        serde_json::json!({ "awaiting": 1, "acked": 0, "overdue": 0, "overdueIds": [] }),
+        "{status}"
+    );
+    assert_eq!(
+        status["data"]["crossMachine"]["recent"][0]["ackWithinSec"], 600,
+        "{status}"
     );
 }
 

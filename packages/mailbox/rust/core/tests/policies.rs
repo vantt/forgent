@@ -637,6 +637,7 @@ fn a_remote_send_is_held_to_the_wire_cap_and_the_senders_lifetime_cap_and_record
         body_bytes: bytes,
         max_body_bytes: wire_cap,
         to: "peer@other",
+        ack: None,
     };
 
     let id = pair

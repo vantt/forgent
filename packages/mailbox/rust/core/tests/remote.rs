@@ -2,8 +2,8 @@ mod common;
 
 use common::{key, plain, t, Pair, B_NAME};
 use fgos_mailbox_core::{
-    CounterReason, Ingested, MailboxState, MessageId, MessageState, Refusal, RemoteMail,
-    Settlement, WakeDrop,
+    CounterReason, Ingested, MailboxState, MessageId, MessageState, NoticeReason, Refusal,
+    RemoteAck, RemoteAckFacts, RemoteMail, RemoteOffer, RemoteSend, Settlement, WakeDrop,
 };
 use std::collections::BTreeSet;
 
@@ -399,4 +399,113 @@ fn a_verified_cross_machine_reply_naming_a_watched_id_marks_it_acknowledged_once
         ingest(&mut pair, &reply("r1"), 7).unwrap(),
         Ingested::Duplicate
     );
+}
+
+#[test]
+fn a_remote_watch_never_goes_overdue_from_a_stale_fetch_and_goes_overdue_once_after_a_fetch_that_started_past_its_deadline(
+) {
+    const SKEW: u64 = 300;
+    let mut pair = Pair::new(t(0));
+    let a = key("a");
+    let peer = key("peer-session");
+    let send = |pair: &mut Pair, reply_to: Option<&MessageId>| {
+        let req = RemoteSend {
+            from: &a,
+            body_bytes: 5,
+            max_body_bytes: WIRE_CAP,
+            to: "peer@peer-machine",
+            ack: Some(RemoteAck {
+                within_sec: 600,
+                to: &peer,
+                machine: "peer-machine",
+                reply_to,
+            }),
+        };
+        pair.state
+            .admit_remote(&req, t(0), &pair.limits, &mut pair.ids)
+    };
+    let id = send(&mut pair, None).unwrap();
+    let watch = |pair: &Pair| {
+        pair.state
+            .ack_watches()
+            .find(|w| w.id == id)
+            .cloned()
+            .unwrap()
+    };
+    assert_eq!(watch(&pair).to_machine.as_deref(), Some("peer-machine"));
+    assert_eq!(watch(&pair).due, t(600));
+    let told =
+        |pair: &Pair| -> Vec<NoticeReason> { pair.state.notices().map(|n| n.reason).collect() };
+    let judge = |pair: &mut Pair, fetch: u64, now: u64, offers: &[RemoteOffer]| {
+        let facts = RemoteAckFacts {
+            fetch_started: t(fetch),
+            skew_sec: SKEW,
+            offers,
+        };
+        pair.state
+            .judge_remote_ack_watches(&facts, t(now), &pair.limits, &mut pair.ids)
+    };
+
+    // No sweep of this machine judges it, however late.
+    pair.sweep(t(10_000));
+    assert!(told(&pair).is_empty());
+    // A fetch that began before the deadline, or inside the clock skew after it, blames nobody.
+    judge(&mut pair, 500, 10_000, &[]);
+    judge(&mut pair, 600 + SKEW, 10_000, &[]);
+    assert!(told(&pair).is_empty());
+    // One that began past deadline plus skew says it was not offered, once.
+    judge(&mut pair, 1_000, 10_000, &[]);
+    judge(&mut pair, 2_000, 10_000, &[]);
+    assert_eq!(told(&pair), vec![NoticeReason::AckNotOffered]);
+
+    // The recipient's machine reports the offer at 1500 s: the deadline restarts there, and a
+    // fetch from before the new deadline plus skew still says nothing.
+    let offer = [RemoteOffer {
+        id: id.clone(),
+        machine: "peer-machine".into(),
+        at: t(1_500),
+    }];
+    judge(&mut pair, 2_100 + SKEW, 10_000, &offer);
+    assert_eq!(told(&pair), vec![NoticeReason::AckNotOffered]);
+    judge(&mut pair, 2_100 + SKEW + 1, 10_000, &offer);
+    judge(&mut pair, 5_000, 10_000, &[]);
+    assert_eq!(
+        told(&pair),
+        vec![NoticeReason::AckNotOffered, NoticeReason::AckOverdue],
+        "overdue once"
+    );
+
+    // An offer reported by another machine restarts nothing, and a fetch from the future of
+    // this clock is read as now.
+    let again = send(&mut pair, None).unwrap();
+    let stranger = [RemoteOffer {
+        id: again.clone(),
+        machine: "other-machine".into(),
+        at: t(1),
+    }];
+    judge(&mut pair, 9_999_999, 700, &stranger);
+    let late = pair.state.ack_watches().find(|w| w.id == again).unwrap();
+    assert!(late.offered_at.is_none());
+
+    // A reply to a message that asked for an acknowledgement is not itself a request.
+    let asked = pair
+        .state
+        .ingest_remote(
+            &RemoteMail {
+                ack_within_sec: Some(600),
+                ..mail(&peer, "q1", &key("b"), "please read")
+            },
+            &BTreeSet::new(),
+            t(800),
+            &pair.limits,
+            &mut pair.ids,
+        )
+        .unwrap();
+    let Ingested::Recorded { id: asked, .. } = asked else {
+        panic!("recorded")
+    };
+    assert!(matches!(
+        send(&mut pair, Some(&asked)),
+        Err(Refusal::AckOnAck)
+    ));
 }

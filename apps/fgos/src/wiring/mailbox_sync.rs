@@ -17,14 +17,14 @@ use super::mailbox_config::{project_mailbox, CrossMachine};
 use super::mailbox_identity::{session_of, state_root};
 use super::mailbox_ingest::{self, Hold};
 use super::mailbox_remote;
-use fgos_event_store::sync::{sync, SyncRequest};
+use fgos_event_store::sync::{sync, sync_status, SyncRequest};
 use fgos_identity::current::machine_info;
 use fgos_identity::directory;
 use fgos_identity::shared::{self, LogDoor};
 use fgos_mailbox::limits::Loaded;
-use fgos_mailbox::record::{Paths, Record, Wait};
+use fgos_mailbox::record::{Paths, Record, Reported, Wait};
 use fgos_mailbox::verbs;
-use fgos_mailbox_core::{Limits, Timestamp};
+use fgos_mailbox_core::{AckStage, Limits, MessageId, RemoteAckFacts, Timestamp};
 use fgos_process::facts::judge_here;
 use fgos_process::mapped::spawn_detached;
 use std::ffi::OsString;
@@ -96,6 +96,11 @@ fn run(args: &[OsString]) {
         Ok(false) => {}
         Err(why) => eprintln!("mailbox-sync: {why}"),
     }
+    // Mail taken above may have been the replies that acknowledge what this machine asked for, so
+    // the watches are judged only now.
+    if let Err(why) = judge_remote_acks(&dir, &fgos_dir, &loaded) {
+        eprintln!("mailbox-sync: {why}");
+    }
     // A machine that keeps its bodies in its own mail-body ref cuts the old ones now and then; a
     // sync that did not run to its end says nothing about what the remote holds.
     if cross.body_ref && events_fetched {
@@ -103,6 +108,57 @@ fn run(args: &[OsString]) {
             eprintln!("mailbox-sync: {why}");
         }
     }
+}
+
+/// Judges the acknowledgement requests this machine's senders made of sessions on other machines.
+/// A deadline is judged only from the clone's last event fetch, and only when that fetch ran to
+/// its end and began after the deadline plus the clock skew: a fetch from before it cannot carry
+/// the answer, and no fetch at all is no verdict. Nothing is read or written when no watch is open.
+fn judge_remote_acks(dir: &Path, fgos_dir: &Path, loaded: &Loaded) -> Result<(), String> {
+    let (Some(root), Some(clone)) = (
+        state_root(),
+        event_store_clone::open(dir).map_err(|f| format!("{}: {}", f.reason, f.detail))?,
+    ) else {
+        return Ok(());
+    };
+    let fetch = sync_status(&clone.layout)
+        .map_err(|e| e.to_string())?
+        .last_fetch
+        .filter(|fetch| fetch.error.is_none());
+    let Some(fetch) = fetch else {
+        return Ok(());
+    };
+    let record = Record::open(fgos_dir).map_err(|e| e.to_string())?;
+    let wait = Wait::Ms(loaded.hook.verbs.lock_wait_ms);
+    let limits = &loaded.limits;
+    let held = record
+        .hold(wait, now(), limits, |state, _| {
+            let open: Vec<(MessageId, String)> = state
+                .ack_watches()
+                .filter(|w| !w.acked && w.stage != AckStage::Overdue)
+                .filter_map(|w| Some((w.id.clone(), w.to_machine.clone()?)))
+                .collect();
+            Reported::unchanged(open)
+        })
+        .map_err(|e| e.to_string())?;
+    let watched = held.value.value;
+    if watched.is_empty() {
+        return Ok(());
+    }
+    let main = fgos_dir.parent().unwrap_or(dir);
+    let offers = mailbox_remote::signed_offers(main, &root, &watched)?;
+    let facts = RemoteAckFacts {
+        fetch_started: Timestamp::from_millis(fetch.time.saturating_mul(1000)),
+        skew_sec: mailbox_ingest::CLOCK_SKEW_SEC,
+        offers: &offers,
+    };
+    record
+        .hold(wait, now(), limits, |state, ids| {
+            state.judge_remote_ack_watches(&facts, now(), limits, ids);
+            Reported::changing(())
+        })
+        .map(|_| ())
+        .map_err(|e| e.to_string())
 }
 
 /// Resets this machine's mail-body ref when some body in it is older than the lifetime. A rotation

@@ -65,14 +65,43 @@ impl AckWatch {
         self.acked || self.stage == AckStage::Overdue
     }
 
-    /// Whether the sweep owes the sender a notice now. The first deadline
-    /// fires once while the message is unoffered; the restarted one fires once.
-    fn firing(&self, now: Timestamp) -> bool {
+    /// Whether the deadline `now` is past owes the sender a notice. The
+    /// first deadline fires once while the message is unoffered; the
+    /// restarted one fires once.
+    fn overdue(&self, now: Timestamp) -> bool {
         !self.finished()
-            && self.to_machine.is_none()
             && now > self.due
             && (self.offered_at.is_some() || self.stage == AckStage::Waiting)
     }
+
+    /// Whether the sweep owes the sender a notice now: only a message to a
+    /// session of this machine, whose offer this record saw itself.
+    fn firing(&self, now: Timestamp) -> bool {
+        self.to_machine.is_none() && self.overdue(now)
+    }
+}
+
+/// That the recipient's machine told the sender it offered the message `id`
+/// (a settlement it signed), at the time it gave.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct RemoteOffer {
+    pub id: MessageId,
+    pub machine: String,
+    pub at: Timestamp,
+}
+
+/// What a sync that fetched the other machines' events knows about the
+/// watches on mail sent to them.
+#[derive(Debug, Clone, Copy)]
+pub struct RemoteAckFacts<'a> {
+    /// When the fetch began; the sync's last fetch ran to its end. A
+    /// watch is judged only from a fetch that began after its deadline plus
+    /// `skew_sec`, so a stale fetch never blames a recipient whose answer it
+    /// could not yet carry.
+    pub fetch_started: Timestamp,
+    /// The clock difference between machines the deadline allows for.
+    pub skew_sec: u64,
+    pub offers: &'a [RemoteOffer],
 }
 
 impl MailboxState {
@@ -150,8 +179,41 @@ impl MailboxState {
         limits: &Limits,
         ids: &mut dyn IdSource,
     ) {
+        self.notify_overdue(now, limits, ids, |w| w.firing(now));
+    }
+
+    /// Takes what a sync learned about mail sent to other machines, then
+    /// tells the senders whose acknowledgement is overdue by that fetch's
+    /// reckoning. The only judge of a watch on a message to another machine.
+    pub fn judge_remote_ack_watches(
+        &mut self,
+        facts: &RemoteAckFacts<'_>,
+        now: Timestamp,
+        limits: &Limits,
+        ids: &mut dyn IdSource,
+    ) {
+        self.sweep(now, limits, ids);
+        let now = self.last_now;
+        for offer in facts.offers {
+            self.mark_ack_offered(&offer.id, Some(&offer.machine), offer.at.min(now));
+        }
+        let fetched = facts.fetch_started.min(now);
+        self.notify_overdue(now, limits, ids, |w| {
+            w.to_machine.is_some()
+                && fetched > w.due.plus_secs(facts.skew_sec)
+                && w.overdue(fetched)
+        });
+    }
+
+    fn notify_overdue(
+        &mut self,
+        now: Timestamp,
+        limits: &Limits,
+        ids: &mut dyn IdSource,
+        fires: impl Fn(&AckWatch) -> bool,
+    ) {
         for i in 0..self.ack_watch.len() {
-            if !self.ack_watch[i].firing(now) {
+            if !fires(&self.ack_watch[i]) {
                 continue;
             }
             let (from, from_generation, to, id) = {
@@ -202,15 +264,19 @@ impl MailboxState {
         if watch.finished() {
             return now.is_past(watch.changed_at, limits.header_horizon_sec());
         }
-        watch.to_machine.is_none()
-            && !matches!(
-                self.message(&watch.id).map(|h| &h.state),
-                Some(
-                    MessageState::Recorded
-                        | MessageState::InFlight { .. }
-                        | MessageState::Offered { .. }
-                )
+        if watch.to_machine.is_some() {
+            // No header here to say it is gone: an open watch the sync never
+            // judged within the horizon is let go.
+            return now.is_past(watch.due, limits.header_horizon_sec());
+        }
+        !matches!(
+            self.message(&watch.id).map(|h| &h.state),
+            Some(
+                MessageState::Recorded
+                    | MessageState::InFlight { .. }
+                    | MessageState::Offered { .. }
             )
+        )
     }
 
     /// Drops the watches [`MailboxState::ack_watch_retires`] names.
