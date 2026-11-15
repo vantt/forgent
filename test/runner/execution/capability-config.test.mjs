@@ -65,12 +65,12 @@ test('a name with no colon has no prefix entry and the bare verb is never consul
   assert.equal(capabilityPersonaOf(runner, 'code'), null, 'a bare prefix is not code:*');
 });
 
-test('the lookups accept the config wrapped as runner.capabilities; every other read is flat only', () => {
-  assert.equal(capabilityRigorOf(wrapped, 'review'), 'high');
-  assert.equal(isCapabilityDeclared(wrapped, 'code:x'), true);
-  assert.equal(hasPreferPool(wrapped, 'review'), true);
-  assert.deepEqual(minCheckersOf(wrapped, 'code:x'), { key: 'code:*', minCheckers: ['red-team'] });
-  assert.equal(capabilityPersonaOf(wrapped, 'code:implement').persona, 'builder');
+test('a config wrapped as runner.capabilities holds no catalog: every read, lookups included, is flat only', () => {
+  assert.equal(capabilityRigorOf(wrapped, 'review'), undefined);
+  assert.equal(isCapabilityDeclared(wrapped, 'code:x'), false);
+  assert.equal(hasPreferPool(wrapped, 'review'), false);
+  assert.equal(minCheckersOf(wrapped, 'code:x'), null);
+  assert.equal(capabilityPersonaOf(wrapped, 'code:implement'), null);
   assert.equal(capabilityVerifyOf(wrapped, 'code:implement'), undefined);
   assert.equal(capabilityConfinementOf(wrapped, 'review'), undefined);
   assert.equal(preferOf(wrapped, 'review'), undefined);

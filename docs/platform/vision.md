@@ -167,9 +167,11 @@ Known gaps against this direction:
   preference.
 - The councils in `core/workflows` move into a named domain.
 - Capability rows, decided by the owner on 2026-11-14 in two steps. First,
-  every reader of `runner.capabilities` goes through `bind()` or its result;
-  today about 27 files under `src/` read the config directly. The config does
-  not change in this step. Second, the 37 business-named rows in
+  every reader of `runner.capabilities` goes through `bind()` or its result.
+  This step landed on 2026-11-14: the rule is one line in section 3 of the
+  Seat Binding spec (`docs/platform/seat-binding/spec.md`), and rows in the
+  `doors` table fail any file that reads the section another way. The config
+  did not change in this step. Second, the 37 business-named rows in
   `core/config-standard/runner.yaml` go away and travel with the councils'
   move. What remains is the real tool abilities (such as `impact-analysis`) and
   the generic jobs `execute`, `review` and `advise`. A workflow step declares

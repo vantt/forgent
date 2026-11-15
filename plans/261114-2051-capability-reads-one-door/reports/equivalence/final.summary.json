@@ -1,0 +1,1726 @@
+{
+  "run": "final",
+  "failures": 0,
+  "notes": 0,
+  "inputs": {
+    "standard": {
+      "seatConfigDigest": {
+        "base": "sha256:1241e4aa6a5da7f5919192b73e2e5c180763de9c74afdb3fbd9d5fed7dca5f29",
+        "head": "sha256:1241e4aa6a5da7f5919192b73e2e5c180763de9c74afdb3fbd9d5fed7dca5f29",
+        "allowlisted": []
+      },
+      "snapshotHash": {
+        "base": "sha256:f37dd1f0948403cff841d4e82351b82149d556ec8ebf5f2376d8d98ae4b9250e",
+        "head": "sha256:f37dd1f0948403cff841d4e82351b82149d556ec8ebf5f2376d8d98ae4b9250e",
+        "allowlisted": []
+      },
+      "validateShape": {
+        "base": "sha256:1025507233e81ac0885449d20670f5fa8f7bc3f383e28f9d1865f14ede4e9eb4",
+        "head": "sha256:1025507233e81ac0885449d20670f5fa8f7bc3f383e28f9d1865f14ede4e9eb4",
+        "allowlisted": []
+      },
+      "lint": {
+        "base": "sha256:d91fb3799dfe2de73795cee0a1a5818c410027b97eb6226bbf1c27d9d01cf111",
+        "head": "sha256:d91fb3799dfe2de73795cee0a1a5818c410027b97eb6226bbf1c27d9d01cf111",
+        "allowlisted": []
+      },
+      "proposal": {
+        "base": "sha256:adc0373af37508e48fcbe7a15732ff22f96efdcd01886d1624dabbc752da35de",
+        "head": "sha256:adc0373af37508e48fcbe7a15732ff22f96efdcd01886d1624dabbc752da35de",
+        "allowlisted": []
+      },
+      "effectiveRigor": {
+        "base": "sha256:d200ee09bd1c075118fdb4c9c19a2b9620f351570969a61bd295846cd769c0ac",
+        "head": "sha256:d200ee09bd1c075118fdb4c9c19a2b9620f351570969a61bd295846cd769c0ac",
+        "allowlisted": []
+      },
+      "checkerPlan": {
+        "base": "sha256:caab0dfc321c283f670caaec3f8ed8e26f5e93c0cd4398859d0bdb98021376e8",
+        "head": "sha256:caab0dfc321c283f670caaec3f8ed8e26f5e93c0cd4398859d0bdb98021376e8",
+        "allowlisted": []
+      },
+      "registeredCapability": {
+        "base": "sha256:c79f7c87a32484aa798dc2b2a15d63abd91dc4d8190d543a3976e9a1f4e5002b",
+        "head": "sha256:c79f7c87a32484aa798dc2b2a15d63abd91dc4d8190d543a3976e9a1f4e5002b",
+        "allowlisted": []
+      },
+      "verifyCommand": {
+        "base": "sha256:9ba617e697cc9303348f1a204f0102f41d3de1bffa343d4357e56ad0d756b23a",
+        "head": "sha256:9ba617e697cc9303348f1a204f0102f41d3de1bffa343d4357e56ad0d756b23a",
+        "allowlisted": []
+      },
+      "executorAndOverrides": {
+        "base": "sha256:cf6eee313076ef49d8379945043f95f78a84e67bd114a5c01461304cb23b7885",
+        "head": "sha256:bdf0b3a3cab570ceaec10e9917e328c38f7232cc3110753e92aa7e5be5a72557",
+        "allowlisted": [
+          "purpose-through-bind",
+          "tool-purpose"
+        ]
+      },
+      "purposeWithoutClis": {
+        "base": "sha256:cf6eee313076ef49d8379945043f95f78a84e67bd114a5c01461304cb23b7885",
+        "head": "sha256:0af218ae98663344baae002554c2923937bd3b38547cf2add90c58b0adce963a",
+        "allowlisted": [
+          "purpose-through-bind",
+          "tool-purpose"
+        ]
+      },
+      "capabilityDetailsExecutor": {
+        "base": "sha256:dfe97e2e25a693b02dc73f43ad1f64a619698bb0f576629b4a0c1297fc06fe58",
+        "head": "sha256:dfe97e2e25a693b02dc73f43ad1f64a619698bb0f576629b4a0c1297fc06fe58",
+        "allowlisted": []
+      },
+      "capabilityDetailsCandidate": {
+        "base": "sha256:85fbd8a25318bf3fb1e8f9b2268f7aaf94dce16dcdef24d0e4c56a86b886d254",
+        "head": "sha256:85fbd8a25318bf3fb1e8f9b2268f7aaf94dce16dcdef24d0e4c56a86b886d254",
+        "allowlisted": []
+      },
+      "confinement": {
+        "base": "sha256:fd7b874b289f8ca29142b6e0f9b5af1c1941dac7521959772986ca7adfe4cf1e",
+        "head": "sha256:fd7b874b289f8ca29142b6e0f9b5af1c1941dac7521959772986ca7adfe4cf1e",
+        "allowlisted": []
+      },
+      "dispatchPlan": {
+        "base": "sha256:495ac74a327c2b092490e0a60c67ee58395df3b82c6ccbfe944e9ea5de983107",
+        "head": "sha256:ab61b6c3d70e1a57fee7acf8dba6b7d57611e3102a87619bcf18503fb17bb4b6",
+        "allowlisted": [
+          "purpose-through-bind",
+          "tool-purpose"
+        ]
+      },
+      "needsSoulPlan": {
+        "base": "sha256:58752eed19ca645a76caf814565558b9a1ecf3e2a65bd593830360668b27dd48",
+        "head": "sha256:118022d432bbfe2bbdaef69202aeef16c9c0e2dd2e959ef74523821b83f36f0d",
+        "allowlisted": [
+          "purpose-through-bind",
+          "tool-purpose"
+        ]
+      },
+      "legacyChecker": {
+        "base": "sha256:e645783d45adf68d748fb506b590ebd59229b52ee66a8276af2f2d0a21639a7a",
+        "head": "sha256:e645783d45adf68d748fb506b590ebd59229b52ee66a8276af2f2d0a21639a7a",
+        "allowlisted": []
+      },
+      "proposalRefusals": {
+        "base": "sha256:f3cbd43c216b56b230de5b7cf8334be1d8b8b640d736904bae71701216a368f6",
+        "head": "sha256:f3cbd43c216b56b230de5b7cf8334be1d8b8b640d736904bae71701216a368f6",
+        "allowlisted": []
+      },
+      "bind": {
+        "base": "sha256:df09b0c495cc8f46d312343c80be446bd8b2e7314b76990677d2a335f0a41048",
+        "head": "sha256:df09b0c495cc8f46d312343c80be446bd8b2e7314b76990677d2a335f0a41048",
+        "allowlisted": []
+      },
+      "operationCapability": {
+        "base": "sha256:cf9237e8b74a9a501b7105ee8f8347f9933f8eac0458c23e8f2e8d4318100b55",
+        "head": "sha256:cf9237e8b74a9a501b7105ee8f8347f9933f8eac0458c23e8f2e8d4318100b55",
+        "allowlisted": []
+      }
+    },
+    "repo": {
+      "seatConfigDigest": {
+        "base": "sha256:8f2fe253519471542be2b7c10934717b9ce5a10eee5da2622fe3eb448b059557",
+        "head": "sha256:8f2fe253519471542be2b7c10934717b9ce5a10eee5da2622fe3eb448b059557",
+        "allowlisted": []
+      },
+      "snapshotHash": {
+        "base": "sha256:7b35135b80b8c0a06775800eecb3fcc998b7d963c72eab531ea7347533e18014",
+        "head": "sha256:7b35135b80b8c0a06775800eecb3fcc998b7d963c72eab531ea7347533e18014",
+        "allowlisted": []
+      },
+      "validateShape": {
+        "base": "sha256:1025507233e81ac0885449d20670f5fa8f7bc3f383e28f9d1865f14ede4e9eb4",
+        "head": "sha256:1025507233e81ac0885449d20670f5fa8f7bc3f383e28f9d1865f14ede4e9eb4",
+        "allowlisted": []
+      },
+      "lint": {
+        "base": "sha256:d91fb3799dfe2de73795cee0a1a5818c410027b97eb6226bbf1c27d9d01cf111",
+        "head": "sha256:d91fb3799dfe2de73795cee0a1a5818c410027b97eb6226bbf1c27d9d01cf111",
+        "allowlisted": []
+      },
+      "proposal": {
+        "base": "sha256:adc0373af37508e48fcbe7a15732ff22f96efdcd01886d1624dabbc752da35de",
+        "head": "sha256:adc0373af37508e48fcbe7a15732ff22f96efdcd01886d1624dabbc752da35de",
+        "allowlisted": []
+      },
+      "effectiveRigor": {
+        "base": "sha256:d200ee09bd1c075118fdb4c9c19a2b9620f351570969a61bd295846cd769c0ac",
+        "head": "sha256:d200ee09bd1c075118fdb4c9c19a2b9620f351570969a61bd295846cd769c0ac",
+        "allowlisted": []
+      },
+      "checkerPlan": {
+        "base": "sha256:caab0dfc321c283f670caaec3f8ed8e26f5e93c0cd4398859d0bdb98021376e8",
+        "head": "sha256:caab0dfc321c283f670caaec3f8ed8e26f5e93c0cd4398859d0bdb98021376e8",
+        "allowlisted": []
+      },
+      "registeredCapability": {
+        "base": "sha256:c79f7c87a32484aa798dc2b2a15d63abd91dc4d8190d543a3976e9a1f4e5002b",
+        "head": "sha256:c79f7c87a32484aa798dc2b2a15d63abd91dc4d8190d543a3976e9a1f4e5002b",
+        "allowlisted": []
+      },
+      "verifyCommand": {
+        "base": "sha256:9ba617e697cc9303348f1a204f0102f41d3de1bffa343d4357e56ad0d756b23a",
+        "head": "sha256:9ba617e697cc9303348f1a204f0102f41d3de1bffa343d4357e56ad0d756b23a",
+        "allowlisted": []
+      },
+      "executorAndOverrides": {
+        "base": "sha256:b356c418408177db0a1af0a0312ce6392c0bc7e91a37eeb10a2313aa114ac7f8",
+        "head": "sha256:db4ba156c57811ac43a1d70d29d09afae52017e3d75cdd3a7b85ce29e9228e47",
+        "allowlisted": [
+          "purpose-through-bind",
+          "tool-purpose"
+        ]
+      },
+      "purposeWithoutClis": {
+        "base": "sha256:b356c418408177db0a1af0a0312ce6392c0bc7e91a37eeb10a2313aa114ac7f8",
+        "head": "sha256:d6c8ee3fc7ccb19108b65263f0564b674a4f3ccf78e1d67a2e451b11483ede11",
+        "allowlisted": [
+          "purpose-through-bind",
+          "tool-purpose"
+        ]
+      },
+      "capabilityDetailsExecutor": {
+        "base": "sha256:5e7a05fc0f86f1bc4afb3ead6068667ad339df3f45109b23da5bae53101c9b20",
+        "head": "sha256:5e7a05fc0f86f1bc4afb3ead6068667ad339df3f45109b23da5bae53101c9b20",
+        "allowlisted": []
+      },
+      "capabilityDetailsCandidate": {
+        "base": "sha256:85fbd8a25318bf3fb1e8f9b2268f7aaf94dce16dcdef24d0e4c56a86b886d254",
+        "head": "sha256:85fbd8a25318bf3fb1e8f9b2268f7aaf94dce16dcdef24d0e4c56a86b886d254",
+        "allowlisted": []
+      },
+      "confinement": {
+        "base": "sha256:fd7b874b289f8ca29142b6e0f9b5af1c1941dac7521959772986ca7adfe4cf1e",
+        "head": "sha256:fd7b874b289f8ca29142b6e0f9b5af1c1941dac7521959772986ca7adfe4cf1e",
+        "allowlisted": []
+      },
+      "dispatchPlan": {
+        "base": "sha256:072f6a996c92dc44cfea6b4f1ce96c89bb226fed5a50676d7302576e82ddeca0",
+        "head": "sha256:dfac01f7a9099d1465e99c6a72abfb81f623d6f68227ce8c450fa810d0f07e14",
+        "allowlisted": [
+          "purpose-through-bind",
+          "tool-purpose"
+        ]
+      },
+      "needsSoulPlan": {
+        "base": "sha256:b5202b663607ebe8bc772196a864bec5de7e53c6c95841b97cbf8590bf6b80a0",
+        "head": "sha256:be42ff51b3a467f995c343c68cbf290101b7f101751fafd1330f4c81fd0a4eec",
+        "allowlisted": [
+          "purpose-through-bind",
+          "tool-purpose"
+        ]
+      },
+      "legacyChecker": {
+        "base": "sha256:e645783d45adf68d748fb506b590ebd59229b52ee66a8276af2f2d0a21639a7a",
+        "head": "sha256:e645783d45adf68d748fb506b590ebd59229b52ee66a8276af2f2d0a21639a7a",
+        "allowlisted": []
+      },
+      "proposalRefusals": {
+        "base": "sha256:f3cbd43c216b56b230de5b7cf8334be1d8b8b640d736904bae71701216a368f6",
+        "head": "sha256:f3cbd43c216b56b230de5b7cf8334be1d8b8b640d736904bae71701216a368f6",
+        "allowlisted": []
+      },
+      "bind": {
+        "base": "sha256:195a388850f13850ec474381f924d126f169f646f28f97839cd26064f9c185a9",
+        "head": "sha256:195a388850f13850ec474381f924d126f169f646f28f97839cd26064f9c185a9",
+        "allowlisted": []
+      },
+      "operationCapability": {
+        "base": "sha256:cf9237e8b74a9a501b7105ee8f8347f9933f8eac0458c23e8f2e8d4318100b55",
+        "head": "sha256:cf9237e8b74a9a501b7105ee8f8347f9933f8eac0458c23e8f2e8d4318100b55",
+        "allowlisted": []
+      }
+    },
+    "m-verify": {
+      "seatConfigDigest": {
+        "base": "sha256:a299fc65760366693460babdb8cb493d413d1ce1face737020f8c2c54db9f13a",
+        "head": "sha256:a299fc65760366693460babdb8cb493d413d1ce1face737020f8c2c54db9f13a",
+        "allowlisted": []
+      },
+      "snapshotHash": {
+        "base": "sha256:65d542f2eeefd6bd7f0787febb458dea1f130fc0c857dcd8ee243b4bc2fa06dd",
+        "head": "sha256:65d542f2eeefd6bd7f0787febb458dea1f130fc0c857dcd8ee243b4bc2fa06dd",
+        "allowlisted": []
+      },
+      "validateShape": {
+        "base": "sha256:1025507233e81ac0885449d20670f5fa8f7bc3f383e28f9d1865f14ede4e9eb4",
+        "head": "sha256:1025507233e81ac0885449d20670f5fa8f7bc3f383e28f9d1865f14ede4e9eb4",
+        "allowlisted": []
+      },
+      "lint": {
+        "base": "sha256:c527ed8fd1de86bd06d99ad1173d1465e83cbcb1192073ee694406ccdd56d09b",
+        "head": "sha256:c527ed8fd1de86bd06d99ad1173d1465e83cbcb1192073ee694406ccdd56d09b",
+        "allowlisted": []
+      },
+      "proposal": {
+        "base": "sha256:f52a7112400605916575f9d6aeaa7deada0a70904d49467986c34259c4e08761",
+        "head": "sha256:f52a7112400605916575f9d6aeaa7deada0a70904d49467986c34259c4e08761",
+        "allowlisted": []
+      },
+      "effectiveRigor": {
+        "base": "sha256:233af5d5858a9ab9980691bb9c5ddef830e55d75467ef5f0d25d236511835e63",
+        "head": "sha256:233af5d5858a9ab9980691bb9c5ddef830e55d75467ef5f0d25d236511835e63",
+        "allowlisted": []
+      },
+      "checkerPlan": {
+        "base": "sha256:633d10a17d3af8fced255e32b94e2cdf288fe04828d6651e0119fc4d14179999",
+        "head": "sha256:633d10a17d3af8fced255e32b94e2cdf288fe04828d6651e0119fc4d14179999",
+        "allowlisted": []
+      },
+      "registeredCapability": {
+        "base": "sha256:2aa717b4b81271ebca99a3d6fb32178cafc8f4041759244e6e622fd7a8dfd1ce",
+        "head": "sha256:2aa717b4b81271ebca99a3d6fb32178cafc8f4041759244e6e622fd7a8dfd1ce",
+        "allowlisted": []
+      },
+      "verifyCommand": {
+        "base": "sha256:65fa32b96c56fdfe2bb946d59c6364f88a315880e971467d907c6a0123d39aa4",
+        "head": "sha256:65fa32b96c56fdfe2bb946d59c6364f88a315880e971467d907c6a0123d39aa4",
+        "allowlisted": []
+      },
+      "executorAndOverrides": {
+        "base": "sha256:d3ee57c9d4244909b9ac3b8204ae7dcec84ffc98c55507436eb382ea4b4ae360",
+        "head": "sha256:65f7abc59d5fc27ea13cf8858ea816d171450bb4996c99d8d2f3438bcbae00f4",
+        "allowlisted": [
+          "purpose-through-bind",
+          "tool-purpose"
+        ]
+      },
+      "purposeWithoutClis": {
+        "base": "sha256:d3ee57c9d4244909b9ac3b8204ae7dcec84ffc98c55507436eb382ea4b4ae360",
+        "head": "sha256:60ed99255730a2a19a473245849b8de2a6a953c163e0de261e0eeaf730a73169",
+        "allowlisted": [
+          "purpose-through-bind",
+          "tool-purpose"
+        ]
+      },
+      "capabilityDetailsExecutor": {
+        "base": "sha256:255774c67fdf03bb20f365bfb0ef9a0ceb7b59dec89e0bbfe7ad7d70aa5825bb",
+        "head": "sha256:255774c67fdf03bb20f365bfb0ef9a0ceb7b59dec89e0bbfe7ad7d70aa5825bb",
+        "allowlisted": []
+      },
+      "capabilityDetailsCandidate": {
+        "base": "sha256:13bcad113bd9e38371e138b6380c811a70e259170da36f2ad543f064775d073d",
+        "head": "sha256:13bcad113bd9e38371e138b6380c811a70e259170da36f2ad543f064775d073d",
+        "allowlisted": []
+      },
+      "confinement": {
+        "base": "sha256:40739b3bc1754779c889a3dc62af2e9d14da57c7eba90403168bdafc403ce011",
+        "head": "sha256:40739b3bc1754779c889a3dc62af2e9d14da57c7eba90403168bdafc403ce011",
+        "allowlisted": []
+      },
+      "dispatchPlan": {
+        "base": "sha256:385a58611e3da16641cbda469fad847502496a53c23fad551af3163c2fdafcf3",
+        "head": "sha256:df5b4ab525b55e060ca81ef6028f0d768b12f371726859deac3840ccca090193",
+        "allowlisted": [
+          "purpose-through-bind",
+          "tool-purpose"
+        ]
+      },
+      "needsSoulPlan": {
+        "base": "sha256:b66b0f6ef66aa5a32dd4597136fbed2818ffbf79ef8cb0c7a90d63686ace812b",
+        "head": "sha256:8898da16f36a8b8efeb4a26c1a2cbb0938b1644e651d16b1824cf1f7134be648",
+        "allowlisted": [
+          "purpose-through-bind",
+          "tool-purpose"
+        ]
+      },
+      "legacyChecker": {
+        "base": "sha256:fea50d2924e45a64aa83475291f0753892e5e0ffb220c09eccd898da87d5c50a",
+        "head": "sha256:fea50d2924e45a64aa83475291f0753892e5e0ffb220c09eccd898da87d5c50a",
+        "allowlisted": []
+      },
+      "proposalRefusals": {
+        "base": "sha256:c7a4aee33a7c63177c389b3736137e149fc2ebd63ecfc0036e9886e70c964b7d",
+        "head": "sha256:c7a4aee33a7c63177c389b3736137e149fc2ebd63ecfc0036e9886e70c964b7d",
+        "allowlisted": []
+      },
+      "bind": {
+        "base": "sha256:cbf90dc946065217ae6cf10c5ccda808e5a288808e346e03d44cd488517eca27",
+        "head": "sha256:cbf90dc946065217ae6cf10c5ccda808e5a288808e346e03d44cd488517eca27",
+        "allowlisted": []
+      },
+      "operationCapability": {
+        "base": "sha256:90a17169215ee2a2f881247dc0e8c7f3e56e57857e8cb597b3808d6c39240f29",
+        "head": "sha256:90a17169215ee2a2f881247dc0e8c7f3e56e57857e8cb597b3808d6c39240f29",
+        "allowlisted": []
+      }
+    },
+    "m-nested": {
+      "seatConfigDigest": {
+        "base": "sha256:a299fc65760366693460babdb8cb493d413d1ce1face737020f8c2c54db9f13a",
+        "head": "sha256:a299fc65760366693460babdb8cb493d413d1ce1face737020f8c2c54db9f13a",
+        "allowlisted": []
+      },
+      "snapshotHash": {
+        "base": "sha256:60d9aed8e052dee0e3a9564bd735636878d70f7712ca439f9bdb0beb0a78c6a0",
+        "head": "sha256:60d9aed8e052dee0e3a9564bd735636878d70f7712ca439f9bdb0beb0a78c6a0",
+        "allowlisted": []
+      },
+      "validateShape": {
+        "base": "sha256:1025507233e81ac0885449d20670f5fa8f7bc3f383e28f9d1865f14ede4e9eb4",
+        "head": "sha256:1025507233e81ac0885449d20670f5fa8f7bc3f383e28f9d1865f14ede4e9eb4",
+        "allowlisted": []
+      },
+      "lint": {
+        "base": "sha256:d4dca91fe1ce2542674654d6f753233c7a502d207895e757ab227399dfd4f84b",
+        "head": "sha256:b6755aae0a2e5cf42878d63e8c5beba2bf17ad57b92e5ec805965ae530f6a216",
+        "allowlisted": [
+          "nested-config-not-read"
+        ]
+      },
+      "proposal": {
+        "base": "sha256:ae27179678e981a49af4859000d2c8971e72dd30e3ace62ac4324162df1cc5e6",
+        "head": "sha256:ae27179678e981a49af4859000d2c8971e72dd30e3ace62ac4324162df1cc5e6",
+        "allowlisted": []
+      },
+      "effectiveRigor": {
+        "base": "sha256:233af5d5858a9ab9980691bb9c5ddef830e55d75467ef5f0d25d236511835e63",
+        "head": "sha256:f0b2d49733becea6525597725b9633a041563e6193bb3b7348c25c97f5b8e12b",
+        "allowlisted": [
+          "nested-config-not-read"
+        ]
+      },
+      "checkerPlan": {
+        "base": "sha256:633d10a17d3af8fced255e32b94e2cdf288fe04828d6651e0119fc4d14179999",
+        "head": "sha256:5cf8518949eb58a48f752f6aae8c9405af2e5edc593984d5621f03f000957f10",
+        "allowlisted": [
+          "nested-config-not-read"
+        ]
+      },
+      "registeredCapability": {
+        "base": "sha256:2aa717b4b81271ebca99a3d6fb32178cafc8f4041759244e6e622fd7a8dfd1ce",
+        "head": "sha256:2aa717b4b81271ebca99a3d6fb32178cafc8f4041759244e6e622fd7a8dfd1ce",
+        "allowlisted": []
+      },
+      "verifyCommand": {
+        "base": "sha256:d046781f71fdb9bd361819ed78968f07cc17cb427ff324f54851d33f3b52d841",
+        "head": "sha256:d046781f71fdb9bd361819ed78968f07cc17cb427ff324f54851d33f3b52d841",
+        "allowlisted": []
+      },
+      "executorAndOverrides": {
+        "base": "sha256:738e0dc80f607b95d6cacad01423b34f623faf14a0118d6d0961f1ac7435bb8c",
+        "head": "sha256:738e0dc80f607b95d6cacad01423b34f623faf14a0118d6d0961f1ac7435bb8c",
+        "allowlisted": []
+      },
+      "purposeWithoutClis": {
+        "base": "sha256:738e0dc80f607b95d6cacad01423b34f623faf14a0118d6d0961f1ac7435bb8c",
+        "head": "sha256:738e0dc80f607b95d6cacad01423b34f623faf14a0118d6d0961f1ac7435bb8c",
+        "allowlisted": []
+      },
+      "capabilityDetailsExecutor": {
+        "base": "sha256:a7bab6404b0ee17b1d9c24bacd602efeb205834332a7f76fa9a1a98a439e690e",
+        "head": "sha256:a7bab6404b0ee17b1d9c24bacd602efeb205834332a7f76fa9a1a98a439e690e",
+        "allowlisted": []
+      },
+      "capabilityDetailsCandidate": {
+        "base": "sha256:9849ee30d844fffa973e50ceff6b2b6bdfc606a5547ea7e8b4fbaf46764eb221",
+        "head": "sha256:9849ee30d844fffa973e50ceff6b2b6bdfc606a5547ea7e8b4fbaf46764eb221",
+        "allowlisted": []
+      },
+      "confinement": {
+        "base": "sha256:2d4d451ed2b340d4e3a83df7a907500e212e5bb79d1b82dac2de3749aadb0a2b",
+        "head": "sha256:2d4d451ed2b340d4e3a83df7a907500e212e5bb79d1b82dac2de3749aadb0a2b",
+        "allowlisted": []
+      },
+      "dispatchPlan": {
+        "base": "sha256:05213f7b4d7b6125155efb0b1c829ea5cfe462f7bd7cf99bac27fdd3f49d4fef",
+        "head": "sha256:05213f7b4d7b6125155efb0b1c829ea5cfe462f7bd7cf99bac27fdd3f49d4fef",
+        "allowlisted": []
+      },
+      "needsSoulPlan": {
+        "base": "sha256:57518379912f5123795f2b3374bb6a4be8111e9659403f6db57f37a69d3a3575",
+        "head": "sha256:57518379912f5123795f2b3374bb6a4be8111e9659403f6db57f37a69d3a3575",
+        "allowlisted": []
+      },
+      "legacyChecker": {
+        "base": "sha256:fea50d2924e45a64aa83475291f0753892e5e0ffb220c09eccd898da87d5c50a",
+        "head": "sha256:fea50d2924e45a64aa83475291f0753892e5e0ffb220c09eccd898da87d5c50a",
+        "allowlisted": []
+      },
+      "proposalRefusals": {
+        "base": "sha256:2300d220f62056cb8cafcf9da59163d38e096a2f44619e0075a06eedb85942b1",
+        "head": "sha256:2300d220f62056cb8cafcf9da59163d38e096a2f44619e0075a06eedb85942b1",
+        "allowlisted": []
+      },
+      "bind": {
+        "base": "sha256:cbf90dc946065217ae6cf10c5ccda808e5a288808e346e03d44cd488517eca27",
+        "head": "sha256:eef873ec1d91cc3f8e3e66e7508a071a1741674a27f2f6ebfcbb0e0c8dea4d65",
+        "allowlisted": [
+          "nested-config-not-read"
+        ]
+      },
+      "operationCapability": {
+        "base": "sha256:c84079be35b3a89ca11676eb4b68e25ebd26e1d171015499f8c5b7c269a7af14",
+        "head": "sha256:c84079be35b3a89ca11676eb4b68e25ebd26e1d171015499f8c5b7c269a7af14",
+        "allowlisted": []
+      }
+    },
+    "m-both": {
+      "seatConfigDigest": {
+        "base": "sha256:1eacedca8d0d5b6dae71f56a3550be51431171be033bf7b1ddb78d5042e3743e",
+        "head": "sha256:1eacedca8d0d5b6dae71f56a3550be51431171be033bf7b1ddb78d5042e3743e",
+        "allowlisted": []
+      },
+      "snapshotHash": {
+        "base": "sha256:facfad884f93489d5a22717a9c92a09483d4f9c2820557e7c5e6a09a849b4ad1",
+        "head": "sha256:facfad884f93489d5a22717a9c92a09483d4f9c2820557e7c5e6a09a849b4ad1",
+        "allowlisted": []
+      },
+      "validateShape": {
+        "base": "sha256:1025507233e81ac0885449d20670f5fa8f7bc3f383e28f9d1865f14ede4e9eb4",
+        "head": "sha256:1025507233e81ac0885449d20670f5fa8f7bc3f383e28f9d1865f14ede4e9eb4",
+        "allowlisted": []
+      },
+      "lint": {
+        "base": "sha256:8902c9b2e064dad143c35655a3e4c67294358acb6cc3797e6b4c219f07af557d",
+        "head": "sha256:8902c9b2e064dad143c35655a3e4c67294358acb6cc3797e6b4c219f07af557d",
+        "allowlisted": []
+      },
+      "proposal": {
+        "base": "sha256:adc0373af37508e48fcbe7a15732ff22f96efdcd01886d1624dabbc752da35de",
+        "head": "sha256:adc0373af37508e48fcbe7a15732ff22f96efdcd01886d1624dabbc752da35de",
+        "allowlisted": []
+      },
+      "effectiveRigor": {
+        "base": "sha256:0f742b77dac7ec5118621dd7199a562b605d60d88b737c8b2d8abff9579d20fe",
+        "head": "sha256:0f742b77dac7ec5118621dd7199a562b605d60d88b737c8b2d8abff9579d20fe",
+        "allowlisted": []
+      },
+      "checkerPlan": {
+        "base": "sha256:b016d8f9550dce46ab4dd83c82b3dcd3375a1d07005c0eae36cea0ebdafdcc69",
+        "head": "sha256:b016d8f9550dce46ab4dd83c82b3dcd3375a1d07005c0eae36cea0ebdafdcc69",
+        "allowlisted": []
+      },
+      "registeredCapability": {
+        "base": "sha256:75365dd8503abfbd81a1728b1e712eede52078f3742cfcc87c61683d191b0ac8",
+        "head": "sha256:75365dd8503abfbd81a1728b1e712eede52078f3742cfcc87c61683d191b0ac8",
+        "allowlisted": []
+      },
+      "verifyCommand": {
+        "base": "sha256:670ae2a9a440822e01fd8303710c521eb151b00ff162cd2e830a9ec2b4ac146e",
+        "head": "sha256:670ae2a9a440822e01fd8303710c521eb151b00ff162cd2e830a9ec2b4ac146e",
+        "allowlisted": []
+      },
+      "executorAndOverrides": {
+        "base": "sha256:64c73da438a3648a2209db22bbc61b43fce5d4ab5e7beadb19aaa73861950f32",
+        "head": "sha256:64c73da438a3648a2209db22bbc61b43fce5d4ab5e7beadb19aaa73861950f32",
+        "allowlisted": []
+      },
+      "purposeWithoutClis": {
+        "base": "sha256:64c73da438a3648a2209db22bbc61b43fce5d4ab5e7beadb19aaa73861950f32",
+        "head": "sha256:64c73da438a3648a2209db22bbc61b43fce5d4ab5e7beadb19aaa73861950f32",
+        "allowlisted": []
+      },
+      "capabilityDetailsExecutor": {
+        "base": "sha256:f9ce3109f2ceb174c1215d4f89496329157b4c74f03b0121fce87ebbdb461937",
+        "head": "sha256:f9ce3109f2ceb174c1215d4f89496329157b4c74f03b0121fce87ebbdb461937",
+        "allowlisted": []
+      },
+      "capabilityDetailsCandidate": {
+        "base": "sha256:43dc102a3ec2c129a654c12fcf13a867732cabc976192ca2ed7e4226b23db6c8",
+        "head": "sha256:43dc102a3ec2c129a654c12fcf13a867732cabc976192ca2ed7e4226b23db6c8",
+        "allowlisted": []
+      },
+      "confinement": {
+        "base": "sha256:ff30ff530ca30d7a470224fa67cca015ab691839bd60eb84bf35a872540a48d2",
+        "head": "sha256:ff30ff530ca30d7a470224fa67cca015ab691839bd60eb84bf35a872540a48d2",
+        "allowlisted": []
+      },
+      "dispatchPlan": {
+        "base": "sha256:f74f211391d284d0f8f3302f271274ba34a4042c05b93255757934112a838a44",
+        "head": "sha256:f74f211391d284d0f8f3302f271274ba34a4042c05b93255757934112a838a44",
+        "allowlisted": []
+      },
+      "needsSoulPlan": {
+        "base": "sha256:215563ba3f7bc7d88df538e218e79b20943688038f205d21b502461c33709c37",
+        "head": "sha256:215563ba3f7bc7d88df538e218e79b20943688038f205d21b502461c33709c37",
+        "allowlisted": []
+      },
+      "legacyChecker": {
+        "base": "sha256:d3d4a5e573da9705de132e4dacfef7b9fb3775ddde77aca1028e41f74c8ec39a",
+        "head": "sha256:d3d4a5e573da9705de132e4dacfef7b9fb3775ddde77aca1028e41f74c8ec39a",
+        "allowlisted": []
+      },
+      "proposalRefusals": {
+        "base": "sha256:66b13f13261e9bf6fd892ae0660d1e3859b2fce2facb21598a4cac96eb979878",
+        "head": "sha256:66b13f13261e9bf6fd892ae0660d1e3859b2fce2facb21598a4cac96eb979878",
+        "allowlisted": []
+      },
+      "bind": {
+        "base": "sha256:157a9a623d0c7916c0b1bff649f22943edc1f3563f46481827be48d31fdd9a9b",
+        "head": "sha256:157a9a623d0c7916c0b1bff649f22943edc1f3563f46481827be48d31fdd9a9b",
+        "allowlisted": []
+      },
+      "operationCapability": {
+        "base": "sha256:167c2f63677c2f787fc33bbbbcf4e76fcf5ed8825fa1bf789307610ce4b2fb57",
+        "head": "sha256:167c2f63677c2f787fc33bbbbcf4e76fcf5ed8825fa1bf789307610ce4b2fb57",
+        "allowlisted": []
+      }
+    },
+    "m-persona-minc": {
+      "seatConfigDigest": {
+        "base": "sha256:deb84aaaf16af299c782a5fe80981c0ed998e673e58c7ecc514f78196aebb8de",
+        "head": "sha256:deb84aaaf16af299c782a5fe80981c0ed998e673e58c7ecc514f78196aebb8de",
+        "allowlisted": []
+      },
+      "snapshotHash": {
+        "base": "sha256:dcc0bd4040fb18b7672cb548c93cbc5ce0c4855679c51aefee72cc62634d309c",
+        "head": "sha256:dcc0bd4040fb18b7672cb548c93cbc5ce0c4855679c51aefee72cc62634d309c",
+        "allowlisted": []
+      },
+      "validateShape": {
+        "base": "sha256:1025507233e81ac0885449d20670f5fa8f7bc3f383e28f9d1865f14ede4e9eb4",
+        "head": "sha256:1025507233e81ac0885449d20670f5fa8f7bc3f383e28f9d1865f14ede4e9eb4",
+        "allowlisted": []
+      },
+      "lint": {
+        "base": "sha256:25e90733c81a805c8c1198b12a7f5a285c27afd3909b40beca9db2cdaa269f0f",
+        "head": "sha256:25e90733c81a805c8c1198b12a7f5a285c27afd3909b40beca9db2cdaa269f0f",
+        "allowlisted": []
+      },
+      "proposal": {
+        "base": "sha256:adc0373af37508e48fcbe7a15732ff22f96efdcd01886d1624dabbc752da35de",
+        "head": "sha256:adc0373af37508e48fcbe7a15732ff22f96efdcd01886d1624dabbc752da35de",
+        "allowlisted": []
+      },
+      "effectiveRigor": {
+        "base": "sha256:26b89a7937b3721bdd4593260596eba57356adb4b101b823a79a6b74e3939e88",
+        "head": "sha256:26b89a7937b3721bdd4593260596eba57356adb4b101b823a79a6b74e3939e88",
+        "allowlisted": []
+      },
+      "checkerPlan": {
+        "base": "sha256:c9cd2018507e7074a86f3d2b6cec3ee19bb5b175f946ad32a1bc0e96f9c5564e",
+        "head": "sha256:c9cd2018507e7074a86f3d2b6cec3ee19bb5b175f946ad32a1bc0e96f9c5564e",
+        "allowlisted": []
+      },
+      "registeredCapability": {
+        "base": "sha256:2454316c0df2a759995a0be992b13af4c34ea5cf604c125e12bd0a87f9370540",
+        "head": "sha256:2454316c0df2a759995a0be992b13af4c34ea5cf604c125e12bd0a87f9370540",
+        "allowlisted": []
+      },
+      "verifyCommand": {
+        "base": "sha256:f4f04234ac6793363f57a32574d330cdcb5ee4689f811c9f408579cb1d1c24bb",
+        "head": "sha256:f4f04234ac6793363f57a32574d330cdcb5ee4689f811c9f408579cb1d1c24bb",
+        "allowlisted": []
+      },
+      "executorAndOverrides": {
+        "base": "sha256:246e2cf2264dccdcf251c79703f3e87d4e7deccadf4483439edc8118779b3d6d",
+        "head": "sha256:fbcb2946c538cd42e93c4023f854f5aa49dea7e6836080f578e2c8ac25f554a9",
+        "allowlisted": [
+          "purpose-through-bind",
+          "tool-purpose"
+        ]
+      },
+      "purposeWithoutClis": {
+        "base": "sha256:246e2cf2264dccdcf251c79703f3e87d4e7deccadf4483439edc8118779b3d6d",
+        "head": "sha256:e5ba066281b8ee8f52cb6f0ec72202dcfc2398819c99050497f79540f3bd26a9",
+        "allowlisted": [
+          "purpose-through-bind",
+          "tool-purpose"
+        ]
+      },
+      "capabilityDetailsExecutor": {
+        "base": "sha256:8c9e55450b1f54d86fc8174ec1f97332b3cc9f887713989153cbc2f390819453",
+        "head": "sha256:8c9e55450b1f54d86fc8174ec1f97332b3cc9f887713989153cbc2f390819453",
+        "allowlisted": []
+      },
+      "capabilityDetailsCandidate": {
+        "base": "sha256:afdd3f26f7316c03b1db7c83b1d281bdbe8ec467617e095160edc00ecb503267",
+        "head": "sha256:afdd3f26f7316c03b1db7c83b1d281bdbe8ec467617e095160edc00ecb503267",
+        "allowlisted": []
+      },
+      "confinement": {
+        "base": "sha256:f82a70836564fde03a187df26e55301d1b8f6d28600d5431a8ca27b1cc5a5a93",
+        "head": "sha256:f82a70836564fde03a187df26e55301d1b8f6d28600d5431a8ca27b1cc5a5a93",
+        "allowlisted": []
+      },
+      "dispatchPlan": {
+        "base": "sha256:d7f002a77e78203c1b507baddff67201d5764ece387af59338285e7c565870a7",
+        "head": "sha256:a28cf59b2480e71b7d6908a6e1269d7ea91b7cf76462c1082a8fe7c525b1ceee",
+        "allowlisted": [
+          "purpose-through-bind",
+          "tool-purpose"
+        ]
+      },
+      "needsSoulPlan": {
+        "base": "sha256:cdbcc0c1bbf64a28e4ff5a13b5c0e03c6048acbb7f54c0d1e680822ce4b00c30",
+        "head": "sha256:2cfa296c8d675907b36a119778af8dcffab542f383489e1caeb6556e88d80157",
+        "allowlisted": [
+          "purpose-through-bind",
+          "tool-purpose"
+        ]
+      },
+      "legacyChecker": {
+        "base": "sha256:8f5426424b47d058621a1ddeb44e4065d707c60d887a2c638126d43c17e379af",
+        "head": "sha256:8f5426424b47d058621a1ddeb44e4065d707c60d887a2c638126d43c17e379af",
+        "allowlisted": []
+      },
+      "proposalRefusals": {
+        "base": "sha256:62ea8e16dcc08bb51bc631e55712bc25b8552b8bd32c634f6fb27be064cfe080",
+        "head": "sha256:62ea8e16dcc08bb51bc631e55712bc25b8552b8bd32c634f6fb27be064cfe080",
+        "allowlisted": []
+      },
+      "bind": {
+        "base": "sha256:3342f3ef2d6b100415191cf16ebbae26965d677fd6f1168535e93fc4731c7c6e",
+        "head": "sha256:3342f3ef2d6b100415191cf16ebbae26965d677fd6f1168535e93fc4731c7c6e",
+        "allowlisted": []
+      },
+      "operationCapability": {
+        "base": "sha256:cf9237e8b74a9a501b7105ee8f8347f9933f8eac0458c23e8f2e8d4318100b55",
+        "head": "sha256:cf9237e8b74a9a501b7105ee8f8347f9933f8eac0458c23e8f2e8d4318100b55",
+        "allowlisted": []
+      }
+    },
+    "m-prefer": {
+      "seatConfigDigest": {
+        "base": "sha256:053b0ead6b9a0fbf0a077979eb44c730605ce6a77aaf37575a514c30bbe98e78",
+        "head": "sha256:053b0ead6b9a0fbf0a077979eb44c730605ce6a77aaf37575a514c30bbe98e78",
+        "allowlisted": []
+      },
+      "snapshotHash": {
+        "base": "sha256:fc97e8398f994c3279520b322a2a4953ef8787e1030096d97c9e1c9ec2c30273",
+        "head": "sha256:fc97e8398f994c3279520b322a2a4953ef8787e1030096d97c9e1c9ec2c30273",
+        "allowlisted": []
+      },
+      "validateShape": {
+        "base": "sha256:1025507233e81ac0885449d20670f5fa8f7bc3f383e28f9d1865f14ede4e9eb4",
+        "head": "sha256:1025507233e81ac0885449d20670f5fa8f7bc3f383e28f9d1865f14ede4e9eb4",
+        "allowlisted": []
+      },
+      "lint": {
+        "base": "sha256:1da74cc12194c5194cab2e8f85a904d5aabb4a8133f2eaa8d4acfbdf30c9f80f",
+        "head": "sha256:1da74cc12194c5194cab2e8f85a904d5aabb4a8133f2eaa8d4acfbdf30c9f80f",
+        "allowlisted": []
+      },
+      "proposal": {
+        "base": "sha256:adc0373af37508e48fcbe7a15732ff22f96efdcd01886d1624dabbc752da35de",
+        "head": "sha256:adc0373af37508e48fcbe7a15732ff22f96efdcd01886d1624dabbc752da35de",
+        "allowlisted": []
+      },
+      "effectiveRigor": {
+        "base": "sha256:b5c6cb22f13b358a3b1f0d3d9aababbb78e65d2ad3d630b0c2f66ff444acddba",
+        "head": "sha256:b5c6cb22f13b358a3b1f0d3d9aababbb78e65d2ad3d630b0c2f66ff444acddba",
+        "allowlisted": []
+      },
+      "checkerPlan": {
+        "base": "sha256:a37b4b1e55ad557e9847a98101c97e37fe605f62099d5b82384e1cc3374f5b1c",
+        "head": "sha256:a37b4b1e55ad557e9847a98101c97e37fe605f62099d5b82384e1cc3374f5b1c",
+        "allowlisted": []
+      },
+      "registeredCapability": {
+        "base": "sha256:b77752272ff3cc427633e73cd478d74e8042ac9df86c7fc99181fad36d2bba87",
+        "head": "sha256:b77752272ff3cc427633e73cd478d74e8042ac9df86c7fc99181fad36d2bba87",
+        "allowlisted": []
+      },
+      "verifyCommand": {
+        "base": "sha256:c0be4a465750ad0b9f01012657456e755201c9c8c3971970c3f9cc73ab52c497",
+        "head": "sha256:c0be4a465750ad0b9f01012657456e755201c9c8c3971970c3f9cc73ab52c497",
+        "allowlisted": []
+      },
+      "executorAndOverrides": {
+        "base": "sha256:26dc7dfb8836b41948fd1194bf1b926e4271208810211ea3d01758de18c3cc47",
+        "head": "sha256:f3f549ade7177c7c670b50f8fd597c7eb9ca2b47ccfefb85579df17faf4d6420",
+        "allowlisted": [
+          "purpose-through-bind",
+          "tool-purpose"
+        ]
+      },
+      "purposeWithoutClis": {
+        "base": "sha256:26dc7dfb8836b41948fd1194bf1b926e4271208810211ea3d01758de18c3cc47",
+        "head": "sha256:044dda61d2835bdc23a561ba225eb68908f822ca4263d397183cfbf99ccb8207",
+        "allowlisted": [
+          "purpose-through-bind",
+          "tool-purpose"
+        ]
+      },
+      "capabilityDetailsExecutor": {
+        "base": "sha256:2f4d5f6b19bc0512c0fcc9ce0b8c7ae4275778ddb89d11acc95fa5bd726e0269",
+        "head": "sha256:4b8506de9faf9ed6cfde018da7c90d6f02b173594d9098f77d73a6b69c9874ea",
+        "allowlisted": [
+          "string-prefer-reverse-match"
+        ]
+      },
+      "capabilityDetailsCandidate": {
+        "base": "sha256:b0b28c661be9941922ef8bf5a107f39495488eb6ccd502bdf3febbd4e62e4545",
+        "head": "sha256:b0b28c661be9941922ef8bf5a107f39495488eb6ccd502bdf3febbd4e62e4545",
+        "allowlisted": []
+      },
+      "confinement": {
+        "base": "sha256:4176c6f00d8d05e1a571280bc6212b42f6e4eff5e5d069cd3efa3a984ee1b9bf",
+        "head": "sha256:4176c6f00d8d05e1a571280bc6212b42f6e4eff5e5d069cd3efa3a984ee1b9bf",
+        "allowlisted": []
+      },
+      "dispatchPlan": {
+        "base": "sha256:bb6b304dd6e62587c6ea7edd7a31e6760d6f8f43454d932050d53778a1055fd3",
+        "head": "sha256:41c62228dcacfe75f934c6d76b0ceb3ce8d0d362b3704e3b8f30ff7a7978e63a",
+        "allowlisted": [
+          "purpose-through-bind",
+          "tool-purpose"
+        ]
+      },
+      "needsSoulPlan": {
+        "base": "sha256:bade073cba38361cfea0886f53c093cc6cf78d58c28151117158ba904f3700de",
+        "head": "sha256:7bea7cb8f385d1ca9d544699720cbd137148e2fbdf4850596928abe57a7245bf",
+        "allowlisted": [
+          "purpose-through-bind",
+          "tool-purpose"
+        ]
+      },
+      "legacyChecker": {
+        "base": "sha256:9f7532322ad12d8f79d05ffed62cf5be3f0f1b28359985e814bc5b6275f06b90",
+        "head": "sha256:9f7532322ad12d8f79d05ffed62cf5be3f0f1b28359985e814bc5b6275f06b90",
+        "allowlisted": []
+      },
+      "proposalRefusals": {
+        "base": "sha256:318ac5a20a921022d7a1328dc6fdddbcd7fb0e33894c386ac5ca10f1da991047",
+        "head": "sha256:318ac5a20a921022d7a1328dc6fdddbcd7fb0e33894c386ac5ca10f1da991047",
+        "allowlisted": []
+      },
+      "bind": {
+        "base": "sha256:19384a23c94fb1a1557b21ec953298c2e4406de9c4aad93b356e4bd1260cd3fc",
+        "head": "sha256:19384a23c94fb1a1557b21ec953298c2e4406de9c4aad93b356e4bd1260cd3fc",
+        "allowlisted": []
+      },
+      "operationCapability": {
+        "base": "sha256:f20342c585bae95cd05d1f6b8a71ad140a00ba9ba72e5dab26b4a84c8c5570a4",
+        "head": "sha256:f20342c585bae95cd05d1f6b8a71ad140a00ba9ba72e5dab26b4a84c8c5570a4",
+        "allowlisted": []
+      }
+    },
+    "m-prefer-blank": {
+      "seatConfigDigest": {
+        "base": "sha256:99aca266dcfca99117f0bde66df32479f67505a1b7044dc4a21dbc0433b9e2c3",
+        "head": "sha256:99aca266dcfca99117f0bde66df32479f67505a1b7044dc4a21dbc0433b9e2c3",
+        "allowlisted": []
+      },
+      "snapshotHash": {
+        "base": "sha256:0575afbe0424753c223cd6d389c0d48601f9c1f80a940357dfd432fab0a11eff",
+        "head": "sha256:0575afbe0424753c223cd6d389c0d48601f9c1f80a940357dfd432fab0a11eff",
+        "allowlisted": []
+      },
+      "validateShape": {
+        "base": "sha256:14d20b98c994c36276a505147390deea24e387cfc8871a234fda156f64d2792e",
+        "head": "sha256:14d20b98c994c36276a505147390deea24e387cfc8871a234fda156f64d2792e",
+        "allowlisted": []
+      },
+      "lint": {
+        "base": "sha256:d02f5d90d2b5ce85f34b0dbe2dae6182097b761f6fdf6b0383368458707e5766",
+        "head": "sha256:d02f5d90d2b5ce85f34b0dbe2dae6182097b761f6fdf6b0383368458707e5766",
+        "allowlisted": []
+      },
+      "proposal": {
+        "base": "sha256:adc0373af37508e48fcbe7a15732ff22f96efdcd01886d1624dabbc752da35de",
+        "head": "sha256:adc0373af37508e48fcbe7a15732ff22f96efdcd01886d1624dabbc752da35de",
+        "allowlisted": []
+      },
+      "effectiveRigor": {
+        "base": "sha256:5469b69569cdee07f657a8ec307da6cf0311a884a39bd9fc4acf8617f75609d4",
+        "head": "sha256:5469b69569cdee07f657a8ec307da6cf0311a884a39bd9fc4acf8617f75609d4",
+        "allowlisted": []
+      },
+      "checkerPlan": {
+        "base": "sha256:ccc3500379fe8c3db85a4808ca1dfcb393903333d0a7156474b132dc3624767c",
+        "head": "sha256:ccc3500379fe8c3db85a4808ca1dfcb393903333d0a7156474b132dc3624767c",
+        "allowlisted": []
+      },
+      "registeredCapability": {
+        "base": "sha256:434b73f4a94a9caf56b02947ebb4a0afaf92a9d9daa1c12fcbaaf0b5a13e7abc",
+        "head": "sha256:434b73f4a94a9caf56b02947ebb4a0afaf92a9d9daa1c12fcbaaf0b5a13e7abc",
+        "allowlisted": []
+      },
+      "verifyCommand": {
+        "base": "sha256:99a38fd9d81b62d27724ff0bdff36c60eb2d6a13919f0b4b723958632b20dec6",
+        "head": "sha256:99a38fd9d81b62d27724ff0bdff36c60eb2d6a13919f0b4b723958632b20dec6",
+        "allowlisted": []
+      },
+      "executorAndOverrides": {
+        "base": "sha256:b1fc0ebdc58378f6e8209e69288a1165e4c72b0a90437b47b389600391e36077",
+        "head": "sha256:412583a642f7f1172afe5a47296ebbce40c2bd5724b752529bda15b5871bffcc",
+        "allowlisted": [
+          "blank-prefer-is-no-pool",
+          "purpose-through-bind",
+          "tool-purpose"
+        ]
+      },
+      "purposeWithoutClis": {
+        "base": "sha256:b1fc0ebdc58378f6e8209e69288a1165e4c72b0a90437b47b389600391e36077",
+        "head": "sha256:b95585ca83847d345e260bc61d78053c1b7fa70d13b4f3c7465281d9b14170ed",
+        "allowlisted": [
+          "blank-prefer-is-no-pool",
+          "purpose-through-bind",
+          "tool-purpose"
+        ]
+      },
+      "capabilityDetailsExecutor": {
+        "base": "sha256:d549e72cc5d73ba77e4b88f93741596fb2a6aca04741f476fcd6453bfd2885ed",
+        "head": "sha256:2f2e23bef78150d0bcb65e06886bd642bbe044c76cdfeb156533eb9b00bb704e",
+        "allowlisted": [
+          "string-prefer-reverse-match"
+        ]
+      },
+      "capabilityDetailsCandidate": {
+        "base": "sha256:e02084887e8ec8deee8d22c1cfa73b5f3310e1cf7328c956ef62bc693226d498",
+        "head": "sha256:e02084887e8ec8deee8d22c1cfa73b5f3310e1cf7328c956ef62bc693226d498",
+        "allowlisted": []
+      },
+      "confinement": {
+        "base": "sha256:afd0410eca38c43d73325556f4336da7f292d9b236f924cb85f1a043da6a0ae3",
+        "head": "sha256:afd0410eca38c43d73325556f4336da7f292d9b236f924cb85f1a043da6a0ae3",
+        "allowlisted": []
+      },
+      "dispatchPlan": {
+        "base": "sha256:d35e0cb02abf5d9ea97fdf799f86c3929278353f164e5cf968375c58e2268864",
+        "head": "sha256:9991a6649c781dd3985b0c8da7290b41e7cfd0a3998d235eaf15146693e65aa6",
+        "allowlisted": [
+          "blank-prefer-is-no-pool",
+          "purpose-through-bind",
+          "tool-purpose"
+        ]
+      },
+      "needsSoulPlan": {
+        "base": "sha256:73adf9b4037390114188a709f72702a4c95d9922ea6dab1487270e3c9990dbd8",
+        "head": "sha256:1ab136208ac7c422c631d7b3d774b5fa260aae80327fc0f268477d62edc197ba",
+        "allowlisted": [
+          "blank-prefer-is-no-pool",
+          "purpose-through-bind",
+          "tool-purpose"
+        ]
+      },
+      "legacyChecker": {
+        "base": "sha256:d906dc048ad08fbfdcd6c54a029c6c7fb971ab30353eee14800bcd2f6a53337d",
+        "head": "sha256:d906dc048ad08fbfdcd6c54a029c6c7fb971ab30353eee14800bcd2f6a53337d",
+        "allowlisted": []
+      },
+      "proposalRefusals": {
+        "base": "sha256:155c538f8ece05dbc487155270b477fa20ae6211367c49a4d2e0837e50309a99",
+        "head": "sha256:155c538f8ece05dbc487155270b477fa20ae6211367c49a4d2e0837e50309a99",
+        "allowlisted": []
+      },
+      "bind": {
+        "base": "sha256:22adfb1b810513d7b0e032885880128746494fb6542c1bda7a2f4fae1ae91b00",
+        "head": "sha256:22adfb1b810513d7b0e032885880128746494fb6542c1bda7a2f4fae1ae91b00",
+        "allowlisted": []
+      },
+      "operationCapability": {
+        "base": "sha256:f20342c585bae95cd05d1f6b8a71ad140a00ba9ba72e5dab26b4a84c8c5570a4",
+        "head": "sha256:f20342c585bae95cd05d1f6b8a71ad140a00ba9ba72e5dab26b4a84c8c5570a4",
+        "allowlisted": []
+      }
+    },
+    "m-entries": {
+      "seatConfigDigest": {
+        "base": "sha256:46a6ac56d212d29c8cc3266e5deb0e4513236c5c80f23e98e739e7108274e324",
+        "head": "sha256:46a6ac56d212d29c8cc3266e5deb0e4513236c5c80f23e98e739e7108274e324",
+        "allowlisted": []
+      },
+      "snapshotHash": {
+        "base": "sha256:48df7308f8ad8bc69fbe62ad0e69c50edbf1aadaf9cb328791c6358faa70cb85",
+        "head": "sha256:48df7308f8ad8bc69fbe62ad0e69c50edbf1aadaf9cb328791c6358faa70cb85",
+        "allowlisted": []
+      },
+      "validateShape": {
+        "base": "sha256:ba0a5b0d0229147d5cf9c33a9517959e1548a42649ea882a1ef11f9d41145d20",
+        "head": "sha256:1025507233e81ac0885449d20670f5fa8f7bc3f383e28f9d1865f14ede4e9eb4",
+        "allowlisted": [
+          "non-object-entry"
+        ]
+      },
+      "lint": {
+        "base": "sha256:e252af73bf0c27a0e734409a69ef493bf098e0dfea5ffcd0b5a93cc0ac0d428c",
+        "head": "sha256:3bec5852105249bc03a23e37a8ce951516a40224a6945feebb045f2b5b35d637",
+        "allowlisted": [
+          "non-object-entry"
+        ]
+      },
+      "proposal": {
+        "base": "sha256:adc0373af37508e48fcbe7a15732ff22f96efdcd01886d1624dabbc752da35de",
+        "head": "sha256:adc0373af37508e48fcbe7a15732ff22f96efdcd01886d1624dabbc752da35de",
+        "allowlisted": []
+      },
+      "effectiveRigor": {
+        "base": "sha256:d68e854e205535ed71ce4388f6563520a6c855f71320f4b8f44d32a16915e7f3",
+        "head": "sha256:d68e854e205535ed71ce4388f6563520a6c855f71320f4b8f44d32a16915e7f3",
+        "allowlisted": []
+      },
+      "checkerPlan": {
+        "base": "sha256:d18e2daf5322edf0b29b04d2d9146b27fd618cd4b735aff5d45c47099d3c7a5e",
+        "head": "sha256:d18e2daf5322edf0b29b04d2d9146b27fd618cd4b735aff5d45c47099d3c7a5e",
+        "allowlisted": []
+      },
+      "registeredCapability": {
+        "base": "sha256:6b2c0e10020b7d554983b97145a9a76641dd3b9548f476f380fbbf4f62b4a90d",
+        "head": "sha256:8a4bf82d5076361b2a88cebd1b9eb316c5bf4e6e412d32d129c915f0169bfdb2",
+        "allowlisted": [
+          "non-object-entry"
+        ]
+      },
+      "verifyCommand": {
+        "base": "sha256:547f21afd431c58a631b29a0152749ecc7426fa7a246353da7e2656ba4185106",
+        "head": "sha256:547f21afd431c58a631b29a0152749ecc7426fa7a246353da7e2656ba4185106",
+        "allowlisted": []
+      },
+      "executorAndOverrides": {
+        "base": "sha256:92c46a454d6f9528fb3b2b0bb7e8b68cc0b3ee671528efb03f638fd7b7edcb48",
+        "head": "sha256:4c9e3ba1477539741b768f0322787176677b29fbdc58b6a457b8e7fe2f70de6d",
+        "allowlisted": [
+          "purpose-through-bind",
+          "tool-purpose"
+        ]
+      },
+      "purposeWithoutClis": {
+        "base": "sha256:92c46a454d6f9528fb3b2b0bb7e8b68cc0b3ee671528efb03f638fd7b7edcb48",
+        "head": "sha256:9df265d489db5b151738454bfe86ebc12ac153c80d5fbaa7ec2c4bd16353acc2",
+        "allowlisted": [
+          "purpose-through-bind",
+          "tool-purpose"
+        ]
+      },
+      "capabilityDetailsExecutor": {
+        "base": "sha256:0915dce8af406b5a81e3ea041fd6c8554045705dc074c67b610ca15d530c29dd",
+        "head": "sha256:0915dce8af406b5a81e3ea041fd6c8554045705dc074c67b610ca15d530c29dd",
+        "allowlisted": []
+      },
+      "capabilityDetailsCandidate": {
+        "base": "sha256:41a8d8d89ea874b00c9edf90b578973b6e747931eb87d7f700b7a717b6855c04",
+        "head": "sha256:41a8d8d89ea874b00c9edf90b578973b6e747931eb87d7f700b7a717b6855c04",
+        "allowlisted": []
+      },
+      "confinement": {
+        "base": "sha256:6fec772bb2c4e0fe5eb078918cb4d49d2462637414e4bf5d6b2fb2c84f19725f",
+        "head": "sha256:6fec772bb2c4e0fe5eb078918cb4d49d2462637414e4bf5d6b2fb2c84f19725f",
+        "allowlisted": []
+      },
+      "dispatchPlan": {
+        "base": "sha256:433cc89333c3c386aa3e445a28d79417fc275bf1c6cab61263f84c468cf22a6a",
+        "head": "sha256:81a835750684bf609b7d4e881580adb64ecad52c505fb1e5eb8023069d15216f",
+        "allowlisted": [
+          "non-object-entry"
+        ]
+      },
+      "needsSoulPlan": {
+        "base": "sha256:3a5346e98c7784eccb46fb1bcaa67bd7f8195d217d66d5f9db090f906bbb55c6",
+        "head": "sha256:3ffaf0fa0c2d6a1d1b6cf4d24eef8eea70f23516ed4318bb9b7a9f1886966a6c",
+        "allowlisted": [
+          "purpose-through-bind",
+          "tool-purpose"
+        ]
+      },
+      "legacyChecker": {
+        "base": "sha256:8bdfde8a1b3d88737d8b724d370c380a24fbf6c98831ac2b47967f5fa7ac1dff",
+        "head": "sha256:8bdfde8a1b3d88737d8b724d370c380a24fbf6c98831ac2b47967f5fa7ac1dff",
+        "allowlisted": []
+      },
+      "proposalRefusals": {
+        "base": "sha256:1867eebec3da91c4a7dd5970857e0a03dc6ee007d9a8925c525925ffa78820dd",
+        "head": "sha256:9c67dd8106d53c6cd0b66e6f1fee7bef13e5a70d4a6df965b74cb4fc1f46fce5",
+        "allowlisted": [
+          "non-object-entry"
+        ]
+      },
+      "bind": {
+        "base": "sha256:f9b48b683ae2be8dff19c0b9be5ba00e7496cb222d3864c7332faa0385b4b0e3",
+        "head": "sha256:f9b48b683ae2be8dff19c0b9be5ba00e7496cb222d3864c7332faa0385b4b0e3",
+        "allowlisted": []
+      },
+      "operationCapability": {
+        "base": "sha256:0df7f7786e3d8789603a630c5c7320fce543a15b9f18bfadae82e033747b9219",
+        "head": "sha256:8c8e20e46fb915c2ab03912f0248a6aa7d9d2b3091d3e7ba3ba1002340f53f47",
+        "allowlisted": [
+          "non-object-entry"
+        ]
+      }
+    },
+    "m-aliases": {
+      "seatConfigDigest": {
+        "base": "sha256:dab8bd1d934c8cde7648cdd0009c50faccf54e901a1c79d3d93100e8560511ba",
+        "head": "sha256:dab8bd1d934c8cde7648cdd0009c50faccf54e901a1c79d3d93100e8560511ba",
+        "allowlisted": []
+      },
+      "snapshotHash": {
+        "base": "sha256:5242d243cf52800d1aa3a9dc2fc63d0cabb6c6716016868f01668cb57bda85f9",
+        "head": "sha256:5242d243cf52800d1aa3a9dc2fc63d0cabb6c6716016868f01668cb57bda85f9",
+        "allowlisted": []
+      },
+      "validateShape": {
+        "base": "sha256:1025507233e81ac0885449d20670f5fa8f7bc3f383e28f9d1865f14ede4e9eb4",
+        "head": "sha256:1025507233e81ac0885449d20670f5fa8f7bc3f383e28f9d1865f14ede4e9eb4",
+        "allowlisted": []
+      },
+      "lint": {
+        "base": "sha256:4f48ecd6b8f6136a7532d2bb6a7b3d5690b2887aa39d234f8d9f3b17d9657142",
+        "head": "sha256:4f48ecd6b8f6136a7532d2bb6a7b3d5690b2887aa39d234f8d9f3b17d9657142",
+        "allowlisted": []
+      },
+      "proposal": {
+        "base": "sha256:adc0373af37508e48fcbe7a15732ff22f96efdcd01886d1624dabbc752da35de",
+        "head": "sha256:adc0373af37508e48fcbe7a15732ff22f96efdcd01886d1624dabbc752da35de",
+        "allowlisted": []
+      },
+      "effectiveRigor": {
+        "base": "sha256:a33bc2f7ad05c8362cdce1a9d4ea33f6af33a8977bb9f7a4e828aab301de4830",
+        "head": "sha256:a33bc2f7ad05c8362cdce1a9d4ea33f6af33a8977bb9f7a4e828aab301de4830",
+        "allowlisted": []
+      },
+      "checkerPlan": {
+        "base": "sha256:de38a049370fa21a1acfa916034a1ea9dfdff71a26e1b071c3ef596b782724fc",
+        "head": "sha256:de38a049370fa21a1acfa916034a1ea9dfdff71a26e1b071c3ef596b782724fc",
+        "allowlisted": []
+      },
+      "registeredCapability": {
+        "base": "sha256:76ddf2674334fe9099a846f3fe16c4b04e018881b90bacfaa8c9ea979f85ef34",
+        "head": "sha256:6df64c3913f887c1029da93588810c13f9aa81264e4f1dd337781feede45169c",
+        "allowlisted": [
+          "string-aliases"
+        ]
+      },
+      "verifyCommand": {
+        "base": "sha256:cae29124bce8f8ae19b564ca5054362a60c776f32b4b565cffc24a16ddee32c9",
+        "head": "sha256:cae29124bce8f8ae19b564ca5054362a60c776f32b4b565cffc24a16ddee32c9",
+        "allowlisted": []
+      },
+      "executorAndOverrides": {
+        "base": "sha256:1f95681fa586cb4353669ec80c5e26f5dffc4835bc4836152000df9592350ebb",
+        "head": "sha256:94c835f2f89414f80618a4d0512543e3629da0cea5f6a9181b5d3de39180dac3",
+        "allowlisted": [
+          "purpose-through-bind",
+          "tool-purpose"
+        ]
+      },
+      "purposeWithoutClis": {
+        "base": "sha256:1f95681fa586cb4353669ec80c5e26f5dffc4835bc4836152000df9592350ebb",
+        "head": "sha256:8e36e208768441834ec6aa490fe18d7ba94448bf89d455a47ecc368465226659",
+        "allowlisted": [
+          "purpose-through-bind",
+          "tool-purpose"
+        ]
+      },
+      "capabilityDetailsExecutor": {
+        "base": "sha256:60d6080ae7a2df530d976a131e3052ac46c6174f851437996bb3e01bd9c6df11",
+        "head": "sha256:60d6080ae7a2df530d976a131e3052ac46c6174f851437996bb3e01bd9c6df11",
+        "allowlisted": []
+      },
+      "capabilityDetailsCandidate": {
+        "base": "sha256:00f0001570fd7cb0f52642814fdb9872e0c44e776bb311a86ed920b8f7f39eb0",
+        "head": "sha256:00f0001570fd7cb0f52642814fdb9872e0c44e776bb311a86ed920b8f7f39eb0",
+        "allowlisted": []
+      },
+      "confinement": {
+        "base": "sha256:fce10cc8c30194974315c7ef531100dc79ea1207bf75ce194fc6312212ffb869",
+        "head": "sha256:fce10cc8c30194974315c7ef531100dc79ea1207bf75ce194fc6312212ffb869",
+        "allowlisted": []
+      },
+      "dispatchPlan": {
+        "base": "sha256:12a0e8cc41869d6a66bfafe42d0da691b67f7e66e9e8935f7ad56526a109b311",
+        "head": "sha256:ab4042a0907062edc277434412f107481408865a3a615448180599eda5757863",
+        "allowlisted": [
+          "purpose-through-bind",
+          "tool-purpose"
+        ]
+      },
+      "needsSoulPlan": {
+        "base": "sha256:d1e6c80708393a2a1eec36c3d65be3cd42668e523b099137aed719005e7f038d",
+        "head": "sha256:d038e3b7daed81f527a99bc93957faa9310ba74585331cfee09e7ef78ae3ab2c",
+        "allowlisted": [
+          "purpose-through-bind",
+          "tool-purpose"
+        ]
+      },
+      "legacyChecker": {
+        "base": "sha256:2c79faa3a7bd43ee32e77289171c58682053f4be794ef2c52d7f2a9a666283b2",
+        "head": "sha256:2c79faa3a7bd43ee32e77289171c58682053f4be794ef2c52d7f2a9a666283b2",
+        "allowlisted": []
+      },
+      "proposalRefusals": {
+        "base": "sha256:ebdbfa7bd2c568105a9cc2449c1c7ed8c0ef7a749446299d2bc567536ab146b2",
+        "head": "sha256:1d58873fad126c94b4e5b448d2c46c3e46d8c20fd58b5a573632799002cd4b6b",
+        "allowlisted": [
+          "string-aliases"
+        ]
+      },
+      "bind": {
+        "base": "sha256:0baba8a21305fb8003f6455243047708bef1e3943822e3eee59343a1dfd1bc62",
+        "head": "sha256:0baba8a21305fb8003f6455243047708bef1e3943822e3eee59343a1dfd1bc62",
+        "allowlisted": []
+      },
+      "operationCapability": {
+        "base": "sha256:9b0354efa3142452568f39463fe353876856d04b0ca4c0eb3757f50e3d511615",
+        "head": "sha256:9b0354efa3142452568f39463fe353876856d04b0ca4c0eb3757f50e3d511615",
+        "allowlisted": []
+      }
+    },
+    "m-nocolon": {
+      "seatConfigDigest": {
+        "base": "sha256:b4768452b8a35b5bd43375a84e4740bca86f31d0f1cccdc1f615ea55713a9c5d",
+        "head": "sha256:b4768452b8a35b5bd43375a84e4740bca86f31d0f1cccdc1f615ea55713a9c5d",
+        "allowlisted": []
+      },
+      "snapshotHash": {
+        "base": "sha256:afa8e420d1c6eaaebfa280b61722afcc0506a6e7c93d1270515d721be061005c",
+        "head": "sha256:afa8e420d1c6eaaebfa280b61722afcc0506a6e7c93d1270515d721be061005c",
+        "allowlisted": []
+      },
+      "validateShape": {
+        "base": "sha256:1025507233e81ac0885449d20670f5fa8f7bc3f383e28f9d1865f14ede4e9eb4",
+        "head": "sha256:1025507233e81ac0885449d20670f5fa8f7bc3f383e28f9d1865f14ede4e9eb4",
+        "allowlisted": []
+      },
+      "lint": {
+        "base": "sha256:4f13e8b3586e664a5e147f28c4787227b4ed3e100bab2a94354a05cf310d00c5",
+        "head": "sha256:4f13e8b3586e664a5e147f28c4787227b4ed3e100bab2a94354a05cf310d00c5",
+        "allowlisted": []
+      },
+      "proposal": {
+        "base": "sha256:adc0373af37508e48fcbe7a15732ff22f96efdcd01886d1624dabbc752da35de",
+        "head": "sha256:adc0373af37508e48fcbe7a15732ff22f96efdcd01886d1624dabbc752da35de",
+        "allowlisted": []
+      },
+      "effectiveRigor": {
+        "base": "sha256:a793c13447706b6f9643b95add63c9ec304ae0e4db1c09152575a591ebda814d",
+        "head": "sha256:a793c13447706b6f9643b95add63c9ec304ae0e4db1c09152575a591ebda814d",
+        "allowlisted": []
+      },
+      "checkerPlan": {
+        "base": "sha256:14caef159c3b04d0377b7422313f722e9495bb7eaac56ef4ecf945636421bd2e",
+        "head": "sha256:14caef159c3b04d0377b7422313f722e9495bb7eaac56ef4ecf945636421bd2e",
+        "allowlisted": []
+      },
+      "registeredCapability": {
+        "base": "sha256:0011f4d761d78e830557de4a8d90cb42a892c89cc5bf2c00eca029de0f2aab98",
+        "head": "sha256:0011f4d761d78e830557de4a8d90cb42a892c89cc5bf2c00eca029de0f2aab98",
+        "allowlisted": []
+      },
+      "verifyCommand": {
+        "base": "sha256:9edf4ca820617336945857a70a79b20779038b39e53c4a975daa294046767466",
+        "head": "sha256:9edf4ca820617336945857a70a79b20779038b39e53c4a975daa294046767466",
+        "allowlisted": []
+      },
+      "executorAndOverrides": {
+        "base": "sha256:517f1bbe142f4b9b573361ac97c00ed83d35db1134f7ef82a7766c9e7ded9f25",
+        "head": "sha256:a317441682d221c5a0c3531fc87e0926db472b1e5711fb053ae6a51a8f303494",
+        "allowlisted": [
+          "purpose-through-bind",
+          "tool-purpose"
+        ]
+      },
+      "purposeWithoutClis": {
+        "base": "sha256:517f1bbe142f4b9b573361ac97c00ed83d35db1134f7ef82a7766c9e7ded9f25",
+        "head": "sha256:ed52d15853f98c970f787f05f53d4fc82203d2f95692d48ab0d0dd6977369c1e",
+        "allowlisted": [
+          "purpose-through-bind",
+          "tool-purpose"
+        ]
+      },
+      "capabilityDetailsExecutor": {
+        "base": "sha256:bda839bad0552340f9258f70225ef568ccdcc5be887cec7d277239c4aab66a16",
+        "head": "sha256:bda839bad0552340f9258f70225ef568ccdcc5be887cec7d277239c4aab66a16",
+        "allowlisted": []
+      },
+      "capabilityDetailsCandidate": {
+        "base": "sha256:cf4449d47b094b4086463f7a6cb2a79fd2ceacf3e9b008e1302ad00c8c4b4d86",
+        "head": "sha256:cf4449d47b094b4086463f7a6cb2a79fd2ceacf3e9b008e1302ad00c8c4b4d86",
+        "allowlisted": []
+      },
+      "confinement": {
+        "base": "sha256:2533f089808077532c60242aa8cbc8308e6009996f554b689965e08294fa6166",
+        "head": "sha256:2533f089808077532c60242aa8cbc8308e6009996f554b689965e08294fa6166",
+        "allowlisted": []
+      },
+      "dispatchPlan": {
+        "base": "sha256:abb5952f65d492ed04030019a3c093413934180c100fb458411baed00e7ba070",
+        "head": "sha256:479f0e437403838840e91033de8335df26431f94388b35ec9d2e5a6f2ba4d05b",
+        "allowlisted": [
+          "purpose-through-bind",
+          "tool-purpose"
+        ]
+      },
+      "needsSoulPlan": {
+        "base": "sha256:6baa251ac3acf5ee5bd903f23174fbc0f75b7b32aa9c2443b1e36f226f1703de",
+        "head": "sha256:fa13b0e379dadd54b88c32af0f10ad4fc5152658b175362521193698e040139f",
+        "allowlisted": [
+          "purpose-through-bind",
+          "tool-purpose"
+        ]
+      },
+      "legacyChecker": {
+        "base": "sha256:987b360069a2b6a1d64cb95c8972b03507936db668939d0db4fc3010a65515f5",
+        "head": "sha256:987b360069a2b6a1d64cb95c8972b03507936db668939d0db4fc3010a65515f5",
+        "allowlisted": []
+      },
+      "proposalRefusals": {
+        "base": "sha256:a5aec41350e39d7a10c6c949cf2243ac9a0b2109404c69f101bb4e4a0b163566",
+        "head": "sha256:a5aec41350e39d7a10c6c949cf2243ac9a0b2109404c69f101bb4e4a0b163566",
+        "allowlisted": []
+      },
+      "bind": {
+        "base": "sha256:6f2ba3313d273b4806658237c0186173ea95e39b2835b7b2ca347fe198e14deb",
+        "head": "sha256:6f2ba3313d273b4806658237c0186173ea95e39b2835b7b2ca347fe198e14deb",
+        "allowlisted": []
+      },
+      "operationCapability": {
+        "base": "sha256:9189201c56827bb048cc00f7453283edefdc2dfd903f97c5310162b8bd9ec790",
+        "head": "sha256:9189201c56827bb048cc00f7453283edefdc2dfd903f97c5310162b8bd9ec790",
+        "allowlisted": []
+      }
+    },
+    "m-proto-own": {
+      "seatConfigDigest": {
+        "base": "sha256:961c483f37b461a2a980733cb3f9aecbdad62b7e9d9c5fe88d52b09995ab6515",
+        "head": "sha256:961c483f37b461a2a980733cb3f9aecbdad62b7e9d9c5fe88d52b09995ab6515",
+        "allowlisted": []
+      },
+      "snapshotHash": {
+        "base": "sha256:518c265e65e5d82cbe6e542a997e0029b423fe360b288552b3c9d25fdc96c04d",
+        "head": "sha256:518c265e65e5d82cbe6e542a997e0029b423fe360b288552b3c9d25fdc96c04d",
+        "allowlisted": []
+      },
+      "validateShape": {
+        "base": "sha256:1025507233e81ac0885449d20670f5fa8f7bc3f383e28f9d1865f14ede4e9eb4",
+        "head": "sha256:1025507233e81ac0885449d20670f5fa8f7bc3f383e28f9d1865f14ede4e9eb4",
+        "allowlisted": []
+      },
+      "lint": {
+        "base": "sha256:037e938ca74ac5a48cc81f31dbdabda8c6ae2ce95e5a18d7d377d1804758b21f",
+        "head": "sha256:037e938ca74ac5a48cc81f31dbdabda8c6ae2ce95e5a18d7d377d1804758b21f",
+        "allowlisted": []
+      },
+      "proposal": {
+        "base": "sha256:adc0373af37508e48fcbe7a15732ff22f96efdcd01886d1624dabbc752da35de",
+        "head": "sha256:adc0373af37508e48fcbe7a15732ff22f96efdcd01886d1624dabbc752da35de",
+        "allowlisted": []
+      },
+      "effectiveRigor": {
+        "base": "sha256:d200ee09bd1c075118fdb4c9c19a2b9620f351570969a61bd295846cd769c0ac",
+        "head": "sha256:d200ee09bd1c075118fdb4c9c19a2b9620f351570969a61bd295846cd769c0ac",
+        "allowlisted": []
+      },
+      "checkerPlan": {
+        "base": "sha256:caab0dfc321c283f670caaec3f8ed8e26f5e93c0cd4398859d0bdb98021376e8",
+        "head": "sha256:caab0dfc321c283f670caaec3f8ed8e26f5e93c0cd4398859d0bdb98021376e8",
+        "allowlisted": []
+      },
+      "registeredCapability": {
+        "base": "sha256:1ca7cc906b4abfbd2fe2e1a0ba2a3fd434106aaf47856eb3bd52ae9d817c7969",
+        "head": "sha256:1ca7cc906b4abfbd2fe2e1a0ba2a3fd434106aaf47856eb3bd52ae9d817c7969",
+        "allowlisted": []
+      },
+      "verifyCommand": {
+        "base": "sha256:9ba617e697cc9303348f1a204f0102f41d3de1bffa343d4357e56ad0d756b23a",
+        "head": "sha256:9ba617e697cc9303348f1a204f0102f41d3de1bffa343d4357e56ad0d756b23a",
+        "allowlisted": []
+      },
+      "executorAndOverrides": {
+        "base": "sha256:b02a00f1dbed48d6faa31362f0309bbaa8a9ad24be0e774c59f944206477670f",
+        "head": "sha256:65490b88f93f01a6bf3f0527c9b9b95608ddb0cabe3334e38c7942e6071328ae",
+        "allowlisted": [
+          "purpose-through-bind",
+          "tool-purpose"
+        ]
+      },
+      "purposeWithoutClis": {
+        "base": "sha256:b02a00f1dbed48d6faa31362f0309bbaa8a9ad24be0e774c59f944206477670f",
+        "head": "sha256:cba5d76404fcc681f679ddd7f6408b94e4d11623482e46e3d52842f5f0085cc6",
+        "allowlisted": [
+          "purpose-through-bind",
+          "tool-purpose"
+        ]
+      },
+      "capabilityDetailsExecutor": {
+        "base": "sha256:ced6230f0fbbc8b670ca36e89a54a9a80274ed24d820157b73192eb9cc684138",
+        "head": "sha256:5c2be5d950e312d21410510158e2dedb15df54a368d3332133d752ee4aa69268",
+        "allowlisted": [
+          "string-prefer-reverse-match"
+        ]
+      },
+      "capabilityDetailsCandidate": {
+        "base": "sha256:85fbd8a25318bf3fb1e8f9b2268f7aaf94dce16dcdef24d0e4c56a86b886d254",
+        "head": "sha256:85fbd8a25318bf3fb1e8f9b2268f7aaf94dce16dcdef24d0e4c56a86b886d254",
+        "allowlisted": []
+      },
+      "confinement": {
+        "base": "sha256:fd7b874b289f8ca29142b6e0f9b5af1c1941dac7521959772986ca7adfe4cf1e",
+        "head": "sha256:fd7b874b289f8ca29142b6e0f9b5af1c1941dac7521959772986ca7adfe4cf1e",
+        "allowlisted": []
+      },
+      "dispatchPlan": {
+        "base": "sha256:6e9e408405ad71ed69f8121804820c09c115fc2dbcfc4cb3dc57f1bf1696f6af",
+        "head": "sha256:fec22b6b57395f1b0b252e0c63dea6c10f1bd7a3e669ab75f55a7ee7e5185b46",
+        "allowlisted": [
+          "purpose-through-bind",
+          "tool-purpose"
+        ]
+      },
+      "needsSoulPlan": {
+        "base": "sha256:e2b685fa8be49550dd31daa105046245f28e8da016f4cbdc985f55ba543fb0a4",
+        "head": "sha256:642da2601d5af6298442c27fdf5021f1e0fa5b70688665c7cf71195161b804ad",
+        "allowlisted": [
+          "purpose-through-bind",
+          "tool-purpose"
+        ]
+      },
+      "legacyChecker": {
+        "base": "sha256:e645783d45adf68d748fb506b590ebd59229b52ee66a8276af2f2d0a21639a7a",
+        "head": "sha256:e645783d45adf68d748fb506b590ebd59229b52ee66a8276af2f2d0a21639a7a",
+        "allowlisted": []
+      },
+      "proposalRefusals": {
+        "base": "sha256:5cff57dc56ad67fe3565caead11fe944c685c5f581f89318cf4a139af591d11f",
+        "head": "sha256:5cff57dc56ad67fe3565caead11fe944c685c5f581f89318cf4a139af591d11f",
+        "allowlisted": []
+      },
+      "bind": {
+        "base": "sha256:7c879423ccdf072ce4bf5dc848770fb8a28b84143e9c8f3bfcc52e80206ec063",
+        "head": "sha256:7c879423ccdf072ce4bf5dc848770fb8a28b84143e9c8f3bfcc52e80206ec063",
+        "allowlisted": []
+      },
+      "operationCapability": {
+        "base": "sha256:cf9237e8b74a9a501b7105ee8f8347f9933f8eac0458c23e8f2e8d4318100b55",
+        "head": "sha256:cf9237e8b74a9a501b7105ee8f8347f9933f8eac0458c23e8f2e8d4318100b55",
+        "allowlisted": []
+      }
+    },
+    "m-proto-absent": {
+      "seatConfigDigest": {
+        "base": "sha256:1241e4aa6a5da7f5919192b73e2e5c180763de9c74afdb3fbd9d5fed7dca5f29",
+        "head": "sha256:1241e4aa6a5da7f5919192b73e2e5c180763de9c74afdb3fbd9d5fed7dca5f29",
+        "allowlisted": []
+      },
+      "snapshotHash": {
+        "base": "sha256:f37dd1f0948403cff841d4e82351b82149d556ec8ebf5f2376d8d98ae4b9250e",
+        "head": "sha256:f37dd1f0948403cff841d4e82351b82149d556ec8ebf5f2376d8d98ae4b9250e",
+        "allowlisted": []
+      },
+      "validateShape": {
+        "base": "sha256:1025507233e81ac0885449d20670f5fa8f7bc3f383e28f9d1865f14ede4e9eb4",
+        "head": "sha256:1025507233e81ac0885449d20670f5fa8f7bc3f383e28f9d1865f14ede4e9eb4",
+        "allowlisted": []
+      },
+      "lint": {
+        "base": "sha256:d91fb3799dfe2de73795cee0a1a5818c410027b97eb6226bbf1c27d9d01cf111",
+        "head": "sha256:d91fb3799dfe2de73795cee0a1a5818c410027b97eb6226bbf1c27d9d01cf111",
+        "allowlisted": []
+      },
+      "proposal": {
+        "base": "sha256:adc0373af37508e48fcbe7a15732ff22f96efdcd01886d1624dabbc752da35de",
+        "head": "sha256:adc0373af37508e48fcbe7a15732ff22f96efdcd01886d1624dabbc752da35de",
+        "allowlisted": []
+      },
+      "effectiveRigor": {
+        "base": "sha256:d200ee09bd1c075118fdb4c9c19a2b9620f351570969a61bd295846cd769c0ac",
+        "head": "sha256:d200ee09bd1c075118fdb4c9c19a2b9620f351570969a61bd295846cd769c0ac",
+        "allowlisted": []
+      },
+      "checkerPlan": {
+        "base": "sha256:caab0dfc321c283f670caaec3f8ed8e26f5e93c0cd4398859d0bdb98021376e8",
+        "head": "sha256:caab0dfc321c283f670caaec3f8ed8e26f5e93c0cd4398859d0bdb98021376e8",
+        "allowlisted": []
+      },
+      "registeredCapability": {
+        "base": "sha256:c79f7c87a32484aa798dc2b2a15d63abd91dc4d8190d543a3976e9a1f4e5002b",
+        "head": "sha256:c79f7c87a32484aa798dc2b2a15d63abd91dc4d8190d543a3976e9a1f4e5002b",
+        "allowlisted": []
+      },
+      "verifyCommand": {
+        "base": "sha256:9ba617e697cc9303348f1a204f0102f41d3de1bffa343d4357e56ad0d756b23a",
+        "head": "sha256:9ba617e697cc9303348f1a204f0102f41d3de1bffa343d4357e56ad0d756b23a",
+        "allowlisted": []
+      },
+      "executorAndOverrides": {
+        "base": "sha256:cf6eee313076ef49d8379945043f95f78a84e67bd114a5c01461304cb23b7885",
+        "head": "sha256:bdf0b3a3cab570ceaec10e9917e328c38f7232cc3110753e92aa7e5be5a72557",
+        "allowlisted": [
+          "purpose-through-bind",
+          "tool-purpose"
+        ]
+      },
+      "purposeWithoutClis": {
+        "base": "sha256:cf6eee313076ef49d8379945043f95f78a84e67bd114a5c01461304cb23b7885",
+        "head": "sha256:0af218ae98663344baae002554c2923937bd3b38547cf2add90c58b0adce963a",
+        "allowlisted": [
+          "purpose-through-bind",
+          "tool-purpose"
+        ]
+      },
+      "capabilityDetailsExecutor": {
+        "base": "sha256:dfe97e2e25a693b02dc73f43ad1f64a619698bb0f576629b4a0c1297fc06fe58",
+        "head": "sha256:dfe97e2e25a693b02dc73f43ad1f64a619698bb0f576629b4a0c1297fc06fe58",
+        "allowlisted": []
+      },
+      "capabilityDetailsCandidate": {
+        "base": "sha256:85fbd8a25318bf3fb1e8f9b2268f7aaf94dce16dcdef24d0e4c56a86b886d254",
+        "head": "sha256:85fbd8a25318bf3fb1e8f9b2268f7aaf94dce16dcdef24d0e4c56a86b886d254",
+        "allowlisted": []
+      },
+      "confinement": {
+        "base": "sha256:fd7b874b289f8ca29142b6e0f9b5af1c1941dac7521959772986ca7adfe4cf1e",
+        "head": "sha256:fd7b874b289f8ca29142b6e0f9b5af1c1941dac7521959772986ca7adfe4cf1e",
+        "allowlisted": []
+      },
+      "dispatchPlan": {
+        "base": "sha256:495ac74a327c2b092490e0a60c67ee58395df3b82c6ccbfe944e9ea5de983107",
+        "head": "sha256:ab61b6c3d70e1a57fee7acf8dba6b7d57611e3102a87619bcf18503fb17bb4b6",
+        "allowlisted": [
+          "purpose-through-bind",
+          "tool-purpose"
+        ]
+      },
+      "needsSoulPlan": {
+        "base": "sha256:58752eed19ca645a76caf814565558b9a1ecf3e2a65bd593830360668b27dd48",
+        "head": "sha256:118022d432bbfe2bbdaef69202aeef16c9c0e2dd2e959ef74523821b83f36f0d",
+        "allowlisted": [
+          "purpose-through-bind",
+          "tool-purpose"
+        ]
+      },
+      "legacyChecker": {
+        "base": "sha256:e645783d45adf68d748fb506b590ebd59229b52ee66a8276af2f2d0a21639a7a",
+        "head": "sha256:e645783d45adf68d748fb506b590ebd59229b52ee66a8276af2f2d0a21639a7a",
+        "allowlisted": []
+      },
+      "proposalRefusals": {
+        "base": "sha256:f3cbd43c216b56b230de5b7cf8334be1d8b8b640d736904bae71701216a368f6",
+        "head": "sha256:f3cbd43c216b56b230de5b7cf8334be1d8b8b640d736904bae71701216a368f6",
+        "allowlisted": []
+      },
+      "bind": {
+        "base": "sha256:df09b0c495cc8f46d312343c80be446bd8b2e7314b76990677d2a335f0a41048",
+        "head": "sha256:df09b0c495cc8f46d312343c80be446bd8b2e7314b76990677d2a335f0a41048",
+        "allowlisted": []
+      },
+      "operationCapability": {
+        "base": "sha256:cf9237e8b74a9a501b7105ee8f8347f9933f8eac0458c23e8f2e8d4318100b55",
+        "head": "sha256:cf9237e8b74a9a501b7105ee8f8347f9933f8eac0458c23e8f2e8d4318100b55",
+        "allowlisted": []
+      }
+    },
+    "m-rigor": {
+      "seatConfigDigest": {
+        "base": "sha256:afe213d252ca16ca4074a23d659d9cb72a8fbfc2446fdf7093563f706bbd37e0",
+        "head": "sha256:afe213d252ca16ca4074a23d659d9cb72a8fbfc2446fdf7093563f706bbd37e0",
+        "allowlisted": []
+      },
+      "snapshotHash": {
+        "base": "sha256:45f73ac4c1ab5d5e64bb3cf305050893924b1cdb4252eaa5dc8589b613b252df",
+        "head": "sha256:45f73ac4c1ab5d5e64bb3cf305050893924b1cdb4252eaa5dc8589b613b252df",
+        "allowlisted": []
+      },
+      "validateShape": {
+        "base": "sha256:1025507233e81ac0885449d20670f5fa8f7bc3f383e28f9d1865f14ede4e9eb4",
+        "head": "sha256:1025507233e81ac0885449d20670f5fa8f7bc3f383e28f9d1865f14ede4e9eb4",
+        "allowlisted": []
+      },
+      "lint": {
+        "base": "sha256:d98fde5b8866cbfa428ce403f057927a5db055049f075a5b28312c1b3bb8e087",
+        "head": "sha256:d98fde5b8866cbfa428ce403f057927a5db055049f075a5b28312c1b3bb8e087",
+        "allowlisted": []
+      },
+      "proposal": {
+        "base": "sha256:adc0373af37508e48fcbe7a15732ff22f96efdcd01886d1624dabbc752da35de",
+        "head": "sha256:adc0373af37508e48fcbe7a15732ff22f96efdcd01886d1624dabbc752da35de",
+        "allowlisted": []
+      },
+      "effectiveRigor": {
+        "base": "sha256:3a0f341dd75afc1b0f045e6189cf56ec7721af40d50ba11083d22daff2b03729",
+        "head": "sha256:3a0f341dd75afc1b0f045e6189cf56ec7721af40d50ba11083d22daff2b03729",
+        "allowlisted": []
+      },
+      "checkerPlan": {
+        "base": "sha256:5c663a194acb12e8c3b42b8e76d14d56aeb9e34d9865357340e5bcc469181fc8",
+        "head": "sha256:5c663a194acb12e8c3b42b8e76d14d56aeb9e34d9865357340e5bcc469181fc8",
+        "allowlisted": []
+      },
+      "registeredCapability": {
+        "base": "sha256:a7da05f66a1e9ec22aff70099556a368d75fc00edddb0693f015dc0dd4597aa6",
+        "head": "sha256:a7da05f66a1e9ec22aff70099556a368d75fc00edddb0693f015dc0dd4597aa6",
+        "allowlisted": []
+      },
+      "verifyCommand": {
+        "base": "sha256:eb9ec225275c96943f18e729f81995ee35c8c5f223e5fd894afbf2d456006bb5",
+        "head": "sha256:eb9ec225275c96943f18e729f81995ee35c8c5f223e5fd894afbf2d456006bb5",
+        "allowlisted": []
+      },
+      "executorAndOverrides": {
+        "base": "sha256:ab7b79d2cf21f8ad0efebd9603e52f4292e08aa633ed04c2411dfbdaf2468ebe",
+        "head": "sha256:fd49d51e377fda187def0c073117ca4d7227fa8f7c9d0923f907877e04f3daec",
+        "allowlisted": [
+          "purpose-through-bind",
+          "tool-purpose"
+        ]
+      },
+      "purposeWithoutClis": {
+        "base": "sha256:ab7b79d2cf21f8ad0efebd9603e52f4292e08aa633ed04c2411dfbdaf2468ebe",
+        "head": "sha256:acd8f569a238d1abfaca39f6a98ffb08abc629ae48bfba3ef15974abda8304f1",
+        "allowlisted": [
+          "purpose-through-bind",
+          "tool-purpose"
+        ]
+      },
+      "capabilityDetailsExecutor": {
+        "base": "sha256:cbd613824fb6211f7474623961e78b8435880cb4bc7d2e232916c169e8944746",
+        "head": "sha256:cbd613824fb6211f7474623961e78b8435880cb4bc7d2e232916c169e8944746",
+        "allowlisted": []
+      },
+      "capabilityDetailsCandidate": {
+        "base": "sha256:5722216f18971bb0689d3d2946d8a097b2237bf75b94450fba9213459d4fb6de",
+        "head": "sha256:5722216f18971bb0689d3d2946d8a097b2237bf75b94450fba9213459d4fb6de",
+        "allowlisted": []
+      },
+      "confinement": {
+        "base": "sha256:05fee3625e47cb09145057263578b95f903c27dfac0e10fd4c1af97a0723533b",
+        "head": "sha256:05fee3625e47cb09145057263578b95f903c27dfac0e10fd4c1af97a0723533b",
+        "allowlisted": []
+      },
+      "dispatchPlan": {
+        "base": "sha256:093b8e171586659a263b6c7b320b5ad06d0207e5a1ba091575eca28aa728a58a",
+        "head": "sha256:ef3b6e6d55e5657e5f2c989ea3344ff603ec33c8da8c1676ed2014344b33ebc4",
+        "allowlisted": [
+          "purpose-through-bind",
+          "tool-purpose"
+        ]
+      },
+      "needsSoulPlan": {
+        "base": "sha256:73ba24cb4e83137e0f912c43f0d86ad1e74489900212a3470902593790f70927",
+        "head": "sha256:cf25d1c96e3ddb00a9b00f055ad80d2144930bf50a860cb506b1918009ae045f",
+        "allowlisted": [
+          "purpose-through-bind",
+          "tool-purpose"
+        ]
+      },
+      "legacyChecker": {
+        "base": "sha256:0b03d22b411a235e55cd33e072266923a022f5561b09f3d8295ad89a1535c7aa",
+        "head": "sha256:0b03d22b411a235e55cd33e072266923a022f5561b09f3d8295ad89a1535c7aa",
+        "allowlisted": []
+      },
+      "proposalRefusals": {
+        "base": "sha256:c0c12e2afe1239c5185cbac2d38db9fa8f57c715730184fdf7c446cad4332194",
+        "head": "sha256:c0c12e2afe1239c5185cbac2d38db9fa8f57c715730184fdf7c446cad4332194",
+        "allowlisted": []
+      },
+      "bind": {
+        "base": "sha256:17bc52f5354fd9bb33823fe83944326d2dc3467a1ae157ae02070ad783d503b1",
+        "head": "sha256:17bc52f5354fd9bb33823fe83944326d2dc3467a1ae157ae02070ad783d503b1",
+        "allowlisted": []
+      },
+      "operationCapability": {
+        "base": "sha256:27859799a759d3fa54087e9c1d7a3e7124966ce54f0157b51a6d407969185a25",
+        "head": "sha256:27859799a759d3fa54087e9c1d7a3e7124966ce54f0157b51a6d407969185a25",
+        "allowlisted": []
+      }
+    },
+    "m-tools": {
+      "seatConfigDigest": {
+        "base": "sha256:cf4e037285d8a6f8a77fd65c8f930958ddc0ae2c94866bdbd91547d97df25a94",
+        "head": "sha256:cf4e037285d8a6f8a77fd65c8f930958ddc0ae2c94866bdbd91547d97df25a94",
+        "allowlisted": []
+      },
+      "snapshotHash": {
+        "base": "sha256:a65a00c6068e62580a371681f8ab976149c2d7e29804ad46afecc5811e8db150",
+        "head": "sha256:a65a00c6068e62580a371681f8ab976149c2d7e29804ad46afecc5811e8db150",
+        "allowlisted": []
+      },
+      "validateShape": {
+        "base": "sha256:1025507233e81ac0885449d20670f5fa8f7bc3f383e28f9d1865f14ede4e9eb4",
+        "head": "sha256:1025507233e81ac0885449d20670f5fa8f7bc3f383e28f9d1865f14ede4e9eb4",
+        "allowlisted": []
+      },
+      "lint": {
+        "base": "sha256:5af1939861d6a391738406b064d80adfff52e964aea03c6631272794e9b21489",
+        "head": "sha256:5af1939861d6a391738406b064d80adfff52e964aea03c6631272794e9b21489",
+        "allowlisted": []
+      },
+      "proposal": {
+        "base": "sha256:adc0373af37508e48fcbe7a15732ff22f96efdcd01886d1624dabbc752da35de",
+        "head": "sha256:adc0373af37508e48fcbe7a15732ff22f96efdcd01886d1624dabbc752da35de",
+        "allowlisted": []
+      },
+      "effectiveRigor": {
+        "base": "sha256:d67f052256484eabbdb9d584f4919c7f2d2857e4ca203ae86e0758129062e452",
+        "head": "sha256:d67f052256484eabbdb9d584f4919c7f2d2857e4ca203ae86e0758129062e452",
+        "allowlisted": []
+      },
+      "checkerPlan": {
+        "base": "sha256:b8c69947f86e3f17f2aa33e35697df66e119da57db640d0e95a022ff6162cc51",
+        "head": "sha256:b8c69947f86e3f17f2aa33e35697df66e119da57db640d0e95a022ff6162cc51",
+        "allowlisted": []
+      },
+      "registeredCapability": {
+        "base": "sha256:b5a205f56db6ba0b37372692c8d5d6f353df8a9fee148ec3e3f9941546a1196d",
+        "head": "sha256:b5a205f56db6ba0b37372692c8d5d6f353df8a9fee148ec3e3f9941546a1196d",
+        "allowlisted": []
+      },
+      "verifyCommand": {
+        "base": "sha256:13a43e9109a127ca6c9b72b27ec565c422e5610a8b769f9973ef0377de3ca956",
+        "head": "sha256:13a43e9109a127ca6c9b72b27ec565c422e5610a8b769f9973ef0377de3ca956",
+        "allowlisted": []
+      },
+      "executorAndOverrides": {
+        "base": "sha256:6487721f1183a9ab2445611840fd2ab444ccfcf5c9d7069f9766d7b491f0a24b",
+        "head": "sha256:79a019ad797bee33837dafb4c599dca86000bd96ef9c5859ac141637d95fd7b4",
+        "allowlisted": [
+          "purpose-through-bind",
+          "tool-purpose"
+        ]
+      },
+      "purposeWithoutClis": {
+        "base": "sha256:6487721f1183a9ab2445611840fd2ab444ccfcf5c9d7069f9766d7b491f0a24b",
+        "head": "sha256:ef4dd26fca7544969bd936294af6e0ba4db7f60ade8bc2fb8c5c2e9138a216ab",
+        "allowlisted": [
+          "purpose-through-bind",
+          "tool-purpose"
+        ]
+      },
+      "capabilityDetailsExecutor": {
+        "base": "sha256:0259e95a48686434be0417e9f5da3330f520d98eb429e5cc3ffc9818b1559a00",
+        "head": "sha256:96d26eebd77451b5c473751690c077b5bec3e3ddad20fecca1abd7a8b87ec3e2",
+        "allowlisted": [
+          "string-prefer-reverse-match"
+        ]
+      },
+      "capabilityDetailsCandidate": {
+        "base": "sha256:57b6f14041f41e909c9f5ebf80c7b29fc396c1bffaf742c4c0a5b756788b15b1",
+        "head": "sha256:57b6f14041f41e909c9f5ebf80c7b29fc396c1bffaf742c4c0a5b756788b15b1",
+        "allowlisted": []
+      },
+      "confinement": {
+        "base": "sha256:519a240198a96580545fc036a8bafb88f82f23794dc32d3cf436aec950b183e8",
+        "head": "sha256:519a240198a96580545fc036a8bafb88f82f23794dc32d3cf436aec950b183e8",
+        "allowlisted": []
+      },
+      "dispatchPlan": {
+        "base": "sha256:ebd1bdfdaf95ff0aefa429e0293cf138fcf416627fd2f20eac5e28dea72565a8",
+        "head": "sha256:e405a0b13f5072c38a7eb77d54ca75620a516af3f407d90b2d6c1948e1ae47a3",
+        "allowlisted": [
+          "purpose-through-bind",
+          "tool-purpose"
+        ]
+      },
+      "needsSoulPlan": {
+        "base": "sha256:2a6b97fb80f378805fc6ad97d9c6b05d75d46d4de3ac45caf472bbfaf185ad6d",
+        "head": "sha256:5f30a8904f2447174d9c6462dbba7726a34416621dfa5999e4bb6c7997d6cf1b",
+        "allowlisted": [
+          "purpose-through-bind",
+          "tool-purpose"
+        ]
+      },
+      "legacyChecker": {
+        "base": "sha256:bc97ba9a0e95fdccaa635467d2d54c5d535f24ed33ac5b2a6a3c9ea8b0c3794a",
+        "head": "sha256:bc97ba9a0e95fdccaa635467d2d54c5d535f24ed33ac5b2a6a3c9ea8b0c3794a",
+        "allowlisted": []
+      },
+      "proposalRefusals": {
+        "base": "sha256:2ae19f0d2cc7c1d2f038d4cde3109723d945093ed372611c0b59b0d753ceb2c4",
+        "head": "sha256:2ae19f0d2cc7c1d2f038d4cde3109723d945093ed372611c0b59b0d753ceb2c4",
+        "allowlisted": []
+      },
+      "bind": {
+        "base": "sha256:edf29a44d06abdb8ffa4692faec1bf85204192af44d15768f01a7c408e8f2651",
+        "head": "sha256:edf29a44d06abdb8ffa4692faec1bf85204192af44d15768f01a7c408e8f2651",
+        "allowlisted": []
+      },
+      "operationCapability": {
+        "base": "sha256:5c0395606f86a2f118fbb930ba8b0e77effbe12ad58d0bb6d3c02dec8f54bb33",
+        "head": "sha256:5c0395606f86a2f118fbb930ba8b0e77effbe12ad58d0bb6d3c02dec8f54bb33",
+        "allowlisted": []
+      }
+    }
+  }
+}

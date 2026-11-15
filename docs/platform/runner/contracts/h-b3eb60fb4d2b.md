@@ -36,7 +36,7 @@ made the **ExecutorProfile** half real too: `executors.<id>.identity`
 (all four fields required together when declared) and `executors.<id>.supports`
 (each field independently optional) are now validated, additive config
 fields (`validateExecutorIdentityShape`/`validateExecutorSupportsShape`,
-same file) that survive `resolveExecutorAndOverrides` unchanged. **Added in
+same file) that survive the executor lookup unchanged (`lookupExecutor`; the earlier name `resolveExecutorAndOverrides` was removed on 2026-11-14). **Added in
 source — current-state correction:** `supports.reasoningEffort` is consumed
 by `resolveExecutorCommand` when validating the requested effort; identity
 remains validated profile metadata, so the former blanket “no consumer”

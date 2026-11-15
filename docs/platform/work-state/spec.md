@@ -611,73 +611,58 @@ chạm trần chống-lặp, xem spec Runner RUL29 (cạnh awaiting-approval→b
 
 Subsections: Registry Projection And Registration Standard, Tool Registry Verbs.
 
+Cập nhật 2026-11-14: registry công cụ chỉ còn MỘT đường hỏi. Verb `fgos tool`
+(`register`, `remove`, `check`, `query`), mô-đun `tool-registry` và file overlay
+cục bộ `.fgos/runtime/tool-status.local.json` đã gỡ; `fgos dispatch decide --for
+<capability>` trả lời bằng một lần probe sống. Quyết định và lý do: spec
+Seat Binding §15 (`docs/platform/seat-binding/spec.md`, mục 2026-11-14, câu trả
+lời Q1 của chủ sở hữu). Hai mục con dưới đây ghi trạng thái hiện hành; nguồn gốc
+distillery (tsk-1dj, `docs/distillery/deep-dives/tool-registry.md`) giữ làm lịch sử.
+
 ### Registry Projection And Registration Standard
 
-Cổng vào cho một mảnh distillery đã porting (tsk-1dj, ported từ
-repository-harness's tool-registry-capability — xem
-`docs/distillery/deep-dives/tool-registry.md`): một registry hai chiều —
-project **đăng ký** công cụ (tool) nào phục vụ **capability** (nhãn tự do,
-chuẩn hóa kebab-case) nào, rồi bất kỳ bước nào cần capability đó **hỏi**
-registry thay vì hardcode tên tool cụ thể ("core consults capabilities,
-never tools" — US-027, ported nguyên vẹn).
+Nguyên tắc ported từ repository-harness giữ nguyên: bất kỳ bước nào cần một
+capability **hỏi** registry thay vì hardcode tên tool ("core consults
+capabilities, never tools" — US-027). Registry không còn là một kho riêng:
 
-- Dạng một tool (nay dẫn xuất từ `runner.executors` bằng `toolsFromExecutors`,
-  không còn là `view.tools` gộp từ sự kiện `tool.register`/`tool.remove`):
-  `{ [name]: { name, kind, capability, command, scanTarget?,
-  responsibility?, description? } }`. `kind` ∈ `cli|binary|mcp|skill|http`
-  — quyết định `tool check` probe bằng cách nào (PATH cho cli/binary; quét
-  `scanTarget` trên đĩa cho mcp/skill — hai kind này vốn không nằm trên
-  PATH; TCP probe ngắn cho http). `capability` LUÔN chuẩn hóa kebab-case
-  lúc `register` (nhiều cách viết cùng gộp về một chuỗi).
-- **`register`/`remove` đã gỡ (tsk-in1-1)** — nhà cung cấp tool khai thẳng trong
-  `runner.executors.<id>` (`.fgos/config.json`), không qua nhật ký sự kiện; sự kiện
-  `tool.register`/`tool.remove` cũ còn trong lịch sử bị fold bỏ qua.
-- **`check`'s kết quả (`status`, `checkedAt`) là SỰ THẬT VỀ MÁY NÀY, không
-  phải quyết định team** — KHÔNG qua event-log. Ghi vào một file cục bộ
-  gitignored riêng, `.fgos/runtime/tool-status.local.json` (đặt
-  ngoài Event Store, không phải trong nó) — cùng tinh thần "trạng thái máy
-  này tách khỏi cấu hình được chia sẻ" mà `.fgos/sessions.json`/
-  `.fgos/*.lock` đã theo trong `.gitignore`. `tool check` LUÔN thoát mã 0
-  — thiếu tool là một sự thật cần báo cáo, không phải lỗi CLI ("absent
-  capability = clean skip, never a failure" — nguyên tắc lõi item này
-  port qua).
-- **Đọc gộp lúc `query`:** `view.tools` (đăng ký) overlay file cục bộ
-  (trạng thái máy này). Một tool đã đăng ký nhưng CHƯA từng `check` trên
-  máy này đọc là `unknown` — KHÔNG BAO GIỜ là `missing` (`missing` nghĩa
-  là đã probe và không thấy). Đây là phân biệt cốt lõi của US-027: "chưa
-  đăng ký" (vô hại, `inactive`) khác hẳn "đăng ký rồi mà probe ra
-  missing/unknown" (gap thật, `degraded`).
+- **Khai báo:** một tool là một entry `runner.executors.<id>` có `kind: tool` và
+  `for: [<capability>, ...]`; MỌI phần tử của `for` đều phục vụ (một executor
+  phục vụ nhiều capability). Tên capability được so sau khi chuẩn hóa kebab-case.
+  `invocations` cho biết `command` hoặc `mcpTool` để gọi, và cách probe:
+  `cli`/`binary` tìm trên PATH; `mcp`/`skill` quét `scanTarget` trên đĩa (hai
+  kind này không nằm trên PATH), `stale` khi `meta.json` của chính tool có
+  `lastCommit` lùi sau `HEAD`; không khai probe nào thì `unknown`.
+- **Một người đọc:** `toolProvidersOf` (`src/runner/dispatch/tool-providers.mjs`)
+  là nơi duy nhất đọc `for` của executor và là lần probe duy nhất; `decide`, hàng
+  doctor `tool-registry-configured` và cảnh báo của `executor-profile-warnings`
+  đều hỏi nó. Hàng `doors` trong `docs/architecture-manifest.json` chặn đường thứ hai.
+- **Trạng thái là sự thật về máy này, không được lưu:** `present`, `stale`,
+  `missing`, `unknown` được tính lúc hỏi, không ghi file, không qua event-log.
+  "Chưa từng probe" không còn tồn tại như một trạng thái riêng. Phân biệt cốt lõi
+  của US-027 vẫn giữ: không có provider nào = `inactive` (vô hại); có khai báo mà
+  probe ra missing/stale/unprobeable = `degraded` (gap thật).
+- `prefer` trên một capability do tool phục vụ bị bỏ qua (tool không chạy qua
+  Seat Binding); doctor cảnh báo `executor.<id>.tool-purpose-prefer-ignored.<cap>`.
+- `register`/`remove` đã gỡ từ tsk-in1-1; sự kiện `tool.register`/`tool.remove` cũ
+  trong lịch sử bị fold bỏ qua.
 
 ### Tool Registry Verbs
 
-- **Runs when:** người/agent gọi `fgos tool <register|check|query|remove>
-  ...`.
-- **Blocked when:** `register` — thiếu `--name`/`--kind`/`--capability`/
-  `--command`, `--kind` ngoài `cli|binary|mcp|skill|http`, `--capability`
-  chuẩn hóa ra rỗng, hoặc `--kind mcp|skill` thiếu `--scan` (hai kind này
-  không nằm trên PATH) — tất cả `validation`; `--name` đã tồn tại —
-  `validation`. `remove` — `--name` chưa từng đăng ký — `validation`.
-  `check --name x` — `x` chưa đăng ký — `validation`. `check`/`query`
-  không có điều kiện chặn nào khác — `check` LUÔN thoát 0 kể cả khi mọi
-  tool được probe đều `missing`.
-- **What changes:** `register` — một sự kiện `tool.register` (bản ghi ĐẦY
-  ĐỦ, ghi đè theo `name` — không có `tool.edit`, đăng ký lại một `name` đã
-  gỡ là một `tool.register` mới, sạch). `remove` — một sự kiện
-  `tool.remove` (xóa hẳn key khỏi `view.tools`, không phải tombstone).
-  `check` — KHÔNG sự kiện nào; ghi đè các entry được probe trong
-  `.fgos/tool-status.local.json` (entry của tool không nằm trong lượt
-  probe này, vd gọi kèm `--name`, giữ nguyên). `query` — không gì, đọc
-  thuần.
-- **Side effects:** `check` gọi `command -v`-tương-đương qua PATH thật
-  (cli/binary) hoặc mở một kết nối TCP ngắn thật (http) — không mock.
-- **Afterwards:** `query --capability X [--status present]` trả về TẬP
-  provider (nhiều tool cùng phục vụ một capability, bổ sung lẫn nhau —
-  không loại trừ), mỗi provider kèm `status` đã gộp overlay cục bộ. Bất kỳ
-  bước nào (skill/AGENTS.md của một project khác) muốn "hỏi trước khi làm
-  X" tự chèn câu gọi `query` vào đúng chỗ cần — injection là hợp đồng văn
-  xuôi (prose contract), KHÔNG có hook cấu trúc nào tự động gọi `query` hộ
-  (phát hiện cốt lõi của deep-dive: ngay cả repository-harness, nơi sinh
-  ra cơ chế này, cũng không tự động hóa bước đó).
+Không còn verb nào. `fgos tool <register|check|query|remove>` đã gỡ.
+
+- **Hỏi:** `fgos dispatch decide --for <capability> --json`. Provider tốt nhất
+  theo trạng thái sống (`present`, rồi `stale`, rồi `missing`/`unknown`) quyết
+  định `mechanism`: `present` → `in-process` kèm `mcpTool` hoặc `command`;
+  `stale` → `in-process` kèm `stale: true`; `missing`/`unknown`/không có tên để
+  gọi → `unavailable` kèm `blockedReason` (mã `tool.missing`, `tool.unprobeable`,
+  `tool.unnamed`). Câu trả lời liệt kê `providers` (tập provider, bổ sung lẫn nhau
+  — không loại trừ). Đây cũng chính là câu trả lời một dispatch nhận.
+- **Không ghi gì:** không file overlay, không sự kiện. File
+  `.fgos/runtime/tool-status.local.json` cũ vô hại, không còn được đọc hay ghi, xóa được.
+- **Side effects:** probe thật qua PATH hoặc đĩa — không mock; chi phí đo được
+  tối đa 3,6 ms ở p95 mỗi lần `decide`.
+- **Prose contract:** skill/AGENTS.md của một project muốn "hỏi trước khi làm X" tự
+  chèn câu gọi `decide --for` vào đúng chỗ cần; KHÔNG có hook cấu trúc nào tự gọi hộ.
 
 ## 9. Behaviors And Operations
 

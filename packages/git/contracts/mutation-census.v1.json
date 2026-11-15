@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "07ab71654b0ea3c4655e85f3d0529b3f384365bf5363d61d4c605309f7447565",
+  "payloadDigest": "7f0a749dc64ee8690c2b38b1aa638ad2ffcffaec67d3ee928bf5311b21897d1f",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "a5629383f89b4488b252a62f0ea86463e649e33e0a891db1a19af2cd6c136aca",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -1071,7 +1071,7 @@
     "src/runner/execution/account-pin.mjs": "aa1c7f9a9233de8278d46f46cf32ef6568051fbe59430866729c30fb55ec04dc",
     "src/runner/execution/account-rotation.mjs": "3f7263e6d0a291ce33aa9c44381138a6ca436f20543565ef857c8f7936388cbe",
     "src/runner/execution/bind.mjs": "69930126949b48f337e75bdf1a9a6d1447ec6b2c2aa5cc62195c2a2792768f3d",
-    "src/runner/execution/capability-config.mjs": "6f65c33e126ab5ae6074dbe082c86cb797f586264a0b5aa6c1ca982049835955",
+    "src/runner/execution/capability-config.mjs": "657e47f86eef32df92451b1ad0a5d6d51e68cfc07927cb833806624a28a8b155",
     "src/runner/execution/case-admission-port.mjs": "9039951a11acbf69cb549239387cc32ae00617b3ae65bd4682908389b01cdebf",
     "src/runner/execution/case-run-paths.mjs": "4beb8229fa90709bea11c6260c4aee23a99b224a9e6314e69ec74696b86e3ce3",
     "src/runner/execution/commit-unit-work.mjs": "d8853dc5d42a53fa2578304de8ef38d55f04e4c9250a4185999a9d7b1f86a158",

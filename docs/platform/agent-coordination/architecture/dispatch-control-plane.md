@@ -85,8 +85,8 @@ executor-id  — explicit concrete implementation override, naming a
 
 `purpose` is not a third identity. It is compatibility terminology for
 capability. The `--for <purpose>` CLI flag and the `purpose`/`for` parameter
-names threaded through `src/runner/dispatch/plan.mjs` and
-`src/runner/dispatch/resolve.mjs` (`resolveExecutorAndOverrides`) name capability
+names threaded through `src/runner/dispatch/plan.mjs` (`purposeSeatOf`) and
+`src/runner/dispatch/resolve.mjs` (`lookupExecutor`) name capability
 values. `resolveExecutorIdForPurpose` is not a current exported resolver.
 `compileDispatchPlan()`'s `selector.type: 'purpose'` is the compatibility
 selector label. It does not create a third conceptual route identity.
@@ -204,7 +204,7 @@ is separately discovered by the leaf resolver. Callers supply composed inputs;
   "requestedTarget": { "kind": "capability", "value": "code:implement" },
   "requestedCapability": "code:implement",
   "selectedExecutor": "agy-herdr",
-  "bindingSource": "capability.prefer",
+  "bindingSource": "seat-binding",
   "providerModel": "gemini",
   "tier": "standard",
   "model": "<resolved-from-policy>",
@@ -269,10 +269,13 @@ Component-Outer Boundary Note's responsibilities.
 
 1. **Request normalizer (design)** — the normalized target/policy/provenance
    boundary is proposed; current inputs are the compiler options above.
-2. **Capability binding resolver** — `resolveExecutorAndOverrides` binds literal
-   executor IDs/defaults or capability `prefer`; aliases and executor `for[]`
-   inform capability labels separately in `resolveCapabilityDetailsFromHints`
-   (`resolve.mjs:25-66,269-310`), not this binding resolver.
+2. **Capability binding resolver** — `purposeSeatOf` (`plan.mjs`) is the one door
+   from a purpose to what serves it: a registered executor id (`lookupExecutor`
+   chooses nothing), else a tool executor's live `for` lookup
+   (`toolProvidersOf`), else Seat Binding's `bind()` for a row with its own
+   `prefer` pool. `prefer` is never read to pick an executor outside the
+   seat-binding crate. Aliases and executor `for[]` inform capability labels
+   separately in `resolveCapabilityDetailsFromHints`, not this binding resolver.
 3. **Executor registry resolver** — resolves a literal executor-id to its
    concrete invocation/tool/agent shape (`resolveExecutorConfig`).
 4. **Policy resolver** — `resolveAssignmentDispatchPolicy`; owns supported

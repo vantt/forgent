@@ -7,8 +7,7 @@
 //   lookup  `capabilityPersonaOf`, `capabilityRigorOf`, `minCheckersOf`, `isCapabilityDeclared` and
 //           `hasPreferPool` read the entries that apply to a capability, most specific first: its exact key,
 //           then its `<prefix>:*` entry (the text before the first colon; a name with no colon has no prefix
-//           entry, and the bare verb of `code:review` is never a key). They also accept the config wrapped as
-//           `{runner:{capabilities}}`, as the seat resolver always did.
+//           entry, and the bare verb of `code:review` is never a key).
 // An "entry" is an own key whose value is a non-null object (an array counts, as the doctor rows treat it).
 
 import { RIGOR_VALUES } from '../rigor.mjs';
@@ -28,7 +27,7 @@ const exactEntryOf = (runner, name) => {
 /** The entries that apply to a capability, most specific first: exact key, then `<prefix>:*`. */
 function entriesOf(cfg, capability) {
   if (typeof capability !== 'string' || !capability) return [];
-  const section = cfg?.capabilities ?? cfg?.runner?.capabilities;
+  const section = sectionOf(cfg);
   if (!isEntry(section)) return [];
   const keys = capability.includes(':') ? [capability, `${capability.split(':')[0]}:*`] : [capability];
   return keys.filter((key) => Object.hasOwn(section, key) && isEntry(section[key])).map((key) => ({ key, entry: section[key] }));

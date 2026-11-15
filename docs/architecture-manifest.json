@@ -554,14 +554,83 @@
       "debt": [
         {
           "path": "src/cli/command-registry.mjs",
-          "reason": "moves to the capability port in a later step of this change"
+          "reason": "the plan-lint help text names `Object.keys(runner.capabilities)`, the config path, in prose; it reads nothing, and rewording it changes the help text users see and the generated command manifest"
         },
         {
           "path": "src/workflow/propose-validate.mjs",
-          "reason": "moves to the capability port in a later step of this change"
+          "reason": "the refusal message names `runner.capabilities`, the config path, for the user; it reads nothing, and rewording it changes a message a test pins"
         }
       ],
       "reason": "the port is the one Node reader of the capabilities section and hands out answers per field, never an entry; the seat-binding crate is the authority over binding fields and is not matched by these JS-shaped patterns"
+    },
+    {
+      "job": "choose an executor from a capability's prefer only in the seat-binding crate; ask bind() (or purposeSeatOf in src/runner/dispatch/plan.mjs)",
+      "kind": "door",
+      "patterns": [
+        "\\bpreferOf\\(",
+        "\\bnormalizePreferCandidates\\(",
+        "\\bbindingTasteOf\\("
+      ],
+      "allowed": [
+        "src/runner/execution/seat-policy.mjs",
+        "src/runner/dispatch/config.mjs",
+        "src/setup/seat-binding-checks.mjs"
+      ],
+      "reason": "reading prefer here never picks an executor: seat-policy builds the crate slice, the load validator checks the named executors exist, and the seat-binding checks decide which capabilities to dry-bind and then ask bind()"
+    },
+    {
+      "job": "the purpose chooser outside bind() is gone: ask purposeSeatOf in src/runner/dispatch/plan.mjs",
+      "kind": "door",
+      "patterns": [
+        "\\bresolveExecutorAndOverrides\\b",
+        "capability\\.prefer"
+      ],
+      "allowed": [],
+      "reason": "the first-prefer chooser and the string-only reverse prefer match were a second executor chooser beside Seat Binding"
+    },
+    {
+      "job": "tool lookup by capability: ask toolProvidersOf in src/runner/dispatch/tool-providers.mjs (or fgos dispatch decide --for)",
+      "kind": "door",
+      "patterns": [
+        "(?<!\\b(?:flags|opts|Symbol)\\??)\\.for\\b(?!\\s*\\\\?\\()",
+        "(?<=[\\w\\])])\\[\\s*['\"]for['\"]\\s*\\]",
+        "\\{[^{}]*\\bfor\\s*:[^{}]*\\}\\s*=(?!=)",
+        "\\bprobeTool\\b",
+        "\\bisIndexStale\\b",
+        "\\bnormalizeCapability\\b"
+      ],
+      "allowed": [
+        "src/runner/dispatch/tool-providers.mjs"
+      ],
+      "reason": "the one reader of an executor's for list and the one presence and staleness probe, so doctor and decide cannot disagree about a tool"
+    },
+    {
+      "job": "the old tool registry and its status overlay are gone: ask fgos dispatch decide --for <capability>",
+      "kind": "door",
+      "patterns": [
+        "\\btoolsFromExecutors\\b",
+        "\\bqueryTools\\b",
+        "\\bcheckTools\\b",
+        "\\breadLocalStatus\\b",
+        "\\bwriteLocalStatus\\b",
+        "tool-status\\.local",
+        "tool-registry\\.mjs",
+        "\\bfgos tool (?:query|check)\\b"
+      ],
+      "allowed": [],
+      "reason": "the verb, the registry module and the local status file were a second path to the same answer decide gives from a live probe"
+    },
+    {
+      "job": "the raw capability section is handed out only for the run record and doctor presence: ask a per-field function of src/runner/execution/capability-config.mjs",
+      "kind": "door",
+      "patterns": [
+        "\\bcatalogOf\\("
+      ],
+      "allowed": [
+        "src/runner/execution/run.mjs",
+        "src/setup/registrations.mjs"
+      ],
+      "reason": "catalogOf (defined in the port) is the only function that returns the whole section: run.mjs snapshots it into the run record and hash, registrations.mjs checks whether it is present"
     }
   ],
   "files": {

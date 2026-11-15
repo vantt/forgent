@@ -644,6 +644,22 @@ test('lintPhaseUnits checks capability declaration by exact key and prefix entry
   assert.equal(unres[0].severity, 'warn');
 });
 
+test('lintPhaseUnits with a runner that declares no capabilities flags every unit as unregistered', () => {
+  const text = `## Units
+- unit: u-one
+  capability: docs:write
+  objective: "First"
+
+- unit: u-two
+  capability: code:implement
+  objective: "Second"
+`;
+  const result = lintPhaseUnits(text, { config: { runner: {} } });
+  const unreg = result.findings.filter((f) => f.code === 'capability.unregistered');
+  assert.deepEqual(unreg.map((f) => f.unit).sort(), ['u-one', 'u-two']);
+  assert.ok(unreg.every((f) => f.severity === 'warn'));
+});
+
 test('lintPhaseUnits warns on unknown pattern', () => {
   const text = `## Units
 - unit: u1

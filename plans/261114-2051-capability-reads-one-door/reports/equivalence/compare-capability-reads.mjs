@@ -43,9 +43,10 @@ const ALLOWLIST = Object.freeze([
     claims: ({ input, question }) => input === 'm-entries' && ['registeredCapability', 'proposalRefusals', 'operationCapability', 'validateShape', 'dispatchPlan', 'lint'].includes(question),
   },
   {
-    // plan-lint reads the flat section only: a config wrapped one level deeper has no catalog at head.
-    delta: 'plan-lint-odd-shape',
-    claims: ({ input, question }) => input === 'm-nested' && question === 'lint',
+    // The port reads the flat section only: a config wrapped one level deeper (`{runner:{capabilities}}`) has no
+    // catalog at head, where the base lookups (rigor, checkers, persona, prefer pool) still unwrapped it.
+    delta: 'nested-config-not-read',
+    claims: ({ input, question }) => input === 'm-nested' && ['lint', 'effectiveRigor', 'checkerPlan', 'bind'].includes(question),
   },
   {
     delta: 'string-aliases',

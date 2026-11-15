@@ -4,6 +4,8 @@ authoritative_for: capabilities.<name>.prefer no longer requires executor's own 
 
 # Why `capabilities.<name>.prefer` no longer requires a matching `for` on the executor
 
+> Superseded on 2026-11-14: `resolveExecutorAndOverrides` and the `prefer` branch described below are deleted. A purpose now goes through `purposeSeatOf` (`src/runner/dispatch/plan.mjs`), which asks Seat Binding's `bind()`; no `prefer` entry is read to pick an executor, and a tool executor's `for` is read only by `toolProvidersOf`. The decision is in `docs/platform/seat-binding/spec.md` section 15. The text below is the history of the earlier behaviour.
+
 `resolveExecutorAndOverrides` (`src/runner/dispatch/resolve.mjs`) used to
 enforce a symmetry rule: if `capabilities.<name>.prefer` named an
 executor, that executor had to self-declare a matching `for: [<name>]`

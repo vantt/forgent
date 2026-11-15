@@ -209,7 +209,7 @@ Common kinds:
 | `feature` | "automatic invoice export" | the feature list | no |
 | `metric` | MRR, locate hit rate | the metric catalog with definitions | no |
 | `objective` | objective A4 of a proposal, a quarterly OKR | the objective register | partly (proposals, backlog) |
-| `tool` | Stripe, HubSpot, herdr | the tool or external-system register | yes (`fgos tool query`) |
+| `tool` | Stripe, HubSpot, herdr | the tool or external-system register | yes (`runner.executors` entries of `kind: tool`, read through `fgos dispatch decide --for <capability>`) |
 | `role` | approver, tier-2 support agent | the role list or RACI table | no |
 | `release` | v0.2.0, the November launch | changelog, tags | yes |
 | `document` | a link to another document | the registry and Convention | yes |
@@ -587,7 +587,7 @@ For each work item, the retrospective writer states the one to three claims the 
 | `fgos --help --json` | the `cli-verb` register |
 | Governance holder table | the `rule` key (holder, id) |
 | Decision index and `fgos identity mint` | the `decision` register |
-| `fgos tool query` | the `tool` register |
+| `fgos dispatch decide --for <capability>` and `runner.executors` | the `tool` register (the verb `fgos tool query` is retired) |
 | Knowledge-registry contract | lifecycle, slots, `topic split/merge/rename`, `doc path-move`, lineage |
 | Component boundary | the fgOS `area` value set |
 | [Admission](../admission/spec.md) | admission of a creation and of observer proposals |

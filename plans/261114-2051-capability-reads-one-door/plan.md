@@ -304,7 +304,7 @@ No data, config or record format changes (the run-record hash is proven identica
 - No executor chooser outside the crate is left (phase 06), so step 2 changes rows, not choosers.
 - Tool rows keep a readable but ignored `prefer` (`impact-analysis: prefer: gitnexus` in this repo's
   `.fgos/config.yaml`; check other projects' configs): step 2 removes them; doctor warns until then.
-- Leftovers for step 2: the nested `{runner:{capabilities}}` tolerance of `entriesOf`; the `fgos-coding-implement`
+- Leftovers for step 2 (the nested `{runner:{capabilities}}` tolerance of `entriesOf` went in phase 08): the `fgos-coding-implement`
   indirection (a Work step skill that is itself a capability row, resolved through `purposeSeatOf` and handed to
   the unit as a soft `prefer`); `DEFAULT_CAPABILITY_SLOTS` (below).
 - `DEFAULT_CAPABILITY_SLOTS` (`src/setup/registrations.mjs:1710-1781`) is not a pure copy of catalog rows, so it is

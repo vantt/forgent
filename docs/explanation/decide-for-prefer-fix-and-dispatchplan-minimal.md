@@ -4,6 +4,8 @@ authoritative_for: fgos dispatch.mjs decide --for calling resolveExecutorIdForPu
 
 # `decide --for` ignored the exact config field it was supposed to read
 
+> Superseded on 2026-11-14: `resolveExecutorAndOverrides` and the `prefer` branch described below are deleted. A purpose now goes through `purposeSeatOf` (`src/runner/dispatch/plan.mjs`), which asks Seat Binding's `bind()`; no `prefer` entry is read to pick an executor, and a tool executor's `for` is read only by `toolProvidersOf`. The decision is in `docs/platform/seat-binding/spec.md` section 15. The text below is the history of the earlier behaviour.
+
 `tsk-5x7-1` is the first of `tsk-5x7`'s three dependency-free children —
 the piece proving `DispatchPlan`'s own seam works, landing the first green
 proof.

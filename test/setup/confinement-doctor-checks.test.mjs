@@ -158,6 +158,23 @@ test('confinement-policies-declared passes when all referenced policies are decl
   }
 });
 
+test('confinement-policies-declared counts an empty capability entry as a missing anchor: named when not strict, a failure when strict', () => {
+  const dir = mkTempProject();
+  try {
+    writeProjectConfig(dir, { runner: { capabilities: { 'custom:probe': {} } } });
+    const relaxed = checkConfinementPoliciesDeclared(dir);
+    assert.equal(relaxed.passed, true);
+    assert.match(relaxed.message, /no confinement anchor declared \([^)]*\bcustom:probe\b/);
+
+    writeProjectConfig(dir, { runner: { confinement: { strict: true }, capabilities: { 'custom:probe': {} } } });
+    const strict = checkConfinementPoliciesDeclared(dir);
+    assert.equal(strict.passed, false);
+    assert.match(strict.message, /missing confinement anchors in strict mode: .*\bcustom:probe\b/);
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});
+
 test('confinement-policies-declared passes with custom policies defined in confinementPolicies', () => {
   const dir = mkTempProject();
   try {
