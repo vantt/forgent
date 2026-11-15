@@ -64,6 +64,18 @@ Phase-lead rules: [plan.md](plan.md). Branch `rust-verb-migration-program/s4-p12
    plan.md under "Added during execution".
 8. **Hand-off:** the `## [Unreleased]` lines of 03-11 to the step lead; the program-plan items (S5-S7 bridged rows).
 
+## Close items added 2026-11-15 (Decision log)
+
+1. **`fgos uninstall` refuses its own root.** Phase 09 stays closed. In `apps/fgos/src/wiring/uninstall.rs` (and the root
+   door where it fits) a root that is `/`, `$HOME` or an ancestor of either is a precondition refusal, exit 2, before
+   any plan, in addition to fgctl's purge guard. One test covers `/`, `$HOME` and an ancestor of a project under HOME.
+   One line in `docs/platform/packaging-distribution/spec.md` 6.1 (done in the decision-log commit). The close's
+   `[Unreleased]` CHANGELOG line mentions it.
+2. **One table of verb-root behaviour (RUL11).** After phases 09, 10 and 11 have added their verbs, fold `root_policy`,
+   `acts_on_resolved_root`, `takes_lenient_root` and `ignores_dir` in `apps/fgos/src/invocation_doors.rs` (four per-verb
+   matches over the same few verbs) into one table, in `invocation_doors` or on the route annotation, so a verb's root
+   rules sit in one row. One proof per behaviour is kept; no test is weakened.
+
 ## Files
 
 - Modify: the docs above, `docs/architecture-manifest.json` (retired-code row), plan.md (file set), census,
