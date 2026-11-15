@@ -288,6 +288,7 @@ pub fn cleanup_stale_activation_tmp_files(installation_dir: &Path) {
             }
         }
     }
+    let _ = fgos_durable_file::sweep_stale_temps(installation_dir);
 }
 
 #[derive(Deserialize)]
@@ -522,41 +523,51 @@ fn verify_candidate_host_entry(
     Ok(())
 }
 
-/// Atomically publishes `activation.json` via .tmp.<activationId> + rename (R7).
+/// Publishes `activation.json` through Fgos Durable File: temp, fsync, rename over the name, directory fsync.
+///
+/// A failure after the rename (only the directory fsync can fail there) leaves the new record in
+/// place, so it is reported as a warning and the caller goes on to write the pin that names it.
 pub fn publish_activation_file(
     activation_path: &Path,
     binding: &WorkspaceActivationBinding,
 ) -> std::io::Result<()> {
-    if let Some(parent) = activation_path.parent() {
-        std::fs::create_dir_all(parent)?;
-    }
-
-    let tmp_path = activation_path
-        .parent()
-        .unwrap()
-        .join(format!("activation.json.tmp.{}", binding.activation_id));
-
+    let (Some(dir), Some(name)) = (activation_path.parent(), activation_path.file_name()) else {
+        return Err(std::io::Error::new(
+            std::io::ErrorKind::InvalidInput,
+            "activation path has no parent directory or file name",
+        ));
+    };
+    let name = name.to_str().ok_or_else(|| {
+        std::io::Error::new(
+            std::io::ErrorKind::InvalidInput,
+            "activation file name is not UTF-8",
+        )
+    })?;
+    std::fs::create_dir_all(dir)?;
     let json_bytes = serde_json::to_vec_pretty(binding).map_err(std::io::Error::other)?;
 
-    {
-        let mut file = std::fs::OpenOptions::new()
-            .write(true)
-            .create(true)
-            .truncate(true)
-            .open(&tmp_path)?;
-        file.write_all(&json_bytes)?;
-        file.sync_all()?;
-    }
+    // Default creation mode (0o666 under the process umask), as the record has always had.
+    settle_activation_install(
+        name,
+        fgos_durable_file::replace_durably_with_mode(dir, name, &json_bytes, 0o666),
+    )
+}
 
-    std::fs::rename(&tmp_path, activation_path)?;
-
-    if let Some(parent) = activation_path.parent() {
-        if let Ok(dir) = std::fs::File::open(parent) {
-            let _ = dir.sync_all();
+fn settle_activation_install(
+    name: &str,
+    result: Result<fgos_durable_file::Installed, fgos_durable_file::InstallError>,
+) -> std::io::Result<()> {
+    match result {
+        Ok(_) => Ok(()),
+        Err(e) if e.installed.is_some() => {
+            eprintln!(
+                "warning: {name} was installed but not made durable ({}): {}",
+                e.step, e.source
+            );
+            Ok(())
         }
+        Err(e) => Err(e.source),
     }
-
-    Ok(())
 }
 
 impl InitError {
@@ -2367,6 +2378,72 @@ mod tests {
     use crate::verify::to_canonical_json;
     use sha2::{Digest, Sha256};
     use std::path::PathBuf;
+
+    fn sample_binding() -> WorkspaceActivationBinding {
+        WorkspaceActivationBinding {
+            schema_version: 1,
+            repository_id: "repo".to_string(),
+            workspace_id: "ws".to_string(),
+            work_state_id: "work".to_string(),
+            activation_id: "act-1".to_string(),
+            status: "ready".to_string(),
+            artifact_digest: "sha256:aa".to_string(),
+            release_path: "/release".to_string(),
+            previous_artifact_digest: None,
+            shim_version: "1".to_string(),
+            resolved_dependencies: serde_json::json!({}),
+            pin_snapshot: serde_json::json!({}),
+            pin_override_reason: None,
+            activated_at: "2026-01-01T00:00:00.000Z".to_string(),
+            activated_by: ActivatedByInfo {
+                tool: "fgctl".to_string(),
+                version: "0".to_string(),
+            },
+        }
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn publish_activation_file_installs_the_record_with_the_default_mode_and_no_temp() {
+        use std::os::unix::fs::PermissionsExt;
+        let root = fresh_temp_root("publish_activation");
+        let dir = root.join("installation");
+        let path = dir.join("activation.json");
+        publish_activation_file(&path, &sample_binding()).unwrap();
+        let ordinary = root.join("ordinary");
+        std::fs::File::create(&ordinary).unwrap();
+        let umask_mode = std::fs::metadata(&ordinary).unwrap().permissions().mode() & 0o777;
+        let mode = std::fs::metadata(&path).unwrap().permissions().mode() & 0o777;
+        assert_eq!(mode, umask_mode);
+        let written: WorkspaceActivationBinding =
+            serde_json::from_slice(&std::fs::read(&path).unwrap()).unwrap();
+        assert_eq!(written.activation_id, "act-1");
+        let names: Vec<_> = std::fs::read_dir(&dir)
+            .unwrap()
+            .map(|e| e.unwrap().file_name())
+            .collect();
+        assert_eq!(names, vec![std::ffi::OsString::from("activation.json")]);
+        let _ = std::fs::remove_dir_all(&root);
+    }
+
+    #[test]
+    fn an_installed_but_unsynced_activation_record_is_a_warning_not_an_error() {
+        let late = fgos_durable_file::InstallError {
+            source: std::io::Error::other("sync refused"),
+            step: "parent-fsync",
+            installed: Some(fgos_durable_file::Installed::Created),
+            temporary: None,
+        };
+        assert!(settle_activation_install("activation.json", Err(late)).is_ok());
+        let early = fgos_durable_file::InstallError {
+            source: std::io::Error::other("disk full"),
+            step: "bytes-written",
+            installed: None,
+            temporary: None,
+        };
+        let err = settle_activation_install("activation.json", Err(early)).unwrap_err();
+        assert_eq!(err.to_string(), "disk full");
+    }
 
     fn sha256_of(bytes: &[u8]) -> String {
         format!("sha256:{:x}", Sha256::digest(bytes))

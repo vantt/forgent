@@ -230,6 +230,9 @@ const EXPECTED_CLOSURE = [
   // ... and the capped log append provider-capacity.mjs writes its audit log through (node:fs and
   // node:path only; no process control).
   'src/util/capped-jsonl-log.mjs',
+  // ... and the temp-name tag that log and the lock transport name their temporaries with (node:crypto and
+  // node:worker_threads only).
+  'src/util/unique-tmp-tag.mjs',
   // The per-cwd dispatch lock the planner reports on (holder list or probe
   // through the door; no process control of its own) and the leaf error type
   // its acquire raises.

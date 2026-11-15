@@ -557,7 +557,7 @@ mod quiesce {
     fn emit(result: Option<&str>, fields: Value, code: i32) -> i32 {
         emit_as(SCAN_PROTOCOL, result, fields, code)
     }
-    use fgos_process::facts::{scan as scan_processes, Scan, ScanFilter};
+    use fgos_process::facts::{scan as scan_processes, ProcView, Scan, ScanFilter};
 
     /// A workspace root and the linked worktrees its caller listed.
     fn workspace_dirs(root: &Path, linked: &[PathBuf]) -> Vec<PathBuf> {
@@ -645,21 +645,17 @@ mod quiesce {
         }
     }
 
-    /// Owner uid of `/proc/<pid>`: a process that made itself non-dumpable
-    /// (ssh-agent, gpg-agent) shows as root and is another user's process
-    /// for this scan.
+    /// Whether the scanned process runs as this process's effective user.
+    /// A non-dumpable process (ssh-agent, gpg-agent) keeps its `/proc/<pid>`
+    /// directory and status uid, so the uid the scan already read answers it.
     #[cfg(target_os = "linux")]
-    fn same_user(pid: u32) -> bool {
-        use std::os::unix::fs::MetadataExt;
+    fn same_user(view: &ProcView) -> bool {
         // SAFETY: geteuid has no preconditions.
-        let me = unsafe { libc::geteuid() };
-        std::fs::metadata(format!("/proc/{pid}"))
-            .map(|m| m.uid() == me)
-            .unwrap_or(false)
+        view.effective_uid == Some(unsafe { libc::geteuid() })
     }
 
     #[cfg(not(target_os = "linux"))]
-    fn same_user(_pid: u32) -> bool {
+    fn same_user(_view: &ProcView) -> bool {
         false
     }
 
@@ -738,7 +734,7 @@ mod quiesce {
                 }
                 None if !workspace_only
                     && !view.unreadable.is_empty()
-                    && same_user(view.pid.0)
+                    && same_user(&view)
                     && could_be_fgos(view.cmdline.as_deref()) =>
                 {
                     unreadable += 1

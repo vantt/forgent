@@ -1,8 +1,9 @@
-// capped-jsonl-log.mjs — one JSON record per line in a private, size-capped log. A kernel leaf (fs and
-// path only), so any layer that keeps a history as a log (L1) can use it without reaching anything above.
+// capped-jsonl-log.mjs — one JSON record per line in a private, size-capped log. A kernel leaf (fs, path and
+// the tier-0 temp-name tag only), so any layer that keeps a history as a log (L1) can use it without reaching anything above.
 
 import fs from 'node:fs';
 import path from 'node:path';
+import { uniqueTmpTag } from './unique-tmp-tag.mjs';
 
 /** Past this size the oldest half of the log is dropped. */
 export const FAULT_LOG_MAX_BYTES = 1024 * 1024;
@@ -17,7 +18,7 @@ export function appendFaultRecord(logPath, record) {
   try {
     if (fs.statSync(logPath).size > FAULT_LOG_MAX_BYTES) {
       const lines = fs.readFileSync(logPath, 'utf8').split('\n').filter(Boolean);
-      const temp = `${logPath}.${process.pid}.tmp`;
+      const temp = `${logPath}.tmp-${uniqueTmpTag()}`;
       fs.writeFileSync(temp, `${lines.slice(Math.ceil(lines.length / 2)).join('\n')}\n`, { mode: 0o600 });
       fs.renameSync(temp, logPath);
     }

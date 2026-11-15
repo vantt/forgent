@@ -10,6 +10,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { uniqueTmpTag } from '../../src/util/unique-tmp-tag.mjs';
 
 import {
   generateWrapperContent,
@@ -474,6 +475,19 @@ test('generateAllSkillWrappers prunes orphaned wrappers from .claude/skills when
   assert.equal(written.length, 1);
   assert.ok(fs.existsSync(path.join(claudeSkillsRoot, 'skill-active', 'SKILL.md')));
   assert.equal(fs.existsSync(path.join(claudeSkillsRoot, 'skill-orphaned')), false);
+});
+
+test('generateAllSkillWrappers skips an in-flight temp skill directory named with uniqueTmpTag, as it does one named by an older release', () => {
+  const agentsSkillsRoot = mkTempDir('skill-wrappers-inflight-agents-');
+  const claudeSkillsRoot = mkTempDir('skill-wrappers-inflight-target-');
+  writeSkill(agentsSkillsRoot, 'skill-active', SAMPLE_FRONTMATTER, '# Active\n');
+  const inFlight = [`skill-a.tmp-${uniqueTmpTag()}`, 'skill-b.tmp-4242-1700000000000-k3j9x2'];
+  for (const name of inFlight) writeSkill(agentsSkillsRoot, name, SAMPLE_FRONTMATTER, '# Temp\n');
+
+  const written = generateAllSkillWrappers(agentsSkillsRoot, claudeSkillsRoot, { owned: everyNameIn(agentsSkillsRoot) });
+
+  assert.equal(written.length, 1);
+  assert.deepEqual(fs.readdirSync(claudeSkillsRoot), ['skill-active']);
 });
 
 test('generateAllSkillWrappers never prunes a standalone skill under .claude/skills that was never a generated wrapper (regression: pruning by name-absence alone previously deleted a hand-authored skill directory)', () => {

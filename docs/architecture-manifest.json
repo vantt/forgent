@@ -138,11 +138,7 @@
         "packages/process/rust/src/platform/windows.rs",
         "packages/process/rust/src/platform/windows_job.rs"
       ],
-      "debt": [
-        { "path": "packages/holder-lock/rust/src/helper.rs", "reason": "moves onto fgos-process: opens the holder and reads its creation time itself instead of open_verified" },
-        { "path": "packages/holder-lock/rust/src/route/hold.rs", "reason": "moves onto fgos-process: watch_parent opens and times the parent itself instead of open_verified" },
-        { "path": "packages/holder-lock/rust/src/borrow_vectors.rs", "reason": "moves onto fgos-process: only asks whether a pid has ended through its own OpenProcess; reads no start time" }
-      ],
+      "debt": [],
       "reason": "one reader of a process start time per platform: the fgos-process drivers; every other crate asks them"
     },
     {
@@ -172,9 +168,7 @@
       ],
       "debt": [
         { "path": "packages/git/rust/src/driver.rs", "reason": "the match is inside a test function, but the test-region brace counter ends the test module early (a brace in a string or char literal), so the check reads it as product code" },
-        { "path": "scripts/run-tests.mjs", "reason": "kills stray processes by a bare pid taken from its own /proc scan, with no identity check; pid reuse could hit another process" },
-        { "path": "scripts/lib/test-file-watchdog.mjs", "reason": "judges liveness with kill(pid, 0) and kills by bare pid, a second judge and a second killer beside fgos-process" },
-        { "path": "scripts/lib/mailbox-live-confined.mjs", "reason": "kills a probe process by bare pid" }
+        { "path": "scripts/lib/mailbox-live-confined.mjs", "reason": "frozen V7n measurement module; moves onto the process door when V7n is re-measured (MAIL)" }
       ],
       "retiredBy": "each Node own-child group kill goes when the code that spawns that child moves to Rust",
       "reason": "signalling by identity goes through fgos-process; the launch gate, holder-lock and two Node modules signal only the group of a child they just spawned"
@@ -192,20 +186,16 @@
         "src/run-supervisor/runtime-dir.mjs",
         "src/runner/dispatch/confinement/drivers/bwrap.mjs",
         "src/runner/dispatch/confinement/probes/harness.mjs",
-        { "path": "scripts/ci-setup-bwrap.sh", "reason": "reads the AppArmor user-namespace switch to set up the sandbox on CI" }
+        { "path": "scripts/ci-setup-bwrap.sh", "reason": "reads the AppArmor user-namespace switch to set up the sandbox on CI" },
+        { "path": "scripts/lib/test-file-cpu.mjs", "reason": "reads /proc/self/stat for waited CPU seconds of the test run, a measurement and not a process judgement" },
+        { "path": "scripts/lib/mailbox-live-cli.mjs", "reason": "live probe reads /proc/meminfo and scans /proc/*/cmdline for the heavy-gate check, machine measurements and not process judgements" },
+        { "path": "scripts/record-mailbox-hook-fixtures.mjs", "reason": "fixture recorder reads /proc/<pid> files and the pid namespace link of the CLI it records" },
+        { "path": "scripts/git/e3-bench.mjs", "reason": "bench counts visible processes in /proc, a measurement and not a process judgement" },
+        { "path": "scripts/git/p-space-resource.mjs", "reason": "bench counts its own open descriptors in /proc/self/fd and its thread count in /proc/self/status, measurements and not process judgements" }
       ],
       "debt": [
-        { "path": "packages/holder-lock/rust/src/route.rs", "reason": "reads /proc/<pid> metadata for the owner uid, a process fact read outside fgos-process" },
-        { "path": "packages/holder-lock/rust/src/origin.rs", "reason": "reads /proc/<pid>/comm, a process fact read outside fgos-process" },
         { "path": "packages/holder-lock/rust/src/borrow_vectors.rs", "reason": "a vector module compiled into the crate whose shell snippet reads /proc/$!/winpid to learn a Windows pid" },
-        { "path": "scripts/run-tests.mjs", "reason": "scans /proc for stray processes of the test run" },
-        { "path": "scripts/lib/test-file-watchdog.mjs", "reason": "scans /proc to judge a test file's processes" },
-        { "path": "scripts/lib/test-file-cpu.mjs", "reason": "reads /proc/self/stat for waited CPU seconds" },
-        { "path": "scripts/lib/mailbox-live-cli.mjs", "reason": "live probe reads /proc/meminfo" },
-        { "path": "scripts/lib/mailbox-live-confined.mjs", "reason": "live probe reads /proc/<pid> files of its own processes" },
-        { "path": "scripts/record-mailbox-hook-fixtures.mjs", "reason": "fixture recorder reads /proc/<pid> files and the pid namespace link" },
-        { "path": "scripts/git/e3-bench.mjs", "reason": "bench counts visible processes in /proc" },
-        { "path": "scripts/git/p-space-resource.mjs", "reason": "bench counts its own open descriptors in /proc/self/fd" }
+        { "path": "scripts/lib/mailbox-live-confined.mjs", "reason": "frozen V7n measurement module; moves onto the process door when V7n is re-measured (MAIL)" }
       ],
       "retiredBy": "the Node socket-table read and the bwrap probe arguments go when the run-supervisor directory and the confinement probes move to Rust",
       "reason": "only fgos-process judges a process; holder-lock reads fdinfo for lock holders, the Git WAL names an open file, and bwrap arguments are not reads of process facts"
@@ -485,6 +475,43 @@
       "debt": [],
       "retiredBy": "S7: the Node facade and its Node readers retire with the Node payload",
       "reason": "only fgos-identity resolves a writer and decides the launcher environment; the Node facade asks it through the addon, and the files listed read or set these names for their own process"
+    },
+    {
+      "job": "fsync a file or directory from Rust",
+      "kind": "door",
+      "patterns": ["\\bsync_(?:all|data)\\b", "\\blibc::f(?:data)?sync\\b", "F_FULLFSYNC", "FlushFileBuffers", "RENAME_EXCHANGE"],
+      "allowed": [
+        "packages/durable-file/rust/src/lib.rs",
+        { "path": "packages/git/rust/src/restore.rs", "reason": "Git writes the restored worktree files with Git's own durability, behind the Git door" },
+        { "path": "packages/git/rust/src/native_lock.rs", "reason": "Git's own lock file, behind the Git door" },
+        { "path": "packages/git/rust/src/sequence.rs", "reason": "Git's own sequence file, behind the Git door" },
+        { "path": "packages/git/rust/src/repository_config.rs", "reason": "Git's own repository config file, behind the Git door" },
+        { "path": "packages/event-store/rust/src/rotate.rs", "reason": "renames an existing segment; Durable File has no move primitive, and the directory sync goes through the door" },
+        { "path": "packages/event-store/rust/src/identity.rs", "reason": "syncs the ancestors of the store directory before the store identity is installed (the door leaves ancestors to its caller); Event Store keeps its own directory-sync calls at the same points" },
+        { "path": "packages/event-store/rust/src/fsio.rs", "reason": "the trait default of sync_file fsyncs an appended segment through an injectable seam; the door installs whole files" },
+        { "path": "packages/holder-lock/rust/src/tombstone.rs", "reason": "exchanges two directories with RENAME_EXCHANGE; holder-lock is not a Durable File client and the door has no exchange" },
+        { "path": "packages/observe/rust/src/shard.rs", "reason": "appends lines to an existing shard file and syncs it; the door installs whole files" },
+        { "path": "packages/run-supervisor/rust/src/gate.rs", "reason": "rewrites an existing gate-exit file in place because a file bind-mounted read-only into the sandbox cannot be renamed; the door installs by rename" }
+      ],
+      "debt": [],
+      "reason": "fgos-durable-file orders temp, fsync, install and directory fsync; each other file does a different job, named in its reason"
+    },
+    {
+      "job": "temp file name of a Node write-then-rename",
+      "kind": "door",
+      "patterns": [
+        "\\}\\.tmp-\\$\\{process\\.pid\\}",
+        "\\$\\{process\\.pid\\}\\.tmp",
+        "\\.tmp\\.\\$\\{process\\.pid\\}",
+        "req-\\$\\{[^}]+\\}\\.json\\.tmp(?!-)"
+      ],
+      "allowed": [
+        { "path": "scripts/git-one-door-scan.mjs", "reason": "single-process tooling writing its own census file; no second thread shares the name" },
+        { "path": "scripts/lib/git-addon-stage.mjs", "reason": "single-process build tooling staging the addon, host and digest files; no second thread shares the name" },
+        { "path": "scripts/run-rust-dev-host.mjs", "reason": "single-process dev tooling materialising the dev host; no second thread shares the name" }
+      ],
+      "debt": [],
+      "reason": "every temp name of a Node write-then-rename comes from uniqueTmpTag so two threads or two calls never share one; there is no shared write helper (each module keeps its own, see the Durable file row of docs/platform/component-boundary.md). The patterns catch the hand-built forms (a pid-only suffix, a pid plus clock, the request-file temp); a directory staging or an mkdtemp prefix is another job and does not match"
     }
   ],
   "files": {

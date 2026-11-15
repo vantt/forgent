@@ -18,6 +18,7 @@ import path from 'node:path';
 import { isConfigRefusal, readConfig } from '../config/facade.mjs';
 import { resolveWorkspaceInstallationBin } from './bin-discovery.mjs';
 import { projectShimPath } from '../util/host-bin-path.mjs';
+import { uniqueTmpTag } from '../util/unique-tmp-tag.mjs';
 
 function configValue(projectRoot, sections) {
   try {
@@ -350,7 +351,7 @@ export function fixManagedTimer(schedule, cwd, overrides = {}) {
   fs.mkdirSync(p.chosen.dir, { recursive: true });
   for (const [name, text] of Object.entries(p.files)) {
     const file = path.join(p.chosen.dir, name);
-    const temp = `${file}.${process.pid}.tmp`;
+    const temp = `${file}.tmp-${uniqueTmpTag()}`;
     fs.writeFileSync(temp, text, { mode: 0o644 });
     fs.renameSync(temp, file);
   }

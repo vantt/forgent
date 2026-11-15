@@ -57,11 +57,11 @@ function waitWhileAlive(views, graceMs) {
  * recorded identity only, so a pid reused since the scan is never hit. A view without a readable identity
  * cannot be signalled safely and is reported in `left`, as is any view still alive after the kill window.
  * @param {string} dir directory whose processes are stopped
- * @param {{ graceMs?: number }} [options] how long each signal gets to take effect
+ * @param {{ graceMs?: number, envKeys?: string[], views?: object[]|'unsupported' }} [options] how long each signal gets to take effect; `envKeys` and `views` are `processesInside`'s
  * @returns {{ found: number, stopped: number, left: object[] }}
  */
-export function stopProcessesInside(dir, { graceMs = 1500 } = {}) {
-  const found = processesInside(dir);
+export function stopProcessesInside(dir, { graceMs = 1500, envKeys = [], views = undefined } = {}) {
+  const found = processesInside(dir, views === undefined ? { envKeys } : { envKeys, views });
   const signalAll = (signal) => {
     for (const view of found) {
       if (view.tuple === null) continue;

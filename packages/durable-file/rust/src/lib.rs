@@ -417,6 +417,43 @@ pub fn sync_directory(dir: &Path) -> io::Result<()> {
     file.sync_all()
 }
 
+/// True for the exact temporary name a write in this crate creates:
+/// `.durable-file-<pid>-<seq>.tmp` with decimal pid and seq.
+fn is_own_temporary(name: &str) -> bool {
+    name.strip_prefix(".durable-file-")
+        .and_then(|n| n.strip_suffix(".tmp"))
+        .and_then(|n| n.split_once('-'))
+        .is_some_and(|(pid, seq)| {
+            [pid, seq]
+                .iter()
+                .all(|part| !part.is_empty() && part.bytes().all(|b| b.is_ascii_digit()))
+        })
+}
+
+/// Remove temporaries a killed or failed write left in `dir` (this crate keeps a
+/// failed temporary for diagnosis), then sync the directory when any was removed.
+/// Recovery only: the caller must exclude every live writer of `dir`. A missing
+/// `dir` has nothing to sweep. Returns how many temporaries were removed.
+pub fn sweep_stale_temps(dir: &Path) -> io::Result<usize> {
+    let entries = match fs::read_dir(dir) {
+        Ok(entries) => entries,
+        Err(e) if e.kind() == io::ErrorKind::NotFound => return Ok(0),
+        Err(e) => return Err(e),
+    };
+    let mut removed = 0;
+    for entry in entries {
+        let entry = entry?;
+        if entry.file_name().to_str().is_some_and(is_own_temporary) {
+            fs::remove_file(entry.path())?;
+            removed += 1;
+        }
+    }
+    if removed > 0 {
+        sync_directory(dir)?;
+    }
+    Ok(removed)
+}
+
 /// Windows counterpart of the no-follow open: opens `path` with `options` without following a
 /// reparse point (symlink, junction) at the leaf, and refuses a handle that is one or is not a
 /// regular file. Replaces any custom flags already set on `options`. Components above the leaf

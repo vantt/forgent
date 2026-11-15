@@ -286,3 +286,40 @@ fn ordered_install_waits_for_its_barrier_before_the_name_exists() {
     sync_directories(&[&dir.0, &other.0]).unwrap();
     assert!(sync_directories(&[&dir.0, &dir.0.join("missing")]).is_err());
 }
+
+#[test]
+fn sweep_removes_only_this_crates_temporaries_and_tolerates_a_missing_directory() {
+    let dir = Dir::new();
+    for name in [".durable-file-123-45.tmp", ".durable-file-1-0.tmp"] {
+        fs::write(dir.0.join(name), b"partial").unwrap();
+    }
+    for name in [
+        ".durable-file-not-ours.tmp",
+        ".durable-file--5.tmp",
+        ".durable-file-1-.tmp",
+        ".durable-file-1-2.txt",
+        "record",
+    ] {
+        fs::write(dir.0.join(name), b"keep").unwrap();
+    }
+    assert_eq!(fgos_durable_file::sweep_stale_temps(&dir.0).unwrap(), 2);
+    let mut left: Vec<_> = fs::read_dir(&dir.0)
+        .unwrap()
+        .map(|e| e.unwrap().file_name().into_string().unwrap())
+        .collect();
+    left.sort();
+    assert_eq!(
+        left,
+        [
+            ".durable-file--5.tmp",
+            ".durable-file-1-.tmp",
+            ".durable-file-1-2.txt",
+            ".durable-file-not-ours.tmp",
+            "record"
+        ]
+    );
+    assert_eq!(
+        fgos_durable_file::sweep_stale_temps(&dir.0.join("missing")).unwrap(),
+        0
+    );
+}

@@ -17,6 +17,7 @@
 // Zero-dep, Node builtins only: the hook imports this file by relative path.
 import fs from 'node:fs';
 import path from 'node:path';
+import { uniqueTmpTag } from '../util/unique-tmp-tag.mjs';
 
 export const BEACON_SCHEMA = 1;
 /** The activity window the pre-commit hook writes unless
@@ -92,7 +93,7 @@ export function writeBeacon(fgosDir, { writer, windowMs, now = Date.now(), audit
   const target = beaconPath(fgosDir);
   fs.mkdirSync(path.dirname(target), { recursive: true });
   const record = { v: BEACON_SCHEMA, kind: 'beacon', writer: { id: writer.id, source: writer.source ?? null }, writtenAt: now, windowMs, auditPid };
-  const tmpPath = `${target}.tmp-${process.pid}-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+  const tmpPath = `${target}.tmp-${uniqueTmpTag()}`;
   fs.writeFileSync(tmpPath, JSON.stringify(record));
   fs.renameSync(tmpPath, target);
   return record;

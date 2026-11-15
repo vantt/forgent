@@ -325,7 +325,7 @@ function mirroredRepoRoot(prefix) {
   fs.copyFileSync(realLibPath, path.join(root, 'scripts', 'lib', 'is-main-module.mjs'));
   fs.copyFileSync(realQueueLibPath, path.join(root, 'scripts', 'lib', 'full-suite-queue.mjs'));
   // ...and the libraries run-tests.mjs and the distribution builder (its one-door census step) import.
-  for (const rel of ['lib/dev-host-manifest.mjs', 'lib/test-file-cpu.mjs', 'lib/git-addon-stage.mjs', 'lib/git-dir-layout.mjs', 'lib/git-ports.mjs', 'git-addon.mjs', 'lib/js-source-lexer.mjs', 'lib/git-spawn-match.mjs', 'lib/rust-source.mjs', 'git-one-door-scan.mjs']) {
+  for (const rel of ['lib/dev-host-manifest.mjs', 'lib/test-file-cpu.mjs', 'lib/git-addon-stage.mjs', 'lib/git-dir-layout.mjs', 'lib/git-ports.mjs', 'git-addon.mjs', 'lib/js-source-lexer.mjs', 'lib/git-spawn-match.mjs', 'lib/rust-source.mjs', 'lib/test-file-watchdog.mjs', 'git-one-door-scan.mjs']) {
     fs.copyFileSync(fileURLToPath(new URL(`../../scripts/${rel}`, import.meta.url)), path.join(root, 'scripts', rel));
   }
   // run-tests.mjs builds the native addon record through the distribution builder's helpers.
@@ -515,7 +515,6 @@ test("a killed run's watchdog prunes the registrations of linked checkouts that 
   fs.writeFileSync(path.join(registrations, 'verify-Killed', 'gitdir'), `${path.join(checkout, '.git')}\n`);
   const pruned = [];
   const reaped = reapRunDirs([runDir], {
-    procRoot: path.join(base, 'no-proc'),
     repo: base,
     prune: (target) => { assert.equal(fs.existsSync(runDir), false, 'the dirs go first'); pruned.push(target); },
   });
@@ -536,8 +535,8 @@ test('a run fails when a process it started still runs in its temp dir, names it
     env: { TMPDIR: base },
     log: (msg) => logs.push(msg),
     spawn: (_exec, _argv, { env }) => {
-      const marker = path.join(env.TMPDIR, 'fixture', 'hook');
-      straggler = spawn(process.execPath, ['-e', 'setTimeout(() => {}, 60000)', marker], { detached: true, stdio: 'ignore' });
+      // A fixture's child inherits the run's temp root, which is how the run finds it.
+      straggler = spawn(process.execPath, ['-e', 'setTimeout(() => {}, 60000)'], { detached: true, stdio: 'ignore', env: { ...process.env, TMPDIR: env.TMPDIR } });
       straggler.unref();
       return { status: 0 };
     },
@@ -549,6 +548,72 @@ test('a run fails when a process it started still runs in its temp dir, names it
   const alive = () => { try { process.kill(straggler.pid, 0); return true; } catch { return false; } };
   while (alive() && Date.now() < deadline) await delay(20);
   assert.equal(alive(), false, 'the run stopped it');
+  fs.rmSync(base, { recursive: true, force: true });
+});
+
+// A stray the door cannot stop (identity unreadable, signal refused) leaves a process running; counting it as
+// "killed now" or skipping it silently would let a leak pass, so the run fails and names a next step.
+test('a run fails when a stray cannot be stopped, and names the process with a next step', async () => {
+  const base = tempBase();
+  const logs = [];
+  let straggler;
+  try {
+    const result = runSelectedTests(['a.test.mjs'], {
+      cwd: base,
+      env: { TMPDIR: base },
+      log: (msg) => logs.push(msg),
+      stopInside: (_dir, { views }) => ({ left: views.filter((view) => view.pid === straggler.pid).map((view) => ({ ...view, tuple: null })) }),
+      spawn: (_exec, _argv, { env }) => {
+        straggler = spawn(process.execPath, ['-e', 'setTimeout(() => {}, 60000)'], { stdio: 'ignore', env: { ...process.env, TMPDIR: env.TMPDIR } });
+        return { status: 0 };
+      },
+    });
+    assert.equal(result.status, 1);
+    assert.equal(result.strayRefusals.length, 1);
+    assert.ok(result.strayRefusals[0].includes(`ps -o pid,lstart,args -p ${straggler.pid}`) && result.strayRefusals[0].includes('identity could not be read'));
+    assert.ok(logs.some((line) => line.includes('could not be stopped')), 'the run says it is refusing, not that the stray was killed');
+    assert.equal(straggler.signalCode, null, 'nothing was sent');
+  } finally {
+    straggler?.kill('SIGKILL');
+    fs.rmSync(base, { recursive: true, force: true });
+  }
+});
+
+// Without a time limit one hung file holds the run for hours; there is no safe way to run on, so no test starts.
+test('a run refuses before running any test when the per-file time limit cannot start', () => {
+  const base = tempBase();
+  const logs = [];
+  let spawned = false;
+  const result = runSelectedTests(['a.test.mjs'], {
+    cwd: base,
+    env: { TMPDIR: base },
+    log: (msg) => logs.push(msg),
+    watchdog: true,
+    startWatchdog: () => ({ stop: () => [], failure: () => 'the process door is unavailable: not shipped' }),
+    spawn: () => { spawned = true; return { status: 0 }; },
+  });
+  assert.equal(spawned, false);
+  assert.equal(result.status, 1);
+  assert.ok(logs.some((line) => line.includes('no test was run') && line.includes('not shipped')));
+  fs.rmSync(base, { recursive: true, force: true });
+});
+
+// The watchdog proves it can kill before it says ready; a door it cannot load is reported in its journal.
+test('the watchdog reports failed in its journal, and exits, when the process door cannot load', () => {
+  const base = tempBase();
+  const out = path.join(base, 'journal.jsonl');
+  const limits = path.join(base, 'limits.json');
+  fs.writeFileSync(limits, '{}');
+  fs.writeFileSync(out, '');
+  const watchdogPath = fileURLToPath(new URL('../../scripts/lib/test-file-watchdog.mjs', import.meta.url));
+  const record = { host: 'h', pid: process.pid, startTime: '1', pidNs: 'x' };
+  const result = spawnSync(process.execPath, [watchdogPath, `--parent=${process.pid}`, `--parent-record=${JSON.stringify(record)}`, '--poll-ms=1000', `--limits=${limits}`, `--out=${out}`], {
+    cwd: base, encoding: 'utf8', env: { PATH: process.env.PATH, FGOS_HOST_BIN: path.join(base, 'no-such-host') },
+  });
+  assert.equal(result.status, 2);
+  const entries = fs.readFileSync(out, 'utf8').split('\n').filter(Boolean).map((line) => JSON.parse(line));
+  assert.deepEqual(entries.map((entry) => Object.keys(entry)), [['failed']]);
+  assert.ok(entries[0].failed.includes('no time limit would hold'));
   fs.rmSync(base, { recursive: true, force: true });
 });
 
@@ -938,17 +1003,20 @@ for (const pauseAfterKill of [false, true]) {
       // No fake process table, source pin, or production-only testing seam:
       // the nested runner, supervisor, and detached child all run for real.
       const watchdogPath = fileURLToPath(new URL('../../scripts/lib/test-file-watchdog.mjs', import.meta.url));
+      const doorUrl = new URL('../../src/native/door.mjs', import.meta.url).href;
       const preload = write(root, 'pause-watchdog.mjs', `
 import fs from 'node:fs';
 if (process.argv[1] === ${JSON.stringify(watchdogPath)}) {
   fs.writeFileSync(${JSON.stringify(supervisorPidFile)}, String(process.pid));
   process.on('exit', () => fs.writeFileSync(${JSON.stringify(supervisorExited)}, '1'));
-  const kill = process.kill;
-  process.kill = function(pid, signal) {
-    const isRunner = signal === 'SIGKILL'
+  const { nativeDoor } = await import(${JSON.stringify(doorUrl)});
+  const facts = nativeDoor().process;
+  const signal = facts.signalByIdentity;
+  facts.signalByIdentity = function(record, name) {
+    const isRunner = name === 'kill'
       && fs.existsSync(${JSON.stringify(runnerPidFile)})
-      && pid === Number(fs.readFileSync(${JSON.stringify(runnerPidFile)}, 'utf8'));
-    const result = kill.call(process, pid, signal);
+      && record.pid === Number(fs.readFileSync(${JSON.stringify(runnerPidFile)}, 'utf8'));
+    const result = signal.call(facts, record, name);
     if (isRunner) {
       fs.writeFileSync(${JSON.stringify(killGapMarker)}, '1');
       const deadline = Date.now() + 60_000;
