@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v0.2.0-rc.10] - 2026-11-15
+
 - `fgos events sync|status|seal|export`, `fgos session start|end|list|gc` and `fgos gateway start|stop|status` now run in the Rust host with no Node process, and the seal and publish children a Node command starts run the host binary.
 - `fgos events status|sync --remote`, `sync --no-push`, `export --stream` given without a value, and `export --since` that is not JSON are refused with exit 4 and a plain message instead of a runtime conversion error (exit 1).
 - `fgos session` outside a project is refused and creates nothing; it used to write a `.fgos` in the current directory. From a subdirectory or a linked worktree with no store it uses the project's session registry instead of creating one there. `sessions.json` is written atomically. `session end` and `session gc` remove only a checkout that sits under the sessions directory and belongs to the project, and `gc` keeps a row whose directory Git does not list as one of its worktrees, reporting it as skipped. `merge`, `approve` and `return` need a resolvable host to list sessions.
