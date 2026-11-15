@@ -4,6 +4,8 @@
 //! start Node.
 
 pub mod bridge;
+pub mod holder_lock;
+pub mod mailbox;
 
 use crate::routing::Call;
 use fgos_distribution::doctor::{
@@ -51,10 +53,10 @@ const CONFIG_ROWS_JSON: &str =
 pub fn registry() -> Result<Registry, String> {
     let registry = Registry::parse(REGISTRY_JSON, &[("config", CONFIG_ROWS_JSON)])?;
     for (kind, listed, adapters) in [
-        ("row", &registry.in_rust_rows, NativeOwner::ROW_IDS),
-        ("fix", &registry.in_rust_fixes, NativeOwner::FIX_IDS),
+        ("row", &registry.in_rust_rows, NativeOwner::row_ids()),
+        ("fix", &registry.in_rust_fixes, NativeOwner::fix_ids()),
     ] {
-        let mut a: Vec<&str> = adapters.to_vec();
+        let mut a: Vec<&str> = adapters;
         let mut l: Vec<&str> = listed.iter().map(String::as_str).collect();
         a.sort_unstable();
         l.sort_unstable();
@@ -102,28 +104,94 @@ pub fn project_doctor_request(
     })
 }
 
-/// The rows and fixes a Rust component judges in process, by id: none until the layers that own them have a
-/// Rust owner. The registry's `rust:` entries must equal [`NativeOwner::ROW_IDS`] and
-/// [`NativeOwner::FIX_IDS`]; a test pins it.
+/// The config door's answer to a project directory it cannot open (the rule of the door's own request check): the
+/// rows that read the project's config say it as the row's failure. `None` when the directory resolves.
+pub fn project_root_refusal(root: &Path) -> Option<&'static str> {
+    std::fs::canonicalize(root)
+        .is_err()
+        .then_some("config-request-invalid (projectRoot)")
+}
+
+/// One component group's adapter: the ids of the rows it judges and the fixes it runs, and the two calls that
+/// answer for them. A group's file calls its component crate's public functions and words the answer; it never
+/// re-derives a fact.
+pub struct Rows {
+    pub rows: &'static [&'static str],
+    pub fixes: &'static [&'static str],
+    /// Judges the group's rows `ids` (registry order) against the project root, one outcome per id, in order.
+    pub judge: fn(&Path, &[&str]) -> Vec<RowOutcome>,
+    /// Runs the group's fixes `ids` (registry order) against the project root, one result per id, in order.
+    pub fix: fn(&Path, &[&str]) -> Vec<FixResult>,
+}
+
+/// Every group the host judges in process. A phase that ports a group of rows adds its line here.
+const GROUPS: &[&Rows] = &[&holder_lock::GROUP, &mailbox::GROUP];
+
+/// The rows and fixes a Rust component judges in process, by id. The registry's `inRust` lists must equal
+/// [`NativeOwner::row_ids`] and [`NativeOwner::fix_ids`]; a test pins it.
 pub struct NativeOwner;
 
 impl NativeOwner {
-    pub const ROW_IDS: &'static [&'static str] = &[];
-    pub const FIX_IDS: &'static [&'static str] = &[];
-}
-
-impl RowOwner for NativeOwner {
-    fn run_fixes(&self, _root: &Path, ids: &[&str]) -> Vec<FixResult> {
-        ids.iter()
-            .map(|id| FixResult::done(id, false, format!("no fix {id} is run in process")))
+    pub fn row_ids() -> Vec<&'static str> {
+        GROUPS
+            .iter()
+            .flat_map(|group| group.rows)
+            .copied()
             .collect()
     }
 
-    fn judge_rows(&self, _root: &Path, ids: &[&str]) -> Vec<RowOutcome> {
+    pub fn fix_ids() -> Vec<&'static str> {
+        GROUPS
+            .iter()
+            .flat_map(|group| group.fixes)
+            .copied()
+            .collect()
+    }
+}
+
+fn no_answer(id: &str, what: &str) -> String {
+    format!("no {what} {id} is judged in process")
+}
+
+impl RowOwner for NativeOwner {
+    /// One fix at a time, in the order asked: a fix may rely on one before it, whichever group owns each.
+    fn run_fixes(&self, root: &Path, ids: &[&str]) -> Vec<FixResult> {
         ids.iter()
-            .map(|id| RowOutcome::Unavailable {
-                message: format!("no row {id} is judged in process"),
-                next: "run fgos doctor again".to_owned(),
+            .map(|id| {
+                match GROUPS.iter().find(|group| group.fixes.contains(id)) {
+                    Some(group) => (group.fix)(root, &[id]).into_iter().next(),
+                    None => None,
+                }
+                .unwrap_or_else(|| {
+                    FixResult::done(id, false, format!("no fix {id} is run in process"))
+                })
+            })
+            .collect()
+    }
+
+    /// A group judges all of its rows in one call, so what its rows share is read once; the answers go back in
+    /// the order asked.
+    fn judge_rows(&self, root: &Path, ids: &[&str]) -> Vec<RowOutcome> {
+        let mut answers: Vec<Option<RowOutcome>> = ids.iter().map(|_| None).collect();
+        for group in GROUPS {
+            let at: Vec<usize> = (0..ids.len())
+                .filter(|&i| group.rows.contains(&ids[i]))
+                .collect();
+            if at.is_empty() {
+                continue;
+            }
+            let asked: Vec<&str> = at.iter().map(|&i| ids[i]).collect();
+            for (&i, outcome) in at.iter().zip((group.judge)(root, &asked)) {
+                answers[i] = Some(outcome);
+            }
+        }
+        ids.iter()
+            .zip(answers)
+            .map(|(id, answer)| {
+                answer.unwrap_or_else(|| RowOutcome::Unavailable {
+                    message: no_answer(id, "row"),
+                    next: "run fgos doctor again".to_owned(),
+                })
             })
             .collect()
     }
@@ -257,8 +325,19 @@ mod tests {
     fn the_registry_the_host_embeds_parses_and_lists_exactly_the_adapters_the_host_has() {
         let registry = registry().unwrap();
         assert!(!registry.rows.is_empty() && !registry.fixes.is_empty());
-        assert_eq!(registry.in_rust_rows, NativeOwner::ROW_IDS);
-        assert_eq!(registry.in_rust_fixes, NativeOwner::FIX_IDS);
+        let sorted = |mut ids: Vec<&str>| {
+            ids.sort_unstable();
+            ids.into_iter().map(str::to_owned).collect::<Vec<_>>()
+        };
+        let listed = |ids: &[String]| sorted(ids.iter().map(String::as_str).collect());
+        assert_eq!(
+            listed(&registry.in_rust_rows),
+            sorted(NativeOwner::row_ids())
+        );
+        assert_eq!(
+            listed(&registry.in_rust_fixes),
+            sorted(NativeOwner::fix_ids())
+        );
     }
 
     #[test]

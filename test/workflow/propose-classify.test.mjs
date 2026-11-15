@@ -45,7 +45,7 @@ test('a slice that touches a locked contract, a schema or a locked law is high, 
 });
 
 test('a slice that touches a Rust crate, a lock file, identity, locks or the git write door is high', () => {
-  for (const file of ['packages/git/rust/src/lib.rs', 'packages/git/write-scope/src/lib.rs', 'packages/identity/rust/Cargo.toml', 'Cargo.lock', 'package-lock.json', 'apps/fgos-gateway/src/mcp.rs', 'src/identity/directory-store.mjs', 'src/holder-lock/index.mjs', 'src/git/scoped-commit.mjs', 'src/workflow/case-lock.mjs', 'src/native/door.mjs', 'src/util/session-identity.mjs', 'src/util/identity-mint.mjs', 'src/state/hot-lock.mjs', 'src/runner/repo-locks.mjs', 'src/setup/holder-lock-checks.mjs', 'tools/platform-probe/src/git.rs', 'tools/terminal-gate-probe/Cargo.toml', 'herdr-dashboard/Cargo.lock', 'packages/yaml-doc/third-party/saphyr-parser-0.2.2/Cargo.toml']) {
+  for (const file of ['packages/git/rust/src/lib.rs', 'packages/git/write-scope/src/lib.rs', 'packages/identity/rust/Cargo.toml', 'Cargo.lock', 'package-lock.json', 'apps/fgos-gateway/src/mcp.rs', 'src/identity/directory-store.mjs', 'src/holder-lock/index.mjs', 'src/git/scoped-commit.mjs', 'src/workflow/case-lock.mjs', 'src/native/door.mjs', 'src/util/session-identity.mjs', 'src/util/identity-mint.mjs', 'src/state/hot-lock.mjs', 'src/runner/repo-locks.mjs', 'apps/fgos/src/wiring/doctor/holder_lock.rs', 'tools/platform-probe/src/git.rs', 'tools/terminal-gate-probe/Cargo.toml', 'herdr-dashboard/Cargo.lock', 'packages/yaml-doc/third-party/saphyr-parser-0.2.2/Cargo.toml']) {
     const slice = classify(['docs/notes.md', file]);
     assert.equal(slice.kind, 'platform', file);
     assert.equal(slice.rigor, 'high', file);

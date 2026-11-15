@@ -269,7 +269,7 @@ The locks of this track moved to their kernel-lock paths in a stop-everything cu
 
 `fgos setup` creates `<lockRoot>` and `<fgosDir>/locks` with mode 0700 when they are missing and tightens an existing one to 0700 (fix `lock-dirs`). It registers no config default: the predecessor kill wait is fixed (section 8), and an existing `lock` section in a config file is ignored.
 
-`fgos doctor` checks, registered in `src/setup/registrations.mjs` with their bodies in `src/setup/holder-lock-checks.mjs`. Levels follow the doctor convention: `passed: false` fails, a message starting with `warning:` warns, `info:` is informational. Messages carry no timings, so two doctor runs over the same state print the same text:
+`fgos doctor` checks, judged in process by the host in `apps/fgos/src/wiring/doctor/holder_lock.rs` over this crate (the doctor registry, `packages/distribution/contracts/doctor-registry.v1.json`, lists them). Levels follow the doctor convention: `passed: false` fails, a message starting with `warning:` warns, `info:` is informational. Messages carry no timings, so two doctor runs over the same state print the same text:
 
 | Check | Does | Result |
 |---|---|---|
@@ -408,7 +408,7 @@ The documentation-cutover write lease, its `fgos docs-lease` verb, the `document
 | boundary | [component-boundary.md](../component-boundary.md) |
 | setup and doctor registry | [setup-doctor-registry.md](../packaging-distribution/contracts/setup-doctor-registry.md#contract-setup-doctor-registry) |
 | implemented by | [src/holder-lock/](../../../src/holder-lock/index.mjs) (Node facade), [packages/holder-lock/](../../../packages/holder-lock/rust/src/lib.rs) (crate, routes) |
-| doctor and setup bodies | [holder-lock-checks.mjs](../../../src/setup/holder-lock-checks.mjs), evidenced by [holder-lock-checks.test.mjs](../../../test/setup/holder-lock-checks.test.mjs) |
+| doctor rows and the `lock-dirs` fix | [holder_lock.rs](../../../apps/fgos/src/wiring/doctor/holder_lock.rs), evidenced by its unit tests |
 | dispatch cwd lock, resume guard, reconcile | [spec.md](../runner/subcomponents/h-6979005beaf7/spec.md#business-rules) |
 | plan | [plan.md](../../../plans/261016-1104-holder-lock-kernel-lock-foundation/plan.md) |
 | design and evidence | design r6 |

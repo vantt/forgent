@@ -433,11 +433,25 @@
       "debt": [
         {
           "path": "src/setup/managed-timer.mjs",
-          "reason": "the Node timer module the doctor rows and uninstall still call until they move to Rust"
+          "reason": "the Node timer module that uninstall still calls until it moves to the host; the doctor rows and fixes are judged by timer.rs"
         }
       ],
-      "retiredBy": "S4: uninstall and the timer doctor rows move to the host and the Node module is deleted with them",
+      "retiredBy": "S4: uninstall moves to the host and the Node module is deleted with it",
       "reason": "the OS timers fgOS writes (systemd user units, launchd plists) are rendered, checked, enabled and removed in one Rust module; the scheduler calls go through the process door's bounded runner"
+    },
+    {
+      "job": "holder-lock and mailbox doctor judgments",
+      "kind": "door",
+      "patterns": [
+        "export (?:async )?function (?:checkLockKernelSemantics|checkLockBorrowVectors|checkLockHolders|fixLockDirs|checkMailboxHook|mailboxRecordVerdict)\\b",
+        "\\bfn (?:kernel_semantics|borrow_vectors_row|holders_pointer|fix_lock_dirs|mailbox_hook|record_verdict|cross_machine_note)\\b"
+      ],
+      "allowed": [
+        "apps/fgos/src/wiring/doctor/holder_lock.rs",
+        "apps/fgos/src/wiring/doctor/mailbox.rs"
+      ],
+      "debt": [],
+      "reason": "the lock rows (guarantee, two-process probe, borrow vectors, lock directories) and the mailbox record row are judged in process by the host over fgos-holder-lock and the one `mailbox status` function, never by a Node body that starts the host back; guards the definitions by name, so a second judge of the same row must be declared. Not covered, by design of a pattern check: a differently named body that starts the host's lock or mailbox routes"
     },
     {
       "job": "skill generated stamp",
@@ -1346,7 +1360,6 @@
     "src/setup/version-info.mjs": "infra",
     "src/setup/managed-timer.mjs": "infra",
     "src/setup/agy-permissions.mjs": "infra",
-    "src/setup/holder-lock-checks.mjs": "infra",
     "src/setup/git-checks.mjs": "infra",
     "src/setup/git-retention-note.mjs": "infra",
     "src/setup/run-supervisor-checks.mjs": "infra",

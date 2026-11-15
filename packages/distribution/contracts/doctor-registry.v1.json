@@ -18,8 +18,19 @@
     }
   },
   "inRust": {
-    "rows": [],
-    "fixes": []
+    "rows": [
+      "lock-kernel-semantics",
+      "lock-borrow-vectors",
+      "lock-holders",
+      "mailbox-hook",
+      "mailbox-sync-timer",
+      "account-probe-timer"
+    ],
+    "fixes": [
+      "lock-dirs",
+      "mailbox-sync-timer",
+      "account-probe-timer"
+    ]
   },
   "layers": {
     "src/run-supervisor/client.mjs": "S6a",

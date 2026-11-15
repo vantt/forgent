@@ -746,14 +746,11 @@ test('mailbox rows install only when the project opts in, and opting out removes
     assert.equal(fs.readFileSync(file, 'utf8'), installed, `${cli} extension untouched, its mailbox handlers kept`);
   }
   // Doctor under a refused config: the hook checks neither require nor reject the mailbox rows (either
-  // extension form is ours), and the mailbox row passes, naming the refusal the config rows report.
+  // extension form is ours). The mailbox row passes under it too and names the refusal; that is proved with the row in the host's doctor wiring.
   for (const check of [checkClaudeHook, checkCodexHook, checkPiHook, checkOmpHook]) {
     const verdict = check(repoRoot);
     assert.equal(verdict.passed, true, `${check.name}: ${verdict.message}`);
   }
-  const mailboxRow = DOCTOR_CHECKS.find((c) => c.id === 'mailbox-hook').check(repoRoot);
-  assert.equal(mailboxRow.passed, true, mailboxRow.message);
-  assert.match(mailboxRow.message, /opt-in unknown: the project config is refused \(config:config-schema in project:config\.yaml\)/);
   writeMailboxOptIn(repoRoot, true);
 
   // A user's own command that merely runs the same kind stays when the project opts out.

@@ -135,17 +135,17 @@ test('runFixes invokes every registered fix against the given cwd and reports id
 // in the same change. These two tests are what makes that obligation real
 // instead of a sentence nobody enforces.
 
-test('Data Dictionary #7 names exactly the registered doctor checks — no missing entry, no stale one', () => {
+test('Data Dictionary #7 names exactly the registry\'s doctor checks — no missing entry, no stale one', () => {
   assert.deepEqual(
     specEnumeratedIds("Today's registered checks: ").slice().sort(),
-    REGISTERED_CHECK_IDS.slice().sort(),
+    registryEntries().rows.map((row) => row.id).sort(),
   );
 });
 
-test('Data Dictionary #7b names exactly the registered doctor fixes — no missing entry, no stale one', () => {
+test('Data Dictionary #7b names exactly the registry\'s doctor fixes — no missing entry, no stale one', () => {
   assert.deepEqual(
     specEnumeratedIds("Today's registered fixes: ").slice().sort(),
-    REGISTERED_FIX_IDS.slice().sort(),
+    registryEntries().fixes.map((fix) => fix.id).sort(),
   );
 });
 
@@ -1095,74 +1095,43 @@ test('doctor check runner-patterns-config: two identical-meaning patterns hint',
   assert.match(res.message, /identical/i);
   fs.rmSync(tmpDir, { recursive: true, force: true });
 });
-test('the mailbox check is enabled by default, passes as not enabled once the project opts out, and names the opt-out', () => {
-  const check = DOCTOR_CHECKS.find((c) => c.id === 'mailbox-hook');
-  assert.ok(check, 'a mailbox check is registered');
-  const temp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-mailbox-check-'));
-  try {
-    const absent = check.check(temp);
-    assert.equal(absent.passed, true);
-    assert.match(absent.message, /^enabled/);
-    fs.mkdirSync(path.join(temp, '.fgos'));
-    writeProjectConfig(temp, { mailbox: { enabled: false } });
-    const off = check.check(temp);
-    assert.match(off.message, /not enabled/);
-    assert.match(off.message, /mailbox\.enabled/);
-    writeProjectConfig(temp, { mailbox: { enabled: true } });
-    const on = check.check(temp);
-    assert.equal(on.passed, true);
-    assert.match(on.message, /^enabled/);
-  } finally { fs.rmSync(temp, { recursive: true, force: true }); }
-});
-
-test('the cross-machine note counts the mail and names a machine key that is still unconfirmed', async () => {
-  const { crossMachineNote } = await import('../../src/setup/mailbox-limits.mjs');
-  assert.equal(crossMachineNote(undefined), '');
-  assert.equal(
-    crossMachineNote({ sent: 2, offered: 1, waiting: 1, refused: { 'unknown-name': 1 }, unconfirmedMachines: [] }),
-    '; cross-machine: 2 sent, 1 offered, 1 with no answer yet, 1 refused',
-  );
-  assert.match(
-    crossMachineNote({ sent: 0, offered: 0, waiting: 0, refused: {}, unconfirmedMachines: ['fg-server-sqs7es'] }),
-    /warning: mail from fg-server-sqs7es is held until you confirm its key \(fgos identity pins --confirm/,
-  );
-});
-
-test('the mailbox-hook doctor row reports the record verdict from fgos mailbox status, passes with no record yet, and writes nothing', async () => {
-  const { ensureHostBin, REPO_ROOT } = await import('../../scripts/lib/git-addon-stage.mjs');
-  const host = ensureHostBin(process.env, REPO_ROOT);
-  const check = DOCTOR_CHECKS.find((c) => c.id === 'mailbox-hook');
+test('the mailbox-hook doctor row reads the record the way fgos mailbox status does: none yet, ok, and an untrusted record fails', () => {
+  const host = process.env.FGOS_HOST_BIN;
+  assert.ok(host, 'FGOS_HOST_BIN is not set: run this file through node scripts/run-tests.mjs');
   const temp = fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-mailbox-doctor-')));
   const project = path.join(temp, 'project');
+  const home = path.join(temp, 'home');
   const record = path.join(project, '.fgos', 'runtime', 'mailbox', 'record');
-  const before = process.env.FGOS_HOST_BIN;
-  process.env.FGOS_HOST_BIN = host;
+  const env = { ...process.env, HOME: home, USERPROFILE: home, FGOS_STATE_ROOT: path.join(temp, 'state'), FGOS_SESSION_ID: 'doctor-test' };
+  const row = () => {
+    const run = spawnSync(host, ['doctor', '--json'], { cwd: project, env, encoding: 'utf8' });
+    return JSON.parse(run.stdout).data.checks.find((c) => c.id === 'mailbox-hook');
+  };
   try {
+    fs.mkdirSync(home);
     execFileSync('git', ['init', '-q', project]);
     fs.mkdirSync(path.join(project, '.fgos'));
     writeProjectConfig(project, { mailbox: { enabled: true } });
 
-    const none = check.check(project);
+    const none = row();
     assert.equal(none.passed, true, none.message);
     assert.match(none.message, /record: none yet/);
-    assert.equal(fs.existsSync(path.join(project, '.fgos', 'runtime')), false, 'the check created nothing');
+    assert.equal(fs.existsSync(path.join(project, '.fgos', 'runtime')), false, 'the row created nothing');
 
     // A refused send opens the record and counts the refusal.
-    const sent = spawnSync(host, ['mailbox', 'send', '--to', 'nobody', 'hi'], { cwd: project, env: { ...process.env, FGOS_SESSION_ID: 'doctor-test' }, encoding: 'utf8' });
+    const sent = spawnSync(host, ['mailbox', 'send', '--to', 'nobody', 'hi'], { cwd: project, env, encoding: 'utf8' });
     assert.equal(sent.status, 1, sent.stdout + sent.stderr);
     const snapshot = fs.readFileSync(path.join(record, 'snapshot.json'));
-    const ok = check.check(project);
+    const ok = row();
     assert.equal(ok.passed, true, ok.message);
     assert.match(ok.message, /record: ok \(0 head\(s\), 0 pending\)/);
-    assert.deepEqual(fs.readFileSync(path.join(record, 'snapshot.json')), snapshot, 'the check wrote nothing');
+    assert.deepEqual(fs.readFileSync(path.join(record, 'snapshot.json')), snapshot, 'the row wrote nothing');
 
     fs.chmodSync(record, 0o777);
-    const broken = check.check(project);
+    const broken = row();
     assert.equal(broken.passed, false, 'an untrusted record stops delivery: readiness, not an incident');
     assert.match(broken.message, /record cannot be read: record-dir-untrusted.*fgos mailbox status/);
   } finally {
-    if (before === undefined) delete process.env.FGOS_HOST_BIN;
-    else process.env.FGOS_HOST_BIN = before;
     fs.rmSync(temp, { recursive: true, force: true });
   }
 });

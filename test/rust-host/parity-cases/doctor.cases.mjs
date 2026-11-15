@@ -6,7 +6,9 @@
 //
 // `cwd`: `repo` (a project with its store), `sub` (a subdirectory), `fresh` (a repository with no fgOS setup at
 // all), `outside` (a directory that is no repository), `linked` (a linked worktree of `repo`), `legacy` (a project
-// whose config is still the legacy JSON file), `other` (a second project `--dir` can name).
+// whose config is still the legacy JSON file), `other` (a second project `--dir` can name), `mailbox` (a project that
+// opted in to the mailbox), `timers` (opted in, with cross-machine mail and both timer schedules on), `badcfg` (a
+// project whose config file cannot be read).
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -15,7 +17,7 @@ import { strict as assert } from 'node:assert';
 
 import { runCaseOnEntry } from '../harness.mjs';
 import { initFixtureRepo } from '../../helpers/git-fixture.mjs';
-import { writeRawLegacyProjectConfig } from '../../helpers/config-fixture.mjs';
+import { writeProjectConfig, writeRawLegacyProjectConfig, writeRawProjectConfig } from '../../helpers/config-fixture.mjs';
 
 export const cases = [];
 
@@ -55,6 +57,18 @@ add('fix-from-a-linked-worktree', [{ do: 'linkedWorktree' }, call(['--fix'], { c
 add('fix-with-a-value-still-fixes', [call(['--fix', 'yes'])], { disk: true });
 add('fix-with-an-empty-value-does-not-fix', [call(['--fix', ''])], { disk: true });
 
+// The holder-lock, mailbox and timer rows: a project that opted in, one with both timers asked for (the service
+// manager is pointed at a bus that does not exist, so no timer is ever enabled on the machine that runs this), and
+// one whose config is refused.
+add('mailbox-opted-in', [call([], { cwd: 'mailbox' })]);
+add('mailbox-opted-in-fix', [call(['--fix'], { cwd: 'mailbox' })], { disk: true });
+add('timers-asked-for', [call([], { cwd: 'timers' })]);
+add('timers-asked-for-fix', [call(['--fix'], { cwd: 'timers' }), call([], { cwd: 'timers' })], { disk: true });
+add('timers-asked-for-fix-twice', [call(['--fix'], { cwd: 'timers' }), call(['--fix'], { cwd: 'timers' })], { disk: true });
+add('refused-config-mailbox-and-timers', [call([], { cwd: 'badcfg' })]);
+add('lock-directories-fixed-then-measured', [call(['--fix']), call([])], { disk: true });
+add('lock-directory-made-too-open-is-tightened', [call(['--fix']), { do: 'openLockDirs' }, call(['--fix'])], { disk: true });
+
 // Refused calls: the flag text is the registry's, and the call writes nothing.
 add('unknown-flag', [call(['--bogus'])], { disk: true });
 add('unknown-flag-after-known', [call(['--fix', '--zeta', '--alpha'])], { disk: true });
@@ -68,12 +82,26 @@ const GIT_DIR = '.git';
 
 function makeWorld() {
   const root = fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), 'p03par-')));
-  const dirs = Object.fromEntries(['repo', 'home', 'tmp', 'state', 'fresh', 'outside', 'legacy'].map((name) => [name, path.join(root, name)]));
+  const dirs = Object.fromEntries(['repo', 'home', 'tmp', 'state', 'fresh', 'outside', 'legacy', 'mailbox', 'timers', 'badcfg'].map((name) => [name, path.join(root, name)]));
   for (const dir of Object.values(dirs)) fs.mkdirSync(dir);
   fs.chmodSync(dirs.state, 0o700);
   fs.writeFileSync(path.join(dirs.state, 'machine-id'), 'parity-machine\n');
   initFixtureRepo(dirs.repo);
   fs.mkdirSync(path.join(dirs.repo, 'sub'));
+  initFixtureRepo(dirs.mailbox);
+  writeProjectConfig(dirs.mailbox, { mailbox: { enabled: true } });
+  initFixtureRepo(dirs.timers);
+  writeProjectConfig(dirs.timers, {
+    mailbox: { enabled: true, crossMachine: { enabled: true } },
+    eventStore: { remote: 'origin', sync: { intervalSec: 300 } },
+    dispatch: { probeAccount: { intervalSec: 600 } },
+  });
+  // The project's installation shim is what a timer unit names, so with one the timer rows reach the unit files.
+  const shim = path.join(dirs.timers, '.fgos', 'installation', 'bin', 'fgos');
+  fs.mkdirSync(path.dirname(shim), { recursive: true });
+  fs.writeFileSync(shim, '#!/bin/sh\nexit 0\n', { mode: 0o755 });
+  initFixtureRepo(dirs.badcfg);
+  writeRawProjectConfig(dirs.badcfg, 'mailbox: [unclosed\n');
   initFixtureRepo(dirs.legacy);
   writeRawLegacyProjectConfig(dirs.legacy, '{\n  "runner": { "generatedPaths": [] }\n}\n');
   const git = (...args) => execFileSync('git', ['-C', dirs.fresh, ...args], { stdio: 'ignore' });
@@ -97,6 +125,9 @@ function act(world, step) {
       fs.mkdirSync(world.other);
       initFixtureRepo(world.other);
       return null;
+    case 'openLockDirs':
+      for (const dir of [path.join(world.repo, '.fgos', 'locks'), path.join(world.state, 'locks')]) fs.chmodSync(dir, 0o775);
+      return null;
     case 'storeAppeared':
       return `store ${fs.existsSync(path.join(world[step.cwd], '.fgos')) ? 'exists' : 'absent'}`;
     default:
@@ -112,6 +143,9 @@ const cwdOf = (world, name = 'repo') => ({
   linked: world.linked,
   legacy: world.legacy,
   other: world.other,
+  mailbox: world.mailbox,
+  timers: world.timers,
+  badcfg: world.badcfg,
 })[name] ?? assert.fail(`unknown cwd ${name}`);
 
 /** The release, host binary and manifest an entry runs from, as text to replace. */
@@ -132,6 +166,8 @@ function normaliser(world, entry) {
       .replace(/(\bfgos \d+\.\d+\.\d+ \()[0-9a-f]{12}(\))/g, '$1<COMMIT>$2')
       // Where the state root was named from: the host pins it for the Node child, a Node run on its own reads the home.
       .replace(/(stateRoot \S+ \()(?:home|pinned|env)\)/g, '$1<SOURCE>)')
+      // A timer unit is named after a hash of the project's path, and every world has its own path.
+      .replace(/(fgos-(?:mailbox-sync|account-probe))-[0-9a-f]{8}/g, '$1-<STEM>')
       .replace(UUID, '<UUID>')
       .replace(ISO, '<TS>')
       .replace(/"(?:data_hash|generated_at)": "[^"]*",?\s*/g, '')
@@ -200,7 +236,7 @@ async function runScript(entry, testCase) {
         id: testCase.id,
         args,
         cwd: cwdOf(world, step.cwd),
-        env: { HOME: world.home, USERPROFILE: world.home, TMPDIR: world.tmp, FGOS_STATE_ROOT: world.state, FGOS_CLAUDE_COMMAND: '/nonexistent/fgos-parity-claude', NO_COLOR: '1' },
+        env: { HOME: world.home, USERPROFILE: world.home, TMPDIR: world.tmp, FGOS_STATE_ROOT: world.state, XDG_RUNTIME_DIR: path.join(world.root, 'no-runtime-dir'), DBUS_SESSION_BUS_ADDRESS: `unix:path=${path.join(world.root, 'no-bus')}`, FGOS_CLAUDE_COMMAND: '/nonexistent/fgos-parity-claude', NO_COLOR: '1' },
         timeoutMs: 180000,
         modes: ['exact-bytes'],
       });
@@ -239,7 +275,9 @@ export async function runPreparedCase(entryA, entryB, testCase) {
     // and none for a call the host refused.
     const nodeStarts = host.children.filter((child) => path.basename(child.cmd) === 'node').length;
     const ran = host.outputs.filter((output) => output.args && ![4].includes(output.exit));
-    const most = ran.reduce((sum, output) => sum + (output.args.includes('--fix') ? 2 : 1), 0);
+    // Each fix the host runs itself can split the bridged fixes around it into one more call.
+    const hostFixes = JSON.parse(fs.readFileSync(new URL('../../../packages/distribution/contracts/doctor-registry.v1.json', import.meta.url), 'utf8')).inRust.fixes.length;
+    const most = ran.reduce((sum, output) => sum + (output.args.includes('--fix') ? 2 + hostFixes : 1), 0);
     if (nodeStarts > most) differences.push(`the host started ${nodeStarts} node children for ${ran.length} answered call(s)`);
     if (ran.length === 0 && nodeStarts > 0) differences.push('a refused call started node');
     if (ran.length > 0 && nodeStarts === 0) differences.push('the bridged rows were judged without the bridge');

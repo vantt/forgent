@@ -54,10 +54,8 @@ import {
   installPiHook,
 } from './agent-hooks.mjs';
 import { checkExecutorProfileWarnings } from './executor-profile-warnings.mjs';
-import { crossMachineNote, mailboxOptIn, refusedConfigName } from './mailbox-limits.mjs';
 import { checkMailboxClaudeAccept } from './mailbox-claude-accept.mjs';
 import { checkClaudePluginMarketplace } from './agent-wiring.mjs';
-import { ACCOUNT_PROBE, MAILBOX_SYNC, checkManagedTimer, fixManagedTimer } from './managed-timer.mjs';
 import { checkAgentCliProjectTrusted } from './agent-cli-trust.mjs';
 import { declaredActivities, readWorkflowCatalog, withUnreadableDefinitions } from './workflow-catalog-reader.mjs';
 import {
@@ -127,7 +125,6 @@ import { checkRunSupervisorRoute, checkRuntimeSocketDir, fixRuntimeSocketDir, ch
 import { checkIdentityMachineId, checkIdentityMachineKey, checkIdentityProjectId, checkIdentitySharedDirectory, checkIdentitySshKeygen, fixIdentityMachineId, fixIdentityMachineKey } from './identity-checks.mjs';
 import { checkTerminalControl, checkTerminalAllocations } from './terminal-control-checks.mjs';
 import { checkOmpNativesPresent, ompExecutorsOf } from './omp-natives-checks.mjs';
-import { checkLockKernelSemantics, checkLockBorrowVectors, checkLockHolders, fixLockDirs } from './holder-lock-checks.mjs';
 export { mainCheckoutHookWired } from './git-hooks.mjs';
 export { claudeCodeHookWired } from './claude-code-hooks.mjs';
 export { checkAgySubHomesConfigured } from './agy-permissions.mjs';
@@ -1557,25 +1554,6 @@ registerCheck({
   check: () => checkProviderCapacityState(),
 });
 
-// Holder-lock (docs/platform/holder-lock/spec.md): the kernel-lock guarantee
-// of both lock directories (with the state root and the fixed kill wait it
-// prints), the borrow vectors, and who holds each lock (with the hot records
-// of the state store). Bodies live in holder-lock-checks.mjs. The
-// `lock-dirs` fix creates the two lock directories.
-registerCheck({
-  id: 'lock-kernel-semantics',
-  check: (cwd) => checkLockKernelSemantics(cwd),
-});
-registerCheck({
-  id: 'lock-borrow-vectors',
-  check: (cwd) => checkLockBorrowVectors(cwd),
-});
-registerCheck({
-  id: 'lock-holders',
-  check: () => checkLockHolders(),
-});
-registerFix({ id: 'lock-dirs', fix: (cwd) => fixLockDirs(cwd) });
-
 // Run supervisor (docs/platform/run-supervisor/spec.md): the host routes with the containment driver agents
 // run in, the runtime socket directory, attempts nobody holds (and the units awaiting resume) and the
 // gate's kill grace with the cancel wait.
@@ -1692,82 +1670,9 @@ export const DEFAULT_CAPABILITY_SLOTS = Object.freeze({
   }),
 });
 
-// The record's verdict as the host's `fgos mailbox status --json` reports it: the record's
-// rules (its directory checks, its snapshot version and caps) stay in Rust, and status
-// reads without the lock and creates nothing. Run from the main checkout without
-// CLAUDE_PROJECT_DIR, which the verbs would otherwise read as the project. `null` with a
-// reason when no host can answer (none resolved, or a release without `mailbox status`).
-function mailboxRecordVerdict(cwd) {
-  const hostBin = resolveHostBin(cwd);
-  if (!hostBin) return { data: null, why: 'no host binary (FGOS_HOST_BIN unset and no active installation manifest)' };
-  const { CLAUDE_PROJECT_DIR: _projectDir, ...env } = process.env;
-  let stdout;
-  try {
-    stdout = execFileSync(hostBin, ['mailbox', 'status', '--json'], {
-      cwd: resolveMainCheckoutRoot(cwd) ?? cwd, env, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], timeout: 10000,
-    });
-  } catch (err) {
-    // Exit 1 still prints the envelope when the record failed; anything else names why.
-    stdout = err.stdout ? String(err.stdout) : '';
-    if (!stdout.trim()) return { data: null, why: (err.stderr ? String(err.stderr).trim().split('\n')[0] : '') || err.message };
-  }
-  try {
-    return { data: JSON.parse(stdout).data, why: null };
-  } catch {
-    return { data: null, why: 'the host answered `mailbox status` with no JSON envelope' };
-  }
-}
-
-function checkMailboxHook(cwd) {
-  const optIn = mailboxOptIn(cwd);
-  // The config rows already fail and name a refused config; this row only says why it cannot tell.
-  if (optIn.state === 'refused') {
-    return { passed: true, message: `opt-in unknown: ${refusedConfigName(optIn)} is refused (${optIn.reason}${optIn.file ? ` in ${optIn.file}` : ''}); the config rows name it, and fgos doctor --fix leaves the mailbox hook rows as they are` };
-  }
-  if (optIn.state === 'off') {
-    return { passed: true, message: 'not enabled: mailbox.enabled is false in the config; set it to true (fgos config set), then run fgos doctor --fix, to install the mailbox hook rows' };
-  }
-  const enabled = 'enabled: the Claude Code and Codex hook checks require the mailbox rows; limits: fgos config show --path mailbox (the standard is fgos config standard --path mailbox)';
-  const { data, why } = mailboxRecordVerdict(cwd);
-  if (!data) return { passed: true, message: `${enabled}; record not checked: ${why}` };
-  // No record field: the verb found no record directory to read here (not a repository,
-  // no .fgos), and says so in its text.
-  if (!data.record) return { passed: true, message: `${enabled}; record not checked: ${data.text ?? 'no answer'}` };
-  if (data.record === 'none') return { passed: true, message: `${enabled}; record: none yet (no hook has run in this project)` };
-  // An unreadable or untrusted record stops send, inbox and hook delivery: readiness, so the row fails and names the verb.
-  if (data.record !== 'ok') return { passed: false, message: `enabled, but the mailbox record cannot be read: ${data.record}; run \`fgos mailbox status\`` };
-  const outcome = data.hookOutcome?.reason ? `, last hook outcome ${data.hookOutcome.reason}` : '';
-  return { passed: true, message: `${enabled}; record: ok (${data.heads} head(s), ${data.signals?.queue?.pending ?? 0} pending${outcome})${crossMachineNote(data.crossMachine)}` };
-}
-
-registerCheck({
-  id: 'mailbox-hook',
-  check: (cwd) => checkMailboxHook(cwd),
-});
-
 registerCheck({
   id: 'mailbox-claude-accept',
   check: (cwd) => checkMailboxClaudeAccept(cwd),
-});
-
-registerCheck({
-  id: 'mailbox-sync-timer',
-  check: (cwd) => checkManagedTimer(MAILBOX_SYNC, cwd),
-});
-
-registerFix({
-  id: 'mailbox-sync-timer',
-  fix: (cwd) => fixManagedTimer(MAILBOX_SYNC, cwd),
-});
-
-registerCheck({
-  id: 'account-probe-timer',
-  check: (cwd) => checkManagedTimer(ACCOUNT_PROBE, cwd),
-});
-
-registerFix({
-  id: 'account-probe-timer',
-  fix: (cwd) => fixManagedTimer(ACCOUNT_PROBE, cwd),
 });
 
 // Every capability a core/domain Workflow unit names must resolve the way

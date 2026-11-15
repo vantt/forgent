@@ -282,19 +282,26 @@ fn ignored_keys_warning(loaded: &Loaded) -> Option<String> {
 fn record_dir(json: bool) -> Result<PathBuf, Box<MailboxAnswer>> {
     let cwd = std::env::current_dir()
         .map_err(|_| failed(record_error_text("cwd-unreadable"), json, None))?;
-    let fgos_dir = super::mailbox_root::mailbox_fgos_dir(
+    record_dir_from(
         std::env::var_os("CLAUDE_PROJECT_DIR").as_deref(),
         &cwd,
+        json,
     )
-    .map_err(|e| {
+}
+
+fn record_dir_from(
+    claude_project_dir: Option<&std::ffi::OsStr>,
+    cwd: &Path,
+    json: bool,
+) -> Result<PathBuf, Box<MailboxAnswer>> {
+    super::mailbox_root::mailbox_fgos_dir(claude_project_dir, cwd).map_err(|e| {
         let text = if e.is_permanent() {
             record_unavailable_text(e.code())
         } else {
             record_error_text(e.code())
         };
-        failed(text, json, None)
-    })?;
-    Ok(fgos_dir)
+        Box::new(failed(text, json, None))
+    })
 }
 
 /// The record directory, its record and its limits, or the failed answer.
@@ -428,11 +435,23 @@ fn incoming_summary(
 /// it (`config`), while the record is still read under the contract's
 /// defaults.
 fn status(json: bool) -> MailboxAnswer {
-    let fgos_dir = match record_dir(json) {
-        Ok(dir) => dir,
-        Err(answer) => return *answer,
-    };
-    let (loaded, config_failure) = match super::mailbox_config::project_limits(&fgos_dir) {
+    match record_dir(json) {
+        Ok(fgos_dir) => status_of(&fgos_dir, json),
+        Err(answer) => *answer,
+    }
+}
+
+/// `status` for the project whose main checkout holds `root`, as `fgos doctor` asks it: the project is the
+/// directory named, never the one `CLAUDE_PROJECT_DIR` points at, and the answer is the `--json` data.
+pub fn status_for_root(root: &Path) -> MailboxAnswer {
+    match record_dir_from(None, root, true) {
+        Ok(fgos_dir) => status_of(&fgos_dir, true),
+        Err(answer) => *answer,
+    }
+}
+
+fn status_of(fgos_dir: &Path, json: bool) -> MailboxAnswer {
+    let (loaded, config_failure) = match super::mailbox_config::project_limits(fgos_dir) {
         Ok(loaded) => (loaded, None),
         Err(failure) => match load(None) {
             Ok(defaults) => (defaults, Some(failure)),
@@ -440,7 +459,7 @@ fn status(json: bool) -> MailboxAnswer {
         },
     };
     let warning = ignored_keys_warning(&loaded);
-    let answer = verbs::status(&fgos_dir, now(), &loaded.limits);
+    let answer = verbs::status(fgos_dir, now(), &loaded.limits);
     let mut data = answer.json;
     let mut text = answer.text;
     let ok = answer.record_ok && config_failure.is_none();
@@ -458,7 +477,7 @@ fn status(json: bool) -> MailboxAnswer {
     // full id that still reaches it.
     if data["record"] == "ok" {
         let conflicts = state_root()
-            .zip(verbs::heads(&fgos_dir, &loaded.limits).ok())
+            .zip(verbs::heads(fgos_dir, &loaded.limits).ok())
             .map(|(root, heads)| handle_conflicts(&root, &heads))
             .unwrap_or_default();
         data["handleConflicts"] = conflicts
@@ -474,14 +493,14 @@ fn status(json: bool) -> MailboxAnswer {
     }
     // Mail waiting for this session: counted and named from the same pending read `inbox` shows, never consumed.
     if data["record"] == "ok" {
-        if let Some((incoming, line)) = incoming_summary(&fgos_dir, &loaded.limits, now()) {
+        if let Some((incoming, line)) = incoming_summary(fgos_dir, &loaded.limits, now()) {
             data["incoming"] = incoming;
             text.push_str(&format!("\n{line}"));
         }
     }
     // Mail that crosses machines: what this machine's recent sends came to, when the project turned it on.
     if let (Ok((_, cross)), Some(root), Some(main)) =
-        (project_mailbox(&fgos_dir), state_root(), fgos_dir.parent())
+        (project_mailbox(fgos_dir), state_root(), fgos_dir.parent())
     {
         if cross.enabled {
             let secs = now().as_millis() / 1000;

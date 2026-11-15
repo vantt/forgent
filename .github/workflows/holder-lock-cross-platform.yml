@@ -13,9 +13,7 @@ on:
       - 'apps/fgos/**'
       - 'apps/fgctl/**'
       - 'src/holder-lock/**'
-      - 'src/setup/holder-lock-checks.mjs'
       - 'test/holder-lock/**'
-      - 'test/setup/holder-lock-checks.test.mjs'
       - '.github/workflows/holder-lock-cross-platform.yml'
   workflow_dispatch:
 

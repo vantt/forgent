@@ -50,6 +50,12 @@ fn answer(request: &MailboxRequest) -> MailboxAnswer {
     }
 }
 
+/// The answer `fgos doctor` reads for a project's mailbox record: the platform's one refusal, which carries no
+/// record, so the doctor row says the record was not checked.
+pub fn status_for_root(_root: &std::path::Path) -> MailboxAnswer {
+    answer(&MailboxRequest { json: true })
+}
+
 /// The provider of one of the mailbox operations.
 pub struct MailboxProvider {
     descriptor: ProviderDescriptor,

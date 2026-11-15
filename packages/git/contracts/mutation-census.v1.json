@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "b13bfb68c557f902d3dba8da96743a0f9059a7703766cde3584c8e53c8ab46f4",
+  "payloadDigest": "99fc9ecd1f051fa85297bf5ac9f667b9f4ac95f44bda46c5a3deff125954d544",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "a5629383f89b4488b252a62f0ea86463e649e33e0a891db1a19af2cd6c136aca",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -92,7 +92,9 @@
     "apps/fgos/src/main.rs": "403422bafef44362f73535759d7c98f9d330d58ac0e49e0e7ac63fd0b3583b00",
     "apps/fgos/src/routing.rs": "79f63effe9856ce540aa01210b959663812ca13291f57ef5e5fb46c3df9b8304",
     "apps/fgos/src/wiring/doctor/bridge.rs": "05abb106f3337db6a6d2b2e9eadcbc1e393b3b23b63ba41cc05294edd1199ab1",
-    "apps/fgos/src/wiring/doctor/mod.rs": "7fc0d9cd987d291205ca9479941172064d90fb0685bd4fab31e0d13b24bb619e",
+    "apps/fgos/src/wiring/doctor/holder_lock.rs": "0f48a26f2eab091717ae1f71e4461bea7a23c5b6b4cce78fd7e28fd41541b78f",
+    "apps/fgos/src/wiring/doctor/mailbox.rs": "543436deb6fd08bf522f0d47caece62d51defa55ea2ebf2d7ec308364ebdc85a",
+    "apps/fgos/src/wiring/doctor/mod.rs": "8c18dbea62b16d5bb9a578c2f7aa6f31f70661983376b67b1794ffd39aafdf4d",
     "apps/fgos/src/wiring/event_store_clone.rs": "923d718f7a6bd5705cbe6e4d4c8393672c1ef4a2142facc9ada314307a4d7574",
     "apps/fgos/src/wiring/events.rs": "17327ace760683d9665d4c4b3ac051f2f67318f8175b37ad21cdffd52e008881",
     "apps/fgos/src/wiring/gateway_control.rs": "60ed2789c9a7c7ffa6aa43abfc8020eec8b219e6c38540c458e8918321c88604",
@@ -111,8 +113,8 @@
     "apps/fgos/src/wiring/mailbox_surface.rs": "f03ecafe23d3c254c9a02288277f3ee7b22ff4d61c72574abc07ee0e38f2ce18",
     "apps/fgos/src/wiring/mailbox_sync.rs": "486d523c86059e89e46e91535a79ba3ffdaa570918518b501cf845d5ad31affa",
     "apps/fgos/src/wiring/mailbox_sync_unsupported.rs": "b56921a2c7999184b9eb2324992d6f7ccdcacda6b4c45b2048c838f993691995",
-    "apps/fgos/src/wiring/mailbox_verbs.rs": "6807db84edf4d6e9b45f80fbf652422c52854b60a52ca9aa0e8d57daf5065f0e",
-    "apps/fgos/src/wiring/mailbox_verbs_unsupported.rs": "c38d21b026d0334ba76460edbeb10f8a23cbe0f3c56357b083064b1028e33709",
+    "apps/fgos/src/wiring/mailbox_verbs.rs": "b083c779109aa8ae92b5ca5fd28a1c6c81881c82769a7b3ed84d77883e6d7cdc",
+    "apps/fgos/src/wiring/mailbox_verbs_unsupported.rs": "8f4ceadc33463deea690b89514b083d529675f2200052f2c67d151613eed7021",
     "apps/fgos/src/wiring/metrics_sources.rs": "504e2c72b52a5da8d8d23a862403d47986811234809f364ee6006c6957f6c583",
     "apps/fgos/src/wiring/mod.rs": "d6195cec6e88e0551083ed41a3f6fc53be07554dc2de2049f2894759ddf9f320",
     "apps/fgos/src/wiring/run_dirs.rs": "6c34c6af1c85e8e326272fc1c08602b81e6e53ab778596f36296ef376c94b970",
@@ -123,6 +125,7 @@
     "apps/fgos/tests/mailbox_routes.rs": "fe4bb33069a6f6eb6f02b052e4581fcfc69ce37dcdfd146280f9c935c14511a6",
     "apps/fgos/tests/mailbox_sync_child.rs": "047e70662085d6f91fa786c9000eb494711f610d37cd63a24f29dc884116763d",
     "apps/fgos/tests/windows_borrow.rs": "4e77453a5386cf512a22db39e6a529e163c7dc930d8795c93ef05e60ba19c7b9",
+    "apps/fgos/tests/windows_doctor_lock_rows.rs": "943ba00e7be5382a532ad47bfa38f6fef888428910e5f70ee18518edeb1eeb63",
     "apps/fgos/tests/windows_lock_hold_route.rs": "9cedd72a21ef501d00d37ce8fe1f52bb33cbfa799774470534c96dc59a4959aa",
     "apps/fgos/tests/windows_predecessor_stress.rs": "1b5268d306deffe0946748a441a1b107427469d310348d6866efd9237b95ada8",
     "apps/fgos/tests/windows_semantics_probe.rs": "ecb59690bbf1259baa1defb6417c24005138526bb565f216f9db3c2ad784d240",
@@ -1176,18 +1179,17 @@
     "src/setup/git-checks.mjs": "7a9873c59b9849c37921c3469e06c1309436c3839a64946ffb631402f0c9aabe",
     "src/setup/git-hooks.mjs": "7c35308129bc8032a436107c561cefa0637cceb72b295eab1ecd2e163c0d0f66",
     "src/setup/git-retention-note.mjs": "8e4bacd772c5562a964c4beeea95d9ee808f41e122a7b6adc09fee81c96949fd",
-    "src/setup/holder-lock-checks.mjs": "e5bd975b74c7a8cec1ca7a2e0317edc6af01f2fe8e174b4e9e068e3553ccd544",
     "src/setup/identity-checks.mjs": "bc790daf5554adae17ad03012260e1b904a3cc922501d1b111582800a623a880",
     "src/setup/instruction-composition.mjs": "6cbefb439141620eccfc990088849627e95577a28688d51b324a4b3dfdf36331",
     "src/setup/instruction-projections.mjs": "82aaa1ec07a5d2925fcb3117a020eb4576777f901c09d054cb17c659d8c144f3",
     "src/setup/instruction-registry.mjs": "0cbf5776e960d58318eb359db934bf692106c57c84fad18319ddef3fce9a6d87",
     "src/setup/mailbox-claude-accept.mjs": "bee986781b57262527be6964cc46d07944dfc3c6fd1fcc18e6779d665963237a",
-    "src/setup/mailbox-limits.mjs": "4d5342b6631a38e00edc30b8d8a4966f7d94f6848e2b68c45529822d4fdd9068",
+    "src/setup/mailbox-limits.mjs": "b8ed2c018a71ee1a06582ea90c7a73ec1a7ebe29e3d931f9a2ba89108a763323",
     "src/setup/managed-timer.mjs": "1001e0f9a6b660c262f4e649cce71b16a062e58cba2ad40ebb6459d488fdb5fb",
     "src/setup/model-pool-checks.mjs": "f686f00122bc1f43c5d0fe182f7879739f112ef4a361ccccf4a7d6a7ddf5bbd5",
     "src/setup/omp-natives-checks.mjs": "6f6faadb66ac09828741445c599dcbaee9462486157ab7074433e2dbcf4d9aad",
     "src/setup/project-launcher.mjs": "3153fdb9caad59eaeace759de1cd126c22f41585fcd1e15f00c1577ab0f9806b",
-    "src/setup/registrations.mjs": "f9ddaeac29b2df2a496564716ace5c95e7baa566baf2487a5114b27ac0ff551f",
+    "src/setup/registrations.mjs": "f29995b5b86fa7fbb3c1adbd98f4b73ce5a3ee4c63f47448e2586b34a4e3c6af",
     "src/setup/run-supervisor-checks.mjs": "31942f9b9dec0bdd009c05199f2fc1a2afe7e6b18f58c50c94d7aa18b0ad0421",
     "src/setup/runner-config-conversion.mjs": "151720f73a061d9ef1ad977bf9f601ad719d44e00cfeb325b85c4f4ce76e436b",
     "src/setup/seat-binding-checks.mjs": "ab0ff541e60c8e5340e87063839f954d970d889159c2aa40ac41992accd2a894",
@@ -1810,6 +1812,15 @@
       "class": "rust-test"
     },
     {
+      "path": "apps/fgos/src/wiring/doctor/holder_lock.rs",
+      "line": 215,
+      "spawn": "Command::new <- packages/process/rust/src/mapped.rs:239",
+      "binary": "git",
+      "class": "production-sandbox-probe",
+      "function": "run",
+      "repository": "self.repo.to_string_lossy().into_owned()"
+    },
+    {
       "path": "apps/fgos/src/wiring/events.rs",
       "line": 796,
       "spawn": "Command::new",
@@ -2290,6 +2301,13 @@
       "line": 231,
       "spawn": "Command::new",
       "binary": "? fgos()",
+      "class": "rust-test"
+    },
+    {
+      "path": "apps/fgos/tests/windows_doctor_lock_rows.rs",
+      "line": 33,
+      "spawn": "Command::new",
+      "binary": "git",
       "class": "rust-test"
     },
     {
@@ -3022,7 +3040,7 @@
       "spawn": "Command::new",
       "binary": "codex",
       "class": "argv-runner",
-      "resolvedAt": "apps/fgos/src/wiring/mailbox_verbs.rs:595"
+      "resolvedAt": "apps/fgos/src/wiring/mailbox_verbs.rs:614"
     },
     {
       "path": "packages/mailbox/rust/store/tests/ancestry.rs",
@@ -3180,7 +3198,7 @@
       "spawn": "Command::new",
       "binary": "codex",
       "class": "argv-runner",
-      "resolvedAt": "apps/fgos/src/wiring/mailbox_verbs.rs:595"
+      "resolvedAt": "apps/fgos/src/wiring/mailbox_verbs.rs:614"
     },
     {
       "path": "packages/process/rust/src/mapped.rs",
@@ -3926,13 +3944,6 @@
       "class": "configured-binary"
     },
     {
-      "path": "src/setup/holder-lock-checks.mjs",
-      "line": 150,
-      "spawn": "spawnSync",
-      "binary": "(env FGOS_HOST_BIN)",
-      "class": "configured-binary"
-    },
-    {
       "path": "src/setup/identity-checks.mjs",
       "line": 38,
       "spawn": "execFileSync",
@@ -3941,49 +3952,42 @@
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 1706,
-      "spawn": "execFileSync",
-      "binary": "(env FGOS_HOST_BIN)",
-      "class": "configured-binary"
-    },
-    {
-      "path": "src/setup/registrations.mjs",
-      "line": 3266,
-      "spawn": "checkBwrapAvailable -> src/setup/registrations.mjs:1199",
+      "line": 3171,
+      "spawn": "checkBwrapAvailable -> src/setup/registrations.mjs:1196",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 3313,
+      "line": 3218,
       "spawn": "runAllConfinementProbes -> src/runner/dispatch/confinement/probes/harness.mjs:834",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 3353,
-      "spawn": "checkBwrapAvailable -> src/setup/registrations.mjs:1199",
+      "line": 3258,
+      "spawn": "checkBwrapAvailable -> src/setup/registrations.mjs:1196",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 3360,
+      "line": 3265,
       "spawn": "probePeerRunHidden -> src/runner/dispatch/confinement/probes/harness.mjs:525",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 3591,
+      "line": 3496,
       "spawn": "probeIdentity -> src/util/session-identity.mjs:68",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 3649,
+      "line": 3554,
       "spawn": "createSeatBindingClient -> src/seat-binding/client.mjs:142",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"

@@ -71,7 +71,7 @@ rules:
       - "src/util/identity-mint.mjs"
       - "src/state/hot-lock.mjs"
       - "src/runner/repo-locks.mjs"
-      - "src/setup/holder-lock-checks.mjs"
+      - "apps/fgos/src/wiring/doctor/holder_lock.rs"
       - "src/workflow/case-lock.mjs"
   - id: code
     kind: code
