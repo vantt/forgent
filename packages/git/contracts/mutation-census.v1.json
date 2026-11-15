@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "d56e530a692d0250ac4f8714e0e0307a47afaa5c3287d6762c525443374bfb64",
+  "payloadDigest": "10a2a3c741f9baa44dfc46216624ffbd51d115812afdb9c11e9ec1450e4ff01b",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "a5629383f89b4488b252a62f0ea86463e649e33e0a891db1a19af2cd6c136aca",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -315,7 +315,7 @@
     "packages/event-store/rust/src/cursor.rs": "7589fddf99e0a99de8d4a3d044f34d823e55b037eeddb3f325bb53ccb9cbcee5",
     "packages/event-store/rust/src/diagnostics.rs": "dcd45280bbd1a4c30c411c5fc0eed3c3d966a14ca48ffad982c2d960e87eed58",
     "packages/event-store/rust/src/envelope.rs": "a535ea38985cb02cb106742b84cd7f8c1a6c0afca93a0642bc7da85b6759392c",
-    "packages/event-store/rust/src/errors.rs": "0e7cfe530024b4ff5e16af709f4cef634697a4d0fb43655fa650a9f0684f43c5",
+    "packages/event-store/rust/src/errors.rs": "1709ec215c82e55c70f4e1a97e6146e4485560a8b7dd67f55f2b2efab3595700",
     "packages/event-store/rust/src/export.rs": "4a6cc251af3c447c13286253432b7a06a814707beca679bf7c257c94199e7b1f",
     "packages/event-store/rust/src/fence.rs": "4e3d66a595506f17e4ca550678290654add6a2d2d4ccc127bc23425a528d69a6",
     "packages/event-store/rust/src/fsio.rs": "4d23234bbd792527da86888b8e4e6c3219948662850d7e28915e2f81e68323ac",

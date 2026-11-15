@@ -35,15 +35,18 @@ pub(crate) fn invalid(detail: impl Into<String>) -> Error {
 /// Builds the io-failure mapper for `.map_err(io("open", path))`: the detail
 /// names the failed operation and the path (never file content) so a failure
 /// seen only in CI can be traced to its call site.
-pub(crate) fn io(
+pub(crate) fn io<'a>(
     operation: &'static str,
-    path: &std::path::Path,
-) -> impl FnOnce(std::io::Error) -> Error {
-    let path = path.display().to_string();
+    path: &'a std::path::Path,
+) -> impl FnOnce(std::io::Error) -> Error + 'a {
     move |error| {
         Error::new(
             ErrorCode::EventStoreIo,
-            format!("{:?}: {error} (during {operation} of {path})", error.kind()),
+            format!(
+                "{:?}: {error} (during {operation} of {})",
+                error.kind(),
+                path.display()
+            ),
         )
     }
 }
