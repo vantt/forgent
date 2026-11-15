@@ -27,6 +27,14 @@ export function projectShimPath(root) {
   return path.join(root, '.fgos', 'installation', 'bin', 'fgos');
 }
 
+/** The activation record relative to the project root, with forward slashes: the form a containment check takes. */
+export const ACTIVATION_RELATIVE = '.fgos/installation/activation.json';
+
+/** The activation record of the project at `root`. */
+export function activationFilePath(root) {
+  return path.join(root, ...ACTIVATION_RELATIVE.split('/'));
+}
+
 /** The project shim relative to the project root, with forward slashes: the form shell commands, hook
  * tables and generated extension text carry. */
 export const PROJECT_SHIM_RELATIVE = projectShimPath('').split(path.sep).join('/');

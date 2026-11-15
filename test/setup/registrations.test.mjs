@@ -17,7 +17,7 @@ import { findWorkflowStageOperationProblems, checkTaskSpecsResolve, checkDomainW
 import { writeGlobalConfig, writeProjectConfig, writeRawLegacyProjectConfig } from '../helpers/config-fixture.mjs';
 
 import { nativeDoor } from '../../src/native/door.mjs';
-import { checkAgentClaimsResolve, checkAgentTypeNamesUnique, runDoctor } from '../../src/setup/registrations.mjs';
+import { allAgentYamlFiles, checkAgentClaimsResolve, checkAgentTypeNamesUnique, readAgentSkills, runDoctor } from '../../src/setup/registrations.mjs';
 
 // The claude-plugin-marketplace row runs the `claude` CLI when it is on PATH.
 // FGOS_CLAUDE_COMMAND (the row's test-only seam, mirroring bin/fgos.mjs's
@@ -1196,6 +1196,25 @@ test('agent-claims-resolve accepts a requires-skill claim only when an agent pro
     write('core/agents/worker.yaml', 'name: worker\nskills: [real-skill]\n');
     const both = run();
     assert.equal(both.passed, true, both.message);
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test('the claims walk reads agent definitions in the door tier order: first tier wins, the project\'s own domains/ is not read', () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-claims-tiers-'));
+  try {
+    const write = (rel, text) => {
+      fs.mkdirSync(path.dirname(path.join(root, rel)), { recursive: true });
+      fs.writeFileSync(path.join(root, rel), text);
+    };
+    write('core/agents/worker.yaml', 'name: worker\nskills: [from-core]\n');
+    write('fgos/agents/worker.yaml', 'name: worker\nskills: [from-workspace]\n');
+    write('domains/ghost/agents/ghost.yaml', 'name: ghost\nskills: [from-ghost]\n');
+    const { agentSkillsMap, problems } = readAgentSkills(allAgentYamlFiles(root));
+    assert.deepEqual(problems, []);
+    assert.deepEqual([...agentSkillsMap.get('worker')], ['from-workspace']);
+    assert.equal(agentSkillsMap.has('ghost'), false);
   } finally {
     fs.rmSync(root, { recursive: true, force: true });
   }
