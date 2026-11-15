@@ -26,8 +26,11 @@ const PROTOTYPE_NAMES = Object.freeze(['constructor', 'toString', 'hasOwnPropert
 const RIGORS = Object.freeze(['low', 'standard', 'high', 'critical']);
 
 // ---- intended deltas ------------------------------------------------------------------------------
-// Each entry names a row of plan.md "Intended deltas". `claims({input, question, name})` is true only for the
-// narrow slice of the matrix where that delta shows.
+// Each entry names a row of plan.md "Intended deltas". `claims({input, question, name, base, head})` is true only
+// for the narrow slice of the matrix where that delta shows: the input and question it names, and, where the delta
+// depends on what an answer says, the base and head answers themselves.
+const PURPOSE_QUESTIONS = ['executorAndOverrides', 'purposeWithoutClis', 'dispatchPlan', 'needsSoulPlan'];
+const TOOL_INPUT = 'm-tools';
 const ALLOWLIST = Object.freeze([
   {
     // Only the input where these names are NOT own keys (inherited, so no longer declared). Where they are own
@@ -48,7 +51,48 @@ const ALLOWLIST = Object.freeze([
     delta: 'string-aliases',
     claims: ({ input, question }) => input === 'm-aliases' && ['registeredCapability', 'proposalRefusals'].includes(question),
   },
+  {
+    // (Q1) A purpose a tool executor serves is answered from the live probe of its providers, never from the
+    // row's `prefer`: head names a tool provider where base named the row's `prefer[0]` or nothing.
+    delta: 'tool-purpose',
+    claims: ({ question, head }) => PURPOSE_QUESTIONS.includes(question) && toolReason(head) !== null,
+  },
+  {
+    // (Q2) A purpose with a pool of its own is answered by the executor Seat Binding binds (or its refusal), where
+    // base named the first `prefer` entry whether or not it could run here.
+    // Only a name whose own row has a `prefer` pool (`pool`, recorded the same on both sides), where base followed
+    // that `prefer` and head took Seat Binding's answer for it.
+    delta: 'purpose-through-bind',
+    claims: ({ question, head, base }) => PURPOSE_QUESTIONS.includes(question) && toolReason(head) === null
+      && head?.pool === true && base?.bindingSource === 'capability.prefer' && hasPurposeBinding(head),
+  },
+  {
+    // A `prefer` with no usable entry (blank text, an empty list) is no pool: base threw on it (a TypeError for the
+    // empty list), head leaves the purpose unconfigured. Only the two names the blank matrix input declares.
+    delta: 'blank-prefer-is-no-pool',
+    claims: ({ input, question, name, base, head }) => input === 'm-prefer-blank' && ['pref:blank', 'pref:empty'].includes(name)
+      && PURPOSE_QUESTIONS.includes(question) && base?.threw !== undefined && head?.threw === undefined,
+  },
+  {
+    // (Q3) A raw string `prefer` (or a one-element list of one name) naming an executor no longer makes its capability a
+    // hint candidate. Only where a capability row really names the asked executor that way.
+    delta: 'string-prefer-reverse-match',
+    claims: ({ question, head }) => question === 'capabilityDetailsExecutor' && head?.preferredByString === true,
+  },
 ]);
+
+/** The reason code of a tool answer inside a purpose answer, or null when it is not one. */
+function toolReason(answer) {
+  if (!answer || typeof answer !== 'object') return null;
+  const code = answer.tool ?? (Array.isArray(answer.reasonCodes) ? answer.reasonCodes.find((c) => typeof c === 'string' && c.startsWith('tool.')) : null);
+  return code ?? null;
+}
+
+/** Whether a purpose answer comes from Seat Binding: its bound executor, or its refusal. */
+function hasPurposeBinding(answer) {
+  if (!answer || typeof answer !== 'object') return false;
+  return answer.bindingSource === 'seat-binding' || (typeof answer.refused === 'string' && answer.refused !== '') || (Array.isArray(answer.reasonCodes) && answer.reasonCodes.includes('seat-binding.refused'));
+}
 
 const sha = (text) => `sha256:${crypto.createHash('sha256').update(text).digest('hex')}`;
 
@@ -160,6 +204,37 @@ async function childMain(args) {
   }
   matrix['m-proto-absent'] = clone(standard);
   matrix['m-rigor'] = withCaps(standard, { 'rigor:bad': { rigor: 'extreme' }, 'rigor:ok': { rigor: 'critical' } });
+  {
+    // Tool purposes with a provider in each probe state. The index directories are fixtures under the output
+    // directory; a stale one records a commit that is not the repository's HEAD.
+    // The same directory on both sides, so a `scanTarget` is the same text in the recorded configuration.
+    const toolDir = path.join(path.dirname(out), 'tool-index');
+    const present = path.join(toolDir, 'present');
+    const stale = path.join(toolDir, 'stale');
+    fs.mkdirSync(present, { recursive: true });
+    fs.mkdirSync(stale, { recursive: true });
+    fs.writeFileSync(path.join(stale, 'meta.json'), JSON.stringify({ lastCommit: '0'.repeat(40) }));
+    const cfg = withCaps(standard, {
+      'tool:cli-present': {}, 'tool:cli-missing': {}, 'tool:unprobeable': {}, 'tool:mcp-present': {}, 'tool:mcp-stale': {}, 'tool:mcp-missing': {},
+      'tool:two-a': {}, 'tool:two-b': {}, 'tool:with-prefer': { prefer: firstExecutor }, 'tool:agent-for': {},
+    });
+    cfg.executors = {
+      ...cfg.executors,
+      'srv-cli-present': { kind: 'tool', for: ['tool:cli-present'], invocations: [{ via: 'cli', command: 'node' }] },
+      'srv-cli-missing': { kind: 'tool', for: ['tool:cli-missing'], invocations: [{ via: 'cli', command: 'fgos-no-such-cli-command' }] },
+      'srv-unprobeable': { kind: 'tool', for: ['tool:unprobeable'] },
+      'srv-mcp-present': { kind: 'tool', for: ['tool:mcp-present'], scanTarget: present, invocations: [{ via: 'mcp', command: 'mcp:t', tools: { 'tool:mcp-present': 'mcp__t__present' } }] },
+      'srv-mcp-stale': { kind: 'tool', for: ['tool:mcp-stale'], scanTarget: stale, invocations: [{ via: 'mcp', command: 'mcp:t', tools: { 'tool:mcp-stale': 'mcp__t__stale' } }] },
+      'srv-mcp-missing': { kind: 'tool', for: ['tool:mcp-missing'], scanTarget: path.join(toolDir, 'absent'), invocations: [{ via: 'mcp', command: 'mcp:t' }] },
+      // One executor serving two capabilities: every `for` entry counts.
+      'srv-two': { kind: 'tool', for: ['tool:two-a', 'tool:two-b'], invocations: [{ via: 'cli', command: 'node' }] },
+      // The row has a pool of its own and a tool serves it: the tool answers, `prefer` is not read.
+      'srv-with-prefer': { kind: 'tool', for: ['tool:with-prefer'], invocations: [{ via: 'cli', command: 'node' }] },
+      // An agent executor's `for` is inert.
+      'srv-agent-with-for': { ...(standard.executors?.[firstExecutor] ?? {}), for: ['tool:agent-for'] },
+    };
+    matrix['m-tools'] = cfg;
+  }
 
   const inputs = { standard, repo, ...matrix };
 
@@ -169,7 +244,7 @@ async function childMain(args) {
     const declared = section && typeof section === 'object' ? Object.keys(section) : [];
     const aliases = declared.flatMap((n) => (Array.isArray(section[n]?.aliases) ? section[n].aliases : []));
     const executors = Object.keys(cfg?.executors ?? cfg?.runner?.executors ?? {});
-    const extra = ['code:review', 'review', 'nope:x', 'code', 'docs:other', 'wide', 'alias-name', ...PROTOTYPE_NAMES];
+    const extra = ['code:review', 'review', 'nope:x', 'code', 'docs:other', 'wide', 'alias-name', 'red-team', ...PROTOTYPE_NAMES];
     return [...new Set([...declared, ...aliases, ...executors, ...extra].filter((n) => typeof n === 'string'))].sort();
   };
   const flat = (cfg) => (cfg && typeof cfg === 'object' && !('capabilities' in cfg) && cfg.runner && typeof cfg.runner === 'object' ? cfg.runner : cfg);
@@ -195,7 +270,24 @@ async function childMain(args) {
       return { threw: `${err?.name ?? 'Error'}: ${err?.message ?? String(err)}` };
     }
   };
-  const summarizeResolved = (r) => ({ executorId: r.executorId, configured: r.configured, bindingSource: r.bindingSource, invocationId: r.invocationId ?? null, candidates: r.candidates ?? null, hasExecutor: Boolean(r.executor) });
+  // The purpose door: head asks `purposeSeatOf` (lookup, tool providers, Seat Binding), base its first-prefer chooser.
+  const seatOf = (cfg, name) => (mods.plan.purposeSeatOf ? mods.plan.purposeSeatOf(cfg, name, { repoRoot: repoDir }) : mods.resolve.resolveExecutorAndOverrides(cfg, name));
+  // Whether the name's own row declares a `prefer`: recorded on both sides so a claim can name the rows it covers.
+  const hasPool = (cfg, name) => Object.hasOwn(cfg.capabilities ?? {}, name) && cfg.capabilities[name]?.prefer !== undefined;
+  const summarizeResolved = (r, pool) => ({ pool, executorId: r.executorId ?? null, configured: r.configured, bindingSource: r.bindingSource, invocationId: r.invocationId ?? null, hasExecutor: Boolean(r.executor), refused: r.refused?.reason ?? null, tool: r.tool?.reasonCode ?? null });
+  const summarizePlan = (plan, pool) => ({ pool, mechanism: plan.mechanism, executorId: plan.executorId ?? null, capability: plan.capability ?? null, reasonCodes: plan.reasonCodes ?? null, configured: plan.configured ?? null, bindingSource: plan.bindingSource ?? null, providers: plan.providers ?? null, mcpTool: plan.mcpTool ?? null, command: plan.command ?? null, stale: plan.stale ?? null });
+  // A fixture PATH with none of the agent CLIs: the first `prefer` entry cannot run here.
+  const withoutClis = (fn) => {
+    const empty = fs.mkdtempSync(path.join(path.dirname(out), 'empty-path-'));
+    const saved = process.env.PATH;
+    process.env.PATH = empty;
+    try {
+      return fn();
+    } finally {
+      process.env.PATH = saved;
+      fs.rmSync(empty, { recursive: true, force: true });
+    }
+  };
 
   // Per-input questions (no name).
   const onceQuestions = {
@@ -226,18 +318,23 @@ async function childMain(args) {
     checkerPlan: (cfg, name) => Object.fromEntries(RIGORS.map((rigor) => [rigor, attempt(() => mods.seatResolver.checkerPlanOf({ capability: name, rigor }, cfg, { shippedCheckersByRigor: shippedCheckers }))])),
     registeredCapability: (cfg, name) => registeredCapabilityOf(flat(cfg), name) ?? null,
     verifyCommand: (cfg, name) => mods.verify.verifyCommandOf({ capability: name }, cfg) ?? null,
-    executorAndOverrides: (cfg, name) => summarizeResolved(mods.resolve.resolveExecutorAndOverrides(cfg, name)),
-    capabilityDetailsExecutor: (cfg, name) => mods.resolve.resolveCapabilityDetailsFromHints({ cfg, executorId: name, resolvedExecutor: Object.hasOwn(cfg.executors ?? {}, name) ? cfg.executors[name] : undefined, hints: {} }),
+    executorAndOverrides: (cfg, name) => summarizeResolved(seatOf(cfg, name), hasPool(cfg, name)),
+    purposeWithoutClis: (cfg, name) => withoutClis(() => summarizeResolved(seatOf(cfg, name), hasPool(cfg, name))),
+    capabilityDetailsExecutor: (cfg, name) => ({
+      ...mods.resolve.resolveCapabilityDetailsFromHints({ cfg, executorId: name, resolvedExecutor: Object.hasOwn(cfg.executors ?? {}, name) ? cfg.executors[name] : undefined, hints: {} }),
+      // Same on both sides: whether some capability row names this executor in a raw string `prefer`.
+      // (A one-element list of one name was read as that name too: the old lookup used it as an object key.)
+      preferredByString: Object.values(cfg.capabilities ?? {}).some((entry) => entry?.prefer === name || (Array.isArray(entry?.prefer) && entry.prefer.length === 1 && entry.prefer[0] === name)),
+    }),
     capabilityDetailsCandidate: (cfg, name) => mods.resolve.resolveCapabilityDetailsFromHints({ cfg, hints: { candidates: [name] } }),
     confinement: (cfg, name) => {
       const req = mods.request.buildConfinementRequest({ capability: name, executorId: 'probe', cfg, context: { runDir: '/probe/run' }, dispatchId: 'disp_probe', anchorCapability: null });
       const r = req.requirement ?? {};
       return { mode: r.mode, policyId: r.policyId ?? null, anchor: r.anchor ?? null, omitted: r.omitted ?? false };
     },
-    dispatchPlan: (cfg, name) => {
-      const plan = mods.plan.compileDispatchPlan(cfg, { for: name });
-      return { mechanism: plan.mechanism, executorId: plan.executorId ?? null, capability: plan.capability ?? null, reasonCodes: plan.reasonCodes ?? null, configured: plan.configured ?? null };
-    },
+    dispatchPlan: (cfg, name) => summarizePlan(mods.plan.compileDispatchPlan(cfg, { for: name, repoRoot: repoDir }), hasPool(cfg, name)),
+    // The Agent/Task hook's question: a label with no row of its own must stay in-process.
+    needsSoulPlan: (cfg, name) => summarizePlan(mods.plan.compileDispatchPlan(cfg, { for: name, needsSoul: true, hasLiveTaskAccess: true, repoRoot: repoDir }), hasPool(cfg, name)),
     legacyChecker: (cfg, name) => mods.legacy.legacySeatsOf({ pattern: 'reviewed', unit: { capability: name, rigor: 'standard' }, configSnapshot: { runner: cfg } }).map((s) => s.seat),
     proposalRefusals: (cfg, name) => {
       const files = ['src/a.mjs'];
@@ -396,7 +493,7 @@ async function main() {
           continue;
         }
         if (canonical(headQ[key]) === canonical(baseQ[key])) continue;
-        const claim = ALLOWLIST.find((entry) => entry.claims({ input, question, name: key }));
+        const claim = ALLOWLIST.find((entry) => entry.claims({ input, question, name: key, base: baseQ[key], head: headQ[key] }));
         if (claim) allowed.add(claim.delta);
         else failures.push({ input, question, name: key, reason: 'differs', base: sha(canonical(baseQ[key])), head: sha(canonical(headQ[key])) });
       }
