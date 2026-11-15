@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "14460267605fa0fcab04049d30af56df7a0c63141dda7dd8bae51bfb09c1b06e",
+  "payloadDigest": "d0e74efd7f091d9f04a843e267116c13cc0fa3507b338a389f45dc92ae6bf263",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "a5629383f89b4488b252a62f0ea86463e649e33e0a891db1a19af2cd6c136aca",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -92,7 +92,7 @@
     "apps/fgos/src/main.rs": "b7747acc581a898f9140e27a1b9626ead5c8e4b5fff14ad80c3b9ffc5c311012",
     "apps/fgos/src/routing.rs": "80fe10af06c2a91c00e9cefdab8929963c6350bfb6078e2963ad8d89cd6cb252",
     "apps/fgos/src/wiring/event_store_clone.rs": "923d718f7a6bd5705cbe6e4d4c8393672c1ef4a2142facc9ada314307a4d7574",
-    "apps/fgos/src/wiring/events.rs": "ba1a9fd47465dc1d2f845142c2e5c0270520a5d0a28bf72c5e5589eb7ec4b73b",
+    "apps/fgos/src/wiring/events.rs": "17327ace760683d9665d4c4b3ac051f2f67318f8175b37ad21cdffd52e008881",
     "apps/fgos/src/wiring/gateway_control.rs": "60ed2789c9a7c7ffa6aa43abfc8020eec8b219e6c38540c458e8918321c88604",
     "apps/fgos/src/wiring/git_incidents.rs": "4e1725b84d23efcfba36ecb8aee429b55bb92114c260f11f883afb289bde2055",
     "apps/fgos/src/wiring/identity_log.rs": "d7d9dd503ecbd84a5373aa27f6853996e6944aba2940d15e8284cd92c14eef7a",
@@ -1789,7 +1789,7 @@
     },
     {
       "path": "apps/fgos/src/wiring/events.rs",
-      "line": 740,
+      "line": 796,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"

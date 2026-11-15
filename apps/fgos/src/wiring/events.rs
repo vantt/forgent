@@ -5,7 +5,9 @@
 //!
 //! A detached seal or publish child (`detached`, the registry's `eventStoreChild` shapes) reads its repository
 //! through the same door but never creates a state root its owner tore down: a root that is gone answers
-//! `{ skipped: "state root gone" }` and stays gone.
+//! `{ skipped: "state root gone" }` and stays gone. A child whose read raced another process writing the
+//! repository's config answers `{ skipped: "repository config changing" }`: nobody waits for it and the next trigger
+//! redoes its work.
 //!
 //! Failures keep the Node CLI's text and exit: a verb's own validation is a categorised refusal (exit 4), every
 //! other failure prints `fgos: <message>` and exits with the table's unexpected status. A failed child leaves one
@@ -468,8 +470,27 @@ fn export_verb(
     .map_err(store_failure)
 }
 
-/// Runs one request: its own validation first, then the store.
+/// The cause Git's config door reports when a config file changed between the stamp taken before a read and the
+/// one taken after it: another process was writing the repository's config while the read ran.
+const CONFIG_CHANGED_DURING_READ: &str = "repository-config-changed-during-read";
+
+/// Runs one request: its own validation first, then the store. A detached child is background work nobody waits
+/// for and whose work is durable (the next trigger seals or publishes), so a read that raced a config write is a
+/// skipped run, not a fault; a foreground call still reports it.
 pub fn answer(request: &EventsRequest, env: &Environment) -> Result<Value, Refused> {
+    skip_a_raced_read(request.detached, run(request, env))
+}
+
+fn skip_a_raced_read(detached: bool, result: Result<Value, Refused>) -> Result<Value, Refused> {
+    match result {
+        Err(refusal) if detached && refusal.message.contains(CONFIG_CHANGED_DURING_READ) => {
+            Ok(json!({"skipped": "repository config changing"}))
+        }
+        other => other,
+    }
+}
+
+fn run(request: &EventsRequest, env: &Environment) -> Result<Value, Refused> {
     match &request.verb {
         Verb::Seal { stream, history } => {
             let stream = stream
@@ -710,6 +731,41 @@ mod tests {
             assert_eq!(answer(&call, &env).unwrap(), state_root_gone());
             assert!(!state.exists(), "the child never rebuilds the root");
         }
+    }
+
+    #[test]
+    fn a_detached_child_that_raced_a_config_write_skips_and_a_foreground_call_still_fails() {
+        // Both shapes the race reaches the verb in: the resolve door's operation error and the store's.
+        let git = || OperationError {
+            code: fgos_git::ResultCode::Refused,
+            cause: CONFIG_CHANGED_DURING_READ.into(),
+            retryable: false,
+            operation_id: None,
+            receipt: None,
+            exit_code: None,
+            signal: None,
+            stderr: Vec::new(),
+            detail: None,
+        };
+        let shapes = || {
+            [
+                resolve_failure(ResolveError::Git(git())),
+                store_failure(StoreError::new(
+                    fgos_event_store::errors::ErrorCode::EventStoreIo,
+                    format!("Git: {CONFIG_CHANGED_DURING_READ}"),
+                )),
+            ]
+        };
+        for refusal in shapes() {
+            assert_eq!(
+                skip_a_raced_read(true, Err(refusal)).unwrap(),
+                json!({"skipped": "repository config changing"})
+            );
+        }
+        for refusal in shapes() {
+            assert!(skip_a_raced_read(false, Err(refusal)).is_err());
+        }
+        assert!(skip_a_raced_read(true, Err(failed("event-store-no-repository"))).is_err());
     }
 
     #[cfg(target_os = "linux")]
