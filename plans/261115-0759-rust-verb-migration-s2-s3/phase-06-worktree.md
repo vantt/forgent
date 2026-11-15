@@ -1,13 +1,15 @@
 ---
 phase: 6
 title: "`worktree create|remove` native (only if the owner answers S23-Q1 = a)"
-status: pending
+status: dropped
 effort: "3d if S23-Q1 = a; 0.25d if S23-Q1 = b (hand-off note only)"
 wave: B
 step: S2
 blockedBy: [0, S23-Q1]
 flipAfter: [1]
 ---
+
+> Dropped (owner answer S23-Q1 = b, 2026-11-15 08:41): the owner moved `worktree` to S6a; nothing in this file is executed in S2.
 
 # Phase 06: `worktree create|remove`
 

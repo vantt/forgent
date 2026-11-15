@@ -10,6 +10,8 @@ blockedBy: [12, S23-Q2, "S2 landed on main"]
 
 # Phase 13: One spelling rule
 
+> Owner answer applies (2026-11-15 08:41): S23-Q2 = a. `=` goes away everywhere; the (b) and (c) branches below are not taken.
+
 The program row: "the last verb's step decides whether `--flag=value` stays accepted everywhere or goes away
 everywhere". After S2 and S3 every ported verb reads only the shared parser; the eight pre-F0 native verbs keep
 their own reading through `PRE_DOOR_NATIVE_VERBS` (phase 01) and three of the ten debt entries of the parse row (the

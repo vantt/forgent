@@ -11,6 +11,8 @@ landsAfter: [4]
 
 # Phase 05: `lock fence` native
 
+> Owner answer applies (2026-11-15 08:41): S23-Q3 = b. Without `--yes` the verb lists the holders and refuses with `lock-fence-not-confirmed` (exit 2), on a terminal too; the (a) and (c) branches below are not taken.
+
 The fence state machine (list holders, confirm, SIGTERM by identity, wait, SIGKILL, probe, clear a hot record) is Node
 (`src/runner/lock-fence.mjs`, 196 lines) over Rust primitives. It moves into the holder-lock crate, signalling only
 through the process door. How a person confirms is S23-Q3; this file gives the requirements for each answer.

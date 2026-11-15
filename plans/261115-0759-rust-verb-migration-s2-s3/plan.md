@@ -1,9 +1,9 @@
 ---
-title: "Rust verb migration S2 (lock, lock-status, git, worktree) and S3 (events, session, gateway, agents)"
+title: "Rust verb migration S2 (lock, lock-status, git) and S3 (events, session, gateway)"
 description: "Move eight legacy-Node verbs onto the Rust host in two parallel steps, one Rust owner per job, Node arms and their tests retired in the same change."
 status: pending
 priority: P1
-effort: 23d (S23-Q1 = b); 28.5d (S23-Q1 = a)
+effort: 23d
 branch: cook/s2s3-plan
 tags: [refactor, infra, host, rust, migration]
 blockedBy: []
@@ -23,7 +23,7 @@ Owner questions are labelled `S23-Qn` so they never read as the program's Q1-Q3.
 ## Outcome
 
 `lock`, `lock-status`, `git` (S2) and `events`, `session`, `gateway` (S3) run in the Rust host with no Node
-process; `worktree` (S2) and `agents` (S3) do too if the owner answers S23-Q1 = (a), else they move to S6a and S5.
+process; `worktree` and `agents` are not in S2/S3: the owner answered S23-Q1 = (b), so they move to S6a and S5.
 Each port moves a whole use case into its Rust owner, deletes the Node arm, the Node use case and the tests whose
 behaviour now has a Rust owner, and ends with a `doors` row that fails on any second path.
 
@@ -50,7 +50,7 @@ Accepted behaviour changes (decided here, each in the phase that makes it and in
 | D2 | Ported verbs read their call only through the shared parser; the eight pre-F0 native verbs keep their own reading through one list, `PRE_DOOR_NATIVE_VERBS` (exact-set test) | keeps each ported verb equal to Node; makes the pre-door debt one visible list | 01, 13 |
 | D3 | One categorised refusal outcome in the host (category -> `exit_codes`, text `fgos: <msg>`) | today every provider error exits 1 with `fgos: error:` (`apps/fgos/src/cli_presenter.rs:57-76`); Node exits 2/3/4/7 | 01 |
 | D4 | A root decision never creates the state root | `read_repo_facts` -> `GitDriver::topology_at` -> `GitDriver::new` creates it (`packages/git/rust/src/driver.rs:266-273, 359-365`); Git spec §20 forbids it for a detached child | 01 |
-| D5 | Hot record read and compare-and-clear get one owner, the holder-lock crate; Node's functions call it | holder-lock spec §15 owns the hot mutex and `hot-lock.v1.json`: a lower-layer contract, unlike S23-Q1's Execution modules | 03 |
+| D5 | Hot record read and compare-and-clear get one owner, the holder-lock crate; Node's functions call it | holder-lock spec §15 owns the hot mutex and `hot-lock.v1.json`: a lower-layer contract, unlike the Execution modules S23-Q1 moved out | 03 |
 | D6 | `lock-status`'s run-scoped instances are listed by the host (it links the Execution-side crates) and passed into `holder-lock::status`; a twin of the three Node listers with one fixture, debt `retiredBy` S6a | holder-lock may not know Execution layouts; `fgos-run-supervisor` depends on holder-lock, so the reverse call is a cycle | 04 |
 | D7 | The session registry's owner is a host module; Node's `listSessions` becomes a client of the host verb (`invokeHost`); identity stays an allowed read-only reader | the registry is runner state, not a Git fact (`docs/platform/git/spec.md:66, 70`); `invokeHost` is the established Node-to-native pattern (`src/convention/convention-client.mjs:21`) | 08 |
 | D8 | Gateway control is a host module; the gateway child is spawned without the recursion guard | only the host uses it after the flip; a guarded child cannot call legacy verbs (`apps/fgos/src/legacy_exec.rs:249`, `main.rs:283`) | 09 |
@@ -109,11 +109,11 @@ Accepted behaviour changes (decided here, each in the phase that makes it and in
 01 shared seam ───┴─> lands on main alone (small series), then:
 S2: 02 git ─────────────────────────────────┐
     03 hot record ─> 04 lock-status ─> 05 lock fence ─┼─> 11 S2 close ─> S2 lands on main
-    06 worktree (S23-Q1 = a only) ───────────┘
+    06 worktree (dropped, S23-Q1 = b) ───────┘
 S3: 07 events ─────────┐
     08 session ────────┤
     09 gateway ────────┼─> 12 S3 close ─> (S2 landed) S3 rebases on main ─> 13 flag spelling (S23-Q2) ─> S3 lands
-    10 agents (S23-Q1 = a) ┘
+    10 agents (dropped, S23-Q1 = b) ┘
 ```
 
 - Integration branches `rust-verb-migration-program/s2` and `.../s3` are cut from `main` after phase 01 lands.
@@ -131,15 +131,15 @@ S3: 07 events ─────────┐
 | 02 | `git status|recover` native | S2 | B | 00, 01 landed | 1.5d | [phase-02-git-status-recover.md](phase-02-git-status-recover.md) |
 | 03 | Hot record door in holder-lock | S2 | B | 00 | 2d | [phase-03-hot-record-door.md](phase-03-hot-record-door.md) |
 | 04 | `lock-status` native (first store-touching wiring proof) | S2 | C | 01, 03 | 3d | [phase-04-lock-status.md](phase-04-lock-status.md) |
-| 05 | `lock fence` native | S2 | C | 01, 03, S23-Q3; lands after 04 | 1.5d (Q3 = b) / 2d (a) | [phase-05-lock-fence.md](phase-05-lock-fence.md) |
-| 06 | `worktree create|remove` native (only if S23-Q1 = a) | S2 | B | 00, 01, S23-Q1 | 3d / 0.25d | [phase-06-worktree.md](phase-06-worktree.md) |
+| 05 | `lock fence` native (S23-Q3 = b) | S2 | C | 01, 03; lands after 04 | 1.5d | [phase-05-lock-fence.md](phase-05-lock-fence.md) |
+| 06 | ~~`worktree create|remove` native~~ dropped: moves to S6a (S23-Q1 = b) | - | - | - | 0d | [phase-06-worktree.md](phase-06-worktree.md) |
 | 07 | `events sync|status|seal|export` native | S3 | B | 00, 01 | 2.5d | [phase-07-events.md](phase-07-events.md) |
 | 08 | `session start|end|list|gc` native | S3 | B | 00, 01 | 3d | [phase-08-session.md](phase-08-session.md) |
 | 09 | `gateway start|stop|status` native | S3 | B | 00, 01, S23-Q4 if asked | 2d | [phase-09-gateway.md](phase-09-gateway.md) |
-| 10 | `agents list` native (only if S23-Q1 = a) | S3 | B | 00, 01, S23-Q1 | 3d / 0.25d | [phase-10-agents.md](phase-10-agents.md) |
-| 11 | S2 close: docs, proof consolidation, parity re-run, gates | S2 | D | 02-05 (06) | 1d | [phase-11-s2-close.md](phase-11-s2-close.md) |
-| 12 | S3 close: docs, proof consolidation, parity re-run, gates | S3 | D | 07-09 (10) | 1d | [phase-12-s3-close.md](phase-12-s3-close.md) |
-| 13 | One `--flag=value` rule for every native verb (S23-Q2) | S3 | E | 12, S23-Q2, S2 landed | 1.5d | [phase-13-flag-spelling.md](phase-13-flag-spelling.md) |
+| 10 | ~~`agents list` native~~ dropped: moves to S5 (S23-Q1 = b) | - | - | - | 0d | [phase-10-agents.md](phase-10-agents.md) |
+| 11 | S2 close: docs, proof consolidation, parity re-run, gates | S2 | D | 02-05 | 1d | [phase-11-s2-close.md](phase-11-s2-close.md) |
+| 12 | S3 close: docs, proof consolidation, parity re-run, gates | S3 | D | 07-09 | 1d | [phase-12-s3-close.md](phase-12-s3-close.md) |
+| 13 | One `--flag=value` rule for every native verb (S23-Q2 = a) | S3 | E | 12, S2 landed | 1.5d | [phase-13-flag-spelling.md](phase-13-flag-spelling.md) |
 
 Critical path: 00 -> 03 -> 04 -> 05 -> 11 (S2 lands) -> S3 rebase -> 13, about 10.5 lead-days
 (1 + 2 + 3 + 1.5 + 1 + 0.5 + 1.5); 01 (2.5 days from day 0) lands before 04's flip needs it. S3's own longest
@@ -149,9 +149,9 @@ chain (00 -> 08 -> 12) is 5 days and finishes inside it.
 
 ```text
 Wave A: [00 facts] [01 shared seam]                       (start together; 01 lands only after 00's report)
-Wave B: S2 [02 git] [03 hot record] [06 worktree*]   ||   S3 [07 events] [08 session] [09 gateway] [10 agents*]
-        (all need 00; their flip commits need 01 on main; * only if S23-Q1 = a)
-Wave C: S2 [04 lock-status] [05 lock fence]                (need 03; 05 also S23-Q3; 05 lands after 04)
+Wave B: S2 [02 git] [03 hot record] [06 dropped]   ||   S3 [07 events] [08 session] [09 gateway] [10 dropped]
+        (all need 00; their flip commits need 01 on main)
+Wave C: S2 [04 lock-status] [05 lock fence]                (need 03; 05 lands after 04)
 Wave D: [11 S2 close]   ||   [12 S3 close]
 Wave E: S2 lands on main -> S3 rebases on main -> [13 flag spelling, on S3] -> S3 lands
 ```
@@ -161,20 +161,20 @@ Wave E: S2 lands on main -> S3 rebases on main -> [13 flag spelling, on S3] -> S
 | File | Writers in order |
 |---|---|
 | `apps/fgos/src/invocation_doors.rs`, `packages/git/rust/src/{invocation_root.rs,driver.rs}` | 01 -> 13 (no verb phase edits them; 08 and 09 call `EventStoreLifecycle::trigger`) |
-| `apps/fgos/src/routing.rs` | 01 -> S2: 02, 04, 05, 06 (one `NATIVE_SUBCOMMANDS` line each, landing order) -> S3: 07, 08, 09, 10 -> 13 |
+| `apps/fgos/src/routing.rs` | 01 -> S2: 02, 04, 05 (one `NATIVE_SUBCOMMANDS` line each, landing order) -> S3: 07, 08, 09 -> 13 |
 | `apps/fgos/src/main.rs`, `cli_projector.rs`, `cli_presenter.rs`, `packages/host-runtime/rust/src/catalog.rs`, `packages/host-runtime/rust/src/contracts.rs` | 01 first (D3; `run_native` reads the categorised outcome); then S2 phases in landing order; S3 phases in landing order; S3 rebases after S2 lands (additive list lines) |
 | `apps/fgos/Cargo.toml` (D10) | 08 or 09, whichever lands first on S3; `Cargo.lock` by the step lead |
 | `packages/host-runtime/contracts/command-route-annotations.json`, `src/cli/command-registry.mjs` | as `main.rs`; 13 last |
 | `command-routes.json`, `command-manifest.json` (generated) | every flip regenerates; on rebase rerun `node scripts/export-command-selectors.mjs` |
 | `bin/fgos.mjs` | every verb phase deletes its own arm and imports (different hunks); 07 also deletes the `eventStoreChild` branch (4054-4134) |
-| `test/architecture.test.mjs` (`ARM_STATIC_IMPORTS` 1660-1700) | 02, 04, 05 (S2; 06 only if a line goes); S3 none (`session.mjs` stays imported for `listSessions`; `events`, `gateway`, `agents` are dynamic imports); the list only shrinks |
+| `test/architecture.test.mjs` (`ARM_STATIC_IMPORTS` 1660-1700) | 02, 04, 05 (S2); S3 none (`session.mjs` stays imported for `listSessions`; `events`, `gateway` are dynamic imports); the list only shrinks |
 | `docs/architecture-manifest.json` | every phase adds its rows and removes its deleted `files` entries; 11 and 12 add the per-step "retired Node verb code" rows; 13 edits the parse row |
 | `test/rust-host/verb-parity.test.mjs` (step branches only, never on `main`) | step lead adds it as the first commit of each integration branch; each verb phase adds its table name; 11 and 12 rerun every table and delete runner and tables |
 | `apps/fgos/tests/cli_tests.rs` | 04 (wiring proof) -> 05 -> 07 -> 08 -> 09 (one case each) |
 | `packages/holder-lock/rust/src/lib.rs` | 03 -> 04 -> 05 |
 | `packages/process/rust/src/control.rs` | 05 only (`self_chain` moves in); `lib.rs`, `mapped.rs`: 09 only, under S23-Q4 = a |
 | `packages/git/rust/src/lib.rs` | 02 only |
-| `packages/git/node-addon/src/git.rs` | 02 only; `holder_lock.rs`: 03 only; `process.rs`: 05 only; `lib.rs`: 10 only (S23-Q1 = a) |
+| `packages/git/node-addon/src/git.rs` | 02 only; `holder_lock.rs`: 03 only; `process.rs`: 05 only |
 | `src/event-store/maintenance.mjs`, `src/util/spawn-detached-fgos.mjs` | 07 only (08 and 09 delete callers, not lines here) |
 | `test/suite-baseline.json` | every phase that deletes a test file removes its row(s) |
 | `packages/git/contracts/mutation-census.v1.json` (generated) | every phase regenerates its own |
@@ -185,13 +185,11 @@ Create:
 - Rust: `packages/git/rust/src/incidents.rs` (02), `packages/holder-lock/rust/src/hot_record.rs` (03),
   `packages/holder-lock/rust/src/status.rs` (04), `apps/fgos/src/wiring/run_dirs.rs` (04, the host's run-directory
   listers, D6), `packages/holder-lock/rust/src/fence.rs` (05), `apps/fgos/src/wiring/events.rs` (07),
-  `apps/fgos/src/wiring/session.rs` (08), `apps/fgos/src/wiring/gateway_control.rs` (09); S23-Q1 = a only: the
-  provisioning module (06) and the agent definitions module (10), names fixed by 00
+  `apps/fgos/src/wiring/session.rs` (08), `apps/fgos/src/wiring/gateway_control.rs` (09)
 - Contracts and fixtures: `packages/holder-lock/contracts/main-checkout-activity.v1.json` (04, beacon; or beside its
   writer if 00 F5 says so), `test/rust-host/fixtures/run-dirs-vectors.json` (04, the three run layouts)
 - Tests (transitional, never reach `main`): `test/rust-host/verb-parity.test.mjs` (first commit of each integration
-  branch), `test/rust-host/parity-cases/{git,lock-status,lock,events,session,gateway}.cases.mjs` (+ `worktree`,
-  `agents` if S23-Q1 = a); all deleted by 11/12
+  branch), `test/rust-host/parity-cases/{git,lock-status,lock,events,session,gateway}.cases.mjs` ; all deleted by 11/12
 - Reports under `plans/261115-0759-rust-verb-migration-s2-s3/reports/`
 
 Modify:
@@ -213,7 +211,7 @@ Modify:
   `test/setup/holder-lock-checks.test.mjs` (04: its owner pointer at 100), `test/cli/fgos-lock-fence.test.mjs` (05),
   `test/git/status.test.mjs` (02), `test/event-store/{triggers,background-seal,verbs}.test.mjs`,
   `test/setup/event-store-checks.test.mjs` (07), `test/cli/helpers/fgos-cli-harness.mjs`, `test/setup/checks.test.mjs`,
-  `test/runner/session.test.mjs` (08), `test/observe/invocation-fault-log.test.mjs` (06), `test/rust-host/command-routes.test.mjs`
+  `test/runner/session.test.mjs` (08), `test/rust-host/command-routes.test.mjs`
   and `test/cli/subcommand-flag-drift.test.mjs` (only where they name these verbs)
 - Docs (closes): `docs/platform/holder-lock/spec.md` (§13, §14, §15, §17, §20), `docs/platform/git/spec.md` (§20),
   `docs/platform/event-store/spec.md` (child paragraph near 454, decision history), `docs/platform/runner/spec.md`
@@ -225,7 +223,7 @@ Modify:
 
 Delete:
 - `src/runner/lock-status.mjs`, `src/runner/lock-fence.mjs`, `src/verbs/events/{sync,status,seal,export}.mjs`,
-  `src/runner/gateway-control.mjs`; S23-Q1 = a: `src/verbs/worktree/*`
+  `src/runner/gateway-control.mjs`
 - Tests: `test/runner/lock-status.test.mjs`, `test/cli/fgos-git.test.mjs`, `test/runner/gateway-control.test.mjs`,
   `test/cli/fgos-gateway.test.mjs`; others shrink (owners named per phase)
 - The transitional parity runner and tables (11, 12)
@@ -248,9 +246,9 @@ open phases touch `apps/`, `packages/`, `src/runner/{lock-*,session,gateway-cont
 | `test/suite-baseline.json` | rows of deleted test files out (26, 27, 325, 334, ...) | capability 07: rows of its three deleted tests | different rows; rebase |
 | `AGENTS.md` | closes: the "Legacy-Node CLI Ownership Boundary" sentence on lock verbs, only if it changes | capability 07: 228-262 (dispatch section) | different section; rebase |
 | `docs/reading-map.md` | rows 174, 189, 190 and new paths (closes) | capability 06 edits 158 | different rows; rebase |
-| `src/setup/registrations.mjs` | **not edited** (02 keeps `src/git/status.mjs` exports, so `src/setup/git-checks.mjs` and doctor are unchanged; 10 keeps `listAgents`/`agentRenderWarnings` reachable) | capability 07 (line 99, row 990-1025); one-door-debt 16 (personas 809-863, 517, activation reads) | none needed; if S23-Q1 = a and 10 must touch doctor's agent calls, 10 starts after one-door-debt 16 lands |
-| `doors` row "agent definition tier directories" | 10 (S23-Q1 = a) moves `allowed` to the Rust owner | one-door-debt 16 removes its `registrations.mjs` debt entry | same JSON object: 10 rebases after 16; the check names any stale entry |
-| `test/runner/agent-definitions.test.mjs` | 10 (S23-Q1 = a) moves its cases to the Rust owner | one-door-debt 16 names it as owning test | 10 starts after 16 lands; with S23-Q1 = b no collision |
+| `src/setup/registrations.mjs` | **not edited** (02 keeps `src/git/status.mjs` exports, so `src/setup/git-checks.mjs` and doctor are unchanged) | capability 07 (line 99, row 990-1025); one-door-debt 16 (personas 809-863, 517, activation reads) | none needed |
+| `doors` row "agent definition tier directories" | not edited here: phase 10 dropped (S23-Q1 = b), `agents` moves to S5 | one-door-debt 16 removes its `registrations.mjs` debt entry | none |
+| `test/runner/agent-definitions.test.mjs` | not edited here: phase 10 dropped (S23-Q1 = b) | one-door-debt 16 names it as owning test | none |
 | `src/runner/execution/seat-policy.mjs`, `src/setup/bin-discovery.mjs`, `src/runner/dispatch/**`, `src/runner/execution/**` | not edited (04 only stops importing `dispatch/assignment-layout.mjs` and `execution/case-run-paths.mjs` by deleting `lock-status.mjs`) | one-door-debt 05, 16; capability 06 | none |
 | `packages/git/contracts/mutation-census.v1.json` | regenerated | regenerated by every product change | regenerate after each landing |
 
@@ -268,8 +266,7 @@ hunks; mitigation is D11's landing order and regeneration. Disjoint by construct
 
 ## Exit criteria (measurable)
 
-1. `command-routes.json`: `lock`, `lock-status`, `git`, `events`, `session`, `gateway` (and `worktree`, `agents` if
-   S23-Q1 = a) have `route_kind: native` and an `operation_id`; counts 80 routes, native 8 -> 14 (16), legacy-cli 72 -> 66 (64).
+1. `command-routes.json`: `lock`, `lock-status`, `git`, `events`, `session`, `gateway` have `route_kind: native` and an `operation_id`; counts 80 routes, native 8 -> 14, legacy-cli 72 -> 66.
 2. No Node process for any flipped verb: the harness PATH shim records zero `node` children for every parity case
    on the host entry (`test/rust-host/harness.mjs:37`, `node` is shimmed; the host starts Node through PATH,
    `apps/fgos/src/legacy_exec.rs:246`), and one `cli_tests.rs` case per step runs a flipped verb with a PATH `node`
@@ -305,13 +302,13 @@ hunks; mitigation is D11's landing order and regeneration. Disjoint by construct
 | Ported verbs exit 1 where Node exits 2/4/7 | certain without D3 | D3 in 01; every refusal is a parity case (00 F16) |
 | Node readers of a moved writer's file read another shape | M x H | one reader each (D5, D7); vector rows in the existing contracts; formats unchanged |
 | Parity impossible in-tree | certain | D1; the base build in its own Cargo target |
-| `lock fence` signals a holder nobody confirmed | M x H | S23-Q3; under (a) the reinvoke carries the confirmed identities and `fence.rs` signals only those still holding |
+| `lock fence` signals a holder nobody confirmed | M x H | S23-Q3 = b: without `--yes` the verb lists the holders and refuses, so nothing is signalled unconfirmed |
 | The gateway child inherits the recursion guard (legacy verb calls from the gateway die; possibly true today) | M x H | D8; 00 F11 confirms the current behaviour live; item for the big lead if it is broken today |
 | Gateway REST `/v1/sessions` parses `fgos session start|end --json` (`apps/fgos-gateway/src/gateway.rs:1091, 1115`) | M x H | exact `data` parity; `cargo test -p fgos-gateway` in 08 |
 | Writes compared in parity (no dual-run, §11) | M x M | each write case runs on its own fresh fixture per entry (`fs-delta`), never on shared state |
 | S2 and S3 both editing host list files | H x L | D11, additive lines, regeneration |
-| Pulling tier-5 modules (provisioning, agent definitions) into S2/S3 | M x M | S23-Q1 |
-| Two `--flag=value` rules live after S3 | certain until S23-Q2 | phase 13 applies the answer |
+| Pulling tier-5 modules (provisioning, agent definitions) into S2/S3 | M x M | not taken: S23-Q1 = b, phases 06 and 10 dropped |
+| Two `--flag=value` rules live after S3 | certain until 13 | phase 13 applies S23-Q2 = a |
 
 Rollback: each phase reverts on its integration branch; a landed step reverts as one series. Rollback of a
 native verb in the field is a release rollback through `fgctl` (migration doc §13): the previous release still
@@ -366,6 +363,12 @@ the `LENIENT_ROOT_VERBS` guard gets an exact-set assertion; phase 03 states why 
 
 ## Validation Log
 
+### Owner answers (2026-11-15 08:41, via HARDEN)
+- S23-Q1 = (b): `worktree` to S6a, `agents` to S5; phases 06 and 10 dropped; effort 23d; program S5 and S6a rows updated.
+- S23-Q2 = (a): `=` removed everywhere; phase 13 runs the (a) branch.
+- S23-Q3 = (b): `lock fence` without `--yes` lists and refuses (`lock-fence-not-confirmed`, exit 2).
+- S23-Q4: still waits on phase 00 fact F11.
+
 ### Verification results
 - Tier: Full (14 phases). Claims checked: 78 (38 by the assumption reviewer, 40 planner spot checks with `sed`/`rg`
   on `e6b78d1d1`).
@@ -378,7 +381,8 @@ the `LENIENT_ROOT_VERBS` guard gets an exact-set assertion; phase 03 states why 
 ## Owner questions (batch)
 
 Asked once, together, when this plan is approved. None blocks wave A, phase 01 or the other verb phases:
-S23-Q1 gates only 06 and 10, S23-Q2 only 13, S23-Q3 only 05, S23-Q4 (if asked) only 09's `start` off Unix.
+S23-Q1 gated only 06 and 10, S23-Q2 only 13, S23-Q3 only 05, S23-Q4 (if asked) only 09's `start` off Unix.
+Status (2026-11-15 08:41): Q1-Q3 answered by the owner (via HARDEN); Q4 still waits on phase 00 fact F11.
 
 ### S23-Q1: `worktree` and `agents` — port now, or move them to the step that moves their shared module?
 
@@ -404,6 +408,7 @@ S23-Q1 gates only 06 and 10, S23-Q2 only 13, S23-Q3 only 05, S23-Q4 (if asked) o
   the per-call gain of these two verbs is small next to `npm ci` or a panel run.
 - **Scope of the answer:** where `worktree` and `agents` are ported (S2/S3 or S6a/S5). It does not change the
   program's step order or any other verb; under (b) the program's S5 and S6a rows gain one verb each.
+- **Answer (2026-11-15 08:41, owner via HARDEN): (b).** `worktree` moves to S6a and `agents` to S5, next to the modules they depend on. Phases 06 and 10 are dropped; the program's S5 and S6a rows gain one verb each. Plan effort is about 23 lead-days.
 
 ### S23-Q2: `--flag=value` — one rule for every native verb
 
@@ -428,6 +433,7 @@ S23-Q1 gates only 06 and 10, S23-Q2 only 13, S23-Q3 only 05, S23-Q4 (if asked) o
 - **Scope of the answer:** how native verbs read `--flag=value`, `--dir=` and the sub-command word. Not root
   leniency (`PRE_DOOR_NATIVE_VERBS` keeps that use: the mailbox behaviours it protects are separate); not the Node
   CLI's rules under (a) or (c).
+- **Answer (2026-11-15 08:41, owner via HARDEN): (a).** `=` goes away everywhere. The eight verbs move onto the shared parser; `named_dir` and the three twin debt entries go; the one doc use (metrics eval) is rewritten in the same change. CHANGELOG line (phase 13): `--flag=value` and `--dir=<path>` are no longer accepted; use `--flag value`.
 
 ### S23-Q3: `lock fence` without `--yes` — keep the terminal question?
 
@@ -448,6 +454,7 @@ S23-Q1 gates only 06 and 10, S23-Q2 only 13, S23-Q3 only 05, S23-Q4 (if asked) o
 - **Recommendation:** (b). It is what every agent already does, it adds nothing to the host, and the confirmation
   the person gives is the same decision made one command later.
 - **Scope of the answer:** `lock fence`'s confirmation only; no other verb gets a confirmation loop.
+- **Answer (2026-11-15 08:41, owner via HARDEN): (b).** `lock fence` without `--yes` lists the holders and refuses with `lock-fence-not-confirmed` (exit 2), on a terminal too. `core/skills/fgos-lock-fence/SKILL.md` is updated if its text needs it (phases 05, 11).
 
 ### S23-Q4 (asked only if phase 00 F11 finds `fgos gateway start` works on Windows today): Windows detached spawn
 

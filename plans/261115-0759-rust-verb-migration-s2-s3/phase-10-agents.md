@@ -1,13 +1,15 @@
 ---
 phase: 10
 title: "`agents list` native (only if the owner answers S23-Q1 = a)"
-status: pending
+status: dropped
 effort: "3d if S23-Q1 = a; 0.25d if S23-Q1 = b (hand-off note only)"
 wave: B
 step: S3
 blockedBy: [0, S23-Q1]
 startsAfter: ["one-door-debt phase 16 landed (S23-Q1 = a only)"]
 ---
+
+> Dropped (owner answer S23-Q1 = b, 2026-11-15 08:41): the owner moved `agents` to S5; nothing in this file is executed in S3.
 
 # Phase 10: `agents list`
 

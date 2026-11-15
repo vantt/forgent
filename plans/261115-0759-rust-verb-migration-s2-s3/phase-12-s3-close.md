@@ -17,12 +17,11 @@ Phase-lead rules: [plan.md](plan.md). Branch `rust-verb-migration-program/s3-p12
 
 ## Requirements
 
-1. **Parity re-run, then deletion** of the S3 tables (`events`, `session`, `gateway`, `agents` under S23-Q1 = a), the
+1. **Parity re-run, then deletion** of the S3 tables (`events`, `session`, `gateway`), the
    S3 runner, the S3 base worktree and its target `rvm-s3-base-target`, as phase 11 requirement 1.
 2. **Retired-code row** "retired Node S3 verb code" (allowed: none): `\bsyncUseCase\b`, `\bstatusUseCase\b`,
    `\bsealUseCase\b`, `\bexportUseCase\b`, `\bstartGateway\b`, `\bstopGateway\b`, `\bgatewayStatus\b`,
-   `\bGatewayControlError\b`, `\bcreateSession\b`, `\bendSession\b`, `\breclaimOrphanedSessions\b`; under S23-Q1 = a
-   nothing for `agents` (its modules stay as adapters).
+   `\bGatewayControlError\b`, `\bcreateSession\b`, `\bendSession\b`, `\breclaimOrphanedSessions\b`.
 3. **Docs:**
    - `docs/platform/event-store/spec.md`: the child paragraph near 454 (children are started from the host binary by
      both lifecycle wrappers; the Node wrapper resolves the host), decision history entry.
@@ -38,7 +37,7 @@ Phase-lead rules: [plan.md](plan.md). Branch `rust-verb-migration-program/s3-p12
 5. **Gates** on the S3 integration head, then again after the rebase onto `main`: plan.md exit criteria 7 (children),
    8 (all gates) and 9 (`events status`, `session list`, `gateway status`).
 6. **File-set check** and **hand-off** lines (`events`, `session`, `gateway` native; Event Store children start the
-   host; `sessions.json` written atomically; S23-Q1 = a: `agents` native).
+   host; `sessions.json` written atomically).
 
 ## Files
 
