@@ -12,7 +12,7 @@
 //! them.
 
 use crate::legacy_exec::RECURSION_GUARD_VAR;
-use crate::routing::{check_call, declared, Call, CommandRouteDescriptor};
+use crate::routing::{check_call, declared, keeps_pre_door_reading, Call, CommandRouteDescriptor};
 use fgos_event_store::lifecycle::{self, Policy, Request, Timers};
 use fgos_git::invocation_root::{resolve_invocation_root, InvocationRoot, RootPolicy, RootRequest};
 use fgos_git::store_admission::{admit_store_access, AdmitRequest, StoreMode};
@@ -20,24 +20,13 @@ use fgos_observe::invocation_fault::{record, FaultInput};
 use std::ffi::OsString;
 use std::path::{Path, PathBuf};
 
-/// Debt: the native verbs that answer from where they are called when the root door refuses the call, as they did
-/// before the doors existed. A verb leaves this list when it is judged by the door like every other verb; a verb
-/// is never added.
-const LENIENT_ROOT_VERBS: [&str; 8] = [
-    "config",
-    "convention",
-    "friction",
-    "gate-bypass",
-    "identity",
-    "mailbox",
-    "metrics",
-    "version",
-];
-
 /// The fault class of a trigger that failed at the start of an invocation.
 const START_TRIGGER: &str = "event-store-start-trigger";
 /// The fault class of a trigger that failed at the end of an invocation.
 const END_TRIGGER: &str = "event-store-end-trigger";
+/// The fault class of a detached seal or publish child that failed: it has no caller to read its error, so a
+/// failure leaves a record whatever the verb's own classification is.
+const EVENT_STORE_CHILD: &str = "event-store-child";
 
 /// The Event Store lifecycle trigger as the doors call it: whether the store runs here at all, and one trigger
 /// for the store of a project root. A trigger never fails its caller: it answers the first error it met.
@@ -198,6 +187,16 @@ pub struct Entered {
     pub project: Result<PathBuf, String>,
     sub: Option<String>,
     opens_store: bool,
+    /// The call is itself a detached seal or publish child of the Event Store.
+    child: bool,
+}
+
+/// How a native invocation ended, as the doors need it: the exit status, and the verb's failure text when it
+/// refused or failed (a verb that only exits non-zero with its own answer carries none).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Ended {
+    pub code: i32,
+    pub failure: Option<String>,
 }
 
 /// The doors of one native call.
@@ -283,7 +282,7 @@ impl<'a> Doors<'a> {
     pub fn enter(&self) -> Result<Entered, Refused> {
         let sub = check_call(self.route, self.call)
             .map_err(|fault| self.refuse(None, fault.sub.as_deref(), fault.class, fault.message))?;
-        let dir = named_dir(self.cli_args);
+        let dir = self.call.named_dir(&self.route.selector, self.cli_args);
         let verb = self.route.selector.as_str();
         let policy = if verb == "init" {
             RootPolicy::StrictCwd
@@ -302,22 +301,20 @@ impl<'a> Doors<'a> {
         // verb, as in the Node CLI. Debt: the eight native verbs of today keep answering from wherever they are
         // called (their documented answers, e.g. the mailbox's `unsupported-checkout`), so for exactly these the
         // refusal reaches only an operation that reads a project, as its not-a-project answer. Any other verb,
-        // whatever its store value, is refused.
+        // whatever its store value, is refused. The list is `routing::PRE_DOOR_NATIVE_VERBS`.
         let (root, project) = match asked {
             Ok(root) => {
                 let project = project_root(dir.as_deref(), &root, &self.cwd, self.home.as_deref());
                 (root, project)
             }
-            Err(refusal) if store_mode == StoreMode::None && LENIENT_ROOT_VERBS.contains(&verb) => {
-                (
-                    InvocationRoot {
-                        root: self.cwd.clone(),
-                        fgos_dir: self.cwd.join(".fgos"),
-                        found: false,
-                    },
-                    Err(format!("{} [not-in-project]", refusal.message)),
-                )
-            }
+            Err(refusal) if store_mode == StoreMode::None && keeps_pre_door_reading(verb) => (
+                InvocationRoot {
+                    root: self.cwd.clone(),
+                    fgos_dir: self.cwd.join(".fgos"),
+                    found: false,
+                },
+                Err(format!("{} [not-in-project]", refusal.message)),
+            ),
             Err(refusal) => {
                 return Err(self.refuse(None, sub.as_deref(), refusal.fault_class, refusal.message))
             }
@@ -347,6 +344,7 @@ impl<'a> Doors<'a> {
             root,
             sub,
             opens_store: store_mode != StoreMode::None && !child,
+            child,
         };
         if entered.opens_store && self.dispatched && verb != "init" {
             self.trigger(&entered, START_TRIGGER, Policy::default());
@@ -354,8 +352,17 @@ impl<'a> Doors<'a> {
         Ok(entered)
     }
 
-    /// The doors after the invocation: the end trigger, once its answer has been presented.
-    pub fn leave(&self, entered: &Entered) {
+    /// The doors after the invocation, once its answer has been presented: the end trigger, and, for a detached
+    /// seal or publish child that failed, the record of why (the failure text, as the Node CLI records it).
+    pub fn leave(&self, entered: &Entered, ended: &Ended) {
+        if let (true, Some(message)) = (entered.child, &ended.failure) {
+            self.fault(
+                Some(&entered.root.fgos_dir),
+                entered.sub.as_deref(),
+                EVENT_STORE_CHILD,
+                message,
+            );
+        }
         if entered.opens_store {
             self.trigger(
                 entered,
@@ -397,22 +404,6 @@ fn dispatch_depth(raw: Option<&str>) -> u64 {
         .map_or(0, |n| n as u64)
 }
 
-/// Debt, until the owner answers whether a native verb may stop reading `--dir=<path>`: the project a native verb
-/// is aimed at as the host has always read it, the first `--dir <path>` or `--dir=<path>` token (a trailing bare
-/// `--dir` names nothing). The Node CLI has no `--dir=` form; once the owner decides, this function goes and
-/// `--dir` is the parsed flag of the call.
-fn named_dir(args: &[OsString]) -> Option<String> {
-    args.iter()
-        .enumerate()
-        .find_map(|(i, arg)| match arg.to_str() {
-            Some("--dir") => args
-                .get(i + 1)
-                .map(|value| value.to_string_lossy().into_owned()),
-            Some(token) => token.strip_prefix("--dir=").map(str::to_owned),
-            None => None,
-        })
-}
-
 /// The project a native operation that reads a project acts on. A named `--dir` is the project (the home
 /// directory excepted: its `.fgos` is the machine's global directory, never a project store); without one it is
 /// the root the door found, and finding none is refused naming the fix.
@@ -448,6 +439,7 @@ fn project_root(
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::routing::PRE_DOOR_NATIVE_VERBS;
     use std::cell::RefCell;
     use std::sync::atomic::{AtomicU32, Ordering};
 
@@ -544,6 +536,13 @@ mod tests {
             dispatched,
             lifecycle,
         )
+    }
+
+    fn finished() -> Ended {
+        Ended {
+            code: 0,
+            failure: None,
+        }
     }
 
     fn records(store: &Path) -> Vec<serde_json::Value> {
@@ -684,7 +683,7 @@ mod tests {
                 &lifecycle,
             );
             let entered = doors.enter().unwrap();
-            doors.leave(&entered);
+            doors.leave(&entered, &finished());
             let ends: Vec<bool> = lifecycle
                 .calls
                 .borrow()
@@ -717,7 +716,7 @@ mod tests {
             let lifecycle = Recorder::new(true);
             let doors = doors(&route, &call, &argv, &base.join("main"), true, &lifecycle);
             let entered = doors.enter().unwrap();
-            doors.leave(&entered);
+            doors.leave(&entered, &finished());
             assert!(lifecycle.calls.borrow().is_empty());
         }
         std::fs::remove_dir_all(&base).unwrap();
@@ -736,7 +735,7 @@ mod tests {
         };
         let doors = doors(&route, &call, &argv, &base.join("main"), true, &lifecycle);
         let entered = doors.enter().unwrap();
-        doors.leave(&entered);
+        doors.leave(&entered, &finished());
         let classes: Vec<String> = records(&base.join("main/.fgos"))
             .iter()
             .map(|r| r["faultClass"].as_str().unwrap().to_owned())
@@ -798,12 +797,114 @@ mod tests {
             records(&base.join("main/.fgos"))[0]["faultClass"],
             "dir-invalid"
         );
-        // The list holds only verbs that are native routes without a store today, so a stale name shows here.
-        for verb in LENIENT_ROOT_VERBS {
+        // The list is exactly the eight verbs written before the doors: it never grows, and a stale name shows here.
+        assert_eq!(
+            PRE_DOOR_NATIVE_VERBS,
+            [
+                "config",
+                "convention",
+                "friction",
+                "gate-bypass",
+                "identity",
+                "mailbox",
+                "metrics",
+                "version"
+            ]
+        );
+        for verb in PRE_DOOR_NATIVE_VERBS {
             let route = &crate::routing::command_routes()[verb];
             assert_eq!(route.route_kind, "native", "{verb}");
             assert_eq!(route.store.as_deref().unwrap_or("none"), "none", "{verb}");
         }
+        std::fs::remove_dir_all(&base).unwrap();
+    }
+
+    #[test]
+    fn a_verb_off_the_pre_door_list_reads_its_dir_from_the_shared_parser_and_a_bare_dir_is_refused()
+    {
+        let base = scratch();
+        repository(&base, false);
+        std::fs::create_dir_all(base.join("other/.fgos")).unwrap();
+        let route = route(serde_json::json!({"store": "open"}));
+        let lifecycle = Recorder::new(true);
+        let other = base.join("other");
+        let argv = args(&["--dir", other.to_str().unwrap()]);
+        let call = Call::new(&argv);
+        let entered = doors(&route, &call, &argv, &base.join("main"), false, &lifecycle)
+            .enter()
+            .expect("the named project is entered");
+        assert_eq!(entered.root.root, other);
+        // `--dir=<path>` is an unknown flag for it, not a project name.
+        let spelled = args(&[&format!("--dir={}", other.display())]);
+        let call = Call::new(&spelled);
+        let refused = doors(
+            &route,
+            &call,
+            &spelled,
+            &base.join("main"),
+            false,
+            &lifecycle,
+        )
+        .enter()
+        .unwrap_err();
+        assert!(
+            refused.message.contains("unknown flag \"--dir="),
+            "{}",
+            refused.message
+        );
+        // A bare `--dir` is the empty path, which the root door refuses.
+        let bare = args(&["--dir"]);
+        let call = Call::new(&bare);
+        let refused = doors(&route, &call, &bare, &base.join("main"), false, &lifecycle)
+            .enter()
+            .unwrap_err();
+        assert!(
+            refused.message.contains("non-empty path"),
+            "{}",
+            refused.message
+        );
+        std::fs::remove_dir_all(&base).unwrap();
+    }
+
+    #[test]
+    fn a_failed_event_store_child_is_recorded_with_the_failure_text_and_a_successful_or_silent_one_is_not(
+    ) {
+        let base = scratch();
+        repository(&base, false);
+        let route = route(serde_json::json!({
+            "selector": "events", "store": "open", "event_store_child": true,
+            "accepted_flags": ["dir", "json", "help", "opportunistic"],
+        }));
+        let argv = args(&["--opportunistic"]);
+        let call = Call::new(&argv);
+        let lifecycle = Recorder::new(true);
+        let doors = doors(&route, &call, &argv, &base.join("main"), true, &lifecycle);
+        let entered = doors.enter().unwrap();
+        for ended in [
+            finished(),
+            Ended {
+                code: 1,
+                failure: None,
+            },
+        ] {
+            doors.leave(&entered, &ended);
+        }
+        assert!(records(&base.join("main/.fgos")).is_empty());
+        doors.leave(
+            &entered,
+            &Ended {
+                code: 1,
+                failure: Some("seal failed: disk full".into()),
+            },
+        );
+        let landed = records(&base.join("main/.fgos"));
+        assert_eq!(landed.len(), 1);
+        assert_eq!(landed[0]["faultClass"], "event-store-child");
+        assert_eq!(landed[0]["message"], "seal failed: disk full");
+        assert!(
+            lifecycle.calls.borrow().is_empty(),
+            "a child runs no trigger"
+        );
         std::fs::remove_dir_all(&base).unwrap();
     }
 
@@ -875,15 +976,5 @@ mod tests {
             Ok(none.root.clone())
         );
         std::fs::remove_dir_all(&base).unwrap();
-    }
-
-    #[test]
-    fn the_dir_a_native_verb_names_keeps_its_two_spellings_and_a_trailing_bare_flag_names_nothing()
-    {
-        let named = |rest: &[&str]| named_dir(&args(rest));
-        assert_eq!(named(&["--dir", "/x"]).as_deref(), Some("/x"));
-        assert_eq!(named(&["--dir=/x"]).as_deref(), Some("/x"));
-        assert_eq!(named(&["show", "--dir"]), None);
-        assert_eq!(named(&["--json"]), None);
     }
 }

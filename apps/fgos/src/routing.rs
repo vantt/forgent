@@ -88,6 +88,28 @@ pub static NATIVE_SUBCOMMANDS: &[(&str, &[&str])] = &[
     ("config", fgos_config::provider::AVAILABLE_SUBCOMMANDS),
 ];
 
+/// Debt: the native verbs written before the shared parser, which keep their own reading of a call: the
+/// sub-command is the token right after the verb when it is not a flag, a flag name is judged up to its `=`,
+/// `--dir=<path>` names the project, and, in the invocation doors, a root the Git door refuses still reaches
+/// them. Every other native verb reads only the shared parser's output (the Node CLI's rules: the sub-command
+/// is the first positional, a flag name is the whole token after `--`, `--dir` is the parsed flag). A verb
+/// leaves this list when it moves onto the shared reading; a verb is never added.
+pub const PRE_DOOR_NATIVE_VERBS: [&str; 8] = [
+    "config",
+    "convention",
+    "friction",
+    "gate-bypass",
+    "identity",
+    "mailbox",
+    "metrics",
+    "version",
+];
+
+/// Whether `selector` keeps the reading `PRE_DOOR_NATIVE_VERBS` names.
+pub fn keeps_pre_door_reading(selector: &str) -> bool {
+    PRE_DOOR_NATIVE_VERBS.contains(&selector)
+}
+
 /// The `hook` kinds the host runs before the composition root.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum HookKind {
@@ -158,12 +180,44 @@ impl Call {
         &self.parsed
     }
 
-    /// The sub-command word: the token right after the verb, when it is not a flag.
-    fn sub_word(&self) -> Option<&str> {
-        self.first
-            .as_deref()
-            .filter(|word| !word.is_empty() && !word.starts_with('-'))
+    /// The sub-command word of a verb of `selector`: the first positional of the shared parser, or, for a
+    /// pre-door verb, the token right after the verb when it is not a flag.
+    fn sub_word(&self, selector: &str) -> Option<&str> {
+        if keeps_pre_door_reading(selector) {
+            self.first
+                .as_deref()
+                .filter(|word| !word.is_empty() && !word.starts_with('-'))
+        } else {
+            self.parsed.positional.first().map(String::as_str)
+        }
     }
+
+    /// The project a verb of `selector` is aimed at, as `--dir` names it: the value the verb's reader gives it
+    /// (a pre-door verb also takes `--dir=<path>`, and a trailing bare `--dir` names nothing). A bare `--dir`
+    /// read by the shared parser is the empty path, which the root door refuses, as the Node CLI does.
+    pub fn named_dir(&self, selector: &str, cli_args: &[OsString]) -> Option<String> {
+        if keeps_pre_door_reading(selector) {
+            return pre_door_named_dir(cli_args);
+        }
+        match self.parsed.flag("dir")? {
+            FlagValue::One(FlagScalar::Str(path)) => Some(path.clone()),
+            FlagValue::One(FlagScalar::Bool) | FlagValue::Many(_) => Some(String::new()),
+        }
+    }
+}
+
+/// Debt, with `PRE_DOOR_NATIVE_VERBS`: the first `--dir <path>` or `--dir=<path>` token of the call (a trailing
+/// bare `--dir` names nothing), as the pre-door native verbs have always read it.
+fn pre_door_named_dir(args: &[OsString]) -> Option<String> {
+    args.iter()
+        .enumerate()
+        .find_map(|(i, arg)| match arg.to_str() {
+            Some("--dir") => args
+                .get(i + 1)
+                .map(|value| value.to_string_lossy().into_owned()),
+            Some(token) => token.strip_prefix("--dir=").map(str::to_owned),
+            None => None,
+        })
 }
 
 /// Whether one shape of a declaration (`sub`, `sub --flag`, `sub --flag=true`) matches the parsed call: the first
@@ -257,7 +311,7 @@ pub fn check_call(
             .find(|(name, _)| *name == selector)
             .copied()
             .unwrap_or((selector, &[]));
-        match call.sub_word() {
+        match call.sub_word(selector) {
             Some(sub) if available.contains(&sub) => served_sub = Some(sub.to_owned()),
             Some(sub) => {
                 return Err(CallFault {
@@ -291,10 +345,12 @@ pub fn check_call(
     }
 }
 
-/// The first flag before a bare `--` that the route's registry projection does not list. A native verb's own
-/// parser also takes `--flag=value`, so the name is compared up to the `=`.
+/// The first flag before a bare `--` that the route's registry projection does not list. The name is the whole
+/// token after `--`, as the shared parser reads it (`--dir=/x` is the flag `dir=/x`); a pre-door verb's own
+/// reading also takes `--flag=value`, so its name is compared up to the `=`.
 fn unknown_flag(route: &CommandRouteDescriptor, call: &Call) -> Option<String> {
-    let sub = call.sub_word();
+    let pre_door = keeps_pre_door_reading(&route.selector);
+    let sub = call.sub_word(&route.selector);
     let accepted: &Vec<String> = match (&route.subcommand_flags, &route.accepted_flags) {
         (Some(by_sub), _) => by_sub.get(sub?)?,
         (None, Some(flags)) => flags,
@@ -304,7 +360,11 @@ fn unknown_flag(route: &CommandRouteDescriptor, call: &Call) -> Option<String> {
         .names_in_node_order()
         .into_iter()
         .find_map(|key| {
-            let name = key.split('=').next().unwrap_or("");
+            let name = if pre_door {
+                key.split('=').next().unwrap_or("")
+            } else {
+                key
+            };
             if accepted.iter().any(|f| f == name) {
                 return None;
             }
@@ -561,5 +621,65 @@ mod tests {
             "{}",
             fault.message
         );
+    }
+
+    fn fake(json: serde_json::Value) -> CommandRouteDescriptor {
+        let mut route = serde_json::json!({
+            "selector": "probe", "route_kind": "native", "operation_id": "probe.run",
+            "owner_path": "x", "compatibility_tests": ["x"],
+        });
+        route
+            .as_object_mut()
+            .unwrap()
+            .extend(json.as_object().unwrap().clone());
+        serde_json::from_value(route).unwrap()
+    }
+
+    #[test]
+    fn a_verb_off_the_pre_door_list_reads_its_sub_command_and_flags_only_through_the_shared_parser()
+    {
+        let route = fake(serde_json::json!({
+            "accepted_flags": ["json", "dir"],
+            "subcommand_flags": {"status": ["json", "dir"]},
+        }));
+        // The sub-command is the first positional, even after a flag that took no value.
+        let read = call("probe", &["--json", "--dir", "/x", "status"]);
+        assert_eq!(read.sub_word("probe"), Some("status"));
+        // A flag that takes the next token as its value leaves no sub-command, as in the Node CLI.
+        let read = call("probe", &["--json", "status"]);
+        assert_eq!(read.sub_word("probe"), None);
+        // The pre-door reading of the same call still finds the word right after the verb.
+        let read = call("config", &["show"]);
+        assert_eq!(read.sub_word("config"), Some("show"));
+        let read = call("config", &["--json", "show"]);
+        assert_eq!(read.sub_word("config"), None);
+        // `--flag=value` is one unknown flag named whole, never `flag` with a value.
+        let fault = check_call(&route, &call("probe", &["status", "--dir=/x"])).unwrap_err();
+        assert!(
+            fault.message.contains("unknown flag \"--dir=/x\""),
+            "{}",
+            fault.message
+        );
+        assert!(check_call(&route, &call("probe", &["status", "--dir", "/x"])).is_ok());
+    }
+
+    #[test]
+    fn the_project_a_call_names_follows_the_reading_of_its_verb() {
+        let named = |verb: &str, rest: &[&str]| {
+            let mut args = vec![verb];
+            args.extend_from_slice(rest);
+            let args = os(&args);
+            Call::new(&args).named_dir(verb, &args)
+        };
+        // A pre-door verb keeps both spellings, and a trailing bare flag names nothing.
+        assert_eq!(named("config", &["--dir", "/x"]).as_deref(), Some("/x"));
+        assert_eq!(named("config", &["--dir=/x"]).as_deref(), Some("/x"));
+        assert_eq!(named("config", &["show", "--dir"]), None);
+        assert_eq!(named("config", &["--json"]), None);
+        // Every other verb has the one spelling, and a bare flag is the empty path the root door refuses.
+        assert_eq!(named("probe", &["--dir", "/x"]).as_deref(), Some("/x"));
+        assert_eq!(named("probe", &["--dir=/x"]), None);
+        assert_eq!(named("probe", &["show", "--dir"]).as_deref(), Some(""));
+        assert_eq!(named("probe", &[]), None);
     }
 }

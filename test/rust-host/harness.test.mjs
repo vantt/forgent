@@ -11,6 +11,7 @@ import {
   REPO_ROOT,
   ROUTES_PATH,
   parseEntry,
+  parityBaseEntrySpec,
   loadParityTable,
   PARITY_CASES_DIR,
   resolveEntries,
@@ -57,6 +58,54 @@ test("R1: Entry specification parsing and environment resolution", () => {
   });
   assert.equal(resolved.entryA.spec, "node:bin/fgos.mjs");
   assert.equal(resolved.entryB.spec, "node:bin/fgos.mjs");
+});
+
+test("a release entry runs its own host with its own release variables and never leaks them into the other entry", { skip: process.platform === "win32" }, async () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "fgos-release-entry-"));
+  try {
+    const host = path.join(dir, "host.sh");
+    fs.writeFileSync(host, '#!/bin/sh\nprintf "%s|%s|%s" "$FGOS_HOST_BIN" "$FGOS_ACTIVE_RELEASE_PATH" "$FGOS_ACTIVE_MANIFEST_PATH"\n', { mode: 0o755 });
+    const description = path.join(dir, "base.json");
+    const release = { hostBin: host, releasePath: path.join(dir, "release"), manifestPath: path.join(dir, "release/manifest.json") };
+    fs.writeFileSync(description, JSON.stringify(release));
+
+    const base = parseEntry(`release:${description}`);
+    assert.equal(base.type, "bin");
+    assert.equal(base.executable, host);
+    assert.equal(base.spec, `release:${description}`);
+    // The case's own environment cannot repoint the entry; the entry's variables win.
+    const own = await runCaseOnEntry(base, { id: "release-env", args: [], env: { FGOS_ACTIVE_RELEASE_PATH: "/elsewhere" } });
+    assert.equal(own.launchError, null);
+    assert.equal(own.stdoutText, `${host}|${release.releasePath}|${release.manifestPath}`);
+
+    // A bin: entry of the same script sees the caller's variables, not the base's.
+    const other = await runCaseOnEntry(parseEntry(`bin:${host}`), { id: "plain-env", args: [], env: { FGOS_HOST_BIN: "plain", FGOS_ACTIVE_RELEASE_PATH: "plain-release", FGOS_ACTIVE_MANIFEST_PATH: "plain-manifest" } });
+    assert.equal(other.stdoutText, "plain|plain-release|plain-manifest");
+
+    assert.equal(parityBaseEntrySpec({ FGOS_TEST_PARITY_BASE: description }), `release:${description}`);
+    assert.throws(() => parityBaseEntrySpec({}), /FGOS_TEST_PARITY_BASE is not set/);
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test("a release description that is missing, malformed or incomplete is refused naming the file and the field", () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "fgos-release-entry-bad-"));
+  try {
+    assert.throws(() => parseEntry(`release:${path.join(dir, "absent.json")}`), /absent\.json cannot be read/);
+    assert.throws(() => parseEntry("release:"), /names no description file/);
+    const garbled = path.join(dir, "garbled.json");
+    fs.writeFileSync(garbled, "{not json");
+    assert.throws(() => parseEntry(`release:${garbled}`), /garbled\.json is not valid JSON/);
+    const partial = path.join(dir, "partial.json");
+    fs.writeFileSync(partial, JSON.stringify({ hostBin: "/h", releasePath: "/r" }));
+    assert.throws(() => parseEntry(`release:${partial}`), /partial\.json needs an absolute path in "manifestPath"/);
+    const relative = path.join(dir, "relative.json");
+    fs.writeFileSync(relative, JSON.stringify({ hostBin: "host", releasePath: "/r", manifestPath: "/m" }));
+    assert.throws(() => parseEntry(`release:${relative}`), /needs an absolute path in "hostBin"/);
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
 });
 
 test("R2: Semantic JSON comparison honors timestamp predicate without exact equality", () => {
