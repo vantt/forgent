@@ -33,6 +33,11 @@ F0 phase 08) left for them are removed. This is the last phase; after it every r
 4. `doors`: remove the `registrations.mjs` debt from phase 02's tier row and phase 12's activation row, the `bin-discovery.mjs`
    debt from phase 12's row, and (if F0 phase 08's "global fgOS directory" row is on your base) the `registrations.mjs` entry there.
    Line numbers above are from 781537524; the capability plan moves them: re-grep.
+5. Raw config read left by phase 13 (`src/setup/runner-config-conversion.mjs:40` `retiredJsonAdvice`, called from
+   `registrations.mjs:534`): it reads an explicit path, global-scope files included, when no parsed document is passed. The
+   "locate and read a project config file" row cannot see it, because the read names no config-file literal, so it cannot be a
+   debt entry; this line is its only record. Pass the parsed document from the facade (project and global scope) and delete the
+   raw read.
 
 ## Files
 
