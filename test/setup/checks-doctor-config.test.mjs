@@ -335,7 +335,17 @@ test('fgos doctor (no flags) on a fresh cwd prints the envelope JSON with every 
   for (const file of configFiles) assert.equal(fs.existsSync(file), false, `fgos doctor must never create ${file}`);
   const envelope = JSON.parse(result.stdout);
   assert.equal(typeof envelope.contract, 'string');
-  assert.equal(envelope.data.checks.length, DOCTOR_CHECKS.length);
+  // The host answers the registry's rows; a Node body exists for each row the registry does not give to Rust.
+  const registry = JSON.parse(fs.readFileSync(new URL('../../packages/distribution/contracts/doctor-registry.v1.json', import.meta.url), 'utf8'));
+  const configRows = JSON.parse(fs.readFileSync(new URL('../../packages/config/contracts/doctor-rows.v1.json', import.meta.url), 'utf8')).rows;
+  const group = registry.groups.config;
+  const registryIds = registry.rows.flatMap((entry) => (entry.group === 'config'
+    ? configRows.map((row) => group.idMap[row.id] ?? row.id)
+    : [entry.id]));
+  assert.deepEqual(envelope.data.checks.map((c) => c.id), registryIds);
+  for (const id of registryIds.filter((rowId) => !registry.inRust.rows.includes(rowId))) {
+    assert.ok(DOCTOR_CHECKS.some((c) => c.id === id), `${id} is judged by Node and has no registered body`);
+  }
   assert.equal(envelope.data.checks.find((c) => c.id === 'config-parse').passed, true);
   fs.rmSync(cwd, { recursive: true, force: true });
   fs.rmSync(homeDir, { recursive: true, force: true });
