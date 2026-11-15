@@ -17,6 +17,7 @@ fgos-git = { path = "../../packages/git/rust" }
 fgos-config = { path = "../../packages/config/rust", features = ["host-provider"] }
 fgos-run-result = { path = "../../packages/run-result/rust" }
 fgos-holder-lock = { path = "../../packages/holder-lock/rust" }
+fgos-durable-file = { path = "../../packages/durable-file/rust" }
 fgos-run-supervisor = { path = "../../packages/run-supervisor/rust" }
 fgos-terminal-control = { path = "../../packages/terminal-control/rust" }
 fgos-seat-binding = { path = "../../packages/seat-binding/rust" }

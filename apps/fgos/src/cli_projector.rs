@@ -116,6 +116,13 @@ pub fn project_cli_invocation(
             ContractRef::from_static("mailbox.status.request", "1.0.0"),
             Box::new(crate::wiring::mailbox_verbs::project_mailbox_request(args)),
         ),
+        crate::wiring::session::START_OPERATION_ID
+        | crate::wiring::session::END_OPERATION_ID
+        | crate::wiring::session::LIST_OPERATION_ID
+        | crate::wiring::session::GC_OPERATION_ID => (
+            ContractRef::new(format!("{operation_id_str}.request"), "1.0.0"),
+            Box::new(crate::wiring::session::project_session_args(args)?),
+        ),
         "config.read" | "config.write" => (
             ContractRef::from_static(
                 if operation.as_str() == "config.read" {
@@ -169,6 +176,11 @@ pub fn native_operation_id(
     }
     if route_operation == crate::wiring::mailbox_verbs::INBOX_OPERATION_ID {
         return Ok(crate::wiring::mailbox_verbs::project_mailbox_request(args)
+            .operation_id()
+            .to_string());
+    }
+    if route_operation == crate::wiring::session::LIST_OPERATION_ID {
+        return Ok(crate::wiring::session::project_session_args(args)?
             .operation_id()
             .to_string());
     }

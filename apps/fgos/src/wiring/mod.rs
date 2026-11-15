@@ -33,3 +33,4 @@ pub mod mailbox_verbs;
 #[path = "mailbox_verbs_unsupported.rs"]
 pub mod mailbox_verbs;
 pub mod metrics_sources;
+pub mod session;

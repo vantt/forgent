@@ -1021,7 +1021,7 @@ fn acquire_admin<'a>(repo: &RepoHandle, mut scope: LockScope<'a>) -> Result<Lock
 /// The `dispatch-cwd` lease file of a checkout, keyed exactly as the lock registry's
 /// `<cwdDevIno>` (`src/holder-lock/registry.mjs`): `<dev>-<ino>-<birthtimeNs>` of the
 /// directory after realpath. A different key would probe a lease nobody holds.
-pub(crate) fn custody_lock_path(repo: &RepoHandle, root: &Path) -> Result<PathBuf> {
+pub fn custody_lock_path(repo: &RepoHandle, root: &Path) -> Result<PathBuf> {
     use std::os::unix::fs::MetadataExt;
     let m = fs::metadata(fs::canonicalize(root).map_err(failure)?).map_err(failure)?;
     let birth = m

@@ -42,6 +42,11 @@
     "owner_path": "packages/observe/rust",
     "subcommands": true
   },
+  "session": {
+    "operation_id": "session.list",
+    "owner_path": "apps/fgos",
+    "subcommands": true
+  },
   "version": {
     "operation_id": "distribution.build.show",
     "owner_path": "packages/distribution/rust"

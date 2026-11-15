@@ -268,6 +268,50 @@ pub const CATALOG: &[OperationDescriptor] = &[
         allowed_host_kinds: &["cli"],
         streaming_mode: StreamingMode::None,
     },
+    OperationDescriptor {
+        operation_id: OperationId::from_static("session.start"),
+        owning_component_id: Cow::Borrowed("session"),
+        request_contract: ContractRef::from_static("session.start.request", "1.0.0"),
+        outcome_contract: ContractRef::from_static("session.start.outcome", "1.0.0"),
+        effect: OperationEffect::Write,
+        idempotency: OperationIdempotency::None,
+        authority_policy_id: Cow::Borrowed("session.write"),
+        allowed_host_kinds: &["cli"],
+        streaming_mode: StreamingMode::None,
+    },
+    OperationDescriptor {
+        operation_id: OperationId::from_static("session.end"),
+        owning_component_id: Cow::Borrowed("session"),
+        request_contract: ContractRef::from_static("session.end.request", "1.0.0"),
+        outcome_contract: ContractRef::from_static("session.end.outcome", "1.0.0"),
+        effect: OperationEffect::Write,
+        idempotency: OperationIdempotency::None,
+        authority_policy_id: Cow::Borrowed("session.write"),
+        allowed_host_kinds: &["cli"],
+        streaming_mode: StreamingMode::None,
+    },
+    OperationDescriptor {
+        operation_id: OperationId::from_static("session.list"),
+        owning_component_id: Cow::Borrowed("session"),
+        request_contract: ContractRef::from_static("session.list.request", "1.0.0"),
+        outcome_contract: ContractRef::from_static("session.list.outcome", "1.0.0"),
+        effect: OperationEffect::Read,
+        idempotency: OperationIdempotency::Safe,
+        authority_policy_id: Cow::Borrowed("session.read"),
+        allowed_host_kinds: &["cli"],
+        streaming_mode: StreamingMode::None,
+    },
+    OperationDescriptor {
+        operation_id: OperationId::from_static("session.gc"),
+        owning_component_id: Cow::Borrowed("session"),
+        request_contract: ContractRef::from_static("session.gc.request", "1.0.0"),
+        outcome_contract: ContractRef::from_static("session.gc.outcome", "1.0.0"),
+        effect: OperationEffect::Write,
+        idempotency: OperationIdempotency::None,
+        authority_policy_id: Cow::Borrowed("session.write"),
+        allowed_host_kinds: &["cli"],
+        streaming_mode: StreamingMode::None,
+    },
 ];
 
 #[cfg(test)]
@@ -278,7 +322,7 @@ mod tests {
     fn catalog_contains_required_operations() {
         // Eleven operations, plus the mailbox's send, inbox, inbox claim, list
         // and status, and the gateway's start, stop and status.
-        assert_eq!(CATALOG.len(), 23);
+        assert_eq!(CATALOG.len(), 27);
         let ids: Vec<&str> = CATALOG.iter().map(|op| op.operation_id.as_str()).collect();
         assert!(ids.contains(&"distribution.build.show"));
         assert!(ids.contains(&"work.gate-bypass.show"));
@@ -302,6 +346,10 @@ mod tests {
         assert!(ids.contains(&"gateway.start"));
         assert!(ids.contains(&"gateway.stop"));
         assert!(ids.contains(&"gateway.status"));
+        assert!(ids.contains(&"session.start"));
+        assert!(ids.contains(&"session.end"));
+        assert!(ids.contains(&"session.list"));
+        assert!(ids.contains(&"session.gc"));
     }
     /// `OperationId::from_static` (used by every `CATALOG` entry, for
     /// const-context construction with no runtime allocation) skips
