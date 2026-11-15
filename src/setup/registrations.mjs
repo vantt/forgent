@@ -128,7 +128,6 @@ const checkConfigOnce = (cwd, run) => (run
   ? run.once(`config-check:${cwd}`, () => checkConfig({ projectRoot: cwd }))
   : checkConfig({ projectRoot: cwd }));
 
-
 // Live, mutated-in-place arrays (never reassigned) so a registration added
 // after this module first evaluates — e.g. from a test, or from another
 // module imported later in the same process — is visible through every
