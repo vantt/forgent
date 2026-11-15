@@ -1244,24 +1244,40 @@ function registryEntries() {
   return { rows, fixes };
 }
 
-test('the registry lists exactly the row bodies Node still has, each id once', () => {
+// A row the registry gives to Rust keeps its Node body, and is judged by it through the bridge, until the host has
+// the Rust judge: the phase that adds an adapter deletes the body and lists the id here.
+const ROWS_JUDGED_IN_RUST = [];
+const FIXES_RUN_IN_RUST = [];
+
+test('the registry lists exactly the row bodies Node still has, each id once, and the bridged ones are among them', () => {
   const { rows } = registryEntries();
-  const bridged = rows.filter((row) => row.owner.startsWith('bridge:')).map((row) => row.id);
   assert.equal(new Set(rows.map((row) => row.id)).size, rows.length, 'a row is listed twice');
-  assert.deepEqual(bridged.slice().sort(), REGISTERED_CHECK_IDS.slice().sort());
+  assert.deepEqual(rows.map((row) => row.id).filter((id) => !ROWS_JUDGED_IN_RUST.includes(id)).sort(), REGISTERED_CHECK_IDS.slice().sort());
+  for (const row of rows.filter((entry) => entry.owner.startsWith('bridge:'))) assert.ok(REGISTERED_CHECK_IDS.includes(row.id), `${row.id} is bridged and has no body`);
 });
 
-test('the registry lists exactly the fix bodies Node still has, each id once', () => {
+test('the registry lists exactly the fix bodies Node still has, each id once, and the bridged ones are among them', () => {
   const { fixes } = registryEntries();
-  const bridged = fixes.filter((fix) => fix.owner.startsWith('bridge:')).map((fix) => fix.id);
   assert.equal(new Set(fixes.map((fix) => fix.id)).size, fixes.length, 'a fix is listed twice');
-  assert.deepEqual(bridged.slice().sort(), REGISTERED_FIX_IDS.slice().sort());
+  assert.deepEqual(fixes.map((fix) => fix.id).filter((id) => !FIXES_RUN_IN_RUST.includes(id)).sort(), REGISTERED_FIX_IDS.slice().sort());
+  for (const fix of fixes.filter((entry) => entry.owner.startsWith('bridge:'))) assert.ok(REGISTERED_FIX_IDS.includes(fix.id), `${fix.id} is bridged and has no body`);
 });
 
 test('the order the bodies register in is the order the registry runs them in', () => {
   const { rows, fixes } = registryEntries();
-  assert.deepEqual(REGISTERED_CHECK_IDS, rows.filter((row) => row.owner.startsWith('bridge:')).map((row) => row.id));
-  assert.deepEqual(REGISTERED_FIX_IDS, fixes.filter((fix) => fix.owner.startsWith('bridge:')).map((fix) => fix.id));
+  assert.deepEqual(REGISTERED_CHECK_IDS, rows.map((row) => row.id).filter((id) => !ROWS_JUDGED_IN_RUST.includes(id)));
+  assert.deepEqual(REGISTERED_FIX_IDS, fixes.map((fix) => fix.id).filter((id) => !FIXES_RUN_IN_RUST.includes(id)));
+});
+
+test('the registry gives 56 rows and 22 fixes to Rust and 53 rows and 5 fixes to the bridge, as measured', () => {
+  const { rows, fixes } = registryEntries();
+  const bridged = (list) => list.filter((entry) => entry.owner.startsWith('bridge:'));
+  // `shell-integration-sourced` is bridge:S4: the phase that retires `setup` removes the row.
+  const byStep = (step) => bridged(rows).filter((row) => row.owner === `bridge:${step}`).length;
+  assert.deepEqual(['S5', 'S6a', 'S6b', 'S7', 'S4'].map(byStep), [8, 31, 6, 8, 1]);
+  assert.equal(rows.length - bridged(rows).length, 56);
+  assert.equal(bridged(fixes).length, 5);
+  assert.equal(fixes.length - bridged(fixes).length, 22);
 });
 
 test('an owner is rust:<component> or bridge:<step>, and a bridged one names the step that removes it', () => {

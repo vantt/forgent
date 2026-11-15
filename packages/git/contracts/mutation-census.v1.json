@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "46089705437f802deeb164b74f227440ecbeac667d6ab17d2f4d097808855f76",
+  "payloadDigest": "bb87d928de0001076bb48c154b0c7ac2c72daf2f69acde9e836acb140577d63d",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "a5629383f89b4488b252a62f0ea86463e649e33e0a891db1a19af2cd6c136aca",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -88,11 +88,11 @@
     "apps/fgos/src/cli_projector.rs": "64f15596a3f7ad510a89ae9263d89f80866f5c02ae832edc9e026c7b0bfd1233",
     "apps/fgos/src/help.rs": "78f8651db9e01553d1a90cf42e9df8a15c99e77a1b76177e866a12b49de57b73",
     "apps/fgos/src/invocation_doors.rs": "44b3e6b227eea8a26487c890a05324f797c999ccc1611de7d75cdfe059c58e94",
-    "apps/fgos/src/legacy_exec.rs": "488ad4bff93582294e37b0e2d4675a81f4b59fccf1947a0effa0c76ece61c097",
+    "apps/fgos/src/legacy_exec.rs": "d99d17506be5bec559b7f840e542c1cfd590389736286d8bf859b5f182c30ec7",
     "apps/fgos/src/main.rs": "e2131983b97bada7decf1ac33e935772b59699435c4ea9915b9f9161370db82c",
     "apps/fgos/src/routing.rs": "79f63effe9856ce540aa01210b959663812ca13291f57ef5e5fb46c3df9b8304",
-    "apps/fgos/src/wiring/doctor/bridge.rs": "8d4325d94011a518e2973f97c9cb36ae8c5ffd9cfdccc278d0be1edebd8f6d33",
-    "apps/fgos/src/wiring/doctor/mod.rs": "b81d900a2def103297108171f58859c691a9e1c0257254cc47b16fdedd898472",
+    "apps/fgos/src/wiring/doctor/bridge.rs": "dc83e1b39b7c0ca55b18f2b924f9ef0e200e98f8ccf684e4ec5210adbca8b0ed",
+    "apps/fgos/src/wiring/doctor/mod.rs": "d053c561302efdf0b2b7f3e56ec67b3e09e80a444075220289167fb5d5a41dd8",
     "apps/fgos/src/wiring/event_store_clone.rs": "923d718f7a6bd5705cbe6e4d4c8393672c1ef4a2142facc9ada314307a4d7574",
     "apps/fgos/src/wiring/events.rs": "17327ace760683d9665d4c4b3ac051f2f67318f8175b37ad21cdffd52e008881",
     "apps/fgos/src/wiring/gateway_control.rs": "60ed2789c9a7c7ffa6aa43abfc8020eec8b219e6c38540c458e8918321c88604",
@@ -287,7 +287,7 @@
     "packages/distribution/rust/src/agent_hooks.rs": "443ba0fd55bb31b4b7d3f26a34bd5eb1ff37e755a19d60e3ad8c0de7227e85d8",
     "packages/distribution/rust/src/canonical.rs": "1ed17ee314cadcd425f25919740a7d80b7596871986c9940094fdd2cf4b7542a",
     "packages/distribution/rust/src/coexistence.rs": "2cbb20865365439eea05888a9680d354ce1d42a00ea01154232262341e2cb224",
-    "packages/distribution/rust/src/doctor.rs": "9040a04949450929bf8ff69de5404d07868a6ffa8f62f41ab4870d3d1f6a73d9",
+    "packages/distribution/rust/src/doctor.rs": "3e4131d16e0360b63c532a5029383fc0cf9436f10500e825d76ac6692060578e",
     "packages/distribution/rust/src/extract.rs": "101e822a4d17774deba3585f7afd3a6718f847e6e2a392c980fa3dfd85b843a6",
     "packages/distribution/rust/src/fetch.rs": "0de7abcd5b6057fcc4632637e34c0aafcde121ebbb9dc878682b68bb9c984573",
     "packages/distribution/rust/src/fgctl_refresh.rs": "36fd15b0c6159e9b9541fbadb2ea5a05f61c9ced1364216e6cbce45170aa4c5a",
@@ -1803,7 +1803,7 @@
     },
     {
       "path": "apps/fgos/src/wiring/doctor/bridge.rs",
-      "line": 394,
+      "line": 404,
       "spawn": "Command::new",
       "binary": "sh",
       "class": "rust-test"

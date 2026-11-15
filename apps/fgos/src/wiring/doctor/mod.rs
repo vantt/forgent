@@ -45,11 +45,12 @@ const CONFIG_ROWS_JSON: &str =
     include_str!("../../../../../packages/config/contracts/doctor-rows.v1.json");
 
 /// The registry the host runs: the contract file with the config crate's rows as its `config` group.
-/// The registry must hand the in-process owner exactly the rows and fixes it has adapters for: a registry that
-/// names an owner nothing implements would silently drop its rows from every report.
+/// The in-process owner may only have adapters for rows and fixes the registry gives to Rust; every other entry
+/// reaches Node through the bridge. A row the registry gives to Rust and that has no adapter yet is judged by its
+/// Node body until the phase that ports it deletes the body.
 pub fn registry() -> Result<Registry, String> {
     let registry = Registry::parse(REGISTRY_JSON, &[("config", CONFIG_ROWS_JSON)])?;
-    for (kind, named, adapters) in [
+    for (kind, owned, adapters) in [
         (
             "row",
             registry.row_ids(OwnerKind::Native),
@@ -61,9 +62,9 @@ pub fn registry() -> Result<Registry, String> {
             NativeOwner::FIX_IDS,
         ),
     ] {
-        if named != adapters {
+        if let Some(stray) = adapters.iter().find(|id| !owned.contains(id)) {
             return Err(format!(
-                "doctor registry: the {kind}s it gives to Rust ({named:?}) are not the ones the host implements ({adapters:?})"
+                "doctor registry: the host has an in-process {kind} {stray} that the registry does not give to Rust"
             ));
         }
     }
@@ -120,6 +121,14 @@ impl RowOwner for NativeOwner {
         ids.iter()
             .map(|id| FixResult::done(id, false, format!("no fix {id} is run in process")))
             .collect()
+    }
+
+    fn handles_row(&self, id: &str) -> bool {
+        Self::ROW_IDS.contains(&id)
+    }
+
+    fn handles_fix(&self, id: &str) -> bool {
+        Self::FIX_IDS.contains(&id)
     }
 
     fn judge_rows(&self, _root: &Path, ids: &[&str]) -> Vec<RowOutcome> {
@@ -247,11 +256,43 @@ mod tests {
     }
 
     #[test]
-    fn the_registry_the_host_embeds_parses_and_its_in_process_entries_are_the_adapters_it_has() {
+    fn the_registry_the_host_embeds_parses_and_every_adapter_the_host_has_is_a_row_or_fix_it_gives_to_rust(
+    ) {
         let registry = registry().unwrap();
         assert!(!registry.rows.is_empty() && !registry.fixes.is_empty());
-        assert_eq!(registry.row_ids(OwnerKind::Native), NativeOwner::ROW_IDS);
-        assert_eq!(registry.fix_ids(OwnerKind::Native), NativeOwner::FIX_IDS);
+        for id in NativeOwner::ROW_IDS {
+            assert!(registry.row_ids(OwnerKind::Native).contains(id), "{id}");
+        }
+        for id in NativeOwner::FIX_IDS {
+            assert!(registry.fix_ids(OwnerKind::Native).contains(id), "{id}");
+        }
+    }
+
+    #[test]
+    fn the_registry_splits_the_rows_and_fixes_between_rust_and_the_bridge_as_measured() {
+        let registry = registry().unwrap();
+        let count = |step: &str| {
+            registry
+                .rows
+                .iter()
+                .filter(|row| row.owner.kind == OwnerKind::Bridge && row.owner.label == step)
+                .count()
+        };
+        // `shell-integration-sourced` is bridge:S4 until the phase that retires `setup` removes the row.
+        assert_eq!(registry.rows.len(), 110);
+        assert_eq!(
+            (
+                count("S5"),
+                count("S6a"),
+                count("S6b"),
+                count("S7"),
+                count("S4")
+            ),
+            (8, 31, 6, 8, 1)
+        );
+        assert_eq!(registry.row_ids(OwnerKind::Native).len(), 56);
+        assert_eq!(registry.fixes.len(), 27);
+        assert_eq!(registry.fix_ids(OwnerKind::Bridge).len(), 5);
     }
 
     #[test]
@@ -277,6 +318,12 @@ mod tests {
                 ids.iter()
                     .map(|id| FixResult::done(id, false, ""))
                     .collect()
+            }
+            fn handles_row(&self, _: &str) -> bool {
+                true
+            }
+            fn handles_fix(&self, _: &str) -> bool {
+                true
             }
             fn judge_rows(&self, _: &Path, ids: &[&str]) -> Vec<RowOutcome> {
                 ids.iter()

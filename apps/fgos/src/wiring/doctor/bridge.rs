@@ -26,10 +26,12 @@ use std::time::{Duration, Instant};
 const RESULT_PREFIX: &str = "\u{1e}FGOS-DOCTOR-BRIDGE ";
 /// The module of the payload this bridge runs.
 const BRIDGE_MODULE: &str = "src/setup/doctor-bridge.mjs";
-/// How long the one call that judges every bridged row may run before its process tree is ended.
-pub const CHECK_DEADLINE: Duration = Duration::from_secs(120);
-/// How long one call that runs a run of bridged fixes may run.
-pub const FIX_DEADLINE: Duration = Duration::from_secs(300);
+/// How long the one call that judges every bridged row may run before its process tree is ended. Measured: the
+/// whole bridged set takes about 2.5 s on a project and its slowest row about 1.3 s, so 30 s is more than ten
+/// times what a healthy run needs.
+pub const CHECK_DEADLINE: Duration = Duration::from_secs(30);
+/// How long one call that runs a run of bridged fixes may run (the same bound; each fix is a small repair).
+pub const FIX_DEADLINE: Duration = Duration::from_secs(30);
 /// How much of the child's stderr a failure shows.
 const STDERR_EXCERPT: usize = 400;
 /// How long to wait for the readers to finish once the child ended.
@@ -329,6 +331,14 @@ fn end_tree(child: &mut Child, identity: Option<fgos_process::facts::ProcTuple>)
 }
 
 impl RowOwner for NodeBridge {
+    fn handles_row(&self, _id: &str) -> bool {
+        true
+    }
+
+    fn handles_fix(&self, _id: &str) -> bool {
+        true
+    }
+
     fn run_fixes(&self, root: &Path, ids: &[&str]) -> Vec<FixResult> {
         let (lines, fault) = self.call(root, "fix", ids, self.fix_deadline);
         let mut done: HashMap<String, FixResult> = lines

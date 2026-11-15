@@ -1091,7 +1091,8 @@
       "kind": "door",
       "patterns": [
         "Command::new\\(\"node\"\\)",
-        "\\blegacy_exec::"
+        "\\blegacy_exec::",
+        "\\.arg\\(\"hook\"\\)"
       ],
       "allowed": [
         {
@@ -1122,7 +1123,7 @@
         }
       ],
       "retiredBy": "the step that removes requires.node from the release manifest",
-      "reason": "doctor, init, uninstall and wire-agents never call back into Node for a layer that already moved: only the bridge starts Node, and a row adapter or a packaging module that needs a fact asks the Rust component that owns it"
+      "reason": "the one named allowance is the hook rows' shim probe, which runs the project shim's `hook` route (dispatch-decide, main-checkout-delete-guard, mailbox), a legacy-cli route until the hook verdicts are native: the phase that ports those rows adds its own file to this row's allowed list with that reason, and nothing else under wiring/doctor may spawn a verb. doctor, init, uninstall and wire-agents never call back into Node for a layer that already moved: only the bridge starts Node, and a row adapter or a packaging module that needs a fact asks the Rust component that owns it"
     }
   ],
   "files": {

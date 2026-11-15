@@ -80,7 +80,15 @@ pub struct Payload {
 
 /// [`resolve_payload_path`] with the root the entry sits under: a module of the payload (the doctor bridge) is
 /// found as `root/<its path>`, never by PATH or cwd.
+///
+/// The release is verified once per host process (the answer, a refusal included, is kept): a real release costs
+/// about 0.19 s to verify, and the doctor makes several calls.
 pub fn resolve_payload() -> Result<Payload, String> {
+    static VERIFIED: std::sync::OnceLock<Result<Payload, String>> = std::sync::OnceLock::new();
+    VERIFIED.get_or_init(verify_payload).clone()
+}
+
+fn verify_payload() -> Result<Payload, String> {
     let active_release_path = if let Ok(p) = env::var("FGOS_ACTIVE_RELEASE_PATH") {
         PathBuf::from(p)
     } else {

@@ -39,3 +39,12 @@ base Node entry 4.0 s; base host serving Node doctor 6.6 s; new host 6.5 s. Not 
 4. Phase 06/07 etc: new `pub` items only in fgos-distribution and host-runtime; none in fgos-git.
 5. Tests outside the phase list touched: `agent-wiring`, `dir-resolution` (separate hunks), `agy-permissions`, `yaml-parse-failures`, `active-release-drift-check`, new `test/helpers/doctor-judge-closure.mjs`, `doctor-bridge.test.mjs`; docs: contract section 3 and 2 sentences, spec RUL109 sentence.
 6. Windows: tree kill is the child only (no Job Object); Node doctor rows mostly fail early there.
+
+## Reconciliation with the phase 00 report (after b80119c7d)
+1. Registry owners are the report's table: 56 rows judged in Rust (rust:*), 53 bridged (S5 8, S6a 31, S6b 6, S7 8), plus `shell-integration-sourced` as bridge:S4 until the setup retirement removes it (110 live rows now, 109 after); fixes 22 Rust, 5 bridged. A row the registry gives to Rust but with no Rust judge yet runs through the bridge (engine routes by "owner Rust and the host has the adapter, else bridge"); the Node body goes with the phase that ports it, which also lists the id in `ROWS_JUDGED_IN_RUST` (registrations test) and in the host's `NativeOwner`. Exact-set tests pin the split. The import-closure rule is gone; `judge` modules and a `layers` module->step map are recorded, the test requires the label to be no earlier than any layer read (`test/helpers/doctor-bridge-labels.mjs`), with seeded negatives.
+2. The payload is verified once per host process (`resolve_payload` caches its answer, refusal included).
+3. Bridge deadlines are 30 s per call (F21).
+4. Doors row "no Node from the native packaging verbs" bans `.arg("hook")` spawns and names the hook rows' shim probe as the one allowance in its reason; the phase that ports those rows adds its own file to `allowed` (an entry for a file that does not exist yet would be stale).
+5. The eight fixes with no `changed` key: the engine keeps the omission (a fix's own answer is reported as given), so parity compares them byte-for-byte; no accepted change. When they move to Rust in 07 that phase decides whether to emit `changed`.
+6. `main-checkout-hook-wired` untouched.
+Gates rerun: fmt, clippy -D warnings, msvc and darwin check, cargo test fgos and distribution, census 0 undeclared, 15 Node files (parity 34 cases, architecture, registrations, bridge, routes, flags, closing-block, fgctl tail/upgrade, checks-doctor-config, release-tree, pin-drift): 384 pass.

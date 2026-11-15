@@ -112,6 +112,10 @@ pub trait RowOwner {
     /// Judges the rows `ids` (registry order) against `root`, after the fixes ran; one outcome per id, in order.
     /// An owner builds the facts its rows share once per call.
     fn judge_rows(&self, root: &Path, ids: &[&str]) -> Vec<RowOutcome>;
+    /// Whether this owner has the judge of row `id` today. The bridge has every row it is asked for.
+    fn handles_row(&self, id: &str) -> bool;
+    /// Whether this owner has the body of fix `id` today.
+    fn handles_fix(&self, id: &str) -> bool;
 }
 
 /// The two kinds of owner the registry names.
@@ -507,6 +511,25 @@ impl Owners<'_> {
             OwnerKind::Bridge => self.bridge,
         }
     }
+
+    /// Who judges a row today: the Rust owner the registry names once it has the judge, else the bridge, whose
+    /// Node body stays until the phase that moves the row deletes it.
+    fn kind_of_row(&self, entry: &RegistryRow) -> OwnerKind {
+        if entry.owner.kind == OwnerKind::Native && self.native.handles_row(&entry.id) {
+            OwnerKind::Native
+        } else {
+            OwnerKind::Bridge
+        }
+    }
+
+    /// Who runs a fix today, by the same rule.
+    fn kind_of_fix(&self, entry: &RegistryFix) -> OwnerKind {
+        if entry.owner.kind == OwnerKind::Native && self.native.handles_fix(&entry.id) {
+            OwnerKind::Native
+        } else {
+            OwnerKind::Bridge
+        }
+    }
 }
 
 /// One doctor run. With `fix`, every fix runs first in exact registry order (a run of consecutive fixes of one
@@ -515,9 +538,20 @@ impl Owners<'_> {
 /// added once to `next`.
 pub fn run(registry: &Registry, owners: &Owners, root: &Path, options: Options) -> Report {
     let fixed = options.fix.then(|| run_fixes(registry, owners, root));
+    let kinds: Vec<OwnerKind> = registry
+        .rows
+        .iter()
+        .map(|entry| owners.kind_of_row(entry))
+        .collect();
     let mut judged: HashMap<OwnerKind, std::vec::IntoIter<RowOutcome>> = HashMap::new();
     for kind in [OwnerKind::Native, OwnerKind::Bridge] {
-        let ids = registry.row_ids(kind);
+        let ids: Vec<&str> = registry
+            .rows
+            .iter()
+            .zip(&kinds)
+            .filter(|(_, row_kind)| **row_kind == kind)
+            .map(|(entry, _)| entry.id.as_str())
+            .collect();
         if ids.is_empty() {
             continue;
         }
@@ -538,9 +572,9 @@ pub fn run(registry: &Registry, owners: &Owners, root: &Path, options: Options) 
         .collect();
     let mut rows = Vec::with_capacity(registry.rows.len());
     let mut next: Vec<String> = Vec::new();
-    for entry in &registry.rows {
+    for (entry, kind) in registry.rows.iter().zip(&kinds) {
         let outcome = judged
-            .get_mut(&entry.owner.kind)
+            .get_mut(kind)
             .and_then(Iterator::next)
             .expect("every row of an owner kind was asked for and answered");
         match outcome {
@@ -601,10 +635,10 @@ fn run_fixes(registry: &Registry, owners: &Owners, root: &Path) -> Vec<FixResult
     let mut results = Vec::with_capacity(registry.fixes.len());
     let mut at = 0;
     while at < registry.fixes.len() {
-        let kind = registry.fixes[at].owner.kind;
+        let kind = owners.kind_of_fix(&registry.fixes[at]);
         let end = registry.fixes[at..]
             .iter()
-            .position(|fix| fix.owner.kind != kind)
+            .position(|fix| owners.kind_of_fix(fix) != kind)
             .map_or(registry.fixes.len(), |len| at + len);
         let ids: Vec<&str> = registry.fixes[at..end]
             .iter()
@@ -727,13 +761,26 @@ mod tests {
     struct Scripted {
         calls: RefCell<Vec<String>>,
         rows: HashMap<&'static str, RowOutcome>,
+        owns: Vec<&'static str>,
+        owns_all: bool,
     }
 
     impl Scripted {
+        /// An in-process owner with an adapter for the rows the test registry gives to Rust.
         fn new(rows: Vec<(&'static str, RowOutcome)>) -> Self {
             Self {
                 calls: RefCell::new(Vec::new()),
                 rows: rows.into_iter().collect(),
+                owns: vec!["alpha", "fix-alpha", "gamma"],
+                owns_all: false,
+            }
+        }
+
+        /// The bridge: it takes whatever it is asked for.
+        fn bridge(rows: Vec<(&'static str, RowOutcome)>) -> Self {
+            Self {
+                owns_all: true,
+                ..Self::new(rows)
             }
         }
     }
@@ -746,6 +793,14 @@ mod tests {
             ids.iter()
                 .map(|id| FixResult::done(id, true, "repaired"))
                 .collect()
+        }
+
+        fn handles_row(&self, id: &str) -> bool {
+            self.owns_all || self.owns.contains(&id)
+        }
+
+        fn handles_fix(&self, id: &str) -> bool {
+            self.owns_all || self.owns.contains(&id)
         }
 
         fn judge_rows(&self, _root: &Path, ids: &[&str]) -> Vec<RowOutcome> {
@@ -871,7 +926,7 @@ mod tests {
     #[test]
     fn a_run_reports_ok_next_and_the_fix_of_each_failing_row_in_registry_order() {
         let native = Scripted::new(vec![("gamma", judged(false, "gamma is broken"))]);
-        let bridge = Scripted::new(vec![
+        let bridge = Scripted::bridge(vec![
             ("beta", judged(false, "beta is broken")),
             (
                 "config-doc-drift",
@@ -941,7 +996,7 @@ mod tests {
     #[test]
     fn fixes_run_in_exact_registry_order_one_call_per_run_of_one_owner() {
         let native = Scripted::new(vec![]);
-        let bridge = Scripted::new(vec![]);
+        let bridge = Scripted::bridge(vec![]);
         let report = run(
             &registry(),
             &Owners {
@@ -993,9 +1048,48 @@ mod tests {
     }
 
     #[test]
+    fn a_row_the_registry_gives_to_rust_goes_to_the_bridge_until_rust_has_its_judge() {
+        // The native owner has no adapter for anything: every row and fix goes to the bridge, whatever the registry
+        // names, so a row is never dropped from a report while its Rust judge is still to come.
+        let mut native = Scripted::new(vec![]);
+        native.owns = vec![];
+        let bridge = Scripted::bridge(vec![]);
+        let report = run(
+            &registry(),
+            &Owners {
+                native: &native,
+                bridge: &bridge,
+            },
+            Path::new("/p"),
+            Options { fix: true },
+        );
+        assert_eq!(report.checks.unwrap().len(), 6);
+        assert!(native.calls.borrow().is_empty());
+        assert_eq!(
+            bridge
+                .calls
+                .borrow()
+                .iter()
+                .filter(|c| c.starts_with("judge"))
+                .count(),
+            1
+        );
+        assert_eq!(
+            bridge
+                .calls
+                .borrow()
+                .iter()
+                .filter(|c| c.starts_with("fix"))
+                .count(),
+            1,
+            "consecutive fixes of one owner are one call"
+        );
+    }
+
+    #[test]
     fn rows_are_judged_after_the_fixes_ran() {
         let native = Scripted::new(vec![]);
-        let bridge = Scripted::new(vec![]);
+        let bridge = Scripted::bridge(vec![]);
         run(
             &registry(),
             &Owners {
@@ -1025,7 +1119,7 @@ mod tests {
             next: "install Node 18 or newer, then run fgos doctor again".into(),
         };
         let native = Scripted::new(vec![]);
-        let bridge = Scripted::new(vec![
+        let bridge = Scripted::bridge(vec![
             ("beta", cause.clone()),
             ("ptr", cause.clone()),
             ("config-doc-drift", cause.clone()),
@@ -1059,7 +1153,7 @@ mod tests {
     #[test]
     fn the_report_serialises_in_the_documented_key_order_and_omits_what_a_row_does_not_say() {
         let native = Scripted::new(vec![("gamma", judged(false, "x"))]);
-        let bridge = Scripted::new(vec![]);
+        let bridge = Scripted::bridge(vec![]);
         let report = run(
             &registry(),
             &Owners {
