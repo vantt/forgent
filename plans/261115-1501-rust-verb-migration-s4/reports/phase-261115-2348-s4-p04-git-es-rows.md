@@ -44,7 +44,8 @@ Branch `rust-verb-migration-program/s4-p04`, rebased on s4 `2f490135f`. Worktree
 - `cargo test --locked -p fgos --no-fail-fast`: all binaries green (283 bin incl. 74 doctor, 67 cli_tests, ...). `fgos-git` tests of `repository_facts` unit test.
 - Census regenerated (0 undeclared). Registry `inRust` lists the 10 rows and 4 fixes.
 - Node (focused, 63 files that import or read a changed file, plus architecture, census, door, status, recovery, parity): all green except the five release-tree tests that need `cargo build --release --workspace` (not run: quiet window; unchanged by this phase).
-- Parity (`doctor.cases.mjs`, 46 cases, host vs base `118df7065`): see Concerns for the last run.
+- Parity (`doctor.cases.mjs`, 70 cases, host vs base `118df7065`, rebased on s4 `6e79fbffe`): green, with wire-agents and uninstall tables. The table also leaves out the base's executor policy warnings on stderr (a clone of this repository) and the pid a writer-identity row names.
+- Rebased gates: `cargo test --locked -p fgos` all binaries green (303 bin, 67 cli_tests); clippy workspace `-D warnings` clean; msvc and darwin `cargo check --tests -p fgos -p fgos-git` clean; one-door scan 0 undeclared; 61 focused Node files 998 tests, 5 red = the release-tree tests that need `cargo build --release --workspace` (not run).
 
 ## Tests the series gate must still run
 Everything that reads the registry or `DOCTOR_CHECKS`: `registrations`, `checks`, `checks-doctor-config`, `yaml-parse-failures`, `doctor-bridge`, `architecture`, `release-tree` (needs release build), install-git-hooks; `test/event-store/*` through `phase07-fixture.mjs`; `test/git/native-load`.
