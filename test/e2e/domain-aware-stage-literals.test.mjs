@@ -12,6 +12,7 @@ import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixtu
 import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
 import { activateGitFixture } from '../helpers/git-fixture.mjs';
 import { writeProjectConfig } from '../helpers/config-fixture.mjs';
+import { spawnFgos } from '../helpers/cli-entry.mjs';
 
 // Workers run confined (bwrap) as Unit runs; the runner child inherits this
 // file-local backend registry through its environment.
@@ -305,7 +306,6 @@ function writeDiscoveringWorkerExecutor(scriptDir, { verify, produce, discovered
     `
 import fs from 'node:fs';
 import { execFileSync } from 'node:child_process';
-import { spawnFgos } from '../helpers/cli-entry.mjs';
 const prompt = process.argv[2] ?? '';
 const fence = String.fromCharCode(96, 96, 96);
 if (prompt.includes('Kiểm tra độc lập một lệnh verify')) {

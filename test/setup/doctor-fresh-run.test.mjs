@@ -62,11 +62,11 @@ test('e2e: on the npm channel, fgos init in a fresh external project refuses and
       shell: isWin,
       env: { ...process.env, FGOS_CLAUDE_COMMAND: '/nonexistent/fgos-test-claude-binary' },
     });
-    assert.notEqual(init.status, 0, 'fgos init must refuse on a channel that ships no addon');
+    assert.equal(init.status, 4, 'fgos init must refuse on a channel that ships no native host');
     assert.match(
       init.stderr,
-      /git-addon-unavailable: addon not shipped on this channel: onboard this project with `fgctl init`/,
-      'the refusal names the addon and the way to onboard',
+      /"init" is only available in the native fgOS host\. Install a release with "fgctl init"/,
+      'the refusal names the native host and the way to onboard',
     );
     assert.deepEqual(fs.readdirSync(externalCwd).sort(), before, 'a refused init changes nothing in the project');
   } finally {

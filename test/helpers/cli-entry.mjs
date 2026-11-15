@@ -26,7 +26,8 @@ const HOST_VARIABLES = ['FGOS_HOST_BIN', 'FGOS_ACTIVE_RELEASE_PATH', 'FGOS_ACTIV
 export function spawnFgos(fgosMjs, args, options = {}) {
   if (cliEntryFor(args) === 'host') {
     const env = { ...(options.env ?? process.env) };
-    for (const name of HOST_VARIABLES) env[name] ??= process.env[name];
+    // A variable the caller names (even as undefined) is the caller's; one it does not name comes from this process.
+    for (const name of HOST_VARIABLES) if (!(name in env)) env[name] = process.env[name];
     if (!env.FGOS_HOST_BIN) {
       throw new Error(`fgos ${args.join(' ')} is answered by the Rust host, but FGOS_HOST_BIN is not set; run this file through node scripts/run-tests.mjs <file>`);
     }

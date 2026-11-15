@@ -39,6 +39,7 @@ import crypto from "node:crypto";
 import { spawn, execFileSync } from "node:child_process";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { activateGitFixture } from "../helpers/git-fixture.mjs";
+import { cliEntryFor } from "../helpers/cli-entry.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 export const REPO_ROOT = path.resolve(__dirname, "../..");
@@ -763,9 +764,12 @@ async function runMultiStepIsolatedWrite(entryA, entryB, testCase, options = {})
       ignoreChildren: true,
     };
     const initCaseB = { ...initCaseA, cwd: scratchB, env: { HOME: homeB, USERPROFILE: homeB } };
+    // `init` is a host verb: a Node entry cannot run it, so both entries start the next step from a repository the
+    // staged host initialised (the host's own init has its parity table).
+    const initEntry = (entry) => (entry.type === "node" && cliEntryFor(["init"]) === "host" ? parseEntry(`bin:${process.env.FGOS_HOST_BIN}`) : entry);
     const [initResA, initResB] = await Promise.all([
-      runCaseOnEntry(entryA, initCaseA, options),
-      runCaseOnEntry(entryB, initCaseB, options),
+      runCaseOnEntry(initEntry(entryA), initCaseA, options),
+      runCaseOnEntry(initEntry(entryB), initCaseB, options),
     ]);
 
     // Normalize dir path and data_hash in stdout JSON for init

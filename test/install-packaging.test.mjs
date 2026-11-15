@@ -157,15 +157,15 @@ test('e2e: npm pack -> npm install -g -> fgos init from a fresh external cwd ref
     // Windows can't exec a .cmd shim directly through the OS loader --
     // shell:true is required there (Node child_process gotcha); posix
     // binaries need no shell.
-    // This channel ships no native Git addon and Git has one door: `fgos init` refuses and names
-    // `fgctl init`, and writes nothing, neither in the external cwd nor in the install prefix.
+    // `init` runs in the native host and this channel ships none: `fgos init` refuses, names `fgctl init`, and
+    // writes nothing, neither in the external cwd nor in the install prefix.
     const init = spawnSync(fgosBin, ['init'], {
       cwd: externalCwd,
       encoding: 'utf8',
       shell: process.platform === 'win32',
     });
-    assert.notEqual(init.status, 0, 'fgos init must refuse on a channel that ships no addon');
-    assert.match(init.stderr, /git-addon-unavailable: addon not shipped on this channel: onboard this project with `fgctl init`/);
+    assert.equal(init.status, 4, 'fgos init must refuse on a channel that ships no native host');
+    assert.match(init.stderr, /"init" is only available in the native fgOS host\. Install a release with "fgctl init"/);
 
     const externalFgosDir = path.join(externalCwd, '.fgos');
     assert.equal(fs.existsSync(externalFgosDir), false, 'a refused init must not create .fgos/ in the external cwd');

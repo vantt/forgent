@@ -17,6 +17,7 @@ import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
 seedFileLocalBwrapRegistry();
 import { resolveHostBin } from '../../src/util/host-bin.mjs';
 import { writeProjectConfig } from '../helpers/config-fixture.mjs';
+import { spawnFgos } from '../helpers/cli-entry.mjs';
 
 // e2e — the whole self-improve loop (self-improve-loop P13 D1-D17), exercised
 // as real fgos.mjs + fgos-runner.mjs subprocesses against a disposable
@@ -134,7 +135,6 @@ function writeCommittingExecutor(scriptDir, produce = 'output.txt') {
     `
 import fs from 'node:fs';
 import { execFileSync } from 'node:child_process';
-import { spawnFgos } from '../helpers/cli-entry.mjs';
 fs.writeFileSync(${JSON.stringify(produce)}, 'produced by worker\\n');
 `,
   );

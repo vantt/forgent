@@ -13,6 +13,7 @@ import { confinedRunnerConfig } from '../runner/loop-worker-fixture.helper.mjs';
 import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
 import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
 import { writeProjectConfig } from '../helpers/config-fixture.mjs';
+import { spawnFgos } from '../helpers/cli-entry.mjs';
 
 // Workers run confined (bwrap) as Unit runs; the runner child inherits this
 // file-local backend registry through its environment.
@@ -257,7 +258,6 @@ function writeAdaptiveWorkerExecutor(scriptDir) {
     `
 import fs from 'node:fs';
 import { execFileSync } from 'node:child_process';
-import { spawnFgos } from '../helpers/cli-entry.mjs';
 const prompt = process.argv[2] ?? '';
 const match = prompt.match(/test -f (\\S+)/);
 const file = match ? match[1] : 'output.txt';

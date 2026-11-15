@@ -17,6 +17,7 @@ import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
 seedFileLocalBwrapRegistry();
 import { frontier } from '../../src/state/frontier.mjs';
 import { writeProjectConfig } from '../helpers/config-fixture.mjs';
+import { spawnFgos } from '../helpers/cli-entry.mjs';
 
 // e2e proof for base-workflow-model (D1-D4): a second, synthetic domain
 // dispatches through the exact same fgos-runner/dispatch code path as the
@@ -150,7 +151,6 @@ function writeAdaptiveCommittingExecutor(scriptDir) {
     `
 import fs from 'node:fs';
 import { execFileSync } from 'node:child_process';
-import { spawnFgos } from '../helpers/cli-entry.mjs';
 const prompt = process.argv[2] ?? '';
 const match = prompt.match(/test -f (\\S+)/);
 const file = match ? match[1] : 'output.txt';

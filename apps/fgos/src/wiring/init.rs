@@ -15,7 +15,7 @@
 
 use super::doctor::bridge::{Fault, NodeBridge};
 use crate::cli_projector::ProjectError;
-use crate::legacy_exec;
+use fgos_distribution::doctor::RowOwner;
 use fgos_host_runtime::{
     CategorisedRefusal, ContractRef, EventSink, HostInvocation, InvocationControl, JsonOutcome,
     OperationId, OperationProvider, OperationRequest, ProviderDescriptor, ProviderError,
@@ -110,7 +110,7 @@ pub trait Steps {
     fn settle_legacy_config(&self, root: &Path) -> Result<Legacy, StepFailure>;
     /// Whether this platform has an Event Store, and with it a Work store to create.
     fn work_store_supported(&self) -> bool;
-    fn fix_lock_dirs(&self, root: &Path) -> Result<(), StepFailure>;
+    fn prepare_store_directories(&self, root: &Path) -> Result<(), StepFailure>;
     fn create_work_store(&self, root: &Path) -> Result<(), StepFailure>;
     /// The signal that ended the Work step early, once one did.
     fn interrupted(&self) -> Option<i32>;
@@ -167,7 +167,9 @@ pub fn run(steps: &dyn Steps, root: &Path) -> Result<Done, CategorisedRefusal> {
     // and the project around it and leaves the store out.
     let work_store = steps.work_store_supported();
     if work_store {
-        steps.fix_lock_dirs(root).map_err(StepFailure::refusal)?;
+        steps
+            .prepare_store_directories(root)
+            .map_err(StepFailure::refusal)?;
         if let Err(failure) = steps.create_work_store(root) {
             return match steps.interrupted() {
                 Some(signal) => Ok(Done::Interrupted(signal)),
@@ -265,7 +267,7 @@ impl Steps for Live {
         fgos_event_store::lifecycle::platform_supported()
     }
 
-    fn fix_lock_dirs(&self, root: &Path) -> Result<(), StepFailure> {
+    fn prepare_store_directories(&self, root: &Path) -> Result<(), StepFailure> {
         use super::doctor::event_store::{build_context, private_directories};
         // The store's setup context is the doctor's: the repository, then the strict `eventStore` config, so a
         // refused config file stops init here as it stops the lock-directory repair.
@@ -283,7 +285,7 @@ impl Steps for Live {
     }
 
     fn interrupted(&self) -> Option<i32> {
-        legacy_exec::interrupted()
+        RowOwner::interrupted(&self.bridge)
     }
 
     fn write_coexistence(&self, root: &Path, data_dir: &Path) -> Vec<Value> {
@@ -657,7 +659,7 @@ mod tests {
         fn work_store_supported(&self) -> bool {
             self.work_store
         }
-        fn fix_lock_dirs(&self, _: &Path) -> Result<(), StepFailure> {
+        fn prepare_store_directories(&self, _: &Path) -> Result<(), StepFailure> {
             self.note("lock-dirs")
         }
         fn create_work_store(&self, _: &Path) -> Result<(), StepFailure> {

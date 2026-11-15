@@ -17,6 +17,7 @@ import { fileURLToPath } from 'node:url';
 
 import { initFixtureRepo } from '../helpers/git-fixture.mjs';
 import { writeProjectConfig } from '../helpers/config-fixture.mjs';
+import { spawnFgos } from '../helpers/cli-entry.mjs';
 
 const FGOS = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../bin/fgos.mjs');
 const WINDOWS = process.platform === 'win32';
@@ -33,7 +34,6 @@ function fakeClaude(dir, state) {
   const script = path.join(dir, 'fake-claude.mjs');
   fs.writeFileSync(script, `#!/usr/bin/env node
 import fs from 'node:fs';
-import { spawnFgos } from '../helpers/cli-entry.mjs';
 const args = process.argv.slice(2);
 fs.appendFileSync(${JSON.stringify(logPath)}, JSON.stringify(args) + '\\n');
 const read = () => JSON.parse(fs.readFileSync(${JSON.stringify(statePath)}, 'utf8'));

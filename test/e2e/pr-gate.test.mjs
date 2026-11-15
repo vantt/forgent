@@ -14,6 +14,7 @@ import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
 import { initFixtureRepo } from '../helpers/git-fixture.mjs';
 import { readRawEvents } from '../../src/state/store.mjs';
 import { writeProjectConfig } from '../helpers/config-fixture.mjs';
+import { spawnFgos } from '../helpers/cli-entry.mjs';
 
 // Workers run confined (bwrap) as Unit runs; the runner child inherits this
 // file-local backend registry through its environment.
@@ -159,7 +160,6 @@ function writeOverwritingExecutor(scriptDir, filename, content) {
     `
 import fs from 'node:fs';
 import { execFileSync } from 'node:child_process';
-import { spawnFgos } from '../helpers/cli-entry.mjs';
 fs.writeFileSync(${JSON.stringify(filename)}, ${JSON.stringify(content)});
 `,
   );
