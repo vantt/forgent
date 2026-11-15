@@ -356,8 +356,14 @@ mod tests {
         let mut rows = std::collections::HashSet::new();
         let mut fixes = std::collections::HashSet::new();
         for group in GROUPS {
-            assert!(group.rows.iter().all(|id| rows.insert(*id)), "a row is in two groups");
-            assert!(group.fixes.iter().all(|id| fixes.insert(*id)), "a fix is in two groups");
+            assert!(
+                group.rows.iter().all(|id| rows.insert(*id)),
+                "a row is in two groups"
+            );
+            assert!(
+                group.fixes.iter().all(|id| fixes.insert(*id)),
+                "a fix is in two groups"
+            );
         }
     }
 

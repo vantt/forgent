@@ -46,8 +46,6 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, with no repo
   assert.deepEqual(
     DOCTOR_CHECKS.map((c) => c.id).sort(),
     [
-      'main-checkout-hook-wired',
-      'node-version-and-git',
       'project-fgos-launcher',
       'tool-registry-configured',
       'provider-capacity-state',
@@ -63,10 +61,6 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, with no repo
       'work-step-vocabulary',
       'work-recorded-conflicts',
       'delivered-not-on-trunk',
-      'event-store-incidents',
-      'event-store-legacy-layout',
-      'event-store-machine-id',
-      'event-store-open-root',
       'seat-binding-route',
       'cli-version-visible',
       'worker-slots-ceiling-usable',
@@ -89,10 +83,6 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, with no repo
       // Phase 01 group D: the three preconditions for an interactive dispatch.
       'terminal-control',
       'omp-natives-present',
-      'git-component-compatible',
-      'git-repository-config',
-      'git-operation-journal',
-      'git-incidents',
       'terminal-allocations',
       'trust-store-readable',
       // Phase 07 (herdr-trust-supervisor R3): codex-toml/agy trust stores had
@@ -583,31 +573,5 @@ test('provider-capacity-state doctor check reports quarantine without clearing i
 // git-hosted dependency), so this doctor check + fgos setup's own wiring
 // (below) are the only paths left that keep it honest.
 
-test('main-checkout-hook-wired doctor check reports passed/failed matching mainCheckoutHookWired, with an actionable message', () => {
-  const cwd = mkTemp('doctor-hook-check-');
-  execFileSync('git', ['init', '-q'], { cwd });
-  const notApplicable = checkById('main-checkout-hook-wired').check(cwd);
-  assert.equal(notApplicable.passed, true);
-  assert.match(notApplicable.message, /not applicable/);
-  fs.mkdirSync(path.join(cwd, '.githooks'));
-  const before = checkById('main-checkout-hook-wired').check(cwd);
-  assert.equal(before.passed, false);
-  assert.match(before.message, /run npm run setup:hooks/);
-
-  execFileSync('git', ['config', 'core.hooksPath', '.githooks'], { cwd });
-  const after = checkById('main-checkout-hook-wired').check(cwd);
-  assert.equal(after.passed, true);
-  fs.rmSync(cwd, { recursive: true, force: true });
-});
-
 // ─── D1/D5: dead source lines are reported as a failed check ────────────────
 
-test('a doctor row keeps its facts under detail so its message stays one sentence', () => {
-  const root = initRepo('doctor-detail-');
-  try {
-    const row = checkById('git-component-compatible').check(root);
-    assert.equal(row.passed, true, row.message);
-    assert.equal(typeof row.detail.versions.napi, 'number');
-    assert.ok(!row.message.includes('{"'), 'a message carries no JSON');
-  } finally { fs.rmSync(root, { recursive: true, force: true }); }
-});

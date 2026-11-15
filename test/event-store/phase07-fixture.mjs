@@ -2,11 +2,11 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { randomUUID } from 'node:crypto';
 import { execFileSync, spawnSync } from 'node:child_process';
 import { ensureGitAddon, root } from '../../scripts/git-addon.mjs';
 import { loadNativeAddon } from '../../src/git/native.mjs';
 import { openStore } from '../../src/event-store/index.mjs';
-import { fixGitFetchMapping } from '../../src/setup/git-checks.mjs';
 const built = ensureGitAddon();
 export const loaderOptions = { descriptor: { manifest: JSON.parse(fs.readFileSync(built.manifest)), releaseRoot: root } };
 export const addon = loadNativeAddon(loaderOptions);
@@ -38,13 +38,10 @@ export function append(store, events) {
   return store.append('project', events.map(e => ({ eventType: e.type ?? 'work.add', schemaVersion: 1, payload: e.payload ?? { id: 'one', title: 'one' }, ts: e.ts ?? new Date().toISOString() })), {}, 'fixture', []);
 }
 
-/** Install the fetch mappings through Git's own setup fix, the one door that writes them. */
-export function installFetchMapping({ repo, stateRoot }) {
-  const prior = process.env.FGOS_STATE_ROOT; process.env.FGOS_STATE_ROOT = stateRoot;
-  try {
-    const result = fixGitFetchMapping(repo, loaderOptions);
-    assert.ok(result.changed || /no fetch mapping change needed/.test(result.message), result.message);
-  } finally { if (prior === undefined) delete process.env.FGOS_STATE_ROOT; else process.env.FGOS_STATE_ROOT = prior; }
+/** Install the fetch mappings through Git's own door (RepositoryConfig), the one door that writes them. */
+export function installFetchMapping({ repo, stateRoot }, remote = 'origin') {
+  addon.prepareGitDriverDirectories(stateRoot);
+  addon.ensureGitFetchMapping(stateRoot, repo, repo, remote, addon.gitFetchMappings(remote), `fixture-${randomUUID()}`);
 }
 
 /**

@@ -211,7 +211,7 @@ Distribution rules and recorded decisions are retained below; the area specifica
   itself. Merge commits skip this root guard; the `.fgos` deletion and worker
   guards accept only a staged entry equal to the merge parent's where that
   parent changed it since the merge base, and no other data-loss guard is
-  skipped. `main-checkout-hook-wired` diagnoses wiring using the existing check.
+  skipped. `main-checkout-hook-wired` diagnoses wiring from RepositoryConfig's report (`wired`), and applies only to a project whose `.githooks/pre-commit` is fgOS's own guard; its remedy is `npm run setup:hooks`.
 - In fgOS source checkouts, the hook sends newly staged, copied, or renamed
   Markdown files directly under `plans/reports/` and `plans/journals/` to the
   native Convention checker, along with new/copied/renamed paths under `docs/`.

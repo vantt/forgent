@@ -45,6 +45,22 @@ function checkById(id) {
   return entry;
 }
 
+/** The doctor registry with its config group expanded the way the host expands it: every row and fix, whoever judges it. */
+function registryEntries() {
+  const registry = JSON.parse(fs.readFileSync(new URL('../../../packages/distribution/contracts/doctor-registry.v1.json', import.meta.url), 'utf8'));
+  const config = JSON.parse(fs.readFileSync(new URL('../../../packages/config/contracts/doctor-rows.v1.json', import.meta.url), 'utf8'));
+  const group = registry.groups.config;
+  const rowId = (id) => group.idMap[id] ?? id;
+  const fixId = (id) => group.fixIdMap[id] ?? `${group.fixIdPrefix}${id}`;
+  const rows = registry.rows.flatMap((entry) => (entry.group === 'config'
+    ? config.rows.map((row) => ({ id: rowId(row.id), owner: group.owner }))
+    : [{ id: entry.id, owner: entry.owner, description: entry.description }]));
+  const fixes = registry.fixes.flatMap((entry) => (entry.group === 'config'
+    ? config.fixes.map((id) => ({ id: fixId(id), owner: group.owner }))
+    : [{ id: entry.id, owner: entry.owner }]));
+  return { rows, fixes };
+}
+
 function fixById(id) {
   const entry = FIX_REGISTRATIONS.find((f) => f.id === id);
   assert.ok(entry, `FIX_REGISTRATIONS is missing "${id}"`);
@@ -105,6 +121,7 @@ export {
   mkTemp,
   os,
   path,
+  registryEntries,
   resolveMainCheckout,
   runHostDoctor,
   spawnSync,

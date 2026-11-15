@@ -1935,6 +1935,20 @@ test('door check: every name of the retired Node S2 verb code fails when a file 
   }
 });
 
+test('door check: every name of the retired Node Git and Event Store doctor rows fails when a file declares it again', () => {
+  const row = manifest.doors.find((r) => r.job === 'retired Node Git and Event Store doctor rows');
+  assert.ok(row && row.allowed.length === 0, 'the retired-names row exists and allows no file');
+  const names = ['checkGit', 'checkEventStore', 'eventStoreDoctor', 'eventStoreDoctorOf', 'eventStoreMappingProblems', 'eventStoreSetupContext', 'fixGitWal', 'fixGitDriverDirectories', 'fixGitFetchMapping', 'compatibleGitContracts', 'describeGitError', 'retentionNote', 'gitFloor', 'checkNodeAndGit', 'checkMainCheckoutHookWired'];
+  assert.equal(row.patterns.length, names.length, 'one pattern per retired name');
+  for (const name of names) {
+    const failures = checkDoors([row], new Map([['src/seeded.mjs', `export function ${name}() {}\n`]]));
+    assert.equal(failures.length, 1, `${name} must fail the door`);
+    assert.match(failures[0], /retired name/);
+  }
+  // A name that merely contains a retired one is not the retired name.
+  assert.deepEqual(checkDoors([row], new Map([['src/seeded.mjs', 'export function checkGitSomethingElse() {}\n']])), []);
+});
+
 // ─── The doctor registry's bridged entries (packages/distribution/contracts/doctor-registry.v1.json) ───────────────
 // A row or fix given to `bridge:<step>` is judged by Node until that step moves the layer it reads. `judge` records
 // the Node modules the row reads and `layers` the step that removes each: the label may not be earlier than a layer

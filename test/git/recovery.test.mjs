@@ -3,7 +3,6 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { fixture } from './land-fixture.mjs';
 import { createGitRecovery, createGitSafeRestore } from '../../src/git/index.mjs';
-import { checkGit } from '../../src/setup/git-checks.mjs';
 import { readGitStatus, recoverGitOperations } from '../../src/git/status.mjs';
 
 test('Recovery lists and inspects an interrupted Land and delegates to its existing recovery', async () => {
@@ -41,7 +40,7 @@ test('Git recovery recovers an interrupted Land through the Recovery door and th
     assert.deepEqual(recoverGitOperations(f.repo,{loaderOptions:f.loader,portOptions:f.options}),{recovered:[],kept:[],message:'no interrupted Land, ScopedCommit or remote transfer operation'});
   } finally { f.close(); }
 });
-test('an interrupted Land is a pending incident until recovered, then a retained Land candidate that never fails the journal row', async () => {
+test('an interrupted Land is a pending incident until recovered, then a retained Land candidate', async () => {
   const f = fixture();
   const prior = process.env.FGOS_STATE_ROOT;
   process.env.FGOS_STATE_ROOT = f.options.stateRoot;
@@ -50,13 +49,9 @@ test('an interrupted Land is a pending incident until recovered, then a retained
     const land = f.port();
     await land.prepare({operationId:'retained-land',request:f.request});
     land.close();
-    assert.match(checkGit(f.repo,'git-incidents',f.loader).message,/^warning: 1 pending Git operation\(s\).*fgos git recover/);
     assert.deepEqual(status().pendingOperations.map(o => o.operationId),['retained-land']);
     recoverGitOperations(f.repo,{loaderOptions:f.loader,portOptions:f.options});
-    assert.match(checkGit(f.repo,'git-incidents',f.loader).message,/^no pending Git operation/);
-    const row = checkGit(f.repo,'git-operation-journal',f.loader);
-    assert.equal(row.passed,true,row.message);
-    assert.equal(row.detail.journal.pendingCount,0);
+    assert.deepEqual(status().pendingOperations,[]);
     const { candidates } = status().retainedLand;
     assert.deepEqual(candidates.map(c => c.operationId),['retained-land']);
     assert.deepEqual([...candidates[0].pins].sort(),['refs/fgos/git-operations/retained-land/candidate','refs/fgos/git-operations/retained-land/source/candidate','refs/fgos/git-operations/retained-land/target/candidate']);

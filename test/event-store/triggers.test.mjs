@@ -13,7 +13,8 @@ import { maintainEventStore, runWithEventStoreLifecycle } from '../../src/event-
 import { processSealCoalescer } from '../../src/event-store/seal-coalescing.mjs';
 import { loadNativeAddon } from '../../src/git/native.mjs';
 import { prepareWorkStore } from '../../src/state/work-event-store.mjs';
-import { fixGitFetchMapping } from '../../src/setup/git-checks.mjs';
+import { installFetchMapping } from './phase07-fixture.mjs';
+import { resolveStateRoot } from '../../src/holder-lock/state-root.mjs';
 import { writeRawProjectConfig } from '../helpers/config-fixture.mjs';
 import { initializeWorkRepository } from '../helpers/work-store-release.mjs';
 import { acquireSync, createLockScope } from '../../src/holder-lock/index.mjs';
@@ -28,7 +29,7 @@ function workRepo(t, { remote = false } = {}) {
   if (remote) {
     execFileSync('git', ['init', '--bare', '-q', path.join(temp, 'remote')]);
     execFileSync('git', ['-C', repo, 'remote', 'add', 'origin', path.join(temp, 'remote')]);
-    fixGitFetchMapping(repo);
+    installFetchMapping({ repo, stateRoot: resolveStateRoot().stateRoot });
   }
   return { temp, repo, dir, store: prepareWorkStore(dir, dir).store };
 }

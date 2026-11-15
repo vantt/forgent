@@ -116,12 +116,6 @@ test('executor-profile-warnings warns, without failing, that a prefer on a tool-
   fs.rmSync(cwd, { recursive: true, force: true });
 });
 
-test('node-version-and-git passes under the current process (real Node, real git)', () => {
-  const { passed, message } = checkById('node-version-and-git').check(process.cwd());
-  assert.equal(passed, true);
-  assert.equal(typeof message, 'string');
-});
-
 test('worker-slots-ceiling-usable passes on the standard alone (unarmed null), and says so', () => {
   const cwd = mkTemp('doctor-slots-standard-');
   const { passed, message } = checkById('worker-slots-ceiling-usable').check(cwd);

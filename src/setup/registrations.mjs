@@ -1,5 +1,4 @@
 import { createGitInspect, gitPortOptions } from '../git/inspect.mjs';
-import { checkGit, gitFloor, fixGitWal, fixGitFetchMapping, fixGitDriverDirectories } from './git-checks.mjs';
 import { checkWorkflowCaseBindingSentinel, checkWorkflowCaseBindings, fixWorkflowCaseBindings } from './workflow-case-checks.mjs';
 // registrations.mjs — the doctor-check / fix registry (CONTEXT.md D1/D2,
 // docs/history/setup-doctor-config-registry/): the one place a module declares
@@ -32,7 +31,6 @@ import { releaseBinaryPath } from '../util/release-binary-path.mjs';
 import { RELEASE_TARGETS, releaseTargetForHost } from '../util/release-targets.mjs';
 import { hashFile, listLegacyNodeSourceFiles } from '../../scripts/build-rust-distribution.mjs';
 import { checkCompiledDomains } from '../util/domain-compile.mjs';
-import { mainCheckoutHookWired } from './git-hooks.mjs';
 import { loadRunnerConfigForDir } from '../runner/dispatch/config.mjs';
 import { checkSessionKeepDeclared } from './session-keep-declared.mjs';
 import { INSTALL_ROOT, agentShapeProblem, findAgentDuplicates, readAgentDefinition, scanAgentTiers } from '../runner/agent-definitions.mjs';
@@ -109,8 +107,6 @@ import { createTerminalControl } from '../terminal-control/client.mjs';
 import { readCodexTrust, readAgyStore, defaultAgySettingsPath, operatorClaudeStorePath } from '../run-supervisor/trust-store.mjs';
 import { refreshGlobalBinCache } from './bin-discovery.mjs';
 import { DEFAULT_WORKER_SLOT_CEILING } from '../state/worker-slots.mjs';
-import { eventStoreDoctorOf } from './event-store-checks.mjs';
-import { fixEventStoreLockDirs } from './event-store-fixes.mjs';
 import { foldEvents } from '../state/replay.mjs';
 import { discoverProjectPromptTemplates, TemplateResolutionError } from '../runner/dispatch/operation-prompt-templates.mjs';
 import { resolveHostBin } from '../util/host-bin.mjs';
@@ -132,7 +128,6 @@ const checkConfigOnce = (cwd, run) => (run
   ? run.once(`config-check:${cwd}`, () => checkConfig({ projectRoot: cwd }))
   : checkConfig({ projectRoot: cwd }));
 
-const MIN_NODE_MAJOR = 18;
 
 // Live, mutated-in-place arrays (never reassigned) so a registration added
 // after this module first evaluates — e.g. from a test, or from another
@@ -364,21 +359,6 @@ function checkCliVersionVisible() {
   }
   const commitPart = info.gitCommit ? ` (${info.gitCommit})` : ' (no git commit -- not a git checkout)';
   return { passed: true, message: `fgos ${info.packageVersion}${commitPart}` };
-}
-
-function checkNodeAndGit(cwd, run) {
-  const major = parseInt(process.version.slice(1).split('.')[0], 10);
-  if (Number.isNaN(major) || major < MIN_NODE_MAJOR) {
-    return { passed: false, message: `node ${process.version} — need >=${MIN_NODE_MAJOR}` };
-  }
-  let floor;
-  try {
-    floor = gitFloor(cwd, undefined, run);
-  } catch (err) {
-    return { passed: false, message: `git not available: ${err.message}` };
-  }
-  if (!floor?.version) return { passed: false, message: 'git not available: fgos-git found no Git binary' };
-  return { passed: true, message: `node ${process.version}, git available` };
 }
 
 // The schema states each entry's keys and types; the owner's validator keeps the rule that a source scope opens with a
@@ -827,16 +807,6 @@ export function checkAgentTypeNamesUnique(cwd, { projectTiersOnly = false, insta
   };
 }
 
-function checkMainCheckoutHookWired(cwd) {
-  if (!fs.existsSync(path.join(resolveMainCheckout(cwd) ?? cwd, '.githooks'))) {
-    return { passed: true, message: 'not applicable -- this project ships no .githooks/ directory' };
-  }
-  if (mainCheckoutHookWired(cwd)) {
-    return { passed: true, message: 'core.hooksPath = .githooks — the hook checks the main-checkout kernel lock on every commit here (a fgOS child borrows it through its description)' };
-  }
-  return { passed: false, message: 'core.hooksPath not wired to .githooks — commits here are NOT guarded against concurrent-writer clobbering (str65) — run npm run setup:hooks' };
-}
-
 function checkDispatchDecideHookWired(cwd, run) {
   return checkClaudeHook(cwd, run);
 }
@@ -865,11 +835,6 @@ function checkToolRegistryConfigured(cwd) {
     message: `degraded — ${present}/${providers.length} tool(s) present (${count('stale')} stale, ${count('missing')} missing, ${count('unknown')} cannot be probed) — install the missing tool, or reindex the stale one; fgos dispatch decide --for <capability> shows the answer a dispatch gets`,
   };
 }
-
-registerCheck({
-  id: 'node-version-and-git',
-  check: (cwd, run) => checkNodeAndGit(cwd, run),
-});
 
 registerCheck({
   id: 'cli-version-visible',
@@ -984,11 +949,6 @@ registerCheck({
 registerCheck({
   id: 'agent-type-names-unique',
   check: (cwd) => checkAgentTypeNamesUnique(cwd, { projectTiersOnly: true }),
-});
-
-registerCheck({
-  id: 'main-checkout-hook-wired',
-  check: (cwd) => checkMainCheckoutHookWired(cwd),
 });
 
 registerCheck({
@@ -3332,18 +3292,6 @@ registerCheck({
   check: (cwd) => checkSeatBindingRoute(cwd),
 });
 
-// Event Store: one setup fix and four doctor rows (`event-store-incidents` is a read-only pointer to `fgos events status`). A doctor run builds one `eventStoreDoctor`
-// (its lazy store snapshot is read at most once) and every row asks it; a row called without a run gets a private one.
-registerFix({ id: 'event-store-lock-dirs', fix: cwd => fixEventStoreLockDirs(cwd) });
-for (const name of ['open-root', 'machine-id', 'legacy-layout', 'incidents']) {
-  const id = `event-store-${name}`;
-  registerCheck({ id, check: (cwd, run = createDoctorRun()) => eventStoreDoctorOf(cwd, run)(id) });
-}
-
-// Git and Event Store share one addon ABI admission row.
-for (const id of ['git-component-compatible', 'git-repository-config', 'git-operation-journal', 'git-incidents']) {
-  registerCheck({ id, check: (cwd, run = createDoctorRun()) => checkGit(cwd, id, undefined, run) });
-}
 // Workflow case bindings (docs/platform/workflow/spec.md#6-business-rules RUL-WF-27): the binding records are a view of each
 // case's ledger. Bodies live in workflow-case-checks.mjs.
 registerCheck({
@@ -3355,6 +3303,3 @@ registerCheck({
   check: (cwd) => checkWorkflowCaseBindings(cwd),
 });
 registerFix({ id: 'workflow-case-bindings', fix: (cwd) => fixWorkflowCaseBindings(cwd) });
-registerFix({ id: 'git-driver-directories', fix: fixGitDriverDirectories });
-registerFix({ id: 'git-wal-dir', fix: fixGitWal });
-registerFix({ id: 'git-publication-refspecs', fix: fixGitFetchMapping });

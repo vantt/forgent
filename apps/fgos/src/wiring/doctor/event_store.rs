@@ -205,13 +205,20 @@ fn machine_id(ctx: &Context) -> Result<RowResult, String> {
     if let Some(error) = facts["machineError"].as_str() {
         return Ok(fail(error));
     }
-    let id = facts["machineId"].as_str().unwrap_or_default();
-    if truthy(&ctx.status()?["machineRefShared"]) {
-        return Ok(warn(format!(
+    let shared = truthy(&ctx.status()?["machineRefShared"]);
+    Ok(machine_id_of(
+        facts["machineId"].as_str().unwrap_or_default(),
+        shared,
+    ))
+}
+
+fn machine_id_of(id: &str, shared: bool) -> RowResult {
+    if shared {
+        return warn(format!(
             "event-store-machine-ref-shared: {id}; set git config fgos.machineId <other-id> in one clone"
-        )));
+        ));
     }
-    Ok(pass(id))
+    pass(id)
 }
 
 fn legacy_layout(ctx: &Context) -> Result<RowResult, String> {
@@ -228,11 +235,30 @@ fn legacy_layout(ctx: &Context) -> Result<RowResult, String> {
     Ok(fail(problems.join("; ")))
 }
 
+/// What the pointer row reads: the store's status and the settings that decide which of its counts matter.
+struct IncidentInput<'a> {
+    status: &'a Value,
+    remote_configured: bool,
+    remote: &'a str,
+    seal_interval_sec: u64,
+    now_sec: u64,
+}
+
 /// A read-only pointer to `fgos events status`: it counts what that verb reports from the same snapshot and never
 /// repairs. Integrity problems (errors, skipped peer mirrors, their sync warnings) fail, because a broken store
 /// does not heal on the normal path and the status verb always exits 0; every other count only warns.
 fn incidents(ctx: &Context, now_sec: u64) -> Result<RowResult, String> {
-    let status = ctx.status()?;
+    Ok(incidents_of(&IncidentInput {
+        status: ctx.status()?,
+        remote_configured: ctx.remote_configured(),
+        remote: &ctx.config.remote,
+        seal_interval_sec: ctx.config.seal_interval_sec,
+        now_sec,
+    }))
+}
+
+fn incidents_of(input: &IncidentInput) -> RowResult {
+    let status = input.status;
     let age = status["streams"]
         .as_array()
         .into_iter()
@@ -264,13 +290,13 @@ fn incidents(ctx: &Context, now_sec: u64) -> Result<RowResult, String> {
         || status["aheadBehind"]["ahead"].as_f64().unwrap_or(0.0) > 0.0
         || truthy(&status["sync"]["unpublishedSince"]);
     let stale_push = push.is_null()
-        || push["remote"].as_str() != Some(ctx.config.remote.as_str())
+        || push["remote"].as_str() != Some(input.remote)
         || truthy(&push["error"])
-        || now_sec as f64 - push["time"].as_f64().unwrap_or(0.0) > 86400.0;
-    let unpublished = ctx.remote_configured() && behind_remote && stale_push;
+        || input.now_sec as f64 - push["time"].as_f64().unwrap_or(0.0) > 86400.0;
+    let unpublished = input.remote_configured && behind_remote && stale_push;
     let orphans = array_len(&status["orphanBranches"]);
     let mut open = Vec::new();
-    if age > 2.0 * ctx.config.seal_interval_sec as f64 {
+    if age > 2.0 * input.seal_interval_sec as f64 {
         open.push(format!("unsealed events age {}s", age as u64));
     }
     if orphans > 0 {
@@ -283,13 +309,13 @@ fn incidents(ctx: &Context, now_sec: u64) -> Result<RowResult, String> {
         open.push("unpublished events".to_owned());
     }
     let point = format!("{}; run `fgos events status`", open.join("; "));
-    Ok(if integrity > 0 {
+    if integrity > 0 {
         fail(point)
     } else if !open.is_empty() {
         warn(point)
     } else {
         pass("no unsealed backlog, integrity problem or unpublished event")
-    })
+    }
 }
 
 fn now_sec() -> u64 {
@@ -460,6 +486,297 @@ mod tests {
         std::os::unix::fs::symlink(&elsewhere, open_root.join("locks")).unwrap();
         let error = private_directories(&open_root).unwrap_err();
         assert!(error.starts_with("unsafe directory:"), "{error}");
+    }
+
+    use crate::wiring::doctor::testkit::Fixture;
+
+    fn status(streams: Value, extra: Value) -> Value {
+        let mut base = json!({
+            "streams": streams, "integrityErrors": [], "skippedMirrors": [], "orphanBranches": [],
+            "sync": {"warnings": []}, "lastPush": null, "aheadBehind": {"ahead": 0, "behind": 0},
+        });
+        for (key, value) in extra.as_object().unwrap() {
+            base[key] = value.clone();
+        }
+        base
+    }
+
+    fn pointer(status: &Value, remote_configured: bool, now_sec: u64) -> RowResult {
+        incidents_of(&IncidentInput {
+            status,
+            remote_configured,
+            remote: "origin",
+            seal_interval_sec: 300,
+            now_sec,
+        })
+    }
+
+    fn text(row: &RowResult) -> String {
+        row.message.clone().unwrap()
+    }
+
+    #[test]
+    fn incidents_warns_past_twice_the_seal_interval_and_never_fails_on_unsealed_age() {
+        for (age, warns) in [(599, false), (601, true), (3601, true)] {
+            let status = status(
+                json!([{"stream": "local", "oldestUnsealedAgeSec": age}]),
+                json!({}),
+            );
+            let row = pointer(&status, false, 0);
+            assert!(row.passed, "{age}");
+            assert_eq!(
+                text(&row).starts_with("warning:"),
+                warns,
+                "{age}: {}",
+                text(&row)
+            );
+            if warns {
+                assert_eq!(
+                    text(&row),
+                    format!("warning: unsealed events age {age}s; run `fgos events status`")
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn incidents_counts_orphan_branch_streams_and_integrity_problems_and_fails_closed_only_on_integrity(
+    ) {
+        let clean = pointer(&status(json!([]), json!({})), true, 0);
+        assert_eq!(
+            text(&clean),
+            "no unsealed backlog, integrity problem or unpublished event"
+        );
+        let orphan = pointer(
+            &status(json!([]), json!({"orphanBranches": ["branch:gone"]})),
+            false,
+            0,
+        );
+        assert_eq!(
+            text(&orphan),
+            "warning: 1 orphan branch stream(s); run `fgos events status`"
+        );
+        let broken = pointer(
+            &status(
+                json!([]),
+                json!({"orphanBranches": ["branch:gone"], "integrityErrors": [{"stream": "project"}]}),
+            ),
+            false,
+            0,
+        );
+        assert!(
+            !broken.passed,
+            "an integrity error fails: the store does not heal and events status exits 0"
+        );
+        assert_eq!(
+            text(&broken),
+            "1 orphan branch stream(s); 1 integrity problem(s); run `fgos events status`"
+        );
+    }
+
+    #[test]
+    fn incidents_counts_a_skipped_peer_mirror_and_the_sync_warning_kept_for_it_but_not_the_shared_machine_ref_warning(
+    ) {
+        let status = status(
+            json!([]),
+            json!({"skippedMirrors": ["peer-bb"], "sync": {"warnings": ["peer-bb skipped", "event-store-machine-ref-shared: x"]}}),
+        );
+        let row = pointer(&status, false, 0);
+        assert!(!row.passed);
+        assert_eq!(
+            text(&row),
+            "2 integrity problem(s); run `fgos events status`"
+        );
+    }
+
+    #[test]
+    fn incidents_warns_for_real_unpublished_project_events_and_not_for_a_private_local_stream() {
+        let local = status(
+            json!([{"stream": "local", "unsealedCount": 1, "oldestUnsealedAgeSec": 0}]),
+            json!({}),
+        );
+        assert!(!text(&pointer(&local, true, 0)).contains("unpublished events"));
+        let project = status(
+            json!([{"stream": "project", "unsealedCount": 1, "oldestUnsealedAgeSec": 0}]),
+            json!({}),
+        );
+        assert!(text(&pointer(&project, true, 0))
+            .ends_with("unpublished events; run `fgos events status`"));
+        // No remote to publish to, or a push that succeeded within the day: nothing is overdue.
+        assert!(!text(&pointer(&project, false, 0)).contains("unpublished events"));
+        let pushed = status(
+            json!([{"stream": "project", "unsealedCount": 1, "oldestUnsealedAgeSec": 0}]),
+            json!({"lastPush": {"remote": "origin", "time": 1_000_000}}),
+        );
+        assert!(!text(&pointer(&pushed, true, 1_000_100)).contains("unpublished events"));
+        assert!(text(&pointer(&pushed, true, 1_000_000 + 90_000)).contains("unpublished events"));
+    }
+
+    #[test]
+    fn a_machine_ref_another_clone_wrote_warns_and_names_the_fix() {
+        assert_eq!(machine_id_of("m1", false).message.as_deref(), Some("m1"));
+        assert_eq!(
+            machine_id_of("m1", true).message.as_deref(),
+            Some("warning: event-store-machine-ref-shared: m1; set git config fgos.machineId <other-id> in one clone")
+        );
+    }
+
+    #[cfg(target_os = "linux")]
+    fn row_of(f: &Fixture, id: &str) -> RowResult {
+        judge(&f.run(), id).unwrap()
+    }
+
+    #[cfg(target_os = "linux")]
+    #[test]
+    fn a_fresh_repository_passes_the_open_root_machine_id_and_incidents_rows_and_the_legacy_layout_row(
+    ) {
+        let f = Fixture::new("fresh");
+        for id in ROW_IDS {
+            let row = row_of(&f, id);
+            assert!(row.passed, "{id}: {}", text(&row));
+        }
+        assert_eq!(
+            text(&row_of(&f, "event-store-machine-id")),
+            "fixture-machine"
+        );
+        assert_eq!(
+            text(&row_of(&f, "event-store-incidents")),
+            "no unsealed backlog, integrity problem or unpublished event"
+        );
+    }
+
+    #[cfg(target_os = "linux")]
+    #[test]
+    fn a_missing_open_root_fails_with_the_path() {
+        let f = Fixture::new("noroot");
+        std::fs::remove_dir_all(f.repo.join(".git/fgos")).unwrap();
+        let row = row_of(&f, "event-store-open-root");
+        assert!(!row.passed);
+        assert!(
+            text(&row).starts_with("ENOENT: no such file or directory, lstat '"),
+            "{}",
+            text(&row)
+        );
+    }
+
+    #[cfg(target_os = "linux")]
+    #[test]
+    fn a_stream_for_a_branch_with_no_live_worktree_is_an_orphan_and_a_live_worktree_branch_key_is_not(
+    ) {
+        let f = Fixture::new("orphans");
+        f.git(&["commit", "--allow-empty", "-qm", "root"]);
+        let linked = f.temp.join("linked");
+        f.git(&[
+            "worktree",
+            "add",
+            "-qb",
+            "Feature/Live_One",
+            linked.to_str().unwrap(),
+        ]);
+        std::fs::create_dir_all(f.repo.join(".git/fgos/events/branch:feature-live-one")).unwrap();
+        assert!(!text(&row_of(&f, "event-store-incidents")).contains("orphan"));
+        f.git(&["worktree", "remove", linked.to_str().unwrap()]);
+        assert!(text(&row_of(&f, "event-store-incidents"))
+            .starts_with("warning: 1 orphan branch stream(s)"));
+    }
+
+    #[cfg(target_os = "linux")]
+    #[test]
+    fn a_persisted_integrity_record_fails_the_incidents_row() {
+        let f = Fixture::new("integrity");
+        let project = f.repo.join(".git/fgos/events/project");
+        std::fs::create_dir_all(&project).unwrap();
+        std::fs::write(
+            project.join("integrity.json"),
+            r#"{"code":"event-store-ref-moved","ranges":[]}"#,
+        )
+        .unwrap();
+        let row = row_of(&f, "event-store-incidents");
+        assert!(!row.passed);
+        assert_eq!(
+            text(&row),
+            "1 integrity problem(s); run `fgos events status`"
+        );
+    }
+
+    #[cfg(target_os = "linux")]
+    #[test]
+    fn a_run_remembers_a_failed_setup_context_for_every_row_and_a_new_run_observes_the_repaired_file(
+    ) {
+        let f = Fixture::new("config");
+        let config = f.repo.join(".fgos/config.yaml");
+        std::fs::write(&config, "eventStore: half-written: [\n").unwrap();
+        let run = f.run();
+        let first = judge(&run, "event-store-open-root").unwrap();
+        assert!(!first.passed);
+        assert!(
+            text(&first).starts_with("event-store-config: "),
+            "{}",
+            text(&first)
+        );
+        assert_eq!(
+            text(&judge(&run, "event-store-machine-id").unwrap()),
+            text(&first),
+            "one remembered failure"
+        );
+        let pointer = judge(&run, "event-store-incidents").unwrap();
+        assert!(
+            pointer.passed,
+            "a pointer never fails; the open-root row carries the failure"
+        );
+        assert!(text(&pointer).starts_with("warning: incidents not read: event-store-config: "));
+        std::fs::write(&config, "{}\n").unwrap();
+        assert!(row_of(&f, "event-store-open-root").passed);
+    }
+
+    #[cfg(target_os = "linux")]
+    #[test]
+    fn a_malformed_seal_coalescing_window_fails_every_row() {
+        let f = Fixture::new("coalesce");
+        let config = f.repo.join(".fgos/config.yaml");
+        for bad in ["0", "-5", "2.5", "'30'", "null"] {
+            std::fs::write(
+                &config,
+                format!("eventStore:\n  seal:\n    coalesceSec: {bad}\n"),
+            )
+            .unwrap();
+            let row = row_of(&f, "event-store-open-root");
+            assert!(!row.passed, "coalesceSec {bad}");
+            assert!(text(&row).contains("coalesceSec"), "{}", text(&row));
+        }
+        std::fs::write(&config, "eventStore:\n  seal:\n    coalesceSec: 5\n").unwrap();
+        assert!(row_of(&f, "event-store-open-root").passed);
+    }
+
+    #[cfg(all(target_os = "linux", unix))]
+    #[test]
+    fn the_lock_dirs_fix_repairs_modes_below_fgos_and_creates_a_missing_tree_private() {
+        use std::os::unix::fs::PermissionsExt;
+        let f = Fixture::new("lockfix");
+        let locks = f.repo.join(".git/fgos/events/locks");
+        let owned = [
+            locks.clone(),
+            locks.parent().unwrap().to_path_buf(),
+            f.repo.join(".git/fgos"),
+        ];
+        for dir in &owned[..2] {
+            std::fs::set_permissions(dir, std::fs::Permissions::from_mode(0o775)).unwrap();
+            assert_eq!(
+                fix(&f.run(), LOCK_DIRS_FIX).unwrap().changed,
+                Some(true),
+                "{dir:?}"
+            );
+            for each in &owned {
+                assert_eq!(
+                    std::fs::metadata(each).unwrap().permissions().mode() & 0o777,
+                    0o700
+                );
+            }
+            assert_eq!(fix(&f.run(), LOCK_DIRS_FIX).unwrap().changed, Some(false));
+        }
+        std::fs::remove_dir_all(&owned[2]).unwrap();
+        assert_eq!(fix(&f.run(), LOCK_DIRS_FIX).unwrap().changed, Some(true));
+        assert!(owned.iter().all(|dir| dir.is_dir()));
     }
 
     #[test]

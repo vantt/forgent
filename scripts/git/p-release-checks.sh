@@ -47,7 +47,8 @@ check() { # name, command...
 check c5-git-gate          cargo test --locked -p fgos-distribution --lib git_gate
 check c5-activation-locks  cargo test --locked -p fgos-distribution --test activation_lock_multiprocess
 check c5-fgctl-wal-gate    cargo test --locked -p fgctl --test git_wal_activation_gate
-check c5-node-doctor-rows  node --test test/setup/git-checks.test.mjs test/distribution/native-addon.test.mjs
+check c5-doctor-rows       cargo test --locked -p fgos --bin fgos doctor::
+check c5-node-native-addon node --test test/distribution/native-addon.test.mjs
 # V-PACK: one combined addon, manifest digests, no PATH/cwd fallback, a second load refused.
 check v-pack-native-load   node --test test/git/native-load.test.mjs
 # Live old process during rollback and forward activation (E3's rollback row, owner budget:

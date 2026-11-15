@@ -22,7 +22,6 @@ import fs from 'node:fs'; import path from 'node:path';
 import { sandboxGit } from './scripts/lib/sandbox-git.mjs';
 import { loadNativeAddon } from './src/git/native.mjs';
 import { openStore } from './src/event-store/index.mjs';
-import { fixGitFetchMapping } from './src/setup/git-checks.mjs';
 import { gitAddonDirectory } from './scripts/lib/git-addon-stage.mjs';
 import { resolveHostBin } from './src/util/host-bin.mjs';
 import { execFileSync } from 'node:child_process';
@@ -49,8 +48,9 @@ function clone(name, machine) {
   fs.mkdirSync(path.join(repo, '.fgos/locks/activation.lock'), { recursive: true });
   fs.writeFileSync(path.join(repo, '.fgos/locks/activation.lock/TOMBSTONE'), JSON.stringify({ lock: 'activation', by: 'fgos git', at: 'forge-probe' }));
   process.env.FGOS_STATE_ROOT = state;
-  const mapping = fixGitFetchMapping(repo, loaderOptions);
-  if (!mapping.changed) throw new Error(mapping.message);
+  // The fetch mappings go in through RepositoryConfig, the one door that writes them (what `fgos doctor --fix` runs).
+  addon.prepareGitDriverDirectories(state);
+  addon.ensureGitFetchMapping(state, repo, repo, 'origin', addon.gitFetchMappings('origin'), `forge-probe-${machine}`);
   const resolved = addon.resolveEventStore(repo, state, repo);
   return { repo, state, store: openStore(resolved, resolved.machineId, [contract], loaderOptions) };
 }

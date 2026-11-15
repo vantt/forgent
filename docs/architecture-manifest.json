@@ -1064,6 +1064,30 @@
       "reason": "the `events`, `session` and `gateway` verbs are native in the host (apps/fgos/src/wiring/{events,session,gateway_control}.rs): the Node use cases, the session writers and the gateway control module are deleted, Node reads the registry only through `fgos session list`, and no file may bring one of these names back"
     },
     {
+      "job": "retired Node Git and Event Store doctor rows",
+      "kind": "door",
+      "patterns": [
+        "\\bcheckGit\\b",
+        "\\bcheckEventStore\\b",
+        "\\beventStoreDoctor\\b",
+        "\\beventStoreDoctorOf\\b",
+        "\\beventStoreMappingProblems\\b",
+        "\\beventStoreSetupContext\\b",
+        "\\bfixGitWal\\b",
+        "\\bfixGitDriverDirectories\\b",
+        "\\bfixGitFetchMapping\\b",
+        "\\bcompatibleGitContracts\\b",
+        "\\bdescribeGitError\\b",
+        "\\bretentionNote\\b",
+        "\\bgitFloor\\b",
+        "\\bcheckNodeAndGit\\b",
+        "\\bcheckMainCheckoutHookWired\\b"
+      ],
+      "allowed": [],
+      "debt": [],
+      "reason": "the Git and Event Store doctor rows, the node-and-git floor row, the hooks row and their fixes are judged in Rust (apps/fgos/src/wiring/doctor/{git,event_store}.rs over fgos-git repository_facts and fgos-event-store diagnostics): the Node row bodies and their helpers are deleted and no file may bring one of these names back"
+    },
+    {
       "job": "doctor readiness registry",
       "kind": "door",
       "patterns": [
@@ -1383,8 +1407,6 @@
     "src/setup/agent-wiring.mjs": "infra",
     "src/setup/version-info.mjs": "infra",
     "src/setup/agy-permissions.mjs": "infra",
-    "src/setup/git-checks.mjs": "infra",
-    "src/setup/git-retention-note.mjs": "infra",
     "src/setup/run-supervisor-checks.mjs": "infra",
     "src/setup/terminal-control-checks.mjs": "infra",
     "src/setup/omp-natives-checks.mjs": "infra",
@@ -1518,7 +1540,6 @@
     "src/event-store/seal-coalescing.mjs": "infra",
     "src/verbs/events/context.mjs": "use-case",
     "src/verbs/events/rebuild.mjs": "use-case",
-    "src/setup/event-store-checks.mjs": "infra",
     "src/setup/event-store-fixes.mjs": "use-case",
     "src/event-store/config.mjs": "infra",
     "src/git/scoped-commit.mjs": "infra",

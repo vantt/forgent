@@ -312,7 +312,7 @@ test('Windows lock-taking addon doors refuse by name before resolving paths', { 
   assert.throws(() => addon.ensureGitFetchMapping('missing-state', 'missing-repo', 'missing-main', 'origin', ['+refs/fgos/events/*:refs/fgos/remotes/origin/events/*'], 'test'), /git-lockscope-unavailable-windows/);
 });
 
-test('umask 002 driver directories are created safely, repaired by setup, and diagnosed without chmod by doctor', { skip: process.platform === 'win32' }, () => {
+test('umask 002 driver directories are created safely, repaired by the driver preparation, and refused without chmod by an inspection', { skip: process.platform === 'win32' }, () => {
   const temp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-driver-umask-'));
   const probe = `
     const assert = require('node:assert/strict');
@@ -331,89 +331,18 @@ test('umask 002 driver directories are created safely, repaired by setup, and di
     fs.mkdirSync(old);
     fs.mkdirSync(path.join(old, 'git-empty-hooks'));
     assert.equal(mode(old), 0o775);
-    const {checkGit, fixGitDriverDirectories, fixGitFetchMapping} = await import(process.argv[3]);
     process.env.FGOS_STATE_ROOT = old;
-    const options = { descriptor: JSON.parse(process.argv[4]) };
-    const before = checkGit(root, 'git-component-compatible', options);
-    assert.equal(before.passed, false);
-    assert.match(before.message, /mode 0775.*group.world writable.*fgos doctor --fix.*git-driver-directories/);
+    assert.throws(() => addon.inspectGit(old, root, root, 'origin'), error => /mode 0775.*group.world writable.*fgos doctor --fix.*git-driver-directories/.test(error.message));
     assert.equal(mode(old), 0o775);
-    const fixed = fixGitDriverDirectories(root, options);
-    assert.equal(fixed.changed, true, fixed.message);
+    assert.equal(addon.prepareGitDriverDirectories(old), true);
     assert.equal(mode(old), 0o755);
     assert.equal(mode(path.join(old, 'git-empty-hooks')), 0o500);
-    const after = checkGit(root, 'git-component-compatible', options);
-    assert.equal(after.passed, true, after.message);
+    assert.equal(addon.inspectGit(old, root, root, 'origin').notARepository, true);
     assert.equal(mode(root), 0o700);
     const {execFileSync} = require('node:child_process');
     const repo = path.join(root, 'repo');
-    const git = (...args) => execFileSync('git', ['-C', repo, ...args], {encoding:'utf8'}).trim();
     execFileSync('git', ['init', '-q', repo]);
-    git('remote', 'add', 'upstream', '/fixture/remote');
-    git('remote', 'add', 'origin', '/fixture/origin');
-    const fence = path.join(repo, '.fgos/locks/activation.lock');
-    fs.mkdirSync(fence, {recursive:true});
-    fs.writeFileSync(path.join(fence, 'TOMBSTONE'), JSON.stringify({at:'fixture',v:1,lock:'activation',by:'fgos git'}));
-    assert.equal(fixGitFetchMapping(repo, options).changed, true);
-    git('config', 'http.https://github.com/.extraheader', 'AUTHORIZATION: secret');
-    const transport = checkGit(repo, 'git-repository-config', options);
-    assert.equal(transport.passed, false);
-    assert.match(transport.message, /persist-credentials: false/);
-    assert.match(transport.message, /trusted global credential helper or GIT_CONFIG_GLOBAL/);
-    assert.doesNotMatch(transport.message, /AUTHORIZATION: secret/);
-    assert.equal(git('config', '--get', 'http.https://github.com/.extraheader'), 'AUTHORIZATION: secret');
-    git('config', '--unset', 'http.https://github.com/.extraheader');
-    assert.equal(checkGit(repo, 'git-repository-config', options).passed, true);
-    git('config', 'credential.helper', 'untrusted-helper');
-    const localHelper = checkGit(repo, 'git-repository-config', options);
-    assert.equal(localHelper.passed, false);
-    assert.match(localHelper.message, /persist-credentials: false/);
-    git('config', '--unset', 'credential.helper');
-    // A real global helper is permitted; private HOME keeps host config intact.
-    const priorHome = process.env.HOME;
-    const priorXdg = process.env.XDG_CONFIG_HOME;
-    const trustedHome = path.join(root, 'trusted-home');
-    fs.mkdirSync(trustedHome);
-    fs.writeFileSync(path.join(trustedHome, '.gitconfig'), '[credential]\\nhelper = trusted-helper\\n');
-    process.env.HOME = trustedHome;
-    process.env.XDG_CONFIG_HOME = path.join(trustedHome, '.config');
-    assert.equal(checkGit(repo, 'git-repository-config', options).passed, true);
-    assert.match(checkGit(repo, 'git-component-compatible', options).message, /^info: .+: .+; .+/);
-    if (priorHome === undefined) delete process.env.HOME; else process.env.HOME = priorHome;
-    if (priorXdg === undefined) delete process.env.XDG_CONFIG_HOME; else process.env.XDG_CONFIG_HOME = priorXdg;
-
-    const oldOrigin = addon.gitFetchMappings('origin').find(r => r.includes('legacy*')).replaceAll('*', '');
-    git('config', '--add', 'remote.origin.fetch', oldOrigin);
-    const { writeProjectConfig } = await import(${JSON.stringify(new URL('../helpers/config-fixture.mjs', import.meta.url).href)});
-    writeProjectConfig(repo, {eventStore:{remote:'upstream'}});
-    const obsolete = addon.gitFetchMappings('upstream').find(r => r.includes('legacy*')).replaceAll('*', '');
-    git('config', '--add', 'remote.upstream.fetch', obsolete);
-    assert.equal(checkGit(repo, 'git-repository-config', options).passed, false);
-    const mappingFix = fixGitFetchMapping(repo, options);
-    assert.equal(mappingFix.changed, true, mappingFix.message);
-    const mappingCheck = checkGit(repo, 'git-repository-config', options);
-    assert.equal(mappingCheck.passed, true, mappingCheck.message);
-    assert.equal(git('config', '--get-all', 'remote.origin.fetch').includes(oldOrigin), false);
-    git('config', '--add', 'remote.origin.fetch', oldOrigin);
-    const originCheck = checkGit(repo, 'git-repository-config', options);
-    assert.equal(originCheck.passed, false);
-    assert.match(originCheck.message, /obsolete exact legacy mapping.*plain fetch.*doctor --fix/);
-    assert.equal(fixGitFetchMapping(repo, options).changed, true);
-    assert.equal(git('config', '--get-all', 'remote.upstream.fetch').split('\\n').includes(obsolete), false);
-    assert.equal(fixGitFetchMapping(repo, options).changed, false);
-    git('config', '--add', 'remote.upstream.fetch', obsolete);
-    assert.equal(checkGit(repo, 'git-repository-config', options).passed, false);
-    assert.equal(fixGitFetchMapping(repo, options).changed, true);
-    assert.equal(checkGit(repo, 'git-repository-config', options).passed, true);
-
-    // Reserved legacy mirrors are diagnosed, never silently read as event tips.
-    git('config', 'user.name', 'Fixture'); git('config', 'user.email', 'fixture@example.test');
-    git('commit', '--allow-empty', '-qm', 'fixture');
-    const badRef = 'refs/fgos/remotes/origin/legacy/events/m';
-    git('update-ref', badRef, 'HEAD');
-    const reserved = checkGit(repo, 'git-repository-config', options);
-    assert.equal(reserved.passed, false); assert.ok(reserved.message.includes(badRef));
-    git('update-ref', '-d', badRef);
+    const inspect = (state = old) => addon.inspectGit(state, repo, repo, 'origin');
 
     const other = path.join(root, 'other');
     fs.mkdirSync(other);
@@ -421,7 +350,7 @@ test('umask 002 driver directories are created safely, repaired by setup, and di
     fs.symlinkSync(old, link);
     assert.equal(addon.prepareGitDriverDirectories(link), false);
     process.env.FGOS_STATE_ROOT = link;
-    assert.equal(checkGit(repo, 'git-component-compatible', options).passed, true);
+    assert.equal(inspect(link).notARepository, undefined);
     fs.chmodSync(old, 0o775);
     assert.equal(addon.prepareGitDriverDirectories(link), true);
     assert.equal(mode(old), 0o755);
@@ -438,9 +367,7 @@ test('umask 002 driver directories are created safely, repaired by setup, and di
     fs.unlinkSync(path.join(hooks, 'foreign'));
     fs.chmodSync(hooks, 0o000);
     if (process.getuid() !== 0) {
-      const unreadable = checkGit(repo, 'git-component-compatible', options);
-      assert.equal(unreadable.passed, false); assert.ok(unreadable.message.includes(hooks));
-      assert.match(unreadable.message, /restore owner read.search.*doctor --fix/);
+      assert.throws(() => inspect(), error => error.message.includes(hooks) && /restore owner read.search.*doctor --fix/.test(error.message));
       assert.throws(() => addon.prepareGitDriverDirectories(old), error => error.message.includes(hooks) && /restore owner read.search.*doctor --fix/.test(error.message));
     }
     fs.chmodSync(hooks, 0o700);
@@ -455,13 +382,13 @@ test('umask 002 driver directories are created safely, repaired by setup, and di
     const custom = path.join(root, 'custom');
     fs.mkdirSync(custom, {mode:0o700});
     process.env.FGOS_STATE_ROOT = custom;
-    assert.equal(checkGit(repo, 'git-component-compatible', options).passed, true);
+    assert.equal(inspect(custom).notARepository, undefined);
     fs.copyFileSync(path.join(old, 'git-floor-verdict.json'), path.join(custom, 'git-floor-verdict.json'));
     fs.chmodSync(custom, 0o775);
     assert.equal(addon.prepareGitDriverDirectories(custom), true);
     assert.equal(mode(custom), 0o755);
   `;
   try {
-    execFileSync('/bin/sh', ['-c', 'umask 002; exec "$@"', 'umask-probe', process.execPath, '--input-type=commonjs', '-e', `(async()=>{${probe}})().catch(e=>{console.error(e);process.exit(1)})`, built.addon, temp, new URL('../../src/setup/git-checks.mjs', import.meta.url).href, JSON.stringify(descriptor)], { encoding: 'utf8' });
+    execFileSync('/bin/sh', ['-c', 'umask 002; exec "$@"', 'umask-probe', process.execPath, '--input-type=commonjs', '-e', `(async()=>{${probe}})().catch(e=>{console.error(e);process.exit(1)})`, built.addon, temp], { encoding: 'utf8' });
   } finally { fs.rmSync(temp, { recursive: true, force: true }); }
 });

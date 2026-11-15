@@ -2,7 +2,7 @@
 // and the fetch mappings to Git (`git-publication-refspecs`).
 import fs from 'node:fs';
 import path from 'node:path';
-import { eventStoreSetupContext } from './event-store-checks.mjs';
+import { eventStoreFacts } from '../event-store/index.mjs';
 
 function realDirectory(dir) {
   const absolute = path.resolve(dir);
@@ -27,7 +27,7 @@ function privateDirectories(openRoot) {
   return changed;
 }
 export function fixEventStoreLockDirs(cwd, options = {}) {
-  const { facts } = eventStoreSetupContext(cwd, options);
-  const changed = privateDirectories(facts.openRoot);
+  const { openRoot } = eventStoreFacts(cwd, { stateRoot: options.stateRoot, trustedMain: options.trustedMain ?? cwd, loaderOptions: options.loaderOptions });
+  const changed = privateDirectories(openRoot);
   return { changed, message: 'Event Store locks directory and its parents up to the Git common dir are mode 0700' };
 }

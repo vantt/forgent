@@ -13,6 +13,7 @@ import path from 'node:path';
 import { execFileSync, spawnSync } from 'node:child_process';
 import crypto from 'node:crypto';
 import { DOCTOR_CHECKS, FIX_REGISTRATIONS, registerCheck, registerFix, runFixes } from '../../src/setup/checks.mjs';
+import { registryEntries } from './helpers/setup-checks-harness.mjs';
 import { findWorkflowStageOperationProblems, checkTaskSpecsResolve, checkDomainWorkflowOperationsCoverage } from '../helpers/packaged-definitions.mjs';
 import { writeGlobalConfig, writeProjectConfig, writeRawLegacyProjectConfig } from '../helpers/config-fixture.mjs';
 
@@ -70,7 +71,7 @@ test('a new module can register a check via registrations.mjs and see it in chec
 
 test('registering a check with a duplicate id throws rather than silently shadowing the original', () => {
   assert.throws(
-    () => registerCheck({ id: 'node-version-and-git', description: 'dup', check: () => ({ passed: true, message: '' }) }),
+    () => registerCheck({ id: 'cli-version-visible', description: 'dup', check: () => ({ passed: true, message: '' }) }),
     /already registered/,
   );
 });
@@ -1194,22 +1195,6 @@ test('the claims walk reads agent definitions in the door tier order: first tier
 
 const REGISTRY_PATH = new URL('../../packages/distribution/contracts/doctor-registry.v1.json', import.meta.url);
 const CONFIG_ROWS_PATH = new URL('../../packages/config/contracts/doctor-rows.v1.json', import.meta.url);
-
-/** The registry with its config group expanded the way the host expands it. */
-function registryEntries() {
-  const registry = JSON.parse(fs.readFileSync(REGISTRY_PATH, 'utf8'));
-  const config = JSON.parse(fs.readFileSync(CONFIG_ROWS_PATH, 'utf8'));
-  const group = registry.groups.config;
-  const rowId = (id) => group.idMap[id] ?? id;
-  const fixId = (id) => group.fixIdMap[id] ?? `${group.fixIdPrefix}${id}`;
-  const rows = registry.rows.flatMap((entry) => (entry.group === 'config'
-    ? config.rows.map((row) => ({ id: rowId(row.id), owner: group.owner }))
-    : [{ id: entry.id, owner: entry.owner, description: entry.description }]));
-  const fixes = registry.fixes.flatMap((entry) => (entry.group === 'config'
-    ? config.fixes.map((id) => ({ id: fixId(id), owner: group.owner }))
-    : [{ id: entry.id, owner: entry.owner }]));
-  return { rows, fixes };
-}
 
 // A row the registry gives to Rust keeps its Node body, and is judged by it through the bridge, until the registry's
 // `inRust` lists it: the phase that adds the adapter lists the id there and deletes the body.

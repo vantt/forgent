@@ -10,7 +10,7 @@ import path from 'node:path';
 import { execFileSync, spawnSync } from 'node:child_process';
 
 import { DOCTOR_CHECKS } from '../../src/setup/checks.mjs';
-import { runHostDoctor } from './helpers/setup-checks-harness.mjs';
+import { registryEntries, runHostDoctor } from './helpers/setup-checks-harness.mjs';
 import { checkBlindStepsUseProvenPools } from '../../src/setup/blind-steps-proven-pools.mjs';
 import { checkSeatBindingDryBind } from '../../src/setup/seat-binding-checks.mjs';
 
@@ -122,10 +122,7 @@ test('fgos doctor still runs and lists every check when a workflow file is malfo
   const run = runHostDoctor(['--json'], { cwd: root });
   assert.equal(run.status, 0, run.stderr);
   const checks = JSON.parse(run.stdout).data.checks;
-  // The host also judges the rows a Rust owner has (the registry's exact list is pinned in registrations.test.mjs): every
-  // row Node still has a body for ran, in the order the bodies register in.
-  const nodeIds = new Set(DOCTOR_CHECKS.map((c) => c.id));
-  assert.deepEqual(checks.map((c) => c.id).filter((id) => nodeIds.has(id)), DOCTOR_CHECKS.map((c) => c.id), 'every registered check ran');
+  assert.deepEqual(checks.map((c) => c.id), registryEntries().rows.map((row) => row.id), 'every row of the registry ran');
   const byId = Object.fromEntries(checks.map((c) => [c.id, c]));
   assert.match(byId['workflow-capabilities-configured'].message, /core\/workflows\/broken\.yaml: cannot be parsed/);
 });

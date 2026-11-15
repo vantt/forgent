@@ -946,10 +946,10 @@ parser. Sync records the actual fetch and push attempts separately in optional
 `lastFetch`/`lastPush` fields of `sync.json`; old records remain readable, and a
 `--no-push` sync never advances lastPush. Doctor reads these observations and
 Git's existing floor, RepositoryConfig mapping, machine-id and pinned URL facts;
-it does not repair the store. Phase 09 must create one `eventStoreDoctor(cwd,
-options)` per doctor invocation and use that checker for all Event Store rows;
-its lazy context/status snapshot is shared only within that run. Standalone
-`checkEventStore` remains a fresh single-check invocation. Ahead/behind counts
+it does not repair the store. The host's doctor (`apps/fgos/src/wiring/doctor/event_store.rs`)
+builds one setup context per doctor invocation and judges all Event Store rows from it;
+its lazy status snapshot is shared only within that run, and a failed context is
+remembered, not retried per row. Ahead/behind counts
 share two paginated reachability walks (one per distinct tip) across both counts.
 Git Inspect stops include the stop commits and do not exclude their ancestry,
 so treating that port as `rev-list A ^B` would miscount shared history.
@@ -960,7 +960,7 @@ when `--stream` is explicit. Only warning-capable checks emit
 The machine id is minted by Identity's mint, which uses the atomic durable-file install-once door;
 concurrent mints expose exactly one complete identity. The state root is
 canonicalized so symlinked ancestors are supported; the machine-id leaf remains
-protected by the atomic installer. Git's `fixGitFetchMapping` owns the fetch
+protected by the atomic installer. Git's `git-publication-refspecs` doctor fix (`apps/fgos/src/wiring/doctor/git.rs`) owns the fetch
 mappings, through Git's journaled `ensure_fetch_mapping`, and never writes push
 mappings. Doctor additionally refuses fetch wildcards that
 could include local/branch event namespaces. Lock-directory setup refuses symlink

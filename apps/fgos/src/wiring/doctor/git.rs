@@ -12,7 +12,6 @@ use fgos_git::{granted_fetch_mappings, GitDriver, OperationError, RepositoryConf
 use serde_json::{json, Value};
 use std::cell::OnceCell;
 use std::path::{Path, PathBuf};
-use std::time::Duration;
 
 pub const ROW_IDS: &[&str] = &[
     "node-version-and-git",
@@ -28,8 +27,6 @@ pub const FIX_IDS: &[&str] = &[
     "git-publication-refspecs",
 ];
 
-const MIN_NODE_MAJOR: u32 = 18;
-const NODE_PROBE_TIMEOUT: Duration = Duration::from_secs(10);
 pub const GROUP: Rows = Rows {
     rows: ROW_IDS,
     fixes: FIX_IDS,
@@ -52,6 +49,8 @@ fn run_fixes(root: &Path, ids: &[&str]) -> Vec<FixResult> {
         .collect()
 }
 
+/// What the release requires of Node (`requires.node`).
+const NODE_REQUIREMENT: &str = ">=18";
 const NO_REMOTE_FIX: &str = "git remote add origin <url> && fgos doctor --fix";
 const TRANSPORT_REMEDY: &str = "For actions/checkout use persist-credentials: false, remove its repo-local http.<url>.extraheader, and configure a trusted global credential helper or GIT_CONFIG_GLOBAL-level setting. Doctor never moves credentials automatically.";
 /// A project's own `.githooks/pre-commit` is fgOS's guard when it carries this name (the guard's own header).
@@ -428,22 +427,11 @@ fn incidents(context: &Context, facts: &RepositoryFacts, now_ms: u64) -> RowResu
 }
 
 fn node_and_git(run: &Run) -> RowResult {
+    // Node stays a release requirement until the runner moves; the one reader of its version is packaging's.
     let version = match node_version() {
         Ok(version) => version,
         Err(message) => return result(false, message, None),
     };
-    let major = version
-        .trim_start_matches('v')
-        .split('.')
-        .next()
-        .and_then(|major| major.parse::<u32>().ok());
-    if major.is_none_or(|major| major < MIN_NODE_MAJOR) {
-        return result(
-            false,
-            format!("node {version} — need >={MIN_NODE_MAJOR}"),
-            None,
-        );
-    }
     let floor = match run.git() {
         Ok(context) => match &context.inspection {
             Inspection::NotARepository { floor } => floor,
@@ -461,23 +449,10 @@ fn node_and_git(run: &Run) -> RowResult {
     result(true, format!("node {version}, git available"), None)
 }
 
-/// The version the Node on PATH reports (`v22.1.0`); the row's Node half asks the Node the bridged rows run in.
+/// The version of the Node on PATH, or why it does not meet the release's requirement.
 fn node_version() -> Result<String, String> {
-    let env: Vec<(String, String)> = std::env::vars().collect();
-    match fgos_process::spawn::run_bounded(
-        "node",
-        ["--version"],
-        &env,
-        None,
-        None,
-        NODE_PROBE_TIMEOUT,
-    ) {
-        Ok(fgos_process::spawn::Outcome::Exited(out)) if out.status.success() => {
-            Ok(String::from_utf8_lossy(&out.stdout).trim().to_owned())
-        }
-        Ok(_) => Err("node is not available: `node --version` failed".to_owned()),
-        Err(error) => Err(format!("node is not available: {error}")),
-    }
+    fgos_distribution::init::check_node_requirement(NODE_REQUIREMENT)
+        .map_err(|error| format!("node is not available: {error}"))
 }
 
 /// The row of `main-checkout-hook-wired`: it applies only to a project whose `.githooks/pre-commit` is fgOS's own
@@ -776,6 +751,461 @@ mod tests {
         let other = unreadable("git-repository-config", "plain");
         assert_eq!(other.message.as_deref(), Some("plain"));
         assert!(!other.passed);
+    }
+
+    use crate::wiring::doctor::testkit::Fixture;
+
+    fn row_of(f: &Fixture, id: &str) -> RowResult {
+        judge(&f.run(), id).unwrap()
+    }
+
+    fn message(row: &RowResult) -> String {
+        row.message.clone().unwrap_or_default()
+    }
+
+    fn fixed(f: &Fixture, id: &str) -> FixResult {
+        fix(&f.run(), id).unwrap()
+    }
+
+    #[test]
+    fn the_journal_row_fails_with_git_fence_missing_when_a_git_wal_has_lost_the_controller_activation_fence(
+    ) {
+        let f = Fixture::new("fence");
+        assert_eq!(fixed(&f, "git-wal-dir").changed, Some(true));
+        assert!(row_of(&f, "git-operation-journal").passed);
+        std::fs::remove_dir_all(f.repo.join(".fgos/locks/activation.lock")).unwrap();
+        let row = row_of(&f, "git-operation-journal");
+        assert!(!row.passed);
+        let text = message(&row);
+        assert!(
+            text.starts_with("git-fence-missing: ") && text.contains("fgctl upgrade"),
+            "{text}"
+        );
+    }
+
+    #[test]
+    fn the_journal_row_fails_and_names_the_fix_while_no_git_wal_exists() {
+        let f = Fixture::new("nowal");
+        let row = row_of(&f, "git-operation-journal");
+        assert!(!row.passed);
+        let text = message(&row);
+        assert!(
+            text.contains("not initialized")
+                && text.contains("fgos doctor --fix")
+                && text.contains("git-wal-dir"),
+            "{text}"
+        );
+        assert_eq!(row.detail.unwrap()["journal"]["initialized"], json!(false));
+    }
+
+    #[test]
+    fn the_wal_fix_initializes_once_and_reports_nothing_changed_the_second_time() {
+        let f = Fixture::new("walfix");
+        assert_eq!(fixed(&f, "git-wal-dir").changed, Some(true));
+        let again = fixed(&f, "git-wal-dir");
+        assert_eq!(again.changed, Some(false));
+        assert_eq!(
+            again.message.as_deref(),
+            Some("Git WAL initialized and trusted")
+        );
+        assert!(row_of(&f, "git-operation-journal").passed);
+    }
+
+    #[test]
+    fn the_driver_directories_fix_is_current_after_the_first_call() {
+        let f = Fixture::new("dirs");
+        fixed(&f, "git-driver-directories");
+        let again = fixed(&f, "git-driver-directories");
+        assert_eq!(again.changed, Some(false));
+        assert!(again
+            .message
+            .unwrap()
+            .starts_with("fgOS Git driver directories"));
+    }
+
+    #[test]
+    fn the_repository_rows_report_information_not_a_failure_outside_a_git_repository() {
+        let f = Fixture::plain("norepo");
+        for id in [
+            "git-repository-config",
+            "git-operation-journal",
+            "git-incidents",
+        ] {
+            let row = row_of(&f, id);
+            assert!(row.passed, "{id}");
+            assert_eq!(message(&row), "info: not a Git repository", "{id}");
+            assert!(row.detail.is_none() && row.status.is_none());
+        }
+        let compat = row_of(&f, "git-component-compatible");
+        assert!(compat.passed);
+        assert_eq!(
+            message(&compat),
+            "the Git addon, its contracts and the Git feature floor are compatible"
+        );
+    }
+
+    #[test]
+    fn the_incidents_row_never_fails_it_counts_native_locks_and_a_merge_in_progress_and_points_to_fgos_git_status(
+    ) {
+        let f = Fixture::new("incidents");
+        f.git(&["commit", "-q", "--allow-empty", "-m", "seed"]);
+        let clean = row_of(&f, "git-incidents");
+        assert!(clean.passed);
+        let text = message(&clean);
+        assert!(
+            text.starts_with("no pending Git operation, native lock or merge in progress; ")
+                && text.ends_with("`fgos git status`"),
+            "{text}"
+        );
+        std::fs::write(f.repo.join(".git/index.lock"), "").unwrap();
+        let head = f.git(&["rev-parse", "HEAD"]);
+        std::fs::write(f.repo.join(".git/MERGE_HEAD"), format!("{head}\n")).unwrap();
+        let open = row_of(&f, "git-incidents");
+        assert!(open.passed);
+        assert_eq!(
+            message(&open),
+            "warning: 1 native lock(s), a merge in progress; run `fgos git status` (`fgos git recover` settles interrupted operations)"
+        );
+        assert_eq!(
+            open.detail.unwrap(),
+            json!({"pendingCount": 0, "nativeLocks": 1, "mergeInProgress": head})
+        );
+    }
+
+    #[test]
+    fn the_repository_config_row_skips_naming_the_command_that_adds_a_remote_while_there_is_no_remote(
+    ) {
+        let f = Fixture::new("noremote");
+        let row = row_of(&f, "git-repository-config");
+        assert!(row.passed, "{}", message(&row));
+        assert_eq!(row.status, Some(Status::Skip));
+        assert_eq!(
+            row.fix_command.as_deref(),
+            Some("git remote add origin <url> && fgos doctor --fix")
+        );
+        assert!(message(&row).contains("no Git remote \"origin\""));
+    }
+
+    #[test]
+    fn the_fetch_mapping_fix_has_nothing_to_repair_and_says_so_without_a_failure_while_there_is_no_remote(
+    ) {
+        let f = Fixture::new("noremotefix");
+        let outcome = fixed(&f, "git-publication-refspecs");
+        let text = outcome.message.unwrap();
+        assert!(
+            !text.contains("warning") && !text.contains("refused"),
+            "{text}"
+        );
+        assert!(text.contains("no Git remote \"origin\""), "{text}");
+    }
+
+    #[cfg(target_os = "linux")]
+    #[test]
+    fn the_repository_config_row_fails_a_missing_fetch_mapping_an_unsafe_refspec_and_a_remote_that_moved_since_setup(
+    ) {
+        let f = Fixture::new("mapping");
+        f.with_remote();
+        assert!(message(&row_of(&f, "git-repository-config"))
+            .contains("the required fetch mapping is missing"));
+        // A clone set up before the mail-body mirror existed carries only the event and legacy mappings.
+        f.git(&[
+            "config",
+            "--add",
+            "remote.origin.fetch",
+            "+refs/fgos/events/*:refs/fgos/remotes/origin/events/*",
+        ]);
+        f.git(&[
+            "config",
+            "--add",
+            "remote.origin.fetch",
+            "+refs/fgos/legacy*:refs/fgos/remotes/origin/legacy*",
+        ]);
+        assert!(message(&row_of(&f, "git-repository-config"))
+            .contains("the required fetch mapping is missing"));
+        f.git(&["config", "--unset-all", "remote.origin.fetch"]);
+        let installed = fixed(&f, "git-publication-refspecs");
+        assert_eq!(installed.changed, Some(true), "{:?}", installed.message);
+        let row = row_of(&f, "git-repository-config");
+        assert!(row.passed, "{}", message(&row));
+        assert!(f
+            .git(&["config", "--get-all", "remote.origin.fetch"])
+            .contains("+refs/fgos/mail-bodies/*:refs/fgos/remotes/origin/mail-bodies/*"));
+        assert_eq!(
+            fixed(&f, "git-publication-refspecs").message.as_deref(),
+            Some("no fetch mapping change needed")
+        );
+        f.git(&[
+            "config",
+            "--add",
+            "remote.origin.fetch",
+            "+refs/*:refs/unsafe/*",
+        ]);
+        assert!(
+            message(&row_of(&f, "git-repository-config")).contains("unsafe publication refspec")
+        );
+        f.git(&["config", "--unset-all", "remote.origin.fetch"]);
+        fixed(&f, "git-publication-refspecs");
+        f.git(&[
+            "config",
+            "--add",
+            "remote.origin.push",
+            "refs/fgos/events/*:refs/fgos/events/*",
+        ]);
+        assert!(
+            message(&row_of(&f, "git-repository-config")).contains("unsafe publication refspec")
+        );
+        f.git(&["config", "--unset-all", "remote.origin.push"]);
+        f.git(&[
+            "remote",
+            "set-url",
+            "origin",
+            f.temp.join("other").to_str().unwrap(),
+        ]);
+        assert!(
+            message(&row_of(&f, "git-repository-config")).contains("event-store-remote-changed")
+        );
+    }
+
+    #[cfg(target_os = "linux")]
+    #[test]
+    fn the_repository_config_row_allows_ordinary_pushes_and_protective_negative_fetches_but_refuses_event_store_pushes(
+    ) {
+        let f = Fixture::new("pushes");
+        f.with_remote();
+        fixed(&f, "git-publication-refspecs");
+        f.git(&[
+            "config",
+            "--add",
+            "remote.origin.fetch",
+            "^refs/fgos/local-events/*",
+        ]);
+        for refspec in [
+            "HEAD",
+            ":",
+            "+:",
+            "refs/heads/*:refs/heads/*",
+            ":refs/fgos/events/old",
+        ] {
+            f.git(&["config", "remote.origin.push", refspec]);
+            assert!(row_of(&f, "git-repository-config").passed, "{refspec}");
+        }
+        for refspec in [
+            "refs/*:refs/*",
+            "+refs/fgos/*:refs/fgos/*",
+            "refs/fgos/events/machine",
+        ] {
+            f.git(&["config", "remote.origin.push", refspec]);
+            assert!(!row_of(&f, "git-repository-config").passed, "{refspec}");
+        }
+    }
+
+    #[test]
+    fn the_floor_row_passes_where_node_and_git_are_available() {
+        if node_version().is_err() {
+            return;
+        }
+        let f = Fixture::new("floor");
+        let row = row_of(&f, "node-version-and-git");
+        assert!(row.passed, "{}", message(&row));
+        assert!(message(&row).ends_with(", git available"));
+    }
+
+    #[test]
+    fn the_hook_row_applies_only_to_a_project_whose_pre_commit_is_the_fgos_guard() {
+        let f = Fixture::new("hooks");
+        assert_eq!(
+            message(&row_of(&f, "main-checkout-hook-wired")),
+            "not applicable -- this project ships no .githooks/ directory"
+        );
+        std::fs::create_dir_all(f.repo.join(".githooks")).unwrap();
+        std::fs::write(f.repo.join(".githooks/pre-commit"), "#!/bin/sh\nexit 0\n").unwrap();
+        let foreign = row_of(&f, "main-checkout-hook-wired");
+        assert!(foreign.passed);
+        assert!(message(&foreign).starts_with(
+            "not applicable -- this project's .githooks/pre-commit is not fgOS's guard"
+        ));
+        let guard = format!("#!/bin/sh\n# {GUARD_MARKER}\nexit 0\n");
+        std::fs::write(f.repo.join(".githooks/pre-commit"), guard).unwrap();
+        #[cfg(unix)]
+        {
+            use std::os::unix::fs::PermissionsExt;
+            std::fs::set_permissions(
+                f.repo.join(".githooks/pre-commit"),
+                std::fs::Permissions::from_mode(0o755),
+            )
+            .unwrap();
+        }
+        let unwired = row_of(&f, "main-checkout-hook-wired");
+        assert!(!unwired.passed);
+        assert!(
+            message(&unwired).ends_with("run npm run setup:hooks"),
+            "{}",
+            message(&unwired)
+        );
+        f.git(&["config", "core.hooksPath", ".githooks"]);
+        let wired = row_of(&f, "main-checkout-hook-wired");
+        assert!(wired.passed, "{}", message(&wired));
+        assert!(message(&wired).starts_with("core.hooksPath = .githooks"));
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn a_group_writable_driver_directory_fails_the_compatibility_row_naming_the_fix_and_the_fix_repairs_it(
+    ) {
+        use std::os::unix::fs::PermissionsExt;
+        let f = Fixture::new("umask");
+        let old = f.temp.join("fgos");
+        std::fs::create_dir_all(old.join("git-empty-hooks")).unwrap();
+        std::fs::set_permissions(&old, std::fs::Permissions::from_mode(0o775)).unwrap();
+        let mode = |path: &Path| std::fs::metadata(path).unwrap().permissions().mode() & 0o777;
+        let at = || Run::with_state_root(&f.repo, old.clone());
+        let before = judge(&at(), "git-component-compatible").unwrap();
+        assert!(!before.passed);
+        let text = message(&before);
+        assert!(
+            text.contains("mode 0775")
+                && text.contains("fgos doctor --fix")
+                && text.contains("git-driver-directories"),
+            "{text}"
+        );
+        assert_eq!(mode(&old), 0o775, "a row never changes a mode");
+        let outcome = fix(&at(), "git-driver-directories").unwrap();
+        assert_eq!(outcome.changed, Some(true), "{:?}", outcome.message);
+        assert_eq!(mode(&old), 0o755);
+        assert_eq!(mode(&old.join("git-empty-hooks")), 0o500);
+        let after = judge(&at(), "git-component-compatible").unwrap();
+        assert!(after.passed, "{}", message(&after));
+    }
+
+    #[test]
+    fn the_repository_config_row_names_an_untrusted_transport_setting_without_echoing_its_value() {
+        let f = Fixture::new("transport");
+        f.git(&["remote", "add", "upstream", "/fixture/remote"]);
+        f.git(&["remote", "add", "origin", "/fixture/origin"]);
+        assert_eq!(fixed(&f, "git-publication-refspecs").changed, Some(true));
+        f.git(&[
+            "config",
+            "http.https://github.com/.extraheader",
+            "AUTHORIZATION: secret",
+        ]);
+        let row = row_of(&f, "git-repository-config");
+        assert!(!row.passed);
+        let text = message(&row);
+        assert!(text.contains("persist-credentials: false"), "{text}");
+        assert!(
+            text.contains("trusted global credential helper or GIT_CONFIG_GLOBAL"),
+            "{text}"
+        );
+        assert!(!text.contains("AUTHORIZATION: secret"), "{text}");
+        assert_eq!(
+            f.git(&["config", "--get", "http.https://github.com/.extraheader"]),
+            "AUTHORIZATION: secret"
+        );
+        f.git(&["config", "--unset", "http.https://github.com/.extraheader"]);
+        assert!(row_of(&f, "git-repository-config").passed);
+        f.git(&["config", "credential.helper", "untrusted-helper"]);
+        let helper = row_of(&f, "git-repository-config");
+        assert!(!helper.passed);
+        assert!(message(&helper).contains("persist-credentials: false"));
+    }
+
+    #[test]
+    fn an_obsolete_legacy_mapping_on_the_origin_or_the_configured_remote_fails_the_row_and_the_fix_repairs_each(
+    ) {
+        let f = Fixture::new("obsolete");
+        f.git(&["remote", "add", "upstream", "/fixture/remote"]);
+        f.git(&["remote", "add", "origin", "/fixture/origin"]);
+        assert_eq!(fixed(&f, "git-publication-refspecs").changed, Some(true));
+        let legacy = |remote: &str| {
+            granted_fetch_mappings(remote)
+                .unwrap()
+                .into_iter()
+                .find(|mapping| mapping.contains("legacy*"))
+                .unwrap()
+                .replace('*', "")
+        };
+        let (old_origin, obsolete) = (legacy("origin"), legacy("upstream"));
+        f.git(&["config", "--add", "remote.origin.fetch", &old_origin]);
+        std::fs::create_dir_all(f.repo.join(".fgos")).unwrap();
+        std::fs::write(
+            f.repo.join(".fgos/config.yaml"),
+            "eventStore:\n  remote: upstream\n",
+        )
+        .unwrap();
+        f.git(&["config", "--add", "remote.upstream.fetch", &obsolete]);
+        assert!(!row_of(&f, "git-repository-config").passed);
+        assert_eq!(fixed(&f, "git-publication-refspecs").changed, Some(true));
+        let repaired = row_of(&f, "git-repository-config");
+        assert!(repaired.passed, "{}", message(&repaired));
+        assert!(!f
+            .git(&["config", "--get-all", "remote.origin.fetch"])
+            .contains(&old_origin));
+        f.git(&["config", "--add", "remote.origin.fetch", &old_origin]);
+        let origin = row_of(&f, "git-repository-config");
+        assert!(!origin.passed);
+        assert!(
+            message(&origin).contains("obsolete exact legacy mapping"),
+            "{}",
+            message(&origin)
+        );
+        assert_eq!(fixed(&f, "git-publication-refspecs").changed, Some(true));
+        assert!(!f
+            .git(&["config", "--get-all", "remote.upstream.fetch"])
+            .lines()
+            .any(|line| line == obsolete));
+        assert_eq!(fixed(&f, "git-publication-refspecs").changed, Some(false));
+        f.git(&["config", "--add", "remote.upstream.fetch", &obsolete]);
+        assert!(!row_of(&f, "git-repository-config").passed);
+        assert_eq!(fixed(&f, "git-publication-refspecs").changed, Some(true));
+        assert!(row_of(&f, "git-repository-config").passed);
+    }
+
+    #[test]
+    fn reserved_legacy_mirror_refs_are_named_by_the_repository_config_row() {
+        let f = Fixture::new("reserved");
+        f.git(&["remote", "add", "origin", "/fixture/origin"]);
+        fixed(&f, "git-publication-refspecs");
+        f.git(&["commit", "--allow-empty", "-qm", "fixture"]);
+        let bad = "refs/fgos/remotes/origin/legacy/events/m";
+        f.git(&["update-ref", bad, "HEAD"]);
+        let row = row_of(&f, "git-repository-config");
+        assert!(!row.passed);
+        assert!(message(&row).contains(bad), "{}", message(&row));
+    }
+
+    #[test]
+    fn the_compatibility_row_keeps_its_facts_under_detail_so_its_message_stays_one_sentence() {
+        let f = Fixture::new("detail");
+        let row = row_of(&f, "git-component-compatible");
+        assert!(row.passed, "{}", message(&row));
+        let detail = row.detail.clone().unwrap();
+        assert_eq!(
+            detail["versions"]["contracts"],
+            fgos_git::contract_versions()
+        );
+        assert_eq!(detail["floor"]["supported"], json!(true));
+        assert!(!message(&row).contains("{\""), "a message carries no JSON");
+    }
+
+    #[test]
+    fn a_git_below_the_feature_floor_fails_the_compatibility_row() {
+        use fgos_git::repository_facts::{FloorFacts, ProbeFacts};
+        let floor = |supported| Inspection::NotARepository {
+            floor: FloorFacts {
+                version: "2.30.0".into(),
+                minimum: "2.40.0".into(),
+                supported,
+                probes: vec![ProbeFacts {
+                    name: "probe".into(),
+                    passed: supported,
+                    evidence: String::new(),
+                }],
+            },
+        };
+        assert!(component_compatible(&floor(true)).passed);
+        let below = component_compatible(&floor(false));
+        assert!(!below.passed);
+        assert!(message(&below).contains("do not match this release"));
     }
 
     #[test]
