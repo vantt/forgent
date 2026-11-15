@@ -1,6 +1,6 @@
 # Phase 01: the executor-model contract (Execution owns it)
 
-Start after: S4 on main, plan approved. Wave 1, parallel with 02 and 03. Rules: [phase-lead-rules.md](phase-lead-rules.md).
+Start after: S4 on main, plan approved. Wave 1, parallel with 02, 03, 13, 14. Rules: [phase-lead-rules.md](phase-lead-rules.md).
 Facts: F1, F2, F3. Worktree `erd-p01`, report slug `erd-p01-executor-model-contract`. Effort: 1.5d.
 
 ## Context
@@ -12,16 +12,33 @@ that stays until S6a reads the same vectors (D7).
 
 ## Requirements
 
-1. `docs/platform/runner/contracts/executor-model.md` (new, Execution area; English, BA-grade, tech-agnostic):
+1. `docs/platform/runner/contracts/executor-model.md` (new, Execution area; English, BA-grade, tech-agnostic; created
+   through the documentation door `fgos doc <subcommand>` if it has a create path, with the same header block as
+   `docs/platform/runner/contracts/unit-run-result.md`: Document type Contract, Design status, Canonical for, Related):
    - the executor entry (`kind` agent/tool, `command`, `adapter`, `agentType`, `providerModel`, `supports.{skills,
      reasoningEffort}`, `invocations[] {id, via, adapter, command, credentialStore}`, `permissionMode`, `confinement`,
      `args`, `for`), pointing at `core/config-schema/runner.schema.yaml` for field syntax (link, do not copy);
-   - the derived facts, each with one definition: family, mechanism (`in-process`/`out-of-process`, the
-     `hasLiveTaskAccess` rule), credential-store CLI, rendered effort levels per CLI, default invocation and posture
-     carrying, governance refusal, missing CLI, tool `for` entries and probe result (`present`/`missing`/`stale`);
+   - the derived facts, each with one definition: the default-executor merge (`withDefaultExecutor`,
+     `dispatch/config.mjs:46-64`: decide applies it, explain does not), family, mechanism (`in-process`/`out-of-process`,
+     the `hasLiveTaskAccess` rule), executor lookup (`resolve.mjs:182 lookupExecutor`), governance
+     (`executor-governance.mjs`, `bind.mjs:132`), capability confinement (`capabilityConfinementOf`), credential-store
+     CLI, rendered effort levels per CLI, default invocation and posture carrying (incl. the backend registry path and
+     its `FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH` override, kept as today), missing CLI, account inventory
+     (`providerAccountInventory`, `readLlmAccounts`, `legacyStateKey`), tool `for` entries and probe result
+     (`present`/`missing`/`stale`);
+   - the runner semantic validation that is a config refusal (`validateRunnerConfigShape`, `dispatch/config.mjs:714-777`):
+     which rules, which `config-*` codes;
+   - the config root rule (`decide.mjs:22-33 configRootFor`: a worktree's own config wins over the main checkout's);
+   - decide's purpose rule, unchanged: a purpose routes through Seat Binding only when it has its own `prefer` pool
+     (`plan.mjs:354-395,577-592`); a name without one answers `in-process` under `--needs-soul`, else `unavailable`;
    - the bind request and answer (binding fields and provenance keys from `bind.mjs:492-548`, refusals from
-     `bind.mjs:118-129,412-427`), the walk chain, the explain answer (`explain.mjs:58-121`), the decide answer
-     (`decide.mjs:215-240`) and the hook verdict (`dispatch/hook.mjs:41-75`);
+     `bind.mjs:118-129,412-427`), the walk chain, the explain answer (`explain.mjs:58-121`), the pre-admission facts
+     (`agentCliMissingRefusal`, a pinned account's quarantine), the seat-config digest (`seat-policy.mjs:28-40`), the
+     decide answer (`decide.mjs:215-240`);
+   - the hook: payload normalization (`src/runner/hook.mjs:28-44`: `CLAUDE_PROJECT_DIR` for every standard-format
+     payload, agy `workspacePaths[0]`), the verdict (`dispatch/hook.mjs:41-75`), and its exit contract: block = exit 2
+     (standard) or the agy JSON; a missing project directory or a config refusal blocks; any other failure, a host
+     panic included, allows;
    - who decides what: Seat Binding ranks (unchanged); Execution derives executor facts and composes the bind;
      Dispatch owns launch and the account-state adapter of Seat Binding's port (`provider-capacity`; it hands its read to bind as an overlay, D4);
    - the version: the binding keeps `contractVersion` `v1alpha1` (its consumers read it from run records); the route
@@ -31,12 +48,13 @@ that stays until S6a reads the same vectors (D7).
    under `.fgos/runtime/tmp/`, never committed). Cover every family `familyOf` names, every `via`/`adapter`, every
    credential store, every CLI with effort levels, `kind: tool`, `agentType` executors, governance by provider and by
    executor, posture with and without a usable backend.
-3. `packages/execution/contracts/bind.v1.json`: request and answer shapes plus `vectors` for bind (incl. walk,
-   overrides, persona chain, refusals), explain, decide (each selector form incl. `--work` with a given hint and
-   `--assignment` with a given record), and hook verdict. Record from Node today.
+3. The bind, decide, hook and listing vectors are not recorded here: they depend on 03's config shape, so 06
+   (`bind.v1.json`), 07 (`decide.v1.json`) and 08 (`agents.v1.json`) record them from Node on the post-03 tree, each in
+   its own file. This phase writes their shapes in the doc only.
 4. Node twin proof: `test/runner/dispatch/executor-model-vectors.test.mjs` (new) reads `executor-model.v1.json` and runs
-   each vector against the Node functions that stay until S6a (`familyOf`, `credentialStoreOf`, `renderedEffortLevels`,
-   `decideExecutorDispatchMechanism`, `resolvePostureInvocation`). Title states the behaviour: "Node launch code derives
+   each vector against the Node functions that stay until S6a (D7): `withDefaultExecutor`, `familyOf`, `lookupExecutor`,
+   governance, `capabilityConfinementOf`, `credentialStoreOf`, `renderedEffortLevels`, `decideExecutorDispatchMechanism`,
+   `resolvePostureInvocation`, `providerAccountInventory`/`readLlmAccounts`/`legacyStateKey`. Title states the behaviour: "Node launch code derives
    the same executor facts as the executor-model contract". Green at once (it documents today); it is the twin proof
    until S6a deletes those functions.
 5. `docs/platform/component-boundary.md`: one row, Execution owns the executor model and bind composition
@@ -47,7 +65,7 @@ that stays until S6a reads the same vectors (D7).
 ## Files
 
 - Create: `docs/platform/runner/contracts/executor-model.md`, `packages/execution/contracts/executor-model.v1.json`,
-  `packages/execution/contracts/bind.v1.json`, `test/runner/dispatch/executor-model-vectors.test.mjs`.
+  `test/runner/dispatch/executor-model-vectors.test.mjs`.
 - Modify: `docs/platform/component-boundary.md`, `docs/platform/runner/subcomponents/h-f34e0d170d89/spec.md`,
   `docs/reading-map.md`, `test/suite-baseline.json` (regenerated), mutation census (regenerated).
 - Delete: none. Tests retired: none.
@@ -63,7 +81,7 @@ that stays until S6a reads the same vectors (D7).
 
 ## Acceptance
 
-- Both JSON files parse; every derived fact named in the doc has at least one vector; the Node twin test passes.
+- The JSON parses; every derived fact named in the doc has at least one vector; the Node twin test passes.
 - `doc-health` and decision-citation-drift green; reading-map row resolves.
 
 ## Risks / rollback

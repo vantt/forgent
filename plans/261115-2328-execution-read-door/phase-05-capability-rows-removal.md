@@ -1,74 +1,76 @@
-# Phase 05: the 37 business capability rows leave the standard; capability names become labels
+# Phase 05: the business capability rows leave the standard; capability names become labels
 
-Start after: 02 and 03 landed. Wave 2. Rules: [phase-lead-rules.md](phase-lead-rules.md). Facts: F6, F7.
-Worktree `erd-p05`, report slug `erd-p05-capability-rows`. Effort: 2.5d. Owner questions Q2 and Q3: the phase runs
-with their defaults; another answer changes only data (config standard, skill text).
+Start after: 02, 03, 14 landed **and the owner's answers to Q2, Q3 and Q4** (this is the one phase that waits on the
+owner; every other phase proceeds). Never at the same time as 09 (both edit `assignment-runner.mjs`) or 11 (both edit
+`registrations.mjs`): whichever starts first lands first. Rules:
+[phase-lead-rules.md](phase-lead-rules.md). Facts: F6, F7, F10. Worktree `erd-p05`, report slug `erd-p05-capability-rows`.
+Effort: 3d.
 
 ## Context
 
 Step 2 of the owner's 2026-11-14 decision (`docs/platform/vision.md` section 6): the 34 business rows and 3 prefix
-wildcards of `runner.capabilities` (F6) go; what remains is the tool abilities (`impact-analysis`, `pane-labeling`)
-and the generic jobs (`execute`, `review`, `advise`); "a project with no capability rows still runs". 02 moved the
-councils' tier and rigor into their workflows; 03 moved role taste to `runner.roles`. Today three consumers refuse a
-capability without a row (F6): `src/workflow/propose-validate.mjs:159`, `src/report/capability-plan-lint.mjs:492-498,713`,
-doctor `workflow-capabilities-configured` (`registrations.mjs:1903`, `bridge:S6b`).
+wildcards (F6) go; what remains is the tool abilities and the generic jobs; "a project with no capability rows still
+runs". 03 moved role taste to `runner.roles`; 14 lets a registered workflow unit declare its tier. The red team showed
+the rows carry more than taste (F10): decide routing (`purposeSeatOf` needs a row's own `prefer`), the `code:*`
+confinement and invocation pins, the `maxTier: frontier` ceiling of three architecture rows, the default red-team
+checker keyed by `code`, a second curated catalog (`DEFAULT_CAPABILITY_SLOTS`), and the names the Work path and coding
+skills route through. Q2-Q4 decide those; this phase carries out the answers.
 
 ## Requirements
 
-1. `core/config-standard/runner.yaml`: delete the 34 business rows and the 3 `<prefix>:*` rows (F6 list). Per Q3
-   default (a): the `review` row takes `code:review`'s `prefer` (`openai#codex-cli-bwrap`, `claude#claude-cli-bwrap`)
-   so a review seat keeps its bwrap pins under `host-write-denied`; `execute` keeps its own `prefer` (the writer order
-   the `code:*` rows repeated). No other row changes.
-2. D9, capability names are labels: a capability with no row binds through the job-less defaults (Seat Binding:
-   `roles`/`personas` tables, workflow seat tier, `tierFallback`). `propose-validate.mjs:159` and
-   `src/report/capability-plan-lint.mjs:492-498,713` stop refusing an unregistered name; they still refuse a tool ability whose tool
-   executor is absent (the rule for `kind: tool`, unchanged). Doctor `workflow-capabilities-configured` (Node body,
-   still `bridge:S6b`): fails only for a tool ability without a tool executor; the "no prefer pool" warning goes
-   (with no rows it would warn on every step). Wording names labels, not "unregistered capability".
-3. Coding and marketing doctrine (Q3 default (a)): `domains/coding/skills/fgos-coding-planning/SKILL.md`,
+1. Delete the rows the answers select from `core/config-standard/runner.yaml`: all 37 under Q3 (a) or (b); under Q3 (c)
+   all but the rows the Work path and the coding skills route through (the set `rg` finds in `src/runner/work-*.mjs`,
+   `domains/coding/**` and `core/skills/**` as `--for`/`--capability`/candidate names; listed in the report, each kept
+   row becomes `debt` in phase 12's "capability rows hold jobs and tool abilities" row with `retiredBy: S7`).
+2. Each deleted council and marketing row's `tier` and `rigor` go into the workflow units that name the capability:
+   `rigor` as the unit's `rigor` (unless the unit already declares one at least as strong), `tier` as the unit `tier`
+   (14). Ceilings (`maxTier: frontier` of `architecture:{shape,critique,synthesize}`) follow Q4.
+3. D9, labels: a capability with no row binds as a unit seat through `runner.personas`/`runner.roles`, the workflow
+   tier and `tierFallback`. Decide's purpose rule does not change: a name without its own `prefer` pool is never
+   routed out of process (`plan.mjs:354-395`), so a custom `subagent_type` keeps being allowed by the hook. Consumers:
+   - `src/workflow/propose-validate.mjs:159` and `src/report/capability-plan-lint.mjs:492-498,713-714` accept a label;
+     both still refuse a tool ability whose tool executor is absent.
+   - `DEFAULT_CAPABILITY_SLOTS` (`registrations.mjs:1651-1735`) is deleted (L10: one catalog); the plan lint's
+     registered set is read through `capability-config.mjs`; `test/setup/capability-catalog-doctrine.test.mjs` and
+     `test/report/capability-plan-lint.test.mjs:21` move to the standard file as their source.
+   - Doctor `workflow-capabilities-configured` (Node body, `bridge:S6b`): fails only for a tool ability without its tool
+     executor; the "no prefer pool" warning goes.
+   - Strict confinement (`dispatch/config.mjs:736-755`) checks rows only; show on the post-change tree whether a
+     strict-mode project refuses a label seat at launch; if not, the strict check refuses a workflow unit whose label
+     has no row, by name (strict means every capability declares confinement).
+4. Per the Q3 answer, the named consumers (F10): coding doctrine (`domains/coding/skills/fgos-coding-planning/SKILL.md`,
+   `domains/coding/skills/fgos-coding-implement/{SKILL.md,references/implement-and-collaboration.md}`,
    `domains/coding/slice-kinds.yaml`, `core/skills/_shared/{capability-catalog,capability-matching,planning-capability-awareness,executor-dispatch-fallback}.md`,
-   `core/skills/fgos-run/SKILL.md`, `core/skills/fgos-cook/references/case-and-doors.md` name the generic jobs
-   (`execute` for implement/test/refactor/docs, `review` for review/debug) plus a unit `tier`/`rigor` where the old row
-   carried one (`docs:write` tier `flagship` becomes the unit's tier). `npm run build:skills` regenerates the render
-   surfaces. `domains/marketing/workflows/content-publish.yaml` keeps its `marketing:*` names as labels (its rows held
-   only `prefer`).
-4. Work dispatch (S7, isolated): no Work code changes. Record in the report how each Work candidate list
-   (`work-compat.mjs:38-54`, `work-dispatch.mjs` `coding:discover`) now resolves (the first registered candidate is the
-   phase job, e.g. `execute`), with the tier it gets before and after; a tier that drops is reported to the plan lead,
-   who asks the big lead before landing.
-5. The persona `rigor` field and per-business `prefer` orders are not carried anywhere (Q2 default (a)); the report
-   lists every dropped `prefer` with its row.
+   `core/skills/fgos-run/SKILL.md`, `core/skills/fgos-cook/references/{case-and-doors,propose}.md`), `propose.mjs:450`
+   (gate command), `seat-binding-checks.mjs:28` (`CORE_CAPABILITIES`), `registrations.mjs:1866`
+   (`RUNNER_LOOP_CAPABILITY_USES`), `assignment-runner.mjs:897` (default capability), `seat-resolver.mjs:35-38,114-118`
+   (default red-team checker key), `command-registry.mjs:1597,2692` (examples); `npm run build:skills` after doctrine edits.
+5. Before/after table, taken **after** the rows are deleted, for every council unit, the marketing workflow units and one
+   coding plan unit of each kind: tier and its source, rigor, checker plan, confinement anchor, invocation, prefer
+   source; plus `decide --for <name> [--needs-soul --has-live-task-access]` and the hook verdict for every deleted name,
+   and `decide --work` for a coding executing and a reviewer item. Every difference is explained by an owner answer;
+   an unexplained one stops the landing (report to the plan lead).
 
 ## Files
 
-- Modify: `core/config-standard/runner.yaml`, `src/workflow/propose-validate.mjs`, `src/report/capability-plan-lint.mjs`,
-  `src/setup/registrations.mjs` (the `workflow-capabilities-configured` body only), the doctrine files of Req 3,
-  generated skill renders, their tests (`test/setup/checks-doctor-config.test.mjs:260-302`, the plan-lint and
-  propose-validate tests `rg -l "capability-plan-lint|propose-validate" test` lists, `test/helpers/config-fixture.mjs:56-107`
-  if it names a removed row), `packages/config/rust/tests/{golden_standard.rs,authoring_equivalence.rs}` if they name a
-  removed row, mutation census.
-- Delete: none. Tests retired: cases asserting "unregistered capability refused" and "no prefer pool warns", owner now
-  the label rule's cases in the same files (named in the report).
-- Net size: about -400 config lines, -40 / +30 Node, doctrine text edits.
-
-## Steps
-
-1. Red: plan-lint and propose-validate cases for a label without a row (accepted) and a tool ability without its tool
-   (refused). 2. Delete the rows; update the consumers. 3. Doctrine text and renders. 4. Work resolution table.
-5. Gates plus `test/workflow/*.test.mjs`, `test/setup/checks-doctor-config.test.mjs`, `cargo test -p fgos-config`.
+- Modify: `core/config-standard/runner.yaml`, the council and marketing workflow files (unit `tier`/`rigor`),
+  `src/workflow/propose-validate.mjs`, `src/report/capability-plan-lint.mjs`, `src/setup/registrations.mjs`
+  (`DEFAULT_CAPABILITY_SLOTS`, `workflow-capabilities-configured`, and per Q3 `RUNNER_LOOP_CAPABILITY_USES`), per Q3 the
+  files of Req 4, `src/runner/dispatch/config.mjs` (strict check, if Req 3 needs it), generated renders, their tests,
+  `packages/config/rust/tests/{golden_standard.rs,authoring_equivalence.rs}` if they name a removed row,
+  `test/suite-baseline.json`, mutation census.
+- Delete: none. Tests retired: "unregistered capability refused", "no prefer pool warns", and the
+  `DEFAULT_CAPABILITY_SLOTS` cases; owners named in the report.
+- Net size: about -450 config lines, -120 / +60 Node, doctrine text edits.
 
 ## Acceptance
 
-- `core/config-standard/runner.yaml` `runner.capabilities` holds exactly `impact-analysis`, `pane-labeling`, `advise`,
-  `execute`, `review`; a project config with no `capabilities` key runs `fgos dispatch explain --for architecture:frame`
-  and the doctor row `seat-binding-dry-bind` (which dry-binds every workflow unit, `src/setup/seat-binding-checks.mjs`)
-  passes for the seven council workflows, without a refusal.
-- `rg -n "code:review|code:implement|docs:write|code:test|code:debug|code:refactor" core domains --glob '!**/compiled.json'`
-  finds only historical notes the report lists.
+- `runner.capabilities` in the standard holds the five rows (plus the Q3 (c) debt rows, if chosen); the Req 5 table
+  shows only answered differences; `seat-binding-dry-bind` passes for the seven council workflows;
+  `rg -n "DEFAULT_CAPABILITY_SLOTS" src test` finds nothing.
 
 ## Risks / rollback
 
-- A review or debug seat loses its bwrap confinement (M x H): Req 1 moves the pins to `review`, whose
-  `host-write-denied` confinement is unchanged; the report shows one dry bind each.
-- Work tier drops (M x M): Req 4 table; big lead decides before landing.
-- Revert: one commit series (data and two lint rules).
+- A review or debug seat loses `host-write-denied` (M x H): Req 5 shows the confinement anchor per unit kind.
+- Work coding dispatch changes (M x H): Req 5's `decide --work` rows; Q3 (c) keeps the Work path whole.
+- Revert: one commit series (data, two lint rules, one catalog).

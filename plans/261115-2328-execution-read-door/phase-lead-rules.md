@@ -25,7 +25,7 @@ plan relies on, stop and report to the plan lead with the new `file:line`; do no
   Assert the path is in `/usr/bin/git worktree list` before any other command in it. Never chain a destructive step
   after a `cd`.
 - Rust: `export CARGO_TARGET_DIR=/home/vantt/projects/forgent-worktrees/erd-pNN-target` (ext4, never `/tmp`). Phases
-  whose Rust is byte-identical to the integration head they cut from (01, 02, and 05 when it changes no Rust) may share
+  whose Rust is byte-identical to the integration head they cut from (01, 02, 14, and 05 when it changes no Rust) may share
   `erd-node-target` only while their Rust stays identical; addon staging reads `target/debug` without a lock
   (`scripts/lib/git-addon-stage.mjs`), so a rebase that brings Rust moves you to a private target. An
   `addon-not-shipped` or `git-addon-unavailable` failure means: read the staging build log first.

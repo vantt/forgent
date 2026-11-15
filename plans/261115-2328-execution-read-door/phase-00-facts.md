@@ -117,7 +117,8 @@ judges). Registration lines on `origin/main`:
 | `invocation-git-write-grants` | :2461 | `checkInvocationGitWriteGrants` :2215 | executor and invocation `args` |
 | `seat-binding-route` | :3755 | `checkSeatBindingRoute` :3734 | `resolveSeatBindingHost` (`client.mjs:43`), `tierLadder` (:173) |
 
-All eight read the executor model or the capability section, so they belong with S5. S4 phase 07 deletes
+Seven read the executor model or the capability section and belong with S5; `seat-binding-route` probes the binary
+the Node client would run, a rule only a Node payload can apply, so it stays with the Node callers (D15, F10). S4 phase 07 deletes
 `agy-permissions.mjs` and possibly `omp-natives-checks.mjs` (its phase file lines 31-33, 48-49): where those two bodies
 live after S4 is a re-read item. The port recipe is S4's ("Port recipe", S4 `plan.md` lines 103-130): registry owner
 flips from `bridge:S5` to `rust:<component>`, adapter file registers the row, Node body deleted, per-row parity on the
@@ -158,8 +159,12 @@ S4 fixtures (00 report section 4 lists volatile rows).
   capability-matching,planning-capability-awareness,executor-dispatch-fallback}.md`, `core/skills/fgos-run/SKILL.md`,
   `domains/coding/skills/fgos-coding-planning/SKILL.md`, `domains/coding/slice-kinds.yaml`), Work dispatch candidates
   (`work-compat.mjs:38-54`: `code:implement`, phase, step; `work-dispatch.mjs` `coding:discover`).
-- Live project config of this repo (`.fgos/config.yaml:94,112`) carries `roles.red-team` under `code:*` and
-  `marketing:*`: removing per-capability `roles` from the schema without a migration would refuse this file.
+- Live project config of this repo (`.fgos/config.yaml:90-116`, tracked) carries three role blocks: `code:*`
+  `roles.red-team.prefer [openai, xai]` (COOK 2026-10-26, `@fgos:why` on independence), `code:*`
+  `roles.reviewer.prefer [xai, openai]` (owner 2026-10-25 21:44), `marketing:*` `roles.red-team.prefer [claude]`. Two
+  red-team orders disagree, and a top-level table applies them to every capability, not only `code:*`. Its `maxTier`
+  is `flagship` (`:176`); the architecture rows' `maxTier: frontier` is what lets their frontier seats run above it.
+  The main checkout also holds uncommitted local edits to this file (session `git status`).
 
 ## F7. Councils and the domain move
 
@@ -168,17 +173,22 @@ S4 fixtures (00 report section 4 lists volatile rows).
   use the 19 `architecture|business|delphi|group-cognition|nominal-group` capabilities.
 - `src/workflow/loader.mjs:25-37 workflowDirs()` already walks every domain's `workflowsDir` (`domainCatalog()`), so a
   council in `domains/<d>/workflows/` is found with no loader change; it gains `owningDomain` (persona lookup adds the
-  domain tier, core stays visible, `agent-definitions.mjs:211-227`). `src/util/domain-compile.mjs:25-40` embeds domain
-  workflows into `domains/<d>/compiled.json` (regenerate). A domain needs no `registry.yaml`
-  (`domain-compile.mjs:24-26`). Domains today: `coding`, `marketing`.
-- Workflow units already declare `rigor?` and seats declare `tier?` (seat-binding spec 6.1 :172;
-  `architecture-advisory.yaml:39` seat `tier: frontier`, :67 `rigor: high`), so the rows' `tier`/`rigor` can move into
-  the workflows with no schema change.
+  domain tier, core stays visible, `agent-definitions.mjs:211-227`). `compileDomain` returns null without a
+  `registry.yaml`, so no `compiled.json` is written (`src/util/domain-compile.mjs:22-26`); `domains/marketing` has
+  neither file. Adding a `registry.yaml` would register a Work domain (`src/state/domain-registry.mjs:66-82`), so the
+  council domain gets none and is not a Work domain. Domains today: `coding`, `marketing`.
+- Workflow units declare `rigor?`; only `seats[].tier` exists, and only a registered workflow definition may carry it
+  (`seat-resolver.mjs:346-366`, `workflowTierOf` reads `seat.tier` only); a unit `tier` is refused
+  (`src/runner/execution/unit.mjs:10`, `src/workflow/definition.mjs:22`). Council units with `pattern: solo|reviewed`
+  declare no `seats` (`architecture-advisory.yaml:25-27,55-56`), and today the row's `tier` reaches every seat they run,
+  checker seats included. **So "a workflow step declares the tier it needs" (the owner's direction) needs a unit-level
+  `tier` in registered workflow definitions: phase 14.**
 - No plan, backlog row or branch exists for the move (rg over `docs/backlog.md`, `plans/*/plan.md`, `git branch -r`).
   The persona `advisor` (`architecture-advisory.yaml:27,89`) resolves in no agent directory today: unchanged by S5,
   recorded for the move phase.
-- **Conclusion (D8):** the move has no code prerequisite and the rows' removal needs it (or the workflows would lose
-  their tier and rigor), so it belongs in S5, landing before the rows go; it need not come before S5.
+- **Conclusion (D8):** the move itself has no code prerequisite (a data move); what the rows' removal needs is the
+  unit-level tier (14), not the move. The vision ties the rows to the move, so both are in S5; the move need not come
+  before S5.
 
 ## F8. Rust building blocks already present
 
@@ -190,6 +200,56 @@ S4 fixtures (00 report section 4 lists volatile rows).
   `HERDR_SOCKET_PATH` in `packages/terminal-control/rust/src/route.rs:249,505` only.
 - YAML: `fgos-yaml-doc` (persona files are YAML). Global directory: the holder-lock home door (`home_for_state_root`).
 - No Rust confinement backend-registry reader (`rg confinementBackends packages apps` finds only the census).
+
+## F10. Facts the red team added (all re-read on `8337d8788`)
+
+- Decide's purpose rule: `purposeSeatOf` binds a purpose only when it has its own `prefer` pool
+  (`plan.mjs:354-359,395`); otherwise `--needs-soul` answers `in-process` and a bare `--for` answers `unavailable` with
+  `selector.unregistered`/`capability.unknown` (`plan.mjs:577-592`). The hook allows `in-process`
+  (`dispatch/hook.mjs:56`). So a name without a row is never routed out of process by decide; changing that rule would
+  route every custom `subagent_type` (e.g. `planner`) out of process and block it.
+- Consumers that name `code:*`/`fgos-coding-implement` outside the config (20 live files): `src/workflow/propose.mjs:450`
+  (gate command `capabilities.code:implement.verify`), `src/setup/registrations.mjs:1651-1735` (`DEFAULT_CAPABILITY_SLOTS`,
+  a second curated catalog that marks `review`, `code:review`, `code:debug` `unconfined`; the plan-lint refusal at
+  `src/report/capability-plan-lint.mjs:714` points at it; pinned by `test/setup/capability-catalog-doctrine.test.mjs`,
+  `test/report/capability-plan-lint.test.mjs:21`), `registrations.mjs:1866` (`RUNNER_LOOP_CAPABILITY_USES`),
+  `src/setup/seat-binding-checks.mjs:28` (`CORE_CAPABILITIES`), `src/runner/dispatch/assignment-runner.mjs:897` (default
+  `code:implement`), `src/runner/work-compat.mjs:38-61` (Work candidates incl. `code:review` for reviewers),
+  `work-dispatch.mjs:301` (`workExecutorId` = `fgos-coding-implement`), `seat-resolver.mjs:35-38,114-118` (default
+  `minCheckers: [red-team]` keyed by `code`/`code:*`), `command-registry.mjs:1597,2692` (examples), coding skills
+  (`domains/coding/skills/fgos-coding-implement/SKILL.md:58,64,124` tells agents `decide --for code:implement`).
+- Runner semantic validation beyond the schema: `validateRunnerConfigShape` (`dispatch/config.mjs:757-777`, with
+  `:714-756`): confinement policy names, strict mode, project `confinementBackends`, `prefer` naming a missing executor,
+  `credentialStore` without a backend. Its refusals are `config-*` codes, which make the hook block
+  (`dispatch/hook.mjs:19-24,50-54`). Strict mode checks only capabilities that have rows (`config.mjs:736-755`).
+- Hook normalization (`src/runner/hook.mjs:28-44`): `CLAUDE_PROJECT_DIR` for every standard-format payload, agy
+  `workspacePaths[0]`, missing directory blocks. The host's mailbox hook is unix-only (`apps/fgos/src/wiring/mod.rs:14-18`,
+  `mailbox_hook_unsupported.rs`), exits 0 on every path and resolves the root differently (`mailbox_root.rs:55-69`).
+  Decide picks the worktree's own config over the main checkout's (`decide.mjs:22-33 configRootFor`).
+- Pre-admission checks run before any bind: `unit-run-start.mjs:213-217` (`agentCliMissingRefusal`, before
+  `simulateUnitBindings` :230), `account-pin.mjs:41-50` (`accountQuarantineOf`).
+- Replay: `assignment-runner.mjs:300-314` compares the recorded `configDigest` with a fresh digest of the committed
+  config before rebinding; the digest covers `seatConfigOf` (`seat-policy.mjs:17,28-40`), whose slice 03 changes. In-flight
+  mutating assignments bound before the landing would be refused `binding-replay-config-mismatch`.
+- Lease state is keyed by provider (`legacyStateKey(pool)`, `provider-capacity.mjs:609-612`); the pool set comes from
+  families plus parsed cells (`bind.mjs:218-228`).
+- `compileDispatchPlan` with an executor id or a bound assignment spawns no host today (`assignment-runner.mjs:1215-1222`;
+  `fanout-batch.mjs:68-80` runs one per candidate inside `Promise.allSettled`).
+- The route checks the op before the protocol (`packages/seat-binding/rust/src/route.rs:46-53,70-76`); the crate has its
+  own input `protocol` 1 (`lib.rs:45-53`, golden case "a protocol other than 1 is refused"). The `ladder` op's only Node
+  consumer is the `seat-binding-route` row (`registrations.mjs:3734-3757`, description says "protocol 1"); the client
+  ignores `FGOS_HOST_BIN` only when its own payload is the activation's (`client.mjs:11-14,43-50`), a rule only a Node
+  payload can apply.
+- The machine backend registry path honours `FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH` (`backend-registry.mjs:187-191`).
+  `--assignment <id>` is joined into a path raw (`decide.mjs:192-199`); `run_dirs.rs:54-63` only lists directories.
+  The Rust no-follow reader is `packages/durable-file/rust/src/beneath.rs:252 open_beneath` (`read(max)` :118).
+- S4's registry `layers` (`doctor-registry.v1.json:41-61` on the S4 head) maps `bind.mjs`, `seat-binding/client.mjs`,
+  `capability-config.mjs`, `tool-providers.mjs`, `agent-listing.mjs`, `dispatch/config.mjs`, `shipped-catalog.mjs`,
+  `patterns/retired-keys.mjs` to `S5`; the label guard (`test/helpers/doctor-bridge-labels.mjs:17-41`) only checks a label
+  is not earlier than its layer. `agent-type-names-unique` reads `listAgents().masked` (`registrations.mjs:931`).
+- Config already has a repair mechanism: `packages/config/rust/src/repair.rs` (one function per fix id) and
+  `packages/config/contracts/doctor-rows.v1.json` (rows with fixes such as `copy-to-destination`).
+- Old payloads still running after activation resolve the new host (`client.mjs:43-50`) and would meet protocol 2.
 
 ## F9. Collisions found
 

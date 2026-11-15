@@ -19,10 +19,12 @@ deletes their Node arms and use cases (L10). `dispatch` stays a `legacy-cli` rou
    assertion at `routing.rs:591`), annotations in `packages/host-runtime/contracts/command-route-annotations.json`,
    `native: true` in `src/cli/command-registry.mjs`, regenerate `command-routes.json` and `command-manifest.json`.
    Refusals keep Node's category and exact text; unknown flags get Node's exact text from the annotation.
-2. Adapters (`apps/fgos/src/wiring/{dispatch_decide.rs,agents.rs}` and the hook arm):
-   - `decide`: `--cwd`/`--repo-root` guard (`decide.mjs:251-265`) and root resolution through the invocation-root door;
-     config through `fgos-config`; `--assignment` reads `.fgos/assignments/<id>/assignment.json` through the run-dirs
-     door (`apps/fgos/src/wiring/run_dirs.rs`), absent or unreadable = no record, as today; `--work` asks the S4 Node
+2. Adapters (`apps/fgos/src/wiring/{dispatch_decide.rs,agents.rs}` and the hook arm) call `fgos-execution` in process
+   with 09's `Machine`/`ToolProbe` implementations; `decide`, `explain` and the hook run 07's `runner_check` first:
+   - `decide`: `--cwd`/`--repo-root` guard (`decide.mjs:251-265`); the project root through the invocation-root door and
+     the config root by 07's `configRootFor` rule (a worktree's own config wins); config through `fgos-config`; `--assignment <id>` must be one plain path segment (else refused by name), then
+     `.fgos/assignments/<id>/assignment.json` is read with `open_beneath` under a byte cap; absent or unreadable = no
+     record, as today; `--work` asks the S4 Node
      bridge for the Work hint (D6): one new bridge operation `work-dispatch-hint` (`src/setup/doctor-bridge.mjs`, its
      contract `packages/distribution/contracts/doctor-bridge.v1.json`, request `{workId, stage, dir}`, answer the
      `workDispatchHint` fields, `src/runner/work-dispatch.mjs:279-306`), shaped like S4's `work-store-init` (re-read
@@ -32,16 +34,19 @@ deletes their Node arms and use cases (L10). `dispatch` stays a `legacy-cli` rou
      selectors are unaffected.
    - `explain`: config through `fgos-config` without defaults (as the arm today, `bin/fgos.mjs:2447-2452`), session
      headless with herdr presence from the 09 adapter.
-   - `hook dispatch-decide`: stdin payload normalization and the answer protocols (`--format standard|agy`, exit codes)
-     exactly as `src/runner/hook.mjs`; reuse the host's existing hook payload reader (`apps/fgos/src/wiring/mailbox_hook.rs`
-     and the mailbox crate's Claude/Codex payload parsing) instead of a second parser; verdict from 07's `hook.rs`.
+   - `hook dispatch-decide`: its own lane outcome, not the mailbox lane's (that one is unix-only, exits 0 on every path
+     and resolves the root differently, F10): reads stdin and env, calls 07's `hook.rs` normalizer and verdict, prints
+     the protocol answer (`--format standard|agy`) and exits per the contract (block = 2 in standard; a panic is caught
+     and allows, as a non-config failure does today); builds and runs on Windows and macOS too. Every CLI whose hook
+     render registers `dispatch-decide` is covered (`src/setup/agent-hooks.mjs:210,225,233` today; S4 moved the table to
+     `packages/distribution/contracts/agent-hooks.v1.json`, re-read).
    - Files a project or a pull can write (the assignment record, persona files) are read with `fgos-durable-file`
      `open_beneath` under a byte cap, as 09 does; an unreadable file is "no record" / a listing problem, as today.
    - `agents list`: project root (`--worktree` or the worktree root through Git Inspect), tiers from the payload root
      (`components.legacyNode.root` of the activated release, resolved by `apps/fgos/src/legacy_exec.rs:69
      resolve_payload_path`, never PATH or cwd: `core/agents`, `domains/*/agents`) and the project
      (`fgos/agents`); 08's `list`.
-3. Parity: restore the parity runner from history as S4 did (re-read item 5), tables
+3. Parity: on 09's restored runner, tables
    `test/rust-host/parity-cases/{dispatch-decide,dispatch-explain,hook-dispatch-decide,agents}.cases.mjs` (every refusal
    of each arm), run green against the base release before deleting Node code. Transitional: phase 12 deletes them.
 4. Delete (same phase): the `decide`, `explain` and `agents` arms of `bin/fgos.mjs` and imports no other arm uses
@@ -50,7 +55,13 @@ deletes their Node arms and use cases (L10). `dispatch` stays a `legacy-cli` rou
    `src/runner/dispatch/decide.mjs` (`retiredDispatchDoorMessage`, still used by the legacy `dispatch` arm for retired
    sub-commands, moves next to that arm's other helpers in `src/runner/dispatch/cli.mjs`; `runDoorHint` goes with the
    hook), the `decide` path of the compatibility alias (`src/runner/dispatch/cli.mjs:21,166`, `src/runner/dispatch.mjs`)
-   and its sentence in `AGENTS.md` "Dispatch" (D13); `scripts/dispatch-decide-hook.mjs` (an old registration's entry that
+   and every live mention of it (D13): `AGENTS.md` "Dispatch",
+   `domains/coding/skills/fgos-coding-implement/{SKILL.md:58,64,124,references/implement-and-collaboration.md}`,
+   `core/skills/_shared/{capability-catalog,planning-capability-awareness}.md`, `docs/reference/dispatch-module-boundaries.md:30`,
+   `docs/platform/runner/spec.md:59`, tests `test/cli/dispatch-operability.test.mjs:42,116`,
+   `test/cli/dispatch-retired-doors.test.mjs:134` (then `npm run build:skills`); the five doctor-row descriptions that
+   name the alias (`registrations.mjs:1133-1189`, now in `doctor-registry.v1.json`) are rewritten by 11, which owns that
+   file; `scripts/dispatch-decide-hook.mjs` (an old registration's entry that
    calls `serveHook('dispatch-decide')`, which no longer exists after this phase): delete it, after checking on the post-S4
    tree that the packaging row `dispatch-decide-hook-wired` reports a settings file naming that script as not wired and
    its fix rewrites it to the shim; if it does not, report to the plan lead before deleting (an old registration would
@@ -62,7 +73,9 @@ deletes their Node arms and use cases (L10). `dispatch` stays a `legacy-cli` rou
 
 ## Files
 
-- Create: `apps/fgos/src/wiring/{dispatch_decide.rs,agents.rs}`, the transitional parity runner and four tables.
+- Create: `apps/fgos/src/wiring/{dispatch_decide.rs,agents.rs}`, four transitional parity tables.
+- Modify (also): the doctrine, docs and tests of Req 4's alias list; `scripts/check-decision-codes.baseline.json` when a
+  retired test's title is pinned there (`:162` pins a `decideExecutorCli` title).
 - Modify: `apps/fgos/src/{main.rs,routing.rs,cli_projector.rs}`, `apps/fgos/src/wiring/mod.rs`,
   `apps/fgos/tests/cli_tests.rs`, `packages/host-runtime/rust/src/catalog.rs`,
   `packages/host-runtime/contracts/{command-route-annotations.json,command-routes.json,command-manifest.json}`,
@@ -92,3 +105,6 @@ deletes their Node arms and use cases (L10). `dispatch` stays a `legacy-cli` rou
   branch; a parity case per protocol and format; a host failure path keeps today's rule (any non-config failure
   allows). Revert: the commit series (route kinds revert with the regenerated contracts).
 - S1 edits the same `HookKind` and hook registry entry (collision table): whoever lands second rebases.
+- The landed S4 bridge may have no operation dispatch beyond doctor phases (its `work-store-init` is S4 phase 10, open
+  at planning) (M x M): re-read item 2 before starting; if the shape does not fit, adding the operation is part of this
+  phase (+0.5d) and the bridge contract change goes to OPC with the phase.
