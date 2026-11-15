@@ -5,7 +5,7 @@ Document type: BA-grade area specification
 Audience: Human reviewer, maintainer, implementation agent
 Purpose: Define the single authority for reading, editing and merging YAML text while keeping every byte a caller did not change, comments included
 Design status: Signed by the owner on 2026-10-22 as a whole; amendments go through "Lịch sử quyết định"
-Implementation: Rust crate done (parse, both profiles, limits, edits, comments, merge, fuzzed; parser `saphyr-parser` 0.2.2 vendored, record in packages/yaml-doc/upgrade-record.md); Rust consumers moved off serde_yaml; Node door (section 10) done 2026-10-23 (addon `yaml` namespace, `src/util/yaml.mjs` over it, js-yaml deleted, RUL108 supersedes RUL101); its one config consumer, the Config component, reaches it from Rust, and Node reads config only through `src/config/facade.mjs` (docs/platform/config/spec.md section 12)
+Implementation: Rust crate done (parse, both profiles, limits, edits, comments, merge, fuzzed; parser `saphyr-parser` 0.2.2 vendored, record in packages/yaml-doc/upgrade-record.md); Rust consumers moved off serde_yaml; Node door (section 10) done 2026-10-23 (addon `yaml` namespace, `src/util/yaml.mjs` over it, js-yaml deleted, RUL108 supersedes RUL101) and writes too since 2026-11-15 (`writeFrontmatter`, addon `yaml.emit`); its one config consumer, the Config component, reaches it from Rust, and Node reads config only through `src/config/facade.mjs` (docs/platform/config/spec.md section 12)
 Canonical: Yes
 Owner: YAML Document component (proposed)
 Source: packages/yaml-doc/rust (crate fgos-yaml-doc)
@@ -27,7 +27,7 @@ Related:
 
 ## 1. Purpose
 
-YAML Document answers one question for any caller holding YAML text: what does this text mean, and what are the exact bytes after this one change. It is a foundation leaf. It knows YAML, comments, positions and a merge primitive. It does not know what a config key means, which file is project or global, what a default is, or who may write. That is the Config component's job, one layer up (`docs/platform/config/spec.md`).
+YAML Document answers one question for any caller holding YAML text: what does this text mean, and what are the exact bytes after this one change, or of a new document. It is a foundation leaf. It knows YAML, comments, positions and a merge primitive. It does not know what a config key means, which file is project or global, what a default is, or who may write. That is the Config component's job, one layer up (`docs/platform/config/spec.md`).
 
 The owner set the shape on 2026-10-21: "chúng ta thực chất cần tool đọc/ghi/merge yaml. và phía trên tool yaml là tool config sẽ đi kèm schema để áp xuống". This component is the first of those two tools.
 
@@ -40,7 +40,7 @@ The owner set the shape on 2026-10-21: "chúng ta thực chất cần tool đọ
 | Edits that keep every untouched byte (section 5) | Locks, concurrency control, durable writes (Holder-lock, Durable File, called by Config) |
 | Comment blocks as positioned text, and their injection guard (section 6) | The `@fgos:` comment grammar and when a reason is required (Config) |
 | The merge primitive over semantic values, with per-path rules supplied by the caller (section 7) | Choosing the merge rules (Config, from descriptors) |
-| Golden fixtures that pin the meaning of both profiles (section 9) | The frontmatter cut, `readFrontmatter` in `src/util/yaml.mjs` (the hand-written report helper is deleted, 2026-11-14), and the portable `distill.mjs` and `instruction-audit.mjs` readers, which ship into user projects without the addon and stay on their own paths |
+| Golden fixtures that pin the meaning of both profiles (section 9) | The frontmatter cut and write, `readFrontmatter` and `writeFrontmatter` in `src/util/yaml.mjs` (the hand-written report helper is deleted, 2026-11-14), and the portable `distill.mjs` and `instruction-audit.mjs` readers, which ship into user projects without the addon and stay on their own paths |
 
 There is one implementation: the Rust crate `fgos-yaml-doc`. Rust callers link it. Node reaches it only through the native door (section 10). No JavaScript YAML parser remains on the main parse path.
 
@@ -97,6 +97,9 @@ Operations on a parsed document, each addressed by a path:
 | `setInlineComment(path, text?)` | replace the trailing comment on the node's line; absent text removes it, empty text is refused `inline-comment-empty` |
 | `commentsAt(path)` | read the block above and the inline comment, as text without the `#` |
 | `toBytes()` | the document after every edit |
+| `emit(value)` | the bytes of a new document holding `value` (a `set` of the whole value on an empty document): rendering depends only on the value; the re-parse check applies |
+
+An empty path on an empty document writes the whole value. `emit` is a bounded shape-A render of new content with the renderers `set` already uses for new subtrees, not a shape-B re-render of an existing document.
 
 Guarantees, each tested by golden fixtures:
 
@@ -116,6 +119,8 @@ Injection guard, applied to every comment this component writes:
 - bidi controls (U+202A–U+202E, U+2066–U+2069, U+200E, U+200F, U+061C) and zero-width characters (U+200B–U+200D, U+2060, U+FEFF) in comment text are refused, the same rule values get in `strict-config` (section 4), so a diff cannot hide what a note says; refused rather than stripped, so the text the caller supplied and the text written stay the same words;
 - whether a caller's text may span lines at all, and which line prefixes it may not start with, is the caller's rule (Config allows neither for reasons, Config spec section 7);
 - an inline comment is one line; text with a line break is refused there.
+
+Values get the matching write rule: a string holding a character of the hidden set (the bidi and zero-width characters above) is never written plain, single-quoted or as a block scalar; double quotes escape it as `\uXXXX`, and the value read back is unchanged.
 
 ## 7. Merge primitive
 
@@ -177,6 +182,7 @@ Node reaches the component through the one combined native addon, as it already 
 - The vendored `src/util/third-party/js-yaml.mjs` (deleted in c38a2f686) and its hash test are deleted in the same change. RUL101 ("every YAML parse goes through one vendored js-yaml behind `src/util/yaml.mjs`") is superseded by a new decision ID recorded in `docs/platform/packaging-distribution/spec.md`'s "Lịch sử quyết định": the one-door rule stays, the implementation behind the door becomes Rust. `distill.mjs` stays on its own path, as RUL101 (every YAML parse goes through one vendored js-yaml; superseded by the native door) kept it. src/report/frontmatter.mjs stayed then and is gone since 2026-11-14: `readFrontmatter` in `src/util/yaml.mjs` cuts and parses a frontmatter block through this door (decision in `docs/platform/packaging-distribution/spec.md`'s "Lịch sử quyết định").
 - Measured cost (spike, G1): one N-API call about 12 µs, against 2.8 ms to spawn `/bin/true` and 40 ms for `fgos version` through the host. Loading the addon costs 0.5 ms plus an 8.4 ms hash check once per process, already paid by every Node process that touches Git.
 - When the addon cannot load (not shipped on the channel, target mismatch), the call fails with the door's named error and its next step. There is no JavaScript fallback parser.
+- The `yaml` namespace exposes `parse` and `emit`; `yaml` marker 2 is the first with `emit`. `writeFrontmatter(meta, body, file)` in `src/util/yaml.mjs` is the one writer of YAML text in Node: it emits `meta` through the `tool` profile, then reads the block back through `readFrontmatter` and refuses a result that differs from `meta`. Node-side rule ids: `frontmatter-not-a-mapping`, `frontmatter-not-json`, `frontmatter-not-round-trip`. There is no general `stringifyYaml`: no caller needs one, while the crate's `emit` is general. A `yaml` marker below 2 makes the whole native door unavailable to the payload (one conjunction in `combinedAbiMatches`), so payload and addon activate together.
 - The Windows load of the addon is unproven (gate G4). Until a Windows run passes, a Windows release is not considered to support YAML reads.
 
 ## 11. Failure cases
@@ -225,3 +231,4 @@ Node reaches the component through the one combined native addon, as it already 
 - **2026-10-22: a caught panic is silent.** One process-wide hook, installed once by the first guard, stays quiet inside a guarded call and delegates all other panics to the previous hook (section 10).
 - **2026-10-23: the Node door landed.** The addon's `yaml` namespace returns JSON text in document order plus the non-finite floats (JSON has no form for them, so they are restored from a path list); `parseYaml` keeps its signature, a refusal is a `YamlParseError` with rule, file, line and column and no input text. Parity of the old and new door over 1414 tracked documents: 1396 equal, 18 rejected by both, 0 different. RUL101 (every YAML parse goes through one vendored js-yaml; superseded by the native door) is superseded by RUL108 (every YAML parse goes through the native door) in `docs/platform/packaging-distribution/spec.md`.
 - **2026-11-14: frontmatter goes through the door.** `readFrontmatter(text, file)` in `src/util/yaml.mjs` is the one cut and parse of a document's `---` block; the flat hand-written helper and its writer are deleted. The decision text is in `docs/platform/packaging-distribution/spec.md`'s "Lịch sử quyết định".
+- **2026-11-15: the door writes.** `emit` and `writeFrontmatter` give Node one writer of YAML text; the five hand-written frontmatter writers moved onto it. The decision text, rejected options and evidence are in `docs/platform/packaging-distribution/spec.md`'s "Lịch sử quyết định" (entry of 2026-11-15).
