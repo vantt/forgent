@@ -197,6 +197,8 @@ where
             Ok(false) => thread::sleep(POLL),
             Err(error) => {
                 group.kill();
+                // The group kill misses a child that moved into another group; the child itself must still end.
+                let _ = child.kill();
                 let _ = child.wait();
                 return Err(error);
             }
@@ -204,6 +206,8 @@ where
     };
     // The child has ended or is out of time; its descendants must not outlive the call either.
     group.kill();
+    // The group kill misses a child that moved into another group; the child itself must still end.
+    let _ = child.kill();
     let status = child.wait()?;
     if let Some(writer) = writer {
         if writer.is_finished() {
@@ -510,11 +514,46 @@ mod tests {
             "sleep 60 & echo $! > '{}/grandchild.pid'; wait",
             dir.display()
         );
+        let started = Instant::now();
         let outcome = sh(&script, &[], Duration::from_millis(500)).unwrap();
+        // Without the group kill the call waits for the 60 s sleep instead of returning.
+        assert!(
+            started.elapsed() < Duration::from_secs(5),
+            "{:?}",
+            started.elapsed()
+        );
         assert!(matches!(outcome, Outcome::TimedOut { .. }));
         assert!(
             gone_soon(pid_written_by(&dir)),
             "the grandchild outlived the call"
+        );
+    }
+
+    #[test]
+    fn a_child_that_left_its_group_is_still_killed_at_the_timeout() {
+        // The child moves into the test process's own group, so the group named by its pid is gone and the
+        // group kill reaches nothing; only killing the child itself ends it.
+        // SAFETY: getpgrp has no preconditions.
+        let ours = unsafe { libc::getpgrp() };
+        let script = format!("import os,time; os.setpgid(0,{ours}); time.sleep(60)");
+        let started = Instant::now();
+        let outcome = run_bounded(
+            "python3",
+            ["-c", script.as_str()],
+            &[(
+                "PATH".to_string(),
+                "/usr/bin:/bin:/usr/local/bin".to_string(),
+            )],
+            None,
+            None,
+            Duration::from_millis(1500),
+        )
+        .unwrap();
+        assert!(matches!(outcome, Outcome::TimedOut { .. }));
+        assert!(
+            started.elapsed() < Duration::from_secs(8),
+            "{:?}",
+            started.elapsed()
         );
     }
 

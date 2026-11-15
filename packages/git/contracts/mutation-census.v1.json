@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "7858d871de7e6b88db3f56bd26306d4a9964aab24b1ea8b87eb90b952b8cab14",
+  "payloadDigest": "f42a1f941e6819357de7634da818825110e5d9fb9f04bc08178fd5285706aa14",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "a5629383f89b4488b252a62f0ea86463e649e33e0a891db1a19af2cd6c136aca",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -669,7 +669,7 @@
     "packages/process/rust/src/platform/windows.rs": "cf66a8c0aa69457c1b7a99c841cec556e4b31fa23890fb370d30c43310d38a45",
     "packages/process/rust/src/platform/windows_job.rs": "0909fae6ac6feb8707e86e06e1d15a62f2182eff42c017c88c51f945b4215561",
     "packages/process/rust/src/platform/windows_spawn.rs": "16c65da01c8dc4546109827a9a91fb3b57e6ab8285532b173c30097c9b889133",
-    "packages/process/rust/src/spawn.rs": "25cb0384dc63ebd56bf42d62c0ee0b08e85651afc07b12431ee36865119cca0f",
+    "packages/process/rust/src/spawn.rs": "008dd5893d7d88fba50350988344d531dc0cdefa2f39411774e3b97b59506a71",
     "packages/process/rust/tests/common/mod.rs": "4c5caaca18815ba835a6ff9ae6b22e08af6e997ebbd152249fa9121a960e5863",
     "packages/process/rust/tests/containment_bwrap.rs": "da5288a138c19e228dc33255bb77abc9756958acfb0792d9ee8386242d8d7c31",
     "packages/process/rust/tests/containment_conformance.rs": "e98c00dbcc32edd5f67831608775f750ffefcdc49229f57426c204c2dd418153",
