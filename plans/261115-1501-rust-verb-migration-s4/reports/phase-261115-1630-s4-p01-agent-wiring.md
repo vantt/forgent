@@ -105,3 +105,22 @@ Status: DONE_WITH_CONCERNS
   feed them the extension text from `agent-hooks.v1.json` (the `omp-*`/`pi-*` cases) before deleting `agent-hooks.mjs`.
 - **For the series gate:** `test/rust-host/release-tree.test.mjs` (not run here; the payload `files` list gained
   `packages/distribution/contracts/delete-guard-prefilter.v1.json`), plus `npm test` and `cargo test --workspace`.
+
+## Review fixes (OPC verdict CHANGES)
+
+- Attempt prefix: `packages/identity/rust/tests/attempt_writer_id.rs` now asserts `agent-hooks.v1.json` `attemptIdPrefix == ATTEMPT_PREFIX`
+  by path (no crate edge); the self-referential agent_hooks test is removed.
+- The contract is small (prefix, shim path, timeout, rows; 6 KB). The 64 replay cases moved to the test-only
+  `packages/distribution/rust/tests/goldens/agent-hooks-vectors.json`; the Node test reads that file. `attempt_prefix()` and
+  `Prefilter::bundled` use `expect`/panic on a missing or empty key instead of a fallback.
+- Accepted change (stricter than Node): an install refuses a hook file whose path resolves outside the canonical project root
+  (a link, or a linked parent such as `.claude -> /elsewhere`), a dangling link included; it answers `wired: false,
+  skippedExisting: "outside-project"` and writes nothing. A link that stays inside the project is followed as before.
+- A new hook file takes `0666 & ~umask` (learned from a probe file), not a fixed `0644`.
+- Door rows: new "delete-guard keyword list" (allowed `agent_hooks.rs`, debt `agent-hooks.mjs`, the guard test's own matcher copy
+  named in the reason, negative cases in `architecture.test.mjs`); hook-table row gains the `hooks.json` pattern and allowed entries
+  for `scripts/lib/mailbox-behaviour-run.mjs` and `scripts/lib/mailbox-behaviour-v7f.mjs` (harness-owned).
+- Phase 07's file lists the deferrals (live harness import, extension runtime cases, launcher digest test, debt entries).
+- `test/setup/project-launcher.test.mjs` pins the Node launcher bodies to `launcher-digests.json`; spec text for the `mailbox.enabled` reader
+  fixed in `docs/platform/agent-mailbox/spec.md`; redundant `set_permissions` removed from `launcher.rs`.
+- Pending: cherry-pick of p02's corrected spawn commits over `abc80cef5` and `cf78c3189` when the step lead sends the shas.

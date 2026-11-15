@@ -142,11 +142,6 @@ pub fn write_launcher(file: &Path, windows: bool) -> io::Result<()> {
         0o755,
     )
     .map_err(io::Error::other)?;
-    #[cfg(unix)]
-    {
-        use std::os::unix::fs::PermissionsExt;
-        std::fs::set_permissions(file, std::fs::Permissions::from_mode(0o755))?;
-    }
     Ok(())
 }
 

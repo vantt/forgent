@@ -7,10 +7,19 @@ import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 
-import { inspectLauncher, writeLauncher, launcherFileName, LAUNCHER_MARKER } from '../../src/setup/project-launcher.mjs';
+import crypto from 'node:crypto';
+import { inspectLauncher, writeLauncher, launcherFileName, launcherBody, LAUNCHER_MARKER } from '../../src/setup/project-launcher.mjs';
 import { checkProjectLauncher, fixProjectLauncher } from '../../src/setup/registrations.mjs';
 
 const POSIX = process.platform !== 'win32';
+
+// The Rust launcher module (packages/distribution/rust/src/launcher.rs) pins its bodies to the same digests.
+test('the launcher bodies stay the bytes recorded for the Rust module', () => {
+  const pinned = JSON.parse(fs.readFileSync(new URL('../../packages/distribution/rust/tests/goldens/launcher-digests.json', import.meta.url), 'utf8'));
+  const digest = (text) => crypto.createHash('sha256').update(text).digest('hex');
+  assert.equal(digest(launcherBody('linux')), pinned.sh);
+  assert.equal(digest(launcherBody('win32')), pinned.cmd);
+});
 
 function sandbox() {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-launcher-'));

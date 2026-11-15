@@ -107,13 +107,22 @@
         "['\"]extensions['\"],\\s*['\"]fgos-hooks\\.ts['\"]",
         "\\[\"\\.claude\", \"settings\\.json\"\\]",
         "\\[\"\\.codex\", \"hooks\\.json\"\\]",
-        "\\[\"\\.agents\", \"hooks\\.json\"\\]"
+        "\\[\"\\.agents\", \"hooks\\.json\"\\]",
+        "['\"]hooks\\.json['\"]"
       ],
       "allowed": [
         "packages/distribution/rust/src/agent_hooks.rs",
         {
           "path": "src/run-supervisor/trust-store.mjs",
           "reason": "reads and hashes the Codex hook file's bytes to trust its entries; it writes no hook"
+        },
+        {
+          "path": "scripts/lib/mailbox-behaviour-v7f.mjs",
+          "reason": "harness-owned frozen experiment: names the hooks.json of the Codex home it builds for a simulated session; not a project hook file"
+        },
+        {
+          "path": "scripts/lib/mailbox-behaviour-run.mjs",
+          "reason": "harness-owned: writes the hooks.json of a Codex home it builds for a simulated session, like worker-home.mjs does for a worker; not a project hook file"
         },
         {
           "path": "scripts/check-hook-registrations-guarded.mjs",
@@ -152,6 +161,26 @@
       ],
       "retiredBy": "S4: the packaging verbs and doctor rows move to the host and the Node table goes with its last importer",
       "reason": "the hook files of the five agent CLIs and the omp/pi extension are rendered, checked and removed from one table (fgos-distribution agent_hooks.rs); the patterns match the file names whole and built in parts. A reader that only reads or hashes a hook file, or writes a worker's own settings, is allowed with its reason"
+    },
+    {
+      "job": "delete-guard keyword list",
+      "kind": "door",
+      "patterns": [
+        "\\bPREFILTER_(?:SUBSTRINGS|WORDS)\\b",
+        "\\bDELETE_GUARD_PREFILTER\\b",
+        "delete-guard-prefilter\\.v1\\.json"
+      ],
+      "allowed": [
+        "packages/distribution/rust/src/agent_hooks.rs"
+      ],
+      "debt": [
+        {
+          "path": "src/setup/agent-hooks.mjs",
+          "reason": "the earlier Node renderer of the extension and the case patterns, which reads the same data file; it goes with the Node hook table"
+        }
+      ],
+      "retiredBy": "S4: the Node hook table goes with its last importer",
+      "reason": "the keywords the main-checkout delete guard's prefilter looks for are data (packages/distribution/contracts/delete-guard-prefilter.v1.json), rendered by agent_hooks.rs. test/git/main-checkout-delete-guard.test.mjs:11-12 keeps its own matcher over the same data to prove every refusal passes the prefilter; tests are outside the door walk, so that copy is named here, not checked"
     },
     {
       "job": "person's agent config writes",

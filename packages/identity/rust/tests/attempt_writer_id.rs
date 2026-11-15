@@ -163,3 +163,15 @@ fn an_empty_inherited_session_id_does_not_survive() {
 fn an_empty_writer_id_is_refused() {
     assert!(launcher_env("", None).is_err());
 }
+
+/// The generated omp and pi extensions run in the agent process and cannot ask this crate, so they carry
+/// the attempt prefix as a literal taken from the hook table contract. That contract is read by path, not
+/// through a crate edge, and must name this crate's prefix.
+#[test]
+fn the_hook_table_contract_names_this_crates_attempt_prefix() {
+    let path = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+        .join("../../distribution/contracts/agent-hooks.v1.json");
+    let text = std::fs::read_to_string(&path).unwrap_or_else(|e| panic!("{}: {e}", path.display()));
+    let contract: Value = serde_json::from_str(&text).unwrap();
+    assert_eq!(contract["attemptIdPrefix"], ATTEMPT_PREFIX);
+}

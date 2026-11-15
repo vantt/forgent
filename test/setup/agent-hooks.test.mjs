@@ -1042,13 +1042,14 @@ process.exit(0);
 // The vectors the Rust hook table (packages/distribution/rust/src/agent_hooks.rs) is proved against
 // ---------------------------------------------------------------------------
 
-const VECTORS = JSON.parse(fs.readFileSync(new URL('../../packages/distribution/contracts/agent-hooks.v1.json', import.meta.url), 'utf8'));
+const VECTORS = JSON.parse(fs.readFileSync(new URL('../../packages/distribution/rust/tests/goldens/agent-hooks-vectors.json', import.meta.url), 'utf8'));
+const CONTRACT = JSON.parse(fs.readFileSync(new URL('../../packages/distribution/contracts/agent-hooks.v1.json', import.meta.url), 'utf8'));
 const INSTALL_BY_CLI = { claude: installClaudeHook, codex: installCodexHook, agy: installAgyHook, omp: installOmpHook, pi: installPiHook };
 const CHECK_BY_CLI = { claude: checkClaudeHook, codex: checkCodexHook, agy: checkAgyHook, omp: checkOmpHook, pi: checkPiHook };
 
-test('the generated extension names the attempt prefix of the vector data, and the data equals the minted prefix', () => {
+test('the hook table contract names the minted attempt prefix', () => {
   const attemptId = 'probe-1';
-  assert.equal(mintAttemptWriterId(attemptId).slice(0, -attemptId.length), VECTORS.attemptIdPrefix);
+  assert.equal(mintAttemptWriterId(attemptId).slice(0, -attemptId.length), CONTRACT.attemptIdPrefix);
 });
 
 test('this module installs, checks and uninstalls every recorded vector exactly as recorded', () => {

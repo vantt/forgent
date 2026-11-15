@@ -63,6 +63,20 @@ Phase-lead rules: [plan.md](plan.md). Branch `rust-verb-migration-program/s4-p07
 | version, host binary rows | their `registrations.test.mjs` cases | `packaging.rs` tests |
 | `curl-available` | `test/setup/curl-check.test.mjs` | `packaging.rs` test |
 
+## Deferred from phase 01 (must be done here, before the Node hook table is deleted)
+
+- `scripts/lib/mailbox-live-confined.mjs` (`installRunRows`) still imports `src/setup/agent-hooks.mjs`; the hook-table door row
+  carries it as debt. Switch it to the host's hook fixes with a scrubbed HOME and PATH (the private release stages no
+  legacy-node payload; `doctor --fix` must not run the launcher or timer fixes against the real machine), then drop the debt entry.
+- The extension runtime cases of `test/setup/agent-hooks.test.mjs` (handlers load in Node, inert for a runner worker, frame
+  after real output, shim owner and mode refusal, hook timeout, shim search from a subdirectory; they use `installOmpHook`,
+  `installPiHook`, `extensionSourceFor`) run the generated JavaScript and call the Node generator. Feed them the omp/pi
+  extension text recorded in `packages/distribution/rust/tests/goldens/agent-hooks-vectors.json` before deleting the module.
+- `test/setup/project-launcher.test.mjs` pins the Node launcher bodies to `launcher-digests.json` until it is deleted; the
+  Rust `launcher.rs` tests own them after.
+- Door rows to settle when the module goes: the hook-table, "delete-guard keyword list" and "person's agent config writes" debt
+  entries naming Node files, and the `src/setup/project-launcher.mjs` entry of the shim row.
+
 ## Files
 
 - Create: `apps/fgos/src/wiring/doctor/packaging.rs`.

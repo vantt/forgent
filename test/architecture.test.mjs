@@ -2103,4 +2103,9 @@ test('door rows for the agent hook table and a person\'s agent config catch a se
   assert.equal(outsideDoor(config, 'src/x.mjs', "const s = { toolPermission: 'always-proceed' };\n").length, 1);
   assert.deepEqual(outsideDoor(config, 'src/x.mjs', '// toolPermission is never written\n'), []);
   assert.equal(outsideDoor('installation shim and activation record location', 'packages/p/rust/src/x.rs', 'let a = ".fgos/installation/bin/fgos";\n').length, 1);
+  assert.equal(outsideDoor(table, 'scripts/x.mjs', "fs.writeFileSync(path.join(home, 'hooks.json'), '{}');\n").length, 1);
+  const keywords = 'delete-guard keyword list';
+  assert.equal(outsideDoor(keywords, 'src/x.mjs', "const PREFILTER_WORDS = ['rm', 'sh'];\n").length, 1);
+  assert.equal(outsideDoor(keywords, 'packages/p/rust/src/x.rs', 'include_str!("../../contracts/delete-guard-prefilter.v1.json");\n').length, 1);
+  assert.deepEqual(outsideDoor(keywords, 'src/x.mjs', '// the PREFILTER_WORDS list is data\n'), []);
 });

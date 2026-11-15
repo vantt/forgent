@@ -14,8 +14,8 @@
 //! - A malformed hook file is skipped and reported, never rewritten.
 //! - The check also probes that the shim runs, with benign input and a finite timeout.
 //!
-//! The bytes written equal what the earlier Node module wrote: `contracts/agent-hooks.v1.json` holds the
-//! vectors both owners were proved against, and the run supervisor's trust store hashes hook bytes.
+//! The bytes written equal what the earlier Node module wrote: `tests/goldens/agent-hooks-vectors.json` holds
+//! the vectors both owners were proved against, and the run supervisor's trust store hashes hook bytes.
 //!
 //! The mailbox hook rows follow `mailbox.enabled`, whose reader this module is
 //! (`packages/mailbox/contracts/limits.v1.json`): a project that opted out gets none and loses the ones
@@ -209,15 +209,23 @@ impl Prefilter {
                 "../../contracts/delete-guard-prefilter.v1.json"
             ))
             .expect("the prefilter contract parses");
+            // A missing or empty list must stop the build of the guard, never silently empty it.
             let list = |key: &str| -> Vec<String> {
-                doc[key]
+                let items: Vec<String> = doc[key]
                     .as_array()
-                    .map(|a| {
-                        a.iter()
-                            .filter_map(|v| v.as_str().map(str::to_string))
-                            .collect()
+                    .unwrap_or_else(|| panic!("the prefilter contract has no `{key}` list"))
+                    .iter()
+                    .map(|v| {
+                        v.as_str()
+                            .unwrap_or_else(|| panic!("a `{key}` entry is not text"))
+                            .to_string()
                     })
-                    .unwrap_or_default()
+                    .collect();
+                assert!(
+                    !items.is_empty(),
+                    "the prefilter contract's `{key}` list is empty"
+                );
+                items
             };
             Prefilter {
                 substrings: list("substrings"),
@@ -835,6 +843,51 @@ fn write_target(path: &Path) -> PathBuf {
     }
 }
 
+/// The mode a file this process creates in `dir` gets: `0666` minus the umask, as the earlier module's plain
+/// write gave. Learned from a probe file the kernel masks, since the umask can only be read by changing it.
+#[cfg(unix)]
+fn creation_mode(dir: &Path) -> u32 {
+    use std::os::unix::fs::{OpenOptionsExt, PermissionsExt};
+    use std::sync::atomic::{AtomicUsize, Ordering};
+    static PROBES: AtomicUsize = AtomicUsize::new(0);
+    let probe = dir.join(format!(
+        ".fgos-mode-probe-{}-{}",
+        std::process::id(),
+        PROBES.fetch_add(1, Ordering::SeqCst)
+    ));
+    let opened = std::fs::OpenOptions::new()
+        .write(true)
+        .create_new(true)
+        .mode(0o666)
+        .open(&probe);
+    let mode = opened
+        .and_then(|file| file.metadata())
+        .map_or(0o644, |m| m.permissions().mode() & 0o7777);
+    let _ = std::fs::remove_file(&probe);
+    mode
+}
+
+/// Whether the hook file at `relative` below `root` is reached through a link that leaves the canonical
+/// project root, or through one that points nowhere: a write there would land outside the project.
+fn leaves_project(root: &Path, relative: &[&str]) -> Result<bool, AgentHooksError> {
+    let canonical_root = std::fs::canonicalize(root).map_err(io_err(root))?;
+    let mut current = root.to_path_buf();
+    for part in relative {
+        current = current.join(part);
+        match std::fs::symlink_metadata(&current) {
+            Ok(meta) if meta.file_type().is_symlink() => match std::fs::canonicalize(&current) {
+                Ok(target) if target.starts_with(&canonical_root) => {}
+                _ => return Ok(true),
+            },
+            Ok(_) => {}
+            Err(_) => return Ok(false),
+        }
+    }
+    Ok(false)
+}
+
+const OUTSIDE_PROJECT: &str = "outside-project";
+
 fn write_file(path: &Path, bytes: &[u8]) -> Result<(), AgentHooksError> {
     let target = write_target(path);
     let dir = target.parent().unwrap_or_else(|| Path::new("."));
@@ -846,7 +899,8 @@ fn write_file(path: &Path, bytes: &[u8]) -> Result<(), AgentHooksError> {
     #[cfg(unix)]
     let mode = {
         use std::os::unix::fs::PermissionsExt;
-        std::fs::metadata(&target).map_or(0o644, |m| m.permissions().mode() & 0o7777)
+        std::fs::metadata(&target)
+            .map_or_else(|_| creation_mode(dir), |m| m.permissions().mode() & 0o7777)
     };
     #[cfg(not(unix))]
     let mode = 0o644;
@@ -1062,6 +1116,13 @@ fn mailbox_notice(rows: &[HookRow], cli: &str, opt_in: &MailboxOptIn) -> Option<
 fn install_rows(root: &Path, cli: &str, env: Env) -> Result<InstallResult, AgentHooksError> {
     let spec = hook_file(cli);
     let path = join_parts(root, spec.file);
+    if leaves_project(root, spec.file)? {
+        return Ok(InstallResult {
+            wired: false,
+            skipped_existing: Some(OUTSIDE_PROJECT),
+            mailbox: None,
+        });
+    }
     let mut config = match read_json(&path)? {
         Read::Absent => Map::new(),
         Read::Object(map) => map,
@@ -1123,6 +1184,13 @@ pub fn install_extension_hook(
     env: Env,
 ) -> Result<InstallResult, AgentHooksError> {
     let path = extension_path(root, cli);
+    if leaves_project(root, &[&format!(".{cli}"), "extensions", "fgos-hooks.ts"])? {
+        return Ok(InstallResult {
+            wired: false,
+            skipped_existing: Some(OUTSIDE_PROJECT),
+            mailbox: None,
+        });
+    }
     let opt_in = mailbox_opt_in(root, env)?;
     let mailbox = refusal_line(&opt_in);
     if mailbox.is_some() && path.exists() {
@@ -1285,16 +1353,16 @@ export default function (api: any) {
 "#;
 
 /// The attempt-id prefix of a runner worker's writer id. The extension runs in the agent process and cannot
-/// ask the identity crate, so the literal travels as data in `agent-hooks.v1.json`, which the test that
-/// pins it to the crate's prefix reads.
+/// ask the identity crate, so the literal travels as data in `agent-hooks.v1.json`, which a test in the identity
+/// crate (`attempt_writer_id.rs`) pins to the crate's prefix.
 fn attempt_prefix() -> &'static str {
     static PREFIX: OnceLock<String> = OnceLock::new();
     PREFIX.get_or_init(|| {
         let doc: Value = serde_json::from_str(include_str!("../../contracts/agent-hooks.v1.json"))
-            .expect("the hook vectors parse");
+            .expect("the hook table contract parses");
         doc["attemptIdPrefix"]
             .as_str()
-            .unwrap_or("att-")
+            .expect("the hook table contract names attemptIdPrefix")
             .to_string()
     })
 }
@@ -2046,10 +2114,19 @@ mod tests {
     use super::*;
     use std::collections::BTreeMap;
 
-    fn vectors() -> &'static Value {
+    /// The small contract: prefix, shim path, hook timeout, rows.
+    fn contract() -> &'static Value {
         static DOC: OnceLock<Value> = OnceLock::new();
         DOC.get_or_init(|| {
             serde_json::from_str(include_str!("../../contracts/agent-hooks.v1.json")).unwrap()
+        })
+    }
+
+    /// The replay vectors recorded from the earlier Node module.
+    fn vectors() -> &'static Value {
+        static DOC: OnceLock<Value> = OnceLock::new();
+        DOC.get_or_init(|| {
+            serde_json::from_str(include_str!("../tests/goldens/agent-hooks-vectors.json")).unwrap()
         })
     }
 
@@ -2194,21 +2271,12 @@ mod tests {
     }
 
     #[test]
-    fn the_extension_carries_the_attempt_prefix_of_the_vector_data() {
-        let source = extension_source("pi", true).unwrap();
-        assert!(source.contains(&format!(
-            ".startsWith('{}')",
-            vectors()["attemptIdPrefix"].as_str().unwrap()
-        )));
-    }
-
-    #[test]
     fn the_hook_table_equals_the_recorded_rows_for_a_project_that_opted_in() {
         let fx = Fixture::new("rows", "project");
         let rows = hook_rows(&fx.root, mailbox_hook_timeout_sec().unwrap());
         assert_eq!(
             mailbox_hook_timeout_sec().unwrap(),
-            vectors()["mailboxHookTimeoutSec"].as_u64().unwrap()
+            contract()["mailboxHookTimeoutSec"].as_u64().unwrap()
         );
         let mut got: Map<String, Value> = Map::new();
         for row in &rows {
@@ -2219,7 +2287,7 @@ mod tests {
                 .push(norm(row.to_value(), &fx));
         }
         // the earlier module recorded a null matcher where an entry has none
-        let mut want = vectors()["rowsMailboxOn"].clone();
+        let mut want = contract()["rowsMailboxOn"].clone();
         for rows in want.as_object_mut().unwrap().values_mut() {
             for row in rows.as_array_mut().unwrap() {
                 if row["matcher"].is_null() {
@@ -2342,17 +2410,22 @@ mod tests {
 
     #[cfg(unix)]
     #[test]
-    fn an_install_keeps_the_mode_of_a_settings_file_and_follows_a_link_in_its_place() {
+    fn an_install_keeps_the_mode_of_a_file_and_follows_a_link_that_stays_inside_the_project() {
         use std::os::unix::fs::PermissionsExt;
         let fx = Fixture::new("mode", "project");
-        let env = fx.env();
-        let target = fx.base.join("dotfiles-settings.json");
+        let lookup = fx.env();
+        let target = fx.root.join("dotfiles").join("settings.json");
+        std::fs::create_dir_all(target.parent().unwrap()).unwrap();
         std::fs::write(&target, "{}").unwrap();
         std::fs::set_permissions(&target, std::fs::Permissions::from_mode(0o600)).unwrap();
         std::fs::create_dir_all(fx.root.join(".claude")).unwrap();
         let link = fx.root.join(".claude").join("settings.json");
         std::os::unix::fs::symlink(&target, &link).unwrap();
-        install_json_hooks(&fx.root, "claude", &env).unwrap();
+        assert!(
+            install_json_hooks(&fx.root, "claude", &lookup)
+                .unwrap()
+                .wired
+        );
         assert!(
             std::fs::symlink_metadata(&link)
                 .unwrap()
@@ -2367,6 +2440,68 @@ mod tests {
             std::fs::metadata(&target).unwrap().permissions().mode() & 0o777,
             0o600
         );
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn a_new_hook_file_gets_the_mode_a_plain_create_gets_under_the_umask() {
+        use std::os::unix::fs::PermissionsExt;
+        let fx = Fixture::new("umask", "project");
+        let lookup = fx.env();
+        install_json_hooks(&fx.root, "claude", &lookup).unwrap();
+        let plain = fx.root.join("plain-create");
+        std::fs::File::create(&plain).unwrap();
+        let mode = |p: &Path| std::fs::metadata(p).unwrap().permissions().mode() & 0o777;
+        assert_eq!(
+            mode(&fx.root.join(".claude").join("settings.json")),
+            mode(&plain)
+        );
+        let left: Vec<_> = std::fs::read_dir(fx.root.join(".claude"))
+            .unwrap()
+            .map(|e| e.unwrap().file_name())
+            .collect();
+        assert!(
+            left.iter().all(|n| !n.to_string_lossy().contains("probe")),
+            "no probe file is left: {left:?}"
+        );
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn an_install_refuses_a_hook_file_that_resolves_outside_the_project_and_writes_nothing_there() {
+        let fx = Fixture::new("escape", "project");
+        let lookup = fx.env();
+        let elsewhere = fx.base.join("elsewhere");
+        std::fs::create_dir_all(&elsewhere).unwrap();
+        let refused = |cli: &str| {
+            let result = install_hook(&fx.root, cli, &lookup).unwrap();
+            assert_eq!(result.skipped_existing, Some("outside-project"), "{cli}");
+            assert!(!result.wired, "{cli}");
+        };
+        // a link in place of the file, pointing outside
+        let outside_file = elsewhere.join("settings.json");
+        std::fs::write(&outside_file, "{}").unwrap();
+        std::fs::create_dir_all(fx.root.join(".claude")).unwrap();
+        std::os::unix::fs::symlink(&outside_file, fx.root.join(".claude").join("settings.json"))
+            .unwrap();
+        refused("claude");
+        assert_eq!(std::fs::read_to_string(&outside_file).unwrap(), "{}");
+        // a dangling link
+        std::fs::create_dir_all(fx.root.join(".codex")).unwrap();
+        std::os::unix::fs::symlink(
+            elsewhere.join("absent.json"),
+            fx.root.join(".codex").join("hooks.json"),
+        )
+        .unwrap();
+        refused("codex");
+        assert!(!elsewhere.join("absent.json").exists());
+        // a linked parent directory
+        std::os::unix::fs::symlink(&elsewhere, fx.root.join(".agents")).unwrap();
+        refused("agy");
+        // the extension, through a linked directory
+        std::os::unix::fs::symlink(&elsewhere, fx.root.join(".pi")).unwrap();
+        refused("pi");
+        assert!(!elsewhere.join("hooks.json").exists() && !elsewhere.join("extensions").exists());
     }
 
     struct Scripted(
