@@ -64,6 +64,19 @@ test('a protocol other than the route protocol fails closed with exit 3 and host
   assert.equal(line(unknown).code, 'usage');
 });
 
+test('source-payload lists the files of a declared payload as one JSON line and refuses another protocol', () => {
+  const root = fs.mkdtempSync(path.join(scratch, 'payload-'));
+  fs.mkdirSync(path.join(root, 'src'));
+  fs.writeFileSync(path.join(root, 'package.json'), JSON.stringify({ files: ['src'] }));
+  fs.writeFileSync(path.join(root, 'src', 'a.mjs'), 'a');
+  const ok = host(['source-payload', root, '--protocol', '1']);
+  assert.equal(ok.status, 0, ok.stderr);
+  assert.deepEqual(line(ok).files, ['package.json', 'src/a.mjs']);
+  const mismatch = host(['source-payload', root, '--protocol', '2']);
+  assert.equal(mismatch.status, 3);
+  assert.equal(line(mismatch).code, 'host-version-mismatch');
+});
+
 test('the run supervisor routes fail closed on a protocol other than 1', () => {
   for (const route of ['supervise', 'gate', 'adopt', 'attempt-step']) {
     for (const args of [[route], [route, '--protocol', '2']]) {

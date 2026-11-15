@@ -18,8 +18,10 @@ pub mod lock;
 pub mod manifest;
 pub mod path_links;
 pub mod rc_lines;
+pub mod release_rows;
 pub mod shim;
 pub mod skill_stamp;
+pub mod source_payload;
 pub mod store;
 pub mod suggest;
 #[cfg(test)]
@@ -234,6 +236,9 @@ pub fn activation_record_path(workspace_root: &std::path::Path) -> PathBuf {
         .join("installation")
         .join("activation.json")
 }
+
+/// The activation record relative to a project root, with forward slashes.
+pub(crate) const ACTIVATION_RELATIVE: &str = ".fgos/installation/activation.json";
 
 /// The activation record of the project at `workspace_root` when it is there, parses and is `ready`.
 pub(crate) fn ready_activation(workspace_root: &std::path::Path) -> Option<serde_json::Value> {

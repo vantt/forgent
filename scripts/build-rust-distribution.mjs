@@ -13,11 +13,10 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
-import { execFileSync } from 'node:child_process';
+import { execFileSync, spawnSync } from 'node:child_process';
 import { createGitInspect, gitPortOptions } from '../src/git/inspect.mjs';
 import { loadNativeAddon } from '../src/git/native.mjs';
 import { scan, writeMutationCensus } from './git-one-door-scan.mjs';
-import { repositoryDirs, repositoryFiles } from './lib/git-dir-layout.mjs';
 import { fileURLToPath } from 'node:url';
 import { releaseBinaryPath } from '../src/util/release-binary-path.mjs';
 import { releaseTargetForHost, manifestTargetForHost } from '../src/util/release-targets.mjs';
@@ -120,68 +119,23 @@ export function computeArtifactDigest(manifestWithoutDigest) {
   return 'sha256:' + crypto.createHash('sha256').update(serialized).digest('hex');
 }
 
-/**
- * Recursively walks a directory or file and returns list of relative paths.
- * Refuses symlinks.
- */
-function collectSourceFiles(baseDir, relativePath, results) {
-  if (path.isAbsolute(relativePath)) {
-    throw new Error(`Absolute path refused in declared release payload entry: ${relativePath}`);
+/** The source payload of the checkout at `repoRoot`: the files `package.json` declares plus `package.json`,
+ * inside a repository only the tracked and untracked non-ignored ones, as forward-slash paths relative to the
+ * root. The one rule lives in the host (`fgos internal source-payload`, packages/distribution/rust/src/source_payload.rs);
+ * this asks the host binary at `hostBin` (the one this build just compiled, or the suite's staged host). */
+export function listLegacyNodeSourceFiles(repoRoot, hostBin = process.env.FGOS_HOST_BIN) {
+  if (!hostBin) throw new Error('listLegacyNodeSourceFiles needs a host binary (FGOS_HOST_BIN)');
+  const result = spawnSync(hostBin, ['internal', 'source-payload', path.resolve(repoRoot), '--protocol', '1'], {
+    encoding: 'utf8', maxBuffer: 64 << 20, stdio: ['ignore', 'pipe', 'pipe'],
+  });
+  if (result.error) throw result.error;
+  let answer;
+  try { answer = JSON.parse(result.stdout.trim().split('\n').pop()); } catch { /* reported below */ }
+  if (result.status !== 0 || answer?.result !== 'ok') {
+    throw new Error(answer?.message ?? `the host could not list the source payload (exit ${result.status}): ${result.stderr.trim()}`);
   }
-  const fullPath = path.join(baseDir, relativePath);
-  // Round-2 red-team HIGH: `../outside-payload` is not absolute, so the
-  // isAbsolute guard above doesn't catch it, but path.join still resolves
-  // it outside baseDir. Refuse anything that escapes the source checkout,
-  // matching the same containment discipline the staged-tree side already
-  // applies via the disposable-outDir check.
-  const resolvedFull = path.resolve(fullPath);
-  const resolvedBase = path.resolve(baseDir);
-  // Round-3 red-team MEDIUM: a declared entry must resolve to something
-  // STRICTLY inside baseDir, never baseDir itself -- an in-root
-  // dot-segment like "bin/.." lexically resolves to exactly baseDir
-  // without ever leaving it, which the round-2 fix's `!==` exception let
-  // through, staging (and packaging) the entire checkout root including
-  // unlisted workspace state.
-  if (!resolvedFull.startsWith(resolvedBase + path.sep)) {
-    throw new Error(`Declared release payload entry escapes the source checkout: ${relativePath}`);
-  }
-  if (!fs.existsSync(fullPath)) {
-    throw new Error(`Declared release payload entry does not exist: ${relativePath}`);
-  }
-
-  const stat = refuseSymlink(fullPath, 'release payload');
-
-  if (stat.isFile()) {
-    results.push(relativePath);
-    return;
-  }
-
-  if (stat.isDirectory()) {
-    const entries = fs.readdirSync(fullPath).sort();
-    for (const ent of entries) {
-      if (ent === '.git' || ent === 'node_modules') continue;
-      const childRel = path.join(relativePath, ent);
-      collectSourceFiles(baseDir, childRel, results);
-    }
-  }
+  return answer.files;
 }
-
-/** Source payload selection shared by release packaging and checkout diagnosis. `openInspect()`
- * opens a Git Inspect port on `repoRoot` (src/git/inspect.mjs): inside a repository its tracked plus
- * untracked, non-ignored paths define the source; an unpacked tarball (no Git layout on disk) keeps
- * the filesystem walk and never needs the addon. */
-export function listLegacyNodeSourceFiles(repoRoot, openInspect) {
-  const resolvedRepo = path.resolve(repoRoot);
-  const pkg = JSON.parse(fs.readFileSync(path.join(resolvedRepo, 'package.json'), 'utf8'));
-  const sourceFiles = [];
-  for (const declared of Array.isArray(pkg.files) ? pkg.files : []) {
-    collectSourceFiles(resolvedRepo, declared, sourceFiles);
-  }
-  collectSourceFiles(resolvedRepo, 'package.json', sourceFiles);
-  const allowed = repositoryDirs(resolvedRepo) ? repositoryFiles(resolvedRepo, openInspect()) : null;
-  return [...new Set(sourceFiles.map((file) => path.relative(resolvedRepo, path.resolve(resolvedRepo, file)).replaceAll('\\', '/')).filter((file) => !allowed || allowed.has(file)))].sort();
-}
-
 
 /**
  * Finds the installed directory of every production dependency (and of their own dependencies),
@@ -527,7 +481,7 @@ if (process.argv[2] === READ_CHECKOUT && fileURLToPath(import.meta.url) === path
   if (!process.env.FGOS_STATE_ROOT?.trim()) process.env.FGOS_STATE_ROOT = loadNativeAddon({ descriptor }).holderLock.stateRoot({ ...process.env }).stateRoot;
   const openInspect = () => createGitInspect(gitPortOptions(repoRoot), { descriptor });
   writeMutationCensus(repoRoot, scan({ root: repoRoot, openInspect }));
-  process.stdout.write(JSON.stringify(listLegacyNodeSourceFiles(repoRoot, openInspect)));
+  process.stdout.write(JSON.stringify(listLegacyNodeSourceFiles(repoRoot)));
 } else if (process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.argv[1])) {
   const args = process.argv.slice(2);
   let outDir = null;

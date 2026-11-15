@@ -2124,6 +2124,11 @@ test('the machine-service door rows catch each of their patterns outside the own
       ['src/x.mjs', 'export function fixManagedTimer(schedule, cwd) {}\n'],
       ['packages/p/rust/src/x.rs', 'pub fn remove_managed_timer(cwd: &Path) {}\n'],
     ],
+    'release source payload selection': [
+      ['scripts/x.mjs', 'function collectSourceFiles(baseDir, relativePath, results) {}\n'],
+      ['scripts/x.mjs', 'export function listLegacyNodeSourceFiles(repoRoot) {}\n'],
+      ['packages/p/rust/src/x.rs', 'pub fn list_source_files(root: &Path) {}\n'],
+    ],
     'holder-lock and mailbox doctor judgments': [
       ['src/x.mjs', 'export function checkLockKernelSemantics(repoRoot) {}\n'],
       ['src/x.mjs', 'export function fixLockDirs(repoRoot) {}\n'],

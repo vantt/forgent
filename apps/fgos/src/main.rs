@@ -174,6 +174,15 @@ fn main() {
                 .collect();
             std::process::exit(fgos_seat_binding::route::main(&rest));
         }
+        // `source-payload <root>`: the one source-payload rule, for the release builder (see
+        // `fgos_distribution::source_payload`).
+        if args.get(2).is_some_and(|a| a == "source-payload") {
+            let rest: Vec<String> = args[3..]
+                .iter()
+                .map(|a| a.to_string_lossy().into_owned())
+                .collect();
+            std::process::exit(fgos_distribution::source_payload::route_main(&rest));
+        }
         // The run supervisor's routes: supervise, gate, adopt, attempt-step.
         let rest: Vec<String> = args[2..]
             .iter()

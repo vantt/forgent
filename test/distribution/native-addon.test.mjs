@@ -30,7 +30,8 @@ test('release staging carries a real combined addon resolved from its release ma
     const output = path.join(temp, 'cargo');
     fs.mkdirSync(path.join(output, 'release'), {recursive: true});
     const host = path.join(output, 'release', process.platform === 'win32' ? 'fgos.exe' : 'fgos');
-    fs.writeFileSync(host, 'fixture host');
+    // The builder asks this host for the source payload (`fgos internal source-payload`), so it is the suite's real host.
+    fs.copyFileSync(process.env.FGOS_HOST_BIN, host);
     fs.writeFileSync(path.join(output, 'release', process.platform === 'win32' ? 'fgctl.exe' : 'fgctl'), 'fixture fgctl');
     fs.copyFileSync(built.addon, path.join(output, 'release', nativeAddonLibraryName()));
     process.env.CARGO_TARGET_DIR = output;

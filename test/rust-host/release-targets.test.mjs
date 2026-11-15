@@ -12,7 +12,6 @@ import {
   manifestTargetForHost,
 } from '../../src/util/release-targets.mjs';
 import { REPO_ROOT, buildRustDistribution, runnerShimContent } from '../../scripts/build-rust-distribution.mjs';
-import { checkRustHostTargetSupported } from '../../src/setup/registrations.mjs';
 
 test('the release target table names exactly the Linux and Windows triples', () => {
   assert.deepEqual(
@@ -35,17 +34,6 @@ test('a release tree declares the manifest target of the host that built it', ()
   // Callers cannot corrupt the table through the returned object.
   manifestTargetForHost('linux', 'x64').os = 'changed';
   assert.equal(manifestTargetForHost('linux', 'x64').os, 'linux');
-});
-
-test('rust-host-target-supported approves both published targets and refuses the rest', () => {
-  assert.equal(checkRustHostTargetSupported('linux', 'x64').passed, true);
-  const win = checkRustHostTargetSupported('win32', 'x64');
-  assert.equal(win.passed, true);
-  assert.match(win.message, /x86_64-pc-windows-msvc/);
-  const mac = checkRustHostTargetSupported('darwin', 'arm64');
-  assert.equal(mac.passed, false);
-  assert.match(mac.message, /not an approved rust host target/);
-  assert.match(mac.message, /x86_64-unknown-linux-gnu, x86_64-pc-windows-msvc/);
 });
 
 test('the release tree runner launcher exists in sh and cmd forms, each relative to its own location', () => {

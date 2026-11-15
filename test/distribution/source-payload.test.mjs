@@ -1,36 +1,14 @@
 import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import fs from 'node:fs';
-import os from 'node:os';
-import path from 'node:path';
-import { execFileSync } from 'node:child_process';
-import { listLegacyNodeSourceFiles } from '../../scripts/build-rust-distribution.mjs';
-import { inspectRepo } from '../../scripts/lib/git-ports.mjs';
+import { listLegacyNodeSourceFiles, REPO_ROOT } from '../../scripts/build-rust-distribution.mjs';
 import { OWN_CLI } from '../../src/util/spawn-detached-fgos.mjs';
+import path from 'node:path';
 
-test('source payload excludes ignored setup output, includes untracked source and works without Git', (t) => {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-payload-'));
-  t.after(() => fs.rmSync(root, { recursive: true, force: true }));
-  fs.mkdirSync(path.join(root, '.agents/skills/instruction-audit'), { recursive: true });
-  fs.writeFileSync(path.join(root, 'package.json'), JSON.stringify({ files: ['.agents'] }));
-  fs.writeFileSync(path.join(root, '.gitignore'), '.agents/hooks.json\n.agents/skills/instruction-audit/\n');
-  fs.writeFileSync(path.join(root, '.agents/source.mjs'), 'source');
-  execFileSync('git', ['init', '-q'], { cwd: root });
-  const before = listLegacyNodeSourceFiles(root, () => inspectRepo(root));
-  fs.writeFileSync(path.join(root, '.agents/hooks.json'), '{}');
-  fs.writeFileSync(path.join(root, '.agents/skills/instruction-audit/SKILL.md'), 'rendered');
-  assert.deepEqual(listLegacyNodeSourceFiles(root, () => inspectRepo(root)), before);
-  assert.deepEqual(before, ['.agents/source.mjs', 'package.json']);
-  fs.rmSync(path.join(root, '.git'), { recursive: true });
-  assert.deepEqual(listLegacyNodeSourceFiles(root, () => inspectRepo(root)), [
-    '.agents/hooks.json', '.agents/skills/instruction-audit/SKILL.md', '.agents/source.mjs', 'package.json',
-  ]);
-});
-
+// The selection rule has one owner, `packages/distribution/rust/src/source_payload.rs`, with its own cases; this
+// file proves the builder's side of the wiring: the list the host answers holds the entry a detached child runs.
 test('the entry a detached child runs sits in the payload at the same layout as the module that spawns it', () => {
-  const repoRoot = path.resolve(path.dirname(new URL(import.meta.url).pathname), '../..');
-  const entry = path.relative(repoRoot, OWN_CLI).split(path.sep).join('/');
+  const entry = path.relative(REPO_ROOT, OWN_CLI).split(path.sep).join('/');
   assert.equal(entry, 'bin/fgos.mjs', 'spawn-detached-fgos.mjs finds the CLI entry two levels above src/util');
-  assert.ok(listLegacyNodeSourceFiles(repoRoot, () => inspectRepo(repoRoot)).includes(entry), 'the entry is part of the staged source payload');
+  assert.ok(listLegacyNodeSourceFiles(REPO_ROOT).includes(entry), 'the entry is part of the staged source payload');
 });

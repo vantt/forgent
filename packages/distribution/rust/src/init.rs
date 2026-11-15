@@ -929,10 +929,10 @@ impl PinFile {
     }
 }
 
-const PIN_FILE_RELATIVE: &str = ".fgos/distribution.json";
+pub(crate) const PIN_FILE_RELATIVE: &str = ".fgos/distribution.json";
 
 /// The one reader of the committed `.fgos/distribution.json` pin.
-fn read_tracked_pin(distribution_path: &Path) -> PinFile {
+pub(crate) fn read_tracked_pin(distribution_path: &Path) -> PinFile {
     if !distribution_path.exists() {
         return PinFile::Absent;
     }
@@ -2290,14 +2290,28 @@ pub fn pin_drift(
     activation: &WorkspaceActivationBinding,
     pin: Option<&TrackedDistributionPin>,
 ) -> Option<PinDrift> {
+    pin_drift_of(
+        &activation.artifact_digest,
+        activation.pin_override_reason.as_deref(),
+        pin,
+    )
+}
+
+/// [`pin_drift`] for a reader that holds only the two facts it compares: the active release's digest and the
+/// override reason its activation recorded (the doctor row reads the record leniently, as the Node row did).
+pub fn pin_drift_of(
+    active_digest: &str,
+    override_reason: Option<&str>,
+    pin: Option<&TrackedDistributionPin>,
+) -> Option<PinDrift> {
     let pin_digest = &pin?.project_runtime.artifact_digest;
-    if *pin_digest == activation.artifact_digest {
+    if pin_digest == active_digest {
         return None;
     }
     Some(PinDrift {
-        active_digest: activation.artifact_digest.clone(),
+        active_digest: active_digest.to_owned(),
         pin_digest: pin_digest.clone(),
-        override_reason: activation.pin_override_reason.clone(),
+        override_reason: override_reason.map(str::to_owned),
     })
 }
 
@@ -2305,12 +2319,27 @@ pub fn pin_drift(
 /// pin: the drift, or that the pin file cannot be read. `None` when there is
 /// nothing to say.
 pub fn pin_note(activation: &WorkspaceActivationBinding, pin: &PinFile) -> Option<String> {
+    pin_note_of(
+        &activation.artifact_digest,
+        activation.pin_override_reason.as_deref(),
+        pin,
+    )
+}
+
+/// [`pin_note`] over the two facts [`pin_drift_of`] takes.
+pub fn pin_note_of(
+    active_digest: &str,
+    override_reason: Option<&str>,
+    pin: &PinFile,
+) -> Option<String> {
     match pin {
         PinFile::Absent => None,
         PinFile::Unreadable => Some(format!(
             "the committed pin is unreadable: {PIN_FILE_RELATIVE}"
         )),
-        PinFile::Present(pin) => pin_drift(activation, Some(pin)).map(|d| d.to_string()),
+        PinFile::Present(pin) => {
+            pin_drift_of(active_digest, override_reason, Some(pin)).map(|d| d.to_string())
+        }
     }
 }
 

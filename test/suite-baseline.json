@@ -442,7 +442,6 @@
     "test/seat-binding/client.test.mjs": 0.2,
     "test/seat-binding/route-doctor-check.test.mjs": 0.6,
     "test/session-identity/attempt-writer-id.test.mjs": 0.3,
-    "test/setup/active-release-drift-check.test.mjs": 2.7,
     "test/setup/agent-cli-trust-check.test.mjs": 0.7,
     "test/setup/agent-hooks.test.mjs": 8.1,
     "test/setup/agy-permissions.test.mjs": 8,

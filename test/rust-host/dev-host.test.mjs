@@ -7,7 +7,6 @@ import path from 'node:path';
 import { spawn, spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { listLegacyNodeSourceFiles, hashFile, computeArtifactDigest, resolveProductionDependencies, nativeAddonLibraryName } from '../../scripts/build-rust-distribution.mjs';
-import { inspectRepo } from '../../scripts/lib/git-ports.mjs';
 import { ensureGitAddon } from '../helpers/git-addon.mjs';
 import { initStore, addWork } from '../../src/state/store.mjs';
 import { initializeWorkRepository } from '../helpers/work-store-release.mjs';
@@ -53,7 +52,7 @@ function fixture() {
   fs.mkdirSync(path.join(root, 'home'));
   fs.mkdirSync(path.join(root, 'state'), { mode: 0o700 });
   fs.chmodSync(path.join(root, 'state'), 0o700);
-  for (const relative of listLegacyNodeSourceFiles(repoRoot, () => inspectRepo(repoRoot))) {
+  for (const relative of listLegacyNodeSourceFiles(repoRoot)) {
     const destination = path.join(checkout, relative);
     fs.mkdirSync(path.dirname(destination), { recursive: true });
     fs.copyFileSync(path.join(repoRoot, relative), destination);

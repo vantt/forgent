@@ -1,8 +1,8 @@
 // release-targets.mjs -- the one table of platforms a fgOS release is published
-// for. The release tree builder, the release packaging script and the
-// `rust-host-target-supported` doctor check all read it, so adding a platform
-// (a macOS row, say) is one row here, one in the Rust `host_target` table
-// (packages/distribution/rust/src/fetch.rs), one in each installer, and one
+// for. The release tree builder and the release packaging script read it; the
+// `rust-host-target-supported` doctor row reads the Rust `host_target` table
+// (packages/distribution/rust/src/fetch.rs). Adding a platform (a macOS row,
+// say) is one row here, one in that table, one in each installer, and one
 // release-workflow matrix entry -- not a hunt through scattered conditionals.
 //
 // PURE: data and lookups only. No fs, no child_process.

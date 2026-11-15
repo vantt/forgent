@@ -536,6 +536,23 @@
       "reason": "only fgos-process judges a process; holder-lock reads fdinfo for lock holders, the Git WAL names an open file, and bwrap arguments are not reads of process facts"
     },
     {
+      "job": "release source payload selection",
+      "kind": "door",
+      "patterns": [
+        "(?:function|fn)\\s+(?:collectSourceFiles|listLegacyNodeSourceFiles|list_source_files)\\b"
+      ],
+      "allowed": [
+        "packages/distribution/rust/src/source_payload.rs",
+        {
+          "path": "scripts/build-rust-distribution.mjs",
+          "reason": "the release builder's one function asks the host for the list (fgos internal source-payload); it selects nothing itself"
+        }
+      ],
+      "debt": [],
+      "retiredBy": "S7: the release builder moves to Rust and its Node half goes",
+      "reason": "which files of a checkout are the Node payload of a release is one rule in Rust: the builder packs it and the doctor row active-release-matches-checkout compares against it, so the two can never disagree. A second walker must be declared here"
+    },
+    {
       "job": "canonical JSON bytes",
       "kind": "door",
       "patterns": ["(?:function|fn)\\s+(?:canonicalJson|stableStringify|sortedJson|canonical_json|to_canonical_json)\\b"],
