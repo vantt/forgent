@@ -88,6 +88,5 @@ mod tests {
         )
         .unwrap();
         assert!(dispatch_coverage(&request(&["--since=2026-10-05"]), scanner).is_err());
-        assert!(dispatch_coverage(&request(&["--dir"]), scanner).is_err());
     }
 }

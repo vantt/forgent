@@ -30,6 +30,8 @@ pub enum FlagValue {
 pub struct ParsedArgs {
     pub flags: Vec<(String, FlagValue)>,
     pub positional: Vec<String>,
+    /// The index, in the tokens read, of the first positional: the token a verb takes as its sub-command.
+    pub first_positional_at: Option<usize>,
 }
 
 impl ParsedArgs {
@@ -89,6 +91,7 @@ pub fn parse_args(args: &[OsString]) -> Result<ParsedArgs, ParseArgsError> {
     let mut i = 0;
     while i < tokens.len() {
         let Some(key) = tokens[i].strip_prefix("--") else {
+            parsed.first_positional_at.get_or_insert(i);
             parsed.positional.push(tokens[i].to_owned());
             i += 1;
             continue;
@@ -215,5 +218,21 @@ mod tests {
                 lossy: "--\u{fffd}".into()
             }
         );
+    }
+
+    #[test]
+    fn the_first_positional_is_found_wherever_it_stands_among_the_flags() {
+        let at = |list: &[&str]| {
+            let argv: Vec<OsString> = list.iter().map(OsString::from).collect();
+            parse_args(&argv).unwrap().first_positional_at
+        };
+        assert_eq!(at(&["list", "--json"]), Some(0));
+        assert_eq!(at(&["--limit", "3", "list"]), Some(2));
+        assert_eq!(
+            at(&["--json", "list"]),
+            None,
+            "the flag took it as its value"
+        );
+        assert_eq!(at(&[]), None);
     }
 }

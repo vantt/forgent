@@ -158,7 +158,7 @@ fn reports_hand_edited_invalid_lines_before_applying_filters() {
         contents.push('\n');
     }
     fs::write(&file, contents).unwrap();
-    let result = dispatch_eval(&req(&root, &["list", "--harness=panel"], None)).unwrap();
+    let result = dispatch_eval(&req(&root, &["list", "--harness", "panel"], None)).unwrap();
     assert_eq!(result["evals"].as_array().unwrap().len(), 1);
     let invalid = result["invalid"].as_array().unwrap();
     assert_eq!(invalid.len(), 8);
@@ -189,7 +189,7 @@ fn cli_stdin_record_list_and_option_errors() {
     assert_eq!(output["eval"]["scores"]["decision-clarity"], 1);
     let listed = dispatch_eval(&req(
         &root,
-        &["list", "--harness", "panel", "--question=q"],
+        &["list", "--harness", "panel", "--question", "q"],
         None,
     ))
     .unwrap();

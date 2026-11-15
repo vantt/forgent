@@ -208,7 +208,7 @@ test('help never runs the verb: write and spawn forms, and a help token after a 
 test('help accepts the --dir the shell function appends, through the real shell function', { skip: process.platform === 'win32' }, () => {
   const cwd = emptyCwd('shell-function');
   const entryOf = (name) => MANIFEST.commands.find((c) => c.name === name);
-  for (const args of [['--help', '--json', '--dir', cwd], ['-h', '--json', `--dir=${cwd}`], ['--help', 'add', '--json', '--dir', cwd]]) {
+  for (const args of [['--help', '--json', '--dir', cwd], ['--help', 'add', '--json', '--dir', cwd]]) {
     const result = host(args, cwd);
     assert.equal(result.status, 0, `${args.join(' ')}: ${result.stderr}`);
     assert.deepEqual(JSON.parse(result.stdout), args.includes('add') ? entryOf('add') : MANIFEST, args.join(' '));

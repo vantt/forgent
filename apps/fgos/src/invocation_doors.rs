@@ -12,7 +12,7 @@
 //! them.
 
 use crate::legacy_exec::RECURSION_GUARD_VAR;
-use crate::routing::{check_call, declared, keeps_pre_door_reading, Call, CommandRouteDescriptor};
+use crate::routing::{check_call, declared, takes_lenient_root, Call, CommandRouteDescriptor};
 use fgos_event_store::lifecycle::{self, Policy, Request, Timers};
 use fgos_git::invocation_root::{resolve_invocation_root, InvocationRoot, RootPolicy, RootRequest};
 use fgos_git::store_admission::{admit_store_access, AdmitRequest, StoreMode};
@@ -282,7 +282,7 @@ impl<'a> Doors<'a> {
     pub fn enter(&self) -> Result<Entered, Refused> {
         let sub = check_call(self.route, self.call)
             .map_err(|fault| self.refuse(None, fault.sub.as_deref(), fault.class, fault.message))?;
-        let dir = self.call.named_dir(&self.route.selector, self.cli_args);
+        let dir = self.call.named_dir();
         let verb = self.route.selector.as_str();
         let policy = if verb == "init" {
             RootPolicy::StrictCwd
@@ -301,13 +301,13 @@ impl<'a> Doors<'a> {
         // verb, as in the Node CLI. Debt: the eight native verbs of today keep answering from wherever they are
         // called (their documented answers, e.g. the mailbox's `unsupported-checkout`), so for exactly these the
         // refusal reaches only an operation that reads a project, as its not-a-project answer. Any other verb,
-        // whatever its store value, is refused. The list is `routing::PRE_DOOR_NATIVE_VERBS`.
+        // whatever its store value, is refused. The list is `routing::LENIENT_ROOT_VERBS`.
         let (root, project) = match asked {
             Ok(root) => {
                 let project = project_root(dir.as_deref(), &root, &self.cwd, self.home.as_deref());
                 (root, project)
             }
-            Err(refusal) if store_mode == StoreMode::None && keeps_pre_door_reading(verb) => (
+            Err(refusal) if store_mode == StoreMode::None && takes_lenient_root(verb) => (
                 InvocationRoot {
                     root: self.cwd.clone(),
                     fgos_dir: self.cwd.join(".fgos"),
@@ -444,7 +444,7 @@ fn project_root(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::routing::PRE_DOOR_NATIVE_VERBS;
+    use crate::routing::LENIENT_ROOT_VERBS;
     use std::cell::RefCell;
     use std::sync::atomic::{AtomicU32, Ordering};
 
@@ -823,7 +823,7 @@ mod tests {
         );
         // The list is exactly the eight verbs written before the doors: it never grows, and a stale name shows here.
         assert_eq!(
-            PRE_DOOR_NATIVE_VERBS,
+            LENIENT_ROOT_VERBS,
             [
                 "config",
                 "convention",
@@ -835,7 +835,7 @@ mod tests {
                 "version"
             ]
         );
-        for verb in PRE_DOOR_NATIVE_VERBS {
+        for verb in LENIENT_ROOT_VERBS {
             let route = &crate::routing::command_routes()[verb];
             assert_eq!(route.route_kind, "native", "{verb}");
             assert_eq!(route.store.as_deref().unwrap_or("none"), "none", "{verb}");

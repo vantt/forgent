@@ -62,9 +62,7 @@ pub fn top_level(args: &[OsString]) -> Result<String, Refusal> {
     let words: Vec<&str> = args
         .iter()
         .enumerate()
-        .filter(|(i, a)| {
-            !(*a == "--dir" || a.starts_with("--dir=") || (*i > 0 && args[*i - 1] == "--dir"))
-        })
+        .filter(|(i, a)| !(*a == "--dir" || (*i > 0 && args[*i - 1] == "--dir")))
         .map(|(_, a)| a.as_str())
         .filter(|a| !matches!(*a, "--json" | "--help" | "-h"))
         .collect();
@@ -573,9 +571,12 @@ mod tests {
             verb("config", None, true).unwrap()
         );
         assert_eq!(
-            top_level(&os(&["--dir=/x", "config", "-h", "--help"])).unwrap(),
+            top_level(&os(&["--dir", "/x", "config", "-h", "--help"])).unwrap(),
             plain
         );
+        // `--dir=<path>` is no spelling of the flag: it is an option help does not know.
+        assert!(refusal(top_level(&os(&["--dir=/x", "config"])))
+            .starts_with("unknown option \"--dir=/x\" for --help."),);
         assert_eq!(
             top_level(&os(&["config", "--dir", "--json"])).unwrap(),
             verb("config", None, true).unwrap(),

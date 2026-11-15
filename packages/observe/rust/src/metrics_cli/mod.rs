@@ -145,9 +145,9 @@ mod tests {
 
     #[test]
     fn every_verb_reads_flags_one_way_json_is_a_no_op_and_bad_input_is_named() {
-        assert!(run("runs", &["--json", "--by=role"]).is_ok());
+        assert!(run("runs", &["--json", "--by", "role"]).is_ok());
         assert!(run("case", &["list", "--json", "--open"]).is_ok());
-        assert!(run("eval", &["list", "--harness=plain", "--json"]).is_ok());
+        assert!(run("eval", &["list", "--harness", "plain", "--json"]).is_ok());
         assert_eq!(
             run("runs", &["--by", "nobody"]).unwrap_err(),
             "invalid --by value \"nobody\". Allowed: executor, adapter, role"

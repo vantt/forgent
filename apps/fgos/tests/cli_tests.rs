@@ -226,18 +226,6 @@ fn a_near_miss_verb_is_refused_with_a_suggestion() {
 }
 
 #[test]
-fn a_near_miss_native_flag_is_refused_with_a_suggestion() {
-    let output = Command::new(fgos_bin())
-        .args(["config", "show", "--pth", "x"])
-        .output()
-        .expect("failed to execute fgos");
-
-    assert_eq!(output.status.code(), Some(4));
-    let stderr = String::from_utf8_lossy(&output.stderr);
-    assert!(stderr.contains("Did you mean --path?"), "{stderr}");
-}
-
-#[test]
 fn a_verb_with_no_near_miss_gets_no_suggestion() {
     let output = Command::new(fgos_bin())
         .arg("not-a-real-selector")
@@ -1437,8 +1425,10 @@ fn native_discussions_reports_owner_voters_and_root_wide_summary_diagnostics() {
         .args([
             "metrics",
             "discussions",
-            "--since=2026-10-05",
-            "--by=executor",
+            "--since",
+            "2026-10-05",
+            "--by",
+            "executor",
             "--dir",
         ])
         .arg(&root)
@@ -1580,7 +1570,8 @@ fn identity_rejects_bad_options() {
         vec!["--pid", "0"],
         vec!["--pid", "abc"],
         vec!["--pid"],
-        vec!["--fgos-dir="],
+        vec!["--fgos-dir", ""],
+        vec!["--pid=7"],
         vec!["--unknown"],
     ] {
         let output = identity_command(&args).output().unwrap();

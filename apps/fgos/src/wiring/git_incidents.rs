@@ -92,7 +92,7 @@ pub fn project_git_request(args: &[OsString]) -> GitRequest {
     GitRequest {
         operation,
         cwd: std::env::current_dir().unwrap_or_else(|_| PathBuf::from(".")),
-        dir: call.named_dir("git", args),
+        dir: call.named_dir(),
         home: fgos_config::machine::home_dir(|key| std::env::var(key).ok()),
     }
 }

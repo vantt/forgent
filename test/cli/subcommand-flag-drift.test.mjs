@@ -358,8 +358,9 @@ function rustSubcommands(src) {
   return [...m[1].matchAll(/"([^"]+)"/g)].map((x) => x[1]);
 }
 
-// A flag is named as a `"--x"` literal, or, where the shared parser's output is read, as `.flag("x")`.
-const rustFlags = (text) => new Set([...text.matchAll(/"--([a-z][a-z-]*)"|\.flag\("([a-z][a-z-]*)"\)/g)].map((m) => m[1] ?? m[2]).filter((n) => !GLOBAL.has(n)));
+// A flag is named as a `"--x"` literal, or, where the shared parser's output is read, as `.flag("x")` or a read of it
+// by name (`value("x")`, `switch("x")`, `text("x")`, `has("x")`, `named("x", ...)`).
+const rustFlags = (text) => new Set([...text.matchAll(/"--([a-z][a-z-]*)"|\.flag\("([a-z][a-z-]*)"\)|\b(?:value|switch|text|named|has)\("([a-z][a-z-]*)"[,)]/g)].map((m) => m[1] ?? m[2] ?? m[3]).filter((n) => !GLOBAL.has(n)));
 const schemaFlags = (spec) => Object.keys(spec.parameters.properties).filter((n) => !(spec.parameters.positional ?? []).includes(n));
 
 for (const entry of NATIVE) {

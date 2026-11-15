@@ -396,12 +396,6 @@ test('fgos preserves explicit --dir without overriding it', () => {
   assert.match(out, /"\/explicit\/path"/);
   assert.doesNotMatch(out, new RegExp(repoRoot));
 
-  const outEq = runBash(repoRoot, `source "${scriptPath}"; fgos --x --dir=/explicit/path`);
-  assert.match(outEq, /FGOS_MARKER/);
-  assert.match(outEq, /"--x"/);
-  assert.match(outEq, /"--dir=\/explicit\/path"/);
-  assert.doesNotMatch(outEq, new RegExp(repoRoot));
-
   fs.rmSync(repoRoot, { recursive: true, force: true });
 });
 

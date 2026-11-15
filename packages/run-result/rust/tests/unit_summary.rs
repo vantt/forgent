@@ -167,7 +167,7 @@ fn consumer_separates_all_attempts_final_seats_groups_and_refusals() {
     unrun_seat["attempts"][0]["runId"] = Value::Null;
     unlinked["seats"] = json!([unrun_seat]);
     root.summary(&unlinked);
-    let report = root.metrics(&["--since=2026-10-05"]);
+    let report = root.metrics(&["--since", "2026-10-05"]);
     assert_eq!(report["totals"]["unitRuns"], 3);
     assert_eq!(report["totals"]["passRate"], json!(2.0 / 3.0));
     assert_eq!(report["totals"]["seats"], 3);
@@ -197,7 +197,7 @@ fn consumer_separates_all_attempts_final_seats_groups_and_refusals() {
     assert_eq!(grouped["groups"]["beta"]["attempts"], 1);
     assert_eq!(grouped["groups"]["beta"]["seats"], 1);
     assert_eq!(grouped["groups"]["beta"]["fallbackSeats"], 1);
-    let personas = root.metrics(&["--by=persona"]);
+    let personas = root.metrics(&["--by", "persona"]);
     assert_eq!(personas["groups"]["lens-beta"]["seats"], 1);
     assert_eq!(personas["groups"]["lens-alpha"]["attempts"], 3);
 }
@@ -404,7 +404,7 @@ fn reader_reports_root_wide_missing_and_unusable_summaries_without_reconstructio
     .unwrap();
     for (args, observed, outside) in [
         (vec![], 3, 0),
-        (vec!["--since=2026-10-06"], 0, 3),
+        (vec!["--since", "2026-10-06"], 0, 3),
         (vec!["--until", "2026-10-04"], 0, 3),
     ] {
         let report = root.metrics(&args);
@@ -579,18 +579,20 @@ fn summary_and_cli_windows_compare_offset_timestamps_temporally_and_include_equa
             .unwrap()
             .starts_with("unit-run-equal")));
     let exact = root.metrics(&[
-        "--since=2026-10-05T00:00:00Z",
-        "--until=2026-10-05T00:00:00Z",
+        "--since",
+        "2026-10-05T00:00:00Z",
+        "--until",
+        "2026-10-05T00:00:00Z",
     ]);
     assert_eq!(exact["totals"]["unitRuns"], 2);
-    let date = root.metrics(&["--since=2026-10-05"]);
+    let date = root.metrics(&["--since", "2026-10-05"]);
     assert_eq!(date["totals"]["unitRuns"], 3);
     assert!(!date["units"]
         .as_array()
         .unwrap()
         .iter()
         .any(|unit| unit["unitRunId"] == "unit-run-before"));
-    let until = root.metrics(&["--until=2026-10-05"]);
+    let until = root.metrics(&["--until", "2026-10-05"]);
     assert_eq!(until["totals"]["unitRuns"], 3);
     assert!(!until["units"]
         .as_array()
@@ -600,8 +602,10 @@ fn summary_and_cli_windows_compare_offset_timestamps_temporally_and_include_equa
     // Lexicographic bound ordering would reject this equal-instant window.
     assert_eq!(
         root.metrics(&[
-            "--since=2026-10-05T02:00:00+02:00",
-            "--until=2026-10-05T00:00:00Z"
+            "--since",
+            "2026-10-05T02:00:00+02:00",
+            "--until",
+            "2026-10-05T00:00:00Z"
         ])["totals"]["unitRuns"],
         2
     );

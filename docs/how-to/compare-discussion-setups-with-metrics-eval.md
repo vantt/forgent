@@ -182,7 +182,7 @@ Do not fabricate scores to make an example or a failed live run look complete.
 # --question must equal the stored string exactly; here, the full historical objective.
 q="$(jq -r '.objective' plans/reports/council-lens-experiment-261004/unit.json)"
 /absolute/path/to/current/fgos metrics eval list --question "$q" --dir /absolute/project/root
-/absolute/path/to/current/fgos metrics eval list --harness=fgos-panel --question="$q" --dir /absolute/project/root
+/absolute/path/to/current/fgos metrics eval list --harness fgos-panel --question "$q" --dir /absolute/project/root
 ```
 
 `--harness` and `--question` are exact-match, intersecting filters: `--question`

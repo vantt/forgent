@@ -51,7 +51,7 @@ pub fn project_lock_status_request(args: &[OsString]) -> LockStatusRequest {
     let call = Call::new(args);
     LockStatusRequest {
         cwd: std::env::current_dir().unwrap_or_else(|_| PathBuf::from(".")),
-        dir: call.named_dir("lock-status", args),
+        dir: call.named_dir(),
         home: fgos_config::machine::home_dir(|key| std::env::var(key).ok()),
     }
 }

@@ -89,7 +89,7 @@ fgos() {
   root=$(dirname "$common_dir")
   for arg in "$@"; do
     case "$arg" in
-      --dir|--dir=*) has_dir=1; break ;;
+      --dir) has_dir=1; break ;;
     esac
   done
   if [ -x "$root/.fgos/installation/bin/fgos" ]; then

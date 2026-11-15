@@ -1,9 +1,10 @@
-//! The one argument grammar of the Observe verbs: `--key value`, `--key=value`,
-//! boolean switches and at most one positional. `--dir` (the target root, which
-//! the host resolves before the verb runs) is skipped and `--json` is accepted
-//! as a no-op. An unknown flag, a missing value or a bad number is an error,
-//! never a silent drop.
+//! The Observe verbs' flags, read from the shared CLI parser (`fgos_host_runtime::cli_args`): `--key value`,
+//! boolean switches and at most one positional. `--dir` (the target root, which the host resolves before the
+//! verb runs) is skipped and `--json` is accepted as a no-op. An unknown flag, a missing value, a value given to
+//! a switch or a bad number is an error, never a silent drop.
 
+use fgos_host_runtime::cli_args::{parse_args, FlagScalar, FlagValue};
+use std::ffi::OsString;
 use std::str::FromStr;
 
 #[derive(Debug, Default)]
@@ -14,50 +15,50 @@ pub struct Flags {
 }
 
 impl Flags {
-    /// Parses `args` against the flags the verb reads. Each verb passes its own
-    /// `"--flag"` literals so the flag-drift test can read them from the verb.
+    /// Reads `args` against the flags the verb takes. Each verb passes its own `"--flag"` literals so the
+    /// flag-drift test can read them from the verb.
     pub fn parse(
         args: &[String],
         value_flags: &[&str],
         switch_flags: &[&str],
         takes_positional: bool,
     ) -> Result<Self, String> {
+        let tokens: Vec<OsString> = args.iter().map(OsString::from).collect();
+        let parsed = parse_args(&tokens).map_err(|error| error.to_string())?;
         let mut flags = Self::default();
-        let mut i = 0;
-        while i < args.len() {
-            let arg = args[i].as_str();
-            i += 1;
-            if !arg.starts_with("--") {
-                if !takes_positional || flags.positional.replace(arg.to_string()).is_some() {
-                    return Err(format!("unexpected argument {arg}"));
+        let mut words = parsed.positional.clone();
+        for (key, value) in &parsed.flags {
+            let name = format!("--{key}");
+            if name == "--json" {
+                // `--json` takes no value: a word the parser handed it is a word of the call.
+                if let FlagValue::One(FlagScalar::Str(word)) = value {
+                    words.push(word.clone());
                 }
                 continue;
             }
-            let (name, inline) = match arg.split_once('=') {
-                Some((name, value)) => (name, Some(value)),
-                None => (arg, None),
+            if name == "--dir" {
+                continue;
+            }
+            let FlagValue::One(scalar) = value else {
+                return Err(format!("unknown option {name}"));
             };
-            if name == "--json" && inline.is_none() {
-                continue;
-            }
-            if name == "--dir" || value_flags.contains(&name) {
-                let value = match inline {
-                    Some(value) => value.to_string(),
-                    None => {
-                        let value = args
-                            .get(i)
-                            .ok_or_else(|| format!("missing value for {name}"))?;
-                        i += 1;
-                        value.clone()
-                    }
-                };
-                if name != "--dir" {
-                    flags.values.push((name.to_string(), value));
+            if value_flags.contains(&name.as_str()) {
+                match scalar {
+                    FlagScalar::Str(text) => flags.values.push((name, text.clone())),
+                    FlagScalar::Bool => return Err(format!("missing value for {name}")),
                 }
-            } else if switch_flags.contains(&name) && inline.is_none() {
-                flags.switches.push(name.to_string());
+            } else if switch_flags.contains(&name.as_str()) {
+                match scalar {
+                    FlagScalar::Bool => flags.switches.push(name),
+                    FlagScalar::Str(_) => return Err(format!("{name} takes no value")),
+                }
             } else {
-                return Err(format!("unknown option {arg}"));
+                return Err(format!("unknown option {name}"));
+            }
+        }
+        for word in words {
+            if !takes_positional || flags.positional.replace(word.clone()).is_some() {
+                return Err(format!("unexpected argument {word}"));
             }
         }
         Ok(flags)
@@ -98,12 +99,13 @@ mod tests {
     }
 
     #[test]
-    fn spaced_and_equals_values_switches_positional_and_global_flags_parse_one_way() {
+    fn values_switches_positional_and_global_flags_parse_one_way() {
         let flags = Flags::parse(
             &args(&[
                 "--layer",
                 "state",
-                "--limit=3",
+                "--limit",
+                "3",
                 "--detail-stdin",
                 "--dir",
                 "/x",
@@ -138,6 +140,14 @@ mod tests {
         assert_eq!(
             parse(&["--on=1"], false).unwrap_err(),
             "unknown option --on=1"
+        );
+        assert_eq!(
+            parse(&["--limit=3"], false).unwrap_err(),
+            "unknown option --limit=3"
+        );
+        assert_eq!(
+            parse(&["--on", "1"], false).unwrap_err(),
+            "--on takes no value"
         );
         assert_eq!(
             parse(&["stray"], false).unwrap_err(),

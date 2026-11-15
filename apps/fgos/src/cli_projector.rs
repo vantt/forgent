@@ -45,7 +45,10 @@ pub fn project_cli_invocation(
 
     let (contract, input): (ContractRef, Box<dyn std::any::Any + Send>) = match operation.as_str() {
         "distribution.build.show" => {
-            let include_runtime = args.iter().any(|a| a == "--runtime-json");
+            let include_runtime = crate::routing::Call::new(args)
+                .flags()
+                .flag("runtime-json")
+                .is_some();
             (
                 ContractRef::from_static("distribution.build.show.request", "1.0.0"),
                 Box::new(fgos_distribution::BuildShowRequest { include_runtime }),
@@ -56,25 +59,14 @@ pub fn project_cli_invocation(
             Box::new(fgos_work_state::GateBypassShowRequest::default()),
         ),
         "observe.metrics" | "observe.friction" => {
-            let sub = if args.len() > 1 {
-                args[1].to_string_lossy().to_string()
-            } else {
-                String::new()
-            };
-            let sub_args: Vec<String> = if args.len() > 2 {
-                args[2..]
-                    .iter()
-                    .map(|a| a.to_string_lossy().to_string())
-                    .collect()
-            } else {
-                Vec::new()
-            };
+            let call = crate::routing::Call::new(args);
+            let sub = call.sub_word().unwrap_or_default().to_owned();
             (
                 ContractRef::new(format!("{operation_id_str}.request"), "1.0.0"),
                 Box::new(fgos_observe::ObserveRequest {
                     operation: operation_id_str.to_string(),
                     sub,
-                    args: sub_args,
+                    args: call.without_sub(),
                     root: root?,
                     stdin,
                 }),
@@ -312,34 +304,30 @@ fn project_config_request(
     root: std::path::PathBuf,
 ) -> Result<fgos_config::provider::ConfigRequest, String> {
     use fgos_config::provider::Verb;
-    let sub = args
-        .get(1)
-        .and_then(|value| value.to_str())
+    let call = crate::routing::Call::new(args);
+    let sub = call
+        .sub_word()
         .ok_or_else(|| "config requires a subcommand".to_string())?;
     let (valued, switches, arguments): (&[&str], &[&str], usize) = match sub {
-        "show" | "standard" => (&["--path"], &[], 0),
+        "show" | "standard" => (&["path"], &[], 0),
         "check" => (&[], &[], 0),
         "explain" => (&[], &[], 1),
-        "set" => (&["--reason"], &["--global"], 2),
-        "unset" => (
-            &["--reason"],
-            &["--global", "--acknowledge-comment-loss"],
-            1,
-        ),
-        "patch" => (&["--reason"], &["--global"], 1),
+        "set" => (&["reason"], &["global"], 2),
+        "unset" => (&["reason"], &["global", "acknowledge-comment-loss"], 1),
+        "patch" => (&["reason"], &["global"], 1),
         "migrate" => (
             &[],
             &[
-                "--dry-run",
-                "--global",
-                "--finish",
-                "--convert",
-                "--machine-checked",
-                "--accept-machine-overrides",
+                "dry-run",
+                "global",
+                "finish",
+                "convert",
+                "machine-checked",
+                "accept-machine-overrides",
             ],
             0,
         ),
-        "refresh-docs" => (&[], &["--global"], 0),
+        "refresh-docs" => (&[], &["global"], 0),
         other => {
             return Err(format!(
                 "unknown config subcommand '{other}'. Available: {}",
@@ -347,50 +335,26 @@ fn project_config_request(
             ))
         }
     };
-    let (mut values, mut on, mut positional) =
-        (std::collections::HashMap::new(), Vec::new(), Vec::new());
-    let mut rest = args[2..].iter().map(|a| a.to_string_lossy().into_owned());
-    while let Some(token) = rest.next() {
-        if !token.starts_with("--") {
-            positional.push(token);
-            continue;
-        }
-        let (flag, inline) = token
-            .split_once('=')
-            .map_or((token.as_str(), None), |(flag, value)| {
-                (flag, Some(value.to_owned()))
-            });
-        if flag == "--json" {
-            continue;
-        }
-        if switches.contains(&flag) {
-            on.push(flag.to_owned());
-        } else if valued.contains(&flag) || flag == "--dir" {
-            let value = inline
-                .or_else(|| rest.next())
-                .ok_or_else(|| format!("{flag} requires a value"))?;
-            values.insert(flag.to_owned(), value);
-        } else {
-            return Err(format!("unknown config option '{token}'"));
-        }
+    let own: Vec<&str> = valued.iter().chain(switches).copied().collect();
+    if let Some(flag) = call.flag_outside(&own) {
+        return Err(format!("unknown config option '--{flag}'"));
     }
+    let has = |flag: &str| call.switch(flag);
+    let global = has("global")?;
+    let positional = call.arguments();
     if positional.len() != arguments {
         return Err(format!(
             "config {sub} takes {arguments} argument(s), got {}",
             positional.len()
         ));
     }
-    let has = |flag: &str| on.iter().any(|f| f == flag);
-    let reason = values.remove("--reason").unwrap_or_default();
-    let (global, mut arg) = (has("--global"), positional.into_iter());
+    let mut path = call.value("path")?;
+    let reason = call.value("reason")?.unwrap_or_default();
+    let mut arg = positional.into_iter();
     let mut next = || arg.next().unwrap_or_default();
     let verb = match sub {
-        "show" => Verb::Show {
-            path: values.remove("--path"),
-        },
-        "standard" => Verb::Standard {
-            path: values.remove("--path"),
-        },
+        "show" => Verb::Show { path: path.take() },
+        "standard" => Verb::Standard { path: path.take() },
         "check" => Verb::Check,
         "explain" => Verb::Explain { path: next() },
         "set" => Verb::Set {
@@ -403,7 +367,7 @@ fn project_config_request(
             path: next(),
             reason,
             global,
-            acknowledge: has("--acknowledge-comment-loss"),
+            acknowledge: has("acknowledge-comment-loss")?,
         },
         "patch" => Verb::Patch {
             file: next().into(),
@@ -412,27 +376,30 @@ fn project_config_request(
         },
         "refresh-docs" => Verb::RefreshDocs { global },
         _ => {
-            if has("--finish") && !global {
+            let (finish, convert) = (has("finish")?, has("convert")?);
+            let (machine_checked, accept) =
+                (has("machine-checked")?, has("accept-machine-overrides")?);
+            if finish && !global {
                 return Err("--finish needs --global".into());
             }
-            if has("--convert") && (!global || has("--finish")) {
+            if convert && (!global || finish) {
                 return Err("--convert needs --global and goes without --finish".into());
             }
-            if has("--machine-checked") && !has("--finish") && !has("--convert") {
+            if machine_checked && !finish && !convert {
                 return Err("--machine-checked needs --finish or --convert".into());
             }
-            if has("--accept-machine-overrides") && global {
+            if accept && global {
                 return Err(
                     "--accept-machine-overrides is for the project migration, not --global".into(),
                 );
             }
             Verb::Migrate {
                 global,
-                finish: has("--finish"),
-                convert: has("--convert"),
-                machine_checked: has("--machine-checked"),
-                accept_machine_overrides: has("--accept-machine-overrides"),
-                dry_run: has("--dry-run"),
+                finish,
+                convert,
+                machine_checked,
+                accept_machine_overrides: accept,
+                dry_run: has("dry-run")?,
             }
         }
     };
@@ -447,37 +414,20 @@ fn project_config_request(
 /// [--json]`. `--dir` is accepted and ignored on
 /// every verb, because the shell integration appends it.
 fn project_identity_request(args: &[OsString]) -> Result<fgos_identity::IdentityRequest, String> {
-    let subcommand = args
-        .get(1)
-        .map(|value| value.to_string_lossy().into_owned())
-        .filter(|value| !value.starts_with('-'));
-    let mut index = if subcommand.is_some() { 2 } else { 1 };
-    let (verb, allowed): (fgos_identity::Verb, &[&str]) = match subcommand.as_deref() {
-        None | Some("writer") => (
-            fgos_identity::Verb::Writer,
-            &["--pid", "--fgos-dir", "--dir"],
-        ),
-        Some("machine") => (
-            fgos_identity::Verb::Machine { alias: None },
-            &["--alias", "--dir"],
-        ),
+    let call = crate::routing::Call::new(args);
+    let subcommand = call.sub_word();
+    let (verb, allowed): (fgos_identity::Verb, &[&str]) = match subcommand {
+        None | Some("writer") => (fgos_identity::Verb::Writer, &["pid", "fgos-dir"]),
+        Some("machine") => (fgos_identity::Verb::Machine { alias: None }, &["alias"]),
         Some("session") => (
             fgos_identity::Verb::Session(fgos_identity::SessionAction::Read),
-            &[
-                "--pid",
-                "--fgos-dir",
-                "--register",
-                "--role",
-                "--drop-role",
-                "--take",
-                "--dir",
-            ],
+            &["pid", "fgos-dir", "register", "role", "drop-role", "take"],
         ),
         Some("resolve") => (
             fgos_identity::Verb::Resolve {
                 query: String::new(),
             },
-            &["--dir"],
+            &[],
         ),
         Some("list") => (
             fgos_identity::Verb::List {
@@ -485,22 +435,22 @@ fn project_identity_request(args: &[OsString]) -> Result<fgos_identity::Identity
                 prune: false,
                 machine: None,
             },
-            &["--project", "--prune", "--machine", "--dir"],
+            &["project", "prune", "machine"],
         ),
         Some("project") => (
             fgos_identity::Verb::Project(fgos_identity::ProjectAction::Read),
-            &["--init", "--new", "--handle", "--dir"],
+            &["init", "new", "handle"],
         ),
         Some("mint") => (
             fgos_identity::Verb::Mint {
                 kind: String::new(),
                 release: None,
             },
-            &["--release", "--dir"],
+            &["release"],
         ),
         Some("pins") => (
             fgos_identity::Verb::Pins(fgos_identity::PinsAction::List),
-            &["--forget", "--confirm", "--fingerprint", "--dir"],
+            &["forget", "confirm", "fingerprint"],
         ),
         Some(other) => {
             return Err(format!(
@@ -509,186 +459,84 @@ fn project_identity_request(args: &[OsString]) -> Result<fgos_identity::Identity
             ))
         }
     };
+    if let Some(flag) = call.flag_outside(allowed) {
+        return Err(format!("unknown identity option '--{flag}'"));
+    }
     let mut request = fgos_identity::IdentityRequest {
         verb,
         ..Default::default()
     };
-    // `mint <kind>` and `resolve <query>`: one positional argument.
+    // `mint <kind>` and `resolve <query>`: one positional argument; no other verb takes any.
+    let mut positional = call.arguments().into_iter();
     match &mut request.verb {
         fgos_identity::Verb::Mint { kind, .. } => {
-            let name = args
-                .get(index)
-                .map(|value| value.to_string_lossy().into_owned())
-                .filter(|value| !value.starts_with('-'))
-                .ok_or_else(|| {
-                    format!(
-                        "mint requires an id kind. Available: {}",
-                        fgos_identity::KIND_NAMES.join(", ")
-                    )
-                })?;
-            index += 1;
-            *kind = name;
+            *kind = positional.next().ok_or_else(|| {
+                format!(
+                    "mint requires an id kind. Available: {}",
+                    fgos_identity::KIND_NAMES.join(", ")
+                )
+            })?;
         }
         fgos_identity::Verb::Resolve { query } => {
-            let name = args
-                .get(index)
-                .map(|value| value.to_string_lossy().into_owned())
-                .filter(|value| !value.starts_with('-'))
-                .ok_or_else(|| {
-                    "resolve requires a handle or a role such as lead:MAIL or work:<name>"
-                        .to_string()
-                })?;
-            index += 1;
-            *query = name;
+            *query = positional.next().ok_or_else(|| {
+                "resolve requires a handle or a role such as lead:MAIL or work:<name>".to_string()
+            })?;
         }
         _ => {}
     }
-    let mut register = false;
-    let mut take = false;
-    let mut role: Option<String> = None;
-    let mut drop_role: Option<String> = None;
-    let mut by_project = false;
-    let mut prune = false;
-    let mut machine_filter: Option<String> = None;
-    // `Some(fork)` once `--init` (false) or `--new` (true) was given.
-    let mut mint: Option<bool> = None;
-    let mut handle: Option<String> = None;
-    let mut forget: Option<String> = None;
-    let mut confirm: Option<String> = None;
-    let mut fingerprint: Option<String> = None;
-    while index < args.len() {
-        let value = args[index].to_string_lossy().into_owned();
-        index += 1;
-        if value == "--json" {
-            continue;
+    if let Some(extra) = positional.next() {
+        return Err(format!("unknown identity option '{extra}'"));
+    }
+    // A value that is given must be non-empty, and says what it was for when it is not.
+    let named = |flag: &str, empty: &str| -> Result<Option<String>, String> {
+        match call.value(flag)? {
+            Some(value) if value.is_empty() => Err(format!("--{flag} requires {empty}")),
+            other => Ok(other),
         }
-        if [
-            "--init",
-            "--new",
-            "--register",
-            "--take",
-            "--project",
-            "--prune",
-        ]
-        .contains(&value.as_str())
-        {
-            if !allowed.contains(&value.as_str()) {
-                return Err(format!("unknown identity option '{value}'"));
-            }
-            match value.as_str() {
-                "--init" | "--new" => {
-                    if mint.replace(value == "--new").is_some() {
-                        return Err("--init and --new are exclusive and each given once".into());
-                    }
-                }
-                "--register" => register = true,
-                "--take" => take = true,
-                "--project" => by_project = true,
-                _ => prune = true,
-            }
-            continue;
-        }
-        let (flag, inline_value) = value
-            .split_once('=')
-            .map_or((value.as_str(), None), |(flag, value)| {
-                (flag, Some(value.to_owned()))
-            });
-        if !allowed.contains(&flag) {
-            return Err(format!("unknown identity option '{value}'"));
-        }
-        let flag_value = match inline_value {
-            Some(value) => value,
-            None => {
-                let next = args
-                    .get(index)
-                    .map(|v| v.to_string_lossy().into_owned())
-                    .ok_or_else(|| format!("{flag} requires a value"))?;
-                index += 1;
-                next
-            }
-        };
-        match flag {
-            "--dir" => {}
-            "--pid" => {
-                let pid = flag_value
-                    .parse::<u32>()
-                    .ok()
-                    .filter(|pid| *pid > 0)
-                    .ok_or_else(|| {
-                        format!("--pid must be a positive integer, got '{flag_value}'")
-                    })?;
-                request.pid = Some(pid);
-            }
-            "--release" => {
-                let number = flag_value
-                    .parse::<u64>()
-                    .ok()
-                    .filter(|number| *number > 0)
-                    .ok_or_else(|| {
-                        format!("--release must be a positive number, got '{flag_value}'")
-                    })?;
-                if let fgos_identity::Verb::Mint { release, .. } = &mut request.verb {
-                    *release = Some(number);
-                }
-            }
-            "--role" => {
-                if flag_value.is_empty() {
-                    return Err("--role requires a value".into());
-                }
-                role = Some(flag_value);
-            }
-            "--drop-role" => {
-                if flag_value.is_empty() {
-                    return Err("--drop-role requires a value".into());
-                }
-                drop_role = Some(flag_value);
-            }
-            "--forget" => {
-                if flag_value.is_empty() {
-                    return Err("--forget requires a machine id".into());
-                }
-                forget = Some(flag_value);
-            }
-            "--confirm" => {
-                if flag_value.is_empty() {
-                    return Err("--confirm requires a machine id".into());
-                }
-                confirm = Some(flag_value);
-            }
-            "--fingerprint" => {
-                if flag_value.is_empty() {
-                    return Err("--fingerprint requires a value".into());
-                }
-                fingerprint = Some(flag_value);
-            }
-            "--machine" => {
-                if flag_value.is_empty() {
-                    return Err("--machine requires a machine handle or id".into());
-                }
-                machine_filter = Some(flag_value);
-            }
-            "--handle" => {
-                if flag_value.is_empty() {
-                    return Err("--handle requires a value".into());
-                }
-                handle = Some(flag_value);
-            }
-            "--alias" => {
-                if flag_value.is_empty() {
-                    return Err("--alias requires a value".into());
-                }
-                request.verb = fgos_identity::Verb::Machine {
-                    alias: Some(flag_value),
-                };
-            }
-            _ => {
-                if flag_value.is_empty() {
-                    return Err("--fgos-dir requires a value".into());
-                }
-                request.fgos_dir = Some(std::path::PathBuf::from(flag_value));
-            }
+    };
+    let (init, new) = (call.switch("init")?, call.switch("new")?);
+    if init && new {
+        return Err("--init and --new are exclusive".into());
+    }
+    let register = call.switch("register")?;
+    let take = call.switch("take")?;
+    let by_project = call.switch("project")?;
+    let prune = call.switch("prune")?;
+    let role = named("role", "a value")?;
+    let drop_role = named("drop-role", "a value")?;
+    let machine_filter = named("machine", "a machine handle or id")?;
+    let handle = named("handle", "a value")?;
+    let forget = named("forget", "a machine id")?;
+    let confirm = named("confirm", "a machine id")?;
+    let fingerprint = named("fingerprint", "a value")?;
+    if let Some(alias) = named("alias", "a value")? {
+        request.verb = fgos_identity::Verb::Machine { alias: Some(alias) };
+    }
+    if let Some(dir) = named("fgos-dir", "a value")? {
+        request.fgos_dir = Some(std::path::PathBuf::from(dir));
+    }
+    if let Some(flag_value) = call.value("pid")? {
+        let pid = flag_value
+            .parse::<u32>()
+            .ok()
+            .filter(|pid| *pid > 0)
+            .ok_or_else(|| format!("--pid must be a positive integer, got '{flag_value}'"))?;
+        request.pid = Some(pid);
+    }
+    if let Some(flag_value) = call.value("release")? {
+        let number = flag_value
+            .parse::<u64>()
+            .ok()
+            .filter(|number| *number > 0)
+            .ok_or_else(|| format!("--release must be a positive number, got '{flag_value}'"))?;
+        if let fgos_identity::Verb::Mint { release, .. } = &mut request.verb {
+            *release = Some(number);
         }
     }
+    let mint = match (init, new) {
+        (false, false) => None,
+        (init, _) => Some(!init),
+    };
     match &mut request.verb {
         fgos_identity::Verb::Session(action) => {
             if take && role.is_none() {
@@ -747,9 +595,9 @@ fn project_convention_request(
     args: &[OsString],
     root: std::path::PathBuf,
 ) -> Result<fgos_convention::ConventionRequest, String> {
-    let subcommand = args
-        .get(1)
-        .and_then(|value| value.to_str())
+    let call = crate::routing::Call::new(args);
+    let subcommand = call
+        .sub_word()
         .ok_or_else(|| "convention requires a subcommand".to_string())?;
     let operation = match subcommand {
         "name" => fgos_convention::ConventionOperation::Name,
@@ -758,66 +606,20 @@ fn project_convention_request(
         "classify" => fgos_convention::ConventionOperation::Classify,
         _ => return Err(format!("unknown convention subcommand '{subcommand}'")),
     };
-    let mut kind = None;
-    let mut artifact_type = None;
-    let mut slug = None;
-    let mut at = None;
-    let mut plan = None;
-    let mut paths = Vec::new();
-    let mut all = false;
-    let mut positional = false;
-    let mut index = 2;
-    while index < args.len() {
-        let value = args[index].to_string_lossy();
-        if positional {
-            paths.push(value.into_owned());
-            index += 1;
-            continue;
-        }
-        if value == "--" {
-            positional = true;
-            index += 1;
-            continue;
-        }
-        if value == "--all" {
-            all = true;
-            index += 1;
-            continue;
-        }
-        if value == "--json" {
-            index += 1;
-            continue;
-        }
-        let (flag, inline_value) = value
-            .split_once('=')
-            .map_or((value.as_ref(), None), |(flag, value)| (flag, Some(value)));
-        if matches!(
-            flag,
-            "--kind" | "--type" | "--slug" | "--at" | "--plan" | "--dir"
-        ) {
-            let flag_value = if let Some(value) = inline_value {
-                value.to_owned()
-            } else {
-                index += 1;
-                args.get(index)
-                    .and_then(|value| value.to_str())
-                    .ok_or_else(|| format!("{flag} requires a value"))?
-                    .to_owned()
-            };
-            match flag {
-                "--kind" => kind = Some(flag_value),
-                "--type" => artifact_type = Some(flag_value),
-                "--slug" => slug = Some(flag_value),
-                "--at" => at = Some(flag_value),
-                "--plan" => plan = Some(flag_value),
-                "--dir" => {}
-                _ => unreachable!(),
-            }
-            index += 1;
-            continue;
-        }
-        return Err(format!("unknown convention option '{value}'"));
+    if let Some(flag) = call.flag_outside(&["kind", "type", "slug", "at", "plan", "all"]) {
+        return Err(format!("unknown convention option '--{flag}'"));
     }
+    // Explicit paths come after a bare `--`; a word before it is not a flag, so it is not understood.
+    if let Some(word) = call.flags().positional.get(1) {
+        return Err(format!("unknown convention option '{word}'"));
+    }
+    let kind = call.value("kind")?;
+    let artifact_type = call.value("type")?;
+    let slug = call.value("slug")?;
+    let at = call.value("at")?;
+    let plan = call.value("plan")?;
+    let all = call.switch("all")?;
+    let paths = call.arguments();
     match &operation {
         fgos_convention::ConventionOperation::Name | fgos_convention::ConventionOperation::Path
             if all || !paths.is_empty() =>
@@ -862,7 +664,7 @@ mod tests {
 
     #[test]
     fn identity_request_ignores_the_shell_appended_dir_flag() {
-        let args: Vec<OsString> = ["identity", "--json", "--dir", "/repo", "--pid=42"]
+        let args: Vec<OsString> = ["identity", "--json", "--dir", "/repo", "--pid", "42"]
             .iter()
             .map(OsString::from)
             .collect();
@@ -946,7 +748,8 @@ mod tests {
         let registered = request(&[
             "identity",
             "session",
-            "--role=lead:MAIL",
+            "--role",
+            "lead:MAIL",
             "--take",
             "--json",
         ])
@@ -1193,7 +996,7 @@ mod tests {
             }
         );
         assert_eq!(
-            config(&["config", "standard", "--path=a"]).unwrap().verb,
+            config(&["config", "standard", "--path", "a"]).unwrap().verb,
             Verb::Standard {
                 path: Some("a".into())
             }
@@ -1256,7 +1059,7 @@ mod tests {
             }
         );
         assert_eq!(
-            config(&["config", "patch", "p.yaml", "--reason=r"])
+            config(&["config", "patch", "p.yaml", "--reason", "r"])
                 .unwrap()
                 .verb,
             Verb::Patch {
@@ -1380,5 +1183,29 @@ mod tests {
                 other => panic!("{args:?}: {other:?}"),
             }
         }
+    }
+
+    #[test]
+    fn a_flag_that_takes_no_value_refuses_the_word_the_parser_handed_it() {
+        assert_eq!(
+            config(&["config", "set", "--global", "a.b", "v"]).unwrap_err(),
+            "--global takes no value"
+        );
+        assert_eq!(
+            config(&["config", "show", "--path"]).unwrap_err(),
+            "--path requires a value"
+        );
+        let identity = |args: &[&str]| {
+            let args: Vec<OsString> = args.iter().map(OsString::from).collect();
+            project_identity_request(&args)
+        };
+        assert_eq!(
+            identity(&["identity", "list", "--project", "extra"]).unwrap_err(),
+            "--project takes no value"
+        );
+        assert_eq!(
+            identity(&["identity", "project", "--init", "--new"]).unwrap_err(),
+            "--init and --new are exclusive"
+        );
     }
 }

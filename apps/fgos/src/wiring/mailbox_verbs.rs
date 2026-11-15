@@ -23,6 +23,7 @@ use super::mailbox_identity::{
 };
 use super::mailbox_remote;
 use crate::exit_codes;
+use crate::routing::Call;
 use fgos_host_runtime::{
     EventSink, HostInvocation, InvocationControl, OperationProvider, OperationRequest,
     ProviderDescriptor, ProviderError, ProviderOutcome,
@@ -99,56 +100,47 @@ impl MailboxRequest {
 /// mailbox status`; `--json` on each, `--dir` accepted and ignored (the
 /// record is always the main checkout's).
 pub fn project_mailbox_request(args: &[OsString]) -> MailboxRequest {
-    let text: Vec<String> = args
-        .iter()
-        .map(|a| a.to_string_lossy().into_owned())
-        .collect();
-    let sub = text.get(1).map(String::as_str);
-    let mut to = None;
-    let mut reply_to = None;
-    let mut wake = false;
-    let mut need_ack = false;
-    let mut reply_by = None;
-    let mut claim = false;
-    let mut long = false;
-    let mut json = false;
-    let mut positional = Vec::new();
-    let mut flags_done = false;
-    let mut index = 2;
-    while index < text.len() {
-        let token = text[index].as_str();
-        index += 1;
-        if flags_done || !token.starts_with("--") {
-            positional.push(token.to_string());
-            continue;
-        }
-        let (name, inline) = match token.split_once('=') {
-            Some((name, value)) => (name, Some(value.to_string())),
-            None => (token, None),
-        };
-        let mut value = || -> Option<String> {
-            inline.clone().or_else(|| {
-                let next = text.get(index).cloned();
-                index += 1;
-                next
-            })
-        };
-        match (sub, name) {
-            (_, "--") => flags_done = true,
-            (_, "--json") => json = true,
-            (_, "--dir") => {
-                value();
-            }
-            (Some("send"), "--to") => to = value(),
-            (Some("send"), "--reply-to") => reply_to = value(),
-            (Some("send"), "--wake") => wake = true,
-            (Some("send"), "--need-ack") => need_ack = true,
-            (Some("send"), "--reply-by") => reply_by = Some(value().unwrap_or_default()),
-            (Some("inbox"), "--claim") => claim = true,
-            (Some("list"), "--long") => long = true,
-            (_, other) => return MailboxRequest::Usage(format!("unknown flag {other}")),
-        }
+    use fgos_host_runtime::cli_args::{FlagScalar, FlagValue};
+    let call = Call::new(args);
+    let sub = call.sub_word();
+    let own: &[&str] = match sub {
+        Some("send") => &["to", "reply-to", "wake", "need-ack", "reply-by"],
+        Some("inbox") => &["claim"],
+        Some("list") => &["long"],
+        _ => &[],
+    };
+    if let Some(flag) = call.flag_outside(own) {
+        return MailboxRequest::Usage(format!("unknown flag --{flag}"));
     }
+    let mut positional = call.arguments();
+    // A flag that takes no value is on whether or not the shared parser handed it the next token as a value: the
+    // usage line puts `--wake` before the body, and that token is then a word of the call (a verb takes one
+    // body at most, so its place among the words does not matter).
+    let mut switch = |name: &str| match call.flags().flag(name) {
+        None => false,
+        Some(FlagValue::One(FlagScalar::Str(word))) => {
+            positional.push(word.clone());
+            true
+        }
+        Some(_) => true,
+    };
+    let (wake, need_ack, claim, long, json) = (
+        switch("wake"),
+        switch("need-ack"),
+        switch("claim"),
+        switch("long"),
+        switch("json"),
+    );
+    let text = |name: &str| match call.flags().flag(name) {
+        Some(FlagValue::One(FlagScalar::Str(word))) => Some(word.clone()),
+        _ => None,
+    };
+    let (to, reply_to) = (text("to"), text("reply-to"));
+    // A bare `--reply-by` names no duration: refused as any other unreadable one is.
+    let reply_by = call
+        .flags()
+        .flag("reply-by")
+        .map(|_| text("reply-by").unwrap_or_default());
     match sub {
         Some("send") => {
             let Some(to) = to.filter(|t| !t.is_empty()) else {
@@ -880,5 +872,96 @@ impl OperationProvider for MailboxProvider {
                 Box::new(answer(request)),
             ))
         })
+    }
+}
+
+#[cfg(test)]
+mod projection_tests {
+    use super::*;
+
+    fn project(args: &[&str]) -> MailboxRequest {
+        let args: Vec<OsString> = std::iter::once("mailbox")
+            .chain(args.iter().copied())
+            .map(OsString::from)
+            .collect();
+        project_mailbox_request(&args)
+    }
+
+    fn send(wake: bool, body: &str) -> MailboxRequest {
+        MailboxRequest::Send {
+            to: "a".into(),
+            wake,
+            reply_to: None,
+            need_ack: false,
+            reply_by_sec: None,
+            body: body.into(),
+            json: false,
+        }
+    }
+
+    #[test]
+    fn a_switch_before_the_body_leaves_the_body_a_word_of_the_call() {
+        assert_eq!(
+            project(&["send", "--to", "a", "hello"]),
+            send(false, "hello")
+        );
+        assert_eq!(
+            project(&["send", "--wake", "--to", "a", "hello"]),
+            send(true, "hello")
+        );
+        assert_eq!(
+            project(&["send", "--to", "a", "--wake", "hello"]),
+            send(true, "hello")
+        );
+        assert_eq!(
+            project(&["send", "--to", "a", "hello", "--wake"]),
+            send(true, "hello")
+        );
+        assert_eq!(
+            project(&["send", "--to", "a", "--wake", "--", "--looks like a flag"]),
+            send(true, "--looks like a flag")
+        );
+        assert!(matches!(
+            project(&["send", "--to", "a", "one", "two"]),
+            MailboxRequest::Usage(_)
+        ));
+        assert_eq!(
+            project(&["inbox", "--claim", "stray"]),
+            MailboxRequest::Usage("inbox takes no positional argument".into())
+        );
+    }
+
+    #[test]
+    fn a_flag_of_another_sub_command_or_spelled_with_an_equals_sign_is_unknown() {
+        assert_eq!(
+            project(&["inbox", "--wake"]),
+            MailboxRequest::Usage("unknown flag --wake".into())
+        );
+        assert_eq!(
+            project(&["send", "--to=a", "hello"]),
+            MailboxRequest::Usage("unknown flag --to=a".into())
+        );
+    }
+
+    #[test]
+    fn a_reply_by_without_a_duration_is_a_usage_error() {
+        assert_eq!(
+            project(&[
+                "send",
+                "--to",
+                "a",
+                "--need-ack",
+                "--reply-by",
+                "x",
+                "hello"
+            ]),
+            MailboxRequest::Usage(
+                "--reply-by wants a duration such as 90s, 30m or 2h, not \"x\"".into()
+            )
+        );
+        assert_eq!(
+            project(&["send", "--to", "a", "--reply-by", "30m", "hello"]),
+            MailboxRequest::Usage("--reply-by needs --need-ack".into())
+        );
     }
 }
