@@ -65,7 +65,7 @@ test('the staged legacy-node payload carries the YAML door, loads nothing but th
     assert.ok(listed.has(door), 'src/util/yaml.mjs must be listed in manifest files[] so verify covers it');
     assert.deepEqual(
       [...fs.readFileSync(path.join(tempOut, door), 'utf8').matchAll(/^import .* from '([^']+)';$/gm)].map((m) => m[1]),
-      ['../native/door.mjs'],
+      ['node:util', '../native/door.mjs'],
       'the staged YAML door imports the native door and no parser',
     );
     assert.ok(!listed.has('libexec/legacy-node/src/util/third-party/js-yaml.mjs'), 'no vendored YAML parser ships');
