@@ -502,3 +502,15 @@ Status (2026-11-15): Q1-Q3 answered by the owner (via HARDEN); Q4 decided by evi
   Git spec §20); D4 fixes it in 01, but it is live on `main` until then.
 - If 00 F11 confirms it, the gateway started by Node inherits `FGOS_RUST_HOST_RECURSION_GUARD`, so its calls to legacy
   verbs fail today; `cook/gateway-guard-fix` fixes it outside the port.
+
+### Added during execution (S3)
+
+Files the S3 phases touched that the File set above does not list, with the reason:
+- `apps/fgos-gateway/src/gateway.rs` (08: one test that drives `POST /v1/sessions` and `DELETE /v1/sessions/{id}` through the real host).
+- `packages/git/rust/src/{refs.rs,recovery.rs}` (08: `acquire_checkout_custody`, the one custody door the session module and recovery share).
+- `src/util/host-bin.mjs` and `test/util/host-bin.test.mjs` (08: `invokeHost` takes the host child's `cwd`).
+- `scripts/export-command-selectors.mjs`, `test/cli/unknown-flag-rejection.test.mjs` (07-09: the generated flag lists keep the registry's order so the host's unknown-flag text equals Node's byte for byte).
+- `test/event-store/phase07-fixture.mjs`, `test/cli/fgos-return.test.mjs`, `test/verbs/merge/approve-leaf-and-worktree.test.mjs` (07, 08: tests that drove the deleted Node paths now drive the host verb).
+- `src/event-store/native.mjs`, `packages/git/node-addon/src/event_store.rs`, `scripts/event-store/forge-probe.sh` (12: the addon facade's `sync` and `exportJsonl` have no caller once the verbs are native; the real-forge probe runs the host's `events sync`).
+- Docs: `docs/platform/runner/operations/h-51f5cd7279fd.md` and `docs/platform/runner/subcomponents/h-ce5b9771a26a/spec.md` hold the session section the plan called "runner spec"; `docs/platform/git/spec.md`, `docs/platform/component-boundary.md` and `packages/holder-lock/contracts/lock-registry.v1.json` named the deleted Node modules.
+- Not touched on purpose: route counts in `docs/platform/host-invocation-routing/spec.md` and `contracts/command-route-descriptor.md` (recomputed from the generated routes after S3 rebases onto `main`), `CHANGELOG.md`, `Cargo.lock`.

@@ -22,7 +22,7 @@
       "rank": 10,
       "v3Path": "<fgosDir>/locks/gateway.lock",
       "owner": "4.2",
-      "note": "v1 source: src/runner/gateway-control.mjs LOCK_FILE"
+      "note": "v1 source: the gateway control module of the host, apps/fgos/src/wiring/gateway_control.rs"
     },
     {
       "name": "runner",
@@ -40,7 +40,7 @@
       "rank": 80,
       "v3Path": "<fgosDir>/locks/sessions.lock",
       "owner": "4.2",
-      "note": "v1 source: src/runner/session.mjs SESSIONS_LOCK"
+      "note": "v1 source: the session module of the host, apps/fgos/src/wiring/session.rs"
     },
     {
       "name": "advance",

@@ -174,7 +174,7 @@ It is attribution, not authentication. Lock authority does not come from this id
 | Owns | Does not own |
 |---|---|
 | The order and validity rule for env session ids | Minting worker ids, scrubbing env, lineage (run supervisor) |
-| Confirming an env id against `<fgosDir>/sessions.json` (read only; an unreadable file means "not confirmed") | Writing `sessions.json` (`src/runner/session.mjs`) |
+| Confirming an env id against `<fgosDir>/sessions.json` (read only; an unreadable file means "not confirmed") | Writing `sessions.json` (the host's session module, `apps/fgos/src/wiring/session.rs`, under the `sessions` lock through Durable File; the row shape is the `x-sessionRegistry` section of `identity.writer.v1.json`, which this crate's tests run) |
 | The process-tree rule: highest ancestor with a terminal, else session id, else caller pid | Liveness, start time, boot id (process facts) |
 | The read-only native verb `fgos identity` | Lock or claim-settle authority |
 | The contract and the shared vectors | Observe shard file names (Observe derives them from `{id, source}`) |

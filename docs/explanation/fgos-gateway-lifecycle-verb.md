@@ -24,7 +24,8 @@ confirming that constraint directly.
 A new process registry (`.fgos/gateway.json`: pid, port, startedAt,
 logPath) and PID-liveness check, modeled on `src/runner/session.mjs`'s
 existing pattern (`isPidAlive`, lock-guarded registry read/write) — a new
-module, `src/runner/gateway-control.mjs`:
+module, first written as `src/runner/gateway-control.mjs` and since 2026-11-15
+the host's own module (see "Where it lives now" below):
 
 - **`start`** — builds the release binary if missing or stale, then spawns
   it detached (`child_process.spawn`, `detached: true`, `unref`, stdout/
@@ -67,6 +68,21 @@ follow-up before they could bite:
    after `stop` could briefly still report `running: true`. Fixed by
    briefly polling `isPidAlive` after `SIGTERM` (`SIGKILL` as a last
    resort) before clearing the registry.
+
+## Where it lives now (2026-11-15)
+
+`fgos gateway start|stop|status` are native verbs of the Rust host, served by
+`apps/fgos/src/wiring/gateway_control.rs`; the Node module and its arm are
+deleted and no Node process runs for them. The behaviour above is kept: the
+`.fgos/gateway.json` registry (written through Durable File), the `gateway`
+lock from the holder-lock registry, the release build of
+`apps/fgos-gateway` (with `--locked`), the detached spawn with its log file,
+the 3 s `GET /v1/contract` probe, identity-checked TERM then KILL on `stop`,
+and the shutdown seal after `stop`. Differences worth knowing: the spawned
+gateway no longer inherits the host recursion guard, so the verb calls it makes
+(`POST /v1/sessions` and the like) reach the host again; `gateway start` is
+refused off Unix with a message saying so (it never worked there); `stop` and
+`status` outside a project answer "not running" and create nothing.
 
 ## The mandatory doctrine this item planted
 

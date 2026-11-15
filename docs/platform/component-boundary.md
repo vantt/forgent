@@ -1088,7 +1088,7 @@ Likely additional or more explicit boundaries:
 
 7. Gateway And External Interface Control Plane.
 
-   Existing code under `src/runner/gateway-control.mjs` and
+   Existing code under `apps/fgos/src/wiring/gateway_control.rs` and
    `apps/fgos-gateway/src/{gateway,mcp,ports}.rs` and
    `packages/herdr-fgos-common/rust/src/fgos.rs` own process lifecycle, REST
    and MCP exposure, authentication, terminal/UI ports, and the `VerbGateway`
