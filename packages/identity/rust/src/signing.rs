@@ -74,19 +74,7 @@ fn key_path(state_root: &Path) -> PathBuf {
     identity_dir(state_root).join(KEY_FILE)
 }
 
-#[cfg(unix)]
-pub(crate) fn private_dir(path: &Path) -> io::Result<()> {
-    use std::os::unix::fs::DirBuilderExt;
-    fs::DirBuilder::new()
-        .recursive(true)
-        .mode(0o700)
-        .create(path)
-}
-
-#[cfg(not(unix))]
-pub(crate) fn private_dir(path: &Path) -> io::Result<()> {
-    fs::create_dir_all(path)
-}
+use crate::machine::private_dir;
 
 /// A private scratch directory under the state root's own `tmp`, removed when
 /// dropped. `ssh-keygen` needs a file for some inputs; they never go to a

@@ -17,7 +17,7 @@ import { strict as assert } from 'node:assert';
 
 import { runCaseOnEntry } from '../harness.mjs';
 import { initFixtureRepo } from '../../helpers/git-fixture.mjs';
-import { writeProjectConfig, writeRawLegacyProjectConfig, writeRawProjectConfig } from '../../helpers/config-fixture.mjs';
+import { writeProjectConfig, writeRawGlobalConfig, writeRawLegacyGlobalConfig, writeRawLegacyProjectConfig, writeRawProjectConfig } from '../../helpers/config-fixture.mjs';
 
 export const cases = [];
 
@@ -85,7 +85,15 @@ add('config-redundant-value-fixed', [{ do: 'redundantValue' }, call([]), call(['
 add('config-legacy-global-token-kept-by-fix', [{ do: 'legacyGlobalToken' }, call(['--fix']), call([])], { disk: true });
 add('identity-without-a-machine-id', [{ do: 'noMachineId' }, call([])]);
 add('identity-without-a-machine-id-fixed', [{ do: 'noMachineId' }, call(['--fix']), call([])], { disk: true });
-add('identity-with-an-invalid-machine-id', [{ do: 'badMachineId' }, call([])]);
+// Accepted change: the words of this refusal moved with the retirement of `setup`, which the base release's text
+// told the person to run. Both rows that read the id say it; everything else about them (status, fix, exit) is
+// still compared. Each side's text is pinned, not skipped.
+const INVALID_ID_TEXT = {
+  rows: ['identity-machine-id', 'identity-machine-key'],
+  base: /^\S+ identity machine failed \(exit 65\): fgos: error: invalid machine id; run setup fix \[machine-id-unreadable\]$/,
+  host: /^\S+ identity machine failed \(exit 65\): fgos: error: invalid machine id in <WORLD>\/state\/machine-id: correct it, or remove it and run fgos doctor --fix to mint a new one \(a new id is a new machine identity\) \[machine-id-unreadable\]$/,
+};
+add('identity-with-an-invalid-machine-id', [{ do: 'badMachineId' }, call([])], { acceptedText: INVALID_ID_TEXT });
 add('identity-with-a-machine-key', [{ do: 'machineKey' }, call([])]);
 add('identity-key-fix-never-replaces-a-key', [{ do: 'machineKey' }, call(['--fix']), call([])], { disk: true });
 add('identity-without-ssh-keygen-on-path', [{ do: 'pathWithout', tools: ['ssh', 'ssh-keygen'] }, call([], { env: 'PATH_WITHOUT' })]);
@@ -330,7 +338,7 @@ const RETIRED_PRETTY_LINE = /^[✓✗] shell-integration source line present in 
 const withoutRetiredLines = (text) => text.split('\n').filter((line) => !RETIRED_PRETTY_LINE.test(line)).join('\n');
 
 /** The rows of one doctor answer as comparable values, or the raw text when the answer is not the JSON envelope. */
-function describe(text, ignoreRows = []) {
+function describe(text, ignoreRows = [], accepted = null, side = 'host') {
   let data;
   try { data = JSON.parse(text).data; } catch { return { text: withoutRetiredLines(text) }; }
   if (!data?.checks) return { text: withoutRetiredLines(text) };
@@ -338,7 +346,14 @@ function describe(text, ignoreRows = []) {
     ok: data.ok,
     next: data.next,
     fixed: data.fixed,
-    rows: data.checks.filter(({ id }) => !RETIRED_ROWS.has(id)).map(({ id, status, passed, fix, message, detail, description }) => (ignoreRows.includes(id) ? { id, description } : { id, status, passed, fix, message, detail, description })),
+    rows: data.checks.filter(({ id }) => !RETIRED_ROWS.has(id)).map(({ id, status, passed, fix, message, detail, description }) => {
+      if (ignoreRows.includes(id)) return { id, description };
+      if (accepted?.rows.includes(id)) {
+        assert.match(message, accepted[side], `${id}: the ${side} text of the accepted difference`);
+        return { id, status, passed, fix, message: '<ACCEPTED TEXT>', detail, description };
+      }
+      return { id, status, passed, fix, message, detail, description };
+    }),
   };
 }
 
@@ -368,7 +383,7 @@ async function runScript(entry, testCase) {
       outputs.push({
         args: step.args,
         exit: result.exitCode,
-        stdout: describe(norm(result.stdoutText), testCase.ignoreRows),
+        stdout: describe(norm(result.stdoutText), testCase.ignoreRows, testCase.acceptedText, entry.type === 'node' ? 'base' : 'host'),
         stderr: norm(result.stderrText),
       });
     }

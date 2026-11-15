@@ -164,6 +164,38 @@ fn rows_from(findings: &Result<Vec<Finding>, String>, ids: &[&str]) -> Vec<RowOu
         .collect()
 }
 
+/// A refusal in the words the Node door gave it: `id file[:line:column] path (keyword)`, each part only when it
+/// exists; never a value.
+#[cfg(unix)]
+fn door_words(refusal: &fgos_config::ConfigRefusal) -> String {
+    let keyword = refusal
+        .detail
+        .as_ref()
+        .and_then(|detail| detail.keyword.clone())
+        .or_else(|| refusal.yaml.as_ref().map(|yaml| yaml.rule.to_string()));
+    let file = refusal
+        .file
+        .as_deref()
+        .map(|file| match (refusal.line, refusal.column) {
+            (Some(line), Some(column)) => format!("{file}:{line}:{column}"),
+            _ => file.to_owned(),
+        });
+    let place = [file, refusal.path.clone()]
+        .into_iter()
+        .flatten()
+        .collect::<Vec<_>>()
+        .join(" ");
+    [
+        Some(refusal.code.to_owned()),
+        Some(place).filter(|place| !place.is_empty()),
+        keyword.map(|keyword| format!("({keyword})")),
+    ]
+    .into_iter()
+    .flatten()
+    .collect::<Vec<_>>()
+    .join(" ")
+}
+
 #[cfg(unix)]
 mod door {
     use fgos_config::detect::PathDetectors;
@@ -206,7 +238,7 @@ mod door {
             .map_err(|error| match error {
                 SnapshotError::Refused(all) => all
                     .iter()
-                    .map(ToString::to_string)
+                    .map(super::door_words)
                     .collect::<Vec<_>>()
                     .join("; "),
                 SnapshotError::Io(io) => format!("config-io ({:?})", io.kind()),
@@ -488,6 +520,14 @@ mod tests {
         let detectors = fgos_config::detect::NoDetectors;
         let ctx = fgos_config::machine::context(&detectors).unwrap();
         let why = door::repair(&ctx, &roots, "chmod").unwrap_err();
+        assert_eq!(
+            door_words(&fgos_config::ConfigRefusal::parse({
+                let mut yaml = fgos_yaml_doc::Refusal::new("comment-would-be-lost");
+                yaml.file = "config.yaml".into();
+                yaml
+            })),
+            "config-parse config.yaml (comment-would-be-lost)"
+        );
         assert!(why.contains("config-write-confined"), "{why}");
         let _ = fs::remove_dir_all(base);
     }
