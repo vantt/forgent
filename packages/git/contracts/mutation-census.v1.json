@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "10a2a3c741f9baa44dfc46216624ffbd51d115812afdb9c11e9ec1450e4ff01b",
+  "payloadDigest": "60e9222554214853f613e0fa8fb83d65b74d81c42a037642e129093193b8ef1f",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "a5629383f89b4488b252a62f0ea86463e649e33e0a891db1a19af2cd6c136aca",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -801,7 +801,7 @@
     "packages/yaml-doc/rust/tests/common/mod.rs": "06ebf61e3adf88211599320f37233f9200cabffb92861aee75d0023c71d4b836",
     "packages/yaml-doc/rust/tests/fixture_shape.rs": "5b114b7899fa60c6ef4dd07654ce0883de8367572ee8f285b88735fd60186c84",
     "packages/yaml-doc/rust/tests/golden_comment.rs": "c156dcfc1adc982418515cb1b88776ad4e4229458ba562456e8629ee8882962d",
-    "packages/yaml-doc/rust/tests/golden_edit.rs": "a974ad1514a64c2733da1eb1ce4c6b0196bbe5b647ec5ff0932b92e664a59e12",
+    "packages/yaml-doc/rust/tests/golden_edit.rs": "8207eae321b95bcb9727aefab75d88956dfaa96d84aaf35f1ec7ed1ca13a92a8",
     "packages/yaml-doc/rust/tests/golden_merge.rs": "953642eb5be012465d621fc86382ebfd2512b3a300aa86c89318bfbd0bfc4687",
     "packages/yaml-doc/rust/tests/golden_parse.rs": "fae0796d36be7224d05987dfb01e4cf513090d65014f5cba7e9368aff13a5811",
     "packages/yaml-doc/rust/tests/golden_path.rs": "3a0d3f7fe529d22b594734a2a33c3f72144c7605df7ea9f8f56f8dad2f5d4b49",

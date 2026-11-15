@@ -2382,6 +2382,567 @@
       "expect": {
         "output": "x:\n  a: 1\n  b: 2\n  c: 3\n"
       }
+    },
+    {
+      "id": "set-root-empty-keeps-key-order",
+      "why": "a whole mapping written into an empty document keeps the order of its keys, not alphabetical order",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "text": ""
+      },
+      "ops": [
+        {
+          "op": "set",
+          "path": "",
+          "value": {
+            "name": "reviewer",
+            "description": "checks",
+            "tools": "Read, Grep, Bash"
+          }
+        }
+      ],
+      "expect": {
+        "output": "name: reviewer\ndescription: checks\ntools: Read, Grep, Bash\n"
+      }
+    },
+    {
+      "id": "set-root-empty-quotes-strings-that-would-read-back-differently",
+      "why": "a string that would change meaning or break the line as plain text is written double-quoted into an empty document",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "text": ""
+      },
+      "ops": [
+        {
+          "op": "set",
+          "path": "",
+          "value": {
+            "colon_space": "a: b",
+            "backtick": "`tick",
+            "dash_space": "- x",
+            "hash": "x #y",
+            "empty": "",
+            "padded": " pad ",
+            "doc_marker": "---x",
+            "newline": "l1\nl2",
+            "bool": "true",
+            "null": "null",
+            "int": "123",
+            "exp": "1e5",
+            "octal": "0123"
+          }
+        }
+      ],
+      "expect": {
+        "output": "colon_space: \"a: b\"\nbacktick: \"`tick\"\ndash_space: \"- x\"\nhash: \"x #y\"\nempty: \"\"\npadded: \" pad \"\ndoc_marker: \"---x\"\nnewline: \"l1\\nl2\"\nbool: \"true\"\nnull: \"null\"\nint: \"123\"\nexp: \"1e5\"\noctal: \"0123\"\n"
+      }
+    },
+    {
+      "id": "set-root-empty-leaves-safe-strings-plain",
+      "why": "a string that reads back as itself stays plain when a whole document is written",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "text": ""
+      },
+      "ops": [
+        {
+          "op": "set",
+          "path": "",
+          "value": {
+            "yes": "yes",
+            "none": "none",
+            "digest": "sha256:copy",
+            "slug": "how-to",
+            "tools": "Read, Grep, Bash",
+            "title": "Decisions index",
+            "hex": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
+          }
+        }
+      ],
+      "expect": {
+        "output": "yes: yes\nnone: none\ndigest: sha256:copy\nslug: how-to\ntools: Read, Grep, Bash\ntitle: Decisions index\nhex: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef\n"
+      }
+    },
+    {
+      "id": "set-root-empty-escapes-hidden-characters",
+      "why": "a value holding a bidi control or a zero-width character is written double-quoted with a visible escape and reads back equal",
+      "profiles": [
+        "tool"
+      ],
+      "input": {
+        "text": ""
+      },
+      "ops": [
+        {
+          "op": "set",
+          "path": "",
+          "value": {
+            "bidi": "a\u202eb",
+            "zero_width": "a\u200bb"
+          }
+        }
+      ],
+      "expect": {
+        "output": "bidi: \"a\\u202Eb\"\nzero_width: \"a\\u200Bb\"\n"
+      }
+    },
+    {
+      "id": "set-root-empty-writes-nested-mapping",
+      "why": "a nested mapping is written as indented block mappings",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "text": ""
+      },
+      "ops": [
+        {
+          "op": "set",
+          "path": "",
+          "value": {
+            "a": {
+              "b": {
+                "c": 1
+              }
+            }
+          }
+        }
+      ],
+      "expect": {
+        "output": "a:\n  b:\n    c: 1\n"
+      }
+    },
+    {
+      "id": "set-root-empty-writes-block-sequence",
+      "why": "a list of strings is written as an indented block sequence",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "text": ""
+      },
+      "ops": [
+        {
+          "op": "set",
+          "path": "",
+          "value": {
+            "list": [
+              "x",
+              "y"
+            ]
+          }
+        }
+      ],
+      "expect": {
+        "output": "list:\n  - x\n  - y\n"
+      }
+    },
+    {
+      "id": "set-root-empty-writes-sequence-of-mappings",
+      "why": "a list of mappings starts each mapping on its dash line",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "text": ""
+      },
+      "ops": [
+        {
+          "op": "set",
+          "path": "",
+          "value": {
+            "items": [
+              {
+                "id": 1,
+                "name": "n"
+              },
+              {
+                "id": 2
+              }
+            ]
+          }
+        }
+      ],
+      "expect": {
+        "output": "items:\n  - id: 1\n    name: n\n  - id: 2\n"
+      }
+    },
+    {
+      "id": "set-root-empty-writes-empty-collections-inline",
+      "why": "an empty mapping and an empty list value are written inline",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "text": ""
+      },
+      "ops": [
+        {
+          "op": "set",
+          "path": "",
+          "value": {
+            "empty_map": {},
+            "empty_list": []
+          }
+        }
+      ],
+      "expect": {
+        "output": "empty_map: {}\nempty_list: []\n"
+      }
+    },
+    {
+      "id": "set-root-empty-writes-scalar-values",
+      "why": "booleans, integers, floats and null are written as their plain scalars",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "text": ""
+      },
+      "ops": [
+        {
+          "op": "set",
+          "path": "",
+          "value": {
+            "flag_on": true,
+            "flag_off": false,
+            "count": 7,
+            "negative": -3,
+            "ratio": 1.5,
+            "nothing": null
+          }
+        }
+      ],
+      "expect": {
+        "output": "flag_on: true\nflag_off: false\ncount: 7\nnegative: -3\nratio: 1.5\nnothing: null\n"
+      }
+    },
+    {
+      "id": "set-root-empty-writes-root-sequence",
+      "why": "a sequence value becomes the whole document",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "text": ""
+      },
+      "ops": [
+        {
+          "op": "set",
+          "path": "",
+          "value": [
+            "a",
+            {
+              "k": 1
+            },
+            2
+          ]
+        }
+      ],
+      "expect": {
+        "output": "- a\n- k: 1\n- 2\n"
+      }
+    },
+    {
+      "id": "set-root-empty-writes-root-scalar",
+      "why": "a scalar value becomes the whole document, quoted when it would read back differently",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "text": ""
+      },
+      "ops": [
+        {
+          "op": "set",
+          "path": "",
+          "value": "a: b"
+        }
+      ],
+      "expect": {
+        "output": "\"a: b\"\n"
+      }
+    },
+    {
+      "id": "set-root-empty-writes-root-plain-scalar",
+      "why": "a plain-safe scalar value becomes the whole document unquoted",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "text": ""
+      },
+      "ops": [
+        {
+          "op": "set",
+          "path": "",
+          "value": "hello"
+        }
+      ],
+      "expect": {
+        "output": "hello\n"
+      }
+    },
+    {
+      "id": "set-root-empty-writes-root-empty-mapping",
+      "why": "an empty mapping value becomes the inline document {}",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "text": ""
+      },
+      "ops": [
+        {
+          "op": "set",
+          "path": "",
+          "value": {}
+        }
+      ],
+      "expect": {
+        "output": "{}\n"
+      }
+    },
+    {
+      "id": "set-root-empty-writes-root-empty-sequence",
+      "why": "an empty sequence value becomes the inline document []",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "text": ""
+      },
+      "ops": [
+        {
+          "op": "set",
+          "path": "",
+          "value": []
+        }
+      ],
+      "expect": {
+        "output": "[]\n"
+      }
+    },
+    {
+      "id": "set-root-comment-only-keeps-comments-above",
+      "why": "a document holding only comments keeps them above the new content",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "lines": [
+          "# keep"
+        ]
+      },
+      "ops": [
+        {
+          "op": "set",
+          "path": "",
+          "value": {
+            "a": 1
+          }
+        }
+      ],
+      "expect": {
+        "output": "# keep\na: 1\n"
+      }
+    },
+    {
+      "id": "set-root-empty-quotes-keys",
+      "why": "a key that needs quotes is quoted and a key named like a prototype is a plain own key",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "text": ""
+      },
+      "ops": [
+        {
+          "op": "set",
+          "path": "",
+          "value": {
+            "a: b": 1,
+            "__proto__": 2
+          }
+        }
+      ],
+      "expect": {
+        "output": "\"a: b\": 1\n__proto__: 2\n"
+      }
+    },
+    {
+      "id": "set-root-empty-refuses-value-past-depth",
+      "why": "a value nested past the profile depth is refused before anything is written",
+      "profiles": [
+        "strict-config",
+        "tool"
+      ],
+      "input": {
+        "text": ""
+      },
+      "ops": [
+        {
+          "op": "set",
+          "path": "",
+          "value": {
+            "a": {
+              "a": {
+                "a": {
+                  "a": {
+                    "a": {
+                      "a": {
+                        "a": {
+                          "a": {
+                            "a": {
+                              "a": {
+                                "a": {
+                                  "a": {
+                                    "a": {
+                                      "a": {
+                                        "a": {
+                                          "a": {
+                                            "a": {
+                                              "a": {
+                                                "a": {
+                                                  "a": {
+                                                    "a": {
+                                                      "a": {
+                                                        "a": {
+                                                          "a": {
+                                                            "a": {
+                                                              "a": {
+                                                                "a": {
+                                                                  "a": {
+                                                                    "a": {
+                                                                      "a": {
+                                                                        "a": {
+                                                                          "a": {
+                                                                            "a": {
+                                                                              "a": {
+                                                                                "a": {
+                                                                                  "a": {
+                                                                                    "a": {
+                                                                                      "a": {
+                                                                                        "a": {
+                                                                                          "a": {
+                                                                                            "a": {
+                                                                                              "a": {
+                                                                                                "a": {
+                                                                                                  "a": {
+                                                                                                    "a": {
+                                                                                                      "a": {
+                                                                                                        "a": {
+                                                                                                          "a": {
+                                                                                                            "a": {
+                                                                                                              "a": {
+                                                                                                                "a": {
+                                                                                                                  "a": {
+                                                                                                                    "a": {
+                                                                                                                      "a": {
+                                                                                                                        "a": {
+                                                                                                                          "a": {
+                                                                                                                            "a": {
+                                                                                                                              "a": {
+                                                                                                                                "a": {
+                                                                                                                                  "a": {
+                                                                                                                                    "a": {
+                                                                                                                                      "a": {
+                                                                                                                                        "a": {
+                                                                                                                                          "a": {
+                                                                                                                                            "a": 1
+                                                                                                                                          }
+                                                                                                                                        }
+                                                                                                                                      }
+                                                                                                                                    }
+                                                                                                                                  }
+                                                                                                                                }
+                                                                                                                              }
+                                                                                                                            }
+                                                                                                                          }
+                                                                                                                        }
+                                                                                                                      }
+                                                                                                                    }
+                                                                                                                  }
+                                                                                                                }
+                                                                                                              }
+                                                                                                            }
+                                                                                                          }
+                                                                                                        }
+                                                                                                      }
+                                                                                                    }
+                                                                                                  }
+                                                                                                }
+                                                                                              }
+                                                                                            }
+                                                                                          }
+                                                                                        }
+                                                                                      }
+                                                                                    }
+                                                                                  }
+                                                                                }
+                                                                              }
+                                                                            }
+                                                                          }
+                                                                        }
+                                                                      }
+                                                                    }
+                                                                  }
+                                                                }
+                                                              }
+                                                            }
+                                                          }
+                                                        }
+                                                      }
+                                                    }
+                                                  }
+                                                }
+                                              }
+                                            }
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "expect": {
+        "refusal": {
+          "rule": "depth-exceeded"
+        }
+      }
     }
   ]
 }
