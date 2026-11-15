@@ -71,7 +71,7 @@ fn refresh_own_binary(cwd: &std::path::Path) {
                 previous.display()
             );
             // One fgctl serves every project on this machine; say which activation chose it.
-            let project = fgos_distribution::workspace::resolve_workspace_root(cwd)
+            let project = fgos_distribution::workspace::workspace_root_of(cwd)
                 .map(|root| root.display().to_string())
                 .unwrap_or_else(|_| cwd.display().to_string());
             eprintln!(

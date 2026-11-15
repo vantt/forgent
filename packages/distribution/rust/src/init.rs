@@ -14,7 +14,7 @@ use crate::store::{
 };
 use crate::verify::{recompute_artifact_digest, verify_legacy_node, verify_release_files};
 use crate::workspace::{
-    compute_repository_id, compute_work_state_id, compute_workspace_id, resolve_workspace_root,
+    compute_repository_id, compute_work_state_id, compute_workspace_id, workspace_root_of,
 };
 use fgos_host_runtime::civil_time::format_system_time_utc;
 use serde::{Deserialize, Serialize};
@@ -1056,7 +1056,7 @@ pub fn init_workspace_resolving(
     }
 
     // Refuse outside a repository checkout before any network traffic.
-    let workspace_root = resolve_workspace_root(start_dir)?;
+    let workspace_root = workspace_root_of(start_dir)?;
     let pin = read_tracked_pin(&workspace_root.join(".fgos").join("distribution.json"))
         .require_readable()?;
 
@@ -1130,7 +1130,7 @@ fn init_workspace_tagged(
     pin_override_reason: Option<&str>,
 ) -> Result<(), InitError> {
     // R1: Resolve workspace root via git-common-dir parent; refuse outside git repo.
-    let workspace_root = resolve_workspace_root(start_dir)?;
+    let workspace_root = workspace_root_of(start_dir)?;
 
     // R2: Compute workspaceId and workStateId.
     let workspace_id = compute_workspace_id(&workspace_root);
@@ -1761,7 +1761,7 @@ pub fn upgrade_workspace_resolving(
 
     // Refuse outside a repository checkout or when no runtime is active before
     // any network traffic.
-    let workspace_root = resolve_workspace_root(start_dir)?;
+    let workspace_root = workspace_root_of(start_dir)?;
     let activation_path = workspace_root
         .join(".fgos")
         .join("installation")
@@ -1807,7 +1807,7 @@ fn upgrade_workspace_tagged(
     from_source: &Path,
     release_tag: Option<&str>,
 ) -> Result<(), InitError> {
-    let workspace_root = resolve_workspace_root(start_dir)?;
+    let workspace_root = workspace_root_of(start_dir)?;
     let workspace_id = compute_workspace_id(&workspace_root);
     let work_state_id = compute_work_state_id(&workspace_id);
 
@@ -1997,7 +1997,7 @@ fn upgrade_workspace_tagged(
 /// Repairs workspace activation: rolls back if previousArtifactDigest is set,
 /// or re-verifies and re-publishes the same digest if previousArtifactDigest is null.
 pub fn repair_workspace(start_dir: &Path) -> Result<(), InitError> {
-    let workspace_root = resolve_workspace_root(start_dir)?;
+    let workspace_root = workspace_root_of(start_dir)?;
     let workspace_id = compute_workspace_id(&workspace_root);
     let work_state_id = compute_work_state_id(&workspace_id);
 
@@ -2156,7 +2156,7 @@ pub fn repair_workspace(start_dir: &Path) -> Result<(), InitError> {
 
 /// Verifies active release files against manifest and quarantines on any drift.
 pub fn verify_workspace(start_dir: &Path) -> Result<(), InitError> {
-    let workspace_root = resolve_workspace_root(start_dir)?;
+    let workspace_root = workspace_root_of(start_dir)?;
     let store_root = resolve_machine_release_store_root();
     let installation_dir = workspace_root.join(".fgos").join("installation");
     let activation_path = installation_dir.join("activation.json");
@@ -2350,7 +2350,7 @@ pub fn status_result_line(status: Option<&FgctlWorkspaceStatus>) -> String {
 
 /// Resolves active workspace status alongside the machine release store releases.
 pub fn get_workspace_status(start_dir: &Path, store_root: &Path) -> Option<FgctlWorkspaceStatus> {
-    let workspace_root = resolve_workspace_root(start_dir).ok()?;
+    let workspace_root = workspace_root_of(start_dir).ok()?;
     let installation_dir = workspace_root.join(".fgos").join("installation");
     let activation_path = installation_dir.join("activation.json");
     if !activation_path.exists() {

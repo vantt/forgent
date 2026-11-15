@@ -10,6 +10,9 @@
 //! - `workspaceId` = first 16 hex chars of `sha256(realpath(workspace root))`
 //! - `workStateId` = `workspaceId` in V1
 
+use fgos_git::invocation_root::{
+    read_repo_facts, resolve_invocation_root_with, RepoFacts, RootPolicy, RootRequest,
+};
 use sha2::{Digest, Sha256};
 use std::path::{Path, PathBuf};
 
@@ -23,15 +26,34 @@ pub enum WorkspaceError {
     Io(#[from] std::io::Error),
 }
 
-/// Resolves the workspace root: the trusted main checkout of the repository
-/// holding `start_dir`, read through the Git component, which creates its own
-/// state root when absent (`fgos init` may run before one exists).
-/// Refuses outside a git repository with `WorkspaceError::NotGitRepository`.
-pub fn resolve_workspace_root(start_dir: &Path) -> Result<PathBuf, WorkspaceError> {
-    let root = fgos_git::GitDriver::trusted_root_at(start_dir)
-        .map_err(|e| WorkspaceError::GitCommand(e.cause))?
-        .ok_or(WorkspaceError::NotGitRepository)?;
-    let canonical = std::fs::canonicalize(root)?;
+/// Resolves the workspace root: the trusted main checkout of the repository holding `start_dir`, asked of the
+/// root door in `fgos-git` under its destructive-verb policy (main checkout only, no `--dir`), so a linked
+/// worktree answers with its main checkout and the repository is read from disk with no Git child.
+/// Refuses outside a git repository with `WorkspaceError::NotGitRepository`; a repository Git cannot trust is
+/// `WorkspaceError::GitCommand` with the door's own text.
+pub fn workspace_root_of(start_dir: &Path) -> Result<PathBuf, WorkspaceError> {
+    let outside_repository = std::cell::Cell::new(false);
+    let read = |path: &Path| {
+        let facts = read_repo_facts(path);
+        if matches!(facts, Ok(RepoFacts::NotARepository)) {
+            outside_repository.set(true);
+        }
+        facts
+    };
+    let request = RootRequest {
+        cwd: start_dir,
+        dir: None,
+        policy: RootPolicy::MainCheckoutOnly,
+        home: None,
+    };
+    let root = resolve_invocation_root_with(&request, &read).map_err(|refusal| {
+        if outside_repository.get() {
+            WorkspaceError::NotGitRepository
+        } else {
+            WorkspaceError::GitCommand(refusal.message)
+        }
+    })?;
+    let canonical = std::fs::canonicalize(root.root)?;
     let clean = {
         let s = canonical.to_string_lossy();
         if let Some(stripped) = s.strip_prefix(r"\\?\") {
@@ -84,19 +106,60 @@ mod tests {
     }
 
     #[test]
-    fn test_resolve_workspace_root_in_current_repo() {
+    fn test_workspace_root_of_current_repo() {
         let cwd = std::env::current_dir().expect("cwd must succeed");
-        let root = resolve_workspace_root(&cwd).expect("current repo must resolve root");
+        let root = workspace_root_of(&cwd).expect("current repo must resolve root");
         assert!(root.exists());
         assert!(root.join(".git").exists() || root.join("package.json").exists());
     }
 
     #[test]
-    fn test_resolve_workspace_root_non_git_refused() {
+    fn test_workspace_root_of_non_git_refused() {
         let temp = std::env::temp_dir().join(format!("test_non_git_{}", std::process::id()));
         let _ = std::fs::create_dir_all(&temp);
-        let res = resolve_workspace_root(&temp);
+        let res = workspace_root_of(&temp);
         assert!(matches!(res, Err(WorkspaceError::NotGitRepository)));
         let _ = std::fs::remove_dir_all(&temp);
+    }
+
+    fn git(dir: &Path, args: &[&str]) {
+        let status = std::process::Command::new("git")
+            .arg("-C")
+            .arg(dir)
+            .args(["-c", "user.name=t", "-c", "user.email=t@t"])
+            .args(args)
+            .status()
+            .expect("git runs");
+        assert!(status.success(), "git {args:?}");
+    }
+
+    #[test]
+    fn test_workspace_root_of_subdirectory_and_linked_worktree_is_the_main_checkout() {
+        let base = std::fs::canonicalize(std::env::temp_dir())
+            .unwrap()
+            .join(format!("fgctl_root_{}", std::process::id()));
+        let main = base.join("main");
+        std::fs::create_dir_all(main.join("docs")).unwrap();
+        git(&main, &["init", "-q", "-b", "main"]);
+        std::fs::write(main.join("docs").join("a.md"), "x").unwrap();
+        git(&main, &["add", "."]);
+        git(&main, &["commit", "-q", "-m", "seed"]);
+        let linked = base.join("linked");
+        git(
+            &main,
+            &[
+                "worktree",
+                "add",
+                "-q",
+                linked.to_str().unwrap(),
+                "-b",
+                "wt",
+            ],
+        );
+
+        assert_eq!(workspace_root_of(&main).unwrap(), main);
+        assert_eq!(workspace_root_of(&main.join("docs")).unwrap(), main);
+        assert_eq!(workspace_root_of(&linked).unwrap(), main);
+        let _ = std::fs::remove_dir_all(&base);
     }
 }

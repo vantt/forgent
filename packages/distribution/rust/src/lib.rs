@@ -226,7 +226,7 @@ pub fn resolve_runtime_identity_info() -> RuntimeIdentityInfo {
         Err(_) => return RuntimeIdentityInfo::dev_source(),
     };
 
-    let workspace_root = match crate::workspace::resolve_workspace_root(&cwd) {
+    let workspace_root = match crate::workspace::workspace_root_of(&cwd) {
         Ok(r) => r,
         Err(_) => return RuntimeIdentityInfo::dev_source(),
     };

@@ -206,7 +206,7 @@ pub fn refresh_fgctl_for_workspace(
     start_dir: &Path,
     installed: &Path,
 ) -> Result<FgctlRefresh, FgctlRefreshError> {
-    let activation = crate::workspace::resolve_workspace_root(start_dir)
+    let activation = crate::workspace::workspace_root_of(start_dir)
         .map_err(|e| e.to_string())
         .and_then(|root| {
             let path = root.join(".fgos/installation/activation.json");

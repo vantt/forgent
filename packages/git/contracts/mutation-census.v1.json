@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "a3e7167ab0b6790d20c53e675c99053605b7e430cd42b3efda68197037694b50",
+  "payloadDigest": "ccf5e644a91add21932037de0c3a5c57a3eab1ff76721e2a622326d14a36b7df",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "a5629383f89b4488b252a62f0ea86463e649e33e0a891db1a19af2cd6c136aca",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -69,7 +69,7 @@
     ".githooks/pre-commit": "a1bff7c257322d97300fd7f32f8abdedb8f34709dfa354810d57a0fb472c77bd",
     "apps/fgctl/build.rs": "316b3d73c7472689532b7ffc164b15fe73f097e1c3e5f53545bc6283ac1c8183",
     "apps/fgctl/src/help.rs": "0db8f6f2eb8f0f4be4fd86f92bfa011eaf866704f6f75a264094e58da48f97fd",
-    "apps/fgctl/src/main.rs": "2316bf86e4d6857374ab610dd16f7dd3adb8ff2600bf573438d8ef0f567b08b2",
+    "apps/fgctl/src/main.rs": "fd34140a0bfb75f15f617ca4dad811bc49136970f7b15cd4f6b608e9fb759921",
     "apps/fgctl/tests/cli_surface.rs": "8a6a59d003f0047289840a8cecc5ab101e724d41b2d322d6253c605671a255c5",
     "apps/fgctl/tests/git_wal_activation_gate.rs": "29773e1594549ab92f94fd9bea9f5023663385d9bd9128128756225540780907",
     "apps/fgctl/tests/uninstall_surface.rs": "9b2f2e233d5ac29cdc78c8dac1e6d2352ed4fbba84530e7cf9ad34648e91cf20",
@@ -285,10 +285,10 @@
     "packages/distribution/rust/src/coexistence.rs": "15e127b29a72c32362d671758cf54a726d308158b890405a6933e5673ec4bcb2",
     "packages/distribution/rust/src/extract.rs": "101e822a4d17774deba3585f7afd3a6718f847e6e2a392c980fa3dfd85b843a6",
     "packages/distribution/rust/src/fetch.rs": "0de7abcd5b6057fcc4632637e34c0aafcde121ebbb9dc878682b68bb9c984573",
-    "packages/distribution/rust/src/fgctl_refresh.rs": "0dbc9856da60bcc36af414dedba195a7a85bd4ed4def2cb4bd644e1e898337a3",
+    "packages/distribution/rust/src/fgctl_refresh.rs": "36fd15b0c6159e9b9541fbadb2ea5a05f61c9ced1364216e6cbce45170aa4c5a",
     "packages/distribution/rust/src/git_gate.rs": "7d50addca54b78ca0b5d6b61c9d857b2de82016a1cc53faefc7c1038da163cba",
-    "packages/distribution/rust/src/init.rs": "9f49761e1f87c3b9f0e1cec4ac8f63bac7d720e762048ce791ece901df078e57",
-    "packages/distribution/rust/src/lib.rs": "24fdbf15d43ce6c137c6b30e386d604863983ea9389fb239fa0218c18a60f049",
+    "packages/distribution/rust/src/init.rs": "fb6b472bbca5b86c32ddf4f2a2a87a222d09f6624a0d5c86a4f24a2db138b8d3",
+    "packages/distribution/rust/src/lib.rs": "b0b53aea8d16512377b5241ccf07d885abf3ec9a8e8bf993b45bf1f95c75ad73",
     "packages/distribution/rust/src/lock.rs": "ee39bccc87c5b34a7799ee886fe3c4b9f59346f22c550c67123efa49f9681f8e",
     "packages/distribution/rust/src/manifest.rs": "7aa7f3d42c3ac708e44cb0bbf4be36c414eaf0b29f0bdafc5bb768901fb46bda",
     "packages/distribution/rust/src/rc_lines.rs": "33397ba7f0ad40c7a80e083bc9d608b2a31825540065e62c270497f1c5b9a587",
@@ -297,9 +297,9 @@
     "packages/distribution/rust/src/store.rs": "1cdaf72bbdf7c4bc0ae3eafd1f37fecd6a358de60c8ce5851ccf9212149174de",
     "packages/distribution/rust/src/suggest.rs": "302d698667662b3544b0761cd53dd87c68594d6f1b1ce52d8b85032627d52182",
     "packages/distribution/rust/src/timer.rs": "3e0163f74c012a9dc51cb4b68a829b4553d25ac018e62bd73d6c10cc6d15fef4",
-    "packages/distribution/rust/src/uninstall.rs": "9e8e8e3a1fed5f0f297ef959be5398bc60cea023ef37a2fe842484eb96c9e515",
+    "packages/distribution/rust/src/uninstall.rs": "0858575082b1fe249e10b89150afce35b82eb78fb2b0aa2f19bfd039fa06d107",
     "packages/distribution/rust/src/verify.rs": "79a9f08e75d0c0ca8f5e04ad8443e4134a3dfbd85a38e01a448d53361463dc69",
-    "packages/distribution/rust/src/workspace.rs": "fd91502f00f1de16a71d3c8bb386e5a840c46e7c10bf948a65b04ecdca6b594b",
+    "packages/distribution/rust/src/workspace.rs": "7f3a0afaf54d35dac0535b94762cd1b4b4f14c2a6592b8f09c566895e8250106",
     "packages/distribution/rust/tests/activation_lock_multiprocess.rs": "ff2818dd10b745ac29c1610effd95ac36552f4aace4525634c6b20f17f325fe0",
     "packages/distribution/rust/tests/fetch_download.rs": "781764dcb50b2143d578f42282f5e4f3a61ad96fce0e861d8cfe6f2529dbf170",
     "packages/distribution/rust/tests/install_lock_multiprocess.rs": "790f1617f49d0a1efea555767705dba32c036e30bd897e0b01b09206342088cb",
@@ -2417,6 +2417,13 @@
       "spawn": "Command::new <- packages/process/rust/src/spawn.rs:43",
       "binary": "(uncalled run_scheduler_call)",
       "class": "uncalled-wrapper"
+    },
+    {
+      "path": "packages/distribution/rust/src/workspace.rs",
+      "line": 126,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
     },
     {
       "path": "packages/event-store/rust/src/refs.rs",

@@ -16,7 +16,7 @@
 use crate::init::format_iso8601_utc;
 use crate::shim::tail_shim_path;
 use crate::store::{InstallLockGuard, LockError};
-use crate::workspace::{resolve_workspace_root, WorkspaceError};
+use crate::workspace::{workspace_root_of, WorkspaceError};
 use std::io::{BufRead, IsTerminal, Write};
 use std::path::{Component, Path, PathBuf};
 use std::process::Command;
@@ -496,7 +496,7 @@ pub fn run_uninstall(
     options: &UninstallOptions,
     store_root: &Path,
 ) -> Result<(), UninstallError> {
-    let workspace_root = resolve_workspace_root(cwd)?;
+    let workspace_root = workspace_root_of(cwd)?;
     let installation = find_installation(&workspace_root)?;
     let shim = project_shim(&workspace_root);
     let shim_runnable = installation.is_some() && shim.is_file();
