@@ -660,6 +660,16 @@ test('lintPhaseUnits with a runner that declares no capabilities flags every uni
   assert.ok(unreg.every((f) => f.severity === 'warn'));
 });
 
+test('lintPhaseUnits unwraps a config given as runner.capabilities, so a declared capability is not flagged', () => {
+  const text = `## Units
+- unit: u-declared
+  capability: docs:write
+  objective: "Declared in the wrapped config"
+`;
+  const result = lintPhaseUnits(text, { config: { runner: { capabilities: { 'docs:write': { description: 'Write documentation' } } } } });
+  assert.deepEqual(result.findings.filter((f) => f.code === 'capability.unregistered'), []);
+});
+
 test('lintPhaseUnits warns on unknown pattern', () => {
   const text = `## Units
 - unit: u1

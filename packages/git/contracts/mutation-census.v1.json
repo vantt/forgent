@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "7f0a749dc64ee8690c2b38b1aa638ad2ffcffaec67d3ee928bf5311b21897d1f",
+  "payloadDigest": "7662667bf6b6d8e15ee33785f7c6b517f88b56bc0478f2ad99b58b0028b740fb",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "a5629383f89b4488b252a62f0ea86463e649e33e0a891db1a19af2cd6c136aca",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -919,7 +919,7 @@
     "scripts/verify-fanout-overlap.mjs": "b74a0ac9f350c5d62a47f3e3bf0896e9d142e5cbba15284527383d1b529ea435",
     "scripts/write-test-marker.mjs": "d1faead7d8efbdcce888100b89f5cd2cc6546ddc3f2647118255f82f6c8e4171",
     "scripts/write-wrapper-script.mjs": "e9e76f2b72329bb4dee9ec980db7a5df7515da3ff339e232466049de259d5c50",
-    "src/cli/command-registry.mjs": "78fa4d3d18572a8818b73784823c590f9d763b7d340e1738a169215ef4af9c15",
+    "src/cli/command-registry.mjs": "f2663f76670532a89b3356dafba646161bd7c0619823579dd12d7e7d31569fc4",
     "src/cli/exit-codes.mjs": "55a68e5a0b03a38adced7ddc9bcfb60964db94b3b868e2c854b6a6a78fdb4964",
     "src/cli/flag-check.mjs": "336a0e94eaec59fa4c1f143b32a14334c1bd5f13d522ef8be4a5b570dc401b62",
     "src/cli/parse-args.mjs": "d4f71dbb91bc8d920995299b78d018efd1643328213a70d6e567a6b462163d66",
@@ -1284,7 +1284,7 @@
     "src/workflow/loader.mjs": "475187a716ea1a294943b18d3e4c40133f3aee49815f4534769c7f0acddd4ab6",
     "src/workflow/propose-classify.mjs": "dabe9993d576e910d8adfd0019313e8f2aa481b87faa3cfff276630c020f56c3",
     "src/workflow/propose-frame.mjs": "455144c70e07f9ee862a052c56ceaca60c99c62b0828f6d67ba93840b6dd3e81",
-    "src/workflow/propose-validate.mjs": "a82f1537ca905d5ef26124a00bb890f6ca22ca4baeba9b9591e7a9809c05f683",
+    "src/workflow/propose-validate.mjs": "68a9687219a6cefadf67d62cc14269a35249f1475c3a9afa6af581afed7b84f5",
     "src/workflow/propose.mjs": "1dfdc4739dc065101485eb57fd92a49a6e7494ed78f94ad1be8e9f29e91450f3",
     "src/workflow/ref-digests.mjs": "7379462ef6521267e12cb028c030a9292d6b6bb176419df9663ecf6547f5a09e",
     "src/workflow/runner.mjs": "f00ca2b91417d1c5fc9b8e0d42dcbfdbf5fa9414808665278ad3541a8685787a",

@@ -2805,7 +2805,7 @@
     {
       "name": "plan-lint",
       "invoke": "fgos plan-lint <path>",
-      "description": "Read-only static check of a plan.md's own `- unit: ... / capability: <name>` and `## Product Gates` table annotations against the planning-capability-awareness doctrine (src/report/capability-plan-lint.mjs): a hedged parenthetical outside \"unresolved (...)\", a duplicate `capability:` line, a plan-time pin of executor/provider/model/tier/prefer/invocation/actors, an invalid or unregistered capability shape. `registered` is always `Object.keys(runner.capabilities)` from this repo's own live config. Exit 0 clean, 1 when a hard finding is present, 2 on a usage error (missing/nonexistent path). Default output is human-readable (each unit alongside its capability's catalog description); `--json` returns the raw findings/units. Never calls `decide`, never writes state.",
+      "description": "Read-only static check of a plan.md's own `- unit: ... / capability: <name>` and `## Product Gates` table annotations against the planning-capability-awareness doctrine (src/report/capability-plan-lint.mjs): a hedged parenthetical outside \"unresolved (...)\", a duplicate `capability:` line, a plan-time pin of executor/provider/model/tier/prefer/invocation/actors, an invalid or unregistered capability shape. `registered` is always the capability names declared in this repo's own live config. Exit 0 clean, 1 when a hard finding is present, 2 on a usage error (missing/nonexistent path). Default output is human-readable (each unit alongside its capability's catalog description); `--json` returns the raw findings/units. Never calls `decide`, never writes state.",
       "parameters": {
         "type": "object",
         "properties": {

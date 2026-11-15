@@ -156,7 +156,7 @@ export function validateProposal({ slices, runnerConfig, rigorFloor, ports }) {
     const wanted = [slice.askOwnerFirst === true ? null : slice.capability, slice.followUp?.capability];
     for (const capability of wanted) {
       if (typeof capability === 'string' && capability !== '' && registeredCapabilityOf(runnerConfig, capability) === undefined) {
-        refuse('capability-unregistered', slice, `"${capability}" is not a registered capability (runner.capabilities)`, { capability });
+        refuse('capability-unregistered', slice, `"${capability}" is not a registered capability (none under runner.capabilities in the config)`, { capability });
       }
     }
 

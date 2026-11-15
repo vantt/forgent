@@ -551,16 +551,6 @@
       "allowed": [
         "src/runner/execution/capability-config.mjs"
       ],
-      "debt": [
-        {
-          "path": "src/cli/command-registry.mjs",
-          "reason": "the plan-lint help text names `Object.keys(runner.capabilities)`, the config path, in prose; it reads nothing, and rewording it changes the help text users see and the generated command manifest"
-        },
-        {
-          "path": "src/workflow/propose-validate.mjs",
-          "reason": "the refusal message names `runner.capabilities`, the config path, for the user; it reads nothing, and rewording it changes a message a test pins"
-        }
-      ],
       "reason": "the port is the one Node reader of the capabilities section and hands out answers per field, never an entry; the seat-binding crate is the authority over binding fields and is not matched by these JS-shaped patterns"
     },
     {

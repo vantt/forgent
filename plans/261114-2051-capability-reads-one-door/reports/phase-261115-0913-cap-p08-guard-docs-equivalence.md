@@ -8,12 +8,12 @@ merged in. Only conflict: `packages/git/contracts/mutation-census.v1.json`, take
 
 - `docs/architecture-manifest.json` `doors`: five rows added after the existing "read runner.capabilities" row
   (prefer chooser, purpose chooser retired, tool lookup, old tool registry retired, `catalogOf`). The two debt entries of the first
-  row stay, with true reasons (below).
+  row are gone: the help text and the propose refusal message were reworded (below).
 - `src/runner/execution/capability-config.mjs`: `entriesOf` reads the flat section only (`sectionOf`); the `cfg.runner.capabilities`
   fallback and its header sentence are gone. Owner of the wrapped-config proof: `test/runner/execution/capability-config.test.mjs`
   (the old "lookups accept the wrapped config" case now asserts the wrapped config holds no catalog for every function).
-- Harness: the allowlist entry `plan-lint-odd-shape` became `nested-config-not-read` and claims input `m-nested` for `lint`,
-  `effectiveRigor`, `checkerPlan`, `bind`; its comment now says the port reads the flat section only. The first run after dropping
+- Harness: the allowlist entry `plan-lint-odd-shape` became `nested-config-not-read` and claims input `m-nested` for four questions (`lint`,
+  `effectiveRigor`, `checkerPlan`, `bind`); its comment now says the port reads the flat section only. The first run after dropping
   the fallback showed exactly those 15 differences (base unwrapped the nested config for the lookups, head does not).
 - New tests: one `{}` entry case in `test/setup/confinement-doctor-checks.test.mjs` (an empty entry is a missing anchor: named when
   not strict, a failure when strict); one case in `test/report/capability-plan-lint.test.mjs` (`{runner:{}}` flags every unit as
@@ -43,17 +43,14 @@ check; zero `.rs` hits. Two findings that differ from the phase file's table:
 
 | row | allowed | debt |
 |---|---|---|
-| read runner.capabilities | `capability-config.mjs` | `src/cli/command-registry.mjs`, `src/workflow/propose-validate.mjs` |
+| read runner.capabilities | `capability-config.mjs` | none |
 | prefer chooser | `seat-policy.mjs`, `dispatch/config.mjs`, `setup/seat-binding-checks.mjs` | none |
 | purpose chooser (retired) | none | none |
 | tool lookup | `dispatch/tool-providers.mjs` | none |
 | old tool registry (retired) | none | none |
 | `catalogOf` | `execution/run.mjs`, `setup/registrations.mjs` | none |
 
-The two debt entries stay: phase 08 does not move them. Both hit prose inside strings a user sees: the plan-lint help text
-(`Object.keys(runner.capabilities)`, also copied into the generated command manifest) and the propose refusal message
-(`(runner.capabilities)`, pinned by a test). They read nothing; rewording changes user-visible text, which this plan promised not
-to do. Their reasons were rewritten (the old "moves to the port in a later step" was false).
+The capability row has no debt: the plan-lint help text now says "the capability names declared in this repo's own live config" (generated command manifest regenerated) and the propose refusal reads "(none under runner.capabilities in the config)"; no test pinned either text.
 Pattern probes (seeded strings): property read, write (not matched), computed key, destructuring, `x?.for`, `['for']`,
 `const { for: f } = e` all behave as intended; `flags.for`, `Symbol.for(` and `required: ['for']` are not matched.
 
@@ -70,6 +67,7 @@ Pattern probes (seeded strings): property read, write (not matched), computed ke
 - `check-decision-citation-drift`: one finding, `docs/backlog.md:7` ("cites RUL108 with no gloss", the `p-eqhfqpz3gy` row that main
   added). It is on origin/main as it stands, not in this branch's diff; left for its owner (COOK) or the big lead.
 - `node scripts/doc-health.mjs` bare needs a host binary (unset here); its test passes.
+- Review fixes: both strings reworded and debt removed, a lint case pinning the `{runner:{capabilities}}` unwrap, a retired-verb line in `docs/distillery/deep-dives/tool-registry.md`.
 - Rust untouched: `git diff --stat origin/main -- packages apps Cargo.lock` is only the regenerated census JSON.
 
 ## Concerns
