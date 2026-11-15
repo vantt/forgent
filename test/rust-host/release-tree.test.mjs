@@ -23,8 +23,6 @@ import {
   runParitySuite,
 } from './harness.mjs';
 
-import { DOCTOR_CHECKS } from '../../src/setup/checks.mjs';
-
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -305,35 +303,5 @@ test('R3: Staged release tree runs P02 harness from outside checkout with cleane
     }
   } finally {
     fs.rmSync(outsideWorkDir, { recursive: true, force: true });
-  }
-});
-
-test('R4: Doctor checks rust host packaging checks are registered and report the current target posture', () => {
-  const checkIds = [
-    'rust-host-binary-present',
-    'rust-host-target-supported',
-    'legacy-node-payload-present',
-  ];
-
-  for (const id of checkIds) {
-    const entry = DOCTOR_CHECKS.find((c) => c.id === id);
-    assert.ok(entry, `Doctor check "${id}" must be registered in DOCTOR_CHECKS`);
-    const result = entry.check(REPO_ROOT);
-    const approvedHost =
-      process.arch === 'x64' && (process.platform === 'linux' || process.platform === 'win32');
-    if (id === 'rust-host-target-supported' && !approvedHost) {
-      assert.equal(
-        result.passed,
-        false,
-        `Doctor check "${id}" should remain unsupported off the approved target, got: ${result.message}`
-      );
-      assert.match(result.message, /not an approved rust host target/);
-      continue;
-    }
-    assert.equal(
-      result.passed,
-      true,
-      `Doctor check "${id}" expected to pass on clean repo, got: ${result.message}`
-    );
   }
 });

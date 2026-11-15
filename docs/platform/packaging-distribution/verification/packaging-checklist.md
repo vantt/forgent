@@ -136,7 +136,7 @@ Status words: `done` met and proven; `partial` met in part, the residual is name
 
 | Rule | Level | Status | Evidence, residual or deviation |
 |---|---|---|---|
-| PRN-02 | SHOULD | done | `fgctl status`, `fgctl verify` and doctor print `active <d12> != pin <d12> (override: <reason or none>)`; an unreadable pin refuses `init` (`pin_drift`, `tests/pin_drift.rs`, `test/setup/pin-drift-check.test.mjs`). |
+| PRN-02 | SHOULD | done | `fgctl status`, `fgctl verify` and doctor print `active <d12> != pin <d12> (override: <reason or none>)`; an unreadable pin refuses `init` (`pin_drift`, `tests/pin_drift.rs`; the doctor row's cases are in `src/release_rows.rs`). |
 | PRN-03 | MUST | done | No global agent write without the opt-in verb; no host written whose CLI is absent. |
 | PRN-04 | MUST | partial | The global-write half is closed. The machine `fgctl` swap in `upgrade` still has no plan, dry run or confirm. |
 | PRN-05, PRN-06 | MUST | done | Lock, re-read under lock, atomic publish, previous digest, repair; manifest digest checked, quarantine. |

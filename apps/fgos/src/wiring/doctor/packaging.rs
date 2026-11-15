@@ -15,9 +15,14 @@ use fgos_distribution::agent_hooks::{
     check_hook, install_hook, install_message, mailbox_opt_in, BoundedRunner, HookCheck, ProbeMemo,
 };
 use fgos_distribution::bin_cache::refresh_global_bin_cache;
-use fgos_distribution::doctor::{FixResult, RowOutcome};
+use fgos_distribution::doctor::{FixResult, RowOutcome, RowResult};
 use fgos_distribution::launcher::{
     check_project_launcher, fix_project_launcher, source_checkout, LauncherCheck, SearchPath,
+};
+use fgos_distribution::release_rows::{
+    check_activation_matches_pin, check_active_release_matches_checkout,
+    check_legacy_node_payload_present, check_rust_host_binary_present,
+    check_rust_host_target_supported, ReleaseEnv,
 };
 use fgos_distribution::{resolve_git_commit, resolve_package_version, resolve_product_root};
 use std::io;
@@ -37,6 +42,11 @@ pub const ROWS: &[&str] = &[
     "bwrap-available",
     "mailbox-claude-accept",
     "claude-plugin-marketplace",
+    "rust-host-binary-present",
+    "rust-host-target-supported",
+    "legacy-node-payload-present",
+    "active-release-matches-checkout",
+    "activation-matches-pin",
 ];
 
 pub const FIXES: &[&str] = &[
@@ -101,6 +111,16 @@ fn judge(root: &Path, ids: &[&str]) -> Vec<RowOutcome> {
                 let check = check_claude_plugin_marketplace(&env, &BoundedRunner);
                 judged(check.passed, check.message)
             }
+            "rust-host-binary-present" => release_row(root, check_rust_host_binary_present),
+            "rust-host-target-supported" => RowOutcome::Judged(check_rust_host_target_supported(
+                std::env::consts::OS,
+                std::env::consts::ARCH,
+            )),
+            "legacy-node-payload-present" => release_row(root, check_legacy_node_payload_present),
+            "active-release-matches-checkout" => {
+                release_row(root, check_active_release_matches_checkout)
+            }
+            "activation-matches-pin" => RowOutcome::Judged(check_activation_matches_pin(root)),
             other => unreachable!("packaging group asked for row {other}"),
         })
         .collect()
@@ -148,6 +168,20 @@ fn version_text(version: &str, commit: Option<&str>) -> RowOutcome {
         |commit| format!(" ({commit})"),
     );
     judged(true, format!("fgos {version}{commit}"))
+}
+
+// The rows over the active release ------------------------------------------------------------------------------
+
+/// One row over the active release and the checkout, judged with the process environment and directory.
+fn release_row(root: &Path, check: fn(&Path, &ReleaseEnv) -> RowResult) -> RowOutcome {
+    let process_cwd = std::env::current_dir().unwrap_or_default();
+    RowOutcome::Judged(check(
+        root,
+        &ReleaseEnv {
+            get: &|key| std::env::var(key).ok(),
+            process_cwd: &process_cwd,
+        },
+    ))
 }
 
 // project-fgos-launcher ---------------------------------------------------------------------------------------

@@ -68,6 +68,11 @@ jobs:
       - name: cargo test (distribution crate)
         run: cargo test -p fgos-distribution
 
+      # The doctor's packaging rows (curl, bwrap, the hook and launcher adapters) are judged by the host; their
+      # words and the registry's group are proved in the binary's own tests, on every platform.
+      - name: cargo test (the host's packaging doctor rows)
+        run: cargo test -p fgos --bin fgos wiring::doctor::packaging
+
       - name: cargo test (identity crate)
         if: runner.os != 'Windows'
         run: cargo test -p fgos-identity
@@ -98,13 +103,12 @@ jobs:
           test/rust-host/fgctl-upgrade.test.mjs
           test/rust-host/release-targets.test.mjs
           test/scripts/release-packaging.test.mjs
-          test/setup/curl-check.test.mjs
 
-      # These drive fgctl init, the release tree and the project launcher against the runtime, and on Windows
+      # These drive fgctl init and the release tree against the runtime, and on Windows
       # they fail for what the runtime does not support there yet (the lock holder script imports a bare drive
-      # path, ready and doctor refuse on Event Store and Config, a planted-launcher case, the staged harness
-      # stderr bytes); they are listed under the Windows runtime support backlog row.
-      - name: Node tests for init, the release tree and launchers
+      # path, ready and doctor refuse on Event Store and Config, the staged harness stderr bytes); they are listed
+      # under the Windows runtime support backlog row.
+      - name: Node tests for init and the release tree
         if: runner.os != 'Windows'
         run: >
           node scripts/run-tests.mjs
@@ -112,4 +116,3 @@ jobs:
           test/rust-host/fgctl-init-activation.test.mjs
           test/rust-host/fgctl-init-preflight-tail.test.mjs
           test/rust-host/release-tree.test.mjs
-          test/setup/project-launcher.test.mjs

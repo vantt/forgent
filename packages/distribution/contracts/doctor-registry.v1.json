@@ -69,7 +69,12 @@
       "curl-available",
       "bwrap-available",
       "mailbox-claude-accept",
-      "claude-plugin-marketplace"
+      "claude-plugin-marketplace",
+      "rust-host-binary-present",
+      "rust-host-target-supported",
+      "legacy-node-payload-present",
+      "active-release-matches-checkout",
+      "activation-matches-pin"
     ],
     "fixes": [
       "lock-dirs",

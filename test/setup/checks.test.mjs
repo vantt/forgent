@@ -88,11 +88,6 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, with no repo
       'executor-profile-warnings',
       'session-keep-declared',
       // Phase 09: rust-host-r1-kernel release tree builder and doctor.
-      'rust-host-binary-present',
-      'rust-host-target-supported',
-      'legacy-node-payload-present',
-      'active-release-matches-checkout',
-      'activation-matches-pin',
       'confinement-policies-declared',
       'confinement-backend-registry-readable',
       'confinement-bwrap-platform',
