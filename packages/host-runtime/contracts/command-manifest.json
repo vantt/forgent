@@ -2271,11 +2271,11 @@
               },
               "need-ack": {
                 "type": "boolean",
-                "description": "Ask the recipient to acknowledge: its frame tells it to reply in one line even with nothing to add, and you get one notice when no acknowledgement comes by the deadline. Same machine only for now; a reply to a message that asked for one cannot ask again (`ack-on-ack`)."
+                "description": "Ask the recipient to acknowledge: its frame tells it to reply in one line even with nothing to add, and you get one notice when no acknowledgement comes by the deadline. Works toward a session on another machine once that machine takes acknowledgement requests (see `fgos mailbox status`); a reply to a message that asked for one cannot ask again (`ack-on-ack`)."
               },
               "reply-by": {
                 "type": "string",
-                "description": "With --need-ack: how long the recipient has, as 90s, 30m or 2h (default mailbox.ack.replyBySec, 10 min; from mailbox.inFlightTtlSec up to a day). Counted from the send, and again from when the recipient is first offered the message. Tell the recipient to answer with --reply-to <id> when the deadline is past the loop window."
+                "description": "With --need-ack: how long the recipient has, as 90s, 30m or 2h (default mailbox.ack.replyBySec, 10 min; from mailbox.inFlightTtlSec up to a day; toward another machine at most one day). Counted from the send, and again from when the recipient is first offered the message. Tell the recipient to answer with --reply-to <id> when the deadline is past the loop window."
               },
               "body": {
                 "type": "string",

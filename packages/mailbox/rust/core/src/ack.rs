@@ -74,6 +74,17 @@ impl AckWatch {
             && (self.offered_at.is_some() || self.stage == AckStage::Waiting)
     }
 
+    /// Whether the watch counts as late at `now` for a status read, which
+    /// never judges: a watch on a message to another machine is late only
+    /// once a sync said so, never by the clock alone.
+    pub fn late(&self, now: Timestamp) -> bool {
+        match self.stage {
+            AckStage::Overdue => true,
+            AckStage::NotOffered => self.offered_at.is_none() || now > self.due,
+            AckStage::Waiting => self.to_machine.is_none() && now > self.due,
+        }
+    }
+
     /// Whether the sweep owes the sender a notice now: only a message to a
     /// session of this machine, whose offer this record saw itself.
     fn firing(&self, now: Timestamp) -> bool {
@@ -90,6 +101,14 @@ pub struct RemoteOffer {
     pub at: Timestamp,
 }
 
+/// That the recipient's machine signed a refusal of the message `id`: it was
+/// never, or no longer, going to be read there.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct RemoteRefusedAck {
+    pub id: MessageId,
+    pub machine: String,
+}
+
 /// What a sync that fetched the other machines' events knows about the
 /// watches on mail sent to them.
 #[derive(Debug, Clone, Copy)]
@@ -102,6 +121,13 @@ pub struct RemoteAckFacts<'a> {
     /// The clock difference between machines the deadline allows for.
     pub skew_sec: u64,
     pub offers: &'a [RemoteOffer],
+    /// Refusals the recipients' machines signed; such a watch is dropped
+    /// without a notice, as a local watch on a refused message is.
+    pub refusals: &'a [RemoteRefusedAck],
+    /// Machines whose latest mail was held unread by this sync (a body not
+    /// yet fetched): a reply from one may be among it, so none of their
+    /// watches is judged now.
+    pub unread: &'a [String],
 }
 
 impl MailboxState {
@@ -197,9 +223,17 @@ impl MailboxState {
         for offer in facts.offers {
             self.mark_ack_offered(&offer.id, Some(&offer.machine), offer.at.min(now));
         }
+        self.ack_watch.retain(|w| {
+            !facts
+                .refusals
+                .iter()
+                .any(|r| r.id == w.id && w.to_machine.as_deref() == Some(r.machine.as_str()))
+        });
         let fetched = facts.fetch_started.min(now);
         self.notify_overdue(now, limits, ids, |w| {
-            w.to_machine.is_some()
+            w.to_machine
+                .as_ref()
+                .is_some_and(|machine| !facts.unread.contains(machine))
                 && fetched > w.due.plus_secs(facts.skew_sec)
                 && w.overdue(fetched)
         });
@@ -227,7 +261,11 @@ impl MailboxState {
             };
             let offered = self.ack_watch[i].offered_at.is_some();
             let earlier = self.ack_watch.iter().enumerate().any(|(j, w)| {
-                j != i && w.from == from && w.to == to && w.stage != AckStage::Waiting
+                j != i
+                    && w.from == from
+                    && w.to == to
+                    && w.to_machine == self.ack_watch[i].to_machine
+                    && w.stage != AckStage::Waiting
             });
             let reason = match (earlier, offered) {
                 (true, _) => NoticeReason::AckOverdueAgain,

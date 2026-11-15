@@ -27,7 +27,7 @@ use fgos_mailbox::record::{Paths, Record, Reported, Wait};
 use fgos_mailbox::verbs;
 use fgos_mailbox_core::{
     record_error_text, refusal_text, Limits, MessageId, Refusal as MailRefusal, RemoteAck,
-    RemoteOffer, RemoteSend, Timestamp, WriterKey,
+    RemoteOffer, RemoteRefusedAck, RemoteSend, Timestamp, WriterKey,
 };
 use serde_json::{json, Value};
 use std::path::Path;
@@ -366,21 +366,28 @@ fn verified_settlement(
     })
 }
 
-/// The offers the machines `watched` messages went to signed for them, read from the shared log:
-/// each `(id, machine)` of `watched` that the machine itself reported offered, with the time it
-/// signed. Only a verified settlement under the settled domain counts.
-pub fn signed_offers(
+/// What the machines `watched` messages went to signed for them.
+#[derive(Debug, Default)]
+pub struct SignedSettlements {
+    pub offers: Vec<RemoteOffer>,
+    pub refusals: Vec<RemoteRefusedAck>,
+}
+
+/// The settlements the machines `watched` messages went to signed for them, read from the shared
+/// log: each `(id, machine)` of `watched` that the machine itself reported offered (with the time
+/// it signed) or refused. Only a verified settlement under the settled domain counts.
+pub fn signed_settlements(
     main: &Path,
     root: &Path,
     watched: &[(MessageId, String)],
-) -> Result<Vec<RemoteOffer>, String> {
+) -> Result<SignedSettlements, String> {
     let refusal = |r: Refusal| format!("{}: {}", r.reason, r.detail);
     let machine = machine_info(root).map_err(refusal)?.id;
     let Some(log) = StoreLogDoor
         .open_store(main, &machine, STREAM)
         .map_err(refusal)?
     else {
-        return Ok(Vec::new());
+        return Ok(SignedSettlements::default());
     };
     let (events, _) = log.envelopes().map_err(refusal)?;
     let wanted = |id: &str, by: &str| {
@@ -388,30 +395,38 @@ pub fn signed_offers(
             .iter()
             .any(|(watched_id, to)| watched_id.as_str() == id && to == by)
     };
-    let mut offers: Vec<RemoteOffer> = Vec::new();
+    let mut found = SignedSettlements::default();
     for event in events.iter().filter(|e| e.event_type == MESSAGE_SETTLED) {
         let Some(settlement) = verified_settlement(root, &event.payload, wanted) else {
             continue;
         };
+        let id = MessageId::from_text(&settlement.id);
+        if settlement.outcome == "refused" {
+            found.refusals.push(RemoteRefusedAck {
+                id,
+                machine: settlement.machine,
+            });
+            continue;
+        }
         if settlement.outcome != "offered" || settlement.at == 0 {
             continue;
         }
-        let id = MessageId::from_text(&settlement.id);
         // The earliest offer a machine signed for a message is when it was first offered.
         let at = Timestamp::from_millis(settlement.at.saturating_mul(1000));
-        match offers
+        match found
+            .offers
             .iter_mut()
             .find(|o| o.id == id && o.machine == settlement.machine)
         {
             Some(held) => held.at = held.at.min(at),
-            None => offers.push(RemoteOffer {
+            None => found.offers.push(RemoteOffer {
                 id,
                 machine: settlement.machine,
                 at,
             }),
         }
     }
-    Ok(offers)
+    Ok(found)
 }
 
 /// This machine's sends of the last day and their settlements, read from the shared log. A send

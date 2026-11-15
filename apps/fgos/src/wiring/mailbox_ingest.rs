@@ -41,7 +41,7 @@ use fgos_mailbox_core::{
     Timestamp, WriterKey,
 };
 use serde_json::Value;
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
 use std::path::Path;
 
 /// `mailbox.remote.maxAgeSec` and `mailbox.remote.clockSkewSec` of the wire contract.
@@ -68,6 +68,8 @@ pub struct Report {
     /// Verified version 3 messages held back, by local message id and the reason; their origins'
     /// cursors stop before them.
     pub held: Vec<(String, String)>,
+    /// The machines those held messages came from.
+    pub held_machines: BTreeSet<String>,
     /// Settlement events appended to the shared log, which still have to be pushed.
     pub settled: usize,
     /// What the nudge for each recorded wake mail came to, by the local id of the message.
@@ -328,6 +330,7 @@ pub fn ingest(
                             if !again {
                                 held_at.insert(event.origin.clone(), event.seq);
                                 report.held.push((mail.id.clone(), why));
+                                report.held_machines.insert(mail.machine.clone());
                             }
                             continue;
                         }

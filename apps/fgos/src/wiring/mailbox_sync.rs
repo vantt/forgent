@@ -85,21 +85,28 @@ fn run(args: &[OsString]) {
     } else {
         BodyFetch::NotFetched("the event sync did not run to its end".into())
     };
+    // The fetch whose events the mail below is taken from: a later sync of this child fetches
+    // events nothing here ingested, so its start never says what the taken mail covered.
+    let fetch_started = last_fetch_started(&dir, &remote);
     // The mail taken may leave settlements for the senders in the log; one more sync pushes them now
-    // instead of at the next interval.
+    // instead of at the next interval. Mail taken may be the replies that acknowledge what this
+    // machine asked for, so the watches are judged after it, and only when it ran to its end.
     match take_mail(&fgos_dir, &loaded, &cross, &bodies) {
-        Ok(true) => {
-            if let Err(why) = publish(&dir, &remote) {
-                eprintln!("mailbox-sync: {why}");
+        Ok(taken) => {
+            if taken.settled {
+                if let Err(why) = publish(&dir, &remote) {
+                    eprintln!("mailbox-sync: {why}");
+                }
+            }
+            if let Some(started) = fetch_started {
+                if let Err(why) =
+                    judge_remote_acks(&dir, &fgos_dir, &loaded, started, &taken.unread)
+                {
+                    eprintln!("mailbox-sync: {why}");
+                }
             }
         }
-        Ok(false) => {}
         Err(why) => eprintln!("mailbox-sync: {why}"),
-    }
-    // Mail taken above may have been the replies that acknowledge what this machine asked for, so
-    // the watches are judged only now.
-    if let Err(why) = judge_remote_acks(&dir, &fgos_dir, &loaded) {
-        eprintln!("mailbox-sync: {why}");
     }
     // A machine that keeps its bodies in its own mail-body ref cuts the old ones now and then; a
     // sync that did not run to its end says nothing about what the remote holds.
@@ -110,22 +117,32 @@ fn run(args: &[OsString]) {
     }
 }
 
-/// Judges the acknowledgement requests this machine's senders made of sessions on other machines.
-/// A deadline is judged only from the clone's last event fetch, and only when that fetch ran to
-/// its end and began after the deadline plus the clock skew: a fetch from before it cannot carry
-/// the answer, and no fetch at all is no verdict. Nothing is read or written when no watch is open.
-fn judge_remote_acks(dir: &Path, fgos_dir: &Path, loaded: &Loaded) -> Result<(), String> {
-    let (Some(root), Some(clone)) = (
-        state_root(),
-        event_store_clone::open(dir).map_err(|f| format!("{}: {}", f.reason, f.detail))?,
-    ) else {
-        return Ok(());
-    };
-    let fetch = sync_status(&clone.layout)
-        .map_err(|e| e.to_string())?
+/// When, in seconds, the clone's last event fetch from `remote` began, if it ran to its end: the
+/// sync record says so for the sync as a whole and for its fetch. `None` for a fetch that failed,
+/// went to another remote, or never ran.
+fn last_fetch_started(dir: &Path, remote: &str) -> Option<u64> {
+    let clone = event_store_clone::open(dir).ok()??;
+    let record = sync_status(&clone.layout).ok()?;
+    record
         .last_fetch
-        .filter(|fetch| fetch.error.is_none());
-    let Some(fetch) = fetch else {
+        .filter(|fetch| fetch.error.is_none() && fetch.remote == remote)
+        .filter(|_| record.error.is_none())
+        .map(|fetch| fetch.time)
+}
+
+/// Judges the acknowledgement requests this machine's senders made of sessions on other machines,
+/// from the fetch that began at `fetch_started` (seconds) and whose events were just ingested: a
+/// deadline is judged only when that fetch began after the deadline plus the clock skew, because
+/// an earlier fetch cannot carry the answer. A machine in `unread` has mail this sync held back, so
+/// its watches wait. Nothing is read or written when no watch is open.
+fn judge_remote_acks(
+    dir: &Path,
+    fgos_dir: &Path,
+    loaded: &Loaded,
+    fetch_started: u64,
+    unread: &[String],
+) -> Result<(), String> {
+    let Some(root) = state_root() else {
         return Ok(());
     };
     let record = Record::open(fgos_dir).map_err(|e| e.to_string())?;
@@ -146,11 +163,13 @@ fn judge_remote_acks(dir: &Path, fgos_dir: &Path, loaded: &Loaded) -> Result<(),
         return Ok(());
     }
     let main = fgos_dir.parent().unwrap_or(dir);
-    let offers = mailbox_remote::signed_offers(main, &root, &watched)?;
+    let settlements = mailbox_remote::signed_settlements(main, &root, &watched)?;
     let facts = RemoteAckFacts {
-        fetch_started: Timestamp::from_millis(fetch.time.saturating_mul(1000)),
+        fetch_started: Timestamp::from_millis(fetch_started.saturating_mul(1000)),
         skew_sec: mailbox_ingest::CLOCK_SKEW_SEC,
-        offers: &offers,
+        offers: &settlements.offers,
+        refusals: &settlements.refusals,
+        unread,
     };
     record
         .hold(wait, now(), limits, |state, ids| {
@@ -187,13 +206,13 @@ fn stamp(fgos_dir: &Path, remote: &str) {
 
 /// Takes the mail the fetch brought into the record. A project that has no record yet takes none:
 /// the record is made by the first hook call of a session, not by the child. Whether settlements
-/// were appended.
+/// were appended, and the machines whose mail was held back.
 fn take_mail(
     fgos_dir: &Path,
     loaded: &Loaded,
     cross: &CrossMachine,
     bodies: &BodyFetch,
-) -> Result<bool, String> {
+) -> Result<Taken, String> {
     let record = Record::open(fgos_dir).map_err(|e| e.to_string())?;
     let wait = Wait::Ms(loaded.hook.verbs.lock_wait_ms);
     // The wake of mail from another machine runs here, after the record's hold is released and
@@ -216,8 +235,17 @@ fn take_mail(
         for (id, why) in &report.held {
             eprintln!("mailbox-sync: held {id}: {why}");
         }
-        report.settled > 0
+        Taken {
+            settled: report.settled > 0,
+            unread: report.held_machines.into_iter().collect(),
+        }
     })
+}
+
+/// What taking mail left for the rest of the sync.
+struct Taken {
+    settled: bool,
+    unread: Vec<String>,
 }
 
 fn now() -> Timestamp {

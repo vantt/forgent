@@ -163,7 +163,7 @@ impl MailboxState {
                 .and_then(|()| self.check_lifetime(req.from, from_generation, limits))
         };
         let verdict = verdict.and_then(|()| match req.ack.as_ref().and_then(|ack| ack.reply_to) {
-            Some(hint) if self.answers_ack_request(hint) => Err(Refusal::AckOnAck),
+            Some(hint) if self.asked_ack(hint) => Err(Refusal::AckOnAck),
             _ => Ok(()),
         });
         match verdict {
@@ -261,11 +261,11 @@ impl MailboxState {
         }
     }
 
-    /// Whether the message `hint` names asked for an acknowledgement.
-    fn answers_ack_request(&self, hint: &MessageId) -> bool {
+    /// Whether the message `id` names asked for an acknowledgement.
+    fn asked_ack(&self, id: &MessageId) -> bool {
         self.messages
             .iter()
-            .any(|h| &h.id == hint && h.ack_within_sec.is_some())
+            .any(|h| &h.id == id && h.ack_within_sec.is_some())
     }
 
     /// Check 4b: a send that asks for an acknowledgement is not a reply to
@@ -282,17 +282,15 @@ impl MailboxState {
         if req.need_ack.is_none() {
             return Ok(());
         }
-        let parent = self
+        let parent_asked = self
             .derived_parent(to, &req.from, from_generation, now, limits)
-            .and_then(|i| self.messages.get(i));
-        let hinted = req
-            .reply_to
-            .as_ref()
-            .and_then(|hint| self.messages.iter().find(|h| &h.id == hint));
-        if parent
-            .into_iter()
-            .chain(hinted)
-            .any(|h| h.ack_within_sec.is_some())
+            .and_then(|i| self.messages.get(i))
+            .is_some_and(|h| h.ack_within_sec.is_some());
+        if parent_asked
+            || req
+                .reply_to
+                .as_ref()
+                .is_some_and(|hint| self.asked_ack(hint))
         {
             return Err(Refusal::AckOnAck);
         }

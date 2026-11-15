@@ -2388,10 +2388,12 @@ fn a_send_to_a_session_on_another_machine_appends_one_signed_event_and_reports_r
 fn need_ack_to_a_session_on_another_machine_signs_the_request_and_is_watched_until_the_answer() {
     let Cross {
         alpha,
+        beta,
         alpha_root,
+        beta_root,
         target,
-        ..
     } = two_machines();
+    let own = identity_of(&alpha_root, "CLAUDE_CODE_SESSION_ID", WRITER).id;
     let send = |extra: &[&str]| {
         let mut args = vec!["mailbox", "send", "--to", &target, "--need-ack"];
         args.extend_from_slice(extra);
@@ -2422,6 +2424,103 @@ fn need_ack_to_a_session_on_another_machine_signs_the_request_and_is_watched_unt
         status["data"]["crossMachine"]["recent"][0]["ackWithinSec"], 600,
         "{status}"
     );
+
+    // Each machine takes the other's mail only once its owner confirmed the key.
+    let alpha_machine = fgos_identity::machine::read(&alpha_root).unwrap();
+    let beta_machine = fgos_identity::machine::read(&beta_root).unwrap();
+    for (signer_root, signer, reader_root) in [
+        (&alpha_root, &alpha_machine, &beta_root),
+        (&beta_root, &beta_machine, &alpha_root),
+    ] {
+        let probe = fgos_identity::signing::sign(signer_root, b"probe").unwrap();
+        fgos_identity::signing::verify(reader_root, b"probe", &probe).unwrap();
+        let fingerprint = fgos_identity::signing::key_fingerprint(signer_root)
+            .unwrap()
+            .unwrap();
+        fgos_identity::pins::confirm(reader_root, signer, &fingerprint).unwrap();
+    }
+    sync_child(&alpha);
+    sync_child(&beta);
+    let frame = beta.claude_hook("post-tool-use", &post_tool_use());
+    assert!(
+        String::from_utf8_lossy(&frame.stdout).contains("hello"),
+        "beta's head was offered the flagged mail: {frame:?}"
+    );
+    let snapshot: serde_json::Value =
+        serde_json::from_slice(&fs::read(beta.mailbox_dir().join("record/snapshot.json")).unwrap())
+            .unwrap();
+    let local_id = snapshot["messages"][0]["id"].as_str().unwrap().to_owned();
+
+    // Beta answers with a reply that names it; once alpha fetches and takes the reply, the watch
+    // counts as acknowledged and nothing is overdue.
+    let reply = beta.run(
+        &beta.main(),
+        Some(WRITER),
+        &[
+            "mailbox",
+            "send",
+            "--to",
+            &own,
+            "--reply-to",
+            &local_id,
+            "read it",
+        ],
+        b"",
+    );
+    assert_eq!(reply.status.code(), Some(0), "{reply:?}");
+    sync_child(&beta);
+    sync_child(&alpha);
+    let status = alpha.run(
+        &alpha.main(),
+        Some("sender-a"),
+        &["mailbox", "status", "--json"],
+        b"",
+    );
+    let status: serde_json::Value = serde_json::from_slice(&status.stdout).unwrap();
+    assert_eq!(
+        status["data"]["signals"]["ack"],
+        serde_json::json!({ "awaiting": 0, "acked": 1, "overdue": 0, "overdueIds": [] }),
+        "{status}"
+    );
+}
+
+#[test]
+fn a_reply_by_longer_than_the_age_another_machine_takes_is_refused_and_writes_no_event() {
+    let Cross {
+        alpha,
+        alpha_root,
+        target,
+        ..
+    } = two_machines();
+    // The longest wait a record can keep is its header horizon, which an owner can raise past the
+    // one day another machine reads mail at.
+    fs::write(
+        alpha.main().join(".fgos/config.json"),
+        r#"{"mailbox":{"crossMachine":{"enabled":true},"record":{"ttlSec":172800}}}"#,
+    )
+    .unwrap();
+    let out = alpha.run(
+        &alpha.main(),
+        Some("sender-a"),
+        &[
+            "mailbox",
+            "send",
+            "--to",
+            &target,
+            "--need-ack",
+            "--reply-by",
+            "25h",
+            "hello",
+        ],
+        b"",
+    );
+    let text = String::from_utf8_lossy(&out.stdout).into_owned();
+    assert_eq!(out.status.code(), Some(1), "{text} {out:?}");
+    assert!(
+        text.contains("longer than mail to another machine"),
+        "{text}"
+    );
+    assert!(sent_events(&alpha_root, &alpha.main()).is_empty());
 }
 
 /// Beta takes mail only from a machine whose key its owner confirmed; this is that confirmation.

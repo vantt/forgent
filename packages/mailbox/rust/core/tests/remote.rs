@@ -3,7 +3,8 @@ mod common;
 use common::{key, plain, t, Pair, B_NAME};
 use fgos_mailbox_core::{
     CounterReason, Ingested, MailboxState, MessageId, MessageState, NoticeReason, Refusal,
-    RemoteAck, RemoteAckFacts, RemoteMail, RemoteOffer, RemoteSend, Settlement, WakeDrop,
+    RemoteAck, RemoteAckFacts, RemoteMail, RemoteOffer, RemoteRefusedAck, RemoteSend, Settlement,
+    WakeDrop,
 };
 use std::collections::BTreeSet;
 
@@ -441,6 +442,8 @@ fn a_remote_watch_never_goes_overdue_from_a_stale_fetch_and_goes_overdue_once_af
             fetch_started: t(fetch),
             skew_sec: SKEW,
             offers,
+            refusals: &[],
+            unread: &[],
         };
         pair.state
             .judge_remote_ack_watches(&facts, t(now), &pair.limits, &mut pair.ids)
@@ -508,4 +511,67 @@ fn a_remote_watch_never_goes_overdue_from_a_stale_fetch_and_goes_overdue_once_af
         send(&mut pair, Some(&asked)),
         Err(Refusal::AckOnAck)
     ));
+}
+
+#[test]
+fn a_remote_watch_on_a_message_its_machine_refused_is_dropped_without_a_notice_and_one_whose_machine_has_unread_mail_is_not_judged_yet(
+) {
+    let mut pair = Pair::new(t(0));
+    let a = key("a");
+    let peer = key("peer-session");
+    let watch = |pair: &mut Pair, machine: &'static str| {
+        let req = RemoteSend {
+            from: &a,
+            body_bytes: 5,
+            max_body_bytes: WIRE_CAP,
+            to: "peer@peer-machine",
+            ack: Some(RemoteAck {
+                within_sec: 600,
+                to: &peer,
+                machine,
+                reply_to: None,
+            }),
+        };
+        pair.state
+            .admit_remote(&req, t(0), &pair.limits, &mut pair.ids)
+            .unwrap()
+    };
+    let refused = watch(&mut pair, "peer-machine");
+    let held_back = watch(&mut pair, "busy-machine");
+    let facts = |refusals: &'static [RemoteRefusedAck], unread: &'static [String]| RemoteAckFacts {
+        fetch_started: t(5_000),
+        skew_sec: 300,
+        offers: &[],
+        refusals,
+        unread,
+    };
+    let refusals: &'static [RemoteRefusedAck] = Box::leak(Box::new([RemoteRefusedAck {
+        id: refused.clone(),
+        machine: "peer-machine".into(),
+    }]));
+    let unread: &'static [String] = Box::leak(Box::new(["busy-machine".to_owned()]));
+    pair.state.judge_remote_ack_watches(
+        &facts(refusals, unread),
+        t(10_000),
+        &pair.limits,
+        &mut pair.ids,
+    );
+    assert!(pair.state.ack_watches().all(|w| w.id != refused));
+    assert!(
+        pair.state.notices().next().is_none(),
+        "no notice for a refused message"
+    );
+    let kept = pair
+        .state
+        .ack_watches()
+        .find(|w| w.id == held_back)
+        .unwrap();
+    assert_eq!(kept.stage, fgos_mailbox_core::AckStage::Waiting);
+
+    pair.state
+        .judge_remote_ack_watches(&facts(&[], &[]), t(10_000), &pair.limits, &mut pair.ids);
+    assert_eq!(
+        pair.state.notices().map(|n| n.reason).collect::<Vec<_>>(),
+        vec![NoticeReason::AckNotOffered]
+    );
 }

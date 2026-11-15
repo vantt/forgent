@@ -30,3 +30,14 @@ fmt check; clippy -D warnings (fgos-mailbox-core, fgos-mailbox, fgos, all target
 - The sync judge path itself (clock-dependent) has only the core proof; live proof is the two-machine run.
 - Risk accepted by design: a fetch that began just after due+skew but before the receiver pushed its "offered" settlement can send one "not offered" notice for a message that was offered.
 - Did not touch hook/ or counters files.
+
+## Round 2 (OPC changes)
+- B1/B2/F3: `run` reads the last fetch start (`last_fetch_started`: fetch error none, same remote, sync record error none) before `take_mail`, and judges only on `Ok(_)` from `take_mail`, with that start. The second publish's fetch is never paired with mail it did not ingest.
+- B3: `signed_settlements` returns offers and verified refusals; `RemoteAckFacts.refusals` makes `judge_remote_ack_watches` drop such a watch with no notice (core test "...machine refused is dropped without a notice and one whose machine has unread mail is not judged yet").
+- F10: `Report.held_machines` -> `RemoteAckFacts.unread`; watches to those machines are not judged in that sync.
+- B4: help text reworded in `src/cli/command-registry.mjs`; `command-manifest.json` regenerated with `scripts/export-command-selectors.mjs` (`--check` clean; test/cli/fgos-manifest 14 pass).
+- F7: `AckWatch::late(now)` in core, used by `ack_signal`. F8: `asked_ack` helper in policy.rs. F9: `earlier` also compares `to_machine`.
+- F6: sender rule written into `packages/mailbox/contracts/remote.v1.json` `ackRequest.sender` (not under docs/). CHANGELOG wording corrected (wrong reason possible, missed deadline never unreported).
+- Wiring tests in mailbox_routes.rs: the cross-machine test now has beta's sync take the mail, beta reply with `--reply-to`, alpha sync, and asserts `signals.ack` {awaiting 0, acked 1, overdue 0}; new test with `record.ttlSec` 172800 and `--reply-by 25h` refused, no event written.
+- Gates: fmt, clippy -D warnings (core, mailbox, fgos, all targets), core+store tests, mailbox_routes (51), mailbox_sync_child (2), fgos bin mailbox (20), darwin ok, msvc ok (same three pre-existing warnings), census 0 undeclared.
+- Separate item, not done: `to_label` (notice names the recipient by an unregistered label, not its handle).

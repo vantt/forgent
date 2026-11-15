@@ -31,7 +31,7 @@ mod sweep;
 mod time;
 mod wake;
 
-pub use ack::{AckStage, AckWatch, RemoteAckFacts, RemoteOffer};
+pub use ack::{AckStage, AckWatch, RemoteAckFacts, RemoteOffer, RemoteRefusedAck};
 pub use counters::{Account, BoundedCounters, CounterReason, Party, PartyKey, UNREGISTERED};
 pub use delivery::{
     AliasCandidate, AliasRefusal, Checkpoint, Claim, ClaimedItem, ClaimedWhat, Finished, MailFrom,
