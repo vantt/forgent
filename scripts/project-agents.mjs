@@ -33,7 +33,7 @@ import path from 'node:path';
 import { RIGOR_VALUES } from '../src/runner/rigor.mjs';
 import { isMainModule } from './lib/is-main-module.mjs';
 import { ensureAddonForScript } from './lib/git-addon-stage.mjs';
-import { parseYaml } from '../src/util/yaml.mjs';
+import { parseYaml, writeFrontmatter } from '../src/util/yaml.mjs';
 import { scanAgentTiers } from '../src/runner/agent-definitions.mjs';
 import { identifierProblem } from '../src/convention/identifier-rules.mjs';
 
@@ -126,16 +126,11 @@ export function projectAgentMarkdown(name, sourceYamlText, sourcePath = `agents/
   ];
   for (const [field, value] of spliced) assertSingleLine(sourcePath, field, value);
 
-  const tools = def['tool-scope'].join(', ');
-
   // skills (tsk-397 D20): OPTIONAL -- declared capabilities of this agent-type
   // used for eligibility matching against a task-spec's requires-skill.
-  const frontmatterLines = ['---', `name: ${def.name}`, `description: ${def.description}`, `tools: ${tools}`];
-  if (Array.isArray(def.skills) && def.skills.length > 0) {
-    frontmatterLines.push(`skills: [${def.skills.join(', ')}]`);
-  }
-  frontmatterLines.push('---');
-  const frontmatter = frontmatterLines.join('\n');
+  // `tools` stays one comma-joined string: that is Claude Code's field shape.
+  const meta = { name: def.name, description: String(def.description), tools: def['tool-scope'].join(', ') };
+  if (Array.isArray(def.skills) && def.skills.length > 0) meta.skills = def.skills.map(String);
 
   const body = [
     `# ${def.role}`,
@@ -157,7 +152,7 @@ export function projectAgentMarkdown(name, sourceYamlText, sourcePath = `agents/
     ...def.decision_boundary.must_escalate.map((item) => `- ${item}`),
   ].join('\n');
 
-  return `${frontmatter}\n\n${body}\n`;
+  return writeFrontmatter(meta, `\n${body}\n`, sourcePath);
 }
 
 /**

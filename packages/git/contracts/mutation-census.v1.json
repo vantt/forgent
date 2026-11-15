@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "96842c632b28cecb070b0481a70fe6c20dac6bce125ba481e69e89eb2449b101",
+  "payloadDigest": "49b6909bde3868d4fd11bd4e462eda1e84bee432246fdb83eb4bfb832d8786e3",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "a5629383f89b4488b252a62f0ea86463e649e33e0a891db1a19af2cd6c136aca",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -911,7 +911,7 @@
     "scripts/prepare-release.mjs": "0bd2e6e7514ba4de781ad480889a8f701729a1d4b9d80d5f5af7b2f1de1160aa",
     "scripts/previous-release-tag.mjs": "d79809904f630061da723099f65817f18367462d1d9d64982426c58eb05d6a0f",
     "scripts/probe-storytelling-material.mjs": "b2991c1c14879193953d901e9122a9e511136a91907949643b7f1af008590df4",
-    "scripts/project-agents.mjs": "461abac152ce0d37a271497c8de00ad59f03a5b03c4a2876a5c766379fe32dfd",
+    "scripts/project-agents.mjs": "eea69eb0e5017c1e1ad44079b061192f10c1734668ad7cfb4a8591a9318c47f0",
     "scripts/record-mailbox-hook-fixtures.mjs": "f1a1f57799f537c46cf582310a1b00deecb2befeba3eab73b33789b8822a1cf3",
     "scripts/regenerate-observe-fixtures.mjs": "e1ab4a029ae9aecf5485393a3f6e967f1e338862391a6b1701ed1954c57b40ee",
     "scripts/run-rust-dev-host.mjs": "54108fe41cb34a3bf60c01a98ab42368e12c0772dcdb707eea9cd28251d66289",
