@@ -6,7 +6,7 @@ effort: 3.5d
 wave: A
 blockedBy: []
 flipAfter: [0]
-q3: "(a)"
+q3: "answered (a)"
 ---
 
 # Phase 03: Doctor engine, registry and bridge

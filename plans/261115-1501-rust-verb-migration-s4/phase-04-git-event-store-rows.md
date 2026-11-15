@@ -5,7 +5,7 @@ status: pending
 effort: 2d
 wave: B
 blockedBy: [3]
-q3: "(a)"
+q3: "answered (a)"
 ---
 
 # Phase 04: Git and Event Store rows

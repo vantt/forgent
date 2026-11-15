@@ -33,7 +33,7 @@ launcher, managed timers, the skill generated-stamp reader, the coexistence mani
 and one runner in Rust; each row whose judged layer already has a Rust owner is judged in process by that owner;
 the rows of layers that S5-S7 still own in Node are judged by **one bounded Node rows bridge**, an exact-set list in
 the registry naming each bridged row with the step that removes it; the same bridge carries `init`'s one Work-store
-step until S7 (Q3, recommended answer (a)).
+step until S7 (Q3, answered (a)).
 
 Non-goals (program): no new verb, flag or behaviour (RUL104); no dual-run of a write (migration doc §11,
 `docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md:367-382`); no change to the `fgos.v1`
@@ -54,8 +54,8 @@ the step lead writes `CHANGELOG.md` at landing):
   the invocation-fault log and refused with the host's text and the Node category, as S2/S3 did for theirs.
 - `fgos doctor` in a project starts one Node child for its bridged rows (until S7); contract §3's "starts no child
   process" is restated as "starts no lifecycle child and writes nothing" (doctor already spawns `git`, `bwrap`,
-  `curl`, `fgctl status`, `fgos mailbox status`, per facts F7). Only under Q3 (a).
-- What only `setup` did ends with it: see "Decided and reported" V1-V4 (the owner may veto each).
+  `curl`, `fgctl status`, `fgos mailbox status`, per facts F7). Q3 is answered (a).
+- What only `setup` did ends with it: see "Decided and reported" V1-V4 (reported to the owner 2026-11-15, not vetoed, they stand).
 - Whatever Q2 decides about `requires.node`.
 
 ## Decisions taken in this plan (evidence in the phase named)
@@ -146,7 +146,7 @@ the step lead writes `CHANGELOG.md` at landing):
 
 ## Phases
 
-| # | Phase | Wave | Blocked by | Effort | Q3 needs | File |
+| # | Phase | Wave | Blocked by | Effort | Q3 (answered a) | File |
 |---|---|---|---|---|---|---|
 | 00 | Facts, row ownership table, parity cases, baselines | A | - | 1.5d | any | [phase-00-facts-and-baselines.md](phase-00-facts-and-baselines.md) |
 | 01 | Agent wiring modules in Rust: hook table, agent-config readers and plan, launcher | A | - | 3.5d | (a), (b) | [phase-01-agent-wiring-modules.md](phase-01-agent-wiring-modules.md) |
@@ -163,9 +163,9 @@ the step lead writes `CHANGELOG.md` at landing):
 | 12 | Close: docs, proof consolidation, parity re-run, retired-code row, gates | C | all | 1.5d | any | [phase-12-close.md](phase-12-close.md) |
 
 Critical path: 03 (3.5, its flip waits for 00's report at day 1.5) -> 07 (2.5; 01 is done by day 3.5) -> 12 (1.5):
-about 7.5 lead-days; next longest 01 (3.5) -> 09 (2) -> 12 = 7. Total work about 27.5 lead-days. Under Q3 (b) the
-plan is 00, 01, 02, 08, 09, 11, 12 plus one 1.5-day phase in which doctor's packaging rows and fixes reach the Rust
-modules through `fgos internal` host routes (about 15 days); under Q3 (c) it is 00, 11, 12 (about 4 days) and the
+about 7.5 lead-days; next longest 01 (3.5) -> 09 (2) -> 12 = 7. Total work about 27.5 lead-days. Q3 (b) would have made the
+plan 00, 01, 02, 08, 09, 11, 12 plus one 1.5-day phase in which doctor's packaging rows and fixes reach the Rust
+modules through `fgos internal` host routes (about 15 days); Q3 (c) would have been 00, 11, 12 (about 4 days) and the
 program's S7 row gains the four verbs.
 
 ### Parallel map
@@ -419,10 +419,10 @@ refs are compared in its parity; `--dir` and the default envelope of `uninstall`
 - Verified: about 100 | Wrong, all fixed: 10 (the `internal` route design; `locks.rs` message already current; three
   delete owners; `runDoctor` end line; init exit-code lines; malformed-file skip lines; the host spec §5 citation;
   D15 edges) | Open, owned by 00: F1-F21.
-- Decided by the planner (priority 2: the analysis picked one): D1-D18 and V1-V4 (reported, owner may veto).
+- Decided by the planner (priority 2: the analysis picked one): D1-D18 and V1-V4 (reported, not vetoed 2026-11-15, they stand).
   Batched for the owner: Q2, Q3.
 
-## Decided and reported (the owner may veto any of these; each is in the frame the program row approved, "retire `setup`")
+## Decided and reported (reported, not vetoed, they stand; each is in the frame the program row approved, "retire `setup`")
 
 - **V1. The hooks path is no longer wired by a product verb.** `setup` was the only product path that set
   `core.hooksPath` to a project's own `.githooks` (`setup-use-case.mjs:56`; `installGitHooks` acts only when
@@ -438,10 +438,13 @@ refs are compared in its parity; `--dir` and the default envelope of `uninstall`
 - **V4. No shell-rc source line is written any more.** Existing lines keep working (the integration script still
   ships); `uninstall` still names them; the row `shell-integration-sourced` goes (`p-bkmh4egqlv`).
 
+## Decision log
+
+2026-11-15 15:55, owner answers relayed by HARDEN: Q3 = (a), all four verbs move in S4 with the one bounded Node rows bridge. Q2 = (b), decided by HARDEN inside the approved frame and reported with no veto: Node stays required until S6, revisited there. V1-V4 were reported to the owner and not vetoed, so they stand. All phases are unblocked; phase 07 still waits for MAIL on the frozen v7e/v7h/v7i file sets (asked by mailbox 2026-11-15).
+
 ## Owner questions (batch)
 
-Asked once, together, when this plan is approved. Neither blocks phases 00 and 11. Q3 gates 01-10 (which ones,
-column "Q3 needs"); Q2 gates only the extra phase its option (a) adds. Labels follow the program plan's Q2 and Q3.
+Answered 2026-11-15 (see "Decision log"): Q3 = (a), Q2 = (b); no phase waits on them. Labels follow the program plan's Q2 and Q3.
 
 ### Q2: does `fgctl init` keep refusing a machine without Node?
 
@@ -471,6 +474,7 @@ column "Q3 needs"); Q2 gates only the extra phase its option (a) adds. Labels fo
 - **Recommendation:** (b). No user gains today (every fgOS machine has Node, and Windows is not ready for other
   reasons); (a) ships an install that cannot run a task. Revisit (a) or (c) at S6 with S5's measured pace; under
   Q3 (a), option (a) stays a 1.5-day change.
+- **Answer (2026-11-15 15:55, HARDEN inside the approved frame, reported to the owner, no veto):** (b). Node stays required until S6, revisited there; no extra phase.
 - **Scope of the answer:** the `requires.node` gate and the host's answer when Node is missing. Not the step order,
   not Windows runtime support (`p-ffz65fjo6u`).
 
@@ -510,13 +514,14 @@ column "Q3 needs"); Q2 gates only the extra phase its option (a) adds. Labels fo
   which (b) would spend at S7 instead. Choose (b) if a smaller S4 matters more than having `doctor` and `init` in
   the host before S7. This differs from the program plan's conditional advice ("(a) only if Q2 is (a) or (c)")
   because that advice weighed only Windows-without-Node; the row count and the shared packaging layer were not known.
+- **Answer (owner, 2026-11-15 15:55, relayed by HARDEN):** (a). All four verbs (`wire-agents`, `uninstall`, `init`, `doctor`) move in S4 with the one bounded Node rows bridge.
 - **Scope of the answer:** where `init` and `doctor` run in S4 and whether one Node rows bridge may exist until S7.
   It does not change the order of S5-S7. Under (a) each of S5-S7 gains "move your bridged doctor rows to Rust" (item
   for the program plan); under (b) the program's S7 row gains `doctor` and `init`; under (c) it gains all four verbs.
 
 ## Items for the program plan (big lead)
 
-- Under Q3 (a): rows S5, S6a, S6b, S7 of the program plan each gain "move the step's bridged doctor rows (and, for
+- Q3 answered (a): rows S5, S6a, S6b, S7 of the program plan each gain "move the step's bridged doctor rows (and, for
   S7, `init`'s Work step) into Rust and remove them from the bridge; S7 deletes the bridge module
   `src/setup/doctor-bridge.mjs` and its host caller". Each of those steps restores the parity runner from history for
   its rows (as S4 restores S3's) and keeps 00's doctor fixtures.

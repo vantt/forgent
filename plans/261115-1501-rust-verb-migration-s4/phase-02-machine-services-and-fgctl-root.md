@@ -5,7 +5,7 @@ status: pending
 effort: 2.5d
 wave: A
 blockedBy: []
-q3: "(a) or (b)"
+q3: "answered (a)"
 ---
 
 # Phase 02: Machine services and the fgctl root

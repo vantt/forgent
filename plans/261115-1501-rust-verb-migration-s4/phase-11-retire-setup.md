@@ -5,7 +5,7 @@ status: pending
 effort: 1d
 wave: B
 blockedBy: [0]
-q3: "any"
+q3: "answered (a)"
 ---
 
 # Phase 11: Retire `setup`
@@ -66,7 +66,7 @@ Phase-lead rules: [plan.md](plan.md). Branch `rust-verb-migration-program/s4-p11
    verb. Onboard a project with `fgctl init`; repair it with `fgos doctor --fix`. It no longer adds a shell-rc
    source line (existing lines keep working and `fgos uninstall` names them), no longer copies the release's skills
    into a project, no longer converts retired runner config keys, and no longer sets `core.hooksPath` (the fgOS source
-   checkout uses `npm run setup:hooks`); the doctor row `shell-integration-sourced` is gone." (plan.md V1-V4)
+   checkout uses `npm run setup:hooks`); the doctor row `shell-integration-sourced` is gone." (plan.md V1-V4; reported to the owner 2026-11-15 and not vetoed, so V1-V4 stand)
 
 ## Files
 

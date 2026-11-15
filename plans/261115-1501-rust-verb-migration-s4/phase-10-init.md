@@ -6,7 +6,7 @@ effort: 2d
 wave: B
 blockedBy: [2, 3]
 landsAfter: [4]
-q3: "(a)"
+q3: "answered (a)"
 ---
 
 # Phase 10: `init` native

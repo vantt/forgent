@@ -6,7 +6,7 @@ effort: 2.5d
 wave: B
 blockedBy: [1, 2, 3]
 landsLast: true
-q3: "(a)"
+q3: "answered (a)"
 ---
 
 # Phase 07: Packaging rows

@@ -5,7 +5,7 @@ status: pending
 effort: 1.5d
 wave: B
 blockedBy: [0, 1, 2]
-q3: "(a) or (b)"
+q3: "answered (a)"
 ---
 
 # Phase 08: `wire-agents` native

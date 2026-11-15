@@ -5,7 +5,7 @@ status: pending
 effort: 2d
 wave: B
 blockedBy: [2, 3]
-q3: "(a)"
+q3: "answered (a)"
 ---
 
 # Phase 06: Holder-lock, Terminal-control and Mailbox rows
