@@ -1,0 +1,98 @@
+# S4 phase 01: agent wiring modules in Rust
+
+Branch `rust-verb-migration-program/s4-p01` (worktree `rvm-s4-p01`). Nothing flips here; 07, 08 and 09 switch to
+these modules and delete the Node ones.
+
+## What landed
+
+- `packages/distribution/rust/src/agent_hooks.rs`: the hook table for five CLIs (render, check, install, reversal),
+  the generated omp/pi extension, the delete-guard prefilter renderer, the mailbox opt-in reader
+  (`mailbox_opt_in`, via `fgos_config::machine::project_snapshot`) and hook timeout, the shim probe with a
+  `ProcessRunner` seam (default `BoundedRunner` over `fgos_process::spawn::run_bounded`) and a per-run `ProbeMemo`.
+- `packages/distribution/rust/src/agent_config.rs`: readers behind `claude-plugin-marketplace`,
+  `agy-permissions-configured`, `agy-sub-homes-configured`, `mailbox-claude-accept`, and the `wire-agents` plan
+  (`agents`, `absent`, `files`, `permissions`). Messages copied from Node. `claude` is started through the runner
+  seam with `resolve_program` (PATHEXT) so Windows runs `claude.cmd`.
+- `packages/distribution/rust/src/launcher.rs` (+ `launcher.sh`, `launcher-cmd.txt` data, `tests/goldens/launcher-digests.json`):
+  launcher writer, checker, row verdict and fix text, `source_checkout(legacy_node_root)`.
+- `packages/distribution/rust/src/shim.rs`: `project_shim_path`, `PROJECT_SHIM_RELATIVE` (one spelling of the shim path for
+  hook text and the launcher).
+- Contracts: `packages/distribution/contracts/agent-hooks.v1.json` (64 recorded cases: install, second install, check
+  with and without the shim, reversal, per CLI; plus the rows table, `attemptIdPrefix`, hook timeout),
+  `packages/distribution/contracts/delete-guard-prefilter.v1.json` (list as data, derived forms and matches recorded from Node).
+- Node: `agent-hooks.mjs` reads the prefilter list from data (literal list deleted); guard test reads the data file;
+  `agent-hooks.test.mjs` replays every vector through the Node module and pins `attemptIdPrefix` to the minted prefix.
+- `mailbox.enabled` reader is now `agent-hooks` in `limits.v1.json` (meaning text rewritten, no `setup`) and in
+  `limits_contract.rs`.
+- Doors rows: new "agent hook table" and "person's agent config writes" (with `retiredBy`, debt and a negative case in
+  `test/architecture.test.mjs`); `launcher.sh` joins "installation shim and activation record location"; `agent_hooks.rs`
+  joins "writer and session id environment" (same reason as the Node module).
+
+## Bytes equal to Node
+
+Vectors were generated once from the Node module (scratch generator, not committed). Rust reproduces all 64 cases
+byte for byte (files, results, check messages, reversal results), including a project path with a space and a quote,
+the omp/pi extension in both mailbox forms, earlier forms replaced in place, user hooks kept, malformed and wrong-shape
+files. Launcher bodies are pinned by sha256 of Node's output.
+
+## Gates
+
+- `cargo fmt --all --check`: ok. `cargo clippy -p fgos-distribution -p fgos-mailbox-core --all-targets -- -D warnings`: ok.
+- `cargo test -p fgos-distribution`: 136 lib tests + integration tests green (3 runs, no flake). `cargo test -p fgos-mailbox-core --test limits_contract`: green.
+- `cargo check -p fgos-distribution --all-targets` for `x86_64-pc-windows-msvc` and `aarch64-apple-darwin`: ok (includes the
+  windows-only cmd launcher test and the `.cmd` resolution unit case).
+- Census regenerated: 0 undeclared sites.
+- `node scripts/run-tests.mjs` over: `test/setup/agent-hooks.test.mjs`, `test/git/main-checkout-delete-guard.test.mjs`,
+  `test/setup/claude-code-hooks.test.mjs`, `test/architecture.test.mjs`, `test/setup/git-mutation-census.test.mjs`,
+  `test/githooks/census-drift.test.mjs`, `test/setup/checks-setup-rc-line.test.mjs`, `test/install-packaging.test.mjs`
+  (143 pass), and earlier `registrations`, `uninstall-project`, `git/one-door`, `distribution/source-payload`,
+  `scripts/prepare-release`, `scripts/mailbox-behaviour-*` (all), `project-launcher`, `agent-wiring`, `agy-permissions`,
+  `mailbox-claude-accept`, `plugin-marketplace-doctor-check`: green.
+- Not run (series gate): `test/rust-host/release-tree.test.mjs` (the payload `files` list gained one contract),
+  `npm test`, `cargo test --workspace`.
+
+## Retired test -> owner now
+
+No test is retired here (the Node modules stay until 07/08/09). Owners established for those deletions:
+
+| Node test (retires with) | Owner after |
+|---|---|
+| `test/setup/agent-hooks.test.mjs` install/check/uninstall/legacy/prefilter cases (07, 09) | `agent_hooks.rs` tests over `agent-hooks.v1.json` and `delete-guard-prefilter.v1.json` |
+| `test/setup/project-launcher.test.mjs` (07) | `launcher.rs` tests (states, fix texts, script behaviour via `/bin/sh`, cmd launcher on Windows, bodies pinned by digest) |
+| `agy-permissions.test.mjs`, `mailbox-claude-accept.test.mjs`, `plugin-marketplace-doctor-check.test.mjs`, plan part of `agent-wiring.test.mjs` (07, 08) | `agent_config.rs` tests (fake HOME, fake `claude` on PATH) |
+| the extension runtime cases in `agent-hooks.test.mjs` (load in Node, inert for runner, owner/mode refusal, hook timeout, subdirectory search) | NOT moved: they run the generated JavaScript in Node and call the Node generator. 07 must point them at the extension text in `agent-hooks.v1.json` before deleting the Node module |
+
+## Accepted changes
+
+- A hook file whose JSON root is not an object (array, `null`, number) is "malformed" for install and check (Node threw or
+  rewrote it); a reversal still treats an array root as holding nothing of ours.
+- Writes replace the file by rename through Durable File, keeping the existing mode and following a symlink in its place
+  (Node wrote in place).
+- Shim probe: a timeout, a signal or an unstartable shim all read `exit-null`, as Node's `spawnSync` result did.
+- `mailbox_opt_in` canonicalises the project root and reads with the root as its own trusted root
+  (`project_snapshot`); Node resolved the main checkout first. Differs only for `command` values of a linked worktree, which no mailbox key uses.
+
+## Proposed `## [Unreleased]` line
+
+None (internal modules; nothing user-visible changes until 07-09 flip).
+
+## Concerns and handoffs
+
+1. **`Cargo.lock` line for the step lead:** under `fgos-distribution` add `"fgos-config",` before `"fgos-durable-file",`
+   (D15 edge, added to `packages/distribution/rust/Cargo.toml`). I left `Cargo.lock` unstaged, so `--locked` builds of this branch fail until it lands.
+   The `fgos-process` edge and lock line come from the cherry-picked p02 commits (`abc80cef5`, `cf78c3189`), which drop out when p02 lands.
+2. **F11 not done, by agreement with the step lead:** `scripts/lib/mailbox-live-confined.mjs` still imports the Node table
+   (debt entry in the hook-table row says so). 07 switches it with a scrubbed HOME and PATH once the Rust fixes own the hook rows.
+3. **Files outside the phase's Modify list that I had to touch:** `package.json` (`files` gains
+   `delete-guard-prefilter.v1.json`, or the payload's `agent-hooks.mjs` would fail on import in a release),
+   `test/setup/checks-setup-rc-line.test.mjs` (its hand-built payload copy lists contracts), `test/architecture.test.mjs` (negative cases for the new rows).
+4. **Plan text vs reality:** the hook-table row cannot list the two contracts as allowed (the door walk reads only
+   source files, an entry would be stale); the launcher row allows `launcher.sh`, the body file, not `launcher.rs`, which
+   spells no shim text. The row's `allowed` for `wire_agents.rs` is added by 08.
+5. **Config helper twin risk:** `agent_config.rs` and `agent_hooks.rs` read config through `project_snapshot` (one door). No new `pub` item
+   in `fgos-git`, `fgos-process` or another OPC-reviewed crate. `fgos-distribution` uses `GitDriver::topology_at` (existing pub).
+6. Windows: `mailbox_opt_in` and the readers run wherever `project_snapshot` runs (the config crate decides); the cmd launcher
+   and `claude.cmd` resolution have msvc-checked tests that only run on Windows (the `.cmd` resolution case runs everywhere).
+7. `test/live/*.live.mjs` import `agent-hooks.mjs` (unchanged); 07 owns them with the module's deletion.
+
+Status: DONE_WITH_CONCERNS
