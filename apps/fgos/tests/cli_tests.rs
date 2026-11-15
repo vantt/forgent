@@ -2963,6 +2963,7 @@ fn lock_status_runs_the_doors_through_the_binary_and_starts_no_node() {
 
     assert!(!node_log.exists(), "a Node process was started");
     let _ = fs::remove_dir_all(&sandbox);
+}
 
 /// The body of the process the lock-fence case below holds a lock with: it takes the lock the environment
 /// names, says so through a file and waits to be ended. Without the variable it does nothing.

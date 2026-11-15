@@ -10,7 +10,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { loadParityTable, parseEntry, parityBaseEntrySpec, runCaseOnEntry, compareResults, snapshotDirectory, diffDirectorySnapshots } from "./harness.mjs";
 
-const TABLES = ["git", "lock-status"];
+const TABLES = ["git", "lock", "lock-status"];
 
 function baseEntry() {
   const description = JSON.parse(fs.readFileSync(parityBaseEntrySpec().slice("release:".length), "utf8"));

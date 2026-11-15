@@ -1,249 +1,235 @@
-/**
- * Parity table of `fgos lock fence`: the host against the step's base release (the entry that still serves the
- * verb from Node). Every case builds a fresh project, home directory and holder for each entry, because a fence
- * signals and removes things: two entries never share state.
- *
- * A case is `{ id, args, prepare, normalise?, exitOnly? }`:
- *  - `prepare()` returns `{ cwd, env, ctx, teardown }` for one entry; `ctx.dir` is the project, `ctx.pids` the
- *    holder processes whose ids differ between entries;
- *  - `args` is a list, or a function of `ctx` when a path or id has to be named;
- *  - the answer is compared on exit code, stdout and stderr byte for byte after `scrub` has replaced what differs
- *    between entries by nature (project and home paths, holder pids and start times, the envelope's time and
- *    hash); `exitOnly` compares the exit code alone, for a refusal whose text the host changed on purpose (a
- *    missing or unknown sub-command, answered with the host's one text).
- * `runPreparedCase(entryA, entryB, testCase)` runs one case on both entries, one after the other, and fails when
- * the second entry (the host) started a Node process.
- */
-
+// `lock fence` parity table: the host against the step's base release, on the step runner's protocol (a case names
+// a fixture builder, its arguments and how it is compared):
+//   semantic - exit code, stderr text and the JSON envelope data (hash and time fields are normalised away);
+//   exact    - exit code, stdout and stderr bytes (every refusal);
+//   accepted - the host answers differently on purpose, or the two entries cannot see the same process:
+//              `exit` and `hostStderr` pin a refusal whose text the host changed, `check(host, base)` compares two
+//              answers that name different processes and returns a problem or "".
+// A fence signals and removes things, so a case that fences builds a fresh fixture, and holder, for each entry. A case
+// that only reads the holders (a refusal without `--yes`) shares one held fixture between the entries, so both see the
+// same process and the listing is compared byte for byte.
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { execFileSync, spawn } from "node:child_process";
-import { fileURLToPath } from "node:url";
-import { runCaseOnEntry } from "../harness.mjs";
+import { observe } from "../../../src/native/process-identity.mjs";
 import { holdLockInChild } from "../../helpers/hold-lock-in-child.mjs";
 import { acquireSync, createLockScope } from "../../../src/holder-lock/index.mjs";
-import { observe } from "../../../src/native/process-identity.mjs";
 
-const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../..");
+const GIT_ENV = {
+  ...process.env,
+  GIT_AUTHOR_NAME: "parity",
+  GIT_AUTHOR_EMAIL: "parity@test",
+  GIT_COMMITTER_NAME: "parity",
+  GIT_COMMITTER_EMAIL: "parity@test",
+};
 
-/** A project: a git repository with an `.fgos` directory, and a home directory of its own. */
-function makeProject() {
-  const root = fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), "fgos-lockfence-parity-")));
-  const dir = path.join(root, "project");
-  const home = path.join(root, "home");
-  fs.mkdirSync(dir);
-  fs.mkdirSync(home);
-  execFileSync("git", ["init", "-q", "."], { cwd: dir });
-  execFileSync("git", ["-c", "user.email=a@b", "-c", "user.name=n", "commit", "-q", "--allow-empty", "-m", "i"], { cwd: dir });
-  fs.mkdirSync(path.join(dir, ".fgos", "locks"), { recursive: true });
-  return { root, dir, home, pids: [], cleanups: [] };
+const scratch = fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), "lock-fence-parity-")));
+const shared = [];
+process.on("exit", () => {
+  for (const close of shared) close();
+  fs.rmSync(scratch, { recursive: true, force: true });
+});
+
+/** No directory above the fixture holds a store, or a call from outside a project would find it. */
+function assertNoStoreAbove(dir) {
+  for (let up = path.dirname(dir); up !== path.dirname(up); up = path.dirname(up)) {
+    if (fs.existsSync(path.join(up, ".fgos"))) throw new Error(`${up} holds a .fgos above the fixture ${dir}`);
+  }
 }
 
-function prepared(project, extra = {}) {
+/** A project (a Git repository with a `.fgos` directory) with its own state root and home. `cleanups` run on close. */
+function project() {
+  const temp = fs.mkdtempSync(path.join(scratch, "fx-"));
+  const repo = path.join(temp, "repo");
+  const state = path.join(temp, "state");
+  const home = path.join(temp, "home");
+  assertNoStoreAbove(repo);
+  fs.mkdirSync(path.join(repo, ".fgos", "locks"), { recursive: true });
+  fs.mkdirSync(state, { mode: 0o700 });
+  fs.mkdirSync(home);
+  execFileSync("git", ["init", "-q"], { cwd: repo, env: GIT_ENV });
+  execFileSync("git", ["commit", "-q", "--allow-empty", "-m", "init"], { cwd: repo, env: GIT_ENV });
+  const cleanups = [];
   return {
-    cwd: project.dir,
-    env: { HOME: project.home, USERPROFILE: project.home, FGOS_SESSION_ID: "fgos-lock-fence-parity", ...extra.env },
-    ctx: project,
-    teardown: async () => {
-      for (const cleanup of project.cleanups.reverse()) await cleanup();
-      fs.rmSync(project.root, { recursive: true, force: true });
+    temp,
+    repo,
+    cwd: repo,
+    fgos: path.join(repo, ".fgos"),
+    locks: path.join(repo, ".fgos", "locks"),
+    env: { HOME: home, USERPROFILE: home, FGOS_STATE_ROOT: state, FGOS_SESSION_ID: "fgos-lock-fence-parity" },
+    cleanups,
+    close() {
+      for (const cleanup of cleanups.splice(0).reverse()) cleanup();
     },
   };
 }
 
-const plain = () => prepared(makeProject());
+const here = (fixture, cwd) => ({ ...fixture, cwd });
+const killOnClose = (fx, child) => {
+  // A holder a shared fixture keeps must not keep this process alive: it is killed when the process ends.
+  child.unref();
+  fx.cleanups.push(() => child.kill("SIGKILL"));
+};
 
-/** A Node process holding `name` under the project, until killed. */
-function holding(name, params = {}) {
-  return async () => {
-    const project = makeProject();
-    const holder = await holdLockInChild(name, { fgosDir: path.join(project.dir, ".fgos"), ...params });
-    project.pids.push(holder.child.pid);
-    project.cleanups.push(async () => {
-      holder.child.kill("SIGKILL");
-      await holder.exited;
-    });
-    return prepared(project);
-  };
-}
+/** Each shared fixture is built the first time a case asks for it, then seen by both entries. */
+const memo = new Map();
+const once = (name, build) => async () => {
+  if (!memo.has(name)) {
+    const fx = await build();
+    shared.push(() => fx.close());
+    // The runner closes a fixture after each entry; a shared one lives until this process ends.
+    memo.set(name, { ...fx, close() {} });
+  }
+  return memo.get(name);
+};
+
+/** A Node process holding `name` under the project's store until killed. */
+const holding = (name, params = {}) => async () => {
+  const fx = project();
+  const holder = await holdLockInChild(name, { fgosDir: fx.fgos, ...params });
+  killOnClose(fx, holder.child);
+  return fx;
+};
 
 /** A holder that ignores SIGTERM, so the fence has to kill it. */
-function holdingStubborn() {
-  return async () => {
-    const project = makeProject();
-    const fgosDir = path.join(project.dir, ".fgos");
-    const ready = path.join(project.root, "ready");
-    const child = spawn(process.execPath, ["--input-type=module", "-e", `
-      import fs from 'node:fs';
-      import { acquireSync, createLockScope } from ${JSON.stringify(new URL("../../../src/holder-lock/index.mjs", import.meta.url).href)};
-      const res = acquireSync(createLockScope('stubborn'), 'main-checkout', { fgosDir: ${JSON.stringify(fgosDir)} });
-      if (res.result !== 'acquired') process.exit(3);
-      process.on('SIGTERM', () => {});
-      fs.writeFileSync(${JSON.stringify(ready)}, 'held');
-      setInterval(() => {}, 1000);
-    `], { stdio: "ignore" });
-    const exited = new Promise((resolve) => child.once("exit", resolve));
-    for (let i = 0; i < 400 && !fs.existsSync(ready); i += 1) await new Promise((resolve) => setTimeout(resolve, 25));
-    project.pids.push(child.pid);
-    project.cleanups.push(async () => {
-      child.kill("SIGKILL");
-      await exited;
-    });
-    return prepared(project);
-  };
+async function holdingStubborn() {
+  const fx = project();
+  const ready = path.join(fx.temp, "ready");
+  const child = spawn(process.execPath, ["--input-type=module", "-e", `
+    import fs from 'node:fs';
+    import { acquireSync, createLockScope } from ${JSON.stringify(new URL("../../../src/holder-lock/index.mjs", import.meta.url).href)};
+    const res = acquireSync(createLockScope('stubborn'), 'main-checkout', { fgosDir: ${JSON.stringify(fx.fgos)} });
+    if (res.result !== 'acquired') process.exit(3);
+    process.on('SIGTERM', () => {});
+    fs.writeFileSync(${JSON.stringify(ready)}, 'held');
+    setInterval(() => {}, 1000);
+  `], { stdio: "ignore" });
+  killOnClose(fx, child);
+  for (let tries = 0; tries < 400 && !fs.existsSync(ready); tries += 1) await new Promise((resolve) => setTimeout(resolve, 25));
+  if (!fs.existsSync(ready)) throw new Error("the stubborn holder never took main-checkout");
+  return fx;
 }
 
-/** A hot record naming a process that is running (`live`), gone (`dead`), or one this host cannot judge. */
+/** A hot record naming a process that is running, gone, or one this host cannot judge; or one that does not parse. */
 function withHotRecord(kind, name = "state") {
-  return async () => {
-    const project = makeProject();
-    const record = path.join(project.dir, ".fgos", "locks", `${name}.hot`);
-    if (kind === "torn") {
-      fs.writeFileSync(record, '{"v":1,"pid":');
-    } else if (kind === "unjudgeable") {
-      fs.writeFileSync(record, JSON.stringify({ v: 1, pid: 4000000, startTime: "1", bootId: "elsewhere", pidNs: "pid:[1]", host: "other-host" }));
+  const fx = project();
+  const record = path.join(fx.locks, `${name}.hot`);
+  if (kind === "torn") {
+    fs.writeFileSync(record, '{"v":1,"pid":');
+  } else if (kind === "unjudgeable") {
+    fs.writeFileSync(record, JSON.stringify({ v: 1, pid: 4000000, startTime: "1", bootId: "elsewhere", pidNs: "pid:[1]", host: "other-host" }));
+  } else {
+    const child = spawn("sleep", ["300"], { stdio: "ignore" });
+    const { pid, startTime, bootId, pidNs } = observe(child.pid);
+    fs.writeFileSync(record, JSON.stringify({ v: 1, pid, startTime, bootId, pidNs }));
+    if (kind === "dead") {
+      child.kill("SIGKILL");
     } else {
-      const child = spawn("sleep", ["300"], { stdio: "ignore" });
-      const exited = new Promise((resolve) => child.once("exit", resolve));
-      const { pid, startTime, bootId, pidNs } = observe(child.pid);
-      fs.writeFileSync(record, JSON.stringify({ v: 1, pid, startTime, bootId, pidNs }));
-      project.pids.push(pid);
-      project.starts = [startTime];
-      if (kind === "dead") {
-        child.kill("SIGKILL");
-        await exited;
-      } else {
-        project.cleanups.push(async () => {
-          child.kill("SIGKILL");
-          await exited;
-        });
-      }
+      killOnClose(fx, child);
     }
-    return prepared(project);
-  };
+  }
+  return fx;
 }
 
-/** The lock held by the process that runs the case, which the fence must refuse to signal. */
-function heldByTheRunner() {
-  return async () => {
-    const project = makeProject();
-    const scope = createLockScope("parity-runner");
-    const mine = acquireSync(scope, "main-checkout", { fgosDir: path.join(project.dir, ".fgos") });
-    if (mine.result !== "acquired") throw new Error("the runner could not take main-checkout");
-    project.pids.push(process.pid, process.ppid);
-    project.cleanups.push(async () => mine.handle.release());
-    return prepared(project);
-  };
-}
+/** The lock held by the process that runs the cases, which the fence must refuse to signal. */
+const heldByTheRunner = () => {
+  const fx = project();
+  const mine = acquireSync(createLockScope("parity-runner"), "main-checkout", { fgosDir: fx.fgos });
+  if (mine.result !== "acquired") throw new Error("the runner could not take main-checkout");
+  fx.cleanups.push(() => mine.handle.release());
+  return fx;
+};
 
-/** A call from a directory outside the project, naming it with `--dir`. */
-function fromOutside() {
-  const make = plain;
-  return async () => {
-    const value = await make();
-    const outside = path.join(value.ctx.root, "outside");
+const builders = {
+  free: async () => project(),
+  "free-from-outside": async () => {
+    const fx = project();
+    const outside = path.join(fx.temp, "outside");
     fs.mkdirSync(outside);
-    value.cwd = outside;
-    return value;
-  };
-}
-
-function nonProject() {
-  return async () => {
-    const value = await plain();
-    const empty = path.join(value.ctx.root, "empty");
+    return here(fx, outside);
+  },
+  nonproject: async () => {
+    const fx = project();
+    const empty = path.join(fx.temp, "empty");
     fs.mkdirSync(empty);
-    value.cwd = empty;
-    return value;
-  };
+    return here(fx, empty);
+  },
+  "hot-torn": async () => withHotRecord("torn"),
+  "hot-unjudgeable": async () => withHotRecord("unjudgeable"),
+  "hot-dead": async () => withHotRecord("dead"),
+  "hot-live": async () => withHotRecord("live"),
+  "hot-live-shared": once("hot-live-shared", async () => withHotRecord("live")),
+  held: holding("main-checkout"),
+  "held-shared": once("held-shared", holding("main-checkout")),
+  "held-merge-slot": holding("merge-slot", { ref: "main" }),
+  "held-stubborn": holdingStubborn,
+  "held-by-the-runner": once("held-by-the-runner", async () => heldByTheRunner()),
+};
+
+/** Two answers of a fence that name different holder processes: everything but the process ids must agree. */
+function sameFence(host, base) {
+  const shape = (data) => JSON.stringify({
+    lock: data.lock,
+    path: data.path.replace(/--\d+-\d+-\d+\.lock$/, "--<key>.lock"),
+    status: data.status,
+    holders: data.holders.map((holder) => Object.keys(holder).sort()),
+    terminated: data.terminated.length,
+    killed: data.killed.length,
+  });
+  return shape(host) === shape(base) ? "" : `host ${shape(host)} against base ${shape(base)}`;
 }
 
-/** What differs between two entries by nature, replaced by one token. */
-export function scrub(text, ctx) {
-  let out = text;
-  for (const [from, to] of [[ctx.dir, "<DIR>"], [ctx.home, "<HOME>"], [ctx.root, "<ROOT>"]]) out = out.split(from).join(to);
-  for (const pid of ctx.pids) out = out.replace(new RegExp(`\\b${pid}\\b`, "g"), "<PID>");
-  return out
-    .replace(/"generated_at": "[^"]*"/g, '"generated_at": "<TIME>"')
-    .replace(/"data_hash": "[^"]*"/g, '"data_hash": "<HASH>"')
-    .replace(/\(started \d+\)/g, "(started <START>)")
-    .replace(/"startTime": "\d+"/g, '"startTime": "<START>"')
-    .replace(/dispatch-cwd--[0-9-]+\.lock/g, "dispatch-cwd--<KEY>.lock");
-}
+const read = (id, fixture, args, extra = {}) => ({ id: `lock-fence-${id}`, fixture, args, mode: "semantic", ...extra });
+const refusal = (id, fixture, args) => ({ id: `lock-fence-${id}`, fixture, args, mode: "exact" });
+const fence = (id, fixture, args) => ({ id: `lock-fence-${id}`, fixture, args, mode: "accepted", check: sameFence });
 
-const withDir = (...tail) => (ctx) => tail.map((token) => (token === "<DIR>" ? ctx.dir : token));
+const cases = [
+  // The host's one text for a missing or unknown sub-command.
+  { id: "lock-fence-no-sub-verb", fixture: "free", args: ["lock"], mode: "accepted", exit: 4, hostStderr: "fgos: lock requires a subcommand. Available: fence" },
+  { id: "lock-fence-unknown-sub-verb", fixture: "free", args: ["lock", "unlock"], mode: "accepted", exit: 4, hostStderr: 'fgos: unknown lock subcommand "unlock". Available: fence' },
 
-export const cases = [
   // Refusals before anything runs.
-  { id: "no-sub-verb", args: ["lock"], prepare: plain, exitOnly: true },
-  { id: "unknown-sub-verb", args: ["lock", "unlock"], prepare: plain, exitOnly: true },
-  { id: "no-lock-name", args: ["lock", "fence"], prepare: plain },
-  { id: "yes-takes-the-name-as-its-value", args: ["lock", "fence", "--yes", "main-checkout"], prepare: plain },
-  { id: "unknown-flag", args: ["lock", "fence", "main-checkout", "--bogus"], prepare: plain },
-  { id: "equals-spelling-of-param", args: ["lock", "fence", "merge-slot", "--param=ref=1"], prepare: plain },
-  { id: "equals-spelling-of-yes", args: ["lock", "fence", "main-checkout", "--yes=true"], prepare: plain },
-  { id: "unknown-lock", args: ["lock", "fence", "no-such-lock", "--yes"], prepare: plain },
-  { id: "param-without-equals", args: ["lock", "fence", "gateway", "--param", "bad"], prepare: plain },
-  { id: "param-without-key", args: ["lock", "fence", "gateway", "--param", "=x"], prepare: plain },
-  { id: "param-bare", args: ["lock", "fence", "gateway", "--param"], prepare: plain },
-  { id: "path-param-missing", args: ["lock", "fence", "merge-slot", "--yes"], prepare: plain },
-  { id: "path-param-missing-event-seal", args: ["lock", "fence", "event-seal"], prepare: plain },
-  { id: "outside-a-project", args: ["lock", "fence", "gateway", "--yes"], prepare: nonProject() },
+  refusal("no-lock-name", "free", ["lock", "fence"]),
+  refusal("yes-takes-the-name-as-its-value", "free", ["lock", "fence", "--yes", "main-checkout"]),
+  refusal("unknown-flag", "free", ["lock", "fence", "main-checkout", "--bogus"]),
+  refusal("equals-spelling-of-param", "free", ["lock", "fence", "merge-slot", "--param=ref=1"]),
+  refusal("equals-spelling-of-yes", "free", ["lock", "fence", "main-checkout", "--yes=true"]),
+  refusal("unknown-lock", "free", ["lock", "fence", "no-such-lock", "--yes"]),
+  refusal("param-without-equals", "free", ["lock", "fence", "gateway", "--param", "bad"]),
+  refusal("param-without-key", "free", ["lock", "fence", "gateway", "--param", "=x"]),
+  refusal("param-bare", "free", ["lock", "fence", "gateway", "--param"]),
+  refusal("path-param-missing", "free", ["lock", "fence", "merge-slot", "--yes"]),
+  refusal("path-param-missing-event-seal", "free", ["lock", "fence", "event-seal"]),
+  refusal("outside-a-project", "nonproject", ["lock", "fence", "gateway", "--yes"]),
+
   // Free locks.
-  { id: "free-fixed-row", args: ["lock", "fence", "gateway"], prepare: plain },
-  { id: "free-main-checkout-with-yes", args: ["lock", "fence", "main-checkout", "--yes"], prepare: plain },
-  { id: "free-machine-row", args: ["lock", "fence", "identity-pins"], prepare: plain },
-  { id: "free-parametric-row", args: ["lock", "fence", "merge-slot", "--param", "ref=main"], prepare: plain },
-  { id: "free-parametric-row-repeated-param", args: ["lock", "fence", "provider-account", "--param", "provider=codex", "--param", "account=a=b"], prepare: plain },
-  { id: "free-cwd-keyed-row", args: (ctx) => ["lock", "fence", "dispatch-cwd", "--param", `cwd=${ctx.dir}`], prepare: plain },
-  { id: "dir-names-the-project-from-outside", args: withDir("lock", "fence", "gateway", "--dir", "<DIR>"), prepare: fromOutside() },
+  read("free-fixed-row", "free", ["lock", "fence", "gateway"]),
+  read("free-main-checkout-with-yes", "free", ["lock", "fence", "main-checkout", "--yes"]),
+  read("free-machine-row", "free", ["lock", "fence", "identity-pins"]),
+  read("free-parametric-row", "free", ["lock", "fence", "merge-slot", "--param", "ref=main"]),
+  read("free-parametric-row-repeated-param", "free", ["lock", "fence", "provider-account", "--param", "provider=codex", "--param", "account=a=b"]),
+  // The key is the directory's device, inode and birth time, which differ between the entries' fixtures.
+  fence("free-cwd-keyed-row", "free", (f) => ["lock", "fence", "dispatch-cwd", "--param", `cwd=${f.repo}`]),
+  read("dir-names-the-project-from-outside", "free-from-outside", (f) => ["lock", "fence", "gateway", "--dir", f.repo]),
+
   // Hot records.
-  { id: "hot-record-absent", args: ["lock", "fence", "state"], prepare: plain },
-  { id: "hot-record-absent-porting-events", args: ["lock", "fence", "porting-events"], prepare: plain },
-  { id: "hot-record-torn-without-attestation", args: ["lock", "fence", "state"], prepare: withHotRecord("torn") },
-  { id: "hot-record-torn-attested", args: ["lock", "fence", "state", "--attest-stopped"], prepare: withHotRecord("torn") },
-  { id: "hot-record-unjudgeable-without-attestation", args: ["lock", "fence", "state"], prepare: withHotRecord("unjudgeable") },
-  { id: "hot-record-unjudgeable-attested", args: ["lock", "fence", "state", "--attest-stopped"], prepare: withHotRecord("unjudgeable") },
-  { id: "hot-record-dead-holder", args: ["lock", "fence", "state"], prepare: withHotRecord("dead") },
-  { id: "hot-record-live-holder-unconfirmed", args: ["lock", "fence", "state"], prepare: withHotRecord("live") },
-  { id: "hot-record-live-holder-confirmed", args: ["lock", "fence", "state", "--yes"], prepare: withHotRecord("live") },
+  read("hot-record-absent", "free", ["lock", "fence", "state"]),
+  read("hot-record-absent-porting-events", "free", ["lock", "fence", "porting-events"]),
+  refusal("hot-record-torn-without-attestation", "hot-torn", ["lock", "fence", "state"]),
+  read("hot-record-torn-attested", "hot-torn", ["lock", "fence", "state", "--attest-stopped"]),
+  refusal("hot-record-unjudgeable-without-attestation", "hot-unjudgeable", ["lock", "fence", "state"]),
+  read("hot-record-unjudgeable-attested", "hot-unjudgeable", ["lock", "fence", "state", "--attest-stopped"]),
+  read("hot-record-dead-holder", "hot-dead", ["lock", "fence", "state"]),
+  refusal("hot-record-live-holder-unconfirmed", "hot-live-shared", ["lock", "fence", "state"]),
+  fence("hot-record-live-holder-confirmed", "hot-live", ["lock", "fence", "state", "--yes"]),
+
   // Held locks.
-  { id: "held-unconfirmed-lists-the-holder-and-signals-nothing", args: ["lock", "fence", "main-checkout"], prepare: holding("main-checkout") },
-  { id: "held-confirmed-ends-the-holder", args: ["lock", "fence", "main-checkout", "--yes"], prepare: holding("main-checkout") },
-  { id: "held-parametric-row-confirmed", args: ["lock", "fence", "merge-slot", "--param", "ref=main", "--yes"], prepare: holding("merge-slot", { ref: "main" }) },
-  { id: "held-holder-ignoring-sigterm-is-killed", args: ["lock", "fence", "main-checkout", "--yes"], prepare: holdingStubborn(), timeoutMs: 40000 },
-  { id: "held-by-the-runner-is-refused", args: ["lock", "fence", "main-checkout", "--yes"], prepare: heldByTheRunner() },
+  refusal("held-unconfirmed-lists-the-holder-and-signals-nothing", "held-shared", ["lock", "fence", "main-checkout"]),
+  fence("held-confirmed-ends-the-holder", "held", ["lock", "fence", "main-checkout", "--yes"]),
+  fence("held-parametric-row-confirmed", "held-merge-slot", ["lock", "fence", "merge-slot", "--param", "ref=main", "--yes"]),
+  fence("held-holder-ignoring-sigterm-is-killed", "held-stubborn", ["lock", "fence", "main-checkout", "--yes"]),
+  refusal("held-by-the-runner-is-refused", "held-by-the-runner", ["lock", "fence", "main-checkout", "--yes"]),
 ];
 
-/** Runs `testCase` on both entries, a fresh fixture for each; the entry that runs first never sees the other's. */
-export async function runPreparedCase(entryA, entryB, testCase) {
-  const answers = [];
-  for (const entry of [entryA, entryB]) {
-    const fixture = await testCase.prepare();
-    try {
-      const args = typeof testCase.args === "function" ? testCase.args(fixture.ctx) : testCase.args;
-      const result = await runCaseOnEntry(entry, { id: testCase.id, args, cwd: fixture.cwd, env: fixture.env, timeoutMs: testCase.timeoutMs ?? 30000 }, { repoRoot: REPO_ROOT });
-      answers.push({
-        exit: result.exitCode,
-        signal: result.signal,
-        launchError: result.launchError,
-        nodeChildren: result.spawnedChildren.filter((child) => path.basename(child.cmd) === "node").length,
-        stdout: scrub(result.stdoutText, fixture.ctx),
-        stderr: scrub(result.stderrText, fixture.ctx),
-      });
-    } finally {
-      await fixture.teardown();
-    }
-  }
-  const [a, b] = answers;
-  const differences = [];
-  if (a.launchError || b.launchError) differences.push(`launch failure: ${JSON.stringify([a.launchError, b.launchError])}`);
-  if (b.nodeChildren > 0) differences.push(`the second entry started ${b.nodeChildren} node process(es)`);
-  if (a.exit !== b.exit || a.signal !== b.signal) differences.push(`exit ${a.exit}/${a.signal} against ${b.exit}/${b.signal}`);
-  if (!testCase.exitOnly) {
-    if (a.stdout !== b.stdout) differences.push(`stdout differs:\n--- A\n${a.stdout}\n--- B\n${b.stdout}`);
-    if (a.stderr !== b.stderr) differences.push(`stderr differs:\n--- A\n${a.stderr}\n--- B\n${b.stderr}`);
-  }
-  return { caseId: testCase.id, passed: differences.length === 0, differences, a, b };
-}
+export { builders, cases };
