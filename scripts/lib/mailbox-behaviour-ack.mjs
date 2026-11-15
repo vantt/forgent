@@ -29,10 +29,18 @@ export const CLIS = Object.freeze(['claude', 'codex']);
 
 /** The sender's scenario texts; `{peer}` is the receiver's mailbox name. */
 export const SCENARIOS = Object.freeze({
-  info: 'To message another agent, run: fgos mailbox send --to <name> [--wake] [--need-ack] "<text>". Tell agent {peer} that the report folder moved to ./reports-new and that nothing is needed from them. Send it with --wake so {peer} sees it now, and with --need-ack because I want to know it arrived. When you have heard back, tell me what they said.',
-  work: 'To message another agent, run: fgos mailbox send --to <name> [--wake] [--need-ack] "<text>". Ask agent {peer} to count the .txt files in the directory ./data and report the number. Send the request with --wake so {peer} sees it now, and with --need-ack because I want to know it arrived. Tell me the number when you have it.',
-  control: 'To message another agent, run: fgos mailbox send --to <name> [--wake] "<text>". Tell agent {peer} that the report folder moved to ./reports-new and that nothing is needed from them. Send it with --wake so {peer} sees it now. When you have finished, tell me what you sent.',
+  info: 'To message another agent, run: fgos mailbox send --to <name> [--wake] [--need-ack] "<text>". Tell agent {peer} that the report folder moved to ./reports-new and that nothing is needed from them. Send it with --wake so {peer} sees it now, and with --need-ack because I want to know it arrived. Then wait 30 seconds by running: sleep 30. In your final answer tell me what they said, or that nothing came.',
+  work: 'To message another agent, run: fgos mailbox send --to <name> [--wake] [--need-ack] "<text>". Ask agent {peer} to count the .txt files in the directory ./data and report the number. Send the request with --wake so {peer} sees it now, and with --need-ack because I want to know it arrived. Then wait 30 seconds by running: sleep 30. In your final answer tell me the number, or that nothing came.',
+  control: 'To message another agent, run: fgos mailbox send --to <name> [--wake] "<text>". Tell agent {peer} that the report folder moved to ./reports-new and that nothing is needed from them. Send it with --wake so {peer} sees it now. Then wait 30 seconds by running: sleep 30. In your final answer tell me what you sent and what they said, or that nothing came.',
 });
+
+/**
+ * The receiver's first step: it waits for a signal file the harness writes once the request is
+ * recorded, so the mail reaches it at the checkpoint after the wait on every CLI (a receiver that
+ * finishes its work before the request exists would measure nothing).
+ */
+export const GO_FILE = 'go.txt';
+export const RECEIVER_WAIT = `Wait for the signal file by running: until [ -f ${GO_FILE} ]; do sleep 2; done`;
 
 /**
  * Runs per CLI: 40, in two arms. `withInstruction`: the receiver also carries the receiver instruction
@@ -182,7 +190,7 @@ export async function runPair(ctx, cell, runId) {
   const launch = (role, peerName, trusted) => {
     const headId = `${runId}.${role}`;
     const paths = confined.runPaths(base, headId, workspace);
-    const prompt = runs.loopPrompt(data, cell.scenario, role, peerName);
+    const prompt = role === RECEIVER ? `${RECEIVER_WAIT}\n${runs.loopPrompt(data, cell.scenario, role, peerName)}` : runs.loopPrompt(data, cell.scenario, role, peerName);
     const instruction = cell.instruction === false ? null : runs.renderInstruction(data.instruction, trusted);
     const args = runs.cliArgs(cell.cli, { settings: paths.settings, ws: paths.ws, lastMessage: paths.lastMessage, instruction, prompt, models: ctx.models });
     const env = live.cliEnv({ zdotdir: path.join(base, 'zdot', headId), pathPrefix: path.join(paths.installation, 'bin'), extra: runs.cliRunEnv(cell.cli) });
@@ -216,6 +224,7 @@ export async function runPair(ctx, cell, runId) {
     return null;
   };
   let endReason = null;
+  let signalled = false;
   const senderBinding = await registered(launch(SENDER, null, []));
   let receiverBinding = null;
   if (!senderBinding) endReason = 'error: sender did not register';
@@ -226,6 +235,10 @@ export async function runPair(ctx, cell, runId) {
   }
   while (!endReason) {
     const messages = readSnapshot(path.join(workspace, 'ws'))?.messages ?? [];
+    if (messages.length && !signalled) {
+      fs.writeFileSync(path.join(workspace, 'ws', GO_FILE), '');
+      signalled = true;
+    }
     if (Object.values(heads).every((h) => h.exit)) endReason = 'own stop';
     else if (Date.now() - startedAt > runs.LOOP_HARD_STOP_MS) endReason = 'hard stop: time';
     else if (messages.length >= runs.LOOP_MAX_MESSAGES) endReason = 'hard stop: messages';

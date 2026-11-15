@@ -50,8 +50,14 @@ function die(message, code = 3) {
 }
 const sha256 = (file) => crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex');
 
+/**
+ * The versioned binary of a CLI. MAILBOX_ACK_CODEX_BIN names a copy of the Codex release kept outside
+ * every login store: the test account's own home holds the installed release, and the confinement
+ * hides each login store, so the installed binary cannot be launched from there.
+ */
 function cliBinary(cli) {
-  const bin = fs.realpathSync(path.join(os.homedir(), '.local', 'bin', cli));
+  const named = cli === 'codex' ? process.env.MAILBOX_ACK_CODEX_BIN : null;
+  const bin = fs.realpathSync(named || path.join(os.homedir(), '.local', 'bin', cli));
   const version = live.semver(spawnSync(bin, ['--version'], { encoding: 'utf8' }).stdout);
   return { bin, version, release: cli === 'codex' ? path.dirname(path.dirname(bin)) : null };
 }
