@@ -164,18 +164,7 @@ pub fn rc_files_sourcing(home: &Path, platform: &str, script: &Path) -> io::Resu
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    fn scratch(label: &str) -> PathBuf {
-        use std::sync::atomic::{AtomicU32, Ordering};
-        static NEXT: AtomicU32 = AtomicU32::new(0);
-        let dir = std::env::temp_dir().join(format!(
-            "fgos-rc-{label}-{}-{}",
-            std::process::id(),
-            NEXT.fetch_add(1, Ordering::Relaxed)
-        ));
-        std::fs::create_dir_all(&dir).unwrap();
-        dir
-    }
+    use crate::test_scratch::scratch;
 
     #[test]
     fn only_rc_files_that_exist_are_detected_bash_before_zsh() {

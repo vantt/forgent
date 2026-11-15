@@ -164,18 +164,7 @@ pub fn write_coexistence_manifest(
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    fn scratch(label: &str) -> PathBuf {
-        use std::sync::atomic::{AtomicU32, Ordering};
-        static NEXT: AtomicU32 = AtomicU32::new(0);
-        let dir = std::env::temp_dir().join(format!(
-            "fgos-coexist-{label}-{}-{}",
-            std::process::id(),
-            NEXT.fetch_add(1, Ordering::Relaxed)
-        ));
-        std::fs::create_dir_all(&dir).unwrap();
-        dir
-    }
+    use crate::test_scratch::scratch;
 
     fn names(d: &Detection) -> Vec<(String, Vec<String>)> {
         d.detected_harnesses

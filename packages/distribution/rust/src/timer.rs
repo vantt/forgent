@@ -1018,20 +1018,9 @@ pub fn fix_with(schedule: Schedule, cwd: &Path, found: Option<Found>, env: &Time
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::test_scratch::{scratch, Scratch};
     use serde_json::json;
     use std::cell::RefCell;
-
-    fn scratch(label: &str) -> PathBuf {
-        use std::sync::atomic::{AtomicU32, Ordering};
-        static NEXT: AtomicU32 = AtomicU32::new(0);
-        let dir = std::env::temp_dir().join(format!(
-            "fgos-timer-{label}-{}-{}",
-            std::process::id(),
-            NEXT.fetch_add(1, Ordering::Relaxed)
-        ));
-        std::fs::create_dir_all(&dir).unwrap();
-        dir
-    }
 
     fn host(platform: &str, home: &Path) -> Host {
         Host {
@@ -1045,7 +1034,7 @@ mod tests {
     const BIN: &str = "/opt/fgos/bin/fgos";
 
     struct World {
-        home: PathBuf,
+        home: Scratch,
         calls: RefCell<Vec<String>>,
         fail_enable: bool,
     }
@@ -1455,7 +1444,8 @@ mod tests {
         #[cfg(unix)]
         {
             // A binary that is a link leading outside the release is refused.
-            let outside = scratch("outside").join("fgos");
+            let outside_dir = scratch("outside");
+            let outside = outside_dir.join("fgos");
             std::fs::write(&outside, "#!/bin/sh\n").unwrap();
             {
                 use std::os::unix::fs::PermissionsExt;

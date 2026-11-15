@@ -37,6 +37,8 @@ None retired in this phase (the Node modules go in 09, 10, 11). Owners created: 
 - msvc and darwin `cargo check` for fgos-distribution, fgctl, fgos-process: clean.
 - Node (release artifacts built into the phase target): skill-wrappers, managed-timer, fgctl-init*, fgctl-upgrade, fgctl-stage, fgctl-init-download*, architecture, invocation-root-table, git/one-door, runner/paths, instruction-registry, propose-classify, distribution/native-addon, setup/{doctor-strict-exit,doctor-fresh-run,pin-drift-check,uninstall-project,project-launcher}, install-packaging, cli/first-run-guide, install/install-sh: 353 tests, 0 fail.
 - Census regenerated after each Rust change; 0 undeclared sites.
+- Door negative cases: the bounded-child row was seeded once per pattern (`pub fn run_bounded`, `pub fn resolve_program`, `fn first_on_path`), each in its own file; each failed the architecture test by name and the file was removed. The four machine-service rows were seeded together in one file.
+- Unit tests use a scratch directory removed on drop (`test_scratch.rs`, test-only); no test leaves files in the OS temp dir.
 
 ## Could be affected beyond the focused set
 

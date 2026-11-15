@@ -115,11 +115,9 @@ mod tests {
 
     #[test]
     fn test_workspace_root_of_non_git_refused() {
-        let temp = std::env::temp_dir().join(format!("test_non_git_{}", std::process::id()));
-        let _ = std::fs::create_dir_all(&temp);
+        let temp = crate::test_scratch::scratch("non-git");
         let res = workspace_root_of(&temp);
         assert!(matches!(res, Err(WorkspaceError::NotGitRepository)));
-        let _ = std::fs::remove_dir_all(&temp);
     }
 
     fn git(dir: &Path, args: &[&str]) {
@@ -135,9 +133,8 @@ mod tests {
 
     #[test]
     fn test_workspace_root_of_subdirectory_and_linked_worktree_is_the_main_checkout() {
-        let base = std::fs::canonicalize(std::env::temp_dir())
-            .unwrap()
-            .join(format!("fgctl_root_{}", std::process::id()));
+        let scratch_dir = crate::test_scratch::scratch("fgctl-root");
+        let base = std::fs::canonicalize(&*scratch_dir).unwrap();
         let main = base.join("main");
         std::fs::create_dir_all(main.join("docs")).unwrap();
         git(&main, &["init", "-q", "-b", "main"]);
@@ -160,6 +157,5 @@ mod tests {
         assert_eq!(workspace_root_of(&main).unwrap(), main);
         assert_eq!(workspace_root_of(&main.join("docs")).unwrap(), main);
         assert_eq!(workspace_root_of(&linked).unwrap(), main);
-        let _ = std::fs::remove_dir_all(&base);
     }
 }

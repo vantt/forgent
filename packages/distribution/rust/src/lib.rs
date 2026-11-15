@@ -16,6 +16,8 @@ pub mod shim;
 pub mod skill_stamp;
 pub mod store;
 pub mod suggest;
+#[cfg(test)]
+mod test_scratch;
 pub mod timer;
 pub mod uninstall;
 pub mod verify;
