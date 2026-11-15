@@ -3,6 +3,7 @@ import path from 'node:path';
 
 import { parseYaml } from '../util/yaml.mjs';
 import { validateUnit } from '../runner/execution/unit.mjs';
+import { capabilityNamesOf, isCapabilityDeclared as declaresCapability, registeredCapabilityOf } from '../runner/execution/capability-config.mjs';
 import { shippedCatalog } from '../runner/dispatch/shipped-catalog.mjs';
 import { RESERVED_PATTERN_NAMES } from '../runner/execution/patterns/retired-keys.mjs';
 // capability-plan-lint.mjs — static/read-only harness (docs/history/
@@ -131,15 +132,14 @@ export function pathsOverlap(a, b) {
 }
 
 /** A capability is declared by its exact key, one of its aliases, or its `<prefix>:*` entry. */
-function isCapabilityDeclared(cap, catalog) {
-  if (!catalog || typeof catalog !== 'object') return true;
-  const prefixKey = cap.includes(':') ? `${cap.split(':')[0]}:*` : null;
-  if (Array.isArray(catalog) || catalog instanceof Set) {
-    const set = catalog instanceof Set ? catalog : new Set(catalog);
+function isCapabilityDeclared(cap, runner) {
+  if (!runner || typeof runner !== 'object') return true;
+  if (Array.isArray(runner) || runner instanceof Set) {
+    const set = runner instanceof Set ? runner : new Set(runner);
+    const prefixKey = cap.includes(':') ? `${cap.split(':')[0]}:*` : null;
     return set.has(cap) || (prefixKey !== null && set.has(prefixKey));
   }
-  if (Object.hasOwn(catalog, cap) || (prefixKey !== null && Object.hasOwn(catalog, prefixKey))) return true;
-  return Object.values(catalog).some((entry) => Array.isArray(entry?.aliases) && entry.aliases.includes(cap));
+  return declaresCapability(runner, cap) || registeredCapabilityOf(runner, cap) !== undefined;
 }
 
 function extractUnitBlocks(content) {
@@ -475,7 +475,7 @@ export function lintPhaseUnits(contentOrPath, { config, phase, cellId } = {}) {
   }
 
   // Capability catalog check
-  const catalog = config?.runner?.capabilities ?? config?.capabilities ?? (config && typeof config === 'object' && !('runner' in config) && !('capabilities' in config) ? config : null);
+  const runner = config?.runner ?? config;
   const knownPatterns = effectivePatternNames(config);
   for (const u of units) {
     const cap = u.capability;
@@ -489,7 +489,7 @@ export function lintPhaseUnits(contentOrPath, { config, phase, cellId } = {}) {
           code: 'capability.unresolved',
           message: `unit "${u.id}" capability is unresolved -- resolve before merge`,
         });
-      } else if (catalog && !isCapabilityDeclared(cap, catalog)) {
+      } else if (runner && !isCapabilityDeclared(cap, runner)) {
         pushFinding({
           line: u.line,
           unit: u.id,
@@ -628,7 +628,7 @@ export function lintPlanCapabilityAnnotations(textOrPath, registeredCapabilities
     options = maybeOptions ?? {};
   } else {
     options = registeredCapabilitiesOrOptions ?? {};
-    registeredCapabilities = options.registeredCapabilities ?? (options.config?.capabilities ? Object.keys(options.config.capabilities) : []);
+    registeredCapabilities = options.registeredCapabilities ?? (options.config ? capabilityNamesOf(options.config) : []);
   }
 
   if (options.phase !== undefined) {

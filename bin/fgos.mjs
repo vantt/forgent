@@ -2355,8 +2355,8 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         }
         throw err;
       }
-      const catalog = cfg.capabilities ?? {};
-      const registered = Object.keys(catalog);
+      const { capabilityNamesOf, capabilityDescriptionOf } = await import('../src/runner/execution/capability-config.mjs');
+      const registered = capabilityNamesOf(cfg);
 
       let targetPath = absPath;
       let result;
@@ -2396,7 +2396,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         const cap = unit.capability;
         let desc = null;
         if (cap != null) {
-          desc = catalog[cap]?.description ?? (cap.includes(':') ? catalog[`${cap.split(':')[0]}:*`]?.description : null) ?? null;
+          desc = capabilityDescriptionOf(cfg, cap);
         }
         return {
           ...unit,

@@ -376,15 +376,7 @@
       ],
       "debt": [
         {
-          "path": "bin/fgos.mjs",
-          "reason": "moves to the capability port in a later step of this change"
-        },
-        {
           "path": "src/cli/command-registry.mjs",
-          "reason": "moves to the capability port in a later step of this change"
-        },
-        {
-          "path": "src/report/capability-plan-lint.mjs",
           "reason": "moves to the capability port in a later step of this change"
         },
         {
@@ -433,10 +425,6 @@
         },
         {
           "path": "src/workflow/propose-validate.mjs",
-          "reason": "moves to the capability port in a later step of this change"
-        },
-        {
-          "path": "src/workflow/propose.mjs",
           "reason": "moves to the capability port in a later step of this change"
         }
       ],

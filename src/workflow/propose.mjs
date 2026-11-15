@@ -18,6 +18,7 @@ import { loadRunnerConfigForDir } from '../runner/dispatch/config.mjs';
 import { RunnerConfigError } from '../runner/dispatch/runner-config-error.mjs';
 import { shippedCatalog } from '../runner/dispatch/shipped-catalog.mjs';
 import { resolveGitRoots } from '../runner/execution/run.mjs';
+import { capabilityVerifyOf } from '../runner/execution/capability-config.mjs';
 import { slugOf } from '../util/slug.mjs';
 import { RIGOR_ORDER } from './guide-schema.mjs';
 import { guideSha256 } from './case-start.mjs';
@@ -446,7 +447,7 @@ export function proposeFromSlices({ manifest, plan, guide, runnerConfig, shipped
   }
 
   const writing = dispatching.filter((s) => s.writes.length > 0);
-  if (writing.length > 0 && !runnerConfig?.capabilities?.['code:implement']?.verify) {
+  if (writing.length > 0 && !capabilityVerifyOf(runnerConfig, 'code:implement')) {
     refusals.push({ code: 'gate-command-missing', detail: 'the whole-worktree gate runs the command declared as capabilities.code:implement.verify: declare it' });
   }
   const slug = plan ? planCaseSlug(plan) : slugOf(request, 'case');
