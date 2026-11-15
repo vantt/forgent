@@ -9,7 +9,11 @@
 // whose config is still the legacy JSON file), `other` (a second project `--dir` can name), `mailbox` (a project that
 // opted in to the mailbox), `timers` (opted in, with cross-machine mail and both timer schedules on), `badcfg` (a
 // project whose config file cannot be read), `remote` (a project with a Git remote), `clone` (a clone of this
-// repository).
+// repository), `agents` (a project with the directory of each of the five agent CLIs and
+// its own runnable shim), `older` (hook files in the forms earlier releases wrote), `srccheckout` (a directory that
+// carries the fgOS source checkout's marker), `pinned` (a committed pin and an activation record that differ) and
+// `badpin` (a pin file that is not a pin). A step may name `env` (`$WORLD` is the world's root) and `do: stubs` puts
+// executable stand-ins for `agy`, `claude` and `fgos` in `$WORLD/bin`.
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -115,6 +119,27 @@ add('observe-directory-present', [{ do: 'observeDir' }, call([])], { disk: true 
 add('observe-friction-store-symlinked', [{ do: 'symlinkedFriction' }, call([])]);
 add('observe-fresh-repository-writes-nothing', [call([], { cwd: 'fresh' }), { do: 'observeAppeared', cwd: 'fresh' }]);
 
+// The packaging rows: the hook files of the five agent CLIs (fixed, judged against a runnable shim, written in an
+// earlier release's form), the reports on a person's own agent config, the global path cache, the committed pin and
+// the checkout drift row.
+const STUB_PATH = '$WORLD/bin:/usr/bin:/bin';
+add('agent-directories-judged-before-any-fix', [call([], { cwd: 'agents' })]);
+add('agent-directories-hooks-fixed-then-judged', [call(['--fix'], { cwd: 'agents' }), call([], { cwd: 'agents' }), call(['--fix'], { cwd: 'agents' })], { disk: true });
+add('hooks-an-earlier-release-wrote-are-replaced-in-place', [call([], { cwd: 'older' }), call(['--fix'], { cwd: 'older' }), call([], { cwd: 'older' })], { disk: true });
+add('agy-on-the-path-without-then-with-its-settings', [{ do: 'stubs', names: ['agy'] }, call([], { env: { PATH: STUB_PATH } }), { do: 'agySettings' }, call([], { env: { PATH: STUB_PATH } })]);
+add('claude-on-the-path-with-the-plugin-installed', [{ do: 'stubs', names: ['claude'] }, call([], { env: { PATH: STUB_PATH, FGOS_CLAUDE_COMMAND: '$WORLD/bin/claude' } })]);
+add('claude-on-the-path-without-the-plugin', [{ do: 'stubs', names: ['claude-bare'] }, call([], { env: { PATH: STUB_PATH, FGOS_CLAUDE_COMMAND: '$WORLD/bin/claude-bare' } })]);
+add('claude-accepts-cross-session-input-or-holds-it-or-cannot-be-read', [
+  { do: 'claudeSettings', text: '{"crossSessionInbound":"accept"}' }, call([], { cwd: 'mailbox' }),
+  { do: 'claudeSettings', text: '{"crossSessionInbound":"hold"}' }, call([], { cwd: 'mailbox' }),
+  { do: 'claudeSettings', text: '{"theme":"dark"}' }, call([], { cwd: 'mailbox' }),
+  { do: 'claudeSettings', text: '[not an object' }, call([], { cwd: 'mailbox' }),
+]);
+add('the-path-cache-follows-the-fgos-on-the-path', [{ do: 'stubs', names: ['fgos'] }, call(['--fix'], { env: { PATH: STUB_PATH } }), call(['--fix'], { env: { PATH: STUB_PATH } }), call(['--fix'], { env: { PATH: '/usr/bin:/bin' } })], { disk: true });
+add('a-pin-the-activation-differs-from', [call([], { cwd: 'pinned' })]);
+add('a-pin-file-that-is-not-a-pin', [call([], { cwd: 'badpin' })]);
+add('the-source-checkout-marker-without-an-activation', [call([], { cwd: 'srccheckout' })]);
+
 // Refused calls: the flag text is the registry's, and the call writes nothing.
 add('unknown-flag', [call(['--bogus'])], { disk: true });
 add('unknown-flag-after-known', [call(['--fix', '--zeta', '--alpha'])], { disk: true });
@@ -123,13 +148,26 @@ add('strict-with-equals', [call(['--strict=1'])], { disk: true });
 add('dir-with-equals', [call(['--dir=/tmp'])], { disk: true });
 
 const MACHINE_ID_SLUG = os.hostname().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+
+// Hook files in the forms earlier releases wrote (an unguarded dispatch entry; a cwd-relative one next to another
+// project's decision-question entry): a fix recognises them as fgOS's and replaces them in place.
+const EARLIER_CLAUDE_SETTINGS = '{\n  "hooks": {\n    "PreToolUse": [\n      {\n        "matcher": "Agent|Task",\n        "hooks": [\n          {\n            "type": "command",\n            "command": "\\"${CLAUDE_PROJECT_DIR}/.fgos/installation/bin/fgos\\" hook dispatch-decide"\n          }\n        ]\n      }\n    ]\n  }\n}\n';
+const EARLIER_CODEX_HOOKS = '{\n  "hooks": {\n    "PreToolUse": [\n      {\n        "matcher": ".*",\n        "hooks": [\n          {\n            "type": "command",\n            "command": ".fgos/installation/bin/fgos hook dispatch-decide"\n          }\n        ]\n      },\n      {\n        "matcher": "RequestUserInput|ask.*",\n        "hooks": [\n          {\n            "type": "command",\n            "command": "\\"/other/project/.fgos/installation/bin/fgos\\" hook decision-question"\n          }\n        ]\n      }\n    ]\n  }\n}\n';
+
+const STUBS = {
+  fgos: '#!/bin/sh\nexit 0\n',
+  agy: '#!/bin/sh\nexit 0\n',
+  claude: '#!/bin/sh\nif [ "$1" = "--version" ]; then echo 1.0.0; exit 0; fi\nif [ "$1" = "plugin" ] && [ "$2" = "marketplace" ]; then echo \'[{"name":"fgos-plugins"}]\'; exit 0; fi\nif [ "$1" = "plugin" ] && [ "$2" = "list" ]; then echo \'[{"id":"fgOS@fgos-plugins","enabled":true}]\'; exit 0; fi\nexit 1\n',
+  'claude-bare': '#!/bin/sh\nif [ "$1" = "--version" ]; then echo 1.0.0; exit 0; fi\nif [ "$1" = "plugin" ]; then echo \'[]\'; exit 0; fi\nexit 1\n',
+};
+
 const UUID = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/g;
 const ISO = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?Z/g;
 const GIT_DIR = '.git';
 
 function makeWorld() {
   const root = fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), 'p03par-')));
-  const dirs = Object.fromEntries(['repo', 'home', 'tmp', 'state', 'fresh', 'outside', 'legacy', 'mailbox', 'timers', 'badcfg'].map((name) => [name, path.join(root, name)]));
+  const dirs = Object.fromEntries(['repo', 'home', 'tmp', 'state', 'fresh', 'outside', 'legacy', 'mailbox', 'timers', 'badcfg', 'agents', 'older', 'srccheckout', 'pinned', 'badpin'].map((name) => [name, path.join(root, name)]));
   for (const dir of Object.values(dirs)) fs.mkdirSync(dir);
   fs.chmodSync(dirs.state, 0o700);
   fs.writeFileSync(path.join(dirs.state, 'machine-id'), 'parity-machine\n');
@@ -147,6 +185,31 @@ function makeWorld() {
   const shim = path.join(dirs.timers, '.fgos', 'installation', 'bin', 'fgos');
   fs.mkdirSync(path.dirname(shim), { recursive: true });
   fs.writeFileSync(shim, '#!/bin/sh\nexit 0\n', { mode: 0o755 });
+  const shimOf = (dir) => {
+    const file = path.join(dir, '.fgos', 'installation', 'bin', 'fgos');
+    fs.mkdirSync(path.dirname(file), { recursive: true });
+    fs.writeFileSync(file, '#!/bin/sh\nexit 0\n', { mode: 0o755 });
+  };
+  const put = (dir, relative, text) => {
+    fs.mkdirSync(path.dirname(path.join(dir, relative)), { recursive: true });
+    fs.writeFileSync(path.join(dir, relative), text);
+  };
+  initFixtureRepo(dirs.agents);
+  for (const agentDir of ['.claude', '.codex', '.agents', '.omp', '.pi']) fs.mkdirSync(path.join(dirs.agents, agentDir));
+  shimOf(dirs.agents);
+  initFixtureRepo(dirs.older);
+  shimOf(dirs.older);
+  put(dirs.older, '.claude/settings.json', EARLIER_CLAUDE_SETTINGS);
+  put(dirs.older, '.codex/hooks.json', EARLIER_CODEX_HOOKS);
+  initFixtureRepo(dirs.srccheckout);
+  put(dirs.srccheckout, 'apps/fgos/Cargo.toml', '[package]\nname = "fgos"\n');
+  put(dirs.srccheckout, 'package.json', '{ "name": "fixture", "files": [] }\n');
+  const pin = (digest) => JSON.stringify({ schemaVersion: 1, projectRuntime: { policy: 'exact-digest', artifactDigest: digest } });
+  initFixtureRepo(dirs.pinned);
+  put(dirs.pinned, '.fgos/distribution.json', pin(`sha256:${'a'.repeat(64)}`));
+  put(dirs.pinned, '.fgos/installation/activation.json', JSON.stringify({ artifactDigest: `sha256:${'b'.repeat(64)}`, releasePath: '/nowhere', status: 'ready', pinOverrideReason: 'testing the next build' }));
+  initFixtureRepo(dirs.badpin);
+  put(dirs.badpin, '.fgos/distribution.json', '{ not json');
   initFixtureRepo(dirs.badcfg);
   writeRawProjectConfig(dirs.badcfg, 'mailbox: [unclosed\n');
   initFixtureRepo(dirs.legacy);
@@ -223,6 +286,18 @@ function act(world, step) {
       return null;
     case 'gitConfig':
       return execFileSync('git', ['-C', world[step.cwd], 'config', '--get-all', 'remote.origin.fetch'], { encoding: 'utf8' }).trim();
+    case 'stubs':
+      fs.mkdirSync(path.join(world.root, 'bin'), { recursive: true });
+      for (const name of step.names) fs.writeFileSync(path.join(world.root, 'bin', name), STUBS[name], { mode: 0o755 });
+      return null;
+    case 'agySettings':
+      fs.mkdirSync(path.join(world.home, '.gemini', 'antigravity-cli'), { recursive: true });
+      fs.writeFileSync(path.join(world.home, '.gemini', 'antigravity-cli', 'settings.json'), JSON.stringify({ toolPermission: 'always-proceed', permissions: { deny: ['command(regex:^sudo )'] } }));
+      return null;
+    case 'claudeSettings':
+      fs.mkdirSync(path.join(world.home, '.claude'), { recursive: true });
+      fs.writeFileSync(path.join(world.home, '.claude', 'settings.json'), step.text);
+      return null;
     case 'storeAppeared':
       return `store ${fs.existsSync(path.join(world[step.cwd], '.fgos')) ? 'exists' : 'absent'}`;
     case 'observeAppeared':
@@ -299,6 +374,11 @@ const cwdOf = (world, name = 'repo') => ({
   badcfg: world.badcfg,
   remote: world.remote,
   clone: world.clone,
+  agents: world.agents,
+  older: world.older,
+  srccheckout: world.srccheckout,
+  pinned: world.pinned,
+  badpin: world.badpin,
 })[name] ?? assert.fail(`unknown cwd ${name}`);
 
 /** The release, host binary and manifest an entry runs from, as text to replace. */
@@ -428,7 +508,7 @@ async function runScript(entry, testCase) {
         id: testCase.id,
         args,
         cwd: cwdOf(world, step.cwd),
-        env: { HOME: world.home, USERPROFILE: world.home, TMPDIR: world.tmp, FGOS_STATE_ROOT: world.state, XDG_RUNTIME_DIR: path.join(world.root, 'no-runtime-dir'), DBUS_SESSION_BUS_ADDRESS: `unix:path=${path.join(world.root, 'no-bus')}`, FGOS_CLAUDE_COMMAND: '/nonexistent/fgos-parity-claude', NO_COLOR: '1', ...(step.env === 'PATH_WITHOUT' ? { PATH: world.pathWithout } : {}) },
+        env: { HOME: world.home, USERPROFILE: world.home, TMPDIR: world.tmp, FGOS_STATE_ROOT: world.state, XDG_RUNTIME_DIR: path.join(world.root, 'no-runtime-dir'), DBUS_SESSION_BUS_ADDRESS: `unix:path=${path.join(world.root, 'no-bus')}`, FGOS_CLAUDE_COMMAND: '/nonexistent/fgos-parity-claude', NO_COLOR: '1', ...(step.env === 'PATH_WITHOUT' ? { PATH: world.pathWithout } : Object.fromEntries(Object.entries(step.env ?? {}).map(([key, value]) => [key, value.replaceAll('$WORLD', world.root)]))) },
         timeoutMs: 180000,
         modes: ['exact-bytes'],
       });

@@ -6,7 +6,7 @@
 //! Each row calls the packaging module that owns its job and words the answer; none re-derives a fact. The shim
 //! probe of the hook rows runs inside `agent_hooks` through the process door (the project's own shim, never Node).
 
-use super::{judged, Rows};
+use super::{judged, project_root_refusal, Rows};
 use fgos_distribution::agent_config::{
     check_agy_permissions_configured, check_claude_plugin_marketplace, check_mailbox_claude_accept,
     claude_user_settings, program_on_path,
@@ -225,6 +225,11 @@ fn agent_hook_row(
     env: &[(String, String)],
     memo: &ProbeMemo,
 ) -> RowOutcome {
+    // The hook table reads the mailbox opt-in through the config door, which refuses a project directory it cannot
+    // open: the row says so as its failure.
+    if let Some(refusal) = project_root_refusal(root) {
+        return judged(false, refusal);
+    }
     match check_hook(
         root,
         cli,
@@ -239,6 +244,9 @@ fn agent_hook_row(
 }
 
 fn agent_hook_fix(root: &Path, id: &str, cli: &str) -> FixResult {
+    if let Some(refusal) = project_root_refusal(root) {
+        return FixResult::done(id, false, refusal);
+    }
     match install_hook(root, cli, &|key| std::env::var(key).ok()) {
         Ok(result) => said(id, install_message(cli, &result)),
         Err(failure) => FixResult::done(id, false, failure.to_string()),
@@ -258,6 +266,9 @@ fn agy_permissions_row(env: &[(String, String)]) -> RowOutcome {
 }
 
 fn mailbox_accept_row(root: &Path, env: &[(String, String)]) -> RowOutcome {
+    if let Some(refusal) = project_root_refusal(root) {
+        return judged(false, refusal);
+    }
     let opt_in = match mailbox_opt_in(root, &|key| std::env::var(key).ok()) {
         Ok(opt_in) => opt_in,
         Err(failure) => return judged(false, failure.to_string()),
