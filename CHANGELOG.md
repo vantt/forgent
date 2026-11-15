@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- YAML that fgOS writes (frontmatter of knowledge projections, the decision index, case answer files and project agent files) now goes through the one native YAML door, which escapes invisible bidirectional and zero-width characters instead of writing them raw, and every written block parses back to the same value.
+
 ## [v0.2.0-rc.10] - 2026-11-15
 
 - `fgos events sync|status|seal|export`, `fgos session start|end|list|gc` and `fgos gateway start|stop|status` now run in the Rust host with no Node process, and the seal and publish children a Node command starts run the host binary.
