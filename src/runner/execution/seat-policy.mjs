@@ -17,16 +17,20 @@ import { bindingTasteOf } from './capability-config.mjs';
 const SEAT_CONFIG_KEYS = Object.freeze(['defaults', 'maxTier', 'tierFallback', 'modelPolicies']);
 const MAX_CACHED = 2000;
 
+/**
+ * `value` as the crate receives it, JSON text read back: a non-finite number and an undefined array member read as null
+ * and an undefined object member is absent. Hashing this keeps every digest over the bytes the crate gets, and the door,
+ * which refuses what JSON has no form for, never throws on a value that binds.
+ */
+const asCrateJson = (value) => JSON.parse(JSON.stringify(value));
+
 /** The slice of a runner config the crate reads: tier vocabulary, cells, fallback order and the per-capability taste. */
 export function seatConfigOf(runnerConfig) {
   const runner = runnerConfig?.runner && !runnerConfig.modelPolicies ? runnerConfig.runner : (runnerConfig ?? {});
   const config = {};
   for (const key of SEAT_CONFIG_KEYS) if (runner[key] !== undefined) config[key] = runner[key];
   config.capabilities = bindingTasteOf(runner);
-  // The slice is exactly what goes to the crate as JSON text: a non-finite number and an undefined array member read as
-  // null and an undefined object member is absent. Normalizing here keeps the digest, which refuses what JSON has no form
-  // for, over the same bytes the crate receives.
-  return JSON.parse(JSON.stringify(config));
+  return asCrateJson(config);
 }
 
 /** The semantic config slice and its digest. */
@@ -45,7 +49,8 @@ const answers = new Map();
  * @param {object} runnerConfig the merged runner section
  * @returns {{policy: object}|{refused: {reason: string, detail: string, config?: string}}} a refusal is a decision
  */
-export function seatPolicy(ask, runnerConfig) {
+export function seatPolicy(rawAsk, runnerConfig) {
+  const ask = asCrateJson(rawAsk);
   const { config, digest } = seatConfigDigestOf(runnerConfig);
   const key = `${digest}\u0000${canonicalJson(ask)}`;
   const cached = answers.get(key);
@@ -65,7 +70,9 @@ export function seatPolicy(ask, runnerConfig) {
  * @param {object} request ask, runnerConfig, peers, walk, accountView, launchView
  * @returns {object} the crate's BindOutput plus `hostVersion`
  */
-export function seatBinding({ ask, runnerConfig, peers = [], walk = {}, accountView = { pools: {} }, launchView = { executors: {} } }) {
+export function seatBinding({ ask: rawAsk, runnerConfig, peers = [], walk = {}, accountView: rawAccountView = { pools: {} }, launchView = { executors: {} } }) {
+  const ask = asCrateJson(rawAsk);
+  const accountView = asCrateJson(rawAccountView);
   const { config, digest } = seatConfigDigestOf(runnerConfig);
   const accountViewDigest = `sha256:${crypto.createHash('sha256').update(canonicalJson(accountView)).digest('hex')}`;
   return bindSeat({ ask, config, configDigest: digest, peers, walk, accountView, accountViewDigest, launchView, now: Date.now() });
