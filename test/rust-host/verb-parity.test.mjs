@@ -11,7 +11,7 @@ import path from "node:path";
 import { pathToFileURL } from "node:url";
 import { parseEntry, PARITY_CASES_DIR } from "./harness.mjs";
 
-const TABLES = ["events"];
+const TABLES = ["events", "session"];
 const JOBS = 4;
 
 /** The base release as the entry that serves its verbs from Node, with the environment that release was staged with. */

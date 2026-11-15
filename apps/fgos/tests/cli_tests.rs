@@ -3004,3 +3004,59 @@ fn test_session_verbs_start_no_node() {
     let _ = fs::remove_dir_all(&sandbox);
     let _ = fs::remove_dir_all(&spy_dir);
 }
+
+// A session verb run where there is no project is refused through the project check, with the refusal every
+// ported verb gives, and creates nothing: no `.fgos`, no lock, no session directory, not even in the current directory.
+#[cfg(unix)]
+#[test]
+fn test_session_verbs_outside_a_project_are_refused_and_create_nothing() {
+    use std::os::unix::fs::PermissionsExt;
+    let sandbox =
+        std::env::temp_dir().join(format!("fgos_test_session_bare_{}", std::process::id()));
+    let _ = fs::remove_dir_all(&sandbox);
+    let (state, temp, bare) = (
+        sandbox.join("state"),
+        sandbox.join("tmp"),
+        sandbox.join("bare"),
+    );
+    for dir in [&state, &temp, &bare] {
+        fs::create_dir_all(dir).unwrap();
+    }
+    fs::set_permissions(&state, fs::Permissions::from_mode(0o700)).unwrap();
+    for args in [
+        &["session", "list"][..],
+        &["session", "start"][..],
+        &["session", "gc"][..],
+        &["session", "end", "x"][..],
+    ] {
+        let output = Command::new(fgos_bin())
+            .args(args)
+            .current_dir(&bare)
+            .env("FGOS_STATE_ROOT", &state)
+            .env("TMPDIR", &temp)
+            .output()
+            .expect("failed to execute fgos");
+        let stderr = String::from_utf8_lossy(&output.stderr);
+        assert_eq!(output.status.code(), Some(4), "{args:?}: {stderr}");
+        assert!(
+            output.stdout.is_empty(),
+            "{args:?} printed {:?}",
+            output.stdout
+        );
+        assert!(
+            stderr.contains("not inside an fgOS project") && stderr.contains("[not-in-project]"),
+            "{args:?}: {stderr}"
+        );
+    }
+    assert_eq!(
+        fs::read_dir(&bare).unwrap().count(),
+        0,
+        "nothing was made in the directory"
+    );
+    assert_eq!(
+        fs::read_dir(&temp).unwrap().count(),
+        0,
+        "no session directory was made"
+    );
+    let _ = fs::remove_dir_all(&sandbox);
+}

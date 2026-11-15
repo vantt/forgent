@@ -271,19 +271,31 @@ impl<'a> Context<'a> {
         }
     }
 
-    /// The root the caller's directory is a project of: the nearest `.fgos` up from it within its checkout, else
-    /// the checkout's top level, else the directory itself. `--dir` is not read: a session always acts on the
-    /// caller's own project.
+    /// The project the caller's directory belongs to: the nearest `.fgos` up from it within its checkout, else, for a
+    /// linked worktree that carries no store of its own, the store of its main checkout. Where there is none (no
+    /// repository, or a repository nobody initialised) the call is refused and nothing is created: a session never
+    /// makes a store where it is run. `--dir` is not read: a session always acts on the caller's own project.
     fn root_of(&self, cwd: &Path) -> Outcome<PathBuf> {
         use fgos_git::invocation_root::{resolve_invocation_root, RootPolicy, RootRequest};
-        resolve_invocation_root(&RootRequest {
+        let asked = resolve_invocation_root(&RootRequest {
             cwd,
             dir: None,
             policy: RootPolicy::CallerTree,
             home: self.home.as_deref(),
         })
-        .map(|root| root.root)
-        .map_err(|refusal| Fault::session(refusal.message))
+        .map_err(|refusal| Fault::session(refusal.message))?;
+        if asked.found {
+            return Ok(asked.root);
+        }
+        if let Ok(Some(main)) = fgos_git::main_checkout_root(cwd) {
+            if main.join(".fgos").is_dir() {
+                return Ok(main);
+            }
+        }
+        Err(Fault::session(format!(
+            "not inside an fgOS project: no .fgos directory above {} -- run the command inside a project, or run 'fgctl init' in the project [not-in-project]",
+            cwd.display()
+        )))
     }
 
     fn driver(&self) -> Outcome<GitDriver> {
@@ -540,10 +552,6 @@ impl<'a> Context<'a> {
     fn list(&self, cwd: &Path) -> Outcome<Value> {
         let root = self.root_of(cwd)?;
         let fgos_dir = fgos_dir_of(&root);
-        // No store, no session: nothing to lock, and a read never creates one.
-        if !fgos_dir.is_dir() {
-            return Ok(json!([]));
-        }
         let _hold = lock_sessions(&fgos_dir)?;
         Ok(Value::Array(read_registry(&fgos_dir)?))
     }
@@ -1584,7 +1592,7 @@ mod tests {
     }
 
     #[test]
-    fn list_answers_the_rows_and_is_empty_without_a_store_or_after_every_end() {
+    fn list_answers_the_rows_and_is_empty_after_every_end() {
         let fixture = Fixture::new();
         assert!(fixture.list().is_empty());
         let one = id_of(&fixture.start().unwrap());
@@ -1594,16 +1602,87 @@ mod tests {
         fixture.end(&one, false).unwrap();
         fixture.end(&two, false).unwrap();
         assert!(fixture.list().is_empty());
+    }
 
-        let bare = std::env::temp_dir().join(format!("fgos-session-bare-{}", std::process::id()));
-        std::fs::create_dir_all(&bare).unwrap();
-        let answer = fixture
+    #[test]
+    fn a_call_outside_any_project_is_refused_and_creates_nothing() {
+        let fixture = Fixture::new();
+        let bare = fixture.root.join("bare");
+        std::fs::create_dir(&bare).unwrap();
+        let requests = [
+            SessionRequest::Start {
+                item: None,
+                cwd: bare.clone(),
+            },
+            SessionRequest::End {
+                session_id: "x".into(),
+                force: false,
+                cwd: bare.clone(),
+            },
+            SessionRequest::List { cwd: bare.clone() },
+            SessionRequest::Gc { cwd: bare.clone() },
+        ];
+        for request in requests {
+            let text = refusal_text(fixture.context().run(&request));
+            assert!(
+                text.contains("not inside an fgOS project") && text.contains("[not-in-project]"),
+                "{text}"
+            );
+        }
+        assert_eq!(
+            std::fs::read_dir(&bare).unwrap().count(),
+            0,
+            "nothing was created"
+        );
+        assert!(!fixture.sessions.exists());
+    }
+
+    #[test]
+    fn a_repository_nobody_initialised_is_refused_and_gets_no_store() {
+        let fixture = Fixture::new();
+        let plain = fixture.root.join("plain");
+        git(
+            &fixture.root,
+            &["init", "-q", "--initial-branch=main", "plain"],
+        );
+        git(&plain, &["config", "user.name", "Fixture"]);
+        git(&plain, &["config", "user.email", "fixture@example.invalid"]);
+        std::fs::write(plain.join("seed.txt"), "seed\n").unwrap();
+        git(&plain, &["add", "-A"]);
+        git(&plain, &["commit", "-qm", "seed"]);
+        let text = refusal_text(fixture.start_in(&plain));
+        assert!(text.contains("[not-in-project]"), "{text}");
+        assert!(!plain.join(".fgos").exists());
+    }
+
+    #[test]
+    fn a_linked_worktree_without_a_store_acts_on_its_main_checkouts_store() {
+        let fixture = Fixture::new();
+        let linked = fixture.root.join("linked");
+        git(
+            &fixture.repo,
+            &[
+                "worktree",
+                "add",
+                "-q",
+                "--detach",
+                linked.to_str().unwrap(),
+                "HEAD",
+            ],
+        );
+        let started = fixture.start_in(&linked).unwrap();
+        assert!(
+            !linked.join(".fgos").exists(),
+            "no store is made in the linked worktree"
+        );
+        assert_eq!(fixture.list()[0]["sessionId"], started["sessionId"]);
+        let from_linked = fixture
             .context()
-            .run(&SessionRequest::List { cwd: bare.clone() })
+            .run(&SessionRequest::List {
+                cwd: linked.clone(),
+            })
             .unwrap();
-        assert_eq!(answer, json!([]));
-        assert!(!bare.join(".fgos").exists(), "a read creates no store");
-        std::fs::remove_dir_all(&bare).unwrap();
+        assert_eq!(from_linked, Value::Array(fixture.list()));
     }
 
     #[test]

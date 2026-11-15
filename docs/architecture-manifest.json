@@ -300,6 +300,7 @@
       "debt": [
         { "path": "packages/distribution/rust/src/workspace.rs", "reason": "a second root decision: the trusted main checkout read for fgctl, init and doctor, through GitDriver::trusted_root_at without the policies, home exclusion or --dir rules; moves with packaging (S4)" },
         { "path": "apps/fgos/src/wiring/mailbox_root.rs", "reason": "the mailbox picks its record root (the main checkout from CLAUDE_PROJECT_DIR or the cwd) separately from the invocation root, so a hook call needs no Git process; one door once the mailbox verbs move" },
+        { "path": "apps/fgos/src/wiring/session.rs", "reason": "`fgos session` acts on the caller's own directory and ignores `--dir`, as the Node verb did, so it asks the root door itself with no `--dir` instead of taking the root the invocation doors resolved from one; it asks the same door, with the caller-tree policy. Retires if the verb starts reading `--dir`" },
         { "path": "src/util/host-bin-path.mjs", "reason": "walks up from cwd for .fgos/installation/activation.json with no Git ceiling and no home exclusion, a root decision of its own for finding the host binary" },
         { "path": "src/runner/worktree.mjs", "reason": "isMainWorktree asks 'is this the main checkout' in Node while fgos-git store_admission asks it in Rust; six other Node callers (resolveMainCheckoutRoot and friends) keep it until their verbs move" }
       ],
