@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "7e2ef463b76ba9b190e9bf8cd39f8ed39daab0da7f259f3d1a5c98eb43361f30",
+  "payloadDigest": "99d5f52c833fd8dfb2cbce058e4fd193a7c2e6910618c9ce697f76a3b0ee481b",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "a5629383f89b4488b252a62f0ea86463e649e33e0a891db1a19af2cd6c136aca",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -90,7 +90,7 @@
     "apps/fgos/src/invocation_doors.rs": "01cd71738e01f31cd9ea3713b6a1108a78f1afada8cd2b3f8ae28f6284c963ea",
     "apps/fgos/src/legacy_exec.rs": "bf2f790d202ad3a25735fc3f9c33feb7aeffdfb015b1e0aafa9282c8b8bcba40",
     "apps/fgos/src/main.rs": "4a0f4a7a117e8553c082730d0deaed164b89903b350ece6e8f9042f5ec8119d2",
-    "apps/fgos/src/routing.rs": "e26ff16f18afb92b761ec26842c73457e35a5ed511c60bd17f8efaac0c8056f7",
+    "apps/fgos/src/routing.rs": "9dda3107c1150d09c8f36d53c138a62a945b6e19cff49f1b0cef2df77871c5c7",
     "apps/fgos/src/wiring/event_store_clone.rs": "923d718f7a6bd5705cbe6e4d4c8393672c1ef4a2142facc9ada314307a4d7574",
     "apps/fgos/src/wiring/identity_log.rs": "d7d9dd503ecbd84a5373aa27f6853996e6944aba2940d15e8284cd92c14eef7a",
     "apps/fgos/src/wiring/mailbox_body.rs": "1d1a1c76ac24e5cb1d9e55a7b54ed35cc7be7656ded86ac52e58dd767b3079ca",
@@ -848,7 +848,7 @@
     "scripts/event-store/store-increment-worker.mjs": "e14caa7c6067ac0f5c99f18f163431e079894a72e1bded877b0faeeeb7933479",
     "scripts/event-store/v-spawn-bench.mjs": "076166b6a8397ab2cba6d416c234d989140574995930cff5bc996464d55bc21e",
     "scripts/explain-command-route.mjs": "db546d74676a1c91c3309241dcb618dc438fbae79448f4e2253319657dbbee24",
-    "scripts/export-command-selectors.mjs": "cf7feb3e74012c06e166e72e90ca47578696e9cb813e10a42507f71a7ca2f381",
+    "scripts/export-command-selectors.mjs": "a0e14a6d63de4db4c219dec7c11e5295a8520ed9a3618fe2564286421a044f6a",
     "scripts/fgos-session-start-hook.mjs": "6ec944bb42698570cb5cb860d24bde1229d884f968ce0f6771c05b9c11a93af6",
     "scripts/fgos-shell-integration.sh": "86a79af2d4b583230823974301ef54eaf6cf6fcee353b5618fcf00a7c7be7945",
     "scripts/git-addon.mjs": "67532c2006d74a97cbc40814e82882da1de5d48b5d072670444489e2ed963d71",

@@ -345,6 +345,10 @@ pub fn check_call(
     }
 }
 
+/// The flags every verb accepts, which the Node CLI's unknown-flag text never lists among a verb's own
+/// (`GLOBAL_FLAGS` in `src/cli/flag-check.mjs`).
+const GLOBAL_FLAGS: [&str; 3] = ["dir", "json", "help"];
+
 /// The first flag before a bare `--` that the route's registry projection does not list. The name is the whole
 /// token after `--`, as the shared parser reads it (`--dir=/x` is the flag `dir=/x`); a pre-door verb's own
 /// reading also takes `--flag=value`, so its name is compared up to the `=`.
@@ -368,23 +372,71 @@ fn unknown_flag(route: &CommandRouteDescriptor, call: &Call) -> Option<String> {
             if accepted.iter().any(|f| f == name) {
                 return None;
             }
-            let token = format!("--{key}");
-            let mut known: Vec<&str> = accepted.iter().map(String::as_str).collect();
-            known.sort_unstable();
-            let near = suggest(name, known.into_iter())
-                .map(|f| format!(" Did you mean --{f}?"))
-                .unwrap_or_default();
-            Some(format!(
-                "unknown flag \"{token}\" for \"fgos {}\".{near} Valid flags: {}. See \"fgos {} --help\".",
-                route.selector,
-                accepted
-                    .iter()
-                    .map(|f| format!("--{f}"))
-                    .collect::<Vec<_>>()
-                    .join(", "),
-                route.selector,
-            ))
+            Some(if pre_door {
+                pre_door_unknown_flag_text(route, key, name, accepted)
+            } else {
+                node_unknown_flag_text(route, sub, key, accepted)
+            })
         })
+}
+
+/// The refusal text a pre-door verb has always answered with.
+fn pre_door_unknown_flag_text(
+    route: &CommandRouteDescriptor,
+    key: &str,
+    name: &str,
+    accepted: &[String],
+) -> String {
+    let token = format!("--{key}");
+    let mut known: Vec<&str> = accepted.iter().map(String::as_str).collect();
+    known.sort_unstable();
+    let near = suggest(name, known.into_iter())
+        .map(|f| format!(" Did you mean --{f}?"))
+        .unwrap_or_default();
+    // Printed sorted: the list is in registry order, and these verbs have always shown it alphabetical.
+    let mut listed: Vec<&str> = accepted.iter().map(String::as_str).collect();
+    listed.sort_unstable();
+    format!(
+        "unknown flag \"{token}\" for \"fgos {}\".{near} Valid flags: {}. See \"fgos {} --help\".",
+        route.selector,
+        listed
+            .iter()
+            .map(|f| format!("--{f}"))
+            .collect::<Vec<_>>()
+            .join(", "),
+        route.selector,
+    )
+}
+
+/// The refusal text of the Node CLI (`unknownFlagMessage`, `src/cli/flag-check.mjs`), byte for byte: the verb and
+/// its sub-command, a hint to write `--k <value>` when the token carries an `=`, the flags of the sub-command
+/// beyond the global ones (or none), and the help call for that sub-command.
+fn node_unknown_flag_text(
+    route: &CommandRouteDescriptor,
+    sub: Option<&str>,
+    key: &str,
+    accepted: &[String],
+) -> String {
+    let verb = match (route.subcommands, sub) {
+        (Some(true), Some(sub)) => format!("{} {sub}", route.selector),
+        _ => route.selector.clone(),
+    };
+    let hint = key.split_once('=').map_or_else(String::new, |(name, _)| {
+        format!(" (write \"--{name} <value>\", not \"--name=value\")")
+    });
+    let own: Vec<String> = accepted
+        .iter()
+        .filter(|flag| !GLOBAL_FLAGS.contains(&flag.as_str()))
+        .map(|flag| format!("--{flag}"))
+        .collect();
+    let valid = if own.is_empty() {
+        "It takes no flags besides --dir, --json.".to_owned()
+    } else {
+        format!("Valid flags: {}, --dir, --json.", own.join(", "))
+    };
+    format!(
+        "unknown flag \"--{key}\" for \"fgos {verb}\"{hint}. {valid} See \"fgos {verb} --help\"."
+    )
 }
 
 #[cfg(test)]
@@ -621,6 +673,22 @@ mod tests {
             "{}",
             fault.message
         );
+    }
+
+    #[test]
+    fn the_valid_flags_of_a_verb_off_the_pre_door_list_print_in_registry_order() {
+        let route = fake(serde_json::json!({
+            "subcommands": true,
+            "subcommand_flags": {"fence": ["dir", "help", "json", "yes", "name"]},
+        }));
+        assert_eq!(
+            node_unknown_flag_text(&route, Some("fence"), "bogus", &route.subcommand_flags.as_ref().unwrap()["fence"]),
+            "unknown flag \"--bogus\" for \"fgos probe fence\". Valid flags: --yes, --name, --dir, --json. See \"fgos probe fence --help\"."
+        );
+        // A pre-door verb keeps printing its flags alphabetically whatever order the table holds them in.
+        let accepted: Vec<String> = ["yes", "name"].map(String::from).to_vec();
+        let text = pre_door_unknown_flag_text(&route, "bogus", "bogus", &accepted);
+        assert!(text.contains("Valid flags: --name, --yes."), "{text}");
     }
 
     fn fake(json: serde_json::Value) -> CommandRouteDescriptor {

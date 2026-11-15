@@ -144,11 +144,12 @@ test('the mailbox selector is native with send, inbox, list and status and their
   assert.equal(routes.mailbox.operation_id, 'mailbox.inbox');
   assert.equal(routes.mailbox.owner_path, 'packages/mailbox/rust');
   assert.equal(routes.mailbox.subcommands, true);
+  // Each list is the registry's: the global flags, then the verb's own in the order the Node CLI prints them.
   assert.deepEqual(routes.mailbox.subcommand_flags, {
-    inbox: ['claim', 'dir', 'help', 'json'],
-    list: ['dir', 'help', 'json', 'long'],
-    send: ['body', 'dir', 'help', 'json', 'need-ack', 'reply-by', 'reply-to', 'to', 'wake'],
-    status: ['dir', 'help', 'json'],
+    inbox: ['dir', 'json', 'help', 'claim'],
+    list: ['dir', 'json', 'help', 'long'],
+    send: ['dir', 'json', 'help', 'to', 'wake', 'reply-to', 'need-ack', 'reply-by', 'body'],
+    status: ['dir', 'json', 'help'],
   });
 });
 
