@@ -166,7 +166,7 @@ pub fn project_cli_invocation(
         crate::wiring::wire_agents::OPERATION_ID => (
             ContractRef::from_static("wire-agents.run.request", "1.0.0"),
             Box::new(crate::wiring::wire_agents::project_wire_agents_request(
-                args,
+                args, root,
             )?),
         ),
         other => {

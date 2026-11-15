@@ -12,7 +12,6 @@ use crate::cli_projector::ProjectError;
 use crate::routing::Call;
 use fgos_distribution::agent_config::{plan_agent_wiring, run_claude_step, Change, WiringPlan};
 use fgos_distribution::agent_hooks::{BoundedRunner, ProcessRunner};
-use fgos_git::invocation_root::{resolve_invocation_root, RootPolicy, RootRequest};
 use fgos_host_runtime::{
     CategorisedRefusal, ContractRef, EventSink, HostInvocation, InvocationControl, OperationId,
     OperationProvider, OperationRequest, ProviderDescriptor, ProviderError, ProviderLifecycle,
@@ -59,22 +58,16 @@ pub struct WireAgentsRequest {
     pub json: bool,
 }
 
-/// Reads a call of `wire-agents` through the shared parser. The project is the main checkout of the caller's
-/// directory whatever `--dir` names (the flag is accepted and ignored); a checkout the Git door cannot trust is
-/// refused as the root door refuses it.
-pub fn project_wire_agents_request(args: &[OsString]) -> Result<WireAgentsRequest, ProjectError> {
+/// Reads a call of `wire-agents` through the shared parser. `root` is the main checkout of the caller's directory
+/// that the invocation doors resolved (they take `--dir` as a flag to accept and never act on it).
+pub fn project_wire_agents_request(
+    args: &[OsString],
+    root: Result<PathBuf, String>,
+) -> Result<WireAgentsRequest, ProjectError> {
     let call = Call::new(args);
     let flags = call.flags();
-    let cwd = std::env::current_dir().map_err(|error| ProjectError::Failed(error.to_string()))?;
-    let root = resolve_invocation_root(&RootRequest {
-        cwd: &cwd,
-        dir: None,
-        policy: RootPolicy::MainCheckout,
-        home: None,
-    })
-    .map_err(|refusal| CategorisedRefusal::new("validation", refusal.message))?;
     Ok(WireAgentsRequest {
-        project: root.root,
+        project: root?,
         apply: crate::wiring::doctor::truthy(flags.flag("yes")),
         json: crate::wiring::doctor::truthy(flags.flag("json")),
     })
@@ -322,7 +315,27 @@ pub fn present(data: &WireAgentsData, json: bool) -> VerbAnswer {
     }
 }
 
-/// The process environment as the list the planner reads.
+/// The home the planner reads agent config under: the `HOME` of the environment. Without one there is nothing to
+/// plan against, and the call is refused as a missing precondition.
+fn home_of(env: &[(String, String)]) -> Result<PathBuf, CategorisedRefusal> {
+    fgos_config::machine::home_dir(|key| env.iter().find(|(k, _)| k == key).map(|(_, v)| v.clone()))
+        .ok_or_else(|| {
+            CategorisedRefusal::new("precondition", fgos_config::machine::home_unset_message())
+        })
+}
+
+/// One call end to end: the home, the plan and the apply when asked, the answer the person sees.
+pub fn serve(
+    request: &WireAgentsRequest,
+    env: &[(String, String)],
+    runner: &dyn ProcessRunner,
+) -> Result<VerbAnswer, CategorisedRefusal> {
+    let home = home_of(env)?;
+    let data = run(request, env, &home, runner).map_err(CategorisedRefusal::unexpected)?;
+    Ok(present(&data, request.json))
+}
+
+/// The process environment as the list the planner reads. A variable whose name or value is not UTF-8 is left out.
 fn process_env() -> Vec<(String, String)> {
     std::env::vars_os()
         .filter_map(|(key, value)| Some((key.into_string().ok()?, value.into_string().ok()?)))
@@ -370,21 +383,18 @@ impl OperationProvider for WireAgentsProvider {
                 })?
                 .clone();
             // `claude` is started and waited for: never on the async worker.
-            let answered = tokio::task::spawn_blocking(move || {
-                let env = process_env();
-                let home = fgos_config::machine::home_dir(|key| {
-                    env.iter().find(|(k, _)| k == key).map(|(_, v)| v.clone())
-                })
-                .ok_or_else(fgos_config::machine::home_unset_message)?;
-                run(&request, &env, Path::new(&home), &BoundedRunner)
-                    .map(|data| present(&data, request.json))
+            let served = tokio::task::spawn_blocking(move || {
+                serve(&request, &process_env(), &BoundedRunner)
             })
             .await
-            .map_err(|error| ProviderError::ProviderFailed(error.to_string()))?
-            .map_err(ProviderError::ProviderFailed)?;
+            .map_err(|error| ProviderError::ProviderFailed(error.to_string()))?;
+            let answered: Box<dyn std::any::Any + Send> = match served {
+                Ok(answer) => Box::new(answer),
+                Err(refusal) => Box::new(refusal),
+            };
             Ok(ProviderOutcome::completed(
                 DESCRIPTOR.outcome_contract.clone(),
-                Box::new(answered),
+                answered,
             ))
         })
     }
@@ -717,17 +727,49 @@ mod tests {
     #[test]
     fn the_request_reads_yes_and_json_as_the_node_cli_read_them() {
         let os = |args: &[&str]| args.iter().map(OsString::from).collect::<Vec<_>>();
-        let read = |args: &[&str]| project_wire_agents_request(&os(args)).unwrap();
+        let root = PathBuf::from("/the/main/checkout");
+        let read =
+            |args: &[&str]| project_wire_agents_request(&os(args), Ok(root.clone())).unwrap();
         let plain = read(&["wire-agents"]);
         assert!(!plain.apply && !plain.json);
         assert!(read(&["wire-agents", "--yes", "--json"]).apply);
         assert!(read(&["wire-agents", "--yes", "x"]).apply);
         assert!(!read(&["wire-agents", "--yes", ""]).apply);
         assert!(!read(&["wire-agents", "--json", ""]).json);
-        // `--dir` is accepted and ignored: the project is where the call runs
+        // `--dir` is a flag the call accepts; the project is the root the doors resolved
         assert_eq!(
             read(&["wire-agents", "--dir", "/nonexistent/elsewhere"]).project,
-            plain.project
+            root
+        );
+        assert!(matches!(
+            project_wire_agents_request(&os(&["wire-agents"]), Err("no root".into())),
+            Err(ProjectError::Failed(message)) if message == "no root"
+        ));
+    }
+
+    #[test]
+    fn a_missing_home_is_refused_as_a_missing_precondition_with_exit_2() {
+        let sb = Sandbox::new("nohome");
+        let without: Vec<(String, String)> = sb
+            .env("")
+            .into_iter()
+            .filter(|(key, _)| key != "HOME")
+            .collect();
+        let refusal = serve(&sb.request(false), &without, &BoundedRunner).unwrap_err();
+        assert_eq!(refusal.category, "precondition");
+        assert_eq!(refusal.exit_code(), 2);
+        assert!(
+            refusal.message.starts_with("HOME is not set"),
+            "{}",
+            refusal.message
+        );
+        let mut blank = without;
+        blank.push(("HOME".to_string(), "  ".to_string()));
+        assert_eq!(
+            serve(&sb.request(false), &blank, &BoundedRunner)
+                .unwrap_err()
+                .category,
+            "precondition"
         );
     }
 }

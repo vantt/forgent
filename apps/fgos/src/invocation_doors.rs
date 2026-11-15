@@ -287,9 +287,14 @@ impl<'a> Doors<'a> {
         let policy = root_policy(verb);
         let store_mode = StoreMode::parse(self.route.store.as_deref().unwrap_or("none"));
         let child = declared(&self.route.event_store_child, self.call);
+        // A verb that ignores `--dir` still has the flag checked (an empty value is refused), but acts on the root
+        // of the caller's directory.
+        let root_dir = dir
+            .as_deref()
+            .filter(|named| !ignores_dir(verb) || named.trim().is_empty());
         let asked = resolve_invocation_root(&RootRequest {
             cwd: &self.cwd,
-            dir: dir.as_deref(),
+            dir: root_dir,
             policy,
             home: self.home.as_deref(),
         });
@@ -407,7 +412,7 @@ impl<'a> Doors<'a> {
 fn root_policy(verb: &str) -> RootPolicy {
     match verb {
         "init" => RootPolicy::StrictCwd,
-        "doctor" => RootPolicy::MainCheckout,
+        "doctor" | "wire-agents" => RootPolicy::MainCheckout,
         _ => RootPolicy::CallerTree,
     }
 }
@@ -415,7 +420,13 @@ fn root_policy(verb: &str) -> RootPolicy {
 /// Whether the verb acts on the root the door resolved even when no `.fgos` is there yet: `doctor` judges a
 /// project that has not been set up, and says so, instead of refusing it.
 fn acts_on_resolved_root(verb: &str) -> bool {
-    verb == "doctor"
+    matches!(verb, "doctor" | "wire-agents")
+}
+
+/// Whether the verb accepts `--dir` and never acts on it: `wire-agents` changes the person's own agent config and
+/// reads only the main checkout of where it is run.
+fn ignores_dir(verb: &str) -> bool {
+    verb == "wire-agents"
 }
 
 /// `FGOS_DISPATCH_DEPTH` as the Node CLI reads it: a non-negative finite number, else 0.
@@ -810,6 +821,40 @@ mod tests {
             "{}",
             refused.message
         );
+        assert_eq!(
+            records(&base.join("main/.fgos"))[0]["faultClass"],
+            "dir-invalid"
+        );
+        std::fs::remove_dir_all(&base).unwrap();
+    }
+
+    #[test]
+    fn wire_agents_acts_on_the_main_checkout_of_the_callers_directory_whatever_dir_names() {
+        let base = scratch();
+        repository(&base, false);
+        std::fs::create_dir_all(base.join("elsewhere")).unwrap();
+        let wire = route(serde_json::json!({"selector": "wire-agents", "store": "none"}));
+        let lifecycle = Recorder::new(true);
+        let main = std::fs::canonicalize(base.join("main")).unwrap();
+        for rest in [
+            vec![],
+            vec!["--dir", base.join("elsewhere").to_str().unwrap()],
+            vec!["--dir", "/nonexistent/fgos-project"],
+        ] {
+            let argv = args(&rest);
+            let call = Call::new(&argv);
+            let entered = doors(&wire, &call, &argv, &base.join("main"), false, &lifecycle)
+                .enter()
+                .unwrap();
+            assert_eq!(entered.project, Ok(main.clone()), "{rest:?}");
+        }
+        // the flag is still checked: an empty value is refused with the door's own class
+        let argv = args(&["--dir", ""]);
+        let call = Call::new(&argv);
+        let refused = doors(&wire, &call, &argv, &base.join("main"), false, &lifecycle)
+            .enter()
+            .unwrap_err();
+        assert!(refused.message.contains("non-empty path"));
         assert_eq!(
             records(&base.join("main/.fgos"))[0]["faultClass"],
             "dir-invalid"

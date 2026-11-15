@@ -23,12 +23,13 @@ release at `rvm-s4-base` (main `118df7065`), used read-only; entry B the host st
 
 ## Behaviour notes (accepted)
 
-- `--dir` is accepted and ignored; the project (mailbox opt-in read) is the main checkout of the caller's directory, resolved
-  through the root door with the main-checkout policy.
+- `--dir` is accepted and ignored (an empty value is still refused by the door, class `dir-invalid`); the project (mailbox opt-in
+  read) is the main checkout of the caller's directory, resolved once by the invocation doors (`root_policy` gives `wire-agents`
+  the main-checkout policy, `ignores_dir` keeps `--dir` from moving the root) and handed to the projector, as for doctor.
 - Apply steps run under a 600 s bound (Node had none; a marketplace fetch can be slow). A step that times out is a `failed[]` item.
-- A home that is unset is refused (`HOME is not set; ...`); Node fell back to the passwd entry.
-- A refusal of the root door in the projector (untrusted checkout) is a categorised `validation` refusal and is not recorded
-  in the fault log by this verb.
+- A home that is unset (or blank) is refused as a `precondition` (exit 2, `HOME is not set; ...`); Node fell back to the passwd entry.
+- Known difference: the process environment handed to `claude` leaves out a variable whose name or value is not UTF-8; Node
+  passed such variables through lossily.
 
 ## Gates
 
@@ -61,13 +62,13 @@ release at `rvm-s4-base` (main `118df7065`), used read-only; entry B the host st
 
 ## Proposed `## [Unreleased]` line
 
-`fgos wire-agents` runs in the native host with no Node process; same plan, same backups, same output. A `claude` step now stops after 10 minutes.
+`fgos wire-agents` runs in the native host with no Node process; same plan, same backups, same output. A `claude` step now stops after 10 minutes, and a missing HOME is refused with exit 2 instead of falling back to the passwd entry.
 
 ## Flags for review
 
 - New `pub` item in fgos-distribution: `agent_config::run_claude_step` (not an OPC-reviewed crate; no new `pub` in fgos-git or fgos-process).
 - `agent_config.rs` (phase 01's file) and `wiring/doctor/mod.rs` (phase 03's) each got one small additive edit, named above.
-- `invocation_doors.rs` untouched: wire-agents uses the default caller-tree door; the verb resolves its own main-checkout project.
+- `invocation_doors.rs`: `wire-agents` joins `root_policy` (main checkout) and `acts_on_resolved_root`, plus `ignores_dir`; one test.
 - Shared hot lines (catalog count 33, `main.rs`, projector, annotations, census) are additive; phases 09, 10, 11 will bump the catalog count again.
 
 Status: DONE
