@@ -695,44 +695,6 @@ pub fn read_project_config(root: &Path) -> Result<Option<Value>, String> {
     }
 }
 
-/// The host binary of the release this project has activated; never a checkout script, a project-local
-/// install or whatever `fgos` the PATH holds.
-pub fn activated_host_bin(project_root: &Path) -> Option<PathBuf> {
-    let text = std::fs::read_to_string(
-        project_root
-            .join(".fgos")
-            .join("installation")
-            .join("activation.json"),
-    )
-    .ok()?;
-    let activation: Value = serde_json::from_str(&text).ok()?;
-    if activation.get("status")?.as_str()? != "ready" {
-        return None;
-    }
-    let release = activation
-        .get("releasePath")?
-        .as_str()
-        .filter(|p| !p.is_empty())?;
-    let base = absolute(Path::new(release));
-    let real_base = std::fs::canonicalize(&base).ok()?;
-    ["fgos", "fgos.exe"]
-        .iter()
-        .map(|name| base.join("bin").join(name))
-        .find(|candidate| {
-            is_executable_file(candidate)
-                && std::fs::canonicalize(candidate)
-                    .map(|real| real.starts_with(&real_base))
-                    .unwrap_or(false)
-        })
-}
-
-fn is_executable_file(path: &Path) -> bool {
-    match std::fs::metadata(path) {
-        Ok(meta) if meta.is_file() => has_execute_bit(&meta),
-        _ => false,
-    }
-}
-
 #[cfg(unix)]
 fn has_execute_bit(meta: &std::fs::Metadata) -> bool {
     use std::os::unix::fs::PermissionsExt;
@@ -758,7 +720,7 @@ impl TimerEnv<'static> {
         Some(TimerEnv {
             host: Host::system(|key| std::env::var(key).ok())?,
             config: &read_project_config,
-            host_bin: &activated_host_bin,
+            host_bin: &crate::activated_host_bin,
             run: &run_scheduler_call,
         })
     }
@@ -781,10 +743,10 @@ enum Plan {
 }
 
 /// What to do for one schedule: `found` is what the config asks (`None` removes an owned timer).
-fn plan(schedule: Schedule, cwd: &Path, found: Option<Found>, env: &TimerEnv) -> Plan {
+fn plan(schedule: Schedule, project_root: &Path, found: Option<Found>, env: &TimerEnv) -> Plan {
     let chosen = env.host.scheduler();
     let Some(found) = found else {
-        let stem = unit_stem(cwd, schedule);
+        let stem = unit_stem(project_root, schedule);
         let owned = chosen
             .as_ref()
             .map(|c| c.owned_units(&stem, schedule))
@@ -806,7 +768,7 @@ fn plan(schedule: Schedule, cwd: &Path, found: Option<Found>, env: &TimerEnv) ->
         ));
     };
     // The project's installation shim outlives an upgrade; a release path would not.
-    let shim = cwd
+    let shim = project_root
         .join(".fgos")
         .join("installation")
         .join("bin")
@@ -814,15 +776,15 @@ fn plan(schedule: Schedule, cwd: &Path, found: Option<Found>, env: &TimerEnv) ->
     let bin = if is_executable_path(&shim) {
         Some(shim)
     } else {
-        (env.host_bin)(cwd)
+        (env.host_bin)(project_root)
     };
     let Some(bin) = bin else {
         return Plan::Skip(
             "no activated fgos host resolves here, so the timer cannot name one".to_string(),
         );
     };
-    let stem = unit_stem(cwd, schedule);
-    let words = schedule.command(&found, cwd);
+    let stem = unit_stem(project_root, schedule);
+    let words = schedule.command(&found, project_root);
     let vars = schedule.service_vars(&env.host);
     let spec = UnitSpec {
         stem: &stem,
@@ -843,8 +805,12 @@ fn plan(schedule: Schedule, cwd: &Path, found: Option<Found>, env: &TimerEnv) ->
     }
 }
 
-fn found_of(schedule: Schedule, cwd: &Path, env: &TimerEnv) -> Result<Option<Found>, String> {
-    Ok(schedule.schedule_of((env.config)(cwd)?.as_ref()))
+fn found_of(
+    schedule: Schedule,
+    project_root: &Path,
+    env: &TimerEnv,
+) -> Result<Option<Found>, String> {
+    Ok(schedule.schedule_of((env.config)(project_root)?.as_ref()))
 }
 
 fn state_of(
@@ -869,20 +835,25 @@ fn state_of(
 /// Doctor's reading of one schedule's timer for this project. An `Err` is a failed config door.
 pub fn check_managed_timer(
     schedule: Schedule,
-    cwd: &Path,
+    project_root: &Path,
     env: &TimerEnv,
 ) -> Result<Check, String> {
-    check_with(schedule, cwd, found_of(schedule, cwd, env)?, env)
+    check_with(
+        schedule,
+        project_root,
+        found_of(schedule, project_root, env)?,
+        env,
+    )
 }
 
 /// [`check_managed_timer`] with the config reading replaced by `found`.
 pub fn check_with(
     schedule: Schedule,
-    cwd: &Path,
+    project_root: &Path,
     found: Option<Found>,
     env: &TimerEnv,
 ) -> Result<Check, String> {
-    Ok(match plan(schedule, cwd, found, env) {
+    Ok(match plan(schedule, project_root, found, env) {
         Plan::Orphan { chosen, stem, .. } => Check {
             passed: false,
             message: format!(
@@ -926,19 +897,33 @@ pub fn check_with(
 }
 
 /// Writes the unit files and enables them; leaves any other unit as it was. An `Err` is a failed config door.
-pub fn fix_managed_timer(schedule: Schedule, cwd: &Path, env: &TimerEnv) -> Result<Fix, String> {
-    Ok(fix_with(schedule, cwd, found_of(schedule, cwd, env)?, env))
+pub fn fix_managed_timer(
+    schedule: Schedule,
+    project_root: &Path,
+    env: &TimerEnv,
+) -> Result<Fix, String> {
+    Ok(fix_with(
+        schedule,
+        project_root,
+        found_of(schedule, project_root, env)?,
+        env,
+    ))
 }
 
 /// Removes this project's timer of `schedule` when it carries the marker, whatever the config says
 /// (`uninstall` and a project that turned the schedule off).
-pub fn remove_managed_timer(schedule: Schedule, cwd: &Path, env: &TimerEnv) -> Fix {
-    fix_with(schedule, cwd, None, env)
+pub fn remove_managed_timer(schedule: Schedule, project_root: &Path, env: &TimerEnv) -> Fix {
+    fix_with(schedule, project_root, None, env)
 }
 
 /// [`fix_managed_timer`] with the config reading replaced by `found`.
-pub fn fix_with(schedule: Schedule, cwd: &Path, found: Option<Found>, env: &TimerEnv) -> Fix {
-    match plan(schedule, cwd, found, env) {
+pub fn fix_with(
+    schedule: Schedule,
+    project_root: &Path,
+    found: Option<Found>,
+    env: &TimerEnv,
+) -> Fix {
+    match plan(schedule, project_root, found, env) {
         Plan::Orphan {
             chosen,
             stem,
@@ -1263,10 +1248,14 @@ mod tests {
     ) {
         for schedule in Schedule::ALL {
             let w = World::new();
-            let cwd = Path::new("/p");
+            let project_root = Path::new("/p");
             with_bin(&w, |env| {
-                assert!(check_with(schedule, cwd, None, env).unwrap().passed);
-                assert!(!fix_with(schedule, cwd, None, env).fixed);
+                assert!(
+                    check_with(schedule, project_root, None, env)
+                        .unwrap()
+                        .passed
+                );
+                assert!(!fix_with(schedule, project_root, None, env).fixed);
             });
             let none = World::new();
             let run = |_: &str, _: &[String]| Ok(());
@@ -1277,7 +1266,7 @@ mod tests {
                 host_bin: &bin,
                 run: &run,
             };
-            let check = check_with(schedule, cwd, on(schedule), &env).unwrap();
+            let check = check_with(schedule, project_root, on(schedule), &env).unwrap();
             assert!(check.passed);
             assert!(
                 check
@@ -1294,22 +1283,26 @@ mod tests {
     ) {
         for schedule in Schedule::ALL {
             let w = World::new();
-            let cwd = Path::new("/p");
-            let stem = unit_stem(cwd, schedule);
+            let project_root = Path::new("/p");
+            let stem = unit_stem(project_root, schedule);
             with_bin(&w, |env| {
-                let before = check_with(schedule, cwd, on(schedule), env).unwrap();
+                let before = check_with(schedule, project_root, on(schedule), env).unwrap();
                 assert!(!before.passed);
                 assert!(before.message.contains("(missing)"), "{}", before.message);
                 assert!(before.message.contains("fgos doctor --fix writes it under"));
-                let fixed = fix_with(schedule, cwd, on(schedule), env);
+                let fixed = fix_with(schedule, project_root, on(schedule), env);
                 assert!(fixed.fixed, "{}", fixed.message);
                 assert!(fixed
                     .message
                     .starts_with(&format!("enabled systemd timer {stem} (every 300 s)")));
-                assert!(check_with(schedule, cwd, on(schedule), env).unwrap().passed);
+                assert!(
+                    check_with(schedule, project_root, on(schedule), env)
+                        .unwrap()
+                        .passed
+                );
                 let mut other = on(schedule).unwrap();
                 other.interval_sec = 60;
-                let changed = check_with(schedule, cwd, Some(other), env).unwrap();
+                let changed = check_with(schedule, project_root, Some(other), env).unwrap();
                 assert!(!changed.passed);
                 assert!(changed.message.contains("(stale)"));
             });
@@ -1350,9 +1343,9 @@ mod tests {
     fn a_timer_that_is_disabled_by_the_scheduler_reads_as_disabled() {
         let w = World::new();
         let schedule = Schedule::AccountProbe;
-        let cwd = Path::new("/p");
+        let project_root = Path::new("/p");
         with_bin(&w, |env| {
-            assert!(fix_with(schedule, cwd, on(schedule), env).fixed);
+            assert!(fix_with(schedule, project_root, on(schedule), env).fixed);
         });
         let run = |_: &str, _: &[String]| Err("inactive".to_string());
         let bin = |_: &Path| Some(PathBuf::from(BIN));
@@ -1362,7 +1355,7 @@ mod tests {
             host_bin: &bin,
             run: &run,
         };
-        let check = check_with(schedule, cwd, on(schedule), &env).unwrap();
+        let check = check_with(schedule, project_root, on(schedule), &env).unwrap();
         assert!(!check.passed);
         assert!(check.message.contains("(disabled)"));
     }
@@ -1420,66 +1413,32 @@ mod tests {
     }
 
     #[test]
-    fn the_activation_record_names_the_host_only_when_ready_and_inside_the_release() {
-        let project = scratch("act");
-        assert_eq!(activated_host_bin(&project), None);
-        let release = project.join("release");
-        std::fs::create_dir_all(release.join("bin")).unwrap();
-        let bin = release.join("bin").join("fgos");
-        std::fs::write(&bin, "#!/bin/sh\n").unwrap();
-        #[cfg(unix)]
-        {
-            use std::os::unix::fs::PermissionsExt;
-            std::fs::set_permissions(&bin, std::fs::Permissions::from_mode(0o755)).unwrap();
-        }
-        let record = project.join(".fgos").join("installation");
-        std::fs::create_dir_all(&record).unwrap();
-        let write = |value: Value| {
-            std::fs::write(record.join("activation.json"), value.to_string()).unwrap()
-        };
-        write(json!({"status": "pending", "releasePath": release}));
-        assert_eq!(activated_host_bin(&project), None);
-        write(json!({"status": "ready", "releasePath": release}));
-        assert_eq!(activated_host_bin(&project), Some(bin.clone()));
-        #[cfg(unix)]
-        {
-            // A binary that is a link leading outside the release is refused.
-            let outside_dir = scratch("outside");
-            let outside = outside_dir.join("fgos");
-            std::fs::write(&outside, "#!/bin/sh\n").unwrap();
-            {
-                use std::os::unix::fs::PermissionsExt;
-                std::fs::set_permissions(&outside, std::fs::Permissions::from_mode(0o755)).unwrap();
-            }
-            std::fs::remove_file(&bin).unwrap();
-            std::os::unix::fs::symlink(&outside, &bin).unwrap();
-            assert_eq!(activated_host_bin(&project), None);
-        }
-    }
-
-    #[test]
     fn turning_a_schedule_off_names_the_leftover_and_the_fix_removes_only_marked_units() {
         for schedule in Schedule::ALL {
             let w = World::new();
-            let cwd = Path::new("/p");
-            let stem = unit_stem(cwd, schedule);
+            let project_root = Path::new("/p");
+            let stem = unit_stem(project_root, schedule);
             let units = w.units();
             with_bin(&w, |env| {
-                assert!(fix_with(schedule, cwd, on(schedule), env).fixed)
+                assert!(fix_with(schedule, project_root, on(schedule), env).fixed)
             });
             let foreign = units.join("someone-elses.timer");
             std::fs::write(&foreign, "[Timer]\n").unwrap();
             with_bin(&w, |env| {
-                let found = check_with(schedule, cwd, None, env).unwrap();
+                let found = check_with(schedule, project_root, None, env).unwrap();
                 assert!(!found.passed);
                 assert!(
                     found.message.contains("still installed"),
                     "{}",
                     found.message
                 );
-                let removed = fix_with(schedule, cwd, None, env);
+                let removed = fix_with(schedule, project_root, None, env);
                 assert!(removed.fixed, "{}", removed.message);
-                assert!(check_with(schedule, cwd, None, env).unwrap().passed);
+                assert!(
+                    check_with(schedule, project_root, None, env)
+                        .unwrap()
+                        .passed
+                );
             });
             assert!(w
                 .calls()
@@ -1497,13 +1456,13 @@ mod tests {
     fn a_unit_without_the_marker_is_never_removed_even_under_this_projects_name() {
         for schedule in Schedule::ALL {
             let w = World::new();
-            let cwd = Path::new("/p");
+            let project_root = Path::new("/p");
             std::fs::create_dir_all(w.units()).unwrap();
             let unmarked = w
                 .units()
-                .join(format!("{}.timer", unit_stem(cwd, schedule)));
+                .join(format!("{}.timer", unit_stem(project_root, schedule)));
             std::fs::write(&unmarked, "[Timer]\nOnBootSec=1\n").unwrap();
-            let fix = with_bin(&w, |env| fix_with(schedule, cwd, None, env));
+            let fix = with_bin(&w, |env| fix_with(schedule, project_root, None, env));
             assert!(!fix.fixed);
             assert!(unmarked.exists());
         }
@@ -1512,10 +1471,18 @@ mod tests {
     #[test]
     fn one_schedule_never_removes_the_units_of_the_other_for_the_same_project() {
         let w = World::new();
-        let cwd = Path::new("/p");
+        let project_root = Path::new("/p");
         with_bin(&w, |env| {
-            assert!(fix_with(Schedule::MailboxSync, cwd, on(Schedule::MailboxSync), env).fixed);
-            assert!(!fix_with(Schedule::AccountProbe, cwd, None, env).fixed);
+            assert!(
+                fix_with(
+                    Schedule::MailboxSync,
+                    project_root,
+                    on(Schedule::MailboxSync),
+                    env
+                )
+                .fixed
+            );
+            assert!(!fix_with(Schedule::AccountProbe, project_root, None, env).fixed);
         });
         assert_eq!(std::fs::read_dir(w.units()).unwrap().count(), 2);
     }
@@ -1559,11 +1526,11 @@ mod tests {
             host_bin: &bin,
             run: &run,
         };
-        let cwd = Path::new("/p");
-        let stem = unit_stem(cwd, Schedule::AccountProbe);
+        let project_root = Path::new("/p");
+        let stem = unit_stem(project_root, Schedule::AccountProbe);
         let fix = fix_with(
             Schedule::AccountProbe,
-            cwd,
+            project_root,
             on(Schedule::AccountProbe),
             &env,
         );

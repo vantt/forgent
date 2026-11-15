@@ -49,3 +49,14 @@ Any test running `fgctl init` or `uninstall` end to end (series gate), `test/e2e
 - Owned-name reader does not re-check portable names or duplicates (the render enforces both before it writes); uninstall only needs the set.
 - `activated_host_bin` in `timer.rs` is a Rust reader of the activation record next to the existing allowed readers; phases 07 and 10 need the same lookup and should move it to a shared home when they land.
 - No parity-runner cases: this phase flips no verb.
+
+## Review round (OPC changes)
+
+- `run_bounded` now leads its own group (process group on Unix, kill-on-close Job Object on Windows), kills the group on timeout and after a normal exit while the child is not yet reaped (waitid with no reap), kills and reaps on an observation error, and collects the pipes with a one-second grace into a buffer (partial output kept). Two tests: a grandchild that outlives the timeout, a grandchild that holds the pipe after the child exits. The Windows part is compile-checked only (msvc).
+- `resolve_program`: Windows tries `PATHEXT` entries only (default `.EXE;.CMD;.BAT`), never the bare name. `windows_spawn.rs` calls it with `.EXE` for an extension-less name; its extension-bearing search stays (declared as debt in the row).
+- The bounded-child row now also matches PATH splits and `try_wait` polls outside `spawn.rs`; 18 existing own-child polls and PATH searches are declared as debt with reasons; the reason names what a pattern cannot catch (an inline spawn with a deadline loop that polls by other means).
+- Seeded negative cases are committed as `outsideDoor` cases for every pattern of the five new rows (`test/architecture.test.mjs`).
+- `activated_host_bin` moved next to the identity reader in `lib.rs` and shares one `ready_activation` read with it; its test moved with it.
+- Table row renamed: `workspace_root_of` passes `home: None`; the row proves "not a repository", not a home exclusion.
+- Timer API parameter `cwd` renamed `project_root`; both scratch helpers use `create_dir` with a retry on `AlreadyExists` and no pre-delete.
+- Not done, filed by the step lead: `$` expansion inside systemd `ExecStart=` and `Environment=` (the Node module has the same gap).

@@ -221,6 +221,55 @@ pub fn resolve_cli_version_info() -> BuildShowOutcome {
     }
 }
 
+/// The activation record of the project at `workspace_root` when it is there, parses and is `ready`.
+pub(crate) fn ready_activation(workspace_root: &std::path::Path) -> Option<serde_json::Value> {
+    let text = std::fs::read_to_string(
+        workspace_root
+            .join(".fgos")
+            .join("installation")
+            .join("activation.json"),
+    )
+    .ok()?;
+    let activation: serde_json::Value = serde_json::from_str(&text).ok()?;
+    (activation["status"].as_str() == Some("ready")).then_some(activation)
+}
+
+/// The host binary of the release the project at `workspace_root` has activated: `<releasePath>/bin/fgos`
+/// (or `fgos.exe`), an executable file that really sits inside the release. Never a checkout script, a
+/// project-local install or whatever `fgos` the PATH holds.
+pub fn activated_host_bin(workspace_root: &std::path::Path) -> Option<PathBuf> {
+    let activation = ready_activation(workspace_root)?;
+    let release = activation["releasePath"]
+        .as_str()
+        .filter(|p| !p.is_empty())?;
+    let base = std::path::absolute(release).ok()?;
+    let real_base = std::fs::canonicalize(&base).ok()?;
+    ["fgos", "fgos.exe"]
+        .iter()
+        .map(|name| base.join("bin").join(name))
+        .find(|candidate| {
+            is_executable_file(candidate)
+                && std::fs::canonicalize(candidate)
+                    .map(|real| real.starts_with(&real_base))
+                    .unwrap_or(false)
+        })
+}
+
+fn is_executable_file(path: &std::path::Path) -> bool {
+    let Ok(meta) = std::fs::metadata(path) else {
+        return false;
+    };
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::PermissionsExt;
+        meta.is_file() && meta.permissions().mode() & 0o111 != 0
+    }
+    #[cfg(not(unix))]
+    {
+        meta.is_file()
+    }
+}
+
 /// Resolves the runtime identity info from .fgos/installation/activation.json (R10).
 pub fn resolve_runtime_identity_info() -> RuntimeIdentityInfo {
     let cwd = match std::env::current_dir() {
@@ -234,24 +283,9 @@ pub fn resolve_runtime_identity_info() -> RuntimeIdentityInfo {
     };
 
     let installation_dir = workspace_root.join(".fgos").join("installation");
-    let activation_path = installation_dir.join("activation.json");
-    if !activation_path.exists() {
+    let Some(activation) = ready_activation(&workspace_root) else {
         return RuntimeIdentityInfo::dev_source();
-    }
-
-    let activation_str = match std::fs::read_to_string(&activation_path) {
-        Ok(s) => s,
-        Err(_) => return RuntimeIdentityInfo::dev_source(),
     };
-
-    let activation: serde_json::Value = match serde_json::from_str(&activation_str) {
-        Ok(v) => v,
-        Err(_) => return RuntimeIdentityInfo::dev_source(),
-    };
-
-    if activation["status"].as_str() != Some("ready") {
-        return RuntimeIdentityInfo::dev_source();
-    }
 
     let root_json_path = installation_dir.join("root.json");
     let root_json: Option<serde_json::Value> = std::fs::read_to_string(&root_json_path)
@@ -379,6 +413,7 @@ impl OperationProvider for BuildShowProvider {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::test_scratch::scratch;
     use fgos_host_runtime::invocation_service::NoopEventSink;
     use fgos_host_runtime::CATALOG;
 
@@ -492,5 +527,43 @@ mod tests {
         };
         let compact = serde_json::to_string(&outcome).unwrap();
         assert_eq!(compact, vector["compact_hash_input"].as_str().unwrap());
+    }
+
+    #[test]
+    fn the_activation_record_names_the_host_only_when_ready_and_inside_the_release() {
+        let project = scratch("act");
+        assert_eq!(activated_host_bin(&project), None);
+        let release = project.join("release");
+        std::fs::create_dir_all(release.join("bin")).unwrap();
+        let bin = release.join("bin").join("fgos");
+        std::fs::write(&bin, "#!/bin/sh\n").unwrap();
+        #[cfg(unix)]
+        {
+            use std::os::unix::fs::PermissionsExt;
+            std::fs::set_permissions(&bin, std::fs::Permissions::from_mode(0o755)).unwrap();
+        }
+        let record = project.join(".fgos").join("installation");
+        std::fs::create_dir_all(&record).unwrap();
+        let write = |value: serde_json::Value| {
+            std::fs::write(record.join("activation.json"), value.to_string()).unwrap()
+        };
+        write(serde_json::json!({"status": "pending", "releasePath": release}));
+        assert_eq!(activated_host_bin(&project), None);
+        write(serde_json::json!({"status": "ready", "releasePath": release}));
+        assert_eq!(activated_host_bin(&project), Some(bin.clone()));
+        #[cfg(unix)]
+        {
+            // A binary that is a link leading outside the release is refused.
+            let outside_dir = scratch("outside");
+            let outside = outside_dir.join("fgos");
+            std::fs::write(&outside, "#!/bin/sh\n").unwrap();
+            {
+                use std::os::unix::fs::PermissionsExt;
+                std::fs::set_permissions(&outside, std::fs::Permissions::from_mode(0o755)).unwrap();
+            }
+            std::fs::remove_file(&bin).unwrap();
+            std::os::unix::fs::symlink(&outside, &bin).unwrap();
+            assert_eq!(activated_host_bin(&project), None);
+        }
     }
 }

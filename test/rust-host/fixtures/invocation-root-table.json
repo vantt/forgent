@@ -37,7 +37,7 @@
     { "name": "main-checkout-only: the main root as --dir", "cwd": "home/proj/docs", "policy": "main-checkout-only", "dir": "home/proj", "dirIsRelativeToBase": true, "root": "home/proj", "found": true },
     { "name": "main-checkout-only: from a linked worktree the main root", "cwd": "home/wt", "policy": "main-checkout-only", "root": "home/proj", "found": true },
     { "name": "main-checkout-only: from a subdirectory of the main checkout the main root", "cwd": "home/proj/docs", "policy": "main-checkout-only", "root": "home/proj", "found": true },
-    { "name": "main-checkout-only: the home directory, which holds no repository, is refused", "cwd": "home", "policy": "main-checkout-only", "refusal": "it is not inside a Git repository" },
+    { "name": "main-checkout-only: a directory that holds no repository is refused, home or not (this policy takes no home exclusion)", "cwd": "home", "policy": "main-checkout-only", "refusal": "it is not inside a Git repository" },
     { "name": "main-checkout-only: a plain directory below home is refused", "cwd": "home/plain", "policy": "main-checkout-only", "refusal": "it is not inside a Git repository" },
     { "name": "main-checkout-only: a nested repository answers with its own main checkout, never the project above", "cwd": "home/proj/vendor/inner", "policy": "main-checkout-only", "root": "home/proj/vendor/inner", "found": false },
     { "name": "main-checkout-only: another repository as --dir is refused", "cwd": "home/proj", "policy": "main-checkout-only", "dir": "home/proj/vendor/inner", "dirIsRelativeToBase": true, "refusal": "is not the main checkout of the repository at" },

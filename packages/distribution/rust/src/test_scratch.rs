@@ -26,14 +26,20 @@ impl Drop for Scratch {
     }
 }
 
-/// A fresh, empty directory unique to this process and call.
+/// A fresh, empty directory unique to this process and call: `create_dir` fails on an existing name, and
+/// the next counter value is tried.
 pub(crate) fn scratch(label: &str) -> Scratch {
     static NEXT: AtomicU32 = AtomicU32::new(0);
-    let dir = std::env::temp_dir().join(format!(
-        "fgos-{label}-{}-{}",
-        std::process::id(),
-        NEXT.fetch_add(1, Ordering::Relaxed)
-    ));
-    std::fs::create_dir_all(&dir).expect("scratch directory");
-    Scratch(dir)
+    loop {
+        let dir = std::env::temp_dir().join(format!(
+            "fgos-{label}-{}-{}",
+            std::process::id(),
+            NEXT.fetch_add(1, Ordering::Relaxed)
+        ));
+        match std::fs::create_dir(&dir) {
+            Ok(()) => return Scratch(dir),
+            Err(e) if e.kind() == std::io::ErrorKind::AlreadyExists => continue,
+            Err(e) => panic!("scratch directory {}: {e}", dir.display()),
+        }
+    }
 }
