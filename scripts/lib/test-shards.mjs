@@ -96,12 +96,14 @@ export function junitUnattributable(xml) {
  * junit named, `manifest` the files the shard was given. A manifest file the junit never named is accepted only
  * as a file whose cases report under a URL source, and never more of them than that shard has distinct URL
  * sources; any other gap fails by name. Each such acceptance is pushed to `accepted` as `{ index, total, file, schemes }`.
+ * A test file may import another test file, so a shard's junit can also name a discovered file its manifest does not
+ * give it: that is pushed to `imported` as `{ index, total, file }` and never counts as the file running in that shard.
  * When a shard reported nothing, `owned(index, total)` names the files that shard was to run, so their
  * "ran in no shard" lines collapse into the one `shard k/n reported no result` line; every other file keeps its line.
  * A file with no test() call still reports one case under its own name, and so does a file that throws on import
  * or has only skipped tests, so every discovered file is expected to appear.
  */
-export function checkShardSet(discovered, shards, { accepted = [], owned = () => [] } = {}) {
+export function checkShardSet(discovered, shards, { accepted = [], imported = [], owned = () => [] } = {}) {
   const problems = [];
   const totals = [...new Set(shards.map((s) => s.total))].sort((a, b) => a - b);
   if (totals.length === 0) return ['no shard result reported'];
@@ -121,12 +123,14 @@ export function checkShardSet(discovered, shards, { accepted = [], owned = () =>
   }
   const owners = new Map();
   const own = (file, s) => owners.set(file, [...(owners.get(file) ?? []), `${s.index}/${s.total}`]);
+  const wanted = new Set(discovered);
   for (const s of shards) {
-    for (const file of s.files) own(file, s);
-    if (!s.manifest) continue;
-    for (const file of [...s.files].sort()) {
-      if (!s.manifest.has(file)) problems.push(`${file} ran in shard ${s.index}/${s.total} but is not in its manifest`);
+    for (const file of s.files) {
+      if (!s.manifest || s.manifest.has(file)) own(file, s);
+      else if (wanted.has(file)) imported.push({ index: s.index, total: s.total, file });
+      else problems.push(`${file} ran in shard ${s.index}/${s.total} but is not in its manifest`);
     }
+    if (!s.manifest) continue;
     const missing = [...s.manifest].filter((file) => !s.files.has(file)).sort();
     const sources = s.unattributable?.size ?? 0;
     if (missing.length > 0 && missing.length <= sources) {
@@ -139,7 +143,6 @@ export function checkShardSet(discovered, shards, { accepted = [], owned = () =>
       problems.push(`shard ${s.index}/${s.total} did not report ${missing.join(', ')} and has ${sources} non-path source(s) to account for ${missing.length} file(s)`);
     }
   }
-  const wanted = new Set(discovered);
   for (const file of [...wanted].sort()) {
     const where = owners.get(file);
     if (!where) {
