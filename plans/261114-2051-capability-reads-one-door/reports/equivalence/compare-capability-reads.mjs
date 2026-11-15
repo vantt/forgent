@@ -37,7 +37,7 @@ const ALLOWLIST = Object.freeze([
   },
   {
     delta: 'non-object-entry',
-    claims: ({ input, question }) => input === 'm-entries' && ['registeredCapability', 'proposalRefusals', 'operationCapability'].includes(question),
+    claims: ({ input, question }) => input === 'm-entries' && ['registeredCapability', 'proposalRefusals', 'operationCapability', 'validateShape', 'dispatchPlan'].includes(question),
   },
   {
     delta: 'string-aliases',
