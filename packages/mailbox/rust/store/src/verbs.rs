@@ -475,15 +475,10 @@ fn signals(state: &fgos_mailbox_core::MailboxState, now: Timestamp) -> serde_jso
 /// passed since, so `status` stays a read; a watch on a message to another
 /// machine is overdue only when its own sweep said so.
 fn ack_signal(state: &fgos_mailbox_core::MailboxState, now: Timestamp) -> serde_json::Value {
-    use fgos_mailbox_core::AckStage;
     let (mut awaiting, mut acked) = (0u64, 0u64);
     let mut overdue_ids = Vec::new();
     for watch in state.ack_watches() {
-        let late = match watch.stage {
-            AckStage::Overdue => true,
-            AckStage::NotOffered => watch.offered_at.is_none() || now > watch.due,
-            AckStage::Waiting => watch.to_machine.is_none() && now > watch.due,
-        };
+        let late = watch.late(now);
         if watch.acked {
             acked += 1;
         } else if late {

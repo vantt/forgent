@@ -235,22 +235,6 @@ fn ack_deadline(requested: Option<u64>, limits: &fgos_mailbox_core::Limits) -> R
     ))
 }
 
-/// The refusal of `--need-ack` toward a recipient of another machine, from
-/// whether `to` names one; `None` for a local recipient. When that could not
-/// be told the refusal says so instead of claiming it is remote.
-fn need_ack_remote_refusal(names_remote: Result<bool, String>, to: &str) -> Option<String> {
-    match names_remote {
-        Ok(false) => None,
-        Ok(true) => Some(
-            "not recorded: --need-ack is not across machines yet; that name is a session of another machine. Send it without --need-ack."
-                .to_string(),
-        ),
-        Err(why) => Some(format!(
-            "not recorded: could not tell whether {to} is on another machine ({why}); send without --need-ack or retry."
-        )),
-    }
-}
-
 fn usage_answer(cause: &str) -> MailboxAnswer {
     MailboxAnswer {
         text: String::new(),
@@ -717,14 +701,6 @@ pub fn answer(request: &MailboxRequest) -> MailboxAnswer {
                                 wait,
                                 now: now(),
                             };
-                            if need_ack.is_some() {
-                                if let Some(text) = need_ack_remote_refusal(
-                                    mailbox_remote::names_remote_head(&ctx, &from, to),
-                                    to,
-                                ) {
-                                    return remote_answer(false, text, *json, warning);
-                                }
-                            }
                             match mailbox_remote::send(
                                 &ctx,
                                 &from,
@@ -732,6 +708,7 @@ pub fn answer(request: &MailboxRequest) -> MailboxAnswer {
                                 body,
                                 reply_to.as_deref(),
                                 *wake,
+                                need_ack,
                             ) {
                                 mailbox_remote::Outcome::NotRemote => {}
                                 mailbox_remote::Outcome::Recorded(text) => {
@@ -903,24 +880,5 @@ impl OperationProvider for MailboxProvider {
                 Box::new(answer(request)),
             ))
         })
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::need_ack_remote_refusal;
-
-    #[test]
-    fn a_need_ack_refusal_names_another_machine_only_when_it_is_known() {
-        assert_eq!(need_ack_remote_refusal(Ok(false), "x"), None);
-        let known = need_ack_remote_refusal(Ok(true), "x").unwrap();
-        assert!(known.contains("not across machines yet"), "{known}");
-        let unknown = need_ack_remote_refusal(Err("log-unreadable: boom".into()), "x").unwrap();
-        assert!(
-            unknown
-                .contains("could not tell whether x is on another machine (log-unreadable: boom)")
-                && !unknown.contains("session of another machine"),
-            "{unknown}"
-        );
     }
 }

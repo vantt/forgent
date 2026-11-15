@@ -26,8 +26,8 @@ use fgos_identity::{project, signing, Refusal, Signature};
 use fgos_mailbox::record::{Paths, Record, Reported, Wait};
 use fgos_mailbox::verbs;
 use fgos_mailbox_core::{
-    record_error_text, refusal_text, Limits, MessageId, Refusal as MailRefusal, RemoteSend,
-    Timestamp, WriterKey,
+    record_error_text, refusal_text, Limits, MessageId, Refusal as MailRefusal, RemoteAck,
+    RemoteOffer, RemoteRefusedAck, RemoteSend, Timestamp, WriterKey,
 };
 use serde_json::{json, Value};
 use std::path::Path;
@@ -136,6 +136,8 @@ struct Outgoing<'a> {
     body: &'a str,
     reply_to: Option<&'a str>,
     wake: bool,
+    /// The seconds the sender gives the recipient to reply, signed with the rest.
+    ack_within: Option<u64>,
     /// The body is kept in this machine's mail-body ref and the event carries only its hash and
     /// length.
     body_ref: bool,
@@ -175,6 +177,10 @@ fn sent_payload(
     }
     if wake {
         payload["wake"] = Value::Bool(true);
+    }
+    // The request rides whichever version the message is, under that version's domain.
+    if let Some(secs) = msg.ack_within {
+        payload["ackWithinSec"] = Value::from(secs);
     }
     sign_payload(root, domain, payload)
 }
@@ -218,6 +224,8 @@ pub struct SentRow {
     pub sent_secs: u64,
     pub preview: String,
     pub answer: Answer,
+    /// The seconds the send gave its recipient to reply, when it asked for a reply.
+    pub ack_within_sec: Option<u64>,
 }
 
 /// The receiving machine's signed settlement of a send, with the time it signed it.
@@ -265,7 +273,11 @@ impl SentSummary {
                         json!({ "state": "refused", "reason": reason, "at": at })
                     }
                 };
-                json!({ "id": row.id, "to": row.to, "sentSecs": row.sent_secs, "preview": row.preview, "answer": answer })
+                let mut json = json!({ "id": row.id, "to": row.to, "sentSecs": row.sent_secs, "preview": row.preview, "answer": answer });
+                if let Some(secs) = row.ack_within_sec {
+                    json["ackWithinSec"] = Value::from(secs);
+                }
+                json
             })
             .collect()
     }
@@ -286,8 +298,11 @@ impl SentSummary {
                     }
                 };
                 let to = row.to.rsplit('/').next().unwrap_or(&row.to);
+                let ack = row.ack_within_sec.map_or_else(String::new, |secs| {
+                    format!(" [reply wanted within {}]", ago(secs))
+                });
                 format!(
-                    "  sent {} ago to {} \"{}\": {answer}",
+                    "  sent {} ago to {} \"{}\"{ack}: {answer}",
                     ago(age),
                     printable(&to.chars().take(8).collect::<String>()),
                     printable(&row.preview)
@@ -311,6 +326,107 @@ pub(super) fn ago(secs: u64) -> String {
         120..=7199 => format!("{} min", secs / 60),
         _ => format!("{} h", secs / 3600),
     }
+}
+
+/// What a receiving machine signed about one message this machine sent.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct VerifiedSettlement {
+    pub id: String,
+    /// The machine that signed it, which is the one the message went to.
+    pub machine: String,
+    /// `offered` or `refused`.
+    pub outcome: String,
+    pub reason: Option<String>,
+    /// When the receiving machine signed it, in seconds.
+    pub at: u64,
+}
+
+/// The settlement `payload` carries, when `wanted(id, machine)` names a message and the machine
+/// it went to and the signature verifies under the settled domain as that machine's own. The
+/// signature is checked last, only for a settlement somebody asked about.
+fn verified_settlement(
+    root: &Path,
+    payload: &Value,
+    wanted: impl Fn(&str, &str) -> bool,
+) -> Option<VerifiedSettlement> {
+    let (id, by, outcome) = (
+        payload["id"].as_str()?,
+        payload["machine"].as_str()?,
+        payload["outcome"].as_str()?,
+    );
+    if !wanted(id, by) || !signed_by(root, by, SETTLED_DOMAIN, payload) {
+        return None;
+    }
+    Some(VerifiedSettlement {
+        id: id.to_owned(),
+        machine: by.to_owned(),
+        outcome: outcome.to_owned(),
+        reason: payload["reason"].as_str().map(str::to_owned),
+        at: payload["at"].as_str().and_then(iso_utc_secs).unwrap_or(0),
+    })
+}
+
+/// What the machines `watched` messages went to signed for them.
+#[derive(Debug, Default)]
+pub struct SignedSettlements {
+    pub offers: Vec<RemoteOffer>,
+    pub refusals: Vec<RemoteRefusedAck>,
+}
+
+/// The settlements the machines `watched` messages went to signed for them, read from the shared
+/// log: each `(id, machine)` of `watched` that the machine itself reported offered (with the time
+/// it signed) or refused. Only a verified settlement under the settled domain counts.
+pub fn signed_settlements(
+    main: &Path,
+    root: &Path,
+    watched: &[(MessageId, String)],
+) -> Result<SignedSettlements, String> {
+    let refusal = |r: Refusal| format!("{}: {}", r.reason, r.detail);
+    let machine = machine_info(root).map_err(refusal)?.id;
+    let Some(log) = StoreLogDoor
+        .open_store(main, &machine, STREAM)
+        .map_err(refusal)?
+    else {
+        return Ok(SignedSettlements::default());
+    };
+    let (events, _) = log.envelopes().map_err(refusal)?;
+    let wanted = |id: &str, by: &str| {
+        watched
+            .iter()
+            .any(|(watched_id, to)| watched_id.as_str() == id && to == by)
+    };
+    let mut found = SignedSettlements::default();
+    for event in events.iter().filter(|e| e.event_type == MESSAGE_SETTLED) {
+        let Some(settlement) = verified_settlement(root, &event.payload, wanted) else {
+            continue;
+        };
+        let id = MessageId::from_text(&settlement.id);
+        if settlement.outcome == "refused" {
+            found.refusals.push(RemoteRefusedAck {
+                id,
+                machine: settlement.machine,
+            });
+            continue;
+        }
+        if settlement.outcome != "offered" || settlement.at == 0 {
+            continue;
+        }
+        // The earliest offer a machine signed for a message is when it was first offered.
+        let at = Timestamp::from_millis(settlement.at.saturating_mul(1000));
+        match found
+            .offers
+            .iter_mut()
+            .find(|o| o.id == id && o.machine == settlement.machine)
+        {
+            Some(held) => held.at = held.at.min(at),
+            None => found.offers.push(RemoteOffer {
+                id,
+                machine: settlement.machine,
+                at,
+            }),
+        }
+    }
+    Ok(found)
 }
 
 /// This machine's sends of the last day and their settlements, read from the shared log. A send
@@ -352,49 +468,24 @@ pub fn sent_summary(main: &Path, root: &Path, now_secs: u64) -> Result<SentSumma
                     .take(PREVIEW_CHARS)
                     .collect(),
                 answer: Answer::None,
+                ack_within_sec: payload["ackWithinSec"].as_u64(),
             });
         }
     }
     for event in events.iter().filter(|e| e.event_type == MESSAGE_SETTLED) {
-        let payload = &event.payload;
-        let (Some(id), Some(by), Some(outcome)) = (
-            payload["id"].as_str(),
-            payload["machine"].as_str(),
-            payload["outcome"].as_str(),
-        ) else {
+        let wanted = |id: &str, by: &str| sent.get(id).is_some_and(|(to, _)| to == by);
+        let Some(settlement) = verified_settlement(root, &event.payload, wanted) else {
             continue;
         };
-        let Some((to, settled)) = sent.get_mut(id) else {
-            continue;
-        };
-        if to != by {
-            continue;
-        }
-        let mut unsigned = payload.clone();
-        let signature: Option<Signature> = unsigned
-            .as_object_mut()
-            .and_then(|o| o.remove("sig"))
-            .and_then(|sig| serde_json::from_value(sig).ok());
-        let verified = signature.as_ref().and_then(|sig| {
-            signed_bytes(SETTLED_DOMAIN, &unsigned)
-                .ok()
-                .and_then(|bytes| signing::verify(root, &bytes, sig).ok())
-        });
-        if verified.is_none_or(|v| v.machine_id != by) {
-            continue;
-        }
-        answered_at.insert(
-            id.to_owned(),
-            payload["at"].as_str().and_then(iso_utc_secs).unwrap_or(0),
-        );
-        *settled = match outcome {
-            "offered" => Some(Ok(())),
-            "refused" => Some(Err(payload["reason"]
-                .as_str()
-                .unwrap_or("unknown")
-                .to_owned())),
+        let settled = match settlement.outcome.as_str() {
+            "offered" => Ok(()),
+            "refused" => Err(settlement.reason.unwrap_or_else(|| "unknown".to_owned())),
             _ => continue,
         };
+        answered_at.insert(settlement.id.clone(), settlement.at);
+        if let Some((_, state)) = sent.get_mut(&settlement.id) {
+            *state = Some(settled);
+        }
     }
     let mut summary = SentSummary {
         sent: sent.len(),
@@ -494,7 +585,13 @@ pub fn unconfirmed_machines(root: &Path) -> Vec<(String, String)> {
 }
 
 /// The text a recorded cross-machine send answers with.
-fn recorded_text(id: &str, target: &Target, cross: &CrossMachine, wake: bool) -> String {
+fn recorded_text(
+    id: &str,
+    target: &Target,
+    cross: &CrossMachine,
+    wake: bool,
+    need_ack: Option<u64>,
+) -> String {
     let pin = match target.pin {
         PinState::Confirmed => String::new(),
         PinState::Seen => " That machine's key is only seen, not confirmed here; the owner confirms it with `fgos identity pins`, and a receiver that requires confirmed keys drops mail from an unconfirmed machine.".to_owned(),
@@ -504,8 +601,14 @@ fn recorded_text(id: &str, target: &Target, cross: &CrossMachine, wake: bool) ->
     } else {
         ""
     };
+    let ack = need_ack.map_or_else(String::new, |secs| {
+        format!(
+            " Reply wanted within {}: you are told if it is not acknowledged; that is judged after a sync of this machine fetched the answer, not at the second.",
+            ago(secs)
+        )
+    });
     format!(
-        "recorded {id} for {} on {}. It crosses machines: written to the project's shared log and pushed in the background, so it is recorded, not delivered. It reaches {} after that machine's next fetch, about every {} seconds while an fgOS process runs there and later when none does.{wake}{pin}",
+        "recorded {id} for {} on {}. It crosses machines: written to the project's shared log and pushed in the background, so it is recorded, not delivered. It reaches {} after that machine's next fetch, about every {} seconds while an fgOS process runs there and later when none does.{wake}{ack}{pin}",
         target.handle, target.machine.handle, target.handle, cross.sync_interval_sec
     )
 }
@@ -519,25 +622,6 @@ pub struct Context<'a> {
     pub cross: &'a CrossMachine,
     pub wait: Wait,
     pub now: Timestamp,
-}
-
-/// Whether `to` names a session of another machine that a send would reach
-/// (or refuse as ambiguous): read-only, records nothing. `Err` says why that
-/// could not be told.
-pub fn names_remote_head(ctx: &Context<'_>, from: &WriterKey, to: &str) -> Result<bool, String> {
-    if !ctx.cross.enabled {
-        return Ok(false);
-    }
-    let (Some(main), Some(root)) = (ctx.fgos_dir.parent(), super::mailbox_identity::state_root())
-    else {
-        return Ok(false);
-    };
-    match resolve(main, &root, from.as_str(), to) {
-        Ok(Some(Ok(_))) => Ok(true),
-        Ok(Some(Err(refusal))) => Ok(refusal.reason == "ambiguous"),
-        Ok(None) => Ok(false),
-        Err(refusal) => Err(refusal_line(&refusal)),
-    }
 }
 
 /// The id `machine` gave the message that `hint` names in this record, when `from` was offered it
@@ -586,6 +670,7 @@ pub fn send(
     body: &str,
     reply_to: Option<&str>,
     wake: bool,
+    need_ack: Option<u64>,
 ) -> Outcome {
     let Context {
         fgos_dir,
@@ -622,12 +707,41 @@ pub fn send(
             Err(text) => return Outcome::Refused(text),
         },
     };
+    // The receiver drops a request longer than the age it accepts mail at, so the sender refuses
+    // one that long instead of sending mail whose request nobody would read.
+    if let Some(secs) = need_ack.filter(|secs| *secs > super::mailbox_ingest::MAX_AGE_SEC) {
+        return Outcome::Refused(format!(
+            "not recorded: --reply-by {secs}s is longer than mail to another machine can wait: at most {}s",
+            super::mailbox_ingest::MAX_AGE_SEC
+        ));
+    }
     let label = format!("{}@{}", target.handle, target.machine.id);
+    let to_key = target
+        .id
+        .split_once('/')
+        .and_then(|(_, local)| WriterKey::new(local).ok());
+    let hint_id = hint.map(MessageId::from_text);
+    let ack = match (need_ack, to_key.as_ref()) {
+        (None, _) => None,
+        (Some(within_sec), Some(to)) => Some(RemoteAck {
+            within_sec,
+            to,
+            machine: &target.machine.id,
+            reply_to: hint_id.as_ref(),
+        }),
+        (Some(_), None) => {
+            return Outcome::Refused(format!(
+                "not recorded: {} has a session id this mailbox cannot watch for a reply",
+                target.handle
+            ))
+        }
+    };
     let req = RemoteSend {
         from,
         body_bytes: body.len() as u64,
         max_body_bytes: WIRE_MAX_BODY_BYTES,
         to: &label,
+        ack,
     };
     let id = match verbs::admit_remote(record, &req, wait, now, limits) {
         Ok(id) => id,
@@ -644,6 +758,7 @@ pub fn send(
             body,
             reply_to: reply_to.as_deref(),
             wake,
+            ack_within: need_ack,
             body_ref: cross.body_ref,
         };
         let payload = sent_payload(&root, &msg, &machine, &target)?;
@@ -677,7 +792,7 @@ pub fn send(
                 mark_answered(ctx, hint);
             }
             super::mailbox_sync::spawn(main, &Paths::new(fgos_dir), &cross.remote);
-            Outcome::Recorded(recorded_text(id.as_str(), &target, cross, wake))
+            Outcome::Recorded(recorded_text(id.as_str(), &target, cross, wake, need_ack))
         }
         Err(refusal) => Outcome::Refused(format!("not recorded: {}", refusal_line(&refusal))),
     }
@@ -686,9 +801,85 @@ pub fn send(
 #[cfg(test)]
 mod tests {
     use super::{
-        printable, ACCEPTED_PAYLOAD_VERSIONS, SENT_DOMAIN, SENT_DOMAIN_BODY_REF, SENT_DOMAIN_WAKE,
-        SETTLED_DOMAIN, WIRE_MAX_BODY_BYTES,
+        printable, sent_payload, signed_bytes, Outgoing, Target, ACCEPTED_PAYLOAD_VERSIONS,
+        SENT_DOMAIN, SENT_DOMAIN_BODY_REF, SENT_DOMAIN_WAKE, SETTLED_DOMAIN, WIRE_MAX_BODY_BYTES,
     };
+    use fgos_identity::pins::PinState;
+    use fgos_identity::shared::MachineRef;
+    use fgos_identity::{machine, signing, Signature};
+    use serde_json::Value;
+
+    #[test]
+    fn a_flagged_send_signs_ack_within_sec_under_its_versions_domain_and_an_unflagged_send_is_unchanged(
+    ) {
+        use std::os::unix::fs::PermissionsExt;
+        let root = std::env::temp_dir().join(format!("fgos-remote-send-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&root);
+        std::fs::create_dir_all(&root).unwrap();
+        std::fs::set_permissions(&root, std::fs::Permissions::from_mode(0o700)).unwrap();
+        machine::mint(&root, "sender").unwrap();
+        signing::mint_key(&root).unwrap();
+        let machine = MachineRef {
+            id: machine::read(&root).unwrap(),
+            handle: "sender".into(),
+        };
+        let target = Target {
+            id: "peer/abc".into(),
+            handle: "claude-ab12@peer".into(),
+            machine: MachineRef {
+                id: "peer".into(),
+                handle: "peer".into(),
+            },
+            pin: PinState::Confirmed,
+            fetched_at: None,
+        };
+        let payload = |wake: bool, body_ref: bool, ack_within: Option<u64>| {
+            let msg = Outgoing {
+                id: "m1",
+                from: "sender/s1",
+                body: "hello",
+                reply_to: None,
+                wake,
+                ack_within,
+                body_ref,
+            };
+            sent_payload(&root, &msg, &machine, &target).unwrap()
+        };
+        let signed_under = |payload: &Value, domain: &str| {
+            let mut unsigned = payload.clone();
+            let sig: Signature =
+                serde_json::from_value(unsigned.as_object_mut().unwrap().remove("sig").unwrap())
+                    .unwrap();
+            let bytes = signed_bytes(domain, &unsigned).unwrap();
+            signing::verify(&root, &bytes, &sig).is_ok()
+        };
+        // Plain mail is version 1, a wake version 2, a body in the mail-body ref version 3.
+        for (wake, body_ref, version, domain) in [
+            (false, false, 1, SENT_DOMAIN),
+            (true, false, 2, SENT_DOMAIN_WAKE),
+            (false, true, 3, SENT_DOMAIN_BODY_REF),
+        ] {
+            let flagged = payload(wake, body_ref, Some(600));
+            assert_eq!(flagged["v"], version);
+            assert_eq!(flagged["ackWithinSec"], 600);
+            assert!(signed_under(&flagged, domain), "version {version}");
+            let mut forged = flagged.clone();
+            forged["ackWithinSec"] = Value::from(60);
+            assert!(!signed_under(&forged, domain), "the request is signed");
+
+            let plain = payload(wake, body_ref, None);
+            assert_eq!(plain["v"], version);
+            assert!(plain.get("ackWithinSec").is_none());
+            assert!(signed_under(&plain, domain));
+            let keys = |payload: &Value| -> Vec<String> {
+                payload.as_object().unwrap().keys().cloned().collect()
+            };
+            let mut flagged_keys = keys(&flagged);
+            flagged_keys.retain(|key| key != "ackWithinSec");
+            assert_eq!(flagged_keys, keys(&plain));
+        }
+        let _ = std::fs::remove_dir_all(&root);
+    }
 
     #[test]
     fn a_listed_send_keeps_to_one_row_with_no_terminal_control_characters() {

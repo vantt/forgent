@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "7662667bf6b6d8e15ee33785f7c6b517f88b56bc0478f2ad99b58b0028b740fb",
+  "payloadDigest": "064cd7e65fb4cfb9e9913663ecc9a848b303acb5c3d6297c41f468abbed5465d",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "a5629383f89b4488b252a62f0ea86463e649e33e0a891db1a19af2cd6c136aca",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -98,19 +98,19 @@
     "apps/fgos/src/wiring/mailbox_hook.rs": "75e05738143170765400ea196ca62350f402a73c58cf37167a8b20568c4f346f",
     "apps/fgos/src/wiring/mailbox_hook_unsupported.rs": "42f2aa9df8c530b5a1534696b2dba99e8410552598691748a6518ede830d674e",
     "apps/fgos/src/wiring/mailbox_identity.rs": "d3b555d77cb34d68d51d04418e578540fdaf35d56a2f2e34c2d3f99028abfe21",
-    "apps/fgos/src/wiring/mailbox_ingest.rs": "7c774fd3d8a7bfdc48861dc09830f8dab949ec57c8af66a2cdf6ece50a0e8e14",
-    "apps/fgos/src/wiring/mailbox_remote.rs": "f83151946e4da2566306dba622d103d5ecc2764a4b8666f5c8baa5c301353b62",
+    "apps/fgos/src/wiring/mailbox_ingest.rs": "1e79f3efdac0797ffb6897f98456c34d824fa99044493898c6335e41f0540054",
+    "apps/fgos/src/wiring/mailbox_remote.rs": "3d1de1aed597404bae9f2e07776795bc67f6ad6f28ec750c04b5057e313dd372",
     "apps/fgos/src/wiring/mailbox_root.rs": "e04f92eaa95d71cd1273b529163f0f903b4f11f4a4de45daecdffb8748d9dbc6",
     "apps/fgos/src/wiring/mailbox_surface.rs": "f03ecafe23d3c254c9a02288277f3ee7b22ff4d61c72574abc07ee0e38f2ce18",
-    "apps/fgos/src/wiring/mailbox_sync.rs": "5b2a109c5c26240f98de96ed425741e56e4b62f3270bb08fd4e4cc6f84538931",
+    "apps/fgos/src/wiring/mailbox_sync.rs": "486d523c86059e89e46e91535a79ba3ffdaa570918518b501cf845d5ad31affa",
     "apps/fgos/src/wiring/mailbox_sync_unsupported.rs": "b56921a2c7999184b9eb2324992d6f7ccdcacda6b4c45b2048c838f993691995",
-    "apps/fgos/src/wiring/mailbox_verbs.rs": "4c03b2ecf0f28fcad8ae61ebb1fb27eee843b53be966e31b44e85a58650ca09f",
+    "apps/fgos/src/wiring/mailbox_verbs.rs": "8d0d61fdf11938861eac71718475ff599f277d07aeb224feb02d8f77bc1f0f88",
     "apps/fgos/src/wiring/mailbox_verbs_unsupported.rs": "c38d21b026d0334ba76460edbeb10f8a23cbe0f3c56357b083064b1028e33709",
     "apps/fgos/src/wiring/metrics_sources.rs": "504e2c72b52a5da8d8d23a862403d47986811234809f364ee6006c6957f6c583",
     "apps/fgos/src/wiring/mod.rs": "1ff390fd1ebcb3529669dfd028fdf9e2aafe4035328f4a9bc76b4d132ebf332b",
     "apps/fgos/tests/cli_tests.rs": "b29e5f4c3b1f19dd0f532c1070ad24196641a3162b8d3db502a21003db91748b",
     "apps/fgos/tests/internal_lock_routes.rs": "e8516f4876c8263b1baa1f997bcfbb01715e69d740aa508fd01a0d481fee309e",
-    "apps/fgos/tests/mailbox_routes.rs": "ca162af742c0f58581991d77853f43cfc63e2b1c2304b1e236ff5c897ddf6eec",
+    "apps/fgos/tests/mailbox_routes.rs": "fe4bb33069a6f6eb6f02b052e4581fcfc69ce37dcdfd146280f9c935c14511a6",
     "apps/fgos/tests/mailbox_sync_child.rs": "047e70662085d6f91fa786c9000eb494711f610d37cd63a24f29dc884116763d",
     "apps/fgos/tests/windows_borrow.rs": "4e77453a5386cf512a22db39e6a529e163c7dc930d8795c93ef05e60ba19c7b9",
     "apps/fgos/tests/windows_lock_hold_route.rs": "9cedd72a21ef501d00d37ce8fe1f52bb33cbfa799774470534c96dc59a4959aa",
@@ -521,18 +521,18 @@
     "packages/identity/rust/tests/session.rs": "465dab66fe06ed7779e25e903220a644b9fa67b6e87f2e5609eed03da42bf361",
     "packages/identity/rust/tests/shared.rs": "3c0bcb1d94d1a0486cf1fbdb382b15107b256f42fa19cbb92c551f147436bc17",
     "packages/identity/rust/tests/signing.rs": "f446d326b152189b65e11976be3bfa8902bf7f65a79db355c08514e7df3edea2",
-    "packages/mailbox/rust/core/src/ack.rs": "d3b51fb0bbc5d8514f63aed9365500965fff4b0a622efb0379201b830b4f9fbc",
+    "packages/mailbox/rust/core/src/ack.rs": "16979ddf83d7d2da0200bac5c77c6140cf43888c3b9ebfd9169cbe5b8ade9ddf",
     "packages/mailbox/rust/core/src/counters.rs": "5a59a9908258111382df32952d8c77d5c62bcf71bdbc0cee917eaba3a3520973",
     "packages/mailbox/rust/core/src/delivery.rs": "27e0ec99abf4a8010a67bade5b479b84b576e35e366456479f1dafc9cc18329f",
     "packages/mailbox/rust/core/src/envelope.rs": "a3872aafacfe98cc3c06067e33fe7a04a2c14d9231b7bd49ef7c1ad030b3e966",
     "packages/mailbox/rust/core/src/forget.rs": "d4919f2723cc63084f7d27922dc7702358293072586bcdb79748f3d4ebc6036e",
     "packages/mailbox/rust/core/src/frame.rs": "e5fb98e107c53bc51bf465ec49839c1616eda3977ad2324b6ef7e2c5f5b3be74",
     "packages/mailbox/rust/core/src/ids.rs": "d9e5104a3ab133d86f17fecc122cc62be2a94fd87abe95a837912f8452f51aba",
-    "packages/mailbox/rust/core/src/lib.rs": "ee412376830b6f154228ced48a6270077c3463eb8bca7747c528fb4da4dfeaa6",
+    "packages/mailbox/rust/core/src/lib.rs": "15189da11f943c05c5461bbb18365303c7eeb1f5fd9f35bba2fabfdbffb2cce9",
     "packages/mailbox/rust/core/src/limits.rs": "2dfb4ca1b4daee28f0868a3294e0c9fe14096d9fec9e2415e625c5beb2e20e1b",
     "packages/mailbox/rust/core/src/names.rs": "d3a0fcaec41145b94c5aca4d40122aea3ba16c9bbd60c7f35d9a47cba3150fce",
     "packages/mailbox/rust/core/src/notices.rs": "70efb159aebc892253abe44f8cf8293f6cd4b3025d3a552eb7672a13e3029948",
-    "packages/mailbox/rust/core/src/policy.rs": "0a14b53b94f8e484946a65a33fade22a6b795e526469e1dc654751e0c9ee928c",
+    "packages/mailbox/rust/core/src/policy.rs": "158a71514473578353d515325ee3c9fd378ec6c9448173134b7fdaa1a7dedfb3",
     "packages/mailbox/rust/core/src/registry.rs": "e039dc6f1d72321f6e46156e08a9fc008b7d924d01ceb3787ce79d3c48fbb421",
     "packages/mailbox/rust/core/src/remote.rs": "2a6502bb3a765ace2d6fae29e1079b56b541880736b91cdbc6bb606a8eb2ef2e",
     "packages/mailbox/rust/core/src/report.rs": "82eae1f3a0927d56c71022e5e8bb46b15cb30439df0a3f0198aaa4389ae87699",
@@ -547,9 +547,9 @@
     "packages/mailbox/rust/core/tests/frame.rs": "002aa37d1186006b0b5df3a867baeb252df9a854bc8dcd06714c0030fa705362",
     "packages/mailbox/rust/core/tests/limits_contract.rs": "85a9f8e01abae9b6bb2bcceb3d03e095d253afa58effe35a4001ef7201e35f7c",
     "packages/mailbox/rust/core/tests/names.rs": "2ba76412acbc32049422874071ede9631e793de26db78efc40805c3a29624269",
-    "packages/mailbox/rust/core/tests/policies.rs": "88e5518f800aa2830ed930af61aaca85345684664e75dd0d6307acbb13ce57c8",
+    "packages/mailbox/rust/core/tests/policies.rs": "a97603338b358e1e0bbbc7dbda151d83cce8de77c9a7544fb835c00c882547fa",
     "packages/mailbox/rust/core/tests/registry.rs": "066b325ed1b04eff7ee90976fefd631b7339d00f3e98def44ac6816a5a271859",
-    "packages/mailbox/rust/core/tests/remote.rs": "dce87dd3beb6e3e3ba374e6ce2bf80b7aebb782aa50225e45d6f76b92fe3b3d5",
+    "packages/mailbox/rust/core/tests/remote.rs": "cb3adbbaf960cc7ceb2c1d1f8b26461ba78c1fc028c3a3aa85e2959842d17bb4",
     "packages/mailbox/rust/core/tests/report.rs": "503ad5d69f78e46f183ac7e6d612f29699f5a73cd183419275898c66baee6477",
     "packages/mailbox/rust/core/tests/scripted_pair.rs": "d514f95028b4d612160fa01129a95815022e6155c42a13bf66784dcd8dd4b086",
     "packages/mailbox/rust/core/tests/snapshot.rs": "b227b1f2fde24482bc8d53bf0c2362f23a9a2670b1f6a6f0b47fe668f1ae3391",
@@ -584,7 +584,7 @@
     "packages/mailbox/rust/store/src/record/prune.rs": "5b49ea7b860d6874f436244c81a1bbd7926d4a74b815e36022a5d5248232d763",
     "packages/mailbox/rust/store/src/record/snapshot.rs": "e3cf5f5c20110c80185189335cf9656ab33276bdc956740b84123de757a33edf",
     "packages/mailbox/rust/store/src/record/sys.rs": "35dc8d786013bd0caa523a1c03eab500cd4eb2dedbe2443df6119b938fd09709",
-    "packages/mailbox/rust/store/src/verbs.rs": "a1d92676ee3ee3999d0f68c042324df61343892eb43500830294b5ca7188098d",
+    "packages/mailbox/rust/store/src/verbs.rs": "c7106d02bdab314851dd7484ad57559ac8a52d2089ab8175f8ef038695a21808",
     "packages/mailbox/rust/store/tests/adapters.rs": "95c99c5a89253a6b8a66ffd28dbecfc7bf71073891f621fa91bbe8dd525a06b4",
     "packages/mailbox/rust/store/tests/ancestry.rs": "8ad4d3a31b3b80789d6efd2a771c682a39aee32d7d68aaf2d52b54aa24ab64dd",
     "packages/mailbox/rust/store/tests/common/mod.rs": "55d8d82091ffb1cb050cfff44da2774c06ce63a4d9f7c3d628a52b3d31a96297",
@@ -919,7 +919,7 @@
     "scripts/verify-fanout-overlap.mjs": "b74a0ac9f350c5d62a47f3e3bf0896e9d142e5cbba15284527383d1b529ea435",
     "scripts/write-test-marker.mjs": "d1faead7d8efbdcce888100b89f5cd2cc6546ddc3f2647118255f82f6c8e4171",
     "scripts/write-wrapper-script.mjs": "e9e76f2b72329bb4dee9ec980db7a5df7515da3ff339e232466049de259d5c50",
-    "src/cli/command-registry.mjs": "f2663f76670532a89b3356dafba646161bd7c0619823579dd12d7e7d31569fc4",
+    "src/cli/command-registry.mjs": "1d46dc684f72b7b4b7647256742471c7d7dc5cfe01c89465bc64ca521a841c99",
     "src/cli/exit-codes.mjs": "55a68e5a0b03a38adced7ddc9bcfb60964db94b3b868e2c854b6a6a78fdb4964",
     "src/cli/flag-check.mjs": "336a0e94eaec59fa4c1f143b32a14334c1bd5f13d522ef8be4a5b570dc401b62",
     "src/cli/parse-args.mjs": "d4f71dbb91bc8d920995299b78d018efd1643328213a70d6e567a6b462163d66",
@@ -2099,14 +2099,14 @@
     },
     {
       "path": "apps/fgos/tests/mailbox_routes.rs",
-      "line": 2771,
+      "line": 2887,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"
     },
     {
       "path": "apps/fgos/tests/mailbox_routes.rs",
-      "line": 2905,
+      "line": 3021,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"
@@ -2834,7 +2834,7 @@
       "spawn": "Command::new",
       "binary": "codex",
       "class": "argv-runner",
-      "resolvedAt": "apps/fgos/src/wiring/mailbox_verbs.rs:619"
+      "resolvedAt": "apps/fgos/src/wiring/mailbox_verbs.rs:603"
     },
     {
       "path": "packages/mailbox/rust/store/tests/ancestry.rs",
@@ -2960,7 +2960,7 @@
       "spawn": "Command::new",
       "binary": "(self)",
       "class": "argv-runner",
-      "resolvedAt": "apps/fgos/src/wiring/mailbox_sync.rs:197"
+      "resolvedAt": "apps/fgos/src/wiring/mailbox_sync.rs:281"
     },
     {
       "path": "packages/process/rust/src/mapped.rs",
@@ -2992,7 +2992,7 @@
       "spawn": "Command::new",
       "binary": "codex",
       "class": "argv-runner",
-      "resolvedAt": "apps/fgos/src/wiring/mailbox_verbs.rs:619"
+      "resolvedAt": "apps/fgos/src/wiring/mailbox_verbs.rs:603"
     },
     {
       "path": "packages/process/rust/src/platform/windows.rs",
