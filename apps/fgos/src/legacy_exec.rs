@@ -76,6 +76,8 @@ pub fn resolve_payload_path() -> Result<PathBuf, String> {
 pub struct Payload {
     pub root: PathBuf,
     pub entry: PathBuf,
+    /// The release manifest's `requires.node`, when it declares one.
+    pub requires_node: Option<String>,
 }
 
 /// [`resolve_payload_path`] with the root the entry sits under: a module of the payload (the doctor bridge) is
@@ -184,7 +186,11 @@ fn verify_payload() -> Result<Payload, String> {
         .nth(depth)
         .map(Path::to_path_buf)
         .ok_or_else(|| "the legacy entry sits above no payload root".to_string())?;
-    Ok(Payload { root, entry })
+    Ok(Payload {
+        root,
+        entry,
+        requires_node: manifest.requires.node.clone(),
+    })
 }
 
 #[cfg(unix)]

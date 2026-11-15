@@ -138,7 +138,7 @@ có bằng chứng sống, không phải bị che giấu — flip khi phía kia 
 
 - `docs/decisions/0009-chong-giao-thoa-luc-cai.md` (deleted in 4722361ae) — quyết định nguồn của 4
   nguyên tắc trên.
-- `packages/distribution/rust/src/coexistence.rs` — cài đặt detection + manifest (writer; Node `src/install/coexist.mjs` đã bị xoá khi `init` chuyển vào host).
+- `packages/distribution/rust/src/coexistence.rs` — cài đặt detection + manifest (writer; module Node coexist đã bị xoá khi `init` chuyển vào host).
 - `apps/fgos/src/wiring/init.rs` — bước `init` gọi detection.
 - `test/e2e/coexistence-canary.test.mjs` — canary pin known-gap + footprint +
   nhường-nhịn.

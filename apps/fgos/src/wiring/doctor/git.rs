@@ -445,10 +445,46 @@ fn incidents_of(
     )
 }
 
-/// The Git floor: the Git binary the driver runs is there and meets the floor. The Node half of the row's old
-/// text is not judged here: Node is the bridged rows' runtime, and a Node that is missing or too old fails those
-/// rows and names the install in `next`; the host starts no Node process of its own for a row it judges itself.
+const NODE_PROBE_TIMEOUT: std::time::Duration = std::time::Duration::from_secs(10);
+
+/// What `node --version` printed, or why it could not be read. Node is the runtime of the bridged rows and of the
+/// legacy lane, so a missing or old one is this row's failure.
+fn probe_node() -> Result<String, String> {
+    use fgos_process::spawn::{run_bounded, Outcome};
+    let env: Vec<(String, String)> = std::env::vars().collect();
+    match run_bounded("node", ["--version"], &env, None, None, NODE_PROBE_TIMEOUT) {
+        Ok(Outcome::Exited(output)) if output.status.success() => {
+            Ok(String::from_utf8_lossy(&output.stdout).trim().to_owned())
+        }
+        Ok(Outcome::Exited(_)) => Err("node --version failed".to_owned()),
+        Ok(Outcome::TimedOut { .. }) => Err("node --version did not answer".to_owned()),
+        Err(error) => Err(error.to_string()),
+    }
+}
+
+/// The Node half of `node-version-and-git`: the version printed against the requirement, or the failure that names
+/// the Node to install. The message of the passing case is the Node row's own.
+fn node_verdict(probed: Result<String, String>, requirement: &str) -> Result<String, String> {
+    let wanted = requirement.trim().strip_prefix(">=").map_or_else(
+        || requirement.trim().to_owned(),
+        |v| format!("{} or newer", v.trim()),
+    );
+    match probed {
+        Err(cause) => Err(format!(
+            "node is not available ({cause}) \u{2014} install Node {wanted}"
+        )),
+        Ok(printed) => fgos_distribution::init::node_version_satisfies(&printed, requirement)
+            .map_err(|_| format!("node {printed} \u{2014} need {}", requirement.trim())),
+    }
+}
+
+/// Node and Git: Node meets the release's `requires.node`, and the Git binary the driver runs is there and meets
+/// the floor.
 fn node_and_git(run: &Run) -> RowResult {
+    let node = match node_verdict(probe_node(), &super::bridge::node_requirement()) {
+        Ok(version) => version,
+        Err(message) => return result(false, message, None),
+    };
     let floor = match run.git() {
         Ok(context) => match &context.inspection {
             Inspection::NotARepository { floor } => floor,
@@ -463,7 +499,7 @@ fn node_and_git(run: &Run) -> RowResult {
             None,
         );
     }
-    result(true, "git available", None)
+    result(true, format!("node {node}, git available"), None)
 }
 
 /// The row of `main-checkout-hook-wired`: it applies only to a project whose `.githooks/pre-commit` is fgOS's own
@@ -1027,11 +1063,31 @@ mod tests {
     }
 
     #[test]
-    fn the_floor_row_passes_where_git_is_available_and_starts_no_node() {
+    fn the_node_and_git_row_passes_where_both_are_available() {
         let f = Fixture::new("floor");
         let row = row_of(&f, "node-version-and-git");
         assert!(row.passed, "{}", message(&row));
-        assert_eq!(message(&row), "git available");
+        let text = message(&row);
+        assert!(
+            text.starts_with("node v") && text.ends_with(", git available"),
+            "{text}"
+        );
+    }
+
+    #[test]
+    fn node_that_is_ok_missing_or_too_old_is_judged_against_the_requirement() {
+        assert_eq!(
+            node_verdict(Ok("v22.4.1".into()), ">=18"),
+            Ok("v22.4.1".to_owned())
+        );
+        assert_eq!(
+            node_verdict(Ok("v16.20.2".into()), ">=18"),
+            Err("node v16.20.2 \u{2014} need >=18".to_owned())
+        );
+        let missing =
+            node_verdict(Err("No such file or directory (os error 2)".into()), ">=20").unwrap_err();
+        assert!(missing.starts_with("node is not available"), "{missing}");
+        assert!(missing.ends_with("install Node 20 or newer"), "{missing}");
     }
 
     #[test]

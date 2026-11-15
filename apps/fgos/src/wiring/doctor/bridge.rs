@@ -105,6 +105,18 @@ impl Fault {
     }
 }
 
+/// The Node floor a release that declares no `requires.node` is judged against.
+const DEFAULT_NODE_REQUIREMENT: &str = ">=18";
+
+/// The release's `requires.node`, read from the manifest the host already verifies; a release that declares none
+/// (or no resolvable release) is judged against the default floor. The one place a doctor row reads the payload.
+pub fn node_requirement() -> String {
+    legacy_exec::resolve_payload()
+        .ok()
+        .and_then(|payload| payload.requires_node)
+        .unwrap_or_else(|| DEFAULT_NODE_REQUIREMENT.to_owned())
+}
+
 /// How the bridge's child is made: the production launcher runs the payload's module; a test gives its own.
 pub type Launch = Box<dyn Fn() -> Result<Command, Fault> + Send + Sync>;
 

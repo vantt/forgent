@@ -383,7 +383,14 @@ pub fn check_node_requirement(req: &str) -> Result<String, String> {
         return Err("runtime-dependency-missing: node --version failed".to_string());
     }
 
-    let version_str = String::from_utf8_lossy(&output.stdout).trim().to_string();
+    node_version_satisfies(&String::from_utf8_lossy(&output.stdout), req)
+}
+
+/// Judges the text `node --version` printed against a release's `requires.node` (`>=<major>`): the trimmed
+/// version when it meets it. The one reading of that rule: `fgctl init`'s preflight and the host's doctor row
+/// both use it.
+pub fn node_version_satisfies(printed: &str, req: &str) -> Result<String, String> {
+    let version_str = printed.trim().to_string();
     let version_core = version_str.strip_prefix('v').unwrap_or(&version_str);
     let parts: Vec<&str> = version_core.split('.').collect();
     let major: u32 = parts

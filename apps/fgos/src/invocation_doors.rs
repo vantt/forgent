@@ -12,7 +12,7 @@
 //! them.
 
 use crate::legacy_exec::RECURSION_GUARD_VAR;
-use crate::routing::{check_call, declared, takes_lenient_root, Call, CommandRouteDescriptor};
+use crate::routing::{check_call, declared, Call, CommandRouteDescriptor};
 use fgos_event_store::lifecycle::{self, Policy, Request, Timers};
 use fgos_git::invocation_root::{resolve_invocation_root, InvocationRoot, RootPolicy, RootRequest};
 use fgos_git::store_admission::{admit_store_access, AdmitRequest, StoreMode};
@@ -303,7 +303,7 @@ impl<'a> Doors<'a> {
         // verb, as in the Node CLI. Debt: the eight native verbs of today keep answering from wherever they are
         // called (their documented answers, e.g. the mailbox's `unsupported-checkout`), so for exactly these the
         // refusal reaches only an operation that reads a project, as its not-a-project answer. Any other verb,
-        // whatever its store value, is refused. The list is `routing::LENIENT_ROOT_VERBS`.
+        // whatever its store value, is refused. The list is the `lenient_on_refused_root` column of `VERB_ROOTS`.
         let (root, project) = match asked {
             Ok(root) if verb_root.acts_on_resolved => {
                 let project = Ok(root.root.clone());
@@ -313,7 +313,7 @@ impl<'a> Doors<'a> {
                 let project = project_root(dir.as_deref(), &root, &self.cwd, self.home.as_deref());
                 (root, project)
             }
-            Err(refusal) if store_mode == StoreMode::None && takes_lenient_root(verb) => (
+            Err(refusal) if store_mode == StoreMode::None && verb_root.lenient_on_refused_root => (
                 InvocationRoot {
                     root: self.cwd.clone(),
                     fgos_dir: self.cwd.join(".fgos"),
@@ -407,7 +407,9 @@ impl<'a> Doors<'a> {
     }
 }
 
-/// How a verb meets its root, one row per verb that is not an ordinary reader of the nearest project.
+/// How a verb meets its root: one row of `VERB_ROOTS` per verb that is not an ordinary reader of the nearest
+/// project.
+#[derive(Clone, Copy)]
 struct VerbRoot {
     /// How the verb picks its root: `init` creates a store, so it acts where it is run; `doctor`, `wire-agents` and
     /// `uninstall` act on the main checkout whichever worktree they are run from; every other verb acts on the
@@ -422,35 +424,67 @@ struct VerbRoot {
     ignores_dir: bool,
     /// Whether the verb creates the store it acts on.
     creates_store: bool,
+    /// Debt: the native verbs written before the invocation doors. When the Git door refuses the root of a call (an
+    /// untrusted or submodule checkout, `--dir ""`) they keep answering from where they are called, because their
+    /// documented answers (the mailbox's `unsupported-checkout`, `apps/fgos/tests/mailbox_routes.rs`) depend on it;
+    /// every other verb is refused. A verb is never added.
+    lenient_on_refused_root: bool,
 }
+
+/// An ordinary reader of the nearest project above the caller.
+const READER: VerbRoot = VerbRoot {
+    policy: RootPolicy::CallerTree,
+    acts_on_resolved: false,
+    ignores_dir: false,
+    creates_store: false,
+    lenient_on_refused_root: false,
+};
+
+const LENIENT_READER: VerbRoot = VerbRoot {
+    lenient_on_refused_root: true,
+    ..READER
+};
 
 const MAIN_CHECKOUT_VERB: VerbRoot = VerbRoot {
     policy: RootPolicy::MainCheckout,
     acts_on_resolved: true,
-    ignores_dir: false,
-    creates_store: false,
+    ..READER
 };
 
-fn verb_root(verb: &str) -> VerbRoot {
-    match verb {
-        "init" => VerbRoot {
+/// Every verb whose root is not that of an ordinary reader.
+const VERB_ROOTS: [(&str, VerbRoot); 12] = [
+    (
+        "init",
+        VerbRoot {
             policy: RootPolicy::StrictCwd,
-            acts_on_resolved: false,
-            ignores_dir: false,
             creates_store: true,
+            ..READER
         },
-        "wire-agents" => VerbRoot {
+    ),
+    (
+        "wire-agents",
+        VerbRoot {
             ignores_dir: true,
             ..MAIN_CHECKOUT_VERB
         },
-        "doctor" | "uninstall" => MAIN_CHECKOUT_VERB,
-        _ => VerbRoot {
-            policy: RootPolicy::CallerTree,
-            acts_on_resolved: false,
-            ignores_dir: false,
-            creates_store: false,
-        },
-    }
+    ),
+    ("doctor", MAIN_CHECKOUT_VERB),
+    ("uninstall", MAIN_CHECKOUT_VERB),
+    ("config", LENIENT_READER),
+    ("convention", LENIENT_READER),
+    ("friction", LENIENT_READER),
+    ("gate-bypass", LENIENT_READER),
+    ("identity", LENIENT_READER),
+    ("mailbox", LENIENT_READER),
+    ("metrics", LENIENT_READER),
+    ("version", LENIENT_READER),
+];
+
+fn verb_root(verb: &str) -> VerbRoot {
+    VERB_ROOTS
+        .iter()
+        .find(|(name, _)| *name == verb)
+        .map_or(READER, |(_, row)| *row)
 }
 
 /// `FGOS_DISPATCH_DEPTH` as the Node CLI reads it: a non-negative finite number, else 0.
@@ -496,7 +530,6 @@ fn project_root(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::routing::LENIENT_ROOT_VERBS;
     use std::cell::RefCell;
     use std::sync::atomic::{AtomicU32, Ordering};
 
@@ -908,8 +941,13 @@ mod tests {
             "dir-invalid"
         );
         // The list is exactly the eight verbs written before the doors: it never grows, and a stale name shows here.
+        let lenient: Vec<&str> = VERB_ROOTS
+            .iter()
+            .filter(|(_, row)| row.lenient_on_refused_root)
+            .map(|(name, _)| *name)
+            .collect();
         assert_eq!(
-            LENIENT_ROOT_VERBS,
+            lenient,
             [
                 "config",
                 "convention",
@@ -921,7 +959,7 @@ mod tests {
                 "version"
             ]
         );
-        for verb in LENIENT_ROOT_VERBS {
+        for verb in lenient {
             let route = &crate::routing::command_routes()[verb];
             assert_eq!(route.route_kind, "native", "{verb}");
             assert_eq!(route.store.as_deref().unwrap_or("none"), "none", "{verb}");

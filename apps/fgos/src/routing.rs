@@ -92,26 +92,6 @@ pub static NATIVE_SUBCOMMANDS: &[(&str, &[&str])] = &[
     ("lock", wiring::lock_fence::AVAILABLE_SUBCOMMANDS),
 ];
 
-/// Debt: the native verbs written before the invocation doors. When the Git door refuses the root of a call (an
-/// untrusted or submodule checkout, `--dir ""`) they keep answering from where they are called, because their
-/// documented answers (the mailbox's `unsupported-checkout`, `apps/fgos/tests/mailbox_routes.rs`) depend on it;
-/// every other verb is refused. A verb is never added.
-pub const LENIENT_ROOT_VERBS: [&str; 8] = [
-    "config",
-    "convention",
-    "friction",
-    "gate-bypass",
-    "identity",
-    "mailbox",
-    "metrics",
-    "version",
-];
-
-/// Whether the doors let `selector` run when the Git door refuses its root.
-pub fn takes_lenient_root(selector: &str) -> bool {
-    LENIENT_ROOT_VERBS.contains(&selector)
-}
-
 /// The `hook` kinds the host runs before the composition root.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum HookKind {

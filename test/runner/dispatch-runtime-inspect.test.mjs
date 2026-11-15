@@ -60,8 +60,8 @@ test('public inspect use-case import graph cannot reach mutation/recovery/proces
   // sibling reconciliation-import-graph test cites this exact carve-out).
   // config/facade.mjs: `inspect.mjs` imports only its `readMachineConfig`, one read-only
   // `snapshot` call of the native config door that builds `runnerConfig` for read-only
-  // inspection context. The same file also exports the `fixConfig` and `initConfigFile`
-  // writers (`inspect.mjs` never imports or calls them), and it reaches the native door
+  // inspection context. The same file also exports the `fixConfig`
+  // writer (`inspect.mjs` never imports or calls it), and it reaches the native door
   // module, whose text names process and file-writing calls. A whole-file text scan cannot
   // distinguish the exports; proven safe by the same read-the-actual-reachable-code standard
   // every other entry here relies on.
