@@ -695,8 +695,7 @@ impl<'a> Context<'a> {
         };
         let writer = Self::writer(&trusted_main.join(".fgos"));
 
-        let custody_path =
-            fgos_git::custody_lock_path(&wt_repo, worktree).map_err(|e| failed(e.cause))?;
+        let custody_path = custody_lease_path(&wt_repo, worktree).map_err(&failed)?;
         if let Some(parent) = custody_path.parent() {
             std::fs::create_dir_all(parent).map_err(|error| failed(error.to_string()))?;
         }
@@ -904,6 +903,18 @@ fn symlink_dir(target: &Path, link: &Path) -> std::io::Result<()> {
 #[cfg(not(unix))]
 fn symlink_dir(target: &Path, link: &Path) -> std::io::Result<()> {
     std::os::windows::fs::symlink_dir(target, link)
+}
+
+/// The lease file that keeps a dispatch out of the checkout `worktree` while it is removed.
+#[cfg(unix)]
+fn custody_lease_path(repo: &RepoHandle, worktree: &Path) -> Result<PathBuf, String> {
+    fgos_git::custody_lock_path(repo, worktree).map_err(|error| error.cause)
+}
+
+/// Checkout custody is a Unix lease: off Unix a session checkout cannot be removed.
+#[cfg(not(unix))]
+fn custody_lease_path(_repo: &RepoHandle, _worktree: &Path) -> Result<PathBuf, String> {
+    Err("git-lockscope-unavailable-windows".into())
 }
 
 /// Removes the `.fgos` symlink this module made inside a session checkout (never its target) so Git's plain
@@ -1328,6 +1339,26 @@ mod tests {
         assert_eq!(rows.len(), 1);
         assert_eq!(rows[0]["sessionId"], started["sessionId"]);
         assert_eq!(rows[0]["record"]["pid"], std::process::id());
+    }
+
+    #[test]
+    fn a_session_started_from_a_subdirectory_is_registered_in_the_projects_store() {
+        let fixture = Fixture::new();
+        let below = fixture.repo.join("sub");
+        std::fs::create_dir(&below).unwrap();
+        let started = fixture.start_in(&below).unwrap();
+        assert!(
+            !below.join(".fgos").exists(),
+            "no store is made below the project"
+        );
+        let rows = fixture.list();
+        assert_eq!(rows.len(), 1);
+        assert_eq!(rows[0]["sessionId"], started["sessionId"]);
+        let listed_below = fixture
+            .context()
+            .run(&SessionRequest::List { cwd: below })
+            .unwrap();
+        assert_eq!(listed_below, Value::Array(rows));
     }
 
     #[test]

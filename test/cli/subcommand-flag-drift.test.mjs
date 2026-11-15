@@ -197,8 +197,8 @@ const MULTI = COMMAND_REGISTRY.filter((entry) => entry.subcommands && entry.nati
 const NATIVE = COMMAND_REGISTRY.filter((entry) => entry.subcommands && entry.native === true);
 
 test('the drift scan covers the verbs that branch on a positional sub-verb', () => {
-  assert.deepEqual(MULTI.map((e) => e.name).sort(), ['agents', 'dispatch', 'git', 'goal', 'lock', 'merge', 'session', 'workflow', 'worktree']);
-  assert.deepEqual(NATIVE.map((e) => e.name).sort(), ['config', 'convention', 'events', 'friction', 'gateway', 'identity', 'mailbox', 'metrics']);
+  assert.deepEqual(MULTI.map((e) => e.name).sort(), ['agents', 'dispatch', 'git', 'goal', 'lock', 'merge', 'workflow', 'worktree']);
+  assert.deepEqual(NATIVE.map((e) => e.name).sort(), ['config', 'convention', 'events', 'friction', 'gateway', 'identity', 'mailbox', 'metrics', 'session']);
 });
 
 for (const entry of MULTI) {
@@ -258,7 +258,9 @@ test('the scanner sees what it claims to: known reads in known regions', () => {
 // config, convention, events and identity -> one parser shared by every sub-verb (cli_projector.rs),
 // mailbox -> one parser in apps/fgos/src/wiring/mailbox_verbs.rs, so
 // its flags must equal the union of the sub-verbs' schemas; its sub-verb names
-// live in mailbox_surface.rs, shared by every platform build.
+// live in mailbox_surface.rs, shared by every platform build; session -> one
+// reader of the shared parser's output (`project_session_request` in
+// apps/fgos/src/wiring/session.rs), which names a flag as `flag("item")`.
 const RUST = (rel) => fs.readFileSync(path.join(REPO_ROOT, rel), 'utf8');
 const NATIVE_SOURCES = {
   metrics: {
@@ -319,6 +321,14 @@ const NATIVE_SOURCES = {
       return src.slice(start, src.indexOf('fn project_identity_request', start));
     },
   },
+  session: {
+    subs: RUST('apps/fgos/src/wiring/session.rs'),
+    shared: () => {
+      const src = RUST('apps/fgos/src/wiring/session.rs');
+      const start = src.indexOf('pub fn project_session_request');
+      return src.slice(start, src.indexOf('pub fn project_session_args', start));
+    },
+  },
   convention: {
     subs: RUST('packages/convention/rust/src/lib.rs'),
     shared: () => {
@@ -335,7 +345,8 @@ function rustSubcommands(src) {
   return [...m[1].matchAll(/"([^"]+)"/g)].map((x) => x[1]);
 }
 
-const rustFlags = (text) => new Set([...text.matchAll(/"--([a-z][a-z-]*)"/g)].map((m) => m[1]).filter((n) => !GLOBAL.has(n)));
+// A flag is named as a `"--x"` literal, or, where the shared parser's output is read, as `.flag("x")`.
+const rustFlags = (text) => new Set([...text.matchAll(/"--([a-z][a-z-]*)"|\.flag\("([a-z][a-z-]*)"\)/g)].map((m) => m[1] ?? m[2]).filter((n) => !GLOBAL.has(n)));
 const schemaFlags = (spec) => Object.keys(spec.parameters.properties).filter((n) => !(spec.parameters.positional ?? []).includes(n));
 
 for (const entry of NATIVE) {

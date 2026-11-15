@@ -192,14 +192,14 @@ test('approve refuses from inside a registered session worktree, naming the sess
   proposePull(cwd, 'approve-nested-pull');
   const headBefore = gitHead(cwd);
 
-  const session = createSession(cwd, { sessionId: 'sess-nested' });
+  const session = createSession(cwd);
   try {
     for (const id of ['approve-nested-runner', 'approve-nested-pull']) {
-      await assert.rejects(approve(cwd, id, {}, session.worktreePath), refusal(4, /sess-nested/, /session end/));
+      await assert.rejects(approve(cwd, id, {}, session.worktreePath), refusal(4, new RegExp(session.sessionId), /session end/));
       assert.equal(stateView(cwd).work[id].status, 'awaiting-approval');
     }
     // The registry guard runs ahead of --github too, and its session-naming message wins.
-    await assert.rejects(approve(cwd, 'approve-nested-runner', { github: true, prNumber: '9' }, session.worktreePath), refusal(4, /sess-nested/, /session end/));
+    await assert.rejects(approve(cwd, 'approve-nested-runner', { github: true, prNumber: '9' }, session.worktreePath), refusal(4, new RegExp(session.sessionId), /session end/));
     assert.equal(gitHead(cwd), headBefore, 'main HEAD must be unchanged — no merge landed');
   } finally {
     endSession(cwd, session.sessionId, { force: true });
@@ -211,7 +211,7 @@ test('approve from the main checkout still closes runner and pull items while a 
   await makeSessionSafeRunnerItem(cwd, 'approve-main-runner', { verify: 'test -f approve-main-runner-produced.txt' });
   proposePull(cwd, 'approve-main-pull');
 
-  const session = createSession(cwd, { sessionId: 'sess-active' });
+  const session = createSession(cwd);
   try {
     assert.equal((await approve(cwd, 'approve-main-runner')).to, 'delivered');
     assert.equal((await approve(cwd, 'approve-main-pull')).to, 'delivered');

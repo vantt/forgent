@@ -2777,7 +2777,7 @@ mod tests {
                 .filter_map(|line| serde_json::from_str::<Value>(line).ok())
                 .filter(|message| message["reason"] == "compiler-artifact" && message["target"]["name"] == "fgos")
                 .filter_map(|message| message["executable"].as_str().map(PathBuf::from))
-                .last()
+                .next_back()
                 .expect("cargo names the host executable")
         })
         .clone()
@@ -2798,7 +2798,7 @@ mod tests {
         let root = std::env::temp_dir().join(format!("fgos-gateway-sessions-{}", std::process::id()));
         let _ = std::fs::remove_dir_all(&root);
         let git = |args: &[&str]| {
-            let status = std::process::Command::new("git").arg("-C").arg(&root.join("project")).args(args).status().unwrap();
+            let status = std::process::Command::new("git").arg("-C").arg(root.join("project")).args(args).status().unwrap();
             assert!(status.success(), "git {args:?}");
         };
         let project = root.join("project");
