@@ -27,6 +27,9 @@ capability rows of the capability-reads plan (F4) still name Node modules as the
      contract" and `retiredBy: "S6a"` (D7).
    - **"decide a dispatch"**: `\bcompileDispatchPlan\b` decision internals and `decideExecutorCli`; allowed the crate's
      `decide.rs` and `src/runner/dispatch/plan.mjs` (reason "S6a: launch policy around the route's plan answer").
+   - **"execution doctor judgments"** (S4's per-group shape, e.g. "holder-lock and mailbox doctor judgments"): the
+     eight judges' Node function names and Rust `fn` names; allowed `packages/execution/rust/src/checks.rs` and
+     `apps/fgos/src/wiring/doctor/execution.rs`.
    - **"retired Node S5 code"**: names that must not come back (`decideDispatchHook`, `explainCapability`,
      `seat-policy.mjs`, `mechanism.mjs`, `internal seat-binding --protocol 1`, the `node src/runner/dispatch.mjs decide` alias).
    - Edit the existing rows (F4) so their reasons and allowed lists name the Rust owner: "read runner.capabilities" (the

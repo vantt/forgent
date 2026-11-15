@@ -27,13 +27,16 @@ deletes their Node arms and use cases (L10). `dispatch` stays a `legacy-cli` rou
      contract `packages/distribution/contracts/doctor-bridge.v1.json`, request `{workId, stage, dir}`, answer the
      `workDispatchHint` fields, `src/runner/work-dispatch.mjs:279-306`), shaped like S4's `work-store-init` (re-read
      item 2) and called through the bridge function in `apps/fgos/src/wiring/doctor/bridge.rs` (S4's "Node rows
-     bridge" door row lets only that file start Node; this adapter spawns nothing itself); deleted with the bridge at S7. Node missing: `--work` fails with the bridge's named cause, other
+     bridge" door row lets only that file start Node; this adapter spawns nothing itself and names no bridge module path, which that row's `doctor-bridge` pattern would
+     catch); deleted with the bridge at S7. Node missing: `--work` fails with the bridge's named cause, other
      selectors are unaffected.
    - `explain`: config through `fgos-config` without defaults (as the arm today, `bin/fgos.mjs:2447-2452`), session
      headless with herdr presence from the 09 adapter.
    - `hook dispatch-decide`: stdin payload normalization and the answer protocols (`--format standard|agy`, exit codes)
      exactly as `src/runner/hook.mjs`; reuse the host's existing hook payload reader (`apps/fgos/src/wiring/mailbox_hook.rs`
      and the mailbox crate's Claude/Codex payload parsing) instead of a second parser; verdict from 07's `hook.rs`.
+   - Files a project or a pull can write (the assignment record, persona files) are read with `fgos-durable-file`
+     `open_beneath` under a byte cap, as 09 does; an unreadable file is "no record" / a listing problem, as today.
    - `agents list`: project root (`--worktree` or the worktree root through Git Inspect), tiers from the payload root
      (`components.legacyNode.root` of the activated release: `core/agents`, `domains/*/agents`) and the project
      (`fgos/agents`); 08's `list`.
@@ -46,7 +49,11 @@ deletes their Node arms and use cases (L10). `dispatch` stays a `legacy-cli` rou
    `src/runner/dispatch/decide.mjs` (`retiredDispatchDoorMessage`, still used by the legacy `dispatch` arm for retired
    sub-commands, moves next to that arm's other helpers in `src/runner/dispatch/cli.mjs`; `runDoorHint` goes with the
    hook), the `decide` path of the compatibility alias (`src/runner/dispatch/cli.mjs:21,166`, `src/runner/dispatch.mjs`)
-   and its sentence in `AGENTS.md` "Dispatch" (D13). `src/runner/agent-listing.mjs` stays (doctor row
+   and its sentence in `AGENTS.md` "Dispatch" (D13); `scripts/dispatch-decide-hook.mjs` (an old registration's entry that
+   calls `serveHook('dispatch-decide')`, which no longer exists after this phase): delete it, after checking on the post-S4
+   tree that the packaging row `dispatch-decide-hook-wired` reports a settings file naming that script as not wired and
+   its fix rewrites it to the shim; if it does not, report to the plan lead before deleting (an old registration would
+   start failing). `src/runner/agent-listing.mjs` stays (doctor row
    `agent-type-names-unique`, S6a).
 5. One `apps/fgos/tests/cli_tests.rs` case per verb (wiring proof), including `hook dispatch-decide` blocking an
    out-of-process `Task` call and allowing an in-process one, and a `PATH` without `node` showing `decide --for`,
@@ -63,7 +70,7 @@ deletes their Node arms and use cases (L10). `dispatch` stays a `legacy-cli` rou
   `packages/distribution/contracts/doctor-bridge.v1.json`, `AGENTS.md` (Dispatch sentence), `test/architecture.test.mjs`
   (`ARM_STATIC_IMPORTS` only), `docs/architecture-manifest.json` (entries of deleted files), `test/suite-baseline.json`,
   mutation census.
-- Delete: `src/runner/dispatch/hook.mjs`, `src/runner/execution/explain.mjs`, `src/runner/dispatch/decide.mjs` if
+- Delete: `scripts/dispatch-decide-hook.mjs` (see Req 4), `src/runner/dispatch/hook.mjs`, `src/runner/execution/explain.mjs`, `src/runner/dispatch/decide.mjs` if
   empty after the moves, `test/scripts/dispatch-decide-hook.test.mjs`, `test/runner/execution/explain.test.mjs`.
 - Tests retired (owner now): decide cases of `test/runner/dispatch.test.mjs` and `test/runner/assignment-dispatch.test.mjs`
   that drive `decideExecutorCli` -> `golden_decide.rs` (cases) and `cli_tests.rs` (one wiring); `dispatch-decide-hook.test.mjs`

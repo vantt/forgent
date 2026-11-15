@@ -40,7 +40,8 @@ them and keep S4's doctor fixtures.
   `src/runner/execution/capability-config.mjs` (drop `capabilityServesOf` if unused), `apps/fgos/tests/cli_tests.rs`
   (one doctor case), `docs/architecture-manifest.json` (entries of deleted files), `test/suite-baseline.json`, mutation census.
 - Delete: `src/setup/omp-natives-checks.mjs` (if S4 left it), `test/seat-binding/route-doctor-check.test.mjs`.
-- Tests retired (owner now): the eight rows' cases in `test/setup/checks-doctor-config.test.mjs` and the files
+- Tests retired (owner now): the eight rows' cases in `test/setup/checks-doctor-config.test.mjs`,
+  `test/setup/visibility-checks.test.mjs` (imports `checkExecutorConfinement`/`checkInvocationGitWriteGrants`), and the files
   `rg -l "omp-natives|agy-sub-homes|executor-confinement|invocation-git-write|generated-paths|tool-registry-configured|capability-serves-valid|seat-binding-route" test`
   lists -> `golden_checks.rs` (judgment) and the registry exact-set tests (wiring). Each named.
 - Net size: about -450 Node, -400 Node test, +450 Rust lines.

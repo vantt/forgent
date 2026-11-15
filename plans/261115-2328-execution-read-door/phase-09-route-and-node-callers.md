@@ -23,6 +23,9 @@ none re-derives a fact the route answers.
    Node reader stays for launch, a declared twin, D7), herdr presence (`HERDR_ENV=1` and an existing
    `HERDR_SOCKET_PATH`, as `run.mjs:63`), tool index commit and `HEAD` through `fgos-git` inspect. When a request
    carries no `runner` section the adapter reads the effective one through `fgos-config` (native verbs, phase 10).
+   Every file the adapter reads (backend registry, tool index metadata) is opened no-follow beneath its root with
+   `fgos-durable-file` `open_beneath` and read under a byte cap (the Rust form of the runner spec's "Hostile input,
+   stated once"; Node uses `readAgentFileSync`).
    `apps/fgos/src/main.rs:161-166` calls the wiring; `packages/seat-binding/rust/src/route.rs` and its `pub mod` go;
    `apps/fgos/Cargo.toml` gains `fgos-execution`.
 2. Node client `src/seat-binding/client.mjs`: `PROTOCOL = 2`, ops `bind`, `explain`, `plan`, `ladder`; same fail-closed
