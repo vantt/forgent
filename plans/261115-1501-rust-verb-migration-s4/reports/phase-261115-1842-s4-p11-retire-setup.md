@@ -13,8 +13,9 @@ hooks path; the hook row's text now names `npm run setup:hooks` (04 owns the row
   the `keep` plumbing of `generateAllSkillWrappers`/`copyDirRecursive`/`pruneExtras` (its only caller was materialize);
   `insertSourceLine`, `deadSourceLines`, `probeShellIntegrationInvocation`; the row `shell-integration-sourced` (body,
   registration, `describeNonGitShellIntegration`, registry entry, spec and contract lists).
-- Kept on purpose: `detectRcFiles` (session-start hook, D18), `hasSourceLine` (uninstall until 09), `createProjectSkillGuard`
-  (uninstall-project, 09 deletes), `integrationScriptPath`. `retiredJsonAdvice` moved next to the `runner-patterns-config` body.
+- Kept on purpose: `detectRcFiles` (session-start hook, D18) and `integrationScriptPath`. Once the uninstall phase landed on the
+  integration branch, `hasSourceLine`, `createProjectSkillGuard` and the helpers only they used (`skillVersion`, `isNewerVersion`,
+  the git-status imports) had no caller and were deleted here, so `shell-rc.mjs` is `detectRcFiles` only. `retiredJsonAdvice` moved next to the `runner-patterns-config` body.
 - Texts that named `fgos setup` now name the current door (registry descriptions, mailbox standard and schema, capability catalog
   plus `build:skills`, the five Rust refusal texts of F15 (`fgos doctor --fix`), comments in worker-slots, tier.rs, limits.rs,
   repository_config.rs, mailbox_body.rs, the shell script, `scripts/install-git-hooks.mjs`, `scripts/git-one-door-scan.mjs`).
@@ -33,7 +34,7 @@ hooks path; the hook row's text now names `npm run setup:hooks` (04 owns the row
 | `claude-code-hooks` two CLI setup cases | removed; fill-only behaviour is owned by the unit cases of the same file |
 | `agent-wiring` `setup` leg | the init and doctor --fix legs of the same case |
 | `skill-wrappers` materialize cases (8) + setup halves of 3 | removed; render keeps the foreign-skill, same-name refusal and earlier-forms cases, now driven through `renderSkillSurfaces` |
-| `checks-doctor-config` 8 `shell-integration-sourced` cases, `shell-rc` insert and dead-line cases | row and writer removed |
+| `checks-doctor-config` 8 `shell-integration-sourced` cases; `shell-rc.test.mjs` insert, dead-line and (after uninstall moved to Rust) `hasSourceLine` cases | row, writer and reader removed; `detectRcFiles` keeps its 7 cases |
 | help.rs two `setup` cases | same rules asserted on `compound` |
 
 Uninstall tests that used setup or materialize as fixture setup (`uninstall-project`, `uninstall-wiring-2/3`) now build their wiring
@@ -62,7 +63,7 @@ texts that told you to run setup now name `fgos doctor --fix`."
 ## Differences from the phase text
 
 - `test/cli/fgos-setup.test.mjs` is mostly init/rebuild cases: only its one setup case went; the file stays (10 owns the rest).
-- `apps/fgctl/src/help.rs` never named `fgos setup`: no change. `createProjectSkillGuard` could not go (uninstall-project imports it).
+- `apps/fgctl/src/help.rs` never named `fgos setup`: no change. `createProjectSkillGuard` could not go while the Node uninstall imported it; it went after 09 landed.
 - `bridge:S4` stays in the step vocabulary of `test/helpers/doctor-bridge-labels.mjs` and `architecture.test.mjs` messages; no row
   uses it now: 12 drops it.
 - Comment-only edits outside the Modify list: `scripts/install-git-hooks.mjs`, `scripts/git-one-door-scan.mjs`,
@@ -70,8 +71,12 @@ texts that told you to run setup now name `fgos doctor --fix`."
   that doc-health and the row-list test require).
 - Left for their owners (comments naming `fgos setup`): `src/setup/uninstall-project.mjs:3` (09), `bin-discovery.mjs` (07),
   `agent-wiring.mjs:2` (07/08); frozen `limits.v1.json`; data files `registry-defaults.v1.json`, `doctor-base-release.json` golden,
-  `check-decision-codes.baseline.json`. After 09 lands, `hasSourceLine` and `createProjectSkillGuard` have no caller: 09 or 12 deletes.
+  `check-decision-codes.baseline.json`. `hasSourceLine` and `createProjectSkillGuard` are already deleted (see above).
 - No `pub` item added in any OPC-reviewed crate (text-only edits in event-store, identity, git, mailbox-store, seat-binding).
 - Baseline rows of already-absent files (`checks-setup-config`, `-hookspath`, `-idempotent`) not edited; for the TEST lane.
+
+Follow-ups after review: refusal texts reworded so none promises a fix that cannot repair the condition (the bridged Event
+Store row now matches `refspec.rs`); doctor parity compares without the retired row on both sides; `RUL109` in the packaging spec
+carries its gloss; the doctor-check test asserts the host answers the registry's rows.
 
 Status: DONE_WITH_CONCERNS

@@ -54,8 +54,8 @@ export function eventStoreMappingProblems(doctor) {
   try { facts = doctor.facts(); } catch { return []; }
   if (facts.pushRefspecs.some(r => overlaps(r, ['refs/fgos'])) || facts.fetchRefspecs.some(r => overlaps(r, ['refs/fgos/local-events', 'refs/fgos/branch-events']))) return ['unsafe publication refspec: push mappings or local/branch namespace fetch'];
   if (!facts.remoteFact.configured) return [];
-  if (!facts.provenance || facts.expectedFetchRefspecs.some(r => !facts.provenance.refspecs.includes(r))) return ['event-store-refspec-missing: no Git mapping provenance; run fgos doctor --fix'];
-  if (facts.provenance.url !== facts.remoteFact.url) return ['event-store-remote-changed; run fgos doctor --fix'];
+  if (!facts.provenance || facts.expectedFetchRefspecs.some(r => !facts.provenance.refspecs.includes(r))) return ['event-store-refspec-missing: the mirror fetch mappings are not recorded for this remote: the recorded mappings are missing or differ from the wanted set'];
+  if (facts.provenance.url !== facts.remoteFact.url) return ['event-store-remote-changed: the fetch mapping provenance records another remote URL than the remote has now'];
   return [];
 }
 export function checkEventStore(cwd, kind, options = {}) {

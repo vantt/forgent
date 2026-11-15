@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "afa81527c46b4170fcefea19b9bf862d1e3ca5ce6829a909bb32336d87f67afb",
+  "payloadDigest": "041a96bc528a53e5d27be6a0ffa88ca5ac568388a5db5134781706568c29e5a0",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "b8b886cee2ea5ce7ee1153e4795512db135a990de894c27e53c5e778b210be62",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -1174,7 +1174,7 @@
     "src/setup/claude-code-hooks.mjs": "d9f4cdbe8c4cec4cb3ea7c67798d24b49e3c86a0d97a041b202dec8def2332fe",
     "src/setup/config-checks.mjs": "db2de73408986a8edcfb2ceab31e17cf0cdc111075847ad070f59888e6166278",
     "src/setup/doctor-bridge.mjs": "170ebcc891b04e44316cc5fa099fa475ce30ce084ee0d60a233b61e913bc90ae",
-    "src/setup/event-store-checks.mjs": "ae9655839a270eed7efebd5918a3b1874de1c13ef2a4f9083eeb13c4ff00b20b",
+    "src/setup/event-store-checks.mjs": "46f1dbaccff146befbdc4ecc249307623604a10fe14353b5c7223bf463f63778",
     "src/setup/event-store-fixes.mjs": "6075174c2a02253e34dda0b021cf46bd33b61f75917fe07d70967fd94e6e3052",
     "src/setup/executor-profile-warnings.mjs": "d31d27253bc28fdcbbb718e53bc2f25306bad1d144f8b7f504a35624ebf8fd32",
     "src/setup/git-checks.mjs": "7a9873c59b9849c37921c3469e06c1309436c3839a64946ffb631402f0c9aabe",
