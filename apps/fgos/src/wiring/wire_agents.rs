@@ -405,6 +405,36 @@ mod tests {
     use super::*;
     use std::os::unix::fs::PermissionsExt;
 
+    /// The runner of every case here: each one starts a script it wrote a moment earlier, and another test's fork
+    /// can still hold that script's write descriptor, which makes the kernel refuse the start as "text file busy"
+    /// (ETXTBSY, 26). The plan then reads as "no claude", so a start is retried while it is busy.
+    struct BoundedRunner;
+
+    impl ProcessRunner for BoundedRunner {
+        fn run(
+            &self,
+            program: &std::ffi::OsStr,
+            args: &[String],
+            env: &[(String, String)],
+            cwd: Option<&Path>,
+            input: Option<&[u8]>,
+            timeout: std::time::Duration,
+        ) -> io::Result<fgos_process::spawn::Outcome> {
+            for _ in 0..100 {
+                match fgos_distribution::agent_hooks::BoundedRunner
+                    .run(program, args, env, cwd, input, timeout)
+                {
+                    Err(error) if error.raw_os_error() == Some(26) => {
+                        std::thread::sleep(std::time::Duration::from_millis(20));
+                    }
+                    other => return other,
+                }
+            }
+            fgos_distribution::agent_hooks::BoundedRunner
+                .run(program, args, env, cwd, input, timeout)
+        }
+    }
+
     struct Sandbox {
         dir: PathBuf,
     }

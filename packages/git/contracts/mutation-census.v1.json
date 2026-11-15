@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "9e6991132d1452fa517828b7549c8b8b08546f3a0bbe0f89310227fe3ad342fe",
+  "payloadDigest": "a3c9ae3ad5f853c4c07bc637ccc7b59fd1e6ea05cb4f5cd5bd1b3cc31845ec25",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "b8b886cee2ea5ce7ee1153e4795512db135a990de894c27e53c5e778b210be62",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -123,7 +123,7 @@
     "apps/fgos/src/wiring/run_dirs.rs": "6c34c6af1c85e8e326272fc1c08602b81e6e53ab778596f36296ef376c94b970",
     "apps/fgos/src/wiring/session.rs": "f2569bef9f072e959f14673c2d2929e2b0b001540a4e147fd5e59082b2e64b43",
     "apps/fgos/src/wiring/uninstall.rs": "e42c1f59bb41b80a4a9d4b19b106579c39145583edabaea54b3b4d8fcb455dbb",
-    "apps/fgos/src/wiring/wire_agents.rs": "8051fc4287d5ea26d6b1e5cf40aa7c77bf831fed48d5e03d0a3c743ce3cd0ed7",
+    "apps/fgos/src/wiring/wire_agents.rs": "db0ee9f2afc3958d153e339fe4288ca08c3c3085f535202cc9012af606533d67",
     "apps/fgos/tests/cli_tests.rs": "7f5b886af32177760e68371c4ed89b51d6d4e71a7b7151785f519c3f512560ac",
     "apps/fgos/tests/internal_lock_routes.rs": "e8516f4876c8263b1baa1f997bcfbb01715e69d740aa508fd01a0d481fee309e",
     "apps/fgos/tests/mailbox_routes.rs": "fe4bb33069a6f6eb6f02b052e4581fcfc69ce37dcdfd146280f9c935c14511a6",
