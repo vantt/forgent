@@ -203,8 +203,14 @@ pub fn resolve_product_root() -> Option<PathBuf> {
 /// Returns None on any failure (not a git checkout, no product root, an unborn
 /// HEAD, or a refused read).
 pub fn resolve_git_commit() -> Option<String> {
-    let root = resolve_product_root()?;
-    let (driver, repo) = fgos_git::GitDriver::open_at(&root).ok()??;
+    git_commit_at(&resolve_product_root()?)
+}
+
+/// The first 12 hex digits of the full HEAD commit id of the checkout holding `root`, never Git's own
+/// abbreviation (whose length depends on the repository). `None` outside a checkout, as for a release install
+/// (which prints nothing about it).
+pub fn git_commit_at(root: &Path) -> Option<String> {
+    let (driver, repo) = fgos_git::GitDriver::open_at(root).ok()??;
     let head = driver.resolve_commit_ref(&repo, "HEAD").ok()??;
     Some(head.as_str()[..12].to_string())
 }
@@ -476,6 +482,26 @@ mod tests {
     #[test]
     fn test_git_commit_no_panic() {
         let _commit = resolve_git_commit();
+    }
+
+    #[test]
+    fn the_commit_is_the_first_twelve_digits_of_the_checkouts_own_head_and_none_outside_a_checkout()
+    {
+        let checkout = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../..");
+        let head = std::process::Command::new("git")
+            .args(["rev-parse", "HEAD"])
+            .current_dir(&checkout)
+            .output()
+            .expect("git runs");
+        let head = String::from_utf8(head.stdout).unwrap();
+        assert_eq!(
+            git_commit_at(&checkout).as_deref(),
+            Some(&head.trim()[..12])
+        );
+        // A release install is no checkout: no commit, and nothing printed.
+        let bare = crate::test_scratch::scratch("version-no-git");
+        std::fs::write(bare.join("package.json"), "{\"version\":\"9.9.9\"}").unwrap();
+        assert_eq!(git_commit_at(&bare), None);
     }
 
     #[tokio::test]
