@@ -9,7 +9,8 @@
 //! `driver`; the helper roles a re-executed binary plays in `helper`; the single state-root resolution in `state_root`; the borrow
 //! vectors in `borrow_vectors`; the two-process semantics probe in
 //! `semantics`; the hot mutex's record reader and compare-and-clear in
-//! `hot_record`; the read-only lock report in `status`; the host's `fgos internal` routes in
+//! `hot_record`; the read-only lock report in `status`; the fence of a registry lock's holders in `fence`; the host's
+//! `fgos internal` routes in
 //! `route`. Contracts, lock registry and shared vectors:
 //! `packages/holder-lock/contracts/`.
 
@@ -17,6 +18,7 @@ pub mod borrow_vectors;
 #[cfg(windows)]
 mod borrow_windows;
 pub mod driver;
+pub mod fence;
 pub mod helper;
 pub mod hot_record;
 pub mod origin;

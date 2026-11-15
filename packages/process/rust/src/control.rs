@@ -5,8 +5,8 @@ use std::fs::File;
 use std::io;
 use std::process::{Child, Command};
 
-use crate::facts::{Observer, ProcTuple};
-use crate::{platform, FdSlot};
+use crate::facts::{self, Observer, ProcTuple, Record};
+use crate::{platform, FdSlot, ProcId};
 
 /// Arm SIGKILL on the calling thread's parent death (Linux gates only).
 /// Call before starting children, then complete the launch handshake: a parent
@@ -102,6 +102,47 @@ pub fn spawn_with_fds(cmd: Command, fd_map: &[(FdSlot, &File)]) -> io::Result<Ch
 /// right before `kill` and the remaining window is documented).
 pub fn signal_by_identity(tuple: &ProcTuple, sig: Signal) -> SignalOutcome {
     platform::current().signal_by_identity(tuple, sig)
+}
+
+/// The tuple a recorded identity names, by the judge table's own rules for a missing field: a record with no
+/// namespace names one only from the initial PID namespace, and one with no pid or start time names none.
+pub fn tuple_of(record: &Record) -> Option<ProcTuple> {
+    let observer = facts::observer();
+    let pid_ns = match &record.pid_ns {
+        Some(ns) => ns.clone(),
+        None if observer.in_init_pid_ns => observer.pid_ns.clone(),
+        None => return None,
+    };
+    Some(ProcTuple {
+        host: record.host.clone().unwrap_or(observer.host),
+        boot_id: record.boot_id.clone(),
+        pid_ns,
+        pid: record.pid?,
+        start_time: record.start_time.clone()?,
+    })
+}
+
+/// [`signal_by_identity`] for a recorded identity: a record that names no process is `IdentityUnknown`, and
+/// nothing is sent.
+pub fn signal_record(record: &Record, sig: Signal) -> SignalOutcome {
+    match tuple_of(record) {
+        Some(tuple) => signal_by_identity(&tuple, sig),
+        None => SignalOutcome::IdentityUnknown,
+    }
+}
+
+/// This process and its ancestors, nearest first, read one pid at a time; off Linux the chain is this process alone.
+pub fn self_chain() -> Vec<u32> {
+    let mut chain = vec![std::process::id()];
+    while let Some(relation) = facts::relation_of(ProcId(
+        *chain.last().expect("the chain starts with this process"),
+    )) {
+        if relation.parent <= 1 || chain.contains(&relation.parent) {
+            break;
+        }
+        chain.push(relation.parent);
+    }
+    chain
 }
 
 /// Take ownership of a descriptor a parent mapped into `slot`. The first
@@ -350,5 +391,40 @@ pub(crate) fn unix_signal_after_check(
         SignalOutcome::Sent
     } else {
         errno_outcome(io::Error::last_os_error())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn the_self_chain_starts_at_this_process_and_never_repeats_a_pid() {
+        let chain = self_chain();
+        assert_eq!(chain[0], std::process::id());
+        let mut seen = chain.clone();
+        seen.sort_unstable();
+        seen.dedup();
+        assert_eq!(seen.len(), chain.len());
+    }
+
+    #[test]
+    fn a_record_without_a_pid_or_a_start_time_names_no_process_and_nothing_is_signalled() {
+        let no_pid = Record {
+            start_time: Some("1".into()),
+            pid_ns: Some("pid:[1]".into()),
+            ..Record::default()
+        };
+        assert!(tuple_of(&no_pid).is_none());
+        assert_eq!(
+            signal_record(&Record::default(), Signal::Term),
+            SignalOutcome::IdentityUnknown
+        );
+    }
+
+    #[test]
+    fn a_record_of_this_process_names_its_identity() {
+        let me = facts::self_identity().expect("this process has an identity here");
+        assert_eq!(tuple_of(&me.to_record()), Some(me));
     }
 }
