@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "73f509a0d2a06e88188e44ed11c946cddcfe03fa1448f263d16b45c5291983b9",
+  "payloadDigest": "b4d033ff15b59dbd3933b577811342ed915754e60fb173e27e71f728feb281c0",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "a5629383f89b4488b252a62f0ea86463e649e33e0a891db1a19af2cd6c136aca",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -85,13 +85,14 @@
     "apps/fgos/examples/identity-mint-machine.rs": "e5ae8784739511aa945f936188f9c3720174fa94fed32f56b7841f76a67f355e",
     "apps/fgos/examples/mailbox-ident-cost.rs": "694f216767532946846ecc69dc584fbb8bf28a7183f741a037ba05c7b4793bc9",
     "apps/fgos/src/cli_presenter.rs": "999e21b7ca7858947ebe19092cd00e8810970f046c16258ac6fb715734d64a4a",
-    "apps/fgos/src/cli_projector.rs": "26bab56e5f1c36439c6816838d444324822c13c1c0676ac9e46ce1200275fff4",
+    "apps/fgos/src/cli_projector.rs": "b675d39ac301d774fd852fb4c499fff166009635df526565bf99bef051f10c61",
     "apps/fgos/src/help.rs": "8b44487769fcdd10f110d8ad996b9721ae3ce37a5c5f29aafa67eb2c10586420",
     "apps/fgos/src/invocation_doors.rs": "01cd71738e01f31cd9ea3713b6a1108a78f1afada8cd2b3f8ae28f6284c963ea",
     "apps/fgos/src/legacy_exec.rs": "bf2f790d202ad3a25735fc3f9c33feb7aeffdfb015b1e0aafa9282c8b8bcba40",
-    "apps/fgos/src/main.rs": "d4de64885d7ccaf3c1ce21f9d0819cec981ecba44c0cbfa05f377c54d4d08f74",
-    "apps/fgos/src/routing.rs": "91493d0628489492fd1b34a4b229faf903e1e91fc033727136e09e40307b4f3d",
+    "apps/fgos/src/main.rs": "f8ecb01a9fc24fe91c416c90afcd099307d8ec431c2c65267df8392a9fe1c3ee",
+    "apps/fgos/src/routing.rs": "eeebe3cd33f953ee2060288ad2a6195f86bd4feed928b92e0164b76135359818",
     "apps/fgos/src/wiring/event_store_clone.rs": "923d718f7a6bd5705cbe6e4d4c8393672c1ef4a2142facc9ada314307a4d7574",
+    "apps/fgos/src/wiring/events.rs": "ba1a9fd47465dc1d2f845142c2e5c0270520a5d0a28bf72c5e5589eb7ec4b73b",
     "apps/fgos/src/wiring/gateway_control.rs": "0d73738acfe1386239cabd241f52aaaefe360f40c9cda879a8bc00c71ede27bc",
     "apps/fgos/src/wiring/identity_log.rs": "d7d9dd503ecbd84a5373aa27f6853996e6944aba2940d15e8284cd92c14eef7a",
     "apps/fgos/src/wiring/mailbox_body.rs": "1d1a1c76ac24e5cb1d9e55a7b54ed35cc7be7656ded86ac52e58dd767b3079ca",
@@ -108,8 +109,8 @@
     "apps/fgos/src/wiring/mailbox_verbs.rs": "8d0d61fdf11938861eac71718475ff599f277d07aeb224feb02d8f77bc1f0f88",
     "apps/fgos/src/wiring/mailbox_verbs_unsupported.rs": "c38d21b026d0334ba76460edbeb10f8a23cbe0f3c56357b083064b1028e33709",
     "apps/fgos/src/wiring/metrics_sources.rs": "504e2c72b52a5da8d8d23a862403d47986811234809f364ee6006c6957f6c583",
-    "apps/fgos/src/wiring/mod.rs": "0ee1d56392474883274074f3dd25d2010c2f842b025d5625f6143967108a9664",
-    "apps/fgos/tests/cli_tests.rs": "4a5ebc43616b8973b92d17c8fcede60816090904b2f0420ae6c181a357258d2a",
+    "apps/fgos/src/wiring/mod.rs": "9717f14e2e1c5e997a862dc0ee5775a77bf5f535fc6358c881963aa25210b42c",
+    "apps/fgos/tests/cli_tests.rs": "976a0f522e3052d5ceadd747fdf4d52df61391f705ce0064e246ee5d815a5d21",
     "apps/fgos/tests/internal_lock_routes.rs": "e8516f4876c8263b1baa1f997bcfbb01715e69d740aa508fd01a0d481fee309e",
     "apps/fgos/tests/mailbox_routes.rs": "fe4bb33069a6f6eb6f02b052e4581fcfc69ce37dcdfd146280f9c935c14511a6",
     "apps/fgos/tests/mailbox_sync_child.rs": "047e70662085d6f91fa786c9000eb494711f610d37cd63a24f29dc884116763d",
@@ -119,7 +120,7 @@
     "apps/fgos/tests/windows_semantics_probe.rs": "ecb59690bbf1259baa1defb6417c24005138526bb565f216f9db3c2ad784d240",
     "apps/fgos/tests/windows_support/mod.rs": "2b8a17676526c87ea5ecfb2074a70a3511fbf9267f9de78a35dc355f272830fb",
     "bin/fgos-runner.mjs": "24fa9b497547a104912b90ab98b3d53fbbe0068a5977a7a04724789c8e717156",
-    "bin/fgos.mjs": "a2aa749f719f7369e229eb502345c82b1923f14f78a900ed18698f17d64cd81b",
+    "bin/fgos.mjs": "a6b143a5abf0d1139bfc69be6f1ae9c8442754a54014c2e58d1716b99f18d2f5",
     "core/skills/_shared/capability-catalog.md": "99d7f682c3ddcfb8ad57c30ca9dde670e331e14b7c5e87e8b53e620660abeb7c",
     "core/skills/_shared/capability-matching.md": "eb67cde05d45c171c1d4803f9d2fbec5fc63565b9fd0a0549c866a7eb262521d",
     "core/skills/_shared/catchup-self-recovery.md": "3b77650c71a0225f00ffa8fe9524d7c0052977204f425c1999225b6f80802c69",
@@ -470,10 +471,10 @@
     "packages/holder-lock/rust/tests/stress.rs": "8337e69861dc1047caca950cad3211363e1cdea00cb0a5d3199053ddb17a46b7",
     "packages/holder-lock/rust/tests/windows_lockfileex.rs": "14b5ecfea2c8041b8b8377a69394243d918b46d1ee6530b5569cfa9d47558283",
     "packages/host-runtime/rust/src/authority_gate.rs": "ad3c0a21cc5b98ec3d8d321d0b700d1378a35fe3a8531b7ed32ccabbf2e4fe17",
-    "packages/host-runtime/rust/src/catalog.rs": "18d78fda4b8009105987f9bcadfd6eadc41d222825a7168fcecf28f1efdaeae3",
+    "packages/host-runtime/rust/src/catalog.rs": "c41e53a2257dba13ed39ee7e2b31aad3a7e123aeb4924c9759cf8a152403e7a8",
     "packages/host-runtime/rust/src/civil_time.rs": "7f206726328eb334c91c8ca2592191d6dead76b91b68ffaf633e7cda40c3625f",
     "packages/host-runtime/rust/src/cli_args.rs": "3ec7bc5a3e7570c17dcc5aded330c2a9b61d67b515cb993559675944d6bd91c2",
-    "packages/host-runtime/rust/src/contracts.rs": "188e6ebf735e97bdd2e8e71d732edf637136f4151b980da2afabfd3079d9250a",
+    "packages/host-runtime/rust/src/contracts.rs": "d72038fc5d650bb33272190f3d47b79118374272c2c056658b2c1503fb03b6b8",
     "packages/host-runtime/rust/src/exit_codes.rs": "f161428fcaa8de111886461f9f0fd40279fe918ba3052dfd9f6502e2c1896368",
     "packages/host-runtime/rust/src/invocation_service.rs": "bd9602d7ae4849bb434d2fe92aaa098c28ce9225ab6ef30b61fbbdb1a197bd55",
     "packages/host-runtime/rust/src/lib.rs": "6c89fc4cb52e8bfea8019202db31324272af21d3c83a5233e7f9c31af9b120c5",
@@ -920,7 +921,7 @@
     "scripts/verify-fanout-overlap.mjs": "b74a0ac9f350c5d62a47f3e3bf0896e9d142e5cbba15284527383d1b529ea435",
     "scripts/write-test-marker.mjs": "d1faead7d8efbdcce888100b89f5cd2cc6546ddc3f2647118255f82f6c8e4171",
     "scripts/write-wrapper-script.mjs": "e9e76f2b72329bb4dee9ec980db7a5df7515da3ff339e232466049de259d5c50",
-    "src/cli/command-registry.mjs": "c29dc7fe2fc4db8d92ca510df114e7d7a4287cb93bd6438d0f2ec160d61a8c49",
+    "src/cli/command-registry.mjs": "cd4eee953f0886ba8af9ee80e787a64d6527e360ebfe50eaf617f78a50864439",
     "src/cli/exit-codes.mjs": "55a68e5a0b03a38adced7ddc9bcfb60964db94b3b868e2c854b6a6a78fdb4964",
     "src/cli/flag-check.mjs": "336a0e94eaec59fa4c1f143b32a14334c1bd5f13d522ef8be4a5b570dc401b62",
     "src/cli/parse-args.mjs": "d4f71dbb91bc8d920995299b78d018efd1643328213a70d6e567a6b462163d66",
@@ -933,7 +934,7 @@
     "src/event-store/config.mjs": "e7edfd4464d84ac17b23023f3251cc9bb02c6302a28fa84e23d7330a72ac643c",
     "src/event-store/consumers.mjs": "81cd05ec92cd75056954051715c0778daac2e620bfd578dc9e3a62d70d4057be",
     "src/event-store/index.mjs": "9c292129c11f9d57c635944548cad4ddb8836e06a0c42289ee850ee864f1ae9d",
-    "src/event-store/maintenance.mjs": "d5be43fb9ae85b7b7e0c51e8bdc71b7e2551f039036dee8bb4b5b1e0bd6f9fd3",
+    "src/event-store/maintenance.mjs": "e869f457fb63cb3ba736bbcdb27ce569a0f0a931f1d880492c981b75df86ed53",
     "src/event-store/native.mjs": "50330e307496f830dd94df176510745b330d7fa3ad3a174339fe34ce35c8dcd7",
     "src/event-store/seal-coalescing.mjs": "84eae01cdf29251f7e50e06ffbac46ea949457adb7b3f4ed20bda542448bd2c3",
     "src/evolve/iron-law.mjs": "c3dce0c23705a8fd1ec463a782fba000ee67f21889f47e7ff350043f7a7ff8d7",
@@ -1232,7 +1233,7 @@
     "src/util/release-targets.mjs": "52157efccc71fa4bc260a47717ab48047792a7057329ab29d9bd6333c322029c",
     "src/util/session-identity.mjs": "ca63b49e07c8998b11beb2677ff739e08f35575a228017e4d8a6492adaf6e138",
     "src/util/slug.mjs": "73ede6899f3214b920683290ce6cce7a2c717fbb80ae88860000348fe8be8c27",
-    "src/util/spawn-detached-fgos.mjs": "557231b581ae3e5b0d978696b72ee7e0cd60bb7d8b0107f73374fec8bdbb9d0c",
+    "src/util/spawn-detached-fgos.mjs": "866621bef7a6ca6900a2b90f9488a0ab139b573c41c6b885b61af470523c1be1",
     "src/util/unique-tmp-tag.mjs": "712eb59d8753224dc3197af5739a3a01fa4188f0b60e6e8ed22a1854d8b68dde",
     "src/util/yaml.mjs": "14759c85bf8107fc67212455a9b54403874b6707e897453dbe22055f5898593f",
     "src/verbs/dispatch/inspect.mjs": "6c687f7604aa011fa9db645aefb7efd11ec943b079b7b62f0fdba52703a78668",
@@ -1240,12 +1241,8 @@
     "src/verbs/dispatch/recover.mjs": "cf8c7458dcda950aa106ead81960bce4107c01ec587fab83a8aab34ac5943b7e",
     "src/verbs/dispatch/show-run.mjs": "6ed836d83f8fc71863fc2ce04115b7d0d63f2fb1f42e8bccabc94b812cb179c9",
     "src/verbs/dispatch/watch.mjs": "e82fb8d94c5d76bc64b006bab2742e777f50785a4c4b12c91f15723864e457a3",
-    "src/verbs/events/context.mjs": "e2bd56122a40d9e021d5e20e48341588f4cfab6a7f8a04a8c5d885fd52113490",
-    "src/verbs/events/export.mjs": "dda27240e36b26efc46a40cf769a475025dc736c21b9f3564437a8bd946fa26c",
+    "src/verbs/events/context.mjs": "6579eafcb90bf8a80d12b86e9ac132c6eb6e27f122942480b5062efbae181716",
     "src/verbs/events/rebuild.mjs": "878c422f69b2aef971be694291a2ddfa7f5c705442b662e18f8d9df61720eae5",
-    "src/verbs/events/seal.mjs": "2974c0afb48af6d1373f09f993e1488d679148c07d2ea8ffa2c7cc9338d9ec4a",
-    "src/verbs/events/status.mjs": "6fb73280f473c45dc2de55c1ad4514235a0f5e9563ebf7e2801d7b4c072ffc6f",
-    "src/verbs/events/sync.mjs": "ab1377bc758810e34fb72d1413a0de9747b8685f8cb2dc814fb8b094b2db7666",
     "src/verbs/merge/approve.mjs": "848bb36b933244a1505e031df39f21d6c1a497ec3c777a2343622c00e7eb207c",
     "src/verbs/merge/catchup.mjs": "3c73bf052a078cbe1ef40a271c32e7772da918637abf7cd2bbb7065dbd2be245",
     "src/verbs/merge/iron-law-level.mjs": "7535987e203033abffcc4ce72f7062489aa7673db6cbb80f0a527dc288ac6087",
@@ -1769,6 +1766,13 @@
       "class": "rust-test"
     },
     {
+      "path": "apps/fgos/src/wiring/events.rs",
+      "line": 740,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
       "path": "apps/fgos/src/wiring/gateway_control.rs",
       "line": 1723,
       "spawn": "Command::new",
@@ -2049,6 +2053,20 @@
       "class": "rust-test"
     },
     {
+      "path": "apps/fgos/tests/cli_tests.rs",
+      "line": 2891,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "apps/fgos/tests/cli_tests.rs",
+      "line": 2899,
+      "spawn": "Command::new",
+      "binary": "? bin",
+      "class": "rust-test"
+    },
+    {
       "path": "apps/fgos/tests/internal_lock_routes.rs",
       "line": 423,
       "spawn": "Command::new",
@@ -2162,14 +2180,14 @@
     },
     {
       "path": "bin/fgos.mjs",
-      "line": 3162,
+      "line": 3126,
       "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:180",
       "binary": "(config door value (readConfig({ projectRoot: repoRoot, sections: ['invariantChecks'] })))",
       "class": "configured-binary"
     },
     {
       "path": "bin/fgos.mjs",
-      "line": 3306,
+      "line": 3270,
       "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:180",
       "binary": "(config door value (readConfig({ projectRoot: repoRoot, sections: ['invariantChecks'] })))",
       "class": "configured-binary"
@@ -3477,6 +3495,27 @@
       "path": "scripts/test-proof-inventory.mjs",
       "line": 704,
       "spawn": "cliCost -> scripts/test-proof-inventory.mjs:666",
+      "binary": "(env FGOS_HOST_BIN)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/event-store/maintenance.mjs",
+      "line": 57,
+      "spawn": "handSyncToChild -> src/event-store/maintenance.mjs:25",
+      "binary": "(env FGOS_HOST_BIN)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/event-store/maintenance.mjs",
+      "line": 98,
+      "spawn": "maintainEventStore -> src/event-store/maintenance.mjs:57",
+      "binary": "(env FGOS_HOST_BIN)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/event-store/maintenance.mjs",
+      "line": 105,
+      "spawn": "handSealsToChild -> src/event-store/maintenance.mjs:68",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
     },
