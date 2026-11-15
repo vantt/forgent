@@ -443,7 +443,7 @@
       "job": "holder-lock and mailbox doctor judgments",
       "kind": "door",
       "patterns": [
-        "export (?:async )?function (?:checkLockKernelSemantics|checkLockBorrowVectors|checkLockHolders|fixLockDirs|checkMailboxHook|mailboxRecordVerdict)\\b",
+        "(?:export )?(?:async )?function (?:checkLockKernelSemantics|checkLockBorrowVectors|checkLockHolders|fixLockDirs|checkMailboxHook|mailboxRecordVerdict)\\b",
         "\\bfn (?:kernel_semantics|borrow_vectors_row|holders_pointer|fix_lock_dirs|mailbox_hook|record_verdict|cross_machine_note)\\b"
       ],
       "allowed": [

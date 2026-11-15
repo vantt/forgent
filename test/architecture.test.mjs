@@ -2081,6 +2081,8 @@ test('the machine-service door rows catch each of their patterns outside the own
       ['src/x.mjs', 'export function checkLockKernelSemantics(repoRoot) {}\n'],
       ['src/x.mjs', 'export function fixLockDirs(repoRoot) {}\n'],
       ['src/x.mjs', 'export function checkMailboxHook(cwd) {}\n'],
+      ['src/x.mjs', 'function mailboxRecordVerdict(cwd) {}\n'],
+      ['src/x.mjs', 'async function checkLockHolders() {}\n'],
       ['apps/fgos/src/wiring/x.rs', 'fn borrow_vectors_row() -> RowOutcome {\n'],
       ['apps/fgos/src/wiring/x.rs', 'fn mailbox_hook(root: &Path) -> RowOutcome {\n'],
       ['apps/fgos/src/wiring/x.rs', 'fn cross_machine_note(cross: Option<&Value>) -> String {\n'],

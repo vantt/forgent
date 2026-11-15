@@ -34,19 +34,17 @@ function configValue(projectRoot, sections) {
  * unit syntax needs it).
  * @typedef {string | { name: string, value: string }} Word
  * @typedef {{
- *   name: string, label: string, marker: string, stemPrefix: string, serviceDescription: string, timerDescription: string,
+ *   name: string, marker: string, stemPrefix: string, serviceDescription: string, timerDescription: string,
  *   scheduleOf: (projectRoot: string) => ({ intervalSec: number } & Record<string, unknown>) | null,
  *   command: (found: any, projectRoot: string) => Word[],
  *   serviceVars: () => Record<string, string>,
- *   words: { off: string, orphan: (kind: string, stem: string) => string, active: (kind: string, stem: string, found: any) => string,
- *            broken: (kind: string, state: string, stem: string, dir: string) => string, removed: (kind: string, stem: string) => string, noScheduler: string },
+ *   words: { off: string, removed: (kind: string, stem: string) => string, noScheduler: string },
  * }} Schedule
  */
 
 /** @type {Schedule} */
 export const MAILBOX_SYNC = {
   name: 'mailbox-sync',
-  label: 'mailbox sync',
   marker: 'fgos-managed: mailbox-sync-timer',
   stemPrefix: 'fgos-mailbox-sync',
   serviceDescription: 'fgOS mailbox sync (takes mail from other machines)',
@@ -65,9 +63,6 @@ export const MAILBOX_SYNC = {
   words: {
     off: 'cross-machine mail is not enabled here (or eventStore.sync.intervalSec is 0), so no timer is needed',
     noScheduler: 'mail is taken when a session runs a tool',
-    orphan: (kind, stem) => `${kind} timer ${stem} is still installed but cross-machine mail is off here`,
-    active: (kind, stem, found) => `${kind} timer ${stem} takes mail every ${found.intervalSec} s, even when no session is running a tool`,
-    broken: (kind, state, stem) => `no working ${kind} timer (${state}) for ${stem}: mail from another machine waits until a session there runs a tool`,
     removed: (kind, stem) => `removed ${kind} timer ${stem}: cross-machine mail is off here`,
   },
 };
@@ -82,7 +77,6 @@ function probePath() {
 /** @type {Schedule} */
 export const ACCOUNT_PROBE = {
   name: 'account-probe',
-  label: 'account probe',
   marker: 'fgos-managed: account-probe-timer',
   stemPrefix: 'fgos-account-probe',
   serviceDescription: 'fgOS account probe (calls each provider account directly and records what it found)',
@@ -99,9 +93,6 @@ export const ACCOUNT_PROBE = {
   words: {
     off: 'the account probe is not scheduled here (dispatch.probeAccount.intervalSec is 0), so no timer is needed',
     noScheduler: 'run fgos dispatch probe-account --all --record by hand',
-    orphan: (kind, stem) => `${kind} timer ${stem} is still installed but dispatch.probeAccount.intervalSec is 0 here`,
-    active: (kind, stem, found) => `${kind} timer ${stem} probes every account every ${found.intervalSec} s`,
-    broken: (kind, state, stem) => `no working ${kind} timer (${state}) for ${stem}: no account is probed between runs`,
     removed: (kind, stem) => `removed ${kind} timer ${stem}: the account probe is off here`,
   },
 };
@@ -247,24 +238,6 @@ const defaultRun = (command, args) => {
   throw new Error(`a managed timer does not start ${command}`);
 };
 
-function stateOf({ scheduler, files, stem, run }) {
-  for (const [name, text] of Object.entries(files)) {
-    let have;
-    try {
-      have = fs.readFileSync(path.join(scheduler.dir, name), 'utf8');
-    } catch {
-      return 'missing';
-    }
-    if (have !== text) return 'stale';
-  }
-  try {
-    scheduler.enabled(stem, run);
-  } catch {
-    return 'disabled';
-  }
-  return 'ok';
-}
-
 function isExecutable(file) {
   try {
     fs.accessSync(file, fs.constants.X_OK);
@@ -325,20 +298,6 @@ function resolveOptions(cwd, schedule, overrides) {
     run: defaultRun,
     ...overrides,
   };
-}
-
-/** Doctor's reading of one schedule's timer for this project. `overrides.found` replaces the config read. */
-export function checkManagedTimer(schedule, cwd, overrides = {}) {
-  const { run, ...planOptions } = resolveOptions(cwd, schedule, overrides);
-  const p = plan(cwd, planOptions);
-  if (p.orphan) {
-    return { passed: false, message: `${schedule.words.orphan(p.orphan.chosen.kind, p.orphan.stem)} (fgos doctor --fix removes it; only files with the ${schedule.marker} marker are touched)` };
-  }
-  if (p.skip) return { passed: true, message: p.skip };
-  if (p.refused) return { passed: true, message: `warning: no ${schedule.label} timer: ${p.refused}` };
-  const state = stateOf({ scheduler: p.chosen, files: p.files, stem: p.stem, run });
-  if (state === 'ok') return { passed: true, message: schedule.words.active(p.chosen.kind, p.stem, p.found) };
-  return { passed: false, message: `${schedule.words.broken(p.chosen.kind, state, p.stem)} (fgos doctor --fix writes it under ${p.chosen.dir})` };
 }
 
 /** Writes the unit files and enables them; leaves any other unit as it was. */

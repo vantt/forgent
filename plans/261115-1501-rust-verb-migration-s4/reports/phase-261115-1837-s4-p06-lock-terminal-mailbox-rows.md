@@ -57,4 +57,9 @@ None needed for users; if wanted: `fgos doctor` judges the holder-lock, mailbox 
 4. `NativeOwner` shape changed (consts -> functions over `GROUPS`): phases 04, 05, 07 add one `pub mod` line and one `GROUPS` entry each and a `GROUP` const in their own file; expect a trivial conflict in `mod.rs` and in `registrations.test.mjs`/`yaml-parse-failures.test.mjs`/`checks.test.mjs` id lists.
 5. Parity needs the real systemd bus out of reach: the table sets `XDG_RUNTIME_DIR` and `DBUS_SESSION_BUS_ADDRESS` to missing paths in every case.
 
+6. For TEST: the rewritten `mailbox-hook` wiring test in `registrations.test.mjs` runs the full `fgos doctor --json` three times, borrow vectors included.
+
+## After OPC review
+`cli_tests.rs` no-Node doctor case now splits by owner (inRust rows must answer without the Node message; the rest keep it); `checkManagedTimer`, `stateOf` and the Node timer wording deleted with their check cases (owner: `timer.rs` tests and `mailbox.rs`); door pattern also matches plain `function` declarations (two more negatives); holder-lock spec lines 270 and 276 reworded; phase file records the `2 + inRust.fixes` budget.
+
 Status: DONE_WITH_CONCERNS

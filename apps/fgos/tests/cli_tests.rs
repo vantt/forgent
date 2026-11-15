@@ -3376,7 +3376,7 @@ fn doctor_in(
 
 #[cfg(unix)]
 #[test]
-fn doctor_without_node_fails_each_bridged_row_naming_node_once_and_still_answers() {
+fn doctor_without_node_fails_each_bridged_row_naming_node_once_and_the_host_rows_still_answer() {
     let project = fresh_dir("fgos_doctor_nonode");
     let path = path_without_node();
 
@@ -3392,7 +3392,35 @@ fn doctor_without_node_fails_each_bridged_row_naming_node_once_and_still_answers
     assert_eq!(data["ok"], false);
     let checks = data["checks"].as_array().unwrap();
     assert!(checks.len() > 100, "{}", checks.len());
-    for row in checks {
+    // The rows the host judges itself (the registry's `inRust`) answer for themselves; every other row is the
+    // Node bridge's and fails naming Node.
+    let registry: serde_json::Value = serde_json::from_str(include_str!(
+        "../../../packages/distribution/contracts/doctor-registry.v1.json"
+    ))
+    .unwrap();
+    let in_rust: Vec<&str> = registry["inRust"]["rows"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|id| id.as_str().unwrap())
+        .collect();
+    for id in &in_rust {
+        let row = checks
+            .iter()
+            .find(|row| row["id"] == *id)
+            .unwrap_or_else(|| panic!("the report has no row {id}"));
+        assert!(
+            !row["message"]
+                .as_str()
+                .unwrap_or_default()
+                .starts_with("Node is not available"),
+            "a row the host judges names Node: {row}"
+        );
+    }
+    for row in checks
+        .iter()
+        .filter(|row| !in_rust.contains(&row["id"].as_str().unwrap()))
+    {
         assert_eq!(row["status"], "fail", "{row}");
         assert_eq!(row["passed"], false);
         assert!(row["fix"].is_null(), "{row}");

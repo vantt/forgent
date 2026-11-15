@@ -64,3 +64,9 @@ Phase-lead rules: [plan.md](plan.md). Branch `rust-verb-migration-program/s4-p06
 
 - The mailbox pointer's cost or verdict changes (M x M): same function as the verb; parity on a trusted and an
   untrusted record. Rollback: revert; rows return to the bridge.
+
+## Outcome notes
+
+- Terminal rows stay `bridge:S6a` (facts F2: the judge reads `resolveHostBin`, no Rust owner). The timer rows and fixes live in `mailbox.rs` and keep the registry owner `rust:packaging`.
+- Accepted transition cost until the bridge goes: the parity runner's budget of Node starts per `--fix` is `2 + inRust.fixes` (each fix the host runs itself can split the bridged fixes around it into one more call); it is read from the registry, so no phase edits it.
+- `checkManagedTimer` and the Node timer wording are deleted (the doctor rows are judged by `timer.rs` through `mailbox.rs`); `managed-timer.mjs` keeps `fixManagedTimer` for `uninstall` until its phase.

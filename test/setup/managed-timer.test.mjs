@@ -4,7 +4,7 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 
-import { ACCOUNT_PROBE, MAILBOX_SYNC, checkManagedTimer, fixManagedTimer, renderLaunchd, renderSystemd, schedulerFor, unitStem } from '../../src/setup/managed-timer.mjs';
+import { ACCOUNT_PROBE, MAILBOX_SYNC, fixManagedTimer, renderLaunchd, renderSystemd, schedulerFor, unitStem } from '../../src/setup/managed-timer.mjs';
 
 const bin = () => ({ tier: 0, path: '/opt/fgos/bin/fgos' });
 
@@ -59,29 +59,18 @@ test('the account probe schedule is off until dispatch.probeAccount.intervalSec 
 
 for (const { schedule, on, other, stemPrefix } of SCHEDULES) {
   test(`${schedule.name}: a project that does not use it needs no timer, and a platform without a scheduler is said to have none`, () => {
-    assert.equal(checkManagedTimer(schedule, '/p', { found: () => null }).passed, true);
     assert.equal(fixManagedTimer(schedule, '/p', { found: () => null }).fixed, false);
-    const none = checkManagedTimer(schedule, '/p', { found: on, scheduler: () => null, bin });
-    assert.equal(none.passed, true);
+    const none = fixManagedTimer(schedule, '/p', { found: on, scheduler: () => null, bin });
+    assert.equal(none.fixed, false);
     assert.match(none.message, /no supported scheduler/);
   });
 
-  test(`${schedule.name}: doctor fails while the units are missing, the fix writes and enables them, and the check then passes; a changed interval is stale`, () => {
+  test(`${schedule.name}: the fix writes the units and enables them`, () => {
     const w = world();
     const options = { found: on, scheduler: w.scheduler, bin, run: w.run };
-    const before = checkManagedTimer(schedule, '/p', options);
-    assert.equal(before.passed, false);
-    assert.match(before.message, /missing/);
-    assert.match(before.message, /fgos doctor --fix/);
-
     const fixed = fixManagedTimer(schedule, '/p', options);
     assert.equal(fixed.fixed, true, fixed.message);
     assert.ok(w.calls.some((call) => call.startsWith(`systemctl --user enable --now ${stemPrefix}`)), w.calls.join('\n'));
-    assert.equal(checkManagedTimer(schedule, '/p', options).passed, true);
-
-    const changed = checkManagedTimer(schedule, '/p', { ...options, found: other });
-    assert.equal(changed.passed, false);
-    assert.match(changed.message, /stale/);
   });
 
   test(`${schedule.name}: a timer that is written but refused by the OS is reported, not claimed fixed`, () => {
@@ -106,7 +95,7 @@ for (const { schedule, on, other, stemPrefix } of SCHEDULES) {
     assert.ok(fs.readFileSync(path.join(w.home, 'units', service), 'utf8').includes(shim));
   });
 
-  test(`${schedule.name}: turning it off makes doctor name the leftover timer and --fix remove only the unit files carrying the marker`, () => {
+  test(`${schedule.name}: turning it off makes --fix remove only the unit files carrying the marker`, () => {
     const w = world();
     const options = { found: on, scheduler: w.scheduler, bin, run: w.run };
     assert.equal(fixManagedTimer(schedule, '/p', options).fixed, true);
@@ -115,15 +104,10 @@ for (const { schedule, on, other, stemPrefix } of SCHEDULES) {
     fs.writeFileSync(foreign, '[Timer]\n');
 
     const off = { ...options, found: () => null };
-    const found = checkManagedTimer(schedule, '/p', off);
-    assert.equal(found.passed, false);
-    assert.match(found.message, /still installed/);
-
     const removed = fixManagedTimer(schedule, '/p', off);
     assert.equal(removed.fixed, true, removed.message);
     assert.ok(w.calls.some((call) => call.includes(`disable --now ${stemPrefix}`)), w.calls.join('\n'));
     assert.deepEqual(fs.readdirSync(units), ['someone-elses.timer']);
-    assert.equal(checkManagedTimer(schedule, '/p', off).passed, true);
   });
 
   test(`${schedule.name}: a unit file without the marker is never removed, even under this project's unit name`, () => {
@@ -163,14 +147,12 @@ test('a unit is never written with "%", a newline or another control character i
   }
 });
 
-test('an unsafe project path leaves the timer unwritten and doctor says why, as a warning', () => {
+test('an unsafe project path leaves the timer unwritten and the fix says why', () => {
   const w = world();
   const dir = path.join(w.home, 'proj%x');
-  const check = checkManagedTimer(MAILBOX_SYNC, dir, { found: SCHEDULES[0].on, scheduler: w.scheduler, bin, run: w.run });
-  assert.equal(check.passed, true);
-  assert.match(check.message, /^warning: no mailbox sync timer: .*projectRoot/);
   const fix = fixManagedTimer(MAILBOX_SYNC, dir, { found: SCHEDULES[0].on, scheduler: w.scheduler, bin, run: w.run });
   assert.equal(fix.fixed, false);
+  assert.match(fix.message, /^skipped: .*projectRoot/);
   assert.equal(fs.existsSync(path.join(w.home, 'units')), false, 'nothing was written');
 });
 
@@ -181,8 +163,8 @@ test('without the project shim the timer names only the activated release host, 
   fs.writeFileSync(path.join(project, 'bin', 'fgos.mjs'), '');
   fs.mkdirSync(path.join(project, 'node_modules', '.bin'), { recursive: true });
   fs.writeFileSync(path.join(project, 'node_modules', '.bin', 'fgos'), '#!/bin/sh\n', { mode: 0o755 });
-  const none = checkManagedTimer(MAILBOX_SYNC, project, { found: SCHEDULES[0].on, scheduler: w.scheduler, run: w.run });
-  assert.equal(none.passed, true);
+  const none = fixManagedTimer(MAILBOX_SYNC, project, { found: SCHEDULES[0].on, scheduler: w.scheduler, run: w.run });
+  assert.equal(none.fixed, false);
   assert.match(none.message, /no activated fgos host resolves here/);
   const release = path.join(project, 'release');
   fs.mkdirSync(path.join(release, 'bin'), { recursive: true });
