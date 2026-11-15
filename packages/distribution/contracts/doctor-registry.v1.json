@@ -47,7 +47,17 @@
       "identity-project-id",
       "identity-shared-directory",
       "observe-dir-writable",
-      "observe-host-resolvable"
+      "observe-host-resolvable",
+      "node-version-and-git",
+      "main-checkout-hook-wired",
+      "git-component-compatible",
+      "git-repository-config",
+      "git-operation-journal",
+      "git-incidents",
+      "event-store-open-root",
+      "event-store-machine-id",
+      "event-store-legacy-layout",
+      "event-store-incidents"
     ],
     "fixes": [
       "lock-dirs",
@@ -60,7 +70,11 @@
       "config-copy-to-destination",
       "gateway-token-configured",
       "identity-machine-id",
-      "identity-machine-key"
+      "identity-machine-key",
+      "git-driver-directories",
+      "git-wal-dir",
+      "git-publication-refspecs",
+      "event-store-lock-dirs"
     ]
   },
   "layers": {

@@ -156,21 +156,26 @@ fn store_failure(error: StoreError) -> Refused {
 
 /// A Git operation's refusal with every field the driver reports, as one JSON line: the text the Node addon
 /// raises for it, so a caller reads the same message from either door.
-fn operation_failure(e: &OperationError) -> String {
+pub(crate) fn operation_failure(e: &OperationError) -> String {
     json!({"code": e.code, "cause": e.cause, "retryable": e.retryable, "operationId": e.operation_id, "receipt": e.receipt, "exitCode": e.exit_code, "signal": e.signal, "stderr": e.stderr, "detail": e.detail}).to_string()
 }
 
-fn resolve_failure(error: ResolveError) -> Refused {
-    failed(match &error {
+/// What a refusal to build a store's authority says: the code, the driver's JSON line, or the machine id's text.
+pub(crate) fn resolve_message(error: &ResolveError) -> String {
+    match error {
         ResolveError::StateRootGone | ResolveError::NoRepository => error.code(),
         ResolveError::Git(e) => operation_failure(e),
         ResolveError::Machine(e) => e.to_string(),
-    })
+    }
 }
 
-/// A config the `events` verbs refuse to act on: the section's own rule, or the refusal of a config file.
-fn config_failure(error: ReadError) -> Refused {
-    failed(match error {
+fn resolve_failure(error: ResolveError) -> Refused {
+    failed(resolve_message(&error))
+}
+
+/// What a config the `events` verbs refuse says: the section's own rule, or the refusal of a config file.
+pub(crate) fn config_message(error: ReadError) -> String {
+    match error {
         ReadError::HomeUnset => fgos_config::machine::HOME_UNSET_ID.to_owned(),
         ReadError::Invalid(invalid) => invalid.to_string(),
         ReadError::Snapshot(SnapshotError::Refused(list)) => format!(
@@ -181,7 +186,11 @@ fn config_failure(error: ReadError) -> Refused {
                 .join("; ")
         ),
         ReadError::Snapshot(SnapshotError::Io(io)) => format!("event-store-config: {io}"),
-    })
+    }
+}
+
+fn config_failure(error: ReadError) -> Refused {
+    failed(config_message(error))
 }
 
 /// What a detached child answers when the state root it was started for is gone.

@@ -26,6 +26,7 @@ pub use remote::{RefMapping, RemoteRef};
 pub use sequence::{sequence_ref, SequenceHome, SequencePush, SequenceTip};
 mod publication;
 mod repository_config;
+pub mod repository_facts;
 pub use publication::{HolderAuthority, PublicationPort, RemoteGrant};
 pub use repository_config::{
     granted_fetch_mappings, obsolete_legacy_fetch_mapping, publication_fetch_mappings,

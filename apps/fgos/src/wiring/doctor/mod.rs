@@ -5,6 +5,8 @@
 
 pub mod bridge;
 pub mod config;
+pub mod event_store;
+pub mod git;
 pub mod holder_lock;
 pub mod identity;
 pub mod mailbox;
@@ -21,6 +23,7 @@ use fgos_host_runtime::{
     VerbAnswer,
 };
 use std::borrow::Cow;
+use std::cell::OnceCell;
 use std::ffi::OsString;
 use std::future::Future;
 use std::path::{Path, PathBuf};
@@ -115,6 +118,30 @@ pub fn project_root_refusal(root: &Path) -> Option<&'static str> {
         .then_some("config-request-invalid (projectRoot)")
 }
 
+/// What one doctor call shares between the rows a group judges in process: the project, the state root and the
+/// facts read once (a failure is remembered, not recomputed per row).
+pub struct Run<'a> {
+    pub root: &'a Path,
+    pub state_root: PathBuf,
+    pub(crate) git: git::Cache,
+    pub(crate) event_store: OnceCell<Result<event_store::Context, String>>,
+}
+
+impl<'a> Run<'a> {
+    pub fn new(root: &'a Path) -> Self {
+        Self::with_state_root(root, fgos_holder_lock::state_root().0)
+    }
+
+    pub fn with_state_root(root: &'a Path, state_root: PathBuf) -> Self {
+        Self {
+            root,
+            state_root,
+            git: OnceCell::new(),
+            event_store: OnceCell::new(),
+        }
+    }
+}
+
 /// One component group's adapter: the ids of the rows it judges and the fixes it runs, and the two calls that
 /// answer for them. A group's file calls its component crate's public functions and words the answer; it never
 /// re-derives a fact.
@@ -130,6 +157,8 @@ pub struct Rows {
 /// Every group the host judges in process. A phase that ports a group of rows adds its line here.
 const GROUPS: &[&Rows] = &[
     &config::GROUP,
+    &git::GROUP,
+    &event_store::GROUP,
     &holder_lock::GROUP,
     &identity::GROUP,
     &mailbox::GROUP,
@@ -323,6 +352,16 @@ mod tests {
     }
 
     #[test]
+    fn a_row_or_fix_belongs_to_exactly_one_group() {
+        let mut rows = std::collections::HashSet::new();
+        let mut fixes = std::collections::HashSet::new();
+        for group in GROUPS {
+            assert!(group.rows.iter().all(|id| rows.insert(*id)), "a row is in two groups");
+            assert!(group.fixes.iter().all(|id| fixes.insert(*id)), "a fix is in two groups");
+        }
+    }
+
+    #[test]
     fn a_call_with_no_project_is_the_projection_error() {
         assert_eq!(
             project_doctor_request(&os(&["doctor"]), Err("no project".into())),
@@ -419,5 +458,109 @@ mod tests {
         );
         assert_eq!(strict.exit, 1);
         assert!(strict.text.unwrap().starts_with("fgos doctor\n"));
+    }
+}
+
+/// Real repositories for the row adapters' tests: a repository with its own machine id, a private state root, the
+/// controller's activation fence and the Event Store's locks directory, the way a project `fgctl init` prepared it.
+#[cfg(test)]
+pub(crate) mod testkit {
+    use super::Run;
+    use std::path::{Path, PathBuf};
+    use std::process::Command;
+
+    pub struct Fixture {
+        pub temp: PathBuf,
+        pub repo: PathBuf,
+        pub state: PathBuf,
+    }
+
+    fn private(path: &Path) {
+        std::fs::create_dir_all(path).unwrap();
+        #[cfg(unix)]
+        {
+            use std::os::unix::fs::PermissionsExt;
+            std::fs::set_permissions(path, std::fs::Permissions::from_mode(0o700)).unwrap();
+        }
+    }
+
+    pub fn git(dir: &Path, args: &[&str]) -> String {
+        let out = Command::new("git")
+            .args(args)
+            .current_dir(dir)
+            .output()
+            .unwrap();
+        assert!(
+            out.status.success(),
+            "git {args:?}: {}",
+            String::from_utf8_lossy(&out.stderr)
+        );
+        String::from_utf8_lossy(&out.stdout).trim().to_owned()
+    }
+
+    impl Fixture {
+        pub fn new(name: &str) -> Self {
+            let temp = std::env::temp_dir().join(format!(
+                "fgos-doctor-{name}-{}-{}",
+                std::process::id(),
+                std::time::SystemTime::now()
+                    .duration_since(std::time::UNIX_EPOCH)
+                    .unwrap()
+                    .as_nanos()
+            ));
+            let repo = temp.join("repo");
+            std::fs::create_dir_all(&repo).unwrap();
+            git(&repo, &["init", "-q", "-b", "main"]);
+            git(&repo, &["config", "user.name", "Fixture"]);
+            git(&repo, &["config", "user.email", "fixture@example.test"]);
+            git(&repo, &["config", "fgos.machineId", "fixture-machine"]);
+            let state = temp.join("state");
+            private(&state);
+            private(&repo.join(".git/fgos"));
+            private(&repo.join(".git/fgos/events"));
+            private(&repo.join(".git/fgos/events/locks"));
+            let fence = repo.join(".fgos/locks/activation.lock");
+            std::fs::create_dir_all(&fence).unwrap();
+            std::fs::write(
+                fence.join("TOMBSTONE"),
+                r#"{"lock":"activation","by":"fgos git","at":"fixture"}"#,
+            )
+            .unwrap();
+            Self { temp, repo, state }
+        }
+
+        /// A directory that is no repository.
+        pub fn plain(name: &str) -> Self {
+            let mut fixture = Self::new(name);
+            let plain = fixture.temp.join("plain");
+            private(&plain);
+            fixture.repo = plain;
+            fixture
+        }
+
+        pub fn git(&self, args: &[&str]) -> String {
+            git(&self.repo, args)
+        }
+
+        pub fn with_remote(&self) -> PathBuf {
+            let remote = self.temp.join("remote");
+            git(
+                &self.temp,
+                &["init", "--bare", "-q", remote.to_str().unwrap()],
+            );
+            self.git(&["remote", "add", "origin", remote.to_str().unwrap()]);
+            remote
+        }
+
+        /// A fresh run: each judgment of a test starts from what is on disk now.
+        pub fn run(&self) -> Run<'_> {
+            Run::with_state_root(&self.repo, self.state.clone())
+        }
+    }
+
+    impl Drop for Fixture {
+        fn drop(&mut self) {
+            let _ = std::fs::remove_dir_all(&self.temp);
+        }
     }
 }

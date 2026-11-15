@@ -340,55 +340,14 @@ pub fn inspect_git(
 ) -> Result<Value> {
     check()?;
     let driver = GitDriver::new(Path::new(&state_root)).map_err(operation)?;
-    let floor = driver.git_floor_verdict().map_err(operation)?;
-    let floor = json!({"version":floor.version,"minimum":floor.minimum,"supported":floor.supported,"probes":floor.probes.iter().map(|p| json!({"name":p.name,"passed":p.passed,"evidence":p.evidence})).collect::<Vec<_>>()});
-    let repo = match driver
-        .resolve_repo(Path::new(&repo_path), Path::new(&trusted_main))
-        .map_err(operation)?
-    {
-        ResolveRepo::Repository(repo) => repo,
-        ResolveRepo::NotARepository => return Ok(json!({"notARepository":true,"floor":floor})),
-    };
-    // The reader below skips the fence on purpose (it never writes); the
-    // fact is reported through the same check every WAL-writing door runs.
-    let activation_fence = wal::require_activation_fence(&repo).is_ok();
-    let journal = incidents::journal_facts(&repo).map_err(fact_error)?;
-    let remote = remote.as_deref().unwrap_or("origin");
-    let obsolete = obsolete_legacy_fetch_mapping(remote).map_err(operation)?;
-    let mappings = driver
-        .configured_fetch_refspecs(&repo, remote)
-        .map_err(operation)?;
-    let mut reserved_legacy_refs = Vec::new();
-    let mut cursor = None;
-    loop {
-        let page = driver
-            .list_refs(
-                &repo,
-                &[RefPrefix::parse("refs/fgos/remotes/").map_err(error)?],
-                cursor,
-                1000,
-            )
-            .map_err(operation)?;
-        for entry in page.entries {
-            let name = entry.name.as_str();
-            if let Some((_, suffix)) = name
-                .strip_prefix("refs/fgos/remotes/")
-                .and_then(|r| r.split_once('/'))
-            {
-                if suffix.starts_with("legacy") && suffix != "legacy" {
-                    reserved_legacy_refs.push(name.to_owned());
-                }
-            }
-        }
-        if page.complete {
-            break;
-        }
-        cursor = page.next_cursor;
-    }
-    let native_locks = incidents::native_lock_names(&repo);
-    Ok(
-        json!({"floor":floor,"commonDir":plain_path(repo.common_dir()),"layout":format!("{:?}",repo.layout()),"journal":json!(journal),"activationFence":activation_fence,"nativeLocks":native_locks,"untrustedTransportConfig":driver.untrusted_transport_config(&repo).map_err(operation)?,"reservedLegacyRefs":reserved_legacy_refs,"obsoleteFetchMapping":mappings.iter().any(|f| f.value == obsolete.as_bytes()),"fetchRefspecs":mappings.into_iter().map(|f| String::from_utf8_lossy(&f.value).into_owned()).collect::<Vec<_>>(),"durability":"process-crash; file and parent sync; stable media not certified"}),
+    repository_facts::inspect_repository(
+        &driver,
+        Path::new(&repo_path),
+        Path::new(&trusted_main),
+        remote.as_deref().unwrap_or("origin"),
     )
+    .map(|inspection| inspection.to_json())
+    .map_err(fact_error)
 }
 #[napi]
 pub fn initialize_git_wal(

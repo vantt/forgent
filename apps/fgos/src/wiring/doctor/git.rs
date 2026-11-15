@@ -1,0 +1,788 @@
+//! The Git rows of `fgos doctor`, the Node-and-Git floor row, the hooks row and the three Git fixes. Every fact
+//! comes from `fgos-git` (`repository_facts`, `incidents`, RepositoryConfig); this file only turns them into the
+//! sentences a row says. Rows judge readiness: open incidents are `fgos git status` and `fgos git recover`, which
+//! `git-incidents` points to.
+
+use super::{Rows, Run};
+use fgos_config::event_store::EventStoreConfig;
+use fgos_distribution::doctor::{FixResult, RowOutcome, RowResult, Status};
+use fgos_git::incidents::{FactError, JournalFacts};
+use fgos_git::repository_facts::{inspect_repository, Inspection, RepositoryFacts};
+use fgos_git::{granted_fetch_mappings, GitDriver, OperationError, RepositoryConfig, ResolveRepo};
+use serde_json::{json, Value};
+use std::cell::OnceCell;
+use std::path::{Path, PathBuf};
+use std::time::Duration;
+
+pub const ROW_IDS: &[&str] = &[
+    "node-version-and-git",
+    "main-checkout-hook-wired",
+    "git-component-compatible",
+    "git-repository-config",
+    "git-operation-journal",
+    "git-incidents",
+];
+pub const FIX_IDS: &[&str] = &[
+    "git-driver-directories",
+    "git-wal-dir",
+    "git-publication-refspecs",
+];
+
+const MIN_NODE_MAJOR: u32 = 18;
+const NODE_PROBE_TIMEOUT: Duration = Duration::from_secs(10);
+pub const GROUP: Rows = Rows {
+    rows: ROW_IDS,
+    fixes: FIX_IDS,
+    judge: judge_rows,
+    fix: run_fixes,
+};
+
+/// The group's rows over one run: the repository is inspected once for all of them.
+fn judge_rows(root: &Path, ids: &[&str]) -> Vec<RowOutcome> {
+    let run = Run::new(root);
+    ids.iter()
+        .map(|id| RowOutcome::Judged(judge(&run, id).expect("the group asked for its own row")))
+        .collect()
+}
+
+fn run_fixes(root: &Path, ids: &[&str]) -> Vec<FixResult> {
+    let run = Run::new(root);
+    ids.iter()
+        .map(|id| fix(&run, id).expect("the group asked for its own fix"))
+        .collect()
+}
+
+const NO_REMOTE_FIX: &str = "git remote add origin <url> && fgos doctor --fix";
+const TRANSPORT_REMEDY: &str = "For actions/checkout use persist-credentials: false, remove its repo-local http.<url>.extraheader, and configure a trusted global credential helper or GIT_CONFIG_GLOBAL-level setting. Doctor never moves credentials automatically.";
+/// A project's own `.githooks/pre-commit` is fgOS's guard when it carries this name (the guard's own header).
+const GUARD_MARKER: &str = "str65-worktree-isolation-enforcement";
+/// The contract versions the Git row requires of the components built into this release.
+const REQUIRED_CONTRACTS: [(&str, u64); 3] = [("gitPort", 1), ("receipt", 1), ("walRecord", 1)];
+const RETENTION_CHAINS: u64 = 64;
+const RETENTION_DAYS: f64 = 7.0;
+
+/// What one run knows about the repository: the driver, the remote the project publishes to and its inspection.
+pub struct Context {
+    driver: GitDriver,
+    root: PathBuf,
+    remote: String,
+    inspection: Inspection,
+}
+
+pub type Cache = OnceCell<Result<Context, String>>;
+
+/// A Git refusal as one readable sentence: its cause plus the decoded stderr text.
+fn describe(error: &OperationError) -> String {
+    let text = String::from_utf8_lossy(&error.stderr).trim().to_owned();
+    if text.is_empty() {
+        error.cause.clone()
+    } else {
+        format!("{}: {text}", error.cause)
+    }
+}
+
+fn describe_fact(error: &FactError) -> String {
+    match error {
+        FactError::Operation(error) => describe(error),
+        FactError::Plain(text) => text.clone(),
+    }
+}
+
+fn project_remote(root: &Path) -> Result<String, String> {
+    EventStoreConfig::read_project(root, |key| std::env::var(key).ok(), false)
+        .map(|config| config.remote)
+        .map_err(crate::wiring::events::config_message)
+}
+
+fn build_context(root: &Path, state_root: &Path) -> Result<Context, String> {
+    let remote = project_remote(root)?;
+    let driver = GitDriver::new(state_root).map_err(|e| describe(&e))?;
+    let inspection =
+        inspect_repository(&driver, root, root, &remote).map_err(|e| describe_fact(&e))?;
+    Ok(Context {
+        driver,
+        root: root.to_path_buf(),
+        remote,
+        inspection,
+    })
+}
+
+impl Run<'_> {
+    /// The run's one inspection of the repository; a failure is remembered with its message.
+    pub fn git(&self) -> Result<&Context, &str> {
+        self.git
+            .get_or_init(|| build_context(self.root, &self.state_root))
+            .as_ref()
+            .map_err(String::as_str)
+    }
+}
+
+fn result(passed: bool, message: impl Into<String>, detail: Option<Value>) -> RowResult {
+    RowResult {
+        passed,
+        status: None,
+        message: Some(message.into()),
+        fix_command: None,
+        detail,
+    }
+}
+
+/// A row is its problems joined into one sentence, or its passing text; the facts it judged go under detail.
+fn row(problems: Vec<Option<String>>, ok: String, detail: Value) -> RowResult {
+    let found: Vec<String> = problems.into_iter().flatten().collect();
+    if found.is_empty() {
+        result(true, ok, Some(detail))
+    } else {
+        result(false, found.join("; "), Some(detail))
+    }
+}
+
+fn when(condition: bool, message: impl FnOnce() -> String) -> Option<String> {
+    condition.then(message)
+}
+
+/// Whether the contract versions of the components in this release are the ones the row requires.
+fn contracts_compatible(contracts: &Value) -> bool {
+    REQUIRED_CONTRACTS
+        .iter()
+        .all(|(key, version)| contracts[key] == json!(version))
+}
+
+fn component_compatible(facts: &Inspection) -> RowResult {
+    let floor = match facts {
+        Inspection::NotARepository { floor } => floor,
+        Inspection::Repository(found) => &found.floor,
+    };
+    let contracts = fgos_git::contract_versions();
+    let detail = json!({
+        "versions": {"git": fgos_git::VERSION, "contracts": contracts},
+        "floor": floor,
+    });
+    let ok = match facts {
+        Inspection::NotARepository { .. } => {
+            "the Git addon, its contracts and the Git feature floor are compatible".to_owned()
+        }
+        Inspection::Repository(found) => {
+            format!(
+                "info: {}: {}; {}",
+                found.common_dir, found.layout, found.durability
+            )
+        }
+    };
+    row(
+        vec![when(
+            !(contracts_compatible(&contracts) && floor.supported),
+            || {
+                "the Git addon, its contract versions or the Git feature floor do not match this release; upgrade the active release or its Git binary".to_owned()
+            },
+        )],
+        ok,
+        detail,
+    )
+}
+
+fn repository(context: &Context) -> Option<&RepositoryFacts> {
+    match &context.inspection {
+        Inspection::Repository(found) => Some(found),
+        Inspection::NotARepository { .. } => None,
+    }
+}
+
+fn obsolete_mapping(context: &Context, facts: &RepositoryFacts) -> Result<bool, String> {
+    if facts.obsolete_fetch_mapping {
+        return Ok(true);
+    }
+    if context.remote == "origin" {
+        return Ok(false);
+    }
+    match inspect_repository(&context.driver, &context.root, &context.root, "origin")
+        .map_err(|e| describe_fact(&e))?
+    {
+        Inspection::Repository(origin) => Ok(origin.obsolete_fetch_mapping),
+        Inspection::NotARepository { .. } => Ok(false),
+    }
+}
+
+/// What is wrong with the Event Store's Git mappings: an unsafe publication refspec, a missing mapping provenance,
+/// a remote that moved since setup. Facts that cannot be read are the Event Store rows' own failure.
+fn event_store_mapping_problems(run: &Run) -> Vec<String> {
+    let Ok(context) = run.event_store() else {
+        return Vec::new();
+    };
+    let facts = context.facts();
+    let strings = |key: &str| -> Vec<&str> {
+        facts[key]
+            .as_array()
+            .map(|all| all.iter().filter_map(Value::as_str).collect())
+            .unwrap_or_default()
+    };
+    let overlaps = |refspec: &str, namespaces: &[&str]| -> bool {
+        if refspec.starts_with('^') {
+            return false;
+        }
+        let source = refspec
+            .trim_start_matches('+')
+            .split(':')
+            .next()
+            .unwrap_or_default();
+        namespaces.iter().any(|namespace| match source.find('*') {
+            None => source == *namespace || source.starts_with(&format!("{namespace}/")),
+            Some(star) => {
+                let prefix = &source[..star];
+                namespace.starts_with(prefix) || prefix.starts_with(&format!("{namespace}/"))
+            }
+        })
+    };
+    if strings("pushRefspecs")
+        .iter()
+        .any(|r| overlaps(r, &["refs/fgos"]))
+        || strings("fetchRefspecs")
+            .iter()
+            .any(|r| overlaps(r, &["refs/fgos/local-events", "refs/fgos/branch-events"]))
+    {
+        return vec![
+            "unsafe publication refspec: push mappings or local/branch namespace fetch".into(),
+        ];
+    }
+    if !context.remote_configured() {
+        return Vec::new();
+    }
+    let provenance = &facts["provenance"];
+    let provenance_refspecs: Vec<&str> = provenance["refspecs"]
+        .as_array()
+        .map(|all| all.iter().filter_map(Value::as_str).collect())
+        .unwrap_or_default();
+    if provenance.is_null()
+        || strings("expectedFetchRefspecs")
+            .iter()
+            .any(|r| !provenance_refspecs.contains(r))
+    {
+        return vec![
+            "event-store-refspec-missing: no Git mapping provenance; run fgos doctor --fix".into(),
+        ];
+    }
+    if provenance["url"] != facts["remoteFact"]["url"] {
+        return vec!["event-store-remote-changed; run fgos doctor --fix".into()];
+    }
+    Vec::new()
+}
+
+fn repository_config(run: &Run, context: &Context, facts: &RepositoryFacts) -> RowResult {
+    let keys = &facts.untrusted_transport_config;
+    let obsolete = match obsolete_mapping(context, facts) {
+        Ok(obsolete) => obsolete,
+        Err(message) => return result(false, message, None),
+    };
+    let has_remote = run
+        .event_store()
+        .map_or(true, |event_store| event_store.remote_configured());
+    let missing_mapping = has_remote
+        && granted_fetch_mappings(&context.remote)
+            .map(|wanted| wanted.iter().any(|w| !facts.fetch_refspecs.contains(w)))
+            .unwrap_or(true);
+    let mut problems = vec![
+        when(!keys.is_empty(), || {
+            format!(
+                "repository-transport-config-untrusted: {}; Publication/Remote transfers refuse these settings. {TRANSPORT_REMEDY}",
+                keys.join(", ")
+            )
+        }),
+        when(missing_mapping, || {
+            "the required fetch mapping is missing; run fgos doctor --fix (git-publication-refspecs)".to_owned()
+        }),
+        when(obsolete, || {
+            "obsolete exact legacy mapping breaks plain fetch when the remote has no refs/fgos/legacy; run fgos doctor --fix (git-publication-refspecs)".to_owned()
+        }),
+        when(!facts.reserved_legacy_refs.is_empty(), || {
+            format!(
+                "reserved legacy mirror refs detected: {}; inspect and remove the foreign refs at their source and these mirrors",
+                facts.reserved_legacy_refs.join(", ")
+            )
+        }),
+    ];
+    problems.extend(event_store_mapping_problems(run).into_iter().map(Some));
+    let judged = row(
+        problems,
+        "repository transport settings and fetch mappings are as fgOS expects".to_owned(),
+        json!({"fetchRefspecs": facts.fetch_refspecs, "untrustedTransportConfig": keys, "reservedLegacyRefs": facts.reserved_legacy_refs}),
+    );
+    // Nothing to fetch from: the mappings are installed once a remote exists, so a local-only project is not red for it.
+    if has_remote || !judged.passed {
+        return judged;
+    }
+    RowResult {
+        status: Some(Status::Skip),
+        fix_command: Some(NO_REMOTE_FIX.to_owned()),
+        message: Some(format!(
+            "no Git remote \"{}\" configured, so there is no fetch mapping to install; add one when the project has a remote",
+            context.remote
+        )),
+        ..judged
+    }
+}
+
+fn operation_journal(facts: &RepositoryFacts) -> RowResult {
+    let journal = &facts.journal;
+    let fence_missing = journal.initialized && !facts.activation_fence;
+    // Every WAL-writing door refuses without the controller's activation fence, so a WAL without it is a hard stop.
+    row(
+        vec![
+            when(fence_missing, || {
+                "git-fence-missing: the Git WAL exists but the controller activation fence does not, so every Git write refuses; run `fgctl upgrade` for the active release (it places the fence)".to_owned()
+            }),
+            when(!journal.initialized, || {
+                "the Git WAL is not initialized; run `fgos doctor --fix` (git-wal-dir)".to_owned()
+            }),
+            when(journal.initialized && !journal.complete, || {
+                "the Git WAL listing is incomplete; inspect it with `fgos git status`".to_owned()
+            }),
+            when(!journal.errors.is_empty(), || {
+                format!(
+                    "{} Git WAL error(s); inspect them with `fgos git status`",
+                    journal.errors.len()
+                )
+            }),
+        ],
+        "the Git WAL is readable".to_owned(),
+        json!({"journal": journal}),
+    )
+}
+
+/// The journal row's retention sentence: pure, so the row's thresholds are testable without a repository.
+/// Finished chains no door compacts yet stay on disk: their count and oldest age show one kind growing unbounded.
+fn retention_note(journal: &JournalFacts, now_ms: u64) -> Option<String> {
+    let chains = journal.retained_chains as u64;
+    let days = journal
+        .oldest_retained_at_ms
+        .map(|at| now_ms.saturating_sub(at) as f64 / 86_400_000.0);
+    let kib = journal.retained_bytes.div_ceil(1024);
+    let age = days.map_or_else(|| "age unknown".to_owned(), |d| format!("{d:.1} days"));
+    let facts = format!("{chains} finished Git operation(s) retained ({kib} KiB, oldest {age})");
+    if journal.ledger_capacity_warning {
+        return Some("warning: the Git WAL id ledger is at capacity (ids are never deleted); report this row".to_owned());
+    }
+    if chains == 0 {
+        return None;
+    }
+    Some(
+        if chains > RETENTION_CHAINS || days.is_some_and(|d| d > RETENTION_DAYS) {
+            format!("warning: {facts}, past {RETENTION_CHAINS} operations or {} days; Worktree and Refs chains are not compacted yet, so report this row to schedule it", RETENTION_DAYS as u64)
+        } else {
+            format!("info: {facts}")
+        },
+    )
+}
+
+/// The commit a merge in the checkout stopped at, or none when no merge is in progress or it cannot be read.
+fn merge_head(context: &Context) -> Option<String> {
+    let ResolveRepo::Repository(repo) = context
+        .driver
+        .resolve_repo(&context.root, &context.root)
+        .ok()?
+    else {
+        return None;
+    };
+    context
+        .driver
+        .resolve_commit_ref(&repo, "MERGE_HEAD")
+        .ok()
+        .flatten()
+        .map(|oid| oid.as_str().to_owned())
+}
+
+fn incidents(context: &Context, facts: &RepositoryFacts, now_ms: u64) -> RowResult {
+    let journal = &facts.journal;
+    let merge = merge_head(context);
+    let note = retention_note(journal, now_ms);
+    let mut open = Vec::new();
+    if journal.pending_count > 0 {
+        open.push(format!(
+            "{} pending Git operation(s)",
+            journal.pending_count
+        ));
+    }
+    if !facts.native_locks.is_empty() {
+        open.push(format!("{} native lock(s)", facts.native_locks.len()));
+    }
+    if merge.is_some() {
+        open.push("a merge in progress".to_owned());
+    }
+    let retention = note
+        .filter(|note| note.starts_with("warning:"))
+        .map_or_else(String::new, |note| format!("; {note}"));
+    let message = if open.is_empty() {
+        format!("no pending Git operation, native lock or merge in progress; worktree and retained-Land findings: `fgos git status`{retention}")
+    } else {
+        format!(
+            "warning: {}; run `fgos git status` (`fgos git recover` settles interrupted operations){retention}",
+            open.join(", ")
+        )
+    };
+    result(
+        true,
+        message,
+        Some(
+            json!({"pendingCount": journal.pending_count, "nativeLocks": facts.native_locks.len(), "mergeInProgress": merge}),
+        ),
+    )
+}
+
+fn node_and_git(run: &Run) -> RowResult {
+    let version = match node_version() {
+        Ok(version) => version,
+        Err(message) => return result(false, message, None),
+    };
+    let major = version
+        .trim_start_matches('v')
+        .split('.')
+        .next()
+        .and_then(|major| major.parse::<u32>().ok());
+    if major.is_none_or(|major| major < MIN_NODE_MAJOR) {
+        return result(
+            false,
+            format!("node {version} — need >={MIN_NODE_MAJOR}"),
+            None,
+        );
+    }
+    let floor = match run.git() {
+        Ok(context) => match &context.inspection {
+            Inspection::NotARepository { floor } => floor,
+            Inspection::Repository(found) => &found.floor,
+        },
+        Err(message) => return result(false, format!("git not available: {message}"), None),
+    };
+    if floor.version.is_empty() {
+        return result(
+            false,
+            "git not available: fgos-git found no Git binary",
+            None,
+        );
+    }
+    result(true, format!("node {version}, git available"), None)
+}
+
+/// The version the Node on PATH reports (`v22.1.0`); the row's Node half asks the Node the bridged rows run in.
+fn node_version() -> Result<String, String> {
+    let env: Vec<(String, String)> = std::env::vars().collect();
+    match fgos_process::spawn::run_bounded(
+        "node",
+        ["--version"],
+        &env,
+        None,
+        None,
+        NODE_PROBE_TIMEOUT,
+    ) {
+        Ok(fgos_process::spawn::Outcome::Exited(out)) if out.status.success() => {
+            Ok(String::from_utf8_lossy(&out.stdout).trim().to_owned())
+        }
+        Ok(_) => Err("node is not available: `node --version` failed".to_owned()),
+        Err(error) => Err(format!("node is not available: {error}")),
+    }
+}
+
+/// The row of `main-checkout-hook-wired`: it applies only to a project whose `.githooks/pre-commit` is fgOS's own
+/// guard; any other project's hooks directory is its own business and never fails here.
+fn hook_wired(run: &Run) -> RowResult {
+    let owned = run.root.join(".githooks");
+    if !owned.exists() {
+        return result(
+            true,
+            "not applicable -- this project ships no .githooks/ directory",
+            None,
+        );
+    }
+    let ships_guard = std::fs::read_to_string(owned.join("pre-commit"))
+        .is_ok_and(|text| text.contains(GUARD_MARKER));
+    if !ships_guard {
+        return result(
+            true,
+            "not applicable -- this project's .githooks/pre-commit is not fgOS's guard",
+            None,
+        );
+    }
+    let wired = run.git().ok().is_some_and(|context| {
+        let Ok(ResolveRepo::Repository(repo)) =
+            context.driver.resolve_repo(&context.root, &context.root)
+        else {
+            return false;
+        };
+        let owned = repo.trusted_main_root().join(".githooks");
+        context
+            .driver
+            .inspect_hooks(&repo, &owned)
+            .is_ok_and(|report| report.wired)
+    });
+    if wired {
+        result(true, "core.hooksPath = .githooks — the hook checks the main-checkout kernel lock on every commit here (a fgOS child borrows it through its description)", None)
+    } else {
+        result(false, "core.hooksPath not wired to .githooks — commits here are NOT guarded against concurrent-writer clobbering (str65) — run npm run setup:hooks", None)
+    }
+}
+
+fn now_ms() -> u64 {
+    std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .map_or(0, |elapsed| elapsed.as_millis() as u64)
+}
+
+/// Judges `id` when it is a Git row.
+pub fn judge(run: &Run, id: &str) -> Option<RowResult> {
+    if !ROW_IDS.contains(&id) {
+        return None;
+    }
+    match id {
+        "node-version-and-git" => return Some(node_and_git(run)),
+        "main-checkout-hook-wired" => return Some(hook_wired(run)),
+        _ => {}
+    }
+    let context = match run.git() {
+        Ok(context) => context,
+        Err(message) => return Some(unreadable(id, message)),
+    };
+    let Some(facts) = repository(context) else {
+        return Some(if id == "git-component-compatible" {
+            component_compatible(&context.inspection)
+        } else {
+            result(true, "info: not a Git repository", None)
+        });
+    };
+    Some(match id {
+        "git-component-compatible" => component_compatible(&context.inspection),
+        "git-repository-config" => repository_config(run, context, facts),
+        "git-operation-journal" => operation_journal(facts),
+        _ => incidents(context, facts, now_ms()),
+    })
+}
+
+/// A Git row whose facts could not be read; an untrusted credential helper names its remedy.
+fn unreadable(id: &str, message: &str) -> RowResult {
+    if id == "git-repository-config"
+        && message.contains("repository-config-untrusted: credential.helper")
+    {
+        return result(false, format!("{message}; {TRANSPORT_REMEDY}"), None);
+    }
+    result(false, message, None)
+}
+
+const NOT_A_REPOSITORY: &str = "not a Git repository";
+
+/// A fix that refused is a warning, never a failure of the doctor.
+fn refused(error: &str) -> (bool, String) {
+    (false, format!("warning: Git setup refused: {error}"))
+}
+
+fn driver_directories(state_root: &Path) -> (bool, String) {
+    // No config read here: the door refuses while these directories are unsafe, and this is what makes them safe.
+    match GitDriver::prepare_directories(state_root) {
+        Ok(changed) => (
+            changed,
+            "fgOS Git driver directories are current-user-owned and safely permissioned".to_owned(),
+        ),
+        Err(error) => refused(&describe(&error)),
+    }
+}
+
+/// The repository as a fix found it, or none when there is nothing to fix.
+fn read_before(run: &Run) -> Result<Option<Context>, String> {
+    let context = build_context(run.root, &run.state_root)?;
+    Ok(repository(&context).is_some().then_some(context))
+}
+
+fn initialize_wal(run: &Run) -> Result<(bool, String), String> {
+    let Some(context) = read_before(run)? else {
+        return Ok((false, NOT_A_REPOSITORY.to_owned()));
+    };
+    let facts = repository(&context).expect("read_before keeps a repository");
+    let initialized_before = facts.journal.initialized;
+    let ResolveRepo::Repository(repo) = context
+        .driver
+        .resolve_repo(&context.root, &context.root)
+        .map_err(|e| describe(&e))?
+    else {
+        return Ok((false, NOT_A_REPOSITORY.to_owned()));
+    };
+    fgos_git::wal::Wal::open(&repo).map_err(|e| e.to_string())?;
+    Ok((
+        !initialized_before,
+        "Git WAL initialized and trusted".to_owned(),
+    ))
+}
+
+fn operation_id() -> String {
+    let nanos = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .map_or(0, |elapsed| elapsed.as_nanos());
+    format!("doctor-{nanos:x}-{:x}", std::process::id())
+}
+
+fn install_fetch_mapping(run: &Run) -> Result<(bool, String), String> {
+    let Some(context) = read_before(run)? else {
+        return Ok((false, NOT_A_REPOSITORY.to_owned()));
+    };
+    let facts = repository(&context).expect("read_before keeps a repository");
+    let remote = &context.remote;
+    let has_remote = build_event_store_remote(run);
+    let mut repairs: Vec<&str> = Vec::new();
+    let mapped = granted_fetch_mappings(remote)
+        .map_err(|e| describe(&e))?
+        .iter()
+        .all(|wanted| facts.fetch_refspecs.contains(wanted));
+    if has_remote && (!mapped || facts.obsolete_fetch_mapping) {
+        repairs.push(remote);
+    }
+    if remote != "origin" && obsolete_mapping(&context, facts)? {
+        repairs.push("origin");
+    }
+    let ResolveRepo::Repository(repo) = context
+        .driver
+        .resolve_repo(&context.root, &context.root)
+        .map_err(|e| describe(&e))?
+    else {
+        return Ok((false, NOT_A_REPOSITORY.to_owned()));
+    };
+    for target in &repairs {
+        let mappings = granted_fetch_mappings(target).map_err(|e| describe(&e))?;
+        context
+            .driver
+            .ensure_fetch_mapping(&repo, target, &mappings, &operation_id())
+            .map_err(|e| describe(&e))?;
+    }
+    let message = if !repairs.is_empty() {
+        format!(
+            "installed fgOS fetch mappings and repaired obsolete legacy mapping: {}",
+            repairs.join(", ")
+        )
+    } else if has_remote {
+        "no fetch mapping change needed".to_owned()
+    } else {
+        format!("no Git remote \"{remote}\" configured, so there is no fetch mapping to install")
+    };
+    Ok((!repairs.is_empty(), message))
+}
+
+/// Whether the configured remote exists; facts that cannot be read count as configured, so the rows keep judging.
+fn build_event_store_remote(run: &Run) -> bool {
+    run.event_store()
+        .map_or(true, |context| context.remote_configured())
+}
+
+/// Runs `id` when it is a Git fix. Each repair first makes the driver directories safe.
+pub fn fix(run: &Run, id: &str) -> Option<FixResult> {
+    if !FIX_IDS.contains(&id) {
+        return None;
+    }
+    let (prepared_changed, prepared_message) = driver_directories(&run.state_root);
+    if id == "git-driver-directories" {
+        return Some(FixResult::done(id, prepared_changed, prepared_message));
+    }
+    let repair = if id == "git-wal-dir" {
+        initialize_wal(run)
+    } else {
+        install_fetch_mapping(run)
+    };
+    let (changed, message) = repair.unwrap_or_else(|error| refused(&error));
+    Some(FixResult::done(id, prepared_changed || changed, message))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn journal(
+        chains: usize,
+        bytes: u64,
+        oldest: Option<u64>,
+        ledger_warning: bool,
+    ) -> JournalFacts {
+        JournalFacts {
+            initialized: true,
+            complete: true,
+            pending_count: 0,
+            retained_bytes: bytes,
+            retained_chains: chains,
+            oldest_retained_at_ms: oldest,
+            ledger_entries: 0,
+            ledger_capacity_warning: ledger_warning,
+            ledger_bytes: None,
+            oldest_unresolved: None,
+            errors: Vec::new(),
+        }
+    }
+
+    const DAY: u64 = 86_400_000;
+
+    #[test]
+    fn the_retention_sentence_warns_when_finished_operations_keep_piling_up_and_only_informs_below_the_line(
+    ) {
+        let now = 100 * DAY;
+        assert_eq!(retention_note(&journal(0, 0, None, false), now), None);
+        assert_eq!(
+            retention_note(&journal(3, 2048, Some(now - DAY), false), now).unwrap(),
+            "info: 3 finished Git operation(s) retained (2 KiB, oldest 1.0 days)"
+        );
+        let many = retention_note(&journal(65, 1, Some(now), false), now).unwrap();
+        assert!(
+            many.starts_with("warning: 65 finished Git operation(s) retained"),
+            "{many}"
+        );
+        let old = retention_note(&journal(1, 1, Some(now - 8 * DAY), false), now).unwrap();
+        assert!(
+            old.starts_with("warning: ") && old.contains("past 64 operations or 7 days"),
+            "{old}"
+        );
+        assert!(retention_note(&journal(1, 1, None, true), now)
+            .unwrap()
+            .contains("ledger is at capacity"));
+        assert!(retention_note(&journal(2, 1, None, false), now)
+            .unwrap()
+            .contains("age unknown"));
+    }
+
+    #[test]
+    fn the_contract_versions_must_equal_the_ones_the_row_requires() {
+        let good = fgos_git::contract_versions();
+        assert!(contracts_compatible(&good));
+        assert!(!contracts_compatible(
+            &json!({"gitPort": 2, "receipt": 1, "walRecord": 1})
+        ));
+        assert!(!contracts_compatible(&json!({"gitPort": 1, "receipt": 1})));
+    }
+
+    #[test]
+    fn a_git_error_reads_as_its_cause_plus_the_decoded_stderr_text() {
+        let mut error = OperationError {
+            code: fgos_git::ResultCode::Failed,
+            cause: "cause".into(),
+            retryable: false,
+            operation_id: None,
+            receipt: None,
+            exit_code: None,
+            signal: None,
+            stderr: Vec::new(),
+            detail: None,
+        };
+        assert_eq!(describe(&error), "cause");
+        error.stderr = b"fatal: nope\n".to_vec();
+        assert_eq!(describe(&error), "cause: fatal: nope");
+    }
+
+    #[test]
+    fn an_untrusted_credential_helper_names_its_remedy_and_other_failures_do_not() {
+        let named = unreadable(
+            "git-repository-config",
+            "x repository-config-untrusted: credential.helper y",
+        );
+        assert!(named.message.unwrap().ends_with(TRANSPORT_REMEDY));
+        let other = unreadable("git-repository-config", "plain");
+        assert_eq!(other.message.as_deref(), Some("plain"));
+        assert!(!other.passed);
+    }
+
+    #[test]
+    fn a_row_or_fix_is_handled_only_when_it_is_a_git_one() {
+        let root = std::env::temp_dir();
+        let run = Run::new(&root);
+        assert!(judge(&run, "event-store-open-root").is_none());
+        assert!(fix(&run, "event-store-lock-dirs").is_none());
+    }
+}
