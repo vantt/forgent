@@ -22,9 +22,9 @@ import { buildPrompt, executorIdForWork } from '../../src/runner/work-compat.mjs
 import { spawnWorker, resolveAgentTypeForWork, resolveWorkForDispatch, workDispatchHint } from '../../src/runner/work-dispatch.mjs';
 import { executeAssignment } from '../../src/runner/dispatch/assignment-runner.mjs';
 import { fanoutBatchExecutorCli } from '../../src/runner/fanout-batch.mjs';
-import { resolveExecutorConfig, resolveExecutorAndOverrides } from '../../src/runner/dispatch/resolve.mjs';
+import { resolveExecutorConfig, lookupExecutor, resolveCapabilityDetailsFromHints } from '../../src/runner/dispatch/resolve.mjs';
 import { initStore, addWork, listWork } from '../../src/state/store.mjs';
-import { compileDispatchPlan as compileDispatchPlanRaw, effectiveDispatchPolicy } from '../../src/runner/dispatch/plan.mjs';
+import { compileDispatchPlan as compileDispatchPlanRaw, effectiveDispatchPolicy, purposeSeatOf } from '../../src/runner/dispatch/plan.mjs';
 import { buildAssignment } from '../helpers/declared-assignment.mjs';
 import { holdLockInChild } from '../helpers/hold-lock-in-child.mjs';
 import { dispatchCwdHolder } from '../../src/run-supervisor/cwd-lock.mjs';
@@ -507,9 +507,9 @@ test('resolveExecutorCommand never requires allowCrossProvider for the named "cl
   assert.doesNotThrow(() => resolveExecutorCommand(cfg, { prompt: 'hello', model: 'sonnet', tier: 'standard', executorId: 'claude' }));
 });
 
-test('resolveExecutorAndOverrides resolves "claude" as a literal registered executor id (tsk-1cn: no longer configured:false)', () => {
+test('lookupExecutor resolves "claude" as a literal registered executor id (tsk-1cn: no longer configured:false)', () => {
   const cfg = claudeExecutorCfg();
-  const resolved = resolveExecutorAndOverrides(cfg, 'claude');
+  const resolved = lookupExecutor(cfg, 'claude');
   assert.equal(resolved.configured, true);
   assert.equal(resolved.executorId, 'claude');
 });
@@ -1469,8 +1469,8 @@ test('decideExecutorCli --needs-soul never overrides a real registered purpose m
   writeRunnerConfigFixture(root, {
     executor: { command: 'claude', args: ['{prompt}'] },
     capabilities: { judge: { prefer: 'gather' } },
-    executors: { gather: { kind: 'tool', for: ['judge'], command: 'agy', args: ['{prompt}'], allowCrossProvider: true } },
-    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
+    executors: { gather: { kind: 'agent', command: 'agy', args: ['{prompt}'], allowCrossProvider: true } },
+    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' }, gemini: { standard: 'gemini-flash' } },
     timeoutMs: 5000,
   });
   const decided = await decideExecutorCli(undefined, { repoRoot: root, for: 'judge', needsSoul: true, hasLiveTaskAccess: true });
@@ -1485,8 +1485,8 @@ test('decideExecutorCli throws a usage RunnerConfigError when executorId/--for/-
 // with an mcp invocation's own "tools" map hands back mcpTool instead of
 // resolving out-of-process -------------------------------------------------
 
-test('decideExecutorCli hands back mcpTool (mechanism upgraded to in-process) for a --for purpose matching an mcp invocation\'s tools map -- the real gitnexus/impact-analysis case', async () => {
-  const root = mkTempDir();
+// A tool executor serving a purpose (`for`) is probed live and the purpose is answered from that probe.
+function writeGitnexusFixture(root, { withTarget }) {
   writeRunnerConfigFixture(root, {
     executor: { command: 'claude', args: ['{prompt}'] },
     capabilities: { 'impact-analysis': { prefer: 'gitnexus' } },
@@ -1494,14 +1494,82 @@ test('decideExecutorCli hands back mcpTool (mechanism upgraded to in-process) fo
       gitnexus: {
         kind: 'tool',
         for: ['impact-analysis'],
+        ...(withTarget ? { scanTarget: '.gitnexus' } : {}),
         invocations: [{ via: 'mcp', command: 'mcp:gitnexus', tools: { 'impact-analysis': 'mcp__gitnexus__impact' } }],
       },
     },
     modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   });
+}
+
+test('decide --for a tool purpose whose tool is present answers in-process with the tool to call, never reading the row\'s prefer', async () => {
+  const root = mkTempDir();
+  writeGitnexusFixture(root, { withTarget: true });
+  fs.mkdirSync(path.join(root, '.gitnexus'));
   const decided = await decideExecutorCli(undefined, { repoRoot: root, for: 'impact-analysis', hasLiveTaskAccess: true });
-  assert.deepEqual(decided, { mechanism: 'in-process', mcpTool: 'mcp__gitnexus__impact', configured: true, reasonCodes: ['native-first.0033.cli-spawn-shaped', 'native-first.mcp-handback'], executorId: 'gitnexus' });
+  assert.deepEqual(decided, {
+    mechanism: 'in-process',
+    mcpTool: 'mcp__gitnexus__impact',
+    providers: [{ executorId: 'gitnexus', status: 'present' }],
+    configured: true,
+    reasonCodes: ['tool.present'],
+    executorId: 'gitnexus',
+  });
+});
+
+test('decide --for a tool purpose whose index is behind HEAD answers in-process and says stale', async () => {
+  const { repoRoot } = mkTempGitRepo();
+  writeGitnexusFixture(repoRoot, { withTarget: true });
+  fs.mkdirSync(path.join(repoRoot, '.gitnexus'));
+  fs.writeFileSync(path.join(repoRoot, '.gitnexus', 'meta.json'), JSON.stringify({ lastCommit: '0'.repeat(40) }));
+  const decided = await decideExecutorCli(undefined, { repoRoot, for: 'impact-analysis', hasLiveTaskAccess: true });
+  assert.deepEqual(decided, {
+    mechanism: 'in-process',
+    mcpTool: 'mcp__gitnexus__impact',
+    stale: true,
+    providers: [{ executorId: 'gitnexus', status: 'stale' }],
+    configured: true,
+    reasonCodes: ['tool.stale'],
+    executorId: 'gitnexus',
+  });
+});
+
+test('decide --for a tool purpose whose tool is missing answers unavailable and names no tool to call', async () => {
+  const root = mkTempDir();
+  writeGitnexusFixture(root, { withTarget: true });
+  const decided = await decideExecutorCli(undefined, { repoRoot: root, for: 'impact-analysis', hasLiveTaskAccess: true });
+  assert.deepEqual(decided, {
+    mechanism: 'unavailable',
+    providers: [{ executorId: 'gitnexus', status: 'missing' }],
+    configured: true,
+    reasonCodes: ['tool.missing'],
+    executorId: 'gitnexus',
+  });
+});
+
+test('decide --for a tool purpose whose tool declares nothing to probe answers unavailable as unprobeable', async () => {
+  const root = mkTempDir();
+  writeGitnexusFixture(root, { withTarget: false });
+  const decided = await decideExecutorCli(undefined, { repoRoot: root, for: 'impact-analysis', hasLiveTaskAccess: true });
+  assert.equal(decided.mechanism, 'unavailable');
+  assert.deepEqual(decided.reasonCodes, ['tool.unprobeable']);
+  assert.deepEqual(decided.providers, [{ executorId: 'gitnexus', status: 'unknown' }]);
+});
+
+test('decide --for a purpose served by a cli tool on PATH answers in-process with its command', async () => {
+  const root = mkTempDir();
+  writeRunnerConfigFixture(root, {
+    executor: { command: 'claude', args: ['{prompt}'] },
+    capabilities: { 'pane-labeling': {} },
+    executors: { herdr: { kind: 'tool', for: ['pane-labeling'], invocations: [{ via: 'cli', command: 'claude', args: ['pane', 'rename'] }] } },
+    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
+    timeoutMs: 5000,
+  });
+  const decided = await decideExecutorCli(undefined, { repoRoot: root, for: 'pane-labeling', hasLiveTaskAccess: true });
+  assert.equal(decided.mechanism, 'in-process');
+  assert.equal(decided.command, 'claude');
+  assert.deepEqual(decided.providers, [{ executorId: 'herdr', status: 'present' }]);
 });
 
 test('decideExecutorCli never hands back mcpTool for a direct executorId call with no --for -- there is no purpose to look the tool up by', async () => {
@@ -1525,40 +1593,28 @@ test('decideExecutorCli never hands back mcpTool for a direct executorId call wi
   assert.equal(decided.configured, true);
 });
 
-test('decideExecutorCli never hands back mcpTool when the requested purpose has no entry in the invocation\'s tools map -- stays out-of-process', async () => {
+test('decide --for a purpose its tool serves but names no tool for answers in-process without an mcpTool', async () => {
   const root = mkTempDir();
   writeRunnerConfigFixture(root, {
     executor: { command: 'claude', args: ['{prompt}'] },
-    capabilities: { 'impact-analysis': { prefer: 'gitnexus' }, other: { prefer: 'gitnexus' } },
+    capabilities: { 'impact-analysis': {}, other: {} },
     executors: {
       gitnexus: {
         kind: 'tool',
         for: ['impact-analysis', 'other'],
+        scanTarget: '.gitnexus',
         invocations: [{ via: 'mcp', command: 'mcp:gitnexus', tools: { 'impact-analysis': 'mcp__gitnexus__impact' } }],
       },
     },
     modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   });
-  // gitnexus declares ONLY an mcp invocation, no via:"cli" one at all --
-  // once mcp-handback doesn't match (purpose "other" has no tools[] entry,
-  // which is what this test pins), there is genuinely no way to dispatch
-  // this executorId for this purpose: not via mcp (no matching tool), and
-  // not via cli (resolveExecutorConfig's own Gate B3 refuses -- no
-  // via:"cli" invocation exists to fall back to). Reporting
-  // "out-of-process, configured:true" here was itself a real instance of
-  // the same class of bug the second-round self-review found: this
-  // executorId would refuse at actual dispatch time. "unavailable" is the
-  // honest answer. `configured` stays true (third-round advisor finding,
-  // real): gitnexus DOES have a real executors.gitnexus entry -- the
-  // refusal is that it cannot be dispatched via cli, not that it is
-  // unregistered; conflating the two under one field was itself a bug.
+  fs.mkdirSync(path.join(root, '.gitnexus'));
   const decided = await decideExecutorCli(undefined, { repoRoot: root, for: 'other', hasLiveTaskAccess: true });
-  assert.equal(decided.mechanism, 'unavailable');
+  assert.equal(decided.mechanism, 'in-process');
   assert.equal(decided.executorId, 'gitnexus');
-  assert.equal(decided.configured, true);
-  assert.deepEqual(decided.reasonCodes, ['native-first.0033.cli-spawn-shaped', 'governance.blocked']);
-  assert.ok(typeof decided.blockedReason === 'string' && decided.blockedReason.length > 0);
+  assert.equal('mcpTool' in decided, false);
+  assert.equal('command' in decided, false);
 });
 
 test('decideExecutorCli never hands back mcpTool for a direct executorId call when the executor names more than one "for" entry -- ambiguous, no purpose to disambiguate', async () => {
@@ -1632,21 +1688,10 @@ test('decideExecutorCli never hands back mcpTool for an agent-kind executor -- a
   assert.equal('mcpTool' in decided, false);
 });
 
-test('the "decide" CLI entry point hands back mcpTool for --for impact-analysis against a real mcp tools map', () => {
+test('the "decide" CLI entry point answers a tool purpose from the live probe, with the mcpTool of a real tools map', () => {
   const { repoRoot } = mkTempGitRepo();
-  writeRunnerConfigFixture(repoRoot, {
-    executor: { command: 'claude', args: ['{prompt}'] },
-    capabilities: { 'impact-analysis': { prefer: 'gitnexus' } },
-    executors: {
-      gitnexus: {
-        kind: 'tool',
-        for: ['impact-analysis'],
-        invocations: [{ via: 'mcp', command: 'mcp:gitnexus', tools: { 'impact-analysis': 'mcp__gitnexus__impact' } }],
-      },
-    },
-    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
-    timeoutMs: 5000,
-  });
+  writeGitnexusFixture(repoRoot, { withTarget: true });
+  fs.mkdirSync(path.join(repoRoot, '.gitnexus'));
   const dispatchPath = path.resolve('src/runner/dispatch.mjs');
   const result = spawnSync(
     process.execPath,
@@ -1654,7 +1699,7 @@ test('the "decide" CLI entry point hands back mcpTool for --for impact-analysis 
     { encoding: 'utf8', cwd: repoRoot },
   );
   assert.equal(result.status, 0, result.stderr);
-  assert.deepEqual(JSON.parse(result.stdout), { mechanism: 'in-process', mcpTool: 'mcp__gitnexus__impact', configured: true, executorId: 'gitnexus', reasonCodes: ['native-first.0033.cli-spawn-shaped', 'native-first.mcp-handback'] });
+  assert.deepEqual(JSON.parse(result.stdout), { mechanism: 'in-process', mcpTool: 'mcp__gitnexus__impact', providers: [{ executorId: 'gitnexus', status: 'present' }], configured: true, executorId: 'gitnexus', reasonCodes: ['tool.present'] });
 });
 
 test('the "decide" CLI entry point parses --needs-soul', () => {
@@ -2055,83 +2100,126 @@ test('resolveExecutorCommand never triggers the carries gate for a executor that
   );
 });
 
-// --- resolveExecutorAndOverrides (D1-D4, docs/history/capability-capacity-
-// remodel/CONTEXT.md) -- the shared resolver every real cfg.executors[id]
-// lookup in this file now goes through: literal key first, then
-// capabilities.<name>.prefer (D5, supersedes D2's "for"-symmetry
-// requirement), then the plain "for" scan, then unconfigured ------------
+// --- lookupExecutor and purposeSeatOf: a name is looked up as an executor id first, and a purpose
+// (a capability row name) is answered by what serves it -- a tool's live probe, else Seat Binding -------
 
-test('resolveExecutorAndOverrides resolves a literal executorId directly, unchanged from pre-this-item behavior -- the deep-customization escape hatch', () => {
+test('lookupExecutor resolves a literal executorId directly -- the deep-customization escape hatch', () => {
   const cfg = { executors: { agy: { kind: 'agent', command: 'agy' } } };
-  const result = resolveExecutorAndOverrides(cfg, 'agy');
+  const result = lookupExecutor(cfg, 'agy');
   assert.equal(result.executorId, 'agy');
   assert.equal(result.executor, cfg.executors.agy);
   assert.ok(!Object.hasOwn(result, 'overrides'));
   assert.equal(result.configured, true);
 });
 
-test('resolveExecutorAndOverrides resolves via capabilities.<name>.prefer when the preferred executor declares a matching "for"', () => {
+test('lookupExecutor never binds a purpose, neither through a capability prefer nor through an executor\'s own "for"', () => {
   const cfg = {
-    executors: { agy: { kind: 'agent', command: 'agy', for: ['fgos-coding-implement'] } },
+    executors: { 'totally-unrelated-name': { kind: 'agent', command: 'agy', for: ['review'] }, agy: { kind: 'agent', command: 'agy' } },
     capabilities: { 'fgos-coding-implement': { prefer: 'agy' } },
   };
-  const result = resolveExecutorAndOverrides(cfg, 'fgos-coding-implement');
-  assert.equal(result.executorId, 'agy');
-  assert.equal(result.executor, cfg.executors.agy);
-  assert.equal(result.configured, true);
+  for (const purpose of ['review', 'fgos-coding-implement']) {
+    const result = lookupExecutor(cfg, purpose);
+    assert.equal(result.executorId, null);
+    assert.equal(result.configured, false);
+  }
 });
 
-test('resolveExecutorAndOverrides selects a capability with a rigor floor without returning retired override payload', () => {
-  const cfg = {
-    executors: { agy: { kind: 'agent', command: 'agy', for: ['fgos-coding-implement'] } },
-    capabilities: { 'fgos-coding-implement': { prefer: 'agy', rigor: 'high' } },
-  };
-  const result = resolveExecutorAndOverrides(cfg, 'fgos-coding-implement');
-  assert.equal(result.executorId, 'agy');
-  assert.equal('overrides' in result, false);
-});
-
-test('resolveExecutorAndOverrides resolves via "prefer" even when the preferred executor declares no "for" at all (D5 -- supersedes D2\'s own symmetry requirement)', () => {
-  const cfg = {
-    executors: { agy: { kind: 'agent', command: 'agy' } }, // no "for" at all
-    capabilities: { 'fgos-coding-implement': { prefer: 'agy' } },
-  };
-  const result = resolveExecutorAndOverrides(cfg, 'fgos-coding-implement');
-  assert.equal(result.executorId, 'agy');
-  assert.equal(result.executor, cfg.executors.agy);
-  assert.equal(result.configured, true);
-});
-
-test('resolveExecutorAndOverrides throws when "prefer" names a executor id that does not exist at all', () => {
-  const cfg = { capabilities: { 'fgos-coding-implement': { prefer: 'no-such-executor' } } };
-  assert.throws(() => resolveExecutorAndOverrides(cfg, 'fgos-coding-implement'), RunnerConfigError);
-});
-
-test('resolveExecutorAndOverrides never binds a purpose through an executor\'s own "for" -- only capabilities.<name>.prefer does', () => {
-  const cfg = { executors: { 'totally-unrelated-name': { kind: 'agent', command: 'agy', for: ['review'] } } };
-  const result = resolveExecutorAndOverrides(cfg, 'review');
+test('lookupExecutor returns configured:false, executorId:null when nothing resolves -- a legitimate state, never thrown', () => {
+  const result = lookupExecutor({}, 'no-such-purpose-or-id');
   assert.equal(result.executorId, null);
   assert.equal(result.configured, false);
 });
 
-test('resolveExecutorAndOverrides returns configured:false, executorId:null when nothing resolves -- a legitimate state, never thrown', () => {
-  const result = resolveExecutorAndOverrides({}, 'no-such-purpose-or-id');
-  assert.equal(result.executorId, null);
-  assert.equal(result.configured, false);
+const PURPOSE_MODELS = { claude: { standard: 'sonnet' }, gemini: { standard: 'gemini-flash' } };
+
+test('purposeSeatOf answers a purpose with the executor Seat Binding binds, its invocation and the binding itself', () => {
+  const cfg = bindable({
+    executor: { command: 'claude', args: ['{prompt}'] },
+    executors: {
+      claude: {
+        kind: 'agent',
+        providerModel: 'claude',
+        invocations: [
+          { id: 'cli', via: 'cli', command: 'claude', args: ['{prompt}', '--full'] },
+          { id: 'cli-bwrap', via: 'cli', command: 'claude', args: ['{prompt}', '--bwrap'], confinement: { backend: 'bwrap' } },
+        ],
+      },
+    },
+    capabilities: { advise: { prefer: [{ executor: 'claude', invocation: 'cli-bwrap' }] } },
+    modelPolicies: PURPOSE_MODELS,
+  });
+  const answer = purposeSeatOf(cfg, 'advise');
+  assert.equal(answer.configured, true);
+  assert.equal(answer.executorId, 'claude');
+  assert.equal(answer.executor, cfg.executors.claude);
+  assert.equal(answer.invocationId, 'cli-bwrap');
+  assert.equal(answer.bindingSource, 'seat-binding');
+  assert.equal(answer.binding.executor, 'claude');
+  assert.equal(answer.binding.invocation, 'cli-bwrap');
 });
 
-test('resolveExecutorCommand\'s allowCrossProvider error names the REAL resolved executor id (via prefer), not just the requested purpose -- a self-review fix: the requested purpose is never a real "executors.<id>" key to set the flag on', () => {
+test('purposeSeatOf names the next prefer entry when the first one\'s CLI is not on this machine, where a first-entry read named the absent one', () => {
+  const cfg = bindable({
+    executor: { command: 'claude', args: ['{prompt}'] },
+    executors: {
+      absent: { kind: 'agent', providerModel: 'gemini', command: 'fgos-test-cli-that-is-not-installed', args: ['{prompt}'], allowCrossProvider: true },
+      agy: { kind: 'agent', providerModel: 'gemini', command: 'agy', args: ['{prompt}'], allowCrossProvider: true },
+    },
+    capabilities: { judge: { prefer: ['absent', 'agy'] } },
+    modelPolicies: PURPOSE_MODELS,
+  });
+  const answer = purposeSeatOf(cfg, 'judge');
+  assert.equal(answer.executorId, 'agy');
+  assert.equal(answer.bindingSource, 'seat-binding');
+});
+
+test('purposeSeatOf reports a refusal, not an executor, when no preferred executor can serve the seat', () => {
+  const cfg = bindable({
+    executor: { command: 'claude', args: ['{prompt}'] },
+    executors: { agy: { kind: 'agent', providerModel: 'gemini', command: 'agy', args: ['{prompt}'], allowCrossProvider: true } },
+    capabilities: { judge: { prefer: 'agy' } },
+    modelPolicies: { claude: { standard: 'sonnet' } },
+  });
+  const answer = purposeSeatOf(cfg, 'judge');
+  assert.equal(answer.configured, true);
+  assert.equal(answer.executorId, null);
+  assert.equal(answer.refused.reason, 'tier-cell-missing');
+  assert.match(answer.refused.detail, /judge/);
+});
+
+test('purposeSeatOf leaves a purpose with no pool of its own unconfigured, however many executors exist', () => {
+  const cfg = bindable({
+    executor: { command: 'claude', args: ['{prompt}'] },
+    executors: { agy: { kind: 'agent', providerModel: 'gemini', command: 'agy', args: ['{prompt}'], allowCrossProvider: true } },
+    capabilities: { judge: {}, 'other:*': { prefer: 'agy' } },
+    modelPolicies: PURPOSE_MODELS,
+  });
+  for (const purpose of ['judge', 'other:thing', 'no-such-purpose']) {
+    const answer = purposeSeatOf(cfg, purpose);
+    assert.equal(answer.configured, false, purpose);
+    assert.equal(answer.executorId, null, purpose);
+  }
+});
+
+test('a string prefer naming an agent executor does not make its capability a candidate when that executor is asked about', () => {
+  const cfg = {
+    executors: { agy: { kind: 'agent', command: 'agy' } },
+    capabilities: { judge: { prefer: 'agy' } },
+  };
+  const { capability } = resolveCapabilityDetailsFromHints({ cfg, executorId: 'agy', resolvedExecutor: cfg.executors.agy, hints: {} });
+  assert.equal(capability, 'agy');
+});
+
+test('resolveExecutorCommand\'s allowCrossProvider error names the executor and the executors key to set the flag on', () => {
   const cfg = {
     executor: { command: 'claude', args: ['{prompt}'] },
-    executors: { agy: { kind: 'agent', command: 'agy', args: ['{prompt}'], for: ['fgos-coding-implement'] } }, // no allowCrossProvider
-    capabilities: { 'fgos-coding-implement': { prefer: 'agy' } },
+    executors: { agy: { kind: 'agent', command: 'agy', args: ['{prompt}'] } }, // no allowCrossProvider
     modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
   };
   assert.throws(
-    () => resolveExecutorCommand(cfg, { prompt: 'p', model: 'sonnet', tier: 'standard', executorId: 'fgos-coding-implement' }),
+    () => resolveExecutorCommand(cfg, { prompt: 'p', model: 'sonnet', tier: 'standard', executorId: 'agy' }),
     (err) => {
-      assert.match(err.message, /executor "fgos-coding-implement"/);
-      assert.match(err.message, /resolved via capabilities\."fgos-coding-implement"\.prefer to executor "agy"/);
+      assert.match(err.message, /executor "agy"/);
       assert.match(err.message, /Set executors\.agy\.allowCrossProvider: true/);
       return true;
     },
@@ -2209,35 +2297,7 @@ test('the runner config check rejects a "prefer" array naming an invocation id t
   );
 });
 
-test('resolveExecutorAndOverrides picks candidates[0] and threads its invocation as invocationId when "prefer" is an array', () => {
-  const cfg = {
-    executors: {
-      claude: { kind: 'agent', invocations: [{ id: 'cli-bwrap', via: 'cli', command: 'claude', args: ['{prompt}'] }] },
-      agy: { kind: 'agent', invocations: [{ id: 'cli-bwrap', via: 'cli', command: 'agy', args: ['{prompt}'] }] },
-    },
-    capabilities: {
-      advise: { prefer: [{ executor: 'claude', invocation: 'cli-bwrap' }, { executor: 'agy', invocation: 'cli-bwrap' }] },
-    },
-  };
-  const result = resolveExecutorAndOverrides(cfg, 'advise');
-  assert.equal(result.executorId, 'claude');
-  assert.equal(result.invocationId, 'cli-bwrap');
-  assert.equal(result.bindingSource, 'capability.prefer');
-  assert.deepEqual(result.candidates, [{ executor: 'claude', invocation: 'cli-bwrap' }, { executor: 'agy', invocation: 'cli-bwrap' }]);
-});
-
-test('resolveExecutorAndOverrides leaves invocationId undefined for a legacy bare-string "prefer" -- byte-identical to before Step 2.2', () => {
-  const cfg = {
-    executors: { agy: { kind: 'agent', command: 'agy', for: ['fgos-coding-implement'] } },
-    capabilities: { 'fgos-coding-implement': { prefer: 'agy' } },
-  };
-  const result = resolveExecutorAndOverrides(cfg, 'fgos-coding-implement');
-  assert.equal(result.executorId, 'agy');
-  assert.equal(result.invocationId, undefined);
-  assert.deepEqual(result.candidates, [{ executor: 'agy', invocation: undefined }]);
-});
-
-test('resolveExecutorConfig resolves the confined invocation end-to-end through a capability with an array "prefer"', () => {
+test('resolveExecutorConfig resolves the confined invocation Seat Binding bound, named by its invocation id', () => {
   const cfg = {
     executor: { command: 'node', args: ['{prompt}'] },
     executors: {
@@ -2249,9 +2309,8 @@ test('resolveExecutorConfig resolves the confined invocation end-to-end through 
         ],
       },
     },
-    capabilities: { advise: { prefer: [{ executor: 'claude', invocation: 'cli-bwrap' }] } },
   };
-  const resolved = resolveExecutorConfig(cfg, 'standard', 'advise');
+  const resolved = resolveExecutorConfig(cfg, 'standard', 'claude', undefined, undefined, undefined, 'cli-bwrap');
   assert.deepEqual(resolved.args, ['{prompt}', '--bwrap']);
 });
 
@@ -2259,15 +2318,15 @@ test('resolveExecutorConfig resolves the confined invocation end-to-end through 
 // resolve a purpose name via capabilities.<name>.prefer the same way a
 // literal executorId already did (D3's own real migration case) ----------
 
-test('decideExecutorCli resolves a purpose-named executorId via capabilities.<name>.prefer -- "configured" reads true even though no literal executors entry of that name exists', async () => {
+test('decideExecutorCli answers a positional capability row name the way a purpose is answered, by the executor Seat Binding binds -- "configured" reads true though no executors entry of that name exists', async () => {
   const root = mkTempDir();
   writeRunnerConfigFixture(root, {
     executor: { command: 'claude', args: ['{prompt}'] },
     // allowCrossProvider: true -- see the "(0a fix)" test's own comment
     // above for why this is required now (second-round self-review finding).
-    executors: { agy: { kind: 'agent', command: 'agy', args: ['{prompt}'], for: ['fgos-coding-implement'], allowCrossProvider: true } },
+    executors: { agy: { kind: 'agent', command: 'agy', args: ['{prompt}'], allowCrossProvider: true } },
     capabilities: { 'fgos-coding-implement': { prefer: 'agy' } },
-    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
+    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' }, gemini: { standard: 'gemini-flash' } },
     timeoutMs: 5000,
   });
   const decided = await decideExecutorCli('fgos-coding-implement', { repoRoot: root, hasLiveTaskAccess: false });
@@ -2329,8 +2388,8 @@ test('decideExecutorCli resolves purpose-based (--for) to the same result a posi
   writeRunnerConfigFixture(root, {
     executor: { command: 'claude', args: ['{prompt}'] },
     capabilities: { judge: { prefer: 'gather' } },
-    executors: { gather: { kind: 'tool', for: ['judge'], command: 'agy', args: ['{prompt}'], allowCrossProvider: true } },
-    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
+    executors: { gather: { kind: 'agent', command: 'agy', args: ['{prompt}'], allowCrossProvider: true } },
+    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' }, gemini: { standard: 'gemini-flash' } },
     timeoutMs: 5000,
   });
   const byPurpose = await decideExecutorCli(undefined, { repoRoot: root, for: 'judge', hasLiveTaskAccess: true });
@@ -2539,7 +2598,7 @@ test('dispatch doors refuse a Work item instead of ignoring it', async () => {
   await assert.rejects(() => executeAssignment({ assignmentId: 'a' }, { work: { id: 'tsk-x' } }), /executeAssignment\(\) takes no Work item/);
 });
 
-test('decideExecutorCli resolves work-item-based (--work) via capabilities.fgos-coding-implement.prefer -- the real tsk-34n/D3 migration shape (no literal executors.fgos-coding-implement entry, only agy declaring "for")', async () => {
+test('decideExecutorCli resolves work-item-based (--work) to the executor Seat Binding binds for the step capability -- no literal executors.fgos-coding-implement entry, and the executor id reported is the bound one', async () => {
   const root = mkTempDir();
   const fgosDir = initializeWorkRepository(root);
   addWork(fgosDir, {
@@ -2554,22 +2613,22 @@ test('decideExecutorCli resolves work-item-based (--work) via capabilities.fgos-
   });
   writeRunnerConfigFixture(root, {
     executor: { command: 'claude', args: ['{prompt}'] },
-    executors: { agy: { kind: 'agent', command: 'agy', args: ['{prompt}'], for: ['fgos-coding-implement'], allowCrossProvider: true } },
+    executors: { agy: { kind: 'agent', command: 'agy', args: ['{prompt}'], allowCrossProvider: true } },
     capabilities: { 'fgos-coding-implement': { prefer: 'agy' } },
-    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
+    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' }, gemini: { standard: 'gemini-flash' } },
     timeoutMs: 5000,
   });
   // hasLiveTaskAccess:true (a live/native session) -- must still resolve
   // out-of-process, since agy is cli-spawn-shaped (tsk-pdg D1): this is
   // the exact real gap tsk-1m8 found live before tsk-pdg fixed it.
   const withLiveAccess = await decideExecutorCli(undefined, { repoRoot: root, resolveWork: resolveWorkForDispatch, workId: 'tsk-fanout-prefer-candidate', hasLiveTaskAccess: true });
-  assert.deepEqual(withLiveAccess, { mechanism: 'out-of-process', executorId: 'fgos-coding-implement', configured: true, reasonCodes: ['native-first.0033.cli-spawn-shaped'] });
+  assert.deepEqual(withLiveAccess, { mechanism: 'out-of-process', executorId: 'agy', configured: true, reasonCodes: ['native-first.0033.cli-spawn-shaped'] });
   // hasLiveTaskAccess:false (the real fgos loop headless runner) --
   // byte-identical mechanism/configured shape either way, matching
   // tsk-pdg's own live evidence against the real repo before this item's
   // migration.
   const headless = await decideExecutorCli(undefined, { repoRoot: root, resolveWork: resolveWorkForDispatch, workId: 'tsk-fanout-prefer-candidate', hasLiveTaskAccess: false });
-  assert.deepEqual(headless, { mechanism: 'out-of-process', executorId: 'fgos-coding-implement', configured: true, reasonCodes: ['native-first.0033.cli-spawn-shaped'] });
+  assert.deepEqual(headless, { mechanism: 'out-of-process', executorId: 'agy', configured: true, reasonCodes: ['native-first.0033.cli-spawn-shaped'] });
 });
 
 test('decideExecutorCli resolves work-item-based (--work) to "in-process" by default when the resolved executorId has NO explicit cfg.executors entry -- the real, common fgos-fanout case (D4 fix): a coding-domain work item is a same-provider, soul-needing rootTask (0026 rule 2), never the generic "no executor -> out-of-process" fallback a NAMED executorId lookup keeps unchanged', async () => {
@@ -3035,8 +3094,9 @@ test('decideExecutorCli resolves --for via capabilities.<name>.prefer returning 
 
 test('compileDispatchPlan builds a canonical DispatchPlan for all four selector forms (0b)', () => {
   const cfg = {
-    executors: { agy: { kind: 'agent', command: 'agy', args: ['{prompt}'], for: ['fgos-coding-implement'], allowCrossProvider: true } },
+    executors: { agy: { kind: 'agent', command: 'agy', args: ['{prompt}'], allowCrossProvider: true } },
     capabilities: { 'fgos-coding-implement': { prefer: 'agy' } },
+    modelPolicies: SLICE_D_MODEL_POLICIES,
   };
 
   // Form 1: executor selector
@@ -3069,7 +3129,8 @@ test('compileDispatchPlan builds a canonical DispatchPlan for all four selector 
   assert.equal(plan3.selector.type, 'work');
   assert.equal(plan3.selector.value, sample.id);
   assert.equal(plan3.mechanism, 'out-of-process');
-  assert.equal(plan3.executorId, 'fgos-coding-implement');
+  assert.equal(plan3.executorId, 'agy', 'the executor Seat Binding binds, not the step skill');
+  assert.equal(plan3.capability, 'fgos-coding-implement');
 
   // Form 4: adHocAgent selector (--needs-soul)
   const plan4 = compileDispatchPlan(cfg, { needsSoul: true });
@@ -3148,21 +3209,25 @@ test('compileDispatchPlan never reports a governance-blocked executor as dispatc
   assert.ok(plan.blockedReason && plan.blockedReason.includes('cross-provider'), `expected a cross-provider blockedReason, got: ${plan.blockedReason}`);
 });
 
-test('compileDispatchPlan mcp-handback (in-process) never attempts cli resolution -- an mcp-only executor with no via:"cli" invocation at all must NOT be reported as governance-blocked (second-round self-review finding)', () => {
+test('compileDispatchPlan answers a tool purpose in-process without attempting cli resolution -- an mcp-only executor with no via:"cli" invocation at all must NOT be reported as governance-blocked', () => {
+  const toolRoot = mkTempDir();
+  fs.mkdirSync(path.join(toolRoot, 'tool-index'));
   const cfg = {
     capabilities: { 'some-purpose': { prefer: 'mcpOnlyExec' } },
     executors: {
       mcpOnlyExec: {
         kind: 'tool',
         for: ['some-purpose'],
+        scanTarget: 'tool-index',
         invocations: [{ via: 'mcp', tools: { 'some-purpose': 'the_real_tool' } }],
       },
     },
   };
-  const plan = compileDispatchPlan(cfg, { for: 'some-purpose' });
+  const plan = compileDispatchPlan(cfg, { for: 'some-purpose', repoRoot: toolRoot });
   assert.equal(plan.mechanism, 'in-process');
   assert.equal(plan.mcpTool, 'the_real_tool');
   assert.equal(plan.configured, true);
+  assert.equal(plan.executorId, 'mcpOnlyExec');
   // No cli dispatch happens for this mechanism -- invocation is honestly
   // null, never a fabricated cli shape for a purely-mcp executor.
   assert.equal(plan.invocation, null);
@@ -3204,18 +3269,19 @@ test('compileDispatchPlan merges tier/model/providerModel/provenance/policy for 
   assert.equal(plan.policy.executorId, 'agy');
 });
 
-test('compileDispatchPlan merges the same fields for a --for capability selector and records bindingSource: capability.prefer', () => {
+test('compileDispatchPlan merges the same fields for a --for capability selector from the seat Seat Binding bound', () => {
   const cfg = {
-    executors: { agy: { kind: 'agent', command: 'agy', args: ['{prompt}'], for: ['fgos-coding-implement'], allowCrossProvider: true } },
+    executors: { agy: { kind: 'agent', command: 'agy', args: ['{prompt}'], allowCrossProvider: true } },
     capabilities: { 'fgos-coding-implement': { prefer: 'agy' } },
     modelPolicies: SLICE_D_MODEL_POLICIES,
   };
   const plan = compileDispatchPlan(cfg, { for: 'fgos-coding-implement' });
   assert.equal(plan.executorId, 'agy');
-  assert.equal(plan.bindingSource, 'capability.prefer');
+  assert.equal(plan.bindingSource, 'seat-binding');
   assert.equal(plan.tier, 'standard');
   assert.equal(plan.model, 'sonnet');
   assert.equal(plan.policy.executorId, 'agy');
+  assert.equal(plan.provenance.tier.source.scope, 'seat-binding');
 });
 
 test('compileDispatchPlan applies the capability\'s tier and rigor when synthesizing policy for a --for capability selector', () => {
@@ -3244,7 +3310,7 @@ test('compileDispatchPlan applies the capability\'s tier and rigor when synthesi
   const plan = compileDispatchPlan(cfg, { for: 'fgos-coding-implement' });
   assert.equal(plan.policy.rigor, 'high', 'the capability rigor is recorded as a demand');
   assert.equal(plan.executorId, 'agy-herdr');
-  assert.equal(plan.bindingSource, 'capability.prefer');
+  assert.equal(plan.bindingSource, 'seat-binding');
   assert.equal(plan.providerModel, 'gemini');
   assert.equal(plan.tier, 'flagship');
   assert.equal(plan.model, 'gemini-pro');

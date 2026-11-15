@@ -380,14 +380,6 @@
           "reason": "moves to the capability port in a later step of this change"
         },
         {
-          "path": "src/runner/dispatch/resolve.mjs",
-          "reason": "moves to the capability port in a later step of this change"
-        },
-        {
-          "path": "src/runner/work-dispatch.mjs",
-          "reason": "moves to the capability port in a later step of this change"
-        },
-        {
           "path": "src/workflow/propose-validate.mjs",
           "reason": "moves to the capability port in a later step of this change"
         }
@@ -436,6 +428,7 @@
     "src/runner/dispatch/tier-cell.mjs": "infra",
     "src/runner/dispatch/mechanism.mjs": "infra",
     "src/runner/dispatch/plan.mjs": "infra",
+    "src/runner/dispatch/tool-providers.mjs": "infra",
     "src/runner/dispatch/transport.mjs": "infra",
     "src/runner/dispatch/assignment.mjs": "infra",
     "src/runner/dispatch/assignment-layout.mjs": "infra",

@@ -1,6 +1,5 @@
 // dispatch/resolve.mjs — unit -> executor -> model/tier/command resolution
-// (D7, tsk-2uf-1): the purpose/executorId resolution chain
-// (`resolveExecutorAndOverrides`), and
+// (D7, tsk-2uf-1): the executor-id lookup (`lookupExecutor`), and
 // `resolveExecutorConfig` (the executor-block resolve + cross-provider
 // governance gate `dispatch/transport.mjs`'s `resolveExecutorCommand`
 // calls). Split out of the former `src/runner/dispatch.mjs` (2204 lines, 6
@@ -10,10 +9,11 @@
 // CONTEXT.md` D7 for the split rationale.
 
 import { familyOf } from './provider-adapter.mjs';
-import { EXECUTOR_CARRIES, CLAUDE_CLI_COMMANDS, EXECUTOR_MISSING_MESSAGE, normalizePreferCandidates } from './config.mjs';
+import { EXECUTOR_CARRIES, CLAUDE_CLI_COMMANDS, EXECUTOR_MISSING_MESSAGE } from './config.mjs';
 import { RunnerConfigError } from './runner-config-error.mjs';
 import { credentialStoreOf } from './provider-capacity.mjs';
 import { capabilityConfinementOf, hasCapabilityEntry, registeredCapabilityOf } from '../execution/capability-config.mjs';
+import { servedCapabilitiesOf } from './tool-providers.mjs';
 
 /**
  * Canonical capability identity for a dispatch, independent of any Work item.
@@ -44,21 +44,9 @@ export function resolveCapabilityDetailsFromHints({
 
   // A tool executor's declared capabilities (`for: [...]`). An agent executor
   // declares none: what it does is the dispatch's to say, never inferred here.
-  if (resolvedExecutor?.kind === 'tool' && Array.isArray(resolvedExecutor.for)) {
-    for (const f of resolvedExecutor.for) {
-      if (typeof f === 'string' && f.trim()) {
-        candidateSet.add(f.trim());
-      }
-    }
-  }
-
-  // Capabilities in config that `prefer` this executor
-  if (executorId || resolvedExecutor) {
-    const capabilities = cfg?.capabilities && typeof cfg.capabilities === 'object' ? cfg.capabilities : {};
-    for (const [capName, capEntry] of Object.entries(capabilities)) {
-      if (capEntry?.prefer && (capEntry.prefer === executorId || (resolvedExecutor && cfg?.executors?.[capEntry.prefer] === resolvedExecutor))) {
-        candidateSet.add(capName);
-      }
+  for (const f of servedCapabilitiesOf(resolvedExecutor)) {
+    if (typeof f === 'string' && f.trim()) {
+      candidateSet.add(f.trim());
     }
   }
 
@@ -142,8 +130,8 @@ export function resolveCapabilityDetailsFromHints({
  * Presence/staleness of a `executors.<executorId>` entry's own tool is no
  * longer checked here (tsk-5tm-1 D1: retired — 2/3 real entries were
  * `kind:"task"`, for which this never ran, and the third's `needs` added no
- * signal beyond the OS's own ENOENT on a missing binary). Ask `fgos tool
- * query --status present/stale` directly at the call site instead.
+ * signal beyond the OS's own ENOENT on a missing binary). Ask `fgos dispatch
+ * decide --for <capability>` instead: it probes the tool live (`toolProvidersOf`).
  *
  * Cross-provider governance (D2/D3, tsk-32n): once the winning `executor`
  * is resolved below, a `kind: "cli"` executor whose FINAL resolved
@@ -185,73 +173,22 @@ function buildAgentTypeExecutor(baseExecutor, agentType) {
 }
 
 /**
- * Resolve a `executorId`-OR-purpose name to its real serving executor,
- * applying `capabilities.<name>.prefer`/`overrides` (2026-08-16 user
- * decision 0033 and `docs/history/
- * capability-capacity-remodel/CONTEXT.md` D1/D2) — the ONE place every
- * `cfg.executors[executorId]` lookup in this file should go through
- * instead of tracing it out ad hoc (D4: `spawnWorker` used to have its
- * own separate inline lookup for model resolution, distinct from
- * `resolveExecutorConfig`'s own internal one — fixing only one left them
- * resolving inconsistently after a duplicate `executors.<id>` entry is
- * removed in favor of `for`/`prefer`).
- *
- * Order (D1): (1) a literal `cfg.executors[executorIdOrPurpose]` entry
- * always wins first, unchanged from every pre-this-item caller's own
- * behavior — this is the deep-customization escape-hatch (a different
- * `command`/`args` entirely), never touched by `overrides`. (2) failing
- * that, `cfg.capabilities[executorIdOrPurpose].prefer` names a real
- * registered executor directly — no requirement that the executor also
- * self-declare a matching `for` entry (D5, `docs/history/capability-
- * capacity-remodel/CONTEXT.md`, supersedes D2's own symmetry requirement:
- * the reverse check forced a second config edit per wiring decision
- * without a proportional safety benefit — a careless `prefer` edit could
- * add a careless `for` entry just as easily). `prefer` naming an executor
- * id that does not exist at all still throws loud (`RunnerConfigError`),
- * matching every other shape-validation gate in this file. (3) nothing
- * found — `{executorId: null, configured: false}`, a legitimate,
- * expected state, never thrown. An executor's own `for` never binds a
- * purpose here: only `capabilities.<name>.prefer` does.
- *
+ * The executor registered under `executorId`: a literal `cfg.executors[executorId]` entry, else the
+ * default executor (named by nothing, by `executor`, or by its own command or first invocation). It
+ * looks a name up and chooses nothing; the executor a purpose runs on is Seat Binding's answer
+ * (`purposeSeatOf` in `plan.mjs`). Nothing found is `{executorId: null, configured: false}`, a
+ * legitimate state, never thrown.
  */
-export function resolveExecutorAndOverrides(cfg, executorIdOrPurpose) {
+export function lookupExecutor(cfg, executorId) {
   const executors = cfg && cfg.executors && typeof cfg.executors === 'object' ? cfg.executors : {};
-  if (executors[executorIdOrPurpose]) {
-    return { executorId: executorIdOrPurpose, executor: executors[executorIdOrPurpose], configured: true, bindingSource: 'executor-id' };
+  if (executors[executorId]) {
+    return { executorId, executor: executors[executorId], configured: true, bindingSource: 'executor-id' };
   }
-  if (!executorIdOrPurpose && cfg?.executor) {
+  if (!executorId && cfg?.executor) {
     return { executorId: cfg.executor.command ?? 'executor', executor: cfg.executor, configured: true, bindingSource: 'default' };
   }
-  if (cfg?.executor && (executorIdOrPurpose === 'executor' || executorIdOrPurpose === cfg.executor.command || executorIdOrPurpose === cfg.executor.invocations?.[0]?.command || executorIdOrPurpose === cfg.executor.invocations?.[0]?.id)) {
-    return { executorId: executorIdOrPurpose, executor: cfg.executor, configured: true, bindingSource: 'default' };
-  }
-  const capabilityEntry = cfg && cfg.capabilities && typeof cfg.capabilities === 'object' ? cfg.capabilities[executorIdOrPurpose] : undefined;
-  const preferred = capabilityEntry?.prefer;
-  if (preferred !== undefined) {
-    // executor-id-consolidation Step 2.2: `prefer` may now be a single
-    // string (legacy, unchanged) or an ORDERED candidate array (cascade,
-    // account-rotator-style — try candidates[0], fall to the next only
-    // when it is not usable). `normalizePreferCandidates` always returns
-    // an array; the single-string case becomes its own 1-element array,
-    // so `candidates[0]` is exactly the pre-existing `preferred` value for
-    // every config that has not adopted the array shape — zero behavior
-    // change for every currently-configured capability.
-    const candidates = normalizePreferCandidates(preferred);
-    const primary = candidates[0];
-    const executor = executors[primary.executor];
-    if (!executor) {
-      throw new RunnerConfigError(
-        `runner config capabilities.${executorIdOrPurpose}.prefer names "${primary.executor}" but no such executor is registered.`,
-      );
-    }
-    return {
-      executorId: primary.executor,
-      executor,
-      configured: true,
-      bindingSource: 'capability.prefer',
-      invocationId: primary.invocation,
-      candidates,
-    };
+  if (cfg?.executor && (executorId === 'executor' || executorId === cfg.executor.command || executorId === cfg.executor.invocations?.[0]?.command || executorId === cfg.executor.invocations?.[0]?.id)) {
+    return { executorId, executor: cfg.executor, configured: true, bindingSource: 'default' };
   }
   return { executorId: null, executor: undefined, configured: false, bindingSource: null };
 }
@@ -262,19 +199,7 @@ export function resolveExecutorAndOverrides(cfg, executorIdOrPurpose) {
 // (byte-identical value/behavior, only newly reachable from outside this
 // file).
 export function resolveExecutorConfig(cfg, tier, executorId, fgosDir, contentCarries, resolvedAgentType, invocationId) {
-  const resolved = executorId ? resolveExecutorAndOverrides(cfg, executorId) : undefined;
-  const executorEntry = resolved?.executor;
-  // Self-review finding: `executorId` below is the CALLER's own requested
-  // id/purpose (e.g. "fgos-coding-implement"), never rewritten to the
-  // executor `prefer` actually resolved (e.g. "agy") -- every error
-  // message already citing `executorId` stays worded exactly as before
-  // (zero risk to existing message-text expectations), but the
-  // `allowCrossProvider` remediation line is the one place an imprecise
-  // id gives actively WRONG advice ("set executors.fgos-coding-
-  // implement.allowCrossProvider" -- not a real executors key at all
-  // when resolved via `prefer`), so that one message names the real
-  // resolved id too when it differs.
-  const realExecutorId = resolved?.executorId;
+  const executorEntry = executorId ? lookupExecutor(cfg, executorId).executor : undefined;
 
   // D15/tsk-5td, first real gate — carries answers "CAI GI duoc di", never
   // "CO duoc ra ngoai khong" (allowCrossProvider's own question, checked
@@ -320,15 +245,9 @@ export function resolveExecutorConfig(cfg, tier, executorId, fgosDir, contentCar
   // `via:"cli"` invocations (e.g. a full-write default alongside a
   // read-only/confined variant) — Gate B2's original "first cli match"
   // pick cannot distinguish between them at all. `invocationId`, when
-  // passed, names exactly which one; the explicit caller param (this
-  // function's own last argument, used by the read-only-redirect and
-  // capability.prefer callers, see resolveExecutorAndOverrides) always
-  // wins over `resolved.invocationId` (an id threaded through by
-  // resolveExecutorAndOverrides's own capability.prefer resolution below).
-  // Neither is ever passed by any pre-existing caller, so this is
-  // additive-only: every caller that never names an invocation id keeps
-  // the exact same "first via:cli" pick as before.
-  const requestedInvocationId = invocationId ?? resolved?.invocationId;
+  // passed, names exactly which one (the invocation Seat Binding picked);
+  // every caller that never names one keeps the "first via:cli" pick.
+  const requestedInvocationId = invocationId;
   //
   // Gate B3 (D9, tsk-in1-4): when `invocations` IS present but none of
   // them is `via:"cli"` (e.g. `gitnexus`'s mcp-only entry), that is a
@@ -428,10 +347,8 @@ export function resolveExecutorConfig(cfg, tier, executorId, fgosDir, contentCar
   };
 
   if (executorEntry && !resolvedViaAgentType && egressKind === 'cross-provider' && executorEntry.allowCrossProvider !== true) {
-    const remediationId = realExecutorId && realExecutorId !== executorId ? realExecutorId : executorId;
-    const resolvedNote = realExecutorId && realExecutorId !== executorId ? ` (resolved via capabilities."${executorId}".prefer to executor "${realExecutorId}")` : '';
     throw new RunnerConfigError(
-      `executor "${executorId}"${resolvedNote} resolves to cross-provider egress target "${egressTarget}" — prompt content would leave the Claude ecosystem. Set executors.${remediationId}.allowCrossProvider: true to permit this.`,
+      `executor "${executorId}" resolves to cross-provider egress target "${egressTarget}" — prompt content would leave the Claude ecosystem. Set executors.${executorId}.allowCrossProvider: true to permit this.`,
       { code: 'governance.cross-provider-not-permitted' },
     );
   }

@@ -453,7 +453,7 @@ test('spawnWorker refuses with no-executor when no executor may run the Unit, no
     assert.ok(err instanceof DispatchError);
     assert.equal(err.errorClass, 'no-executor');
     assert.match(err.message, /posture-unavailable/);
-    assert.match(err.message, /runner\.capabilities\["code:implement"\]\.prefer/, 'the message names what to configure');
+    assert.match(err.message, /"prefer" list of capability "code:implement"/, 'the message names what to configure');
     return true;
   });
   assert.equal(countWorkerRuns(fx.repoRoot), 0);

@@ -8,7 +8,7 @@ import os from 'node:os';
 import { loadRunnerConfigForDir, validateRunnerConfigShape } from '../../src/runner/dispatch/config.mjs';
 import { RunnerConfigError } from '../../src/runner/dispatch/runner-config-error.mjs';
 import { normalizeLegacyConfinement } from '../../src/runner/dispatch/confinement/policies.mjs';
-import { resolveExecutorConfig, resolveExecutorAndOverrides } from '../../src/runner/dispatch/resolve.mjs';
+import { resolveExecutorConfig, lookupExecutor } from '../../src/runner/dispatch/resolve.mjs';
 import { writeGlobalConfig, writeProjectConfig, withHome } from '../helpers/config-fixture.mjs';
 
 // Phase 01 groups A and C5. The subject here is what an executor may declare about itself that the
@@ -135,11 +135,11 @@ test('the real repository config still loads -- every existing executor stays va
   assert.ok(Object.keys(cfg.executors).length > 0, 'the repository config declares executors');
 });
 
-test('Phase C: the real repository config declares identity/supports on "claude" and it survives resolveExecutorAndOverrides end to end', () => {
+test('Phase C: the real repository config declares identity/supports on "claude" and it survives lookupExecutor end to end', () => {
   // The phase's own close criterion: "resolvable end-to-end for at least one real executor" -- a synthetic
   // fixture alone would not prove this, only the actual live config declaring it for real does.
   const cfg = loadRunnerConfigForDir(committedConfigDir());
-  const { executor } = resolveExecutorAndOverrides(cfg, 'claude');
+  const { executor } = lookupExecutor(cfg, 'claude');
   assert.ok(executor.identity, '"claude" must declare a real identity block');
   assert.equal(executor.identity.trustDomain, 'local-operator');
   assert.ok(executor.supports, '"claude" must declare a real supports block');

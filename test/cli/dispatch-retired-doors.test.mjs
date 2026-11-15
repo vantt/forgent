@@ -9,6 +9,10 @@ import { spawnSync, execFileSync } from 'node:child_process';
 import { initStore, addWork } from '../../src/state/store.mjs';
 import { activateGitFixture } from '../helpers/git-fixture.mjs';
 import { writeProjectConfig } from '../helpers/config-fixture.mjs';
+import { seedStubAgentClis } from '../helpers/agent-clis.mjs';
+
+// Seat Binding names only an executor whose CLI this machine has: the config below states which one is.
+seedStubAgentClis('claude');
 
 // `dispatch execute` (prompt, --contract, --assignment) and `dispatch log` are gone: one task
 // runs through `fgos run`, planned work through a Workflow. Calling a removed door is a
@@ -25,6 +29,8 @@ function mkStore() {
   fs.mkdirSync(fgosDir);
   activateGitFixture(root);
   initStore(fgosDir);
+  // A project with no executors of its own: the executors an earlier test wrote to the machine's file are not read.
+  writeProjectConfig(root, { runner: { patterns: { seatBinding: { schema: 1 } } } });
   addWork(fgosDir, {
     id: 'cand1', title: 'x', kind: 'task', status: 'todo', domain: 'coding',
     workflowStep: 'executing', deps: [], refs: [], risk: 'light', verify: 'true',
@@ -49,9 +55,9 @@ function writeConfig(fgosDir) {
     runner: {
       patterns: { seatBinding: { schema: 1 } },
       executor: { command: 'claude', args: ['{prompt}'] },
-      capabilities: { blocked: { prefer: 'tool-only' } },
+      capabilities: { blocked: { description: 'a purpose only a tool serves' }, 'fgos-coding-implement': { prefer: 'ag1' } },
       executors: {
-        'tool-only': { kind: 'tool', command: 'agy', args: ['{prompt}'], allowCrossProvider: true },
+        'tool-only': { kind: 'tool', for: ['blocked'], command: 'agy', args: ['{prompt}'], allowCrossProvider: true },
         ag1: { kind: 'agent', command: 'claude', args: ['{prompt}'] },
       },
       modelPolicies: { claude: { standard: 'sonnet' } },
@@ -117,11 +123,12 @@ test('fgos dispatch log is a validation error pointing at the unit run directory
   assert.equal(eventLines(fgosDir), before);
 });
 
-test('fgos dispatch decide --work resolves the item through the Work layer handed in by bin', () => {
-  const { root } = mkStore();
+test('fgos dispatch decide --work resolves the item through the Work layer handed in by bin, to the executor Seat Binding binds for its step', () => {
+  const { root, fgosDir } = mkStore();
+  writeConfig(fgosDir);
   const out = run(FGOS, ['dispatch', 'decide', '--work', 'cand1'], root);
   assert.equal(out.status, 0, out.stderr);
-  assert.equal(JSON.parse(out.stdout).data.executorId, 'fgos-coding-implement');
+  assert.equal(JSON.parse(out.stdout).data.executorId, 'ag1');
 });
 
 test('node src/runner/dispatch.mjs decide --work refuses and points at fgos dispatch decide --work', () => {

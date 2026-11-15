@@ -9,7 +9,7 @@
 // name below unchanged as a barrel. See `docs/history/dispatch-activation-
 // and-handoff-redesign/CONTEXT.md` D7 for the split rationale.
 
-import { resolveExecutorAndOverrides } from './resolve.mjs';
+import { lookupExecutor } from './resolve.mjs';
 
 /**
  * Native-First Dispatch Doctrine rules 1/2/4 (`docs/platform/runner/decisions/h-36d872fbb0e5.md#0026-native-first-dispatch-doctrine-launcherroottaskcapacity`), as one pure
@@ -49,7 +49,7 @@ export function decideDispatchMechanism({ hasNativeMechanism, hasLiveTaskAccess,
  * above (tsk-3ik-1): derives `hasNativeMechanism` (`executor.kind ===
  * "agent"`, D5 tsk-in1-4 — was `"task"` before `kind` split into the
  * `agent`/`tool` BAN CHAT axis) and `forceCliSpawn` (`executor.forceCliSpawn`)
- * from `resolveExecutorAndOverrides(cfg, executorId).executor` (D4,
+ * from `lookupExecutor(cfg, executorId).executor` (D4,
  * `docs/history/capability-capacity-remodel/CONTEXT.md` — the same shared
  * resolver `resolveExecutorConfig` now uses too), without calling or
  * mutating `resolveExecutorConfig` itself — this stays a read-only
@@ -79,7 +79,7 @@ export function decideDispatchMechanism({ hasNativeMechanism, hasLiveTaskAccess,
  * `agentType`), so `0026` rule 2's reasoning still holds there.
  */
 export function decideExecutorDispatchMechanism(cfg, executorId, { hasLiveTaskAccess = false } = {}) {
-  const executor = executorId ? resolveExecutorAndOverrides(cfg, executorId).executor : undefined;
+  const executor = executorId ? lookupExecutor(cfg, executorId).executor : undefined;
   const isCliSpawnShaped = Boolean(
     executor
       && (executor.command

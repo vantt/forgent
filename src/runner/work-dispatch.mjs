@@ -16,7 +16,8 @@ import { RunnerConfigError } from './dispatch/runner-config-error.mjs';
 import { resolveStrongerRigor, RIGOR_VALUES } from './rigor.mjs';
 import { stampDeclaredAssignment } from './dispatch/assignment-normalizer.mjs';
 import { deriveOperationCapability } from './operation-capability.mjs';
-import { resolveExecutorAndOverrides, resolveExecutorConfig } from './dispatch/resolve.mjs';
+import { resolveExecutorConfig } from './dispatch/resolve.mjs';
+import { purposeSeatOf } from './dispatch/plan.mjs';
 import { DispatchError } from '../run-supervisor/dispatch-error.mjs';
 import { resolveAgentTypeForTaskSpec, watchWritesOutsideWorkspace, strayWriteWarning } from './dispatch/cli.mjs';
 import { runUnit, resolveGitRoots } from './execution/run.mjs';
@@ -193,7 +194,7 @@ export async function spawnWorker(work, cfg, cwd, opts = {}) {
     if (refused.reason === 'foreign-staged-index') {
       throw fail('worktree-fail', `the worktree's index holds changes the runner did not stage: ${refused.detail ?? ''}`.trim(), { refused });
     }
-    throw fail('no-executor', `no executor may run this work (capability "${unitData.capability}"): ${refused.reason ?? 'refused'}${refused.detail ? ` (${refused.detail})` : ''}; register an executor with a confined invocation in runner.capabilities["${unitData.capability}"].prefer`, { refused });
+    throw fail('no-executor', `no executor may run this work (capability "${unitData.capability}"): ${refused.reason ?? 'refused'}${refused.detail ? ` (${refused.detail})` : ''}; register an executor with a confined invocation in the "prefer" list of capability "${unitData.capability}"`, { refused });
   }
   if (outcome === 'provider-limit') {
     // Stopped over its own partial writes: the worktree holds them, and only a resume of this run
@@ -442,7 +443,7 @@ export function workUnitFor(item, opts = {}) {
   }
 
   const executorId = executorIdForWork(item, stage);
-  const resolved = executorId ? resolveExecutorAndOverrides(cfg, executorId) : { configured: false };
+  const resolved = executorId ? purposeSeatOf(cfg, executorId) : { configured: false };
   const stepCapability = resolveCapabilityIdentityDetails({
     cfg, work: item, stage, executorId, resolvedExecutor: resolved.executor,
   }).capability;
@@ -498,7 +499,7 @@ export function workUnitFor(item, opts = {}) {
 
   const writes = !mutating ? [] : (Array.isArray(expectedFiles) && expectedFiles.length ? [...expectedFiles] : ['**']);
   const rigor = workRigorFor(item, matchedOp?.policy);
-  const preferId = resolved.configured && cfg.executors?.[resolved.executorId] ? resolved.executorId : null;
+  const preferId = resolved.configured && resolved.bindingSource !== 'tool-provider' && cfg.executors?.[resolved.executorId] ? resolved.executorId : null;
   const unitId = unitIdOf(item.id, operation ?? stage);
 
   const unitData = {

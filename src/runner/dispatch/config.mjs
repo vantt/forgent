@@ -18,6 +18,7 @@ import { definitionFileName } from '../../convention/definition-names.mjs';
 import { RIGOR_VALUES } from '../rigor.mjs';
 import { canonicalizeWriteEntry } from './write-scope.mjs';
 import { RunnerConfigError, commonDottedParent } from './runner-config-error.mjs';
+import { forEntriesOf } from './tool-providers.mjs';
 import { RUN_TIMEOUT_MAX_MS, RUN_TIMEOUT_MIN_MS, runTimeoutProblem } from './run-timeout.mjs';
 import { parseTierCell, REASONING_EFFORT_VALUES } from './tier-cell.mjs';
 import fs from 'node:fs';
@@ -515,7 +516,7 @@ function checkExecutorEntry(executor, label, isRegistered) {
     }
   }
   // `for` describes `kind: "tool"` executors; on an agent it is inert and `fgos doctor` names it.
-  for (const purpose of executor.for ?? []) {
+  for (const purpose of forEntriesOf(executor)) {
     if (!isRegistered(purpose)) {
       throw new RunnerConfigError(
         `runner config (${label}) "for" entry "${purpose}" is not declared in "capabilities" — add it there first.`,

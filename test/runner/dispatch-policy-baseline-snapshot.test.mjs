@@ -19,10 +19,15 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { loadRunnerConfigForDir } from '../../src/runner/dispatch/config.mjs';
-import { resolveExecutorAndOverrides } from '../../src/runner/dispatch/resolve.mjs';
+import { lookupExecutor } from '../../src/runner/dispatch/resolve.mjs';
+import { purposeSeatOf } from '../../src/runner/dispatch/plan.mjs';
+import { seedStubAgentClis } from '../helpers/agent-clis.mjs';
 import { familyOf } from '../../src/runner/dispatch/provider-adapter.mjs';
 import { parseTierCell } from '../../src/runner/dispatch/tier-cell.mjs';
 import { resolveExecutorCommand } from '../../src/runner/dispatch/transport.mjs';
+
+// Seat Binding counts only the CLIs this machine has: the fact tests below state which are installed.
+seedStubAgentClis('claude', 'codex', 'omp', 'pi', 'glm');
 
 /**
  * Derive read-only enforcement mechanism from policy-shaped flags present in args:
@@ -59,8 +64,8 @@ export function deriveReadOnlyMechanism(args, confinement) {
  * pre-consolidation name) even though `executorId` alone is now ambiguous.
  */
 export function resolveNormalizedSnapshotRow(cfg, executorId, workTier, throwawayDir, { invocationId, label } = {}) {
-  // 1. Resolve executor entry and overrides
-  const { executorId: resolvedExecutorId, executor, overrides, bindingSource } = resolveExecutorAndOverrides(cfg, executorId);
+  // 1. Resolve the executor entry
+  const { executor, bindingSource } = lookupExecutor(cfg, executorId);
 
   // 2. Resolve model for tier using production policy tier mapping
   const provider = familyOf(executor);
@@ -113,7 +118,8 @@ export const CANONICAL_EXECUTOR_DESCRIPTORS = [
   { label: 'claude', executorId: 'claude', invocationId: 'claude-cli' },
   { label: 'gemini-cli', executorId: 'gemini', invocationId: 'omp-cli-bwrap' },
   { label: 'gemini-herdr', executorId: 'gemini', invocationId: 'omp-herdr' },
-  { label: 'fgos-coding-implement', executorId: 'fgos-coding-implement' },
+  // The executor and invocation Seat Binding binds for the fgos-coding-implement capability (fact (b) below).
+  { label: 'fgos-coding-implement', executorId: 'gemini', invocationId: 'omp-herdr' },
   { label: 'codex-bwrap', executorId: 'openai', invocationId: 'codex-cli-bwrap' },
   // `pi` was a literal config duplicate of `codex-pi` before executor-provider-naming (2026-09-17); the
   // merged `openai` executor keeps one pi invocation, and an account is leased at launch rather than named
@@ -589,7 +595,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
   {
     selector: 'fgos-coding-implement',
     workTier: 'light',
-    bindingSource: 'capability.prefer',
+    bindingSource: 'executor-id',
     provider: 'gemini',
     model: 'gemini-3.8-flash-low',
     command: 'omp',
@@ -622,7 +628,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
   {
     selector: 'fgos-coding-implement',
     workTier: 'standard',
-    bindingSource: 'capability.prefer',
+    bindingSource: 'executor-id',
     provider: 'gemini',
     model: 'gemini-3.8-flash-medium',
     command: 'omp',
@@ -655,7 +661,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
   {
     selector: 'fgos-coding-implement',
     workTier: 'heavy',
-    bindingSource: 'capability.prefer',
+    bindingSource: 'executor-id',
     provider: 'gemini',
     model: 'gemini-4-argon-high',
     command: 'omp',
@@ -1145,16 +1151,16 @@ describe('dispatch policy baseline snapshot harness (Phase 00)', () => {
     });
 
     // (b) fgos-coding-implement heavy resolves model to gemini-4-argon-high (policy tier frontier, D15)
-    test('fact (b): fgos-coding-implement heavy resolves model to gemini-4-argon-high without overrides (D15)', () => {
-      const { executorId: resolvedExecutorId, invocationId: resolvedInvocationId, bindingSource } = resolveExecutorAndOverrides(cfg, 'fgos-coding-implement');
-      assert.equal(bindingSource, 'capability.prefer', 'bindingSource must be capability.prefer');
+    test('fact (b): fgos-coding-implement is bound by Seat Binding to gemini\'s omp pane invocation, and heavy resolves model to gemini-4-argon-high (D15)', () => {
+      const { executorId: resolvedExecutorId, invocationId: resolvedInvocationId, bindingSource } = purposeSeatOf(cfg, 'fgos-coding-implement');
+      assert.equal(bindingSource, 'seat-binding', 'the purpose is answered by Seat Binding');
       assert.equal(resolvedExecutorId, 'gemini', 'resolvedExecutorId resolves to gemini (executor-provider-naming 2026-09-17 -- was agy)');
       assert.equal(resolvedInvocationId, 'omp-herdr', 'resolvedInvocationId pins gemini\'s omp pane invocation');
 
       const fgosImplementHeavy = resolveSnapshotRowByLabel(cfg, 'fgos-coding-implement', 'heavy', throwawayDir);
       assert.equal(fgosImplementHeavy.model, 'gemini-4-argon-high', 'fgos-coding-implement heavy model must be gemini-4-argon-high');
       assert.equal(fgosImplementHeavy.selector, 'fgos-coding-implement');
-      assert.equal(fgosImplementHeavy.bindingSource, 'capability.prefer');
+      assert.equal(fgosImplementHeavy.bindingSource, 'executor-id');
     });
 
 

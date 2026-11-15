@@ -11,6 +11,10 @@ import { workUnitFor, workRigorFor } from '../../src/runner/work-dispatch.mjs';
 import { buildPrompt } from '../../src/runner/work-compat.mjs';
 import { validateUnit } from '../../src/runner/execution/unit.mjs';
 import { RunnerConfigError } from '../../src/runner/dispatch/runner-config-error.mjs';
+import { bindable } from '../helpers/work-seat-config.mjs';
+import { seedStubAgentClis } from '../helpers/agent-clis.mjs';
+
+seedStubAgentClis('claude');
 
 function tmpRoot() {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-work-unit-for-'));
@@ -146,16 +150,30 @@ test('work refs that are not safe repo-relative paths are skipped with a warning
 test('prefer names the step executor only when it is configured', () => {
   const none = workUnitFor(item(), { cfg: {}, worktree: '/wt' });
   assert.equal(none.unitData.prefer, undefined);
-  const viaCapability = workUnitFor(item(), {
-    cfg: { executors: { claude: { command: 'claude' } }, capabilities: { 'fgos-coding-implement': { prefer: 'claude' } } },
-    worktree: '/wt',
+  const boundCfg = bindable({
+    executor: { command: 'claude', args: ['{prompt}'] },
+    executors: { claude: { kind: 'agent', providerModel: 'claude', command: 'claude', args: ['{prompt}'] } },
+    modelPolicies: { claude: { standard: 'sonnet' } },
+    capabilities: { 'fgos-coding-implement': { prefer: 'claude' } },
   });
-  assert.deepEqual(viaCapability.unitData.prefer, ['claude']);
+  const viaCapability = workUnitFor(item(), { cfg: boundCfg, worktree: '/wt' });
+  assert.deepEqual(viaCapability.unitData.prefer, ['claude'], 'the soft prefer is the executor Seat Binding binds for the step');
   const direct = workUnitFor(item(), {
     cfg: { executors: { 'fgos-coding-implement': { command: 'x' } } },
     worktree: '/wt',
   });
   assert.deepEqual(direct.unitData.prefer, ['fgos-coding-implement']);
+});
+
+test('a step purpose Seat Binding refuses leaves the Unit with no soft prefer, to be refused where it runs', () => {
+  const refusedCfg = bindable({
+    executor: { command: 'claude', args: ['{prompt}'] },
+    executors: { claude: { kind: 'agent', providerModel: 'claude', command: 'claude', args: ['{prompt}'] } },
+    modelPolicies: { claude: { standard: 'sonnet' } },
+    capabilities: { 'fgos-coding-implement': { prefer: 'not-registered' } },
+  });
+  const { unitData } = workUnitFor(item(), { cfg: refusedCfg, worktree: '/wt' });
+  assert.equal(unitData.prefer, undefined);
 });
 
 test('work refs that name another run or a gate answer are skipped, never read as inputs', () => {

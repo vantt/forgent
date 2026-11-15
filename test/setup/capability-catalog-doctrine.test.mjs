@@ -12,6 +12,10 @@ import { test } from 'node:test';
 
 import { DEFAULT_CAPABILITY_SLOTS } from '../../src/setup/registrations.mjs';
 import { compileDispatchPlan } from '../../src/runner/dispatch/plan.mjs';
+import { bindable } from '../helpers/work-seat-config.mjs';
+import { seedStubAgentClis } from '../helpers/agent-clis.mjs';
+
+seedStubAgentClis('claude');
 
 const repoRoot = path.resolve(import.meta.dirname, '../..');
 const SHARED_DIR = path.join(repoRoot, 'core', 'skills', '_shared');
@@ -84,10 +88,11 @@ test('decide --for resolves an unconfigured capability to unavailable (the fallb
 });
 
 test('decide --for resolves a capability to an agent executor when configured, in-process with live task access', () => {
-  const cfg = {
+  const cfg = bindable({
     capabilities: { 'code:review': { prefer: 'reviewer-agent' } },
-    executors: { 'reviewer-agent': { kind: 'agent' } },
-  };
+    executors: { 'reviewer-agent': { kind: 'agent', providerModel: 'claude' } },
+    modelPolicies: { claude: { standard: 'sonnet' } },
+  });
   const plan = compileDispatchPlan(cfg, { for: 'code:review', hasLiveTaskAccess: true });
   assert.equal(plan.mechanism, 'in-process');
   assert.equal(plan.executorId, 'reviewer-agent');
@@ -96,15 +101,17 @@ test('decide --for resolves a capability to an agent executor when configured, i
 
 test('decide --for resolves a capability to a tool/MCP provider, never assuming an agent-shaped hand-off (mirrors impact-analysis -> gitnexus)', () => {
   const cfg = {
-    capabilities: { 'code:review': { prefer: 'review-tool' } },
+    capabilities: { 'code:review': {} },
     executors: {
       'review-tool': {
         kind: 'tool',
+        for: ['code:review'],
+        scanTarget: '.',
         invocations: [{ via: 'mcp', command: 'mcp:review-tool', tools: { 'code:review': 'mcp__review_tool__review' } }],
       },
     },
   };
-  const plan = compileDispatchPlan(cfg, { for: 'code:review' });
+  const plan = compileDispatchPlan(cfg, { for: 'code:review', repoRoot });
   assert.equal(plan.executorId, 'review-tool');
   assert.equal(plan.configured, true);
   // mcp-handback: the resolved mechanism is in-process (the caller calls the

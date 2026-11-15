@@ -8,7 +8,8 @@
 
 import { MODEL_POLICY_TIERS, assertReasoningEffort } from './config.mjs';
 import { RunnerConfigError } from './runner-config-error.mjs';
-import { resolveExecutorAndOverrides, resolveExecutorConfig } from './resolve.mjs';
+import { lookupExecutor, resolveExecutorConfig } from './resolve.mjs';
+import { toolProvidersOf } from './tool-providers.mjs';
 import { decideDispatchMechanism, decideExecutorDispatchMechanism } from './mechanism.mjs';
 import { refuseWorkItemInput } from './work-item-input.mjs';
 import { resolveExecutorProvider, resolveExecutorGovernance } from './executor-governance.mjs';
@@ -16,7 +17,7 @@ import { REPEAT_MODE_VALUES } from './execution-contract.mjs';
 import { RIGOR_VALUES, resolveStrongerRigor } from '../rigor.mjs';
 import { deriveOperationCapability } from '../operation-capability.mjs';
 import { SEAT_ROLES, effectiveRigorOf } from '../execution/seat-resolver.mjs';
-import { capabilityRigorOf, registeredCapabilityOf } from '../execution/capability-config.mjs';
+import { capabilityRigorOf, hasOwnPreferPool, registeredCapabilityOf } from '../execution/capability-config.mjs';
 import { isReadOnlyAssignment } from './assignment.mjs';
 import { bindWorkSeat } from '../execution/bind.mjs';
 
@@ -340,11 +341,106 @@ function planForUnconfiguredWork({ shell, cfg, executorId, workHint, workIdArg, 
   return planOf(shell, { mechanism, executorId, capability: executorId, governance, reasonCodes, configured: false });
 }
 
-/** The tool a handback invocation names for `purpose`, when the executor declares an mcp invocation. */
-function mcpToolFor(executor, purpose) {
-  const mcpInvocation = Array.isArray(executor?.invocations) ? executor.invocations.find((inv) => inv.via === 'mcp') : undefined;
-  const candidate = purpose && mcpInvocation?.tools ? mcpInvocation.tools[purpose] : undefined;
-  return typeof candidate === 'string' && candidate ? candidate : undefined;
+const TOOL_STATUS_RANK = { present: 0, stale: 1, missing: 2, unknown: 2 };
+const TOOL_ANSWERS = {
+  present: { mechanism: 'in-process', reasonCode: 'tool.present' },
+  stale: { mechanism: 'in-process', reasonCode: 'tool.stale' },
+  missing: { mechanism: 'unavailable', reasonCode: 'tool.missing' },
+  unknown: { mechanism: 'unavailable', reasonCode: 'tool.unprobeable' },
+};
+
+/**
+ * The one door from a purpose (a capability row name, or an executor id) to what serves it:
+ * 1. an executor registered under that name is that executor (nothing is chosen);
+ * 2. a tool executor serving it (`for`) answers with its live presence: the best provider by status
+ *    (`present`, then `stale`, then `missing` or `unknown`), the row's `prefer` is never read;
+ * 3. a row with a `prefer` pool of its own is bound by Seat Binding, the same crate call a unit run makes,
+ *    so the executor named is the one that would run (or the refusal that would stop it);
+ * 4. otherwise nothing is configured: no executor, never a fallback tier.
+ *
+ * @returns {{configured: boolean, executorId: string|null, executor?: object, bindingSource: string|null,
+ *   invocationId?: string, binding?: object, refused?: {reason: string, detail: string},
+ *   tool?: {mechanism: string, reasonCode: string, stale?: true, mcpTool?: string, command?: string,
+ *   providers: {executorId: string, status: string}[]}}}
+ */
+export function purposeSeatOf(cfg, purpose, { repoRoot } = {}) {
+  const named = lookupExecutor(cfg, purpose);
+  if (named.configured || !purpose) return named;
+
+  const providers = toolProvidersOf(cfg, { capability: purpose, repoRoot });
+  if (providers.length > 0) {
+    const best = providers.reduce((chosen, next) => (TOOL_STATUS_RANK[next.status] < TOOL_STATUS_RANK[chosen.status] ? next : chosen));
+    const { mechanism, reasonCode } = TOOL_ANSWERS[best.status];
+    // What to call is named only when the tool can be called.
+    const callable = mechanism === 'in-process';
+    return {
+      configured: true,
+      executorId: best.executorId,
+      executor: cfg.executors[best.executorId],
+      bindingSource: 'tool-provider',
+      tool: {
+        mechanism,
+        reasonCode,
+        ...(best.status === 'stale' ? { stale: true } : {}),
+        ...(callable && best.mcpTool ? { mcpTool: best.mcpTool } : {}),
+        ...(callable && best.command ? { command: best.command } : {}),
+        providers: providers.map(({ executorId, status }) => ({ executorId, status })),
+      },
+    };
+  }
+
+  if (hasOwnPreferPool(cfg, purpose)) {
+    try {
+      const binding = bindWorkSeat({ runnerConfig: cfg, unit: { id: purpose, capability: purpose } });
+      return {
+        configured: true,
+        executorId: binding.executor,
+        executor: cfg.executors?.[binding.executor],
+        bindingSource: 'seat-binding',
+        invocationId: binding.invocation ?? undefined,
+        binding,
+      };
+    } catch (err) {
+      if (!(err instanceof RunnerConfigError) || !err.code) throw err;
+      const prefix = `${err.code}: `;
+      const detail = err.message.startsWith(prefix) ? err.message.slice(prefix.length) : err.message;
+      return { configured: true, executorId: null, executor: undefined, bindingSource: null, refused: { reason: err.code, detail } };
+    }
+  }
+
+  return named;
+}
+
+/**
+ * The plan a purpose answered by a tool or by a seat refusal carries, or null when the answer names an
+ * executor to dispatch. A tool answer is final: it has no policy and no governance, the caller runs the tool.
+ */
+function planOfPurposeAnswer(shell, purposeName, answer) {
+  if (answer.refused) {
+    return planOf(shell, {
+      mechanism: 'unavailable',
+      executorId: null,
+      capability: purposeName,
+      reasonCodes: ['seat-binding.refused'],
+      configured: true,
+      blockedReason: `${answer.refused.reason}: ${answer.refused.detail}`,
+    });
+  }
+  if (answer.tool) {
+    const { mechanism, reasonCode, stale, mcpTool, command, providers } = answer.tool;
+    return planOf(shell, {
+      mechanism,
+      executorId: answer.executorId,
+      capability: purposeName,
+      reasonCodes: [reasonCode],
+      configured: true,
+      ...(mcpTool ? { mcpTool } : {}),
+      ...(command ? { command } : {}),
+      ...(stale ? { stale } : {}),
+      providers,
+    });
+  }
+  return null;
 }
 
 /**
@@ -399,6 +495,7 @@ function policyForPlan({ cfg, executorId, capability, assignmentItem, assignment
  *   Workflow declares none), the item's agent type, its rigor demand and its domain. Required with
  *   `workId`; dispatch never reads the Work item itself.
  * @param {object} [opts.assignmentItem] - Pre-resolved assignment object (for --assignment option)
+ * @param {string} [opts.repoRoot] - Root a tool purpose's `scanTarget` and `HEAD` resolve against (the working directory when absent)
  * @returns {object} DispatchPlan
  */
 export function compileDispatchPlan(
@@ -413,6 +510,7 @@ export function compileDispatchPlan(
     caller = { role: 'driver' },
     workHint,
     assignmentItem,
+    repoRoot,
     binding,
     cliOverride,
     options,
@@ -430,15 +528,16 @@ export function compileDispatchPlan(
   const reasonCodes = [];
 
   let executorId = executorIdArg;
-  let workResolved;
-  let workResolvedInputId;
-  let assignmentResolved;
+  // What names the executor to dispatch (a registry lookup, or the seat Seat Binding bound), and the seat itself.
+  let resolved;
+  let seatBinding;
+  let workInputId;
 
   if (!executorId && assignmentArg) {
     const asgnObj = assignmentItem ?? (typeof assignmentArg === 'object' ? assignmentArg : null);
     if (asgnObj) {
       executorId = effectiveDispatchPolicy({ assignment: asgnObj, runnerConfig: cfg, binding, cliOverride, options }).executorId;
-      assignmentResolved = resolveExecutorAndOverrides(cfg, executorId);
+      resolved = lookupExecutor(cfg, executorId);
     }
   }
 
@@ -451,18 +550,25 @@ export function compileDispatchPlan(
         `work item "${workIdArg}" was supplied without the executor identity its Workflow step resolves to -- the Work layer must resolve it (dispatch does not look steps up).`,
       );
     }
-    executorId = workHint.workExecutorId ?? undefined;
-    workResolvedInputId = executorId;
-    workResolved = resolveExecutorAndOverrides(cfg, executorId);
-    if (!workResolved.configured) {
-      return planForUnconfiguredWork({ shell, cfg, executorId, workHint, workIdArg, hasLiveTaskAccess, cliOverride, options });
+    workInputId = workHint.workExecutorId ?? undefined;
+    const answer = purposeSeatOf(cfg, workInputId, { repoRoot });
+    const answered = planOfPurposeAnswer(shell, workInputId, answer);
+    if (answered) return answered;
+    if (!answer.configured) {
+      return planForUnconfiguredWork({ shell, cfg, executorId: workInputId, workHint, workIdArg, hasLiveTaskAccess, cliOverride, options });
     }
+    resolved = answer;
+    seatBinding = answer.binding;
+    executorId = answer.bindingSource === 'seat-binding' ? answer.executorId : workInputId;
   }
 
-  let purposeResolved;
   if (!executorId && purpose) {
-    purposeResolved = resolveExecutorAndOverrides(cfg, purpose);
-    executorId = purposeResolved.executorId;
+    const answer = purposeSeatOf(cfg, purpose, { repoRoot });
+    const answered = planOfPurposeAnswer(shell, purpose, answer);
+    if (answered) return answered;
+    resolved = answer;
+    seatBinding = answer.binding;
+    executorId = answer.executorId ?? undefined;
   }
 
   if (!executorId) {
@@ -483,18 +589,23 @@ export function compileDispatchPlan(
     return planOf(shell, { mechanism: 'unavailable', executorId: null, capability: purpose ?? null, reasonCodes, configured: false });
   }
 
+  // A positional name may be a capability row rather than an executor id: it is answered the way a purpose is.
+  const positionalName = executorIdArg;
+  if (positionalName) {
+    const answer = purposeSeatOf(cfg, positionalName, { repoRoot });
+    const answered = planOfPurposeAnswer(shell, positionalName, answer);
+    if (answered) return answered;
+    resolved = answer;
+    seatBinding = answer.binding;
+    if (answer.bindingSource === 'seat-binding') executorId = answer.executorId;
+  }
+
   const mechanism = decideExecutorDispatchMechanism(cfg, executorId, { hasLiveTaskAccess });
   reasonCodes.push(mechanism === 'out-of-process' ? 'native-first.0033.cli-spawn-shaped' : 'native-first.rule-2.live-task-access');
 
-  const resolved = workResolved && workResolvedInputId === executorId
-    ? workResolved
-    : assignmentResolved && assignmentResolved.executorId === executorId
-      ? assignmentResolved
-      : purposeResolved && purposeResolved.executorId === executorId
-        ? purposeResolved
-        : resolveExecutorAndOverrides(cfg, executorId);
+  resolved = resolved?.executorId === executorId ? resolved : lookupExecutor(cfg, executorId);
   const { executor, configured } = resolved;
-  const capability = purpose ?? (executorId ?? null);
+  const capability = purpose ?? positionalName ?? workInputId ?? executorId ?? null;
 
   // An unregistered executor id is refused the same way an unregistered `--for` name is: never guessed at.
   if (selector.type === 'executor' && !configured) {
@@ -502,10 +613,11 @@ export function compileDispatchPlan(
     return planOf(shell, { mechanism: 'unavailable', executorId, capability, reasonCodes, configured: false });
   }
 
+  // An executor named together with a purpose it serves hands the tool back, as a purpose alone does.
   let mcpTool;
   let finalMechanism = mechanism;
-  if (mechanism === 'out-of-process') {
-    mcpTool = mcpToolFor(executor, purpose);
+  if (mechanism === 'out-of-process' && purpose && executor?.kind === 'tool') {
+    mcpTool = toolProvidersOf(cfg, { capability: purpose, repoRoot }).find((provider) => provider.executorId === executorId)?.mcpTool;
     if (mcpTool) {
       finalMechanism = 'in-process';
       reasonCodes.push('native-first.mcp-handback');
@@ -523,7 +635,7 @@ export function compileDispatchPlan(
   if (finalMechanism === 'out-of-process') {
     try {
       // A pinned invocation (bind() picks herdr-spawn vs cli-spawn that way) must be the one the plan describes.
-      const { invocation: pinnedInvocationId } = launchPinOf({ binding, cliOverride });
+      const { invocation: pinnedInvocationId } = launchPinOf({ binding: seatBinding ?? binding, cliOverride });
       const pinnedInvocation = typeof pinnedInvocationId === 'string' && pinnedInvocationId.trim() ? pinnedInvocationId : undefined;
       resolvedForDispatch = resolveExecutorConfig(cfg, undefined, executorId, undefined, undefined, agentType, pinnedInvocation);
     } catch (err) {
@@ -548,7 +660,7 @@ export function compileDispatchPlan(
     : null;
 
   const { policy: effectivePolicy, reasonCode } = policyForPlan({
-    cfg, executorId, capability, assignmentItem, assignmentArg, workHint, workIdArg, binding, cliOverride, options,
+    cfg, executorId, capability, assignmentItem, assignmentArg, workHint, workIdArg, binding: seatBinding ?? binding, cliOverride, options,
   });
   if (reasonCode) reasonCodes.push(reasonCode);
 

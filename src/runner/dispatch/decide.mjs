@@ -133,16 +133,16 @@ export function retiredDispatchDoorMessage(sub, positional, flags) {
  * resolved executor has no override configured is `configured:
  * false` by design (tsk-in1 D12), not an error.
  *
- * `mcpTool` (tsk-45f D10, additive, mutually exclusive with `agentType`):
- * MCP hand-back -- a `kind:"tool"` executor whose mcp invocation declares a
- * `tools` map (piece 3) with an entry for the requested purpose gets
- * `mechanism` upgraded from `out-of-process` to `in-process`, carrying
- * `mcpTool` instead of `agentType`. Same reasoning as the agent-kind
- * hand-back: dispatch has no MCP client of its own, so the caller calls its
- * OWN MCP tool directly (AGENTS.md's Dispatch section, D12). Never builds
- * an MCP client here, never touches Gate B3 (`resolveExecutorConfig`) --
- * a caller that skips `decide` and calls `execute` directly on an mcp-only
- * executor still hits that gate exactly as before.
+ * A purpose a tool executor serves (its `for`) is answered from a live probe of
+ * the tools serving it (`toolProvidersOf`), never from the row's `prefer`:
+ * `present` or `stale` is `in-process` (`stale: true` when its index is behind
+ * HEAD) carrying the tool to call, `mcpTool` (mutually exclusive with
+ * `agentType`) or `command`; `missing` or an unprobeable tool is `unavailable`.
+ * `providers` lists what was probed. Dispatch has no MCP client of its own, so
+ * the caller calls its OWN tool directly (AGENTS.md's Dispatch section).
+ * Every other purpose with a `prefer` pool of its own is answered by Seat
+ * Binding (`purposeSeatOf`): the executor named is the one that would run, or
+ * `unavailable` with the refusal in `blockedReason`.
  */
 export async function decideExecutorCli(
   executorIdArg,
@@ -214,31 +214,33 @@ export async function decideExecutorCli(
     caller,
     workHint,
     assignmentItem,
+    repoRoot: configRoot,
   });
 
   const resolvedIndirectly = !executorIdArg;
-  const base = plan.mcpTool
-    ? {
-        mechanism: 'in-process',
-        mcpTool: plan.mcpTool,
-        configured: plan.configured,
-        reasonCodes: plan.reasonCodes ?? [],
-        ...(plan.blockedReason !== undefined ? { blockedReason: plan.blockedReason } : {}),
-      }
-    : typeof plan.agentType === 'string' && plan.agentType
-      ? {
-          mechanism: plan.mechanism,
-          agentType: plan.agentType,
-          configured: plan.configured,
-          reasonCodes: plan.reasonCodes ?? [],
-          ...(plan.blockedReason !== undefined ? { blockedReason: plan.blockedReason } : {}),
-        }
-      : {
-          mechanism: plan.mechanism,
-          configured: plan.configured,
-          reasonCodes: plan.reasonCodes ?? [],
-          ...(plan.blockedReason !== undefined ? { blockedReason: plan.blockedReason } : {}),
-        };
+  const common = {
+    configured: plan.configured,
+    reasonCodes: plan.reasonCodes ?? [],
+    ...(plan.blockedReason !== undefined ? { blockedReason: plan.blockedReason } : {}),
+  };
+  let base;
+  if (plan.providers) {
+    // A purpose a tool serves: the caller runs the tool itself, and `providers` says what was probed.
+    base = {
+      mechanism: plan.mechanism,
+      ...(plan.mcpTool ? { mcpTool: plan.mcpTool } : {}),
+      ...(plan.command ? { command: plan.command } : {}),
+      ...(plan.stale ? { stale: true } : {}),
+      providers: plan.providers,
+      ...common,
+    };
+  } else if (plan.mcpTool) {
+    base = { mechanism: 'in-process', mcpTool: plan.mcpTool, ...common };
+  } else if (typeof plan.agentType === 'string' && plan.agentType) {
+    base = { mechanism: plan.mechanism, agentType: plan.agentType, ...common };
+  } else {
+    base = { mechanism: plan.mechanism, ...common };
+  }
 
   return resolvedIndirectly && plan.executorId ? { ...base, executorId: plan.executorId } : base;
 }
