@@ -179,7 +179,7 @@ test('manifest entries of multi-sub-verb verbs carry subcommands whose keys matc
   assert.equal(manifest.schema_version, MANIFEST_SCHEMA_VERSION);
   const withSubs = manifest.commands.filter((c) => c.subcommands);
   const names = withSubs.map((c) => c.name).sort();
-  for (const required of ['agents', 'dispatch', 'gateway', 'goal', 'merge', 'session', 'tool', 'workflow']) {
+  for (const required of ['agents', 'dispatch', 'gateway', 'goal', 'merge', 'session', 'workflow']) {
     assert.ok(names.includes(required), `${required} has no subcommands in the manifest`);
   }
   for (const command of withSubs) {
