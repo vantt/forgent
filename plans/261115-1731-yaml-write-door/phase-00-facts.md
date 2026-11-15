@@ -82,7 +82,7 @@ Rust, `.yaml` files written from strings, and `stringify`/`dump` names. Result:
   ("read every frontmatter block through the YAML door", 2026-11-14). Intended: the decision text
   (`docs/platform/packaging-distribution/spec.md`, history entry 2026-11-14) rejects "a YAML writer in this change" and puts
   the question on the one-door-debt plan's idea list (`plans/261114-2215-one-door-debt/plan.md`, Ideas row 1 and Q1,
-  recommendation (a)); the owner approved it as backlog row `p-eqhfqpz3gy` (`docs/backlog.md:22`).
+  recommendation (a)); the owner approved it as backlog row `p-eqhfqpz3gy` (`docs/backlog.md:23` on `origin/main` `83a8178b2`).
 - No `stringify`/`dump` of YAML ever existed in Node: `git log -S` for `stringifyYaml`, `dumpYaml`, `YAML.stringify`,
   `yaml.stringify`, `serializeFrontmatter`, `writeFrontmatter` over `src scripts bin packages` finds nothing; the npm `yaml`
   era (`838b044e5`, 2026-10-16) removed only `import YAML from 'yaml'` parse sites.

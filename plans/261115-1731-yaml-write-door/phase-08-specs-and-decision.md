@@ -1,7 +1,7 @@
 # Phase 08: specs and the decision record
 
-Start after: plan approval (may start beside 01); lands after 02 on the integration branch, so the names it cites exist.
-Parallel with 01-07. Rules: [phase-lead-rules.md](phase-lead-rules.md). Facts: F2, F4. Worktree `ywd-p08`, report slug
+Start after: plan approval (may start beside 01); lands after 07 (and so after 02-06) on the integration branch, so the
+names and the phase reports of 01-07 it cites exist. Writes in parallel with 01-07. Rules: [phase-lead-rules.md](phase-lead-rules.md). Facts: F2, F4. Worktree `ywd-p08`, report slug
 `ywd-p08-specs`. Effort: 1.5h.
 
 ## Context

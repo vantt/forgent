@@ -22,7 +22,8 @@ the one writer whose bytes change: quoting where needed, and `skills` as a block
   number or bool is interpolated as text; a native value would change the written type (and a map would emit a nested
   mapping). `name` is already a validated identifier string.
 - Owning proofs in `test/scripts/project-agents.test.mjs`:
-  - `:45` "tool-scope maps exactly into the generated tools" asserts `readFrontmatter(markdown).meta.tools === 'Read, Grep, Bash'`
+  - `:45` "tool-scope maps exactly into the generated tools" keeps its exact title, `(D1)` included:
+    `scripts/check-decision-codes.baseline.json:217-219` pins it. The test body changes only; it asserts `readFrontmatter(markdown).meta.tools === 'Read, Grep, Bash'`
     instead of the raw line (same behaviour, value-level).
   - `:61` "skills, when declared, projects into the frontmatter as a bracketed list" is renamed "skills, when declared,
     project into the frontmatter as a list in declared order" and asserts

@@ -39,11 +39,16 @@ printer: there is no "parse, re-render the whole document" path for an existing 
    with a one-line comment. Today the feature reaches the crate only through `fgos-config` in a workspace build; under
    `cargo test -p fgos-yaml-doc` (resolver 2, root `Cargo.toml:40`) keys come back sorted. `Cargo.lock` must not change
    (`indexmap` is already locked); if it does, stop and ask the big lead.
+   Side effect: five crates depend on `fgos-yaml-doc` without `fgos-config` (`cargo tree --offline -p <crate>`):
+   `fgos-host-runtime`, `fgos-convention`, `fgos-run-result`, `fgos-seat-binding`, `fgos-identity`. Their per-crate builds
+   switch `serde_json` maps from sorted to insertion order (workspace builds already have it). Gate each one with its own
+   `cargo test -p` (step 3).
 
 ## Proofs (design principle 8)
 
 - `set` on an empty document is a change of `set`; its owning proof is `golden_edit.rs` over `edit.v1.json`. Add the cases
-  there (input empty, one op `set` with path `[]`), each with its `why`:
+  there (input empty, one op `set` with path `""`, the fixture's text form of the empty path, as in
+  `set-root-replaces-document`), each with its `why`:
   - multi-key mapping whose keys are NOT alphabetical (`name`, `description`, `tools`) keeps their order;
   - strings that must quote: contains `": "`, leading backtick, leading `-` + space, ` #`, empty string, leading/trailing
     space, `---` prefix, a newline (double-quoted with `\n`), `true`, `null`, `123`, `1e5`, `0123`;
@@ -55,7 +60,7 @@ printer: there is no "parse, re-render the whole document" path for an existing 
   - a key needing quotes (`a: b`) and `__proto__` (plain own key);
   - refusal: a value nested past the profile depth (existing `check_value` rule).
   Run under both profiles where the case allows (`strict-config` refuses hidden characters in values: list only `tool` for those cases).
-- `emit` is a composition: one test in `golden_edit.rs` runs every empty-input `set([])` case through `emit` too and asserts
+- `emit` is a composition: one test in `golden_edit.rs` runs every empty-input `set` case with path `""` through `emit` too and asserts
   the same bytes (no second fixture family, no change to `FIXTURE_FILES`).
 - `api_seal.rs`: the existing public-entry seal cases (no panic out, bounded time, no value in a refusal) also drive `emit`,
   seeded from those fixture values.
@@ -74,7 +79,10 @@ printer: there is no "parse, re-render the whole document" path for an existing 
 1. Red: add the `edit.v1.json` cases and the `emit` assertion in `golden_edit.rs`; `cargo test -p fgos-yaml-doc --test golden_edit`
    fails (no `emit`; empty-document `set` refuses; order sorted; hidden characters raw). Commit, push.
 2. Implement requirements 1-4.
-3. Green: `cargo test -p fgos-yaml-doc` (all golden runners; the pre-existing `edit.v1.json` cases unchanged and green).
+3. Green: `cargo test -p fgos-yaml-doc` (all golden runners; the pre-existing `edit.v1.json` cases unchanged and green);
+   then each crate whose per-crate map order changes: `cargo test -p fgos-host-runtime`, `-p fgos-convention`,
+   `-p fgos-run-result`, `-p fgos-seat-binding`, `-p fgos-identity --features provider`. A failure there is a test that
+   depended on sorted keys: report it to the plan lead before changing it.
 4. Gates in phase-lead-rules (fmt, clippy `-p fgos-yaml-doc`, msvc and aarch64-apple-darwin check, census).
 
 ## Acceptance
@@ -86,6 +94,8 @@ printer: there is no "parse, re-render the whole document" path for an existing 
 
 - Root-branch change alters an existing edit's bytes (M x M): existing `edit.v1.json` cases unchanged is the check; the
   branch is entered only when the document holds no node and the path is empty.
+- `preserve_order` changes map order in the per-crate builds of the five crates above (M x M): their own
+  `cargo test -p` gates; workspace builds already ran with insertion order.
 - Hidden-set quoting changes the bytes of an existing `set` of a new value holding such a character in a `tool` document
   (L x L): before, it was written raw (and `strict-config` refuses it anyway); now escaped, same value.
 - A string the profile resolves differently from `plain_ok` (L x H): the commit re-parse check refuses instead of writing a

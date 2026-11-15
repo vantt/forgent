@@ -13,7 +13,11 @@ Binding for every phase lead; a phase file may tighten a rule, never loosen it. 
 - Rust: `export CARGO_TARGET_DIR=/home/vantt/projects/forgent-worktrees/ywd-pNN-target` for 01 and 02 (ext4, never `/tmp`).
   Phases 03-08 change no Rust: they share one target, `ywd-node-target` (cargo's own lock serializes the addon build that
   `scripts/run-tests.mjs` stages; one cold build instead of five). The phase that lands last in wave 3 deletes it; 01 and 02
-  delete their own when they land.
+  delete their own when they land. The shared target is valid only while every wave-3 worktree holds byte-identical Rust
+  (the post-02 integration head): addon staging reads the built library from `target/debug` without a lock
+  (`scripts/lib/git-addon-stage.mjs:37-40`), and earlier lanes got false E0432/E0061 errors and a wrong host catalog from a
+  shared target with differing Rust. A phase whose rebase brings in any Rust change moves to a fresh private target
+  (`ywd-pNN-target`). An `addon-not-shipped` or `git-addon-unavailable` failure means: read the staging build log first.
 - Red first: commit and push the failing test before the fix.
 - Tests: `node scripts/run-tests.mjs <file.test.mjs> ...` only (logs to `/dev/shm`, one file per run). Run the phase's gate
   list plus every test that imports or reads a file you change (`rg -l "<file basename>|<symbol>" test`). Ask the big lead
@@ -37,7 +41,9 @@ Binding for every phase lead; a phase file may tighten a rule, never loosen it. 
 - Push the phase branch at least every 30 minutes (`/usr/bin/git push origin HEAD:refs/heads/yaml-write-door/pNN`). Never push to `main`.
 - Never edit `CHANGELOG.md`, `docs/architecture-manifest.json`, `docs/backlog.md` or `Cargo.lock` unless your phase file
   owns it. Name a user-visible `## [Unreleased]` line, if any, in your report for phase 09.
-- Landing on the integration branch: only after OPC (`forgent-5f`) answers MERGE on your pushed head (send branch, head
+- Landing on the integration branch: only after OPC (`forgent-5f`) answers MERGE on your pushed head. A MERGE carries over
+  to the rebased landing head only when `git range-diff <reviewed-base>..<reviewed-head> <new-base>..<landing-head>` shows
+  the census regeneration as the only change; any other delta needs a new review (send branch, head
   commit, phase file). One board line per landing or blocker in `plans/261017-1313-fgos-platform-program-board/log.md`
   (insert before the first `\n- 20`, stamp with `date '+%Y-%m-%d %H:%M'`, prefix `YAML-WRITE`).
 - Report: `fgos convention path --kind report --type phase --slug ywd-pNN-<slug> --plan 261115-1731-yaml-write-door --json </dev/null`

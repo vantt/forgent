@@ -3,7 +3,7 @@ title: "YAML write door: one writer of YAML text"
 description: "The native YAML door gains emit; the five hand-written frontmatter writers use it; a doors row keeps fence writing in the door; every emitted block reads back to the same value."
 status: pending
 priority: P2
-effort: 13h (9 executable phases; longest chain 01 -> 02 -> 05 or 07 -> 09, about 9h)
+effort: 13.5h (9 executable phases; longest chain 01 -> 02 -> 07 -> 08 -> 09, about 11h)
 branch: plan/yaml-write-door
 tags: [refactor, one-door, yaml, rust, node]
 blockedBy: []
@@ -13,7 +13,7 @@ created: 2026-11-15
 
 # YAML write door
 
-Source: backlog row `p-eqhfqpz3gy` (`docs/backlog.md:22`), owner approved 2026-11-15; it was option (a) of Q1 in
+Source: backlog row `p-eqhfqpz3gy` (`docs/backlog.md:23` on `origin/main` `83a8178b2`), owner approved 2026-11-15; it was option (a) of Q1 in
 `plans/261114-2215-one-door-debt/plan.md` (Ideas row 1). Its precondition ("after the capability-reads and one-door-debt
 plans close") holds: capability reads landed (`1c30f30f8` on main), one-door-debt landed (`67a4c9380`, last phase). Code
 read on `origin/main` `0b425a2f0`. Facts, census and prior art: [phase-00-facts.md](phase-00-facts.md). Rules for every
@@ -49,7 +49,7 @@ row); no regeneration of the committed `.claude/agents/*.md` (Q1, backlog row); 
 | D7 | `preserve_order` belongs to `fgos-yaml-doc` (owner of `Value::from_json`), not the addon | F2: `-p fgos-yaml-doc` sorts keys today |
 | D8 | Hidden characters in values are escaped by the emitter (quoting only; no refusal rule, no profile change), reusing `Hidden::of` | F2; spec section 6 I2 (2026-10-22) applies the same set to comment text |
 | D9 | The answer view (05) coerces untrusted round fields to JSON-plain values so it never throws on a malformed inbox file | `case-runtime.mjs:152-158,271-272,349` |
-| D10 | Writer phases stay separate (owner asked for small parallel phases) but share one Cargo target and regenerate the census per commit | phase-lead-rules |
+| D10 | Writer phases stay separate (owner asked for small parallel phases) but share one Cargo target while their Rust is byte-identical (a rebase that brings Rust moves a phase to a private target) and regenerate the census per commit | phase-lead-rules; `scripts/lib/git-addon-stage.mjs:37-40` |
 
 ## Phases
 
@@ -63,22 +63,23 @@ row); no regeneration of the committed `.claude/agents/*.md` (Q1, backlog row); 
 | 05 | [Case answer writer](phase-05-case-answer-writer.md) | `src/workflow/case-runtime.mjs`, `test/workflow/case-runtime.test.mjs` | 02 | 1h | pending |
 | 06 | [Knowledge canary writer](phase-06-knowledge-canary-writer.md) | `scripts/knowledge-canary.mjs` | 02 | 0.5h | pending |
 | 07 | [Agent projection writer](phase-07-agent-projection-writer.md) | `scripts/project-agents.mjs`, `test/scripts/project-agents.test.mjs` | 02 | 1h | pending |
-| 08 | [Specs and decision record](phase-08-specs-and-decision.md) | `docs/platform/yaml-document/spec.md`, `docs/platform/packaging-distribution/spec.md`, `docs/platform/component-boundary.md` | approval (lands after 02) | 1.5h | pending |
-| 09 | [Doors row and close](phase-09-door-row-and-close.md) | `docs/architecture-manifest.json`, `docs/backlog.md`, this `plan.md` status | 03-08 | 1h | pending |
+| 08 | [Specs and decision record](phase-08-specs-and-decision.md) | `docs/platform/yaml-document/spec.md`, `docs/platform/packaging-distribution/spec.md`, `docs/platform/component-boundary.md` | approval (lands after 07) | 1.5h | pending |
+| 09 | [Doors row and close](phase-09-door-row-and-close.md) | `docs/architecture-manifest.json`, `test/architecture.test.mjs` (one seeded-case test), `docs/backlog.md`, this `plan.md` status | 03-08 | 1.5h | pending |
 
 Shared by every code phase: `packages/git/contracts/mutation-census.v1.json` (regenerated, never hand-merged; F7).
 
 ## Parallel map
 
 ```text
-wave 1:  01 ─────────────┐        08 (writes beside 01; lands after 02)
+wave 1:  01 ─────────────┐        08 (writes beside 01-07; lands after 07)
 wave 2:  02 ◄────────────┘
 wave 3:  03   04   05   06   07   (all at once; file-disjoint except the census)
+         08 lands ◄── 07 (and 02-06)
 wave 4:  09 ◄── 03, 04, 05, 06, 07, 08
 ```
 
-- Run at the same time: 01 with 08; 03, 04, 05, 06, 07 together (and with 08 if still open).
-- Must wait: 02 for 01 (`emit`); 03-07 for 02 (`writeFrontmatter`); 09 for all.
+- Run at the same time: 01 with 08 (writing); 03, 04, 05, 06, 07 together (08 may still be writing).
+- Must wait: 02 for 01 (`emit`); 03-07 for 02 (`writeFrontmatter`); 08's landing for 07 (it cites the reports of 01-07); 09 for all.
 - Hot file inside this plan: `packages/git/contracts/mutation-census.v1.json` only. Every code commit regenerates it on its
   own tree (the pre-commit hook requires it); landings on the integration branch are serialized by OPC's MERGE order, and
   each later lander drops its census hunk, rebases, and regenerates (phase-lead-rules). Every other file has exactly one owner.
@@ -88,7 +89,7 @@ wave 4:  09 ◄── 03, 04, 05, 06, 07, 08
 
 `meta` (JS object) -> `writeFrontmatter` (plain-object check) -> `JSON.stringify` (throw -> `frontmatter-not-json`) ->
 addon `yaml.emit(json, file)` -> `serde_json` (order kept by the crate) -> `Value::from_json` -> `emit`: `parse("")` +
-`set([], value)` -> commit re-parses under `tool` and compares -> bytes -> Node wraps `---\n…---\n` + body ->
+`set(&[], value)` (Rust empty slice; the fixture text form is `""`) -> commit re-parses under `tool` and compares -> bytes -> Node wraps `---\n…---\n` + body ->
 `readFrontmatter(text)` + `isDeepStrictEqual` (else `frontmatter-not-round-trip`) -> text -> the writer's file. Refusals
 reach the writer as `YamlParseError` (rule, file; never a value).
 
@@ -106,7 +107,9 @@ reach the writer as `YamlParseError` (rule, file; never a value).
 | Agent frontmatter: tools, skills list, `": "` description read back | `test/scripts/project-agents.test.mjs` (assertions moved to value level) | 07 |
 | Committed projections unchanged | `test/scripts/doc-health.test.mjs:150-154` (decisions index fixpoint); `fgos doc-registry --check` (no test owns `docs/doc-registry.md` today) | 03, 04 |
 | Census matches the tree | `test/setup/git-mutation-census.test.mjs` | every code phase |
-| Only the door writes a fence | `test/architecture.test.mjs` `checkDoors` over the new row | 09 |
+| The row's patterns catch every literal fence form and ignore other dashes | `test/architecture.test.mjs`, one seeded-case test (`caught`/`passed`, red first) | 09 |
+| Only the door writes a fence in the repo | `test/architecture.test.mjs` live `checkDoors` over the new row | 09 |
+| Per-crate map order after `preserve_order` | `cargo test -p` for `fgos-host-runtime`, `fgos-convention`, `fgos-run-result`, `fgos-seat-binding`, `fgos-identity --features provider` | 01 |
 | Whole system | `cargo test --workspace` and one full `npm test` on the integration head (big lead's queue) | before landing on main |
 
 ## Risks
@@ -117,11 +120,14 @@ reach the writer as `YamlParseError` (rule, file; never a value).
 | Root-set change alters bytes of an existing edit | M x M | branch only for empty document + empty path; existing `edit.v1.json` cases unchanged |
 | Emitter quotes a string the profile reads differently | L x H | commit re-parse refuses; cases `true`/`null`/`123`/`1e5`/`0123`/hex digest |
 | Key order sorted in a per-crate build | M x M | `preserve_order` on the crate; non-alphabetical case under `-p` |
+| `preserve_order` flips map order in per-crate builds of five crates without `fgos-config` | M x M | per-crate `cargo test -p` gates in 01 |
+| A typo in a door pattern stays green | M x M | seeded-case test in 09 (red first) |
+| Stale MERGE carried to a changed landing head | L x M | MERGE carries over only when range-diff shows census-only change (phase-lead-rules) |
 | Hidden characters written raw into agent files | M x M | escape in the emitter (D8) |
 | Answer view throws after durable writes | M x H | coercion (D9) and the malformed-round case |
 | Committed index drifts and `readDecisionIds` silently empties | L x H | doc-health fixpoint test in 04's gate |
 | Stale addon paired with the new payload disables the whole native door | M x H | landing step below; machines upgrade together |
-| Five cold Rust builds in wave 3 | M x L | shared target (D10) |
+| Five cold Rust builds in wave 3 | M x L | shared target while Rust is identical (D10) |
 | Door row misses a writer | L x M | stated limit; census F3 over all roots and extensions found none |
 
 ## Collision table
@@ -133,7 +139,8 @@ reach the writer as `YamlParseError` (rule, file; never a value).
 | `docs/platform/packaging-distribution/spec.md` | 08: one decision-history entry | S4 phase 12 (section 2 and its own history entry) | different sections; rebase |
 | `docs/backlog.md` | 09: one row done, two new rows | S4 phase 12 (closes `p-bkmh4egqlv`, `p-tgqxcemygh`, `p-wheblpunzi`) | different rows; rebase |
 | `CHANGELOG.md` | none (09 names a candidate line) | S4 step lead | big lead serializes |
-| `test/architecture.test.mjs`, `bin/fgos.mjs`, `src/setup/**`, `apps/fgos/**` | not touched | S4 hot files | no collision (`registrations.mjs:327` names `project-agents.mjs` in a comment only) |
+| `test/architecture.test.mjs` | 09: one seeded-case test beside the YAML parser row's cases | S4 (`ARM_STATIC_IMPORTS` and its own rows' cases) | additive; rebase handles it; rerun the file |
+| `bin/fgos.mjs`, `src/setup/**`, `apps/fgos/**` | not touched | S4 hot files | no collision (`registrations.mjs:327` names `project-agents.mjs` in a comment only) |
 | `packages/git/node-addon/src/lib.rs` | 02: marker line 73 | `origin/harden/ci-state-root` (PR #20, `driver_for`/`operation` near line 29) | different hunk; rebase |
 | `src/util/yaml.mjs` | 02 | board "File chung dễ va": CFG; no open branch touches it (scan of the 40 newest origin branches, 2026-11-15) | 02 step 1 checks `git log` first |
 | `docs/platform/yaml-document/spec.md`, `docs/platform/component-boundary.md` | 08 | board: HARDEN/DOC | message DOC before landing 08 if a DOC branch is open |
@@ -215,6 +222,15 @@ Four reviewers (failure modes, assumptions, security, scope and contracts), 2026
 | 17 | Cap meta size before cloning in `emit` (Medium) | Reject: the `tool` profile's limits and the depth check already bound input; callers write a handful of keys; no evidence of a real path to large meta | - |
 
 Rejected without evidence filter: none (every finding cited file:line).
+
+### OPC review of 73545bbdb (applied)
+
+One blocking change and six folds, each re-verified on `origin/main` `83a8178b2`: B1 seeded cases for the new row
+(09; patterns simulated over the `lexSource` code view, all cases as intended); N1 per-crate gates for the five crates
+that reach `fgos-yaml-doc` without `fgos-config` (01; `cargo tree --offline -p`); N2 shared-target validity and the
+staging-log rule (phase-lead-rules); N3 MERGE carry-over only for census-only deltas (phase-lead-rules); N4 08 lands after
+07 (08, parallel map); N5 the `:45` test title is pinned by `scripts/check-decision-codes.baseline.json:217-219` (07);
+N6 the fixture's empty path is `""` (01) and the backlog row is at `docs/backlog.md:23`.
 
 ### Whole-Plan Consistency Sweep
 
