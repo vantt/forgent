@@ -34,13 +34,18 @@ impl std::fmt::Display for ScopeError {
 }
 impl std::error::Error for ScopeError {}
 
-fn entry(name: &str) -> Result<&'static serde_json::Value, ScopeError> {
+/// The lock registry, parsed once from the embedded contract file.
+pub(crate) fn registry() -> &'static serde_json::Value {
     static REGISTRY: OnceLock<serde_json::Value> = OnceLock::new();
-    let registry = REGISTRY.get_or_init(|| {
+    REGISTRY.get_or_init(|| {
         serde_json::from_str(include_str!("../../contracts/lock-registry.v1.json"))
             .expect("embedded lock registry")
-    });
-    registry["locks"]
+    })
+}
+
+/// The registry row named `name`.
+pub(crate) fn entry(name: &str) -> Result<&'static serde_json::Value, ScopeError> {
+    registry()["locks"]
         .as_array()
         .and_then(|rows| rows.iter().find(|row| row["name"] == name))
         .ok_or_else(|| ScopeError::Registry(format!("unknown-lock: {name}")))

@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "81f70409b0a06cd8ec4592c949fac34d4da9674758c9260be24c1736e3c26586",
+  "payloadDigest": "b5cf6634e1eb885dc7dff74adca3faa84b222229439a85515d1e2439515ff652",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "a5629383f89b4488b252a62f0ea86463e649e33e0a891db1a19af2cd6c136aca",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -459,7 +459,7 @@
     "packages/holder-lock/rust/src/predecessor.rs": "04735a46e5476bd41697f2b3f3584f5a844af98dd0cf90965727e5a4578f547d",
     "packages/holder-lock/rust/src/route.rs": "b84a7d4279223174b2102c7ea67999e2191d4f02cf26562db32e6748afaa9c60",
     "packages/holder-lock/rust/src/route/hold.rs": "4317dd6f3ea2ee183ec26d78fcd6e6ca21563d16e0beb964c45c2f3d688fd382",
-    "packages/holder-lock/rust/src/scope.rs": "5a0801ddce1254184c408c1f2d95b30450b0e065d12bbace30b1b70fa2507a07",
+    "packages/holder-lock/rust/src/scope.rs": "eae3215cd62ae51a53f473d92c5e24da5e1dd9c535c3c9f804a49aebbbaa411b",
     "packages/holder-lock/rust/src/semantics.rs": "cfb5e67d996db60f4493678cf1dbb2898c4d1028f6e6102d3c026dddd6763e91",
     "packages/holder-lock/rust/src/state_root.rs": "3495be27ddd89e8fed9e05053bf1731a87054da8c472a6772cf8f51fc1b3e94a",
     "packages/holder-lock/rust/src/tombstone.rs": "c83051cd8c7d405264deb827fb09997060edabeeee57ef6c1347bfc27b7ecd21",
