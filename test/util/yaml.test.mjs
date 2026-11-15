@@ -7,7 +7,7 @@
 import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { YamlParseError, describeYamlError, parseYaml, readFrontmatter, cutFrontmatter } from '../../src/util/yaml.mjs';
+import { YamlParseError, describeYamlError, parseYaml, readFrontmatter, cutFrontmatter, writeFrontmatter } from '../../src/util/yaml.mjs';
 
 test('a document reaches JavaScript as plain values, own __proto__ keys and restored non-finite floats', () => {
   assert.deepEqual(parseYaml('a: 1\nb: [x, .nan]\nc:\n  - d: true\n  - null\n'), { a: 1, b: ['x', NaN], c: [{ d: true }, null] });
@@ -80,4 +80,16 @@ test('cutFrontmatter cuts the fenced block without parsing it, so a block that i
   assert.deepEqual(cutFrontmatter(text), { block: '---\ndescription: Use when: the user asks\n---\n', source: 'description: Use when: the user asks', body: 'body\n' });
   assert.deepEqual(cutFrontmatter('no block\n'), { block: '', source: '', body: 'no block\n' });
   assert.throws(() => readFrontmatter(text, 'bad.md'), YamlParseError);
+});
+
+test('writeFrontmatter writes a block that readFrontmatter reads back, and refuses meta that would not survive, naming the rule and the file', () => {
+  const meta = { title: 'a: b', tags: ['x', 'y'], n: 3 };
+  const text = writeFrontmatter(meta, '# Body\n', 'doc.md');
+  assert.deepEqual(Object.keys(readFrontmatter(text).meta), ['title', 'tags', 'n']);
+  const read = readFrontmatter(text, 'doc.md');
+  assert.deepEqual([read.meta, read.body], [meta, '# Body\n']);
+  const cyclic = {}; cyclic.self = cyclic;
+  for (const [bad, id] of [[[1], 'frontmatter-not-a-mapping'], [cyclic, 'frontmatter-not-json'], [{ when: new Date(0), secret: 'SECRET-5521' }, 'frontmatter-not-round-trip']]) {
+    assert.throws(() => writeFrontmatter(bad, '', 'doc.md'), (err) => err instanceof YamlParseError && err.rule === id && err.file === 'doc.md' && !/SECRET|1970/.test(err.message));
+  }
 });

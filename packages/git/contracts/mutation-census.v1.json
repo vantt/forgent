@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "cdc268cf5a4b63d84d13b4e9771921198030a46dd1b7ec5c61fffc64e7d1e1cf",
+  "payloadDigest": "c9aded55a526603d0b26a9966eb925e04720d220fdcb55da903b367680cb36a8",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "a5629383f89b4488b252a62f0ea86463e649e33e0a891db1a19af2cd6c136aca",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -405,7 +405,7 @@
     "packages/git/node-addon/src/session_identity.rs": "3f57b0edb1ec11ffd9180fef107daa3ed8e8ddf75861dccc1e460f77c38c7ca8",
     "packages/git/node-addon/src/single_load.rs": "23fe7cc00220b39b3f7265806e6be0f01bc9e38b3a95c9582c72d4fccf96d313",
     "packages/git/node-addon/src/yaml.rs": "cdb0ecd0b330966e5fd3c8e41e2069bf87722f1ac16df8363e514e9441d4432c",
-    "packages/git/node-addon/tests/yaml_parts.rs": "835efdf2a4183cd1197385f318bfb370db8804ae9f4e8e500548c75fd6a3462f",
+    "packages/git/node-addon/tests/yaml_parts.rs": "fb7093ffe0d7a2ca1bba3b5031120637487aa7b664494849a5fb6d75f51947d1",
     "packages/git/rust/src/driver.rs": "de13165ccc3945fc8382d361e6f74b9bee41464aae6145a84d31fbecc7d3fccb",
     "packages/git/rust/src/incidents.rs": "b5f15a7e609c8c7311991df23a0044acf35f8556441b65fc16c85ae4319e888a",
     "packages/git/rust/src/inspect.rs": "f01f4b4709058650ef9643c8331aa20ab69eef7353abca9769eacb8b829fa2e7",
