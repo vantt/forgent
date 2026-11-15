@@ -87,6 +87,7 @@ pub static NATIVE_SUBCOMMANDS: &[(&str, &[&str])] = &[
     ("mailbox", wiring::mailbox_verbs::AVAILABLE_SUBCOMMANDS),
     ("config", fgos_config::provider::AVAILABLE_SUBCOMMANDS),
     ("gateway", wiring::gateway_control::AVAILABLE_SUBCOMMANDS),
+    ("events", wiring::events::AVAILABLE_SUBCOMMANDS),
 ];
 
 /// Debt: the native verbs written before the shared parser, which keep their own reading of a call: the

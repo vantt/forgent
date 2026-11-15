@@ -9,6 +9,11 @@
     "owner_path": "packages/convention/rust",
     "subcommands": true
   },
+  "events": {
+    "operation_id": "event-store.status",
+    "owner_path": "packages/event-store/rust",
+    "subcommands": true
+  },
   "friction": {
     "operation_id": "observe.friction",
     "owner_path": "packages/observe/rust",

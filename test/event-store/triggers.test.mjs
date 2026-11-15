@@ -168,15 +168,7 @@ test('a CLI verb that opens the store runs its triggers through the crate policy
   assert.deepEqual(list.calls, ['maintain', 'maintain'], 'one trigger at the start and one at the end, no integrity status');
   // A command that hands its seals to a child skips the start trigger: only the end trigger reads facts and seals what is due.
   assert.deepEqual(cli(['list'], { dispatched: false }).calls, ['maintain'], 'a hand-off command runs the end trigger only');
-  const status = cli(['events', 'status']);
-  assert.equal(status.status, 0, status.stderr);
-  assert.equal(JSON.parse(status.stdout).data.remote, 'origin');
-  assert.deepEqual(status.calls.filter((call) => call === 'maintain'), ['maintain', 'maintain'], 'one trigger at each end of the verb');
-  // The seal child does one seal and nothing around it: no start or end trigger, hence no sweep and no publish.
-  const seal = cli(['events', 'seal', '--stream', 'project']);
-  assert.equal(seal.status, 0, seal.stderr);
-  assert.deepEqual(seal.calls, []);
-  assert.match(cli(['events', 'nonsense']).stderr, /events requires sync\|status\|seal\|export/);
+  assert.equal(cli(['events', 'nonsense']).status, 4, 'a Node-run `events` call is refused: the verb runs in the host');
 });
 
 test('only a Land verb in a non-dispatched session sweeps retained Land candidates, at the end of the command', (t) => {
@@ -197,6 +189,7 @@ function faultRecords(repo, dir) {
   return file && fs.existsSync(file) ? fs.readFileSync(file, 'utf8').trim().split('\n').filter(Boolean).map((line) => JSON.parse(line)) : [];
 }
 const BIN = path.resolve(import.meta.dirname, '../../bin/fgos.mjs');
+const HOST = process.env.FGOS_HOST_BIN;
 /** A group-writable locks directory makes every seal refuse, while a read verb never takes that lock. */
 const refuseSeals = (repo) => fs.chmodSync(path.join(repo, '.git/fgos/events/locks'), 0o775);
 
@@ -232,7 +225,7 @@ test('a detached seal or sync child that fails leaves a record and exits non-zer
   refuseSeals(repo);
   const env = { ...process.env }; delete env.FGOS_DISPATCH_DEPTH;
   for (const args of [['events', 'seal', '--stream', 'project'], ['events', 'sync', '--opportunistic']]) {
-    const result = spawnSync(process.execPath, [BIN, ...args, '--dir', repo], { cwd: repo, encoding: 'utf8', env });
+    const result = spawnSync(HOST, [...args, '--dir', repo], { cwd: repo, encoding: 'utf8', env });
     assert.notEqual(result.status, 0, `${args.join(' ')} fails with the locks directory refused`);
   }
   const faults = faultRecords(repo, dir).filter((record) => record.faultClass === 'event-store-child');

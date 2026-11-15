@@ -348,12 +348,44 @@
   },
   "events": {
     "selector": "events",
-    "route_kind": "legacy-cli",
-    "legacy_payload": "legacy-node",
-    "owner_path": "src/cli/command-registry.mjs",
+    "route_kind": "native",
+    "operation_id": "event-store.status",
+    "owner_path": "packages/event-store/rust",
     "compatibility_tests": [
       "test/rust-host/command-routes.test.mjs"
     ],
+    "subcommands": true,
+    "subcommand_flags": {
+      "export": [
+        "dir",
+        "json",
+        "help",
+        "out",
+        "stream",
+        "since"
+      ],
+      "seal": [
+        "dir",
+        "json",
+        "help",
+        "stream",
+        "history"
+      ],
+      "status": [
+        "dir",
+        "json",
+        "help",
+        "remote"
+      ],
+      "sync": [
+        "dir",
+        "json",
+        "help",
+        "remote",
+        "no-push",
+        "opportunistic"
+      ]
+    },
     "store": "open",
     "mutates_store": [
       "sync"

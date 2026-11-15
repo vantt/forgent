@@ -197,8 +197,13 @@ const MULTI = COMMAND_REGISTRY.filter((entry) => entry.subcommands && entry.nati
 const NATIVE = COMMAND_REGISTRY.filter((entry) => entry.subcommands && entry.native === true);
 
 test('the drift scan covers the verbs that branch on a positional sub-verb', () => {
+<<<<<<< HEAD
   assert.deepEqual(MULTI.map((e) => e.name).sort(), ['agents', 'dispatch', 'events', 'git', 'goal', 'lock', 'merge', 'session', 'workflow', 'worktree']);
   assert.deepEqual(NATIVE.map((e) => e.name).sort(), ['config', 'convention', 'friction', 'gateway', 'identity', 'mailbox', 'metrics']);
+=======
+  assert.deepEqual(MULTI.map((e) => e.name).sort(), ['agents', 'dispatch', 'gateway', 'git', 'goal', 'lock', 'merge', 'session', 'workflow', 'worktree']);
+  assert.deepEqual(NATIVE.map((e) => e.name).sort(), ['config', 'convention', 'events', 'friction', 'identity', 'mailbox', 'metrics']);
+>>>>>>> 0d0846607 (feat(events): sync, status, seal and export run in the host)
 });
 
 for (const entry of MULTI) {
@@ -255,7 +260,7 @@ test('the scanner sees what it claims to: known reads in known regions', () => {
 // the crate's AVAILABLE_SUBCOMMANDS, and the `"--flag"` literals in a
 // sub-verb's own Rust region equal its schema's flags. Regions: metrics -> its
 // metrics_cli/<sub>.rs file; friction -> its match arm in friction_cli.rs;
-// config, convention and identity -> one parser shared by every sub-verb (cli_projector.rs),
+// config, convention, events and identity -> one parser shared by every sub-verb (cli_projector.rs),
 // mailbox -> one parser in apps/fgos/src/wiring/mailbox_verbs.rs, so
 // its flags must equal the union of the sub-verbs' schemas; its sub-verb names
 // live in mailbox_surface.rs, shared by every platform build.
@@ -294,6 +299,7 @@ const NATIVE_SOURCES = {
       return src.slice(start, src.indexOf('pub struct MailboxAnswer', start));
     },
   },
+<<<<<<< HEAD
   // gateway -> one projector (project_gateway_request) over the three sub-verbs, none of which takes a flag of its own.
   gateway: {
     subs: RUST('apps/fgos/src/wiring/gateway_control.rs'),
@@ -301,6 +307,14 @@ const NATIVE_SOURCES = {
       const src = RUST('apps/fgos/src/wiring/gateway_control.rs');
       const start = src.indexOf('pub fn project_gateway_request');
       return src.slice(start, src.indexOf('fn serve(', start));
+=======
+  events: {
+    subs: RUST('apps/fgos/src/wiring/events.rs'),
+    shared: () => {
+      const src = RUST('apps/fgos/src/cli_projector.rs');
+      const start = src.indexOf('fn project_events_request');
+      return src.slice(start, src.indexOf('/// `fgos config show', start));
+>>>>>>> 0d0846607 (feat(events): sync, status, seal and export run in the host)
     },
   },
   config: {

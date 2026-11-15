@@ -2871,3 +2871,57 @@ fn a_native_verb_under_home_with_no_project_is_refused_instead_of_using_the_glob
     );
     let _ = fs::remove_dir_all(&sandbox);
 }
+
+// `events` runs in the host: a status of a fresh repository answers from the Event Store crate with no Node child
+// (the `node` wrapper on PATH is never started), and a seal of a malformed stream is refused with the validation exit.
+#[cfg(target_os = "linux")]
+#[test]
+fn events_status_runs_in_the_host_and_starts_no_node() {
+    use std::os::unix::fs::PermissionsExt;
+    let (spy_dir, spy_log, path) = node_spy_dir("fgos_test_events_spy");
+    let repo = spy_dir.join("repo");
+    fs::create_dir_all(&repo).unwrap();
+    let state = spy_dir.join("state");
+    fs::create_dir_all(&state).unwrap();
+    fs::set_permissions(&state, fs::Permissions::from_mode(0o700)).unwrap();
+    for args in [
+        &["init", "-q", "-b", "main"][..],
+        &["config", "fgos.machineId", "testbox"],
+    ] {
+        assert!(Command::new("git")
+            .args(args)
+            .current_dir(&repo)
+            .status()
+            .unwrap()
+            .success());
+    }
+    let run = |args: &[&str]| {
+        let mut command = Command::new(fgos_bin());
+        command.args(args).current_dir(&repo);
+        command.env("PATH", &path);
+        command.env("FGOS_STATE_ROOT", &state);
+        command.env("HOME", &spy_dir);
+        command.output().expect("failed to execute fgos")
+    };
+    let status = run(&["events", "status"]);
+    assert_eq!(
+        status.status.code(),
+        Some(0),
+        "{}",
+        String::from_utf8_lossy(&status.stderr)
+    );
+    let answer: serde_json::Value = serde_json::from_slice(&status.stdout).unwrap();
+    assert_eq!(answer["data"]["remote"], "origin");
+    assert_eq!(answer["data"]["machineId"], "testbox");
+    let refused = run(&["events", "seal", "--stream", "Bad_1"]);
+    assert_eq!(refused.status.code(), Some(4));
+    assert!(String::from_utf8_lossy(&refused.stderr)
+        .contains("fgos: events seal requires --stream <name>"));
+    let spied = fs::read_to_string(&spy_log).unwrap_or_default();
+    assert_eq!(
+        spied.lines().filter(|l| l.starts_with("SPY_PID:")).count(),
+        0,
+        "no node child for a native events call: {spied}"
+    );
+    let _ = fs::remove_dir_all(&spy_dir);
+}

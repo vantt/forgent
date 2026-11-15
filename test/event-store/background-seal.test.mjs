@@ -142,15 +142,15 @@ test('a detached seal or publish child skips quietly when its state root is gone
   await waitFor('every child of the command to end', () => scan({}).every((view) => !/ events (?:seal|sync) /.test(` ${[view.cmdline].flat().join(' ')} `) || !String(view.cmdline).includes(w.cwd) || (view.tuple !== null && judge(view.tuple) === 'dead')));
   fs.rmSync(stateRoot, { recursive: true, force: true });
   for (const args of [['events', 'sync', '--opportunistic', '--dir', w.cwd], ['events', 'seal', '--stream', 'project', '--dir', w.cwd]]) {
-    const child = spawnSync(process.execPath, [BIN, ...args], { cwd: w.cwd, env, encoding: 'utf8' });
+    const child = spawnSync(process.env.FGOS_HOST_BIN, args, { cwd: w.cwd, env, encoding: 'utf8' });
     assert.equal(child.status, 0, `${args[1]}: ${child.stderr}`);
     assert.equal(child.stderr, '', `${args[1]} is quiet`);
     assert.equal(JSON.parse(child.stdout).data.skipped, 'state root gone', `${args[1]} reports why it skipped: ${child.stdout}`);
     assert.equal(fs.existsSync(stateRoot), false, `${args[1]} left the gone state root gone`);
   }
-  // The verb takes the child decision from main()'s one reading of the registry: the same sync run in the
+  // The host takes the child decision from the registry's declaration: the same sync run in the
   // foreground (no --opportunistic) is no child, so it does not skip and creates the root as setup would.
-  const foreground = spawnSync(process.execPath, [BIN, 'events', 'sync', '--no-push', '--dir', w.cwd], { cwd: w.cwd, env, encoding: 'utf8' });
+  const foreground = spawnSync(process.env.FGOS_HOST_BIN, ['events', 'sync', '--no-push', '--dir', w.cwd], { cwd: w.cwd, env, encoding: 'utf8' });
   assert.notEqual(JSON.parse(foreground.stdout || '{}').data?.skipped, 'state root gone', `${foreground.stdout} ${foreground.stderr}`);
   assert.equal(fs.existsSync(stateRoot), true, 'a foreground sync creates its state root');
 });

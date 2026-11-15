@@ -1,6 +1,7 @@
 //! Source wiring modules for composition root.
 
 pub mod event_store_clone;
+pub mod events;
 pub mod gateway_control;
 pub mod identity_log;
 #[cfg(unix)]

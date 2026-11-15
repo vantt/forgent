@@ -16,10 +16,11 @@ mod legacy_exec;
 mod routing;
 mod wiring;
 use fgos_distribution::suggest::suggest;
+use fgos_git::store_admission::StoreMode;
 use fgos_host_runtime::exit_codes;
 use fgos_host_runtime::invocation_service::NoopEventSink;
 use fgos_host_runtime::{build_snapshot, InvocationService, ProviderDescriptor, CATALOG};
-use invocation_doors::Ended;
+use invocation_doors::{Ended, Entered};
 use routing::{command_routes, Call, HookKind, Lane};
 use std::sync::Arc;
 
@@ -118,6 +119,10 @@ static COMPOSITION_PROVIDERS: &[ProviderDescriptor] = &[
     wiring::gateway_control::START_DESCRIPTOR,
     wiring::gateway_control::STOP_DESCRIPTOR,
     wiring::gateway_control::STATUS_DESCRIPTOR,
+    wiring::events::SYNC_DESCRIPTOR,
+    wiring::events::STATUS_DESCRIPTOR,
+    wiring::events::SEAL_DESCRIPTOR,
+    wiring::events::EXPORT_DESCRIPTOR,
 ];
 
 fn main() {
@@ -287,6 +292,16 @@ fn main() {
             wiring::gateway_control::GatewayProvider::for_descriptor(descriptor),
         ));
     }
+    for descriptor in [
+        wiring::events::SYNC_DESCRIPTOR,
+        wiring::events::STATUS_DESCRIPTOR,
+        wiring::events::SEAL_DESCRIPTOR,
+        wiring::events::EXPORT_DESCRIPTOR,
+    ] {
+        service.register_provider(Arc::new(wiring::events::EventsProvider::for_descriptor(
+            descriptor,
+        )));
+    }
     let tracker = service.tracker();
 
     match lane {
@@ -311,7 +326,12 @@ fn main() {
                 Ok(entered) => entered,
                 Err(refused) => std::process::exit(refused.report()),
             };
-            let ended = run_native(&service, &operation_id, cli_args, entered.project.clone());
+            let ended = run_native(
+                &service,
+                &operation_id,
+                cli_args,
+                project_of(route, &entered),
+            );
             doors.leave(&entered, &ended);
             std::process::exit(ended.code);
         }
@@ -322,6 +342,21 @@ fn main() {
             );
             std::process::exit(exit_codes::unexpected());
         }
+    }
+}
+
+/// The project a native operation acts on. A verb that declares a store (`open`, `read`, `require`) acts on the
+/// root the doors resolved and admitted, found or not: admission already judged a missing `.fgos` for its mode.
+/// A verb that declares none reads a project only when one was found, or says why not.
+fn project_of(
+    route: &routing::CommandRouteDescriptor,
+    entered: &Entered,
+) -> Result<std::path::PathBuf, String> {
+    let mode = StoreMode::parse(route.store.as_deref().unwrap_or("none"));
+    if mode == StoreMode::None {
+        entered.project.clone()
+    } else {
+        Ok(entered.root.root.clone())
     }
 }
 

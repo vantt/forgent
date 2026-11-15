@@ -97,7 +97,7 @@ import { recoverObserveUseCase, recoverApplyUseCase } from '../src/verbs/dispatc
 import { branchNameFor, branchExists, resyncWorktree, detectTrunk, isMainWorktree, admitStoreAccess, currentHead, realpathOrSelf as realpathOr, inspectGit, resolveRefSha, createVerifyCheckout, removeWorktree } from '../src/runner/worktree.mjs';
 import { claimWork, ClaimError, readWorkerSlotCeiling } from '../src/runner/claim-port.mjs';
 import { isReclaimEligible } from '../src/runner/claim-liveness.mjs';
-import { commitAt, pathExistsAt, readRepoFacts } from '../src/git/inspect.mjs';
+import { commitAt, pathExistsAt } from '../src/git/inspect.mjs';
 import { readGitStatus, readMergeHead, recoverGitOperations } from '../src/git/status.mjs';
 import { HolderLockError } from '../src/holder-lock/index.mjs';
 import { collectLockStatus } from '../src/runner/lock-status.mjs';
@@ -136,20 +136,10 @@ function mainCheckoutRootAt(cwd) {
   return mainCheckoutRootOf({}, cwd);
 }
 
-// What an Event Store verb reads: the project the `.fgos` `dir` belongs to, and the main checkout that owns the store.
-// A detached seal or publish child (`detached`) never rebuilds a state root its owner tore down: when it is gone the
-// context says `stateRootGone` and the verb skips.
-function eventStoreContext(dir, { detached = false } = {}) {
+// What `rebuild` reads: the project the `.fgos` `dir` belongs to, and the main checkout that owns the store.
+function eventStoreContext(dir) {
   const cwd = path.dirname(dir);
-  if (!detached) return { cwd, trustedMain: mainCheckoutRootAt(cwd) };
-  let facts;
-  try {
-    facts = readRepoFacts(cwd, { detached });
-  } catch (error) {
-    if (error.code === 'state-root-gone') return { cwd, stateRootGone: true };
-    throw error;
-  }
-  return { cwd, trustedMain: resolveInvocationRoot({ cwd, policy: 'main-checkout', facts }).root };
+  return { cwd, trustedMain: mainCheckoutRootAt(cwd) };
 }
 
 // `currentHead`/`resolveRefSha` live in src/runner/worktree.mjs (tsk-49i
@@ -871,9 +861,7 @@ function submitWork(dir, text, opts = {}) {
   return event.payload;
 }
 
-// `eventStoreChild` is main()'s one reading of the registry: whether this invocation is a detached seal or publish
-// child of the Event Store. A verb that needs it reads it here and never asks the registry again.
-async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slice(3), { eventStoreChild = false } = {}) {
+async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slice(3)) {
   switch (verb) {
     case 'init': {
       const { initStoreUseCase } = await import('../src/verbs/state/init.mjs');
@@ -2626,30 +2614,6 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
 
 
 
-    // `events sync|status|seal|export` and `rebuild` are the Event Store's verbs; each use case owns its
-    // own validation and refusals. The Event Store is Linux-only, so every one of them refuses elsewhere.
-    case 'events': {
-      const sub = positional[0];
-      const ctx = eventStoreContext(dir, { detached: eventStoreChild });
-      if (sub === 'sync') {
-        const { syncUseCase } = await import('../src/verbs/events/sync.mjs');
-        return syncUseCase(ctx, { remote: flags.remote, noPush: flags['no-push'], opportunistic: flags.opportunistic });
-      }
-      if (sub === 'status') {
-        const { statusUseCase } = await import('../src/verbs/events/status.mjs');
-        return statusUseCase(ctx, { remote: flags.remote });
-      }
-      if (sub === 'seal') {
-        const { sealUseCase } = await import('../src/verbs/events/seal.mjs');
-        return sealUseCase(ctx, { stream: flags.stream, history: flags.history });
-      }
-      if (sub === 'export') {
-        const { exportUseCase } = await import('../src/verbs/events/export.mjs');
-        return exportUseCase(ctx, { out: flags.out, stream: flags.stream, since: flags.since });
-      }
-      throw new StoreError('validation', 'events requires sync|status|seal|export');
-    }
-
     case 'rebuild': {
       const { rebuildStoreUseCase } = await import('../src/verbs/events/rebuild.mjs');
       return rebuildStoreUseCase(eventStoreContext(dir));
@@ -3995,7 +3959,6 @@ async function main() {
   let dir;
   // Set once the verb is known: whether it is itself a seal or publish child, and its sub-verb (the only argument the
   // fault record keeps by value).
-  let eventStoreChild = false;
   let sub;
   const { currentDispatchDepth } = await import('../src/runner/dispatch/adapters.mjs');
   try {
@@ -4029,14 +3992,13 @@ async function main() {
     // comes from `runVerb` unchanged.
     // The Event Store lifecycle (spec §16) wraps the verb, its answer and its exit code; the verb's own registry entry
     // says whether it opens the store, ran Land, or is itself a seal or publish child.
-    eventStoreChild = declared(entry?.eventStoreChild, positional, flags);
     sub = entry?.subcommands && Object.hasOwn(entry.subcommands, positional[0]) ? positional[0] : undefined;
     await withFaultClass(entry ? null : 'unknown-verb', () => runWithEventStoreLifecycle({
       cwd: path.dirname(dir),
       // Resolved only for a verb that opens the store, and only once: it runs Git.
       trustedMain: () => mainCheckoutRootAt(path.dirname(dir)),
       dispatched: currentDispatchDepth() > 0,
-      opensStore: !!entry && entry.store !== 'none' && !eventStoreChild,
+      opensStore: !!entry && entry.store !== 'none',
       creating: verb === 'init',
       landed: declared(entry?.landsWork, positional),
       recordFault: (triggerFaultClass, message) => recordInvocationFault({ fgosDir: dir, cwd: process.cwd(), verb, sub, faultClass: triggerFaultClass, message, argv: process.argv.slice(2) }),
@@ -4045,7 +4007,7 @@ async function main() {
         for (const warning of releaseRecordedLand(trustedMain).warnings) process.stderr.write(`fgos: warning: Land candidate release: ${warning}\n`);
       },
     }, async () => {
-      const data = await runVerb(verb, flags, positional, dir, rest, { eventStoreChild });
+      const data = await runVerb(verb, flags, positional, dir, rest);
       if (flags.pretty && (verb === 'setup' || verb === 'doctor')) {
         process.stdout.write(renderPretty(verb, data));
       } else if (verb === 'plan-lint' && !flags.json) {
@@ -4074,8 +4036,7 @@ async function main() {
       cwd: process.cwd(),
       verb,
       sub,
-      // The detached children have no caller to read their error, so a child that fails leaves a record whatever the verb's own classification is.
-      faultClass: err.faultClass ?? (eventStoreChild ? 'event-store-child' : null),
+      faultClass: err.faultClass ?? null,
       message: err.message,
       argv: process.argv.slice(2),
     });

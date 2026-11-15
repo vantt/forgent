@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
-import { fixture, append, installFetchMapping } from '../event-store/phase07-fixture.mjs';
+import { fixture, append, installFetchMapping, hostEvents } from '../event-store/phase07-fixture.mjs';
 import { checkEventStore, eventStoreSetupContext, eventStoreDoctor } from '../../src/setup/event-store-checks.mjs';
 import { writeProjectConfig, writeRawProjectConfig } from '../helpers/config-fixture.mjs';
 import { DOCTOR_CHECKS, FIX_REGISTRATIONS, createDoctorRun } from '../../src/setup/registrations.mjs';
@@ -44,7 +44,6 @@ test('incidents counts orphan branch streams and persisted integrity problems, a
   assert.equal(checkEventStore(f.temp, 'event-store-open-root', { ...f.ctx, trustedMain: f.temp }).passed, false);
 });
 test('incidents reports a peer mirror the reader skipped and the warning the last sync kept for it', async t => {
-  const { syncUseCase } = await import('../../src/verbs/events/sync.mjs');
   const f = fixture(t, { remote: true });
   installFetchMapping(f); append(f.store, [{}]);
   assert.equal(checkEventStore(f.repo, 'event-store-incidents', f.ctx).passed, true);
@@ -52,18 +51,17 @@ test('incidents reports a peer mirror the reader skipped and the warning the las
   const remote = (...args) => execFileSync('git', ['-C', path.join(f.temp, 'remote'), ...args], { encoding: 'utf8', input: '',
     env: { ...process.env, GIT_AUTHOR_NAME: 'Peer', GIT_AUTHOR_EMAIL: 'peer@example.test', GIT_COMMITTER_NAME: 'Peer', GIT_COMMITTER_EMAIL: 'peer@example.test' } }).trim();
   remote('update-ref', 'refs/fgos/events/peer-bb', remote('commit-tree', '-m', 'not a seal', remote('mktree')));
-  syncUseCase(f.ctx);
+  hostEvents(f, ['sync']);
   const row = checkEventStore(f.repo, 'event-store-incidents', f.ctx);
   assert.equal(row.passed, false, 'a skipped peer mirror fails like an integrity error');
   assert.match(row.message, /^2 integrity problem\(s\); run `fgos events status`$/, 'the skipped mirror and the sync warning are both counted');
 });
 test('shared machine ref warns only after reading another clone origin on the own mirror', async t => {
-  const { syncUseCase } = await import('../../src/verbs/events/sync.mjs');
   const first = fixture(t, { remote: true });
-  installFetchMapping(first); append(first.store, [{}]); syncUseCase(first.ctx);
+  installFetchMapping(first); append(first.store, [{}]); hostEvents(first, ['sync']);
   const second = fixture(t, { remote: true });
   second.git('remote', 'set-url', 'origin', path.join(first.temp, 'remote'));
-  installFetchMapping(second); append(second.store, [{}]); syncUseCase(second.ctx);
+  installFetchMapping(second); append(second.store, [{}]); hostEvents(second, ['sync']);
   assert.match(checkEventStore(second.repo, 'event-store-machine-id', second.ctx).message, /^warning: event-store-machine-ref-shared/);
   assert.equal(checkEventStore(second.repo, 'event-store-incidents', second.ctx).message.startsWith('warning:'), false);
 });

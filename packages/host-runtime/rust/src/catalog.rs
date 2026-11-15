@@ -224,6 +224,50 @@ pub const CATALOG: &[OperationDescriptor] = &[
         allowed_host_kinds: &["cli"],
         streaming_mode: StreamingMode::None,
     },
+    OperationDescriptor {
+        operation_id: OperationId::from_static("event-store.sync"),
+        owning_component_id: Cow::Borrowed("event-store"),
+        request_contract: ContractRef::from_static("event-store.sync.request", "1.0.0"),
+        outcome_contract: ContractRef::from_static("event-store.sync.outcome", "1.0.0"),
+        effect: OperationEffect::Write,
+        idempotency: OperationIdempotency::None,
+        authority_policy_id: Cow::Borrowed("event-store.write"),
+        allowed_host_kinds: &["cli"],
+        streaming_mode: StreamingMode::None,
+    },
+    OperationDescriptor {
+        operation_id: OperationId::from_static("event-store.status"),
+        owning_component_id: Cow::Borrowed("event-store"),
+        request_contract: ContractRef::from_static("event-store.status.request", "1.0.0"),
+        outcome_contract: ContractRef::from_static("event-store.status.outcome", "1.0.0"),
+        effect: OperationEffect::Read,
+        idempotency: OperationIdempotency::Safe,
+        authority_policy_id: Cow::Borrowed("event-store.read"),
+        allowed_host_kinds: &["cli"],
+        streaming_mode: StreamingMode::None,
+    },
+    OperationDescriptor {
+        operation_id: OperationId::from_static("event-store.seal"),
+        owning_component_id: Cow::Borrowed("event-store"),
+        request_contract: ContractRef::from_static("event-store.seal.request", "1.0.0"),
+        outcome_contract: ContractRef::from_static("event-store.seal.outcome", "1.0.0"),
+        effect: OperationEffect::Write,
+        idempotency: OperationIdempotency::None,
+        authority_policy_id: Cow::Borrowed("event-store.write"),
+        allowed_host_kinds: &["cli"],
+        streaming_mode: StreamingMode::None,
+    },
+    OperationDescriptor {
+        operation_id: OperationId::from_static("event-store.export"),
+        owning_component_id: Cow::Borrowed("event-store"),
+        request_contract: ContractRef::from_static("event-store.export.request", "1.0.0"),
+        outcome_contract: ContractRef::from_static("event-store.export.outcome", "1.0.0"),
+        effect: OperationEffect::Read,
+        idempotency: OperationIdempotency::Safe,
+        authority_policy_id: Cow::Borrowed("event-store.read"),
+        allowed_host_kinds: &["cli"],
+        streaming_mode: StreamingMode::None,
+    },
 ];
 
 #[cfg(test)]
@@ -234,7 +278,7 @@ mod tests {
     fn catalog_contains_required_operations() {
         // Eleven operations, plus the mailbox's send, inbox, inbox claim, list
         // and status, and the gateway's start, stop and status.
-        assert_eq!(CATALOG.len(), 19);
+        assert_eq!(CATALOG.len(), 23);
         let ids: Vec<&str> = CATALOG.iter().map(|op| op.operation_id.as_str()).collect();
         assert!(ids.contains(&"distribution.build.show"));
         assert!(ids.contains(&"work.gate-bypass.show"));
@@ -252,6 +296,9 @@ mod tests {
         assert!(ids.contains(&"mailbox.status"));
         assert!(ids.contains(&"config.read"));
         assert!(ids.contains(&"config.write"));
+        for op in ["sync", "status", "seal", "export"] {
+            assert!(ids.contains(&format!("event-store.{op}").as_str()));
+        }
         assert!(ids.contains(&"gateway.start"));
         assert!(ids.contains(&"gateway.stop"));
         assert!(ids.contains(&"gateway.status"));

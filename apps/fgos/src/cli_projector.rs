@@ -133,6 +133,13 @@ pub fn project_cli_invocation(
                 args, root,
             )?),
         ),
+        crate::wiring::events::SYNC_OPERATION_ID
+        | crate::wiring::events::STATUS_OPERATION_ID
+        | crate::wiring::events::SEAL_OPERATION_ID
+        | crate::wiring::events::EXPORT_OPERATION_ID => (
+            ContractRef::new(format!("{operation_id_str}.request"), "1.0.0"),
+            Box::new(project_events_request(args, root?)?),
+        ),
         other => {
             return Err(format!(
                 "native CLI projector has no request mapping for '{}'",
@@ -174,7 +181,86 @@ pub fn native_operation_id(
             crate::wiring::gateway_control::project_gateway_request(args, Err(String::new()))?;
         return Ok(request.sub.operation_id().to_string());
     }
+    if route_operation == crate::wiring::events::STATUS_OPERATION_ID {
+        let request = project_events_request(args, std::path::PathBuf::new())?;
+        return Ok(request.operation_id().to_string());
+    }
     Ok(route_operation.to_string())
+}
+
+/// `fgos events sync [--remote <name>] [--no-push] [--opportunistic]`, `status [--remote <name>]`, `seal --stream
+/// <name> [--history <file>]`, `export --out <dir> [--stream <name>] [--since <cursor json>]`, read only through the
+/// shared parser. A flag that takes a value and a flag that takes none are each refused when given the other
+/// way: the Node CLI hands the wrong shape to the store and fails there. Whether the call is a seal or publish
+/// child is the registry's declaration, the same one the invocation doors read.
+fn project_events_request(
+    args: &[OsString],
+    root: std::path::PathBuf,
+) -> Result<crate::wiring::events::EventsRequest, ProjectError> {
+    use crate::wiring::events::{EventsRequest, Verb};
+    use fgos_host_runtime::cli_args::{FlagScalar, FlagValue, ParsedArgs};
+    let call = crate::routing::Call::new(args);
+    let parsed: &ParsedArgs = call.parsed();
+    let sub = parsed.positional.first().map(String::as_str).unwrap_or("");
+    let refuse =
+        |message: String| ProjectError::Refused(CategorisedRefusal::new("validation", message));
+    let flag = |name: &str| parsed.flag(name.trim_start_matches("--"));
+    let text = |name: &str| match flag(name) {
+        Some(FlagValue::One(FlagScalar::Str(text))) => Some(text.clone()),
+        _ => None,
+    };
+    let value = |name: &str| -> Result<Option<String>, ProjectError> {
+        match flag(name) {
+            None => Ok(None),
+            Some(FlagValue::One(FlagScalar::Str(text))) => Ok(Some(text.clone())),
+            Some(_) => Err(refuse(format!("events {sub} {name} needs a value"))),
+        }
+    };
+    let switch = |name: &str| -> Result<bool, ProjectError> {
+        match flag(name) {
+            None => Ok(false),
+            Some(FlagValue::One(FlagScalar::Bool)) => Ok(true),
+            Some(_) => Err(refuse(format!("events {sub} {name} takes no value"))),
+        }
+    };
+    let verb = match sub {
+        "sync" => Verb::Sync {
+            remote: value("--remote")?,
+            no_push: switch("--no-push")?,
+            opportunistic: switch("--opportunistic")?,
+        },
+        "status" => Verb::Status {
+            remote: value("--remote")?,
+        },
+        "seal" => Verb::Seal {
+            stream: text("--stream"),
+            history: match flag("--history") {
+                None => None,
+                Some(FlagValue::One(FlagScalar::Str(text))) => Some(text.clone()),
+                // A bare `--history` names no file: refused as any path outside the cache is.
+                Some(_) => Some(String::new()),
+            },
+        },
+        "export" => Verb::Export {
+            out: text("--out"),
+            stream: value("--stream")?,
+            since: value("--since")?,
+        },
+        other => {
+            return Err(refuse(format!(
+                "unknown events subcommand \"{other}\". Available: {}",
+                crate::wiring::events::AVAILABLE_SUBCOMMANDS.join(", ")
+            )))
+        }
+    };
+    let detached = crate::routing::command_routes()
+        .get("events")
+        .is_some_and(|route| crate::routing::declared(&route.event_store_child, &call));
+    Ok(EventsRequest {
+        root,
+        verb,
+        detached,
+    })
 }
 
 /// `fgos config show|standard [--path <p>]`, `explain <path>`, `check`, `set <path> <value>
@@ -1183,5 +1269,79 @@ mod tests {
         assert!(config(&["config", "set", "only-a-path"]).is_err());
         assert!(config(&["config", "set", "a", "b", "--reason"]).is_err());
         assert!(config(&["config", "unset", "a", "--global", "--finish"]).is_err());
+    }
+
+    fn events(args: &[&str]) -> Result<crate::wiring::events::EventsRequest, ProjectError> {
+        let mut all = vec!["events"];
+        all.extend_from_slice(args);
+        let all: Vec<OsString> = all.iter().map(OsString::from).collect();
+        project_events_request(&all, std::path::PathBuf::from("/repo"))
+    }
+
+    #[test]
+    fn events_arguments_map_to_their_verb_and_pick_the_operation_that_matches_their_effect() {
+        use crate::wiring::events::Verb;
+        let sync = events(&["sync", "--no-push", "--remote", "backup"]).unwrap();
+        assert_eq!(
+            sync.verb,
+            Verb::Sync {
+                remote: Some("backup".into()),
+                no_push: true,
+                opportunistic: false
+            }
+        );
+        assert!(!sync.detached, "a foreground publish is no child");
+        let child = events(&["sync", "--opportunistic", "--dir", "/x"]).unwrap();
+        assert!(
+            child.detached,
+            "the publish child shape is declared by the registry"
+        );
+        assert!(events(&["seal", "--stream", "project"]).unwrap().detached);
+        assert!(!events(&["export", "--out", "o"]).unwrap().detached);
+        assert_eq!(
+            events(&["export", "--out", "o", "--stream", "s", "--since", "{}"])
+                .unwrap()
+                .verb,
+            Verb::Export {
+                out: Some("o".into()),
+                stream: Some("s".into()),
+                since: Some("{}".into())
+            }
+        );
+        // A seal without a stream value reaches the provider, which owns that refusal.
+        assert_eq!(
+            events(&["seal", "--stream"]).unwrap().verb,
+            Verb::Seal {
+                stream: None,
+                history: None
+            }
+        );
+        for (args, operation) in [
+            (&["events", "sync"][..], "event-store.sync"),
+            (&["events", "status"], "event-store.status"),
+            (&["events", "seal", "--stream", "p"], "event-store.seal"),
+            (&["events", "export", "--out", "o"], "event-store.export"),
+        ] {
+            let args: Vec<OsString> = args.iter().map(OsString::from).collect();
+            assert_eq!(
+                native_operation_id("event-store.status", &args).unwrap(),
+                operation
+            );
+        }
+    }
+
+    #[test]
+    fn a_flag_given_the_wrong_shape_is_a_validation_refusal() {
+        for args in [
+            &["status", "--remote"][..],
+            &["sync", "--no-push", "yes"],
+            &["sync", "--remote"],
+            &["export", "--out", "o", "--since"],
+        ] {
+            match events(args) {
+                Err(ProjectError::Refused(refusal)) => assert_eq!(refusal.category, "validation"),
+                other => panic!("{args:?}: {other:?}"),
+            }
+        }
     }
 }

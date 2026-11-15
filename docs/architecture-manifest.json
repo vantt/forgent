@@ -355,11 +355,21 @@
       "kind": "door",
       "patterns": ["event-store-child"],
       "allowed": ["apps/fgos/src/invocation_doors.rs"],
-      "debt": [
-        { "path": "bin/fgos.mjs", "reason": "the Node branch that classifies a Node-run child; deleted by the `events` port" }
-      ],
-      "retiredBy": "S3: the Node branch goes with the `events` port",
+      "debt": [],
+      "retiredBy": "S7: the host doors are the only classifier once no Node verb runs",
       "reason": "a detached seal or publish child has no caller to read its error, so a failure leaves a record whatever the verb's own classification is; the host records it where the doors leave an invocation, from the failure text the verb answered"
+    },
+    {
+      "job": "start a detached Event Store child",
+      "kind": "door",
+      "patterns": ["['\"]events['\"],\\s*['\"](?:sync|seal)['\"]", "\"events\"\\.into\\(\\)"],
+      "allowed": [
+        { "path": "src/event-store/maintenance.mjs", "reason": "the Node lifecycle wrapper of Node verbs starts the host binary for the publish and seal children" },
+        { "path": "apps/fgos/src/invocation_doors.rs", "reason": "the host lifecycle starts its own executable for the publish child" }
+      ],
+      "debt": [],
+      "retiredBy": "S7: the Node lifecycle wrapper retires with the last Node verb",
+      "reason": "a seal or publish child is always the host's native `events` verb, started from the two lifecycle wrappers; a second place that spells the child's argv is a second way to start one (a Node child would be refused by the native verb)"
     },
     {
       "job": "parse CLI arguments (twin)",
@@ -998,10 +1008,6 @@
     "src/event-store/maintenance.mjs": "infra",
     "src/event-store/seal-coalescing.mjs": "infra",
     "src/verbs/events/context.mjs": "use-case",
-    "src/verbs/events/status.mjs": "use-case",
-    "src/verbs/events/seal.mjs": "use-case",
-    "src/verbs/events/sync.mjs": "use-case",
-    "src/verbs/events/export.mjs": "use-case",
     "src/verbs/events/rebuild.mjs": "use-case",
     "src/setup/event-store-checks.mjs": "infra",
     "src/setup/event-store-fixes.mjs": "use-case",

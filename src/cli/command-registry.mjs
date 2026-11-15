@@ -1744,6 +1744,7 @@ export const COMMAND_REGISTRY = [
     store: 'open',
     mutatesStore: ['sync'],
     eventStoreChild: ['seal', 'sync --opportunistic=true'],
+    native: true,
     externalEffect: true,
     paginated: false,
     deprecated: null,

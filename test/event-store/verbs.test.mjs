@@ -4,10 +4,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
-import { fixture, append, installFetchMapping } from './phase07-fixture.mjs';
-import { statusUseCase } from '../../src/verbs/events/status.mjs';
-import { syncUseCase } from '../../src/verbs/events/sync.mjs';
-import { exportUseCase } from '../../src/verbs/events/export.mjs';
+import { fixture, append, installFetchMapping, hostEvents } from './phase07-fixture.mjs';
 import { rebuildStoreUseCase } from '../../src/verbs/events/rebuild.mjs';
 import { eventStoreConfig, readEventStoreConfig } from '../../src/event-store/index.mjs';
 import { readStandardValue } from '../../src/config/facade.mjs';
@@ -15,34 +12,34 @@ import { writeProjectConfig, writeRawProjectConfig } from '../helpers/config-fix
 
 test('status exposes real open counts, receipt, refs, deferred fields and linked/subdir discovery', t => {
   const f = fixture(t); append(f.store, [{}]);
-  let got = statusUseCase(f.ctx);
+  let got = hostEvents(f, ['status']);
   assert.equal(got.streams.find(s => s.stream === 'project').unsealedCount, 1);
   assert.equal(got.machineId, 'phase-seven'); assert.deepEqual(got.missing, []);
   assert.ok(got.guarantee); assert.equal(got.remoteUrl, null);
   f.store.seal('project', []);
-  got = statusUseCase(f.ctx);
+  got = hostEvents(f, ['status']);
   assert.ok(got.refs['refs/fgos/events/phase-seven']);
   assert.equal(got.streams.find(s => s.stream === 'project').lastReceipt.lastSeq, 1);
   f.git('commit', '--allow-empty', '-qm', 'initial');
   const linked = path.join(f.temp, 'linked'); f.git('worktree', 'add', '-qb', 'linked', linked);
   fs.mkdirSync(path.join(linked, 'sub'));
-  assert.equal(statusUseCase({ ...f.ctx, cwd: path.join(linked, 'sub') }).storeId, got.storeId);
+  assert.equal(hostEvents(f, ['status'], { cwd: path.join(linked, 'sub') }).storeId, got.storeId);
 });
 test('status reports every incident the doctor pointer counts: unsealed age, orphan branch streams, integrity errors, skipped peer mirrors and the sync warning kept for them', t => {
   const f = fixture(t, { remote: true });
   installFetchMapping(f);
   append(f.store, [{ ts: new Date(Date.now() - 3601 * 1000).toISOString() }]);
-  assert.ok(statusUseCase(f.ctx).streams.find(s => s.stream === 'project').oldestUnsealedAgeSec >= 3601);
+  assert.ok(hostEvents(f, ['status']).streams.find(s => s.stream === 'project').oldestUnsealedAgeSec >= 3601);
   fs.mkdirSync(path.join(f.repo, '.git/fgos/events/branch:gone'));
-  assert.deepEqual(statusUseCase(f.ctx).orphanBranches, ['branch:gone']);
+  assert.deepEqual(hostEvents(f, ['status']).orphanBranches, ['branch:gone']);
   fs.writeFileSync(path.join(f.repo, '.git/fgos/events/project/integrity.json'), JSON.stringify({ code: 'event-store-ref-moved', ranges: [] }));
-  assert.equal(statusUseCase(f.ctx).integrityErrors.length, 1);
+  assert.equal(hostEvents(f, ['status']).integrityErrors.length, 1);
   // A peer pushed a ref whose commit is no sealed history (no seal.json).
   const remote = (...args) => execFileSync('git', ['-C', path.join(f.temp, 'remote'), ...args], { encoding: 'utf8', input: '',
     env: { ...process.env, GIT_AUTHOR_NAME: 'Peer', GIT_AUTHOR_EMAIL: 'peer@example.test', GIT_COMMITTER_NAME: 'Peer', GIT_COMMITTER_EMAIL: 'peer@example.test' } }).trim();
   remote('update-ref', 'refs/fgos/events/peer-bb', remote('commit-tree', '-m', 'not a seal', remote('mktree')));
-  syncUseCase(f.ctx);
-  const got = statusUseCase(f.ctx);
+  hostEvents(f, ['sync']);
+  const got = hostEvents(f, ['status']);
   assert.match(got.skippedMirrors.map(m => `${m.code} ${m.refName}`).join(), /event-store-gap refs\/fgos\/remotes\/origin\/events\/peer-bb/, 'the read skipped the mirror by name');
   assert.ok(got.sync.warnings.some(w => w.startsWith('event-store-gap: ')), 'the warning the sync kept is reported');
   assert.equal(got.lastPush.error ?? null, null);
@@ -50,24 +47,24 @@ test('status reports every incident the doctor pointer counts: unsealed age, orp
 test('status never prints the credentials of a remote URL: Git redacts userinfo and query before any verb sees it', t => {
   const f = fixture(t, { remote: true });
   f.git('remote', 'set-url', 'origin', 'https://user:ghp_secret@example.test/repo.git?token=querysecret');
-  const got = statusUseCase(f.ctx);
+  const got = hostEvents(f, ['status']);
   assert.equal(got.remoteUrl, 'https://[redacted]@example.test/repo.git?[redacted]');
   assert.doesNotMatch(JSON.stringify(got), /ghp_secret|querysecret/, 'neither the status fields nor the whole facts carry the credential');
 });
 test('sync waits, seals and records actual fetch/push; no-push preserves last push', t => {
   const f = fixture(t, { remote: true }); installFetchMapping(f); append(f.store, [{}]);
-  const got = syncUseCase(f.ctx);
+  const got = hostEvents(f, ['sync']);
   assert.equal(got.status.aheadBehind.ahead, 0); assert.ok(got.status.lastPush.time); assert.ok(got.status.lastFetch.time);
-  const second = syncUseCase(f.ctx, { noPush: true });
+  const second = hostEvents(f, ['sync', '--no-push']);
   assert.deepEqual(second.status.lastPush, got.status.lastPush);
 });
 test('JSONL export writes canonical reader order, cursors and refuses existing output', t => {
   const f = fixture(t); const written = append(f.store, [{}, {}]);
-  const out = path.join(f.temp, 'export'); const result = exportUseCase(f.ctx, { out });
+  const out = path.join(f.temp, 'export'); const result = hostEvents(f, ['export', '--out', out]);
   const lines = fs.readFileSync(path.join(out, 'events.jsonl'), 'utf8').trim().split('\n').map(JSON.parse);
   assert.deepEqual(lines.map(e => e.h), written.events.map(e => e.h));
-  assert.throws(() => exportUseCase(f.ctx, { out }), /exists|Exist/);
-  const next = path.join(f.temp, 'delta'); exportUseCase(f.ctx, { out: next, since: result.cursor });
+  assert.throws(() => hostEvents(f, ['export', '--out', out]), /exists|Exist/);
+  const next = path.join(f.temp, 'delta'); hostEvents(f, ['export', '--out', next, '--since', JSON.stringify(result.cursor)]);
   assert.equal(fs.readFileSync(path.join(next, 'events.jsonl'), 'utf8'), '');
 });
 test('an unset eventStore key takes the bundled standard value', () => {
@@ -110,10 +107,10 @@ test('status identifies deferred predecessors explicitly and exports no deferred
   const f = fixture(t);
   const origin = 'a'.repeat(32);
   f.store.append('project', [{ eventType: 'work.add', schemaVersion: 1, payload: { id: 'deferred' }, ts: new Date().toISOString() }], { [`${origin}:project`]: 1 }, 'fixture', []);
-  const got = statusUseCase(f.ctx);
+  const got = hostEvents(f, ['status']);
   assert.equal(got.deferred.length, 1);
   assert.deepEqual(got.missing, [{ origin, stream: 'project', seq: 1 }]);
-  const out = path.join(f.temp, 'deferred'); exportUseCase(f.ctx, { out });
+  const out = path.join(f.temp, 'deferred'); hostEvents(f, ['export', '--out', out]);
   assert.equal(fs.readFileSync(path.join(out, 'events.jsonl'), 'utf8'), '');
 });
 
@@ -149,12 +146,12 @@ test('ahead and behind count only commits outside the opposite tip ancestry', t 
   append(f.store, [{ payload: { id: 'two' } }]); f.store.seal('project', []);
   const second = f.git('rev-parse', 'refs/fgos/events/phase-seven');
   f.git('update-ref', 'refs/fgos/remotes/origin/events/phase-seven', first);
-  assert.deepEqual(statusUseCase(f.ctx).aheadBehind, { ahead: 1, behind: 0 });
+  assert.deepEqual(hostEvents(f, ['status']).aheadBehind, { ahead: 1, behind: 0 });
   f.git('update-ref', 'refs/fgos/remotes/origin/events/phase-seven', second);
   f.git('update-ref', 'refs/fgos/events/phase-seven', first);
-  assert.deepEqual(statusUseCase(f.ctx).aheadBehind, { ahead: 0, behind: 1 });
+  assert.deepEqual(hostEvents(f, ['status']).aheadBehind, { ahead: 0, behind: 1 });
   f.git('update-ref', 'refs/fgos/events/phase-seven', second);
-  assert.deepEqual(statusUseCase(f.ctx).aheadBehind, { ahead: 0, behind: 0 });
+  assert.deepEqual(hostEvents(f, ['status']).aheadBehind, { ahead: 0, behind: 0 });
 });
 
 test('failed real Work rebuild preserves the previous cache', async t => {

@@ -3,12 +3,25 @@
 // oldest unsealed age and the last push attempt), never the integrity status: no ref walk and no legacy read, so
 // it costs a directory listing and a few first-line reads on every command.
 import { spawnDetachedCli } from '../util/spawn-detached-fgos.mjs';
+import { resolveHostBin } from '../util/host-bin.mjs';
 import { maintainStore, readEventStoreConfig } from './index.mjs';
 import { processSealCoalescer } from './seal-coalescing.mjs';
 
+/**
+ * Start a detached `fgos events` child. The host runs it natively, so the child never forwards to this payload, and
+ * the recursion guard of a host that started this process is not handed on. No host to run it: the spawn's error.
+ */
+function startEventStoreChild(root, args) {
+  const executable = resolveHostBin(root);
+  if (!executable) return { pid: null, error: 'host-unavailable' };
+  const env = Object.assign({}, process.env);
+  delete env.FGOS_RUST_HOST_RECURSION_GUARD;
+  return spawnDetachedCli({ cwd: root, args, env, executable });
+}
+
 /** Start the one detached child that publishes for this clone; a spawn that cannot start is the trigger's error. */
 function handSyncToChild(root) {
-  const { error } = spawnDetachedCli({ cwd: root, args: ['events', 'sync', '--opportunistic', '--dir', root] });
+  const { error } = startEventStoreChild(root, ['events', 'sync', '--opportunistic', '--dir', root]);
   if (error) throw new Error(`event-store-sync-child: ${error}`);
 }
 
@@ -49,7 +62,7 @@ export function maintainEventStore(cwd, { trustedMain = cwd, shutdown = false, e
  * the next trigger or the `event-store-incidents` pointer covers them (spec §16). */
 function handSealsToChild() {
   for (const { root, stream, checkpointPath } of processSealCoalescer.takeHandedOff()) {
-    spawnDetachedCli({ cwd: root, args: ['events', 'seal', '--stream', stream, ...(checkpointPath ? ['--history', checkpointPath] : []), '--dir', root] });
+    startEventStoreChild(root, ['events', 'seal', '--stream', stream, ...(checkpointPath ? ['--history', checkpointPath] : []), '--dir', root]);
   }
 }
 

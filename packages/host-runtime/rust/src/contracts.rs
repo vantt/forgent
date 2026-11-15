@@ -347,6 +347,16 @@ impl CategorisedRefusal {
         }
     }
 
+    /// A failure no category names: the Node CLI exits with the table's `unexpected` status for an error that carries
+    /// no category, and prints the same `fgos: <message>`.
+    pub fn unexpected(message: impl Into<String>) -> Self {
+        Self {
+            category: "unexpected",
+            message: message.into(),
+            exit: crate::exit_codes::unexpected(),
+        }
+    }
+
     /// The process exit status of the refusal's category.
     pub fn exit_code(&self) -> i32 {
         self.exit
@@ -624,6 +634,14 @@ mod tests {
             );
             assert_eq!(refusal.category, name);
         }
+    }
+
+    #[test]
+    fn an_unexpected_failure_exits_with_the_tables_unexpected_status() {
+        let refusal = CategorisedRefusal::unexpected("event-store-io: broke");
+        assert_eq!(refusal.exit_code(), crate::exit_codes::unexpected());
+        assert_eq!(refusal.category, "unexpected");
+        assert_eq!(refusal.message, "event-store-io: broke");
     }
 
     #[test]

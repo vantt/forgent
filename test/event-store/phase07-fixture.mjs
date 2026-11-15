@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { execFileSync } from 'node:child_process';
+import { execFileSync, spawnSync } from 'node:child_process';
 import { ensureGitAddon, root } from '../../scripts/git-addon.mjs';
 import { loadNativeAddon } from '../../src/git/native.mjs';
 import { openStore } from '../../src/event-store/index.mjs';
@@ -45,4 +45,18 @@ export function installFetchMapping({ repo, stateRoot }) {
     const result = fixGitFetchMapping(repo, loaderOptions);
     assert.ok(result.changed || /no fetch mapping change needed/.test(result.message), result.message);
   } finally { if (prior === undefined) delete process.env.FGOS_STATE_ROOT; else process.env.FGOS_STATE_ROOT = prior; }
+}
+
+/**
+ * Runs `fgos events <args>` through the staged host binary against a fixture and returns the answer's `data`. The verbs
+ * run only in the host; a refusal throws with the host's message. `home` holds no global config, so no
+ * setting of the person running the test reaches the call.
+ */
+export function hostEvents({ temp, repo, stateRoot }, args, { cwd = repo } = {}) {
+  const home = path.join(temp, 'home'); fs.mkdirSync(home, { recursive: true });
+  const run = spawnSync(process.env.FGOS_HOST_BIN, ['events', ...args], {
+    cwd, encoding: 'utf8', env: Object.assign({}, process.env, { FGOS_STATE_ROOT: stateRoot, HOME: home }),
+  });
+  if (run.status !== 0) throw new Error(`events ${args[0]} exited ${run.status}: ${run.stderr}`);
+  return JSON.parse(run.stdout).data;
 }
