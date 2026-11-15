@@ -1,3 +1,4 @@
+- 2026-11-15 18:35 OPC: MERGE yaml-write-door/p03 52b4bf4f9 (knowledge registry frontmatter through writeFrontmatter, byte-identical, doc-registry --check clean).
 - 2026-11-15 18:34 OPC: MERGE yaml-write-door/p05 0b7a47a48 (case answer file frontmatter through writeFrontmatter, bytes unchanged on good rounds, malformed round fields coerced; case-runtime 20/20). Carry-over to the rebased head on a census-only range-diff.
 - 2026-11-15 18:28 OPC: MERGE yaml-write-door/p02 delta 4155b139d (release-tree pins the staged YAML door imports as node:util + native door; release-tree 4/4 with a release build).
 - 2026-11-15 18:25 OPC: MERGE yaml-write-door/p02 09e22e726 (addon yaml.emit, Node writeFrontmatter with read-back check, yaml ABI marker 1->2 with every consumer). release-tree needs a release workspace build; run it once on the integration head after p02 (it is the proof the staged addon passes yaml>=2) and in the main gate.
