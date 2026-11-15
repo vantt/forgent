@@ -89,12 +89,13 @@ Accepted behaviour changes (decided here, each in the phase that makes it and in
    the annotation in `packages/host-runtime/contracts/command-route-annotations.json`, `native: true` in
    `src/cli/command-registry.mjs`; regenerate `command-routes.json` and `command-manifest.json`
    (`node scripts/export-command-selectors.mjs`). Refusals use D3's outcome with Node's category and text.
-   An unknown flag gets the host's one per-verb text (an accepted change); when the input used `--k=v`, the
-   host's one message rule keeps the "write --k <value>" hint, never a per-verb copy.
+   An unknown flag is refused with Node's exact text: the host takes each sub-verb's flag list from the registry
+   annotation it already ships and reuses Node's message grammar (including the `--k=v` "write --k <value>" hint).
+   No user-visible change, no CHANGELOG line.
 3. Parity: the verb's table `test/rust-host/parity-cases/<verb>.cases.mjs` (every `requireField`/`optionalField`
    refusal of the arm included, 00 F16) runs green against the step's base release before the Node code is deleted.
    A verb phase uses the `node:<base>/bin/fgos.mjs` entry with the staged env (about 0.34 s a case, not 2.7 s through
-   the staged host). For the unknown-flag case the parity test compares exit code and refusal id, not bytes.
+   the staged host). The unknown-flag case is compared on exit code and exact stderr bytes like every other refusal.
 4. Delete in the same phase: the `bin/fgos.mjs` arm, its static imports that no other arm uses (and their
    `ARM_STATIC_IMPORTS` lines, `test/architecture.test.mjs:1660`), the Node use case, its `files` entry in
    `docs/architecture-manifest.json` (the architecture test compares files on disk with `manifest.files`), and every
@@ -391,9 +392,12 @@ the `LENIENT_ROOT_VERBS` guard gets an exact-set assertion; phase 03 states why 
 - (d) Phase 04 pins the three run-lister rules and the unreachable `lock-not-node-owned` as cases (facts report section 8).
 - (e) `git recover` outside a repository printing `--sha [object Object]` is fixed in the port, not copied: an
   accepted change with a CHANGELOG line, written by phase 02.
-- (f) Unknown-flag text: the host's one per-verb text is the accepted change; parity tests compare exit code and
-  refusal id, not bytes. Exception: the "write --k <value>" hint stays when the input used `--k=v`, in the host's
-  one message rule, not per verb (phase 13 flag-spelling and the Port recipe).
+- (f) Unknown-flag text: the host takes each sub-verb's flag list from the registry annotation it already ships and
+  reuses Node's message grammar (including the `=` hint), so the stderr refusal stays exact-bytes with Node; one source
+  of truth, no user-visible change, no CHANGELOG line (phase 13 flag-spelling and the Port recipe).
+  Superseded (2026-11-15, same day): "the host's one per-verb text is the accepted change; parity compares exit code
+  and refusal id, not bytes", dropped because it kept two sources of truth for the same refusal.
+- 2026-11-15, HARDEN, after OPC's review: switched decision (f) to OPC's version above.
 - S23-Q4 decided (b), see the question below.
 
 ## Owner questions (batch)
