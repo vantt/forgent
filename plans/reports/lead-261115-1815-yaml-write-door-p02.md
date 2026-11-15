@@ -10,7 +10,7 @@ Branch `yaml-write-door/p02`, base e5ddbef0a (integration head). Red commit firs
 
 ## Gates
 Green: `cargo test -p fgos-node-addon` (yaml_parts 3), fmt, clippy -D warnings, msvc and aarch64-apple-darwin check, one-door scan 0 undeclared, census, architecture, doc-health, decision-citation-drift, yaml, config-door, native-load, and every test that names `util/yaml.mjs` or `native/door.mjs` (26 files, one per run).
-Not green, environmental: `test/rust-host/release-tree.test.mjs` (4 tests) needs a `cargo build --release --workspace` artifact (`target/release/libfgos_node_addon.so` missing); not run (heavy, not asked). The debug addon staging by run-tests is proven by native-load.
+`test/rust-host/release-tree.test.mjs` after one release build (`-p fgos -p fgctl -p fgos-node-addon`, log /dev/shm/ywd-p02-release.log): 3 pass, 1 fails (log /dev/shm/ywd-p02-rt.log). The failing test asserts the staged `src/util/yaml.mjs` imports exactly `['../native/door.mjs']` ("no parser"); `writeFrontmatter` adds `import util from 'node:util'` (for `isDeepStrictEqual`). Cause is the phase's own import, the test file is not owned by phase 02. Options: (a) widen the test's allowed list to add `node:util` (intent is "no parser"); (b) drop the import and compare via a local deep-equal (not recommended: second authority for equality). Awaiting HARDEN's choice; nothing changed.
 Not run: full npm test, cargo test --workspace.
 
 ## Landing note
