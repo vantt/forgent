@@ -112,3 +112,9 @@ Phase-lead rules: [plan.md](plan.md). Branch `rust-verb-migration-program/s3-p07
 - Seal or publish children lost after the flip (H x H): requirement 2 in the same commit as the flip; triggers test.
 - A host child inheriting the recursion guard from a Node payload dies silently (M x H): guard removed, as `spawn_sync_child` does; test asserts the child ran.
 - Rollback: revert the phase; Node children return to `bin/fgos.mjs` with the Node arm.
+
+## Settle at this port (from the review of the shared seam, 2026-11-15)
+
+- Node keeps a verb's own fault class (`err.faultClass ?? 'event-store-child'`), prints "invocation fault recorded to <path>" and records the bare message. The host records `event-store-child` always, prints nothing, and its text carries the "provider failed: " prefix. Decide which behaviour stays and pin it in the parity cases.
+- Node's `DispatchError` exit-1 special case is not ported in the seam yet; port it or record why it is not needed.
+- Optional: the parity harness `parseReleaseEntry` could check that `hostBin` exists.
