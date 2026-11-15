@@ -2107,5 +2107,7 @@ test('door rows for the agent hook table and a person\'s agent config catch a se
   const keywords = 'delete-guard keyword list';
   assert.equal(outsideDoor(keywords, 'src/x.mjs', "const PREFILTER_WORDS = ['rm', 'sh'];\n").length, 1);
   assert.equal(outsideDoor(keywords, 'packages/p/rust/src/x.rs', 'include_str!("../../contracts/delete-guard-prefilter.v1.json");\n').length, 1);
+  assert.equal(outsideDoor(keywords, 'src/x.mjs', "const GUARD_KEYWORDS = ['xargs', 'clean', '-delete'];\n").length, 1, 'a copy of the list under another name');
+  assert.equal(outsideDoor(keywords, 'packages/p/rust/src/x.rs', 'const KW: [&str; 2] = [\"xargs\", \"clean\"];\n').length, 1);
   assert.deepEqual(outsideDoor(keywords, 'src/x.mjs', '// the PREFILTER_WORDS list is data\n'), []);
 });

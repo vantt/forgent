@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "099ba13c4daa5a48f2cf46f1cf0159a416fe0290a2c2aeb9802ae712bd02c5a0",
+  "payloadDigest": "67f6fe1ace8a0b79564870fd30d27dca783431163f343b1e746272e022c79f18",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "a5629383f89b4488b252a62f0ea86463e649e33e0a891db1a19af2cd6c136aca",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -282,7 +282,7 @@
     "packages/convention/rust/tests/golden.rs": "1dcc65df4784f25dbdbe8609765eba2faba6c482da5894cf56523760af7cec03",
     "packages/distribution/rust/examples/print-workspace-shim.rs": "767a8d526d1b030dd4327509a63c9e194ed03fe2ae5a2a263682cd62724dc6d4",
     "packages/distribution/rust/src/agent_config.rs": "1d095a1382995fd56437f64a4b8bbf9af68cb4e8985ae0fd7c254b4a1b2b9ef7",
-    "packages/distribution/rust/src/agent_hooks.rs": "f3a5679ea015ae80ce67277ea164b3073ce8412899bd2c5d0f06afff09b24406",
+    "packages/distribution/rust/src/agent_hooks.rs": "443ba0fd55bb31b4b7d3f26a34bd5eb1ff37e755a19d60e3ad8c0de7227e85d8",
     "packages/distribution/rust/src/canonical.rs": "1ed17ee314cadcd425f25919740a7d80b7596871986c9940094fdd2cf4b7542a",
     "packages/distribution/rust/src/coexistence.rs": "2cbb20865365439eea05888a9680d354ce1d42a00ea01154232262341e2cb224",
     "packages/distribution/rust/src/extract.rs": "101e822a4d17774deba3585f7afd3a6718f847e6e2a392c980fa3dfd85b843a6",
@@ -3172,7 +3172,7 @@
       "spawn": "Command::new",
       "binary": ".fgos",
       "class": "argv-runner",
-      "resolvedAt": "packages/distribution/rust/src/agent_hooks.rs:1528"
+      "resolvedAt": "packages/distribution/rust/src/agent_hooks.rs:1533"
     },
     {
       "path": "packages/process/rust/src/spawn.rs",
@@ -3180,7 +3180,7 @@
       "spawn": "Command::new",
       "binary": "bin",
       "class": "argv-runner",
-      "resolvedAt": "packages/distribution/rust/src/agent_hooks.rs:1528"
+      "resolvedAt": "packages/distribution/rust/src/agent_hooks.rs:1533"
     },
     {
       "path": "packages/process/rust/src/spawn.rs",
@@ -3188,7 +3188,7 @@
       "spawn": "Command::new",
       "binary": "fgos",
       "class": "argv-runner",
-      "resolvedAt": "packages/distribution/rust/src/agent_hooks.rs:1528"
+      "resolvedAt": "packages/distribution/rust/src/agent_hooks.rs:1533"
     },
     {
       "path": "packages/process/rust/src/spawn.rs",
@@ -3196,7 +3196,7 @@
       "spawn": "Command::new",
       "binary": "installation",
       "class": "argv-runner",
-      "resolvedAt": "packages/distribution/rust/src/agent_hooks.rs:1528"
+      "resolvedAt": "packages/distribution/rust/src/agent_hooks.rs:1533"
     },
     {
       "path": "packages/process/rust/tests/containment_bwrap.rs",

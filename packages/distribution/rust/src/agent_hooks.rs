@@ -867,9 +867,10 @@ fn creation_mode(dir: &Path) -> u32 {
     mode
 }
 
-/// Whether the hook file at `relative` below `root` is reached through a link that leaves the canonical
-/// project root, or through one that points nowhere: a write there would land outside the project.
-fn leaves_project(root: &Path, relative: &[&str]) -> Result<bool, AgentHooksError> {
+/// The first link on the way to the hook file at `relative` below `root` that leaves the canonical project
+/// root or points nowhere: a write there would land outside the project. A link that stays inside is no
+/// reason to refuse; install and reversal both follow it.
+fn escaping_link(root: &Path, relative: &[&str]) -> Result<Option<PathBuf>, AgentHooksError> {
     let canonical_root = std::fs::canonicalize(root).map_err(io_err(root))?;
     let mut current = root.to_path_buf();
     for part in relative {
@@ -877,13 +878,17 @@ fn leaves_project(root: &Path, relative: &[&str]) -> Result<bool, AgentHooksErro
         match std::fs::symlink_metadata(&current) {
             Ok(meta) if meta.file_type().is_symlink() => match std::fs::canonicalize(&current) {
                 Ok(target) if target.starts_with(&canonical_root) => {}
-                _ => return Ok(true),
+                _ => return Ok(Some(current)),
             },
             Ok(_) => {}
-            Err(_) => return Ok(false),
+            Err(_) => return Ok(None),
         }
     }
-    Ok(false)
+    Ok(None)
+}
+
+fn leaves_project(root: &Path, relative: &[&str]) -> Result<bool, AgentHooksError> {
+    Ok(escaping_link(root, relative)?.is_some())
 }
 
 const OUTSIDE_PROJECT: &str = "outside-project";
@@ -1898,21 +1903,6 @@ pub struct UninstallResult {
     pub state: UninstallState,
 }
 
-/// The first symbolic link on the way from `root` down `relative` (each component below `root`, the last
-/// included), or `None` when there is none or the path stops existing.
-pub fn first_symlink_under(root: &Path, relative: &[&str]) -> Option<PathBuf> {
-    let mut current = root.to_path_buf();
-    for part in relative {
-        current = current.join(part);
-        match std::fs::symlink_metadata(&current) {
-            Ok(meta) if meta.file_type().is_symlink() => return Some(current),
-            Ok(_) => {}
-            Err(_) => return None,
-        }
-    }
-    None
-}
-
 /// Every command string a hook file still carries (nested `hooks.<Event>` entries, agy groups).
 fn remaining_commands(node: &Value, found: &mut Vec<String>) {
     match node {
@@ -1951,7 +1941,7 @@ fn uninstall_json_rows(
         kept: Vec::new(),
         state: UninstallState::Clean,
     };
-    if let Some(link) = first_symlink_under(root, spec.file) {
+    if let Some(link) = escaping_link(root, spec.file)? {
         base.state = UninstallState::Symlink;
         base.kept = vec![format!(
             "{} is reached through a symbolic link ({}): left as it is",
@@ -2052,7 +2042,7 @@ fn uninstall_extension(
         kept: Vec::new(),
         state: UninstallState::Clean,
     };
-    if let Some(link) = first_symlink_under(root, &[&dir, "extensions", "fgos-hooks.ts"]) {
+    if let Some(link) = escaping_link(root, &[&dir, "extensions", "fgos-hooks.ts"])? {
         base.state = UninstallState::Symlink;
         base.kept = vec![format!(
             "{label} is reached through a symbolic link ({}): left as it is",
@@ -2440,6 +2430,47 @@ mod tests {
             std::fs::metadata(&target).unwrap().permissions().mode() & 0o777,
             0o600
         );
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn a_reversal_follows_a_link_that_stays_inside_the_project_and_refuses_one_that_leaves_it() {
+        let fx = Fixture::new("reversal-link", "project");
+        let lookup = fx.env();
+        let target = fx.root.join("dotfiles").join("settings.json");
+        std::fs::create_dir_all(target.parent().unwrap()).unwrap();
+        std::fs::write(&target, "{}").unwrap();
+        std::fs::create_dir_all(fx.root.join(".claude")).unwrap();
+        std::os::unix::fs::symlink(&target, fx.root.join(".claude").join("settings.json")).unwrap();
+        assert!(
+            install_json_hooks(&fx.root, "claude", &lookup)
+                .unwrap()
+                .wired
+        );
+        let results = uninstall_agent_hooks(&fx.root, true).unwrap();
+        assert_eq!(
+            results[0].state,
+            UninstallState::Changed,
+            "install and reversal agree on an inner link"
+        );
+        assert_eq!(std::fs::read_to_string(&target).unwrap().trim(), "{}");
+        // a link that leaves the project is refused by both
+        let outside = fx.base.join("elsewhere.json");
+        std::fs::write(&outside, "{}").unwrap();
+        std::fs::remove_file(fx.root.join(".claude").join("settings.json")).unwrap();
+        std::os::unix::fs::symlink(&outside, fx.root.join(".claude").join("settings.json"))
+            .unwrap();
+        assert_eq!(
+            install_json_hooks(&fx.root, "claude", &lookup)
+                .unwrap()
+                .skipped_existing,
+            Some("outside-project")
+        );
+        assert_eq!(
+            uninstall_agent_hooks(&fx.root, true).unwrap()[0].state,
+            UninstallState::Symlink
+        );
+        assert_eq!(std::fs::read_to_string(&outside).unwrap(), "{}");
     }
 
     #[cfg(unix)]

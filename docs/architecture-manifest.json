@@ -168,6 +168,7 @@
       "patterns": [
         "\\bPREFILTER_(?:SUBSTRINGS|WORDS)\\b",
         "\\bDELETE_GUARD_PREFILTER\\b",
+        "['\"]xargs['\"],\\s*['\"]clean['\"]",
         "delete-guard-prefilter\\.v1\\.json"
       ],
       "allowed": [
