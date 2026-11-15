@@ -46,7 +46,7 @@ The `eventStore` section's standard values (`seal.intervalSec`, `seal.coalesceSe
 
 A fix repairs the row with its own id; the registry's `repairs` names the rows it repairs when their ids differ (the Git WAL fix repairs `git-operation-journal`, the fetch-mapping fix `git-repository-config`, a config fix the config rows whose contract row names it).
 
-The registries are independent. A module may register only a check, only a fix, or both. The rows over the config files (`config-*`, and `gateway-token-configured` for the machine files) are registered from the config crate's `doctor-rows.v1.json` contract by `src/setup/config-checks.mjs`.
+The registries are independent. A module may register only a check, only a fix, or both. The rows over the config files (`config-*`, and `gateway-token-configured` for the machine files) are judged in process by the host's doctor (`apps/fgos/src/wiring/doctor/config.rs`) from the config crate's `doctor-rows.v1.json` contract.
 
 ## 3. Doctor Contract
 

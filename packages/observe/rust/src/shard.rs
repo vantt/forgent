@@ -133,7 +133,11 @@ pub fn probe_observe_dir(root: &Path) -> io::Result<bool> {
         return Ok(false);
     }
     let probe = dir.join(format!(".probe-{}", std::process::id()));
-    let mut file = OpenOptions::new().write(true).create(true).truncate(true).open(&probe)?;
+    let mut file = OpenOptions::new()
+        .write(true)
+        .create(true)
+        .truncate(true)
+        .open(&probe)?;
     let written = file.write_all(b"ok");
     drop(file);
     fs::remove_file(&probe)?;
@@ -390,7 +394,8 @@ mod tests {
     }
 
     #[test]
-    fn the_observe_directory_probe_reports_absent_without_creating_and_writable_without_leaving_a_file() {
+    fn the_observe_directory_probe_reports_absent_without_creating_and_writable_without_leaving_a_file(
+    ) {
         let tmp = temp_root("probe");
         assert!(!probe_observe_dir(&tmp).unwrap());
         assert!(!tmp.join(".fgos").exists());
@@ -400,12 +405,14 @@ mod tests {
         #[cfg(unix)]
         {
             use std::os::unix::fs::PermissionsExt;
-            fs::set_permissions(tmp.join(".fgos/observe"), fs::Permissions::from_mode(0o500)).unwrap();
+            fs::set_permissions(tmp.join(".fgos/observe"), fs::Permissions::from_mode(0o500))
+                .unwrap();
             // A superuser writes anywhere; only a user the mode binds sees the refusal.
             if fs::write(tmp.join(".fgos/observe/.x"), b"").is_err() {
                 assert!(probe_observe_dir(&tmp).is_err());
             }
-            fs::set_permissions(tmp.join(".fgos/observe"), fs::Permissions::from_mode(0o700)).unwrap();
+            fs::set_permissions(tmp.join(".fgos/observe"), fs::Permissions::from_mode(0o700))
+                .unwrap();
         }
         let _ = fs::remove_dir_all(&tmp);
     }

@@ -40,7 +40,11 @@ add('outside-any-repository', [call([], { cwd: 'outside' }), { do: 'storeAppeare
 add('legacy-config-project', [call([], { cwd: 'legacy' })]);
 add('dir-names-another-project', [{ do: 'otherProject' }, call(['--dir', '$OTHER'])]);
 add('dir-names-another-project-from-outside', [{ do: 'otherProject' }, call(['--dir', '$OTHER'], { cwd: 'outside' })]);
-add('dir-that-does-not-exist', [call(['--dir', '/nonexistent/fgos-parity-project'])]);
+// Accepted change: Node spawned the identity rows from the named directory, so a directory that does not exist
+// failed them with the spawn's ENOENT; the host reads the machine's identity without a child, and the machine id
+// and key do not depend on the project directory, so those rows now answer what they judge.
+const SPAWN_ARTEFACT_ROWS = ['identity-machine-id', 'identity-machine-key', 'identity-project-id'];
+add('dir-that-does-not-exist', [call(['--dir', '/nonexistent/fgos-parity-project'])], { ignoreRows: SPAWN_ARTEFACT_ROWS });
 add('dir-empty', [call(['--dir', ''])]);
 add('dir-bare', [call(['--dir'])]);
 
@@ -68,6 +72,32 @@ add('timers-asked-for-fix-twice', [call(['--fix'], { cwd: 'timers' }), call(['--
 add('refused-config-mailbox-and-timers', [call([], { cwd: 'badcfg' })]);
 add('lock-directories-fixed-then-measured', [call(['--fix']), call([])], { disk: true });
 add('lock-directory-made-too-open-is-tightened', [call(['--fix']), { do: 'openLockDirs' }, call(['--fix'])], { disk: true });
+// The config, identity and observe rows: a broken file, a legacy file, a secret outside `private`, a machine with
+// and without its id and key, OpenSSH missing from PATH, a project id, and the Observe store.
+add('config-file-that-does-not-parse', [{ do: 'brokenProjectConfig' }, call([])]);
+add('config-file-with-an-unknown-key', [{ do: 'unknownKeyProjectConfig' }, call([])]);
+add('config-secret-outside-private', [{ do: 'strayGlobalFile' }, call([])]);
+add('config-secret-outside-private-fixed', [{ do: 'strayGlobalFile' }, call(['--fix']), call([])], { disk: true });
+add('config-global-file-readable-by-others', [{ do: 'looseGlobalConfig' }, call([])]);
+add('config-global-file-readable-by-others-fixed', [{ do: 'looseGlobalConfig' }, call(['--fix']), call([])], { disk: true });
+add('config-doc-drift-fixed', [{ do: 'driftedDocs' }, call([]), call(['--fix']), call([])], { disk: true });
+add('config-redundant-value-fixed', [{ do: 'redundantValue' }, call([]), call(['--fix']), call([])], { disk: true });
+add('config-legacy-global-token-kept-by-fix', [{ do: 'legacyGlobalToken' }, call(['--fix']), call([])], { disk: true });
+add('identity-without-a-machine-id', [{ do: 'noMachineId' }, call([])]);
+add('identity-without-a-machine-id-fixed', [{ do: 'noMachineId' }, call(['--fix']), call([])], { disk: true });
+add('identity-with-an-invalid-machine-id', [{ do: 'badMachineId' }, call([])]);
+add('identity-with-a-machine-key', [{ do: 'machineKey' }, call([])]);
+add('identity-key-fix-never-replaces-a-key', [{ do: 'machineKey' }, call(['--fix']), call([])], { disk: true });
+add('identity-without-ssh-keygen-on-path', [{ do: 'pathWithout', tools: ['ssh', 'ssh-keygen'] }, call([], { env: 'PATH_WITHOUT' })]);
+add('identity-fix-without-ssh-keygen-on-path', [{ do: 'pathWithout', tools: ['ssh', 'ssh-keygen'] }, call(['--fix'], { env: 'PATH_WITHOUT' })], { disk: true });
+add('identity-with-an-old-openssh', [{ do: 'fakeOpenssh', banner: 'OpenSSH_7.4p1, OpenSSL 1.0.2k' }, call([], { env: 'PATH_WITHOUT' })]);
+add('identity-with-an-unreadable-openssh-version', [{ do: 'fakeOpenssh', banner: 'OpenSSH_for_Windows_9.5p2, LibreSSL 3.8.2' }, call([], { env: 'PATH_WITHOUT' })]);
+add('identity-project-id-file-broken', [{ do: 'brokenProjectId' }, call([])]);
+add('identity-outside-any-repository', [call([], { cwd: 'outside' })]);
+add('identity-activation-record-without-a-host', [{ do: 'pendingActivation' }, call([])]);
+add('observe-directory-present', [{ do: 'observeDir' }, call([])], { disk: true });
+add('observe-friction-store-symlinked', [{ do: 'symlinkedFriction' }, call([])]);
+add('observe-fresh-repository-writes-nothing', [call([], { cwd: 'fresh' }), { do: 'observeAppeared', cwd: 'fresh' }]);
 
 // Refused calls: the flag text is the registry's, and the call writes nothing.
 add('unknown-flag', [call(['--bogus'])], { disk: true });
@@ -76,6 +106,7 @@ add('flag-with-equals', [call(['--fix=1'])], { disk: true });
 add('strict-with-equals', [call(['--strict=1'])], { disk: true });
 add('dir-with-equals', [call(['--dir=/tmp'])], { disk: true });
 
+const MACHINE_ID_SLUG = os.hostname().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
 const UUID = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/g;
 const ISO = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?Z/g;
 const GIT_DIR = '.git';
@@ -114,6 +145,30 @@ function makeWorld() {
   return { root, ...dirs };
 }
 
+function writeAt(dir, relative, text) {
+  const file = path.join(dir, relative);
+  fs.mkdirSync(path.dirname(file), { recursive: true });
+  fs.writeFileSync(file, text);
+}
+
+function writeTool(dir, name, body) {
+  fs.writeFileSync(path.join(dir, name), `#!/bin/sh\n${body}\n`, { mode: 0o755 });
+}
+
+/** A PATH directory holding the tools a doctor run needs but the named ones, so a row that asks for one finds it missing. */
+function toolPath(world, without) {
+  const dir = path.join(world.root, 'toolbin');
+  fs.mkdirSync(dir, { recursive: true });
+  for (const name of ['git', 'node', 'sh', 'env', 'bwrap', 'curl', 'ssh', 'ssh-keygen', 'sleep', 'uname', 'cat']) {
+    if (without.includes(name)) continue;
+    for (const base of (process.env.PATH ?? '').split(path.delimiter)) {
+      const candidate = path.join(base, name);
+      if (fs.existsSync(candidate)) { fs.symlinkSync(candidate, path.join(dir, name)); break; }
+    }
+  }
+  return dir;
+}
+
 function act(world, step) {
   switch (step.do) {
     case 'linkedWorktree':
@@ -130,6 +185,62 @@ function act(world, step) {
       return null;
     case 'storeAppeared':
       return `store ${fs.existsSync(path.join(world[step.cwd], '.fgos')) ? 'exists' : 'absent'}`;
+    case 'observeAppeared':
+      return `observe ${fs.existsSync(path.join(world[step.cwd], '.fgos', 'observe')) ? 'exists' : 'absent'}`;
+    case 'brokenProjectConfig':
+      writeAt(world.repo, '.fgos/config.yaml', '# @fgos:v1\nrunner: [\n');
+      return null;
+    case 'unknownKeyProjectConfig':
+      writeAt(world.repo, '.fgos/config.yaml', '# @fgos:v1\nunknownKey: 1\n');
+      return null;
+    case 'strayGlobalFile':
+      writeAt(world.home, '.fgos/stray.yaml', '# @fgos:v1\ngateway:\n  token: SENTINEL-9931\n');
+      return null;
+    case 'looseGlobalConfig':
+      writeAt(world.home, '.fgos/config.yaml', '# @fgos:v1\n');
+      fs.chmodSync(path.join(world.home, '.fgos/config.yaml'), 0o666);
+      return null;
+    case 'driftedDocs':
+      writeAt(world.repo, '.fgos/config.yaml', '# @fgos:v1\n\n# @fgos:doc stale text\nrunner:\n  maxParallel: 3\n');
+      return null;
+    case 'redundantValue':
+      writeAt(world.repo, '.fgos/config.yaml', '# @fgos:v1\n\nrunner:\n  maxParallel: 1\n');
+      return null;
+    case 'legacyGlobalToken':
+      writeAt(world.home, '.fgos/config.json', JSON.stringify({ gateway: { port: 4001, token: 'SENTINEL-9931' } }));
+      return null;
+    case 'noMachineId':
+      fs.rmSync(path.join(world.state, 'machine-id'));
+      return null;
+    case 'badMachineId':
+      fs.writeFileSync(path.join(world.state, 'machine-id'), 'BAD\n');
+      return null;
+    case 'machineKey':
+      fs.mkdirSync(path.join(world.state, 'identity'), { recursive: true, mode: 0o700 });
+      execFileSync('ssh-keygen', ['-q', '-t', 'ed25519', '-N', '', '-C', 'fgos-machine', '-f', path.join(world.state, 'identity/machine-key')], { stdio: 'ignore' });
+      return null;
+    case 'pathWithout':
+      world.pathWithout = toolPath(world, step.tools ?? []);
+      return null;
+    case 'fakeOpenssh':
+      world.pathWithout = toolPath(world, ['ssh', 'ssh-keygen']);
+      writeTool(world.pathWithout, 'ssh', `echo '${step.banner}' >&2`);
+      writeTool(world.pathWithout, 'ssh-keygen', 'exit 1');
+      return null;
+    case 'brokenProjectId':
+      writeAt(world.repo, '.fgos/project.json', '{ not json');
+      return null;
+    case 'pendingActivation':
+      writeAt(world.repo, '.fgos/installation/activation.json', JSON.stringify({ status: 'pending' }));
+      return null;
+    case 'observeDir':
+      fs.mkdirSync(path.join(world.repo, '.fgos/observe'), { recursive: true });
+      return null;
+    case 'symlinkedFriction':
+      fs.mkdirSync(path.join(world.repo, '.fgos/observe'), { recursive: true });
+      fs.mkdirSync(path.join(world.repo, 'elsewhere'));
+      fs.symlinkSync(path.join(world.repo, 'elsewhere'), path.join(world.repo, '.fgos/observe/friction'));
+      return null;
     default:
       throw new Error(`unknown action ${step.do}`);
   }
@@ -171,6 +282,8 @@ function normaliser(world, entry) {
       // The config file's own documentation comment: the base names the retired `setup` verb in the mailbox.enabled sentence.
       .replace('Whether fgos setup and doctor --fix install the mailbox hook rows into this project\'s Claude Code and Codex hook files; false removes the rows they installed.', 'Whether fgos doctor --fix installs the mailbox hook rows into this project\'s Claude Code and Codex hook files; false removes the rows it installed.')
       .replace(UUID, '<UUID>')
+      // The machine id a fix mints is random after the host's name.
+      .replace(new RegExp(`${MACHINE_ID_SLUG}-[a-z2-7]{6}\\b`, 'g'), '<MACHINE-ID>')
       .replace(ISO, '<TS>')
       .replace(/"(?:data_hash|generated_at)": "[^"]*",?\s*/g, '')
       .replace(/\b[0-9a-f]{64}\b/g, '<H64>')
@@ -217,7 +330,7 @@ const RETIRED_PRETTY_LINE = /^[✓✗] shell-integration source line present in 
 const withoutRetiredLines = (text) => text.split('\n').filter((line) => !RETIRED_PRETTY_LINE.test(line)).join('\n');
 
 /** The rows of one doctor answer as comparable values, or the raw text when the answer is not the JSON envelope. */
-function describe(text) {
+function describe(text, ignoreRows = []) {
   let data;
   try { data = JSON.parse(text).data; } catch { return { text: withoutRetiredLines(text) }; }
   if (!data?.checks) return { text: withoutRetiredLines(text) };
@@ -225,7 +338,7 @@ function describe(text) {
     ok: data.ok,
     next: data.next,
     fixed: data.fixed,
-    rows: data.checks.filter(({ id }) => !RETIRED_ROWS.has(id)).map(({ id, status, passed, fix, message, detail, description }) => ({ id, status, passed, fix, message, detail, description })),
+    rows: data.checks.filter(({ id }) => !RETIRED_ROWS.has(id)).map(({ id, status, passed, fix, message, detail, description }) => (ignoreRows.includes(id) ? { id, description } : { id, status, passed, fix, message, detail, description })),
   };
 }
 
@@ -246,7 +359,7 @@ async function runScript(entry, testCase) {
         id: testCase.id,
         args,
         cwd: cwdOf(world, step.cwd),
-        env: { HOME: world.home, USERPROFILE: world.home, TMPDIR: world.tmp, FGOS_STATE_ROOT: world.state, XDG_RUNTIME_DIR: path.join(world.root, 'no-runtime-dir'), DBUS_SESSION_BUS_ADDRESS: `unix:path=${path.join(world.root, 'no-bus')}`, FGOS_CLAUDE_COMMAND: '/nonexistent/fgos-parity-claude', NO_COLOR: '1' },
+        env: { HOME: world.home, USERPROFILE: world.home, TMPDIR: world.tmp, FGOS_STATE_ROOT: world.state, XDG_RUNTIME_DIR: path.join(world.root, 'no-runtime-dir'), DBUS_SESSION_BUS_ADDRESS: `unix:path=${path.join(world.root, 'no-bus')}`, FGOS_CLAUDE_COMMAND: '/nonexistent/fgos-parity-claude', NO_COLOR: '1', ...(step.env === 'PATH_WITHOUT' ? { PATH: world.pathWithout } : {}) },
         timeoutMs: 180000,
         modes: ['exact-bytes'],
       });
@@ -255,7 +368,7 @@ async function runScript(entry, testCase) {
       outputs.push({
         args: step.args,
         exit: result.exitCode,
-        stdout: describe(norm(result.stdoutText)),
+        stdout: describe(norm(result.stdoutText), testCase.ignoreRows),
         stderr: norm(result.stderrText),
       });
     }

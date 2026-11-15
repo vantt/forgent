@@ -1018,6 +1018,28 @@
       "reason": "starting, stopping and probing the gateway (the .fgos/gateway.json registry, the release build of apps/fgos-gateway, the detached spawn) is one module of the host; nothing else in the product reads or writes the registry, builds the binary or names it to run it, so a second path to a gateway process fails here (the holder-lock origin list only names the binary to recognise a lock holder)"
     },
     {
+      "job": "retired Node config, identity and observe doctor rows",
+      "kind": "door",
+      "patterns": [
+        "\\bCONFIG_CHECKS\\b",
+        "\\bCONFIG_FIXES\\b",
+        "\\bcheckIdentityMachineId\\b",
+        "\\bcheckIdentityMachineKey\\b",
+        "\\bcheckIdentityProjectId\\b",
+        "\\bcheckIdentitySharedDirectory\\b",
+        "\\bcheckIdentitySshKeygen\\b",
+        "\\bfixIdentityMachineId\\b",
+        "\\bfixIdentityMachineKey\\b",
+        "\\bcheckObserveDirWritable\\b",
+        "\\bcheckObserveHostResolvable\\b",
+        "\\bcheckWriterIdentityResolvable\\b",
+        "\\bparseOpensshVersion\\b"
+      ],
+      "allowed": [],
+      "debt": [],
+      "reason": "the config, identity and observe doctor rows are judged in process by the host (apps/fgos/src/wiring/doctor/{config,identity,observe}.rs) over the config, identity and observe crates; the Node check and fix bodies and the OpenSSH version reader are gone, and no file may bring one back"
+    },
+    {
       "job": "retired Node S3 verb code",
       "kind": "door",
       "patterns": [
@@ -1347,7 +1369,6 @@
     "src/convention/seat-id.mjs": "domain",
     "src/observe/friction-client.mjs": "infra",
     "src/intake/classify.mjs": "use-case",
-    "src/setup/config-checks.mjs": "domain",
     "src/setup/shell-rc.mjs": "infra",
     "src/setup/project-launcher.mjs": "infra",
     "src/setup/bin-discovery.mjs": "infra",
@@ -1364,7 +1385,6 @@
     "src/setup/git-checks.mjs": "infra",
     "src/setup/git-retention-note.mjs": "infra",
     "src/setup/run-supervisor-checks.mjs": "infra",
-    "src/setup/identity-checks.mjs": "use-case",
     "src/setup/terminal-control-checks.mjs": "infra",
     "src/setup/omp-natives-checks.mjs": "infra",
     "src/setup/agent-cli-trust.mjs": "infra",

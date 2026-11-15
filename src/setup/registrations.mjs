@@ -15,7 +15,7 @@ import { checkWorkflowCaseBindingSentinel, checkWorkflowCaseBindings, fixWorkflo
 // the schemas (core/config-schema) every shape rule, both read through the
 // config door. A check below reads the effective value through the facade only
 // when it enforces a rule a schema cannot state; the rows over the config files
-// themselves are config-checks.mjs's.
+// themselves are the Rust host's (the config crate's rows, judged in process).
 //
 // `fgos doctor --fix` (bin/fgos.mjs) runs every registered fix via `runFixes`
 // below; `doctor` without `--fix` writes nothing.
@@ -99,8 +99,7 @@ import { getDomain, resolveDomainName, effectiveStep, domainSteps, skillForStep 
 import { toolProvidersOf } from '../runner/dispatch/tool-providers.mjs';
 import { resolveCliVersionInfo } from './version-info.mjs';
 import { firstOnPath, inspectLauncher, writeLauncher } from './project-launcher.mjs';
-import { globalFgosDir, readConfig, readMachineConfig, readProjectConfigSource } from '../config/facade.mjs';
-import { CONFIG_CHECKS, CONFIG_FIXES, checkConfigOnce, isConfigDoorFailure } from './config-checks.mjs';
+import { checkConfig, ConfigDoorError, globalFgosDir, readConfig, readMachineConfig, readProjectConfigSource } from '../config/facade.mjs';
 import { parseYaml } from '../util/yaml.mjs';
 import { legacyStateKey } from '../runner/dispatch/llm-accounts.mjs';
 import { inspectProviderCapacity, defaultProviderCapacityRuntimeDir, providerAccountInventory, credentialStoreOf, credentialSourceForCli } from '../runner/dispatch/provider-capacity.mjs';
@@ -114,18 +113,24 @@ import { eventStoreDoctorOf } from './event-store-checks.mjs';
 import { fixEventStoreLockDirs } from './event-store-fixes.mjs';
 import { foldEvents } from '../state/replay.mjs';
 import { discoverProjectPromptTemplates, TemplateResolutionError } from '../runner/dispatch/operation-prompt-templates.mjs';
-import { resolveHostBin, invokeHost } from '../util/host-bin.mjs';
-import { ACTIVATION_RELATIVE, activationFilePath, readActivationFile, resolveActiveHostBin } from '../util/host-bin-path.mjs';
-import { probeIdentity } from '../util/session-identity.mjs';
+import { resolveHostBin } from '../util/host-bin.mjs';
+import { ACTIVATION_RELATIVE, activationFilePath, readActivationFile } from '../util/host-bin-path.mjs';
 import { createSeatBindingClient, resolveSeatBindingHost } from '../seat-binding/client.mjs';
 import { checkSeatBindingDryBind } from './seat-binding-checks.mjs';
 import { checkRunSupervisorRoute, checkRuntimeSocketDir, fixRuntimeSocketDir, checkRunAttemptsStuck, checkRunSupervisorConfig } from './run-supervisor-checks.mjs';
-import { checkIdentityMachineId, checkIdentityMachineKey, checkIdentityProjectId, checkIdentitySharedDirectory, checkIdentitySshKeygen, fixIdentityMachineId, fixIdentityMachineKey } from './identity-checks.mjs';
 import { checkTerminalControl, checkTerminalAllocations } from './terminal-control-checks.mjs';
 import { checkOmpNativesPresent, ompExecutorsOf } from './omp-natives-checks.mjs';
 export { mainCheckoutHookWired } from './git-hooks.mjs';
 export { claudeCodeHookWired } from './claude-code-hooks.mjs';
 export { checkAgySubHomesConfigured } from './agy-permissions.mjs';
+
+/** A refusal of the door (a file that is unusable, a request it cannot serve) or a process that cannot load the addon at all: the failures a row reports as its own failure, with the door's message, instead of ending the run. */
+const isConfigDoorFailure = (err) => err instanceof ConfigDoorError || (typeof err?.code === 'string' && err.code.startsWith('git-addon-'));
+
+/** The door's findings for a project: one read per doctor run, shared by every bridged row that asks. A row called without a run reads for itself. */
+const checkConfigOnce = (cwd, run) => (run
+  ? run.once(`config-check:${cwd}`, () => checkConfig({ projectRoot: cwd }))
+  : checkConfig({ projectRoot: cwd }));
 
 const MIN_NODE_MAJOR = 18;
 
@@ -1715,11 +1720,6 @@ registerCheck({
 export const IRON_LAW_LEVELS = Object.freeze(['ask', 'warn']);
 export const DEFAULT_IRON_LAW_LEVEL = 'ask';
 
-// The rows over the config files themselves, from the config crate's contract (spec section 11), and their
-// repairs; the gateway token row is the contract's machine-files row.
-for (const entry of CONFIG_CHECKS) registerCheck(entry);
-for (const entry of CONFIG_FIXES) registerFix(entry);
-
 // tsk-4xg: the fgOS Claude Code plugin. The row reports; registering the marketplace and
 // installing the plugin change the person's own Claude config, so only the opt-in
 // `fgos wire-agents` does it (src/setup/agent-wiring.mjs).
@@ -3299,127 +3299,6 @@ export function checkConfinementHerdrMaturity(cwd) {
 registerCheck({
   id: 'confinement-herdr-maturity',
   check: (cwd) => checkConfinementHerdrMaturity(cwd),
-});
-
-// ─── Observe Component (Phase F8, plans/260929-1501-metrics-friction-rust-native) ─
-
-export function checkObserveDirWritable(cwd) {
-  const root = resolveMainCheckoutRoot(cwd) ?? cwd;
-  const observeDir = path.join(root, '.fgos', 'observe');
-  try {
-    // The observe store creates its own directory on first write; a read-only check never does.
-    if (!fs.existsSync(observeDir)) {
-      return { passed: true, message: 'info: .fgos/observe does not exist yet; the observe store creates it on first write' };
-    }
-    const probeFile = path.join(observeDir, `.probe-${process.pid}-${Date.now()}`);
-    fs.writeFileSync(probeFile, 'ok', 'utf8');
-    fs.unlinkSync(probeFile);
-    return { passed: true, message: '.fgos/observe is writable' };
-  } catch (err) {
-    return { passed: false, message: `.fgos/observe is not writable: ${err.message}` };
-  }
-}
-
-export function checkObserveHostResolvable(cwd) {
-  const hostBin = resolveHostBin(cwd);
-  if (!hostBin) {
-    return {
-      passed: false,
-      message: 'host binary unavailable (FGOS_HOST_BIN unset and no active installation manifest)',
-    };
-  }
-
-  // A real read of the friction store, so a store the host refuses (a symlinked
-  // directory or shard, an I/O error) fails the row instead of passing on a ping.
-  try {
-    invokeHost(['friction', 'rank', '--limit', '1'], { dir: cwd });
-    return {
-      passed: true,
-      message: `host binary at ${hostBin} resolved and verified (friction store readable)`,
-    };
-  } catch (err) {
-    return {
-      passed: false,
-      message: `host binary at ${hostBin} failed the friction read probe: ${err.message}`,
-    };
-  }
-}
-
-registerCheck({
-  id: 'observe-dir-writable',
-  check: (cwd) => checkObserveDirWritable(cwd),
-});
-
-registerCheck({
-  id: 'observe-host-resolvable',
-  check: (cwd) => checkObserveHostResolvable(cwd),
-});
-
-/**
- * The writer identity resolves through the Rust host on both doors a write
- * can come through: the normal one (FGOS_HOST_BIN when run via the `fgos`
- * host) and the one a plain `git commit` hook takes (the workspace
- * activation, ignoring FGOS_HOST_BIN). Each binary is asked directly, never
- * through the facade's cache, so an old activated release shows up as a
- * version mismatch even when the host running doctor is newer.
- */
-export function checkWriterIdentityResolvable(cwd) {
-  const root = resolveMainCheckoutRoot(cwd) ?? cwd;
-  const fgosDir = path.join(root, '.fgos');
-  const hasActivation = fs.existsSync(activationFilePath(root));
-  const parts = [];
-  let failure = null;
-  for (const [door, ignoreEnv] of [['current host', false], ['activation (git commit hook)', true]]) {
-    const { bin, tried } = resolveActiveHostBin({ fgosDir, cwd, ignoreEnv });
-    if (!bin) {
-      if (ignoreEnv && !hasActivation) {
-        parts.push(`${door}: no activation in ${root} (a plain git commit at home cannot resolve a writer)`);
-        continue;
-      }
-      failure ??= `${door}: no host binary (tried ${tried.join('; ')}) -- run fgctl init/repair, or set FGOS_HOST_BIN`;
-      continue;
-    }
-    try {
-      const { id, source } = probeIdentity(bin, fgosDir);
-      parts.push(`${door}: ${bin} -> ${JSON.stringify({ id, source })}`);
-    } catch (err) {
-      failure ??= `${door}: ${bin} -> ${err.code ?? 'error'}: ${err.message}`;
-    }
-  }
-  if (failure) return { passed: false, message: [failure, ...parts].join(' | ') };
-  return { passed: true, message: parts.join(' | ') };
-}
-
-registerCheck({
-  id: 'writer-identity-resolvable',
-  check: (cwd) => checkWriterIdentityResolvable(cwd),
-});
-
-registerCheck({
-  id: 'identity-machine-id',
-  check: (cwd) => checkIdentityMachineId(cwd),
-});
-registerFix({ id: 'identity-machine-id', fix: (cwd) => fixIdentityMachineId(cwd) });
-
-registerCheck({
-  id: 'identity-machine-key',
-  check: (cwd) => checkIdentityMachineKey(cwd),
-});
-registerFix({ id: 'identity-machine-key', fix: (cwd) => fixIdentityMachineKey(cwd) });
-
-registerCheck({
-  id: 'identity-ssh-keygen',
-  check: () => checkIdentitySshKeygen(),
-});
-
-registerCheck({
-  id: 'identity-project-id',
-  check: (cwd) => checkIdentityProjectId(cwd),
-});
-
-registerCheck({
-  id: 'identity-shared-directory',
-  check: (cwd) => checkIdentitySharedDirectory(cwd),
 });
 
 /**

@@ -200,7 +200,9 @@ pub fn probe_openssh() -> OpensshProbe {
 /// `[major, minor]` of the first `OpenSSH_<major>.<minor>` in `ssh -V` output.
 fn openssh_version(text: &str) -> Option<(u32, u32)> {
     fn number(from: &str) -> Option<(u32, &str)> {
-        let end = from.find(|c: char| !c.is_ascii_digit()).unwrap_or(from.len());
+        let end = from
+            .find(|c: char| !c.is_ascii_digit())
+            .unwrap_or(from.len());
         Some((from[..end].parse().ok()?, &from[end..]))
     }
     text.match_indices("OpenSSH_").find_map(|(at, tag)| {
@@ -217,7 +219,11 @@ pub fn judge_openssh(probe: &OpensshProbe) -> Result<String, String> {
     }
     let Some((major, minor)) = openssh_version(&probe.version_text) else {
         let shown: String = probe.version_text.trim().chars().take(100).collect();
-        let shown = if shown.is_empty() { "no output" } else { &shown };
+        let shown = if shown.is_empty() {
+            "no output"
+        } else {
+            &shown
+        };
         return Err(format!(
             "cannot read the OpenSSH version from `ssh -V` ({shown}); OpenSSH 8.1 or later is needed"
         ));

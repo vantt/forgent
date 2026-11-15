@@ -226,15 +226,17 @@ pub fn resolve_cli_version_info() -> BuildShowOutcome {
     }
 }
 
+/// Where the activation record of the project at `workspace_root` is (it may not be there).
+pub fn activation_record_path(workspace_root: &std::path::Path) -> PathBuf {
+    workspace_root
+        .join(".fgos")
+        .join("installation")
+        .join("activation.json")
+}
+
 /// The activation record of the project at `workspace_root` when it is there, parses and is `ready`.
 pub(crate) fn ready_activation(workspace_root: &std::path::Path) -> Option<serde_json::Value> {
-    let text = std::fs::read_to_string(
-        workspace_root
-            .join(".fgos")
-            .join("installation")
-            .join("activation.json"),
-    )
-    .ok()?;
+    let text = std::fs::read_to_string(activation_record_path(workspace_root)).ok()?;
     let activation: serde_json::Value = serde_json::from_str(&text).ok()?;
     (activation["status"].as_str() == Some("ready")).then_some(activation)
 }

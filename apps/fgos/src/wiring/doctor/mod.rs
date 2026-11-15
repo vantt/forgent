@@ -4,8 +4,11 @@
 //! start Node.
 
 pub mod bridge;
+pub mod config;
 pub mod holder_lock;
+pub mod identity;
 pub mod mailbox;
+pub mod observe;
 
 use crate::routing::Call;
 use fgos_distribution::doctor::{
@@ -125,7 +128,13 @@ pub struct Rows {
 }
 
 /// Every group the host judges in process. A phase that ports a group of rows adds its line here.
-const GROUPS: &[&Rows] = &[&holder_lock::GROUP, &mailbox::GROUP];
+const GROUPS: &[&Rows] = &[
+    &config::GROUP,
+    &holder_lock::GROUP,
+    &identity::GROUP,
+    &mailbox::GROUP,
+    &observe::GROUP,
+];
 
 /// The rows and fixes a Rust component judges in process, by id. The registry's `inRust` lists must equal
 /// [`NativeOwner::row_ids`] and [`NativeOwner::fix_ids`]; a test pins it.

@@ -692,11 +692,9 @@ test('doctor check runner-patterns-config: a legacy json project file keeps the 
   assert.match(patterns.message, /runner\.loops\.reviewed\.maxRounds/);
   assert.match(patterns.message, /edit .*config\.json.*, then run `fgos config migrate`/i);
   assert.doesNotMatch(patterns.message, /config\.yaml/);
-  const door = DOCTOR_CHECKS.find((c) => c.id === 'config-format-legacy-json').check(tmpDir);
-  assert.equal(door.passed, false);
-  assert.match(door.message, /project:config\.json/);
+  // The format failure itself is the host's config row (`config-format-legacy-json`, judged by the config crate).
 
-  // With no retired key in the legacy file, the format failure is the door row's alone.
+  // With no retired key in the legacy file, the format failure is the config row's alone.
   writeRawLegacyProjectConfig(tmpDir, JSON.stringify({ runner: {} }));
   const quiet = DOCTOR_CHECKS.find((c) => c.id === 'runner-patterns-config').check(tmpDir);
   assert.equal(quiet.passed, true);

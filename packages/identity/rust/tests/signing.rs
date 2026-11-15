@@ -405,7 +405,10 @@ fn probe(keygen_present: bool, version_text: &str) -> signing::OpensshProbe {
 #[test]
 fn an_openssh_of_8_1_or_later_with_ssh_keygen_is_the_machine_that_can_sign() {
     assert_eq!(
-        signing::judge_openssh(&probe(true, "OpenSSH_9.6p1 Ubuntu-3ubuntu13, OpenSSL 3.0.13\n")),
+        signing::judge_openssh(&probe(
+            true,
+            "OpenSSH_9.6p1 Ubuntu-3ubuntu13, OpenSSL 3.0.13\n"
+        )),
         Ok("OpenSSH 9.6".to_owned())
     );
     assert_eq!(
@@ -422,7 +425,10 @@ fn an_openssh_of_8_1_or_later_with_ssh_keygen_is_the_machine_that_can_sign() {
 #[test]
 fn a_machine_that_cannot_sign_is_told_why_in_the_words_the_doctor_row_shows() {
     let missing = signing::judge_openssh(&probe(false, "OpenSSH_9.6p1")).unwrap_err();
-    assert!(missing.starts_with("ssh-keygen is not installed or not on PATH;"), "{missing}");
+    assert!(
+        missing.starts_with("ssh-keygen is not installed or not on PATH;"),
+        "{missing}"
+    );
     assert!(signing::judge_openssh(&probe(true, "OpenSSH_8.0p1"))
         .unwrap_err()
         .starts_with("OpenSSH 8.0 is older than 8.1,"));

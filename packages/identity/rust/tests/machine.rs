@@ -188,7 +188,10 @@ fn the_state_root_is_made_private_with_its_parents_and_answered_canonical() {
     #[cfg(unix)]
     {
         use std::os::unix::fs::PermissionsExt;
-        assert_eq!(fs::metadata(&canonical).unwrap().permissions().mode() & 0o777, 0o700);
+        assert_eq!(
+            fs::metadata(&canonical).unwrap().permissions().mode() & 0o777,
+            0o700
+        );
     }
     // A second call finds it as it is.
     assert_eq!(machine::prepare_state_root(&nested).unwrap(), canonical);
@@ -201,6 +204,9 @@ fn minting_here_makes_the_root_names_the_host_and_never_replaces_the_id() {
     let (created, id) = machine::mint_here(&root).unwrap();
     assert!(created);
     assert!(valid_machine_id(&id), "{id}");
-    assert_eq!(fs::read_to_string(root.join("machine-id")).unwrap(), format!("{id}\n"));
+    assert_eq!(
+        fs::read_to_string(root.join("machine-id")).unwrap(),
+        format!("{id}\n")
+    );
     assert_eq!(machine::mint_here(&root).unwrap(), (false, id));
 }
