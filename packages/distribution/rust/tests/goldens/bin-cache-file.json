@@ -1,0 +1,4 @@
+{
+  "note": "The bytes of <global dir>/runtime/bin-cache.json for one resolved fgos path (<BIN> stands for it): the Rust writer produces exactly this and the Node bin discovery reader, which the shell integration script mirrors, reads it back. Mode 0600 in a 0700 directory.",
+  "file": "{\"globalFgosPath\":\"<BIN>\"}\n"
+}

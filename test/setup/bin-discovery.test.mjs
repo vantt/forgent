@@ -13,17 +13,15 @@ import {
   resolveDevCheckoutBin,
   resolveProjectLocalBin,
   cachedGlobalBin,
-  refreshGlobalBinCache,
   resolveFgosBin,
 } from '../../src/setup/bin-discovery.mjs';
-import { globalConfigPath } from '../helpers/config-fixture.mjs';
+import { fileURLToPath } from 'node:url';
 
 const cacheFile = (globalDir) => path.join(globalDir, 'runtime', 'bin-cache.json');
 const writeCache = (globalDir, globalFgosPath) => {
   fs.mkdirSync(path.dirname(cacheFile(globalDir)), { recursive: true });
   fs.writeFileSync(cacheFile(globalDir), JSON.stringify({ globalFgosPath }));
 };
-const readCache = (globalDir) => JSON.parse(fs.readFileSync(cacheFile(globalDir), 'utf8'));
 
 function mkTempDir(prefix) {
   return fs.realpathSync.native(fs.mkdtempSync(path.join(os.tmpdir(), prefix)));
@@ -85,58 +83,16 @@ test('cachedGlobalBin self-heals: returns null when the cached path no longer ex
   assert.equal(cachedGlobalBin({ globalDir: dir }), null);
 });
 
-test('refreshGlobalBinCache writes the resolved PATH bin and reports changed:true on first populate', () => {
-  const dir = mkTempDir('bin-discovery-refresh-');
-  const binDir = mkTempDir('bin-discovery-refresh-pathstub-');
-  const binPath = path.join(binDir, 'fgos');
+// The writer is `fgos doctor --fix` (packages/distribution/rust/src/bin_cache.rs, which owns what is written and
+// when); this reader must read the very bytes it produces, pinned by one golden both read.
+test('cachedGlobalBin reads the bytes the fgos doctor --fix writer produces', () => {
+  const dir = mkTempDir('bin-discovery-cache-golden-');
+  const binPath = path.join(dir, 'fgos');
   writeStub(binPath);
-  fs.chmodSync(binPath, 0o755);
-  const originalPath = process.env.PATH;
-  process.env.PATH = `${binDir}${path.delimiter}${originalPath}`;
-  try {
-    const { resolved, changed } = refreshGlobalBinCache({ globalDir: dir });
-    assert.equal(resolved, binPath);
-    assert.equal(changed, true);
-    assert.deepEqual(readCache(dir), { globalFgosPath: binPath });
-    assert.equal(fs.statSync(cacheFile(dir)).mode & 0o777, 0o600);
-    assert.equal(fs.existsSync(globalConfigPath(path.dirname(dir))), false, 'the cache never lands in config');
-  } finally {
-    process.env.PATH = originalPath;
-  }
-});
-
-test('refreshGlobalBinCache is a no-op write when the resolved value already matches the cache (fgos setup idempotency)', () => {
-  const dir = mkTempDir('bin-discovery-refresh-idempotent-');
-  const binDir = mkTempDir('bin-discovery-refresh-idempotent-pathstub-');
-  const binPath = path.join(binDir, 'fgos');
-  writeStub(binPath);
-  fs.chmodSync(binPath, 0o755);
-  const originalPath = process.env.PATH;
-  process.env.PATH = `${binDir}${path.delimiter}${originalPath}`;
-  try {
-    refreshGlobalBinCache({ globalDir: dir });
-    const mtimeBefore = fs.statSync(cacheFile(dir)).mtimeMs;
-    const second = refreshGlobalBinCache({ globalDir: dir });
-    assert.equal(second.changed, false);
-    assert.equal(fs.statSync(cacheFile(dir)).mtimeMs, mtimeBefore, 'must not rewrite when nothing changed');
-  } finally {
-    process.env.PATH = originalPath;
-  }
-});
-
-test('refreshGlobalBinCache deletes the cache file when nothing resolves on PATH anymore', () => {
-  const dir = mkTempDir('bin-discovery-refresh-clear-');
-  writeCache(dir, '/some/stale/path');
-  const originalPath = process.env.PATH;
-  process.env.PATH = '';
-  try {
-    const { resolved, changed } = refreshGlobalBinCache({ globalDir: dir });
-    assert.equal(resolved, null);
-    assert.equal(changed, true);
-    assert.equal(fs.existsSync(cacheFile(dir)), false);
-  } finally {
-    process.env.PATH = originalPath;
-  }
+  const golden = JSON.parse(fs.readFileSync(path.join(path.dirname(fileURLToPath(import.meta.url)), '../../packages/distribution/rust/tests/goldens/bin-cache-file.json'), 'utf8'));
+  fs.mkdirSync(path.dirname(cacheFile(dir)), { recursive: true });
+  fs.writeFileSync(cacheFile(dir), golden.file.replace('<BIN>', binPath));
+  assert.equal(cachedGlobalBin({ globalDir: dir }), binPath);
 });
 
 test('resolveFgosBin prefers tier 1 (dev-checkout) over tier 2 and tier 3', () => {

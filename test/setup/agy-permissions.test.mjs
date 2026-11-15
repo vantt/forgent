@@ -1,7 +1,7 @@
-// agy-permissions.test.mjs -- tsk-1xm's agy-permissions-configured doctor row and the agy sub-HOME
-// row (src/setup/agy-permissions.mjs), in process, plus one `fgos doctor` wiring proof. Both rows
-// only read; that no fgOS verb writes the person's own agy settings is proven in
-// test/setup/agent-wiring.test.mjs. Every case overrides HOME.
+// agy-permissions.test.mjs -- the agy sub-HOME row (src/setup/agy-permissions.mjs), in process, plus one
+// `fgos doctor` wiring proof that the host reports it and the agy permissions row. The agy permissions row itself
+// is owned by packages/distribution/rust/src/agent_config.rs; that no fgOS verb writes the person's own agy
+// settings is proven in test/setup/agent-wiring.test.mjs. Every case overrides HOME.
 import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import {
@@ -14,7 +14,7 @@ import {
   runHostDoctor,
   spawnSync,
 } from './helpers/setup-checks-harness.mjs';
-import { checkAgyPermissionsConfigured, checkAgySubHomesConfigured, findAgySubHomes } from '../../src/setup/agy-permissions.mjs';
+import { checkAgySubHomesConfigured, findAgySubHomes } from '../../src/setup/agy-permissions.mjs';
 
 function agySettingsPath(homeDir) {
   return path.join(homeDir, '.gemini', 'antigravity-cli', 'settings.json');
@@ -26,30 +26,6 @@ function doctorCheck(result, id) {
   assert.ok(entry, `doctor did not report a "${id}" check`);
   return entry;
 }
-
-test('agy-permissions-configured passes with nothing to check when agy is not on PATH, and only warns (never fails, never writes) when agy is there without the settings', () => {
-  const homeDir = mkTemp('agy-perms-fresh-home-');
-  const absent = checkAgyPermissionsConfigured(homeDir, { agyPresent: false });
-  assert.equal(absent.passed, true);
-  assert.match(absent.message, /not found on PATH/);
-  const bare = checkAgyPermissionsConfigured(homeDir, { agyPresent: true });
-  assert.equal(bare.passed, true);
-  assert.equal(bare.configured, false);
-  assert.match(bare.message, /^warning: .*never sets it for you; `fgos wire-agents` shows the exact edit/);
-  assert.deepEqual(fs.readdirSync(homeDir), [], 'the check writes nothing');
-  fs.rmSync(homeDir, { recursive: true, force: true });
-});
-
-test('agy-permissions-configured accepts always-proceed with the person\'s own customized deny list', () => {
-  const homeDir = mkTemp('agy-perms-custom-home-');
-  const settingsPath = agySettingsPath(homeDir);
-  fs.mkdirSync(path.dirname(settingsPath), { recursive: true });
-  fs.writeFileSync(settingsPath, JSON.stringify({ toolPermission: 'always-proceed', permissions: { deny: ['command(regex:^my-own-custom-rule)'] } }));
-  const result = checkAgyPermissionsConfigured(homeDir, { agyPresent: true });
-  assert.equal(result.configured, true);
-  assert.match(result.message, /1 deny rule\(s\) configured/);
-  fs.rmSync(homeDir, { recursive: true, force: true });
-});
 
 test('fgos doctor reports the agy-permissions and agy sub-HOME rows', () => {
   const cwd = mkTemp('agy-perms-doctor-cwd-');

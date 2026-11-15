@@ -33,7 +33,7 @@ test('a request that is not a phase, a list of ids and a directory is refused by
 
 test('an id with no body refuses the whole call and judges nothing', async () => {
   lines.length = 0;
-  const code = await serve(JSON.stringify({ phase: 'check', ids: ['curl-available', 'no-such-row'], dir: root }), collect());
+  const code = await serve(JSON.stringify({ phase: 'check', ids: ['operation-prompt-templates-valid', 'no-such-row'], dir: root }), collect());
   assert.equal(code, 2);
   assert.equal(lines.length, 1);
   assert.match(lines[0], /"kind":"refusal".*no row body for no-such-row/);
@@ -41,11 +41,11 @@ test('an id with no body refuses the whole call and judges nothing', async () =>
 
 test('rows come back in the order asked, each as one line, and the call ends with its count', async () => {
   lines.length = 0;
-  const code = await serve(JSON.stringify({ phase: 'check', ids: ['bwrap-available', 'curl-available'], dir: root }), collect());
+  const code = await serve(JSON.stringify({ phase: 'check', ids: ['agent-type-names-unique', 'operation-prompt-templates-valid'], dir: root }), collect());
   assert.equal(code, 0);
   const kinds = lines.map((line) => JSON.parse(line.slice(RESULT_PREFIX.length)));
   assert.deepEqual(kinds.map((entry) => entry.kind), ['row', 'row', 'end']);
-  assert.deepEqual(kinds.slice(0, 2).map((entry) => entry.id), ['bwrap-available', 'curl-available']);
+  assert.deepEqual(kinds.slice(0, 2).map((entry) => entry.id), ['agent-type-names-unique', 'operation-prompt-templates-valid']);
   assert.equal(kinds[2].count, 2);
   for (const entry of kinds.slice(0, 2)) assert.equal(typeof entry.passed, 'boolean');
 });
@@ -69,12 +69,12 @@ test('a row that returns no verdict or throws fails its own row and never ends t
 });
 
 test('as a script: stdin in, prefixed lines out, and what a body prints never becomes a result', () => {
-  const request = JSON.stringify({ phase: 'check', ids: ['curl-available'], dir: root });
+  const request = JSON.stringify({ phase: 'check', ids: ['operation-prompt-templates-valid'], dir: root });
   const run = spawnSync(process.execPath, [MODULE], { input: request, encoding: 'utf8', cwd: root });
   assert.equal(run.status, 0, run.stderr);
   const results = run.stdout.split('\n').filter((line) => line.startsWith(RESULT_PREFIX));
   assert.equal(results.length, 2);
-  assert.equal(JSON.parse(results[0].slice(RESULT_PREFIX.length)).id, 'curl-available');
+  assert.equal(JSON.parse(results[0].slice(RESULT_PREFIX.length)).id, 'operation-prompt-templates-valid');
 });
 
 test('as a script: a malformed request exits 2 with one refusal line', () => {

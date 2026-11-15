@@ -4,6 +4,7 @@
 
 pub mod agent_config;
 pub mod agent_hooks;
+pub mod bin_cache;
 pub mod canonical;
 pub mod coexistence;
 pub mod doctor;

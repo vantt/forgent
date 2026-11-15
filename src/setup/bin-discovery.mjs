@@ -5,16 +5,15 @@
 // Tier 1 (dev-checkout self-hosting) and tier 2 (project-local install) are
 // cheap file-checks, re-run on every call -- no caching needed. Tier 3
 // (global install) is the only tier that needs a PATH lookup (a real
-// subprocess spawn), so it is cached (D4): `fgos setup`/`doctor --fix`
-// populate `~/.fgos/runtime/bin-cache.json` (a cache, never config) once via
-// `refreshGlobalBinCache`; every other caller reads that cached path first
+// subprocess spawn), so it is cached (D4): `fgos doctor --fix` populates
+// `~/.fgos/runtime/bin-cache.json` (a cache, never config) once, in Rust
+// (packages/distribution/rust/src/bin_cache.rs); every other caller reads that cached path first
 // and only falls back to a live PATH probe when the cached path no longer
 // exists on disk (self-heal via a cheap `existsSync` check) or the cache
 // was never populated at all.
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { replaceDurably } from '../native/door.mjs';
 import { hostBinFromActivation, installationDir } from '../util/host-bin-path.mjs';
 import { globalFgosDir } from '../config/facade.mjs';
 
@@ -102,33 +101,6 @@ function readBinCache(globalDir) {
 export function cachedGlobalBin({ globalDir = globalFgosDir() } = {}) {
   const cached = readBinCache(globalDir);
   return cached && fs.existsSync(cached) ? cached : null;
-}
-
-/**
- * Populate (or refresh) the cached tier-3 path in
- * `<globalDir>/runtime/bin-cache.json` (`{ "globalFgosPath": "<abs>" }`,
- * mode 0600). The one write this module performs -- called only from
- * `fgos setup`/`doctor --fix` (D4: "multi-tier probing is a one-time
- * populate/repair step", never run on every call). Deletes the file when
- * nothing resolves, rather than leaving a stale path behind.
- *
- * Only writes when the resolved value actually differs from what is
- * already cached (`fgos setup` runs every registered fix unconditionally,
- * so an unconditional write would break its idempotency guarantee).
- */
-export function refreshGlobalBinCache({ globalDir = globalFgosDir() } = {}) {
-  const resolved = probeGlobalBin();
-  if ((resolved ?? null) === readBinCache(globalDir)) {
-    return { resolved, changed: false };
-  }
-  if (resolved) {
-    const dir = path.join(globalDir, BIN_CACHE_DIR);
-    fs.mkdirSync(dir, { recursive: true, mode: 0o700 });
-    replaceDurably(dir, BIN_CACHE_NAME, `${JSON.stringify({ globalFgosPath: resolved })}\n`, 0o600);
-  } else {
-    fs.rmSync(binCachePath(globalDir), { force: true });
-  }
-  return { resolved, changed: true };
 }
 
 /**

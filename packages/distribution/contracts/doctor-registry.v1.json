@@ -57,7 +57,19 @@
       "event-store-open-root",
       "event-store-machine-id",
       "event-store-legacy-layout",
-      "event-store-incidents"
+      "event-store-incidents",
+      "cli-version-visible",
+      "project-fgos-launcher",
+      "dispatch-decide-hook-wired",
+      "codex-hook-wired",
+      "agy-hook-wired",
+      "omp-hook-wired",
+      "pi-hook-wired",
+      "agy-permissions-configured",
+      "curl-available",
+      "bwrap-available",
+      "mailbox-claude-accept",
+      "claude-plugin-marketplace"
     ],
     "fixes": [
       "lock-dirs",
@@ -74,7 +86,14 @@
       "git-driver-directories",
       "git-wal-dir",
       "git-publication-refspecs",
-      "event-store-lock-dirs"
+      "event-store-lock-dirs",
+      "project-fgos-launcher",
+      "dispatch-decide-hook-wired",
+      "codex-hook-wired",
+      "agy-hook-wired",
+      "omp-hook-wired",
+      "pi-hook-wired",
+      "bin-discovery-cache"
     ]
   },
   "layers": {

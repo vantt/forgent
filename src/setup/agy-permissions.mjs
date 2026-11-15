@@ -1,10 +1,9 @@
 // agy-permissions.mjs — infra layer: agy's (Antigravity Cli) command-permission settings
-// (tsk-1xm, docs/history/agy-permission-capability-allowlist/).
-//   - checkAgyPermissionsConfigured: the read-only doctor row over the person's own
-//     ~/.gemini/antigravity-cli/settings.json. fgOS never writes that file: always-proceed widens
-//     what agy may do in the person's own sessions too, so the row only reports it (as a warning)
-//     and `fgos wire-agents` shows the edit (src/setup/agent-wiring.mjs).
-//   - checkAgySubHomesConfigured: the same settings in each agy sub-HOME the executor config names.
+// (tsk-1xm, docs/history/agy-permission-capability-allowlist/). What stays here is the sub-HOME reading the
+// executor config's agy rows need (`agy-sub-homes-configured`, and the agent CLI trust row): the same settings in
+// each agy sub-HOME the executor config names. The row over the person's own settings file and the settings
+// `fgos wire-agents` shows are `packages/distribution/rust/src/agent_config.rs`'s; fgOS never writes the
+// person's file: always-proceed widens what agy may do in the person's own sessions too.
 //
 // RESEARCH.md Round 4 (live-proven, 2026-08-18): `agy`'s `--dangerously-
 // skip-permissions` flag is NOT replaceable by a true default-deny
@@ -23,38 +22,6 @@ import os from 'node:os';
 import path from 'node:path';
 
 import { isConfigRefusal, readConfig } from '../config/facade.mjs';
-import { firstOnPath } from './project-launcher.mjs';
-
-/**
- * Deny-rules chosen to mirror this repo's own already-documented incident
- * history (AGENTS.md's "Never run a raw git reset --hard.../Never git
- * stash..." guidance -- tsk-3au, tsk-56u) plus the other classes of
- * irreversible or exfiltration-prone commands a headless worker should
- * never run unattended: destructive recursive deletes, privilege
- * escalation, force-pushing, and raw network egress. `regex:` prefix
- * matches agy's own documented opt-in syntax (RESEARCH.md Round 1's
- * changelog citation) -- bare-token/exact-literal deny rules were never
- * tested as thoroughly, and a regex lets each rule target the dangerous
- * shape specifically rather than the whole command family.
- */
-export const AGY_PERMISSIONS_DENYLIST = [
-  'command(regex:^rm .*-rf)',
-  'command(regex:^sudo )',
-  'command(regex:^git push .*(--force|-f\\b))',
-  'command(regex:^git reset .*--hard)',
-  'command(regex:^git stash)',
-  'command(regex:^curl )',
-  'command(regex:^wget )',
-];
-
-/** The settings `fgos wire-agents` shows a person who wants agy to run commands headless; fgOS
- * never writes them into the person's own settings file. */
-export const AGY_PERMISSIONS_DEFAULT = {
-  toolPermission: 'always-proceed',
-  permissions: {
-    deny: AGY_PERMISSIONS_DENYLIST,
-  },
-};
 
 /**
  * Absolute path to agy's one real on-disk settings file (RESEARCH.md
@@ -84,27 +51,6 @@ export function readAgySettings(homeDir = os.homedir()) {
   } catch {
     return {};
   }
-}
-
-/**
- * Read-only doctor row over the person's own agy settings. Passes when agy is not on PATH (nothing
- * of the person's to judge) or when `toolPermission` is `"always-proceed"` with a non-empty
- * `permissions.deny` (a customized deny list is the person's choice). Otherwise it warns: agy run
- * under this HOME refuses every command headless, and the only setting that changes that widens
- * agy's permissions, which fgOS never sets for the person.
- */
-export function checkAgyPermissionsConfigured(homeDir = os.homedir(), { agyPresent = firstOnPath('agy') !== null } = {}) {
-  if (!agyPresent) return { passed: true, configured: false, message: 'agy not found on PATH — nothing to check' };
-  const settings = readAgySettings(homeDir);
-  const denyList = settings.permissions?.deny;
-  if (settings.toolPermission === 'always-proceed' && Array.isArray(denyList) && denyList.length > 0) {
-    return { passed: true, configured: true, message: `agy settings.json: toolPermission=always-proceed, ${denyList.length} deny rule(s) configured` };
-  }
-  return {
-    passed: true,
-    configured: false,
-    message: `warning: ${agySettingsPath(homeDir)} has no toolPermission "always-proceed" with a deny list, so agy run under this HOME refuses every command headless (RESEARCH.md Round 4). That setting widens what agy may do, so fgOS never sets it for you; \`fgos wire-agents\` shows the exact edit`,
-  };
 }
 
 /**

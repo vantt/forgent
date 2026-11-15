@@ -147,18 +147,14 @@
       "debt": [
         {
           "path": "src/setup/agent-hooks.mjs",
-          "reason": "the earlier Node table, kept until the packaging rows and verbs that import it move to the host; agent_hooks.rs is the owner and the recorded vectors pin both"
-        },
-        {
-          "path": "src/setup/registrations.mjs",
-          "reason": "row descriptions name the hook files; the doctor registry contract carries them once the rows move"
+          "reason": "the earlier Node table, kept as a frozen measurement input of the mailbox behaviour experiments (its bytes do not change); no doctor row, fix or verb reads it any more; agent_hooks.rs is the owner and the recorded vectors pin both"
         },
         {
           "path": "scripts/lib/mailbox-live-confined.mjs",
-          "reason": "frozen live measurement harness; it lifts the hook rows out of the project and imports the Node table until the host's hook fixes own that call"
+          "reason": "frozen live measurement harness; it lifts the hook rows out of the project and imports the Node table until the mailbox lane re-measures it"
         }
       ],
-      "retiredBy": "S4: the packaging verbs and doctor rows move to the host and the Node table goes with its last importer",
+      "retiredBy": "the mailbox lane re-measures its frozen experiment sets without the Node hook table; the table goes then",
       "reason": "the hook files of the five agent CLIs and the omp/pi extension are rendered, checked and removed from one table (fgos-distribution agent_hooks.rs); the patterns match the file names whole and built in parts. A reader that only reads or hashes a hook file, or writes a worker's own settings, is allowed with its reason"
     },
     {
@@ -208,14 +204,14 @@
       "debt": [
         {
           "path": "src/setup/agy-permissions.mjs",
-          "reason": "the earlier Node agy settings reader and the default it shows; it goes with its doctor rows"
+          "reason": "the sub-HOME reader of the executor config's agy rows reads toolPermission in each sub-HOME; it goes with those rows (S5) and the agent CLI trust row (S6a)"
         },
         {
           "path": "src/cli/command-registry.mjs",
           "reason": "the wire-agents description names the settings it never sets"
         }
       ],
-      "retiredBy": "S4: wire-agents moves to the host and the Node wiring goes with it",
+      "retiredBy": "S5 and S6a: the agy sub-HOME rows and the agent CLI trust row leave Node, and the settings reader with them",
       "reason": "fgOS changes a person's own agent config only through the opt-in wire-agents verb (RUL111); init and doctor --fix write only the project and ~/.fgos. The patterns catch the backup suffix, the claude plugin calls and the agy permission setting that only that verb applies"
     },
     {
@@ -423,10 +419,9 @@
         { "path": "packages/run-supervisor/rust/src/steps.rs", "reason": "a supervised step led in its own group with the stepTimeoutMs of its envelope" },
         { "path": "packages/run-supervisor/rust/src/supervise.rs", "reason": "polls a child it started itself (try_wait); not a run-to-completion with a replacement environment" },
         { "path": "packages/run-supervisor/rust/src/supervise/windows.rs", "reason": "polls a child it started itself (try_wait); not a run-to-completion with a replacement environment" },
-        { "path": "packages/terminal-control/rust/src/driver/herdr.rs", "reason": "polls a child it started itself (try_wait); not a run-to-completion with a replacement environment" },
-        { "path": "src/setup/project-launcher.mjs", "reason": "the Node firstOnPath of the launcher check until the launcher moves to Rust; Node cannot call the Rust lookup" }
+        { "path": "packages/terminal-control/rust/src/driver/herdr.rs", "reason": "polls a child it started itself (try_wait); not a run-to-completion with a replacement environment" }
       ],
-      "retiredBy": "each Rust caller moves onto spawn.rs when its crate next changes how it spawns; the Node lookup retires with the project launcher (S4) and the Node payload (S7)",
+      "retiredBy": "each Rust caller moves onto spawn.rs when its crate next changes how it spawns",
       "reason": "guards the definitions of run_bounded, resolve_program and firstOnPath, and flags a PATH split or a try_wait child poll outside spawn.rs, so a second bounded spawn or program lookup must be declared. Not covered, by design of a pattern check: an inline Command::new with a deadline loop that polls by some other means. Debt lists the existing own-child polls and PATH searches that predate the door"
     },
     {
@@ -796,7 +791,6 @@
         "packages/distribution/rust/src/fgctl_refresh.rs",
         { "path": "packages/distribution/rust/src/timer.rs", "reason": "names the project shim, or the activated release host, that a managed timer runs; never a checkout script or a PATH lookup" },
         "apps/fgctl/src/help.rs",
-        "src/setup/project-launcher.mjs",
         { "path": "packages/distribution/rust/src/launcher.sh", "reason": "the launcher body the launcher module writes beside fgctl: it reads the nearest activation record from the shell" },
         { "path": "bin/fgos.mjs", "reason": "an error message tells the user the shim path to run; it never builds or reads the path" },
         { "path": "scripts/check-hook-registrations-guarded.mjs", "reason": "the check looks for the shim text inside hook commands, which is the string the hooks carry" },
@@ -1182,7 +1176,8 @@
       "patterns": [
         "Command::new\\(\"node\"\\)",
         "\\blegacy_exec::",
-        "\\.arg\\(\"hook\"\\)"
+        "\\.arg\\(\"hook\"\\)",
+        "\"hook\"\\.into\\(\\), KIND_"
       ],
       "allowed": [
         {
@@ -1204,6 +1199,10 @@
         {
           "path": "apps/fgos/src/wiring/doctor/bridge.rs",
           "reason": "the one bridge to the Node-owned doctor rows"
+        },
+        {
+          "path": "packages/distribution/rust/src/agent_hooks.rs",
+          "reason": "the hook rows' shim probe runs the project's own shim (never Node) with the `hook` route's three kinds and benign input, through the process door; the shim's `hook` route is a legacy-cli route until the hook verdicts are native"
         }
       ],
       "debt": [
@@ -1213,7 +1212,42 @@
         }
       ],
       "retiredBy": "the step that removes requires.node from the release manifest",
-      "reason": "the one named allowance is the hook rows' shim probe, which runs the project shim's `hook` route (dispatch-decide, main-checkout-delete-guard, mailbox), a legacy-cli route until the hook verdicts are native: the phase that ports those rows adds its own file to this row's allowed list with that reason, and nothing else under wiring/doctor may spawn a verb. doctor, init, uninstall and wire-agents never call back into Node for a layer that already moved: only the bridge starts Node, and a row adapter or a packaging module that needs a fact asks the Rust component that owns it"
+      "reason": "the one named allowance is agent_hooks.rs, the hook rows' shim probe, which runs the project shim's `hook` route (dispatch-decide, main-checkout-delete-guard, mailbox), a legacy-cli route until the hook verdicts are native: nothing else under wiring/doctor or in a packaging module may spawn a verb. doctor, init, uninstall and wire-agents never call back into Node for a layer that already moved: only the bridge starts Node, and a row adapter or a packaging module that needs a fact asks the Rust component that owns it"
+    },
+    {
+      "job": "global fgos path cache",
+      "kind": "door",
+      "patterns": [
+        "bin-cache\\.json",
+        "globalFgosPath"
+      ],
+      "allowed": [
+        "packages/distribution/rust/src/bin_cache.rs",
+        {
+          "path": "src/setup/bin-discovery.mjs",
+          "reason": "the Node reader: the cached path is tried first and a live PATH probe follows when it is gone; reads only"
+        },
+        {
+          "path": "scripts/fgos-shell-integration.sh",
+          "reason": "the shell integration the user sources reads the cached path before it probes PATH; reads only"
+        }
+      ],
+      "debt": [],
+      "retiredBy": "S7: the Node reader retires with the Node payload",
+      "reason": "<global dir>/runtime/bin-cache.json is written in one place, `fgos doctor --fix` through bin_cache.rs; the two readers (Node bin discovery, the shell script) read the bytes the golden tests/goldens/bin-cache-file.json pins for both. Allows an .mjs and a .rs file, so it names retiredBy"
+    },
+    {
+      "job": "packaging doctor judgments",
+      "kind": "door",
+      "patterns": [
+        "(?:export )?(?:async )?function (?:checkCliVersionVisible|checkProjectLauncher|fixProjectLauncher|checkDispatchDecideHookWired|checkCurlAvailable|checkMailboxClaudeAccept|checkClaudePluginMarketplace|checkAgyPermissionsConfigured|fixBinDiscoveryCache|refreshGlobalBinCache)\\b",
+        "\\bfn (?:version_row|launcher_row|launcher_fix|agent_hook_row|agent_hook_fix|agy_permissions_row|mailbox_accept_row|curl_row|bwrap_row|bin_cache_fix)\\b"
+      ],
+      "allowed": [
+        "apps/fgos/src/wiring/doctor/packaging.rs"
+      ],
+      "debt": [],
+      "reason": "the version, launcher, hook-wiring, agent-config report, curl, bwrap and global path cache rows and fixes are judged in process by the host over the packaging modules (agent_hooks, agent_config, launcher, bin_cache), never by a Node body; guards the definitions by name, so a second judge of the same row must be declared. Not covered, by design of a pattern check: a differently named body. The Node `checkBwrapAvailable` that the confinement rows of S6a still call is a different job (a smoke test of a named binary) and stays until they move"
     }
   ],
   "files": {
@@ -1418,17 +1452,12 @@
     "src/observe/friction-client.mjs": "infra",
     "src/intake/classify.mjs": "use-case",
     "src/setup/shell-rc.mjs": "infra",
-    "src/setup/project-launcher.mjs": "infra",
     "src/setup/bin-discovery.mjs": "infra",
     "src/setup/skill-wrappers.mjs": "infra",
     "src/setup/instruction-registry.mjs": "infra",
     "src/setup/git-hooks.mjs": "infra",
-    "src/setup/claude-code-hooks.mjs": "infra",
     "src/setup/agent-hooks.mjs": "infra",
     "src/setup/mailbox-limits.mjs": "infra",
-    "src/setup/mailbox-claude-accept.mjs": "infra",
-    "src/setup/agent-wiring.mjs": "infra",
-    "src/setup/version-info.mjs": "infra",
     "src/setup/agy-permissions.mjs": "infra",
     "src/setup/run-supervisor-checks.mjs": "infra",
     "src/setup/terminal-control-checks.mjs": "infra",

@@ -37,22 +37,7 @@ import { INSTALL_ROOT, agentShapeProblem, findAgentDuplicates, readAgentDefiniti
 import { isWithinDir } from '../runner/dispatch/assignment-layout.mjs';
 import { ownedSkillNames } from './skill-wrappers.mjs';
 import { agentRenderWarnings, listAgents } from '../runner/agent-listing.mjs';
-import { claudeCodeHookWired } from './claude-code-hooks.mjs';
-import {
-  checkClaudeHook,
-  installClaudeHook,
-  checkCodexHook,
-  installCodexHook,
-  checkAgyHook,
-  installAgyHook,
-  checkOmpHook,
-  installOmpHook,
-  checkPiHook,
-  installPiHook,
-} from './agent-hooks.mjs';
 import { checkExecutorProfileWarnings } from './executor-profile-warnings.mjs';
-import { checkMailboxClaudeAccept } from './mailbox-claude-accept.mjs';
-import { checkClaudePluginMarketplace } from './agent-wiring.mjs';
 import { checkAgentCliProjectTrusted } from './agent-cli-trust.mjs';
 import { declaredActivities, readWorkflowCatalog, withUnreadableDefinitions } from './workflow-catalog-reader.mjs';
 import {
@@ -64,7 +49,7 @@ import {
   checkLlmAccountsVsLegacy,
 } from './model-pool-checks.mjs';
 import { checkBlindStepsUseProvenPools } from './blind-steps-proven-pools.mjs';
-import { checkAgyPermissionsConfigured, checkAgySubHomesConfigured } from './agy-permissions.mjs';
+import { checkAgySubHomesConfigured } from './agy-permissions.mjs';
 import { BUILTIN_POLICY_IDS, validateConfinementPolicyShape, normalizeLegacyConfinement } from '../runner/dispatch/confinement/policies.mjs';
 import {
   resolveMachineBackendRegistryPath,
@@ -95,8 +80,6 @@ import { postLandDrift } from '../state/postland-drift.mjs';
 import { isResolvedStatus } from '../state/frontier.mjs';
 import { getDomain, resolveDomainName, effectiveStep, domainSteps, skillForStep } from '../state/domain-registry.mjs';
 import { toolProvidersOf } from '../runner/dispatch/tool-providers.mjs';
-import { resolveCliVersionInfo } from './version-info.mjs';
-import { firstOnPath, inspectLauncher, writeLauncher } from './project-launcher.mjs';
 import { checkConfig, ConfigDoorError, globalFgosDir, readConfig, readMachineConfig, readProjectConfigSource } from '../config/facade.mjs';
 import { parseYaml } from '../util/yaml.mjs';
 import { legacyStateKey } from '../runner/dispatch/llm-accounts.mjs';
@@ -105,7 +88,6 @@ import { inspectRetainedCredentialCopies, inspectPendingCopiesOverLimit, sweepIn
 import { resolveHerdrBin } from '../runner/dispatch/transport.mjs';
 import { createTerminalControl } from '../terminal-control/client.mjs';
 import { readCodexTrust, readAgyStore, defaultAgySettingsPath, operatorClaudeStorePath } from '../run-supervisor/trust-store.mjs';
-import { refreshGlobalBinCache } from './bin-discovery.mjs';
 import { DEFAULT_WORKER_SLOT_CEILING } from '../state/worker-slots.mjs';
 import { foldEvents } from '../state/replay.mjs';
 import { discoverProjectPromptTemplates, TemplateResolutionError } from '../runner/dispatch/operation-prompt-templates.mjs';
@@ -117,7 +99,6 @@ import { checkRunSupervisorRoute, checkRuntimeSocketDir, fixRuntimeSocketDir, ch
 import { checkTerminalControl, checkTerminalAllocations } from './terminal-control-checks.mjs';
 import { checkOmpNativesPresent, ompExecutorsOf } from './omp-natives-checks.mjs';
 export { mainCheckoutHookWired } from './git-hooks.mjs';
-export { claudeCodeHookWired } from './claude-code-hooks.mjs';
 export { checkAgySubHomesConfigured } from './agy-permissions.mjs';
 
 /** A refusal of the door (a file that is unusable, a request it cannot serve) or a process that cannot load the addon at all: the failures a row reports as its own failure, with the door's message, instead of ending the run. */
@@ -344,22 +325,6 @@ export function integrationScriptPath() {
   return fs.existsSync(canonical) ? canonical : executingCopy;
 }
 
-// tsk-2ej: not a staleness detector -- `doctor` can only ever report on
-// whatever build is actually running it, so it structurally cannot tell
-// itself apart from a newer release. What this check gives is the thing
-// that friction was missing: the running build's own version/commit made
-// legible on demand, the first thing to compare when a verb comes back
-// "unknown" on some other machine, without needing to read node_modules
-// directly (blocked by this repo's own scout-block hook).
-function checkCliVersionVisible() {
-  const info = resolveCliVersionInfo();
-  if (!info.packageVersion) {
-    return { passed: false, message: 'the build did not resolve a packageVersion -- src/setup/version-info.mjs is broken' };
-  }
-  const commitPart = info.gitCommit ? ` (${info.gitCommit})` : ' (no git commit -- not a git checkout)';
-  return { passed: true, message: `fgos ${info.packageVersion}${commitPart}` };
-}
-
 // The schema states each entry's keys and types; the owner's validator keeps the rule that a source scope opens with a
 // literal directory. The bounds and cumulative-checker rules of runner.loops are checked by runner-patterns-config.
 export function checkRunnerGeneratedPathsConfig(cwd) {
@@ -533,8 +498,7 @@ export function checkRunnerPatternsConfig(cwd, run) {
     if (hasGlobal) {
       let olderNote;
       try {
-        const fgctl = firstOnPath('fgctl');
-        if (!fgctl) {
+        if (!isCommandAvailable('fgctl')) {
           olderNote = 'older releases may refuse that file (compatibility with older releases was not established)';
         } else {
           const out = execFileSync('fgctl', ['status', '--json'], {
@@ -806,10 +770,6 @@ export function checkAgentTypeNamesUnique(cwd, { projectTiersOnly = false, insta
   };
 }
 
-function checkDispatchDecideHookWired(cwd, run) {
-  return checkClaudeHook(cwd, run);
-}
-
 // Posture of the tools the config declares (`kind: "tool"` executors, read through `toolProvidersOf`, the same
 // live probe `fgos dispatch decide --for` answers from): inactive when none is declared, full when every one is
 // present, degraded when any is stale, missing or cannot be probed. Degraded fails the check: a declared tool
@@ -834,56 +794,6 @@ function checkToolRegistryConfigured(cwd) {
     message: `degraded — ${present}/${providers.length} tool(s) present (${count('stale')} stale, ${count('missing')} missing, ${count('unknown')} cannot be probed) — install the missing tool, or reindex the stale one; fgos dispatch decide --for <capability> shows the answer a dispatch gets`,
   };
 }
-
-registerCheck({
-  id: 'cli-version-visible',
-  check: () => checkCliVersionVisible(),
-});
-
-// A release install (no git checkout to source a script from) is reached through
-// one `fgos` launcher written next to `fgctl`, which runs each project's own
-// activated fgos. A source checkout keeps the shell-integration script instead.
-export function checkProjectLauncher({ pathEnv = process.env.PATH, sourceCheckout = integrationScriptPath() !== null } = {}) {
-  if (sourceCheckout) {
-    return { passed: true, message: 'running from a source checkout -- shell integration provides fgos, no launcher needed' };
-  }
-  const status = inspectLauncher({ pathEnv });
-  switch (status.state) {
-    case 'ready':
-      return { passed: true, message: `fgos on PATH is the project launcher at ${status.file}: each project runs its own activated fgos` };
-    case 'stale':
-      return { passed: false, message: `the fgos launcher at ${status.file} is out of date -- run fgos doctor --fix` };
-    case 'foreign':
-      return { passed: false, message: `the fgos found first on PATH (${status.file}) is not the project launcher, so projects may not run their own fgos -- remove it or put the fgctl directory earlier on PATH, then run fgos doctor --fix` };
-    case 'missing':
-      return { passed: false, message: `no fgos on PATH -- run fgos doctor --fix to write the project launcher at ${status.file}` };
-    default:
-      return { passed: false, message: 'neither fgos nor fgctl is on PATH -- add the directory fgctl was installed into (default ~/.local/bin) to PATH, then run fgos doctor --fix' };
-  }
-}
-
-export function fixProjectLauncher({ pathEnv = process.env.PATH } = {}) {
-  const status = inspectLauncher({ pathEnv });
-  if (status.state === 'ready') return { fixed: false, message: 'launcher already current' };
-  if (status.state === 'foreign') {
-    return { fixed: false, message: `left ${status.file} alone: it is not the project launcher; remove it or put the fgctl directory earlier on PATH` };
-  }
-  if (status.state === 'no-fgctl') {
-    return { fixed: false, message: 'neither fgos nor fgctl is on PATH, so there is no directory to write the launcher into; add the fgctl directory to PATH first' };
-  }
-  writeLauncher(status.file);
-  return { fixed: true, message: `wrote the project launcher at ${status.file}` };
-}
-
-registerCheck({
-  id: 'project-fgos-launcher',
-  check: () => checkProjectLauncher(),
-});
-
-registerFix({
-  id: 'project-fgos-launcher',
-  fix: () => fixProjectLauncher(),
-});
 
 registerCheck({
   id: 'runner-generated-paths',
@@ -951,78 +861,8 @@ registerCheck({
 });
 
 registerCheck({
-  id: 'dispatch-decide-hook-wired',
-  check: (cwd, run) => checkDispatchDecideHookWired(cwd, run),
-});
-
-registerFix({
-  id: 'dispatch-decide-hook-wired',
-  fix: (cwd) => {
-    const res = installClaudeHook(cwd);
-    return { fixed: res.wired, message: res.wired ? `wired Claude Code hooks in .claude/settings.json${res.mailbox ? `; ${res.mailbox}` : ''}` : `skipped: ${res.skippedExisting}` };
-  },
-});
-
-registerCheck({
-  id: 'codex-hook-wired',
-  check: (cwd, run) => checkCodexHook(cwd, run),
-});
-
-registerFix({
-  id: 'codex-hook-wired',
-  fix: (cwd) => {
-    const res = installCodexHook(cwd);
-    return { fixed: res.wired, message: res.wired ? `wired Codex CLI hooks in .codex/hooks.json${res.mailbox ? `; ${res.mailbox}` : ''}` : `skipped: ${res.skippedExisting}` };
-  },
-});
-
-registerCheck({
-  id: 'agy-hook-wired',
-  check: (cwd, run) => checkAgyHook(cwd, run),
-});
-
-registerFix({
-  id: 'agy-hook-wired',
-  fix: (cwd) => {
-    const res = installAgyHook(cwd);
-    return { fixed: res.wired, message: res.wired ? 'wired AGY hooks in .agents/hooks.json' : `skipped: ${res.skippedExisting}` };
-  },
-});
-
-registerCheck({
-  id: 'omp-hook-wired',
-  check: (cwd, run) => checkOmpHook(cwd, run),
-});
-
-registerFix({
-  id: 'omp-hook-wired',
-  fix: (cwd) => {
-    const res = installOmpHook(cwd);
-    return { fixed: res.wired, message: res.wired ? `wired OMP extension hook in .omp/extensions/fgos-hooks.ts${res.mailbox ? `; ${res.mailbox}` : ''}` : `skipped: ${res.skippedExisting}` };
-  },
-});
-
-registerCheck({
-  id: 'pi-hook-wired',
-  check: (cwd, run) => checkPiHook(cwd, run),
-});
-
-registerFix({
-  id: 'pi-hook-wired',
-  fix: (cwd) => {
-    const res = installPiHook(cwd);
-    return { fixed: res.wired, message: res.wired ? `wired Pi extension hook in .pi/extensions/fgos-hooks.ts${res.mailbox ? `; ${res.mailbox}` : ''}` : `skipped: ${res.skippedExisting}` };
-  },
-});
-
-registerCheck({
   id: 'tool-registry-configured',
   check: (cwd) => checkToolRegistryConfigured(cwd),
-});
-
-registerCheck({
-  id: 'agy-permissions-configured',
-  check: () => checkAgyPermissionsConfigured(),
 });
 
 registerCheck({
@@ -1060,32 +900,6 @@ export function checkBwrapAvailable(binary = 'bwrap') {
   }
   return res;
 }
-
-// `fgctl init` shells out to the system `curl` when it downloads a release
-// (no source given, FGCTL_VERSION, or a URL source). A
-// machine that only ever installs from a local path never needs it, so a
-// missing curl is a warning, not a failure.
-export function checkCurlAvailable(binary = 'curl') {
-  try {
-    execFileSync(binary, ['--version'], { stdio: 'ignore' });
-    return { passed: true, message: `${binary} is available on PATH` };
-  } catch (err) {
-    return {
-      passed: true,
-      message: `warning: ${binary} is not usable on PATH (${err.code ?? err.message}); fgctl init cannot download a release -- install curl or pass a local --from path`,
-    };
-  }
-}
-
-registerCheck({
-  id: 'curl-available',
-  check: () => checkCurlAvailable(),
-});
-
-registerCheck({
-  id: 'bwrap-available',
-  check: () => checkBwrapAvailable(),
-});
 
 // tsk-5m7 (docs/history/tsk-3bn-merge-conductor-harness-v2/): a real
 // actionable problem, same class as the hook/config checks above — a root
@@ -1521,11 +1335,6 @@ export const DEFAULT_CAPABILITY_SLOTS = Object.freeze({
   }),
 });
 
-registerCheck({
-  id: 'mailbox-claude-accept',
-  check: (cwd) => checkMailboxClaudeAccept(cwd),
-});
-
 // Every capability a core/domain Workflow unit names must resolve the way
 // bind() resolves it (exact name, then its `<prefix>:*` entry). One that does not has
 // no candidate pool, so that unit is refused at run time with no earlier signal.
@@ -1679,34 +1488,6 @@ registerCheck({
 export const IRON_LAW_LEVELS = Object.freeze(['ask', 'warn']);
 export const DEFAULT_IRON_LAW_LEVEL = 'ask';
 
-// tsk-4xg: the fgOS Claude Code plugin. The row reports; registering the marketplace and
-// installing the plugin change the person's own Claude config, so only the opt-in
-// `fgos wire-agents` does it (src/setup/agent-wiring.mjs).
-registerCheck({
-  id: 'claude-plugin-marketplace',
-  check: () => checkClaudePluginMarketplace(),
-});
-
-// tsk-2qc-1 D4: the tier-3 (global) config-cache is populated/refreshed
-// only here, from `fgos doctor --fix` -- never on every `resolveFgosBin`
-// call, which is the whole point of caching the PATH probe instead of
-// re-running it. Idempotent and always safe to re-run: a stale cached
-// path is simply overwritten with whatever `probeGlobalBin` finds now
-// (or cleared, if nothing resolves).
-function fixBinDiscoveryCache() {
-  const { resolved, changed } = refreshGlobalBinCache();
-  if (!changed) {
-    return { changed: false, message: resolved ? `global bin-discovery cache already up to date: ${resolved}` : 'global bin-discovery cache already empty (no fgos on PATH)' };
-  }
-  return resolved
-    ? { changed: true, message: `global bin-discovery cache refreshed: ${resolved}` }
-    : { changed: true, message: 'global bin-discovery cache cleared (no fgos on PATH)' };
-}
-
-registerFix({
-  id: 'bin-discovery-cache',
-  fix: () => fixBinDiscoveryCache(),
-});
 
 function checkOperationPromptTemplatesValid(cwd) {
   try {

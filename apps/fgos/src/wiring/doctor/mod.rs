@@ -11,6 +11,7 @@ pub mod holder_lock;
 pub mod identity;
 pub mod mailbox;
 pub mod observe;
+pub mod packaging;
 
 use crate::routing::Call;
 use fgos_distribution::doctor::{
@@ -184,6 +185,17 @@ pub(crate) fn config_read_text(error: fgos_config::event_store::ReadError) -> St
             .join("; "),
         other => crate::wiring::events::config_message(other),
     }
+
+/// A row the owner judged: whether it passed and its one-sentence message. The level and the fix come from the
+/// engine.
+pub(crate) fn judged(passed: bool, message: impl Into<String>) -> RowOutcome {
+    RowOutcome::Judged(doctor::RowResult {
+        passed,
+        status: None,
+        message: Some(message.into()),
+        fix_command: None,
+        detail: None,
+    })
 }
 
 /// One component group's adapter: the ids of the rows it judges and the fixes it runs, and the two calls that
@@ -207,6 +219,7 @@ const GROUPS: &[&Rows] = &[
     &identity::GROUP,
     &mailbox::GROUP,
     &observe::GROUP,
+    &packaging::GROUP,
 ];
 
 /// The rows and fixes a Rust component judges in process, by id. The registry's `inRust` lists must equal

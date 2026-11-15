@@ -1210,6 +1210,33 @@ pub fn install_hook(root: &Path, cli: &str, env: Env) -> Result<InstallResult, A
     }
 }
 
+/// What a fix says of an install of `cli`'s hooks: what it wired and where, with the mailbox notice for the CLIs
+/// whose table has mailbox rows, or why it left the file alone.
+pub fn install_message(cli: &str, result: &InstallResult) -> String {
+    let (what, with_mailbox) = match cli {
+        "claude" => ("Claude Code hooks in .claude/settings.json", true),
+        "codex" => ("Codex CLI hooks in .codex/hooks.json", true),
+        "agy" => ("AGY hooks in .agents/hooks.json", false),
+        "omp" => ("OMP extension hook in .omp/extensions/fgos-hooks.ts", true),
+        "pi" => ("Pi extension hook in .pi/extensions/fgos-hooks.ts", true),
+        other => unreachable!("no hook of {other}"),
+    };
+    if !result.wired {
+        return format!(
+            "skipped: {}",
+            result.skipped_existing.unwrap_or("undefined")
+        );
+    }
+    match result
+        .mailbox
+        .as_deref()
+        .filter(|notice| with_mailbox && !notice.is_empty())
+    {
+        Some(notice) => format!("wired {what}; {notice}"),
+        None => format!("wired {what}"),
+    }
+}
+
 /// Wires every supported CLI, in table order.
 pub fn install_all(
     root: &Path,
@@ -2663,5 +2690,41 @@ mod tests {
         for command in &foreign {
             assert!(!command_is_kind(command, &row), "{command}");
         }
+    }
+
+    #[test]
+    fn a_fix_that_wired_a_hook_names_the_file_and_the_mailbox_notice_where_the_cli_has_mailbox_rows(
+    ) {
+        let wired = |mailbox: Option<&str>| InstallResult {
+            wired: true,
+            skipped_existing: None,
+            mailbox: mailbox.map(str::to_owned),
+        };
+        assert_eq!(
+            install_message("claude", &wired(None)),
+            "wired Claude Code hooks in .claude/settings.json"
+        );
+        assert_eq!(
+            install_message("codex", &wired(Some("the mailbox opt-in is refused"))),
+            "wired Codex CLI hooks in .codex/hooks.json; the mailbox opt-in is refused"
+        );
+        assert_eq!(
+            install_message("agy", &wired(Some("never shown for agy"))),
+            "wired AGY hooks in .agents/hooks.json"
+        );
+        assert_eq!(
+            install_message("omp", &wired(Some(""))),
+            "wired OMP extension hook in .omp/extensions/fgos-hooks.ts"
+        );
+        assert_eq!(
+            install_message("pi", &wired(Some("n"))),
+            "wired Pi extension hook in .pi/extensions/fgos-hooks.ts; n"
+        );
+        let skipped = InstallResult {
+            wired: false,
+            skipped_existing: Some("malformed"),
+            mailbox: None,
+        };
+        assert_eq!(install_message("pi", &skipped), "skipped: malformed");
     }
 }
