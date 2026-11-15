@@ -695,7 +695,7 @@ impl<'a> Context<'a> {
         };
         let writer = Self::writer(&trusted_main.join(".fgos"));
 
-        let custody_path = custody_lease_path(&wt_repo, worktree).map_err(&failed)?;
+        let custody_path = custody_lease_path(&wt_repo, worktree).map_err(failed)?;
         if let Some(parent) = custody_path.parent() {
             std::fs::create_dir_all(parent).map_err(|error| failed(error.to_string()))?;
         }

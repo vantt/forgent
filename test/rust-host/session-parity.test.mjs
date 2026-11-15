@@ -158,7 +158,7 @@ function normaliser(world, { nativeCause = false } = {}) {
 
 function stateOf(world, { ignoreSub }) {
   const norm = normaliser(world);
-  const dirNames = (dir) => (fs.existsSync(dir) ? fs.readdirSync(dir).sort().map(norm) : null);
+  const dirNames = (dir) => (fs.existsSync(dir) ? fs.readdirSync(dir).map(norm).sort() : null);
   return {
     registry: fs.existsSync(registryPath(world)) ? norm(fs.readFileSync(registryPath(world), 'utf8')) : null,
     sessionCheckouts: dirNames(path.join(world.tmp, 'fgos-sessions')),
@@ -205,6 +205,11 @@ async function runScript(entry, testCase) {
         stdout: step.mode === 'exit' ? '' : result.stdoutText,
         stderr: step.mode === 'exit' ? '' : result.stderrText,
       });
+    }
+    // A run leaves no store above its own tree: a stray `.fgos` there would make a later fixture treat that directory as its project.
+    for (let dir = path.dirname(world.root); ; dir = path.dirname(dir)) {
+      assert.ok(!fs.existsSync(path.join(dir, '.fgos')), `${testCase.id}: a run left ${path.join(dir, '.fgos')} above its fixture`);
+      if (dir === path.dirname(dir)) break;
     }
     const norm = normaliser(world, { nativeCause: testCase.nativeCause });
     return {
