@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- `fgos events sync|status|seal|export`, `fgos session start|end|list|gc` and `fgos gateway start|stop|status` now run in the Rust host with no Node process, and the seal and publish children a Node command starts run the host binary.
+- `fgos events status|sync --remote`, `sync --no-push`, `export --stream` given without a value, and `export --since` that is not JSON are refused with exit 4 and a plain message instead of a runtime conversion error (exit 1).
+- `fgos session` outside a project is refused and creates nothing; it used to write a `.fgos` in the current directory. From a subdirectory or a linked worktree with no store it uses the project's session registry instead of creating one there. `sessions.json` is written atomically. `session end` and `session gc` remove only a checkout that sits under the sessions directory and belongs to the project, and `gc` keeps a row whose directory Git does not list as one of its worktrees, reporting it as skipped. `merge`, `approve` and `return` need a resolvable host to list sessions.
+- `fgos gateway start` is refused off Unix with a message saying so; it never worked there. `fgos gateway stop` and `status` outside a project create nothing, and `stop` from a linked worktree answers `alreadyStopped` and runs no shutdown seal.
+- `--flag=value` and `--dir=<path>` are no longer accepted by any verb; use `--flag value`. The refusal names the flag and says to write `--k <value>`. The eight older native verbs (config, convention, friction, gate-bypass, identity, mailbox, metrics, version) now print the unknown-flag text of the Node CLI, so their "Did you mean --x?" hint is gone.
+
 - `fgos git status`, `fgos git recover`, `fgos lock fence` and `fgos lock-status` now run in the Rust host with no Node process and answer much faster (`lock-status` about 160 ms, down from about 2.7 s through the staged host).
 - `fgos git recover` outside a repository no longer prints `--sha [object Object]` in its next-step hint.
 - `fgos lock fence` without `--yes` lists the holders and refuses with `lock-fence-not-confirmed` (exit 2), on a terminal too; the `Stop these processes? [y/N]` question is gone. Rerun the call with `--yes` to fence them.
