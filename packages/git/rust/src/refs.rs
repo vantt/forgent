@@ -1021,7 +1021,7 @@ fn acquire_admin<'a>(repo: &RepoHandle, mut scope: LockScope<'a>) -> Result<Lock
 /// The `dispatch-cwd` lease file of a checkout, keyed exactly as the lock registry's
 /// `<cwdDevIno>` (`src/holder-lock/registry.mjs`): `<dev>-<ino>-<birthtimeNs>` of the
 /// directory after realpath. A different key would probe a lease nobody holds.
-pub fn custody_lock_path(repo: &RepoHandle, root: &Path) -> Result<PathBuf> {
+pub(crate) fn custody_lock_path(repo: &RepoHandle, root: &Path) -> Result<PathBuf> {
     use std::os::unix::fs::MetadataExt;
     let m = fs::metadata(fs::canonicalize(root).map_err(failure)?).map_err(failure)?;
     let birth = m
@@ -1036,6 +1036,37 @@ pub fn custody_lock_path(repo: &RepoHandle, root: &Path) -> Result<PathBuf> {
         m.ino(),
         birth
     )))
+}
+/// A linked checkout's custody lease, taken once and never waited for: a checkout a live writer holds answers
+/// `checkout-custody-busy`. The one door for a caller that must hold the lease while it acts on `root` (recovery of a
+/// scoped commit; the removal of a session checkout). Off Unix there is no lease: `git-lockscope-unavailable-windows`.
+pub fn acquire_checkout_custody(
+    repo: &RepoHandle,
+    root: &Path,
+) -> Result<fgos_holder_lock::Handle> {
+    #[cfg(unix)]
+    {
+        use fgos_holder_lock::{acquire, Acquire, Mode, Resource, Wait, DEFAULT_KILL_WAIT_MS};
+        let lock = custody_lock_path(repo, root)?;
+        if let Some(parent) = lock.parent() {
+            fs::create_dir_all(parent).map_err(failure)?;
+        }
+        match acquire(
+            &Resource::new("dispatch-cwd", lock),
+            Mode::Ex,
+            Wait::Try,
+            DEFAULT_KILL_WAIT_MS,
+        ) {
+            Acquire::Acquired(handle) => Ok(handle),
+            Acquire::Held { .. } => Err(failure("checkout-custody-busy")),
+            other => Err(failure(format!("checkout-custody-unavailable: {other:?}"))),
+        }
+    }
+    #[cfg(not(unix))]
+    {
+        let _ = (repo, root);
+        Err(failure("git-lockscope-unavailable-windows"))
+    }
 }
 pub(crate) fn branch_in_use(
     fact: &WorktreeFact,

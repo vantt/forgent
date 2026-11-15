@@ -1,6 +1,6 @@
 # Phase 08 report: `session start|end|list|gc` native
 
-Branch `rust-verb-migration-program/s3-p08`, rebased on `origin/rust-verb-migration-program/s3` (`0b2e36d77`). Status: DONE_WITH_CONCERNS.
+Branch `rust-verb-migration-program/s3-p08`, rebased on `origin/rust-verb-migration-program/s3` (`0b2e36d77`). Status: DONE_WITH_CONCERNS (revised after OPC's CHANGES verdict: B1, B2, M1-M4 and the two low items are fixed below).
 
 ## What changed
 - **Owner.** `apps/fgos/src/wiring/session.rs`: the four verbs over the Git Worktree and SafeRestore ports, the holder-lock `sessions` lock and Durable File. Registry written atomically, same JSON shape; a registry that is not a JSON array fails closed (never read as empty, never rewritten; unit test and parity cases). `end` seals through `EventStoreLifecycle::trigger` with `Policy { shutdown: true }` only, outside the `sessions` lock, also when the end fails.
@@ -30,7 +30,17 @@ Kept as in Node: cwd as the starting point and `--dir` ignored, session checkout
 - `cargo fmt --all --check` clean; `cargo clippy -p fgos -p fgos-identity -p fgos-git -p fgos-host-runtime --all-targets -- -D warnings` clean; gateway crate clippy clean; `cargo test -p fgos -p fgos-identity -p fgos-host-runtime` green (session module 23 tests, `cli_tests` session cases 2); gateway crate `cargo test` 100 passed; `cargo check` for `x86_64-pc-windows-msvc` and `aarch64-apple-darwin` clean.
 - Census regenerated, 0 undeclared; `export-command-selectors.mjs --check` clean.
 - `node scripts/run-tests.mjs` on: verb-parity (events + session tables, session = 42 cases incl. two accepted-difference cases), session, host-bin, architecture, flag-drift, command-routes, git-mutation-census, setup/checks, disconnected-worktree-guard, approve-leaf-and-worktree, fgos-return, postland-drift, merge-gate, unknown-flag-rejection, plus every file importing the harness session helpers: green except the three below.
-- Not from this change: `test/cli/fgos-return.test.mjs` "return ... subdirectory" x3 (`init` is refused from a subdirectory; reproduced with the base release's Node, also with the stray `/tmp/.fgos` gone). `A4 boundary guard` fails under plain `node --test` only.
+- The three `test/cli/fgos-return.test.mjs` "return ... subdirectory" tests did come from this branch (correction of the earlier report): on the base Node's `listSessions` took the sessions lock under `<subdir>/.fgos` and made a stray store that `stateView(cwd)` then read. The host creates nothing there, so the tests now read state from the project's top level (`stateView(topLevel)`); `fgos-return.test.mjs` passes in full. `A4 boundary guard` fails under plain `node --test` only.
+
+## Fixes after OPC's verdict
+- **B1 (destructive removal).** `end` and `gc` no longer trust a registry row. The project's repository is opened once (`project_repo`, at its trusted main checkout) and passed to `remove_checkout`, which now requires: an absolute `worktreePath` whose real path is under the real sessions directory and not the directory itself, and a worktree whose `common_dir` equals the project's. The check runs before anything is unlinked or removed (the `.fgos` symlink unlink used to come first). `remove_worktree` gets the project repository. `gc` removes nothing Git does not list as a worktree of the project: such a row whose directory exists is kept and reported skipped. A stale row that names nothing on disk is still dropped (only the row goes, nothing is removed): this is the one place I read "keep the row" narrowly, to keep gc able to clear dead rows. Tests: `a_row_naming_another_repositorys_worktree_is_refused_and_that_worktree_is_left_alone`, `a_row_naming_a_path_outside_the_sessions_directory_is_refused_and_touches_nothing` (also the sessions dir itself, a relative and an empty path, and the outside checkout's `.fgos` link left in place).
+- **B2.** See Gates: tests fixed, report corrected.
+- **M1.** `start` takes HEAD from the caller's own checkout (the base did): `a_session_started_from_a_linked_worktree_begins_on_that_checkouts_own_head` (the linked worktree is ahead of main). The registry and store stay the project's.
+- **M2.** `list` waits for the `sessions` lock 3 s, less than the Node client's 5 s, so a busy end or gc gives the named timeout, never the client's.
+- **M3 (fgos-git, for OPC).** `fgos_git::acquire_checkout_custody(repo, root)` (all platforms; off Unix `git-lockscope-unavailable-windows`) is the one custody door, called by `recovery.rs` (`scoped_commit_custody`, unchanged behaviour, still `Ok(None)` off Unix) and `session.rs`; `custody_lock_path` is `pub(crate)` again; session's cfg pair is gone. Files: `packages/git/rust/src/{lib.rs,refs.rs,recovery.rs}`.
+- **M4.** Module comment states the real lock discipline.
+- **Low.** A parse error of the call is a validation refusal, not "requires a sub-verb". Known, as in the base: a lock or registry failure after `start` created the worktree leaves the checkout with no row (gc does not see it; nothing removes it).
+- `--dir` debt row retirement text names backlog `p-5x37olszki` (session honours --dir).
 
 ## Parity
 Table `test/rust-host/parity-cases/session.cases.mjs` (owns `runPreparedCase`, a fresh repository, HOME, TMPDIR per entry; ids, paths, hashes, times and pids normalised) against the base release `8d6a07c4c`. Covers: list/gc empty, start with/without `--item` (bare, empty, `=`), unknown flags (single and several), nesting from a worktree and below it, linked and frozen worktrees (admission refusals), non-repository, `--dir` naming another project, end (no id, `--force` before the id, unknown, twice, clean, forced, diverged then forced, dirty), gc (dead process, diverged and dirty orphans, own worktree, unjudgeable row, vanished worktree), corrupt registry (not JSON, not an array). Zero `node` children from the host for every case; the runner asserts no `.fgos` exists above a fixture. Latency (`session list`) is not re-measured here.
@@ -56,8 +66,17 @@ Table `test/rust-host/parity-cases/session.cases.mjs` (owns `runPreparedCase`, a
 | guarded removal refusal preserves link, checkout, registry | `a_refused_removal_keeps_the_store_link_the_checkout_and_the_row` |
 Also new: corrupt-registry fail-closed, subdirectory and store-less linked worktree roots, outside-a-project refusals, contract rows, projector reading, catalog/descriptor agreement.
 
+## CHANGELOG lines proposed
+- `fgos session` runs in the Rust host; `sessions.json` is written atomically.
+- `fgos session` outside a project is refused and creates nothing; it used to write a .fgos in the current directory.
+- `fgos session` run from a subdirectory or a store-less linked worktree uses the project's session registry instead of creating one there.
+- `fgos session end` and `gc` refuse a registry row that does not name one of the project's own session checkouts (under the sessions directory, a worktree of the same repository).
+- `--flag=value` is refused for `fgos session`, as for every verb on the shared parser; a missing or unknown sub-command gets the host's one text.
+- A refused removal prints the Git port's cause instead of a JSON blob.
+- Merge, approve and return read the session registry through the host (`fgos session list`), so they need a resolvable host binary.
+
 ## Concerns
-1. `fgos-git` touch (`custody_lock_path` public) needs OPC review.
+1. `fgos-git` touch (`acquire_checkout_custody`, files `lib.rs`, `refs.rs`, `recovery.rs`) needs OPC review.
 2. The harness `createSession` ignores a requested `sessionId`/`sessionsDir` (no flag exists); fixed ids in `fgos-return`, `fgos-disconnected-worktree-guard` and `approve` tests were only labels except in the one file edited.
 3. Reading `--dir` as Node did (ignored) forces `session.rs` to ask the root door itself: one debt entry on the "resolve the invocation root" row, retires if the verb ever reads `--dir`.
 4. Close phase: docs (`docs/platform/identity/spec.md` registry owner, runner spec, reading-map rows, route counts) and the "retired Node verb code" row names `createSession`, `endSession`, `reclaimOrphanedSessions`, `sessionSummary`, `acquireSessionsLock`, `SessionError`. The shared parity runner and my table are deleted by phase 12.

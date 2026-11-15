@@ -498,7 +498,7 @@ test('return succeeds when ONLY .fgos/ (the live event log) is dirty — its own
 });
 
 test('return succeeds when cwd is a subdirectory of the real git top-level and only .fgos/ (under that subtree) is dirty', () => {
-  const { cwd } = initGitCwdInSubdir();
+  const { cwd, topLevel } = initGitCwdInSubdir();
   run(cwd, ['init']);
   addOk(cwd, 'sub-return-fgos-only-dirty', { verify: 'test -f proof.txt' });
   assert.equal(run(cwd, ['take', '--id', 'sub-return-fgos-only-dirty']).status, 0);
@@ -512,7 +512,7 @@ test('return succeeds when cwd is a subdirectory of the real git top-level and o
 
   const result = run(cwd, ['return', 'sub-return-fgos-only-dirty']);
   assert.equal(result.status, 0, `return should succeed with only the subdirectory's .fgos/ dirty: ${result.stderr}`);
-  assert.equal(stateView(cwd).work['sub-return-fgos-only-dirty'].status, 'awaiting-approval');
+  assert.equal(stateView(topLevel).work['sub-return-fgos-only-dirty'].status, 'awaiting-approval');
 });
 
 test('return succeeds when cwd is a subdirectory and an unrelated file is dirty ELSEWHERE in the repo, outside cwd\'s own subtree', () => {
@@ -531,11 +531,11 @@ test('return succeeds when cwd is a subdirectory and an unrelated file is dirty 
 
   const result = run(cwd, ['return', 'sub-return-scope-ok']);
   assert.equal(result.status, 0, `an unrelated dirty file outside cwd's subtree must never block return: ${result.stderr}`);
-  assert.equal(stateView(cwd).work['sub-return-scope-ok'].status, 'awaiting-approval');
+  assert.equal(stateView(topLevel).work['sub-return-scope-ok'].status, 'awaiting-approval');
 });
 
 test('return still refuses when cwd is a subdirectory and a non-.fgos file is dirty INSIDE cwd\'s own subtree (real dirt still caught, does not overcorrect)', () => {
-  const { cwd } = initGitCwdInSubdir();
+  const { cwd, topLevel } = initGitCwdInSubdir();
   run(cwd, ['init']);
   addOk(cwd, 'sub-return-dirty', { verify: 'test -f proof.txt' });
   assert.equal(run(cwd, ['take', '--id', 'sub-return-dirty']).status, 0);
@@ -543,7 +543,7 @@ test('return still refuses when cwd is a subdirectory and a non-.fgos file is di
 
   const result = run(cwd, ['return', 'sub-return-dirty']);
   assert.equal(result.status, 4);
-  assert.equal(stateView(cwd).work['sub-return-dirty'].status, 'doing');
+  assert.equal(stateView(topLevel).work['sub-return-dirty'].status, 'doing');
 });
 
 test('return refuses a main-source claim whose verify is still a discovery-stage placeholder — clean validation, exit 4, item stays doing (tsk-1zo: previously shelled out to the placeholder text itself, "<word>: not found", exit 127)', () => {

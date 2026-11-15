@@ -12,8 +12,7 @@ mod inspect;
 pub mod invocation_root;
 mod objects;
 mod refs;
-#[cfg(unix)]
-pub use refs::custody_lock_path;
+pub use refs::acquire_checkout_custody;
 mod worktree;
 pub use worktree::{
     DiscardedIgnored, IgnoredBytes, WorktreeCreate, WorktreeDelivery, WorktreeHandle, WorktreeIssue,

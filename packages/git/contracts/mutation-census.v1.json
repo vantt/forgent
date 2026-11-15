@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "9f6dc356f08df9ab1106ff22d176942e0c6503b3bf460b570561d8bc13393e6f",
+  "payloadDigest": "d712f8f268bfcd5667d8e6aa399f0eae85205703836fdd09783f1d90dc76a2a1",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "a5629383f89b4488b252a62f0ea86463e649e33e0a891db1a19af2cd6c136aca",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -110,7 +110,7 @@
     "apps/fgos/src/wiring/mailbox_verbs_unsupported.rs": "c38d21b026d0334ba76460edbeb10f8a23cbe0f3c56357b083064b1028e33709",
     "apps/fgos/src/wiring/metrics_sources.rs": "504e2c72b52a5da8d8d23a862403d47986811234809f364ee6006c6957f6c583",
     "apps/fgos/src/wiring/mod.rs": "1e52253985c3fddc61652681c7afc56717bca3d33abc9be8da9dcfd9b13552a2",
-    "apps/fgos/src/wiring/session.rs": "eec3a8f1a4831cc01a965bb42fa7213a57f844fbc7af61fce2003aaa39721895",
+    "apps/fgos/src/wiring/session.rs": "0b7e5f7847c2551af3c740deeaf5991a6126c83ee545e5456f68fd2075fda452",
     "apps/fgos/tests/cli_tests.rs": "d3357867b9179123a4d9b682533b5235eb5fa170b1baaa98c183e0cd7f899514",
     "apps/fgos/tests/internal_lock_routes.rs": "e8516f4876c8263b1baa1f997bcfbb01715e69d740aa508fd01a0d481fee309e",
     "apps/fgos/tests/mailbox_routes.rs": "fe4bb33069a6f6eb6f02b052e4581fcfc69ce37dcdfd146280f9c935c14511a6",
@@ -406,12 +406,12 @@
     "packages/git/rust/src/inspect.rs": "f01f4b4709058650ef9643c8331aa20ab69eef7353abca9769eacb8b829fa2e7",
     "packages/git/rust/src/invocation_root.rs": "854396e23b8c00d76c6560d3682fa4c940dc7050280dae10eae1b7af3ff85463",
     "packages/git/rust/src/land.rs": "3397a76d1f4c00b4d1ca20a3394f445b129d59f59a031c5c9cd419665f684803",
-    "packages/git/rust/src/lib.rs": "3891a42308bc783367f8ca0e75e74b5a2301939c8fd6d9a31753f9b7f732d1ac",
+    "packages/git/rust/src/lib.rs": "9f59036f753acf03a111ef6bc7ba36e798778c60d61b75740a7c4e6c735b946d",
     "packages/git/rust/src/native_lock.rs": "49758dea6b6d2f2abae425b31b937817b8c15174a83bf10ce33dd9046cc5139a",
     "packages/git/rust/src/objects.rs": "835dcdc093cbbdad82eb25b82fd28df9de6942789751a57b571f24e389cf23ec",
     "packages/git/rust/src/publication.rs": "2197f50540e53b98b6e62961fe37eaf5f860d6f79fd2559084909d67dca9cd92",
-    "packages/git/rust/src/recovery.rs": "b30f9de2ee0168597c487c09fa11ad1b61e1fdeb5b5047d8a135af4764d33183",
-    "packages/git/rust/src/refs.rs": "2b65058d95b2e6c7c12b078ef2c38762ba52cc4c4987bd7d5f08c0706b9c240b",
+    "packages/git/rust/src/recovery.rs": "c9f1f55ceaed434e271b003989b68b52b139ab37730267db06468e4be6fdc134",
+    "packages/git/rust/src/refs.rs": "f4b0e7dfbe85c081f9e37bb1d8a91d309b65c58615fc66b9fda7da2f349d47ec",
     "packages/git/rust/src/remote.rs": "8600d1b6964f4bba67fbee98520cdf43c92b91ac8eb2b8e94b9b0ef0e68373fa",
     "packages/git/rust/src/repository_config.rs": "aea3bd5b9811e49c77bda3cbb9b1e44061d4b4b5b38cfd3377de12f488f3c1f8",
     "packages/git/rust/src/restore.rs": "c55f72fc71c397e7efa44ae20b4f916d158999825c9fcc151856f4dc9f82c964",
@@ -1803,14 +1803,14 @@
     },
     {
       "path": "apps/fgos/src/wiring/session.rs",
-      "line": 1132,
+      "line": 1188,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"
     },
     {
       "path": "apps/fgos/src/wiring/session.rs",
-      "line": 1327,
+      "line": 1383,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"

@@ -254,16 +254,7 @@ fn scoped_commit_custody(
     }
     #[cfg(unix)]
     {
-        use fgos_holder_lock::{acquire, Acquire, Mode, Resource, DEFAULT_KILL_WAIT_MS};
-        let resource = Resource::new(
-            "dispatch-cwd",
-            crate::refs::custody_lock_path(checkout, root)?,
-        );
-        match acquire(&resource, Mode::Ex, Wait::Try, DEFAULT_KILL_WAIT_MS) {
-            Acquire::Acquired(handle) => Ok(Some(handle)),
-            Acquire::Held { .. } => Err(failure("checkout-custody-busy")),
-            other => Err(failure(format!("checkout-custody-unavailable: {other:?}"))),
-        }
+        crate::refs::acquire_checkout_custody(checkout, root).map(Some)
     }
     #[cfg(not(unix))]
     Ok(None)

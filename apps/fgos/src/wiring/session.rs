@@ -11,9 +11,14 @@
 //!
 //! Lock discipline. Every registry read-modify-write holds the `sessions` lock (rank 80, a leaf); the lock is
 //! never held while the worktree-admin lock is taken, so `start` releases it around the worktree creation and
-//! re-takes it to append the row. `end` and `gc` hold it across their removals, as the checkout custody lease and
-//! the worktree-admin lock are each taken in a scope of their own, without waiting. A registry that is present but
+//! re-takes it to append the row. `end` and `gc` hold it across their removals, and inside it take the checkout
+//! custody lease (one attempt, never waited for) and, in the Git port, the worktree-admin lock (waited for up to
+//! five seconds); `list` waits for the lock for less than the Node client's timeout. A registry that is present but
 //! not a JSON array fails closed: it is never read as empty and never rewritten.
+//!
+//! A row is trusted only as far as the registry file is: `end` and `gc` remove a checkout only when its real path
+//! lies under the sessions directory (never the directory itself) and it is a worktree of this project's own
+//! repository, and `gc` removes nothing Git does not list as a worktree.
 //!
 //! The nesting refusal of `start` and the self-mount guard of `gc` compare the caller's own directory, never the
 //! root the invocation doors resolved. `end` seals the Event Store once, outside the `sessions` lock and also
@@ -94,6 +99,9 @@ const REGISTRY_FILE: &str = "sessions.json";
 const SESSIONS_DIR_NAME: &str = "fgos-sessions";
 /// How long a registry hold waits for another holder.
 const SESSIONS_LOCK_WAIT_MS: u64 = 10_000;
+/// How long `list` waits: less than the five seconds the Node client gives a host call, so a busy end or gc is
+/// answered with the named timeout, never with the client's own.
+const LIST_LOCK_WAIT_MS: u64 = 3_000;
 /// How long a worktree creation waits for the worktree-admin lock.
 const WORKTREE_ADMIN_WAIT_MS: u64 = 30_000;
 
@@ -194,7 +202,7 @@ pub fn project_session_args(args: &[OsString]) -> Result<SessionRequest, Categor
         .skip(1)
         .map(|token| OsString::from(token.to_string_lossy().into_owned()))
         .collect();
-    let parsed = parse_args(&tokens).unwrap_or_default();
+    let parsed = parse_args(&tokens).map_err(|error| validation(error.to_string()))?;
     let cwd = std::env::current_dir()
         .map_err(|error| validation(format!("the current directory cannot be read: {error}")))?;
     project_session_request(&parsed, cwd)
@@ -345,12 +353,13 @@ impl<'a> Context<'a> {
         let root = self.root_of(cwd)?;
         let fgos_dir = fgos_dir_of(&root);
         let driver = self.driver()?;
-        let head = self.current_head(&driver, &root)?;
+        // The session starts on the HEAD of the checkout the caller stands in, as the base release did.
+        let head = self.current_head(&driver, cwd)?;
         let cwd_real = realpath_or(cwd);
         let session_id = new_session_id()?;
 
         {
-            let _hold = lock_sessions(&fgos_dir)?;
+            let _hold = lock_sessions(&fgos_dir, SESSIONS_LOCK_WAIT_MS)?;
             for entry in read_registry(&fgos_dir)? {
                 let Some(worktree) = entry.get("worktreePath").and_then(Value::as_str) else {
                     continue;
@@ -373,9 +382,7 @@ impl<'a> Context<'a> {
                 self.sessions_dir.display()
             ))
         })?;
-        let repo = self
-            .open(&driver, &root)?
-            .ok_or_else(|| Fault::session(format!("\"{}\" is not a repository", root.display())))?;
+        let repo = self.project_repo(&driver, &root)?;
         let trusted_main = repo.trusted_main_root().to_path_buf();
         let writer = Self::writer(&trusted_main.join(".fgos"));
         let created = {
@@ -408,7 +415,7 @@ impl<'a> Context<'a> {
 
         if let Err(error) = symlink_dir(&fgos_dir, &worktree_path.join(".fgos")) {
             // Best-effort rollback of the checkout just made; the refusal below is the one that matters.
-            let _ = self.remove_checkout(&driver, &worktree_path, None);
+            let _ = self.remove_checkout(&driver, &repo, &worktree_path, None);
             return Err(Fault::session(format!(
                 "symlinking .fgos into session \"{session_id}\" worktree failed: {error}"
             )));
@@ -423,7 +430,7 @@ impl<'a> Context<'a> {
             "record": self_record(),
             "startedAt": fgos_host_runtime::civil_time::format_system_time_utc(std::time::SystemTime::now()),
         });
-        let _hold = lock_sessions(&fgos_dir)?;
+        let _hold = lock_sessions(&fgos_dir, SESSIONS_LOCK_WAIT_MS)?;
         let mut entries = read_registry(&fgos_dir)?;
         entries.push(entry.clone());
         write_registry(&fgos_dir, &entries)?;
@@ -433,8 +440,8 @@ impl<'a> Context<'a> {
     fn end(&self, cwd: &Path, session_id: &str, force: bool) -> Outcome<Value> {
         let root = self.root_of(cwd)?;
         let fgos_dir = fgos_dir_of(&root);
-        let hold = lock_sessions(&fgos_dir)?;
-        let answer = self.end_locked(&fgos_dir, session_id, force);
+        let hold = lock_sessions(&fgos_dir, SESSIONS_LOCK_WAIT_MS)?;
+        let answer = self.end_locked(&root, &fgos_dir, session_id, force);
         drop(hold);
         // A clean writer exit seals what the session left open, outside the `sessions` lock and whatever the end
         // did. The one trigger door; `end` stays false, so no publish child starts, and a trigger never fails its
@@ -451,7 +458,13 @@ impl<'a> Context<'a> {
         answer
     }
 
-    fn end_locked(&self, fgos_dir: &Path, session_id: &str, force: bool) -> Outcome<Value> {
+    fn end_locked(
+        &self,
+        root: &Path,
+        fgos_dir: &Path,
+        session_id: &str,
+        force: bool,
+    ) -> Outcome<Value> {
         let entries = read_registry(fgos_dir)?;
         let entry = entries
             .iter()
@@ -472,6 +485,10 @@ impl<'a> Context<'a> {
             .unwrap_or("")
             .to_owned();
         let driver = self.driver()?;
+        // The row is only a claim: touch nothing that is not one of this project's own session checkouts.
+        let project = self.project_repo(&driver, root)?;
+        self.require_session_checkout(&project, &worktree)
+            .map_err(|why| Fault::session(format!("session \"{session_id}\": {why}")))?;
 
         if !force {
             let head_now = self.current_head(&driver, &worktree).map_err(|fault| {
@@ -494,7 +511,7 @@ impl<'a> Context<'a> {
 
         let link = unlink_fgos_symlink(&worktree);
         let retain_to = force.then_some(start_commit.as_str());
-        let retained = match self.remove_checkout(&driver, &worktree, retain_to) {
+        let retained = match self.remove_checkout(&driver, &project, &worktree, retain_to) {
             Ok(retained) => retained,
             Err(message) => {
                 restore_fgos_symlink(&worktree, link);
@@ -552,17 +569,20 @@ impl<'a> Context<'a> {
     fn list(&self, cwd: &Path) -> Outcome<Value> {
         let root = self.root_of(cwd)?;
         let fgos_dir = fgos_dir_of(&root);
-        let _hold = lock_sessions(&fgos_dir)?;
+        let _hold = lock_sessions(&fgos_dir, LIST_LOCK_WAIT_MS)?;
         Ok(Value::Array(read_registry(&fgos_dir)?))
     }
 
     fn gc(&self, cwd: &Path) -> Outcome<Value> {
         let root = self.root_of(cwd)?;
         let fgos_dir = fgos_dir_of(&root);
-        let _hold = lock_sessions(&fgos_dir)?;
+        let _hold = lock_sessions(&fgos_dir, SESSIONS_LOCK_WAIT_MS)?;
         let entries = read_registry(&fgos_dir)?;
         let driver = self.driver()?;
-        let registered = self.registered_worktrees(&driver, &root)?;
+        let project = self.project_repo(&driver, &root).map_err(|fault| {
+            Fault::session(format!("listing git worktrees failed: {}", fault.message()))
+        })?;
+        let registered = self.registered_worktrees(&driver, &project)?;
         let caller = realpath_or(&std::path::absolute(cwd).unwrap_or_else(|_| cwd.to_path_buf()));
         let (mut reclaimed, mut skipped, mut kept) = (Vec::new(), Vec::new(), Vec::new());
 
@@ -592,6 +612,15 @@ impl<'a> Context<'a> {
                 continue;
             }
             let on_disk = worktree.exists();
+            // A directory Git does not list as a worktree, or one that is not this project's own session
+            // checkout, is not ours to remove: the row stays and is reported.
+            if on_disk
+                && (missing_from_git || self.require_session_checkout(&project, &worktree).is_err())
+            {
+                skipped.push(id);
+                kept.push(entry);
+                continue;
+            }
             if on_disk && !missing_from_git {
                 // A diverged orphan keeps its dangling commit; a dirty one keeps its uncommitted work. An
                 // unreadable status counts as dirty: never assume clean.
@@ -609,7 +638,10 @@ impl<'a> Context<'a> {
             }
             if on_disk {
                 let link = unlink_fgos_symlink(&worktree);
-                if self.remove_checkout(&driver, &worktree, None).is_err() {
+                if self
+                    .remove_checkout(&driver, &project, &worktree, None)
+                    .is_err()
+                {
                     restore_fgos_symlink(&worktree, link);
                     skipped.push(id);
                     kept.push(entry);
@@ -630,19 +662,15 @@ impl<'a> Context<'a> {
         Ok(json!({"reclaimed": reclaimed, "skipped": skipped}))
     }
 
-    /// Every path Git registers as a worktree of the repository `root` sits in, as real paths.
-    fn registered_worktrees(&self, driver: &GitDriver, root: &Path) -> Outcome<Vec<PathBuf>> {
+    /// Every path Git registers as a worktree of the repository `repo` belongs to, as real paths.
+    fn registered_worktrees(&self, driver: &GitDriver, repo: &RepoHandle) -> Outcome<Vec<PathBuf>> {
         let listing_failed =
             |cause: String| Fault::session(format!("listing git worktrees failed: {cause}"));
-        let repo = self
-            .open(driver, root)
-            .map_err(|fault| listing_failed(fault.message().to_owned()))?
-            .ok_or_else(|| listing_failed("not a repository".into()))?;
         let mut paths = Vec::new();
         let mut cursor = None;
         loop {
             let page = driver
-                .list_worktrees(&repo, cursor, 4096)
+                .list_worktrees(repo, cursor, 4096)
                 .map_err(|error| listing_failed(error.cause))?;
             for row in &page.entries {
                 paths.push(realpath_or(&path_of_bytes(&row.path)));
@@ -653,6 +681,60 @@ impl<'a> Context<'a> {
             }
         }
         Ok(paths)
+    }
+
+    /// The repository of the project at `root`, opened at its trusted main checkout: the one handle every removal
+    /// of this project's checkouts is administered through.
+    fn project_repo(&self, driver: &GitDriver, root: &Path) -> Outcome<RepoHandle> {
+        let not_a_repository =
+            || Fault::session(format!("\"{}\" is not a repository", root.display()));
+        let at_root = self.open(driver, root)?.ok_or_else(not_a_repository)?;
+        let main = at_root.trusted_main_root().to_path_buf();
+        self.open(driver, &main)?.ok_or_else(not_a_repository)
+    }
+
+    /// Whether `worktree` may be removed as a session checkout of the project `project`: an absolute path whose real
+    /// path lies under the real sessions directory (never the directory itself) and that is a worktree of this
+    /// project's own repository. The error names why not.
+    fn require_session_checkout(
+        &self,
+        project: &RepoHandle,
+        worktree: &Path,
+    ) -> Result<(), String> {
+        if !worktree.is_absolute() {
+            return Err(format!(
+                "worktree \"{}\" is not an absolute path",
+                worktree.display()
+            ));
+        }
+        let outside = || {
+            format!(
+                "worktree \"{}\" is not a checkout under \"{}\"; refusing to touch it",
+                worktree.display(),
+                self.sessions_dir.display()
+            )
+        };
+        let base = std::fs::canonicalize(&self.sessions_dir).map_err(|_| outside())?;
+        let real = std::fs::canonicalize(worktree).map_err(|_| outside())?;
+        if real == base || !real.starts_with(&base) {
+            return Err(outside());
+        }
+        let driver = self.driver().map_err(|fault| fault.message().to_owned())?;
+        let belongs = match driver.resolve_repo(&real, &real) {
+            Ok(ResolveRepo::Repository(repo)) => {
+                std::fs::canonicalize(repo.common_dir()).ok()
+                    == std::fs::canonicalize(project.common_dir()).ok()
+            }
+            _ => false,
+        };
+        if belongs {
+            Ok(())
+        } else {
+            Err(format!(
+                "worktree \"{}\" belongs to another repository; refusing to touch it",
+                worktree.display()
+            ))
+        }
     }
 
     /// Whether the checkout `worktree` holds uncommitted work (`.fgos` aside). Unreadable counts as dirty.
@@ -676,6 +758,7 @@ impl<'a> Context<'a> {
     fn remove_checkout(
         &self,
         driver: &GitDriver,
+        main_repo: &RepoHandle,
         worktree: &Path,
         retain_to: Option<&str>,
     ) -> Result<Option<Retained>, String> {
@@ -685,6 +768,8 @@ impl<'a> Context<'a> {
                 worktree.display()
             )
         };
+        self.require_session_checkout(main_repo, worktree)
+            .map_err(failed)?;
         let wt_repo = match driver.resolve_repo(worktree, worktree) {
             Ok(ResolveRepo::Repository(repo)) => repo,
             Ok(ResolveRepo::NotARepository) => {
@@ -695,28 +780,11 @@ impl<'a> Context<'a> {
             }
             Err(error) => return Err(failed(error.cause)),
         };
-        let trusted_main = wt_repo.trusted_main_root().to_path_buf();
-        let main_repo = match driver.resolve_repo(&trusted_main, &trusted_main) {
-            Ok(ResolveRepo::Repository(repo)) => repo,
-            Ok(ResolveRepo::NotARepository) => return Err(failed("not-a-repository".into())),
-            Err(error) => return Err(failed(error.cause)),
-        };
+        let trusted_main = main_repo.trusted_main_root().to_path_buf();
         let writer = Self::writer(&trusted_main.join(".fgos"));
 
-        let custody_path = custody_lease_path(&wt_repo, worktree).map_err(failed)?;
-        if let Some(parent) = custody_path.parent() {
-            std::fs::create_dir_all(parent).map_err(|error| failed(error.to_string()))?;
-        }
-        let resource = fgos_holder_lock::Resource::new("dispatch-cwd", custody_path);
-        let custody = match fgos_holder_lock::acquire(
-            &resource,
-            fgos_holder_lock::Mode::Ex,
-            Wait::Try,
-            fgos_holder_lock::DEFAULT_KILL_WAIT_MS,
-        ) {
-            fgos_holder_lock::Acquire::Acquired(handle) => handle,
-            _ => return Err(failed("worktree custody is held".into())),
-        };
+        let custody = fgos_git::acquire_checkout_custody(&wt_repo, worktree)
+            .map_err(|error| failed(error.cause))?;
         let borrow = || {
             BorrowedHandle::new(&custody)
                 .map_err(|error| failed(format!("borrowing the custody lease failed: {error:?}")))
@@ -780,7 +848,7 @@ impl<'a> Context<'a> {
         );
         let remove_id = new_session_id().map_err(|fault| failed(fault.message().to_owned()))?;
         let removal = driver.remove_worktree(
-            &main_repo,
+            main_repo,
             vec![borrow().map_err(|cause| with_retained(cause, &retained))?],
             worktree,
             &WorktreeDelivery {
@@ -795,7 +863,7 @@ impl<'a> Context<'a> {
         drop(custody);
         removal.map_err(|error| with_retained(failed(error.cause), &retained))?;
         // The removal already succeeded; a prune that cannot run leaves a registration Git prunes later.
-        let _ = driver.prune_worktree(&main_repo, vec![], &remove_id);
+        let _ = driver.prune_worktree(main_repo, vec![], &remove_id);
         Ok(retained)
     }
 }
@@ -913,18 +981,6 @@ fn symlink_dir(target: &Path, link: &Path) -> std::io::Result<()> {
     std::os::windows::fs::symlink_dir(target, link)
 }
 
-/// The lease file that keeps a dispatch out of the checkout `worktree` while it is removed.
-#[cfg(unix)]
-fn custody_lease_path(repo: &RepoHandle, worktree: &Path) -> Result<PathBuf, String> {
-    fgos_git::custody_lock_path(repo, worktree).map_err(|error| error.cause)
-}
-
-/// Checkout custody is a Unix lease: off Unix a session checkout cannot be removed.
-#[cfg(not(unix))]
-fn custody_lease_path(_repo: &RepoHandle, _worktree: &Path) -> Result<PathBuf, String> {
-    Err("git-lockscope-unavailable-windows".into())
-}
-
 /// Removes the `.fgos` symlink this module made inside a session checkout (never its target) so Git's plain
 /// removal sees only the checkout's own bytes; answers where it pointed.
 fn unlink_fgos_symlink(worktree: &Path) -> Option<PathBuf> {
@@ -948,13 +1004,13 @@ fn restore_fgos_symlink(worktree: &Path, target: Option<PathBuf>) {
 }
 
 /// Takes the `sessions` lock, waiting up to its bound. Dropping the answer releases it.
-fn lock_sessions(fgos_dir: &Path) -> Outcome<LockScope<'static>> {
+fn lock_sessions(fgos_dir: &Path, wait_ms: u64) -> Outcome<LockScope<'static>> {
     let mut scope = LockScope::seeded(vec![]).map_err(|error| Fault::session(error.to_string()))?;
     let params = BTreeMap::from([(
         "fgosDir".to_owned(),
         fgos_dir.to_string_lossy().into_owned(),
     )]);
-    match scope.acquire("sessions", &params, Wait::Ms(SESSIONS_LOCK_WAIT_MS)) {
+    match scope.acquire("sessions", &params, Wait::Ms(wait_ms)) {
         Ok(_) => Ok(scope),
         Err(_) => {
             let lock_path = fgos_dir.join("locks").join("sessions.lock");
@@ -966,7 +1022,7 @@ fn lock_sessions(fgos_dir: &Path) -> Outcome<LockScope<'static>> {
                 _ => None,
             };
             Err(Fault::session(format!(
-                "timed out acquiring sessions.lock at \"{}\" after {SESSIONS_LOCK_WAIT_MS}ms{}",
+                "timed out acquiring sessions.lock at \"{}\" after {wait_ms}ms{}",
                 lock_path.display(),
                 holder
                     .map(|pid| format!(" (held by pid {pid})"))
@@ -1683,6 +1739,177 @@ mod tests {
             })
             .unwrap();
         assert_eq!(from_linked, Value::Array(fixture.list()));
+    }
+
+    /// A registry row that names `worktree` as a session of the fixture's project.
+    fn forge_row(fixture: &Fixture, id: &str, worktree: &str, pid: Option<u32>) {
+        let mut rows = read_registry(&fixture.repo.join(".fgos")).unwrap();
+        let mut row = json!({
+            "sessionId": id,
+            "worktreePath": worktree,
+            "itemId": null,
+            "startCommit": git(&fixture.repo, &["rev-parse", "HEAD"]),
+            "pid": pid.unwrap_or(std::process::id()),
+            "startedAt": "2026-11-15T03:00:00.000Z",
+        });
+        if let Some(pid) = pid {
+            row["record"] = json!({"pid": pid});
+        }
+        rows.push(row);
+        write_registry(&fixture.repo.join(".fgos"), &rows).unwrap();
+    }
+
+    fn dead_pid() -> u32 {
+        let mut child = Command::new("true").spawn().unwrap();
+        let pid = child.id();
+        child.wait().unwrap();
+        pid
+    }
+
+    #[test]
+    fn a_row_naming_another_repositorys_worktree_is_refused_and_that_worktree_is_left_alone() {
+        let fixture = Fixture::new();
+        let other = fixture.root.join("other");
+        git(
+            &fixture.root,
+            &["init", "-q", "--initial-branch=main", "other"],
+        );
+        git(&other, &["config", "user.name", "Fixture"]);
+        git(&other, &["config", "user.email", "fixture@example.invalid"]);
+        std::fs::write(other.join("seed.txt"), "seed\n").unwrap();
+        git(&other, &["add", "-A"]);
+        git(&other, &["commit", "-qm", "seed"]);
+        // Inside the sessions directory, so only the repository check can refuse it.
+        std::fs::create_dir_all(&fixture.sessions).unwrap();
+        let foreign = fixture.sessions.join("foreign");
+        git(
+            &other,
+            &[
+                "worktree",
+                "add",
+                "-q",
+                "--detach",
+                foreign.to_str().unwrap(),
+                "HEAD",
+            ],
+        );
+        forge_row(
+            &fixture,
+            "ended-by-mistake",
+            foreign.to_str().unwrap(),
+            None,
+        );
+        forge_row(
+            &fixture,
+            "reclaimed-by-mistake",
+            foreign.to_str().unwrap(),
+            Some(dead_pid()),
+        );
+
+        let text = refusal_text(fixture.end("ended-by-mistake", false));
+        assert!(text.contains("belongs to another repository"), "{text}");
+        let forced = refusal_text(fixture.end("ended-by-mistake", true));
+        assert!(forced.contains("belongs to another repository"), "{forced}");
+        let answer = fixture.gc_in(&fixture.repo);
+        assert_eq!(answer["reclaimed"], json!([]));
+        assert_eq!(
+            answer["skipped"],
+            json!(["ended-by-mistake", "reclaimed-by-mistake"]),
+            "a directory Git does not list as a worktree of this project is reported, never removed"
+        );
+        assert!(
+            foreign.join("seed.txt").exists(),
+            "the other project's worktree is untouched"
+        );
+        assert!(git(&other, &["worktree", "list", "--porcelain"]).contains("foreign"));
+        assert_eq!(fixture.list().len(), 2, "both rows stay");
+    }
+
+    #[test]
+    fn a_row_naming_a_path_outside_the_sessions_directory_is_refused_and_touches_nothing() {
+        let fixture = Fixture::new();
+        let outside = fixture.root.join("outside-checkout");
+        git(
+            &fixture.repo,
+            &[
+                "worktree",
+                "add",
+                "-q",
+                "--detach",
+                outside.to_str().unwrap(),
+                "HEAD",
+            ],
+        );
+        std::os::unix::fs::symlink(fixture.repo.join(".fgos"), outside.join(".fgos")).unwrap();
+        std::fs::create_dir_all(&fixture.sessions).unwrap();
+        forge_row(&fixture, "outside", outside.to_str().unwrap(), None);
+        forge_row(
+            &fixture,
+            "outside-dead",
+            outside.to_str().unwrap(),
+            Some(dead_pid()),
+        );
+        forge_row(
+            &fixture,
+            "the-sessions-dir-itself",
+            fixture.sessions.to_str().unwrap(),
+            None,
+        );
+        forge_row(&fixture, "relative", "worktrees/x", None);
+        forge_row(&fixture, "empty", "", None);
+
+        for id in ["outside", "the-sessions-dir-itself", "relative", "empty"] {
+            for force in [false, true] {
+                let text = refusal_text(fixture.end(id, force));
+                assert!(
+                    text.contains("not a checkout under") || text.contains("not an absolute path"),
+                    "{id}: {text}"
+                );
+            }
+        }
+        fixture.mark_dead(&["outside-dead"]);
+        let answer = fixture.gc_in(&fixture.repo);
+        // Only rows that name nothing on disk are dropped (there is nothing to remove for them).
+        assert_eq!(answer["reclaimed"], json!(["relative", "empty"]));
+        assert!(
+            outside.join("seed.txt").exists(),
+            "the checkout outside the sessions directory stays"
+        );
+        assert!(
+            std::fs::symlink_metadata(outside.join(".fgos"))
+                .unwrap()
+                .file_type()
+                .is_symlink(),
+            "its .fgos link is not unlinked"
+        );
+        assert!(fixture.sessions.exists());
+        assert_eq!(
+            fixture.list().len(),
+            3,
+            "the rows that name a real directory stay"
+        );
+    }
+
+    #[test]
+    fn a_session_started_from_a_linked_worktree_begins_on_that_checkouts_own_head() {
+        let fixture = Fixture::new();
+        let linked = fixture.root.join("linked");
+        git(
+            &fixture.repo,
+            &[
+                "worktree",
+                "add",
+                "-q",
+                "--detach",
+                linked.to_str().unwrap(),
+                "HEAD",
+            ],
+        );
+        let ahead = commit_inside(&linked);
+        assert_ne!(ahead, git(&fixture.repo, &["rev-parse", "HEAD"]));
+        let started = fixture.start_in(&linked).unwrap();
+        assert_eq!(started["startCommit"], ahead);
+        assert_eq!(git(&worktree_of(&started), &["rev-parse", "HEAD"]), ahead);
     }
 
     #[test]
