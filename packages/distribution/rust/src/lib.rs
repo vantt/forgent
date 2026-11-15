@@ -3,6 +3,7 @@
 //! Distribution provider and manifest utilities.
 
 pub mod canonical;
+pub mod coexistence;
 pub mod extract;
 pub mod fetch;
 pub mod fgctl_refresh;
@@ -10,6 +11,7 @@ pub mod git_gate;
 pub mod init;
 pub mod lock;
 pub mod manifest;
+pub mod rc_lines;
 pub mod shim;
 pub mod store;
 pub mod suggest;
