@@ -563,6 +563,10 @@ mod tests {
                     .env("PATH", std::env::var("PATH").unwrap_or_default())
                     .envs(extra.iter().copied());
                 match command.output() {
+                    // the script the launcher execs can be busy for the same reason: retry
+                    Ok(out) if String::from_utf8_lossy(&out.stderr).contains("Text file busy") => {
+                        std::thread::sleep(std::time::Duration::from_millis(20))
+                    }
                     Ok(out) => {
                         return Ran {
                             status: out.status.code().unwrap_or(-1),

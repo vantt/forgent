@@ -124,3 +124,13 @@ Status: DONE_WITH_CONCERNS
 - `test/setup/project-launcher.test.mjs` pins the Node launcher bodies to `launcher-digests.json`; spec text for the `mailbox.enabled` reader
   fixed in `docs/platform/agent-mailbox/spec.md`; redundant `set_permissions` removed from `launcher.rs`.
 - Spawn: the branch carries p02's three corrected commits in order (`4cab0cb29` spawn, `a6cb41064` fgos-process lock line, `ea4c968a8` process group and bounded collection; resolved onto this base, they drop out when p02 lands). The `fgos-config` lock line is folded into the commit that adds the Cargo.toml edge, so every commit builds with `--locked`; drop it if p02 lands the same line first. Callers needed no change.
+
+## Correction: frozen files restored (MAIL)
+
+`src/setup/agent-hooks.mjs` and `packages/mailbox/contracts/limits.v1.json` are measurement inputs of MAIL's frozen experiments;
+the earlier edits to them (and the changes that depended on them) are reverted to `origin/main` bytes. Superseded statements above:
+the `mailbox.enabled` reader stays `setup` in `limits.v1.json`/`limits_contract.rs` (no rename, no meaning-text change, spec text
+restored); `package.json` and `checks-setup-rc-line.test.mjs` no longer carry the prefilter data file (Node does not read it).
+The Node module keeps its literal keyword list as a named twin of `delete-guard-prefilter.v1.json`: the "delete-guard keyword list"
+door row carries it as debt with `retiredBy` naming MAIL's re-measure, and `test/setup/agent-hooks.test.mjs` pins the literal list
+(read from the module source) equal to the data file and to its derived forms. The Rust code reads neither file's `reader` value.

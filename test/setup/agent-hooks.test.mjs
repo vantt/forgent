@@ -1106,3 +1106,18 @@ test('this module installs, checks and uninstalls every recorded vector exactly 
     fs.rmSync(home, { recursive: true, force: true });
   }
 });
+
+test('the literal prefilter list of this module (a frozen file) equals the data file the Rust renderer reads', () => {
+  const source = fs.readFileSync(new URL('../../src/setup/agent-hooks.mjs', import.meta.url), 'utf8');
+  const literal = (name) => {
+    const found = source.match(new RegExp(`const ${name} = (\\[[^\\]]*\\]);`));
+    assert.ok(found, `${name} is a literal list in the module`);
+    return JSON.parse(found[1].replace(/'/g, '"'));
+  };
+  const data = JSON.parse(fs.readFileSync(new URL('../../packages/distribution/contracts/delete-guard-prefilter.v1.json', import.meta.url), 'utf8'));
+  assert.deepEqual(literal('PREFILTER_SUBSTRINGS'), data.substrings);
+  assert.deepEqual(literal('PREFILTER_WORDS'), data.words);
+  assert.deepEqual(deleteGuardPrefilter.substrings, data.substrings);
+  assert.equal(deleteGuardPrefilter.regExpSource, data.regExpSource);
+  assert.equal(deleteGuardPrefilter.caseGlobs, data.caseGlobs);
+});

@@ -140,16 +140,14 @@ const claudeGuardedHookCommand = (kind) => `S=${CLAUDE_SHIM}; [ -x "$S" ] || exi
 
 /** What the main-checkout delete guard judges, as text a shell or a JavaScript check can find without
  * starting node (about 170 ms per call): `rm` (also quoted or after a path or `sudo`), `xargs`, `git
- * clean`, `find -delete`, and a shell or `eval` that may run a computed script (the list is the data file
- * `packages/distribution/contracts/delete-guard-prefilter.v1.json`, which the Rust renderer reads too). The list is a superset
+ * clean`, `find -delete`, and a shell or `eval` that may run a computed script. The list is a superset
  * of the guard's refusals: the guard test runs every refusal it asserts through `matches`, so a
  * refusal the list would skip fails there. `rm` and `sh` are keywords only at the start of a word
  * (after a character that is not a letter or digit), because they sit inside `permission_mode` and
  * `Bash`, which every payload carries. A command name spelled with quote splits or a backslash (`r''m`, `r\m`) is the one
  * form the list does not see. */
-const PREFILTER_CONTRACT = JSON.parse(readFileSync(new URL('../../packages/distribution/contracts/delete-guard-prefilter.v1.json', import.meta.url), 'utf8'));
-const PREFILTER_SUBSTRINGS = PREFILTER_CONTRACT.substrings;
-const PREFILTER_WORDS = PREFILTER_CONTRACT.words;
+const PREFILTER_SUBSTRINGS = ['xargs', 'clean', '-delete', 'eval', 'bash', 'zsh', 'dash', 'ksh'];
+const PREFILTER_WORDS = ['rm', 'sh'];
 
 const escapeRegExp = (text) => text.replace(/[.*+?^${}()|[\]\\-]/g, '\\$&');
 const PREFILTER_SOURCE = `${PREFILTER_SUBSTRINGS.map(escapeRegExp).join('|')}|(?:^|[^A-Za-z0-9])(?:${PREFILTER_WORDS.join('|')})`;

@@ -177,10 +177,10 @@
       "debt": [
         {
           "path": "src/setup/agent-hooks.mjs",
-          "reason": "the earlier Node renderer of the extension and the case patterns, which reads the same data file; it goes with the Node hook table"
+          "reason": "the Node twin keeps its own literal list: src/setup/agent-hooks.mjs is a frozen measurement input of the mailbox behaviour experiments, so its bytes do not change; test/setup/agent-hooks.test.mjs pins the literal list equal to the data file"
         }
       ],
-      "retiredBy": "S4: the Node hook table goes with its last importer",
+      "retiredBy": "the mailbox lane re-measures its frozen experiment sets without the Node hook table; the twin goes then",
       "reason": "the keywords the main-checkout delete guard's prefilter looks for are data (packages/distribution/contracts/delete-guard-prefilter.v1.json), rendered by agent_hooks.rs. test/git/main-checkout-delete-guard.test.mjs:11-12 keeps its own matcher over the same data to prove every refusal passes the prefilter; tests are outside the door walk, so that copy is named here, not checked"
     },
     {

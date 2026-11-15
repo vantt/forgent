@@ -17,9 +17,9 @@
 //! The bytes written equal what the earlier Node module wrote: `tests/goldens/agent-hooks-vectors.json` holds
 //! the vectors both owners were proved against, and the run supervisor's trust store hashes hook bytes.
 //!
-//! The mailbox hook rows follow `mailbox.enabled`, whose reader this module is
-//! (`packages/mailbox/contracts/limits.v1.json`): a project that opted out gets none and loses the ones
-//! an earlier install wrote; a refused config leaves the rows exactly as they are.
+//! The mailbox hook rows follow `mailbox.enabled`, which this module reads (the mailbox limits contract,
+//! frozen by content, still names its reader `setup`): a project that opted out gets none and loses the
+//! ones an earlier install wrote; a refused config leaves the rows exactly as they are.
 
 use std::collections::{HashMap, HashSet};
 use std::ffi::OsStr;
