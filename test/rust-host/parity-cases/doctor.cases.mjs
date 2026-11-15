@@ -219,7 +219,7 @@ function act(world, step) {
     }
     case 'cloneThisRepository':
       world.clone = path.join(world.root, 'clone');
-      execFileSync('git', ['clone', '-q', '--local', fileURLToPath(new URL('../../../', import.meta.url)), world.clone], { stdio: 'ignore' });
+      execFileSync('git', ['clone', '-q', '--shared', fileURLToPath(new URL('../../../', import.meta.url)), world.clone], { stdio: 'ignore' });
       return null;
     case 'gitConfig':
       return execFileSync('git', ['-C', world[step.cwd], 'config', '--get-all', 'remote.origin.fetch'], { encoding: 'utf8' }).trim();
@@ -323,6 +323,11 @@ function normaliser(world, entry) {
       .replace(/(fgos-(?:mailbox-sync|account-probe))-[0-9a-f]{8}/g, '$1-<STEM>')
       // The config file's own documentation comment: the base names the retired `setup` verb in the mailbox.enabled sentence.
       .replace('Whether fgos setup and doctor --fix install the mailbox hook rows into this project\'s Claude Code and Codex hook files; false removes the rows they installed.', 'Whether fgos doctor --fix installs the mailbox hook rows into this project\'s Claude Code and Codex hook files; false removes the rows it installed.')
+      // A clone of this tree carries the mailbox.enabled sentence of this tree; the base release's schema words it as before.
+      .replace('; project:config.yaml:256:3 config-doc-drift mailbox.enabled (drift)', '')
+      // The base release words the two provenance problems of the mirror mappings in their older sentences.
+      .replace('event-store-refspec-missing: the mirror fetch mappings are not recorded for this remote: the recorded mappings are missing or differ from the wanted set', 'event-store-refspec-missing: no Git mapping provenance; run fgos doctor --fix')
+      .replace('event-store-remote-changed: the fetch mapping provenance records another remote URL than the remote has now', 'event-store-remote-changed; run fgos doctor --fix')
       // The hooks row's remedy names the command that wires the hooks path, not the retired `setup`.
       .replace(/run npm run setup:hooks/g, 'run fgos setup')
       // The floor row no longer names the Node version (Node is the bridged rows' runtime, reported by them).

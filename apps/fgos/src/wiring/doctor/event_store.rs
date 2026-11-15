@@ -373,6 +373,7 @@ fn mode_differs(_: &std::fs::Metadata) -> bool {
 }
 
 fn make_private_directory(path: &Path) -> std::io::Result<()> {
+    #[cfg_attr(not(unix), allow(unused_mut))]
     let mut builder = std::fs::DirBuilder::new();
     #[cfg(unix)]
     {
@@ -497,6 +498,7 @@ mod tests {
         assert!(error.starts_with("unsafe directory:"), "{error}");
     }
 
+    #[cfg(target_os = "linux")]
     use crate::wiring::doctor::testkit::Fixture;
 
     fn status(streams: Value, extra: Value) -> Value {

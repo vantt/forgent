@@ -592,6 +592,7 @@ pub(crate) mod testkit {
             git(&self.repo, args)
         }
 
+        #[cfg_attr(not(target_os = "linux"), allow(dead_code))]
         pub fn with_remote(&self) -> PathBuf {
             let remote = self.temp.join("remote");
             git(
