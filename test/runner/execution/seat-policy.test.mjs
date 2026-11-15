@@ -9,7 +9,9 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 
-import { seatConfigDigestOf, seatConfigOf, seatPolicy, resetSeatPolicyCache } from '../../../src/runner/execution/seat-policy.mjs';
+import crypto from 'node:crypto';
+import { canonicalJson } from '../../../src/native/door.mjs';
+import { seatBinding, seatConfigDigestOf, seatConfigOf, seatPolicy, resetSeatPolicyCache } from '../../../src/runner/execution/seat-policy.mjs';
 import { resetSeatBindingClient } from '../../../src/seat-binding/client.mjs';
 
 const runner = () => ({
@@ -49,6 +51,27 @@ test('the config digest ignores key order, comments and everything outside the s
   assert.notEqual(seatConfigDigestOf(retiered).digest, base);
   // A runner section handed over whole (`{ runner: {...} }`) digests like the section itself.
   assert.equal(seatConfigDigestOf({ runner: runner() }).digest, base);
+});
+
+test('the config digest is the sha-256 of the canonical JSON door bytes of the slice', () => {
+  const { config, digest } = seatConfigDigestOf(runner());
+  assert.equal(digest, `sha256:${crypto.createHash('sha256').update(canonicalJson(config)).digest('hex')}`);
+});
+
+test('a config carrying non-finite numbers or undefined members still digests, over what the crate receives as JSON', () => {
+  const odd = runner();
+  odd.defaults = { tier: 'standard', budget: Infinity, unset: undefined };
+  odd.modelPolicies.claude.list = [NaN, undefined, 1];
+  const { config, digest } = seatConfigDigestOf(odd);
+  assert.deepEqual(config.defaults, { tier: 'standard', budget: null });
+  assert.deepEqual(config.modelPolicies.claude.list, [null, null, 1]);
+  assert.equal(digest, `sha256:${crypto.createHash('sha256').update(canonicalJson(JSON.parse(JSON.stringify(config)))).digest('hex')}`);
+});
+
+test('an account view with a NaN quarantinedUntil binds and digests without throwing', () => {
+  const accountView = { pools: { claude: [{ id: 'acct-1', clis: ['claude'], quarantinedUntil: NaN }] } };
+  const out = seatBinding({ ask: ask(), runnerConfig: runner(), accountView });
+  assert.ok(out.policy || out.refusal, 'the crate answered');
 });
 
 test('a decided seat comes back as its policy: tier, where it came from, the executors in order', () => {

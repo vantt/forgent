@@ -304,9 +304,7 @@
         { "path": "scripts/build-rust-distribution.mjs", "reason": "producer half of the release-manifest pair kept together with its verifier" },
         "packages/distribution/rust/src/verify.rs"
       ],
-      "debt": [
-        { "path": "src/runner/execution/seat-policy.mjs", "reason": "its own canonicalJson sorts keys by Array.sort and prints numbers with JSON.stringify, so it equals RFC 8785 only by luck; it is not an accepted exception" }
-      ],
+      "debt": [],
       "retiredBy": "the exceptions the component-boundary row names go when their stated reasons end (the release-manifest pair moves as one; the others when their contracts change)",
       "reason": "RFC 8785 bytes come from one crate; each allowed exception except run-supervisor envelope.rs (its envelope digest, not named in that row) is named with its reason in the component-boundary row for Canonical JSON"
     },
@@ -410,7 +408,6 @@
         "src/config/facade.mjs"
       ],
       "debt": [
-        { "path": "src/setup/registrations.mjs", "reason": "checkRunnerPatternsConfig derives ~/.fgos from os.homedir() itself; the capability-reads plan edits this file, so whoever lands second moves it to globalFgosDir()" },
         { "path": "src/runner/dispatch/llm-accounts.mjs", "reason": "machineLoginStores takes a homeDir parameter (default os.homedir()) and joins .fgos itself, so a caller can name a home the global directory door does not know" },
         { "path": "src/runner/dispatch/confinement/probes/harness.mjs", "reason": "the probe harness builds ~/.fgos/private from its own home value" },
         { "path": "src/setup/setup-use-case.mjs", "reason": "takes a homeDir parameter and joins .fgos itself for the retired-config notice" },
@@ -542,7 +539,6 @@
         { "path": "scripts/record-mailbox-hook-fixtures.mjs", "reason": "the fixture recorder spawns the shim of the workspace it builds" }
       ],
       "debt": [
-        { "path": "src/setup/registrations.mjs", "reason": "doctor rows read activation.json directly; moved after the capability plan rewrites the file" },
         { "path": "packages/herdr-fgos-common/rust/src/fgos.rs", "reason": "builds the shim path itself; no step owns the move yet, see backlog row p-rypvkc3kai (a move onto the distribution crate would add a crate edge)" }
       ],
       "retiredBy": "S7: the Node reader retires with the Node payload; distribution keeps writing",
@@ -564,9 +560,7 @@
         { "path": "src/util/domain-dirs.mjs", "reason": "defines the domain layout (a domain's agents/ folder) that the door reads" },
         { "path": "src/cli/command-registry.mjs", "reason": "help text naming the tiers a persona is looked up in; no directory is read" }
       ],
-      "debt": [
-        { "path": "src/setup/registrations.mjs", "reason": "doctor claims/skills walk (allAgentYamlFiles, readAgentSkills) re-walks the tiers and reads the project's own domains/; moved after the capability plan rewrites the file" }
-      ],
+      "debt": [],
       "reason": "one module knows the tier directories and their order"
     },
     {
