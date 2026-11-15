@@ -8,10 +8,12 @@
 // all), `outside` (a directory that is no repository), `linked` (a linked worktree of `repo`), `legacy` (a project
 // whose config is still the legacy JSON file), `other` (a second project `--dir` can name), `mailbox` (a project that
 // opted in to the mailbox), `timers` (opted in, with cross-machine mail and both timer schedules on), `badcfg` (a
-// project whose config file cannot be read).
+// project whose config file cannot be read), `remote` (a project with a Git remote), `clone` (a clone of this
+// repository).
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
 import { strict as assert } from 'node:assert';
 
@@ -47,6 +49,12 @@ const SPAWN_ARTEFACT_ROWS = ['identity-machine-id', 'identity-machine-key', 'ide
 add('dir-that-does-not-exist', [call(['--dir', '/nonexistent/fgos-parity-project'])], { ignoreRows: SPAWN_ARTEFACT_ROWS });
 add('dir-empty', [call(['--dir', ''])]);
 add('dir-bare', [call(['--dir'])]);
+
+// The Git and Event Store rows over the shapes of repository they judge.
+add('git-remote-without-mapping', [{ do: 'remoteProject' }, call([], { cwd: 'remote' }), call(['--fix'], { cwd: 'remote' }), { do: 'gitConfig', cwd: 'remote' }], { disk: true });
+add('git-obsolete-fetch-mapping', [{ do: 'remoteProject', obsolete: true }, call([], { cwd: 'remote' }), call(['--fix'], { cwd: 'remote' }), { do: 'gitConfig', cwd: 'remote' }, call([], { cwd: 'remote' })], { disk: true });
+add('git-merge-in-progress-and-native-lock', [{ do: 'mergeAndLock' }, call([])]);
+add('clone-of-this-repository', [{ do: 'cloneThisRepository' }, call([], { cwd: 'clone' })]);
 
 // Writing: `--fix` runs every fix first and judges the rows after the repair.
 add('fix', [call(['--fix'])], { disk: true });
@@ -191,6 +199,30 @@ function act(world, step) {
     case 'openLockDirs':
       for (const dir of [path.join(world.repo, '.fgos', 'locks'), path.join(world.state, 'locks')]) fs.chmodSync(dir, 0o775);
       return null;
+    case 'remoteProject': {
+      world.remote = path.join(world.root, 'remote');
+      fs.mkdirSync(world.remote);
+      initFixtureRepo(world.remote);
+      const bare = path.join(world.root, 'remote.git');
+      execFileSync('git', ['init', '--bare', '-q', bare], { stdio: 'ignore' });
+      const git = (...args) => execFileSync('git', ['-C', world.remote, ...args], { stdio: 'ignore' });
+      git('remote', 'add', 'origin', bare);
+      // The pre-wildcard legacy mapping breaks a plain fetch when the remote has no such ref.
+      if (step.obsolete) git('config', '--add', 'remote.origin.fetch', '+refs/fgos/legacy:refs/fgos/remotes/origin/legacy');
+      return null;
+    }
+    case 'mergeAndLock': {
+      const head = execFileSync('git', ['-C', world.repo, 'rev-parse', 'HEAD'], { encoding: 'utf8' }).trim();
+      fs.writeFileSync(path.join(world.repo, GIT_DIR, 'MERGE_HEAD'), `${head}\n`);
+      fs.writeFileSync(path.join(world.repo, GIT_DIR, 'index.lock'), '');
+      return null;
+    }
+    case 'cloneThisRepository':
+      world.clone = path.join(world.root, 'clone');
+      execFileSync('git', ['clone', '-q', '--local', fileURLToPath(new URL('../../../', import.meta.url)), world.clone], { stdio: 'ignore' });
+      return null;
+    case 'gitConfig':
+      return execFileSync('git', ['-C', world[step.cwd], 'config', '--get-all', 'remote.origin.fetch'], { encoding: 'utf8' }).trim();
     case 'storeAppeared':
       return `store ${fs.existsSync(path.join(world[step.cwd], '.fgos')) ? 'exists' : 'absent'}`;
     case 'observeAppeared':
@@ -265,6 +297,8 @@ const cwdOf = (world, name = 'repo') => ({
   mailbox: world.mailbox,
   timers: world.timers,
   badcfg: world.badcfg,
+  remote: world.remote,
+  clone: world.clone,
 })[name] ?? assert.fail(`unknown cwd ${name}`);
 
 /** The release, host binary and manifest an entry runs from, as text to replace. */
@@ -289,6 +323,11 @@ function normaliser(world, entry) {
       .replace(/(fgos-(?:mailbox-sync|account-probe))-[0-9a-f]{8}/g, '$1-<STEM>')
       // The config file's own documentation comment: the base names the retired `setup` verb in the mailbox.enabled sentence.
       .replace('Whether fgos setup and doctor --fix install the mailbox hook rows into this project\'s Claude Code and Codex hook files; false removes the rows they installed.', 'Whether fgos doctor --fix installs the mailbox hook rows into this project\'s Claude Code and Codex hook files; false removes the rows it installed.')
+      // The hooks row's remedy names the command that wires the hooks path, not the retired `setup`.
+      .replace(/run npm run setup:hooks/g, 'run fgos setup')
+      // The floor row no longer names the Node version (Node is the bridged rows' runtime, reported by them).
+      .replace(/"message": "node v\d+\.\d+\.\d+, git available"/g, '"message": "git available"')
+      .replace(/\(node v\d+\.\d+\.\d+, git available\)/g, '(git available)')
       .replace(UUID, '<UUID>')
       // The machine id a fix mints is random after the host's name.
       .replace(new RegExp(`${MACHINE_ID_SLUG}-[a-z2-7]{6}\\b`, 'g'), '<MACHINE-ID>')
@@ -346,8 +385,13 @@ function describe(text, ignoreRows = [], accepted = null, side = 'host') {
     ok: data.ok,
     next: data.next,
     fixed: data.fixed,
-    rows: data.checks.filter(({ id }) => !RETIRED_ROWS.has(id)).map(({ id, status, passed, fix, message, detail, description }) => {
+    // The compatibility row's `detail.versions` listed the Node addon's own component versions; the host has no addon, so
+    // it lists the Git component's (accepted change); the floor in `detail` is compared.
+    rows: data.checks.filter(({ id }) => !RETIRED_ROWS.has(id)).map(({ id, status, passed, fix, message, detail: rawDetail, description }) => {
       if (ignoreRows.includes(id)) return { id, description };
+      const detail = id === 'git-component-compatible' && rawDetail ? { ...rawDetail, versions: undefined }
+        // How much finished-operation history the journal holds, and since when, depends on when the run was.
+        : id === 'git-operation-journal' && rawDetail?.journal ? { ...rawDetail, journal: { ...rawDetail.journal, retainedBytes: '<n>', oldestRetainedAtMs: '<ms>' } } : rawDetail;
       if (accepted?.rows.includes(id)) {
         assert.match(message, accepted[side], `${id}: the ${side} text of the accepted difference`);
         return { id, status, passed, fix, message: '<ACCEPTED TEXT>', detail, description };
@@ -406,6 +450,14 @@ export async function runPreparedCase(entryA, entryB, testCase) {
     const same = (left, right, what) => {
       try { assert.deepEqual(left, right); } catch (error) { differences.push(`${what} differ: ${error.message.split('\n').slice(0, 60).join('\n')}`); }
     };
+    // Name the rows that differ first: a deep-equal of two whole reports hides them behind skipped lines.
+    host.outputs.forEach((output, at) => {
+      const rowsOf = (call) => Object.fromEntries((call?.stdout?.rows ?? []).map((row) => [row.id, row]));
+      const [mine, theirs] = [rowsOf(output), rowsOf(base.outputs[at])];
+      for (const id of new Set([...Object.keys(mine), ...Object.keys(theirs)])) {
+        if (JSON.stringify(mine[id]) !== JSON.stringify(theirs[id])) differences.push(`row ${id} (call ${at}) host ${JSON.stringify(mine[id])} base ${JSON.stringify(theirs[id])}`);
+      }
+    });
     same(host.outputs, base.outputs, 'the calls');
     same(host.outsideStore, base.outsideStore, 'whether a .fgos appeared outside any repository');
     if (testCase.disk) same(host.disk, base.disk, 'what the run left on disk');

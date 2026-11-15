@@ -263,11 +263,11 @@ fn event_store_mapping_problems(run: &Run) -> Vec<String> {
             .any(|r| !provenance_refspecs.contains(r))
     {
         return vec![
-            "event-store-refspec-missing: no Git mapping provenance; run fgos doctor --fix".into(),
+            "event-store-refspec-missing: the mirror fetch mappings are not recorded for this remote: the recorded mappings are missing or differ from the wanted set".into(),
         ];
     }
     if provenance["url"] != facts["remoteFact"]["url"] {
-        return vec!["event-store-remote-changed; run fgos doctor --fix".into()];
+        return vec!["event-store-remote-changed: the fetch mapping provenance records another remote URL than the remote has now".into()];
     }
     Vec::new()
 }
