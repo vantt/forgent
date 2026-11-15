@@ -91,14 +91,14 @@ function context() {
   };
 }
 
-/** The runs of `cli` in the plan's interleaved order: one of each scenario still owed, round by round. */
+/** The runs of `cli` in the plan's interleaved order: one of each cell still owed, round by round. */
 export function schedule(cli, results) {
-  const done = (scenario) => results.filter((r) => r.cli === cli && r.scenario === scenario).length;
+  const done = (cell) => results.filter((r) => r.cli === cli && r.scenario === cell.scenario && (r.arm ?? 'with-instruction') === ack.armOf(cell)).length;
   const order = [];
-  for (let round = 0; round < Math.max(...Object.values(ack.PLAN)); round += 1) {
-    for (const [scenario, n] of Object.entries(ack.PLAN)) if (round < n) order.push({ cli, scenario, n: round + 1 });
+  for (let round = 0; round < Math.max(...ack.PLAN.map((c) => c.n)); round += 1) {
+    for (const cell of ack.PLAN) if (round < cell.n) order.push({ cli, scenario: cell.scenario, instruction: cell.instruction, n: round + 1 });
   }
-  return order.filter((o) => o.n > done(o.scenario));
+  return order.filter((o) => o.n > done(o));
 }
 
 async function cmdRun(cli, count, { from, until }) {
@@ -108,7 +108,7 @@ async function cmdRun(cli, count, { from, until }) {
   const { left, asides, unsettled } = confined.sweepOrphans(BASE);
   if (left.length || asides.length || unsettled.length) die(`orphans left: ${JSON.stringify({ left, asides, unsettled })}`);
   const todo = schedule(cli, runs.readResults(RESULTS)).slice(0, count);
-  for (const { scenario, n } of todo) {
+  for (const { scenario, instruction, n } of todo) {
     if (until && Date.now() >= Date.parse(until)) {
       say(`stopped at ${until}`);
       return;
@@ -123,7 +123,7 @@ async function cmdRun(cli, count, { from, until }) {
       die(`login: ${error.message}`);
     }
     const started = new Date().toISOString();
-    const { line, stop } = await ack.runPair(ctx, { cli, scenario }, `ack.${cli}.${scenario}.${String(n).padStart(3, '0')}`);
+    const { line, stop } = await ack.runPair(ctx, { cli, scenario, instruction }, `ack.${cli}.${scenario}${instruction ? '' : '-frameonly'}.${String(n).padStart(3, '0')}`);
     say(`${started} ${line.runId}: ${line.endReason}; request ${line.requestSent}, acked ${line.acked}, ack reached ${line.ackReached}, sender silent ${line.senderSilent}, ${line.totalMessages} messages, cost ${line.usage?.costUsd ?? 'n/a'}`);
     if (stop) die(stop);
   }
@@ -133,7 +133,7 @@ function cmdReport() {
   const lines = runs.readResults(RESULTS);
   for (const r of ack.summarize(lines)) {
     const pct = ([lo, hi]) => `${Math.round(lo * 100)}-${Math.round(hi * 100)}%`;
-    say(`${r.cli}/${r.scenario}: runs ${r.runs} (errors ${r.errors}), valid ${r.valid}; acked ${r.acked}/${r.valid} ${pct(r.ackedCi)}; ack reached sender ${r.reached}; sender silent ${r.silentOfReached}/${r.reached} ${pct(r.silentCi)}; ack-on-ack ${r.ackOnAck}; invocations ${r.invocations}; cost ${r.costUsd.toFixed(3)} usd`);
+    say(`${r.cli}/${r.scenario}/${r.arm}: runs ${r.runs} (errors ${r.errors}), valid ${r.valid}; acked ${r.acked}/${r.valid} ${pct(r.ackedCi)}; ack reached sender ${r.reached}; sender silent ${r.silentOfReached}/${r.reached} ${pct(r.silentCi)}; ack-on-ack ${r.ackOnAck}; invocations ${r.invocations}; cost ${r.costUsd.toFixed(3)} usd`);
   }
 }
 

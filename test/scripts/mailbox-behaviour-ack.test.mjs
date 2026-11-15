@@ -52,7 +52,7 @@ test('the interval of nothing observed is the whole range and of all observed st
 });
 
 test('the plan is 40 runs per CLI and only the flagged scenarios carry the flag', () => {
-  assert.equal(Object.values(ack.PLAN).reduce((a, b) => a + b, 0), 40);
+  assert.equal(ack.PLAN.reduce((a, c) => a + c.n, 0), 40);
   assert.deepEqual(Object.fromEntries(Object.entries(ack.FLAGGED)), { info: true, work: true, control: false });
   assert.ok(ack.SCENARIOS.info.includes('--need-ack') && !/with --need-ack/.test(ack.SCENARIOS.control));
 });

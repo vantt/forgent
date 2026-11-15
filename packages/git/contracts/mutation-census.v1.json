@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "8491f7a335da751b2540b429401c7e14dffc451db19d9bc7637269223412ee0f",
+  "payloadDigest": "4c396f82c24e6037e2b1acb11bef3d512e1ca19d888b1d1dffd28a6dc0fe3370",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "a5629383f89b4488b252a62f0ea86463e649e33e0a891db1a19af2cd6c136aca",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -885,7 +885,7 @@
     "scripts/lib/git-spawn-match.mjs": "45403263d2d8bbd51068f6db07866fe3cb15efd6bbf61bccb4a074322dfbceae",
     "scripts/lib/is-main-module.mjs": "e39f98fb73a497be73b7d92f0335d9f0c88eb627a77f2ab964f9c7034f711a45",
     "scripts/lib/js-source-lexer.mjs": "3effa44590fde482bbc593d49fa46fac7f5519198232fe56c704f09508a071a4",
-    "scripts/lib/mailbox-behaviour-ack.mjs": "836aedfdbb8ac40f745f8e4e19202cf7e1352ce12b8a02273006ee5ff8773e62",
+    "scripts/lib/mailbox-behaviour-ack.mjs": "cc76706dcc69b25ce3067162fdda87c30dbf632c16426421101b04c064ee5200",
     "scripts/lib/mailbox-behaviour-run.mjs": "e4f2904c8d53726e1b48529079c9050ecad6e542f29f82295e50255361bacfe4",
     "scripts/lib/mailbox-behaviour-score.mjs": "84dc8fb0e49fb2da8e331ab6302f6a6055ec7abf1eb3993746502aecf1afe36e",
     "scripts/lib/mailbox-behaviour-v7.mjs": "3fe42c79f56a07e707bda26c74f2bc6cd0d12dc035229af403db1e5c23996961",
