@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "49b6909bde3868d4fd11bd4e462eda1e84bee432246fdb83eb4bfb832d8786e3",
+  "payloadDigest": "85fd253d70ad76a6bfad3366c2dcebc80f1009d41e2f573c174afda0e595ad2e",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "a5629383f89b4488b252a62f0ea86463e649e33e0a891db1a19af2cd6c136aca",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -903,10 +903,12 @@
     "scripts/lib/test-file-cpu.mjs": "f54eb34a6f6f01607c123fbeb04d1a8be61805c7fe687f7887a0adac2068e4a7",
     "scripts/lib/test-file-watchdog.mjs": "90fe256c808c268d8039136a225b4517a9cc1290a530fa503158f6ba2bcb7211",
     "scripts/lib/test-git-config-guard.mjs": "e9bc333d889985d94b847fd80fbfed7e6dcfa1e9b2ffffc97a14e7be326153d1",
+    "scripts/lib/test-shards.mjs": "1a157a920efe2951f98d37d1b4ed2c823e2289fa87e91642e1798817a524a166",
     "scripts/list-doc-anchors.mjs": "fe4d901d266dc9d93e8a405051b618210f17808cc10f29663d48ad55a13e253f",
     "scripts/main-checkout-delete-guard-hook.mjs": "1441b87ef8661132314d89ec1d534a6049cfcf2bc088ca789e5a50fd68ec02be",
     "scripts/measure-p08-performance.mjs": "2ab686e2e3f880f584a2f9278a6bbb27a49d71effcdb65215f1cbd3865099e3e",
     "scripts/measure-verify-cost.mjs": "97768198548908742f0687b069fbe77dfc35839a88e4906f3813afbdd5918abc",
+    "scripts/merge-test-shards.mjs": "6c4136fee878260d0ed1f42a5e675a55975554e64869ae5d43c71ef4e670e980",
     "scripts/package-release-assets.mjs": "60efb629a7ebfe1143445557c55abfa4b3269286a0498754a28dddb662a70fd0",
     "scripts/prepare-release.mjs": "0bd2e6e7514ba4de781ad480889a8f701729a1d4b9d80d5f5af7b2f1de1160aa",
     "scripts/previous-release-tag.mjs": "d79809904f630061da723099f65817f18367462d1d9d64982426c58eb05d6a0f",
@@ -916,10 +918,10 @@
     "scripts/regenerate-observe-fixtures.mjs": "e1ab4a029ae9aecf5485393a3f6e967f1e338862391a6b1701ed1954c57b40ee",
     "scripts/run-rust-dev-host.mjs": "54108fe41cb34a3bf60c01a98ab42368e12c0772dcdb707eea9cd28251d66289",
     "scripts/run-test-canary.mjs": "ef25e2f8237ffefddbf707c68289c0fe00ee95bd10da6a51a80fd965b30c42ba",
-    "scripts/run-tests.mjs": "537a5f870984a0b87e935a5fcef6567b708dcb5c3fc72b2d7c57f9030ce954a0",
+    "scripts/run-tests.mjs": "4de545cd0358ff63b4d7b5b5b5869b54913643e2dcdba6bee397cce8afc6a216",
     "scripts/stress-test-files.mjs": "1c9298587bae21b5971c2e1eba5effd3c2a0c85ba94372936fa5e0c1d70d4f4e",
     "scripts/test-ownership-lint.mjs": "1917bcc0ec0387e43d4e09dc3bc1e6a5923e30b4c3848cf480df9eb0c2c042e2",
-    "scripts/test-proof-inventory.mjs": "002c3b089c9eb270dfbfb5505840b212784de1d83ef4d1be6c033df0b6ef9803",
+    "scripts/test-proof-inventory.mjs": "fb8d24de073f628cd1cea540af8d39b55ec55d4199543ddf9cb062941a243e70",
     "scripts/test-select-compare.mjs": "45ec5c8f1b192430431127a06133376cd5e5d2a50f8e6865472c1ae341ae1329",
     "scripts/test-select-coverage-map.mjs": "b313d02cce6c8fa7f03dae8acdfd14a37b8f3a04b330ae9b2c144d0287b08e85",
     "scripts/test-select-mutate.mjs": "77d8bc7ae624453d5c50d6f83d3136ef41803f69452cef41c8fd14587cd4df39",
@@ -3550,22 +3552,22 @@
     },
     {
       "path": "scripts/run-tests.mjs",
-      "line": 139,
+      "line": 140,
       "spawn": "loadNativeAddon -> src/git/index.mjs:10",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "scripts/test-proof-inventory.mjs",
-      "line": 666,
-      "spawn": "median -> scripts/test-proof-inventory.mjs:661",
+      "line": 691,
+      "spawn": "median -> scripts/test-proof-inventory.mjs:686",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
     },
     {
       "path": "scripts/test-proof-inventory.mjs",
-      "line": 704,
-      "spawn": "cliCost -> scripts/test-proof-inventory.mjs:666",
+      "line": 729,
+      "spawn": "cliCost -> scripts/test-proof-inventory.mjs:691",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
     },
