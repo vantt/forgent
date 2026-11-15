@@ -17,6 +17,30 @@ use std::future::Future;
 use std::path::PathBuf;
 use std::pin::Pin;
 
+/// A Git driver failure as a person reads it: the cause, then what Git said.
+pub fn describe_operation_error(error: &fgos_git::OperationError) -> String {
+    let text = String::from_utf8_lossy(&error.stderr).trim().to_owned();
+    if text.is_empty() {
+        error.cause.clone()
+    } else {
+        format!("{}: {text}", error.cause)
+    }
+}
+
+/// Creates and trusts the Git WAL of the repository at `root` (opening it is what makes it trusted), through the
+/// one call both `fgos init` and the `git-wal-dir` doctor fix make. `Ok(false)` when `root` is no repository.
+pub fn open_wal(driver: &fgos_git::GitDriver, root: &std::path::Path) -> Result<bool, String> {
+    match driver
+        .resolve_repo(root, root)
+        .map_err(|error| describe_operation_error(&error))?
+    {
+        fgos_git::ResolveRepo::Repository(repo) => fgos_git::wal::Wal::open(&repo)
+            .map(|_| true)
+            .map_err(|error| error.to_string()),
+        _ => Ok(false),
+    }
+}
+
 pub const STATUS_OPERATION_ID: &str = "git.status";
 pub const RECOVER_OPERATION_ID: &str = "git.recover";
 

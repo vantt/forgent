@@ -8,7 +8,9 @@
 //! 4. the harness coexistence manifest;
 //! 5. the header-only config files of the project and the machine;
 //! 6. the headless-repository notice;
-//! 7. the recovery of an interrupted Git operation (`fgos-git`).
+//! 7. the Git WAL of the repository, created and trusted (`fgos-git`), so a fresh project's first doctor finds the
+//!    journal ready;
+//! 8. the recovery of an interrupted Git operation (`fgos-git`).
 //!
 //! Only the first three steps refuse; every later one is fail-safe, so a quirk there still leaves `.fgos/`
 //! initialised. The order lives in [`run`], over the [`Steps`] port; [`Live`] is the port's one adapter.
@@ -120,6 +122,8 @@ pub trait Steps {
     fn create_config_files(&self, root: &Path) -> Value;
     /// Whether HEAD names no commit (zero commits, an unreadable ref).
     fn headless(&self, root: &Path) -> bool;
+    /// Creates and trusts the repository's Git WAL; nothing to do when the directory is no repository.
+    fn initialize_git_wal(&self, root: &Path) -> Result<(), String>;
     /// `Ok(None)` when nothing was recovered or kept.
     fn recover_git(&self, root: &Path) -> Result<Option<Value>, String>;
 }
@@ -143,6 +147,8 @@ pub struct InitData {
     pub config: Value,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub git_headless: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub git_wal_warning: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub git_recovery: Option<Value>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -180,6 +186,10 @@ pub fn run(steps: &dyn Steps, root: &Path) -> Result<Done, CategorisedRefusal> {
     let detected_harnesses = steps.write_coexistence(root, &data_dir);
     let config = steps.create_config_files(root);
     let git_headless = steps.headless(root).then_some(true);
+    let git_wal_warning = steps
+        .initialize_git_wal(root)
+        .err()
+        .map(|cause| format!("Git WAL not initialised: {cause}; `fgos doctor` names the repair"));
     let (git_recovery, git_recovery_warning) = match steps.recover_git(root) {
         Ok(recovery) => (recovery, None),
         Err(cause) => (
@@ -199,6 +209,7 @@ pub fn run(steps: &dyn Steps, root: &Path) -> Result<Done, CategorisedRefusal> {
         work_store_note: (!work_store).then_some(WORK_STORE_NOTE),
         config,
         git_headless,
+        git_wal_warning,
         git_recovery,
         git_recovery_warning,
     })))
@@ -306,6 +317,12 @@ impl Steps for Live {
             }
             _ => true,
         }
+    }
+
+    fn initialize_git_wal(&self, root: &Path) -> Result<(), String> {
+        let driver = fgos_git::GitDriver::new(&self.state_root)
+            .map_err(|error| super::git_incidents::describe_operation_error(&error))?;
+        super::git_incidents::open_wal(&driver, root).map(|_| ())
     }
 
     fn recover_git(&self, root: &Path) -> Result<Option<Value>, String> {
@@ -627,6 +644,7 @@ mod tests {
         recovery: Option<Result<Option<Value>, String>>,
         interrupted: Option<i32>,
         work_failure: Option<StepFailure>,
+        wal_failure: Option<String>,
     }
 
     impl Fake {
@@ -675,6 +693,10 @@ mod tests {
             self.calls.borrow_mut().push("head");
             self.headless
         }
+        fn initialize_git_wal(&self, _: &Path) -> Result<(), String> {
+            self.calls.borrow_mut().push("git-wal");
+            self.wal_failure.clone().map_or(Ok(()), Err)
+        }
         fn recover_git(&self, _: &Path) -> Result<Option<Value>, String> {
             self.calls.borrow_mut().push("git-recovery");
             self.recovery.clone().unwrap_or(Ok(None))
@@ -705,9 +727,26 @@ mod tests {
                 "coexistence",
                 "config-files",
                 "head",
+                "git-wal",
                 "git-recovery"
             ]
         );
+    }
+
+    #[test]
+    fn a_git_wal_that_cannot_be_created_is_a_warning_and_the_recovery_still_runs() {
+        let fake = Fake {
+            wal_failure: Some("the directory is not private".into()),
+            ..Fake::default()
+        };
+        let answer = data(run(&fake, Path::new("/p")));
+        assert_eq!(
+            answer.git_wal_warning.as_deref(),
+            Some("Git WAL not initialised: the directory is not private; `fgos doctor` names the repair")
+        );
+        assert_eq!(fake.calls().last(), Some(&"git-recovery"));
+        let ok = data(run(&Fake::default(), Path::new("/p")));
+        assert_eq!(ok.git_wal_warning, None);
     }
 
     #[test]
@@ -722,6 +761,7 @@ mod tests {
                 "coexistence",
                 "config-files",
                 "head",
+                "git-wal",
                 "git-recovery"
             ]
         );

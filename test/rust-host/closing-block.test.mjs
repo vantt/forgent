@@ -153,9 +153,8 @@ test('a clean doctor ends the tail after init and one doctor run, and a rerun of
       const env = { HOME: home, PATH, CANNED_DOCTOR: JSON.stringify(CANNED.ok), CALL_LOG: log };
       const first = runFgctlRaw(['init', '--from', release.dir], { cwd: proj, stateHome: state, env });
       assert.equal(first.status, 0, first.stderr);
-      // A fresh project's Git journal is not initialised by `init`, so its first doctor names `doctor --fix`; the
-      // fix makes it, and every later run finds a clean doctor.
-      assert.deepEqual(calls(log), ['doctor work-store-init', 'doctor check', 'doctor fix', 'doctor check', 'doctor check'], 'init always runs (it asks the bridge for the Work store)');
+      // `init` creates the Git journal, so a fresh project's first doctor is clean: init, then one doctor run.
+      assert.deepEqual(calls(log), ['doctor work-store-init', 'doctor check'], 'init always runs (it asks the bridge for the Work store)');
       fs.rmSync(log);
 
       for (const args of [['init', '--from', release.dir], ['upgrade', '--from', release.dir]]) {

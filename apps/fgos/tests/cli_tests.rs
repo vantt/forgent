@@ -3989,6 +3989,60 @@ fn init_makes_the_machine_and_project_files_in_process_and_asks_node_only_for_th
     let _ = fs::remove_dir_all(&node_dir);
 }
 
+/// After a fresh `init` the Git journal exists and is trusted, so the first doctor of the project finds the
+/// `git-operation-journal` row passing and has no Git fix to name.
+#[cfg(unix)]
+#[test]
+fn after_a_fresh_init_the_git_journal_row_passes_and_no_git_fix_is_named() {
+    let world = InitWorld::new("fgos_init_wal");
+    // The controller's activation fence is what `fgctl` places when it activates the release, before the tail runs.
+    let fence = world.project.join(".fgos/locks/activation.lock");
+    fs::create_dir_all(&fence).unwrap();
+    fs::write(
+        fence.join("TOMBSTONE"),
+        "{\"at\":\"fixture\",\"v\":1,\"lock\":\"activation\",\"by\":\"fgos git\"}\n",
+    )
+    .unwrap();
+    let request = world.base.join("request.json");
+    let (node_dir, path) = bridge_node(
+        "fgos_init_wal_node",
+        &request,
+        &format!("[ \"$1\" = --version ] && {{ echo v22.0.0; exit 0; }}\n{BRIDGE_END_LINE}"),
+    );
+    // The scripted node answers the version probe, then the bridge request.
+    let first = world.data(&world.init(&path, &["--json"]));
+    assert!(first.get("gitWalWarning").is_none(), "{first}");
+
+    let output = Command::new(fgos_bin())
+        .args(["doctor", "--json"])
+        .current_dir(&world.project)
+        .env("PATH", &path)
+        .env("HOME", &world.home)
+        .env("FGOS_STATE_ROOT", &world.state)
+        .env("FGOS_ACTIVE_RELEASE_PATH", repo_root())
+        .env("FGOS_ACTIVE_MANIFEST_PATH", ensure_dev_manifest())
+        .output()
+        .expect("failed to execute fgos");
+    let envelope: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
+    let checks = envelope["data"]["checks"].as_array().unwrap();
+    let journal = checks
+        .iter()
+        .find(|row| row["id"] == "git-operation-journal")
+        .expect("the journal row is in the report");
+    assert_eq!(journal["passed"], true, "{journal}");
+    assert!(
+        !envelope["data"]["next"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|entry| entry.as_str().is_some_and(|s| s.contains("git-wal"))),
+        "{}",
+        envelope["data"]["next"]
+    );
+    let _ = fs::remove_dir_all(&world.base);
+    let _ = fs::remove_dir_all(&node_dir);
+}
+
 #[cfg(unix)]
 const TOKEN: &str = "SENTINEL-4417";
 

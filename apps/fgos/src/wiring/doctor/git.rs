@@ -4,11 +4,12 @@
 //! `git-incidents` points to.
 
 use super::{Rows, Run};
+use crate::wiring::git_incidents::describe_operation_error as describe;
 use fgos_config::event_store::EventStoreConfig;
 use fgos_distribution::doctor::{FixResult, RowOutcome, RowResult, Status};
 use fgos_git::incidents::{FactError, JournalFacts};
 use fgos_git::repository_facts::{inspect_repository, Inspection, RepositoryFacts};
-use fgos_git::{granted_fetch_mappings, GitDriver, OperationError, RepositoryConfig, ResolveRepo};
+use fgos_git::{granted_fetch_mappings, GitDriver, RepositoryConfig, ResolveRepo};
 use serde_json::{json, Value};
 use std::cell::OnceCell;
 use std::path::{Path, PathBuf};
@@ -67,16 +68,6 @@ pub struct Context {
 }
 
 pub type Cache = OnceCell<Result<Context, String>>;
-
-/// A Git refusal as one readable sentence: its cause plus the decoded stderr text.
-fn describe(error: &OperationError) -> String {
-    let text = String::from_utf8_lossy(&error.stderr).trim().to_owned();
-    if text.is_empty() {
-        error.cause.clone()
-    } else {
-        format!("{}: {text}", error.cause)
-    }
-}
 
 fn describe_fact(error: &FactError) -> String {
     match error {
@@ -616,14 +607,9 @@ fn initialize_wal(run: &Run) -> Result<(bool, String), String> {
     };
     let facts = repository(&context).expect("read_before keeps a repository");
     let initialized_before = facts.journal.initialized;
-    let ResolveRepo::Repository(repo) = context
-        .driver
-        .resolve_repo(&context.root, &context.root)
-        .map_err(|e| describe(&e))?
-    else {
+    if !crate::wiring::git_incidents::open_wal(&context.driver, &context.root)? {
         return Ok((false, NOT_A_REPOSITORY.to_owned()));
-    };
-    fgos_git::wal::Wal::open(&repo).map_err(|e| e.to_string())?;
+    }
     Ok((
         !initialized_before,
         "Git WAL initialized and trusted".to_owned(),
@@ -709,6 +695,7 @@ pub fn fix(run: &Run, id: &str) -> Option<FixResult> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use fgos_git::OperationError;
 
     fn journal(
         chains: usize,

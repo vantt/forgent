@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "ae0c4951d35ddbf007dafebdef16188c544c1b155bc35184a3c1170f62525c2b",
+  "payloadDigest": "f7aa857f11993f3824ac5e90f369a356fa502786e6d311b8310927a866332e2e",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "b8b886cee2ea5ce7ee1153e4795512db135a990de894c27e53c5e778b210be62",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -94,7 +94,7 @@
     "apps/fgos/src/wiring/doctor/bridge.rs": "d7dde36a8daf4b3df410eaa605f282f8e1f7c0d4be8ca4b641560518ecdaeb9f",
     "apps/fgos/src/wiring/doctor/config.rs": "97a5d1653dccc89f3788232544fe4bbd640b91fb24c5f592fcce075862c91273",
     "apps/fgos/src/wiring/doctor/event_store.rs": "61c66e050710eb6ea4aa2f8cb4643bdf91f8cd63bb482f1674de4614edf46e34",
-    "apps/fgos/src/wiring/doctor/git.rs": "0bf6550c94737c88e3f142b7cf6b1f2622bd4a6b5d6565bfd86e9e32e34c2218",
+    "apps/fgos/src/wiring/doctor/git.rs": "75552c9cc14e21920f31b78fdfc394b8997fa8e3b16362737835ef589ffed259",
     "apps/fgos/src/wiring/doctor/holder_lock.rs": "75b6efcf2c782e6508595d5049214226a5ffedefe73b3dc7f6ea018fd89bc232",
     "apps/fgos/src/wiring/doctor/identity.rs": "c77b8f84fb27f10717b264bb839e5c79dd2a817d51263779bb7d233db9469a55",
     "apps/fgos/src/wiring/doctor/mailbox.rs": "8de4fb5222d9cba45cf7a269e5bb18cb2cd804333c13316821d2ebde5c16219b",
@@ -104,9 +104,9 @@
     "apps/fgos/src/wiring/event_store_clone.rs": "923d718f7a6bd5705cbe6e4d4c8393672c1ef4a2142facc9ada314307a4d7574",
     "apps/fgos/src/wiring/events.rs": "472018eb9c3e76867d7e50f388de9248edd6803011972fa1f43eb72bf64a8386",
     "apps/fgos/src/wiring/gateway_control.rs": "60ed2789c9a7c7ffa6aa43abfc8020eec8b219e6c38540c458e8918321c88604",
-    "apps/fgos/src/wiring/git_incidents.rs": "4088a5ddb8dcad0685a3e2554fbadcee11854c0d3d00ce4d622ba5c124e8c371",
+    "apps/fgos/src/wiring/git_incidents.rs": "f5021920b0d59ab598d86b9756a57897debaea31bc65faa01a5b80238e0aeef8",
     "apps/fgos/src/wiring/identity_log.rs": "d7d9dd503ecbd84a5373aa27f6853996e6944aba2940d15e8284cd92c14eef7a",
-    "apps/fgos/src/wiring/init.rs": "93f80e98d703de5fec0e0186555faf2bed65b087765c5931d1ed554ceb65266d",
+    "apps/fgos/src/wiring/init.rs": "5177557222a34c380c796e9cccd3b16c65969df8c494bd6c678a38f16025863a",
     "apps/fgos/src/wiring/lock_fence.rs": "088ed1fae4f5d3becdd6b75d820a90f15ac5e255761f84e79246e467bbec97e8",
     "apps/fgos/src/wiring/lock_status.rs": "067bd9e25326f1142b82ce964a893a1db7c3f67af7f98632055c58b9e03831a1",
     "apps/fgos/src/wiring/mailbox_body.rs": "68910fba9f0e68ac08a823fb51e781f076395418656debaa61c316433cbaa977",
@@ -128,7 +128,7 @@
     "apps/fgos/src/wiring/session.rs": "f2569bef9f072e959f14673c2d2929e2b0b001540a4e147fd5e59082b2e64b43",
     "apps/fgos/src/wiring/uninstall.rs": "3a26ef78acee70ba6bae99ac15c10955809eecf62a5548df977de518ef77ccdd",
     "apps/fgos/src/wiring/wire_agents.rs": "a434308907a3e7d87c880ebf95a957e1342b77e83ebe1ee0272002335b7a248c",
-    "apps/fgos/tests/cli_tests.rs": "968de60f903120b597469e00613c7259010f92f7cc07fabe89093b9382fff9a7",
+    "apps/fgos/tests/cli_tests.rs": "0b6c707ade2867fdb9df2726adcc91f7511bc7edc85bda0b59625e0ed07250f6",
     "apps/fgos/tests/internal_lock_routes.rs": "e8516f4876c8263b1baa1f997bcfbb01715e69d740aa508fd01a0d481fee309e",
     "apps/fgos/tests/mailbox_routes.rs": "fe4bb33069a6f6eb6f02b052e4581fcfc69ce37dcdfd146280f9c935c14511a6",
     "apps/fgos/tests/mailbox_sync_child.rs": "047e70662085d6f91fa786c9000eb494711f610d37cd63a24f29dc884116763d",
@@ -2274,6 +2274,13 @@
       "class": "rust-test"
     },
     {
+      "path": "apps/fgos/tests/cli_tests.rs",
+      "line": 4016,
+      "spawn": "Command::new",
+      "binary": "? bin",
+      "class": "rust-test"
+    },
+    {
       "path": "apps/fgos/tests/internal_lock_routes.rs",
       "line": 423,
       "spawn": "Command::new",
@@ -3388,7 +3395,7 @@
       "spawn": "Command::new",
       "binary": "node",
       "class": "argv-runner",
-      "resolvedAt": "apps/fgos/src/wiring/doctor/git.rs:455"
+      "resolvedAt": "apps/fgos/src/wiring/doctor/git.rs:446"
     },
     {
       "path": "packages/process/rust/src/spawn.rs",
