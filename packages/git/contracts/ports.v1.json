@@ -109,7 +109,6 @@
     ]
   },
   "functions": [
-    "inspectGitWorktreeRecovery",
     "ensureGitFetchMapping",
     "gitFetchMappings",
     "prepareGitDriverDirectories",

@@ -301,6 +301,8 @@ test('umask 002 driver directories are created safely, repaired by the driver pr
     fs.symlinkSync(old, link);
     assert.equal(addon.prepareGitDriverDirectories(link), false);
     process.env.FGOS_STATE_ROOT = link;
+    // A symlinked state root is canonicalised and accepted by the driver.
+    assert.equal(addon.readGitStatus(link, repo).journal.error, undefined);
     fs.chmodSync(old, 0o775);
     assert.equal(addon.prepareGitDriverDirectories(link), true);
     assert.equal(mode(old), 0o755);
@@ -317,6 +319,7 @@ test('umask 002 driver directories are created safely, repaired by the driver pr
     fs.unlinkSync(path.join(hooks, 'foreign'));
     fs.chmodSync(hooks, 0o000);
     if (process.getuid() !== 0) {
+      assert.match(addon.readGitStatus(old, repo).journal.error, /restore owner read.search.*doctor --fix/);
       assert.throws(() => addon.prepareGitDriverDirectories(old), error => error.message.includes(hooks) && /restore owner read.search.*doctor --fix/.test(error.message));
     }
     fs.chmodSync(hooks, 0o700);
@@ -331,6 +334,8 @@ test('umask 002 driver directories are created safely, repaired by the driver pr
     const custom = path.join(root, 'custom');
     fs.mkdirSync(custom, {mode:0o700});
     process.env.FGOS_STATE_ROOT = custom;
+    // A custom 0700 state root is accepted by the driver.
+    assert.equal(addon.readGitStatus(custom, repo).journal.error, undefined);
     fs.copyFileSync(path.join(old, 'git-floor-verdict.json'), path.join(custom, 'git-floor-verdict.json'));
     fs.chmodSync(custom, 0o775);
     assert.equal(addon.prepareGitDriverDirectories(custom), true);

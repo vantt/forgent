@@ -1180,7 +1180,13 @@ mod tests {
         assert_eq!(fixed(&f, "git-publication-refspecs").changed, Some(false));
         f.git(&["config", "--add", "remote.upstream.fetch", &obsolete]);
         assert!(!row_of(&f, "git-repository-config").passed);
-        assert_eq!(fixed(&f, "git-publication-refspecs").changed, Some(true));
+        let last = fixed(&f, "git-publication-refspecs");
+        assert_eq!(last.changed, Some(true));
+        let text = last.message.unwrap();
+        assert!(
+            text.contains("upstream") && !text.contains("origin"),
+            "{text}"
+        );
         assert!(row_of(&f, "git-repository-config").passed);
     }
 

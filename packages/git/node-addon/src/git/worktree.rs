@@ -164,24 +164,3 @@ impl GitWorktree {
         }
     }
 }
-
-/// Read-only and independently extensible: custody diagnostics can add a row
-/// without changing worktree recovery or acquiring any mutation authority.
-#[napi]
-pub fn inspect_git_worktree_recovery(
-    state_root: String,
-    repo_path: String,
-    trusted_main: String,
-) -> Result<Value> {
-    check()?;
-    let driver = GitDriver::new(Path::new(&state_root)).map_err(operation)?;
-    let repo = match driver
-        .resolve_repo(Path::new(&repo_path), Path::new(&trusted_main))
-        .map_err(operation)?
-    {
-        ResolveRepo::Repository(r) => r,
-        _ => return Ok(json!({"notARepository":true})),
-    };
-    let facts = incidents::worktree_recovery_facts(&driver, &repo).map_err(super::fact_error)?;
-    Ok(json!(facts))
-}
