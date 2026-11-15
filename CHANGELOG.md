@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- `fgos mailbox status` now shows how many mailbox hook calls skipped their drain because the mailbox lock was busy (a line, only when the count is above zero), kept in `runtime/mailbox/hook-lock-busy.json`; a skipped call leaves its mail pending for the next call. The count may undercount when two skips race.
 - A document whose frontmatter is not valid YAML is now reported by file name by `fgos docs-index`, `fgos authoritative-match` and `fgos knowledge status`, instead of being read as having no frontmatter. Frontmatter is parsed by the one YAML door; `fgos setup` still copies a project skill whose frontmatter is not valid YAML without failing.
 - An unquoted `metadata.version` in a project skill (for example `version: 1.10`, read as a number) no longer protects the skill from being overwritten by `fgos setup`; a warning asks to quote it.
 - Removed `scripts/knowledge-migration.mjs` and `scripts/knowledge-classifier.mjs` from the payload; the one-time knowledge migration they ran is done.

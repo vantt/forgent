@@ -23,6 +23,7 @@ const BODIES_DIR: &str = "bodies";
 const BODY_SUFFIX: &str = ".body";
 const BREAKER_FILE: &str = "breaker.json";
 const HOOK_OUTCOME_FILE: &str = "hook-outcome.json";
+const HOOK_LOCK_BUSY_FILE: &str = "hook-lock-busy.json";
 const SYNC_LOG_FILE: &str = "sync.log";
 const TAKE_STAMP_FILE: &str = "mail-taken";
 /// The holder-lock registry row the record takes.
@@ -68,6 +69,17 @@ impl Paths {
     /// `record/`, written without the mailbox lock.
     pub fn hook_outcome(&self) -> PathBuf {
         self.mailbox_dir().join(HOOK_OUTCOME_FILE)
+    }
+
+    /// How many hook calls skipped their drain because the mailbox lock was
+    /// busy, beside `record/`, written without the mailbox lock.
+    pub fn hook_lock_busy(&self) -> PathBuf {
+        self.mailbox_dir().join(HOOK_LOCK_BUSY_FILE)
+    }
+
+    /// The lock-busy count file's name inside [`Paths::mailbox_dir`].
+    pub(crate) const fn hook_lock_busy_name() -> &'static str {
+        HOOK_LOCK_BUSY_FILE
     }
 
     /// The output of the detached sync child, beside `record/`, appended

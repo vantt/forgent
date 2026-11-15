@@ -1089,6 +1089,77 @@ fn a_call_that_skipped_or_failed_its_drain_leaves_its_reason_in_the_hook_outcome
 }
 
 #[test]
+fn a_hook_call_that_skips_its_drain_on_a_busy_lock_is_counted_and_a_call_that_drains_is_not() {
+    use fgos_mailbox::hook::outcome_log::{self, LockBusySkips};
+    use fgos_mailbox::record::Step;
+    let fgos = TempFgos::new("shell-lock-busy-count");
+    let record = fgos.record();
+    let paths = record.paths();
+    let head = Head::spawn();
+    let (stdin, _) = payload(files::POST_TOOL_USE);
+    let log = |outcome: &ShellOutcome, at: Timestamp| {
+        outcome_log::record(paths, Adapter::Claude, HookEvent::PostToolUse, outcome, at);
+    };
+
+    let ok = call(&record, &head, head.ancestry(), &stdin, &mut Vec::new(), T0);
+    log(&ok, T0);
+    assert_eq!(
+        outcome_log::lock_busy_skips(paths),
+        None,
+        "a drain is not a skip"
+    );
+
+    // A second handle holds the lock while the hook call waits its short cap.
+    let holder = fgos.record();
+    let mut skipped = Vec::new();
+    holder
+        .hold_observed(
+            Wait::Try,
+            T0,
+            &limits(),
+            |step| {
+                if step == Step::Locked {
+                    let outcome =
+                        call(&record, &head, head.ancestry(), &stdin, &mut Vec::new(), T0);
+                    skipped.push(outcome);
+                }
+                Ok(())
+            },
+            |state, ids| rec::register(state, "head-held", T0, &limits(), ids),
+        )
+        .unwrap();
+    let outcome = &skipped[0];
+    assert_eq!(
+        outcome.quiet,
+        Some(Quiet::Record(fgos_mailbox::record::LOCK_BUSY))
+    );
+    log(outcome, T0.plus_secs(1));
+    log(outcome, T0.plus_secs(2));
+    assert_eq!(
+        outcome_log::lock_busy_skips(paths),
+        Some(LockBusySkips {
+            count: 2,
+            last_at_ms: T0.plus_secs(2).as_millis()
+        })
+    );
+
+    let ok = call(&record, &head, head.ancestry(), &stdin, &mut Vec::new(), T0);
+    log(&ok, T0.plus_secs(3));
+    assert_eq!(
+        outcome_log::lock_busy_skips(paths).map(|s| s.count),
+        Some(2),
+        "a call that drains leaves the count alone"
+    );
+    let answer = fgos_mailbox::verbs::status(&fgos.fgos_dir(), T0, &limits());
+    assert_eq!(answer.json["hookLockBusy"]["count"], 2);
+    assert!(
+        answer.text.contains("skipped on a busy lock: 2"),
+        "{}",
+        answer.text
+    );
+}
+
+#[test]
 fn a_hook_call_names_the_head_it_bound_and_reports_it_as_registered_only_when_it_created_or_replaced_the_binding(
 ) {
     let fgos = TempFgos::new("shell-registered");
