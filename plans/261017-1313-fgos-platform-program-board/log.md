@@ -1,3 +1,4 @@
+- 2026-11-15 18:36 OPC: MERGE yaml-write-door/p07 a5285f3c9 (agent projection frontmatter through writeFrontmatter; stated byte change: skills as a block list, a description with ': ' quoted; no line-based reader of agent frontmatter; D1 title kept).
 - 2026-11-15 18:35 OPC: MERGE yaml-write-door/p03 52b4bf4f9 (knowledge registry frontmatter through writeFrontmatter, byte-identical, doc-registry --check clean).
 - 2026-11-15 18:34 OPC: MERGE yaml-write-door/p05 0b7a47a48 (case answer file frontmatter through writeFrontmatter, bytes unchanged on good rounds, malformed round fields coerced; case-runtime 20/20). Carry-over to the rebased head on a census-only range-diff.
 - 2026-11-15 18:28 OPC: MERGE yaml-write-door/p02 delta 4155b139d (release-tree pins the staged YAML door imports as node:util + native door; release-tree 4/4 with a release build).
