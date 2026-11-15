@@ -1,0 +1,107 @@
+{
+  "contract": "main-checkout-activity",
+  "version": 1,
+  "owner": "holder-lock (docs/platform/holder-lock/spec.md section 14, the main checkout's one door)",
+  "path": "<fgosDir>/runtime/main-checkout-activity.json",
+  "record": {
+    "v": "1",
+    "kind": "\"beacon\"",
+    "writer": "{ id: non-empty string or positive integer, source: string or null }",
+    "writtenAt": "positive safe integer, ms since the epoch",
+    "windowMs": "positive safe integer, the activity window the writer sets",
+    "auditPid": "integer, debugging only; liveness is never probed"
+  },
+  "readers": "A file that does not parse, or parses to anything else than the record above, is 'corrupt': the pre-commit hook fails open and overwrites it, lock-status reports it. Every reader (src/runner/main-checkout-activity.mjs, packages/holder-lock/rust/src/status.rs) answers the rows of vectors the same way.",
+  "vectors": [
+    {
+      "name": "a complete beacon",
+      "raw": "{\"v\":1,\"kind\":\"beacon\",\"writer\":{\"id\":\"session-1\",\"source\":\"pre-commit\"},\"writtenAt\":1700000000000,\"windowMs\":20000,\"auditPid\":4242}",
+      "valid": true
+    },
+    {
+      "name": "a numeric writer id",
+      "raw": "{\"v\":1,\"kind\":\"beacon\",\"writer\":{\"id\":4242},\"writtenAt\":1700000000000,\"windowMs\":20000,\"auditPid\":4242}",
+      "valid": true
+    },
+    {
+      "name": "a writer with no source",
+      "raw": "{\"v\":1,\"kind\":\"beacon\",\"writer\":{\"id\":\"s\"},\"writtenAt\":1700000000000,\"windowMs\":20000,\"auditPid\":4242}",
+      "valid": true
+    },
+    {
+      "name": "no auditPid",
+      "raw": "{\"v\":1,\"kind\":\"beacon\",\"writer\":{\"id\":\"session-1\",\"source\":\"pre-commit\"},\"writtenAt\":1700000000000,\"windowMs\":20000}",
+      "valid": true
+    },
+    {
+      "name": "not JSON",
+      "raw": "not json",
+      "valid": false
+    },
+    {
+      "name": "a JSON array",
+      "raw": "[1]",
+      "valid": false
+    },
+    {
+      "name": "JSON null",
+      "raw": "null",
+      "valid": false
+    },
+    {
+      "name": "an unknown version",
+      "raw": "{\"v\":2,\"kind\":\"beacon\",\"writer\":{\"id\":\"session-1\",\"source\":\"pre-commit\"},\"writtenAt\":1700000000000,\"windowMs\":20000,\"auditPid\":4242}",
+      "valid": false
+    },
+    {
+      "name": "another kind",
+      "raw": "{\"v\":1,\"kind\":\"lock\",\"writer\":{\"id\":\"session-1\",\"source\":\"pre-commit\"},\"writtenAt\":1700000000000,\"windowMs\":20000,\"auditPid\":4242}",
+      "valid": false
+    },
+    {
+      "name": "an empty writer id",
+      "raw": "{\"v\":1,\"kind\":\"beacon\",\"writer\":{\"id\":\"\"},\"writtenAt\":1700000000000,\"windowMs\":20000,\"auditPid\":4242}",
+      "valid": false
+    },
+    {
+      "name": "a zero writer id",
+      "raw": "{\"v\":1,\"kind\":\"beacon\",\"writer\":{\"id\":0},\"writtenAt\":1700000000000,\"windowMs\":20000,\"auditPid\":4242}",
+      "valid": false
+    },
+    {
+      "name": "a fractional writer id",
+      "raw": "{\"v\":1,\"kind\":\"beacon\",\"writer\":{\"id\":1.5},\"writtenAt\":1700000000000,\"windowMs\":20000,\"auditPid\":4242}",
+      "valid": false
+    },
+    {
+      "name": "a writer that is not an object",
+      "raw": "{\"v\":1,\"kind\":\"beacon\",\"writer\":\"s1\",\"writtenAt\":1700000000000,\"windowMs\":20000,\"auditPid\":4242}",
+      "valid": false
+    },
+    {
+      "name": "no writtenAt",
+      "raw": "{\"v\":1,\"kind\":\"beacon\",\"writer\":{\"id\":\"session-1\",\"source\":\"pre-commit\"},\"windowMs\":20000,\"auditPid\":4242}",
+      "valid": false
+    },
+    {
+      "name": "a zero writtenAt",
+      "raw": "{\"v\":1,\"kind\":\"beacon\",\"writer\":{\"id\":\"session-1\",\"source\":\"pre-commit\"},\"writtenAt\":0,\"windowMs\":20000,\"auditPid\":4242}",
+      "valid": false
+    },
+    {
+      "name": "a text windowMs",
+      "raw": "{\"v\":1,\"kind\":\"beacon\",\"writer\":{\"id\":\"session-1\",\"source\":\"pre-commit\"},\"writtenAt\":1700000000000,\"windowMs\":\"20000\",\"auditPid\":4242}",
+      "valid": false
+    },
+    {
+      "name": "a negative windowMs",
+      "raw": "{\"v\":1,\"kind\":\"beacon\",\"writer\":{\"id\":\"session-1\",\"source\":\"pre-commit\"},\"writtenAt\":1700000000000,\"windowMs\":-1,\"auditPid\":4242}",
+      "valid": false
+    },
+    {
+      "name": "a windowMs beyond a safe integer",
+      "raw": "{\"v\":1,\"kind\":\"beacon\",\"writer\":{\"id\":\"session-1\",\"source\":\"pre-commit\"},\"writtenAt\":1700000000000,\"windowMs\":9007199254740993,\"auditPid\":4242}",
+      "valid": false
+    }
+  ]
+}

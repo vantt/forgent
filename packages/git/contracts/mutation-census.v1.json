@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "b5cf6634e1eb885dc7dff74adca3faa84b222229439a85515d1e2439515ff652",
+  "payloadDigest": "1052e663b3e0cccf6b57b7e4d5a7a945f5c20940176ba3d86eb4ab69731ce5ab",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "a5629383f89b4488b252a62f0ea86463e649e33e0a891db1a19af2cd6c136aca",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -453,7 +453,7 @@
     "packages/holder-lock/rust/src/driver/windows.rs": "3ac02f1bb7fcac9d43f4ffa889fce4db6dfb467e8b851535c984de1c0dc78762",
     "packages/holder-lock/rust/src/helper.rs": "11c8764215d951d460a6d2c7bc52e679eb928fcf91eab4f9533406a59c632b24",
     "packages/holder-lock/rust/src/hot_record.rs": "eabfeb63df4eb278ce92282d41f2f1f6027a3ddc8fee145c867c19b4962a8e99",
-    "packages/holder-lock/rust/src/lib.rs": "c4686b7b423c975c1978fcf807e7217a9442dd5c982ffbba7a8cf798058708a7",
+    "packages/holder-lock/rust/src/lib.rs": "b0bee5fe28868896d41cfcdea8a76d237f59cb6a103212f434769ab16dcac3c1",
     "packages/holder-lock/rust/src/origin.rs": "bb1b83fd875746b6907894a3aeaaee2e5013c45661b7a199bb425882bd9c2317",
     "packages/holder-lock/rust/src/port.rs": "980b91ecbc5d3f9850623ca80e584eb85d2d04c073807d7b17a4bc59a78ff80f",
     "packages/holder-lock/rust/src/predecessor.rs": "04735a46e5476bd41697f2b3f3584f5a844af98dd0cf90965727e5a4578f547d",
@@ -462,6 +462,7 @@
     "packages/holder-lock/rust/src/scope.rs": "eae3215cd62ae51a53f473d92c5e24da5e1dd9c535c3c9f804a49aebbbaa411b",
     "packages/holder-lock/rust/src/semantics.rs": "cfb5e67d996db60f4493678cf1dbb2898c4d1028f6e6102d3c026dddd6763e91",
     "packages/holder-lock/rust/src/state_root.rs": "3495be27ddd89e8fed9e05053bf1731a87054da8c472a6772cf8f51fc1b3e94a",
+    "packages/holder-lock/rust/src/status.rs": "0a0cf552299674b471aa9c46a62badbdc2e5ae15ca5dc67364534a6aa38074e9",
     "packages/holder-lock/rust/src/tombstone.rs": "c83051cd8c7d405264deb827fb09997060edabeeee57ef6c1347bfc27b7ecd21",
     "packages/holder-lock/rust/tests/borrow_git.rs": "f073459db20415fb10aad535ee84e41d13e6b6e94cdf01b1ba437a9b29bcf5bf",
     "packages/holder-lock/rust/tests/borrow_io.rs": "73c1bf13cd2ba16d31d9c91ccb4cc3c8dda7d9e699acf5713eea4fc3e0b26f9f",
