@@ -301,7 +301,10 @@ fn incidents_of(input: &IncidentInput) -> RowResult {
     let stale_push = push.is_null()
         || push["remote"].as_str() != Some(input.remote)
         || truthy(&push["error"])
-        || input.now_sec as f64 - push["time"].as_f64().unwrap_or(0.0) > 86400.0;
+        // A push record without a time is never stale: the age is not a number, and Node compared `NaN > 86400`.
+        || push["time"]
+            .as_f64()
+            .is_some_and(|time| input.now_sec as f64 - time > 86400.0);
     let unpublished = input.remote_configured && behind_remote && stale_push;
     let orphans = array_len(&status["orphanBranches"]);
     let mut open = Vec::new();
@@ -361,78 +364,6 @@ pub fn judge(run: &Run, id: &str) -> Option<RowResult> {
     }))
 }
 
-#[cfg(unix)]
-fn mode_differs(meta: &std::fs::Metadata) -> bool {
-    use std::os::unix::fs::PermissionsExt;
-    meta.permissions().mode() & 0o777 != 0o700
-}
-
-#[cfg(not(unix))]
-fn mode_differs(_: &std::fs::Metadata) -> bool {
-    false
-}
-
-fn make_private_directory(path: &Path) -> std::io::Result<()> {
-    #[cfg_attr(not(unix), allow(unused_mut))]
-    let mut builder = std::fs::DirBuilder::new();
-    #[cfg(unix)]
-    {
-        use std::os::unix::fs::DirBuilderExt;
-        builder.mode(0o700);
-    }
-    match builder.create(path) {
-        Err(error) if error.kind() != std::io::ErrorKind::AlreadyExists => Err(error),
-        _ => Ok(()),
-    }
-}
-
-/// `path` and every parent are real directories (created 0700 when absent), never a link.
-fn real_directory(path: &Path) -> Result<(), String> {
-    if let Some(parent) = path.parent() {
-        if parent != path && !parent.as_os_str().is_empty() {
-            real_directory(parent)?;
-        }
-    }
-    make_private_directory(path).map_err(|e| e.to_string())?;
-    let meta = std::fs::symlink_metadata(path).map_err(|e| e.to_string())?;
-    if !meta.is_dir() || meta.file_type().is_symlink() {
-        return Err(format!("unsafe directory: {}", path.display()));
-    }
-    Ok(())
-}
-
-/// Git's WAL refuses a group- or world-writable `fgos` directory in the Git common dir, so the open root
-/// (`fgos/events` there), its parent and its locks directory are real 0700 directories. Returns whether any of them
-/// was created or had another mode.
-pub(crate) fn private_directories(open_root: &Path) -> Result<bool, String> {
-    let dirs = [
-        open_root.parent().unwrap_or(open_root).to_path_buf(),
-        open_root.to_path_buf(),
-        open_root.join("locks"),
-    ];
-    let mut changed = false;
-    for dir in &dirs {
-        match std::fs::symlink_metadata(dir) {
-            Ok(meta) => {
-                changed = changed
-                    || !meta.is_dir()
-                    || meta.file_type().is_symlink()
-                    || mode_differs(&meta);
-            }
-            Err(error) if error.kind() == std::io::ErrorKind::NotFound => changed = true,
-            Err(error) => return Err(error.to_string()),
-        }
-    }
-    real_directory(&dirs[2])?;
-    #[cfg(unix)]
-    for dir in &dirs {
-        use std::os::unix::fs::PermissionsExt;
-        std::fs::set_permissions(dir, std::fs::Permissions::from_mode(0o700))
-            .map_err(|e| e.to_string())?;
-    }
-    Ok(changed)
-}
-
 /// Runs `id` when it is an Event Store fix.
 pub fn fix(run: &Run, id: &str) -> Option<FixResult> {
     if !FIX_IDS.contains(&id) {
@@ -444,7 +375,7 @@ pub fn fix(run: &Run, id: &str) -> Option<FixResult> {
             .as_str()
             .unwrap_or_default()
             .to_owned();
-        private_directories(Path::new(&open_root))
+        fgos_event_store::locks::prepare_directories(Path::new(&open_root)).map_err(|e| e.detail)
     });
     Some(match outcome {
         Ok(changed) => FixResult::done(
@@ -466,36 +397,6 @@ mod tests {
         let _ = std::fs::remove_dir_all(&dir);
         std::fs::create_dir_all(&dir).unwrap();
         dir
-    }
-
-    #[test]
-    fn the_private_directories_are_made_then_left_alone_and_a_loose_mode_is_repaired() {
-        let git = scratch("dirs");
-        let open_root = git.join("fgos/events");
-        assert_eq!(private_directories(&open_root), Ok(true));
-        assert_eq!(private_directories(&open_root), Ok(false));
-        #[cfg(unix)]
-        {
-            use std::os::unix::fs::PermissionsExt;
-            let locks = open_root.join("locks");
-            std::fs::set_permissions(&locks, std::fs::Permissions::from_mode(0o755)).unwrap();
-            assert_eq!(private_directories(&open_root), Ok(true));
-            let mode = std::fs::metadata(&locks).unwrap().permissions().mode() & 0o777;
-            assert_eq!(mode, 0o700);
-        }
-    }
-
-    #[cfg(unix)]
-    #[test]
-    fn a_symlinked_locks_directory_is_refused_not_followed() {
-        let git = scratch("link");
-        let open_root = git.join("fgos/events");
-        std::fs::create_dir_all(&open_root).unwrap();
-        let elsewhere = git.join("elsewhere");
-        std::fs::create_dir_all(&elsewhere).unwrap();
-        std::os::unix::fs::symlink(&elsewhere, open_root.join("locks")).unwrap();
-        let error = private_directories(&open_root).unwrap_err();
-        assert!(error.starts_with("unsafe directory:"), "{error}");
     }
 
     #[cfg(target_os = "linux")]
@@ -621,6 +522,12 @@ mod tests {
         );
         assert!(!text(&pointer(&pushed, true, 1_000_100)).contains("unpublished events"));
         assert!(text(&pointer(&pushed, true, 1_000_000 + 90_000)).contains("unpublished events"));
+        // A push record that carries no time has no age, so it is never overdue.
+        let untimed = status(
+            json!([{"stream": "project", "unsealedCount": 1, "oldestUnsealedAgeSec": 0}]),
+            json!({"lastPush": {"remote": "origin"}}),
+        );
+        assert!(!text(&pointer(&untimed, true, 10_000_000)).contains("unpublished events"));
     }
 
     #[test]

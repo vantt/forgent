@@ -273,10 +273,11 @@ fn event_store_mapping_problems(run: &Run) -> Vec<String> {
 
 fn repository_config(run: &Run, context: &Context, facts: &RepositoryFacts) -> RowResult {
     let keys = &facts.untrusted_transport_config;
-    let obsolete = match origin_obsolete(context).map(|origin| facts.obsolete_fetch_mapping || origin) {
-        Ok(obsolete) => obsolete,
-        Err(message) => return result(false, message, None),
-    };
+    let obsolete =
+        match origin_obsolete(context).map(|origin| facts.obsolete_fetch_mapping || origin) {
+            Ok(obsolete) => obsolete,
+            Err(message) => return result(false, message, None),
+        };
     let has_remote = run
         .event_store()
         .map_or(true, |event_store| event_store.remote_configured());
@@ -395,8 +396,21 @@ fn merge_head(context: &Context) -> Option<String> {
 }
 
 fn incidents(context: &Context, facts: &RepositoryFacts, now_ms: u64) -> RowResult {
-    let journal = &facts.journal;
-    let merge = merge_head(context);
+    incidents_of(
+        &facts.journal,
+        &facts.native_locks,
+        merge_head(context).as_deref(),
+        now_ms,
+    )
+}
+
+/// The git-incidents pointer over what it reads: the journal, the native locks and the merge head. Pure; it never fails.
+fn incidents_of(
+    journal: &JournalFacts,
+    native_locks: &[String],
+    merge: Option<&str>,
+    now_ms: u64,
+) -> RowResult {
     let note = retention_note(journal, now_ms);
     let mut open = Vec::new();
     if journal.pending_count > 0 {
@@ -405,8 +419,8 @@ fn incidents(context: &Context, facts: &RepositoryFacts, now_ms: u64) -> RowResu
             journal.pending_count
         ));
     }
-    if !facts.native_locks.is_empty() {
-        open.push(format!("{} native lock(s)", facts.native_locks.len()));
+    if !native_locks.is_empty() {
+        open.push(format!("{} native lock(s)", native_locks.len()));
     }
     if merge.is_some() {
         open.push("a merge in progress".to_owned());
@@ -426,7 +440,7 @@ fn incidents(context: &Context, facts: &RepositoryFacts, now_ms: u64) -> RowResu
         true,
         message,
         Some(
-            json!({"pendingCount": journal.pending_count, "nativeLocks": facts.native_locks.len(), "mergeInProgress": merge}),
+            json!({"pendingCount": journal.pending_count, "nativeLocks": native_locks.len(), "mergeInProgress": merge}),
         ),
     )
 }
@@ -838,6 +852,22 @@ mod tests {
         assert_eq!(
             message(&compat),
             "the Git addon, its contracts and the Git feature floor are compatible"
+        );
+    }
+
+    #[test]
+    fn pending_git_operations_make_the_incidents_pointer_warn_and_name_the_recover_command() {
+        let mut pending = journal(0, 0, None, false);
+        pending.pending_count = 1;
+        let row = incidents_of(&pending, &[], None, 0);
+        assert!(row.passed);
+        assert_eq!(
+            message(&row),
+            "warning: 1 pending Git operation(s); run `fgos git status` (`fgos git recover` settles interrupted operations)"
+        );
+        assert_eq!(
+            row.detail.unwrap(),
+            json!({"pendingCount": 1, "nativeLocks": 0, "mergeInProgress": null})
         );
     }
 
