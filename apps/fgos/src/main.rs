@@ -117,6 +117,7 @@ static COMPOSITION_PROVIDERS: &[ProviderDescriptor] = &[
     fgos_config::provider::CONFIG_WRITE_DESCRIPTOR,
     wiring::git_incidents::STATUS_DESCRIPTOR,
     wiring::git_incidents::RECOVER_DESCRIPTOR,
+    wiring::lock_status::DESCRIPTOR,
 ];
 
 fn main() {
@@ -285,6 +286,7 @@ fn main() {
             wiring::git_incidents::GitIncidentsProvider::for_descriptor(descriptor),
         ));
     }
+    service.register_provider(Arc::new(wiring::lock_status::LockStatusProvider::new()));
     let tracker = service.tracker();
 
     match lane {

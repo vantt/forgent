@@ -213,6 +213,17 @@ pub const CATALOG: &[OperationDescriptor] = &[
         allowed_host_kinds: &["cli"],
         streaming_mode: StreamingMode::None,
     },
+    OperationDescriptor {
+        operation_id: OperationId::from_static("holder-lock.status"),
+        owning_component_id: Cow::Borrowed("holder-lock"),
+        request_contract: ContractRef::from_static("holder-lock.status.request", "1.0.0"),
+        outcome_contract: ContractRef::from_static("holder-lock.status.outcome", "1.0.0"),
+        effect: OperationEffect::Read,
+        idempotency: OperationIdempotency::Safe,
+        authority_policy_id: Cow::Borrowed("holder-lock.read"),
+        allowed_host_kinds: &["cli"],
+        streaming_mode: StreamingMode::None,
+    },
 ];
 
 #[cfg(test)]
@@ -222,8 +233,8 @@ mod tests {
     #[test]
     fn catalog_contains_required_operations() {
         // Eleven operations, plus the mailbox's send, inbox, inbox claim, list
-        // and status, and the git status and recover.
-        assert_eq!(CATALOG.len(), 18);
+        // and status, the git status and recover, and the lock status.
+        assert_eq!(CATALOG.len(), 19);
         let ids: Vec<&str> = CATALOG.iter().map(|op| op.operation_id.as_str()).collect();
         assert!(ids.contains(&"distribution.build.show"));
         assert!(ids.contains(&"work.gate-bypass.show"));
@@ -243,6 +254,7 @@ mod tests {
         assert!(ids.contains(&"config.write"));
         assert!(ids.contains(&"git.status"));
         assert!(ids.contains(&"git.recover"));
+        assert!(ids.contains(&"holder-lock.status"));
     }
     /// `OperationId::from_static` (used by every `CATALOG` entry, for
     /// const-context construction with no runtime allocation) skips

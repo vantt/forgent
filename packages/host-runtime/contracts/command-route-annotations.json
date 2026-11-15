@@ -27,6 +27,10 @@
     "operation_id": "identity.writer",
     "owner_path": "packages/identity/rust"
   },
+  "lock-status": {
+    "operation_id": "holder-lock.status",
+    "owner_path": "packages/holder-lock/rust"
+  },
   "mailbox": {
     "operation_id": "mailbox.inbox",
     "owner_path": "packages/mailbox/rust",

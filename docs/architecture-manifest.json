@@ -145,7 +145,7 @@
     {
       "job": "read and clear a hot mutex record",
       "kind": "door",
-      "patterns": ["export function (?:readHotRecord|reclaimDeadHolder|clearHotRecord|unlinkRecordIfUnchanged)\\b", "\\.reclaim\\.lock", "\\bhotRecord(?:Read|UnlinkIfUnchanged|Reclaim|Clear)\\b"],
+      "patterns": ["export function (?:readHotRecord|reclaimDeadHolder|clearHotRecord|unlinkRecordIfUnchanged)\\b", "\\.reclaim\\.lock", "\\bhotRecord(?:Read|UnlinkIfUnchanged|Reclaim|Clear)\\b", "\\.hot\\b"],
       "allowed": [
         "packages/holder-lock/rust/src/hot_record.rs",
         {
@@ -157,14 +157,70 @@
           "reason": "the client of the door, and the writer of the record in withStateTx"
         }
       ],
-      "debt": [
-        {
-          "path": "src/runner/lock-status.mjs",
-          "reason": "lists the reclaim lock files of a project until lock-status moves; removed by that port"
-        }
-      ],
+      "debt": [],
       "retiredBy": "the Node record writer in src/state/hot-lock.mjs moves with the Work state store",
       "reason": "the hot record's reader and compare-and-clear are the holder-lock crate's (hot_record.rs); Node's functions call it, so a second reader or cleaner of the record cannot disagree about a torn record or clear a record that changed"
+    },
+    {
+      "job": "report the registry locks",
+      "kind": "door",
+      "patterns": ["\\bLOCK_FILES\\b", "\\bexistingInstances\\b", "export function collectLockStatus", "pub fn collect\\("],
+      "allowed": ["packages/holder-lock/rust/src/status.rs"],
+      "debt": [],
+      "reason": "the lock report scans each registry row once, by the row's own path template, in the holder-lock crate; a second table of lock files, a second template walk or a second report cannot disagree with the registry"
+    },
+    {
+      "job": "main checkout activity beacon",
+      "kind": "door",
+      "patterns": ["main-checkout-activity\\.json"],
+      "allowed": [
+        {
+          "path": "src/runner/main-checkout-activity.mjs",
+          "reason": "the pre-commit hook's writer and the commit gate's reader"
+        },
+        {
+          "path": "packages/holder-lock/rust/src/status.rs",
+          "reason": "the reader of the lock report"
+        },
+        {
+          "path": "src/cli/command-registry.mjs",
+          "reason": "description text"
+        }
+      ],
+      "debt": [],
+      "retiredBy": "the pre-commit hook and the commit gate move to Rust",
+      "reason": "the beacon file has one writer and two kinds of reader, all checked by the rows of packages/holder-lock/contracts/main-checkout-activity.v1.json; a third path to the file would read a different shape"
+    },
+    {
+      "job": "list run directories (twin)",
+      "kind": "door",
+      "patterns": [
+        "export function (?:scanAssignmentLayout|listOpenAttemptDirs)\\b",
+        "export const runsRoot\\b",
+        "['\"`]workflow-runs['\"`]\\)",
+        "\\bfn (?:workflow_run_dirs|assignment_run_dirs|open_attempt_dirs)\\b"
+      ],
+      "allowed": [
+        {
+          "path": "src/runner/dispatch/assignment-layout.mjs",
+          "reason": "the runner's assignment layout lister (its twin is run_dirs.rs)"
+        },
+        {
+          "path": "src/run-supervisor/client.mjs",
+          "reason": "the run supervisor's open attempt lister (its twin is run_dirs.rs)"
+        },
+        {
+          "path": "src/runner/execution/case-run-paths.mjs",
+          "reason": "the runner's case run directory (its twin is run_dirs.rs)"
+        },
+        {
+          "path": "apps/fgos/src/wiring/run_dirs.rs",
+          "reason": "the host lists run directories for the lock report; both sides read test/rust-host/fixtures/run-dirs-vectors.json"
+        }
+      ],
+      "debt": [],
+      "retiredBy": "the runner's layouts move to Rust",
+      "reason": "the lock report needs the run directories the runner lays out, one layer above the lock crate; until the layouts move the host lists them with a twin of each Node lister, pinned by one fixture"
     },
     {
       "job": "take a holder lock from Node",
@@ -747,7 +803,6 @@
     "src/runner/merge.mjs": "infra",
     "src/runner/repo-locks.mjs": "infra",
     "src/runner/lock-fence.mjs": "infra",
-    "src/runner/lock-status.mjs": "infra",
     "src/runner/main-checkout-activity.mjs": "infra",
     "src/runner/main-checkout-reset-guard.mjs": "infra",
     "src/runner/github-adapter.mjs": "infra",

@@ -90,15 +90,6 @@ import {
 } from './helpers/fgos-cli-harness.mjs';
 
 
-test('lock-status from a .fgos/-less linked worktree with no --dir warns on stderr instead of a silent "free"', () => {
-  const { wt } = tmpLinkedWorktree();
-  const result = run(wt, ['lock-status']);
-  assert.equal(result.status, 0, 'lock-status has a store that is not required: -- it warns, never refuses');
-  assert.match(result.stderr, /\.fgos\/ not found/);
-  assert.equal(envelopeData(result.stdout).mainCheckout.outcome, 'free', 'the structurally-forced empty-store answer, never silently trusted as a real lock read');
-});
-
-
 // tsk-5iv D1 (round-3 review, HIGH): main-checkout-reset's repoRoot =
 // path.dirname(dir), and dir defaults to a cwd-strict resolution (never
 // git-resolved) -- called with no --dir from a linked worktree, repoRoot

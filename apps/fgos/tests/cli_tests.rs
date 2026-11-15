@@ -2821,3 +2821,146 @@ fn a_native_verb_under_home_with_no_project_is_refused_instead_of_using_the_glob
     );
     let _ = fs::remove_dir_all(&sandbox);
 }
+
+/// `fgos lock-status` is the first native verb that opens the store, so this is the one proof that the invocation
+/// doors work through the binary for a `store: read` verb: the admission warning for a worktree with no store, the
+/// refused `--dir ""` with one record in the caller's store, and the Event Store lifecycle triggers (a refused
+/// `eventStore` section answers a deterministic error: one end record, and with a dispatch depth also one start
+/// record, on Linux only). A `node` wrapper that fails when started proves no Node process runs.
+#[cfg(unix)]
+#[test]
+fn lock_status_runs_the_doors_through_the_binary_and_starts_no_node() {
+    use std::os::unix::fs::PermissionsExt;
+    let sandbox = std::env::temp_dir().join(format!(
+        "fgos_test_lock_status_doors_{}",
+        std::process::id()
+    ));
+    let _ = fs::remove_dir_all(&sandbox);
+    let (home, state) = (sandbox.join("home"), sandbox.join("state"));
+    let shim = sandbox.join("shim");
+    for dir in [&home, &state, &shim] {
+        fs::create_dir_all(dir).unwrap();
+    }
+    fs::set_permissions(&state, fs::Permissions::from_mode(0o700)).unwrap();
+    let node_log = sandbox.join("node-started.log");
+    let wrapper = shim.join("node");
+    fs::write(
+        &wrapper,
+        format!(
+            "#!/bin/sh\necho started >> \"{}\"\nexit 97\n",
+            node_log.display()
+        ),
+    )
+    .unwrap();
+    fs::set_permissions(&wrapper, fs::Permissions::from_mode(0o755)).unwrap();
+    let path = format!(
+        "{}:{}",
+        shim.display(),
+        std::env::var("PATH").unwrap_or_default()
+    );
+    let git = |dir: &Path, args: &[&str]| {
+        let output = Command::new("git")
+            .current_dir(dir)
+            .args(["-c", "user.name=doors", "-c", "user.email=doors@test"])
+            .args(args)
+            .output()
+            .expect("git runs");
+        assert!(
+            output.status.success(),
+            "git {args:?}: {}",
+            String::from_utf8_lossy(&output.stderr)
+        );
+    };
+    let project = |name: &str| {
+        let root = sandbox.join(name);
+        fs::create_dir_all(root.join(".fgos")).unwrap();
+        git(&root, &["init", "-q", "."]);
+        git(&root, &["commit", "-q", "--allow-empty", "-m", "init"]);
+        fs::canonicalize(&root).unwrap()
+    };
+    let run = |dir: &Path, extra: &[(&str, &str)], args: &[&str]| {
+        let mut command = Command::new(fgos_bin());
+        command
+            .current_dir(dir)
+            .args(args)
+            .env("HOME", &home)
+            .env("FGOS_STATE_ROOT", &state)
+            .env("PATH", &path)
+            .env_remove("FGOS_DISPATCH_DEPTH");
+        for (key, value) in extra {
+            command.env(key, value);
+        }
+        command.output().expect("failed to execute fgos")
+    };
+    let records = |root: &Path, class: &str| {
+        fs::read_to_string(root.join(".fgos/logs/invocation-faults.jsonl"))
+            .unwrap_or_default()
+            .lines()
+            .filter(|line| line.contains(&format!("\"faultClass\":\"{class}\"")))
+            .count()
+    };
+
+    // A worktree with no store: admitted with the warning, and the report is the empty-store answer.
+    let main = project("main");
+    let worktree = sandbox.join("worktree");
+    git(
+        &main,
+        &[
+            "worktree",
+            "add",
+            "-q",
+            "--detach",
+            worktree.to_str().unwrap(),
+        ],
+    );
+    let from_worktree = run(&worktree, &[], &["lock-status"]);
+    let stderr = String::from_utf8_lossy(&from_worktree.stderr);
+    assert_eq!(from_worktree.status.code(), Some(0), "{stderr}");
+    assert!(stderr.contains(".fgos/ not found"), "{stderr}");
+    let envelope: serde_json::Value = serde_json::from_slice(&from_worktree.stdout).unwrap();
+    assert_eq!(envelope["data"]["mainCheckout"]["outcome"], "free");
+    assert!(envelope["data"]["locks"]
+        .as_array()
+        .is_some_and(|rows| rows.len() > 20));
+
+    // `--dir ""` is refused as an invalid directory, with exactly one record in the caller's store.
+    let caller = project("caller");
+    let refused = run(&caller, &[], &["lock-status", "--dir", ""]);
+    assert_eq!(refused.status.code(), Some(4));
+    assert!(
+        String::from_utf8_lossy(&refused.stderr).contains("--dir requires a non-empty path value"),
+        "{}",
+        String::from_utf8_lossy(&refused.stderr)
+    );
+    assert_eq!(records(&caller, "dir-invalid"), 1);
+    assert_eq!(
+        records(&caller, "event-store-end-trigger"),
+        0,
+        "a refused call never reaches the lifecycle"
+    );
+
+    // A project whose `eventStore` section the reader refuses: the lifecycle's error is recorded, never fatal.
+    let store = project("store");
+    fs::write(
+        store.join(".fgos/config.yaml"),
+        "eventStore:\n  remote: origin\n",
+    )
+    .unwrap();
+    let on_linux = usize::from(cfg!(target_os = "linux"));
+    let plain = run(&store, &[], &["lock-status"]);
+    assert_eq!(
+        plain.status.code(),
+        Some(0),
+        "{}",
+        String::from_utf8_lossy(&plain.stderr)
+    );
+    assert_eq!(records(&store, "event-store-end-trigger"), on_linux);
+    assert_eq!(records(&store, "event-store-start-trigger"), 0);
+    let dispatched = run(&store, &[("FGOS_DISPATCH_DEPTH", "1")], &["lock-status"]);
+    assert_eq!(dispatched.status.code(), Some(0));
+    assert_eq!(records(&store, "event-store-end-trigger"), 2 * on_linux);
+    assert_eq!(records(&store, "event-store-start-trigger"), on_linux);
+
+    assert!(!node_log.exists(), "a Node process was started");
+    let _ = fs::remove_dir_all(&sandbox);
+}

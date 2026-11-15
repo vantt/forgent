@@ -99,7 +99,6 @@ import { claimWork, ClaimError, readWorkerSlotCeiling } from '../src/runner/clai
 import { isReclaimEligible } from '../src/runner/claim-liveness.mjs';
 import { commitAt, pathExistsAt, readRepoFacts } from '../src/git/inspect.mjs';
 import { HolderLockError } from '../src/holder-lock/index.mjs';
-import { collectLockStatus } from '../src/runner/lock-status.mjs';
 import { fenceLock, parseLockParams } from '../src/runner/lock-fence.mjs';
 import { formatLockDurationMs } from '../src/util/format-lock-duration.mjs';
 import { clearBeaconIfOwn } from '../src/runner/main-checkout-activity.mjs';
@@ -3746,9 +3745,6 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       }
       throw new StoreError('validation', `unknown lock sub-verb "${sub}". Usage: fgos lock fence <name> [--param k=v] [--yes] [--attest-stopped]`);
     }
-
-    case 'lock-status':
-      return collectLockStatus({ fgosDir: dir });
 
     // The repair verb `.githooks/pre-commit`'s stale-index guard prints. Run FROM INSIDE the stale
     // worktree; `--path` points it at another one. `resyncWorktree` needs the MAIN checkout (branch

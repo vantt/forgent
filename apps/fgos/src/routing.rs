@@ -709,6 +709,28 @@ mod tests {
         assert!(text.contains("Valid flags: --name, --yes."), "{text}");
     }
 
+    #[test]
+    fn lock_status_refuses_an_unknown_flag_in_the_node_cli_text_and_accepts_a_positional() {
+        let text = |rest: &[&str]| {
+            check_call(route("lock-status"), &call("lock-status", rest))
+                .unwrap_err()
+                .message
+        };
+        assert_eq!(
+            text(&["--bogus"]),
+            "unknown flag \"--bogus\" for \"fgos lock-status\". It takes no flags besides --dir, --json. See \"fgos lock-status --help\"."
+        );
+        assert_eq!(
+            text(&["--dir=/x"]),
+            "unknown flag \"--dir=/x\" for \"fgos lock-status\" (write \"--dir <value>\", not \"--name=value\"). It takes no flags besides --dir, --json. See \"fgos lock-status --help\"."
+        );
+        assert!(check_call(
+            route("lock-status"),
+            &call("lock-status", &["extra", "--json"])
+        )
+        .is_ok());
+    }
+
     fn fake(json: serde_json::Value) -> CommandRouteDescriptor {
         let mut route = serde_json::json!({
             "selector": "probe", "route_kind": "native", "operation_id": "probe.run",

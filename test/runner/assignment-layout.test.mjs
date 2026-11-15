@@ -9,6 +9,7 @@ import { allRuns, inspectDispatchRuntime, withRunsCache } from '../../src/runner
 import { showRunUseCase, readRunSnapshot, DispatchObserveError } from '../../src/verbs/dispatch/show-run.mjs';
 import { watchRunUseCase } from '../../src/verbs/dispatch/watch.mjs';
 import { findRunningRuns } from '../../src/runner/dispatch/visibility-session.mjs';
+import { RUN_DIRS_VECTORS, buildRunDirsTree, relativeTo } from '../helpers/run-dirs-fixture.mjs';
 import { recoverObserveUseCase, recoverApplyUseCase, RecoveryError } from '../../src/verbs/dispatch/recover.mjs';
 
 const fixture = JSON.parse(fs.readFileSync(new URL('../fixtures/run-layout/expected.json', import.meta.url), 'utf8'));
@@ -189,4 +190,16 @@ test('lookup keeps metadata identity authoritative over a different result ident
   writeJson(path.join(dir, 'result.json'), { runId: 'result-id' });
   assert.equal(findRunDir(fgosDir, 'owner-id'), dir);
   assert.equal(findRunDir(fgosDir, 'result-id'), null);
+});
+
+test('the assignment lister yields what the shared run-directory fixture says for every tree (the host lists the same)', () => {
+  assert.ok(RUN_DIRS_VECTORS.length >= 10);
+  for (const vector of RUN_DIRS_VECTORS) {
+    const { fgosDir, cleanup } = buildRunDirsTree(vector);
+    try {
+      assert.deepEqual(relativeTo(fgosDir, scanAssignmentLayout(fgosDir).runs.map((run) => run.runDir)), vector.expect.assignmentRuns, vector.name);
+    } finally {
+      cleanup();
+    }
+  }
 });

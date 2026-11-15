@@ -135,6 +135,12 @@ pub fn project_cli_invocation(
             ContractRef::from_static("git.recover.request", "1.0.0"),
             Box::new(crate::wiring::git_incidents::project_git_request(args)),
         ),
+        crate::wiring::lock_status::OPERATION_ID => (
+            ContractRef::from_static("holder-lock.status.request", "1.0.0"),
+            Box::new(crate::wiring::lock_status::project_lock_status_request(
+                args,
+            )),
+        ),
         other => {
             return Err(format!(
                 "native CLI projector has no request mapping for '{}'",

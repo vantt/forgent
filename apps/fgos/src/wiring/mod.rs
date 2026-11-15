@@ -3,6 +3,7 @@
 pub mod event_store_clone;
 pub mod git_incidents;
 pub mod identity_log;
+pub mod lock_status;
 #[cfg(unix)]
 pub mod mailbox_body;
 #[cfg(unix)]
@@ -32,3 +33,4 @@ pub mod mailbox_verbs;
 #[path = "mailbox_verbs_unsupported.rs"]
 pub mod mailbox_verbs;
 pub mod metrics_sources;
+pub mod run_dirs;

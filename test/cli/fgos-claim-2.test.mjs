@@ -3,12 +3,9 @@
 // Bộ đồ nghề dùng chung nằm ở ./helpers/fgos-cli-harness.mjs.
 import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
-import { spawn } from 'node:child_process';
-import { holdLockInChild } from '../helpers/hold-lock-in-child.mjs';
 import { commandManifest } from '../helpers/command-manifest.mjs';
 import {
   ADD_BAD_FLAG_CASES,
-  FGOS,
   REAL_REPO_ROOT,
   SUBMIT_BAD_FLAG_CASES,
   StoreError,
@@ -242,61 +239,6 @@ test('unlock is gone: an unknown verb, and no manifest entry', () => {
 
 // --- `fgos lock-status`: read-only report of every repo/machine registry lock
 
-test('lock-status: nothing held -- every row is free, main checkout included, and no lock file is created', () => {
-  const cwd = tmpCwdFast();
-  const result = run(cwd, ['lock-status']);
-  assert.equal(result.status, 0, result.stderr);
-  const data = envelopeData(result.stdout);
-  assert.equal(data.mainCheckout.outcome, 'free');
-  assert.deepEqual(data.mainCheckout.holders, []);
-  assert.ok(data.locks.length > 0);
-  // The full-suite door holds the machine-wide full-suite queue lock for the whole run, so inside
-  // it that one row is legitimately held; every other row must be free.
-  const suiteQueueHeld = process.env.FGOS_FULL_SUITE_QUEUE_HELD === '1';
-  for (const row of data.locks) {
-    if (suiteQueueHeld && row.name === 'full-suite') continue;
-    assert.ok(['free', 'not-node-owned'].includes(row.status), `${row.name} should be free, got ${row.status}`);
-    assert.ok(['repo', 'machine'].includes(row.scope), `${row.name} scope ${row.scope} is not reported`);
-  }
-  // The fixture's activation fence is the only entry; a status read creates nothing beside it.
-  assert.deepEqual(fs.readdirSync(path.join(cwd, '.fgos', 'locks')), ['activation.lock'], 'a status read creates nothing');
-  assert.equal(data.beacon.status, 'none');
-});
-
-
-test('lock-status: main held by another process -- held with that pid, other rows stay free', async () => {
-  const cwd = initGitCwdFast();
-  await withMainHeldByChild(cwd, async (holder) => {
-    const result = await runAsync(cwd, ['lock-status']);
-    assert.equal(result.status, 0, result.stderr);
-    const data = envelopeData(result.stdout);
-    assert.equal(data.mainCheckout.outcome, 'held');
-    assert.deepEqual(data.mainCheckout.holders, [holder.child.pid]);
-    const main = data.locks.find((row) => row.name === 'main-checkout');
-    assert.equal(main.status, 'held');
-    assert.equal(main.via, 'probe');
-    assert.ok(main.guarantee, 'the guarantee of the lock directory is reported');
-    assert.equal(data.locks.find((row) => row.name === 'worktree-admin').status, 'free');
-  });
-});
-
-
-test('lock-status: a merge slot held for one ref is listed as an instance of the parametric row', async () => {
-  const cwd = initGitCwdFast();
-  const holder = await holdLockInChild('merge-slot', { fgosDir: path.join(cwd, '.fgos'), ref: 'main' });
-  try {
-    const data = envelopeData((await runAsync(cwd, ['lock-status'])).stdout);
-    const slot = data.locks.find((row) => row.name === 'merge-slot');
-    assert.equal(slot.parametric, true);
-    assert.equal(slot.status, 'held');
-    assert.deepEqual(slot.instances.map((i) => i.holders), [[holder.child.pid]]);
-  } finally {
-    holder.child.kill('SIGKILL');
-    await holder.exited;
-  }
-});
-
-
 test('lock-status: registered in the command manifest as read-only (touchesState/externalEffect both false)', () => {
   const entry = commandManifest().commands.find((c) => c.name === 'lock-status');
   assert.ok(entry, 'lock-status entry missing from the command manifest');
@@ -304,30 +246,6 @@ test('lock-status: registered in the command manifest as read-only (touchesState
   assert.equal(entry.externalEffect, false);
 });
 
-
-// The main checkout mutex is a kernel lock: a holder is a live process, never
-// a record with a TTL, so these hold it from a real child and kill that child.
-async function withMainHeldByChild(cwd, fn) {
-  const holder = await holdLockInChild('main-checkout', { fgosDir: path.join(cwd, '.fgos') });
-  try {
-    return await fn(holder);
-  } finally {
-    holder.child.kill('SIGKILL');
-    await holder.exited;
-  }
-}
-
-function runAsync(cwd, args) {
-  return new Promise((resolve) => {
-    const started = Date.now();
-    const child = spawn(process.execPath, [FGOS, ...args], { cwd, env: { ...process.env, FGOS_SESSION_ID: 'fgos-cli-harness-test' }, stdio: ['ignore', 'pipe', 'pipe'] });
-    let stdout = '';
-    let stderr = '';
-    child.stdout.on('data', (d) => { stdout += d; });
-    child.stderr.on('data', (d) => { stderr += d; });
-    child.on('exit', (status) => resolve({ status, stdout, stderr, elapsed: Date.now() - started }));
-  });
-}
 
 test('take --wait rejects a non-numeric or non-positive value the same way --timeout already does', () => {
   const cwd = initGitCwdFast();
