@@ -2432,7 +2432,7 @@
             "doc_marker": "---x",
             "newline": "l1\nl2",
             "bool": "true",
-            "null": "null",
+            "nothing": "null",
             "int": "123",
             "exp": "1e5",
             "octal": "0123"
@@ -2440,7 +2440,7 @@
         }
       ],
       "expect": {
-        "output": "colon_space: \"a: b\"\nbacktick: \"`tick\"\ndash_space: \"- x\"\nhash: \"x #y\"\nempty: \"\"\npadded: \" pad \"\ndoc_marker: \"---x\"\nnewline: \"l1\\nl2\"\nbool: \"true\"\nnull: \"null\"\nint: \"123\"\nexp: \"1e5\"\noctal: \"0123\"\n"
+        "output": "colon_space: \"a: b\"\nbacktick: \"`tick\"\ndash_space: \"- x\"\nhash: \"x #y\"\nempty: \"\"\npadded: \" pad \"\ndoc_marker: \"---x\"\nnewline: \"l1\\nl2\"\nbool: \"true\"\nnothing: \"null\"\nint: \"123\"\nexp: \"1e5\"\noctal: \"0123\"\n"
       }
     },
     {
@@ -2769,7 +2769,7 @@
     },
     {
       "id": "set-root-empty-quotes-keys",
-      "why": "a key that needs quotes is quoted and a key named like a prototype is a plain own key",
+      "why": "a key that needs quotes is double-quoted",
       "profiles": [
         "strict-config",
         "tool"
@@ -2783,12 +2783,34 @@
           "path": "",
           "value": {
             "a: b": 1,
+            "plain": 2
+          }
+        }
+      ],
+      "expect": {
+        "output": "\"a: b\": 1\nplain: 2\n"
+      }
+    },
+    {
+      "id": "set-root-empty-writes-prototype-name-as-plain-own-key",
+      "why": "a key named like a prototype is a plain own key where the profile allows it (strict-config refuses it)",
+      "profiles": [
+        "tool"
+      ],
+      "input": {
+        "text": ""
+      },
+      "ops": [
+        {
+          "op": "set",
+          "path": "",
+          "value": {
             "__proto__": 2
           }
         }
       ],
       "expect": {
-        "output": "\"a: b\": 1\n__proto__: 2\n"
+        "output": "__proto__: 2\n"
       }
     },
     {
