@@ -341,7 +341,11 @@ impl OperationProvider for ConfigProvider {
                 })?;
             let output: Box<dyn std::any::Any + Send> = match answer(request) {
                 Ok(outcome) if outcome.exit == 0 => Box::new(JsonOutcome(outcome.data)),
-                Ok(outcome) => Box::new(outcome),
+                Ok(outcome) => Box::new(fgos_host_runtime::VerbAnswer {
+                    data: outcome.data,
+                    exit: outcome.exit,
+                    text: None,
+                }),
                 Err(refusal) => Box::new(refusal),
             };
             Ok(ProviderOutcome::completed(

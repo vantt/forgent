@@ -1,0 +1,596 @@
+//! The Node rows bridge: how `fgos doctor` reaches the rows and fixes whose layers Node still owns.
+//!
+//! One bounded path, not a verb, route or `fgos internal` entry. The bodies live in the legacy payload's
+//! `src/setup/doctor-bridge.mjs`, which this module starts as a script with the payload's Node through
+//! `legacy_exec` (the payload is found only through the release manifest's `components.legacyNode`). Each call
+//! writes one request (`phase`, `ids`, `dir`) on its stdin and reads one prefixed JSON line per result from its
+//! stdout; the contract is `packages/distribution/contracts/doctor-bridge.v1.json`. Stray output of a body is
+//! never read as a result because only prefixed lines count, and a crash keeps the results already produced.
+//!
+//! The child is a bounded helper of one doctor run, not a legacy route: it gets a fresh recursion guard
+//! (a guard the host inherited does not stop it), leads its own process group so a deadline or a signal reaches
+//! its whole tree, and writes no fault or lifecycle record. When Node is missing, the call fails, or the
+//! deadline passes, every row of the call is a failure naming the cause and `next` names it once.
+
+use crate::legacy_exec;
+use fgos_distribution::doctor::{FixResult, RowOutcome, RowOwner, RowResult};
+use serde::Deserialize;
+use std::collections::HashMap;
+use std::io::{BufRead, BufReader, Read, Write};
+use std::path::Path;
+use std::process::{Child, Command, Stdio};
+use std::sync::mpsc;
+use std::time::{Duration, Instant};
+
+/// The prefix of a result line; `src/setup/doctor-bridge.mjs` writes the same bytes.
+const RESULT_PREFIX: &str = "\u{1e}FGOS-DOCTOR-BRIDGE ";
+/// The module of the payload this bridge runs.
+const BRIDGE_MODULE: &str = "src/setup/doctor-bridge.mjs";
+/// How long the one call that judges every bridged row may run before its process tree is ended.
+pub const CHECK_DEADLINE: Duration = Duration::from_secs(120);
+/// How long one call that runs a run of bridged fixes may run.
+pub const FIX_DEADLINE: Duration = Duration::from_secs(300);
+/// How much of the child's stderr a failure shows.
+const STDERR_EXCERPT: usize = 400;
+/// How long to wait for the readers to finish once the child ended.
+const DRAIN_GRACE: Duration = Duration::from_millis(500);
+
+/// One line of the bridge's answer.
+#[derive(Debug, Deserialize)]
+#[serde(tag = "kind", rename_all = "lowercase")]
+enum Line {
+    Row {
+        id: String,
+        #[serde(flatten)]
+        result: RowResult,
+    },
+    Fix(FixResult),
+    End {
+        count: usize,
+    },
+    Refusal {
+        message: String,
+    },
+}
+
+/// Why a call to the bridge did not produce every answer it was asked for.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum Fault {
+    /// Node could not be started: it is not installed or not on PATH.
+    NodeMissing(String),
+    /// The call failed after it started: no payload, a refusal, a crash, a deadline.
+    Failed(String),
+}
+
+impl Fault {
+    /// The row's own message.
+    pub fn message(&self) -> String {
+        match self {
+            Fault::NodeMissing(cause) => format!(
+                "Node is not available ({cause}); the doctor rows of the layers still written in Node need Node 18 or newer"
+            ),
+            Fault::Failed(cause) => format!("the Node rows bridge failed: {cause}"),
+        }
+    }
+
+    /// The one entry of `next` for the whole run.
+    pub fn next(&self) -> String {
+        match self {
+            Fault::NodeMissing(_) => {
+                "install Node 18 or newer so the Node-owned doctor rows can run, then run fgos doctor again"
+                    .to_owned()
+            }
+            Fault::Failed(cause) => {
+                format!("the Node rows bridge failed ({cause}); run fgos doctor again")
+            }
+        }
+    }
+}
+
+/// How the bridge's child is made: the production launcher runs the payload's module; a test gives its own.
+pub type Launch = Box<dyn Fn() -> Result<Command, Fault> + Send + Sync>;
+
+/// The bridge to the Node-owned rows.
+pub struct NodeBridge {
+    launch: Launch,
+    check_deadline: Duration,
+    fix_deadline: Duration,
+}
+
+/// The command that runs `doctor-bridge.mjs` from the active release's payload.
+fn payload_launch() -> Result<Command, Fault> {
+    let payload = legacy_exec::resolve_payload().map_err(|cause| {
+        Fault::Failed(format!("the legacy payload cannot be resolved: {cause}"))
+    })?;
+    let module = payload.root.join(BRIDGE_MODULE);
+    if !module.is_file() {
+        return Err(Fault::Failed(format!(
+            "the legacy payload carries no {BRIDGE_MODULE}"
+        )));
+    }
+    let module = {
+        let text = module.to_string_lossy();
+        match text.strip_prefix(r"\\?\") {
+            Some(stripped) => std::path::PathBuf::from(stripped),
+            None => module,
+        }
+    };
+    Ok(legacy_exec::payload_command(&module))
+}
+
+impl NodeBridge {
+    /// The production bridge.
+    pub fn new() -> Self {
+        Self::with(Box::new(payload_launch), CHECK_DEADLINE, FIX_DEADLINE)
+    }
+
+    pub fn with(launch: Launch, check_deadline: Duration, fix_deadline: Duration) -> Self {
+        Self {
+            launch,
+            check_deadline,
+            fix_deadline,
+        }
+    }
+
+    /// One call: the lines the child produced, and why it did not finish when it did not.
+    fn call(
+        &self,
+        root: &Path,
+        phase: &str,
+        ids: &[&str],
+        deadline: Duration,
+    ) -> (Vec<Line>, Option<Fault>) {
+        let mut command = match (self.launch)() {
+            Ok(command) => command,
+            Err(fault) => return (Vec::new(), Some(fault)),
+        };
+        command
+            .stdin(Stdio::piped())
+            .stdout(Stdio::piped())
+            .stderr(Stdio::piped());
+        // The child leads its own group: a deadline or a signal then ends its whole tree.
+        #[cfg(unix)]
+        {
+            use std::os::unix::process::CommandExt;
+            command.process_group(0);
+        }
+        let mut child = match command.spawn() {
+            Ok(child) => child,
+            Err(error) if error.kind() == std::io::ErrorKind::NotFound => {
+                return (Vec::new(), Some(Fault::NodeMissing(error.to_string())))
+            }
+            Err(error) => {
+                return (
+                    Vec::new(),
+                    Some(Fault::Failed(format!("the child could not start: {error}"))),
+                )
+            }
+        };
+        let identity = fgos_process::facts::identity_of_child(fgos_process::ProcId(child.id()));
+        let target = if cfg!(unix) {
+            -(child.id() as i32)
+        } else {
+            child.id() as i32
+        };
+        let forwarding = legacy_exec::Forwarding::to(target);
+        let request =
+            serde_json::json!({ "phase": phase, "ids": ids, "dir": root.to_string_lossy() });
+        if let Some(mut stdin) = child.stdin.take() {
+            // A child that exits without reading closes the pipe first; its answer is what counts.
+            let _ = stdin.write_all(request.to_string().as_bytes());
+        }
+        let (sender, receiver) = mpsc::channel::<Piece>();
+        let readers = [
+            child.stdout.take().map(|out| {
+                let sender = sender.clone();
+                std::thread::spawn(move || {
+                    for line in BufReader::new(out).lines().map_while(Result::ok) {
+                        if sender.send(Piece::Out(line)).is_err() {
+                            break;
+                        }
+                    }
+                })
+            }),
+            child.stderr.take().map(|err| {
+                let sender = sender.clone();
+                std::thread::spawn(move || {
+                    let mut text = String::new();
+                    let _ = BufReader::new(err)
+                        .take(64 * 1024)
+                        .read_to_string(&mut text);
+                    let _ = sender.send(Piece::Err(text));
+                })
+            }),
+        ];
+        drop(sender);
+
+        let started = Instant::now();
+        let mut out_lines: Vec<String> = Vec::new();
+        let mut stderr = String::new();
+        let mut timed_out = false;
+        let status = loop {
+            while let Ok(piece) = receiver.try_recv() {
+                keep(piece, &mut out_lines, &mut stderr);
+            }
+            match child.try_wait() {
+                Ok(Some(status)) => break Some(status),
+                Ok(None) if started.elapsed() >= deadline => {
+                    timed_out = true;
+                    end_tree(&mut child, identity);
+                    break child.wait().ok();
+                }
+                Ok(None) => std::thread::sleep(Duration::from_millis(10)),
+                Err(_) => {
+                    end_tree(&mut child, identity);
+                    break child.wait().ok();
+                }
+            }
+        };
+        drop(forwarding);
+        let drained = Instant::now();
+        while drained.elapsed() < DRAIN_GRACE {
+            match receiver.recv_timeout(DRAIN_GRACE) {
+                Ok(piece) => keep(piece, &mut out_lines, &mut stderr),
+                Err(_) => break,
+            }
+        }
+        for reader in readers.into_iter().flatten() {
+            if reader.is_finished() {
+                let _ = reader.join();
+            }
+        }
+
+        let mut lines = Vec::new();
+        let mut ended = false;
+        let mut refused = None;
+        for raw in &out_lines {
+            let Some(json) = raw.strip_prefix(RESULT_PREFIX) else {
+                continue;
+            };
+            match serde_json::from_str::<Line>(json) {
+                Ok(Line::End { count }) => ended = count == lines.len(),
+                Ok(Line::Refusal { message }) => refused = Some(message),
+                Ok(line) => lines.push(line),
+                Err(error) => {
+                    refused = Some(format!("an unreadable result line ({error})"));
+                }
+            }
+        }
+        let fault = if timed_out {
+            Some(Fault::Failed(format!(
+                "no answer within {} s; its process tree was ended{}",
+                deadline.as_secs(),
+                excerpt(&stderr)
+            )))
+        } else if let Some(message) = refused {
+            Some(Fault::Failed(format!("it refused the call: {message}")))
+        } else if !ended {
+            Some(Fault::Failed(format!(
+                "it stopped before it finished ({}){}",
+                status.map_or("unknown exit".to_owned(), |s| s.to_string()),
+                excerpt(&stderr)
+            )))
+        } else {
+            None
+        };
+        (lines, fault)
+    }
+}
+
+impl Default for NodeBridge {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// What a reader thread hands the waiting loop.
+enum Piece {
+    Out(String),
+    Err(String),
+}
+
+fn keep(piece: Piece, out: &mut Vec<String>, err: &mut String) {
+    match piece {
+        Piece::Out(line) => out.push(line),
+        Piece::Err(text) => err.push_str(&text),
+    }
+}
+
+/// The tail of the child's stderr for a failure message, or nothing.
+fn excerpt(stderr: &str) -> String {
+    let text = stderr.trim();
+    if text.is_empty() {
+        return String::new();
+    }
+    let tail: String = text
+        .chars()
+        .rev()
+        .take(STDERR_EXCERPT)
+        .collect::<Vec<_>>()
+        .into_iter()
+        .rev()
+        .collect();
+    format!(": {}", tail.replace('\n', " | "))
+}
+
+/// Ends the child and everything it started: the process door ends the group (Linux) or tree (macOS) it leads
+/// when its identity was read; elsewhere, and as the last resort, the child alone.
+fn end_tree(child: &mut Child, identity: Option<fgos_process::facts::ProcTuple>) {
+    #[cfg(target_os = "linux")]
+    if let Some(leader) = identity.clone() {
+        let _ = fgos_process::domain_kill_all(&fgos_process::Domain::LinuxPgroup(leader));
+    }
+    #[cfg(target_os = "macos")]
+    if let Some(root) = identity.clone() {
+        let _ = fgos_process::domain_kill_all(&fgos_process::Domain::MacosTree(root));
+    }
+    let _ = identity;
+    let _ = child.kill();
+}
+
+impl RowOwner for NodeBridge {
+    fn run_fixes(&self, root: &Path, ids: &[&str]) -> Vec<FixResult> {
+        let (lines, fault) = self.call(root, "fix", ids, self.fix_deadline);
+        let mut done: HashMap<String, FixResult> = lines
+            .into_iter()
+            .filter_map(|line| match line {
+                Line::Fix(result) => Some((result.id.clone(), result)),
+                _ => None,
+            })
+            .collect();
+        let cause = fault.map(|fault| fault.message());
+        ids.iter()
+            .map(|id| {
+                done.remove(*id).unwrap_or_else(|| FixResult {
+                    id: (*id).to_owned(),
+                    changed: false,
+                    message: cause.clone().unwrap_or_else(|| {
+                        "the Node rows bridge gave no answer for this fix".to_owned()
+                    }),
+                })
+            })
+            .collect()
+    }
+
+    fn judge_rows(&self, root: &Path, ids: &[&str]) -> Vec<RowOutcome> {
+        let (lines, fault) = self.call(root, "check", ids, self.check_deadline);
+        let mut judged: HashMap<String, RowResult> = lines
+            .into_iter()
+            .filter_map(|line| match line {
+                Line::Row { id, result } => Some((id, result)),
+                _ => None,
+            })
+            .collect();
+        let unavailable = || match &fault {
+            Some(fault) => RowOutcome::Unavailable {
+                message: fault.message(),
+                next: fault.next(),
+            },
+            None => RowOutcome::Unavailable {
+                message: "the Node rows bridge gave no answer for this row".to_owned(),
+                next: "run fgos doctor again".to_owned(),
+            },
+        };
+        ids.iter()
+            .map(|id| match judged.remove(*id) {
+                Some(result) => RowOutcome::Judged(result),
+                None => unavailable(),
+            })
+            .collect()
+    }
+}
+
+#[cfg(all(test, unix))]
+mod tests {
+    use super::*;
+
+    /// A bridge whose child is `sh -c <script>`; the script gets the request on stdin like the real module.
+    fn scripted(script: &str, deadline: Duration) -> NodeBridge {
+        let script = script.to_owned();
+        NodeBridge::with(
+            Box::new(move || {
+                let mut command = Command::new("sh");
+                command.arg("-c").arg(&script);
+                Ok(command)
+            }),
+            deadline,
+            deadline,
+        )
+    }
+
+    fn line(body: &str) -> String {
+        format!("printf '\\036FGOS-DOCTOR-BRIDGE %s\\n' '{body}'")
+    }
+
+    fn row(id: &str, passed: bool) -> String {
+        line(&format!(
+            r#"{{"kind":"row","id":"{id}","passed":{passed},"message":"said {id}"}}"#
+        ))
+    }
+
+    fn end(count: usize) -> String {
+        line(&format!(r#"{{"kind":"end","count":{count}}}"#))
+    }
+
+    #[test]
+    fn each_row_is_judged_from_its_own_prefixed_line_and_stray_output_is_never_a_result() {
+        let bridge = scripted(
+            &format!(
+                "cat >/dev/null; echo 'a body printed this'; {}; echo '{{\"kind\":\"row\",\"id\":\"x\",\"passed\":true}}'; {}; {}",
+                row("one", true),
+                row("two", false),
+                end(2)
+            ),
+            Duration::from_secs(20),
+        );
+        let out = bridge.judge_rows(Path::new("/p"), &["one", "two"]);
+        match (&out[0], &out[1]) {
+            (RowOutcome::Judged(one), RowOutcome::Judged(two)) => {
+                assert!(one.passed && !two.passed);
+                assert_eq!(one.message.as_deref(), Some("said one"));
+            }
+            other => panic!("{other:?}"),
+        }
+    }
+
+    #[test]
+    fn the_request_reaches_the_child_on_stdin_with_the_phase_ids_and_directory() {
+        let dir = std::env::temp_dir().join(format!("fgos-bridge-request-{}", std::process::id()));
+        std::fs::create_dir_all(&dir).unwrap();
+        let seen = dir.join("request.json");
+        let bridge = scripted(
+            &format!("cat > '{}'; {}", seen.display(), end(0)),
+            Duration::from_secs(20),
+        );
+        let _ = bridge.run_fixes(Path::new("/project"), &["fix-a", "fix-b"]);
+        let request: serde_json::Value =
+            serde_json::from_str(&std::fs::read_to_string(&seen).unwrap()).unwrap();
+        std::fs::remove_dir_all(&dir).unwrap();
+        assert_eq!(request["phase"], "fix");
+        assert_eq!(request["ids"], serde_json::json!(["fix-a", "fix-b"]));
+        assert_eq!(request["dir"], "/project");
+    }
+
+    #[test]
+    fn a_crash_keeps_the_results_already_produced_and_fails_only_the_rest_with_the_cause() {
+        let bridge = scripted(
+            &format!(
+                "cat >/dev/null; {}; echo boom >&2; exit 3",
+                row("one", true)
+            ),
+            Duration::from_secs(20),
+        );
+        let out = bridge.judge_rows(Path::new("/p"), &["one", "two"]);
+        assert!(matches!(&out[0], RowOutcome::Judged(r) if r.passed));
+        match &out[1] {
+            RowOutcome::Unavailable { message, next } => {
+                assert!(message.contains("stopped before it finished"), "{message}");
+                assert!(message.contains("boom"), "{message}");
+                assert!(next.contains("run fgos doctor again"));
+            }
+            other => panic!("{other:?}"),
+        }
+    }
+
+    #[test]
+    fn a_fix_that_never_answered_reports_the_cause_and_changed_false() {
+        let bridge = scripted("cat >/dev/null; exit 1", Duration::from_secs(20));
+        let out = bridge.run_fixes(Path::new("/p"), &["fix-a"]);
+        assert_eq!(out.len(), 1);
+        assert!(!out[0].changed);
+        assert!(out[0].message.contains("failed"), "{}", out[0].message);
+    }
+
+    #[test]
+    fn a_refusal_fails_every_row_with_its_message() {
+        let bridge = scripted(
+            &format!(
+                "cat >/dev/null; {}",
+                line(r#"{"kind":"refusal","message":"no row body for nope"}"#)
+            ),
+            Duration::from_secs(20),
+        );
+        let out = bridge.judge_rows(Path::new("/p"), &["nope"]);
+        match &out[0] {
+            RowOutcome::Unavailable { message, .. } => {
+                assert!(message.contains("no row body for nope"), "{message}")
+            }
+            other => panic!("{other:?}"),
+        }
+    }
+
+    #[test]
+    fn a_child_that_hangs_is_ended_with_its_whole_tree_at_the_deadline() {
+        let dir = std::env::temp_dir().join(format!("fgos-bridge-hang-{}", std::process::id()));
+        std::fs::create_dir_all(&dir).unwrap();
+        let grandchild = dir.join("grandchild.pid");
+        let bridge = scripted(
+            &format!(
+                "cat >/dev/null; (sleep 300 & echo $! > '{}'; wait) & wait",
+                grandchild.display()
+            ),
+            Duration::from_millis(600),
+        );
+        let started = Instant::now();
+        let out = bridge.judge_rows(Path::new("/p"), &["one"]);
+        assert!(started.elapsed() < Duration::from_secs(15));
+        match &out[0] {
+            RowOutcome::Unavailable { message, .. } => {
+                assert!(message.contains("process tree was ended"), "{message}")
+            }
+            other => panic!("{other:?}"),
+        }
+        let pid: i32 = std::fs::read_to_string(&grandchild)
+            .unwrap()
+            .trim()
+            .parse()
+            .unwrap();
+        std::thread::sleep(Duration::from_millis(300));
+        let alive = std::path::Path::new(&format!("/proc/{pid}/stat")).exists()
+            && std::fs::read_to_string(format!("/proc/{pid}/stat"))
+                .map(|stat| !stat.contains(") Z "))
+                .unwrap_or(false);
+        std::fs::remove_dir_all(&dir).unwrap();
+        assert!(
+            !alive,
+            "the grandchild of the hung child outlived the deadline"
+        );
+    }
+
+    #[test]
+    fn a_missing_node_fails_every_row_with_the_install_hint_and_one_next_entry() {
+        let bridge = NodeBridge::with(
+            Box::new(|| Ok(Command::new("fgos-no-such-node-binary-for-the-bridge"))),
+            Duration::from_secs(5),
+            Duration::from_secs(5),
+        );
+        let out = bridge.judge_rows(Path::new("/p"), &["one", "two"]);
+        let nexts: Vec<&str> = out
+            .iter()
+            .map(|outcome| match outcome {
+                RowOutcome::Unavailable { next, message } => {
+                    assert!(message.starts_with("Node is not available"), "{message}");
+                    next.as_str()
+                }
+                other => panic!("{other:?}"),
+            })
+            .collect();
+        assert_eq!(nexts[0], nexts[1]);
+        assert!(nexts[0].contains("install Node 18 or newer"));
+    }
+
+    #[test]
+    fn a_launcher_that_cannot_find_the_payload_fails_the_call_without_starting_anything() {
+        let bridge = NodeBridge::with(
+            Box::new(|| {
+                Err(Fault::Failed(
+                    "the legacy payload cannot be resolved: none".into(),
+                ))
+            }),
+            Duration::from_secs(5),
+            Duration::from_secs(5),
+        );
+        let out = bridge.run_fixes(Path::new("/p"), &["fix-a"]);
+        assert!(out[0].message.contains("cannot be resolved"));
+    }
+
+    #[test]
+    fn the_child_runs_in_its_own_process_group_so_a_signal_to_the_host_group_cannot_leave_it_orphaned(
+    ) {
+        let bridge = scripted(
+            &format!(
+                "cat >/dev/null; own=$(ps -o pgid= -p $$ | tr -d ' '); par=$(ps -o pgid= -p $PPID | tr -d ' '); \
+                 printf '\\036FGOS-DOCTOR-BRIDGE {{\"kind\":\"row\",\"id\":\"g\",\"passed\":true,\"message\":\"%s vs %s\"}}\\n' $own $par; {}",
+                end(1)
+            ),
+            Duration::from_secs(20),
+        );
+        let out = bridge.judge_rows(Path::new("/p"), &["g"]);
+        let RowOutcome::Judged(result) = &out[0] else {
+            panic!("{out:?}")
+        };
+        let message = result.message.clone().unwrap();
+        let (own, parent) = message.split_once(" vs ").unwrap();
+        assert_ne!(own, parent, "the child shares the host's group: {message}");
+    }
+}

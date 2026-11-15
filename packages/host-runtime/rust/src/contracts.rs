@@ -515,6 +515,16 @@ pub type OperationCatalog = &'static [OperationDescriptor];
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct JsonOutcome(pub serde_json::Value);
 
+/// A verb's answer that prints and still decides its own exit status: the envelope of `data` (or `text`, a
+/// form the person asked for, in its place) and `exit`, which may be non-zero. `doctor --strict` and a failing
+/// `config check` end this way; a call that cannot be answered at all is a categorised refusal instead.
+#[derive(Debug, Clone, PartialEq)]
+pub struct VerbAnswer {
+    pub data: serde_json::Value,
+    pub exit: i32,
+    pub text: Option<String>,
+}
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct RegistrySnapshot {
     pub catalog: OperationCatalog,

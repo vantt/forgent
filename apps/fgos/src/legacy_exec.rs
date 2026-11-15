@@ -67,6 +67,20 @@ pub fn check_recursion_guard() -> Result<(), String> {
 /// `active_release_path` was determined, which is what red-team's other,
 /// genuinely valid HIGH finding on this function was actually about.)
 pub fn resolve_payload_path() -> Result<PathBuf, String> {
+    resolve_payload().map(|payload| payload.entry)
+}
+
+/// The legacy payload of the active release: its root directory and its entry script, both canonical, found
+/// only through the manifest's `components.legacyNode` fields.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Payload {
+    pub root: PathBuf,
+    pub entry: PathBuf,
+}
+
+/// [`resolve_payload_path`] with the root the entry sits under: a module of the payload (the doctor bridge) is
+/// found as `root/<its path>`, never by PATH or cwd.
+pub fn resolve_payload() -> Result<Payload, String> {
     let active_release_path = if let Ok(p) = env::var("FGOS_ACTIVE_RELEASE_PATH") {
         PathBuf::from(p)
     } else {
@@ -150,11 +164,19 @@ pub fn resolve_payload_path() -> Result<PathBuf, String> {
         verify_release_files_except_running(Path::new(&active_release_path), &manifest, &running)
             .map_err(|err| format!("manifest file verification failed: {}", err))?;
 
-    let payload_path_canonical =
-        verify_legacy_node(Path::new(&active_release_path), &manifest, files)
-            .map_err(|err| format!("{}", err))?;
-
-    Ok(payload_path_canonical)
+    let entry = verify_legacy_node(Path::new(&active_release_path), &manifest, files)
+        .map_err(|err| format!("{}", err))?;
+    // The entry is `root/<legacyNode.entry>`: the root is that many components above it.
+    let depth = Path::new(&manifest.components.legacy_node.entry)
+        .components()
+        .filter(|part| matches!(part, std::path::Component::Normal(_)))
+        .count();
+    let root = entry
+        .ancestors()
+        .nth(depth)
+        .map(Path::to_path_buf)
+        .ok_or_else(|| "the legacy entry sits above no payload root".to_string())?;
+    Ok(Payload { root, entry })
 }
 
 #[cfg(unix)]
@@ -170,11 +192,59 @@ static CHILD_PID: std::sync::atomic::AtomicI32 = std::sync::atomic::AtomicI32::n
 #[cfg(unix)]
 extern "C" fn sig_handler(sig: i32) {
     let pid = CHILD_PID.load(std::sync::atomic::Ordering::SeqCst);
-    if pid > 0 {
+    if pid != 0 {
         unsafe {
             sys::kill(pid, sig);
         }
     }
+}
+
+/// Forwards `SIGINT` and `SIGTERM` sent to this process to a child for as long as it lives, so a Ctrl-C or a
+/// termination of the host never leaves the Node chain behind. A negative `target` is a process group (the
+/// child leads its own). Dropping it stops forwarding. Off Unix there is nothing to forward.
+pub struct Forwarding;
+
+impl Forwarding {
+    pub fn to(target: i32) -> Self {
+        CHILD_PID.store(target, std::sync::atomic::Ordering::SeqCst);
+        #[cfg(unix)]
+        unsafe {
+            sys::signal(2, sig_handler as *const () as usize); // SIGINT
+            sys::signal(15, sig_handler as *const () as usize); // SIGTERM
+        }
+        Self
+    }
+}
+
+impl Drop for Forwarding {
+    fn drop(&mut self) {
+        CHILD_PID.store(0, std::sync::atomic::Ordering::SeqCst);
+        #[cfg(unix)]
+        unsafe {
+            sys::signal(2, 0);
+            sys::signal(15, 0);
+        }
+    }
+}
+
+/// The command that runs a script of the legacy payload with the payload's Node: the environment every Node
+/// child of the host gets (a fresh recursion guard, this host as `FGOS_HOST_BIN`, and the one state root of the
+/// invocation tree, kept as it is when the caller pinned one). The caller adds arguments, streams and a lead.
+pub fn payload_command(script: &Path) -> Command {
+    let mut cmd = Command::new("node");
+    cmd.arg(script);
+    cmd.env(RECURSION_GUARD_VAR, "1");
+    if let Ok(exe) = std::env::current_exe() {
+        cmd.env("FGOS_HOST_BIN", exe);
+    }
+    // One state root for the whole invocation tree: the payload reads it
+    // instead of resolving its own, and a root already pinned by the caller
+    // (dispatch, a sandbox HOME) is kept as it is.
+    let (state_root, source) = fgos_holder_lock::state_root::state_root();
+    if source != fgos_holder_lock::state_root::Source::Pinned {
+        cmd.env(fgos_holder_lock::state_root::PINNED_ROOT_ENV, state_root);
+    }
+    cmd
 }
 
 /// Appends exactly one JSON-lines record to `FGOS_INVOCATION_RECORD_PATH` when set.
@@ -243,20 +313,8 @@ pub fn execute_legacy_cli(
         }
     };
 
-    let mut cmd = Command::new("node");
-    cmd.arg(&payload_path);
+    let mut cmd = payload_command(&payload_path);
     cmd.args(forward_args);
-    cmd.env(RECURSION_GUARD_VAR, "1");
-    if let Ok(exe) = std::env::current_exe() {
-        cmd.env("FGOS_HOST_BIN", exe);
-    }
-    // One state root for the whole invocation tree: the payload reads it
-    // instead of resolving its own, and a root already pinned by the caller
-    // (dispatch, a sandbox HOME) is kept as it is.
-    let (state_root, source) = fgos_holder_lock::state_root::state_root();
-    if source != fgos_holder_lock::state_root::Source::Pinned {
-        cmd.env(fgos_holder_lock::state_root::PINNED_ROOT_ENV, state_root);
-    }
     cmd.stdin(Stdio::inherit());
     cmd.stdout(Stdio::inherit());
     cmd.stderr(Stdio::inherit());
@@ -295,35 +353,16 @@ pub fn execute_legacy_cli(
         }
     };
 
-    let child_id = child.id() as i32;
-    CHILD_PID.store(child_id, std::sync::atomic::Ordering::SeqCst);
-
-    #[cfg(unix)]
-    unsafe {
-        sys::signal(2, sig_handler as *const () as usize); // SIGINT
-        sys::signal(15, sig_handler as *const () as usize); // SIGTERM
-    }
-
+    let forwarding = Forwarding::to(child.id() as i32);
     let status = match child.wait() {
         Ok(s) => s,
         Err(err) => {
-            CHILD_PID.store(0, std::sync::atomic::Ordering::SeqCst);
-            #[cfg(unix)]
-            unsafe {
-                sys::signal(2, 0);
-                sys::signal(15, 0);
-            }
+            drop(forwarding);
             eprintln!("fgos: error: failed to wait for node child: {}", err);
             std::process::exit(1);
         }
     };
-
-    CHILD_PID.store(0, std::sync::atomic::Ordering::SeqCst);
-    #[cfg(unix)]
-    unsafe {
-        sys::signal(2, 0);
-        sys::signal(15, 0);
-    }
+    drop(forwarding);
 
     let completed_at = SystemTime::now();
 

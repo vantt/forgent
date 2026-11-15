@@ -9,6 +9,10 @@
     "owner_path": "packages/convention/rust",
     "subcommands": true
   },
+  "doctor": {
+    "operation_id": "doctor.run",
+    "owner_path": "apps/fgos"
+  },
   "events": {
     "operation_id": "event-store.status",
     "owner_path": "packages/event-store/rust",

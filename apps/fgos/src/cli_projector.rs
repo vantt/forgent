@@ -159,6 +159,10 @@ pub fn project_cli_invocation(
                 args,
             )),
         ),
+        crate::wiring::doctor::OPERATION_ID => (
+            ContractRef::from_static("doctor.run.request", "1.0.0"),
+            Box::new(crate::wiring::doctor::project_doctor_request(args, root)?),
+        ),
         other => {
             return Err(format!(
                 "native CLI projector has no request mapping for '{}'",

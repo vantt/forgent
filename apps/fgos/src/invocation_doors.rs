@@ -284,11 +284,7 @@ impl<'a> Doors<'a> {
             .map_err(|fault| self.refuse(None, fault.sub.as_deref(), fault.class, fault.message))?;
         let dir = self.call.named_dir();
         let verb = self.route.selector.as_str();
-        let policy = if verb == "init" {
-            RootPolicy::StrictCwd
-        } else {
-            RootPolicy::CallerTree
-        };
+        let policy = root_policy(verb);
         let store_mode = StoreMode::parse(self.route.store.as_deref().unwrap_or("none"));
         let child = declared(&self.route.event_store_child, self.call);
         let asked = resolve_invocation_root(&RootRequest {
@@ -303,6 +299,10 @@ impl<'a> Doors<'a> {
         // refusal reaches only an operation that reads a project, as its not-a-project answer. Any other verb,
         // whatever its store value, is refused. The list is `routing::LENIENT_ROOT_VERBS`.
         let (root, project) = match asked {
+            Ok(root) if acts_on_resolved_root(verb) => {
+                let project = Ok(root.root.clone());
+                (root, project)
+            }
             Ok(root) => {
                 let project = project_root(dir.as_deref(), &root, &self.cwd, self.home.as_deref());
                 (root, project)
@@ -399,6 +399,23 @@ impl<'a> Doors<'a> {
             );
         }
     }
+}
+
+/// How a verb picks its root: `init` creates a store, so it acts where it is run; `doctor` reports and repairs the
+/// shared store of the main checkout whichever worktree it is run from; every other verb acts on the nearest
+/// project above the caller.
+fn root_policy(verb: &str) -> RootPolicy {
+    match verb {
+        "init" => RootPolicy::StrictCwd,
+        "doctor" => RootPolicy::MainCheckout,
+        _ => RootPolicy::CallerTree,
+    }
+}
+
+/// Whether the verb acts on the root the door resolved even when no `.fgos` is there yet: `doctor` judges a
+/// project that has not been set up, and says so, instead of refusing it.
+fn acts_on_resolved_root(verb: &str) -> bool {
+    verb == "doctor"
 }
 
 /// `FGOS_DISPATCH_DEPTH` as the Node CLI reads it: a non-negative finite number, else 0.

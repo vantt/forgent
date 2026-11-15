@@ -1,5 +1,6 @@
 //! Source wiring modules for composition root.
 
+pub mod doctor;
 pub mod event_store_clone;
 pub mod events;
 pub mod gateway_control;

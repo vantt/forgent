@@ -127,6 +127,25 @@ fn present_mailbox(answer: &crate::wiring::mailbox_verbs::MailboxAnswer) -> i32 
     answer.exit
 }
 
+/// A verb answer that decides its own exit status: its text when it has one, else the envelope of its data,
+/// and the exit status the verb asked for.
+fn present_answer(answer: &fgos_host_runtime::VerbAnswer) -> i32 {
+    let printed = match &answer.text {
+        Some(text) => Ok(text.clone()),
+        None => wrap_envelope(&answer.data, None),
+    };
+    match printed {
+        Ok(text) => {
+            let _ = std::io::stdout().write_all(text.as_bytes());
+            answer.exit
+        }
+        Err(err) => {
+            eprintln!("fgos: error: {err}");
+            1
+        }
+    }
+}
+
 /// A typed refusal as one stdout line of JSON, the failure channel for a
 /// caller that asked for `--json`: `error` is the human message (the same
 /// string stderr carries), `reason` the stable code, `candidates` the sessions
@@ -162,6 +181,9 @@ pub fn present_outcome(outcome: &ProviderOutcome, json: bool) -> i32 {
                     println!("{}", refusal_json(refusal));
                 }
                 return fgos_identity::Refusal::EXIT;
+            }
+            if let Some(answer) = output.downcast_ref::<fgos_host_runtime::VerbAnswer>() {
+                return present_answer(answer);
             }
             let formatted =
                 if let Some(show) = output.downcast_ref::<fgos_distribution::BuildShowOutcome>() {
@@ -252,21 +274,6 @@ pub fn present_outcome(outcome: &ProviderOutcome, json: bool) -> i32 {
                         wrap_envelope(&data_val, None)
                     } else {
                         wrap_envelope(show, None)
-                    }
-                } else if let Some(config) =
-                    output.downcast_ref::<fgos_config::provider::ConfigOutcome>()
-                {
-                    // `config check` prints its findings and carries its own exit code.
-                    let code = config.exit;
-                    match wrap_envelope(&config.data, None) {
-                        Ok(text) => {
-                            let _ = std::io::stdout().write_all(text.as_bytes());
-                            return code;
-                        }
-                        Err(err) => {
-                            eprintln!("fgos: error: {}", err);
-                            return 1;
-                        }
                     }
                 } else if let Some(show) =
                     output.downcast_ref::<fgos_work_state::GateBypassShowOutcome>()
