@@ -49,8 +49,6 @@ fn run_fixes(root: &Path, ids: &[&str]) -> Vec<FixResult> {
         .collect()
 }
 
-/// What the release requires of Node (`requires.node`).
-const NODE_REQUIREMENT: &str = ">=18";
 const NO_REMOTE_FIX: &str = "git remote add origin <url> && fgos doctor --fix";
 const TRANSPORT_REMEDY: &str = "For actions/checkout use persist-credentials: false, remove its repo-local http.<url>.extraheader, and configure a trusted global credential helper or GIT_CONFIG_GLOBAL-level setting. Doctor never moves credentials automatically.";
 /// A project's own `.githooks/pre-commit` is fgOS's guard when it carries this name (the guard's own header).
@@ -426,12 +424,10 @@ fn incidents(context: &Context, facts: &RepositoryFacts, now_ms: u64) -> RowResu
     )
 }
 
+/// The Git floor: the Git binary the driver runs is there and meets the floor. The Node half of the row's old
+/// text is not judged here: Node is the bridged rows' runtime, and a Node that is missing or too old fails those
+/// rows and names the install in `next`; the host starts no Node process of its own for a row it judges itself.
 fn node_and_git(run: &Run) -> RowResult {
-    // Node stays a release requirement until the runner moves; the one reader of its version is packaging's.
-    let version = match node_version() {
-        Ok(version) => version,
-        Err(message) => return result(false, message, None),
-    };
     let floor = match run.git() {
         Ok(context) => match &context.inspection {
             Inspection::NotARepository { floor } => floor,
@@ -446,13 +442,7 @@ fn node_and_git(run: &Run) -> RowResult {
             None,
         );
     }
-    result(true, format!("node {version}, git available"), None)
-}
-
-/// The version of the Node on PATH, or why it does not meet the release's requirement.
-fn node_version() -> Result<String, String> {
-    fgos_distribution::init::check_node_requirement(NODE_REQUIREMENT)
-        .map_err(|error| format!("node is not available: {error}"))
+    result(true, "git available", None)
 }
 
 /// The row of `main-checkout-hook-wired`: it applies only to a project whose `.githooks/pre-commit` is fgOS's own
@@ -1000,14 +990,11 @@ mod tests {
     }
 
     #[test]
-    fn the_floor_row_passes_where_node_and_git_are_available() {
-        if node_version().is_err() {
-            return;
-        }
+    fn the_floor_row_passes_where_git_is_available_and_starts_no_node() {
         let f = Fixture::new("floor");
         let row = row_of(&f, "node-version-and-git");
         assert!(row.passed, "{}", message(&row));
-        assert!(message(&row).ends_with(", git available"));
+        assert_eq!(message(&row), "git available");
     }
 
     #[test]
