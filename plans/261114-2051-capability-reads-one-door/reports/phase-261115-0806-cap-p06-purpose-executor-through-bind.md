@@ -91,20 +91,20 @@ base `capability.prefer`, head `seat-binding` (or `agent-cli-missing` on the emp
 
 ## Deviations and things to decide
 
-1. `decide <tool executor id> --for <purpose it serves>` keeps its old hand-back (in-process with `mcpTool`), now through
-   `toolProvidersOf` instead of `mcpToolFor`; `decide <id>` alone and `decide --for <purpose>` are the two documented doors, so
-   this combination has no test of its own; say if it should be dropped.
+1. `decide <tool executor id> --for <purpose>` no longer hands the tool back: it answers exactly as `decide <tool executor id>`
+   (reviewer finding; the hand-back block and `mcpToolFor`'s successor are gone, a test pins the equality).
 2. Q3 also removes the match the old code made by accident for a one-element `prefer` list of one bare name (it used the list as
    an object key). A project with `prefer: [agy]` loses that candidate too. Real shapes: none in the shipped standard or in this
    repo's config; other projects not checked.
 3. A blank or empty `prefer` was an error (a thrown message, a TypeError for `[]`); it is now "no pool", which is what the phase
    file says (`hasOwnPreferPool`). The config validator still refuses a blank `prefer` at load.
-4. A tool executor with no probe declared (no invocation, or `mcp`/`skill` without `scanTarget`) answers `unavailable`
+4. A tool that is present or stale but names nothing to call (no mcp tool for the purpose, no cli command) answers
+   `unavailable` with `tool.unnamed`, not in-process. A cli tool is probed with `isCommandAvailable`, so an absolute command
+   path is found. A tool executor with no probe declared (no invocation, or `mcp`/`skill` without `scanTarget`) answers `unavailable`
    (`tool.unprobeable`), as the phase file says. This repo's `herdr` has a cli invocation in the machine's config, so it is
    present here; a project whose herdr declares none would see `unavailable`.
-5. `fanout-batch.mjs` and `assignment-runner.mjs` pass no `repoRoot` (not in this phase's file list): a tool probe there resolves
-   `scanTarget` against the process's working directory. Neither can reach a tool answer today (work ids and assignments name
-   executors or pooled purposes).
+5. `fanout-batch.mjs` passes its root and `workUnitFor` passes `stateRoot` as `repoRoot`. `assignment-runner.mjs` passes none: it
+   compiles from an assignment, which names an executor and cannot reach a tool answer.
 6. Tests that used a `kind: tool` executor with a `command` as a stand-in for an agent now use `kind: agent`; tests whose
    purposes bind through Seat Binding give the config a tier cell for the executor's family and put the CLI on the fixture PATH
    (`seedStubAgentClis`). The snapshot test's `fgos-coding-implement` descriptor names the executor and invocation Seat Binding
@@ -115,6 +115,13 @@ base `capability.prefer`, head `seat-binding` (or `agent-cli-missing` on the emp
    the dispatch spec (`docs/platform/runner/...`), `docs/explanation/capabilities-prefer-symmetry-removed.md` and
    `decide-for-prefer-fix-and-dispatchplan-minimal.md` still describe the first-`prefer` resolution; the D1/D5 narrative that
    lived in the deleted comment block goes to the decision history there.
+
+9. Stale chooser text to put in phase 07 or 08's file list: `core/skills/_shared/capability-catalog.md:93`,
+   `planning-capability-awareness.md:63`, `executor-dispatch-fallback.md:76` (it should mention `command`, `providers` and `stale`),
+   and `docs/platform/agent-coordination/architecture/dispatch-control-plane.md:89`, `:207` and `:272`.
+10. `executor-profile-warnings.mjs:59/63` and `tool-registry.mjs:106` still read `for` until phase 07, which owns both.
+11. The three `fgos-coding-implement` rows of the baseline snapshot repeated the `gemini-herdr` rows (the purpose binds there);
+    they are dropped, and fact (b) keeps the one proof that the purpose reaches `gemini` / `omp-herdr`.
 
 ## CHANGELOG line (for the big lead; not edited here)
 

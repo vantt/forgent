@@ -76,6 +76,7 @@ export async function fanoutBatchExecutorCli(
         workId: candidateId,
         workHint: workDispatchHint(workItem),
         hasLiveTaskAccess,
+        repoRoot: root,
       });
 
       if (mechanism === 'in-process') {

@@ -73,6 +73,14 @@ test('toolProvidersOf finds a cli tool on the given PATH as present and as missi
   assert.equal(toolProvidersOf(cfg, { capability: 'pane-labeling', pathEnv: '' })[0].status, 'missing');
 });
 
+test('toolProvidersOf finds a cli tool named by an absolute path', () => {
+  const dir = pathWith('abs-tool');
+  const cfg = { executors: { t: { kind: 'tool', for: ['x'], invocations: [{ via: 'cli', command: path.join(dir, 'abs-tool') }] } } };
+  assert.equal(toolProvidersOf(cfg, { capability: 'x', pathEnv: '' })[0].status, 'present');
+  const gone = { executors: { t: { kind: 'tool', for: ['x'], invocations: [{ via: 'cli', command: path.join(dir, 'nope') }] } } };
+  assert.equal(toolProvidersOf(gone, { capability: 'x', pathEnv: '' })[0].status, 'missing');
+});
+
 test('toolProvidersOf probes an mcp tool by its scanTarget: missing, present, and stale when its index is behind HEAD', () => {
   const repo = initFixtureRepo(tmpDir(), { branch: 'main' });
   const cfg = { executors: { index: mcpTool() } };

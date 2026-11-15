@@ -118,8 +118,6 @@ export const CANONICAL_EXECUTOR_DESCRIPTORS = [
   { label: 'claude', executorId: 'claude', invocationId: 'claude-cli' },
   { label: 'gemini-cli', executorId: 'gemini', invocationId: 'omp-cli-bwrap' },
   { label: 'gemini-herdr', executorId: 'gemini', invocationId: 'omp-herdr' },
-  // The executor and invocation Seat Binding binds for the fgos-coding-implement capability (fact (b) below).
-  { label: 'fgos-coding-implement', executorId: 'gemini', invocationId: 'omp-herdr' },
   { label: 'codex-bwrap', executorId: 'openai', invocationId: 'codex-cli-bwrap' },
   // `pi` was a literal config duplicate of `codex-pi` before executor-provider-naming (2026-09-17); the
   // merged `openai` executor keeps one pi invocation, and an account is leased at launch rather than named
@@ -561,105 +559,6 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
   },
   {
     selector: 'gemini-herdr',
-    workTier: 'heavy',
-    bindingSource: 'executor-id',
-    provider: 'gemini',
-    model: 'gemini-4-argon-high',
-    command: 'omp',
-    args: [
-      '--model',
-      'gemini-4-argon-high',
-      '--thinking',
-      'medium',
-      '--tools',
-      'read,write,edit,bash,grep,glob',
-      '--auto-approve'
-    ],
-    envKeys: [
-      'PI_CONFIG_DIR'
-    ],
-    credentialStore: {
-      use: 'omp',
-      homeEnv: 'PI_CODING_AGENT_DIR',
-      sessionDir: 'sessions',
-      files: [
-        'agent.db',
-        'config.yml'
-      ]
-    },
-    adapter: 'herdr-spawn',
-    promptDelivery: 'inline',
-    confinement: 'bwrap',
-    readOnlyMechanism: 'none'
-  },
-  {
-    selector: 'fgos-coding-implement',
-    workTier: 'light',
-    bindingSource: 'executor-id',
-    provider: 'gemini',
-    model: 'gemini-3.8-flash-low',
-    command: 'omp',
-    args: [
-      '--model',
-      'gemini-3.8-flash-low',
-      '--thinking',
-      'medium',
-      '--tools',
-      'read,write,edit,bash,grep,glob',
-      '--auto-approve'
-    ],
-    envKeys: [
-      'PI_CONFIG_DIR'
-    ],
-    credentialStore: {
-      use: 'omp',
-      homeEnv: 'PI_CODING_AGENT_DIR',
-      sessionDir: 'sessions',
-      files: [
-        'agent.db',
-        'config.yml'
-      ]
-    },
-    adapter: 'herdr-spawn',
-    promptDelivery: 'inline',
-    confinement: 'bwrap',
-    readOnlyMechanism: 'none'
-  },
-  {
-    selector: 'fgos-coding-implement',
-    workTier: 'standard',
-    bindingSource: 'executor-id',
-    provider: 'gemini',
-    model: 'gemini-3.8-flash-medium',
-    command: 'omp',
-    args: [
-      '--model',
-      'gemini-3.8-flash-medium',
-      '--thinking',
-      'medium',
-      '--tools',
-      'read,write,edit,bash,grep,glob',
-      '--auto-approve'
-    ],
-    envKeys: [
-      'PI_CONFIG_DIR'
-    ],
-    credentialStore: {
-      use: 'omp',
-      homeEnv: 'PI_CODING_AGENT_DIR',
-      sessionDir: 'sessions',
-      files: [
-        'agent.db',
-        'config.yml'
-      ]
-    },
-    adapter: 'herdr-spawn',
-    promptDelivery: 'inline',
-    confinement: 'bwrap',
-    readOnlyMechanism: 'none'
-  },
-  {
-    selector: 'fgos-coding-implement',
     workTier: 'heavy',
     bindingSource: 'executor-id',
     provider: 'gemini',
@@ -1150,17 +1049,12 @@ describe('dispatch policy baseline snapshot harness (Phase 00)', () => {
       }
     });
 
-    // (b) fgos-coding-implement heavy resolves model to gemini-4-argon-high (policy tier frontier, D15)
-    test('fact (b): fgos-coding-implement is bound by Seat Binding to gemini\'s omp pane invocation, and heavy resolves model to gemini-4-argon-high (D15)', () => {
+    // (b) the purpose reaches gemini-herdr, so its rows are not repeated under the purpose's name
+    test('fact (b): fgos-coding-implement is bound by Seat Binding to gemini\'s omp pane invocation, whose rows are the gemini-herdr rows above', () => {
       const { executorId: resolvedExecutorId, invocationId: resolvedInvocationId, bindingSource } = purposeSeatOf(cfg, 'fgos-coding-implement');
       assert.equal(bindingSource, 'seat-binding', 'the purpose is answered by Seat Binding');
       assert.equal(resolvedExecutorId, 'gemini', 'resolvedExecutorId resolves to gemini (executor-provider-naming 2026-09-17 -- was agy)');
       assert.equal(resolvedInvocationId, 'omp-herdr', 'resolvedInvocationId pins gemini\'s omp pane invocation');
-
-      const fgosImplementHeavy = resolveSnapshotRowByLabel(cfg, 'fgos-coding-implement', 'heavy', throwawayDir);
-      assert.equal(fgosImplementHeavy.model, 'gemini-4-argon-high', 'fgos-coding-implement heavy model must be gemini-4-argon-high');
-      assert.equal(fgosImplementHeavy.selector, 'fgos-coding-implement');
-      assert.equal(fgosImplementHeavy.bindingSource, 'executor-id');
     });
 
 

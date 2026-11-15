@@ -443,7 +443,7 @@ export function workUnitFor(item, opts = {}) {
   }
 
   const executorId = executorIdForWork(item, stage);
-  const resolved = executorId ? purposeSeatOf(cfg, executorId) : { configured: false };
+  const resolved = executorId ? purposeSeatOf(cfg, executorId, { repoRoot: stateRoot }) : { configured: false };
   const stepCapability = resolveCapabilityIdentityDetails({
     cfg, work: item, stage, executorId, resolvedExecutor: resolved.executor,
   }).capability;

@@ -1593,7 +1593,7 @@ test('decideExecutorCli never hands back mcpTool for a direct executorId call wi
   assert.equal(decided.configured, true);
 });
 
-test('decide --for a purpose its tool serves but names no tool for answers in-process without an mcpTool', async () => {
+test('decide --for a purpose its present tool serves but names no tool for answers unavailable as unnamed', async () => {
   const root = mkTempDir();
   writeRunnerConfigFixture(root, {
     executor: { command: 'claude', args: ['{prompt}'] },
@@ -1611,10 +1611,41 @@ test('decide --for a purpose its tool serves but names no tool for answers in-pr
   });
   fs.mkdirSync(path.join(root, '.gitnexus'));
   const decided = await decideExecutorCli(undefined, { repoRoot: root, for: 'other', hasLiveTaskAccess: true });
-  assert.equal(decided.mechanism, 'in-process');
+  assert.equal(decided.mechanism, 'unavailable');
   assert.equal(decided.executorId, 'gitnexus');
+  assert.deepEqual(decided.reasonCodes, ['tool.unnamed']);
+  assert.deepEqual(decided.providers, [{ executorId: 'gitnexus', status: 'present' }]);
   assert.equal('mcpTool' in decided, false);
   assert.equal('command' in decided, false);
+});
+
+test('decide --for a tool purpose names the best provider by status: a missing first provider yields to a present second, and providers lists both in config order', async () => {
+  const root = mkTempDir();
+  writeRunnerConfigFixture(root, {
+    executor: { command: 'claude', args: ['{prompt}'] },
+    capabilities: { 'impact-analysis': {} },
+    executors: {
+      'first-missing': { kind: 'tool', for: ['impact-analysis'], scanTarget: '.absent', invocations: [{ via: 'mcp', command: 'mcp:a', tools: { 'impact-analysis': 'mcp__a__impact' } }] },
+      'second-present': { kind: 'tool', for: ['impact-analysis'], scanTarget: '.present', invocations: [{ via: 'mcp', command: 'mcp:b', tools: { 'impact-analysis': 'mcp__b__impact' } }] },
+    },
+    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
+    timeoutMs: 5000,
+  });
+  fs.mkdirSync(path.join(root, '.present'));
+  const decided = await decideExecutorCli(undefined, { repoRoot: root, for: 'impact-analysis', hasLiveTaskAccess: true });
+  assert.equal(decided.mechanism, 'in-process');
+  assert.equal(decided.executorId, 'second-present');
+  assert.equal(decided.mcpTool, 'mcp__b__impact');
+  assert.deepEqual(decided.providers, [{ executorId: 'first-missing', status: 'missing' }, { executorId: 'second-present', status: 'present' }]);
+});
+
+test('decide <tool id> --for <purpose it serves> answers exactly as decide <tool id>: naming the executor is no second door to the tool', async () => {
+  const root = mkTempDir();
+  writeGitnexusFixture(root, { withTarget: true });
+  const byId = await decideExecutorCli('gitnexus', { repoRoot: root, hasLiveTaskAccess: true });
+  const byIdAndPurpose = await decideExecutorCli('gitnexus', { repoRoot: root, for: 'impact-analysis', hasLiveTaskAccess: true });
+  assert.deepEqual(byIdAndPurpose, byId);
+  assert.equal('mcpTool' in byIdAndPurpose, false);
 });
 
 test('decideExecutorCli never hands back mcpTool for a direct executorId call when the executor names more than one "for" entry -- ambiguous, no purpose to disambiguate', async () => {

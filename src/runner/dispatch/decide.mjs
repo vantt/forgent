@@ -234,8 +234,6 @@ export async function decideExecutorCli(
       providers: plan.providers,
       ...common,
     };
-  } else if (plan.mcpTool) {
-    base = { mechanism: 'in-process', mcpTool: plan.mcpTool, ...common };
   } else if (typeof plan.agentType === 'string' && plan.agentType) {
     base = { mechanism: plan.mechanism, agentType: plan.agentType, ...common };
   } else {

@@ -6,7 +6,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { findExecutableOnPath } from '../paths.mjs';
+import { isCommandAvailable } from '../paths.mjs';
 import { commitAt } from '../../git/inspect.mjs';
 
 /** The raw `for` list of any executor (`[]` when it declares none): the one reader of `for`. */
@@ -59,7 +59,7 @@ function isIndexStale(scanPath, repoRoot) {
 function probeStatus(executor, { repoRoot, pathEnv }) {
   const probe = Array.isArray(executor.invocations) ? executor.invocations[0] : undefined;
   if (probe?.via === 'cli' || probe?.via === 'binary') {
-    return typeof probe.command === 'string' && findExecutableOnPath([probe.command], pathEnv) !== null ? 'present' : 'missing';
+    return isCommandAvailable(probe.command, pathEnv) ? 'present' : 'missing';
   }
   if (probe?.via === 'mcp' || probe?.via === 'skill') {
     if (!executor.scanTarget) return 'unknown';

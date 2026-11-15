@@ -370,8 +370,11 @@ export function purposeSeatOf(cfg, purpose, { repoRoot } = {}) {
   const providers = toolProvidersOf(cfg, { capability: purpose, repoRoot });
   if (providers.length > 0) {
     const best = providers.reduce((chosen, next) => (TOOL_STATUS_RANK[next.status] < TOOL_STATUS_RANK[chosen.status] ? next : chosen));
-    const { mechanism, reasonCode } = TOOL_ANSWERS[best.status];
-    // What to call is named only when the tool can be called.
+    // A tool that is there but names nothing to call (no mcp tool for the purpose, no cli command) is no answer.
+    const named = Boolean(best.mcpTool || best.command);
+    const { mechanism, reasonCode } = TOOL_ANSWERS[best.status].mechanism === 'in-process' && !named
+      ? { mechanism: 'unavailable', reasonCode: 'tool.unnamed' }
+      : TOOL_ANSWERS[best.status];
     const callable = mechanism === 'in-process';
     return {
       configured: true,
@@ -613,17 +616,6 @@ export function compileDispatchPlan(
     return planOf(shell, { mechanism: 'unavailable', executorId, capability, reasonCodes, configured: false });
   }
 
-  // An executor named together with a purpose it serves hands the tool back, as a purpose alone does.
-  let mcpTool;
-  let finalMechanism = mechanism;
-  if (mechanism === 'out-of-process' && purpose && executor?.kind === 'tool') {
-    mcpTool = toolProvidersOf(cfg, { capability: purpose, repoRoot }).find((provider) => provider.executorId === executorId)?.mcpTool;
-    if (mcpTool) {
-      finalMechanism = 'in-process';
-      reasonCodes.push('native-first.mcp-handback');
-    }
-  }
-
   const agentType = executor?.agentType;
 
   // The invocation and governance describe what execution will actually do, so an out-of-process plan runs
@@ -632,7 +624,7 @@ export function compileDispatchPlan(
   // plan never takes the cli path, so an mcp-only executor failing there is no blocker.
   let resolvedForDispatch;
   let resolveError;
-  if (finalMechanism === 'out-of-process') {
+  if (mechanism === 'out-of-process') {
     try {
       // A pinned invocation (bind() picks herdr-spawn vs cli-spawn that way) must be the one the plan describes.
       const { invocation: pinnedInvocationId } = launchPinOf({ binding: seatBinding ?? binding, cliOverride });
@@ -665,14 +657,13 @@ export function compileDispatchPlan(
   if (reasonCode) reasonCodes.push(reasonCode);
 
   return planOf(shell, {
-    mechanism: finalMechanism,
+    mechanism: mechanism,
     executorId,
     capability,
     invocation,
     governance: resolvedForDispatch?.governance ?? noGovernance(),
     reasonCodes,
     ...(agentType ? { agentType } : {}),
-    ...(mcpTool ? { mcpTool } : {}),
     configured,
     bindingSource: resolved.bindingSource ?? null,
     tier: effectivePolicy?.tier ?? null,
