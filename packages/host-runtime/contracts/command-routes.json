@@ -107,69 +107,69 @@
     "subcommand_flags": {
       "check": [
         "dir",
-        "help",
-        "json"
+        "json",
+        "help"
       ],
       "explain": [
         "dir",
-        "help",
         "json",
+        "help",
         "path"
       ],
       "migrate": [
-        "accept-machine-overrides",
-        "convert",
         "dir",
-        "dry-run",
-        "finish",
-        "global",
-        "help",
         "json",
-        "machine-checked"
+        "help",
+        "dry-run",
+        "global",
+        "finish",
+        "convert",
+        "machine-checked",
+        "accept-machine-overrides"
       ],
       "patch": [
         "dir",
-        "file",
-        "global",
-        "help",
         "json",
-        "reason"
+        "help",
+        "file",
+        "reason",
+        "global"
       ],
       "refresh-docs": [
         "dir",
-        "global",
+        "json",
         "help",
-        "json"
+        "global"
       ],
       "set": [
         "dir",
-        "global",
-        "help",
         "json",
+        "help",
         "path",
+        "value",
         "reason",
-        "value"
+        "global"
       ],
       "show": [
         "dir",
-        "help",
         "json",
+        "help",
         "path"
       ],
       "standard": [
         "dir",
-        "help",
         "json",
+        "help",
         "path"
       ],
       "unset": [
-        "acknowledge-comment-loss",
         "dir",
-        "global",
-        "help",
         "json",
+        "help",
         "path",
-        "reason"
+        "reason",
+        "global",
+        "acknowledge-comment-loss"
       ]
     },
     "store": "none"
@@ -205,36 +205,36 @@
     "subcommands": true,
     "subcommand_flags": {
       "check": [
-        "all",
         "dir",
-        "help",
         "json",
+        "help",
+        "all",
         "paths"
       ],
       "classify": [
         "dir",
-        "help",
         "json",
+        "help",
         "path"
       ],
       "name": [
-        "at",
         "dir",
-        "help",
         "json",
+        "help",
         "kind",
+        "type",
         "slug",
-        "type"
+        "at"
       ],
       "path": [
-        "at",
         "dir",
-        "help",
         "json",
+        "help",
         "kind",
-        "plan",
+        "type",
         "slug",
-        "type"
+        "at",
+        "plan"
       ]
     },
     "store": "none"
@@ -375,49 +375,49 @@
     "subcommand_flags": {
       "list": [
         "dir",
-        "help",
         "json",
+        "help",
         "kind",
         "layer",
         "since"
       ],
       "ping": [
         "dir",
-        "help",
-        "json"
+        "json",
+        "help"
       ],
       "rank": [
         "dir",
-        "help",
         "json",
+        "help",
         "limit"
       ],
       "record": [
-        "attempts",
-        "detail",
-        "detail-stdin",
         "dir",
-        "disposition",
-        "doc-type",
-        "error-class",
-        "help",
         "json",
+        "help",
+        "subject",
         "layer",
+        "error-class",
+        "disposition",
         "producer",
-        "subject"
+        "attempts",
+        "doc-type",
+        "detail",
+        "detail-stdin"
       ],
       "resolve": [
-        "by",
         "dir",
-        "help",
         "json",
+        "help",
+        "subject",
         "reason",
-        "subject"
+        "by"
       ],
       "show": [
         "dir",
-        "help",
         "json",
+        "help",
         "subject"
       ]
     },
@@ -444,8 +444,8 @@
     ],
     "accepted_flags": [
       "dir",
-      "help",
-      "json"
+      "json",
+      "help"
     ],
     "store": "none"
   },
@@ -471,18 +471,18 @@
     "subcommand_flags": {
       "start": [
         "dir",
-        "help",
-        "json"
+        "json",
+        "help"
       ],
       "status": [
         "dir",
-        "help",
-        "json"
+        "json",
+        "help"
       ],
       "stop": [
         "dir",
-        "help",
-        "json"
+        "json",
+        "help"
       ]
     },
     "store": "none",
@@ -571,64 +571,64 @@
     "subcommand_flags": {
       "list": [
         "dir",
-        "help",
         "json",
-        "machine",
+        "help",
         "project",
+        "machine",
         "prune"
       ],
       "machine": [
-        "alias",
         "dir",
+        "json",
         "help",
-        "json"
+        "alias"
       ],
       "mint": [
         "dir",
-        "help",
         "json",
+        "help",
         "kind",
         "release"
       ],
       "pins": [
-        "confirm",
         "dir",
-        "fingerprint",
-        "forget",
+        "json",
         "help",
-        "json"
+        "forget",
+        "confirm",
+        "fingerprint"
       ],
       "project": [
         "dir",
-        "handle",
+        "json",
         "help",
         "init",
-        "json",
-        "new"
+        "new",
+        "handle"
       ],
       "resolve": [
         "dir",
-        "help",
         "json",
+        "help",
         "query"
       ],
       "session": [
         "dir",
-        "drop-role",
-        "fgos-dir",
-        "help",
         "json",
+        "help",
         "pid",
+        "fgos-dir",
         "register",
         "role",
-        "take"
+        "take",
+        "drop-role"
       ],
       "writer": [
         "dir",
-        "fgos-dir",
-        "help",
         "json",
-        "pid"
+        "help",
+        "pid",
+        "fgos-dir"
       ]
     },
     "store": "none"
@@ -700,32 +700,32 @@
     "subcommands": true,
     "subcommand_flags": {
       "inbox": [
-        "claim",
         "dir",
+        "json",
         "help",
-        "json"
+        "claim"
       ],
       "list": [
         "dir",
-        "help",
         "json",
+        "help",
         "long"
       ],
       "send": [
-        "body",
         "dir",
-        "help",
         "json",
+        "help",
+        "to",
+        "wake",
+        "reply-to",
         "need-ack",
         "reply-by",
-        "reply-to",
-        "to",
-        "wake"
+        "body"
       ],
       "status": [
         "dir",
-        "help",
-        "json"
+        "json",
+        "help"
       ]
     },
     "store": "none"
@@ -767,86 +767,86 @@
     "subcommands": true,
     "subcommand_flags": {
       "case": [
-        "action",
         "dir",
-        "harness",
-        "help",
-        "interventions",
-        "items",
         "json",
+        "help",
+        "action",
         "name",
-        "note",
-        "open",
-        "sessions",
+        "harness",
         "task",
-        "verdict"
+        "interventions",
+        "verdict",
+        "note",
+        "items",
+        "sessions",
+        "open"
       ],
       "coverage": [
         "dir",
-        "help",
-        "json"
+        "json",
+        "help"
       ],
       "discussions": [
-        "by",
         "dir",
-        "help",
         "json",
+        "help",
+        "by",
         "since",
         "until"
       ],
       "entropy": [
         "dir",
-        "help",
-        "json"
+        "json",
+        "help"
       ],
       "eval": [
-        "action",
         "dir",
-        "harness",
-        "help",
         "json",
+        "help",
+        "action",
+        "harness",
         "question"
       ],
       "faults": [
-        "class",
         "dir",
-        "help",
         "json",
-        "limit",
+        "help",
+        "class",
         "since",
-        "until"
+        "until",
+        "limit"
       ],
       "harness": [
-        "case",
         "dir",
-        "help",
         "json",
+        "help",
+        "case",
         "since",
         "until"
       ],
       "outcomes": [
         "dir",
-        "help",
-        "json"
+        "json",
+        "help"
       ],
       "ping": [
         "dir",
-        "help",
-        "json"
+        "json",
+        "help"
       ],
       "runs": [
+        "dir",
+        "json",
+        "help",
         "by",
         "case",
-        "dir",
-        "help",
-        "json",
         "since",
         "until"
       ],
       "snapshot": [
         "dir",
-        "help",
-        "json"
+        "json",
+        "help"
       ]
     },
     "store": "none"
@@ -1179,8 +1179,8 @@
     ],
     "accepted_flags": [
       "dir",
-      "help",
       "json",
+      "help",
       "runtime-json"
     ],
     "store": "none"

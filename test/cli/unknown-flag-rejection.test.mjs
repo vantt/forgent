@@ -77,10 +77,10 @@ test('every native route carries the registry projection of its flags', () => {
     const entry = COMMAND_REGISTRY.find((e) => e.name === route.selector);
     if (entry.subcommands) {
       for (const sub of Object.keys(entry.subcommands)) {
-        assert.deepEqual(route.subcommand_flags[sub], [...acceptedFlags(entry, [sub])].sort(), `${route.selector} ${sub}`);
+        assert.deepEqual(route.subcommand_flags[sub], [...acceptedFlags(entry, [sub])], `${route.selector} ${sub}`);
       }
     } else {
-      assert.deepEqual(route.accepted_flags, [...acceptedFlags(entry)].sort(), route.selector);
+      assert.deepEqual(route.accepted_flags, [...acceptedFlags(entry)], route.selector);
     }
   }
 });

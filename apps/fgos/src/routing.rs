@@ -394,10 +394,13 @@ fn pre_door_unknown_flag_text(
     let near = suggest(name, known.into_iter())
         .map(|f| format!(" Did you mean --{f}?"))
         .unwrap_or_default();
+    // Printed sorted: the list is in registry order, and these verbs have always shown it alphabetical.
+    let mut listed: Vec<&str> = accepted.iter().map(String::as_str).collect();
+    listed.sort_unstable();
     format!(
         "unknown flag \"{token}\" for \"fgos {}\".{near} Valid flags: {}. See \"fgos {} --help\".",
         route.selector,
-        accepted
+        listed
             .iter()
             .map(|f| format!("--{f}"))
             .collect::<Vec<_>>()
@@ -688,6 +691,22 @@ mod tests {
             "{}",
             fault.message
         );
+    }
+
+    #[test]
+    fn the_valid_flags_of_a_verb_off_the_pre_door_list_print_in_registry_order() {
+        let route = fake(serde_json::json!({
+            "subcommands": true,
+            "subcommand_flags": {"fence": ["dir", "help", "json", "yes", "name"]},
+        }));
+        assert_eq!(
+            node_unknown_flag_text(&route, Some("fence"), "bogus", &route.subcommand_flags.as_ref().unwrap()["fence"]),
+            "unknown flag \"--bogus\" for \"fgos probe fence\". Valid flags: --yes, --name, --dir, --json. See \"fgos probe fence --help\"."
+        );
+        // A pre-door verb keeps printing its flags alphabetically whatever order the table holds them in.
+        let accepted: Vec<String> = ["yes", "name"].map(String::from).to_vec();
+        let text = pre_door_unknown_flag_text(&route, "bogus", "bogus", &accepted);
+        assert!(text.contains("Valid flags: --name, --yes."), "{text}");
     }
 
     fn fake(json: serde_json::Value) -> CommandRouteDescriptor {
