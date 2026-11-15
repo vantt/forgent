@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "8210d3b8b4322accf9f48777cc9ada2c6c8678c40892b60b6ae1674c43e4a99d",
+  "payloadDigest": "45169be97cc1e26e8942a3b0b5e1181de819c9c2cec038a88928d7aab8e8c536",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -1106,7 +1106,7 @@
     "src/runner/execution/unit.mjs": "353d59b816712730aa77c61fe66b2ffe4b01110ce380a865e190237d6061439c",
     "src/runner/fanout-batch.mjs": "3764f2f7fe07664be359e1dba5f1703d443e0017a5b130e2ecf2dc0aa2f5223c",
     "src/runner/frozen-judge.mjs": "96265fab86a2a57ae4b191c83a864a4f285942f2c35318fbdae435a832bb75ed",
-    "src/runner/gateway-control.mjs": "0e47bc274b4836003c5e1881461a4f1f7490ff782ef39dde711af7ef5952a04c",
+    "src/runner/gateway-control.mjs": "4c74c8680d174e43d62cedbfe0204f54677f7d7f36b2c82d90f40b8fb735904c",
     "src/runner/github-adapter.mjs": "162d7b2064b9b311ea88afba25567601420626743dff6b72b0aba78f42220c00",
     "src/runner/goal-check.mjs": "bed1a778d1f702695160cab5896bb65a96e6c18c7a446ed6bc3b530c7b8ab66c",
     "src/runner/hook.mjs": "449913d1dc664a2420f4d026b12307257725886a1cf51c8397bd4922435e4044",

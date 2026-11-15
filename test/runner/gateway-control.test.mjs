@@ -569,3 +569,45 @@ test('startGateway: two concurrent starts build and spawn exactly once; the othe
     cleanup(repoRoot);
   }
 });
+
+// The host exports its recursion guard to the Node payload; the gateway calls `fgos` verbs
+// through the host, so a started gateway must not carry the guard or every call is refused.
+// Owning proof of the env handed to the spawned gateway (a live gateway is too heavy for the suite).
+test('startGateway: the spawned gateway does not inherit the host recursion guard but keeps the rest of the env', () => {
+  if (os.platform() !== 'linux') return;
+  const { repoRoot, fgosDir } = mkFgosDir();
+  const gatewayDir = path.join(repoRoot, 'apps', 'fgos-gateway');
+  const binDir = path.join(repoRoot, 'bin-shim');
+  const releaseDir = path.join(gatewayDir, 'target', 'release');
+  const envDump = path.join(repoRoot, 'gateway-env.txt');
+  fs.mkdirSync(gatewayDir, { recursive: true });
+  fs.mkdirSync(binDir, { recursive: true });
+  const binary = path.join(releaseDir, 'fgos-gateway');
+  fs.writeFileSync(path.join(binDir, 'cargo'), [
+    '#!/bin/sh',
+    `mkdir -p ${JSON.stringify(releaseDir)}`,
+    `printf '#!/bin/sh\\nenv > ${envDump}\\necho "listening on 127.0.0.1:0"\\nexec sleep 300\\n' > ${JSON.stringify(binary)}`,
+    `chmod +x ${JSON.stringify(binary)}`,
+    '',
+  ].join('\n'), { mode: 0o755 });
+  const script = `
+    import { startGateway } from ${JSON.stringify(GATEWAY_CONTROL_MOD_PATH)};
+    const entry = startGateway(${JSON.stringify(repoRoot)}, ${JSON.stringify(fgosDir)});
+    console.log(JSON.stringify({ pid: entry.pid }));
+  `;
+  const env = { ...process.env, FGOS_RUST_HOST_RECURSION_GUARD: '1', GATEWAY_ENV_MARKER: 'kept', PATH: `${binDir}${path.delimiter}${process.env.PATH}` };
+  let pid = null;
+  try {
+    const run = spawnSync(process.execPath, ['--input-type=module', '-e', script], { env, encoding: 'utf8', timeout: 10000 });
+    assert.equal(run.status, 0, run.stderr);
+    pid = JSON.parse(run.stdout.trim().split('\n').pop()).pid;
+    const dumped = fs.readFileSync(envDump, 'utf8').split('\n');
+    assert.ok(!dumped.some((line) => line.startsWith('FGOS_RUST_HOST_RECURSION_GUARD=')), 'guard must not reach the gateway');
+    assert.ok(dumped.includes('GATEWAY_ENV_MARKER=kept'), 'the rest of the environment is passed through');
+  } finally {
+    if (pid) {
+      try { process.kill(pid, 'SIGKILL'); } catch { /* already gone */ }
+    }
+    cleanup(repoRoot);
+  }
+});

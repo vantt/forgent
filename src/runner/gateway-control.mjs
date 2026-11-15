@@ -207,6 +207,8 @@ export function startGateway(repoRoot, fgosDir) {
       throw new GatewayControlError(`no apps/fgos-gateway/ directory found at "${gatewayDir}" — this repo has no gateway to start`, { gatewayDir });
     }
 
+    // Not `--locked`: the gateway crate is outside the root workspace and its own lock can lag the
+    // manifests, which `--locked` turns into a failed start; the build is kept as it was.
     try {
       execFileSync('cargo', ['build', '--release', '--bin', 'fgos-gateway'], { cwd: gatewayDir, stdio: 'pipe', maxBuffer: BUILD_MAX_BUFFER });
     } catch (err) {
@@ -228,10 +230,16 @@ export function startGateway(repoRoot, fgosDir) {
     const logPath = path.join(logsDir, `gateway-${Date.now()}-${process.pid}.log`);
     const logFd = fs.openSync(logPath, 'a');
 
+    // The host sets its recursion guard for the Node payload it runs. The gateway is a long-lived
+    // process that itself calls `fgos` verbs through the host, so it must not inherit the guard:
+    // every one of those calls would be refused as a recursive host spawn.
+    const gatewayEnv = { ...process.env };
+    delete gatewayEnv.FGOS_RUST_HOST_RECURSION_GUARD;
     let child;
     try {
       child = spawn(binaryPath, [], {
         cwd: gatewayDir,
+        env: gatewayEnv,
         detached: true,
         stdio: ['ignore', logFd, logFd],
       });
