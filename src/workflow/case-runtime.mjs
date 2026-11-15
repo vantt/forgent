@@ -182,7 +182,11 @@ function roundProblem({ events, round }) {
   return null;
 }
 
-/** The text of an answer file, drawn from its rounds. A view: deleting it loses nothing. */
+/**
+ * The text of an answer file, drawn from its rounds. A view: deleting it loses nothing. Coercion keeps it from
+ * throwing on a malformed round; the only refusals left are the YAML door's own limits (a value over the
+ * profile's size bound), which propagate by name from `writeFrontmatter` and are never caught here.
+ */
 function renderAnswerFile(caseId, stepId, rounds, file) {
   const latest = rounds.at(-1);
   const entries = rounds.map((r) => [
@@ -195,11 +199,13 @@ function renderAnswerFile(caseId, stepId, rounds, file) {
     r.answer,
     '',
   ].join('\n'));
+  // The rounds are agent-written input, so each field is coerced to the plain value the door can round-trip.
+  const plain = (value) => (Number.isInteger(value) ? value : String(value));
   const meta = {
     approved: latest.approved ? 'yes' : 'no',
-    occurrence: latest.occurrence,
-    round: latest.round,
-    subjectDigest: latest.subjectDigest ?? 'none',
+    occurrence: plain(latest.occurrence),
+    round: plain(latest.round),
+    subjectDigest: String(latest.subjectDigest ?? 'none'),
   };
   return writeFrontmatter(meta, [
     '',

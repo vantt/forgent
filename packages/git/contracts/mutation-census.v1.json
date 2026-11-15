@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "a4697a3549a3de5300c00721cccfb9aacb4830c10de59eae1fd2ea5963af4c64",
+  "payloadDigest": "e96d88db4bf2b4210175b445438b8624d72d45491d2df5205e183c05beb17d7f",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "a5629383f89b4488b252a62f0ea86463e649e33e0a891db1a19af2cd6c136aca",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -1277,7 +1277,7 @@
     "src/workflow/case-inherit.mjs": "5d2811d88258fcaddfb643ee9030377ed9e6c2e7f25c76f7be08e62a22a7f4fc",
     "src/workflow/case-lock.mjs": "c5f5df8c003ba78ff4d2983ce578a3dee022c4595f5c0f2a2804f56649a83e33",
     "src/workflow/case-projection.mjs": "5b2999f41e9638df0ee14034655c5ce938ce0cbdacff080bfee7b7a9b15a374a",
-    "src/workflow/case-runtime.mjs": "1a8ef0438f53b997584ae962bf2679ecfcbe3bba3dc5fa0c173c33855fb41e9b",
+    "src/workflow/case-runtime.mjs": "bc8fd9abdded62ed2182cfd76b45844f7820852ce88839d7b68189451d9726bb",
     "src/workflow/case-start.mjs": "d6ab60b0e18c077dbf65e5111b334917b5b2c42ab93c323452dd2eac5d677917",
     "src/workflow/case-verbs.mjs": "fff61cbc9e419f6e1eed82e29af0cf4db6b0c3176b4351cab638fd4b0e5e4f24",
     "src/workflow/checked.mjs": "ff61a4c3ecd3d492dcd4a97c91efc12250fd1ffd99ebd598b1c458691a6bc038",
