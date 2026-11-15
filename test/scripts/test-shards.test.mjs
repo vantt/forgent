@@ -11,7 +11,7 @@ import { readSuiteBaseline } from '../../scripts/test-proof-inventory.mjs';
 import { countXmlCases } from '../../scripts/write-test-marker.mjs';
 import { mergeShards } from '../../scripts/merge-test-shards.mjs';
 import { runCompare } from '../../scripts/test-select-compare.mjs';
-import { checkShardSet, junitFiles, mergeJunit, parseShard, partitionFiles, repoRelative, shardLoads } from '../../scripts/lib/test-shards.mjs';
+import { checkShardSet, junitFiles, junitSeconds, measuredImbalance, mergeJunit, parseShard, partitionFiles, repoRelative, shardLoads } from '../../scripts/lib/test-shards.mjs';
 
 const MERGE_CLI = fileURLToPath(new URL('../../scripts/merge-test-shards.mjs', import.meta.url));
 
@@ -182,7 +182,7 @@ test('the merge writes full.xml when the shards ran every file once, and fails b
   put(2, 2, names.slice(2), done);
   const out = path.join(dir, 'out');
   const ok = mergeShards({ dir: shards, out, repoRoot: dir, discovered: names });
-  assert.deepEqual(ok, { problems: [], exitCode: 1 }, 'a failing shard keeps its exit code');
+  assert.deepEqual({ problems: ok.problems, exitCode: ok.exitCode }, { problems: [], exitCode: 1 }, 'a failing shard keeps its exit code');
   assert.equal(countXmlCases(path.join(out, 'full.xml')), 5);
 
   fs.rmSync(path.join(shards, 'test-shard-2'), { recursive: true });
@@ -194,5 +194,25 @@ test('the merge writes full.xml when the shards ran every file once, and fails b
   const unvouched = mergeShards({ dir: shards, out, repoRoot: dir, discovered: names });
   assert.deepEqual(unvouched.problems, ['test-shard-2 has no completed test-marker.json']);
   assert.equal(unvouched.exitCode, 1);
+  fs.rmSync(dir, { recursive: true, force: true });
+});
+
+test('the merge reports the measured imbalance: the slowest shard\'s summed testcase time over the mean, and which shard it was', () => {
+  const dir = fixtureDir();
+  const xml = (...times) => `<testsuites>${times.map((t, i) => `<testsuite name="s" file="${dir}/t${i}.test.mjs"><testcase name="c" time="${t}" classname="c"/></testsuite>`).join('')}</testsuites>`;
+  assert.equal(junitSeconds(xml(1.5, 2.5)), 4);
+  const shards = path.join(dir, 'shards');
+  for (const [k, body] of [[1, xml(10)], [2, xml(30)], [3, xml(20)]]) {
+    const sub = path.join(shards, `test-shard-${k}`);
+    fs.mkdirSync(sub, { recursive: true });
+    fs.writeFileSync(path.join(sub, `shard-${k}-of-3.xml`), body);
+    fs.writeFileSync(path.join(sub, 'test-marker.json'), JSON.stringify({ completed: true, exitCode: 0 }));
+  }
+  const { imbalance } = mergeShards({ dir: shards, out: path.join(dir, 'out'), repoRoot: dir, discovered: ['t0.test.mjs'] });
+  assert.equal(imbalance.slowest, 2);
+  assert.equal(imbalance.ratio.toFixed(2), '1.50');
+  const cli = spawnSync(process.execPath, [MERGE_CLI, '--dir', shards, '--out', path.join(dir, 'out2')], { encoding: 'utf8' });
+  assert.match(cli.stdout, /merge-test-shards: imbalance max\/mean = \d\.\d\d \(shard 2 slowest\)/);
+  assert.equal(measuredImbalance([]), null);
   fs.rmSync(dir, { recursive: true, force: true });
 });

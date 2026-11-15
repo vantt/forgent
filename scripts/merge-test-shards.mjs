@@ -6,7 +6,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { isMainModule } from './lib/is-main-module.mjs';
 import { REPO_ROOT } from './lib/git-addon-stage.mjs';
-import { checkShardSet, junitFiles, mergeJunit, repoRelative } from './lib/test-shards.mjs';
+import { checkShardSet, junitFiles, junitSeconds, measuredImbalance, mergeJunit, repoRelative } from './lib/test-shards.mjs';
 import { discoverTestFiles } from './run-tests.mjs';
 
 const SHARD_XML = /^shard-(\d+)-of-(\d+)\.xml$/;
@@ -21,12 +21,14 @@ function readMarker(file) {
 
 /**
  * Merges every shard report under `dir` into `<out>/full.xml`. Returns `{ problems, exitCode }`; problems is empty
- * only when each shard completed and together they ran every discovered file exactly once.
+ * only when each shard completed and together they ran every discovered file exactly once. `imbalance` is the
+ * slowest shard's measured test seconds over the mean (the number the shard balance is judged by), or null.
  */
 export function mergeShards({ dir, out, repoRoot = REPO_ROOT, discovered = discoverTestFiles().map((f) => repoRelative(REPO_ROOT, f)) }) {
   const problems = [];
   const shards = [];
   const reports = [];
+  const seconds = [];
   let exitCode = 0;
   const dirs = fs.existsSync(dir) ? fs.readdirSync(dir, { withFileTypes: true }).filter((e) => e.isDirectory() && e.name.startsWith('test-shard-')).map((e) => e.name).sort() : [];
   for (const name of dirs) {
@@ -42,6 +44,7 @@ export function mergeShards({ dir, out, repoRoot = REPO_ROOT, discovered = disco
     exitCode = Math.max(exitCode, Number.isInteger(marker?.exitCode) ? marker.exitCode : 1);
     shards.push({ index: Number(index), total: Number(total), files: junitFiles(xml, repoRoot) });
     reports.push(xml);
+    seconds.push({ index: Number(index), seconds: junitSeconds(xml) });
   }
   problems.push(...checkShardSet(discovered, shards));
   if (reports.length > 0) {
@@ -53,7 +56,7 @@ export function mergeShards({ dir, out, repoRoot = REPO_ROOT, discovered = disco
       problems.push(err.message);
     }
   }
-  return { problems, exitCode: problems.length > 0 ? exitCode || 1 : exitCode };
+  return { problems, exitCode: problems.length > 0 ? exitCode || 1 : exitCode, imbalance: measuredImbalance(seconds) };
 }
 
 if (isMainModule(import.meta.url)) {
@@ -68,9 +71,10 @@ if (isMainModule(import.meta.url)) {
     console.error('merge-test-shards: ERROR: usage: --dir <shards-dir> --out <dir>');
     process.exit(2);
   }
-  const { problems, exitCode } = mergeShards({ dir, out });
+  const { problems, exitCode, imbalance } = mergeShards({ dir, out });
   for (const problem of problems) console.error(`merge-test-shards: ERROR: ${problem}`);
   if (process.env.GITHUB_OUTPUT) fs.appendFileSync(process.env.GITHUB_OUTPUT, `exit_code=${exitCode}\n`);
+  if (imbalance) console.log(`merge-test-shards: imbalance max/mean = ${imbalance.ratio.toFixed(2)} (shard ${imbalance.slowest} slowest)`);
   if (problems.length === 0) console.log(`merge-test-shards: ${fs.readdirSync(dir).filter((d) => d.startsWith('test-shard-')).length} shards cover every test file exactly once`);
   process.exit(problems.length > 0 ? 1 : 0);
 }

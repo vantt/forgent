@@ -127,3 +127,21 @@ export function mergeJunit(xmls) {
   }).filter(Boolean);
   return `<?xml version="1.0" encoding="utf-8"?>\n<testsuites>\n\t${body.join('\n\t')}\n</testsuites>\n`;
 }
+
+/** The summed `<testcase time>` seconds of a junit report: what the shard that produced it spent on its tests. */
+export function junitSeconds(xml) {
+  let total = 0;
+  for (const [, tag] of xml.matchAll(/<testcase\b([^>]*)>/g)) {
+    const time = /\stime="([^"]*)"/.exec(tag);
+    if (time && Number.isFinite(Number(time[1]))) total += Number(time[1]);
+  }
+  return total;
+}
+
+/** `{ ratio, slowest }`: the slowest shard's seconds over the mean, from `[{ index, seconds }]`; null when nothing was measured. */
+export function measuredImbalance(shards) {
+  const total = shards.reduce((sum, s) => sum + s.seconds, 0);
+  if (shards.length === 0 || total <= 0) return null;
+  const slowest = shards.reduce((a, b) => (b.seconds > a.seconds ? b : a));
+  return { ratio: slowest.seconds / (total / shards.length), slowest: slowest.index };
+}
