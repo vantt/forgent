@@ -258,6 +258,15 @@ test('a test file that imports its tests from a data: URL reports under that URL
   // A junit file the manifest never gave the shard still fails by name.
   const stray = checkShardSet(names, shard([...reported, 'other.test.mjs'], names, urls));
   assert.ok(stray.includes('other.test.mjs ran in shard 1/1 but is not in its manifest'));
+
+  // A discovered file that another file imported shows up in a shard that was not given it: noted, never counted.
+  const two = (extra) => [{ index: 1, total: 2, files: new Set(['a', ...extra]), manifest: new Set(['a']), unattributable: new Set() }, { index: 2, total: 2, files: new Set(['b']), manifest: new Set(['b']), unattributable: new Set() }];
+  const imported = [];
+  assert.deepEqual(checkShardSet(['a', 'b'], two(['b']), { imported }), []);
+  assert.deepEqual(imported, [{ index: 1, total: 2, file: 'b' }]);
+  const alone = two(['b']);
+  alone[1] = { ...alone[1], files: new Set() };
+  assert.deepEqual(checkShardSet(['a', 'b'], alone), ['shard 2/2 did not report b and has 0 non-path source(s) to account for 1 file(s)', 'b ran in no shard'], 'an import in another shard never stands in for the owner running the file');
   fs.rmSync(dir, { recursive: true, force: true });
 });
 
