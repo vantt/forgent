@@ -168,6 +168,8 @@ function normaliser(world, entry) {
       .replace(/(stateRoot \S+ \()(?:home|pinned|env)\)/g, '$1<SOURCE>)')
       // A timer unit is named after a hash of the project's path, and every world has its own path.
       .replace(/(fgos-(?:mailbox-sync|account-probe))-[0-9a-f]{8}/g, '$1-<STEM>')
+      // The config file's own documentation comment: the base names the retired `setup` verb in the mailbox.enabled sentence.
+      .replace('Whether fgos setup and doctor --fix install the mailbox hook rows into this project\'s Claude Code and Codex hook files; false removes the rows they installed.', 'Whether fgos doctor --fix installs the mailbox hook rows into this project\'s Claude Code and Codex hook files; false removes the rows it installed.')
       .replace(UUID, '<UUID>')
       .replace(ISO, '<TS>')
       .replace(/"(?:data_hash|generated_at)": "[^"]*",?\s*/g, '')
