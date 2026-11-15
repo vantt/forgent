@@ -141,11 +141,13 @@ restaged; activation never refreshes itself merely because source was edited.
 cài đặt/setup/doctor story. Before any change is done, check:
 
 - A new config key goes into `core/config-standard` and `core/config-schema`;
-  nothing registers a default anywhere else (`fgos setup` is deprecated).
+  nothing registers a default anywhere else.
 - A new runtime dependency (a tool it shells out to, a file or directory it
-  expects, a platform capability) needs a readiness row in doctor
-  (`src/setup/registrations.mjs`), and a registered fix only when the repair
-  is safe and about readiness.
+  expects, a platform capability) needs a row in
+  `packages/distribution/contracts/doctor-registry.v1.json`, judged by its
+  owning crate (a row of a layer still in Node is bridged with its step's
+  label), and a registered fix only when the repair is safe and about
+  readiness.
 - A new runtime state or incident class must be reportable and repairable
   through its component's own verb, on that component's normal path, never
   only through doctor. Doctor may carry one read-only pointer row for it

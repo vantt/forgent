@@ -329,7 +329,7 @@ Config key `dispatch.gateKillGraceMs` (milliseconds, minimum 1000, standard valu
 
 Config key `dispatch.cancelWaitMs` (milliseconds, minimum 1000, standard value 15000; a literal, not derived from the grace: raise both together, the doctor check names a wait shorter than the grace): how long a controller stopped by Ctrl-C or SIGTERM waits for the receipts of its attempts before it exits. A present but unusable value is refused by the config door, which stops `fgos run`. Only a process that asks for it installs the signal handlers (the `fgos` CLI entry); a library caller of the runner keeps its own signal handling. It is read by the same reader, in the same file (`src/run-supervisor/gate-kill-grace.mjs`), and setup registers no config default for it for the same reason; `run-supervisor-config` is its registration.
 
-`fgos setup` creates the runtime socket directory (0700) when missing; it runs the registered fixes, so the `runtime-socket-dir` fix is the setup step.
+`fgos doctor --fix` creates the runtime socket directory (0700) when missing (the `runtime-socket-dir` fix).
 
 Doctor checks (registered in `src/setup/registrations.mjs`; levels follow the doctor convention: `passed: false` fails, a `warning:` prefix warns):
 

@@ -49,7 +49,7 @@ without cloning or understanding the fgOS source repo internals.
 | Project-local runtime safety | A workspace should use its selected runtime, not an accidental global `PATH` binary. | Implemented preview: activation, tier-zero resolution, V1 schemas, and external-consumer Rust-host proof exist; stable/default graduation remains release-owned. |
 | Global/project/dev contexts coexist | Global install, project-local install, and dev-checkout self-hosting must not break each other. | Implemented/partial: resolver tiers and config precedence exist; continue guarding drift. |
 | Doctor/fix self-repair | Environment readiness should be repairable through named fixes, not just reported. | Implemented for the current registry model. |
-| Extensible readiness/config registry | New modules should register checks, fixes, and config defaults through the shared registry. | Implemented; avoid ad hoc setup logic. |
+| Extensible readiness/config registry | New modules add a row to the one doctor registry (`packages/distribution/contracts/doctor-registry.v1.json`), judged by its owning crate; config defaults live in the config standard. | Implemented; avoid ad hoc setup logic. |
 | Composable agent instructions | Rules should originate under the authority that owns them, compose into an effective instruction set, and render to `AGENTS.md` or host adapters without semantic drift. | Implemented for canonical sources, composition, portable `AGENTS.md` managed-block rendering, and instruction projection health checks; host-specific adapter expansion remains demand-driven. |
 | Portable skill distribution | A skill should be authored once under the owning component/domain and rendered into host-native adapter surfaces. | Partial: Codex/OpenAI, Claude wrapper, and plugin skill projections exist; Gemini extension target is planned. |
 | CI as install/readiness confidence | CI/release proof should catch install/distribution failures before users do. | Implemented preview for the current release-shaped external-consumer proof; keep expanding as release promises grow. |
@@ -117,6 +117,6 @@ The source document `docs/distribution-vision.md` (deleted in 97dd62aa7) recorde
 | Current behavior | `spec.md` |
 | Runtime design | `architecture/runtime-identity-and-activation.md` |
 | fgctl/local fgos boundary | `architecture/fgctl-and-local-fgos.md` |
-| Doctor/fix registry and legacy setup compatibility | `contracts/setup-doctor-registry.md` |
+| Doctor/fix registry (`fgos setup` is retired) | `contracts/setup-doctor-registry.md` |
 | Implementation status | `verification/implementation-alignment.md` |
 | Historical baseline | `history/distribution-baseline.md` |

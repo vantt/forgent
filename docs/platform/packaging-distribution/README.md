@@ -41,7 +41,7 @@ Use this area when the work touches:
 - `fgctl` bootstrap, stage, init, upgrade, repair, or verify;
 - workspace-local `.fgos/installation/` activation;
 - legacy Node payload compatibility;
-- `fgos doctor`, `fgos doctor --fix`, or legacy `fgos setup` compatibility;
+- `fgos doctor` or `fgos doctor --fix`;
 - global/project/dev-checkout resolution;
 - plugin/dev-skill packaging as a distributed surface;
 - instruction composition and managed `AGENTS.md` projections;
@@ -82,7 +82,7 @@ When sources disagree, read them in this order:
 
 If current code implements behavior that target architecture has already superseded, document it as `implemented legacy` or compatibility. Do not promote it as the active design merely because it still exists in code.
 
-Example: current Node `fgos setup` still exists, but the target architecture routes onboarding through `fgctl init` plus local `fgos init` / `fgos doctor --fix` / `fgos doctor`.
+Example: `fgos setup` is retired (unknown verb); onboarding runs through `fgctl init` plus local `fgos init` / `fgos doctor --fix` / `fgos doctor`.
 
 ## 4. Current Position
 
@@ -102,7 +102,7 @@ For implemented legacy setup, doctor and npm compatibility read [spec.md](spec.m
 | Code-panel rollout | `done` | P1-P9 merged to `main`; whole-track proof is recorded in [reports/track-closeout.md](reports/track-closeout.md). | No active packet remains; use the closeout's remaining partial claims as the next tracker. |
 | Release tree and Rust packaging records | `implemented` | Native `<release>/bin/fgos`, runner shim, `libexec/legacy-node`, manifest schemas, `artifactDigest`, activation binding, distribution pin, and topology root binding have tests and V1 contract docs. | Keep golden/schema tests current when manifest fields evolve. |
 | `fgctl` stage/init/upgrade/repair | `implemented preview` | Staging, verification, activation publish, local runtime tail, no-op upgrade, repair, published `v0.1.0` release assets, and external-consumer proof are recorded. | Stable/default release graduation remains a release-owner decision. |
-| Legacy Node/npm compatibility | `implemented legacy deprecated` | Legacy npm install and `fgos setup` remain reachable as compatibility surfaces with deprecation guidance. | Retire only after the preview fallback window and release-owner policy permit it. |
+| Legacy Node/npm compatibility | `retired` | The npm install channel and `fgos setup` are retired; `fgos init` there points to `fgctl init`. | none |
 | Doctor/fix registry | `implemented` | Checks, fixes, config defaults, and legacy setup compatibility use the shared registry. | Keep new infra/config assumptions registered here instead of ad hoc checks. |
 | Instruction composition/projection | `implemented for current portable path` | Canonical source registry, effective-set composition, portable `AGENTS.md` managed block, effective-set JSON, projection ledger entry, and doctor/fix repair exist. | Host-specific adapter expansion remains demand-driven; wider projection ledger coverage is partial. |
 | Skill packaging | `implemented partial` | Canonical skill source discovery, Codex/OpenAI and Claude projections, plugin dev-skill mirroring, duplicate/collision checks, and Gemini package prototype exist. | Public intent alias metadata, full Gemini release/install/doctor integration, and skill projection ledger coverage remain open. |
@@ -139,7 +139,7 @@ It does not own:
 | `artifactDigest` | Canonical digest of the release manifest/tree identity, not the compressed tarball checksum. |
 | activation binding | Workspace-local `.fgos/installation/activation.json` selecting the active release. |
 | legacy Node payload | Compatibility payload under `libexec/legacy-node/`, still carrying existing Node CLI behavior. |
-| doctor/fix registry | Open registry of checks, fixes, and config defaults used by `fgos doctor` and `fgos doctor --fix`; current legacy `fgos setup` also consumes it until retired. |
+| doctor/fix registry | One registry file (`packages/distribution/contracts/doctor-registry.v1.json`) of every row and fix with its owner, used by `fgos doctor` and `fgos doctor --fix`; config defaults live in the config standard. |
 | effective instruction set | Machine-readable composed rules after authority, specificity, override, and conflict policy are resolved. |
 | instruction projection | Generated host/workspace instruction file such as root or scoped `AGENTS.md`; host-specific files exist only as adapters when needed. |
 | skill adapter projection | Generated host-specific skill surface, such as `.agents/skills`, `.claude/skills`, plugin skills, or a future Gemini extension package. |

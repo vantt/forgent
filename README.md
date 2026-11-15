@@ -158,7 +158,9 @@ config problems and, with `--fix`, repairs the ones it names. Details:
 generated skill directories, git hooks and the `.fgos/installation/` activation. It
 prints the plan first and applies it with `--yes`. Your config and data stay.
 `--purge` also removes the machine's release store. The `fgctl` binary and the
-`fgos` launcher beside it are named, never removed.
+`fgos` launcher beside it are named, never removed. The project half is
+`fgos uninstall` (plan without `--yes`); it refuses `/`, your home directory
+and any directory that contains it.
 
 ```bash
 fgctl uninstall --dry-run   # print the plan, change nothing
