@@ -225,10 +225,13 @@ fn agent_hook_row(
     env: &[(String, String)],
     memo: &ProbeMemo,
 ) -> RowOutcome {
-    // The hook table reads the mailbox opt-in through the config door, which refuses a project directory it cannot
-    // open: the row says so as its failure.
-    if let Some(refusal) = project_root_refusal(root) {
-        return judged(false, refusal);
+    // Claude Code's table is read whether or not the project has a `.claude/` directory, so it reads the mailbox
+    // opt-in through the config door, which refuses a project directory it cannot open: the row says so as its
+    // failure. The other CLIs first look for their own directory and are not required without one.
+    if cli == "claude" {
+        if let Some(refusal) = project_root_refusal(root) {
+            return judged(false, refusal);
+        }
     }
     match check_hook(
         root,
