@@ -782,6 +782,22 @@
       "allowed": [],
       "debt": [],
       "reason": "the `events`, `session` and `gateway` verbs are native in the host (apps/fgos/src/wiring/{events,session,gateway_control}.rs): the Node use cases, the session writers and the gateway control module are deleted, Node reads the registry only through `fgos session list`, and no file may bring one of these names back"
+    },
+    {
+      "job": "write a YAML frontmatter fence",
+      "kind": "door",
+      "patterns": [
+        "(['\"`])---(?:\\\\r)?\\\\n",
+        "`---$",
+        "(['\"`])---\\1\\s*[,\\];]",
+        "\\.push\\(\\s*(['\"`])---\\1\\s*\\)"
+      ],
+      "allowed": [
+        "src/util/yaml.mjs",
+        { "path": "core/skills/distill/scripts/distill.mjs", "reason": "standalone shipped skill script; runs in user projects without the fgOS addon" }
+      ],
+      "debt": [],
+      "reason": "only src/util/yaml.mjs writeFrontmatter writes a frontmatter block, through the crate's emit (the addon's yaml.emit), so quoting is the crate's and every block reads back to its value; a hand writer opens a block with a fence literal: a quoted `---` followed by an escaped newline, a template line ending in `---`, a `---` array element or constant, or a pushed `---`. Per-line match on code and string text in the scanned roots: YAML text built without a fence literal, or a fence assembled from parts, is not seen"
     }
   ],
   "files": {
