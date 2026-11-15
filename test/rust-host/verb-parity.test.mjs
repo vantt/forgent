@@ -10,7 +10,8 @@ import fs from "node:fs";
 import path from "node:path";
 import { loadParityTable, parseEntry, parityBaseEntrySpec, runCaseOnEntry, compareResults, snapshotDirectory, diffDirectorySnapshots } from "./harness.mjs";
 
-const TABLES = ["git", "lock", "lock-status"];
+// The tables of the verbs a step moved; the step that closes deletes its own. Empty until a step adds one.
+const TABLES = [];
 
 function baseEntry() {
   const description = JSON.parse(fs.readFileSync(parityBaseEntrySpec().slice("release:".length), "utf8"));

@@ -233,6 +233,15 @@ Delete:
   `test/cli/fgos-gateway.test.mjs`; others shrink (owners named per phase)
 - The transitional parity runner and tables (11, 12)
 
+### Added during execution (S2, checked with `git diff --name-only origin/main...HEAD`)
+
+- Host: `apps/fgos/src/wiring/{git_incidents,lock_fence,lock_status}.rs` (a provider cannot live in `fgos-git` or `holder-lock`: neither has a host-runtime edge).
+- Addon and ABI: `packages/git/node-addon/src/{lib.rs,git/worktree.rs}`, `src/native/door.mjs`, `test/git/native-load.test.mjs` (`holderLock` ABI 2 to 3); `packages/holder-lock/rust/src/scope.rs` (one crate-internal registry accessor).
+- Generator and generated: `scripts/export-command-selectors.mjs` (registry flag order kept), `packages/host-runtime/contracts/command-manifest.json`, the render surfaces of `core/skills/fgos-lock-fence/SKILL.md` (`.agents/skills/`, `plugins/fgOS/skills/`).
+- Tests: `packages/git/rust/tests/incidents.rs`, `test/helpers/run-dirs-fixture.mjs`, `test/run-supervisor/adopt-client.test.mjs`, `test/runner/assignment-layout.test.mjs` (the shared run-directory fixture), `test/cli/unknown-flag-rejection.test.mjs`.
+- Close: `packages/holder-lock/rust/Cargo.toml` (comment on `preserve_order`), `packages/git/node-addon/src/holder_lock.rs` and `src/state/hot-lock.mjs` (the Node hot-record clear and its addon binding deleted), `apps/fgos/src/invocation_doors.rs` (a read that found no store runs no end trigger), `test/architecture.test.mjs` (retired S2 names), `docs/platform/runner/spec.md` (one line, the run-directory twin).
+- Kept for S3 by decision of the step lead: the runner `test/rust-host/verb-parity.test.mjs` (its table list is empty after S2). The S2 tables are deleted.
+
 ## Collision watch (HARDEN's request)
 
 Checked against `origin/capability-reads-one-door` `3ec1a7812` (phases 01-05 landed there, 06-08 open) and
