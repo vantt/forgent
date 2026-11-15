@@ -1,0 +1,93 @@
+{
+  "contract": "delete-guard-prefilter.v1",
+  "substrings": [
+    "xargs",
+    "clean",
+    "-delete",
+    "eval",
+    "bash",
+    "zsh",
+    "dash",
+    "ksh"
+  ],
+  "words": [
+    "rm",
+    "sh"
+  ],
+  "regExpSource": "xargs|clean|\\-delete|eval|bash|zsh|dash|ksh|(?:^|[^A-Za-z0-9])(?:rm|sh)",
+  "caseGlobs": "*\"xargs\"*|*\"clean\"*|*\"-delete\"*|*\"eval\"*|*\"bash\"*|*\"zsh\"*|*\"dash\"*|*\"ksh\"*|*[!A-Za-z0-9]rm*|*\\\\[bfnrt]rm*|*[!A-Za-z0-9]sh*|*\\\\[bfnrt]sh*",
+  "vectors": [
+    {
+      "command": "rm -rf /tmp/x",
+      "matches": true
+    },
+    {
+      "command": "ls -la",
+      "matches": false
+    },
+    {
+      "command": "sudo rm x",
+      "matches": true
+    },
+    {
+      "command": "echo permission_mode",
+      "matches": false
+    },
+    {
+      "command": "git clean -fdx",
+      "matches": true
+    },
+    {
+      "command": "find . -delete",
+      "matches": true
+    },
+    {
+      "command": "xargs rm",
+      "matches": true
+    },
+    {
+      "command": "bash -c \"x\"",
+      "matches": true
+    },
+    {
+      "command": "echo \"a\nsh b\"",
+      "matches": true
+    },
+    {
+      "command": "zsh",
+      "matches": true
+    },
+    {
+      "command": "eval \"$x\"",
+      "matches": true
+    },
+    {
+      "command": "cat a | dash",
+      "matches": true
+    },
+    {
+      "command": "ksh x",
+      "matches": true
+    },
+    {
+      "command": "echo harmless",
+      "matches": false
+    },
+    {
+      "command": "printf shell",
+      "matches": true
+    },
+    {
+      "command": "confirm",
+      "matches": false
+    },
+    {
+      "command": "ash",
+      "matches": false
+    },
+    {
+      "command": "r\"m\" x",
+      "matches": false
+    }
+  ]
+}

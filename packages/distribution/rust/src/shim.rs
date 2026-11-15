@@ -9,6 +9,19 @@
 
 use std::path::{Path, PathBuf};
 
+/// The project shim relative to the project root, with forward slashes: the form shell commands, hook
+/// tables and generated extension text carry.
+pub const PROJECT_SHIM_RELATIVE: &str = ".fgos/installation/bin/fgos";
+
+/// The project's own `fgos` shim under `root`: the stable path that outlives an upgrade, which every agent
+/// hook and the launcher run.
+pub fn project_shim_path(root: &Path) -> PathBuf {
+    root.join(".fgos")
+        .join("installation")
+        .join("bin")
+        .join("fgos")
+}
+
 /// Names of the launchers the release tree exposes under `bin/`.
 const ENTRY_FGOS: &str = "fgos";
 const ENTRY_FGOS_RUNNER: &str = "fgos-runner";
