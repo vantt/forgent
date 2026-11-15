@@ -202,6 +202,18 @@ export function buildTestEnv(env = process.env) {
 }
 
 /**
+ * The nearest `.fgos` directory at or above the temp root the runner gives tests, or null. Test fixtures
+ * live under that root and walk up for a project, so a `.fgos` above it makes the temp root itself the project.
+ */
+export function strayFgosAbove(tempRoot) {
+  for (let dir = path.resolve(tempRoot); ; dir = path.dirname(dir)) {
+    const candidate = path.join(dir, '.fgos');
+    if (fs.existsSync(candidate)) return candidate;
+    if (path.dirname(dir) === dir) return null;
+  }
+}
+
+/**
  * Runs `node --test` against an EXPLICIT, already-resolved file list (P03:
  * the shared seam between the full-suite door and the canary runner).
  * Applies the exact same env/argv construction `runTests()` always has
@@ -513,6 +525,14 @@ export function runSelectedTests(files, {
   startWatchdog = startFileWatchdog,
 } = {}) {
   const relFiles = files.map((file) => path.relative(cwd, file));
+  const stray = strayFgosAbove(env.TMPDIR || os.tmpdir());
+  if (stray) {
+    return {
+      status: 1,
+      files: relFiles,
+      message: `run-tests: refusing to start: ${stray} sits above the temp root the tests use, so fixtures there would resolve that directory as their project. Remove ${stray} and run again.`,
+    };
+  }
   const childEnv = buildTestEnv(env);
   let runTemp = null;
   try {

@@ -8,7 +8,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { spawn, spawnSync, execFileSync } from 'node:child_process';
 import { setTimeout as delay } from 'node:timers/promises';
 import { parseEtime, parsePs, treeOf, findOverdue, reapRunDirs } from '../../scripts/lib/test-file-watchdog.mjs';
-import { discoverTestFiles, buildTestArgv, GIT_CONFIG_GUARD_PATH, GIT_SPAWN_SPY_PATH, snapshotGitIdentity, diffGitIdentity, buildTestEnv, runTests, runChosenTests, runSelectedTests, KEEP_TMP_ENV, REPO_ROOT, DEFAULT_TEST_ROOT, snapshotFgos, diffFgosSnapshots, SENSITIVE_FGOS_FILES, leftoverTempPrefixes, describeLeftoverTemps } from '../../scripts/run-tests.mjs';
+import { discoverTestFiles, buildTestArgv, GIT_CONFIG_GUARD_PATH, GIT_SPAWN_SPY_PATH, snapshotGitIdentity, diffGitIdentity, buildTestEnv, runTests, runChosenTests, runSelectedTests, KEEP_TMP_ENV, REPO_ROOT, DEFAULT_TEST_ROOT, snapshotFgos, diffFgosSnapshots, SENSITIVE_FGOS_FILES, leftoverTempPrefixes, describeLeftoverTemps, strayFgosAbove } from '../../scripts/run-tests.mjs';
 import { writeRawProjectConfig } from '../helpers/config-fixture.mjs';
 
 function tmpFixtureRoot() {
@@ -410,6 +410,26 @@ test('runSelectedTests points the child at a fresh per-run temp dir and removes 
   assert.equal(seen.TEMP, seen.TMPDIR);
   assert.equal(fs.existsSync(seen.TMPDIR), false, 'the per-run dir and everything leaked into it is gone');
   fs.rmSync(base, { recursive: true, force: true });
+});
+
+test('runSelectedTests refuses to start when a .fgos directory sits above the temp root, naming it', () => {
+  const outer = tempBase();
+  try {
+    const stray = path.join(outer, '.fgos');
+    fs.mkdirSync(stray);
+    const tempRoot = path.join(outer, 'nested', 'tmp');
+    fs.mkdirSync(tempRoot, { recursive: true });
+    assert.equal(strayFgosAbove(tempRoot), stray);
+    let spawned = false;
+    const result = runSelectedTests(['a.test.mjs'], { cwd: outer, env: { TMPDIR: tempRoot }, spawn: () => { spawned = true; return { status: 0 }; } });
+    assert.equal(result.status, 1);
+    assert.equal(spawned, false);
+    assert.ok(result.message.includes(stray), 'the message names the stray directory');
+    assert.match(result.message, /Remove /);
+    assert.deepEqual(fs.readdirSync(tempRoot), [], 'no per-run directory was created');
+  } finally {
+    fs.rmSync(outer, { recursive: true, force: true });
+  }
 });
 
 test('runSelectedTests keeps the per-run temp dir when FGOS_TEST_KEEP_TMP=1, and says where', () => {
