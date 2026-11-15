@@ -15,6 +15,7 @@ pub mod init;
 pub mod launcher;
 pub mod lock;
 pub mod manifest;
+pub mod path_links;
 pub mod rc_lines;
 pub mod shim;
 pub mod skill_stamp;

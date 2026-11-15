@@ -39,10 +39,6 @@ impl GitRepositoryConfig {
                 .driver
                 .ensure_hooks(&self.repo, path, text(&args, "operationId")?)
                 .map_err(operation)?)),
-            "removeOwnedHooksConfig" => Ok(json!(self
-                .driver
-                .remove_owned_hooks_config(&self.repo, path, text(&args, "operationId")?)
-                .map_err(operation)?)),
             _ => Err(error("unknown Git RepositoryConfig method")),
         }
     }

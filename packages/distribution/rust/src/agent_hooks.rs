@@ -871,20 +871,8 @@ fn creation_mode(dir: &Path) -> u32 {
 /// root or points nowhere: a write there would land outside the project. A link that stays inside is no
 /// reason to refuse; install and reversal both follow it.
 fn escaping_link(root: &Path, relative: &[&str]) -> Result<Option<PathBuf>, AgentHooksError> {
-    let canonical_root = std::fs::canonicalize(root).map_err(io_err(root))?;
-    let mut current = root.to_path_buf();
-    for part in relative {
-        current = current.join(part);
-        match std::fs::symlink_metadata(&current) {
-            Ok(meta) if meta.file_type().is_symlink() => match std::fs::canonicalize(&current) {
-                Ok(target) if target.starts_with(&canonical_root) => {}
-                _ => return Ok(Some(current)),
-            },
-            Ok(_) => {}
-            Err(_) => return Ok(None),
-        }
-    }
-    Ok(None)
+    crate::path_links::first_link_under(root, relative, crate::path_links::LinkPolicy::Escaping)
+        .map_err(io_err(root))
 }
 
 fn leaves_project(root: &Path, relative: &[&str]) -> Result<bool, AgentHooksError> {

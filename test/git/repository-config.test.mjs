@@ -6,7 +6,7 @@ import path from 'node:path';
 import { fixture } from './land-fixture.mjs';
 import { createGitRepositoryConfig } from '../../src/git/index.mjs';
 
-test('RepositoryConfig fills empty hooks, reports missing enforcement and removes only its exact value', () => {
+test('RepositoryConfig fills empty hooks, reports missing enforcement and keeps a custom value', () => {
   const f = fixture();
   try {
     const port = createGitRepositoryConfig(f.options, f.loader);
@@ -19,10 +19,9 @@ test('RepositoryConfig fills empty hooks, reports missing enforcement and remove
     assert.equal(f.git('config', 'core.hooksPath'), ownedPath);
     fs.mkdirSync(ownedPath); fs.writeFileSync(path.join(ownedPath, 'pre-commit'), '#!/bin/sh\nexit 0\n', { mode: 0o755 });
     assert.equal(port.inspectHooks({ ownedPath }).enforcementMissing, false);
-    assert.equal(port.removeOwnedHooksConfig({ ownedPath, operationId: 'remove' }).status, 'empty');
+    f.git('config', '--unset', 'core.hooksPath');
     f.git('config', 'core.hooksPath', '/custom/hooks');
     assert.equal(port.ensureHooks({ ownedPath, operationId: 'custom' }).status, 'skippedExisting');
-    assert.equal(port.removeOwnedHooksConfig({ ownedPath, operationId: 'custom-remove' }).status, 'skippedExisting');
     assert.equal(f.git('config', 'core.hooksPath'), '/custom/hooks');
     assert.throws(() => port.ensureHooks({ ownedPath: '.githooks', operationId: 'relative' }), /invalid-hooks-path/);
   } finally { f.close(); }

@@ -567,6 +567,8 @@ fn skills_removal_lines(dirs: &[PathBuf], rel: &dyn Fn(&Path) -> String) -> Vec<
 struct HooksOutcome {
     unwired: bool,
     skipped_existing: Option<String>,
+    /// The link the hooks directory is reached through: nothing inside it was touched.
+    left_link: Option<PathBuf>,
 }
 
 fn git_error(error: fgos_git::OperationError) -> String {
@@ -593,6 +595,7 @@ fn unwire_git_hooks(project: &Path, git_state_root: &Path) -> Result<HooksOutcom
     let nothing = HooksOutcome {
         unwired: false,
         skipped_existing: None,
+        left_link: None,
     };
     if !project.join(".git").exists() {
         return Ok(nothing);
@@ -618,6 +621,16 @@ fn unwire_git_hooks(project: &Path, git_state_root: &Path) -> Result<HooksOutcom
         return Ok(HooksOutcome {
             unwired: false,
             skipped_existing: after.configured_path,
+            left_link: None,
+        });
+    }
+    // The configuration is already unset. A hooks directory reached through a link is somewhere else's: nothing
+    // inside it is removed.
+    if let Some(link) = first_symlink_under(project, &[".githooks"]) {
+        return Ok(HooksOutcome {
+            unwired: true,
+            skipped_existing: None,
+            left_link: Some(link),
         });
     }
     let pre_commit = owned.join("pre-commit");
@@ -654,6 +667,7 @@ fn unwire_git_hooks(project: &Path, git_state_root: &Path) -> Result<HooksOutcom
     Ok(HooksOutcome {
         unwired: true,
         skipped_existing: None,
+        left_link: None,
     })
 }
 
@@ -741,12 +755,14 @@ pub fn uninstall_project(root: &Path, apply: bool, machine: &Machine) -> Reversa
             HooksOutcome {
                 unwired: false,
                 skipped_existing: None,
+                left_link: None,
             }
         })
     } else {
         HooksOutcome {
             unwired: hooks_wired(root, machine.git_state_root),
             skipped_existing: None,
+            left_link: None,
         }
     };
 
@@ -828,6 +844,12 @@ pub fn uninstall_project(root: &Path, apply: bool, machine: &Machine) -> Reversa
     }));
     if let Some(why) = skills.skipped {
         keeps.push(format!("skills: {why}"));
+    }
+    if let Some(link) = &git_hooks.left_link {
+        keeps.push(format!(
+            "git: .githooks is reached through a symbolic link ({}): left as it is",
+            link.display()
+        ));
     }
     if let Some(existing) = &git_hooks.skipped_existing {
         keeps.push(format!(
@@ -1775,6 +1797,29 @@ mod tests {
             .stdout
             .is_empty());
         assert!(!world.project.join(".githooks").exists());
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn a_hooks_directory_reached_through_a_link_loses_its_setting_but_nothing_inside_it() {
+        let world = World::new("linked-hooks");
+        real_repository(&world);
+        let elsewhere = world.base.join("elsewhere");
+        world.put(&elsewhere.join("pre-commit"), "#!/bin/sh\nexit 0\n");
+        std::os::unix::fs::symlink(&elsewhere, world.project.join(".githooks")).unwrap();
+        wire_hooks(&world);
+        let data = world.run(true).data;
+        assert_eq!(data["failed"], serde_json::json!([]), "{data}");
+        assert_eq!(data["hooksUnwired"], true, "the setting is ours and goes");
+        assert_eq!(
+            std::fs::read_to_string(elsewhere.join("pre-commit")).unwrap(),
+            "#!/bin/sh\nexit 0\n",
+            "the link's other end is not ours"
+        );
+        assert!(world.project.join(".githooks").is_symlink());
+        assert!(strings(&data["keeps"])
+            .iter()
+            .any(|k| k.starts_with("git: .githooks is reached through a symbolic link (")));
     }
 
     #[cfg(unix)]

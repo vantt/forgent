@@ -7,10 +7,16 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { execFileSync } from 'node:child_process';
+import { execFileSync, spawnSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
 import { useReleaseFixture, fixture, runFgctl, removeStateHome } from './fgctl-init-fixture.mjs';
 
 useReleaseFixture();
+
+const GOLDENS = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', '..', 'apps', 'fgctl', 'tests', 'goldens');
+const golden = (name) => JSON.parse(fs.readFileSync(path.join(GOLDENS, name), 'utf8')).data;
+/** Each key of an answer and what kind of value it holds: the shape `fgctl` parses. */
+const shapeOf = (data) => Object.fromEntries(Object.entries(data).map(([key, value]) => [key, Array.isArray(value) ? 'array' : value === null ? 'null' : typeof value]));
 
 test('fgctl uninstall reverses the wiring through the shim of a real release and then removes the activation', () => {
   const home = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-uninstall-home-'));
@@ -25,6 +31,19 @@ test('fgctl uninstall reverses the wiring through the shim of a real release and
     assert.equal(init.status, 0, init.stderr);
     const settings = path.join(project, '.claude', 'settings.json');
     assert.match(fs.readFileSync(settings, 'utf8'), /hook dispatch-decide/, 'the install wired the hook the reversal takes out');
+
+    // The recorded answers the fgctl fake-shim cases replay still have the shape this host prints.
+    const live = spawnSync(path.join(project, '.fgos', 'installation', 'bin', 'fgos'), ['uninstall'], {
+      cwd: project,
+      env: { ...process.env, FGOS_STATE_HOME: state, HOME: home, FGOS_ACTIVE_RELEASE_PATH: '', FGOS_ACTIVE_MANIFEST_PATH: '' },
+      encoding: 'utf8',
+    });
+    const liveData = JSON.parse(live.stdout).data;
+    assert.deepEqual(shapeOf(golden('uninstall-answer-plan.json')), shapeOf(liveData), 'goldens/uninstall-answer-plan.json is stale: record it again from this host');
+    const failedGolden = golden('uninstall-answer-failed.json');
+    assert.deepEqual(Object.keys(failedGolden.failed[0]).sort(), ['error', 'id']);
+    assert.equal(failedGolden.skills, null, 'the failed-backup answer is the short one');
+    assert.deepEqual(Object.keys(golden('uninstall-answer-plan.json').hooks[0]).sort(), Object.keys(liveData.hooks[0]).sort());
 
     const plan = runFgctl(['uninstall'], opts);
     assert.equal(plan.status, 0, plan.stderr);

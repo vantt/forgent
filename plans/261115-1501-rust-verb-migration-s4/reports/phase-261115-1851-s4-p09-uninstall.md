@@ -70,3 +70,11 @@ New proofs besides: `repository_config.rs` `wired` (unit + integration assertion
 - Phase 08's shared-list lines (`main.rs`, doors, catalog, parity tables) were merged by hand on rebase; routes, manifest and census regenerated.
 - The base's `.fgos/runtime/tmp/parity-base.json` was absent; I wrote my description file in the scratchpad from the staged addon directory (read-only use of the base).
 - Phase 11 note: `docs/knowledge/*` pages still name `uninstallGitHooks` as history; left.
+
+## Review follow-up
+
+- `unwire_git_hooks` refuses to touch anything inside a `.githooks` reached through a link (the setting is still unset; the keep line names the link); test `a_hooks_directory_reached_through_a_link_loses_its_setting_but_nothing_inside_it`.
+- One link walk, `distribution/path_links.rs` (`LinkPolicy::Any` for removals, `Escaping` for hook writes), replaces `skill_stamp::first_symlink_under`'s body and `agent_hooks::escaping_link`'s; new `pub` module in an OPC-reviewed crate.
+- `removeOwnedHooksConfig` is retired from `src/git/config.mjs` and the Node addon's `GitRepositoryConfig`; the Rust method keeps its proof in `packages/git/rust/tests/repository_config.rs`.
+- `managed-timer.mjs` and its test are deleted (phases 06 and 08 removed its last importers); the timer door row has no debt.
+- The recorded fgctl answers are checked against a live host by `test/rust-host/fgctl-uninstall.test.mjs` (key and value-kind shape); re-record with the one-off script described in the commit if the shape changes.

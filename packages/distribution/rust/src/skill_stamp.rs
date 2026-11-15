@@ -165,19 +165,11 @@ fn is_own_agents_dir(dir: &Path) -> io::Result<bool> {
     })
 }
 
-/// The first symbolic link on the way from `root` down `relative` (each component below `root`, the last
-/// included), or `None` when there is none or the path stops existing.
-pub fn first_symlink_under(root: &Path, relative: &[&str]) -> Option<PathBuf> {
-    let mut current = root.to_path_buf();
-    for part in relative {
-        current.push(part);
-        match std::fs::symlink_metadata(&current) {
-            Ok(meta) if meta.file_type().is_symlink() => return Some(current),
-            Ok(_) => {}
-            Err(_) => return None,
-        }
-    }
-    None
+/// The first symbolic link on the way from `project` down `relative`; a skill root behind a link is never walked.
+pub fn first_symlink_under(project: &Path, relative: &[&str]) -> Option<PathBuf> {
+    crate::path_links::first_link_under(project, relative, crate::path_links::LinkPolicy::Any)
+        .ok()
+        .flatten()
 }
 
 /// The skill directories of the project at `project` that fgOS wrote, and the same-named ones it did not.
