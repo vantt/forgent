@@ -16,10 +16,13 @@ on:
         type: boolean
         default: false
 
-# Only the newest head of a ref runs; a tag run (the release suite) is never cancelled.
+# One run per ref at a time. A pull request cancels its superseded run. On main the running
+# run always finishes and only the newest waiting head runs next: docs-only pushes land more
+# often than the suite takes, so cancelling would leave main without any finished run (and
+# without a saved Rust cache). A tag run (the release suite) is never cancelled.
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: ${{ !startsWith(github.ref, 'refs/tags/') }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' && !startsWith(github.ref, 'refs/tags/') }}
 
 jobs:
   test:
