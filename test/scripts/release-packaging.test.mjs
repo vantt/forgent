@@ -154,6 +154,10 @@ test('the release suite runs every shard and one aggregate check fails when any 
   assert.ok(named.every((n) => n === total), `every N in the shard job equals the matrix size ${total}`);
   assert.match(shardJob, /name: test shard \(\$\{\{ matrix\.shard \}\}\/\d+\)/);
   assert.match(shardJob, /--shard=\$\{\{ matrix\.shard \}\}\/\d+/);
+  // The report the run writes, the one the marker reads and the name the merge expects are one file name.
+  const junit = `test-results/shard-\${{ matrix.shard }}-of-${total}.xml`;
+  assert.ok(shardJob.includes(`--test-reporter=junit --test-reporter-destination=${junit}`), 'the run writes the shard junit under the merge name');
+  assert.ok(shardJob.includes(`--type full --xml ${junit} `), 'the marker reads that same junit');
   assert.match(shardJob, /fail-fast: false/);
   assert.match(shardJob, /name: test-shard-\$\{\{ matrix\.shard \}\}\n\s+path: test-results\//);
 
