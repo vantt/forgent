@@ -536,6 +536,8 @@ export function checkRunnerPatternsConfig(cwd, run) {
     const targetPath = display(f.file);
     try {
       // The facade's one raw source read, for the scope the finding names (the global directory's parent holds `.fgos`).
+      // readProjectConfigSource reads `<dir>/.fgos/`, so the global scope passes the parent of the global directory;
+      // this holds because globalFgosDir() always ends in `.fgos`.
       const scopeDir = f.file?.startsWith('global:') ? path.dirname(globalDir) : cwd;
       const source = readProjectConfigSource(scopeDir);
       if (source?.format !== 'json') throw new Error(`${targetPath}: cannot read the legacy JSON config file`);
