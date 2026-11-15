@@ -68,7 +68,9 @@ stale, say so and cross-check with `rg`.
 7. `src/runner/operation-capability.mjs:24-26`: `hasCapabilityEntry(runnerConfig, domainCapability)`.
 8. `docs/architecture-manifest.json`: file row `src/runner/execution/capability-config.mjs: kernel` and tier
    override `"src/runner/execution/capability-config.mjs": 0` (as `src/runner/rigor.mjs` has), so tier-0
-   `operation-capability.mjs` may import it. No other row changes.
+   `operation-capability.mjs` may import it. Also the first `doors` row (readers of `runner.capabilities`): `allowed`
+   is the port, `debt` has one entry per reader still outside it (reason "moves to the capability port in a later step
+   of this change"), and phases 02-05 delete the entries of the files they move. No other row changes.
 9. Equivalence harness (evidence, not a test):
    `plans/261114-2051-capability-reads-one-door/reports/equivalence/compare-capability-reads.mjs`
    `--base <path> --head <path> --out <dir>`.

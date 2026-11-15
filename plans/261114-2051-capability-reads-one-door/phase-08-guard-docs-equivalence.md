@@ -3,7 +3,7 @@ phase: 08
 title: "The door made mechanical: rows in the doors table, docs, final equivalence"
 status: pending
 effort: 2h
-depends_on: [02, 03, 04, 05, 06, 07, "F0 phase 01 (plans/261114-2051-rust-verb-migration-program) landed on main"]
+depends_on: [02, 03, 04, 05, 06, 07]
 ---
 
 # Phase 08 — The door made mechanical
@@ -13,8 +13,11 @@ depends_on: [02, 03, 04, 05, 06, 07, "F0 phase 01 (plans/261114-2051-rust-verb-m
 Owner concern: the one door keeps regressing because nothing enforces it (plan.md Facts, last paragraph). The
 system has one mechanism for one-door guards: the `doors` table in `docs/architecture-manifest.json`, checked by
 `test/architecture.test.mjs`, added by F0 phase 01 (`plans/261114-2051-rust-verb-migration-program/phase-01-manifest-artifact.md`
-on `origin/plan/rust-verb-migration-program` 3509d10f3, requirements 5-7). This phase adds rows to that table and
-builds no guard of its own.
+on `origin/plan/rust-verb-migration-program` 3509d10f3, requirements 5-7). This phase completes the rows of that table and
+builds no guard of its own. The first row (readers of `runner.capabilities`) already exists: phase 01 added it with the
+port as `allowed` and one `debt` entry per reader still outside the port (reason "moves to the capability port in a later
+step of this change"); phases 02-05 each removed the entries of the files they moved. 08 verifies that row's `debt` is
+empty and its patterns still hold, and adds the other rows below.
 
 Row shape (F0 phase 01 req 5): `{ "job": "<plain words>", "patterns": ["<regex source>", ...], "allowed": ["<repo path>", ...], "reason": "<why these files>", "retiredBy": "<step, only for a twin>" }`;
 `allowed: []` marks a retired name. F0's later revision (eb2e29d2f, "stale debt fails, new debt needs a reason") may add fields; read the landed schema before writing rows. The check scans product files (tracked `bin/ src/ scripts/ apps/ packages/
@@ -23,14 +26,15 @@ matches outside `allowed`, when an `allowed` path no longer matches (stale), or 
 `.rs` without `retiredBy`. Its message names the row's `job`, the file and the line, so the `job` text names the
 door to use.
 
-Order: start after F0 phase 01 is on main and 02-07 are merged; rebase the integration branch on main first. All
+Order: start after 02-07 are merged; rebase the integration branch on main first. All
 readers are then switched, the purpose chooser is gone and the tool registry is deleted, so the rows are green when added; the integration
 branch lands on main once, so the rows and the last reader move reach main in the same change and can never start red.
 
 ## Requirements
 
 1. Rows in `docs/architecture-manifest.json` `doors` (patterns are JS regex sources; calibrate them on the
-   rebased branch with the same file list the check uses, and record the calibration in the report):
+   rebased branch with the same file list the check uses, and record the calibration in the report). The first row below
+   exists already (phase 01); keep its patterns, remove nothing but leftover `debt`, and add the rest:
 
 | job | patterns (intent) | allowed | reason |
 |---|---|---|---|
@@ -100,10 +104,10 @@ manifest: +~45 lines (six rows); docs: +~15 lines.
 
 | Risk | L x I | Mitigation |
 |---|---|---|
-| F0 phase 01 not landed or its row shape changed | M x M | dependency in plan.md; read the landed `doors` schema before writing rows |
+| The row shape changed on main since phase 01 wrote the first row | L x M | read the landed `doors` schema (`checkDoors`) before adding rows |
 | A pattern hits prose or another meaning | M x L | receiver lookbehinds; reword comments in files this plan already owns; ask the big lead for any other file |
 | A pattern misses a read (false negative) | M x M | three shapes covered (property, computed, destructuring); the port never returns an entry; the `catalogOf` row closes the only path to raw entries |
-| Rows land red | L x H | written after 02-07 merged and the branch rebased on F0; run the check before commit |
+| Rows land red | L x H | the first row ships with debt that 02-05 remove; 08 adds the rest after 02-07 merged; run the check before commit |
 | `docs/architecture-manifest.json` written by F0 at the same time | M x M | rows are an additive block; rebase first; plan.md Collision risk |
 
 ## Rollback
@@ -112,6 +116,6 @@ Revert the phase merge (plan.md Rollback); rows and docs have no runtime effect.
 
 ## Success criteria
 
-The `doors` check green with the six rows; harness 0 failures and doctor rows equal (summaries committed);
+The `doors` check green with the six rows and the first row's `debt` empty; harness 0 failures and doctor rows equal (summaries committed);
 docs gates green; `git diff --stat origin/main` shows no file under `core/config-standard`, `core/config-schema`,
 `packages`, `apps`, nor `CHANGELOG.md`, `Cargo.lock`.

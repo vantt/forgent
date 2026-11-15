@@ -30,8 +30,10 @@ const RIGORS = Object.freeze(['low', 'standard', 'high', 'critical']);
 // narrow slice of the matrix where that delta shows.
 const ALLOWLIST = Object.freeze([
   {
+    // Only the input where these names are NOT own keys (inherited, so no longer declared). Where they are own
+    // keys (`m-proto-own`) base and head must agree exactly.
     delta: 'prototype-names',
-    claims: ({ name }) => PROTOTYPE_NAMES.includes(name),
+    claims: ({ input, name }) => input === 'm-proto-absent' && PROTOTYPE_NAMES.includes(name),
   },
   {
     delta: 'non-object-entry',

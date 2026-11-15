@@ -39,6 +39,23 @@ test('a capability reads its exact entry before its prefix entry', () => {
   assert.deepEqual(minCheckersOf(runner, 'code:implement'), { key: 'code:*', minCheckers: ['red-team'] });
 });
 
+test('when the exact entry and the prefix entry both declare a field, the exact one wins and the prefix one covers the rest', () => {
+  const both = {
+    capabilities: {
+      'lane:*': { persona: 'prefix-persona', rigor: 'low', minCheckers: ['prefix-checker'] },
+      'lane:exact': { persona: 'exact-persona', rigor: 'critical', minCheckers: ['exact-checker'] },
+      'lane:bare': { description: 'no persona, rigor or checkers of its own' },
+    },
+  };
+  assert.deepEqual(capabilityPersonaOf(both, 'lane:exact'), { persona: 'exact-persona', key: 'lane:exact' });
+  assert.equal(capabilityRigorOf(both, 'lane:exact'), 'critical');
+  assert.deepEqual(minCheckersOf(both, 'lane:exact'), { key: 'lane:exact', minCheckers: ['exact-checker'] });
+  assert.deepEqual(capabilityPersonaOf(both, 'lane:other'), { persona: 'prefix-persona', key: 'lane:*' });
+  assert.equal(capabilityRigorOf(both, 'lane:other'), 'low');
+  assert.deepEqual(capabilityPersonaOf(both, 'lane:bare'), { persona: 'prefix-persona', key: 'lane:*' }, 'a field the exact entry lacks falls to the prefix entry');
+  assert.equal(capabilityRigorOf(both, 'lane:bare'), 'low');
+});
+
 test('a name with no colon has no prefix entry and the bare verb is never consulted', () => {
   assert.equal(capabilityRigorOf(runner, 'x:review'), undefined);
   assert.equal(isCapabilityDeclared(runner, 'x:review'), false);

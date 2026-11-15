@@ -201,15 +201,18 @@ Everything else is byte-identical, including the proposal's truthy `verify` chec
                 F0 phase 01 (doors table) on main
 ```
 
-- 01 alone first (it creates the port every other phase imports and moves helpers with all their importers).
+- 01 alone first (it creates the port every other phase imports and moves helpers with all their importers). 01 also adds
+  the first `doors` row (readers of `runner.capabilities`): `allowed` is the port, and every reader still outside it is a
+  `debt` entry with the reason "moves to the capability port in a later step of this change". Each of 02-05 deletes the
+  debt entries of the files it moves in the same commit (the check fails a stale entry, so this cannot be forgotten).
 - 02, 03, 04, 05 run at the same time: file sets are disjoint (checked below).
 - 06 starts when 03 is merged (same files: `resolve.mjs`, `plan.mjs`, `config.mjs`, `work-dispatch.mjs`); it runs beside
   02, 04 and 05 (disjoint from them).
 - 07 starts when 04 (`registrations.mjs`), 05 (`bin/fgos.mjs`) and 06 (`toolProvidersOf`) are merged, and only if 06's
   probe measurement met its budget; it runs beside 02.
-- 08 last, after 02-07 are merged and F0 phase 01
-  (`plans/261114-2051-rust-verb-migration-program/phase-01-manifest-artifact.md`, the `doors` table) is on main;
-  rebase the integration branch on main first. 08 builds no guard: it adds rows to F0's table.
+- 08 last, after 02-07 are merged. The `doors` table is already on main, and the first row exists since 01; 08 completes
+  the rows (the `prefer`, purpose chooser, tool lookup, retired registry and `catalogOf` rows) and checks the first row's
+  `debt` is empty. 08 builds no guard.
 - Landing: each phase merges into the integration branch `capability-reads-one-door` in dependency order. After every
   merge the big lead runs the union of the merged phases' focused gates plus `test/architecture.test.mjs`. The branch
   lands on main once, so the rows and the last reader move land in the same change. Interims on the integration
@@ -231,7 +234,7 @@ Hot files, one writer at a time (serial by dependency, never parallel):
 | `src/setup/registrations.mjs` | 04, then 07 |
 | `bin/fgos.mjs` | 05, then 07 |
 | `src/cli/command-registry.mjs`, `packages/host-runtime/contracts/command-routes.json`, `src/state/fgos-file-registry.mjs`, `src/setup/executor-profile-warnings.mjs`, `AGENTS.md`, `domains/coding/skills/*/references/*`, `plugins/fgOS/skills/**`, `.agents/skills/**`, `test/architecture.test.mjs` | 07 only |
-| `docs/architecture-manifest.json` | 01 (file row), 06 (file row), 07 (delete a row), then 08 (`doors` rows) |
+| `docs/architecture-manifest.json` | 01 (file row, first `doors` row with debt), 02-05 (each deletes its debt entries), 06 (file row), 07 (delete a row), then 08 (remaining `doors` rows) |
 | `plans/.../reports/equivalence/compare-capability-reads.mjs` | 01, then 06 (allowlist and probes; 08 runs it) |
 
 File-disjointness of the parallel set (Modify sets): 02 {loops/verify.mjs, legacy-seat-read.mjs, run.mjs};

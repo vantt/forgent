@@ -362,6 +362,85 @@
       ],
       "debt": [],
       "reason": "every temp name of a Node write-then-rename comes from uniqueTmpTag so two threads or two calls never share one; there is no shared write helper (each module keeps its own, see the Durable file row of docs/platform/component-boundary.md). The patterns catch the hand-built forms (a pid-only suffix, a pid plus clock, the request-file temp); a directory staging or an mkdtemp prefix is another job and does not match"
+    },
+    {
+      "job": "read runner.capabilities only through src/runner/execution/capability-config.mjs (one function per field) or bind()'s result",
+      "kind": "door",
+      "patterns": [
+        "(?<!\\b(?:contract|payload|fanOutPayload|manifestWithoutDigest|manifest|report|entry|provider|self|a)\\??)\\.capabilities\\b\\s*(?:\\?\\?|\\|\\||&&|\\?\\.|\\[|\\)|;|,|===|!==)",
+        "\\[\\s*[\\'\"]capabilities[\\'\"]\\s*\\]",
+        "\\{[^{}]*\\bcapabilities\\b[^{}]*\\}\\s*=(?!=)(?!\\s*report\\b)"
+      ],
+      "allowed": [
+        "src/runner/execution/capability-config.mjs"
+      ],
+      "debt": [
+        {
+          "path": "bin/fgos.mjs",
+          "reason": "moves to the capability port in a later step of this change"
+        },
+        {
+          "path": "src/cli/command-registry.mjs",
+          "reason": "moves to the capability port in a later step of this change"
+        },
+        {
+          "path": "src/report/capability-plan-lint.mjs",
+          "reason": "moves to the capability port in a later step of this change"
+        },
+        {
+          "path": "src/runner/dispatch/config.mjs",
+          "reason": "moves to the capability port in a later step of this change"
+        },
+        {
+          "path": "src/runner/dispatch/confinement/request.mjs",
+          "reason": "moves to the capability port in a later step of this change"
+        },
+        {
+          "path": "src/runner/dispatch/plan.mjs",
+          "reason": "moves to the capability port in a later step of this change"
+        },
+        {
+          "path": "src/runner/dispatch/resolve.mjs",
+          "reason": "moves to the capability port in a later step of this change"
+        },
+        {
+          "path": "src/runner/execution/legacy-seat-read.mjs",
+          "reason": "moves to the capability port in a later step of this change"
+        },
+        {
+          "path": "src/runner/execution/loops/verify.mjs",
+          "reason": "moves to the capability port in a later step of this change"
+        },
+        {
+          "path": "src/runner/execution/run.mjs",
+          "reason": "moves to the capability port in a later step of this change"
+        },
+        {
+          "path": "src/runner/execution/seat-resolver.mjs",
+          "reason": "moves to the capability port in a later step of this change"
+        },
+        {
+          "path": "src/runner/work-dispatch.mjs",
+          "reason": "moves to the capability port in a later step of this change"
+        },
+        {
+          "path": "src/setup/registrations.mjs",
+          "reason": "moves to the capability port in a later step of this change"
+        },
+        {
+          "path": "src/setup/seat-binding-checks.mjs",
+          "reason": "moves to the capability port in a later step of this change"
+        },
+        {
+          "path": "src/workflow/propose-validate.mjs",
+          "reason": "moves to the capability port in a later step of this change"
+        },
+        {
+          "path": "src/workflow/propose.mjs",
+          "reason": "moves to the capability port in a later step of this change"
+        }
+      ],
+      "reason": "the port is the one Node reader of the capabilities section and hands out answers per field, never an entry; the seat-binding crate is the authority over binding fields and is not matched by these JS-shaped patterns"
     }
   ],
   "files": {

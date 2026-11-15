@@ -70,6 +70,18 @@ census of word matches in `src bin scripts test`: `capabilityEntriesOf` 2 files,
   `reports/equivalence/doctor-base.summary.json`. All `ok` except `confinement-strict-readiness` (`warn`).
   The messages mention this machine's state, so they are comparable on this machine only.
 
+## Review follow-ups
+
+- Owning test: a case where the exact entry and the `<prefix>:*` entry both declare persona, rigor and
+  `minCheckers` (exact wins; the prefix covers a name whose exact entry lacks the field). Checked by mutation: with
+  the prefix key read first, that case and the minCheckers case fail.
+- Harness: the `prototype-names` claim now covers only input `m-proto-absent` (inherited names). With no claim at
+  all the run still shows 0 failures, so the delta is unobservable in answers; where the names are own keys
+  (`m-proto-own`) base and head must match exactly.
+- First `doors` row added in the manifest (readers of `runner.capabilities`): allowed = the port; 16 `debt`
+  entries, one per reader still outside it, reason "moves to the capability port in a later step of this change".
+  Phases 02-05 delete their own entries; phase 08 completes the other rows. Calibrated: zero `.rs` hits.
+
 ## Notes for later phases
 
 - Port API change is not needed by anything in the census; phases 02-05 import only what the table lists.
