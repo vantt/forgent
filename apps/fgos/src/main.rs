@@ -19,6 +19,7 @@ use fgos_distribution::suggest::suggest;
 use fgos_host_runtime::exit_codes;
 use fgos_host_runtime::invocation_service::NoopEventSink;
 use fgos_host_runtime::{build_snapshot, InvocationService, ProviderDescriptor, CATALOG};
+use invocation_doors::Ended;
 use routing::{command_routes, Call, HookKind, Lane};
 use std::sync::Arc;
 
@@ -298,9 +299,9 @@ fn main() {
                 Ok(entered) => entered,
                 Err(refused) => std::process::exit(refused.report()),
             };
-            let code = run_native(&service, &operation_id, cli_args, entered.project.clone());
-            doors.leave(&entered);
-            std::process::exit(code);
+            let ended = run_native(&service, &operation_id, cli_args, entered.project.clone());
+            doors.leave(&entered, &ended);
+            std::process::exit(ended.code);
         }
         Lane::Legacy => {
             eprintln!(
@@ -312,7 +313,7 @@ fn main() {
     }
 }
 
-/// Runs one native operation of the composition root and presents its answer; returns the exit code.
+/// Runs one native operation of the composition root and presents its answer; returns how it ended.
 /// `project` is the root the doors resolved, or why there is none: only the operations that read a project
 /// consume it.
 fn run_native(
@@ -320,13 +321,10 @@ fn run_native(
     route_operation: &str,
     cli_args: &[std::ffi::OsString],
     project: Result<std::path::PathBuf, String>,
-) -> i32 {
+) -> Ended {
     let op_id_owned = match cli_projector::native_operation_id(route_operation, cli_args) {
         Ok(id) => id,
-        Err(err) => {
-            eprintln!("fgos: error: {}", err);
-            return exit_codes::unexpected();
-        }
+        Err(err) => return cli_presenter::present_projection_error(&err),
     };
     let op_id_str = op_id_owned.as_str();
 
@@ -343,8 +341,12 @@ fn run_native(
             let mut handle = std::io::stdin().take(max_bytes as u64 + 1);
             handle.read_to_end(&mut buf).unwrap_or_default();
             if buf.len() > max_bytes {
-                eprintln!("fgos: error: stdin payload exceeds 1 MiB limit [stdin-overflow]");
-                return exit_codes::validation();
+                let message = "error: stdin payload exceeds 1 MiB limit [stdin-overflow]";
+                eprintln!("fgos: {message}");
+                return Ended {
+                    code: exit_codes::validation(),
+                    failure: Some(message.to_owned()),
+                };
             }
             if !buf.is_empty() {
                 Some(buf)
@@ -361,10 +363,7 @@ fn run_native(
     let (invocation, request) =
         match cli_projector::project_cli_invocation(op_id_str, cli_args, project, stdin_data) {
             Ok(pair) => pair,
-            Err(err) => {
-                eprintln!("fgos: error: {}", err);
-                return exit_codes::unexpected();
-            }
+            Err(err) => return cli_presenter::present_projection_error(&err),
         };
     let rt = tokio::runtime::Builder::new_current_thread()
         .enable_all()
@@ -381,9 +380,18 @@ fn run_native(
 
     match res {
         Ok(outcome) => {
-            cli_presenter::present_outcome(&outcome, cli_args.iter().any(|arg| arg == "--json"))
+            let failure =
+                cli_presenter::refusal_of(&outcome).map(|refusal| refusal.message.clone());
+            let code = cli_presenter::present_outcome(
+                &outcome,
+                cli_args.iter().any(|arg| arg == "--json"),
+            );
+            Ended { code, failure }
         }
-        Err(err) => cli_presenter::present_error(&err),
+        Err(err) => Ended {
+            code: cli_presenter::present_error(&err),
+            failure: Some(err.to_string()),
+        },
     }
 }
 

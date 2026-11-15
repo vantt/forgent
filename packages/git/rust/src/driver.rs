@@ -354,11 +354,11 @@ impl GitDriver {
     pub fn trusted_root_at(path: &Path) -> Result<Option<PathBuf>> {
         Self::new(&fgos_holder_lock::state_root::state_root().0)?.trusted_root(path)
     }
-    /// The checkout facts of `path` from the disk-only topology check, with no Git child and no config or format
-    /// probe: the top level it sits in and the trusted main checkout. `None` outside a repository.
+    /// The checkout facts of `path` from the disk-only topology check, with no Git child, no config or format
+    /// probe and no driver: the top level it sits in and the trusted main checkout. `None` outside a repository.
+    /// It never touches the state root, so a root decision cannot create one a detached child's owner removed.
     pub fn topology_at(path: &Path) -> Result<Option<RepoHandle>> {
-        let driver = Self::new(&fgos_holder_lock::state_root::state_root().0)?;
-        Ok(match driver.resolve_topology(path, path)? {
+        Ok(match Self::topology_on_disk(path, path)? {
             ResolveRepo::Repository(repo) => Some(repo),
             ResolveRepo::NotARepository => None,
         })
@@ -493,6 +493,12 @@ impl GitDriver {
     /// Disk-only authority check, kept before every checkout child. Git config
     /// and storage probes belong to the operation, not topology discovery.
     pub(crate) fn resolve_topology(&self, path: &Path, trusted_main: &Path) -> Result<ResolveRepo> {
+        Self::topology_on_disk(path, trusted_main)
+    }
+
+    /// The disk read behind [`Self::resolve_topology`]; it needs no driver state, so a root decision can run it
+    /// without building one.
+    fn topology_on_disk(path: &Path, trusted_main: &Path) -> Result<ResolveRepo> {
         let path = fs::canonicalize(path).map_err(io)?;
         let Some(main) = main_checkout_root(trusted_main)? else {
             return Ok(ResolveRepo::NotARepository);

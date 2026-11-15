@@ -350,6 +350,17 @@
       "reason": "the fault record has a Rust writer for the host and a Node writer for the Node CLI, which must also record a missing host; one vector file (test/rust-host/fixtures/invocation-fault-vectors.json) is read by both. The capped append has the same two owners (two other Node callers, approve-fault-log and provider-capacity, move with S7 and S6a). Known gap kept visible: the Node writer does not redact `message` (an unknown-flag message quotes the typed token, value included), which the Rust writer does"
     },
     {
+      "job": "classify a failed Event Store child",
+      "kind": "door",
+      "patterns": ["event-store-child"],
+      "allowed": ["apps/fgos/src/invocation_doors.rs"],
+      "debt": [
+        { "path": "bin/fgos.mjs", "reason": "the Node branch that classifies a Node-run child; deleted by the `events` port" }
+      ],
+      "retiredBy": "S3: the Node branch goes with the `events` port",
+      "reason": "a detached seal or publish child has no caller to read its error, so a failure leaves a record whatever the verb's own classification is; the host records it where the doors leave an invocation, from the failure text the verb answered"
+    },
+    {
       "job": "parse CLI arguments (twin)",
       "kind": "door",
       "patterns": ["export function parseArgs", "pub fn parse_args", "(?:starts_with|strip_prefix)\\(\\\"--\\\"\\)", "\\\"--dir\\\" \\| \\\"--worktree\\\""],

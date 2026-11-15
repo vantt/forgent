@@ -444,6 +444,37 @@ mod tests {
     }
 
     #[test]
+    fn a_root_read_never_creates_the_state_root_a_removed_owner_tore_down() {
+        static ENV: std::sync::Mutex<()> = std::sync::Mutex::new(());
+        let _env = ENV.lock().unwrap_or_else(|e| e.into_inner());
+        let tree = Tree::build("state-root-gone");
+        let row = tree.table["rows"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|row| row["main"].is_string())
+            .expect("a table row inside a repository");
+        let cwd = tree.at(row["cwd"].as_str().unwrap());
+        std::fs::remove_dir_all(&tree.state).unwrap();
+        let prior = std::env::var_os(fgos_holder_lock::state_root::PINNED_ROOT_ENV);
+        std::env::set_var(fgos_holder_lock::state_root::PINNED_ROOT_ENV, &tree.state);
+        let facts = read_repo_facts(&cwd);
+        match prior {
+            Some(value) => std::env::set_var(fgos_holder_lock::state_root::PINNED_ROOT_ENV, value),
+            None => std::env::remove_var(fgos_holder_lock::state_root::PINNED_ROOT_ENV),
+        }
+        assert!(
+            matches!(facts, Ok(RepoFacts::Repository { .. })),
+            "{facts:?}"
+        );
+        assert!(
+            !tree.state.exists(),
+            "the read rebuilt the state root at {}",
+            tree.state.display()
+        );
+    }
+
+    #[test]
     fn the_door_answers_the_shared_root_table() {
         let tree = Tree::build("table");
         for row in tree.table["rows"].as_array().unwrap() {

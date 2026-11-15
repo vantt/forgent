@@ -326,6 +326,39 @@ impl fmt::Debug for ProviderOutcome {
     }
 }
 
+/// A verb's own refusal with the category the Node CLI exits under (`exit-codes.v1.json`): the provider hands it
+/// back as the output of a completed operation, the host prints `fgos: <message>` and exits with the category's
+/// code. It is a correct answer of the verb, not a malformed call, so it records no invocation fault.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct CategorisedRefusal {
+    pub category: &'static str,
+    pub message: String,
+    exit: i32,
+}
+
+impl CategorisedRefusal {
+    /// A refusal under `category`, which the exit-code table must name (a category the table lacks is a coding
+    /// error and fails here, at construction).
+    pub fn new(category: &'static str, message: impl Into<String>) -> Self {
+        Self {
+            category,
+            message: message.into(),
+            exit: crate::exit_codes::code_of(category),
+        }
+    }
+
+    /// The process exit status of the refusal's category.
+    pub fn exit_code(&self) -> i32 {
+        self.exit
+    }
+
+    /// Prints the refusal on stderr the way the Node CLI does and returns its exit status.
+    pub fn report(&self) -> i32 {
+        eprintln!("fgos: {}", self.message);
+        self.exit
+    }
+}
+
 /// Closed failure families a provider call can terminate with (kernel §8).
 ///
 /// Note: pipeline normalization (`provider-failed`) and outcome extension (`parked`)
@@ -569,5 +602,33 @@ mod tests {
     fn provider_error_provider_failed() {
         let err = ProviderError::ProviderFailed("crash detail".to_string());
         assert_eq!(err.to_string(), "provider failed: crash detail");
+    }
+
+    #[test]
+    fn a_refusal_exits_with_the_code_of_every_category_the_table_names() {
+        let path = concat!(
+            env!("CARGO_MANIFEST_DIR"),
+            "/../contracts/exit-codes.v1.json"
+        );
+        let table: serde_json::Value =
+            serde_json::from_str(&std::fs::read_to_string(path).unwrap()).unwrap();
+        let categories = table["categories"].as_object().unwrap();
+        assert!(categories.len() >= 8);
+        for (name, code) in categories {
+            let name: &'static str = Box::leak(name.clone().into_boxed_str());
+            let refusal = CategorisedRefusal::new(name, "refused");
+            assert_eq!(
+                i64::from(refusal.exit_code()),
+                code.as_i64().unwrap(),
+                "{name}"
+            );
+            assert_eq!(refusal.category, name);
+        }
+    }
+
+    #[test]
+    #[should_panic(expected = "names no category")]
+    fn a_refusal_under_a_category_the_table_lacks_fails_at_construction() {
+        let _ = CategorisedRefusal::new("no-such-category", "x");
     }
 }

@@ -3,7 +3,9 @@
 //! Formats native kernel outcomes and errors for presentation to stdout/stderr.
 //! Emits exactly one `fgos.v1` envelope matching `src/state/envelope.mjs` semantics.
 
-use fgos_host_runtime::{ProviderError, ProviderOutcome};
+use crate::cli_projector::ProjectError;
+use crate::invocation_doors::Ended;
+use fgos_host_runtime::{CategorisedRefusal, ProviderError, ProviderOutcome};
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use std::io::Write;
@@ -75,6 +77,32 @@ pub fn present_error(err: &ProviderError) -> i32 {
     }
 }
 
+/// Presents a call that could not be projected into a request: a verb's categorised refusal exits with its
+/// category, a plain failure exits as unexpected.
+pub fn present_projection_error(err: &ProjectError) -> Ended {
+    match err {
+        ProjectError::Refused(refusal) => Ended {
+            code: refusal.report(),
+            failure: Some(refusal.message.clone()),
+        },
+        ProjectError::Failed(message) => {
+            eprintln!("fgos: error: {message}");
+            Ended {
+                code: fgos_host_runtime::exit_codes::unexpected(),
+                failure: Some(message.clone()),
+            }
+        }
+    }
+}
+
+/// The categorised refusal a completed operation answers with, if it is one.
+pub fn refusal_of(outcome: &ProviderOutcome) -> Option<&CategorisedRefusal> {
+    match outcome {
+        ProviderOutcome::Completed { output, .. } => output.downcast_ref::<CategorisedRefusal>(),
+        ProviderOutcome::Parked { .. } => None,
+    }
+}
+
 /// A mailbox verb's answer: its contract text and a newline (nothing when
 /// the verb wrote its frames itself), or with `--json` the envelope; a
 /// warning line on stderr; the verb's own exit status.
@@ -118,6 +146,9 @@ pub fn refusal_json(refusal: &fgos_identity::Refusal) -> String {
 /// Presents a successful provider outcome and returns the process exit code.
 /// `json` is whether the caller passed `--json`.
 pub fn present_outcome(outcome: &ProviderOutcome, json: bool) -> i32 {
+    if let Some(refusal) = refusal_of(outcome) {
+        return refusal.report();
+    }
     match outcome {
         ProviderOutcome::Completed { output, .. } => {
             if let Some(answer) =
@@ -441,5 +472,38 @@ mod tests {
         assert_eq!(compact, fixture["compact_bytes"].as_str().unwrap());
         let pretty = serde_json::to_string_pretty(input_val).unwrap();
         assert_eq!(pretty, fixture["pretty_bytes"].as_str().unwrap());
+    }
+
+    fn refused(category: &'static str) -> ProviderOutcome {
+        ProviderOutcome::completed(
+            fgos_host_runtime::ContractRef::from_static("probe.request", "1.0.0"),
+            Box::new(CategorisedRefusal::new(category, "no thanks")),
+        )
+    }
+
+    #[test]
+    fn a_categorised_refusal_exits_with_its_category_and_names_its_text_to_the_doors() {
+        for (category, code) in [("precondition", 2), ("validation", 4), ("lock-timeout", 7)] {
+            let outcome = refused(category);
+            assert_eq!(present_outcome(&outcome, false), code, "{category}");
+            assert_eq!(
+                present_outcome(&outcome, true),
+                code,
+                "{category} with --json"
+            );
+            assert_eq!(refusal_of(&outcome).unwrap().message, "no thanks");
+        }
+    }
+
+    #[test]
+    fn a_projection_error_exits_with_its_category_or_as_unexpected() {
+        let refusal = ProjectError::Refused(CategorisedRefusal::new("validation", "bad call"));
+        let ended = present_projection_error(&refusal);
+        assert_eq!(ended.code, 4);
+        assert_eq!(ended.failure.as_deref(), Some("bad call"));
+        let plain = ProjectError::Failed("broken".into());
+        let ended = present_projection_error(&plain);
+        assert_eq!(ended.code, fgos_host_runtime::exit_codes::unexpected());
+        assert_eq!(ended.failure.as_deref(), Some("broken"));
     }
 }

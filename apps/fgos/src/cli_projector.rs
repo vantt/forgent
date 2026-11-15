@@ -3,9 +3,32 @@
 //! Projects command-line arguments and route descriptors into kernel
 //! `HostInvocation` and `OperationRequest` structs for native operations.
 
-use fgos_host_runtime::{ContractRef, HostInvocation, OperationId, OperationRequest};
+use fgos_host_runtime::{
+    CategorisedRefusal, ContractRef, HostInvocation, OperationId, OperationRequest,
+};
 use std::ffi::OsString;
 use std::path::PathBuf;
+
+/// Why a call could not be projected into a request. A verb that reads the shared parser answers a malformed
+/// call with its category (`Refused`: the Node CLI's exit status and text); the readers that predate it keep
+/// answering a plain message (`Failed`: exits as an unexpected failure).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum ProjectError {
+    Refused(CategorisedRefusal),
+    Failed(String),
+}
+
+impl From<String> for ProjectError {
+    fn from(message: String) -> Self {
+        Self::Failed(message)
+    }
+}
+
+impl From<CategorisedRefusal> for ProjectError {
+    fn from(refusal: CategorisedRefusal) -> Self {
+        Self::Refused(refusal)
+    }
+}
 
 /// Projects a native CLI invocation into a `(HostInvocation, OperationRequest)` pair.
 /// `root` is the project the invocation doors resolved; only the operations that read
@@ -16,7 +39,7 @@ pub fn project_cli_invocation(
     args: &[OsString],
     root: Result<PathBuf, String>,
     stdin: Option<Vec<u8>>,
-) -> Result<(HostInvocation, OperationRequest), String> {
+) -> Result<(HostInvocation, OperationRequest), ProjectError> {
     let operation = OperationId::parse(operation_id_str)
         .map_err(|e| format!("invalid operation id '{}': {}", operation_id_str, e))?;
 
@@ -108,7 +131,8 @@ pub fn project_cli_invocation(
             return Err(format!(
                 "native CLI projector has no request mapping for '{}'",
                 other
-            ));
+            )
+            .into());
         }
     };
 
@@ -123,7 +147,10 @@ pub fn project_cli_invocation(
 /// (`mailbox.send`, `mailbox.inbox`, `mailbox.inbox.claim` with `--claim`,
 /// `mailbox.list`, `mailbox.status`),
 /// and the arguments decide which.
-pub fn native_operation_id(route_operation: &str, args: &[OsString]) -> Result<String, String> {
+pub fn native_operation_id(
+    route_operation: &str,
+    args: &[OsString],
+) -> Result<String, ProjectError> {
     if route_operation == fgos_identity::IDENTITY_OPERATION_ID {
         return Ok(project_identity_request(args)?.operation_id().to_string());
     }
