@@ -380,18 +380,6 @@
           "reason": "moves to the capability port in a later step of this change"
         },
         {
-          "path": "src/runner/dispatch/config.mjs",
-          "reason": "moves to the capability port in a later step of this change"
-        },
-        {
-          "path": "src/runner/dispatch/confinement/request.mjs",
-          "reason": "moves to the capability port in a later step of this change"
-        },
-        {
-          "path": "src/runner/dispatch/plan.mjs",
-          "reason": "moves to the capability port in a later step of this change"
-        },
-        {
           "path": "src/runner/dispatch/resolve.mjs",
           "reason": "moves to the capability port in a later step of this change"
         },

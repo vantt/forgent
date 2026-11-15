@@ -13,6 +13,7 @@ import {
   ConfinementPolicyError,
 } from "./policies.mjs";
 import { credentialStoreOf, credentialStoreProblem, providerCapacityForInvocation } from "../provider-capacity.mjs";
+import { capabilityConfinementOf } from "../../execution/capability-config.mjs";
 
 /** A refusal that names why a blind dispatch cannot be enforced, before anything launches. */
 function blindRefusal(code, detail) {
@@ -312,8 +313,8 @@ export function buildConfinementRequest({
   }
   if (!resolvedRequirement) {
     const effectiveFallback = fallbackFrom || anchorCapability || null;
-    const capConfinement = cfg?.capabilities?.[cap]?.confinement;
-    const skillConfinement = stageSkill && stageSkill !== cap ? cfg?.capabilities?.[stageSkill]?.confinement : undefined;
+    const capConfinement = capabilityConfinementOf(cfg, cap);
+    const skillConfinement = stageSkill && stageSkill !== cap ? capabilityConfinementOf(cfg, stageSkill) : undefined;
 
     if (capConfinement && skillConfinement) {
       validateCapabilityConfinementShape(capConfinement, `capabilities.${cap}.confinement`);
@@ -333,8 +334,9 @@ export function buildConfinementRequest({
     let effectiveAnchor = capConfinement ? cap : (skillConfinement ? stageSkill : null);
 
     // F-c: capability fallback must carry the same confinement policy that the anchor it fell back from declared
-    if (!activeConfinement && effectiveFallback && cfg?.capabilities?.[effectiveFallback]?.confinement) {
-      activeConfinement = cfg.capabilities[effectiveFallback].confinement;
+    const fallbackConfinement = effectiveFallback ? capabilityConfinementOf(cfg, effectiveFallback) : undefined;
+    if (!activeConfinement && fallbackConfinement) {
+      activeConfinement = fallbackConfinement;
       effectiveAnchor = effectiveFallback;
     }
 

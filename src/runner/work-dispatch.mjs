@@ -447,9 +447,8 @@ export function workUnitFor(item, opts = {}) {
     cfg, work: item, stage, executorId, resolvedExecutor: resolved.executor,
   }).capability;
   // A step Unit names its capability the way the domain's Workflow units do (`coding:discover`),
-  // so the pool configured for the Workflow serves the loop's worker too. bind() falls back to the
-  // bare verb when the qualified entry has no pool, so a config that only declares `discover`
-  // binds exactly as before.
+  // so the pool configured for the Workflow serves the loop's worker too. The qualified name is what
+  // the Workflow units declare; a config that declares only the bare verb has no entry for it.
   let capability = typeof stepCapability === 'string' && stepCapability && !stepCapability.includes(':')
     ? `${domain}:${stepCapability}`
     : stepCapability;

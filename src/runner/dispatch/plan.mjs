@@ -16,22 +16,9 @@ import { REPEAT_MODE_VALUES } from './execution-contract.mjs';
 import { RIGOR_VALUES, resolveStrongerRigor } from '../rigor.mjs';
 import { deriveOperationCapability } from '../operation-capability.mjs';
 import { SEAT_ROLES, effectiveRigorOf } from '../execution/seat-resolver.mjs';
-import { capabilityRigorOf } from '../execution/capability-config.mjs';
+import { capabilityRigorOf, registeredCapabilityOf } from '../execution/capability-config.mjs';
 import { isReadOnlyAssignment } from './assignment.mjs';
 import { bindWorkSeat } from '../execution/bind.mjs';
-
-// Additive check for the `capability.unknown` reason code (never changes
-// `mechanism`): is `name` a real entry key, or a declared `aliases[]` member,
-// of `cfg.capabilities`? Mirrors the same "key or alias" membership
-// `resolveExecutorAndOverrides` (resolve.mjs) already checks for `prefer`
-// resolution, kept local here since that function resolves a single name to
-// its serving executor rather than answering a plain existence question.
-function isKnownCapabilityName(cfg, name) {
-  const capabilities = cfg && cfg.capabilities && typeof cfg.capabilities === 'object' ? cfg.capabilities : {};
-  if (Object.prototype.hasOwnProperty.call(capabilities, name)) return true;
-  return Object.values(capabilities).some((entry) => Array.isArray(entry?.aliases) && entry.aliases.includes(name));
-}
-
 
 /** The source Seat Binding recorded for one field of a bound seat, carried over as it is. */
 function bindingSource(binding, field) {
@@ -490,7 +477,7 @@ export function compileDispatchPlan(
     }
     reasonCodes.push('selector.unregistered');
     // Additive diagnosis for the one case a caller can act on: the purpose was never registered as a capability key or alias.
-    if (selector.type === 'purpose' && !isKnownCapabilityName(cfg, purpose)) {
+    if (selector.type === 'purpose' && registeredCapabilityOf(cfg, purpose) === undefined) {
       reasonCodes.push('capability.unknown');
     }
     return planOf(shell, { mechanism: 'unavailable', executorId: null, capability: purpose ?? null, reasonCodes, configured: false });

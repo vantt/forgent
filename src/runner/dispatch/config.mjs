@@ -11,6 +11,7 @@
 // source file, but that also means it carries the same trust level as code:
 // only apply it from a checkout you already trust.
 import { checkDeclaredSeats, SeatResolutionError } from '../execution/seat-resolver.mjs';
+import { bindingTasteOf, capabilityConfinementOf, capabilityNamesOf, registeredCapabilityOf } from '../execution/capability-config.mjs';
 import { paramTableOf } from '../execution/loops/index.mjs';
 import { isSeatId } from '../../convention/seat-id.mjs';
 import { definitionFileName } from '../../convention/definition-names.mjs';
@@ -487,10 +488,10 @@ function checkBypassIsConfined(executor, label) {
 }
 
 /** The rules of one invocation that read beyond its own fields: its tools against the catalog, its store against the confinement. */
-function checkInvocation(invocation, label, capabilityNames, executorConfinement) {
+function checkInvocation(invocation, label, isRegistered, executorConfinement) {
   if (invocation.via === 'mcp') {
     for (const capabilityName of Object.keys(invocation.tools ?? {})) {
-      if (!capabilityNames.has(capabilityName)) {
+      if (!isRegistered(capabilityName)) {
         throw new RunnerConfigError(
           `runner config (${label}) "tools" key "${capabilityName}" is not declared in "capabilities" — add it there first.`,
         );
@@ -507,7 +508,7 @@ function checkInvocation(invocation, label, capabilityNames, executorConfinement
 }
 
 /** The rules of one `executors.<id>` entry that read beyond its own fields. */
-function checkExecutorEntry(executor, label, capabilityNames) {
+function checkExecutorEntry(executor, label, isRegistered) {
   for (const [field, why] of Object.entries(REMOVED_EXECUTOR_FIELDS)) {
     if (executor[field] !== undefined) {
       throw new RunnerConfigError(`runner config (${label}) "${field}" was removed. ${why}`);
@@ -515,7 +516,7 @@ function checkExecutorEntry(executor, label, capabilityNames) {
   }
   // `for` describes `kind: "tool"` executors; on an agent it is inert and `fgos doctor` names it.
   for (const purpose of executor.for ?? []) {
-    if (!capabilityNames.has(purpose)) {
+    if (!isRegistered(purpose)) {
       throw new RunnerConfigError(
         `runner config (${label}) "for" entry "${purpose}" is not declared in "capabilities" — add it there first.`,
       );
@@ -524,7 +525,7 @@ function checkExecutorEntry(executor, label, capabilityNames) {
   checkBypassIsConfined(executor, label);
   const seenInvocationIds = new Set();
   (executor.invocations ?? []).forEach((invocation, index) => {
-    checkInvocation(invocation, `${label} invocations[${index}]`, capabilityNames, executor.confinement);
+    checkInvocation(invocation, `${label} invocations[${index}]`, isRegistered, executor.confinement);
     if (invocation.id === undefined) return;
     if (seenInvocationIds.has(invocation.id)) {
       throw new RunnerConfigError(`runner config (${label}) "invocations" declares "id": "${invocation.id}" more than once — each invocation id must be unique within one executor.`);
@@ -549,26 +550,15 @@ const SEAT_TASTE_KEY_RULES = Object.freeze({
 });
 
 /** The rules of one capability entry that read beyond its own fields: the key rules Convention owns, and the confinement policy. */
-function checkCapabilityEntry(entry, label) {
+function checkCapabilityEntry(cfg, name, taste, label) {
   for (const [mapKey, keyProblem] of Object.entries(SEAT_TASTE_KEY_RULES)) {
-    for (const key of Object.keys(entry[mapKey] ?? {})) {
+    for (const key of Object.keys(taste?.[mapKey] ?? {})) {
       const verdict = keyProblem(key);
       if (verdict !== true) throw new RunnerConfigError(`runner config (${label}.${mapKey}) key ${JSON.stringify(key)} must be ${verdict}.`);
     }
   }
-  if (entry.confinement !== undefined) validateCapabilityConfinementShape(entry.confinement, `${label}.confinement`);
-}
-
-/** Every `prefer` a capability entry carries, with the label that names where it sits. */
-function preferSitesOf(entry, label) {
-  const sites = [];
-  if (entry.prefer !== undefined) sites.push({ prefer: entry.prefer, label: `${label} "prefer"` });
-  for (const mapKey of ['roles', 'personas', 'seats']) {
-    for (const [key, taste] of Object.entries(entry[mapKey] ?? {})) {
-      if (taste?.prefer !== undefined) sites.push({ prefer: taste.prefer, label: `${label}.${mapKey}.${key} "prefer"` });
-    }
-  }
-  return sites;
+  const confinement = capabilityConfinementOf(cfg, name);
+  if (confinement !== undefined) validateCapabilityConfinementShape(confinement, `${label}.confinement`);
 }
 
 function boundedParamsForLoop(loopName) {
@@ -686,23 +676,34 @@ export function validateGeneratedPathsShape(generatedPaths, label) {
   });
 }
 
+/** Every `prefer` of the capability catalog with the label that names where it sits: the entry's, then each scope's. */
+function* capabilityPreferSites(cfg, sourceLabel) {
+  for (const [name, taste] of Object.entries(bindingTasteOf(cfg))) {
+    const entryLabel = `${sourceLabel} capabilities.${name}`;
+    if (taste.prefer !== undefined) yield { prefer: taste.prefer, siteName: entryLabel };
+    for (const mapKey of ['roles', 'personas', 'seats']) {
+      for (const [key, scope] of Object.entries(taste[mapKey] ?? {})) {
+        if (scope.prefer !== undefined) yield { prefer: scope.prefer, siteName: `${entryLabel}.${mapKey}.${key}` };
+      }
+    }
+  }
+}
+
 /** What a prefer site names must exist: the executor, and the invocation id when it pins one. */
 function checkPreferTargets(cfg, sourceLabel) {
-  for (const [name, entry] of Object.entries(cfg.capabilities ?? {})) {
-    for (const site of preferSitesOf(entry, `${sourceLabel} capabilities.${name}`)) {
-      const siteName = site.label.slice(0, site.label.lastIndexOf(' "prefer"'));
-      for (const candidate of normalizePreferCandidates(site.prefer)) {
-        const candidateExecutor = cfg.executors?.[candidate.executor];
-        if (!candidateExecutor) {
-          throw new RunnerConfigError(
-            `runner config (${siteName}) "prefer" names "${candidate.executor}" but no such executor is registered.`,
-          );
-        }
-        if (candidate.invocation !== undefined && !(candidateExecutor.invocations ?? []).some((inv) => inv.id === candidate.invocation)) {
-          throw new RunnerConfigError(
-            `runner config (${siteName}) "prefer" names invocation "${candidate.invocation}" on executor "${candidate.executor}" but no such invocation id is declared on it.`,
-          );
-        }
+  for (const site of capabilityPreferSites(cfg, sourceLabel)) {
+    const siteName = site.siteName;
+    for (const candidate of normalizePreferCandidates(site.prefer)) {
+      const candidateExecutor = cfg.executors?.[candidate.executor];
+      if (!candidateExecutor) {
+        throw new RunnerConfigError(
+          `runner config (${siteName}) "prefer" names "${candidate.executor}" but no such executor is registered.`,
+        );
+      }
+      if (candidate.invocation !== undefined && !(candidateExecutor.invocations ?? []).some((inv) => inv.id === candidate.invocation)) {
+        throw new RunnerConfigError(
+          `runner config (${siteName}) "prefer" names invocation "${candidate.invocation}" on executor "${candidate.executor}" but no such invocation id is declared on it.`,
+        );
       }
     }
   }
@@ -719,11 +720,12 @@ function checkConfinementAgainstPolicies(cfg, sourceLabel) {
     }
     validateConfinementPolicyShape(policyDoc, `${sourceLabel} confinementPolicies.${policyId}`);
   }
-  const capabilities = Object.entries(cfg.capabilities ?? {});
-  for (const [name, entry] of capabilities) {
-    const mode = entry.confinement?.mode;
+  const names = capabilityNamesOf(cfg);
+  for (const name of names) {
+    const confinement = capabilityConfinementOf(cfg, name);
+    const mode = confinement?.mode;
     if (mode === 'required' || (strict && mode === 'preferred')) {
-      const policyId = entry.confinement.policy;
+      const policyId = confinement.policy;
       if (!BUILTIN_POLICY_IDS.includes(policyId) && !(cfg.confinementPolicies && policyId in cfg.confinementPolicies)) {
         throw new RunnerConfigError(strict
           ? `runner config (${sourceLabel} capabilities.${name}) references unknown policy "${policyId}" in strict mode (confinement-policy-missing).`
@@ -732,13 +734,13 @@ function checkConfinementAgainstPolicies(cfg, sourceLabel) {
     }
   }
   if (!strict) return;
-  if (capabilities.length === 0) {
+  if (names.length === 0) {
     throw new RunnerConfigError(
       `runner config (${sourceLabel}) strict mode requires explicit capabilities declared (confinement-policy-missing).`,
     );
   }
-  for (const [name, entry] of capabilities) {
-    if (!entry.confinement?.mode) {
+  for (const name of names) {
+    if (!capabilityConfinementOf(cfg, name)?.mode) {
       throw new RunnerConfigError(
         `runner config (${sourceLabel} capabilities.${name}) missing required explicit confinement in strict mode (confinement-policy-missing).`,
       );
@@ -755,14 +757,13 @@ export function validateRunnerConfigShape(cfg, sourceLabel) {
   for (const [key, why] of Object.entries(REMOVED_RUNNER_KEYS)) {
     if (key in cfg) throw new RunnerConfigError(`runner config (${sourceLabel}) declares retired "${key}": ${why}`);
   }
-  const capabilityNames = new Set();
-  for (const [name, entry] of Object.entries(cfg.capabilities ?? {})) {
-    checkCapabilityEntry(entry, `${sourceLabel} capabilities.${name}`);
-    capabilityNames.add(name);
-    for (const alias of entry.aliases ?? []) capabilityNames.add(alias);
+  const taste = bindingTasteOf(cfg);
+  for (const name of capabilityNamesOf(cfg)) {
+    checkCapabilityEntry(cfg, name, taste[name], `${sourceLabel} capabilities.${name}`);
   }
+  const isRegistered = (name) => registeredCapabilityOf(cfg, name) !== undefined;
   for (const [executorId, executor] of Object.entries(cfg.executors ?? {})) {
-    checkExecutorEntry(executor, `${sourceLabel} executors.${executorId}`, capabilityNames);
+    checkExecutorEntry(executor, `${sourceLabel} executors.${executorId}`, isRegistered);
     warnIfProviderFamilyUnreliable(executorId, executor);
   }
   checkPreferTargets(cfg, sourceLabel);

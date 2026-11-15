@@ -13,6 +13,7 @@ import { familyOf } from './provider-adapter.mjs';
 import { EXECUTOR_CARRIES, CLAUDE_CLI_COMMANDS, EXECUTOR_MISSING_MESSAGE, normalizePreferCandidates } from './config.mjs';
 import { RunnerConfigError } from './runner-config-error.mjs';
 import { credentialStoreOf } from './provider-capacity.mjs';
+import { capabilityConfinementOf, hasCapabilityEntry, registeredCapabilityOf } from '../execution/capability-config.mjs';
 
 /**
  * Canonical capability identity for a dispatch, independent of any Work item.
@@ -33,18 +34,7 @@ export function resolveCapabilityDetailsFromHints({
   hints,
 } = {}) {
   const { candidates = [], preferred = null, fallbackLabel = null } = hints ?? {};
-  const capabilities = cfg?.capabilities && typeof cfg.capabilities === 'object' ? cfg.capabilities : {};
-
-  function resolveAlias(name) {
-    if (!name || typeof name !== 'string') return name;
-    if (capabilities[name]) return name;
-    for (const [capName, capEntry] of Object.entries(capabilities)) {
-      if (Array.isArray(capEntry?.aliases) && capEntry.aliases.includes(name)) {
-        return capName;
-      }
-    }
-    return name;
-  }
+  const resolveAlias = (name) => (!name || typeof name !== 'string' ? name : registeredCapabilityOf(cfg, name) ?? name);
 
   const explicitPurpose = purpose && typeof purpose === 'string' && purpose.trim()
     ? resolveAlias(purpose.trim())
@@ -64,6 +54,7 @@ export function resolveCapabilityDetailsFromHints({
 
   // Capabilities in config that `prefer` this executor
   if (executorId || resolvedExecutor) {
+    const capabilities = cfg?.capabilities && typeof cfg.capabilities === 'object' ? cfg.capabilities : {};
     for (const [capName, capEntry] of Object.entries(capabilities)) {
       if (capEntry?.prefer && (capEntry.prefer === executorId || (resolvedExecutor && cfg?.executors?.[capEntry.prefer] === resolvedExecutor))) {
         candidateSet.add(capName);
@@ -88,7 +79,7 @@ export function resolveCapabilityDetailsFromHints({
 
   // 1. Any candidate with required confinement (confinement.mode === 'required') wins!
   const requiredCandidates = normalizedCandidates.filter(
-    (c) => capabilities[c]?.confinement?.mode === 'required',
+    (c) => capabilityConfinementOf(cfg, c)?.mode === 'required',
   );
   if (!capability && requiredCandidates.length > 0) {
     requiredCandidates.sort();
@@ -97,7 +88,7 @@ export function resolveCapabilityDetailsFromHints({
 
   // 2. Any candidate with configured confinement wins next
   const configuredConfinementCandidates = normalizedCandidates.filter(
-    (c) => Boolean(capabilities[c]?.confinement),
+    (c) => Boolean(capabilityConfinementOf(cfg, c)),
   );
   if (!capability && configuredConfinementCandidates.length > 0) {
     configuredConfinementCandidates.sort();
@@ -110,7 +101,7 @@ export function resolveCapabilityDetailsFromHints({
   }
 
   // 4. Prefer registered capabilities in cfg.capabilities
-  const registeredCandidates = normalizedCandidates.filter((c) => Boolean(capabilities[c]));
+  const registeredCandidates = normalizedCandidates.filter((c) => hasCapabilityEntry(cfg, c));
   if (!capability && registeredCandidates.length > 0) {
     registeredCandidates.sort();
     capability = registeredCandidates[0];
@@ -123,9 +114,9 @@ export function resolveCapabilityDetailsFromHints({
   }
 
   const policyAnchors = normalizedCandidates
-    .filter((candidate) => candidate !== capability && capabilities[candidate]?.confinement);
+    .filter((candidate) => candidate !== capability && capabilityConfinementOf(cfg, candidate));
   const requiredAnchors = policyAnchors.filter(
-    (candidate) => capabilities[candidate]?.confinement?.mode === 'required',
+    (candidate) => capabilityConfinementOf(cfg, candidate)?.mode === 'required',
   ).sort();
   const anchorCapability = requiredAnchors[0] ?? policyAnchors.sort()[0] ?? null;
 
