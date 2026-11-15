@@ -557,7 +557,42 @@ pub struct HooksReport {
     pub status: String,
     pub configured_path: Option<String>,
     pub enforcement_missing: bool,
+    /// The configured hooks path, resolved against the directory holding the owned path, is the owned path
+    /// (compared without case on Windows).
+    pub wired: bool,
     pub provenance: Option<String>,
+}
+
+/// The path with `.` and `..` components folded, as `path.resolve` leaves it; no filesystem access.
+fn lexically_normal(path: &std::path::Path) -> std::path::PathBuf {
+    use std::path::Component;
+    let mut out = std::path::PathBuf::new();
+    for part in path.components() {
+        match part {
+            Component::CurDir => {}
+            Component::ParentDir => {
+                if !out.pop() {
+                    out.push("..");
+                }
+            }
+            other => out.push(other.as_os_str()),
+        }
+    }
+    out
+}
+
+/// Whether `configured` (as Git stores it, possibly relative to the owned path's parent) names `owned`.
+fn hooks_path_wired(configured: Option<&str>, owned: &std::path::Path) -> bool {
+    let Some(configured) = configured else {
+        return false;
+    };
+    let base = owned.parent().unwrap_or(owned);
+    let resolved = lexically_normal(&base.join(configured));
+    if cfg!(windows) {
+        resolved.to_string_lossy().to_lowercase() == owned.to_string_lossy().to_lowercase()
+    } else {
+        resolved == owned
+    }
 }
 impl GitDriver {
     pub(crate) fn hooks_value(&self, repo: &RepoHandle) -> Result<Option<String>> {
@@ -757,6 +792,7 @@ impl GitDriver {
                 m.is_file()
             }
         });
+        let wired = hooks_path_wired(configured.as_deref(), owned_path);
         let enforcement_missing = configured.as_deref() != Some(path) || !executable;
         Ok(HooksReport {
             status: if configured.is_none() {
@@ -769,6 +805,7 @@ impl GitDriver {
             .into(),
             configured_path: configured,
             enforcement_missing,
+            wired,
             provenance,
         })
     }
@@ -852,5 +889,23 @@ impl GitDriver {
             .ok_or_else(|| failure("invalid-hooks-operation"))?;
         self.recover_config_change(repo, id, change)?;
         self.inspect_hooks(repo, std::path::Path::new(&h.owner_path))
+    }
+}
+
+#[cfg(test)]
+mod wired_tests {
+    use super::hooks_path_wired;
+    use std::path::Path;
+
+    #[test]
+    fn a_hooks_path_is_wired_only_when_it_resolves_to_the_owned_path() {
+        let owned = Path::new("/repo/.githooks");
+        assert!(hooks_path_wired(Some("/repo/.githooks"), owned));
+        assert!(hooks_path_wired(Some(".githooks"), owned));
+        assert!(hooks_path_wired(Some("./.githooks"), owned));
+        assert!(hooks_path_wired(Some("../repo/.githooks"), owned));
+        assert!(!hooks_path_wired(Some("/repo/other"), owned));
+        assert!(!hooks_path_wired(Some("/repo/.githooks/sub"), owned));
+        assert!(!hooks_path_wired(None, owned));
     }
 }

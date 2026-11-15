@@ -12,6 +12,7 @@ fn hooks_fill_empty_preserve_custom_diagnose_and_remove_only_owned() {
     let report = f.driver.ensure_hooks(&f.repo, &path, "hooks").unwrap();
     assert_eq!(report.status, "owned");
     assert!(report.enforcement_missing);
+    assert!(report.wired);
     assert_eq!(report.provenance.as_deref(), Some("hooks"));
     assert_eq!(
         git(&f.main, &["config", "core.hooksPath"]),
@@ -370,6 +371,7 @@ fn global_hooks_child() {
     assert_eq!(report.status, "skippedExisting");
     assert_eq!(report.configured_path.as_deref(), Some("/global/hooks"));
     assert!(report.enforcement_missing);
+    assert!(!report.wired);
     assert!(!fs::read_to_string(f.main.join(".git/config"))
         .unwrap()
         .contains("hooksPath"));
