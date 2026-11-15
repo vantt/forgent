@@ -65,6 +65,10 @@
     "owner_path": "apps/fgos",
     "subcommands": true
   },
+  "uninstall": {
+    "operation_id": "uninstall.run",
+    "owner_path": "apps/fgos"
+  },
   "version": {
     "operation_id": "distribution.build.show",
     "owner_path": "packages/distribution/rust"

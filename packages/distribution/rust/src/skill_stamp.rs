@@ -167,7 +167,7 @@ fn is_own_agents_dir(dir: &Path) -> io::Result<bool> {
 
 /// The first symbolic link on the way from `root` down `relative` (each component below `root`, the last
 /// included), or `None` when there is none or the path stops existing.
-fn first_symlink_under(root: &Path, relative: &[&str]) -> Option<PathBuf> {
+pub fn first_symlink_under(root: &Path, relative: &[&str]) -> Option<PathBuf> {
     let mut current = root.to_path_buf();
     for part in relative {
         current.push(part);
@@ -186,7 +186,7 @@ fn first_symlink_under(root: &Path, relative: &[&str]) -> Option<PathBuf> {
 /// carries the assembled header (or sits beside a stamped wrapper); a directory under an owned name without a
 /// stamp is another tool's and is listed in `foreign`, as is a link under an owned name. Anything else is the
 /// person's and is not named. A link in a skills root, or above it, is never walked. Reads only; each list is
-/// sorted by path.
+/// in the order roots (`.claude/skills`, then `.agents/skills`) and entry names within a root give.
 pub fn generated_skill_dirs(
     project: &Path,
     owned: &BTreeSet<String>,
@@ -214,8 +214,10 @@ pub fn generated_skill_dirs(
             });
             continue;
         }
-        for entry in std::fs::read_dir(&root)? {
-            let entry = entry?;
+        // Entries by name within a root, roots in the order above: the order the render's own reader names them.
+        let mut entries = std::fs::read_dir(&root)?.collect::<io::Result<Vec<_>>>()?;
+        entries.sort_by_key(|entry| entry.file_name());
+        for entry in entries {
             let name = entry.file_name().to_string_lossy().into_owned();
             if is_own_tmp_file(&name) {
                 continue;
@@ -241,8 +243,6 @@ pub fn generated_skill_dirs(
             }
         }
     }
-    found.ours.sort();
-    found.foreign.sort_by(|a, b| a.dir.cmp(&b.dir));
     Ok(found)
 }
 
@@ -357,6 +357,10 @@ mod tests {
                 .map(|v| v.as_str().unwrap())
                 .collect();
             let name = vector["name"].as_str().unwrap();
+            // The contract's expectations are sets, written sorted; the reader's order is the render's.
+            let (mut ours, mut want_ours) = (ours, want_ours);
+            ours.sort_unstable();
+            want_ours.sort_unstable();
             assert_eq!(ours, want_ours, "{name}: ours");
             let foreign: Vec<(String, String)> = got
                 .foreign
@@ -374,6 +378,9 @@ mod tests {
                     )
                 })
                 .collect();
+            let (mut foreign, mut want_foreign) = (foreign, want_foreign);
+            foreign.sort();
+            want_foreign.sort();
             assert_eq!(foreign, want_foreign, "{name}: foreign");
         }
     }

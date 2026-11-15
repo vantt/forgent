@@ -36,6 +36,23 @@ pub fn integration_script_path(payload_root: &Path) -> PathBuf {
     payload_root.join("scripts").join(SCRIPT_NAME)
 }
 
+/// The script an rc line can name for a payload that sits in a Git checkout: its `scripts/` file, rewritten to the
+/// same path in the main checkout when the payload is a linked worktree, so a worktree never earns a line of
+/// its own. `None` for a payload outside any checkout (a release, an unpacked archive): no rc line was ever
+/// written for such a place, so there is nothing to look for.
+pub fn checkout_integration_script(payload_root: &Path) -> Option<PathBuf> {
+    let executing = integration_script_path(payload_root);
+    let repo = fgos_git::GitDriver::topology_at(executing.parent()?)
+        .ok()
+        .flatten()?;
+    let canonical = repo.trusted_main_root().join("scripts").join(SCRIPT_NAME);
+    Some(if canonical.exists() {
+        canonical
+    } else {
+        executing
+    })
+}
+
 /// The rc files of `home` that exist: bash and zsh, or the PowerShell profiles when `platform` is `win32`.
 pub fn detect_rc_files(home: &Path, platform: &str) -> Vec<PathBuf> {
     let candidates: Vec<PathBuf> = if platform == "win32" {
@@ -261,6 +278,31 @@ mod tests {
             vec![gone.display().to_string()]
         );
         assert!(dead_source_lines(&home.join(".none")).unwrap().is_empty());
+    }
+
+    #[test]
+    fn the_script_an_rc_line_can_name_exists_only_for_a_payload_inside_a_checkout() {
+        let root = scratch("checkout");
+        let payload = root.join("payload");
+        std::fs::create_dir_all(payload.join("scripts")).unwrap();
+        assert_eq!(checkout_integration_script(&payload), None, "no checkout");
+        let git = root.join(".git");
+        std::fs::create_dir_all(git.join("objects")).unwrap();
+        std::fs::create_dir_all(git.join("refs")).unwrap();
+        std::fs::write(git.join("HEAD"), "ref: refs/heads/main\n").unwrap();
+        assert_eq!(
+            checkout_integration_script(&payload),
+            Some(integration_script_path(&payload)),
+            "the main checkout has no such script of its own: the payload's file is named"
+        );
+        let canonical = root.join("scripts");
+        std::fs::create_dir_all(&canonical).unwrap();
+        std::fs::write(canonical.join(SCRIPT_NAME), "").unwrap();
+        assert_eq!(
+            checkout_integration_script(&payload),
+            Some(canonical.join(SCRIPT_NAME)),
+            "the main checkout's own script wins"
+        );
     }
 
     #[test]

@@ -39,4 +39,5 @@ pub mod mailbox_verbs;
 pub mod metrics_sources;
 pub mod run_dirs;
 pub mod session;
+pub mod uninstall;
 pub mod wire_agents;

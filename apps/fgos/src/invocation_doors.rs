@@ -406,21 +406,22 @@ impl<'a> Doors<'a> {
     }
 }
 
-/// How a verb picks its root: `init` creates a store, so it acts where it is run; `doctor` reports and repairs the
-/// shared store of the main checkout whichever worktree it is run from; every other verb acts on the nearest
-/// project above the caller.
+/// How a verb picks its root: `init` creates a store, so it acts where it is run; `doctor` and `uninstall` act on
+/// the main checkout whichever worktree they are run from; every other verb acts on the nearest project above the
+/// caller.
 fn root_policy(verb: &str) -> RootPolicy {
     match verb {
         "init" => RootPolicy::StrictCwd,
-        "doctor" | "wire-agents" => RootPolicy::MainCheckout,
+        "doctor" | "wire-agents" | "uninstall" => RootPolicy::MainCheckout,
         _ => RootPolicy::CallerTree,
     }
 }
 
 /// Whether the verb acts on the root the door resolved even when no `.fgos` is there yet: `doctor` judges a
-/// project that has not been set up, and says so, instead of refusing it.
+/// project that has not been set up, and says so, and `uninstall` reverses what it finds there, instead of
+/// refusing.
 fn acts_on_resolved_root(verb: &str) -> bool {
-    matches!(verb, "doctor" | "wire-agents")
+    matches!(verb, "doctor" | "wire-agents" | "uninstall")
 }
 
 /// Whether the verb accepts `--dir` and never acts on it: `wire-agents` changes the person's own agent config and

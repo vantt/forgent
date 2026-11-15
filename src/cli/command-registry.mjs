@@ -2336,7 +2336,7 @@ export const COMMAND_REGISTRY = [
   {
     name: 'uninstall',
     invoke: 'fgos uninstall [--yes] [--dry-run]',
-    description: 'The project half of `fgctl uninstall`: takes out of this project what fgOS wrote (its hook entries in the agent configs, the generated skill directories, the git hooks `fgos setup` wired, the mailbox sync timer) and keeps everything else. Without --yes, or with --dry-run, it prints the plan and changes nothing. With --yes it first copies each file it rewrites or deletes to <file>.pre-uninstall-<time>. It never touches .fgos data or config, the committed pin, a hook entry or skill directory without fgOS\'s own mark, a shell profile (the rc line is only named) or your global agent config (`fgos wire-agents` keeps no record; the plan prints how to undo it by hand). It does not remove .fgos/installation or the release store: run `fgctl uninstall` for those.',
+    description: 'The project half of `fgctl uninstall`: takes out of this project what fgOS wrote (its hook entries in the agent configs, the generated skill directories, the git hooks fgOS wired, the mailbox sync timer) and keeps everything else. Without --yes, or with --dry-run, it prints the plan and changes nothing. With --yes it first copies each file it rewrites or deletes to <file>.pre-uninstall-<time>. It never touches .fgos data or config, the committed pin, a hook entry or skill directory without fgOS\'s own mark, a shell profile (the rc line is only named) or your global agent config (`fgos wire-agents` keeps no record; the plan prints how to undo it by hand). It does not remove .fgos/installation or the release store: run `fgctl uninstall` for those.',
     parameters: {
       type: 'object',
       properties: {
@@ -2346,6 +2346,7 @@ export const COMMAND_REGISTRY = [
       required: [],
     },
     examples: ['fgos uninstall', 'fgos uninstall --yes'],
+    native: true,
     touchesState: true,
     store: 'none',
     externalEffect: false,

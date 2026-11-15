@@ -1257,11 +1257,18 @@
   },
   "uninstall": {
     "selector": "uninstall",
-    "route_kind": "legacy-cli",
-    "legacy_payload": "legacy-node",
-    "owner_path": "src/cli/command-registry.mjs",
+    "route_kind": "native",
+    "operation_id": "uninstall.run",
+    "owner_path": "apps/fgos",
     "compatibility_tests": [
       "test/rust-host/command-routes.test.mjs"
+    ],
+    "accepted_flags": [
+      "dir",
+      "json",
+      "help",
+      "yes",
+      "dry-run"
     ],
     "store": "none"
   },

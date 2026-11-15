@@ -169,6 +169,12 @@ pub fn project_cli_invocation(
                 args, root,
             )?),
         ),
+        crate::wiring::uninstall::OPERATION_ID => (
+            ContractRef::from_static("uninstall.run.request", "1.0.0"),
+            Box::new(crate::wiring::uninstall::project_uninstall_request(
+                args, root,
+            )?),
+        ),
         other => {
             return Err(format!(
                 "native CLI projector has no request mapping for '{}'",
