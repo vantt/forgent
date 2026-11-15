@@ -24,7 +24,6 @@
     "test/cli/fgos-edit.test.mjs": 8.1,
     "test/cli/fgos-gate-approve.test.mjs": 9.3,
     "test/cli/fgos-gateway.test.mjs": 2,
-    "test/cli/fgos-git.test.mjs": 8.3,
     "test/cli/fgos-handoff.test.mjs": 10,
     "test/cli/fgos-intake-2.test.mjs": 26.1,
     "test/cli/fgos-intake-3.test.mjs": 27.3,

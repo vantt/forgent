@@ -197,8 +197,8 @@ const MULTI = COMMAND_REGISTRY.filter((entry) => entry.subcommands && entry.nati
 const NATIVE = COMMAND_REGISTRY.filter((entry) => entry.subcommands && entry.native === true);
 
 test('the drift scan covers the verbs that branch on a positional sub-verb', () => {
-  assert.deepEqual(MULTI.map((e) => e.name).sort(), ['agents', 'dispatch', 'events', 'gateway', 'git', 'goal', 'lock', 'merge', 'session', 'workflow', 'worktree']);
-  assert.deepEqual(NATIVE.map((e) => e.name).sort(), ['config', 'convention', 'friction', 'identity', 'mailbox', 'metrics']);
+  assert.deepEqual(MULTI.map((e) => e.name).sort(), ['agents', 'dispatch', 'events', 'gateway', 'goal', 'lock', 'merge', 'session', 'workflow', 'worktree']);
+  assert.deepEqual(NATIVE.map((e) => e.name).sort(), ['config', 'convention', 'friction', 'git', 'identity', 'mailbox', 'metrics']);
 });
 
 for (const entry of MULTI) {
@@ -300,6 +300,14 @@ const NATIVE_SOURCES = {
       const src = RUST('apps/fgos/src/cli_projector.rs');
       const start = src.indexOf('fn project_config_request');
       return src.slice(start, src.indexOf('fn project_identity_request', start));
+    },
+  },
+  git: {
+    subs: RUST('apps/fgos/src/wiring/git_incidents.rs'),
+    shared: () => {
+      const src = RUST('apps/fgos/src/wiring/git_incidents.rs');
+      const start = src.indexOf('pub fn project_git_request');
+      return src.slice(start, src.indexOf('/// What a request answers', start));
     },
   },
   convention: {

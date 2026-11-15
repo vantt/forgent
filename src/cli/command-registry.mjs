@@ -2484,6 +2484,7 @@ export const COMMAND_REGISTRY = [
     externalEffect: false,
     paginated: false,
     deprecated: null,
+    native: true,
   }),
   {
     name: 'resync-worktree',

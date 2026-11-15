@@ -18,6 +18,11 @@
     "operation_id": "work.gate-bypass.show",
     "owner_path": "packages/work-state/rust"
   },
+  "git": {
+    "operation_id": "git.status",
+    "owner_path": "packages/git/rust",
+    "subcommands": true
+  },
   "identity": {
     "operation_id": "identity.writer",
     "owner_path": "packages/identity/rust"

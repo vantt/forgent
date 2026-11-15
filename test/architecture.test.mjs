@@ -1662,7 +1662,6 @@ const ARM_STATIC_IMPORTS = [
   '../src/config/facade.mjs',
   '../src/event-store/maintenance.mjs',
   '../src/git/inspect.mjs',
-  '../src/git/status.mjs',
   '../src/holder-lock/index.mjs',
   '../src/intake/classify.mjs',
   '../src/intake/discovery.mjs',

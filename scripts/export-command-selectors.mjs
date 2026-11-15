@@ -242,13 +242,13 @@ function assertNoNativeLanding(cmd, native, landsWork) {
 // The flags keep the registry's property order: the Node CLI lists a verb's valid flags in that order, and the host
 // repeats its text byte for byte.
 function nativeFlagProjection(cmd, onlySubs) {
-  const sorted = (set) => [...set];
+  const inRegistryOrder = (set) => [...set];
   if (cmd.subcommands) {
     const subcommand_flags = {};
-    for (const sub of onlySubs ?? Object.keys(cmd.subcommands).sort()) subcommand_flags[sub] = sorted(acceptedFlags(cmd, [sub]));
+    for (const sub of onlySubs ?? Object.keys(cmd.subcommands).sort()) subcommand_flags[sub] = inRegistryOrder(acceptedFlags(cmd, [sub]));
     return { subcommand_flags };
   }
-  return { accepted_flags: sorted(acceptedFlags(cmd)) };
+  return { accepted_flags: inRegistryOrder(acceptedFlags(cmd)) };
 }
 
 const ANNOTATION_FIELDS = ['selector', 'operation_id', 'owner_path', 'subcommands', 'legacy_payload', 'compatibility_tests'];

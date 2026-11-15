@@ -98,7 +98,6 @@ import { branchNameFor, branchExists, resyncWorktree, detectTrunk, isMainWorktre
 import { claimWork, ClaimError, readWorkerSlotCeiling } from '../src/runner/claim-port.mjs';
 import { isReclaimEligible } from '../src/runner/claim-liveness.mjs';
 import { commitAt, pathExistsAt, readRepoFacts } from '../src/git/inspect.mjs';
-import { readGitStatus, readMergeHead, recoverGitOperations } from '../src/git/status.mjs';
 import { HolderLockError } from '../src/holder-lock/index.mjs';
 import { collectLockStatus } from '../src/runner/lock-status.mjs';
 import { fenceLock, parseLockParams } from '../src/runner/lock-fence.mjs';
@@ -878,20 +877,6 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
     case 'init': {
       const { initStoreUseCase } = await import('../src/verbs/state/init.mjs');
       return initStoreUseCase({ dir });
-    }
-
-    case 'git': {
-      const sub = positional[0];
-      const root = mainCheckoutRootOf(flags);
-      if (sub === 'status') {
-        return readGitStatus(root);
-      }
-      if (sub === 'recover') {
-        const { recovered, kept, message } = recoverGitOperations(root);
-        const mergeHead = readMergeHead(root);
-        return { recovered, kept, message, ...(mergeHead ? { mergeInProgress: mergeHead, next: `fgos main-checkout-reset --sha ${mergeHead} --confirm` } : {}) };
-      }
-      throw new StoreError('validation', `unknown git sub-verb "${sub ?? ''}". Usage: fgos git <status|recover> [--dir <path>]`);
     }
 
     case 'add': {

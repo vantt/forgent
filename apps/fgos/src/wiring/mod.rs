@@ -1,6 +1,7 @@
 //! Source wiring modules for composition root.
 
 pub mod event_store_clone;
+pub mod git_incidents;
 pub mod identity_log;
 #[cfg(unix)]
 pub mod mailbox_body;

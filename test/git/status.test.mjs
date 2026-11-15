@@ -2,34 +2,15 @@ import '../helpers/process-tmp-root.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import os from 'node:os';
-import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { readGitStatus, recoverGitOperations } from '../../src/git/status.mjs';
+import { createGitLand } from '../../src/git/index.mjs';
+import { gitPortOptions } from '../../src/git/inspect.mjs';
 import { fixture as landFixture } from './land-fixture.mjs';
-import { ensureGitAddon, root as addonRoot } from '../../scripts/git-addon.mjs';
+import { envelopeData, gitHead, initGitCwdFast, run } from '../cli/helpers/fgos-cli-harness.mjs';
 
-// boundary: the doctor incidents row counts these same facts; this file owns what each fact says.
-test('git status reads native locks and a merge in progress from the repository, and a clean one reads empty', { skip: process.platform === 'win32' }, () => {
-  const built = ensureGitAddon();
-  const loaderOptions = { descriptor: { manifest: JSON.parse(fs.readFileSync(built.manifest)), releaseRoot: addonRoot } };
-  const repo = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-git-status-'));
-  try {
-    execFileSync('git', ['init', '-q', repo], { stdio: 'ignore' });
-    execFileSync('git', ['-c', 'user.name=t', '-c', 'user.email=t@t', 'commit', '-q', '--allow-empty', '-m', 'seed'], { cwd: repo, stdio: 'ignore' });
-    const clean = readGitStatus(repo, { loaderOptions });
-    assert.equal(clean.mergeInProgress, null);
-    assert.deepEqual(clean.nativeLocks, []);
-    assert.deepEqual(clean.pendingOperations, []);
-    fs.writeFileSync(path.join(repo, '.git', 'index.lock'), '');
-    const head = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: repo, encoding: 'utf8' }).trim();
-    fs.writeFileSync(path.join(repo, '.git', 'MERGE_HEAD'), `${head}\n`);
-    const open = readGitStatus(repo, { loaderOptions });
-    assert.equal(open.mergeInProgress, head);
-    assert.equal(open.nativeLocks.length, 1);
-  } finally { fs.rmSync(repo, { recursive: true, force: true }); }
-});
-
+// boundary: what each fact says, and how a part that cannot be read answers, is owned by the open-incident model in
+// packages/git/rust/tests/incidents.rs. This file proves only that the Node callers (`fgos init`, the doctor rows) reach it.
 async function withLandJournal(body) {
   const f = landFixture();
   const prior = process.env.FGOS_STATE_ROOT;
@@ -37,23 +18,45 @@ async function withLandJournal(body) {
   try { return await body(f); } finally { if (prior === undefined) delete process.env.FGOS_STATE_ROOT; else process.env.FGOS_STATE_ROOT = prior; f.close(); }
 }
 
-test('a part git status cannot read answers an error in place and hides no other part', { skip: process.platform === 'win32' }, () => withLandJournal(async (f) => {
-  const land = f.port();
-  await land.prepare({ operationId: 'pending-only', request: f.request });
-  land.close();
-  const broken = { ...f.options, repoPath: path.join(f.temp, 'no-such-repo') };
-  const status = readGitStatus(f.repo, { loaderOptions: f.loader, portOptions: broken });
-  assert.equal(status.journal.pendingCount, 1);
-  assert.equal(typeof status.retainedLand.error, 'string');
-}));
-
-test('git status reports the retained finished operations of a real journal with their count and age', { skip: process.platform === 'win32' }, () => withLandJournal(async (f) => {
+test('the adapter reads a real journal through the addon and recovery settles it', { skip: process.platform === 'win32' }, () => withLandJournal(async (f) => {
   const land = f.port();
   await land.prepare({ operationId: 'finished-one', request: f.request });
   land.close();
-  recoverGitOperations(f.repo, { loaderOptions: f.loader, portOptions: f.options });
+  assert.deepEqual(readGitStatus(f.repo, { loaderOptions: f.loader, portOptions: f.options }).pendingOperations.map(o => [o.operationId, o.kind]), [['finished-one', 'Land']]);
+  assert.deepEqual(recoverGitOperations(f.repo, { loaderOptions: f.loader, portOptions: f.options }).recovered, ['finished-one']);
   const { retention } = readGitStatus(f.repo, { loaderOptions: f.loader, portOptions: f.options }).journal;
   // The Land chain and the candidate worktree's own chain are both finished and retained.
   assert.equal(retention.retainedChains, 2);
   assert.equal(typeof retention.oldestRetainedAtMs, 'number');
 }));
+
+const git = (cwd, ...args) => execFileSync('git', args, { cwd, encoding: 'utf8' }).trim();
+
+// A Land that prepared and stopped: one pending operation, closed by recovery whoever runs it.
+async function interruptedLand(cwd, operationId) {
+  const target = gitHead(cwd);
+  const destination = `refs/heads/${git(cwd, 'symbolic-ref', '--short', 'HEAD')}`;
+  git(cwd, 'checkout', '-qb', `source-${operationId}`);
+  fs.writeFileSync(`${cwd}/seed.txt`, `incoming ${operationId}\n`);
+  git(cwd, 'commit', '-qam', 'source');
+  const source = gitHead(cwd);
+  git(cwd, 'checkout', '-q', destination.replace('refs/heads/', ''));
+  const land = createGitLand(gitPortOptions(cwd, { mutation: true }));
+  try { await land.prepare({ operationId, request: { source, target, destination, message: 'consumer land', squash: false, footprint: [], subtree: null, files: [] } }); } finally { land.close(); }
+}
+
+const data = (result) => { assert.equal(result.status, 0, result.stderr); return envelopeData(result.stdout); };
+
+test('fgos init recovers an interrupted Land and answers what it settled', { skip: process.platform === 'win32' }, async () => {
+  const cwd = initGitCwdFast();
+  await interruptedLand(cwd, 'init-land');
+  const answer = data(run(cwd, ['init', '--json']));
+  assert.deepEqual(answer.gitRecovery.recovered, ['init-land']);
+  assert.equal(data(run(cwd, ['git', 'status', '--json'])).journal.pendingCount, 0);
+});
+
+test('fgos init in a repository that never journalled a Git operation reports nothing about recovery', { skip: process.platform === 'win32' }, () => {
+  const answer = data(run(initGitCwdFast(), ['init', '--json']));
+  assert.equal(answer.gitRecovery, undefined);
+  assert.equal(answer.gitRecoveryWarning, undefined);
+});

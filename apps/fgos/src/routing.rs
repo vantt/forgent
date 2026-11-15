@@ -86,6 +86,7 @@ pub static NATIVE_SUBCOMMANDS: &[(&str, &[&str])] = &[
     ("convention", fgos_convention::AVAILABLE_SUBCOMMANDS),
     ("mailbox", wiring::mailbox_verbs::AVAILABLE_SUBCOMMANDS),
     ("config", fgos_config::provider::AVAILABLE_SUBCOMMANDS),
+    ("git", wiring::git_incidents::AVAILABLE_SUBCOMMANDS),
 ];
 
 /// Debt: the native verbs written before the shared parser, which keep their own reading of a call: the
@@ -672,6 +673,23 @@ mod tests {
             fault.message.contains("unknown flag \"--zzz\""),
             "{}",
             fault.message
+        );
+    }
+
+    #[test]
+    fn git_refuses_an_unknown_flag_in_the_node_cli_text() {
+        let text = |rest: &[&str]| {
+            check_call(route("git"), &call("git", rest))
+                .unwrap_err()
+                .message
+        };
+        assert_eq!(
+            text(&["status", "--bogus"]),
+            "unknown flag \"--bogus\" for \"fgos git status\". It takes no flags besides --dir, --json. See \"fgos git status --help\"."
+        );
+        assert_eq!(
+            text(&["recover", "--dir=/x"]),
+            "unknown flag \"--dir=/x\" for \"fgos git recover\" (write \"--dir <value>\", not \"--name=value\"). It takes no flags besides --dir, --json. See \"fgos git recover --help\"."
         );
     }
 

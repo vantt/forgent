@@ -191,6 +191,28 @@ pub const CATALOG: &[OperationDescriptor] = &[
         allowed_host_kinds: &["cli"],
         streaming_mode: StreamingMode::None,
     },
+    OperationDescriptor {
+        operation_id: OperationId::from_static("git.status"),
+        owning_component_id: Cow::Borrowed("git"),
+        request_contract: ContractRef::from_static("git.status.request", "1.0.0"),
+        outcome_contract: ContractRef::from_static("git.status.outcome", "1.0.0"),
+        effect: OperationEffect::Read,
+        idempotency: OperationIdempotency::Safe,
+        authority_policy_id: Cow::Borrowed("git.read"),
+        allowed_host_kinds: &["cli"],
+        streaming_mode: StreamingMode::None,
+    },
+    OperationDescriptor {
+        operation_id: OperationId::from_static("git.recover"),
+        owning_component_id: Cow::Borrowed("git"),
+        request_contract: ContractRef::from_static("git.recover.request", "1.0.0"),
+        outcome_contract: ContractRef::from_static("git.recover.outcome", "1.0.0"),
+        effect: OperationEffect::Write,
+        idempotency: OperationIdempotency::None,
+        authority_policy_id: Cow::Borrowed("git.write"),
+        allowed_host_kinds: &["cli"],
+        streaming_mode: StreamingMode::None,
+    },
 ];
 
 #[cfg(test)]
@@ -200,8 +222,8 @@ mod tests {
     #[test]
     fn catalog_contains_required_operations() {
         // Eleven operations, plus the mailbox's send, inbox, inbox claim, list
-        // and status.
-        assert_eq!(CATALOG.len(), 16);
+        // and status, and the git status and recover.
+        assert_eq!(CATALOG.len(), 18);
         let ids: Vec<&str> = CATALOG.iter().map(|op| op.operation_id.as_str()).collect();
         assert!(ids.contains(&"distribution.build.show"));
         assert!(ids.contains(&"work.gate-bypass.show"));
@@ -219,6 +241,8 @@ mod tests {
         assert!(ids.contains(&"mailbox.status"));
         assert!(ids.contains(&"config.read"));
         assert!(ids.contains(&"config.write"));
+        assert!(ids.contains(&"git.status"));
+        assert!(ids.contains(&"git.recover"));
     }
     /// `OperationId::from_static` (used by every `CATALOG` entry, for
     /// const-context construction with no runtime allocation) skips

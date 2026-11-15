@@ -127,6 +127,14 @@ pub fn project_cli_invocation(
             ),
             Box::new(project_config_request(args, root?)?),
         ),
+        crate::wiring::git_incidents::STATUS_OPERATION_ID => (
+            ContractRef::from_static("git.status.request", "1.0.0"),
+            Box::new(crate::wiring::git_incidents::project_git_request(args)),
+        ),
+        crate::wiring::git_incidents::RECOVER_OPERATION_ID => (
+            ContractRef::from_static("git.recover.request", "1.0.0"),
+            Box::new(crate::wiring::git_incidents::project_git_request(args)),
+        ),
         other => {
             return Err(format!(
                 "native CLI projector has no request mapping for '{}'",
@@ -145,7 +153,7 @@ pub fn project_cli_invocation(
 /// operation; `identity` fans out over three (`identity.writer` bare,
 /// `identity.read`, `identity.write`) and `mailbox` over five
 /// (`mailbox.send`, `mailbox.inbox`, `mailbox.inbox.claim` with `--claim`,
-/// `mailbox.list`, `mailbox.status`),
+/// `mailbox.list`, `mailbox.status`) and `git` over two (`git.status`, `git.recover`),
 /// and the arguments decide which.
 pub fn native_operation_id(
     route_operation: &str,
@@ -156,6 +164,11 @@ pub fn native_operation_id(
     }
     if route_operation == crate::wiring::mailbox_verbs::INBOX_OPERATION_ID {
         return Ok(crate::wiring::mailbox_verbs::project_mailbox_request(args)
+            .operation_id()
+            .to_string());
+    }
+    if route_operation == crate::wiring::git_incidents::STATUS_OPERATION_ID {
+        return Ok(crate::wiring::git_incidents::project_git_request(args)
             .operation_id()
             .to_string());
     }

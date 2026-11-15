@@ -386,6 +386,18 @@
       "reason": "a detached seal or publish child has no caller to read its error, so a failure leaves a record whatever the verb's own classification is; the host records it where the doors leave an invocation, from the failure text the verb answered"
     },
     {
+      "job": "compose Git status and recovery",
+      "kind": "door",
+      "patterns": ["export function (?:readGitStatus|recoverGitOperations)\\b", "fn (?:read_git_status|recover_git_operations)\\b"],
+      "allowed": [
+        "packages/git/rust/src/incidents.rs",
+        { "path": "packages/git/node-addon/src/git.rs", "reason": "carries the door to Node: its two snake_case entries (read_git_status, recover_git_operations) match the Rust pattern and call incidents.rs, composing nothing" },
+        { "path": "src/git/status.mjs", "reason": "the client `fgos init` and the doctor rows use: each export is one addon call, no logic" }
+      ],
+      "retiredBy": "S4: init and doctor move to the host, and the client with them",
+      "reason": "the open Git incidents of a repository (journal, pending and retained operations, worktree findings, native locks, a merge in progress) and the recovery pass are composed once, in fgos-git, for the host verb and for the Node callers; the row catches a second definition by name only, not a copy under another name"
+    },
+    {
       "job": "parse CLI arguments (twin)",
       "kind": "door",
       "patterns": ["export function parseArgs", "pub fn parse_args", "(?:starts_with|strip_prefix)\\(\\\"--\\\"\\)", "\\\"--dir\\\" \\| \\\"--worktree\\\""],
