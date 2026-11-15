@@ -263,6 +263,14 @@
       "reason": "signalling by identity goes through fgos-process; the launch gate, holder-lock and two Node modules signal only the group of a child they just spawned"
     },
     {
+      "job": "run a bounded child and find a program on the search path",
+      "kind": "door",
+      "patterns": ["pub fn run_bounded\\b", "pub fn resolve_program\\b", "\\bfn first_on_path\\b"],
+      "allowed": ["packages/process/rust/src/spawn.rs"],
+      "debt": [],
+      "reason": "the one place a Rust caller runs a child with a replacement environment, an input, a timeout and a distinct timed-out answer (std Command, which also runs Windows batch files), and the one PATH and PATHEXT lookup; the packaging modules pass their own runner in tests and this one by default"
+    },
+    {
       "job": "process facts: read /proc",
       "kind": "door",
       "patterns": ["/proc/(?:self|sys|net|\\{|\\$|\\d|loadavg|meminfo)", "[\"']/proc[\"']", "[\"'`]/proc/"],

@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "54ef8ff238ad703b98f4d159490da8e22021c280811b11eb6bbe40e1ff7cff48",
+  "payloadDigest": "11d079efe7368290117ad344a46053151adfce97921bbfbd6c816cf0bac6e6e0",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "a5629383f89b4488b252a62f0ea86463e649e33e0a891db1a19af2cd6c136aca",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -656,7 +656,7 @@
     "packages/process/rust/src/containment/windows.rs": "8eee30e9e8c730cb5ae2eab973fa56162929d294c68987aa6ebf79b6b5035ae0",
     "packages/process/rust/src/control.rs": "5e24c3db11e30aa6ee44721c6d82df09d8f99bc459b3872bac4627cfa196c276",
     "packages/process/rust/src/facts.rs": "e340f6764b55bce7da3865adfac42d6f8bc1a762e81ac256c37a156143ef22c5",
-    "packages/process/rust/src/lib.rs": "11f9bd7cc0ee5a0cb895677017b81a779306b75e80b6a0627da58a5a13407fd3",
+    "packages/process/rust/src/lib.rs": "04300ba7c8c97873f67e9815d914f71db93ab5b9ac5c4afb7235d45dcb1a078b",
     "packages/process/rust/src/mapped.rs": "c4b337e6f32bb1b209d7d9953d844f806c97510abdf9a4ab6a4e77c5ffefd1fc",
     "packages/process/rust/src/platform/linux.rs": "85e36414323a2e7cdd274503b715ba31f320e8d2d61dea689b06c7ad891a3a2b",
     "packages/process/rust/src/platform/macos.rs": "dcc9cc3a1e41d80b4ab19088420d2a7a77a76279c4382f6536d61ae60f5c520b",
@@ -664,6 +664,7 @@
     "packages/process/rust/src/platform/windows.rs": "cf66a8c0aa69457c1b7a99c841cec556e4b31fa23890fb370d30c43310d38a45",
     "packages/process/rust/src/platform/windows_job.rs": "0909fae6ac6feb8707e86e06e1d15a62f2182eff42c017c88c51f945b4215561",
     "packages/process/rust/src/platform/windows_spawn.rs": "ea3e815d159d793eb2006a6153ef9790b27c3b44aa798c0801208290834253fd",
+    "packages/process/rust/src/spawn.rs": "ea9fbac58257f1c72882c46209217a8200ddd1b4066bb0725cdece278810df33",
     "packages/process/rust/tests/common/mod.rs": "4c5caaca18815ba835a6ff9ae6b22e08af6e997ebbd152249fa9121a960e5863",
     "packages/process/rust/tests/containment_bwrap.rs": "da5288a138c19e228dc33255bb77abc9756958acfb0792d9ee8386242d8d7c31",
     "packages/process/rust/tests/containment_conformance.rs": "e98c00dbcc32edd5f67831608775f750ffefcdc49229f57426c204c2dd418153",
@@ -3127,6 +3128,13 @@
       "spawn": "Command::new",
       "binary": "cmd",
       "class": "rust-test"
+    },
+    {
+      "path": "packages/process/rust/src/spawn.rs",
+      "line": 31,
+      "spawn": "Command::new <- packages/process/rust/src/spawn.rs:43",
+      "binary": "(uncalled run_bounded)",
+      "class": "uncalled-wrapper"
     },
     {
       "path": "packages/process/rust/tests/containment_bwrap.rs",

@@ -15,6 +15,7 @@ pub mod facts;
 #[cfg(unix)]
 pub mod mapped;
 pub mod platform;
+pub mod spawn;
 
 pub use platform::ProcessPlatform;
 
