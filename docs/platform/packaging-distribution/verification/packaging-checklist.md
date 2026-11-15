@@ -119,7 +119,7 @@ Status words: `done` met and proven; `partial` met in part, the residual is name
 | CFG-01 | MUST | gap | Config stays in `~/.fgos` (owner idea: move to `$XDG_CONFIG_HOME` with an alias window). |
 | CFG-02 | MUST | partial | `FGOS_STATE_ROOT` and `FGOS_STATE_HOME` both name the root (owner idea: merge). |
 | CFG-03 | MUST | gap | No `paths --json` (owner idea). |
-| CFG-04, 05, 07, 08, 12, 13 | MUST | done | Precedence documented; `config standard` from the binary; gateway token 0600; malformed config refused; wrong-file check; generated token. A JSON-era config is moved by `fgos init` (`settle-legacy-config.mjs`) with the token kept. |
+| CFG-04, 05, 07, 08, 12, 13 | MUST | done | Precedence documented; `config standard` from the binary; gateway token 0600; malformed config refused; wrong-file check; generated token. A JSON-era config is moved by `fgos init` (`apps/fgos/src/wiring/init.rs`) with the token kept. |
 | CFG-06 | MUST | partial | The agy permission writer is no longer reached by `init` or `doctor --fix`; `fgos wire-agents` copies the file first. Atomic write not re-measured. |
 | DOC-01 | MUST | done | `status` per row, `fix` on a failing row (JSON key `fixCommand` on the row itself). |
 | DOC-02 | MUST | gap | Doctor exits 0 whatever the checks say; `--strict` exits 1; `ok` and `next[]` carry the verdict (owner choice Q-B, default kept). |

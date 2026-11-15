@@ -138,7 +138,7 @@ có bằng chứng sống, không phải bị che giấu — flip khi phía kia 
 
 - `docs/decisions/0009-chong-giao-thoa-luc-cai.md` (deleted in 4722361ae) — quyết định nguồn của 4
   nguyên tắc trên.
-- `src/install/coexist.mjs` — cài đặt detection + manifest.
+- `packages/distribution/rust/src/coexistence.rs` — cài đặt detection + manifest (`fgos init` ghi nó, `apps/fgos/src/wiring/init.rs`).
 - `bin/fgos.mjs` verb `init` — điểm gọi detection.
 - `test/e2e/coexistence-canary.test.mjs` — canary pin known-gap + footprint +
   nhường-nhịn.

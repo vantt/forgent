@@ -43,7 +43,7 @@ This document points to evidence. It is not the design authority.
 | `fgctl` and `fgos` command surface (`--version`, `--help`, exit codes, did-you-mean) | `apps/fgctl/tests/cli_surface.rs`, `apps/fgos/tests/cli_tests.rs`, `apps/fgos/src/help.rs` (unit tests), `test/rust-host/help-routes.test.mjs`, `test/cli/first-run-guide.test.mjs` |
 | `fgctl uninstall` and `fgos uninstall` | `packages/distribution/rust/src/uninstall.rs` unit tests, `apps/fgos/src/wiring/uninstall.rs` unit tests, `apps/fgctl/tests/uninstall_surface.rs`, `test/rust-host/fgctl-uninstall.test.mjs` |
 | Activation versus pin drift | `packages/distribution/rust/tests/pin_drift.rs`, `test/setup/pin-drift-check.test.mjs` (one golden) |
-| Upgrade from a JSON-era release | `test/verbs/settle-legacy-config.test.mjs`, the upgrade step of `scripts/ci-external-consumer.sh` |
+| Upgrade from a JSON-era release | `apps/fgos/tests/cli_tests.rs` (`init_moves_an_older_releases_json_config_*`), the upgrade step of `scripts/ci-external-consumer.sh` |
 | Release gate and version agreement | `test/scripts/prepare-release.test.mjs`, `test/scripts/previous-release-tag.test.mjs`, `.github/workflows/release.yml` (`suite`) |
 | Legacy Node packaging (retired as an install channel; the entry points stay for the dev checkout and the staged legacy-node payload) | `package.json`, `bin/fgos.mjs`, `bin/fgos-runner.mjs`, `test/install-packaging.test.mjs` |
 | Shell helper resolution | `scripts/fgos-shell-integration.sh`, `test/scripts/fgos-shell-integration.test.mjs` |
