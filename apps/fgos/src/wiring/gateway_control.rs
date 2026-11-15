@@ -15,6 +15,7 @@
 //! Off Unix `start` is refused: the detached spawn exists only there. `stop` and `status` run everywhere.
 
 use crate::invocation_doors::{EventStoreLifecycle, Lifecycle};
+#[cfg(unix)]
 use crate::legacy_exec::RECURSION_GUARD_VAR;
 use fgos_config::detect::NoDetectors;
 use fgos_config::machine;
@@ -108,6 +109,7 @@ const LISTENING_MARKER: &str = "listening on";
 /// The variables the gateway must not inherit: it is a long-lived process that itself calls `fgos` verbs
 /// through the host, and a host started under a legacy payload carries the recursion guard, which would
 /// refuse every one of those calls.
+#[cfg(unix)]
 const GATEWAY_ENV_REMOVE: [&str; 1] = [RECURSION_GUARD_VAR];
 const START_UNSUPPORTED: &str = "gateway start is not available on this platform: the gateway starts as a detached background process, which only Linux and macOS support (gateway stop and gateway status work here)";
 
@@ -429,11 +431,11 @@ pub fn build_release(gateway_dir: &Path) -> Result<(), GatewayControlError> {
 /// the effective machine view). A machine config the door refuses names the documented default, never a guess.
 pub fn configured_port() -> Result<u64, GatewayControlError> {
     let lookup = |key: &str| std::env::var(key).ok();
-    let home = machine::home_dir(lookup)
+    let global = machine::global_dir(lookup)
         .ok_or_else(|| GatewayControlError::new(machine::home_unset_message()))?;
     let context = machine::context(&NoDetectors)
         .map_err(|error| GatewayControlError::new(error.to_string()))?;
-    match machine::snapshot(&context, &home.join(".fgos"), session_class(lookup)) {
+    match machine::snapshot(&context, &global, session_class(lookup)) {
         Ok(snapshot) => Ok(snapshot.value["gateway"]["port"]
             .as_u64()
             .filter(|port| *port > 0)

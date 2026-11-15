@@ -197,8 +197,8 @@ const MULTI = COMMAND_REGISTRY.filter((entry) => entry.subcommands && entry.nati
 const NATIVE = COMMAND_REGISTRY.filter((entry) => entry.subcommands && entry.native === true);
 
 test('the drift scan covers the verbs that branch on a positional sub-verb', () => {
-  assert.deepEqual(MULTI.map((e) => e.name).sort(), ['agents', 'dispatch', 'events', 'gateway', 'git', 'goal', 'lock', 'merge', 'session', 'workflow', 'worktree']);
-  assert.deepEqual(NATIVE.map((e) => e.name).sort(), ['config', 'convention', 'friction', 'identity', 'mailbox', 'metrics']);
+  assert.deepEqual(MULTI.map((e) => e.name).sort(), ['agents', 'dispatch', 'events', 'git', 'goal', 'lock', 'merge', 'session', 'workflow', 'worktree']);
+  assert.deepEqual(NATIVE.map((e) => e.name).sort(), ['config', 'convention', 'friction', 'gateway', 'identity', 'mailbox', 'metrics']);
 });
 
 for (const entry of MULTI) {
@@ -292,6 +292,15 @@ const NATIVE_SOURCES = {
       const src = RUST('apps/fgos/src/wiring/mailbox_verbs.rs');
       const start = src.indexOf('pub fn project_mailbox_request');
       return src.slice(start, src.indexOf('pub struct MailboxAnswer', start));
+    },
+  },
+  // gateway -> one projector (project_gateway_request) over the three sub-verbs, none of which takes a flag of its own.
+  gateway: {
+    subs: RUST('apps/fgos/src/wiring/gateway_control.rs'),
+    shared: () => {
+      const src = RUST('apps/fgos/src/wiring/gateway_control.rs');
+      const start = src.indexOf('pub fn project_gateway_request');
+      return src.slice(start, src.indexOf('fn serve(', start));
     },
   },
   config: {

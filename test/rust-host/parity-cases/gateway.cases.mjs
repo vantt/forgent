@@ -249,6 +249,8 @@ export const cases = [
   c("status-live-reachable", "live-serving", ["status"], { expectedExitCode: 0, jsonIgnorePaths: ["data.pid", "data.port", "data_hash"] }),
   refusal("status-corrupt-registry", "corrupt", ["status"], 4, { substitute: [["\\(not valid JSON\\): .*", "(not valid JSON): <reason>"]] }),
   refusal("status-unknown-flag", "project", ["status", "--bogus"], 4),
+  // Of several unknown flags the first one the Node parser lists is the one named.
+  refusal("status-several-unknown-flags", "project", ["status", "--zzz", "--aaa", "--json"], 4),
   // The Rust fault writer reduces a `--k=v` value inside the recorded message to its length, the Node writer keeps it.
   refusal("status-equals-flag", "project", ["status", "--dir={REPO}"], 4, { ignoreEvidence: ["faults"] }),
   refusal("status-bare-dir", "project", ["status", "--dir"], 4),
