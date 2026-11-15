@@ -78,7 +78,7 @@ None (internal modules; nothing user-visible changes until 07-09 flip).
 
 ## Concerns and handoffs
 
-1. **`Cargo.lock` line for the step lead:** under `fgos-distribution` add `"fgos-config",` before `"fgos-durable-file",`
+1. **`Cargo.lock` (authorized by the step lead, own commit `build: fgos-distribution depends on fgos-config`):** if p02 already carries the same lock line when this rebases onto s4, drop that commit. Original note: under `fgos-distribution` add `"fgos-config",` before `"fgos-durable-file",`
    (D15 edge, added to `packages/distribution/rust/Cargo.toml`). I left `Cargo.lock` unstaged, so `--locked` builds of this branch fail until it lands.
    The `fgos-process` edge and lock line come from the cherry-picked p02 commits (`abc80cef5`, `cf78c3189`), which drop out when p02 lands.
 2. **F11 not done, by agreement with the step lead:** `scripts/lib/mailbox-live-confined.mjs` still imports the Node table
@@ -96,3 +96,12 @@ None (internal modules; nothing user-visible changes until 07-09 flip).
 7. `test/live/*.live.mjs` import `agent-hooks.mjs` (unchanged); 07 owns them with the module's deletion.
 
 Status: DONE_WITH_CONCERNS
+
+## Named items
+
+- **For phase 07 (could not move):** the extension runtime cases of `test/setup/agent-hooks.test.mjs` (handlers load in Node,
+  inert for a runner worker, frame appended after real output, shim owner/mode refusal, hook timeout, shim search from a
+  subdirectory, `loadedHandlers`/`recordingShim` users). They run the generated JavaScript and call the Node generator; 07 must
+  feed them the extension text from `agent-hooks.v1.json` (the `omp-*`/`pi-*` cases) before deleting `agent-hooks.mjs`.
+- **For the series gate:** `test/rust-host/release-tree.test.mjs` (not run here; the payload `files` list gained
+  `packages/distribution/contracts/delete-guard-prefilter.v1.json`), plus `npm test` and `cargo test --workspace`.
