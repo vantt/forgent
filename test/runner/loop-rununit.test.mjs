@@ -270,7 +270,7 @@ test('an item whose capability has no executor pool parks as no-executor with wh
   assert.equal(byId['item-no-pool'].outcome, 'parked');
   assert.equal(byId['item-no-pool'].errorClass, 'no-executor');
   assert.equal(byId['item-no-pool'].attempts, 1, 'retrying cannot fix a config gap');
-  assert.match(fs.readFileSync(path.join(fx.dir, 'logs', 'item-no-pool.log'), 'utf8'), /runner\.capabilities\["synthetic:assembling"\]\.prefer/);
+  assert.match(fs.readFileSync(path.join(fx.dir, 'logs', 'item-no-pool.log'), 'utf8'), /capability "synthetic:assembling".*"prefer" list of capability "synthetic:assembling"/);
   assert.equal(byId['item-served'].outcome, 'awaiting-approval');
 });
 
