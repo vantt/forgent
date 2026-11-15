@@ -1,7 +1,7 @@
 ---
 phase: 11
 title: "S2 close: docs, proof consolidation, parity re-run, gates"
-status: pending
+status: completed
 effort: 1d
 wave: D
 step: S2

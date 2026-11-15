@@ -1,7 +1,7 @@
 ---
 phase: 4
 title: "`lock-status` native, and the first store-touching wiring proof"
-status: pending
+status: completed
 effort: 3d
 wave: C
 step: S2

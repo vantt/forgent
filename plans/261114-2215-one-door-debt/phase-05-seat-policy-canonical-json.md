@@ -1,7 +1,7 @@
 ---
 phase: 5
 title: "Seat config digest uses the canonical JSON door"
-status: pending
+status: completed
 effort: 0.5d
 leak: "census rank 5"
 startAfter: ["F0 wave A on main", "capability plan on main (it rewrites src/runner/execution/seat-policy.mjs)"]

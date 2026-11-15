@@ -1,7 +1,7 @@
 ---
 phase: 13
 title: "One --flag=value rule for every native verb (applies the owner's answer to S23-Q2)"
-status: pending
+status: completed
 effort: "1.5d if S23-Q2 = a; 2d if b; 0.25d if c"
 wave: E
 step: S3

@@ -1,7 +1,7 @@
 ---
 phase: 0
 title: "Facts, prior art, parity cases and baselines (S2 and S3)"
-status: pending
+status: completed
 effort: 1d
 wave: A
 blockedBy: []

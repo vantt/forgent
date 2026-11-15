@@ -1,7 +1,7 @@
 ---
 phase: 6
 title: "Launcher identity environment decided once, in fgos-identity"
-status: pending
+status: completed
 effort: 0.75d
 leak: "census rank 6"
 startAfter: ["F0 wave A on main"]

@@ -1,7 +1,7 @@
 ---
 phase: 4
 title: "Uninstall's purge guard uses the state root's own home rule"
-status: pending
+status: completed
 effort: 0.5d
 leak: "census rank 4, the uninstall.rs part (F0 phase 08 records it as debt for step S4)"
 startAfter: ["F0 wave A on main"]

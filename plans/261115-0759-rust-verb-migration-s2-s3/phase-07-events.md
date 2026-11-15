@@ -1,7 +1,7 @@
 ---
 phase: 7
 title: "`events sync|status|seal|export` native"
-status: pending
+status: completed
 effort: 2.5d
 wave: B
 step: S3

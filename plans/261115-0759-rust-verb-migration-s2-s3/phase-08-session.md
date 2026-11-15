@@ -1,7 +1,7 @@
 ---
 phase: 8
 title: "`session start|end|list|gc` native"
-status: pending
+status: completed
 effort: 3d
 wave: B
 step: S3

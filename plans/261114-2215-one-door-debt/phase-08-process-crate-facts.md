@@ -1,7 +1,7 @@
 ---
 phase: 8
 title: "fgos-process answers every process fact other crates read themselves"
-status: pending
+status: completed
 effort: 1d
 leak: "census rank 8 (the crate side)"
 startAfter: ["F0 wave A on main"]

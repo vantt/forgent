@@ -1,7 +1,7 @@
 ---
 phase: 3
 title: "Activation record written through Durable File; one row for Rust durable syncs"
-status: pending
+status: completed
 effort: 1d
 leak: "census rank 3, plus the Rust half of rank 9 (classification only)"
 startAfter: ["F0 wave A on main"]

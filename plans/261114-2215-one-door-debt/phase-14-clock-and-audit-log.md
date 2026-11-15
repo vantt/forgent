@@ -1,7 +1,7 @@
 ---
 phase: 14
 title: "The event store parses timestamps with the identity helper; build.rs and the reconciliation log are named"
-status: pending
+status: completed
 effort: 0.5d
 leak: "census rank 10 (clock copies, reconciliation append log)"
 startAfter: ["F0 wave A on main"]

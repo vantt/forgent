@@ -1,7 +1,7 @@
 ---
 phase: 15
 title: "Every ranked Node write-then-rename names its temp with uniqueTmpTag"
-status: pending
+status: completed
 effort: 0.75d
 leak: "census rank 9 (Node half), plus the generator writeAtomic the big lead added (his other two finds are adapters, kept)"
 startAfter: ["F0 wave A on main", "phase 01 on main (src/setup/skill-wrappers.mjs)", "phase 12 on main (src/setup/managed-timer.mjs)"]

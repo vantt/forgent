@@ -1,7 +1,7 @@
 ---
 title: "One-door debt: fix the ten ranked leaks of the door census"
 description: "Move every second path the door census ranked onto its door, delete the old path in the same change, and leave each fix guarded by a doors-table row with no debt."
-status: pending
+status: completed
 priority: P1
 effort: 11d (16 phases; longest internal chain about 2.5 lead-days)
 branch: plan/one-door-debt

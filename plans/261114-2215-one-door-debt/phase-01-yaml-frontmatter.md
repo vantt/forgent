@@ -1,7 +1,7 @@
 ---
 phase: 1
 title: "YAML frontmatter through the YAML door; the hand-written parser and writer deleted"
-status: pending
+status: completed
 effort: 1.5d
 leak: "census rank 1"
 startAfter: ["F0 wave A on main"]

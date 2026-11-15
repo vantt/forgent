@@ -1,7 +1,7 @@
 ---
 phase: 12
 title: "The project shim path and the activation record are known once in Node"
-status: pending
+status: completed
 effort: 0.75d
 leak: "census rank 10 (shim path by hand; activation record location)"
 startAfter: ["F0 wave A on main"]

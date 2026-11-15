@@ -1,7 +1,7 @@
 ---
 phase: 12
 title: "S3 close: docs, proof consolidation, parity re-run, gates"
-status: pending
+status: completed
 effort: 1d
 wave: D
 step: S3

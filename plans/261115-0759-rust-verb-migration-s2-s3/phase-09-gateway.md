@@ -1,7 +1,7 @@
 ---
 phase: 9
 title: "`gateway start|stop|status` native"
-status: pending
+status: completed
 effort: 2d
 wave: B
 step: S3

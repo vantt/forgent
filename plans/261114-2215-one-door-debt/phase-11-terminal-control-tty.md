@@ -1,7 +1,7 @@
 ---
 phase: 11
 title: "Terminal control asks fgos-process for a pane's tty"
-status: pending
+status: completed
 effort: 0.25d
 leak: "census rank 8 (terminal-control)"
 startAfter: ["phase 08 on main"]

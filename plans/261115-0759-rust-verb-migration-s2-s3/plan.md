@@ -1,7 +1,7 @@
 ---
 title: "Rust verb migration S2 (lock, lock-status, git) and S3 (events, session, gateway)"
 description: "Move eight legacy-Node verbs onto the Rust host in two parallel steps, one Rust owner per job, Node arms and their tests retired in the same change."
-status: pending
+status: completed
 priority: P1
 effort: 23d
 branch: cook/s2s3-plan

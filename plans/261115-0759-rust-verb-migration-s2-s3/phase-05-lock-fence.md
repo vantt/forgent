@@ -1,7 +1,7 @@
 ---
 phase: 5
 title: "`lock fence` native"
-status: pending
+status: completed
 effort: "1.5d (S23-Q3 = b); 2d (a); 0.25d (c, hand-off note only)"
 wave: C
 step: S2

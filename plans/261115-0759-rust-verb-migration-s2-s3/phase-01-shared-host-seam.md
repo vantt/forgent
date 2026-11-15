@@ -1,7 +1,7 @@
 ---
 phase: 1
 title: "Shared host seam: parity entry, parser-only reading, categorised refusal, child faults, no state root from a root read"
-status: pending
+status: completed
 effort: 2.5d
 wave: A
 blockedBy: []

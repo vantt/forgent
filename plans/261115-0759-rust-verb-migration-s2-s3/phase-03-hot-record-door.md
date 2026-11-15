@@ -1,7 +1,7 @@
 ---
 phase: 3
 title: "Hot record door in holder-lock (read, compare-and-clear)"
-status: pending
+status: completed
 effort: 2d
 wave: B
 step: S2

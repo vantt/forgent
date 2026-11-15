@@ -1,7 +1,7 @@
 ---
 phase: 13
 title: "The config facade owns the raw project-config read used by conversion"
-status: pending
+status: completed
 effort: 0.5d
 leak: "census rank 10 (runner-config-conversion config reads)"
 startAfter: ["F0 wave A on main", "F0 phase 06 on main (it edits src/config/facade.mjs and runner-config-conversion.mjs)"]

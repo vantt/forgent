@@ -1,7 +1,7 @@
 ---
 phase: 7
 title: "Test tooling stops killing by bare pid"
-status: pending
+status: completed
 effort: 1d
 leak: "census rank 7"
 startAfter: ["F0 wave A on main"]

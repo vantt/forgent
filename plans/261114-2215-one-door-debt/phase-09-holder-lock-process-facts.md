@@ -1,7 +1,7 @@
 ---
 phase: 9
 title: "Holder-lock reads process facts only through fgos-process"
-status: pending
+status: completed
 effort: 1d
 leak: "census rank 8 (holder-lock files)"
 startAfter: ["phase 08 on main"]

@@ -1,7 +1,7 @@
 ---
 phase: 10
 title: "Git crate and addon read process facts only through fgos-process"
-status: pending
+status: completed
 effort: 0.5d
 leak: "census rank 8 (git files)"
 startAfter: ["phase 08 on main"]

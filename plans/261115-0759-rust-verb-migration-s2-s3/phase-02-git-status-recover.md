@@ -1,7 +1,7 @@
 ---
 phase: 2
 title: "`git status|recover` native"
-status: pending
+status: completed
 effort: 1.5d
 wave: B
 step: S2

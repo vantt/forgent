@@ -1,7 +1,7 @@
 ---
 phase: 2
 title: "Agent definitions are found only through the agent-definitions door"
-status: pending
+status: completed
 effort: 1d
 leak: "census rank 2 (three of four choosers; the doctor chooser is phase 16)"
 startAfter: ["F0 wave A on main"]

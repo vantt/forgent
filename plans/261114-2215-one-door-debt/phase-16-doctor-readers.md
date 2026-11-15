@@ -1,7 +1,7 @@
 ---
 phase: 16
 title: "Doctor and setup readers use the persona, global-directory and activation doors"
-status: pending
+status: completed
 effort: 0.75d
 leak: "census ranks 2, 4 and 10 (the parts in src/setup/registrations.mjs and src/setup/bin-discovery.mjs)"
 startAfter: ["capability plan on main (rewrites registrations.mjs)", "F0 phase 06 on main (globalFgosDir; rewrites bin-discovery.mjs)", "phase 02 on main", "phase 12 on main"]
