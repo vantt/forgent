@@ -2925,3 +2925,82 @@ fn events_status_runs_in_the_host_and_starts_no_node() {
     );
     let _ = fs::remove_dir_all(&spy_dir);
 }
+
+// The session verbs are served by the host itself: start, list, end and gc of a real checkout run with a
+// `node` spy on PATH and start no Node process.
+#[cfg(unix)]
+#[test]
+fn test_session_verbs_start_no_node() {
+    use std::os::unix::fs::PermissionsExt;
+    let (spy_dir, spy_log, path) = node_spy_dir("fgos_test_session_spy");
+    let sandbox = std::env::temp_dir().join(format!("fgos_test_session_{}", std::process::id()));
+    let _ = fs::remove_dir_all(&sandbox);
+    let state = sandbox.join("state");
+    let temp = sandbox.join("tmp");
+    let repo = sandbox.join("repo");
+    for dir in [&state, &temp, &repo] {
+        fs::create_dir_all(dir).unwrap();
+    }
+    fs::set_permissions(&state, fs::Permissions::from_mode(0o700)).unwrap();
+    let git = |args: &[&str]| {
+        let status = Command::new("git")
+            .arg("-C")
+            .arg(&repo)
+            .args(args)
+            .status()
+            .unwrap();
+        assert!(status.success(), "git {args:?}");
+    };
+    git(&["init", "-q", "--initial-branch=main"]);
+    git(&["config", "user.name", "Fixture"]);
+    git(&["config", "user.email", "fixture@example.invalid"]);
+    fs::write(repo.join("seed.txt"), "seed\n").unwrap();
+    git(&["add", "-A"]);
+    git(&["commit", "-qm", "seed"]);
+    let fence = repo.join(".fgos/locks/activation.lock");
+    fs::create_dir_all(&fence).unwrap();
+    fs::write(
+        fence.join("TOMBSTONE"),
+        r#"{"lock":"activation","by":"fgos git","at":"fixture"}"#,
+    )
+    .unwrap();
+
+    let run = |args: &[&str]| {
+        let output = Command::new(fgos_bin())
+            .args(args)
+            .current_dir(&repo)
+            .env("PATH", &path)
+            .env("FGOS_STATE_ROOT", &state)
+            .env("TMPDIR", &temp)
+            .env_remove("FGOS_ACTIVE_RELEASE_PATH")
+            .env_remove("FGOS_ACTIVE_MANIFEST_PATH")
+            .output()
+            .expect("failed to execute fgos");
+        assert_eq!(
+            output.status.code(),
+            Some(0),
+            "{args:?}: {}",
+            String::from_utf8_lossy(&output.stderr)
+        );
+        serde_json::from_slice::<serde_json::Value>(&output.stdout).unwrap()["data"].clone()
+    };
+    let started = run(&["session", "start", "--json"]);
+    let id = started["sessionId"].as_str().unwrap().to_owned();
+    assert_eq!(run(&["session", "list"]).as_array().unwrap().len(), 1);
+    assert_eq!(run(&["session", "end", &id])["forced"], false);
+    assert_eq!(run(&["session", "list"]), serde_json::json!([]));
+    // The one-shot start process is gone by the time a gc runs, so a clean session it left is reclaimed.
+    let left = run(&["session", "start"])["sessionId"].clone();
+    assert_eq!(
+        run(&["session", "gc"])["reclaimed"],
+        serde_json::json!([left])
+    );
+
+    let starts = fs::read_to_string(&spy_log).unwrap_or_default();
+    assert!(
+        starts.is_empty(),
+        "the session verbs started node: {starts}"
+    );
+    let _ = fs::remove_dir_all(&sandbox);
+    let _ = fs::remove_dir_all(&spy_dir);
+}

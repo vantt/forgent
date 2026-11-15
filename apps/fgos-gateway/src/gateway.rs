@@ -2757,4 +2757,124 @@ mod tests {
         assert_eq!(data["data"]["planMd"], "# plan\n");
         std::fs::remove_dir_all(&root).ok();
     }
+    /// The executable of the `fgos` host binary, built by this workspace: the host the session routes drive is the
+    /// real one, never a stand-in. Cargo reports the artifact path, so no target directory is guessed.
+    #[cfg(unix)]
+    fn built_host() -> PathBuf {
+        use std::sync::OnceLock;
+        static HOST: OnceLock<PathBuf> = OnceLock::new();
+        HOST.get_or_init(|| {
+            let manifest = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../Cargo.toml");
+            let output = std::process::Command::new(env!("CARGO"))
+                .args(["build", "-p", "fgos", "--bin", "fgos", "--message-format=json", "--manifest-path"])
+                .arg(&manifest)
+                .stderr(Stdio::inherit())
+                .output()
+                .expect("cargo builds the host");
+            assert!(output.status.success(), "building the fgos host failed");
+            String::from_utf8_lossy(&output.stdout)
+                .lines()
+                .filter_map(|line| serde_json::from_str::<Value>(line).ok())
+                .filter(|message| message["reason"] == "compiler-artifact" && message["target"]["name"] == "fgos")
+                .filter_map(|message| message["executable"].as_str().map(PathBuf::from))
+                .last()
+                .expect("cargo names the host executable")
+        })
+        .clone()
+    }
+
+    /// `POST /v1/sessions` and `DELETE /v1/sessions/{id}` run the real host, in the workspace root, and the
+    /// answer's `data` is the session summary the client parses (`sessionId`, `worktreePath`, `itemId`,
+    /// `startCommit`, `pid`, `startedAt`; `forced` on an end).
+    #[cfg(unix)]
+    #[tokio::test]
+    async fn the_session_routes_drive_the_real_host_and_return_its_summary_unchanged() {
+        use axum::body::Body;
+        use axum::http::Request;
+        use std::os::unix::fs::PermissionsExt;
+        use tower::ServiceExt;
+
+        let host = built_host();
+        let root = std::env::temp_dir().join(format!("fgos-gateway-sessions-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&root);
+        let git = |args: &[&str]| {
+            let status = std::process::Command::new("git").arg("-C").arg(&root.join("project")).args(args).status().unwrap();
+            assert!(status.success(), "git {args:?}");
+        };
+        let project = root.join("project");
+        std::fs::create_dir_all(&project).unwrap();
+        git(&["init", "-q", "--initial-branch=main"]);
+        git(&["config", "user.name", "Fixture"]);
+        git(&["config", "user.email", "fixture@example.invalid"]);
+        std::fs::write(project.join("seed.txt"), "seed\n").unwrap();
+        git(&["add", "-A"]);
+        git(&["commit", "-qm", "seed"]);
+        let fence = project.join(".fgos/locks/activation.lock");
+        std::fs::create_dir_all(&fence).unwrap();
+        std::fs::write(fence.join("TOMBSTONE"), r#"{"lock":"activation","by":"fgos git","at":"fixture"}"#).unwrap();
+
+        // The workspace shim the gateway resolves, pointing the host at a state root and temp directory of this test.
+        let state = root.join("state");
+        let temp = root.join("tmp");
+        for dir in [&state, &temp] {
+            std::fs::create_dir_all(dir).unwrap();
+        }
+        std::fs::set_permissions(&state, std::fs::Permissions::from_mode(0o700)).unwrap();
+        let shim = project.join(".fgos/installation/bin/fgos");
+        std::fs::create_dir_all(shim.parent().unwrap()).unwrap();
+        std::fs::write(
+            &shim,
+            format!(
+                "#!/bin/sh\nexport FGOS_STATE_ROOT='{}'\nexport TMPDIR='{}'\nexec '{}' \"$@\"\n",
+                state.display(),
+                temp.display(),
+                host.display()
+            ),
+        )
+        .unwrap();
+        std::fs::set_permissions(&shim, std::fs::Permissions::from_mode(0o755)).unwrap();
+
+        let gateway: Arc<dyn VerbGateway> = Arc::new(FgosCliGateway { root: project.clone() });
+        let app = build_router(gateway, test_config(), project.clone());
+        let call = |method: &'static str, uri: String| {
+            let app = app.clone();
+            async move {
+                let response = app
+                    .oneshot(
+                        Request::builder()
+                            .method(method)
+                            .uri(uri)
+                            .header(axum::http::header::AUTHORIZATION, "Bearer test-token")
+                            .body(Body::empty())
+                            .unwrap(),
+                    )
+                    .await
+                    .unwrap();
+                let status = response.status();
+                let body = axum::body::to_bytes(response.into_body(), usize::MAX).await.unwrap();
+                (status, serde_json::from_slice::<Value>(&body).unwrap_or(Value::Null))
+            }
+        };
+
+        let (status, started) = call("POST", "/v1/sessions".into()).await;
+        assert_eq!(status, StatusCode::OK, "body: {started}");
+        assert_eq!(started["contract"], "fgos.v1");
+        let data = started["data"].as_object().expect("the summary is the envelope's data");
+        let keys: Vec<&str> = data.keys().map(String::as_str).collect();
+        assert_eq!(keys, ["sessionId", "worktreePath", "itemId", "startCommit", "pid", "startedAt"]);
+        assert_eq!(data["itemId"], Value::Null);
+        let id = data["sessionId"].as_str().unwrap().to_owned();
+        assert!(Path::new(data["worktreePath"].as_str().unwrap()).join("seed.txt").exists());
+
+        let (status, ended) = call("DELETE", format!("/v1/sessions/{id}")).await;
+        assert_eq!(status, StatusCode::OK, "body: {ended}");
+        assert_eq!(ended["data"]["sessionId"], id.as_str());
+        assert_eq!(ended["data"]["forced"], false);
+        assert!(!Path::new(data["worktreePath"].as_str().unwrap()).exists());
+
+        let (status, refused) = call("DELETE", format!("/v1/sessions/{id}")).await;
+        assert_eq!(status, StatusCode::BAD_REQUEST, "body: {refused}");
+        assert!(refused["message"].as_str().unwrap().contains("unknown or already-ended session"));
+        std::fs::remove_dir_all(&root).ok();
+    }
 }
