@@ -40,6 +40,7 @@ const RESULTS = path.join(BASE, 'results.jsonl');
 /** The real CLI starts this check may spend, both heads of every run included. */
 const CEILING = 200;
 const MIN_FREE_GB = 8;
+const MEMORY_WAIT_MS = 30 * 60_000;
 const CODEX_TEST_ACCOUNT = 'tetnu';
 const CODEX_EFFORT = 'low';
 
@@ -121,8 +122,18 @@ async function cmdRun(cli, count, { from, until }) {
     }
     const ceiling = runs.ceilingProblem(BASE, CEILING);
     if (ceiling) die(`ceiling: ${ceiling}`);
-    const problem = live.resourceProblem({ minFreeGb: MIN_FREE_GB });
-    if (problem) die(`memory: ${problem}`);
+    // A heavy gate of another lane holds the machine: wait for it (bounded), as the behaviour suite does.
+    for (const waited = Date.now(); ;) {
+      const problem = live.resourceProblem({ minFreeGb: MIN_FREE_GB });
+      if (!problem) break;
+      if (Date.now() - waited > MEMORY_WAIT_MS) die(`memory: ${problem}`);
+      say(`${new Date().toISOString()} waiting: memory (${problem})`);
+      await new Promise((resolve) => setTimeout(resolve, 30_000));
+    }
+    if (until && Date.now() >= Date.parse(until)) {
+      say(`stopped at ${until}`);
+      return;
+    }
     try {
       await confined.waitForFreshLogin(ctx.login[cli]);
     } catch (error) {

@@ -40,7 +40,7 @@ export const SCENARIOS = Object.freeze({
  * finishes its work before the request exists would measure nothing).
  */
 export const GO_FILE = 'go.txt';
-export const RECEIVER_WAIT = `Wait for the signal file by running: until [ -f ${GO_FILE} ]; do sleep 2; done`;
+export const RECEIVER_WAIT = `${runs.REGISTER_FIRST}\nThen wait for the signal file by running: until [ -f ${GO_FILE} ]; do sleep 2; done`;
 
 /**
  * Runs per CLI: 40, in two arms. `withInstruction`: the receiver also carries the receiver instruction
