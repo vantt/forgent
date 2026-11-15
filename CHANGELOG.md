@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- `fgos git status`, `fgos git recover`, `fgos lock fence` and `fgos lock-status` now run in the Rust host with no Node process and answer much faster (`lock-status` about 160 ms, down from about 2.7 s through the staged host).
+- `fgos git recover` outside a repository no longer prints `--sha [object Object]` in its next-step hint.
+- `fgos lock fence` without `--yes` lists the holders and refuses with `lock-fence-not-confirmed` (exit 2), on a terminal too; the `Stop these processes? [y/N]` question is gone. Rerun the call with `--yes` to fence them.
+- On these verbs a missing or unknown sub-command and a `--flag=value` spelling are refused with exit 4 and the host's usual text (unknown flags list the valid ones in registry order), and a malformed call is recorded in the invocation fault log.
+- `fgos lock-status` no longer lists a lock file with an empty registry placeholder in its name (such as `merge-slot--.lock`) among its problems.
+
 - `fgos doctor` now counts agent definitions in the same tier order as persona lookup, first tier wins; a project's own `domains/` agents, a legacy `agents/` directory and `.yml` agent files are no longer counted, matching what the runtime loads.
 - Fixed: `fgos gateway start` no longer passes the host recursion guard to the gateway, so its session calls work instead of failing with HTTP 500, and it builds the gateway with `--locked`, so a start no longer rewrites `apps/fgos-gateway/Cargo.lock`.
 - `fgos mailbox status` now shows how many mailbox hook calls skipped their drain because the mailbox lock was busy (a line, only when the count is above zero), kept in `runtime/mailbox/hook-lock-busy.json`; a skipped call leaves its mail pending for the next call. The count may undercount when two skips race.
