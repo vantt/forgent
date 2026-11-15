@@ -621,6 +621,20 @@
         "src/setup/registrations.mjs"
       ],
       "reason": "catalogOf (defined in the port) is the only function that returns the whole section: run.mjs snapshots it into the run record and hash, registrations.mjs checks whether it is present"
+    },
+    {
+      "job": "control the gateway process",
+      "kind": "door",
+      "patterns": [
+        "gateway\\.json",
+        "export function (?:startGateway|stopGateway|gatewayStatus)\\b",
+        "['\"]--bin['\"],\\s*['\"]fgos-gateway['\"]"
+      ],
+      "allowed": [
+        "apps/fgos/src/wiring/gateway_control.rs"
+      ],
+      "debt": [],
+      "reason": "starting, stopping and probing the gateway (the .fgos/gateway.json registry, the release build of apps/fgos-gateway, the detached spawn) is one module of the host; nothing else in the product reads or writes the registry or builds the binary, so a second path to a gateway process fails here"
     }
   ],
   "files": {
@@ -704,7 +718,6 @@
     "src/runner/promote-preflight.mjs": "infra",
     "src/runner/promote-engine.mjs": "infra",
     "src/runner/session.mjs": "infra",
-    "src/runner/gateway-control.mjs": "infra",
     "src/runner/goal-check.mjs": "infra",
     "src/runner/iron-law-gate.mjs": "infra",
     "src/runner/frozen-judge.mjs": "domain",

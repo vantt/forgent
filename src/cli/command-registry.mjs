@@ -2260,6 +2260,7 @@ export const COMMAND_REGISTRY = [
     externalEffect: true,
     paginated: false,
     deprecated: null,
+    native: true,
   }),
   withSubcommands({
     name: 'goal',

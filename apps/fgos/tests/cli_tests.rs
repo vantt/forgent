@@ -591,6 +591,52 @@ fn test_native_gate_bypass_zero_node_child_process_spy() {
     let _ = fs::remove_dir_all(&temp_dir);
 }
 
+// The gateway verbs run in the host with no Node: a `node` wrapper on PATH is never started, and a project with
+// no registry answers "not running" with the Node CLI's envelope.
+#[cfg(unix)]
+#[test]
+fn gateway_status_and_stop_of_a_fresh_project_start_no_node_and_answer_not_running() {
+    let (spy_dir, spy_log, path) = node_spy_dir("fgos_test_gateway_spy");
+    let project = spy_dir.join("project");
+    fs::create_dir_all(project.join(".fgos")).unwrap();
+    let home = spy_dir.join("home");
+    fs::create_dir_all(&home).unwrap();
+    let run = |sub: &str| {
+        Command::new(fgos_bin())
+            .args(["gateway", sub])
+            .current_dir(&project)
+            .env("PATH", &path)
+            .env("HOME", &home)
+            .output()
+            .expect("failed to execute fgos")
+    };
+    for (sub, expected) in [
+        (
+            "status",
+            serde_json::json!({"running": false, "reachable": false}),
+        ),
+        ("stop", serde_json::json!({"alreadyStopped": true})),
+    ] {
+        let output = run(sub);
+        assert_eq!(
+            output.status.code(),
+            Some(0),
+            "gateway {sub}: {}",
+            String::from_utf8_lossy(&output.stderr)
+        );
+        let parsed: serde_json::Value =
+            serde_json::from_slice(&output.stdout).expect("output must be a JSON envelope");
+        assert_eq!(parsed["contract"], "fgos.v1");
+        assert_eq!(parsed["data"], expected, "gateway {sub}");
+    }
+    let spied = fs::read_to_string(&spy_log).unwrap_or_default();
+    assert!(
+        spied.lines().all(|line| !line.starts_with("SPY_PID:")),
+        "gateway status and stop started node: {spied}"
+    );
+    let _ = fs::remove_dir_all(&spy_dir);
+}
+
 #[test]
 fn test_legacy_exec_invocation_record_sink() {
     let manifest_path = ensure_dev_manifest();

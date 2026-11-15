@@ -127,6 +127,12 @@ pub fn project_cli_invocation(
             ),
             Box::new(project_config_request(args, root?)?),
         ),
+        "gateway.start" | "gateway.stop" | "gateway.status" => (
+            ContractRef::new(format!("{operation_id_str}.request"), "1.0.0"),
+            Box::new(crate::wiring::gateway_control::project_gateway_request(
+                args, root,
+            )?),
+        ),
         other => {
             return Err(format!(
                 "native CLI projector has no request mapping for '{}'",
@@ -162,6 +168,11 @@ pub fn native_operation_id(
     if route_operation == fgos_config::provider::CONFIG_READ_OPERATION_ID {
         let request = project_config_request(args, std::path::PathBuf::new())?;
         return Ok(request.operation_id().to_string());
+    }
+    if route_operation == crate::wiring::gateway_control::STATUS_OPERATION_ID {
+        let request =
+            crate::wiring::gateway_control::project_gateway_request(args, Err(String::new()))?;
+        return Ok(request.sub.operation_id().to_string());
     }
     Ok(route_operation.to_string())
 }

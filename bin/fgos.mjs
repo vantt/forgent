@@ -3570,34 +3570,6 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       }
     }
 
-    // Gateway process lifecycle (tsk-31v): the one-door way any agent
-    // starts/stops/checks the fgos gateway (REST API + web
-    // dashboard) as a detached background process instead of hand-rolling
-    // nohup/tmux/systemd. AGENTS.md's own dispatch doctrine names this as
-    // the mandatory entry point.
-    case 'gateway': {
-      const sub = requireSubVerb('gateway', positional);
-      const repoRoot = path.dirname(dir);
-      const { startGateway, stopGateway, gatewayStatus, GatewayControlError } = await import('../src/runner/gateway-control.mjs');
-      try {
-        if (sub === 'start') {
-          return startGateway(repoRoot, dir);
-        }
-        if (sub === 'stop') {
-          return stopGateway(dir);
-        }
-        if (sub === 'status') {
-          return await gatewayStatus(dir);
-        }
-        throw new StoreError('validation', `gateway sub-verb "${sub}" has no handler`);
-      } catch (err) {
-        if (err instanceof GatewayControlError) {
-          throw new StoreError('validation', err.message);
-        }
-        throw err;
-      }
-    }
-
     // Persisted-focus CLI surface (str67-goal-directed-planning D3/D4/D6/D7):
     // reads/writes go through the setFocus/goalFocusShow facades only, never
     // graph-metrics.mjs directly. Only `set`/`show` exist here — `clear`/

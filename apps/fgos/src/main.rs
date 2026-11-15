@@ -115,6 +115,9 @@ static COMPOSITION_PROVIDERS: &[ProviderDescriptor] = &[
     wiring::mailbox_verbs::STATUS_DESCRIPTOR,
     fgos_config::provider::CONFIG_READ_DESCRIPTOR,
     fgos_config::provider::CONFIG_WRITE_DESCRIPTOR,
+    wiring::gateway_control::START_DESCRIPTOR,
+    wiring::gateway_control::STOP_DESCRIPTOR,
+    wiring::gateway_control::STATUS_DESCRIPTOR,
 ];
 
 fn main() {
@@ -273,6 +276,15 @@ fn main() {
     ] {
         service.register_provider(Arc::new(
             fgos_config::provider::ConfigProvider::for_descriptor(descriptor),
+        ));
+    }
+    for descriptor in [
+        wiring::gateway_control::START_DESCRIPTOR,
+        wiring::gateway_control::STOP_DESCRIPTOR,
+        wiring::gateway_control::STATUS_DESCRIPTOR,
+    ] {
+        service.register_provider(Arc::new(
+            wiring::gateway_control::GatewayProvider::for_descriptor(descriptor),
         ));
     }
     let tracker = service.tracker();
