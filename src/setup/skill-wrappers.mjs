@@ -13,15 +13,12 @@
 // name/description; only the body redirects.
 //
 // Callers: `npm run build:skills` (repo CI/dogfood: assembles canonical skills,
-// generates thin wrappers, and mirrors dev-skills into plugins/fgOS/skills)
-// and `fgos setup`'s external-project materialize path (`materializeSkillsIntoProject`).
+// generates thin wrappers, and mirrors dev-skills into plugins/fgOS/skills) and `fgos uninstall`.
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { createGitInspect, gitPortOptions } from '../git/inspect.mjs';
-import { inspectEntries, inspectPath } from '../util/git-paths.mjs';
 import { domainCatalog } from '../util/domain-dirs.mjs';
-import { cutFrontmatter, readFrontmatter, YamlParseError } from '../util/yaml.mjs';
+import { cutFrontmatter } from '../util/yaml.mjs';
 import { refuseSymlink } from '../util/refuse-symlink.mjs';
 import { uniqueTmpTag } from '../util/unique-tmp-tag.mjs';
 import { computeInstructionProjection, materializeInstructionProjection } from './instruction-projections.mjs';
@@ -183,11 +180,9 @@ function assertTargetsWritable(owned, { agentsSkills, claudeSkills, pluginSkills
  * routes any `_shared` reference inside the source file to
  * `agentsSkillsRoot`'s own `_shared/`, so `.claude/skills/_shared` is not
  * needed once every `.claude/skills/*` entry is a redirect). Returns the
- * list of wrapper paths written. An optional `keep(targetPath, incoming)`
- * (see `createProjectSkillGuard`) names a target file to leave untouched;
- * a kept wrapper is not listed as written.
+ * list of wrapper paths written.
  */
-export function generateAllSkillWrappers(agentsSkillsRoot, claudeSkillsRoot, { owned, keep } = {}) {
+export function generateAllSkillWrappers(agentsSkillsRoot, claudeSkillsRoot, { owned } = {}) {
   const written = [];
   const validWrapperNames = new Set();
   for (const entry of ownedSkillDirs(agentsSkillsRoot, owned)) {
@@ -203,13 +198,11 @@ export function generateAllSkillWrappers(agentsSkillsRoot, claudeSkillsRoot, { o
     const sourceRelativePath = path.relative(wrapperDir, sourcePath).replaceAll('\\', '/');
     const wrapperContent = generateWrapperContent(sourceContent, sourceRelativePath);
     for (const linkable of [sourcePath, wrapperDir, wrapperPath]) refuseSymlink(linkable, SKILL_PATH, { optional: true });
-    if (!keep?.(wrapperPath, wrapperContent)) {
-      fs.mkdirSync(wrapperDir, { recursive: true });
-      if (!readIfFile(wrapperPath)?.equals(Buffer.from(wrapperContent))) fs.writeFileSync(wrapperPath, wrapperContent);
-      written.push(wrapperPath);
-    }
+    fs.mkdirSync(wrapperDir, { recursive: true });
+    if (!readIfFile(wrapperPath)?.equals(Buffer.from(wrapperContent))) fs.writeFileSync(wrapperPath, wrapperContent);
+    written.push(wrapperPath);
 
-    pruneExtras(wrapperDir, new Set([wrapperPath]), keep);
+    pruneExtras(wrapperDir, new Set([wrapperPath]));
   }
 
   if (fs.existsSync(claudeSkillsRoot)) {
@@ -224,43 +217,6 @@ export function generateAllSkillWrappers(agentsSkillsRoot, claudeSkillsRoot, { o
   return written;
 }
 
-/** `atomicCopyFileSync` that leaves a target file `keep` names untouched. */
-function keptCopy(keep) {
-  if (!keep) return atomicCopyFileSync;
-  return (sourcePath, targetPath) => {
-    if (!keep(targetPath, fs.readFileSync(sourcePath))) atomicCopyFileSync(sourcePath, targetPath);
-  };
-}
-
-// A version is a dotted string ("1.10" is after "1.9"). An unquoted `version: 1.10` reaches us as the number 1.1,
-// so a non-string version counts as no version, like a missing line, and the caller is told to quote it.
-function skillVersion(content, file) {
-  let meta;
-  try {
-    ({ meta } = readFrontmatter(content, file));
-  } catch (err) {
-    if (!(err instanceof YamlParseError)) throw err;
-    process.stderr.write(`${err.message}; its version is ignored\n`);
-    return null;
-  }
-  const version = meta.metadata?.version ?? meta.version;
-  if (version === undefined) return null;
-  if (typeof version !== 'string' || !/^\d+(?:\.\d+)*$/.test(version.trim())) {
-    process.stderr.write(`${file}: version is not a quoted dotted number, so it is ignored; quote it ("1.10")\n`);
-    return null;
-  }
-  return version.trim().split('.').map(Number);
-}
-
-function isNewerVersion(candidate, baseline) {
-  if (!candidate || !baseline) return false;
-  for (let i = 0; i < Math.max(candidate.length, baseline.length); i += 1) {
-    const diff = (candidate[i] ?? 0) - (baseline[i] ?? 0);
-    if (diff !== 0) return diff > 0;
-  }
-  return false;
-}
-
 function readIfFile(file) {
   try {
     return fs.readFileSync(file);
@@ -269,71 +225,11 @@ function readIfFile(file) {
   }
 }
 
-/**
- * The files of a project's own skill folders that setup must not overwrite
- * with the release copy: a tracked file with uncommitted changes since HEAD
- * (its content would be lost), and every file of a skill whose `SKILL.md`
- * declares a newer `version` than the copy being written (the project's
- * version is ahead of the release). Anything else -- untracked, or tracked
- * and clean, or identical content -- is refreshed as before.
- *
- * `guard.forRoots(sourceSkillsRoot, targetSkillsRoot)` returns
- * `keep(targetPath, incoming)`; each call that returns true records the
- * target's project-relative path in `guard.skipped`. Outside a git
- * repository only the version rule applies.
- */
-export function createProjectSkillGuard(projectRoot) {
-  const skipped = [];
-  let dirty;
-  const dirtyPaths = () => {
-    if (dirty) return dirty;
-    dirty = new Set();
-    try {
-      const inspect = createGitInspect(gitPortOptions(projectRoot));
-      const facts = inspect.resolveRepo();
-      if (!facts.notARepository) {
-        for (const entry of inspectEntries((page) => inspect.status({ ...page, untracked: 'none' }))) {
-          dirty.add(path.join(facts.worktreeRoot, inspectPath(entry.path)));
-        }
-      }
-    } catch {
-      // Any Git refusal or absence (not installed, untrusted-worktree, ...)
-      // falls back to the version rule alone.
-    }
-    return dirty;
-  };
-  return {
-    skipped,
-    forRoots(sourceSkillsRoot, targetSkillsRoot) {
-      const versionAhead = new Map();
-      return (targetPath, incoming) => {
-        const current = readIfFile(targetPath);
-        if (!current || current.equals(Buffer.from(incoming))) return false;
-        const name = path.relative(targetSkillsRoot, targetPath).split(path.sep)[0];
-        if (!versionAhead.has(name)) {
-          // Decided on the first file of the skill, before any of its files is rewritten.
-          const targetMd = readIfFile(path.join(targetSkillsRoot, name, 'SKILL.md'));
-          const sourceMd = readIfFile(path.join(sourceSkillsRoot, name, 'SKILL.md'));
-          versionAhead.set(name, Boolean(targetMd && sourceMd
-            && isNewerVersion(
-              skillVersion(targetMd.toString('utf8'), path.join(targetSkillsRoot, name, 'SKILL.md')),
-              skillVersion(sourceMd.toString('utf8'), path.join(sourceSkillsRoot, name, 'SKILL.md')),
-            )));
-        }
-        // worktreeRoot is canonical; the project may be reached through a symlink.
-        if (!versionAhead.get(name) && !dirtyPaths().has(fs.realpathSync(targetPath))) return false;
-        skipped.push(path.relative(projectRoot, targetPath).split(path.sep).join('/'));
-        return true;
-      };
-    },
-  };
-}
-
 /** Mirror every file under `sourceDir` into `targetDir`: create directories, overwrite a file at
  * the same relative path (the source is canonical), and remove target files the source lacks. A
  * nested call (`present` given) leaves that removal to the outermost caller, which names every file
- * the run wrote. `keep` shields a project file from removal as it does from overwriting. */
-function copyDirRecursive(sourceDir, targetDir, copyFile = atomicCopyFileSync, keep, present) {
+ * the run wrote. */
+function copyDirRecursive(sourceDir, targetDir, copyFile = atomicCopyFileSync, present) {
   const outermost = !present;
   present ??= new Set();
   refuseSymlink(targetDir, SKILL_PATH, { optional: true });
@@ -343,24 +239,24 @@ function copyDirRecursive(sourceDir, targetDir, copyFile = atomicCopyFileSync, k
     const sourcePath = path.join(sourceDir, entry.name);
     const targetPath = path.join(targetDir, entry.name);
     if (entry.isDirectory()) {
-      copyDirRecursive(sourcePath, targetPath, copyFile, keep, present);
+      copyDirRecursive(sourcePath, targetPath, copyFile, present);
     } else {
       copyFile(sourcePath, targetPath);
       present.add(targetPath);
     }
   }
-  if (outermost) pruneExtras(targetDir, present, keep);
+  if (outermost) pruneExtras(targetDir, present);
 }
 
 /** Removes the files under `dir` that `present` does not name, then any directory left empty. */
-function pruneExtras(dir, present, keep) {
+function pruneExtras(dir, present) {
   for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
     if (isOwnTmpFile(entry.name)) continue;
     const entryPath = path.join(dir, entry.name);
     if (entry.isDirectory()) {
-      pruneExtras(entryPath, present, keep);
+      pruneExtras(entryPath, present);
       if (fs.readdirSync(entryPath).length === 0) fs.rmdirSync(entryPath);
-    } else if (!present.has(entryPath) && !keep?.(entryPath, '')) {
+    } else if (!present.has(entryPath)) {
       fs.rmSync(entryPath, { force: true });
     }
   }
@@ -681,65 +577,6 @@ export function assembleSkills(
   }
 
   return assembled;
-}
-
-/**
- * `fgos setup`'s external-project materialize path: copies the package's
- * `.agents/skills` (owned names only) into `targetRoot/.agents/skills`, then
- * generates every `targetRoot/.claude/skills` wrapper against that local copy,
- * so wrappers never point back at the installed package. `assembleSkills` runs
- * first, best-effort (a read-only global install already ships `.agents/skills`
- * assembled; a write failure there means nothing new to pick up). A no-op when
- * the package carries no `.agents/skills`; self-hosting (package root equals
- * target root) skips the copy and only regenerates wrappers.
- */
-export function materializeSkillsIntoProject(packageRoot, targetRoot) {
-  // Which names fgOS may write is read from sources and decided before any write. The package's
-  // own skills are the only ones copied in; the wrapper step also covers the target's own.
-  const packageOwned = ownedSkillNames(packageRoot);
-  const owned = ownedSkillNames(packageRoot, targetRoot);
-  assertTargetsWritable(owned, {
-    agentsSkills: path.join(targetRoot, '.agents', 'skills'),
-    claudeSkills: path.join(targetRoot, '.claude', 'skills'),
-  });
-  try {
-    assembleSkills(packageRoot);
-  } catch {
-    // Best-effort: packageRoot's own .agents/skills (already
-    // shipped/committed) is still used below, unassembled.
-  }
-  const sourceAgentsSkills = path.join(packageRoot, '.agents', 'skills');
-  if (!fs.existsSync(sourceAgentsSkills)) {
-    return { copied: false, wrappersWritten: [], skipped: [] };
-  }
-  const targetAgentsSkills = path.join(targetRoot, '.agents', 'skills');
-  const targetClaudeSkills = path.join(targetRoot, '.claude', 'skills');
-  // Self-hosting (forgentX's own dev checkout running `fgos setup` on
-  // itself): packageRoot and targetRoot are the same real directory, so
-  // there is nothing to copy -- `.agents/skills` is already its own
-  // target. Skip straight to wrapper (re)generation, the same thing
-  // `npm run build:skills` already does on its own.
-  const copied = path.resolve(packageRoot) !== path.resolve(targetRoot);
-  const guard = copied ? createProjectSkillGuard(targetRoot) : null;
-  if (copied) {
-    const keep = guard.forRoots(sourceAgentsSkills, targetAgentsSkills);
-    const keepCopy = keptCopy(keep);
-    for (const entry of ownedSkillDirs(sourceAgentsSkills, packageOwned)) {
-      copyDirRecursive(path.join(sourceAgentsSkills, entry.name), path.join(targetAgentsSkills, entry.name), keepCopy, keep);
-    }
-    // prune: false -- this call only layers targetRoot's own domain skills
-    // on top of the packageRoot base skills just copied above; the base
-    // skills are never derivable from targetRoot's own core/skills+domains,
-    // so the default prune-orphans pass would delete them outright the
-    // moment targetRoot has any domains/ of its own (see assembleSkills's
-    // own comment on its `prune` parameter).
-    assembleSkills(targetRoot, undefined, { prune: false });
-  }
-  const wrappersWritten = generateAllSkillWrappers(targetAgentsSkills, targetClaudeSkills, {
-    owned,
-    keep: guard?.forRoots(targetAgentsSkills, targetClaudeSkills),
-  });
-  return { copied, wrappersWritten, skipped: guard?.skipped ?? [] };
 }
 
 /**

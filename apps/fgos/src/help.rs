@@ -555,9 +555,9 @@ mod tests {
 
     #[test]
     fn a_deprecated_verb_keeps_its_full_entry_when_asked_for_alone() {
-        let text = verb("setup", None, false).unwrap();
+        let text = verb("compound", None, false).unwrap();
         assert!(
-            text.contains("    DEPRECATED — since 2026-09-14; use fgctl init"),
+            text.contains("    DEPRECATED — fgos doc reserve/register/promote"),
             "{text}"
         );
         assert!(!text.contains("Compatibility ("));
@@ -967,7 +967,8 @@ mod tests {
     }
 
     #[test]
-    fn every_deprecated_verb_prints_a_plain_notice_alone_and_setup_is_listed_under_compatibility() {
+    fn every_deprecated_verb_prints_a_plain_notice_alone_and_compound_is_listed_under_compatibility(
+    ) {
         for entry in commands().iter().filter(|e| truthy(e.get("deprecated"))) {
             let name = entry["name"].as_str().unwrap();
             let text = verb(name, None, false).unwrap();
@@ -977,22 +978,23 @@ mod tests {
                 "{name}: {text}"
             );
         }
-        let setup = verb("setup", None, false).unwrap();
-        for part in ["fgctl init", "fgos doctor --fix", "git hooks path"] {
-            assert!(setup.contains(part), "setup notice lacks {part}");
-        }
+        let compound = verb("compound", None, false).unwrap();
+        assert!(
+            compound.contains("fgos doc reserve/register/promote"),
+            "compound notice lacks its replacement"
+        );
         let whole = top_level(&[]).unwrap();
         let (verbs, compatibility) = whole
             .split_once("Compatibility (")
             .expect("a Compatibility section");
         assert!(
-            !verbs.contains("\nfgos setup ["),
-            "setup is listed among the verbs"
+            !verbs.contains("\nfgos compound ["),
+            "compound is listed among the verbs"
         );
         assert!(
             compatibility
                 .lines()
-                .any(|l| l.contains("fgos setup") && l.contains("fgctl init")),
+                .any(|l| l.contains("fgos compound") && l.contains("fgos doc reserve")),
             "{compatibility}"
         );
     }

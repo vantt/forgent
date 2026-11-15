@@ -37,7 +37,9 @@ pub fn read(state_root: &Path) -> Result<String, Error> {
     })?;
     let value = raw.trim_end_matches(['\r', '\n']);
     if !valid_machine_id(value) {
-        return Err(Error::Invalid("invalid machine id; run setup fix".into()));
+        return Err(Error::Invalid(
+            "invalid machine id; run fgos doctor --fix".into(),
+        ));
     }
     Ok(value.to_owned())
 }

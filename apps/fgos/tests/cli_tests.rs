@@ -213,6 +213,28 @@ fn no_arguments_print_get_started_and_exit_0() {
 }
 
 #[test]
+fn a_retired_verb_answers_unknown_verb_for_a_call_and_for_its_help() {
+    for args in [
+        vec!["setup"],
+        vec!["setup", "--pretty"],
+        vec!["setup", "--help"],
+    ] {
+        let output = Command::new(fgos_bin())
+            .args(&args)
+            .output()
+            .expect("failed to execute fgos");
+
+        assert_eq!(output.status.code(), Some(4), "{args:?}");
+        let stderr = String::from_utf8_lossy(&output.stderr);
+        assert!(
+            stderr.contains("unknown verb \"setup\""),
+            "{args:?}: {stderr}"
+        );
+        assert!(output.stdout.is_empty(), "{args:?}");
+    }
+}
+
+#[test]
 fn a_near_miss_verb_is_refused_with_a_suggestion() {
     let output = Command::new(fgos_bin())
         .arg("doctr")

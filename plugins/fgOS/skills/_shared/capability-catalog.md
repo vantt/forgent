@@ -134,5 +134,5 @@ capability either — see that skill's own doc for the split.
    `src/setup/registrations.mjs` with a one-line `description`, no
    `prefer`/`overrides` (a curated default never pins an executor).
 3. Add one row to the table above.
-4. Only after step 2 lands does `fgos setup`/`fgos doctor` discover the
+4. Only after step 2 lands does `fgos doctor` discover the
    slot; a capability with no registered default is invisible to both.

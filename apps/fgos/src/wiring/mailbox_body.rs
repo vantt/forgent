@@ -62,7 +62,7 @@ pub fn fetch(main: &Path, remote: &str) -> BodyFetch {
 fn try_fetch(main: &Path, remote: &str) -> Result<(), String> {
     let clone = open_clone(main)?;
     // The mapping the clone needs is the granted one the Event Store sync does not require; a clone
-    // that has not run setup again lacks it, and nothing is fetched without it.
+    // that has not run `fgos doctor --fix` again lacks it, and nothing is fetched without it.
     let mapping = &body_mapping(remote)?;
     let configured = clone
         .driver

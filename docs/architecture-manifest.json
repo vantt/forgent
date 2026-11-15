@@ -494,7 +494,7 @@
       "debt": [
         {
           "path": "src/setup/shell-rc.mjs",
-          "reason": "the repository's session-start hook (scripts/fgos-session-start-hook.mjs) prints the rc file names as context, and setup and doctor still call it until they move"
+          "reason": "the repository's session-start hook (scripts/fgos-session-start-hook.mjs) prints the rc file names as context"
         }
       ],
       "retiredBy": "S7: the Node payload retires",
@@ -585,7 +585,6 @@
       "allowed": [
         "src/config/facade.mjs",
         { "path": "src/runner/dispatch/config.mjs", "reason": "names the file in the display of a finding's origin; reads nothing" },
-        { "path": "src/setup/runner-config-conversion.mjs", "reason": "names the global file in the display of a retired-key notice when a finding carries no file; reads nothing" },
         { "path": "packages/config/rust/src/files.rs", "reason": "the fgos-config crate owns the file names" },
         { "path": "packages/config/rust/src/machine.rs", "reason": "the fgos-config crate lists the machine files it reads" }
       ],
@@ -668,7 +667,6 @@
       "debt": [
         { "path": "src/runner/dispatch/llm-accounts.mjs", "reason": "machineLoginStores takes a homeDir parameter (default os.homedir()) and joins .fgos itself, so a caller can name a home the global directory door does not know" },
         { "path": "src/runner/dispatch/confinement/probes/harness.mjs", "reason": "the probe harness builds ~/.fgos/private from its own home value" },
-        { "path": "src/setup/setup-use-case.mjs", "reason": "takes a homeDir parameter and joins .fgos itself for the retired-config notice" },
         { "path": "apps/fgos-gateway/src/gateway.rs", "reason": "load_gateway_config takes an explicit home_dir (a test seam) where machine::global_dir takes an environment lookup, so the join stays here; one door once the gateway reads the lookup form" },
         { "path": "packages/holder-lock/rust/src/state_root.rs", "reason": "the state root's home rule, HOME first on every platform; Config uses USERPROFILE on Windows, so under Git Bash the two can resolve under different homes; backlog row p-n22bigucgp" }
       ],
@@ -872,7 +870,6 @@
         "src/cli/command-registry.mjs",
         { "path": "src/setup/agent-hooks.mjs", "reason": "the generated pi/omp extension runs in the agent process and cannot import the addon; its attempt-id prefix is pinned to the crate's by a test" },
         { "path": "packages/distribution/rust/src/agent_hooks.rs", "reason": "the generated pi/omp extension runs in the agent process and cannot import the identity crate; its attempt-id prefix is data in agent-hooks.v1.json, which a test pins to the crate's prefix" },
-        { "path": "src/setup/registrations.mjs", "reason": "doctor detects a harness shell by these variables; it does not resolve or hand out a writer" },
         { "path": "apps/fgos/examples/mailbox-ident-cost.rs", "reason": "a cost probe example names one source variable as its input; it decides nothing" },
         { "path": "scripts/event-store/settle-host-proof.mjs", "reason": "a proof script sets its own writer id for the process it runs" },
         { "path": "scripts/event-store/v-spawn-bench.mjs", "reason": "a benchmark clears inherited session ids and sets its own writer ids for the commands it times" },
@@ -1350,7 +1347,6 @@
     "src/convention/seat-id.mjs": "domain",
     "src/observe/friction-client.mjs": "infra",
     "src/intake/classify.mjs": "use-case",
-    "src/setup/ansi.mjs": "domain",
     "src/setup/config-checks.mjs": "domain",
     "src/setup/shell-rc.mjs": "infra",
     "src/setup/project-launcher.mjs": "infra",
@@ -1363,13 +1359,11 @@
     "src/setup/mailbox-limits.mjs": "infra",
     "src/setup/mailbox-claude-accept.mjs": "infra",
     "src/setup/agent-wiring.mjs": "infra",
-    "src/setup/setup-use-case.mjs": "use-case",
     "src/setup/version-info.mjs": "infra",
     "src/setup/agy-permissions.mjs": "infra",
     "src/setup/git-checks.mjs": "infra",
     "src/setup/git-retention-note.mjs": "infra",
     "src/setup/run-supervisor-checks.mjs": "infra",
-    "src/setup/runner-config-conversion.mjs": "infra",
     "src/setup/identity-checks.mjs": "use-case",
     "src/setup/terminal-control-checks.mjs": "infra",
     "src/setup/omp-natives-checks.mjs": "infra",

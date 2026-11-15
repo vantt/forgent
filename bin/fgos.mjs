@@ -56,13 +56,9 @@ import { lintPlanCapabilityAnnotations, lintPhaseUnits } from '../src/report/cap
 import { appendWorkerLog } from '../src/runner/worker-log.mjs';
 import { enableCancelOnSignal } from '../src/run-supervisor/cancel-opt-in.mjs';
 
-// tsk-1qi: this running copy's own package root -- the source
-// `materializeSkillsIntoProject` copies `.agents/skills/*` FROM, when
-// `fgos setup` runs in an external project whose own cwd has no
-// `.agents/skills` of its own yet. Two levels up from this file
-// (bin/fgos.mjs -> package root), the same "derive from the executing
-// copy's own on-disk location" approach `integrationScriptPath()` already
-// uses in src/setup/registrations.mjs.
+// This running copy's own package root (bin/fgos.mjs -> two levels up): the source `uninstall` reads the owned skill
+// names from, derived from the executing copy's own on-disk location like `integrationScriptPath()` in
+// src/setup/registrations.mjs.
 const PACKAGE_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 import { resolveInvocationRoot, fgosDirFromRoot } from '../src/runner/paths.mjs';
 import { resolveFgosFile, FGOS_FILE } from '../src/state/fgos-file-registry.mjs';
@@ -111,7 +107,6 @@ import { computeAwaitingContext } from '../src/state/awaiting-context.mjs';
 import { readConfig } from '../src/config/facade.mjs';
 import { countWorkerSlots, hasWorkerSlotRoom } from '../src/state/worker-slots.mjs';
 import { assessCleanupReadiness, blockedItemsNowResolvable } from '../src/state/cleanup-harness.mjs';
-import { formatCheck, bold } from '../src/setup/ansi.mjs';
 
 // D5: `verify` is a required non-empty field on every work item, but a
 // free-text submission has no verification plan yet — that is P15's job. The
@@ -119,7 +114,7 @@ import { formatCheck, bold } from '../src/setup/ansi.mjs';
 // overridable by a later edit.
 const SUBMIT_VERIFY_SENTINEL = 'chưa xác định — P15 bổ sung';
 
-// The root a verb that acts on the main checkout (setup, doctor, uninstall, git, unclaim, wire-agents,
+// The root a verb that acts on the main checkout (uninstall, git, unclaim, wire-agents,
 // resync-worktree, main-checkout-reset) takes, from `cwd` or from the checkout `--dir` names.
 // `--dir` is taken as the project root the caller names; `main-checkout-only` (a destructive verb) requires it to be
 // the main root of the repository the command runs in.
@@ -3489,30 +3484,6 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       return { projectRoot, ...listAgents({ projectRoot }) };
     }
 
-    // Do-and-announce shell-integration + config bootstrap (str87-fgos-setup-doctor
-    // D6, retargeted per tsk-2ta D1 amended / tsk-5vf D2/D4): inserts the
-    // shell-integration source line into every DETECTED rc file (bash/zsh,
-    // D4) — never creates a new rc file (shell-rc.mjs's own refusal) — then
-    // ensures the project's and the machine's header-only config file
-    // (`.fgos/config.yaml`, `~/.fgos/config.yaml`) exist, through the config
-    // door's `init` (the one write path allowed here; `doctor`, unlike
-    // `setup`, never calls it).
-    case 'setup': {
-      // tsk-2xj: same --dir resolution as `doctor`/`uninstall` below and `resync-worktree`: setup's writes are
-      // unconditional (tsk-5hi), so from a linked worktree this used to materialize .fgos/config.json INSIDE the
-      // worktree (ADR0020 violation), not just report wrong.
-      const { setupUseCase } = await import('../src/setup/setup-use-case.mjs');
-      const result = setupUseCase(mainCheckoutRootOf(flags), { packageRoot: PACKAGE_ROOT });
-      const deprecation = COMMAND_REGISTRY.find((entry) => entry.name === 'setup')?.deprecated ?? null;
-      return {
-        deprecation,
-        deprecationMessage: deprecation
-          ? `fgos setup is legacy compatibility; ${deprecation}.`
-          : undefined,
-        ...result,
-      };
-    }
-
     case 'unclaim': {
       const id = requireField(positional[0] ?? flags.id, 'unclaim requires an id: fgos unclaim <id>');
       const repoRoot = mainCheckoutRootOf(flags);
@@ -3610,11 +3581,6 @@ async function forwardHelp() {
   }
 }
 
-// `--pretty` rendering (D7): ONLY for `setup`/`doctor`, and only when the
-// flag is given — every other verb, and these two without `--pretty`, stay
-// byte-identical to the wrapEnvelope + JSON path. `--pretty` itself IS
-// CTR001's documented exception here: an explicit human-readable rendering
-// opt-out via an explicit flag, not a verb's default payload.
 // Default (non-`--json`) rendering for `fgos plan-lint`: prints each unit
 // alongside the catalog's own `description` text, so a reader can see a
 // registered capability's real meaning next to a unit whose own title text
@@ -3641,93 +3607,6 @@ function renderPlanLintReport(data) {
   return `${lines.join('\n')}\n`;
 }
 
-function renderPretty(verb, data) {
-  const lines = [];
-  if (verb === 'setup') {
-    lines.push(bold('fgos setup'));
-    if (data.deprecationMessage) {
-      lines.push(formatCheck(true, 'legacy compatibility command', data.deprecationMessage));
-    }
-    for (const rc of data.rcFilesInserted) {
-      lines.push(formatCheck(true, `inserted shell-integration source line`, rc));
-    }
-    for (const rc of data.rcFilesAlreadyConfigured) {
-      lines.push(formatCheck(true, `already sourced`, rc));
-    }
-    if (data.rcWriteDeclinedReason) {
-      lines.push(formatCheck(false, 'skipped shell-profile line', data.rcWriteDeclinedReason));
-    }
-    lines.push(
-      formatCheck(
-        data.hooksWired,
-        data.hooksWired
-          ? 'core.hooksPath wired to .githooks'
-          : data.hooksSkippedExisting
-            ? `core.hooksPath already set to "${data.hooksSkippedExisting}" — left untouched, main-checkout lock is NOT active`
-            : 'core.hooksPath not wired (no .git checkout here)',
-        'main-checkout lock hook',
-      ),
-    );
-    if (typeof data.skillWrappersGenerated === 'number') {
-      lines.push(
-        formatCheck(
-          true,
-          data.skillsSourceCopied
-            ? `copied .agents/skills and generated ${data.skillWrappersGenerated} .claude/skills wrapper(s)`
-            : `regenerated ${data.skillWrappersGenerated} .claude/skills wrapper(s)`,
-          '.agents/skills is the canonical source',
-        ),
-      );
-    }
-    for (const kept of data.skillFilesKept ?? []) {
-      lines.push(formatCheck(false, 'kept project skill file (newer version or uncommitted changes), not overwritten', kept));
-    }
-    if (data.runnerPatternsConversion?.status === 'converted') {
-      lines.push(
-        formatCheck(
-          true,
-          'converted runner patterns config to runner.loops (schema 2)',
-          data.runnerPatternsConversion.backup ? `backup: ${data.runnerPatternsConversion.backup}` : undefined,
-        ),
-      );
-      if (data.runnerPatternsConversion.remainingValidation) {
-        lines.push(
-          formatCheck(
-            false,
-            `runner config has remaining validation errors (${data.runnerPatternsConversion.remainingValidation})`,
-          ),
-        );
-      }
-    } else if (data.runnerPatternsConversion?.status === 'blocked') {
-      lines.push(
-        formatCheck(
-          false,
-          `runner patterns config conversion blocked (${data.runnerPatternsConversion.blocker})`,
-          data.runnerPatternsConversion.backup ? `backup: ${data.runnerPatternsConversion.backup}` : undefined,
-        ),
-      );
-    }
-    if (data.globalRetiredNotice) {
-      const notice = data.globalRetiredNotice;
-      const hasPatch = Array.isArray(notice.patch) ? notice.patch.length > 0 : Boolean(notice.patch);
-      const patchStr = hasPatch ? (notice.patchBody ?? JSON.stringify(notice.patch)) : '';
-      const noteParts = [];
-      if (notice.warning) noteParts.push(notice.warning);
-      if (hasPatch && notice.command) noteParts.push(notice.command);
-      if (patchStr) noteParts.push(`patch body:\n${patchStr}`);
-      const note = noteParts.join('\n');
-      lines.push(
-        formatCheck(
-          false,
-          `global config holds retired keys; edit ${notice.file} (${notice.edits.join('; ')})`,
-          note || undefined,
-        ),
-      );
-    }
-  }
-  return `${lines.join('\n')}\n`;
-}
-
 // What a verb does about the `.fgos/` store (refuse when missing, warn, open the Event Store, guard against a
 // disconnected snapshot, run Land) is declared once on its registry entry: `store`, `mutatesStore`, `landsWork`
 // (src/cli/command-registry.mjs). Nothing here keeps a verb list of its own.
@@ -3736,7 +3615,7 @@ function renderPretty(verb, data) {
 // never `fgos pick`/`take`, which strip `.fgos/` per ADR0020, nor `fgos session start`, which symlinks it) inherits
 // a real but frozen-at-branch-point `.fgos/`. Because it exists, the `store: 'require'` refusal never fires and
 // `dataDir()`'s cwd-strict resolution accepts the snapshot as the live store. Every invocation that writes the
-// shared store says so with `mutatesStore` and is refused from there. Left unmarked on purpose: `setup`, `doctor`,
+// shared store says so with `mutatesStore` and is refused from there. Left unmarked on purpose: `doctor`,
 // `uninstall` and `git` (they resolve the main checkout themselves), `tool` (writes only the local status overlay),
 // and the verbs with a worktree guard of their own (`init`, `approve`, `sync-root`, `promote-to-component`,
 // `catchup`, `unclaim`, `return`, whose own registered-session check is deliberately more permissive).
@@ -3853,9 +3732,7 @@ async function main() {
       },
     }, async () => {
       const data = await runVerb(verb, flags, positional, dir, rest);
-      if (flags.pretty && verb === 'setup') {
-        process.stdout.write(renderPretty(verb, data));
-      } else if (verb === 'plan-lint' && !flags.json) {
+      if (verb === 'plan-lint' && !flags.json) {
         process.stdout.write(renderPlanLintReport(data));
       } else if (verb === 'workflow' && positional[0] === 'propose' && !flags.json) {
         const { renderProposalText } = await import('../src/workflow/propose.mjs');

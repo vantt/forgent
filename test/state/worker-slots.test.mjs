@@ -346,7 +346,7 @@ test('a project config that does not parse refuses the claim by name and leaves 
 
 // --- the standard's value ---------------------------------------------------
 
-// The regression that matters most about the shipped value: `fgos doctor` tells every project to run `fgos setup` as
+// The regression that matters most about the shipped value: `fgos doctor` tells every project to run `fgos doctor --fix` as
 // ordinary maintenance, and a project that never sets the ceiling gets the standard's. This repo was carrying 12
 // running items when the ceiling shipped; had the standard armed the recommended 8, the very next take/pick would
 // have been refused and the backlog frozen. Asserting the value alone would not catch a future edit that puts a
@@ -368,7 +368,7 @@ test('the standard leaves every claim allowed, however many items are already ru
 // The admin reservation is constant by definition (D9): the lane never
 // claims a work item, so nothing counts it and nothing could enforce a
 // different number. It was briefly a `workerSlots.adminReservation` config
-// key that setup wrote, doctor displayed, and no code ever read.
+// key that a config file carried, doctor displayed, and no code ever read.
 test('the admin reservation is reported as a constant, never offered as a config knob', () => {
   const empty = fs.mkdtempSync(path.join(os.tmpdir(), 'worker-slots-standard-'));
   const { value } = readConfig({ projectRoot: empty, sections: ['workerSlots'] });

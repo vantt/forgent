@@ -1592,13 +1592,12 @@ test('pattern vocabulary rename is complete with no live retired aliases or dele
   assert.ok(!fs.readFileSync(path.join(root, 'src/runner/execution/loops/history-outcome.mjs'), 'utf8').includes('patternName'), 'history-outcome.mjs must not accept patternName');
 });
 
-test('retired pattern literals appear only in permitted refusal, setup, and decoder paths', () => {
+test('retired pattern literals appear only in permitted refusal and decoder paths', () => {
   const allowed = new Set([
     'src/runner/dispatch/config.mjs',
     'src/runner/execution/legacy-seat-read.mjs',
     'src/runner/execution/patterns/catalog-entries.mjs',
     'src/runner/execution/patterns/retired-keys.mjs',
-    'src/setup/runner-config-conversion.mjs',
   ]);
 
   const targetPattern = /\b(?:research-fan-out-gated|unknown-checker-seat)\b/;
@@ -1695,7 +1694,6 @@ const ARM_STATIC_IMPORTS = [
   '../src/runner/session.mjs',
   '../src/runner/worker-log.mjs',
   '../src/runner/worktree.mjs',
-  '../src/setup/ansi.mjs',
   '../src/state/awaiting-context.mjs',
   '../src/state/cleanup-harness.mjs',
   '../src/state/cursor.mjs',

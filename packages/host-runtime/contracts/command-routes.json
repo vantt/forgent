@@ -1151,16 +1151,6 @@
       "gc"
     ]
   },
-  "setup": {
-    "selector": "setup",
-    "route_kind": "legacy-cli",
-    "legacy_payload": "legacy-node",
-    "owner_path": "src/cli/command-registry.mjs",
-    "compatibility_tests": [
-      "test/rust-host/command-routes.test.mjs"
-    ],
-    "store": "open"
-  },
   "show": {
     "selector": "show",
     "route_kind": "legacy-cli",

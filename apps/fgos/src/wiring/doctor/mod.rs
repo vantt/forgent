@@ -350,17 +350,10 @@ mod tests {
                 .filter(|row| row.owner.kind == OwnerKind::Bridge && row.owner.label == step)
                 .count()
         };
-        // `shell-integration-sourced` is bridge:S4 until the phase that retires `setup` removes the row.
-        assert_eq!(registry.rows.len(), 110);
+        assert_eq!(registry.rows.len(), 109);
         assert_eq!(
-            (
-                count("S5"),
-                count("S6a"),
-                count("S6b"),
-                count("S7"),
-                count("S4")
-            ),
-            (8, 31, 6, 8, 1)
+            (count("S5"), count("S6a"), count("S6b"), count("S7")),
+            (8, 31, 6, 8)
         );
         assert_eq!(registry.row_ids(OwnerKind::Native).len(), 56);
         assert_eq!(registry.fixes.len(), 27);
@@ -370,7 +363,7 @@ mod tests {
     #[test]
     fn every_bridged_entry_names_the_step_that_removes_it() {
         let registry = registry().unwrap();
-        let steps = ["S4", "S5", "S6a", "S6b", "S7"];
+        let steps = ["S5", "S6a", "S6b", "S7"];
         for owner in registry
             .rows
             .iter()

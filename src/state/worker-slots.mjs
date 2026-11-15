@@ -51,7 +51,7 @@
  *
  * Constant by definition is also why this is NOT project config (tsk-1oz).
  * It was briefly registered as a `workerSlots.adminReservation` key that
- * `fgos setup` wrote and `fgos doctor` displayed, but nothing ever read:
+ * the config files carried and `fgos doctor` displayed, but nothing ever read:
  * every consumer reports this constant. A dial wired to nothing is worse
  * than no dial, so the key is gone and the number lives here, reported
  * through `fgos slots` for anyone who needs to see it.
@@ -63,10 +63,10 @@ export const ADMIN_LANE_RESERVATION = 4;
  * value the system applies on its own.
  *
  * It is NOT a fallback for a silent config, and (tsk-1oz) it is NOT what
- * `fgos setup` writes either: setup writes `ceiling: null`, present but
+ * a fresh config file carries either: that holds `ceiling: null`, present but
  * unarmed. Both would refuse the very next claim in any repo already running
  * more items than this number, and `fgos doctor` asks every project to run
- * `fgos setup` as routine maintenance — so writing a live number would arm
+ * `fgos doctor --fix` as routine maintenance — so writing a live number would arm
  * the gate on a command nobody runs meaning "cap me now", and freeze the
  * backlog until someone parked work by hand.
  *

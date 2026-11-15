@@ -1,13 +1,8 @@
-// dir-resolution.test.mjs -- tsk-2xj: `fgos doctor`/`setup`/`uninstall` used
-// to pass raw process.cwd() to every check/fix/write instead of resolving
-// the real main checkout, so running any of them bare (no --dir) from
-// inside a linked worktree silently targeted the WRONG tree -- false
-// "missing" diagnoses from doctor, and setup/uninstall reading or writing
-// .fgos/config.json and core.hooksPath against the worktree instead of the
-// shared store (an ADR0020 violation for setup, since its writes are
-// unconditional, docs/history/setup-doctor-uninstall-dir-resolution/
-// RESEARCH.md round 1). These prove the fix: bare invocation from a linked
-// worktree now resolves to the same main checkout an explicit --dir would.
+// dir-resolution.test.mjs -- tsk-2xj: `fgos doctor` used to pass raw process.cwd() to every check/fix instead of
+// resolving the real main checkout, so running it bare (no --dir) from inside a linked worktree silently targeted
+// the WRONG tree -- false "missing" diagnoses (docs/history/setup-doctor-uninstall-dir-resolution/RESEARCH.md round 1).
+// These prove the fix: bare invocation from a linked worktree now resolves to the same main checkout an explicit
+// --dir would.
 import '../helpers/process-tmp-root.mjs';
 import { initFixtureRepo } from '../helpers/git-fixture.mjs';
 import { test } from 'node:test';
@@ -52,8 +47,8 @@ test('tsk-2xj: fgos doctor run bare from a linked worktree reports the same chec
     // comparing two runs against an unconfigured main would trivially
     // "match" (both report everything missing) regardless of whether the
     // worktree-cwd resolution bug is present.
-    const setupOnMain = runFgos(main, ['setup'], homeDir);
-    assert.equal(setupOnMain.status, 0, setupOnMain.stderr);
+    const initOnMain = runFgos(main, ['init'], homeDir);
+    assert.equal(initOnMain.status, 0, initOnMain.stderr);
 
     // The comparison itself deliberately uses cwd=main directly, never
     // --dir: the old buggy `doctor` case ignored the parsed --dir flag
@@ -86,29 +81,6 @@ test('tsk-2xj: fgos doctor --fix run bare from a linked worktree never materiali
       !fs.existsSync(path.join(wt, '.fgos')),
       'doctor --fix run bare from a worktree must never create .fgos/ INSIDE that worktree (ADR0020)',
     );
-  } finally {
-    cleanup(main, wt);
-  }
-});
-
-test('tsk-2xj: fgos setup run bare from a linked worktree writes to the main checkout, never the worktree', () => {
-  const { main, wt } = initGitWithWorktree('dir-resolution-setup');
-  try {
-    const homeDir = mkTemp('dir-resolution-setup-home-');
-    const result = runFgos(wt, ['setup'], homeDir);
-    assert.equal(result.status, 0, result.stderr);
-    assert.ok(
-      !fs.existsSync(path.join(wt, '.fgos')),
-      'setup run bare from a worktree must never materialize .fgos/ INSIDE that worktree (ADR0020) -- setup writes unconditionally, so this is the live violation RESEARCH.md round 1 confirmed',
-    );
-
-    const hooksPath = execFileSync('git', ['config', '--get', 'core.hooksPath'], { cwd: main, encoding: 'utf8' }).trim();
-    assert.equal(
-      hooksPath,
-      path.join(main, '.githooks'),
-      'core.hooksPath wired by a bare worktree-cwd setup must still be the MAIN checkout\'s absolute .githooks path, not the worktree\'s (a relative or worktree-anchored value resolves per-worktree, tsk-2u5 D4)',
-    );
-    cleanup(homeDir);
   } finally {
     cleanup(main, wt);
   }

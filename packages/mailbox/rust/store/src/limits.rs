@@ -105,7 +105,7 @@ pub fn load(project_config: Option<&Value>) -> Result<Loaded, LimitsError> {
     let mut values = contract.defaults.clone();
     let mut ignored_keys = Vec::new();
     let mut overridden = Vec::new();
-    // An empty section (the one `fgos setup` registers) overrides nothing.
+    // An empty section (the one a fresh config file carries) overrides nothing.
     if let Some(section) = project_config
         .and_then(|config| config.get(SECTION))
         .filter(|section| section.as_object().is_none_or(|map| !map.is_empty()))

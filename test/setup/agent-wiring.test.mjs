@@ -1,5 +1,5 @@
 // agent-wiring.test.mjs -- fgOS writes a person's own agent config (~/.claude, ~/.gemini, ...)
-// only through the opt-in `fgos wire-agents`: init, setup and doctor --fix leave HOME alone
+// only through the opt-in `fgos wire-agents`: init and doctor --fix leave HOME alone
 // outside ~/.fgos. The opt-in command itself (acts only on agents present, prints every file, backs
 // each one up first, never sets a permission) is the host's: its proofs are in
 // apps/fgos/src/wiring/wire_agents.rs and packages/distribution/rust/src/agent_config.rs.
@@ -95,14 +95,14 @@ function snapshotHome(root) {
 const CHANGING_CLAUDE_CALLS = (calls) => calls.filter((args) => args[0] === 'plugin' && ['add', 'install'].includes(args[args[1] === 'marketplace' ? 2 : 1]));
 
 function runFgos(cwd, args, env) {
-  // boundary: the claim is about what the init, setup, doctor --fix and wire-agents verbs write as whole
+  // boundary: the claim is about what the init, doctor --fix and wire-agents verbs write as whole
   // processes under one HOME; the verb cases in bin/fgos.mjs have no use case to call in process.
   // `doctor` is the host's verb, run through the host binary the test launcher staged.
   if (args[0] === 'doctor') return spawnSync(process.env.FGOS_HOST_BIN, args, { cwd, encoding: 'utf8', env });
   return spawnSync(process.execPath, [FGOS, ...args], { cwd, encoding: 'utf8', env });
 }
 
-test('init, doctor --fix and setup write nothing in HOME outside ~/.fgos and change no Claude state, with claude and agy present and the mailbox on', () => {
+test('init and doctor --fix write nothing in HOME outside ~/.fgos and change no Claude state, with claude and agy present and the mailbox on', () => {
   const work = mkTemp('agent-wiring-untouched-');
   const home = path.join(work, 'home');
   fs.mkdirSync(path.join(home, '.claude'), { recursive: true });
@@ -120,7 +120,7 @@ test('init, doctor --fix and setup write nothing in HOME outside ~/.fgos and cha
   delete env.CLAUDE_CONFIG_DIR;
   const before = snapshotHome(home);
 
-  for (const args of [['init'], ['doctor', '--fix'], ['setup']]) {
+  for (const args of [['init'], ['doctor', '--fix']]) {
     const result = runFgos(repo, args, env);
     assert.equal(result.status, 0, `fgos ${args.join(' ')} failed: ${result.stderr}`);
   }

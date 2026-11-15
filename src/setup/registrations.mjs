@@ -26,7 +26,6 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
-import { detectRcFiles, hasSourceLine, deadSourceLines, probeShellIntegrationInvocation } from './shell-rc.mjs';
 import { domainCatalog } from '../util/domain-dirs.mjs';
 import { refuseSymlink } from '../util/refuse-symlink.mjs';
 import { releaseBinaryPath } from '../util/release-binary-path.mjs';
@@ -102,7 +101,6 @@ import { resolveCliVersionInfo } from './version-info.mjs';
 import { firstOnPath, inspectLauncher, writeLauncher } from './project-launcher.mjs';
 import { globalFgosDir, readConfig, readMachineConfig, readProjectConfigSource } from '../config/facade.mjs';
 import { CONFIG_CHECKS, CONFIG_FIXES, checkConfigOnce, isConfigDoorFailure } from './config-checks.mjs';
-import { retiredJsonAdvice } from './runner-config-conversion.mjs';
 import { parseYaml } from '../util/yaml.mjs';
 import { legacyStateKey } from '../runner/dispatch/llm-accounts.mjs';
 import { inspectProviderCapacity, defaultProviderCapacityRuntimeDir, providerAccountInventory, credentialStoreOf, credentialSourceForCli } from '../runner/dispatch/provider-capacity.mjs';
@@ -110,7 +108,7 @@ import { inspectRetainedCredentialCopies, inspectPendingCopiesOverLimit, sweepIn
 import { resolveHerdrBin } from '../runner/dispatch/transport.mjs';
 import { createTerminalControl } from '../terminal-control/client.mjs';
 import { readCodexTrust, readAgyStore, defaultAgySettingsPath, operatorClaudeStorePath } from '../run-supervisor/trust-store.mjs';
-import { resolveFgosBin, refreshGlobalBinCache } from './bin-discovery.mjs';
+import { refreshGlobalBinCache } from './bin-discovery.mjs';
 import { DEFAULT_WORKER_SLOT_CEILING } from '../state/worker-slots.mjs';
 import { eventStoreDoctorOf } from './event-store-checks.mjs';
 import { fixEventStoreLockDirs } from './event-store-fixes.mjs';
@@ -130,10 +128,6 @@ export { claudeCodeHookWired } from './claude-code-hooks.mjs';
 export { checkAgySubHomesConfigured } from './agy-permissions.mjs';
 
 const MIN_NODE_MAJOR = 18;
-
-// How many distinct dead paths the shell-integration check names before
-// falling back to a count. Observed real profiles carry over a hundred.
-const DEAD_LINE_SAMPLE_SIZE = 3;
 
 // Live, mutated-in-place arrays (never reassigned) so a registration added
 // after this module first evaluates — e.g. from a test, or from another
@@ -326,8 +320,7 @@ export function resolveMainCheckout(dir) {
  * is the copy actually being executed, and the only one guaranteed to exist.
  * When that copy sits inside a linked worktree, the equivalent path in the
  * main checkout is returned instead, so a worktree never earns its own rc
- * line and `checkShellIntegrationSourced` stops reporting a working setup as
- * unconfigured.
+ * line and `uninstall` recognises the line the checkout's script was sourced by.
  *
  * The `existsSync` guard keeps the canonical rewrite honest for a checkout
  * that is not fgOS's own — fgOS installed under another repo's
@@ -383,114 +376,6 @@ function checkNodeAndGit(cwd, run) {
   return { passed: true, message: `node ${process.version}, git available` };
 }
 
-// tsk-2qc-1 D3: an npm-installed, non-git copy has no `fgos-shell-
-// integration.sh` rc line to check for at all -- npm's own global install
-// already links a real `fgos` binary onto PATH, no rc sourcing needed. The
-// PRE-tsk-2qc-1 behavior silently reported "nothing to check" regardless of
-// whether that PATH link (or a dev/project-local bin) actually resolved --
-// the fail-open gap D3 exists to close. What actually matters for this
-// case is whether SOME tier of `resolveFgosBin` resolves; extracted as its
-// own function so it is unit-testable without needing a genuinely
-// non-git `import.meta.url` (`integrationScriptPath()` always resolves
-// inside this repo's own git checkout when its OWN test suite runs it).
-export function describeNonGitShellIntegration(cwd) {
-  const resolved = resolveFgosBin(cwd);
-  if (resolved) {
-    return {
-      passed: true,
-      message: `not inside a git checkout — no rc sourcing needed; fgos resolved via tier ${resolved.tier} at ${resolved.path}`,
-    };
-  }
-  return {
-    passed: false,
-    message: 'not inside a git checkout and no fgos bin reachable at any of the 3 tiers (dev-checkout, project-local, global PATH) -- install a release with "fgctl init" (https://github.com/vantt/forgent#install)',
-  };
-}
-
-// A shell started by an agent harness (Claude Code) hands its tools a snapshot of the
-// user's shell functions, and that snapshot can drop underscore-prefixed helpers. The
-// probe below reproduces exactly that, so inside such a shell its verdict says nothing
-// about the user's own terminal and is reported as information, not a failure.
-function insideHarnessShell(env = process.env) {
-  return Boolean(env.CLAUDECODE || env.CLAUDE_CODE_SESSION_ID);
-}
-
-function checkShellIntegrationSourced(cwd) {
-  const scriptPath = integrationScriptPath();
-  if (scriptPath === null) {
-    return describeNonGitShellIntegration(cwd);
-  }
-  const rcFiles = detectRcFiles(os.homedir());
-  if (rcFiles.length === 0) {
-    return { passed: true, message: 'no shell rc file(s) detected — nothing to check' };
-  }
-  // Reported even when the integration itself is correctly sourced: each dead
-  // line makes an interactive shell emit its own `no such file or directory`
-  // error on open, which is the failure a user actually sees. Reported per rc
-  // file because setup writes to every rc file it detects, so they drift apart.
-  const dead = rcFiles.flatMap((rcFile) =>
-    deadSourceLines(rcFile).map((target) => ({ rcFile, target })),
-  );
-  const missing = rcFiles.filter((rcFile) => !hasSourceLine(rcFile, scriptPath));
-  const problems = [];
-  if (missing.length > 0) {
-    problems.push(`not sourced in: ${missing.join(', ')} — run fgos setup`);
-  }
-  // tsk-2wpi: a source line can be textually present and correct while the
-  // function it defines is dead (e.g. a harness snapshot dropping an
-  // underscore-prefixed helper the function depends on) -- the checks
-  // above can't tell the difference, since neither ever actually invokes
-  // the resulting shell function. Only probe once integration is active
-  // somewhere (missing.length < rcFiles.length) -- the failure mode lives
-  // in the shared script itself, not in which rc file references it, so
-  // one probe against scriptPath covers every rc file that sources it.
-  let harnessProbeNote = '';
-  if (missing.length < rcFiles.length) {
-    // FGOS_SHELL_INTEGRATION_PROBE_SCRIPT (test-only seam, mirrors
-    // FGOS_CLAUDE_COMMAND/FGOS_GH_COMMAND below): lets a test probe a
-    // disposable fixture script instead of this repo's own real, live
-    // scripts/fgos-shell-integration.sh -- needed because integrationScriptPath()
-    // always resolves to the real file (derived from import.meta.url, not
-    // cwd), so a passing-case test would otherwise couple its own
-    // assertion to whatever state that real file happens to be in.
-    const probeTarget = process.env.FGOS_SHELL_INTEGRATION_PROBE_SCRIPT || scriptPath;
-    const { ok, strippedFunctions } = probeShellIntegrationInvocation(probeTarget);
-    if (!ok) {
-      const helperNote = strippedFunctions.length > 0
-        ? ` after stripping ${strippedFunctions.join(', ')} (an underscore-prefixed helper a harness shell-function snapshot can drop)`
-        : '';
-      const probeMessage = `sourced correctly, but "fgos --help" fails${helperNote} -- the source line being present is not proof the command actually works`;
-      if (insideHarnessShell()) {
-        harnessProbeNote = ` (informational, running inside an agent harness shell: ${probeMessage}; re-run fgos doctor from your own terminal to confirm)`;
-      } else {
-        problems.push(probeMessage);
-      }
-    }
-  }
-  if (dead.length > 0) {
-    const byFile = new Map();
-    for (const { rcFile, target } of dead) {
-      byFile.set(rcFile, (byFile.get(rcFile) ?? 0) + 1);
-    }
-    const counts = [...byFile].map(([rcFile, count]) => `${rcFile} (${count})`).join(', ');
-    // Only a sample of the paths: these accumulate into the hundreds, and a
-    // check message that prints every one of them scrolls the rest of the
-    // report off the screen. The counts above are the actionable part.
-    const unique = [...new Set(dead.map(({ target }) => target))];
-    const sample = unique.slice(0, DEAD_LINE_SAMPLE_SIZE).join(', ');
-    const rest = unique.length - DEAD_LINE_SAMPLE_SIZE;
-    problems.push(
-      `${dead.length} dead fgos source line(s) in ${counts} — each one errors on every shell open; ` +
-        `delete them by hand (fgos never edits your shell profile to remove a line). ` +
-        `e.g. ${sample}${rest > 0 ? ` (+${rest} more path(s))` : ''}`,
-    );
-  }
-  if (problems.length > 0) {
-    return { passed: false, message: problems.join('; ') };
-  }
-  return { passed: true, message: `sourced in: ${rcFiles.join(', ')}${harnessProbeNote}` };
-}
-
 // The schema states each entry's keys and types; the owner's validator keeps the rule that a source scope opens with a
 // literal directory. The bounds and cumulative-checker rules of runner.loops are checked by runner-patterns-config.
 export function checkRunnerGeneratedPathsConfig(cwd) {
@@ -501,6 +386,13 @@ export function checkRunnerGeneratedPathsConfig(cwd) {
     return { passed: false, message: err.message };
   }
   return { passed: true, message: `runner.generatedPaths is valid (${generatedPaths.length} mapping(s))` };
+}
+
+// The retired runner.patterns keys a legacy JSON config document still holds, as data (empty when none).
+function retiredJsonAdvice(parsed) {
+  const runner = parsed?.runner ?? parsed;
+  const patterns = runner?.patterns ?? {};
+  return parsed ? detectRetiredPatternKeys(patterns) : [];
 }
 
 export function checkRunnerPatternsConfig(cwd, run) {
@@ -937,7 +829,7 @@ function checkMainCheckoutHookWired(cwd) {
   if (mainCheckoutHookWired(cwd)) {
     return { passed: true, message: 'core.hooksPath = .githooks — the hook checks the main-checkout kernel lock on every commit here (a fgOS child borrows it through its description)' };
   }
-  return { passed: false, message: 'core.hooksPath not wired to .githooks — commits here are NOT guarded against concurrent-writer clobbering (str65) — run fgos setup' };
+  return { passed: false, message: 'core.hooksPath not wired to .githooks — commits here are NOT guarded against concurrent-writer clobbering (str65) — run npm run setup:hooks' };
 }
 
 function checkDispatchDecideHookWired(cwd, run) {
@@ -977,11 +869,6 @@ registerCheck({
 registerCheck({
   id: 'cli-version-visible',
   check: () => checkCliVersionVisible(),
-});
-
-registerCheck({
-  id: 'shell-integration-sourced',
-  check: (cwd) => checkShellIntegrationSourced(cwd),
 });
 
 // A release install (no git checkout to source a script from) is reached through

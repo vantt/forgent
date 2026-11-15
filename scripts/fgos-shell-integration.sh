@@ -18,8 +18,8 @@
 # way Node's own module resolution does -- kept as a real mode for
 # cross-project version pinning) > global install (tier 3, the only tier
 # needing a PATH lookup). Tier 3 reads the bin cache
-# (`~/.fgos/runtime/bin-cache.json`'s `globalFgosPath`, populated by `fgos setup`/
-# `doctor --fix` -- see src/setup/bin-discovery.mjs) before ever shelling
+# (`~/.fgos/runtime/bin-cache.json`'s `globalFgosPath`, populated by
+# `fgos doctor --fix` -- see src/setup/bin-discovery.mjs) before ever shelling
 # out to `command -v`, and self-heals: a stale/missing cached path falls
 # straight through to the live PATH probe, same as before this cache
 # existed (docs/history/global-project-config-awareness/CONTEXT.md D2).

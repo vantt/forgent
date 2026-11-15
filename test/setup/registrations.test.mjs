@@ -1241,9 +1241,8 @@ test('the order the bodies register in is the order the registry runs them in', 
 test('the registry gives 56 rows and 22 fixes to Rust and 53 rows and 5 fixes to the bridge, as measured', () => {
   const { rows, fixes } = registryEntries();
   const bridged = (list) => list.filter((entry) => entry.owner.startsWith('bridge:'));
-  // `shell-integration-sourced` is bridge:S4: the phase that retires `setup` removes the row.
   const byStep = (step) => bridged(rows).filter((row) => row.owner === `bridge:${step}`).length;
-  assert.deepEqual(['S5', 'S6a', 'S6b', 'S7', 'S4'].map(byStep), [8, 31, 6, 8, 1]);
+  assert.deepEqual(['S5', 'S6a', 'S6b', 'S7'].map(byStep), [8, 31, 6, 8]);
   assert.equal(rows.length - bridged(rows).length, 56);
   assert.equal(bridged(fixes).length, 5);
   assert.equal(fixes.length - bridged(fixes).length, 22);
@@ -1252,7 +1251,7 @@ test('the registry gives 56 rows and 22 fixes to Rust and 53 rows and 5 fixes to
 test('an owner is rust:<component> or bridge:<step>, and a bridged one names the step that removes it', () => {
   const { rows, fixes } = registryEntries();
   for (const { id, owner } of [...rows, ...fixes]) {
-    assert.match(owner, /^(rust:[a-z][a-z-]*|bridge:(S4|S5|S6a|S6b|S7))$/, `${id}: ${owner}`);
+    assert.match(owner, /^(rust:[a-z][a-z-]*|bridge:(S5|S6a|S6b|S7))$/, `${id}: ${owner}`);
   }
 });
 

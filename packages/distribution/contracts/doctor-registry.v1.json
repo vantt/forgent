@@ -82,12 +82,6 @@
       "owner": "rust:packaging"
     },
     {
-      "id": "shell-integration-sourced",
-      "description": "shell-integration source line present in detected rc file(s)",
-      "note": "removed with the setup verb: nothing keeps writing the shell-rc source line",
-      "owner": "bridge:S4"
-    },
-    {
       "id": "project-fgos-launcher",
       "description": "a release install has a single fgos on PATH that runs each project's own activated fgos",
       "owner": "rust:packaging"

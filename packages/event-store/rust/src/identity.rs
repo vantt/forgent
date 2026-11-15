@@ -28,7 +28,7 @@ pub fn machine_id(config_value: Option<&str>, state_root: &Path) -> Result<Strin
     if !valid_machine_id(&value) {
         return Err(Error::new(
             ErrorCode::EventStoreMachineId,
-            "invalid machine id; run setup fix",
+            "invalid machine id; run fgos doctor --fix",
         ));
     }
     Ok(value)

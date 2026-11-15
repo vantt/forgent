@@ -2042,7 +2042,7 @@
           ]
         },
         "session": {
-          "description": "This session: {id, handle}. The id is <machine-id>/<local id>; the handle is <cli>-<4 characters>@<machine-handle> and never changes for the same session, so it can be pasted on the board. `--register` (the only way a session enters the local directory; a plain read never does; the SessionStart hook `fgos setup` writes calls it, and a seat the runner started answers `registered: false` and is never listed) records it with the process facts of its agent head, the highest ancestor holding a terminal; `--role lead:<LANE>` (a program lane) or `--role work:<name>` (one piece of work that is not a lane; a work item id or a slug) also claims that role (and registers), refused with [role-held] while another live session holds it unless `--take` moves it. A second live session with the same handle is refused [handle-in-use]. Exit 65 [machine-id-missing] without a machine id, [unresolved] when the caller cannot be told from any other.",
+          "description": "This session: {id, handle}. The id is <machine-id>/<local id>; the handle is <cli>-<4 characters>@<machine-handle> and never changes for the same session, so it can be pasted on the board. `--register` (the only way a session enters the local directory; a plain read never does; the SessionStart hook `fgos doctor --fix` writes calls it, and a seat the runner started answers `registered: false` and is never listed) records it with the process facts of its agent head, the highest ancestor holding a terminal; `--role lead:<LANE>` (a program lane) or `--role work:<name>` (one piece of work that is not a lane; a work item id or a slug) also claims that role (and registers), refused with [role-held] while another live session holds it unless `--take` moves it. A second live session with the same handle is refused [handle-in-use]. Exit 65 [machine-id-missing] without a machine id, [unresolved] when the caller cannot be told from any other.",
           "parameters": {
             "type": "object",
             "properties": {
@@ -2696,7 +2696,7 @@
     {
       "name": "slots",
       "invoke": "fgos slots",
-      "description": "Read-only worker-slot ledger: how many work items are running right now (execution-lane occupancy, one running item = one slot), whether the lane has room under the configured ceiling, and the admin lane's fixed reservation. This is the port launchers pre-check before standing a worker up — herdr-dashboard (Rust) and fgos-fanout (a prose skill) reach the engine only through the CLI, per decision 0014. An absent or null workerSlots.ceiling means no ceiling: hasRoom is always true, which is what `fgos setup` writes until a person arms it. Not paginated: a launcher reads the fixed summary fields (hasRoom, occupied, ceiling, free), and execution.items — one row per running item, so it grows with the number of items at doing — is diagnostic detail for a human, never a row set to page through.",
+      "description": "Read-only worker-slot ledger: how many work items are running right now (execution-lane occupancy, one running item = one slot), whether the lane has room under the configured ceiling, and the admin lane's fixed reservation. This is the port launchers pre-check before standing a worker up — herdr-dashboard (Rust) and fgos-fanout (a prose skill) reach the engine only through the CLI, per decision 0014. An absent or null workerSlots.ceiling means no ceiling: hasRoom is always true, which is what a project has until a person arms it. Not paginated: a launcher reads the fixed summary fields (hasRoom, occupied, ceiling, free), and execution.items — one row per running item, so it grows with the number of items at doing — is diagnostic detail for a human, never a row set to page through.",
       "parameters": {
         "type": "object",
         "properties": {},
@@ -3687,7 +3687,7 @@
     {
       "name": "show",
       "invoke": "fgos show",
-      "description": "Full detail of one work item, scoped to its own id: the work record plus every per-item log (discovery, decisions, gates, outcome, friction, settlement, learning) and the conflicts recorded against it (acknowledged on one machine, never applied here). Unlike \"list --id\", which only scopes the work map and leaves those logs global, \"show\" filters all of them to just this item. Output is always JSON.stringify(data, null, 2) -- --json is accepted but a no-op, since only \"setup\"/\"doctor\" --pretty ever render differently.",
+      "description": "Full detail of one work item, scoped to its own id: the work record plus every per-item log (discovery, decisions, gates, outcome, friction, settlement, learning) and the conflicts recorded against it (acknowledged on one machine, never applied here). Unlike \"list --id\", which only scopes the work map and leaves those logs global, \"show\" filters all of them to just this item. Output is always JSON.stringify(data, null, 2) -- --json is accepted but a no-op, since only \"doctor\" --pretty ever renders differently.",
       "parameters": {
         "type": "object",
         "properties": {
@@ -4692,29 +4692,6 @@
       "deprecated": null
     },
     {
-      "name": "setup",
-      "invoke": "fgos setup",
-      "description": "Legacy: inserts the fgos shell-integration source line, writes the shared config defaults and support hooks, and runs the registered fixes. Use `fgctl init`, then `fgos doctor --fix`.",
-      "parameters": {
-        "type": "object",
-        "properties": {
-          "pretty": {
-            "type": "boolean",
-            "description": "Render colored human-readable text instead of the JSON envelope."
-          }
-        },
-        "required": []
-      },
-      "examples": [
-        "fgos setup",
-        "fgos setup --pretty"
-      ],
-      "touchesState": true,
-      "externalEffect": false,
-      "paginated": false,
-      "deprecated": "since 2026-09-14; use fgctl init, then fgos doctor --fix (setup still wires the git hooks path and the shell-integration line that doctor --fix does not)"
-    },
-    {
       "name": "uninstall",
       "invoke": "fgos uninstall [--yes] [--dry-run]",
       "description": "The project half of `fgctl uninstall`: takes out of this project what fgOS wrote (its hook entries in the agent configs, the generated skill directories, the git hooks fgOS wired, the mailbox sync timer) and keeps everything else. Without --yes, or with --dry-run, it prints the plan and changes nothing. With --yes it first copies each file it rewrites or deletes to <file>.pre-uninstall-<time>. It never touches .fgos data or config, the committed pin, a hook entry or skill directory without fgOS's own mark, a shell profile (the rc line is only named) or your global agent config (`fgos wire-agents` keeps no record; the plan prints how to undo it by hand). It does not remove .fgos/installation or the release store: run `fgctl uninstall` for those.",
@@ -4753,7 +4730,7 @@
     {
       "name": "wire-agents",
       "invoke": "fgos wire-agents [--yes] [--json]",
-      "description": "The one opt-in command that changes your own agent config outside the project (fgos init, setup and doctor --fix write only the project and ~/.fgos). Acts only on agent CLIs found on this machine. Without --yes it prints every change and every file it would touch and writes nothing; with --yes it first copies each existing file to <file>.pre-wire-agents-<time>, then applies the changes (today: registers the fgOS Claude Code plugin marketplace and installs the plugin through the claude CLI). It never sets a permission that widens what an agent may do (agy toolPermission \"always-proceed\", Claude crossSessionInbound \"accept\"): it shows the file, the value and why, and you decide. Prints text; --json prints the envelope.",
+      "description": "The one opt-in command that changes your own agent config outside the project (fgos init and doctor --fix write only the project and ~/.fgos). Acts only on agent CLIs found on this machine. Without --yes it prints every change and every file it would touch and writes nothing; with --yes it first copies each existing file to <file>.pre-wire-agents-<time>, then applies the changes (today: registers the fgOS Claude Code plugin marketplace and installs the plugin through the claude CLI). It never sets a permission that widens what an agent may do (agy toolPermission \"always-proceed\", Claude crossSessionInbound \"accept\"): it shows the file, the value and why, and you decide. Prints text; --json prints the envelope.",
       "parameters": {
         "type": "object",
         "properties": {

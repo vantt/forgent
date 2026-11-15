@@ -4,12 +4,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
-import { execFileSync, spawnSync } from 'node:child_process';
 import { installClaudeCodeHook, claudeCodeHookWired } from '../../src/setup/claude-code-hooks.mjs';
-
-const FGOS = fileURLToPath(new URL('../../bin/fgos.mjs', import.meta.url));
-const NO_CLAUDE_ENV = { ...process.env, FGOS_CLAUDE_COMMAND: '/nonexistent/fgos-test-claude-binary' };
 
 function mkTempDir(prefix) {
   return fs.mkdtempSync(path.join(os.tmpdir(), prefix));
@@ -93,40 +88,6 @@ test('claudeCodeHookWired reads false when settings.json has other hooks but not
   );
   assert.equal(claudeCodeHookWired(repoRoot), false);
   fs.rmSync(repoRoot, { recursive: true, force: true });
-});
-
-// --- real "fgos setup" CLI, end to end -------------------------------------
-
-test('fgos setup wires the dispatch-decide PreToolUse hook and reports it in the envelope', () => {
-  const cwd = mkTempDir('claude-code-hooks-cli-setup-');
-  const homeDir = mkTempDir('claude-code-hooks-cli-setup-home-');
-  execFileSync('git', ['init', '-q'], { cwd });
-  const result = spawnSync(process.execPath, [FGOS, 'setup'], { cwd, encoding: 'utf8', env: { ...NO_CLAUDE_ENV, HOME: homeDir, USERPROFILE: homeDir } });
-  assert.equal(result.status, 0, result.stderr);
-  const envelope = JSON.parse(result.stdout);
-  assert.equal(envelope.data.dispatchDecideHookWired, true);
-  assert.equal(envelope.data.dispatchDecideHookSkippedExisting, null);
-  assert.equal(claudeCodeHookWired(cwd), true);
-  fs.rmSync(cwd, { recursive: true, force: true });
-  fs.rmSync(homeDir, { recursive: true, force: true });
-});
-
-test('fgos setup leaves a pre-existing SessionStart hook untouched while wiring its own hooks alongside it', () => {
-  const cwd = mkTempDir('claude-code-hooks-cli-preserve-');
-  const homeDir = mkTempDir('claude-code-hooks-cli-preserve-home-');
-  execFileSync('git', ['init', '-q'], { cwd });
-  fs.mkdirSync(path.join(cwd, '.claude'), { recursive: true });
-  const before = { hooks: { SessionStart: [{ matcher: 'startup', hooks: [{ type: 'command', command: 'node foo.mjs' }] }] } };
-  fs.writeFileSync(path.join(cwd, '.claude', 'settings.json'), JSON.stringify(before, null, 2));
-
-  const result = spawnSync(process.execPath, [FGOS, 'setup'], { cwd, encoding: 'utf8', env: { ...NO_CLAUDE_ENV, HOME: homeDir, USERPROFILE: homeDir } });
-  assert.equal(result.status, 0, result.stderr);
-
-  const after = JSON.parse(fs.readFileSync(path.join(cwd, '.claude', 'settings.json'), 'utf8'));
-  assert.deepEqual(after.hooks.SessionStart[0], before.hooks.SessionStart[0]);
-  assert.equal(claudeCodeHookWired(cwd), true);
-  fs.rmSync(cwd, { recursive: true, force: true });
-  fs.rmSync(homeDir, { recursive: true, force: true });
 });
 
 test('installClaudeCodeHook also wires the AskUserQuestion decision-question hook, and wired needs both', () => {

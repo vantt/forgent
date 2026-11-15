@@ -1,5 +1,5 @@
 //! Tier vocabulary, strength order and the ladder definitions: one contract file,
-//! the source of the `$comment` that `fgos setup` writes into the config and of the
+//! the source of the `$comment` that the config files carry and of the
 //! tier names the Node config loader accepts.
 
 use serde::{Deserialize, Serialize};

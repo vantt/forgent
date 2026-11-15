@@ -48,7 +48,6 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, with no repo
     [
       'main-checkout-hook-wired',
       'node-version-and-git',
-      'shell-integration-sourced',
       'project-fgos-launcher',
       'tool-registry-configured',
       'provider-capacity-state',
@@ -617,7 +616,7 @@ test('main-checkout-hook-wired doctor check reports passed/failed matching mainC
   fs.mkdirSync(path.join(cwd, '.githooks'));
   const before = checkById('main-checkout-hook-wired').check(cwd);
   assert.equal(before.passed, false);
-  assert.match(before.message, /run fgos setup/);
+  assert.match(before.message, /run npm run setup:hooks/);
 
   execFileSync('git', ['config', 'core.hooksPath', '.githooks'], { cwd });
   const after = checkById('main-checkout-hook-wired').check(cwd);

@@ -168,10 +168,8 @@ test('no duplicate verb names in the registry', () => {
   assert.deepEqual(names, [...new Set(names)]);
 });
 
-test('setup is marked deprecated with the fgctl init workspace-onboarding path', () => {
-  const setupEntry = COMMAND_REGISTRY.find((entry) => entry.name === 'setup');
-  assert.ok(setupEntry, 'COMMAND_REGISTRY is missing a "setup" entry');
-  assert.equal(setupEntry.deprecated, 'since 2026-09-14; use fgctl init, then fgos doctor --fix (setup still wires the git hooks path and the shell-integration line that doctor --fix does not)');
+test('a retired verb has no registry entry, so the host answers it as an unknown verb', () => {
+  assert.equal(COMMAND_REGISTRY.find((entry) => entry.name === 'setup'), undefined);
 });
 
 test('manifest entries of multi-sub-verb verbs carry subcommands whose keys match the sub enum', () => {

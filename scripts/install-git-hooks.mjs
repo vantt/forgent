@@ -4,8 +4,8 @@
 // the real logic lives in src/setup/git-hooks.mjs (that layer ships with the
 // npm package per package.json's "files"; scripts/ does not, and
 // docs/architecture-manifest.json's import-direction check only tracks
-// src/bin -- bin/fgos.mjs's own `fgos setup` wiring imports the same
-// src/setup/git-hooks.mjs directly, never this file, per that same rule).
+// src/bin -- the `fgos` code imports src/setup/git-hooks.mjs directly, never
+// this file, per that same rule).
 // Re-exported here so this script's own CLI form and `npm run setup:hooks`
 // keep working unchanged.
 

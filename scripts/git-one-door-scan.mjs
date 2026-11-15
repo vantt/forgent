@@ -48,7 +48,7 @@ import { repositoryDirs, repositoryFiles } from './lib/git-dir-layout.mjs';
 import { createGitInspect, gitPortOptions } from '../src/git/inspect.mjs';
 
 const REPO = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-// The hooks directory `fgos setup` wires as core.hooksPath (src/setup/git-hooks.mjs).
+// The hooks directory `npm run setup:hooks` wires as core.hooksPath (src/setup/git-hooks.mjs).
 const HOOKS_DIR = '.githooks';
 const JS_EXT = new Set(['.mjs', '.js', '.cjs']);
 const SPAWN_FNS = ['execFileSync', 'execFile', 'spawnSync', 'spawn', 'execSync', 'exec'];
@@ -88,7 +88,7 @@ export function listFiles(root, openInspect = () => createGitInspect(gitPortOpti
  * The product `root`'s owners declare, as a predicate over relative paths, or null when `root`
  * declares none (then every file is judged): the Node payload its package.json ships (`files`,
  * `bin`, package.json itself), every crate its Cargo workspace names (members, and the crates it
- * builds on their own under `exclude`), and the hooks directory `fgos setup` installs. Files outside
+ * builds on their own under `exclude`), and the hooks directory `npm run setup:hooks` installs. Files outside
  * it (tests, fixtures, records) are counted in the census, never judged as product.
  */
 export function declaredProduct(root) {

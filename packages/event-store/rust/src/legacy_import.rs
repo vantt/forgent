@@ -164,7 +164,7 @@ pub fn write_readiness(driver: &GitDriver, repo: &RepoHandle, remote: &str) -> R
     {
         return Err(Error::new(
             ErrorCode::EventStoreRefspecMissing,
-            "run setup and fetch the pinned legacy ref",
+            "run fgos doctor --fix and fetch the pinned legacy ref",
         ));
     }
     // A local-only repository has no mapping to install. Configured publication

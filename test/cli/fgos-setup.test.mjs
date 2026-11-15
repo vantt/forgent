@@ -1,4 +1,4 @@
-// fgos-setup.test.mjs -- phần "setup, init, repair, rebuild, schedule, gate-bypass" của bộ test CLI, tách nguyên văn
+// fgos-setup.test.mjs -- phần "init, repair, rebuild, schedule, gate-bypass" của bộ test CLI, tách nguyên văn
 // từ test/cli/fgos.test.mjs (tsk-3um). Nội dung test không đổi, chỉ chỗ ở đổi.
 // Bộ đồ nghề dùng chung nằm ở ./helpers/fgos-cli-harness.mjs.
 import '../helpers/process-tmp-root.mjs';
@@ -161,23 +161,6 @@ test('init on a fresh checkout that is not a linked worktree still succeeds, exi
   assert.ok(fs.existsSync(path.join(cwd, '.fgos')));
 });
 
-// `setup` appends a source line to every rc file it detects under $HOME, so
-// this must run against a throwaway HOME: inheriting the real one made every
-// `npm test` run permanently append a line naming a temp worktree that the
-// test then deletes, leaving a dead `source` in the developer's own profile
-// that errors on every interactive shell open. `run`'s `extraEnv` already
-// merges over process.env, the same sandboxing test/setup/checks.test.mjs
-// does when it spawns `setup`.
-test('setup inside a .fgos/-less linked worktree still succeeds (setup never touches .fgos/, exempt from the guard)', () => {
-  const { wt } = tmpLinkedWorktree();
-  const tmpHome = rawTmpCwd();
-  const result = run(wt, ['setup'], { HOME: tmpHome, USERPROFILE: tmpHome });
-  assert.equal(result.status, 0, `setup unexpectedly refused: ${result.stderr}`);
-});
-
-// tsk-5hi: setup now also runs every registered fix (`runFixes()`, the same
-// call `doctor --fix` already makes) instead of leaving a person to
-// separately discover and run `doctor --fix`.
 // The persisted view without its cursor. The cursor records which commits were certified when the view was written;
 // every command seals after it writes, so it differs between two reads of the same folded history, while the fold
 // and its revision do not.

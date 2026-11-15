@@ -21,12 +21,11 @@ function mkTempDir(prefix) {
 // script's tier-3 resolution now reads `$HOME/.fgos/runtime/bin-cache.json` (the
 // bin-discovery cache, D4) -- without this, any real cached
 // `bin.globalFgosPath` left on the machine running these tests (from a
-// real `fgos setup`/`doctor --fix` run) would make a test resolve to that
+// real `doctor --fix` run) would make a test resolve to that
 // real global fgos instead of the fixture the test itself set up,
 // answering "unknown verb" instead of matching the fixture's own marker.
-// No test in this file needs a real HOME (rc-file sourcing is covered
-// separately, test/setup/checks.test.mjs's own shell-integration-sourced
-// tests) -- one shared isolated dir for the whole file is enough.
+// No test in this file needs a real HOME -- one shared isolated dir
+// for the whole file is enough.
 const isolatedHome = mkTempDir('fgos-shell-integration-home-');
 const SHELL_ENV = { ...process.env, HOME: isolatedHome };
 

@@ -285,7 +285,7 @@ properties:
         x-fgos-scope: both
         x-fgos-file: config
   enabled:
-    description: "Whether fgos setup and doctor --fix install the mailbox hook rows into this project's Claude Code and Codex hook files; false removes the rows they installed. On by default (owner decision 2026-10-28): a project opts out with mailbox.enabled: false."
+    description: "Whether fgos doctor --fix installs the mailbox hook rows into this project's Claude Code and Codex hook files; false removes the rows it installed. On by default (owner decision 2026-10-28): a project opts out with mailbox.enabled: false."
     type: boolean
     x-fgos-scope: project-only
     x-fgos-file: config

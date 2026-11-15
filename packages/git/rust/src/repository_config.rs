@@ -64,8 +64,8 @@ pub fn publication_fetch_mappings(remote: &str) -> Result<Vec<String>> {
 }
 
 /// Everything a clone's fetch config may carry: the mappings above plus the
-/// mail-body mirror. Setup installs this set; Event Store sync keeps requiring
-/// only the set above, so a clone that has not run setup yet still syncs.
+/// mail-body mirror. `fgos doctor --fix` installs this set; Event Store sync keeps requiring
+/// only the set above, so a clone that has not been repaired yet still syncs.
 pub fn granted_fetch_mappings(remote: &str) -> Result<Vec<String>> {
     let mut all = publication_fetch_mappings(remote)?;
     all.push(format!(
