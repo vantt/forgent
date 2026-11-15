@@ -75,7 +75,7 @@ fn key_path(state_root: &Path) -> PathBuf {
 }
 
 #[cfg(unix)]
-fn private_dir(path: &Path) -> io::Result<()> {
+pub(crate) fn private_dir(path: &Path) -> io::Result<()> {
     use std::os::unix::fs::DirBuilderExt;
     fs::DirBuilder::new()
         .recursive(true)
@@ -84,7 +84,7 @@ fn private_dir(path: &Path) -> io::Result<()> {
 }
 
 #[cfg(not(unix))]
-fn private_dir(path: &Path) -> io::Result<()> {
+pub(crate) fn private_dir(path: &Path) -> io::Result<()> {
     fs::create_dir_all(path)
 }
 

@@ -1033,11 +1033,12 @@
         "\\bcheckObserveDirWritable\\b",
         "\\bcheckObserveHostResolvable\\b",
         "\\bcheckWriterIdentityResolvable\\b",
-        "\\bparseOpensshVersion\\b"
+        "\\bparseOpensshVersion\\b",
+        "\\bprobeIdentity\\b"
       ],
       "allowed": [],
       "debt": [],
-      "reason": "the config, identity and observe doctor rows are judged in process by the host (apps/fgos/src/wiring/doctor/{config,identity,observe}.rs) over the config, identity and observe crates; the Node check and fix bodies and the OpenSSH version reader are gone, and no file may bring one back"
+      "reason": "the config, identity and observe doctor rows are judged in process by the host (apps/fgos/src/wiring/doctor/{config,identity,observe}.rs) over the config, identity and observe crates; the Node check and fix bodies the OpenSSH version reader and the Node host probe of the writer identity are gone, and no file may bring one back"
     },
     {
       "job": "retired Node S3 verb code",

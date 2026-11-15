@@ -388,9 +388,9 @@ pub fn global_dir_entry(args: Value) -> Result<String> {
 mod unix {
     use super::*;
     use fgos_config::doctor::{check, Consumer, Severity};
-    use fgos_config::repair::fix;
+    use fgos_config::repair::fix_with_roots;
     use fgos_config::scope::SourceKind;
-    use fgos_config::write::{init, target_revision, WriteRequest};
+    use fgos_config::write::init;
 
     const LOCK_WAIT_MS: u64 = 5_000;
 
@@ -412,21 +412,9 @@ mod unix {
     pub fn fix_entry(a: Request) -> Res<Value> {
         a.project()?;
         let (roots, detectors) = (a.roots(true)?, on_path());
-        let lock_root = fgos_holder_lock::state_root::lock_root();
-        // Each repair asks for the request of the file it edits; the transaction reads that file again.
-        let request = |target: SourceKind| WriteRequest {
-            roots: roots.clone(),
-            lock_root: lock_root.clone(),
-            target,
-            expected: target_revision(&roots, target).ok().flatten(),
-            edits: Vec::new(),
-            reason: String::new(),
-            acknowledge_comment_loss: a.acknowledge,
-            lock_wait_ms: LOCK_WAIT_MS,
-        };
         let ids: Vec<&str> = a.ids.iter().map(String::as_str).collect();
         let writer = fgos_identity::resolve_current(None);
-        let done = fix(&context(&detectors)?, request, &writer, &ids, a.acknowledge)?;
+        let done = fix_with_roots(&context(&detectors)?, &roots, &writer, &ids, a.acknowledge)?;
         let changed = done
             .applied
             .iter()

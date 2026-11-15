@@ -1,4 +1,12 @@
 {
   "schema": "git-one-door-declarations.v1",
-  "declarations": []
+  "declarations": [
+    {
+      "path": "apps/fgos/src/wiring/doctor/identity.rs",
+      "siteId": "writer_identity_row:9c4f62b40c1e16ccf7d5decfb220ab42ecc894ebef673eaa20658d29c2e68938",
+      "class": "configured-binary",
+      "reason": "the host binary named by the project's activation record, read by fgos_distribution::activated_host_bin",
+      "retireWhen": "p-7aqs6rhb2k"
+    }
+  ]
 }

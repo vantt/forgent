@@ -2334,6 +2334,18 @@ function rustTempRepo(ctx, model, fn, text, depth = 0) {
   return rustTempRepo(ctx, model, fn, init.replace(/\.map_err\([\s\S]*\)\??$/, '').replace(/\?$/, ''), depth + 1);
 }
 
+/** The identity a declaration names for a Rust site: the enclosing function and the digest of the line the site is
+ * reported at, whitespace collapsed. It is stable while that call and its function are unchanged; a changed call
+ * makes the declaration stale and fail by name. */
+function rustSiteId(ctx, site) {
+  const model = ctx.rust.get(site.path);
+  if (!model) return undefined;
+  const lines = model.source.split('\n');
+  const text = (lines[site.line - 1] ?? '').trim().replace(/\s+/g, ' ');
+  const offset = lines.slice(0, site.line - 1).reduce((sum, line) => sum + line.length + 1, 0);
+  return `${model.within(offset)?.name ?? '<module>'}:${sha256(text)}`;
+}
+
 function scanRust(model, ctx) {
   const { name, source, code, within } = model;
   const aliases = ['Command', ...[...code.matchAll(/\bCommand\s+as\s+([A-Za-z_]\w*)/g)].map((m) => m[1])];
@@ -2382,7 +2394,7 @@ function scanRust(model, ctx) {
         if (cls === 'git' && named && rustTempRepo(ctx, named.model, named.fn, named.text)) {
           ctx.classes.push({ ...site, class: 'production-sandbox-probe', function: named.fn?.name, repository: named.text.trim() }); continue;
         }
-        ctx.raw.push({ ...site, family: cls === 'unknown' || cls === 'param' ? 'unresolved-binary' : cls === 'hook' ? 'hook-spawn' : 'rust' });
+        ctx.raw.push({ ...site, siteId: rustSiteId(ctx, site), family: cls === 'unknown' || cls === 'param' ? 'unresolved-binary' : cls === 'hook' ? 'hook-spawn' : 'rust' });
       }
     }
   }

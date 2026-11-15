@@ -427,3 +427,36 @@ test('the census binds declaration bytes so doctor rejects missing or changed de
   fs.unlinkSync(path.join(f.root, DECLARATIONS));
   assert.match(verifyCensus(doc, f.root).message, /git-one-door-declarations.*missing/);
 });
+
+const RUST = [
+  'use std::path::Path;',
+  'use std::process::Command;',
+  'fn run(program: &Path) { let _ = Command::new(program).status(); }',
+  'fn judge() {',
+  '    let bin = chosen_by_the_project();',
+  '    run(&bin);',
+  '}',
+  '',
+].join('\n');
+
+test('a Rust site gets the same kind of identity, a declaration reclasses it, and a changed call makes it stale by name', (t) => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-declarations-rust-'));
+  t.after(() => fs.rmSync(root, { recursive: true, force: true }));
+  const write = (file, text) => { fs.mkdirSync(path.dirname(path.join(root, file)), { recursive: true }); fs.writeFileSync(path.join(root, file), text); };
+  const file = 'apps/fgos/src/judge.rs';
+  write(file, RUST);
+  const [site] = scan({ root }).sites;
+  assert.equal(site.family, 'unresolved-binary');
+  assert.match(site.siteId, /^judge:[a-f0-9]{64}$/);
+  const entry = { path: file, siteId: site.siteId, class: 'configured-binary', reason: 'The binary the project names.', retireWhen: 'The scanner resolves the project data.' };
+  write(DECLARATIONS, JSON.stringify({ schema: 'git-one-door-declarations.v1', declarations: [entry] }));
+  // A line inserted above does not disturb the identity; the site is now a declared class, not an undeclared one.
+  write(file, '// a comment\n' + RUST);
+  const declared = scan({ root });
+  assert.deepEqual(declared.sites, []);
+  assert.equal(declared.classCounts['configured-binary'], 1);
+  assert.equal(declared.classes.find((c) => c.path === file).siteId, entry.siteId);
+  // The call changed: the declaration no longer names a call of this file, and the scan fails by name.
+  write(file, RUST.replace('run(&bin);', 'run(&other);'));
+  assert.throws(() => scan({ root }), /stale or ambiguous Git declaration: apps\/fgos\/src\/judge\.rs judge:/);
+});

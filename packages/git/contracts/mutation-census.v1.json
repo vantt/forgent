@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "dbb9524e3d79868b2c21e7974fb0d1d8ad20ead7e1adf407dbb9d5a9b289a5d1",
+  "payloadDigest": "073d5f263090837ee7f52a0c89b276ed08db86fb18aef4dbddcb6a229c8c9c21",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "b8b886cee2ea5ce7ee1153e4795512db135a990de894c27e53c5e778b210be62",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -94,7 +94,7 @@
     "apps/fgos/src/wiring/doctor/bridge.rs": "05abb106f3337db6a6d2b2e9eadcbc1e393b3b23b63ba41cc05294edd1199ab1",
     "apps/fgos/src/wiring/doctor/config.rs": "51162ec6caa45e2d7cfd1883e4ec5e279e5465406f65a274ead6a5d248bf8d99",
     "apps/fgos/src/wiring/doctor/holder_lock.rs": "0f48a26f2eab091717ae1f71e4461bea7a23c5b6b4cce78fd7e28fd41541b78f",
-    "apps/fgos/src/wiring/doctor/identity.rs": "991882d3049d687daf26678fc2d7ee864a9e2705cd6fe1f284080e8816a734c5",
+    "apps/fgos/src/wiring/doctor/identity.rs": "c77b8f84fb27f10717b264bb839e5c79dd2a817d51263779bb7d233db9469a55",
     "apps/fgos/src/wiring/doctor/mailbox.rs": "543436deb6fd08bf522f0d47caece62d51defa55ea2ebf2d7ec308364ebdc85a",
     "apps/fgos/src/wiring/doctor/mod.rs": "83c00ca31c0223b61a9548d05f08a86c8b1dd89816c9ac105737422097180cb2",
     "apps/fgos/src/wiring/doctor/observe.rs": "277742f65ac2d3ac816d11c212b27ba0fffebd5e121dce4f8370154cd864e03e",
@@ -402,7 +402,7 @@
     "packages/git/node-addon/examples/e3_fixture.rs": "f3a98f5c8de968be2109b9958a5a7d0efeca7fa5000493278277d7bba035a75a",
     "packages/git/node-addon/src/agent_protocol.rs": "2ce97fafe42160657665c87ef6b5a4cdf657ab5d6ac83a8ee289c9b8fe2996fe",
     "packages/git/node-addon/src/canonical_json.rs": "e91f461709624467b89c145b906be459015ac77622522d9cf5e1b663a49bf14b",
-    "packages/git/node-addon/src/config.rs": "6d48bf185f33b2c95bc2e69b63590e03f3957b4dfa7dae3ce96d5610e584dc50",
+    "packages/git/node-addon/src/config.rs": "667a9aabfab918510913908db5856b7361105ec50e3923e2c98f226aacdc7349",
     "packages/git/node-addon/src/durable_file.rs": "92d33582a588824a105683b230a694f3b103657b1b1520fc0b86bac079c490e1",
     "packages/git/node-addon/src/event_store.rs": "189480768df880251eaa5ae181f680e13f8d1a782f098787e87cca21ca8a85ae",
     "packages/git/node-addon/src/git.rs": "60788f729b689bad6b75c8d96e2ff56f5d8c85daa3f95651116b18e929303b65",
@@ -532,7 +532,7 @@
     "packages/identity/rust/src/errors.rs": "2a7c34f15a605f6f14f9f24484d8b980c1ca51791a4f08b4a3da1131eba4adf1",
     "packages/identity/rust/src/launcher.rs": "e84d9ed6e37f4e634371a5d988dec1e7c71194b400808e385343a87723d0398a",
     "packages/identity/rust/src/lib.rs": "b88eaaebb1c2fdbb09d396ceb22740d8e5c960f6bfc07b5407bc20fae3b953ee",
-    "packages/identity/rust/src/machine.rs": "76565f0a603fe092a7ce7f4eb34d41624c7cdf82573a4de551de7638c9f2b5ab",
+    "packages/identity/rust/src/machine.rs": "d9efb6e13e61777ca5f842297406c86a5c2772470ea7e5ea32eee78af006b31e",
     "packages/identity/rust/src/mint.rs": "4ac085ae07ab5b218d3657a3368937b5caa3fabbfe21a862e51a161fa607a171",
     "packages/identity/rust/src/pins.rs": "8a76ca414a538e2f1f0018add8038f48c646cfa473ecdf07c4256ab464dcb60a",
     "packages/identity/rust/src/proc_tree.rs": "94e32e7a329989a8255e442c4947721dfca53f53ae44c82eeedd9ce5e6782266",
@@ -542,7 +542,7 @@
     "packages/identity/rust/src/resolve.rs": "c9b611f02aed198b1acfe408f24cdcfaf77d112dcb906f7290315603707c1f68",
     "packages/identity/rust/src/session.rs": "c47d0ee2bc070e02979f702a17031d48799867de27dd0688c74d6477a255c5a2",
     "packages/identity/rust/src/shared.rs": "0af34e63b1832c74dd7f48aabca466b6ff425b93bd6c54b9206ca29f04c0d995",
-    "packages/identity/rust/src/signing.rs": "d0879d40c77949ebd1ecdc7a1279b0937dafa0aa4ec0f8a9f54a63abd23cfae2",
+    "packages/identity/rust/src/signing.rs": "6fbf0a228f59d0a3c6f37613b6c4eaf769fa4be27919bba31f2825bd9f5ba1d2",
     "packages/identity/rust/src/text.rs": "9639cf6ee8a57d88dbc620a505575ce1054b437c0ac2172426e93193bd45604a",
     "packages/identity/rust/tests/attempt_writer_id.rs": "4a2c27555d3acbedc432e097e5701ecb26c229e7d4283623ec331fad5f11ba36",
     "packages/identity/rust/tests/directory.rs": "23a4e315960c947278a9863a435c281a7e94dae6ee5fac2a89eec351e5326eb8",
@@ -1254,7 +1254,7 @@
     "src/util/refuse-symlink.mjs": "d159c2a509be27fe199675e37d5cb255eb44c1622e806de8a52916366f1cbffa",
     "src/util/release-binary-path.mjs": "f74aefea9a51b750049a9d32b62c2dbd9fb9782f944535b293e9cc352b466f76",
     "src/util/release-targets.mjs": "52157efccc71fa4bc260a47717ab48047792a7057329ab29d9bd6333c322029c",
-    "src/util/session-identity.mjs": "ca63b49e07c8998b11beb2677ff739e08f35575a228017e4d8a6492adaf6e138",
+    "src/util/session-identity.mjs": "a216f345379e23854c73ea9992b56a935208da6bea54b5f819654106884978ee",
     "src/util/slug.mjs": "73ede6899f3214b920683290ce6cce7a2c717fbb80ae88860000348fe8be8c27",
     "src/util/spawn-detached-fgos.mjs": "866621bef7a6ca6900a2b90f9488a0ab139b573c41c6b885b61af470523c1be1",
     "src/util/unique-tmp-tag.mjs": "712eb59d8753224dc3197af5739a3a01fa4188f0b60e6e8ed22a1854d8b68dde",
@@ -1314,7 +1314,7 @@
     "src/workflow/store.mjs": "a22836f4560658fff5a76463157607e368201b01f6f6fff0c2554730aa40e908",
     "src/workflow/unit-handoff.mjs": "27869bc0d550081fb69724f2064161498d64c524389d12b04f2125e9ea151720",
     "src/workflow/units-source.mjs": "fd7d7a3ed5db5f00c6244fc60da479aa739e1935e1ffaf02341f71f3a326e307",
-    "scripts/lib/git-one-door-declarations.v1.json": "c06a8ee8c3164c54bfd3cd4401271c3e080ae3bb86e5a469cf7532d3fd60d3e9"
+    "scripts/lib/git-one-door-declarations.v1.json": "3ff089b6fdbb59c6e58f912603ba8a3e2bae612a1ecebe94e6bc95db590e30d7"
   },
   "sites": [],
   "classes": [
@@ -1820,10 +1820,14 @@
     },
     {
       "path": "apps/fgos/src/wiring/doctor/identity.rs",
-      "line": 179,
+      "line": 299,
       "spawn": "Command::new <- packages/process/rust/src/spawn.rs:141",
-      "binary": "(parsed configuration (activation[\"bin\"]))",
-      "class": "configured-binary"
+      "binary": "? bin",
+      "siteId": "writer_identity_row:9c4f62b40c1e16ccf7d5decfb220ab42ecc894ebef673eaa20658d29c2e68938",
+      "family": "unresolved-binary",
+      "class": "configured-binary",
+      "reason": "the host binary named by the project's activation record, read by fgos_distribution::activated_host_bin",
+      "retireWhen": "p-7aqs6rhb2k"
     },
     {
       "path": "apps/fgos/src/wiring/events.rs",
@@ -4082,14 +4086,6 @@
       "spawn": "execFileSync",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
-    },
-    {
-      "path": "src/util/session-identity.mjs",
-      "line": 68,
-      "spawn": "execFileSync",
-      "binary": "param bin",
-      "class": "uncalled-wrapper",
-      "function": "probeIdentity"
     },
     {
       "path": "src/workflow/case-gate.mjs",

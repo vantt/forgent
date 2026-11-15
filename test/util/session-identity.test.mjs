@@ -14,7 +14,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { IDENTITY_ENV_KEYS } from '../helpers/identity-env.mjs';
-import { identityDoor, probeIdentity, resolveWriterIdentity } from '../../src/util/session-identity.mjs';
+import { identityDoor, resolveWriterIdentity } from '../../src/util/session-identity.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '../..');
@@ -67,20 +67,6 @@ function shellQuote(value) {
 }
 
 /** A stand-in host: a sh script that logs each call then runs `tail`. */
-function standIn(dir, name, tail) {
-  const file = path.join(dir, name);
-  fs.writeFileSync(file, `#!/bin/sh\necho "$$ $*" >> "${file}.calls"\n${tail}\n`, { mode: 0o755 });
-  return file;
-}
-
-function calls(file) {
-  try {
-    return fs.readFileSync(`${file}.calls`, 'utf8').trim().split('\n').filter(Boolean);
-  } catch {
-    return [];
-  }
-}
-
 test('the dispatch writerId format floor uses the contract id charset and length', async () => {
   const contract = JSON.parse(fs.readFileSync(path.join(CONTRACTS, 'identity.writer.v1.json'), 'utf8'));
   const { WRITER_ID_RE, MAX_WRITER_ID_LENGTH } = await import('../../src/runner/dispatch/execution-contract.mjs');
@@ -159,29 +145,6 @@ fs.writeFileSync(${JSON.stringify(out)}, JSON.stringify({ answer: facade.resolve
   assert.deepEqual(answer, { id: session, source: 'pid' });
 });
 
-test('the doctor probe finds the activation host without FGOS_HOST_BIN, runs it with the caller pid and without the invocation record path', (t) => {
-  if (!UNIX) return t.skip('stand-in release binary is a sh script');
-  const host = requireHost(t);
-  const root = tmp('fgos-identity-activation-');
-  const release = path.join(root, 'release');
-  fs.mkdirSync(path.join(release, 'bin'), { recursive: true });
-  const releaseBin = standIn(path.join(release, 'bin'), 'fgos', `echo "record=\${FGOS_INVOCATION_RECORD_PATH:-unset}" >> "${root}/seen"; exec "${host}" "$@"`);
-  fs.mkdirSync(path.join(root, '.fgos', 'installation'), { recursive: true });
-  fs.writeFileSync(path.join(root, '.fgos', 'installation', 'activation.json'), JSON.stringify({ status: 'ready', releasePath: release }));
-  const result = inFreshProcess(`
-    const { resolveActiveHostBin } = await import(${JSON.stringify(new URL('../../src/util/host-bin-path.mjs', import.meta.url).href)});
-    const { bin } = resolveActiveHostBin({ fgosDir: ${JSON.stringify(path.join(root, '.fgos'))}, cwd: ${JSON.stringify(root)} });
-    return { bin, answer: facade.probeIdentity(bin, ${JSON.stringify(path.join(root, '.fgos'))}), pid: process.pid };`, {
-    cwd: os.tmpdir(),
-    env: cleanEnv({ FGOS_HOST_BIN: undefined, FGOS_SESSION_ID: 'via-activation', FGOS_INVOCATION_RECORD_PATH: path.join(root, 'records.jsonl') }),
-  });
-  assert.equal(result.bin, releaseBin);
-  assert.deepEqual(result.answer, { id: 'via-activation', source: 'env' });
-  assert.equal(fs.readFileSync(path.join(root, 'seen'), 'utf8').trim(), 'record=unset');
-  assert.ok(!fs.existsSync(path.join(root, 'records.jsonl')));
-  assert.match(calls(releaseBin)[0], new RegExp(`identity --pid ${result.pid} --fgos-dir ${path.join(root, '.fgos')}$`));
-});
-
 test('without the addon the resolver is host-missing and names the dev door', () => {
   const cwd = tmp('fgos-identity-missing-');
   const result = inFreshProcess(`
@@ -193,33 +156,6 @@ test('without the addon the resolver is host-missing and names the dev door', ()
   assert.equal(result.code, 'host-missing');
   assert.equal(result.category, 'precondition');
   assert.match(result.message, /npm run fgos:dev/);
-});
-
-test('the doctor probe classifies every host failure and never guesses an id', (t) => {
-  if (!UNIX) return t.skip('stand-in hosts are sh scripts');
-  const dir = tmp('fgos-identity-failures-');
-  const oldHost = standIn(dir, 'old', 'echo \'fgos: unknown verb "identity". Usage: fgos <command> [args...]\' >&2; exit 4');
-  const slow = standIn(dir, 'slow', `echo $$ > "${dir}/slow.pid"; exec sleep 10`);
-  const junk = standIn(dir, 'junk', 'echo not json');
-  const okShape = standIn(dir, 'shape', 'echo \'{"contract":"fgos.v1","generated_at":"x","data_hash":"y","data":{"id":"7","source":"pid"}}\'');
-  const broken = standIn(dir, 'broken', 'echo boom >&2; exit 3');
-  const codeOf = (bin) => { try { probeIdentity(bin); } catch (err) { return err; } return { code: 'answered' }; };
-
-  assert.equal(codeOf(path.join(dir, 'absent')).code, 'host-missing');
-  assert.equal(codeOf(oldHost).code, 'host-version-mismatch');
-  assert.equal(codeOf(junk).code, 'host-error', 'an answer that is not JSON');
-  assert.equal(codeOf(okShape).code, 'host-error', 'a pid source with a string id');
-  const hostError = codeOf(broken);
-  assert.equal(hostError.code, 'host-error');
-  assert.match(hostError.message, /exit 3.*boom/);
-
-  const started = Date.now();
-  const hung = codeOf(slow);
-  assert.equal(hung.code, 'host-error', 'a hung host is killed and named');
-  assert.match(hung.message, /ETIMEDOUT|SIGKILL/);
-  assert.ok(Date.now() - started < 6000, `took ${Date.now() - started} ms`);
-  const slowPid = Number(fs.readFileSync(path.join(dir, 'slow.pid'), 'utf8'));
-  assert.throws(() => process.kill(slowPid, 0), { code: 'ESRCH' }, 'the timed-out host was killed and reaped');
 });
 
 test('on every platform an unresolved answer names the calling Node process', (t) => {

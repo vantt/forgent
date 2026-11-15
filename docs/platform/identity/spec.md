@@ -202,7 +202,7 @@ The facade has four exports and decides nothing about the id. `resolveWriterIden
 
 The shared directory is judged by the crate (`shared::judge_directory`: counts, dropped events with reason and machine, entries naming another project, machines shown by id) and reaches Node through `sessionIdentity.sharedDirectory(mainRoot)`; the doctor row `identity-shared-directory` only shows that answer.
 
-`probeIdentity(bin, fgosDir)` is the one exec that remains: doctor asks each candidate host binary `fgos identity --pid <own pid>` directly (2000 ms kill deadline; the child writes no invocation record), so a stale activation shows up by name.
+The host's doctor row `writer-identity-resolvable` (`apps/fgos/src/wiring/doctor/identity.rs`) is the one exec that remains: it resolves the running host in process and asks the activation's host binary, when it is another binary, `fgos identity --pid <own pid>` directly (2000 ms kill deadline; the child writes no invocation record), so a stale activation shows up by name.
 
 Errors (`WriterIdentityError`, category `precondition`, exit 2): `host-missing` (the door cannot load; from a checkout it names `npm run fgos:dev`; the probe's binary cannot run), `host-version-mismatch` (probe only: the active release has no `identity` verb), `host-error` (probe only: the host failed, hung, or printed an unexpected answer), `invalid-attempt-id`. A verb that writes state fails before writing. `unresolved` is a valid answer and blocks nothing.
 

@@ -1916,7 +1916,7 @@ test('door check: every name of the retired Node events, session and gateway cod
 test('door check: every name of the retired Node config, identity and observe doctor rows fails when a file declares it again', () => {
   const row = manifest.doors.find((r) => r.job === 'retired Node config, identity and observe doctor rows');
   assert.ok(row && row.allowed.length === 0, 'the retired-names row exists and allows no file');
-  const names = ['CONFIG_CHECKS', 'CONFIG_FIXES', 'checkIdentityMachineId', 'checkIdentityMachineKey', 'checkIdentityProjectId', 'checkIdentitySharedDirectory', 'checkIdentitySshKeygen', 'fixIdentityMachineId', 'fixIdentityMachineKey', 'checkObserveDirWritable', 'checkObserveHostResolvable', 'checkWriterIdentityResolvable', 'parseOpensshVersion'];
+  const names = ['CONFIG_CHECKS', 'CONFIG_FIXES', 'checkIdentityMachineId', 'checkIdentityMachineKey', 'checkIdentityProjectId', 'checkIdentitySharedDirectory', 'checkIdentitySshKeygen', 'fixIdentityMachineId', 'fixIdentityMachineKey', 'checkObserveDirWritable', 'checkObserveHostResolvable', 'checkWriterIdentityResolvable', 'parseOpensshVersion', 'probeIdentity'];
   assert.equal(row.patterns.length, names.length, 'one pattern per retired name');
   for (const name of names) {
     const failures = checkDoors([row], new Map([['src/seeded.mjs', `export function ${name}() {}\n`]]));

@@ -1,9 +1,7 @@
 // Node facade over the writer identity: the rule lives in the Rust crate fgos-identity, read in process through the
 // native door (docs/platform/identity/spec.md §7a). It decides nothing about the id; no door means WriterIdentityError.
-import { execFileSync } from 'node:child_process';
 import path from 'node:path';
 import { nativeDoor } from '../native/door.mjs';
-import { routeEnv } from './host-bin-path.mjs';
 
 export class WriterIdentityError extends Error {
   constructor(code, message) {
@@ -59,24 +57,3 @@ export function launcherEnv(writerId, parent = null) {
   }
 }
 
-/** Doctor's probe: asks host binary `bin` (`fgos identity`) for this process's answer. Codes: host-missing, host-version-mismatch, host-error. */
-export function probeIdentity(bin, fgosDir) {
-  const env = routeEnv();
-  const args = ['identity', '--pid', String(process.pid), ...(fgosDir ? ['--fgos-dir', path.resolve(fgosDir)] : [])];
-  let stdout;
-  try {
-    stdout = execFileSync(bin, args, { env, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], timeout: 2000, killSignal: 'SIGKILL', maxBuffer: 64 * 1024, windowsHide: true });
-  } catch (err) {
-    const stderr = String(err.stderr ?? '').trim();
-    if (err.code === 'ENOENT' || err.code === 'EACCES') throw new WriterIdentityError('host-missing', `cannot run ${bin} (${err.code})`);
-    if (err.status === 4 && stderr.includes('unknown verb "identity"')) throw new WriterIdentityError('host-version-mismatch', `${bin} has no "identity" verb: the active release is older than this payload; restage/activate it (fgctl), or run a plain \`git commit\` with FGOS_HOST_BIN pointing at a host built from this checkout`);
-    const how = err.code ? `error ${err.code}` : err.signal ? `signal ${err.signal}` : `exit ${err.status}`;
-    throw new WriterIdentityError('host-error', `${bin} identity failed (${how})${stderr ? `: ${stderr.slice(0, 500)}` : ''}`);
-  }
-  let data;
-  try { const envelope = JSON.parse(stdout); data = envelope?.contract === 'fgos.v1' ? envelope.data : undefined; } catch { /* the shape check below names it */ }
-  const named = typeof data?.id === 'string' && data.id.length > 0 && (data.source === 'registry' || data.source === 'env');
-  const numbered = Number.isInteger(data?.id) && data.id > 0 && (data.source === 'pid' || data.source === 'unresolved');
-  if (!named && !numbered) throw new WriterIdentityError('host-error', `${bin} identity printed an unexpected answer: ${String(stdout).slice(0, 200)}`);
-  return { id: data.id, source: data.source };
-}

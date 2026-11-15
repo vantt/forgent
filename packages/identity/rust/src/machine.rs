@@ -78,16 +78,7 @@ pub fn mint(state_root: &Path, hostname: &str) -> Result<(bool, String), Error> 
 /// Makes the state root (private, parents included) and answers its canonical path, which is the directory
 /// every file of the machine's identity is written under.
 pub fn prepare_state_root(state_root: &Path) -> std::io::Result<PathBuf> {
-    #[cfg(unix)]
-    {
-        use std::os::unix::fs::DirBuilderExt;
-        fs::DirBuilder::new()
-            .recursive(true)
-            .mode(0o700)
-            .create(state_root)?;
-    }
-    #[cfg(not(unix))]
-    fs::create_dir_all(state_root)?;
+    crate::signing::private_dir(state_root)?;
     fs::canonicalize(state_root)
 }
 
