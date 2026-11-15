@@ -3,6 +3,17 @@
 Start after: S4 on main, plan approved. Wave 1, parallel with 01, 02, 13. Rules: [phase-lead-rules.md](phase-lead-rules.md).
 Facts: F7, F10. Worktree `erd-p14`, report slug `erd-p14-unit-tier`. Effort: 1.5d.
 
+## Why this phase exists, and its limit
+
+- **Why:** step 2 (phase 05) removes the capability rows, which today give council units without a `seats:` block
+  their tier, checker seats included. A unit cannot declare a tier today (`unit.mjs:10`, `definition.mjs:22`), so
+  without this phase those checker seats would drop to `defaults.tier`.
+- **Narrow fix:** this phase adds only the `tier` declaration on units of registered workflow definitions, read by
+  `workflowTierOf` as the fallback after the seat's own tier: no other unit key, no ceiling (`maxTier`) key, no change
+  to units files, stdin units or `fgos run`, no change to the Seat Binding crate.
+- **Stop rule:** if the work grows past that (another key, a ceiling, a crate or precedence change, units outside
+  registered workflow definitions), the phase lead stops and asks the plan lead before going on.
+
 ## Context
 
 The owner's direction for capability step 2 (`docs/platform/vision.md` section 6): "A workflow step declares the tier

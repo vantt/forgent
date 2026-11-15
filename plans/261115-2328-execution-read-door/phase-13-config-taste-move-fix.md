@@ -4,6 +4,17 @@ Start after: S4 on main, plan approved. Wave 1, parallel with 01, 02, 14; **03 l
 [phase-lead-rules.md](phase-lead-rules.md). Facts: F6, F10 (Config repair mechanism). Worktree `erd-p13`, report slug
 `erd-p13-taste-move-fix`. Effort: 1.5d.
 
+## Why this phase exists, and its limit
+
+- **Why:** step 2 (phase 03) removes `roles`, `personas` and `seats` from `runner.capabilities.<x>`. Any config that
+  still holds them is then refused on load, and a refused config makes the PreToolUse hook block every agent Task call
+  (`dispatch/hook.mjs:50-54`). Without this repair, step 2 would stop agent work in every project until a person edits
+  the file by hand.
+- **Narrow fix:** this phase repairs only the retired per-capability keys (`runner.capabilities.<x>.roles|personas|seats`)
+  and nothing else: no other key, no general key-move or migration rule, no change to `fgos config migrate`.
+- **Stop rule:** if the work grows past that (another key, a generic rename mechanism, a change outside Config's
+  existing repair module and its contract), the phase lead stops and asks the plan lead before going on.
+
 ## Context
 
 Phase 03 removes `roles`, `personas` and `seats` from `runner.capabilities.<x>` (schema `additionalProperties: false`).

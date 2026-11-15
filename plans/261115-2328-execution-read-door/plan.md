@@ -70,8 +70,8 @@ known defect, which becomes a backlog row); launch, lease, transport and confine
 | 00 | [Facts, census, prior art](phase-00-facts.md) | (record only) | - | done | done |
 | 01 | [Executor-model contract](phase-01-executor-model-contract.md) | `docs/platform/runner/contracts/executor-model.md`, `packages/execution/contracts/executor-model.v1.json`, `test/runner/dispatch/executor-model-vectors.test.mjs`, `component-boundary.md` row, runner pointers, `docs/reading-map.md` | S4 landed | 1.5d | pending |
 | 02 | [Councils to a domain](phase-02-councils-to-domain.md) | `core/workflows/*` -> `domains/council/**`, references, renders | S4 landed | 1d | pending |
-| 13 | [Config repair for moved taste](phase-13-config-taste-move-fix.md) | `packages/config/contracts/doctor-rows.v1.json`, `packages/config/rust/src/{repair,doctor}.rs` + tests | S4 landed | 1.5d | pending |
-| 14 | [Workflow unit tier](phase-14-workflow-unit-tier.md) | `src/workflow/definition.mjs`, `seat-resolver.mjs`, `unit.mjs` (message), workflow spec, one line of seat-binding spec 6.1 | S4 landed | 1.5d | pending |
+| 13 | [Config repair for moved taste](phase-13-config-taste-move-fix.md) | `packages/config/contracts/doctor-rows.v1.json`, `packages/config/rust/src/{repair,doctor}.rs` + tests. Exists because step 2 would otherwise make a refused config block every agent Task call; repairs only the retired per-capability keys; stop and ask the plan lead if it grows | S4 landed | 1.5d | pending |
+| 14 | [Workflow unit tier](phase-14-workflow-unit-tier.md) | `src/workflow/definition.mjs`, `seat-resolver.mjs`, `unit.mjs` (message), workflow spec, one line of seat-binding spec 6.1. Exists because step 2 would otherwise drop checker seats to the default tier; adds only the tier declaration on registered workflow units; stop and ask the plan lead if it grows | S4 landed | 1.5d | pending |
 | 03 | [Taste tables](phase-03-seat-binding-config-shape.md) | `packages/seat-binding/**` (model, policy, explain, golden), schema, standard roles/seats blocks, `capability-config.mjs`, `seat-policy.mjs`, `dispatch/config.mjs`, `agent-definitions.mjs`, `.fgos/config.yaml`, seat-binding spec 6, `vision.md` | S4 landed; lands after 02, 13, 14 | 3d | pending |
 | 04 | [Crate and executor model](phase-04-crate-executor-model.md) | `packages/execution/rust/{Cargo.toml,src/{lib,ports,executor_model}.rs,tests/golden_executor_model.rs}`, root `Cargo.toml`, `Cargo.lock` | 01 | 2.5d | pending |
 | 05 | [Capability rows removal](phase-05-capability-rows-removal.md) | standard rows, council/marketing unit tier+rigor, `propose-validate.mjs`, `capability-plan-lint.mjs`, `registrations.mjs` (catalog, workflow row), Q3 consumers | 02, 03, 14 **and owner answers Q2-Q4**; never beside 09 or 11 | 3d | pending |
@@ -160,6 +160,7 @@ caller; pre-admission asks `preflight`; replay asks `digest` before rebinding. D
 | Parallel census/suite-line conflicts | H x L | regenerate-never-merge |
 | S1 lands in between and edits `HookKind` | M x L | collision table; second lander rebases |
 | The landed S4 bridge needs an operation dispatch for `--work` | M x M | re-read item 2; +0.5d in 10 |
+| Phases 13 and 14 add mechanisms and grow beyond their purpose (a general config-key migration; more unit keys or a ceiling) | M x M | each exists only to keep step 2 from breaking the hook (13) or dropping checker seats to the default tier (14); 13 repairs only the retired per-capability keys, 14 adds only the unit `tier` on registered workflows; stop rule in both: the phase lead stops and asks the plan lead if the work grows past that |
 
 ## Collision table
 
