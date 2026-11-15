@@ -18,12 +18,19 @@ Status: done (read on `origin/main` `0b425a2f0`, 2026-11-15). Every later phase 
   document". Every edit is committed by `commit` (`edit.rs:261`), which re-parses the result under the same profile and
   refuses any result whose value differs from the intended one (spec section 5, guarantee 2). That re-parse check is the
   round-trip guarantee the backlog row asks for.
+- Hidden characters: `check_value` (`edit.rs:438-443`) checks depth only; the `tool` profile refuses bidi and zero-width
+  characters in keys only (`packages/yaml-doc/contracts/profiles.v1.json`, `refuse-keys-only`); `plain_ok`/`double_quoted`
+  escape only `is_control` plus U+2028/2029/FEFF, so such a value is written raw. `Hidden::of` (`comment.rs:50-61`) is the
+  crate's one hidden set.
 - Rendering of new content: `render_for` (`edit.rs:1119`), `map_lines`/`entry_lines`/`seq_lines` (`:967-1005`), scalar quoting
   `string`/`plain_ok`/`single_ok`/`double_quoted` (`:889-1068`): a plain scalar only when it reads back as the same string
   (`plain_ok`, `:1007-1039`, ends in `resolve(...) == Str`); `": "`, `" #"`, leading indicator, `---` prefix all force quotes;
   an empty mapping renders inline `{}` (`:921`).
 - Production use of "write new YAML through `set`": `packages/config/rust/src/write.rs:349-418` (`produce`) parses a
   header-only text and calls `doc.set(path, Doc::from_json(value), loss)` per key, then `doc.to_bytes()`.
+- Key order inside the crate: `packages/yaml-doc/rust/Cargo.toml:8` has plain `serde_json`; under `cargo test -p
+  fgos-yaml-doc` (resolver 2, root `Cargo.toml:40`) `Value::from_json` sorts keys. Only a workspace build unifies
+  `preserve_order` from `fgos-config`.
 - Gap (code trace, to be proven red first in phase 01): on a document that holds no node, `set_inner` (`edit.rs:71-117`)
   takes the `chain.is_empty()` branch, wraps the value with `nested_map([], value)` and then appends only the FIRST entry
   (`entries.remove(0)`, `:94-96`, `plan_append_root` `:1375-1391`); `commit` then compares the full intended value and
@@ -38,7 +45,9 @@ Status: done (read on `origin/main` `0b425a2f0`, 2026-11-15). Every later phase 
 
 ## F3. Census of YAML text written by string building (Node, Rust, scripts)
 
-Searched `bin src scripts apps packages core domains .githooks plugins/fgOS tools` for fence literals (`'---'`, `"---\n`,
+Searched `bin src scripts apps packages core domains .githooks plugins/fgOS tools herdr-dashboard components` (all
+tracked extensions, including the 18 `.ts`/`.tsx` gateway web files and the tracked `.py` files outside `plans/`, which
+the doors check does not scan) for fence literals (`'---'`, `"---\n`,
 `` `---\n ``, template lines ending in `` `--- ``), `key: ${...}` emission, `writeln!`/`format!`/`push_str` with `---` in
 Rust, `.yaml` files written from strings, and `stringify`/`dump` names. Result:
 
@@ -58,7 +67,8 @@ Rust, `.yaml` files written from strings, and `stringify`/`dump` names. Result:
   (`cutFrontmatter`); `src/setup/instruction-projections.mjs:133` writes a Markdown bullet; `scripts/test-proof-inventory.mjs:346,374`
   reads `---` lines of a unified diff; `src/runner/worker-log.mjs:30`, `scripts/record-mailbox-hook-fixtures.mjs:316,1164`,
   `scripts/probe-storytelling-material.mjs:132` write `--- label ---` text; Rust has no YAML text writer outside the crate
-  (`packages/config/rust/src/write.rs` goes through `Document::set`). No `.py`/`.sh`/`.ps1` writer.
+  (`packages/config/rust/src/write.rs` goes through `Document::set`). No `.py`/`.sh`/`.ps1`/`.ts`/`.tsx` writer (`git ls-files '*.ts' '*.tsx' '*.py' | xargs grep -ln -e '---'` finds only
+  `plans/reports/` analysis scripts, not product); `components/` holds Markdown only.
 - Rows 1-5 bytes today vs the emitter (from `plain_ok`): rows 1-4 render identically (`yes`, `none`, `sha256:copy`,
   `explanation`, `Decisions index`, `diataxis`, `how-to` are plain strings under the `tool` profile; `true` and integers are
   plain). Row 5 changes: a `description` holding `": "` becomes double-quoted (today's committed
@@ -83,7 +93,7 @@ Rust, `.yaml` files written from strings, and `stringify`/`dump` names. Result:
   2026-08-17), `5b2b91044` (case answer file, 2026-10-19), `33937a93a` (project-agents frontmatter, 2026-08-16). None was a
   deliberate second YAML authority; each predates a door that could write.
 - Side fact (not this plan's scope, see owner question Q1): `3133ed474` removed `model:` from the agent projection
-  ("names no model", `scripts/project-agents.mjs:101-104`) without regenerating the committed `.claude/agents/*.md`, which
+  ("names no model", `scripts/project-agents.mjs:106-110`) without regenerating the committed `.claude/agents/*.md`, which
   still carry `model: sonnet`/`model: haiku`. No test compares committed projections with the generator.
 
 ## F5. Guard mechanics
@@ -108,3 +118,13 @@ Rust, `.yaml` files written from strings, and `stringify`/`dump` names. Result:
 | Writer 3 | `test/workflow/case-runtime.test.mjs:44` (regex over the frontmatter bytes) |
 | Writer 4 | `test/skills/knowledge-canary.test.mjs` (end-to-end canary) |
 | Writer 5 | `test/scripts/project-agents.test.mjs:45-70` (tools line, no model line, skills flow line, no skills), `:188` (newline refused) |
+
+## F7. The committed Git mutation census pins every file this plan edits
+
+- `packages/git/contracts/mutation-census.v1.json` stores a sha256 per product file plus one `payloadDigest`; it lists
+  `src/util/yaml.mjs`, `src/native/door.mjs`, the five writers, `packages/yaml-doc/rust/src/edit.rs`,
+  `packages/git/node-addon/src/yaml.rs` and the touched test files (e.g. `:407-408`, `:791`, `:914`, `:996`, `:1246`).
+- `.githooks/pre-commit:424` (`censusDriftRefusal`, called at `:585`) refuses a commit that stages a judged file without a
+  regenerated census; `test/setup/git-mutation-census.test.mjs:9-14` fails on a stale census;
+  `scripts/git-one-door-scan.mjs --write-census` regenerates it. So every phase commit that touches code carries a
+  regenerated census, and parallel phases all rewrite the same `payloadDigest` line.

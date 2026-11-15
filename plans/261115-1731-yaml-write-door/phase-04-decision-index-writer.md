@@ -15,19 +15,25 @@ renders the three keys identically (F3).
   `writeFrontmatter({ type: 'explanation', title: 'Decisions index', generated: true }, lines.join('\n'), 'docs/decisions/index.md')`
   where `lines` now starts with `''` (the blank line after the closing fence today). Keep the function's JSDoc paragraph on
   why `type: explanation` is there.
-- Owning proof: the pure cases in `test/report/decision-index.test.mjs` (from `:46`) gain one assertion in an existing case:
-  `readFrontmatter(markdown).meta` deep-equals the three keys. No new test.
+- No test change. Owning drift proof of the committed index: `test/scripts/doc-health.test.mjs:150-154` ("the committed
+  decisions index is a fixpoint of the generator over its own rows") compares the rebuilt text with
+  `docs/decisions/index.md` byte for byte; it must stay green. That matters beyond the file: `readDecisionIds`
+  (`src/setup/instruction-registry.mjs:95-107`) returns an empty set silently when the bytes differ.
+- Consumers (now need the addon): `src/report/decision-index.mjs:135` (`computeDecisionIndex`), `bin/fgos.mjs:40` import
+  (`fgos decision-index`), `src/setup/instruction-registry.mjs:106` (outside the `try` that guards `listWork`). Each already
+  needs the addon: `instruction-registry.mjs:17` imports `parseYaml` and `cutFrontmatter` and calls them on the same path.
+  A refusal from `writeFrontmatter` here is impossible for the literal meta; no new handling.
 
 ## Files
 
-- Modify: `src/report/decision-index.mjs`, `test/report/decision-index.test.mjs` (one assertion).
+- Modify: `src/report/decision-index.mjs`, `packages/git/contracts/mutation-census.v1.json` (regenerated).
 - Create/Delete: none. Tests retired: none. `docs/decisions/index.md`: must stay byte-identical.
 - Net size: about -5 / +3 lines.
 
 ## Steps
 
-1. Add the assertion (passes on today's bytes), change the writer.
-2. `node scripts/run-tests.mjs test/report/decision-index.test.mjs test/report/enduser-index.test.mjs test/setup/instruction-registry.test.mjs`
+1. Change the writer.
+2. `node scripts/run-tests.mjs test/scripts/doc-health.test.mjs test/setup/git-mutation-census.test.mjs test/report/decision-index.test.mjs test/report/enduser-index.test.mjs test/setup/instruction-registry.test.mjs`
    plus the `rg -l "decision-index" test` list; `npm run fgos:dev -- decision-index --check` exits 0.
 3. Gates in phase-lead-rules.
 

@@ -18,14 +18,14 @@ staged test environment (`test/skills/knowledge-canary.test.mjs`), so the addon 
 
 ## Files
 
-- Modify: `scripts/knowledge-canary.mjs`.
+- Modify: `scripts/knowledge-canary.mjs`, `packages/git/contracts/mutation-census.v1.json` (regenerated).
 - Create/Delete: none. Tests retired: none.
 - Net size: +1 / -1 lines.
 
 ## Steps
 
 1. Change the line and the import.
-2. `node scripts/run-tests.mjs test/skills/knowledge-canary.test.mjs`.
+2. `node scripts/run-tests.mjs test/skills/knowledge-canary.test.mjs test/setup/git-mutation-census.test.mjs`.
 3. Gates in phase-lead-rules.
 
 ## Acceptance

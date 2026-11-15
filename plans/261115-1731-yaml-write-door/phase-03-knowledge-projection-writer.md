@@ -14,20 +14,24 @@ committed file must not change.
 
 - `md` starts as `writeFrontmatter({ generated: true }, '# Knowledge Registry Index\n\n> **WARNING**: ... overwritten.\n\n', 'docs/doc-registry.md')`
   (body text exactly as today); import `writeFrontmatter` from `../util/yaml.mjs`. Nothing else in the function changes.
-- The owning proof of this writer's metadata becomes value-level: `test/report/knowledge-lints.test.mjs:42`
-  `assert.ok(mdContent.includes('generated: true'))` becomes `assert.deepEqual(readFrontmatter(mdContent).meta, { generated: true })`.
-  Same behaviour, stronger assertion (not a weakening).
+- No test change. `writeFrontmatter` checks on every call that the block reads back to the meta (phase 02), and the meta
+  here is a literal, so a per-writer read-back assertion would repeat that proof (design principle 8). The existing
+  `test/report/knowledge-lints.test.mjs:42` stays as is.
+- Consumers (the projection now needs the addon): `bin/fgos.mjs:1531` (`fgos doc-registry`, already loads the native door
+  through its YAML and state reads); `test/report/knowledge-lints.test.mjs`. No setup or doctor path calls it.
+- Drift proof for the committed `docs/doc-registry.md`: no test compares it today; the gate is `fgos doc-registry --check`
+  (step 2), recorded in the report.
 
 ## Files
 
-- Modify: `src/report/knowledge-projection.mjs`, `test/report/knowledge-lints.test.mjs` (that one assertion).
+- Modify: `src/report/knowledge-projection.mjs`, `packages/git/contracts/mutation-census.v1.json` (regenerated).
 - Create/Delete: none. Tests retired: none. `docs/doc-registry.md`: must stay byte-identical (if it differs, stop and report).
-- Net size: about -6 / +2 lines.
+- Net size: about -6 / +2 lines; no test lines.
 
 ## Steps
 
-1. Change the assertion (passes already: the hand-written block parses), then the writer.
-2. `node scripts/run-tests.mjs test/report/knowledge-lints.test.mjs` plus tests that `rg -l "knowledge-projection|computeKnowledgeProjection|doc-registry" test` lists;
+1. Change the writer.
+2. `node scripts/run-tests.mjs test/report/knowledge-lints.test.mjs` plus `test/setup/git-mutation-census.test.mjs` and tests that `rg -l "knowledge-projection|computeKnowledgeProjection|doc-registry" test` lists;
    `npm run fgos:dev -- doc-registry --check` from the worktree root exits 0 (no drift).
 3. Gates in phase-lead-rules.
 
