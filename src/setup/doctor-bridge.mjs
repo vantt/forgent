@@ -91,10 +91,18 @@ async function main() {
   process.stdout.write = (...args) => process.stderr.write(...args);
   const chunks = [];
   for await (const chunk of process.stdin) chunks.push(chunk);
-  const { runBridged } = await import('./registrations.mjs');
+  // The rows' bodies load only for the requests that run rows.
+  const text = Buffer.concat(chunks).toString('utf8');
+  let runsRows = true;
+  try { runsRows = parseRequest(text).phase !== 'work-store-init'; } catch { /* serve answers a malformed request */ }
+  let runBridged;
+  if (runsRows) {
+    const rows = await import('./registrations.mjs');
+    runBridged = rows.runBridged;
+  }
   // Loaded only for the one request that needs the store.
   const initStore = async (dir) => (await import('../state/store.mjs')).initStore(dir);
-  process.exitCode = await serve(Buffer.concat(chunks).toString('utf8'), { write, runBridged, initStore });
+  process.exitCode = await serve(text, { write, runBridged, initStore });
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1] ?? '').href) {

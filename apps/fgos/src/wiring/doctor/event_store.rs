@@ -364,19 +364,22 @@ pub fn judge(run: &Run, id: &str) -> Option<RowResult> {
     }))
 }
 
+/// Makes the store's directories under the Git common dir real 0700 directories for the project at `root`: the
+/// setup context (the repository, then the strict `eventStore` config) names the open root, and the Event Store
+/// crate prepares it. The one piece of glue the lock-directory fix and `fgos init` share.
+pub(crate) fn prepare_store_directories(root: &Path, state_root: &Path) -> Result<bool, String> {
+    let context = build_context(root, state_root)?;
+    let open_root = context.facts()["openRoot"].as_str().unwrap_or_default();
+    fgos_event_store::locks::prepare_directories(Path::new(open_root)).map_err(|e| e.detail)
+}
+
 /// Runs `id` when it is an Event Store fix.
 pub fn fix(run: &Run, id: &str) -> Option<FixResult> {
     if !FIX_IDS.contains(&id) {
         return None;
     }
     debug_assert_eq!(id, LOCK_DIRS_FIX);
-    let outcome = build_context(run.root, &run.state_root).and_then(|context| {
-        let open_root = context.facts()["openRoot"]
-            .as_str()
-            .unwrap_or_default()
-            .to_owned();
-        fgos_event_store::locks::prepare_directories(Path::new(&open_root)).map_err(|e| e.detail)
-    });
+    let outcome = prepare_store_directories(run.root, &run.state_root);
     Some(match outcome {
         Ok(changed) => FixResult::done(
             id,

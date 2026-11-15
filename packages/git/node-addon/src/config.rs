@@ -389,10 +389,6 @@ mod unix {
     use super::*;
     use fgos_config::doctor::{check, Consumer, Severity};
     use fgos_config::repair::fix_with_roots;
-    use fgos_config::scope::SourceKind;
-    use fgos_config::write::init;
-
-    const LOCK_WAIT_MS: u64 = 5_000;
 
     pub fn check_entry(a: Request) -> Res<Value> {
         a.project()?;
@@ -421,24 +417,6 @@ mod unix {
             .map(|(fix, path)| json!({ "fix": fix, "path": path }));
         Ok(json!({ "changed": changed.collect::<Vec<_>>(), "skipped": done.skipped }))
     }
-
-    pub fn init_entry(a: Request) -> Res<Value> {
-        let target = match a.target.as_deref() {
-            Some("project") => SourceKind::Project,
-            Some("global") => SourceKind::Global,
-            _ => return Err(invalid("target")),
-        };
-        if target == SourceKind::Project {
-            a.project()?;
-        }
-        let made = init(
-            &a.roots(false)?,
-            target,
-            &fgos_holder_lock::state_root::lock_root(),
-            LOCK_WAIT_MS,
-        )?;
-        Ok(json!({ "created": made.created, "file": made.file, "revision": made.revision }))
-    }
 }
 
 /// Writes and the findings engine need the no-follow primitives of Durable File, which are Unix only.
@@ -450,7 +428,6 @@ mod unix {
         Err(failure("config-platform-unsupported", "write"))
     }
     pub use check_entry as fix_entry;
-    pub use check_entry as init_entry;
 }
 
 /// The findings of the config files of a project and the machine, each source judged on its own, with the
@@ -467,11 +444,4 @@ pub fn check_config(args: Value) -> Result<String> {
 #[napi(namespace = "config", js_name = "fix")]
 pub fn fix_config(args: Value) -> Result<String> {
     entry(args, unix::fix_entry)
-}
-
-/// Creates the header-only file of a scope that has none: `{ created, file, revision }`; an existing file, legacy
-/// JSON included, is kept. `{ projectRoot?, globalDir, class, target: "project" | "global" }`.
-#[napi(namespace = "config", js_name = "init")]
-pub fn init_config(args: Value) -> Result<String> {
-    entry(args, unix::init_entry)
 }

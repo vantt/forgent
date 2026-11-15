@@ -268,14 +268,9 @@ impl Steps for Live {
     }
 
     fn prepare_store_directories(&self, root: &Path) -> Result<(), StepFailure> {
-        use super::doctor::event_store::build_context;
-        // The store's setup context is the doctor's: the repository, then the strict `eventStore` config, so a
-        // refused config file stops init here as it stops the lock-directory repair.
-        let context = build_context(root, &self.state_root).map_err(StepFailure::plain)?;
-        let open_root = context.facts()["openRoot"].as_str().unwrap_or_default();
-        fgos_event_store::locks::prepare_directories(Path::new(open_root))
+        super::doctor::event_store::prepare_store_directories(root, &self.state_root)
             .map(|_| ())
-            .map_err(|error| StepFailure::plain(error.detail))
+            .map_err(StepFailure::plain)
     }
 
     fn create_work_store(&self, root: &Path) -> Result<(), StepFailure> {
@@ -314,13 +309,12 @@ impl Steps for Live {
     }
 
     fn recover_git(&self, root: &Path) -> Result<Option<Value>, String> {
-        let own = |fgos_dir: &Path| {
-            fgos_identity::resolve_current(Some(fgos_dir))
-                .id
-                .to_string()
-        };
-        let recovered = fgos_git::incidents::recover_git_operations(&self.state_root, root, &own)
-            .map_err(|error| error.cause().to_owned())?;
+        let recovered = fgos_git::incidents::recover_git_operations(
+            &self.state_root,
+            root,
+            &super::git_incidents::own_writer,
+        )
+        .map_err(|error| error.cause().to_owned())?;
         Ok(
             (!recovered.recovered.is_empty() || !recovered.kept.is_empty()).then(|| {
                 json!({

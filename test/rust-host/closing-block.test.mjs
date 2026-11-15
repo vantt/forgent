@@ -27,21 +27,12 @@ const CANNED = {
   },
 };
 
-/**
- * The payload's rows bridge of a release copy, replaced by one that answers from `CANNED_DOCTOR` and logs each call.
- * The Work store step of `init` is not a row: it creates the real store (it also initialises Git's journal, which a
- * doctor row judges), so only the rows are canned.
- */
+/** The payload's rows bridge of a release copy, replaced by one that answers from `CANNED_DOCTOR` and logs each call. */
 const CANNED_BRIDGE = `import fs from 'node:fs';
-import path from 'node:path';
 const input = JSON.parse(fs.readFileSync(0, 'utf8'));
 if (process.env.CALL_LOG) fs.appendFileSync(process.env.CALL_LOG, 'doctor ' + input.phase + '\\n');
 const canned = JSON.parse(process.env.CANNED_DOCTOR ?? '{}');
 const write = (kind, body) => fs.writeSync(1, '\\u001eFGOS-DOCTOR-BRIDGE ' + JSON.stringify({ kind, ...body }) + '\\n');
-if (input.phase === 'work-store-init') {
-  const { initStore } = await import('../state/store.mjs');
-  initStore(path.join(input.dir, '.fgos'));
-}
 for (const id of input.ids) {
   if (input.phase === 'fix') write('fix', { id, changed: false, message: 'canned' });
   else write('row', { id, ...(canned[id] ?? { passed: true, message: 'fine' }) });
@@ -144,7 +135,9 @@ test('a clean doctor ends the tail after init and one doctor run, and a rerun of
       const env = { HOME: home, CANNED_DOCTOR: JSON.stringify(CANNED.ok), CALL_LOG: log };
       const first = runFgctlRaw(['init', '--from', release.dir], { cwd: proj, stateHome: state, env });
       assert.equal(first.status, 0, first.stderr);
-      assert.deepEqual(calls(log), ['doctor work-store-init', 'doctor check'], 'init always runs (it asks the bridge for the Work store); a clean doctor skips doctor --fix');
+      // A fresh project's Git journal is not initialised by `init`, so its first doctor names `doctor --fix`; the
+      // fix makes it, and every later run finds a clean doctor.
+      assert.deepEqual(calls(log), ['doctor work-store-init', 'doctor check', 'doctor fix', 'doctor check', 'doctor check'], 'init always runs (it asks the bridge for the Work store)');
       fs.rmSync(log);
 
       for (const args of [['init', '--from', release.dir], ['upgrade', '--from', release.dir]]) {

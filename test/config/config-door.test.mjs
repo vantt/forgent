@@ -11,7 +11,6 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { combinedAbiMatches, fromDoorJson, nativeDoor } from '../../src/native/door.mjs';
 import { initFixtureRepo } from '../helpers/git-fixture.mjs';
-import { readRawProjectConfig } from '../helpers/config-fixture.mjs';
 
 // The door resolves the main checkout through a Git driver that keeps its directories under the state root.
 process.env.FGOS_STATE_HOME = fs.mkdtempSync(path.join(os.tmpdir(), 'config-door-state-'));
@@ -135,15 +134,4 @@ test('snapshot refuses by failure id, listing every refusal with its position an
   assert.equal(refusal('snapshot', { globalDir: d.global, class: 'maybe' }).id, 'config-request-invalid');
   assert.equal(refusal('snapshot', { globalDir: 'relative', class: 'unconfined' }).keyword, 'globalDir');
   assert.equal(refusal('snapshot', { globalDir: d.global, class: 'unconfined', surprise: 1 }).id, 'config-request-invalid');
-});
-
-// The header-only file, keeping an existing yaml or legacy json file and the other refusals of init are owned by
-// packages/config/rust/tests/golden_init.rs; this proves only the door's wiring: the entry, no prototype, one refusal by id.
-test('init reaches the crate through the door, answers with no prototype and refuses a confined session by id', () => {
-  const d = dirs('init');
-  const args = { projectRoot: d.project, globalDir: d.global, class: 'unconfined', target: 'project' };
-  const made = call('init', args);
-  assert.deepEqual([made.created, made.file, Object.getPrototypeOf(made)], [true, 'config.yaml', null]);
-  assert.match(readRawProjectConfig(d.project), /^# @fgos:v1\n/);
-  assert.equal(refusal('init', { ...args, class: 'confined' }).id, 'config-write-confined');
 });

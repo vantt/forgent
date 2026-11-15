@@ -118,8 +118,6 @@ export const checkConfig = (options) => call('check', options);
 /** Applies the named repairs (`ids`) a check offered: `{ changed: [{ fix, path }], skipped }`. A confined session is refused. */
 export const fixConfig = (options) => call('fix', options);
 
-/** Creates the header-only config file of `target` (`'project'` or `'global'`) when that scope has none: `{ created, file, revision }`, `file` being the name the scope holds now (`config.yaml`, or a legacy `config.json` left alone). */
-export const initConfigFile = (options) => call('init', options);
 
 /** The `eventStore` section of a project, every key set: `{ remote, seal: { intervalSec, coalesceSec }, sync: { intervalSec }, rebuild: { maxAttempts } }`. A refused file reaches a `strict` caller, and any caller when the refusal names an `eventStore` value; otherwise the answer is a config that never publishes (`sync.intervalSec` 0). */
 export const readEventStoreSection = (options) => call('eventStore', options);
