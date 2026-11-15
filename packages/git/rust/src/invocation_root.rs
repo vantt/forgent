@@ -456,6 +456,9 @@ mod tests {
             .expect("a table row inside a repository");
         let cwd = tree.at(row["cwd"].as_str().unwrap());
         std::fs::remove_dir_all(&tree.state).unwrap();
+        // The pinned root is process-wide. This is safe only while no other test in this crate
+        // reaches `state_root()` (only `open_at` and `trusted_root_at` do, and none is called
+        // from a test); a test that does must not run beside this one.
         let prior = std::env::var_os(fgos_holder_lock::state_root::PINNED_ROOT_ENV);
         std::env::set_var(fgos_holder_lock::state_root::PINNED_ROOT_ENV, &tree.state);
         let facts = read_repo_facts(&cwd);
