@@ -9,9 +9,9 @@ import { fileURLToPath } from 'node:url';
 import { discoverTestFiles, REPO_ROOT } from '../../scripts/run-tests.mjs';
 import { readSuiteBaseline } from '../../scripts/test-proof-inventory.mjs';
 import { countXmlCases } from '../../scripts/write-test-marker.mjs';
-import { mergeShards } from '../../scripts/merge-test-shards.mjs';
+import { mergeShards, shardManifest } from '../../scripts/merge-test-shards.mjs';
 import { runCompare } from '../../scripts/test-select-compare.mjs';
-import { checkShardSet, junitFiles, junitSeconds, measuredImbalance, mergeJunit, parseShard, partitionFiles, repoRelative, shardLoads } from '../../scripts/lib/test-shards.mjs';
+import { checkShardSet, junitFiles, junitSeconds, junitUnattributable, measuredImbalance, mergeJunit, parseShard, partitionFiles, repoRelative, shardLoads } from '../../scripts/lib/test-shards.mjs';
 
 const MERGE_CLI = fileURLToPath(new URL('../../scripts/merge-test-shards.mjs', import.meta.url));
 
@@ -175,6 +175,7 @@ test('the merge writes full.xml when the shards ran every file once, and fails b
     const sub = path.join(shards, `test-shard-${k}`);
     fs.mkdirSync(sub, { recursive: true });
     fs.writeFileSync(path.join(sub, `shard-${k}-of-${n}.xml`), realJunit(dir, files));
+    fs.writeFileSync(path.join(sub, `shard-${k}-of-${n}.files.json`), JSON.stringify(files));
     if (marker) fs.writeFileSync(path.join(sub, 'test-marker.json'), JSON.stringify(marker));
   };
   const done = { completed: true, exitCode: 0 };
@@ -206,6 +207,7 @@ test('the merge reports the measured imbalance: the slowest shard\'s summed test
     const sub = path.join(shards, `test-shard-${k}`);
     fs.mkdirSync(sub, { recursive: true });
     fs.writeFileSync(path.join(sub, `shard-${k}-of-3.xml`), body);
+    fs.writeFileSync(path.join(sub, `shard-${k}-of-3.files.json`), JSON.stringify(['t0.test.mjs']));
     fs.writeFileSync(path.join(sub, 'test-marker.json'), JSON.stringify({ completed: true, exitCode: 0 }));
   }
   const { imbalance } = mergeShards({ dir: shards, out: path.join(dir, 'out'), repoRoot: dir, discovered: ['t0.test.mjs'] });
@@ -215,4 +217,68 @@ test('the merge reports the measured imbalance: the slowest shard\'s summed test
   assert.match(cli.stdout, /merge-test-shards: imbalance max\/mean = \d\.\d\d \(shard 2 slowest\)/);
   assert.equal(measuredImbalance([]), null);
   fs.rmSync(dir, { recursive: true, force: true });
+});
+
+// A file whose tests register through a module imported from a data: URL: node reports its cases under the URL,
+// never under the file's own path, and emits no entry for the file itself.
+const DATA_URL_BODY = "import test from 'node:test';\ntest('inside the data module', () => {});\n";
+function dataUrlFixture(dir, name) {
+  fs.writeFileSync(path.join(dir, name), `await import('data:text/javascript;base64,${Buffer.from(DATA_URL_BODY).toString('base64')}');\n`);
+}
+
+test('a test file that imports its tests from a data: URL reports under that URL, and the shard check accepts it only as far as the manifest and the URL sources account for it', () => {
+  const dir = fixtureDir();
+  writeFixtures(dir);
+  dataUrlFixture(dir, 'via-data-url.test.mjs');
+  const names = [...Object.keys(FIXTURES), 'via-data-url.test.mjs'].sort();
+  const xml = realJunit(dir, names);
+  assert.ok(!junitFiles(xml, dir).has('via-data-url.test.mjs'), 'node never names the file itself');
+  assert.equal(junitUnattributable(xml).size, 1);
+  assert.ok([...junitUnattributable(xml)][0].startsWith('data:text/javascript;base64,'));
+  assert.ok([...junitFiles(xml, dir)].every((f) => !f.startsWith('data:')), 'a URL is never a path');
+
+  const shard = (files, manifest, unattributable) => [{ index: 1, total: 1, files: new Set(files), manifest: new Set(manifest), unattributable: new Set(unattributable) }];
+  const reported = junitFiles(xml, dir);
+  const urls = junitUnattributable(xml);
+  assert.deepEqual(checkShardSet(names, shard(reported, names, urls)), [], 'the data: file is accounted for by its URL source');
+
+  // The same gap with no URL case in the junit is a file that did not run.
+  assert.deepEqual(checkShardSet(names, shard(reported, names, [])), [
+    'shard 1/1 did not report via-data-url.test.mjs and has 0 non-path source(s) to account for 1 file(s)',
+    'via-data-url.test.mjs ran in no shard',
+  ]);
+
+  // Two files missing but one URL source: the surplus cannot hide behind it.
+  const twoMissing = checkShardSet(names, shard([...reported].filter((f) => f !== 'ok.test.mjs'), names, urls));
+  assert.ok(twoMissing.some((p) => /did not report .*ok\.test\.mjs.*via-data-url\.test\.mjs.* has 1 non-path source\(s\) to account for 2 file\(s\)/.test(p)), twoMissing.join('\n'));
+  assert.ok(twoMissing.includes('ok.test.mjs ran in no shard') && twoMissing.includes('via-data-url.test.mjs ran in no shard'));
+
+  // A junit file the manifest never gave the shard still fails by name.
+  const stray = checkShardSet(names, shard([...reported, 'other.test.mjs'], names, urls));
+  assert.ok(stray.includes('other.test.mjs ran in shard 1/1 but is not in its manifest'));
+  fs.rmSync(dir, { recursive: true, force: true });
+});
+
+test('the merge accepts the data: URL file through the shard manifest, and refuses a shard that wrote none', () => {
+  const dir = fixtureDir();
+  writeFixtures(dir);
+  dataUrlFixture(dir, 'via-data-url.test.mjs');
+  const names = [...Object.keys(FIXTURES), 'via-data-url.test.mjs'].sort();
+  const sub = path.join(dir, 'shards', 'test-shard-1');
+  fs.mkdirSync(sub, { recursive: true });
+  fs.writeFileSync(path.join(sub, 'shard-1-of-1.xml'), realJunit(dir, names));
+  fs.writeFileSync(path.join(sub, 'test-marker.json'), JSON.stringify({ completed: true, exitCode: 0 }));
+  const merge = () => mergeShards({ dir: path.join(dir, 'shards'), out: path.join(dir, 'out'), repoRoot: dir, discovered: names });
+  assert.deepEqual(merge().problems, ['test-shard-1 has no readable shard-1-of-1.files.json', 'via-data-url.test.mjs ran in no shard']);
+  fs.writeFileSync(path.join(sub, 'shard-1-of-1.files.json'), JSON.stringify(names));
+  assert.deepEqual(merge().problems, []);
+  fs.rmSync(dir, { recursive: true, force: true });
+});
+
+test('a shard manifest is the partition npm test --shard=k/n runs, repo-relative', async () => {
+  const files = discoverTestFiles().map((f) => repoRelative(REPO_ROOT, f));
+  const all = [];
+  for (let k = 1; k <= 3; k++) all.push(...(await shardManifest(`${k}/3`)));
+  assert.deepEqual(all.sort(), files);
+  await assert.rejects(() => shardManifest('4/3'), /invalid shard "4\/3"/);
 });

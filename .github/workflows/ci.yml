@@ -89,6 +89,11 @@ jobs:
       - name: Build Rust release binaries for npm tests
         run: cargo build --locked --release --workspace
 
+      # The files this shard is given, written before the tests so a crash cannot lose it. The merge matches it
+      # against the junit: a test file that loads its tests from a data: URL reports under that URL, not its path.
+      - name: Record the files of shard ${{ matrix.shard }}/5
+        run: node scripts/merge-test-shards.mjs --manifest ${{ matrix.shard }}/5 --out test-results/shard-${{ matrix.shard }}-of-5.files.json
+
       # This shard of the full suite (docs/distribution-vision.md tsk-49r D1): the shards together include
       # test/install-packaging.test.mjs (the pack -> install -g -> fgos init proof) and
       # test/setup/doctor-fresh-run.test.mjs (the fresh-runner fgos doctor proof, D4). Every run-tests check

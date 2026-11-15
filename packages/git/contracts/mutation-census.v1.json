@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "469f79e0d036e4ecad98533904f2dd0de3b03c277f6212d9f6afebff0f50a766",
+  "payloadDigest": "895d9fafe1f6342042553a8924ec900e0c90acb0a197e3e6f21501edfaab91e8",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "a5629383f89b4488b252a62f0ea86463e649e33e0a891db1a19af2cd6c136aca",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -904,12 +904,12 @@
     "scripts/lib/test-file-cpu.mjs": "f54eb34a6f6f01607c123fbeb04d1a8be61805c7fe687f7887a0adac2068e4a7",
     "scripts/lib/test-file-watchdog.mjs": "90fe256c808c268d8039136a225b4517a9cc1290a530fa503158f6ba2bcb7211",
     "scripts/lib/test-git-config-guard.mjs": "e9bc333d889985d94b847fd80fbfed7e6dcfa1e9b2ffffc97a14e7be326153d1",
-    "scripts/lib/test-shards.mjs": "47ae2b0d914092eeb696beace53fe47756d7ac6ee8d843e5d129bc894bdbb244",
+    "scripts/lib/test-shards.mjs": "ea5ba60685bd3a6398f53d3667b599f5ed20e6a4db1afca3a7be7b1fbfded7e8",
     "scripts/list-doc-anchors.mjs": "fe4d901d266dc9d93e8a405051b618210f17808cc10f29663d48ad55a13e253f",
     "scripts/main-checkout-delete-guard-hook.mjs": "1441b87ef8661132314d89ec1d534a6049cfcf2bc088ca789e5a50fd68ec02be",
     "scripts/measure-p08-performance.mjs": "2ab686e2e3f880f584a2f9278a6bbb27a49d71effcdb65215f1cbd3865099e3e",
     "scripts/measure-verify-cost.mjs": "97768198548908742f0687b069fbe77dfc35839a88e4906f3813afbdd5918abc",
-    "scripts/merge-test-shards.mjs": "25ef5290303f69784492d3f744b4ac60abe1ae843a25e5edcef013da370337a1",
+    "scripts/merge-test-shards.mjs": "d8ed473d76445db79e74e71455f479016c6aad1fd4a5a2d475b2705da9d3e913",
     "scripts/package-release-assets.mjs": "60efb629a7ebfe1143445557c55abfa4b3269286a0498754a28dddb662a70fd0",
     "scripts/prepare-release.mjs": "0bd2e6e7514ba4de781ad480889a8f701729a1d4b9d80d5f5af7b2f1de1160aa",
     "scripts/previous-release-tag.mjs": "d79809904f630061da723099f65817f18367462d1d9d64982426c58eb05d6a0f",
