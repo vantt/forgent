@@ -85,10 +85,18 @@ fn describe_fact(error: &FactError) -> String {
     }
 }
 
+/// The remote the project publishes to. A refused config file is the rows' failure (every Git fact starts here);
+/// a value of the `eventStore` section that breaks its own rules is the Event Store rows' business.
 fn project_remote(root: &Path) -> Result<String, String> {
-    EventStoreConfig::read_project(root, |key| std::env::var(key).ok(), false)
-        .map(|config| config.remote)
-        .map_err(crate::wiring::events::config_message)
+    use fgos_config::event_store::ReadError;
+    if let Some(refusal) = super::project_root_refusal(root) {
+        return Err(refusal.to_owned());
+    }
+    match EventStoreConfig::read_project(root, |key| std::env::var(key).ok(), true) {
+        Ok(config) => Ok(config.remote),
+        Err(ReadError::Invalid(_)) => Ok("origin".to_owned()),
+        Err(error) => Err(super::config_read_text(error)),
+    }
 }
 
 fn build_context(root: &Path, state_root: &Path) -> Result<Context, String> {

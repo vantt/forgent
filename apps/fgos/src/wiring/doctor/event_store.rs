@@ -4,7 +4,7 @@
 //! reports the one remembered error instead of recomputing the setup per row.
 
 use super::{Rows, Run};
-use crate::wiring::events::{config_message, resolve_message};
+use crate::wiring::events::resolve_message;
 use fgos_config::event_store::EventStoreConfig;
 use fgos_distribution::doctor::{FixResult, RowOutcome, RowResult};
 use fgos_event_store::{
@@ -58,6 +58,15 @@ pub struct Context {
     status: OnceCell<Result<Value, String>>,
 }
 
+/// A refused config file or a broken `eventStore` value, worded as the Node doctor worded it.
+fn es_config_text(error: fgos_config::event_store::ReadError) -> String {
+    use fgos_config::event_store::ReadError;
+    match error {
+        ReadError::Snapshot(_) => format!("event-store-config: {}", super::config_read_text(error)),
+        other => super::config_read_text(other),
+    }
+}
+
 /// The setup context in the order the Node doctor built it: the platform, the repository and its facts for
 /// `origin`, the strict config, then the facts for the configured remote.
 pub fn build_context(root: &Path, state_root: &Path) -> Result<Context, String> {
@@ -70,7 +79,7 @@ pub fn build_context(root: &Path, state_root: &Path) -> Result<Context, String> 
         diagnostics::facts(&driver, &repo, state_root, "origin").map_err(|e| e.to_string())?;
     let trusted_main = repo.trusted_main_root().to_path_buf();
     let config = EventStoreConfig::read_project(&trusted_main, |key| std::env::var(key).ok(), true)
-        .map_err(config_message)?;
+        .map_err(es_config_text)?;
     let facts = if config.remote == "origin" {
         initial
     } else {
