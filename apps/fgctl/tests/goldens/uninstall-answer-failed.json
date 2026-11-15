@@ -1,0 +1,84 @@
+{
+  "contract": "fgos.v1",
+  "generated_at": "2026-11-15T11:46:54.883Z",
+  "data_hash": "b4bc8f841902e4954bb9fbd7d415fe1cd57055a90471e06b4edf591bac41029b",
+  "data": {
+    "applied": true,
+    "hooks": [
+      {
+        "cli": "claude",
+        "file": "/tmp/fgos-tp-t631GY/golden-proj-lZ0AkZ/.claude/settings.json",
+        "label": ".claude/settings.json",
+        "removed": [
+          "dispatch-decide (PreToolUse)",
+          "decision-question (PreToolUse)",
+          "main-checkout-delete-guard (PreToolUse)",
+          "mailbox --cli claude --event stop (Stop)",
+          "mailbox --cli claude --event post-tool-use (PostToolUse)",
+          "session-register (SessionStart)"
+        ],
+        "kept": [],
+        "state": "changed"
+      },
+      {
+        "cli": "codex",
+        "file": "/tmp/fgos-tp-t631GY/golden-proj-lZ0AkZ/.codex/hooks.json",
+        "label": ".codex/hooks.json",
+        "removed": [
+          "session-register (SessionStart)",
+          "dispatch-decide (PreToolUse)",
+          "decision-question (PreToolUse)",
+          "main-checkout-delete-guard (PreToolUse)",
+          "mailbox --cli codex --event stop (Stop)",
+          "mailbox --cli codex --event post-tool-use (PostToolUse)"
+        ],
+        "kept": [],
+        "state": "changed"
+      },
+      {
+        "cli": "agy",
+        "file": "/tmp/fgos-tp-t631GY/golden-proj-lZ0AkZ/.agents/hooks.json",
+        "label": ".agents/hooks.json",
+        "removed": [
+          "fgos-session-register",
+          "fgos-dispatch-guard",
+          "fgos-decision-guard",
+          "fgos-delete-guard"
+        ],
+        "kept": [],
+        "state": "changed"
+      },
+      {
+        "cli": "omp",
+        "file": "/tmp/fgos-tp-t631GY/golden-proj-lZ0AkZ/.omp/extensions/fgos-hooks.ts",
+        "label": ".omp/extensions/fgos-hooks.ts",
+        "removed": [
+          "extension"
+        ],
+        "kept": [],
+        "state": "changed"
+      },
+      {
+        "cli": "pi",
+        "file": "/tmp/fgos-tp-t631GY/golden-proj-lZ0AkZ/.pi/extensions/fgos-hooks.ts",
+        "label": ".pi/extensions/fgos-hooks.ts",
+        "removed": [
+          "extension"
+        ],
+        "kept": [],
+        "state": "changed"
+      }
+    ],
+    "skills": null,
+    "backups": [],
+    "failed": [
+      {
+        "id": "backup",
+        "error": "backup failed, nothing changed: /tmp/fgos-tp-t631GY/golden-proj-lZ0AkZ/.claude/settings.json.pre-uninstall-20261115T114654880Z: durable install failed at temp-created (installed: none): Permission denied (os error 13)"
+      }
+    ],
+    "changes": [],
+    "keeps": [],
+    "leftToYou": []
+  }
+}

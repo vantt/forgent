@@ -890,9 +890,13 @@ fn no_skills() -> Skills {
 // The provider
 // ---------------------------------------------------------------------------------------------------------
 
+/// Where the running release's legacy payload root is found; the composition root hands it in, so this module
+/// never reaches for the legacy lane itself.
+pub type PayloadRoot = fn() -> Result<PathBuf, String>;
+
 /// The reversal against this machine: the running release's payload, the process environment and clock.
-fn run(request: &UninstallRequest) -> Reversal {
-    let payload = crate::legacy_exec::resolve_payload().map(|payload| payload.root);
+fn run(request: &UninstallRequest, payload_root: PayloadRoot) -> Reversal {
+    let payload = payload_root();
     let home = fgos_config::machine::home_dir(|key| std::env::var(key).ok());
     let (state_root, _) = fgos_holder_lock::state_root::state_root();
     let timers = TimerEnv::system();
@@ -918,19 +922,15 @@ fn run(request: &UninstallRequest) -> Reversal {
 /// The provider of `uninstall.run`.
 pub struct UninstallProvider {
     descriptor: ProviderDescriptor,
+    payload_root: PayloadRoot,
 }
 
 impl UninstallProvider {
-    pub fn new() -> Self {
+    pub fn new(payload_root: PayloadRoot) -> Self {
         Self {
             descriptor: DESCRIPTOR,
+            payload_root,
         }
-    }
-}
-
-impl Default for UninstallProvider {
-    fn default() -> Self {
-        Self::new()
     }
 }
 
@@ -956,7 +956,8 @@ impl OperationProvider for UninstallProvider {
                 })?
                 .clone();
             // The reversal reads and removes files and runs Git and the scheduler: never on the async worker.
-            let reversal = tokio::task::spawn_blocking(move || run(&request))
+            let payload_root = self.payload_root;
+            let reversal = tokio::task::spawn_blocking(move || run(&request, payload_root))
                 .await
                 .map_err(|error| ProviderError::ProviderFailed(error.to_string()))?;
             for note in &reversal.notes {
@@ -971,5 +972,891 @@ impl OperationProvider for UninstallProvider {
                 }),
             ))
         })
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use fgos_distribution::agent_hooks::install_all;
+    use fgos_distribution::timer::{unit_stem, Host};
+    use std::collections::BTreeMap;
+    use std::process::Command;
+
+    const WRAPPER_STAMP: &str = "This is a generated thin wrapper (tsk-1qi) -- do not edit directly, edit the source instead.";
+    const GIT_DIR: &str = ".git";
+
+    /// A world of its own: a project directory (a repository only where a test makes it one), a HOME, a payload that owns the skill
+    /// `distill` (version 0.1) and a state root for Git's driver that does not exist unless a test makes it.
+    struct World {
+        base: PathBuf,
+        project: PathBuf,
+        home: PathBuf,
+        payload: PathBuf,
+        state: PathBuf,
+    }
+
+    impl World {
+        fn new(label: &str) -> World {
+            static COUNTER: std::sync::atomic::AtomicUsize = std::sync::atomic::AtomicUsize::new(0);
+            let n = COUNTER.fetch_add(1, std::sync::atomic::Ordering::SeqCst);
+            let base = std::fs::canonicalize(std::env::temp_dir())
+                .unwrap()
+                .join(format!("fgos-uninstall-{}-{n}-{label}", std::process::id()));
+            let _ = std::fs::remove_dir_all(&base);
+            let world = World {
+                project: base.join("project"),
+                home: base.join("home"),
+                payload: base.join("payload"),
+                state: base.join("state"),
+                base,
+            };
+            for dir in [&world.project, &world.home] {
+                std::fs::create_dir_all(dir).unwrap();
+            }
+            world.put(
+                &world.payload.join("core/skills/distill/SKILL.md"),
+                "---\nname: distill\n---\nbody\n",
+            );
+            world.put(
+                &world.payload.join(".agents/skills/distill/SKILL.md"),
+                "---\nname: distill\nmetadata:\n  version: \"0.1\"\n---\nbody\n",
+            );
+            world
+        }
+
+        fn put(&self, file: &Path, text: &str) {
+            std::fs::create_dir_all(file.parent().unwrap()).unwrap();
+            std::fs::write(file, text).unwrap();
+        }
+
+        fn in_project(&self, rel: &str, text: &str) {
+            self.put(&self.project.join(rel), text);
+        }
+
+        fn hooks(&self) {
+            let home = self.home.to_string_lossy().into_owned();
+            install_all(&self.project, &move |key| {
+                (key == "HOME").then(|| home.clone())
+            })
+            .unwrap();
+        }
+
+        fn stamped_skill(&self, name: &str, frontmatter_extra: &str, body: &str) {
+            self.in_project(
+                &format!(".claude/skills/{name}/SKILL.md"),
+                &format!("---\nname: {name}\n{frontmatter_extra}---\n{WRAPPER_STAMP}\n{body}"),
+            );
+        }
+
+        /// Every file under the project and HOME as text, the Git internals left out.
+        fn tree(&self) -> BTreeMap<String, String> {
+            let mut out = BTreeMap::new();
+            let mut stack = vec![self.project.clone(), self.home.clone()];
+            while let Some(dir) = stack.pop() {
+                for entry in std::fs::read_dir(&dir).unwrap() {
+                    let path = entry.unwrap().path();
+                    if path.ends_with(GIT_DIR) {
+                        continue;
+                    }
+                    let rel = path
+                        .strip_prefix(&self.base)
+                        .unwrap()
+                        .to_string_lossy()
+                        .into_owned();
+                    let kind = std::fs::symlink_metadata(&path).unwrap().file_type();
+                    if kind.is_dir() {
+                        out.insert(format!("{rel}/"), String::new());
+                        stack.push(path);
+                    } else if kind.is_symlink() {
+                        out.insert(rel, "<link>".into());
+                    } else {
+                        out.insert(
+                            rel,
+                            String::from_utf8_lossy(&std::fs::read(&path).unwrap()).into_owned(),
+                        );
+                    }
+                }
+            }
+            out
+        }
+
+        fn machine<'a>(&'a self, timers: Option<&'a TimerEnv<'a>>) -> Machine<'a> {
+            Machine {
+                payload: Ok(&self.payload),
+                home: Some(&self.home),
+                platform: "linux",
+                git_state_root: &self.state,
+                timers,
+                stamp: "20261115T000000000Z",
+            }
+        }
+
+        /// One run against this world with timers that touch only the world's own HOME.
+        fn run(&self, apply: bool) -> Reversal {
+            let run = |_: &str, _: &[String]| -> Result<(), String> { Ok(()) };
+            let config = |_: &Path| Ok(None);
+            let host_bin = |_: &Path| None;
+            let env = TimerEnv {
+                host: Host {
+                    platform: "linux".into(),
+                    home: self.home.clone(),
+                    uid: 0,
+                    xdg_config_home: None,
+                },
+                config: &config,
+                host_bin: &host_bin,
+                run: &run,
+            };
+            uninstall_project(&self.project, apply, &self.machine(Some(&env)))
+        }
+    }
+
+    impl Drop for World {
+        fn drop(&mut self) {
+            let _ = std::fs::remove_dir_all(&self.base);
+        }
+    }
+
+    fn strings(value: &Value) -> Vec<String> {
+        value
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|v| v.as_str().unwrap().to_owned())
+            .collect()
+    }
+
+    fn git(dir: &Path, args: &[&str]) -> String {
+        let out = Command::new("git")
+            .arg("-C")
+            .arg(dir)
+            .args(args)
+            .output()
+            .unwrap();
+        assert!(
+            out.status.success(),
+            "git {args:?}: {}",
+            String::from_utf8_lossy(&out.stderr)
+        );
+        String::from_utf8_lossy(&out.stdout).trim().to_owned()
+    }
+
+    /// A real repository at the world's project with one commit, and an owner-only state root for Git's driver.
+    #[cfg(unix)]
+    fn real_repository(world: &World) {
+        git(&world.project, &["init", "-q", "-b", "main"]);
+        git(&world.project, &["config", "user.email", "t@example.com"]);
+        git(&world.project, &["config", "user.name", "T"]);
+        git(&world.project, &["config", "commit.gpgsign", "false"]);
+        // The activation fence production's activation leaves behind: Git's mutations refuse without it.
+        git(
+            &world.project,
+            &["config", "fgos.machineId", "uninstall-fixture"],
+        );
+        {
+            use std::os::unix::fs::DirBuilderExt;
+            std::fs::DirBuilder::new()
+                .recursive(true)
+                .mode(0o700)
+                .create(world.project.join(GIT_DIR).join("fgos/events/locks"))
+                .unwrap();
+        }
+        world.in_project(
+            ".fgos/locks/activation.lock/TOMBSTONE",
+            "{\"lock\":\"activation\",\"by\":\"fgos git\",\"at\":\"fixture\"}",
+        );
+        world.in_project("seed.txt", "seed\n");
+        git(&world.project, &["add", "seed.txt"]);
+        git(&world.project, &["commit", "-qm", "seed"]);
+        std::fs::create_dir_all(&world.state).unwrap();
+        use std::os::unix::fs::PermissionsExt;
+        std::fs::set_permissions(&world.state, std::fs::Permissions::from_mode(0o700)).unwrap();
+    }
+
+    // ----- the call -----
+
+    fn os(args: &[&str]) -> Vec<OsString> {
+        args.iter().map(OsString::from).collect()
+    }
+
+    #[test]
+    fn only_a_bare_yes_applies_and_a_bare_dry_run_cancels_it() {
+        let root = || Ok(PathBuf::from("/p"));
+        let apply = |args: &[&str]| project_uninstall_request(&os(args), root()).unwrap().apply;
+        assert!(!apply(&["uninstall"]));
+        assert!(apply(&["uninstall", "--yes"]));
+        assert!(!apply(&["uninstall", "--yes", "--dry-run"]));
+        assert!(
+            !apply(&["uninstall", "--yes", "now"]),
+            "a value is not consent"
+        );
+        assert!(
+            apply(&["uninstall", "--yes", "--dry-run", "now"]),
+            "a dry-run with a value is not bare"
+        );
+        assert_eq!(
+            project_uninstall_request(&os(&["uninstall"]), Err("no project".into())),
+            Err("no project".into())
+        );
+    }
+
+    // ----- the plan and the apply -----
+
+    #[test]
+    fn a_plan_lists_changes_and_keeps_and_changes_nothing() {
+        let world = World::new("plan");
+        world.hooks();
+        world.stamped_skill("distill", "", "x\n");
+        let before = world.tree();
+        let reversal = world.run(false);
+        assert_eq!(world.tree(), before);
+        let data = &reversal.data;
+        assert_eq!(data["applied"], false);
+        assert_eq!(reversal.exit(), 0);
+        let changes = strings(&data["changes"]);
+        assert!(
+            changes.iter().any(|c| c.contains("remove the fgOS hook")),
+            "{changes:?}"
+        );
+        assert!(
+            changes
+                .iter()
+                .any(|c| c
+                    .starts_with(".claude/skills: remove 1 generated skill directory (distill)")),
+            "{changes:?}"
+        );
+        let keeps = strings(&data["keeps"]);
+        assert!(keeps[0].starts_with(".fgos: your fgOS data"));
+        assert!(keeps[1].starts_with(".fgos/distribution.json: the committed release pin"));
+        assert_eq!(data["backups"], serde_json::json!([]));
+        assert_eq!(data["hooksUnwired"], false);
+    }
+
+    #[test]
+    fn an_apply_removes_every_fgos_hook_and_generated_skill_and_keeps_what_is_the_persons() {
+        let world = World::new("apply");
+        world.hooks();
+        world.stamped_skill("distill", "", "x\n");
+        world.in_project(
+            ".claude/skills/mine/SKILL.md",
+            "---\nname: mine\n---\nmine\n",
+        );
+        world.in_project(
+            ".claude/skills/fgos-clarifying/SKILL.md",
+            "---\nname: fgos-clarifying\n---\nan owned name without the mark\n",
+        );
+        world.put(
+            &world.payload.join("core/skills/fgos-clarifying/SKILL.md"),
+            "---\nname: fgos-clarifying\n---\n",
+        );
+        world.in_project(".fgos/notes.txt", "keep: me\n");
+        let reversal = world.run(true);
+        let data = &reversal.data;
+        assert_eq!(data["failed"], serde_json::json!([]), "{data}");
+        assert!(!world.project.join(".claude/skills/distill").exists());
+        assert!(
+            world.project.join(".claude/skills/mine/SKILL.md").exists(),
+            "not an fgOS name"
+        );
+        assert!(
+            world
+                .project
+                .join(".claude/skills/fgos-clarifying/SKILL.md")
+                .exists(),
+            "no mark"
+        );
+        assert_eq!(
+            std::fs::read_to_string(world.project.join(".fgos/notes.txt")).unwrap(),
+            "keep: me\n"
+        );
+        let keeps = strings(&data["keeps"]);
+        assert!(
+            keeps.iter().any(|k| k.contains(
+                ".claude/skills/fgos-clarifying: kept, not generated by fgOS (it carries no fgOS generated marker)"
+            )),
+            "{keeps:?}"
+        );
+        // The omp extension is gone and only its backup is left beside it.
+        let left: Vec<String> = std::fs::read_dir(world.project.join(".omp/extensions"))
+            .unwrap()
+            .map(|e| {
+                e.unwrap()
+                    .file_name()
+                    .to_string_lossy()
+                    .replace("20261115T000000000Z", "<time>")
+            })
+            .collect();
+        assert_eq!(left, vec!["fgos-hooks.ts.pre-uninstall-<time>".to_owned()]);
+    }
+
+    #[test]
+    fn every_file_a_run_rewrites_or_deletes_is_copied_beside_itself_first() {
+        let world = World::new("backup");
+        world.hooks();
+        let originals: Vec<(PathBuf, Vec<u8>)> = [
+            ".claude/settings.json",
+            ".codex/hooks.json",
+            ".omp/extensions/fgos-hooks.ts",
+        ]
+        .iter()
+        .map(|rel| {
+            (
+                world.project.join(rel),
+                std::fs::read(world.project.join(rel)).unwrap(),
+            )
+        })
+        .collect();
+        let data = world.run(true).data;
+        let backups = data["backups"].as_array().unwrap();
+        assert!(backups.len() >= originals.len());
+        for (file, bytes) in &originals {
+            let backup = backups
+                .iter()
+                .find(|b| b["file"] == file.to_string_lossy().as_ref())
+                .unwrap_or_else(|| panic!("no backup of {}", file.display()));
+            let copy = PathBuf::from(backup["backup"].as_str().unwrap());
+            assert_eq!(
+                copy.file_name().unwrap().to_string_lossy(),
+                format!(
+                    "{}.pre-uninstall-20261115T000000000Z",
+                    file.file_name().unwrap().to_string_lossy()
+                )
+            );
+            assert_eq!(&std::fs::read(copy).unwrap(), bytes);
+        }
+    }
+
+    #[test]
+    fn a_failed_backup_runs_nothing_and_the_answer_has_the_short_shape() {
+        let world = World::new("nobackup");
+        world.hooks();
+        let file = world.project.join(".claude/settings.json");
+        let taken = PathBuf::from(format!(
+            "{}.pre-uninstall-20261115T000000000Z",
+            file.display()
+        ));
+        std::fs::write(&taken, "an earlier backup").unwrap();
+        let before = world.tree();
+        let reversal = world.run(true);
+        assert_eq!(world.tree(), before, "nothing changed");
+        assert_eq!(reversal.exit(), 1);
+        let data = &reversal.data;
+        assert_eq!(data["applied"], true);
+        assert!(data["skills"].is_null());
+        for empty in ["backups", "changes", "keeps", "leftToYou"] {
+            assert_eq!(data[empty], serde_json::json!([]), "{empty}");
+        }
+        assert!(
+            data.get("hooksUnwired").is_none(),
+            "the short answer stops before the later steps"
+        );
+        let failed = &data["failed"][0];
+        assert_eq!(failed["id"], "backup");
+        assert!(
+            failed["error"]
+                .as_str()
+                .unwrap()
+                .starts_with("backup failed, nothing changed: "),
+            "{failed}"
+        );
+    }
+
+    #[test]
+    fn a_hook_of_the_persons_that_only_mentions_the_shim_stays_and_is_named() {
+        let world = World::new("mention");
+        world.hooks();
+        let file = world.project.join(".claude/settings.json");
+        let mut settings: Value = serde_json::from_slice(&std::fs::read(&file).unwrap()).unwrap();
+        settings["hooks"]["PostToolUse"] = serde_json::json!([{
+            "matcher": "*",
+            "hooks": [{ "type": "command", "command": "sh .fgos/installation/bin/fgos hook custom-thing" }]
+        }]);
+        std::fs::write(&file, serde_json::to_vec_pretty(&settings).unwrap()).unwrap();
+        let data = world.run(true).data;
+        let keeps = strings(&data["keeps"]);
+        assert!(
+            keeps.iter().any(|k| k.contains(
+                "a hook of yours names the fgOS shim and stays: sh .fgos/installation/bin/fgos hook custom-thing"
+            )),
+            "{keeps:?}"
+        );
+        let left = std::fs::read_to_string(&file).unwrap();
+        assert!(
+            left.contains("custom-thing") && !left.contains("dispatch-decide"),
+            "{left}"
+        );
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn links_are_refused_never_followed_and_a_root_behind_a_link_stays() {
+        let world = World::new("links");
+        let outside = world.base.join("outside");
+        world.put(&outside.join("hooks/settings.json"), "{}\n");
+        world.put(
+            &outside.join("skills/distill/SKILL.md"),
+            &format!("---\nname: distill\n---\n{WRAPPER_STAMP}\n"),
+        );
+        // A linked agent directory and a linked skills root.
+        std::os::unix::fs::symlink(outside.join("hooks"), world.project.join(".claude")).unwrap();
+        std::fs::create_dir_all(world.project.join(".agents")).unwrap();
+        std::os::unix::fs::symlink(outside.join("skills"), world.project.join(".agents/skills"))
+            .unwrap();
+        let outside_before: BTreeMap<_, _> = [
+            outside.join("hooks/settings.json"),
+            outside.join("skills/distill/SKILL.md"),
+        ]
+        .into_iter()
+        .map(|f| (f.clone(), std::fs::read(f).unwrap()))
+        .collect();
+        let data = world.run(true).data;
+        for (file, bytes) in outside_before {
+            assert_eq!(
+                std::fs::read(&file).unwrap(),
+                bytes,
+                "{} is outside the project",
+                file.display()
+            );
+        }
+        assert!(
+            world.project.join(".agents/skills").exists(),
+            "the link stays"
+        );
+        let keeps = strings(&data["keeps"]);
+        assert!(
+            keeps.iter().any(|k| k.contains(
+                ".agents/skills: kept, not generated by fgOS (a symbolic link: left as it is)"
+            )),
+            "{keeps:?}"
+        );
+        assert_eq!(data["failed"], serde_json::json!([]), "{data}");
+
+        // A link inside a generated directory stays and keeps the directory.
+        let world = World::new("inner-link");
+        world.stamped_skill("distill", "", "x\n");
+        std::os::unix::fs::symlink(
+            "/etc/hostname",
+            world.project.join(".claude/skills/distill/link.md"),
+        )
+        .unwrap();
+        let data = world.run(true).data;
+        assert!(world
+            .project
+            .join(".claude/skills/distill/link.md")
+            .is_symlink());
+        assert!(
+            !world
+                .project
+                .join(".claude/skills/distill/SKILL.md")
+                .exists(),
+            "the file beside the link goes"
+        );
+        assert_eq!(data["skills"]["removed"], serde_json::json!([]));
+        assert_eq!(data["skills"]["kept"][0]["why"], "a symbolic link");
+    }
+
+    #[test]
+    fn an_emptied_skills_root_is_removed_and_the_source_checkout_keeps_its_surfaces() {
+        let world = World::new("emptied");
+        world.stamped_skill("distill", "", "x\n");
+        world.run(true);
+        assert!(
+            !world.project.join(".claude/skills").exists(),
+            "an emptied skills root goes"
+        );
+        assert!(world.project.join(".claude").exists());
+
+        let world = World::new("source");
+        world.stamped_skill("distill", "", "x\n");
+        let machine = Machine {
+            payload: Ok(&world.project),
+            ..world.machine(None)
+        };
+        let reversal = uninstall_project(&world.project, false, &machine);
+        assert_eq!(reversal.data["skills"]["skipped"], SOURCE_CHECKOUT_SKIPPED);
+        assert!(strings(&reversal.data["keeps"])
+            .iter()
+            .any(|k| k == &format!("skills: {SOURCE_CHECKOUT_SKIPPED}")));
+        assert!(world.project.join(".claude/skills/distill").exists());
+    }
+
+    #[test]
+    fn a_payload_that_cannot_be_found_fails_the_skills_step_and_nothing_else() {
+        let world = World::new("nopayload");
+        world.hooks();
+        let machine = Machine {
+            payload: Err("no release".into()),
+            ..world.machine(None)
+        };
+        let data = uninstall_project(&world.project, false, &machine).data;
+        assert_eq!(
+            data["failed"],
+            serde_json::json!([{ "id": "payload", "error": "no release" }])
+        );
+        assert!(strings(&data["changes"])
+            .iter()
+            .any(|c| c.contains("remove the fgOS hook")));
+    }
+
+    /// The script a rc line names for a payload in a checkout: the payload's own file when its repository has none.
+    fn integration_script_for(world: &World) -> PathBuf {
+        // The payload must sit in a repository for an rc line to be looked for at all.
+        let repository = world.base.join(GIT_DIR);
+        std::fs::create_dir_all(repository.join("objects")).unwrap();
+        std::fs::create_dir_all(repository.join("refs")).unwrap();
+        std::fs::write(repository.join("HEAD"), "ref: refs/heads/main\n").unwrap();
+        let script = world
+            .payload
+            .join("scripts")
+            .join("fgos-shell-integration.sh");
+        world.put(&script, "# integration\n");
+        script
+    }
+
+    #[test]
+    fn a_shell_profile_is_only_named_and_global_agent_wiring_is_left_with_how_to_undo_it() {
+        let world = World::new("rc");
+        let script = integration_script_for(&world);
+        let rc = world.home.join(".bashrc");
+        let content = format!("# mine\nsource \"{}\"\n", script.display());
+        std::fs::write(&rc, &content).unwrap();
+        let data = world.run(true).data;
+        assert_eq!(
+            std::fs::read_to_string(&rc).unwrap(),
+            content,
+            "never edited"
+        );
+        assert_eq!(
+            data["shellRcSourceLinesFound"][0]["rcFile"],
+            rc.to_string_lossy().as_ref()
+        );
+        assert!(data["shellRcRemovalInstructions"]
+            .as_str()
+            .unwrap()
+            .contains("remove the line(s) above by hand"));
+        let left = strings(&data["leftToYou"]);
+        assert!(left[0].contains("remove the line source") && left[0].contains("by hand"));
+        assert!(left
+            .last()
+            .unwrap()
+            .contains("claude plugin uninstall fgOS@fgos-plugins"));
+        // Without such a line the keys are empty, not absent.
+        std::fs::write(&rc, "# nothing\n").unwrap();
+        let data = world.run(false).data;
+        assert_eq!(data["shellRcSourceLinesFound"], serde_json::json!([]));
+        assert!(data["shellRcRemovalInstructions"].is_null());
+    }
+
+    #[test]
+    fn a_timer_fgos_wrote_is_removed_by_its_marker_and_a_missing_home_is_a_failed_step() {
+        let world = World::new("timer");
+        let dir = world.home.join(".config/systemd/user");
+        let stem = unit_stem(&world.project, Schedule::MailboxSync);
+        for ext in ["service", "timer"] {
+            world.put(
+                &dir.join(format!("{stem}.{ext}")),
+                &format!("# {}\n[Unit]\n", Schedule::MailboxSync.marker()),
+            );
+        }
+        world.put(&dir.join("other.timer"), "# mine\n");
+        let data = world.run(true).data;
+        assert!(
+            !dir.join(format!("{stem}.timer")).exists()
+                && !dir.join(format!("{stem}.service")).exists()
+        );
+        assert!(dir.join("other.timer").exists());
+        assert!(
+            strings(&data["changes"])
+                .iter()
+                .any(|c| c.starts_with("removed systemd timer fgos-mailbox-sync-")),
+            "{data}"
+        );
+
+        let world = World::new("nohome");
+        let data = uninstall_project(&world.project, true, &world.machine(None)).data;
+        let ids: Vec<String> = data["failed"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|f| f["id"].as_str().unwrap().to_owned())
+            .collect();
+        assert_eq!(ids, vec!["mailbox-sync-timer", "account-probe-timer"]);
+    }
+
+    // ----- the version rule and the Git rule of the skill guard -----
+
+    #[test]
+    fn a_skill_whose_version_is_newer_than_the_releases_is_kept_and_an_unreadable_version_is_named()
+    {
+        let world = World::new("version");
+        world.stamped_skill("distill", "metadata:\n  version: \"0.10\"\n", "newer\n");
+        let data = world.run(true).data;
+        assert!(world
+            .project
+            .join(".claude/skills/distill/SKILL.md")
+            .exists());
+        assert_eq!(data["skills"]["removed"], serde_json::json!([]));
+        assert_eq!(data["skills"]["kept"][0]["why"], KEPT_BY_YOU);
+
+        let world = World::new("version-equal");
+        world.stamped_skill("distill", "metadata:\n  version: \"0.1\"\n", "same\n");
+        world.run(true);
+        assert!(
+            !world.project.join(".claude/skills/distill").exists(),
+            "the same version is the release's own"
+        );
+
+        let world = World::new("version-unquoted");
+        world.stamped_skill("distill", "metadata:\n  version: 9.9\n", "x\n");
+        let reversal = world.run(true);
+        assert!(
+            !world.project.join(".claude/skills/distill").exists(),
+            "an unreadable version counts as none"
+        );
+        assert_eq!(reversal.notes.len(), 1);
+        assert!(
+            reversal.notes[0].ends_with(
+                "version is not a quoted dotted number, so it is ignored; quote it (\"1.10\")\n"
+            ),
+            "{:?}",
+            reversal.notes
+        );
+    }
+
+    #[test]
+    fn versions_compare_as_dotted_numbers_and_a_frontmatter_block_is_cut_as_the_render_cuts_it() {
+        let mut notes = Vec::new();
+        let v = |text: &str, notes: &mut Vec<String>| skill_version(text, Path::new("f.md"), notes);
+        let newer = |a: &str, b: &str| {
+            let mut notes = Vec::new();
+            is_newer(v(a, &mut notes).as_deref(), v(b, &mut notes).as_deref())
+        };
+        let doc = |version: &str| {
+            format!("---\nname: x\nmetadata:\n  version: \"{version}\"\n---\nbody\n")
+        };
+        assert!(newer(&doc("1.10"), &doc("1.9")));
+        assert!(!newer(&doc("1.9"), &doc("1.10")));
+        assert!(!newer(&doc("1.0"), &doc("1")), "missing parts are zero");
+        assert!(!newer(&doc("2"), "no frontmatter"));
+        assert_eq!(
+            v("---\nversion: \"3.1\"\n---\n", &mut notes),
+            Some(vec![3.0, 1.0]),
+            "a top-level version counts when metadata has none"
+        );
+        assert_eq!(
+            v(
+                "---\r\nmetadata:\r\n  version: \"2\"\r\n---\r\nx",
+                &mut notes
+            ),
+            Some(vec![2.0]),
+            "CRLF fences"
+        );
+        assert_eq!(
+            v("---\nname: x\n", &mut notes),
+            None,
+            "an unclosed block is no block"
+        );
+        assert_eq!(v("---\n---\nbody\n", &mut notes), None);
+        assert!(notes.is_empty());
+        assert_eq!(v("---\n- a\n- b\n---\n", &mut notes), None);
+        assert!(
+            notes[0]
+                .contains("frontmatter-not-a-mapping (line 2, column 1); its version is ignored"),
+            "{notes:?}"
+        );
+        notes.clear();
+        assert_eq!(v("---\nname: [unclosed\n---\n", &mut notes), None);
+        assert!(
+            notes[0].starts_with("f.md: ") && notes[0].ends_with("; its version is ignored\n"),
+            "{notes:?}"
+        );
+        assert_eq!(frontmatter_source("---\na: 1\n---\nrest"), Some("a: 1"));
+        assert_eq!(frontmatter_source("a: 1\n---\n"), None);
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn a_tracked_skill_file_with_uncommitted_edits_is_kept_and_a_clean_one_goes() {
+        let world = World::new("dirty");
+        real_repository(&world);
+        world.stamped_skill("distill", "", "x\n");
+        world.in_project(".claude/skills/distill/references/a.md", "ref\n");
+        git(&world.project, &["add", "-f", ".claude"]);
+        git(&world.project, &["commit", "-qm", "skills"]);
+        std::fs::write(
+            world.project.join(".claude/skills/distill/references/a.md"),
+            "ref\nedited\n",
+        )
+        .unwrap();
+        world.in_project(".claude/skills/distill/untracked.md", "not tracked\n");
+        let data = world.run(true).data;
+        assert_eq!(data["failed"], serde_json::json!([]), "{data}");
+        let kept: Vec<&str> = data["skills"]["kept"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|k| k["path"].as_str().unwrap())
+            .collect();
+        assert_eq!(
+            kept,
+            vec![world
+                .project
+                .join(".claude/skills/distill/references/a.md")
+                .to_str()
+                .unwrap()]
+        );
+        assert!(world
+            .project
+            .join(".claude/skills/distill/references/a.md")
+            .exists());
+        assert!(
+            !world
+                .project
+                .join(".claude/skills/distill/SKILL.md")
+                .exists(),
+            "a clean tracked file goes"
+        );
+        assert!(
+            !world
+                .project
+                .join(".claude/skills/distill/untracked.md")
+                .exists(),
+            "an untracked file is not a tracked edit"
+        );
+    }
+
+    // ----- the git hooks path -----
+
+    /// Wires the hooks path the way an install does: through RepositoryConfig, which keeps the ownership proof.
+    #[cfg(unix)]
+    fn wire_hooks(world: &World) {
+        let driver = GitDriver::new(&world.state).unwrap();
+        let ResolveRepo::Repository(repo) =
+            driver.resolve_repo(&world.project, &world.project).unwrap()
+        else {
+            panic!("not a repository");
+        };
+        let report = driver
+            .ensure_hooks(&repo, &world.project.join(".githooks"), "fixture-wire")
+            .unwrap();
+        assert_eq!(report.status, "owned");
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn a_hooks_path_fgos_wired_is_unset_and_its_untracked_hook_and_empty_directory_go() {
+        let world = World::new("unwire");
+        real_repository(&world);
+        world.in_project(".githooks/pre-commit", "#!/bin/sh\nexit 0\n");
+        wire_hooks(&world);
+        assert!(
+            hooks_wired(&world.project, &world.state),
+            "the plan says it would unwire"
+        );
+        let plan = world.run(false).data;
+        assert_eq!(plan["hooksUnwired"], true);
+        assert!(
+            world.project.join(".githooks").exists(),
+            "a plan changes nothing"
+        );
+        let data = world.run(true).data;
+        assert_eq!(data["hooksUnwired"], true);
+        assert_eq!(data["hooksSkippedExisting"], Value::Null);
+        assert!(strings(&data["changes"])
+            .iter()
+            .any(|c| c.starts_with("git: unset core.hooksPath (fgOS wired it)")));
+        assert!(Command::new("git")
+            .arg("-C")
+            .arg(&world.project)
+            .args(["config", "--get", "core.hooksPath"])
+            .output()
+            .unwrap()
+            .stdout
+            .is_empty());
+        assert!(!world.project.join(".githooks").exists());
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn a_tracked_pre_commit_survives_the_unwiring_byte_for_byte() {
+        let world = World::new("tracked-hook");
+        real_repository(&world);
+        world.in_project(".githooks/pre-commit", "#!/bin/sh\nexit 0\n");
+        git(&world.project, &["add", ".githooks/pre-commit"]);
+        git(&world.project, &["commit", "-qm", "hook"]);
+        wire_hooks(&world);
+        let outcome = unwire_git_hooks(&world.project, &world.state).unwrap();
+        assert!(outcome.unwired && outcome.skipped_existing.is_none());
+        assert_eq!(
+            std::fs::read_to_string(world.project.join(".githooks/pre-commit")).unwrap(),
+            "#!/bin/sh\nexit 0\n"
+        );
+        assert_eq!(
+            git(
+                &world.project,
+                &["status", "--porcelain", "--", ".githooks"]
+            ),
+            ""
+        );
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn a_hooks_path_the_person_set_is_left_alone_and_named_and_an_unset_one_is_a_no_op() {
+        let world = World::new("user-hooks");
+        real_repository(&world);
+        assert!(
+            !unwire_git_hooks(&world.project, &world.state)
+                .unwrap()
+                .unwired,
+            "never set"
+        );
+        world.in_project(".husky/x", "x\n");
+        git(&world.project, &["config", "core.hooksPath", ".husky"]);
+        let outcome = unwire_git_hooks(&world.project, &world.state).unwrap();
+        assert!(!outcome.unwired);
+        assert_eq!(outcome.skipped_existing.as_deref(), Some(".husky"));
+        assert_eq!(
+            git(&world.project, &["config", "--get", "core.hooksPath"]),
+            ".husky"
+        );
+
+        // A relative setting of the owned directory without fgOS's ownership record is the person's too.
+        let world = World::new("relative-hooks");
+        real_repository(&world);
+        world.in_project(".githooks/pre-commit", "#!/bin/sh\nexit 0\n");
+        git(&world.project, &["config", "core.hooksPath", ".githooks"]);
+        let outcome = unwire_git_hooks(&world.project, &world.state).unwrap();
+        assert_eq!(
+            (outcome.unwired, outcome.skipped_existing.as_deref()),
+            (false, Some(".githooks"))
+        );
+        assert!(world.project.join(".githooks/pre-commit").exists());
+        let data = world.run(true).data;
+        assert!(strings(&data["keeps"])
+            .iter()
+            .any(|k| k == "git: core.hooksPath .githooks is yours (fgOS did not set it): kept"));
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn a_plan_never_creates_a_state_root_that_is_gone() {
+        let world = World::new("no-state");
+        assert!(!world.state.exists());
+        assert!(!hooks_wired(&world.project, &world.state));
+        world.run(false);
+        assert!(
+            !world.state.exists(),
+            "a read does not create the driver's directories"
+        );
+    }
+
+    #[test]
+    fn a_project_without_a_repository_unwires_nothing_and_asks_no_driver() {
+        let world = World::new("no-git");
+        let outcome = unwire_git_hooks(&world.project, &world.state).unwrap();
+        assert!(!outcome.unwired && outcome.skipped_existing.is_none());
+        assert!(!world.state.exists());
     }
 }

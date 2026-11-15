@@ -3513,19 +3513,6 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       };
     }
 
-    // The project half of an uninstall (src/setup/uninstall-project.mjs): without --yes (or with
-    // --dry-run) it prints the plan and changes nothing. `fgctl uninstall` runs this verb first, then
-    // removes the activation and, with --purge, the release store.
-    case 'uninstall': {
-      const { uninstallProject } = await import('../src/setup/uninstall-project.mjs');
-      const { integrationScriptPath } = await import('../src/setup/checks.mjs');
-      return uninstallProject(mainCheckoutRootOf(flags), {
-        apply: flags.yes === true && flags['dry-run'] !== true,
-        packageRoot: PACKAGE_ROOT,
-        shellIntegrationScript: integrationScriptPath(),
-      });
-    }
-
     case 'unclaim': {
       const id = requireField(positional[0] ?? flags.id, 'unclaim requires an id: fgos unclaim <id>');
       const repoRoot = mainCheckoutRootOf(flags);

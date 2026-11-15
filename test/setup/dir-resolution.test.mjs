@@ -113,31 +113,3 @@ test('tsk-2xj: fgos setup run bare from a linked worktree writes to the main che
     cleanup(main, wt);
   }
 });
-
-test('tsk-2xj: fgos uninstall --yes run bare from a linked worktree unwires the main checkout\'s git hooks, not the worktree\'s', () => {
-  const { main, wt } = initGitWithWorktree('dir-resolution-uninstall');
-  try {
-    const homeDir = mkTemp('dir-resolution-uninstall-home-');
-    const setupResult = runFgos(wt, ['setup'], homeDir);
-    assert.equal(setupResult.status, 0, setupResult.stderr);
-    assert.equal(
-      execFileSync('git', ['config', '--get', 'core.hooksPath'], { cwd: main, encoding: 'utf8' }).trim(),
-      path.join(main, '.githooks'),
-      'precondition: setup wired the main checkout\'s hooksPath',
-    );
-
-    const uninstallResult = runFgos(wt, ['uninstall', '--yes'], homeDir);
-    assert.equal(uninstallResult.status, 0, uninstallResult.stderr);
-    const data = JSON.parse(uninstallResult.stdout).data;
-    assert.equal(
-      data.hooksUnwired,
-      true,
-      'uninstall run bare from a worktree must recognize and unwire the MAIN checkout\'s wired hooksPath, not compare against the worktree\'s own (unwired-by-construction) path',
-    );
-    const hooksPathAfter = spawnSync('git', ['config', '--get', 'core.hooksPath'], { cwd: main, encoding: 'utf8' });
-    assert.notEqual(hooksPathAfter.status, 0, 'core.hooksPath must be unset on the main checkout after a real unwire');
-    cleanup(homeDir);
-  } finally {
-    cleanup(main, wt);
-  }
-});

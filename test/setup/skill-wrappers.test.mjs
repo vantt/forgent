@@ -22,7 +22,6 @@ import {
   ownedSkillNames,
   discoverCanonicalSkills,
   discoverSharedFragments,
-  generatedSkillDirs,
 } from '../../src/setup/skill-wrappers.mjs';
 import { ownedFileSet } from '../../scripts/lib/git-ports.mjs';
 
@@ -1087,18 +1086,6 @@ test('the stamps the render writes are the ones the stamp contract names', () =>
   assembleSkills(root);
   const assembled = fs.readFileSync(path.join(root, '.agents', 'skills', 'x', 'SKILL.md'), 'utf8');
   assert.ok(assembled.slice(SAMPLE_FRONTMATTER.length).trimStart().startsWith(STAMP_CONTRACT.stamps.assembledHeaderPrefix));
-});
-
-test('every project vector of the stamp contract: which skill directories are generated, which are foreign', () => {
-  for (const vector of STAMP_CONTRACT.vectors.projects) {
-    const root = mkTempDir('skill-wrappers-stamp-vector-');
-    materializeVectorTree(root, vector.entries);
-    const got = generatedSkillDirs(root, new Set(vector.owned));
-    const rel = (p) => path.relative(root, p).split(path.sep).join('/');
-    assert.deepEqual(got.ours.map(rel).sort(), vector.expect.ours, `${vector.name}: ours`);
-    const foreign = got.foreign.map((entry) => ({ dir: rel(entry.dir), why: entry.why })).sort((a, b) => a.dir.localeCompare(b.dir));
-    assert.deepEqual(foreign, vector.expect.foreign, `${vector.name}: foreign`);
-  }
 });
 
 test('every payload vector of the stamp contract: the skill names fgOS owns', () => {

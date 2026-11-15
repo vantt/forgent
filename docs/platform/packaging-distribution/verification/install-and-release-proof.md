@@ -41,7 +41,7 @@ This document points to evidence. It is not the design authority.
 | Install script behavior | `install.sh`, `scripts/install.ps1`, `test/install/install-sh.test.mjs`, `test/install/install-ps1.test.mjs` |
 | `fgctl init` closing block and no-op re-runs | `packages/distribution/rust/src/init.rs` unit tests, `test/rust-host/closing-block.test.mjs` |
 | `fgctl` and `fgos` command surface (`--version`, `--help`, exit codes, did-you-mean) | `apps/fgctl/tests/cli_surface.rs`, `apps/fgos/tests/cli_tests.rs`, `apps/fgos/src/help.rs` (unit tests), `test/rust-host/help-routes.test.mjs`, `test/cli/first-run-guide.test.mjs` |
-| `fgctl uninstall` and `fgos uninstall` | `packages/distribution/rust/src/uninstall.rs` unit tests, `apps/fgctl/tests/uninstall_surface.rs`, `test/setup/uninstall-project.test.mjs` |
+| `fgctl uninstall` and `fgos uninstall` | `packages/distribution/rust/src/uninstall.rs` unit tests, `apps/fgos/src/wiring/uninstall.rs` unit tests, `apps/fgctl/tests/uninstall_surface.rs`, `test/rust-host/fgctl-uninstall.test.mjs` |
 | Activation versus pin drift | `packages/distribution/rust/tests/pin_drift.rs`, `test/setup/pin-drift-check.test.mjs` (one golden) |
 | Upgrade from a JSON-era release | `test/verbs/settle-legacy-config.test.mjs`, the upgrade step of `scripts/ci-external-consumer.sh` |
 | Release gate and version agreement | `test/scripts/prepare-release.test.mjs`, `test/scripts/previous-release-tag.test.mjs`, `.github/workflows/release.yml` (`suite`) |

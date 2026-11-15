@@ -3700,3 +3700,130 @@ fn wire_agents_runs_in_the_host_without_node_and_a_failing_step_exits_1() {
     let _ = fs::remove_dir_all(&work);
     let _ = fs::remove_dir_all(&node_dir);
 }
+
+// ---------------------------------------------------------------------------------------------------------
+// `fgos uninstall` in the host: no Node anywhere on the way.
+// ---------------------------------------------------------------------------------------------------------
+
+#[cfg(unix)]
+#[test]
+fn uninstall_plans_and_applies_with_no_node_on_the_machine_and_exits_zero() {
+    let manifest_path = ensure_dev_manifest();
+    let project = fresh_dir("fgos_uninstall_nonode");
+    let home = fresh_dir("fgos_uninstall_home");
+    let state = fresh_dir("fgos_uninstall_state");
+    let path = path_without_node();
+    let run = |args: &[&str]| {
+        Command::new(fgos_bin())
+            .arg("uninstall")
+            .args(args)
+            .current_dir(&project)
+            .env("PATH", &path)
+            .env("HOME", &home)
+            .env("FGOS_STATE_ROOT", &state)
+            .env("FGOS_ACTIVE_RELEASE_PATH", repo_root())
+            .env("FGOS_ACTIVE_MANIFEST_PATH", &manifest_path)
+            .output()
+            .expect("failed to execute fgos")
+    };
+    for args in [&[][..], &["--yes"][..], &["--yes", "--dry-run"][..]] {
+        let output = run(args);
+        assert_eq!(
+            output.status.code(),
+            Some(0),
+            "{args:?}: {}",
+            String::from_utf8_lossy(&output.stderr)
+        );
+        let envelope: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
+        let data = &envelope["data"];
+        assert_eq!(data["applied"], args == ["--yes"], "{args:?}");
+        for key in ["changes", "keeps", "leftToYou", "backups", "failed"] {
+            assert!(data[key].is_array(), "{args:?}: {key}");
+        }
+        assert_eq!(data["failed"], serde_json::json!([]), "{args:?}");
+    }
+    assert_eq!(
+        fs::read_dir(&project).unwrap().count(),
+        0,
+        "a reversal in a project with nothing of fgOS's left something behind"
+    );
+    // A refused call is refused by the host with the Node text and exit status.
+    let refused = run(&["--bogus"]);
+    assert_eq!(refused.status.code(), Some(4));
+    assert!(String::from_utf8_lossy(&refused.stderr)
+        .contains("unknown flag \"--bogus\" for \"fgos uninstall\"."));
+    let _ = fs::remove_dir_all(&project);
+}
+
+/// A call from a linked worktree acts on the main checkout that owns it, as the Node CLI did: the extension file
+/// only the main checkout has is the one the reversal names.
+#[cfg(unix)]
+#[test]
+fn uninstall_from_a_linked_worktree_acts_on_the_main_checkout() {
+    let manifest_path = ensure_dev_manifest();
+    let base = fresh_dir("fgos_uninstall_worktree");
+    let main = base.join("main");
+    let linked = base.join("linked");
+    let home = fresh_dir("fgos_uninstall_worktree_home");
+    let state = fresh_dir("fgos_uninstall_worktree_state");
+    let git = |dir: &Path, args: &[&str]| {
+        let output = Command::new("git")
+            .arg("-C")
+            .arg(dir)
+            .args(["-c", "user.email=t@example.com", "-c", "user.name=T"])
+            .args(args)
+            .output()
+            .unwrap();
+        assert!(
+            output.status.success(),
+            "git {args:?}: {}",
+            String::from_utf8_lossy(&output.stderr)
+        );
+    };
+    fs::create_dir_all(&main).unwrap();
+    git(&main, &["init", "-q", "-b", "main"]);
+    fs::write(main.join("seed.txt"), "seed\n").unwrap();
+    git(&main, &["add", "seed.txt"]);
+    git(&main, &["commit", "-qm", "seed"]);
+    git(
+        &main,
+        &[
+            "worktree",
+            "add",
+            "-q",
+            "--detach",
+            linked.to_str().unwrap(),
+        ],
+    );
+    fs::create_dir_all(main.join(".omp/extensions")).unwrap();
+    fs::write(
+        main.join(".omp/extensions/fgos-hooks.ts"),
+        "// the person's own\n",
+    )
+    .unwrap();
+    let output = Command::new(fgos_bin())
+        .arg("uninstall")
+        .current_dir(&linked)
+        .env("PATH", path_without_node())
+        .env("HOME", &home)
+        .env("FGOS_STATE_ROOT", &state)
+        .env("FGOS_ACTIVE_RELEASE_PATH", repo_root())
+        .env("FGOS_ACTIVE_MANIFEST_PATH", &manifest_path)
+        .output()
+        .expect("failed to execute fgos");
+    assert_eq!(
+        output.status.code(),
+        Some(0),
+        "{}",
+        String::from_utf8_lossy(&output.stderr)
+    );
+    let envelope: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
+    let hooks = envelope["data"]["hooks"].as_array().unwrap();
+    assert_eq!(hooks.len(), 1, "{hooks:?}");
+    assert_eq!(
+        hooks[0]["file"],
+        main.join(".omp/extensions/fgos-hooks.ts").to_str().unwrap()
+    );
+    assert_eq!(hooks[0]["state"], "edited");
+    let _ = fs::remove_dir_all(&base);
+}

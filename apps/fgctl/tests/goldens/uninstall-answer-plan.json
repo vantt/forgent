@@ -1,0 +1,112 @@
+{
+  "contract": "fgos.v1",
+  "generated_at": "2026-11-15T11:46:54.831Z",
+  "data_hash": "4150b7ee2596496ac1f7f953a917d53f8ecd35d3d8bd47a9fdb96673cc61112b",
+  "data": {
+    "applied": false,
+    "hooks": [
+      {
+        "cli": "claude",
+        "file": "/tmp/fgos-tp-t631GY/golden-proj-lZ0AkZ/.claude/settings.json",
+        "label": ".claude/settings.json",
+        "removed": [
+          "dispatch-decide (PreToolUse)",
+          "decision-question (PreToolUse)",
+          "main-checkout-delete-guard (PreToolUse)",
+          "mailbox --cli claude --event stop (Stop)",
+          "mailbox --cli claude --event post-tool-use (PostToolUse)",
+          "session-register (SessionStart)"
+        ],
+        "kept": [],
+        "state": "changed"
+      },
+      {
+        "cli": "codex",
+        "file": "/tmp/fgos-tp-t631GY/golden-proj-lZ0AkZ/.codex/hooks.json",
+        "label": ".codex/hooks.json",
+        "removed": [
+          "session-register (SessionStart)",
+          "dispatch-decide (PreToolUse)",
+          "decision-question (PreToolUse)",
+          "main-checkout-delete-guard (PreToolUse)",
+          "mailbox --cli codex --event stop (Stop)",
+          "mailbox --cli codex --event post-tool-use (PostToolUse)"
+        ],
+        "kept": [],
+        "state": "changed"
+      },
+      {
+        "cli": "agy",
+        "file": "/tmp/fgos-tp-t631GY/golden-proj-lZ0AkZ/.agents/hooks.json",
+        "label": ".agents/hooks.json",
+        "removed": [
+          "fgos-session-register",
+          "fgos-dispatch-guard",
+          "fgos-decision-guard",
+          "fgos-delete-guard"
+        ],
+        "kept": [],
+        "state": "changed"
+      },
+      {
+        "cli": "omp",
+        "file": "/tmp/fgos-tp-t631GY/golden-proj-lZ0AkZ/.omp/extensions/fgos-hooks.ts",
+        "label": ".omp/extensions/fgos-hooks.ts",
+        "removed": [
+          "extension"
+        ],
+        "kept": [],
+        "state": "changed"
+      },
+      {
+        "cli": "pi",
+        "file": "/tmp/fgos-tp-t631GY/golden-proj-lZ0AkZ/.pi/extensions/fgos-hooks.ts",
+        "label": ".pi/extensions/fgos-hooks.ts",
+        "removed": [
+          "extension"
+        ],
+        "kept": [],
+        "state": "changed"
+      }
+    ],
+    "skills": {
+      "removed": [],
+      "kept": [],
+      "foreign": [],
+      "skipped": null
+    },
+    "changes": [
+      ".claude/settings.json: remove the fgOS hook dispatch-decide (PreToolUse)",
+      ".claude/settings.json: remove the fgOS hook decision-question (PreToolUse)",
+      ".claude/settings.json: remove the fgOS hook main-checkout-delete-guard (PreToolUse)",
+      ".claude/settings.json: remove the fgOS hook mailbox --cli claude --event stop (Stop)",
+      ".claude/settings.json: remove the fgOS hook mailbox --cli claude --event post-tool-use (PostToolUse)",
+      ".claude/settings.json: remove the fgOS hook session-register (SessionStart)",
+      ".codex/hooks.json: remove the fgOS hook session-register (SessionStart)",
+      ".codex/hooks.json: remove the fgOS hook dispatch-decide (PreToolUse)",
+      ".codex/hooks.json: remove the fgOS hook decision-question (PreToolUse)",
+      ".codex/hooks.json: remove the fgOS hook main-checkout-delete-guard (PreToolUse)",
+      ".codex/hooks.json: remove the fgOS hook mailbox --cli codex --event stop (Stop)",
+      ".codex/hooks.json: remove the fgOS hook mailbox --cli codex --event post-tool-use (PostToolUse)",
+      ".agents/hooks.json: remove the fgOS hook fgos-session-register",
+      ".agents/hooks.json: remove the fgOS hook fgos-dispatch-guard",
+      ".agents/hooks.json: remove the fgOS hook fgos-decision-guard",
+      ".agents/hooks.json: remove the fgOS hook fgos-delete-guard",
+      ".omp/extensions/fgos-hooks.ts: remove the fgOS hook extension",
+      ".pi/extensions/fgos-hooks.ts: remove the fgOS hook extension"
+    ],
+    "keeps": [
+      ".fgos: your fgOS data and config (config.yaml, work, logs and the rest of .fgos)",
+      ".fgos/distribution.json: the committed release pin, so `fgctl init` can bring fgOS back"
+    ],
+    "leftToYou": [
+      "global agent config changed by `fgos wire-agents`, if you ran it: left alone, fgOS keeps no record to undo it from. To undo it: claude plugin uninstall fgOS@fgos-plugins; claude plugin marketplace remove fgos-plugins; restore any <file>.pre-wire-agents-<time> backup beside your agent config by hand"
+    ],
+    "backups": [],
+    "failed": [],
+    "hooksUnwired": false,
+    "hooksSkippedExisting": null,
+    "shellRcSourceLinesFound": [],
+    "shellRcRemovalInstructions": null
+  }
+}

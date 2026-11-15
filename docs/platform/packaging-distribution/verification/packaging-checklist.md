@@ -146,7 +146,7 @@ Status words: `done` met and proven; `partial` met in part, the residual is name
 | SEC-05 | MUST | done | The archive is listed before extraction; only `fgctl` is extracted; links, `..` and absolute names refused. |
 | SEC-06 | SHOULD | done | `cargo deny` job. |
 | UNI-01 | MUST | done | `fgctl uninstall` reverses the project wiring and removes the activation. |
-| UNI-02 | MUST | done | Hook entries, generated skill directories, git hooks, mailbox timer and `.fgos/installation` go; config, data and the pin stay (`uninstall-project.mjs`, `uninstall.rs`; live run in the closing report). The binary, launcher and a shell-rc line are named, not removed. |
+| UNI-02 | MUST | done | Hook entries, generated skill directories, git hooks, mailbox timer and `.fgos/installation` go; config, data and the pin stay (`apps/fgos/src/wiring/uninstall.rs`, `uninstall.rs`; live run in the closing report). The binary, launcher and a shell-rc line are named, not removed. |
 | UNI-03 | MUST | done | `--dry-run`, and the plan prints before anything changes. |
 | UNI-04 | MUST | done | Fill-only reversal; a foreign hook or skill is kept and named. |
 | UNI-05 | MUST | done | `--purge` removes the store entries and says where data lives; identity and locks stay. |

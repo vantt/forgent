@@ -1,6 +1,7 @@
 //! `fgctl uninstall` as a user meets it: a child process in a scratch project with its own HOME and
-//! state root. The project's `fgos` is a stand-in script that records how it was called and answers
-//! the way the real verb does (its own tests own the wiring reversal); what is proven here is the
+//! state root. The project's `fgos` is a stand-in script that records how it was called and replays
+//! answers recorded from the real verb (its own tests own the wiring reversal;
+//! `test/rust-host/fgctl-uninstall.test.mjs` runs the real shim once); what is proven here is the
 //! plan, the order, what is removed and what stays.
 
 use std::path::{Path, PathBuf};
@@ -28,8 +29,10 @@ impl Drop for Scratch {
 }
 
 const HEX: &str = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
-const OK_ANSWER: &str = r#"{"ok":true,"data":{"changes":["settings.json: remove the fgOS hook"],"keeps":[".fgos: your data"],"leftToYou":["rc: remove the line by hand"],"backups":[],"failed":[]}}"#;
-const FAILED_ANSWER: &str = r#"{"ok":true,"data":{"changes":[],"keeps":[],"leftToYou":[],"backups":[],"failed":[{"id":"skills","error":"boom"}]}}"#;
+/// What the project's own `fgos uninstall` answered, recorded from a real release (`fgctl init`, then the shim): a plan,
+/// and a `--yes` run whose backup failed. The stand-in shim replays them, so what `fgctl` parses is what the host prints.
+const OK_ANSWER: &str = include_str!("goldens/uninstall-answer-plan.json");
+const FAILED_ANSWER: &str = include_str!("goldens/uninstall-answer-failed.json");
 
 struct World {
     scratch: Scratch,
@@ -169,7 +172,10 @@ fn without_yes_and_without_a_terminal_it_prints_the_plan_and_changes_nothing() {
         stdout.contains("Keeps:") && stdout.contains("Nothing changed"),
         "{stdout}"
     );
-    assert!(stdout.contains("rc: remove the line by hand"), "{stdout}");
+    assert!(
+        stdout.contains("claude plugin uninstall fgOS@fgos-plugins"),
+        "{stdout}"
+    );
     assert!(world
         .project()
         .join(".fgos/installation/activation.json")
@@ -246,7 +252,8 @@ fn a_failed_reversal_leaves_the_activation_and_the_store_in_place() {
     assert_eq!(out.status.code(), Some(1));
     let stderr = text(&out.stderr);
     assert!(
-        stderr.contains("skills: boom") && stderr.contains("skipped: activation"),
+        stderr.contains("backup: backup failed, nothing changed")
+            && stderr.contains("skipped: activation"),
         "{stderr}"
     );
     assert!(world

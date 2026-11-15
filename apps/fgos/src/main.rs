@@ -136,6 +136,11 @@ static COMPOSITION_PROVIDERS: &[ProviderDescriptor] = &[
     wiring::uninstall::DESCRIPTOR,
 ];
 
+/// The legacy payload root of the running release, for the verbs that read what it ships (its skills, its scripts).
+fn active_payload_root() -> Result<std::path::PathBuf, String> {
+    legacy_exec::resolve_payload().map(|payload| payload.root)
+}
+
 fn main() {
     let args: Vec<std::ffi::OsString> = std::env::args_os().collect();
 
@@ -336,7 +341,9 @@ fn main() {
     service.register_provider(Arc::new(wiring::lock_fence::LockFenceProvider::new()));
     service.register_provider(Arc::new(wiring::doctor::DoctorProvider::new()));
     service.register_provider(Arc::new(wiring::wire_agents::WireAgentsProvider::new()));
-    service.register_provider(Arc::new(wiring::uninstall::UninstallProvider::new()));
+    service.register_provider(Arc::new(wiring::uninstall::UninstallProvider::new(
+        active_payload_root,
+    )));
     let tracker = service.tracker();
 
     match lane {

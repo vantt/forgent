@@ -200,6 +200,10 @@
         {
           "path": "apps/fgos/src/wiring/wire_agents.rs",
           "reason": "the wire-agents verb: the only code that applies the plan, copying each existing file to <file>.pre-wire-agents-<time> through the Durable File door before the claude steps run, and never writing a permission that widens what an agent may do"
+        },
+        {
+          "path": "apps/fgos/src/wiring/uninstall.rs",
+          "reason": "the uninstall notice names the backup suffix wire-agents leaves beside a person's config, and how to undo the plugin by hand; it never writes that config"
         }
       ],
       "debt": [
@@ -210,14 +214,24 @@
         {
           "path": "src/cli/command-registry.mjs",
           "reason": "the wire-agents description names the settings it never sets"
-        },
-        {
-          "path": "src/setup/uninstall-project.mjs",
-          "reason": "the uninstall notice names the backup suffix wire-agents leaves beside a person's config"
         }
       ],
-      "retiredBy": "S4: wire-agents and uninstall move to the host and the Node wiring goes with them",
+      "retiredBy": "S4: wire-agents moves to the host and the Node wiring goes with it",
       "reason": "fgOS changes a person's own agent config only through the opt-in wire-agents verb (RUL111); init and doctor --fix write only the project and ~/.fgos. The patterns catch the backup suffix, the claude plugin calls and the agy permission setting that only that verb applies"
+    },
+    {
+      "job": "project wiring reversal",
+      "kind": "door",
+      "patterns": [
+        "\\.pre-uninstall-(?:\\$\\{|\\{)",
+        "export function (?:uninstallProject|uninstallGitHooks)\\b",
+        "pub fn (?:uninstall_project|unwire_git_hooks)\\b"
+      ],
+      "allowed": [
+        "apps/fgos/src/wiring/uninstall.rs"
+      ],
+      "debt": [],
+      "reason": "what fgOS wrote into a project (hook entries, generated skill directories, the git hooks path it wired, its managed timers) is taken out in one place, uninstall.rs: it plans and applies together, copies every file it rewrites or deletes to <file>.pre-uninstall-<time> first, removes file by file under a root it asserted, and refuses links; the hook table's own reversal, the skill stamp reader, the timer module, the rc-line reader and RepositoryConfig's ownership proof are the pieces it composes"
     },
     {
       "job": "civil date arithmetic",
@@ -430,13 +444,7 @@
       "allowed": [
         "packages/distribution/rust/src/timer.rs"
       ],
-      "debt": [
-        {
-          "path": "src/setup/managed-timer.mjs",
-          "reason": "the Node timer module that uninstall still calls until it moves to the host; the doctor rows and fixes are judged by timer.rs"
-        }
-      ],
-      "retiredBy": "S4: uninstall moves to the host and the Node module is deleted with it",
+      "debt": [],
       "reason": "the OS timers fgOS writes (systemd user units, launchd plists) are rendered, checked, enabled and removed in one Rust module; the scheduler calls go through the process door's bounded runner"
     },
     {
@@ -1355,10 +1363,8 @@
     "src/setup/mailbox-limits.mjs": "infra",
     "src/setup/mailbox-claude-accept.mjs": "infra",
     "src/setup/agent-wiring.mjs": "infra",
-    "src/setup/uninstall-project.mjs": "infra",
     "src/setup/setup-use-case.mjs": "use-case",
     "src/setup/version-info.mjs": "infra",
-    "src/setup/managed-timer.mjs": "infra",
     "src/setup/agy-permissions.mjs": "infra",
     "src/setup/git-checks.mjs": "infra",
     "src/setup/git-retention-note.mjs": "infra",

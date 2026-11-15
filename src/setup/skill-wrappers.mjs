@@ -22,7 +22,7 @@ import { createGitInspect, gitPortOptions } from '../git/inspect.mjs';
 import { inspectEntries, inspectPath } from '../util/git-paths.mjs';
 import { domainCatalog } from '../util/domain-dirs.mjs';
 import { cutFrontmatter, readFrontmatter, YamlParseError } from '../util/yaml.mjs';
-import { firstSymlinkUnder, refuseSymlink } from '../util/refuse-symlink.mjs';
+import { refuseSymlink } from '../util/refuse-symlink.mjs';
 import { uniqueTmpTag } from '../util/unique-tmp-tag.mjs';
 import { computeInstructionProjection, materializeInstructionProjection } from './instruction-projections.mjs';
 
@@ -740,41 +740,6 @@ export function materializeSkillsIntoProject(packageRoot, targetRoot) {
     keep: guard?.forRoots(targetAgentsSkills, targetClaudeSkills),
   });
   return { copied, wrappersWritten, skipped: guard?.skipped ?? [] };
-}
-
-/**
- * The skill directories of a project that fgOS wrote, and the same-named ones it did not. A
- * `.claude/skills` entry is ours when it carries the wrapper stamp, a `.agents/skills` entry when it
- * carries the assembled header (or sits beside a stamped wrapper); a directory under an owned name
- * without a stamp is another tool's and is listed in `foreign`, as is a link under an owned name.
- * Anything else is the person's and is not named. Reads only.
- */
-export function generatedSkillDirs(projectRoot, owned) {
-  const ours = [];
-  const foreign = [];
-  for (const [root, isStamped] of [
-    [path.join(projectRoot, '.claude', 'skills'), isGeneratedWrapper],
-    [path.join(projectRoot, '.agents', 'skills'), isOwnAgentsDir],
-  ]) {
-    if (!fs.existsSync(root)) continue;
-    // A link in the skills root or above it is never walked: what it leads to is not this project's.
-    const link = firstSymlinkUnder(projectRoot, path.relative(projectRoot, root));
-    if (link) {
-      foreign.push({ dir: link, why: 'a symbolic link: left as it is' });
-      continue;
-    }
-    for (const entry of fs.readdirSync(root, { withFileTypes: true })) {
-      if (isOwnTmpFile(entry.name)) continue;
-      const dir = path.join(root, entry.name);
-      if (entry.isSymbolicLink()) {
-        if (owned.has(entry.name)) foreign.push({ dir, why: 'a symbolic link' });
-      } else if (entry.isDirectory()) {
-        if (isStamped(dir)) ours.push(dir);
-        else if (owned.has(entry.name)) foreign.push({ dir, why: 'it carries no fgOS generated marker' });
-      }
-    }
-  }
-  return { ours, foreign };
 }
 
 /**
