@@ -234,6 +234,7 @@ dependencies = [
  "fgos-seat-binding",
  "fgos-terminal-control",
  "fgos-work-state",
+ "fgos-yaml-doc",
  "libc",
  "serde",
  "serde_json",

@@ -23,6 +23,8 @@ fgos-seat-binding = { path = "../../packages/seat-binding/rust" }
 fgos-mailbox = { path = "../../packages/mailbox/rust/store" }
 fgos-mailbox-core = { path = "../../packages/mailbox/rust/core" }
 fgos-durable-file = { path = "../../packages/durable-file/rust" }
+# The YAML door: the skill guard reads a skill file's frontmatter version through it.
+fgos-yaml-doc = { path = "../../packages/yaml-doc/rust" }
 tokio = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true, features = ["preserve_order", "arbitrary_precision"] }
