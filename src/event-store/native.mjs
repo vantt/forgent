@@ -130,11 +130,6 @@ export function openStore(resolvedRoot, machineId, files, loaderOptions, remote 
       const ranks = outsideGate(heldRanks);
       return call(() => native.promote({ branch, throughSeq, cursor, writer, ts }, ranks, hotLockDepth()));
     },
-    /** `opportunistic` tries the seal lock and returns `{ busy: true }` instead of waiting when another process holds it. */
-    sync({ remote = 'origin', noPush = false, opportunistic = false } = {}, heldRanks) {
-      const ranks = outsideGate(heldRanks);
-      return call(() => native.sync(remote, noPush, ranks, hotLockDepth(), opportunistic));
-    },
     maintenance(heldRanks) {
       const ranks = outsideGate(heldRanks);
       return call(() => native.maintenance(ranks, hotLockDepth()));
@@ -142,10 +137,6 @@ export function openStore(resolvedRoot, machineId, files, loaderOptions, remote 
     status(heldRanks, remote = 'origin') {
       const ranks = outsideGate(heldRanks);
       return call(() => native.status(remote, ranks, hotLockDepth()));
-    },
-    exportJsonl({ streams, since = null, out }, heldRanks) {
-      const ranks = outsideGate(heldRanks);
-      return call(() => native.exportJsonl(streams, since, out, ranks, hotLockDepth()));
     },
     legacyLayout(heldRanks) {
       const ranks = outsideGate(heldRanks);
@@ -192,7 +183,7 @@ export function eventStoreAddonAvailable(loaderOptions) {
   return typeof native.resolveEventStore === 'function' && typeof native.openStore === 'function'
     && typeof native.eventStoreFacts === 'function' && typeof native.maintainEventStore === 'function'
     && typeof native.eventStoreBranchKey === 'function'
-    && ['read', 'append', 'admitWrites', 'promote', 'sync', 'maintenance', 'status', 'exportJsonl', 'legacyLayout'].every(name => typeof native.EventStore?.prototype?.[name] === 'function');
+    && ['read', 'append', 'admitWrites', 'promote', 'maintenance', 'status', 'legacyLayout'].every(name => typeof native.EventStore?.prototype?.[name] === 'function');
 }
 
 /** Branch stream key, defined and validated by the crate. */

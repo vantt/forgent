@@ -366,7 +366,8 @@
       "patterns": ["['\"]events['\"],\\s*['\"](?:sync|seal)['\"]", "\"events\"\\.into\\(\\)"],
       "allowed": [
         { "path": "src/event-store/maintenance.mjs", "reason": "the Node lifecycle wrapper of Node verbs starts the host binary for the publish and seal children" },
-        { "path": "apps/fgos/src/invocation_doors.rs", "reason": "the host lifecycle starts its own executable for the publish child" }
+        { "path": "apps/fgos/src/invocation_doors.rs", "reason": "the host lifecycle starts its own executable for the publish child" },
+        { "path": "scripts/event-store/forge-probe.sh", "reason": "a manual real-forge probe runs the host's `events sync` in the foreground to push one ref; it starts no detached child" }
       ],
       "debt": [],
       "retiredBy": "S7: the Node lifecycle wrapper retires with the last Node verb",
@@ -375,7 +376,7 @@
     {
       "job": "per-session checkout registry",
       "kind": "door",
-      "patterns": ["sessions\\.json", "\\bSESSIONS_FILE\\b", "export function (?:createSession|endSession|reclaimOrphanedSessions)\\b"],
+      "patterns": ["sessions\\.json", "\\bSESSIONS_FILE\\b"],
       "allowed": [
         "apps/fgos/src/wiring/session.rs",
         { "path": "packages/identity/rust/src/resolve.rs", "reason": "reads the file read-only to confirm an env session id (one field, fail soft); the row shape is the `x-sessionRegistry` section of identity.writer.v1.json, run by both readers" },
@@ -650,7 +651,6 @@
       "kind": "door",
       "patterns": [
         "gateway\\.json",
-        "export function (?:startGateway|stopGateway|gatewayStatus)\\b",
         "['\"]--bin['\"],\\s*['\"]fgos-gateway['\"]",
         "['\"]fgos-gateway['\"]"
       ],
@@ -660,6 +660,29 @@
       ],
       "debt": [],
       "reason": "starting, stopping and probing the gateway (the .fgos/gateway.json registry, the release build of apps/fgos-gateway, the detached spawn) is one module of the host; nothing else in the product reads or writes the registry, builds the binary or names it to run it, so a second path to a gateway process fails here (the holder-lock origin list only names the binary to recognise a lock holder)"
+    },
+    {
+      "job": "retired Node S3 verb code",
+      "kind": "door",
+      "patterns": [
+        "\\bsyncUseCase\\b",
+        "\\bstatusUseCase\\b",
+        "\\bsealUseCase\\b",
+        "\\bexportUseCase\\b",
+        "\\bstartGateway\\b",
+        "\\bstopGateway\\b",
+        "\\bgatewayStatus\\b",
+        "\\bGatewayControlError\\b",
+        "\\bcreateSession\\b",
+        "\\bendSession\\b",
+        "\\breclaimOrphanedSessions\\b",
+        "\\bsessionSummary\\b",
+        "\\bacquireSessionsLock\\b",
+        "\\bSessionError\\b"
+      ],
+      "allowed": [],
+      "debt": [],
+      "reason": "the `events`, `session` and `gateway` verbs are native in the host (apps/fgos/src/wiring/{events,session,gateway_control}.rs): the Node use cases, the session writers and the gateway control module are deleted, Node reads the registry only through `fgos session list`, and no file may bring one of these names back"
     }
   ],
   "files": {

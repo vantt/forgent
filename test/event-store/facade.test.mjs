@@ -53,7 +53,7 @@ test('real facade append, full read, seal, and published read retain the same en
 
 test('seal-like operations require held ranks and reject ranks 58 and 80 before native work', { skip: process.platform !== 'linux' }, t => {
   const { store } = fixture(t);
-  for (const invoke of [r => store.seal('project', r), r => store.sealAll(['project'], r), r => store.sealIfDue('project', 60, r), r => store.sync({}, r), r => store.read({ streams: ['project'] }, r), r => store.status(r)]) {
+  for (const invoke of [r => store.seal('project', r), r => store.sealAll(['project'], r), r => store.sealIfDue('project', 60, r), r => store.read({ streams: ['project'] }, r), r => store.status(r)]) {
     assert.throws(() => invoke(undefined), { code: 'event-store-held-ranks-required' });
     for (const rank of [58, 70, 80]) assert.throws(() => invoke([rank]), { code: 'lock-order-violation' });
   }
@@ -67,7 +67,7 @@ test('prefetched store survives a hot transaction while every Git route refuses 
   withStateTx(hot, tx => {
     const result = store.append('project', [event], {}, 'fixture', [60]);
     assert.equal(store.readInGate(result.ack.origin, 'project', 0).events.length, 1);
-    for (const invoke of [() => store.seal('project', []), () => store.sealIfDue('project', 60, []), () => store.sealAll(['project'], []), () => store.read({ streams: ['project'] }, []), () => store.sync({}, []), () => store.status([])]) {
+    for (const invoke of [() => store.seal('project', []), () => store.sealIfDue('project', 60, []), () => store.sealAll(['project'], []), () => store.read({ streams: ['project'] }, []), () => store.status([])]) {
       assert.throws(invoke, { code: 'event-store-seal-under-state' });
     }
   }, { prefetched: { writer: 'fixture' } });
@@ -110,18 +110,6 @@ test('machine fallback and Git environment scrubbing use the real config-read po
     }
   }
 });
-
-test('sync marshals a real local bare-remote round trip through Publication authority', { skip: process.platform !== 'linux' }, t => {
-  const { store, repo, temp, stateRoot, git } = fixture(t);
-  const remote = path.join(temp, 'remote.git');
-  execFileSync('git', ['init', '-q', '--bare', remote]);
-  git('remote', 'add', 'origin', remote);
-  addon.ensureGitFetchMapping(stateRoot, repo, repo, 'origin', addon.gitFetchMappings('origin'), 'facade-fetch-mapping');
-  store.append('project', [event], {}, 'fixture', []);
-  assert.deepEqual(store.sync({ remote: 'origin' }, []).warnings, []);
-  assert.match(execFileSync('git', ['--git-dir', remote, 'rev-parse', 'refs/fgos/events/facade-machine'], { encoding: 'utf8' }).trim(), /^[a-f0-9]{40}$/);
-});
-
 
 test('native prepared authority binds append identity and has no raw constructor', { skip: process.platform !== 'linux' }, t => {
   const { resolved, contracts } = fixture(t);

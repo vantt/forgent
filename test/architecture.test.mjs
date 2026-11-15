@@ -1905,6 +1905,18 @@ test('door check: every name of the retired Node help renderer fails when a file
   }
 });
 
+test('door check: every name of the retired Node events, session and gateway code fails when a file declares it again', () => {
+  const row = manifest.doors.find((r) => r.job === 'retired Node S3 verb code');
+  assert.ok(row && row.allowed.length === 0, 'the retired-names row exists and allows no file');
+  const names = ['syncUseCase', 'statusUseCase', 'sealUseCase', 'exportUseCase', 'startGateway', 'stopGateway', 'gatewayStatus', 'GatewayControlError', 'createSession', 'endSession', 'reclaimOrphanedSessions', 'sessionSummary', 'acquireSessionsLock', 'SessionError'];
+  assert.equal(row.patterns.length, names.length, 'one pattern per retired name');
+  for (const name of names) {
+    const failures = checkDoors([row], new Map([['src/seeded.mjs', `export function ${name}() {}\n`]]));
+    assert.equal(failures.length, 1, `${name} must fail the door`);
+    assert.match(failures[0], /retired name/);
+  }
+});
+
 test('door check: a stale allowed path, stale glob and stale debt entry each fail', () => {
   const text = new Map([['src/a.mjs', 'foo(1);']]);
   const base = { job: 'j', kind: 'door', patterns: ['foo\\('] };

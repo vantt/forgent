@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { spawn, spawnSync } from 'node:child_process';
-import { fixture, append, loaderOptions, addon } from './phase07-fixture.mjs';
+import { fixture, append, loaderOptions, addon, hostEvents } from './phase07-fixture.mjs';
 import { branchKey } from '../../src/event-store/index.mjs';
 import { benchmarkStore, seedStore } from '../../scripts/event-store/store-increment-worker.mjs';
 
@@ -28,7 +28,7 @@ test('maintenance returns the actual last push receipt',t=>{
   const f=fixture(t,{remote:true});
   append(f.store,[{payload:{id:'pushed'}}]);
   addon.ensureGitFetchMapping(f.stateRoot,f.repo,f.repo,'origin',addon.gitFetchMappings('origin'),'maintenance-mapping');
-  f.store.sync({remote:'origin'},[]);
+  hostEvents(f,['sync','--remote','origin']);
   const last=f.store.maintenance([]).lastPush;
   assert.equal(last.remote,'origin');assert.equal(last.error,null);
   assert.ok(last.time>0);

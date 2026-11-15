@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
 # Event Store real-forge probe (spec section 23.2 item 5, last step; owner
-# authorization Q3). Through the facade, clone A appends one event and syncs,
-# which pushes refs/fgos/events/<probe-id> to the forge; a fresh clone B
-# installs the fetch refspec, syncs without pushing and must read the event.
+# authorization Q3). Through the facade, clone A appends one event; the host's
+# `fgos events sync` then pushes refs/fgos/events/<probe-id> to the forge; a fresh
+# clone B installs the fetch refspec, syncs without pushing and must read the event.
 # Pushes one ref to the forge; the last line prints how to delete it.
 #   node scripts/git-addon.mjs                       # once, builds the addon
+#   FGOS_HOST_BIN=<host binary>                      # or an active installation: the sync runs in the host
 #   scripts/event-store/forge-probe.sh <forge-url>   # from the checkout
 set -euo pipefail
 FORGE=$1; CHECKOUT=$(cd "$(dirname "$0")/../.." && pwd)
@@ -23,12 +24,22 @@ import { loadNativeAddon } from './src/git/native.mjs';
 import { openStore } from './src/event-store/index.mjs';
 import { fixGitFetchMapping } from './src/setup/git-checks.mjs';
 import { gitAddonDirectory } from './scripts/lib/git-addon-stage.mjs';
+import { resolveHostBin } from './src/util/host-bin.mjs';
+import { execFileSync } from 'node:child_process';
 const P = process.argv[2];
 const git = sandboxGit(P);
 const loaderOptions = { descriptor: { manifest: JSON.parse(fs.readFileSync(path.join(gitAddonDirectory(process.cwd()), 'manifest.json'))), releaseRoot: process.cwd() } };
 const addon = loadNativeAddon(loaderOptions);
 const contract = path.join(P, 'contract.json');
 fs.writeFileSync(contract, JSON.stringify({ v: 1, types: [{ type: 'forge.probe', domain: 'forge', schemaVersion: 1, scope: 'project', sealOnWrite: false }] }));
+const host = resolveHostBin(process.cwd());
+if (!host) throw new Error('no host binary: set FGOS_HOST_BIN or activate an installation');
+// `fgos events sync` is a host verb; the clone's own state root and a clean guard decide which store it opens.
+const hostSync = (clone, ...flags) => {
+  const env = { ...process.env, FGOS_STATE_ROOT: clone.state };
+  delete env.FGOS_RUST_HOST_RECURSION_GUARD;
+  return JSON.parse(execFileSync(host, ['events', 'sync', '--remote', 'origin', ...flags, '--dir', clone.repo], { cwd: clone.repo, encoding: 'utf8', env })).data;
+};
 const id = `forge-probe-${Date.now().toString(36)}`;
 function clone(name, machine) {
   const repo = path.join(P, name), state = path.join(P, `${name}-state`);
@@ -41,17 +52,17 @@ function clone(name, machine) {
   const mapping = fixGitFetchMapping(repo, loaderOptions);
   if (!mapping.changed) throw new Error(mapping.message);
   const resolved = addon.resolveEventStore(repo, state, repo);
-  return openStore(resolved, resolved.machineId, [contract], loaderOptions);
+  return { repo, state, store: openStore(resolved, resolved.machineId, [contract], loaderOptions) };
 }
 const a = clone('a', id);
-const appended = a.append('project', [{ eventType: 'forge.probe', schemaVersion: 1, payload: { id }, ts: new Date().toISOString() }], {}, 'forge-probe', []);
-const pushed = a.sync({ remote: 'origin' }, []);
+const appended = a.store.append('project', [{ eventType: 'forge.probe', schemaVersion: 1, payload: { id }, ts: new Date().toISOString() }], {}, 'forge-probe', []);
+const pushed = hostSync(a);
 const ref = `refs/fgos/events/${id}`;
 const b = clone('b', `${id}-reader`);
-const fetched = b.sync({ remote: 'origin', noPush: true }, []);
+const fetched = hostSync(b, '--no-push');
 // The fresh clone's mirror of A's ref is what the forge served.
-const remoteTip = Object.entries(b.status([]).refs).find(([name]) => name.endsWith(`/events/${id}`))?.[1] ?? null;
-const seen = b.read({ streams: ['project'] }, []).events.some(e => e.h === appended.events[0].h);
+const remoteTip = Object.entries(b.store.status([]).refs).find(([name]) => name.endsWith(`/events/${id}`))?.[1] ?? null;
+const seen = b.store.read({ streams: ['project'] }, []).events.some(e => e.h === appended.events[0].h);
 const result = { forgeRef: ref, remoteTip, pushWarnings: pushed.warnings, fetchWarnings: fetched.warnings, freshCloneReadsEvent: seen, verdict: remoteTip && seen ? 'PASS' : 'FAIL' };
 console.log(JSON.stringify(result));
 console.log(`remove the probe ref afterwards: git push ${process.env.FORGE ?? '<forge-url>'} :${ref}`);

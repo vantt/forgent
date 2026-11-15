@@ -394,34 +394,6 @@ impl EventStore {
         .map_err(error)
     }
     #[napi]
-    pub fn sync(
-        &self,
-        remote: String,
-        no_push: bool,
-        held_ranks: Vec<u32>,
-        hot_lock_depth: u32,
-        opportunistic: Option<bool>,
-    ) -> Result<Value> {
-        let (driver, repo, machine) = self.context(&held_ranks, hot_lock_depth)?;
-        let result = fgos_event_store::sync::sync(
-            driver,
-            repo,
-            fgos_event_store::sync::SyncRequest {
-                layout: &self.layout,
-                machine,
-                remote: &remote,
-                no_push,
-                opportunistic: opportunistic.unwrap_or(false),
-                held_ranks: &held_ranks,
-                hot_lock_depth,
-            },
-        )
-        .map_err(error)?;
-        Ok(
-            json!({"mirrorsChanged":result.mirrors_changed,"warnings":result.warnings,"busy":result.busy}),
-        )
-    }
-    #[napi]
     pub fn maintenance(&self, held_ranks: Vec<u32>, hot_lock_depth: u32) -> Result<Value> {
         self.context(&held_ranks, hot_lock_depth)?;
         fgos_event_store::diagnostics::maintenance(&self.layout).map_err(error)
@@ -558,42 +530,6 @@ impl EventStore {
         let (driver, repo, machine) = self.context(&held_ranks, hot_lock_depth)?;
         fgos_event_store::diagnostics::status(driver, repo, &self.layout, machine, &remote)
             .map_err(error)
-    }
-    #[napi]
-    pub fn export_jsonl(
-        &self,
-        streams: Vec<String>,
-        since: Value,
-        out: String,
-        held_ranks: Vec<u32>,
-        hot_lock_depth: u32,
-    ) -> Result<Value> {
-        let (driver, repo, machine) = self.context(&held_ranks, hot_lock_depth)?;
-        let origin = if self.layout.store().exists() {
-            StoreIdentity::open(&self.layout, machine)
-                .map_err(error)?
-                .store_id
-        } else {
-            String::new()
-        };
-        let streams = stream_ids(&streams)?;
-        let since = if since.is_null() {
-            Default::default()
-        } else {
-            fgos_event_store::cursor::Cursor::parse(
-                &fgos_event_store::envelope::line(&since).map_err(error)?,
-            )
-            .map_err(error)?
-        };
-        let request = fgos_event_store::export::ExportRequest {
-            layout: &self.layout,
-            origin: &origin,
-            machine,
-            streams: &streams,
-            since: &since,
-            out: Path::new(&out),
-        };
-        fgos_event_store::export::export_jsonl(driver, repo, request).map_err(error)
     }
     #[napi]
     pub fn legacy_layout(&self, held_ranks: Vec<u32>, hot_lock_depth: u32) -> Result<Value> {
