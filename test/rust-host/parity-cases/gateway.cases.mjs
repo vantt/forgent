@@ -14,10 +14,12 @@
 // the pair of exit codes and the words the host answers with; the entries must differ in exactly that way and in no
 // other. `ignoreEvidence` names the evidence keys that may differ.
 import fs from "node:fs";
+import os from "node:os";
 import path from "node:path";
 import { execFileSync, spawnSync } from "node:child_process";
 import { observe, selfRecord } from "../../../src/native/process-identity.mjs";
 import { resolveFaultLogPath } from "../../../src/observe/invocation-fault-log.mjs";
+import { runCaseOnEntry, compareResults } from "../harness.mjs";
 
 const git = (cwd, ...args) => execFileSync("git", ["-C", cwd, ...args], { stdio: "pipe" });
 const sleepSync = (ms) => Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms);
@@ -300,3 +302,53 @@ export const cases = [
   accepted("unknown-sub-command", "project", ["restart"], 4, 4, 'unknown gateway subcommand "restart". Available: start, stop, status'),
   accepted("flag-before-missing-sub-command", "project", ["--dir", "{REPO}"], 4, 4, "gateway requires a subcommand. Available: start, stop, status"),
 ];
+
+const substituteIn = (result, pairs) => {
+  for (const [pattern, replacement] of pairs ?? []) {
+    const re = new RegExp(pattern, "g");
+    result.stdoutText = result.stdoutText.replace(re, replacement);
+    result.stderrText = result.stderrText.replace(re, replacement);
+  }
+  result.stdout = Buffer.from(result.stdoutText);
+  result.stderr = Buffer.from(result.stderrText);
+};
+
+async function runOn(entry, testCase, scratch) {
+  fs.rmSync(scratch, { recursive: true, force: true });
+  const fixture = prepare(testCase, scratch);
+  try {
+    const result = await runCaseOnEntry(entry, { ...testCase, cwd: fixture.cwd, env: fixture.env, args: fixture.args });
+    return { result, left: evidence(fixture) };
+  } finally {
+    fixture.cleanup();
+  }
+}
+
+/** Runs `testCase` on both entries (a fresh project each, at the same path) and compares them; `{ caseId, passed, differences }`. */
+export async function runPreparedCase(entryA, entryB, testCase) {
+  const scratch = path.join(fs.mkdtempSync(path.join(os.tmpdir(), "gateway-parity-")), "p");
+  const a = await runOn(entryA, testCase, scratch);
+  const b = await runOn(entryB, testCase, scratch);
+  fs.rmSync(path.dirname(scratch), { recursive: true, force: true });
+  const differences = [];
+  if (testCase.accepted) {
+    const { baseExit, hostExit, hostText } = testCase.accepted;
+    if (a.result.exitCode !== baseExit) differences.push(`base exit ${a.result.exitCode} != ${baseExit}`);
+    if (b.result.exitCode !== hostExit) differences.push(`host exit ${b.result.exitCode} != ${hostExit}`);
+    if (!b.result.stderrText.includes(hostText)) differences.push(`host stderr lacks ${JSON.stringify(hostText)}`);
+    if (a.result.stderrText.includes(hostText)) differences.push("base stderr already says the host text");
+  } else {
+    substituteIn(a.result, testCase.substitute);
+    substituteIn(b.result, testCase.substitute);
+    differences.push(...compareResults(testCase, a.result, b.result).differences);
+    for (const key of new Set([...Object.keys(a.left), ...Object.keys(b.left)])) {
+      if ((testCase.ignoreEvidence ?? []).includes(key)) continue;
+      if (JSON.stringify(a.left[key]) !== JSON.stringify(b.left[key])) differences.push(`evidence ${key}: base ${JSON.stringify(a.left[key])} != host ${JSON.stringify(b.left[key])}`);
+    }
+  }
+  if (differences.length) {
+    const note = (label, r) => `${label}: exit ${r.result.exitCode} stdout ${JSON.stringify(r.result.stdoutText.slice(0, 400))} stderr ${JSON.stringify(r.result.stderrText.slice(0, 500))}`;
+    differences.push(note("base", a), note("host", b));
+  }
+  return { caseId: testCase.id, passed: differences.length === 0, differences };
+}
