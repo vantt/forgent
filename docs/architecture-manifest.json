@@ -216,9 +216,7 @@
         { "path": "scripts/build-rust-distribution.mjs", "reason": "producer half of the release-manifest pair kept together with its verifier" },
         "packages/distribution/rust/src/verify.rs"
       ],
-      "debt": [
-        { "path": "src/runner/execution/seat-policy.mjs", "reason": "its own canonicalJson sorts keys by Array.sort and prints numbers with JSON.stringify, so it equals RFC 8785 only by luck; it is not an accepted exception" }
-      ],
+      "debt": [],
       "retiredBy": "the exceptions the component-boundary row names go when their stated reasons end (the release-manifest pair moves as one; the others when their contracts change)",
       "reason": "RFC 8785 bytes come from one crate; each allowed exception except run-supervisor envelope.rs (its envelope digest, not named in that row) is named with its reason in the component-boundary row for Canonical JSON"
     },

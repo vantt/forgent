@@ -9,6 +9,7 @@
 // Architecture guard: MUST NOT import src/state/** or src/runner/coordination/**.
 
 import crypto from 'node:crypto';
+import { canonicalJson } from '../../native/door.mjs';
 import { bindSeat } from '../../seat-binding/client.mjs';
 import { bindingTasteOf } from './capability-config.mjs';
 
@@ -16,22 +17,16 @@ import { bindingTasteOf } from './capability-config.mjs';
 const SEAT_CONFIG_KEYS = Object.freeze(['defaults', 'maxTier', 'tierFallback', 'modelPolicies']);
 const MAX_CACHED = 2000;
 
-const isObject = (value) => value !== null && typeof value === 'object' && !Array.isArray(value);
-
 /** The slice of a runner config the crate reads: tier vocabulary, cells, fallback order and the per-capability taste. */
 export function seatConfigOf(runnerConfig) {
   const runner = runnerConfig?.runner && !runnerConfig.modelPolicies ? runnerConfig.runner : (runnerConfig ?? {});
   const config = {};
   for (const key of SEAT_CONFIG_KEYS) if (runner[key] !== undefined) config[key] = runner[key];
   config.capabilities = bindingTasteOf(runner);
-  return config;
-}
-
-/** JSON with every object's keys sorted, so equal configs digest equal whatever order they were written in. */
-function canonicalJson(value) {
-  if (Array.isArray(value)) return `[${value.map(canonicalJson).join(',')}]`;
-  if (isObject(value)) return `{${Object.keys(value).sort().map((key) => `${JSON.stringify(key)}:${canonicalJson(value[key])}`).join(',')}}`;
-  return JSON.stringify(value) ?? 'null';
+  // The slice is exactly what goes to the crate as JSON text: a non-finite number and an undefined array member read as
+  // null and an undefined object member is absent. Normalizing here keeps the digest, which refuses what JSON has no form
+  // for, over the same bytes the crate receives.
+  return JSON.parse(JSON.stringify(config));
 }
 
 /** The semantic config slice and its digest. */

@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "881144fdaafeb2c2fe56116160f6611bf7e99f2a5138791c76f0bdd17782f359",
+  "payloadDigest": "f926c04105cc99fc45b4eed12e81398dddc03d7896c03f88e977903338a1f23b",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "a5629383f89b4488b252a62f0ea86463e649e33e0a891db1a19af2cd6c136aca",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -1096,7 +1096,7 @@
     "src/runner/execution/run-request.mjs": "e704b5658f03fae0ce279e31aaee560af3f9648e7f41d39863ce406a0bb03494",
     "src/runner/execution/run.mjs": "645228be746fe5b7724a4adfef2953e45c31ee2916a442c430a16744740cafad",
     "src/runner/execution/seat-ledger.mjs": "e033ac97585dc96b22b35d69d361d96d04b2e2b84703bcde241442ec84e74680",
-    "src/runner/execution/seat-policy.mjs": "3f3d9b166a071eea1c01dce3c76189689b7971aadb06341a77d3e83c659af9a6",
+    "src/runner/execution/seat-policy.mjs": "e6293e244eed9e3b4f32fce85869f6f80f504734dd6dc8d9fae3074d8deda32c",
     "src/runner/execution/seat-resolver.mjs": "34728d8859a4af8cff1979178ca0f87882c24cb00da2bfcd772a0655ba3d44e8",
     "src/runner/execution/unit-control.mjs": "039d11a4fc003664db5fc0dabd2a3d44835a0d43f1e3826faaadee4339a7d7cf",
     "src/runner/execution/unit-run-history.mjs": "3bdc5074997363f237ddecfc6f43429663500de6e53df2138046b9cd28e988f7",
