@@ -46,7 +46,8 @@ Phase-lead rules: [plan.md](plan.md). Branch `rust-verb-migration-program/s4-p11
    and `fgos --help setup` answer like any unknown verb (did-you-mean when one is near).
 3. Every text that tells a user to run `fgos setup` (00 F15) names the current door instead: registry descriptions
    (`command-registry.mjs:1098, 1320, 2339`, regenerate the manifest); the hooks-path row message
-   (`registrations.mjs:954`) if 04 has not moved it yet; `apps/fgctl/src/help.rs`; config standard and schema texts
+   (`registrations.mjs:954`) if 04 has not moved it yet; the five Rust refusal texts that name `setup`
+   (`refspec.rs`, `legacy_import.rs`, event-store `identity.rs` and `identity/machine.rs`; 00 F15 lists them); `apps/fgctl/src/help.rs`; config standard and schema texts
    (`core/config-standard/mailbox.yaml:93`, `core/config-schema/mailbox.schema.yaml:288`); skills text
    (`core/skills/_shared/capability-catalog.md:136`, then `npm run build:skills`); code comments that describe current
    behaviour (`src/state/worker-slots.mjs:54-69`, `packages/seat-binding/rust/src/tier.rs:2`,

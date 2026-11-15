@@ -46,7 +46,8 @@ Phase-lead rules: [plan.md](plan.md). Branch `rust-verb-migration-program/s4-p07
    `bridge:release-builder` and an item for the big lead (it is then the one bridged row no step retires, so S7
    cannot delete the bridge until it moves); never a copy of the walker.
 3. Delete (last importer, D14): `src/setup/{claude-code-hooks,agy-permissions,mailbox-claude-accept,project-launcher,agent-wiring}.mjs`,
-   `version-info.mjs` and `mailbox-limits.mjs` and `omp-natives-checks.mjs` if 00 finds no other user; the rows'
+   `version-info.mjs` and `omp-natives-checks.mjs` if 00 finds no other user (`mailbox-limits.mjs` stays: the frozen
+   `agent-hooks.mjs` imports it); the rows'
    bodies and registrations; the doors rows' debt entries for these files (stale check). `src/setup/agent-hooks.mjs`
    is NOT deleted: it is frozen by the v7e, v7h and v7i file sets (MAIL 2026-11-15; a deleted or ported file is a new
    measurement). It stays with `test/setup/agent-hooks.test.mjs`, as does `scripts/lib/mailbox-live-confined.mjs`; both
