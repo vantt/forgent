@@ -78,7 +78,7 @@ pub struct DoctorRequest {
 }
 
 /// What the Node CLI made of a flag: any value but an empty string is true (`--fix`, `--fix yes`, `--pretty`).
-fn truthy(flag: Option<&FlagValue>) -> bool {
+pub(crate) fn truthy(flag: Option<&FlagValue>) -> bool {
     match flag {
         None => false,
         Some(FlagValue::One(FlagScalar::Bool)) | Some(FlagValue::Many(_)) => true,

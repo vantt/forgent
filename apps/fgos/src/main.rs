@@ -132,6 +132,7 @@ static COMPOSITION_PROVIDERS: &[ProviderDescriptor] = &[
     wiring::lock_status::DESCRIPTOR,
     wiring::lock_fence::DESCRIPTOR,
     wiring::doctor::DESCRIPTOR,
+    wiring::wire_agents::DESCRIPTOR,
 ];
 
 fn main() {
@@ -333,6 +334,7 @@ fn main() {
     service.register_provider(Arc::new(wiring::lock_status::LockStatusProvider::new()));
     service.register_provider(Arc::new(wiring::lock_fence::LockFenceProvider::new()));
     service.register_provider(Arc::new(wiring::doctor::DoctorProvider::new()));
+    service.register_provider(Arc::new(wiring::wire_agents::WireAgentsProvider::new()));
     let tracker = service.tracker();
 
     match lane {

@@ -2374,6 +2374,7 @@ export const COMMAND_REGISTRY = [
       required: [],
     },
     examples: ['fgos wire-agents', 'fgos wire-agents --yes', 'fgos wire-agents --json'],
+    native: true,
     touchesState: false,
     store: 'none',
     externalEffect: true,

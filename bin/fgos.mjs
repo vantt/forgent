@@ -3526,13 +3526,6 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       });
     }
 
-    // The one opt-in door to a person's own agent config (src/setup/agent-wiring.mjs). Without --yes
-    // it only plans; --yes backs up each file first. Its project is the main checkout, like setup's.
-    case 'wire-agents': {
-      const { wireAgentsUseCase } = await import('../src/setup/agent-wiring.mjs');
-      return wireAgentsUseCase(mainCheckoutRootOf({}), { apply: Boolean(flags.yes) });
-    }
-
     case 'unclaim': {
       const id = requireField(positional[0] ?? flags.id, 'unclaim requires an id: fgos unclaim <id>');
       const repoRoot = mainCheckoutRootOf(flags);
@@ -3877,9 +3870,6 @@ async function main() {
         process.stdout.write(renderPretty(verb, data));
       } else if (verb === 'plan-lint' && !flags.json) {
         process.stdout.write(renderPlanLintReport(data));
-      } else if (verb === 'wire-agents' && !flags.json) {
-        const { renderAgentWiringText } = await import('../src/setup/agent-wiring.mjs');
-        process.stdout.write(renderAgentWiringText(data));
       } else if (verb === 'workflow' && positional[0] === 'propose' && !flags.json) {
         const { renderProposalText } = await import('../src/workflow/propose.mjs');
         process.stdout.write(renderProposalText(data));

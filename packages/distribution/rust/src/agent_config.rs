@@ -92,6 +92,49 @@ fn run_claude(
     }
 }
 
+/// The longest a step that changes Claude's state may take: it can fetch a marketplace over the network.
+const CLAUDE_STEP_TIMEOUT: Duration = Duration::from_secs(600);
+
+/// Runs one step of a change (`claude <args>`) and says why it failed: the standard error when the program wrote
+/// any, else the line the Node CLI gave (`Command failed: <command> <args>`, `spawnSync <command> ENOENT`).
+pub fn run_claude_step(
+    args: &[String],
+    env: &[(String, String)],
+    runner: &dyn ProcessRunner,
+) -> Result<(), String> {
+    let get = lookup(env);
+    let name = get("FGOS_CLAUDE_COMMAND")
+        .filter(|c| !c.is_empty())
+        .unwrap_or_else(|| "claude".to_string());
+    let command_line = || format!("{name} {}", args.join(" "));
+    match runner.run(
+        &claude_program(env, cfg!(windows)),
+        args,
+        env,
+        None,
+        None,
+        CLAUDE_STEP_TIMEOUT,
+    ) {
+        Ok(fgos_process::spawn::Outcome::Exited(out)) if out.status.success() => Ok(()),
+        Ok(fgos_process::spawn::Outcome::Exited(out)) => {
+            let stderr = String::from_utf8_lossy(&out.stderr);
+            Err(match stderr.trim() {
+                "" => format!("Command failed: {}", command_line()),
+                detail => detail.to_string(),
+            })
+        }
+        Ok(fgos_process::spawn::Outcome::TimedOut { .. }) => Err(format!(
+            "{} did not finish within {} seconds",
+            command_line(),
+            CLAUDE_STEP_TIMEOUT.as_secs()
+        )),
+        Err(error) if error.kind() == std::io::ErrorKind::NotFound => {
+            Err(format!("spawnSync {name} ENOENT"))
+        }
+        Err(error) => Err(format!("spawnSync {name} {error}")),
+    }
+}
+
 /// `claude plugin marketplace list --json` and `claude plugin list --json` print a JSON array; a failed run
 /// or unparsable output is `None`.
 fn claude_plugin_json(
@@ -1296,5 +1339,34 @@ mod tests {
             none.is_err(),
             "a root that cannot be read is the module's failure, not a refusal"
         );
+    }
+
+    #[test]
+    fn a_step_that_changes_claude_runs_with_its_argv_and_says_why_it_failed() {
+        let sb = Sandbox::new("step");
+        let env = sb.env(&[]);
+        let args: Vec<String> = ["plugin", "install", "fgOS@fgos-plugins"]
+            .map(String::from)
+            .to_vec();
+        assert_eq!(
+            run_claude_step(&args, &env, &BoundedRunner),
+            Err("spawnSync fgos-test-claude ENOENT".to_string()),
+            "a program that cannot start"
+        );
+        sb.fake_claude("[]", "[]");
+        // the fake answers an install with `unrecognized` on stderr and a non-zero exit
+        assert_eq!(
+            run_claude_step(&args, &env, &BoundedRunner),
+            Err("unrecognized".to_string())
+        );
+        assert_eq!(sb.calls(), vec!["plugin install fgOS@fgos-plugins"]);
+        sb.script("fgos-test-claude", "exit 3");
+        assert_eq!(
+            run_claude_step(&args, &env, &BoundedRunner),
+            Err("Command failed: fgos-test-claude plugin install fgOS@fgos-plugins".to_string()),
+            "no standard error: the command line"
+        );
+        sb.script("fgos-test-claude", "exit 0");
+        assert_eq!(run_claude_step(&args, &env, &BoundedRunner), Ok(()));
     }
 }

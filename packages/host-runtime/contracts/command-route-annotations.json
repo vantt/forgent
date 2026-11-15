@@ -68,5 +68,9 @@
   "version": {
     "operation_id": "distribution.build.show",
     "owner_path": "packages/distribution/rust"
+  },
+  "wire-agents": {
+    "operation_id": "wire-agents.run",
+    "owner_path": "apps/fgos"
   }
 }

@@ -196,13 +196,13 @@
         {
           "path": "packages/distribution/rust/src/agent_config.rs",
           "reason": "builds the wire-agents plan: the claude plugin steps and the settings it shows and never writes; the writes themselves are the wire-agents verb's"
+        },
+        {
+          "path": "apps/fgos/src/wiring/wire_agents.rs",
+          "reason": "the wire-agents verb: the only code that applies the plan, copying each existing file to <file>.pre-wire-agents-<time> through the Durable File door before the claude steps run, and never writing a permission that widens what an agent may do"
         }
       ],
       "debt": [
-        {
-          "path": "src/setup/agent-wiring.mjs",
-          "reason": "the earlier Node plan and writer of wire-agents; it goes with the verb"
-        },
         {
           "path": "src/setup/agy-permissions.mjs",
           "reason": "the earlier Node agy settings reader and the default it shows; it goes with its doctor rows"

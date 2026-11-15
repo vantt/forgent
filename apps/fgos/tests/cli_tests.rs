@@ -3601,3 +3601,74 @@ fn a_malformed_doctor_call_is_refused_before_anything_runs() {
     }
     let _ = fs::remove_dir_all(&project);
 }
+
+// ---------------------------------------------------------------------------------------------------------
+// `fgos wire-agents` in the host: no Node process at all, whatever `node` on PATH would do.
+// ---------------------------------------------------------------------------------------------------------
+
+#[cfg(unix)]
+#[test]
+fn wire_agents_runs_in_the_host_without_node_and_a_failing_step_exits_1() {
+    use std::os::unix::fs::PermissionsExt;
+    let (node_dir, path) = scripted_node(
+        "fgos_wire_agents_node",
+        "echo node-was-started >&2\nexit 99",
+    );
+    let work = fresh_dir("fgos_wire_agents");
+    let (home, project) = (work.join("home"), work.join("project"));
+    fs::create_dir_all(&home).unwrap();
+    fs::create_dir_all(&project).unwrap();
+    assert!(Command::new("git")
+        .args(["init", "-q", "-b", "main"])
+        .current_dir(&project)
+        .status()
+        .unwrap()
+        .success());
+    let claude = work.join("fake-claude");
+    fs::write(
+        &claude,
+        "#!/bin/sh\ncase \"$*\" in\n  --version) echo 1.0;;\n  'plugin marketplace list --json'|'plugin list --json') printf '[]';;\n  'plugin marketplace add '*) echo 'refused' >&2; exit 1;;\n  *) exit 0;;\nesac\n",
+    )
+    .unwrap();
+    fs::set_permissions(&claude, fs::Permissions::from_mode(0o755)).unwrap();
+    let run = |args: &[&str]| {
+        Command::new(fgos_bin())
+            .arg("wire-agents")
+            .args(args)
+            .current_dir(&project)
+            .env("PATH", &path)
+            .env("HOME", &home)
+            .env("FGOS_STATE_ROOT", work.join("state"))
+            .env("FGOS_CLAUDE_COMMAND", &claude)
+            .output()
+            .expect("failed to execute fgos")
+    };
+    let plan = run(&["--json"]);
+    assert_eq!(
+        plan.status.code(),
+        Some(0),
+        "{}",
+        String::from_utf8_lossy(&plan.stderr)
+    );
+    let answer: serde_json::Value = serde_json::from_slice(&plan.stdout).unwrap();
+    assert_eq!(answer["data"]["applied"], false);
+    assert_eq!(
+        answer["data"]["agents"][0]["changes"][0]["id"],
+        "claude-plugin"
+    );
+    let applied = run(&["--yes"]);
+    assert_eq!(applied.status.code(), Some(1));
+    let text = String::from_utf8_lossy(&applied.stdout);
+    assert!(
+        text.contains(
+            "Failed: claude-plugin: \"claude plugin marketplace add vantt/forgent\" failed: refused"
+        ),
+        "{text}"
+    );
+    assert!(!String::from_utf8_lossy(&applied.stderr).contains("node-was-started"));
+    let refused = run(&["--yes=1"]);
+    assert_eq!(refused.status.code(), Some(4));
+    assert!(String::from_utf8_lossy(&refused.stderr).contains("unknown flag"));
+    let _ = fs::remove_dir_all(&work);
+    let _ = fs::remove_dir_all(&node_dir);
+}
