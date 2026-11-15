@@ -1,8 +1,8 @@
 # Hướng dẫn: nâng ba máy lên v0.2.0-rc.8
 
-Dành cho: anh (owner). Người viết: COOK (nháp theo yêu cầu của HARDEN). Trạng thái: **nháp, chưa áp dụng, chưa land**. Dựa trên `plans/reports/guide-261112-1817-owner-machine-packaging-close.md` (viết cho rc.6); mục nào khác bản đó thì có ghi "mới".
+Dành cho: anh (owner). Người viết: COOK (nháp theo yêu cầu của HARDEN). Trạng thái: **rc.8 đã phát hành; bản kế tiếp là rc.9 (xem guide-261115-0800-owner-machine-upgrade-rc9.md)**. Dựa trên `plans/reports/guide-261112-1817-owner-machine-packaging-close.md` (viết cho rc.6); mục nào khác bản đó thì có ghi "mới".
 
-**Chỗ HARDEN điền sau khi đẩy tag:** commit của tag: `<TAG_COMMIT>`; trang phát hành: `<RELEASE_URL>`; tên asset và `SHA256SUMS` lấy từ trang đó. Mọi chỗ khác dùng tag `v0.2.0-rc.8`.
+**Bản phát hành:** commit của tag: `88e4cb651`; trang phát hành: `https://github.com/vantt/forgent/releases/tag/v0.2.0-rc.8`; tên asset và `SHA256SUMS` lấy từ trang đó. Mọi chỗ khác dùng tag `v0.2.0-rc.8`.
 
 HARDEN và COOK không tự sửa tệp cấu hình nào của anh (các tệp trong `~/.fgos/` và `~/.fgos/private/`). Các bước dưới đây chưa chạy thử cho rc.8 (chưa có tag); phần đã chạy thử ở rc.6 giữ nguyên ghi chú ở mục 6.
 
@@ -59,7 +59,7 @@ fgos --version                              # fgos 0.2.0-rc.8
 fgos doctor                                 # ok: true
 ```
 
-Nếu `fgctl` của máy cũ (không có `--version`), chạy lại `install.sh` của bản mới trước. Nguồn bản phát hành: `<RELEASE_URL>` (kiểm `SHA256SUMS`; `fgctl upgrade` tự kiểm). Dự án commit pin (như repo này) thì commit `.fgos/distribution.json` đã đổi.
+Nếu `fgctl` của máy cũ (không có `--version`), chạy lại `install.sh` của bản mới trước. Nguồn bản phát hành: `https://github.com/vantt/forgent/releases/tag/v0.2.0-rc.8` (kiểm `SHA256SUMS`; `fgctl upgrade` tự kiểm). Dự án commit pin (như repo này) thì commit `.fgos/distribution.json` đã đổi.
 
 Kiểm định tuyến không đổi (trước và sau, cùng dự án): `fgos dispatch explain --for execute` và `--for review`.
 
