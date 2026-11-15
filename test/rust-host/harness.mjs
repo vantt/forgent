@@ -18,6 +18,18 @@
  * processes and would show a `node:` entry a deeper tree than a `bin:` entry can show. `node` is
  * shimmed so a host entry that forwards to the legacy payload shows up in its evidence. Add a name to
  * PATH_SHIM_COMMANDS before trusting a comparison of a verb that spawns it.
+ *
+ * Parity against a base release. After a verb is ported the tree's own Node refuses it, so a port is compared with
+ * the release the step started from, never with this tree's `bin/fgos.mjs`. A `release:<description.json>` entry
+ * runs that release's host with that release's own environment (`FGOS_HOST_BIN`, `FGOS_ACTIVE_RELEASE_PATH`,
+ * `FGOS_ACTIVE_MANIFEST_PATH`), so entry A can be the base build and entry B `bin:$FGOS_HOST_BIN`. Recipe:
+ *   1. a linked worktree at the step's base commit;
+ *   2. `CARGO_TARGET_DIR=<ext4 dir used only for this base> node scripts/run-tests.mjs <any one test file>` there,
+ *      which stages the host binary and its release manifest;
+ *   3. write `{"hostBin": ..., "releasePath": ..., "manifestPath": ...}` (absolute paths of what step 2 staged)
+ *      to `.fgos/runtime/tmp/parity-base.json` and pass the file as `FGOS_TEST_PARITY_BASE` (the `FGOS_TEST_`
+ *      prefix reaches the test through `run-tests`); `parityBaseEntrySpec()` turns it into the entry.
+ * The entry's variables are applied last, so no case or inherited environment can point it at another release.
  */
 
 import fs from "node:fs";
@@ -118,9 +130,60 @@ export function parseEntry(entrySpec, repoRoot = REPO_ROOT) {
       target: resolvedPath,
       spec: entrySpec,
     };
+  } else if (entrySpec.startsWith("release:")) {
+    return parseReleaseEntry(entrySpec);
   } else {
-    throw new Error(`Unknown entry prefix in "${entrySpec}". Expected "node:<path>" or "bin:<path>"`);
+    throw new Error(`Unknown entry prefix in "${entrySpec}". Expected "node:<path>", "bin:<path>" or "release:<description.json>"`);
   }
+}
+
+const RELEASE_DESCRIPTION_FIELDS = ["hostBin", "releasePath", "manifestPath"];
+
+/**
+ * A staged release as an entry: the description file names the host binary, the release directory and its
+ * manifest. The three travel with every case run on the entry as the variables the host and its Node payload read.
+ */
+function parseReleaseEntry(entrySpec) {
+  const file = entrySpec.slice("release:".length);
+  if (!file) throw new Error(`Release entry "${entrySpec}" names no description file`);
+  let text;
+  try {
+    text = fs.readFileSync(file, "utf8");
+  } catch (err) {
+    throw new Error(`Release description ${file} cannot be read: ${err.code ?? err.message}`);
+  }
+  let description;
+  try {
+    description = JSON.parse(text);
+  } catch (err) {
+    throw new Error(`Release description ${file} is not valid JSON: ${err.message}`);
+  }
+  for (const field of RELEASE_DESCRIPTION_FIELDS) {
+    const value = description?.[field];
+    if (typeof value !== "string" || !path.isAbsolute(value)) {
+      throw new Error(`Release description ${file} needs an absolute path in "${field}"`);
+    }
+  }
+  return {
+    type: "bin",
+    executable: description.hostBin,
+    target: description.hostBin,
+    env: {
+      FGOS_HOST_BIN: description.hostBin,
+      FGOS_ACTIVE_RELEASE_PATH: description.releasePath,
+      FGOS_ACTIVE_MANIFEST_PATH: description.manifestPath,
+    },
+    spec: entrySpec,
+  };
+}
+
+/** The `release:` entry spec of the step's base release, from `FGOS_TEST_PARITY_BASE` (a description file path). */
+export function parityBaseEntrySpec(environment = process.env) {
+  const file = environment.FGOS_TEST_PARITY_BASE;
+  if (!file) {
+    throw new Error("FGOS_TEST_PARITY_BASE is not set: parity compares a port with the step's base release (see the recipe in test/rust-host/harness.mjs)");
+  }
+  return `release:${file}`;
 }
 
 /**
@@ -258,6 +321,8 @@ export async function runCaseOnEntry(entry, testCase, options = {}) {
   const beforeSnapshot = captureFs ? snapshotDirectory(workingDir) : null;
 
   const env = { ...process.env, ...(testCase.env ?? {}) };
+  // A release entry's own variables win over the caller's and the case's, so it can never run another release.
+  Object.assign(env, entry.env ?? {});
   env.FGOS_HARNESS_SPY_LOG = spyLogPath;
   // PATH shim: the one child-process evidence mechanism, the same for a node: and a bin: entry
   // (see header comment). No NODE_OPTIONS preload, so a node: entry sees no deeper tree than a bin: one.
