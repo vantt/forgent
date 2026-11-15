@@ -24,6 +24,10 @@ publishes the GitHub Release.
 1. **Confirm `main` is green.** Check the latest commit on `main` passed
    CI (`.github/workflows/ci.yml`'s `test` matrix job). Only tag a commit
    you've already seen pass there.
+   Only the newest head of `main` runs CI (older runs are cancelled), and a
+   commit that touches only `plans/**` starts none. If the head you want to
+   tag is such a commit, check the nearest earlier commit that changed code.
+   The tag-triggered release and its suite are never cancelled or cached.
 
 2. **Decide the version number.** Follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html):
    bump the patch version for fixes, minor for backward-compatible
