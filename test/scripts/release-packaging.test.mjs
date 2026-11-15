@@ -125,7 +125,15 @@ test('a release publishes only after the whole suite: publish needs the suite, w
   // The jobs a release skips are exactly the pull-request tuning ones; the suite itself always runs.
   assert.match(ci, /selector-plan:\n\s+name: selector-plan\n\s+if: \$\{\{ !inputs\.release-gate \}\}/);
   assert.match(ci, /compare:\n(?:.*\n)*?\s+if: \$\{\{ always\(\) && !inputs\.release-gate \}\}/);
-  assert.doesNotMatch(ci.slice(ci.indexOf('\n  test:'), ci.indexOf('\n  selector-plan:')), /release-gate/);
+  // The test job may skip only its toolchain install and Rust cache on a release, which stays on a clean
+  // runner; every other step, the suite above all, runs on a release too.
+  const testJob = ci.slice(ci.indexOf('\n  test:'), ci.indexOf('\n  selector-plan:'));
+  const gatedSteps = testJob.split(/\n(?=      - )/).filter((step) => step.includes('release-gate'));
+  assert.equal(gatedSteps.length, 2, 'the test job gates exactly its toolchain and rust-cache steps');
+  for (const step of gatedSteps) {
+    assert.match(step, /^      - if: \$\{\{ !inputs\.release-gate \}\}\n/, 'a gated step carries only the plain release-gate skip');
+    assert.match(step, /name: Rust toolchain\n|uses: Swatinem\/rust-cache@/, 'only the toolchain and rust-cache steps may be gated');
+  }
 });
 
 test('release assets workflow builds Linux on ubuntu-22.04 and Windows on windows-latest, never newer Linux', () => {
