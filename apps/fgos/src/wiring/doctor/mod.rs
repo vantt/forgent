@@ -185,6 +185,7 @@ pub(crate) fn config_read_text(error: fgos_config::event_store::ReadError) -> St
             .join("; "),
         other => crate::wiring::events::config_message(other),
     }
+}
 
 /// A row the owner judged: whether it passed and its one-sentence message. The level and the fix come from the
 /// engine.

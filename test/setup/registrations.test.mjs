@@ -71,7 +71,7 @@ test('a new module can register a check via registrations.mjs and see it in chec
 
 test('registering a check with a duplicate id throws rather than silently shadowing the original', () => {
   assert.throws(
-    () => registerCheck({ id: 'cli-version-visible', description: 'dup', check: () => ({ passed: true, message: '' }) }),
+    () => registerCheck({ id: 'tier-fallback', description: 'dup', check: () => ({ passed: true, message: '' }) }),
     /already registered/,
   );
 });
