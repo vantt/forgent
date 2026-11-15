@@ -665,13 +665,9 @@ pub fn init_notes(init_stdout: &[u8]) -> Vec<String> {
 pub fn closing_block(doctor_stdout: &str, facts: &ReadyFacts) -> Result<ClosingBlock, String> {
     let not_doctor =
         |why: &str| format!("fgos doctor --json did not return a doctor result ({why})");
-    let value: serde_json::Value =
-        serde_json::from_str(doctor_stdout).map_err(|e| not_doctor(&e.to_string()))?;
-    let data = value.get("data").unwrap_or(&value);
-    let ok = data
-        .get("ok")
-        .and_then(|v| v.as_bool())
-        .ok_or_else(|| not_doctor("no boolean `ok`"))?;
+    let report = crate::doctor::Report::from_stdout(doctor_stdout)
+        .map_err(|error| not_doctor(&error.to_string()))?;
+    let ok = report.ok == Some(true);
     let tag = facts
         .tag
         .as_deref()
@@ -692,19 +688,20 @@ pub fn closing_block(doctor_stdout: &str, facts: &ReadyFacts) -> Result<ClosingB
             ready: true,
         });
     }
-    let checks = data
-        .get("checks")
-        .and_then(|v| v.as_array())
-        .ok_or_else(|| not_doctor("no `checks` list"))?;
-    let lines: Vec<String> = checks
-        .iter()
-        .filter(|c| c.get("status").and_then(|s| s.as_str()) == Some("fail"))
-        .map(|c| {
-            let id = c.get("id").and_then(|v| v.as_str()).unwrap_or("?");
-            let what = c
-                .get("fix")
-                .and_then(|v| v.as_str())
-                .or_else(|| c.get("message").and_then(|v| v.as_str()))
+    if report.checks.is_none() {
+        return Err(not_doctor(
+            &crate::doctor::ReportError::NoChecks.to_string(),
+        ));
+    }
+    let lines: Vec<String> = report
+        .failing()
+        .map(|row| {
+            let id = row.id.as_deref().unwrap_or("?");
+            let what = row
+                .fix
+                .as_ref()
+                .and_then(|fix| fix.command())
+                .or(row.message.as_deref())
                 .unwrap_or("see fgos doctor");
             format!("{id}: {}", what.lines().next().unwrap_or(what))
         })
@@ -801,23 +798,14 @@ fn run_tail_step(
 /// that is not passing still names a fix (`doctor --fix` would have work to
 /// do). Anything that is not a doctor result is not clean.
 fn doctor_is_clean(doctor_stdout: &str) -> bool {
-    let Ok(value) = serde_json::from_str::<serde_json::Value>(doctor_stdout) else {
+    let Ok(report) = crate::doctor::Report::from_stdout(doctor_stdout) else {
         return false;
     };
-    let data = value.get("data").unwrap_or(&value);
-    if data.get("ok").and_then(|v| v.as_bool()) != Some(true) {
-        return false;
-    }
-    let has_pending_fix = |row: &serde_json::Value| {
-        matches!(
-            row.get("status").and_then(|s| s.as_str()),
-            Some("warn" | "fail")
-        ) && row.get("fix").is_some_and(|f| !f.is_null())
+    let has_pending_fix = |row: &crate::doctor::ReportRow| {
+        matches!(row.status.as_deref(), Some("warn" | "fail"))
+            && row.fix.as_ref().is_some_and(|fix| fix.command().is_some())
     };
-    !data
-        .get("checks")
-        .and_then(|v| v.as_array())
-        .is_some_and(|rows| rows.iter().any(has_pending_fix))
+    report.ok == Some(true) && !report.checks.iter().flatten().any(has_pending_fix)
 }
 
 /// What a no-op run prints instead of the closing block's first line.

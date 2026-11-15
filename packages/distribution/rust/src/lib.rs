@@ -6,6 +6,7 @@ pub mod agent_config;
 pub mod agent_hooks;
 pub mod canonical;
 pub mod coexistence;
+pub mod doctor;
 pub mod extract;
 pub mod fetch;
 pub mod fgctl_refresh;
