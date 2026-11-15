@@ -7,7 +7,7 @@ pub mod bridge;
 
 use crate::routing::Call;
 use fgos_distribution::doctor::{
-    self, FixResult, Options, OwnerKind, Owners, Palette, Registry, RowOutcome, RowOwner,
+    self, FixResult, Options, Owners, Palette, Registry, RowOutcome, RowOwner,
 };
 use fgos_host_runtime::cli_args::{FlagScalar, FlagValue};
 use fgos_host_runtime::{
@@ -45,26 +45,22 @@ const CONFIG_ROWS_JSON: &str =
     include_str!("../../../../../packages/config/contracts/doctor-rows.v1.json");
 
 /// The registry the host runs: the contract file with the config crate's rows as its `config` group.
-/// The in-process owner may only have adapters for rows and fixes the registry gives to Rust; every other entry
-/// reaches Node through the bridge. A row the registry gives to Rust and that has no adapter yet is judged by its
-/// Node body until the phase that ports it deletes the body.
+/// The registry names which rows and fixes Rust judges today (`inRust`); the host's adapters are exactly those.
+/// An entry the registry gives to Rust but has not listed yet is judged by its Node body through the bridge until
+/// the phase that ports it adds the adapter and lists it, in one change.
 pub fn registry() -> Result<Registry, String> {
     let registry = Registry::parse(REGISTRY_JSON, &[("config", CONFIG_ROWS_JSON)])?;
-    for (kind, owned, adapters) in [
-        (
-            "row",
-            registry.row_ids(OwnerKind::Native),
-            NativeOwner::ROW_IDS,
-        ),
-        (
-            "fix",
-            registry.fix_ids(OwnerKind::Native),
-            NativeOwner::FIX_IDS,
-        ),
+    for (kind, listed, adapters) in [
+        ("row", &registry.in_rust_rows, NativeOwner::ROW_IDS),
+        ("fix", &registry.in_rust_fixes, NativeOwner::FIX_IDS),
     ] {
-        if let Some(stray) = adapters.iter().find(|id| !owned.contains(id)) {
+        let mut a: Vec<&str> = adapters.to_vec();
+        let mut l: Vec<&str> = listed.iter().map(String::as_str).collect();
+        a.sort_unstable();
+        l.sort_unstable();
+        if a != l {
             return Err(format!(
-                "doctor registry: the host has an in-process {kind} {stray} that the registry does not give to Rust"
+                "doctor registry: the {kind}s it lists as judged in Rust ({l:?}) are not the host's adapters ({a:?})"
             ));
         }
     }
@@ -121,14 +117,6 @@ impl RowOwner for NativeOwner {
         ids.iter()
             .map(|id| FixResult::done(id, false, format!("no fix {id} is run in process")))
             .collect()
-    }
-
-    fn handles_row(&self, id: &str) -> bool {
-        Self::ROW_IDS.contains(&id)
-    }
-
-    fn handles_fix(&self, id: &str) -> bool {
-        Self::FIX_IDS.contains(&id)
     }
 
     fn judge_rows(&self, _root: &Path, ids: &[&str]) -> Vec<RowOutcome> {
@@ -225,6 +213,7 @@ impl OperationProvider for DoctorProvider {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use fgos_distribution::doctor::OwnerKind;
 
     fn os(args: &[&str]) -> Vec<OsString> {
         args.iter().map(OsString::from).collect()
@@ -256,16 +245,11 @@ mod tests {
     }
 
     #[test]
-    fn the_registry_the_host_embeds_parses_and_every_adapter_the_host_has_is_a_row_or_fix_it_gives_to_rust(
-    ) {
+    fn the_registry_the_host_embeds_parses_and_lists_exactly_the_adapters_the_host_has() {
         let registry = registry().unwrap();
         assert!(!registry.rows.is_empty() && !registry.fixes.is_empty());
-        for id in NativeOwner::ROW_IDS {
-            assert!(registry.row_ids(OwnerKind::Native).contains(id), "{id}");
-        }
-        for id in NativeOwner::FIX_IDS {
-            assert!(registry.fix_ids(OwnerKind::Native).contains(id), "{id}");
-        }
+        assert_eq!(registry.in_rust_rows, NativeOwner::ROW_IDS);
+        assert_eq!(registry.in_rust_fixes, NativeOwner::FIX_IDS);
     }
 
     #[test]
@@ -318,12 +302,6 @@ mod tests {
                 ids.iter()
                     .map(|id| FixResult::done(id, false, ""))
                     .collect()
-            }
-            fn handles_row(&self, _: &str) -> bool {
-                true
-            }
-            fn handles_fix(&self, _: &str) -> bool {
-                true
             }
             fn judge_rows(&self, _: &Path, ids: &[&str]) -> Vec<RowOutcome> {
                 ids.iter()

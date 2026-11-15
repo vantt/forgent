@@ -196,11 +196,24 @@ mod sys {
 }
 
 static CHILD_PID: std::sync::atomic::AtomicI32 = std::sync::atomic::AtomicI32::new(0);
+/// The signal that was forwarded to the child, or 0: a caller that is not the legacy lane (the doctor's bridge)
+/// reads it after its call to stop and exit as a signalled process does.
+static INTERRUPTED: std::sync::atomic::AtomicI32 = std::sync::atomic::AtomicI32::new(0);
+
+/// Ends the host with `128 + signal` when a signal was forwarded to a child since the process began, as the
+/// legacy lane ends after a signalled child. Returns when none was.
+pub fn exit_if_interrupted() {
+    let sig = INTERRUPTED.load(std::sync::atomic::Ordering::SeqCst);
+    if sig != 0 {
+        std::process::exit(128 + sig);
+    }
+}
 
 #[cfg(unix)]
 extern "C" fn sig_handler(sig: i32) {
     let pid = CHILD_PID.load(std::sync::atomic::Ordering::SeqCst);
     if pid != 0 {
+        INTERRUPTED.store(sig, std::sync::atomic::Ordering::SeqCst);
         unsafe {
             sys::kill(pid, sig);
         }

@@ -112,10 +112,6 @@ pub trait RowOwner {
     /// Judges the rows `ids` (registry order) against `root`, after the fixes ran; one outcome per id, in order.
     /// An owner builds the facts its rows share once per call.
     fn judge_rows(&self, root: &Path, ids: &[&str]) -> Vec<RowOutcome>;
-    /// Whether this owner has the judge of row `id` today. The bridge has every row it is asked for.
-    fn handles_row(&self, id: &str) -> bool;
-    /// Whether this owner has the body of fix `id` today.
-    fn handles_fix(&self, id: &str) -> bool;
 }
 
 /// The two kinds of owner the registry names.
@@ -180,6 +176,10 @@ pub struct RegistryFix {
 pub struct Registry {
     pub rows: Vec<RegistryRow>,
     pub fixes: Vec<RegistryFix>,
+    /// The row and fix ids a Rust owner judges or runs today: a subset of what the registry gives to Rust. Every
+    /// other entry, whoever the registry names, goes through the bridge until its port lands and lists it here.
+    pub in_rust_rows: Vec<String>,
+    pub in_rust_fixes: Vec<String>,
 }
 
 #[derive(Deserialize)]
@@ -189,6 +189,16 @@ struct RawRegistry {
     groups: HashMap<String, RawGroup>,
     rows: Vec<RawEntry>,
     fixes: Vec<RawEntry>,
+    #[serde(default, rename = "inRust")]
+    in_rust: RawInRust,
+}
+
+#[derive(Deserialize, Default)]
+struct RawInRust {
+    #[serde(default)]
+    rows: Vec<String>,
+    #[serde(default)]
+    fixes: Vec<String>,
 }
 
 /// A set of rows and fixes that another contract lists (the config crate's `doctor-rows.v1.json`): the ids the
@@ -339,7 +349,32 @@ impl Registry {
                 ));
             }
         }
-        Ok(Self { rows, fixes })
+        for (kind, listed, entries) in [
+            (
+                "row",
+                &raw.in_rust.rows,
+                rows.iter().map(|r| (&r.id, &r.owner)).collect::<Vec<_>>(),
+            ),
+            (
+                "fix",
+                &raw.in_rust.fixes,
+                fixes.iter().map(|f| (&f.id, &f.owner)).collect::<Vec<_>>(),
+            ),
+        ] {
+            for id in listed {
+                match entries.iter().find(|(entry, _)| *entry == id) {
+                    Some((_, owner)) if owner.kind == OwnerKind::Native => {}
+                    Some(_) => return Err(format!("doctor registry: {kind} {id} is judged in Rust but the registry gives it to the bridge")),
+                    None => return Err(format!("doctor registry: inRust names {kind} {id}, which is not in the registry")),
+                }
+            }
+        }
+        Ok(Self {
+            rows,
+            fixes,
+            in_rust_rows: raw.in_rust.rows,
+            in_rust_fixes: raw.in_rust.fixes,
+        })
     }
 
     /// The ids of the rows an owner kind judges, in registry order.
@@ -514,8 +549,8 @@ impl Owners<'_> {
 
     /// Who judges a row today: the Rust owner the registry names once it has the judge, else the bridge, whose
     /// Node body stays until the phase that moves the row deletes it.
-    fn kind_of_row(&self, entry: &RegistryRow) -> OwnerKind {
-        if entry.owner.kind == OwnerKind::Native && self.native.handles_row(&entry.id) {
+    fn kind_of_row(&self, registry: &Registry, entry: &RegistryRow) -> OwnerKind {
+        if registry.in_rust_rows.contains(&entry.id) {
             OwnerKind::Native
         } else {
             OwnerKind::Bridge
@@ -523,8 +558,8 @@ impl Owners<'_> {
     }
 
     /// Who runs a fix today, by the same rule.
-    fn kind_of_fix(&self, entry: &RegistryFix) -> OwnerKind {
-        if entry.owner.kind == OwnerKind::Native && self.native.handles_fix(&entry.id) {
+    fn kind_of_fix(&self, registry: &Registry, entry: &RegistryFix) -> OwnerKind {
+        if registry.in_rust_fixes.contains(&entry.id) {
             OwnerKind::Native
         } else {
             OwnerKind::Bridge
@@ -541,7 +576,7 @@ pub fn run(registry: &Registry, owners: &Owners, root: &Path, options: Options) 
     let kinds: Vec<OwnerKind> = registry
         .rows
         .iter()
-        .map(|entry| owners.kind_of_row(entry))
+        .map(|entry| owners.kind_of_row(registry, entry))
         .collect();
     let mut judged: HashMap<OwnerKind, std::vec::IntoIter<RowOutcome>> = HashMap::new();
     for kind in [OwnerKind::Native, OwnerKind::Bridge] {
@@ -635,10 +670,10 @@ fn run_fixes(registry: &Registry, owners: &Owners, root: &Path) -> Vec<FixResult
     let mut results = Vec::with_capacity(registry.fixes.len());
     let mut at = 0;
     while at < registry.fixes.len() {
-        let kind = owners.kind_of_fix(&registry.fixes[at]);
+        let kind = owners.kind_of_fix(registry, &registry.fixes[at]);
         let end = registry.fixes[at..]
             .iter()
-            .position(|fix| owners.kind_of_fix(fix) != kind)
+            .position(|fix| owners.kind_of_fix(registry, fix) != kind)
             .map_or(registry.fixes.len(), |len| at + len);
         let ids: Vec<&str> = registry.fixes[at..end]
             .iter()
@@ -731,6 +766,7 @@ mod tests {
       "groups": { "config": { "owner": "bridge:S5", "idMap": { "config-machine-files": "gateway-token-configured" },
         "fixIdMap": { "create-machine-files": "gateway-token-configured" }, "fixIdPrefix": "config-",
         "descriptionOverrides": { "config-machine-files": "the gateway token file exists" } } },
+      "inRust": { "rows": ["alpha", "gamma"], "fixes": ["fix-alpha"] },
       "rows": [
         { "id": "alpha", "description": "alpha is fine", "owner": "rust:identity" },
         { "id": "beta", "description": "beta is fine", "owner": "bridge:S7" },
@@ -761,8 +797,6 @@ mod tests {
     struct Scripted {
         calls: RefCell<Vec<String>>,
         rows: HashMap<&'static str, RowOutcome>,
-        owns: Vec<&'static str>,
-        owns_all: bool,
     }
 
     impl Scripted {
@@ -771,17 +805,12 @@ mod tests {
             Self {
                 calls: RefCell::new(Vec::new()),
                 rows: rows.into_iter().collect(),
-                owns: vec!["alpha", "fix-alpha", "gamma"],
-                owns_all: false,
             }
         }
 
         /// The bridge: it takes whatever it is asked for.
         fn bridge(rows: Vec<(&'static str, RowOutcome)>) -> Self {
-            Self {
-                owns_all: true,
-                ..Self::new(rows)
-            }
+            Self::new(rows)
         }
     }
 
@@ -793,14 +822,6 @@ mod tests {
             ids.iter()
                 .map(|id| FixResult::done(id, true, "repaired"))
                 .collect()
-        }
-
-        fn handles_row(&self, id: &str) -> bool {
-            self.owns_all || self.owns.contains(&id)
-        }
-
-        fn handles_fix(&self, id: &str) -> bool {
-            self.owns_all || self.owns.contains(&id)
         }
 
         fn judge_rows(&self, _root: &Path, ids: &[&str]) -> Vec<RowOutcome> {
@@ -1048,14 +1069,18 @@ mod tests {
     }
 
     #[test]
-    fn a_row_the_registry_gives_to_rust_goes_to_the_bridge_until_rust_has_its_judge() {
+    fn a_row_the_registry_gives_to_rust_goes_to_the_bridge_until_the_registry_lists_it_as_judged_in_rust(
+    ) {
         // The native owner has no adapter for anything: every row and fix goes to the bridge, whatever the registry
         // names, so a row is never dropped from a report while its Rust judge is still to come.
-        let mut native = Scripted::new(vec![]);
-        native.owns = vec![];
+        let native = Scripted::new(vec![]);
         let bridge = Scripted::bridge(vec![]);
+        let without_adapters = REGISTRY.replace(
+            r#""inRust": { "rows": ["alpha", "gamma"], "fixes": ["fix-alpha"] },"#,
+            "",
+        );
         let report = run(
-            &registry(),
+            &Registry::parse(&without_adapters, &[("config", CONFIG)]).unwrap(),
             &Owners {
                 native: &native,
                 bridge: &bridge,

@@ -16,11 +16,9 @@ use crate::legacy_exec;
 use fgos_distribution::doctor::{FixResult, RowOutcome, RowOwner, RowResult};
 use serde::Deserialize;
 use std::collections::HashMap;
-use std::io::{BufRead, BufReader, Read, Write};
 use std::path::Path;
-use std::process::{Child, Command, Stdio};
-use std::sync::mpsc;
-use std::time::{Duration, Instant};
+use std::process::Command;
+use std::time::Duration;
 
 /// The prefix of a result line; `src/setup/doctor-bridge.mjs` writes the same bytes.
 const RESULT_PREFIX: &str = "\u{1e}FGOS-DOCTOR-BRIDGE ";
@@ -34,8 +32,6 @@ pub const CHECK_DEADLINE: Duration = Duration::from_secs(30);
 pub const FIX_DEADLINE: Duration = Duration::from_secs(30);
 /// How much of the child's stderr a failure shows.
 const STDERR_EXCERPT: usize = 400;
-/// How long to wait for the readers to finish once the child ended.
-const DRAIN_GRACE: Duration = Duration::from_millis(500);
 
 /// One line of the bridge's answer.
 #[derive(Debug, Deserialize)]
@@ -134,7 +130,9 @@ impl NodeBridge {
         }
     }
 
-    /// One call: the lines the child produced, and why it did not finish when it did not.
+    /// One call: the lines the child produced, and why it did not finish when it did not. The child runs under the
+    /// process door's bounded run (its own group, ended whole at the deadline and when it exits); a signal sent to
+    /// the host is forwarded to that group for as long as it lives, and ends the doctor once the call returns.
     fn call(
         &self,
         root: &Path,
@@ -142,22 +140,34 @@ impl NodeBridge {
         ids: &[&str],
         deadline: Duration,
     ) -> (Vec<Line>, Option<Fault>) {
-        let mut command = match (self.launch)() {
+        let command = match (self.launch)() {
             Ok(command) => command,
             Err(fault) => return (Vec::new(), Some(fault)),
         };
-        command
-            .stdin(Stdio::piped())
-            .stdout(Stdio::piped())
-            .stderr(Stdio::piped());
-        // The child leads its own group: a deadline or a signal then ends its whole tree.
-        #[cfg(unix)]
-        {
-            use std::os::unix::process::CommandExt;
-            command.process_group(0);
-        }
-        let mut child = match command.spawn() {
-            Ok(child) => child,
+        let request =
+            serde_json::json!({ "phase": phase, "ids": ids, "dir": root.to_string_lossy() });
+        let outcome = fgos_process::spawn::run_bounded_command(
+            command,
+            Some(request.to_string().as_bytes()),
+            deadline,
+            |pid| {
+                // The child leads its own group: a negative target reaches the whole group.
+                let target = if cfg!(unix) {
+                    -(pid as i32)
+                } else {
+                    pid as i32
+                };
+                legacy_exec::Forwarding::to(target)
+            },
+        );
+        legacy_exec::exit_if_interrupted();
+        let (stdout, stderr, status, timed_out) = match outcome {
+            Ok(fgos_process::spawn::Outcome::Exited(output)) => {
+                (output.stdout, output.stderr, Some(output.status), false)
+            }
+            Ok(fgos_process::spawn::Outcome::TimedOut { stdout, stderr }) => {
+                (stdout, stderr, None, true)
+            }
             Err(error) if error.kind() == std::io::ErrorKind::NotFound => {
                 return (Vec::new(), Some(Fault::NodeMissing(error.to_string())))
             }
@@ -168,84 +178,11 @@ impl NodeBridge {
                 )
             }
         };
-        let identity = fgos_process::facts::identity_of_child(fgos_process::ProcId(child.id()));
-        let target = if cfg!(unix) {
-            -(child.id() as i32)
-        } else {
-            child.id() as i32
-        };
-        let forwarding = legacy_exec::Forwarding::to(target);
-        let request =
-            serde_json::json!({ "phase": phase, "ids": ids, "dir": root.to_string_lossy() });
-        if let Some(mut stdin) = child.stdin.take() {
-            // A child that exits without reading closes the pipe first; its answer is what counts.
-            let _ = stdin.write_all(request.to_string().as_bytes());
-        }
-        let (sender, receiver) = mpsc::channel::<Piece>();
-        let readers = [
-            child.stdout.take().map(|out| {
-                let sender = sender.clone();
-                std::thread::spawn(move || {
-                    for line in BufReader::new(out).lines().map_while(Result::ok) {
-                        if sender.send(Piece::Out(line)).is_err() {
-                            break;
-                        }
-                    }
-                })
-            }),
-            child.stderr.take().map(|err| {
-                let sender = sender.clone();
-                std::thread::spawn(move || {
-                    let mut text = String::new();
-                    let _ = BufReader::new(err)
-                        .take(64 * 1024)
-                        .read_to_string(&mut text);
-                    let _ = sender.send(Piece::Err(text));
-                })
-            }),
-        ];
-        drop(sender);
-
-        let started = Instant::now();
-        let mut out_lines: Vec<String> = Vec::new();
-        let mut stderr = String::new();
-        let mut timed_out = false;
-        let status = loop {
-            while let Ok(piece) = receiver.try_recv() {
-                keep(piece, &mut out_lines, &mut stderr);
-            }
-            match child.try_wait() {
-                Ok(Some(status)) => break Some(status),
-                Ok(None) if started.elapsed() >= deadline => {
-                    timed_out = true;
-                    end_tree(&mut child, identity);
-                    break child.wait().ok();
-                }
-                Ok(None) => std::thread::sleep(Duration::from_millis(10)),
-                Err(_) => {
-                    end_tree(&mut child, identity);
-                    break child.wait().ok();
-                }
-            }
-        };
-        drop(forwarding);
-        let drained = Instant::now();
-        while drained.elapsed() < DRAIN_GRACE {
-            match receiver.recv_timeout(DRAIN_GRACE) {
-                Ok(piece) => keep(piece, &mut out_lines, &mut stderr),
-                Err(_) => break,
-            }
-        }
-        for reader in readers.into_iter().flatten() {
-            if reader.is_finished() {
-                let _ = reader.join();
-            }
-        }
-
+        let stderr = String::from_utf8_lossy(&stderr).into_owned();
         let mut lines = Vec::new();
         let mut ended = false;
         let mut refused = None;
-        for raw in &out_lines {
+        for raw in String::from_utf8_lossy(&stdout).lines() {
             let Some(json) = raw.strip_prefix(RESULT_PREFIX) else {
                 continue;
             };
@@ -285,19 +222,6 @@ impl Default for NodeBridge {
     }
 }
 
-/// What a reader thread hands the waiting loop.
-enum Piece {
-    Out(String),
-    Err(String),
-}
-
-fn keep(piece: Piece, out: &mut Vec<String>, err: &mut String) {
-    match piece {
-        Piece::Out(line) => out.push(line),
-        Piece::Err(text) => err.push_str(&text),
-    }
-}
-
 /// The tail of the child's stderr for a failure message, or nothing.
 fn excerpt(stderr: &str) -> String {
     let text = stderr.trim();
@@ -315,30 +239,7 @@ fn excerpt(stderr: &str) -> String {
     format!(": {}", tail.replace('\n', " | "))
 }
 
-/// Ends the child and everything it started: the process door ends the group (Linux) or tree (macOS) it leads
-/// when its identity was read; elsewhere, and as the last resort, the child alone.
-fn end_tree(child: &mut Child, identity: Option<fgos_process::facts::ProcTuple>) {
-    #[cfg(target_os = "linux")]
-    if let Some(leader) = identity.clone() {
-        let _ = fgos_process::domain_kill_all(&fgos_process::Domain::LinuxPgroup(leader));
-    }
-    #[cfg(target_os = "macos")]
-    if let Some(root) = identity.clone() {
-        let _ = fgos_process::domain_kill_all(&fgos_process::Domain::MacosTree(root));
-    }
-    let _ = identity;
-    let _ = child.kill();
-}
-
 impl RowOwner for NodeBridge {
-    fn handles_row(&self, _id: &str) -> bool {
-        true
-    }
-
-    fn handles_fix(&self, _id: &str) -> bool {
-        true
-    }
-
     fn run_fixes(&self, root: &Path, ids: &[&str]) -> Vec<FixResult> {
         let (lines, fault) = self.call(root, "fix", ids, self.fix_deadline);
         let mut done: HashMap<String, FixResult> = lines
@@ -395,6 +296,7 @@ impl RowOwner for NodeBridge {
 #[cfg(all(test, unix))]
 mod tests {
     use super::*;
+    use std::time::Instant;
 
     /// A bridge whose child is `sh -c <script>`; the script gets the request on stdin like the real module.
     fn scripted(script: &str, deadline: Duration) -> NodeBridge {

@@ -3549,7 +3549,9 @@ fn an_interrupt_of_the_host_ends_the_bridge_child_and_everything_it_started() {
     assert_eq!(unsafe { libc::kill(host.id() as i32, libc::SIGINT) }, 0);
     let ended = std::time::Instant::now();
     loop {
-        if host.try_wait().unwrap().is_some() {
+        if let Some(status) = host.try_wait().unwrap() {
+            // A signalled doctor ends as a signalled process does (128 + SIGINT), it does not print a report and go on.
+            assert_eq!(status.code(), Some(130), "{status}");
             break;
         }
         assert!(

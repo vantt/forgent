@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "about": "Every doctor row and every doctor fix in the order doctor runs them: the one source of ids, order, descriptions and owners (docs/platform/packaging-distribution/contracts/setup-doctor-registry.md section 3). owner is the owner the row has when the packaging step lands: rust:<component> for a Rust component, bridge:<step> for a row whose layer Node still owns until that step moves it. A row the registry gives to Rust is judged by its Node body, through the bridge (packages/distribution/contracts/doctor-bridge.v1.json), until the host has its Rust judge. repairs names the rows a fix repairs when they do not share its id; a failing row it repairs reports fgos doctor --fix. pointer marks a read-only pointer row. judge lists the Node modules a bridged row reads, and layers gives the step that removes each one: a bridged row is labelled with a step at least as late as every layer it reads (a row may wait longer when it also reads a layer through a function the list does not name). The rows and fixes the config crate lists (packages/config/contracts/doctor-rows.v1.json) enter as one group at their position, with the ids and descriptions this registry gives them.",
+  "about": "Every doctor row and every doctor fix in the order doctor runs them: the one source of ids, order, descriptions and owners (docs/platform/packaging-distribution/contracts/setup-doctor-registry.md section 3). owner is the owner the row has when the packaging step lands: rust:<component> for a Rust component, bridge:<step> for a row whose layer Node still owns until that step moves it. inRust lists the rows and fixes a Rust owner judges or runs today (the host's adapters are exactly that list); every other entry, whoever owns it, is judged by its Node body through the bridge (packages/distribution/contracts/doctor-bridge.v1.json) until the phase that ports it lists it here. judge is a hand-written list for the bridged rows (the bridged fixes carry none) and nothing checks it against what the bodies import. repairs names the rows a fix repairs when they do not share its id; a failing row it repairs reports fgos doctor --fix. pointer marks a read-only pointer row. judge lists the Node modules a bridged row reads, and layers gives the step that removes each one: a bridged row is labelled with a step at least as late as every layer it reads (a row may wait longer when it also reads a layer through a function the list does not name). The rows and fixes the config crate lists (packages/config/contracts/doctor-rows.v1.json) enter as one group at their position, with the ids and descriptions this registry gives them.",
   "groups": {
     "config": {
       "contract": "packages/config/contracts/doctor-rows.v1.json",
@@ -16,6 +16,10 @@
         "config-machine-files": "the gateway token file ~/.fgos/private/gateway-token exists, is 0600 and holds one line"
       }
     }
+  },
+  "inRust": {
+    "rows": [],
+    "fixes": []
   },
   "layers": {
     "src/run-supervisor/client.mjs": "S6a",

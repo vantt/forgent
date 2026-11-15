@@ -1244,10 +1244,10 @@ function registryEntries() {
   return { rows, fixes };
 }
 
-// A row the registry gives to Rust keeps its Node body, and is judged by it through the bridge, until the host has
-// the Rust judge: the phase that adds an adapter deletes the body and lists the id here.
-const ROWS_JUDGED_IN_RUST = [];
-const FIXES_RUN_IN_RUST = [];
+// A row the registry gives to Rust keeps its Node body, and is judged by it through the bridge, until the registry's
+// `inRust` lists it: the phase that adds the adapter lists the id there and deletes the body.
+const ROWS_JUDGED_IN_RUST = JSON.parse(fs.readFileSync(REGISTRY_PATH, 'utf8')).inRust.rows;
+const FIXES_RUN_IN_RUST = JSON.parse(fs.readFileSync(REGISTRY_PATH, 'utf8')).inRust.fixes;
 
 test('the registry lists exactly the row bodies Node still has, each id once, and the bridged ones are among them', () => {
   const { rows } = registryEntries();

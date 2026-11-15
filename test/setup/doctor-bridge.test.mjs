@@ -56,11 +56,15 @@ test('a row that returns no verdict or throws fails its own row and never ends t
   const { registerCheck, runBridged: run } = await import('../../src/setup/registrations.mjs');
   registerCheck({ id: 'bridge-test-throws', check: () => { throw new Error('exploded'); } });
   registerCheck({ id: 'bridge-test-silent', check: () => ({}) });
+  registerCheck({ id: 'bridge-test-async', check: async () => ({ passed: true, message: 'resolved later' }) });
+  registerCheck({ id: 'bridge-test-async-throws', check: async () => { throw new Error('rejected'); } });
   registerCheck({ id: 'bridge-test-fine', check: () => ({ passed: true, status: 'skip', message: 'nothing to judge', fixCommand: 'run x', detail: { n: 1 } }) });
-  await run({ ...bodies, ids: ['bridge-test-throws', 'bridge-test-silent', 'bridge-test-fine'] }, (result) => seen.push(result));
+  await run({ ...bodies, ids: ['bridge-test-throws', 'bridge-test-silent', 'bridge-test-fine', 'bridge-test-async', 'bridge-test-async-throws'] }, (result) => seen.push(result));
   assert.deepEqual(seen[0], { id: 'bridge-test-throws', passed: false, message: 'exploded' });
   assert.equal(seen[1].passed, false);
   assert.match(seen[1].message, /returned no verdict/);
+  assert.deepEqual(seen[3], { id: 'bridge-test-async', passed: true, message: 'resolved later' });
+  assert.deepEqual(seen[4], { id: 'bridge-test-async-throws', passed: false, message: 'rejected' });
   assert.deepEqual(seen[2], { id: 'bridge-test-fine', passed: true, status: 'skip', message: 'nothing to judge', fixCommand: 'run x', detail: { n: 1 } });
 });
 

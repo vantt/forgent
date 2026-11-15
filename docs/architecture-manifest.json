@@ -394,7 +394,6 @@
       "patterns": ["pub fn run_bounded\\b", "pub fn resolve_program\\b", "\\bfn first_on_path\\b", "export function firstOnPath\\b", "std::env::split_paths\\(", "\\.try_wait\\(\\)"],
       "allowed": ["packages/process/rust/src/spawn.rs"],
       "debt": [
-        { "path": "apps/fgos/src/wiring/doctor/bridge.rs", "reason": "polls the Node rows bridge child against its deadline and ends its process tree; it streams result lines while it runs, which the process door's run-to-completion does not" },
         { "path": "apps/fgos-gateway/src/gateway.rs", "reason": "watches its own gateway child (try_wait) for liveness; a service, not a bounded run" },
         { "path": "packages/config/rust/src/detect.rs", "reason": "searches PATH (absolute entries only) for the detection candidates of the contract" },
         { "path": "packages/distribution/rust/src/init.rs", "reason": "resolve_node_path looks for node on PATH for the install preflight" },

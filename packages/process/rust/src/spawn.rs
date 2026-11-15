@@ -142,7 +142,26 @@ where
     command
         .args(args)
         .env_clear()
-        .envs(env.iter().map(|(k, v)| (k, v)))
+        .envs(env.iter().map(|(k, v)| (k, v)));
+    if let Some(cwd) = cwd {
+        command.current_dir(cwd);
+    }
+    run_bounded_command(command, input, timeout, |_| ())
+}
+
+/// [`run_bounded`] for a command the caller already shaped (its program, arguments, working directory and
+/// environment, inherited or replaced as it chose): this function sets the three streams, the group or Job
+/// Object and the wait, and nothing else. `on_spawn` runs once with the child's pid right after it started,
+/// and what it returns is kept until the call ends, so a caller can forward signals to the child's group for as
+/// long as it lives. A program that cannot be started returns the OS error; the child and every descendant in
+/// its group are gone when this returns, on every path.
+pub fn run_bounded_command<G>(
+    mut command: Command,
+    input: Option<&[u8]>,
+    timeout: Duration,
+    on_spawn: impl FnOnce(u32) -> G,
+) -> io::Result<Outcome> {
+    command
         .stdin(if input.is_some() {
             Stdio::piped()
         } else {
@@ -150,9 +169,6 @@ where
         })
         .stdout(Stdio::piped())
         .stderr(Stdio::piped());
-    if let Some(cwd) = cwd {
-        command.current_dir(cwd);
-    }
     #[cfg(unix)]
     {
         use std::os::unix::process::CommandExt;
@@ -172,6 +188,7 @@ where
         let _ = child.wait();
         return Err(error);
     }
+    let _kept = on_spawn(child.id());
     let group = Group {
         #[cfg(unix)]
         pid: child.id() as libc::pid_t,
@@ -429,6 +446,40 @@ mod tests {
         assert_eq!(out.stdout, b"out\n");
         assert_eq!(out.stderr, b"err\n");
         assert_eq!(out.status.code(), Some(3));
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn a_shaped_command_keeps_its_own_environment_and_the_spawn_hook_holds_its_guard_until_the_call_ends(
+    ) {
+        use std::sync::atomic::{AtomicU32, Ordering};
+        static GUARD_DROPPED: AtomicU32 = AtomicU32::new(0);
+        static SPAWNED_PID: AtomicU32 = AtomicU32::new(0);
+        struct Guard;
+        impl Drop for Guard {
+            fn drop(&mut self) {
+                GUARD_DROPPED.store(1, Ordering::SeqCst);
+            }
+        }
+        std::env::set_var("FGOS_SPAWN_TEST_KEPT", "inherited");
+        let mut command = Command::new("/bin/sh");
+        command.args(["-c", "printf %s \"$FGOS_SPAWN_TEST_KEPT\""]);
+        let outcome = run_bounded_command(command, None, Duration::from_secs(5), |pid| {
+            SPAWNED_PID.store(pid, Ordering::SeqCst);
+            assert_eq!(GUARD_DROPPED.load(Ordering::SeqCst), 0);
+            Guard
+        });
+        let out = exited(outcome);
+        assert_eq!(
+            out.stdout, b"inherited",
+            "the caller chose to inherit the environment"
+        );
+        assert_ne!(SPAWNED_PID.load(Ordering::SeqCst), 0);
+        assert_eq!(
+            GUARD_DROPPED.load(Ordering::SeqCst),
+            1,
+            "the guard lives for the call and no longer"
+        );
     }
 
     #[test]
