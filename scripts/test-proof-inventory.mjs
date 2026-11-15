@@ -572,6 +572,18 @@ function cpuGrowthLines({ cpuSeconds, fileCpu = {}, tests }, baseline) {
   return lines;
 }
 
+// The baseline cost of only the shard's files, so CPU per test() call compares like with like: a file the baseline
+// has no cost for contributes neither CPU nor tests to it.
+function shardBaseline(baseline, calls) {
+  const known = new Set(Object.keys(baseline.fileCpu));
+  const mine = new Set(calls.map((c) => c.file));
+  const cpuSeconds = Object.entries(baseline.fileCpu)
+    .filter(([file]) => mine.has(file))
+    .reduce((sum, [, seconds]) => sum + seconds, 0);
+  // The whole suite's wall time says nothing about one shard's.
+  return { ...baseline, files: [...mine].filter((f) => known.has(f)).length, wallSeconds: null, cpuSeconds, tests: calls.filter((c) => known.has(c.file)).length };
+}
+
 /**
  * What `npm test` prints after the run: the suite size line against the
  * committed baseline, clone and shared-title findings, and new admission-rule
@@ -579,6 +591,10 @@ function cpuGrowthLines({ cpuSeconds, fileCpu = {}, tests }, baseline) {
  */
 export function suiteReport({
   files,
+  // Clones and shared titles are scanned over these (a shard passes the whole suite); size, cost and growth over `files`.
+  cloneFiles = files,
+  // A shard run: `{ index, total, load, mean }`, the predicted load of this shard against the mean of all.
+  shard = null,
   wallSeconds = null,
   cpuSeconds = null,
   fileCpu = {},
@@ -589,13 +605,16 @@ export function suiteReport({
   change = () => ({ base: admissionBaseRef({ cwd }), ...suiteChange({ baseRef: admissionBaseRef({ cwd }), cwd }) }),
   countRust = countRustTests,
 } = {}) {
-  const calls = files.flatMap((file) => scanTestCalls(readFile(path.resolve(cwd, file)), path.relative(cwd, path.resolve(cwd, file)).replaceAll('\\', '/')));
-  const baseline = readSuiteBaseline(baselinePath);
+  const scan = (list) => list.flatMap((file) => scanTestCalls(readFile(path.resolve(cwd, file)), path.relative(cwd, path.resolve(cwd, file)).replaceAll('\\', '/')));
+  const calls = scan(files);
+  const whole = readSuiteBaseline(baselinePath);
+  const baseline = shard && whole.tests !== null ? shardBaseline(whole, calls) : whole;
   const lines = [];
   const at = baseline.sha ? ` at ${baseline.sha.slice(0, 9)}` : '';
   const rustTests = countRust(cwd);
   const base = baseline.tests === null ? 'no baseline' : `baseline ${baseline.files} / ${baseline.tests} / ${baseline.rustTests ?? '?'} Rust / ${formatWall(baseline.wallSeconds)} / ${formatWall(baseline.cpuSeconds)} CPU${at}`;
-  lines.push(`suite: ${files.length} files, ${calls.length} test() calls, ${rustTests} Rust tests, ${formatWall(wallSeconds)} wall, ${formatWall(cpuSeconds)} CPU (${base})`);
+  const load = shard ? `; load ${Math.round(shard.load)} of mean ${Math.round(shard.mean)} (${(shard.load / shard.mean).toFixed(2)})` : '';
+  lines.push(`suite: ${shard ? `shard ${shard.index}/${shard.total}: ` : ''}${files.length} files, ${calls.length} test() calls, ${rustTests} Rust tests, ${formatWall(wallSeconds)} wall, ${formatWall(cpuSeconds)} CPU (${base})${load}`);
   lines.push(...cpuGrowthLines({ cpuSeconds, fileCpu, tests: calls.length }, baseline));
   try {
     const delta = change();
@@ -604,7 +623,8 @@ export function suiteReport({
     lines.push(`suite: warning: change against the merge base not measured: ${String(err.message).split('\n')[0]}`);
   }
 
-  const clones = findCloneGroups(calls);
+  const cloneCalls = cloneFiles === files ? calls : scan(cloneFiles);
+  const clones = findCloneGroups(cloneCalls);
   const known = new Set(baseline.knownClones.map((c) => c.hash));
   const newClones = clones.filter((g) => !known.has(g.hash));
   const present = new Set(clones.map((g) => g.hash));
@@ -615,7 +635,7 @@ export function suiteReport({
   }
   if (clones.length - newClones.length > 0) lines.push(`suite: warning: ${clones.length - newClones.length} known cross-file clone(s) still listed in ${path.relative(cwd, baselinePath)}`);
   if (gone.length > 0) lines.push(`suite: ${gone.length} baselined clone(s) are gone; shrink the baseline with \`node scripts/test-proof-inventory.mjs --write-baseline\``);
-  const shared = findSharedTitles(calls);
+  const shared = findSharedTitles(cloneCalls);
   if (shared.length > 0) lines.push(`suite: warning: ${shared.length} test title(s) appear in more than one file (\`node scripts/test-proof-inventory.mjs --duplicates\` lists them)`);
   let violations = [];
   try {

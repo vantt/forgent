@@ -25,6 +25,7 @@ import { acquireFullSuiteQueue, QUEUE_HELD_ENV, QUEUE_SWITCH_ENV } from './lib/f
 import { configEntries, repositoryDirs, worktreeRegistrationsUnder } from './lib/git-dir-layout.mjs';
 import { pruneMissingCheckouts } from './lib/git-ports.mjs';
 import { refusalAdvice } from './lib/test-file-watchdog.mjs';
+import { parseShard, partitionFiles, repoRelative, shardLoads } from './lib/test-shards.mjs';
 import { loadNativeAddon, nativeDoor } from '../src/native/door.mjs';
 import { scan, selfRecord } from '../src/native/process-identity.mjs';
 import { processesInside, stopProcessesInside } from '../src/runner/dispatch/stop-processes-inside.mjs';
@@ -722,8 +723,20 @@ export function runSelectedTests(files, {
   return result;
 }
 
+/** The absolute files of `shard` out of the absolute `discovered` files, split over repo-relative `weights`. */
+export function selectShard(discovered, { index, total }, weights, cwd = REPO_ROOT) {
+  const byKey = new Map(discovered.map((file) => [repoRelative(cwd, file), file]));
+  return partitionFiles([...byKey.keys()], total, weights)[index - 1].map((key) => byKey.get(key));
+}
+
+/** What the suite line says of a shard: its position and its predicted load against the mean load of all shards. */
+function shardInfo(discovered, { index, total }, weights, cwd) {
+  const loads = shardLoads(discovered.map((file) => repoRelative(cwd, file)), total, weights);
+  return { index, total, load: loads[index - 1], mean: loads.reduce((a, b) => a + b, 0) / total };
+}
+
 /**
- * Runs the full suite. Returns `{ status, files }` without touching
+ * Runs the full suite, or one shard of it. Returns `{ status, files }` without touching
  * `process.exitCode` itself, so callers (the CLI entrypoint below, or a
  * test) can decide what to do with the result. Refuses (status 1, no
  * spawn) when zero files are discovered -- a portable-looking wrapper that
@@ -740,24 +753,36 @@ export function runTests({
   stdio = 'inherit',
   queue = null,
   allowedFgosMutations = DERIVED_FGOS_FILES,
+  // `{ index, total }`: run only that shard of the discovered files, split by `weights` (repo-relative path -> seconds).
+  shard = null,
+  weights = {},
   ...limitOptions
 } = {}) {
-  const files = discoverTestFiles(root);
-  if (files.length === 0) {
+  const discovered = discoverTestFiles(root);
+  const files = shard ? selectShard(discovered, shard, weights, cwd) : discovered;
+  if (discovered.length === 0) {
     return {
       status: 1,
-      files,
+      files: discovered,
       message: `run-tests: discovered 0 test files under "${root}" -- refusing to report a false-green empty run. Check the path or the ".test.mjs" naming convention.`,
     };
   }
+  if (files.length === 0) {
+    return { status: 1, files, message: `run-tests: shard ${shard.index}/${shard.total} holds no test file out of ${discovered.length} -- refusing to report a false-green empty run.` };
+  }
+  // A shard also reports what the whole discovered suite is, for the checks that must see every file.
+  const run = (runFiles, runOptions) => {
+    const result = runSelectedTests(runFiles, runOptions);
+    return shard ? { ...result, shard: shardInfo(discovered, shard, weights, cwd), allFiles: discovered.map((f) => path.relative(cwd, f)) } : result;
+  };
 
   // `queue` (the CLI door passes acquireFullSuiteQueue): taken only once
   // there is real work to run, and marked on the child's env so a test that
   // spawns this door itself never waits on its own parent's lock.
-  if (!queue) return runSelectedTests(files, { cwd, forwardedArgs, execPath, spawn, env, stdio, allowedFgosMutations, ...limitOptions });
+  if (!queue) return run(files, { cwd, forwardedArgs, execPath, spawn, env, stdio, allowedFgosMutations, ...limitOptions });
   const release = queue({ env });
   try {
-    return runSelectedTests(files, { cwd, forwardedArgs, execPath, spawn, env: { ...env, [QUEUE_HELD_ENV]: '1' }, stdio, allowedFgosMutations, ...limitOptions });
+    return run(files, { cwd, forwardedArgs, execPath, spawn, env: { ...env, [QUEUE_HELD_ENV]: '1' }, stdio, allowedFgosMutations, ...limitOptions });
   } finally {
     release();
   }
@@ -806,15 +831,37 @@ export function runChosenTests(paths, { cwd = REPO_ROOT, ...options } = {}) {
 }
 
 if (isMainModule(import.meta.url)) {
-  const argv = process.argv.slice(2);
+  const shardArgs = process.argv.slice(2).filter((arg) => /^--shard=/.test(arg));
+  const argv = process.argv.slice(2).filter((arg) => !shardArgs.includes(arg));
+  let shard = null;
+  if (shardArgs.length > 0) {
+    try {
+      if (shardArgs.length > 1) throw new Error('--shard given more than once');
+      shard = parseShard(shardArgs[0].slice('--shard='.length));
+    } catch (err) {
+      console.error(`run-tests: ${err.message}`);
+      process.exit(1);
+    }
+  }
   const chosen = argv.filter((arg) => arg.endsWith(TEST_FILE_SUFFIX));
+  if (chosen.length > 0 && shard) {
+    console.error('run-tests: --shard selects test files itself and cannot be combined with chosen test files');
+    process.exit(1);
+  }
   if (chosen.length > 0) {
     const { status, message } = runChosenTests(chosen, { forwardedArgs: argv.filter((arg) => !chosen.includes(arg)) });
     if (message) console.error(message);
     process.exit(status);
   }
-  const { status, message, files, wallSeconds, cpuSeconds, fileCpu } = runTests({
-    forwardedArgs: process.argv.slice(2),
+  let weights = {};
+  if (shard) {
+    const { readSuiteBaseline } = await import('./test-proof-inventory.mjs');
+    weights = readSuiteBaseline().fileCpu;
+  }
+  const { status, message, files, wallSeconds, cpuSeconds, fileCpu, shard: shardRun, allFiles } = runTests({
+    forwardedArgs: argv,
+    shard,
+    weights,
     queue: (options) => queueAfterStaging(options),
   });
   if (message) console.error(message);
@@ -825,7 +872,7 @@ if (isMainModule(import.meta.url)) {
     if (typeof cpuSeconds === 'number' && process.argv.length === 2) {
       try { recordLastRun({ wallSeconds, cpuSeconds, fileCpu }); } catch (err) { console.error(`suite: warning: this run's cost not recorded: ${err.message}`); }
     }
-    const report = suiteReport({ files, wallSeconds, cpuSeconds, fileCpu });
+    const report = suiteReport({ files, wallSeconds, cpuSeconds, fileCpu, cloneFiles: allFiles, shard: shardRun });
     for (const line of report.lines) console.error(line);
     reportStatus = report.status;
   }
