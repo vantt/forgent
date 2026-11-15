@@ -31,6 +31,11 @@
     "operation_id": "holder-lock.status",
     "owner_path": "packages/holder-lock/rust"
   },
+  "lock": {
+    "operation_id": "holder-lock.fence",
+    "owner_path": "packages/holder-lock/rust",
+    "subcommands": true
+  },
   "mailbox": {
     "operation_id": "mailbox.inbox",
     "owner_path": "packages/mailbox/rust",

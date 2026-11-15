@@ -3,6 +3,7 @@
 pub mod event_store_clone;
 pub mod git_incidents;
 pub mod identity_log;
+pub mod lock_fence;
 pub mod lock_status;
 #[cfg(unix)]
 pub mod mailbox_body;

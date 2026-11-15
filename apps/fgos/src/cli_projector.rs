@@ -116,6 +116,12 @@ pub fn project_cli_invocation(
             ContractRef::from_static("mailbox.status.request", "1.0.0"),
             Box::new(crate::wiring::mailbox_verbs::project_mailbox_request(args)),
         ),
+        crate::wiring::lock_fence::OPERATION_ID => (
+            ContractRef::from_static("holder-lock.fence.request", "1.0.0"),
+            Box::new(crate::wiring::lock_fence::project_fence_request(
+                args, root,
+            )?),
+        ),
         "config.read" | "config.write" => (
             ContractRef::from_static(
                 if operation.as_str() == "config.read" {

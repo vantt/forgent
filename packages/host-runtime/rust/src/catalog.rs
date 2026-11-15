@@ -104,6 +104,17 @@ pub const CATALOG: &[OperationDescriptor] = &[
         streaming_mode: StreamingMode::None,
     },
     OperationDescriptor {
+        operation_id: OperationId::from_static("holder-lock.fence"),
+        owning_component_id: Cow::Borrowed("holder-lock"),
+        request_contract: ContractRef::from_static("holder-lock.fence.request", "1.0.0"),
+        outcome_contract: ContractRef::from_static("holder-lock.fence.outcome", "1.0.0"),
+        effect: OperationEffect::Write,
+        idempotency: OperationIdempotency::None,
+        authority_policy_id: Cow::Borrowed("holder-lock.write"),
+        allowed_host_kinds: &["cli"],
+        streaming_mode: StreamingMode::None,
+    },
+    OperationDescriptor {
         operation_id: OperationId::from_static("test.fixture.echo"),
         owning_component_id: Cow::Borrowed("test"),
         request_contract: ContractRef::from_static("test.fixture.echo.request", "1.0.0"),
@@ -233,8 +244,8 @@ mod tests {
     #[test]
     fn catalog_contains_required_operations() {
         // Eleven operations, plus the mailbox's send, inbox, inbox claim, list
-        // and status, the git status and recover, and the lock status.
-        assert_eq!(CATALOG.len(), 19);
+        // and status, the git status and recover, the lock status and the lock fence.
+        assert_eq!(CATALOG.len(), 20);
         let ids: Vec<&str> = CATALOG.iter().map(|op| op.operation_id.as_str()).collect();
         assert!(ids.contains(&"distribution.build.show"));
         assert!(ids.contains(&"work.gate-bypass.show"));
@@ -255,6 +266,7 @@ mod tests {
         assert!(ids.contains(&"git.status"));
         assert!(ids.contains(&"git.recover"));
         assert!(ids.contains(&"holder-lock.status"));
+        assert!(ids.contains(&"holder-lock.fence"));
     }
     /// `OperationId::from_static` (used by every `CATALOG` entry, for
     /// const-context construction with no runtime allocation) skips
