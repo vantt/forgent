@@ -1,7 +1,7 @@
 ---
 title: "YAML write door: one writer of YAML text"
 description: "The native YAML door gains emit; the five hand-written frontmatter writers use it; a doors row keeps fence writing in the door; every emitted block reads back to the same value."
-status: pending
+status: done
 priority: P2
 effort: 13.5h (9 executable phases; longest chain 01 -> 02 -> 07 -> 08 -> 09, about 11h)
 branch: plan/yaml-write-door
@@ -9,6 +9,7 @@ tags: [refactor, one-door, yaml, rust, node]
 blockedBy: []
 blocks: []
 created: 2026-11-15
+completed: 2026-11-15
 ---
 
 # YAML write door
@@ -56,15 +57,15 @@ row); no regeneration of the committed `.claude/agents/*.md` (Q1, backlog row); 
 | # | Phase | Owns (writes) | Start after | Effort | Status |
 |---|---|---|---|---|---|
 | 00 | [Facts and prior art](phase-00-facts.md) | (record only) | - | done | done |
-| 01 | [Crate emits a whole document](phase-01-crate-emit.md) | `packages/yaml-doc/rust/{Cargo.toml,src/edit.rs,src/lib.rs,tests/golden_edit.rs,tests/api_seal.rs}`, `packages/yaml-doc/contracts/fixtures/edit.v1.json` | approval | 4h | pending |
-| 02 | [Addon and Node door write](phase-02-node-door-write.md) | `packages/git/node-addon/{src/yaml.rs,src/lib.rs,tests/yaml_parts.rs}`, `src/native/door.mjs`, `src/util/yaml.mjs`, `test/util/yaml.test.mjs`, `test/config/config-door.test.mjs`, `test/git/native-load.test.mjs` | 01 | 3h | pending |
-| 03 | [Knowledge projection writer](phase-03-knowledge-projection-writer.md) | `src/report/knowledge-projection.mjs` | 02 | 0.5h | pending |
-| 04 | [Decisions index writer](phase-04-decision-index-writer.md) | `src/report/decision-index.mjs` | 02 | 0.5h | pending |
-| 05 | [Case answer writer](phase-05-case-answer-writer.md) | `src/workflow/case-runtime.mjs`, `test/workflow/case-runtime.test.mjs` | 02 | 1h | pending |
-| 06 | [Knowledge canary writer](phase-06-knowledge-canary-writer.md) | `scripts/knowledge-canary.mjs` | 02 | 0.5h | pending |
-| 07 | [Agent projection writer](phase-07-agent-projection-writer.md) | `scripts/project-agents.mjs`, `test/scripts/project-agents.test.mjs` | 02 | 1h | pending |
-| 08 | [Specs and decision record](phase-08-specs-and-decision.md) | `docs/platform/yaml-document/spec.md`, `docs/platform/packaging-distribution/spec.md`, `docs/platform/component-boundary.md` | approval (lands after 07) | 1.5h | pending |
-| 09 | [Doors row and close](phase-09-door-row-and-close.md) | `docs/architecture-manifest.json`, `test/architecture.test.mjs` (one seeded-case test), `docs/backlog.md`, this `plan.md` status | 03-08 | 1.5h | pending |
+| 01 | [Crate emits a whole document](phase-01-crate-emit.md) | `packages/yaml-doc/rust/{Cargo.toml,src/edit.rs,src/lib.rs,tests/golden_edit.rs,tests/api_seal.rs}`, `packages/yaml-doc/contracts/fixtures/edit.v1.json` | approval | 4h | done |
+| 02 | [Addon and Node door write](phase-02-node-door-write.md) | `packages/git/node-addon/{src/yaml.rs,src/lib.rs,tests/yaml_parts.rs}`, `src/native/door.mjs`, `src/util/yaml.mjs`, `test/util/yaml.test.mjs`, `test/config/config-door.test.mjs`, `test/git/native-load.test.mjs` | 01 | 3h | done |
+| 03 | [Knowledge projection writer](phase-03-knowledge-projection-writer.md) | `src/report/knowledge-projection.mjs` | 02 | 0.5h | done |
+| 04 | [Decisions index writer](phase-04-decision-index-writer.md) | `src/report/decision-index.mjs` | 02 | 0.5h | done |
+| 05 | [Case answer writer](phase-05-case-answer-writer.md) | `src/workflow/case-runtime.mjs`, `test/workflow/case-runtime.test.mjs` | 02 | 1h | done |
+| 06 | [Knowledge canary writer](phase-06-knowledge-canary-writer.md) | `scripts/knowledge-canary.mjs` | 02 | 0.5h | done |
+| 07 | [Agent projection writer](phase-07-agent-projection-writer.md) | `scripts/project-agents.mjs`, `test/scripts/project-agents.test.mjs` | 02 | 1h | done |
+| 08 | [Specs and decision record](phase-08-specs-and-decision.md) | `docs/platform/yaml-document/spec.md`, `docs/platform/packaging-distribution/spec.md`, `docs/platform/component-boundary.md` | approval (lands after 07) | 1.5h | done |
+| 09 | [Doors row and close](phase-09-door-row-and-close.md) | `docs/architecture-manifest.json`, `test/architecture.test.mjs` (one seeded-case test), `docs/backlog.md`, this `plan.md` status | 03-08 | 1.5h | done |
 
 Shared by every code phase: `packages/git/contracts/mutation-census.v1.json` (regenerated, never hand-merged; F7).
 
@@ -172,6 +173,20 @@ activation needs the release rebuilt and reactivated. No data format changes: ro
 4. `docs/decisions/index.md` and `docs/doc-registry.md` byte-identical (doc-health fixpoint test; `doc-registry --check`).
 5. Each writer goes through `writeFrontmatter`, which re-reads every block to the intended meta; 05's malformed-round case and 07's `": "` case green.
 6. `npm test` and `cargo test --workspace` green on the integration head; backlog row `p-eqhfqpz3gy` `done`; the two follow-up rows exist.
+
+## Outcome of execution
+
+All nine phases landed on `origin/yaml-write-door/integration`, each after OPC MERGE; integration head `795ba6472`.
+Landed phase heads on integration: 01 `e5ddbef0a`, 02 `4155b139d`, 05 `1a1ba38a5`, 03 `b21366b92`, 04 `8e88483fe`,
+06 `b4b5ba4df`, 07 `324c95660`, 08 `1ec57277a`, 09 `795ba6472`.
+
+Deviations from the plan:
+- The release-tree check now allows the `node:util` import (`writeFrontmatter` uses `isDeepStrictEqual`).
+- Phase 07 added a separate quoting test instead of folding the `": "` case into an existing test.
+- Two new backlog rows: `p-bazzipipk5` and `p-4vjneux6wv`.
+- Q1 (the committed `.claude/agents/*.md` files) is still open with the owner.
+
+Landing the integration branch on main is the big lead's (HARDEN) job, not this plan's.
 
 ## Owner questions (batch)
 
