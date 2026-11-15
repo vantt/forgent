@@ -1,0 +1,59 @@
+# Phase 07: the agent projection writes its frontmatter through the door
+
+Start after: 02 landed on the integration branch. Parallel with 03, 04, 05, 06, 08. Rules: [phase-lead-rules.md](phase-lead-rules.md).
+Facts: F3 row 5, F4 side fact, F6. Worktree `ywd-p07`, report slug `ywd-p07-agent-projection`. Effort: 1h.
+
+## Context
+
+`projectAgentMarkdown` (`scripts/project-agents.mjs:110-161`) builds the Claude Code agent file's frontmatter by joining
+`name: ${def.name}`, `description: ${def.description}`, `tools: ${tools}` and `skills: [${...}]` (`:133-138`). A
+description containing `": "` makes the block invalid YAML (the committed `council-*.md` are such files today). This is
+the one writer whose bytes change: quoting where needed, and `skills` as a block sequence. `assertSingleLine`
+(`:63`, applied at `:117-127`) stays: it also guards the Markdown body, which splices the same strings.
+
+## Requirements
+
+- Frontmatter = `{ name: def.name, description: def.description, tools: def['tool-scope'].join(', ') }` plus
+  `skills: [...def.skills]` only when `def.skills` is a non-empty array (same condition as today, `:134`). Return
+  `writeFrontmatter(meta, `\n${body}\n`, sourcePath)`; today's output is `${frontmatter}\n\n${body}\n`, so the text after
+  the closing fence stays `\n` + body + `\n`.
+- `tools` stays one comma-joined string (Claude Code's `tools` field), not a list.
+- Owning proofs in `test/scripts/project-agents.test.mjs`:
+  - `:45` "tool-scope maps exactly into the generated tools" asserts `readFrontmatter(markdown).meta.tools === 'Read, Grep, Bash'`
+    instead of the raw line (same behaviour, value-level).
+  - `:61` "skills, when declared, projects into the frontmatter as a bracketed list" is renamed "skills, when declared,
+    project into the frontmatter as a list in declared order" and asserts
+    `readFrontmatter(markdown).meta.skills` deep-equals `['fgos-coding-implement', 'fgos-coding-validating']`. The flow-list
+    bytes are not a behaviour any reader depends on (Claude Code reads YAML); the commit message says the byte form is
+    retired and this test still owns the behaviour.
+  - one assertion added to `:45`'s test or the skills test, not a new test: a description holding `": "` reads back
+    unchanged through `readFrontmatter` (the bug this phase removes). Use the existing `VALID_YAML` with
+    `description: "Council task posture: assumption testing."`.
+  - `:188` (newline refused before any write) unchanged.
+- Committed `.claude/agents/*.md`: NOT regenerated in this phase (owner question Q1). If the owner answers yes before the
+  phase lands, regenerate in a separate commit with `node scripts/project-agents.mjs` and list the diff in the report.
+
+## Files
+
+- Modify: `scripts/project-agents.mjs`, `test/scripts/project-agents.test.mjs`.
+- Conditional (Q1 = yes): `.claude/agents/council-assumptions.md`, `council-feedback-loops.md`, `council-ship-maintain.md`,
+  `fgos-placeholder.md` (generated, separate commit).
+- Create/Delete: none. Tests retired: the raw-line form of `:61` (owner after the change: the same test, value-level).
+- Net size: about -6 / +6 lines.
+
+## Steps
+
+1. Red: the `": "` description assertion fails on today's writer (the door refuses the block). Commit, push.
+2. Change the writer; update the two assertions.
+3. `node scripts/run-tests.mjs test/scripts/project-agents.test.mjs` plus the `rg -l "project-agents" test` list.
+4. Gates in phase-lead-rules.
+
+## Acceptance
+
+- No `'---'` literal left in `scripts/project-agents.mjs`; every frontmatter the script writes reads back through
+  `readFrontmatter` to `{ name, description, tools[, skills] }`; tests green.
+
+## Risks / rollback
+
+- Claude Code reads a double-quoted description or a block `skills` list differently (L x M): both are plain YAML; the
+  projection only takes effect when the files are regenerated (Q1). Revert the commits.
