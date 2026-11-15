@@ -134,6 +134,7 @@ static COMPOSITION_PROVIDERS: &[ProviderDescriptor] = &[
     wiring::doctor::DESCRIPTOR,
     wiring::wire_agents::DESCRIPTOR,
     wiring::uninstall::DESCRIPTOR,
+    wiring::init::DESCRIPTOR,
 ];
 
 /// The legacy payload root of the running release, for the verbs that read what it ships (its skills, its scripts).
@@ -344,6 +345,7 @@ fn main() {
     service.register_provider(Arc::new(wiring::uninstall::UninstallProvider::new(
         active_payload_root,
     )));
+    service.register_provider(Arc::new(wiring::init::InitProvider::new()));
     let tracker = service.tracker();
 
     match lane {

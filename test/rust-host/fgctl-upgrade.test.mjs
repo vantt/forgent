@@ -91,25 +91,23 @@ function restampRelease(fromDir, prefix, edit) {
   return { dir, digest: manifest.artifactDigest };
 }
 
-/** A copy of `fromDir` whose payload exits 42 on `init`, the first tail step, while SIMULATE_TAIL_FAILURE=1. */
+/**
+ * A copy of `fromDir` whose payload's Node rows bridge exits 42 while SIMULATE_TAIL_FAILURE=1: `init`, the first tail
+ * step, is native and asks that bridge only for its Work store, so it fails there (with status 1).
+ */
 function releaseWithFailingTail(fromDir, prefix, label) {
   return restampRelease(fromDir, prefix, (manifest, dir) => {
-    const fgosMjsPath = path.join(dir, 'libexec', 'legacy-node', 'bin', 'fgos.mjs');
-    const originalContent = fs.readFileSync(fgosMjsPath, 'utf8');
-    const firstLineEnd = originalContent.indexOf('\n');
-    const shebang = originalContent.slice(0, firstLineEnd + 1);
-    const rest = originalContent.slice(firstLineEnd + 1);
-    const failInjection = `if (process.env.SIMULATE_TAIL_FAILURE === '1' && process.argv.includes('init')) {\n  console.error('simulated ${label} init failure in tail');\n  process.exit(42);\n}\n`;
-    fs.writeFileSync(fgosMjsPath, shebang + failInjection + rest);
-    const newMjsHash = 'sha256:' + hashFile(fgosMjsPath);
-    const newMjsSize = fs.statSync(fgosMjsPath).size;
+    const bridgePath = path.join(dir, 'libexec', 'legacy-node', 'src', 'setup', 'doctor-bridge.mjs');
+    const failInjection = `if (process.env.SIMULATE_TAIL_FAILURE === '1') {\n  console.error('simulated ${label} init failure in tail');\n  process.exit(42);\n}\n`;
+    fs.writeFileSync(bridgePath, failInjection + fs.readFileSync(bridgePath, 'utf8'));
+    const newHash = 'sha256:' + hashFile(bridgePath);
+    const newSize = fs.statSync(bridgePath).size;
     for (const f of manifest.files) {
-      if (f.path === 'libexec/legacy-node/bin/fgos.mjs') {
-        f.digest = newMjsHash;
-        f.size = newMjsSize;
+      if (f.path === 'libexec/legacy-node/src/setup/doctor-bridge.mjs') {
+        f.digest = newHash;
+        f.size = newSize;
       }
     }
-    manifest.components.legacyNode.digest = newMjsHash;
   });
 }
 
@@ -577,7 +575,7 @@ test('P7: Upgrade candidate local tail failure leaves workspace in diagnosable s
     });
 
     assert.notEqual(upgRes.status, 0, 'upgrade must fail when tail fails');
-    assert.match(upgRes.stderr, /tail command 'init.*failed with status 42/);
+    assert.match(upgRes.stderr, /tail command 'init.*failed with status 1/);
 
     // Activation was published before tail
     const activationPath = path.join(projDir, '.fgos', 'installation', 'activation.json');
@@ -633,7 +631,7 @@ test('P7: Repair local tail failure leaves workspace in diagnosable state with r
     });
 
     assert.notEqual(repRes.status, 0, 'repair must fail when tail fails');
-    assert.match(repRes.stderr, /tail command 'init.*failed with status 42/);
+    assert.match(repRes.stderr, /tail command 'init.*failed with status 1/);
 
     // Activation was published before tail
     const activationPath = path.join(projDir, '.fgos', 'installation', 'activation.json');

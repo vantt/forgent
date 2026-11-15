@@ -839,11 +839,6 @@ function submitWork(dir, text, opts = {}) {
 
 async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slice(3)) {
   switch (verb) {
-    case 'init': {
-      const { initStoreUseCase } = await import('../src/verbs/state/init.mjs');
-      return initStoreUseCase({ dir });
-    }
-
     case 'add': {
       // --id is optional: an explicit id is still honored as-is (e.g. a
       // deliberately chosen or parent-lineage child id like "tsk-4vo-1");

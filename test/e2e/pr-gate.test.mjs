@@ -57,7 +57,7 @@ function initTempRepo() {
 }
 
 function fgos(cwd, args) {
-  return spawnSync(process.execPath, [FGOS, ...args], { cwd, encoding: 'utf8' });
+  return spawnFgos(FGOS, args, { cwd, encoding: 'utf8' });
 }
 
 function runner(cwd, args = ['--once']) {
@@ -159,6 +159,7 @@ function writeOverwritingExecutor(scriptDir, filename, content) {
     `
 import fs from 'node:fs';
 import { execFileSync } from 'node:child_process';
+import { spawnFgos } from '../helpers/cli-entry.mjs';
 fs.writeFileSync(${JSON.stringify(filename)}, ${JSON.stringify(content)});
 `,
   );

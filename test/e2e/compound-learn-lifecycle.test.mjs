@@ -7,7 +7,8 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { execFileSync, spawnSync } from 'node:child_process';
+import { execFileSync } from 'node:child_process';
+import { spawnFgos } from '../helpers/cli-entry.mjs';
 
 // e2e proof for the Compound-learn stage + done-gate (D2/D3), driven end to
 // end through the real fgos binary: a coding item cannot reach `done` without
@@ -29,7 +30,7 @@ function initTempRepo() {
 }
 
 function fgos(cwd, args) {
-  return spawnSync(process.execPath, [FGOS, ...args], { cwd, encoding: 'utf8' });
+  return spawnFgos(FGOS, args, { cwd, encoding: 'utf8' });
 }
 
 function gitAt(cwd, args) {

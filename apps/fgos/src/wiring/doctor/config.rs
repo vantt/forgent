@@ -165,7 +165,7 @@ fn rows_from(findings: &Result<Vec<Finding>, String>, ids: &[&str]) -> Vec<RowOu
 }
 
 #[cfg(unix)]
-mod door {
+pub(crate) mod door {
     use fgos_config::detect::PathDetectors;
     use fgos_config::doctor::{check, Finding};
     use fgos_config::repair::fix_with_roots;

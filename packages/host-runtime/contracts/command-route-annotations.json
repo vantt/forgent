@@ -41,6 +41,10 @@
     "operation_id": "identity.writer",
     "owner_path": "packages/identity/rust"
   },
+  "init": {
+    "operation_id": "init.run",
+    "owner_path": "apps/fgos"
+  },
   "lock-status": {
     "operation_id": "holder-lock.status",
     "owner_path": "packages/holder-lock/rust"

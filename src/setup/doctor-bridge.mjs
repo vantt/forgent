@@ -11,20 +11,25 @@
 // stderr, and a result line is recognised by its prefix, so stray output can never be read as a result. Each
 // result is written as soon as it exists, so a crash keeps the results already produced. Deleted with the last
 // row Node owns.
+//
+// One more request shares the door: `work-store-init`, the Work store `fgos init` creates until the Work layer
+// moves (the Event Store rebuild of the project's `.fgos`). It answers with an `end` line of count 0, or with a
+// `refusal` line carrying the error's text and its category.
 
 import fs from 'node:fs';
+import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 
 /** The prefix of a result line; anything else on stdout is not a result. */
 export const RESULT_PREFIX = '\u001eFGOS-DOCTOR-BRIDGE ';
 
-/** Reads the request from `input`: `{ phase: 'fix' | 'check', ids: [...], dir }`, or throws what is wrong with it. */
+/** Reads the request from `input`: `{ phase: 'fix' | 'check' | 'work-store-init', ids: [...], dir }`, or throws what is wrong with it. */
 export function parseRequest(text) {
   let request;
   try { request = JSON.parse(text); } catch (error) { throw new Error(`the request is not JSON (${error.message})`); }
   const { phase, ids, dir } = request ?? {};
-  if (phase !== 'fix' && phase !== 'check') throw new Error('the request names no phase (fix or check)');
-  if (!Array.isArray(ids) || ids.some((id) => typeof id !== 'string' || id === '')) throw new Error('the request names no list of ids');
+  if (phase !== 'fix' && phase !== 'check' && phase !== 'work-store-init') throw new Error('the request names no phase (fix, check or work-store-init)');
+  if (!Array.isArray(ids) || ids.some((id) => typeof id !== 'string' || id === '') || (phase === 'work-store-init' && ids.length > 0)) throw new Error('the request names no list of ids');
   if (typeof dir !== 'string' || dir === '') throw new Error('the request names no project directory');
   return { phase, ids, dir };
 }
@@ -34,14 +39,25 @@ export function resultLine(kind, body) {
   return `${RESULT_PREFIX}${JSON.stringify({ kind, ...body })}\n`;
 }
 
+/** A refusal line: the error's text, and its category when it carries one (the host turns it into the exit status). */
+function refusalLine(error) {
+  return resultLine('refusal', { message: error.message, ...(typeof error.category === 'string' && { category: error.category }) });
+}
+
 /**
  * Runs one request. `write` receives each result line; `runBridged` is the body map of the registry
- * (src/setup/registrations.mjs). Ends with an `end` line carrying the count, so the host can tell a finished
- * call from one that stopped. A refusal (a malformed request, an id with no body) is one `refusal` line.
+ * (src/setup/registrations.mjs) and `initStore` creates the Work store of a `.fgos` directory. Ends with an `end`
+ * line carrying the count, so the host can tell a finished call from one that stopped. A refusal (a malformed
+ * request, an id with no body) is one `refusal` line.
  */
-export async function serve(text, { write, runBridged }) {
+export async function serve(text, { write, runBridged, initStore }) {
   let request;
   try { request = parseRequest(text); } catch (error) { write(resultLine('refusal', { message: error.message })); return 2; }
+  if (request.phase === 'work-store-init') {
+    try { await initStore(path.join(request.dir, '.fgos')); } catch (error) { write(refusalLine(error)); return 2; }
+    write(resultLine('end', { count: 0 }));
+    return 0;
+  }
   let count = 0;
   try {
     await runBridged(request, (result) => {
@@ -49,7 +65,7 @@ export async function serve(text, { write, runBridged }) {
       write(resultLine(request.phase === 'fix' ? 'fix' : 'row', result));
     });
   } catch (error) {
-    write(resultLine('refusal', { message: error.message }));
+    write(refusalLine(error));
     return 2;
   }
   write(resultLine('end', { count }));
@@ -76,7 +92,9 @@ async function main() {
   const chunks = [];
   for await (const chunk of process.stdin) chunks.push(chunk);
   const { runBridged } = await import('./registrations.mjs');
-  process.exitCode = await serve(Buffer.concat(chunks).toString('utf8'), { write, runBridged });
+  // Loaded only for the one request that needs the store.
+  const initStore = async (dir) => (await import('../state/store.mjs')).initStore(dir);
+  process.exitCode = await serve(Buffer.concat(chunks).toString('utf8'), { write, runBridged, initStore });
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1] ?? '').href) {

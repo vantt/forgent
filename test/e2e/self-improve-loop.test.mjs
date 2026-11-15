@@ -51,7 +51,7 @@ function fgos(cwd, args) {
     const hostBin = resolveHostBin(cwd) || path.resolve(__dirname, '../../target/debug/fgos');
     return spawnSync(hostBin, [...args, '--dir', cwd], { cwd, encoding: 'utf8' });
   }
-  return spawnSync(process.execPath, [FGOS, ...args], { cwd, encoding: 'utf8' });
+  return spawnFgos(FGOS, args, { cwd, encoding: 'utf8' });
 }
 
 function runner(cwd, args = ['--once']) {
@@ -134,6 +134,7 @@ function writeCommittingExecutor(scriptDir, produce = 'output.txt') {
     `
 import fs from 'node:fs';
 import { execFileSync } from 'node:child_process';
+import { spawnFgos } from '../helpers/cli-entry.mjs';
 fs.writeFileSync(${JSON.stringify(produce)}, 'produced by worker\\n');
 `,
   );

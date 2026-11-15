@@ -6,7 +6,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { spawnSync } from 'node:child_process';
+import { spawnFgos } from '../helpers/cli-entry.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const FGOS = path.resolve(__dirname, '../../bin/fgos.mjs');
@@ -42,7 +42,7 @@ function tmpCwd() {
 }
 
 function run(cwd, args) {
-  return spawnSync(process.execPath, [FGOS, ...args], { cwd, encoding: 'utf8' });
+  return spawnFgos(FGOS, args, { cwd, encoding: 'utf8' });
 }
 
 function envelopeData(stdout) {

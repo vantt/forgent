@@ -19,7 +19,6 @@ import assert from 'node:assert/strict';
 import { sandboxGit } from './lib/sandbox-git.mjs';
 import { ensureGitAddon } from './git-addon.mjs';
 import { prepareStore } from '../src/event-store/index.mjs';
-import { fixEventStoreLockDirs } from '../src/setup/event-store-fixes.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');
@@ -66,11 +65,10 @@ function main() {
     git(['init', tmpDir]);
     git(['-C', tmpDir, 'config', 'fgos.machineId', PINNED_SESSION_ID]);
     git(['commit', '--allow-empty', '-m', 'init'], { cwd: tmpDir });
-    fixEventStoreLockDirs(tmpDir, { trustedMain: tmpDir });
-
-    // 1. Initialize store with Node CLI
-    execFileSync(process.execPath, [path.join(REPO_ROOT, 'bin', 'fgos.mjs'), 'init'], {
+    // 1. Initialize the store with the working tree's host (it makes the lock directories itself)
+    execFileSync(process.execPath, [path.join(REPO_ROOT, 'scripts', 'run-rust-dev-host.mjs'), 'init'], {
       cwd: tmpDir,
+      env: { ...process.env, INIT_CWD: tmpDir },
       stdio: 'pipe',
     });
 

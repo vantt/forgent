@@ -59,7 +59,7 @@ function initTempRepo() {
 }
 
 function fgos(cwd, args) {
-  return spawnSync(process.execPath, [FGOS, ...args], { cwd, encoding: 'utf8' });
+  return spawnFgos(FGOS, args, { cwd, encoding: 'utf8' });
 }
 
 function runner(cwd, args = ['--once']) {
@@ -150,6 +150,7 @@ function writeAdaptiveCommittingExecutor(scriptDir) {
     `
 import fs from 'node:fs';
 import { execFileSync } from 'node:child_process';
+import { spawnFgos } from '../helpers/cli-entry.mjs';
 const prompt = process.argv[2] ?? '';
 const match = prompt.match(/test -f (\\S+)/);
 const file = match ? match[1] : 'output.txt';

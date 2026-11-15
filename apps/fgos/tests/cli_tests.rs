@@ -3858,3 +3858,339 @@ fn uninstall_from_a_linked_worktree_acts_on_the_main_checkout() {
     assert_eq!(hooks[0]["state"], "edited");
     let _ = fs::remove_dir_all(&base);
 }
+
+// ---------------------------------------------------------------------------------------------------------
+// `fgos init` in the host: the machine and project steps run in process; Node is asked for the Work store only.
+// ---------------------------------------------------------------------------------------------------------
+
+/// One world for `init`: a repository with a commit, its own HOME and state root.
+#[cfg(unix)]
+struct InitWorld {
+    base: PathBuf,
+    project: PathBuf,
+    home: PathBuf,
+    state: PathBuf,
+}
+
+#[cfg(unix)]
+impl InitWorld {
+    fn new(prefix: &str) -> Self {
+        let base = fresh_dir(prefix);
+        let (project, home, state) = (base.join("project"), base.join("home"), base.join("state"));
+        for dir in [&project, &home.join(".fgos"), &state] {
+            fs::create_dir_all(dir).unwrap();
+        }
+        {
+            use std::os::unix::fs::PermissionsExt;
+            fs::set_permissions(&state, fs::Permissions::from_mode(0o700)).unwrap();
+        }
+        let git = |args: &[&str]| {
+            assert!(Command::new("git")
+                .args(args)
+                .current_dir(&project)
+                .output()
+                .unwrap()
+                .status
+                .success());
+        };
+        git(&["init", "-q", "-b", "main"]);
+        git(&["config", "user.email", "test@example.com"]);
+        git(&["config", "user.name", "Test"]);
+        fs::write(project.join("seed.txt"), "seed\n").unwrap();
+        git(&["add", "seed.txt"]);
+        git(&["commit", "-q", "-m", "seed"]);
+        Self {
+            base,
+            project,
+            home,
+            state,
+        }
+    }
+
+    fn command(&self, path: &str) -> Command {
+        let mut command = Command::new(fgos_bin());
+        command
+            .arg("init")
+            .current_dir(&self.project)
+            .env("PATH", path)
+            .env("HOME", &self.home)
+            .env("FGOS_STATE_ROOT", &self.state)
+            .env("FGOS_ACTIVE_RELEASE_PATH", repo_root())
+            .env("FGOS_ACTIVE_MANIFEST_PATH", ensure_dev_manifest());
+        command
+    }
+
+    fn init(&self, path: &str, args: &[&str]) -> std::process::Output {
+        self.command(path)
+            .args(args)
+            .output()
+            .expect("failed to execute fgos")
+    }
+
+    fn data(&self, output: &std::process::Output) -> serde_json::Value {
+        assert_eq!(
+            output.status.code(),
+            Some(0),
+            "{}",
+            String::from_utf8_lossy(&output.stderr)
+        );
+        let envelope: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
+        envelope["data"].clone()
+    }
+
+    fn fgos_file(&self, name: &str) -> PathBuf {
+        self.project.join(".fgos").join(name)
+    }
+}
+
+/// A Node that records the request the host sends it and answers with `answer` (a shell command).
+#[cfg(unix)]
+fn bridge_node(prefix: &str, request: &Path, answer: &str) -> (PathBuf, String) {
+    scripted_node(prefix, &format!("cat > '{}'\n{answer}", request.display()))
+}
+
+#[cfg(unix)]
+#[test]
+fn init_makes_the_machine_and_project_files_in_process_and_asks_node_only_for_the_work_store() {
+    let world = InitWorld::new("fgos_init_fresh");
+    let request = world.base.join("request.json");
+    let (node_dir, path) = bridge_node("fgos_init_node", &request, BRIDGE_END_LINE);
+
+    let first = world.data(&world.init(&path, &["--json"]));
+    assert_eq!(first["dir"], world.project.join(".fgos").to_str().unwrap());
+    assert_eq!(first["detectedHarnesses"], serde_json::json!([]));
+    assert_eq!(first["config"]["project"]["created"], true);
+    assert_eq!(first["config"]["global"]["created"], true);
+    assert!(first.get("workStore").is_none(), "{first}");
+    for file in ["config.yaml", "coexistence.json"] {
+        assert!(world.fgos_file(file).is_file(), "{file}");
+    }
+    assert!(world.state.join("machine-id").is_file());
+    assert!(world.home.join(".fgos/config.yaml").is_file());
+    let asked: serde_json::Value =
+        serde_json::from_str(&fs::read_to_string(&request).unwrap()).unwrap();
+    assert_eq!(asked["phase"], "work-store-init");
+    assert_eq!(asked["ids"], serde_json::json!([]));
+    assert_eq!(asked["dir"], world.project.to_str().unwrap());
+
+    let second = world.data(&world.init(&path, &[]));
+    assert_eq!(second["config"]["project"]["created"], false);
+    assert_eq!(second["config"]["global"]["created"], false);
+    let _ = fs::remove_dir_all(&world.base);
+    let _ = fs::remove_dir_all(&node_dir);
+}
+
+#[cfg(unix)]
+const TOKEN: &str = "SENTINEL-4417";
+
+/// An older release's global and project `config.json`, the gateway token inside the global one.
+#[cfg(unix)]
+fn write_legacy_config(world: &InitWorld) {
+    fs::write(
+        world.home.join(".fgos/config.json"),
+        format!(
+            r#"{{"gateway":{{"port":4001,"token":"{TOKEN}"}},"bin":{{"globalFgosPath":"/opt/fgos"}}}}"#
+        ),
+    )
+    .unwrap();
+    fs::create_dir_all(world.fgos_file("")).unwrap();
+    fs::write(
+        world.fgos_file("config.json"),
+        r#"{"gateBypass":{"level":"light"},"ironLaw":{"level":"ask"}}"#,
+    )
+    .unwrap();
+}
+
+#[cfg(unix)]
+#[test]
+fn init_moves_an_older_releases_json_config_in_order_keeps_the_token_and_a_second_run_changes_nothing(
+) {
+    let world = InitWorld::new("fgos_init_legacy");
+    let (node_dir, path) = scripted_node(
+        "fgos_init_legacy_node",
+        &format!("cat >/dev/null\n{BRIDGE_END_LINE}"),
+    );
+    write_legacy_config(&world);
+
+    let output = world.init(&path, &["--json"]);
+    let text = format!(
+        "{}{}",
+        String::from_utf8_lossy(&output.stdout),
+        String::from_utf8_lossy(&output.stderr)
+    );
+    assert!(!text.contains(TOKEN), "no output carries the token");
+    let first = world.data(&output);
+    assert_eq!(
+        first["legacyConfig"],
+        serde_json::json!(["copy", "finish", "convert-global", "convert-project"])
+    );
+    assert_eq!(
+        first["legacyConfigNote"],
+        "~/.fgos/config.json moved; projects on an older release refuse until `fgctl upgrade`"
+    );
+    let token = fs::read_to_string(world.home.join(".fgos/private/gateway-token")).unwrap();
+    assert_eq!(
+        token.trim(),
+        TOKEN,
+        "the token the person had is the machine token"
+    );
+    let snapshot = || {
+        [
+            world.home.join(".fgos/config.yaml"),
+            world.home.join(".fgos/config.json"),
+            world.fgos_file("config.yaml"),
+            world.fgos_file("config.json"),
+        ]
+        .map(|file| fs::read(file).ok())
+    };
+    let settled = snapshot();
+    let second = world.data(&world.init(&path, &["--json"]));
+    assert!(second.get("legacyConfig").is_none(), "{second}");
+    assert_eq!(snapshot(), settled);
+    let _ = fs::remove_dir_all(&world.base);
+    let _ = fs::remove_dir_all(&node_dir);
+}
+
+#[cfg(unix)]
+#[test]
+fn init_never_replaces_a_private_token_that_differs_and_stops_before_the_later_steps() {
+    let world = InitWorld::new("fgos_init_differs");
+    let (node_dir, path) = scripted_node(
+        "fgos_init_differs_node",
+        &format!("cat >/dev/null\n{BRIDGE_END_LINE}"),
+    );
+    write_legacy_config(&world);
+    let private = world.home.join(".fgos/private");
+    fs::create_dir_all(&private).unwrap();
+    fs::write(private.join("gateway-token"), "SENTINEL-8820\n").unwrap();
+    {
+        use std::os::unix::fs::PermissionsExt;
+        fs::set_permissions(&private, fs::Permissions::from_mode(0o700)).unwrap();
+        fs::set_permissions(
+            private.join("gateway-token"),
+            fs::Permissions::from_mode(0o600),
+        )
+        .unwrap();
+    }
+    let legacy = fs::read(world.home.join(".fgos/config.json")).unwrap();
+
+    let output = world.init(&path, &[]);
+    assert_eq!(output.status.code(), Some(1));
+    let stderr = String::from_utf8_lossy(&output.stderr);
+    assert!(
+        stderr.starts_with("fgos: config-migrate-destination-differs: "),
+        "{stderr}"
+    );
+    assert!(!stderr.contains(TOKEN) && !stderr.contains("SENTINEL-8820"));
+    assert_eq!(
+        fs::read(world.home.join(".fgos/config.json")).unwrap(),
+        legacy
+    );
+    assert_eq!(
+        fs::read_to_string(private.join("gateway-token")).unwrap(),
+        "SENTINEL-8820\n"
+    );
+    assert!(
+        !world.fgos_file("coexistence.json").exists(),
+        "a later step ran"
+    );
+    let _ = fs::remove_dir_all(&world.base);
+    let _ = fs::remove_dir_all(&node_dir);
+}
+
+#[cfg(unix)]
+#[test]
+fn a_legacy_global_file_init_may_not_move_leaves_it_and_the_event_store_config_refuses_it_by_name()
+{
+    use std::os::unix::fs::PermissionsExt;
+    let world = InitWorld::new("fgos_init_readonly");
+    let (node_dir, path) = scripted_node(
+        "fgos_init_readonly_node",
+        &format!("cat >/dev/null\n{BRIDGE_END_LINE}"),
+    );
+    write_legacy_config(&world);
+    let global = world.home.join(".fgos");
+    fs::set_permissions(&global, fs::Permissions::from_mode(0o500)).unwrap();
+    if fs::write(global.join("probe"), "").is_ok() {
+        let _ = fs::remove_dir_all(&world.base);
+        return; // a user the mode does not bind (root)
+    }
+    let output = world.init(&path, &[]);
+    fs::set_permissions(&global, fs::Permissions::from_mode(0o700)).unwrap();
+    // The refused write is a warning of the settle, not an error; the next step reads the config and says what is
+    // still wrong, naming the file and the key and never the value.
+    assert_eq!(output.status.code(), Some(1));
+    let stderr = String::from_utf8_lossy(&output.stderr);
+    assert!(
+        stderr
+            .starts_with("fgos: event-store-config: config-key-in-wrong-file global:config.json:"),
+        "{stderr}"
+    );
+    assert!(!stderr.contains(TOKEN));
+    assert!(
+        !world.fgos_file("coexistence.json").exists(),
+        "a later step ran"
+    );
+    let _ = fs::remove_dir_all(&world.base);
+    let _ = fs::remove_dir_all(&node_dir);
+}
+
+#[cfg(unix)]
+#[test]
+fn a_refusal_of_the_work_store_keeps_the_payloads_text_and_exit_category_and_the_later_steps_do_not_run(
+) {
+    let world = InitWorld::new("fgos_init_refused");
+    let (node_dir, path) = scripted_node(
+        "fgos_init_refused_node",
+        r#"cat >/dev/null
+printf '\036FGOS-DOCTOR-BRIDGE {"kind":"refusal","message":"lock-timeout: the project lock stayed held","category":"lock-timeout"}\n'
+exit 2"#,
+    );
+    let output = world.init(&path, &[]);
+    assert_eq!(output.status.code(), Some(7));
+    assert_eq!(
+        String::from_utf8_lossy(&output.stderr).trim(),
+        "fgos: lock-timeout: the project lock stayed held"
+    );
+    assert!(output.stdout.is_empty());
+    assert!(
+        !world.fgos_file("coexistence.json").exists(),
+        "a later step ran"
+    );
+    assert!(
+        world.state.join("machine-id").is_file(),
+        "an earlier step did not"
+    );
+    let _ = fs::remove_dir_all(&world.base);
+    let _ = fs::remove_dir_all(&node_dir);
+}
+
+#[cfg(unix)]
+#[test]
+fn init_without_node_is_a_missing_precondition_after_the_steps_that_need_none() {
+    let world = InitWorld::new("fgos_init_nonode");
+    let output = world.init(&path_without_node(), &[]);
+    assert_eq!(output.status.code(), Some(2));
+    let stderr = String::from_utf8_lossy(&output.stderr);
+    assert!(stderr.contains("Node 18 or newer"), "{stderr}");
+    assert!(world.state.join("machine-id").is_file());
+    assert!(!world.fgos_file("coexistence.json").exists());
+    let _ = fs::remove_dir_all(&world.base);
+}
+
+#[cfg(unix)]
+#[test]
+fn init_without_a_home_is_a_missing_precondition_and_writes_nothing() {
+    let world = InitWorld::new("fgos_init_nohome");
+    let output = world
+        .command(&std::env::var("PATH").unwrap_or_default())
+        .env_remove("HOME")
+        .env_remove("USERPROFILE")
+        .output()
+        .expect("failed to execute fgos");
+    assert_eq!(output.status.code(), Some(2));
+    assert!(String::from_utf8_lossy(&output.stderr).contains("HOME is not set"));
+    assert!(!world.state.join("machine-id").exists());
+    assert!(!world.fgos_file("coexistence.json").exists());
+    let _ = fs::remove_dir_all(&world.base);
+}

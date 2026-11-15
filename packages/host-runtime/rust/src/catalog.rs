@@ -379,6 +379,17 @@ pub const CATALOG: &[OperationDescriptor] = &[
         streaming_mode: StreamingMode::None,
     },
     OperationDescriptor {
+        operation_id: OperationId::from_static("init.run"),
+        owning_component_id: Cow::Borrowed("packaging"),
+        request_contract: ContractRef::from_static("init.run.request", "1.0.0"),
+        outcome_contract: ContractRef::from_static("init.run.outcome", "1.0.0"),
+        effect: OperationEffect::Write,
+        idempotency: OperationIdempotency::None,
+        authority_policy_id: Cow::Borrowed("init.write"),
+        allowed_host_kinds: &["cli"],
+        streaming_mode: StreamingMode::None,
+    },
+    OperationDescriptor {
         operation_id: OperationId::from_static("holder-lock.status"),
         owning_component_id: Cow::Borrowed("holder-lock"),
         request_contract: ContractRef::from_static("holder-lock.status.request", "1.0.0"),
@@ -398,8 +409,8 @@ mod tests {
     #[test]
     fn catalog_contains_required_operations() {
         // Eleven operations, plus the mailbox's send, inbox, inbox claim, list
-        // and status, the gateway start, stop and status, the git status and recover, the lock status, the lock fence, the doctor run, the wire-agents run and the uninstall run.
-        assert_eq!(CATALOG.len(), 34);
+        // and status, the gateway start, stop and status, the git status and recover, the lock status, the lock fence, the doctor run, the wire-agents run, the uninstall run and the init run.
+        assert_eq!(CATALOG.len(), 35);
         let ids: Vec<&str> = CATALOG.iter().map(|op| op.operation_id.as_str()).collect();
         assert!(ids.contains(&"distribution.build.show"));
         assert!(ids.contains(&"work.gate-bypass.show"));
@@ -434,6 +445,7 @@ mod tests {
         assert!(ids.contains(&"doctor.run"));
         assert!(ids.contains(&"wire-agents.run"));
         assert!(ids.contains(&"uninstall.run"));
+        assert!(ids.contains(&"init.run"));
     }
     /// `OperationId::from_static` (used by every `CATALOG` entry, for
     /// const-context construction with no runtime allocation) skips

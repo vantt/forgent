@@ -441,6 +441,7 @@ export const COMMAND_REGISTRY = [
     description: 'Initialize the .fgos/ store in the current directory (event log, empty view, coexistence manifest).',
     parameters: { type: 'object', properties: {}, required: [] },
     examples: ['fgos init'],
+    native: true,
     touchesState: true,
     store: 'open',
     externalEffect: false,

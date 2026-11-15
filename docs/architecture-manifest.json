@@ -511,13 +511,7 @@
       "allowed": [
         "packages/distribution/rust/src/coexistence.rs"
       ],
-      "debt": [
-        {
-          "path": "src/install/coexist.mjs",
-          "reason": "Node init still writes the manifest until init moves to the host"
-        }
-      ],
-      "retiredBy": "S4: init moves to the host and the Node module is deleted with it",
+      "debt": [],
       "reason": "the .fgos/coexistence.json manifest and the read-only detection of other agent harnesses have one owner"
     },
     {
@@ -739,11 +733,9 @@
       "patterns": ["export function (?:readGitStatus|recoverGitOperations)\\b", "fn (?:read_git_status|recover_git_operations)\\b"],
       "allowed": [
         "packages/git/rust/src/incidents.rs",
-        { "path": "packages/git/node-addon/src/git.rs", "reason": "carries the door to Node: its two snake_case entries (read_git_status, recover_git_operations) match the Rust pattern and call incidents.rs, composing nothing" },
-        { "path": "src/git/status.mjs", "reason": "the client `fgos init` and the doctor rows use: each export is one addon call, no logic" }
+        { "path": "packages/git/node-addon/src/git.rs", "reason": "carries the door to Node: its two snake_case entries (read_git_status, recover_git_operations) match the Rust pattern and call incidents.rs, composing nothing" }
       ],
-      "retiredBy": "S4: init and doctor move to the host, and the client with them",
-      "reason": "the open Git incidents of a repository (journal, pending and retained operations, worktree findings, native locks, a merge in progress) and the recovery pass are composed once, in fgos-git, for the host verb and for the Node callers; the row catches a second definition by name only, not a copy under another name"
+      "reason": "the open Git incidents of a repository (journal, pending and retained operations, worktree findings, native locks, a merge in progress) and the recovery pass are composed once, in fgos-git, for the host verbs `git status|recover` and for `fgos init`; the row catches a second definition by name only, not a copy under another name"
     },
     {
       "job": "parse CLI arguments (twin)",
@@ -1093,6 +1085,35 @@
       "reason": "the Git and Event Store doctor rows, the node-and-git floor row, the hooks row and their fixes are judged in Rust (apps/fgos/src/wiring/doctor/{git,event_store}.rs over fgos-git repository_facts and fgos-event-store diagnostics): the Node row bodies and their helpers are deleted (with the Node fact readers `gitFacts` and `readMergeHead`, `eventStoreAddonAvailable` and the addon's `initializeGitWal` and `inspectGitWorktreeRecovery`) and no file may bring one of these names back"
     },
     {
+      "job": "init steps",
+      "kind": "door",
+      "patterns": [
+        "\\bWORK_STORE_NOTE\\b",
+        "\\bGLOBAL_MOVED_NOTE\\b",
+        "&dyn Steps\\b"
+      ],
+      "allowed": [
+        "apps/fgos/src/wiring/init.rs"
+      ],
+      "debt": [],
+      "reason": "`fgos init` composes its steps in one place, init.rs, in one order: the machine id, the legacy config settle, the Event Store lock directories, the Work store (the one step Node still owns, asked through the Node rows bridge), the coexistence manifest, the config files, the headless notice and the Git recovery; only the first three refuse"
+    },
+    {
+      "job": "retired Node init code",
+      "kind": "door",
+      "patterns": [
+        "\\binitStoreUseCase\\b",
+        "\\bsettleLegacyConfig\\b",
+        "\\bcreateConfigFiles\\b",
+        "\\bfixEventStoreLockDirs\\b",
+        "\\bwriteCoexistenceManifest\\b",
+        "\\bdetectHarnesses\\b"
+      ],
+      "allowed": [],
+      "debt": [],
+      "reason": "`init` runs in the host (apps/fgos/src/wiring/init.rs over fgos-identity, fgos-config, fgos-event-store, fgos-distribution coexistence and fgos-git incidents): the Node use case, the legacy settle, the lock-directory fix and the coexistence writer are deleted and no file may bring one of these names back"
+    },
+    {
       "job": "doctor readiness registry",
       "kind": "door",
       "patterns": [
@@ -1207,7 +1228,6 @@
     "src/verbs/worktree/create.mjs": "use-case",
     "src/verbs/worktree/remove.mjs": "use-case",
     "src/git/native.mjs": "infra",
-    "src/git/status.mjs": "infra",
     "src/native/door.mjs": "kernel",
     "src/config/facade.mjs": "kernel",
     "bin/fgos.mjs": "entry",
@@ -1293,7 +1313,6 @@
     "src/state/cursor.mjs": "use-case",
     "src/state/porting-store.mjs": "infra",
     "src/identity/directory-store.mjs": "infra",
-    "src/install/coexist.mjs": "infra",
     "src/runner/recovery.mjs": "domain",
     "src/runner/anti-loop.mjs": "domain",
     "src/runner/attestation-guard.mjs": "infra",
@@ -1533,8 +1552,6 @@
     "src/state/domain-registry.mjs": "kernel",
     "src/state/step-fsm.mjs": "domain",
     "src/verbs/state/step.mjs": "use-case",
-    "src/verbs/state/init.mjs": "use-case",
-    "src/verbs/state/settle-legacy-config.mjs": "use-case",
     "src/runner/operation-choice.mjs": "use-case",
     "src/runner/work-dispatch.mjs": "use-case",
     "src/event-store/consumers.mjs": "infra",
@@ -1545,7 +1562,6 @@
     "src/event-store/seal-coalescing.mjs": "infra",
     "src/verbs/events/context.mjs": "use-case",
     "src/verbs/events/rebuild.mjs": "use-case",
-    "src/setup/event-store-fixes.mjs": "use-case",
     "src/event-store/config.mjs": "infra",
     "src/git/scoped-commit.mjs": "infra",
     "src/git/sync.mjs": "infra",

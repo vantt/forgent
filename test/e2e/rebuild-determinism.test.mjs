@@ -8,7 +8,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { spawnSync } from 'node:child_process';
+import { spawnFgos } from '../helpers/cli-entry.mjs';
 
 // Demo mốc C (per plan.md Shape/C) as an automated e2e test, exercised
 // through the real CLI binary via child_process — never through the
@@ -28,7 +28,7 @@ function tmpCwd() {
 }
 
 function run(cwd, args) {
-  return spawnSync(process.execPath, [FGOS, ...args], { cwd, encoding: 'utf8' });
+  return spawnFgos(FGOS, args, { cwd, encoding: 'utf8' });
 }
 
 // The whole Work history of the store, as the verbs under test see it.

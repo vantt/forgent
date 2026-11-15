@@ -229,28 +229,24 @@ test('P7: Local runtime tail failure leaves workspace in diagnosable state with 
     // Copy fixture release into tailFailReleaseDir
     fs.cpSync(fixture.releaseDir, tailFailReleaseDir, { recursive: true });
 
-    // Modify legacy node payload to fail on init, the first tail step, when SIMULATE_TAIL_FAILURE is set
-    const fgosMjsPath = path.join(tailFailReleaseDir, 'libexec', 'legacy-node', 'bin', 'fgos.mjs');
-    const originalContent = fs.readFileSync(fgosMjsPath, 'utf8');
-    const firstLineEnd = originalContent.indexOf('\n');
-    const shebang = originalContent.slice(0, firstLineEnd + 1);
-    const rest = originalContent.slice(firstLineEnd + 1);
-    const failInjection = `if (process.env.SIMULATE_TAIL_FAILURE === '1' && process.argv.includes('init')) {\n  console.error('simulated init failure in tail');\n  process.exit(42);\n}\n`;
-    fs.writeFileSync(fgosMjsPath, shebang + failInjection + rest);
+    // The Node rows bridge is the payload's one door the native `init` and `doctor` reach: make it die when
+    // SIMULATE_TAIL_FAILURE is set, so `init`, the first tail step, fails at its Work store step.
+    const bridgePath = path.join(tailFailReleaseDir, 'libexec', 'legacy-node', 'src', 'setup', 'doctor-bridge.mjs');
+    const failInjection = `if (process.env.SIMULATE_TAIL_FAILURE === '1') {\n  console.error('simulated init failure in tail');\n  process.exit(42);\n}\n`;
+    fs.writeFileSync(bridgePath, failInjection + fs.readFileSync(bridgePath, 'utf8'));
 
-    // Update manifest.json with updated hash for bin/fgos.mjs and legacyNode component
+    // Update manifest.json with the updated hash of the bridge module
     const manifestPath = path.join(tailFailReleaseDir, 'manifest.json');
     const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
-    const newMjsHash = hashFile(fgosMjsPath);
-    const newMjsSize = fs.statSync(fgosMjsPath).size;
+    const newMjsHash = hashFile(bridgePath);
+    const newMjsSize = fs.statSync(bridgePath).size;
 
     for (const f of manifest.files) {
-      if (f.path === 'libexec/legacy-node/bin/fgos.mjs') {
+      if (f.path === 'libexec/legacy-node/src/setup/doctor-bridge.mjs') {
         f.digest = newMjsHash;
         f.size = newMjsSize;
       }
     }
-    manifest.components.legacyNode.digest = newMjsHash;
     delete manifest.artifactDigest;
     const newDigest = computeArtifactDigest(manifest);
     manifest.artifactDigest = newDigest;
@@ -263,7 +259,7 @@ test('P7: Local runtime tail failure leaves workspace in diagnosable state with 
     });
 
     assert.notEqual(res.status, 0, 'fgctl init must fail when tail command fails');
-    assert.match(res.stderr, /tail command 'init.*failed with status 42/);
+    assert.match(res.stderr, /tail command 'init.*failed with status 1/);
 
     // 1. activation.json was published before tail and has status ready
     const activationPath = path.join(tempProj, '.fgos', 'installation', 'activation.json');

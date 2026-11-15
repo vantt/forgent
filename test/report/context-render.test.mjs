@@ -16,6 +16,7 @@ import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
 import { decisionDIdAndText, renderLockedDecisionsTable } from '../../src/report/context-render.mjs';
 import { replaceLockedDecisionsSection } from '../../src/intake/plan.mjs';
+import { spawnFgos } from '../helpers/cli-entry.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const FGOS = path.resolve(__dirname, '../../bin/fgos.mjs');
@@ -27,7 +28,7 @@ function tmpRepoRoot() {
 }
 
 function run(cwd, args) {
-  return spawnSync(process.execPath, [FGOS, ...args], { cwd, encoding: 'utf8' });
+  return spawnFgos(FGOS, args, { cwd, encoding: 'utf8' });
 }
 
 function initCwd() {

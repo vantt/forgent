@@ -33,6 +33,7 @@ function fakeClaude(dir, state) {
   const script = path.join(dir, 'fake-claude.mjs');
   fs.writeFileSync(script, `#!/usr/bin/env node
 import fs from 'node:fs';
+import { spawnFgos } from '../helpers/cli-entry.mjs';
 const args = process.argv.slice(2);
 fs.appendFileSync(${JSON.stringify(logPath)}, JSON.stringify(args) + '\\n');
 const read = () => JSON.parse(fs.readFileSync(${JSON.stringify(statePath)}, 'utf8'));
@@ -99,7 +100,7 @@ function runFgos(cwd, args, env) {
   // processes under one HOME; the verb cases in bin/fgos.mjs have no use case to call in process.
   // `doctor` is the host's verb, run through the host binary the test launcher staged.
   if (args[0] === 'doctor') return spawnSync(process.env.FGOS_HOST_BIN, args, { cwd, encoding: 'utf8', env });
-  return spawnSync(process.execPath, [FGOS, ...args], { cwd, encoding: 'utf8', env });
+  return spawnFgos(FGOS, args, { cwd, encoding: 'utf8', env });
 }
 
 test('init and doctor --fix write nothing in HOME outside ~/.fgos and change no Claude state, with claude and agy present and the mailbox on', () => {

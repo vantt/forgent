@@ -26,8 +26,8 @@ import { releaseClaim } from '../../../src/state/runtime-coordination.mjs';
 import { moveUseCase } from '../../../src/verbs/state/move.mjs';
 import { claimWork } from '../../../src/runner/claim-port.mjs';
 import { resolveFgosFile, FGOS_FILE } from '../../../src/state/fgos-file-registry.mjs';
-import { writeCoexistenceManifest } from '../../../src/install/coexist.mjs';
 import { invokeHost } from '../../../src/util/host-bin.mjs';
+import { cliEntryFor, spawnFgos } from '../../helpers/cli-entry.mjs';
 import { initFixtureRepo, activateGitFixture } from '../../helpers/git-fixture.mjs';
 import { projectConfigPath, writeProjectConfig } from '../../helpers/config-fixture.mjs';
 
@@ -99,12 +99,6 @@ function initFgosFixtureInProcess(cwd) {
   const dir = initializeWorkRepository(cwd);
   initStore(dir);
   configureLocalOnlyStore(cwd);
-  try {
-    writeCoexistenceManifest(cwd, dir);
-  } catch {
-    // Mirrors fgos init's fail-safe: coexistence detection must never make a
-    // ready store unavailable to tests that are not proving init itself.
-  }
   return cwd;
 }
 
@@ -131,20 +125,6 @@ function tmpCwdFromTemplate() {
   return cwd;
 }
 
-// Which entry answers a CLI test's call: the host for a help token, a native verb, or a native sub-verb
-// of a partly native verb, the Node payload for everything else. The data is the generated route file.
-const ROUTES = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../../packages/host-runtime/contracts/command-routes.json'), 'utf8'));
-const HELP_TOKENS = new Set(['--help', '-h']);
-
-function cliEntryFor(args, routes = ROUTES) {
-  if (args.some((arg) => HELP_TOKENS.has(arg))) return 'host';
-  const positionals = args.filter((arg) => !arg.startsWith('-'));
-  const route = routes[positionals[0]];
-  if (route?.route_kind === 'native') return 'host';
-  if (positionals.length > 1 && route?.native_subcommands?.includes(positionals[1])) return 'host';
-  return 'node';
-}
-
 function run(cwd, args, extraEnv = {}) {
   const opts = { cwd, encoding: 'utf8' };
   // Every spawned child gets the pinned test-only FGOS_SESSION_ID by
@@ -153,14 +133,7 @@ function run(cwd, args, extraEnv = {}) {
   // extraEnv.FGOS_SESSION_ID from the caller still wins (R2) since it is
   // spread last.
   opts.env = { ...process.env, FGOS_SESSION_ID: DEFAULT_CLI_SESSION_ID, ...extraEnv };
-  if (cliEntryFor(args) === 'host') {
-    const hostBin = opts.env.FGOS_HOST_BIN;
-    if (!hostBin) {
-      throw new Error(`fgos ${args.join(' ')} is answered by the Rust host, but FGOS_HOST_BIN is not set; run this file through node scripts/run-tests.mjs <file>`);
-    }
-    return spawnSync(hostBin, args, opts);
-  }
-  return spawnSync(process.execPath, [FGOS, ...args], opts);
+  return spawnFgos(FGOS, args, opts);
 }
 
 function logPath(cwd) {
@@ -1020,7 +993,7 @@ async function makeAlreadyCaughtUpItem(cwd, id, verify) {
 }
 
 // --- coexistence: harness marker detection + territory manifest -----------
-// (install-coexistence D2/D4/D6 — see src/install/coexist.mjs)
+// (install-coexistence D2/D4/D6 — see packages/distribution/rust/src/coexistence.rs)
 
 function coexistPath(cwd) {
   return path.join(cwd, '.fgos', 'coexistence.json');

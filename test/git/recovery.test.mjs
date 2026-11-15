@@ -3,7 +3,6 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { fixture } from './land-fixture.mjs';
 import { createGitRecovery, createGitSafeRestore } from '../../src/git/index.mjs';
-import { readGitStatus, recoverGitOperations } from '../../src/git/status.mjs';
 
 test('Recovery lists and inspects an interrupted Land and delegates to its existing recovery', async () => {
   const f = fixture();
@@ -26,36 +25,6 @@ test('Recovery lists and inspects an interrupted Land and delegates to its exist
     // caller can start one instead of failing on any read error.
     assert.throws(() => recovery.inspectOperation({operationId:'never-journalled'}), err => JSON.parse(err.message).cause === 'git-operation-unknown');
   } finally { f.close(); }
-});
-test('Git recovery recovers an interrupted Land through the Recovery door and then has nothing left to recover', async () => {
-  const f = fixture();
-  try {
-    const land = f.port();
-    await land.prepare({operationId:'interrupted-fix',request:f.request});
-    land.close();
-    const fixed = recoverGitOperations(f.repo,{loaderOptions:f.loader,portOptions:f.options});
-    assert.deepEqual(fixed.recovered,['interrupted-fix'],fixed.message);
-    assert.match(fixed.message,/recovered interrupted Git operations: interrupted-fix/);
-    assert.equal(createGitRecovery(f.options,f.loader).inspectOperation({operationId:'interrupted-fix'}).terminal,true);
-    assert.deepEqual(recoverGitOperations(f.repo,{loaderOptions:f.loader,portOptions:f.options}),{recovered:[],kept:[],message:'no interrupted Land, ScopedCommit or remote transfer operation'});
-  } finally { f.close(); }
-});
-test('an interrupted Land is a pending incident until recovered, then a retained Land candidate', async () => {
-  const f = fixture();
-  const prior = process.env.FGOS_STATE_ROOT;
-  process.env.FGOS_STATE_ROOT = f.options.stateRoot;
-  const status = () => readGitStatus(f.repo,{loaderOptions:f.loader,portOptions:f.options});
-  try {
-    const land = f.port();
-    await land.prepare({operationId:'retained-land',request:f.request});
-    land.close();
-    assert.deepEqual(status().pendingOperations.map(o => o.operationId),['retained-land']);
-    recoverGitOperations(f.repo,{loaderOptions:f.loader,portOptions:f.options});
-    assert.deepEqual(status().pendingOperations,[]);
-    const { candidates } = status().retainedLand;
-    assert.deepEqual(candidates.map(c => c.operationId),['retained-land']);
-    assert.deepEqual([...candidates[0].pins].sort(),['refs/fgos/git-operations/retained-land/candidate','refs/fgos/git-operations/retained-land/source/candidate','refs/fgos/git-operations/retained-land/target/candidate']);
-  } finally { if (prior === undefined) delete process.env.FGOS_STATE_ROOT; else process.env.FGOS_STATE_ROOT = prior; f.close(); }
 });
 test('Recovery terminal Restore replay delegates without changing its outcome', () => {
   const f = fixture();

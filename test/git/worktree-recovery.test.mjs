@@ -3,11 +3,12 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
-import { readGitStatus } from '../../src/git/status.mjs';
+import { loadNativeAddon } from '../../src/git/native.mjs';
+import { resolveStateRoot } from '../../src/holder-lock/state-root.mjs';
 import { fixture } from './worktree-fixture.mjs';
 
 // The worktree findings `fgos git status` reports, as reason codes.
-const reasons=(f)=>readGitStatus(f.repoPath,{loaderOptions:f.loader}).worktrees.issues.map(i=>i.reason);
+const reasons=(f)=>loadNativeAddon(f.loader).readGitStatus(resolveStateRoot().stateRoot,f.repoPath).worktrees.issues.map(i=>i.reason);
 
 test('read-only worktree diagnostics preserve foreign missing and partial registrations', {skip:process.platform==='win32'},()=>{
   const f=fixture();

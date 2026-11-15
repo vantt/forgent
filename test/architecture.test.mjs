@@ -1935,6 +1935,28 @@ test('door check: every name of the retired Node S2 verb code fails when a file 
   }
 });
 
+test('door check: every name of the retired Node init code fails when a file declares it again', () => {
+  const row = manifest.doors.find((r) => r.job === 'retired Node init code');
+  assert.ok(row && row.allowed.length === 0, 'the retired-names row exists and allows no file');
+  const names = ['initStoreUseCase', 'settleLegacyConfig', 'createConfigFiles', 'fixEventStoreLockDirs', 'writeCoexistenceManifest', 'detectHarnesses'];
+  assert.equal(row.patterns.length, names.length, 'one pattern per retired name');
+  for (const name of names) {
+    const failures = checkDoors([row], new Map([['src/seeded.mjs', `export function ${name}() {}\n`]]));
+    assert.equal(failures.length, 1, `${name} must fail the door`);
+    assert.match(failures[0], /retired name/);
+  }
+});
+
+test('door check: the init steps live in init.rs only: a second composition under the same names fails, a comment does not', () => {
+  const row = manifest.doors.find((r) => r.job === 'init steps');
+  assert.deepEqual(row.allowed, ['apps/fgos/src/wiring/init.rs']);
+  for (const text of ['const WORK_STORE_NOTE: &str = "x";\n', 'pub const GLOBAL_MOVED_NOTE: &str = "x";\n', 'pub fn run(steps: &dyn Steps) {}\n']) {
+    assert.equal(checkDoors([row], new Map([['apps/fgos/src/wiring/other.rs', text]])).length, 1, text);
+    assert.deepEqual(checkDoors([row], new Map([['apps/fgos/src/wiring/init.rs', text]])), [], text);
+  }
+  assert.deepEqual(checkDoors([row], new Map([['apps/fgos/src/wiring/other.rs', '// the WORK_STORE_NOTE is init.rs\n']])), []);
+});
+
 test('door check: every name of the retired Node Git and Event Store doctor rows fails when a file declares it again', () => {
   const row = manifest.doors.find((r) => r.job === 'retired Node Git and Event Store doctor rows');
   assert.ok(row && row.allowed.length === 0, 'the retired-names row exists and allows no file');

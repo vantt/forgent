@@ -22,7 +22,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { spawnSync } from 'node:child_process';
+import { spawnFgos } from '../helpers/cli-entry.mjs';
 import {
   parseDecisionRelation,
   decisionTextLooksLikeSupersession,
@@ -41,7 +41,7 @@ function tmpRepoRoot() {
 }
 
 function run(cwd, args) {
-  return spawnSync(process.execPath, [FGOS, ...args], { cwd, encoding: 'utf8' });
+  return spawnFgos(FGOS, args, { cwd, encoding: 'utf8' });
 }
 
 function envelopeData(stdout) {

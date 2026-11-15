@@ -19,6 +19,7 @@ import { StoreError, withFaultClass } from '../../src/state/store-error.mjs';
 import { argvShape, recordInvocationFault, resolveFaultLogPath } from '../../src/observe/invocation-fault-log.mjs';
 import { appendFaultRecord, FAULT_LOG_MAX_BYTES } from '../../src/util/capped-jsonl-log.mjs';
 import { recordApprovePostSuccessFault } from '../../src/observe/approve-fault-log.mjs';
+import { spawnFgos } from '../helpers/cli-entry.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '../..');
@@ -26,7 +27,7 @@ const FGOS = path.join(REPO_ROOT, 'bin', 'fgos.mjs');
 const FAULT_LOG = 'invocation-faults.jsonl';
 
 function run(cwd, args) {
-  return spawnSync(process.execPath, [FGOS, ...args], { cwd, encoding: 'utf8' });
+  return spawnFgos(FGOS, args, { cwd, encoding: 'utf8' });
 }
 
 function rawTmpCwd() {
@@ -201,7 +202,7 @@ test('concurrent faults append whole lines, never a torn one', () => {
     ['nosuchverb', '--one'],
     ['nosuchverb', '--two'],
     ['nosuchverb', '--three'],
-  ].map((args) => spawnSync(process.execPath, [FGOS, ...args], { cwd, encoding: 'utf8' }));
+  ].map((args) => spawnFgos(FGOS, args, { cwd, encoding: 'utf8' }));
 
   for (const r of runs) assert.equal(r.status, 4);
   const records = faultRecords(cwd); // parses every line — a torn line throws here

@@ -6,6 +6,7 @@ pub mod events;
 pub mod gateway_control;
 pub mod git_incidents;
 pub mod identity_log;
+pub mod init;
 pub mod lock_fence;
 pub mod lock_status;
 #[cfg(unix)]

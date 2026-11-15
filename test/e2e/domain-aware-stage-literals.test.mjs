@@ -57,7 +57,7 @@ function initTempRepo() {
 }
 
 function fgos(cwd, args) {
-  return spawnSync(process.execPath, [FGOS, ...args], { cwd, encoding: 'utf8' });
+  return spawnFgos(FGOS, args, { cwd, encoding: 'utf8' });
 }
 
 function runner(cwd, args = ['--once']) {
@@ -305,6 +305,7 @@ function writeDiscoveringWorkerExecutor(scriptDir, { verify, produce, discovered
     `
 import fs from 'node:fs';
 import { execFileSync } from 'node:child_process';
+import { spawnFgos } from '../helpers/cli-entry.mjs';
 const prompt = process.argv[2] ?? '';
 const fence = String.fromCharCode(96, 96, 96);
 if (prompt.includes('Kiểm tra độc lập một lệnh verify')) {

@@ -438,7 +438,8 @@ test('a failing post-land drift detection is reported beside a landed merge, nev
 
 test('an unclassified failure while publishing claims no abandoned result: the land reports its effect unknown and fgos git recover settles it through Land recovery', async () => {
   const { landRunnerItem } = await import('../../src/runner/merge.mjs');
-  const { recoverGitOperations } = await import('../../src/git/status.mjs');
+  const { loadNativeAddon } = await import('../../src/git/native.mjs');
+  const { resolveStateRoot } = await import('../../src/holder-lock/state-root.mjs');
   const { cwd } = await approvableRootRepo('tsk-publish-unknown');
   const mainBefore = execGit(cwd, ['rev-parse', 'main']).trim();
   // The verify edits a tracked file of the candidate, so publication refuses.
@@ -447,7 +448,7 @@ test('an unclassified failure while publishing claims no abandoned result: the l
   assert.equal(err?.code, 'land-effect-unknown', String(err?.stack ?? err));
   assert.match(err.message, /fgos git recover/);
   assert.equal(execGit(cwd, ['rev-parse', 'main']).trim(), mainBefore);
-  const fixed = recoverGitOperations(cwd);
+  const fixed = loadNativeAddon().recoverGitOperations(resolveStateRoot().stateRoot, cwd, null);
   assert.deepEqual(fixed.recovered, [err.operationId], fixed.message);
   assert.match(fixed.message, new RegExp(`recovered interrupted Git operations: ${err.operationId}`));
 });

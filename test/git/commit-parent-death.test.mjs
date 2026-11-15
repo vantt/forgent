@@ -10,7 +10,7 @@ import { once } from 'node:events';
 import { ensureGitAddon, root } from '../../scripts/git-addon.mjs';
 import { acquireSync, createLockScope } from '../../src/holder-lock/index.mjs';
 import { createGitScopedCommit, createGitSync } from '../../src/git/index.mjs';
-import { recoverGitOperations } from '../../src/git/status.mjs';
+import { loadNativeAddon } from '../../src/git/native.mjs';
 const built = ensureGitAddon();
 const loader = { descriptor: { manifest: JSON.parse(fs.readFileSync(built.manifest)), releaseRoot: root } };
 const pause = () => new Promise(resolve => setTimeout(resolve, 10));
@@ -72,10 +72,11 @@ for (const mode of ['commit', 'sync']) for (const rejected of [false,true]) {
         // afterwards) for the writer that started it
         const fromMain = { ...config, repoPath: repo };
         holder.release();
-        const kept = recoverGitOperations(linked, { loaderOptions: loader, portOptions: { ...fromMain, writer: 'doctor' } });
+        const recover = (writer) => loadNativeAddon(loader).recoverGitOperations(config.stateRoot, linked, writer);
+        const kept = recover('doctor');
         assert.deepEqual(kept.recovered, []);
         assert.match(kept.message, /death \(commit-authority-mismatch; only its writer .* can recover it\)/);
-        const closed = recoverGitOperations(linked, { loaderOptions: loader, portOptions: fromMain });
+        const closed = recover(fromMain.writer);
         assert.deepEqual(closed.recovered, ['death'], closed.message);
         assert.match(closed.message, /recovered interrupted Git operations: death/);
         const free = acquireSync(createLockScope(), 'dispatch-cwd', params);

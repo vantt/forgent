@@ -273,7 +273,9 @@ fn read(ctx: &Context, roots: &SnapshotRequest, verb: &Verb) -> Result<ConfigOut
     Ok(ConfigOutcome { data, exit: 0 })
 }
 
-fn answer(req: &ConfigRequest) -> Result<ConfigOutcome, Refusal> {
+/// One request of `fgos config` end to end: what the host's provider runs, for the in-process callers that
+/// run the same use case (`fgos init`'s legacy settle).
+pub fn answer(req: &ConfigRequest) -> Result<ConfigOutcome, Refusal> {
     let detectors = PathDetectors {
         path: std::env::var_os("PATH"),
     };

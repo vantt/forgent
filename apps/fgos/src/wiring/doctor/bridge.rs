@@ -7,7 +7,11 @@
 //! stdout; the contract is `packages/distribution/contracts/doctor-bridge.v1.json`. Stray output of a body is
 //! never read as a result because only prefixed lines count, and a crash keeps the results already produced.
 //!
-//! The child is a bounded helper of one doctor run, not a legacy route: it gets a fresh recursion guard
+//! The same door carries one more request, `work-store-init`, for the Work store `fgos init` creates until the
+//! Work layer moves (`work_store_init`): no rows, an `end` line when the store was made, a refusal line with the
+//! error's text and exit category when it was not.
+//!
+//! The child is a bounded helper of one doctor run (or of one init), not a legacy route: it gets a fresh recursion guard
 //! (a guard the host inherited does not stop it), leads its own process group so a deadline or a signal reaches
 //! its whole tree, and writes no fault or lifecycle record. When Node is missing, the call fails, or the
 //! deadline passes, every row of the call is a failure naming the cause and `next` names it once.
@@ -30,6 +34,9 @@ const BRIDGE_MODULE: &str = "src/setup/doctor-bridge.mjs";
 pub const CHECK_DEADLINE: Duration = Duration::from_secs(30);
 /// How long one call that runs a run of bridged fixes may run (the same bound; each fix is a small repair).
 pub const FIX_DEADLINE: Duration = Duration::from_secs(30);
+/// How long the Work store step of `fgos init` may run: it rebuilds the view from the whole log, which grows with
+/// the project, so the bound is generous; a stuck child still never outlives its caller.
+pub const WORK_STORE_DEADLINE: Duration = Duration::from_secs(600);
 /// How much of the child's stderr a failure shows.
 const STDERR_EXCERPT: usize = 400;
 
@@ -48,6 +55,8 @@ enum Line {
     },
     Refusal {
         message: String,
+        #[serde(default)]
+        category: Option<String>,
     },
 }
 
@@ -56,8 +65,13 @@ enum Line {
 pub enum Fault {
     /// Node could not be started: it is not installed or not on PATH.
     NodeMissing(String),
-    /// The call failed after it started: no payload, a refusal, a crash, a deadline.
+    /// The call failed after it started: no payload, a crash, a deadline.
     Failed(String),
+    /// The Node side refused the call and said why; `category` is the error's exit category when it had one.
+    Refused {
+        message: String,
+        category: Option<String>,
+    },
 }
 
 impl Fault {
@@ -68,6 +82,9 @@ impl Fault {
                 "Node is not available ({cause}); the doctor rows of the layers still written in Node need Node 18 or newer"
             ),
             Fault::Failed(cause) => format!("the Node rows bridge failed: {cause}"),
+            Fault::Refused { message, .. } => {
+                format!("the Node rows bridge failed: it refused the call: {message}")
+            }
         }
     }
 
@@ -81,6 +98,9 @@ impl Fault {
             Fault::Failed(cause) => {
                 format!("the Node rows bridge failed ({cause}); run fgos doctor again")
             }
+            Fault::Refused { message, .. } => format!(
+                "the Node rows bridge failed (it refused the call: {message}); run fgos doctor again"
+            ),
         }
     }
 }
@@ -93,6 +113,7 @@ pub struct NodeBridge {
     launch: Launch,
     check_deadline: Duration,
     fix_deadline: Duration,
+    work_store_deadline: Duration,
 }
 
 /// The command that runs `doctor-bridge.mjs` from the active release's payload.
@@ -127,6 +148,16 @@ impl NodeBridge {
             launch,
             check_deadline,
             fix_deadline,
+            work_store_deadline: WORK_STORE_DEADLINE,
+        }
+    }
+
+    /// Creates the Work store of the project at `root` (`fgos init`'s one step Node still owns): `Ok` once the
+    /// payload said it was made, the fault otherwise (a refusal carries the error's text and category).
+    pub fn work_store_init(&self, root: &Path) -> Result<(), Fault> {
+        match self.call(root, "work-store-init", &[], self.work_store_deadline) {
+            (_, None) => Ok(()),
+            (_, Some(fault)) => Err(fault),
         }
     }
 
@@ -180,17 +211,17 @@ impl NodeBridge {
         let stderr = String::from_utf8_lossy(&stderr).into_owned();
         let mut lines = Vec::new();
         let mut ended = false;
-        let mut refused = None;
+        let mut refused: Option<(String, Option<String>)> = None;
         for raw in String::from_utf8_lossy(&stdout).lines() {
             let Some(json) = raw.strip_prefix(RESULT_PREFIX) else {
                 continue;
             };
             match serde_json::from_str::<Line>(json) {
                 Ok(Line::End { count }) => ended = count == lines.len(),
-                Ok(Line::Refusal { message }) => refused = Some(message),
+                Ok(Line::Refusal { message, category }) => refused = Some((message, category)),
                 Ok(line) => lines.push(line),
                 Err(error) => {
-                    refused = Some(format!("an unreadable result line ({error})"));
+                    refused = Some((format!("an unreadable result line ({error})"), None));
                 }
             }
         }
@@ -200,8 +231,8 @@ impl NodeBridge {
                 deadline.as_secs(),
                 excerpt(&stderr)
             )))
-        } else if let Some(message) = refused {
-            Some(Fault::Failed(format!("it refused the call: {message}")))
+        } else if let Some((message, category)) = refused {
+            Some(Fault::Refused { message, category })
         } else if !ended {
             Some(Fault::Failed(format!(
                 "it stopped before it finished ({}){}",
@@ -418,6 +449,75 @@ mod tests {
     }
 
     #[test]
+    fn the_work_store_step_sends_its_phase_with_no_ids_and_succeeds_on_an_end_line() {
+        let dir = std::env::temp_dir().join(format!("fgos-bridge-work-{}", std::process::id()));
+        std::fs::create_dir_all(&dir).unwrap();
+        let seen = dir.join("request.json");
+        let bridge = scripted(
+            &format!("cat > '{}'; {}", seen.display(), end(0)),
+            Duration::from_secs(20),
+        );
+        assert_eq!(bridge.work_store_init(Path::new("/project")), Ok(()));
+        let request: serde_json::Value =
+            serde_json::from_str(&std::fs::read_to_string(&seen).unwrap()).unwrap();
+        std::fs::remove_dir_all(&dir).unwrap();
+        assert_eq!(request["phase"], "work-store-init");
+        assert_eq!(request["ids"], serde_json::json!([]));
+        assert_eq!(request["dir"], "/project");
+    }
+
+    #[test]
+    fn a_refused_work_store_step_carries_the_error_text_and_its_category() {
+        let bridge = scripted(
+            &format!(
+                "cat >/dev/null; {}",
+                line(r#"{"kind":"refusal","message":"lock held","category":"lock-timeout"}"#)
+            ),
+            Duration::from_secs(20),
+        );
+        assert_eq!(
+            bridge.work_store_init(Path::new("/p")),
+            Err(Fault::Refused {
+                message: "lock held".into(),
+                category: Some("lock-timeout".into())
+            })
+        );
+    }
+
+    #[test]
+    fn a_work_store_step_that_stops_without_an_end_line_or_cannot_start_is_a_fault() {
+        let crashed = scripted(
+            "cat >/dev/null; echo boom >&2; exit 3",
+            Duration::from_secs(20),
+        );
+        assert!(matches!(
+            crashed.work_store_init(Path::new("/p")),
+            Err(Fault::Failed(cause)) if cause.contains("stopped before it finished") && cause.contains("boom")
+        ));
+        let missing = NodeBridge::with(
+            Box::new(|| Ok(Command::new("fgos-no-such-node-binary-for-the-bridge"))),
+            Duration::from_secs(5),
+            Duration::from_secs(5),
+        );
+        assert!(matches!(
+            missing.work_store_init(Path::new("/p")),
+            Err(Fault::NodeMissing(_))
+        ));
+    }
+
+    #[test]
+    fn a_work_store_step_that_hangs_is_ended_at_its_own_deadline() {
+        let mut bridge = scripted("cat >/dev/null; sleep 30", Duration::from_secs(60));
+        bridge.work_store_deadline = Duration::from_millis(300);
+        let started = Instant::now();
+        assert!(matches!(
+            bridge.work_store_init(Path::new("/p")),
+            Err(Fault::Failed(cause)) if cause.contains("no answer within")
+        ));
+        assert!(started.elapsed() < Duration::from_secs(20));
+    }
+
+    #[test]
     fn a_child_that_hangs_is_ended_with_its_whole_tree_at_the_deadline() {
         let dir = std::env::temp_dir().join(format!("fgos-bridge-hang-{}", std::process::id()));
         std::fs::create_dir_all(&dir).unwrap();
@@ -573,8 +673,13 @@ mod contract_tests {
                     );
                 }
                 Line::End { count } => assert_eq!(body["count"], count, "{name}"),
-                Line::Refusal { message } => {
-                    assert_eq!(body["message"], message.as_str(), "{name}")
+                Line::Refusal { message, category } => {
+                    assert_eq!(body["message"], message.as_str(), "{name}");
+                    assert_eq!(
+                        body.get("category").and_then(|c| c.as_str()),
+                        category.as_deref(),
+                        "{name}"
+                    );
                 }
             }
         }
