@@ -31,14 +31,11 @@ Branch `capability-reads-p03`, based on 74d5f296f. No Rust, no CHANGELOG line.
 - Other tests importing the changed files (12 more) plus `test/scripts/doc-health.test.mjs`: 159 pass, 0 fail.
 - `check-decision-citation-drift`: no new findings. `git-one-door-scan`: 0 undeclared. Bare `node scripts/doc-health.mjs`
   needs a host binary (unset in the worktree); its test passes.
-- Equivalence (`compare-capability-reads.mjs`, base 781537524 vs head, run `phase-03`): 5 differences, all on the `m-entries`
-  input (null/string/array capability entries), none in the real inputs (standard, this repo, other matrix rows):
-  - `dispatchPlan` for `null:entry`, `null:review`, `string:entry`, `string:review`: head adds `capability.unknown` where the
-    entry is a non-object. This is the plan's non-object-entry delta; the allowlist covers three questions of that input, not `dispatchPlan`.
-  - `validateShape` on `m-entries`: base threw `TypeError ... reading 'personas'` on the null entry, head accepts it.
-    The config door refuses non-object entries at load, so the validator never sees this; the harness feeds it that input anyway.
-  Both need allowlist or skip entries in the harness (owned by phase 01, then 06); not edited here.
-  Summary digests: `reports/equivalence/phase-03.summary.json`.
+- Equivalence (`compare-capability-reads.mjs`, base 781537524 vs head after the phase 04 merge, run `phase-03`): 0 failures,
+  0 notes. The allowlist now claims, on input `m-entries` only, the non-object-entry delta for `validateShape`,
+  `dispatchPlan` and `lint` (head adds `capability.unknown`/unregistered findings for null and string entries; base threw
+  on a null entry in the validator, which the config door never lets through), and the plan-lint nested-shape delta on
+  `m-nested` only (plan-lint reads the flat section). Digests: `reports/equivalence/phase-03.summary.json`.
 
 ## Lessons
 

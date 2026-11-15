@@ -1,6 +1,6 @@
 {
   "run": "phase-03",
-  "failures": 5,
+  "failures": 0,
   "notes": 0,
   "inputs": {
     "standard": {
@@ -297,8 +297,10 @@
       },
       "lint": {
         "base": "sha256:d4dca91fe1ce2542674654d6f753233c7a502d207895e757ab227399dfd4f84b",
-        "head": "sha256:d4dca91fe1ce2542674654d6f753233c7a502d207895e757ab227399dfd4f84b",
-        "allowlisted": []
+        "head": "sha256:6e843f64820e10d89b27d1f8143edc14871bf61a4191df584f1b23e6051d0ca1",
+        "allowlisted": [
+          "plan-lint-odd-shape"
+        ]
       },
       "proposal": {
         "base": "sha256:ae27179678e981a49af4859000d2c8971e72dd30e3ace62ac4324162df1cc5e6",
@@ -753,12 +755,16 @@
       "validateShape": {
         "base": "sha256:ba0a5b0d0229147d5cf9c33a9517959e1548a42649ea882a1ef11f9d41145d20",
         "head": "sha256:1025507233e81ac0885449d20670f5fa8f7bc3f383e28f9d1865f14ede4e9eb4",
-        "allowlisted": []
+        "allowlisted": [
+          "non-object-entry"
+        ]
       },
       "lint": {
         "base": "sha256:ecc9e63219ccdc778eb1d09f530230b8b14833264cee4ad7adc4f1d36030d46e",
-        "head": "sha256:ecc9e63219ccdc778eb1d09f530230b8b14833264cee4ad7adc4f1d36030d46e",
-        "allowlisted": []
+        "head": "sha256:58b8370f9d7de03440c21057536eca779d12543bf669875615c778192a3c6ffc",
+        "allowlisted": [
+          "non-object-entry"
+        ]
       },
       "proposal": {
         "base": "sha256:adc0373af37508e48fcbe7a15732ff22f96efdcd01886d1624dabbc752da35de",
@@ -810,7 +816,9 @@
       "dispatchPlan": {
         "base": "sha256:9b253e2377b57bbcbc26d21292c8d8db8a89cacb26854507b221f9199699e62f",
         "head": "sha256:9f4d338c1ee8b6503057661abb8fd8887b7a23a4d51c4d543c3d3e7620190c60",
-        "allowlisted": []
+        "allowlisted": [
+          "non-object-entry"
+        ]
       },
       "legacyChecker": {
         "base": "sha256:0fd63578b1f9195bb48755eaa612933a6e8a17c56a23160b81468eef2cbd70aa",

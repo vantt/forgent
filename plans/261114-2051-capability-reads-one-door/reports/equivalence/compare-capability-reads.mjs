@@ -37,7 +37,12 @@ const ALLOWLIST = Object.freeze([
   },
   {
     delta: 'non-object-entry',
-    claims: ({ input, question }) => input === 'm-entries' && ['registeredCapability', 'proposalRefusals', 'operationCapability', 'validateShape', 'dispatchPlan'].includes(question),
+    claims: ({ input, question }) => input === 'm-entries' && ['registeredCapability', 'proposalRefusals', 'operationCapability', 'validateShape', 'dispatchPlan', 'lint'].includes(question),
+  },
+  {
+    // plan-lint reads the flat section only: a config wrapped one level deeper has no catalog at head.
+    delta: 'plan-lint-odd-shape',
+    claims: ({ input, question }) => input === 'm-nested' && question === 'lint',
   },
   {
     delta: 'string-aliases',
