@@ -8,7 +8,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { isMainModule } from './lib/is-main-module.mjs';
 import { REPO_ROOT } from './lib/git-addon-stage.mjs';
-import { checkShardSet, parseShard, junitFiles, junitSeconds, junitUnattributable, measuredImbalance, mergeJunit, repoRelative } from './lib/test-shards.mjs';
+import { readSuiteBaseline } from './test-proof-inventory.mjs';
+import { checkShardSet, parseShard, partitionFiles, junitFiles, junitSeconds, junitUnattributable, measuredImbalance, mergeJunit, repoRelative } from './lib/test-shards.mjs';
 import { discoverTestFiles, selectShard } from './run-tests.mjs';
 
 const SHARD_XML = /^shard-(\d+)-of-(\d+)\.xml$/;
@@ -19,6 +20,11 @@ function readMarker(file) {
   } catch {
     return null;
   }
+}
+
+/** The log line for a manifest file accepted because its cases report under a URL source. */
+export function acceptedLine({ index, total, file, schemes }) {
+  return `merge-test-shards: shard ${index}/${total} accepted ${file} (reports under a ${schemes.join(', ')} URL)`;
 }
 
 function readManifest(file) {
@@ -33,20 +39,20 @@ function readManifest(file) {
 /** The repo-relative files shard `spec` (`k/n`) is given: the partition `npm test -- --shard=k/n` runs. */
 export async function shardManifest(spec, { repoRoot = REPO_ROOT } = {}) {
   const shard = parseShard(spec);
-  const { readSuiteBaseline } = await import('./test-proof-inventory.mjs');
   return selectShard(discoverTestFiles(), shard, readSuiteBaseline().fileCpu, repoRoot).map((f) => repoRelative(repoRoot, f));
 }
 
 /**
  * Merges every shard report under `dir` into `<out>/full.xml`. Returns `{ problems, exitCode }`; problems is empty
- * only when each shard completed and together they ran every discovered file exactly once. `imbalance` is the
+ * only when each shard completed and together they ran every discovered file exactly once. `accepted` lists the manifest files taken on the strength of a URL source; `imbalance` is the
  * slowest shard's measured test seconds over the mean (the number the shard balance is judged by), or null.
  */
-export function mergeShards({ dir, out, repoRoot = REPO_ROOT, discovered = discoverTestFiles().map((f) => repoRelative(REPO_ROOT, f)) }) {
+export function mergeShards({ dir, out, repoRoot = REPO_ROOT, discovered = discoverTestFiles().map((f) => repoRelative(REPO_ROOT, f)), weights = readSuiteBaseline().fileCpu }) {
   const problems = [];
   const shards = [];
   const reports = [];
   const seconds = [];
+  const accepted = [];
   let exitCode = 0;
   const dirs = fs.existsSync(dir) ? fs.readdirSync(dir, { withFileTypes: true }).filter((e) => e.isDirectory() && e.name.startsWith('test-shard-')).map((e) => e.name).sort() : [];
   for (const name of dirs) {
@@ -66,7 +72,9 @@ export function mergeShards({ dir, out, repoRoot = REPO_ROOT, discovered = disco
     reports.push(xml);
     seconds.push({ index: Number(index), seconds: junitSeconds(xml) });
   }
-  problems.push(...checkShardSet(discovered, shards));
+  // The partition of a shard that reported nothing only shortens the problem list; it never accepts a file.
+  const owned = (index, total) => (index >= 1 && index <= total ? partitionFiles(discovered, total, weights)[index - 1] : []);
+  problems.push(...checkShardSet(discovered, shards, { accepted, owned }));
   if (reports.length > 0) {
     try {
       const merged = mergeJunit(reports);
@@ -76,7 +84,7 @@ export function mergeShards({ dir, out, repoRoot = REPO_ROOT, discovered = disco
       problems.push(err.message);
     }
   }
-  return { problems, exitCode: problems.length > 0 ? exitCode || 1 : exitCode, imbalance: measuredImbalance(seconds) };
+  return { problems, exitCode: problems.length > 0 ? exitCode || 1 : exitCode, imbalance: measuredImbalance(seconds), accepted };
 }
 
 if (isMainModule(import.meta.url)) {
@@ -103,7 +111,8 @@ if (isMainModule(import.meta.url)) {
     console.error('merge-test-shards: ERROR: usage: --dir <shards-dir> --out <dir>');
     process.exit(2);
   }
-  const { problems, exitCode, imbalance } = mergeShards({ dir, out });
+  const { problems, exitCode, imbalance, accepted } = mergeShards({ dir, out });
+  for (const a of accepted) console.log(acceptedLine(a));
   for (const problem of problems) console.error(`merge-test-shards: ERROR: ${problem}`);
   if (process.env.GITHUB_OUTPUT) fs.appendFileSync(process.env.GITHUB_OUTPUT, `exit_code=${exitCode}\n`);
   if (imbalance) console.log(`merge-test-shards: imbalance max/mean = ${imbalance.ratio.toFixed(2)} (shard ${imbalance.slowest} slowest)`);

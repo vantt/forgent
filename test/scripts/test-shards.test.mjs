@@ -9,7 +9,7 @@ import { fileURLToPath } from 'node:url';
 import { discoverTestFiles, REPO_ROOT } from '../../scripts/run-tests.mjs';
 import { readSuiteBaseline } from '../../scripts/test-proof-inventory.mjs';
 import { countXmlCases } from '../../scripts/write-test-marker.mjs';
-import { mergeShards, shardManifest } from '../../scripts/merge-test-shards.mjs';
+import { acceptedLine, mergeShards, shardManifest } from '../../scripts/merge-test-shards.mjs';
 import { runCompare } from '../../scripts/test-select-compare.mjs';
 import { checkShardSet, junitFiles, junitSeconds, junitUnattributable, measuredImbalance, mergeJunit, parseShard, partitionFiles, repoRelative, shardLoads } from '../../scripts/lib/test-shards.mjs';
 
@@ -240,7 +240,9 @@ test('a test file that imports its tests from a data: URL reports under that URL
   const shard = (files, manifest, unattributable) => [{ index: 1, total: 1, files: new Set(files), manifest: new Set(manifest), unattributable: new Set(unattributable) }];
   const reported = junitFiles(xml, dir);
   const urls = junitUnattributable(xml);
-  assert.deepEqual(checkShardSet(names, shard(reported, names, urls)), [], 'the data: file is accounted for by its URL source');
+  const accepted = [];
+  assert.deepEqual(checkShardSet(names, shard(reported, names, urls), { accepted }), [], 'the data: file is accounted for by its URL source');
+  assert.deepEqual(accepted, [{ index: 1, total: 1, file: 'via-data-url.test.mjs', schemes: ['data:'] }], 'the acceptance is reported, not silent');
 
   // The same gap with no URL case in the junit is a file that did not run.
   assert.deepEqual(checkShardSet(names, shard(reported, names, [])), [
@@ -271,7 +273,10 @@ test('the merge accepts the data: URL file through the shard manifest, and refus
   const merge = () => mergeShards({ dir: path.join(dir, 'shards'), out: path.join(dir, 'out'), repoRoot: dir, discovered: names });
   assert.deepEqual(merge().problems, ['test-shard-1 has no readable shard-1-of-1.files.json', 'via-data-url.test.mjs ran in no shard']);
   fs.writeFileSync(path.join(sub, 'shard-1-of-1.files.json'), JSON.stringify(names));
-  assert.deepEqual(merge().problems, []);
+  const merged = merge();
+  assert.deepEqual(merged.problems, []);
+  assert.deepEqual(merged.accepted.map((a) => a.file), ['via-data-url.test.mjs']);
+  assert.equal(acceptedLine(merged.accepted[0]), 'merge-test-shards: shard 1/1 accepted via-data-url.test.mjs (reports under a data: URL)');
   fs.rmSync(dir, { recursive: true, force: true });
 });
 
@@ -281,4 +286,25 @@ test('a shard manifest is the partition npm test --shard=k/n runs, repo-relative
   for (let k = 1; k <= 3; k++) all.push(...(await shardManifest(`${k}/3`)));
   assert.deepEqual(all.sort(), files);
   await assert.rejects(() => shardManifest('4/3'), /invalid shard "4\/3"/);
+});
+
+test('a shard with no result is named once and its own files get no line each, while any other unreported file keeps its line', () => {
+  const shard = (index, total, ...files) => ({ index, total, files: new Set(files), manifest: new Set(files), unattributable: new Set() });
+  const discovered = ['a', 'b', 'c', 'd', 'stray'];
+  const owned = (index) => (index === 2 ? ['c', 'd'] : []);
+  assert.deepEqual(checkShardSet(discovered, [shard(1, 2, 'a', 'b')], { owned }), ['shard 2/2 reported no result', 'stray ran in no shard']);
+  // Without the missing shard's partition every file of it is listed, as before.
+  assert.deepEqual(checkShardSet(discovered, [shard(1, 2, 'a', 'b')]), ['shard 2/2 reported no result', 'c ran in no shard', 'd ran in no shard', 'stray ran in no shard']);
+
+  const dir = fixtureDir();
+  const names = ['a.test.mjs', 'b.test.mjs', 'c.test.mjs', 'd.test.mjs'];
+  const sub = path.join(dir, 'shards', 'test-shard-1');
+  fs.mkdirSync(sub, { recursive: true });
+  const first = partitionFiles(names, 2, {})[0];
+  fs.writeFileSync(path.join(sub, 'shard-1-of-2.xml'), `<testsuites>${first.map((f) => `<testcase name="n" time="1" file="${dir}/${f}"/>`).join('')}</testsuites>`);
+  fs.writeFileSync(path.join(sub, 'shard-1-of-2.files.json'), JSON.stringify(first));
+  fs.writeFileSync(path.join(sub, 'test-marker.json'), JSON.stringify({ completed: true, exitCode: 0 }));
+  const { problems } = mergeShards({ dir: path.join(dir, 'shards'), out: path.join(dir, 'out'), repoRoot: dir, discovered: [...names, 'extra.test.mjs'], weights: {} });
+  assert.deepEqual(problems, ['shard 2/2 reported no result', 'extra.test.mjs ran in no shard']);
+  fs.rmSync(dir, { recursive: true, force: true });
 });
