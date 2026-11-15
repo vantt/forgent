@@ -10,6 +10,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
 import { computeArtifactDigest, hashFile } from '../../scripts/build-rust-distribution.mjs';
 import { gatewayTokenPath } from '../helpers/config-fixture.mjs';
 import { useReleaseFixture, fixture, runFgctl, runFgctlRaw, removeStateHome } from './fgctl-init-fixture.mjs';
@@ -20,10 +21,10 @@ useReleaseFixture();
 // and the fix of a failing one: a fail of a row a registered fix repairs names `fgos doctor --fix`.
 const CANNED = {
   ok: {},
-  pending: { 'curl-available': { passed: true, message: 'warning: drifted', fixCommand: 'fgos doctor --fix' } },
+  pending: { 'tier-fallback': { passed: true, message: 'warning: drifted', fixCommand: 'fgos doctor --fix' } },
   failing: {
-    'project-fgos-launcher': { passed: false, message: 'the launcher is stale' },
-    'curl-available': { passed: false, message: 'install the thing' },
+    'executor-family-unique': { passed: false, message: 'install the thing' },
+    'runtime-socket-dir': { passed: false, message: 'the socket directory is missing' },
   },
 };
 
@@ -94,6 +95,23 @@ function withMachineFiles(home) {
   fs.writeFileSync(token, 'closing-block-token\n', { mode: 0o600 });
 }
 
+const REPO = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
+
+/** What the host's own packaging rows read in a project that is set up: the Claude Code hook file the table writes
+ * (its bytes are the recorded install of the hook vectors), and a project launcher first on PATH (the launcher body
+ * is the one file the doctor compares against). Returns the PATH the run needs. */
+function withHostPackagingRows(home, proj) {
+  withMachineFiles(home);
+  const vectors = JSON.parse(fs.readFileSync(path.join(REPO, 'packages/distribution/rust/tests/goldens/agent-hooks-vectors.json'), 'utf8'));
+  const settings = vectors.cases.find((c) => c.id === 'claude-fresh-default').install.files['.claude/settings.json'];
+  fs.mkdirSync(path.join(proj, '.claude'), { recursive: true });
+  fs.writeFileSync(path.join(proj, '.claude', 'settings.json'), settings);
+  const bin = path.join(home, 'bin');
+  fs.mkdirSync(bin, { recursive: true });
+  fs.writeFileSync(path.join(bin, 'fgos'), fs.readFileSync(path.join(REPO, 'packages/distribution/rust/src/launcher.sh')), { mode: 0o755 });
+  return [bin, path.dirname(process.execPath), '/usr/bin', '/bin'].join(path.delimiter);
+}
+
 const transactionStatus = (state) => {
   const dir = path.join(state, 'installs');
   const [file] = fs.readdirSync(dir);
@@ -130,9 +148,9 @@ test('a clean doctor ends the tail after init and one doctor run, and a rerun of
   const release = releaseWithCannedDoctor();
   try {
     withProject(({ home, state, proj }) => {
-      withMachineFiles(home);
+      const PATH = withHostPackagingRows(home, proj);
       const log = path.join(home, 'calls.log');
-      const env = { HOME: home, CANNED_DOCTOR: JSON.stringify(CANNED.ok), CALL_LOG: log };
+      const env = { HOME: home, PATH, CANNED_DOCTOR: JSON.stringify(CANNED.ok), CALL_LOG: log };
       const first = runFgctlRaw(['init', '--from', release.dir], { cwd: proj, stateHome: state, env });
       assert.equal(first.status, 0, first.stderr);
       // A fresh project's Git journal is not initialised by `init`, so its first doctor names `doctor --fix`; the
@@ -163,8 +181,9 @@ test('a doctor that still names a fix runs doctor --fix (its fixes, then its row
   const release = releaseWithCannedDoctor();
   try {
     withProject(({ home, state, proj }) => {
+      const PATH = withHostPackagingRows(home, proj);
       const log = path.join(home, 'calls.log');
-      const env = { HOME: home, CANNED_DOCTOR: JSON.stringify(CANNED.pending), CALL_LOG: log };
+      const env = { HOME: home, PATH, CANNED_DOCTOR: JSON.stringify(CANNED.pending), CALL_LOG: log };
       assert.equal(runFgctlRaw(['init', '--from', release.dir], { cwd: proj, stateHome: state, env }).status, 0);
       fs.rmSync(log);
       const again = runFgctlRaw(['init', '--from', release.dir], { cwd: proj, stateHome: state, env });
@@ -181,10 +200,11 @@ test('init lists each failing check with its fix, exits 2 (precondition) and mar
   const release = releaseWithCannedDoctor();
   try {
     withProject(({ home, state, proj }) => {
-      const env = { HOME: home, CANNED_DOCTOR: JSON.stringify(CANNED.failing) };
+      const PATH = withHostPackagingRows(home, proj);
+      const env = { HOME: home, PATH, CANNED_DOCTOR: JSON.stringify(CANNED.failing) };
       const res = runFgctlRaw(['init', '--from', release.dir], { cwd: proj, stateHome: state, env });
       assert.equal(res.status, 2, 'precondition, the exit-code table\'s code for a ready-later release');
-      assert.equal(res.stdout, '2 checks need you:\n  1. project-fgos-launcher: fgos doctor --fix\n  2. curl-available: install the thing\n');
+      assert.equal(res.stdout, '2 checks need you:\n  1. executor-family-unique: install the thing\n  2. runtime-socket-dir: fgos doctor --fix\n');
       assert.match(res.stderr, /not ready/);
       assert.equal(transactionStatus(state), 'ready-degraded');
       assert.ok(fs.existsSync(path.join(proj, '.fgos', 'installation', 'activation.json')), 'the release stays activated');
