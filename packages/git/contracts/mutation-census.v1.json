@@ -1,8 +1,8 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "badd8d7a02ec6f195217813459b51e2edc622fe50d92385c4aaafb0384fb9a82",
+  "payloadDigest": "afa81527c46b4170fcefea19b9bf862d1e3ca5ce6829a909bb32336d87f67afb",
   "files": {
-    ".agents/skills/_shared/capability-catalog.md": "a5629383f89b4488b252a62f0ea86463e649e33e0a891db1a19af2cd6c136aca",
+    ".agents/skills/_shared/capability-catalog.md": "b8b886cee2ea5ce7ee1153e4795512db135a990de894c27e53c5e778b210be62",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
     ".agents/skills/_shared/catchup-self-recovery.md": "6768580ac6b84a2f58706f4170d7df3e544aa1b9dc6f93d87167ed9f34ae1e6c",
     ".agents/skills/_shared/citation-format.md": "a6c834b250d83fbf68c42a0b87a93c128cb7dfeb28d07904134bae32fc93afb2",
@@ -86,7 +86,7 @@
     "apps/fgos/examples/mailbox-ident-cost.rs": "694f216767532946846ecc69dc584fbb8bf28a7183f741a037ba05c7b4793bc9",
     "apps/fgos/src/cli_presenter.rs": "6e50cf7387a4ce98eec1d3705b8bf33150960e6180559f9bbe6cb8c1529e2d15",
     "apps/fgos/src/cli_projector.rs": "0d0c03d9d41dc782635eca424a5a7417a02f974f2858bdb2fdf030c7aedac015",
-    "apps/fgos/src/help.rs": "78f8651db9e01553d1a90cf42e9df8a15c99e77a1b76177e866a12b49de57b73",
+    "apps/fgos/src/help.rs": "a7f18814361555860a4f0a44e3bb3c12246f5cb00d124f725e9a506857c2dd8d",
     "apps/fgos/src/invocation_doors.rs": "029d92175364f3e9e33c5865980faf5cc8b2c783d98908a16111eefc10e01bd9",
     "apps/fgos/src/legacy_exec.rs": "d97d3a46c0f120271bc0f08805755029bfc430c8ca338ddabdc38a7a0a84c8a0",
     "apps/fgos/src/main.rs": "16bdc1d4fae6c81d025810ef086b59fe57e319961e198b399f5785ddd3a6790c",
@@ -94,7 +94,7 @@
     "apps/fgos/src/wiring/doctor/bridge.rs": "05abb106f3337db6a6d2b2e9eadcbc1e393b3b23b63ba41cc05294edd1199ab1",
     "apps/fgos/src/wiring/doctor/holder_lock.rs": "0f48a26f2eab091717ae1f71e4461bea7a23c5b6b4cce78fd7e28fd41541b78f",
     "apps/fgos/src/wiring/doctor/mailbox.rs": "543436deb6fd08bf522f0d47caece62d51defa55ea2ebf2d7ec308364ebdc85a",
-    "apps/fgos/src/wiring/doctor/mod.rs": "8c18dbea62b16d5bb9a578c2f7aa6f31f70661983376b67b1794ffd39aafdf4d",
+    "apps/fgos/src/wiring/doctor/mod.rs": "904eca0b8130357fc2e91785748865712142ea20625f6a2bac75c59d40fc15ca",
     "apps/fgos/src/wiring/event_store_clone.rs": "923d718f7a6bd5705cbe6e4d4c8393672c1ef4a2142facc9ada314307a4d7574",
     "apps/fgos/src/wiring/events.rs": "17327ace760683d9665d4c4b3ac051f2f67318f8175b37ad21cdffd52e008881",
     "apps/fgos/src/wiring/gateway_control.rs": "60ed2789c9a7c7ffa6aa43abfc8020eec8b219e6c38540c458e8918321c88604",
@@ -102,7 +102,7 @@
     "apps/fgos/src/wiring/identity_log.rs": "d7d9dd503ecbd84a5373aa27f6853996e6944aba2940d15e8284cd92c14eef7a",
     "apps/fgos/src/wiring/lock_fence.rs": "088ed1fae4f5d3becdd6b75d820a90f15ac5e255761f84e79246e467bbec97e8",
     "apps/fgos/src/wiring/lock_status.rs": "067bd9e25326f1142b82ce964a893a1db7c3f67af7f98632055c58b9e03831a1",
-    "apps/fgos/src/wiring/mailbox_body.rs": "1d1a1c76ac24e5cb1d9e55a7b54ed35cc7be7656ded86ac52e58dd767b3079ca",
+    "apps/fgos/src/wiring/mailbox_body.rs": "68910fba9f0e68ac08a823fb51e781f076395418656debaa61c316433cbaa977",
     "apps/fgos/src/wiring/mailbox_config.rs": "c9aa04a7c117869798ce407edccfef8c51ef9047ec22f58596c2db3ac63ac0d5",
     "apps/fgos/src/wiring/mailbox_hook.rs": "75e05738143170765400ea196ca62350f402a73c58cf37167a8b20568c4f346f",
     "apps/fgos/src/wiring/mailbox_hook_unsupported.rs": "42f2aa9df8c530b5a1534696b2dba99e8410552598691748a6518ede830d674e",
@@ -121,7 +121,7 @@
     "apps/fgos/src/wiring/session.rs": "f2569bef9f072e959f14673c2d2929e2b0b001540a4e147fd5e59082b2e64b43",
     "apps/fgos/src/wiring/uninstall.rs": "e42c1f59bb41b80a4a9d4b19b106579c39145583edabaea54b3b4d8fcb455dbb",
     "apps/fgos/src/wiring/wire_agents.rs": "8051fc4287d5ea26d6b1e5cf40aa7c77bf831fed48d5e03d0a3c743ce3cd0ed7",
-    "apps/fgos/tests/cli_tests.rs": "53d2aee4398ef82f5d8b08830f643b78cf8b56c38cb187a8158cf879625cfe5a",
+    "apps/fgos/tests/cli_tests.rs": "58fb6dc1e584f8e7ab14dd3eedc81219ae292ed8d270fce36a1c57ab5846b3fd",
     "apps/fgos/tests/internal_lock_routes.rs": "e8516f4876c8263b1baa1f997bcfbb01715e69d740aa508fd01a0d481fee309e",
     "apps/fgos/tests/mailbox_routes.rs": "fe4bb33069a6f6eb6f02b052e4581fcfc69ce37dcdfd146280f9c935c14511a6",
     "apps/fgos/tests/mailbox_sync_child.rs": "047e70662085d6f91fa786c9000eb494711f610d37cd63a24f29dc884116763d",
@@ -132,8 +132,8 @@
     "apps/fgos/tests/windows_semantics_probe.rs": "ecb59690bbf1259baa1defb6417c24005138526bb565f216f9db3c2ad784d240",
     "apps/fgos/tests/windows_support/mod.rs": "2b8a17676526c87ea5ecfb2074a70a3511fbf9267f9de78a35dc355f272830fb",
     "bin/fgos-runner.mjs": "24fa9b497547a104912b90ab98b3d53fbbe0068a5977a7a04724789c8e717156",
-    "bin/fgos.mjs": "0ca57aa0839c50a57b9d535264ad2119f6cca173e8dcd3cd3813e53b6bca17a2",
-    "core/skills/_shared/capability-catalog.md": "99d7f682c3ddcfb8ad57c30ca9dde670e331e14b7c5e87e8b53e620660abeb7c",
+    "bin/fgos.mjs": "cca9227df938c37ba9be3f15137ce9f5e46d9175306790d323c66f0fd2aa301d",
+    "core/skills/_shared/capability-catalog.md": "c6a51bd9fbac8192043cbd497ae291bdbb64b80b6bc9832f25fadda8f9cfe926",
     "core/skills/_shared/capability-matching.md": "eb67cde05d45c171c1d4803f9d2fbec5fc63565b9fd0a0549c866a7eb262521d",
     "core/skills/_shared/catchup-self-recovery.md": "3b77650c71a0225f00ffa8fe9524d7c0052977204f425c1999225b6f80802c69",
     "core/skills/_shared/citation-format.md": "589e65ffeccaf45b3de4d1047eaec5face605265b05bbf462939c50677651fdd",
@@ -337,10 +337,10 @@
     "packages/event-store/rust/src/export.rs": "ab1df39e8599c8e07bb1c9d9074edf2fb3f3a93f11123c0ee43491d75e0ffc0b",
     "packages/event-store/rust/src/fence.rs": "4e3d66a595506f17e4ca550678290654add6a2d2d4ccc127bc23425a528d69a6",
     "packages/event-store/rust/src/fsio.rs": "a55012db39b1173ced4bb544de964b88e8f3db194927e5e6405100201a3ccdd8",
-    "packages/event-store/rust/src/identity.rs": "7f1ea9d6a94f891d38e6ce9caa53ac04d35a67c2dadee5a2ae566ed99b19e665",
+    "packages/event-store/rust/src/identity.rs": "8ff2ba9fc1582082c59d953c113184042ef5e2856bf0616739b4b06d3e90e778",
     "packages/event-store/rust/src/layout.rs": "63a715edf633be8382f1eb1a78740d1403cc9d62b5f2a57430b5027c08b95fc1",
     "packages/event-store/rust/src/legacy.rs": "acd6ea10650e7f962a3f008ba313e3f9c48fb761a96ed40d575839c3cdc68e83",
-    "packages/event-store/rust/src/legacy_import.rs": "b71faa2ea980c85836cbf0ca89d8e6880797fda2466d304fb4876b84203296b7",
+    "packages/event-store/rust/src/legacy_import.rs": "8a2910c54b33ed62508b7ff5a1a31835aa7c3ff8ca1b60a8bf0814ac14f6c43a",
     "packages/event-store/rust/src/lib.rs": "a8b1df7da6fd5b7a437c77b356cfae946e75ee4139ae5a6d8675cc5cdec5366e",
     "packages/event-store/rust/src/lifecycle.rs": "e1b88c61a07546e609943fc50f62e5cc4afea1d543b6ce8a99a7431f952535d5",
     "packages/event-store/rust/src/locks.rs": "35ef964ebaf80aaa87f1628af806423e30855de598b9eeb698c6f74d598ec780",
@@ -352,7 +352,7 @@
     "packages/event-store/rust/src/receipt.rs": "9c9f25ece26274d210898401a1089f97a30ebd9dd94cd5eef50c73f7ab101170",
     "packages/event-store/rust/src/reconcile.rs": "31016bcb05e3d8bd85ab849a43602027a1a988f2052132c5ea8c35e0c0984a2f",
     "packages/event-store/rust/src/refs.rs": "80e9d1f01c44f18c2bce7b3bd7fec12c8657c4807043dcb8011da4e1a9a0afc8",
-    "packages/event-store/rust/src/refspec.rs": "6b6e65a57ff159b845906d768fe4eec9a9af761115b990f4315c3219f7b2451b",
+    "packages/event-store/rust/src/refspec.rs": "0499e1572a5c6ada163c1ed8874a11cf90994d807af8829b6efd93564ea56aa9",
     "packages/event-store/rust/src/registry.rs": "4dff23fd6e894bbe7fda1a5ca79b2dcd73c171baa19afb72ad42239d651b3d01",
     "packages/event-store/rust/src/resolve.rs": "f7bbe7a26cfcb3d65effc6e57f7cc0d0c065d103c4d214fe5b39e177fcab8c7f",
     "packages/event-store/rust/src/rotate.rs": "6daf009b38713e7083eccae22dc88a2d609d3a6b74aa93791718d64f89bb9de9",
@@ -436,7 +436,7 @@
     "packages/git/rust/src/recovery.rs": "c9f1f55ceaed434e271b003989b68b52b139ab37730267db06468e4be6fdc134",
     "packages/git/rust/src/refs.rs": "f4b0e7dfbe85c081f9e37bb1d8a91d309b65c58615fc66b9fda7da2f349d47ec",
     "packages/git/rust/src/remote.rs": "8600d1b6964f4bba67fbee98520cdf43c92b91ac8eb2b8e94b9b0ef0e68373fa",
-    "packages/git/rust/src/repository_config.rs": "c98662817750c33e8ff089a44def4a77abf0a1cc7a785c87781c64d5ab4bbc77",
+    "packages/git/rust/src/repository_config.rs": "63c27995a8138be55972af8922292224d619836462835f83e053b4062d5ad261",
     "packages/git/rust/src/restore.rs": "c55f72fc71c397e7efa44ae20b4f916d158999825c9fcc151856f4dc9f82c964",
     "packages/git/rust/src/scoped_commit.rs": "4d185965fc75c9bf7052e2533c1fda78f541065db2076746b53b80f28e10ac32",
     "packages/git/rust/src/sequence.rs": "00ab99823a85eae69ed8acf06d1da968b016cb5ae40464394adf2aa78d015295",
@@ -529,7 +529,7 @@
     "packages/identity/rust/src/errors.rs": "2a7c34f15a605f6f14f9f24484d8b980c1ca51791a4f08b4a3da1131eba4adf1",
     "packages/identity/rust/src/launcher.rs": "e84d9ed6e37f4e634371a5d988dec1e7c71194b400808e385343a87723d0398a",
     "packages/identity/rust/src/lib.rs": "b88eaaebb1c2fdbb09d396ceb22740d8e5c960f6bfc07b5407bc20fae3b953ee",
-    "packages/identity/rust/src/machine.rs": "b0b603c2747156fc964d425e4f56324cabbb4e3306b9734bb1c25032451dbd15",
+    "packages/identity/rust/src/machine.rs": "748d1a5465b9585035f33c3e27ba6871de6b9fb4a0111df94370d8f072b4f4fb",
     "packages/identity/rust/src/mint.rs": "4ac085ae07ab5b218d3657a3368937b5caa3fabbfe21a862e51a161fa607a171",
     "packages/identity/rust/src/pins.rs": "8a76ca414a538e2f1f0018add8038f48c646cfa473ecdf07c4256ab464dcb60a",
     "packages/identity/rust/src/proc_tree.rs": "94e32e7a329989a8255e442c4947721dfca53f53ae44c82eeedd9ce5e6782266",
@@ -605,7 +605,7 @@
     "packages/mailbox/rust/store/src/hook/resolve.rs": "15bb647b18b6f4cf0604c2d8ce09f5180d926e4e5623773404ecbc7818be3048",
     "packages/mailbox/rust/store/src/hook/shell.rs": "c705bcbcef1b55989eba759cf007fdfc64c67e4396c6ad07de76de024570d415",
     "packages/mailbox/rust/store/src/lib.rs": "168a22d982494903bb11318dfc99d6a02d12e5cf2d09f732ca80fae6e43c2765",
-    "packages/mailbox/rust/store/src/limits.rs": "06ce138acdf54dbcaa5c07f27006828038a1a935f7aa087ea6fd7a876950e025",
+    "packages/mailbox/rust/store/src/limits.rs": "2e24dd6ee58b3b9986b7a45ed7975f29fa63a1ff02b53ca6624b5e8f4361275b",
     "packages/mailbox/rust/store/src/nudge.rs": "4d48af901ffedbfe69ce4f07becfae12c50d6b353f15c30238ed4ca004c8c84d",
     "packages/mailbox/rust/store/src/record/bodies.rs": "22a80c7052850aae3ad924a46c3390a6961e2c78d8024cfea00c344c0b476490",
     "packages/mailbox/rust/store/src/record/mod.rs": "72fd0f9ed799956b3c42e61c9ed3d59fc5d9a7333c4d6a03af911f83488e6bad",
@@ -761,7 +761,7 @@
     "packages/seat-binding/rust/src/policy.rs": "ca93a8c356448adbd935f04a310f82eb53894ea76d25a1a55c065e545e83e8e7",
     "packages/seat-binding/rust/src/rank.rs": "7a5c02424890755fe923882b281f4b01391eb7d7111737488c7b5129b48515ff",
     "packages/seat-binding/rust/src/route.rs": "b14ba0cee5bd2aee535f2b76ea96bc0ef532e4166016a26c98d89c11d2fd484f",
-    "packages/seat-binding/rust/src/tier.rs": "367ff6b68c0db941e5b942879a79afac721017ba36e7dec2443cc98383155cb7",
+    "packages/seat-binding/rust/src/tier.rs": "8c13a47153cb90274751bca8b36b5d20e349c50dacbcf06631c65195c73fe24c",
     "packages/seat-binding/rust/tests/golden.rs": "3536ea649db21c346bd59829b33aa461e05e902d4f603ad15bc8db79d71eb561",
     "packages/secrets/rust/src/declaration.rs": "cb491b78ab3b8d337740747e03abce6e6c6be8190f898ef45f7e5e9f541c7d64",
     "packages/secrets/rust/src/expand.rs": "ed6ac70abe6110ae802416ce70ac9938175c5564675879ea2fc92bcf942a1a40",
@@ -880,7 +880,7 @@
     "scripts/explain-command-route.mjs": "db546d74676a1c91c3309241dcb618dc438fbae79448f4e2253319657dbbee24",
     "scripts/export-command-selectors.mjs": "8347ac6f9232df87b1e4b3ab8ec20063872796b36119ffb3b3d9c0ba10a4e521",
     "scripts/fgos-session-start-hook.mjs": "6ec944bb42698570cb5cb860d24bde1229d884f968ce0f6771c05b9c11a93af6",
-    "scripts/fgos-shell-integration.sh": "f11c59da4bb5539d3e59c2a2fafeea38d85353fafa029bb320761af52406e6a3",
+    "scripts/fgos-shell-integration.sh": "657a8a83677992b9890a4400e1f5eb3423947904cd41bb5e84bf2dfb2286bad4",
     "scripts/git-addon.mjs": "67532c2006d74a97cbc40814e82882da1de5d48b5d072670444489e2ed963d71",
     "scripts/git/e1-power-cut.mjs": "73da033846ea409abd7a8b36827aaf0a2caa6e6cd822878b5d332c536169ec9d",
     "scripts/git/e1-power-cut.sh": "be0500b7f99580694cf1ca7418c17ddf6bd70583f3a06686aaab923118e2d1fa",
@@ -891,7 +891,7 @@
     "scripts/herdr-cockpit-notify.mjs": "f3e1cd7e31438e75a113b2cc2481ca6472c1fadaf94a16ed781204d50ed2ac0e",
     "scripts/herdr-cockpit.sh": "4f5b3176b3aab743d5a8bab7199361474cddae81bb9a074261a034cb07b78c16",
     "scripts/identity-ids-unique.mjs": "911396033b882660aa261c22a67f316f9627e3e2979a523feeca0629518f424f",
-    "scripts/install-git-hooks.mjs": "5d37cb2d1596d02d89df9e52bc0773ccbb33cdee58c8d692215e88474d69ffce",
+    "scripts/install-git-hooks.mjs": "ffed7555ffe05bb8617cce93a26970dfdeb924abfb50b853ac7cf9eb16ed157d",
     "scripts/knowledge-bootstrap.mjs": "6ffd1b84d5ebf773b52806cd9d47007e60f4999a0f36b43bca4cc50d0f649543",
     "scripts/knowledge-canary.mjs": "da7fa9d8201b93dd3e68e09b51de2ab467a433d305fccfa7038e03e2a9493285",
     "scripts/lib/codex-auth-guard.mjs": "e7d0ec136014ece7375a545789734203f6c3840cb64aec76a80ecd9f1af198ee",
@@ -950,7 +950,7 @@
     "scripts/verify-fanout-overlap.mjs": "b74a0ac9f350c5d62a47f3e3bf0896e9d142e5cbba15284527383d1b529ea435",
     "scripts/write-test-marker.mjs": "d1faead7d8efbdcce888100b89f5cd2cc6546ddc3f2647118255f82f6c8e4171",
     "scripts/write-wrapper-script.mjs": "e9e76f2b72329bb4dee9ec980db7a5df7515da3ff339e232466049de259d5c50",
-    "src/cli/command-registry.mjs": "a3a890d8404f8c1ad8f3c39a85786111c32a994303092a21ebad853ce5817ff8",
+    "src/cli/command-registry.mjs": "2d78b16ad8c41dc51dc5fe0239aaabd7ba2d007ea675b34cf25c83d808a21b83",
     "src/cli/exit-codes.mjs": "55a68e5a0b03a38adced7ddc9bcfb60964db94b3b868e2c854b6a6a78fdb4964",
     "src/cli/flag-check.mjs": "336a0e94eaec59fa4c1f143b32a14334c1bd5f13d522ef8be4a5b570dc401b62",
     "src/cli/parse-args.mjs": "d4f71dbb91bc8d920995299b78d018efd1643328213a70d6e567a6b462163d66",
@@ -1168,7 +1168,6 @@
     "src/setup/agent-hooks.mjs": "b8cc0592f2b625213629bed03754d128691792e9c41077d0e22a3df12e714647",
     "src/setup/agent-wiring.mjs": "2471bcc4c53a70890e6de823090e2787b369723a1a5571dbaf98d457ccb41afc",
     "src/setup/agy-permissions.mjs": "ed40e05c846fbf499d0a0bfbe0e066f27ad060e144e55f8fa809b2b0e024df78",
-    "src/setup/ansi.mjs": "eba6bc60d211847426382240224cf07fd94b4d22683df5e078bbb1338a8b42eb",
     "src/setup/bin-discovery.mjs": "7e30300c8fc47754106d216c7395dbb76b65332be6e5b56e16cfe6117c58ffe9",
     "src/setup/blind-steps-proven-pools.mjs": "b3da45e89da558eaa65990245ef6a39d7534b67be4e40e68544324734dc6dd66",
     "src/setup/checks.mjs": "8fb90256b24fc5de9cf6cd22694c9df563c0ec87adfb34eedd9f2e4218a1a6c3",
@@ -1190,14 +1189,12 @@
     "src/setup/model-pool-checks.mjs": "f686f00122bc1f43c5d0fe182f7879739f112ef4a361ccccf4a7d6a7ddf5bbd5",
     "src/setup/omp-natives-checks.mjs": "6f6faadb66ac09828741445c599dcbaee9462486157ab7074433e2dbcf4d9aad",
     "src/setup/project-launcher.mjs": "3153fdb9caad59eaeace759de1cd126c22f41585fcd1e15f00c1577ab0f9806b",
-    "src/setup/registrations.mjs": "f29995b5b86fa7fbb3c1adbd98f4b73ce5a3ee4c63f47448e2586b34a4e3c6af",
+    "src/setup/registrations.mjs": "edf01940115277d6baa2910082fc42297ea708fb269be0220ff9aa6afc0745da",
     "src/setup/run-supervisor-checks.mjs": "31942f9b9dec0bdd009c05199f2fc1a2afe7e6b18f58c50c94d7aa18b0ad0421",
-    "src/setup/runner-config-conversion.mjs": "151720f73a061d9ef1ad977bf9f601ad719d44e00cfeb325b85c4f4ce76e436b",
     "src/setup/seat-binding-checks.mjs": "ab0ff541e60c8e5340e87063839f954d970d889159c2aa40ac41992accd2a894",
     "src/setup/session-keep-declared.mjs": "b97619a3524d7d87245220459863181c03dd6066cd738aed9bad5874e6686067",
-    "src/setup/setup-use-case.mjs": "3ba56a73b56b3989928040545239c956a9696b36dd29c4d1bf58f60263332a91",
-    "src/setup/shell-rc.mjs": "36c0eb600e6943d5c6ed94918d5d6a294d447fa8a6491076faaf525aa80807c0",
-    "src/setup/skill-wrappers.mjs": "84229eac055e700d73e85f873bb783b2ff021dd0434c9c83988e02799dec87ca",
+    "src/setup/shell-rc.mjs": "260deb1e3dddb3b9f006bb8eab34f39f656f64188b004542effd9fc7072a0bd4",
+    "src/setup/skill-wrappers.mjs": "bb593e9a9083b8d58b3c08e0389fa90437f3aa9b912f7b289bf5513fe0aa2e1f",
     "src/setup/terminal-control-checks.mjs": "5dca8b2bf0c8bddbc55bcfad97700e65708a04822bf8065b484d5d6c251ce4aa",
     "src/setup/version-info.mjs": "028de487765f43228f49e561286a535cb277dd4b21639478b7be5cad1eecfdcc",
     "src/setup/workflow-case-checks.mjs": "9b187678986f33683b456a75565026e0d86be858cc8281feb86e8b660a6e4ba1",
@@ -1238,7 +1235,7 @@
     "src/state/store.mjs": "9c12cdc33b77fd861084639c36f2f26b0644909b3d57729f226da4e19d6ac224",
     "src/state/work-event-store.mjs": "a1e9476269ed8da9af7defe9d4b8201232276b15d75a7619e7bbabf022cdf22e",
     "src/state/work.mjs": "e791dcc0dec278838723d7fa0ffeb4ea3eea06c6ba88c7e4ebee4a8d2f553aa8",
-    "src/state/worker-slots.mjs": "d76bba3e38f6b94e8307ff9d7dbe6f1e139f973e26a019bfd04dd9bd7ec13f75",
+    "src/state/worker-slots.mjs": "3bd71eb1c2a96d7dbe4d3cf4d87d2b37d0ae55189c2ee873c5a9059e469e374b",
     "src/terminal-control/client.mjs": "e3904df8b75e73448363197641490813ecc6fab69aabd392d262ea4c57a49bb4",
     "src/terminal-control/config.mjs": "722271395f84821afadd1c10985a1cbadf6904aaa30173d4ec8ee1471ab18763",
     "src/util/agent-skill-dirs.mjs": "82747166ecb7b91205ef3e5cdf469e42e8c239b41b3e548823f1615032998bf5",
@@ -1906,336 +1903,343 @@
     },
     {
       "path": "apps/fgos/tests/cli_tests.rs",
-      "line": 217,
+      "line": 222,
       "spawn": "Command::new",
       "binary": "? bin",
       "class": "rust-test"
     },
     {
       "path": "apps/fgos/tests/cli_tests.rs",
-      "line": 230,
+      "line": 239,
       "spawn": "Command::new",
       "binary": "? bin",
       "class": "rust-test"
     },
     {
       "path": "apps/fgos/tests/cli_tests.rs",
-      "line": 241,
+      "line": 252,
       "spawn": "Command::new",
       "binary": "? bin",
       "class": "rust-test"
     },
     {
       "path": "apps/fgos/tests/cli_tests.rs",
-      "line": 315,
+      "line": 263,
       "spawn": "Command::new",
       "binary": "? bin",
       "class": "rust-test"
     },
     {
       "path": "apps/fgos/tests/cli_tests.rs",
-      "line": 350,
+      "line": 337,
       "spawn": "Command::new",
       "binary": "? bin",
       "class": "rust-test"
     },
     {
       "path": "apps/fgos/tests/cli_tests.rs",
-      "line": 380,
+      "line": 372,
       "spawn": "Command::new",
       "binary": "? bin",
       "class": "rust-test"
     },
     {
       "path": "apps/fgos/tests/cli_tests.rs",
-      "line": 456,
+      "line": 402,
       "spawn": "Command::new",
       "binary": "? bin",
       "class": "rust-test"
     },
     {
       "path": "apps/fgos/tests/cli_tests.rs",
-      "line": 495,
+      "line": 478,
       "spawn": "Command::new",
       "binary": "? bin",
       "class": "rust-test"
     },
     {
       "path": "apps/fgos/tests/cli_tests.rs",
-      "line": 557,
+      "line": 517,
       "spawn": "Command::new",
       "binary": "? bin",
       "class": "rust-test"
     },
     {
       "path": "apps/fgos/tests/cli_tests.rs",
-      "line": 593,
+      "line": 579,
       "spawn": "Command::new",
       "binary": "? bin",
       "class": "rust-test"
     },
     {
       "path": "apps/fgos/tests/cli_tests.rs",
-      "line": 641,
+      "line": 615,
       "spawn": "Command::new",
       "binary": "? bin",
       "class": "rust-test"
     },
     {
       "path": "apps/fgos/tests/cli_tests.rs",
-      "line": 677,
+      "line": 663,
       "spawn": "Command::new",
       "binary": "? bin",
       "class": "rust-test"
     },
     {
       "path": "apps/fgos/tests/cli_tests.rs",
-      "line": 733,
+      "line": 699,
       "spawn": "Command::new",
       "binary": "? bin",
       "class": "rust-test"
     },
     {
       "path": "apps/fgos/tests/cli_tests.rs",
-      "line": 781,
+      "line": 755,
       "spawn": "Command::new",
       "binary": "? bin",
       "class": "rust-test"
     },
     {
       "path": "apps/fgos/tests/cli_tests.rs",
-      "line": 839,
+      "line": 803,
       "spawn": "Command::new",
       "binary": "? bin",
       "class": "rust-test"
     },
     {
       "path": "apps/fgos/tests/cli_tests.rs",
-      "line": 872,
+      "line": 861,
       "spawn": "Command::new",
       "binary": "? bin",
       "class": "rust-test"
     },
     {
       "path": "apps/fgos/tests/cli_tests.rs",
-      "line": 889,
+      "line": 894,
       "spawn": "Command::new",
       "binary": "? bin",
       "class": "rust-test"
     },
     {
       "path": "apps/fgos/tests/cli_tests.rs",
-      "line": 1053,
+      "line": 911,
       "spawn": "Command::new",
       "binary": "? bin",
       "class": "rust-test"
     },
     {
       "path": "apps/fgos/tests/cli_tests.rs",
-      "line": 1107,
+      "line": 1075,
       "spawn": "Command::new",
       "binary": "? bin",
       "class": "rust-test"
     },
     {
       "path": "apps/fgos/tests/cli_tests.rs",
-      "line": 1188,
+      "line": 1129,
       "spawn": "Command::new",
       "binary": "? bin",
       "class": "rust-test"
     },
     {
       "path": "apps/fgos/tests/cli_tests.rs",
-      "line": 1265,
+      "line": 1210,
       "spawn": "Command::new",
       "binary": "? bin",
       "class": "rust-test"
     },
     {
       "path": "apps/fgos/tests/cli_tests.rs",
-      "line": 1347,
+      "line": 1287,
       "spawn": "Command::new",
       "binary": "? bin",
       "class": "rust-test"
     },
     {
       "path": "apps/fgos/tests/cli_tests.rs",
-      "line": 1424,
+      "line": 1369,
       "spawn": "Command::new",
       "binary": "? bin",
       "class": "rust-test"
     },
     {
       "path": "apps/fgos/tests/cli_tests.rs",
-      "line": 1476,
+      "line": 1446,
       "spawn": "Command::new",
       "binary": "? bin",
       "class": "rust-test"
     },
     {
       "path": "apps/fgos/tests/cli_tests.rs",
-      "line": 1791,
+      "line": 1498,
+      "spawn": "Command::new",
+      "binary": "? bin",
+      "class": "rust-test"
+    },
+    {
+      "path": "apps/fgos/tests/cli_tests.rs",
+      "line": 1813,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"
     },
     {
       "path": "apps/fgos/tests/cli_tests.rs",
-      "line": 2041,
+      "line": 2063,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"
     },
     {
       "path": "apps/fgos/tests/cli_tests.rs",
-      "line": 2323,
+      "line": 2345,
       "spawn": "Command::new",
       "binary": "/usr/bin/git",
       "class": "rust-test"
     },
     {
       "path": "apps/fgos/tests/cli_tests.rs",
-      "line": 2373,
+      "line": 2395,
       "spawn": "Command::new",
       "binary": "? bin",
       "class": "rust-test"
     },
     {
       "path": "apps/fgos/tests/cli_tests.rs",
-      "line": 2434,
+      "line": 2456,
       "spawn": "Command::new",
       "binary": "? bin",
       "class": "rust-test"
     },
     {
       "path": "apps/fgos/tests/cli_tests.rs",
-      "line": 2486,
+      "line": 2508,
       "spawn": "Command::new",
       "binary": "? bin",
       "class": "rust-test"
     },
     {
       "path": "apps/fgos/tests/cli_tests.rs",
-      "line": 2523,
+      "line": 2545,
       "spawn": "Command::new",
       "binary": "? bin",
       "class": "rust-test"
     },
     {
       "path": "apps/fgos/tests/cli_tests.rs",
-      "line": 2835,
+      "line": 2857,
       "spawn": "Command::new",
       "binary": "? bin",
       "class": "rust-test"
     },
     {
       "path": "apps/fgos/tests/cli_tests.rs",
-      "line": 2882,
+      "line": 2904,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"
     },
     {
       "path": "apps/fgos/tests/cli_tests.rs",
-      "line": 2890,
+      "line": 2912,
       "spawn": "Command::new",
       "binary": "? bin",
       "class": "rust-test"
     },
     {
       "path": "apps/fgos/tests/cli_tests.rs",
-      "line": 2937,
+      "line": 2959,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"
     },
     {
       "path": "apps/fgos/tests/cli_tests.rs",
-      "line": 2960,
+      "line": 2982,
       "spawn": "Command::new",
       "binary": "? bin",
       "class": "rust-test"
     },
     {
       "path": "apps/fgos/tests/cli_tests.rs",
-      "line": 3023,
+      "line": 3045,
       "spawn": "Command::new",
       "binary": "? bin",
       "class": "rust-test"
     },
     {
       "path": "apps/fgos/tests/cli_tests.rs",
-      "line": 3092,
+      "line": 3114,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"
     },
     {
       "path": "apps/fgos/tests/cli_tests.rs",
-      "line": 3112,
+      "line": 3134,
       "spawn": "Command::new",
       "binary": "? bin",
       "class": "rust-test"
     },
     {
       "path": "apps/fgos/tests/cli_tests.rs",
-      "line": 3250,
+      "line": 3272,
       "spawn": "Command::new",
       "binary": "? bin",
       "class": "rust-test"
     },
     {
       "path": "apps/fgos/tests/cli_tests.rs",
-      "line": 3360,
+      "line": 3382,
       "spawn": "Command::new",
       "binary": "? bin",
       "class": "rust-test"
     },
     {
       "path": "apps/fgos/tests/cli_tests.rs",
-      "line": 3552,
+      "line": 3574,
       "spawn": "Command::new",
       "binary": "? bin",
       "class": "rust-test"
     },
     {
       "path": "apps/fgos/tests/cli_tests.rs",
-      "line": 3615,
+      "line": 3637,
       "spawn": "Command::new",
       "binary": "? bin",
       "class": "rust-test"
     },
     {
       "path": "apps/fgos/tests/cli_tests.rs",
-      "line": 3649,
+      "line": 3671,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"
     },
     {
       "path": "apps/fgos/tests/cli_tests.rs",
-      "line": 3663,
+      "line": 3685,
       "spawn": "Command::new",
       "binary": "? bin",
       "class": "rust-test"
     },
     {
       "path": "apps/fgos/tests/cli_tests.rs",
-      "line": 3717,
+      "line": 3739,
       "spawn": "Command::new",
       "binary": "? bin",
       "class": "rust-test"
     },
     {
       "path": "apps/fgos/tests/cli_tests.rs",
-      "line": 3770,
+      "line": 3792,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"
     },
     {
       "path": "apps/fgos/tests/cli_tests.rs",
-      "line": 3804,
+      "line": 3826,
       "spawn": "Command::new",
       "binary": "? bin",
       "class": "rust-test"
@@ -2361,14 +2365,14 @@
     },
     {
       "path": "bin/fgos.mjs",
-      "line": 3093,
+      "line": 3088,
       "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:180",
       "binary": "(config door value (readConfig({ projectRoot: repoRoot, sections: ['invariantChecks'] })))",
       "class": "configured-binary"
     },
     {
       "path": "bin/fgos.mjs",
-      "line": 3237,
+      "line": 3232,
       "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:180",
       "binary": "(config door value (readConfig({ projectRoot: repoRoot, sections: ['invariantChecks'] })))",
       "class": "configured-binary"
@@ -3987,42 +3991,42 @@
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 3171,
-      "spawn": "checkBwrapAvailable -> src/setup/registrations.mjs:1196",
+      "line": 3058,
+      "spawn": "checkBwrapAvailable -> src/setup/registrations.mjs:1083",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 3218,
+      "line": 3105,
       "spawn": "runAllConfinementProbes -> src/runner/dispatch/confinement/probes/harness.mjs:834",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 3258,
-      "spawn": "checkBwrapAvailable -> src/setup/registrations.mjs:1196",
+      "line": 3145,
+      "spawn": "checkBwrapAvailable -> src/setup/registrations.mjs:1083",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 3265,
+      "line": 3152,
       "spawn": "probePeerRunHidden -> src/runner/dispatch/confinement/probes/harness.mjs:525",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 3496,
+      "line": 3383,
       "spawn": "probeIdentity -> src/util/session-identity.mjs:68",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 3554,
+      "line": 3441,
       "spawn": "createSeatBindingClient -> src/seat-binding/client.mjs:142",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
@@ -4031,13 +4035,6 @@
       "path": "src/setup/run-supervisor-checks.mjs",
       "line": 108,
       "spawn": "probeRoute -> src/setup/run-supervisor-checks.mjs:41",
-      "binary": "(env FGOS_HOST_BIN)",
-      "class": "configured-binary"
-    },
-    {
-      "path": "src/setup/runner-config-conversion.mjs",
-      "line": 188,
-      "spawn": "applyNativeConfigPatch -> src/setup/runner-config-conversion.mjs:19",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
     },
