@@ -628,13 +628,15 @@
       "patterns": [
         "gateway\\.json",
         "export function (?:startGateway|stopGateway|gatewayStatus)\\b",
-        "['\"]--bin['\"],\\s*['\"]fgos-gateway['\"]"
+        "['\"]--bin['\"],\\s*['\"]fgos-gateway['\"]",
+        "['\"]fgos-gateway['\"]"
       ],
       "allowed": [
-        "apps/fgos/src/wiring/gateway_control.rs"
+        "apps/fgos/src/wiring/gateway_control.rs",
+        "packages/holder-lock/rust/src/origin.rs"
       ],
       "debt": [],
-      "reason": "starting, stopping and probing the gateway (the .fgos/gateway.json registry, the release build of apps/fgos-gateway, the detached spawn) is one module of the host; nothing else in the product reads or writes the registry or builds the binary, so a second path to a gateway process fails here"
+      "reason": "starting, stopping and probing the gateway (the .fgos/gateway.json registry, the release build of apps/fgos-gateway, the detached spawn) is one module of the host; nothing else in the product reads or writes the registry, builds the binary or names it to run it, so a second path to a gateway process fails here (the holder-lock origin list only names the binary to recognise a lock holder)"
     }
   ],
   "files": {

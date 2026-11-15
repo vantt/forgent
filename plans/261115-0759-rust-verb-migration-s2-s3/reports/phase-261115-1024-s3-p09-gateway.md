@@ -27,9 +27,10 @@ Status: DONE_WITH_CONCERNS.
 - `node scripts/run-tests.mjs` over fgos-manifest, command-routes, subcommand-flag-drift (now lists gateway as native, shared projector), architecture, git-mutation-census, unknown-flag-rejection: green. `test/rust-host/verb-parity.test.mjs` does not exist on the integration branch (the step lead adds it), so parity ran through an ad hoc driver (scratchpad `p09-parity.mjs`) that implements the call order of the table header (`prepare`, entry, `evidence`, `cleanup`), entry A = `node <base>/bin/fgos.mjs` with the staged env of `rvm-s23-base` (main `8d6a07c4c`), entry B = this tree's staged host. **39/39 cases green**: status (fresh, flag before the sub, named dir from elsewhere, extra positional, no project, linked and frozen worktree, stale, no identity, live not reachable, live reachable, corrupt, unknown flag, several unknown flags, `--dir=`, bare and empty `--dir`), stop (fresh, from elsewhere, no project, linked, frozen refused, stale, live process, reused pid, a process ignoring TERM (about 5 s), no identity, corrupt, unknown flag), start refused before any build (no crate, already running, no identity, corrupt, frozen, unknown flag, no project), and the three sub-command refusals.
 - Manual, fg-server2, staged host: real `gateway start` (cold build 70 s; the crate's `Cargo.lock` stayed clean), `status` running+reachable, `/proc/<pid>/environ` has no `FGOS_RUST_HOST_RECURSION_GUARD` although the caller had it set, `POST /v1/sessions` answered HTTP 200 with a session row, a second `start` refused (`already running (pid 1965679, port 4199)`), `stop` -> `{alreadyStopped:false,pid,port}`, port free, no process left.
 
-## Proposed `## [Unreleased]` line
-`fgos gateway start` is refused off Unix with a message saying so; it never worked there.
-(Also user-visible, same entry if the step lead wants it: `fgos gateway stop` and `status` outside a project create nothing.)
+## Proposed `## [Unreleased]` lines (the step lead writes them)
+- `fgos gateway start` is refused off Unix with a message saying so; it never worked there.
+- `fgos gateway stop` and `fgos gateway status` outside a project create nothing.
+- `fgos gateway stop` from a linked worktree answers `alreadyStopped` and runs no shutdown seal (it used to create the worktree's `.fgos` and seal the main checkout).
 
 ## Retired test -> owner now
 | retired test (`test/runner/gateway-control.test.mjs`) | owner now (`gateway_control.rs` unless noted) |
@@ -41,7 +42,7 @@ Status: DONE_WITH_CONCERNS.
 | status: live, nothing listening | `a_live_process_with_nothing_listening_or_a_failing_answer_is_running_but_not_reachable` (+ hung: `a_hung_gateway_makes_status_return_within_the_probe_timeout`) |
 | stop: no registry | `stop_with_no_registry_is_already_stopped_and_seals_what_is_open` |
 | stop seals after releasing the lock | same test (lock free at the trigger) and `the_shutdown_seal_also_runs_when_the_stop_failed_and_never_where_the_store_does_not_run` |
-| stop from a linked worktree seals the main checkout's events | main root resolution: `fgos-git` `main_checkout_root` tests (`packages/git/rust/tests/inspect.rs`); the trigger takes the project root: the two seal tests above |
+| stop from a linked worktree seals the main checkout's events | **removed, a disclosed behaviour change**: from a linked worktree no project is found, so the CLI never reaches the trigger. `stop` answers `alreadyStopped`, creates nothing and runs no shutdown seal (Node created `<linked>/.fgos` and sealed main). What the trigger does with a project root is owned by `the_shutdown_seal_*` tests; main-root resolution by the `fgos-git` `main_checkout_root` tests |
 | stop: dead pid cleared | `a_dead_process_is_cleared_and_reported_already_stopped_with_its_pid` |
 | stop: live pid TERM-ed | `a_live_process_is_sent_term_and_the_registry_is_cleared` |
 | stop: escalates to KILL | `a_process_that_ignores_term_is_killed_after_its_window_and_the_registry_is_cleared` |
@@ -71,5 +72,11 @@ New tests with no old owner: build argv and failure shapes (`run_build` pair), s
 4. `packages/holder-lock/contracts/lock-registry.v1.json` still says "v1 source: src/runner/gateway-control.mjs"; docs naming the deleted module (`docs/explanation/fgos-gateway-lifecycle-verb.md`, `docs/platform/component-boundary.md`, backlog row p-265qfonr5w about the guard "in five places") are left for the close phase.
 5. `subcommand-flag-drift.test.mjs` edits two array lines (`MULTI`, `NATIVE`) that other S3/S2 phases edit too: expect a one-line rebase conflict.
 6. The gateway build inherits `CARGO_TARGET_DIR`; a caller that sets it gets "no binary found" (as Node did). Unchanged, not fixed here.
-7. A started gateway that never prints `listening on` within 30 s is left running without a registry entry (as Node did). Unchanged.
+7. Follow-up fix: a gateway that is spawned and then never prints `listening on` within the startup timeout is now stopped by identity (TERM, then KILL) before `start` returns; test `a_gateway_that_never_says_it_is_listening_is_stopped_by_identity_and_not_recorded` (the timeout is a `StartParts` field). The identity-unreadable path cannot be stopped by identity (no identity to name) and still leaves the process running; its message names the log.
 8. The gateway crate's `target` under the worktree (about 1 GB) remains until the worktree is removed; a shell hook blocked deleting a path named `target`.
+
+## Follow-ups after the OPC verdict
+- Guard test no longer sets the process environment; it pins `GATEWAY_ENV_REMOVE`, and `spawn_mapped.rs` owns the removal.
+- The test reaper signals by the recorded tuple (`signal_by_identity`), not a bare `kill -9`.
+- `status-equals-flag` compares the fault record's class, verb and sub-command; only the message is masked.
+- Doors row gains `['"]fgos-gateway['"]` (allowed: `gateway_control.rs`, and `holder-lock/.../origin.rs`, whose binary list only recognises a lock holder). The gateway crate is not listed: it has no match, and an unmatched allowed path is stale. Negative case: a scratch `src/scratch-door.mjs` containing `"fgos-gateway"` fails the row.

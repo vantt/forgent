@@ -178,6 +178,7 @@ export function prepare(testCase, scratch) {
     scratch,
     repo: built.repo,
     pids,
+    maskFaultMessage: Boolean(testCase.maskFaultMessage),
     cwd: built.cwd ?? built.repo,
     // An empty home, so the machine's real config decides no case.
     env: { HOME: home, USERPROFILE: home },
@@ -208,7 +209,7 @@ export function evidence(fixture) {
   const faults = log && fs.existsSync(log)
     ? fs.readFileSync(log, "utf8").trim().split("\n").filter(Boolean).map((line) => {
       const record = JSON.parse(line);
-      return { faultClass: record.faultClass, message: record.message, verb: record.verb, sub: record.sub };
+      return { faultClass: record.faultClass, message: fixture.maskFaultMessage ? undefined : record.message, verb: record.verb, sub: record.sub };
     })
     : [];
   const registry = fs.existsSync(registryFile(fixture.repo)) ? fs.readFileSync(registryFile(fixture.repo), "utf8").replace(/"pid":\d+/g, '"pid":<pid>').replace(/"startTime":"\d+"/g, '"startTime":"<t>"').replace(/"port":\d+/g, '"port":<port>') : null;
@@ -251,8 +252,9 @@ export const cases = [
   refusal("status-unknown-flag", "project", ["status", "--bogus"], 4),
   // Of several unknown flags the first one the Node parser lists is the one named.
   refusal("status-several-unknown-flags", "project", ["status", "--zzz", "--aaa", "--json"], 4),
-  // The Rust fault writer reduces a `--k=v` value inside the recorded message to its length, the Node writer keeps it.
-  refusal("status-equals-flag", "project", ["status", "--dir={REPO}"], 4, { ignoreEvidence: ["faults"] }),
+  // The Rust fault writer reduces a `--k=v` value inside the recorded message to its length, the Node writer keeps
+  // it: the record is compared on its class, verb and sub-command, and its message is not.
+  refusal("status-equals-flag", "project", ["status", "--dir={REPO}"], 4, { maskFaultMessage: true }),
   refusal("status-bare-dir", "project", ["status", "--dir"], 4),
   refusal("status-empty-dir", "project", ["status", "--dir", ""], 4),
   // stop
@@ -260,6 +262,9 @@ export const cases = [
   c("stop-named-dir-from-elsewhere", "elsewhere", ["stop", "--dir", "{REPO}"], { expectedExitCode: 0 }),
   // Where no project is found the host creates nothing, where the Node CLI left an empty store with a lock file.
   c("stop-nonproject", "nonproject", ["stop"], { expectedExitCode: 0, ignoreEvidence: ["files"] }),
+  // A linked worktree carries no store, so no project is found there: the host answers "already stopped", creates
+  // nothing and runs no shutdown seal. The Node CLI created `<linked>/.fgos` (a lock file) and sealed the main
+  // checkout's open events. The answer is compared; what the call left in the worktree is not.
   c("stop-linked-worktree", "linked", ["stop"], { expectedExitCode: 0, ignoreEvidence: ["linkedFiles"] }),
   refusal("stop-frozen-worktree", "frozen", ["stop"], 4),
   c("stop-stale-registry", "stale", ["stop"], { expectedExitCode: 0, jsonIgnorePaths: ["data.pid", "data_hash"] }),

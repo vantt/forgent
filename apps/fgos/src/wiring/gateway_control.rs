@@ -377,6 +377,8 @@ fn wait_until_dead_or_deadline(entry: &Value, deadline: Instant) -> Verdict {
 pub struct StartParts<'a> {
     pub build: &'a dyn Fn(&Path) -> Result<(), GatewayControlError>,
     pub port: &'a dyn Fn() -> Result<u64, GatewayControlError>,
+    /// How long the spawned gateway has to print `listening on`.
+    pub startup_timeout: Duration,
 }
 
 fn gateway_crate_dir(repo_root: &Path) -> PathBuf {
@@ -475,6 +477,17 @@ fn log_tail(log: &Path) -> String {
     lines[lines.len().saturating_sub(20)..].join("\n")
 }
 
+/// Stops a gateway that was spawned and never registered, by its identity: TERM, then KILL after its window.
+/// A process that is no longer the recorded one is left alone.
+fn stop_unregistered(record: &Value) {
+    let entry = json!({ "record": record });
+    if let Ok(Sent::Delivered) = signal_gateway(&entry, Signal::Term) {
+        if wait_until_dead_or_deadline(&entry, Instant::now() + STOP_TIMEOUT) == Verdict::Alive {
+            let _ = signal_gateway(&entry, Signal::Kill);
+        }
+    }
+}
+
 /// Starts the gateway as a detached background process, under the gateway lock for the whole
 /// check-build-spawn-confirm sequence. Refuses, spawning nothing, while the registry names a live process.
 /// Returns the registry entry it wrote once the log shows the gateway serving.
@@ -570,7 +583,7 @@ pub fn start_gateway(repo_root: &Path, fgos_dir: &Path, parts: &StartParts) -> A
 
     // A pid exists the instant the spawn returns even when the process panics a moment later (a missing
     // token, a port in use), so the process printing its own `listening on` line is what confirms startup.
-    let deadline = Instant::now() + STARTUP_TIMEOUT;
+    let deadline = Instant::now() + parts.startup_timeout;
     loop {
         let alive = record
             .as_ref()
@@ -587,9 +600,13 @@ pub fn start_gateway(repo_root: &Path, fgos_dir: &Path, parts: &StartParts) -> A
             break;
         }
         if Instant::now() >= deadline {
+            // The gateway was spawned but never registered: nothing would ever stop it, so stop it here.
+            if let Some(record) = &record {
+                stop_unregistered(record);
+            }
             return Err(GatewayControlError::new(format!(
                 "gateway did not report \"{LISTENING_MARKER}\" within {}ms — see \"{}\"",
-                STARTUP_TIMEOUT.as_millis(),
+                parts.startup_timeout.as_millis(),
                 log_path.display()
             )));
         }
@@ -867,6 +884,7 @@ fn serve(request: &GatewayRequest, lifecycle: &dyn Lifecycle) -> Answer {
             &StartParts {
                 build: &build_release,
                 port: &configured_port,
+                startup_timeout: STARTUP_TIMEOUT,
             },
         ),
         Sub::Stop => stop_gateway(&fgos_dir, lifecycle),
@@ -1234,6 +1252,7 @@ mod tests {
         StartParts {
             build: &|_| panic!("the build must not run"),
             port: &|| Ok(4170),
+            startup_timeout: STARTUP_TIMEOUT,
         }
     }
 
@@ -1265,11 +1284,12 @@ mod tests {
             &StartParts {
                 build: &built,
                 port: &|| Ok(4321),
+                startup_timeout: STARTUP_TIMEOUT,
             },
         )
         .unwrap();
         let pid = entry["pid"].as_u64().unwrap();
-        let _cleanup = Reaper(pid as u32);
+        let _cleanup = Reaper::new(pid as u32);
         assert_eq!(entry["port"], 4321);
         assert_eq!(entry["binaryPath"], binary.to_string_lossy().as_ref());
         assert_eq!(entry["record"]["pid"], pid);
@@ -1304,33 +1324,13 @@ mod tests {
         );
     }
 
-    /// The gateway calls `fgos` verbs through the host, so it must not inherit the recursion guard; every
-    /// other variable of the caller reaches it.
+    /// The gateway calls `fgos` verbs through the host, so it must not inherit the recursion guard. That the
+    /// spawn door removes every variable it is given is proved by its own test (`spawn_mapped.rs`); this pins
+    /// what the gateway asks it to remove.
     #[cfg(unix)]
     #[test]
-    fn the_gateway_is_spawned_without_the_recursion_guard_but_with_the_rest_of_the_environment() {
+    fn the_gateway_is_spawned_without_the_recursion_guard() {
         assert_eq!(GATEWAY_ENV_REMOVE, [RECURSION_GUARD_VAR]);
-        let root = scratch();
-        stub_gateway(
-            &root,
-            &format!("echo \"guard=${{{RECURSION_GUARD_VAR}-unset}} kept=${{FGOS_GATEWAY_TEST_KEPT-unset}}\"\necho 'listening on 127.0.0.1:4170'\nexec sleep 600"),
-        );
-        std::env::set_var(RECURSION_GUARD_VAR, "1");
-        std::env::set_var("FGOS_GATEWAY_TEST_KEPT", "yes");
-        let entry = start_gateway(
-            &root,
-            &root.join(".fgos"),
-            &StartParts {
-                build: &built,
-                port: &|| Ok(4170),
-            },
-        );
-        std::env::remove_var(RECURSION_GUARD_VAR);
-        std::env::remove_var("FGOS_GATEWAY_TEST_KEPT");
-        let entry = entry.unwrap();
-        let _cleanup = Reaper(entry["pid"].as_u64().unwrap() as u32);
-        let log = std::fs::read_to_string(entry["logPath"].as_str().unwrap()).unwrap();
-        assert!(log.contains("guard=unset kept=yes"), "{log}");
     }
 
     /// The gateway binary exits at once. The child is a zombie of this very process, which is dead as the
@@ -1347,6 +1347,7 @@ mod tests {
             &StartParts {
                 build: &built,
                 port: &|| Ok(4170),
+                startup_timeout: STARTUP_TIMEOUT,
             },
         )
         .unwrap_err();
@@ -1367,6 +1368,40 @@ mod tests {
         assert!(
             !registry_exists(&root),
             "a gateway that never served is not recorded"
+        );
+    }
+
+    /// A gateway that is spawned and never serves has no registry entry, so nothing would stop it later.
+    #[cfg(unix)]
+    #[test]
+    fn a_gateway_that_never_says_it_is_listening_is_stopped_by_identity_and_not_recorded() {
+        let root = scratch();
+        let pid_file = root.join("gateway-pid");
+        stub_gateway(&root, &format!("echo $$ > {pid_file:?}\nexec sleep 600"));
+        let error = start_gateway(
+            &root,
+            &root.join(".fgos"),
+            &StartParts {
+                build: &built,
+                port: &|| Ok(4170),
+                startup_timeout: Duration::from_millis(600),
+            },
+        )
+        .unwrap_err()
+        .to_string();
+        assert!(
+            error.starts_with("gateway did not report \"listening on\" within 600ms"),
+            "{error}"
+        );
+        assert!(!registry_exists(&root));
+        let pid: u32 = std::fs::read_to_string(&pid_file)
+            .unwrap()
+            .trim()
+            .parse()
+            .unwrap();
+        assert!(
+            !matches!(facts::observe(ProcId(pid)), Observed::Live { .. }),
+            "the unregistered gateway was left running"
         );
     }
 
@@ -1416,6 +1451,7 @@ mod tests {
             &StartParts {
                 build: &built,
                 port: &|| Ok(4170),
+                startup_timeout: STARTUP_TIMEOUT,
             },
         )
         .unwrap_err();
@@ -1449,6 +1485,7 @@ mod tests {
                             &StartParts {
                                 build: &build,
                                 port: &|| Ok(4170),
+                                startup_timeout: STARTUP_TIMEOUT,
                             },
                         )
                     })
@@ -1458,7 +1495,7 @@ mod tests {
         });
         let started: Vec<&Value> = outcomes.iter().filter_map(|o| o.as_ref().ok()).collect();
         assert_eq!(started.len(), 1, "{outcomes:?}");
-        let _cleanup = Reaper(started[0]["pid"].as_u64().unwrap() as u32);
+        let _cleanup = Reaper::new(started[0]["pid"].as_u64().unwrap() as u32);
         let refused: Vec<String> = outcomes
             .iter()
             .filter_map(|o| o.as_ref().err())
@@ -1642,6 +1679,7 @@ mod tests {
     /// the `stop` that signals it); killed when dropped.
     struct Throwaway {
         pid: u32,
+        _reaper: Reaper,
     }
 
     impl Throwaway {
@@ -1657,23 +1695,20 @@ mod tests {
         }
     }
 
-    impl Drop for Throwaway {
-        fn drop(&mut self) {
-            drop(Reaper(self.pid));
+    /// Kills the process when dropped, by the identity it had when this was made, so a reused pid is never hit.
+    struct Reaper(Option<ProcTuple>);
+
+    impl Reaper {
+        fn new(pid: u32) -> Self {
+            Self(facts::identity_of(ProcId(pid)))
         }
     }
 
-    /// Kills the process when dropped.
-    struct Reaper(u32);
-
     impl Drop for Reaper {
         fn drop(&mut self) {
-            #[cfg(unix)]
-            let _ = std::process::Command::new("kill")
-                .args(["-9", &self.0.to_string()])
-                .output();
-            #[cfg(not(unix))]
-            let _ = self.0;
+            if let Some(tuple) = &self.0 {
+                let _ = signal_by_identity(tuple, Signal::Kill);
+            }
         }
     }
 
@@ -1705,7 +1740,10 @@ mod tests {
             );
             std::thread::sleep(Duration::from_millis(10));
         }
-        Throwaway { pid }
+        Throwaway {
+            pid,
+            _reaper: Reaper::new(pid),
+        }
     }
 
     /// A local server answering every connection with `status`, and the port it listens on.

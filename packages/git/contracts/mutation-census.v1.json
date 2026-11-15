@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "50349d45832c50184e4fa572b72ccbe1be70d951115e40078af711ab74038ed2",
+  "payloadDigest": "65c9557b57bfdf40e4c75d9ed90a093c8f1b679ddd895e788f8755184c5bd12b",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "a5629383f89b4488b252a62f0ea86463e649e33e0a891db1a19af2cd6c136aca",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -92,7 +92,7 @@
     "apps/fgos/src/main.rs": "d4de64885d7ccaf3c1ce21f9d0819cec981ecba44c0cbfa05f377c54d4d08f74",
     "apps/fgos/src/routing.rs": "91493d0628489492fd1b34a4b229faf903e1e91fc033727136e09e40307b4f3d",
     "apps/fgos/src/wiring/event_store_clone.rs": "923d718f7a6bd5705cbe6e4d4c8393672c1ef4a2142facc9ada314307a4d7574",
-    "apps/fgos/src/wiring/gateway_control.rs": "30affc2847ea173ab7af7699729f02cf7875f2deb358c0cd7a9ae23745c3eb9d",
+    "apps/fgos/src/wiring/gateway_control.rs": "0d73738acfe1386239cabd241f52aaaefe360f40c9cda879a8bc00c71ede27bc",
     "apps/fgos/src/wiring/identity_log.rs": "d7d9dd503ecbd84a5373aa27f6853996e6944aba2940d15e8284cd92c14eef7a",
     "apps/fgos/src/wiring/mailbox_body.rs": "1d1a1c76ac24e5cb1d9e55a7b54ed35cc7be7656ded86ac52e58dd767b3079ca",
     "apps/fgos/src/wiring/mailbox_config.rs": "c9aa04a7c117869798ce407edccfef8c51ef9047ec22f58596c2db3ac63ac0d5",
@@ -1770,7 +1770,7 @@
     },
     {
       "path": "apps/fgos/src/wiring/gateway_control.rs",
-      "line": 1688,
+      "line": 1723,
       "spawn": "Command::new",
       "binary": "sh",
       "class": "rust-test"
@@ -3014,7 +3014,7 @@
       "spawn": "Command::new",
       "binary": "fgos-gateway",
       "class": "argv-runner",
-      "resolvedAt": "apps/fgos/src/wiring/gateway_control.rs:533"
+      "resolvedAt": "apps/fgos/src/wiring/gateway_control.rs:546"
     },
     {
       "path": "packages/process/rust/src/mapped.rs",
@@ -3022,7 +3022,7 @@
       "spawn": "Command::new",
       "binary": "release",
       "class": "argv-runner",
-      "resolvedAt": "apps/fgos/src/wiring/gateway_control.rs:533"
+      "resolvedAt": "apps/fgos/src/wiring/gateway_control.rs:546"
     },
     {
       "path": "packages/process/rust/src/mapped.rs",
@@ -3030,7 +3030,7 @@
       "spawn": "Command::new",
       "binary": "target",
       "class": "argv-runner",
-      "resolvedAt": "apps/fgos/src/wiring/gateway_control.rs:533"
+      "resolvedAt": "apps/fgos/src/wiring/gateway_control.rs:546"
     },
     {
       "path": "packages/process/rust/src/platform/windows.rs",
