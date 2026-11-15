@@ -50,11 +50,13 @@ this change ship no `fgctl`, and the upgrade says so. Never edit or commit the p
 past this: it is shared by every machine, and changing it is a separate,
 owner-approved change.
 
-## 2. fgos setup
+## 2. fgos doctor --fix
+
+`fgctl init` (step 1) leaves the workspace active; `doctor --fix` repairs what a wipe took from it (hook rows, launcher, config files).
 
 ```sh
-.fgos/installation/bin/fgos setup
-git diff --stat -- .fgos/coexistence.json      # setup can drop the codex entry
+.fgos/installation/bin/fgos doctor --fix
+git diff --stat -- .fgos/coexistence.json      # check the codex entry is still there
 git checkout -- .fgos/coexistence.json         # restore it from HEAD if it changed
 ```
 
@@ -71,7 +73,7 @@ Stale registrations make `fgos worktree create` refuse with
 
 ## 4. AgentKit v3, per runtime
 
-`fgos setup` does not rebuild `.claude/hooks`, `.claude/rules` or `.grok`.
+`fgos doctor --fix` does not rebuild `.claude/hooks`, `.claude/rules` or `.grok`.
 
 ```sh
 export AK_NO_AUTO_UPDATE=1                     # a kit install may otherwise bump the ak binary

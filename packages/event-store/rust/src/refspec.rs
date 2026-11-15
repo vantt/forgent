@@ -20,7 +20,7 @@ pub fn pinned_url(git: &dyn Inspect, repo: &RepoHandle, remote: &str) -> Result<
         .ok_or_else(|| {
             Error::new(
                 ErrorCode::EventStoreRefspecMissing,
-                "run fgos doctor --fix to install mirror fetch mappings",
+                "the mirror fetch mappings are not recorded for this remote: the recorded mappings are missing or differ from the wanted set",
             )
         })?;
     if wanted
@@ -35,7 +35,7 @@ pub fn pinned_url(git: &dyn Inspect, repo: &RepoHandle, remote: &str) -> Result<
     if git.remote_url(repo, remote).map_err(git_error)? != provenance.remote_url {
         return Err(Error::new(
             ErrorCode::EventStoreRemoteChanged,
-            "remote URL changed; run fgos doctor --fix",
+            "the fetch mapping provenance records another remote URL than the remote has now",
         ));
     }
     Ok(provenance.remote_url)

@@ -206,16 +206,24 @@ function disk(world, norm) {
   return out;
 }
 
+/** Rows the base release answers and this release no longer has: the row is deleted with the `setup` verb that kept its
+ * source line, so both sides are compared without it. */
+const RETIRED_ROWS = new Set(['shell-integration-sourced']);
+const RETIRED_PRETTY_LINE = /^[✓✗] shell-integration source line present in detected rc file\(s\)/;
+
+/** The pretty text without the line of a retired row. */
+const withoutRetiredLines = (text) => text.split('\n').filter((line) => !RETIRED_PRETTY_LINE.test(line)).join('\n');
+
 /** The rows of one doctor answer as comparable values, or the raw text when the answer is not the JSON envelope. */
 function describe(text) {
   let data;
-  try { data = JSON.parse(text).data; } catch { return { text }; }
-  if (!data?.checks) return { text };
+  try { data = JSON.parse(text).data; } catch { return { text: withoutRetiredLines(text) }; }
+  if (!data?.checks) return { text: withoutRetiredLines(text) };
   return {
     ok: data.ok,
     next: data.next,
     fixed: data.fixed,
-    rows: data.checks.map(({ id, status, passed, fix, message, detail, description }) => ({ id, status, passed, fix, message, detail, description })),
+    rows: data.checks.filter(({ id }) => !RETIRED_ROWS.has(id)).map(({ id, status, passed, fix, message, detail, description }) => ({ id, status, passed, fix, message, detail, description })),
   };
 }
 

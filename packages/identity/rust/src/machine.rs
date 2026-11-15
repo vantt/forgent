@@ -37,9 +37,10 @@ pub fn read(state_root: &Path) -> Result<String, Error> {
     })?;
     let value = raw.trim_end_matches(['\r', '\n']);
     if !valid_machine_id(value) {
-        return Err(Error::Invalid(
-            "invalid machine id; run fgos doctor --fix".into(),
-        ));
+        return Err(Error::Invalid(format!(
+            "invalid machine id in {}: correct it, or remove it and run fgos doctor --fix to mint a new one (a new id is a new machine identity)",
+            state_root.join(ID_FILE).display()
+        )));
     }
     Ok(value.to_owned())
 }
