@@ -1,21 +1,21 @@
 ---
 phase: 10
-title: "`agents list` native (only if the owner answers Q1 = a)"
+title: "`agents list` native (only if the owner answers S23-Q1 = a)"
 status: pending
-effort: "3d if Q1 = a; 0.25d if Q1 = c (hand-off note only)"
+effort: "3d if S23-Q1 = a; 0.25d if S23-Q1 = b (hand-off note only)"
 wave: B
 step: S3
-blockedBy: [0, Q1]
-startsAfter: ["one-door-debt phase 16 landed (Q1 = a only)"]
+blockedBy: [0, S23-Q1]
+startsAfter: ["one-door-debt phase 16 landed (S23-Q1 = a only)"]
 ---
 
 # Phase 10: `agents list`
 
-**If Q1 = (c):** this phase only writes one line into the program plan's S5 row ("`agents` verb, moved from S3 by
-owner answer Q1; the persona reader joins `bind()`") and one into its S3 row. Effort 0.25d. The rest applies to Q1 = (a).
+**If S23-Q1 = (b):** this phase only writes one line into the program plan's S5 row ("`agents` verb, moved from S3 by
+owner answer S23-Q1; the persona reader joins `bind()`") and one into its S3 row. Effort 0.25d. The rest applies to S23-Q1 = (a).
 
 `agents list` (`src/runner/agent-listing.mjs`, 123 lines) reads personas through `src/runner/agent-definitions.mjs`
-(272 lines), which eight runner, workflow, doctor and script modules import (plan.md Q1). The definitions reader gets
+(272 lines), which eight runner, workflow, doctor and script modules import (plan.md S23-Q1). The definitions reader gets
 one Rust owner; `agent-definitions.mjs` and `agent-listing.mjs` keep their exports as addon calls, so no runner caller
 and no doctor row changes.
 
@@ -36,7 +36,8 @@ Report slug `s3-p10-agents`.
 ## Requirements
 
 1. Rust owner of agent definitions (crate and module named by 00 F12; candidate `packages/seat-binding/rust`, the persona
-   authority of the binding, which the addon would then link: a crate edge, stop and ask the step lead): tier scan
+   authority of the binding, which the addon would then link: a crate edge not in D10, stop and ask the step lead; the
+   step lead commits `Cargo.lock`): tier scan
    (core, domain, project), `readAgentDefinition`, `resolveAgentDefinition`, render warnings, shadowing and hidden
    personas, YAML through `fgos-yaml-doc`.
 2. Addon entries; `agent-definitions.mjs` and `agent-listing.mjs` keep every export as calls; a vector file of tier

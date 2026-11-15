@@ -1,18 +1,18 @@
 ---
 phase: 6
-title: "`worktree create|remove` native (only if the owner answers Q1 = a)"
+title: "`worktree create|remove` native (only if the owner answers S23-Q1 = a)"
 status: pending
-effort: "3d if Q1 = a; 0.25d if Q1 = c (hand-off note only)"
+effort: "3d if S23-Q1 = a; 0.25d if S23-Q1 = b (hand-off note only)"
 wave: B
 step: S2
-blockedBy: [0, Q1]
+blockedBy: [0, S23-Q1]
 flipAfter: [1]
 ---
 
 # Phase 06: `worktree create|remove`
 
-**If Q1 = (c):** this phase only writes one line into the program plan's S6a row ("`worktree` verb, moved from S2 by
-owner answer Q1") and one into its S2 row; nothing else. Effort 0.25d. The rest of this file applies to Q1 = (a).
+**If S23-Q1 = (b):** this phase only writes one line into the program plan's S6a row ("`worktree` verb, moved from S2 by
+owner answer S23-Q1") and one into its S2 row; nothing else. Effort 0.25d. The rest of this file applies to S23-Q1 = (a).
 
 The Git part is already Rust (Worktree port, `packages/git/rust/src/worktree.rs:689, 705, 983`, addon class
 `GitWorktree`, `packages/git/node-addon/src/git/worktree.rs:13, 49`). What is Node: provisioning
@@ -36,8 +36,8 @@ Phase-lead rules: [plan.md](plan.md). Branch `rust-verb-migration-program/s2-p06
 ## Requirements
 
 1. Provisioning owner: a module in the Execution-side Rust crate 00 F12 names (candidate: `packages/run-supervisor/rust`,
-   linked by the host; the addon does not link it today, so adding it is a crate edge: stop and ask the step lead
-   with the Cargo diff before writing code). It owns `provision(worktree, repo_root, state_root, disposable)`,
+   linked by the host; the addon does not link it today, so adding it is a crate edge not in D10: stop and ask the step
+   lead with the Cargo diff before writing code; the step lead commits `Cargo.lock`). It owns `provision(worktree, repo_root, state_root, disposable)`,
    `set_aside` / `restore` / `discard`, the `worktree-provisioning.v1` record (unchanged format), `npm ci|install`
    through the process door, skill-root copies (links never followed, existing targets left alone).
 2. Node `provisionWorktree`, `provisionDependencies`, `provisionSkillRoots`, `removeProvisioned` become addon calls

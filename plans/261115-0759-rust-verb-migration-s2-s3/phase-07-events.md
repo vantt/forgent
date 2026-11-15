@@ -33,8 +33,12 @@ Phase-lead rules: [plan.md](plan.md). Branch `rust-verb-migration-program/s3-p07
   `process.execPath OWN_CLI ...`); host `spawn_sync_child` (`apps/fgos/src/invocation_doors.rs:116-123`, its own
   executable, recursion guard removed). Other `spawnDetachedCli` user: `src/workflow/case-start.mjs:26, 148` (not an
   `events` child: unchanged).
-- Doors already handle `event_store_child` (no triggers for a child) and, after 01, record a failed child as
-  `event-store-child`.
+- Doors already handle `event_store_child` (no triggers for a child); after 01 they record a failed child as
+  `event-store-child` with its message (01 requirement 4), and a root read never creates the state root (01 requirement 5).
+- Node's own classification of a child (`eventStoreChild`, `bin/fgos.mjs:4054, 4088, 4095, 4134`) serves only `events`
+  (no other verb declares children): dead once `events` is native.
+- Tests that spawn the Node CLI directly for a child: `test/event-store/background-seal.test.mjs:144-153`,
+  `test/event-store/triggers.test.mjs:235` (and its message check at 238-239).
 - Doctor pointer rows say "run `fgos events status`" (`src/setup/event-store-checks.mjs:79, 95-96`,
   `src/setup/registrations.mjs:3797`): text only, unchanged.
 
@@ -47,6 +51,9 @@ Phase-lead rules: [plan.md](plan.md). Branch `rust-verb-migration-program/s3-p07
    spelling of it); `NATIVE_SUBCOMMANDS` `("events", ["sync", "status", "seal", "export"])`; annotation; `native: true`.
    Outputs as Node's (00 F9): opportunistic sync returns `{ error }` or `{ skipped: "state root gone" }` the way
    `src/verbs/events/context.mjs` does; `seal` busy is `{ busy: true }` exit 0; validation refusals exit 4.
+   A child shape reads its repository facts in detached mode and never recreates a gone state root (Git spec §20;
+   Node `eventStoreContext(dir, { detached })`, `bin/fgos.mjs:143-154`, `readRepoFacts(cwd, { detached })`): a gone
+   state root answers `{ skipped: "state root gone" }`, as Node. A parity case removes the state root before the child runs.
 2. Node children through the host: `spawnDetachedCli` takes the executable to run (default unchanged for its other
    caller); `maintenance.mjs` starts `events sync` and `events seal` children with the host binary
    (`resolveHostBin`, `src/util/host-bin.mjs:17`), same argv, same cwd, recursion guard removed from the child env as the
@@ -57,9 +64,13 @@ Phase-lead rules: [plan.md](plan.md). Branch `rust-verb-migration-program/s3-p07
    `sync --opportunistic` (child shape; no trigger), `seal --stream work` (child shape), bad `--stream`, `--history`
    outside the cache, `export --out` with `--stream` and `--since`, `export` without `--out`, missing/unknown sub,
    flag-before-sub (`--remote status`).
-5. `test/event-store/triggers.test.mjs` proves the children: a Node-run store verb's end trigger starts a host
-   `events sync` child and a seal child; a child that fails is recorded `event-store-child` (the host's record now).
-6. Delete: `src/verbs/events/{sync,status,seal,export}.mjs`, the arm, `eventStoreContext`'s events-only part; the
+5. `test/event-store/triggers.test.mjs` and `background-seal.test.mjs` prove the children: a Node-run store verb's end
+   trigger starts a host `events sync` child and a seal child; a child that fails is recorded `event-store-child` with
+   its message (the host's record now, `triggers.test.mjs:238-239` unchanged); their direct `node bin/fgos.mjs events ...`
+   spawns become spawns of `FGOS_HOST_BIN`.
+6. Delete: `src/verbs/events/{sync,status,seal,export}.mjs` and their `manifest.files` entries, the arm,
+   `eventStoreContext`'s events-only part, Node's `eventStoreChild` detection and its `event-store-child` branch
+   (`bin/fgos.mjs:4054-4134`; the debt entry 01 put on the "classify a failed Event Store child" row goes); the
    `syncUseCase` import of `test/setup/event-store-checks.test.mjs:47, 61` (those cases call the host verb or the
    addon); `test/event-store/verbs.test.mjs` cases now owned by the crate or the host (names in the report).
 7. `doors` row "start a detached Event Store child": patterns `['"]events['"],\s*['"](?:sync|seal)['"]` and
@@ -74,7 +85,7 @@ Phase-lead rules: [plan.md](plan.md). Branch `rust-verb-migration-program/s3-p07
 |---|---|---|
 | status fields, sync / no-push, JSONL export, config merge (verbs.test.mjs, 11) | `test/event-store/verbs.test.mjs` | crate tests (`packages/event-store/rust/tests/`) for store behaviour; `wiring/events.rs` unit tests for the outcome shapes; `rebuild` cases stay in the Node file |
 | child shapes run no trigger; child failure recorded | `triggers.test.mjs:171-239` | `invocation_doors.rs` unit tests (01) + `triggers.test.mjs` (Node-started children, one wiring case each) |
-| seal child lifecycle | `background-seal.test.mjs` (7), `background-seal-confined.test.mjs` (1) | unchanged; they now see a host child |
+| seal child lifecycle | `background-seal.test.mjs` (7), `background-seal-confined.test.mjs` (1) | same files; direct child spawns now start the host |
 | doctor rows | `test/setup/event-store-checks.test.mjs` (12) | unchanged except the two `syncUseCase` calls |
 
 ## Files
@@ -82,7 +93,9 @@ Phase-lead rules: [plan.md](plan.md). Branch `rust-verb-migration-program/s3-p07
 - Create: `apps/fgos/src/wiring/events.rs`, `events.cases.mjs` (deleted by 12).
 - Modify: `apps/fgos/src/wiring/mod.rs`, host files per the recipe, `src/event-store/maintenance.mjs`,
   `src/util/spawn-detached-fgos.mjs`, `src/verbs/events/context.mjs` (only what `rebuild` keeps), `bin/fgos.mjs`,
-  `test/event-store/triggers.test.mjs`, `test/event-store/verbs.test.mjs`, `test/setup/event-store-checks.test.mjs`,
+  `apps/fgos/tests/cli_tests.rs` (one case: `events status` through the binary, no Node),
+  `test/event-store/triggers.test.mjs`, `test/event-store/background-seal.test.mjs`, `test/event-store/verbs.test.mjs`,
+  `test/setup/event-store-checks.test.mjs`,
   `test/distribution/source-payload.test.mjs` (only if it pins `OWN_CLI`'s use), `docs/architecture-manifest.json`, census.
 - Delete: `src/verbs/events/{sync,status,seal,export}.mjs`.
 

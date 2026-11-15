@@ -50,13 +50,15 @@ Phase-lead rules: [plan.md](plan.md). Branch `rust-verb-migration-program/s2-p02
 4. Parity table `test/rust-host/parity-cases/git.cases.mjs` (00's list): status in a clean repo, with a pending
    operation, a retained Land, a merge in progress, outside a repository; recover with nothing to do, with one
    interrupted Land (fresh fixture per entry, `fs-delta`), with a merge in progress; `--dir` to a linked worktree;
-   unknown sub; `--json` and none.
-5. Delete: the arm, the `readGitStatus`/`recoverGitOperations` import at `bin/fgos.mjs:102` if no other arm uses it,
-   its `ARM_STATIC_IMPORTS` line (`test/architecture.test.mjs:1665`), `test/cli/fgos-git.test.mjs` (4 cases).
+   unknown sub (Node's text `unknown git sub-verb "<x>". Usage: ...` becomes the host's generic one, an accepted
+   change); `--json` and none.
+5. Delete: the arm, the import at `bin/fgos.mjs:102` (no other arm uses it), its `ARM_STATIC_IMPORTS` line
+   (`test/architecture.test.mjs:1665`), `test/cli/fgos-git.test.mjs` (4 cases) and its `suite-baseline.json` row (27).
 6. `doors` row "compose Git status and recovery": patterns the two definitions in both languages
    (`export function (?:readGitStatus|recoverGitOperations)\b`, `fn (?:read_git_status|recover_git_operations)\b`);
-   allowed `packages/git/rust/src/incidents.rs`, `src/git/status.mjs` (reason: adapter for `init` and doctor, no
-   logic), `retiredBy: "S4: init and doctor move to the host"`. Negative case in the report: a copy of
+   allowed `packages/git/rust/src/incidents.rs`, `packages/git/node-addon/src/git.rs` (reason: carries the door; its
+   snake_case entries match the Rust pattern), `src/git/status.mjs` (reason: client for `init` and doctor, no logic),
+   `retiredBy: "S4: init and doctor move to the host"`. The row catches definitions by name only (say so in the report). Negative case in the report: a copy of
    `readGitStatus` in a scratch file fails the row.
 
 ## Test owners after the move
@@ -75,7 +77,7 @@ Phase-lead rules: [plan.md](plan.md). Branch `rust-verb-migration-program/s2-p02
   `packages/host-runtime/rust/src/catalog.rs`, `apps/fgos/src/{main.rs,cli_projector.rs,routing.rs}`,
   `command-route-annotations.json`, `src/cli/command-registry.mjs`, generated route files, `bin/fgos.mjs`,
   `test/architecture.test.mjs`, `test/git/status.test.mjs`, `docs/architecture-manifest.json`, `test/suite-baseline.json`
-  (only if `fgos-git.test.mjs` has a row), census, the integration branch's parity runner (`TABLES`).
+  (row 27), census, the integration branch's parity runner (`TABLES`).
 - Delete: `test/cli/fgos-git.test.mjs`.
 
 ## Gates
