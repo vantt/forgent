@@ -115,23 +115,23 @@ const START_UNSUPPORTED: &str = "gateway start is not available on this platform
 
 /// A refused gateway lifecycle call: the text the Node CLI printed, answered under the `validation` category.
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct GatewayControlError(String);
+pub struct GatewayRefusal(String);
 
-impl GatewayControlError {
+impl GatewayRefusal {
     fn new(message: impl Into<String>) -> Self {
         Self(message.into())
     }
 }
 
-impl std::fmt::Display for GatewayControlError {
+impl std::fmt::Display for GatewayRefusal {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.write_str(&self.0)
     }
 }
 
-impl std::error::Error for GatewayControlError {}
+impl std::error::Error for GatewayRefusal {}
 
-type Answer = Result<Value, GatewayControlError>;
+type Answer = Result<Value, GatewayRefusal>;
 
 // ---------------------------------------------------------------------------------------------------
 // The registry
@@ -162,13 +162,13 @@ fn is_entry(value: &Value) -> bool {
 
 /// A missing file is "not running" (a fresh project, or already stopped). A file that is there and does not
 /// parse fails closed: it is never overwritten over unknown state.
-fn read_registry(fgos_dir: &Path) -> Result<Option<Value>, GatewayControlError> {
+fn read_registry(fgos_dir: &Path) -> Result<Option<Value>, GatewayRefusal> {
     let path = registry_path(fgos_dir);
     let bytes = match std::fs::read(&path) {
         Ok(bytes) => bytes,
         Err(error) if error.kind() == std::io::ErrorKind::NotFound => return Ok(None),
         Err(error) => {
-            return Err(GatewayControlError::new(format!(
+            return Err(GatewayRefusal::new(format!(
                 "reading gateway.json at \"{}\" failed: {error}",
                 path.display()
             )))
@@ -176,7 +176,7 @@ fn read_registry(fgos_dir: &Path) -> Result<Option<Value>, GatewayControlError> 
     };
     let parsed =
         serde_json::from_str::<Value>(&String::from_utf8_lossy(&bytes)).map_err(|error| {
-            GatewayControlError::new(format!(
+            GatewayRefusal::new(format!(
                 "gateway.json at \"{}\" is corrupt (not valid JSON): {error}",
                 path.display()
             ))
@@ -185,17 +185,17 @@ fn read_registry(fgos_dir: &Path) -> Result<Option<Value>, GatewayControlError> 
 }
 
 /// Replaces the registry atomically (`Some`), or removes it (`None`).
-fn write_registry(fgos_dir: &Path, entry: Option<&Value>) -> Result<(), GatewayControlError> {
+fn write_registry(fgos_dir: &Path, entry: Option<&Value>) -> Result<(), GatewayRefusal> {
     let Some(entry) = entry else {
         return match std::fs::remove_file(registry_path(fgos_dir)) {
             Err(error) if error.kind() != std::io::ErrorKind::NotFound => {
-                Err(GatewayControlError::new(error.to_string()))
+                Err(GatewayRefusal::new(error.to_string()))
             }
             _ => Ok(()),
         };
     };
     let text = serde_json::to_string_pretty(entry)
-        .map_err(|error| GatewayControlError::new(error.to_string()))?;
+        .map_err(|error| GatewayRefusal::new(error.to_string()))?;
     fgos_durable_file::replace_durably_with_mode(
         fgos_dir,
         REGISTRY_FILE,
@@ -203,7 +203,7 @@ fn write_registry(fgos_dir: &Path, entry: Option<&Value>) -> Result<(), GatewayC
         0o644,
     )
     .map(drop)
-    .map_err(|error| GatewayControlError::new(error.to_string()))
+    .map_err(|error| GatewayRefusal::new(error.to_string()))
 }
 
 /// The identity tuple of an entry: its `record`, or, for an old entry written before identities were
@@ -239,15 +239,15 @@ fn lock_path(fgos_dir: &Path) -> PathBuf {
 pub fn acquire_gateway_lock(
     fgos_dir: &Path,
     timeout_ms: u64,
-) -> Result<GatewayLock, GatewayControlError> {
+) -> Result<GatewayLock, GatewayRefusal> {
     let fgos_dir = std::path::absolute(fgos_dir).map_err(|error| {
-        GatewayControlError::new(format!(
+        GatewayRefusal::new(format!(
             "resolving \"{}\" failed: {error}",
             fgos_dir.display()
         ))
     })?;
-    let mut scope = LockScope::seeded(Vec::new())
-        .map_err(|error| GatewayControlError::new(error.to_string()))?;
+    let mut scope =
+        LockScope::seeded(Vec::new()).map_err(|error| GatewayRefusal::new(error.to_string()))?;
     let params = BTreeMap::from([(
         "fgosDir".to_owned(),
         fgos_dir.to_string_lossy().into_owned(),
@@ -258,11 +258,11 @@ pub fn acquire_gateway_lock(
     match acquired {
         Ok(()) => Ok(GatewayLock { _scope: scope }),
         Err(ScopeError::Acquire(answer)) => Err(not_acquired(&fgos_dir, timeout_ms, *answer)),
-        Err(other) => Err(GatewayControlError::new(other.to_string())),
+        Err(other) => Err(GatewayRefusal::new(other.to_string())),
     }
 }
 
-fn not_acquired(fgos_dir: &Path, timeout_ms: u64, answer: Acquire) -> GatewayControlError {
+fn not_acquired(fgos_dir: &Path, timeout_ms: u64, answer: Acquire) -> GatewayRefusal {
     let path = lock_path(fgos_dir);
     match answer {
         Acquire::Timeout { .. } => {
@@ -270,21 +270,21 @@ fn not_acquired(fgos_dir: &Path, timeout_ms: u64, answer: Acquire) -> GatewayCon
                 Ok(HoldersList::List(holders)) => holders.first().map(|h| h.pid),
                 _ => None,
             };
-            GatewayControlError::new(format!(
+            GatewayRefusal::new(format!(
                 "timed out acquiring gateway.lock at \"{}\" after {timeout_ms}ms{}",
                 path.display(),
                 holder.map_or(String::new(), |pid| format!(" (held by pid {pid})"))
             ))
         }
-        Acquire::Held { reason, .. } => GatewayControlError::new(format!(
+        Acquire::Held { reason, .. } => GatewayRefusal::new(format!(
             "lock-predecessor-domain-not-empty: gateway: the previous holder's domain is still not empty ({})",
             reason.as_str()
         )),
-        Acquire::Unavailable { reason, detail } => GatewayControlError::new(format!(
+        Acquire::Unavailable { reason, detail } => GatewayRefusal::new(format!(
             "lock-driver-unavailable: {}: {detail}",
             reason.as_str()
         )),
-        Acquire::Acquired(_) => GatewayControlError::new("the gateway lock was acquired twice"),
+        Acquire::Acquired(_) => GatewayRefusal::new("the gateway lock was acquired twice"),
     }
 }
 
@@ -333,7 +333,7 @@ enum Sent {
 }
 
 /// Sends `signal` to the recorded gateway only while it is still that process.
-fn signal_gateway(entry: &Value, signal: Signal) -> Result<Sent, GatewayControlError> {
+fn signal_gateway(entry: &Value, signal: Signal) -> Result<Sent, GatewayRefusal> {
     let outcome = match tuple_of(&record_of(entry)) {
         Some(tuple) => signal_by_identity(&tuple, signal),
         None => SignalOutcome::IdentityUnknown,
@@ -351,7 +351,7 @@ fn signal_gateway(entry: &Value, signal: Signal) -> Result<Sent, GatewayControlE
         Signal::Kill => "kill",
         Signal::Int => "int",
     };
-    Err(GatewayControlError::new(format!(
+    Err(GatewayRefusal::new(format!(
         "sending {name} to gateway pid {} failed: {refused}",
         js_text(entry.get("pid"))
     )))
@@ -375,8 +375,8 @@ fn wait_until_dead_or_deadline(entry: &Value, deadline: Instant) -> Verdict {
 /// What `start` needs from its caller: the release build of the crate at the directory it names (the binary
 /// lands at `release_binary_path`), and the port the gateway binds.
 pub struct StartParts<'a> {
-    pub build: &'a dyn Fn(&Path) -> Result<(), GatewayControlError>,
-    pub port: &'a dyn Fn() -> Result<u64, GatewayControlError>,
+    pub build: &'a dyn Fn(&Path) -> Result<(), GatewayRefusal>,
+    pub port: &'a dyn Fn() -> Result<u64, GatewayRefusal>,
     /// How long the spawned gateway has to print `listening on`.
     pub startup_timeout: Duration,
 }
@@ -408,9 +408,9 @@ fn cargo_build_command(gateway_dir: &Path) -> std::process::Command {
 }
 
 /// Runs a build command to its end: a refusal carries cargo's own stderr.
-fn run_build(command: &mut std::process::Command) -> Result<(), GatewayControlError> {
+fn run_build(command: &mut std::process::Command) -> Result<(), GatewayRefusal> {
     let output = command.output().map_err(|error| {
-        GatewayControlError::new(format!(
+        GatewayRefusal::new(format!(
             "building the release binary failed: could not run {}: {error}",
             command.get_program().to_string_lossy()
         ))
@@ -418,32 +418,32 @@ fn run_build(command: &mut std::process::Command) -> Result<(), GatewayControlEr
     if output.status.success() {
         return Ok(());
     }
-    Err(GatewayControlError::new(format!(
+    Err(GatewayRefusal::new(format!(
         "building the release binary failed: {}",
         String::from_utf8_lossy(&output.stderr)
     )))
 }
 
 /// Builds the release binary of the crate at `gateway_dir` (the answer of the `build` part of a `start`).
-pub fn build_release(gateway_dir: &Path) -> Result<(), GatewayControlError> {
+pub fn build_release(gateway_dir: &Path) -> Result<(), GatewayRefusal> {
     run_build(&mut cargo_build_command(gateway_dir))
 }
 
 /// The port the gateway would bind, read from the machine config the gateway itself reads (`gateway.port` of
 /// the effective machine view). A machine config the door refuses names the documented default, never a guess.
-pub fn configured_port() -> Result<u64, GatewayControlError> {
+pub fn configured_port() -> Result<u64, GatewayRefusal> {
     let lookup = |key: &str| std::env::var(key).ok();
     let global = machine::global_dir(lookup)
-        .ok_or_else(|| GatewayControlError::new(machine::home_unset_message()))?;
-    let context = machine::context(&NoDetectors)
-        .map_err(|error| GatewayControlError::new(error.to_string()))?;
+        .ok_or_else(|| GatewayRefusal::new(machine::home_unset_message()))?;
+    let context =
+        machine::context(&NoDetectors).map_err(|error| GatewayRefusal::new(error.to_string()))?;
     match machine::snapshot(&context, &global, session_class(lookup)) {
         Ok(snapshot) => Ok(snapshot.value["gateway"]["port"]
             .as_u64()
             .filter(|port| *port > 0)
             .unwrap_or(DEFAULT_PORT)),
         Err(SnapshotError::Refused(_)) => Ok(DEFAULT_PORT),
-        Err(SnapshotError::Io(error)) => Err(GatewayControlError::new(format!(
+        Err(SnapshotError::Io(error)) => Err(GatewayRefusal::new(format!(
             "reading the machine config failed: {error}"
         ))),
     }
@@ -493,20 +493,20 @@ fn stop_unregistered(record: &Value) {
 /// Returns the registry entry it wrote once the log shows the gateway serving.
 pub fn start_gateway(repo_root: &Path, fgos_dir: &Path, parts: &StartParts) -> Answer {
     if !cfg!(unix) {
-        return Err(GatewayControlError::new(START_UNSUPPORTED));
+        return Err(GatewayRefusal::new(START_UNSUPPORTED));
     }
     let _lock = acquire_gateway_lock(fgos_dir, LOCK_TIMEOUT_MS)?;
     if let Some(existing) = read_registry(fgos_dir)? {
         let pid = js_text(existing.get("pid"));
         match judge_entry(&existing) {
             Verdict::Unknown => {
-                return Err(GatewayControlError::new(format!(
+                return Err(GatewayRefusal::new(format!(
                     "gateway-start-identity-unknown: the registry names pid {pid} without a verifiable identity; confirm it is not a gateway, then delete {}",
                     registry_path(fgos_dir).display()
                 )))
             }
             Verdict::Alive => {
-                return Err(GatewayControlError::new(format!(
+                return Err(GatewayRefusal::new(format!(
                     "gateway is already running (pid {pid}, port {}) — stop it first with \"fgos gateway stop\" if you meant to restart it",
                     js_text(existing.get("port"))
                 )))
@@ -516,7 +516,7 @@ pub fn start_gateway(repo_root: &Path, fgos_dir: &Path, parts: &StartParts) -> A
     }
     let gateway_dir = gateway_crate_dir(repo_root);
     if !gateway_dir.exists() {
-        return Err(GatewayControlError::new(format!(
+        return Err(GatewayRefusal::new(format!(
             "no apps/fgos-gateway/ directory found at \"{}\" — this repo has no gateway to start",
             gateway_dir.display()
         )));
@@ -524,7 +524,7 @@ pub fn start_gateway(repo_root: &Path, fgos_dir: &Path, parts: &StartParts) -> A
     (parts.build)(&gateway_dir)?;
     let binary = release_binary_path(&gateway_dir);
     if !binary.exists() {
-        return Err(GatewayControlError::new(format!(
+        return Err(GatewayRefusal::new(format!(
             "cargo build reported success but no binary was found at \"{}\"",
             binary.display()
         )));
@@ -533,7 +533,7 @@ pub fn start_gateway(repo_root: &Path, fgos_dir: &Path, parts: &StartParts) -> A
 
     let logs_dir = fgos_dir.join("logs");
     std::fs::create_dir_all(&logs_dir).map_err(|error| {
-        GatewayControlError::new(format!(
+        GatewayRefusal::new(format!(
             "creating \"{}\" failed: {error}",
             logs_dir.display()
         ))
@@ -544,7 +544,7 @@ pub fn start_gateway(repo_root: &Path, fgos_dir: &Path, parts: &StartParts) -> A
         .map_or(0, |elapsed| elapsed.as_millis());
     let log_path = logs_dir.join(format!("gateway-{millis}-{}.log", std::process::id()));
     let pid = spawn_gateway(&binary, &gateway_dir, &log_path).map_err(|error| {
-        GatewayControlError::new(format!(
+        GatewayRefusal::new(format!(
             "starting \"{}\" failed: {error}; see \"{}\"",
             binary.display(),
             log_path.display()
@@ -561,7 +561,7 @@ pub fn start_gateway(repo_root: &Path, fgos_dir: &Path, parts: &StartParts) -> A
                 UnreadableCause::Permission => "permission",
                 UnreadableCause::Timeout => "timeout",
             };
-            return Err(GatewayControlError::new(format!(
+            return Err(GatewayRefusal::new(format!(
                 "gateway-start-identity-unreadable: pid {pid} cannot be observed ({cause}); see \"{}\"",
                 log_path.display()
             )));
@@ -589,7 +589,7 @@ pub fn start_gateway(repo_root: &Path, fgos_dir: &Path, parts: &StartParts) -> A
             .as_ref()
             .is_some_and(|record| facts::judge_here(&Record::from_json(record)) == Verdict::Alive);
         if !alive {
-            return Err(GatewayControlError::new(format!(
+            return Err(GatewayRefusal::new(format!(
                 "gateway process exited immediately after starting — see \"{}\" for the real error:\n{}",
                 log_path.display(),
                 log_tail(&log_path)
@@ -604,7 +604,7 @@ pub fn start_gateway(repo_root: &Path, fgos_dir: &Path, parts: &StartParts) -> A
             if let Some(record) = &record {
                 stop_unregistered(record);
             }
-            return Err(GatewayControlError::new(format!(
+            return Err(GatewayRefusal::new(format!(
                 "gateway did not report \"{LISTENING_MARKER}\" within {}ms — see \"{}\"",
                 parts.startup_timeout.as_millis(),
                 log_path.display()
@@ -654,7 +654,7 @@ fn stop_locked(fgos_dir: &Path) -> Answer {
         return Ok(with_pid(json!({ "alreadyStopped": true }), pid));
     }
     if first == Verdict::Unknown {
-        return Err(GatewayControlError::new(format!(
+        return Err(GatewayRefusal::new(format!(
             "gateway-stop-identity-unknown: the registry names pid {} without a verifiable identity; nothing was signalled. Confirm it is not a gateway, then delete {}",
             js_text(pid),
             registry_path(fgos_dir).display()
@@ -665,7 +665,7 @@ fn stop_locked(fgos_dir: &Path) -> Answer {
     // Each signal gets its own full window: a signal never takes effect instantly, and judging only once
     // right after KILL would treat a brief kernel delay as "alive forever". Only a dead verdict clears the
     // registry.
-    let settle = |signal: Signal| -> Result<Verdict, GatewayControlError> {
+    let settle = |signal: Signal| -> Result<Verdict, GatewayRefusal> {
         Ok(match signal_gateway(&entry, signal)? {
             Sent::Unsupported => Verdict::Alive,
             Sent::Gone => judge_entry(&entry),
@@ -677,12 +677,12 @@ fn stop_locked(fgos_dir: &Path) -> Answer {
         verdict = settle(Signal::Kill)?;
     }
     match verdict {
-        Verdict::Unknown => Err(GatewayControlError::new(format!(
+        Verdict::Unknown => Err(GatewayRefusal::new(format!(
             "gateway-stop-unresolved: pid {} can no longer be judged after the signal; see {log_path}, then delete {} once it is gone",
             js_text(pid),
             registry_path(fgos_dir).display()
         ))),
-        Verdict::Alive => Err(GatewayControlError::new(format!(
+        Verdict::Alive => Err(GatewayRefusal::new(format!(
             "gateway-stop-failed: pid {} survived SIGKILL; see {log_path}",
             js_text(pid)
         ))),
@@ -872,7 +872,7 @@ fn serve(request: &GatewayRequest, lifecycle: &dyn Lifecycle) -> Answer {
             return match request.sub {
                 Sub::Status => Ok(not_running()),
                 Sub::Stop => Ok(json!({ "alreadyStopped": true })),
-                Sub::Start => Err(GatewayControlError::new(why.clone())),
+                Sub::Start => Err(GatewayRefusal::new(why.clone())),
             }
         }
     };
@@ -1269,7 +1269,7 @@ mod tests {
     }
 
     /// A build that has nothing to do: the binary is already where a build leaves it.
-    fn built(_: &Path) -> Result<(), GatewayControlError> {
+    fn built(_: &Path) -> Result<(), GatewayRefusal> {
         Ok(())
     }
 
@@ -1471,7 +1471,7 @@ mod tests {
         let root = scratch();
         stub_gateway(&root, "echo 'listening on 127.0.0.1:4170'\nexec sleep 600");
         let builds = AtomicUsize::new(0);
-        let build = |_: &Path| -> Result<(), GatewayControlError> {
+        let build = |_: &Path| -> Result<(), GatewayRefusal> {
             builds.fetch_add(1, Ordering::SeqCst);
             Ok(())
         };

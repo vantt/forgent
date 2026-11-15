@@ -719,12 +719,18 @@ impl<'a> Context<'a> {
         if real == base || !real.starts_with(&base) {
             return Err(outside());
         }
+        // The project's own repository must resolve: two unresolvable directories are never "the same one".
+        let project_common = std::fs::canonicalize(project.common_dir()).map_err(|error| {
+            format!(
+                "the project repository \"{}\" cannot be resolved ({error}); refusing to touch \"{}\"",
+                project.common_dir().display(),
+                worktree.display()
+            )
+        })?;
         let driver = self.driver().map_err(|fault| fault.message().to_owned())?;
         let belongs = match driver.resolve_repo(&real, &real) {
-            Ok(ResolveRepo::Repository(repo)) => {
-                std::fs::canonicalize(repo.common_dir()).ok()
-                    == std::fs::canonicalize(project.common_dir()).ok()
-            }
+            Ok(ResolveRepo::Repository(repo)) => std::fs::canonicalize(repo.common_dir())
+                .is_ok_and(|common| common == project_common),
             _ => false,
         };
         if belongs {
@@ -1823,6 +1829,28 @@ mod tests {
         );
         assert!(git(&other, &["worktree", "list", "--porcelain"]).contains("foreign"));
         assert_eq!(fixture.list().len(), 2, "both rows stay");
+    }
+
+    #[test]
+    fn a_project_repository_that_cannot_be_resolved_never_claims_a_checkout() {
+        let fixture = Fixture::new();
+        let worktree = worktree_of(&fixture.start().unwrap());
+        let context = fixture.context();
+        let driver = context.driver().unwrap();
+        let project = context.open(&driver, &fixture.repo).unwrap().unwrap();
+        assert!(
+            context
+                .require_session_checkout(&project, &worktree)
+                .is_ok(),
+            "a checkout of the project passes while the repository resolves"
+        );
+        // With the repository gone, neither side resolves: that must not read as "the same repository".
+        let hidden = fixture.root.join("hidden-common-dir");
+        std::fs::rename(project.common_dir(), &hidden).unwrap();
+        let text = context
+            .require_session_checkout(&project, &worktree)
+            .unwrap_err();
+        assert!(text.contains("cannot be resolved"), "{text}");
     }
 
     #[test]
