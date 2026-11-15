@@ -69,7 +69,6 @@ export const MANIFEST = [
   { id: 'state-priority-formula', status: 'shadow', pattern: 'src/state/priority-formula.mjs', directTests: ['test/state/priority-formula.test.mjs'], boundaryTests: [] },
   { id: 'state-retro-pool', status: 'shadow', pattern: 'src/state/retro-pool.mjs', directTests: ['test/state/retro-pool.test.mjs'], boundaryTests: [] },
   { id: 'state-retrospective-doors', status: 'shadow', pattern: 'src/state/retrospective-doors.mjs', directTests: ['test/state/retrospective-doors.test.mjs'], boundaryTests: [] },
-  { id: 'state-tool-registry', status: 'shadow', pattern: 'src/state/tool-registry.mjs', directTests: ['test/state/tool-registry.test.mjs'], boundaryTests: [] },
 
   { id: 'verbs-state-edit', status: 'shadow', pattern: 'src/verbs/state/edit.mjs', directTests: ['test/direct/fgos-edit.test.mjs'], boundaryTests: [] },
   { id: 'verbs-state-read', status: 'shadow', pattern: 'src/verbs/state/read.mjs', directTests: ['test/direct/fgos-read.test.mjs'], boundaryTests: [] },

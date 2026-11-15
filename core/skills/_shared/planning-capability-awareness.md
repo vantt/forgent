@@ -60,7 +60,7 @@ A static harness or lint (`plan-lint`) reads these declared units and verifies t
   names, no paraphrase).
 - Nothing about which provider, model, tier, or executor will carry it
   out. `prefer`/executor selection is a live-config/execution-time
-  concern (`resolveExecutorAndOverrides`, `decide`), never a plan
+  concern (Seat Binding through `decide`), never a plan
   artifact — a plan that pins an executor has leaked an execution-time
   decision into a planning-time document.
 - A unit whose capability is not yet registered gets flagged as

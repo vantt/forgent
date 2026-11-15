@@ -3,7 +3,7 @@
 # terminal-control port (attach, then label). Chrome-only (D2,
 # docs/history/fgos-terminal-pane-rename/CONTEXT.md): never touches .fgos/
 # state, never blocks the caller. Any missing precondition -- including the
-# pane-labeling capability not being registered at all -- is a silent no-op,
+# pane-labeling capability having no provider here -- is a silent no-op,
 # exit 0.
 #
 # Usage: rename.sh <task-id> <project-root> [<title>]
@@ -23,28 +23,27 @@ title="${3:-}"
 
 # Capability gate (D5, docs/history/orchestrator-worker-slots/DISCUSSION.md
 # §6 "Nhãn: session tự đặt qua helper skill có gate"). Pane labeling is an
-# adapter-swappable capability declared through the tool registry:
+# adapter-swappable capability, served by a tool executor that declares it in
+# `for` (here `runner.executors.herdr`):
 #
-#   fgos tool register --name herdr --kind cli --capability pane-labeling \
-#     --command herdr
+#   fgos dispatch decide --for pane-labeling --json
 #
-# Zero registered providers means this environment has no pane-label concept
-# at all, so labeling is skipped silently -- the same shape this script
-# already had outside a herdr pane, never a failure ("absent capability =
-# clean skip", src/state/tool-registry.mjs's own header). Swapping herdr for
-# tmux/cmux later means registering a different provider here, not editing
-# every caller: this query is the hexagon seam, and it sits ahead of the
-# herdr-specific guards below precisely so those guards read as one
-# adapter's implementation detail rather than as the gate itself.
+# The answer is `"mechanism": "in-process"` only when such a provider is
+# declared and found on this machine right now (the tool is probed live on
+# every call). No provider, or one that is not there, means this environment
+# has no pane-label concept at all, so labeling is skipped silently -- the same
+# shape this script already had outside a herdr pane, never a failure ("absent
+# capability = clean skip"). Swapping herdr for tmux/cmux later means
+# declaring a different provider, not editing every caller: this query is the
+# hexagon seam, and it sits ahead of the herdr-specific guards below precisely
+# so those guards read as one adapter's implementation detail rather than as
+# the gate itself. The adapter guards below then answer "and is it usable right
+# now", which for herdr is a strictly sharper question than a PATH probe --
+# herdr being installed says nothing about this session running inside one of
+# its panes.
 #
-# Gated on REGISTERED, not on `--status present`: `present` only becomes true
-# once someone has run `fgos tool check` on this machine (bin/fgos.mjs's
-# `tool query`, resolvedStatus), so gating on it would switch labeling off on
-# every fresh clone with no signal. The registry answers "does this
-# environment have the concept"; the adapter guards below answer "and is it
-# usable right now", which for herdr is a strictly sharper question than a
-# PATH probe -- herdr being installed says nothing about this session running
-# inside one of its panes.
+# `decide` reads the config of the directory it runs in, so the query runs
+# from <project-root>.
 #
 # Any failure to answer the question at all -- no <project-root>, no
 # .fgos/installation/bin/fgos or bin/fgos.mjs there, node missing, CLI error --
@@ -53,11 +52,11 @@ title="${3:-}"
 # that it is present.
 [ -n "$project_root" ] || exit 0
 if [ -x "$project_root/.fgos/installation/bin/fgos" ]; then
-  "$project_root/.fgos/installation/bin/fgos" tool query --capability pane-labeling --dir "$project_root" 2>/dev/null \
-    | grep -q '"capability" *: *"pane-labeling"' || exit 0
+  ( cd "$project_root" && "$project_root/.fgos/installation/bin/fgos" dispatch decide --for pane-labeling --json 2>/dev/null ) \
+    | grep -q '"mechanism" *: *"in-process"' || exit 0
 elif [ -f "$project_root/bin/fgos.mjs" ]; then
-  node "$project_root/bin/fgos.mjs" tool query --capability pane-labeling --dir "$project_root" 2>/dev/null \
-    | grep -q '"capability" *: *"pane-labeling"' || exit 0
+  ( cd "$project_root" && node "$project_root/bin/fgos.mjs" dispatch decide --for pane-labeling --json 2>/dev/null ) \
+    | grep -q '"mechanism" *: *"in-process"' || exit 0
 else
   exit 0
 fi

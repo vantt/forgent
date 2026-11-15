@@ -8,6 +8,9 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { machineHome, writeProjectConfig, writeRawProjectConfig } from '../helpers/config-fixture.mjs';
 import { runHook, normalizeHookPayload } from '../../src/runner/hook.mjs';
+import { seedStubAgentClis } from '../helpers/agent-clis.mjs';
+
+seedStubAgentClis('agy');
 
 // The verdict of the Agent/Task guard, judged in-process: one fixture table run for each payload format (the
 // standard one of Claude Code and Codex, and agy's), because both must answer alike. Real configs on real git
@@ -36,10 +39,19 @@ const IN_PROCESS_CONFIG = {
   defaults: { tier: 'standard' },
   timeoutMs: 5000,
 };
+// A capability row whose pool holds one agent executor Seat Binding can place, and which a call cannot run in-process.
 const OUT_OF_PROCESS_CONFIG = {
   ...IN_PROCESS_CONFIG,
-  capabilities: { blocked: { prefer: 'tool-only' } },
-  executors: { 'tool-only': { kind: 'tool', command: 'agy', args: ['{prompt}'], allowCrossProvider: true } },
+  modelPolicies: { claude: { standard: 'sonnet' }, gemini: { standard: 'gemini-flash' } },
+  capabilities: { blocked: { prefer: 'agy' } },
+  executors: { agy: { kind: 'agent', providerModel: 'gemini', command: 'agy', args: ['{prompt}'], allowCrossProvider: true } },
+};
+// A capability row with its own executor pool whose only executor Seat Binding cannot place: its CLI is not installed.
+const UNBINDABLE_POOL_CONFIG = {
+  ...IN_PROCESS_CONFIG,
+  modelPolicies: OUT_OF_PROCESS_CONFIG.modelPolicies,
+  capabilities: { judge: { prefer: 'absent' } },
+  executors: { absent: { kind: 'agent', providerModel: 'gemini', command: 'fgos-test-cli-that-is-not-installed', args: ['{prompt}'], allowCrossProvider: true } },
 };
 
 /** The payload each format sends for a tool call; `stray` is a cwd the payload claims, which no verdict may read. */
@@ -87,15 +99,24 @@ for (const name of Object.keys(FORMATS)) {
     assert.equal((await judge(name, repo, 'Task', {})).blocked, false);
   });
 
-  test(`dispatch-decide hook, ${name} format: a call that resolves to a registered out-of-process executor is blocked with a door fgos run accepts`, async () => {
+  test(`dispatch-decide hook, ${name} format: a call that resolves to an out-of-process executor is blocked with a door fgos run accepts`, async () => {
     const repo = mkTempGitRepo();
     writeRunnerConfigFixture(repo, OUT_OF_PROCESS_CONFIG);
     const { blocked, text } = await judge(name, repo, 'Agent', { subagent_type: 'blocked' });
     assert.equal(blocked, true);
     assert.match(text, /BLOCKED/);
-    assert.match(text, /fgos run "<prompt>" --capability blocked/);
-    assert.match(text, /"tool-only" is a tool executor/);
-    assert.doesNotMatch(text, /--provider tool-only|dispatch execute|dispatch\.mjs execute/);
+    assert.match(text, /resolves to out-of-process dispatch/);
+    assert.match(text, /fgos run "<prompt>" --provider agy --capability blocked/);
+    assert.doesNotMatch(text, /dispatch execute|dispatch\.mjs execute/);
+  });
+
+  test(`dispatch-decide hook, ${name} format: a call whose capability pool cannot be bound blocks with the refusal, not as out-of-process`, async () => {
+    const repo = mkTempGitRepo();
+    writeRunnerConfigFixture(repo, UNBINDABLE_POOL_CONFIG);
+    const { blocked, text } = await judge(name, repo, 'Agent', { subagent_type: 'judge' });
+    assert.equal(blocked, true);
+    assert.match(text, /decide answered unavailable for it \(cli-missing: executor "absent"/);
+    assert.doesNotMatch(text, /out-of-process|fgos run/);
   });
 
   test(`dispatch-decide hook, ${name} format: a payload cwd of /tmp, a missing path or the home directory is judged against the project, which blocks`, async () => {

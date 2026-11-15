@@ -58,12 +58,11 @@ Query `CLAUDE.md`'s impact-analysis capability gate — the same check
 `fgos-coding-planning`/`fgos-coding-validating`/`fgos-coding-implement`
 already run — rather than assuming GitNexus is on this machine. This
 session's own gate query here never inherits a wider grant a dispatched
-subprocess judge might carry, so check fresh regardless. The `tool`
-sub-verb `query` requires an existing store, so run it with `--dir`
-explicitly the same as every other bare verb this skill calls:
+subprocess judge might carry, so check fresh regardless. `decide` probes
+the tool live and answers the way a dispatch would:
 
 ```bash
-fgos tool query --capability impact-analysis --status present
+fgos dispatch decide --for impact-analysis --json
 ```
 
 Fold the result into `CLAUDE.md`'s three-way framing

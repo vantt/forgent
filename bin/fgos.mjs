@@ -44,7 +44,6 @@ import { runFourDoorChecks } from '../src/state/retrospective-doors.mjs';
 import { findAuthoritativeMatch, findDuplicateAuthoritativeClaims } from '../src/report/authoritative-match.mjs';
 import { checkVerifyForC4 } from '../src/intake/verify-pattern-check.mjs';
 import { describeYamlError, readFrontmatter, YamlParseError } from '../src/util/yaml.mjs';
-import { checkTools, queryTools } from '../src/state/tool-registry.mjs';
 import { EventLogError } from '../src/state/event-log.mjs';
 import { foldEvents, conflictsFor } from '../src/state/replay.mjs';
 import { deriveTitle, classify } from '../src/intake/classify.mjs';
@@ -3619,18 +3618,6 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       throw new StoreError('validation', `unknown goal sub-verb "${sub}". Usage: fgos goal <set|show> ...`);
     }
 
-    // Tool registry (tsk-1dj, ported from repository-harness's
-    // tool-registry-capability per docs/distillery/deep-dives/
-    // tool-registry.md; tsk-in1-1 D1: `register`/`remove` retired — a tool
-    // provider is now declared directly in `runner.executors.<id>`
-    // (`.fgos/config.json`), config-edited like every other executor, never
-    // through the event log): `check` writes ONLY the local, gitignored
-    // status overlay (tool-registry.mjs's readLocalStatus/writeLocalStatus)
-    // — never an event, per CONTEXT.md's pinned "registered vs present"
-    // term, and it always succeeds even when every probed tool comes back
-    // missing (absent capability is a fact to report, never a CLI error);
-    // `query` merges the two (config-declared tools + local overlay) at
-    // read time.
     // Read-only listing of the personas a `--seats "@name"` seat can name; a pure read of the
     // three definition tiers (src/runner/agent-listing.mjs), no store and no event.
     case 'agents': {
@@ -3639,21 +3626,6 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       const { resolveGitRoots } = await import('../src/runner/execution/run.mjs');
       const projectRoot = typeof flags.worktree === 'string' ? path.resolve(flags.worktree) : resolveGitRoots(process.cwd()).worktreeRoot;
       return { projectRoot, ...listAgents({ projectRoot }) };
-    }
-    case 'tool': {
-      const sub = requireSubVerb('tool', positional);
-      const repoRoot = path.dirname(dir);
-      const { executors } = loadRunnerConfigForDir(repoRoot);
-      if (sub === 'check') {
-        return checkTools({ executors, dir, repoRoot, name: optionalField(flags.name, 'tool check --name requires a non-empty value.') });
-      }
-      // `query`: requireSubVerb admitted only the registry's two sub-verbs.
-      return queryTools({
-        executors,
-        dir,
-        capability: optionalField(flags.capability, 'tool query --capability requires a non-empty value.'),
-        status: optionalField(flags.status, 'tool query --status requires a non-empty value.'),
-      });
     }
 
     // Do-and-announce shell-integration + config bootstrap (str87-fgos-setup-doctor

@@ -154,11 +154,9 @@
   ],
   "test/runner/dispatch.test.mjs": [
     "test('buildPrompt omitting stage defaults to \"executing\", byte-identical to every pre-tsk-5mj call', () => {",
-    "test('EXECUTOR_KINDS reuses tool-registry\\'s KINDS verbatim plus \"task\" (D2) — never a separate vocabulary', () => {",
     "test('loadRunnerConfig accepts a config with no \"executors\" block at all — pre-tsk-62v shape, unchanged', () => {",
     "test('the committed .fgos/config.json runner section no longer declares a coding-classify-intake executor (tsk-49u): tsk-4ns already stripped its only consumer (fgos-submit-assist\\'s dispatch-fallback branch), leaving the config entry orphaned, so it was removed via the same ADR0020 hand-commit-to-main path its own rename (tsk-3fj) originally used', () => {",
     "test('the committed .fgos/config.json runner section declares the gather executor (tsk-28o): for \"gather\", needs \"prompt-completion\", carries \"repo-content\" (D1, gather-executor-purpose-binding CONTEXT.md), kind cli, allowCrossProvider true, well-formed {prompt}/{model} args', () => {",
-    "test('detectAssistantCli delegates to tool-registry.mjs\\'s shared findExecutableOnPath (D5) — same result, one implementation', () => {",
     "test('resolveExecutorCommand: attestRoot, when given, is read INSTEAD of fgosDir\\'s own root (tsk-4hl fix)', () => {",
     "test('resolveExecutorCommand still skips both the presence check and the cross-provider check for a kind:\"task\" executor, even unregistered and non-Claude-shaped (D13: kind !== \"task\" excludes task by construction)', () => {",
     "test('decideExecutorCli omits agentType entirely for a kind:\"cli\" executor that declares none (tsk-3ik-3)', async () => {",
@@ -320,9 +318,6 @@
   "test/state/store.test.mjs": [
     "test('editWork patch { parent: null } clears an existing parent (edit --parent \"\" clear semantics, D2)', () => {",
     "test('concurrent editWork calls on DIFFERENT ids never lose a write to state.json (tsk-1q5)', async () => {"
-  ],
-  "test/state/tool-registry.test.mjs": [
-    "test('probeTool on kind mcp/skill resolves \"stale\" when scanTarget/meta.json lastCommit is behind repoRoot\\'s current git HEAD, \"present\" when it matches (tsk-j7y)', async () => {"
   ],
   "test/state/work.test.mjs": [
     "test('STAGES includes \"decompose\" between clarify and executing — compound-learn is retired (D11); \"discovery\"/\"exploring\" now sit between clarify and decompose (tsk-1w7 D10)', () => {",

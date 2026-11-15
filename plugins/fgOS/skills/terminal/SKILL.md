@@ -4,9 +4,9 @@ description: >-
   Use when a Claude Code session working an fgOS item should label its
   own herdr pane with the claimed task id and session identities, from
   inside a Claude Code session, invoked as /fgOS:terminal <task-id>.
-  Gated on a registered pane-labeling capability and herdr-only today
+  Gated on a live pane-labeling provider and herdr-only today
   (chrome, per STR40): never writes .fgos/ state, never blocks the caller
-  when no provider is registered, herdr isn't present, or a session id
+  when no provider is present, herdr isn't present, or a session id
   can't be resolved.
   Examples: "/fgOS:terminal tsk-62x", "rename my herdr pane for this
   task".
@@ -36,22 +36,24 @@ gated on a declared **`pane-labeling`** capability rather than assuming
 herdr (D5,
 `docs/history/orchestrator-worker-slots/DISCUSSION.md` §6 "Nhãn: session
 tự đặt qua helper skill có gate"). The capability is declared through the
-tool registry that already exists — no new mechanism. This project's own
-`.fgos/config.json` already carries it, as a `runner.executors.herdr`
-entry (tsk-in1-1 D1: config-declared, not a CLI verb):
+tool executor that serves it: a `kind: "tool"` entry under `runner.executors`
+names the capability in `for`, and `fgos dispatch decide --for pane-labeling`
+probes it on this machine every time it is asked. This project's own
+`.fgos/config.yaml` already carries it, as the `runner.executors.herdr`
+entry (config-declared, not a CLI verb); the machine config gives it the
+`cli` invocation that names the `herdr` command, which is what the probe
+looks for on `PATH`:
 
-```json
-"herdr": {
-  "kind": "cli",
-  "capability": "pane-labeling",
-  "probeCommand": "herdr"
-}
+```yaml
+herdr:
+  kind: tool
+  for: [pane-labeling]
 ```
 
-`rename.sh` queries it (`fgos tool query --capability pane-labeling`) before
-doing anything herdr-specific. **Zero registered providers is a silent
+`rename.sh` asks it (`fgos dispatch decide --for pane-labeling --json`)
+before doing anything herdr-specific. **No provider found is a silent
 no-op, exit 0** — the same shape the script already had outside a herdr
-pane, never a failure. Moving to tmux/cmux later means registering a
+pane, never a failure. Moving to tmux/cmux later means declaring a
 different provider and writing its adapter behind that same query; every
 caller of this skill inherits the swap without being edited, which is what
 makes this the hexagon seam rather than just a helper.
@@ -62,15 +64,14 @@ Two deliberate details, both load-bearing:
   `/fgOS:pick` step 3, `fgos-coding-driving`'s execution-lane call, any
   future launcher — converges on that one script, so none of them can
   forget the gate.
-- **The gate asks whether a provider is REGISTERED, not `--status
-  present`.** A tool's `present` status only exists after someone runs
-  `fgos tool check` on that machine; gating on it would switch labeling
-  off on every fresh clone with no signal. The registry answers "does this
-  environment have the concept at all"; the adapter's own guards
-  (`HERDR_ENV=1`, `herdr` and `fgos` on `PATH`, `HERDR_PANE_ID` set) answer "and is
-  it usable right now" — a sharper question than a `PATH` probe, since
-  herdr being installed says nothing about this session running inside one
-  of its panes.
+- **The gate asks whether a provider is there now.** `decide` probes the
+  tool live (no stored status to forget to refresh), so a fresh clone with
+  `herdr` on `PATH` labels at once and one without it stays silent. That
+  answers "does this environment have the concept"; the adapter's own
+  guards (`HERDR_ENV=1`, `herdr` and `fgos` on `PATH`, `HERDR_PANE_ID` set)
+  answer "and is it usable right now" — a sharper question than a `PATH`
+  probe, since herdr being installed says nothing about this session
+  running inside one of its panes.
 
 **Labels are write-only, for humans** (D2). Nothing in fgOS may ever read a
 pane label to decide anything — occupancy and "what is running" are engine
@@ -110,13 +111,13 @@ state, never chrome. This skill only ever writes.
    wrong place or fail outright. The second argument (also
    `${CLAUDE_PROJECT_DIR}`-based) is the real repo root, and it is
    required, not optional: the script needs it both to run the
-   `pane-labeling` capability query and to resolve the fgOS session-id
+   `pane-labeling` query and to resolve the fgOS session-id
    fallback, even though the script file itself may be running from that
    same plugin cache copy. Without a resolvable repo root the script
    cannot confirm the capability, so it no-ops.
 
    The script always exits `0` — it is a silent no-op whenever no
-   `pane-labeling` provider is registered, the session isn't inside a
+   `pane-labeling` provider is present, the session isn't inside a
    herdr-managed pane, `herdr` isn't installed, or the pane id isn't
    available. It also refuses, with one line on stderr, when `HERDR_PANE_ID`
    names a pane herdr no longer knows or a pane whose shell is not an

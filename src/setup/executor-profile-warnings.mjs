@@ -10,6 +10,8 @@
 // later migration target lives, per each warning's own `migrateTo` field.
 
 import { familyOf, extractPolicyShapedFlags } from '../runner/dispatch/provider-adapter.mjs';
+import { forEntriesOf, servedCapabilitiesOf } from '../runner/dispatch/tool-providers.mjs';
+import { hasOwnPreferPool } from '../runner/execution/capability-config.mjs';
 
 // Env var name patterns that look like they are trying to do Provider
 // Capacity Rotator's own job (account pool / credential home selection)
@@ -56,11 +58,20 @@ export function collectExecutorProfileWarnings(cfg) {
   for (const [executorId, executorEntry] of Object.entries(executors)) {
     const { args, env, command, providerModel } = collectArgsAndEnv(executorEntry);
 
-    if (executorEntry?.kind !== 'tool' && executorEntry?.for !== undefined) {
+    if (executorEntry?.kind !== 'tool' && forEntriesOf(executorEntry).length > 0) {
       warnings.push({
         id: `executor.${executorId}.agent-for-inert`,
         migrateTo: 'the dispatch names its capability (execute <id> --for <capability>); remove "for" from this executor',
-        detail: `executors.${executorId} is an agent executor declaring "for" (${[].concat(executorEntry.for).join(', ')}); dispatch ignores it -- an agent serves any capability, so the work names the one it runs under`,
+        detail: `executors.${executorId} is an agent executor declaring "for" (${forEntriesOf(executorEntry).join(', ')}); dispatch ignores it -- an agent serves any capability, so the work names the one it runs under`,
+      });
+    }
+
+    for (const capability of new Set(servedCapabilitiesOf(executorEntry))) {
+      if (!hasOwnPreferPool(cfg, capability)) continue;
+      warnings.push({
+        id: `executor.${executorId}.tool-purpose-prefer-ignored.${capability}`,
+        migrateTo: `remove runner.capabilities.${capability}.prefer; the tool executor's "for" is what serves it`,
+        detail: `runner.capabilities.${capability}.prefer is ignored: ${capability} is served by tool executor ${executorId} through "for"`,
       });
     }
 

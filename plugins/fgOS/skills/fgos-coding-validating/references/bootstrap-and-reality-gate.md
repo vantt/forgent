@@ -43,7 +43,7 @@ path, a command's real output, an existing test):
   evidence, does its recorded `impact-analysis: inactive|degraded|full`
   posture (from `fgos-coding-planning`'s Approach step) match what
   `CLAUDE.md`'s impact-analysis capability gate actually reports right
-  now (`fgos tool query --capability impact-analysis --status present`)?
+  now (`fgos dispatch decide --for impact-analysis --json`)?
   A stale or missing posture is a FAIL here, not a skip — never assume
   GitNexus is present because the plan says so.
 

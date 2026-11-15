@@ -7,8 +7,8 @@
 // resolveMainCheckoutRoot etc. shell out to git), which only entry/
 // use-case/infra-layer callers may import.
 //
-// Before this module, well-known files (state.json, tool-status.local.json,
-// 5 diagnostic logs) each had their path built
+// Before this module, well-known files (state.json, 5 diagnostic
+// logs) each had their path built
 // independently in every module AND every test that touched them -- moving
 // state.json into a bucket once broke 51 tests across 21 files that had
 // each hardcoded their own copy, for no reason other than no shared
@@ -24,7 +24,6 @@ export const FGOS_FILE = {
   EVENT_HISTORY: 'eventHistory',
   PORTING_STATE: 'portingState',
   IDENTITY_DIRECTORY: 'identityDirectory',
-  TOOL_STATUS: 'toolStatus',
   APPROVE_FAULT_LOG: 'approveFaultLog',
   INVOCATION_FAULTS: 'invocationFaults',
   COORDINATION_SCHEMA_FAULTS: 'coordinationSchemaFaults',
@@ -37,7 +36,6 @@ const FGOS_FILE_RESOLVERS = {
   [FGOS_FILE.EVENT_HISTORY]: (fgosDir) => path.join(fgosDir, 'cache', 'event-history.json'),
   [FGOS_FILE.PORTING_STATE]: (fgosDir) => path.join(fgosDir, 'cache', 'porting-state.json'),
   [FGOS_FILE.IDENTITY_DIRECTORY]: (fgosDir) => path.join(fgosDir, 'cache', 'identity-directory.json'),
-  [FGOS_FILE.TOOL_STATUS]: (fgosDir) => path.join(fgosDir, 'runtime', 'tool-status.local.json'),
   [FGOS_FILE.APPROVE_FAULT_LOG]: (fgosDir) => path.join(fgosDir, 'logs', 'approve-post-success-faults.jsonl'),
   [FGOS_FILE.INVOCATION_FAULTS]: (fgosDir) => path.join(fgosDir, 'logs', 'invocation-faults.jsonl'),
   [FGOS_FILE.COORDINATION_SCHEMA_FAULTS]: (fgosDir) => path.join(fgosDir, 'logs', 'coordination-schema-faults.jsonl'),

@@ -54,11 +54,22 @@ export async function decideDispatchHook(call, { decide = decideExecutorCli } = 
       : block(`this ${call.toolName} call cannot be routed because the config is unusable: ${refusal}. Run \`fgos config check\` to list every refusal with its fix, correct the file, then retry.`);
   }
   if (decided.mechanism === 'in-process') return allow;
+  const decidedVia = `(decided via: decide --for "${subagentType}" --needs-soul --has-live-task-access)`;
+  if (decided.mechanism !== 'out-of-process') {
+    // `unavailable`: the capability has executors of its own, and none can run it here (Seat Binding refused the
+    // seat, or the tool that serves it is not there). A `fgos run` would meet the same refusal, so name the cause.
+    const cause = decided.blockedReason ?? (Array.isArray(decided.reasonCodes) && decided.reasonCodes.length > 0 ? decided.reasonCodes.join(', ') : 'no reason reported');
+    return block(
+      `this ${call.toolName} call cannot be dispatched: "${subagentType}" has executors of its own and decide answered unavailable for it (${cause}). ` +
+        `Fix that cause (run \`fgos dispatch decide --for "${subagentType}" --needs-soul --has-live-task-access\` to see it), or use a subagent type that has no executors of its own. ` +
+        decidedVia,
+    );
+  }
   const runDoor = runDoorHint({ cwd: call.projectDir, executorId: decided.executorId, capability: subagentType });
   return block(
     `this ${call.toolName} call resolves to out-of-process dispatch (no native in-process handler for "${subagentType}"). ` +
       `Run it through ${runDoor} instead of calling this tool directly -- it runs the task as one unit and hands back the real result. ` +
-      `(decided via: decide --for "${subagentType}" --needs-soul --has-live-task-access)`,
+      decidedVia,
   );
 }
 

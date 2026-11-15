@@ -341,8 +341,8 @@ export function resolveContentRoot(stateRoot, id, docsRef) {
   return stateRoot;
 }
 
-// Well-known FILE paths under `.fgos/` (state.json, tool-status.local.json,
-// diagnostic logs...) moved to
+// Well-known FILE paths under `.fgos/` (state.json, diagnostic
+// logs...) moved to
 // src/state/fgos-file-registry.mjs (kernel layer, tsk phase-03): this
 // module (infra) reads git, so a domain/kernel-layer caller
 // importing FGOS_FILE/resolveFgosFile from here would violate the

@@ -15,8 +15,8 @@ or high risk in the map needs a proof point at `fgos-coding-validating`,
 not a guess here.
 
 Before writing a proof point that would lean on blast-radius evidence,
-run `CLAUDE.md`'s impact-analysis capability gate (`fgos tool query
---capability impact-analysis --status present`) instead of assuming
+run `CLAUDE.md`'s impact-analysis capability gate (`fgos dispatch
+decide --for impact-analysis --json`) instead of assuming
 GitNexus is on this machine. Record the resulting posture
 (`impact-analysis: inactive|degraded|full`) in `plan.md` next to that
 proof point — inactive drops the requirement, degraded keeps it but marks

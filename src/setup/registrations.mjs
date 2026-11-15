@@ -99,7 +99,7 @@ import { driftStatus, unmergedDeliveries } from '../state/drift-status.mjs';
 import { postLandDrift } from '../state/postland-drift.mjs';
 import { isResolvedStatus } from '../state/frontier.mjs';
 import { getDomain, resolveDomainName, effectiveStep, domainSteps, skillForStep } from '../state/domain-registry.mjs';
-import { readLocalStatus, classifyRegistryPosture, toolsFromExecutors } from '../state/tool-registry.mjs';
+import { toolProvidersOf } from '../runner/dispatch/tool-providers.mjs';
 import { resolveCliVersionInfo } from './version-info.mjs';
 import { firstOnPath, inspectLauncher, writeLauncher } from './project-launcher.mjs';
 import { readConfig, readMachineConfig } from '../config/facade.mjs';
@@ -983,42 +983,28 @@ function checkDispatchDecideHookWired(cwd, run) {
   return checkClaudeHook(cwd, run);
 }
 
-// tsk-1dj (tool-registry-capability port), CONTEXT.md D1: reports the tool
-// registry's posture (inactive/degraded/full), never a hard failure — an
-// empty or partially-present registry is never itself a problem (the core
-// "absent capability = clean skip" contract this whole item ports), so
-// `passed` is always `true` here; only the message carries the posture.
-// Reports across every registered tool, never a single hardcoded capability
-// (e.g. "impact-analysis") — the registry itself never names one.
-//
-// tsk-in1-1 D1: tools are no longer event-sourced (`view.tools`) — reads
-// `runner.executors` from the effective runner section (the config door),
-// same as `fgos tool check/query` (bin/fgos.mjs) now does.
+// Posture of the tools the config declares (`kind: "tool"` executors, read through `toolProvidersOf`, the same
+// live probe `fgos dispatch decide --for` answers from): inactive when none is declared, full when every one is
+// present, degraded when any is stale, missing or cannot be probed. Degraded fails the check: a declared tool
+// that is not there is a real gap, unlike a project that declares none.
 function checkToolRegistryConfigured(cwd) {
   const mainCheckout = resolveMainCheckout(cwd);
   if (mainCheckout === null) {
     return { passed: true, message: 'not inside a git checkout — nothing to check' };
   }
-  const fgosDir = path.join(mainCheckout, '.fgos');
-  const executors = effectiveSection(mainCheckout, 'runner')?.executors;
-  const tools = toolsFromExecutors(executors);
-  const localStatus = readLocalStatus(fgosDir);
-  const { posture, registeredCount, presentCount, missingCount, unknownCount } = classifyRegistryPosture(tools, localStatus);
-  if (posture === 'inactive') {
+  // One tool executor serving several capabilities is one tool: its status is the same for each.
+  const providers = [...new Map(toolProvidersOf(effectiveSection(mainCheckout, 'runner'), { repoRoot: mainCheckout }).map((p) => [p.executorId, p])).values()];
+  if (providers.length === 0) {
     return { passed: true, message: 'inactive — no tool-capable executors declared (declare one under runner.executors with fgos config set)' };
   }
-  if (posture === 'full') {
-    return { passed: true, message: `full — ${presentCount}/${registeredCount} registered tool(s) present` };
+  const count = (status) => providers.filter((provider) => provider.status === status).length;
+  const present = count('present');
+  if (present === providers.length) {
+    return { passed: true, message: `full — ${present}/${providers.length} tool(s) present` };
   }
-  // tsk-3oa2: degraded used to report passed:true, the same as full --
-  // meaning AGENTS.md's impact-analysis capability gate's own "Degraded"
-  // branch (a tool registered but not present, or present but stale) had
-  // no doctor signal a person would ever see flagged. A registered tool
-  // that is missing or was never checked here is a real gap, not a clean
-  // skip the way "nothing registered at all" (inactive) is.
   return {
     passed: false,
-    message: `degraded — ${presentCount}/${registeredCount} registered tool(s) present (${missingCount} missing, ${unknownCount} never checked — run fgos tool check)`,
+    message: `degraded — ${present}/${providers.length} tool(s) present (${count('stale')} stale, ${count('missing')} missing, ${count('unknown')} cannot be probed) — install the missing tool, or reindex the stale one; fgos dispatch decide --for <capability> shows the answer a dispatch gets`,
   };
 }
 

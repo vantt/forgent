@@ -44,10 +44,11 @@ its answer:
 
 Either way, before editing a symbol yourself, apply `CLAUDE.md`'s
 impact-analysis capability gate rather than assuming GitNexus is on this
-machine: `fgos tool query --capability impact-analysis --status present`
-decides whether the MUST-run-impact rule is Full (present — run it),
-Degraded (registered but not present — proceed, but say the blast radius
-is unconfirmed), or Inactive (nothing registered — proceed without it).
+machine: `fgos dispatch decide --for impact-analysis --json` decides
+whether the MUST-run-impact rule is Full (`mechanism: "in-process"` —
+run it), Degraded (`mechanism: "unavailable"` or `stale: true` —
+proceed, but say the blast radius is unconfirmed), or Inactive
+(`configured: false` — proceed without it).
 
 ## When reality disagrees with what the item assumed
 

@@ -1712,7 +1712,6 @@ const ARM_STATIC_IMPORTS = [
   '../src/state/retrospective-doors.mjs',
   '../src/state/runtime-coordination.mjs',
   '../src/state/store.mjs',
-  '../src/state/tool-registry.mjs',
   '../src/state/work.mjs',
   '../src/state/work.mjs',
   '../src/state/worker-slots.mjs',

@@ -15,7 +15,7 @@
 # entropy-history.jsonl, invocation-faults.jsonl since phase-01,
 # plans/260825-0842-fgos-logs-dir-bucketing)
 .fgos/logs/
-# per-machine runtime facts — tool-status.local.json and the events.jsonl
+# per-machine runtime facts — the events.jsonl
 # truncation-guard mark, moved here phase-02
 # (plans/260825-0842-fgos-logs-dir-bucketing). sessions.json/*.lock stay at
 # .fgos/ root for now (deferred, on the git hook's own live import path —

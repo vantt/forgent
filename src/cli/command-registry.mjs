@@ -2272,42 +2272,6 @@ export const COMMAND_REGISTRY = [
     deprecated: null,
   }),
   withSubcommands({
-    name: 'tool',
-    invoke: 'fgos tool <check|query>',
-    description: 'Tool registry (tsk-1dj, ported from repository-harness; tsk-in1-1 D1: a tool provider is declared directly in runner.executors.<id> in .fgos/config.json — config-edited, not a CLI verb): "check" probes presence on THIS machine into a local, gitignored overlay; "query" returns the provider set for a capability.',
-    subcommands: {
-      check: {
-        description: 'Probe every declared tool\'s presence on THIS machine and write it to a local, gitignored overlay file, never the shared event log; always succeeds even when a probed tool is missing.',
-        parameters: {
-          type: 'object',
-          properties: {
-            name: { type: 'string', description: 'Optional filter: a declared tool\'s executor id; omitted checks every tool-capable executor.' },
-          },
-          required: [],
-        },
-        examples: ['fgos tool check', 'fgos tool check --name gitnexus'],
-      },
-      query: {
-        description: 'Return the provider set for a capability, merging the config-declared tools with the local overlay ("unknown" for one never checked here).',
-        parameters: {
-          type: 'object',
-          properties: {
-            capability: { type: 'string', description: 'Optional filter: free-text capability label, normalized to kebab-case.' },
-            status: { type: 'string', description: 'Optional filter: one of present/missing/unknown/stale ("stale" is mcp/skill-only: the tool is installed but its own on-disk metadata records a commit behind the repo\'s current HEAD, tsk-j7y).' },
-          },
-          required: [],
-        },
-        examples: ['fgos tool query --capability impact-analysis --status present'],
-      },
-    },
-    examples: ['fgos tool check', 'fgos tool query --capability impact-analysis --status present'],
-    touchesState: true,
-    store: 'require',
-    externalEffect: false,
-    paginated: false,
-    deprecated: null,
-  }),
-  withSubcommands({
     name: 'agents',
     invoke: 'fgos agents list',
     description: 'Personas a panel seat can name with `--seats "@name"`. Read-only.',

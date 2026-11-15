@@ -175,7 +175,7 @@ test('fgos dispatch decide writes a refusal once, on stderr, with nothing on std
   assert.match(out.stderr, /no work item "no-such-item" found/);
 });
 
-test('fgos hook dispatch-decide (agy payload) denies an out-of-process subagent call and points at a door fgos run accepts, not dispatch execute', () => {
+test('fgos hook dispatch-decide (agy payload) denies a subagent call whose purpose nothing can serve here, naming the decide answer and no retired door', () => {
   const { root, fgosDir } = mkStore();
   writeConfig(fgosDir);
   const env = { ...process.env };
@@ -189,7 +189,6 @@ test('fgos hook dispatch-decide (agy payload) denies an out-of-process subagent 
   assert.equal(out.status, 0, out.stderr);
   const decision = JSON.parse(out.stdout.trim().split('\n').at(-1));
   assert.equal(decision.decision, 'deny');
-  assert.match(decision.reason, /fgos run "<prompt>" --capability blocked/);
-  assert.match(decision.reason, /"tool-only" is a tool executor/);
+  assert.match(decision.reason, /decide answered unavailable for it \(tool\.unprobeable\)/);
   assert.doesNotMatch(decision.reason, /dispatch execute|--provider tool-only/);
 });

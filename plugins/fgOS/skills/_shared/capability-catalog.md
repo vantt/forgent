@@ -86,13 +86,13 @@ and do not treat it as a place to pre-invent capabilities nobody has asked
 
 ## Capability execution guidance: not agent-only
 
-`decide` resolves a capability to whichever provider is actually
-registered for it — an agent executor (`kind: "agent"`), an MCP or other
-tool provider (`kind: "tool"`, e.g. `impact-analysis` → `gitnexus` via
-`invocations: [{ via: "mcp", ... }]`), or another registered adapter
-(`pane-labeling`). Nothing in the resolver (`src/runner/dispatch/resolve.mjs`'s
-`resolveExecutorAndOverrides`) special-cases agent-shaped executors —
-resolution is the same lookup regardless of `kind`. A caller must never
+`decide` resolves a capability to whatever actually serves it — an agent
+executor (`kind: "agent"`) that Seat Binding places for the capability's own
+`prefer` pool, or a tool provider (`kind: "tool"`, e.g. `impact-analysis` →
+`gitnexus` via `invocations: [{ via: "mcp", ... }]`, or `pane-labeling` →
+`herdr`) that names the capability in its `for` and is probed live. The two
+are separate paths (`purposeSeatOf` in `src/runner/dispatch/plan.mjs`): a
+capability served by a tool never reads its own `prefer`. A caller must never
 assume a capability implies an Agent/Task-tool hand-off; read the
 resolved `mechanism` and, when relevant, the executor's own `kind`/`via`
 before deciding how to act on it.

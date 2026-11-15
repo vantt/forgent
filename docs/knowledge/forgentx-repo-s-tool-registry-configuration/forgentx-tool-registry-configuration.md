@@ -4,12 +4,22 @@ mode: reference
 ---
 # forgentX repo's tool-registry configuration
 
-Lookup facts about the `fgos tool` registry's real, live configuration in
-this repo (`tsk-4ad`), quoted from `docs/distillery/deep-dives/tool-
-registry.md`'s "Cấu hình forgentX hiện tại (tsk-4ad)" section — the verb
-group itself (`check`/`query`) is the `tsk-1dj` port; this reference covers
-only what is actually configured today and how to read/extend it without
-asking again.
+Lookup facts about the tool providers declared in this repo's runner config
+(`tsk-4ad`), quoted from `docs/distillery/deep-dives/tool-registry.md`'s
+"Cấu hình forgentX hiện tại (tsk-4ad)" section; this reference covers only
+what is actually configured today and how to read/extend it without asking
+again.
+
+> **The `fgos tool` verb (`check`/`query`) and its local status file are
+> removed.** A tool is asked about the way a dispatch is: `fgos dispatch
+> decide --for <capability> --json` reads the executor's `for`, probes the
+> tool live and answers `in-process` (present, with `command`/`mcpTool`;
+> `stale: true` when its index is behind `HEAD`) or `unavailable`
+> (`tool.missing`, `tool.unprobeable`, `tool.unnamed`), listing every
+> `providers` entry with its status. `toolProvidersOf`
+> (`src/runner/dispatch/tool-providers.mjs`) is the one reader. The sections
+> below that name `fgos tool`, `capability` on an executor or
+> `normalizeCapability` describe the earlier design and are kept as history.
 
 > **tsk-in1-1 D1**: `register`/`remove` đã bị rút — provider giờ khai báo
 > thẳng trong `runner.executors.<id>` (`.fgos/config.json`), sửa file
@@ -21,7 +31,7 @@ like any other `executors` entry, no longer through a dedicated CLI verb.)
 
 ## Registered providers
 
-Confirmed via `fgos tool query --capability impact-analysis --json`:
+Confirmed (when this was written) via `fgos tool query --capability impact-analysis --json`; today the same fact is `fgos dispatch decide --for impact-analysis --json`:
 
 > `gitnexus` — `kind: mcp`, `capability: impact-analysis`, `scan:
 > .gitnexus`, `responsibility: Verification`, `description: Code-graph
@@ -169,39 +179,32 @@ test server), not through a registered executor — 0 executors declare
 
 ## Probing and reading status
 
-> - `fgos tool check [--name x] [--json]` — probe từng tool đã đăng ký,
->   ghi `status`+`checkedAt` vào `.fgos/tool-status.local.json` (cục bộ,
->   gitignored, KHÔNG qua event-log — sự thật về máy đang chạy, không
->   phải quyết định team). Luôn exit 0, kể cả khi tool thiếu.
-> - `fgos tool query --capability <nhan> [--status present]` — trả
->   provider set, gộp đăng ký (chia sẻ) với overlay trạng thái cục bộ
->   (máy này).
-> - `fgos doctor` — check `tool-registry-configured`
->   (`src/setup/checks.mjs`) tự báo posture tổng quát, không cần tự gọi
->   `tool query` tay.
+- `fgos dispatch decide --for <capability> --json` — the one question. It
+  probes every tool executor that names the capability in `for` (a `cli`
+  tool on `PATH`, an `mcp`/`skill` tool by its `scanTarget` on disk, `stale`
+  when the tool's own `meta.json` records a commit behind `HEAD`), live on
+  every call; nothing is stored between calls.
+- `fgos doctor` — the check `tool-registry-configured` reports the overall
+  posture from the same probe, and `executor-profile-warnings` warns when a
+  tool-served capability still carries a `prefer` (ignored).
 
-(`fgos tool check` probes each registered tool, writes `status`+
-`checkedAt` to the local, gitignored `.fgos/tool-status.local.json` —
-never through the event log, since it's a fact about the running machine,
-not a team decision. Always exits 0, even when a tool is missing. `fgos
-tool query --capability <label> [--status present]` returns the provider
-set, merging the shared registration with the local machine's status
-overlay. `fgos doctor`'s `tool-registry-configured` check already reports
-overall posture without needing to call `tool query` by hand.)
+(`fgos tool check` and `fgos tool query` and the local
+`.fgos/runtime/tool-status.local.json` they used are gone; an existing file
+is inert and can be deleted.)
 
 ## Degrade-ladder status meanings
 
 > - **inactive** — 0 tool đăng ký cho capability này. Vô hại, bỏ qua
 >   sạch, không phải thiếu sót.
-> - **degraded** — có đăng ký nhưng probe ra `missing`, hoặc chưa từng
->   `check` (`unknown`). Gap thật — cảnh báo weak-proof trong verify/plan
+> - **degraded** — có đăng ký nhưng probe ra `missing`, `stale` hoặc
+>   không probe được (`unknown`). Gap thật — cảnh báo weak-proof trong verify/plan
 >   note, nhưng vẫn chạy tiếp phần khác.
 > - **full** — mọi tool đăng ký đều `present`. Giữ nguyên hành vi MUST
 >   hiện tại không đổi.
 
 (**inactive** — zero tools registered for this capability; harmless, a
-clean skip, not a gap. **degraded** — registered but probes `missing`, or
-never `check`ed (`unknown`); a real gap — flag a weak-proof warning in a
+clean skip, not a gap. **degraded** — registered but probes `missing`, `stale` or
+cannot be probed (`unknown`); a real gap — flag a weak-proof warning in a
 verify/plan note, but keep going on everything else. **full** — every
 registered tool is `present`; existing MUST behavior stays unchanged.)
 
@@ -220,7 +223,7 @@ registered tool is `present`; existing MUST behavior stays unchanged.)
 > explicitly, at the call site:
 >
 > ```
-> fgos tool query --capability <nhan> --status present --dir <main-checkout-root>
+> fgos dispatch decide --for <nhan> --json
 > ```
 >
 > — never something `resolveExecutorConfig`/`fgos-coding-implement` does on
@@ -237,7 +240,7 @@ declaring a `capability` (making it also a tool-registry entry, per the
 "Registering a new provider" section above) and one that dispatches are
 completely independent concerns. A caller that wants a real presence gate
 before dispatching a specific executor has to ask for it explicitly at the
-call site, with `fgos tool query --status present`, never something
+call site, with `fgos dispatch decide --for <label>`, never something
 `resolveExecutorConfig`/`fgos-coding-implement` does automatically.
 `CLAUDE.md`'s impact-analysis capability gate is the one real consumer of
 this pattern today, gating on `gitnexus`.)
@@ -247,7 +250,7 @@ this pattern today, gating on `gitnexus`.)
 > Việc CHƯA nằm trong tsk-4ad: sửa prose 3 skill
 > (fgos-coding-planning/validating/executing) + CLAUDE.md để MỖI BƯỚC workflow
 > tự hỏi capability (`fgos tool query --capability impact-analysis
-> --status present`) thay vì hardcode tên "GitNexus" trong logic gate —
+> --status present`, nay là `fgos dispatch decide --for impact-analysis`) thay vì hardcode tên "GitNexus" trong logic gate —
 > đó là injection thật sự (xem mục "Ví dụ end-to-end" ở trên), và là
 > việc riêng của tsk-1e4. tsk-4ad dừng ở: đăng ký provider, có
 > DOCTOR_CHECKS entry, và ghi chú đọc-hiểu-được này.

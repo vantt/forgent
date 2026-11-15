@@ -114,8 +114,8 @@ test('decide --for resolves a capability to a tool/MCP provider, never assuming 
   const plan = compileDispatchPlan(cfg, { for: 'code:review', repoRoot });
   assert.equal(plan.executorId, 'review-tool');
   assert.equal(plan.configured, true);
-  // mcp-handback: the resolved mechanism is in-process (the caller calls the
-  // MCP tool directly), even though the executor is "tool"-kind, not "agent".
+  // The resolved mechanism is in-process (the caller calls the MCP tool
+  // directly), even though the executor is "tool"-kind, not "agent".
   assert.equal(plan.mechanism, 'in-process');
   assert.equal(plan.mcpTool, 'mcp__review_tool__review');
 });

@@ -74,14 +74,33 @@ Then branch on `mechanism`:
   nothing at all. This is the default/common path, byte-identical to
   before this executor existed.
 - **`in-process`** — call the returned hand-back yourself: use `agentType`
-  with your Agent/Task tool, or call `mcpTool` directly. If neither field
-  is returned, use your normal default for that live call. Print the
-  announce line, then read its answer through Step C.
+  with your Agent/Task tool, call `mcpTool` directly, or, for a CLI tool,
+  run the returned `command` yourself (a tool executor is never run through
+  `fgos run`). If none of these fields is returned, use your normal default
+  for that live call. Print the announce line, then read its answer through
+  Step C.
 - **`out-of-process`** — continue to Step B.
 
 When `--for`/`--work` resolved a `executorId` (carried in this same JSON
 response, additive), reuse that exact value for `<EXECUTOR_ID>` in every
 step below — never re-derive it.
+
+A purpose that a tool executor serves (it names the purpose in its `for`) is
+answered from a live probe of the tool, and the answer carries three more
+additive fields:
+
+- **`providers`** — every tool executor serving the purpose, each with its
+  `status`: `present`, `stale`, `missing` or `unknown` (nothing declared to
+  probe it by).
+- **`command`** / **`mcpTool`** — what to call, taken from the executor's own
+  invocations; present only when the tool is there and names something to call.
+- **`stale: true`** — the tool is present but its own index is behind the
+  repository's `HEAD`; the answer is still `in-process`, so use the tool and
+  treat its result as possibly out of date.
+
+A tool that is `missing` or `unknown`, or present but naming nothing to call,
+answers `unavailable` (`reasonCodes` `tool.missing`, `tool.unprobeable` or
+`tool.unnamed`): go to `<INLINE_FALLBACK_HEADING>`.
 
 ## Step B — run it as a Unit (out-of-process only)
 

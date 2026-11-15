@@ -487,7 +487,6 @@
     "src/state/cursor.mjs": "use-case",
     "src/state/porting-store.mjs": "infra",
     "src/identity/directory-store.mjs": "infra",
-    "src/state/tool-registry.mjs": "infra",
     "src/install/coexist.mjs": "infra",
     "src/runner/recovery.mjs": "domain",
     "src/runner/anti-loop.mjs": "domain",

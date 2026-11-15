@@ -53,11 +53,11 @@ before(async () => {
   scratch = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-terminal-skill-'));
   fake = createFakeHerdr(path.join(scratch, 'herdr'));
   installShims();
-  // A project root whose capability query reports a pane-labeling provider, so the script never
+  // A project root whose `decide --for pane-labeling` answers in-process, so the script never
   // reads this checkout's own .fgos/ (a worker worktree has none) or bootstraps a config into it.
   const projectRoot = path.join(scratch, 'project');
   fs.mkdirSync(path.join(projectRoot, 'bin'), { recursive: true });
-  fs.writeFileSync(path.join(projectRoot, 'bin', 'fgos.mjs'), 'console.log(JSON.stringify({ capability: "pane-labeling" }, null, 1));\n');
+  fs.writeFileSync(path.join(projectRoot, 'bin', 'fgos.mjs'), 'console.log(JSON.stringify({ mechanism: "in-process" }, null, 1));\n');
   renameArgs = ['tsk-1lvxq7m2h9', projectRoot];
   allocationsDir = () => {
     const root = path.join(harness.stateRoot, 'terminal', 'herdr');

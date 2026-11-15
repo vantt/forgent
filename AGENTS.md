@@ -233,25 +233,27 @@ present on this machine. Before treating them as binding — and before
 `fgos-coding-planning`/`fgos-coding-validating`/`fgos-coding-implement`
 decide how much
 impact-analysis evidence a plan's verify/test scope needs — query the
-capability instead of assuming the tool:
+capability instead of assuming the tool. The answer is the same one a
+dispatch gets, and the tool is probed live on every call:
 
 ```bash
-fgos tool query --capability impact-analysis --status present
+fgos dispatch decide --for impact-analysis --json
 ```
 
-- **0 providers registered** — Inactive: skip impact-analysis evidence in
+- **`configured: false`** — Inactive: skip impact-analysis evidence in
   verify/test scope; note `impact-analysis: inactive` in the plan/verify
   note. Not a gap.
-- **Registered but not `present`, or `present` but flagged `stale`** —
+- **`mechanism: "unavailable"` (`reasonCodes` `tool.missing`,
+  `tool.unprobeable` or `tool.unnamed`), or `stale: true`** —
   Degraded: run every other required check, mark that proof weak, and name
   the gap plainly (e.g. "GitNexus registered but not present on this
   machine — blast radius not confirmed", or "GitNexus present but its
   index is behind the current HEAD — blast radius may be stale"). A
-  `present` status only means the tool is installed, never that its index
+  present tool only means it is installed, never that its index
   is fresh or intact (tsk-j7y) — a suspicious zero-result or "not found"
   answer from an impact-analysis tool is worth a quick grep/rg cross-check
-  before being trusted, regardless of what `fgos tool query` reports.
-- **`present`, freshly checked** — Full: the MUST rules below apply exactly
+  before being trusted, regardless of what `fgos dispatch decide` reports.
+- **`mechanism: "in-process"` without `stale`** — Full: the MUST rules below apply exactly
   as written. A `full` posture still is not a guarantee of complete
   per-file coverage: a genuinely fresh, non-stale index can still carry
   zero indexed symbols for one large/complex file (tsk-38h — confirmed on
