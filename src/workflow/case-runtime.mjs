@@ -19,6 +19,7 @@ import { appendWorkflowEvent, readWorkflowEvents } from './store.mjs';
 import { gateOfStep, projectCase } from './case-projection.mjs';
 import { repairCaseBindings, unbindWorktree } from './case-bindings.mjs';
 import { installOnce, replaceDurably } from '../native/door.mjs';
+import { writeFrontmatter } from '../util/yaml.mjs';
 import { readAgentFileSync } from '../native/proof-helpers.mjs';
 
 /** The id prefix of the Unit run a case gate makes; a gate has no unit record to resume. */
@@ -182,7 +183,7 @@ function roundProblem({ events, round }) {
 }
 
 /** The text of an answer file, drawn from its rounds. A view: deleting it loses nothing. */
-function renderAnswerFile(caseId, stepId, rounds) {
+function renderAnswerFile(caseId, stepId, rounds, file) {
   const latest = rounds.at(-1);
   const entries = rounds.map((r) => [
     `### Round at ${r.answeredAt} (${r.approved ? 'Approved' : 'Clarification'})`,
@@ -194,13 +195,13 @@ function renderAnswerFile(caseId, stepId, rounds) {
     r.answer,
     '',
   ].join('\n'));
-  return [
-    '---',
-    `approved: ${latest.approved ? 'yes' : 'no'}`,
-    `occurrence: ${latest.occurrence}`,
-    `round: ${latest.round}`,
-    `subjectDigest: ${latest.subjectDigest ?? 'none'}`,
-    '---',
+  const meta = {
+    approved: latest.approved ? 'yes' : 'no',
+    occurrence: latest.occurrence,
+    round: latest.round,
+    subjectDigest: latest.subjectDigest ?? 'none',
+  };
+  return writeFrontmatter(meta, [
     '',
     `# Owner's answer at the "${stepId}" gate`,
     '',
@@ -217,14 +218,14 @@ function renderAnswerFile(caseId, stepId, rounds) {
     '## Rounds',
     '',
     ...entries,
-  ].join('\n');
+  ].join('\n'), file);
 }
 
 function renderGateAnswerFile(mainRoot, caseId, stepId) {
   const { file } = roundsDir(mainRoot, caseId, stepId);
   const rounds = roundsOf(mainRoot, caseId, stepId);
   if (rounds.length === 0) return;
-  writeText(file, renderAnswerFile(caseId, stepId, rounds));
+  writeText(file, renderAnswerFile(caseId, stepId, rounds, file));
 }
 
 const roundConsumed = (events, r) => events.some((e) => e.type === 'gate.answer' && e.payload?.stepId === r.stepId

@@ -15,6 +15,7 @@ import { bindWorktree, readBinding } from '../../src/workflow/case-bindings.mjs'
 import { acquireDispatchCwdLock } from '../../src/run-supervisor/cwd-lock.mjs';
 import { digestSubject, digestText, digestContextRefs } from '../../src/workflow/ref-digests.mjs';
 import { resolveUnitInputs } from '../../src/runner/execution/handoff-refs.mjs';
+import { readFrontmatter } from '../../src/util/yaml.mjs';
 import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
 import { appendAll, append, eventsOf, FRAME, openCase, projectionOf, settle, withHold } from '../helpers/workflow-case-fixture.mjs';
 
@@ -324,6 +325,17 @@ const drain = (run, planted = () => {}) => withHold(run, (hold) => {
   return drainCaseInbox({ mainRoot: run.repoRoot, caseId: run.caseId, hold });
 });
 const answersOf = (run) => eventsOf(run).filter((e) => e.type === 'gate.answer');
+
+test('a malformed round file in the gate inbox does not break the answer view the drain renders', () => {
+  const run = gatedRun();
+  const drained = drain(run, () => {
+    plant(run, 'ok', '1-1.json', {});
+    plant(run, 'ok', '1-2.json', { occurrence: undefined, subjectDigest: { not: 'a string' } });
+  });
+  assert.equal(drained.answers, 1, 'the good round was folded');
+  const { meta } = readFrontmatter(fs.readFileSync(answerFile(run), 'utf8'), answerFile(run));
+  assert.deepEqual(Object.keys(meta), ['approved', 'occurrence', 'round', 'subjectDigest']);
+});
 
 test('the drain leaves a planted round unfolded and names why: not a gate, not the open occurrence, a name or directory that disagrees', () => {
   const run = gatedRun();
