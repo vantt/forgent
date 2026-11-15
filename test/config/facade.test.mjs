@@ -11,7 +11,7 @@ import { spawnSync } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
 import { CONFINED_MARKER_ENV as DRIVER_MARKER } from '../../src/runner/dispatch/confinement/drivers/bwrap.mjs';
 import {
-  CONFINED_MARKER_ENV, ConfigDoorError, checkConfig, globalFgosDir, initConfigFile, isConfigRefusal, projectConfigPresent, readConfig, readMachineAccounts, readMachineConfig, readStandardValue,
+  CONFINED_MARKER_ENV, ConfigDoorError, checkConfig, globalFgosDir, initConfigFile, isConfigRefusal, projectConfigPresent, readConfig, readMachineAccounts, readMachineConfig, readProjectConfigSource, readStandardValue,
 } from '../../src/config/facade.mjs';
 
 process.env.FGOS_STATE_HOME = fs.mkdtempSync(path.join(os.tmpdir(), 'config-facade-state-'));
@@ -159,4 +159,16 @@ test('a platform that cannot read config files refuses by name and warns once th
     process.off('warning', onWarning);
     config.snapshot = real;
   }
+});
+
+test('the raw project config source is the YAML file over a legacy JSON one, text unvalidated, or null', () => {
+  const dir = fixture();
+  assert.equal(readProjectConfigSource(dir.project), null);
+  assert.equal(readProjectConfigSource(path.join(dir.root, 'missing')), null);
+  const json = path.join(dir.project, '.fgos/config.json');
+  lay(json, '{"runner":{"patterns":{"retired":1}}}');
+  assert.deepEqual(readProjectConfigSource(dir.project), { path: json, format: 'json', text: '{"runner":{"patterns":{"retired":1}}}' });
+  const yaml = path.join(dir.project, '.fgos/config.yaml');
+  lay(yaml, 'runner:\n  patterns:\n    retired: 1\n');
+  assert.deepEqual(readProjectConfigSource(dir.project), { path: yaml, format: 'yaml', text: 'runner:\n  patterns:\n    retired: 1\n' });
 });

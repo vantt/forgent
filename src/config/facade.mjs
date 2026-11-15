@@ -3,6 +3,7 @@
 // comes from the fgos-config crate (project over global over standard, the accounts layer when unconfined, `command`
 // values from the main checkout), never from a JavaScript merge, a cache or a validator in this module. A process
 // that cannot load the addon fails every call with the door's own named error; there is no JavaScript fallback.
+import fs from 'node:fs';
 import path from 'node:path';
 import { fromDoorJson, nativeDoor } from '../native/door.mjs';
 
@@ -86,6 +87,24 @@ export const readMachineConfig = (options = {}) => call('snapshot', options);
 
 /** Whether `projectRoot` has a project config file: a YAML file or a legacy JSON one. A migration tombstone is no source. */
 export const projectConfigPresent = (projectRoot, options = {}) => readConfig({ ...options, projectRoot, sections: [] }).revisions.project !== 'absent';
+
+/**
+ * The raw project config file of `dir`, unvalidated: `{ path, format: 'yaml'|'json', text }`, or `null` when `.fgos` holds
+ * none or the file cannot be read. A YAML file wins over a legacy JSON one. This is the one read that goes around the
+ * validating door, for the conversion of keys the door refuses on purpose; everything else asks the door.
+ */
+export function readProjectConfigSource(dir) {
+  const fgosDir = path.join(dir, '.fgos');
+  try {
+    const entries = fs.readdirSync(fgosDir);
+    const file = ['config.yaml', 'config.json'].find((name) => entries.includes(name));
+    if (!file) return null;
+    const filePath = path.join(fgosDir, file);
+    return { path: filePath, format: file.endsWith('.json') ? 'json' : 'yaml', text: fs.readFileSync(filePath, 'utf8') };
+  } catch {
+    return null;
+  }
+}
 
 /** The bundled standard's value at a dotted path (`runner.modelPolicies.claude.advanced`), reading no file: `{ present, value }`. */
 export const readStandardValue = (path) => door('standardValue', { path });

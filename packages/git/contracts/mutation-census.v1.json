@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "4af36b858c76b45bfa40f44688016324a794ec13e0c3f6530bc5a913bfa7e39f",
+  "payloadDigest": "32d1ee3c8b6087861202163a5d176768171c2ee1417865faba6676b64c629afe",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -924,7 +924,7 @@
     "src/cli/flag-check.mjs": "336a0e94eaec59fa4c1f143b32a14334c1bd5f13d522ef8be4a5b570dc401b62",
     "src/cli/parse-args.mjs": "d4f71dbb91bc8d920995299b78d018efd1643328213a70d6e567a6b462163d66",
     "src/cli/verb-exit.mjs": "baec4717ee96883bb84c08861c442be0e2ea2b0c3ae611306d8d7441b40f7f7c",
-    "src/config/facade.mjs": "aea0028925f737338a649fcef55e805da44ec1fffbdfb5f27c4faa9da74ac6e2",
+    "src/config/facade.mjs": "96cbee0c3db6a5ce6f1f43804c525bdab9b54673cce597c0bbb21506249b381c",
     "src/convention/convention-client.mjs": "0e1645ca052ee5d1bce6d73bfd7d7c6ae82c0a2442b240f4549d76858d279167",
     "src/convention/definition-names.mjs": "f845b39591111b910bea842945a32c37287cafdd53fb08fc3cd2b64767294678",
     "src/convention/identifier-rules.mjs": "f3b0fed979b522c53be7c6b756b49425723121a587fe056b1bf616deef81b615",
@@ -1163,7 +1163,7 @@
     "src/setup/project-launcher.mjs": "3153fdb9caad59eaeace759de1cd126c22f41585fcd1e15f00c1577ab0f9806b",
     "src/setup/registrations.mjs": "64e5c94338053d197f79a203942c94ac503830175ccacf9c61c3e8af03e528a2",
     "src/setup/run-supervisor-checks.mjs": "31942f9b9dec0bdd009c05199f2fc1a2afe7e6b18f58c50c94d7aa18b0ad0421",
-    "src/setup/runner-config-conversion.mjs": "43f6b37a0537ae6639c60591a470c0b61d4639ab21c0318c86895c9eba54b0cf",
+    "src/setup/runner-config-conversion.mjs": "cf8bb8e3c64852f1aa56ae9c98ee99ccd37cefa027c01a344f92845d7a00934b",
     "src/setup/seat-binding-checks.mjs": "61a2b752ec407709c25c5409ce00d595472d2acf4c99176300f3ecba3d539085",
     "src/setup/session-keep-declared.mjs": "b97619a3524d7d87245220459863181c03dd6066cd738aed9bad5874e6686067",
     "src/setup/setup-use-case.mjs": "3ba56a73b56b3989928040545239c956a9696b36dd29c4d1bf58f60263332a91",
@@ -3723,8 +3723,8 @@
     },
     {
       "path": "src/setup/runner-config-conversion.mjs",
-      "line": 212,
-      "spawn": "applyNativeConfigPatch -> src/setup/runner-config-conversion.mjs:31",
+      "line": 194,
+      "spawn": "applyNativeConfigPatch -> src/setup/runner-config-conversion.mjs:19",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
     },

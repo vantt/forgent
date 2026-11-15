@@ -12,18 +12,6 @@ import { loadRunnerConfigForDir } from '../runner/dispatch/config.mjs';
 import * as facade from '../config/facade.mjs';
 import { resolveActiveHostBin } from '../util/host-bin-path.mjs';
 
-function findProjectConfigFile(projectDir) {
-  const fgosDir = path.join(projectDir, '.fgos');
-  try {
-    const entries = fs.readdirSync(fgosDir);
-    if (entries.includes('config.yaml')) return path.join(fgosDir, 'config.yaml');
-    if (entries.includes('config.json')) return path.join(fgosDir, 'config.json');
-  } catch {
-    return null;
-  }
-  return null;
-}
-
 function applyNativeConfigPatch(hostBin, projectDir, edits, reason) {
   const tmpPatch = path.join(os.tmpdir(), `fgos-patch-${Date.now()}-${Math.random().toString(36).slice(2)}.json`);
   try {
@@ -92,10 +80,11 @@ export function formatLegacyJsonAdvice(targetPath, parsed = null) {
  * @returns {{ status: 'absent'|'unchanged'|'converted'|'blocked', backup?: string, written: string[], blocker?: string }}
  */
 export function convertRunnerPatternsConfig(projectDir, options = {}) {
-  const targetPath = findProjectConfigFile(projectDir);
-  if (!targetPath) {
+  const source = facade.readProjectConfigSource(projectDir);
+  if (!source) {
     return { status: 'absent', written: [] };
   }
+  const { path: targetPath, text: originalText } = source;
 
   // Opening load check must always run
   try {
@@ -107,13 +96,6 @@ export function convertRunnerPatternsConfig(projectDir, options = {}) {
 
   // Side-read raw config text to extract values of retired keys (maxRounds, checkersByRigor, etc.)
   // for patch edits; the validating door refuses to load configs holding retired keys.
-  let originalText;
-  try {
-    originalText = fs.readFileSync(targetPath, 'utf8');
-  } catch {
-    return { status: 'absent', written: [] };
-  }
-
   let parsed;
   try {
     parsed = parseYaml(originalText, { filename: targetPath });
@@ -130,7 +112,7 @@ export function convertRunnerPatternsConfig(projectDir, options = {}) {
   }
 
   // For a .json target, make no backup and do not call the door; return blocked with per-key hand edits
-  if (targetPath.endsWith('.json')) {
+  if (source.format === 'json') {
     return {
       status: 'blocked',
       blocker: formatLegacyJsonAdvice(targetPath, parsed),
@@ -211,7 +193,7 @@ export function convertRunnerPatternsConfig(projectDir, options = {}) {
       if (host?.bin) {
         applyNativeConfigPatch(host.bin, projectDir, edits, reason);
       } else {
-        const backup = discardUnusedBackup(targetPath, backupPath);
+        const backup = discardUnusedBackup(projectDir, originalText, backupPath);
         return {
           status: 'blocked',
           blocker: 'config-write-door-unavailable: Config write door (native fgos config patch) is unavailable; conversion must go through the Config write door',
@@ -221,7 +203,7 @@ export function convertRunnerPatternsConfig(projectDir, options = {}) {
       }
     }
   } catch (err) {
-    const backup = discardUnusedBackup(targetPath, backupPath);
+    const backup = discardUnusedBackup(projectDir, originalText, backupPath);
     return {
       status: 'blocked',
       blocker: err.message ?? String(err),
@@ -249,16 +231,16 @@ export function convertRunnerPatternsConfig(projectDir, options = {}) {
 }
 
 // A refused write leaves the file byte-identical, so the copy made just before it
-// only adds one file per setup run; keep it when the file differs from it.
+// only adds one file per setup run; keep it when the file now differs from the text the copy was made from.
 // Returns the path of a kept copy, or undefined when it was deleted.
-function discardUnusedBackup(targetPath, backupPath) {
+function discardUnusedBackup(projectDir, originalText, backupPath) {
   try {
-    if (fs.readFileSync(targetPath).equals(fs.readFileSync(backupPath))) {
+    if (facade.readProjectConfigSource(projectDir)?.text === originalText) {
       fs.rmSync(backupPath);
       return undefined;
     }
   } catch {
-    // keep the copy when either file cannot be read
+    // keep the copy when it cannot be removed
   }
   return backupPath;
 }

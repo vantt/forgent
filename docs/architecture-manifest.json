@@ -234,6 +234,21 @@
       "reason": "only fgos-yaml-doc decides what YAML means; no file loads a YAML library by import, import(), require() or createRequire, and no pasted copy of a parser (found by its loadAll entry point) exists. Per-line match: an alias bound to createRequire on another line, or a load split over lines, is not seen"
     },
     {
+      "job": "locate and read a project config file",
+      "kind": "door",
+      "patterns": ["['\"`]config\\.ya?ml['\"`]", "['\"`]config\\.json['\"`]"],
+      "allowed": [
+        "src/config/facade.mjs",
+        { "path": "src/runner/dispatch/config.mjs", "reason": "names the file in the display of a finding's origin; reads nothing" },
+        { "path": "src/setup/runner-config-conversion.mjs", "reason": "names the global file in the display of a retired-key notice when a finding carries no file; reads nothing" },
+        { "path": "packages/config/rust/src/files.rs", "reason": "the fgos-config crate owns the file names" },
+        { "path": "packages/config/rust/src/machine.rs", "reason": "the fgos-config crate lists the machine files it reads" }
+      ],
+      "debt": [],
+      "retiredBy": "S7: the Node facade retires with the Node payload",
+      "reason": "only fgos-config and its Node facade read config; other files only name the file in text"
+    },
+    {
       "job": "render CLI help from the manifest",
       "kind": "door",
       "patterns": ["command-manifest\\.json"],
