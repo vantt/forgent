@@ -9,7 +9,8 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { execFileSync, spawnSync } from 'node:child_process';
-import { maintainEventStore } from '../../src/event-store/maintenance.mjs';
+import { maintainEventStore, runWithEventStoreLifecycle } from '../../src/event-store/maintenance.mjs';
+import { processSealCoalescer } from '../../src/event-store/seal-coalescing.mjs';
 import { loadNativeAddon } from '../../src/git/native.mjs';
 import { prepareWorkStore } from '../../src/state/work-event-store.mjs';
 import { fixGitFetchMapping } from '../../src/setup/git-checks.mjs';
@@ -94,6 +95,12 @@ test('the end trigger hands a due publish to a detached child, does not wait for
   maintainEventStore(repo, { trustedMain: repo, end: true });
   assert.deepEqual(syncChildren(repo), [], 'a push inside the interval starts no child');
   assert.deepEqual(store.maintenance([]).lastPush, first, 'a push inside the interval is not repeated');
+});
+
+test('a due publish with no host to run it is the trigger\'s error, never a silent loss', (t) => {
+  const { repo, store } = workRepo(t, { remote: true });
+  addAt(store, 3600);
+  assert.equal(maintainEventStore(repo, { trustedMain: repo, end: true, childHost: () => null }).error, 'event-store-sync-child: host-unavailable');
 });
 
 test('end triggers that run while a publish child is in flight start no second child', async (t) => {
@@ -231,4 +238,18 @@ test('a detached seal or sync child that fails leaves a record and exits non-zer
   const faults = faultRecords(repo, dir).filter((record) => record.faultClass === 'event-store-child');
   assert.deepEqual(faults.map((record) => record.argv.slice(0, 2)), [['events', 'seal'], ['events', 'sync']]);
   for (const record of faults) assert.match(record.message, /fgos doctor --fix/);
+});
+
+// Last in the file: it puts this process's seal coalescer in hand-off mode, as a CLI entry does.
+test('a seal child with no host to run it is recorded, and the command it follows is not failed', async (t) => {
+  const { repo, store } = workRepo(t);
+  processSealCoalescer.handOff();
+  processSealCoalescer.seal(store, 'project', [], 30, undefined, repo);
+  const records = [];
+  const answer = await runWithEventStoreLifecycle({
+    cwd: repo, trustedMain: repo, dispatched: true, opensStore: false, childHost: () => null,
+    recordFault: (faultClass, message) => records.push([faultClass, message]),
+  }, async () => 'answered');
+  assert.equal(answer, 'answered');
+  assert.deepEqual(records, [['event-store-seal-child', 'event-store-seal-child: host-unavailable']]);
 });

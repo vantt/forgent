@@ -9,10 +9,11 @@ import { processSealCoalescer } from './seal-coalescing.mjs';
 
 /**
  * Start a detached `fgos events` child. The host runs it natively, so the child never forwards to this payload, and
- * the recursion guard of a host that started this process is not handed on. No host to run it: the spawn's error.
+ * the recursion guard of a host that started this process is not handed on. `childHost(root)` names the host to run
+ * it (the project's active host unless a caller says otherwise); none: the spawn's error.
  */
-function startEventStoreChild(root, args) {
-  const executable = resolveHostBin(root);
+function startEventStoreChild(root, args, childHost) {
+  const executable = childHost(root);
   if (!executable) return { pid: null, error: 'host-unavailable' };
   const env = Object.assign({}, process.env);
   delete env.FGOS_RUST_HOST_RECURSION_GUARD;
@@ -20,8 +21,8 @@ function startEventStoreChild(root, args) {
 }
 
 /** Start the one detached child that publishes for this clone; a spawn that cannot start is the trigger's error. */
-function handSyncToChild(root) {
-  const { error } = startEventStoreChild(root, ['events', 'sync', '--opportunistic', '--dir', root]);
+function handSyncToChild(root, childHost) {
+  const { error } = startEventStoreChild(root, ['events', 'sync', '--opportunistic', '--dir', root], childHost);
   if (error) throw new Error(`event-store-sync-child: ${error}`);
 }
 
@@ -39,7 +40,7 @@ function handSyncToChild(root) {
  * `{ error }` (its code, else its message). Durable open batches stay on disk and doctor reports the store, so the
  * next trigger simply retries.
  */
-export function maintainEventStore(cwd, { trustedMain = cwd, shutdown = false, end = false, dispatched = false } = {}) {
+export function maintainEventStore(cwd, { trustedMain = cwd, shutdown = false, end = false, dispatched = false, childHost = resolveHostBin } = {}) {
   let error = null;
   const attempt = (step) => {
     try { return step(); } catch (cause) { error ??= cause.code ?? cause.message; return undefined; }
@@ -53,17 +54,21 @@ export function maintainEventStore(cwd, { trustedMain = cwd, shutdown = false, e
   const outcome = attempt(() => maintainStore(cwd, { trustedMain: main, config, shutdown, end, dispatched }));
   if (!outcome) return { error };
   error ??= outcome.error;
-  if (outcome.syncDue) attempt(() => handSyncToChild(main));
+  if (outcome.syncDue) attempt(() => handSyncToChild(main, childHost));
   return { error };
 }
 
 /** A Work command's seals are not waited for: once its answer is printed, the pending seals go to one short detached
- * `fgos events seal` child per stream. No child (spawn failed, killed first) loses nothing: the events are durable and
- * the next trigger or the `event-store-incidents` pointer covers them (spec §16). */
-function handSealsToChild() {
+ * `fgos events seal` child per stream. No child (spawn failed, host missing, killed first) loses nothing: the events are
+ * durable and the next trigger or the `event-store-incidents` pointer covers them (spec §16). A child that could not be
+ * started is still said: the first error is returned for the caller to record. */
+function handSealsToChild(childHost) {
+  let error = null;
   for (const { root, stream, checkpointPath } of processSealCoalescer.takeHandedOff()) {
-    startEventStoreChild(root, ['events', 'seal', '--stream', stream, ...(checkpointPath ? ['--history', checkpointPath] : []), '--dir', root]);
+    const started = startEventStoreChild(root, ['events', 'seal', '--stream', stream, ...(checkpointPath ? ['--history', checkpointPath] : []), '--dir', root], childHost);
+    error ??= started.error ?? null;
   }
+  return error;
 }
 
 /**
@@ -75,11 +80,12 @@ function handSealsToChild() {
  * Facts: `cwd` (the store's project root), `trustedMain` (as for `maintainEventStore`), `dispatched` (a dispatched
  * worker seals inline and never publishes or releases Land), `opensStore` (the verb opens the store: it carries both
  * triggers), `creating` (the verb creates the store: no start trigger), `landed` (the verb ran Land).
+ * `childHost(root)` names the host that runs the seal and publish children (default: the project's active host).
  * Callbacks keep this layer free of the shell and of Work: `recordFault(faultClass, message)` receives a trigger error,
  * which never fails the command, and `releaseLand(trustedMain)` releases the candidates Work recorded.
  */
 export async function runWithEventStoreLifecycle(
-  { cwd, trustedMain = cwd, dispatched = false, opensStore = false, creating = false, landed = false, recordFault, releaseLand },
+  { cwd, trustedMain = cwd, dispatched = false, opensStore = false, creating = false, landed = false, recordFault, releaseLand, childHost = resolveHostBin },
   fn,
 ) {
   if (!dispatched) processSealCoalescer.handOff();
@@ -89,14 +95,15 @@ export async function runWithEventStoreLifecycle(
     return resolved;
   };
   const trigger = (faultClass, policy) => {
-    const { error } = maintainEventStore(cwd, { trustedMain: main, dispatched, ...policy });
+    const { error } = maintainEventStore(cwd, { trustedMain: main, dispatched, childHost, ...policy });
     if (error) recordFault(faultClass, error);
   };
   if (opensStore && dispatched && !creating) trigger('event-store-start-trigger', {});
   try {
     return await fn();
   } finally {
-    handSealsToChild();
+    const sealChildError = handSealsToChild(childHost);
+    if (sealChildError) recordFault('event-store-seal-child', `event-store-seal-child: ${sealChildError}`);
     if (opensStore) {
       trigger('event-store-end-trigger', { end: true });
       // A dispatched worker never releases: only the clone owner's own session does (D13). A root that could not be

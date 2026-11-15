@@ -211,11 +211,6 @@ fn open(
     env: &Environment,
 ) -> Result<Option<Open>, Refused> {
     let state = env.state_root.as_path();
-    match resolve::driver(state, detached) {
-        Ok(_) => {}
-        Err(ResolveError::StateRootGone) => return Ok(None),
-        Err(other) => return Err(resolve_failure(other)),
-    }
     let hint = resolve_invocation_root(&RootRequest {
         cwd: root,
         dir: None,
@@ -287,12 +282,7 @@ fn status_of(open: &Open, remote: &str) -> Result<Value, Refused> {
     .map_err(store_failure)
 }
 
-fn sync_verb(
-    open: &Open,
-    no_push: bool,
-    opportunistic: bool,
-    started_sec: u64,
-) -> Result<Value, Refused> {
+fn sync_verb(open: &Open, no_push: bool, opportunistic: bool) -> Result<Value, Refused> {
     let run = || {
         sync(
             &open.driver,
@@ -317,6 +307,9 @@ fn sync_verb(
     // it) and answers a failed attempt as `{ error }` when the sync itself persisted that attempt, which
     // `event-store-incidents` and `events status` read. A failure before the sync could record its attempt (a
     // refused lock directory) is the child's error.
+    let started_sec = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .map_or(0, |elapsed| elapsed.as_secs());
     match run() {
         Ok(result) => Ok(synced_json(result)),
         Err(error) => {
@@ -477,9 +470,6 @@ fn export_verb(
 
 /// Runs one request: its own validation first, then the store.
 pub fn answer(request: &EventsRequest, env: &Environment) -> Result<Value, Refused> {
-    let started_sec = std::time::SystemTime::now()
-        .duration_since(std::time::UNIX_EPOCH)
-        .map_or(0, |elapsed| elapsed.as_secs());
     match &request.verb {
         Verb::Seal { stream, history } => {
             let stream = stream
@@ -519,7 +509,7 @@ pub fn answer(request: &EventsRequest, env: &Environment) -> Result<Value, Refus
             let Some(open) = open(&request.root, request.detached, remote.as_deref(), env)? else {
                 return Ok(state_root_gone());
             };
-            sync_verb(&open, *no_push, *opportunistic, started_sec)
+            sync_verb(&open, *no_push, *opportunistic)
         }
         Verb::Status { remote } => {
             ensure_platform()?;

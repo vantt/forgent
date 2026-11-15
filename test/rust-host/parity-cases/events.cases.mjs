@@ -3,15 +3,17 @@
 // Every case runs on a fresh project per entry (the verbs write: seal, sync and export change the store), built by
 // `prepare` at the same path for both entries so the answers can be compared byte for byte, and `evidence` reads
 // what the call left behind (the files under the store, the fault records, the state root) so a difference in an
-// effect fails like a difference in an answer. A runner calls, per entry: `prepare(case, scratch)`, the entry with the
-// returned `cwd`/`args`/`env`, then `evidence(fixture)`.
+// effect fails like a difference in an answer. `runPreparedCase(entryA, entryB, testCase)` runs one case on both entries, one
+// after the other, and compares them.
 //
 // `accepted` names a difference the migration accepts, as the pair of exit codes and the host's refusal text; the
 // entries must differ in exactly that way and in no other.
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
+import crypto from "node:crypto";
 import { execFileSync } from "node:child_process";
+import { runCaseOnEntry, compareResults } from "../harness.mjs";
 import { initializeWorkRepository } from "../../helpers/work-store-release.mjs";
 import { writeProjectConfig } from "../../helpers/config-fixture.mjs";
 import { prepareWorkStore } from "../../../src/state/work-event-store.mjs";
@@ -62,6 +64,18 @@ const FIXTURES = {
     const cwd = path.join(root, "elsewhere");
     fs.mkdirSync(cwd);
     return { repo, cwd };
+  },
+  // As `gone`, for a project whose machine id lives only in the (removed) state root, as a project set up by the host has it.
+  "gone-machine-in-state": (root) => {
+    const repo = project(root);
+    git(repo, "config", "--unset", "fgos.machineId");
+    return { repo, env: { FGOS_STATE_ROOT: path.join(root, "state-gone") }, stateRoot: path.join(root, "state-gone") };
+  },
+  // A directory that is no repository, and a state root that is gone.
+  "gone-nonproject": (root) => {
+    const repo = path.join(root, "repo");
+    fs.mkdirSync(repo, { recursive: true });
+    return { repo, cwd: repo, env: { FGOS_STATE_ROOT: path.join(root, "state-gone") }, stateRoot: path.join(root, "state-gone") };
   },
   // The state root the call finds is gone: a detached child skips, and nothing may recreate it.
   gone: (root) => {
@@ -168,6 +182,11 @@ export const cases = [
   // a detached child never rebuilds a state root its owner removed
   c("seal-state-root-gone", "gone", ["seal", "--stream", "project", "--dir", "{REPO}"], { expectedExitCode: 0 }),
   c("sync-opportunistic-state-root-gone", "gone", ["sync", "--opportunistic", "--dir", "{REPO}"], { expectedExitCode: 0 }),
+  // The same child with no --dir: the root the doors resolve is the project, so it skips too.
+  c("seal-state-root-gone-no-dir", "gone-machine-in-state", ["seal", "--stream", "project"], { expectedExitCode: 0 }),
+  c("seal-unlisted-stream-state-root-gone-no-dir", "gone-machine-in-state", ["seal", "--stream", "demo"], { expectedExitCode: 0, dropRecordLine: LINE.source }),
+  c("seal-state-root-gone-outside-a-repository", "gone-nonproject", ["seal", "--stream", "project"], { expectedExitCode: 0 }),
+  c("sync-opportunistic-state-root-gone-no-dir", "gone-machine-in-state", ["sync", "--opportunistic"], { expectedExitCode: 0 }),
   c("sync-state-root-gone-foreground", "gone", ["sync", "--no-push", "--dir", "{REPO}"], { modes: [], ignoreStderr: true }),
   // export
   c("export", "events", ["export", "--out", "{OUT}"], { expectedExitCode: 0, jsonIgnorePaths: ["data.cursor"] }),
@@ -184,3 +203,98 @@ export const cases = [
   refusal("unknown-sub-command", "project", ["bogus"], 4, { modes: [], accepted: { baseExit: 4, hostExit: 4, hostText: 'unknown events subcommand "bogus". Available: sync, status, seal, export' } }),
   refusal("flag-before-sub-command", "project", ["--remote", "status"], 4, { modes: [], accepted: { baseExit: 4, hostExit: 4, hostText: "events requires a subcommand. Available: sync, status, seal, export" } }),
 ];
+
+// What differs between two runs by nature: ages and times, store ids, commit ids, and the value of a `--k=v` token
+// the host redacts in a fault record.
+const VOLATILE = [
+  [/"(oldestUnsealedAgeSec|time|createdAt|at|startedAt|lastSeq)": \d+/g, '"$1": <n>'],
+  [/[0-9a-f]{40}/g, "<sha>"],
+  [/[0-9a-f]{32}/g, "<id>"],
+  [/--([a-z-]+)=(<\d+>|[^"\\\s]*)/g, "--$1=<v>"],
+];
+const normalize = (text) => VOLATILE.reduce((acc, [pattern, to]) => acc.replace(pattern, to), text);
+
+function dataText(text, ignorePaths) {
+  const json = JSON.parse(text);
+  const hashesItself = crypto.createHash("sha256").update(JSON.stringify(json.data)).digest("hex") === json.data_hash;
+  for (const dotted of ignorePaths ?? []) {
+    const keys = dotted.split(".").slice(1);
+    let node = json.data;
+    for (const key of keys.slice(0, -1)) node = node?.[key];
+    if (node && typeof node === "object") delete node[keys.at(-1)];
+  }
+  // Key order is part of the answer (the envelope hashes the data as printed), so the text keeps it.
+  return { hashesItself, text: normalize(JSON.stringify(json.data, null, 1)) };
+}
+
+const normaliseFaults = (left) => ({ ...left, faults: left.faults.map((fault) => ({ ...fault, message: normalize(fault.message) })) });
+
+async function runOn(entry, testCase, parent) {
+  fs.rmSync(parent, { recursive: true, force: true });
+  const fixture = prepare(testCase, path.join(parent, "w"));
+  const result = await runCaseOnEntry(entry, { id: testCase.id, args: fixture.args, cwd: fixture.cwd, env: fixture.env, ignoreChildren: true, timeoutMs: 120000 });
+  const left = evidence(fixture);
+  fs.rmSync(parent, { recursive: true, force: true });
+  return { result, left };
+}
+
+function withoutRecordLine(result, pattern) {
+  if (!pattern) return result;
+  const text = result.stderrText.replace(new RegExp(pattern, "m"), "");
+  return { ...result, stderrText: text, stderr: Buffer.from(text) };
+}
+
+/** Every `.fgos` above `dir`: a call from a fixture would take one of them for its project and write into it. */
+function storesAbove(dir) {
+  const found = [];
+  for (let up = path.dirname(dir); up !== path.dirname(up); up = path.dirname(up)) {
+    if (fs.existsSync(path.join(up, ".fgos"))) found.push(path.join(up, ".fgos"));
+  }
+  if (fs.existsSync(path.join(path.parse(dir).root, ".fgos"))) found.push(path.join(path.parse(dir).root, ".fgos"));
+  return found;
+}
+
+/** Runs `testCase` on both entries (a fresh project each, at the same path) and compares them; `{ caseId, passed, differences }`. */
+export async function runPreparedCase(entryA, entryB, testCase) {
+  const parent = path.join(fs.mkdtempSync(path.join(os.tmpdir(), "events-parity-")), "p");
+  // Each fixture is its own repository root with its own `.fgos`: nothing above it may be a project, before or after.
+  const before = storesAbove(parent);
+  const a = await runOn(entryA, testCase, parent);
+  const b = await runOn(entryB, testCase, parent);
+  const after = storesAbove(parent);
+  fs.rmSync(path.dirname(parent), { recursive: true, force: true });
+  if (before.length > 0 || after.length > 0) {
+    return { caseId: testCase.id, passed: false, differences: [`a .fgos exists above the fixture tree (before: ${before}; after: ${after})`] };
+  }
+  const ra = withoutRecordLine(a.result, testCase.dropRecordLine);
+  const rb = withoutRecordLine(b.result, testCase.dropRecordLine);
+  const differences = [];
+  if (rb.spawnedChildren.some((child) => path.basename(child.cmd) === "node")) differences.push("the host entry started a node process");
+  if (testCase.accepted) {
+    const { baseExit, hostExit, hostText, hostStdout, hostStateRootAbsent } = testCase.accepted;
+    if (ra.exitCode !== baseExit) differences.push(`base exit ${ra.exitCode} != ${baseExit}`);
+    if (rb.exitCode !== hostExit) differences.push(`host exit ${rb.exitCode} != ${hostExit}`);
+    if (!rb.stderrText.includes(hostText)) differences.push(`host stderr lacks "${hostText}": ${rb.stderrText}`);
+    if (hostStdout && !rb.stdoutText.includes(hostStdout)) differences.push(`host stdout lacks "${hostStdout}": ${rb.stdoutText}`);
+    if (hostStateRootAbsent && b.left.stateRootExists !== false) differences.push("the host left a state root behind");
+  } else {
+    const wanted = testCase.modes ?? [];
+    const quiet = (result) => (testCase.ignoreStderr ? { ...result, stderr: Buffer.alloc(0), stderrText: "" } : result);
+    differences.push(...compareResults({ ...testCase, modes: [], ignoreChildren: true }, quiet(ra), quiet(rb)).differences);
+    if (wanted.includes("exact-bytes")) {
+      if (!ra.stdout.equals(rb.stdout)) differences.push("stdout bytes differ");
+      if (!ra.stderr.equals(rb.stderr)) differences.push("stderr bytes differ");
+    }
+    if (wanted.includes("semantic-json")) {
+      const da = dataText(ra.stdoutText, testCase.jsonIgnorePaths);
+      const db = dataText(rb.stdoutText, testCase.jsonIgnorePaths);
+      if (!da.hashesItself || !db.hashesItself) differences.push("data_hash does not hash its own data");
+      if (da.text !== db.text) differences.push(`data differs:\n--- base\n${da.text.slice(0, 1500)}\n--- host\n${db.text.slice(0, 1500)}`);
+      if (ra.stderrText !== rb.stderrText) differences.push(`stderr differs: ${JSON.stringify(ra.stderrText)} vs ${JSON.stringify(rb.stderrText)}`);
+    }
+    if (JSON.stringify(normaliseFaults(a.left)) !== JSON.stringify(normaliseFaults(b.left))) {
+      differences.push(`what the call left behind differs: ${JSON.stringify(a.left)} vs ${JSON.stringify(b.left)}`);
+    }
+  }
+  return { caseId: testCase.id, passed: differences.length === 0, differences };
+}

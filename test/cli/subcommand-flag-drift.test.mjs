@@ -197,13 +197,8 @@ const MULTI = COMMAND_REGISTRY.filter((entry) => entry.subcommands && entry.nati
 const NATIVE = COMMAND_REGISTRY.filter((entry) => entry.subcommands && entry.native === true);
 
 test('the drift scan covers the verbs that branch on a positional sub-verb', () => {
-<<<<<<< HEAD
-  assert.deepEqual(MULTI.map((e) => e.name).sort(), ['agents', 'dispatch', 'events', 'git', 'goal', 'lock', 'merge', 'session', 'workflow', 'worktree']);
-  assert.deepEqual(NATIVE.map((e) => e.name).sort(), ['config', 'convention', 'friction', 'gateway', 'identity', 'mailbox', 'metrics']);
-=======
-  assert.deepEqual(MULTI.map((e) => e.name).sort(), ['agents', 'dispatch', 'gateway', 'git', 'goal', 'lock', 'merge', 'session', 'workflow', 'worktree']);
-  assert.deepEqual(NATIVE.map((e) => e.name).sort(), ['config', 'convention', 'events', 'friction', 'identity', 'mailbox', 'metrics']);
->>>>>>> 0d0846607 (feat(events): sync, status, seal and export run in the host)
+  assert.deepEqual(MULTI.map((e) => e.name).sort(), ['agents', 'dispatch', 'git', 'goal', 'lock', 'merge', 'session', 'workflow', 'worktree']);
+  assert.deepEqual(NATIVE.map((e) => e.name).sort(), ['config', 'convention', 'events', 'friction', 'gateway', 'identity', 'mailbox', 'metrics']);
 });
 
 for (const entry of MULTI) {
@@ -299,7 +294,6 @@ const NATIVE_SOURCES = {
       return src.slice(start, src.indexOf('pub struct MailboxAnswer', start));
     },
   },
-<<<<<<< HEAD
   // gateway -> one projector (project_gateway_request) over the three sub-verbs, none of which takes a flag of its own.
   gateway: {
     subs: RUST('apps/fgos/src/wiring/gateway_control.rs'),
@@ -307,14 +301,14 @@ const NATIVE_SOURCES = {
       const src = RUST('apps/fgos/src/wiring/gateway_control.rs');
       const start = src.indexOf('pub fn project_gateway_request');
       return src.slice(start, src.indexOf('fn serve(', start));
-=======
+    },
+  },
   events: {
     subs: RUST('apps/fgos/src/wiring/events.rs'),
     shared: () => {
       const src = RUST('apps/fgos/src/cli_projector.rs');
       const start = src.indexOf('fn project_events_request');
       return src.slice(start, src.indexOf('/// `fgos config show', start));
->>>>>>> 0d0846607 (feat(events): sync, status, seal and export run in the host)
     },
   },
   config: {
