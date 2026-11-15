@@ -40,7 +40,7 @@ Accepted behaviour changes (decided here, each in the phase that makes it and in
   refusal) is recorded in `.fgos/logs/invocation-faults.jsonl`, as F0 did for today's native verbs; a verb's own
   refusal is not recorded (as in Node);
 - `.fgos/sessions.json` is written atomically (Durable File) instead of `writeFileSync` (`src/runner/session.mjs:164-167`);
-- whatever the owner picks in S23-Q3 (`lock fence` confirmation) and, if asked, S23-Q4 (`gateway start` off Unix).
+- whatever the owner picks in S23-Q3 (`lock fence` confirmation); `gateway start` is refused off Unix (S23-Q4, decided by evidence).
 
 ## Decisions taken in this plan (evidence in the phase named)
 
@@ -53,7 +53,7 @@ Accepted behaviour changes (decided here, each in the phase that makes it and in
 | D5 | Hot record read and compare-and-clear get one owner, the holder-lock crate; Node's functions call it | holder-lock spec §15 owns the hot mutex and `hot-lock.v1.json`: a lower-layer contract, unlike the Execution modules S23-Q1 moved out | 03 |
 | D6 | `lock-status`'s run-scoped instances are listed by the host (it links the Execution-side crates) and passed into `holder-lock::status`; a twin of the three Node listers with one fixture, debt `retiredBy` S6a | holder-lock may not know Execution layouts; `fgos-run-supervisor` depends on holder-lock, so the reverse call is a cycle | 04 |
 | D7 | The session registry's owner is a host module; Node's `listSessions` becomes a client of the host verb (`invokeHost`); identity stays an allowed read-only reader | the registry is runner state, not a Git fact (`docs/platform/git/spec.md:66, 70`); `invokeHost` is the established Node-to-native pattern (`src/convention/convention-client.mjs:21`) | 08 |
-| D8 | Gateway control is a host module; the gateway child is spawned without the recursion guard | only the host uses it after the flip; a guarded child cannot call legacy verbs (`apps/fgos/src/legacy_exec.rs:249`, `main.rs:283`) | 09 |
+| D8 | Gateway control is a host module (the recursion-guard fix is made outside the port, `cook/gateway-guard-fix`) | only the host uses it after the flip; a guarded child cannot call legacy verbs (`apps/fgos/src/legacy_exec.rs:249`, `main.rs:283`) | 09 |
 | D9 | Event Store children start the host binary from both lifecycle wrappers; Node's `event-store-child` branch goes with `events` | Node would refuse a native `events` child | 07 |
 | D10 | Crate edges approved with this plan: `apps/fgos` -> `fgos-durable-file` (08, 09); `self_chain` moves from the addon into `fgos-process` (05, no new edge). The step lead commits each `Cargo.lock` change alone | the plan's own "new edge = stop" rule, settled once | 05, 08, 09 |
 | D11 | S2 lands on `main` before S3 | S2 carries the first store-touching wiring proof (program risk row) | landing |
@@ -89,8 +89,13 @@ Accepted behaviour changes (decided here, each in the phase that makes it and in
    the annotation in `packages/host-runtime/contracts/command-route-annotations.json`, `native: true` in
    `src/cli/command-registry.mjs`; regenerate `command-routes.json` and `command-manifest.json`
    (`node scripts/export-command-selectors.mjs`). Refusals use D3's outcome with Node's category and text.
+   An unknown flag is refused with Node's exact text: the host takes each sub-verb's flag list from the registry
+   annotation it already ships and reuses Node's message grammar (including the `--k=v` "write --k <value>" hint).
+   No user-visible change, no CHANGELOG line.
 3. Parity: the verb's table `test/rust-host/parity-cases/<verb>.cases.mjs` (every `requireField`/`optionalField`
    refusal of the arm included, 00 F16) runs green against the step's base release before the Node code is deleted.
+   A verb phase uses the `node:<base>/bin/fgos.mjs` entry with the staged env (about 0.34 s a case, not 2.7 s through
+   the staged host). The unknown-flag case is compared on exit code and exact stderr bytes like every other refusal.
 4. Delete in the same phase: the `bin/fgos.mjs` arm, its static imports that no other arm uses (and their
    `ARM_STATIC_IMPORTS` lines, `test/architecture.test.mjs:1660`), the Node use case, its `files` entry in
    `docs/architecture-manifest.json` (the architecture test compares files on disk with `manifest.files`), and every
@@ -135,7 +140,7 @@ S3: 07 events ─────────┐
 | 06 | ~~`worktree create|remove` native~~ dropped: moves to S6a (S23-Q1 = b) | - | - | - | 0d | [phase-06-worktree.md](phase-06-worktree.md) |
 | 07 | `events sync|status|seal|export` native | S3 | B | 00, 01 | 2.5d | [phase-07-events.md](phase-07-events.md) |
 | 08 | `session start|end|list|gc` native | S3 | B | 00, 01 | 3d | [phase-08-session.md](phase-08-session.md) |
-| 09 | `gateway start|stop|status` native | S3 | B | 00, 01, S23-Q4 if asked | 2d | [phase-09-gateway.md](phase-09-gateway.md) |
+| 09 | `gateway start|stop|status` native | S3 | B | 00, 01 | 2d | [phase-09-gateway.md](phase-09-gateway.md) |
 | 10 | ~~`agents list` native~~ dropped: moves to S5 (S23-Q1 = b) | - | - | - | 0d | [phase-10-agents.md](phase-10-agents.md) |
 | 11 | S2 close: docs, proof consolidation, parity re-run, gates | S2 | D | 02-05 | 1d | [phase-11-s2-close.md](phase-11-s2-close.md) |
 | 12 | S3 close: docs, proof consolidation, parity re-run, gates | S3 | D | 07-09 | 1d | [phase-12-s3-close.md](phase-12-s3-close.md) |
@@ -172,7 +177,7 @@ Wave E: S2 lands on main -> S3 rebases on main -> [13 flag spelling, on S3] -> S
 | `test/rust-host/verb-parity.test.mjs` (step branches only, never on `main`) | step lead adds it as the first commit of each integration branch; each verb phase adds its table name; 11 and 12 rerun every table and delete runner and tables |
 | `apps/fgos/tests/cli_tests.rs` | 04 (wiring proof) -> 05 -> 07 -> 08 -> 09 (one case each) |
 | `packages/holder-lock/rust/src/lib.rs` | 03 -> 04 -> 05 |
-| `packages/process/rust/src/control.rs` | 05 only (`self_chain` moves in); `lib.rs`, `mapped.rs`: 09 only, under S23-Q4 = a |
+| `packages/process/rust/src/control.rs` | 05 only (`self_chain` moves in); `lib.rs`, `mapped.rs`: no phase touches them (S23-Q4 = b) |
 | `packages/git/rust/src/lib.rs` | 02 only |
 | `packages/git/node-addon/src/git.rs` | 02 only; `holder_lock.rs`: 03 only; `process.rs`: 05 only |
 | `src/event-store/maintenance.mjs`, `src/util/spawn-detached-fgos.mjs` | 07 only (08 and 09 delete callers, not lines here) |
@@ -197,7 +202,7 @@ Modify:
   `apps/fgos/src/wiring/mod.rs`, `apps/fgos/Cargo.toml`, `apps/fgos/tests/cli_tests.rs`
 - Kernel and crates: `packages/host-runtime/rust/src/{catalog.rs,contracts.rs}` (01: categorised refusal),
   `packages/git/rust/src/{invocation_root.rs,driver.rs,lib.rs}` (01, 02), `packages/holder-lock/rust/src/lib.rs`,
-  `packages/process/rust/src/control.rs` (05), `packages/process/rust/src/{lib.rs,mapped.rs}` (09, only under S23-Q4 = a),
+  `packages/process/rust/src/control.rs` (05),
   `packages/git/node-addon/src/{git.rs,holder_lock.rs,process.rs}`,
   `packages/identity/rust` tests and `packages/identity/contracts/identity.writer.v1.json` (08, the registry row shape),
   `packages/event-store/rust/src/lib.rs` (07, only if an op needs a public entry 00 finds missing)
@@ -340,8 +345,8 @@ the planner's own trace (D4). **Findings:** 41 raw, merged to 24 (21 accepted, 2
 | 14 | Torn (non-UTF-8) hot records never compare equal through a JS string | Medium | Accept: opaque token, invalid-UTF-8 row | 03 |
 | 15 | `session end` must not start a publish child; seal also on failure | Medium | Accept: `Policy { shutdown: true }` only, finally-equivalent, no-child assertion | 08, 09 |
 | 16 | Event Store tests spawn `node bin/fgos.mjs events` directly; `leave` needs the error message | Medium | Accept | 01, 07 |
-| 17 | Gateway child inherits the recursion guard | Medium | Accept: D8; current behaviour checked in 00 F11 | 09 |
-| 18 | `gateway start` off Unix: `spawn_detached` is `cfg(unix)` | Medium | Accept: S23-Q4, asked only if 00 F11 finds it works on Windows today | 09, Q |
+| 17 | Gateway child inherits the recursion guard | Medium | Fixed outside the port on `cook/gateway-guard-fix` | 09 |
+| 18 | `gateway start` off Unix: `spawn_detached` is `cfg(unix)` | Medium | Accept: S23-Q4 decided by evidence (b): refused off Unix, 00 F11 found it never worked on Windows | 09, Q |
 | 19 | Session self-checks use the caller's cwd; `gc` from inside a session could remove a live one | Medium | Accept: provider takes the caller's cwd; parity cases inside a session worktree and a subdirectory | 08 |
 | 20 | `doors` row defects: 02 addon entry, 09 `--bin` pattern and stale registry entry, 08 registry text, 07 `event-store-child` twin unguarded | Medium | Accept | 02, 07, 08, 09 |
 | 21 | File-set gaps: `manifest.files` entries, recount after rebase, `cli_tests.rs` in 07/08, `holder-lock-checks.test.mjs:100`, baseline rows 26/27, `lock-fence-signal-refused`, gateway `cargo` cwd and `readMachineConfig` port, `TEST_ENV_KEYS` (use the `FGOS_TEST_` prefix) | Medium | Accept | recipe, 01, 02, 04, 05, 09 |
@@ -367,7 +372,7 @@ the `LENIENT_ROOT_VERBS` guard gets an exact-set assertion; phase 03 states why 
 - S23-Q1 = (b): `worktree` to S6a, `agents` to S5; phases 06 and 10 dropped; effort 23d; program S5 and S6a rows updated.
 - S23-Q2 = (a): `=` removed everywhere; phase 13 runs the (a) branch.
 - S23-Q3 = (b): `lock fence` without `--yes` lists and refuses (`lock-fence-not-confirmed`, exit 2).
-- S23-Q4: still waits on phase 00 fact F11.
+- S23-Q4 = (b), decided by evidence (see the 2026-11-15 phase 00 entry below).
 
 ### Verification results
 - Tier: Full (14 phases). Claims checked: 78 (38 by the assumption reviewer, 40 planner spot checks with `sed`/`rg`
@@ -378,11 +383,28 @@ the `LENIENT_ROOT_VERBS` guard gets an exact-set assertion; phase 03 states why 
   frozen-worktree warning and non-project `--dir`; gateway `cargo` cwd) | Open, owned by 00: F1-F16.
 - Decided by the planner (priority 2: the analysis picked one): D1-D11. Batched for the owner: S23-Q1..Q4.
 
+### Phase 00 decisions (2026-11-15, HARDEN, inside the approved frame)
+- (a) The gateway recursion-guard bug and the `--locked` cargo build are fixed outside the port, on branch
+  `cook/gateway-guard-fix`. Phase 09 must not carry them; its text drops the guard fix.
+- (b) Phase 07 gets a positive case: root removed gives `skipped`, and the root stays absent.
+- (c) Parity entry A is `node <base>/bin/fgos.mjs` plus the staged env (about 0.34 s a case against 2.7 s through the
+  staged host, output byte-equal on six cases). Phase 01 already landed, so only the Port recipe carries a note.
+- (d) Phase 04 pins the three run-lister rules and the unreachable `lock-not-node-owned` as cases (facts report section 8).
+- (e) `git recover` outside a repository printing `--sha [object Object]` is fixed in the port, not copied: an
+  accepted change with a CHANGELOG line, written by phase 02.
+- (f) Unknown-flag text: the host takes each sub-verb's flag list from the registry annotation it already ships and
+  reuses Node's message grammar (including the `=` hint), so the stderr refusal stays exact-bytes with Node; one source
+  of truth, no user-visible change, no CHANGELOG line (phase 13 flag-spelling and the Port recipe).
+  Superseded (2026-11-15, same day): "the host's one per-verb text is the accepted change; parity compares exit code
+  and refusal id, not bytes", dropped because it kept two sources of truth for the same refusal.
+- 2026-11-15, HARDEN, after OPC's review: switched decision (f) to OPC's version above.
+- S23-Q4 decided (b), see the question below.
+
 ## Owner questions (batch)
 
 Asked once, together, when this plan is approved. None blocks wave A, phase 01 or the other verb phases:
-S23-Q1 gated only 06 and 10, S23-Q2 only 13, S23-Q3 only 05, S23-Q4 (if asked) only 09's `start` off Unix.
-Status (2026-11-15 08:41): Q1-Q3 answered by the owner (via HARDEN); Q4 still waits on phase 00 fact F11.
+S23-Q1 gated only 06 and 10, S23-Q2 only 13, S23-Q3 only 05, S23-Q4 only 09's `start` off Unix.
+Status (2026-11-15): Q1-Q3 answered by the owner (via HARDEN); Q4 decided by evidence (b).
 
 ### S23-Q1: `worktree` and `agents` — port now, or move them to the step that moves their shared module?
 
@@ -456,7 +478,7 @@ Status (2026-11-15 08:41): Q1-Q3 answered by the owner (via HARDEN); Q4 still wa
 - **Scope of the answer:** `lock fence`'s confirmation only; no other verb gets a confirmation loop.
 - **Answer (2026-11-15 08:41, owner via HARDEN): (b).** `lock fence` without `--yes` lists the holders and refuses with `lock-fence-not-confirmed` (exit 2), on a terminal too. `core/skills/fgos-lock-fence/SKILL.md` is updated if its text needs it (phases 05, 11).
 
-### S23-Q4 (asked only if phase 00 F11 finds `fgos gateway start` works on Windows today): Windows detached spawn
+### S23-Q4: Windows detached spawn
 
 - **What is happening:** Node starts the gateway detached on every platform (`src/runner/gateway-control.mjs:233-238`);
   the host's detached spawn exists only on Unix (`packages/process/rust/src/lib.rs:15-16`, `mapped.rs:194`).
@@ -468,6 +490,8 @@ Status (2026-11-15 08:41): Q1-Q3 answered by the owner (via HARDEN); Q4 still wa
     user loses `gateway start`.
 - **Recommendation:** (a) if any Windows project uses the gateway today (00 F11 checks), else (b).
 - **Scope of the answer:** the gateway's start on Windows and the process crate's detached spawn; nothing else.
+- **Decided by evidence (2026-11-15, HARDEN, inside the approved frame): (b)** `gateway start` is refused off Unix with a clear message. Phase 00 proved it cannot work on Windows today (no `.exe` in `releaseBinaryPath`), so refusing loses nothing.
+- CHANGELOG line owed by phase 09: "`fgos gateway start` is refused off Unix with a message saying so; it never worked there."
 
 ## Items for the big lead (outside this plan)
 
@@ -477,4 +501,4 @@ Status (2026-11-15 08:41): Q1-Q3 answered by the owner (via HARDEN); Q4 still wa
 - If 00 F15 confirms it, F0's root door recreates a removed state root for a Node `events` child today (regression of
   Git spec §20); D4 fixes it in 01, but it is live on `main` until then.
 - If 00 F11 confirms it, the gateway started by Node inherits `FGOS_RUST_HOST_RECURSION_GUARD`, so its calls to legacy
-  verbs fail today; D8 fixes it in 09.
+  verbs fail today; `cook/gateway-guard-fix` fixes it outside the port.

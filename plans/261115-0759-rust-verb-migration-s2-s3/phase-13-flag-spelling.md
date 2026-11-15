@@ -55,6 +55,10 @@ Phase-lead rules: [plan.md](plan.md). Branch `rust-verb-migration-program/s3-p13
 - (c): `docs/architecture-manifest.json` only.
 - Docs: `docs/platform/host-invocation-routing/spec.md` §9 (the open question closed, the answer recorded).
 
+Flag spelling for unknown flags: the host takes each sub-verb's flag list from the registry annotation it already ships
+and reuses Node's message grammar (including the `=` hint), so the stderr refusal stays exact-bytes with Node; no
+user-visible change, no CHANGELOG line.
+
 ## Gates
 
 - `cargo fmt --all --check`; `cargo clippy -p fgos -p fgos-observe -p fgos-host-runtime --all-targets -- -D warnings`;

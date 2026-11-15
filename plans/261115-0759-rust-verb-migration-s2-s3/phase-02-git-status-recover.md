@@ -80,6 +80,9 @@ Phase-lead rules: [plan.md](plan.md). Branch `rust-verb-migration-program/s2-p02
   (row 27), census, the integration branch's parity runner (`TABLES`).
 - Delete: `test/cli/fgos-git.test.mjs`.
 
+Acceptance addition: `git recover` outside a repository printed `--sha [object Object]` in Node; the port fixes it
+instead of copying it. It is an accepted change with a CHANGELOG line, written by this phase.
+
 ## Gates
 
 - `cargo fmt --all --check`; `cargo clippy -p fgos-git -p fgos-node-addon -p fgos --all-targets -- -D warnings`;

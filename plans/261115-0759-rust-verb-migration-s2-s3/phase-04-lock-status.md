@@ -104,6 +104,9 @@ Report slug `s2-p04-lock-status`.
   `docs/architecture-manifest.json`, `test/suite-baseline.json`, census, the parity runner's `TABLES`.
 - Delete: `src/runner/lock-status.mjs`, `test/runner/lock-status.test.mjs`.
 
+Acceptance addition: the three run-lister rules and the unreachable `lock-not-node-owned` are pinned as parity cases
+(facts report section 8).
+
 ## Gates
 
 - `cargo fmt --all --check`; `cargo clippy -p fgos-holder-lock -p fgos --all-targets -- -D warnings`;
