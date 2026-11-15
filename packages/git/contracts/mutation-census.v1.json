@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "3c42ed1a4c3e1bc728752b8d1bddc61830e9ebb179a6e92a84944883fabecf2a",
+  "payloadDigest": "366873f842efeb898e02d040817d365fafa8d27dcd1075f9f2d088ff65aca0d7",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "a5629383f89b4488b252a62f0ea86463e649e33e0a891db1a19af2cd6c136aca",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -918,10 +918,10 @@
     "scripts/regenerate-observe-fixtures.mjs": "e1ab4a029ae9aecf5485393a3f6e967f1e338862391a6b1701ed1954c57b40ee",
     "scripts/run-rust-dev-host.mjs": "54108fe41cb34a3bf60c01a98ab42368e12c0772dcdb707eea9cd28251d66289",
     "scripts/run-test-canary.mjs": "ef25e2f8237ffefddbf707c68289c0fe00ee95bd10da6a51a80fd965b30c42ba",
-    "scripts/run-tests.mjs": "a43ce208e06ab2627add9878bf1198ad8b85a7f75a399b7b3c700a59c5ff4572",
+    "scripts/run-tests.mjs": "4de545cd0358ff63b4d7b5b5b5869b54913643e2dcdba6bee397cce8afc6a216",
     "scripts/stress-test-files.mjs": "1c9298587bae21b5971c2e1eba5effd3c2a0c85ba94372936fa5e0c1d70d4f4e",
     "scripts/test-ownership-lint.mjs": "1917bcc0ec0387e43d4e09dc3bc1e6a5923e30b4c3848cf480df9eb0c2c042e2",
-    "scripts/test-proof-inventory.mjs": "7f8abf998e06311d581fa2fea37ed33df6d213572d50ff0fb7154dfb30f45b61",
+    "scripts/test-proof-inventory.mjs": "fb8d24de073f628cd1cea540af8d39b55ec55d4199543ddf9cb062941a243e70",
     "scripts/test-select-compare.mjs": "45ec5c8f1b192430431127a06133376cd5e5d2a50f8e6865472c1ae341ae1329",
     "scripts/test-select-coverage-map.mjs": "b313d02cce6c8fa7f03dae8acdfd14a37b8f3a04b330ae9b2c144d0287b08e85",
     "scripts/test-select-mutate.mjs": "77d8bc7ae624453d5c50d6f83d3136ef41803f69452cef41c8fd14587cd4df39",
@@ -3559,15 +3559,15 @@
     },
     {
       "path": "scripts/test-proof-inventory.mjs",
-      "line": 686,
-      "spawn": "median -> scripts/test-proof-inventory.mjs:681",
+      "line": 691,
+      "spawn": "median -> scripts/test-proof-inventory.mjs:686",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
     },
     {
       "path": "scripts/test-proof-inventory.mjs",
-      "line": 724,
-      "spawn": "cliCost -> scripts/test-proof-inventory.mjs:686",
+      "line": 729,
+      "spawn": "cliCost -> scripts/test-proof-inventory.mjs:691",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
     },

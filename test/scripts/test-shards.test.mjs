@@ -39,6 +39,18 @@ function writeFixtures(dir) {
   for (const [name, text] of Object.entries(FIXTURES)) fs.writeFileSync(path.join(dir, name), text);
 }
 
+// Deterministic Fisher-Yates over a small LCG, so a failure reproduces.
+function shuffled(list, seed) {
+  const out = [...list];
+  let state = seed * 2654435761 >>> 0;
+  for (let i = out.length - 1; i > 0; i--) {
+    state = (Math.imul(state, 1664525) + 1013904223) >>> 0;
+    const j = state % (i + 1);
+    [out[i], out[j]] = [out[j], out[i]];
+  }
+  return out;
+}
+
 test('every discovered test file lands in exactly one shard for 1 to 8 shards, whatever the input order', () => {
   const files = discoverTestFiles().map((f) => repoRelative(REPO_ROOT, f));
   const weights = readSuiteBaseline().fileCpu;
@@ -48,7 +60,7 @@ test('every discovered test file lands in exactly one shard for 1 to 8 shards, w
     assert.equal(shards.length, total);
     assert.deepEqual(shards.flat().sort(), files);
     assert.equal(new Set(shards.flat()).size, files.length, `a file is in two of ${total} shards`);
-    assert.deepEqual(partitionFiles([...files].reverse(), total, weights), shards);
+    assert.deepEqual(partitionFiles(shuffled(files, total), total, weights), shards);
   }
 });
 

@@ -615,7 +615,12 @@ export function suiteReport({
   const base = baseline.tests === null ? 'no baseline' : `baseline ${baseline.files} / ${baseline.tests} / ${baseline.rustTests ?? '?'} Rust / ${formatWall(baseline.wallSeconds)} / ${formatWall(baseline.cpuSeconds)} CPU${at}`;
   const load = shard ? `; load ${Math.round(shard.load)} of mean ${Math.round(shard.mean)} (${(shard.load / shard.mean).toFixed(2)})` : '';
   lines.push(`suite: ${shard ? `shard ${shard.index}/${shard.total}: ` : ''}${files.length} files, ${calls.length} test() calls, ${rustTests} Rust tests, ${formatWall(wallSeconds)} wall, ${formatWall(cpuSeconds)} CPU (${base})${load}`);
-  lines.push(...cpuGrowthLines({ cpuSeconds, fileCpu, tests: calls.length }, baseline));
+  // A shard compares only files the baseline has a cost for, so both sides of CPU per test() call cover the same files.
+  const knownFiles = new Set(Object.keys(whole.fileCpu));
+  const current = shard && whole.tests !== null
+    ? { cpuSeconds: typeof cpuSeconds === 'number' ? Object.entries(fileCpu).filter(([f]) => knownFiles.has(f)).reduce((sum, [, v]) => sum + v, 0) : cpuSeconds, fileCpu, tests: calls.filter((c) => knownFiles.has(c.file)).length }
+    : { cpuSeconds, fileCpu, tests: calls.length };
+  lines.push(...cpuGrowthLines(current, baseline));
   try {
     const delta = change();
     if (delta) lines.push(`suite: this change against ${String(delta.base).slice(0, 9)}: +${delta.added} -${delta.removed} test() calls, ${delta.spawns} new CLI/host spawn site(s), ${delta.unexplained} without a reason`);

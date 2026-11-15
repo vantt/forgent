@@ -89,7 +89,7 @@ export function discoverTestFiles(root = DEFAULT_TEST_ROOT) {
  * runner arguments (reporters, name patterns, concurrency, ...) followed by
  * the FULL discovered file list -- never the other way around, and never a
  * caller-supplied file list in place of it (R5: the default `npm test`
- * door must never let a caller narrow the full-suite selection).
+ * door must never let a caller narrow the full-suite selection, or one --shard of it).
  */
 export const GIT_CONFIG_GUARD_PATH = path.join(REPO_ROOT, 'scripts', 'lib', 'test-git-config-guard.mjs');
 
@@ -831,11 +831,16 @@ export function runChosenTests(paths, { cwd = REPO_ROOT, ...options } = {}) {
 }
 
 if (isMainModule(import.meta.url)) {
-  const shardArgs = process.argv.slice(2).filter((arg) => /^--shard=/.test(arg));
-  const argv = process.argv.slice(2).filter((arg) => !shardArgs.includes(arg));
+  // `--shard=k/n` is the only accepted spelling; a bare `--shard` (even followed by a value) is refused rather than
+  // passed on to node --test.
+  const rawArgs = process.argv.slice(2);
+  const bareAt = rawArgs.indexOf('--shard');
+  const shardArgs = rawArgs.filter((arg) => /^--shard=/.test(arg));
+  const argv = rawArgs.filter((arg, i) => !shardArgs.includes(arg) && arg !== '--shard' && !(bareAt >= 0 && i === bareAt + 1));
   let shard = null;
-  if (shardArgs.length > 0) {
+  if (shardArgs.length > 0 || bareAt >= 0) {
     try {
+      if (bareAt >= 0) throw new Error(`invalid shard "${rawArgs[bareAt + 1] ?? ''}": expected --shard=k/n with 1 <= k <= n, for example --shard=2/5`);
       if (shardArgs.length > 1) throw new Error('--shard given more than once');
       shard = parseShard(shardArgs[0].slice('--shard='.length));
     } catch (err) {

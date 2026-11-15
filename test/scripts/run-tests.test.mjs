@@ -198,6 +198,11 @@ test('a shard runs only the files its partition gives, split by the weights give
     assert.equal(refused.status, 1);
     assert.match(refused.stderr, new RegExp(`invalid shard "${bad.slice(8)}"`));
   }
+  for (const spaced of [['--shard', '2/5'], ['--shard']]) {
+    const refused = cli(...spaced);
+    assert.equal(refused.status, 1, `${spaced.join(' ')} is refused, not passed to node --test`);
+    assert.match(refused.stderr, /invalid shard ".*": expected --shard=k\/n/);
+  }
   const combined = cli('--shard=1/2', 'test/scripts/run-tests.test.mjs');
   assert.equal(combined.status, 1);
   assert.match(combined.stderr, /cannot be combined with chosen test files/);
