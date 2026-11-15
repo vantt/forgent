@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "717154473a08f0c68670c3f0891c869419d25e7b576afd2183c502e7995c29bf",
+  "payloadDigest": "7858d871de7e6b88db3f56bd26306d4a9964aab24b1ea8b87eb90b952b8cab14",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "a5629383f89b4488b252a62f0ea86463e649e33e0a891db1a19af2cd6c136aca",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -288,7 +288,7 @@
     "packages/distribution/rust/src/fgctl_refresh.rs": "36fd15b0c6159e9b9541fbadb2ea5a05f61c9ced1364216e6cbce45170aa4c5a",
     "packages/distribution/rust/src/git_gate.rs": "7d50addca54b78ca0b5d6b61c9d857b2de82016a1cc53faefc7c1038da163cba",
     "packages/distribution/rust/src/init.rs": "fb6b472bbca5b86c32ddf4f2a2a87a222d09f6624a0d5c86a4f24a2db138b8d3",
-    "packages/distribution/rust/src/lib.rs": "1d74467014f80910bdc389ef85a63fd425850874bb432046a88a6480e6327554",
+    "packages/distribution/rust/src/lib.rs": "f08eaf819dcae7513d4f084cdf8ab258f0accf105f5ce1096d962304aaaba891",
     "packages/distribution/rust/src/lock.rs": "ee39bccc87c5b34a7799ee886fe3c4b9f59346f22c550c67123efa49f9681f8e",
     "packages/distribution/rust/src/manifest.rs": "7aa7f3d42c3ac708e44cb0bbf4be36c414eaf0b29f0bdafc5bb768901fb46bda",
     "packages/distribution/rust/src/rc_lines.rs": "82b378ecb9a3e9ce0808271be51d94af373b089fff2c22bf7e8aaac90d4ffb57",
@@ -296,8 +296,8 @@
     "packages/distribution/rust/src/skill_stamp.rs": "f88b12c91c9d73eb9efc3924c031d590cf9a68506e602385ffdb8650e60fe9a6",
     "packages/distribution/rust/src/store.rs": "1cdaf72bbdf7c4bc0ae3eafd1f37fecd6a358de60c8ce5851ccf9212149174de",
     "packages/distribution/rust/src/suggest.rs": "302d698667662b3544b0761cd53dd87c68594d6f1b1ce52d8b85032627d52182",
-    "packages/distribution/rust/src/test_scratch.rs": "71ecf3bb18d75b0f7a17838ba33c64eecdc054009bb33313432dc0e2d7976242",
-    "packages/distribution/rust/src/timer.rs": "699abeba39ef34c027e6160d87a1fa5d9afa9eb808c716b13024959584106f68",
+    "packages/distribution/rust/src/test_scratch.rs": "244cd414a2413dfa0bb1410e6206ea24844ea1860e825eae90072d2ea123fab7",
+    "packages/distribution/rust/src/timer.rs": "d1a12b661c529be10aa7f62b978dbccc843fbf76947322d9b65df98fe0b2be43",
     "packages/distribution/rust/src/uninstall.rs": "0858575082b1fe249e10b89150afce35b82eb78fb2b0aa2f19bfd039fa06d107",
     "packages/distribution/rust/src/verify.rs": "79a9f08e75d0c0ca8f5e04ad8443e4134a3dfbd85a38e01a448d53361463dc69",
     "packages/distribution/rust/src/workspace.rs": "ceb38606817fe7fe75d832d2c207e1b544cef3a2105acfb8892d2e1c25985fab",
@@ -668,8 +668,8 @@
     "packages/process/rust/src/platform/mod.rs": "b4ff396d9b969422f781e6255727dc0928ca00da032db87c7f7fc497d1be879f",
     "packages/process/rust/src/platform/windows.rs": "cf66a8c0aa69457c1b7a99c841cec556e4b31fa23890fb370d30c43310d38a45",
     "packages/process/rust/src/platform/windows_job.rs": "0909fae6ac6feb8707e86e06e1d15a62f2182eff42c017c88c51f945b4215561",
-    "packages/process/rust/src/platform/windows_spawn.rs": "ea3e815d159d793eb2006a6153ef9790b27c3b44aa798c0801208290834253fd",
-    "packages/process/rust/src/spawn.rs": "ea1302e236cb65acfaa3901e786dfba8cf5c15cdb2322b8509bfd63a31f4b44e",
+    "packages/process/rust/src/platform/windows_spawn.rs": "16c65da01c8dc4546109827a9a91fb3b57e6ab8285532b173c30097c9b889133",
+    "packages/process/rust/src/spawn.rs": "25cb0384dc63ebd56bf42d62c0ee0b08e85651afc07b12431ee36865119cca0f",
     "packages/process/rust/tests/common/mod.rs": "4c5caaca18815ba835a6ff9ae6b22e08af6e997ebbd152249fa9121a960e5863",
     "packages/process/rust/tests/containment_bwrap.rs": "da5288a138c19e228dc33255bb77abc9756958acfb0792d9ee8386242d8d7c31",
     "packages/process/rust/tests/containment_conformance.rs": "e98c00dbcc32edd5f67831608775f750ffefcdc49229f57426c204c2dd418153",
@@ -2415,7 +2415,7 @@
     {
       "path": "packages/distribution/rust/src/timer.rs",
       "line": 547,
-      "spawn": "Command::new <- packages/process/rust/src/spawn.rs:43",
+      "spawn": "Command::new <- packages/process/rust/src/spawn.rs:141",
       "binary": "(uncalled run_scheduler_call)",
       "class": "uncalled-wrapper"
     },

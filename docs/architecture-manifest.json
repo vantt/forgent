@@ -265,10 +265,30 @@
     {
       "job": "run a bounded child and find a program on the search path",
       "kind": "door",
-      "patterns": ["pub fn run_bounded\\b", "pub fn resolve_program\\b", "\\bfn first_on_path\\b"],
+      "patterns": ["pub fn run_bounded\\b", "pub fn resolve_program\\b", "\\bfn first_on_path\\b", "export function firstOnPath\\b", "std::env::split_paths\\(", "\\.try_wait\\(\\)"],
       "allowed": ["packages/process/rust/src/spawn.rs"],
-      "debt": [],
-      "reason": "the one place a Rust caller runs a child with a replacement environment, an input, a timeout and a distinct timed-out answer (std Command, which also runs Windows batch files), and the one PATH and PATHEXT lookup; the packaging modules pass their own runner in tests and this one by default"
+      "debt": [
+        { "path": "apps/fgos-gateway/src/gateway.rs", "reason": "watches its own gateway child (try_wait) for liveness; a service, not a bounded run" },
+        { "path": "packages/config/rust/src/detect.rs", "reason": "searches PATH (absolute entries only) for the detection candidates of the contract" },
+        { "path": "packages/distribution/rust/src/init.rs", "reason": "resolve_node_path looks for node on PATH for the install preflight" },
+        { "path": "packages/git/rust/src/driver.rs", "reason": "finds git on PATH (absolute entries only) and bounds its own git children with a deadline loop of its own" },
+        { "path": "packages/holder-lock/rust/src/borrow_windows.rs", "reason": "polls a child it started itself (try_wait); not a run-to-completion with a replacement environment" },
+        { "path": "packages/host-runtime/rust/src/providers/external_process/bound_invocation_supervisor.rs", "reason": "the external-process provider's bounded invocation, with its own output limit and cancellation" },
+        { "path": "packages/mailbox/rust/store/src/adapters/version.rs", "reason": "probes a CLI version with its own deadline" },
+        { "path": "packages/mailbox/rust/store/src/nudge.rs", "reason": "runs the nudge child with its own deadline" },
+        { "path": "packages/process/rust/src/containment/linux.rs", "reason": "polls a contained child in the containment driver" },
+        { "path": "packages/process/rust/src/mapped.rs", "reason": "searches PATH for the program of a descriptor-mapped spawn and polls its child" },
+        { "path": "packages/process/rust/src/platform/windows_spawn.rs", "reason": "keeps the PATH search for a name that already has an extension; the extension-less lookup is spawn.rs's resolve_program" },
+        { "path": "packages/run-supervisor/rust/src/attempt_step.rs", "reason": "finds node on PATH for the attempt step runner" },
+        { "path": "packages/run-supervisor/rust/src/gate/windows.rs", "reason": "the supervisor's own gate child, ended through its Job Object" },
+        { "path": "packages/run-supervisor/rust/src/steps.rs", "reason": "a supervised step led in its own group with the stepTimeoutMs of its envelope" },
+        { "path": "packages/run-supervisor/rust/src/supervise.rs", "reason": "polls a child it started itself (try_wait); not a run-to-completion with a replacement environment" },
+        { "path": "packages/run-supervisor/rust/src/supervise/windows.rs", "reason": "polls a child it started itself (try_wait); not a run-to-completion with a replacement environment" },
+        { "path": "packages/terminal-control/rust/src/driver/herdr.rs", "reason": "polls a child it started itself (try_wait); not a run-to-completion with a replacement environment" },
+        { "path": "src/setup/project-launcher.mjs", "reason": "the Node firstOnPath of the launcher check until the launcher moves to Rust; Node cannot call the Rust lookup" }
+      ],
+      "retiredBy": "each Rust caller moves onto spawn.rs when its crate next changes how it spawns; the Node lookup retires with the project launcher (S4) and the Node payload (S7)",
+      "reason": "guards the definitions of run_bounded, resolve_program and firstOnPath, and flags a PATH split or a try_wait child poll outside spawn.rs, so a second bounded spawn or program lookup must be declared. Not covered, by design of a pattern check: an inline Command::new with a deadline loop that polls by some other means. Debt lists the existing own-child polls and PATH searches that predate the door"
     },
     {
       "job": "managed timer",

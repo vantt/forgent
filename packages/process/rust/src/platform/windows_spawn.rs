@@ -212,26 +212,27 @@ fn environment_block(vars: &[(OsString, OsString)]) -> Vec<u16> {
     block
 }
 
-/// The program as a path: a name with a directory part is used as given
-/// (`.exe` added when it has no extension); a bare name is searched for in
-/// `PATH` of the child's environment, never in the working directory.
+/// The program as a path: a name with an extension is taken as it is (as given when it has a directory part,
+/// else searched on `PATH`); one without is looked up by the crate's one lookup with the `.EXE` extension
+/// only, never in the working directory.
 fn resolve_program(program: &OsStr, path_var: Option<&OsStr>) -> io::Result<PathBuf> {
-    let with_extension = |candidate: PathBuf| {
-        if candidate.extension().is_some() {
-            candidate
-        } else {
-            candidate.with_extension("exe")
-        }
-    };
     let direct = Path::new(program);
     let has_directory = program.to_string_lossy().contains(['\\', '/', ':']);
-    let found = if has_directory {
-        let candidate = with_extension(direct.to_path_buf());
-        candidate.is_file().then_some(candidate)
+    let found = if direct.extension().is_none() {
+        crate::spawn::resolve_program(
+            &program.to_string_lossy(),
+            &path_var
+                .map(|p| p.to_string_lossy().into_owned())
+                .unwrap_or_default(),
+            ".EXE",
+            true,
+        )
+    } else if has_directory {
+        direct.is_file().then(|| direct.to_path_buf())
     } else {
         path_var.and_then(|paths| {
             std::env::split_paths(paths)
-                .map(|dir| with_extension(dir.join(program)))
+                .map(|dir| dir.join(program))
                 .find(|candidate| candidate.is_file())
         })
     };
