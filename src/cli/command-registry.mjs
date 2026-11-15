@@ -2437,7 +2437,7 @@ export const COMMAND_REGISTRY = [
           properties: {
             name: { type: 'string', description: 'Positional: the registry lock name (e.g. main-checkout, merge-slot, worktree-admin, gateway).' },
             param: { type: 'string', description: 'Repeatable key=value for a lock path parameter the verb cannot know (e.g. --param ref=refs%2Fheads%2Fmain for merge-slot, the URL-encoded full target ref, --param provider=codex --param account=a1 for provider-account). fgosDir and lockRoot default to this checkout / this machine.' },
-            yes: { type: 'boolean', description: 'Confirm the fence. Without it the verb lists the holders and refuses (lock-fence-not-confirmed, exit 2), on a terminal too; nothing is signalled.' },
+            yes: { type: 'boolean', description: 'Confirm the fence. Without it the verb lists the holders and refuses (exit 2), on a terminal too; nothing is signalled.' },
             'attest-stopped': { type: 'boolean', description: 'Only where holders cannot be listed: say the holder is already stopped; the lock is then only re-checked with a probe, never signalled.' },
           },
           positional: ['name'],

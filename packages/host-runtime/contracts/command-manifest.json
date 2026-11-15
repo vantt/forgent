@@ -4887,7 +4887,7 @@
               },
               "yes": {
                 "type": "boolean",
-                "description": "Confirm the fence. Without it the verb lists the holders and refuses (lock-fence-not-confirmed, exit 2), on a terminal too; nothing is signalled."
+                "description": "Confirm the fence. Without it the verb lists the holders and refuses (exit 2), on a terminal too; nothing is signalled."
               },
               "attest-stopped": {
                 "type": "boolean",
