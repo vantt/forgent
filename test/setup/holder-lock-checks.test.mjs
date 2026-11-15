@@ -97,7 +97,7 @@ test('lock-borrow-vectors passes with the real host and real git', () => {
 
 // ─── lock-holders ───────────────────────────────────────────────────────
 
-// The judgments themselves (foreign holders, predecessor domains, hot records) are owned by test/runner/lock-status.test.mjs;
+// The judgments themselves (foreign holders, predecessor domains, hot records) are owned by packages/holder-lock/rust/src/status.rs;
 // the row only points at the verb that reads them.
 test('lock-holders is a read-only pointer to fgos lock-status', () => {
   const res = checkLockHolders();

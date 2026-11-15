@@ -21,7 +21,7 @@ Supersedes: The mapped source location; source provenance is retained
 Superseded by: None recorded
 ```
 
-Correction — checked route snapshot (2026-11-15): `packages/host-runtime/contracts/command-routes.json` has 80 selectors: 72 `legacy-cli` and eight native (`config`, `convention`, `friction`, `gate-bypass`, `identity`, `mailbox`, `metrics`, `version`). The two help selectors (`--help`, `-h`) are gone: the host answers help before it reads the table, so help is not a route. (`preflight` was retired on 2026-11-13.) This recount supersedes current-count wording; dated proof records remain historical.
+Correction — checked route snapshot (2026-11-15, recounted when S3 merged main, from the generated table): `packages/host-runtime/contracts/command-routes.json` has 79 selectors: 65 `legacy-cli` and fourteen native (`config`, `convention`, `events`, `friction`, `gate-bypass`, `gateway`, `git`, `identity`, `lock`, `lock-status`, `mailbox`, `metrics`, `session`, `version`). The two help selectors (`--help`, `-h`) are gone: the host answers help before it reads the table, so help is not a route. (`preflight` was retired on 2026-11-13.) This recount supersedes current-count wording; dated proof records remain historical.
 
 ## 1. Contract
 

@@ -1,6 +1,6 @@
-// `fgos lock fence`, `fgos lock-status`' view of a fenced lock, and
-// `main-checkout-reset` under the main checkout mutex. Every holder here is a
-// real process holding a real kernel lock; the verbs run as real CLI children.
+// `main-checkout-reset` under the main checkout mutex: the holder is a real process holding a real kernel
+// lock, and the verb runs as a real CLI child. The fence of a lock's holders is the holder-lock crate's
+// (`packages/holder-lock/rust/src/fence.rs`, with `apps/fgos/tests/cli_tests.rs` for the verb).
 import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -8,18 +8,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { spawn, execFileSync } from 'node:child_process';
 import { holdLockInChild } from '../helpers/hold-lock-in-child.mjs';
-import { acquireSync, createLockScope } from '../../src/holder-lock/index.mjs';
-import { parseLockParams } from '../../src/runner/lock-fence.mjs';
 import { FGOS, commitFile, envelopeData, gitHead, initGitCwdFast, run } from './helpers/fgos-cli-harness.mjs';
-
-function alive(pid) {
-  try {
-    process.kill(pid, 0);
-    return true;
-  } catch {
-    return false;
-  }
-}
 
 function lockStatus(cwd) {
   const result = run(cwd, ['lock-status']);
@@ -37,128 +26,6 @@ function runAsync(cwd, args) {
     child.on('exit', (status) => resolve({ status, stdout, stderr }));
   });
 }
-
-test('lock fence main-checkout: lists the holder pid, refuses without --yes, and --yes ends the holder and frees the lock', async () => {
-  const cwd = initGitCwdFast();
-  const fgosDir = path.join(cwd, '.fgos');
-  const holder = await holdLockInChild('main-checkout', { fgosDir });
-  try {
-    const refused = await runAsync(cwd, ['lock', 'fence', 'main-checkout']);
-    assert.notEqual(refused.status, 0, 'no terminal and no --yes: nothing may be signalled');
-    assert.match(refused.stderr, new RegExp(`pid ${holder.child.pid}\\b`), 'the holder is listed');
-    assert.match(refused.stderr, /nothing was signalled/);
-    assert.equal(alive(holder.child.pid), true, 'an unconfirmed fence leaves the holder alone');
-    assert.equal(lockStatus(cwd).mainCheckout.outcome, 'held');
-
-    const fenced = await runAsync(cwd, ['lock', 'fence', 'main-checkout', '--yes']);
-    assert.equal(fenced.status, 0, fenced.stderr);
-    const data = envelopeData(fenced.stdout);
-    assert.equal(data.status, 'fenced');
-    assert.deepEqual(data.holders.map((h) => h.pid), [holder.child.pid]);
-    assert.deepEqual(data.terminated, [holder.child.pid]);
-    assert.deepEqual(data.killed, []);
-    await holder.exited;
-    assert.equal(lockStatus(cwd).mainCheckout.outcome, 'free');
-  } finally {
-    holder.child.kill('SIGKILL');
-  }
-});
-
-test('lock fence escalates to SIGKILL when the holder ignores SIGTERM', async () => {
-  const cwd = initGitCwdFast();
-  const fgosDir = path.join(cwd, '.fgos');
-  const readyFile = path.join(cwd, 'sigterm-ignored');
-  const child = spawn(process.execPath, ['--input-type=module', '-e', `
-    import fs from 'node:fs';
-    import { acquireSync, createLockScope } from ${JSON.stringify(new URL('../../src/holder-lock/index.mjs', import.meta.url).href)};
-    const res = acquireSync(createLockScope('stubborn'), 'main-checkout', { fgosDir: ${JSON.stringify(fgosDir)} });
-    if (res.result !== 'acquired') process.exit(3);
-    process.on('SIGTERM', () => {});
-    fs.writeFileSync(${JSON.stringify(readyFile)}, 'held');
-    setInterval(() => {}, 1000);
-  `], { stdio: 'ignore' });
-  const exited = new Promise((resolve) => child.once('exit', resolve));
-  try {
-    for (let i = 0; i < 400 && !fs.existsSync(readyFile); i += 1) await new Promise((resolve) => setTimeout(resolve, 25));
-    assert.ok(fs.existsSync(readyFile), 'the stubborn holder took the lock');
-
-    const fenced = await runAsync(cwd, ['lock', 'fence', 'main-checkout', '--yes']);
-    assert.equal(fenced.status, 0, fenced.stderr);
-    const data = envelopeData(fenced.stdout);
-    assert.deepEqual(data.terminated, [child.pid]);
-    assert.deepEqual(data.killed, [child.pid], 'SIGTERM was ignored, so SIGKILL ended it');
-    await exited;
-    assert.equal(lockStatus(cwd).mainCheckout.outcome, 'free');
-  } finally {
-    child.kill('SIGKILL');
-  }
-});
-
-test('lock fence on a lock nobody holds reports free and signals nothing', () => {
-  const cwd = initGitCwdFast();
-  const result = run(cwd, ['lock', 'fence', 'main-checkout', '--yes']);
-  assert.equal(result.status, 0, result.stderr);
-  const data = envelopeData(result.stdout);
-  assert.equal(data.status, 'free');
-  assert.deepEqual(data.holders, []);
-});
-
-test('lock fence takes a lock path parameter with --param and fences only that instance', async () => {
-  const cwd = initGitCwdFast();
-  const fgosDir = path.join(cwd, '.fgos');
-  const onMain = await holdLockInChild('merge-slot', { fgosDir, ref: 'main' });
-  const onDev = await holdLockInChild('merge-slot', { fgosDir, ref: 'dev' });
-  try {
-    const missing = await runAsync(cwd, ['lock', 'fence', 'merge-slot', '--yes']);
-    assert.notEqual(missing.status, 0);
-    assert.match(missing.stderr, /lock-path-param-missing/);
-    assert.equal(alive(onMain.child.pid) && alive(onDev.child.pid), true, 'a lock whose path is unknown is never guessed');
-
-    const fenced = await runAsync(cwd, ['lock', 'fence', 'merge-slot', '--param', 'ref=main', '--yes']);
-    assert.equal(fenced.status, 0, fenced.stderr);
-    await onMain.exited;
-    assert.equal(alive(onDev.child.pid), true, 'the other target keeps its slot');
-  } finally {
-    onMain.child.kill('SIGKILL');
-    onDev.child.kill('SIGKILL');
-  }
-});
-
-test('lock fence never fences a lock held by the process that runs it or its parents', () => {
-  const cwd = initGitCwdFast();
-  const scope = createLockScope('test-parent');
-  const mine = acquireSync(scope, 'main-checkout', { fgosDir: path.join(cwd, '.fgos') });
-  assert.equal(mine.result, 'acquired');
-  try {
-    const result = run(cwd, ['lock', 'fence', 'main-checkout', '--yes']);
-    assert.notEqual(result.status, 0);
-    assert.match(result.stderr, /lock-fence-self/);
-    assert.equal(alive(process.pid), true);
-  } finally {
-    mine.handle.release();
-  }
-});
-
-test('lock fence refuses an unknown lock name and a missing name', () => {
-  const cwd = initGitCwdFast();
-  const unknown = run(cwd, ['lock', 'fence', 'no-such-lock', '--yes']);
-  assert.notEqual(unknown.status, 0);
-  assert.match(unknown.stderr, /unknown-lock/);
-  const noName = run(cwd, ['lock', 'fence']);
-  assert.equal(noName.status, 4);
-  assert.match(noName.stderr, /lock fence requires a lock name/);
-  const badSub = run(cwd, ['lock', 'steal']);
-  assert.equal(badSub.status, 4);
-  assert.match(badSub.stderr, /unknown lock sub-verb/);
-});
-
-test('parseLockParams reads repeated key=value pairs and refuses anything else', () => {
-  assert.deepEqual(parseLockParams(['provider=codex', 'account=a=b']), { provider: 'codex', account: 'a=b' });
-  assert.deepEqual(parseLockParams('ref=main'), { ref: 'main' });
-  assert.deepEqual(parseLockParams(undefined), {});
-  assert.throws(() => parseLockParams(['nokey']), /key=value/);
-  assert.throws(() => parseLockParams(['=x']), /key=value/);
-});
 
 test('main-checkout-reset while another process holds main: refuses with the lock and the holder pid, touches no file', async () => {
   const cwd = initGitCwdFast();
@@ -187,108 +54,4 @@ test('main-checkout-reset while another process holds main: refuses with the loc
   assert.equal(after.status, 0, after.stderr);
   assert.equal(gitHead(cwd), target, 'once main is free the reset runs');
   assert.equal(lockStatus(cwd).mainCheckout.outcome, 'free', 'the reset released main');
-});
-
-test('lock fence state: an unreadable record needs --attest-stopped, then the record is removed; a live holder is ended by --yes', async () => {
-  const cwd = initGitCwdFast();
-  const fgosDir = path.join(cwd, '.fgos');
-  fs.mkdirSync(path.join(fgosDir, 'locks'), { recursive: true });
-  const record = path.join(fgosDir, 'locks', 'state.hot');
-
-  fs.writeFileSync(record, '{"v":1,"pid":');
-  const refused = await runAsync(cwd, ['lock', 'fence', 'state']);
-  assert.notEqual(refused.status, 0);
-  assert.match(refused.stderr, /attest-stopped/);
-  assert.equal(fs.existsSync(record), true, 'nothing was removed without the attestation');
-  const attested = await runAsync(cwd, ['lock', 'fence', 'state', '--attest-stopped']);
-  assert.equal(attested.status, 0, attested.stderr);
-  assert.equal(envelopeData(attested.stdout).status, 'attested-free');
-  assert.equal(fs.existsSync(record), false, 'the garbage record is gone');
-
-  const free = await runAsync(cwd, ['lock', 'fence', 'state']);
-  assert.equal(envelopeData(free.stdout).status, 'free');
-
-  // A live holder: a real process whose full tuple is in the record.
-  const child = spawn(process.execPath, ['-e', 'setInterval(() => {}, 1000)'], { stdio: 'ignore' });
-  try {
-    const { observe } = await import('../../src/native/process-identity.mjs');
-    const { pid, startTime, bootId, pidNs } = observe(child.pid);
-    fs.writeFileSync(record, JSON.stringify({ v: 1, pid, startTime, bootId, pidNs }));
-    const unconfirmed = await runAsync(cwd, ['lock', 'fence', 'state']);
-    assert.notEqual(unconfirmed.status, 0);
-    assert.match(unconfirmed.stderr, /nothing was signalled/);
-    assert.equal(alive(child.pid), true);
-    assert.equal(fs.existsSync(record), true);
-    const fenced = await runAsync(cwd, ['lock', 'fence', 'state', '--yes']);
-    assert.equal(fenced.status, 0, fenced.stderr);
-    const data = envelopeData(fenced.stdout);
-    assert.equal(data.status, 'fenced');
-    assert.deepEqual(data.holders.map((h) => h.pid), [child.pid]);
-    assert.equal(fs.existsSync(record), false);
-  } finally {
-    child.kill('SIGKILL');
-  }
-});
-
-// The holder dies after it was judged alive and listed but before any signal
-// goes out (the confirm step is where that window is observable). The fence
-// must see the death, send nothing and clear the record at once; it must not
-// wait out TERM_WAIT_MS + KILL_WAIT_MS and then claim the dead holder is
-// still holding. The narrower window, death between the judge and a second
-// identity read, cannot occur: the fence signals the record's own tuple through
-// the door, so a vanished holder is not-found and nothing is sent (asserted below).
-test('fenceHotRecord on a holder that died between judge and signal returns at once and clears the record; it never waits TERM_WAIT_MS on a dead pid', async () => {
-  const { fenceLock } = await import('../../src/runner/lock-fence.mjs');
-  const { observe } = await import('../../src/native/process-identity.mjs');
-  const cwd = initGitCwdFast();
-  const fgosDir = path.join(cwd, '.fgos');
-  fs.mkdirSync(path.join(fgosDir, 'locks'), { recursive: true });
-  const record = path.join(fgosDir, 'locks', 'state.hot');
-  const child = spawn(process.execPath, ['-e', 'setInterval(() => {}, 1000)'], { stdio: 'ignore' });
-  const exited = new Promise((resolve) => child.on('exit', resolve));
-  try {
-    const { pid, startTime, bootId, pidNs } = observe(child.pid);
-    fs.writeFileSync(record, JSON.stringify({ v: 1, pid, startTime, bootId, pidNs }));
-    const started = Date.now();
-    const result = await fenceLock({
-      name: 'state',
-      fgosDir,
-      confirm: async () => {
-        child.kill('SIGKILL');
-        await exited; // reaped: the pid no longer exists
-        return true;
-      },
-    });
-    const elapsed = Date.now() - started;
-    assert.ok(elapsed < 1000, `a dead holder must not be waited on; took ${elapsed} ms`);
-    assert.equal(result.status, 'fenced');
-    assert.equal(fs.existsSync(record), false, 'the record of the dead holder is cleared');
-    assert.deepEqual([result.terminated, result.killed], [[], []], 'the holder vanished before the signal: the door sent nothing');
-  } finally {
-    child.kill('SIGKILL');
-  }
-});
-
-// A record whose pid is already dead is judged dead before anything else: the fence returns at once and
-// never signals, whatever process the pid may name by now.
-test('fenceHotRecord on a record whose holder is already dead signals nothing and clears the record at once', async () => {
-  const { fenceLock } = await import('../../src/runner/lock-fence.mjs');
-  const { observe } = await import('../../src/native/process-identity.mjs');
-  const cwd = initGitCwdFast();
-  const fgosDir = path.join(cwd, '.fgos');
-  fs.mkdirSync(path.join(fgosDir, 'locks'), { recursive: true });
-  const record = path.join(fgosDir, 'locks', 'state.hot');
-  const child = spawn(process.execPath, ['-e', 'setInterval(() => {}, 1000)'], { stdio: 'ignore' });
-  const exited = new Promise((resolve) => child.on('exit', resolve));
-  const { pid, startTime, bootId, pidNs } = observe(child.pid);
-  child.kill('SIGKILL');
-  await exited;
-  fs.writeFileSync(record, JSON.stringify({ v: 1, pid, startTime, bootId, pidNs }));
-  let asked = false;
-  const started = Date.now();
-  const result = await fenceLock({ name: 'state', fgosDir, confirm: async () => { asked = true; return true; } });
-  assert.ok(Date.now() - started < 1000, 'a dead holder is not waited on');
-  assert.equal(asked, false, 'nothing to confirm: no holder');
-  assert.deepEqual([result.status, result.terminated, result.killed], ['attested-free', [], []]);
-  assert.equal(fs.existsSync(record), false);
 });

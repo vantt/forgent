@@ -3060,3 +3060,247 @@ fn test_session_verbs_outside_a_project_are_refused_and_create_nothing() {
     );
     let _ = fs::remove_dir_all(&sandbox);
 }
+
+/// `fgos lock-status` is the first native verb that opens the store, so this is the one proof that the invocation
+/// doors work through the binary for a `store: read` verb: the admission warning for a worktree with no store, the
+/// refused `--dir ""` with one record in the caller's store, and the Event Store lifecycle triggers (a refused
+/// `eventStore` section answers a deterministic error: one end record, and with a dispatch depth also one start
+/// record, on Linux only). A `node` wrapper that fails when started proves no Node process runs.
+#[cfg(unix)]
+#[test]
+fn lock_status_runs_the_doors_through_the_binary_and_starts_no_node() {
+    use std::os::unix::fs::PermissionsExt;
+    let sandbox = std::env::temp_dir().join(format!(
+        "fgos_test_lock_status_doors_{}",
+        std::process::id()
+    ));
+    let _ = fs::remove_dir_all(&sandbox);
+    let (home, state) = (sandbox.join("home"), sandbox.join("state"));
+    let shim = sandbox.join("shim");
+    for dir in [&home, &state, &shim] {
+        fs::create_dir_all(dir).unwrap();
+    }
+    fs::set_permissions(&state, fs::Permissions::from_mode(0o700)).unwrap();
+    let node_log = sandbox.join("node-started.log");
+    let wrapper = shim.join("node");
+    fs::write(
+        &wrapper,
+        format!(
+            "#!/bin/sh\necho started >> \"{}\"\nexit 97\n",
+            node_log.display()
+        ),
+    )
+    .unwrap();
+    fs::set_permissions(&wrapper, fs::Permissions::from_mode(0o755)).unwrap();
+    let path = format!(
+        "{}:{}",
+        shim.display(),
+        std::env::var("PATH").unwrap_or_default()
+    );
+    let git = |dir: &Path, args: &[&str]| {
+        let output = Command::new("git")
+            .current_dir(dir)
+            .args(["-c", "user.name=doors", "-c", "user.email=doors@test"])
+            .args(args)
+            .output()
+            .expect("git runs");
+        assert!(
+            output.status.success(),
+            "git {args:?}: {}",
+            String::from_utf8_lossy(&output.stderr)
+        );
+    };
+    let project = |name: &str| {
+        let root = sandbox.join(name);
+        fs::create_dir_all(root.join(".fgos")).unwrap();
+        git(&root, &["init", "-q", "."]);
+        git(&root, &["commit", "-q", "--allow-empty", "-m", "init"]);
+        fs::canonicalize(&root).unwrap()
+    };
+    let run = |dir: &Path, extra: &[(&str, &str)], args: &[&str]| {
+        let mut command = Command::new(fgos_bin());
+        command
+            .current_dir(dir)
+            .args(args)
+            .env("HOME", &home)
+            .env("FGOS_STATE_ROOT", &state)
+            .env("PATH", &path)
+            .env_remove("FGOS_DISPATCH_DEPTH");
+        for (key, value) in extra {
+            command.env(key, value);
+        }
+        command.output().expect("failed to execute fgos")
+    };
+    let records = |root: &Path, class: &str| {
+        fs::read_to_string(root.join(".fgos/logs/invocation-faults.jsonl"))
+            .unwrap_or_default()
+            .lines()
+            .filter(|line| line.contains(&format!("\"faultClass\":\"{class}\"")))
+            .count()
+    };
+
+    // A worktree with no store: admitted with the warning, and the report is the empty-store answer.
+    let main = project("main");
+    let worktree = sandbox.join("worktree");
+    git(
+        &main,
+        &[
+            "worktree",
+            "add",
+            "-q",
+            "--detach",
+            worktree.to_str().unwrap(),
+        ],
+    );
+    let from_worktree = run(&worktree, &[], &["lock-status"]);
+    let stderr = String::from_utf8_lossy(&from_worktree.stderr);
+    assert_eq!(from_worktree.status.code(), Some(0), "{stderr}");
+    assert!(stderr.contains(".fgos/ not found"), "{stderr}");
+    let envelope: serde_json::Value = serde_json::from_slice(&from_worktree.stdout).unwrap();
+    assert_eq!(envelope["data"]["mainCheckout"]["outcome"], "free");
+    assert!(envelope["data"]["locks"]
+        .as_array()
+        .is_some_and(|rows| rows.len() > 20));
+
+    // `--dir ""` is refused as an invalid directory, with exactly one record in the caller's store.
+    let caller = project("caller");
+    let refused = run(&caller, &[], &["lock-status", "--dir", ""]);
+    assert_eq!(refused.status.code(), Some(4));
+    assert!(
+        String::from_utf8_lossy(&refused.stderr).contains("--dir requires a non-empty path value"),
+        "{}",
+        String::from_utf8_lossy(&refused.stderr)
+    );
+    assert_eq!(records(&caller, "dir-invalid"), 1);
+    assert_eq!(
+        records(&caller, "event-store-end-trigger"),
+        0,
+        "a refused call never reaches the lifecycle"
+    );
+
+    // A project whose `eventStore` section the reader refuses: the lifecycle's error is recorded, never fatal.
+    let store = project("store");
+    fs::write(
+        store.join(".fgos/config.yaml"),
+        "eventStore:\n  remote: origin\n",
+    )
+    .unwrap();
+    let on_linux = usize::from(cfg!(target_os = "linux"));
+    let plain = run(&store, &[], &["lock-status"]);
+    assert_eq!(
+        plain.status.code(),
+        Some(0),
+        "{}",
+        String::from_utf8_lossy(&plain.stderr)
+    );
+    assert_eq!(records(&store, "event-store-end-trigger"), on_linux);
+    assert_eq!(records(&store, "event-store-start-trigger"), 0);
+    let dispatched = run(&store, &[("FGOS_DISPATCH_DEPTH", "1")], &["lock-status"]);
+    assert_eq!(dispatched.status.code(), Some(0));
+    assert_eq!(records(&store, "event-store-end-trigger"), 2 * on_linux);
+    assert_eq!(records(&store, "event-store-start-trigger"), on_linux);
+
+    assert!(!node_log.exists(), "a Node process was started");
+    let _ = fs::remove_dir_all(&sandbox);
+}
+
+/// The body of the process the lock-fence case below holds a lock with: it takes the lock the environment
+/// names, says so through a file and waits to be ended. Without the variable it does nothing.
+#[cfg(unix)]
+#[test]
+fn lock_fence_holder_child_body() {
+    use fgos_holder_lock::{acquire, Acquire, Mode, Resource, Wait, DEFAULT_KILL_WAIT_MS};
+    let Ok(path) = std::env::var("FGOS_TEST_FENCE_HOLD") else {
+        return;
+    };
+    let Acquire::Acquired(_handle) = acquire(
+        &Resource::new("main-checkout", &path),
+        Mode::Ex,
+        Wait::Ms(0),
+        DEFAULT_KILL_WAIT_MS,
+    ) else {
+        std::process::exit(3);
+    };
+    fs::write(std::env::var("FGOS_TEST_FENCE_READY").unwrap(), "held").unwrap();
+    loop {
+        std::thread::sleep(std::time::Duration::from_secs(1));
+    }
+}
+
+// `lock fence` through the binary: without `--yes` it lists the holder and signals nothing (exit 2, on a
+// terminal too), with `--yes` it ends the holder and answers the envelope, and neither call starts Node.
+#[cfg(unix)]
+#[test]
+fn lock_fence_refuses_without_yes_then_ends_the_holder_and_starts_no_node() {
+    let (spy_dir, spy_log, path) = node_spy_dir("fgos_test_lock_fence_spy");
+    let base = std::env::temp_dir().join(format!("fgos-lock-fence-cli-{}", std::process::id()));
+    let _ = fs::remove_dir_all(&base);
+    let project = base.join("project");
+    fs::create_dir_all(project.join(".git")).unwrap();
+    fs::create_dir_all(project.join(".fgos/locks")).unwrap();
+    let lock_file = project.join(".fgos/locks/main-checkout.lock");
+    let ready = base.join("ready");
+    let mut holder = Command::new(std::env::current_exe().unwrap())
+        .args(["--exact", "lock_fence_holder_child_body", "--nocapture"])
+        .env("FGOS_TEST_FENCE_HOLD", &lock_file)
+        .env("FGOS_TEST_FENCE_READY", &ready)
+        .stdout(std::process::Stdio::null())
+        .stderr(std::process::Stdio::null())
+        .spawn()
+        .unwrap();
+    for _ in 0..400 {
+        if ready.exists() {
+            break;
+        }
+        std::thread::sleep(std::time::Duration::from_millis(25));
+    }
+    assert!(ready.exists(), "the holder child never took the lock");
+    let fence = |extra: &[&str]| {
+        Command::new(fgos_bin())
+            .current_dir(&project)
+            .env("HOME", &base)
+            .env("PATH", &path)
+            .args(["lock", "fence", "main-checkout"])
+            .args(extra)
+            .output()
+            .expect("failed to execute fgos")
+    };
+
+    let refused = fence(&[]);
+    let stderr = String::from_utf8_lossy(&refused.stderr);
+    assert_eq!(refused.status.code(), Some(2), "stderr={stderr}");
+    assert!(
+        stderr.contains(&format!("pid {} (started ", holder.id())),
+        "the holder is listed: {stderr}"
+    );
+    assert!(
+        stderr.contains("holder-lock (lock-fence-not-confirmed)")
+            && stderr.contains("nothing was signalled"),
+        "{stderr}"
+    );
+    assert!(
+        holder.try_wait().unwrap().is_none(),
+        "an unconfirmed fence leaves the holder alone"
+    );
+
+    let fenced = fence(&["--yes"]);
+    assert_eq!(
+        fenced.status.code(),
+        Some(0),
+        "stderr={}",
+        String::from_utf8_lossy(&fenced.stderr)
+    );
+    let parsed: serde_json::Value = serde_json::from_slice(&fenced.stdout).unwrap();
+    assert_eq!(parsed["contract"], "fgos.v1");
+    assert_eq!(parsed["data"]["status"], "fenced");
+    assert_eq!(parsed["data"]["terminated"][0], holder.id());
+    holder.wait().unwrap();
+
+    let spied = fs::read_to_string(&spy_log).unwrap_or_default();
+    assert!(
+        !spied.lines().any(|line| line.starts_with("SPY_PID:")),
+        "lock fence started a node process: {spied}"
+    );
+    let _ = fs::remove_dir_all(&base);
+    let _ = fs::remove_dir_all(&spy_dir);
+}

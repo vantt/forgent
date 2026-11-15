@@ -8,6 +8,7 @@ mod restore;
 pub use restore::{RestorePreview, RestoreRequest, RestoreResult};
 mod land;
 pub use land::{LandCandidate, LandEvidence, LandFile, LandRequest, LandSession};
+pub mod incidents;
 mod inspect;
 pub mod invocation_root;
 mod objects;

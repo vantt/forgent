@@ -1662,7 +1662,6 @@ const ARM_STATIC_IMPORTS = [
   '../src/config/facade.mjs',
   '../src/event-store/maintenance.mjs',
   '../src/git/inspect.mjs',
-  '../src/git/status.mjs',
   '../src/holder-lock/index.mjs',
   '../src/intake/classify.mjs',
   '../src/intake/discovery.mjs',
@@ -1688,8 +1687,6 @@ const ARM_STATIC_IMPORTS = [
   '../src/runner/dispatch/runner-config-error.mjs',
   '../src/runner/frozen-judge.mjs',
   '../src/runner/goal-check.mjs',
-  '../src/runner/lock-fence.mjs',
-  '../src/runner/lock-status.mjs',
   '../src/runner/main-checkout-activity.mjs',
   '../src/runner/main-checkout-reset-guard.mjs',
   '../src/runner/merge.mjs',
@@ -1917,6 +1914,16 @@ test('door check: every name of the retired Node events, session and gateway cod
   }
 });
 
+test('door check: every name of the retired Node S2 verb code fails when a file declares it again', () => {
+  const row = manifest.doors.find((r) => r.job === 'retired Node S2 verb code');
+  assert.ok(row && row.allowed.length === 0, 'the retired-names row exists and allows no file');
+  for (const name of ['collectLockStatus', 'fenceLock', 'parseLockParams', 'lockParamsFor', 'fenceHotRecord', 'confirmFence', 'LOCK_FILES', 'cutOverLockFiles']) {
+    const failures = checkDoors([row], new Map([['src/seeded.mjs', `function ${name}() {}\n`]]));
+    assert.equal(failures.length, 1, `${name} must fail the door`);
+    assert.match(failures[0], /retired name/);
+  }
+});
+
 test('door check: a stale allowed path, stale glob and stale debt entry each fail', () => {
   const text = new Map([['src/a.mjs', 'foo(1);']]);
   const base = { job: 'j', kind: 'door', patterns: ['foo\\('] };
@@ -1978,6 +1985,21 @@ test('door rows catch a process signal, a /proc read and a second lock taker, an
   assert.deepEqual(outsideDoor('process control: signal a process or group', 'src/x.mjs', '// process.kill(pid, 15)\n'), []);
   assert.deepEqual(outsideDoor('process facts: read /proc', 'src/x.mjs', '/* reads /proc/self/stat */\n'), []);
   assert.deepEqual(outsideDoor('kernel lock primitive', 'packages/p/rust/src/x.rs', '// LockFileEx is what Windows offers\nstruct LockFileExDriver;\n'), []);
+});
+
+test('door rows catch a second lock report, a second reader of the beacon, a second run lister and a second cleaner of a hot record', () => {
+  const report = 'report the registry locks';
+  assert.equal(outsideDoor(report, 'src/x.mjs', 'const LOCK_FILES = { gateway: () => [] };\n').length, 1);
+  assert.equal(outsideDoor(report, 'src/x.mjs', 'export function collectLockStatus() {}\n').length, 1);
+  assert.equal(outsideDoor(report, 'packages/p/rust/src/x.rs', 'pub fn collect(request: &Request) -> Report {\n').length, 1);
+  assert.equal(outsideDoor('main checkout activity beacon', 'src/x.mjs', "fs.readFileSync(path.join(dir, 'runtime', 'main-checkout-activity.json'));\n").length, 1);
+  assert.equal(outsideDoor('list run directories (twin)', 'src/x.mjs', 'export function listOpenAttemptDirs(root) {}\n').length, 1);
+  assert.equal(outsideDoor('list run directories (twin)', 'src/x.mjs', "fs.readdirSync(path.join(fgosDir, 'workflow-runs'));\n").length, 1);
+  assert.equal(outsideDoor('list run directories (twin)', 'packages/p/rust/src/x.rs', 'fn assignment_run_dirs(dir: &Path) {}\n').length, 1);
+  const hot = 'read and clear a hot mutex record';
+  assert.equal(outsideDoor(hot, 'src/x.mjs', 'fs.unlinkSync(`${dir}/state.hot`);\n').length, 1);
+  assert.equal(outsideDoor(hot, 'packages/p/rust/src/x.rs', 'std::fs::remove_file(dir.join("state.hot")).ok();\n').length, 1);
+  assert.deepEqual(outsideDoor(hot, 'src/x.mjs', '// the record is <resource>.hot\n'), []);
 });
 
 test('the door walk prunes vendored and fixture trees only outside bin and src', () => {

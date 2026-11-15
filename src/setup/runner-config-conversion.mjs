@@ -30,22 +30,16 @@ function applyNativeConfigPatch(hostBin, projectDir, edits, reason) {
 }
 
 /**
- * Inspects a legacy JSON config file for retired runner.patterns keys.
- * Returns findings as data (empty array when none) and throws on read/parse errors.
+ * Inspects the parsed document of a legacy JSON config file for retired runner.patterns keys.
+ * Returns findings as data (empty array when none); reading the file is the caller's job.
  *
- * @param {string} targetPath
- * @param {object} [parsed]
+ * @param {object | null} parsed
  * @returns {Array<{ key: string, replacement: string | null, instruction: string }>}
  */
-export function retiredJsonAdvice(targetPath, parsed = null) {
-  let doc = parsed;
-  if (!doc) {
-    const text = fs.readFileSync(targetPath, 'utf8');
-    doc = parseYaml(text, { filename: targetPath });
-  }
-  const runner = doc?.runner ?? doc;
+export function retiredJsonAdvice(parsed) {
+  const runner = parsed?.runner ?? parsed;
   const patterns = runner?.patterns ?? {};
-  return doc ? detectRetiredPatternKeys(patterns) : [];
+  return parsed ? detectRetiredPatternKeys(patterns) : [];
 }
 
 /**
@@ -59,7 +53,7 @@ export function retiredJsonAdvice(targetPath, parsed = null) {
 export function formatLegacyJsonAdvice(targetPath, parsed = null) {
   let retired = [];
   try {
-    retired = retiredJsonAdvice(targetPath, parsed);
+    retired = retiredJsonAdvice(parsed);
   } catch {
     return `${targetPath}: config-format-legacy-json: legacy JSON configuration format must be migrated first; edit ${targetPath}, then run \`fgos config migrate\``;
   }

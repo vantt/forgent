@@ -525,12 +525,25 @@
   },
   "git": {
     "selector": "git",
-    "route_kind": "legacy-cli",
-    "legacy_payload": "legacy-node",
-    "owner_path": "src/cli/command-registry.mjs",
+    "route_kind": "native",
+    "operation_id": "git.status",
+    "owner_path": "packages/git/rust",
     "compatibility_tests": [
       "test/rust-host/command-routes.test.mjs"
     ],
+    "subcommands": true,
+    "subcommand_flags": {
+      "recover": [
+        "dir",
+        "json",
+        "help"
+      ],
+      "status": [
+        "dir",
+        "json",
+        "help"
+      ]
+    },
     "store": "none"
   },
   "goal": {
@@ -700,12 +713,24 @@
   },
   "lock": {
     "selector": "lock",
-    "route_kind": "legacy-cli",
-    "legacy_payload": "legacy-node",
-    "owner_path": "src/cli/command-registry.mjs",
+    "route_kind": "native",
+    "operation_id": "holder-lock.fence",
+    "owner_path": "packages/holder-lock/rust",
     "compatibility_tests": [
       "test/rust-host/command-routes.test.mjs"
     ],
+    "subcommands": true,
+    "subcommand_flags": {
+      "fence": [
+        "dir",
+        "json",
+        "help",
+        "name",
+        "param",
+        "yes",
+        "attest-stopped"
+      ]
+    },
     "store": "require",
     "mutates_store": [
       "fence"
@@ -713,11 +738,16 @@
   },
   "lock-status": {
     "selector": "lock-status",
-    "route_kind": "legacy-cli",
-    "legacy_payload": "legacy-node",
-    "owner_path": "src/cli/command-registry.mjs",
+    "route_kind": "native",
+    "operation_id": "holder-lock.status",
+    "owner_path": "packages/holder-lock/rust",
     "compatibility_tests": [
       "test/rust-host/command-routes.test.mjs"
+    ],
+    "accepted_flags": [
+      "dir",
+      "json",
+      "help"
     ],
     "store": "read"
   },

@@ -1,0 +1,277 @@
+{
+  "description": "Directory trees under a project's .fgos and what each of the three run-directory listers yields, paths relative to .fgos. The Node listers (src/runner/dispatch/assignment-layout.mjs scanAssignmentLayout, src/run-supervisor/client.mjs listOpenAttemptDirs) and the host listers (apps/fgos/src/wiring/run_dirs.rs) both read this file; the three listers apply three rules, so a tree can yield a different list from each.",
+  "vectors": [
+    {
+      "name": "workflow-runs: every real directory counts, files and symlinks do not",
+      "tree": [
+        {
+          "path": "workflow-runs/case-1",
+          "kind": "dir"
+        },
+        {
+          "path": "workflow-runs/.bindings",
+          "kind": "dir"
+        },
+        {
+          "path": "workflow-runs/notes.txt",
+          "kind": "file"
+        },
+        {
+          "path": "workflow-runs/linked",
+          "kind": "symlink",
+          "points": "case-1"
+        },
+        {
+          "path": "workflow-runs/case-2",
+          "kind": "dir"
+        }
+      ],
+      "expect": {
+        "workflowRuns": [
+          "workflow-runs/.bindings",
+          "workflow-runs/case-1",
+          "workflow-runs/case-2"
+        ],
+        "assignmentRuns": [],
+        "openAttempts": []
+      }
+    },
+    {
+      "name": "no directories at all",
+      "tree": [],
+      "expect": {
+        "workflowRuns": [],
+        "assignmentRuns": [],
+        "openAttempts": []
+      }
+    },
+    {
+      "name": "an attempt with and without closed.json",
+      "tree": [
+        {
+          "path": "assignments/work-1/runs/01",
+          "kind": "dir"
+        },
+        {
+          "path": "assignments/work-1/runs/01/closed.json",
+          "kind": "file"
+        },
+        {
+          "path": "assignments/work-1/runs/02",
+          "kind": "dir"
+        }
+      ],
+      "expect": {
+        "workflowRuns": [],
+        "assignmentRuns": [
+          "assignments/work-1/runs/01",
+          "assignments/work-1/runs/02"
+        ],
+        "openAttempts": [
+          "assignments/work-1/runs/02"
+        ]
+      }
+    },
+    {
+      "name": "nested assignment ids",
+      "tree": [
+        {
+          "path": "assignments/team/work-2/runs/1",
+          "kind": "dir"
+        },
+        {
+          "path": "assignments/work-1/runs/03",
+          "kind": "dir"
+        }
+      ],
+      "expect": {
+        "workflowRuns": [],
+        "assignmentRuns": [
+          "assignments/team/work-2/runs/1",
+          "assignments/work-1/runs/03"
+        ],
+        "openAttempts": [
+          "assignments/team/work-2/runs/1",
+          "assignments/work-1/runs/03"
+        ]
+      }
+    },
+    {
+      "name": "a symlinked attempt is skipped by both listers",
+      "tree": [
+        {
+          "path": "assignments/work-1/runs/01",
+          "kind": "dir"
+        },
+        {
+          "path": "assignments/work-1/runs/02",
+          "kind": "symlink",
+          "points": "01"
+        }
+      ],
+      "expect": {
+        "workflowRuns": [],
+        "assignmentRuns": [
+          "assignments/work-1/runs/01"
+        ],
+        "openAttempts": [
+          "assignments/work-1/runs/01"
+        ]
+      }
+    },
+    {
+      "name": "a symlinked runs directory is a barrier",
+      "tree": [
+        {
+          "path": "assignments/work-1/real",
+          "kind": "dir"
+        },
+        {
+          "path": "assignments/work-1/runs",
+          "kind": "symlink",
+          "points": "real"
+        }
+      ],
+      "expect": {
+        "workflowRuns": [],
+        "assignmentRuns": [],
+        "openAttempts": []
+      }
+    },
+    {
+      "name": "a runs entry that is a file lists nothing",
+      "tree": [
+        {
+          "path": "assignments/work-1",
+          "kind": "dir"
+        },
+        {
+          "path": "assignments/work-1/runs",
+          "kind": "file"
+        }
+      ],
+      "expect": {
+        "workflowRuns": [],
+        "assignmentRuns": [],
+        "openAttempts": []
+      }
+    },
+    {
+      "name": "a symlinked assignments root is never read",
+      "tree": [
+        {
+          "path": "elsewhere/work-1/runs/01",
+          "kind": "dir"
+        },
+        {
+          "path": "assignments",
+          "kind": "symlink",
+          "points": "elsewhere"
+        }
+      ],
+      "expect": {
+        "workflowRuns": [],
+        "assignmentRuns": [],
+        "openAttempts": [
+          "assignments/work-1/runs/01"
+        ]
+      }
+    },
+    {
+      "name": "a closed.json symlink counts when its target exists and not when it dangles",
+      "tree": [
+        {
+          "path": "assignments/w/runs/01",
+          "kind": "dir"
+        },
+        {
+          "path": "assignments/w/runs/01/closed.json",
+          "kind": "symlink",
+          "points": "../../../../marker"
+        },
+        {
+          "path": "marker",
+          "kind": "file"
+        },
+        {
+          "path": "assignments/w/runs/02",
+          "kind": "dir"
+        },
+        {
+          "path": "assignments/w/runs/02/closed.json",
+          "kind": "symlink",
+          "points": "nowhere"
+        }
+      ],
+      "expect": {
+        "workflowRuns": [],
+        "assignmentRuns": [
+          "assignments/w/runs/01",
+          "assignments/w/runs/02"
+        ],
+        "openAttempts": [
+          "assignments/w/runs/02"
+        ]
+      }
+    },
+    {
+      "name": "the depth limit stops the recovery lister at 16 levels and not the attempt lister",
+      "tree": [
+        {
+          "path": "assignments/a1/a2/a3/a4/a5/a6/a7/a8/a9/a10/a11/a12/a13/a14/a15/a16/runs/01",
+          "kind": "dir"
+        },
+        {
+          "path": "assignments/a1/a2/a3/a4/a5/a6/a7/a8/a9/a10/a11/a12/a13/a14/a15/a16/a17/runs/01",
+          "kind": "dir"
+        }
+      ],
+      "expect": {
+        "workflowRuns": [],
+        "assignmentRuns": [
+          "assignments/a1/a2/a3/a4/a5/a6/a7/a8/a9/a10/a11/a12/a13/a14/a15/a16/runs/01"
+        ],
+        "openAttempts": [
+          "assignments/a1/a2/a3/a4/a5/a6/a7/a8/a9/a10/a11/a12/a13/a14/a15/a16/a17/runs/01",
+          "assignments/a1/a2/a3/a4/a5/a6/a7/a8/a9/a10/a11/a12/a13/a14/a15/a16/runs/01"
+        ]
+      }
+    },
+    {
+      "name": "names are ordered by their UTF-8 bytes",
+      "tree": [
+        {
+          "path": "assignments/b/runs/1",
+          "kind": "dir"
+        },
+        {
+          "path": "assignments/a/runs/2",
+          "kind": "dir"
+        },
+        {
+          "path": "assignments/B/runs/3",
+          "kind": "dir"
+        },
+        {
+          "path": "assignments/é/runs/4",
+          "kind": "dir"
+        }
+      ],
+      "expect": {
+        "workflowRuns": [],
+        "assignmentRuns": [
+          "assignments/B/runs/3",
+          "assignments/a/runs/2",
+          "assignments/b/runs/1",
+          "assignments/é/runs/4"
+        ],
+        "openAttempts": [
+          "assignments/B/runs/3",
+          "assignments/a/runs/2",
+          "assignments/b/runs/1",
+          "assignments/é/runs/4"
+        ]
+      }
+    }
+  ]
+}

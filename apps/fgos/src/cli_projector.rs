@@ -123,6 +123,12 @@ pub fn project_cli_invocation(
             ContractRef::new(format!("{operation_id_str}.request"), "1.0.0"),
             Box::new(crate::wiring::session::project_session_args(args)?),
         ),
+        crate::wiring::lock_fence::OPERATION_ID => (
+            ContractRef::from_static("holder-lock.fence.request", "1.0.0"),
+            Box::new(crate::wiring::lock_fence::project_fence_request(
+                args, root,
+            )?),
+        ),
         "config.read" | "config.write" => (
             ContractRef::from_static(
                 if operation.as_str() == "config.read" {
@@ -147,6 +153,20 @@ pub fn project_cli_invocation(
             ContractRef::new(format!("{operation_id_str}.request"), "1.0.0"),
             Box::new(project_events_request(args, root?)?),
         ),
+        crate::wiring::git_incidents::STATUS_OPERATION_ID => (
+            ContractRef::from_static("git.status.request", "1.0.0"),
+            Box::new(crate::wiring::git_incidents::project_git_request(args)),
+        ),
+        crate::wiring::git_incidents::RECOVER_OPERATION_ID => (
+            ContractRef::from_static("git.recover.request", "1.0.0"),
+            Box::new(crate::wiring::git_incidents::project_git_request(args)),
+        ),
+        crate::wiring::lock_status::OPERATION_ID => (
+            ContractRef::from_static("holder-lock.status.request", "1.0.0"),
+            Box::new(crate::wiring::lock_status::project_lock_status_request(
+                args,
+            )),
+        ),
         other => {
             return Err(format!(
                 "native CLI projector has no request mapping for '{}'",
@@ -165,7 +185,7 @@ pub fn project_cli_invocation(
 /// operation; `identity` fans out over three (`identity.writer` bare,
 /// `identity.read`, `identity.write`) and `mailbox` over five
 /// (`mailbox.send`, `mailbox.inbox`, `mailbox.inbox.claim` with `--claim`,
-/// `mailbox.list`, `mailbox.status`),
+/// `mailbox.list`, `mailbox.status`) and `git` over two (`git.status`, `git.recover`),
 /// and the arguments decide which.
 pub fn native_operation_id(
     route_operation: &str,
@@ -181,6 +201,11 @@ pub fn native_operation_id(
     }
     if route_operation == crate::wiring::session::LIST_OPERATION_ID {
         return Ok(crate::wiring::session::project_session_args(args)?
+            .operation_id()
+            .to_string());
+    }
+    if route_operation == crate::wiring::git_incidents::STATUS_OPERATION_ID {
+        return Ok(crate::wiring::git_incidents::project_git_request(args)
             .operation_id()
             .to_string());
     }

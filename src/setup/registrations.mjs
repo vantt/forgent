@@ -102,9 +102,10 @@ import { getDomain, resolveDomainName, effectiveStep, domainSteps, skillForStep 
 import { toolProvidersOf } from '../runner/dispatch/tool-providers.mjs';
 import { resolveCliVersionInfo } from './version-info.mjs';
 import { firstOnPath, inspectLauncher, writeLauncher } from './project-launcher.mjs';
-import { readConfig, readMachineConfig } from '../config/facade.mjs';
+import { globalFgosDir, readConfig, readMachineConfig, readProjectConfigSource } from '../config/facade.mjs';
 import { CONFIG_CHECKS, CONFIG_FIXES, checkConfigOnce, isConfigDoorFailure } from './config-checks.mjs';
 import { retiredJsonAdvice } from './runner-config-conversion.mjs';
+import { parseYaml } from '../util/yaml.mjs';
 import { legacyStateKey } from '../runner/dispatch/llm-accounts.mjs';
 import { inspectProviderCapacity, defaultProviderCapacityRuntimeDir, providerAccountInventory, credentialStoreOf, credentialSourceForCli } from '../runner/dispatch/provider-capacity.mjs';
 import { inspectRetainedCredentialCopies, inspectPendingCopiesOverLimit, sweepInterruptedStagings, credentialWriteBackTarget, inventoryAccount, MAX_PENDING_COPIES } from '../runner/dispatch/provider-credential-renewal.mjs';
@@ -118,7 +119,7 @@ import { fixEventStoreLockDirs } from './event-store-fixes.mjs';
 import { foldEvents } from '../state/replay.mjs';
 import { discoverProjectPromptTemplates, TemplateResolutionError } from '../runner/dispatch/operation-prompt-templates.mjs';
 import { resolveHostBin, invokeHost } from '../util/host-bin.mjs';
-import { readActivationFile, resolveActiveHostBin } from '../util/host-bin-path.mjs';
+import { ACTIVATION_RELATIVE, activationFilePath, readActivationFile, resolveActiveHostBin } from '../util/host-bin-path.mjs';
 import { probeIdentity } from '../util/session-identity.mjs';
 import { createSeatBindingClient, resolveSeatBindingHost } from '../seat-binding/client.mjs';
 import { checkSeatBindingDryBind } from './seat-binding-checks.mjs';
@@ -517,7 +518,7 @@ export function checkRunnerGeneratedPathsConfig(cwd) {
 }
 
 export function checkRunnerPatternsConfig(cwd, run) {
-  const globalDir = path.join(os.homedir(), '.fgos');
+  const globalDir = globalFgosDir();
   const display = (file) => {
     if (file?.startsWith('global:')) return path.join(globalDir, file.slice('global:'.length));
     if (file?.startsWith('project:')) return path.join(cwd, '.fgos', file.slice('project:'.length));
@@ -534,7 +535,13 @@ export function checkRunnerPatternsConfig(cwd, run) {
   for (const f of legacy) {
     const targetPath = display(f.file);
     try {
-      const retired = retiredJsonAdvice(targetPath);
+      // The facade's one raw source read, for the scope the finding names (the global directory's parent holds `.fgos`).
+      // readProjectConfigSource reads `<dir>/.fgos/`, so the global scope passes the parent of the global directory;
+      // this holds because globalFgosDir() always ends in `.fgos`.
+      const scopeDir = f.file?.startsWith('global:') ? path.dirname(globalDir) : cwd;
+      const source = readProjectConfigSource(scopeDir);
+      if (source?.format !== 'json') throw new Error(`${targetPath}: cannot read the legacy JSON config file`);
+      const retired = retiredJsonAdvice(parseYaml(source.text, { filename: source.path }));
       if (retired.length > 0) {
         const editsText = retired.map((r) => formatRetiredKeySentence(r)).join('; ');
         note(`${targetPath}: config-format-legacy-json: ${editsText}; edit ${targetPath}, then run \`fgos config migrate\``);
@@ -799,45 +806,12 @@ function parseTaskSpecHeaderFields(headerLine) {
   return res;
 }
 
-// D32 "deterministic, never random": readdirSync's own order is
-// filesystem-dependent, not a stable ordering guarantee -- sorted so
-// D33's own duplicate-name scan (the caller) reports the same "first
-// occurrence wins" file on every machine/run (review finding M2).
-function sortedReaddir(dir) {
-  return fs.readdirSync(dir).sort((a, b) => a.localeCompare(b));
-}
-
+// The definition files the one door resolves for `cwd`, in its tier order. A name is listed once: the first tier
+// that holds it wins, as listAgents resolves it. A name defined twice inside one tier is the duplicate check's finding.
 export function allAgentYamlFiles(cwd) {
-  const files = [];
-  const coreDir = path.join(cwd, 'core', 'agents');
-  if (fs.existsSync(coreDir)) {
-    for (const f of sortedReaddir(coreDir)) {
-      if (f.endsWith('.yaml') || f.endsWith('.yml')) {
-        files.push({ source: 'core/agents', filePath: path.join(coreDir, f), fileName: f });
-      }
-    }
-  }
-  for (const { name: domain, agentsDir: domainAgentsDir } of domainCatalog({ payloadRoot: cwd }).domains) {
-    if (fs.existsSync(domainAgentsDir)) {
-      for (const f of sortedReaddir(domainAgentsDir)) {
-        if (f.endsWith('.yaml') || f.endsWith('.yml')) {
-          files.push({ source: `domains/${domain}/agents`, filePath: path.join(domainAgentsDir, f), fileName: f });
-        }
-      }
-    }
-  }
-  const legacyDir = path.join(cwd, 'agents');
-  if (fs.existsSync(legacyDir)) {
-    for (const f of sortedReaddir(legacyDir)) {
-      if (f.endsWith('.yaml') || f.endsWith('.yml')) {
-        const fp = path.join(legacyDir, f);
-        if (!files.some((item) => item.filePath === fp)) {
-          files.push({ source: 'agents', filePath: fp, fileName: f });
-        }
-      }
-    }
-  }
-  return files;
+  const seen = new Set();
+  return scanAgentTiers({ projectRoot: cwd }).flatMap((tier) => tier.entries)
+    .filter(({ name }) => !seen.has(name) && seen.add(name));
 }
 
 // Reads every agent file once and maps agent name to the skills it declares. A file that cannot be
@@ -846,10 +820,10 @@ export function readAgentSkills(agentFiles) {
   const agentSkillsMap = new Map();
   const problems = [];
   for (const file of agentFiles) {
-    const rel = `${file.source}/${file.fileName}`;
+    const rel = file.rel;
     let text;
     try {
-      text = fs.readFileSync(file.filePath, 'utf8');
+      text = fs.readFileSync(file.file, 'utf8');
     } catch (error) {
       problems.push(`${rel}: cannot be read (${error.message})`);
       continue;
@@ -859,7 +833,7 @@ export function readAgentSkills(agentFiles) {
       problems.push(`${rel}: ${error}`);
       continue;
     }
-    agentSkillsMap.set(declared ?? file.fileName.replace(/\.yaml$|\.yml$/, ''), new Set(skills));
+    agentSkillsMap.set(declared ?? file.name, new Set(skills));
   }
   return { agentSkillsMap, problems };
 }
@@ -928,6 +902,7 @@ export function checkAgentTypeNamesUnique(cwd, { projectTiersOnly = false, insta
     : fullScan;
   const problems = findAgentDuplicates(scan).map(({ label, name, files }) => `duplicate agent-type name "${name}" in ${label} (${files.join(', ')})`);
 
+  const tierLabels = Object.fromEntries(fullScan.map((tier) => [tier.tier, tier.label]));
   const workspace = scan.find((tier) => tier.tier === 'workspace') ?? { entries: [], ignored: [] };
   const lowerEntries = fullScan.filter((tier) => tier.tier !== 'workspace').flatMap((tier) => tier.entries);
   const customizations = [];
@@ -954,7 +929,7 @@ export function checkAgentTypeNamesUnique(cwd, { projectTiersOnly = false, insta
   // installed core definitions it lacks cannot be seated; this is reported, not failed, because a project may
   // choose that.
   for (const hidden of listAgents({ projectRoot: cwd }).masked) {
-    notes.push(`installed persona "${hidden.name}" (${hidden.source}) is hidden by ${hidden.hiddenBy}; copy it there or into fgos/agents to seat it`);
+    notes.push(`installed persona "${hidden.name}" (${hidden.source}) is hidden by ${hidden.hiddenBy}; copy it there or into ${tierLabels.workspace} to seat it`);
   }
 
   if (problems.length > 0) {
@@ -964,8 +939,8 @@ export function checkAgentTypeNamesUnique(cwd, { projectTiersOnly = false, insta
   return {
     passed: true,
     message: (customizations.length > 0
-      ? `agent-type names are unique within each tier; fgos/agents holds ${customizations.join(', ')}`
-      : 'agent-type names are unique within each tier (fgos/agents, domains/*/agents, core/agents)') + tail,
+      ? `agent-type names are unique within each tier; ${tierLabels.workspace} holds ${customizations.join(', ')}`
+      : `agent-type names are unique within each tier (${fullScan.map((tier) => tier.label).join(', ')})`) + tail,
   };
 }
 
@@ -1143,7 +1118,7 @@ registerCheck({
 
 registerCheck({
   id: 'agent-type-names-unique',
-  description: 'agent definition names are unique in the project\'s own tiers (fgos/agents, and core/agents when the project ships one); a higher tier replaces a lower one whole, and fgos/agents files have the shape the renderer needs; the installed fgOS\'s own tiers (domains/*/agents, core/agents) are judged by npm test',
+  description: 'agent definition names are unique in the project\'s own tiers (the workspace tier, and the core tier when the project ships one); a higher tier replaces a lower one whole, and workspace-tier files have the shape the renderer needs; the installed fgOS\'s own domain and core tiers are judged by npm test',
   check: (cwd) => checkAgentTypeNamesUnique(cwd, { projectTiersOnly: true }),
 });
 
@@ -2556,9 +2531,9 @@ function resolveActiveReleaseForDoctor(dir, scope = {}) {
     return { releasePath, manifestPath: null, manifest: null };
   }
 
-  // 2. Workspace activation binding (.fgos/installation/activation.json), through the one activation reader
+  // 2. Workspace activation binding, through the one activation reader
   for (const candidate of candidateDirs) {
-    const activationPath = path.join(candidate, '.fgos', 'installation', 'activation.json');
+    const activationPath = activationFilePath(candidate);
     if (fs.existsSync(activationPath)) {
       try {
         const act = readActivationFile(activationPath);
@@ -2749,7 +2724,7 @@ function doctorDriftPath(base, relative = '.', optional = false) {
 }
 
 function doctorDriftActivation(checkout) {
-  const activationPath = doctorDriftPath(checkout, '.fgos/installation/activation.json', true);
+  const activationPath = doctorDriftPath(checkout, ACTIVATION_RELATIVE, true);
   if (!activationPath) return null;
   const activation = readActivationFile(activationPath);
   if (!activation || typeof activation.releasePath !== 'string' || !path.isAbsolute(activation.releasePath)) {
@@ -2781,7 +2756,7 @@ function checkActiveReleaseMatchesCheckout(dir) {
     } else if (!activation) {
       const main = resolveMainCheckout(checkout);
       if (main && path.resolve(main) !== checkout &&
-          doctorDriftPath(main, '.fgos/installation/activation.json', true)) {
+          doctorDriftPath(main, ACTIVATION_RELATIVE, true)) {
         return { passed: true, status: 'skip', message: `active-release-matches-checkout skipped: activation belongs to main checkout ${main}, not this linked worktree` };
       }
       return { passed: true, status: 'skip', message: 'active-release-matches-checkout skipped: no activation owned by doctor dir' };
@@ -2932,7 +2907,7 @@ export function checkActivationMatchesPin(cwd) {
         fixCommand: 'restore .fgos/distribution.json from version control, or fgctl upgrade to write a new pin',
       };
     }
-    const activationFile = doctorDriftPath(root, '.fgos/installation/activation.json', true);
+    const activationFile = doctorDriftPath(root, ACTIVATION_RELATIVE, true);
     const activation = activationFile ? readActivationFile(activationFile) : null;
     if (typeof activation?.artifactDigest !== 'string') return { passed: true, status: 'skip', message: 'activation-matches-pin skipped: no activation in this workspace' };
     if (activation.artifactDigest === pinned) return { passed: true, message: `active release matches the pin (${shortDigest(pinned)})` };
@@ -3688,7 +3663,7 @@ registerCheck({
 export function checkWriterIdentityResolvable(cwd) {
   const root = resolveMainCheckoutRoot(cwd) ?? cwd;
   const fgosDir = path.join(root, '.fgos');
-  const hasActivation = fs.existsSync(path.join(fgosDir, 'installation', 'activation.json'));
+  const hasActivation = fs.existsSync(activationFilePath(root));
   const parts = [];
   let failure = null;
   for (const [door, ignoreEnv] of [['current host', false], ['activation (git commit hook)', true]]) {

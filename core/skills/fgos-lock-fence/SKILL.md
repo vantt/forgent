@@ -54,8 +54,10 @@ whether the lock is free afterwards.
    ```
    A merge slot belongs to its target's full ref, URL-encoded as the lock
    file name carries it (`refs/heads/fgw/tsk-1` is `refs%2Fheads%2Ffgw%2Ftsk-1`).
-   Without a terminal the verb lists the holders and signals nothing; pass
-   `--yes` only after you decided in step 3 that these holders are wedged.
+   Without `--yes` the verb lists the holders and refuses with
+   `lock-fence-not-confirmed` (exit 2), on a terminal too, and signals nothing:
+   read the list, then rerun the same command with `--yes` only after you
+   decided in step 3 that these holders are wedged.
 4. Read the result:
    - `{ status: "free" }` — nobody held it; retry the original command.
    - `{ status: "fenced", terminated, killed }` — the holders ended (SIGTERM,

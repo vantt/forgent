@@ -182,27 +182,6 @@ pub fn inspect_git_worktree_recovery(
         ResolveRepo::Repository(r) => r,
         _ => return Ok(json!({"notARepository":true})),
     };
-    let issues = driver.inspect_worktree_orphans(&repo).map_err(operation)?;
-    let mut pending = vec![];
-    match std::fs::symlink_metadata(repo.common_dir().join("fgos/git")) {
-        Ok(_) => {
-            let wal =
-                wal::Wal::open_existing(repo.common_dir(), wal::OsFileSystem).map_err(error)?;
-            for chain in wal.active(100_000).map_err(error)? {
-                if matches!(
-                    chain.intent().kind,
-                    wal::OperationKind::WorktreeCreate { .. }
-                        | wal::OperationKind::WorktreeMove { .. }
-                        | wal::OperationKind::WorktreeRemove { .. }
-                ) {
-                    pending.push(
-                        json!({"operationId":chain.last().operation_id,"kind":chain.intent().kind}),
-                    );
-                }
-            }
-        }
-        Err(e) if e.kind() == std::io::ErrorKind::NotFound => (),
-        Err(e) => return Err(error(e)),
-    }
-    Ok(json!({"issues":issues,"pendingOperations":pending}))
+    let facts = incidents::worktree_recovery_facts(&driver, &repo).map_err(super::fact_error)?;
+    Ok(json!(facts))
 }

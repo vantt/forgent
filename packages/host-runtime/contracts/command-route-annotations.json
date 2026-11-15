@@ -28,9 +28,23 @@
     "owner_path": "apps/fgos",
     "subcommands": true
   },
+  "git": {
+    "operation_id": "git.status",
+    "owner_path": "packages/git/rust",
+    "subcommands": true
+  },
   "identity": {
     "operation_id": "identity.writer",
     "owner_path": "packages/identity/rust"
+  },
+  "lock-status": {
+    "operation_id": "holder-lock.status",
+    "owner_path": "packages/holder-lock/rust"
+  },
+  "lock": {
+    "operation_id": "holder-lock.fence",
+    "owner_path": "packages/holder-lock/rust",
+    "subcommands": true
   },
   "mailbox": {
     "operation_id": "mailbox.inbox",

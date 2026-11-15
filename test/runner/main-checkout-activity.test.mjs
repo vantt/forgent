@@ -57,3 +57,16 @@ test('clearBeaconIfOwn removes only the caller\'s own beacon', () => {
   assert.equal(clearBeaconIfOwn(dir, 'session-a').status, 'cleared');
   assert.equal(fs.existsSync(beaconPath(dir)), false);
 });
+
+// The beacon contract (packages/holder-lock/contracts/main-checkout-activity.v1.json) holds the rows every reader
+// answers the same way; the host's lock report (packages/holder-lock/rust/src/status.rs) checks the same rows.
+test('readBeacon answers corrupt or ok for every vector of the beacon contract as written', () => {
+  const contract = JSON.parse(fs.readFileSync(new URL('../../packages/holder-lock/contracts/main-checkout-activity.v1.json', import.meta.url), 'utf8'));
+  assert.ok(contract.vectors.length >= 12);
+  for (const row of contract.vectors) {
+    const dir = fgosDir();
+    fs.mkdirSync(path.dirname(beaconPath(dir)), { recursive: true });
+    fs.writeFileSync(beaconPath(dir), row.raw);
+    assert.equal(readBeacon(dir).status, row.valid ? 'ok' : 'corrupt', row.name);
+  }
+});

@@ -6,7 +6,9 @@ rust-version.workspace = true
 
 [dependencies]
 fgos-process = { path = "../../process/rust" }
-serde_json = { workspace = true }
+# preserve_order: lock-status keeps the registry's and the records' key order, which the parity runner compares byte for
+# byte (it normalises the envelope's data_hash away, so the hash itself is not what this proves).
+serde_json = { workspace = true, features = ["preserve_order"] }
 
 [target.'cfg(unix)'.dependencies]
 libc = { workspace = true }

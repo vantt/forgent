@@ -127,6 +127,10 @@ static COMPOSITION_PROVIDERS: &[ProviderDescriptor] = &[
     wiring::session::END_DESCRIPTOR,
     wiring::session::LIST_DESCRIPTOR,
     wiring::session::GC_DESCRIPTOR,
+    wiring::git_incidents::STATUS_DESCRIPTOR,
+    wiring::git_incidents::RECOVER_DESCRIPTOR,
+    wiring::lock_status::DESCRIPTOR,
+    wiring::lock_fence::DESCRIPTOR,
 ];
 
 fn main() {
@@ -317,6 +321,16 @@ fn main() {
             Arc::new(invocation_doors::EventStoreLifecycle),
         )));
     }
+    for descriptor in [
+        wiring::git_incidents::STATUS_DESCRIPTOR,
+        wiring::git_incidents::RECOVER_DESCRIPTOR,
+    ] {
+        service.register_provider(Arc::new(
+            wiring::git_incidents::GitIncidentsProvider::for_descriptor(descriptor),
+        ));
+    }
+    service.register_provider(Arc::new(wiring::lock_status::LockStatusProvider::new()));
+    service.register_provider(Arc::new(wiring::lock_fence::LockFenceProvider::new()));
     let tracker = service.tracker();
 
     match lane {

@@ -2431,7 +2431,7 @@ export const COMMAND_REGISTRY = [
   withSubcommands({
     name: 'lock',
     invoke: 'fgos lock fence <name>',
-    description: 'Stop the process that holds a registry lock so the lock can be taken again. Lists the holders (pid, start time, command line), asks for confirmation (--yes skips it), sends SIGTERM by identity, waits 5 s, sends SIGKILL, then asks the kernel with a probe whether the lock is free. A lock is never taken from a live holder: with no listable holder (a platform without /proc) the caller stops it, then --attest-stopped only re-checks the lock. Lock names: fgos lock-status.',
+    description: 'Stop the process that holds a registry lock so the lock can be taken again. Lists the holders (pid, start time) and refuses unless --yes confirms the fence, sends SIGTERM by identity, waits 5 s, sends SIGKILL, then asks the kernel with a probe whether the lock is free. A lock is never taken from a live holder: with no listable holder (a platform without /proc) the caller stops it, then --attest-stopped only re-checks the lock. Lock names: fgos lock-status.',
     subcommands: {
       fence: {
         description: 'Fence the holder(s) of one registry lock. Reports free (exit 0) when nobody holds it.',
@@ -2440,7 +2440,7 @@ export const COMMAND_REGISTRY = [
           properties: {
             name: { type: 'string', description: 'Positional: the registry lock name (e.g. main-checkout, merge-slot, worktree-admin, gateway).' },
             param: { type: 'string', description: 'Repeatable key=value for a lock path parameter the verb cannot know (e.g. --param ref=refs%2Fheads%2Fmain for merge-slot, the URL-encoded full target ref, --param provider=codex --param account=a1 for provider-account). fgosDir and lockRoot default to this checkout / this machine.' },
-            yes: { type: 'boolean', description: 'Skip the confirmation prompt. Without it and without a terminal, nothing is signalled.' },
+            yes: { type: 'boolean', description: 'Confirm the fence. Without it the verb lists the holders and refuses (exit 2), on a terminal too; nothing is signalled.' },
             'attest-stopped': { type: 'boolean', description: 'Only where holders cannot be listed: say the holder is already stopped; the lock is then only re-checked with a probe, never signalled.' },
           },
           positional: ['name'],
@@ -2456,6 +2456,7 @@ export const COMMAND_REGISTRY = [
     externalEffect: true,
     paginated: false,
     deprecated: null,
+    native: true,
   }),
   {
     name: 'lock-status',
@@ -2472,6 +2473,7 @@ export const COMMAND_REGISTRY = [
     externalEffect: false,
     paginated: false,
     deprecated: null,
+    native: true,
   },
   withSubcommands({
     name: 'git',
@@ -2487,6 +2489,7 @@ export const COMMAND_REGISTRY = [
     externalEffect: false,
     paginated: false,
     deprecated: null,
+    native: true,
   }),
   {
     name: 'resync-worktree',

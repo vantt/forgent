@@ -89,6 +89,8 @@ pub static NATIVE_SUBCOMMANDS: &[(&str, &[&str])] = &[
     ("gateway", wiring::gateway_control::AVAILABLE_SUBCOMMANDS),
     ("events", wiring::events::AVAILABLE_SUBCOMMANDS),
     ("session", wiring::session::AVAILABLE_SUBCOMMANDS),
+    ("git", wiring::git_incidents::AVAILABLE_SUBCOMMANDS),
+    ("lock", wiring::lock_fence::AVAILABLE_SUBCOMMANDS),
 ];
 
 /// Debt: the native verbs written before the shared parser, which keep their own reading of a call: the
@@ -696,6 +698,23 @@ mod tests {
     }
 
     #[test]
+    fn git_refuses_an_unknown_flag_in_the_node_cli_text() {
+        let text = |rest: &[&str]| {
+            check_call(route("git"), &call("git", rest))
+                .unwrap_err()
+                .message
+        };
+        assert_eq!(
+            text(&["status", "--bogus"]),
+            "unknown flag \"--bogus\" for \"fgos git status\". It takes no flags besides --dir, --json. See \"fgos git status --help\"."
+        );
+        assert_eq!(
+            text(&["recover", "--dir=/x"]),
+            "unknown flag \"--dir=/x\" for \"fgos git recover\" (write \"--dir <value>\", not \"--name=value\"). It takes no flags besides --dir, --json. See \"fgos git recover --help\"."
+        );
+    }
+
+    #[test]
     fn the_valid_flags_of_a_verb_off_the_pre_door_list_print_in_registry_order() {
         let route = fake(serde_json::json!({
             "subcommands": true,
@@ -709,6 +728,28 @@ mod tests {
         let accepted: Vec<String> = ["yes", "name"].map(String::from).to_vec();
         let text = pre_door_unknown_flag_text(&route, "bogus", "bogus", &accepted);
         assert!(text.contains("Valid flags: --name, --yes."), "{text}");
+    }
+
+    #[test]
+    fn lock_status_refuses_an_unknown_flag_in_the_node_cli_text_and_accepts_a_positional() {
+        let text = |rest: &[&str]| {
+            check_call(route("lock-status"), &call("lock-status", rest))
+                .unwrap_err()
+                .message
+        };
+        assert_eq!(
+            text(&["--bogus"]),
+            "unknown flag \"--bogus\" for \"fgos lock-status\". It takes no flags besides --dir, --json. See \"fgos lock-status --help\"."
+        );
+        assert_eq!(
+            text(&["--dir=/x"]),
+            "unknown flag \"--dir=/x\" for \"fgos lock-status\" (write \"--dir <value>\", not \"--name=value\"). It takes no flags besides --dir, --json. See \"fgos lock-status --help\"."
+        );
+        assert!(check_call(
+            route("lock-status"),
+            &call("lock-status", &["extra", "--json"])
+        )
+        .is_ok());
     }
 
     fn fake(json: serde_json::Value) -> CommandRouteDescriptor {

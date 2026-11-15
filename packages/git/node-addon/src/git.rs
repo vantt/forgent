@@ -213,6 +213,50 @@ fn refused(refusal: fgos_git::invocation_root::Refusal) -> Value {
     json!({"refused": {"faultClass": refusal.fault_class, "message": refusal.message}})
 }
 
+/// A fact that could not be read as the addon's error: a driver refusal keeps every field, a plain failure its text.
+pub(crate) fn fact_error(error: incidents::FactError) -> napi::Error {
+    match error {
+        incidents::FactError::Operation(e) => operation(e),
+        incidents::FactError::Plain(text) => crate::error(text),
+    }
+}
+
+/// Every open Git incident of the repository `cwd` sits in; read-only. `{notARepository}` outside a repository,
+/// and a part that cannot be read answers `{ error }` in place.
+#[allow(dead_code)] // exported through N-API
+#[napi]
+pub fn read_git_status(state_root: String, cwd: String) -> Result<Value> {
+    check()?;
+    serde_json::to_value(incidents::read_git_status(
+        Path::new(&state_root),
+        Path::new(&cwd),
+    ))
+    .map_err(error)
+}
+
+/// Recovers every interrupted Land, ScopedCommit and remote transfer of the repository `cwd` sits in:
+/// `{ recovered, kept, message }`, plus the merge pointer when a merge is pending. `writer` is the caller's writer;
+/// without one it is this process's own identity for the main checkout's `.fgos`.
+#[allow(dead_code)] // exported through N-API
+#[napi]
+pub fn recover_git_operations(
+    state_root: String,
+    cwd: String,
+    writer: Option<String>,
+) -> Result<Value> {
+    check()?;
+    let own = |fgos_dir: &Path| {
+        fgos_identity::resolve_current(Some(fgos_dir))
+            .id
+            .to_string()
+    };
+    let writer_for = |fgos_dir: &Path| writer.clone().unwrap_or_else(|| own(fgos_dir));
+    let recovered =
+        incidents::recover_git_operations(Path::new(&state_root), Path::new(&cwd), &writer_for)
+            .map_err(fact_error)?;
+    serde_json::to_value(recovered).map_err(error)
+}
+
 /// Which project, and which `.fgos`, an invocation acts on: `{root, fgosDir, found}`, or `{refused}`.
 /// Request: `{cwd, dir?, policy, home?, facts?}`; the policy and every refusal text live in `fgos-git`.
 #[allow(dead_code)] // exported through N-API
@@ -305,21 +349,10 @@ pub fn inspect_git(
         ResolveRepo::Repository(repo) => repo,
         ResolveRepo::NotARepository => return Ok(json!({"notARepository":true,"floor":floor})),
     };
-    let wal_present = match std::fs::symlink_metadata(repo.common_dir().join("fgos/git")) {
-        Ok(_) => true,
-        Err(e) if e.kind() == std::io::ErrorKind::NotFound => false,
-        Err(e) => return Err(error(e)),
-    };
     // The reader below skips the fence on purpose (it never writes); the
     // fact is reported through the same check every WAL-writing door runs.
     let activation_fence = wal::require_activation_fence(&repo).is_ok();
-    let journal = if wal_present {
-        let wal = wal::Wal::open_existing(repo.common_dir(), wal::OsFileSystem).map_err(error)?;
-        let scan = wal.scan(100_000).map_err(error)?;
-        json!({"initialized":true,"complete":scan.complete,"pendingCount":scan.unresolved,"retainedBytes":scan.retained_bytes,"retainedChains":scan.retained_terminal,"oldestRetainedAtMs":scan.oldest_retained.map(|t| t.duration_since(std::time::UNIX_EPOCH).unwrap_or_default().as_millis() as u64),"ledgerEntries":scan.ledger_entries,"ledgerCapacityWarning":scan.ledger_capacity_warning,"ledgerBytes":scan.ledger_bytes,"oldestUnresolved":scan.oldest_unresolved.map(|(id,time)| json!({"operationId":id,"unixMillis":time.duration_since(std::time::UNIX_EPOCH).unwrap_or_default().as_millis().to_string()})),"errors":scan.entries.iter().filter_map(|e| e.error.as_ref()).collect::<Vec<_>>()})
-    } else {
-        json!({"initialized":false,"complete":true,"pendingCount":0,"retainedBytes":0,"retainedChains":0,"oldestRetainedAtMs":null,"ledgerEntries":0,"ledgerCapacityWarning":false,"oldestUnresolved":null,"errors":[]})
-    };
+    let journal = incidents::journal_facts(&repo).map_err(fact_error)?;
     let remote = remote.as_deref().unwrap_or("origin");
     let obsolete = obsolete_legacy_fetch_mapping(remote).map_err(operation)?;
     let mappings = driver
@@ -352,28 +385,9 @@ pub fn inspect_git(
         }
         cursor = page.next_cursor;
     }
-    let mut native_locks = ["config.lock", "packed-refs.lock", "shallow.lock"]
-        .iter()
-        .filter(|name| std::fs::symlink_metadata(repo.common_dir().join(name)).is_ok())
-        .map(|name| (*name).to_owned())
-        .collect::<Vec<_>>();
-    if std::fs::symlink_metadata(repo.git_dir().join("index.lock")).is_ok() {
-        native_locks.push("index.lock".to_owned());
-    }
-    // A crash inside a pin delete leaves Git's own `<pin>.lock` beside the
-    // operation's reachability pin; report it like the other native locks.
-    let pins = std::path::Path::new("refs/fgos/git-operations");
-    if let Ok(operations) = std::fs::read_dir(repo.common_dir().join(pins)) {
-        for operation in operations.flatten() {
-            let lock = pins.join(operation.file_name()).join("candidate.lock");
-            if std::fs::symlink_metadata(repo.common_dir().join(&lock)).is_ok() {
-                native_locks.push(lock.to_string_lossy().replace('\\', "/"));
-            }
-        }
-    }
-    native_locks.sort();
+    let native_locks = incidents::native_lock_names(&repo);
     Ok(
-        json!({"floor":floor,"commonDir":plain_path(repo.common_dir()),"layout":format!("{:?}",repo.layout()),"journal":journal,"activationFence":activation_fence,"nativeLocks":native_locks,"untrustedTransportConfig":driver.untrusted_transport_config(&repo).map_err(operation)?,"reservedLegacyRefs":reserved_legacy_refs,"obsoleteFetchMapping":mappings.iter().any(|f| f.value == obsolete.as_bytes()),"fetchRefspecs":mappings.into_iter().map(|f| String::from_utf8_lossy(&f.value).into_owned()).collect::<Vec<_>>(),"durability":"process-crash; file and parent sync; stable media not certified"}),
+        json!({"floor":floor,"commonDir":plain_path(repo.common_dir()),"layout":format!("{:?}",repo.layout()),"journal":json!(journal),"activationFence":activation_fence,"nativeLocks":native_locks,"untrustedTransportConfig":driver.untrusted_transport_config(&repo).map_err(operation)?,"reservedLegacyRefs":reserved_legacy_refs,"obsoleteFetchMapping":mappings.iter().any(|f| f.value == obsolete.as_bytes()),"fetchRefspecs":mappings.into_iter().map(|f| String::from_utf8_lossy(&f.value).into_owned()).collect::<Vec<_>>(),"durability":"process-crash; file and parent sync; stable media not certified"}),
     )
 }
 #[napi]

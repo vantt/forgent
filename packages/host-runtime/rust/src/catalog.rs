@@ -104,6 +104,17 @@ pub const CATALOG: &[OperationDescriptor] = &[
         streaming_mode: StreamingMode::None,
     },
     OperationDescriptor {
+        operation_id: OperationId::from_static("holder-lock.fence"),
+        owning_component_id: Cow::Borrowed("holder-lock"),
+        request_contract: ContractRef::from_static("holder-lock.fence.request", "1.0.0"),
+        outcome_contract: ContractRef::from_static("holder-lock.fence.outcome", "1.0.0"),
+        effect: OperationEffect::Write,
+        idempotency: OperationIdempotency::None,
+        authority_policy_id: Cow::Borrowed("holder-lock.write"),
+        allowed_host_kinds: &["cli"],
+        streaming_mode: StreamingMode::None,
+    },
+    OperationDescriptor {
         operation_id: OperationId::from_static("test.fixture.echo"),
         owning_component_id: Cow::Borrowed("test"),
         request_contract: ContractRef::from_static("test.fixture.echo.request", "1.0.0"),
@@ -225,6 +236,17 @@ pub const CATALOG: &[OperationDescriptor] = &[
         streaming_mode: StreamingMode::None,
     },
     OperationDescriptor {
+        operation_id: OperationId::from_static("git.status"),
+        owning_component_id: Cow::Borrowed("git"),
+        request_contract: ContractRef::from_static("git.status.request", "1.0.0"),
+        outcome_contract: ContractRef::from_static("git.status.outcome", "1.0.0"),
+        effect: OperationEffect::Read,
+        idempotency: OperationIdempotency::Safe,
+        authority_policy_id: Cow::Borrowed("git.read"),
+        allowed_host_kinds: &["cli"],
+        streaming_mode: StreamingMode::None,
+    },
+    OperationDescriptor {
         operation_id: OperationId::from_static("event-store.sync"),
         owning_component_id: Cow::Borrowed("event-store"),
         request_contract: ContractRef::from_static("event-store.sync.request", "1.0.0"),
@@ -232,6 +254,17 @@ pub const CATALOG: &[OperationDescriptor] = &[
         effect: OperationEffect::Write,
         idempotency: OperationIdempotency::None,
         authority_policy_id: Cow::Borrowed("event-store.write"),
+        allowed_host_kinds: &["cli"],
+        streaming_mode: StreamingMode::None,
+    },
+    OperationDescriptor {
+        operation_id: OperationId::from_static("git.recover"),
+        owning_component_id: Cow::Borrowed("git"),
+        request_contract: ContractRef::from_static("git.recover.request", "1.0.0"),
+        outcome_contract: ContractRef::from_static("git.recover.outcome", "1.0.0"),
+        effect: OperationEffect::Write,
+        idempotency: OperationIdempotency::None,
+        authority_policy_id: Cow::Borrowed("git.write"),
         allowed_host_kinds: &["cli"],
         streaming_mode: StreamingMode::None,
     },
@@ -312,6 +345,17 @@ pub const CATALOG: &[OperationDescriptor] = &[
         allowed_host_kinds: &["cli"],
         streaming_mode: StreamingMode::None,
     },
+    OperationDescriptor {
+        operation_id: OperationId::from_static("holder-lock.status"),
+        owning_component_id: Cow::Borrowed("holder-lock"),
+        request_contract: ContractRef::from_static("holder-lock.status.request", "1.0.0"),
+        outcome_contract: ContractRef::from_static("holder-lock.status.outcome", "1.0.0"),
+        effect: OperationEffect::Read,
+        idempotency: OperationIdempotency::Safe,
+        authority_policy_id: Cow::Borrowed("holder-lock.read"),
+        allowed_host_kinds: &["cli"],
+        streaming_mode: StreamingMode::None,
+    },
 ];
 
 #[cfg(test)]
@@ -321,8 +365,8 @@ mod tests {
     #[test]
     fn catalog_contains_required_operations() {
         // Eleven operations, plus the mailbox's send, inbox, inbox claim, list
-        // and status, and the gateway's start, stop and status.
-        assert_eq!(CATALOG.len(), 27);
+        // and status, the gateway start, stop and status, the git status and recover, the lock status and the lock fence.
+        assert_eq!(CATALOG.len(), 31);
         let ids: Vec<&str> = CATALOG.iter().map(|op| op.operation_id.as_str()).collect();
         assert!(ids.contains(&"distribution.build.show"));
         assert!(ids.contains(&"work.gate-bypass.show"));
@@ -350,6 +394,10 @@ mod tests {
         assert!(ids.contains(&"session.end"));
         assert!(ids.contains(&"session.list"));
         assert!(ids.contains(&"session.gc"));
+        assert!(ids.contains(&"git.status"));
+        assert!(ids.contains(&"git.recover"));
+        assert!(ids.contains(&"holder-lock.status"));
+        assert!(ids.contains(&"holder-lock.fence"));
     }
     /// `OperationId::from_static` (used by every `CATALOG` entry, for
     /// const-context construction with no runtime allocation) skips

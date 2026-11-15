@@ -85,23 +85,6 @@ pub fn self_record() -> Result<Value> {
         .clone())
 }
 
-/// A record names a tuple by the judge table's own rules for missing fields.
-fn tuple_of(record: &Record) -> Option<ProcTuple> {
-    let observer = facts::observer();
-    let pid_ns = match &record.pid_ns {
-        Some(ns) => ns.clone(),
-        None if observer.in_init_pid_ns => observer.pid_ns.clone(),
-        None => return None,
-    };
-    Some(ProcTuple {
-        host: record.host.clone().unwrap_or(observer.host),
-        boot_id: record.boot_id.clone(),
-        pid_ns,
-        pid: record.pid?,
-        start_time: record.start_time.clone()?,
-    })
-}
-
 #[napi(namespace = "process", js_name = "signalByIdentity")]
 pub fn signal_by_identity(record: Option<Value>, signal: String) -> Result<&'static str> {
     check()?;
@@ -117,18 +100,17 @@ pub fn signal_by_identity(record: Option<Value>, signal: String) -> Result<&'sta
         }
     };
     // The driver judges the tuple again under the pidfd, so a reused pid is never signalled.
-    let Some(tuple) = tuple_of(&Record::from_json(&record.unwrap_or(Value::Null))) else {
-        return Ok("identity-unknown");
-    };
-    Ok(match control::signal_by_identity(&tuple, signal) {
-        SignalOutcome::Sent => "sent",
-        SignalOutcome::NotFound => "not-found",
-        SignalOutcome::IdentityMismatch => "identity-mismatch",
-        SignalOutcome::IdentityUnknown => "identity-unknown",
-        SignalOutcome::Denied => "denied",
-        SignalOutcome::Unsupported => "unsupported",
-        SignalOutcome::Failed(_) => "failed",
-    })
+    Ok(
+        match control::signal_record(&Record::from_json(&record.unwrap_or(Value::Null)), signal) {
+            SignalOutcome::Sent => "sent",
+            SignalOutcome::NotFound => "not-found",
+            SignalOutcome::IdentityMismatch => "identity-mismatch",
+            SignalOutcome::IdentityUnknown => "identity-unknown",
+            SignalOutcome::Denied => "denied",
+            SignalOutcome::Unsupported => "unsupported",
+            SignalOutcome::Failed(_) => "failed",
+        },
+    )
 }
 
 #[napi(namespace = "process")]
@@ -160,18 +142,9 @@ pub fn scan(filter: Value) -> Result<Value> {
     })
 }
 
-/// This process and its ancestors, nearest first, read one pid at a time; off Linux the chain is this process alone.
+/// This process and its ancestors, nearest first; off Linux the chain is this process alone.
 #[napi(namespace = "process", js_name = "selfChain")]
 pub fn self_chain() -> Result<Vec<u32>> {
     check()?;
-    let mut chain = vec![std::process::id()];
-    while let Some(relation) = facts::relation_of(ProcId(
-        *chain.last().expect("the chain starts with this process"),
-    )) {
-        if relation.parent <= 1 || chain.contains(&relation.parent) {
-            break;
-        }
-        chain.push(relation.parent);
-    }
-    Ok(chain)
+    Ok(control::self_chain())
 }

@@ -1,16 +1,13 @@
 import '../helpers/process-tmp-root.mjs';
 // The state transaction: confined paths, revocation, async refusal, reentry,
-// and the record the fast path writes. Real files in a temp .fgos; no host
-// binary is needed because nothing here has to clean a dead holder.
+// and the record the fast path writes. Real files in a temp .fgos.
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { spawn } from 'node:child_process';
-import { withStateTx, hotPaths, readHotRecord, reclaimDeadHolder, clearHotRecord, HotLockError } from '../../src/state/hot-lock.mjs';
-import { observe, selfRecord } from '../../src/native/process-identity.mjs';
+import { withStateTx, hotPaths, readHotRecord, unlinkRecordIfUnchanged, HotLockError } from '../../src/state/hot-lock.mjs';
 
 function fixture() {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-hot-tx-'));
@@ -202,54 +199,29 @@ test('a record that cannot be released never replaces the callback result or its
   } finally { f.cleanup(); }
 });
 
-// The record functions the state transaction cleans with. Each takes the
-// kernel reclaim lock through the holder-lock facade, so the harness's staged
-// host binary is needed.
+// Wiring of the record door: the cases of reading, reclaiming and clearing a
+// record live in packages/holder-lock/rust/src/hot_record.rs and the vectors of
+// hot-lock.v1.json. This proves only that the bytes cross the addon as a Buffer,
+// so a record that is not valid UTF-8 is cleared by its own bytes. It needs the
+// harness's staged addon.
 
-function recordFile(f) {
-  const { record, dir } = hotPaths(f.fgosDir);
-  fs.mkdirSync(dir, { recursive: true });
-  return record;
-}
-
-async function exitedHolderRecord() {
-  const child = spawn(process.execPath, ['-e', 'setInterval(() => {}, 1000)'], { stdio: 'ignore' });
-  const exited = new Promise((resolve) => child.on('exit', resolve));
-  const { pid, startTime, bootId, pidNs } = observe(child.pid);
-  child.kill('SIGKILL');
-  await exited;
-  return JSON.stringify({ v: 1, pid, startTime, bootId, pidNs });
-}
-
-test('a record that changed after it was judged dead is never reclaimed', async () => {
+test('a torn record that is not valid UTF-8 is read and cleared by its bytes through the addon', () => {
   const f = fixture();
   try {
-    const file = recordFile(f);
-    fs.writeFileSync(file, await exitedHolderRecord());
-    const observed = readHotRecord(file);
-    assert.equal(observed.state, 'ok');
-    const live = JSON.stringify({ v: 1, ...selfRecord() });
-    fs.writeFileSync(file, live);
-    assert.equal(reclaimDeadHolder(f.fgosDir, 'state', observed), 'changed');
-    assert.equal(fs.readFileSync(file, 'utf8'), live, 'the live holder keeps its record');
-  } finally {
-    f.cleanup();
-  }
-});
-
-test('clearing a record removes only the bytes the person saw', () => {
-  const f = fixture();
-  try {
-    const file = recordFile(f);
-    const seen = '{"v":1,"pid":';
-    fs.writeFileSync(file, seen);
-    assert.equal(clearHotRecord(f.fgosDir, 'state', seen), true);
-    assert.equal(fs.existsSync(file), false);
-
-    const arrived = '{"v":1,"pid":99';
-    fs.writeFileSync(file, arrived);
-    assert.equal(clearHotRecord(f.fgosDir, 'state', seen), false);
-    assert.equal(fs.readFileSync(file, 'utf8'), arrived, 'the record that arrived since stays');
+    const { record, dir } = hotPaths(f.fgosDir);
+    fs.mkdirSync(dir, { recursive: true });
+    const torn = Buffer.concat([Buffer.from('{"v":1,"pid":7,"writer":"'), Buffer.from([0xff]), Buffer.from('"}')]);
+    fs.writeFileSync(record, torn);
+    const seen = readHotRecord(record);
+    assert.equal(seen.state, 'unreadable');
+    assert.ok(Buffer.isBuffer(seen.token) && seen.token.equals(torn), 'the token is the file bytes');
+    const other = Buffer.from(torn);
+    other[other.indexOf(0xff)] = 0xfe;
+    fs.writeFileSync(record, other);
+    assert.equal(unlinkRecordIfUnchanged(record, seen), false, 'bytes that differ only in the invalid byte are another record');
+    fs.writeFileSync(record, torn);
+    assert.equal(unlinkRecordIfUnchanged(record, seen), true);
+    assert.equal(fs.existsSync(record), false);
   } finally {
     f.cleanup();
   }

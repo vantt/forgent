@@ -339,11 +339,16 @@ impl<'a> Doors<'a> {
         if let Some(warning) = admitted.warning {
             eprint!("{warning}");
         }
+        // A read that found no store opens nothing, so no lifecycle trigger has a store to run against; its
+        // refusal would otherwise land in whichever store the fault log resolves to.
+        let opens_store = store_mode != StoreMode::None
+            && !child
+            && !(store_mode == StoreMode::Read && !root.found);
         let entered = Entered {
             project,
             root,
             sub,
-            opens_store: store_mode != StoreMode::None && !child,
+            opens_store,
             child,
         };
         if entered.opens_store && self.dispatched && verb != "init" {
@@ -636,6 +641,25 @@ mod tests {
             .enter()
             .expect("a read warns and runs");
         assert!(!entered.root.found);
+        assert!(records(&base.join("main/.fgos")).is_empty());
+        std::fs::remove_dir_all(&base).unwrap();
+    }
+
+    #[test]
+    fn a_read_that_found_no_store_runs_no_trigger_and_records_no_refusal_in_the_main_store() {
+        let base = scratch();
+        repository(&base, false);
+        let route = route(serde_json::json!({"store": "read"}));
+        let argv = args(&[]);
+        let call = Call::new(&argv);
+        let lifecycle = Recorder {
+            error: Some("event-store-refused".into()),
+            ..Recorder::new(true)
+        };
+        let doors = doors(&route, &call, &argv, &base.join("wt"), true, &lifecycle);
+        let entered = doors.enter().expect("a read warns and runs");
+        doors.leave(&entered, &finished());
+        assert!(lifecycle.calls.borrow().is_empty());
         assert!(records(&base.join("main/.fgos")).is_empty());
         std::fs::remove_dir_all(&base).unwrap();
     }

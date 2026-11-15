@@ -8,6 +8,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { computeSha256Digest } from '../../src/native/proof-helpers.mjs';
+import { RUN_DIRS_VECTORS, buildRunDirsTree, relativeTo } from '../helpers/run-dirs-fixture.mjs';
 import { adoptRun, adoptScan, listOpenAttemptDirs, RunSupervisorError } from '../../src/run-supervisor/client.mjs';
 
 const HOST = process.env.FGOS_HOST_BIN;
@@ -95,5 +96,16 @@ test('a route that fails is a named error, not a verdict', { skip: NEEDS_HOST },
     assert.throws(() => adoptRun(root, { hostBin: old }), (err) => err.code === 'host-version-mismatch');
   } finally {
     fs.rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test('the open attempt lister yields what the shared run-directory fixture says for every tree (the host lists the same)', () => {
+  for (const vector of RUN_DIRS_VECTORS) {
+    const { fgosDir, cleanup } = buildRunDirsTree(vector);
+    try {
+      assert.deepEqual(relativeTo(fgosDir, listOpenAttemptDirs(path.join(fgosDir, 'assignments'))), vector.expect.openAttempts, vector.name);
+    } finally {
+      cleanup();
+    }
   }
 });
