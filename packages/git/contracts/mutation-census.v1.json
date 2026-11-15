@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "900c51da545a09771e7be70d72ee65ee2653e9f7a96941e7a5810fb33f8a10c3",
+  "payloadDigest": "dbb9524e3d79868b2c21e7974fb0d1d8ad20ead7e1adf407dbb9d5a9b289a5d1",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "b8b886cee2ea5ce7ee1153e4795512db135a990de894c27e53c5e778b210be62",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -94,7 +94,7 @@
     "apps/fgos/src/wiring/doctor/bridge.rs": "05abb106f3337db6a6d2b2e9eadcbc1e393b3b23b63ba41cc05294edd1199ab1",
     "apps/fgos/src/wiring/doctor/config.rs": "51162ec6caa45e2d7cfd1883e4ec5e279e5465406f65a274ead6a5d248bf8d99",
     "apps/fgos/src/wiring/doctor/holder_lock.rs": "0f48a26f2eab091717ae1f71e4461bea7a23c5b6b4cce78fd7e28fd41541b78f",
-    "apps/fgos/src/wiring/doctor/identity.rs": "c77b8f84fb27f10717b264bb839e5c79dd2a817d51263779bb7d233db9469a55",
+    "apps/fgos/src/wiring/doctor/identity.rs": "991882d3049d687daf26678fc2d7ee864a9e2705cd6fe1f284080e8816a734c5",
     "apps/fgos/src/wiring/doctor/mailbox.rs": "543436deb6fd08bf522f0d47caece62d51defa55ea2ebf2d7ec308364ebdc85a",
     "apps/fgos/src/wiring/doctor/mod.rs": "83c00ca31c0223b61a9548d05f08a86c8b1dd89816c9ac105737422097180cb2",
     "apps/fgos/src/wiring/doctor/observe.rs": "277742f65ac2d3ac816d11c212b27ba0fffebd5e121dce4f8370154cd864e03e",
@@ -1316,15 +1316,7 @@
     "src/workflow/units-source.mjs": "fd7d7a3ed5db5f00c6244fc60da479aa739e1935e1ffaf02341f71f3a326e307",
     "scripts/lib/git-one-door-declarations.v1.json": "c06a8ee8c3164c54bfd3cd4401271c3e080ae3bb86e5a469cf7532d3fd60d3e9"
   },
-  "sites": [
-    {
-      "path": "apps/fgos/src/wiring/doctor/identity.rs",
-      "line": 299,
-      "spawn": "Command::new <- packages/process/rust/src/spawn.rs:141",
-      "binary": "? bin",
-      "family": "unresolved-binary"
-    }
-  ],
+  "sites": [],
   "classes": [
     {
       "path": ".agents/skills/distill/scripts/distill.mjs",
@@ -1825,6 +1817,13 @@
       "class": "production-sandbox-probe",
       "function": "run",
       "repository": "self.repo.to_string_lossy().into_owned()"
+    },
+    {
+      "path": "apps/fgos/src/wiring/doctor/identity.rs",
+      "line": 179,
+      "spawn": "Command::new <- packages/process/rust/src/spawn.rs:141",
+      "binary": "(parsed configuration (activation[\"bin\"]))",
+      "class": "configured-binary"
     },
     {
       "path": "apps/fgos/src/wiring/events.rs",

@@ -161,7 +161,7 @@ pub fn shared_directory_row(root: &Path) -> RowOutcome {
 }
 
 /// `fgos identity --pid <pid> --fgos-dir <dir>` answered by another host binary, or why it could not.
-fn ask_host(bin: &Path, pid: u32, fgos_dir: &Path) -> Result<String, String> {
+fn ask_host(activation: &serde_json::Value, pid: u32, fgos_dir: &Path) -> Result<String, String> {
     use fgos_process::spawn::{run_bounded, Outcome};
     let env: Vec<(String, String)> = std::env::vars()
         .filter(|(name, _)| name != "FGOS_INVOCATION_RECORD_PATH")
@@ -173,8 +173,17 @@ fn ask_host(bin: &Path, pid: u32, fgos_dir: &Path) -> Result<String, String> {
         "--fgos-dir".to_owned(),
         fgos_dir.display().to_string(),
     ];
+    // The program is what the activation record names: data of the project, not a name this code picks.
+    let bin = Path::new(activation["bin"].as_str().unwrap_or_default());
     let host = bin.display();
-    let output = match run_bounded(bin, args, &env, None, None, PROBE_TIMEOUT) {
+    let output = match run_bounded(
+        activation["bin"].as_str().unwrap_or_default(),
+        args,
+        &env,
+        None,
+        None,
+        PROBE_TIMEOUT,
+    ) {
         Ok(Outcome::Exited(output)) => output,
         Ok(Outcome::TimedOut { .. }) => {
             return Err(format!(
@@ -296,7 +305,7 @@ pub fn writer_identity_row(root: &Path, running: &Path) -> RowOutcome {
             let answer = if same {
                 Ok(here(&fgos_dir))
             } else {
-                ask_host(&bin, pid, &fgos_dir)
+                ask_host(&serde_json::json!({ "bin": bin }), pid, &fgos_dir)
             };
             match answer {
                 Ok(json) => parts.push(format!("{door}: {} -> {json}", bin.display())),
