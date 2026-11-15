@@ -10,7 +10,7 @@ import { machineHome, writeProjectConfig, writeRawProjectConfig } from '../helpe
 import { runHook, normalizeHookPayload } from '../../src/runner/hook.mjs';
 import { seedStubAgentClis } from '../helpers/agent-clis.mjs';
 
-seedStubAgentClis('agy');
+seedStubAgentClis('agy', 'claude');
 
 // The verdict of the Agent/Task guard, judged in-process: one fixture table run for each payload format (the
 // standard one of Claude Code and Codex, and agy's), because both must answer alike. Real configs on real git
