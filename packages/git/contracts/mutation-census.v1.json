@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "42e1ccbb3d9f4efe38edddc28d81f04a16211e9993ed13537f5d7bb5b7224bdf",
+  "payloadDigest": "96842c632b28cecb070b0481a70fe6c20dac6bce125ba481e69e89eb2449b101",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "a5629383f89b4488b252a62f0ea86463e649e33e0a891db1a19af2cd6c136aca",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -874,7 +874,7 @@
     "scripts/identity-ids-unique.mjs": "911396033b882660aa261c22a67f316f9627e3e2979a523feeca0629518f424f",
     "scripts/install-git-hooks.mjs": "5d37cb2d1596d02d89df9e52bc0773ccbb33cdee58c8d692215e88474d69ffce",
     "scripts/knowledge-bootstrap.mjs": "6ffd1b84d5ebf773b52806cd9d47007e60f4999a0f36b43bca4cc50d0f649543",
-    "scripts/knowledge-canary.mjs": "da7fa9d8201b93dd3e68e09b51de2ab467a433d305fccfa7038e03e2a9493285",
+    "scripts/knowledge-canary.mjs": "235eeaad5921c9d4cb83bec0ef1504ad74ff5b61486e2727f86d2e5f5e29240d",
     "scripts/lib/codex-auth-guard.mjs": "e7d0ec136014ece7375a545789734203f6c3840cb64aec76a80ecd9f1af198ee",
     "scripts/lib/dev-host-manifest.mjs": "9928ceb97e807bcb02a7fed73153cf21de09d6cc9b6d56492166cb94e48c44bb",
     "scripts/lib/doc-links.mjs": "a4f2720a80234e2f3d5000877efdf2be95dd7c5ca11eda519f025d65df711cd1",

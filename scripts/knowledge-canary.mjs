@@ -7,6 +7,7 @@ import { fileURLToPath } from 'node:url';
 import { execSync } from 'node:child_process';
 import { sandboxGit } from './lib/sandbox-git.mjs';
 import { rebuild } from '../src/state/store.mjs';
+import { writeFrontmatter } from '../src/util/yaml.mjs';
 
 export function runKnowledgeCanary(repoRoot) {
   // The canary exercises a DISPOSABLE sandbox repo passed as `repoRoot`
@@ -36,7 +37,7 @@ export function runKnowledgeCanary(repoRoot) {
   // 3. Write file and commit
   const fullPath = path.join(repoRoot, docPath);
   fs.mkdirSync(path.dirname(fullPath), { recursive: true });
-  fs.writeFileSync(fullPath, `---\nframework: diataxis\nmode: how-to\n---\n# Worktree Reclaim Guide\n`, 'utf8');
+  fs.writeFileSync(fullPath, writeFrontmatter({ framework: 'diataxis', mode: 'how-to' }, '# Worktree Reclaim Guide\n', docPath), 'utf8');
   // The sandbox repository's own commit, through the named sandbox door
   // (argv array, no shell; refused outside repoRoot).
   const git = sandboxGit(repoRoot);
