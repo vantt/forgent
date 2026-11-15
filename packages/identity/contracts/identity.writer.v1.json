@@ -24,6 +24,141 @@
   "x-idPattern": "^[A-Za-z0-9._-]+$",
   "x-maxIdLength": 200,
   "x-registryFile": "sessions.json",
+  "x-sessionRegistry": {
+    "description": "The rows of .fgos/sessions.json that `fgos session` writes and lists (apps/fgos/src/wiring/session.rs) and this rule reads (one field, sessionId, to confirm an env id). The file is a JSON array written two-space with a trailing newline; `list` answers the array as it is, a summary row projects the six summaryFields. A file that is not JSON or not an array is refused by `session` (fail closed) and confirms nothing here (fail soft). Both readers run every row below.",
+    "rowFields": [
+      "sessionId",
+      "worktreePath",
+      "itemId",
+      "startCommit",
+      "pid",
+      "record",
+      "startedAt"
+    ],
+    "summaryFields": [
+      "sessionId",
+      "worktreePath",
+      "itemId",
+      "startCommit",
+      "pid",
+      "startedAt"
+    ],
+    "rows": [
+      {
+        "name": "no file",
+        "registry": {
+          "absent": true
+        },
+        "list": [],
+        "summary": [],
+        "confirms": [],
+        "rejects": [
+          "11111111-1111-4111-8111-111111111111"
+        ]
+      },
+      {
+        "name": "empty array",
+        "registry": {
+          "text": "[]\n"
+        },
+        "list": [],
+        "summary": [],
+        "confirms": [],
+        "rejects": [
+          "11111111-1111-4111-8111-111111111111"
+        ]
+      },
+      {
+        "name": "two sessions, one bound to an item",
+        "registry": {
+          "text": "[\n  {\n    \"sessionId\": \"11111111-1111-4111-8111-111111111111\",\n    \"worktreePath\": \"/tmp/fgos-sessions/11111111-1111-4111-8111-111111111111-AbC123\",\n    \"itemId\": null,\n    \"startCommit\": \"0123456789abcdef0123456789abcdef01234567\",\n    \"pid\": 4242,\n    \"record\": {\n      \"host\": \"fixture-host\",\n      \"bootId\": \"boot-1\",\n      \"pidNs\": \"pid:[4026531836]\",\n      \"pid\": 4242,\n      \"startTime\": \"123456\"\n    },\n    \"startedAt\": \"2026-11-15T03:00:00.000Z\"\n  },\n  {\n    \"sessionId\": \"22222222-2222-4222-8222-222222222222\",\n    \"worktreePath\": \"/tmp/fgos-sessions/22222222-2222-4222-8222-222222222222-AbC123\",\n    \"itemId\": \"tsk-abc\",\n    \"startCommit\": \"0123456789abcdef0123456789abcdef01234567\",\n    \"pid\": 4243,\n    \"record\": {\n      \"host\": \"fixture-host\",\n      \"bootId\": \"boot-1\",\n      \"pidNs\": \"pid:[4026531836]\",\n      \"pid\": 4243,\n      \"startTime\": \"123456\"\n    },\n    \"startedAt\": \"2026-11-15T03:00:01.000Z\"\n  }\n]\n"
+        },
+        "list": [
+          {
+            "sessionId": "11111111-1111-4111-8111-111111111111",
+            "worktreePath": "/tmp/fgos-sessions/11111111-1111-4111-8111-111111111111-AbC123",
+            "itemId": null,
+            "startCommit": "0123456789abcdef0123456789abcdef01234567",
+            "pid": 4242,
+            "record": {
+              "host": "fixture-host",
+              "bootId": "boot-1",
+              "pidNs": "pid:[4026531836]",
+              "pid": 4242,
+              "startTime": "123456"
+            },
+            "startedAt": "2026-11-15T03:00:00.000Z"
+          },
+          {
+            "sessionId": "22222222-2222-4222-8222-222222222222",
+            "worktreePath": "/tmp/fgos-sessions/22222222-2222-4222-8222-222222222222-AbC123",
+            "itemId": "tsk-abc",
+            "startCommit": "0123456789abcdef0123456789abcdef01234567",
+            "pid": 4243,
+            "record": {
+              "host": "fixture-host",
+              "bootId": "boot-1",
+              "pidNs": "pid:[4026531836]",
+              "pid": 4243,
+              "startTime": "123456"
+            },
+            "startedAt": "2026-11-15T03:00:01.000Z"
+          }
+        ],
+        "summary": [
+          {
+            "sessionId": "11111111-1111-4111-8111-111111111111",
+            "worktreePath": "/tmp/fgos-sessions/11111111-1111-4111-8111-111111111111-AbC123",
+            "itemId": null,
+            "startCommit": "0123456789abcdef0123456789abcdef01234567",
+            "pid": 4242,
+            "startedAt": "2026-11-15T03:00:00.000Z"
+          },
+          {
+            "sessionId": "22222222-2222-4222-8222-222222222222",
+            "worktreePath": "/tmp/fgos-sessions/22222222-2222-4222-8222-222222222222-AbC123",
+            "itemId": "tsk-abc",
+            "startCommit": "0123456789abcdef0123456789abcdef01234567",
+            "pid": 4243,
+            "startedAt": "2026-11-15T03:00:01.000Z"
+          }
+        ],
+        "confirms": [
+          "11111111-1111-4111-8111-111111111111",
+          "22222222-2222-4222-8222-222222222222"
+        ],
+        "rejects": [
+          "33333333-3333-4333-8333-333333333333"
+        ]
+      },
+      {
+        "name": "not JSON",
+        "registry": {
+          "text": "{bad"
+        },
+        "list": {
+          "refused": "not-json"
+        },
+        "confirms": [],
+        "rejects": [
+          "11111111-1111-4111-8111-111111111111"
+        ]
+      },
+      {
+        "name": "a JSON object, not an array",
+        "registry": {
+          "text": "{}"
+        },
+        "list": {
+          "refused": "not-array"
+        },
+        "confirms": [],
+        "rejects": [
+          "11111111-1111-4111-8111-111111111111"
+        ]
+      }
+    ]
+  },
   "definitions": {
     "machine": {
       "description": "This machine, when its id was minted (fgos doctor --fix); null otherwise. Bare identity never mints and never fails on a missing id.",

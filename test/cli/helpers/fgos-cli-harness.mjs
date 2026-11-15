@@ -25,7 +25,6 @@ import { appendEvent } from '../../helpers/legacy-event-fixture.mjs';
 import { releaseClaim } from '../../../src/state/runtime-coordination.mjs';
 import { moveUseCase } from '../../../src/verbs/state/move.mjs';
 import { claimWork } from '../../../src/runner/claim-port.mjs';
-import { createSession, endSession } from '../../../src/runner/session.mjs';
 import { resolveFgosFile, FGOS_FILE } from '../../../src/state/fgos-file-registry.mjs';
 import { writeCoexistenceManifest } from '../../../src/install/coexist.mjs';
 import { invokeHost } from '../../../src/util/host-bin.mjs';
@@ -1080,6 +1079,21 @@ function startSession(cwd, extraArgs = []) {
     sessionId: data.sessionId,
     worktreePath: data.worktreePath,
   };
+}
+
+// `fgos session start [--item <id>]` run in `repoRoot`; answers the session summary the verb prints. The session
+// id is the host's own (a UUID), so a caller reads it from the answer.
+function createSession(repoRoot, { itemId } = {}) {
+  const result = run(repoRoot, ['session', 'start', ...(itemId ? ['--item', itemId] : [])]);
+  if (result.status !== 0) throw new Error(`session start failed (${result.status}): ${result.stderr}`);
+  return envelopeData(result.stdout);
+}
+
+// `fgos session end <id> [--force]` run in `repoRoot`; answers the summary (with `forced`) the verb prints.
+function endSession(repoRoot, sessionId, { force = false } = {}) {
+  const result = run(repoRoot, ['session', 'end', sessionId, ...(force ? ['--force'] : [])]);
+  if (result.status !== 0) throw new Error(`session end failed (${result.status}): ${result.stderr}`);
+  return envelopeData(result.stdout);
 }
 
 // Makes a commit from INSIDE a detached-HEAD session worktree, diverging its

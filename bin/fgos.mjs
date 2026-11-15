@@ -105,7 +105,7 @@ import { fenceLock, parseLockParams } from '../src/runner/lock-fence.mjs';
 import { formatLockDurationMs } from '../src/util/format-lock-duration.mjs';
 import { clearBeaconIfOwn } from '../src/runner/main-checkout-activity.mjs';
 import { resolveWriterIdentity } from '../src/util/session-identity.mjs';
-import { createSession, endSession, listSessions, reclaimOrphanedSessions, sessionSummary, SessionError } from '../src/runner/session.mjs';
+import { listSessions } from '../src/runner/session.mjs';
 import { visitCount } from '../src/runner/anti-loop.mjs';
 import { DEFAULTS } from '../src/state/work.mjs';
 import { DEFAULT_DOMAIN, getDomain, stepForPhase, domainSteps, effectiveStep, resolveDomainName } from '../src/state/domain-registry.mjs';
@@ -3491,47 +3491,6 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         });
       }
       throw new StoreError('validation', `unknown worktree sub-verb: ${sub}`);
-    }
-    // Opt-in per-session git worktree lifecycle (fgos-multi-session-checkout
-    // Epic 1, D6/D7): a first-class `session` verb family wiring session.mjs's
-    // createSession/endSession/listSessions/reclaimOrphanedSessions. `start`
-    // opens a detached-HEAD worktree on the current HEAD (zero new branches)
-    // with a `.fgos` symlink back to the one shared store (D10) and prints
-    // where to `cd`; `end` removes it, refusing a diverged (dangling-commit)
-    // session without --force and naming the sha(s); `list` prints the
-    // registry; `gc` (p-fgos-session-gc) sweeps entries whose worktree is gone
-    // from git or whose one-shot `start` CLI pid has since exited, sparing any
-    // that are diverged or have uncommitted work. session.mjs raises
-    // SessionError for every lifecycle failure (unknown id, divergence
-    // refusal, git failure) — surfaced here as `validation` (exit 4) so a bad
-    // input is a clean categorized exit, never an uncaught crash. repoRoot is
-    // the caller's cwd, the same root every other git-backed verb uses.
-    case 'session': {
-      const sub = requireField(positional[0], 'session requires a sub-verb: fgos session <start|end|list|gc> ...');
-      const repoRoot = process.cwd();
-      try {
-        if (sub === 'start') {
-          const itemId = optionalField(flags.item, 'session start --item requires a non-empty id value (omit --item entirely to start a session with no item bound)');
-          const entry = createSession(repoRoot, { itemId });
-          return sessionSummary(entry);
-        }
-        if (sub === 'end') {
-          const sessionId = requireField(positional[1], 'session end requires a session id: fgos session end <session-id> [--force]');
-          return { ...sessionSummary(endSession(repoRoot, sessionId, { force: Boolean(flags.force) })), forced: Boolean(flags.force) };
-        }
-        if (sub === 'list') {
-          return listSessions(repoRoot);
-        }
-        if (sub === 'gc') {
-          return reclaimOrphanedSessions(repoRoot);
-        }
-        throw new StoreError('validation', `unknown session sub-verb "${sub}". Usage: fgos session <start|end|list|gc> ...`);
-      } catch (err) {
-        if (err instanceof SessionError) {
-          throw new StoreError('validation', err.message);
-        }
-        throw err;
-      }
     }
 
     // Persisted-focus CLI surface (str67-goal-directed-planning D3/D4/D6/D7):

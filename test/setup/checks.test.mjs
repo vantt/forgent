@@ -30,7 +30,7 @@ import {
   spawnSync,
   withHome,
 } from './helpers/setup-checks-harness.mjs';
-import { createSession } from '../../src/runner/session.mjs';
+import { createSession } from '../cli/helpers/fgos-cli-harness.mjs';
 import { activateGitFixture } from '../helpers/git-fixture.mjs';
 import { ensureScriptAddon } from '../../scripts/lib/git-ports.mjs';
 

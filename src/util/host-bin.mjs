@@ -46,10 +46,11 @@ export function runHostInherited(args, { dir = process.cwd() } = {}) {
  * @param {object} [options]
  * @param {string|Buffer} [options.input] stdin payload
  * @param {string} [options.dir] starting directory (defaults to process.cwd())
+ * @param {string} [options.cwd] working directory of the host child, for a verb that acts on the caller's own directory (defaults to this process's)
  * @param {'main-checkout'|'caller'} [options.dirScope] root to measure (default main-checkout)
  * @returns {object} data field from the returned fgos.v1 envelope
  */
-export function invokeHost(args, { input, dir = process.cwd(), dirScope = 'main-checkout' } = {}) {
+export function invokeHost(args, { input, dir = process.cwd(), dirScope = 'main-checkout', cwd } = {}) {
   const hostBin = resolveHostBin(dir);
   if (!hostBin) {
     const err = new Error('Rust host binary unavailable (FGOS_HOST_BIN unset and no active installation manifest)');
@@ -68,6 +69,7 @@ export function invokeHost(args, { input, dir = process.cwd(), dirScope = 'main-
   try {
     stdout = execFileSync(hostBin, fullArgs, {
       input,
+      cwd,
       encoding: 'utf8',
       stdio: ['pipe', 'pipe', 'pipe'],
       maxBuffer: 10 * 1024 * 1024,

@@ -174,3 +174,41 @@ fn contract_outcome_version_is_the_one_the_provider_declares() {
             .version()
     );
 }
+
+/// The `x-sessionRegistry` rows of the writer contract: the registry `fgos session` writes, read by this reader.
+/// The session module runs the same rows (`apps/fgos/src/wiring/session.rs`).
+#[test]
+fn every_session_registry_row_confirms_only_the_ids_it_lists() {
+    let contract: Value = serde_json::from_str(CONTRACT).unwrap();
+    let rows = contract["x-sessionRegistry"]["rows"].as_array().unwrap();
+    assert!(rows.len() >= 5);
+    let scratch =
+        std::env::temp_dir().join(format!("fgos-identity-registry-{}", std::process::id()));
+    std::fs::create_dir_all(&scratch).unwrap();
+    for row in rows {
+        let name = row["name"].as_str().unwrap();
+        let file = scratch.join(REGISTRY_FILE);
+        let _ = std::fs::remove_file(&file);
+        if let Some(text) = row["registry"]["text"].as_str() {
+            std::fs::write(&file, text).unwrap();
+        }
+        let confirmed = |id: &str| {
+            let lookup = |key: &str| (key == "FGOS_SESSION_ID").then(|| id.to_owned());
+            env_identity(&lookup, Some(&scratch)).map(|identity| identity.source)
+                == Some(fgos_identity::resolve::Source::Registry)
+        };
+        for id in row["confirms"].as_array().unwrap() {
+            assert!(
+                confirmed(id.as_str().unwrap()),
+                "row {name:?} confirms {id}"
+            );
+        }
+        for id in row["rejects"].as_array().unwrap() {
+            assert!(
+                !confirmed(id.as_str().unwrap()),
+                "row {name:?} rejects {id}"
+            );
+        }
+    }
+    let _ = std::fs::remove_dir_all(&scratch);
+}

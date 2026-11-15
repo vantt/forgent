@@ -170,3 +170,23 @@ test('invokeHost bounds a hung host at five seconds', {
     fs.rmSync(root, { recursive: true, force: true });
   }
 });
+
+test('invokeHost starts the host in the cwd it is given and in this process\'s cwd by default', {
+  skip: process.platform === 'win32',
+}, () => {
+  const original = process.env.FGOS_HOST_BIN;
+  const scratch = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-host-bin-cwd-'));
+  try {
+    const host = path.join(scratch, 'host.sh');
+    fs.writeFileSync(host, '#!/bin/sh\nprintf \'{"contract":"fgos.v1","data":{"cwd":"%s"}}\' "$PWD"\n', { mode: 0o755 });
+    const where = path.join(scratch, 'where');
+    fs.mkdirSync(where);
+    process.env.FGOS_HOST_BIN = host;
+    assert.equal(invokeHost(['session', 'list'], { dir: where, cwd: where }).cwd, fs.realpathSync(where));
+    assert.equal(invokeHost(['session', 'list'], { dir: where }).cwd, fs.realpathSync(process.cwd()));
+  } finally {
+    if (original !== undefined) process.env.FGOS_HOST_BIN = original;
+    else delete process.env.FGOS_HOST_BIN;
+    fs.rmSync(scratch, { recursive: true, force: true });
+  }
+});

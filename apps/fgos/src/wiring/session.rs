@@ -1067,3 +1067,756 @@ impl OperationProvider for SessionProvider {
         })
     }
 }
+
+#[cfg(all(test, target_os = "linux"))]
+mod tests {
+    use super::*;
+    use std::collections::BTreeSet;
+    use std::process::Command;
+    use std::sync::atomic::{AtomicU64, Ordering};
+    use std::sync::Mutex;
+
+    static NEXT: AtomicU64 = AtomicU64::new(0);
+
+    /// Records every trigger the module asks of the Event Store lifecycle, and whether the `sessions` lock was
+    /// free at that moment.
+    #[derive(Default)]
+    struct Recorder {
+        calls: Mutex<Vec<(Policy, bool)>>,
+        sessions_lock: Mutex<Option<PathBuf>>,
+    }
+
+    impl Lifecycle for Recorder {
+        fn platform_supported(&self) -> bool {
+            true
+        }
+        fn trigger(&self, _root: &Path, policy: Policy) -> Option<String> {
+            let free = self
+                .sessions_lock
+                .lock()
+                .unwrap()
+                .as_ref()
+                .is_none_or(|path| {
+                    path.exists()
+                        && fgos_holder_lock::probe(&fgos_holder_lock::Resource::new(
+                            "sessions",
+                            path.clone(),
+                        ))
+                        .is_ok_and(|probe| probe == fgos_holder_lock::Probe::Free)
+                });
+            self.calls.lock().unwrap().push((policy, free));
+            None
+        }
+    }
+
+    fn git(path: &Path, args: &[&str]) -> String {
+        let out = Command::new("git")
+            .arg("-C")
+            .arg(path)
+            .args(args)
+            .output()
+            .unwrap();
+        assert!(
+            out.status.success(),
+            "git {args:?}: {}",
+            String::from_utf8_lossy(&out.stderr)
+        );
+        String::from_utf8(out.stdout).unwrap().trim().to_owned()
+    }
+
+    struct Fixture {
+        root: PathBuf,
+        repo: PathBuf,
+        sessions: PathBuf,
+        state: PathBuf,
+        recorder: Recorder,
+    }
+
+    impl Fixture {
+        fn new() -> Self {
+            Self::with(false)
+        }
+
+        /// `committed_fgos`: the project's own `.fgos/events.jsonl` is tracked at HEAD, as this repository's is.
+        fn with(committed_fgos: bool) -> Self {
+            use std::os::unix::fs::PermissionsExt;
+            let root = std::env::temp_dir().join(format!(
+                "fgos-session-{}-{}",
+                std::process::id(),
+                NEXT.fetch_add(1, Ordering::Relaxed)
+            ));
+            std::fs::create_dir(&root).unwrap();
+            std::fs::set_permissions(&root, std::fs::Permissions::from_mode(0o700)).unwrap();
+            let state = root.join("state");
+            std::fs::create_dir(&state).unwrap();
+            std::fs::set_permissions(&state, std::fs::Permissions::from_mode(0o700)).unwrap();
+            let repo = root.join("repo");
+            git(&root, &["init", "-q", "--initial-branch=main", "repo"]);
+            git(&repo, &["config", "user.name", "Fixture"]);
+            git(&repo, &["config", "user.email", "fixture@example.invalid"]);
+            std::fs::write(repo.join("seed.txt"), "seed\n").unwrap();
+            if committed_fgos {
+                std::fs::create_dir(repo.join(".fgos")).unwrap();
+                std::fs::write(repo.join(".fgos/events.jsonl"), "{\"seed\":true}\n").unwrap();
+            }
+            git(&repo, &["add", "-A"]);
+            git(&repo, &["commit", "-qm", "seed"]);
+            let fence = repo.join(".fgos/locks/activation.lock");
+            std::fs::create_dir_all(&fence).unwrap();
+            std::fs::write(
+                fence.join("TOMBSTONE"),
+                r#"{"lock":"activation","by":"fgos git","at":"fixture"}"#,
+            )
+            .unwrap();
+            let sessions = root.join("worktrees");
+            Self {
+                root,
+                repo,
+                sessions,
+                state,
+                recorder: Recorder::default(),
+            }
+        }
+
+        fn context(&self) -> Context<'_> {
+            Context {
+                state_root: self.state.clone(),
+                sessions_dir: self.sessions.clone(),
+                home: None,
+                lifecycle: &self.recorder,
+            }
+        }
+
+        fn start(&self) -> Outcome<Value> {
+            self.start_in(&self.repo)
+        }
+
+        fn start_in(&self, cwd: &Path) -> Outcome<Value> {
+            self.context().run(&SessionRequest::Start {
+                item: None,
+                cwd: cwd.to_path_buf(),
+            })
+        }
+
+        fn end(&self, id: &str, force: bool) -> Outcome<Value> {
+            self.context().run(&SessionRequest::End {
+                session_id: id.into(),
+                force,
+                cwd: self.repo.clone(),
+            })
+        }
+
+        fn list(&self) -> Vec<Value> {
+            match self
+                .context()
+                .run(&SessionRequest::List {
+                    cwd: self.repo.clone(),
+                })
+                .unwrap()
+            {
+                Value::Array(rows) => rows,
+                other => panic!("list answered {other}"),
+            }
+        }
+
+        fn gc_in(&self, cwd: &Path) -> Value {
+            self.context()
+                .run(&SessionRequest::Gc {
+                    cwd: cwd.to_path_buf(),
+                })
+                .unwrap()
+        }
+
+        fn registry_file(&self) -> PathBuf {
+            self.repo.join(".fgos").join(REGISTRY_FILE)
+        }
+
+        fn worktree_listing(&self) -> String {
+            git(&self.repo, &["worktree", "list", "--porcelain"])
+        }
+
+        /// Rewrites the rows `edit` names to record a process that is gone.
+        fn mark_dead(&self, ids: &[&str]) {
+            let dead = {
+                let mut child = Command::new("true").spawn().unwrap();
+                let pid = child.id();
+                child.wait().unwrap();
+                pid
+            };
+            let rows: Vec<Value> = read_registry(&self.repo.join(".fgos"))
+                .unwrap()
+                .into_iter()
+                .map(|mut row| {
+                    if ids.contains(&row["sessionId"].as_str().unwrap()) {
+                        row["pid"] = json!(dead);
+                        row["record"]["pid"] = json!(dead);
+                    }
+                    row
+                })
+                .collect();
+            write_registry(&self.repo.join(".fgos"), &rows).unwrap();
+        }
+    }
+
+    impl Drop for Fixture {
+        fn drop(&mut self) {
+            // Registered session checkouts first, so no worktree of this fixture outlives it.
+            for row in read_registry(&self.repo.join(".fgos")).unwrap_or_default() {
+                if let Some(path) = row["worktreePath"].as_str() {
+                    let _ = std::fs::remove_dir_all(path);
+                }
+            }
+            let _ = std::fs::remove_dir_all(&self.root);
+        }
+    }
+
+    fn commit_inside(worktree: &Path) -> String {
+        std::fs::write(worktree.join("seed.txt"), "seed\ndiverge\n").unwrap();
+        git(worktree, &["add", "seed.txt"]);
+        git(worktree, &["commit", "-qm", "commit from inside session"]);
+        git(worktree, &["rev-parse", "HEAD"])
+    }
+
+    fn id_of(answer: &Value) -> String {
+        answer["sessionId"].as_str().unwrap().to_owned()
+    }
+
+    fn worktree_of(answer: &Value) -> PathBuf {
+        PathBuf::from(answer["worktreePath"].as_str().unwrap())
+    }
+
+    fn refusal_text(outcome: Outcome<Value>) -> String {
+        match outcome {
+            Err(fault) => fault.message().to_owned(),
+            Ok(answer) => panic!("expected a refusal, got {answer}"),
+        }
+    }
+
+    fn parsed(tokens: &[&str]) -> ParsedArgs {
+        let tokens: Vec<OsString> = tokens.iter().map(OsString::from).collect();
+        parse_args(&tokens).unwrap()
+    }
+
+    #[test]
+    fn start_makes_exactly_one_detached_worktree_with_no_new_branch() {
+        let fixture = Fixture::new();
+        let branches = git(&fixture.repo, &["branch", "--list"]);
+        let started = fixture.start().unwrap();
+        let worktree = worktree_of(&started);
+        assert!(worktree.join("seed.txt").exists());
+        assert_eq!(git(&fixture.repo, &["branch", "--list"]), branches);
+        let symbolic = Command::new("git")
+            .arg("-C")
+            .arg(&worktree)
+            .args(["symbolic-ref", "-q", "HEAD"])
+            .status()
+            .unwrap();
+        assert!(!symbolic.success(), "HEAD is detached");
+        let detached = fixture
+            .worktree_listing()
+            .lines()
+            .filter(|line| *line == "detached")
+            .count();
+        assert_eq!(detached, 1);
+        assert_eq!(
+            started["startCommit"],
+            git(&fixture.repo, &["rev-parse", "HEAD"])
+        );
+        assert_eq!(started["itemId"], Value::Null);
+        assert_eq!(started["pid"], std::process::id());
+        let rows = fixture.list();
+        assert_eq!(rows.len(), 1);
+        assert_eq!(rows[0]["sessionId"], started["sessionId"]);
+        assert_eq!(rows[0]["record"]["pid"], std::process::id());
+    }
+
+    #[test]
+    fn start_binds_the_item_it_is_given() {
+        let fixture = Fixture::new();
+        let started = fixture
+            .context()
+            .run(&SessionRequest::Start {
+                item: Some("tsk-abc".into()),
+                cwd: fixture.repo.clone(),
+            })
+            .unwrap();
+        assert_eq!(started["itemId"], "tsk-abc");
+        assert_eq!(fixture.list()[0]["itemId"], "tsk-abc");
+    }
+
+    #[test]
+    fn dot_fgos_in_the_session_worktree_is_a_symlink_to_the_shared_store() {
+        let fixture = Fixture::new();
+        let started = fixture.start().unwrap();
+        let link = worktree_of(&started).join(".fgos");
+        assert!(std::fs::symlink_metadata(&link)
+            .unwrap()
+            .file_type()
+            .is_symlink());
+        std::fs::write(link.join("probe.txt"), "from-session\n").unwrap();
+        assert_eq!(
+            std::fs::read_to_string(fixture.repo.join(".fgos/probe.txt")).unwrap(),
+            "from-session\n"
+        );
+        std::fs::write(fixture.repo.join(".fgos/probe2.txt"), "from-main\n").unwrap();
+        assert_eq!(
+            std::fs::read_to_string(link.join("probe2.txt")).unwrap(),
+            "from-main\n"
+        );
+    }
+
+    #[test]
+    fn start_with_dot_fgos_committed_at_head_still_links_the_shared_store() {
+        let fixture = Fixture::with(true);
+        let started = fixture.start().unwrap();
+        let link = worktree_of(&started).join(".fgos");
+        assert!(std::fs::symlink_metadata(&link)
+            .unwrap()
+            .file_type()
+            .is_symlink());
+        assert_eq!(
+            std::fs::canonicalize(&link).unwrap(),
+            std::fs::canonicalize(fixture.repo.join(".fgos")).unwrap()
+        );
+        assert_eq!(
+            std::fs::read_to_string(fixture.repo.join(".fgos/events.jsonl")).unwrap(),
+            "{\"seed\":true}\n"
+        );
+    }
+
+    #[test]
+    fn start_from_inside_a_session_worktree_or_below_is_refused_and_creates_nothing() {
+        let fixture = Fixture::new();
+        let outer = fixture.start().unwrap();
+        let worktree = std::fs::canonicalize(worktree_of(&outer)).unwrap();
+        let below = worktree.join("nested");
+        std::fs::create_dir(&below).unwrap();
+        for cwd in [&worktree, &below] {
+            let text = refusal_text(fixture.start_in(cwd));
+            assert!(
+                text.contains("cannot start a session from inside an existing session worktree"),
+                "{text}"
+            );
+        }
+        assert_eq!(fixture.list().len(), 1, "no nested session was registered");
+        assert_eq!(
+            fixture.worktree_listing().matches("detached").count(),
+            1,
+            "no nested worktree was created"
+        );
+    }
+
+    #[test]
+    fn concurrent_starts_never_lose_a_registry_row() {
+        let fixture = Fixture::new();
+        let recorder = Recorder::default();
+        let answers: Vec<Value> = std::thread::scope(|scope| {
+            let handles: Vec<_> = (0..5)
+                .map(|_| {
+                    scope.spawn(|| {
+                        Context {
+                            state_root: fixture.state.clone(),
+                            sessions_dir: fixture.sessions.clone(),
+                            home: None,
+                            lifecycle: &recorder,
+                        }
+                        .run(&SessionRequest::Start {
+                            item: None,
+                            cwd: fixture.repo.clone(),
+                        })
+                        .unwrap()
+                    })
+                })
+                .collect();
+            handles.into_iter().map(|h| h.join().unwrap()).collect()
+        });
+        let started: BTreeSet<String> = answers.iter().map(id_of).collect();
+        let listed: BTreeSet<String> = fixture.list().iter().map(id_of).collect();
+        assert_eq!(started.len(), 5);
+        assert_eq!(listed, started);
+    }
+
+    #[test]
+    fn end_seals_once_with_shutdown_only_after_the_sessions_lock_is_released_and_also_on_failure() {
+        let fixture = Fixture::new();
+        let started = fixture.start().unwrap();
+        *fixture.recorder.sessions_lock.lock().unwrap() =
+            Some(fixture.repo.join(".fgos/locks/sessions.lock"));
+        fixture.end(&id_of(&started), false).unwrap();
+        let _ = fixture.end("never-existed", false).unwrap_err();
+        let calls = fixture.recorder.calls.lock().unwrap();
+        assert_eq!(calls.len(), 2, "one seal per end, failed or not");
+        for (policy, lock_was_free) in calls.iter() {
+            assert_eq!(
+                *policy,
+                Policy {
+                    shutdown: true,
+                    end: false,
+                    dispatched: false
+                },
+                "a shutdown seal only: no publish is asked for"
+            );
+            assert!(lock_was_free, "the seal runs outside the sessions lock");
+        }
+    }
+
+    #[test]
+    fn end_removes_a_non_diverged_session_and_clears_its_row() {
+        for committed_fgos in [false, true] {
+            let fixture = Fixture::with(committed_fgos);
+            let started = fixture.start().unwrap();
+            let worktree = worktree_of(&started);
+            let answer = fixture.end(&id_of(&started), false).unwrap();
+            assert_eq!(answer["forced"], false);
+            assert_eq!(answer["sessionId"], started["sessionId"]);
+            assert!(fixture.list().is_empty());
+            assert!(!worktree.exists());
+            assert!(!fixture.worktree_listing().contains("detached"));
+            assert!(fixture.repo.join(".fgos/locks").is_dir());
+            if committed_fgos {
+                assert_eq!(
+                    std::fs::read_to_string(fixture.repo.join(".fgos/events.jsonl")).unwrap(),
+                    "{\"seed\":true}\n"
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn end_refuses_a_diverged_session_naming_the_sha_and_force_keeps_the_commit() {
+        let fixture = Fixture::new();
+        let started = fixture.start().unwrap();
+        let worktree = worktree_of(&started);
+        let dangling = commit_inside(&worktree);
+        let id = id_of(&started);
+        let text = refusal_text(fixture.end(&id, false));
+        assert!(
+            text.contains(&dangling) && text.contains("diverged"),
+            "{text}"
+        );
+        assert!(worktree.exists(), "nothing was removed");
+        assert_eq!(fixture.list().len(), 1, "the registry is unchanged");
+
+        let answer = fixture.end(&id, true).unwrap();
+        assert_eq!(answer["forced"], true);
+        assert!(!worktree.exists());
+        assert!(fixture.list().is_empty());
+        let retained = git(
+            &fixture.repo,
+            &[
+                "for-each-ref",
+                "--format=%(objectname) %(refname)",
+                "refs/fgos/git-operations",
+            ],
+        );
+        assert!(
+            retained
+                .lines()
+                .any(|line| line.starts_with(&dangling) && line.ends_with("/candidate")),
+            "the session commit is pinned: {retained}"
+        );
+    }
+
+    #[test]
+    fn end_of_an_unknown_or_already_ended_session_is_a_refusal() {
+        let fixture = Fixture::new();
+        let text = refusal_text(fixture.end("never-existed", false));
+        assert_eq!(text, "unknown or already-ended session \"never-existed\"");
+        let id = id_of(&fixture.start().unwrap());
+        fixture.end(&id, false).unwrap();
+        let again = refusal_text(fixture.end(&id, false));
+        assert!(again.contains("unknown or already-ended"));
+        assert!(fixture.list().is_empty());
+    }
+
+    #[test]
+    fn a_refused_removal_keeps_the_store_link_the_checkout_and_the_row() {
+        let fixture = Fixture::new();
+        let started = fixture.start().unwrap();
+        let worktree = worktree_of(&started);
+        let tip = commit_inside(&worktree);
+        let link = worktree.join(".fgos");
+        let target = std::fs::read_link(&link).unwrap();
+        std::fs::write(worktree.join("dirty.txt"), "preserve me\n").unwrap();
+        let text = refusal_text(fixture.end(&id_of(&started), true));
+        assert!(
+            text.contains("git worktree remove failed for session"),
+            "{text}"
+        );
+        assert_eq!(
+            std::fs::read_to_string(worktree.join("dirty.txt")).unwrap(),
+            "preserve me\n"
+        );
+        assert_eq!(std::fs::read_link(&link).unwrap(), target);
+        assert_eq!(fixture.list().len(), 1);
+        assert_eq!(git(&worktree, &["rev-parse", "HEAD"]), tip);
+    }
+
+    #[test]
+    fn list_answers_the_rows_and_is_empty_without_a_store_or_after_every_end() {
+        let fixture = Fixture::new();
+        assert!(fixture.list().is_empty());
+        let one = id_of(&fixture.start().unwrap());
+        let two = id_of(&fixture.start().unwrap());
+        let listed: BTreeSet<String> = fixture.list().iter().map(id_of).collect();
+        assert_eq!(listed, BTreeSet::from([one.clone(), two.clone()]));
+        fixture.end(&one, false).unwrap();
+        fixture.end(&two, false).unwrap();
+        assert!(fixture.list().is_empty());
+
+        let bare = std::env::temp_dir().join(format!("fgos-session-bare-{}", std::process::id()));
+        std::fs::create_dir_all(&bare).unwrap();
+        let answer = fixture
+            .context()
+            .run(&SessionRequest::List { cwd: bare.clone() })
+            .unwrap();
+        assert_eq!(answer, json!([]));
+        assert!(!bare.join(".fgos").exists(), "a read creates no store");
+        std::fs::remove_dir_all(&bare).unwrap();
+    }
+
+    #[test]
+    fn a_corrupt_registry_fails_every_verb_closed_and_is_never_rewritten() {
+        let fixture = Fixture::new();
+        for text in ["{bad", "{}"] {
+            std::fs::write(fixture.registry_file(), text).unwrap();
+            let before = std::fs::read(fixture.registry_file()).unwrap();
+            let refusals = [
+                refusal_text(fixture.start()),
+                refusal_text(fixture.end("x", false)),
+                refusal_text(fixture.end("x", true)),
+                refusal_text(fixture.context().run(&SessionRequest::List {
+                    cwd: fixture.repo.clone(),
+                })),
+                refusal_text(fixture.context().run(&SessionRequest::Gc {
+                    cwd: fixture.repo.clone(),
+                })),
+            ];
+            for refusal in refusals {
+                assert!(refusal.contains("is corrupt"), "{refusal}");
+            }
+            assert_eq!(std::fs::read(fixture.registry_file()).unwrap(), before);
+            assert!(
+                !fixture.sessions.exists(),
+                "no checkout was made over unknown state"
+            );
+        }
+    }
+
+    #[test]
+    fn gc_reclaims_a_dead_orphan_keeps_live_and_unprovable_rows_and_spares_a_diverged_one() {
+        let fixture = Fixture::new();
+        let live = fixture.start().unwrap();
+        let orphan = fixture.start().unwrap();
+        let diverged = fixture.start().unwrap();
+        let dangling = commit_inside(&worktree_of(&diverged));
+        let legacy = fixture.start().unwrap();
+        fixture.mark_dead(&[&id_of(&orphan), &id_of(&diverged)]);
+        // A row written before identities were recorded names a live pid and nothing else: kept.
+        let rows: Vec<Value> = read_registry(&fixture.repo.join(".fgos"))
+            .unwrap()
+            .into_iter()
+            .map(|mut row| {
+                if row["sessionId"] == legacy["sessionId"] {
+                    row.as_object_mut().unwrap().remove("record");
+                }
+                row
+            })
+            .collect();
+        write_registry(&fixture.repo.join(".fgos"), &rows).unwrap();
+
+        let answer = fixture.gc_in(&fixture.repo);
+        assert_eq!(answer["reclaimed"], json!([id_of(&orphan)]));
+        assert_eq!(answer["skipped"], json!([id_of(&diverged)]));
+        let remaining: BTreeSet<String> = fixture.list().iter().map(id_of).collect();
+        assert_eq!(
+            remaining,
+            BTreeSet::from([id_of(&live), id_of(&diverged), id_of(&legacy)])
+        );
+        assert!(!worktree_of(&orphan).exists());
+        assert!(worktree_of(&diverged).exists());
+        assert!(worktree_of(&live).exists());
+        assert_eq!(
+            git(&worktree_of(&diverged), &["rev-parse", "HEAD"]),
+            dangling
+        );
+    }
+
+    #[test]
+    fn gc_spares_a_dead_orphan_with_uncommitted_changes() {
+        let fixture = Fixture::new();
+        let dirty = fixture.start().unwrap();
+        std::fs::write(worktree_of(&dirty).join("wip.txt"), "not committed yet\n").unwrap();
+        fixture.mark_dead(&[&id_of(&dirty)]);
+        let answer = fixture.gc_in(&fixture.repo);
+        assert_eq!(answer["reclaimed"], json!([]));
+        assert_eq!(answer["skipped"], json!([id_of(&dirty)]));
+        assert!(worktree_of(&dirty).join("wip.txt").exists());
+        assert_eq!(fixture.list().len(), 1);
+    }
+
+    #[test]
+    fn gc_never_reclaims_the_checkout_it_runs_from_even_with_a_dead_pid() {
+        let fixture = Fixture::new();
+        let own = fixture.start().unwrap();
+        let other = fixture.start().unwrap();
+        fixture.mark_dead(&[&id_of(&own), &id_of(&other)]);
+        let from = std::fs::canonicalize(worktree_of(&own)).unwrap();
+        let answer = fixture.gc_in(&from);
+        assert_eq!(answer["reclaimed"], json!([id_of(&other)]));
+        assert_eq!(
+            answer["skipped"],
+            json!([]),
+            "the caller's own row is kept outright"
+        );
+        let remaining: Vec<String> = fixture.list().iter().map(id_of).collect();
+        assert_eq!(remaining, vec![id_of(&own)]);
+        assert!(worktree_of(&own).exists());
+        assert!(!worktree_of(&other).exists());
+    }
+
+    #[test]
+    fn every_registry_row_of_the_identity_contract_reads_and_projects_as_it_declares() {
+        let contract: Value = serde_json::from_str(include_str!(
+            "../../../../packages/identity/contracts/identity.writer.v1.json"
+        ))
+        .unwrap();
+        let section = &contract["x-sessionRegistry"];
+        let summary_fields: Vec<&str> = section["summaryFields"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|field| field.as_str().unwrap())
+            .collect();
+        let dir = std::env::temp_dir().join(format!("fgos-session-rows-{}", std::process::id()));
+        std::fs::create_dir_all(&dir).unwrap();
+        for row in section["rows"].as_array().unwrap() {
+            let name = row["name"].as_str().unwrap();
+            let file = dir.join(REGISTRY_FILE);
+            let _ = std::fs::remove_file(&file);
+            if let Some(text) = row["registry"]["text"].as_str() {
+                std::fs::write(&file, text).unwrap();
+            }
+            match &row["list"] {
+                Value::Array(expected) => {
+                    let rows = read_registry(&dir).unwrap();
+                    assert_eq!(&rows, expected, "row {name:?} list");
+                    let summaries: Vec<Value> = rows.iter().map(summary).collect();
+                    if let Some(expected) = row.get("summary") {
+                        assert_eq!(
+                            &Value::Array(summaries.clone()),
+                            expected,
+                            "row {name:?} summary"
+                        );
+                    }
+                    for summary in &summaries {
+                        let keys: Vec<&str> = summary
+                            .as_object()
+                            .unwrap()
+                            .keys()
+                            .map(String::as_str)
+                            .collect();
+                        assert_eq!(keys, summary_fields, "row {name:?} summary fields");
+                    }
+                    if let Some(text) = row["registry"]["text"]
+                        .as_str()
+                        .filter(|_| !rows.is_empty())
+                    {
+                        write_registry(&dir, &rows).unwrap();
+                        assert_eq!(
+                            std::fs::read_to_string(&file).unwrap(),
+                            text,
+                            "row {name:?} is written byte for byte as the contract shows it"
+                        );
+                    }
+                }
+                refused => {
+                    let cause = refused["refused"].as_str().unwrap();
+                    let text = read_registry(&dir).unwrap_err().message().to_owned();
+                    let expected = match cause {
+                        "not-json" => "(not valid JSON)",
+                        _ => "(expected a JSON array)",
+                    };
+                    assert!(text.contains(expected), "row {name:?}: {text}");
+                }
+            }
+        }
+        std::fs::remove_dir_all(&dir).unwrap();
+    }
+
+    #[test]
+    fn a_session_call_reads_its_flags_with_the_shared_parser() {
+        let cwd = PathBuf::from("/caller");
+        let read = |tokens: &[&str]| project_session_request(&parsed(tokens), cwd.clone());
+        assert_eq!(
+            read(&["start"]).unwrap(),
+            SessionRequest::Start {
+                item: None,
+                cwd: cwd.clone()
+            }
+        );
+        assert_eq!(
+            read(&["start", "--item", "tsk-abc"]).unwrap(),
+            SessionRequest::Start {
+                item: Some("tsk-abc".into()),
+                cwd: cwd.clone()
+            }
+        );
+        let bare_item = "session start --item requires a non-empty id value (omit --item entirely to start a session with no item bound)";
+        for tokens in [&["start", "--item"][..], &["start", "--item", ""][..]] {
+            assert_eq!(read(tokens).unwrap_err().message, bare_item);
+        }
+        assert_eq!(
+            read(&["end"]).unwrap_err().message,
+            "session end requires a session id: fgos session end <session-id> [--force]"
+        );
+        assert_eq!(
+            read(&["end", "abc", "--force"]).unwrap(),
+            SessionRequest::End {
+                session_id: "abc".into(),
+                force: true,
+                cwd: cwd.clone()
+            }
+        );
+        assert_eq!(
+            read(&["end", "abc"]).unwrap(),
+            SessionRequest::End {
+                session_id: "abc".into(),
+                force: false,
+                cwd: cwd.clone()
+            }
+        );
+        // `--force <word>` takes the word as its value, so the id is then missing, as in the Node CLI.
+        assert!(read(&["end", "--force", "abc"]).is_err());
+        assert_eq!(
+            read(&["end", "abc", "--force", ""]).unwrap(),
+            SessionRequest::End {
+                session_id: "abc".into(),
+                force: false,
+                cwd: cwd.clone()
+            }
+        );
+        assert_eq!(read(&["list"]).unwrap().operation_id(), LIST_OPERATION_ID);
+        assert_eq!(read(&["gc"]).unwrap().operation_id(), GC_OPERATION_ID);
+        assert_eq!(read(&["start"]).unwrap().operation_id(), START_OPERATION_ID);
+        assert_eq!(
+            read(&["end", "x"]).unwrap().operation_id(),
+            END_OPERATION_ID
+        );
+    }
+
+    #[test]
+    fn every_session_operation_id_names_a_catalog_entry_and_a_descriptor() {
+        for (id, descriptor) in [
+            (START_OPERATION_ID, &START_DESCRIPTOR),
+            (END_OPERATION_ID, &END_DESCRIPTOR),
+            (LIST_OPERATION_ID, &LIST_DESCRIPTOR),
+            (GC_OPERATION_ID, &GC_DESCRIPTOR),
+        ] {
+            assert_eq!(descriptor.operation_id.as_str(), id);
+            assert!(fgos_host_runtime::CATALOG
+                .iter()
+                .any(|entry| entry.operation_id.as_str() == id));
+        }
+    }
+}
