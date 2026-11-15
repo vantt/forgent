@@ -60,24 +60,42 @@ export function parseShard(text) {
 
 const XML_ENTITIES = { '&quot;': '"', '&amp;': '&', '&lt;': '<', '&gt;': '>', '&apos;': "'" };
 
+// A junit `file` that is a URL (`data:`, `node:`, `file:`...) and not a path names no test file of the repo.
+const SCHEME = /^[a-z][a-z0-9+.-]+:/i;
+
+function junitFileValues(xml) {
+  return [...xml.matchAll(/\sfile="([^"]*)"/g)].map(([, raw]) => raw.replace(/&(?:quot|amp|lt|gt|apos);/g, (e) => XML_ENTITIES[e]).replaceAll('\\', '/'));
+}
+
 /**
  * The repo-relative posix paths named by the `file="..."` attributes of a junit report. `repoRoot` is the exact
  * checkout directory the report was produced in; a path that does not start with it is kept as reported, so the
- * exact-set check names it instead of matching it by accident.
+ * exact-set check names it instead of matching it by accident. URL sources are not paths: see `junitUnattributable`.
  */
 export function junitFiles(xml, repoRoot) {
   const root = repoRoot.replaceAll('\\', '/').replace(/\/+$/, '');
   const found = new Set();
-  for (const [, raw] of xml.matchAll(/\sfile="([^"]*)"/g)) {
-    const file = raw.replace(/&(?:quot|amp|lt|gt|apos);/g, (e) => XML_ENTITIES[e]).replaceAll('\\', '/');
+  for (const file of junitFileValues(xml)) {
+    if (SCHEME.test(file)) continue;
     found.add(file.startsWith(`${root}/`) ? file.slice(root.length + 1) : file);
   }
   return found;
 }
 
 /**
+ * The distinct non-path `file` sources of a junit report. A test file that registers its tests through a module
+ * loaded from a URL (a `data:` import) reports its cases under that URL, never under its own path.
+ */
+export function junitUnattributable(xml) {
+  return new Set(junitFileValues(xml).filter((file) => SCHEME.test(file)));
+}
+
+/**
  * The problem lines (empty = exact set) when the shards that reported do not cover `discovered` exactly once.
- * `shards` is `[{ index, total, files: Set }]`, read from what each shard produced, not from the partition.
+ * `shards` is `[{ index, total, files: Set, manifest?: Set, unattributable?: Set }]`: `files` is what the shard's
+ * junit named, `manifest` the files the shard was given. A manifest file the junit never named is accepted only
+ * as a file whose cases report under a URL source, and never more of them than that shard has distinct URL
+ * sources; any other gap fails by name.
  * A file with no test() call still reports one case under its own name, and so does a file that throws on import
  * or has only skipped tests, so every discovered file is expected to appear.
  */
@@ -97,8 +115,20 @@ export function checkShardSet(discovered, shards) {
     if (index < 1 || index > total) problems.push(`shard ${index} is outside 1..${total}`);
   }
   const owners = new Map();
+  const own = (file, s) => owners.set(file, [...(owners.get(file) ?? []), `${s.index}/${s.total}`]);
   for (const s of shards) {
-    for (const file of s.files) owners.set(file, [...(owners.get(file) ?? []), `${s.index}/${s.total}`]);
+    for (const file of s.files) own(file, s);
+    if (!s.manifest) continue;
+    for (const file of [...s.files].sort()) {
+      if (!s.manifest.has(file)) problems.push(`${file} ran in shard ${s.index}/${s.total} but is not in its manifest`);
+    }
+    const missing = [...s.manifest].filter((file) => !s.files.has(file)).sort();
+    const sources = s.unattributable?.size ?? 0;
+    if (missing.length > 0 && missing.length <= sources) {
+      for (const file of missing) own(file, s);
+    } else if (missing.length > 0) {
+      problems.push(`shard ${s.index}/${s.total} did not report ${missing.join(', ')} and has ${sources} non-path source(s) to account for ${missing.length} file(s)`);
+    }
   }
   const wanted = new Set(discovered);
   for (const file of [...wanted].sort()) {

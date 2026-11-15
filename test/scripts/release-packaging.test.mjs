@@ -158,6 +158,8 @@ test('the release suite runs every shard and one aggregate check fails when any 
   const junit = `test-results/shard-\${{ matrix.shard }}-of-${total}.xml`;
   assert.ok(shardJob.includes(`--test-reporter=junit --test-reporter-destination=${junit}`), 'the run writes the shard junit under the merge name');
   assert.ok(shardJob.includes(`--type full --xml ${junit} `), 'the marker reads that same junit');
+  assert.ok(shardJob.includes(`--manifest \${{ matrix.shard }}/${total} --out test-results/shard-\${{ matrix.shard }}-of-${total}.files.json`), 'the shard records its files under the merge name before the tests run');
+  assert.ok(shardJob.indexOf('--manifest') < shardJob.indexOf('npm test --'), 'the manifest is written before the suite can crash');
   assert.match(shardJob, /fail-fast: false/);
   assert.match(shardJob, /name: test-shard-\$\{\{ matrix\.shard \}\}\n\s+path: test-results\//);
 

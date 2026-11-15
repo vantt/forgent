@@ -1,13 +1,15 @@
 // Merges the junit reports of the test shards into one full.xml and proves the shards that ran are exactly the
 // discovered suite. Usage: node scripts/merge-test-shards.mjs --dir <shards-dir> --out <dir>
-// The shards-dir holds one `test-shard-*` directory per shard, each with `shard-<k>-of-<n>.xml` and `test-marker.json`.
+// The shards-dir holds one `test-shard-*` directory per shard, each with `shard-<k>-of-<n>.xml`, `shard-<k>-of-<n>.files.json`
+// (the files the shard was given) and `test-marker.json`.
+// `--manifest k/n --out <file>` writes that shard's file list instead.
 
 import fs from 'node:fs';
 import path from 'node:path';
 import { isMainModule } from './lib/is-main-module.mjs';
 import { REPO_ROOT } from './lib/git-addon-stage.mjs';
-import { checkShardSet, junitFiles, junitSeconds, measuredImbalance, mergeJunit, repoRelative } from './lib/test-shards.mjs';
-import { discoverTestFiles } from './run-tests.mjs';
+import { checkShardSet, parseShard, junitFiles, junitSeconds, junitUnattributable, measuredImbalance, mergeJunit, repoRelative } from './lib/test-shards.mjs';
+import { discoverTestFiles, selectShard } from './run-tests.mjs';
 
 const SHARD_XML = /^shard-(\d+)-of-(\d+)\.xml$/;
 
@@ -17,6 +19,22 @@ function readMarker(file) {
   } catch {
     return null;
   }
+}
+
+function readManifest(file) {
+  try {
+    const list = JSON.parse(fs.readFileSync(file, 'utf8'));
+    return Array.isArray(list) && list.every((f) => typeof f === 'string') ? new Set(list) : null;
+  } catch {
+    return null;
+  }
+}
+
+/** The repo-relative files shard `spec` (`k/n`) is given: the partition `npm test -- --shard=k/n` runs. */
+export async function shardManifest(spec, { repoRoot = REPO_ROOT } = {}) {
+  const shard = parseShard(spec);
+  const { readSuiteBaseline } = await import('./test-proof-inventory.mjs');
+  return selectShard(discoverTestFiles(), shard, readSuiteBaseline().fileCpu, repoRoot).map((f) => repoRelative(repoRoot, f));
 }
 
 /**
@@ -39,10 +57,12 @@ export function mergeShards({ dir, out, repoRoot = REPO_ROOT, discovered = disco
     }
     const [, index, total] = SHARD_XML.exec(xmls[0]);
     const xml = fs.readFileSync(path.join(dir, name, xmls[0]), 'utf8');
+    const manifest = readManifest(path.join(dir, name, `shard-${index}-of-${total}.files.json`));
+    if (!manifest) problems.push(`${name} has no readable shard-${index}-of-${total}.files.json`);
     const marker = readMarker(path.join(dir, name, 'test-marker.json'));
     if (!marker || marker.completed !== true) problems.push(`${name} has no completed test-marker.json`);
     exitCode = Math.max(exitCode, Number.isInteger(marker?.exitCode) ? marker.exitCode : 1);
-    shards.push({ index: Number(index), total: Number(total), files: junitFiles(xml, repoRoot) });
+    shards.push({ index: Number(index), total: Number(total), files: junitFiles(xml, repoRoot), manifest, unattributable: junitUnattributable(xml) });
     reports.push(xml);
     seconds.push({ index: Number(index), seconds: junitSeconds(xml) });
   }
@@ -63,9 +83,21 @@ if (isMainModule(import.meta.url)) {
   const argv = process.argv.slice(2);
   let dir = null;
   let out = null;
+  let manifest = null;
   for (let i = 0; i < argv.length; i++) {
+    if (argv[i] === '--manifest') manifest = argv[++i];
     if (argv[i] === '--dir') dir = argv[++i];
     if (argv[i] === '--out') out = argv[++i];
+  }
+  if (manifest && out) {
+    try {
+      fs.mkdirSync(path.dirname(out), { recursive: true });
+      fs.writeFileSync(out, `${JSON.stringify(await shardManifest(manifest), null, 1)}\n`);
+    } catch (err) {
+      console.error(`merge-test-shards: ERROR: ${err.message}`);
+      process.exit(1);
+    }
+    process.exit(0);
   }
   if (!dir || !out) {
     console.error('merge-test-shards: ERROR: usage: --dir <shards-dir> --out <dir>');
