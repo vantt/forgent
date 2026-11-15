@@ -83,6 +83,8 @@ already moved.
 | **S6b** Workflow | `workflow` | 1 | `src/workflow/**` | S6a landed | tier-6 Node deleted; `doors` rows | S6a | none |
 | **S7** Work | Work core (replay first, writers with the §11 gates), about 52 Work and Knowledge arms, tier-7 rest of `src/runner` (`work-dispatch.mjs`, `fanout-batch.mjs`, `work-compat.mjs`, `merge.mjs`, ...), knowledge/docs verbs | ~52 | `src/state/**`, `src/intake/**`, `src/report/**`, `src/verbs/state/**`, `src/runner/*.mjs` tier 7 | S6b landed; Work council (decision 78) held | zero `legacy-cli` routes; migration doc §12 removal gates; every F0 twin row (argument parse, invocation fault) retired | S6b | Work council |
 
+S2 and S3 detailed plan (one plan, file split, parallel map, owner questions Q1 and Q2): [`plans/261115-0759-rust-verb-migration-s2-s3/plan.md`](../261115-0759-rust-verb-migration-s2-s3/plan.md).
+
 S1 is the one step allowed to run beside another: its files (`hook` registry entry, hook verdict
 modules, a new host hook handler) do not overlap S2-S7. If S1 starts while F0's phase 08 is open, it
 waits: both touch `apps/fgos/src/main.rs` and `routing.rs`.
