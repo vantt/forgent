@@ -145,7 +145,7 @@
     {
       "job": "read and clear a hot mutex record",
       "kind": "door",
-      "patterns": ["export function (?:readHotRecord|reclaimDeadHolder|clearHotRecord|unlinkRecordIfUnchanged)\\b", "\\.reclaim\\.lock", "\\bhotRecord(?:Read|UnlinkIfUnchanged|Reclaim|Clear)\\b", "\\.hot\\b"],
+      "patterns": ["export function (?:readHotRecord|reclaimDeadHolder|unlinkRecordIfUnchanged)\\b", "\\.reclaim\\.lock", "\\bhotRecord(?:Read|UnlinkIfUnchanged|Reclaim)\\b", "\\.hot\\b"],
       "allowed": [
         "packages/holder-lock/rust/src/hot_record.rs",
         {
@@ -356,6 +356,14 @@
       "allowed": [],
       "debt": [],
       "reason": "the registry `native` field is the only declaration of what the host serves natively, and the help words are answered before any route lookup; the four old names are retired and no file may bring one back"
+    },
+    {
+      "job": "retired Node S2 verb code",
+      "kind": "door",
+      "patterns": ["\\bcollectLockStatus\\b", "\\bfenceLock\\b", "\\bparseLockParams\\b", "\\blockParamsFor\\b", "\\bfenceHotRecord\\b", "\\bconfirmFence\\b", "\\bLOCK_FILES\\b", "\\bcutOverLockFiles\\b"],
+      "allowed": [],
+      "debt": [],
+      "reason": "`lock`, `lock-status` and `git` run in the host: the lock report is status.rs, the fence is fence.rs and the Git status and recovery composition is incidents.rs; the Node report, the Node fence with its terminal question, the parameter reader and the lock-file table are gone, and no file may bring one back (`doors` rows for each job carry their own patterns for the Rust names)"
     },
     {
       "job": "retired Node help renderer",

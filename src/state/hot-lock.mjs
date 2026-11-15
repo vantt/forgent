@@ -136,15 +136,6 @@ export function reclaimDeadHolder(fgosDir, resource, observed) {
   return viaHotDoor((door) => door.hotRecordReclaim(path.resolve(fgosDir), resource, observed.token));
 }
 
-/** Remove the record a person has confirmed is dead weight: under the reclaim kernel lock, and only
- * while it still holds exactly the bytes of `seen` (a token or the read that carries one), so a holder
- * that arrived since is never cleared. Returns whether it was removed. */
-export function clearHotRecord(fgosDir, resource, seen) {
-  hotPaths(fgosDir, resource); // refuses an unknown resource by name
-  const token = tokenOfRead(seen);
-  return token !== null && viaHotDoor((door) => door.hotRecordClear(path.resolve(fgosDir), resource, token));
-}
-
 // --- acquire / release ---------------------------------------------------
 
 function sleepSync(ms) {

@@ -7,7 +7,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { withStateTx, hotPaths, readHotRecord, clearHotRecord, HotLockError } from '../../src/state/hot-lock.mjs';
+import { withStateTx, hotPaths, readHotRecord, unlinkRecordIfUnchanged, HotLockError } from '../../src/state/hot-lock.mjs';
 
 function fixture() {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-hot-tx-'));
@@ -218,9 +218,9 @@ test('a torn record that is not valid UTF-8 is read and cleared by its bytes thr
     const other = Buffer.from(torn);
     other[other.indexOf(0xff)] = 0xfe;
     fs.writeFileSync(record, other);
-    assert.equal(clearHotRecord(f.fgosDir, 'state', seen), false, 'bytes that differ only in the invalid byte are another record');
+    assert.equal(unlinkRecordIfUnchanged(record, seen), false, 'bytes that differ only in the invalid byte are another record');
     fs.writeFileSync(record, torn);
-    assert.equal(clearHotRecord(f.fgosDir, 'state', seen), true);
+    assert.equal(unlinkRecordIfUnchanged(record, seen), true);
     assert.equal(fs.existsSync(record), false);
   } finally {
     f.cleanup();

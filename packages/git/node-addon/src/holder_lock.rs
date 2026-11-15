@@ -344,10 +344,3 @@ pub fn hot_record_reclaim(fgos_dir: String, resource: String, token: Buffer) -> 
     }
     .to_owned())
 }
-
-/// Remove a confirmed record under the reclaim lock, only while it still holds exactly `token`.
-#[napi(namespace = "holderLock", js_name = "hotRecordClear")]
-pub fn hot_record_clear(fgos_dir: String, resource: String, token: Buffer) -> Result<bool> {
-    door()?;
-    hot_record::clear(Path::new(&fgos_dir), &resource, &token).map_err(hot_failed)
-}
