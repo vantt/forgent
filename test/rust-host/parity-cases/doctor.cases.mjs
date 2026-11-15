@@ -316,8 +316,6 @@ function normaliser(world, entry) {
       .replace(/<RUNTIME>(?:\/\.fgos\/runtime\/git-addon\/[0-9a-f]+)?/g, '<RUNTIME>')
       .replace(/\.fgos\/runtime\/git-addon\/[0-9a-f]+/g, '<ADDON>')
       .replace(/\.fgos\/runtime\/dev-host\/[A-Za-z0-9_-]+/g, '<DEVHOST>')
-      // The writer identity row names the process it resolved for; the id is a pid of this run.
-      .replace(/(\\*"id\\*":)\d+(,\\*"source\\*":\\*"pid)/g, '$1<PID>$2')
       .replace(/(\bfgos \d+\.\d+\.\d+ \()[0-9a-f]{12}(\))/g, '$1<COMMIT>$2')
       // Where the state root was named from: the host pins it for the Node child, a Node run on its own reads the home.
       .replace(/(stateRoot \S+ \()(?:home|pinned|env)\)/g, '$1<SOURCE>)')
