@@ -284,14 +284,15 @@ impl<'a> Doors<'a> {
             .map_err(|fault| self.refuse(None, fault.sub.as_deref(), fault.class, fault.message))?;
         let dir = self.call.named_dir();
         let verb = self.route.selector.as_str();
-        let policy = root_policy(verb);
+        let verb_root = verb_root(verb);
+        let policy = verb_root.policy;
         let store_mode = StoreMode::parse(self.route.store.as_deref().unwrap_or("none"));
         let child = declared(&self.route.event_store_child, self.call);
         // A verb that ignores `--dir` still has the flag checked (an empty value is refused), but acts on the root
         // of the caller's directory.
         let root_dir = dir
             .as_deref()
-            .filter(|named| !ignores_dir(verb) || named.trim().is_empty());
+            .filter(|named| !verb_root.ignores_dir || named.trim().is_empty());
         let asked = resolve_invocation_root(&RootRequest {
             cwd: &self.cwd,
             dir: root_dir,
@@ -304,7 +305,7 @@ impl<'a> Doors<'a> {
         // refusal reaches only an operation that reads a project, as its not-a-project answer. Any other verb,
         // whatever its store value, is refused. The list is `routing::LENIENT_ROOT_VERBS`.
         let (root, project) = match asked {
-            Ok(root) if acts_on_resolved_root(verb) => {
+            Ok(root) if verb_root.acts_on_resolved => {
                 let project = Ok(root.root.clone());
                 (root, project)
             }
@@ -328,7 +329,7 @@ impl<'a> Doors<'a> {
             verb,
             store_mode,
             mutates: declared(&self.route.mutates_store, self.call),
-            creates: verb == "init",
+            creates: verb_root.creates_store,
             explicit_dir: dir.is_some(),
             dir: &root.fgos_dir,
             cwd: &self.cwd,
@@ -356,7 +357,7 @@ impl<'a> Doors<'a> {
             opens_store,
             child,
         };
-        if entered.opens_store && self.dispatched && verb != "init" {
+        if entered.opens_store && self.dispatched && !verb_root.creates_store {
             self.trigger(&entered, START_TRIGGER, Policy::default());
         }
         Ok(entered)
@@ -406,28 +407,50 @@ impl<'a> Doors<'a> {
     }
 }
 
-/// How a verb picks its root: `init` creates a store, so it acts where it is run; `doctor` and `uninstall` act on
-/// the main checkout whichever worktree they are run from; every other verb acts on the nearest project above the
-/// caller.
-fn root_policy(verb: &str) -> RootPolicy {
+/// How a verb meets its root, one row per verb that is not an ordinary reader of the nearest project.
+struct VerbRoot {
+    /// How the verb picks its root: `init` creates a store, so it acts where it is run; `doctor`, `wire-agents` and
+    /// `uninstall` act on the main checkout whichever worktree they are run from; every other verb acts on the
+    /// nearest project above the caller.
+    policy: RootPolicy,
+    /// Whether the verb acts on the root the door resolved even when no `.fgos` is there yet: `doctor` judges a
+    /// project that has not been set up, and says so, and `uninstall` reverses what it finds there, instead of
+    /// refusing.
+    acts_on_resolved: bool,
+    /// Whether the verb accepts `--dir` and never acts on it: `wire-agents` changes the person's own agent config
+    /// and reads only the main checkout of where it is run.
+    ignores_dir: bool,
+    /// Whether the verb creates the store it acts on.
+    creates_store: bool,
+}
+
+const MAIN_CHECKOUT_VERB: VerbRoot = VerbRoot {
+    policy: RootPolicy::MainCheckout,
+    acts_on_resolved: true,
+    ignores_dir: false,
+    creates_store: false,
+};
+
+fn verb_root(verb: &str) -> VerbRoot {
     match verb {
-        "init" => RootPolicy::StrictCwd,
-        "doctor" | "wire-agents" | "uninstall" => RootPolicy::MainCheckout,
-        _ => RootPolicy::CallerTree,
+        "init" => VerbRoot {
+            policy: RootPolicy::StrictCwd,
+            acts_on_resolved: false,
+            ignores_dir: false,
+            creates_store: true,
+        },
+        "wire-agents" => VerbRoot {
+            ignores_dir: true,
+            ..MAIN_CHECKOUT_VERB
+        },
+        "doctor" | "uninstall" => MAIN_CHECKOUT_VERB,
+        _ => VerbRoot {
+            policy: RootPolicy::CallerTree,
+            acts_on_resolved: false,
+            ignores_dir: false,
+            creates_store: false,
+        },
     }
-}
-
-/// Whether the verb acts on the root the door resolved even when no `.fgos` is there yet: `doctor` judges a
-/// project that has not been set up, and says so, and `uninstall` reverses what it finds there, instead of
-/// refusing.
-fn acts_on_resolved_root(verb: &str) -> bool {
-    matches!(verb, "doctor" | "wire-agents" | "uninstall")
-}
-
-/// Whether the verb accepts `--dir` and never acts on it: `wire-agents` changes the person's own agent config and
-/// reads only the main checkout of where it is run.
-fn ignores_dir(verb: &str) -> bool {
-    verb == "wire-agents"
 }
 
 /// `FGOS_DISPATCH_DEPTH` as the Node CLI reads it: a non-negative finite number, else 0.

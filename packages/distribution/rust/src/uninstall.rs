@@ -128,6 +128,24 @@ fn comparable(path: &Path) -> Vec<String> {
         .collect()
 }
 
+/// Names what `path` is when it is a place no uninstall may act on as a whole: the filesystem root, the home
+/// directory, or a directory that contains the home directory. One answer for the state-root guard and for the
+/// project half of `fgos uninstall`.
+pub fn broad_root(path: &Path, home: Option<&Path>) -> Option<&'static str> {
+    if path.parent().is_none() {
+        return Some("the filesystem root");
+    }
+    let parts = comparable(path);
+    let home_parts = comparable(home?);
+    if home_parts == parts {
+        Some("your home directory")
+    } else {
+        home_parts
+            .starts_with(&parts)
+            .then_some("a directory that contains your home directory")
+    }
+}
+
 /// Refuses a state root no purge may act under: not absolute, a `..` in it, `/`, the home
 /// directory, or an ancestor of the home directory or of the project.
 pub fn guard_store_root(
@@ -147,13 +165,10 @@ pub fn guard_store_root(
     if root.components().any(|c| c == Component::ParentDir) {
         return refuse("the state root contains `..`");
     }
-    if root.parent().is_none() {
-        return refuse("the state root is the filesystem root");
+    if let Some(reason) = broad_root(root, home) {
+        return refuse(&format!("the state root is {reason}"));
     }
     let root_parts = comparable(root);
-    if home.is_some_and(|h| comparable(h) == root_parts) {
-        return refuse("the state root is your home directory");
-    }
     if home.is_some_and(|h| comparable(h).starts_with(&root_parts))
         || comparable(workspace_root).starts_with(&root_parts)
     {

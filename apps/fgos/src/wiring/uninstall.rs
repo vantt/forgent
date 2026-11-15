@@ -23,12 +23,13 @@ use fgos_distribution::skill_stamp::{
     first_symlink_under, generated_skill_dirs, owned_skill_names, Foreign,
 };
 use fgos_distribution::timer::{remove_managed_timer, Schedule, TimerEnv};
+use fgos_distribution::uninstall::broad_root;
 use fgos_git::{GitDriver, Inspect, PathValue, ResolveRepo, Untracked};
 use fgos_host_runtime::cli_args::{FlagScalar, FlagValue};
 use fgos_host_runtime::{
-    ContractRef, EventSink, HostInvocation, InvocationControl, OperationId, OperationProvider,
-    OperationRequest, ProviderDescriptor, ProviderError, ProviderLifecycle, ProviderOutcome,
-    VerbAnswer,
+    CategorisedRefusal, ContractRef, EventSink, HostInvocation, InvocationControl, OperationId,
+    OperationProvider, OperationRequest, ProviderDescriptor, ProviderError, ProviderLifecycle,
+    ProviderOutcome, VerbAnswer,
 };
 use serde_json::{json, Value};
 use std::borrow::Cow;
@@ -149,6 +150,21 @@ fn inside(root: &Path, target: &Path) -> Result<(), String> {
             target.display(),
             root.display()
         )),
+    }
+}
+
+/// A project root no reversal may act on: the filesystem root, the person's home directory, or a directory that
+/// contains it. Refused as a missing precondition before anything is read or removed.
+fn refuse_broad_root(root: &Path, home: Option<&Path>) -> Result<(), CategorisedRefusal> {
+    match broad_root(root, home) {
+        Some(what) => Err(CategorisedRefusal::new(
+            "precondition",
+            format!(
+                "refusing to uninstall from {}: it is {what}; run uninstall inside a project",
+                root.display()
+            ),
+        )),
+        None => Ok(()),
     }
 }
 
@@ -917,9 +933,13 @@ fn no_skills() -> Skills {
 pub type PayloadRoot = fn() -> Result<PathBuf, String>;
 
 /// The reversal against this machine: the running release's payload, the process environment and clock.
-fn run(request: &UninstallRequest, payload_root: PayloadRoot) -> Reversal {
+fn run(
+    request: &UninstallRequest,
+    payload_root: PayloadRoot,
+) -> Result<Reversal, CategorisedRefusal> {
     let payload = payload_root();
     let home = fgos_config::machine::home_dir(|key| std::env::var(key).ok());
+    refuse_broad_root(&request.root, home.as_deref())?;
     let (state_root, _) = fgos_holder_lock::state_root::state_root();
     let timers = TimerEnv::system();
     let stamp: String =
@@ -927,7 +947,7 @@ fn run(request: &UninstallRequest, payload_root: PayloadRoot) -> Reversal {
             .chars()
             .filter(|c| !matches!(c, '-' | ':' | '.'))
             .collect();
-    uninstall_project(
+    Ok(uninstall_project(
         &request.root,
         request.apply,
         &Machine {
@@ -938,7 +958,7 @@ fn run(request: &UninstallRequest, payload_root: PayloadRoot) -> Reversal {
             timers: timers.as_ref(),
             stamp: &stamp,
         },
-    )
+    ))
 }
 
 /// The provider of `uninstall.run`.
@@ -979,9 +999,18 @@ impl OperationProvider for UninstallProvider {
                 .clone();
             // The reversal reads and removes files and runs Git and the scheduler: never on the async worker.
             let payload_root = self.payload_root;
-            let reversal = tokio::task::spawn_blocking(move || run(&request, payload_root))
+            let served = tokio::task::spawn_blocking(move || run(&request, payload_root))
                 .await
                 .map_err(|error| ProviderError::ProviderFailed(error.to_string()))?;
+            let reversal = match served {
+                Ok(reversal) => reversal,
+                Err(refusal) => {
+                    return Ok(ProviderOutcome::completed(
+                        DESCRIPTOR.outcome_contract.clone(),
+                        Box::new(refusal),
+                    ))
+                }
+            };
             for note in &reversal.notes {
                 eprint!("{note}");
             }
@@ -1568,6 +1597,32 @@ mod tests {
         let data = world.run(false).data;
         assert_eq!(data["shellRcSourceLinesFound"], serde_json::json!([]));
         assert!(data["shellRcRemovalInstructions"].is_null());
+    }
+
+    #[test]
+    fn a_root_that_is_the_filesystem_root_home_or_a_directory_holding_home_is_refused_before_anything_runs(
+    ) {
+        let world = World::new("broad");
+        let outer = world.base.join("outer");
+        let inner_home = outer.join("people/me");
+        std::fs::create_dir_all(inner_home.join("work/project")).unwrap();
+        let root = Path::new(std::path::MAIN_SEPARATOR_STR);
+        for (label, project, home) in [
+            ("filesystem root", root, Some(inner_home.as_path())),
+            ("home", inner_home.as_path(), Some(inner_home.as_path())),
+            (
+                "ancestor of home",
+                outer.as_path(),
+                Some(inner_home.as_path()),
+            ),
+        ] {
+            let refusal = refuse_broad_root(project, home).unwrap_err();
+            assert_eq!(refusal.category, "precondition", "{label}");
+            assert_eq!(refusal.exit_code(), 2, "{label}");
+        }
+        let under_home = inner_home.join("work/project");
+        assert!(refuse_broad_root(&under_home, Some(&inner_home)).is_ok());
+        assert!(refuse_broad_root(&under_home, None).is_ok());
     }
 
     #[test]

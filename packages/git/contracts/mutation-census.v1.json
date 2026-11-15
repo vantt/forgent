@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "8cdaf1f1916a0d9c372a1d0cf231ffa1d4403d8fe6bdcd1f9349032d2cd56350",
+  "payloadDigest": "56503838433f35f270739e168fea571b481776ae0a8d8d9a89ef1c7abbe85c6b",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "b8b886cee2ea5ce7ee1153e4795512db135a990de894c27e53c5e778b210be62",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -87,7 +87,7 @@
     "apps/fgos/src/cli_presenter.rs": "6e50cf7387a4ce98eec1d3705b8bf33150960e6180559f9bbe6cb8c1529e2d15",
     "apps/fgos/src/cli_projector.rs": "b373c7d507a8dbb8e5806bbbae888e2487fc70305c9643c2d6dbf158ab45a79a",
     "apps/fgos/src/help.rs": "a7f18814361555860a4f0a44e3bb3c12246f5cb00d124f725e9a506857c2dd8d",
-    "apps/fgos/src/invocation_doors.rs": "029d92175364f3e9e33c5865980faf5cc8b2c783d98908a16111eefc10e01bd9",
+    "apps/fgos/src/invocation_doors.rs": "a2ddd44a64f6b07cfc1eec0dd870e16bf94554fb9b84fe8155efc8090d9598f3",
     "apps/fgos/src/legacy_exec.rs": "d97d3a46c0f120271bc0f08805755029bfc430c8ca338ddabdc38a7a0a84c8a0",
     "apps/fgos/src/main.rs": "7d60f87240a27091fe04373aa10be936156fbf6162167128ad09b0602dcf2f84",
     "apps/fgos/src/routing.rs": "79f63effe9856ce540aa01210b959663812ca13291f57ef5e5fb46c3df9b8304",
@@ -126,7 +126,7 @@
     "apps/fgos/src/wiring/mod.rs": "67f6a83767fc7130425665f0f385023887f11cfd2a64d12a0d7d84a428be3ea9",
     "apps/fgos/src/wiring/run_dirs.rs": "6c34c6af1c85e8e326272fc1c08602b81e6e53ab778596f36296ef376c94b970",
     "apps/fgos/src/wiring/session.rs": "f2569bef9f072e959f14673c2d2929e2b0b001540a4e147fd5e59082b2e64b43",
-    "apps/fgos/src/wiring/uninstall.rs": "e42c1f59bb41b80a4a9d4b19b106579c39145583edabaea54b3b4d8fcb455dbb",
+    "apps/fgos/src/wiring/uninstall.rs": "3a26ef78acee70ba6bae99ac15c10955809eecf62a5548df977de518ef77ccdd",
     "apps/fgos/src/wiring/wire_agents.rs": "a434308907a3e7d87c880ebf95a957e1342b77e83ebe1ee0272002335b7a248c",
     "apps/fgos/tests/cli_tests.rs": "932a0820c5b009d18dde3b0a365257d9cf1441f0542283902ac2118e63d7be6f",
     "apps/fgos/tests/internal_lock_routes.rs": "e8516f4876c8263b1baa1f997bcfbb01715e69d740aa508fd01a0d481fee309e",
@@ -321,7 +321,7 @@
     "packages/distribution/rust/src/suggest.rs": "302d698667662b3544b0761cd53dd87c68594d6f1b1ce52d8b85032627d52182",
     "packages/distribution/rust/src/test_scratch.rs": "244cd414a2413dfa0bb1410e6206ea24844ea1860e825eae90072d2ea123fab7",
     "packages/distribution/rust/src/timer.rs": "d1a12b661c529be10aa7f62b978dbccc843fbf76947322d9b65df98fe0b2be43",
-    "packages/distribution/rust/src/uninstall.rs": "0858575082b1fe249e10b89150afce35b82eb78fb2b0aa2f19bfd039fa06d107",
+    "packages/distribution/rust/src/uninstall.rs": "42e1148853b4b07d84a68ff48b6c0b98423620ba2c0b26989c2994d6fe126798",
     "packages/distribution/rust/src/verify.rs": "79a9f08e75d0c0ca8f5e04ad8443e4134a3dfbd85a38e01a448d53361463dc69",
     "packages/distribution/rust/src/workspace.rs": "ceb38606817fe7fe75d832d2c207e1b544cef3a2105acfb8892d2e1c25985fab",
     "packages/distribution/rust/tests/activation_lock_multiprocess.rs": "ff2818dd10b745ac29c1610effd95ac36552f4aace4525634c6b20f17f325fe0",
@@ -1869,14 +1869,14 @@
     },
     {
       "path": "apps/fgos/src/wiring/uninstall.rs",
-      "line": 1153,
+      "line": 1182,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"
     },
     {
       "path": "apps/fgos/src/wiring/uninstall.rs",
-      "line": 1791,
+      "line": 1846,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"
