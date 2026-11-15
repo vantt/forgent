@@ -316,6 +316,8 @@ function normaliser(world, entry) {
       .replace(/<RUNTIME>(?:\/\.fgos\/runtime\/git-addon\/[0-9a-f]+)?/g, '<RUNTIME>')
       .replace(/\.fgos\/runtime\/git-addon\/[0-9a-f]+/g, '<ADDON>')
       .replace(/\.fgos\/runtime\/dev-host\/[A-Za-z0-9_-]+/g, '<DEVHOST>')
+      // The writer identity row names the process it resolved for; the id is a pid of this run.
+      .replace(/(\\*"id\\*":)\d+(,\\*"source\\*":\\*"pid)/g, '$1<PID>$2')
       .replace(/(\bfgos \d+\.\d+\.\d+ \()[0-9a-f]{12}(\))/g, '$1<COMMIT>$2')
       // Where the state root was named from: the host pins it for the Node child, a Node run on its own reads the home.
       .replace(/(stateRoot \S+ \()(?:home|pinned|env)\)/g, '$1<SOURCE>)')
@@ -381,6 +383,11 @@ const RETIRED_PRETTY_LINE = /^[✓✗] shell-integration source line present in 
 /** The pretty text without the line of a retired row. */
 const withoutRetiredLines = (text) => text.split('\n').filter((line) => !RETIRED_PRETTY_LINE.test(line)).join('\n');
 
+/** The base release's Node config loader prints a provider-family warning per executor that declares none, once per load, while
+ * the host's bridged child keeps its own stderr; a clone of this repository carries such executors. The warnings belong to the
+ * executor policy loader, not to a doctor row, so both sides are compared without them. */
+const withoutExecutorPolicyWarnings = (text) => text.split('\n').filter((line) => !/^fgos: executor "[^"]+" declares no "providerModel"/.test(line)).join('\n');
+
 /** The rows of one doctor answer as comparable values, or the raw text when the answer is not the JSON envelope. */
 function describe(text, ignoreRows = [], accepted = null, side = 'host') {
   let data;
@@ -433,7 +440,7 @@ async function runScript(entry, testCase) {
         args: step.args,
         exit: result.exitCode,
         stdout: describe(norm(result.stdoutText), testCase.ignoreRows, testCase.acceptedText, entry.type === 'node' ? 'base' : 'host'),
-        stderr: norm(result.stderrText),
+        stderr: withoutExecutorPolicyWarnings(norm(result.stderrText)),
       });
     }
     // A run leaves no store above its own tree: a stray `.fgos` there would make a later fixture treat that directory as its project.
