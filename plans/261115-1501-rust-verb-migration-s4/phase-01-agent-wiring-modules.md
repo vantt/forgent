@@ -47,11 +47,12 @@ Phase-lead rules: [plan.md](plan.md). Branch `rust-verb-migration-program/s4-p01
    The extension's attempt-id prefix is data in `agent-hooks.v1.json`, read by the identity crate's existing test
    (no crate edge, D15). Config values (`mailbox.enabled` and the rest) are read through `fgos-config` (D15 edge).
 2. `packages/distribution/contracts/agent-hooks.v1.json` with vectors per CLI (input file, after install, after
-   uninstall, check verdict), generated once from the Node module and read by the Rust tests and by
-   `test/setup/agent-hooks.test.mjs` until 07 deletes the Node module.
+   uninstall, check verdict), generated once from the Node module and read by the Rust tests. `agent-hooks.mjs` and
+   `test/setup/agent-hooks.test.mjs` stay untouched (frozen, MAIL 2026-11-15): the Rust module is a twin of the Node
+   one until the re-measure, so the vectors are also checked against the Node module by a test that only reads it.
 3. `packages/distribution/contracts/delete-guard-prefilter.v1.json` (D9): the keyword list as data. `agent-hooks.mjs`
-   reads it now (its literal list deleted); `test/git/main-checkout-delete-guard.test.mjs` reads it (one list from this
-   phase on). If S1 has moved the guard and its test first, edit S1's reader instead.
+   keeps its own literal list (frozen file, not edited); `test/git/main-checkout-delete-guard.test.mjs` reads the data
+   file and a test pins the Node literal list equal to it (one list of record, the Node copy named debt). If S1 has moved the guard and its test first, edit S1's reader instead.
 4. `packages/distribution/rust/src/agent_config.rs`: the readers behind the four agent-config rows (one `claude`
    invocation for its three plugin questions, as T9 P10 settled) and the `wire-agents` plan (`agents`, `absent`,
    `files`, `permissions` shown but never written), with Node's message texts (tests assert them: F13). `claude` is
@@ -63,17 +64,18 @@ Phase-lead rules: [plan.md](plan.md). Branch `rust-verb-migration-program/s4-p01
    `scripts/fgos-shell-integration.sh` path from `components.legacyNode.root` (D18).
 6. The mailbox hook rows follow `mailbox.enabled`, whose contract names its reader `"setup"`
    (`packages/mailbox/contracts/limits.v1.json:34`, test `packages/mailbox/rust/core/tests/limits_contract.rs`): the
-   reader becomes `agent_hooks.rs` and the contract's reader value and meaning text say so (no `setup`), in the same
-   change; a MAIL-lane file (plan collision table).
-7. F11: `scripts/lib/mailbox-live-confined.mjs` gets its hooks from the host (`fgos doctor --fix` in its scratch
-   workspace, or the narrowest existing call F11 names); it never keeps a third copy of the table.
+   contract is frozen by content (MAIL 2026-11-15): its bytes do not change in S4. Its reader moves off `setup` in the
+   Rust code only (`agent_hooks.rs` reads it; `limits_contract.rs` unchanged); the contract's own `"setup"` reader text is
+   corrected when MAIL re-measures.
+7. F11: `scripts/lib/mailbox-live-confined.mjs` is frozen (v7h, v7i, v7n; MAIL 2026-11-15) and is not edited. It keeps
+   importing `agent-hooks.mjs`; both stay as named debt until MAIL re-measures. No third copy of the table is made.
 8. `doors` rows (debt names the Node files that 07, 08, 09 delete; the stale check then forces their removal):
    "agent hook table" (patterns match the hook file names whole and built in parts, and the extension marker;
    allowed `agent_hooks.rs`, the two contracts, and with reasons the readers that only read or hash hook files:
    `src/run-supervisor/trust-store.mjs:498`, `scripts/check-hook-registrations-guarded.mjs:26`,
    `scripts/record-mailbox-hook-fixtures.mjs:230`; `src/runner/dispatch/worker-home.mjs:145` writes a worker's own
-   `settings.json`, not a project hook file: allowed with that reason; debt `src/setup/agent-hooks.mjs`,
-   `src/setup/claude-code-hooks.mjs`), "person's agent config writes" (RUL111; patterns from F19; allowed
+   `settings.json`, not a project hook file: allowed with that reason; debt `src/setup/agent-hooks.mjs` (reason: "moves to the Rust owner when V7e/h/i are re-measured (MAIL)", `retiredBy` names the
+   re-measure), `src/setup/claude-code-hooks.mjs` (deleted in 07), and `scripts/lib/mailbox-live-confined.mjs` (V7n debt, kept)), "person's agent config writes" (RUL111; patterns from F19; allowed
    `agent_config.rs` and, from 08, `apps/fgos/src/wiring/wire_agents.rs`; debt `src/setup/agent-wiring.mjs`,
    `agy-permissions.mjs`, `mailbox-claude-accept.mjs` with reasons). The launcher joins the existing row
    "installation shim and activation record location" (allowed `launcher.rs`; its `src/setup/project-launcher.mjs`
@@ -83,10 +85,9 @@ Phase-lead rules: [plan.md](plan.md). Branch `rust-verb-migration-program/s4-p01
 ## Files
 
 - Create: `packages/distribution/rust/src/{agent_hooks.rs,agent_config.rs,launcher.rs}`, the two contracts.
-- Modify: `packages/distribution/rust/src/lib.rs` (module lines), `src/setup/agent-hooks.mjs` (prefilter from data),
-  `test/git/main-checkout-delete-guard.test.mjs`, `test/setup/agent-hooks.test.mjs` (reads the vectors),
-  `scripts/lib/mailbox-live-confined.mjs` (F11), `packages/mailbox/contracts/limits.v1.json` and
-  `packages/mailbox/rust/core/tests/limits_contract.rs` (the `mailbox.enabled` reader), `docs/architecture-manifest.json` (rows), census.
+- Modify: `packages/distribution/rust/src/lib.rs` (module lines), `test/git/main-checkout-delete-guard.test.mjs`, `docs/architecture-manifest.json` (rows), census. Not modified (frozen):
+  `src/setup/agent-hooks.mjs`, `test/setup/agent-hooks.test.mjs`, `scripts/lib/mailbox-live-confined.mjs`,
+  `packages/mailbox/contracts/limits.v1.json`.
 - Delete: none (Node modules go in 07, 08, 09).
 
 ## Tests

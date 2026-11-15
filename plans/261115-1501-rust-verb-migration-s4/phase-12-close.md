@@ -24,9 +24,13 @@ Phase-lead rules: [plan.md](plan.md). Branch `rust-verb-migration-program/s4-p12
 2. **Retired-code row** "retired Node S4 verb code" (allowed none): `setupUseCase`, `materializeSkillsIntoProject`,
    `createProjectSkillGuard`, `insertSourceLine`, `convertRunnerPatternsConfig`, `wireAgentsUseCase`, the Node
    uninstall use case's name (F8), `initStoreUseCase`, `settleLegacyConfig`, `writeCoexistenceManifest`, `runDoctor`,
-   `installAgentHooks`, `uninstallAgentHooks`, `deleteGuardPrefilter` (as a function); each with a seeded-file case.
-   A name still used elsewhere stays out (say which).
-3. **Bridge bound.** The registry's bridge set equals 00's table minus the rows S4 moved; no row is labelled
+   `deleteGuardPrefilter` (as a function, outside `agent-hooks.mjs`); each with a seeded-file case.
+   `installAgentHooks` and `uninstallAgentHooks` stay out: they live in the frozen `src/setup/agent-hooks.mjs`, which
+   stays as debt until MAIL re-measures V7e/h/i. A name still used elsewhere stays out (say which).
+3. **Frozen debt.** `src/setup/agent-hooks.mjs` and `scripts/lib/mailbox-live-confined.mjs` remain, with their tests, as
+   named `doors` debt (`retiredBy` the MAIL re-measure); the report says so and does not claim "last Node packaging
+   modules deleted" without that exception.
+4. **Bridge bound.** The registry's bridge set equals 00's table minus the rows S4 moved; no row is labelled
    `bridge:S4`; the D4 import-closure test passes; the report lists the set per step (S5, S6a, S6b, S7) with counts and
    the bridge-call count of a `doctor --fix` run, for the program plan's rows. 00's doctor fixtures are kept in the
    report (paths and setup) for S5-S7.

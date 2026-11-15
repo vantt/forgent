@@ -45,9 +45,14 @@ Phase-lead rules: [plan.md](plan.md). Branch `rust-verb-migration-program/s4-p07
    bytes" precedent); about +0.5 day here. If 00 finds that larger than one day, the row stays bridged with owner
    `bridge:release-builder` and an item for the big lead (it is then the one bridged row no step retires, so S7
    cannot delete the bridge until it moves); never a copy of the walker.
-3. Delete (last importer, D14): `src/setup/{agent-hooks,claude-code-hooks,agy-permissions,mailbox-claude-accept,project-launcher,agent-wiring}.mjs`,
+3. Delete (last importer, D14): `src/setup/{claude-code-hooks,agy-permissions,mailbox-claude-accept,project-launcher,agent-wiring}.mjs`,
    `version-info.mjs` and `mailbox-limits.mjs` and `omp-natives-checks.mjs` if 00 finds no other user; the rows'
-   bodies and registrations; the doors rows' debt entries for these files (stale check).
+   bodies and registrations; the doors rows' debt entries for these files (stale check). `src/setup/agent-hooks.mjs`
+   is NOT deleted: it is frozen by the v7e, v7h and v7i file sets (MAIL 2026-11-15; a deleted or ported file is a new
+   measurement). It stays with `test/setup/agent-hooks.test.mjs`, as does `scripts/lib/mailbox-live-confined.mjs`; both
+   remain doors debt "moves to the Rust owner when V7e/h/i are re-measured (MAIL)". Its last importers
+   (`registrations.mjs` rows, `claude-code-hooks.mjs`, `uninstall-project.mjs`) go; the tests and the mailbox tooling
+   keep it reachable.
 4. Registry owners `rust:packaging`; parity: the doctor table's packaging rows, plus `doctor --fix` on a fresh project
    and on a project with hooks of an older release (`fs-delta` of the project and HOME).
 
@@ -55,7 +60,7 @@ Phase-lead rules: [plan.md](plan.md). Branch `rust-verb-migration-program/s4-p07
 
 | Behaviour | Old proof | Owner now |
 |---|---|---|
-| hook rows and fixes | `test/setup/agent-hooks.test.mjs`, `claude-code-hooks.test.mjs` | `agent_hooks.rs` tests (vectors) + `wiring/doctor/packaging.rs` row tests |
+| hook rows and fixes | `claude-code-hooks.test.mjs` (retired); `test/setup/agent-hooks.test.mjs` stays (frozen debt, twin) | `agent_hooks.rs` tests (vectors) + `wiring/doctor/packaging.rs` row tests |
 | agent-config reports | `plugin-marketplace-doctor-check.test.mjs`, `agy-permissions.test.mjs`, `mailbox-claude-accept.test.mjs` | `agent_config.rs` tests |
 | launcher row and fix | `test/setup/project-launcher.test.mjs` | `launcher.rs` tests |
 | pin drift row | `test/setup/pin-drift-check.test.mjs` | `tests/pin_drift.rs` over the golden (one reader) |
@@ -68,8 +73,7 @@ Phase-lead rules: [plan.md](plan.md). Branch `rust-verb-migration-program/s4-p07
 - Create: `apps/fgos/src/wiring/doctor/packaging.rs`.
 - Modify: `wiring/doctor/mod.rs`, the registry contract, `registrations.mjs`, `scripts/build-rust-distribution.mjs`
   only under F18's first branch, `.github/workflows/release-assets-check.yml` (101 and 115 run `curl-check.test.mjs` and
-  `project-launcher.test.mjs`: they run the Rust owners' tests instead), the MAIL experiment files after MAIL answers
-  (collision table), the `doors` rows "installation shim and activation record location" and "writer and session id
+  `project-launcher.test.mjs`: they run the Rust owners' tests instead), (the MAIL experiment files and the frozen sets are not touched), the `doors` rows "installation shim and activation record location" and "writer and session id
   environment" (their `src/setup` entries leave), tests, baseline, manifest, census.
 - Delete: as requirement 3.
 
