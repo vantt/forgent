@@ -104,12 +104,17 @@ export function readHotRecord(recordPath) {
   return seen.token ? { ...seen, raw: seen.token.toString('utf8') } : seen;
 }
 
-/** The bytes a clear compares against: the `token` of a read, the read itself,
- * or (a caller that kept only the decoded text) the record's current bytes when
- * they decode to that text. `null` when nothing matches. */
-function tokenOf(recordPath, seen) {
+/** The bytes a compare names: a token, or the read that carries one; `null` for anything else. */
+function tokenOfRead(seen) {
   if (Buffer.isBuffer(seen)) return seen;
-  if (Buffer.isBuffer(seen?.token)) return seen.token;
+  return Buffer.isBuffer(seen?.token) ? seen.token : null;
+}
+
+/** The bytes an unlink compares against: the token, or (a caller that kept only the decoded text) the
+ * record's current bytes when they decode to that text. `null` when nothing matches. */
+function tokenOf(recordPath, seen) {
+  const token = tokenOfRead(seen);
+  if (token !== null) return token;
   const now = readHotRecord(recordPath);
   return now.token && now.raw === seen ? now.token : null;
 }
@@ -131,13 +136,12 @@ export function reclaimDeadHolder(fgosDir, resource, observed) {
   return viaHotDoor((door) => door.hotRecordReclaim(path.resolve(fgosDir), resource, observed.token));
 }
 
-/** Remove the record a person has confirmed is dead weight (`fgos lock fence`):
- * under the reclaim kernel lock, and only while it still holds exactly what
- * `seen` names, so a holder that arrived since is never cleared. Returns whether
- * it was removed. */
+/** Remove the record a person has confirmed is dead weight: under the reclaim kernel lock, and only
+ * while it still holds exactly the bytes of `seen` (a token or the read that carries one), so a holder
+ * that arrived since is never cleared. Returns whether it was removed. */
 export function clearHotRecord(fgosDir, resource, seen) {
-  const { record } = hotPaths(fgosDir, resource);
-  const token = tokenOf(record, seen);
+  hotPaths(fgosDir, resource); // refuses an unknown resource by name
+  const token = tokenOfRead(seen);
   return token !== null && viaHotDoor((door) => door.hotRecordClear(path.resolve(fgosDir), resource, token));
 }
 

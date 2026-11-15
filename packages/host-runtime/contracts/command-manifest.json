@@ -4848,7 +4848,7 @@
     {
       "name": "lock",
       "invoke": "fgos lock fence <name>",
-      "description": "Stop the process that holds a registry lock so the lock can be taken again. Lists the holders (pid, start time, command line), asks for confirmation (--yes skips it), sends SIGTERM by identity, waits 5 s, sends SIGKILL, then asks the kernel with a probe whether the lock is free. A lock is never taken from a live holder: with no listable holder (a platform without /proc) the caller stops it, then --attest-stopped only re-checks the lock. Lock names: fgos lock-status.",
+      "description": "Stop the process that holds a registry lock so the lock can be taken again. Lists the holders (pid, start time) and refuses unless --yes confirms the fence, sends SIGTERM by identity, waits 5 s, sends SIGKILL, then asks the kernel with a probe whether the lock is free. A lock is never taken from a live holder: with no listable holder (a platform without /proc) the caller stops it, then --attest-stopped only re-checks the lock. Lock names: fgos lock-status.",
       "parameters": {
         "type": "object",
         "properties": {
@@ -4887,7 +4887,7 @@
               },
               "yes": {
                 "type": "boolean",
-                "description": "Skip the confirmation prompt. Without it and without a terminal, nothing is signalled."
+                "description": "Confirm the fence. Without it the verb lists the holders and refuses (lock-fence-not-confirmed, exit 2), on a terminal too; nothing is signalled."
               },
               "attest-stopped": {
                 "type": "boolean",

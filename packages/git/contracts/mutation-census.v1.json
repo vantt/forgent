@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "37725c1e6be2ea828839afe61cd65d8550d432305efd9de76ccc0c39f7530606",
+  "payloadDigest": "78d18c82021cd77fde58fbb40f43a1f414b8b88a036185f7a72ec43e21b3d6c7",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "a5629383f89b4488b252a62f0ea86463e649e33e0a891db1a19af2cd6c136aca",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -58,7 +58,7 @@
     ".agents/skills/fgos-fanout/references/wave-dispatch-mechanics.md": "a0fe69420b35473170e16047369fb3ce6d9dff9c33de08d9b84e00ef46a6f885",
     ".agents/skills/fgos-group-thinking/SKILL.md": "232a142a34037a2080dc4c9faabbd4abce37e702914cd2fde593ef83ff7749ef",
     ".agents/skills/fgos-indexing/SKILL.md": "6ca1ab67e874beb7e8ac98c0f15b685d407c01d9c071fe4607d3ae159be2f960",
-    ".agents/skills/fgos-lock-fence/SKILL.md": "d3d2feb9dd0152b1e7bb3a7b2359846643d47ed630c3e303f87fec5e550653cb",
+    ".agents/skills/fgos-lock-fence/SKILL.md": "14fe7c0f0a389d9fda3b8f117a446a43d8bd7edd3df42f78ccd2f06a363e37e0",
     ".agents/skills/fgos-researching/SKILL.md": "81f94ec67b7cafe77a809e786b00f304c505a52cade46ec75a5be2b3ed996e93",
     ".agents/skills/fgos-routing/SKILL.md": "cd1143c3ff1cd01159ae8b06a62c56fd2a6a38ee89437964d66fb41be55c49d5",
     ".agents/skills/fgos-run/SKILL.md": "04c3ddb332589b9bb5c3bd4ebd30acdb812e2603915a229e07c84e0d3ef919e2",
@@ -112,7 +112,7 @@
     "apps/fgos/src/wiring/metrics_sources.rs": "504e2c72b52a5da8d8d23a862403d47986811234809f364ee6006c6957f6c583",
     "apps/fgos/src/wiring/mod.rs": "faf2e7c6368170d4a5e3ef0b7eb393adcd1f7200b78581374b92747fc0a9fe59",
     "apps/fgos/src/wiring/run_dirs.rs": "6c34c6af1c85e8e326272fc1c08602b81e6e53ab778596f36296ef376c94b970",
-    "apps/fgos/tests/cli_tests.rs": "ba7bab3e80d16d2d3c9c6d43ac74e963aea2a0e90590d97499f95987e1bc2750",
+    "apps/fgos/tests/cli_tests.rs": "8d13473546fe908f82d65263b166ec2088e15955479eaac028200421cd729d77",
     "apps/fgos/tests/internal_lock_routes.rs": "e8516f4876c8263b1baa1f997bcfbb01715e69d740aa508fd01a0d481fee309e",
     "apps/fgos/tests/mailbox_routes.rs": "fe4bb33069a6f6eb6f02b052e4581fcfc69ce37dcdfd146280f9c935c14511a6",
     "apps/fgos/tests/mailbox_sync_child.rs": "047e70662085d6f91fa786c9000eb494711f610d37cd63a24f29dc884116763d",
@@ -122,7 +122,7 @@
     "apps/fgos/tests/windows_semantics_probe.rs": "ecb59690bbf1259baa1defb6417c24005138526bb565f216f9db3c2ad784d240",
     "apps/fgos/tests/windows_support/mod.rs": "2b8a17676526c87ea5ecfb2074a70a3511fbf9267f9de78a35dc355f272830fb",
     "bin/fgos-runner.mjs": "24fa9b497547a104912b90ab98b3d53fbbe0068a5977a7a04724789c8e717156",
-    "bin/fgos.mjs": "d0bc31d4a2047ed0a1b32bfc34fcb614550cfa7d95389f5338e53a7b3bd781f2",
+    "bin/fgos.mjs": "bcc105fcb0f71f0bee4bd04a0f1892ab05eddf5a9b8db27e64767232afa74947",
     "core/skills/_shared/capability-catalog.md": "99d7f682c3ddcfb8ad57c30ca9dde670e331e14b7c5e87e8b53e620660abeb7c",
     "core/skills/_shared/capability-matching.md": "eb67cde05d45c171c1d4803f9d2fbec5fc63565b9fd0a0549c866a7eb262521d",
     "core/skills/_shared/catchup-self-recovery.md": "3b77650c71a0225f00ffa8fe9524d7c0052977204f425c1999225b6f80802c69",
@@ -153,7 +153,7 @@
     "core/skills/fgos-fanout/references/wave-dispatch-mechanics.md": "6aaaa2f8c3704b7c36dbcbf9f9603880c3704cf2b878ace806607c4202f19925",
     "core/skills/fgos-group-thinking/SKILL.md": "c1dd22ba63f255c873cdb77ba01b13280190b8888041d038db0157c3b8bfe795",
     "core/skills/fgos-indexing/SKILL.md": "fdfbe78a25b7119e9dd82f30e03dc2cd41dfe44ce537a6978a3199ad78bc9772",
-    "core/skills/fgos-lock-fence/SKILL.md": "472613ae3d73f7c20eb77ef4e27ecbd7944682a641b497a3788560fe0d228430",
+    "core/skills/fgos-lock-fence/SKILL.md": "fd6ce6121bc8605162df2b1556b651e16a70aeb0c0404b81d6cbaa6ff0df0398",
     "core/skills/fgos-researching/SKILL.md": "26a8d7e2f909f53fad478a98ba010cb85ef0de7d405516f1b01d6a7967e061dc",
     "core/skills/fgos-routing/SKILL.md": "61aeab18845185ab3e729e1996f063442e184bb442545221f42f531e5628bd4d",
     "core/skills/fgos-run/SKILL.md": "7f8a0d3be342c8c6a2a83c832d5751ab6ed309fde1dd2293cc3bf645f18da690",
@@ -928,7 +928,7 @@
     "scripts/verify-fanout-overlap.mjs": "b74a0ac9f350c5d62a47f3e3bf0896e9d142e5cbba15284527383d1b529ea435",
     "scripts/write-test-marker.mjs": "d1faead7d8efbdcce888100b89f5cd2cc6546ddc3f2647118255f82f6c8e4171",
     "scripts/write-wrapper-script.mjs": "e9e76f2b72329bb4dee9ec980db7a5df7515da3ff339e232466049de259d5c50",
-    "src/cli/command-registry.mjs": "86ef5fffc21a705a611a74e674de1ec776c0043355abe2c6840d85cdc898b558",
+    "src/cli/command-registry.mjs": "bf6e5d84517e6f94175ecb35ff952c9efaae930a00a4611e9b7a153b9e1a0a98",
     "src/cli/exit-codes.mjs": "55a68e5a0b03a38adced7ddc9bcfb60964db94b3b868e2c854b6a6a78fdb4964",
     "src/cli/flag-check.mjs": "336a0e94eaec59fa4c1f143b32a14334c1bd5f13d522ef8be4a5b570dc401b62",
     "src/cli/parse-args.mjs": "d4f71dbb91bc8d920995299b78d018efd1643328213a70d6e567a6b462163d66",
@@ -1122,7 +1122,6 @@
     "src/runner/goal-check.mjs": "bed1a778d1f702695160cab5896bb65a96e6c18c7a446ed6bc3b530c7b8ab66c",
     "src/runner/hook.mjs": "449913d1dc664a2420f4d026b12307257725886a1cf51c8397bd4922435e4044",
     "src/runner/iron-law-gate.mjs": "37e253ef40240e535e6587d41b393e6ddecc7cb174104760d0f48ba168203d43",
-    "src/runner/lock-fence.mjs": "d88aabce1f8f078fe6ad86b27c0201f1d22f7471af61ff78617f9e7fdb890b06",
     "src/runner/loop.mjs": "4a396b6fc5252280983a1dcde6a39edf3ff6e6474074b0b0130783a4abb18076",
     "src/runner/main-checkout-activity.mjs": "d6f7169033c1fbdd46280d2075700aeda87f447ecc6fdb2da516be6ca3c0011f",
     "src/runner/main-checkout-reset-guard.mjs": "9e472e44a494761adce347f93c08c1ad20433f97e49b12c32a96105a67307256",
@@ -1202,7 +1201,7 @@
     "src/state/graph-harness.mjs": "0c4aa4d924401927595d41f42155159c0f3dcc1121c5c416ab096f146dc58fb6",
     "src/state/graph-metrics.mjs": "ce0c9112f0a22ae408a442773fc91628eb225ef103bc9024a16ce926c1f0f167",
     "src/state/handoff.mjs": "352dbce5f607f2ad478bf0119fbf875bf640142f3438a745ebcead4804dd4d38",
-    "src/state/hot-lock.mjs": "8af8eab1532b0da724ef87250a04926d7d70c6dc7f50e6224ab49cd14bf37d35",
+    "src/state/hot-lock.mjs": "bb03319069e047cd212bf571ec8b503388f4602c2f7596115dd6a6902558cefd",
     "src/state/impact.mjs": "c0324c2b1e0498fcee28418c43deb820f8c7e2a36f9035b7b72fad986c446185",
     "src/state/knowledge-registry.mjs": "7b3ad5cdd4b4ca87580dd589388e761e5c9e1118109da28c59519a2d1065125e",
     "src/state/plan-pool.mjs": "20c667909048853fa2dddf239b27467c29dbe8551cd7c90fef88c241143483ad",
@@ -2057,6 +2056,13 @@
       "class": "rust-test"
     },
     {
+      "path": "apps/fgos/tests/cli_tests.rs",
+      "line": 3019,
+      "spawn": "Command::new",
+      "binary": "? bin",
+      "class": "rust-test"
+    },
+    {
       "path": "apps/fgos/tests/internal_lock_routes.rs",
       "line": 423,
       "spawn": "Command::new",
@@ -2170,14 +2176,14 @@
     },
     {
       "path": "bin/fgos.mjs",
-      "line": 3146,
+      "line": 3129,
       "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:180",
       "binary": "(config door value (readConfig({ projectRoot: repoRoot, sections: ['invariantChecks'] })))",
       "class": "configured-binary"
     },
     {
       "path": "bin/fgos.mjs",
-      "line": 3290,
+      "line": 3273,
       "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:180",
       "binary": "(config door value (readConfig({ projectRoot: repoRoot, sections: ['invariantChecks'] })))",
       "class": "configured-binary"

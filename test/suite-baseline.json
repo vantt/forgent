@@ -33,7 +33,7 @@
     "test/cli/fgos-intake-7.test.mjs": 16.9,
     "test/cli/fgos-intake.test.mjs": 10.1,
     "test/cli/fgos-iron-law-gate.test.mjs": 32.3,
-    "test/cli/fgos-lock-fence.test.mjs": 20,
+    "test/cli/fgos-lock-fence.test.mjs": 3,
     "test/cli/fgos-manifest.test.mjs": 1.8,
     "test/cli/fgos-merge-next-idle-turn.test.mjs": 6.2,
     "test/cli/fgos-merge-next-no-config-write.test.mjs": 3.3,

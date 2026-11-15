@@ -1687,7 +1687,6 @@ const ARM_STATIC_IMPORTS = [
   '../src/runner/dispatch/runner-config-error.mjs',
   '../src/runner/frozen-judge.mjs',
   '../src/runner/goal-check.mjs',
-  '../src/runner/lock-fence.mjs',
   '../src/runner/main-checkout-activity.mjs',
   '../src/runner/main-checkout-reset-guard.mjs',
   '../src/runner/merge.mjs',

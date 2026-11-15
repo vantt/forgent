@@ -2963,4 +2963,104 @@ fn lock_status_runs_the_doors_through_the_binary_and_starts_no_node() {
 
     assert!(!node_log.exists(), "a Node process was started");
     let _ = fs::remove_dir_all(&sandbox);
+
+/// The body of the process the lock-fence case below holds a lock with: it takes the lock the environment
+/// names, says so through a file and waits to be ended. Without the variable it does nothing.
+#[cfg(unix)]
+#[test]
+fn lock_fence_holder_child_body() {
+    use fgos_holder_lock::{acquire, Acquire, Mode, Resource, Wait, DEFAULT_KILL_WAIT_MS};
+    let Ok(path) = std::env::var("FGOS_TEST_FENCE_HOLD") else {
+        return;
+    };
+    let Acquire::Acquired(_handle) = acquire(
+        &Resource::new("main-checkout", &path),
+        Mode::Ex,
+        Wait::Ms(0),
+        DEFAULT_KILL_WAIT_MS,
+    ) else {
+        std::process::exit(3);
+    };
+    fs::write(std::env::var("FGOS_TEST_FENCE_READY").unwrap(), "held").unwrap();
+    loop {
+        std::thread::sleep(std::time::Duration::from_secs(1));
+    }
+}
+
+// `lock fence` through the binary: without `--yes` it lists the holder and signals nothing (exit 2, on a
+// terminal too), with `--yes` it ends the holder and answers the envelope, and neither call starts Node.
+#[cfg(unix)]
+#[test]
+fn lock_fence_refuses_without_yes_then_ends_the_holder_and_starts_no_node() {
+    let (spy_dir, spy_log, path) = node_spy_dir("fgos_test_lock_fence_spy");
+    let base = std::env::temp_dir().join(format!("fgos-lock-fence-cli-{}", std::process::id()));
+    let _ = fs::remove_dir_all(&base);
+    let project = base.join("project");
+    fs::create_dir_all(project.join(".git")).unwrap();
+    fs::create_dir_all(project.join(".fgos/locks")).unwrap();
+    let lock_file = project.join(".fgos/locks/main-checkout.lock");
+    let ready = base.join("ready");
+    let mut holder = Command::new(std::env::current_exe().unwrap())
+        .args(["--exact", "lock_fence_holder_child_body", "--nocapture"])
+        .env("FGOS_TEST_FENCE_HOLD", &lock_file)
+        .env("FGOS_TEST_FENCE_READY", &ready)
+        .stdout(std::process::Stdio::null())
+        .stderr(std::process::Stdio::null())
+        .spawn()
+        .unwrap();
+    for _ in 0..400 {
+        if ready.exists() {
+            break;
+        }
+        std::thread::sleep(std::time::Duration::from_millis(25));
+    }
+    assert!(ready.exists(), "the holder child never took the lock");
+    let fence = |extra: &[&str]| {
+        Command::new(fgos_bin())
+            .current_dir(&project)
+            .env("HOME", &base)
+            .env("PATH", &path)
+            .args(["lock", "fence", "main-checkout"])
+            .args(extra)
+            .output()
+            .expect("failed to execute fgos")
+    };
+
+    let refused = fence(&[]);
+    let stderr = String::from_utf8_lossy(&refused.stderr);
+    assert_eq!(refused.status.code(), Some(2), "stderr={stderr}");
+    assert!(
+        stderr.contains(&format!("pid {} (started ", holder.id())),
+        "the holder is listed: {stderr}"
+    );
+    assert!(
+        stderr.contains("holder-lock (lock-fence-not-confirmed)")
+            && stderr.contains("nothing was signalled"),
+        "{stderr}"
+    );
+    assert!(
+        holder.try_wait().unwrap().is_none(),
+        "an unconfirmed fence leaves the holder alone"
+    );
+
+    let fenced = fence(&["--yes"]);
+    assert_eq!(
+        fenced.status.code(),
+        Some(0),
+        "stderr={}",
+        String::from_utf8_lossy(&fenced.stderr)
+    );
+    let parsed: serde_json::Value = serde_json::from_slice(&fenced.stdout).unwrap();
+    assert_eq!(parsed["contract"], "fgos.v1");
+    assert_eq!(parsed["data"]["status"], "fenced");
+    assert_eq!(parsed["data"]["terminated"][0], holder.id());
+    holder.wait().unwrap();
+
+    let spied = fs::read_to_string(&spy_log).unwrap_or_default();
+    assert!(
+        !spied.lines().any(|line| line.starts_with("SPY_PID:")),
+        "lock fence started a node process: {spied}"
+    );
+    let _ = fs::remove_dir_all(&base);
+    let _ = fs::remove_dir_all(&spy_dir);
 }

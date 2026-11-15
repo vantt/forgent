@@ -223,6 +223,14 @@
       "reason": "the lock report needs the run directories the runner lays out, one layer above the lock crate; until the layouts move the host lists them with a twin of each Node lister, pinned by one fixture"
     },
     {
+      "job": "fence a registry lock",
+      "kind": "door",
+      "patterns": ["export function fenceLock\\b", "\\bconst TERM_WAIT_MS\\b", "\\bconst KILL_WAIT_MS(?:: u64)? = 3000\\b", "lock-fence-not-confirmed"],
+      "allowed": ["packages/holder-lock/rust/src/fence.rs"],
+      "debt": [],
+      "reason": "the state machine that stops a lock's holders (list, refuse unless confirmed, signal by identity, wait, kill, probe, clear a hot record) is the holder-lock crate's fence.rs; the host verb only reads the call and prints the answer, so no second fence can signal a holder nobody confirmed"
+    },
+    {
       "job": "take a holder lock from Node",
       "kind": "door",
       "patterns": ["holderLock\\.take\\("],
@@ -802,7 +810,6 @@
     "src/runner/frozen-judge.mjs": "domain",
     "src/runner/merge.mjs": "infra",
     "src/runner/repo-locks.mjs": "infra",
-    "src/runner/lock-fence.mjs": "infra",
     "src/runner/main-checkout-activity.mjs": "infra",
     "src/runner/main-checkout-reset-guard.mjs": "infra",
     "src/runner/github-adapter.mjs": "infra",

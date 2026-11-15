@@ -27,7 +27,6 @@
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import readline from 'node:readline';
 import { execFileSync, execSync, spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { addWork, moveWork, settleClaim, editWork, resolveParkReason, addDecision, addOutcome, recordFriction, listWork, readyWork, isDepsAndLineageReady, footprintConflicts, computedSchedule, readRawEvents, putInAwaiting, answerAwaiting, setFocus, goalFocusShow, assertAcceptanceEvidence, assertPlanEvidence, assertValidDocType, recordGateApprove, recordCall, recordCallReturn,      parseDecisionRelation, decisionTextLooksLikeSupersession, registerTopicStore, renameTopicStore, splitTopicStore, mergeTopicStore, retireTopicStore, reserveDocStore, registerDocStore, markDocRenderedStore, promoteDocStore, demoteDocStore, supersedeDocStore, retireDocStore, moveDocPathStore, attestDocStore } from '../src/state/store.mjs';
@@ -99,7 +98,6 @@ import { claimWork, ClaimError, readWorkerSlotCeiling } from '../src/runner/clai
 import { isReclaimEligible } from '../src/runner/claim-liveness.mjs';
 import { commitAt, pathExistsAt, readRepoFacts } from '../src/git/inspect.mjs';
 import { HolderLockError } from '../src/holder-lock/index.mjs';
-import { fenceLock, parseLockParams } from '../src/runner/lock-fence.mjs';
 import { formatLockDurationMs } from '../src/util/format-lock-duration.mjs';
 import { clearBeaconIfOwn } from '../src/runner/main-checkout-activity.mjs';
 import { resolveWriterIdentity } from '../src/util/session-identity.mjs';
@@ -320,21 +318,6 @@ function lockErrorToStoreError(err, verbName) {
   if (!(err instanceof HolderLockError)) return err;
   const category = err.code === 'lock-held' ? 'lock-timeout' : 'precondition';
   return new StoreError(category, `${verbName}: ${err.message}`);
-}
-
-// Asks on the terminal before `lock fence` signals anything. Without a
-// terminal there is nobody to ask, so the answer is no (pass --yes).
-async function confirmFence(name, holders) {
-  const list = holders.map((h) => `  pid ${h.pid} (started ${h.startTime})`).join('\n');
-  process.stderr.write(`fgos: lock ${name} is held by:\n${list}\n`);
-  if (!process.stdin.isTTY || !process.stderr.isTTY) return false;
-  const rl = readline.createInterface({ input: process.stdin, output: process.stderr });
-  try {
-    const answer = await new Promise((resolve) => rl.question('Stop these processes? [y/N] ', resolve));
-    return /^y(es)?$/i.test(answer.trim());
-  } finally {
-    rl.close();
-  }
 }
 
 function parseWaitFlags(flags, verbName) {
@@ -3723,28 +3706,6 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       return { released: true, reason: 'stale-liveness', ...(rel.admin ? { admin: rel.admin } : {}) };
     }
 
-    // `lock fence`: stop the process that holds a registry lock so the lock
-    // can be taken again. Never takes a lock from a live holder: holders are
-    // listed, signalled by identity (SIGTERM, then SIGKILL), and the kernel
-    // is asked with a probe whether the lock is free afterwards.
-    case 'lock': {
-      const sub = requireField(positional[0], 'lock requires a sub-verb: fgos lock fence <name> [--param k=v] [--yes] [--attest-stopped]');
-      if (sub === 'fence') {
-        const name = requireField(positional[1], 'lock fence requires a lock name: fgos lock fence <name> (names: fgos lock-status)');
-        try {
-          return await fenceLock({
-            name,
-            fgosDir: dir,
-            params: parseLockParams(flags.param),
-            attestStopped: Boolean(flags['attest-stopped']),
-            confirm: (holders) => (flags.yes ? true : confirmFence(name, holders)),
-          });
-        } catch (err) {
-          throw lockErrorToStoreError(err, 'lock fence');
-        }
-      }
-      throw new StoreError('validation', `unknown lock sub-verb "${sub}". Usage: fgos lock fence <name> [--param k=v] [--yes] [--attest-stopped]`);
-    }
 
     // The repair verb `.githooks/pre-commit`'s stale-index guard prints. Run FROM INSIDE the stale
     // worktree; `--path` points it at another one. `resyncWorktree` needs the MAIN checkout (branch
