@@ -24,6 +24,7 @@ import path from 'node:path';
 import * as live from './mailbox-live-cli.mjs';
 import * as confined from './mailbox-live-confined.mjs';
 import * as runs from './mailbox-behaviour-run.mjs';
+import { wilson } from './mailbox-behaviour-score.mjs';
 
 export const CLIS = Object.freeze(['claude', 'codex']);
 
@@ -109,16 +110,6 @@ export function scoreRecord(snapshot, names) {
   };
 }
 
-/** Wilson 95 percent interval of `k` of `n`, as [low, high] fractions. */
-export function wilson(k, n, z = 1.96) {
-  if (!n) return [0, 1];
-  const p = k / n;
-  const d = 1 + (z * z) / n;
-  const centre = (p + (z * z) / (2 * n)) / d;
-  const half = (z * Math.sqrt((p * (1 - p)) / n + (z * z) / (4 * n * n))) / d;
-  return [Math.max(0, centre - half), Math.min(1, centre + half)];
-}
-
 /** Per CLI and scenario: runs, valid runs, acks, ack reached the sender, sender silent, ack-on-ack, cost. */
 export function summarize(lines) {
   const rows = new Map();
@@ -144,7 +135,11 @@ export function summarize(lines) {
   return [...rows.values()].map((r) => ({ ...r, ackedCi: wilson(r.acked, r.valid), silentCi: wilson(r.silentOfReached, r.reached) }));
 }
 
-/** Token counts and cost only (never a session id): Claude Code's result record, Codex's summed turns. */
+/**
+ * Token counts and cost only (never a session id): Claude Code's result record, Codex's summed turns.
+ * A twin of `usageOf` in mailbox-behaviour-run.mjs (not exported there: that file is a frozen input of
+ * the earlier measurements' freeze lists, so it cannot be edited to export it); pi and omp are not run here.
+ */
 export function usageOf(cli, stdoutFile) {
   if (!fs.existsSync(stdoutFile)) return null;
   const lines = fs.readFileSync(stdoutFile, 'utf8').split('\n').filter(Boolean).flatMap((l) => {

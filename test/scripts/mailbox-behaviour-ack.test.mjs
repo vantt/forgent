@@ -46,11 +46,6 @@ test('the summary counts silence only among acks that reached the sender, leaves
   assert.deepEqual([row.runs, row.errors, row.valid, row.acked, row.reached, row.silentOfReached, row.ackOnAck, row.invocations, row.costUsd], [5, 1, 4, 3, 2, 1, 1, 10, 2.5]);
 });
 
-test('the interval of nothing observed is the whole range and of all observed stays above half', () => {
-  assert.deepEqual(ack.wilson(0, 0), [0, 1]);
-  assert.ok(ack.wilson(20, 20)[0] > 0.8);
-});
-
 test('the plan is 40 runs per CLI and only the flagged scenarios carry the flag', () => {
   assert.equal(ack.PLAN.reduce((a, c) => a + c.n, 0), 40);
   assert.deepEqual(Object.fromEntries(Object.entries(ack.FLAGGED)), { info: true, work: true, control: false });
