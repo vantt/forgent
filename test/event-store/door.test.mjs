@@ -49,5 +49,8 @@ test('event-store product code has no Git spawn site and no classified spawn: it
   // Rust integration tests build fixture repositories with git; only product code is judged. A wrapper
   // no product code calls is reported by the scan so a later caller is noticed, but no spawn reaches it:
   // that caller would turn it into a site or a configured binary, which the two assertions here do judge.
-  assert.deepEqual(classes.filter(c=>owned(c)&&!['rust-test','uncalled-wrapper'].includes(c.class)),[],'event-store code carries a classified git spawn');
+  // The two lifecycle wrappers start the host binary for the seal and publish children (`events seal`, `events sync`):
+  // a named non-Git program, so it is not a Git spawn. Any other binary, configured or not, still fails here.
+  const isHostChild=c=>c.class==='configured-binary'&&c.binary==='(env FGOS_HOST_BIN)'&&c.path==='src/event-store/maintenance.mjs';
+  assert.deepEqual(classes.filter(c=>owned(c)&&!isHostChild(c)&&!['rust-test','uncalled-wrapper'].includes(c.class)),[],'event-store code carries a classified git spawn');
 });
