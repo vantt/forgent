@@ -57,7 +57,7 @@ pub fn rotate_guarded(
     if let Some(first) = active.events.first() {
         File::open(paths.active())
             .and_then(|f| f.sync_all())
-            .map_err(io)?;
+            .map_err(io("sync_file", &paths.active()))?;
         point(fs, Point::AfterRotationFsync)?;
         let target = paths.segment(first.seq, high)?;
         // Recovery rejects overlapping closed ranges, so this name cannot
@@ -65,10 +65,10 @@ pub fn rotate_guarded(
         match fs::symlink_metadata(&target) {
             Ok(_) => return Err(crate::errors::invalid("rotation target already exists")),
             Err(e) if e.kind() == std::io::ErrorKind::NotFound => (),
-            Err(e) => return Err(io(e)),
+            Err(e) => return Err(io("stat", &target)(e)),
         }
         point(fs, Point::BeforeRotationRename)?;
-        fs::rename(paths.active(), &target).map_err(io)?;
+        fs::rename(paths.active(), &target).map_err(io("rename", &target))?;
         point(fs, Point::AfterRotationRename)?;
         sync_dir(&paths.closed())?;
         point(fs, Point::AfterClosedDirFsync)?;

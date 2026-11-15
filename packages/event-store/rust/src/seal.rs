@@ -186,7 +186,7 @@ pub(crate) fn seal_guarded(
             break;
         }
         for (first, last, path) in listed {
-            let bytes = std::fs::read(&path).map_err(io)?;
+            let bytes = std::fs::read(&path).map_err(io("read", &path))?;
             let framed = closed(&bytes, &identity.store_id, req.stream, first, last)?;
             let prior = Receipt::read(&paths.sealed())?;
             let tip = match port.read_ref(repo, &reference).map_err(git_error)? {
@@ -398,7 +398,7 @@ pub(crate) fn seal_guarded(
                     }
                 }
             }
-            std::fs::remove_file(&path).map_err(io)?;
+            std::fs::remove_file(&path).map_err(io("remove_file", &path))?;
             point(fs, Point::AfterSealDelete)?;
             sync_dir(&paths.closed())?;
             point(fs, Point::AfterSealDeleteDirFsync)?;
@@ -411,7 +411,7 @@ pub(crate) fn seal_guarded(
     let record = paths.root.join("integrity.json");
     if record.exists() && segments(&paths)?.is_empty() {
         let diagnostic: serde_json::Value =
-            serde_json::from_slice(&std::fs::read(&record).map_err(io)?)
+            serde_json::from_slice(&std::fs::read(&record).map_err(io("read", &record))?)
                 .map_err(|e| invalid(e.to_string()))?;
         let ranges: Vec<(u64, u64)> = serde_json::from_value(
             diagnostic
@@ -450,7 +450,7 @@ pub(crate) fn seal_guarded(
                 if receipt.last_seq <= high
                     && ranges.iter().all(|(_, last)| *last <= receipt.last_seq)
                 {
-                    std::fs::remove_file(record).map_err(io)?;
+                    std::fs::remove_file(&record).map_err(io("remove_file", &record))?;
                     sync_dir(&paths.root)?;
                 }
             }
@@ -509,7 +509,12 @@ fn find_segment(
 }
 /// Oldest local unsealed file age; no Git or gate work.
 pub fn oldest_unsealed_age_sec(layout: &Layout, streams: &[StreamId]) -> Result<u64, Error> {
-    if streams.is_empty() || !layout.root.try_exists().map_err(io)? {
+    if streams.is_empty()
+        || !layout
+            .root
+            .try_exists()
+            .map_err(io("exists", &layout.root))?
+    {
         return Ok(0);
     }
     // Serialize the header read with append recovery/truncation and rotation.
@@ -526,15 +531,15 @@ pub fn oldest_unsealed_age_sec(layout: &Layout, streams: &[StreamId]) -> Result<
             // Open once: rename/unlink cannot change this header snapshot. A writer
             // only appends; an incomplete first line is not an observation yet.
             use std::io::BufRead;
-            let file = match std::fs::File::open(p) {
+            let file = match std::fs::File::open(&p) {
                 Ok(file) => file,
                 Err(e) if e.kind() == std::io::ErrorKind::NotFound => continue,
-                Err(e) => return Err(io(e)),
+                Err(e) => return Err(io("open", &p)(e)),
             };
             let mut line = Vec::new();
             std::io::BufReader::new(file)
                 .read_until(b'\n', &mut line)
-                .map_err(io)?;
+                .map_err(io("read_header", &p))?;
             if line.last() == Some(&b'\n') && line.len() > 1 {
                 {
                     let e = serde_json::from_slice::<crate::envelope::Envelope>(&line)
@@ -702,7 +707,7 @@ pub(crate) fn known_receipt_tip(
             let Some((_, _, path)) = segment else {
                 return Ok(false);
             };
-            let bytes = std::fs::read(path).map_err(io)?;
+            let bytes = std::fs::read(&path).map_err(io("read", &path))?;
             closed(&bytes, origin, &stream, first_seq, last_seq)?;
             if walk::blob(port, repo, &commit.oid, b"events.jsonl")?.as_deref()
                 != Some(bytes.as_slice())

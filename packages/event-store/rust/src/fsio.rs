@@ -66,10 +66,11 @@ pub struct OsFileSystem;
 impl FileSystem for OsFileSystem {}
 
 pub(crate) fn point(fs: &dyn FileSystem, p: Point) -> Result<(), Error> {
-    fs.checkpoint(p).map_err(io_error)
+    fs.checkpoint(p)
+        .map_err(io_error("checkpoint", Path::new("<checkpoint hook>")))
 }
 pub(crate) fn sync_dir(path: &Path) -> Result<(), Error> {
-    fgos_durable_file::sync_directory(path).map_err(io_error)
+    fgos_durable_file::sync_directory(path).map_err(io_error("sync_dir", path))
 }
 /// The shared durable-file leaf owns temporary creation and atomic replacement.
 pub(crate) fn write_hwm(root: &Path, seq: u64, fs: &dyn FileSystem) -> Result<(), Error> {
@@ -88,6 +89,6 @@ pub(crate) fn write_hwm(root: &Path, seq: u64, fs: &dyn FileSystem) -> Result<()
             })
         },
     )
-    .map_err(|e| io_error(io::Error::other(e)))?;
+    .map_err(|e| io_error("replace_durably", &root.join("hwm.json"))(io::Error::other(e)))?;
     Ok(())
 }

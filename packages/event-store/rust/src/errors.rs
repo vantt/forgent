@@ -32,9 +32,37 @@ impl Error {
 pub(crate) fn invalid(detail: impl Into<String>) -> Error {
     Error::new(ErrorCode::EventStoreIntegrity, detail)
 }
-pub(crate) fn io(error: std::io::Error) -> Error {
-    Error::new(
-        ErrorCode::EventStoreIo,
-        format!("{:?}: {error}", error.kind()),
-    )
+/// Builds the io-failure mapper for `.map_err(io("open", path))`: the detail
+/// names the failed operation and the path (never file content) so a failure
+/// seen only in CI can be traced to its call site.
+pub(crate) fn io(
+    operation: &'static str,
+    path: &std::path::Path,
+) -> impl FnOnce(std::io::Error) -> Error {
+    let path = path.display().to_string();
+    move |error| {
+        Error::new(
+            ErrorCode::EventStoreIo,
+            format!("{:?}: {error} (during {operation} of {path})", error.kind()),
+        )
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn io_error_names_operation_and_path() {
+        let path = std::path::Path::new("/nonexistent-event-store-dir/missing.jsonl");
+        let error = std::fs::read(path).map_err(io("read", path)).unwrap_err();
+        assert_eq!(error.code, ErrorCode::EventStoreIo);
+        assert!(error.detail.starts_with("NotFound: "), "{}", error.detail);
+        assert!(error.detail.contains("during read of"), "{}", error.detail);
+        assert!(
+            error.detail.contains(&path.display().to_string()),
+            "{}",
+            error.detail
+        );
+    }
 }

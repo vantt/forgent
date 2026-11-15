@@ -1002,7 +1002,8 @@ pub fn reconcile_durable_history(
         ));
     }
     if high > receipt {
-        std::fs::create_dir_all(&paths.root).map_err(crate::errors::io)?;
+        std::fs::create_dir_all(&paths.root)
+            .map_err(crate::errors::io("create_dir_all", &paths.root))?;
         crate::fsio::sync_dir(&layout.root)?;
         // lastSeq is physical publication, deliberately separate from coverage:
         // causal deferral must never permit reuse of a published sequence.

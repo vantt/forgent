@@ -68,7 +68,7 @@ impl Registry {
     pub fn load_files(&mut self, paths: &[impl AsRef<Path>]) -> Result<(), Error> {
         let mut next = self.clone();
         for path in paths {
-            let bytes = fs::read(path).map_err(crate::errors::io)?;
+            let bytes = fs::read(path).map_err(crate::errors::io("read", path.as_ref()))?;
             let contract: ConsumerContract =
                 serde_json::from_slice(&bytes).map_err(|e| invalid(e.to_string()))?;
             next.register(contract)?;
