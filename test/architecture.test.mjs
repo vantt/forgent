@@ -1938,7 +1938,7 @@ test('door check: every name of the retired Node S2 verb code fails when a file 
 test('door check: every name of the retired Node Git and Event Store doctor rows fails when a file declares it again', () => {
   const row = manifest.doors.find((r) => r.job === 'retired Node Git and Event Store doctor rows');
   assert.ok(row && row.allowed.length === 0, 'the retired-names row exists and allows no file');
-  const names = ['checkGit', 'checkEventStore', 'eventStoreDoctor', 'eventStoreDoctorOf', 'eventStoreMappingProblems', 'eventStoreSetupContext', 'fixGitWal', 'fixGitDriverDirectories', 'fixGitFetchMapping', 'compatibleGitContracts', 'describeGitError', 'retentionNote', 'gitFloor', 'checkNodeAndGit', 'checkMainCheckoutHookWired'];
+  const names = ['checkGit', 'checkEventStore', 'eventStoreDoctor', 'eventStoreDoctorOf', 'eventStoreMappingProblems', 'eventStoreSetupContext', 'fixGitWal', 'fixGitDriverDirectories', 'fixGitFetchMapping', 'compatibleGitContracts', 'describeGitError', 'retentionNote', 'gitFloor', 'checkNodeAndGit', 'checkMainCheckoutHookWired', 'gitFacts', 'readMergeHead', 'eventStoreAddonAvailable', 'initializeGitWal'];
   assert.equal(row.patterns.length, names.length, 'one pattern per retired name');
   for (const name of names) {
     const failures = checkDoors([row], new Map([['src/seeded.mjs', `export function ${name}() {}\n`]]));

@@ -1,13 +1,11 @@
 //! The facts of one repository the doctor's Git rows judge, read without writing anything: the Git floor, the
 //! layout, the journal, the activation fence, native locks, untrusted transport settings, reserved legacy refs and
-//! the fetch mappings. The Node addon serves the same bytes through `inspectGit`; the host's doctor reads the typed
-//! value.
+//! the fetch mappings. The host's doctor reads the typed value.
 use crate::incidents::{journal_facts, native_lock_names, FactError, JournalFacts};
 use crate::repository_config::obsolete_legacy_fetch_mapping;
 use crate::wal;
 use crate::{plain_path, GitDriver, GitFloorVerdict, Inspect, RefPrefix, RepoHandle, ResolveRepo};
 use serde::Serialize;
-use serde_json::{json, Value};
 use std::path::Path;
 
 /// The durability sentence the doctor prints for a repository.
@@ -51,8 +49,7 @@ impl From<&GitFloorVerdict> for FloorFacts {
 }
 
 /// What a repository reports about itself.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
-#[serde(rename_all = "camelCase")]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct RepositoryFacts {
     pub floor: FloorFacts,
     pub common_dir: String,
@@ -72,16 +69,6 @@ pub struct RepositoryFacts {
 pub enum Inspection {
     NotARepository { floor: FloorFacts },
     Repository(Box<RepositoryFacts>),
-}
-
-impl Inspection {
-    /// The answer the addon gives its callers.
-    pub fn to_json(&self) -> Value {
-        match self {
-            Self::NotARepository { floor } => json!({"notARepository": true, "floor": floor}),
-            Self::Repository(facts) => json!(facts),
-        }
-    }
 }
 
 /// Inspects `repo_path` (inside `trusted_main`) for `remote`. Never acquires a lock, never initialises a journal;
@@ -142,31 +129,5 @@ fn reserved_legacy_refs(driver: &GitDriver, repo: &RepoHandle) -> Result<Vec<Str
             return Ok(found);
         }
         cursor = page.next_cursor;
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn a_path_with_no_repository_answers_the_floor_alone() {
-        let answer = Inspection::NotARepository {
-            floor: FloorFacts {
-                version: "2.50.0".into(),
-                minimum: "2.40.0".into(),
-                supported: true,
-                probes: vec![ProbeFacts {
-                    name: "p".into(),
-                    passed: true,
-                    evidence: "e".into(),
-                }],
-            },
-        };
-        assert_eq!(
-            answer.to_json(),
-            json!({"notARepository": true, "floor": {"version": "2.50.0", "minimum": "2.40.0", "supported": true,
-                "probes": [{"name": "p", "passed": true, "evidence": "e"}]}})
-        );
     }
 }

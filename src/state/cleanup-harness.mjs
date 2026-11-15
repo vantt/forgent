@@ -77,7 +77,7 @@ export function resolveTtlDaysForItem(view, id, { ttlDays, leafTtlDays } = {}) {
 
 // The Git facts the merge checks read, through one Inspect port opened on
 // first use; every unreadable fact answers "no".
-function gitFacts(repoRoot) {
+function trunkGitFacts(repoRoot) {
   let port;
   const inspect = () => (port ??= createGitInspect(gitPortOptions(repoRoot)));
   const commit = (name) => {
@@ -171,7 +171,7 @@ function gitFacts(repoRoot) {
  * inferred content match.
  */
 export function checkMergeStillResolves(repoRoot, work, { view, id } = {}) {
-  return mergeStillResolves(gitFacts(repoRoot), work, { view, id });
+  return mergeStillResolves(trunkGitFacts(repoRoot), work, { view, id });
 }
 
 function mergeStillResolves(git, work, { view, id } = {}) {

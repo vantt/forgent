@@ -1081,11 +1081,15 @@
         "\\bretentionNote\\b",
         "\\bgitFloor\\b",
         "\\bcheckNodeAndGit\\b",
-        "\\bcheckMainCheckoutHookWired\\b"
+        "\\bcheckMainCheckoutHookWired\\b",
+        "\\bgitFacts\\b",
+        "\\breadMergeHead\\b",
+        "\\beventStoreAddonAvailable\\b",
+        "\\binitializeGitWal\\b"
       ],
       "allowed": [],
       "debt": [],
-      "reason": "the Git and Event Store doctor rows, the node-and-git floor row, the hooks row and their fixes are judged in Rust (apps/fgos/src/wiring/doctor/{git,event_store}.rs over fgos-git repository_facts and fgos-event-store diagnostics): the Node row bodies and their helpers are deleted and no file may bring one of these names back"
+      "reason": "the Git and Event Store doctor rows, the node-and-git floor row, the hooks row and their fixes are judged in Rust (apps/fgos/src/wiring/doctor/{git,event_store}.rs over fgos-git repository_facts and fgos-event-store diagnostics): the Node row bodies and their helpers are deleted (with the Node fact readers `gitFacts` and `readMergeHead`, `eventStoreAddonAvailable` and the addon's `initializeGitWal`) and no file may bring one of these names back"
     },
     {
       "job": "doctor readiness registry",

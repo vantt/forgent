@@ -176,16 +176,6 @@ export function eventStoreFacts(cwd, { stateRoot, trustedMain = cwd, remote = 'o
   outsideState();
   return call(() => loadNativeAddon(loaderOptions).eventStoreFacts(cwd, stateRoot ?? resolveStateRoot().stateRoot, trustedMain, remote, detached));
 }
-export function eventStoreAddonAvailable(loaderOptions) {
-  available();
-  outsideState();
-  const native = call(() => loadNativeAddon(loaderOptions));
-  return typeof native.resolveEventStore === 'function' && typeof native.openStore === 'function'
-    && typeof native.eventStoreFacts === 'function' && typeof native.maintainEventStore === 'function'
-    && typeof native.eventStoreBranchKey === 'function'
-    && ['read', 'append', 'admitWrites', 'promote', 'maintenance', 'status', 'legacyLayout'].every(name => typeof native.EventStore?.prototype?.[name] === 'function');
-}
-
 /** Branch stream key, defined and validated by the crate. */
 export function branchKey(branch, loaderOptions) {
   return call(() => loadNativeAddon(loaderOptions).eventStoreBranchKey(branch));

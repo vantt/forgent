@@ -702,12 +702,10 @@ async function run(args) {
     const made = fixture('backlog', repo, '10000', shape, '8');
     const { loadNativeAddon } = await import('../../src/git/native.mjs');
     const native = loadNativeAddon(loader);
-    for (let i = 0; i < 3; i++) native.inspectGit(state, repo, repo);
-    let last;
-    const nodeMs = Array.from({ length: 20 }, () => { const [ms, facts] = time(() => native.inspectGit(state, repo, repo)); last = facts; return ms; });
+    const last = native.readGitStatus(state, repo);
     const rust = fixture('scan', repo, '20');
     const disk = footprint(path.join(repo, 'fgos/git'));
-    say(`backlog-${shape}`, { operations: made.created, recordsPerOperation: made.recordsPerOperation, fixtureSeconds: made.seconds, allocatedBytes: disk.bytes, inodes: disk.inodes, oldestUnresolved: last.journal.oldestUnresolved, nodeInspectGit: stats(nodeMs), complete: last.journal.complete, pendingCount: last.journal.pendingCount, errors: last.journal.errors.length, retainedBytes: last.journal.retainedBytes, rustScan: { ...stats(rust.ms), complete: rust.complete, unresolved: rust.unresolved, errors: rust.errors } });
+    say(`backlog-${shape}`, { operations: made.created, recordsPerOperation: made.recordsPerOperation, fixtureSeconds: made.seconds, allocatedBytes: disk.bytes, inodes: disk.inodes, complete: last.journal.complete, pendingCount: last.journal.pendingCount, errors: last.journal.errors.length, retainedBytes: last.journal.retention.retainedBytes, rustScan: { ...stats(rust.ms), complete: rust.complete, unresolved: rust.unresolved, errors: rust.errors } });
   }
 
   // Reconciliation of 100 interrupted publications through the Node route.
@@ -716,7 +714,7 @@ async function run(args) {
     const made = fixture('interrupted', state, repo, '100', WRITER);
     const { loadNativeAddon } = await import('../../src/git/native.mjs');
     const native = loadNativeAddon(loader);
-    const pendingBefore = native.inspectGit(state, repo, repo).journal.pendingCount;
+    const pendingBefore = native.readGitStatus(state, repo).journal.pendingCount;
     const outcomes = {};
     const [ms] = time(() => {
       for (const op of made.operations) {
@@ -728,7 +726,7 @@ async function run(args) {
         outcomes[key] = (outcomes[key] ?? 0) + 1;
       }
     });
-    const after = native.inspectGit(state, repo, repo).journal;
+    const after = native.readGitStatus(state, repo).journal;
     say('reconciliation', { operations: made.operations.length, fixtureSeconds: made.seconds, totalMs: ms, perOperationMs: ms / made.operations.length, pendingBefore, pendingAfter: after.pendingCount, scanErrors: after.errors.length, outcomes });
   }
 
@@ -818,7 +816,7 @@ async function rollback(root, fgctl, descriptor, index, loader) {
   port.close();
   const { loadNativeAddon } = await import('../../src/git/native.mjs');
   const native = loadNativeAddon(loader);
-  const journal = native.inspectGit(state, fs.realpathSync(ws), fs.realpathSync(ws)).journal;
+  const journal = native.readGitStatus(state, fs.realpathSync(ws)).journal;
   const tally = {};
   for (const a of attempts) tally[`${a.direction}: ${a.code}`] = (tally[`${a.direction}: ${a.code}`] ?? 0) + 1;
   return { liveWriterReceipts: receipts.length, attempts: tally, controllerMs: stats(attempts.map(a => a.ms)), unprovenLivePayload: { outcome: refusedForUnproven.code, namesThatPid: refusedForUnproven.detail.includes(`pid ${unproven.pid} `) }, lostOrMismatchedReceipts: lost, tipMatchesLastReceipt: tipMatches, walScan: { complete: journal.complete, pending: journal.pendingCount, errors: journal.errors.length } };

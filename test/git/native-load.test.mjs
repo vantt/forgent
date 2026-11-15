@@ -235,21 +235,7 @@ test('a staged release resolves its own addon without PATH or cwd fallback, and 
   } finally { fs.rmSync(temp, { recursive: true, force: true }); }
 });
 
-test('inspection reports whether the controller activation fence stands', { skip: process.platform === 'win32' }, () => {
-  const temp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-addon-fence-'));
-  const repo = path.join(temp, 'repo');
-  execFileSync('git', ['init', '--bare', repo], { stdio: 'ignore' });
-  const fence = path.join(repo, '.fgos/locks/activation.lock');
-  try {
-    assert.equal(addon.inspectGit(temp, repo, repo).activationFence, false);
-    fs.mkdirSync(fence, { recursive: true });
-    fs.writeFileSync(path.join(fence, 'TOMBSTONE'), JSON.stringify({ lock: 'activation', by: 'fgos git', at: 'fixture' }));
-    assert.equal(addon.inspectGit(temp, repo, repo).activationFence, true);
-    fs.writeFileSync(path.join(fence, 'TOMBSTONE'), JSON.stringify({ lock: 'activation', by: 'fgos 4.4', at: 'fixture' }));
-    assert.equal(addon.inspectGit(temp, repo, repo).activationFence, false);
-  } finally { fs.rmSync(temp, { recursive: true, force: true }); }
-});
-test('inspection leaves WAL absent; setup and mapping use the shared Rust config writer', { skip: process.platform === 'win32' }, async () => {
+test('fetch mapping setup uses the shared Rust config writer and the addon door reaches it unchanged', { skip: process.platform === 'win32' }, async () => {
   const temp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-addon-inspect-'));
   const repo = path.join(temp, 'repo');
   execFileSync('git', ['init', '--bare', repo], { stdio: 'ignore' });
@@ -260,16 +246,6 @@ test('inspection leaves WAL absent; setup and mapping use the shared Rust config
   fs.writeFileSync(path.join(repo, '.fgos/locks/activation.lock/TOMBSTONE'), JSON.stringify({ lock: 'activation', by: 'fgos git', at: 'fixture' }));
   let port;
   try {
-    const facts = addon.inspectGit(temp, repo, repo);
-    assert.equal(facts.journal.initialized, false);
-    assert.deepEqual(facts.untrustedTransportConfig, []);
-    git('config', 'http.https://github.com/.extraheader', 'AUTHORIZATION: secret');
-    assert.deepEqual(addon.inspectGit(temp, repo, repo).untrustedTransportConfig, ['http.https://github.com/.extraheader']);
-    git('config', '--unset', 'http.https://github.com/.extraheader');
-
-    assert.equal(fs.existsSync(path.join(repo, 'fgos/git')), false);
-    addon.initializeGitWal(temp, repo, repo);
-    assert.equal(addon.inspectGit(temp, repo, repo).journal.initialized, true);
     fs.mkdirSync(path.join(repo, 'fgos/events/locks'), { recursive: true, mode: 0o700 });
     port = createGitPublication({ stateRoot: temp, repoPath: repo, trustedMain: repo, reference: 'refs/fgos/events/fixture', writer: 'fixture' }, options);
     const refspecs = addon.gitFetchMappings('origin');
@@ -279,31 +255,7 @@ test('inspection leaves WAL absent; setup and mapping use the shared Rust config
     addon.ensureGitFetchMapping(temp, repo, repo, 'origin', refspecs, 'mapping-two');
     assert.equal(git('config', '--get-all', 'remote.origin.fetch'), installed);
     assert.equal(port.fetchMappingProvenance({ remote: 'origin' }).remoteUrl, '/fixture/remote');
-    const after = addon.inspectGit(temp, repo, repo);
-    assert.equal(after.journal.pendingCount, 0);
-    assert.equal(after.fetchRefspecs.length, 4);
-    fs.writeFileSync(path.join(repo, 'config.lock'), 'native owner');
-    assert.deepEqual(addon.inspectGit(temp, repo, repo).nativeLocks, ['config.lock']);
-    assert.equal(fs.readFileSync(path.join(repo, 'config.lock'), 'utf8'), 'native owner');
-    const pinDir = path.join(repo, 'refs', 'fgos', 'git-operations', 'op-1');
-    fs.mkdirSync(pinDir, { recursive: true });
-    fs.writeFileSync(path.join(pinDir, 'candidate.lock'), '');
-    assert.deepEqual(addon.inspectGit(temp, repo, repo).nativeLocks, ['config.lock', 'refs/fgos/git-operations/op-1/candidate.lock']);
-    assert.ok(fs.existsSync(path.join(pinDir, 'candidate.lock')));
   } finally { port?.close(); fs.rmSync(temp, { recursive: true, force: true }); }
-});
-
-test('native lock inspection includes symlink residue in a linked worktree git directory', { skip: process.platform === 'win32' }, () => {
-  const temp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-linked-lock-'));
-  const main = path.join(temp, 'main'), linked = path.join(temp, 'linked');
-  try {
-    execFileSync('git', ['init', '-q', main]);
-    execFileSync('git', ['-C', main, '-c', 'user.name=fixture', '-c', 'user.email=fixture@example.invalid', 'commit', '--allow-empty', '-qm', 'fixture']);
-    execFileSync('git', ['-C', main, 'worktree', 'add', '-q', '--detach', linked]);
-    const gitDir = execFileSync('git', ['-C', linked, 'rev-parse', '--absolute-git-dir'], { encoding: 'utf8' }).trim();
-    fs.symlinkSync(path.join(temp, 'missing'), path.join(gitDir, 'index.lock'));
-    assert.ok(addon.inspectGit(temp, linked, main).nativeLocks.includes('index.lock'));
-  } finally { fs.rmSync(temp, { recursive: true, force: true }); }
 });
 
 test('Windows lock-taking addon doors refuse by name before resolving paths', { skip: process.platform !== 'win32' }, () => {
@@ -312,7 +264,7 @@ test('Windows lock-taking addon doors refuse by name before resolving paths', { 
   assert.throws(() => addon.ensureGitFetchMapping('missing-state', 'missing-repo', 'missing-main', 'origin', ['+refs/fgos/events/*:refs/fgos/remotes/origin/events/*'], 'test'), /git-lockscope-unavailable-windows/);
 });
 
-test('umask 002 driver directories are created safely, repaired by the driver preparation, and refused without chmod by an inspection', { skip: process.platform === 'win32' }, () => {
+test('umask 002 driver directories are created safely, repaired by the driver preparation', { skip: process.platform === 'win32' }, () => {
   const temp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-driver-umask-'));
   const probe = `
     const assert = require('node:assert/strict');
@@ -332,17 +284,16 @@ test('umask 002 driver directories are created safely, repaired by the driver pr
     fs.mkdirSync(path.join(old, 'git-empty-hooks'));
     assert.equal(mode(old), 0o775);
     process.env.FGOS_STATE_ROOT = old;
-    assert.throws(() => addon.inspectGit(old, root, root, 'origin'), error => /mode 0775.*group.world writable.*fgos doctor --fix.*git-driver-directories/.test(error.message));
     assert.equal(mode(old), 0o775);
     assert.equal(addon.prepareGitDriverDirectories(old), true);
     assert.equal(mode(old), 0o755);
     assert.equal(mode(path.join(old, 'git-empty-hooks')), 0o500);
-    assert.equal(addon.inspectGit(old, root, root, 'origin').notARepository, true);
+    // A read through the driver writes its floor record into the prepared state root.
+    addon.readGitStatus(old, root);
     assert.equal(mode(root), 0o700);
     const {execFileSync} = require('node:child_process');
     const repo = path.join(root, 'repo');
     execFileSync('git', ['init', '-q', repo]);
-    const inspect = (state = old) => addon.inspectGit(state, repo, repo, 'origin');
 
     const other = path.join(root, 'other');
     fs.mkdirSync(other);
@@ -350,7 +301,6 @@ test('umask 002 driver directories are created safely, repaired by the driver pr
     fs.symlinkSync(old, link);
     assert.equal(addon.prepareGitDriverDirectories(link), false);
     process.env.FGOS_STATE_ROOT = link;
-    assert.equal(inspect(link).notARepository, undefined);
     fs.chmodSync(old, 0o775);
     assert.equal(addon.prepareGitDriverDirectories(link), true);
     assert.equal(mode(old), 0o755);
@@ -367,7 +317,6 @@ test('umask 002 driver directories are created safely, repaired by the driver pr
     fs.unlinkSync(path.join(hooks, 'foreign'));
     fs.chmodSync(hooks, 0o000);
     if (process.getuid() !== 0) {
-      assert.throws(() => inspect(), error => error.message.includes(hooks) && /restore owner read.search.*doctor --fix/.test(error.message));
       assert.throws(() => addon.prepareGitDriverDirectories(old), error => error.message.includes(hooks) && /restore owner read.search.*doctor --fix/.test(error.message));
     }
     fs.chmodSync(hooks, 0o700);
@@ -382,7 +331,6 @@ test('umask 002 driver directories are created safely, repaired by the driver pr
     const custom = path.join(root, 'custom');
     fs.mkdirSync(custom, {mode:0o700});
     process.env.FGOS_STATE_ROOT = custom;
-    assert.equal(inspect(custom).notARepository, undefined);
     fs.copyFileSync(path.join(old, 'git-floor-verdict.json'), path.join(custom, 'git-floor-verdict.json'));
     fs.chmodSync(custom, 0o775);
     assert.equal(addon.prepareGitDriverDirectories(custom), true);

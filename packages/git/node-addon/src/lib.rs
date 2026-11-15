@@ -6,9 +6,9 @@ pub use event_store::{
 };
 mod git;
 pub use git::{
-    close_git_loan, ensure_git_fetch_mapping, git_fetch_mappings, initialize_git_wal, inspect_git,
-    inspect_git_worktree_recovery, mint_git_loan, prepare_git_driver_directories, read_git_status,
-    recover_git_operations, take_git_handover,
+    close_git_loan, ensure_git_fetch_mapping, git_fetch_mappings, inspect_git_worktree_recovery,
+    mint_git_loan, prepare_git_driver_directories, read_git_status, recover_git_operations,
+    take_git_handover,
 };
 pub mod agent_protocol;
 pub mod canonical_json;

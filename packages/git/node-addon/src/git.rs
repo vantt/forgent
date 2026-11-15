@@ -330,45 +330,6 @@ pub fn admit_store_access(request: Value) -> Result<Value> {
     )
 }
 
-/// Inspection never acquires event-seal or initializes a repository WAL.
-#[napi]
-pub fn inspect_git(
-    state_root: String,
-    repo_path: String,
-    trusted_main: String,
-    remote: Option<String>,
-) -> Result<Value> {
-    check()?;
-    let driver = GitDriver::new(Path::new(&state_root)).map_err(operation)?;
-    repository_facts::inspect_repository(
-        &driver,
-        Path::new(&repo_path),
-        Path::new(&trusted_main),
-        remote.as_deref().unwrap_or("origin"),
-    )
-    .map(|inspection| inspection.to_json())
-    .map_err(fact_error)
-}
-#[napi]
-pub fn initialize_git_wal(
-    state_root: String,
-    repo_path: String,
-    trusted_main: String,
-) -> Result<()> {
-    check()?;
-    let driver = GitDriver::new(Path::new(&state_root)).map_err(operation)?;
-    match driver
-        .resolve_repo(Path::new(&repo_path), Path::new(&trusted_main))
-        .map_err(operation)?
-    {
-        ResolveRepo::Repository(repo) => {
-            wal::Wal::open(&repo).map_err(error)?;
-            Ok(())
-        }
-        ResolveRepo::NotARepository => Err(error("not-a-repository")),
-    }
-}
-
 /// Repository configuration has its own rank-80 authority, independent of a seal.
 #[napi]
 pub fn ensure_git_fetch_mapping(
