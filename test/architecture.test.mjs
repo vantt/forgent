@@ -1976,8 +1976,7 @@ test('door check: every name of the retired Node Git and Event Store doctor rows
 // A row or fix given to `bridge:<step>` is judged by Node until that step moves the layer it reads. `judge` records
 // the Node modules the row reads and `layers` the step that removes each: the label may not be earlier than a layer
 // the row reads. (An import closure over the manifest cannot say it: a named upward port makes nearly every row
-// reach the Work layer, and a judge kept in a tier-0 file reaches nothing.) `bridge:S4` rows move to Rust inside the
-// packaging step and may not outlive it.
+// reach the Work layer, and a judge kept in a tier-0 file reaches nothing.)
 
 const DOCTOR_REGISTRY = JSON.parse(fs.readFileSync(path.join(root, 'packages/distribution/contracts/doctor-registry.v1.json'), 'utf8'));
 
@@ -2011,8 +2010,8 @@ test('doctor registry: a label before a layer, a layer with no step, a row with 
   assert.deepEqual(bridgeFailures([entry('early', 'bridge:S6b', ['src/state/store.mjs'])], layers), ['row early: labelled bridge:S6b but reads src/state/store.mjs, which stays in Node until S7']);
   assert.deepEqual(bridgeFailures([entry('unlisted', 'bridge:S7', ['src/state/other.mjs'])], layers), ['row unlisted: reads src/state/other.mjs, which has no step in layers']);
   assert.deepEqual(bridgeFailures([entry('silent', 'bridge:S7')], layers), ['row silent: reads no recorded layer and gives no note saying why']);
-  assert.deepEqual(bridgeFailures([entry('odd', 'bridge:S3', [])], layers), ['row odd: bridge:S3 names no step (S4, S5, S6a, S6b, S7)']);
-  assert.deepEqual(bridgeFailures([], { 'src/gone.mjs': 'S5', 'src/state/store.mjs': 'S9' }, (module) => module !== 'src/gone.mjs'), ['layer src/gone.mjs: no such file (drop it from layers)', 'layer src/state/store.mjs: S9 names no step (S4, S5, S6a, S6b, S7)']);
+  assert.deepEqual(bridgeFailures([entry('odd', 'bridge:S3', [])], layers), ['row odd: bridge:S3 names no step (S5, S6a, S6b, S7)']);
+  assert.deepEqual(bridgeFailures([], { 'src/gone.mjs': 'S5', 'src/state/store.mjs': 'S9' }, (module) => module !== 'src/gone.mjs'), ['layer src/gone.mjs: no such file (drop it from layers)', 'layer src/state/store.mjs: S9 names no step (S5, S6a, S6b, S7)']);
 });
 
 test('door rows of the doctor registry, the Node rows bridge and Node from the packaging verbs reject a second path and accept their own', () => {

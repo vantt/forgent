@@ -3,17 +3,19 @@
 ```txt
 Document type: Contract
 Audience: Maintainer, implementation agent, reviewer
-Purpose: Define the doctor/fix registry contract and legacy setup compatibility used by packaging-distribution
+Purpose: Define the doctor/fix registry contract used by packaging-distribution (the retired `fgos setup` is a history line in section 4)
 Design status: Draft
 Implementation status: Implemented
 Canonical: Yes, after review
 Owner: Platform documentation
 Source type: Promoted from docs/specs/distribution.md and src/setup/**
-Last reviewed: 2026-09-13
+Last reviewed: 2026-11-16
 Related:
-- src/setup/checks.mjs
+- packages/distribution/contracts/doctor-registry.v1.json
+- packages/distribution/rust/src/doctor.rs
+- apps/fgos/src/wiring/doctor/
+- src/setup/doctor-bridge.mjs
 - src/setup/registrations.mjs
-- bin/fgos.mjs
 - test/setup/registrations.test.mjs
 Implementation: Original section-specific implementation statements retained; provenance does not certify current implementation
 Provenance: Existing area document plus source-detail carriage at 77830ba77eb05991d95b005919776ee6254e833b
@@ -29,9 +31,7 @@ Superseded by: None recorded
 
 The doctor/fix registry is the extension point for environment readiness: whether fgOS can run correctly on this machine and in this project (RUL109 of the spec). It is not an incident console and not a linter of the fgOS repository; section 3 says where those judgments live. Modules register checks and fixes instead of adding one-off repair logic. Config defaults are not registered: the standard (`core/config-standard`) holds every default and the schemas (`core/config-schema`) every shape rule, read through the config door.
 
-Target architecture has no separate `fgos setup` verb for workspace onboarding. `fgctl init` is the one-command workspace onboarding orchestrator; after activation it invokes active local `fgos init`, `fgos doctor --fix`, and `fgos doctor --json`; the last result is the closing block on stdout: `Ready` and one runnable next step with exit 0 when `ok`, otherwise a numbered list of the failing checks with their fixes and exit 2, the table's `precondition` (the release stays activated). `fgos init` also gives the project and the machine their header-only `config.yaml`. `fgos init` also recovers interrupted Git operations as its last, fail-safe step, through the function `fgos git recover` runs. Legacy shell/global integration remains compatibility behavior under the explicit deprecated fallback window: 30 calendar days after preview release publication, unless a later release decision replaces that policy.
-
-Current Node `fgos setup` remains implemented as deprecated legacy compatibility and consumes the same registry while it exists.
+There is no `fgos setup` verb (retired, section 4). `fgctl init` is the one-command workspace onboarding orchestrator; after activation it invokes active local `fgos init`, `fgos doctor --fix`, and `fgos doctor --json`; the last result is the closing block on stdout: `Ready` and one runnable next step with exit 0 when `ok`, otherwise a numbered list of the failing checks with their fixes and exit 2, the table's `precondition` (the release stays activated). `fgos init` also gives the project and the machine their header-only `config.yaml`. `fgos init` also recovers interrupted Git operations as its last, fail-safe step, through the function `fgos git recover` runs. Legacy shell/global integration remains compatibility behavior under the explicit deprecated fallback window: 30 calendar days after preview release publication, unless a later release decision replaces that policy.
 
 ## 2. Registry Types
 
@@ -40,7 +40,7 @@ The registry itself is one contract file, `packages/distribution/contracts/docto
 | Body registry (Node, bridged rows only) | Function | Meaning |
 | --- | --- | --- |
 | Check | `registerCheck` | The body of a row the registry gives to `bridge:<step>`, keyed by its id. |
-| Fix | `registerFix` | The body of a fix the registry gives to `bridge:<step>`; current legacy `fgos setup` also runs fixes while it remains implemented. |
+| Fix | `registerFix` | The body of a fix the registry gives to `bridge:<step>`. |
 
 The `eventStore` section's standard values (`seal.intervalSec`, `seal.coalesceSec`, `sync.intervalSec`, `rebuild.maxAttempts`, `remote`) live in `core/config-standard/eventStore.yaml` with its shape in `core/config-schema/eventStore.schema.yaml`; `EVENT_STORE_DEFAULTS` in `src/event-store/config.mjs` names the same values and a test pins that they agree. `seal.coalesceSec` (default 30, an integer of at least 1) is the runner's seal batching window, and a malformed value fails every Event Store doctor row with `event-store-config: invalid seal.coalesceSec`. The `eventStore.remote` default (`origin`) is the standard's; the `git-repository-config` check diagnoses obsolete exact legacy mappings on the configured remote and on historical `origin`, and the `git-publication-refspecs` fix repairs them.
 
@@ -132,17 +132,9 @@ skips without a pin or an activation. The pin moves at each official release
 - reports fix results;
 - then reports checks.
 
-## 4. Legacy Setup Compatibility
+## 4. Retired `fgos setup`
 
-Current legacy `fgos setup` is deprecated but still reachable:
-
-- wires known local support such as shell integration and hooks where applicable;
-- creates a header-only project and machine config file when none exists (`fgos config init`); it seeds no default;
-- runs every registered fix unconditionally;
-- reports changes;
-- preserves idempotency when run repeatedly.
-
-The command registry and setup result payload expose the deprecation and workspace-onboarding path. This is implemented behavior, not the target architecture. New distribution design should route workspace onboarding through `fgctl init` plus local `fgos init`/`doctor --fix`/`doctor`, while preserving `fgos setup` as the legacy shell/global integration path through the 30-day preview fallback window unless a later release decision replaces that behavior. Removing the command entirely remains gated by that release-policy window, not by implementation-side inference.
+`fgos setup` was retired on 2026-11-16 (program step S4): it answers "unknown verb" (exit 4) like any unknown verb, and `fgos setup --help` and `fgos setup --pretty` do too. The condition this section used to carry, the 30-day preview fallback window, ended on 2026-10-18. With the verb went the shell-rc source line it wrote, the retired runner-config conversion, its copy of the release's skills into a project, and the doctor row `shell-integration-sourced`. Onboard a project with `fgctl init`; repair it with `fgos doctor --fix`. Existing rc lines keep working (the integration script still ships) and `fgos uninstall` names them. History: packaging spec "Lịch sử quyết định", 2026-11-16.
 
 ## 5. Config Merge Contract
 
@@ -162,9 +154,11 @@ Doctor/fix paths may repair environment readiness only; an incident is repaired 
 
 | Claim | Evidence |
 | --- | --- |
-| Checks/fixes/defaults are registered through open registries | `src/setup/checks.mjs`, `src/setup/registrations.mjs`, `test/setup/registrations.test.mjs` |
-| Doctor default path is read-only | `bin/fgos.mjs`, `test/setup/*.test.mjs` |
-| Doctor fix runs registered fixes | `src/setup/registrations.mjs`, `bin/fgos.mjs`, `test/setup/*.test.mjs` |
+| One registry lists every row and fix with its owner, and Node's bridged bodies equal the registry's bridged ids | `packages/distribution/contracts/doctor-registry.v1.json`, `apps/fgos/src/wiring/doctor/mod.rs` and `test/setup/registrations.test.mjs` (exact-set tests both sides) |
+| The engine derives status, `ok`, `next`, fix sequencing and `--strict` | `packages/distribution/rust/src/doctor.rs` unit tests |
+| Doctor default path is read-only and starts no lifecycle child | `apps/fgos/tests/cli_tests.rs`, `test/setup/doctor-fresh-run.test.mjs` |
+| Doctor fix runs registered fixes in registry order, bridged fixes in one call per consecutive segment | `apps/fgos/src/wiring/doctor/bridge.rs` tests, `test/setup/doctor-bridge.test.mjs` |
+| A bridged row is labelled no earlier than the layers its judge reads | `test/architecture.test.mjs` (import-closure test), `docs/architecture-manifest.json` rows "doctor readiness registry" and "Node rows bridge" |
 | Project config overrides global config | `src/config/global-config.mjs` (deleted in 38361f01d), `test/config/global-config.test.mjs` (deleted in 38361f01d) |
 
 ## 8. Open Follow-Up
@@ -173,7 +167,7 @@ The exact list of registered checks/fixes changes over time. This contract shoul
 
 ## Registered inventory
 
-This canonical inventory is checked against the live registry by `test/setup/registrations.test.mjs`; the legacy distribution Data Dictionary is a historical projection.
+The registry file `packages/distribution/contracts/doctor-registry.v1.json` is the inventory of record (rows and fixes in run order, each with its owner); the lists below are a snapshot checked against it by `test/setup/registrations.test.mjs`, and the legacy distribution Data Dictionary is a historical projection.
 
 Today's registered checks: `account-probe-timer`, `activation-matches-pin`, `active-release-matches-checkout`, `agent-cli-project-trusted`, `agent-type-names-unique`, `agy-hook-wired`, `agy-permissions-configured`, `agy-sub-homes-configured`, `blind-steps-use-proven-pools`, `bwrap-available`, `capability-serves-valid`, `claude-plugin-marketplace`, `cli-version-visible`, `codex-hook-wired`, `config-comment-migrated-why`, `config-comment-missing-doc`, `config-comment-missing-why`, `config-doc-drift`, `config-format-legacy-json`, `config-global-permissions`, `config-key-in-wrong-file`, `config-legacy-shadowed`, `config-migrate-backup-stale`, `config-parse`, `config-redundant-value`, `config-schema`, `config-secret-outside-private`, `config-unknown-key`, `confined-pane-accounts`, `confinement-backend-registry-readable`, `confinement-blind-read`, `confinement-bwrap-platform`, `confinement-herdr-maturity`, `confinement-orphaned-resources-reaped`, `confinement-policies-declared`, `confinement-probe-freshness`, `confinement-strict-readiness`, `credential-copies-retained`, `curl-available`, `delivered-not-on-trunk`, `dispatch-decide-hook-wired`, `domain-registry-compiled`, `event-store-incidents`, `event-store-legacy-layout`, `event-store-machine-id`, `event-store-open-root`, `executor-confinement`, `executor-family-unique`, `executor-profile-warnings`, `executor-skills-installed`, `gateway-token-configured`, `git-component-compatible`, `git-incidents`, `git-operation-journal`, `git-repository-config`, `herdr-executor-kinds`, `identity-machine-id`, `identity-machine-key`, `identity-project-id`, `identity-shared-directory`, `identity-ssh-keygen`, `invocation-git-write-grants`, `leaf-notify-drift`, `legacy-node-payload-present`, `llm-accounts-shape`, `llm-accounts-vs-legacy`, `lock-borrow-vectors`, `lock-holders`, `lock-kernel-semantics`, `mailbox-claude-accept`, `mailbox-hook`, `mailbox-sync-timer`, `main-checkout-hook-wired`, `model-policy-pools`, `node-version-and-git`, `non-claude-trust-stores-readable`, `observe-dir-writable`, `observe-host-resolvable`, `omp-hook-wired`, `omp-natives-present`, `operation-prompt-templates-valid`, `pi-hook-wired`, `project-fgos-launcher`, `provider-capacity-state`, `root-drift`, `run-attempts-stuck`, `run-supervisor-config`, `run-supervisor-route`, `runner-generated-paths`, `runner-patterns-config`, `runtime-socket-dir`, `rust-host-binary-present`, `rust-host-target-supported`, `seat-binding-dry-bind`, `seat-binding-route`, `session-keep-declared`, `terminal-allocations`, `terminal-control`, `tier-fallback`, `tool-registry-configured`, `trust-store-readable`, `work-classification-vocabulary`, `work-recorded-conflicts`, `work-step-vocabulary`, `worker-slots-ceiling-usable`, `workflow-capabilities-configured`, `workflow-case-binding-sentinel`, `workflow-case-bindings`, `writer-identity-resolvable`. This list changes with the corresponding registrations`.
 
@@ -221,6 +215,8 @@ Distribution rules and recorded decisions are retained below; the area specifica
 
 ##### Setup
 
+> **Retired 2026-11-16.** `fgos setup` no longer exists (section 4). The scenario below is kept as the history of what it did; the doctor's fixes and `fgctl init` now carry the parts that survive (lock directories, config files, hooks). The shell-rc source line, the skill copy into a project and the runner-config conversion ended with it.
+
 - **Blocked when:** never — running `fgos setup` always attempts its work;
   a shell profile that does not exist is simply skipped rather than
   refused.
@@ -264,5 +260,5 @@ Distribution rules and recorded decisions are retained below; the area specifica
 - **Side effects:** none.
 - **Afterwards:** the caller sees each named check (Data Dictionary #7) and
   whether it passed, including enough detail to know what to do next (e.g.
-  which config settings are missing, or that `fgos setup` has not been run
-  yet).
+  which config settings are missing, or the command that repairs them,
+  `fgos doctor --fix`).

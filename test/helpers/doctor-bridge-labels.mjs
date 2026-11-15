@@ -4,10 +4,9 @@
 // The registry records, per bridged row, the Node modules it reads (`judge`) and, once per module, the step that
 // removes it (`layers`). The label may not be earlier than any layer the row reads; it may be later, because a
 // row can also read a layer through a function the list does not name (a note says so when there is no list).
-// `S4` is a step too: a row labelled with it moves inside the packaging step and may not outlive it.
 
 /** The order of the steps; a later step removes its layers later. */
-export const STEP_ORDER = ['S4', 'S5', 'S6a', 'S6b', 'S7'];
+export const STEP_ORDER = ['S5', 'S6a', 'S6b', 'S7'];
 
 /**
  * Failures of the bridged entries. Each `entries` item is `{ kind, id, owner, judge?, note? }`; `layers` maps a

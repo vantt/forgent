@@ -42,15 +42,16 @@ The spec is written for current behavior and near-term accepted target behavior.
 | `fgctl upgrade` | Implemented preview | Moves a workspace activation to a new release chosen by `--from` > `FGCTL_FROM` > `FGCTL_VERSION` > the latest GitHub release (checksum-verified against `SHA256SUMS` when downloaded), records the previous release for rollback, and updates `.fgos/distribution.json` (including `releaseVersion` when downloaded). Then it replaces the running `fgctl` with the one the activated release ships when their bytes differ, keeping the old binary as `<path>.prev` (RUL110 (a release ships its `fgctl` and `fgctl upgrade` installs it)). |
 | `fgctl repair` | Implemented preview | Repairs a workspace installation under the selected release model; current preview proof covers repair after activation. |
 | `fgctl uninstall` | Implemented | Removes what fgOS installed in the project and keeps the person's config and data; `--dry-run`, `--yes`, `--purge` (6.1). |
-| `fgos uninstall` | Implemented | The project half of `fgctl uninstall`: reverses the project wiring from one plan; without `--yes` it prints the plan and exits 0 (6.1). |
+| `fgos uninstall` | Implemented | The project half of `fgctl uninstall`, in the host: reverses the project wiring from one plan; without `--yes` it prints the plan and exits 0 (6.1). |
+| `fgos wire-agents` | Implemented | Opt-in, in the host: installs the fgOS plugin into the agents present on the machine and backs up each file it changes (RUL111). |
 | `.fgos/installation/bin/fgos` | Implemented preview | Stable workspace command surface after activation; current preview proof reports `host: "rust"` and the activated `artifactDigest`. |
 | `.fgos/installation/bin/fgos.cmd`, `fgos-runner.cmd` | Implemented preview | The same stable surface for PowerShell and `cmd.exe`, written by `fgctl init`/`repair` next to the `sh` pair and needing no POSIX shell; `fgctl verify` reports a missing or edited launcher and `fgctl repair` regenerates it. |
 | `npm install -g github:vantt/forgent` | Retired (3.2) | Not an install channel: it ships no native addon; `fgos init` there refuses and points to `fgctl init`. |
 | `scripts/fgos-shell-integration.sh` | Implemented | Contributor/dev helper that resolves fgOS command tiers from shell functions. |
-| local `fgos init` | Partial target | Adopts/materializes workspace state after `fgctl` publishes a ready activation. |
-| `fgos doctor` | Implemented | Answers whether fgOS can run on this machine and in this project (readiness only, RUL109 (doctor answers readiness only; incidents and repo rules live elsewhere)) without writing by default; a live incident is a read-only pointer row naming its component's own verb. |
+| `fgos init` | Implemented | Runs in the host (no Node process except the Work-store step, which goes through the rows bridge on Linux until the Work layer moves): adopts/materializes workspace state after `fgctl` publishes a ready activation. |
+| `fgos doctor` | Implemented | Runs in the host over one registry (`packages/distribution/contracts/doctor-registry.v1.json`); answers whether fgOS can run on this machine and in this project (readiness only, RUL109 (doctor answers readiness only; incidents and repo rules live elsewhere)) without writing by default; a live incident is a read-only pointer row naming its component's own verb. |
 | `fgos doctor --fix` | Implemented | Runs registered readiness fixes and then reports checks; it repairs no incident (RUL109 (doctor answers readiness only; incidents and repo rules live elsewhere)). |
-| `fgos setup` | Implemented deprecated legacy compatibility | Wires local development support and runs registered environment repairs in the current Node CLI; command surfaces point workspace onboarding to `fgctl init` plus local `fgos doctor --fix`/`fgos doctor`, while shell/global integration remains compatibility behavior through the 30-day preview fallback window unless a later release decision replaces it. |
+| `fgos setup` | Retired (2026-11-16) | Answers "unknown verb" (exit 4) like any unknown verb. Onboard with `fgctl init`; repair with `fgos doctor --fix` (6). |
 
 ## 3. Install Channels
 
@@ -133,9 +134,9 @@ The decision index unions committed rows with local state (state wins by scope a
 
 Repository, workspace, worker-capsule, release-store, and projection layout boundaries belong to `contracts/repository-runtime-layout.md`. The spec should not inline the full tree; the contract is the source for layout details.
 
-## 6. Doctor, Fix, And Legacy Setup
+## 6. Doctor And Fix
 
-The target architecture has no separate setup verb for workspace onboarding. One-command workspace onboarding is `fgctl init`; after publishing the ready workspace activation, `fgctl` invokes the active local runtime tail:
+There is no setup verb (`fgos setup` was retired, 2026-11-16). One-command workspace onboarding is `fgctl init`; after publishing the ready workspace activation, `fgctl` invokes the active local runtime tail:
 
 ```txt
 local fgos init
@@ -143,16 +144,9 @@ local fgos doctor --fix
 local fgos doctor
 ```
 
-`fgctl init` therefore wires the agent hooks (through the registered fixes of `doctor --fix`) and writes no config defaults of its own; `fgos setup` is not a step of onboarding. `fgctl init` ends on the last doctor report: `Ready: fgOS <tag> active (<digest12>)` plus `Next: fgos run "<prompt>"` with exit 0 when `ok` is true, otherwise `<N> checks need you:` and one numbered line per failing check (its fix command, or its message when only a person can fix it) with exit 2 (`precondition`); it has no `--yes` flag. The tail's own exit status stays 0 whatever the checks say, so a tail that crashes is told apart from one that found checks to fix. A `.fgos/distribution.json` that exists but is not a pin stops `fgctl init` with exit 4 (`validation`) before anything is fetched; `fgctl --help` and `fgctl init --help` list 2 and 4 beside 0 and 1, and `apps/fgctl/tests/cli_surface.rs` checks those numbers against `packages/host-runtime/contracts/exit-codes.v1.json`. `fgctl`'s own usage-error exit stays 2, which is also the table's `precondition` code.
+`fgctl init` therefore wires the agent hooks (through the registered fixes of `doctor --fix`) and writes no config defaults of its own. `fgctl init` ends on the last doctor report: `Ready: fgOS <tag> active (<digest12>)` plus `Next: fgos run "<prompt>"` with exit 0 when `ok` is true, otherwise `<N> checks need you:` and one numbered line per failing check (its fix command, or its message when only a person can fix it) with exit 2 (`precondition`); it has no `--yes` flag. The tail's own exit status stays 0 whatever the checks say, so a tail that crashes is told apart from one that found checks to fix. A `.fgos/distribution.json` that exists but is not a pin stops `fgctl init` with exit 4 (`validation`) before anything is fetched; `fgctl --help` and `fgctl init --help` list 2 and 4 beside 0 and 1, and `apps/fgctl/tests/cli_surface.rs` checks those numbers against `packages/host-runtime/contracts/exit-codes.v1.json`. `fgctl`'s own usage-error exit stays 2, which is also the table's `precondition` code.
 
-Current legacy `fgos setup` remains implemented and deprecated in the Node CLI and still:
-
-- wires shell/helper and hook support where applicable;
-- fills missing config defaults without overwriting customized values;
-- applies both project-local and global config default handling;
-- runs every registered fix unconditionally, using the same fix registry as `doctor --fix`;
-- reports what changed;
-- exposes a deprecation path in command help, command manifest JSON, and setup result payloads.
+`fgos doctor` and `fgos init` run in the Rust host. Doctor has one registry, `packages/distribution/contracts/doctor-registry.v1.json`, listing every row and fix in run order with its `owner`: `rust:<component>` (judged in process by that component's crate through an adapter under `apps/fgos/src/wiring/doctor/`) or `bridge:<step>` (the row's layer is still written in Node; the step, S5, S6a, S6b or S7, is the one that moves it). The engine is `fgos-distribution::doctor` (status, fix attribution, `ok`, `next`, `--strict`, the JSON envelope and `--pretty`). The rows of bridged layers run in **one bounded Node rows bridge**, `src/setup/doctor-bridge.mjs`, which the host starts through the legacy payload path (no verb, no route): one call per consecutive run of bridged fixes and one for all bridged checks, in exact registry order; when Node is missing, fails or times out, each bridged row is `fail` with the cause and `fix: null`, and the doctor still answers. A bridged row leaves the bridge when its step moves the layer; S7 deletes the bridge. `fgos init` composes the same Rust owners and uses the bridge only for the Work-store step. Node stays required until S6 (owner answer Q2 = (b): `requires.node` and the `fgctl init` preflight stay).
 
 `fgos doctor`:
 
@@ -170,7 +164,7 @@ Current legacy `fgos setup` remains implemented and deprecated in the Node CLI a
 - uses named fix registrations rather than ad hoc command-specific repair logic;
 - repairs no incident: Git recovery is `fgos git recover` (also run by `fgos init`), stuck run attempts are adopted by the next `fgos run`, and the other incident verbs are named by the pointer rows.
 
-Exact registry behavior and legacy setup compatibility belong to `contracts/setup-doctor-registry.md`.
+Exact registry behavior belongs to `contracts/setup-doctor-registry.md`.
 
 `fgos setup` and the `*-hook-wired` fixes render the agent guard hooks from one table (`src/setup/agent-hooks.mjs`): Claude Code `.claude/settings.json`, Codex `.codex/hooks.json`, agy `.agents/hooks.json` and the OMP and Pi extensions. Besides the dispatch and decision-question guards, every CLI gets the main-checkout delete guard (`fgos hook main-checkout-delete-guard`) before each shell tool call. It refuses a command that would mass-delete inside the main checkout of a fgOS project (a directory with a `.git` directory and a `.fgos` directory): `git clean` with `-x` or `-X`, `xargs ... rm`, `rm -r` of the checkout root, an ancestor of it or a top-level `.fgos`, `.claude`, `target` or `node_modules`, and `find ... -delete` or `-exec rm` under it; the inner command of `xargs` and `find -exec` is unwrapped, and a shell's script (its `-c` operand, or a heredoc or here-string fed to it) is judged too, while a shell reading its script from a pipe is refused in a main checkout. `rm -r` of a deeper path such as `.fgos/installation` is a named delete and stays allowed. It resolves the directory from the payload's cwd, every `cd` and `git -C`; a `cd` joined by `;`, `||` or a newline keeps the old directory in play, because the shell continues there when the `cd` fails; `NAME=literal` and `export NAME=literal` are followed. A directory or operand it cannot resolve (a variable, a command substitution, `cd -`) is refused where the command may run in a main checkout. A linked worktree and single named files stay allowed. The refusal names `fgos worktree remove <path> --delivered-to <ref> --discard-ignored` and `git -C <linked-worktree>`. It is a guard against accidents, not a sandbox: a command built to evade a shell reader (an alias, `${IFS}`, a script file) passes. Every CLI answers a call that cannot be refused before it starts the shim (starting it costs about 170 ms of node per shell call): one keyword list in `src/setup/agent-hooks.mjs` (`deleteGuardPrefilter`) is rendered as a `case` over the payload in the Claude Code command, as the same script under `/bin/sh -c` in the Codex and agy commands (agy gets its `allow` decision on stdout for a skipped call), and as a regular expression inside the omp and pi extension before it spawns the shim. The list covers `rm`, `xargs`, `clean`, `-delete`, `eval` and every shell name the guard unwraps, and the guard's own test runs each refusal it asserts through it. The judgement is `src/git/main-checkout-delete-guard.mjs`.
 
@@ -182,9 +176,9 @@ Exact registry behavior and legacy setup compatibility belong to `contracts/setu
 2. `.fgos/installation/` goes, after its two records are copied to `.fgos/uninstall-backup-<time>/`;
 3. with `--purge`, the release store entries go: only the entries of `releases/`, `quarantine/` and `installs/` whose names have the shape fgOS gave them, then each of those directories when nothing foreign keeps it. The rest of the machine state root (`identity/`, `locks/`, `machine-id`) is not release data and stays. Other projects pinned to a purged release need `fgctl init`.
 
-A failed step makes every later irreversible step skip. A link is refused, never followed, in any component of a path it reaches; a root that is not absolute, contains `..`, or is `/`, `$HOME` or an ancestor of `$HOME` or of the project is refused. With an activation but no runnable shim the plan says to run `fgctl repair` and `--yes` changes nothing (exit 1).
+A failed step makes every later irreversible step skip. A link is refused, never followed, in any component of a path it reaches; a root that is not absolute, contains `..`, or is `/`, `$HOME` or an ancestor of `$HOME` or of the project is refused. `fgos uninstall` itself refuses, before it reads or removes anything, a project root that is `/`, `$HOME` or a directory that contains `$HOME`, as a `precondition` refusal (exit 2). With an activation but no runnable shim the plan says to run `fgctl repair` and `--yes` changes nothing (exit 1).
 
-Kept: `.fgos` data and `config.yaml`, the committed `.fgos/distribution.json` (so `fgctl init` can bring fgOS back) and the person's shell profile. Named but never removed: the `fgctl` binary, the `fgos` launcher beside it, a shell-rc line from legacy `setup`, and global agent config changed by `fgos wire-agents` (the plan prints `claude plugin uninstall fgOS@fgos-plugins`, `claude plugin marketplace remove fgos-plugins` and the backup note, because `wire-agents` records no ledger to undo it from). Source: `packages/distribution/rust/src/uninstall.rs` (`fgctl`), `apps/fgos/src/wiring/uninstall.rs` (the project half, `fgos uninstall`, composed from `agent_hooks.rs`, `skill_stamp.rs`, `timer.rs`, `rc_lines.rs` and RepositoryConfig); proofs the unit tests in both files, `apps/fgos/tests/cli_tests.rs`, `apps/fgctl/tests/uninstall_surface.rs` and `test/rust-host/fgctl-uninstall.test.mjs`.
+Kept: `.fgos` data and `config.yaml`, the committed `.fgos/distribution.json` (so `fgctl init` can bring fgOS back) and the person's shell profile. Named but never removed: the `fgctl` binary, the `fgos` launcher beside it, a shell-rc line the retired `setup` wrote, and global agent config changed by `fgos wire-agents` (the plan prints `claude plugin uninstall fgOS@fgos-plugins`, `claude plugin marketplace remove fgos-plugins` and the backup note, because `wire-agents` records no ledger to undo it from). Source: `packages/distribution/rust/src/uninstall.rs` (`fgctl`), `apps/fgos/src/wiring/uninstall.rs` (the project half, `fgos uninstall`, composed from `agent_hooks.rs`, `skill_stamp.rs`, `timer.rs`, `rc_lines.rs` and RepositoryConfig); proofs the unit tests in both files, `apps/fgos/tests/cli_tests.rs`, `apps/fgctl/tests/uninstall_surface.rs` and `test/rust-host/fgctl-uninstall.test.mjs`.
 
 ## 6.2 Command Surface And Exit Codes
 
@@ -253,9 +247,9 @@ The hard contract is merge policy, not Markdown rendering. Composition must reso
 
 Exact instruction unit fields, rule force, composition order, conflict rules, effective instruction set, and doctor/fix obligations belong to `contracts/instruction-composition-and-projection.md`.
 
-## Legacy Setup Scenario
+## Retired Setup Scenario
 
-The complete scenario has one holder: [Setup and doctor registry — Setup](contracts/setup-doctor-registry.md#setup). This spec does not keep a second copy.
+`fgos setup` is retired (2026-11-16). The scenario it had keeps one holder, marked retired: [Setup and doctor registry — Setup](contracts/setup-doctor-registry.md#setup); the retirement itself is [section 4 of that contract](contracts/setup-doctor-registry.md#4-retired-fgos-setup). This spec does not keep a second copy.
 
 ## Dependency Upgrade Discipline
 
