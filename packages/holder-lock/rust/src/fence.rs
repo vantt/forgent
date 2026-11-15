@@ -209,6 +209,33 @@ fn outcome_name(outcome: SignalOutcome) -> &'static str {
     }
 }
 
+/// The refusal of a signal. Holders signalled before it keep the signal they were sent, so the message names them.
+fn signal_refused(
+    holder: &Holder,
+    signal: Signal,
+    outcome: SignalOutcome,
+    already_sent: &[Holder],
+) -> FenceError {
+    let earlier = if already_sent.is_empty() {
+        String::new()
+    } else {
+        format!(
+            "; already sent {}: pid {}",
+            signal_name(signal),
+            pids(already_sent)
+        )
+    };
+    named(
+        "lock-fence-signal-refused",
+        format!(
+            "pid {} refused {}: {}{earlier}",
+            holder.pid,
+            signal_name(signal),
+            outcome_name(outcome)
+        ),
+    )
+}
+
 /// Who was sent `signal`, and who has no such signal on this platform (`unsupported`: Windows has no graceful
 /// one). A holder that is no longer the recorded process was sent nothing and needs no signal; any other refusal
 /// is named.
@@ -222,15 +249,7 @@ fn send_all(holders: &[Holder], signal: Signal) -> Result<(Vec<Holder>, Vec<Hold
             }
             SignalOutcome::IdentityMismatch | SignalOutcome::NotFound => {}
             other => {
-                return Err(named(
-                    "lock-fence-signal-refused",
-                    format!(
-                        "pid {} refused {}: {}",
-                        holder.pid,
-                        signal_name(signal),
-                        outcome_name(other)
-                    ),
-                ))
+                return Err(signal_refused(holder, signal, other, &sent));
             }
         }
     }
@@ -273,7 +292,18 @@ fn terminate_holders(
         .collect();
     let waited = wait_until_gone(still_holding, askable, TERM_WAIT_MS);
     let to_kill: Vec<Holder> = unsupported.into_iter().chain(waited).collect();
-    let (killed, _) = send_all(&to_kill, Signal::Kill)?;
+    let (killed, _) = send_all(&to_kill, Signal::Kill).map_err(|err| match err {
+        FenceError::Named {
+            code,
+            message,
+            listing,
+        } if !sent.is_empty() => FenceError::Named {
+            code,
+            message: format!("{message}; already sent term: pid {}", pids(&sent)),
+            listing,
+        },
+        other => other,
+    })?;
     let left = wait_until_gone(still_holding, to_kill, KILL_WAIT_MS);
     Ok(Terminated {
         terminated: sent.iter().map(|holder| holder.pid).collect(),
@@ -514,6 +544,8 @@ fn fence_hot(request: &FenceRequest) -> Result<FenceResult, FenceError> {
             ),
         ));
     }
+    // A dead holder's record is labelled `attested-free` whether or not the caller attested, as the verb has
+    // always printed it (the parity table pins it).
     let status = if holders_now.is_empty() {
         "attested-free"
     } else {
@@ -1002,6 +1034,28 @@ mod tests {
         .unwrap();
         assert!(started.elapsed() < Duration::from_secs(1));
         assert!(ended.terminated.is_empty() && ended.killed.is_empty() && ended.left.is_empty());
+    }
+
+    #[test]
+    fn a_refused_signal_names_the_holders_already_signalled() {
+        let mut child = sleeper();
+        let first = Holder::of_tuple(
+            &fgos_process::facts::identity_of(fgos_process::ProcId(child.id())).unwrap(),
+        );
+        // A holder from another PID namespace cannot be signalled from here: its identity cannot be checked.
+        let mut foreign = first.clone();
+        foreign.pid += 1;
+        foreign.record.pid_ns = Some("pid:[1]".into());
+        foreign.record.pid = Some(fgos_process::ProcId(foreign.pid));
+        let err = send_all(&[first.clone(), foreign.clone()], Signal::Term).unwrap_err();
+        assert_eq!(
+            err.to_string(),
+            format!(
+                "holder-lock (lock-fence-signal-refused): pid {} refused term: identity-unknown; already sent term: pid {}",
+                foreign.pid, first.pid
+            )
+        );
+        child.wait().unwrap();
     }
 
     #[test]

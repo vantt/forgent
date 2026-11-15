@@ -69,6 +69,14 @@ driver is `.fgos/runtime/tmp/lock-parity.test.mjs` (untracked, not committed). L
 
 `fgos lock fence` without `--yes` lists the holders and refuses (exit 2), on a terminal too; it no longer asks `Stop these processes? [y/N]`. Rerun the call with `--yes` to fence them.
 
+## Accepted changes (differences from the base release)
+
+- `lock fence` without `--yes` refuses (exit 2) on a terminal too; the `[y/N]` prompt is gone.
+- A missing or unknown sub-command (`lock`, `lock unlock`) is the host's one text, exit 4.
+- `fgos lock fence dispatch-cwd --param cwd=<dir>` on Windows: the `<cwdDevIno>` key (dev, ino, birth time of the directory) is computed on unix only in Rust, so there the param is reported `lock-path-param-missing`; Node computed it. The row's holders are unlistable on Windows anyway.
+- A refused signal after earlier holders were already signalled now names those holders in the message (`; already sent term: pid ...`).
+- A dead holder's hot record is still labelled `attested-free` without `--attest-stopped`, as Node prints it; the parity case `hot-record-dead-holder` pins that label.
+
 ## Concerns / for the step lead
 
 1. `src/state/hot-lock.mjs` `clearHotRecord` has no production caller left (only `hot-lock-tx.test.mjs`). Retiring it fully means deleting the addon binding
@@ -77,7 +85,7 @@ driver is `.fgos/runtime/tmp/lock-parity.test.mjs` (untracked, not committed). L
 2. `docs/platform/holder-lock/spec.md` section 17 point 2 ("It asks the person to confirm") is now stale, plus `docs/reading-map.md` and the route counts: phase 11's doc pass.
 3. New file `apps/fgos/src/wiring/lock_fence.rs` and one line in `wiring/mod.rs` are not in the plan's Create/Modify list; the provider cannot live in `holder-lock` (no host-runtime edge).
 4. `catalog.rs` count assertion is now 17; phases 02 and 04 add their own operations, so the number needs a recount at the second landing.
-5. `cwdDevIno` (for `--param cwd=` on `dispatch-cwd`) is unix only in Rust; on Windows the param is reported missing (Node computed it there). The row is unlistable there anyway.
+5. `cwdDevIno` unix-only: recorded under accepted changes.
 6. A fence call blocks the host's single thread while it waits (up to 8 s); fine for a one-shot verb, same as Node's event loop wait.
 
 Status: DONE_WITH_CONCERNS

@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "936b0acb7f993593b316a940923c1827334f6b9a41a53d025e5009fb02481466",
+  "payloadDigest": "f6f42eac5d07ca16142c66ec559696abf61f56fff030884a77e48b37acef79bf",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "a5629383f89b4488b252a62f0ea86463e649e33e0a891db1a19af2cd6c136aca",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -454,7 +454,7 @@
     "packages/holder-lock/rust/src/driver/flock.rs": "2d7b0d728a9f4153a56c93c27b44b89b1601705abed150c0702b6b4e8659ffc1",
     "packages/holder-lock/rust/src/driver/mod.rs": "450b05d8d0616b73c2ed8356913e8cc88767d14c0a35f2a33b981398baef0da1",
     "packages/holder-lock/rust/src/driver/windows.rs": "3ac02f1bb7fcac9d43f4ffa889fce4db6dfb467e8b851535c984de1c0dc78762",
-    "packages/holder-lock/rust/src/fence.rs": "4a6cf7c6902602c6f1a62b36617bff8c250dc93725ef7f0872a0d7fc695a2d24",
+    "packages/holder-lock/rust/src/fence.rs": "d679ec525a729b627e1b9248553e5685f8238166d33a01efcecb9998a931f55d",
     "packages/holder-lock/rust/src/helper.rs": "11c8764215d951d460a6d2c7bc52e679eb928fcf91eab4f9533406a59c632b24",
     "packages/holder-lock/rust/src/hot_record.rs": "eabfeb63df4eb278ce92282d41f2f1f6027a3ddc8fee145c867c19b4962a8e99",
     "packages/holder-lock/rust/src/lib.rs": "cb538b39114fadca751ce641a7c25a7382c9d813ffe6697a28392b3c4274f509",
