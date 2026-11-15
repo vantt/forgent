@@ -142,6 +142,7 @@ test('R1 & R2: Release tree builder stages release tree and produces canonical m
     assert.ok(fs.existsSync(path.join(legacyNodeDir, 'bin', 'fgos-runner.mjs')), 'bin/fgos-runner.mjs must exist in legacy-node');
     assert.ok(fs.existsSync(path.join(legacyNodeDir, 'package.json')), 'package.json must exist in legacy-node');
     assert.ok(fs.existsSync(path.join(legacyNodeDir, 'src', 'setup', 'registrations.mjs')), 'src/ must be staged intact in legacy-node');
+    assert.ok(fs.existsSync(path.join(legacyNodeDir, 'src', 'setup', 'doctor-bridge.mjs')), 'the rows bridge the host starts for the Node-owned doctor rows must be staged in legacy-node');
     assert.ok(
       fs.existsSync(path.join(legacyNodeDir, 'packages', 'convention', 'contracts', 'convention.rules.v1.json')),
       'Convention rule data read by the installed identifier rules must be staged in legacy-node',

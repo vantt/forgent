@@ -108,6 +108,8 @@ const CHANGING_CLAUDE_CALLS = (calls) => calls.filter((args) => args[0] === 'plu
 function runFgos(cwd, args, env) {
   // boundary: the claim is about what the init, setup, doctor --fix and wire-agents verbs write as whole
   // processes under one HOME; the verb cases in bin/fgos.mjs have no use case to call in process.
+  // `doctor` is the host's verb, run through the host binary the test launcher staged.
+  if (args[0] === 'doctor') return spawnSync(process.env.FGOS_HOST_BIN, args, { cwd, encoding: 'utf8', env });
   return spawnSync(process.execPath, [FGOS, ...args], { cwd, encoding: 'utf8', env });
 }
 

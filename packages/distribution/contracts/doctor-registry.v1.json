@@ -4,7 +4,10 @@
   "groups": {
     "config": {
       "contract": "packages/config/contracts/doctor-rows.v1.json",
-      "owner": "bridge:S5",
+      "owner": "bridge:S4",
+      "judge": [
+        "src/setup/config-checks.mjs"
+      ],
       "idMap": {
         "config-machine-files": "gateway-token-configured"
       },
@@ -21,235 +24,420 @@
     {
       "id": "node-version-and-git",
       "description": "Node >=18 and git available",
-      "owner": "bridge:S7"
+      "owner": "bridge:S4",
+      "judge": [
+        "src/setup/git-checks.mjs"
+      ]
     },
     {
       "id": "cli-version-visible",
       "description": "the running fgOS's own package version and git commit resolve cleanly",
-      "owner": "bridge:S7"
+      "owner": "bridge:S4",
+      "judge": [
+        "src/setup/version-info.mjs"
+      ]
     },
     {
       "id": "shell-integration-sourced",
       "description": "shell-integration source line present in detected rc file(s)",
-      "owner": "bridge:S7"
+      "owner": "bridge:S4",
+      "judge": [
+        "src/runner/paths.mjs",
+        "src/setup/bin-discovery.mjs",
+        "src/setup/shell-rc.mjs"
+      ]
     },
     {
       "id": "project-fgos-launcher",
       "description": "a release install has a single fgos on PATH that runs each project's own activated fgos",
-      "owner": "bridge:S7"
+      "owner": "bridge:S4",
+      "judge": [
+        "src/runner/paths.mjs",
+        "src/setup/project-launcher.mjs"
+      ]
     },
     {
       "id": "runner-generated-paths",
       "description": "runner.generatedPaths maps generated sources to render targets with well-formed write-scope entries",
-      "owner": "bridge:S7"
+      "owner": "bridge:S6a",
+      "judge": [
+        "src/config/facade.mjs",
+        "src/runner/dispatch/config.mjs"
+      ]
     },
     {
       "id": "runner-patterns-config",
       "description": "project and global runner patterns configuration is present, well-formed, and cumulative",
-      "owner": "bridge:S7"
+      "owner": "bridge:S6b",
+      "judge": [
+        "src/config/facade.mjs",
+        "src/runner/dispatch/config.mjs",
+        "src/runner/dispatch/runner-config-error.mjs",
+        "src/runner/dispatch/shipped-catalog.mjs",
+        "src/runner/execution/capability-config.mjs",
+        "src/runner/execution/patterns/catalog-entries.mjs",
+        "src/runner/execution/patterns/catalog.mjs",
+        "src/runner/execution/patterns/retired-keys.mjs",
+        "src/setup/config-checks.mjs",
+        "src/setup/project-launcher.mjs",
+        "src/setup/runner-config-conversion.mjs",
+        "src/setup/workflow-catalog-reader.mjs",
+        "src/util/yaml.mjs"
+      ]
     },
     {
       "id": "executor-family-unique",
       "description": "each agent family (providerModel) is served by exactly one executor; its transports are invocations of that executor",
-      "owner": "bridge:S7"
+      "owner": "bridge:S6a",
+      "judge": [
+        "src/setup/model-pool-checks.mjs"
+      ]
     },
     {
       "id": "executor-skills-installed",
       "description": "every skill an executor declares in supports.skills exists in the skill directory of each CLI the executor invokes, in the main checkout; fails naming the missing path",
-      "owner": "bridge:S7"
+      "owner": "bridge:S6a",
+      "judge": [
+        "src/setup/model-pool-checks.mjs"
+      ]
     },
     {
       "id": "tier-fallback",
       "description": "every family runner.tierFallback lists for a tier has a modelPolicies cell at that tier and an agent executor; warns otherwise",
-      "owner": "bridge:S7"
+      "owner": "bridge:S6a",
+      "judge": [
+        "src/setup/model-pool-checks.mjs"
+      ]
     },
     {
       "id": "model-policy-pools",
       "description": "every pool a runner.modelPolicies cell names (model@pool) is declared in runner.llmAccounts, since a pool with no account is skipped by the walk; warns otherwise",
-      "owner": "bridge:S7"
+      "owner": "bridge:S6a",
+      "judge": [
+        "src/setup/model-pool-checks.mjs"
+      ]
     },
     {
       "id": "llm-accounts-shape",
       "description": "runner.llmAccounts is global-only and well formed: pool names without \"@\" or a family alias, every account with a credentialStore directory per CLI",
-      "owner": "bridge:S7"
+      "owner": "bridge:S6a",
+      "judge": [
+        "src/setup/model-pool-checks.mjs"
+      ]
     },
     {
       "id": "llm-accounts-vs-legacy",
       "description": "when runner.llmAccounts is declared, it carries the same accounts and login directories as runner.providers, which the lease still reads for a pool llmAccounts does not declare; warns otherwise",
-      "owner": "bridge:S7"
+      "owner": "bridge:S6a",
+      "judge": [
+        "src/setup/model-pool-checks.mjs"
+      ]
     },
     {
       "id": "domain-registry-compiled",
       "description": "every compiled.json of the running fgOS's domains (the form the Work lifecycle reads) exists, parses, carries the contract this fgOS reads and matches its registry and workflow YAML",
-      "owner": "bridge:S7"
+      "owner": "bridge:S4",
+      "judge": [
+        "src/util/domain-compile.mjs"
+      ]
     },
     {
       "id": "agent-type-names-unique",
       "description": "agent definition names are unique in the project's own tiers (the workspace tier, and the core tier when the project ships one); a higher tier replaces a lower one whole, and workspace-tier files have the shape the renderer needs; the installed fgOS's own domain and core tiers are judged by npm test",
-      "owner": "bridge:S7"
+      "owner": "bridge:S6a",
+      "judge": [
+        "src/runner/agent-definitions.mjs",
+        "src/runner/agent-listing.mjs",
+        "src/runner/dispatch/assignment-layout.mjs"
+      ]
     },
     {
       "id": "main-checkout-hook-wired",
       "description": "core.hooksPath wired to .githooks (main-checkout kernel lock check, borrowed through the description, and source-checkout new-root-file guards)",
-      "owner": "bridge:S7"
+      "owner": "bridge:S4",
+      "judge": [
+        "src/runner/paths.mjs",
+        "src/setup/git-hooks.mjs"
+      ]
     },
     {
       "id": "dispatch-decide-hook-wired",
       "description": ".claude/settings.json PreToolUse hooks enforce dispatch.mjs decide on every Agent/Task call, the decision-question template and the main-checkout delete guard on every Bash call",
-      "owner": "bridge:S7"
+      "owner": "bridge:S4",
+      "judge": [
+        "src/setup/agent-hooks.mjs"
+      ]
     },
     {
       "id": "codex-hook-wired",
       "description": ".codex/hooks.json PreToolUse hooks enforce dispatch.mjs decide, the decision-question template and the main-checkout delete guard",
-      "owner": "bridge:S7"
+      "owner": "bridge:S4",
+      "judge": [
+        "src/setup/agent-hooks.mjs"
+      ]
     },
     {
       "id": "agy-hook-wired",
       "description": ".agents/hooks.json PreToolUse hooks enforce dispatch.mjs decide, the decision-question template and the main-checkout delete guard",
-      "owner": "bridge:S7"
+      "owner": "bridge:S4",
+      "judge": [
+        "src/setup/agent-hooks.mjs"
+      ]
     },
     {
       "id": "omp-hook-wired",
       "description": ".omp/extensions/fgos-hooks.ts in-process extension enforces dispatch.mjs decide, the decision-question template and the main-checkout delete guard",
-      "owner": "bridge:S7"
+      "owner": "bridge:S4",
+      "judge": [
+        "src/setup/agent-hooks.mjs"
+      ]
     },
     {
       "id": "pi-hook-wired",
       "description": ".pi/extensions/fgos-hooks.ts in-process extension enforces dispatch.mjs decide, the decision-question template and the main-checkout delete guard",
-      "owner": "bridge:S7"
+      "owner": "bridge:S4",
+      "judge": [
+        "src/setup/agent-hooks.mjs"
+      ]
     },
     {
       "id": "tool-registry-configured",
       "description": "tool registry posture — inactive/degraded/full",
-      "owner": "bridge:S7"
+      "owner": "bridge:S6a",
+      "judge": [
+        "src/config/facade.mjs",
+        "src/runner/dispatch/tool-providers.mjs",
+        "src/runner/paths.mjs"
+      ]
     },
     {
       "id": "agy-permissions-configured",
       "description": "when agy is on PATH, the person's own agy settings.json lets headless agy run commands under a deny list; report only, fgOS never widens it (fgos wire-agents shows the edit)",
-      "owner": "bridge:S7"
+      "owner": "bridge:S4",
+      "judge": [
+        "src/setup/agy-permissions.mjs"
+      ]
     },
     {
       "id": "agy-sub-homes-configured",
       "description": "agy sub-HOMEs referenced in executor configs have settings.json configured with toolPermission: always-proceed",
-      "owner": "bridge:S7"
+      "owner": "bridge:S6a",
+      "judge": [
+        "src/runner/dispatch/config.mjs",
+        "src/setup/agy-permissions.mjs"
+      ]
     },
     {
       "id": "curl-available",
       "description": "curl resolves on PATH (fgctl init downloads releases through it); a missing curl only blocks the download paths",
-      "owner": "bridge:S7"
+      "owner": "bridge:S4",
+      "judge": []
     },
     {
       "id": "bwrap-available",
       "description": "bwrap binary resolves on PATH and minimal smoke test (bwrap --ro-bind / / -- true) exits 0",
-      "owner": "bridge:S7"
+      "owner": "bridge:S4",
+      "judge": []
     },
     {
       "id": "work-classification-vocabulary",
       "description": "every open item's risk/kind matches its domain's declared classification vocabulary",
-      "owner": "bridge:S7"
+      "owner": "bridge:S7",
+      "judge": [
+        "src/runner/paths.mjs",
+        "src/state/domain-registry.mjs",
+        "src/state/frontier.mjs",
+        "src/state/replay.mjs",
+        "src/state/store.mjs"
+      ]
     },
     {
       "id": "work-step-vocabulary",
       "description": "every open item sits at a step its own domain's Workflow still registers — no item stranded on a retired step",
-      "owner": "bridge:S7"
+      "owner": "bridge:S7",
+      "judge": [
+        "src/runner/paths.mjs",
+        "src/state/domain-registry.mjs",
+        "src/state/frontier.mjs",
+        "src/state/replay.mjs",
+        "src/state/store.mjs"
+      ]
     },
     {
       "id": "work-recorded-conflicts",
       "description": "the Work view holds no recorded cross-machine conflicts: acknowledged changes a concurrent change from another machine kept from applying (warns, never fails)",
-      "owner": "bridge:S7"
+      "owner": "bridge:S7",
+      "judge": [
+        "src/runner/paths.mjs",
+        "src/state/replay.mjs",
+        "src/state/store.mjs"
+      ]
     },
     {
       "id": "root-drift",
       "description": "every fgw/<root> branch is in sync with its real target — no unsynced drift left over from a leaf merge",
-      "owner": "bridge:S7"
+      "owner": "bridge:S7",
+      "judge": [
+        "src/runner/paths.mjs",
+        "src/runner/worktree.mjs",
+        "src/state/drift-status.mjs",
+        "src/state/replay.mjs",
+        "src/state/store.mjs"
+      ]
     },
     {
       "id": "leaf-notify-drift",
       "description": "every live session branch has no post-land drift against its target",
-      "owner": "bridge:S7"
+      "owner": "bridge:S7",
+      "judge": [
+        "src/runner/paths.mjs",
+        "src/runner/worktree.mjs",
+        "src/state/postland-drift.mjs",
+        "src/state/replay.mjs",
+        "src/state/store.mjs"
+      ]
     },
     {
       "id": "delivered-not-on-trunk",
       "description": "every item whose status says its work was handed over has its fgw/<id> branch reachable from the trunk",
-      "owner": "bridge:S7"
+      "owner": "bridge:S7",
+      "judge": [
+        "src/runner/paths.mjs",
+        "src/runner/worktree.mjs",
+        "src/state/drift-status.mjs",
+        "src/state/replay.mjs",
+        "src/state/store.mjs"
+      ]
     },
     {
       "id": "provider-capacity-state",
       "description": "provider-capacity account leases/quarantine state is reportable; doctor never auto-clears quarantine",
-      "owner": "bridge:S7"
+      "owner": "bridge:S6a",
+      "judge": [
+        "src/config/facade.mjs",
+        "src/runner/dispatch/provider-capacity.mjs"
+      ]
     },
     {
       "id": "lock-kernel-semantics",
       "description": "the holder-lock driver gives kernel lock exclusion on <fgosDir>/locks and <lockRoot>, proven by a two-process probe on each mount",
-      "owner": "bridge:S7"
+      "owner": "bridge:S4",
+      "judge": [
+        "src/setup/holder-lock-checks.mjs"
+      ]
     },
     {
       "id": "lock-borrow-vectors",
       "description": "a lock description borrowed by a git child never leaks to a background process (fgos internal lock-borrow-vectors)",
-      "owner": "bridge:S7"
+      "owner": "bridge:S4",
+      "judge": [
+        "src/setup/holder-lock-checks.mjs"
+      ]
     },
     {
       "id": "lock-holders",
       "description": "read-only pointer: foreign lock holders, predecessor domains still running and hot records that need a person are read by fgos lock-status",
-      "owner": "bridge:S7",
+      "owner": "bridge:S4",
+      "judge": [
+        "src/setup/holder-lock-checks.mjs"
+      ],
       "pointer": true
     },
     {
       "id": "run-supervisor-route",
       "description": "the host binary serves supervise, gate, adopt and attempt-step at protocol 1 and names the containment driver agents run in and its level (kernel or best-effort)",
-      "owner": "bridge:S7"
+      "owner": "bridge:S4",
+      "judge": [
+        "src/setup/run-supervisor-checks.mjs"
+      ]
     },
     {
       "id": "runtime-socket-dir",
       "description": "the runtime socket directory exists, is owned by this user and is 0700",
-      "owner": "bridge:S7"
+      "owner": "bridge:S4",
+      "judge": [
+        "src/setup/run-supervisor-checks.mjs"
+      ]
     },
     {
       "id": "run-attempts-stuck",
       "description": "read-only pointer: attempts with no closed.json and no lock holder, an attempt whose release was removed named with what to restore; the next fgos run adopts them, or run fgos dispatch recover (a warning, never a failure)",
-      "owner": "bridge:S7",
+      "owner": "bridge:S4",
+      "judge": [
+        "src/setup/run-supervisor-checks.mjs"
+      ],
       "pointer": true
     },
     {
       "id": "run-supervisor-config",
       "description": "dispatch.gateKillGraceMs and dispatch.cancelWaitMs read through the config door (each at least 1000 ms) and the cancel wait is not shorter than the grace",
-      "owner": "bridge:S7"
+      "owner": "bridge:S4",
+      "judge": [
+        "src/setup/run-supervisor-checks.mjs"
+      ]
     },
     {
       "id": "mailbox-hook",
       "description": "agent mailbox: whether this project opted in to the mailbox hook rows (mailbox.enabled), and when it did, the record verdict from fgos mailbox status",
-      "owner": "bridge:S7",
+      "owner": "bridge:S4",
+      "judge": [
+        "src/runner/paths.mjs",
+        "src/setup/mailbox-limits.mjs",
+        "src/util/host-bin.mjs"
+      ],
       "pointer": true
     },
     {
       "id": "mailbox-claude-accept",
       "description": "agent mailbox: whether the Claude Code user settings accept cross-session input (crossSessionInbound), which decides if mail wakes an idle Claude session; report only, fgOS never sets it",
-      "owner": "bridge:S7"
+      "owner": "bridge:S4",
+      "judge": [
+        "src/setup/mailbox-claude-accept.mjs"
+      ]
     },
     {
       "id": "mailbox-sync-timer",
       "description": "agent mailbox: when cross-machine mail is on, an OS timer runs the mailbox sync child every eventStore.sync.intervalSec, so mail is taken on a machine where no session runs a tool",
-      "owner": "bridge:S7"
+      "owner": "bridge:S4",
+      "judge": [
+        "src/setup/managed-timer.mjs"
+      ]
     },
     {
       "id": "account-probe-timer",
       "description": "account health: when dispatch.probeAccount.intervalSec is set, an OS timer runs fgos dispatch probe-account --all --record --leg direct every that many seconds, so an exhausted or logged-out account is found between runs; off (0) by default",
-      "owner": "bridge:S7"
+      "owner": "bridge:S4",
+      "judge": [
+        "src/setup/managed-timer.mjs"
+      ]
     },
     {
       "id": "workflow-capabilities-configured",
       "description": "every capability a core/domain Workflow unit names is declared in runner.capabilities",
-      "owner": "bridge:S7"
+      "owner": "bridge:S6b",
+      "judge": [
+        "src/config/facade.mjs",
+        "src/runner/execution/capability-config.mjs",
+        "src/setup/workflow-catalog-reader.mjs"
+      ]
     },
     {
       "id": "capability-serves-valid",
       "description": "runner.capabilities' \"serves\" attribute sets are mutually distinct (I19); the schema states their shape",
-      "owner": "bridge:S7"
+      "owner": "bridge:S4",
+      "judge": [
+        "src/config/facade.mjs",
+        "src/runner/execution/capability-config.mjs"
+      ]
     },
     {
       "id": "worker-slots-ceiling-usable",
       "description": "workerSlots.ceiling is either a positive integer or explicitly null (a malformed value silently enforces nothing)",
-      "owner": "bridge:S7"
+      "owner": "bridge:S7",
+      "judge": [
+        "src/config/facade.mjs",
+        "src/state/worker-slots.mjs"
+      ]
     },
     {
       "group": "config"
@@ -257,343 +445,600 @@
     {
       "id": "claude-plugin-marketplace",
       "description": "fgOS Claude Code plugin marketplace is registered and the fgOS plugin is installed/enabled; report only, fgos wire-agents installs it",
-      "owner": "bridge:S7"
+      "owner": "bridge:S4",
+      "judge": [
+        "src/setup/agent-wiring.mjs"
+      ]
     },
     {
       "id": "operation-prompt-templates-valid",
       "description": "every operation prompt template in the project tier (.fgos/prompt-templates) validates against bounded variables and schema; the release's domain and core templates are judged by npm test",
-      "owner": "bridge:S7"
+      "owner": "bridge:S6a",
+      "judge": [
+        "src/runner/dispatch/operation-prompt-templates.mjs"
+      ]
     },
     {
       "id": "terminal-control",
       "description": "the terminal-control driver (herdr) answers, which capabilities it declares and which server it talks to, and terminal.* after the config merge with each value and its source; a bad FGOS_HERDR_ANCHOR_PANE or terminal.* value fails, a missing herdr only warns",
-      "owner": "bridge:S7"
+      "owner": "bridge:S6a",
+      "judge": [
+        "src/setup/terminal-control-checks.mjs"
+      ]
     },
     {
       "id": "terminal-allocations",
       "description": "terminal slots past allocationGraceMs that never launched and retained panes past their time; reports only, closes nothing",
-      "owner": "bridge:S7",
+      "owner": "bridge:S6a",
+      "judge": [
+        "src/setup/terminal-control-checks.mjs"
+      ],
       "pointer": true
     },
     {
       "id": "omp-natives-present",
       "description": "omp's native addon for its installed version is in the natives directory omp resolves (a confined omp cannot extract it); fails only when an executor runs omp, warns when omp is missing or unused; readiness only, no repair",
-      "owner": "bridge:S7"
+      "owner": "bridge:S6a",
+      "judge": [
+        "src/runner/dispatch/config.mjs",
+        "src/setup/omp-natives-checks.mjs"
+      ]
     },
     {
       "id": "herdr-executor-kinds",
       "description": "every executor dispatched through a herdr pane names an agent kind herdr can start, and none depends on an outdated herdr integration hook",
-      "owner": "bridge:S7"
+      "owner": "bridge:S6a",
+      "judge": [
+        "src/runner/dispatch/config.mjs",
+        "src/runner/dispatch/transport.mjs",
+        "src/terminal-control/client.mjs"
+      ]
     },
     {
       "id": "executor-profile-warnings",
       "description": "legacy executor entries hardcoding policy-shaped flags or account-pool-like env, each named with its documented migration target",
-      "owner": "bridge:S7"
+      "owner": "bridge:S6a",
+      "judge": [
+        "src/runner/dispatch/config.mjs",
+        "src/setup/executor-profile-warnings.mjs"
+      ]
     },
     {
       "id": "session-keep-declared",
       "description": "read-only pointer: confined agent invocations that declare no session directory keep no seat transcript; fgos dispatch probe-session <executorId> shows where the CLI writes it (a warning, never a failure; doctor never runs the probe)",
-      "owner": "bridge:S7",
+      "owner": "bridge:S6a",
+      "judge": [
+        "src/runner/dispatch/config.mjs",
+        "src/setup/session-keep-declared.mjs"
+      ],
       "pointer": true
     },
     {
       "id": "trust-store-readable",
       "description": "the agent folder-trust store is readable and carries a usable \"projects\" object, so a dispatch into a fresh worktree can be pre-trusted instead of stopping at a dialog",
-      "owner": "bridge:S7"
+      "owner": "bridge:S4",
+      "judge": [
+        "src/run-supervisor/trust-store.mjs",
+        "src/runner/paths.mjs"
+      ]
     },
     {
       "id": "confined-pane-accounts",
       "description": "every confined invocation that reads a login store has an account in the global provider inventory with at least one of that store's credential files, so its agent starts logged in",
-      "owner": "bridge:S7"
+      "owner": "bridge:S6a",
+      "judge": [
+        "src/config/facade.mjs",
+        "src/runner/dispatch/config.mjs",
+        "src/runner/dispatch/llm-accounts.mjs",
+        "src/runner/dispatch/provider-capacity.mjs",
+        "src/runner/paths.mjs",
+        "src/setup/config-checks.mjs"
+      ]
     },
     {
       "id": "non-claude-trust-stores-readable",
       "description": "every executor or invocation declaring a codex-toml or agy/agy-json trustStore reads from a store that is actually readable, the same read a live dispatch will do",
-      "owner": "bridge:S7"
+      "owner": "bridge:S6a",
+      "judge": [
+        "src/run-supervisor/trust-store.mjs",
+        "src/runner/dispatch/config.mjs"
+      ]
     },
     {
       "id": "agent-cli-project-trusted",
       "description": "the project root is trusted in every codex home and agy sub-HOME the configured executors run under, so a headless dispatch does not stop at a \"Trust this folder?\" prompt",
-      "owner": "bridge:S7"
+      "owner": "bridge:S6a",
+      "judge": [
+        "src/runner/dispatch/config.mjs",
+        "src/setup/agent-cli-trust.mjs"
+      ]
     },
     {
       "id": "seat-binding-dry-bind",
       "description": "every seat of every Workflow unit, and every core capability (execute, code:implement, any capability declaring an agent pool) as a writing producer, binds under the committed config in a fixed headless session (no lease, nothing started); a policy refusal or a pool with no executor able to carry the confinement posture fails, no pool, account state, tier caps and shared families are information",
-      "owner": "bridge:S7"
+      "owner": "bridge:S6b",
+      "judge": [
+        "src/runner/dispatch/config.mjs",
+        "src/setup/seat-binding-checks.mjs"
+      ]
     },
     {
       "id": "blind-steps-use-proven-pools",
       "description": "every blind Workflow unit can only bind executors whose provider family and transport were proven to keep a worker blind (read-only, no model call)",
-      "owner": "bridge:S7"
+      "owner": "bridge:S6b",
+      "judge": [
+        "src/runner/dispatch/config.mjs",
+        "src/setup/blind-steps-proven-pools.mjs"
+      ]
     },
     {
       "id": "executor-confinement",
       "description": "no executor declares \"permissionMode\": \"bypass\" without privateHome, isolatedSession and ownWorktree all true",
-      "owner": "bridge:S7"
+      "owner": "bridge:S6a",
+      "judge": [
+        "src/runner/dispatch/config.mjs"
+      ]
     },
     {
       "id": "invocation-git-write-grants",
       "description": "warns when an executor or invocation still grants git add/git commit to a worker through --allowedTools (the runner commits; workers hold no git write grant)",
-      "owner": "bridge:S7"
+      "owner": "bridge:S6a",
+      "judge": [
+        "src/runner/dispatch/config.mjs"
+      ]
     },
     {
       "id": "rust-host-binary-present",
       "description": "the active release's entries.fgos binary exists and is executable",
-      "owner": "bridge:S7"
+      "owner": "bridge:S4",
+      "judge": [
+        "src/runner/paths.mjs",
+        "src/util/host-bin-path.mjs",
+        "src/util/release-binary-path.mjs"
+      ]
     },
     {
       "id": "rust-host-target-supported",
       "description": "current OS and architecture is an approved target for the fgos rust host (x86_64-unknown-linux-gnu, x86_64-pc-windows-msvc)",
-      "owner": "bridge:S7"
+      "owner": "bridge:S4",
+      "judge": [
+        "src/util/release-targets.mjs"
+      ]
     },
     {
       "id": "legacy-node-payload-present",
       "description": "the legacy node payload components.legacyNode.root/entry resolves to a real file",
-      "owner": "bridge:S7"
+      "owner": "bridge:S4",
+      "judge": [
+        "src/runner/paths.mjs",
+        "src/util/host-bin-path.mjs"
+      ]
     },
     {
       "id": "active-release-matches-checkout",
       "description": "activated legacy Node payload matches this source checkout working tree (not Rust freshness)",
-      "owner": "bridge:S7"
+      "owner": "bridge:S4",
+      "judge": [
+        "scripts/build-rust-distribution.mjs",
+        "src/git/inspect.mjs",
+        "src/runner/paths.mjs",
+        "src/util/host-bin-path.mjs",
+        "src/util/refuse-symlink.mjs"
+      ]
     },
     {
       "id": "activation-matches-pin",
       "description": "the active release is the one the committed .fgos/distribution.json pin names (warns when it differs)",
-      "owner": "bridge:S7"
+      "owner": "bridge:S4",
+      "judge": [
+        "src/runner/paths.mjs",
+        "src/util/host-bin-path.mjs",
+        "src/util/refuse-symlink.mjs"
+      ]
     },
     {
       "id": "confinement-policies-declared",
       "description": "confinement policies referenced by capabilities exist in built-ins or runner.confinementPolicies",
-      "owner": "bridge:S7"
+      "owner": "bridge:S6a",
+      "judge": [
+        "src/config/facade.mjs",
+        "src/runner/dispatch/confinement/policies.mjs",
+        "src/runner/execution/capability-config.mjs"
+      ]
     },
     {
       "id": "confinement-backend-registry-readable",
       "description": "machine backend registry file exists and conforms to confinement-backend-registry.v1 schema",
-      "owner": "bridge:S7"
+      "owner": "bridge:S6a",
+      "judge": [
+        "src/runner/dispatch/confinement/backend-registry.mjs"
+      ]
     },
     {
       "id": "confinement-orphaned-resources-reaped",
       "description": "confinement temp roots are owner-only and no dispatch home is left behind by a dead process",
-      "owner": "bridge:S7"
+      "owner": "bridge:S6a",
+      "judge": [
+        "src/runner/dispatch/confinement/backend-registry.mjs",
+        "src/runner/dispatch/confinement/cleanup.mjs"
+      ]
     },
     {
       "id": "credential-copies-retained",
       "description": "no login copy (pending, scratch, or a kept private home) that may hold the only valid refresh token is left unapplied",
-      "owner": "bridge:S7"
+      "owner": "bridge:S6a",
+      "judge": [
+        "src/config/facade.mjs",
+        "src/runner/dispatch/confinement/backend-registry.mjs",
+        "src/runner/dispatch/confinement/cleanup.mjs",
+        "src/runner/dispatch/provider-capacity.mjs",
+        "src/runner/dispatch/provider-credential-renewal.mjs",
+        "src/setup/config-checks.mjs"
+      ]
     },
     {
       "id": "confinement-bwrap-platform",
       "description": "bwrap backend instance configured in machine registry is enabled and its executable is verified on Linux",
-      "owner": "bridge:S7"
+      "owner": "bridge:S6a",
+      "judge": [
+        "src/runner/dispatch/confinement/backend-registry.mjs"
+      ]
     },
     {
       "id": "confinement-probe-freshness",
       "description": "confinement probe freshness status (runs the falsification probe harness against the registered bwrap backend)",
-      "owner": "bridge:S7"
+      "owner": "bridge:S6a",
+      "judge": [
+        "src/runner/dispatch/confinement/backend-registry.mjs",
+        "src/runner/dispatch/confinement/probes/harness.mjs"
+      ]
     },
     {
       "id": "confinement-blind-read",
       "description": "a blind unit can be enforced: the registered bwrap backend hides peer run state, homes and processes from a worker",
-      "owner": "bridge:S7"
+      "owner": "bridge:S6a",
+      "judge": [
+        "src/runner/dispatch/confinement/backend-registry.mjs",
+        "src/runner/dispatch/confinement/probes/harness.mjs"
+      ]
     },
     {
       "id": "confinement-strict-readiness",
       "description": "strict confinement readiness (all capabilities declared with known policies, bwrap ready)",
-      "owner": "bridge:S7"
+      "owner": "bridge:S6a",
+      "judge": [
+        "src/config/facade.mjs",
+        "src/runner/dispatch/confinement/backend-registry.mjs",
+        "src/runner/dispatch/confinement/policies.mjs",
+        "src/runner/execution/capability-config.mjs"
+      ]
     },
     {
       "id": "confinement-herdr-maturity",
       "description": "herdr confinement convergence maturity status (partial: pre-adapter checks under Authority, session/home lifecycle adapter-managed)",
-      "owner": "bridge:S7"
+      "owner": "bridge:S6a",
+      "judge": [
+        "src/config/facade.mjs",
+        "src/runner/dispatch/confinement/policies.mjs"
+      ]
     },
     {
       "id": "observe-dir-writable",
       "description": ".fgos/observe directory is writable",
-      "owner": "bridge:S7"
+      "owner": "bridge:S4",
+      "judge": [
+        "src/runner/paths.mjs"
+      ]
     },
     {
       "id": "observe-host-resolvable",
       "description": "Rust host binary resolves and reads the friction store (friction rank)",
-      "owner": "bridge:S7"
+      "owner": "bridge:S4",
+      "judge": [
+        "src/util/host-bin.mjs"
+      ]
     },
     {
       "id": "writer-identity-resolvable",
       "description": "the writer identity resolves through the Rust host, both for the running host and for the activation a plain git commit hook uses",
-      "owner": "bridge:S7"
+      "owner": "bridge:S4",
+      "judge": [
+        "src/runner/paths.mjs",
+        "src/util/host-bin-path.mjs",
+        "src/util/session-identity.mjs"
+      ]
     },
     {
       "id": "identity-machine-id",
       "description": "this machine has an id minted by the Identity component (the base of every machine and session handle); absent only warns, `fgos doctor --fix` mints it",
-      "owner": "bridge:S7"
+      "owner": "bridge:S4",
+      "judge": [
+        "src/setup/identity-checks.mjs"
+      ]
     },
     {
       "id": "identity-machine-key",
       "description": "this machine has an ed25519 signing key minted by the Identity component (what signs for MAIL and the shared directory); absent only warns, `fgos doctor --fix` mints it once and never replaces it",
-      "owner": "bridge:S7"
+      "owner": "bridge:S4",
+      "judge": [
+        "src/setup/identity-checks.mjs"
+      ]
     },
     {
       "id": "identity-ssh-keygen",
       "description": "ssh-keygen from OpenSSH 8.1 or later is installed: the Identity component signs and verifies through it (no crypto library of its own); no fix, install OpenSSH",
-      "owner": "bridge:S7"
+      "owner": "bridge:S4",
+      "judge": [
+        "src/setup/identity-checks.mjs"
+      ]
     },
     {
       "id": "identity-project-id",
       "description": "this repository carries one project id in the tracked file .fgos/project.json, the same in every clone; absent only warns, and there is no fix: run `fgos identity project --init` once on one machine, commit, pull elsewhere",
-      "owner": "bridge:S7"
+      "owner": "bridge:S4",
+      "judge": [
+        "src/setup/identity-checks.mjs"
+      ]
     },
     {
       "id": "identity-shared-directory",
       "description": "the shared directory of other machines' sessions, read from its cache (.fgos/cache/identity-directory.json): passes with the counts; warns on entries dropped for a bad signature or a changed key (naming the machine id), on entries of another project than this clone's, and on a machine handle two machines share; no fix, the owner decides",
-      "owner": "bridge:S7"
+      "owner": "bridge:S4",
+      "judge": [
+        "src/setup/identity-checks.mjs"
+      ]
     },
     {
       "id": "seat-binding-route",
       "description": "the host Seat Binding runs answers the internal seat-binding route at protocol 1",
-      "owner": "bridge:S7"
+      "owner": "bridge:S5",
+      "judge": [
+        "src/runner/paths.mjs",
+        "src/seat-binding/client.mjs"
+      ]
     },
     {
       "id": "event-store-open-root",
       "description": "Event Store open-root",
-      "owner": "bridge:S7"
+      "owner": "bridge:S4",
+      "judge": [
+        "src/setup/event-store-checks.mjs"
+      ]
     },
     {
       "id": "event-store-machine-id",
       "description": "Event Store machine-id",
-      "owner": "bridge:S7"
+      "owner": "bridge:S4",
+      "judge": [
+        "src/setup/event-store-checks.mjs"
+      ]
     },
     {
       "id": "event-store-legacy-layout",
       "description": "Event Store legacy-layout",
-      "owner": "bridge:S7"
+      "owner": "bridge:S4",
+      "judge": [
+        "src/setup/event-store-checks.mjs"
+      ]
     },
     {
       "id": "event-store-incidents",
       "description": "Event Store incidents",
-      "owner": "bridge:S7",
+      "owner": "bridge:S4",
+      "judge": [
+        "src/setup/event-store-checks.mjs"
+      ],
       "pointer": true
     },
     {
       "id": "git-component-compatible",
       "description": "Combined addon contracts and Git feature floor, with the repository layout and measured durability",
-      "owner": "bridge:S7"
+      "owner": "bridge:S4",
+      "judge": [
+        "src/setup/git-checks.mjs"
+      ]
     },
     {
       "id": "git-repository-config",
       "description": "Repository transport settings refused by Publication/Remote, and the Event Store mirror fetch mappings",
-      "owner": "bridge:S7"
+      "owner": "bridge:S4",
+      "judge": [
+        "src/setup/git-checks.mjs"
+      ]
     },
     {
       "id": "git-operation-journal",
       "description": "Readable Git WAL under the controller activation fence (`git-fence-missing` when the fence is gone); open operations are `git-incidents`",
-      "owner": "bridge:S7"
+      "owner": "bridge:S4",
+      "judge": [
+        "src/setup/git-checks.mjs"
+      ]
     },
     {
       "id": "git-incidents",
       "description": "read-only pointer: open Git incidents, read and recovered through fgos git status / fgos git recover",
-      "owner": "bridge:S7",
+      "owner": "bridge:S4",
+      "judge": [
+        "src/setup/git-checks.mjs"
+      ],
       "pointer": true
     },
     {
       "id": "workflow-case-binding-sentinel",
       "description": "the worktree binding directory carries the host sentinel that tells a reader it is not a masked view",
-      "owner": "bridge:S7"
+      "owner": "bridge:S6b",
+      "judge": [
+        "src/setup/workflow-case-checks.mjs"
+      ]
     },
     {
       "id": "workflow-case-bindings",
       "description": "every worktree binding record matches the ledger of its case, and every bound open case has its record",
-      "owner": "bridge:S7"
+      "owner": "bridge:S6b",
+      "judge": [
+        "src/setup/workflow-case-checks.mjs"
+      ]
     }
   ],
   "fixes": [
     {
       "id": "project-fgos-launcher",
-      "owner": "bridge:S7"
+      "owner": "bridge:S4",
+      "judge": [
+        "src/setup/project-launcher.mjs"
+      ]
     },
     {
       "id": "dispatch-decide-hook-wired",
-      "owner": "bridge:S7"
+      "owner": "bridge:S4",
+      "judge": [
+        "src/setup/agent-hooks.mjs"
+      ]
     },
     {
       "id": "codex-hook-wired",
-      "owner": "bridge:S7"
+      "owner": "bridge:S4",
+      "judge": [
+        "src/setup/agent-hooks.mjs"
+      ]
     },
     {
       "id": "agy-hook-wired",
-      "owner": "bridge:S7"
+      "owner": "bridge:S4",
+      "judge": [
+        "src/setup/agent-hooks.mjs"
+      ]
     },
     {
       "id": "omp-hook-wired",
-      "owner": "bridge:S7"
+      "owner": "bridge:S4",
+      "judge": [
+        "src/setup/agent-hooks.mjs"
+      ]
     },
     {
       "id": "pi-hook-wired",
-      "owner": "bridge:S7"
+      "owner": "bridge:S4",
+      "judge": [
+        "src/setup/agent-hooks.mjs"
+      ]
     },
     {
       "id": "lock-dirs",
-      "owner": "bridge:S7"
+      "owner": "bridge:S4",
+      "judge": [
+        "src/setup/holder-lock-checks.mjs"
+      ]
     },
     {
       "id": "runtime-socket-dir",
-      "owner": "bridge:S7"
+      "owner": "bridge:S4",
+      "judge": [
+        "src/setup/run-supervisor-checks.mjs"
+      ]
     },
     {
       "id": "mailbox-sync-timer",
-      "owner": "bridge:S7"
+      "owner": "bridge:S4",
+      "judge": [
+        "src/setup/managed-timer.mjs"
+      ]
     },
     {
       "id": "account-probe-timer",
-      "owner": "bridge:S7"
+      "owner": "bridge:S4",
+      "judge": [
+        "src/setup/managed-timer.mjs"
+      ]
     },
     {
       "group": "config"
     },
     {
       "id": "bin-discovery-cache",
-      "owner": "bridge:S7"
+      "owner": "bridge:S4",
+      "judge": [
+        "src/setup/bin-discovery.mjs"
+      ]
     },
     {
       "id": "confinement-backend-registry-readable",
-      "owner": "bridge:S7"
+      "owner": "bridge:S6a",
+      "judge": [
+        "src/runner/dispatch/confinement/backend-registry.mjs"
+      ]
     },
     {
       "id": "confinement-orphaned-resources-reaped",
-      "owner": "bridge:S7"
+      "owner": "bridge:S6a",
+      "judge": [
+        "src/runner/dispatch/confinement/backend-registry.mjs",
+        "src/runner/dispatch/confinement/cleanup.mjs"
+      ]
     },
     {
       "id": "credential-copies-retained",
-      "owner": "bridge:S7"
+      "owner": "bridge:S6a",
+      "judge": [
+        "src/config/facade.mjs",
+        "src/runner/dispatch/confinement/backend-registry.mjs",
+        "src/runner/dispatch/confinement/cleanup.mjs",
+        "src/runner/dispatch/provider-capacity.mjs",
+        "src/runner/dispatch/provider-credential-renewal.mjs",
+        "src/setup/config-checks.mjs"
+      ]
     },
     {
       "id": "identity-machine-id",
-      "owner": "bridge:S7"
+      "owner": "bridge:S4",
+      "judge": [
+        "src/setup/identity-checks.mjs"
+      ]
     },
     {
       "id": "identity-machine-key",
-      "owner": "bridge:S7"
+      "owner": "bridge:S4",
+      "judge": [
+        "src/setup/identity-checks.mjs"
+      ]
     },
     {
       "id": "event-store-lock-dirs",
-      "owner": "bridge:S7"
+      "owner": "bridge:S4",
+      "judge": [
+        "src/setup/event-store-fixes.mjs"
+      ]
     },
     {
       "id": "workflow-case-bindings",
-      "owner": "bridge:S7"
+      "owner": "bridge:S6b",
+      "judge": [
+        "src/setup/workflow-case-checks.mjs"
+      ]
     },
     {
       "id": "git-driver-directories",
-      "owner": "bridge:S7"
+      "owner": "bridge:S4",
+      "judge": [
+        "src/setup/git-checks.mjs"
+      ]
     },
     {
       "id": "git-wal-dir",
-      "owner": "bridge:S7",
+      "owner": "bridge:S4",
+      "judge": [
+        "src/setup/git-checks.mjs"
+      ],
       "repairs": [
         "git-operation-journal"
       ]
     },
     {
       "id": "git-publication-refspecs",
-      "owner": "bridge:S7",
+      "owner": "bridge:S4",
+      "judge": [
+        "src/setup/git-checks.mjs"
+      ],
       "repairs": [
         "git-repository-config"
       ]

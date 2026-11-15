@@ -17,7 +17,7 @@ import { findWorkflowStageOperationProblems, checkTaskSpecsResolve, checkDomainW
 import { writeGlobalConfig, writeProjectConfig, writeRawLegacyProjectConfig } from '../helpers/config-fixture.mjs';
 
 import { nativeDoor } from '../../src/native/door.mjs';
-import { allAgentYamlFiles, checkAgentClaimsResolve, checkAgentTypeNamesUnique, readAgentSkills, runDoctor } from '../../src/setup/registrations.mjs';
+import { allAgentYamlFiles, checkAgentClaimsResolve, checkAgentTypeNamesUnique, readAgentSkills } from '../../src/setup/registrations.mjs';
 
 // The claude-plugin-marketplace row runs the `claude` CLI when it is on PATH.
 // FGOS_CLAUDE_COMMAND (the row's test-only seam, mirroring bin/fgos.mjs's
@@ -1220,48 +1220,60 @@ test('the claims walk reads agent definitions in the door tier order: first tier
   }
 });
 
-test('a doctor run reports a status per row, the command that repairs each failing row, and a top-level ok and deduplicated next', async () => {
-  const row = (id, result) => ({ id, description: id, check: () => result });
-  const checks = [
-    row('fine', { passed: true, message: 'all good' }),
-    row('heads-up', { passed: true, message: 'warning: a note' }),
-    row('left-out', { passed: true, status: 'skip', message: 'not applicable here' }),
-    row('own-command', { passed: false, message: 'broken', fixCommand: 'fgos thing --yes' }),
-    row('repaired-by-fix-a', { passed: false, message: 'broken' }),
-    row('repaired-by-fix-b', { passed: false, message: 'broken' }),
-    row('needs-a-person', { passed: false, message: 'broken', detail: { why: 'x' } }),
-    { id: 'async-row', description: 'async-row', check: async () => ({ passed: true, message: 'info: fine' }) },
-  ];
-  const fixes = [
-    { id: 'repaired-by-fix-a', fix: () => ({ changed: true, message: 'done' }) },
-    { id: 'shared-fix', repairs: ['repaired-by-fix-b'], fix: () => ({ changed: false, message: 'nothing' }) },
-  ];
-  const report = await runDoctor('/unused', { checks, fixes });
-  assert.deepEqual(report.checks.map((c) => [c.id, c.status]), [
-    ['fine', 'ok'], ['heads-up', 'warn'], ['left-out', 'skip'], ['own-command', 'fail'],
-    ['repaired-by-fix-a', 'fail'], ['repaired-by-fix-b', 'fail'], ['needs-a-person', 'fail'], ['async-row', 'ok'],
-  ]);
-  const fixOf = (id) => report.checks.find((c) => c.id === id).fix;
-  assert.equal(fixOf('own-command'), 'fgos thing --yes');
-  assert.equal(fixOf('repaired-by-fix-a'), 'fgos doctor --fix');
-  assert.equal(fixOf('repaired-by-fix-b'), 'fgos doctor --fix');
-  assert.equal(fixOf('needs-a-person'), null);
-  assert.equal(fixOf('fine'), undefined);
-  assert.equal(report.ok, false);
-  assert.deepEqual(report.next, ['fgos thing --yes', 'fgos doctor --fix']);
-  assert.deepEqual(report.checks.find((c) => c.id === 'needs-a-person').detail, { why: 'x' });
-  assert.equal(report.checks.every((c) => typeof c.passed === 'boolean'), true);
-  const healthy = await runDoctor('/unused', { checks: checks.slice(0, 3), fixes });
-  assert.equal(healthy.ok, true);
-  assert.deepEqual(healthy.next, []);
-  assert.equal(healthy.fixed, undefined);
+// ─── the registry contract and the body map agree. The doctor's ids, order, descriptions and owners are the
+// registry's (packages/distribution/contracts/doctor-registry.v1.json); Node keeps only the bodies of the rows
+// and fixes it still owns, keyed by id. The Rust host pins its own side the same way (its in-process owner
+// against the registry's `rust:` entries), so a row can be neither dropped nor judged twice.
+
+const REGISTRY_PATH = new URL('../../packages/distribution/contracts/doctor-registry.v1.json', import.meta.url);
+const CONFIG_ROWS_PATH = new URL('../../packages/config/contracts/doctor-rows.v1.json', import.meta.url);
+
+/** The registry with its config group expanded the way the host expands it. */
+function registryEntries() {
+  const registry = JSON.parse(fs.readFileSync(REGISTRY_PATH, 'utf8'));
+  const config = JSON.parse(fs.readFileSync(CONFIG_ROWS_PATH, 'utf8'));
+  const group = registry.groups.config;
+  const rowId = (id) => group.idMap[id] ?? id;
+  const fixId = (id) => group.fixIdMap[id] ?? `${group.fixIdPrefix}${id}`;
+  const rows = registry.rows.flatMap((entry) => (entry.group === 'config'
+    ? config.rows.map((row) => ({ id: rowId(row.id), owner: group.owner }))
+    : [{ id: entry.id, owner: entry.owner, description: entry.description }]));
+  const fixes = registry.fixes.flatMap((entry) => (entry.group === 'config'
+    ? config.fixes.map((id) => ({ id: fixId(id), owner: group.owner }))
+    : [{ id: entry.id, owner: entry.owner }]));
+  return { rows, fixes };
+}
+
+test('the registry lists exactly the row bodies Node still has, each id once', () => {
+  const { rows } = registryEntries();
+  const bridged = rows.filter((row) => row.owner.startsWith('bridge:')).map((row) => row.id);
+  assert.equal(new Set(rows.map((row) => row.id)).size, rows.length, 'a row is listed twice');
+  assert.deepEqual(bridged.slice().sort(), REGISTERED_CHECK_IDS.slice().sort());
 });
 
-test('doctor --fix runs every fix before the rows, reports each fix, and judges the rows after the repair', async () => {
-  let repaired = false;
-  const checks = [{ id: 'row', description: 'row', check: () => (repaired ? { passed: true, message: 'fine' } : { passed: false, message: 'broken' }) }];
-  const fixes = [{ id: 'row', fix: () => { repaired = true; return { changed: true, message: 'repaired' }; } }];
-  const report = await runDoctor('/unused', { fix: true, checks, fixes });
-  assert.deepEqual(report.fixed, [{ id: 'row', changed: true, message: 'repaired' }]);
-  assert.equal(report.ok, true);
+test('the registry lists exactly the fix bodies Node still has, each id once', () => {
+  const { fixes } = registryEntries();
+  const bridged = fixes.filter((fix) => fix.owner.startsWith('bridge:')).map((fix) => fix.id);
+  assert.equal(new Set(fixes.map((fix) => fix.id)).size, fixes.length, 'a fix is listed twice');
+  assert.deepEqual(bridged.slice().sort(), REGISTERED_FIX_IDS.slice().sort());
+});
+
+test('the order the bodies register in is the order the registry runs them in', () => {
+  const { rows, fixes } = registryEntries();
+  assert.deepEqual(REGISTERED_CHECK_IDS, rows.filter((row) => row.owner.startsWith('bridge:')).map((row) => row.id));
+  assert.deepEqual(REGISTERED_FIX_IDS, fixes.filter((fix) => fix.owner.startsWith('bridge:')).map((fix) => fix.id));
+});
+
+test('an owner is rust:<component> or bridge:<step>, and a bridged one names the step that removes it', () => {
+  const { rows, fixes } = registryEntries();
+  for (const { id, owner } of [...rows, ...fixes]) {
+    assert.match(owner, /^(rust:[a-z][a-z-]*|bridge:(S4|S5|S6a|S6b|S7))$/, `${id}: ${owner}`);
+  }
+});
+
+test('every row of the registry says what it checks, in one sentence of its own', () => {
+  const { rows } = registryEntries();
+  for (const row of rows.filter((entry) => entry.description !== undefined)) {
+    assert.ok(row.description.trim().length > 10, `${row.id} has no description`);
+  }
 });

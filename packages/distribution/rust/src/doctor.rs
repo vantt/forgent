@@ -75,12 +75,26 @@ impl RowResult {
     }
 }
 
-/// What one fix did.
+/// What one fix did, as the fix said it: `changed` and `message` are as the fix gave them (a fix that says
+/// nothing about one of them leaves it out of the report, as before).
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct FixResult {
     pub id: String,
-    pub changed: bool,
-    pub message: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub changed: Option<bool>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub message: Option<String>,
+}
+
+impl FixResult {
+    /// A fix that ran and said whether it changed anything, and why.
+    pub fn done(id: &str, changed: bool, message: impl Into<String>) -> Self {
+        Self {
+            id: id.to_owned(),
+            changed: Some(changed),
+            message: Some(message.into()),
+        }
+    }
 }
 
 /// How an owner answered for one row: it judged it, or it could not (the cause is shown as the row's failure
@@ -599,11 +613,11 @@ fn run_fixes(registry: &Registry, owners: &Owners, root: &Path) -> Vec<FixResult
         let mut done = owners.of(kind).run_fixes(root, &ids);
         done.truncate(ids.len());
         for id in &ids[done.len()..] {
-            done.push(FixResult {
-                id: (*id).to_owned(),
-                changed: false,
-                message: "the owner of this fix gave no answer".to_owned(),
-            });
+            done.push(FixResult::done(
+                id,
+                false,
+                "the owner of this fix gave no answer",
+            ));
         }
         results.extend(done);
         at = end;
@@ -656,7 +670,7 @@ impl Palette {
 pub fn render_pretty(report: &Report, palette: Palette) -> String {
     let mut lines = vec![palette.bold("fgos doctor")];
     for fix in report.fixed.iter().flatten() {
-        lines.push(palette.check_line(true, &format!("fix: {}", fix.id), Some(&fix.message)));
+        lines.push(palette.check_line(true, &format!("fix: {}", fix.id), fix.message.as_deref()));
     }
     for row in report.checks.iter().flatten() {
         lines.push(palette.check_line(
@@ -730,11 +744,7 @@ mod tests {
                 .borrow_mut()
                 .push(format!("fix {}", ids.join(",")));
             ids.iter()
-                .map(|id| FixResult {
-                    id: (*id).to_owned(),
-                    changed: true,
-                    message: "repaired".to_owned(),
-                })
+                .map(|id| FixResult::done(id, true, "repaired"))
                 .collect()
         }
 
@@ -1075,6 +1085,21 @@ mod tests {
     }
 
     #[test]
+    fn a_fix_that_says_nothing_about_a_field_leaves_it_out_of_the_report() {
+        let silent: FixResult =
+            serde_json::from_str(r#"{"id":"x","message":"launcher already current"}"#).unwrap();
+        assert_eq!(silent.changed, None);
+        assert_eq!(
+            serde_json::to_string(&silent).unwrap(),
+            r#"{"id":"x","message":"launcher already current"}"#
+        );
+        assert_eq!(
+            serde_json::to_string(&FixResult::done("y", false, "nothing")).unwrap(),
+            r#"{"id":"y","changed":false,"message":"nothing"}"#
+        );
+    }
+
+    #[test]
     fn a_failing_row_with_no_repair_serialises_fix_as_null() {
         let row = ReportRow {
             id: Some("x".into()),
@@ -1134,11 +1159,7 @@ mod tests {
         let report = Report {
             ok: Some(false),
             next: Some(vec!["fgos doctor --fix".into()]),
-            fixed: Some(vec![FixResult {
-                id: "fix-a".into(),
-                changed: true,
-                message: "1 repaired".into(),
-            }]),
+            fixed: Some(vec![FixResult::done("fix-a", true, "1 repaired")]),
             checks: Some(vec![
                 ReportRow {
                     description: Some("a works".into()),

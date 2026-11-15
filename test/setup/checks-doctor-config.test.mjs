@@ -21,6 +21,7 @@ import {
   mkTemp,
   path,
   resolveMainCheckout,
+  runHostDoctor,
   spawnSync,
   withHome,
 } from './helpers/setup-checks-harness.mjs';
@@ -318,7 +319,7 @@ test('fgos doctor --fix (CLI e2e) creates the gateway token file through the rea
   const homeDir = mkTemp('doctor-cli-fix-token-home-');
   const env = { ...NO_CLAUDE_ENV, HOME: homeDir, USERPROFILE: homeDir };
   execFileSync('git', ['init', '-q'], { cwd, encoding: 'utf8' });
-  const result = spawnSync(process.execPath, [FGOS, 'doctor', '--fix'], { cwd, encoding: 'utf8', env });
+  const result = runHostDoctor(['--fix'], { cwd, env });
   assert.equal(result.status, 0, `fgos doctor --fix failed: ${result.stderr}`);
   const { data } = JSON.parse(result.stdout);
   const fixedEntry = data.fixed.find((f) => f.id === 'gateway-token-configured');
@@ -346,7 +347,7 @@ test('fgos doctor --fix --pretty (CLI e2e) prints plain text, not JSON, and mark
   fs.mkdirSync(path.dirname(tokenFile), { recursive: true, mode: 0o700 });
   fs.writeFileSync(tokenFile, `${'a'.repeat(64)}\n`, { mode: 0o600 });
 
-  const second = spawnSync(process.execPath, [FGOS, 'doctor', '--fix', '--pretty'], { cwd, encoding: 'utf8', env });
+  const second = runHostDoctor(['--fix', '--pretty'], { cwd, env });
   assert.equal(second.status, 0, `fgos doctor --fix --pretty failed: ${second.stderr}`);
   assert.throws(() => JSON.parse(second.stdout), 'expected --pretty output to NOT be valid JSON');
   const lines = second.stdout.split('\n');
@@ -421,7 +422,7 @@ test('fgos doctor (no flags) on a fresh cwd prints the envelope JSON with every 
   const cwd = mkTemp('doctor-cli-readonly-');
   const homeDir = mkTemp('doctor-cli-readonly-home-');
   const configFiles = ['config.json', 'config.yaml'].map((name) => path.join(cwd, '.fgos', name));
-  const result = spawnSync(process.execPath, [FGOS, 'doctor'], { cwd, encoding: 'utf8', env: { ...NO_CLAUDE_ENV, HOME: homeDir, USERPROFILE: homeDir } });
+  const result = runHostDoctor([], { cwd, env: { ...NO_CLAUDE_ENV, HOME: homeDir, USERPROFILE: homeDir } });
   assert.equal(result.status, 0, result.stderr);
   for (const file of configFiles) assert.equal(fs.existsSync(file), false, `fgos doctor must never create ${file}`);
   const envelope = JSON.parse(result.stdout);
@@ -438,7 +439,7 @@ test('fgos doctor in a git repo that is not set up for fgOS writes no .fgos and 
   const realCwd = fs.realpathSync(cwd);
   try {
     execFileSync('git', ['init', '-q', '-b', 'main'], { cwd });
-    const result = spawnSync(process.execPath, [FGOS, 'doctor', '--json'], { cwd, encoding: 'utf8', env: { ...NO_CLAUDE_ENV, HOME: homeDir, USERPROFILE: homeDir } });
+    const result = runHostDoctor(['--json'], { cwd, env: { ...NO_CLAUDE_ENV, HOME: homeDir, USERPROFILE: homeDir } });
     assert.equal(result.status, 0, result.stderr);
     // A detached publish child outlives doctor, so give it a bounded window to show up in the process table.
     const deadline = Date.now() + 3000;

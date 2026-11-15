@@ -438,3 +438,58 @@ pub fn execute_legacy_cli(
 
     std::process::exit(1);
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::collections::HashMap;
+
+    fn envs(command: &Command) -> HashMap<String, Option<String>> {
+        command
+            .get_envs()
+            .map(|(key, value)| {
+                (
+                    key.to_string_lossy().into_owned(),
+                    value.map(|v| v.to_string_lossy().into_owned()),
+                )
+            })
+            .collect()
+    }
+
+    #[test]
+    fn the_payload_command_runs_the_script_with_a_fresh_guard_this_host_and_the_state_root() {
+        let command = payload_command(Path::new("/payload/src/setup/doctor-bridge.mjs"));
+        assert_eq!(command.get_program(), "node");
+        let args: Vec<_> = command.get_args().collect();
+        assert_eq!(args, ["/payload/src/setup/doctor-bridge.mjs"]);
+        let envs = envs(&command);
+        assert_eq!(
+            envs.get(RECURSION_GUARD_VAR),
+            Some(&Some("1".to_owned())),
+            "the child is told it runs under a host whatever the host itself inherited"
+        );
+        assert_eq!(
+            envs.get("FGOS_HOST_BIN"),
+            Some(&Some(
+                std::env::current_exe()
+                    .unwrap()
+                    .to_string_lossy()
+                    .into_owned()
+            ))
+        );
+        let (_, source) = fgos_holder_lock::state_root::state_root();
+        if source != fgos_holder_lock::state_root::Source::Pinned {
+            assert!(envs.contains_key(fgos_holder_lock::state_root::PINNED_ROOT_ENV));
+        }
+    }
+
+    #[test]
+    fn the_payload_root_is_the_entry_less_its_manifest_components() {
+        let entry = Path::new("/release/libexec/legacy-node/bin/fgos.mjs");
+        let depth = Path::new("bin/fgos.mjs").components().count();
+        assert_eq!(
+            entry.ancestors().nth(depth),
+            Some(Path::new("/release/libexec/legacy-node"))
+        );
+    }
+}

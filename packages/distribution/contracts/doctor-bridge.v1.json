@@ -1,0 +1,97 @@
+{
+  "version": 1,
+  "about": "The contract of the Node rows bridge: the one door the Rust host uses to reach the doctor rows and fixes whose layers Node still owns (owner bridge:<step> in doctor-registry.v1.json). The host starts `module` of the legacy payload with the payload's Node, writes one request as JSON on its stdin and reads one line per result from its stdout. Only a line that starts with resultPrefix is a result, so output a body prints can never be read as one; each result is written as soon as it exists, so a crash keeps what was produced; the call ends with one `end` line carrying the number of results, and a call without it did not finish. A malformed request or an id with no body is one `refusal` line. The level of a row (`status` when the row does not say it), the fix of a failing row, `ok` and `next` are the host's, never the bridge's. Each side reads `vectors`: the Node module writes exactly `line` for `kind` and `body`, the host reads `line` back as `body`. The bridge ends with the last Node-owned row.",
+  "module": "src/setup/doctor-bridge.mjs",
+  "resultPrefix": "\u001eFGOS-DOCTOR-BRIDGE ",
+  "request": {
+    "phase": "`fix` (every id is a fix id) or `check` (every id is a row id)",
+    "ids": "a non-empty-string id each, in registry order; one call per run of consecutive fixes of the bridge, one call for every bridged row",
+    "dir": "the project root the run acts on"
+  },
+  "lines": {
+    "row": {
+      "required": [
+        "id",
+        "passed"
+      ],
+      "optional": [
+        "status",
+        "message",
+        "fixCommand",
+        "detail"
+      ]
+    },
+    "fix": {
+      "required": [
+        "id",
+        "changed",
+        "message"
+      ],
+      "optional": []
+    },
+    "end": {
+      "required": [
+        "count"
+      ],
+      "optional": []
+    },
+    "refusal": {
+      "required": [
+        "message"
+      ],
+      "optional": []
+    }
+  },
+  "vectors": [
+    {
+      "name": "a judged row with everything it can say",
+      "kind": "row",
+      "body": {
+        "id": "curl-available",
+        "passed": false,
+        "status": "fail",
+        "message": "curl is not on PATH",
+        "fixCommand": "install curl",
+        "detail": {
+          "path": "/usr/bin"
+        }
+      },
+      "line": "\u001eFGOS-DOCTOR-BRIDGE {\"kind\":\"row\",\"id\":\"curl-available\",\"passed\":false,\"status\":\"fail\",\"message\":\"curl is not on PATH\",\"fixCommand\":\"install curl\",\"detail\":{\"path\":\"/usr/bin\"}}\n"
+    },
+    {
+      "name": "a judged row with only a verdict",
+      "kind": "row",
+      "body": {
+        "id": "bwrap-available",
+        "passed": true
+      },
+      "line": "\u001eFGOS-DOCTOR-BRIDGE {\"kind\":\"row\",\"id\":\"bwrap-available\",\"passed\":true}\n"
+    },
+    {
+      "name": "a fix result",
+      "kind": "fix",
+      "body": {
+        "id": "lock-dirs",
+        "changed": true,
+        "message": "2 repaired"
+      },
+      "line": "\u001eFGOS-DOCTOR-BRIDGE {\"kind\":\"fix\",\"id\":\"lock-dirs\",\"changed\":true,\"message\":\"2 repaired\"}\n"
+    },
+    {
+      "name": "the end of a finished call",
+      "kind": "end",
+      "body": {
+        "count": 2
+      },
+      "line": "\u001eFGOS-DOCTOR-BRIDGE {\"kind\":\"end\",\"count\":2}\n"
+    },
+    {
+      "name": "a refusal of the whole call",
+      "kind": "refusal",
+      "body": {
+        "message": "no row body for nope"
+      },
+      "line": "\u001eFGOS-DOCTOR-BRIDGE {\"kind\":\"refusal\",\"message\":\"no row body for nope\"}\n"
+    }
+  ]
+}

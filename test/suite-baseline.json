@@ -470,7 +470,6 @@
     "test/setup/curl-check.test.mjs": 0.2,
     "test/setup/dir-resolution.test.mjs": 29.4,
     "test/setup/doctor-fresh-run.test.mjs": 3.2,
-    "test/setup/doctor-strict-exit.test.mjs": 15,
     "test/setup/event-store-checks.test.mjs": 7.9,
     "test/setup/event-store-fixes.test.mjs": 1.1,
     "test/setup/executor-profile-warnings.test.mjs": 0.1,

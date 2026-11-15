@@ -2394,6 +2394,7 @@ export const COMMAND_REGISTRY = [
       required: [],
     },
     examples: ['fgos doctor', 'fgos doctor --pretty', 'fgos doctor --fix', 'fgos doctor --strict'],
+    native: true,
     touchesState: true,
     store: 'none',
     externalEffect: false,

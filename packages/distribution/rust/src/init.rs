@@ -3084,6 +3084,29 @@ mod tests {
         );
     }
 
+    /// A real doctor answer of an earlier release (rows of every level, a failing row with no fix, one with a
+    /// fix, a skip), read through the one lenient report type: a pinned release older than a field must not
+    /// turn into "not a doctor result".
+    #[test]
+    fn a_doctor_answer_of_the_release_before_the_shared_type_still_builds_the_closing_block() {
+        let golden = include_str!("../tests/goldens/doctor-base-release.json");
+        assert!(!doctor_is_clean(golden));
+        let block = closing_block(golden, &facts(false)).unwrap();
+        assert!(!block.ready);
+        let lines: Vec<&str> = block.text.lines().collect();
+        assert_eq!(lines[0], "6 checks need you:");
+        assert!(
+            lines[1].starts_with("  1. shell-integration-sourced: not sourced in:"),
+            "{}",
+            lines[1]
+        );
+        assert_eq!(
+            lines[2],
+            "  2. dispatch-decide-hook-wired: fgos doctor --fix"
+        );
+        assert_eq!(lines.len(), 7, "{}", block.text);
+    }
+
     #[test]
     fn closing_block_of_one_failing_check_uses_the_singular() {
         let json = doctor_json(false, &[("x", "fail", Some("fgos doctor --fix"))]);

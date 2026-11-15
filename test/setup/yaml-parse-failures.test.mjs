@@ -8,13 +8,12 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { execFileSync, spawnSync } from 'node:child_process';
-import { fileURLToPath } from 'node:url';
 
 import { DOCTOR_CHECKS } from '../../src/setup/checks.mjs';
+import { runHostDoctor } from './helpers/setup-checks-harness.mjs';
 import { checkBlindStepsUseProvenPools } from '../../src/setup/blind-steps-proven-pools.mjs';
 import { checkSeatBindingDryBind } from '../../src/setup/seat-binding-checks.mjs';
 
-const FGOS = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..', 'bin', 'fgos.mjs');
 const PARSE_PROBLEM = /cannot be parsed: .* \(line \d+, column \d+\)/;
 
 function makeProject(t) {
@@ -120,7 +119,7 @@ test('fgos doctor still runs and lists every check when a workflow file is malfo
   const { root, write } = makeProject(t);
   write('core/workflows/broken.yaml', MALFORMED_WORKFLOW);
   // boundary: the loop that runs every registered row and survives a failing one belongs to the doctor verb; no lower layer runs the whole list.
-  const run = spawnSync(process.execPath, [FGOS, 'doctor', '--json'], { cwd: root, encoding: 'utf8' });
+  const run = runHostDoctor(['--json'], { cwd: root });
   assert.equal(run.status, 0, run.stderr);
   const checks = JSON.parse(run.stdout).data.checks;
   assert.deepEqual(checks.map((c) => c.id), DOCTOR_CHECKS.map((c) => c.id), 'every registered check ran');

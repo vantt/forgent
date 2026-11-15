@@ -11,6 +11,7 @@ import {
   fs,
   mkTemp,
   path,
+  runHostDoctor,
   spawnSync,
 } from './helpers/setup-checks-harness.mjs';
 import { checkAgyPermissionsConfigured, checkAgySubHomesConfigured, findAgySubHomes } from '../../src/setup/agy-permissions.mjs';
@@ -56,7 +57,7 @@ test('fgos doctor reports the agy-permissions and agy sub-HOME rows', () => {
   const env = { ...NO_CLAUDE_ENV, HOME: homeDir, USERPROFILE: homeDir };
 
   // boundary: the one wiring proof that the doctor verb registers and reports both agy rows.
-  const result = spawnSync(process.execPath, [FGOS, 'doctor'], { cwd, encoding: 'utf8', env });
+  const result = runHostDoctor([], { cwd, env });
   assert.equal(result.status, 0, result.stderr);
   assert.equal(doctorCheck(result, 'agy-permissions-configured').passed, true);
   // With no executor config the sub-HOME row has nothing to check.

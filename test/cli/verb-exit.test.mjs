@@ -12,8 +12,6 @@ test('a verb result maps to its exit code and every other verb exits 0', () => {
   assert.equal(exitCodeOf('plan-lint', { ok: true }, {}), 0);
   assert.equal(exitCodeOf('wire-agents', { failed: ['x'] }, {}), 1);
   assert.equal(exitCodeOf('wire-agents', { failed: [] }, {}), 0);
-  assert.equal(exitCodeOf('doctor', { ok: false }, { flags: { strict: true } }), 1);
-  assert.equal(exitCodeOf('doctor', { ok: false }, { flags: {} }), 0);
   assert.equal(exitCodeOf('list', [], { positional: [], flags: {} }), 0);
 });
 

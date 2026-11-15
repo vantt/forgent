@@ -12,7 +12,6 @@ const contract = JSON.parse(fs.readFileSync(new URL('../../packages/config/contr
 // The machine files row keeps the id the gateway token row has always had, so nothing that names it changes.
 const ROW_IDS = { 'config-machine-files': 'gateway-token-configured' };
 const FIX_IDS = { 'create-machine-files': 'gateway-token-configured' };
-const DESCRIPTIONS = { 'config-machine-files': 'the gateway token file ~/.fgos/private/gateway-token exists, is 0600 and holds one line' };
 
 /** A refusal of the door (a file that is unusable, a request it cannot serve) or a process that cannot load the addon at all: the failures a doctor row reports as its own failure, with the door's message, instead of ending the run. */
 export const isConfigDoorFailure = (err) => err instanceof ConfigDoorError || (typeof err?.code === 'string' && err.code.startsWith('git-addon-'));
@@ -44,17 +43,15 @@ function mapFindings(findings, description) {
   return { passed: true, message: `warning: ${lines}${repair}` };
 }
 
-/** The doctor checks: `{ id, description, check }`, one per contract row. */
+/** The doctor checks: `{ id, check }`, one per contract row (the registry gives the description). */
 export const CONFIG_CHECKS = contract.rows.map((row) => ({
   id: rowId(row.id),
-  description: DESCRIPTIONS[row.id] ?? row.description,
   check: (cwd, run) => mapFindings(findingsOf(cwd, run, row.id), row.description),
 }));
 
 /** The doctor fixes: `{ id, fix }`, one per contract fix id; a confined session or a refused file repairs nothing and says why. */
 export const CONFIG_FIXES = contract.fixes.map((fix) => ({
   id: fixId(fix),
-  repairs: contract.rows.filter((row) => row.fix === fix).map((row) => rowId(row.id)),
   fix: (cwd) => {
     try {
       const { changed } = fixConfig({ projectRoot: cwd, ids: [fix] });

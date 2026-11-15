@@ -3295,3 +3295,300 @@ fn lock_fence_refuses_without_yes_then_ends_the_holder_and_starts_no_node() {
     let _ = fs::remove_dir_all(&base);
     let _ = fs::remove_dir_all(&spy_dir);
 }
+
+// ---------------------------------------------------------------------------------------------------------
+// `fgos doctor` in the host: the rows whose layers Node still owns are judged through the one Node rows bridge;
+// everything else (the report, `--strict`, `--pretty`, the refusals) is the host's own.
+// ---------------------------------------------------------------------------------------------------------
+
+/// A fresh, empty directory under the temp dir.
+fn fresh_dir(prefix: &str) -> PathBuf {
+    let dir = std::env::temp_dir().join(format!(
+        "{prefix}_{}_{}",
+        std::process::id(),
+        std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap()
+            .as_nanos()
+    ));
+    fs::create_dir_all(&dir).unwrap();
+    dir.canonicalize().unwrap()
+}
+
+/// `PATH` without any directory that holds a `node`, so the host finds no Node at all.
+#[cfg(unix)]
+fn path_without_node() -> String {
+    std::env::split_paths(&std::env::var_os("PATH").unwrap_or_default())
+        .filter(|dir| !dir.join("node").exists())
+        .map(|dir| dir.display().to_string())
+        .collect::<Vec<_>>()
+        .join(":")
+}
+
+/// A directory whose `node` is a shell script with `body`; returns it and a `PATH` that finds it first.
+#[cfg(unix)]
+fn scripted_node(prefix: &str, body: &str) -> (PathBuf, String) {
+    use std::os::unix::fs::PermissionsExt;
+    let dir = fresh_dir(prefix);
+    let script = dir.join("node");
+    fs::write(&script, format!("#!/bin/sh\n{body}\n")).unwrap();
+    fs::set_permissions(&script, fs::Permissions::from_mode(0o755)).unwrap();
+    (
+        dir.clone(),
+        format!(
+            "{}:{}",
+            dir.display(),
+            std::env::var("PATH").unwrap_or_default()
+        ),
+    )
+}
+
+/// The one result line a finished bridge call ends with, as a shell command.
+#[cfg(unix)]
+const BRIDGE_END_LINE: &str = r#"printf '\036FGOS-DOCTOR-BRIDGE {"kind":"end","count":0}\n'"#;
+
+/// `fgos doctor <args>` in `cwd` with its own HOME and state root, against the checkout's dev release.
+fn doctor_in(
+    cwd: &Path,
+    path: &str,
+    args: &[&str],
+    extra_env: &[(&str, &str)],
+) -> std::process::Output {
+    let manifest_path = ensure_dev_manifest();
+    let home = fresh_dir("fgos_doctor_home");
+    let state = fresh_dir("fgos_doctor_state");
+    let mut command = Command::new(fgos_bin());
+    command
+        .arg("doctor")
+        .args(args)
+        .current_dir(cwd)
+        .env("PATH", path)
+        .env("HOME", &home)
+        .env("FGOS_STATE_ROOT", &state)
+        .env("FGOS_ACTIVE_RELEASE_PATH", repo_root())
+        .env("FGOS_ACTIVE_MANIFEST_PATH", &manifest_path)
+        .env("FGOS_CLAUDE_COMMAND", "/nonexistent/fgos-test-claude");
+    for (key, value) in extra_env {
+        command.env(key, value);
+    }
+    command.output().expect("failed to execute fgos")
+}
+
+#[cfg(unix)]
+#[test]
+fn doctor_without_node_fails_each_bridged_row_naming_node_once_and_still_answers() {
+    let project = fresh_dir("fgos_doctor_nonode");
+    let path = path_without_node();
+
+    let plain = doctor_in(&project, &path, &["--json"], &[]);
+    assert_eq!(
+        plain.status.code(),
+        Some(0),
+        "{}",
+        String::from_utf8_lossy(&plain.stderr)
+    );
+    let envelope: serde_json::Value = serde_json::from_slice(&plain.stdout).unwrap();
+    let data = &envelope["data"];
+    assert_eq!(data["ok"], false);
+    let checks = data["checks"].as_array().unwrap();
+    assert!(checks.len() > 100, "{}", checks.len());
+    for row in checks {
+        assert_eq!(row["status"], "fail", "{row}");
+        assert_eq!(row["passed"], false);
+        assert!(row["fix"].is_null(), "{row}");
+        assert!(
+            row["message"]
+                .as_str()
+                .unwrap()
+                .starts_with("Node is not available"),
+            "{row}"
+        );
+    }
+    let next = data["next"].as_array().unwrap();
+    assert_eq!(next.len(), 1, "{next:?}");
+    assert!(next[0]
+        .as_str()
+        .unwrap()
+        .contains("install Node 18 or newer"));
+
+    // `--strict` exits 1 when a row still fails; `--pretty` prints the text form instead of the envelope.
+    let strict = doctor_in(&project, &path, &["--strict", "--json"], &[]);
+    assert_eq!(strict.status.code(), Some(1));
+    let pretty = doctor_in(&project, &path, &["--pretty"], &[]);
+    assert_eq!(pretty.status.code(), Some(0));
+    let text = String::from_utf8_lossy(&pretty.stdout);
+    assert!(text.starts_with("fgos doctor\n"), "{text}");
+    assert!(
+        text.contains("\nNext:\n  install Node 18 or newer"),
+        "{text}"
+    );
+    assert_eq!(
+        fs::read_dir(&project).unwrap().count(),
+        0,
+        "a doctor run left something in the project"
+    );
+    let _ = fs::remove_dir_all(&project);
+}
+
+/// The rows of the Node-owned layers are one call of the rows bridge: one Node process for the whole run, however
+/// many rows it judges. (That a doctor run leaves a repository with no fgOS setup untouched and starts no events
+/// child is proved through the host by `test/setup/checks-doctor-config.test.mjs`.)
+#[cfg(unix)]
+#[test]
+fn doctor_starts_one_node_child_for_all_its_bridged_rows() {
+    let project = fresh_dir("fgos_doctor_fresh");
+    let (spy_dir, spy_log, path) = node_spy_dir("fgos_doctor_spy");
+
+    let output = doctor_in(&project, &path, &["--json"], &[]);
+    assert_eq!(
+        output.status.code(),
+        Some(0),
+        "{}",
+        String::from_utf8_lossy(&output.stderr)
+    );
+    let envelope: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
+    assert!(envelope["data"]["checks"].as_array().unwrap().len() > 100);
+
+    let starts = fs::read_to_string(&spy_log).unwrap_or_default();
+    assert_eq!(
+        starts.lines().filter(|l| l.starts_with("SPY_PID:")).count(),
+        1,
+        "the rows of Node-owned layers are one bridge call: {starts}"
+    );
+    let _ = fs::remove_dir_all(&project);
+    let _ = fs::remove_dir_all(&spy_dir);
+}
+
+#[cfg(unix)]
+#[test]
+fn the_bridge_child_gets_a_fresh_guard_this_host_and_the_state_root_even_when_the_host_inherited_a_guard(
+) {
+    let dump = fresh_dir("fgos_doctor_env");
+    let seen = dump.join("env.txt");
+    let (spy_dir, path) = scripted_node(
+        "fgos_doctor_envnode",
+        &format!(
+            "cat >/dev/null\nenv | grep -E '^(FGOS_RUST_HOST_RECURSION_GUARD|FGOS_HOST_BIN|{state})=' > '{out}'\n{end}",
+            state = fgos_holder_lock::state_root::PINNED_ROOT_ENV,
+            out = seen.display(),
+            end = BRIDGE_END_LINE
+        ),
+    );
+    let project = fresh_dir("fgos_doctor_envproj");
+    // The parent carries a guard already: a legacy route would refuse here, the bridge is a bounded child and runs.
+    let output = doctor_in(
+        &project,
+        &path,
+        &["--json"],
+        &[("FGOS_RUST_HOST_RECURSION_GUARD", "1")],
+    );
+    assert_eq!(
+        output.status.code(),
+        Some(0),
+        "{}",
+        String::from_utf8_lossy(&output.stderr)
+    );
+    let env = fs::read_to_string(&seen).expect("the bridge child never started");
+    assert!(env.contains("FGOS_RUST_HOST_RECURSION_GUARD=1"), "{env}");
+    assert!(
+        env.contains(&format!("FGOS_HOST_BIN={}", fgos_bin().display())),
+        "{env}"
+    );
+    assert!(
+        env.contains(&format!(
+            "{}=",
+            fgos_holder_lock::state_root::PINNED_ROOT_ENV
+        )),
+        "{env}"
+    );
+    for dir in [dump, spy_dir, project] {
+        let _ = fs::remove_dir_all(&dir);
+    }
+}
+
+#[cfg(unix)]
+#[test]
+fn an_interrupt_of_the_host_ends_the_bridge_child_and_everything_it_started() {
+    let dump = fresh_dir("fgos_doctor_sigint");
+    let grandchild = dump.join("grandchild.pid");
+    let (spy_dir, path) = scripted_node(
+        "fgos_doctor_sigintnode",
+        &format!(
+            "cat >/dev/null\nsh -c 'echo $$ > \"{pid}\"; exec sleep 300'",
+            pid = grandchild.display()
+        ),
+    );
+    let project = fresh_dir("fgos_doctor_sigintproj");
+    let manifest_path = ensure_dev_manifest();
+    let mut host = Command::new(fgos_bin())
+        .args(["doctor", "--json"])
+        .current_dir(&project)
+        .env("PATH", &path)
+        .env("HOME", fresh_dir("fgos_doctor_sigint_home"))
+        .env("FGOS_STATE_ROOT", fresh_dir("fgos_doctor_sigint_state"))
+        .env("FGOS_ACTIVE_RELEASE_PATH", repo_root())
+        .env("FGOS_ACTIVE_MANIFEST_PATH", &manifest_path)
+        .stdout(std::process::Stdio::null())
+        .stderr(std::process::Stdio::null())
+        .spawn()
+        .unwrap();
+    let started = std::time::Instant::now();
+    while !grandchild.exists() {
+        assert!(
+            started.elapsed() < std::time::Duration::from_secs(30),
+            "the bridge child never started"
+        );
+        std::thread::sleep(std::time::Duration::from_millis(20));
+    }
+    std::thread::sleep(std::time::Duration::from_millis(200));
+    let pid: i32 = fs::read_to_string(&grandchild)
+        .unwrap()
+        .trim()
+        .parse()
+        .unwrap();
+    assert_eq!(unsafe { libc::kill(host.id() as i32, libc::SIGINT) }, 0);
+    let ended = std::time::Instant::now();
+    loop {
+        if host.try_wait().unwrap().is_some() {
+            break;
+        }
+        assert!(
+            ended.elapsed() < std::time::Duration::from_secs(30),
+            "the host did not end after the interrupt"
+        );
+        std::thread::sleep(std::time::Duration::from_millis(20));
+    }
+    std::thread::sleep(std::time::Duration::from_millis(300));
+    let alive = unsafe { libc::kill(pid, 0) } == 0
+        && fs::read_to_string(format!("/proc/{pid}/stat"))
+            .map_or(true, |stat| !stat.contains(") Z "));
+    assert!(
+        !alive,
+        "the grandchild of the bridge child outlived the interrupted host"
+    );
+    for dir in [dump, spy_dir, project] {
+        let _ = fs::remove_dir_all(&dir);
+    }
+}
+
+#[test]
+fn a_malformed_doctor_call_is_refused_before_anything_runs() {
+    let project = fresh_dir("fgos_doctor_refused");
+    for args in [vec!["--bogus"], vec!["--fix=1"], vec!["--strict=1"]] {
+        let output = Command::new(fgos_bin())
+            .arg("doctor")
+            .args(&args)
+            .current_dir(&project)
+            .env("FGOS_STATE_ROOT", fresh_dir("fgos_doctor_refused_state"))
+            .output()
+            .unwrap();
+        assert_eq!(output.status.code(), Some(4), "{args:?}");
+        assert!(output.stdout.is_empty(), "{args:?}");
+        assert!(
+            String::from_utf8_lossy(&output.stderr).contains("unknown flag"),
+            "{args:?}: {}",
+            String::from_utf8_lossy(&output.stderr)
+        );
+    }
+    let _ = fs::remove_dir_all(&project);
+}

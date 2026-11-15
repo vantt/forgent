@@ -1,7 +1,8 @@
 // What `fgctl init`, `upgrade` and `repair` print and exit with once the activation is done: the closing block built
-// from `fgos doctor --json`. The payload of one release copy answers that call with a canned doctor result, so the
-// block's wiring (stdout, exit code, transaction record) is proven independently of the machine running the test; the
-// block's wording has its own unit tests beside `closing_block`.
+// from `fgos doctor --json`. The doctor is the host's; the rows of the Node-owned layers come from the payload's
+// rows bridge, which one release copy answers with canned rows, so the block's wiring (stdout, exit code,
+// transaction record) is proven independently of the machine running the test; the block's wording has its own unit
+// tests beside `closing_block`.
 import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -14,29 +15,42 @@ import { useReleaseFixture, fixture, runFgctl, runFgctlRaw, removeStateHome } fr
 
 useReleaseFixture();
 
+// What the bridge answers per row id; every row it is not told about passes. The registry decides the level of a row
+// and the fix of a failing one: a fail of a row a registered fix repairs names `fgos doctor --fix`.
 const CANNED = {
-  ok: { ok: true, next: [], checks: [{ id: 'fine', status: 'ok' }] },
-  pending: { ok: true, next: [], checks: [{ id: 'fine', status: 'ok' }, { id: 'drifted', status: 'warn', fix: 'fgos doctor --fix' }] },
+  ok: {},
+  pending: { 'curl-available': { passed: true, message: 'warning: drifted', fixCommand: 'fgos doctor --fix' } },
   failing: {
-    ok: false,
-    next: ['fgos doctor --fix'],
-    checks: [
-      { id: 'fine', status: 'ok' },
-      { id: 'needs-a-fix', status: 'fail', fix: 'fgos doctor --fix' },
-      { id: 'needs-a-person', status: 'fail', fix: null, message: 'install the thing' },
-    ],
+    'project-fgos-launcher': { passed: false, message: 'the launcher is stale' },
+    'curl-available': { passed: false, message: 'install the thing' },
   },
 };
 
-/** A copy of the fixture release whose payload prints `CANNED_DOCTOR`'s result for `doctor --json`. */
+/** The payload's rows bridge of a release copy, replaced by one that answers from `CANNED_DOCTOR` and logs each call. */
+const CANNED_BRIDGE = `import fs from 'node:fs';
+const input = JSON.parse(fs.readFileSync(0, 'utf8'));
+if (process.env.CALL_LOG) fs.appendFileSync(process.env.CALL_LOG, 'doctor ' + input.phase + '\\n');
+const canned = JSON.parse(process.env.CANNED_DOCTOR ?? '{}');
+const write = (kind, body) => fs.writeSync(1, '\\u001eFGOS-DOCTOR-BRIDGE ' + JSON.stringify({ kind, ...body }) + '\\n');
+for (const id of input.ids) {
+  if (input.phase === 'fix') write('fix', { id, changed: false, message: 'canned' });
+  else write('row', { id, ...(canned[id] ?? { passed: true, message: 'fine' }) });
+}
+write('end', { count: input.ids.length });
+`;
+
+/** A copy of the fixture release whose rows bridge answers the canned rows, and whose payload logs its own calls. */
 function releaseWithCannedDoctor() {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-closing-rel-'));
   fs.cpSync(fixture.releaseDir, dir, { recursive: true });
-  const mjs = path.join(dir, 'libexec', 'legacy-node', 'bin', 'fgos.mjs');
+  const payload = path.join(dir, 'libexec', 'legacy-node');
+  const mjs = path.join(payload, 'bin', 'fgos.mjs');
   const original = fs.readFileSync(mjs, 'utf8');
   const lineEnd = original.indexOf('\n');
-  const injection = `if (process.env.CALL_LOG) (await import('node:fs')).appendFileSync(process.env.CALL_LOG, process.argv.slice(2).join(' ') + '\\n');\nif (process.env.CANNED_DOCTOR && process.argv.includes('doctor') && process.argv.includes('--json')) {\n  process.stdout.write(JSON.stringify({ contract: 'fgos.v1', data: JSON.parse(process.env.CANNED_DOCTOR) }));\n  process.exit(0);\n}\n`;
+  const injection = `if (process.env.CALL_LOG) (await import('node:fs')).appendFileSync(process.env.CALL_LOG, process.argv.slice(2).join(' ') + '\\n');\n`;
   fs.writeFileSync(mjs, original.slice(0, lineEnd + 1) + injection + original.slice(lineEnd + 1));
+  const bridge = path.join(payload, 'src', 'setup', 'doctor-bridge.mjs');
+  fs.writeFileSync(bridge, CANNED_BRIDGE);
   const manifestPath = path.join(dir, 'manifest.json');
   const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
   const digest = hashFile(mjs);
@@ -44,6 +58,10 @@ function releaseWithCannedDoctor() {
     if (f.path === 'libexec/legacy-node/bin/fgos.mjs') {
       f.digest = digest;
       f.size = fs.statSync(mjs).size;
+    }
+    if (f.path === 'libexec/legacy-node/src/setup/doctor-bridge.mjs') {
+      f.digest = hashFile(bridge);
+      f.size = fs.statSync(bridge).size;
     }
   }
   manifest.components.legacyNode.digest = digest;
@@ -93,7 +111,7 @@ test('init ends on Ready and one runnable next step, exits 0 and completes the t
   }
 });
 
-// The tail steps only: the payload also logs the hook calls that `doctor --fix` makes.
+// The tail steps only: the payload also logs the hook calls that `doctor --fix` makes, and the bridge each of its calls.
 const calls = (log) => (fs.existsSync(log) ? fs.readFileSync(log, 'utf8').trim().split('\n') : []).filter((c) => /^(init|doctor)\b/.test(c));
 
 test('a clean doctor ends the tail after init and one doctor run, and a rerun of the active release says nothing to do', () => {
@@ -104,14 +122,14 @@ test('a clean doctor ends the tail after init and one doctor run, and a rerun of
       const env = { HOME: home, CANNED_DOCTOR: JSON.stringify(CANNED.ok), CALL_LOG: log };
       const first = runFgctlRaw(['init', '--from', release.dir], { cwd: proj, stateHome: state, env });
       assert.equal(first.status, 0, first.stderr);
-      assert.deepEqual(calls(log), ['init', 'doctor --json'], 'init always runs; a clean doctor skips doctor --fix');
+      assert.deepEqual(calls(log), ['init', 'doctor check'], 'init always runs; a clean doctor skips doctor --fix');
       fs.rmSync(log);
 
       for (const args of [['init', '--from', release.dir], ['upgrade', '--from', release.dir]]) {
         const again = runFgctlRaw(args, { cwd: proj, stateHome: state, env });
         assert.equal(again.status, 0, `${args[0]}: ${again.stderr}`);
         assert.match(again.stdout, /^nothing to do: fgOS (.+ )?already active, doctor ok\nNext: .*fgos run "<prompt>"\n$/, args[0]);
-        assert.deepEqual(calls(log), ['init', 'doctor --json'], `${args[0]} runs init and one doctor`);
+        assert.deepEqual(calls(log), ['init', 'doctor check'], `${args[0]} runs init and one doctor`);
         fs.rmSync(log);
       }
       assert.equal(transactionStatus(state), 'complete');
@@ -119,14 +137,14 @@ test('a clean doctor ends the tail after init and one doctor run, and a rerun of
       const repaired = runFgctlRaw(['repair'], { cwd: proj, stateHome: state, env });
       assert.equal(repaired.status, 0, repaired.stderr);
       assert.match(repaired.stdout, /^Ready: fgOS (.+ )?active /, 'repair re-publishes, so it is never a no-op');
-      assert.deepEqual(calls(log), ['init', 'doctor --json']);
+      assert.deepEqual(calls(log), ['init', 'doctor check']);
     });
   } finally {
     fs.rmSync(release.dir, { recursive: true, force: true });
   }
 });
 
-test('a doctor that still names a fix runs doctor --fix and a second doctor before the closing block', () => {
+test('a doctor that still names a fix runs doctor --fix (its fixes, then its rows) and a second doctor before the closing block', () => {
   const release = releaseWithCannedDoctor();
   try {
     withProject(({ home, state, proj }) => {
@@ -137,7 +155,7 @@ test('a doctor that still names a fix runs doctor --fix and a second doctor befo
       const again = runFgctlRaw(['init', '--from', release.dir], { cwd: proj, stateHome: state, env });
       assert.equal(again.status, 0, again.stderr);
       assert.match(again.stdout, /^Ready: already up to date at /);
-      assert.deepEqual(calls(log), ['init', 'doctor --json', 'doctor --fix', 'doctor --json']);
+      assert.deepEqual(calls(log), ['init', 'doctor check', 'doctor fix', 'doctor check', 'doctor check']);
     });
   } finally {
     fs.rmSync(release.dir, { recursive: true, force: true });
@@ -151,7 +169,7 @@ test('init lists each failing check with its fix, exits 2 (precondition) and mar
       const env = { HOME: home, CANNED_DOCTOR: JSON.stringify(CANNED.failing) };
       const res = runFgctlRaw(['init', '--from', release.dir], { cwd: proj, stateHome: state, env });
       assert.equal(res.status, 2, 'precondition, the exit-code table\'s code for a ready-later release');
-      assert.equal(res.stdout, '2 checks need you:\n  1. needs-a-fix: fgos doctor --fix\n  2. needs-a-person: install the thing\n');
+      assert.equal(res.stdout, '2 checks need you:\n  1. project-fgos-launcher: fgos doctor --fix\n  2. curl-available: install the thing\n');
       assert.match(res.stderr, /not ready/);
       assert.equal(transactionStatus(state), 'ready-degraded');
       assert.ok(fs.existsSync(path.join(proj, '.fgos', 'installation', 'activation.json')), 'the release stays activated');

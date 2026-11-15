@@ -3533,29 +3533,6 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       return wireAgentsUseCase(mainCheckoutRootOf({}), { apply: Boolean(flags.yes) });
     }
 
-    // Diagnostic by default (D2, docs/platform/packaging-distribution/spec.md#business-rules RUL9): runs every
-    // DOCTOR_CHECKS entry against the current cwd, writing nothing — no rc
-    // file insertion, no config write — unless `--fix` is given.
-    //
-    // `--fix` (docs/history/doctor-fix-gate-bypass/CONTEXT.md D2, deliberate
-    // reversal of RUL9/RUL11 per distribution-vision.md §3): runs every
-    // registered `fix` (`runFixes`, `src/setup/registrations.mjs`) BEFORE
-    // re-running the checks, so the returned `checks` array reflects
-    // post-fix state — the same "report what changed" shape
-    // `setup` already uses. Without
-    // `--fix`, behavior is byte-identical to before this flag existed.
-    case 'doctor': {
-      // tsk-2xj: resolve the real main checkout the same way `resync-worktree`
-      // (:4939) already does — an explicit --dir always wins, otherwise
-      // self-detect via resolveMainCheckoutRoot so this reports/fixes the
-      // shared store even when run from a linked worktree (ADR0020: a
-      // worktree never carries its own .fgos/, so process.cwd() there was
-      // silently checking/writing the wrong tree).
-      const repoRoot = mainCheckoutRootOf(flags);
-      const { runDoctor } = await import('../src/setup/checks.mjs');
-      return runDoctor(repoRoot, { fix: Boolean(flags.fix) });
-    }
-
     case 'unclaim': {
       const id = requireField(positional[0] ?? flags.id, 'unclaim requires an id: fgos unclaim <id>');
       const repoRoot = mainCheckoutRootOf(flags);
@@ -3686,20 +3663,7 @@ function renderPlanLintReport(data) {
 
 function renderPretty(verb, data) {
   const lines = [];
-  if (verb === 'doctor') {
-    lines.push(bold('fgos doctor'));
-    if (data.fixed) {
-      for (const f of data.fixed) {
-        lines.push(formatCheck(true, `fix: ${f.id}`, f.message));
-      }
-    }
-    for (const c of data.checks) {
-      lines.push(formatCheck(c.passed, c.description, c.message));
-    }
-    if (data.next?.length) {
-      lines.push('', 'Next:', ...data.next.map((cmd) => `  ${cmd}`));
-    }
-  } else if (verb === 'setup') {
+  if (verb === 'setup') {
     lines.push(bold('fgos setup'));
     if (data.deprecationMessage) {
       lines.push(formatCheck(true, 'legacy compatibility command', data.deprecationMessage));
@@ -3909,7 +3873,7 @@ async function main() {
       },
     }, async () => {
       const data = await runVerb(verb, flags, positional, dir, rest);
-      if (flags.pretty && (verb === 'setup' || verb === 'doctor')) {
+      if (flags.pretty && verb === 'setup') {
         process.stdout.write(renderPretty(verb, data));
       } else if (verb === 'plan-lint' && !flags.json) {
         process.stdout.write(renderPlanLintReport(data));

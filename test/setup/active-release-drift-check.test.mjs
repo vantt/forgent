@@ -5,12 +5,10 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { execFileSync, spawnSync } from 'node:child_process';
-import { fileURLToPath } from 'node:url';
 import { DOCTOR_CHECKS, FIX_REGISTRATIONS } from '../../src/setup/checks.mjs';
 import { REPO_ROOT, buildRustDistribution, hashFile, listLegacyNodeSourceFiles, nativeAddonLibraryName } from '../../scripts/build-rust-distribution.mjs';
 import { inspectRepo } from '../../scripts/lib/git-ports.mjs';
 
-const CLI = fileURLToPath(new URL('../../bin/fgos.mjs', import.meta.url));
 const ID = 'active-release-matches-checkout';
 const ACTIVATED_AT = '2026-10-06T12:00:00Z';
 const ENV_KEYS = ['FGOS_ACTIVE_RELEASE_PATH', 'FGOS_ACTIVE_MANIFEST_PATH'];
@@ -313,7 +311,7 @@ test('unsafe source fails only this check and CLI doctor continues with normal a
   delete env.CLAUDE_CODE_SESSION_ID;
   delete env.CLAUDECODE;
   for (const strict of [false, true]) {
-    const child = spawnSync(process.execPath, [CLI, 'doctor', '--dir', f.source, ...(strict ? ['--strict'] : [])], {
+    const child = spawnSync(process.env.FGOS_HOST_BIN, ['doctor', '--dir', f.source, ...(strict ? ['--strict'] : [])], {
       cwd: f.outside, env, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], timeout: 60_000,
     });
     assert.equal(child.error, undefined);

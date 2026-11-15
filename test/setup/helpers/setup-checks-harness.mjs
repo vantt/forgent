@@ -51,6 +51,16 @@ function fixById(id) {
   return entry;
 }
 
+/**
+ * `fgos doctor <args>` as the product runs it: the host binary the test launcher staged (`FGOS_HOST_BIN`, with the
+ * release it names in the environment), never `bin/fgos.mjs`, which no longer serves the verb.
+ */
+function runHostDoctor(args, options) {
+  const host = process.env.FGOS_HOST_BIN;
+  assert.ok(host, 'FGOS_HOST_BIN is not set: run this file through node scripts/run-tests.mjs');
+  return spawnSync(host, ['doctor', ...args], { encoding: 'utf8', ...options });
+}
+
 function withHome(homeDir, fn) {
   const prevHome = process.env.HOME;
   const prevUserProfile = process.env.USERPROFILE;
@@ -96,6 +106,7 @@ export {
   os,
   path,
   resolveMainCheckout,
+  runHostDoctor,
   spawnSync,
   withHome,
 };

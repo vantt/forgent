@@ -1024,6 +1024,108 @@
       "allowed": [],
       "debt": [],
       "reason": "the `events`, `session` and `gateway` verbs are native in the host (apps/fgos/src/wiring/{events,session,gateway_control}.rs): the Node use cases, the session writers and the gateway control module are deleted, Node reads the registry only through `fgos session list`, and no file may bring one of these names back"
+    },
+    {
+      "job": "doctor readiness registry",
+      "kind": "door",
+      "patterns": [
+        "\\bregisterCheck\\(",
+        "\\bregisterFix\\(",
+        "\\bDOCTOR_CHECKS\\b",
+        "\\bFIX_REGISTRATIONS\\b",
+        "doctor-registry\\.v1\\.json",
+        "\\bpub const FIX_COMMAND\\b",
+        "\\bpub fn render_pretty\\b"
+      ],
+      "allowed": [
+        {
+          "path": "packages/distribution/rust/src/doctor.rs",
+          "reason": "the doctor engine: the one fix command, the one report renderer"
+        },
+        {
+          "path": "apps/fgos/src/wiring/doctor/**",
+          "reason": "the host's registry reader and the in-process row adapters"
+        }
+      ],
+      "debt": [
+        {
+          "path": "src/setup/registrations.mjs",
+          "reason": "the bodies of the rows and fixes of the layers Node still owns, keyed by id (bridge:S5, S6a, S6b, S7 in the registry); each step removes its own"
+        },
+        {
+          "path": "src/setup/checks.mjs",
+          "reason": "the re-export of the same body map, removed with it"
+        }
+      ],
+      "retiredBy": "S7: the last Node-owned row moves to Rust and the body map goes",
+      "reason": "one registry of every doctor row and fix, in run order, with an owner each (packages/distribution/contracts/doctor-registry.v1.json): Rust runs it, Node keeps only bodies"
+    },
+    {
+      "job": "Node rows bridge",
+      "kind": "door",
+      "patterns": [
+        "doctor-bridge",
+        "\\brunBridged\\b"
+      ],
+      "allowed": [
+        {
+          "path": "apps/fgos/src/wiring/doctor/bridge.rs",
+          "reason": "the host side: starts the payload module and reads its result lines"
+        },
+        {
+          "path": "src/setup/doctor-bridge.mjs",
+          "reason": "the payload side: runs the bodies the host asks for"
+        },
+        {
+          "path": "src/setup/registrations.mjs",
+          "reason": "defines the body map the bridge runs"
+        },
+        {
+          "path": "src/setup/checks.mjs",
+          "reason": "re-exports it for the bridge"
+        }
+      ],
+      "debt": [],
+      "retiredBy": "S7: the last Node-owned doctor row and init's Work-store step move to Rust, and the bridge module and its host caller are deleted",
+      "reason": "the one bounded way a native verb reaches Node: a payload module the host starts through legacy_exec, never a verb, route or fgos internal entry, never a parsed command line"
+    },
+    {
+      "job": "no Node from the native packaging verbs",
+      "kind": "door",
+      "patterns": [
+        "Command::new\\(\"node\"\\)",
+        "\\blegacy_exec::"
+      ],
+      "allowed": [
+        {
+          "path": "apps/fgos/src/legacy_exec.rs",
+          "reason": "owns the legacy payload: its resolution, its environment and the one node spawn"
+        },
+        {
+          "path": "apps/fgos/src/main.rs",
+          "reason": "the legacy lane of the composition root"
+        },
+        {
+          "path": "apps/fgos/src/invocation_doors.rs",
+          "reason": "names the recursion guard variable the detached Event Store child must not inherit"
+        },
+        {
+          "path": "apps/fgos/src/wiring/gateway_control.rs",
+          "reason": "names the recursion guard variable for the gateway child"
+        },
+        {
+          "path": "apps/fgos/src/wiring/doctor/bridge.rs",
+          "reason": "the one bridge to the Node-owned doctor rows"
+        }
+      ],
+      "debt": [
+        {
+          "path": "packages/distribution/rust/src/init.rs",
+          "reason": "fgctl's preflight asks the Node on PATH for its version (the release requires Node until the runner moves)"
+        }
+      ],
+      "retiredBy": "the step that removes requires.node from the release manifest",
+      "reason": "doctor, init, uninstall and wire-agents never call back into Node for a layer that already moved: only the bridge starts Node, and a row adapter or a packaging module that needs a fact asks the Rust component that owns it"
     }
   ],
   "files": {
@@ -1261,6 +1363,7 @@
     "src/setup/model-pool-checks.mjs": "use-case",
     "src/setup/seat-binding-checks.mjs": "use-case",
     "src/setup/checks.mjs": "use-case",
+    "src/setup/doctor-bridge.mjs": "use-case",
     "src/setup/executor-profile-warnings.mjs": "infra",
     "src/setup/session-keep-declared.mjs": "infra",
     "src/setup/registrations.mjs": "use-case",

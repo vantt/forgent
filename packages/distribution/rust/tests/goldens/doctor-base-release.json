@@ -1,0 +1,110 @@
+{
+  "contract": "fgos.v1",
+  "generated_at": "2026-11-15T09:11:55.341Z",
+  "data_hash": "4deddac6e34259ed28e064e5398bdd8ca4a289a7e260cb13c115a5f6f2fb3d90",
+  "data": {
+    "ok": false,
+    "next": [
+      "fgos doctor --fix"
+    ],
+    "checks": [
+      {
+        "id": "node-version-and-git",
+        "description": "Node >=18 and git available",
+        "passed": true,
+        "status": "ok",
+        "message": "node v24.22.0, git available"
+      },
+      {
+        "id": "cli-version-visible",
+        "description": "the running fgOS's own package version and git commit resolve cleanly",
+        "passed": true,
+        "status": "ok",
+        "message": "fgos 0.2.0 (118df7065d62)"
+      },
+      {
+        "id": "shell-integration-sourced",
+        "description": "shell-integration source line present in detected rc file(s)",
+        "passed": false,
+        "status": "fail",
+        "message": "not sourced in: /home/person/.bashrc, /home/person/.zshrc — run fgos setup; 2 dead fgos source line(s) in /home/person/.bashrc (1), /home/person/.zshrc (1) — each one errors on every shell open; delete them by hand (fgos never edits your shell profile to remove a line). e.g. /tmp/sacr/scripts/fgos-shell-integration.sh",
+        "fix": null
+      },
+      {
+        "id": "project-fgos-launcher",
+        "description": "a release install has a single fgos on PATH that runs each project's own activated fgos",
+        "passed": true,
+        "status": "ok",
+        "message": "running from a source checkout -- shell integration provides fgos, no launcher needed"
+      },
+      {
+        "id": "dispatch-decide-hook-wired",
+        "description": ".claude/settings.json PreToolUse hooks enforce dispatch.mjs decide on every Agent/Task call, the decision-question template and the main-checkout delete guard on every Bash call",
+        "passed": false,
+        "status": "fail",
+        "message": ".claude/settings.json missing canonical hook(s): dispatch-decide, decision-question, main-checkout-delete-guard, mailbox Stop, mailbox PostToolUse, session-register — run fgos doctor --fix",
+        "fix": "fgos doctor --fix"
+      },
+      {
+        "id": "tool-registry-configured",
+        "description": "tool registry posture — inactive/degraded/full",
+        "passed": false,
+        "status": "fail",
+        "message": "degraded — 1/2 tool(s) present (0 stale, 1 missing, 0 cannot be probed) — install the missing tool, or reindex the stale one; fgos dispatch decide --for <capability> shows the answer a dispatch gets",
+        "fix": null
+      },
+      {
+        "id": "lock-kernel-semantics",
+        "description": "the holder-lock driver gives kernel lock exclusion on <fgosDir>/locks and <lockRoot>, proven by a two-process probe on each mount",
+        "passed": true,
+        "status": "warn",
+        "message": "warning: workspace /work/project/.fgos/locks does not exist yet, not measured (fgos doctor --fix creates it); machine /home/person/.local/state/fgos/locks {\"driver\":\"flock\",\"exclusion\":\"kernel\",\"borrow\":\"kernel\",\"holders\":\"kernel\"}, two-process probe green; stateRoot /home/person/.local/state/fgos (home); killWaitMs 2000 (fixed)"
+      },
+      {
+        "id": "agent-cli-project-trusted",
+        "description": "the project root is trusted in every codex home and agy sub-HOME the configured executors run under, so a headless dispatch does not stop at a \"Trust this folder?\" prompt",
+        "passed": false,
+        "status": "fail",
+        "message": "codex config /home/person/.codex/config.toml (openai/codex-herdr) has no entry for /work/project; codex will stop at \"Trust this folder?\" -- add to that file: [projects.\"/work/project\"] trust_level = \"trusted\" (fgOS never edits it)",
+        "fix": null
+      },
+      {
+        "id": "activation-matches-pin",
+        "description": "the active release is the one the committed .fgos/distribution.json pin names (warns when it differs)",
+        "passed": true,
+        "status": "skip",
+        "message": "activation-matches-pin skipped: no committed pin"
+      },
+      {
+        "id": "event-store-open-root",
+        "description": "Event Store open-root",
+        "passed": false,
+        "status": "fail",
+        "message": "ENOENT: no such file or directory, lstat '/work/project/.git/fgos/events'",
+        "fix": null
+      },
+      {
+        "id": "git-operation-journal",
+        "description": "Readable Git WAL under the controller activation fence (`git-fence-missing` when the fence is gone); open operations are `git-incidents`",
+        "passed": false,
+        "status": "fail",
+        "message": "the Git WAL is not initialized; run `fgos doctor --fix` (git-wal-dir)",
+        "fix": "fgos doctor --fix",
+        "detail": {
+          "journal": {
+            "initialized": false,
+            "complete": true,
+            "pendingCount": 0,
+            "retainedBytes": 0,
+            "retainedChains": 0,
+            "oldestRetainedAtMs": null,
+            "ledgerEntries": 0,
+            "ledgerCapacityWarning": false,
+            "oldestUnresolved": null,
+            "errors": []
+          }
+        }
+      }
+    ]
+  }
+}

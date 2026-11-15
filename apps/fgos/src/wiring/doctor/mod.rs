@@ -118,11 +118,7 @@ impl NativeOwner {
 impl RowOwner for NativeOwner {
     fn run_fixes(&self, _root: &Path, ids: &[&str]) -> Vec<FixResult> {
         ids.iter()
-            .map(|id| FixResult {
-                id: (*id).to_owned(),
-                changed: false,
-                message: format!("no fix {id} is run in process"),
-            })
+            .map(|id| FixResult::done(id, false, format!("no fix {id} is run in process")))
             .collect()
     }
 
@@ -261,7 +257,7 @@ mod tests {
     #[test]
     fn every_bridged_entry_names_the_step_that_removes_it() {
         let registry = registry().unwrap();
-        let steps = ["S5", "S6a", "S6b", "S7"];
+        let steps = ["S4", "S5", "S6a", "S6b", "S7"];
         for owner in registry
             .rows
             .iter()
@@ -279,11 +275,7 @@ mod tests {
         impl RowOwner for Failing {
             fn run_fixes(&self, _: &Path, ids: &[&str]) -> Vec<FixResult> {
                 ids.iter()
-                    .map(|id| FixResult {
-                        id: (*id).to_owned(),
-                        changed: false,
-                        message: String::new(),
-                    })
+                    .map(|id| FixResult::done(id, false, ""))
                     .collect()
             }
             fn judge_rows(&self, _: &Path, ids: &[&str]) -> Vec<RowOutcome> {

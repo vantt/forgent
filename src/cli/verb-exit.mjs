@@ -10,8 +10,6 @@ const EXIT_OF = {
   'wire-agents': (data) => (data.failed?.length > 0 ? 1 : 0),
   // A step of the reversal that failed exits 1, so fgctl leaves its own irreversible removal undone.
   uninstall: (data) => (data.failed?.length > 0 ? 1 : 0),
-  // `doctor --strict` exits 1 when any check still fails after optional fixes ran.
-  doctor: (data, { flags }) => (flags.strict === true && !data.ok ? 1 : 0),
   // A foreground start/resume/answer and a gate settle exit with their outcome's code; a proposal exits 1 when it is not ok.
   workflow: (data, { positional, flags }) => {
     const sub = positional[0];

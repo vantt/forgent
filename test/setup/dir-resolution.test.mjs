@@ -16,7 +16,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync, spawnSync } from 'node:child_process';
 
-import { FGOS, NO_CLAUDE_ENV, mkTemp } from './helpers/setup-checks-harness.mjs';
+import { FGOS, NO_CLAUDE_ENV, mkTemp, runHostDoctor } from './helpers/setup-checks-harness.mjs';
 
 function initGitWithWorktree(prefix) {
   const main = mkTemp(`${prefix}-main-`);
@@ -34,11 +34,9 @@ function cleanup(...dirs) {
 
 function runFgos(cwd, args, homeDir) {
   const resolvedHome = homeDir ?? mkTemp('dir-resolution-home-');
-  return spawnSync(process.execPath, [FGOS, ...args], {
-    cwd,
-    encoding: 'utf8',
-    env: { ...NO_CLAUDE_ENV, HOME: resolvedHome, USERPROFILE: resolvedHome },
-  });
+  const options = { cwd, encoding: 'utf8', env: { ...NO_CLAUDE_ENV, HOME: resolvedHome, USERPROFILE: resolvedHome } };
+  // `doctor` is the host's verb; the others are still served by the Node entry.
+  return args[0] === 'doctor' ? runHostDoctor(args.slice(1), options) : spawnSync(process.execPath, [FGOS, ...args], options);
 }
 
 test('tsk-2xj: fgos doctor run bare from a linked worktree reports the same checks as running directly at the main checkout', () => {

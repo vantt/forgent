@@ -91,15 +91,15 @@ function restampRelease(fromDir, prefix, edit) {
   return { dir, digest: manifest.artifactDigest };
 }
 
-/** A copy of `fromDir` whose payload exits 42 on `doctor` while SIMULATE_TAIL_FAILURE=1. */
-function releaseWithFailingDoctor(fromDir, prefix, label) {
+/** A copy of `fromDir` whose payload exits 42 on `init`, the first tail step, while SIMULATE_TAIL_FAILURE=1. */
+function releaseWithFailingTail(fromDir, prefix, label) {
   return restampRelease(fromDir, prefix, (manifest, dir) => {
     const fgosMjsPath = path.join(dir, 'libexec', 'legacy-node', 'bin', 'fgos.mjs');
     const originalContent = fs.readFileSync(fgosMjsPath, 'utf8');
     const firstLineEnd = originalContent.indexOf('\n');
     const shebang = originalContent.slice(0, firstLineEnd + 1);
     const rest = originalContent.slice(firstLineEnd + 1);
-    const failInjection = `if (process.env.SIMULATE_TAIL_FAILURE === '1' && process.argv.includes('doctor')) {\n  console.error('simulated ${label} doctor failure in tail');\n  process.exit(42);\n}\n`;
+    const failInjection = `if (process.env.SIMULATE_TAIL_FAILURE === '1' && process.argv.includes('init')) {\n  console.error('simulated ${label} init failure in tail');\n  process.exit(42);\n}\n`;
     fs.writeFileSync(fgosMjsPath, shebang + failInjection + rest);
     const newMjsHash = 'sha256:' + hashFile(fgosMjsPath);
     const newMjsSize = fs.statSync(fgosMjsPath).size;
@@ -565,8 +565,8 @@ test('P7: Upgrade candidate preflight failure refuses upgrade and leaves existin
 
 test('P7: Upgrade candidate local tail failure leaves workspace in diagnosable state with ready-degraded transaction', () => {
   const { proj: projDir, state: stateHome } = workspaceAtA.restore();
-  // Release B whose doctor fails when SIMULATE_TAIL_FAILURE is set
-  const candidate = releaseWithFailingDoctor(releaseDirB, 'fgctl-upg-tailfail-cand-', 'upgrade');
+  // Release B whose tail fails when SIMULATE_TAIL_FAILURE is set
+  const candidate = releaseWithFailingTail(releaseDirB, 'fgctl-upg-tailfail-cand-', 'upgrade');
   const newDigest = candidate.digest;
 
   try {
@@ -577,7 +577,7 @@ test('P7: Upgrade candidate local tail failure leaves workspace in diagnosable s
     });
 
     assert.notEqual(upgRes.status, 0, 'upgrade must fail when tail fails');
-    assert.match(upgRes.stderr, /tail command 'doctor.*failed with status 42/);
+    assert.match(upgRes.stderr, /tail command 'init.*failed with status 42/);
 
     // Activation was published before tail
     const activationPath = path.join(projDir, '.fgos', 'installation', 'activation.json');
@@ -612,8 +612,8 @@ test('P7: Upgrade candidate local tail failure leaves workspace in diagnosable s
 test('P7: Repair local tail failure leaves workspace in diagnosable state with ready-degraded transaction', () => {
   const stateHome = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-rep-tailfail-state-'));
   const projDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-rep-tailfail-proj-'));
-  // Release A whose doctor fails when SIMULATE_TAIL_FAILURE is set
-  const candidate = releaseWithFailingDoctor(releaseDirA, 'fgctl-rep-tailfail-cand-', 'repair');
+  // Release A whose tail fails when SIMULATE_TAIL_FAILURE is set
+  const candidate = releaseWithFailingTail(releaseDirA, 'fgctl-rep-tailfail-cand-', 'repair');
   const newDigest = candidate.digest;
 
   try {
@@ -633,7 +633,7 @@ test('P7: Repair local tail failure leaves workspace in diagnosable state with r
     });
 
     assert.notEqual(repRes.status, 0, 'repair must fail when tail fails');
-    assert.match(repRes.stderr, /tail command 'doctor.*failed with status 42/);
+    assert.match(repRes.stderr, /tail command 'init.*failed with status 42/);
 
     // Activation was published before tail
     const activationPath = path.join(projDir, '.fgos', 'installation', 'activation.json');

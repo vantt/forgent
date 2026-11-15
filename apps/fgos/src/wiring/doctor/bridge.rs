@@ -341,12 +341,14 @@ impl RowOwner for NodeBridge {
         let cause = fault.map(|fault| fault.message());
         ids.iter()
             .map(|id| {
-                done.remove(*id).unwrap_or_else(|| FixResult {
-                    id: (*id).to_owned(),
-                    changed: false,
-                    message: cause.clone().unwrap_or_else(|| {
-                        "the Node rows bridge gave no answer for this fix".to_owned()
-                    }),
+                done.remove(*id).unwrap_or_else(|| {
+                    FixResult::done(
+                        id,
+                        false,
+                        cause.clone().unwrap_or_else(|| {
+                            "the Node rows bridge gave no answer for this fix".to_owned()
+                        }),
+                    )
                 })
             })
             .collect()
@@ -477,8 +479,9 @@ mod tests {
         let bridge = scripted("cat >/dev/null; exit 1", Duration::from_secs(20));
         let out = bridge.run_fixes(Path::new("/p"), &["fix-a"]);
         assert_eq!(out.len(), 1);
-        assert!(!out[0].changed);
-        assert!(out[0].message.contains("failed"), "{}", out[0].message);
+        assert_eq!(out[0].changed, Some(false));
+        let message = out[0].message.clone().unwrap();
+        assert!(message.contains("failed"), "{message}");
     }
 
     #[test]
@@ -571,7 +574,11 @@ mod tests {
             Duration::from_secs(5),
         );
         let out = bridge.run_fixes(Path::new("/p"), &["fix-a"]);
-        assert!(out[0].message.contains("cannot be resolved"));
+        assert!(out[0]
+            .message
+            .as_deref()
+            .unwrap()
+            .contains("cannot be resolved"));
     }
 
     #[test]
@@ -592,5 +599,69 @@ mod tests {
         let message = result.message.clone().unwrap();
         let (own, parent) = message.split_once(" vs ").unwrap();
         assert_ne!(own, parent, "the child shares the host's group: {message}");
+    }
+}
+
+#[cfg(test)]
+mod contract_tests {
+    use super::*;
+
+    const CONTRACT: &str =
+        include_str!("../../../../../packages/distribution/contracts/doctor-bridge.v1.json");
+
+    #[test]
+    fn the_prefix_and_module_are_the_contracts() {
+        let contract: serde_json::Value = serde_json::from_str(CONTRACT).unwrap();
+        assert_eq!(contract["resultPrefix"], RESULT_PREFIX);
+        assert_eq!(contract["module"], BRIDGE_MODULE);
+    }
+
+    #[test]
+    fn every_vector_line_reads_back_as_the_body_it_was_written_from() {
+        let contract: serde_json::Value = serde_json::from_str(CONTRACT).unwrap();
+        for vector in contract["vectors"].as_array().unwrap() {
+            let name = vector["name"].as_str().unwrap();
+            let raw = vector["line"].as_str().unwrap();
+            let json = raw
+                .strip_prefix(RESULT_PREFIX)
+                .and_then(|rest| rest.strip_suffix('\n'))
+                .unwrap_or_else(|| panic!("{name}: not a result line"));
+            let line: Line = serde_json::from_str(json).unwrap_or_else(|e| panic!("{name}: {e}"));
+            let body = &vector["body"];
+            match line {
+                Line::Row { id, result } => {
+                    assert_eq!(body["id"], id.as_str(), "{name}");
+                    assert_eq!(body["passed"], result.passed, "{name}");
+                    assert_eq!(
+                        body.get("message").and_then(|m| m.as_str()),
+                        result.message.as_deref(),
+                        "{name}"
+                    );
+                    assert_eq!(
+                        body.get("fixCommand").and_then(|m| m.as_str()),
+                        result.fix_command.as_deref(),
+                        "{name}"
+                    );
+                    assert_eq!(body.get("detail"), result.detail.as_ref(), "{name}");
+                }
+                Line::Fix(fix) => {
+                    assert_eq!(body["id"], fix.id.as_str(), "{name}");
+                    assert_eq!(
+                        body.get("changed").and_then(|c| c.as_bool()),
+                        fix.changed,
+                        "{name}"
+                    );
+                    assert_eq!(
+                        body.get("message").and_then(|m| m.as_str()),
+                        fix.message.as_deref(),
+                        "{name}"
+                    );
+                }
+                Line::End { count } => assert_eq!(body["count"], count, "{name}"),
+                Line::Refusal { message } => {
+                    assert_eq!(body["message"], message.as_str(), "{name}")
+                }
+            }
+        }
     }
 }

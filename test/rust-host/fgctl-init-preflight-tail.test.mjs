@@ -229,13 +229,13 @@ test('P7: Local runtime tail failure leaves workspace in diagnosable state with 
     // Copy fixture release into tailFailReleaseDir
     fs.cpSync(fixture.releaseDir, tailFailReleaseDir, { recursive: true });
 
-    // Modify legacy node payload to fail on doctor when SIMULATE_TAIL_FAILURE is set
+    // Modify legacy node payload to fail on init, the first tail step, when SIMULATE_TAIL_FAILURE is set
     const fgosMjsPath = path.join(tailFailReleaseDir, 'libexec', 'legacy-node', 'bin', 'fgos.mjs');
     const originalContent = fs.readFileSync(fgosMjsPath, 'utf8');
     const firstLineEnd = originalContent.indexOf('\n');
     const shebang = originalContent.slice(0, firstLineEnd + 1);
     const rest = originalContent.slice(firstLineEnd + 1);
-    const failInjection = `if (process.env.SIMULATE_TAIL_FAILURE === '1' && process.argv.includes('doctor')) {\n  console.error('simulated doctor failure in tail');\n  process.exit(42);\n}\n`;
+    const failInjection = `if (process.env.SIMULATE_TAIL_FAILURE === '1' && process.argv.includes('init')) {\n  console.error('simulated init failure in tail');\n  process.exit(42);\n}\n`;
     fs.writeFileSync(fgosMjsPath, shebang + failInjection + rest);
 
     // Update manifest.json with updated hash for bin/fgos.mjs and legacyNode component
@@ -263,7 +263,7 @@ test('P7: Local runtime tail failure leaves workspace in diagnosable state with 
     });
 
     assert.notEqual(res.status, 0, 'fgctl init must fail when tail command fails');
-    assert.match(res.stderr, /tail command 'doctor.*failed with status 42/);
+    assert.match(res.stderr, /tail command 'init.*failed with status 42/);
 
     // 1. activation.json was published before tail and has status ready
     const activationPath = path.join(tempProj, '.fgos', 'installation', 'activation.json');

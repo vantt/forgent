@@ -167,7 +167,7 @@ function machineRunner() {
  * checks — a duplicate is a programming error (two modules picked the same
  * name), not a runtime condition to degrade gracefully on, so it throws.
  */
-export function registerCheck({ id, description, check }) {
+export function registerCheck({ id, check }) {
   if (typeof id !== 'string' || !id.trim()) {
     throw new Error('registerCheck requires a non-empty id');
   }
@@ -178,7 +178,7 @@ export function registerCheck({ id, description, check }) {
     throw new Error(`registerCheck("${id}") requires a check function`);
   }
   // A check that throws (an unreadable store, a refused clone) fails its own row; it never stops the rest of the run.
-  DOCTOR_CHECKS.push({ id, description, check(cwd, run) {
+  DOCTOR_CHECKS.push({ id, check(cwd, run) {
     const failed = error => ({ passed: false, message: error.message });
     try {
       const result = check(cwd, run);
@@ -233,10 +233,9 @@ function doctorWorkView(root, run = createDoctorRun()) {
  * those two already follow) — a module may register any subset of the
  * three.
  *
- * `repairs` names the check rows this fix repairs when they do not share its id; a failing row it repairs
- * reports `fgos doctor --fix` as its `fix`. Default: the row with the fix's own id.
+ * Which rows a fix repairs is the registry's (`repairs` in doctor-registry.v1.json); this module keeps the body.
  */
-export function registerFix({ id, fix, repairs = [id] }) {
+export function registerFix({ id, fix }) {
   if (typeof id !== 'string' || !id.trim()) {
     throw new Error('registerFix requires a non-empty id');
   }
@@ -246,18 +245,13 @@ export function registerFix({ id, fix, repairs = [id] }) {
   if (typeof fix !== 'function') {
     throw new Error(`registerFix("${id}") requires a fix function`);
   }
-  if (!Array.isArray(repairs) || repairs.some((row) => typeof row !== 'string')) {
-    throw new Error(`registerFix("${id}") requires repairs to be a list of check ids`);
-  }
-  FIX_REGISTRATIONS.push({ id, fix, repairs });
+  FIX_REGISTRATIONS.push({ id, fix });
 }
 
 /**
- * Run every registered fix against `cwd` (`fgos doctor --fix`'s own write
- * path — the one place doctor writes, gated behind the explicit `--fix`
- * flag; without it doctor stays exactly as before). Each fix's own
- * `{changed, message}` is reported per entry, mirroring `DOCTOR_CHECKS`'
- * per-entry `{passed, message}` report shape.
+ * Run registered fixes against `cwd`: every one, or the `fixes` given. Each fix's own `{changed, message}` is
+ * reported per entry. The order is the caller's: the host runs them in the registry's order
+ * (packages/distribution/contracts/doctor-registry.v1.json) through `runBridged`.
  */
 export function runFixes(cwd, fixes = FIX_REGISTRATIONS) {
   return fixes.map(({ id, fix }) => {
@@ -268,47 +262,42 @@ export function runFixes(cwd, fixes = FIX_REGISTRATIONS) {
   });
 }
 
-const DOCTOR_FIX_COMMAND = 'fgos doctor --fix';
-
 /**
- * The level of one row: a row that says its own `status` keeps it; otherwise a failed row is `fail`, a passing row
- * whose message opens with `warning:` is `warn` (the level convention every row module documents), and any other
- * passing row is `ok`.
+ * One call of the host's Node rows bridge (src/setup/doctor-bridge.mjs): the bodies of the rows or fixes the
+ * registry still gives to Node, run in the order the host asked and nothing else. `phase` is `fix` (every id is a
+ * fix id; `onResult` gets `{ id, changed, message }` per fix) or `check` (every id is a row id; `onResult` gets
+ * `{ id, passed, status?, message, fixCommand?, detail? }` per row, judged with one shared run so rows that read
+ * the same fact read it once). The level, the fix command of a failing row, `ok` and `next` are the host's: this
+ * function derives none of them. An id with no body here is a refusal of the whole call, never a silent skip.
  */
-function rowStatus({ passed, status, message }) {
-  if (status !== undefined) return status;
-  if (passed === false) return 'fail';
-  return typeof message === 'string' && message.startsWith('warning:') ? 'warn' : 'ok';
-}
-
-/**
- * One doctor run as agents and `--pretty` read it: `{ ok, next, fixed?, checks }`. Each row keeps `{ id, description,
- * passed, message, detail? }` and adds `status` (`ok|warn|fail|skip`) and, on a failing row, `fix` (the command that
- * repairs it, or null when only a person can). `ok` is "no row fails"; `next` is the failing rows' fix commands, once
- * each, in registry order. With `fix`, every registered fix runs first, so the rows are judged after the repair.
- * The exit code is not part of this contract (`--strict` maps `ok` to it).
- */
-export async function runDoctor(repoRoot, { fix = false, checks = DOCTOR_CHECKS, fixes = FIX_REGISTRATIONS } = {}) {
-  const fixed = fix ? runFixes(repoRoot, fixes) : undefined;
-  const repairedByDoctor = new Set();
-  for (const entry of fixes) for (const rowId of entry.repairs ?? [entry.id]) repairedByDoctor.add(rowId);
-  // A check may return its result directly or as a promise (one drives promise-based runner code).
-  // Rows of one run share what they read once (the Work view).
+export async function runBridged({ phase, ids, dir }, onResult) {
+  if (phase === 'fix') {
+    const bodies = ids.map((id) => FIX_REGISTRATIONS.find((entry) => entry.id === id) ?? null);
+    const missing = ids.filter((_, at) => bodies[at] === null);
+    if (missing.length > 0) throw new Error(`no fix body for ${missing.join(', ')}`);
+    for (const result of runFixes(dir, bodies)) onResult(result);
+    return;
+  }
+  if (phase !== 'check') throw new Error(`unknown phase "${phase}"`);
+  const bodies = ids.map((id) => DOCTOR_CHECKS.find((entry) => entry.id === id) ?? null);
+  const missing = ids.filter((_, at) => bodies[at] === null);
+  if (missing.length > 0) throw new Error(`no row body for ${missing.join(', ')}`);
   const run = createDoctorRun();
-  const rows = [];
-  const next = [];
-  for (const { id, description, check } of checks) {
-    const result = await check(repoRoot, run);
-    const status = rowStatus(result);
-    const repair = result.fixCommand ?? (status === 'fail' ? (repairedByDoctor.has(id) ? DOCTOR_FIX_COMMAND : null) : undefined);
-    if (status === 'fail' && repair && !next.includes(repair)) next.push(repair);
-    rows.push({
-      id, description, passed: result.passed, status, message: result.message,
-      ...(repair !== undefined && { fix: repair }),
+  for (const { id, check } of bodies) {
+    // A check may return its result directly or as a promise (one drives promise-based runner code). One that
+    // returns nothing usable fails its own row, as one that throws does, and never ends the call.
+    let result;
+    try { result = await check(dir, run); } catch (error) { result = { passed: false, message: error.message }; }
+    if (typeof result?.passed !== 'boolean') result = { passed: false, message: `the row returned no verdict (${id})` };
+    onResult({
+      id,
+      passed: result.passed,
+      ...(result.status !== undefined && { status: result.status }),
+      ...(result.message !== undefined && { message: result.message }),
+      ...(result.fixCommand !== undefined && { fixCommand: result.fixCommand }),
       ...(result.detail !== undefined && { detail: result.detail }),
     });
   }
-  return { ok: rows.every((row) => row.status !== 'fail'), next, ...(fixed !== undefined && { fixed }), checks: rows };
 }
 
 /**
@@ -985,19 +974,16 @@ function checkToolRegistryConfigured(cwd) {
 
 registerCheck({
   id: 'node-version-and-git',
-  description: `Node >=${MIN_NODE_MAJOR} and git available`,
   check: (cwd, run) => checkNodeAndGit(cwd, run),
 });
 
 registerCheck({
   id: 'cli-version-visible',
-  description: 'the running fgOS\'s own package version and git commit resolve cleanly',
   check: () => checkCliVersionVisible(),
 });
 
 registerCheck({
   id: 'shell-integration-sourced',
-  description: 'shell-integration source line present in detected rc file(s)',
   check: (cwd) => checkShellIntegrationSourced(cwd),
 });
 
@@ -1038,7 +1024,6 @@ export function fixProjectLauncher({ pathEnv = process.env.PATH } = {}) {
 
 registerCheck({
   id: 'project-fgos-launcher',
-  description: 'a release install has a single fgos on PATH that runs each project\'s own activated fgos',
   check: () => checkProjectLauncher(),
 });
 
@@ -1049,49 +1034,41 @@ registerFix({
 
 registerCheck({
   id: 'runner-generated-paths',
-  description: 'runner.generatedPaths maps generated sources to render targets with well-formed write-scope entries',
   check: (cwd) => checkRunnerGeneratedPathsConfig(cwd),
 });
 
 registerCheck({
   id: 'runner-patterns-config',
-  description: 'project and global runner patterns configuration is present, well-formed, and cumulative',
   check: (cwd, run) => checkRunnerPatternsConfig(cwd, run),
 });
 
 registerCheck({
   id: 'executor-family-unique',
-  description: 'each agent family (providerModel) is served by exactly one executor; its transports are invocations of that executor',
   check: (cwd) => checkExecutorFamilyUnique(cwd),
 });
 
 registerCheck({
   id: 'executor-skills-installed',
-  description: 'every skill an executor declares in supports.skills exists in the skill directory of each CLI the executor invokes, in the main checkout; fails naming the missing path',
   check: (cwd) => checkExecutorSkillsInstalled(cwd),
 });
 
 registerCheck({
   id: 'tier-fallback',
-  description: 'every family runner.tierFallback lists for a tier has a modelPolicies cell at that tier and an agent executor; warns otherwise',
   check: (cwd) => checkTierFallback(cwd),
 });
 
 registerCheck({
   id: 'model-policy-pools',
-  description: 'every pool a runner.modelPolicies cell names (model@pool) is declared in runner.llmAccounts, since a pool with no account is skipped by the walk; warns otherwise',
   check: (cwd) => checkModelPolicyPools(cwd),
 });
 
 registerCheck({
   id: 'llm-accounts-shape',
-  description: 'runner.llmAccounts is global-only and well formed: pool names without "@" or a family alias, every account with a credentialStore directory per CLI',
   check: (cwd) => checkLlmAccountsShape(cwd),
 });
 
 registerCheck({
   id: 'llm-accounts-vs-legacy',
-  description: 'when runner.llmAccounts is declared, it carries the same accounts and login directories as runner.providers, which the lease still reads for a pool llmAccounts does not declare; warns otherwise',
   check: (cwd) => checkLlmAccountsVsLegacy(cwd),
 });
 
@@ -1112,25 +1089,21 @@ export function checkDomainRegistryCompiled({ payloadRoot } = {}) {
 
 registerCheck({
   id: 'domain-registry-compiled',
-  description: "every compiled.json of the running fgOS's domains (the form the Work lifecycle reads) exists, parses, carries the contract this fgOS reads and matches its registry and workflow YAML",
   check: () => checkDomainRegistryCompiled(),
 });
 
 registerCheck({
   id: 'agent-type-names-unique',
-  description: 'agent definition names are unique in the project\'s own tiers (the workspace tier, and the core tier when the project ships one); a higher tier replaces a lower one whole, and workspace-tier files have the shape the renderer needs; the installed fgOS\'s own domain and core tiers are judged by npm test',
   check: (cwd) => checkAgentTypeNamesUnique(cwd, { projectTiersOnly: true }),
 });
 
 registerCheck({
   id: 'main-checkout-hook-wired',
-  description: 'core.hooksPath wired to .githooks (main-checkout kernel lock check, borrowed through the description, and source-checkout new-root-file guards)',
   check: (cwd) => checkMainCheckoutHookWired(cwd),
 });
 
 registerCheck({
   id: 'dispatch-decide-hook-wired',
-  description: '.claude/settings.json PreToolUse hooks enforce dispatch.mjs decide on every Agent/Task call, the decision-question template and the main-checkout delete guard on every Bash call',
   check: (cwd, run) => checkDispatchDecideHookWired(cwd, run),
 });
 
@@ -1144,7 +1117,6 @@ registerFix({
 
 registerCheck({
   id: 'codex-hook-wired',
-  description: '.codex/hooks.json PreToolUse hooks enforce dispatch.mjs decide, the decision-question template and the main-checkout delete guard',
   check: (cwd, run) => checkCodexHook(cwd, run),
 });
 
@@ -1158,7 +1130,6 @@ registerFix({
 
 registerCheck({
   id: 'agy-hook-wired',
-  description: '.agents/hooks.json PreToolUse hooks enforce dispatch.mjs decide, the decision-question template and the main-checkout delete guard',
   check: (cwd, run) => checkAgyHook(cwd, run),
 });
 
@@ -1172,7 +1143,6 @@ registerFix({
 
 registerCheck({
   id: 'omp-hook-wired',
-  description: '.omp/extensions/fgos-hooks.ts in-process extension enforces dispatch.mjs decide, the decision-question template and the main-checkout delete guard',
   check: (cwd, run) => checkOmpHook(cwd, run),
 });
 
@@ -1186,7 +1156,6 @@ registerFix({
 
 registerCheck({
   id: 'pi-hook-wired',
-  description: '.pi/extensions/fgos-hooks.ts in-process extension enforces dispatch.mjs decide, the decision-question template and the main-checkout delete guard',
   check: (cwd, run) => checkPiHook(cwd, run),
 });
 
@@ -1200,19 +1169,16 @@ registerFix({
 
 registerCheck({
   id: 'tool-registry-configured',
-  description: 'tool registry posture — inactive/degraded/full',
   check: (cwd) => checkToolRegistryConfigured(cwd),
 });
 
 registerCheck({
   id: 'agy-permissions-configured',
-  description: 'when agy is on PATH, the person\'s own agy settings.json lets headless agy run commands under a deny list; report only, fgOS never widens it (fgos wire-agents shows the edit)',
   check: () => checkAgyPermissionsConfigured(),
 });
 
 registerCheck({
   id: 'agy-sub-homes-configured',
-  description: 'agy sub-HOMEs referenced in executor configs have settings.json configured with toolPermission: always-proceed',
   // The merged config (project + global): the credential homes of the declared gemini accounts live in
   // the global one, and a confined invocation runs as one of those accounts.
   check: (cwd) => {
@@ -1265,13 +1231,11 @@ export function checkCurlAvailable(binary = 'curl') {
 
 registerCheck({
   id: 'curl-available',
-  description: 'curl resolves on PATH (fgctl init downloads releases through it); a missing curl only blocks the download paths',
   check: () => checkCurlAvailable(),
 });
 
 registerCheck({
   id: 'bwrap-available',
-  description: 'bwrap binary resolves on PATH and minimal smoke test (bwrap --ro-bind / / -- true) exits 0',
   check: () => checkBwrapAvailable(),
 });
 
@@ -1421,7 +1385,6 @@ function checkWorkClassificationVocabulary(cwd, run) {
 
 registerCheck({
   id: 'work-classification-vocabulary',
-  description: "every open item's risk/kind matches its domain's declared classification vocabulary",
   check: (cwd, run) => checkWorkClassificationVocabulary(cwd, run),
 });
 
@@ -1467,7 +1430,6 @@ function checkWorkStepVocabulary(cwd, run) {
 
 registerCheck({
   id: 'work-step-vocabulary',
-  description: "every open item sits at a step its own domain's Workflow still registers — no item stranded on a retired step",
   check: (cwd, run) => checkWorkStepVocabulary(cwd, run),
 });
 
@@ -1490,20 +1452,17 @@ function checkWorkRecordedConflicts(cwd, run) {
 
 registerCheck({
   id: 'work-recorded-conflicts',
-  description: 'the Work view holds no recorded cross-machine conflicts: acknowledged changes a concurrent change from another machine kept from applying (warns, never fails)',
   check: (cwd, run) => checkWorkRecordedConflicts(cwd, run),
 });
 
 
 registerCheck({
   id: 'root-drift',
-  description: 'every fgw/<root> branch is in sync with its real target — no unsynced drift left over from a leaf merge',
   check: (cwd, run) => checkRootDrift(cwd, run),
 });
 
 registerCheck({
   id: 'leaf-notify-drift',
-  description: 'every live session branch has no post-land drift against its target',
   check: (cwd, run) => checkLeafNotifyDrift(cwd, run),
 });
 
@@ -1561,7 +1520,6 @@ function checkDeliveredNotOnTrunk(cwd, run) {
 
 registerCheck({
   id: 'delivered-not-on-trunk',
-  description: "every item whose status says its work was handed over has its fgw/<id> branch reachable from the trunk",
   check: (cwd, run) => checkDeliveredNotOnTrunk(cwd, run),
 });
 
@@ -1596,7 +1554,6 @@ function checkProviderCapacityState() {
 
 registerCheck({
   id: 'provider-capacity-state',
-  description: 'provider-capacity account leases/quarantine state is reportable; doctor never auto-clears quarantine',
   check: () => checkProviderCapacityState(),
 });
 
@@ -1607,17 +1564,14 @@ registerCheck({
 // `lock-dirs` fix creates the two lock directories.
 registerCheck({
   id: 'lock-kernel-semantics',
-  description: 'the holder-lock driver gives kernel lock exclusion on <fgosDir>/locks and <lockRoot>, proven by a two-process probe on each mount',
   check: (cwd) => checkLockKernelSemantics(cwd),
 });
 registerCheck({
   id: 'lock-borrow-vectors',
-  description: 'a lock description borrowed by a git child never leaks to a background process (fgos internal lock-borrow-vectors)',
   check: (cwd) => checkLockBorrowVectors(cwd),
 });
 registerCheck({
   id: 'lock-holders',
-  description: 'read-only pointer: foreign lock holders, predecessor domains still running and hot records that need a person are read by fgos lock-status',
   check: () => checkLockHolders(),
 });
 registerFix({ id: 'lock-dirs', fix: (cwd) => fixLockDirs(cwd) });
@@ -1628,22 +1582,18 @@ registerFix({ id: 'lock-dirs', fix: (cwd) => fixLockDirs(cwd) });
 // `dispatch.gateKillGraceMs` and `dispatch.cancelWaitMs` take their values from the dispatch section of the standard and are never written by setup.
 registerCheck({
   id: 'run-supervisor-route',
-  description: 'the host binary serves supervise, gate, adopt and attempt-step at protocol 1 and names the containment driver agents run in and its level (kernel or best-effort)',
   check: (cwd) => checkRunSupervisorRoute(cwd),
 });
 registerCheck({
   id: 'runtime-socket-dir',
-  description: 'the runtime socket directory exists, is owned by this user and is 0700',
   check: () => checkRuntimeSocketDir(),
 });
 registerCheck({
   id: 'run-attempts-stuck',
-  description: 'read-only pointer: attempts with no closed.json and no lock holder, an attempt whose release was removed named with what to restore; the next fgos run adopts them, or run fgos dispatch recover (a warning, never a failure)',
   check: (cwd) => checkRunAttemptsStuck(cwd),
 });
 registerCheck({
   id: 'run-supervisor-config',
-  description: 'dispatch.gateKillGraceMs and dispatch.cancelWaitMs read through the config door (each at least 1000 ms) and the cancel wait is not shorter than the grace',
   check: (cwd) => checkRunSupervisorConfig(cwd),
 });
 registerFix({ id: 'runtime-socket-dir', fix: () => fixRuntimeSocketDir() });
@@ -1792,19 +1742,16 @@ function checkMailboxHook(cwd) {
 
 registerCheck({
   id: 'mailbox-hook',
-  description: 'agent mailbox: whether this project opted in to the mailbox hook rows (mailbox.enabled), and when it did, the record verdict from fgos mailbox status',
   check: (cwd) => checkMailboxHook(cwd),
 });
 
 registerCheck({
   id: 'mailbox-claude-accept',
-  description: 'agent mailbox: whether the Claude Code user settings accept cross-session input (crossSessionInbound), which decides if mail wakes an idle Claude session; report only, fgOS never sets it',
   check: (cwd) => checkMailboxClaudeAccept(cwd),
 });
 
 registerCheck({
   id: 'mailbox-sync-timer',
-  description: 'agent mailbox: when cross-machine mail is on, an OS timer runs the mailbox sync child every eventStore.sync.intervalSec, so mail is taken on a machine where no session runs a tool',
   check: (cwd) => checkManagedTimer(MAILBOX_SYNC, cwd),
 });
 
@@ -1815,7 +1762,6 @@ registerFix({
 
 registerCheck({
   id: 'account-probe-timer',
-  description: 'account health: when dispatch.probeAccount.intervalSec is set, an OS timer runs fgos dispatch probe-account --all --record --leg direct every that many seconds, so an exhausted or logged-out account is found between runs; off (0) by default',
   check: (cwd) => checkManagedTimer(ACCOUNT_PROBE, cwd),
 });
 
@@ -1901,7 +1847,6 @@ function evaluateWorkflowCapabilities(cwd, uses) {
 
 registerCheck({
   id: 'workflow-capabilities-configured',
-  description: 'every capability a core/domain Workflow unit names is declared in runner.capabilities',
   check: (cwd) => checkWorkflowCapabilitiesConfigured(cwd),
 });
 
@@ -1940,7 +1885,6 @@ function checkCapabilityServesValid(cwd) {
 
 registerCheck({
   id: 'capability-serves-valid',
-  description: 'runner.capabilities\' "serves" attribute sets are mutually distinct (I19); the schema states their shape',
   check: (cwd) => checkCapabilityServesValid(cwd),
 });
 
@@ -1970,7 +1914,6 @@ function checkWorkerSlotsCeiling(cwd) {
 
 registerCheck({
   id: 'worker-slots-ceiling-usable',
-  description: 'workerSlots.ceiling is either a positive integer or explicitly null (a malformed value silently enforces nothing)',
   check: (cwd) => checkWorkerSlotsCeiling(cwd),
 });
 
@@ -1990,7 +1933,6 @@ for (const entry of CONFIG_FIXES) registerFix(entry);
 // `fgos wire-agents` does it (src/setup/agent-wiring.mjs).
 registerCheck({
   id: 'claude-plugin-marketplace',
-  description: 'fgOS Claude Code plugin marketplace is registered and the fgOS plugin is installed/enabled; report only, fgos wire-agents installs it',
   check: () => checkClaudePluginMarketplace(),
 });
 
@@ -2032,7 +1974,6 @@ function checkOperationPromptTemplatesValid(cwd) {
 
 registerCheck({
   id: 'operation-prompt-templates-valid',
-  description: 'every operation prompt template in the project tier (.fgos/prompt-templates) validates against bounded variables and schema; the release\'s domain and core templates are judged by npm test',
   check: (cwd) => checkOperationPromptTemplatesValid(cwd),
 });
 
@@ -2316,18 +2257,15 @@ export function checkHerdrExecutorKinds(runnerCfg = {}, ask = askHerdrFacts) {
 
 registerCheck({
   id: 'terminal-control',
-  description: 'the terminal-control driver (herdr) answers, which capabilities it declares and which server it talks to, and terminal.* after the config merge with each value and its source; a bad FGOS_HERDR_ANCHOR_PANE or terminal.* value fails, a missing herdr only warns',
   check: (cwd) => checkTerminalControl(cwd),
 });
 registerCheck({
   id: 'terminal-allocations',
-  description: 'terminal slots past allocationGraceMs that never launched and retained panes past their time; reports only, closes nothing',
   check: (cwd) => checkTerminalAllocations(cwd),
 });
 
 registerCheck({
   id: 'omp-natives-present',
-  description: "omp's native addon for its installed version is in the natives directory omp resolves (a confined omp cannot extract it); fails only when an executor runs omp, warns when omp is missing or unused; readiness only, no repair",
   check: (cwd) => {
     let ompExecutors = null;
     try {
@@ -2341,7 +2279,6 @@ registerCheck({
 
 registerCheck({
   id: 'herdr-executor-kinds',
-  description: 'every executor dispatched through a herdr pane names an agent kind herdr can start, and none depends on an outdated herdr integration hook',
   check: (cwd) => {
     try {
       return checkHerdrExecutorKinds(loadRunnerConfigForDir(cwd));
@@ -2353,7 +2290,6 @@ registerCheck({
 
 registerCheck({
   id: 'executor-profile-warnings',
-  description: 'legacy executor entries hardcoding policy-shaped flags or account-pool-like env, each named with its documented migration target',
   check: (cwd) => {
     try {
       return checkExecutorProfileWarnings(cwd, loadRunnerConfigForDir(cwd));
@@ -2365,7 +2301,6 @@ registerCheck({
 
 registerCheck({
   id: 'session-keep-declared',
-  description: 'read-only pointer: confined agent invocations that declare no session directory keep no seat transcript; fgos dispatch probe-session <executorId> shows where the CLI writes it (a warning, never a failure; doctor never runs the probe)',
   check: (cwd) => {
     try {
       return checkSessionKeepDeclared(loadRunnerConfigForDir(cwd));
@@ -2377,7 +2312,6 @@ registerCheck({
 
 registerCheck({
   id: 'trust-store-readable',
-  description: 'the agent folder-trust store is readable and carries a usable "projects" object, so a dispatch into a fresh worktree can be pre-trusted instead of stopping at a dialog',
   check: () => (isCommandAvailable('claude')
     ? checkTrustStoreWritable()
     : { passed: true, status: 'skip', message: 'skipped: claude is not installed on this machine, so no trust dialog can stop a dispatch' }),
@@ -2385,7 +2319,6 @@ registerCheck({
 
 registerCheck({
   id: 'confined-pane-accounts',
-  description: 'every confined invocation that reads a login store has an account in the global provider inventory with at least one of that store\'s credential files, so its agent starts logged in',
   check: (cwd) => {
     // The account inventory is the machine's (global config and accounts file), so it is read from there whatever
     // the cwd. Executors come from the project config merged with the machine's; with no usable project config
@@ -2409,7 +2342,6 @@ registerCheck({
 
 registerCheck({
   id: 'non-claude-trust-stores-readable',
-  description: 'every executor or invocation declaring a codex-toml or agy/agy-json trustStore reads from a store that is actually readable, the same read a live dispatch will do',
   check: (cwd) => {
     try {
       return checkTrustStoresReadable(cwd, loadRunnerConfigForDir(cwd));
@@ -2421,7 +2353,6 @@ registerCheck({
 
 registerCheck({
   id: 'agent-cli-project-trusted',
-  description: 'the project root is trusted in every codex home and agy sub-HOME the configured executors run under, so a headless dispatch does not stop at a "Trust this folder?" prompt',
   check: (cwd) => checkAgentCliProjectTrusted(cwd, { loadRunnerConfig: loadRunnerConfigForDir }),
 });
 
@@ -2429,7 +2360,6 @@ registerCheck({
 // awaits every check, so a check may return its result directly or as a promise.
 registerCheck({
   id: 'seat-binding-dry-bind',
-  description: 'every seat of every Workflow unit, and every core capability (execute, code:implement, any capability declaring an agent pool) as a writing producer, binds under the committed config in a fixed headless session (no lease, nothing started); a policy refusal or a pool with no executor able to carry the confinement posture fails, no pool, account state, tier caps and shared families are information',
   check: (cwd) => checkSeatBindingDryBind(cwd, {
     loadRunnerConfig: loadRunnerConfigForDir,
   }),
@@ -2437,7 +2367,6 @@ registerCheck({
 
 registerCheck({
   id: 'blind-steps-use-proven-pools',
-  description: 'every blind Workflow unit can only bind executors whose provider family and transport were proven to keep a worker blind (read-only, no model call)',
   check: (cwd) => checkBlindStepsUseProvenPools(cwd, {
     loadRunnerConfig: loadRunnerConfigForDir,
   }),
@@ -2445,7 +2374,6 @@ registerCheck({
 
 registerCheck({
   id: 'executor-confinement',
-  description: 'no executor declares "permissionMode": "bypass" without privateHome, isolatedSession and ownWorktree all true',
   check: (cwd) => {
     try {
       return checkExecutorConfinement(loadRunnerConfigForDir(cwd));
@@ -2459,7 +2387,6 @@ registerCheck({
 
 registerCheck({
   id: 'invocation-git-write-grants',
-  description: 'warns when an executor or invocation still grants git add/git commit to a worker through --allowedTools (the runner commits; workers hold no git write grant)',
   check: (cwd) => {
     try {
       return checkInvocationGitWriteGrants(loadRunnerConfigForDir(cwd));
@@ -2861,25 +2788,21 @@ function checkActiveReleaseMatchesCheckout(dir) {
 
 registerCheck({
   id: 'rust-host-binary-present',
-  description: 'the active release\'s entries.fgos binary exists and is executable',
   check: (cwd) => checkRustHostBinaryPresent(cwd),
 });
 
 registerCheck({
   id: 'rust-host-target-supported',
-  description: 'current OS and architecture is an approved target for the fgos rust host (x86_64-unknown-linux-gnu, x86_64-pc-windows-msvc)',
   check: () => checkRustHostTargetSupported(),
 });
 
 registerCheck({
   id: 'legacy-node-payload-present',
-  description: 'the legacy node payload components.legacyNode.root/entry resolves to a real file',
   check: (cwd) => checkLegacyNodePayloadPresent(cwd),
 });
 
 registerCheck({
   id: 'active-release-matches-checkout',
-  description: 'activated legacy Node payload matches this source checkout working tree (not Rust freshness)',
   check: checkActiveReleaseMatchesCheckout,
 });
 
@@ -2924,7 +2847,6 @@ export function checkActivationMatchesPin(cwd) {
 
 registerCheck({
   id: 'activation-matches-pin',
-  description: 'the active release is the one the committed .fgos/distribution.json pin names (warns when it differs)',
   check: (cwd) => checkActivationMatchesPin(cwd),
 });
 
@@ -2995,7 +2917,6 @@ export function checkConfinementPoliciesDeclared(cwd) {
 
 registerCheck({
   id: 'confinement-policies-declared',
-  description: 'confinement policies referenced by capabilities exist in built-ins or runner.confinementPolicies',
   check: (cwd) => checkConfinementPoliciesDeclared(cwd),
 });
 
@@ -3066,7 +2987,6 @@ export function fixConfinementBackendRegistryReadable() {
 
 registerCheck({
   id: 'confinement-backend-registry-readable',
-  description: 'machine backend registry file exists and conforms to confinement-backend-registry.v1 schema',
   check: () => checkConfinementBackendRegistryReadable(),
 });
 
@@ -3114,7 +3034,6 @@ export function fixConfinementOrphanedResourcesReaped() {
 
 registerCheck({
   id: 'confinement-orphaned-resources-reaped',
-  description: 'confinement temp roots are owner-only and no dispatch home is left behind by a dead process',
   check: () => checkConfinementOrphanedResourcesReaped(),
 });
 
@@ -3302,7 +3221,6 @@ export function fixCredentialCopiesRetained({ roots = credentialScanRoots(), ret
 
 registerCheck({
   id: 'credential-copies-retained',
-  description: 'no login copy (pending, scratch, or a kept private home) that may hold the only valid refresh token is left unapplied',
   check: () => checkCredentialCopiesRetained(readDoctorProviderInventory()),
 });
 
@@ -3361,7 +3279,6 @@ export function checkConfinementBwrapPlatform() {
 
 registerCheck({
   id: 'confinement-bwrap-platform',
-  description: 'bwrap backend instance configured in machine registry is enabled and its executable is verified on Linux',
   check: () => checkConfinementBwrapPlatform(),
 });
 
@@ -3409,7 +3326,6 @@ export function checkConfinementProbeFreshness() {
 
 registerCheck({
   id: 'confinement-probe-freshness',
-  description: 'confinement probe freshness status (runs the falsification probe harness against the registered bwrap backend)',
   check: () => checkConfinementProbeFreshness(),
 });
 
@@ -3452,7 +3368,6 @@ export function checkConfinementBlindRead() {
 
 registerCheck({
   id: 'confinement-blind-read',
-  description: 'a blind unit can be enforced: the registered bwrap backend hides peer run state, homes and processes from a worker',
   check: () => checkConfinementBlindRead(),
 });
 
@@ -3533,7 +3448,6 @@ export function checkConfinementStrictReadiness(cwd) {
 
 registerCheck({
   id: 'confinement-strict-readiness',
-  description: 'strict confinement readiness (all capabilities declared with known policies, bwrap ready)',
   check: (cwd) => checkConfinementStrictReadiness(cwd),
 });
 
@@ -3592,7 +3506,6 @@ export function checkConfinementHerdrMaturity(cwd) {
 
 registerCheck({
   id: 'confinement-herdr-maturity',
-  description: 'herdr confinement convergence maturity status (partial: pre-adapter checks under Authority, session/home lifecycle adapter-managed)',
   check: (cwd) => checkConfinementHerdrMaturity(cwd),
 });
 
@@ -3642,13 +3555,11 @@ export function checkObserveHostResolvable(cwd) {
 
 registerCheck({
   id: 'observe-dir-writable',
-  description: '.fgos/observe directory is writable',
   check: (cwd) => checkObserveDirWritable(cwd),
 });
 
 registerCheck({
   id: 'observe-host-resolvable',
-  description: 'Rust host binary resolves and reads the friction store (friction rank)',
   check: (cwd) => checkObserveHostResolvable(cwd),
 });
 
@@ -3689,39 +3600,33 @@ export function checkWriterIdentityResolvable(cwd) {
 
 registerCheck({
   id: 'writer-identity-resolvable',
-  description: 'the writer identity resolves through the Rust host, both for the running host and for the activation a plain git commit hook uses',
   check: (cwd) => checkWriterIdentityResolvable(cwd),
 });
 
 registerCheck({
   id: 'identity-machine-id',
-  description: 'this machine has an id minted by the Identity component (the base of every machine and session handle); absent only warns, `fgos doctor --fix` mints it',
   check: (cwd) => checkIdentityMachineId(cwd),
 });
 registerFix({ id: 'identity-machine-id', fix: (cwd) => fixIdentityMachineId(cwd) });
 
 registerCheck({
   id: 'identity-machine-key',
-  description: 'this machine has an ed25519 signing key minted by the Identity component (what signs for MAIL and the shared directory); absent only warns, `fgos doctor --fix` mints it once and never replaces it',
   check: (cwd) => checkIdentityMachineKey(cwd),
 });
 registerFix({ id: 'identity-machine-key', fix: (cwd) => fixIdentityMachineKey(cwd) });
 
 registerCheck({
   id: 'identity-ssh-keygen',
-  description: 'ssh-keygen from OpenSSH 8.1 or later is installed: the Identity component signs and verifies through it (no crypto library of its own); no fix, install OpenSSH',
   check: () => checkIdentitySshKeygen(),
 });
 
 registerCheck({
   id: 'identity-project-id',
-  description: 'this repository carries one project id in the tracked file .fgos/project.json, the same in every clone; absent only warns, and there is no fix: run `fgos identity project --init` once on one machine, commit, pull elsewhere',
   check: (cwd) => checkIdentityProjectId(cwd),
 });
 
 registerCheck({
   id: 'identity-shared-directory',
-  description: 'the shared directory of other machines\' sessions, read from its cache (.fgos/cache/identity-directory.json): passes with the counts; warns on entries dropped for a bad signature or a changed key (naming the machine id), on entries of another project than this clone\'s, and on a machine handle two machines share; no fix, the owner decides',
   check: (cwd) => checkIdentitySharedDirectory(cwd),
 });
 
@@ -3753,7 +3658,6 @@ export function checkSeatBindingRoute(cwd, { hostBin } = {}) {
 
 registerCheck({
   id: 'seat-binding-route',
-  description: 'the host Seat Binding runs answers the internal seat-binding route at protocol 1',
   check: (cwd) => checkSeatBindingRoute(cwd),
 });
 
@@ -3762,31 +3666,24 @@ registerCheck({
 registerFix({ id: 'event-store-lock-dirs', fix: cwd => fixEventStoreLockDirs(cwd) });
 for (const name of ['open-root', 'machine-id', 'legacy-layout', 'incidents']) {
   const id = `event-store-${name}`;
-  registerCheck({ id, description: `Event Store ${name}`, check: (cwd, run = createDoctorRun()) => eventStoreDoctorOf(cwd, run)(id) });
+  registerCheck({ id, check: (cwd, run = createDoctorRun()) => eventStoreDoctorOf(cwd, run)(id) });
 }
 
 // Git and Event Store share one addon ABI admission row.
 for (const id of ['git-component-compatible', 'git-repository-config', 'git-operation-journal', 'git-incidents']) {
-  registerCheck({ id, description: {
-    'git-component-compatible': 'Combined addon contracts and Git feature floor, with the repository layout and measured durability',
-    'git-repository-config': 'Repository transport settings refused by Publication/Remote, and the Event Store mirror fetch mappings',
-    'git-operation-journal': 'Readable Git WAL under the controller activation fence (`git-fence-missing` when the fence is gone); open operations are `git-incidents`',
-    'git-incidents': 'read-only pointer: open Git incidents, read and recovered through fgos git status / fgos git recover',
-  }[id], check: (cwd, run = createDoctorRun()) => checkGit(cwd, id, undefined, run) });
+  registerCheck({ id, check: (cwd, run = createDoctorRun()) => checkGit(cwd, id, undefined, run) });
 }
 // Workflow case bindings (docs/platform/workflow/spec.md#6-business-rules RUL-WF-27): the binding records are a view of each
 // case's ledger. Bodies live in workflow-case-checks.mjs.
 registerCheck({
   id: 'workflow-case-binding-sentinel',
-  description: 'the worktree binding directory carries the host sentinel that tells a reader it is not a masked view',
   check: (cwd) => checkWorkflowCaseBindingSentinel(cwd),
 });
 registerCheck({
   id: 'workflow-case-bindings',
-  description: 'every worktree binding record matches the ledger of its case, and every bound open case has its record',
   check: (cwd) => checkWorkflowCaseBindings(cwd),
 });
 registerFix({ id: 'workflow-case-bindings', fix: (cwd) => fixWorkflowCaseBindings(cwd) });
 registerFix({ id: 'git-driver-directories', fix: fixGitDriverDirectories });
-registerFix({ id: 'git-wal-dir', fix: fixGitWal, repairs: ['git-operation-journal'] });
-registerFix({ id: 'git-publication-refspecs', fix: fixGitFetchMapping, repairs: ['git-repository-config'] });
+registerFix({ id: 'git-wal-dir', fix: fixGitWal });
+registerFix({ id: 'git-publication-refspecs', fix: fixGitFetchMapping });

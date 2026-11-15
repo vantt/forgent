@@ -22,6 +22,7 @@ import os from 'node:os';
 import { parseYaml } from '../src/util/yaml.mjs';
 import { lexSource } from '../scripts/lib/js-source-lexer.mjs';
 import { lexRust, rustTestRanges } from '../scripts/lib/rust-source.mjs';
+import { bridgeFailures, judgeModulesOf, stepOfClosure } from './helpers/doctor-judge-closure.mjs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
@@ -1922,6 +1923,94 @@ test('door check: every name of the retired Node S2 verb code fails when a file 
     assert.equal(failures.length, 1, `${name} must fail the door`);
     assert.match(failures[0], /retired name/);
   }
+});
+
+// ─── The doctor registry's bridged entries (packages/distribution/contracts/doctor-registry.v1.json) ───────────────
+// A row or fix the registry gives to `bridge:<step>` is judged by Node until that step moves the layer it reads. The
+// label is not a promise: it is the highest step among the modules the row's registration reaches, followed along the
+// manifest's import edges without the named upward ports (a port is how a low layer reaches a higher one, not a
+// dependency of what it judges). `judge` records those modules, so a row that starts reading another layer changes
+// its record in the same change. `bridge:S4` rows move to Rust inside the packaging step and may not outlive it.
+
+const DOCTOR_REGISTRY = JSON.parse(fs.readFileSync(path.join(root, 'packages/distribution/contracts/doctor-registry.v1.json'), 'utf8'));
+const REGISTRATIONS = 'src/setup/registrations.mjs';
+
+/** The registry's entries with the config group expanded to one entry per kind, as `{ kind, id, owner, judge }`. */
+function doctorRegistryEntries() {
+  const entries = [];
+  for (const [kind, list] of [['row', DOCTOR_REGISTRY.rows], ['fix', DOCTOR_REGISTRY.fixes]]) {
+    for (const entry of list) {
+      if (entry.group) entries.push({ kind, id: `group ${entry.group}`, owner: DOCTOR_REGISTRY.groups[entry.group].owner, judge: DOCTOR_REGISTRY.groups[entry.group].judge });
+      else entries.push({ kind, id: entry.id, owner: entry.owner, judge: entry.judge });
+    }
+  }
+  return entries;
+}
+
+function doctorBridgeFailures(entries, edges, tiers, source) {
+  return bridgeFailures(entries, {
+    judgeOf: (entry) => (entry.id.startsWith('group ')
+      ? entry.judge
+      : judgeModulesOf(REGISTRATIONS, source, entry.id, entry.kind === 'row' ? 'registerCheck' : 'registerFix')),
+    stepOf: (modules) => stepOfClosure(modules.filter((m) => m in manifest.files), edges, (file) => tierOf(file, tiers)),
+  });
+}
+
+const edgesWithoutPorts = () => manifestEdges().filter(([from, to]) => !manifest.tierExceptions.some((e) => e.from === from && e.to === to));
+
+test('doctor registry: every bridged row and fix is labelled with the highest step its registration still reads in Node', () => {
+  const entries = doctorRegistryEntries();
+  assert.ok(entries.some((entry) => entry.owner.startsWith('bridge:')), 'the registry gives no row to the bridge');
+  assert.deepEqual(doctorBridgeFailures(entries, edgesWithoutPorts(), manifest.tiers, fs.readFileSync(path.join(root, REGISTRATIONS), 'utf8')), []);
+});
+
+test('doctor registry: a label below what the row reads, a label above it, a drifted judge record and an unknown step each fail by name', () => {
+  const source = [
+    "import { readWork } from '../state/store.mjs';",
+    "import { checkTier } from '../workflow/check.mjs';",
+    "import { gitFloor } from './git-facts.mjs';",
+    'function reader() { return readWork(); }',
+    "registerCheck({ id: 'reads-work', check: () => reader() });",
+    "registerCheck({ id: 'reads-workflow', check: () => checkTier() });",
+    "registerCheck({ id: 'reads-git', check: () => gitFloor() });",
+    '',
+  ].join('\n');
+  const tiers = { 'src/state/': 7, 'src/workflow/': 6, 'src/setup/': 9 };
+  const edges = [['src/state/store.mjs', 'src/workflow/check.mjs']];
+  const run = (entries) => bridgeFailures(entries, {
+    judgeOf: (entry) => judgeModulesOf('src/setup/registrations.mjs', source, entry.id),
+    stepOf: (modules) => stepOfClosure(modules, edges, (file) => tierOf(file, tiers)),
+  });
+  const entry = (id, owner, judge) => ({ kind: 'row', id, owner, judge });
+  assert.deepEqual(run([
+    entry('reads-work', 'bridge:S7', ['src/state/store.mjs']),
+    entry('reads-workflow', 'bridge:S6b', ['src/workflow/check.mjs']),
+    entry('reads-git', 'bridge:S4', ['src/setup/git-facts.mjs']),
+  ]), []);
+  assert.match(run([entry('reads-work', 'bridge:S6b', ['src/state/store.mjs'])])[0], /reads-work: labelled bridge:S6b but it still reads a layer that stays in Node until S7/);
+  assert.match(run([entry('reads-git', 'bridge:S7', ['src/setup/git-facts.mjs'])])[0], /reads-git: labelled bridge:S7 but what it reads is gone from Node after S4: move it to Rust/);
+  assert.match(run([entry('reads-work', 'bridge:S7', ['src/state/other.mjs'])])[0], /reads-work: records judge .* but its registration reaches/);
+  assert.match(run([entry('reads-work', 'bridge:S3', ['src/state/store.mjs'])])[0], /bridge:S3 names no step/);
+  assert.deepEqual(run([entry('reads-work', 'rust:identity', ['x'])]), []);
+});
+
+test('door rows of the doctor registry, the Node rows bridge and Node from the packaging verbs reject a second path and accept their own', () => {
+  const hits = (job, file, text) => checkDoors([doorRow(job)], new Map([[file, text]])).filter((failure) => failure.includes(file));
+  // The doctor registry: a body registered anywhere else, and the registry file read anywhere else.
+  assert.equal(hits('doctor readiness registry', 'src/setup/second-checks.mjs', "registerCheck({ id: 'x', check: () => ({}) });\n").length, 1);
+  assert.equal(hits('doctor readiness registry', 'src/setup/second-checks.mjs', 'const rows = DOCTOR_CHECKS.length;\n').length, 1);
+  assert.equal(hits('doctor readiness registry', 'apps/fgos/src/wiring/second.rs', 'const R: &str = include_str!("doctor-registry.v1.json");\n').length, 1);
+  assert.deepEqual(hits('doctor readiness registry', 'apps/fgos/src/wiring/doctor/git.rs', 'const R: &str = include_str!("doctor-registry.v1.json");\n'), []);
+  // The bridge: a second caller of the bridge module or of its runner.
+  assert.equal(hits('Node rows bridge', 'src/setup/second-checks.mjs', "await import('./doctor-bridge.mjs');\n").length, 1);
+  assert.equal(hits('Node rows bridge', 'apps/fgos/src/wiring/doctor/git.rs', 'let m = "src/setup/doctor-bridge.mjs";\n').length, 1);
+  assert.deepEqual(hits('Node rows bridge', 'apps/fgos/src/wiring/doctor/bridge.rs', 'let m = "src/setup/doctor-bridge.mjs";\n'), []);
+  // Node from a native packaging verb: a node spawn or a legacy_exec call in an adapter, init, uninstall or wire-agents.
+  for (const file of ['apps/fgos/src/wiring/doctor/git.rs', 'apps/fgos/src/wiring/init.rs', 'apps/fgos/src/wiring/uninstall.rs', 'apps/fgos/src/wiring/wire_agents.rs']) {
+    assert.equal(hits('no Node from the native packaging verbs', file, 'let c = Command::new("node");\n').length, 1, file);
+    assert.equal(hits('no Node from the native packaging verbs', file, 'crate::legacy_exec::execute_legacy_cli(a, b, c);\n').length, 1, file);
+  }
+  assert.deepEqual(hits('no Node from the native packaging verbs', 'apps/fgos/src/wiring/doctor/bridge.rs', 'legacy_exec::payload_command(&m);\n'), []);
 });
 
 test('door check: a stale allowed path, stale glob and stale debt entry each fail', () => {
