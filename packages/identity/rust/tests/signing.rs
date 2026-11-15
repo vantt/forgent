@@ -394,3 +394,59 @@ fn a_confirm_racing_a_forget_never_leaves_a_confirmed_pin_after_the_forget() {
         );
     }
 }
+
+fn probe(keygen_present: bool, version_text: &str) -> signing::OpensshProbe {
+    signing::OpensshProbe {
+        keygen_present,
+        version_text: version_text.to_owned(),
+    }
+}
+
+#[test]
+fn an_openssh_of_8_1_or_later_with_ssh_keygen_is_the_machine_that_can_sign() {
+    assert_eq!(
+        signing::judge_openssh(&probe(true, "OpenSSH_9.6p1 Ubuntu-3ubuntu13, OpenSSL 3.0.13\n")),
+        Ok("OpenSSH 9.6".to_owned())
+    );
+    assert_eq!(
+        signing::judge_openssh(&probe(true, "OpenSSH_8.1p1, LibreSSL 2.7.4")),
+        Ok("OpenSSH 8.1".to_owned())
+    );
+    // A text that names OpenSSH first without a version still finds the one that has it.
+    assert_eq!(
+        signing::judge_openssh(&probe(true, "OpenSSH_x OpenSSH_10.0p2")),
+        Ok("OpenSSH 10.0".to_owned())
+    );
+}
+
+#[test]
+fn a_machine_that_cannot_sign_is_told_why_in_the_words_the_doctor_row_shows() {
+    let missing = signing::judge_openssh(&probe(false, "OpenSSH_9.6p1")).unwrap_err();
+    assert!(missing.starts_with("ssh-keygen is not installed or not on PATH;"), "{missing}");
+    assert!(signing::judge_openssh(&probe(true, "OpenSSH_8.0p1"))
+        .unwrap_err()
+        .starts_with("OpenSSH 8.0 is older than 8.1,"));
+    assert!(signing::judge_openssh(&probe(true, "OpenSSH_7.9"))
+        .unwrap_err()
+        .contains("upgrade OpenSSH"));
+    assert_eq!(
+        signing::judge_openssh(&probe(true, "")).unwrap_err(),
+        "cannot read the OpenSSH version from `ssh -V` (no output); OpenSSH 8.1 or later is needed"
+    );
+    // OpenSSH for Windows names itself without a number the rule can read.
+    let windows = "OpenSSH_for_Windows_9.5p2, LibreSSL 3.8.2";
+    assert!(signing::judge_openssh(&probe(true, windows))
+        .unwrap_err()
+        .contains("(OpenSSH_for_Windows_9.5p2, LibreSSL 3.8.2)"));
+    let long = "x".repeat(300);
+    let shown = signing::judge_openssh(&probe(true, &long)).unwrap_err();
+    assert!(shown.contains(&format!("({})", "x".repeat(100))), "{shown}");
+}
+
+#[test]
+fn probing_this_machine_answers_without_hanging() {
+    let here = signing::probe_openssh();
+    // Whatever this machine has, the verdict is one of the two shapes and never a panic.
+    let verdict = signing::judge_openssh(&here);
+    assert!(verdict.is_ok() || verdict.is_err());
+}

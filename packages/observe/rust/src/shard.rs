@@ -125,6 +125,22 @@ fn store_dir(root: &Path, store: &str, create: bool) -> io::Result<Option<PathBu
     Ok(Some(path))
 }
 
+/// Whether `<root>/.fgos/observe` can take a shard: `Ok(false)` when it does not exist yet (the first write
+/// creates it; a read never does), `Ok(true)` when a probe file could be written in it and was removed at once.
+pub fn probe_observe_dir(root: &Path) -> io::Result<bool> {
+    let dir = root.join(".fgos").join("observe");
+    if !dir.exists() {
+        return Ok(false);
+    }
+    let probe = dir.join(format!(".probe-{}", std::process::id()));
+    let mut file = OpenOptions::new().write(true).create(true).truncate(true).open(&probe)?;
+    let written = file.write_all(b"ok");
+    drop(file);
+    fs::remove_file(&probe)?;
+    written?;
+    Ok(true)
+}
+
 /// The current writer's shard path, creating the store directories first.
 pub fn shard_path(root: &Path, store: &str) -> io::Result<PathBuf> {
     let dir = store_dir(root, store, true)?.expect("created store directory exists");
@@ -370,6 +386,27 @@ mod tests {
         assert_eq!((order[0].1, order[1].1), (1, 2));
         assert_eq!(order[2], ("zzzz-last".to_string(), 1, json!(0)));
         assert!(read.invalid.is_empty());
+        let _ = fs::remove_dir_all(&tmp);
+    }
+
+    #[test]
+    fn the_observe_directory_probe_reports_absent_without_creating_and_writable_without_leaving_a_file() {
+        let tmp = temp_root("probe");
+        assert!(!probe_observe_dir(&tmp).unwrap());
+        assert!(!tmp.join(".fgos").exists());
+        fs::create_dir_all(tmp.join(".fgos/observe")).unwrap();
+        assert!(probe_observe_dir(&tmp).unwrap());
+        assert_eq!(fs::read_dir(tmp.join(".fgos/observe")).unwrap().count(), 0);
+        #[cfg(unix)]
+        {
+            use std::os::unix::fs::PermissionsExt;
+            fs::set_permissions(tmp.join(".fgos/observe"), fs::Permissions::from_mode(0o500)).unwrap();
+            // A superuser writes anywhere; only a user the mode binds sees the refusal.
+            if fs::write(tmp.join(".fgos/observe/.x"), b"").is_err() {
+                assert!(probe_observe_dir(&tmp).is_err());
+            }
+            fs::set_permissions(tmp.join(".fgos/observe"), fs::Permissions::from_mode(0o700)).unwrap();
+        }
         let _ = fs::remove_dir_all(&tmp);
     }
 

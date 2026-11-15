@@ -17,8 +17,8 @@ use crate::locks::{hold, GLOBAL_CONFIG};
 use crate::machine::{ensure_private_dir, fix_modes, refused, token, TOKEN_FILE};
 use crate::relocate::{copy, plan, Held, MoveRequest};
 use crate::scope::SourceKind;
-use crate::snapshot::{split_global, Context, SessionClass, SnapshotError};
-use crate::write::{commit, io_error, refresh, Edit, WriteRequest};
+use crate::snapshot::{split_global, Context, SessionClass, SnapshotError, SnapshotRequest};
+use crate::write::{commit, io_error, refresh, target_revision, Edit, WriteRequest};
 use crate::ConfigRefusal;
 
 /// The fix ids this module applies; `contracts/doctor-rows.v1.json` lists the same.
@@ -172,6 +172,33 @@ fn move_under_private(req: &MoveRequest, name: &str) -> Result<bool, SnapshotErr
     }
     fs::remove_file(global.join(name)).map_err(io_error)?;
     Ok(true)
+}
+
+/// How long a repair waits for the lock of the file it edits.
+const LOCK_WAIT_MS: u64 = 5_000;
+
+/// [`fix`] for a caller that holds the roots of a project and nothing else: each target's request is built
+/// from `roots` (the revision the file has now, the machine lock root, no edits of its own), which is what
+/// `fgos doctor --fix` applies.
+pub fn fix_with_roots(
+    ctx: &Context,
+    roots: &SnapshotRequest,
+    writer: &WriterIdentity,
+    ids: &[&str],
+    acknowledge: bool,
+) -> Result<FixReport, SnapshotError> {
+    let lock_root = fgos_holder_lock::state_root::lock_root();
+    let request = |target: SourceKind| WriteRequest {
+        roots: roots.clone(),
+        lock_root: lock_root.clone(),
+        target,
+        expected: target_revision(roots, target).ok().flatten(),
+        edits: Vec::new(),
+        reason: String::new(),
+        acknowledge_comment_loss: acknowledge,
+        lock_wait_ms: LOCK_WAIT_MS,
+    };
+    fix(ctx, request, writer, ids, acknowledge)
 }
 
 /// Applies the named repairs a check offered. The write request builder `req` gives each target's

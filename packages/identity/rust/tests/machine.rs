@@ -178,3 +178,29 @@ fn iso_utc_formats_known_instants_to_the_millisecond() {
     assert_eq!(iso_utc(1_791_940_354, 7), "2026-10-14T01:12:34.007Z");
     assert_eq!(iso_utc(951_782_400, 0), "2000-02-29T00:00:00.000Z");
 }
+
+#[test]
+fn the_state_root_is_made_private_with_its_parents_and_answered_canonical() {
+    let base = state_root();
+    let nested = base.join("a").join("b");
+    let canonical = machine::prepare_state_root(&nested).unwrap();
+    assert_eq!(canonical, fs::canonicalize(&nested).unwrap());
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::PermissionsExt;
+        assert_eq!(fs::metadata(&canonical).unwrap().permissions().mode() & 0o777, 0o700);
+    }
+    // A second call finds it as it is.
+    assert_eq!(machine::prepare_state_root(&nested).unwrap(), canonical);
+}
+
+#[test]
+fn minting_here_makes_the_root_names_the_host_and_never_replaces_the_id() {
+    let base = state_root();
+    let root = base.join("fresh");
+    let (created, id) = machine::mint_here(&root).unwrap();
+    assert!(created);
+    assert!(valid_machine_id(&id), "{id}");
+    assert_eq!(fs::read_to_string(root.join("machine-id")).unwrap(), format!("{id}\n"));
+    assert_eq!(machine::mint_here(&root).unwrap(), (false, id));
+}

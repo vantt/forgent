@@ -165,6 +165,72 @@ fn failed(what: &str, output: &std::process::Output) -> Refusal {
     )
 }
 
+/// What this machine has of OpenSSH: whether `ssh-keygen` starts, and what `ssh -V` prints (it names the same
+/// OpenSSH). Each program runs for at most two seconds.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct OpensshProbe {
+    pub keygen_present: bool,
+    pub version_text: String,
+}
+
+/// The earliest OpenSSH with `ssh-keygen -Y sign` and `-Y verify`.
+const MIN_OPENSSH: (u32, u32) = (8, 1);
+const PROBE_TIMEOUT: std::time::Duration = std::time::Duration::from_secs(2);
+
+/// Asks the machine: `ssh-keygen -?` (it prints its usage and exits non-zero; only a binary that cannot be
+/// found is missing) and `ssh -V` (the version goes to stderr). Both run through the bounded process door.
+pub fn probe_openssh() -> OpensshProbe {
+    use fgos_process::spawn::{run_bounded, Outcome};
+    let env: Vec<(String, String)> = std::env::vars().collect();
+    let keygen_present = !matches!(
+        run_bounded("ssh-keygen", ["-?"], &env, None, None, PROBE_TIMEOUT),
+        Err(ref e) if e.kind() == io::ErrorKind::NotFound
+    );
+    let version_text = match run_bounded("ssh", ["-V"], &env, None, None, PROBE_TIMEOUT) {
+        Ok(Outcome::Exited(output)) => [output.stdout, output.stderr].concat(),
+        Ok(Outcome::TimedOut { stdout, stderr }) => [stdout, stderr].concat(),
+        Err(_) => Vec::new(),
+    };
+    OpensshProbe {
+        keygen_present,
+        version_text: String::from_utf8_lossy(&version_text).into_owned(),
+    }
+}
+
+/// `[major, minor]` of the first `OpenSSH_<major>.<minor>` in `ssh -V` output.
+fn openssh_version(text: &str) -> Option<(u32, u32)> {
+    fn number(from: &str) -> Option<(u32, &str)> {
+        let end = from.find(|c: char| !c.is_ascii_digit()).unwrap_or(from.len());
+        Some((from[..end].parse().ok()?, &from[end..]))
+    }
+    text.match_indices("OpenSSH_").find_map(|(at, tag)| {
+        let (major, rest) = number(&text[at + tag.len()..])?;
+        let (minor, _) = number(rest.strip_prefix('.')?)?;
+        Some((major, minor))
+    })
+}
+
+/// The verdict on what the machine has: the version it signs with, or why it cannot sign.
+pub fn judge_openssh(probe: &OpensshProbe) -> Result<String, String> {
+    if !probe.keygen_present {
+        return Err("ssh-keygen is not installed or not on PATH; install OpenSSH 8.1 or later (the Identity component signs with it)".into());
+    }
+    let Some((major, minor)) = openssh_version(&probe.version_text) else {
+        let shown: String = probe.version_text.trim().chars().take(100).collect();
+        let shown = if shown.is_empty() { "no output" } else { &shown };
+        return Err(format!(
+            "cannot read the OpenSSH version from `ssh -V` ({shown}); OpenSSH 8.1 or later is needed"
+        ));
+    };
+    if (major, minor) < MIN_OPENSSH {
+        return Err(format!(
+            "OpenSSH {major}.{minor} is older than {}.{}, which has no `ssh-keygen -Y sign`; upgrade OpenSSH",
+            MIN_OPENSSH.0, MIN_OPENSSH.1
+        ));
+    }
+    Ok(format!("OpenSSH {major}.{minor}"))
+}
+
 /// The first two fields of an OpenSSH public key line: the type and the key,
 /// without the comment.
 fn key_without_comment(line: &str) -> String {

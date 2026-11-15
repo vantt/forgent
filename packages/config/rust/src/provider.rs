@@ -209,8 +209,9 @@ fn path_arg(text: &str) -> Result<Vec<Segment>, Refusal> {
     parse_path(text).map_err(|r| refuse("path-invalid", format!("{text}: {}", r.rule)))
 }
 
-/// The roots of a verb: the project, its trusted main checkout, `~/.fgos` and the session class.
-fn roots(root: &Path) -> Result<SnapshotRequest, Refusal> {
+/// The roots of a verb: the project, its trusted main checkout, `~/.fgos` and the session class. Public for the
+/// in-process callers that judge or repair a project's config files (the doctor rows) from the same roots.
+pub fn roots(root: &Path) -> Result<SnapshotRequest, Refusal> {
     let global_dir = machine::global_dir(|key| std::env::var(key).ok()).ok_or_else(|| {
         refuse(
             machine::HOME_UNSET_ID,

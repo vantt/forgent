@@ -7,7 +7,7 @@
 use crate::errors::Error;
 use crate::text::{random_hex128, slug};
 use std::fs;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 pub const ID_FILE: &str = "machine-id";
 pub const ALIAS_FILE: &str = "machine-alias";
@@ -73,6 +73,29 @@ pub fn mint(state_root: &Path, hostname: &str) -> Result<(bool, String), Error> 
     let id = read(state_root)
         .map_err(|e| Error::Invalid(format!("existing identity is invalid: {e}")))?;
     Ok((result == fgos_durable_file::Installed::Created, id))
+}
+
+/// Makes the state root (private, parents included) and answers its canonical path, which is the directory
+/// every file of the machine's identity is written under.
+pub fn prepare_state_root(state_root: &Path) -> std::io::Result<PathBuf> {
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::DirBuilderExt;
+        fs::DirBuilder::new()
+            .recursive(true)
+            .mode(0o700)
+            .create(state_root)?;
+    }
+    #[cfg(not(unix))]
+    fs::create_dir_all(state_root)?;
+    fs::canonicalize(state_root)
+}
+
+/// [`mint`] for this machine: the state root is made first and the id takes this host's name. Returns the
+/// canonical state root with the answer, so a key minted next lands beside the id.
+pub fn mint_here(state_root: &Path) -> Result<(bool, String), Error> {
+    let root = prepare_state_root(state_root)?;
+    mint(&root, &fgos_process::facts::host())
 }
 
 /// The alias the owner chose, if any. The shape is checked by the caller
