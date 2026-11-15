@@ -13,6 +13,7 @@ pub mod lock;
 pub mod manifest;
 pub mod rc_lines;
 pub mod shim;
+pub mod skill_stamp;
 pub mod store;
 pub mod suggest;
 pub mod timer;

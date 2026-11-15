@@ -22,6 +22,7 @@ import {
   ownedSkillNames,
   discoverCanonicalSkills,
   discoverSharedFragments,
+  generatedSkillDirs,
 } from '../../src/setup/skill-wrappers.mjs';
 import { ownedFileSet } from '../../scripts/lib/git-ports.mjs';
 
@@ -1063,4 +1064,47 @@ test('a package skill never overwrites a target own core skill: the copy step ta
 
   assert.ok(fs.existsSync(path.join(targetRoot, '.agents', 'skills', 'package-skill', 'SKILL.md')), 'the package own skill is copied');
   assert.equal(fs.existsSync(path.join(targetRoot, '.agents', 'skills', 'shared-name')), false, 'the copy step wrote a skill the package does not own');
+});
+
+// The stamp forms, the owned-name rule and their vectors are one contract the Rust reader of `fgos uninstall`
+// reads too (packages/distribution/rust/src/skill_stamp.rs); this render is the only writer.
+const STAMP_CONTRACT = JSON.parse(fs.readFileSync(path.join(path.dirname(fileURLToPath(import.meta.url)), '..', '..', 'packages', 'distribution', 'contracts', 'skill-stamp.v1.json'), 'utf8'));
+
+function materializeVectorTree(root, entries) {
+  for (const entry of entries) {
+    const target = path.join(root, entry.path);
+    fs.mkdirSync(entry.dir ? target : path.dirname(target), { recursive: true });
+    if (entry.symlink) fs.symlinkSync(entry.symlink, target);
+    else if (!entry.dir) fs.writeFileSync(target, entry.text);
+  }
+}
+
+test('the stamps the render writes are the ones the stamp contract names', () => {
+  const wrapper = generateWrapperContent(SAMPLE_FRONTMATTER, 'core/skills/x/SKILL.md');
+  assert.equal(wrapper.slice(SAMPLE_FRONTMATTER.length).trimStart().split('\n')[0], STAMP_CONTRACT.stamps.wrapper[0]);
+  const root = mkTempDir('skill-wrappers-stamp-contract-');
+  writeSkill(path.join(root, 'core', 'skills'), 'x', SAMPLE_FRONTMATTER, '# x\n');
+  assembleSkills(root);
+  const assembled = fs.readFileSync(path.join(root, '.agents', 'skills', 'x', 'SKILL.md'), 'utf8');
+  assert.ok(assembled.slice(SAMPLE_FRONTMATTER.length).trimStart().startsWith(STAMP_CONTRACT.stamps.assembledHeaderPrefix));
+});
+
+test('every project vector of the stamp contract: which skill directories are generated, which are foreign', () => {
+  for (const vector of STAMP_CONTRACT.vectors.projects) {
+    const root = mkTempDir('skill-wrappers-stamp-vector-');
+    materializeVectorTree(root, vector.entries);
+    const got = generatedSkillDirs(root, new Set(vector.owned));
+    const rel = (p) => path.relative(root, p).split(path.sep).join('/');
+    assert.deepEqual(got.ours.map(rel).sort(), vector.expect.ours, `${vector.name}: ours`);
+    const foreign = got.foreign.map((entry) => ({ dir: rel(entry.dir), why: entry.why })).sort((a, b) => a.dir.localeCompare(b.dir));
+    assert.deepEqual(foreign, vector.expect.foreign, `${vector.name}: foreign`);
+  }
+});
+
+test('every payload vector of the stamp contract: the skill names fgOS owns', () => {
+  for (const vector of STAMP_CONTRACT.vectors.payloads) {
+    const root = mkTempDir('skill-wrappers-owned-vector-');
+    materializeVectorTree(root, vector.entries);
+    assert.deepEqual([...ownedSkillNames(root)].sort(), vector.expect, vector.name);
+  }
 });
