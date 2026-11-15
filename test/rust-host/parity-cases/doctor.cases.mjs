@@ -188,26 +188,26 @@ function act(world, step) {
     case 'observeAppeared':
       return `observe ${fs.existsSync(path.join(world[step.cwd], '.fgos', 'observe')) ? 'exists' : 'absent'}`;
     case 'brokenProjectConfig':
-      writeAt(world.repo, '.fgos/config.yaml', '# @fgos:v1\nrunner: [\n');
+      writeRawProjectConfig(world.repo, '# @fgos:v1\nrunner: [\n');
       return null;
     case 'unknownKeyProjectConfig':
-      writeAt(world.repo, '.fgos/config.yaml', '# @fgos:v1\nunknownKey: 1\n');
+      writeRawProjectConfig(world.repo, '# @fgos:v1\nunknownKey: 1\n');
       return null;
     case 'strayGlobalFile':
       writeAt(world.home, '.fgos/stray.yaml', '# @fgos:v1\ngateway:\n  token: SENTINEL-9931\n');
       return null;
     case 'looseGlobalConfig':
-      writeAt(world.home, '.fgos/config.yaml', '# @fgos:v1\n');
+      writeRawGlobalConfig(world.home, '# @fgos:v1\n');
       fs.chmodSync(path.join(world.home, '.fgos/config.yaml'), 0o666);
       return null;
     case 'driftedDocs':
-      writeAt(world.repo, '.fgos/config.yaml', '# @fgos:v1\n\n# @fgos:doc stale text\nrunner:\n  maxParallel: 3\n');
+      writeRawProjectConfig(world.repo, '# @fgos:v1\n\n# @fgos:doc stale text\nrunner:\n  maxParallel: 3\n');
       return null;
     case 'redundantValue':
-      writeAt(world.repo, '.fgos/config.yaml', '# @fgos:v1\n\nrunner:\n  maxParallel: 1\n');
+      writeRawProjectConfig(world.repo, '# @fgos:v1\n\nrunner:\n  maxParallel: 1\n');
       return null;
     case 'legacyGlobalToken':
-      writeAt(world.home, '.fgos/config.json', JSON.stringify({ gateway: { port: 4001, token: 'SENTINEL-9931' } }));
+      writeRawLegacyGlobalConfig(world.home, JSON.stringify({ gateway: { port: 4001, token: 'SENTINEL-9931' } }));
       return null;
     case 'noMachineId':
       fs.rmSync(path.join(world.state, 'machine-id'));

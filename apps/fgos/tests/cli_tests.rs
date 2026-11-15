@@ -3454,12 +3454,21 @@ fn doctor_without_node_fails_each_bridged_row_naming_node_once_and_the_host_rows
             "{row}"
         );
     }
-    let next = data["next"].as_array().unwrap();
-    assert_eq!(next.len(), 1, "{next:?}");
-    assert!(next[0]
-        .as_str()
+    // Node is named once; a row the host judges and `doctor --fix` repairs adds that one command, nothing else.
+    let next: Vec<&str> = data["next"]
+        .as_array()
         .unwrap()
-        .contains("install Node 18 or newer"));
+        .iter()
+        .map(|entry| entry.as_str().unwrap())
+        .collect();
+    let (named_node, others): (Vec<&str>, Vec<&str>) = next
+        .iter()
+        .partition(|entry| entry.contains("install Node 18 or newer"));
+    assert_eq!(named_node.len(), 1, "{next:?}");
+    assert!(
+        others.iter().all(|entry| *entry == "fgos doctor --fix"),
+        "{next:?}"
+    );
 
     // `--strict` exits 1 when a row still fails; `--pretty` prints the text form instead of the envelope.
     let strict = doctor_in(&project, &path, &["--strict", "--json"], &[]);

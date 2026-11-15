@@ -183,7 +183,7 @@ mod door {
             path: std::env::var_os("PATH"),
         };
         let ctx = machine::context(&detectors).map_err(|refusal| refusal.to_string())?;
-        if let Some(refusal) = super::project_root_refusal(root) {
+        if let Some(refusal) = super::super::project_root_refusal(root) {
             return Err(refusal.to_owned());
         }
         let roots = provider::roots(root).map_err(|refusal| match refusal.reason {
@@ -370,6 +370,61 @@ mod tests {
         assert!(!broken.passed);
         assert!(broken.message.as_deref().unwrap().contains("config-parse"));
         let _ = fs::remove_dir_all(base);
+    }
+
+    #[test]
+    fn every_runner_key_a_past_release_retired_is_an_unknown_key_whichever_file_carries_it() {
+        let retired = serde_json::json!({
+            "runner": {
+                "models": { "light": "haiku" },
+                "DEFAULT_TIER_TO_POLICY": {},
+                "QUALITY_TIER_BRIDGE": {},
+                "QUALITY_MODE_VALUES": [],
+                "minTier": "standard",
+                "minRigor": "standard",
+                "rigorOverrides": { "low": "standard" },
+                "PLACEMENT_POLICY_SHADOW": true,
+                "rigorToTier": { "low": "nano" },
+                "executors": { "agent": { "rigorOverrides": {}, "models": {} } },
+                "capabilities": { "code:review": { "overrides": { "tier": "standard" }, "rigorOverrides": {}, "minTier": "standard", "minRigor": "standard" } }
+            }
+        });
+        let paths = [
+            "runner.models",
+            "runner.DEFAULT_TIER_TO_POLICY",
+            "runner.QUALITY_TIER_BRIDGE",
+            "runner.QUALITY_MODE_VALUES",
+            "runner.minTier",
+            "runner.minRigor",
+            "runner.rigorOverrides",
+            "runner.PLACEMENT_POLICY_SHADOW",
+            "runner.rigorToTier",
+            "runner.executors.agent.rigorOverrides",
+            "runner.executors.agent.models",
+            "runner.capabilities.code:review.overrides",
+            "runner.capabilities.code:review.rigorOverrides",
+            "runner.capabilities.code:review.minTier",
+            "runner.capabilities.code:review.minRigor",
+        ];
+        let text = format!("# @fgos:v1\n\n{retired}\n");
+        for (tag, file) in [("retired-project", false), ("retired-global", true)] {
+            let (base, roots) = world(tag);
+            let target = if file {
+                roots.global_dir.clone()
+            } else {
+                roots.project_root.join(".fgos")
+            };
+            fs::write(target.join("config.yaml"), &text).unwrap();
+            let rows = judged(&roots);
+            let message = row(&rows, "config-unknown-key").message.clone().unwrap();
+            for key in paths {
+                assert!(
+                    message.contains(&format!("config-unknown-key {key} ")),
+                    "{tag}: {key} is not reported as unknown: {message}"
+                );
+            }
+            let _ = fs::remove_dir_all(base);
+        }
     }
 
     #[test]

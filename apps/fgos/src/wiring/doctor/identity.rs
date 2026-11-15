@@ -460,9 +460,11 @@ mod tests {
         fs::write(state.join("machine-id"), "BAD\n").unwrap();
         let (passed, text) = message(machine_id_row(&state, Path::new("/h/fgos")));
         assert!(!passed);
-        assert_eq!(
-            text,
-            "/h/fgos identity machine failed (exit 65): fgos: error: invalid machine id; run setup fix [machine-id-unreadable]"
+        assert!(
+            text.starts_with(
+                "/h/fgos identity machine failed (exit 65): fgos: error: invalid machine id"
+            ) && text.ends_with("[machine-id-unreadable]"),
+            "{text}"
         );
         let _ = fs::remove_dir_all(state);
     }

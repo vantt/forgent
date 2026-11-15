@@ -11,6 +11,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { computeArtifactDigest, hashFile } from '../../scripts/build-rust-distribution.mjs';
+import { gatewayTokenPath } from '../helpers/config-fixture.mjs';
 import { useReleaseFixture, fixture, runFgctl, runFgctlRaw, removeStateHome } from './fgctl-init-fixture.mjs';
 
 useReleaseFixture();
@@ -86,6 +87,13 @@ function withProject(fn) {
   }
 }
 
+/** The machine files a machine that has been set up holds: the host judges them itself, so a doctor over a bare home would name a fix. */
+function withMachineFiles(home) {
+  const token = gatewayTokenPath(path.join(home, '.fgos'));
+  fs.mkdirSync(path.dirname(token), { recursive: true, mode: 0o700 });
+  fs.writeFileSync(token, 'closing-block-token\n', { mode: 0o600 });
+}
+
 const transactionStatus = (state) => {
   const dir = path.join(state, 'installs');
   const [file] = fs.readdirSync(dir);
@@ -112,12 +120,17 @@ test('init ends on Ready and one runnable next step, exits 0 and completes the t
 });
 
 // The tail steps only: the payload also logs the hook calls that `doctor --fix` makes, and the bridge each of its calls.
-const calls = (log) => (fs.existsSync(log) ? fs.readFileSync(log, 'utf8').trim().split('\n') : []).filter((c) => /^(init|doctor)\b/.test(c));
+// The bridge runs each stretch of fixes it still owns as one call, and the host runs the others itself, so a doctor
+// that fixes calls it once per stretch: consecutive `doctor fix` entries are one step here.
+const calls = (log) => (fs.existsSync(log) ? fs.readFileSync(log, 'utf8').trim().split('\n') : [])
+  .filter((c) => /^(init|doctor)\b/.test(c))
+  .filter((call, at, all) => !(call === 'doctor fix' && all[at - 1] === 'doctor fix'));
 
 test('a clean doctor ends the tail after init and one doctor run, and a rerun of the active release says nothing to do', () => {
   const release = releaseWithCannedDoctor();
   try {
     withProject(({ home, state, proj }) => {
+      withMachineFiles(home);
       const log = path.join(home, 'calls.log');
       const env = { HOME: home, CANNED_DOCTOR: JSON.stringify(CANNED.ok), CALL_LOG: log };
       const first = runFgctlRaw(['init', '--from', release.dir], { cwd: proj, stateHome: state, env });

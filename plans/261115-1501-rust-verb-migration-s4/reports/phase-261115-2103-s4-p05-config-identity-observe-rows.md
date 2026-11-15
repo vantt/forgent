@@ -1,6 +1,6 @@
 # Phase 05 report: config, identity and observe doctor rows in Rust
 
-Branch `rust-verb-migration-program/s4-p05` from `8043a263f`. Status: DONE_WITH_CONCERNS.
+Branch `rust-verb-migration-program/s4-p05`, rebased on `2f490135f` (phase 06's group table adopted: each adapter exports a `GROUP` beside `holder_lock` and `mailbox`). Status: DONE_WITH_CONCERNS.
 
 ## What changed
 - Host adapters `apps/fgos/src/wiring/doctor/{config,identity,observe}.rs`; `mod.rs` gains one `GROUPS` table (rows, fixes, judge, fix per component) and `NativeOwner::row_ids()/fix_ids()` built from it. A later phase adds one `mod` line and one `Group` line.
@@ -40,11 +40,18 @@ Other message differences (not exercised by parity, accepted): the text of an I/
 
 ## Gates
 - fmt; clippy `-D warnings` on fgos, fgos-config, fgos-identity, fgos-observe, fgos-distribution (all targets): clean; msvc and darwin `cargo check` of fgos, fgos-identity, fgos-observe, fgos-distribution: no warning from my files.
-- `cargo test --locked -p fgos --no-fail-fast`: all pass except (1) `cli_tests` `doctor_without_node_fails_each_bridged_row_naming_node_once_and_still_answers` (asserts every row fails "Node is not available"; split by owner is p06's fix, take it when it lands) and (2) `wiring::gateway_control` `a_build_that_succeeds_...` once with "Text file busy" (race writing a fake cargo script, unrelated, passed in isolation earlier in the suite).
+- After the rebase: `cargo test --locked -p fgos --no-fail-fast` green (260 bin tests, 67 cli_tests, all other binaries), clippy `-D warnings` clean, msvc and darwin check clean, crate tests of identity/observe/config/distribution green. Before the rebase the run had these two reds, now gone: (1) `cli_tests` `doctor_without_node_fails_each_bridged_row_naming_node_once_and_still_answers` (asserts every row fails "Node is not available"; split by owner is p06's fix, take it when it lands) and (2) `wiring::gateway_control` `a_build_that_succeeds_...` once with "Text file busy" (race writing a fake cargo script, unrelated, passed in isolation earlier in the suite).
 - `cargo test` fgos-identity, fgos-observe, fgos-config, fgos-distribution: green.
 - Node: architecture, registrations, doctor-bridge, config-door green; wider focused run of every test importing checks/registrations/harness/config-fixture: see the final lines of the status below.
 - Census regenerated (0 undeclared). Routes unchanged (no verb added).
 - Beyond my focused set the series gate should include: every `test/setup/*.test.mjs`, `test/cli/*`, `closing-block`, `fgctl-init*`, `doctor-fresh-run`, the doors rows in `architecture.test.mjs`, and the p06 `cli_tests` fix.
+
+## After the rebase (changes beyond the first draft)
+- `cli_tests` Node-missing case: `next` now allows one Node hint plus `fgos doctor --fix` (a row the host judges and fix repairs); p06's owner split kept.
+- `closing-block.test.mjs`: the call log collapses consecutive `doctor fix` calls (one per stretch the bridge still owns), and the clean-doctor test creates the machine files the host now judges itself.
+- `checks.test.mjs` expected id list drops the 23 rows; the Node retired-runner-keys test is retired: owner now `config.rs` `every_runner_key_a_past_release_retired_is_an_unknown_key_whichever_file_carries_it` (project and global file).
+- Parity table writes config only through `test/helpers/config-fixture.mjs` (the config test door).
+- NOT rerun after the rebase: the doctor parity table (it stages the host; quiet window). It was green on the pre-rebase head with 58 cases; the step lead or I rerun after 23:30.
 
 ## Proposed `## [Unreleased]` line
 `fgos doctor` judges its config, identity and observe rows inside the host; with `--dir` naming a directory that does not exist the machine identity rows now answer instead of failing on a start-up error.
