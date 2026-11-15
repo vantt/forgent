@@ -193,10 +193,9 @@ fn repository(context: &Context) -> Option<&RepositoryFacts> {
     }
 }
 
-fn obsolete_mapping(context: &Context, facts: &RepositoryFacts) -> Result<bool, String> {
-    if facts.obsolete_fetch_mapping {
-        return Ok(true);
-    }
+/// Whether `origin` carries an obsolete legacy fetch mapping, asked about `origin` itself; a configured remote that is
+/// `origin` is the facts' own answer and not asked twice.
+fn origin_obsolete(context: &Context) -> Result<bool, String> {
     if context.remote == "origin" {
         return Ok(false);
     }
@@ -274,7 +273,7 @@ fn event_store_mapping_problems(run: &Run) -> Vec<String> {
 
 fn repository_config(run: &Run, context: &Context, facts: &RepositoryFacts) -> RowResult {
     let keys = &facts.untrusted_transport_config;
-    let obsolete = match obsolete_mapping(context, facts) {
+    let obsolete = match origin_obsolete(context).map(|origin| facts.obsolete_fetch_mapping || origin) {
         Ok(obsolete) => obsolete,
         Err(message) => return result(false, message, None),
     };
@@ -603,7 +602,7 @@ fn install_fetch_mapping(run: &Run) -> Result<(bool, String), String> {
     if has_remote && (!mapped || facts.obsolete_fetch_mapping) {
         repairs.push(remote);
     }
-    if remote != "origin" && obsolete_mapping(&context, facts)? {
+    if origin_obsolete(&context)? {
         repairs.push("origin");
     }
     let ResolveRepo::Repository(repo) = context
@@ -1153,6 +1152,35 @@ mod tests {
         assert!(!row_of(&f, "git-repository-config").passed);
         assert_eq!(fixed(&f, "git-publication-refspecs").changed, Some(true));
         assert!(row_of(&f, "git-repository-config").passed);
+    }
+
+    #[test]
+    fn an_obsolete_mapping_on_only_the_configured_remote_is_repaired_there_and_never_on_an_origin_that_does_not_exist(
+    ) {
+        let f = Fixture::new("obsoleteupstream");
+        f.git(&["remote", "add", "upstream", "/fixture/remote"]);
+        std::fs::create_dir_all(f.repo.join(".fgos")).unwrap();
+        std::fs::write(
+            f.repo.join(".fgos/config.yaml"),
+            "eventStore:\n  remote: upstream\n",
+        )
+        .unwrap();
+        let obsolete = granted_fetch_mappings("upstream")
+            .unwrap()
+            .into_iter()
+            .find(|mapping| mapping.contains("legacy*"))
+            .unwrap()
+            .replace('*', "");
+        f.git(&["config", "--add", "remote.upstream.fetch", &obsolete]);
+        let outcome = fixed(&f, "git-publication-refspecs");
+        assert_eq!(outcome.changed, Some(true), "{:?}", outcome.message);
+        let text = outcome.message.unwrap();
+        assert!(text.contains("upstream"), "{text}");
+        assert!(!text.contains("origin"), "{text}");
+        assert!(!f
+            .git(&["config", "--get-all", "remote.upstream.fetch"])
+            .lines()
+            .any(|line| line == obsolete));
     }
 
     #[test]
