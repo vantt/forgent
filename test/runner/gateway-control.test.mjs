@@ -573,7 +573,7 @@ test('startGateway: two concurrent starts build and spawn exactly once; the othe
 // The host exports its recursion guard to the Node payload; the gateway calls `fgos` verbs
 // through the host, so a started gateway must not carry the guard or every call is refused.
 // Owning proof of the env handed to the spawned gateway (a live gateway is too heavy for the suite).
-test('startGateway: the spawned gateway does not inherit the host recursion guard but keeps the rest of the env', () => {
+test('startGateway: the gateway is built --locked and spawned without the host recursion guard but with the rest of the env', () => {
   if (os.platform() !== 'linux') return;
   const { repoRoot, fgosDir } = mkFgosDir();
   const gatewayDir = path.join(repoRoot, 'apps', 'fgos-gateway');
@@ -585,6 +585,7 @@ test('startGateway: the spawned gateway does not inherit the host recursion guar
   const binary = path.join(releaseDir, 'fgos-gateway');
   fs.writeFileSync(path.join(binDir, 'cargo'), [
     '#!/bin/sh',
+    `echo "$@" > ${JSON.stringify(path.join(repoRoot, 'cargo-args.txt'))}`,
     `mkdir -p ${JSON.stringify(releaseDir)}`,
     `printf '#!/bin/sh\\nenv > ${envDump}\\necho "listening on 127.0.0.1:0"\\nexec sleep 300\\n' > ${JSON.stringify(binary)}`,
     `chmod +x ${JSON.stringify(binary)}`,
@@ -601,6 +602,7 @@ test('startGateway: the spawned gateway does not inherit the host recursion guar
     const run = spawnSync(process.execPath, ['--input-type=module', '-e', script], { env, encoding: 'utf8', timeout: 10000 });
     assert.equal(run.status, 0, run.stderr);
     pid = JSON.parse(run.stdout.trim().split('\n').pop()).pid;
+    assert.match(fs.readFileSync(path.join(repoRoot, 'cargo-args.txt'), 'utf8'), /build --release --locked /, 'the build must not rewrite the lock');
     const dumped = fs.readFileSync(envDump, 'utf8').split('\n');
     assert.ok(!dumped.some((line) => line.startsWith('FGOS_RUST_HOST_RECURSION_GUARD=')), 'guard must not reach the gateway');
     assert.ok(dumped.includes('GATEWAY_ENV_MARKER=kept'), 'the rest of the environment is passed through');

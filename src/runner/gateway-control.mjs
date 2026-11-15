@@ -176,7 +176,7 @@ function releaseBinaryPath(repoRoot) {
  * the gateway lock for the whole check-build-spawn-confirm sequence
  * (tsk-2n2). Refuses (no process spawned) when the registry already
  * names a live pid. Builds the release binary first (`cargo build
- * --release`, synchronous — cargo's own incremental cache makes a no-op
+ * --release --locked`, synchronous — cargo's own incremental cache makes a no-op
  * rebuild fast) rather than assuming a prior manual build, so `fgos
  * gateway start` alone is always sufficient. Returns the recorded
  * registry entry once the log file shows the real "listening on" line
@@ -207,10 +207,9 @@ export function startGateway(repoRoot, fgosDir) {
       throw new GatewayControlError(`no apps/fgos-gateway/ directory found at "${gatewayDir}" — this repo has no gateway to start`, { gatewayDir });
     }
 
-    // Not `--locked`: the gateway crate is outside the root workspace and its own lock can lag the
-    // manifests, which `--locked` turns into a failed start; the build is kept as it was.
+    // `--locked`: a start must never rewrite the tracked lock of the gateway crate.
     try {
-      execFileSync('cargo', ['build', '--release', '--bin', 'fgos-gateway'], { cwd: gatewayDir, stdio: 'pipe', maxBuffer: BUILD_MAX_BUFFER });
+      execFileSync('cargo', ['build', '--release', '--locked', '--bin', 'fgos-gateway'], { cwd: gatewayDir, stdio: 'pipe', maxBuffer: BUILD_MAX_BUFFER });
     } catch (err) {
       const stderr = err.stderr ? err.stderr.toString('utf8') : err.message;
       throw new GatewayControlError(`building the release binary failed: ${stderr}`, { gatewayDir });
