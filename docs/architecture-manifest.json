@@ -391,7 +391,7 @@
     {
       "job": "run a bounded child and find a program on the search path",
       "kind": "door",
-      "patterns": ["pub fn run_bounded\\b", "pub fn resolve_program\\b", "\\bfn first_on_path\\b", "export function firstOnPath\\b", "std::env::split_paths\\(", "\\.try_wait\\(\\)"],
+      "patterns": ["pub fn run_bounded\\b", "pub fn run_bounded_command\\b", "pub fn resolve_program\\b", "\\bfn first_on_path\\b", "export function firstOnPath\\b", "std::env::split_paths\\(", "\\.try_wait\\(\\)"],
       "allowed": ["packages/process/rust/src/spawn.rs"],
       "debt": [
         { "path": "apps/fgos-gateway/src/gateway.rs", "reason": "watches its own gateway child (try_wait) for liveness; a service, not a bounded run" },

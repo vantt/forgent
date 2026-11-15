@@ -112,6 +112,10 @@ pub trait RowOwner {
     /// Judges the rows `ids` (registry order) against `root`, after the fixes ran; one outcome per id, in order.
     /// An owner builds the facts its rows share once per call.
     fn judge_rows(&self, root: &Path, ids: &[&str]) -> Vec<RowOutcome>;
+    /// The signal that interrupted the run, once one did: the engine stops after the call it is in.
+    fn interrupted(&self) -> Option<i32> {
+        None
+    }
 }
 
 /// The two kinds of owner the registry names.
@@ -449,6 +453,9 @@ pub struct Report {
     pub fixed: Option<Vec<FixResult>>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub checks: Option<Vec<ReportRow>>,
+    /// The signal that stopped the run before it finished; never part of the report on the wire.
+    #[serde(skip)]
+    pub interrupted: Option<i32>,
 }
 
 /// One row of the report.
@@ -549,6 +556,12 @@ impl Owners<'_> {
 
     /// Who judges a row today: the Rust owner the registry names once it has the judge, else the bridge, whose
     /// Node body stays until the phase that moves the row deletes it.
+    fn interrupted(&self) -> Option<i32> {
+        self.native
+            .interrupted()
+            .or_else(|| self.bridge.interrupted())
+    }
+
     fn kind_of_row(&self, registry: &Registry, entry: &RegistryRow) -> OwnerKind {
         if registry.in_rust_rows.contains(&entry.id) {
             OwnerKind::Native
@@ -573,6 +586,13 @@ impl Owners<'_> {
 /// added once to `next`.
 pub fn run(registry: &Registry, owners: &Owners, root: &Path, options: Options) -> Report {
     let fixed = options.fix.then(|| run_fixes(registry, owners, root));
+    if let Some(signal) = owners.interrupted() {
+        return Report {
+            fixed,
+            interrupted: Some(signal),
+            ..Report::default()
+        };
+    }
     let kinds: Vec<OwnerKind> = registry
         .rows
         .iter()
@@ -662,6 +682,7 @@ pub fn run(registry: &Registry, owners: &Owners, root: &Path, options: Options) 
         next: Some(next),
         fixed,
         checks: Some(rows),
+        interrupted: owners.interrupted(),
     }
 }
 
@@ -689,6 +710,9 @@ fn run_fixes(registry: &Registry, owners: &Owners, root: &Path) -> Vec<FixResult
             ));
         }
         results.extend(done);
+        if owners.interrupted().is_some() {
+            break;
+        }
         at = end;
     }
     results
@@ -1292,6 +1316,7 @@ mod tests {
                     ..ReportRow::default()
                 },
             ]),
+            ..Report::default()
         };
         let text = render_pretty(&report, Palette { enabled: false });
         assert_eq!(

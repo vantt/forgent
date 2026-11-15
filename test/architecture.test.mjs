@@ -2039,6 +2039,7 @@ const outsideDoor = (job, file, text) => checkDoors([{ ...doorRow(job), allowed:
 
 test('door rows catch a process signal, a /proc read and a second lock taker, and skip comments', () => {
   assert.equal(outsideDoor('process control: signal a process or group', 'src/x.mjs', 'process.kill(-child.pid, 15);\n').length, 1);
+  assert.equal(outsideDoor('run a bounded child and find a program on the search path', 'packages/p/rust/src/x.rs', 'pub fn run_bounded_command<G>(c: Command) {}\n').length, 1);
   assert.equal(outsideDoor('process control: signal a process or group', 'packages/p/rust/src/x.rs', 'unsafe { libc::killpg(pid, 9) };\n').length, 1);
   assert.equal(outsideDoor('process facts: read /proc', 'src/x.mjs', "fs.readFileSync('/proc/net/unix', 'utf8');\n").length, 1);
   assert.equal(outsideDoor('process facts: read /proc', 'src/x.mjs', "fs.readdirSync('/proc');\n").length, 1);

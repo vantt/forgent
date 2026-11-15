@@ -3519,6 +3519,7 @@ fn an_interrupt_of_the_host_ends_the_bridge_child_and_everything_it_started() {
         ),
     );
     let project = fresh_dir("fgos_doctor_sigintproj");
+    let record = dump.join("invocation-record.jsonl");
     let manifest_path = ensure_dev_manifest();
     let mut host = Command::new(fgos_bin())
         .args(["doctor", "--json"])
@@ -3528,6 +3529,7 @@ fn an_interrupt_of_the_host_ends_the_bridge_child_and_everything_it_started() {
         .env("FGOS_STATE_ROOT", fresh_dir("fgos_doctor_sigint_state"))
         .env("FGOS_ACTIVE_RELEASE_PATH", repo_root())
         .env("FGOS_ACTIVE_MANIFEST_PATH", &manifest_path)
+        .env("FGOS_INVOCATION_RECORD_PATH", &record)
         .stdout(std::process::Stdio::null())
         .stderr(std::process::Stdio::null())
         .spawn()
@@ -3560,6 +3562,11 @@ fn an_interrupt_of_the_host_ends_the_bridge_child_and_everything_it_started() {
         );
         std::thread::sleep(std::time::Duration::from_millis(20));
     }
+    let written = fs::read_to_string(&record).unwrap_or_default();
+    assert!(
+        written.contains("doctor.run"),
+        "an interrupted doctor still writes its invocation record: {written:?}"
+    );
     std::thread::sleep(std::time::Duration::from_millis(300));
     let alive = unsafe { libc::kill(pid, 0) } == 0
         && fs::read_to_string(format!("/proc/{pid}/stat"))

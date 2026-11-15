@@ -200,12 +200,12 @@ static CHILD_PID: std::sync::atomic::AtomicI32 = std::sync::atomic::AtomicI32::n
 /// reads it after its call to stop and exit as a signalled process does.
 static INTERRUPTED: std::sync::atomic::AtomicI32 = std::sync::atomic::AtomicI32::new(0);
 
-/// Ends the host with `128 + signal` when a signal was forwarded to a child since the process began, as the
-/// legacy lane ends after a signalled child. Returns when none was.
-pub fn exit_if_interrupted() {
-    let sig = INTERRUPTED.load(std::sync::atomic::Ordering::SeqCst);
-    if sig != 0 {
-        std::process::exit(128 + sig);
+/// The signal that was forwarded to a child since the process began, if any. The caller stops what it was doing
+/// and ends with `128 + signal` once it has written its record, as the legacy lane does.
+pub fn interrupted() -> Option<i32> {
+    match INTERRUPTED.load(std::sync::atomic::Ordering::SeqCst) {
+        0 => None,
+        sig => Some(sig),
     }
 }
 

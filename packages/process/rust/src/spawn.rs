@@ -154,7 +154,9 @@ where
 /// Object and the wait, and nothing else. `on_spawn` runs once with the child's pid right after it started,
 /// and what it returns is kept until the call ends, so a caller can forward signals to the child's group for as
 /// long as it lives. A program that cannot be started returns the OS error; the child and every descendant in
-/// its group are gone when this returns, on every path.
+/// its group are gone when this returns, on every path, with two limits: `on_spawn` must not panic (the child is
+/// already running and a panic would leave it unreaped), and a command whose own `pre_exec` leaves the group
+/// (`setsid`) takes the child out of what the group kill reaches.
 pub fn run_bounded_command<G>(
     mut command: Command,
     input: Option<&[u8]>,
@@ -188,7 +190,7 @@ pub fn run_bounded_command<G>(
         let _ = child.wait();
         return Err(error);
     }
-    let _kept = on_spawn(child.id());
+    let mut kept = Some(on_spawn(child.id()));
     let group = Group {
         #[cfg(unix)]
         pid: child.id() as libc::pid_t,
@@ -214,6 +216,8 @@ pub fn run_bounded_command<G>(
             Ok(false) => thread::sleep(POLL),
             Err(error) => {
                 group.kill();
+                // The hook's guard goes before the child is reaped: until then its pid cannot be reused.
+                drop(kept.take());
                 // The group kill misses a child that moved into another group; the child itself must still end.
                 let _ = child.kill();
                 let _ = child.wait();
@@ -223,6 +227,8 @@ pub fn run_bounded_command<G>(
     };
     // The child has ended or is out of time; its descendants must not outlive the call either.
     group.kill();
+    // The hook's guard goes before the child is reaped: until then its pid cannot be reused.
+    drop(kept.take());
     // The group kill misses a child that moved into another group; the child itself must still end.
     let _ = child.kill();
     let status = child.wait()?;

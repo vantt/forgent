@@ -160,7 +160,6 @@ impl NodeBridge {
                 legacy_exec::Forwarding::to(target)
             },
         );
-        legacy_exec::exit_if_interrupted();
         let (stdout, stderr, status, timed_out) = match outcome {
             Ok(fgos_process::spawn::Outcome::Exited(output)) => {
                 (output.stdout, output.stderr, Some(output.status), false)
@@ -240,6 +239,10 @@ fn excerpt(stderr: &str) -> String {
 }
 
 impl RowOwner for NodeBridge {
+    fn interrupted(&self) -> Option<i32> {
+        legacy_exec::interrupted()
+    }
+
     fn run_fixes(&self, root: &Path, ids: &[&str]) -> Vec<FixResult> {
         let (lines, fault) = self.call(root, "fix", ids, self.fix_deadline);
         let mut done: HashMap<String, FixResult> = lines

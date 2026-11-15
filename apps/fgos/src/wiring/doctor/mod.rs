@@ -138,6 +138,15 @@ pub fn answer(request: &DoctorRequest, registry: &Registry, owners: &Owners) -> 
         &request.root,
         Options { fix: request.fix },
     );
+    // An interrupted run prints nothing and ends as a signalled process does (128 + signal) once the host has
+    // written its invocation record.
+    if let Some(signal) = report.interrupted {
+        return VerbAnswer {
+            data: serde_json::Value::Null,
+            exit: 128 + signal,
+            text: Some(String::new()),
+        };
+    }
     VerbAnswer {
         exit: report.exit_code(request.strict),
         text: request
