@@ -295,6 +295,7 @@ dependencies = [
  "fgos-git",
  "fgos-holder-lock",
  "fgos-host-runtime",
+ "fgos-process",
  "flate2",
  "libc",
  "semver",
