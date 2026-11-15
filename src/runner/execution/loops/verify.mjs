@@ -1,4 +1,5 @@
 import { VERIFY_SEAT } from '../seat-resolver.mjs';
+import { capabilityVerifyOf } from '../capability-config.mjs';
 
 /**
  * Verification command resolution for collaboration loops.
@@ -15,7 +16,7 @@ import { VERIFY_SEAT } from '../seat-resolver.mjs';
  * @returns {string|undefined}
  */
 export function verifyCommandOf(unit, cfg) {
-  const command = unit?.verify || cfg?.capabilities?.[unit?.capability]?.verify;
+  const command = unit?.verify || capabilityVerifyOf(cfg, unit?.capability);
   return typeof command === 'string' && command.trim() ? command : undefined;
 }
 

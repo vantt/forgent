@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "2d7febfe703e1ad6510cfd09366be45d40ae61cb1589c825c53b941ce57d65c8",
+  "payloadDigest": "7fd4f6d9742fcca22b8257904564249fd3390b8867eaac8dc1d912ad473390c3",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -1067,7 +1067,7 @@
     "src/runner/execution/dry-bind.mjs": "94acf7f1b659f663e4d8727f4984d6a8fb577e984a79b69f158892eca6cbd07a",
     "src/runner/execution/explain.mjs": "9cdb1dca7c667feac6c3ae9989470b37f76046220816b0d3bea3fd13a127bf12",
     "src/runner/execution/handoff-refs.mjs": "ee8cc943132a9b25b6f2ea45efb9c462b5d591c8a93d6feabcf6dce107e3b318",
-    "src/runner/execution/legacy-seat-read.mjs": "0199b8f8c48357c60180a58693f85d8da9cb4d0490648f29730e7fb715ce67e6",
+    "src/runner/execution/legacy-seat-read.mjs": "3c508338331f5403d50bc95e598991f951754a2947f511d378da022d629b5617",
     "src/runner/execution/loops/debate.mjs": "952e40f982ec2e0eae4888cd46b85b2a462a93b459b42830c39311500ab87720",
     "src/runner/execution/loops/history-outcome.mjs": "f6eb9a25db6fa1164010588537bf92988687b4189c66c82a018a209a07916901",
     "src/runner/execution/loops/index.mjs": "49254b0102d6c32aec04ff9feaa82b60985da7177ebca7d17d228922b10bb002",
@@ -1075,14 +1075,14 @@
     "src/runner/execution/loops/reviewed.mjs": "f441697d944f4be563296e790038755e19cf3265d10bda472d00c29c1342890e",
     "src/runner/execution/loops/role-tasks.mjs": "435976f373727ac41effa8dae8082a43b68fb39fa4e091534ffcef64c58ee753",
     "src/runner/execution/loops/solo.mjs": "eed1beeff82bab5cb724f7877644a0e8dd861af001f7d6b5c2f7fa5cce6e1ee2",
-    "src/runner/execution/loops/verify.mjs": "a34d714b62392c34cb81cf349dfd80598aa1bc70b2115c5328ce798db40764c2",
+    "src/runner/execution/loops/verify.mjs": "aa3d85c4be97eddeb3f4dfa814533a9be2735dea9a32246611b682ac79a200c9",
     "src/runner/execution/outcome.mjs": "24f6999ee97bc39be66e7b0680dfcced385115f65e6a2e6427627b102dab9794",
     "src/runner/execution/partial-writes.mjs": "9c7ab4a2f57852b93283b819ed8c4adcac2b71c9241cdd4c760e73960bc1c027",
     "src/runner/execution/patterns/catalog-entries.mjs": "d96ef8305f33b49d07e7a49b5537a2c5534d88d7d95d690a86d371bb8e3ccdc2",
     "src/runner/execution/patterns/catalog.mjs": "d95d8fc276930093c14d2a757b8cc5217cf20a21bd06b891f7c191ab905addce",
     "src/runner/execution/patterns/retired-keys.mjs": "c07f8407d169c7db410aba99db2b7bb1119f5a20ec7a7b63f8cb81d1324e0f40",
     "src/runner/execution/run-request.mjs": "e704b5658f03fae0ce279e31aaee560af3f9648e7f41d39863ce406a0bb03494",
-    "src/runner/execution/run.mjs": "0d3cf2384a572ffa5a4b4ccd80544d676d874c28ede3a66fa8a853812f2ec1cd",
+    "src/runner/execution/run.mjs": "645228be746fe5b7724a4adfef2953e45c31ee2916a442c430a16744740cafad",
     "src/runner/execution/seat-ledger.mjs": "e033ac97585dc96b22b35d69d361d96d04b2e2b84703bcde241442ec84e74680",
     "src/runner/execution/seat-policy.mjs": "3f3d9b166a071eea1c01dce3c76189689b7971aadb06341a77d3e83c659af9a6",
     "src/runner/execution/seat-resolver.mjs": "34728d8859a4af8cff1979178ca0f87882c24cb00da2bfcd772a0655ba3d44e8",
@@ -3485,14 +3485,14 @@
     },
     {
       "path": "src/runner/execution/run.mjs",
-      "line": 542,
+      "line": 543,
       "spawn": "runVerify -> src/runner/execution/custody-door.mjs:83",
-      "binary": "(consumer verify command (cfg?.capabilities?.[unit?.capability]?.verify))",
+      "binary": "(consumer verify command (exactEntryOf(runner, capability)?.verify))",
       "class": "configured-binary"
     },
     {
       "path": "src/runner/execution/run.mjs",
-      "line": 542,
+      "line": 543,
       "spawn": "runVerify -> src/runner/execution/custody-door.mjs:83",
       "binary": "(consumer verify command (unit?.verify))",
       "class": "configured-binary"
@@ -3701,7 +3701,7 @@
       "path": "src/workflow/case-gate.mjs",
       "line": 97,
       "spawn": "runVerify -> src/runner/execution/custody-door.mjs:83",
-      "binary": "(consumer verify command (cfg?.capabilities?.[unit?.capability]?.verify))",
+      "binary": "(consumer verify command (exactEntryOf(runner, capability)?.verify))",
       "class": "configured-binary"
     },
     {

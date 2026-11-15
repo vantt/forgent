@@ -7,6 +7,8 @@
 // resume. Readers do not branch on those names: they ask here which seats the old pattern had and
 // what each one was. This is the only module that knows the retired names.
 
+import { ownMinCheckersOf } from './capability-config.mjs';
+
 const posture = (fields) => Object.freeze({ readOnly: false, writer: false, forceOutOfProcess: false, stance: false, verdict: false, ...fields });
 const seat = (name, role, fields) => Object.freeze({ seat: name, role, posture: posture(fields) });
 
@@ -44,7 +46,7 @@ function legacyCheckers(unit, cfg, params) {
   const byRigor = cfg?.patterns?.reviewed?.checkersByRigor || LEGACY_DEFAULT_CHECKERS;
   const names = new Set([
     ...(byRigor[rigor] || LEGACY_DEFAULT_CHECKERS[rigor] || ['reviewer']),
-    ...(cfg?.capabilities?.[unit?.capability]?.minCheckers || []),
+    ...(ownMinCheckersOf(cfg, unit?.capability) || []),
     ...(Array.isArray(params?.minCheckers) ? params.minCheckers : (params?.minCheckers ? [params.minCheckers] : [])),
   ]);
   if (unit?.capability?.startsWith('code:') || unit?.capability === 'code') names.add('red-team');

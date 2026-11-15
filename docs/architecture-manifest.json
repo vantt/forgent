@@ -396,18 +396,6 @@
           "reason": "moves to the capability port in a later step of this change"
         },
         {
-          "path": "src/runner/execution/legacy-seat-read.mjs",
-          "reason": "moves to the capability port in a later step of this change"
-        },
-        {
-          "path": "src/runner/execution/loops/verify.mjs",
-          "reason": "moves to the capability port in a later step of this change"
-        },
-        {
-          "path": "src/runner/execution/run.mjs",
-          "reason": "moves to the capability port in a later step of this change"
-        },
-        {
           "path": "src/runner/work-dispatch.mjs",
           "reason": "moves to the capability port in a later step of this change"
         },
