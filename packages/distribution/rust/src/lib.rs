@@ -13,6 +13,7 @@ pub mod manifest;
 pub mod shim;
 pub mod store;
 pub mod suggest;
+pub mod timer;
 pub mod uninstall;
 pub mod verify;
 pub mod workspace;

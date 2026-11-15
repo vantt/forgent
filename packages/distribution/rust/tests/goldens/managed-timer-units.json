@@ -1,0 +1,66 @@
+[
+  {
+    "schedule": "mailbox-sync",
+    "projectRoot": "/proj",
+    "remote": "origin",
+    "intervalSec": 300,
+    "bin": "/opt/fgos/bin/fgos",
+    "home": "/home/u",
+    "stem": "fgos-mailbox-sync-79903f0c",
+    "systemd": {
+      "fgos-mailbox-sync-79903f0c.service": "# fgos-managed: mailbox-sync-timer\n[Unit]\nDescription=fgOS mailbox sync (takes mail from other machines)\n\n[Service]\nType=oneshot\nExecStart=\"/opt/fgos/bin/fgos\" hook mailbox-sync --dir \"/proj\" --remote \"origin\"\n",
+      "fgos-mailbox-sync-79903f0c.timer": "# fgos-managed: mailbox-sync-timer\n[Unit]\nDescription=fgOS mailbox sync timer\n\n[Timer]\nOnBootSec=60\nOnUnitActiveSec=300\n\n[Install]\nWantedBy=timers.target\n"
+    },
+    "launchd": {
+      "dev.fgos.fgos-mailbox-sync-79903f0c.plist": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<!-- fgos-managed: mailbox-sync-timer -->\n<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">\n<plist version=\"1.0\">\n<dict>\n  <key>Label</key><string>dev.fgos.fgos-mailbox-sync-79903f0c</string>\n  <key>ProgramArguments</key>\n  <array>\n    <string>/opt/fgos/bin/fgos</string>\n    <string>hook</string>\n    <string>mailbox-sync</string>\n    <string>--dir</string>\n    <string>/proj</string>\n    <string>--remote</string>\n    <string>origin</string>\n  </array>\n  <key>StartInterval</key><integer>300</integer>\n  <key>RunAtLoad</key><true/>\n</dict>\n</plist>\n"
+    }
+  },
+  {
+    "schedule": "account-probe",
+    "projectRoot": "/proj",
+    "remote": null,
+    "intervalSec": 21600,
+    "bin": "/opt/fgos/bin/fgos",
+    "home": "/home/u",
+    "stem": "fgos-account-probe-79903f0c",
+    "systemd": {
+      "fgos-account-probe-79903f0c.service": "# fgos-managed: account-probe-timer\n[Unit]\nDescription=fgOS account probe (calls each provider account directly and records what it found)\n\n[Service]\nType=oneshot\nEnvironment=\"PATH=/home/u/.local/bin:/usr/local/bin:/usr/bin:/bin\"\nExecStart=\"/opt/fgos/bin/fgos\" dispatch probe-account --all --record --leg direct --dir \"/proj\"\n",
+      "fgos-account-probe-79903f0c.timer": "# fgos-managed: account-probe-timer\n[Unit]\nDescription=fgOS account probe timer\n\n[Timer]\nOnBootSec=60\nOnUnitActiveSec=21600\n\n[Install]\nWantedBy=timers.target\n"
+    },
+    "launchd": {
+      "dev.fgos.fgos-account-probe-79903f0c.plist": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<!-- fgos-managed: account-probe-timer -->\n<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">\n<plist version=\"1.0\">\n<dict>\n  <key>Label</key><string>dev.fgos.fgos-account-probe-79903f0c</string>\n  <key>ProgramArguments</key>\n  <array>\n    <string>/opt/fgos/bin/fgos</string>\n    <string>dispatch</string>\n    <string>probe-account</string>\n    <string>--all</string>\n    <string>--record</string>\n    <string>--leg</string>\n    <string>direct</string>\n    <string>--dir</string>\n    <string>/proj</string>\n  </array>\n  <key>EnvironmentVariables</key>\n  <dict>\n    <key>PATH</key><string>/home/u/.local/bin:/usr/local/bin:/usr/bin:/bin</string>\n  </dict>\n  <key>StartInterval</key><integer>21600</integer>\n  <key>RunAtLoad</key><true/>\n</dict>\n</plist>\n"
+    }
+  },
+  {
+    "schedule": "mailbox-sync",
+    "projectRoot": "/work/we \"ird\" \\ & <dir>",
+    "remote": "origin",
+    "intervalSec": 300,
+    "bin": "/opt/fgos/bin/fgos",
+    "home": "/home/u",
+    "stem": "fgos-mailbox-sync-779dd153",
+    "systemd": {
+      "fgos-mailbox-sync-779dd153.service": "# fgos-managed: mailbox-sync-timer\n[Unit]\nDescription=fgOS mailbox sync (takes mail from other machines)\n\n[Service]\nType=oneshot\nExecStart=\"/opt/fgos/bin/fgos\" hook mailbox-sync --dir \"/work/we \\\"ird\\\" \\\\ & <dir>\" --remote \"origin\"\n",
+      "fgos-mailbox-sync-779dd153.timer": "# fgos-managed: mailbox-sync-timer\n[Unit]\nDescription=fgOS mailbox sync timer\n\n[Timer]\nOnBootSec=60\nOnUnitActiveSec=300\n\n[Install]\nWantedBy=timers.target\n"
+    },
+    "launchd": {
+      "dev.fgos.fgos-mailbox-sync-779dd153.plist": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<!-- fgos-managed: mailbox-sync-timer -->\n<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">\n<plist version=\"1.0\">\n<dict>\n  <key>Label</key><string>dev.fgos.fgos-mailbox-sync-779dd153</string>\n  <key>ProgramArguments</key>\n  <array>\n    <string>/opt/fgos/bin/fgos</string>\n    <string>hook</string>\n    <string>mailbox-sync</string>\n    <string>--dir</string>\n    <string>/work/we \"ird\" \\ &amp; &lt;dir&gt;</string>\n    <string>--remote</string>\n    <string>origin</string>\n  </array>\n  <key>StartInterval</key><integer>300</integer>\n  <key>RunAtLoad</key><true/>\n</dict>\n</plist>\n"
+    }
+  },
+  {
+    "schedule": "account-probe",
+    "projectRoot": "/work/we \"ird\" \\ & <dir>",
+    "remote": null,
+    "intervalSec": 21600,
+    "bin": "/opt/fgos/bin/fgos",
+    "home": "/home/u",
+    "stem": "fgos-account-probe-779dd153",
+    "systemd": {
+      "fgos-account-probe-779dd153.service": "# fgos-managed: account-probe-timer\n[Unit]\nDescription=fgOS account probe (calls each provider account directly and records what it found)\n\n[Service]\nType=oneshot\nEnvironment=\"PATH=/home/u/.local/bin:/usr/local/bin:/usr/bin:/bin\"\nExecStart=\"/opt/fgos/bin/fgos\" dispatch probe-account --all --record --leg direct --dir \"/work/we \\\"ird\\\" \\\\ & <dir>\"\n",
+      "fgos-account-probe-779dd153.timer": "# fgos-managed: account-probe-timer\n[Unit]\nDescription=fgOS account probe timer\n\n[Timer]\nOnBootSec=60\nOnUnitActiveSec=21600\n\n[Install]\nWantedBy=timers.target\n"
+    },
+    "launchd": {
+      "dev.fgos.fgos-account-probe-779dd153.plist": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<!-- fgos-managed: account-probe-timer -->\n<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">\n<plist version=\"1.0\">\n<dict>\n  <key>Label</key><string>dev.fgos.fgos-account-probe-779dd153</string>\n  <key>ProgramArguments</key>\n  <array>\n    <string>/opt/fgos/bin/fgos</string>\n    <string>dispatch</string>\n    <string>probe-account</string>\n    <string>--all</string>\n    <string>--record</string>\n    <string>--leg</string>\n    <string>direct</string>\n    <string>--dir</string>\n    <string>/work/we \"ird\" \\ &amp; &lt;dir&gt;</string>\n  </array>\n  <key>EnvironmentVariables</key>\n  <dict>\n    <key>PATH</key><string>/home/u/.local/bin:/usr/local/bin:/usr/bin:/bin</string>\n  </dict>\n  <key>StartInterval</key><integer>21600</integer>\n  <key>RunAtLoad</key><true/>\n</dict>\n</plist>\n"
+    }
+  }
+]
