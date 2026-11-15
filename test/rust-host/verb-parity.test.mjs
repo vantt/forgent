@@ -10,7 +10,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { loadParityTable, parseEntry, parityBaseEntrySpec, runCaseOnEntry, compareResults, snapshotDirectory, diffDirectorySnapshots } from "./harness.mjs";
 
-const TABLES = ["git"];
+const TABLES = ["git", "lock-status"];
 
 function baseEntry() {
   const description = JSON.parse(fs.readFileSync(parityBaseEntrySpec().slice("release:".length), "utf8"));
@@ -19,7 +19,7 @@ function baseEntry() {
   return entry;
 }
 
-const TIME_KEYS = new Set(["updatedAtMs", "oldestRetainedAtMs"]);
+const TIME_KEYS = new Set(["updatedAtMs", "oldestRetainedAtMs", "ageMs"]);
 function scrub(value) {
   if (Array.isArray(value)) return value.map(scrub);
   if (value && typeof value === "object") return Object.fromEntries(Object.entries(value).map(([k, v]) => [k, TIME_KEYS.has(k) && typeof v === "number" ? 0 : scrub(v)]));
@@ -81,6 +81,11 @@ for (const name of TABLES) {
           if (!result.stderrText.startsWith(testCase.hostStderr)) failures.push(`${testCase.id}: host said ${JSON.stringify(result.stderrText)}`);
           const baseSide = await runOnEntry(a, testCase, table.builders);
           if (baseSide.result.exitCode !== testCase.exit) failures.push(`${testCase.id}: base exit ${baseSide.result.exitCode}`);
+        } else if (testCase.check) {
+          // The host answers differently on purpose: the case states how, from both answers.
+          const baseSide = await runOnEntry(a, testCase, table.builders);
+          const problem = result.exitCode === 0 && baseSide.result.exitCode === 0 ? testCase.check(JSON.parse(result.stdoutText).data, JSON.parse(baseSide.result.stdoutText).data) : `exits ${result.exitCode} and ${baseSide.result.exitCode}`;
+          if (problem) failures.push(`${testCase.id}: ${problem}`);
         } else {
           if (result.exitCode !== 0) failures.push(`${testCase.id}: host exit ${result.exitCode}: ${result.stderrText}`);
           else if (JSON.stringify(JSON.parse(result.stdoutText).data) !== JSON.stringify(testCase.host)) failures.push(`${testCase.id}: host answered ${result.stdoutText}`);
