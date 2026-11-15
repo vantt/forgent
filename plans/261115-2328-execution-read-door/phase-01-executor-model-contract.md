@@ -57,7 +57,8 @@ that stays until S6a reads the same vectors (D7).
 
 1. Read the Node functions named in Requirements 1 end to end; write the doc.
 2. Record vectors with a scratch script; review every vector by hand against the code path (a vector is evidence,
-   not a snapshot of a bug: a vector that records a bug is marked `"knownDefect": "<why>"` and reported).
+   not a snapshot of a bug: a vector that records a bug is marked `"knownDefect": "<why>"`, keeps today's expected output, and is reported for a backlog row; S5 fixes no
+   behaviour while porting).
 3. Write the Node twin test; run it and the gates.
 
 ## Acceptance
@@ -67,5 +68,5 @@ that stays until S6a reads the same vectors (D7).
 
 ## Risks / rollback
 
-- Vectors that freeze a defect (M x M): marked, reported, decided by the plan lead before 04 consumes them.
+- Vectors that freeze a defect (M x M): marked and reported; the port keeps the behaviour; 12 proposes the backlog row.
 - `docs/reading-map.md` collides with MAIL shards p02 (one different row; rebase). Revert = one commit.

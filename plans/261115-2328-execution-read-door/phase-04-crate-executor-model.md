@@ -23,10 +23,11 @@ by `executor-model.v1.json` (01).
    Option<Backend>; fn herdr_present(&self) -> bool; }` (exactly what the derived facts need; 07 and 08 add their own
    reads through their own small traits, never through a grab-bag).
 4. `src/executor_model.rs`: typed executor entry deserialized from the runner section (`executors`, the legacy
-   `executor` default command); derived facts with one function each: `family`, `mechanism(has_live_task_access)`,
+   `executor` default command and its merge `with_default_executor`, as `dispatch/config.mjs:46 withDefaultExecutor`,
+   which decide applies (`decide.mjs:172`) and explain does not (`bin/fgos.mjs:2447`)); derived facts with one function each: `family`, `mechanism(has_live_task_access)`,
    `credential_store_cli`, `effort_levels`, `default_invocation`/`carries_posture`, `disallowed(governance)`,
-   `missing_clis`, `tool_for_entries`. Semantics exactly as the contract (01); where the Node code has an edge the
-   contract records as `knownDefect`, implement the contract and report the difference.
+   `missing_clis`, `tool_for_entries`. Semantics exactly as the contract (01), which records today's behaviour; a vector marked `knownDefect` keeps
+   today's behaviour in Rust too (a port changes no behaviour, RUL104) and becomes a backlog row proposed in 12.
 5. `tests/golden_executor_model.rs` reads `packages/execution/contracts/executor-model.v1.json` and runs every vector
    (with a fake `Machine`).
 

@@ -61,7 +61,8 @@ doctor `workflow-capabilities-configured` (`registrations.mjs:1903`, `bridge:S6b
 
 - `core/config-standard/runner.yaml` `runner.capabilities` holds exactly `impact-analysis`, `pane-labeling`, `advise`,
   `execute`, `review`; a project config with no `capabilities` key runs `fgos dispatch explain --for architecture:frame`
-  and a council `workflow start --dry-run` (or the repository's equivalent read-only check) without a refusal.
+  and the doctor row `seat-binding-dry-bind` (which dry-binds every workflow unit, `src/setup/seat-binding-checks.mjs`)
+  passes for the seven council workflows, without a refusal.
 - `rg -n "code:review|code:implement|docs:write|code:test|code:debug|code:refactor" core domains --glob '!**/compiled.json'`
   finds only historical notes the report lists.
 

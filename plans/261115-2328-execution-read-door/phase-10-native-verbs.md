@@ -38,7 +38,8 @@ deletes their Node arms and use cases (L10). `dispatch` stays a `legacy-cli` rou
    - Files a project or a pull can write (the assignment record, persona files) are read with `fgos-durable-file`
      `open_beneath` under a byte cap, as 09 does; an unreadable file is "no record" / a listing problem, as today.
    - `agents list`: project root (`--worktree` or the worktree root through Git Inspect), tiers from the payload root
-     (`components.legacyNode.root` of the activated release: `core/agents`, `domains/*/agents`) and the project
+     (`components.legacyNode.root` of the activated release, resolved by `apps/fgos/src/legacy_exec.rs:69
+     resolve_payload_path`, never PATH or cwd: `core/agents`, `domains/*/agents`) and the project
      (`fgos/agents`); 08's `list`.
 3. Parity: restore the parity runner from history as S4 did (re-read item 5), tables
    `test/rust-host/parity-cases/{dispatch-decide,dispatch-explain,hook-dispatch-decide,agents}.cases.mjs` (every refusal

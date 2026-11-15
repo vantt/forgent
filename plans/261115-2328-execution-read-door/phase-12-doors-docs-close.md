@@ -40,13 +40,17 @@ capability rows of the capability-reads plan (F4) still name Node modules as the
    and the tables (they never reach main).
 3. Docs: `docs/platform/runner/spec.md` "Execution Core and Dispatch" (bind composition is Rust; Node S6a callers
    ask the route), `docs/platform/seat-binding/spec.md` section 3 (who asks; route protocol 2) and 16 (pointers),
-   `docs/platform/host-invocation-routing/spec.md` route counts, `docs/reading-map.md` (`packages/execution`),
+   `docs/platform/host-invocation-routing/spec.md` route counts, `docs/platform/component-boundary.md` Seat Binding row
+   (`:71`: the route now lives in host wiring at protocol 2; "Node seat tests prove only what the facade adds" is now
+   the `fgos-execution` goldens) and the Execution row 01 added, `docs/reading-map.md` (`packages/execution`),
    `docs/platform/vision.md` capability bullet (step 2 done, S5), the program plan's S5 row (status, landed commit,
    deviations), `docs/backlog.md` rows for the Ideas the owner picks (none by default).
-4. `CHANGELOG.md` `## [Unreleased]`: the user-visible lines the phase reports proposed (native `dispatch decide` /
+4. Port pace for the program's Q2 ("decide (c) with S5's measured port pace", program `plan.md` Q2): the close report
+   records lead-days per phase, Node lines and Node test lines deleted, Rust lines added, so the big lead can size S6.
+5. `CHANGELOG.md` `## [Unreleased]`: the user-visible lines the phase reports proposed (native `dispatch decide` /
    `explain` / `hook dispatch-decide` / `agents`; `runner.personas`/`runner.roles`; capability rows and labels; the
    compatibility alias gone).
-5. Owner-machine guide (path from `fgos convention path --kind report --type guide ...`): build, stage and activate
+6. Owner-machine guide (path from `fgos convention path --kind report --type guide ...`): build, stage and activate
    the release in one window (host route protocol 2 and the Node payload must match); move any
    `runner.capabilities.<x>.{roles,personas,seats}` in project and global configs (`fgos config check` names them);
    `fgos doctor` through the installed shim; linked on the board.
