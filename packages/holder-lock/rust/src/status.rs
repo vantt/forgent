@@ -894,6 +894,12 @@ mod tests {
         json!({ "locks": rows })
     }
 
+    /// A lock file with a predecessor record that is not JSON, which the scan names under the row's own name.
+    fn write_pair(file: &Path) {
+        fs::write(file, "").unwrap();
+        fs::write(predecessor::record_path(file), "x").unwrap();
+    }
+
     fn none() -> RunInstances {
         RunInstances::new()
     }
@@ -1379,6 +1385,52 @@ mod tests {
         )
         .unwrap();
         assert_eq!(fx.report(&reg, &none())["beacon"]["writer"], json!(42));
+    }
+
+    #[test]
+    fn the_problem_scan_covers_every_repo_and_machine_row_of_the_real_registry() {
+        let fx = Fixture::new();
+        let mut expected = Vec::new();
+        for entry in scope::registry()["locks"].as_array().unwrap() {
+            let scope_name = entry["scope"].as_str().unwrap();
+            let template = entry["v3Path"].as_str().unwrap();
+            if !["repo", "machine"].contains(&scope_name) || template.contains("<eventOpenRoot>") {
+                continue;
+            }
+            let mut filled = template
+                .replace("<fgosDir>", &fx.fgos().to_string_lossy())
+                .replace("<lockRoot>", &fx.machine().to_string_lossy());
+            for (_, _, key) in placeholders(template) {
+                if key != "fgosDir" && key != "lockRoot" {
+                    filled = filled.replace(&format!("<{key}>"), "x");
+                }
+            }
+            let file = PathBuf::from(filled);
+            fs::create_dir_all(file.parent().unwrap()).unwrap();
+            write_pair(&file);
+            expected.push(entry["name"].as_str().unwrap().to_owned());
+        }
+        assert!(expected.len() >= 20, "{expected:?}");
+        let report = collect(&StatusRequest {
+            fgos_dir: &fx.fgos(),
+            lock_root: &fx.machine(),
+            run_instances: &none(),
+            now_ms: 0,
+        })
+        .unwrap();
+        let problems: Vec<&str> = report["problems"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|p| p.as_str().unwrap())
+            .collect();
+        for name in &expected {
+            assert!(
+                problems.iter().any(|p| p.starts_with(&format!("{name}: "))),
+                "{name} was not scanned: {problems:?}"
+            );
+        }
+        assert_eq!(problems.len(), expected.len());
     }
 
     #[test]
