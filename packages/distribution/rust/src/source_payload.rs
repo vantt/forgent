@@ -434,4 +434,47 @@ mod tests {
         assert_eq!((code, line["result"].clone()), (1, json!("error")));
         assert_eq!(line["code"], "source-payload-refused");
     }
+
+    #[test]
+    fn the_route_answers_as_its_contract_says() {
+        let contract: Value = serde_json::from_str(include_str!(
+            "../../contracts/internal-route.source-payload.v1.json"
+        ))
+        .unwrap();
+        let dir = scratch("payload-route");
+        put(&dir, "package.json", r#"{"files":[]}"#);
+        let root = dir.to_string_lossy().into_owned();
+        let (code, ok) = route(&[root.clone(), "--protocol".into(), "1".into()]);
+        assert_eq!(code, 0);
+        let keys = |v: &Value| v.as_object().unwrap().keys().cloned().collect::<Vec<_>>();
+        assert_eq!(keys(&ok), keys(&contract["answer"]["ok"]));
+        assert_eq!(ok["files"], json!(["package.json"]));
+        for (args, exit) in [
+            (vec![root.clone(), "--protocol".into(), "2".into()], 3),
+            (vec![root.clone()], 3),
+            (vec!["--protocol".into(), "1".into()], 2),
+            (
+                vec![
+                    root.clone(),
+                    "--bogus".into(),
+                    "--protocol".into(),
+                    "1".into(),
+                ],
+                2,
+            ),
+            (
+                vec![
+                    "/nonexistent/fgos-payload".into(),
+                    "--protocol".into(),
+                    "1".into(),
+                ],
+                1,
+            ),
+        ] {
+            let (code, answer) = route(&args);
+            assert_eq!(code, exit, "{args:?}");
+            assert!(contract["exits"][exit.to_string()].is_string());
+            assert_eq!(keys(&answer), keys(&contract["answer"]["error"]));
+        }
+    }
 }

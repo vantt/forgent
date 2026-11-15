@@ -3,10 +3,10 @@
 //! same record verdict `fgos mailbox status` answers (`mailbox_verbs::status_for_root`), in process. The timer
 //! rows and fixes call `fgos_distribution::timer`, which owns the unit bytes and the scheduler calls.
 
-use super::{project_root_refusal, Rows};
+use super::{judged, project_root_refusal, Rows};
 use crate::wiring::mailbox_verbs;
 use fgos_distribution::agent_hooks::{mailbox_opt_in, refused_config_name, MailboxOptIn};
-use fgos_distribution::doctor::{FixResult, RowOutcome, RowResult};
+use fgos_distribution::doctor::{FixResult, RowOutcome};
 use fgos_distribution::timer::{
     check_managed_timer, fix_managed_timer, Check, Fix, Schedule, TimerEnv,
 };
@@ -42,16 +42,6 @@ fn fix(root: &Path, ids: &[&str]) -> Vec<FixResult> {
             other => unreachable!("mailbox group asked for fix {other}"),
         })
         .collect()
-}
-
-fn judged(passed: bool, message: String) -> RowOutcome {
-    RowOutcome::Judged(RowResult {
-        passed,
-        status: None,
-        message: Some(message),
-        fix_command: None,
-        detail: None,
-    })
 }
 
 // The timer rows and fixes ---------------------------------------------------------------------------------

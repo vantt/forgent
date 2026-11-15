@@ -1257,13 +1257,19 @@
       "job": "packaging doctor judgments",
       "kind": "door",
       "patterns": [
-        "(?:export )?(?:async )?function (?:checkCliVersionVisible|checkProjectLauncher|fixProjectLauncher|checkDispatchDecideHookWired|checkCurlAvailable|checkMailboxClaudeAccept|checkClaudePluginMarketplace|checkAgyPermissionsConfigured|fixBinDiscoveryCache|refreshGlobalBinCache)\\b",
+        "(?:export )?(?:async )?function (?:checkCliVersionVisible|checkProjectLauncher|fixProjectLauncher|checkDispatchDecideHookWired|checkCurlAvailable|checkMailboxClaudeAccept|checkClaudePluginMarketplace|checkAgyPermissionsConfigured|fixBinDiscoveryCache|refreshGlobalBinCache|checkBwrapAvailable)\\b",
         "\\bfn (?:version_row|launcher_row|launcher_fix|agent_hook_row|agent_hook_fix|agy_permissions_row|mailbox_accept_row|curl_row|bwrap_row|bin_cache_fix)\\b"
       ],
       "allowed": [
         "apps/fgos/src/wiring/doctor/packaging.rs"
       ],
-      "debt": [],
+      "debt": [
+        {
+          "path": "src/setup/registrations.mjs",
+          "reason": "checkBwrapAvailable(binary): the smoke test the S6a confinement rows call for a named binary, a twin of the Rust bwrap-available row until those rows move"
+        }
+      ],
+      "retiredBy": "S6a: the confinement rows move to Rust and call the Rust smoke test",
       "reason": "the version, launcher, hook-wiring, agent-config report, curl, bwrap and global path cache rows and fixes are judged in process by the host over the packaging modules (agent_hooks, agent_config, launcher, bin_cache), never by a Node body; guards the definitions by name, so a second judge of the same row must be declared. Not covered, by design of a pattern check: a differently named body. The Node `checkBwrapAvailable` that the confinement rows of S6a still call is a different job (a smoke test of a named binary) and stays until they move"
     }
   ],

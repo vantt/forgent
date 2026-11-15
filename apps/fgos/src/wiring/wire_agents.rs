@@ -10,6 +10,7 @@
 
 use crate::cli_projector::ProjectError;
 use crate::routing::Call;
+use crate::wiring::process_env;
 use fgos_distribution::agent_config::{plan_agent_wiring, run_claude_step, Change, WiringPlan};
 use fgos_distribution::agent_hooks::{BoundedRunner, ProcessRunner};
 use fgos_host_runtime::{
@@ -333,13 +334,6 @@ pub fn serve(
     let home = home_of(env)?;
     let data = run(request, env, &home, runner).map_err(CategorisedRefusal::unexpected)?;
     Ok(present(&data, request.json))
-}
-
-/// The process environment as the list the planner reads. A variable whose name or value is not UTF-8 is left out.
-fn process_env() -> Vec<(String, String)> {
-    std::env::vars_os()
-        .filter_map(|(key, value)| Some((key.into_string().ok()?, value.into_string().ok()?)))
-        .collect()
 }
 
 /// The provider of `wire-agents.run`.

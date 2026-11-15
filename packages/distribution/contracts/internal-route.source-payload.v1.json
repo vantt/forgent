@@ -1,0 +1,21 @@
+{
+  "contract": { "id": "internal-route-source-payload", "version": 1 },
+  "command": "fgos internal source-payload",
+  "description": "Lists the Node source payload of a checkout: the files package.json declares plus package.json, and inside a Git repository only the tracked and untracked non-ignored ones. The release builder and the checkout drift row use this one rule (packages/distribution/rust/src/source_payload.rs); it reads and writes nothing else.",
+  "argv": {
+    "required": ["<root>", "--protocol 1"],
+    "optional": []
+  },
+  "answer": {
+    "stdout": "one JSON line",
+    "ok": { "v": 1, "protocol": 1, "op": "source-payload", "result": "ok", "files": ["<forward-slash path relative to root>", "..."] },
+    "error": { "v": 1, "protocol": 1, "op": "source-payload", "result": "error", "code": "usage | host-version-mismatch | source-payload-refused", "message": "<text>" },
+    "files": "sorted in JavaScript's default string order, each once"
+  },
+  "exits": {
+    "0": "ok",
+    "1": "source-payload-refused: a declared entry that is absolute, escapes the root, is the root itself, is missing or is a link; an unreadable package.json; a failed Git read",
+    "2": "usage: a missing root, a missing --protocol value, an unknown or extra argument",
+    "3": "host-version-mismatch: any --protocol other than 1"
+  }
+}

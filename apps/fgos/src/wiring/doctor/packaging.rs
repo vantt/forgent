@@ -7,6 +7,7 @@
 //! probe of the hook rows runs inside `agent_hooks` through the process door (the project's own shim, never Node).
 
 use super::{judged, project_root_refusal, Rows};
+use crate::wiring::process_env;
 use fgos_distribution::agent_config::{
     check_agy_permissions_configured, check_claude_plugin_marketplace, check_mailbox_claude_accept,
     claude_user_settings, program_on_path,
@@ -65,14 +66,6 @@ pub const GROUP: Rows = Rows {
     judge,
     fix,
 };
-
-/// The process environment as the packaging readers take it. A variable whose name or value is not UTF-8 is left
-/// out.
-fn process_env() -> Vec<(String, String)> {
-    std::env::vars_os()
-        .filter_map(|(key, value)| Some((key.into_string().ok()?, value.into_string().ok()?)))
-        .collect()
-}
 
 fn var(env: &[(String, String)], key: &str) -> Option<String> {
     env.iter().find(|(k, _)| k == key).map(|(_, v)| v.clone())

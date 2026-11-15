@@ -2,8 +2,8 @@
 //! the two-process probe on each lock directory, the borrow vectors, the pointer to `fgos lock-status`, and the
 //! creation of the lock directories. The crate decides every fact; this file words them for the report.
 
-use super::Rows;
-use fgos_distribution::doctor::{FixResult, RowOutcome, RowResult};
+use super::{judged, Rows};
+use fgos_distribution::doctor::{FixResult, RowOutcome};
 use fgos_holder_lock::borrow_vectors::{self, RunError};
 use fgos_holder_lock::port::{self, Guarantee, Level};
 use fgos_holder_lock::semantics::two_process_probe;
@@ -50,16 +50,6 @@ fn fix(root: &Path, ids: &[&str]) -> Vec<FixResult> {
             other => unreachable!("holder-lock group asked for fix {other}"),
         })
         .collect()
-}
-
-fn judged(passed: bool, message: String) -> RowOutcome {
-    RowOutcome::Judged(RowResult {
-        passed,
-        status: None,
-        message: Some(message),
-        fix_command: None,
-        detail: None,
-    })
 }
 
 fn warn(text: &str) -> String {
