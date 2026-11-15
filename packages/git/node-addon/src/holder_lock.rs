@@ -4,15 +4,17 @@
 //! registration per worker thread and every call that acts on an open lock
 //! takes it first, so no module but the facade can mint a lock from an fd.
 use crate::check;
+use fgos_holder_lock::hot_record::{self, HotRecordError, Read as HotRead, Reclaim};
 use fgos_holder_lock::origin::{self, Holder};
 use fgos_holder_lock::{
     state_root, HelperExe, HoldersList, Probe, Resource, UnavailableReason, DEFAULT_KILL_WAIT_MS,
 };
 #[cfg(unix)]
 use fgos_holder_lock::{HeldReason, Mode, NodeLock, Release, Wait};
-use napi::{bindgen_prelude::External, Error, Result};
-#[cfg(unix)]
-use napi::{Env, JsObject};
+use napi::{
+    bindgen_prelude::{Buffer, External},
+    Env, Error, JsObject, Result,
+};
 use napi_derive::napi;
 use serde_json::{json, Value};
 #[cfg(unix)]
@@ -287,4 +289,65 @@ pub fn two_process_probe(dir: String, helper_exe: Option<String>) -> Result<f64>
         &HelperExe(helper_exe.unwrap_or_default().into()),
     )
     .map_err(failed)
+}
+
+fn hot_failed(err: HotRecordError) -> Error {
+    match err {
+        HotRecordError::UnknownResource(name) => failed(format!(
+            "hot-lock-resource-unknown: unknown hot resource {name:?}"
+        )),
+        HotRecordError::Io(err) => failed(format!("hot-record-io: {err}")),
+        HotRecordError::LockUnavailable(detail) => {
+            failed(format!("holder-lock-unavailable: {detail}"))
+        }
+    }
+}
+
+/// One look at the hot record file at `record_path`: `{state: 'absent'}`,
+/// `{state: 'retry', code}`, `{state: 'unreadable', token}` or
+/// `{state: 'ok', token, record}`. `token` is the file's bytes as a `Buffer`,
+/// never a string, so a torn record compares equal to itself.
+#[napi(namespace = "holderLock", js_name = "hotRecordRead")]
+pub fn hot_record_read(env: Env, record_path: String) -> Result<JsObject> {
+    door()?;
+    let seen = hot_record::read_record(Path::new(&record_path)).map_err(hot_failed)?;
+    let (answer, token) = match seen {
+        HotRead::Missing => (json!({ "state": "absent" }), None),
+        HotRead::Retry { code } => (json!({ "state": "retry", "code": code }), None),
+        HotRead::Unreadable { token } => (json!({ "state": "unreadable" }), Some(token)),
+        HotRead::Ok { record, token } => (json!({ "state": "ok", "record": record }), Some(token)),
+    };
+    let mut object = env.to_js_value(&answer)?.coerce_to_object()?;
+    if let Some(token) = token {
+        object.set("token", Buffer::from(token))?;
+    }
+    Ok(object)
+}
+
+/// Unlink the hot record at `record_path` only while it still holds exactly `token`.
+#[napi(namespace = "holderLock", js_name = "hotRecordUnlinkIfUnchanged")]
+pub fn hot_record_unlink_if_unchanged(record_path: String, token: Buffer) -> Result<bool> {
+    door()?;
+    hot_record::unlink_if_unchanged(Path::new(&record_path), &token).map_err(hot_failed)
+}
+
+/// Clean a dead holder's record under the reclaim lock: `cleaned`, `changed` or `busy`.
+#[napi(namespace = "holderLock", js_name = "hotRecordReclaim")]
+pub fn hot_record_reclaim(fgos_dir: String, resource: String, token: Buffer) -> Result<String> {
+    door()?;
+    let outcome =
+        hot_record::reclaim_dead(Path::new(&fgos_dir), &resource, &token).map_err(hot_failed)?;
+    Ok(match outcome {
+        Reclaim::Cleaned => "cleaned",
+        Reclaim::Changed => "changed",
+        Reclaim::Busy => "busy",
+    }
+    .to_owned())
+}
+
+/// Remove a confirmed record under the reclaim lock, only while it still holds exactly `token`.
+#[napi(namespace = "holderLock", js_name = "hotRecordClear")]
+pub fn hot_record_clear(fgos_dir: String, resource: String, token: Buffer) -> Result<bool> {
+    door()?;
+    hot_record::clear(Path::new(&fgos_dir), &resource, &token).map_err(hot_failed)
 }

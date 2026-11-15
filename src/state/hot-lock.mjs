@@ -6,12 +6,12 @@
 // exposes a fully written record, so a competitor never reads half of one.
 //
 // A record whose holder died is cleaned only by a process that holds the
-// kernel lock `<resource>.reclaim` (the holder-lock facade): it reads the
-// record again, compares bytes with what the judge saw, and only then
-// unlinks. Two cleaners can therefore never both unlink and then both link,
-// and a fresh holder's record is never taken for the dead one's. A record that
-// does not parse, or whose holder the judge cannot prove dead, is never
-// cleaned: the waiter times out and an owner runs `fgos lock fence`.
+// kernel lock `<resource>.reclaim` (the holder-lock crate's `hot_record`,
+// reached through the addon): it reads the record again, compares bytes with
+// what the judge saw, and only then unlinks. Two cleaners can therefore never
+// both unlink and then both link, and a fresh holder's record is never taken
+// for the dead one's. A record that does not parse, or whose holder the judge
+// cannot prove dead, is never cleaned: the waiter times out and an owner runs `fgos lock fence`.
 //
 // Inside the critical section the process may not start a child and may not
 // take a hot mutex again; both throw at once. Every write inside goes through
@@ -22,7 +22,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { judge, selfRecord as doorSelfRecord } from '../native/process-identity.mjs';
-import { acquireSync, createLockScope } from '../holder-lock/index.mjs';
+import { nativeDoor } from '../native/door.mjs';
 import { resolveWriterIdentity } from '../util/session-identity.mjs';
 import { HotLockError, hotLockDepth, enterHotLock } from '../holder-lock/hot-guard.mjs';
 export { HotLockError, hotLockDepth } from '../holder-lock/hot-guard.mjs';
@@ -31,7 +31,6 @@ import { uniqueTmpTag } from '../util/unique-tmp-tag.mjs';
 const RESOURCES = Object.freeze(['state', 'porting-events']);
 const WAIT_TIMEOUT_MS = 5000;
 const POLL_MS = 10;
-const RECLAIM_WAIT_MS = 1000;
 const WINDOWS_RETRYABLE = new Set(['EPERM', 'EBUSY']);
 
 // --- paths, record, judge ------------------------------------------------
@@ -81,42 +80,46 @@ function recordOfSelf(writer) {
   return text;
 }
 
-/** One look at the record file: `{state: 'absent'}`, `{state: 'retry', code}`
- * (Windows: the file is open by another process, so its content is unknown),
- * `{state: 'unreadable', raw}` or `{state: 'ok', raw, record}`. A record that
- * is not a JSON object with a positive pid is unreadable, never cleaned. */
-export function readHotRecord(recordPath) {
-  let raw;
+/** Run one hot-record entry of the addon; its unknown-resource refusal is the module's own error. */
+function viaHotDoor(call) {
   try {
-    raw = fs.readFileSync(recordPath, 'utf8');
+    return call(nativeDoor().holderLock);
   } catch (err) {
-    if (err.code === 'ENOENT') return { state: 'absent' };
-    if (WINDOWS_RETRYABLE.has(err.code)) return { state: 'retry', code: err.code };
+    const message = String(err?.message ?? '');
+    if (message.startsWith('hot-lock-resource-unknown:')) throw new HotLockError('hot-lock-resource-unknown', message.slice('hot-lock-resource-unknown:'.length).trim());
     throw err;
   }
-  let record;
-  try {
-    record = JSON.parse(raw);
-  } catch {
-    return { state: 'unreadable', raw };
-  }
-  if (!record || typeof record !== 'object' || !Number.isInteger(record.pid) || record.pid <= 0) return { state: 'unreadable', raw };
-  return { state: 'ok', raw, record };
 }
 
-/** Unlink `recordPath` only when it still holds exactly `raw`. Returns
- * whether it was removed. Callers hold the reclaim kernel lock. */
-export function unlinkRecordIfUnchanged(recordPath, raw) {
-  const current = readHotRecord(recordPath);
-  if (current.state !== 'ok' && current.state !== 'unreadable') return false;
-  if (current.raw !== raw) return false;
-  try {
-    fs.unlinkSync(recordPath);
-  } catch (err) {
-    if (err.code === 'ENOENT' || WINDOWS_RETRYABLE.has(err.code)) return false;
-    throw err;
-  }
-  return true;
+/** One look at the record file: `{state: 'absent'}`, `{state: 'retry', code}`
+ * (Windows: the file is open by another process, so its content is unknown),
+ * `{state: 'unreadable', raw, token}` or `{state: 'ok', raw, token, record}`.
+ * `token` is the file's bytes (a Buffer, opaque): every clear compares it, so a
+ * torn record that is not valid UTF-8 still equals itself. `raw` is the same
+ * bytes decoded as text, for messages only. A record that is not a JSON object
+ * with a positive pid is unreadable, never cleaned. The reader is the
+ * holder-lock crate's (packages/holder-lock/rust/src/hot_record.rs). */
+export function readHotRecord(recordPath) {
+  const seen = viaHotDoor((door) => door.hotRecordRead(path.resolve(recordPath)));
+  return seen.token ? { ...seen, raw: seen.token.toString('utf8') } : seen;
+}
+
+/** The bytes a clear compares against: the `token` of a read, the read itself,
+ * or (a caller that kept only the decoded text) the record's current bytes when
+ * they decode to that text. `null` when nothing matches. */
+function tokenOf(recordPath, seen) {
+  if (Buffer.isBuffer(seen)) return seen;
+  if (Buffer.isBuffer(seen?.token)) return seen.token;
+  const now = readHotRecord(recordPath);
+  return now.token && now.raw === seen ? now.token : null;
+}
+
+/** Unlink `recordPath` only when it still holds exactly what `seen` names (a
+ * token, a read, or its text). Returns whether it was removed. Callers hold
+ * the reclaim kernel lock. */
+export function unlinkRecordIfUnchanged(recordPath, seen) {
+  const token = tokenOf(recordPath, seen);
+  return token !== null && viaHotDoor((door) => door.hotRecordUnlinkIfUnchanged(path.resolve(recordPath), token));
 }
 
 /** Clean the record of a dead holder under the kernel lock `<resource>.reclaim`.
@@ -124,38 +127,18 @@ export function unlinkRecordIfUnchanged(recordPath, raw) {
  * `'cleaned'`, `'changed'` (somebody else got there, or a fresh holder
  * arrived) or `'busy'` (another cleaner holds the kernel lock). */
 export function reclaimDeadHolder(fgosDir, resource, observed) {
-  const { record } = hotPaths(fgosDir, resource);
-  const attempt = acquireSync(createLockScope(`hot-reclaim:${resource}`), resource, { fgosDir }, { waitMs: RECLAIM_WAIT_MS });
-  if (attempt.result !== 'acquired') return 'busy';
-  try {
-    // One read under the kernel lock: the bytes must equal what the judge saw and
-    // the judge must still answer dead; then the unlink needs no second read.
-    const again = readHotRecord(record);
-    if (again.state !== 'ok' || again.raw !== observed.raw || judgeHotRecord(again.record) !== 'dead') return 'changed';
-    try {
-      fs.unlinkSync(record);
-    } catch (err) {
-      if (err.code === 'ENOENT' || WINDOWS_RETRYABLE.has(err.code)) return 'changed';
-      throw err;
-    }
-    return 'cleaned';
-  } finally {
-    attempt.handle.release();
-  }
+  hotPaths(fgosDir, resource); // refuses an unknown resource by name
+  return viaHotDoor((door) => door.hotRecordReclaim(path.resolve(fgosDir), resource, observed.token));
 }
 
 /** Remove the record a person has confirmed is dead weight (`fgos lock fence`):
- * under the reclaim kernel lock, and only while it still holds exactly `raw`,
- * so a holder that arrived since is never cleared. Returns whether it was removed. */
-export function clearHotRecord(fgosDir, resource, raw) {
+ * under the reclaim kernel lock, and only while it still holds exactly what
+ * `seen` names, so a holder that arrived since is never cleared. Returns whether
+ * it was removed. */
+export function clearHotRecord(fgosDir, resource, seen) {
   const { record } = hotPaths(fgosDir, resource);
-  const attempt = acquireSync(createLockScope(`hot-clear:${resource}`), resource, { fgosDir }, { waitMs: RECLAIM_WAIT_MS });
-  if (attempt.result !== 'acquired') return false;
-  try {
-    return unlinkRecordIfUnchanged(record, raw);
-  } finally {
-    attempt.handle.release();
-  }
+  const token = tokenOf(record, seen);
+  return token !== null && viaHotDoor((door) => door.hotRecordClear(path.resolve(fgosDir), resource, token));
 }
 
 // --- acquire / release ---------------------------------------------------

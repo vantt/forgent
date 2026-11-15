@@ -1,6 +1,6 @@
 {
   "contract": { "id": "hot-lock", "version": 1 },
-  "description": "The hot mutex of the state store: a link-created record file for the fast path, and a kernel lock (the registry row of the same name) that serialises the cleanup of a dead holder's record. Node implements it in src/state/hot-lock.mjs until the state store moves to Rust.",
+  "description": "The hot mutex of the state store: a link-created record file for the fast path, and a kernel lock (the registry row of the same name) that serialises the cleanup of a dead holder's record. The record is written by Node (src/state/hot-lock.mjs, until the state store moves to Rust); reading it, reclaiming a dead holder's record and clearing a confirmed one are the holder-lock crate's (packages/holder-lock/rust/src/hot_record.rs), which Node calls through the addon.",
   "resources": {
     "state": {
       "registryLock": "state",
@@ -23,14 +23,15 @@
   "cleanup": {
     "allOf": [
       "the judge of the recorded tuple answers dead (zombie counts as dead; alive and unknown never qualify)",
-      "the cleaner holds the kernel lock <resource>.reclaim",
+      "the cleaner holds the kernel lock <resource>.reclaim (it waits at most reclaimWaitMs for it, then answers busy)",
       "the record is read again under that kernel lock; the bytes must equal what the judge saw and the judge must still answer dead",
       "only then unlink the record, release the kernel lock, and try the link again"
     ],
     "never": [
       "a record that does not parse is never cleaned",
       "a record whose judge answers unknown is never cleaned (an observer outside the initial pid namespace judging a record without pidNs is unknown)"
-    ]
+    ],
+    "reclaimWaitMs": 1000
   },
   "wait": { "timeoutMs": 5000, "pollMs": 10 },
   "criticalSection": {
@@ -48,5 +49,32 @@
     "hot-lock-release-stuck": { "category": "precondition", "meaning": "the record could not be unlinked after the bounded Windows retries; the record stays and `fgos lock fence <resource>` is the way out" },
     "state-tx-revoked": { "category": "precondition", "meaning": "a transaction object was used after its callback returned" },
     "state-tx-async": { "category": "precondition", "meaning": "the callback returned a thenable; the lock is already released when this is thrown" }
+  },
+  "vectors": {
+    "bytes": "a file is {\"utf8\": text} or {\"hex\": bytes}; null means no file. The reader hands a record's bytes back as an opaque token, never as text, so a record that is not valid UTF-8 compares equal to itself",
+    "read": [
+      {"name": "no file", "file": null, "outcome": "missing"},
+      {"name": "full tuple record", "file": {"utf8": "{\"v\":1,\"pid\":4242,\"startTime\":\"100\",\"bootId\":\"b\",\"pidNs\":\"pid:[1]\",\"writer\":\"w\"}"}, "outcome": "ok"},
+      {"name": "pid only", "file": {"utf8": "{\"pid\":42}"}, "outcome": "ok"},
+      {"name": "integral pid written as a float", "file": {"utf8": "{\"pid\":5.0}"}, "outcome": "ok"},
+      {"name": "empty file", "file": {"utf8": ""}, "outcome": "unreadable"},
+      {"name": "half-written text", "file": {"utf8": "{\"v\":1,\"pid\":"}, "outcome": "unreadable"},
+      {"name": "not an object", "file": {"utf8": "[1]"}, "outcome": "unreadable"},
+      {"name": "no pid", "file": {"utf8": "{\"v\":1}"}, "outcome": "unreadable"},
+      {"name": "pid zero", "file": {"utf8": "{\"pid\":0}"}, "outcome": "unreadable"},
+      {"name": "negative pid", "file": {"utf8": "{\"pid\":-3}"}, "outcome": "unreadable"},
+      {"name": "pid as text", "file": {"utf8": "{\"pid\":\"5\"}"}, "outcome": "unreadable"},
+      {"name": "fractional pid", "file": {"utf8": "{\"pid\":1.5}"}, "outcome": "unreadable"},
+      {"name": "byte order mark before the object", "file": {"hex": "efbbbf7b22706964223a357d"}, "outcome": "unreadable"},
+      {"name": "torn write, invalid UTF-8", "file": {"hex": "7b2276223a312c22706964223a372c22777269746572223a22ff227d"}, "outcome": "unreadable"}
+    ],
+    "clear": [
+      {"name": "record unchanged since it was read", "onDisk": {"utf8": "{\"v\":1,\"pid\":4242}"}, "token": {"utf8": "{\"v\":1,\"pid\":4242}"}, "cleared": true},
+      {"name": "half-written record unchanged since it was read", "onDisk": {"utf8": "{\"v\":1,\"pid\":"}, "token": {"utf8": "{\"v\":1,\"pid\":"}, "cleared": true},
+      {"name": "torn invalid-UTF-8 record unchanged since it was read", "onDisk": {"hex": "7b2276223a312c22706964223a372c22777269746572223a22ff227d"}, "token": {"hex": "7b2276223a312c22706964223a372c22777269746572223a22ff227d"}, "cleared": true},
+      {"name": "a holder arrived since the record was read", "onDisk": {"utf8": "{\"v\":1,\"pid\":99}"}, "token": {"utf8": "{\"v\":1,\"pid\":"}, "cleared": false},
+      {"name": "two torn records that differ only in the invalid byte", "onDisk": {"hex": "7b2276223a312c22706964223a372c22777269746572223a22fe227d"}, "token": {"hex": "7b2276223a312c22706964223a372c22777269746572223a22ff227d"}, "cleared": false},
+      {"name": "record already gone", "onDisk": null, "token": {"utf8": "{\"v\":1,\"pid\":4242}"}, "cleared": false}
+    ]
   }
 }
