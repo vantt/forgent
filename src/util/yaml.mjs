@@ -1,7 +1,9 @@
-// The one door for reading YAML. Every YAML parse in fgOS goes through parseYaml; nothing else may
+// The one door for reading and writing YAML. Every YAML parse in fgOS goes through parseYaml; nothing else may
 // import a parser (test/architecture.test.mjs enforces it). The parser is the Rust `fgos-yaml-doc` crate
 // behind the native addon's `yaml` namespace, with the `tool` profile; there is no JavaScript fallback, so a
-// process that cannot load the addon fails every read with the door's own named error.
+// process that cannot load the addon fails every read with the door's own named error. The one writer is
+// writeFrontmatter: every YAML text fgOS writes is a frontmatter block.
+import util from 'node:util';
 import { fromDoorJson, nativeDoor } from '../native/door.mjs';
 
 /** A refusal of the parser: the rule, the file and the 1-based position, never a value of the input. */
@@ -10,6 +12,17 @@ export class YamlParseError extends Error {
     const where = Number.isInteger(line) && Number.isInteger(column) ? ` (line ${line}, column ${column})` : '';
     super(`${file}: ${id}${where}`);
     Object.assign(this, { name: 'YamlParseError', code: id, rule: id, file, line, column });
+  }
+}
+
+/** Runs one addon call; a refusal of the crate becomes a YamlParseError naming `file`, any other error passes. */
+function viaDoor(file, call) {
+  try {
+    return call();
+  } catch (err) {
+    let refusal;
+    try { refusal = JSON.parse(err.message); } catch { /* not a refusal of the parser */ }
+    throw typeof refusal?.id === 'string' ? new YamlParseError({ file, ...refusal }) : err;
   }
 }
 
@@ -28,14 +41,7 @@ export class YamlParseError extends Error {
  */
 export function parseYaml(text, { filename } = {}) {
   const file = filename ?? 'YAML input';
-  let parts;
-  try {
-    parts = nativeDoor().yaml.parse(text, file);
-  } catch (err) {
-    let refusal;
-    try { refusal = JSON.parse(err.message); } catch { /* not a refusal of the parser */ }
-    throw typeof refusal?.id === 'string' ? new YamlParseError({ file, ...refusal }) : err;
-  }
+  const parts = viaDoor(file, () => nativeDoor().yaml.parse(text, file));
   return fromDoorJson(parts.json, { special: parts.special });
 }
 
@@ -89,4 +95,35 @@ export function readFrontmatter(text, file) {
     throw new YamlParseError({ id: 'frontmatter-not-a-mapping', file: file ?? 'YAML input', line: 2, column: 1 });
   }
   return { meta: parsed, body, block };
+}
+
+/**
+ * The one writer of YAML text in Node: a `---` fenced block for `meta` followed by `body`. The output reads back
+ * through `readFrontmatter` to `{ meta, body }`; keys keep the order of `meta`; quoting is the crate's.
+ *
+ * - `meta` that is not a plain object throws `frontmatter-not-a-mapping`.
+ * - `meta` that JSON cannot carry (a cycle, a BigInt, a throwing `toJSON`) throws `frontmatter-not-json`.
+ * - `meta` or `body` that would not read back identical (`undefined`, NaN, -0, a Date, a class instance, a body
+ *   that the reader cuts differently) throws `frontmatter-not-round-trip`.
+ * - A refusal of the crate throws its own rule. No refusal carries a value.
+ *
+ * @param {Record<string, unknown>} meta
+ * @param {string} body text after the block
+ * @param {string} [file] named in refusals
+ * @returns {string}
+ */
+export function writeFrontmatter(meta, body, file) {
+  const named = file ?? 'YAML output';
+  if (meta === null || typeof meta !== 'object' || Object.getPrototypeOf(meta) !== Object.prototype) {
+    throw new YamlParseError({ id: 'frontmatter-not-a-mapping', file: named });
+  }
+  let json;
+  try { json = JSON.stringify(meta); } catch { throw new YamlParseError({ id: 'frontmatter-not-json', file: named }); }
+  const emitted = viaDoor(named, () => nativeDoor().yaml.emit(json, named));
+  const text = `---\n${emitted}---\n${body}`;
+  const read = readFrontmatter(text, named);
+  if (!util.isDeepStrictEqual(read.meta, meta) || read.body !== body) {
+    throw new YamlParseError({ id: 'frontmatter-not-round-trip', file: named });
+  }
+  return text;
 }

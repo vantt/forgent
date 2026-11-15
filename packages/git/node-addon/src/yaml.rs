@@ -1,7 +1,7 @@
-//! `yaml` namespace: parse one document with the `tool` profile; the meaning lives in `fgos-yaml-doc`.
+//! `yaml` namespace: parse or emit one document with the `tool` profile; the meaning lives in `fgos-yaml-doc`.
 use crate::check;
 use crate::marshal::{guarded, Failure};
-use fgos_yaml_doc::{parse, Profile, Value};
+use fgos_yaml_doc::{emit, parse, rule, Profile, Value};
 use napi::Result;
 use napi_derive::napi;
 use serde_json::{json, Number, Value as Json};
@@ -67,4 +67,26 @@ pub fn parse_document(text: String, filename: Option<String>) -> Result<Json> {
     check()?;
     let (json, special) = guarded(|| to_parts(&text, filename.as_deref().unwrap_or("YAML input")))?;
     Ok(json!({ "json": json, "special": special }))
+}
+
+/// The YAML text of a JSON document, keys in the order the JSON gives them. The argument is JSON the Node door
+/// just produced, so one that does not parse is an internal fault, reported without a word of it.
+pub fn emit_text(json: &str, filename: &str) -> std::result::Result<String, Failure> {
+    let internal = || Failure {
+        id: rule::YAML_INTERNAL_ERROR.to_string(),
+        file: filename.to_string(),
+        ..Failure::default()
+    };
+    let parsed: Json = serde_json::from_str(json).map_err(|_| internal())?;
+    let bytes = emit(&Value::from_json(&parsed), Profile::Tool, filename)?;
+    String::from_utf8(bytes).map_err(|_| internal())
+}
+
+/// The document as YAML text; a refusal is the JSON message of the error (`marshal::Failure`).
+#[napi(namespace = "yaml", js_name = "emit")]
+pub fn emit_document(json: String, filename: Option<String>) -> Result<String> {
+    check()?;
+    Ok(guarded(|| {
+        emit_text(&json, filename.as_deref().unwrap_or("YAML output"))
+    })?)
 }
