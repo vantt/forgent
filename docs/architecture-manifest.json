@@ -408,19 +408,7 @@
           "reason": "moves to the capability port in a later step of this change"
         },
         {
-          "path": "src/runner/execution/seat-resolver.mjs",
-          "reason": "moves to the capability port in a later step of this change"
-        },
-        {
           "path": "src/runner/work-dispatch.mjs",
-          "reason": "moves to the capability port in a later step of this change"
-        },
-        {
-          "path": "src/setup/registrations.mjs",
-          "reason": "moves to the capability port in a later step of this change"
-        },
-        {
-          "path": "src/setup/seat-binding-checks.mjs",
           "reason": "moves to the capability port in a later step of this change"
         },
         {

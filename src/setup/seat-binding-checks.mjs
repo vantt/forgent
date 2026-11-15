@@ -2,7 +2,7 @@
 
 import { bind } from '../runner/execution/bind.mjs';
 import { simulateUnitBindings } from '../runner/execution/dry-bind.mjs';
-import { hasUsablePrefer } from '../runner/execution/seat-resolver.mjs';
+import { capabilityNamesOf, hasOwnPreferPool, preferOf } from '../runner/execution/capability-config.mjs';
 import { resolveCollaboration, loopOf } from '../runner/execution/patterns/catalog.mjs';
 import { shippedCatalog } from '../runner/dispatch/shipped-catalog.mjs';
 import { declaredActivities, readWorkflowCatalog, sourceOf, withUnreadableDefinitions, workflowUnitContract } from './workflow-catalog-reader.mjs';
@@ -34,12 +34,11 @@ const CORE_CAPABILITIES = ['execute', 'code:implement'];
  * `capability -> executor` coverage list.
  */
 function bindCapabilityPostures(runnerConfig) {
-  const capabilities = runnerConfig?.capabilities ?? runnerConfig?.runner?.capabilities ?? {};
   const executors = runnerConfig?.executors ?? runnerConfig?.runner?.executors ?? {};
   const capsToCheck = new Set(CORE_CAPABILITIES);
-  for (const [name, entry] of Object.entries(capabilities)) {
-    if (!hasUsablePrefer(entry)) continue;
-    const candidates = Array.isArray(entry.prefer) ? entry.prefer : [entry.prefer];
+  for (const name of capabilityNamesOf(runnerConfig)) {
+    if (!hasOwnPreferPool(runnerConfig, name)) continue;
+    const candidates = [preferOf(runnerConfig, name)].flat();
     const hasAgentCandidate = candidates.some((cand) => {
       const exec = executors[typeof cand === 'string' ? cand : cand?.executor];
       return !exec || exec.kind !== 'tool';

@@ -89,7 +89,10 @@ import { checkCatalog } from '../runner/execution/patterns/catalog.mjs';
 import { deepEqual } from '../runner/execution/patterns/catalog-entries.mjs';
 import { detectRetiredPatternKeys, RESERVED_PATTERN_NAMES, SEAT_BINDING_MARKER_PATH, formatRetiredKeySentence } from '../runner/execution/patterns/retired-keys.mjs';
 import { isCommandAvailable, resolveMainCheckoutRoot } from '../runner/paths.mjs';
-import { capabilityEntriesOf, hasUsablePrefer } from '../runner/execution/seat-resolver.mjs';
+import {
+  capabilityConfinementOf, capabilityNamesOf, capabilityServesOf, catalogOf, hasCapabilityEntry,
+  hasPreferPool, isCapabilityDeclared, ownMinCheckersOf,
+} from '../runner/execution/capability-config.mjs';
 import { detectTrunk } from '../runner/worktree.mjs';
 import { listWork } from '../state/store.mjs';
 import { driftStatus, unmergedDeliveries } from '../state/drift-status.mjs';
@@ -693,13 +696,11 @@ export function checkRunnerPatternsConfig(cwd, run) {
   }
 
   // 3. Information: capability minCheckers omitting red-team for code/code:*
-  const capabilities = runner.capabilities ?? {};
-  for (const [capName, capDef] of Object.entries(capabilities)) {
+  for (const capName of capabilityNamesOf(runner)) {
     if (capName === 'code' || capName.startsWith('code:')) {
-      if (capDef && typeof capDef === 'object' && Array.isArray(capDef.minCheckers)) {
-        if (!capDef.minCheckers.includes('red-team')) {
-          info.push(`capability "${capName}" minCheckers explicitly omits red-team`);
-        }
+      const minCheckers = ownMinCheckersOf(runner, capName);
+      if (Array.isArray(minCheckers) && !minCheckers.includes('red-team')) {
+        info.push(`capability "${capName}" minCheckers explicitly omits red-team`);
       }
     }
   }
@@ -1863,9 +1864,9 @@ registerFix({
 });
 
 // Every capability a core/domain Workflow unit names must resolve the way
-// bind() resolves it (exact name, then the bare verb). One that does not has
+// bind() resolves it (exact name, then its `<prefix>:*` entry). One that does not has
 // no candidate pool, so that unit is refused at run time with no earlier signal.
-// A declared entry that carries no `prefer` pool (exact or bare verb) is reported too.
+// A declared entry that carries no `prefer` pool (exact or prefix entry) is reported too.
 // Definitions come from the Workflow loader's one catalog (readWorkflowCatalog): the one that runs for each
 // id, project before shipped. Every string under a key named `capability`, at any depth, is a use. A file
 // that cannot be read, parsed or validated is reported by name, never skipped.
@@ -1913,9 +1914,8 @@ function checkWorkflowCapabilitiesConfigured(cwd) {
 }
 
 function evaluateWorkflowCapabilities(cwd, uses) {
-  const declared = effectiveSection(cwd, 'runner').capabilities ?? {};
-  const entriesOf = (capability) => capabilityEntriesOf({ capabilities: declared }, capability);
-  const missing = [...uses].filter(([capability]) => entriesOf(capability).length === 0);
+  const runner = effectiveSection(cwd, 'runner');
+  const missing = [...uses].filter(([capability]) => !isCapabilityDeclared(runner, capability));
   if (missing.length > 0) {
     const list = missing.map(([cap, ids]) => `${cap} (${[...ids].join(', ')})`).join('; ');
     return {
@@ -1927,9 +1927,7 @@ function evaluateWorkflowCapabilities(cwd, uses) {
   // (or a tierFallback list for its tier), or it is refused headless. Setup's own slots are description-only on
   // purpose (which executors serve a capability is the project's taste), so this is a
   // warning that names the gap rather than a failure on a fresh project.
-  const noPool = [...uses].filter(
-    ([capability]) => !entriesOf(capability).some(({ entry }) => hasUsablePrefer(entry)),
-  );
+  const noPool = [...uses].filter(([capability]) => !hasPreferPool(runner, capability));
   if (noPool.length > 0) {
     const list = noPool.map(([cap, ids]) => `${cap} (${[...ids].join(', ')})`).join('; ');
     return {
@@ -1955,10 +1953,11 @@ function normalizeServesForComparison(serves) {
 }
 
 function checkCapabilityServesValid(cwd) {
-  const capabilities = effectiveSection(cwd, 'runner').capabilities ?? {};
+  const runner = effectiveSection(cwd, 'runner');
   const servesByName = new Map();
-  for (const [name, entry] of Object.entries(capabilities)) {
-    if (entry?.serves !== undefined) servesByName.set(name, entry.serves);
+  for (const name of capabilityNamesOf(runner)) {
+    const serves = capabilityServesOf(runner, name);
+    if (serves !== undefined) servesByName.set(name, serves);
   }
   const seenBySignature = new Map();
   for (const [name, serves] of servesByName) {
@@ -2977,7 +2976,8 @@ export function checkConfinementPoliciesDeclared(cwd) {
   } catch (err) {
     return { passed: false, message: `runner config not readable: ${err.message}` };
   }
-  if (!runner?.capabilities || typeof runner.capabilities !== 'object') {
+  const section = catalogOf(runner);
+  if (!section || typeof section !== 'object') {
     return { passed: true, message: 'no runner capabilities declared -- nothing to check' };
   }
 
@@ -2996,14 +2996,15 @@ export function checkConfinementPoliciesDeclared(cwd) {
 
   const undeclared = [];
   const missingAnchors = [];
-  for (const [name, cap] of Object.entries(runner.capabilities)) {
-    if (!cap || typeof cap !== 'object') continue;
-    if (!cap.confinement) {
+  for (const name of capabilityNamesOf(runner)) {
+    if (!hasCapabilityEntry(runner, name)) continue;
+    const confinement = capabilityConfinementOf(runner, name);
+    if (!confinement) {
       missingAnchors.push(name);
-    } else if (cap.confinement?.mode === 'unconfined') {
+    } else if (confinement?.mode === 'unconfined') {
       continue;
-    } else if (cap.confinement?.policy) {
-      const policyId = cap.confinement.policy;
+    } else if (confinement?.policy) {
+      const policyId = confinement.policy;
       if (!BUILTIN_POLICY_IDS.includes(policyId) && !customPolicies[policyId]) {
         undeclared.push(`capability "${name}" references unknown policy "${policyId}"`);
       }
@@ -3505,19 +3506,20 @@ export function checkConfinementStrictReadiness(cwd) {
   const isStrict = Boolean(runner?.confinement?.strict);
   const missing = [];
   const invalid = [];
-  const capabilities = runner?.capabilities;
+  const section = catalogOf(runner);
   const customPolicies = runner?.confinementPolicies || {};
 
-  if (!capabilities || typeof capabilities !== 'object' || Object.keys(capabilities).length === 0) {
+  if (!section || typeof section !== 'object' || capabilityNamesOf(runner).length === 0) {
     missing.push('no capabilities declared');
   } else {
-    for (const [name, cap] of Object.entries(capabilities)) {
-      if (!cap || typeof cap !== 'object') {
+    for (const name of capabilityNamesOf(runner)) {
+      if (!hasCapabilityEntry(runner, name)) {
         invalid.push(`capability "${name}" is malformed`);
         continue;
       }
-      if (cap.confinement?.mode === 'unconfined') continue;
-      const policyId = cap.confinement?.policy;
+      const confinement = capabilityConfinementOf(runner, name);
+      if (confinement?.mode === 'unconfined') continue;
+      const policyId = confinement?.policy;
       if (!policyId) {
         missing.push(`capability "${name}" missing confinement policy`);
       } else if (!BUILTIN_POLICY_IDS.includes(policyId) && !customPolicies[policyId]) {

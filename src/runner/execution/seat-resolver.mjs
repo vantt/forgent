@@ -69,26 +69,6 @@ const noWrites = (unit) => (unit?.writes ?? []).length === 0;
 // ---- rigor and checker composition --------------------------------------------------------------
 
 /**
- * The config entries that apply to a capability, most specific first: its exact key, then its
- * `<prefix>:*` entry (the text before the first colon). A capability with no colon has no prefix
- * entry, and nothing else is inherited: the bare verb of `code:review` is not a lookup key.
- */
-export function capabilityEntriesOf(runnerConfig, capability) {
-  if (typeof capability !== 'string' || !capability) return [];
-  const capabilities = runnerConfig?.capabilities ?? runnerConfig?.runner?.capabilities ?? {};
-  const keys = capability.includes(':') ? [capability, `${capability.split(':')[0]}:*`] : [capability];
-  return keys
-    .filter((key) => capabilities[key] && typeof capabilities[key] === 'object')
-    .map((key) => ({ key, entry: capabilities[key] }));
-}
-
-/** Whether a capability entry names at least one executor in `prefer` (a string or a non-empty list). */
-export function hasUsablePrefer(entry) {
-  const prefer = entry?.prefer;
-  return typeof prefer === 'string' ? prefer.trim() !== '' : Array.isArray(prefer) && prefer.length > 0;
-}
-
-/**
  * The rigor a unit runs at: the stronger of its own and its capability's. `undefined` when neither
  * says one, unless `fallback` names the rigor to read in that case.
  */
