@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "835f61a7046af8cb50971b6243e7fae975ae47ef7364e9ca5ebc5cd6770fb443",
+  "payloadDigest": "42e1ccbb3d9f4efe38edddc28d81f04a16211e9993ed13537f5d7bb5b7224bdf",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "a5629383f89b4488b252a62f0ea86463e649e33e0a891db1a19af2cd6c136aca",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -988,7 +988,7 @@
     "src/report/authoritative-match.mjs": "4678762776ac5a748426cee142ab90a474f479374205d3997a5cb92e26277a1c",
     "src/report/capability-plan-lint.mjs": "12980c7dd50a27b2ec9b620cbdfc7927617196523d7a19f7230d4780fd3c0ab0",
     "src/report/context-render.mjs": "21f0d004ecc62a6be3d059f2c4911dd9dd9fcd3c646d348625e8277efb750fdb",
-    "src/report/decision-index.mjs": "e32e8f246f8e2cb67e27b754bdb24768b75a7b4b61a7afbcdb5019a9b5dd4e9a",
+    "src/report/decision-index.mjs": "ee6aff686058845a3ec2255079fa0b095602b0c6c2acc503518a1b8e5d528bb5",
     "src/report/enduser-index-generate.mjs": "b4ef9eb3fef9fa66415945e3b5a55fae670f7df3e234dd44711352b89459e08b",
     "src/report/enduser-index.mjs": "373da334b9cd862b2c3a0fbf4fffb3fe010f244872702dbfceb25eada5c5e650",
     "src/report/item-trace.mjs": "bb91d0d9635d0794ed9a979cc4fa6721d26db18905637d465be8ce6d831e7155",

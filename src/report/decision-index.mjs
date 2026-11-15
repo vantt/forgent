@@ -13,6 +13,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { listWork, StoreError } from '../state/store.mjs';
+import { writeFrontmatter } from '../util/yaml.mjs';
 
 export function indexPathFor(repoRoot) {
   return path.join(repoRoot, 'docs', 'decisions', 'index.md');
@@ -94,11 +95,6 @@ export function buildDecisionIndexMarkdown(decisions, existingMarkdown = '', { h
   });
 
   const lines = [
-    '---',
-    'type: explanation',
-    'title: Decisions index',
-    'generated: true',
-    '---',
     '',
     '# Decisions index',
     '',
@@ -114,7 +110,7 @@ export function buildDecisionIndexMarkdown(decisions, existingMarkdown = '', { h
     }
     lines.push('');
   }
-  return lines.join('\n');
+  return writeFrontmatter({ type: 'explanation', title: 'Decisions index', generated: true }, lines.join('\n'), 'docs/decisions/index.md');
 }
 
 /**
