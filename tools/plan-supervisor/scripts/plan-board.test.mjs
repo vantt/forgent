@@ -4,7 +4,7 @@ import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, utimesSync, exists
 import { spawnSync } from 'node:child_process';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { main, parseFrontmatter, overlaps } from './plan-board.mjs';
+import { main, parseFrontmatter, overlaps, analyse } from './plan-board.mjs';
 
 function vault(plans) {
   const root = mkdtempSync(join(tmpdir(), 'pb-'));
@@ -347,7 +347,7 @@ test('install --add is additive, per project, and --remove disables the timer wh
   assert.deepEqual(list, [a, b]);                                             // second add kept the first
   const unit = readFileSync(join(home, 'cfg', 'systemd', 'user', 'plan-supervisor-watchdog.service'), 'utf8');
   assert.doesNotMatch(unit, /alpha|beta/);                                    // the unit names no project
-  assert.match(sh(installSh, ['--list'], env).stdout, /"maxRunning":2/);
+  assert.match(sh(installSh, ['--list'], env).stdout, /"maxLanes":2/);
   assert.match(sh(installSh, ['--list'], env).stdout, /"stallMin":5/);
   mkdirSync(join(a, '.fgos', 'assignments', 'late'), { recursive: true });    // a failure that appears after registration
   writeFileSync(join(a, '.fgos', 'assignments', 'late', 'unit.json'), '{}');
@@ -378,4 +378,54 @@ test('watchdog reads the registered list and alerts only for the project that fa
   assert.ok(!existsSync(alerts('good')));
   sh(watchdogSh, [], env);
   assert.equal(readFileSync(alerts('bad'), 'utf8').match(/ALERT/g).length, 1); // not repeated
+});
+
+// ---- the cap counts lanes --------------------------------------------------------------------------------------------
+
+const P = (id, priority, footprint, extra = {}) => ({ id, title: id, status: 'todo', priority, blockedBy: [], blocks: [], footprint, base: 'x', created: '2026-01-01', ...extra });
+
+test('lanes: ready plans are admitted in priority order until the free lanes run out', () => {
+  const plans = [P('c', 'P2', ['c']), P('a', 'P1', ['a']), P('b', 'P1', ['b'])];
+  const r = analyse(plans, { leaders: {} }, { maxLanes: 2 });
+  assert.deepEqual(r.eligible.map((p) => p.id), ['a', 'b']);                 // P1 first, the cap bounds how many start together
+  assert.match(r.held[0].why, /no free lane/);
+  assert.deepEqual(r.lanes, { used: 0, max: 2, free: 2, admitted: 2 });
+});
+
+test('lanes: a running plan that uses several lanes leaves less for the next plan', () => {
+  const plans = [P('run', 'P1', ['r']), P('n1', 'P1', ['n1']), P('n2', 'P2', ['n2'])];
+  const state = { leaders: { run: { caseId: 'wf-run-1' } } };
+  const one = analyse(plans, state, { maxLanes: 3, lanes: new Map([['run', 1]]) });
+  assert.deepEqual(one.eligible.map((p) => p.id), ['n1', 'n2']);             // 1 used, 2 free
+  const three = analyse(plans, state, { maxLanes: 3, lanes: new Map([['run', 3]]) });
+  assert.deepEqual(three.eligible, []);                                       // all lanes taken by the running plan
+  const two = analyse(plans, state, { maxLanes: 3, lanes: new Map([['run', 2]]) });
+  assert.deepEqual(two.eligible.map((p) => p.id), ['n1']);                    // spill-over only into what is left
+  assert.equal(two.lanes.used, 2);
+});
+
+test('lanes: two ready plans whose footprints overlap are not admitted together', () => {
+  const plans = [P('a', 'P1', ['crates/x']), P('b', 'P1', ['crates/x/src']), P('c', 'P1', ['docs'])];
+  const r = analyse(plans, { leaders: {} }, { maxLanes: 4 });
+  assert.deepEqual(r.eligible.map((p) => p.id), ['a', 'c']);
+  assert.match(r.held.find((h) => h.id === 'b').why, /overlaps a/);
+});
+
+test('lanes: the number of live reservations of the case is read from fgos; maxRunning is an alias of maxLanes', () => {
+  const { home, env } = sandbox();
+  const p = project(home, 'lanes');
+  mkdirSync(join(p, 'plans', 'b'), { recursive: true });
+  mkdirSync(join(p, 'plans', 'c'), { recursive: true });
+  writeFileSync(join(p, 'plans', 'a', 'plan.md'), '---\nstatus: todo\nfootprint: [a]\npriority: P1\n---\n');
+  writeFileSync(join(p, 'plans', 'b', 'plan.md'), '---\nstatus: todo\nfootprint: [b]\npriority: P2\n---\n');
+  writeFileSync(join(p, 'plans', 'c', 'plan.md'), '---\nstatus: todo\nfootprint: [c]\npriority: P3\n---\n');
+  const stub = join(home, 'fgos-stub.sh');
+  writeFileSync(stub, '#!/bin/sh\necho \'{"data":{"case":{"liveReservations":[{},{}]}}}\'\n', { mode: 0o755 });
+  const e = { ...env, PLAN_SUPERVISOR_FGOS: stub };
+  assert.equal(node(['config', 'set', 'maxRunning', '3'], e, p).status, 0);              // old name
+  assert.equal(JSON.parse(node(['config', 'get'], e, p).stdout).maxLanes, 3);              // stored and shown as maxLanes
+  node(['claim', 'a', 'wf-run-9'], e, p);                                                  // plan a runs and holds 2 lanes
+  const r = JSON.parse(node(['eligible', '--json'], e, p).stdout);
+  assert.deepEqual(r.lanes, { used: 2, max: 3, free: 1, admitted: 1 });
+  assert.deepEqual(r.eligible, ['b']);                                                      // one lane left: b, not c
 });

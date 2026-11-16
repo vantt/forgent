@@ -3,7 +3,8 @@
 #   install.sh                          install or update the skill and scripts in ~/.claude/skills/plan-supervisor
 #   install.sh --add DIR [DIR...]       register projects: shows a readiness check for each, marks existing runs as seen,
 #                                       and (re)writes the systemd user timer. Additive: earlier projects stay.
-#         [--max-running N] [--stall-min N]   per-project settings for the DIRs of this call (defaults 1 and 20)
+#         [--max-lanes N] [--stall-min N]   per-project settings for the DIRs of this call (defaults 1 and 20);
+#                                           a lane is one concurrently live dispatch; --max-running is the old name
 #   install.sh --remove DIR [DIR...]    unregister; the timer is disabled when no project is left
 #   install.sh --list                   show registered projects and their settings
 #   install.sh --uninstall              remove the timer and the copied skill (state files are kept)
@@ -25,7 +26,7 @@ while [ $# -gt 0 ]; do
     --remove) MODE=remove ;;
     --list) MODE=list ;;
     --uninstall) MODE=uninstall ;;
-    --max-running) shift; MAXRUN="${1:-}" ;;
+    --max-lanes|--max-running) shift; MAXRUN="${1:-}" ;;
     --stall-min) shift; STALL="${1:-}" ;;
     -*) echo "unknown option $1" >&2; exit 2 ;;
     *) DIRS="$DIRS
@@ -85,7 +86,7 @@ case "$MODE" in
       [ -d "$P/.fgos" ] || { echo "$P has no .fgos: run \`fgctl init\` there first" >&2; exit 1; }
       echo "== $P"
       (cd "$P" && node "$DEST/scripts/plan-board.mjs" doctor) || echo "   (required checks above must be fixed for the supervisor to drive this project; the watchdog still works)"
-      [ -z "$MAXRUN" ] || (cd "$P" && run node "$DEST/scripts/plan-board.mjs" config set maxRunning "$MAXRUN")
+      [ -z "$MAXRUN" ] || (cd "$P" && run node "$DEST/scripts/plan-board.mjs" config set maxLanes "$MAXRUN")
       [ -z "$STALL" ] || (cd "$P" && run node "$DEST/scripts/plan-board.mjs" config set stallMin "$STALL")
       mkdir -p "$P/.fgos/assignments" 2>/dev/null || true
       # mark what exists as seen only for a project not registered yet: re-adding must not swallow real new alerts

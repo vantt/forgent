@@ -28,7 +28,7 @@ project, one after the other (cost grows linearly: a `node` start per project pe
 
 1. In each project: `fgctl init`, trust the folder once in Claude Code (`claude`, accept the prompt), then declare its whole-tree gate
    `fgos config set 'runner.capabilities.code:implement.verify' '<command>' --reason "<why>"`.
-2. `tools/plan-supervisor/install.sh --add /path/to/project [--max-running N] [--stall-min N]`
+2. `tools/plan-supervisor/install.sh --add /path/to/project [--max-lanes N] [--stall-min N]`
    (`--dry-run` first). It prints a readiness check for the project (`plan-board.mjs doctor`: fgOS initialised, gate
    declared, plans present, footprint/base declared, `.fgos` ignored), marks existing runs as seen so only new failures
    alert, registers the project in `~/.config/plan-supervisor/projects` and (re)writes the timer. Adding a project never
@@ -38,7 +38,7 @@ project, one after the other (cost grows linearly: a `node` start per project pe
    `footprint: [paths]` and `base: <commit>`; without them a plan cannot run beside another and drift is not detected.
    The watchdog needs none of this: it works on any project with a `.fgos/assignments`, plans or not.
 4. In a Claude session in the project: "run one supervisor tick" (the skill). Ticks are manual in v0.
-5. Per-project settings: `plan-board.mjs config set maxRunning N` (plans at once, default 1) and
+5. Per-project settings: `plan-board.mjs config set maxLanes N` (concurrent live dispatches over all running plans, default 1; `maxRunning` is the old name) and
    `config set stallMin N` (idle minutes before a live run counts as stalled, default 20).
 
 ## What it measures (no tokens: fgOS records none)

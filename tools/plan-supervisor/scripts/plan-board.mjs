@@ -139,7 +139,9 @@ function writeState(stateDir, state) {
   writeFileSync(join(stateDir, 'state.json'), JSON.stringify(state, null, 2) + '\n');
 }
 
-export function analyse(plans, state, { maxRunning = 1 } = {}) {
+// Lanes: a lane is one concurrently live dispatch. A running plan uses `lanes.get(id)` lanes (read from its case), at least 1.
+// The cap is on lanes, and plans are admitted in priority order until the remaining lanes run out.
+export function analyse(plans, state, { maxLanes = 1, lanes = new Map() } = {}) {
   const byId = new Map(plans.map((p) => [p.id, p]));
   const problems = [];
   const warnings = [];
@@ -165,20 +167,25 @@ export function analyse(plans, state, { maxRunning = 1 } = {}) {
   const cycle = findCycle(plans);
   if (cycle) problems.push(`blockedBy cycle: ${cycle.join(' -> ')}`);
 
+  const laneOf = (id) => Math.max(1, lanes.get(id) ?? 1);
+  const usedLanes = running.reduce((t, r) => t + laneOf(r.id), 0);
+  let free = maxLanes - usedLanes;
   const eligible = [];
   const held = [];
-  for (const p of plans) {
-    if (p.status !== 'todo' || state.leaders[p.id]) continue;
+  const rank = (a, b) => (PRIORITY[a.priority] ?? 9) - (PRIORITY[b.priority] ?? 9) || a.created.localeCompare(b.created) || a.id.localeCompare(b.id);
+  const candidates = plans.filter((p) => p.status === 'todo' && !state.leaders[p.id]).sort(rank);
+  for (const p of candidates) {
     const waiting = p.blockedBy.filter((b) => byId.get(b)?.status !== 'completed');
     if (waiting.length) { held.push({ id: p.id, why: `waits for ${waiting.join(', ')}` }); continue; }
-    if (running.length >= maxRunning) { held.push({ id: p.id, why: `running limit ${maxRunning} reached` }); continue; }
-    const clash = running.find((r) => !r.footprint || !p.footprint || overlaps(r.footprint, p.footprint));
-    if (clash) { held.push({ id: p.id, why: `footprint unknown or overlaps running ${clash.id}` }); continue; }
+    if (free < 1) { held.push({ id: p.id, why: `no free lane (${usedLanes + eligible.length}/${maxLanes} in use or reserved)` }); continue; }
+    // footprints must be disjoint from running plans and from plans admitted earlier in this pass
+    const others = [...running, ...eligible];
+    const clash = others.length ? others.find((r) => !r.footprint || !p.footprint || overlaps(r.footprint, p.footprint)) : null;
+    if (clash) { held.push({ id: p.id, why: `footprint unknown or overlaps ${clash.id}` }); continue; }
     eligible.push(p);
+    free -= 1;
   }
-  eligible.sort((a, b) =>
-    (PRIORITY[a.priority] ?? 9) - (PRIORITY[b.priority] ?? 9) || a.created.localeCompare(b.created) || a.id.localeCompare(b.id));
-  return { problems, warnings, eligible, held, running };
+  return { problems, warnings, eligible, held, running, lanes: { used: usedLanes, max: maxLanes, free: Math.max(0, maxLanes - usedLanes), admitted: eligible.length } };
 }
 
 function findCycle(plans) {
@@ -246,8 +253,20 @@ export function main(argv, out = console.log) {
   const plans = existsSync(plansDir) ? readPlans(plansDir) : [];
   const state = readState(stateDir);
   const cfg = readConfig(stateDir);
-  const maxRunning = Number(flags['max-running'] ?? cfg.maxRunning ?? 1);
-  const result = analyse(plans, state, { maxRunning });
+  // `maxRunning` is the old name of the same setting (it used to count plans); one running plan counts as one lane.
+  const maxLanes = Number(flags['max-lanes'] ?? flags['max-running'] ?? cfg.maxLanes ?? cfg.maxRunning ?? 1);
+  const lanes = new Map();
+  const fgosForLanes = process.env.PLAN_SUPERVISOR_FGOS ?? join(projectRoot, '.fgos', 'installation', 'bin', 'fgos');
+  if (existsSync(fgosForLanes)) {
+    for (const [id, l] of Object.entries(state.leaders)) {
+      if (!/^wf-run-/.test(l.caseId)) continue;
+      try {
+        const r = spawnSync(fgosForLanes, ['workflow', 'status', l.caseId, '--json'], { cwd: projectRoot, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'], timeout: 20000 });
+        lanes.set(id, JSON.parse(r.stdout).data.case.liveReservations.length);
+      } catch { /* unreadable: counts as one lane */ }
+    }
+  }
+  const result = analyse(plans, state, { maxLanes, lanes });
 
   switch (cmd) {
     case 'check':
@@ -255,8 +274,9 @@ export function main(argv, out = console.log) {
       for (const p of result.problems) out(`error: ${p}`);
       return result.problems.length ? 1 : 0;
     case 'eligible':
-      if (flags.json) out(JSON.stringify({ eligible: result.eligible.map((p) => p.id), held: result.held, running: result.running.map((p) => p.id), problems: result.problems }, null, 2));
+      if (flags.json) out(JSON.stringify({ eligible: result.eligible.map((p) => p.id), held: result.held, running: result.running.map((p) => p.id), lanes: result.lanes, problems: result.problems }, null, 2));
       else {
+        out(`lanes ${result.lanes.used}/${result.lanes.max} in use, ${result.lanes.free} free, ${result.lanes.admitted} plan(s) can start now`);
         for (const p of result.eligible) out(`${p.id}\t${p.priority}\t${p.title}`);
         for (const h of result.held) out(`held ${h.id}: ${h.why}`);
       }
@@ -311,17 +331,19 @@ export function main(argv, out = console.log) {
       return 0;
     }
     case 'config': {
-      // Per-project settings kept in the state dir: maxRunning (plans run at once), stallMin (watchdog idle threshold).
+      // Per-project settings kept in the state dir: maxLanes (concurrent live dispatches over all running plans), stallMin.
       const [action, key, value] = args;
-      const KEYS = { maxRunning: 'number', stallMin: 'number' };
+      const KEYS = { maxLanes: 'number', maxRunning: 'number', stallMin: 'number' };
       if (action === 'set' && key in KEYS && value !== undefined && !Number.isNaN(Number(value)) && Number(value) > 0) {
         ensureState();
-        writeFileSync(join(stateDir, 'config.json'), JSON.stringify({ ...cfg, [key]: Number(value) }, null, 2) + '\n');
-        out(`${key} = ${Number(value)}`);
+        const name = key === 'maxRunning' ? 'maxLanes' : key;   // old name, same setting
+        const { maxRunning: _old, ...rest } = cfg;
+        writeFileSync(join(stateDir, 'config.json'), JSON.stringify({ ...rest, [name]: Number(value) }, null, 2) + '\n');
+        out(`${name} = ${Number(value)}`);
         return 0;
       }
-      if (action === 'get' || action === undefined) { out(JSON.stringify({ maxRunning, stallMin: cfg.stallMin ?? 20, stateDir, project: projectRoot })); return 0; }
-      out('usage: config [get] | config set <maxRunning|stallMin> <positive number>');
+      if (action === 'get' || action === undefined) { out(JSON.stringify({ maxLanes, stallMin: cfg.stallMin ?? 20, stateDir, project: projectRoot })); return 0; }
+      out('usage: config [get] | config set <maxLanes|stallMin> <positive number>');
       return 2;
     }
     case 'doctor': {
@@ -352,7 +374,7 @@ export function main(argv, out = console.log) {
       if (hasPlans) add(missing.length === 0, false, `todo plans declare footprint and base${missing.length ? ' (' + missing.length + ' do not)' : ''}`, 'add `footprint: [paths]` and `base: <commit>` to their frontmatter so they can run side by side');
       const ign = spawnSync('git', ['-C', projectRoot, 'check-ignore', '-q', '.fgos'], { encoding: 'utf8' });
       add(ign.status === 0, false, '.fgos is ignored by git', 'add `/.fgos/` to .gitignore');
-      add(true, false, `settings: maxRunning ${maxRunning}, stallMin ${cfg.stallMin ?? 20} (change: plan-board.mjs config set ...)`, '');
+      add(true, false, `settings: maxLanes ${maxLanes}, stallMin ${cfg.stallMin ?? 20} (change: plan-board.mjs config set ...)`, '');
       for (const l of lines) out(l.text);
       return lines.some((l) => !l.ok && l.required) ? 1 : 0;
     }

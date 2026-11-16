@@ -27,7 +27,7 @@ comes from a failure, the failure is named. Commands assume this package is inst
 6. **Plans** from `ak:plan` (`plans/<id>/plan.md`). Add `footprint: [paths]` and `base: <commit>` to the frontmatter.
    Footprints must include the tests, README and docs your project's rules require with a behaviour change, or the
    worker cannot write them and the conductor has to widen the slice (it happened in 2 of 3 pilot slices).
-7. **Register the watchdog:** `install.sh --add DIR [--max-running N] [--stall-min N]` (additive; shows `doctor`).
+7. **Register the watchdog:** `install.sh --add DIR [--max-lanes N] [--stall-min N]` (additive; shows `doctor`).
 
 ## C. Run a plan (the conductor's loop; the session you are in is the conductor)
 1. Read the whole plan and its phase files; compare with the code; list what only the owner can decide.

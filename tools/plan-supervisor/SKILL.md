@@ -23,8 +23,8 @@ Tool: `node ~/.claude/skills/plan-supervisor/scripts/plan-board.mjs <cmd> [--roo
 Commands: `check`, `eligible [--json]`, `render [--write]`, `claim <plan> <leader-id>`, `release <plan>`, `lock acquire|release [--ttl-min N]`, `log <note> k=v`.
 Mechanical pre-check, no LLM: `changed` (exit 10 = nothing changed since the last finished tick, do not start a session; run `changed --mark` at the end of a tick). Owner queue: `queue add <plan> <text>`, `queue list`, `queue done <id>`; step 6 writes here instead of only listing.
 Start every tick with `lock acquire` (exit 3 = another tick runs: stop) and end it with `lock release`; a lock older than its ttl (default 30 min) is taken over.
-State lives in `~/.local/state/plan-supervisor/<project>/`, outside the repo. `--max-running` defaults to 1: plans run one
-at a time unless their footprints are declared and disjoint. Per-project cap: `plan-board.mjs config set maxRunning N` (the pilot project used 2; raise to 4 only after
+State lives in `~/.local/state/plan-supervisor/<project>/`, outside the repo. `--max-lanes` defaults to 1: plans run one
+at a time unless their footprints are declared and disjoint. Per-project cap, counted in **lanes** (one lane = one concurrently live dispatch; a running plan uses its case's live reservations, at least 1; plans are admitted in priority order until lanes run out; footprints must be disjoint): `plan-board.mjs config set maxLanes N` (the pilot project used 2; raise to 4 only after
 seeing disk and CPU use: each worktree builds its own `target`, 13 GB for the pilot; claude-only shares one account's quota).
 Within one case, writing slices are serial (fgos-cook); parallelism is only across cases with disjoint footprints.
 
