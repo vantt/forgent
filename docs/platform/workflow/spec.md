@@ -63,7 +63,8 @@ Hôm nay ngược lại: một Workflow là DAG các step mà Workflow runner th
 | N1 và giao thức ngữ cảnh authority (RUL-WF-11), bản ghi ràng buộc worktree (RUL-WF-27) | định dạng nội bộ của Event Store; tên và rank của hàng khoá |
 | AdmissionPort do Execution Core sở hữu, Workflow cài (mục 5.2) | chữ ký cụ thể của port |
 | đơn vị đếm của khung và trần seat launch giao cho Unit (RUL-WF-12) | auto-advance như một runtime thứ hai |
-| `advance` theo Shape C (mục 5.4) | Work là engine, hoặc Work chỉ là projection |
+| `advance` theo Shape C (mục 5.4) | |
+| Work là lớp surface (view, projection) giữa người và engine; Workflow cùng Execution là engine; hai bên nối bằng một contract hoặc adapter, phụ thuộc đi từ Work xuống engine (D-ADR0076) | |
 | ledger JSONL được làm cứng tại chỗ (RUL-WF-24) | các phase cài đặt, Size 0/Size 1 như kiến trúc |
 | đích supersede một phần: 0048 §2, 0049 §4 (mục 17) | đổi tên file (một bước L10 sau, đề xuất riêng) |
 | ranh giới component diễn đạt bằng lời theo manifest (mục 5) | |
@@ -793,6 +794,13 @@ Mỗi dòng: ai quyết, **tín hiệu quan sát được** sẽ mở lại, và
 ### Playbook không còn bước `integrate` (owner 2026-11-08, quyết định 71 mục 2a)
 
 Playbook không có cửa merge thứ hai vào trunk: loại step `kind: integrate` và trường `target` bị xoá, một định nghĩa khai chúng bị từ chối theo tên lúc nạp (lời từ chối chỉ tới approve door). Nhánh của unit ghi chỉ vào trunk qua approve door (coding) hoặc `landRunnerItem` (proof tiêu thụ không-coding: `test/git/e2e-consumer-noncoding.test.mjs`). Dọn worktree sau run vẫn coi unit pass là đã giao khi nhánh của nó nằm trong trunk (`origin/HEAD`, không có thì nhánh đang checkout). Kind `integrate` của *activity guide* (`feature.yaml`) không đổi. Ledger cũ có sự kiện step integrate vẫn fold và in.
+
+### D-ADR0076 (Work is the surface) — Work chỉ là lớp surface; Workflow và Execution là engine
+
+- **Trạng thái:** **Settled (owner 2026-11-16).** Record chính thức ở "Lịch sử quyết định" của [runner decisions](../runner/decisions/h-36d872fbb0e5.md); mục này là bản tóm tắt cho khu vực Workflow.
+- **Quyết định:** Work là lớp surface (view, projection): nơi người tiếp xúc, phản hồi và trung chuyển thông tin giữa người và engine. Workflow và Execution là engine; thứ tự, admission, bản ghi tiến độ, claim, slot và settlement thuộc phía engine. Hai bên nối bằng một contract hoặc adapter, phụ thuộc đi từ Work xuống engine. Thứ tự việc: hoàn tất Workflow trước, rồi mới thiết kế UX của Work, ánh xạ và tuỳ biến được cho mọi loại business workflow.
+- **Chưa quyết:** claim/return, slot, settlement chuyển về đâu; hình dạng contract; cách cắt các import từ runner sang kho Work. Mỗi điều cần record riêng.
+- **Hệ quả cho spec này:** dòng "Work là engine, hoặc Work chỉ là projection" ở mục 1.1 không còn ở cột "Không khoá"; 0049 §1–3 giữ nguyên.
 
 ## 18. Pointers
 
