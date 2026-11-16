@@ -3,8 +3,10 @@ name: plan-supervisor
 description: >-
   Run one supervisor tick over a project's ak:plan plans: read the plan index, find plans ready to run, check running
   leaders, hold drifted or blocked plans, and tell the owner what to start or decide. Use when the owner says "chạy một
-  lượt supervisor", "đẩy plan", "plan nào chạy được", or asks for the plan board. Prototype v0: manual ticks only, it
-  starts nothing by itself and never edits plan content, merges or tags.
+  lượt supervisor", "đẩy plan", "plan nào chạy được", or asks for the plan board. ALSO use it when the owner asks to
+  run, cook or deliver one plan ("chạy plan <path>", "run this plan"): then you are the conductor and follow
+  RUNBOOK.md section C exactly (read it first, run `plan-board.mjs doctor` before anything else, stop on a TODO line).
+  Prototype v0: nothing starts by itself; it never edits plan content, merges or tags.
 ---
 
 # plan-supervisor (prototype v0)
