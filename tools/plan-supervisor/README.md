@@ -11,21 +11,31 @@ Hand-off for the fgOS refactor: `plans/reports/note-261116-1503-plan-supervisor-
 | File | What |
 |---|---|
 | `SKILL.md` | the supervisor tick (a Claude skill); read it first |
-| `scripts/plan-board.mjs` | plan index and everything a tick needs: `check`, `eligible`, `render`, `claim`, `release`, `lock`, `changed`, `queue`, `health`, `watch`, `verify`, `event`, `sessions`, `report`. Node only, no dependencies. 17 tests: `node --test scripts/plan-board.test.mjs` |
+| `scripts/plan-board.mjs` | plan index and everything a tick needs: `check`, `eligible`, `render`, `claim`, `release`, `lock`, `changed`, `queue`, `health`, `watch`, `config`, `doctor`, `verify`, `event`, `sessions`, `report`. Node only, no dependencies. 23 tests: `node --test scripts/plan-board.test.mjs` |
 | `scripts/watchdog.sh` | runs `watch` on projects; alerts to `alerts.log`, the owner queue and an fgOS mailbox message |
 | `systemd/` | user timer templates for the watchdog |
 | `install.sh` | copy the skill to `~/.claude/skills/plan-supervisor`, optionally enable the timer for some projects |
 
-## Use on another project
+## Use on one or more projects
 
-1. Initialise fgOS in the project (`fgctl init`), declare its whole-tree gate:
+One machine, any number of projects: one systemd user timer runs the watchdog every 3 minutes over every registered
+project, one after the other (cost grows linearly: a `node` start per project per run). Per project, state is in
+`~/.local/state/plan-supervisor/<folder>/` (a short path hash is added if two projects share a folder name).
+
+1. In each project: `fgctl init`, then declare its whole-tree gate
    `fgos config set 'runner.capabilities.code:implement.verify' '<command>' --reason "<why>"`.
-2. `tools/plan-supervisor/install.sh --timer /path/to/project` (add `--dry-run` first to see what it does).
+2. `tools/plan-supervisor/install.sh --add /path/to/project [--max-running N] [--stall-min N]`
+   (`--dry-run` first). It prints a readiness check for the project (`plan-board.mjs doctor`: fgOS initialised, gate
+   declared, plans present, footprint/base declared, `.fgos` ignored), marks existing runs as seen so only new failures
+   alert, registers the project in `~/.config/plan-supervisor/projects` and (re)writes the timer. Adding a project never
+   drops the others. `--remove DIR` unregisters (the timer is disabled when none is left), `--list` shows projects and
+   settings, `--uninstall` removes the timer and the skill.
 3. Plans are `ak:plan` plans (`plans/<id>/plan.md`). The index also reads two optional frontmatter fields **we added**:
    `footprint: [paths]` and `base: <commit>`; without them a plan cannot run beside another and drift is not detected.
+   The watchdog needs none of this: it works on any project with a `.fgos/assignments`, plans or not.
 4. In a Claude session in the project: "run one supervisor tick" (the skill). Ticks are manual in v0.
-5. State lives outside the repo: `~/.local/state/plan-supervisor/<project>/`. Stop everything:
-   `install.sh --uninstall`.
+5. Per-project settings: `plan-board.mjs config set maxRunning N` (plans at once, default 1) and
+   `config set stallMin N` (idle minutes before a live run counts as stalled, default 20).
 
 ## What it measures (no tokens: fgOS records none)
 

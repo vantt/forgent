@@ -76,8 +76,21 @@ export function overlaps(a, b) {
 
 export function stateDirFor(plansDir) {
   if (process.env.PLAN_SUPERVISOR_STATE) return process.env.PLAN_SUPERVISOR_STATE;
-  const project = basename(dirname(resolve(plansDir)));
-  return join(process.env.XDG_STATE_HOME ?? join(homedir(), '.local/state'), 'plan-supervisor', project);
+  // One state dir per project. Named after the folder; if another project with the same folder name already owns that
+  // dir (recorded in project.txt), this project gets a dir with a short hash of its path instead.
+  const project = dirname(resolve(plansDir));
+  const base = join(process.env.XDG_STATE_HOME ?? join(homedir(), '.local/state'), 'plan-supervisor');
+  const plain = join(base, basename(project));
+  const marker = join(plain, 'project.txt');
+  if (existsSync(marker) && readFileSync(marker, 'utf8').trim() !== project) {
+    return join(base, `${basename(project)}-${createHash('sha1').update(project).digest('hex').slice(0, 8)}`);
+  }
+  return plain;
+}
+
+export function readConfig(stateDir) {
+  const f = join(stateDir, 'config.json');
+  return existsSync(f) ? JSON.parse(readFileSync(f, 'utf8')) : {};
 }
 
 export function readState(stateDir) {
@@ -216,15 +229,24 @@ function parseArgs(argv) {
   return { flags, rest };
 }
 
+const NEEDS_PLANS = new Set(['check', 'eligible', 'render', 'claim', 'release']);
+
 export function main(argv, out = console.log) {
   const { flags, rest } = parseArgs(argv);
   const [cmd, ...args] = rest;
   const plansDir = resolve(flags.root ?? 'plans');
-  if (!existsSync(plansDir)) { out(`no plans directory at ${plansDir}`); return 2; }
+  if (NEEDS_PLANS.has(cmd) && !existsSync(plansDir)) { out(`no plans directory at ${plansDir}`); return 2; }
   const stateDir = stateDirFor(plansDir);
-  const plans = readPlans(plansDir);
+  const projectRoot = dirname(plansDir);
+  const ensureState = () => {
+    mkdirSync(stateDir, { recursive: true });
+    const marker = join(stateDir, 'project.txt');
+    if (!existsSync(marker)) writeFileSync(marker, projectRoot + '\n');
+  };
+  const plans = existsSync(plansDir) ? readPlans(plansDir) : [];
   const state = readState(stateDir);
-  const maxRunning = Number(flags['max-running'] ?? 1);
+  const cfg = readConfig(stateDir);
+  const maxRunning = Number(flags['max-running'] ?? cfg.maxRunning ?? 1);
   const result = analyse(plans, state, { maxRunning });
 
   switch (cmd) {
@@ -250,6 +272,7 @@ export function main(argv, out = console.log) {
       if (!plans.some((p) => p.id === id)) { out(`unknown plan ${id}`); return 2; }
       if (state.leaders[id]) { out(`${id} already held by ${state.leaders[id].caseId}`); return 0; }
       state.leaders[id] = { caseId, since: new Date().toISOString() };
+      ensureState();
       writeState(stateDir, state);
       out(`claimed ${id} for ${caseId}`);
       return 0;
@@ -258,6 +281,7 @@ export function main(argv, out = console.log) {
       const [id] = args;
       if (!state.leaders[id]) { out(`${id} has no leader`); return 0; }
       delete state.leaders[id];
+      ensureState();
       writeState(stateDir, state);
       out(`released ${id}`);
       return 0;
@@ -286,6 +310,44 @@ export function main(argv, out = console.log) {
       if (failed.length) { out(`FAILED: ${failed.map((r) => `${r.activity} (${r.reason || r.outcome})`).join(', ')}`); return 4; }
       return 0;
     }
+    case 'config': {
+      // Per-project settings kept in the state dir: maxRunning (plans run at once), stallMin (watchdog idle threshold).
+      const [action, key, value] = args;
+      const KEYS = { maxRunning: 'number', stallMin: 'number' };
+      if (action === 'set' && key in KEYS && value !== undefined && !Number.isNaN(Number(value)) && Number(value) > 0) {
+        ensureState();
+        writeFileSync(join(stateDir, 'config.json'), JSON.stringify({ ...cfg, [key]: Number(value) }, null, 2) + '\n');
+        out(`${key} = ${Number(value)}`);
+        return 0;
+      }
+      if (action === 'get' || action === undefined) { out(JSON.stringify({ maxRunning, stallMin: cfg.stallMin ?? 20, stateDir, project: projectRoot })); return 0; }
+      out('usage: config [get] | config set <maxRunning|stallMin> <positive number>');
+      return 2;
+    }
+    case 'doctor': {
+      // Is this project ready for the supervisor? Prints one line per check; changes nothing. Exit 1 if a required check fails.
+      const lines = [];
+      const add = (ok, required, what, fix) => lines.push({ ok, required, text: `${ok ? 'ok  ' : required ? 'TODO' : 'warn'} ${what}${ok ? '' : ' -> ' + fix}` });
+      const fgosBin = join(projectRoot, '.fgos', 'installation', 'bin', 'fgos');
+      const inited = existsSync(fgosBin);
+      add(inited, true, 'fgOS initialised in the project', 'run `fgctl init` in the project');
+      if (inited) {
+        const r = spawnSync(fgosBin, ['config', 'show', '--path', 'runner.capabilities.code:implement.verify', '--json'], { cwd: projectRoot, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] });
+        let present = false;
+        try { present = JSON.parse(r.stdout).data.present === true; } catch { /* unknown */ }
+        add(present, true, 'whole-tree gate declared (runner.capabilities.code:implement.verify)', "`fgos config set 'runner.capabilities.code:implement.verify' '<command>' --reason '<why>'`");
+      }
+      add(existsSync(join(projectRoot, '.fgos', 'assignments')), false, '.fgos/assignments exists (appears after the first fgOS run)', 'run any `fgos run` once; the watchdog needs it');
+      const hasPlans = plans.length > 0;
+      add(hasPlans, false, `plans/ has plans (${plans.length})`, 'create plans with ak:plan; the supervisor tick needs them, the watchdog does not');
+      const missing = plans.filter((p) => p.status === 'todo' && (!p.footprint || !p.base)).map((p) => p.id);
+      if (hasPlans) add(missing.length === 0, false, `todo plans declare footprint and base${missing.length ? ' (' + missing.length + ' do not)' : ''}`, 'add `footprint: [paths]` and `base: <commit>` to their frontmatter so they can run side by side');
+      const ign = spawnSync('git', ['-C', projectRoot, 'check-ignore', '-q', '.fgos'], { encoding: 'utf8' });
+      add(ign.status === 0, false, '.fgos is ignored by git', 'add `/.fgos/` to .gitignore');
+      add(true, false, `settings: maxRunning ${maxRunning}, stallMin ${cfg.stallMin ?? 20} (change: plan-board.mjs config set ...)`, '');
+      for (const l of lines) out(l.text);
+      return lines.some((l) => !l.ok && l.required) ? 1 : 0;
+    }
     case 'verify': {
       // Conductor's independent check: verify <case> <slice|plan> <pass|fail> <note...> [k=v ...] [--commit SHA --repo DIR --at ISO]
       // Extras (k=v): gates=fmt+clippy+test|none  widened=N  needswrites=N  mismatch=N (worker claim contradicted by my re-run)
@@ -296,7 +358,7 @@ export function main(argv, out = console.log) {
       const note = [];
       for (const t of rest) { const m = /^([a-z_]+)=(\S*)$/.exec(t); if (m) extras[m[1]] = m[2]; else note.push(t); }
       if (flags.commit) extras.facts = commitFacts(resolve(flags.repo ?? '.'), flags.commit);
-      mkdirSync(stateDir, { recursive: true });
+      ensureState();
       appendFileSync(join(stateDir, 'verifications.tsv'), [flags.at ?? new Date().toISOString(), caseId, slice, result, note.join(' '), JSON.stringify(extras)].join('\t') + '\n');
       out(`recorded ${slice} ${result}${extras.facts ? ' facts=' + JSON.stringify(extras.facts) : ''}`);
       return 0;
@@ -305,7 +367,7 @@ export function main(argv, out = console.log) {
       // event <case> <assigned|note...>: timestamps the report cannot read from fgOS (e.g. when the owner handed the work over)
       const [caseId, kind, ...note] = args;
       if (!caseId || !kind) { out('usage: event <case> <kind> [note] [--at ISO]'); return 2; }
-      mkdirSync(stateDir, { recursive: true });
+      ensureState();
       appendFileSync(join(stateDir, 'events.tsv'), [flags.at ?? new Date().toISOString(), caseId, kind, note.join(' ')].join('\t') + '\n');
       out(`event ${kind} recorded`);
       return 0;
@@ -327,7 +389,7 @@ export function main(argv, out = console.log) {
       }).sort((a, b) => b.mb - a.mb);
       if (flags.label) {
         const cur = [...rows].sort((a, b) => b.mtime - a.mtime)[0];
-        mkdirSync(stateDir, { recursive: true });
+        ensureState();
         appendFileSync(join(stateDir, 'session-marks.tsv'), [new Date().toISOString(), flags.label, cur.session, cur.mb, cur.lines, cur.assistant].join('\t') + '\n');
         out(`mark ${flags.label}: ${cur.session} ${cur.mb} MB, ${cur.assistant} assistant messages`);
         return 0;
@@ -437,7 +499,7 @@ export function main(argv, out = console.log) {
       // `--baseline` marks everything present as seen without alerting (first install). Exit 4 = new alerts.
       const dir = join(resolve(flags.fgos ?? '.fgos'), 'assignments');
       if (!existsSync(dir)) { out('no .fgos/assignments here'); return 0; }
-      const stallMs = Number(flags['stall-min'] ?? 20) * 60_000;
+      const stallMs = Number(flags['stall-min'] ?? cfg.stallMin ?? 20) * 60_000;
       const seenFile = join(stateDir, 'seen.json');
       const seen = new Set(existsSync(seenFile) ? JSON.parse(readFileSync(seenFile, 'utf8')) : []);
       const BAD = new Set(['execution-failure', 'policy-refusal', 'provider-limit', 'blocked']);
@@ -459,14 +521,14 @@ export function main(argv, out = console.log) {
           }
         }
       }
-      mkdirSync(stateDir, { recursive: true });
+      ensureState();
       for (const a of alerts) {
         seen.add(a.key);
         if (flags.baseline) continue;
         out(a.line);
         appendFileSync(join(stateDir, 'detections.tsv'), [new Date().toISOString(), a.key, a.kind, a.eventAt ? new Date(a.eventAt).toISOString() : '', a.eventAt ? minutes(Date.now() - a.eventAt) : ''].join('\t') + '\n');
       }
-      mkdirSync(stateDir, { recursive: true });
+      ensureState();
       writeFileSync(seenFile, JSON.stringify([...seen], null, 0) + '\n');
       if (flags.baseline) { out(`baseline: ${alerts.length} existing alert(s) marked as seen`); return 0; }
       return alerts.length ? 4 : 0;
@@ -481,7 +543,7 @@ export function main(argv, out = console.log) {
       })).digest('hex');
       const file = join(stateDir, 'fingerprint');
       const last = existsSync(file) ? readFileSync(file, 'utf8').trim() : '';
-      if (flags.mark) { mkdirSync(stateDir, { recursive: true }); writeFileSync(file, fp + '\n'); out('fingerprint stored'); return 0; }
+      if (flags.mark) { ensureState(); writeFileSync(file, fp + '\n'); out('fingerprint stored'); return 0; }
       if (fp === last) { out('unchanged'); return 10; }
       out('changed');
       return 0;
@@ -494,7 +556,7 @@ export function main(argv, out = console.log) {
         const [plan, ...text] = qargs;
         if (!plan || !text.length) { out('usage: queue add <plan> <what is happening / options / recommendation>'); return 2; }
         const id = String(items.length + 1);
-        mkdirSync(stateDir, { recursive: true });
+        ensureState();
         appendFileSync(join(stateDir, 'queue.jsonl'), JSON.stringify({ id, plan, text: text.join(' '), kind: flags.kind ?? 'unknown', at: flags.at ?? new Date().toISOString(), done: false }) + '\n');
         out(`queued ${id}`);
         return 0;
@@ -519,7 +581,7 @@ export function main(argv, out = console.log) {
       // One supervisor tick at a time. A lock older than its ttl is taken over, so a dead tick never wedges the loop.
       const [action] = args;
       const file = join(stateDir, 'lock.json');
-      mkdirSync(stateDir, { recursive: true });
+      ensureState();
       if (action === 'release') { if (existsSync(file)) unlinkSync(file); out('lock released'); return 0; }
       if (action !== 'acquire') { out('usage: lock <acquire|release> [--ttl-min N]'); return 2; }
       const ttlMs = Number(flags['ttl-min'] ?? 30) * 60_000;
@@ -532,12 +594,12 @@ export function main(argv, out = console.log) {
     }
     case 'log': {
       const [note, ...kv] = args;
-      mkdirSync(stateDir, { recursive: true });
+      ensureState();
       appendFileSync(join(stateDir, 'ticks.tsv'), [new Date().toISOString(), note ?? '', ...kv].join('\t') + '\n');
       return 0;
     }
     default:
-      out('usage: plan-board.mjs <check|eligible|render|claim|release|health|watch|verify|event|sessions|report|changed|queue|lock|log> [--root plans] [--max-running N] [--json] [--write]');
+      out('usage: plan-board.mjs <check|eligible|render|claim|release|health|watch|config|doctor|verify|event|sessions|report|changed|queue|lock|log> [--root plans] [--max-running N] [--json] [--write]');
       return 2;
   }
 }

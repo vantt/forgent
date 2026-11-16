@@ -1,6 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, utimesSync } from 'node:fs';
+import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, utimesSync, existsSync, readdirSync } from 'node:fs';
+import { spawnSync } from 'node:child_process';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { main, parseFrontmatter, overlaps } from './plan-board.mjs';
@@ -262,4 +263,115 @@ test('verify --commit reads unit, e2e and guide from git, not from anyone\'s wor
   g('commit', '-qam', 'two');
   const sha2 = g('rev-parse', 'HEAD').stdout.trim();
   assert.match(run(['verify', 'c9', 's2', 'pass', 'n', '--commit', sha2, '--repo', repo, '--root', vault({ a: 'status: todo' })]).text, /"unit":false,"e2e":false,"doc":false/);
+});
+
+// ---- several projects on one machine ------------------------------------------------------------------------------
+
+const here = (p) => new URL(p, import.meta.url).pathname;
+const installSh = here('../install.sh');
+const watchdogSh = here('./watchdog.sh');
+const board = here('./plan-board.mjs');
+
+function project(root, name, { failing = false, plans = true } = {}) {
+  const dir = join(root, name);
+  mkdirSync(join(dir, '.fgos', 'assignments'), { recursive: true });
+  if (plans) { mkdirSync(join(dir, 'plans', 'a'), { recursive: true }); writeFileSync(join(dir, 'plans', 'a', 'plan.md'), '---\nstatus: todo\n---\n'); }
+  if (failing) {
+    mkdirSync(join(dir, '.fgos', 'assignments', 'bad'), { recursive: true });
+    writeFileSync(join(dir, '.fgos', 'assignments', 'bad', 'unit.json'), '{}');
+    writeFileSync(join(dir, '.fgos', 'assignments', 'bad', 'unit-summary.json'), JSON.stringify({ workflow: { activity: 'validate-plan' }, outcome: 'execution-failure' }));
+  }
+  return dir;
+}
+const sandbox = () => {
+  const home = mkdtempSync(join(tmpdir(), 'pbi-'));
+  return { home, env: { ...process.env, HOME: home, XDG_CONFIG_HOME: join(home, 'cfg'), XDG_STATE_HOME: join(home, 'state'), CLAUDE_HOME: join(home, 'claude'), PLAN_SUPERVISOR_NO_SYSTEMD: '1', PLAN_SUPERVISOR_STATE: '' } };
+};
+const sh = (file, args, env, cwd) => spawnSync('sh', [file, ...args], { env, cwd, encoding: 'utf8' });
+const node = (args, env, cwd) => spawnSync(process.execPath, [board, ...args], { env, cwd, encoding: 'utf8' });
+
+test('watch still alerts in a project that has no plans directory', () => {
+  const { home, env } = sandbox();
+  const p = project(home, 'noplans', { failing: true, plans: false });
+  const r = node(['watch'], env, p);
+  assert.equal(r.status, 4);
+  assert.match(r.stdout, /ALERT failed bad validate-plan execution-failure/);
+});
+
+test('two projects with the same folder name get separate state dirs', () => {
+  const { home, env } = sandbox();
+  const a = project(join(home, 'one'), 'app');
+  const b = project(join(home, 'two'), 'app');
+  node(['queue', 'add', '-', 'from first'], env, a);
+  node(['queue', 'add', '-', 'from second'], env, b);
+  assert.match(node(['queue', 'list'], env, a).stdout, /from first/);
+  assert.doesNotMatch(node(['queue', 'list'], env, a).stdout, /from second/);
+  assert.match(node(['queue', 'list'], env, b).stdout, /from second/);
+  assert.equal(readdirSync(join(home, 'state', 'plan-supervisor')).length, 2);
+});
+
+test('config sets per-project limits and eligible uses them; bad values are refused', () => {
+  const { home, env } = sandbox();
+  const p = project(home, 'cfg');
+  mkdirSync(join(p, 'plans', 'b'), { recursive: true });
+  writeFileSync(join(p, 'plans', 'a', 'plan.md'), '---\nstatus: todo\nfootprint: [x]\n---\n');
+  writeFileSync(join(p, 'plans', 'b', 'plan.md'), '---\nstatus: todo\nfootprint: [y]\n---\n');
+  node(['claim', 'a', 'leader-1'], env, p);
+  assert.doesNotMatch(node(['eligible'], env, p).stdout, /^b\t/m);          // default limit 1
+  assert.equal(node(['config', 'set', 'maxRunning', '2'], env, p).status, 0);
+  assert.match(node(['eligible'], env, p).stdout, /^b\t/m);
+  assert.equal(node(['config', 'set', 'maxRunning', '0'], env, p).status, 2);
+  assert.equal(node(['config', 'set', 'nope', '3'], env, p).status, 2);
+});
+
+test('doctor reports what a project still needs and exits 1 when a required check fails', () => {
+  const { home, env } = sandbox();
+  const p = project(home, 'raw');
+  const r = node(['doctor'], env, p);
+  assert.equal(r.status, 1);
+  assert.match(r.stdout, /TODO fgOS initialised in the project -> run `fgctl init`/);
+  assert.match(r.stdout, /warn todo plans declare footprint and base/);
+});
+
+test('install --add is additive, per project, and --remove disables the timer when none is left', () => {
+  const { home, env } = sandbox();
+  const a = project(home, 'alpha');
+  const b = project(home, 'beta');
+  assert.equal(sh(installSh, ['--add', a, '--max-running', '2'], env).status, 0);
+  assert.equal(sh(installSh, ['--add', b, '--stall-min', '5'], env).status, 0);
+  const list = readFileSync(join(home, 'cfg', 'plan-supervisor', 'projects'), 'utf8').trim().split('\n');
+  assert.deepEqual(list, [a, b]);                                             // second add kept the first
+  const unit = readFileSync(join(home, 'cfg', 'systemd', 'user', 'plan-supervisor-watchdog.service'), 'utf8');
+  assert.doesNotMatch(unit, /alpha|beta/);                                    // the unit names no project
+  assert.match(sh(installSh, ['--list'], env).stdout, /"maxRunning":2/);
+  assert.match(sh(installSh, ['--list'], env).stdout, /"stallMin":5/);
+  mkdirSync(join(a, '.fgos', 'assignments', 'late'), { recursive: true });    // a failure that appears after registration
+  writeFileSync(join(a, '.fgos', 'assignments', 'late', 'unit.json'), '{}');
+  writeFileSync(join(a, '.fgos', 'assignments', 'late', 'unit-summary.json'), JSON.stringify({ outcome: 'execution-failure' }));
+  assert.equal(sh(installSh, ['--add', a], env).status, 0);                   // idempotent, and keeps the baseline
+  assert.equal(node(['watch'], env, a).status, 4);                            // so the late failure is still reported
+  assert.equal(readFileSync(join(home, 'cfg', 'plan-supervisor', 'projects'), 'utf8').trim().split('\n').length, 2);
+  sh(installSh, ['--remove', a], env);
+  assert.deepEqual(readFileSync(join(home, 'cfg', 'plan-supervisor', 'projects'), 'utf8').trim().split('\n'), [b]);
+  assert.match(sh(installSh, ['--remove', b], env).stdout, /timer disabled/);
+  assert.notEqual(sh(installSh, ['--add', join(home, 'missing')], env).status, 0);
+  const noFgos = join(home, 'nofgos'); mkdirSync(noFgos);
+  assert.match(sh(installSh, ['--add', noFgos], env).stderr, /fgctl init/);
+});
+
+test('watchdog reads the registered list and alerts only for the project that failed', () => {
+  const { home, env } = sandbox();
+  const good = project(home, 'good');
+  const bad = project(home, 'bad', { failing: true });
+  sh(installSh, ['--add', good], env);
+  mkdirSync(join(bad, '.fgos', 'assignments', 'bad'), { recursive: true });
+  const listFile = join(home, 'cfg', 'plan-supervisor', 'projects');
+  writeFileSync(listFile, readFileSync(listFile, 'utf8') + bad + '\n');       // registered after its baseline: alerts are new
+  assert.equal(sh(watchdogSh, [], env).status, 0);
+  const alerts = (name) => join(home, 'state', 'plan-supervisor', name, 'alerts.log');
+  assert.ok(existsSync(alerts('bad')));
+  assert.match(readFileSync(alerts('bad'), 'utf8'), /ALERT failed bad validate-plan/);
+  assert.ok(!existsSync(alerts('good')));
+  sh(watchdogSh, [], env);
+  assert.equal(readFileSync(alerts('bad'), 'utf8').match(/ALERT/g).length, 1); // not repeated
 });

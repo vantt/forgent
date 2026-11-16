@@ -115,8 +115,7 @@ Under three real plans the numbers are observation only; do not redesign from th
 have not changed for 20 min while still live, is alerted once. Alerts go to `alerts.log` and the owner queue in the state
 dir, and as an fgOS mailbox message to the first live agent head of the project, which the Claude session shows through
 its hook (mail is "from another agent": never an approval). The machine has no display, so `notify-send` is not used.
-Add a project: append its path to `ExecStart` in the service file, run `watch --baseline` there first, then
-`systemctl --user daemon-reload`. Stop it: `systemctl --user disable --now plan-supervisor-watchdog.timer`.
+Add a project: `install.sh --add DIR` (additive; it also runs `plan-board.mjs doctor` and sets the baseline). Stop it: `systemctl --user disable --now plan-supervisor-watchdog.timer`.
 Checked on real pkm data: it flags the three 2026-11-16 failures (the `infra-exec-failed` validate, the orphan killed
 with its leader, the `independence-unsatisfiable` refusal) and nothing for passing runs.
 

@@ -4,4 +4,4 @@ Description=plan-supervisor watchdog (no LLM): alert on failed or stalled fgOS u
 [Service]
 Type=oneshot
 Environment=PATH=@NODE_DIR@:/usr/local/bin:/usr/bin:/bin
-ExecStart=/bin/sh @SCRIPTS@/watchdog.sh @PROJECTS@
+ExecStart=/bin/sh @SCRIPTS@/watchdog.sh
