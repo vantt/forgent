@@ -43,6 +43,17 @@ verification records, the measures) is in TSV/JSON files under `~/.local/state/p
 - **A sanctioned top-level launcher** for leader sessions. A confined `fgos run` seat cannot dispatch writers; a
   top-level `claude -p ... --allowedTools 'Bash(fgos:*)'` can call fgos but was never given a proper contract.
 
+## Parallel phases (measured after the note above)
+
+fgos-cook runs writing slices serially in a case, but cases are independent: one case per independent `ak:plan
+--parallel` phase, continued from one closed case with `--inherit`, ran two slices side by side with no clash (12 s
+wall against 24 s serial on a throwaway project; judge and validate done once). So the real driver can get write
+parallelism from cases today. What the platform should own: deciding the split from the plan's file ownership and
+dependency columns (the conductor now reads it by hand), starting the cases together, and the integration step, which is
+git by hand now (`approve` per branch, or an integration worktree) and needs a full-gate re-run on the combined tree.
+Open: a project gate that must hold on partial trees; short `--base` hashes are refused; what happens to the quota and
+CPU when several cases run real builds.
+
 ## How to judge the driving design later
 
 Run it on two more plans, with the measures in `tools/plan-supervisor/README.md`, before changing the flow. The

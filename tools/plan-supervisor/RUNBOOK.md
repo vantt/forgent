@@ -52,6 +52,26 @@ gate and the independent check all passed, milestones reached `integrated`, 3 of
 Note for the report: measure 7 ("unit + e2e + guide in the commit") encodes the pilot project's own rule; for a project
 with other rules read it as "which of these three the commit lacks", not as a verdict.
 
+## C2. Several phases of one plan at once (measured, 2026-11-16)
+`ak:plan --parallel` already gives what is needed: phases with strictly disjoint **file ownership** and a dependency
+column. fgos-cook runs writing slices one after another inside a case, but cases are independent, so run **one case per
+independent phase** and let each case have its own worktree:
+1. One case for the whole plan: `judge` and `validate` once (as in C), then `fgos workflow close` it.
+2. For each independent phase, a slice list of that phase only, `fgos workflow propose` with its own
+   `--worktree`/`--branch`. `propose` finds the closed case (same plan, same base commit) and **continues it**: the
+   `start` line carries `--inherit` and the judge and validate lines are gone. Use a full commit hash for `--base`
+   (an abbreviated one failed).
+3. Start every case, then dispatch the slices **together**. Two slices on a fresh project started in the same second,
+   ran 12 s each, wall 12 s against 24 s one after the other; no lock, refusal or reservation clash. Each case's gate
+   passed and reached `integrated` on its own. A one-family project uses `solo`, 2 deviations per case: one slice per case.
+4. A phase that depends on others waits, and starts from the merged result (new base, so a new case).
+5. Land the branches one after the other at the approve door, or merge them in an integration worktree. **Re-run the full
+   gate on the combined tree**: a branch that passes alone does not prove the merge. The project's single gate must also
+   hold on a tree that has only some phases (a gate that needs all files fails every partial case).
+The lanes cap of `plan-board.mjs` counts these concurrent dispatches. Not yet measured: a real project's cases
+competing for CPU (cargo builds), the quota of one account under several seats, and cases whose footprints turn out to
+overlap after all.
+
 ## D. Supervisor tick
 In a Claude session: "run one supervisor tick" (`SKILL.md`). It never starts a leader by itself in v0.
 
@@ -66,4 +86,5 @@ In a Claude session: "run one supervisor tick" (`SKILL.md`). It never starts a l
 | `gate-command-missing` | no gate declared | B4 |
 | `git-predecessor-writer-live` on `fgctl init` | init chained after git in one shell | run it alone |
 | a run failed and nobody knew | headless runs are silent | the watchdog (B7) |
+| `worktree create --base <short hash>` fails | abbreviated hash not accepted | use the full 40-character hash |
 | `closed` case still `running`, orphan reservation | fgOS gap, no clean-up verb | report it; do not rely on it |
