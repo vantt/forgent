@@ -40,8 +40,8 @@ canon() { (cd "$1" 2>/dev/null && pwd -P) || return 1; }
 install_skill() {
   command -v node >/dev/null || { echo "node is required" >&2; exit 1; }
   run mkdir -p "$DEST/scripts"
-  run cp "$HERE/SKILL.md" "$DEST/SKILL.md"
-  run cp "$HERE/scripts/plan-board.mjs" "$HERE/scripts/plan-board.test.mjs" "$HERE/scripts/watchdog.sh" "$DEST/scripts/"
+  run cp "$HERE/SKILL.md" "$HERE/RUNBOOK.md" "$DEST/"
+  run cp "$HERE/scripts/plan-board.mjs" "$HERE/scripts/plan-board.test.mjs" "$HERE/scripts/watchdog.sh" "$HERE/scripts/claude-only.sh" "$DEST/scripts/"
   run chmod +x "$DEST/scripts/watchdog.sh"
   echo "skill installed at $DEST"
 }

@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, utimesSync, existsSync, readdirSync } from 'node:fs';
+import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, utimesSync, existsSync, readdirSync, realpathSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -325,12 +325,16 @@ test('config sets per-project limits and eligible uses them; bad values are refu
 });
 
 test('doctor reports what a project still needs and exits 1 when a required check fails', () => {
-  const { home, env } = sandbox();
+  const { home, env: base } = sandbox();
+  const env = { ...base, CLAUDE_JSON: join(home, 'claude.json') };
   const p = project(home, 'raw');
   const r = node(['doctor'], env, p);
   assert.equal(r.status, 1);
   assert.match(r.stdout, /TODO fgOS initialised in the project -> run `fgctl init`/);
   assert.match(r.stdout, /warn todo plans declare footprint and base/);
+  assert.match(r.stdout, /TODO Claude Code trusts this folder -> open `claude` once/);
+  writeFileSync(join(home, 'claude.json'), JSON.stringify({ projects: { [realpathSync(p)]: { hasTrustDialogAccepted: true } } }));
+  assert.match(node(['doctor'], env, p).stdout, /ok +Claude Code trusts this folder/);
 });
 
 test('install --add is additive, per project, and --remove disables the timer when none is left', () => {

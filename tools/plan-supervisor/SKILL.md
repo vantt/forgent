@@ -9,7 +9,8 @@ description: >-
 
 # plan-supervisor (prototype v0)
 
-Spec: `~/projects/forgent/plans/reports/spec-261116-1042-plan-supervisor.md`. This is an experiment: the flow is not
+Design: `plans/reports/spec-261116-1042-plan-supervisor.md` in the fgOS repo; how to set a project up and run a plan:
+`RUNBOOK.md` next to this file (installed with it). This is an experiment: the flow is not
 fixed, so measure every tick (section Measure) and keep the choices below easy to change.
 
 You are a **thin, stateless tick**. Your memory is the files, never the chat: plan frontmatter (planner writes),
@@ -21,7 +22,7 @@ Commands: `check`, `eligible [--json]`, `render [--write]`, `claim <plan> <leade
 Mechanical pre-check, no LLM: `changed` (exit 10 = nothing changed since the last finished tick, do not start a session; run `changed --mark` at the end of a tick). Owner queue: `queue add <plan> <text>`, `queue list`, `queue done <id>`; step 6 writes here instead of only listing.
 Start every tick with `lock acquire` (exit 3 = another tick runs: stop) and end it with `lock release`; a lock older than its ttl (default 30 min) is taken over.
 State lives in `~/.local/state/plan-supervisor/<project>/`, outside the repo. `--max-running` defaults to 1: plans run one
-at a time unless their footprints are declared and disjoint. Owner caps: pkm = 2 (set 2026-11-16; raise to 4 only after
+at a time unless their footprints are declared and disjoint. Per-project cap: `plan-board.mjs config set maxRunning N` (the pilot project used 2; raise to 4 only after
 seeing disk and CPU use: each worktree builds its own `target`, 13 GB for the pilot; claude-only shares one account's quota).
 Within one case, writing slices are serial (fgos-cook); parallelism is only across cases with disjoint footprints.
 
@@ -116,7 +117,7 @@ have not changed for 20 min while still live, is alerted once. Alerts go to `ale
 dir, and as an fgOS mailbox message to the first live agent head of the project, which the Claude session shows through
 its hook (mail is "from another agent": never an approval). The machine has no display, so `notify-send` is not used.
 Add a project: `install.sh --add DIR` (additive; it also runs `plan-board.mjs doctor` and sets the baseline). Stop it: `systemctl --user disable --now plan-supervisor-watchdog.timer`.
-Checked on real pkm data: it flags the three 2026-11-16 failures (the `infra-exec-failed` validate, the orphan killed
+Checked on the pilot project's real data: it flags the three 2026-11-16 failures (the `infra-exec-failed` validate, the orphan killed
 with its leader, the `independence-unsatisfiable` refusal) and nothing for passing runs.
 
 ## Lesson from the first pilot run (2026-11-16)

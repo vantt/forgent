@@ -14,15 +14,19 @@ Hand-off for the fgOS refactor: `plans/reports/note-261116-1503-plan-supervisor-
 | `scripts/plan-board.mjs` | plan index and everything a tick needs: `check`, `eligible`, `render`, `claim`, `release`, `lock`, `changed`, `queue`, `health`, `watch`, `config`, `doctor`, `verify`, `event`, `sessions`, `report`. Node only, no dependencies. 23 tests: `node --test scripts/plan-board.test.mjs` |
 | `scripts/watchdog.sh` | runs `watch` on projects; alerts to `alerts.log`, the owner queue and an fgOS mailbox message |
 | `systemd/` | user timer templates for the watchdog |
+| `RUNBOOK.md` | **how to set a project up and run a plan**, with the failures each step comes from |
+| `scripts/claude-only.sh` | keep one project on the claude family only (and what that costs) |
 | `install.sh` | copy the skill to `~/.claude/skills/plan-supervisor`, optionally enable the timer for some projects |
 
 ## Use on one or more projects
+
+Full steps and pitfalls: `RUNBOOK.md`. Short version:
 
 One machine, any number of projects: one systemd user timer runs the watchdog every 3 minutes over every registered
 project, one after the other (cost grows linearly: a `node` start per project per run). Per project, state is in
 `~/.local/state/plan-supervisor/<folder>/` (a short path hash is added if two projects share a folder name).
 
-1. In each project: `fgctl init`, then declare its whole-tree gate
+1. In each project: `fgctl init`, trust the folder once in Claude Code (`claude`, accept the prompt), then declare its whole-tree gate
    `fgos config set 'runner.capabilities.code:implement.verify' '<command>' --reason "<why>"`.
 2. `tools/plan-supervisor/install.sh --add /path/to/project [--max-running N] [--stall-min N]`
    (`--dry-run` first). It prints a readiness check for the project (`plan-board.mjs doctor`: fgOS initialised, gate
