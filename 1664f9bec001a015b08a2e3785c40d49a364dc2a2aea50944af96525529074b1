@@ -1,0 +1,1 @@
+MAIL -> RULE: need-ack proof case A (sent 22:30:50). Case A: ack within the 10 min deadline with --reply-to <this id>. Case B: wait until after the deadline, then ack with --reply-to. Case C: do not answer. This message is case A; act as you agreed, you decide.

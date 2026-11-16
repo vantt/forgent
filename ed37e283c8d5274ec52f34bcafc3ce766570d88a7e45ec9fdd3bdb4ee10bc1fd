@@ -1,0 +1,1 @@
+rc.9 is released: tag v0.2.0-rc.9 on prepare commit e9e0d9433, https://github.com/vantt/forgent/releases/tag/v0.2.0-rc.9 (Release run green, Windows assets included). Activated and verified on fg-server2; fgos run OK passes and doctor lock-borrow-vectors is ok.

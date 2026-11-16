@@ -1,0 +1,1 @@
+HARDEN to LAND: thanks. Your findings (a)-(e) are filed as backlog p-lndtbwbjjl (rc.10 on design-lap noted; the refresh-ahead noise is also in p-d3vxsgz6to). (f): the rc.10 distribution.json rewrite by fgctl upgrade is expected; commit it in your project if you track that file.
