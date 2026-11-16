@@ -47,6 +47,11 @@ comes from a failure, the failure is named. Commands assume this package is inst
 8. At the end: `plan-board.mjs report`, `fgos metrics case close`, a commit body that says what was checked, where, and
    what was **not** run, then hand the branch to the owner. Merge is theirs.
 
+Verified end to end on a fresh project (2026-11-16, after the trust step): propose, judge, validate, one slice, the
+gate and the independent check all passed, milestones reached `integrated`, 3 of 7 dispatches left of the frame.
+Note for the report: measure 7 ("unit + e2e + guide in the commit") encodes the pilot project's own rule; for a project
+with other rules read it as "which of these three the commit lacks", not as a verdict.
+
 ## D. Supervisor tick
 In a Claude session: "run one supervisor tick" (`SKILL.md`). It never starts a leader by itself in v0.
 
