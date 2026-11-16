@@ -10,7 +10,7 @@ Session làm việc dài nên tốn token vì context tích luỹ. Muốn: chủ
 hàng đợi cần-quyết để duyệt), còn plan đã lập sẵn thì tự được đẩy đi đúng lịch bằng các session ngắn, mỗi session bắt đầu
 từ trạng thái trên đĩa chứ không từ trí nhớ.
 
-## 2. Năm vai
+## 2. Sáu vai (năm vai chốt đầu, thêm watchdog sau pilot; hiện trạng ở §13)
 
 | Vai | Sống | Làm | Không làm |
 |---|---|---|---|
@@ -19,6 +19,7 @@ từ trạng thái trên đĩa chứ không từ trí nhớ.
 | **Supervisor** | Sống lâu về danh tính; mỗi lượt là session mới | Quét chỉ mục, bật leader, thay leader chết, đẩy việc cần-quyết lên hàng đợi | Đổi nội dung plan, duyệt merge, tag |
 | **Leader** | Một plan; thay được giữa chừng | `fgos-cook` nguyên bản: đọc cả plan, mở case, chia slice, kiểm, tích hợp | Merge, sửa trạng thái plan |
 | **Worker** | Một slice | Do leader quyết, theo flow `fgos run` | (chủ dự án không cần thấy tầng này) |
+| **Watchdog** (thêm sau pilot) | Tiến trình cơ học, không LLM, chạy theo timer | Dò lượt chạy hỏng hoặc treo, báo qua mailbox, `alerts.log` và hàng đợi | Quyết định gì, bật gì, sửa gì |
 
 ## 3. Ràng buộc đã đọc từ fgOS (đổi thiết kế so với bản thảo luận)
 
@@ -156,7 +157,7 @@ chuỗi, **chạy tay supervisor trước** (chủ dự án gõ lệnh một lư
 Để có sớm cho pkm, bản thử chạy từ `~/.claude/skills/plan-supervisor/`. Từ 2026-11-16 mã nguồn của nó nằm ở
 `tools/plan-supervisor/` (cài bằng `install.sh`); chưa là skill của fgOS, chưa qua render và kiểm gốc repo. Ghi chú
 cho phiên refactor: `plans/reports/note-261116-1503-plan-supervisor-driver-for-refactor.md`. (Số test và lệnh đã tăng
-sau đó: 17 test, thêm `health`, `watch`, `verify`, `event`, `sessions`, `report`.) Trạng thái slice: S1 xong (script + `check`/`render`), S4 bản
+sau đó: 27 test, thêm `health`, `watch`, `config`, `doctor`, `verify`, `event`, `sessions`, `report`; hiện trạng đầy đủ ở §13.) Trạng thái slice: S1 xong (script + `check`/`render`), S4 bản
 tay xong (skill, chưa có hàng đợi dạng file), S0/S2/S3 hoãn. Cùng ngày: `fgctl init` đã chạy trong pkm (v0.2.0-rc.10); `fgos workflow propose` chạy được trên plan pilot `261115-2140-packaging-followups` (phase 1, 3, 4; phase 2 là CI ở repo ngoài, để chủ dự án): ba slice đều rigor `high`, khung 12 lượt/7 lượt ghi, nên plan pkm đi đường nặng (`fgos-cook`). Phát hiện: khoá cấu hình cổng là `runner.capabilities.code:implement.verify`. Chưa mở case thật (cần chủ dự án duyệt khung).
 **S0 (kết quả):** `fgos run "<prompt>" --pattern solo` mở được một session Claude sạch, chạy nền, khoảng 17 giây, outcome
 `pass`, nhưng **bị giam (bwrap)**: hợp cho lượt supervisor (chỉ đọc, không dispatch), không hợp cho leader (worker bị
@@ -166,6 +167,9 @@ test xanh, 9 test); bộ kiểm cơ học không LLM và lịch vẫn hoãn. **a
 (`skills: [ak:cook]`, đã khai trong config máy), không làm leader; thêm vào danh sách đo.
 
 ## 12. Đo và quan sát (bắt buộc, làm từ slice đầu)
+
+> **Cập nhật 2026-11-16:** token bị bỏ (fgOS không ghi token, không có hạ tầng). Bộ đo thật là bảy thước ở §13.3; bảng dưới
+> là kế hoạch ban đầu, giữ để so.
 
 Mục đích: rút kinh nghiệm từ vận hành thật để chọn flow tốt nhất, vì fgOS còn đổi. Dùng sẵn công cụ quan sát của fgOS,
 không dựng hệ đo riêng:
@@ -198,3 +202,55 @@ Cách làm kỷ luật:
    định dạng chỉ mục đều là tham số hoặc một lớp nhỏ, không rải khắp mã. Khi fgOS chuyển sang workflow, phần phải đổi
    là các điểm nối này, không phải cả thiết kế.
 5. Không tối ưu sớm: số liệu dưới 3 mẫu chỉ để quan sát, không dùng để đổi thiết kế.
+
+## 13. Hiện trạng sau pilot (cập nhật 2026-11-16)
+
+Mã và hướng dẫn nằm ở `tools/plan-supervisor/` (README, `RUNBOOK.md`, `SKILL.md`); ghi chú cho phiên refactor:
+`plans/reports/note-261116-1503-plan-supervisor-driver-for-refactor.md`; ma sát đã gặp:
+`plans/reports/review-261116-1313-plan-supervisor-pilot-friction.md`. Pilot: ba phase của một plan thật (pkm), cộng một
+dự án thử mới. Đây là một mẫu: chỉ cho xu hướng.
+
+### 13.1 Vai trò thực tế
+- **Người điều phối** (một session Claude) làm cả phần leader lẫn phần supervisor: đọc plan, `propose`, chạy các dòng
+  lệnh, tự kiểm sau mỗi slice. Leader headless bằng `claude -p` đã thử một lần, lỗi im lặng, chưa dựng lại.
+- **Watchdog** là vai thêm: timer systemd người dùng chạy `watchdog.sh` mỗi 3 phút trên mọi project đã đăng ký
+  (`install.sh --add/--remove/--list`); đã kiểm trên dữ liệu thật (bắt đúng ba sự cố của pilot).
+- **Planner** chưa là vai riêng: người điều phối sửa plan khi `validate-plan` chỉ ra lệch code (phase 3 và 4 của pilot).
+- **Shaper** và sửa `fgos-coding-shaping` (§9) chưa làm.
+
+### 13.2 Quyết định đã chốt
+- **Trần theo làn, không theo plan.** Một làn = một lượt chạy đang sống; plan đang chạy dùng số reservation sống của case
+  (tối thiểu 1). Plan sẵn sàng được nhận theo thứ tự ưu tiên tới khi hết làn, footprint phải tách nhau. `maxLanes` (tên cũ
+  `maxRunning`). Pkm đặt 2.
+- **Song song bằng case, không bằng cook.** Cook chạy slice ghi nối tiếp trong một case; vì vậy mỗi phase độc lập của
+  `ak:plan --parallel` là một case, một worktree; judge và validate chạy một lần rồi `--inherit`. Đo: hai slice cùng bắt
+  đầu trong một giây, 12 s so với 24 s nối tiếp, không tranh chấp. Cổng phải chạy lại trên cây đã gộp. Phase phụ thuộc
+  chờ. Chưa đo: build thật chạy đồng thời, hạn mức của một tài khoản, footprint hoá ra giao nhau.
+- **Một họ AI (claude-only) có giá:** `reviewed` bị từ chối (`independence-unsatisfiable`), `solo` tính là lệch và mỗi case
+  chỉ cho 2 lần (`deviation-limit-reached`), nên một case một slice. `scripts/claude-only.sh` áp cấu hình theo project.
+- **Thang tự động hoá supervisor:** nấc 0 gõ tay (hiện tại); nấc 1 theo timer chỉ báo cáo, mở session chỉ khi `changed`
+  thấy chỉ mục đổi (chỉ đáng khi thường có từ 3 plan chờ trở lên); nấc 2 tự chạy `propose` và đưa câu hỏi duyệt khung vào
+  hàng đợi (sau ≥3 plan thật tỉ lệ lỗi thấp); nấc 3 tự bật leader trong ngân sách đã duyệt, chỉ plan nhẹ, không merge
+  (cần bộ khởi chạy leader chính thống, trần chi phí, số liệu). Chưa lên nấc nào.
+- **Cài đặt:** một timer cho nhiều project, danh sách đăng ký cộng dồn; `doctor` kiểm project sẵn sàng (fgOS, gate, tin
+  tưởng thư mục của Claude Code, plan, footprint/base); trạng thái ở `~/.local/state/plan-supervisor/<thư mục>/`.
+
+### 13.3 Bảy thước đo (không token)
+Hoàn tất (mốc case, độ dài transcript); thời gian từ giao việc tới kết quả đã kiểm tách worker / lượt hỏng / kiểm lại /
+chờ chủ dự án; can thiệp theo loại và thời gian chờ; bám phạm vi (đường dẫn phải mở rộng, lời worker bị phép kiểm
+mâu thuẫn); lỗi của plan do validate bắt, theo loại; độ trễ phát hiện lỗi; qua cổng ngay lần kiểm đầu và có đủ unit, e2e,
+hướng dẫn trong commit (đọc từ git; phản ánh luật của project thử). `plan-board.mjs report`. Mù: lượt bị từ chối ngay lúc
+nhận và lượt mồ côi không có tóm tắt; thời gian chờ của chủ dự án mới đo từ hàng đợi.
+
+### 13.4 Số liệu của pilot (pkm, ba phase, một người điều phối)
+Ba slice qua phép kiểm độc lập (902 test pass ở phase 3; fmt và clippy sạch; đủ unit, e2e và hướng dẫn trong commit).
+Validate bắt 5 lỗi của plan (3 giả định sai, 2 thiếu chi tiết). Hai trong ba slice phải mở rộng phạm vi ghi vì footprint của
+plan thiếu test và README. Lỗi đầu tiên ở chạy nền không ai biết trong 42,6 phút (anh phát hiện). 9 lần can thiệp,
+phần lớn là duyệt cổng. Độ dài transcript của session điều phối: 4,2 MB, so với 44 và 48 MB của hai session dài khác
+trong cùng project (chỉ số gần đúng, transcript của worker không có trong số đó).
+
+### 13.5 Việc còn mở (không làm ở đây)
+`fgos-coding-shaping` chế độ thoát "giao planner" (§9, thuộc repo này, qua quy trình của nó); supervisor chạy theo lịch (thang
+ở trên); bộ khởi chạy leader; chạy song song với build thật; đưa gói thành skill chính thức của fgOS (render, kiểm gốc
+repo) nếu số liệu nhiều mẫu đáng; con trỏ trong backlog hoặc bảng chương trình (chưa chèn: kiểm đối chiếu của backlog
+đang đỏ sẵn và một dòng `proposed` mới cần thêm mục đối chiếu).
