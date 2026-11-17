@@ -294,7 +294,7 @@ runner:
             kind: omp
     deepseek:
       kind: agent
-      description: "DeepSeek provider via pi CLI, OpenRouter gateway account. --provider omitted -- account dir has a single provider (openrouter). Same account dir also serves other OpenRouter-hosted models (e.g. glm-cli's z-ai route uses a different account/mechanism); --model alone selects deepseek/* here. pi-herdr-openrouter runs the same pi account in a confined herdr pane."
+      description: "DeepSeek provider via pi CLI, OpenRouter gateway account. --provider omitted -- account dir has a single provider (openrouter). Same account dir also serves other OpenRouter-hosted models (e.g. glm-cli's z-ai route uses a different account/mechanism); --model alone selects deepseek/* here. pi-herdr-bwrap runs the same pi account in a confined herdr pane."
       allowCrossProvider: true
       providerModel: deepseek
       invocations:
