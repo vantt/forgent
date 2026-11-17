@@ -5,8 +5,8 @@ discussion: open
 ## 1. Trạng thái hiện tại
 
 Round 2 (2026-11-17). Point 1: draft persona presented (does / never does, see §5); owner chose that Miu orders
-topics itself by the product priority list and reports the order (candidate D-ID, holds one more round). Now asking
-when Miu rotates its own session. No D-ID minted yet.
+topics itself by the product priority list and reports the order (candidate D-ID, holds one more round). Rotation:
+owner rejected "owner types /clear" (forgets often), so rotation must be automatic; now discussing the right moment. No D-ID minted yet.
 
 ## 2. Mục tiêu & đề bài
 
@@ -22,7 +22,7 @@ sessions, not in the secretary's chat.
 
 | # | Point | State |
 |---|---|---|
-| 1 | Persona content and protocol (does / never does) | discussing. Provisionally clear: Miu orders topics itself and reports (owner, round 2). Open: session rotation trigger |
+| 1 | Persona content and protocol (does / never does) | discussing. Provisionally clear: Miu orders topics itself and reports (owner, round 2). Open: rotation must be automatic (owner, round 3); right moment and signal under discussion |
 | 2 | Placement and activation (`core/agents/secretary.yaml`, `claude --agent secretary` in herdr, opening shaper tabs) | open |
 | 3 | Domain classification without Work (reuse fgos-clarifying; default when a domain has no shaper) | open |
 | 4 | Token saving (3x always-loaded rules, model choice, short agent results, peer mail only on decisions) | open, needs owner approval |
@@ -45,6 +45,11 @@ sessions, not in the secretary's chat.
   (except topic list), run tests, land, discuss a topic in depth itself, know any domain's steps. Asked who orders
   topics. Owner: "Miu tự xếp thứ tự rồi báo lại anh." (Miu orders by product priority, reports; asks only on a tie or
   when a reorder delays something promised.)
+- 2026-11-17 — Miu asked when to rotate (milestones / every N topics / never). Owner asked what the right method is.
+  Miu scouted: SessionStart hook matcher `startup|resume|clear|compact` in `.claude/settings.json`; herdr
+  `tab`/`pane run`/`pane close`; Miu cannot type `/clear` itself. Proposed (A) owner `/clear` + handoff updated
+  every state-changing turn, (B) self-rotation via herdr later. Owner: "không đồng ý, anh còn quên miết, đưa thêm
+  thảo luận: thời điểm phù hợp để đổi phiên." -> rotation must not depend on the owner.
 
 ## 6. Thiết kế đã chốt {#design}
 
