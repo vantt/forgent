@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "51045784b2625cc21091c09c55d0294679bd728851c36381a92622a74fd53d4c",
+  "payloadDigest": "2e6faf3b468a05e9eecf328f958b018b06f1ae4a510eab7944c14db977712f10",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "a5629383f89b4488b252a62f0ea86463e649e33e0a891db1a19af2cd6c136aca",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -1032,7 +1032,7 @@
     "src/runner/dispatch/assignment-runner.mjs": "9d8c1c970b7cde74e46cb535db114d529c32a7c31337091161466964ba8f129a",
     "src/runner/dispatch/assignment.mjs": "44d721e6e0eaf0e60ee484203382ebc50c3d4f6dc886dcbb7b1bec399497c1e7",
     "src/runner/dispatch/brief.mjs": "c51d5398653cd6f839c2902134e627e57af7911b473fe16904478919c2d95e14",
-    "src/runner/dispatch/cli.mjs": "298d19fd6c5c15c9034bcd79471eec307c804340fa2b3c8349fc3f368879c1a7",
+    "src/runner/dispatch/cli.mjs": "4a0b1ed8bfe2dd026985005e80dc8b8fbef8d8a2132f9e2052a8568d491153b3",
     "src/runner/dispatch/config.mjs": "ba70b5f9d94a9be84bba8cc4d0892f0d2216a86062cfe8da8fb393da66ff7705",
     "src/runner/dispatch/confinement/attestation-store.mjs": "25aeaef901e6c331ec84de3f4e072224d3f14c77775ba46fe6b91348ad795805",
     "src/runner/dispatch/confinement/authority.mjs": "2dc70a6d42306184aff303c8a1c565d6a30d87892f57427b5487a2944dd2a727",
@@ -1049,7 +1049,7 @@
     "src/runner/dispatch/evidence-attribution.mjs": "e286beb61bc988049d44645db9a7a0900ba2431132ce694861ac7c43390b229f",
     "src/runner/dispatch/execution-contract.mjs": "a5b5160f4fb82aa885a961b8f6f66f353a8d455a0ab46a1bd2fe84f527e16e53",
     "src/runner/dispatch/executor-governance.mjs": "8e8f93d957741e107b0e38630d7b0816209019234c93c95140113b231e18f73e",
-    "src/runner/dispatch/herdr-round.mjs": "0afea1970b2d39f429eeb141bcdd1635165adfe079fb919c0c0c5be28929c9a5",
+    "src/runner/dispatch/herdr-round.mjs": "e5570ff9ea2527a9bbbeb17256cfac54c015aab65c8cfa138cb1f01967af0316",
     "src/runner/dispatch/hook.mjs": "32e97b8f6a652b2d02346d59e8c3924021acade166102a7fb5fe757aefdbfc89",
     "src/runner/dispatch/llm-accounts.mjs": "f8d1015b1e9adab52286ef2a871db21c66811ecb9b31c17f1074e34a75b63343",
     "src/runner/dispatch/mechanism.mjs": "18ffe81e94a42ca290de501777f0383c1505772c3e6254363ea101469c31cf30",
@@ -3662,7 +3662,7 @@
     {
       "path": "src/runner/dispatch/assignment-runner.mjs",
       "line": 972,
-      "spawn": "prepareTerminalAttempt -> src/runner/dispatch/herdr-round.mjs:401",
+      "spawn": "prepareTerminalAttempt -> src/runner/dispatch/herdr-round.mjs:405",
       "binary": "(env FGOS_HERDR_BIN)",
       "class": "configured-binary"
     },

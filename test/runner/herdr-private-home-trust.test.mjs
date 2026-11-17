@@ -436,4 +436,21 @@ test('claude: a composed home trusts the working directory and every directory t
 test('a directory granted with --add-dir is found in the argv, up to the next option', () => {
   assert.deepEqual(addDirsOf(['--model', 'sonnet', '--add-dir', '/a', '/b', '--settings', '{}']), ['/a', '/b']);
   assert.deepEqual(addDirsOf(['--model', 'sonnet']), []);
+  assert.deepEqual(addDirsOf(['--add-dir=/x', '--model', 'sonnet', '--add-dir', '/y']), ['/x', '/y']);
+});
+
+test('claude: with no private config directory the operator store gets the working directory only, never a granted run directory', () => {
+  const { real } = realClaudeStore();
+  const runDir = path.join(ROOT, '.fgos', 'assignments', 'unit-1', 'producer', '1', 'runs', '01');
+  const notes = [];
+  const round = { trustWritten: false, note: (patch) => notes.push(patch) };
+
+  seedWorkspaceTrust({
+    trustStore: { kind: 'claude-json', path: real }, round, cwd: WORKSPACE, repoRoot: ROOT,
+    fullEnv: {}, workerEnv: null, alsoTrust: [runDir],
+  });
+
+  assert.equal(readTrust(real, WORKSPACE), true, 'the working directory is seeded as before');
+  assert.equal(readTrust(real, runDir), null, 'a unique run directory is not added to the operator store');
+  assert.ok(notes.some((n) => n.trustSkipped === 'add-dir' && n.dirs[0] === runDir), 'the skipped grant is noted by name');
 });

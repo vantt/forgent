@@ -223,7 +223,11 @@ export function seedWorkspaceTrust({ trustStore, round, cwd, repoRoot, fullEnv, 
   const stores = trustStorePaths({ trustStore, fullEnv, workerEnv, accountSource });
   // The working directory and every directory the agent is granted with `--add-dir`: claude asks about each
   // one it has not seen, keyed by exact path, so a granted directory left out stops the seat at a dialog.
-  for (const dir of [cwd, ...alsoTrust]) {
+  // Only into a private home: every run directory is unique and a claude entry is never taken back, so in
+  // the person's own store each run would leave a permanent entry. There a dialog is reported by name instead.
+  const granted = stores.target !== stores.root ? alsoTrust : [];
+  if (alsoTrust.length > 0 && granted.length === 0) round.note({ trustSkipped: 'add-dir', dirs: alsoTrust });
+  for (const dir of [cwd, ...granted]) {
     const projectPath = path.resolve(dir);
     const roots = trustRoots(projectPath, repoRoot ?? path.dirname(projectPath));
     let firstError = null;

@@ -133,12 +133,15 @@ function withAddDirs(args, directories) {
  * asks for folder trust on each of them, so a pane that is given them must trust them first.
  */
 export function addDirsOf(args) {
-  const at = Array.isArray(args) ? args.indexOf('--add-dir') : -1;
-  if (at < 0) return [];
+  if (!Array.isArray(args)) return [];
   const dirs = [];
-  for (const value of args.slice(at + 1)) {
-    if (typeof value !== 'string' || value.startsWith('-')) break;
-    dirs.push(value);
+  let variadic = false;
+  for (const value of args) {
+    if (typeof value !== 'string') { variadic = false; continue; }
+    if (value === '--add-dir') { variadic = true; continue; }
+    if (value.startsWith('--add-dir=')) { dirs.push(value.slice('--add-dir='.length)); variadic = false; continue; }
+    if (value.startsWith('-')) { variadic = false; continue; }
+    if (variadic) dirs.push(value);
   }
   return dirs;
 }
