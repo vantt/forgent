@@ -23,7 +23,6 @@ import {
   getBackendDriver,
 } from "../../src/runner/dispatch/confinement/backend-registry.mjs";
 import { establishConfinement } from "../../src/runner/dispatch/herdr-round.mjs";
-import { DEFAULT_CAPABILITY_SLOTS } from "../../src/setup/registrations.mjs";
 import { DispatchError } from "../../src/runner/dispatch/transport.mjs";
 import { loadAttestationRecord } from "../../src/runner/dispatch/confinement/attestation-store.mjs";
 import { resolveCapabilityIdentityDetails } from "../../src/runner/work-compat.mjs";
@@ -853,13 +852,3 @@ test("R6 / F-d: establishConfinement returns confined: false, status: unconfined
   fs.rmSync(tmpBase, { recursive: true, force: true });
 });
 
-// ─── R7: DEFAULT_CAPABILITY_SLOTS Explicit Confinement Policies ────────────────
-
-test("R7: read-only DEFAULT_CAPABILITY_SLOTS use the explicit interim unconfined posture until P06 wires backends", () => {
-  const unconfinedSlots = ["advise", "code:review", "code:debug"];
-  for (const name of unconfinedSlots) {
-    const slot = DEFAULT_CAPABILITY_SLOTS[name];
-    assert.ok(slot, `slot "${name}" must exist`);
-    assert.equal(slot.confinement?.mode, "unconfined", `${name} must have unconfined mode`);
-  }
-});

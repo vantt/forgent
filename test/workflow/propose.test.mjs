@@ -130,7 +130,7 @@ test('a proposal that does not match the repository is refused by name, with no 
     [[slice('a', ['src/a.mjs']), slice('b', ['src/a.mjs'])], 'write-overlap'],
     [[slice('a', ['src/missing/new.mjs'])], 'write-path-missing'],
     [[slice('a', ['src/a.mjs'], { raise: { rigor: 'low', reason: 'cheap' } })], 'slice-rigor-below-table'],
-    [[slice('a', ['src/a.mjs'], { followUp: { capability: 'no-such-capability', pattern: 'solo' } })], 'capability-unregistered'],
+    [[slice('a', ['src/a.mjs'], { followUp: { capability: 'impact-analysis', pattern: 'solo' } })], 'capability-tool-unserved'],
     [[slice('a', ['src/a.mjs'], { inputs: ['plans/p/absent.md'] })], 'input-missing'],
     [[slice('a', ['src/a.mjs'], { objective: '--sneaky' })], 'slice-invalid'],
     [[slice('a', ['src/a.mjs,src/b.mjs'])], 'slice-invalid'],

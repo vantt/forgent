@@ -117,25 +117,25 @@ test('--json omitted (default) prints a human-readable report naming each unit\'
   assert.match(result.stdout, /coding implementation/i);
 });
 
-test('a hard finding (unregistered capability) exits 1, --json reports ok:false', () => {
+test('a hard finding (a tool ability no tool executor serves) exits 1, --json reports ok:false', () => {
   const cwd = tmpCwd();
-  const rel = writePlan(cwd, 'plan.md', `- unit: apply the fix\n  capability: code:teleport\n`);
+  const rel = writePlan(cwd, 'plan.md', `- unit: apply the fix\n  capability: impact-analysis\n`);
   const result = run(cwd, ['plan-lint', rel, '--json']);
   assert.equal(result.status, 1, result.stderr);
   const data = envelopeData(result.stdout);
   assert.equal(data.ok, false);
   assert.equal(data.findings.length, 1);
-  assert.equal(data.findings[0].code, 'capability.unregistered');
+  assert.equal(data.findings[0].code, 'capability.tool-unserved');
   assert.equal(data.findings[0].severity, 'hard');
 });
 
 test('default readable output on a failing plan says FAILED and lists the finding', () => {
   const cwd = tmpCwd();
-  const rel = writePlan(cwd, 'plan.md', `- unit: apply the fix\n  capability: code:teleport\n`);
+  const rel = writePlan(cwd, 'plan.md', `- unit: apply the fix\n  capability: impact-analysis\n`);
   const result = run(cwd, ['plan-lint', rel]);
   assert.equal(result.status, 1, result.stderr);
   assert.match(result.stdout, /FAILED -- hard findings present/);
-  assert.match(result.stdout, /HARD capability\.unregistered/);
+  assert.match(result.stdout, /HARD capability\.tool-unserved/);
 });
 
 test('a warn-only finding (unresolved) still exits 0', () => {
@@ -154,7 +154,7 @@ test('--cell scopes the result to only the matching unit', () => {
   const rel = writePlan(
     cwd,
     'plan.md',
-    `- unit: I18 — plan lint hardening\n  capability: code:implement\n- unit: I19 — catalog serves\n  capability: code:teleport\n`,
+    `- unit: I18 — plan lint hardening\n  capability: code:implement\n- unit: I19 — catalog serves\n  capability: impact-analysis\n`,
   );
   const result = run(cwd, ['plan-lint', rel, '--cell', 'I18', '--json']);
   assert.equal(result.status, 0, result.stderr);

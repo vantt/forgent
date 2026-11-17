@@ -5,6 +5,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
 import { validateRunnerConfigShape } from '../../src/runner/dispatch/config.mjs';
+import { buildConfinementRequest } from '../../src/runner/dispatch/confinement/request.mjs';
 import {
   BUILTIN_POLICIES,
   BUILTIN_POLICY_IDS,
@@ -513,6 +514,16 @@ test('Strict mode: passes when capability declares valid built-in policy or mode
       advise: { description: 'advising', confinement: { mode: 'unconfined' } },
     },
   }), 'test'));
+});
+
+test('Strict mode: a seat whose capability has no row declaring confinement (a label) is refused at launch, by name', () => {
+  const runDir = fs.mkdtempSync(path.join(os.tmpdir(), 'strict-label-'));
+  const cfg = { confinement: { strict: true }, capabilities: { advise: { confinement: { mode: 'unconfined' } } } };
+  const launch = (capability, config) => buildConfinementRequest({ capability, executorId: 'claude', cfg: config, context: { cwd: runDir, repoRoot: runDir, runDir } });
+  assert.throws(() => launch('council:frame', cfg), /strict mode.*"council:frame".*confinement-policy-missing/);
+  assert.equal(launch('advise', cfg).requirement.mode, 'unconfined', 'a row that declares confinement still launches');
+  assert.equal(launch('council:frame', { ...cfg, confinement: { strict: false } }).requirement.mode, 'unconfined', 'outside strict mode a label launches unconfined');
+  fs.rmSync(runDir, { recursive: true, force: true });
 });
 
 test('L6: Non-strict mode rejects mode:required referencing a nonexistent policy', () => {

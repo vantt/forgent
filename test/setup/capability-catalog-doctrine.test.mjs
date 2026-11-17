@@ -10,7 +10,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { test } from 'node:test';
 
-import { DEFAULT_CAPABILITY_SLOTS } from '../../src/setup/registrations.mjs';
+import { readStandardValue } from '../../src/config/facade.mjs';
 import { compileDispatchPlan } from '../../src/runner/dispatch/plan.mjs';
 import { bindable } from '../helpers/work-seat-config.mjs';
 import { seedStubAgentClis } from '../helpers/agent-clis.mjs';
@@ -23,21 +23,26 @@ const CATALOG_PATH = path.join(SHARED_DIR, 'capability-catalog.md');
 const PLANNING_PATH = path.join(SHARED_DIR, 'planning-capability-awareness.md');
 const DISPATCH_PATH = path.join(SHARED_DIR, 'executor-dispatch-fallback.md');
 
-// ─── P2-foundation: curated catalog never pins provider/model/executor ───
+// The standard's capability rows, the one catalog a fresh project starts from.
+const STANDARD_CAPABILITIES = JSON.parse(JSON.stringify(readStandardValue('runner.capabilities').value));
 
-test('P2-runtime capability slots are registered with no provider/model/executor pin', () => {
-  for (const name of ['code:review', 'code:test', 'code:debug', 'code:refactor']) {
-    const entry = DEFAULT_CAPABILITY_SLOTS[name];
-    assert.ok(entry, `DEFAULT_CAPABILITY_SLOTS is missing "${name}"`);
-    assert.ok(!entry.prefer && !entry.overrides, `"${name}" must never carry prefer/overrides`);
-    assert.equal(typeof entry.description, 'string');
-    assert.ok(entry.description.trim().length > 0);
-  }
+// ─── The standard holds jobs and tool abilities; business names are labels ───
+
+test('the standard declares only the generic jobs, the tool abilities and the coding rows the Work path and skills route through', () => {
+  const jobs = ['advise', 'execute', 'review'];
+  const toolAbilities = ['impact-analysis', 'pane-labeling'];
+  // Kept as debt until the coding rows' behaviour gets its own home: the Work executing step, the reviewer item,
+  // the discovery step's `coding:discover` unit, and the names the coding skills ask decide for.
+  const codingDebt = [
+    'fgos-coding-implement', 'code:implement', 'code:review', 'code:test', 'code:debug', 'code:refactor',
+    'docs:write', 'coding:discover', 'coding:*', 'code:*',
+  ];
+  assert.deepEqual(Object.keys(STANDARD_CAPABILITIES).sort(), [...jobs, ...toolAbilities, ...codingDebt].sort());
 });
 
-// ─── I19: `serves` on the curated catalog, and the new "review" slot ───
+// ─── I19: `serves` on the catalog ───
 
-test('every DEFAULT_CAPABILITY_SLOTS entry declares a "serves" attribute set matching capability-matching.md\'s doctrine table', () => {
+test('the standard\'s job and coding rows declare the "serves" attribute set capability-matching.md\'s doctrine table gives them', () => {
   const expected = {
     advise: { outputKind: 'decision', mutates: false },
     execute: { outputKind: 'change', mutates: true },
@@ -50,28 +55,8 @@ test('every DEFAULT_CAPABILITY_SLOTS entry declares a "serves" attribute set mat
     'code:refactor': { outputKind: 'change', domain: 'code', mutates: true, behaviorPreserving: true },
   };
   for (const [name, serves] of Object.entries(expected)) {
-    const entry = DEFAULT_CAPABILITY_SLOTS[name];
-    assert.ok(entry, `DEFAULT_CAPABILITY_SLOTS is missing "${name}"`);
-    assert.deepEqual(entry.serves, serves, `"${name}".serves`);
-  }
-});
-
-test('"review" is a new curated slot with no prefer/overrides pin, same discipline as every other curated default', () => {
-  const entry = DEFAULT_CAPABILITY_SLOTS.review;
-  assert.ok(entry, 'DEFAULT_CAPABILITY_SLOTS is missing "review"');
-  assert.ok(!entry.prefer && !entry.overrides, '"review" must never carry prefer/overrides');
-  assert.equal(typeof entry.description, 'string');
-  assert.ok(entry.description.trim().length > 0);
-});
-
-test('no two DEFAULT_CAPABILITY_SLOTS entries declare the identical "serves" attribute set', () => {
-  const signatures = new Map();
-  for (const [name, entry] of Object.entries(DEFAULT_CAPABILITY_SLOTS)) {
-    if (!entry.serves) continue;
-    const signature = JSON.stringify(Object.fromEntries(Object.entries(entry.serves).sort(([a], [b]) => a.localeCompare(b))));
-    const prior = signatures.get(signature);
-    assert.ok(!prior, `"${prior}" and "${name}" declare the identical serves attribute set`);
-    signatures.set(signature, name);
+    assert.ok(STANDARD_CAPABILITIES[name], `the standard is missing "${name}"`);
+    assert.deepEqual(STANDARD_CAPABILITIES[name].serves, serves, `"${name}".serves`);
   }
 });
 
