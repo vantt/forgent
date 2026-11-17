@@ -302,13 +302,13 @@ second-order question, or apply the logic to something the panel did not cover?
 
 ## 9. A Fresh Session Can Resume Through The Registered Workflow
 
-Evaluate whether evidence and unresolved decisions remain available through Workflow-owned records and the registered skill boundary. Do not score a session.md ledger, hand-run graph or coordinator reading raw run-state as if those were the registered runtime. The actor does not resume the Workflow itself; Workflow resume and human gates are the owning doors. Evidence: core/skills/fgos-architecture-panel/SKILL.md:17-37; core/workflows/architecture-advisory.yaml:78-84.
+Evaluate whether evidence and unresolved decisions remain available through Workflow-owned records and the registered skill boundary. Do not score a session.md ledger, hand-run graph or coordinator reading raw run-state as if those were the registered runtime. The actor does not resume the Workflow itself; Workflow resume and human gates are the owning doors. Evidence: core/skills/fgos-architecture-panel/SKILL.md:17-37; domains/council/workflows/architecture-advisory.yaml:78-84.
 
 Evidence must preserve pending decisions, attributed findings and reversibility; losing a local terminal is not completion or approval.
 
 ## 10. Independence Is Material, Not A Decorative Model Roster
 
-Evaluate whether the fixed shaping seats offer materially different system, alternative and constraint lenses and whether independent final-packet checks preserve dissent. Actor/model selection is governed by configuration and bind(), not a hand-written roster or manual run record. Evidence: core/workflows/architecture-advisory.yaml:18-64; core/skills/fgos-architecture-panel/SKILL.md:17-24.
+Evaluate whether the fixed shaping seats offer materially different system, alternative and constraint lenses and whether independent final-packet checks preserve dissent. Actor/model selection is governed by configuration and bind(), not a hand-written roster or manual run record. Evidence: domains/council/workflows/architecture-advisory.yaml:18-64; core/skills/fgos-architecture-panel/SKILL.md:17-24.
 
 Model/provider diversity alone is not proof of cognitive independence; report its demonstrated effect and limits without inventing live routing evidence.
 
@@ -401,6 +401,6 @@ for the declared human close, approval of advice, or permission to implement.
 - **Volume of alternatives.** Three real candidates beat six with three escorts.
 - **Protocol conformance.** This manual quality rubric is not a runtime
   conformance gate. The architecture-advisory Workflow and skill already ship
-  (`core/workflows/architecture-advisory.yaml`, `core/skills/fgos-architecture-panel/SKILL.md`).
+  (`domains/council/workflows/architecture-advisory.yaml`, `core/skills/fgos-architecture-panel/SKILL.md`).
   Compare advice quality on the same case without treating this rubric as a
   required score the registered runtime must pass; conformance alone is not quality.

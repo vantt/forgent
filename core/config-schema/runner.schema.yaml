@@ -38,6 +38,28 @@ properties:
     type: object
     additionalProperties:
       $ref: "#/$defs/capability"
+  roles:
+    description: "Per-role tier and executor taste, for every capability; a role is producer, synthesizer, reviewer, red-team or judge."
+    type: object
+    additionalProperties: false
+    x-fgos-scope: project-only
+    properties:
+      producer:
+        $ref: "#/$defs/taste"
+      synthesizer:
+        $ref: "#/$defs/taste"
+      reviewer:
+        $ref: "#/$defs/taste"
+      red-team:
+        $ref: "#/$defs/taste"
+      judge:
+        $ref: "#/$defs/taste"
+  personas:
+    description: "Per-persona tier and executor taste, for every capability, by bare persona name."
+    type: object
+    x-fgos-scope: project-only
+    additionalProperties:
+      $ref: "#/$defs/taste"
   modelPolicies:
     description: "The model each family uses at each tier, by family then tier.\nTier ladder, weakest first:\nnano: mechanical, no reasoning; self-check: only recognizes or transforms by pattern?; e.g. classify, extract, format, route, vote\nmini: light reasoning over the given input, narrow scope; self-check: enough information, only understand and summarize?; e.g. summarize, answer from a given document, small exact fix, review a small diff\nstandard: follows an existing plan, many steps; self-check: is there a plan with detailed instructions?; e.g. code to a plan, write tests, refactor as described\nadvanced: finds its own way, no ready answer; self-check: must investigate and decide how?; e.g. hard debugging, complex code, many files with no plan\nflagship: judgment, design, critique; self-check: is the result an opinion or a design?; e.g. review, red-team, solution design, panel synthesis\nfrontier: the costliest decisions; self-check: hard to reverse, costly if wrong?; e.g. architecture lock-in, final synthesis of an important council"
     type: object
@@ -414,8 +436,8 @@ $defs:
       - description: "A non-empty list of entries."
         type: array
         minItems: 1
-  seatTaste:
-    description: "The tier and executors one role, persona or seat prefers."
+  taste:
+    description: "The tier and executors one role or persona prefers."
     type: object
     additionalProperties: false
     properties:
@@ -535,34 +557,6 @@ $defs:
         x-fgos-scope: project-only
       maxTier:
         $ref: "#/$defs/tierName"
-        x-fgos-scope: project-only
-      roles:
-        description: "Per-role tier and executor taste; a role is producer, synthesizer, reviewer, red-team or judge."
-        type: object
-        additionalProperties: false
-        properties:
-          producer:
-            $ref: "#/$defs/seatTaste"
-          synthesizer:
-            $ref: "#/$defs/seatTaste"
-          reviewer:
-            $ref: "#/$defs/seatTaste"
-          red-team:
-            $ref: "#/$defs/seatTaste"
-          judge:
-            $ref: "#/$defs/seatTaste"
-        x-fgos-scope: project-only
-      personas:
-        description: "Per-persona tier and executor taste."
-        type: object
-        additionalProperties:
-          $ref: "#/$defs/seatTaste"
-        x-fgos-scope: project-only
-      seats:
-        description: "Per-seat tier and executor taste."
-        type: object
-        additionalProperties:
-          $ref: "#/$defs/seatTaste"
         x-fgos-scope: project-only
   adapterName:
     description: "The adapters that can spawn an executor."

@@ -9,11 +9,11 @@ import path from 'node:path';
 import { parseYaml } from '../../src/util/yaml.mjs';
 
 import { validateWorkflow } from '../../src/workflow/definition.mjs';
-import { loadWorkflow, discoverWorkflows } from '../../src/workflow/loader.mjs';
+import { loadWorkflow, loadWorkflowWithSource, discoverWorkflows } from '../../src/workflow/loader.mjs';
 
 test('delphi.yaml schema validation & discovery', () => {
-  const filePath = path.resolve('core/workflows/delphi.yaml');
-  assert.ok(fs.existsSync(filePath), 'core/workflows/delphi.yaml must exist');
+  const filePath = path.resolve('domains/council/workflows/delphi.yaml');
+  assert.ok(fs.existsSync(filePath), 'domains/council/workflows/delphi.yaml must exist');
 
   const content = fs.readFileSync(filePath, 'utf8');
   const raw = parseYaml(content);
@@ -64,8 +64,8 @@ test('delphi.yaml schema validation & discovery', () => {
 });
 
 test('nominal-group.yaml schema validation & discovery', () => {
-  const filePath = path.resolve('core/workflows/nominal-group.yaml');
-  assert.ok(fs.existsSync(filePath), 'core/workflows/nominal-group.yaml must exist');
+  const filePath = path.resolve('domains/council/workflows/nominal-group.yaml');
+  assert.ok(fs.existsSync(filePath), 'domains/council/workflows/nominal-group.yaml must exist');
 
   const content = fs.readFileSync(filePath, 'utf8');
   const raw = parseYaml(content);
@@ -112,8 +112,8 @@ test('nominal-group.yaml schema validation & discovery', () => {
 });
 
 test('group-cognition.yaml schema validation & discovery', () => {
-  const filePath = path.resolve('core/workflows/group-cognition.yaml');
-  assert.ok(fs.existsSync(filePath), 'core/workflows/group-cognition.yaml must exist');
+  const filePath = path.resolve('domains/council/workflows/group-cognition.yaml');
+  assert.ok(fs.existsSync(filePath), 'domains/council/workflows/group-cognition.yaml must exist');
 
   const content = fs.readFileSync(filePath, 'utf8');
   const raw = parseYaml(content);
@@ -196,4 +196,15 @@ test('critique checkers of business-discussion read the supplied artifact, not t
       assert.ok(text.includes('{objective}'), `${id} ${role} must carry the unit objective`);
     }
   }
+});
+
+test('the seven councils ship in the council domain and keep their workflow ids', () => {
+  const councils = ['architecture-advisory', 'architecture-advisory-reopen', 'business-discussion', 'council-lite', 'delphi', 'group-cognition', 'nominal-group'];
+  for (const id of councils) {
+    const { workflow, source } = loadWorkflowWithSource(id);
+    assert.equal(workflow.id, id);
+    assert.equal(source.owningDomain, 'council', id);
+    assert.equal(source.sourcePath, path.resolve('domains/council/workflows', `${id}.yaml`), id);
+  }
+  assert.equal(fs.existsSync(path.resolve('domains/council/registry.yaml')), false, 'council is not a Work domain');
 });

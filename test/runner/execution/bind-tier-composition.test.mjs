@@ -14,3 +14,10 @@ test('a workflow seat recommendation names the workflow, the unit and the seat, 
   assert.deepEqual(workflowTierOf(seat, { id: 'shape-proposals' }), { tier: 'frontier', source: 'workflow:shape-proposals/system' });
   assert.equal(workflowTierOf({ seat: 'system' }, { id: 'shape-proposals' }, 'architecture-advisory'), undefined);
 });
+
+test('a workflow unit recommendation covers every seat the unit runs and loses to the seat own tier', () => {
+  const unit = { id: 'review-it', tier: 'flagship' };
+  assert.deepEqual(workflowTierOf({ seat: 'producer' }, unit, 'wf'), { tier: 'flagship', source: 'workflow:wf/review-it' });
+  assert.deepEqual(workflowTierOf({ seat: 'red-team' }, unit), { tier: 'flagship', source: 'workflow:review-it' });
+  assert.deepEqual(workflowTierOf({ seat: 'system', tier: 'frontier' }, unit, 'wf'), { tier: 'frontier', source: 'workflow:wf/review-it/system' });
+});

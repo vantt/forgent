@@ -14,7 +14,7 @@ import { spawnSync, execFileSync } from 'node:child_process';
 import { loadRunnerConfigForDir, validateRunnerConfigShape } from '../../src/runner/dispatch/config.mjs';
 import { RunnerConfigError } from '../../src/runner/dispatch/runner-config-error.mjs';
 import { resolveExecutorCommand, resolveExecutorEnv, DispatchError, DEFAULT_ADAPTER, EXECUTOR_ADAPTERS } from '../../src/runner/dispatch/transport.mjs';
-import { decideDispatchMechanism, decideExecutorDispatchMechanism } from '../../src/runner/dispatch/mechanism.mjs';
+import { decideDispatchMechanism } from '../../src/runner/dispatch/mechanism.mjs';
 import { resolveAgentTypeForTaskSpec } from '../../src/runner/dispatch/cli.mjs';
 import { decideExecutorCli } from '../../src/runner/dispatch/decide.mjs';
 import { validateProviderAccountInventory, ProviderCapacityConfigError } from '../../src/runner/dispatch/provider-capacity.mjs';
@@ -505,13 +505,6 @@ test('resolveExecutorCommand never requires allowCrossProvider for the named "cl
   const cfg = claudeExecutorCfg();
   assert.equal(cfg.executors.claude.allowCrossProvider, undefined);
   assert.doesNotThrow(() => resolveExecutorCommand(cfg, { prompt: 'hello', model: 'sonnet', tier: 'standard', executorId: 'claude' }));
-});
-
-test('lookupExecutor resolves "claude" as a literal registered executor id (tsk-1cn: no longer configured:false)', () => {
-  const cfg = claudeExecutorCfg();
-  const resolved = lookupExecutor(cfg, 'claude');
-  assert.equal(resolved.configured, true);
-  assert.equal(resolved.executorId, 'claude');
 });
 
 test('EXECUTOR_ADAPTERS registers adapters: cli-spawn (default) and herdr-spawn', () => {
@@ -1308,56 +1301,6 @@ test('decideDispatchMechanism: forceCliSpawn wins over native mechanism + live T
   assert.equal(decideDispatchMechanism({ hasNativeMechanism: true, hasLiveTaskAccess: true, forceCliSpawn: true }), 'out-of-process');
 });
 
-// --- decideExecutorDispatchMechanism — executors.<id>-specific convenience,
-// derives hasNativeMechanism/forceCliSpawn from cfg.executors[executorId]
-// without touching resolveExecutorConfig's own resolution path ---
-
-test('decideExecutorDispatchMechanism resolves to in-process for a kind:"task" executor when the caller declares live Task access', () => {
-  const cfg = {
-    executor: { command: 'claude', args: ['{prompt}'] },
-    executors: { 'judge-discovery': { kind: 'agent', agentType: 'judge' } },
-    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
-    timeoutMs: 5000,
-  };
-  assert.equal(decideExecutorDispatchMechanism(cfg, 'judge-discovery', { hasLiveTaskAccess: true }), 'in-process');
-});
-
-test('decideExecutorDispatchMechanism falls back to out-of-process for a kind:"task" executor when the caller has no live Task access', () => {
-  const cfg = {
-    executor: { command: 'claude', args: ['{prompt}'] },
-    executors: { 'judge-discovery': { kind: 'agent', agentType: 'judge' } },
-    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
-    timeoutMs: 5000,
-  };
-  assert.equal(decideExecutorDispatchMechanism(cfg, 'judge-discovery', { hasLiveTaskAccess: false }), 'out-of-process');
-  assert.equal(decideExecutorDispatchMechanism(cfg, 'judge-discovery'), 'out-of-process');
-});
-
-test('decideExecutorDispatchMechanism respects a executor\'s own forceCliSpawn override even with live Task access', () => {
-  const cfg = {
-    executor: { command: 'claude', args: ['{prompt}'] },
-    executors: { 'judge-discovery': { kind: 'agent', agentType: 'judge', forceCliSpawn: true } },
-    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
-    timeoutMs: 5000,
-  };
-  assert.equal(decideExecutorDispatchMechanism(cfg, 'judge-discovery', { hasLiveTaskAccess: true }), 'out-of-process');
-});
-
-test('decideExecutorDispatchMechanism always resolves out-of-process for a kind:"tool" executor, regardless of live Task access (D5, tsk-in1-4: mechanical/never-native, even one that DOES dispatch via a real command — "agent" is the only native-eligible kind)', () => {
-  const cfg = {
-    executor: { command: 'claude', args: ['{prompt}'] },
-    executors: { 'submit-assist-classify': { kind: 'tool', invocations: [{ id: 'submit-assist-classify-cli', via: 'cli', command: 'agy', args: ['{prompt}'] }],  allowCrossProvider: true } },
-    modelPolicies: { agy: { nano: 'flash-3.5', standard: 'flash-3.5' }, node: { nano: 'flash-3.5', standard: 'flash-3.5' } },
-    timeoutMs: 5000,
-  };
-  assert.equal(decideExecutorDispatchMechanism(cfg, 'submit-assist-classify', { hasLiveTaskAccess: true }), 'out-of-process');
-});
-
-test('decideExecutorDispatchMechanism resolves out-of-process for an unconfigured executor, regardless of live Task access', () => {
-  const cfg = { executor: { command: 'claude', args: ['{prompt}'] }, modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } }, timeoutMs: 5000 };
-  assert.equal(decideExecutorDispatchMechanism(cfg, 'no-such-executor', { hasLiveTaskAccess: true }), 'out-of-process');
-});
-
 // --- decideExecutorCli — the "decide <executorId>" CLI-facing async
 // function, with a repoRoot that skips the git lookup ---
 
@@ -2103,15 +2046,6 @@ test('resolveExecutorCommand never triggers the carries gate for a executor that
 // --- lookupExecutor and purposeSeatOf: a name is looked up as an executor id first, and a purpose
 // (a capability row name) is answered by what serves it -- a tool's live probe, else Seat Binding -------
 
-test('lookupExecutor resolves a literal executorId directly -- the deep-customization escape hatch', () => {
-  const cfg = { executors: { agy: { kind: 'agent', invocations: [{ id: 'agy-cli', via: 'cli', command: 'agy' }]} } };
-  const result = lookupExecutor(cfg, 'agy');
-  assert.equal(result.executorId, 'agy');
-  assert.equal(result.executor, cfg.executors.agy);
-  assert.ok(!Object.hasOwn(result, 'overrides'));
-  assert.equal(result.configured, true);
-});
-
 test('lookupExecutor never binds a purpose, neither through a capability prefer nor through an executor\'s own "for"', () => {
   const cfg = {
     executors: { 'totally-unrelated-name': { kind: 'agent', invocations: [{ id: 'totally-unrelated-name-cli', via: 'cli', command: 'agy' }], for: ['review'] }, agy: { kind: 'agent', invocations: [{ id: 'agy-cli', via: 'cli', command: 'agy' }]} },
@@ -2122,12 +2056,6 @@ test('lookupExecutor never binds a purpose, neither through a capability prefer 
     assert.equal(result.executorId, null);
     assert.equal(result.configured, false);
   }
-});
-
-test('lookupExecutor returns configured:false, executorId:null when nothing resolves -- a legitimate state, never thrown', () => {
-  const result = lookupExecutor({}, 'no-such-purpose-or-id');
-  assert.equal(result.executorId, null);
-  assert.equal(result.configured, false);
 });
 
 const PURPOSE_MODELS = { claude: { standard: 'sonnet' }, gemini: { standard: 'gemini-flash' } };

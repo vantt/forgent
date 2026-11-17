@@ -547,13 +547,13 @@ mod tests {
                 .filter(|row| row.owner.kind == OwnerKind::Bridge && row.owner.label == step)
                 .count()
         };
-        assert_eq!(registry.rows.len(), 109);
+        assert_eq!(registry.rows.len(), 110);
         assert_eq!(
             (count("S5"), count("S6a"), count("S6b"), count("S7")),
             (8, 31, 6, 8)
         );
-        assert_eq!(registry.row_ids(OwnerKind::Native).len(), 56);
-        assert_eq!(registry.fixes.len(), 27);
+        assert_eq!(registry.row_ids(OwnerKind::Native).len(), 57);
+        assert_eq!(registry.fixes.len(), 28);
         assert_eq!(registry.fix_ids(OwnerKind::Bridge).len(), 5);
     }
 

@@ -14,7 +14,7 @@ import { seedFileLocalBwrapRegistry } from '../confinement-registry-fixture.help
 import { seedStubAgentClis, stubAgentCliDir } from '../../helpers/agent-clis.mjs';
 
 seedFileLocalBwrapRegistry();
-seedStubAgentClis('claude', 'codex', 'omp', 'pi');
+seedStubAgentClis('claude', 'codex', 'omp', 'pi', 'agy');
 
 // The project config names the pools its tier cells use; the account inventory that pays for
 // them lives in the machine-global config, so the test declares the one pool the cells name.
@@ -30,7 +30,7 @@ const executors = runnerConfig.executors;
 const NEEDS_PRIVATE_HOME = new Set(['openai', 'gemini', 'xai', 'deepseek']);
 
 const headless = { headless: true };
-const ask = (capability, writes = []) => ({ unit: { id: 'u', capability, writes }, role: writes.length ? 'producer' : 'reviewer' });
+const ask = (capability, writes = []) => ({ unit: { id: 'u', capability, writes }, role: 'producer' });
 
 function invocationOf(binding) {
   return executors[binding.executor].invocations.find((inv) => inv.id === binding.invocation);
@@ -110,6 +110,13 @@ test('a Workflow capability with no prefer pool takes the families the tier list
   assert.equal(result.executor, 'gemini', 'the first family of tierFallback.advanced that can serve the seat');
 });
 
+test('the committed config\'s reviewer order applies to a reviewer seat of any capability', () => {
+  const result = bind({ unit: { id: 'u', capability: 'coding:no-pool-declared', writes: [] }, role: 'reviewer' }, { runnerConfig, session: headless });
+  assert.ok(!result.refused, JSON.stringify(result.refused));
+  assert.equal(result.provenance.executor.source, 'roles.reviewer.prefer');
+  assert.equal(result.executor, 'xai', 'the first family of runner.roles.reviewer the machine can serve');
+});
+
 test('with no tier list either, a capability with no prefer pool is refused with a structured reason, never guessed', () => {
   const capability = 'coding:no-pool-declared';
   const result = bind(ask(capability), { runnerConfig: { ...runnerConfig, tierFallback: undefined }, session: headless });
@@ -122,7 +129,7 @@ test('a capability gets the same family and model inside herdr and headless; onl
   // pane one ran claude inside herdr and fell to the next family headless.
   for (const capability of ['architecture:explain', 'business:frame', 'architecture:synthesize']) {
     for (const rigor of ['low', 'standard', 'high', 'critical']) {
-      const unitAsk = { unit: { id: 'u', capability, writes: [], rigor }, role: 'reviewer' };
+      const unitAsk = { unit: { id: 'u', capability, writes: [], rigor }, role: 'producer' };
       const pane = bind(unitAsk, { runnerConfig, session: { herdrPresent: true } });
       const cli = bind(unitAsk, { runnerConfig, session: headless });
       assert.ok(!pane.refused && !cli.refused, `${capability}/${rigor}: ${JSON.stringify(pane.refused ?? cli.refused)}`);

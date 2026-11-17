@@ -47,26 +47,22 @@ fn validate(config: &Config) -> Result<(), Refusal> {
                 "prefer must not be empty",
             ));
         }
-        for role in entry.roles.0.keys() {
-            if !ROLES.contains(&role.as_str()) {
-                return Err(invalid(
-                    &format!("{base}.roles.{role}"),
-                    &format!("unknown role; the roles are {}", ROLES.join(", ")),
-                ));
-            }
+    }
+    for role in config.roles.0.keys() {
+        if !ROLES.contains(&role.as_str()) {
+            return Err(invalid(
+                &format!("roles.{role}"),
+                &format!("unknown role; the roles are {}", ROLES.join(", ")),
+            ));
         }
-        for (group, scopes) in [
-            ("roles", &entry.roles),
-            ("personas", &entry.personas),
-            ("seats", &entry.seats),
-        ] {
-            for (name, scope) in &scopes.0 {
-                if scope.prefer.as_ref().is_some_and(Vec::is_empty) {
-                    return Err(invalid(
-                        &format!("{base}.{group}.{name}.prefer"),
-                        "prefer must not be empty",
-                    ));
-                }
+    }
+    for (group, scopes) in [("roles", &config.roles), ("personas", &config.personas)] {
+        for (name, scope) in &scopes.0 {
+            if scope.prefer.as_ref().is_some_and(Vec::is_empty) {
+                return Err(invalid(
+                    &format!("{group}.{name}.prefer"),
+                    "prefer must not be empty",
+                ));
             }
         }
     }
@@ -93,35 +89,37 @@ struct Resolved {
     source: String,
 }
 
+/// The persona table entry, then the role table entry: taste that applies to every capability.
+fn taste<'a>(config: &'a Config, persona: Option<&str>, role: Role) -> Vec<(String, &'a Scope)> {
+    let mut found = Vec::new();
+    if let Some(name) = persona {
+        if let Some(scope) = config.personas.0.get(name) {
+            found.push((format!("personas.{name}"), scope));
+        }
+    }
+    if let Some(scope) = config.roles.0.get(role.name()) {
+        found.push((format!("roles.{}", role.name()), scope));
+    }
+    found
+}
+
 /// Step 1 of the tier rule: the first declared value of the §6.3 `tier` column.
 fn resolve_tier(
     config: &Config,
     capability: &str,
-    seat: &str,
     persona: Option<&str>,
     role: Role,
     workflow: Option<&WorkflowTier>,
 ) -> Resolved {
-    let found = entries(config, capability);
-    let scoped = |pick: &dyn Fn(&CapabilityEntry) -> Option<&Scope>, group: &str, name: &str| {
-        found.iter().find_map(|(path, entry)| {
-            pick(entry)
-                .and_then(|scope| scope.tier)
-                .map(|tier| Resolved {
-                    tier,
-                    source: format!("{path}.{group}.{name}.tier"),
-                })
+    if let Some(hit) = taste(config, persona, role)
+        .into_iter()
+        .find_map(|(path, scope)| {
+            scope.tier.map(|tier| Resolved {
+                tier,
+                source: format!("{path}.tier"),
+            })
         })
-    };
-    if let Some(hit) = scoped(&|e| e.seats.0.get(seat), "seats", seat) {
-        return hit;
-    }
-    if let Some(name) = persona {
-        if let Some(hit) = scoped(&|e| e.personas.0.get(name), "personas", name) {
-            return hit;
-        }
-    }
-    if let Some(hit) = scoped(&|e| e.roles.0.get(role.name()), "roles", role.name()) {
+    {
         return hit;
     }
     if let Some(recommended) = workflow {
@@ -130,6 +128,7 @@ fn resolve_tier(
             source: recommended.source.clone(),
         };
     }
+    let found = entries(config, capability);
     if let Some(hit) = found.iter().find_map(|(path, entry)| {
         entry.tier.map(|tier| Resolved {
             tier,
@@ -160,30 +159,17 @@ fn resolve_max(config: &Config, capability: &str) -> Option<(Tier, String)> {
 fn resolve_prefer(
     config: &Config,
     capability: &str,
-    seat: &str,
     persona: Option<&str>,
     role: Role,
     tier: Tier,
 ) -> (Vec<Prefer>, String) {
+    if let Some((path, list)) = taste(config, persona, role)
+        .into_iter()
+        .find_map(|(path, scope)| scope.prefer.clone().map(|list| (path, list)))
+    {
+        return (list, format!("{path}.prefer"));
+    }
     let found = entries(config, capability);
-    let scoped = |pick: &dyn Fn(&CapabilityEntry) -> Option<&Scope>, group: &str, name: &str| {
-        found.iter().find_map(|(path, entry)| {
-            pick(entry)
-                .and_then(|scope| scope.prefer.clone())
-                .map(|list| (list, format!("{path}.{group}.{name}.prefer")))
-        })
-    };
-    if let Some(hit) = scoped(&|e| e.seats.0.get(seat), "seats", seat) {
-        return hit;
-    }
-    if let Some(name) = persona {
-        if let Some(hit) = scoped(&|e| e.personas.0.get(name), "personas", name) {
-            return hit;
-        }
-    }
-    if let Some(hit) = scoped(&|e| e.roles.0.get(role.name()), "roles", role.name()) {
-        return hit;
-    }
     if let Some(hit) = found.iter().find_map(|(path, entry)| {
         entry
             .prefer
@@ -233,17 +219,9 @@ pub fn policy(ask: &Ask, config: &Config) -> Result<Policy, Refusal> {
     validate(config)?;
 
     let capability = ask.capability.as_str();
-    let seat = ask.seat.as_str();
     let persona = ask.selectors.persona.as_deref().or(ask.persona.as_deref());
 
-    let resolved = resolve_tier(
-        config,
-        capability,
-        seat,
-        persona,
-        ask.role,
-        ask.workflow.as_ref(),
-    );
+    let resolved = resolve_tier(config, capability, persona, ask.role, ask.workflow.as_ref());
     let max = resolve_max(config, capability);
 
     // A persona an override names that lifts the tier above the answer without it is a raise.
@@ -252,7 +230,6 @@ pub fn policy(ask: &Ask, config: &Config) -> Result<Policy, Refusal> {
         let base = resolve_tier(
             config,
             &ask.capability,
-            &ask.seat,
             ask.persona.as_deref(),
             ask.role,
             ask.workflow.as_ref(),
@@ -316,8 +293,7 @@ pub fn policy(ask: &Ask, config: &Config) -> Result<Policy, Refusal> {
         .filter(|workflow| workflow.source != resolved.source)
         .cloned();
 
-    let (prefer, prefer_source) =
-        resolve_prefer(config, capability, seat, persona, ask.role, final_tier);
+    let (prefer, prefer_source) = resolve_prefer(config, capability, persona, ask.role, final_tier);
 
     let tier_fallback = config
         .tier_fallback
@@ -351,7 +327,6 @@ pub fn policy(ask: &Ask, config: &Config) -> Result<Policy, Refusal> {
         prefer_source,
         tier_fallback,
         cells,
-        seat_tier_path: format!("{}.seats.{seat}.tier", cap_path(capability)),
         effective_rigor: ask.effective_rigor,
         ask: ask.clone(),
     })

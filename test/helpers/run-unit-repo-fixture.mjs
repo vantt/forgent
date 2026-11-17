@@ -150,6 +150,8 @@ export function reviewedConfig(repoRoot, executorNames) {
   const prefer = executorNames.map((executor) => ({ executor }));
   cfg.runner.capabilities['docs:write'] = { prefer, rigor: 'standard', tier: 'standard' };
   cfg.runner.capabilities['docs:review'] = { prefer, persona: 'code-reviewer', rigor: 'standard', tier: 'standard' };
+  // The standard's red-team order names real families; the fixture's own executors take that seat instead.
+  cfg.runner.roles = { 'red-team': { prefer } };
   cfg.runner.defaultExecutor = executorNames[0];
   writeProjectConfig(repoRoot, cfg);
 }

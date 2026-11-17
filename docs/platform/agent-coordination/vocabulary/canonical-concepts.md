@@ -167,7 +167,7 @@ it is not a Job. See the retained
 
 ### Persona
 
-A behavioral viewpoint supplied to a Unit template or advisory seat, not a persisted SessionActor identity. The registered advisory framing/explanation templates use persona: advisor (core/workflows/architecture-advisory.yaml:14-17,71-74).
+A behavioral viewpoint supplied to a Unit template or advisory seat, not a persisted SessionActor identity. The registered advisory framing/explanation templates use persona: advisor (domains/council/workflows/architecture-advisory.yaml:14-17,71-74).
 
 ### Stance
 
@@ -183,4 +183,4 @@ A proposed structured communication envelope. This is an engine-independent desi
 
 ### Synthesis
 
-A recommendation that preserves alternatives, evidence and attributed dissent. The registered architecture-advisory synthesis template specifies the RAW JSON packet and independent reviewer/red-team checks (core/workflows/architecture-advisory.yaml:43-64).
+A recommendation that preserves alternatives, evidence and attributed dissent. The registered architecture-advisory synthesis template specifies the RAW JSON packet and independent reviewer/red-team checks (domains/council/workflows/architecture-advisory.yaml:43-64).

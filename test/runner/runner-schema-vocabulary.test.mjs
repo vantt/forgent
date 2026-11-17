@@ -33,7 +33,7 @@ test('the schema lists the adapters, loops, rigors, tiers, efforts, seat roles a
   assert.deepEqual(defs.tierEntry.properties.effort.enum, [...REASONING_EFFORT_VALUES]);
   assert.deepEqual(defs.executorEntry.properties.supports.properties.reasoningEffort.items.enum, [...REASONING_EFFORT_VALUES]);
   assert.deepEqual(defs.declaredSeat.properties.role.enum, [...SEAT_ROLES]);
-  assert.deepEqual(Object.keys(defs.capability.properties.roles.properties), [...SEAT_ROLES]);
+  assert.deepEqual(Object.keys(schema.properties.roles.properties), [...SEAT_ROLES]);
   assert.deepEqual(defs.executorEntry.properties.carries.enum, [...EXECUTOR_CARRIES]);
 });
 

@@ -227,7 +227,7 @@ function lookupTiers(options, workflow) {
 }
 
 /**
- * Model taste (`tier`, `prefer`) belongs to a seat, not to a persona: a persona file that names one is refused,
+ * Model taste (`tier`, `prefer`) belongs to the project config, not to a persona file: a persona file that names one is refused,
  * and the refusal says where it goes. `rigor` stays a plain field of the persona and no seat choice reads it.
  *
  * @param {object|null} data a parsed definition (see readAgentDefinition)
@@ -236,7 +236,7 @@ function lookupTiers(options, workflow) {
 export function personaModelTasteProblem(data) {
   const field = ['tier', 'prefer'].find((key) => isPlainObject(data) && Object.hasOwn(data, key));
   if (field === undefined) return null;
-  return `persona-model-taste-not-allowed: "${field}" is a model choice and a persona does not make one; set it at capabilities.<cap>.personas.<name> in the runner config`;
+  return `persona-model-taste-not-allowed: "${field}" is a model choice and a persona does not make one; set it at runner.personas.<name> in the runner config`;
 }
 
 /**

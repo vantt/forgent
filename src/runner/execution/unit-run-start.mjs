@@ -25,7 +25,7 @@ import { CaseAdmissionRefusedError, PORT_MISSING } from './case-admission-port.m
 import { assertPinnedAccountsUsable } from './account-pin.mjs';
 import { agentCliMissingRefusal } from './bind.mjs';
 import { simulateUnitBindings } from './dry-bind.mjs';
-import { assertNoSeatTier, effectiveRigorOf, SeatResolutionError } from './seat-resolver.mjs';
+import { assertNoSeatTier, assertNoUnitTier, effectiveRigorOf, SeatResolutionError } from './seat-resolver.mjs';
 import { isSeatRecord, collaborationOfRecord } from './legacy-seat-read.mjs';
 import { loopRunsVerify, paramTableOf } from './loops/index.mjs';
 import { resolveCollaboration, CollaborationError } from './patterns/catalog.mjs';
@@ -366,8 +366,11 @@ export function loadResumedUnit({ options, scope, mainRoot, worktreePath, port, 
 export async function admitFreshUnit({ options, scope, mainRoot, worktreePath, caseRef, port, assignmentsDir, liveConfig, withAccounts, snapshot, assertRepository, herdrPresent }) {
   if (options.declared === undefined && options.pinInputs !== undefined) throw new RunnerConfigError('runUnit: pinInputs needs declared');
   const raw = readUnitSource(options);
-  // A seat's tier is a recommendation only a registered workflow may make, never a unit file.
-  if (!options.unitData) assertNoSeatTier(raw?.seats, 'a unit file');
+  // A seat's or a unit's tier is a recommendation only a registered workflow may make, never a unit file.
+  if (!options.unitData) {
+    assertNoSeatTier(raw?.seats, 'a unit file');
+    assertNoUnitTier(raw, 'a unit file');
+  }
   const unit = validateUnit(options.stanceOptions === undefined ? raw : { ...raw, stanceOptions: options.stanceOptions });
   assertRepository(writesWorktree(unit, unit.syncBase));
 

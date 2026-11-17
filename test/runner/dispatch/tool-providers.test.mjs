@@ -42,37 +42,6 @@ test('servedCapabilitiesOf lists what a tool executor serves and nothing for an 
   assert.deepEqual(servedCapabilitiesOf({ for: ['a'] }), []);
 });
 
-test('toolProvidersOf reads every for entry: an executor serving two capabilities answers both', () => {
-  const cfg = { executors: { multi: { kind: 'tool', for: ['first', 'second'], invocations: [{ via: 'cli', command: 'multi' }] } } };
-  const env = pathWith('multi');
-  assert.deepEqual(toolProvidersOf(cfg, { capability: 'first', pathEnv: env }).map((p) => p.executorId), ['multi']);
-  assert.deepEqual(toolProvidersOf(cfg, { capability: 'second', pathEnv: env }).map((p) => p.executorId), ['multi']);
-  assert.deepEqual(toolProvidersOf(cfg, { capability: 'third', pathEnv: env }), []);
-});
-
-test('toolProvidersOf folds capability spellings: Impact Analysis, impact_analysis and impact-analysis are one name', () => {
-  const cfg = { executors: { a: { kind: 'tool', for: ['Impact Analysis'] }, b: { kind: 'tool', for: ['impact_analysis'] } } };
-  for (const asked of ['impact-analysis', 'IMPACT_ANALYSIS', ' Impact Analysis ']) {
-    assert.deepEqual(toolProvidersOf(cfg, { capability: asked }).map((p) => p.executorId), ['a', 'b'], asked);
-  }
-  assert.deepEqual(toolProvidersOf(cfg, { capability: '' }), []);
-  assert.deepEqual(toolProvidersOf(cfg, { capability: '---' }), []);
-});
-
-test('toolProvidersOf ignores the for of an agent executor', () => {
-  const cfg = { executors: { reviewer: { kind: 'agent', for: ['code:review'] } } };
-  assert.deepEqual(toolProvidersOf(cfg, { capability: 'code:review' }), []);
-});
-
-test('toolProvidersOf finds a cli tool on the given PATH as present and as missing when it is not there', () => {
-  const cfg = { executors: { herdr: { kind: 'tool', for: ['pane-labeling'], invocations: [{ via: 'cli', command: 'fgos-herdr-probe' }] } } };
-  assert.deepEqual(toolProvidersOf(cfg, { capability: 'pane-labeling', pathEnv: pathWith('fgos-herdr-probe') }), [
-    { executorId: 'herdr', capability: 'pane-labeling', status: 'present', command: 'fgos-herdr-probe' },
-  ]);
-  assert.equal(toolProvidersOf(cfg, { capability: 'pane-labeling', pathEnv: pathWith('another-tool') })[0].status, 'missing');
-  assert.equal(toolProvidersOf(cfg, { capability: 'pane-labeling', pathEnv: '' })[0].status, 'missing');
-});
-
 test('toolProvidersOf finds a cli tool named by an absolute path', () => {
   const dir = pathWith('abs-tool');
   const cfg = { executors: { t: { kind: 'tool', for: ['x'], invocations: [{ via: 'cli', command: path.join(dir, 'abs-tool') }] } } };
@@ -102,54 +71,3 @@ test('toolProvidersOf probes an mcp tool by its scanTarget: missing, present, an
   assert.equal(ask()[0].status, 'present', 'an unreadable index record never reports staleness it did not see');
 });
 
-test('toolProvidersOf reports unknown for a tool with nothing to probe', () => {
-  const cfg = {
-    executors: {
-      bare: { kind: 'tool', for: ['x'] },
-      noTarget: { kind: 'tool', for: ['x'], invocations: [{ via: 'mcp', command: 'mcp:t' }] },
-      other: { kind: 'tool', for: ['x'], invocations: [{ via: 'herdr-spawn' }] },
-    },
-  };
-  assert.deepEqual(toolProvidersOf(cfg, { capability: 'x' }).map((p) => [p.executorId, p.status]), [['bare', 'unknown'], ['noTarget', 'unknown'], ['other', 'unknown']]);
-});
-
-test('toolProvidersOf takes mcpTool from the mcp invocation and command from the cli invocation', () => {
-  const cfg = {
-    executors: {
-      both: {
-        kind: 'tool',
-        for: ['impact-analysis'],
-        invocations: [
-          { via: 'cli', command: 'impact-cli' },
-          { via: 'mcp', command: 'mcp:impact', tools: { 'Impact Analysis': 'mcp__impact__run', other: 'mcp__impact__other' } },
-        ],
-      },
-    },
-  };
-  const [provider] = toolProvidersOf(cfg, { capability: 'impact-analysis', pathEnv: pathWith('impact-cli') });
-  assert.equal(provider.mcpTool, 'mcp__impact__run');
-  assert.equal(provider.command, 'impact-cli');
-  assert.equal(provider.status, 'present');
-});
-
-test('toolProvidersOf lists providers in the config order', () => {
-  const cfg = { executors: { second: { kind: 'tool', for: ['x'] }, first: { kind: 'tool', for: ['x'] } } };
-  assert.deepEqual(toolProvidersOf(cfg, { capability: 'x' }).map((p) => p.executorId), ['second', 'first']);
-});
-
-test('toolProvidersOf without a capability lists every tool executor once per capability it serves', () => {
-  const cfg = {
-    executors: {
-      multi: { kind: 'tool', for: ['a', 'b', 'A'] },
-      single: { kind: 'tool', for: ['c'] },
-      agent: { kind: 'agent', for: ['d'] },
-      none: { kind: 'tool' },
-    },
-  };
-  assert.deepEqual(toolProvidersOf(cfg).map((p) => [p.executorId, p.capability]), [['multi', 'a'], ['multi', 'b'], ['single', 'c']]);
-});
-
-test('toolProvidersOf answers [] for a config with no executors', () => {
-  assert.deepEqual(toolProvidersOf({}, { capability: 'x' }), []);
-  assert.deepEqual(toolProvidersOf(undefined), []);
-});

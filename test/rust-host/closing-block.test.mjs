@@ -122,7 +122,8 @@ test('init ends on Ready and one runnable next step, exits 0 and completes the t
   const release = releaseWithCannedDoctor();
   try {
     withProject(({ home, state, proj }) => {
-      const env = { HOME: home, CANNED_DOCTOR: JSON.stringify(CANNED.ok) };
+      const PATH = withHostPackagingRows(home, proj);
+      const env = { HOME: home, PATH, CANNED_DOCTOR: JSON.stringify(CANNED.ok) };
       const res = runFgctlRaw(['init', '--from', release.dir], { cwd: proj, stateHome: state, env });
       assert.equal(res.status, 0, res.stderr);
       const lines = res.stdout.trim().split('\n');

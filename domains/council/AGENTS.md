@@ -1,0 +1,3 @@
+# Council domain: deliberation workflows
+
+The councils (`architecture-advisory`, `architecture-advisory-reopen`, `business-discussion`, `council-lite`, `delphi`, `group-cognition`, `nominal-group`) are compositions of Workflow mechanisms: panels, debates, blind rounds and human gates declared in `workflows/*.yaml`. No business case lives in `src/workflow`; a council differs from another only in its declared steps, seats and capabilities. This is not a Work domain: it has no `registry.yaml` and no `compiled.json`. Council personas stay in `core/agents` and are visible to every domain; `advisor` is not a persona and stays unresolved there. Start one with `fgos workflow start <name>`; the names did not change with the move.

@@ -32,11 +32,9 @@ const runnerConfig = (personaTier) => ({
   maxTier: 'frontier',
   modelPolicies: Object.fromEntries(FAMILIES.map((family) => [family, cell(family)])),
   capabilities: {
-    'business:perspectives': {
-      prefer: FAMILIES,
-      ...(personaTier ? { personas: { sage: { tier: personaTier } } } : {}),
-    },
+    'business:perspectives': { prefer: FAMILIES },
   },
+  ...(personaTier ? { personas: { sage: { tier: personaTier } } } : {}),
   executors: Object.fromEntries(FAMILIES.map((family) => [family, executor(family)])),
 });
 

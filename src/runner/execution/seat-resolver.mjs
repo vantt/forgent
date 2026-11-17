@@ -342,10 +342,16 @@ export function seatOfRecord(unitRecord, seatId) {
   return unitRecord?.seats?.find((s) => s.seat === seatId) ?? null;
 }
 
-/** The tier a workflow recommends on a seat, with where it was declared (`workflow:[<id>/]<unit>/<seat>`); undefined for none. */
+/**
+ * The tier a workflow recommends on a seat, with where it was declared: the seat's own tier
+ * (`workflow:[<id>/]<unit>/<seat>`), else its unit's, which covers every seat the unit runs
+ * (`workflow:[<id>/]<unit>`); undefined for none.
+ */
 export function workflowTierOf(seat, unit, workflowId) {
-  if (!seat?.tier) return undefined;
-  return { tier: seat.tier, source: `workflow:${workflowId ? `${workflowId}/` : ''}${unit?.id ?? 'unit'}/${seat.seat}` };
+  const unitPath = `workflow:${workflowId ? `${workflowId}/` : ''}${unit?.id ?? 'unit'}`;
+  if (seat?.tier) return { tier: seat.tier, source: `${unitPath}/${seat.seat}` };
+  if (unit?.tier) return { tier: unit.tier, source: unitPath };
+  return undefined;
 }
 
 /**
@@ -354,8 +360,8 @@ export function workflowTierOf(seat, unit, workflowId) {
  */
 export function bindSeatOf(unitRecord, seatId) {
   const seat = seatOfRecord(unitRecord, seatId);
-  if (!seat) return { seat: seatId, role: 'producer', posture: PRODUCER_POSTURE };
-  const workflowTier = workflowTierOf(seat, unitRecord.unit, unitRecord.workflowId);
+  const workflowTier = workflowTierOf(seat ?? { seat: seatId }, unitRecord?.unit, unitRecord?.workflowId);
+  if (!seat) return { seat: seatId, role: 'producer', posture: PRODUCER_POSTURE, ...(workflowTier ? { workflowTier } : {}) };
   return { seat: seat.seat, role: seat.role, posture: seat.posture, ...(seat.persona ? { persona: seat.persona } : {}), ...(workflowTier ? { workflowTier } : {}) };
 }
 
@@ -363,5 +369,12 @@ export function bindSeatOf(unitRecord, seatId) {
 export function assertNoSeatTier(rawSeats, source) {
   if (Array.isArray(rawSeats) && rawSeats.some((entry) => entry && typeof entry === 'object' && entry.tier !== undefined)) {
     throw new SeatResolutionError(`${source} cannot carry seats[].tier: a seat's tier is a recommendation only a registered workflow definition may make`, 'seat-tier-not-allowed');
+  }
+}
+
+/** A unit's `tier` is a recommendation only a registered workflow may make: a unit file or stdin carrying one is refused. */
+export function assertNoUnitTier(rawUnit, source) {
+  if (rawUnit && typeof rawUnit === 'object' && rawUnit.tier !== undefined) {
+    throw new SeatResolutionError(`${source} cannot carry tier: a unit's tier is a recommendation only a registered workflow definition may make`, 'unit-tier-not-allowed');
   }
 }

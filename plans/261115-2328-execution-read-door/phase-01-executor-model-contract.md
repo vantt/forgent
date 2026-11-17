@@ -44,8 +44,9 @@ that stays until S6a reads the same vectors (D7).
    - the version: the binding keeps `contractVersion` `v1alpha1` (its consumers read it from run records); the route
      request gains protocol 2 (phase 09).
 2. `packages/execution/contracts/executor-model.v1.json`: `version`, `about`, then `vectors` for each derived fact
-   (`{ name, entry, runner?, machine?, expect }`), recorded from today's Node functions (record with a scratch script
-   under `.fgos/runtime/tmp/`, never committed). Cover every family `familyOf` names, every `via`/`adapter`, every
+   (`{ name, entry, runner?, machine?, expect }`), recorded from today's Node functions by the committed
+   `scripts/executor-model-vectors.mjs`, which rewrites only the `expect` values through `evaluateVector` and has a `--check`
+   mode (one regenerate path, so 06, 07, 08 and 15 reuse it instead of each keeping a private script). Cover every family `familyOf` names, every `via`/`adapter`, every
    credential store, every CLI with effort levels, `kind: tool`, `agentType` executors, governance by provider and by
    executor, posture with and without a usable backend.
 3. The bind, decide, hook and listing vectors are not recorded here: they depend on 03's config shape, so 06
@@ -65,16 +66,21 @@ that stays until S6a reads the same vectors (D7).
 ## Files
 
 - Create: `docs/platform/runner/contracts/executor-model.md`, `packages/execution/contracts/executor-model.v1.json`,
-  `test/runner/dispatch/executor-model-vectors.test.mjs`.
+  `test/runner/dispatch/executor-model-vectors.test.mjs`, `test/helpers/executor-model-vectors.helper.mjs` (the evaluator the
+  script and the test share), `scripts/executor-model-vectors.mjs` (record and `--check`).
 - Modify: `docs/platform/component-boundary.md`, `docs/platform/runner/subcomponents/h-f34e0d170d89/spec.md`,
-  `docs/reading-map.md`, `test/suite-baseline.json` (regenerated), mutation census (regenerated).
-- Delete: none. Tests retired: none.
+  `docs/reading-map.md`; the suite baseline and mutation census are regenerated once at landing, not on this branch.
+- Delete: none. Tests retired (vectors are the one owner of each behaviour): the five merge cases of
+  `test/runner/default-executor-merge.test.mjs` (the non-mutation case stays), the `credentialStoreOf` case of
+  `test/runner/credential-store.test.mjs`, nine `toolProvidersOf` cases of `test/runner/dispatch/tool-providers.test.mjs`, the
+  `legacyStateKey` case of `test/runner/llm-accounts.test.mjs`, five `decideExecutorDispatchMechanism` and three `lookupExecutor`
+  cases of `test/runner/dispatch.test.mjs`, and the `resolvePostureInvocation` case of `test/runner/execution/run-posture.test.mjs`.
 - Net size: about +350 doc lines, +1 500 vector lines (JSON), +60 test lines.
 
 ## Steps
 
 1. Read the Node functions named in Requirements 1 end to end; write the doc.
-2. Record vectors with a scratch script; review every vector by hand against the code path (a vector is evidence,
+2. Write each vector's inputs, run `node scripts/executor-model-vectors.mjs` to record `expect`; review every vector by hand against the code path (a vector is evidence,
    not a snapshot of a bug: a vector that records a bug is marked `"knownDefect": "<why>"`, keeps today's expected output, and is reported for a backlog row; S5 fixes no
    behaviour while porting).
 3. Write the Node twin test; run it and the gates.

@@ -9,7 +9,7 @@ import { moveMachineKeysTo, writeAccountsFile, writeGlobalConfig, writeProjectCo
 import { seedStubAgentClis } from '../helpers/agent-clis.mjs';
 
 // The executors these checks judge name these CLIs; a CLI the machine lacks is skipped, so each is stated installed.
-seedStubAgentClis('claude', 'codex', 'omp', 'pi', 'odd');
+seedStubAgentClis('claude', 'codex', 'omp', 'pi', 'agy', 'odd');
 
 function agent(providerModel, command = providerModel) {
   return { kind: 'agent', providerModel,   invocations: [{ id: `${command}-cli`, via: 'cli', adapter: 'cli-spawn', command, args: ['{prompt}'] }] };

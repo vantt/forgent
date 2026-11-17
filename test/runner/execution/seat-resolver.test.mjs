@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 
 import {
   SEAT_ROLES, resolveSeats, checkDeclaredSeats, SeatResolutionError, effectiveRigorOf,
-  requiresDistinctFamilies, seatLaunchesOf, seatKind, assertNoSeatTier, bindSeatOf, PRODUCER_POSTURE,
+  requiresDistinctFamilies, seatLaunchesOf, seatKind, assertNoSeatTier, assertNoUnitTier, bindSeatOf, PRODUCER_POSTURE,
   checkerPlanOf, RESERVED_SEAT_IDS, DEFAULT_CAPABILITY_MIN_CHECKERS, CHECKER_SEATS,
 } from '../../../src/runner/execution/seat-resolver.mjs';
 import { shippedCatalog } from '../../../src/runner/dispatch/shipped-catalog.mjs';
@@ -246,6 +246,11 @@ test('checker row: a rigor with no row in the configured or shipped table is a c
 test('a seat tier from a file source is refused by name; a registered definition keeps it', () => {
   assert.throws(() => assertNoSeatTier([{ seat: 'a', role: 'producer', tier: 'frontier' }], 'a units file'), /cannot carry seats\[\]\.tier/);
   assert.doesNotThrow(() => assertNoSeatTier([{ seat: 'a', role: 'producer' }], 'a units file'));
+});
+
+test('a unit tier from a file source is refused by name with the seat tier reason', () => {
+  assert.throws(() => assertNoUnitTier({ id: 'u', tier: 'frontier' }, 'a units file'), (err) => err.code === 'unit-tier-not-allowed' && /cannot carry tier: .*only a registered workflow definition may make/.test(err.message));
+  assert.doesNotThrow(() => assertNoUnitTier({ id: 'u' }, 'a units file'));
 });
 
 test('a unit record written when a door could choose selectors still replays: the field is ignored', () => {

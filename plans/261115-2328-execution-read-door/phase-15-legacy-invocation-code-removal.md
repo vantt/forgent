@@ -37,7 +37,7 @@ HARDEN's; re-verify each with `rg` first.
 
 ## Acceptance
 
-- `rg "FGOS_HERDR_PROMPT_DELIVERY"` and the inference branch return nothing; the schema has one place for launch fields.
+- `rg "FGOS_HERDR_PROMPT_DELIVERY"` and the inference branch return nothing; the schema has one place for launch fields, except entry-level `confinement`, which stays as a project capability (owner decision 79 Q6c: a project file may turn `ownWorktree` on there).
 - Focused tests green, one file per run; `test/architecture.test.mjs` green; census regenerated, not merged by hand.
 - Report lists each caller and config moved.
 

@@ -26,7 +26,7 @@ Complete pre-rework input: [historical snapshot](../history/retired-engine/playb
 
 ## Registered Output Boundary
 
-These are cognitive artifact shapes and optional manual-harness examples. They do not prescribe a session.md filesystem ledger, manual run records, storage ownership or a nine-phase runtime for the registered architecture-advisory Workflow. Its synthesis template requires a final RAW JSON packet; Workflow owns persistence, gates and resumption. Evidence: core/workflows/architecture-advisory.yaml:43-84 and core/skills/fgos-architecture-panel/SKILL.md:17-37,135-142.
+These are cognitive artifact shapes and optional manual-harness examples. They do not prescribe a session.md filesystem ledger, manual run records, storage ownership or a nine-phase runtime for the registered architecture-advisory Workflow. Its synthesis template requires a final RAW JSON packet; Workflow owns persistence, gates and resumption. Evidence: domains/council/workflows/architecture-advisory.yaml:43-84 and core/skills/fgos-architecture-panel/SKILL.md:17-37,135-142.
 
 | Optional manual artifact | Current registered counterpart |
 |---|---|
@@ -714,7 +714,7 @@ understand whether a person was answered and which artifact supports the reply.
 It is not the retired Dialogue Turn Protocol's fourth runtime layer, and the
 registered Workflow does not guarantee crash recovery of these companion files.
 The registered graph remains framing, shaping, critique, synthesis, explanation
-and the human close gate (`core/workflows/architecture-advisory.yaml:8-84`).
+and the human close gate (`domains/council/workflows/architecture-advisory.yaml:8-84`).
 
 It is also the layer where authority leaks. The response is produced under the
 driver's authorization, and naming that authorization here is what makes it

@@ -24,7 +24,7 @@ Superseded by: None
 
 ## 1. Layers and who decides what
 
-Three layers, named after their directories: **Execution** (`fgos run` and below: seat binding, Unit runs, Dispatch, RunResult), **Workflow** (`src/workflow`: steps, cases, resume, gate, the case budget frame) and **Domain** (workflow definitions, slice kinds, evidence rules under `domains/` and `core/workflows`). Names are not changed by this contract.
+Three layers, named after their directories: **Execution** (`fgos run` and below: seat binding, Unit runs, Dispatch, RunResult), **Workflow** (`src/workflow`: steps, cases, resume, gate, the case budget frame) and **Domain** (workflow definitions, slice kinds, evidence rules under `domains/`). Names are not changed by this contract.
 
 - The upper layer governs: what to run, how much it may spend, what counts as done, when to ask a person.
 - The lower layer executes and reports facts truthfully: whether a run started, who ran it, whether it ended on infrastructure rather than reaching a verdict, what it spent.

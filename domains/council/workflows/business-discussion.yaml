@@ -1,4 +1,4 @@
-# core/workflows/business-discussion.yaml — Business discussion and strategic deliberation workflow
+# domains/council/workflows/business-discussion.yaml — Business discussion and strategic deliberation workflow
 
 id: business-discussion
 title: Business strategic deliberation and analysis workflow

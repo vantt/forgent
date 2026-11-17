@@ -823,7 +823,8 @@ function waitForStdout(child, marker, timeoutMs = 5000) {
   });
 }
 
-test('e2e --watch: stays alive over an idle frontier, completes a cycle, and a single SIGINT stops it cleanly (exit 0) within 2000ms', { timeout: 10_000, skip: process.platform === 'win32' ? 'Windows child processes cannot receive SIGINT via child.kill' : false }, async () => {
+// The timeout covers `fgos init` (the Rust host, seconds on a loaded runner) and the first drain cycle; the 2000ms exit bound asserted below is the behaviour.
+test('e2e --watch: stays alive over an idle frontier, completes a cycle, and a single SIGINT stops it cleanly (exit 0) within 2000ms', { timeout: 60_000, skip: process.platform === 'win32' ? 'Windows child processes cannot receive SIGINT via child.kill' : false }, async () => {
   const repoRoot = initTempRepo();
   assert.equal(fgos(repoRoot, ['init']).status, 0);
 

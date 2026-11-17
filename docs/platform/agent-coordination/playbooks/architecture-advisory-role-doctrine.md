@@ -69,7 +69,7 @@ in [the rubric](architecture-advisory-evaluation-rubric.md).
 
 ## The Shape Of The Panel
 
-The registered architecture-advisory Workflow is framing -> blind three-seat shaping -> reviewed critique -> reviewed synthesis -> explanation -> human close. Synthesis requires reviewer and red-team checks of the final RAW JSON packet. Evidence: core/workflows/architecture-advisory.yaml:8-84.
+The registered architecture-advisory Workflow is framing -> blind three-seat shaping -> reviewed critique -> reviewed synthesis -> explanation -> human close. Synthesis requires reviewer and red-team checks of the final RAW JSON packet. Evidence: domains/council/workflows/architecture-advisory.yaml:8-84.
 
 The nine role postures below are cognitive lenses and worked examples, not nine mandatory runtime jobs or a driver-owned phase graph. They do not authorize a new roster, conditional specialist step or direct actor launch. Execution, routing and resumption follow core/skills/fgos-architecture-panel/SKILL.md, not an operating recipe in the coordinator companion.
 

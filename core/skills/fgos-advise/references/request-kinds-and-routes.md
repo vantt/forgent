@@ -1,7 +1,7 @@
 # Request kinds and routes
 
 The one kind-to-route map for [`fgos-advise`](../SKILL.md). It describes
-selection only. The Workflow YAML (`core/workflows/*.yaml`) or pattern in the
+selection only. The Workflow YAML (`domains/<domain>/workflows/*.yaml`) or pattern in the
 effective Config's `runner.patterns` (shipped declarations:
 `core/config-standard/runner.yaml`) stays authoritative for topology,
 rounds, blind, and gates, and for the seats of every route except the four

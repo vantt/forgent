@@ -1,4 +1,4 @@
-# core/workflows/architecture-advisory.yaml — Architecture Advisory Workflow
+# domains/council/workflows/architecture-advisory.yaml — Architecture Advisory Workflow
 # Biểu diễn architecture advisory panel thành clean Workflow trên Single Model & Engine Retirement
 
 id: architecture-advisory

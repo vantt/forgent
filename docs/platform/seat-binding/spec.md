@@ -142,15 +142,14 @@ Bảng là một file hợp đồng chung `packages/seat-binding/contracts/seat-
 Cho một ghế agent, theo thứ tự:
 
 1. **Tier đã giải** = giá trị đầu tiên được khai theo danh sách (bảng đầy đủ ở mục 6.3):
-   1. khoá seat của project: `cap.seats.<seat>`, rồi `prefix.seats.<seat>`;
-   2. khoá persona của project: `cap.personas.<p>`, rồi `prefix.personas.<p>`;
-   3. khoá role của project: `cap.roles.<role>`, rồi `prefix.roles.<role>`;
-   4. `tier` của ghế trong workflow (khuyến nghị);
-   5. mặc định capability của project: `cap.tier`, rồi `prefix.tier`;
-   6. tier trong domain package (đợt sau; vắng đợt này);
-   7. `defaults.tier`.
+   1. khoá persona của project: `personas.<p>`;
+   2. khoá role của project: `roles.<role>`;
+   3. `tier` trong workflow (khuyến nghị): của ghế, rồi của unit;
+   4. mặc định capability của project: `cap.tier`, rồi `prefix.tier`;
+   5. tier trong domain package (đợt sau; vắng đợt này);
+   6. `defaults.tier`.
 2. **Override.** Tier override cao hơn tier đã giải bị từ chối `tier-escalation-unauthorized` trong đợt đầu (mục 5.5). Override bằng hoặc thấp hơn thì nhận, ghi `tierSource: override`.
-3. **Nguồn hiển thị.** Binding record, run evidence và `explain` mang `tierSource` (đường config chính xác, `workflow:<id>/<unit>/<seat>` hoặc `override`). Khi giá trị chọn khác khuyến nghị của workflow, chúng mang cả khuyến nghị, ví dụ `workflow recommends frontier, project config sets flagship (capabilities."architecture:shape".seats.system.tier)`.
+3. **Nguồn hiển thị.** Binding record, run evidence và `explain` mang `tierSource` (đường config chính xác, `workflow:<id>/<unit>/<seat>` hoặc `override`). Khi giá trị chọn khác khuyến nghị của workflow, chúng mang cả khuyến nghị, ví dụ `workflow recommends frontier, project config sets flagship (personas.system-lens.tier)`.
 4. **Trần ngân sách.** `maxTier` = `cap.maxTier` ?? `prefix.maxTier` ?? `maxTier` toàn cục; giá trị của capability được phép cố ý vượt giá trị toàn cục. Tier đã giải cao hơn `maxTier` thì **bị hạ xuống `maxTier`, hiển thị**: `tierSource`, `loweredFrom` và lý do `max-tier-cap` (gọi tên dòng `maxTier`) vào `explain`, binding record và run evidence.
 5. **Cell.** Family không có cell ở tier cuối thì bị bỏ qua trong walk. Nếu không candidate được phép nào có cell ở tier đó, ghế bị từ chối `tier-cell-missing`, gọi tên dòng config cần đổi (khoá tier đã đặt nó, hoặc danh sách `prefer` đã hạn chế). Ghế ghim cứng vào family không có cell đó cũng bị từ chối như vậy. Thiếu cell không bao giờ hạ tier.
 6. **Liên tục.** Ghế chạy nhiều round trong một unit (Delphi `sameSeat`, rebuttal của debate) giữ executor + model + effort. Xoay account trong cùng pool được phép nếu giữ được ghim đó; không thì ghế bị từ chối `seat-continuity-unavailable`.
@@ -171,12 +170,12 @@ Tên tier sai trong config là lỗi load. Việc hạ tier duy nhất từng x�
 
 | Bên khai | Khoá | Ghi chú |
 |---|---|---|
-| Workflow unit | `capability`, `pattern`, `persona?`, `rigor?`, `seats: [{seat, role, persona?, tier?}]` | `tier` là khuyến nghị; không bao giờ `prefer`, `executor`, `overrides` |
+| Workflow unit | `capability`, `pattern`, `persona?`, `rigor?`, `tier?`, `seats: [{seat, role, persona?, tier?}]` | `tier` là khuyến nghị: của ghế trước, rồi của unit (phủ mọi ghế unit chạy, cả ghế checker do pattern sinh); chỉ định nghĩa workflow đã đăng ký được khai, file unit/stdin bị từ chối; không bao giờ `prefer`, `executor`, `overrides` |
 | Domain package (đợt sau) | `tier`, độc lập | chỉ phần mang theo được; không bao giờ `prefer` |
-| Project `.fgos/config.json` `runner` | `defaults`, `maxTier`, `tierFallback`, `modelPolicies`, `capabilities` | tiếng nói cuối, trong khuôn mục 5.4 |
+| Project `.fgos/config.yaml` `runner` | `defaults`, `maxTier`, `tierFallback`, `modelPolicies`, `capabilities`, `roles`, `personas` | tiếng nói cuối, trong khuôn mục 5.4 |
 | Global `~/.fgos/config.json` | `llmAccounts`, executor máy | không nhận khoá mới đợt này (mục 9) |
 
-Workflow khai ghế tường minh; workflow không bao giờ khai `prefer`. Khẩu vị role sống trong config capability (`capabilities."code:*".roles.red-team.prefer = ["xai"]`). Một prefix capability không phải domain; không có khoá `domains`. Ghế checker mang capability của unit.
+Workflow khai ghế tường minh; workflow không bao giờ khai `prefer`. Khẩu vị role và persona sống trong hai bảng riêng của config project, áp cho mọi capability (`runner.roles.red-team.prefer = ["xai"]`); hàng capability chỉ giữ việc và khả năng tool (D-ADR0080 (persona and role taste live in runner.personas and runner.roles)). Một prefix capability không phải domain; không có khoá `domains`. Ghế checker mang capability của unit.
 
 ### 6.2 Schema
 
@@ -186,10 +185,9 @@ Workflow khai ghế tường minh; workflow không bao giờ khai `prefer`. Kh�
 | `maxTier` | tier | trần ngân sách toàn cục |
 | `tierFallback.<tier>` | danh sách family, đủ sáu khoá gồm `mini` | thứ tự walk sau danh sách lần đầu |
 | `modelPolicies.<family>.<tier>` | cell (mục 5.3) | thiếu khoá = unmet |
-| `capabilities.<cap-or-prefix>` | `{ tier?, maxTier?, rigor?, prefer?, roles?, personas?, seats?, ...khoá hiện có }` | `<prefix>:*` khớp mọi capability bắt đầu `<prefix>:` |
-| `….roles.<role>` | `{ tier?, prefer? }` | một trong năm role |
-| `….personas.<persona-name>` | `{ tier?, prefer? }` | tên persona trần |
-| `….seats.<seat>` | `{ tier?, prefer? }` | khoá theo tên ghế trong capability |
+| `capabilities.<cap-or-prefix>` | `{ tier?, maxTier?, rigor?, prefer?, ...khoá hiện có }` | `<prefix>:*` khớp mọi capability bắt đầu `<prefix>:` |
+| `roles.<role>` | `{ tier?, prefer? }` | một trong năm role; chỉ file project; áp cho mọi capability |
+| `personas.<persona-name>` | `{ tier?, prefer? }` | tên persona trần; chỉ file project; áp cho mọi capability |
 
 - `prefer` là khoá duy nhất, giữ hình sẵn có: id executor, hoặc `{executor, invocation}` cho ghim. Không có khoá `families`: capability còn do tool executor phục vụ (`impact-analysis: prefer "gitnexus"`), nên "family" không phải khái niệm config chung. Với agent executor, id gọi tên family của nó (một executor mỗi family, `executor-family-unique`, `src/setup/registrations.mjs:1473`), nhờ đó `prefer` gặp được `tierFallback` và `modelPolicies` khoá theo family (ví dụ executor `glm` ↔ family `z-ai`). Spec viết ghim invocation là `family#invocation`; trong config là entry `{executor, invocation}`.
 - Khoá capability hiện có (`description`, `aliases`, `confinement`, `serves`, `persona`, `minCheckers`, `verify`) giữ nguyên.
@@ -202,21 +200,17 @@ Workflow khai ghế tường minh; workflow không bao giờ khai `prefer`. Kh�
 | Thứ | `tier` | `prefer` (thứ tự lần đầu) | `maxTier` | `rigor` |
 |---|---|---|---|---|
 | 1 | override bằng hoặc thấp hơn tier đã giải (mục 5.4 bước 2) | override executor | `cap.maxTier` | `cap.rigor` |
-| 2 | `cap.seats.<seat>` | `cap.seats.<seat>` | `prefix.maxTier` | `prefix.rigor` |
-| 3 | `prefix.seats.<seat>` | `prefix.seats.<seat>` | `maxTier` toàn cục | — |
-| 4 | `cap.personas.<p>` | `cap.personas.<p>` | | |
-| 5 | `prefix.personas.<p>` | `prefix.personas.<p>` | | |
-| 6 | `cap.roles.<role>` | `cap.roles.<role>` | | |
-| 7 | `prefix.roles.<role>` | `prefix.roles.<role>` | | |
-| 8 | **`tier` ghế của workflow** | `cap.prefer` | | |
-| 9 | `cap.tier` | `prefix.prefer` | | |
-| 10 | `prefix.tier` | `tierFallback.<tier>` | | |
-| 11 | tier domain (đợt sau) | | | |
-| 12 | `defaults.tier` | | | |
+| 2 | `personas.<p>` | `personas.<p>` | `prefix.maxTier` | `prefix.rigor` |
+| 3 | `roles.<role>` | `roles.<role>` | `maxTier` toàn cục | — |
+| 4 | **`tier` của workflow: ghế, rồi unit** | `cap.prefer` | | |
+| 5 | `cap.tier` | `prefix.prefer` | | |
+| 6 | `prefix.tier` | `tierFallback.<tier>` | | |
+| 7 | tier domain (đợt sau) | | | |
+| 8 | `defaults.tier` | | | |
 
 Luật:
 - Mỗi thuộc tính giải độc lập xuống cột của nó; một ghế có thể lấy `tier` từ dòng này và `prefer` từ dòng khác. `maxTier` rồi chặn `tier` (mục 5.4 bước 4).
-- Danh sách thay thế, không gộp; map (`roles`, `personas`, `seats`) kế thừa theo khoá từ entry prefix.
+- Danh sách thay thế, không gộp; bảng `roles` và `personas` tra theo khoá, một lần cho mọi capability.
 - Vắng = kế thừa dòng sau. `prefer: []` là lỗi load.
 - `prefer` chỉ xếp thứ tự lần thử đầu; khi hỏng, walk theo `tierFallback.<tier>` giới hạn trong các family của danh sách ghế (capability chỉ thu hẹp).
 - Prefix = chữ trước dấu `:` đầu tiên; capability không có `:` không có dòng prefix. Chỉ một cấp prefix nên không có hoà giữa các prefix.
@@ -228,8 +222,8 @@ Luật:
 - Workflow loader khám phá workflow đóng gói (`<wf>/wf.<wf>.yaml`) bên cạnh file phẳng và gắn `{sourcePath, workflowDir, owningDomain|null}`; `owningDomain` đến từ vị trí file, không bao giờ từ prefix capability. Hôm nay `src/workflow/loader.mjs:72-98` chỉ quét file phẳng.
 - Thứ tự tìm persona: workspace `fgos/agents` → thư mục workflow (`wf.<name>.yaml`, `agent.<name>.yaml`) → domain sở hữu → core. `agent-definitions` giải thứ tự này, nhận `agent.<name>.yaml` cạnh workflow; persona của một domain chỉ thấy trong domain đó. Hôm nay `agentTierDirs` (`agent-definitions.mjs:36-54`) gộp mọi domain vào một tầng và chờ `<name>.yaml`.
 - Convention sở hữu luật tên và đường dẫn; đọc, thứ tự lớp và ghim ở lại `agent-definitions`.
-- Persona được giải trước `bindSeat`; binding lưu identity đủ (`<layer>:<source>/<name>`) và digest. Khẩu vị tra theo tên persona trần dưới `capabilities.<cap-or-prefix>.personas`.
-- **File persona không bao giờ mang `prefer` hay `tier`**: persona dùng chung giữa các project, còn chọn model là việc của project (project thắng). File persona mô tả ai ngồi ghế (giọng, phong cách, ranh giới quyết định, skill, phạm vi tool). Trường `rigor` sẵn có của nó hôm nay không code chọn ghế nào đọc, và không ảnh hưởng tier hay số checker. Khẩu vị cho persona chỉ khai trong config project, `capabilities.<cap-or-prefix>.personas.<name>.{tier, prefer}`, xếp hạng seat > persona > role (owner 21:23).
+- Persona được giải trước `bindSeat`; binding lưu identity đủ (`<layer>:<source>/<name>`) và digest. Khẩu vị tra theo tên persona trần trong `runner.personas`.
+- **File persona không bao giờ mang `prefer` hay `tier`**: persona dùng chung giữa các project, còn chọn model là việc của project (project thắng). File persona mô tả ai ngồi ghế (giọng, phong cách, ranh giới quyết định, skill, phạm vi tool). Trường `rigor` sẵn có của nó hôm nay không code chọn ghế nào đọc, và không ảnh hưởng tier hay số checker. Khẩu vị cho persona chỉ khai trong config project, `runner.personas.<name>.{tier, prefer}`, xếp hạng persona > role (owner 21:23; bảng riêng theo D-ADR0080 (persona and role taste live in runner.personas and runner.roles)).
 
 ## 7. Danh tính ghế và pattern
 
@@ -289,20 +283,17 @@ Luật cứng không đạt thì từ chối ghế `independence-unsatisfiable`,
 "capabilities": {
   "architecture:*": {
     "tier": "flagship", "rigor": "high",
-    "prefer": ["claude", "openai", "gemini", "xai", "deepseek"],
-    "roles": { "red-team": { "prefer": ["xai"] } }
+    "prefer": ["claude", "openai", "gemini", "xai", "deepseek"]
   },
-  "architecture:shape": {
-    "rigor": "critical", "maxTier": "frontier",
-    "seats": { "system": { "prefer": ["claude", "openai"] } }
-  },
-  "architecture:critique": { "maxTier": "frontier", "seats": { "producer": { "tier": "frontier" } } },
-  "architecture:synthesize": { "rigor": "critical", "maxTier": "frontier", "seats": { "producer": { "tier": "frontier" } } },
+  "architecture:shape": { "rigor": "critical", "maxTier": "frontier" },
+  "architecture:critique": { "maxTier": "frontier" },
+  "architecture:synthesize": { "rigor": "critical", "maxTier": "frontier" },
   "group-cognition:*": { "prefer": ["claude", "openai", "gemini", "xai", { "executor": "glm", "invocation": "pi-cli-bwrap" }] }
-}
+},
+"roles": { "red-team": { "prefer": ["xai"] } }
 ```
 
-`architecture:explain` không cần entry: nó kế thừa flagship từ prefix. Ghế critique nào mang frontier là khẩu vị; ví dụ đặt nó ở producer của critique. Tên model dưới đây là cell của config forgentX lúc duyệt.
+`architecture:explain` không cần entry: nó kế thừa flagship từ prefix. Ghế critique nào mang frontier là khuyến nghị của workflow trên ghế đó; ví dụ đặt nó ở producer của critique. Tên model dưới đây là cell của config forgentX lúc duyệt.
 
 ### 10.2 `architecture-advisory` từ đầu đến cuối
 
@@ -328,18 +319,18 @@ Workflow (`shape-proposals` đã chuyển):
 | shape / alternative | flagship (`architecture:*`.tier) | frontier | spread: openai → `gpt-6.1-sol` | mềm |
 | shape / constraint | flagship | frontier | spread: gemini → `gemini-4-argon-high` | mềm |
 | shape / synthesis | flagship | frontier | xai → `grok-4.6` (spread mềm: family ít peer nhất thắng; erratum E2) | mềm |
-| critique / producer | frontier (khoá seat của cap) | frontier (cap) | claude → `fable` | — |
+| critique / producer | frontier (khuyến nghị workflow của ghế) | frontier (cap) | claude → `fable` | — |
 | critique / reviewer | flagship (prefix) | frontier | cứng ≠ claude: openai → `gpt-6.1-sol` | cứng so với producer |
-| critique / red-team | flagship | frontier | `prefix.roles.red-team.prefer` → xai `grok-4.6` | cứng; đôi một ở high |
-| synthesize / producer | frontier (khoá seat của cap) | frontier | claude → `fable` | — |
+| critique / red-team | flagship | frontier | `roles.red-team.prefer` → xai `grok-4.6` | cứng; đôi một ở high |
+| synthesize / producer | frontier (khuyến nghị workflow của ghế) | frontier | claude → `fable` | — |
 | synthesize / reviewer, red-team, tester | flagship (prefix); rigor critical → ba checker | frontier | openai; xai; tester → gemini | cứng, đôi một |
 | explain / producer | flagship (prefix) | flagship | claude → `opus` | — |
 
 **Biến thể A (ngân sách bằng mặc định capability).** Project đặt `"architecture:*": { "tier": "standard" }`. Ghế không có khuyến nghị workflow chạy standard; `system` giữ frontier, vì khuyến nghị workflow thắng `tier` của capability và prefix, miễn `architecture:shape.maxTier` cho phép.
 
-**Biến thể B (ngân sách bằng trần).** Project không khai entry `architecture:shape` và giữ `maxTier: flagship` toàn cục. `system` giải ra frontier từ workflow rồi bị hạ: `tier flagship (max-tier-cap: maxTier = flagship, global), lowered from frontier (workflow:architecture-advisory/shape-proposals/system)`. Muốn giữ frontier cho ghế đó, đặt `capabilities."architecture:shape".maxTier = "frontier"`. Muốn ghim thấp hơn ở mọi nơi, đặt `capabilities."architecture:shape".seats.system.tier`.
+**Biến thể B (ngân sách bằng trần).** Project không khai entry `architecture:shape` và giữ `maxTier: flagship` toàn cục. `system` giải ra frontier từ workflow rồi bị hạ: `tier flagship (max-tier-cap: maxTier = flagship, global), lowered from frontier (workflow:architecture-advisory/shape-proposals/system)`. Muốn giữ frontier cho ghế đó, đặt `capabilities."architecture:shape".maxTier = "frontier"`. Muốn ghim thấp hơn cho một persona, đặt `personas.<name>.tier`.
 
-**Biến thể C (từ chối).** Project đặt `"architecture:shape": { "seats": { "system": { "prefer": ["deepseek"] } } }` dưới biến thể B. Tier bị cap xuống flagship; deepseek không có cell flagship; `prefer` thay danh sách nên không còn candidate khác. Kết quả: `tier-cell-missing: shape-proposals/system flagship — no allowed executor has a cell; change capabilities."architecture:shape".seats.system.prefer or set capabilities."architecture:shape".seats.system.tier`.
+**Biến thể C (từ chối).** Project đặt `"architecture:shape": { "prefer": ["deepseek"] }` dưới biến thể B. Tier bị cap xuống flagship; deepseek không có cell flagship; `prefer` thay danh sách nên không còn candidate khác. Kết quả: `tier-cell-missing: shape-proposals/system flagship — no allowed executor has a cell; change capabilities."architecture:shape".prefer or the tier set by maxTier`.
 
 Một dòng `explain` cho một ghế:
 
@@ -347,7 +338,7 @@ Một dòng `explain` cho một ghế:
 architecture-advisory / critique-proposals / red-team  (role red-team, capability architecture:critique)
   → xai grok-4.6 @ flagship, effort: invocation default (medium), account xai/<id>
     tier: capabilities."architecture:*".tier = flagship; maxTier: capabilities."architecture:critique".maxTier = frontier (not applied)
-    prefer: capabilities."architecture:*".roles.red-team = [xai]; independence: ≠ producer(claude) ok, ≠ reviewer(openai) ok
+    prefer: roles.red-team = [xai]; independence: ≠ producer(claude) ok, ≠ reviewer(openai) ok
     on failure: rotate xai accounts → tierFallback.flagship ∩ [xai] → none left: refuse
 ```
 
@@ -382,7 +373,7 @@ Owner đã chốt khẩu vị 2026-10-20 13:26: `shape-proposals` một ghế fr
 | synthesis business/delphi standard | `"business:synthesize": {"tier": "standard"}`, `"delphi:synthesize": {"tier": "standard"}` |
 | panel ý kiến dẫn rẻ | `"business:perspectives": {"prefer": ["gemini", "deepseek", "glm", "claude", "openai"]}` (tương tự cho capability panel ý kiến) |
 | code review/debug codex rồi claude | `"code:review"`/`"code:debug"`: `{"prefer": [{"executor": "openai", "invocation": "codex-cli-bwrap"}, {"executor": "claude", "invocation": "claude-cli-bwrap"}]}` (dòng cấu hình sẵn có; xem ghi chú mục 8) |
-| khẩu vị red-team theo mảng | `"code:*": {"roles": {"red-team": {"prefer": ["xai"]}}}`, `"marketing:*": {"roles": {"red-team": {"prefer": ["claude"]}}}` |
+| khẩu vị red-team | `"roles": {"red-team": {"prefer": ["xai"]}}` (một thứ tự cho mọi capability, không theo mảng; D-ADR0080 (persona and role taste live in runner.personas and runner.roles)) |
 
 ## 11. Bằng chứng phải có (proof list cho plan)
 
@@ -420,7 +411,7 @@ Plan của code change phải chứng minh mọi mục sau; không mục nào đ
 
 `maxTier` (toàn cục và capability) là trần chi phí duy nhất của đợt này, nên trần đó và hiển thị `max-tier-cap` là thứ kiểm soát chi tiêu.
 
-Lỗi sống ngoài spec này: `{objective}` rò vào `roleTasks` của checker trong `core/workflows/architecture-advisory.yaml`.
+Lỗi sống ngoài spec này: `{objective}` rò vào `roleTasks` của checker trong `domains/council/workflows/architecture-advisory.yaml`.
 
 ## 13. Bằng chứng xác minh (đọc-only, 2026-10-20)
 
@@ -441,6 +432,14 @@ Lỗi sống ngoài spec này: `{objective}` rò vào `roleTasks` của checker 
 - Đổi luật "project thắng": chỉ owner; lý do gốc ở mục 15.
 
 ## 15. Lịch sử quyết định
+
+### D-ADR0080 (persona and role taste live in runner.personas and runner.roles) — khẩu vị persona và role có bảng riêng; hàng capability giữ việc và khả năng tool; sửa mục 6.3 của D-ADR0072 (Seat Binding: one authority for agent seat choice), luật file persona của nó giữ nguyên
+
+- **Quyết định:** khẩu vị persona và role sống trong `runner.personas` và `runner.roles` (chỉ file project), áp cho mọi capability; hàng capability chỉ giữ việc và khả năng tool (`tier`, `maxTier`, `rigor`, `prefer`, `confinement`, `serves` và các khoá hiện có). Mỗi loại tuỳ biến có đúng một chỗ (`docs/platform/vision.md` mục 6).
+- **Sửa mục 6.3 của D-ADR0072 (Seat Binding: one authority for agent seat choice):** thứ tự mỗi thuộc tính, phần còn lại giữ nguyên thứ tự tương đối: `tier` là override > `personas.<p>` > `roles.<role>` > tier workflow (ghế, rồi unit) > `cap.tier` > `prefix.tier` > `defaults.tier`; `prefer` là override executor > `personas.<p>` > `roles.<role>` > `cap.prefer` > `prefix.prefer` > `tierFallback.<tier>`. Khoá khẩu vị theo ghế (`cap.seats.<seat>`) bị bỏ: ghế mang tier qua workflow (khuyến nghị của ghế, rồi của unit), không qua config. Luật file persona của D-ADR0072 (file persona không mang `tier` hay `prefer`, mục 6.4) đứng nguyên; chỉ nơi khẩu vị của persona đổi sang `runner.personas.<name>`.
+- **Hệ quả thấy được:** một thứ tự role khai một lần giờ áp cho mọi capability, không chỉ `code:*` hay `marketing:*`; hai thứ tự red-team khác nhau của hai prefix gộp thành một giá trị. Một role chỉ nêu hai family thì không đủ phục vụ ba checker khác family ở rigor cao: danh sách role cần đủ family.
+- **Chuyển config:** `fgos doctor --fix` (fix `move-capability-taste` của Config) chuyển khoá cũ, giữ dòng lý do của từng giá trị; hai giá trị khác nhau cho một đích thì dừng để người quyết; `seats` bị gỡ.
+- **Điều kiện đảo:** owner muốn khẩu vị theo việc hoặc theo ghế trở lại (nơi của nó là p-bjmoxexuwi).
 
 ### D-ADR0072 (Seat Binding: one authority for agent seat choice) — một authority cho ghế agent; project thắng; tier khai trực tiếp; supersede phần chọn ghế của RUL80 (an account is chosen first, then a CLI), RUL91 (a person may pin the provider account of a unit run), RUL98 (workflow start passes --timeout and --account to each Unit), RUL102 (a tier cell names its pool; one family has one executor), RUL103 (runner.maxTier caps every seat), RUL106 (a seat walks a tier declared order and its cell entries)
 

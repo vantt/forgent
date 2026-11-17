@@ -11,9 +11,8 @@
 // source file, but that also means it carries the same trust level as code:
 // only apply it from a checkout you already trust.
 import { checkDeclaredSeats, SeatResolutionError } from '../execution/seat-resolver.mjs';
-import { bindingTasteOf, capabilityConfinementOf, capabilityNamesOf, registeredCapabilityOf } from '../execution/capability-config.mjs';
+import { bindingTasteOf, capabilityConfinementOf, capabilityNamesOf, preferSitesOf, registeredCapabilityOf } from '../execution/capability-config.mjs';
 import { paramTableOf } from '../execution/loops/index.mjs';
-import { isSeatId } from '../../convention/seat-id.mjs';
 import { definitionFileName } from '../../convention/definition-names.mjs';
 import { RIGOR_VALUES } from '../rigor.mjs';
 import { canonicalizeWriteEntry } from './write-scope.mjs';
@@ -549,19 +548,8 @@ function personaNameProblem(name) {
   }
 }
 
-const SEAT_TASTE_KEY_RULES = Object.freeze({
-  personas: personaNameProblem,
-  seats: (key) => isSeatId(key) || 'a seat id (a lowercase letter, then lowercase letters, digits or "-"; not a reserved name)',
-});
-
-/** The rules of one capability entry that read beyond its own fields: the key rules Convention owns, and the confinement policy. */
-function checkCapabilityEntry(cfg, name, taste, label) {
-  for (const [mapKey, keyProblem] of Object.entries(SEAT_TASTE_KEY_RULES)) {
-    for (const key of Object.keys(taste?.[mapKey] ?? {})) {
-      const verdict = keyProblem(key);
-      if (verdict !== true) throw new RunnerConfigError(`runner config (${label}.${mapKey}) key ${JSON.stringify(key)} must be ${verdict}.`);
-    }
-  }
+/** The rule of the capability entry that reads beyond its own fields: the confinement policy. */
+function checkCapabilityEntry(cfg, name, label) {
   const confinement = capabilityConfinementOf(cfg, name);
   if (confinement !== undefined) validateCapabilityConfinementShape(confinement, `${label}.confinement`);
 }
@@ -681,24 +669,19 @@ export function validateGeneratedPathsShape(generatedPaths, label) {
   });
 }
 
-/** Every `prefer` of the capability catalog with the label that names where it sits: the entry's, then each scope's. */
-function* capabilityPreferSites(cfg, sourceLabel) {
-  for (const [name, taste] of Object.entries(bindingTasteOf(cfg))) {
-    const entryLabel = `${sourceLabel} capabilities.${name}`;
-    if (taste.prefer !== undefined) yield { prefer: taste.prefer, siteName: entryLabel };
-    for (const mapKey of ['roles', 'personas', 'seats']) {
-      for (const [key, scope] of Object.entries(taste[mapKey] ?? {})) {
-        if (scope.prefer !== undefined) yield { prefer: scope.prefer, siteName: `${entryLabel}.${mapKey}.${key}` };
-      }
-    }
+/** The persona names of `runner.personas` are bare names under Convention's agent-name rule. */
+function checkPersonaNames(cfg, sourceLabel) {
+  for (const key of Object.keys(bindingTasteOf(cfg).personas)) {
+    const verdict = personaNameProblem(key);
+    if (verdict !== true) throw new RunnerConfigError(`runner config (${sourceLabel} personas) key ${JSON.stringify(key)} must be ${verdict}.`);
   }
 }
 
 /** What a prefer site names must exist: the executor, and the invocation id when it pins one. */
 function checkPreferTargets(cfg, sourceLabel) {
-  for (const site of capabilityPreferSites(cfg, sourceLabel)) {
-    const siteName = site.siteName;
-    for (const candidate of normalizePreferCandidates(site.prefer)) {
+  for (const { prefer, site } of preferSitesOf(cfg)) {
+    const siteName = `${sourceLabel} ${site}`;
+    for (const candidate of normalizePreferCandidates(prefer)) {
       const candidateExecutor = cfg.executors?.[candidate.executor];
       if (!candidateExecutor) {
         throw new RunnerConfigError(
@@ -762,9 +745,9 @@ export function validateRunnerConfigShape(cfg, sourceLabel) {
   for (const [key, why] of Object.entries(REMOVED_RUNNER_KEYS)) {
     if (key in cfg) throw new RunnerConfigError(`runner config (${sourceLabel}) declares retired "${key}": ${why}`);
   }
-  const taste = bindingTasteOf(cfg);
+  checkPersonaNames(cfg, sourceLabel);
   for (const name of capabilityNamesOf(cfg)) {
-    checkCapabilityEntry(cfg, name, taste[name], `${sourceLabel} capabilities.${name}`);
+    checkCapabilityEntry(cfg, name, `${sourceLabel} capabilities.${name}`);
   }
   const isRegistered = (name) => registeredCapabilityOf(cfg, name) !== undefined;
   for (const [executorId, executor] of Object.entries(cfg.executors ?? {})) {

@@ -4,7 +4,7 @@
 import { validateWorkflow, WorkflowDefinitionError } from './definition.mjs';
 import { MODEL_POLICY_TIERS } from '../runner/dispatch/config.mjs';
 import { RunnerConfigError } from '../runner/dispatch/runner-config-error.mjs';
-import { checkDeclaredSeats, assertNoSeatTier } from '../runner/execution/seat-resolver.mjs';
+import { checkDeclaredSeats, assertNoSeatTier, assertNoUnitTier } from '../runner/execution/seat-resolver.mjs';
 
 /**
  * Validate a raw Workflow definition, surfacing a malformed definition as the
@@ -26,6 +26,11 @@ export function validateWorkflowChecked(raw, options) {
   // tier is a recommendation of a registered definition, so one from a units file is refused.
   for (const step of workflow.steps) {
     for (const unit of step.units ?? []) {
+      if (options?.source === 'units-file') assertNoUnitTier(unit.template, 'a units file');
+      const tier = unit.template?.tier;
+      if (tier !== undefined && !MODEL_POLICY_TIERS.includes(tier)) {
+        throw new RunnerConfigError(`step "${step.id}" unit "${unit.id}" tier "${tier}" must be one of [${MODEL_POLICY_TIERS.join(', ')}]`);
+      }
       const seats = unit.template?.seats;
       if (seats === undefined) continue;
       const label = `step "${step.id}" unit "${unit.id}" seats`;

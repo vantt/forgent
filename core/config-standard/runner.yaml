@@ -517,10 +517,6 @@ runner:
       rigor: high
       tier: flagship
       maxTier: frontier
-      seats:
-        producer:
-          tier: frontier
-          prefer: [openai, claude]
     "architecture:synthesize":
       description: "acceptance-run binding for a Workflow unit, over the five provider families that can run in a confined herdr pane"
       prefer:
@@ -532,9 +528,6 @@ runner:
       rigor: critical
       tier: flagship
       maxTier: frontier
-      seats:
-        producer:
-          tier: frontier
     "architecture:explain":
       description: "acceptance-run binding for a Workflow unit, over the five provider families that can run in a confined herdr pane"
       prefer:
@@ -705,14 +698,11 @@ runner:
       tier: flagship
       prefer: [openai, claude]
     "code:*":
-      roles:
-        red-team:
-          prefer: [xai, claude, openai]
       tier: advanced
-    "marketing:*":
-      roles:
-        red-team:
-          prefer: [claude, openai]
+  # @fgos:doc Per-role tier and executor taste, for every capability; a role is producer, synthesizer, reviewer, red-team or judge.
+  roles:
+    red-team:
+      prefer: [xai, claude, openai]
   # @fgos:doc The model each family uses at each tier, by family then tier.
   # @fgos:doc Tier ladder, weakest first:
   # @fgos:doc nano: mechanical, no reasoning; self-check: only recognizes or transforms by pattern?; e.g. classify, extract, format, route, vote
@@ -735,8 +725,8 @@ runner:
       nano: gemini-3.8-flash-low
       standard: gemini-3.8-flash-medium
       advanced: gemini-3.8-flash-high
-      flagship: gemini-4-argon-high
-      frontier: gemini-4-argon-high
+      flagship: gemini-3.8-flash-high
+      frontier: gemini-3.8-flash-high
       mini: gemini-3.8-flash-low
     openai:
       nano:

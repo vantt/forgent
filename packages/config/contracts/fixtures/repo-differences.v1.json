@@ -3,9 +3,9 @@
  "about": "The authoring equivalence record: this repository's tuned config, pinned, against the bundled standard files. differences are the paths where the pinned source differs from the standard layer (maps compared per entry, lists as leaves), each with its reason; standard-only are paths the standard holds and the source does not. Owning test: tests/authoring_equivalence.rs.",
  "source": {
   "file": "authoring-source.config.json",
-  "copied-from": ".fgos/config.json",
+  "copied-from": ".fgos/config.json at ef4a056d7, reshaped at 9758cb1bf (taste moved to runner.roles; seat and marketing blocks removed)",
   "commit": "ef4a056d7",
-  "sha256": "9bf53864fbb6f827768cf03836e9183d0bc2504d328e7d9fb13897bace318d36"
+  "sha256": "52ff463bcd547ecced288f18bc9b350031e2670c8d893bab04506a58d13bd20c"
  },
  "exclusions": [
   {
@@ -265,6 +265,24 @@
   {
    "path": [
     "runner",
+    "modelPolicies",
+    "gemini",
+    "flagship"
+   ],
+   "reason": "the standard names a model agy serves (gemini-3.8-flash-high); the pinned authoring source predates gemini running only through agy and names gemini-4-argon-high, which agy refuses"
+  },
+  {
+   "path": [
+    "runner",
+    "modelPolicies",
+    "gemini",
+    "frontier"
+   ],
+   "reason": "the standard names a model agy serves (gemini-3.8-flash-high); the pinned authoring source predates gemini running only through agy and names gemini-4-argon-high, which agy refuses"
+  },
+  {
+   "path": [
+    "runner",
     "timeoutMs"
    ],
    "reason": "scalar the code already defaults (900000): the standard takes the code default, this repository runs 2100000"
@@ -416,19 +434,6 @@
   {
    "path": [
     "runner",
-    "capabilities",
-    "code:*",
-    "roles",
-    "red-team",
-    "prefer"
-   ],
-   "reason": "the standard appends families to this checker pool so a machine without its preferred family can still seat a red-team checker that differs from the producer; this repository keeps its own list"
-  },
-  {
-   "path": [
-    "runner",
-    "capabilities",
-    "marketing:*",
     "roles",
     "red-team",
     "prefer"

@@ -35,9 +35,9 @@ const trimmedOrUndefined = (value) => (typeof value === 'string' ? value.trim() 
 const fail = (message) => { throw new WorkflowDefinitionError(message); };
 
 /** Refuse an infrastructure field on `object`: the one G2 rule for every place a definition can carry one. */
-function rejectInfraFields(object, subject, { allow, suffix = '' } = {}) {
+function rejectInfraFields(object, subject, { allow = [], suffix = '' } = {}) {
   for (const field of DISALLOWED_G2_FIELDS) {
-    if (field === allow) continue;
+    if (allow?.includes(field)) continue;
     if (object[field] !== undefined) fail(`${subject} contains disallowed infrastructure field "${field}" (G2 constraint${suffix}).`);
   }
 }
@@ -140,6 +140,7 @@ function normalizeTemplate(template, label, allowPrefer) {
     objective: trimmedOrUndefined(template.objective),
     pattern: trimmedOrUndefined(template.pattern),
     rigor,
+    ...(template.tier !== undefined ? { tier: template.tier } : {}),
     writes,
     taskSpec: trimmedOrUndefined(template.taskSpec),
     persona: isText(template.persona) ? template.persona.trim() : undefined,
@@ -164,9 +165,10 @@ function normalizeTemplate(template, label, allowPrefer) {
 function normalizeUnit(u, uIdx, stepLabel, stepId, allowPrefer) {
   const label = `${stepLabel}.units[${uIdx}]`;
   if (!isObject(u)) fail(`${label} must be a non-null object`);
-  rejectInfraFields(u, label);
   const template = u.template && typeof u.template === 'object' ? u.template : u;
-  rejectInfraFields(template, `${label}.template`, { allow: allowPrefer ? 'prefer' : undefined });
+  // A unit's tier is a registered definition's recommendation (a units file is refused it by validateWorkflowChecked).
+  rejectInfraFields(u, label, { allow: template === u ? ['tier'] : [] });
+  rejectInfraFields(template, `${label}.template`, { allow: allowPrefer ? ['prefer', 'tier'] : ['tier'] });
   return Object.freeze({
     id: isText(u.id) ? u.id.trim() : `${stepId}-u${uIdx + 1}`,
     template: normalizeTemplate(template, label, allowPrefer),
