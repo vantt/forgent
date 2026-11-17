@@ -556,6 +556,10 @@ fn unreadable(id: &str, message: &str) -> RowResult {
     {
         return result(false, format!("{message}; {TRANSPORT_REMEDY}"), None);
     }
+    // The incidents row is a pointer and never fails: facts it cannot read are a warning.
+    if id == "git-incidents" {
+        return result(true, format!("warning: {message}"), None);
+    }
     result(false, message, None)
 }
 
@@ -760,6 +764,13 @@ mod tests {
     }
 
     #[test]
+    fn the_incidents_pointer_never_fails_even_when_its_facts_cannot_be_read() {
+        let row = unreadable("git-incidents", "git-spawn-failed");
+        assert!(row.passed);
+        assert_eq!(row.message.as_deref(), Some("warning: git-spawn-failed"));
+    }
+
+    #[test]
     fn an_untrusted_credential_helper_names_its_remedy_and_other_failures_do_not() {
         let named = unreadable(
             "git-repository-config",
@@ -934,9 +945,7 @@ mod tests {
         );
     }
 
-    // These rows read the repository through the Git door, which keeps its journal on Linux only; macOS answers them
-    // differently from run to run.
-    #[cfg(target_os = "linux")]
+    #[cfg(unix)]
     #[test]
     fn the_incidents_row_never_fails_it_counts_native_locks_and_a_merge_in_progress_and_points_to_fgos_git_status(
     ) {
@@ -1106,9 +1115,7 @@ mod tests {
         assert_eq!(message(&row), "git available");
     }
 
-    // These rows read the repository through the Git door, which keeps its journal on Linux only; macOS answers them
-    // differently from run to run.
-    #[cfg(target_os = "linux")]
+    #[cfg(unix)]
     #[test]
     fn the_hook_row_applies_only_to_a_project_whose_pre_commit_is_the_fgos_guard() {
         let f = Fixture::new("hooks");
