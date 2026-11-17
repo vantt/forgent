@@ -223,8 +223,8 @@ async function runScript(entry, testCase) {
   }
 }
 
-/** The one key the host adds to the answer where the activation fence is missing. */
-const WAL_FENCE_WARNING = ',"gitWalWarning":"Git WAL not initialised: git-fence-missing; run `fgctl init` (or `fgctl upgrade`) in this project to place the activation fence, then run fgos init again"';
+/** The one key the host adds to the answer where the activation fence is missing, in compact or pretty-printed JSON. */
+const WAL_FENCE_WARNING = new RegExp(',\\s*"gitWalWarning":\\s*' + JSON.stringify('Git WAL not initialised: git-fence-missing; run `fgctl init` (or `fgctl upgrade`) in this project to place the activation fence, then run fgos init again').replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
 
 /** Runs one case on the base release (entry A) and the host (entry B), each on a fresh world, and compares them. */
 export async function runPreparedCase(entryA, entryB, testCase) {
@@ -235,7 +235,7 @@ export async function runPreparedCase(entryA, entryB, testCase) {
     // release never touched the WAL). The warning is pinned here and left out of the comparison.
     if (testCase.world.fence === false) {
       for (const output of host.outputs) {
-        assert.ok(output.stdout.includes(WAL_FENCE_WARNING), `${testCase.id}: the host did not warn about the missing fence: ${output.stdout}`);
+        assert.ok(WAL_FENCE_WARNING.test(output.stdout), `${testCase.id}: the host did not warn about the missing fence: ${output.stdout}`);
         output.stdout = output.stdout.replace(WAL_FENCE_WARNING, '');
       }
     }

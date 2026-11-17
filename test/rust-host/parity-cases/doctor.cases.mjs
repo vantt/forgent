@@ -484,8 +484,12 @@ function describe(text, ignoreRows = [], accepted = null, side = 'host') {
   if (!data?.checks) return { text: withoutRetiredLines(text) };
   return {
     ok: data.ok,
-    // The accepted fix of a row is also one entry of `next`; each side's entry is dropped after it was pinned above.
-    next: accepted?.next ? data.next.filter((entry) => entry !== accepted.next[side]) : data.next,
+    // The accepted fix of a row is also one entry of `next` (each command once); each side's entry is dropped after it was
+    // pinned above, unless another failing row names the same command, which keeps it in `next` on its own.
+    next: accepted?.next
+      ? data.next.filter((entry) => entry !== accepted.next[side]
+        || data.checks.some((check) => !accepted.rows.includes(check.id) && check.fix === entry))
+      : data.next,
     fixed: data.fixed,
     // The compatibility row's `detail.versions` listed the Node addon's own component versions; the host has no addon, so
     // it lists the Git component's (accepted change); the floor in `detail` is compared.
