@@ -22,7 +22,7 @@ two phases in one wave share a footprint. The planner then states in the plan, u
 phase table, that it checked these and what it found.
 
 Plans are project data: plain files in the repository, generic and self-describing, with
-no UI-specific or project-specific keys (D-ADR0079). An engine runs from them with no UI;
+no UI-specific or project-specific keys (D-ADR0079 (the portfolio is the project's truth; Work is a replaceable surface)). An engine runs from them with no UI;
 any UI layer reads them through its own adapter. The check reads frontmatter through
 the YAML door (`src/util/yaml.mjs`), never a private parser.
 
