@@ -1,7 +1,7 @@
 ---
 phase: 5
 title: "One account inventory shape (runner.llmAccounts)"
-status: pending
+status: applied on design-lap 2026-11-17 except step 6 (deferred)
 priority: P2
 effort: 3h
 depends_on: [P3, D3, P4 step 3 (agy files known)]
@@ -82,3 +82,30 @@ All three activations (2026-10-25 and later) read `llmAccounts` (`bc57e8550`, 20
 
 Restore the accounts backup through the door (`fgos config set runner.providers '<flow>'`), or by
 file copy with the owner present. `llmAccounts` entries can stay, because the lease prefers them per pool.
+
+## Applied (design-lap machine, 2026-11-17, owner-approved)
+
+Backup: `~/.fgos/private/config-backup-261117-p5/` (accounts file and global config before P5).
+
+- Steps 1 to 5 and 7 done. The agy `files` (step 2) were already added in P8. The names comparison (step 3)
+  found no file that an account lists and no invocation declares, for agy, omp, pi and claude (codex needs none).
+- `runner.llmAccounts` now holds pools `openai` (fgovn, tetnu, each with a codex and a pi store), `xai` (vantt),
+  `claude` (main), `gemini` (tetcu72, tetnu) and, from P8, `gemini-lite` (mucdong), besides the existing
+  `openrouter` and `thehive`: 9 accounts in 7 pools. Order and the lease state keys are unchanged.
+- Doctor: `llm-accounts-shape` ok, `confined-pane-accounts` ok, `model-policy-pools` ok. `llm-accounts-vs-legacy`
+  differs only for pools that exist in one place: `z-ai/openrouter` and `deepseek/openrouter` (only in
+  `runner.providers`; no tier cell names those pools, so they are dead) and the pools that exist only in
+  `llmAccounts`.
+- `fgos dispatch explain`: every pool reports source `llmAccounts`.
+- Harness probes after the move, all `healthy`: openai/fgovn and openai/tetnu (codex cli, codex herdr, pi cli,
+  pi herdr, all `ok`), xai/vantt (omp cli, omp herdr), gemini/tetcu72 and gemini/tetnu (`agy-cli-bwrap`).
+  claude/main was not probed (headless claude stops at the trust prompt).
+
+**Step 6 deferred on purpose.** `runner.providers` is not removed yet. The lease already prefers `llmAccounts`
+per pool, so the legacy copies change no behaviour; but `fgos dispatch probe-account` reads accounts only from
+`runner.providers`, so removing it now would leave no way to probe any account. The S5 / MP-C change that
+deletes the reader must first make `probe-account` read `llmAccounts` (and ask the model of the account's own
+pool, not the first tier-cell entry). Until then the legacy copies and the two dead pools stay, and this phase
+closes with step 6 once that lands.
+
+Rollback: restore the accounts file from the backup through the door, or by file copy with the owner present.
