@@ -1082,6 +1082,8 @@ mod tests {
             .unwrap()
     }
 
+    // Systemd units and launchd plists are written for Unix hosts from host paths; a Windows host has no timer.
+    #[cfg(unix)]
     #[test]
     fn units_and_plists_have_the_bytes_node_wrote_on_both_platforms() {
         let vectors: Vec<Value> =
@@ -1121,6 +1123,8 @@ mod tests {
         }
     }
 
+    // Systemd units and launchd plists are written for Unix hosts from host paths; a Windows host has no timer.
+    #[cfg(unix)]
     #[test]
     fn the_probe_path_adds_the_homebrew_folder_only_on_darwin() {
         let home = Path::new("/home/u");
@@ -1360,6 +1364,8 @@ mod tests {
         assert!(check.message.contains("(disabled)"));
     }
 
+    // Systemd units and launchd plists are written for Unix hosts from host paths; a Windows host has no timer.
+    #[cfg(unix)]
     #[test]
     fn the_timer_names_the_project_shim_when_there_is_one() {
         for schedule in Schedule::ALL {
@@ -1509,6 +1515,8 @@ mod tests {
         assert!(!w.units().exists(), "nothing was written");
     }
 
+    // Systemd units and launchd plists are written for Unix hosts from host paths; a Windows host has no timer.
+    #[cfg(unix)]
     #[test]
     fn the_launchd_enable_boots_out_then_bootstraps_the_plist_in_the_user_domain() {
         let w = World::new();
@@ -1551,6 +1559,23 @@ mod tests {
         );
     }
 
+    // The config door refuses Windows by name; a timer then reads as off.
+    #[cfg(not(unix))]
+    #[test]
+    fn on_a_platform_the_config_door_refuses_a_project_config_reads_as_no_schedule() {
+        let project = scratch("config-refused");
+        let fgos = project.join(".fgos");
+        std::fs::create_dir_all(&fgos).unwrap();
+        std::fs::write(
+            fgos.join("config.yaml"),
+            "dispatch:\n  probeAccount:\n    intervalSec: 300\n",
+        )
+        .unwrap();
+        let value = read_project_config(&project).unwrap();
+        assert_eq!(Schedule::AccountProbe.schedule_of(value.as_ref()), None);
+    }
+
+    #[cfg(unix)]
     #[test]
     fn the_real_config_read_turns_a_probe_interval_on_and_reads_an_unusable_file_as_off() {
         let project = scratch("config");
