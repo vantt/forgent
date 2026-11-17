@@ -340,10 +340,12 @@ dependencies = [
 name = "fgos-execution"
 version = "0.2.0"
 dependencies = [
+ "fgos-canonical-json",
  "fgos-seat-binding",
  "fgos-yaml-doc",
  "serde",
  "serde_json",
+ "sha2",
 ]
 
 [[package]]

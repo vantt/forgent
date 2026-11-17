@@ -18,12 +18,12 @@ import { BIND_FACTS, evaluateVector, leaseReadOf, VECTOR_FACTS } from '../../hel
 const CONTRACT = JSON.parse(fs.readFileSync(new URL('../../../packages/execution/contracts/executor-model.v1.json', import.meta.url), 'utf8'));
 const BIND_CONTRACT = JSON.parse(fs.readFileSync(new URL('../../../packages/execution/contracts/bind.v1.json', import.meta.url), 'utf8'));
 
-test('Node launch code derives the same executor facts as the executor-model contract', () => {
+test('Node launch code derives the same executor facts as the executor-model contract, except where a vector states a rule decided after it', () => {
   assert.equal(CONTRACT.version, 'executor-model.v1');
   assert.deepEqual([...new Set(CONTRACT.vectors.map((vector) => vector.fact))].sort(), [...VECTOR_FACTS].sort(), 'every derived fact has at least one vector');
   assert.deepEqual(CONTRACT.facts, [...new Set(CONTRACT.vectors.map((vector) => vector.fact))], 'the fact list names the facts the vectors cover');
   assert.equal(new Set(CONTRACT.vectors.map((vector) => vector.name)).size, CONTRACT.vectors.length, 'vector names are unique');
-  for (const vector of CONTRACT.vectors) {
+  for (const vector of CONTRACT.vectors.filter((v) => !v.decided)) {
     assert.deepEqual(evaluateVector(vector), vector.expect, vector.name);
     assert.deepEqual(leaseReadOf(vector), vector.leaseRead, `${vector.name}: lease read`);
   }

@@ -11,25 +11,25 @@ use std::fmt;
 // ---- reading the JSON ----------------------------------------------------------------------------------
 
 /// A JSON null to borrow where a reading finds nothing.
-static NULL: Value = Value::Null;
+pub(crate) static NULL: Value = Value::Null;
 
 /// A key that is present and not null (the reading of `??`).
-fn present<'a>(value: &'a Value, key: &str) -> Option<&'a Value> {
+pub(crate) fn present<'a>(value: &'a Value, key: &str) -> Option<&'a Value> {
     value.get(key).filter(|found| !found.is_null())
 }
 
 /// A string-valued key.
-fn str_of<'a>(value: &'a Value, key: &str) -> Option<&'a str> {
+pub(crate) fn str_of<'a>(value: &'a Value, key: &str) -> Option<&'a str> {
     value.get(key).and_then(Value::as_str)
 }
 
 /// A string-valued key that is not empty (the reading of `||` and a truthiness test).
-fn truthy_str<'a>(value: &'a Value, key: &str) -> Option<&'a str> {
+pub(crate) fn truthy_str<'a>(value: &'a Value, key: &str) -> Option<&'a str> {
     str_of(value, key).filter(|text| !text.is_empty())
 }
 
 /// An array-valued key; empty when the key is absent or holds anything else.
-fn array_of<'a>(value: &'a Value, key: &str) -> &'a [Value] {
+pub(crate) fn array_of<'a>(value: &'a Value, key: &str) -> &'a [Value] {
     value
         .get(key)
         .and_then(Value::as_array)
@@ -37,7 +37,7 @@ fn array_of<'a>(value: &'a Value, key: &str) -> &'a [Value] {
 }
 
 /// The executors of a runner section (the caller unwraps a config that nests it as `runner`).
-fn executors_of(runner: &Value) -> Option<&Map<String, Value>> {
+pub(crate) fn executors_of(runner: &Value) -> Option<&Map<String, Value>> {
     present(runner, "executors").and_then(Value::as_object)
 }
 
@@ -54,7 +54,7 @@ fn is_separator(c: char) -> bool {
 }
 
 /// The program name of a command, as Node's `path.basename`.
-fn basename(command: &str) -> &str {
+pub(crate) fn basename(command: &str) -> &str {
     command
         .trim_end_matches(is_separator)
         .rsplit(is_separator)
@@ -63,7 +63,11 @@ fn basename(command: &str) -> &str {
 }
 
 /// The command an invocation runs: its own, else the executor's, else the runner's default executor.
-fn command_of<'a>(runner: &'a Value, entry: &'a Value, invocation: &'a Value) -> Option<&'a str> {
+pub(crate) fn command_of<'a>(
+    runner: &'a Value,
+    entry: &'a Value,
+    invocation: &'a Value,
+) -> Option<&'a str> {
     present(invocation, "command")
         .or_else(|| present(entry, "command"))
         .and_then(Value::as_str)
@@ -99,6 +103,19 @@ impl ModelError {
         ModelError {
             name: "RunnerConfigError",
             code: Some(code),
+            message,
+        }
+    }
+
+    /// An error of another class than the runner config's (the class Node throws it under).
+    pub(crate) fn of_class(
+        name: &'static str,
+        code: Option<&'static str>,
+        message: String,
+    ) -> Self {
+        ModelError {
+            name,
+            code,
             message,
         }
     }
@@ -242,7 +259,7 @@ pub fn family_of(source: FamilySource<'_>, command: Option<&str>) -> String {
 /// The family of an executor id as the bind reads it: the entry's own, else inferred from the command of its
 /// first `cli` invocation, else its own command, else the default executor's (an entry whose only program name
 /// is an `adapter` takes `claude`).
-fn executor_family(runner: &Value, id: &str) -> String {
+pub(crate) fn executor_family(runner: &Value, id: &str) -> String {
     let entry = executors_of(runner).and_then(|executors| executors.get(id));
     let Some(entry) = entry else {
         return family_of(FamilySource::None, default_command_of(runner));
@@ -579,7 +596,7 @@ const NO_POSTURE: Posture = Posture {
 };
 
 /// The confinement an invocation runs under: its own, else the executor's.
-fn confinement_of<'a>(invocation: &'a Value, entry: &'a Value) -> Option<&'a Value> {
+pub(crate) fn confinement_of<'a>(invocation: &'a Value, entry: &'a Value) -> Option<&'a Value> {
     present(invocation, "confinement").or_else(|| present(entry, "confinement"))
 }
 
@@ -685,7 +702,7 @@ pub struct Session {
 
 /// The programs an executor starts, as bare names, when none of them is installed here; `None` when one is, when
 /// the executor starts no program of its own (a native agent, a tool), or when it is in-process.
-fn missing_clis(
+pub(crate) fn missing_clis(
     runner: &Value,
     id: &str,
     entry: &Value,
@@ -807,6 +824,65 @@ pub struct LaunchFacts {
     pub unnamed_carries: bool,
 }
 
+/// Whether an invocation is a generic form: its id is `<cli>-<cli|herdr>[-bwrap]`, where `<cli>` is the program it
+/// runs, the transport is `herdr` for a herdr-spawn invocation, and `-bwrap` is there exactly when bwrap confines it.
+/// Any other id is a named form, there for a pin.
+fn is_generic_form(runner: &Value, entry: &Value, invocation: &Value) -> bool {
+    let (Some(id), Some(command)) = (
+        truthy_str(invocation, "id"),
+        command_of(runner, entry, invocation),
+    ) else {
+        return false;
+    };
+    let transport = if str_of(invocation, "adapter") == Some("herdr-spawn") {
+        "herdr"
+    } else {
+        "cli"
+    };
+    let bwrap =
+        confinement_of(invocation, entry).and_then(|c| str_of(c, "backend")) == Some("bwrap");
+    id == format!(
+        "{}-{transport}{}",
+        basename(command),
+        if bwrap { "-bwrap" } else { "" }
+    )
+}
+
+/// The invocation an unpinned seat runs, by one explicit rule over the cli invocations that can carry the posture
+/// here (a herdr-spawn one only inside herdr): a generic form before a named one, then the session's transport
+/// (herdr inside herdr), then the declared order. A pin never comes here: a pinned invocation is kept or refused.
+fn chosen_invocation(
+    runner: &Value,
+    entry: &Value,
+    facts: &[InvocationFacts],
+    herdr: bool,
+) -> Option<String> {
+    array_of(entry, "invocations")
+        .iter()
+        .enumerate()
+        .filter(|(_, inv)| str_of(inv, "via") == Some("cli"))
+        .filter_map(|(order, inv)| {
+            let id = truthy_str(inv, "id")?;
+            let on_herdr = str_of(inv, "adapter") == Some("herdr-spawn");
+            if on_herdr && !herdr {
+                return None;
+            }
+            facts
+                .iter()
+                .any(|fact| fact.id == id && fact.carries_posture)
+                .then_some((
+                    (
+                        !is_generic_form(runner, entry, inv),
+                        herdr && !on_herdr,
+                        order,
+                    ),
+                    id,
+                ))
+        })
+        .min_by_key(|(rank, _)| *rank)
+        .map(|(_, id)| id.to_string())
+}
+
 fn executor_facts(
     runner: &Value,
     governance: &Governance,
@@ -868,26 +944,15 @@ fn executor_facts(
             invocation: invocations.first().map(|inv| inv.id.clone()),
         };
     }
-    let mut default_invocation = None;
-    if let Some(invocation) = approved.invocation.as_ref().filter(|_| approved.ok) {
-        default_invocation = Some(invocation.clone());
-        let herdr_invocation = array_of(entry, "invocations")
-            .iter()
-            .find(|inv| {
-                str_of(inv, "via") == Some("cli")
-                    && str_of(inv, "adapter") == Some("herdr-spawn")
-                    && truthy_str(inv, "id").is_some()
-            })
-            .and_then(|inv| truthy_str(inv, "id"));
-        if let Some(herdr_id) = herdr_invocation.filter(|herdr_id| {
-            herdr
-                && invocations
-                    .iter()
-                    .any(|inv| inv.id == *herdr_id && inv.carries_posture)
-        }) {
-            default_invocation = Some(herdr_id.to_string());
-        }
-    }
+    let mut default_invocation =
+        approved
+            .invocation
+            .as_ref()
+            .filter(|_| approved.ok)
+            .map(|approved_id| {
+                chosen_invocation(runner, entry, &invocations, herdr)
+                    .unwrap_or_else(|| approved_id.clone())
+            });
     // An executor that declares no invocation runs its own command: for a caller that does not launch this
     // binding, that command is the one invocation whose effort levels are judged.
     if at_launch && invocations.is_empty() {

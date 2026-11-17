@@ -32,7 +32,9 @@ fn machine_of(vector: &Value) -> VectorMachine {
 }
 
 fn now_of(args: &Value) -> u64 {
-    args["now"].as_u64().expect("a vector states the time it runs at")
+    args["now"]
+        .as_u64()
+        .expect("a vector states the time it runs at")
 }
 
 fn answer<T: Into<Value>>(result: Result<T, fgos_execution::executor_model::ModelError>) -> Value {
@@ -82,7 +84,9 @@ fn evaluate(vector: &Value) -> Value {
                 now_of(args),
             ))
         }
-        "seatConfig" => json!({ "config": seat_config(runner), "digest": seat_config_digest(runner) }),
+        "seatConfig" => {
+            json!({ "config": seat_config(runner), "digest": seat_config_digest(runner) })
+        }
         "effectiveRigor" => answer(
             effective_rigor(&args["unit"], runner).map(|rigor| json!(rigor.unwrap_or("standard"))),
         ),

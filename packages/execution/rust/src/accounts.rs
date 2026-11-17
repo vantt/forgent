@@ -667,3 +667,177 @@ pub fn provider_account_inventory(
     }
     Ok(inventory)
 }
+
+// ---- the account view Seat Binding ranks from -----------------------------------------------------------
+
+/// Whether an account of the inventory holds a login store for `cli`: its store for that CLI when it declares one
+/// per CLI, else its one store.
+pub(crate) fn has_store_for(account: &Value, cli: Option<&str>) -> bool {
+    let truthy = |value: Option<&Value>| {
+        value.is_some_and(|v| {
+            !v.is_null() && v != &json!(false) && v != &json!("") && v != &json!(0)
+        })
+    };
+    match account
+        .get("credentialSources")
+        .filter(|sources| truthy(Some(sources)))
+    {
+        Some(sources) => cli.is_some_and(|cli| truthy(sources.get(cli))),
+        None => truthy(account.get("credentialSource")),
+    }
+}
+
+/// The cells' pools of one `modelPolicies` cell, as the tier cell reader names them; `None` for a cell it would
+/// refuse (the config validator reports that one).
+fn cell_pools(cell: &Value, family: &str) -> Option<Vec<String>> {
+    const EFFORTS: [&str; 4] = ["low", "medium", "high", "max"];
+    let entries: Vec<&Value> = match cell {
+        Value::Array(list) if list.is_empty() => return None,
+        Value::Array(list) => list.iter().collect(),
+        one => vec![one],
+    };
+    entries
+        .into_iter()
+        .map(|entry| match entry {
+            Value::Object(fields) => {
+                let model_ok = fields
+                    .get("model")
+                    .and_then(Value::as_str)
+                    .is_some_and(|model| !model.trim().is_empty());
+                let effort_ok = fields
+                    .get("effort")
+                    .is_none_or(|effort| effort.as_str().is_some_and(|e| EFFORTS.contains(&e)));
+                let keys_ok = fields
+                    .keys()
+                    .all(|key| ["model", "pool", "effort"].contains(&key.as_str()));
+                match fields.get("pool") {
+                    _ if !(model_ok && effort_ok && keys_ok) => None,
+                    None => Some(family.to_string()),
+                    Some(Value::String(pool)) if !pool.trim().is_empty() => Some(pool.clone()),
+                    Some(_) => None,
+                }
+            }
+            Value::String(text) if !text.trim().is_empty() => match text.rfind('@') {
+                None => Some(family.to_string()),
+                Some(at) => {
+                    let (model, pool) = (text[..at].trim(), text[at + 1..].trim());
+                    (!model.is_empty() && !pool.is_empty()).then(|| pool.to_string())
+                }
+            },
+            _ => None,
+        })
+        .collect()
+}
+
+/// The pools a seat may be served by and the accounts each declares, each with the CLIs it holds a login store for
+/// (never where it is kept): the pools are every family of the launch view and every pool a `modelPolicies` cell
+/// names. An unreadable inventory is no accounts. `account_state` is Dispatch's read of the lease state keyed by the
+/// lease document's provider keys (a pool reads the key `legacy_state_key` gives it): the account held (sticky), a
+/// quarantine still running at `now`, a failed probe, and a quarantine one real call may lift, which the view offers
+/// only when no account of the pool is healthy. Without it the view is the config alone.
+pub fn account_view(
+    runner: &Value,
+    launch_view: &Map<String, Value>,
+    account_state: Option<&Value>,
+    now: u64,
+    machine: &dyn Machine,
+) -> Value {
+    let inventory = provider_account_inventory(runner, machine).unwrap_or_default();
+    let mut clis: Vec<&str> = Vec::new();
+    let mut pools: Vec<String> = Vec::new();
+    for facts in launch_view.values() {
+        for cli in facts
+            .get("invocations")
+            .and_then(Value::as_array)
+            .into_iter()
+            .flatten()
+            .filter_map(|inv| inv.get("cli").and_then(Value::as_str))
+        {
+            if !clis.contains(&cli) {
+                clis.push(cli);
+            }
+        }
+        if let Some(family) = facts.get("family").and_then(Value::as_str) {
+            if !pools.iter().any(|pool| pool == family) {
+                pools.push(family.to_string());
+            }
+        }
+    }
+    for (family, tiers) in runner
+        .get("modelPolicies")
+        .and_then(Value::as_object)
+        .into_iter()
+        .flatten()
+    {
+        for cell in tiers
+            .as_object()
+            .into_iter()
+            .flat_map(|tiers| tiers.values())
+        {
+            for pool in cell_pools(cell, family).unwrap_or_default() {
+                if !pools.contains(&pool) {
+                    pools.push(pool);
+                }
+            }
+        }
+    }
+    let empty = Map::new();
+    let view: Map<String, Value> = pools
+        .into_iter()
+        .map(|pool| {
+            let key = legacy_state_key(&pool);
+            let states = account_state
+                .and_then(|overlay| overlay.get(&key))
+                .and_then(Value::as_object)
+                .unwrap_or(&empty);
+            let out = |id: &str| {
+                states
+                    .get(id)
+                    .and_then(|state| state.get("quarantinedUntil"))
+                    .and_then(Value::as_u64)
+                    .filter(|until| *until > now)
+            };
+            let declared = inventory
+                .get(&key)
+                .and_then(|provider| provider.get("accounts"))
+                .and_then(Value::as_object)
+                .unwrap_or(&empty);
+            let healthy = declared.iter().any(|(id, account)| {
+                account.get("disabled") != Some(&json!(true)) && out(id).is_none()
+            });
+            let accounts: Vec<Value> = declared
+                .iter()
+                .map(|(id, account)| {
+                    let state = states.get(id).unwrap_or(&Value::Null);
+                    let flag = |key: &str| state.get(key) == Some(&json!(true));
+                    let until = out(id);
+                    let liftable = until.is_some() && flag("probeable") && !healthy;
+                    let mut entry = Map::new();
+                    entry.insert("id".into(), json!(id));
+                    entry.insert(
+                        "clis".into(),
+                        json!(clis
+                            .iter()
+                            .filter(|cli| has_store_for(account, Some(cli)))
+                            .collect::<Vec<_>>()),
+                    );
+                    if account.get("disabled") == Some(&json!(true)) {
+                        entry.insert("disabled".into(), json!(true));
+                    }
+                    if flag("sticky") {
+                        entry.insert("sticky".into(), json!(true));
+                    }
+                    if let Some(until) = until.filter(|_| !liftable) {
+                        entry.insert("quarantinedUntil".into(), json!(until));
+                    }
+                    if until.is_some() && flag("probeFailed") {
+                        entry.insert("probe".into(), json!("failed"));
+                    }
+                    Value::Object(entry)
+                })
+                .collect();
+            (pool, Value::Array(accounts))
+        })
+        .collect();
+    json!({ "pools": view })
+}

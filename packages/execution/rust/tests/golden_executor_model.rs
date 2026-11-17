@@ -172,7 +172,9 @@ fn evaluate(vector: &Value) -> Option<Value> {
                 Some(&pin),
                 vector.get("leaseRead"),
                 &machine,
-                args["now"].as_u64().expect("a quarantine vector states now"),
+                args["now"]
+                    .as_u64()
+                    .expect("a quarantine vector states now"),
             );
             json!(facts.pin_quarantined_until)
         }
