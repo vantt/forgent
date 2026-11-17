@@ -104,10 +104,13 @@ mod tests {
 
     const GOLDEN: &str = include_str!("../tests/goldens/bin-cache-file.json");
 
+    /// The launcher's extension where the search is Windows's own: a program there is found by `PATHEXT`.
+    const EXT: &str = if cfg!(windows) { ".exe" } else { "" };
+
     fn fgos_on_path(dir: &Path) -> PathBuf {
         let bin = dir.join("bin");
         std::fs::create_dir_all(&bin).unwrap();
-        let file = bin.join("fgos");
+        let file = bin.join(format!("fgos{EXT}"));
         std::fs::write(&file, "#!/bin/sh\nexit 0\n").unwrap();
         #[cfg(unix)]
         {
@@ -118,7 +121,7 @@ mod tests {
     }
 
     fn refresh(global: &Path, path: &str) -> Refreshed {
-        refresh_global_bin_cache(global, path, "", false).unwrap()
+        refresh_global_bin_cache(global, path, EXT, cfg!(windows)).unwrap()
     }
 
     #[test]
@@ -131,10 +134,12 @@ mod tests {
         assert!(out.changed);
         let written = std::fs::read_to_string(global.join(CACHE_FILE)).unwrap();
         let golden: Value = serde_json::from_str(GOLDEN).unwrap();
+        // The file holds the path as a JSON string, so a Windows path's backslashes are escaped there.
+        let escaped = serde_json::to_string(fgos.to_str().unwrap()).unwrap();
         let expected = golden["file"]
             .as_str()
             .unwrap()
-            .replace("<BIN>", fgos.to_str().unwrap());
+            .replace("<BIN>", escaped.trim_matches('"'));
         assert_eq!(written, expected);
         #[cfg(unix)]
         {

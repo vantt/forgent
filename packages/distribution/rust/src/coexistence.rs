@@ -228,15 +228,12 @@ mod tests {
         std::fs::create_dir(root.join("AGENTS.md")).unwrap();
         let d = detect_harnesses(&root);
         assert!(d.detected_harnesses.is_empty());
-        assert_eq!(
-            d.agents_md_read_error.as_deref(),
-            Some("EISDIR: illegal operation on a directory, read")
-        );
+        let error = d.agents_md_read_error.as_deref().expect("a recorded error");
+        // The text is the OS's own for reading a directory; Node's name for it is what a Unix host answers.
+        #[cfg(unix)]
+        assert_eq!(error, "EISDIR: illegal operation on a directory, read");
         let manifest = build_manifest(&root, Path::new("/tmp"));
-        assert_eq!(
-            manifest["agentsMdReadError"],
-            "EISDIR: illegal operation on a directory, read"
-        );
+        assert_eq!(manifest["agentsMdReadError"], error);
     }
 
     #[test]
@@ -245,7 +242,11 @@ mod tests {
         std::fs::create_dir(root.join(".claude")).unwrap();
         let data = root.join(".fgos");
         write_coexistence_manifest(&root, &data, Path::new("/tmp")).unwrap();
-        let expected = "{\n  \"v\": 1,\n  \"territory\": {\n    \"data\": \".fgos/\",\n    \"worktrees\": {\n      \"descriptor\": \"<tmpdir>/fgos-worktrees\",\n      \"resolved\": \"/tmp/fgos-worktrees\"\n    },\n    \"branches\": \"fgw/*\"\n  },\n  \"detected_harnesses\": [\n    {\n      \"name\": \"claude\",\n      \"markers\": [\n        \".claude\"\n      ]\n    }\n  ]\n}\n";
+        // The resolved directory is the tmpdir joined with the platform's own separator.
+        let resolved = Path::new("/tmp").join("fgos-worktrees");
+        let resolved = serde_json::to_string(resolved.to_str().unwrap()).unwrap();
+        let expected = "{\n  \"v\": 1,\n  \"territory\": {\n    \"data\": \".fgos/\",\n    \"worktrees\": {\n      \"descriptor\": \"<tmpdir>/fgos-worktrees\",\n      \"resolved\": RESOLVED\n    },\n    \"branches\": \"fgw/*\"\n  },\n  \"detected_harnesses\": [\n    {\n      \"name\": \"claude\",\n      \"markers\": [\n        \".claude\"\n      ]\n    }\n  ]\n}\n";
+        let expected = expected.replace("RESOLVED", &resolved);
         assert_eq!(
             std::fs::read_to_string(data.join(MANIFEST_FILE)).unwrap(),
             expected
@@ -277,6 +278,14 @@ mod tests {
         );
     }
 
+    // Windows answers its own temporary directory whatever the variables say.
+    #[cfg(windows)]
+    #[test]
+    fn the_tmpdir_is_the_platforms_own_on_windows() {
+        assert_eq!(os_tmpdir(|_| Some("/a".into())), std::env::temp_dir());
+    }
+
+    #[cfg(unix)]
     #[test]
     fn the_tmpdir_follows_the_first_variable_set_and_drops_one_trailing_slash() {
         let env = |pairs: &'static [(&'static str, &'static str)]| {
