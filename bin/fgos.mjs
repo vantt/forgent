@@ -2269,6 +2269,14 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
     // wired into `doctor` or any automatic gate. The runner config is THIS
     // repo's own live config, read via `loadRunnerConfigForDir`, which never
     // writes, so a read-only lint never mutates state as a side effect of being run.
+    // Read-only portfolio verb: the open owner questions of the discussion, plan and execution stages,
+    // read through src/portfolio and never written.
+    case 'questions': {
+      if (flags.open !== true && flags.open !== 'true') throw new StoreError('precondition', 'questions requires --open: fgos questions --open [--json]');
+      const { collectOpenQuestions } = await import('../src/portfolio/open-questions.mjs');
+      return { questions: collectOpenQuestions(path.dirname(dir)) };
+    }
+
     case 'plan-lint': {
       const rawPath = optionalField(positional[0], 'plan-lint requires a <path> to a plan directory, plan.md, or phase file, e.g. `fgos plan-lint plans/<track>`.');
       if (rawPath === undefined) {
@@ -3725,7 +3733,10 @@ async function main() {
       },
     }, async () => {
       const data = await runVerb(verb, flags, positional, dir, rest);
-      if (verb === 'plan-lint' && !flags.json) {
+      if (verb === 'questions' && !flags.json) {
+        const { renderOpenQuestions } = await import('../src/portfolio/open-questions.mjs');
+        process.stdout.write(`${renderOpenQuestions(data.questions)}\n`);
+      } else if (verb === 'plan-lint' && !flags.json) {
         process.stdout.write(renderPlanLintReport(data));
       } else if (verb === 'workflow' && positional[0] === 'propose' && !flags.json) {
         const { renderProposalText } = await import('../src/workflow/propose.mjs');

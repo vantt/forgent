@@ -2844,6 +2844,35 @@
       "deprecated": null
     },
     {
+      "name": "questions",
+      "invoke": "fgos questions --open",
+      "description": "Read-only: every open owner question across the three stage places in one batch, grouped by topic. A discussion question (docs/discussions/<topic>/QUESTIONS.md), a draft plan's owner-questions section, and an open Workflow gate each carry {topic, stage: discussion|plan|execution, ref, question, answerDoor}; answerDoor is the command or place that answers it in its own stage. Default output is a text batch; `--json` returns the items. Never writes.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "open": {
+            "type": "boolean",
+            "description": "List the open questions (the only mode today)."
+          },
+          "json": {
+            "type": "boolean",
+            "description": "Return the items as JSON instead of the text batch."
+          }
+        },
+        "required": [
+          "open"
+        ]
+      },
+      "examples": [
+        "fgos questions --open",
+        "fgos questions --open --json"
+      ],
+      "touchesState": false,
+      "externalEffect": false,
+      "paginated": false,
+      "deprecated": null
+    },
+    {
       "name": "merge",
       "invoke": "fgos merge <list|next>",
       "description": "Merge the awaiting-approval items that are ready: \"list\" (read-only) ranks them, \"next\" merges the top-ranked one through the same approve/sync-root logic (never a parallel merge path).",

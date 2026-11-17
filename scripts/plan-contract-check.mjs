@@ -13,6 +13,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { readFrontmatter } from '../src/util/yaml.mjs';
 import { isMainModule } from './lib/is-main-module.mjs';
+import { PLAN_SECTIONS, hasSection } from '../src/portfolio/plan-sections.mjs';
 
 export const CONTRACT_MARKER = 'plan-v1';
 export const STATUSES = ['draft', 'ready', 'running', 'done', 'withdrawn'];
@@ -23,10 +24,6 @@ export const LEGACY_STATUS = {
 };
 const PRIORITIES = ['P0', 'P1', 'P2', 'P3'];
 const TABLE_COLUMNS = ['id', 'title', 'dependson', 'footprint', 'wave', 'status'];
-const SECTIONS = [
-  ['outcome', /outcome|goal/i], ['acceptance criteria', /acceptance/i], ['non-goals', /non-?goals/i],
-  ['phases', /phases/i], ['owner questions', /owner questions/i], ['risks and rollback', /risk/i],
-];
 
 const strings = (v) => Array.isArray(v) && v.every((s) => typeof s === 'string' && s.trim() !== '');
 const norm = (p) => p.replace(/\\/g, '/').replace(/\*.*$/, '').replace(/\/+$/, '');
@@ -131,8 +128,7 @@ export function checkPlanDir(dir, { plansRoot = path.dirname(path.resolve(dir)) 
     if (!Array.isArray(meta.footprint) || meta.footprint.length === 0) errors.push(`footprint is required when status is ${meta.status}`);
     if (meta.base === undefined) errors.push(`base is required when status is ${meta.status}`);
   }
-  const headings = body.split(/\r?\n/).filter((l) => /^#{1,6}\s/.test(l));
-  for (const [name, re] of SECTIONS) if (!headings.some((h) => re.test(h))) errors.push(`missing section: ${name}`);
+  for (const [name] of PLAN_SECTIONS) if (!hasSection(body, name)) errors.push(`missing section: ${name}`);
   checkPhaseTable(body, errors);
   return { dir, legacy: false, meta, errors };
 }

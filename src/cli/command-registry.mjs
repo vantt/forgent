@@ -1413,6 +1413,25 @@ export const COMMAND_REGISTRY = [
     paginated: false,
     deprecated: null,
   },
+  {
+    name: 'questions',
+    invoke: 'fgos questions --open',
+    description: 'Read-only: every open owner question across the three stage places in one batch, grouped by topic. A discussion question (docs/discussions/<topic>/QUESTIONS.md), a draft plan\'s owner-questions section, and an open Workflow gate each carry {topic, stage: discussion|plan|execution, ref, question, answerDoor}; answerDoor is the command or place that answers it in its own stage. Default output is a text batch; `--json` returns the items. Never writes.',
+    parameters: {
+      type: 'object',
+      properties: {
+        open: { type: 'boolean', description: 'List the open questions (the only mode today).' },
+        json: { type: 'boolean', description: 'Return the items as JSON instead of the text batch.' },
+      },
+      required: ['open'],
+    },
+    examples: ['fgos questions --open', 'fgos questions --open --json'],
+    touchesState: false,
+    store: 'none',
+    externalEffect: false,
+    paginated: false,
+    deprecated: null,
+  },
   withSubcommands({
     name: 'merge',
     invoke: 'fgos merge <list|next>',
