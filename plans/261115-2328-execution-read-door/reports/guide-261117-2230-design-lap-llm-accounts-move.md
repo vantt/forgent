@@ -1,6 +1,6 @@
-# Guide: move a machine's LLM accounts to `runner.llmAccounts` only (design-lap)
+# Guide: move a machine's LLM accounts to `runner.llmAccounts` only (design-lap, fg-server, fg-server2)
 
-For: the design-lap session (forgentx-46, claude-phdk@design-lap). Written on fg-server2, 2026-11-17, from main `54261df0a`
+For: any machine with LLM accounts. Run it on the machine itself: design-lap (forgentx-46, claude-phdk@design-lap), fg-server (the owner's machine), fg-server2 (done by HARDEN, p-ag76llwilb). Written on fg-server2, 2026-11-17, from main `54261df0a`
 and the installed release v0.2.0-rc.10. Unblocks plan 261115-2328 phase 16 (deletes the `runner.providers.<p>.accounts`
 reader and refuses a config that still sets it). Never print credential values or login-store contents; print key names,
 counts and directory paths only.
@@ -67,16 +67,16 @@ Each step has a check and a rollback. `F=~/.fgos/private/accounts.yaml`.
    covers the gemini account homes (fact 2). Check: `fgos config show` lists no `runner.providers.*.accounts`. Rollback: restore the backup.
 7. **Check again.** Run step 4 and step 5 again. The vs-legacy row now lists every account as "only in runner.llmAccounts"; that
    is expected. Check: the same verdicts as in step 5. Rollback: restore the backup, then post on the board that the move is reverted.
-8. **Board line.** Stamp the time with `date`, then add this line at the top of
-   `plans/261017-1313-fgos-platform-program-board/log.md`, with exactly this text:
-   `<date> DESIGN-LAP: every machine's accounts are on runner.llmAccounts (<machines>)`
-   `<machines>` lists the machines that are really moved, for example `design-lap, fg-server2`. fg-server2 does its
-   own move under backlog row p-ag76llwilb (it still has no `z-ai` and no `deepseek` pool). Name fg-server2 only after
-   its own board line says it is done. Otherwise name only design-lap and add `fg-server2 pending p-ag76llwilb`, so phase
-   16 stays gated. Check: `git log -1 -p` shows only that line. Rollback: a new line that withdraws it.
+8. **Board line.** Each machine posts its own line when its move is done. Stamp the time with `date` and add this line
+   at the top of `plans/261017-1313-fgos-platform-program-board/log.md`:
+   `<date> <MACHINE>: <machine> accounts are on runner.llmAccounts only`
+   The machine whose move completes last (all three lines present: design-lap, fg-server, fg-server2) also adds
+   the gate line for phase 16, with exactly this text:
+   `<date> DESIGN-LAP: every machine's accounts are on runner.llmAccounts (design-lap, fg-server, fg-server2)`
+   Check: `git log -1 -p` shows only the added line(s). Rollback: a new line that withdraws it.
 
 ## Preconditions
 
 - Release: none beyond rc.10.
-- Phase 16 opens only on a line that covers **every** machine (design-lap, fg-server2 and any other machine with accounts).
+- Phase 16 opens only on the gate line that covers **every** machine: design-lap, fg-server and fg-server2.
 - Phase 16 must also move `src/setup/agy-permissions.mjs:160` to read `llmAccounts` (pool `gemini`).
