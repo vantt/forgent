@@ -54,6 +54,14 @@ pub fn digest(envelope: &Value) -> Result<String, CanonicalError> {
     Ok(format!("sha256:{:x}", Sha256::digest(canonical.as_bytes())))
 }
 
+/// Where an attempt is placed, `terminal` or `direct`: the envelope's (and the attempt intent's) `host`.
+/// A record written before placement went through the Session Host names it `mode`; such a record can
+/// still be on disk (a controller that wrote it before the upgrade, then adopt or recover after it), so the
+/// old field is read where `host` is absent. Nothing writes `mode` any more.
+pub fn host_of(record: &Value) -> Option<&str> {
+    record["host"].as_str().or_else(|| record["mode"].as_str())
+}
+
 /// Read an envelope file and check what every consumer checks first: it is
 /// JSON, `v` is 3, `protocolId` is 1 and the digest matches its content.
 pub fn read_verified(path: &std::path::Path) -> Result<Value, String> {
@@ -88,4 +96,22 @@ pub fn host_bin_is_current(envelope: &Value) -> bool {
         .ok()
         .and_then(|p| std::fs::canonicalize(p).ok())
         .is_some_and(|me| me == named)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::host_of;
+    use serde_json::json;
+
+    #[test]
+    fn the_placement_is_read_from_host_and_from_mode_only_where_a_record_predates_host() {
+        assert_eq!(host_of(&json!({"host": "terminal"})), Some("terminal"));
+        assert_eq!(
+            host_of(&json!({"host": "direct", "mode": "terminal"})),
+            Some("direct")
+        );
+        // A record written before placement went through the Session Host.
+        assert_eq!(host_of(&json!({"mode": "terminal"})), Some("terminal"));
+        assert_eq!(host_of(&json!({})), None);
+    }
 }

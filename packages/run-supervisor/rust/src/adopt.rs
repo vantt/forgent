@@ -459,7 +459,7 @@ fn pane_is_this_attempts(intent: &Value) -> bool {
     let Some(terminal) = intent.get("terminal") else {
         return true;
     };
-    intent["mode"] == "terminal"
+    crate::envelope::host_of(intent) == Some("terminal")
         && terminal["slot"]["key"] == intent["attemptId"]
         && terminal["slot"]["groupKey"].is_string()
         && terminal["endpointEnv"].as_object().is_some_and(|env| {
@@ -508,7 +508,7 @@ fn publish_not_started_envelope(dir: &Path) -> Result<(), String> {
         "attemptId": attempt_id,
         "unitRunId": intent["unitRunId"],
         "runDir": intent["runDir"],
-        "mode": "direct",
+        "host": "direct",
         "protocolId": 1,
         "hostBin": host,
         "payloadRoot": payload,

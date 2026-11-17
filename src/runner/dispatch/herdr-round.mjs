@@ -25,6 +25,7 @@ import { DispatchError } from '../../run-supervisor/dispatch-error.mjs';
 import { terminalRouteConfig } from '../../terminal-control/config.mjs';
 import { normalizeAgentName } from '../../native/proof-helpers.mjs';
 import { createRoundTerminalControl, portKey, slotDisplay, refusalError, herdrEndpointEnv } from './terminal-slot.mjs';
+import { createSessionHost } from '../../session-host/client.mjs';
 import { briefPaths, renderBrief, renderPointer } from './brief.mjs';
 import { writeVisibility } from './visibility-session.mjs';
 import { createWorkerHome, removeWorkerHome, redactWorkerHome } from './worker-home.mjs';
@@ -340,6 +341,77 @@ function seedAttemptTrust({ trustStore, round, runDir, cwd, repoRoot, fullEnv, w
   });
 }
 
+const paneHosts = new Map();
+
+/**
+ * The Session Host client for one herdr endpoint, shared for the life of the process. `endpointEnv` is the
+ * driver environment of the herdr server the pane lives in (only its `HERDR_*` entries, as `herdrEndpointEnv`
+ * selects them). Giving a pane back is the host's `retire`; kept here, not in `terminal-slot.mjs`, because that
+ * module is read by read-only inspection and the host client spawns a process.
+ */
+export function createPaneHost({ herdrBin, endpointEnv, hostBin, timeoutMs } = {}) {
+  const env = endpointEnv ?? {};
+  const identity = JSON.stringify([hostBin ?? null, herdrBin ?? null, env, timeoutMs ?? null]);
+  let host = paneHosts.get(identity);
+  if (!host) {
+    host = createSessionHost({
+      ...(hostBin ? { hostBin } : {}),
+      ...(herdrBin ? { herdrBin } : {}),
+      ...(Object.keys(env).length ? { env } : {}),
+      ...(timeoutMs ? { timeoutMs } : {}),
+    });
+    paneHosts.set(identity, host);
+  }
+  return host;
+}
+
+/** Give the pane of `key` back (`close` by default); true when the port answered `retired`. */
+export function retirePane(host, key, disposition = 'close') {
+  return host.retire({ host: 'terminal', key }, disposition).result === 'retired';
+}
+
+/** Close the pane of `key` only when it is live now: a pane a settled round already closed is not closed again. */
+export function closeLivePane(host, key) {
+  if (host.alive({ host: 'terminal', key }).result !== 'live') return false;
+  return retirePane(host, key);
+}
+
+/**
+ * Prepare an interactive seat from its binding: the private home (and the herdr session) its confinement
+ * declares, and the folder-trust entry the agent would otherwise stop at. The one door both a worker attempt
+ * (`prepareTerminalAttempt`) and a head session go through, so a seat is confined and trusted the same way
+ * whoever places it.
+ *
+ * `binding` is what the executor resolved for the seat: `{ command, args, env }` (the env already carries the
+ * private-home variables the confinement driver set), `confinement`, `permissionMode`, and, when the CLI has a
+ * folder-trust dialog, `trustStore`, `trustAlso` (more directories it asks about) and `trustAccountSource`.
+ * Returns `{ command, args, env, trust, workerHomePath, sessionEnv, confined, status }` where `trust` is
+ * `{ seeded, store }` (`store` is `{ root, target }` or null when no entry was needed). The caller owns what it
+ * returns: `workerHomePath` is its to remove, a codex or agy trust entry is taken back by `cleanup-trust`.
+ */
+export async function prepareSeat({ binding, round, runDir, cwd, repoRoot, fullEnv, herdrBin, attemptEnv = null }) {
+  const { command, args = [], env = {}, confinement, permissionMode, trustStore, trustAlso, trustAccountSource } = binding;
+  const confined = await establishConfinement({ confinement, round, fullEnv, cwd, repoRoot, permissionMode, herdrBin });
+  round.note({ confinement: { status: confined.status, confined: confined.confined } });
+  // A confined run with a private home needs no seeding: that home is provisioned with the workspace
+  // already trusted, so writing to the operator's own store for a directory only the seat will ever
+  // see would be pure side effect.
+  const trusted = Boolean(trustStore && !confined.workerHomePath);
+  if (trusted) {
+    seedAttemptTrust({ trustStore, round, runDir, cwd, repoRoot, fullEnv, workerEnv: attemptEnv, accountSource: trustAccountSource ?? null, alsoTrust: trustAlso ?? [] });
+  }
+  return {
+    command,
+    args,
+    env,
+    trust: { seeded: trusted, store: trusted ? trustStorePaths({ trustStore, fullEnv, workerEnv: attemptEnv }) : null },
+    workerHomePath: confined.workerHomePath,
+    sessionEnv: confined.sessionEnv,
+    confined: confined.confined,
+    status: confined.status,
+  };
+}
+
 /**
  * Everything a terminal attempt needs before its supervisor can start, in the order that makes every
  * failure leave nothing behind but the pane's key: the stale-result check, the brief, the confinement
@@ -402,10 +474,10 @@ export async function prepareTerminalAttempt(ctx) {
   const briefPath = writeTypedBrief({ delivery, briefText, runDir, roundNumber, paths });
   round.note({ status: 'requested', agentName, round: roundNumber, terminalKey: key });
 
-  const { workerHomePath, sessionEnv, confined, status } = await establishConfinement({
-    confinement, round, fullEnv, cwd, repoRoot, permissionMode, herdrBin,
+  const { workerHomePath, sessionEnv } = await prepareSeat({
+    binding: { confinement, permissionMode, trustStore, trustAlso, trustAccountSource },
+    round, runDir, cwd, repoRoot, fullEnv, herdrBin, attemptEnv,
   });
-  round.note({ confinement: { status, confined } });
   round.herdrSession = sessionEnv?.HERDR_SESSION ?? null;
   if (round.herdrSession) round.note({ herdrSession: round.herdrSession });
 
@@ -422,7 +494,7 @@ export async function prepareTerminalAttempt(ctx) {
   const display = slotDisplay({ ...workLabel, agent: agentKind, model, role: rawContract?.assignment?.role });
 
   const abandon = async () => {
-    if (tc) { try { await tc.releaseAsync({ key, groupKey, disposition: 'close' }); } catch { /* the pane is the port's to reconcile */ } }
+    if (tc) { try { retirePane(createPaneHost({ herdrBin, endpointEnv: herdrEndpointEnv(sessionEnv) }), key, 'close'); } catch { /* the pane is the port's to reconcile */ } }
     try { await cleanupTrust({ runDir }); } catch { /* a leftover entry costs one line in the store */ }
     if (workerHomePath) { try { redactWorkerHome(workerHomePath); } catch { /* nothing further to do about a home we cannot read */ } }
   };
@@ -457,13 +529,6 @@ export async function prepareTerminalAttempt(ctx) {
     }
     round.paneId = slot.slot.paneId;
     round.note({ status: 'pane-created', paneId: round.paneId });
-
-    // A confined run with a private home needs no seeding: that home is provisioned with the workspace
-    // already trusted, so writing to the operator's own store for a directory only the worker will ever
-    // see would be pure side effect.
-    if (trustStore && !workerHomePath) {
-      seedAttemptTrust({ trustStore, round, runDir, cwd, repoRoot, fullEnv, workerEnv: attemptEnv ?? null, accountSource: trustAccountSource ?? null, alsoTrust: trustAlso ?? [] });
-    }
   } catch (err) {
     await abandon();
     throw err;

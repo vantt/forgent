@@ -148,7 +148,7 @@ test('the envelope is immutable, digest-checked and secret-free; the side file i
   const { digest, ...rest } = envelope;
   assert.equal(digest, computeSha256Digest(rest));
   assert.equal(envelope.v, 3);
-  assert.equal(envelope.mode, 'direct');
+  assert.equal(envelope.host, 'direct');
   assert.equal(envelope.containment.bwrapPrefix[0], '/usr/bin/bwrap', 'the sandbox program leads the prefix');
   assert.equal(envelope.deadlines.gateKillGraceMs, 2345);
   assert.equal(envelope.deadlines.killWaitMs, 3456);

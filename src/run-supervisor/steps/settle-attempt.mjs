@@ -68,7 +68,8 @@ function controlOf(runDir, envelope) {
  * read; a screen that cannot be read is no evidence, never a failure of the settlement.
  */
 function paneScreenOf(runDir, envelope) {
-  if (envelope.mode !== 'terminal') return '';
+  // A record written before placement went through the Session Host names it `mode`.
+  if ((envelope.host ?? envelope.mode) !== 'terminal') return '';
   try {
     const endpoint = readJson(path.join(runDir, 'terminal-endpoint.json')) ?? {};
     const env = {};
@@ -243,7 +244,7 @@ export async function settleAttempt({ runDir, envelope }) {
         repoRoot: context.repoRoot ?? envelope.cwd,
         updateRunJson: 'settled',
         ...(context.providerCapacityRuntimeDir ? { providerCapacityRuntimeDir: context.providerCapacityRuntimeDir } : {}),
-        adapter: envelope.mode === 'terminal' ? 'herdr-spawn' : 'cli-spawn',
+        adapter: (envelope.host ?? envelope.mode) === 'terminal' ? 'herdr-spawn' : 'cli-spawn',
       },
     });
     return { result: 'done', detail: { settled: 'now', runId: runMeta.runId, status: settled.status } };

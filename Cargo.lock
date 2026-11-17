@@ -497,6 +497,7 @@ dependencies = [
  "fgos-holder-lock",
  "fgos-identity",
  "fgos-process",
+ "fgos-session-host",
  "fgos-terminal-control",
  "libc",
  "serde_json",

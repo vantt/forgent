@@ -13,6 +13,7 @@ fgos-identity = { path = "../../identity/rust", default-features = false }
 fgos-holder-lock = { path = "../../holder-lock/rust" }
 fgos-agent-protocol = { path = "../../agent-protocol/rust" }
 fgos-terminal-control = { path = "../../terminal-control/rust" }
+fgos-session-host = { path = "../../session-host/rust" }
 serde_json = { workspace = true }
 sha2 = { workspace = true }
 

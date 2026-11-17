@@ -286,7 +286,7 @@ pub(crate) fn publish_receipt_with(
         }
     } else {
         let direct = || {
-            if envelope["mode"] == "direct" {
+            if crate::envelope::host_of(envelope) == Some("direct") {
                 direct_reason(
                     envelope,
                     receipt.get("gateExit"),
@@ -565,10 +565,10 @@ fn supervise(args: &SuperviseArgs) -> Result<i32, Refusal> {
         .as_str()
         .map(PathBuf::from)
         .ok_or_else(|| invalid("runDir missing"))?;
-    let terminal = match envelope["mode"].as_str() {
+    let terminal = match crate::envelope::host_of(&envelope) {
         Some("direct") => false,
         Some("terminal") => true,
-        _ => return Err(invalid("mode must be direct or terminal")),
+        _ => return Err(invalid("host must be direct or terminal")),
     };
     // A supervisor already ran this attempt (or its receipt exists): a second one would take the lock and,
     // by the predecessor rule, end the live domain the first one left running. Leave the attempt to adopt.

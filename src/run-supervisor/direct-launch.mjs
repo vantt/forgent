@@ -182,7 +182,7 @@ export function writeAttemptIntent({ runDir, attemptId, unitRunId, terminal, cwd
     attemptId,
     unitRunId,
     runDir: paths.runDir,
-    mode: terminal ? 'terminal' : 'direct',
+    host: terminal ? 'terminal' : 'direct',
     cwd,
     launch: { capture: { stdout: paths.stdout, stderr: paths.stderr }, outboxDir: paths.outboxDir },
     steps: attemptSteps({ runDir: paths.runDir, host, stepEnv, extraSteps: terminal ? ['cleanup-trust'] : [] }),
@@ -205,13 +205,13 @@ export function buildEnvelope({ attemptId, unitRunId, runDir, host, cwd, mutatin
   if (2 + extraSteps.length > MAX_ATTEMPT_STEPS) throw new DispatchError('too-many-steps', `an attempt runs at most ${MAX_ATTEMPT_STEPS} steps`, { runDir });
   const paths = attemptPaths(runDir, attemptId);
   const confined = Array.isArray(attempt.bwrapPrefix);
-  const mode = terminal ? 'terminal' : 'direct';
+  const placement = terminal ? 'terminal' : 'direct';
   return {
     v: 3,
     attemptId,
     unitRunId,
     runDir,
-    mode,
+    host: placement,
     protocolId: PROTOCOL,
     hostBin: host.hostBin,
     payloadRoot: host.payloadRoot,
@@ -236,7 +236,7 @@ export function buildEnvelope({ attemptId, unitRunId, runDir, host, cwd, mutatin
       gateKillGraceMs,
       killWaitMs,
     },
-    agentProtocol: { cli, mode },
+    agentProtocol: { cli },
     identity,
     steps: [
       ...attemptSteps({ runDir, host, stepEnv, extraSteps }),

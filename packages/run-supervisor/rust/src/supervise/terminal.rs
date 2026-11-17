@@ -32,10 +32,11 @@ use fgos_agent_protocol::terminal::{
 use fgos_agent_protocol::BlockedReason;
 use fgos_process::facts::{self, ProcTuple};
 use fgos_process::{domain_is_empty, domain_kill_all, Domain, DomainState, ProcId};
+use fgos_session_host::PaneIo;
 use fgos_terminal_control::core::{Core, Want};
 use fgos_terminal_control::port::{
     ExpectedProcess, LaunchOutcome, LaunchSpec, PaneState, ProcessIdentity,
-    Refusal as TerminalRefusal, SendOutcome,
+    Refusal as TerminalRefusal,
 };
 use serde_json::{json, Value};
 
@@ -640,17 +641,18 @@ impl Sup<'_> {
     }
 }
 
-/// The agent protocol's port over terminal-control, by key. Time only passes through `pause`, which
-/// keeps the supervisor's own watch (deadlines, cancel, carrier, the gate leaving) running.
+/// The agent protocol's port over a pane: the Session Host's `PaneIo` for the three core calls, plus
+/// what only the supervisor knows. Time only passes through `pause`, which keeps the supervisor's own
+/// watch (deadlines, cancel, carrier, the gate leaving) running.
 struct TermIo<'a, 'b> {
+    pane: PaneIo<'a>,
     core: &'a Core<'a>,
     key: &'a str,
     sup: &'a mut Sup<'b>,
 }
 
-fn io_err(refusal: TerminalRefusal) -> IoError {
-    IoError::Io(format!("{refusal:?}"))
-}
+/// How `PaneIo::send` words a send that typed nothing because the agent is not the pane's foreground program.
+const NOTHING_TYPED: &str = "nothing was typed: ";
 
 impl AgentIo for TermIo<'_, '_> {
     fn send(&mut self, input: &SendInput) -> Result<(), IoError> {
@@ -660,20 +662,11 @@ impl AgentIo for TermIo<'_, '_> {
         if self.sup.finished() {
             return Err(IoError::Io("the attempt is ending".into()));
         }
-        match self
-            .core
-            .send(
-                self.key,
-                input.text.as_deref(),
-                input.keys.as_deref(),
-                input.submit,
-            )
-            .map_err(io_err)?
-        {
-            SendOutcome::Sent => Ok(()),
-            // Nothing was typed. The agent is not the pane's foreground program, so it cannot take a
-            // brief: the attempt ends with the reason on its receipt, a failed attempt for the settlement.
-            SendOutcome::ForegroundNotAgent { reason } => {
+        let sent = self.pane.send(input);
+        // Nothing was typed. The agent is not the pane's foreground program, so it cannot take a
+        // brief: the attempt ends with the reason on its receipt, a failed attempt for the settlement.
+        if let Err(IoError::Io(why)) = &sent {
+            if let Some(reason) = why.strip_prefix(NOTHING_TYPED) {
                 eprintln!("fgos internal supervise: nothing typed into the pane: {reason}");
                 eprintln!(
                     "fgos internal supervise: pane foreground facts: {}",
@@ -681,19 +674,16 @@ impl AgentIo for TermIo<'_, '_> {
                 );
                 self.sup
                     .begin_stop("cancel", Some(REASON_FOREGROUND_NOT_AGENT));
-                Err(IoError::Io(format!("nothing was typed: {reason}")))
             }
         }
+        sent
     }
 
     fn screen(&mut self) -> Result<String, IoError> {
         if self.sup.finished() {
             return Err(IoError::Io("the attempt is ending".into()));
         }
-        let screen = self
-            .core
-            .read(self.key, None, Some("visible"))
-            .map_err(io_err)?;
+        let screen = self.pane.screen()?;
         self.sup.note_screen(Some(screen.clone()));
         Ok(screen)
     }
@@ -702,34 +692,7 @@ impl AgentIo for TermIo<'_, '_> {
         if self.sup.finished() {
             return Err(IoError::Io("the attempt is ending".into()));
         }
-        let seen = self.core.inspect_parts(
-            self.key,
-            Want {
-                foreground: false,
-                activity: true,
-                detail: true,
-            },
-        );
-        let activity = match (seen.pane, seen.activity) {
-            (PaneState::Live, Some(activity)) => activity,
-            _ => return Err(IoError::Io("the pane gave no activity".into())),
-        };
-        Ok(match activity.detail {
-            Some(detail) => Inspection {
-                state: detail
-                    .state
-                    .or_else(|| Some(activity.state).filter(|s| !s.is_empty())),
-                visible_blocker: detail.visible_blocker,
-                visible_idle: detail.visible_idle,
-                visible_working: detail.visible_working,
-                matched_rule: detail.matched_rule.is_some(),
-                prompt_text: detail.prompt_text,
-            },
-            None => Inspection {
-                state: Some(activity.state).filter(|s| !s.is_empty()),
-                ..Default::default()
-            },
-        })
+        self.pane.inspect()
     }
 
     fn pause(&mut self, ms: u64) {
@@ -908,6 +871,7 @@ impl UnreadableWait {
 /// gate leaves on its own.
 fn drive(plan: &Plan, core: &Core, sup: &mut Sup) {
     let mut io = TermIo {
+        pane: PaneIo::new(core, &plan.key),
         core,
         key: &plan.key,
         sup,

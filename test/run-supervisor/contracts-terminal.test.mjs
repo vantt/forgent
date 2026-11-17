@@ -36,8 +36,8 @@ function mintAttemptWriterId(attemptId) {
 
 test('terminal envelope vector carries every terminal field and the digest reproduces', () => {
   for (const field of Object.keys(envelopeContract.fields)) assert.ok(field in terminalEnvelope, `terminal vector carries ${field}`);
-  assert.equal(terminalEnvelope.mode, 'terminal');
-  assert.equal(terminalEnvelope.agentProtocol.mode, 'terminal');
+  assert.equal(terminalEnvelope.host, 'terminal');
+  assert.ok(!('mode' in terminalEnvelope) && !('mode' in terminalEnvelope.agentProtocol), 'the placement is `host`, never `mode`');
   assert.equal(terminalEnvelope.slot.key, terminalEnvelope.attemptId);
   assert.equal(typeof terminalEnvelope.slot.groupKey, 'string');
   for (const field of ['socketPath', 'exitCommand', 'orphanSettleMs']) assert.ok(field in terminalEnvelope.terminal, field);

@@ -24,7 +24,8 @@ import { adoptRun } from '../../run-supervisor/client.mjs';
 import { ACCOUNT_PROBE_LEGS, runAccountProbe, runAccountSweep } from './provider-account-probe.mjs';
 import { runSessionProbe } from './provider-session-probe.mjs';
 import { createCredentialRenewal } from './provider-credential-renewal.mjs';
-import { createRoundTerminalControl } from './terminal-slot.mjs';
+import { herdrEndpointEnv } from './terminal-slot.mjs';
+import { createPaneHost, closeLivePane } from './herdr-round.mjs';
 import { envForSession } from './worker-session.mjs';
 import { resolveHerdrBin } from './transport.mjs';
 import { buildAssignment, claimAssignmentId } from './assignment.mjs';
@@ -249,13 +250,11 @@ export async function runDispatchCli(argv = process.argv.slice(2), { returnResul
             if (!terminalKey) return false;
             let closed = false;
             try {
-              const tc = createRoundTerminalControl({
-                herdrBin, herdrEnv: herdrSession ? envForSession(process.env, herdrSession) : process.env,
+              const host = createPaneHost({
+                herdrBin, endpointEnv: herdrEndpointEnv(herdrSession ? envForSession(process.env, herdrSession) : process.env),
               });
               // A pane a settled round already closed is not "closed by the probe".
-              if (tc.inspect({ key: terminalKey }).pane === 'live') {
-                closed = tc.release({ key: terminalKey, disposition: 'close' }).result === 'released';
-              }
+              closed = closeLivePane(host, terminalKey);
             } catch { /* a pane that cannot be closed stays open */ }
             return closed;
           },

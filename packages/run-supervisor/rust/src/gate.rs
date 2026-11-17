@@ -196,10 +196,10 @@ pub(crate) fn load_config(path: &Path) -> Result<Config, String> {
         (Some(boot), Some(ns)) => Some((boot.to_string(), ns)),
         _ => None,
     };
-    let terminal = match value["mode"].as_str() {
+    let terminal = match crate::envelope::host_of(&value) {
         Some("terminal") => true,
         Some("direct") => false,
-        _ => return Err("envelope field mode missing".into()),
+        _ => return Err("envelope field host missing".into()),
     };
     #[cfg(unix)]
     let orphan_settle = match (terminal, value["terminal"]["orphanSettleMs"].as_u64()) {

@@ -1,8 +1,8 @@
 //! The supervisor's door to terminal-control: one driver, one core, built the
 //! way the `fgos internal terminal-control` route builds them, addressed by the
 //! attempt's slot key. The supervisor never allocates (the controller did, with
-//! its serialization group); it launches into, reads from, types at and
-//! releases the slot it was handed.
+//! its serialization group); it launches into, reads from and types at the slot
+//! it was handed, and gives it back through the Session Host (`retire`).
 //!
 //! The herdr endpoint comes from the supervisor's own environment
 //! (`FGOS_HERDR_BIN`, `HERDR_SESSION`, `HERDR_SOCKET_PATH`), so the controller
@@ -11,11 +11,19 @@
 use std::path::Path;
 use std::time::{SystemTime, UNIX_EPOCH};
 
-use fgos_terminal_control::core::{Core, CoreConfig};
+use fgos_session_host::direct::OsDirect;
+use fgos_session_host::{
+    HostKind, Panes, Placement, RefusalKind, RetireAnswer, Retirement, SessionHost,
+    DEFAULT_GRACE_MS, DEFAULT_READY_MS,
+};
+use fgos_terminal_control::core::{Core, CoreConfig, Want};
 use fgos_terminal_control::driver::herdr::{HerdrConfig, HerdrDriver};
 use fgos_terminal_control::driver::TerminalDriver;
 use fgos_terminal_control::policy::{policy_by_name, PlacementPolicy};
-use fgos_terminal_control::port::{Disposition, ReleaseOutcome};
+use fgos_terminal_control::port::{
+    AllocateRequest, Allocation, Disposition, Inspection, LaunchOutcome, LaunchSpec, Refusal,
+    ReleaseOutcome, SendOutcome,
+};
 use fgos_terminal_control::route::{
     DEFAULT_ALLOCATION_GRACE_MS, DEFAULT_LAUNCH_IDENTIFY_TIMEOUT_MS, DEFAULT_LIMITS,
     DEFAULT_SHELL_READY_TIMEOUT_MS,
@@ -176,32 +184,98 @@ pub enum ReleaseFailure {
     NoRecord(String),
 }
 
-/// `release(key, disposition)`; `Ok` carries the detail the step receipt records.
+/// The Terminal Control surface of the Session Host over the supervisor's core. The only thing it adds is
+/// the retain window a kept pane carries (`until`), which the port's own `Core` wrapper does not know.
+struct SlotPanes<'a> {
+    core: &'a Core<'a>,
+    until: Option<u64>,
+}
+
+impl Panes for SlotPanes<'_> {
+    fn allocate(&self, request: &AllocateRequest) -> Result<Allocation, Refusal> {
+        Panes::allocate(self.core, request)
+    }
+
+    fn launch(&self, key: &str, spec: &LaunchSpec) -> Result<LaunchOutcome, Refusal> {
+        Panes::launch(self.core, key, spec)
+    }
+
+    fn send(
+        &self,
+        key: &str,
+        text: Option<&str>,
+        keys: Option<&[String]>,
+        submit: bool,
+    ) -> Result<SendOutcome, Refusal> {
+        Panes::send(self.core, key, text, keys, submit)
+    }
+
+    fn read(&self, key: &str, source: Option<&str>) -> Result<String, Refusal> {
+        Panes::read(self.core, key, source)
+    }
+
+    fn inspect(&self, key: &str, want: Want) -> Inspection {
+        Panes::inspect(self.core, key, want)
+    }
+
+    fn focus(&self, key: &str) -> Result<(), Refusal> {
+        Panes::focus(self.core, key)
+    }
+
+    fn release(&self, key: &str, disposition: Disposition) -> Result<ReleaseOutcome, Refusal> {
+        self.core.release(key, disposition, self.until)
+    }
+}
+
+/// `retire(key, close | retain)` through the Session Host; `Ok` carries the detail the step receipt records.
 pub fn release(
     backend: &Backend,
     key: &str,
     disposition: Disposition,
     retain_window: Option<u64>,
 ) -> Result<Value, ReleaseFailure> {
-    use fgos_terminal_control::port::Refusal;
     // A retained pane with no window stays until a person closes it.
     let until = if disposition == Disposition::Retain {
         retain_window.map(|window| now_ms() + window)
     } else {
         None
     };
-    match backend.core().release(key, disposition, until) {
-        Ok(ReleaseOutcome::Released { disposition }) => {
-            Ok(serde_json::json!({"disposition": disposition, "key": key}))
+    let core = backend.core();
+    let panes = SlotPanes { core: &core, until };
+    let direct = OsDirect::in_state_root();
+    let host = SessionHost {
+        panes: &panes,
+        direct: &direct,
+        ready_ms: DEFAULT_READY_MS,
+        grace_ms: DEFAULT_GRACE_MS,
+    };
+    let placement = Placement {
+        host: HostKind::Terminal,
+        key: key.to_string(),
+        display: None,
+    };
+    let retirement = match disposition {
+        Disposition::Close => Retirement::Close,
+        Disposition::Retain => Retirement::Retain,
+    };
+    match host.retire(&placement, retirement) {
+        RetireAnswer::Retired => Ok(serde_json::json!({
+            "disposition": match disposition {
+                Disposition::Close => "close",
+                Disposition::Retain => "retain",
+            },
+            "key": key,
+        })),
+        RetireAnswer::Refused(refusal) => {
+            let reason = refusal.detail.unwrap_or_default();
+            match refusal.result {
+                RefusalKind::Unsupported => Err(ReleaseFailure::Unsupported(reason)),
+                RefusalKind::Unknown if !backend.ever_recorded(key) => {
+                    Err(ReleaseFailure::NoRecord(reason))
+                }
+                RefusalKind::Unknown => Err(ReleaseFailure::Retry(reason)),
+            }
         }
-        Ok(ReleaseOutcome::KeptUnknown { reason }) if !backend.ever_recorded(key) => {
-            Err(ReleaseFailure::NoRecord(reason))
-        }
-        Ok(ReleaseOutcome::KeptUnknown { reason }) => Err(ReleaseFailure::Retry(reason)),
-        Err(Refusal::Unknown { reason }) => Err(ReleaseFailure::Retry(reason)),
-        Err(Refusal::Unsupported { capability, detail }) => Err(ReleaseFailure::Unsupported(
-            format!("{capability}: {detail}"),
-        )),
     }
 }
 

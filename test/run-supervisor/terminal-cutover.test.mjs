@@ -37,7 +37,7 @@ test('a herdr-spawn seat runs as a terminal attempt: brief typed by the supervis
 
   const attemptDir = project.attemptDir();
   const envelope = readJson(path.join(attemptDir, 'envelope.json'));
-  assert.equal(envelope.mode, 'terminal');
+  assert.equal(envelope.host, 'terminal');
   assert.equal(envelope.slot.key, envelope.attemptId);
   assert.equal(envelope.terminal.retainFailedPaneMs, null, 'the configured retain window travels with the attempt (the default keeps a genuine crash pane until a person closes it)');
   assert.equal(envelope.agentProtocol.cli, 'claude');
@@ -149,7 +149,7 @@ test('an executor declared by invocations[] runs the same way as one declared fl
   const { exit } = await finishAttempt(project, run);
   assert.equal(exit.code, 0, JSON.stringify(run.output()));
   assert.equal(run.answer().result.classification.outcome.reason, 'completed-pass');
-  assert.equal(readJson(path.join(project.attemptDir(), 'envelope.json')).mode, 'terminal');
+  assert.equal(readJson(path.join(project.attemptDir(), 'envelope.json')).host, 'terminal');
 });
 
 test('the brief the pane agent reads names the one result path, the outbox claim', { skip: noHost, timeout: 180_000 }, async () => {
@@ -184,7 +184,7 @@ test('fgos run with herdr present runs a confined read-only unit in a pane: the 
   assert.equal(exit.code, 0, run.output().stderr.slice(-1500) + run.output().stdout.slice(-800));
 
   const envelope = readJson(path.join(project.attemptDir(), 'envelope.json'));
-  assert.equal(envelope.mode, 'terminal');
+  assert.equal(envelope.host, 'terminal');
   assert.equal(envelope.containment.preferred, 'linux-gate');
   const prefix = envelope.containment.bwrapPrefix;
   assert.ok(prefix.includes('--die-with-parent'), 'in a pane the sandbox goes with the pane');
