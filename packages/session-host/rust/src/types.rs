@@ -1,5 +1,6 @@
 //! The request and answer types of the contract `session-host/host-port.v1.json`.
 
+use fgos_terminal_control::port::{ProcessIdentity, Slot};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::collections::BTreeMap;
@@ -67,6 +68,27 @@ pub struct StartRequest {
     pub role: Role,
 }
 
+/// Allocate the slot of a terminal placement without starting anything in it: what a controller that
+/// builds its command only afterwards (the run supervisor's gate) needs before it can `launch`.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct OpenRequest {
+    pub host: HostKind,
+    pub key: String,
+    #[serde(default)]
+    pub group_key: Option<String>,
+    #[serde(default)]
+    pub beside: Option<String>,
+    /// How many panes the caller's batch opens in all, when it knows; sizes the batch's panes equally.
+    #[serde(default)]
+    pub group_size: Option<u32>,
+    pub cwd: String,
+    #[serde(default)]
+    pub env: BTreeMap<String, String>,
+    #[serde(default)]
+    pub display: Option<Value>,
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "lowercase")]
 pub enum RefusalKind {
@@ -114,6 +136,26 @@ impl Refusal {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum StartAnswer {
     Placed(Placement),
+    Refused(Refusal),
+}
+
+/// What `open` answers: the placement, and the slot this call allocated for it (absent when the key's
+/// pane was already live, so nothing was allocated).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum OpenAnswer {
+    Opened {
+        placement: Placement,
+        slot: Option<Slot>,
+    },
+    Refused(Refusal),
+}
+
+/// What `launch` answers: the launched process root, or that nothing was proven to run (the slot is
+/// then kept and never launched into again), or a refusal.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum LaunchAnswer {
+    Launched(ProcessIdentity),
+    NotStarted { reason: String },
     Refused(Refusal),
 }
 

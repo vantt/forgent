@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "session-host/host-port.v1.json",
   "title": "Session Host port, version 1",
-  "description": "The one port that places an agent session: start, alive, front, retire. Adapters: terminal (Terminal Control), direct (screenless prepared command). Spec: docs/platform/session-host/spec.md.",
+  "description": "The one port that places an agent session: start, alive, front, retire; and, for a controller that builds its command only after the slot exists, open then launch. Adapters: terminal (Terminal Control), direct (screenless prepared command). Spec: docs/platform/session-host/spec.md.",
   "contract": { "id": "session-host-port", "version": 1 },
   "$defs": {
     "key": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$", "description": "Same key shape as terminal-control; for a run the attempt id, for a head session <persona>-<name>." },
@@ -37,6 +37,39 @@
         "detail": { "type": "string" }
       }
     },
+    "openRequest": {
+      "type": "object",
+      "required": ["host", "key", "cwd"],
+      "additionalProperties": false,
+      "properties": {
+        "host": { "const": "terminal" },
+        "key": { "$ref": "#/$defs/key" },
+        "groupKey": { "$ref": "#/$defs/key", "description": "Panes of one group share a tab." },
+        "beside": { "$ref": "#/$defs/key", "description": "Open next to this existing placement; needs groupKey." },
+        "groupSize": { "type": "integer", "minimum": 1, "description": "How many panes the caller's batch opens in all, when it knows; sizes the batch's panes equally." },
+        "cwd": { "type": "string", "minLength": 1 },
+        "env": { "type": "object", "additionalProperties": { "type": "string" } },
+        "display": { "$ref": "#/$defs/display" }
+      }
+    },
+    "launchSpec": {
+      "type": "object",
+      "required": ["command", "cwd"],
+      "additionalProperties": false,
+      "properties": {
+        "command": { "type": "string", "minLength": 1 },
+        "args": { "type": "array", "items": { "type": "string" } },
+        "cwd": { "type": "string", "minLength": 1 },
+        "env": { "type": "object", "additionalProperties": { "type": "string" } },
+        "expect": { "type": "object", "required": ["argv0", "command"], "additionalProperties": false, "description": "The foreground process the launch is expected to become when it is not the command itself.", "properties": { "argv0": { "type": "string" }, "command": { "type": "string" }, "args": { "type": "array", "items": { "type": "string" } } } }
+      }
+    },
+    "processIdentity": {
+      "type": "object",
+      "required": ["pid", "startTime", "bootId", "pgid"],
+      "additionalProperties": false,
+      "properties": { "pid": { "type": "integer" }, "startTime": { "type": "string" }, "bootId": { "type": "string" }, "pgid": { "type": "integer" } }
+    },
     "startRequest": {
       "type": "object",
       "required": ["host", "key", "cwd", "command"],
@@ -65,6 +98,31 @@
         "direct: starts the prepared command without a screen; opening.delivery must be argument or file, typed is refused with opening-delivery-unsupported.",
         "role head with host direct answers unsupported / head-needs-interactive-host.",
         "a key that already has a live placement answers that placement; it never starts a second one."
+      ]
+    },
+    "open": {
+      "request": { "$ref": "#/$defs/openRequest" },
+      "answer": { "oneOf": [
+        { "type": "object", "required": ["result", "placement"], "additionalProperties": false, "properties": { "result": { "const": "placed" }, "placement": { "$ref": "#/$defs/placement" }, "slot": { "type": "object", "required": ["tabId", "paneId"], "additionalProperties": false, "description": "The slot this call allocated, for a diagnostic line; absent when the key's pane was already live.", "properties": { "tabId": { "type": "string" }, "paneId": { "type": "string" } } } } },
+        { "$ref": "#/$defs/refusal" }
+      ] },
+      "rules": [
+        "terminal only: Terminal Control allocate and nothing else; nothing is started in the slot. host direct answers unsupported / host-unsupported-here.",
+        "a key that already has a live placement answers that placement and allocates nothing.",
+        "start is open followed by launch (and the opening); a controller that learns its command only after the slot exists calls the two itself."
+      ]
+    },
+    "launch": {
+      "request": { "type": "object", "required": ["placement", "spec"], "additionalProperties": false, "properties": { "placement": { "$ref": "#/$defs/placement" }, "spec": { "$ref": "#/$defs/launchSpec" } } },
+      "answer": { "oneOf": [
+        { "type": "object", "required": ["result", "identity"], "additionalProperties": false, "properties": { "result": { "const": "launched" }, "identity": { "$ref": "#/$defs/processIdentity" } } },
+        { "type": "object", "required": ["result", "reason"], "additionalProperties": false, "properties": { "result": { "const": "not-started" }, "reason": { "type": "string" } } },
+        { "$ref": "#/$defs/refusal" }
+      ] },
+      "rules": [
+        "terminal only: Terminal Control launch into the slot open allocated for the placement's key; the launched marker is durable before the answer, so the caller may let the process run on once it has the identity.",
+        "not-started: nothing was proven to run; the slot is kept and never launched into again.",
+        "host direct answers unsupported / host-unsupported-here: a screenless host runs its process in start."
       ]
     },
     "alive": {

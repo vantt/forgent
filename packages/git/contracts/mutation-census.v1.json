@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "d3d2f56d3ea23574d61aa4fe5d73dd75dfec47694ec3b3a4e5f7e57dd75f9979",
+  "payloadDigest": "519217d94889ffa62aa2b8fbe66a4b61373b6ecdc658c51c263245c0b342d4db",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "68bd36c02991c59a52f206cb092605f9aa16d218d0f52eb2cb34d1db8d4d9ace",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -755,7 +755,7 @@
     "packages/run-supervisor/rust/src/route.rs": "707891c1da2ad85f17fb1cd6a49f90e7c68b5dbce638bef95a2eb5c03ac8bdcd",
     "packages/run-supervisor/rust/src/steps.rs": "444b8f91a8bc04ee0a0baefedf9a7a61069d2864ebc33cbb32e84f185d725cd9",
     "packages/run-supervisor/rust/src/supervise.rs": "9d1b58e2c224afb8bcacd63db7b26e97acddcb14422f7670c82f3c331289255e",
-    "packages/run-supervisor/rust/src/supervise/terminal.rs": "3c72e992eb43c11f0aa9adf7b4f775a8498e1338130ec5eb90e73f196c2c17e7",
+    "packages/run-supervisor/rust/src/supervise/terminal.rs": "4ee17ecc1dba050204df0f4d75da2de73783b2766542b02cf9e1a925c2e8cc11",
     "packages/run-supervisor/rust/src/supervise/unix.rs": "d9510693da158bf18e139257b3672c6641247b76cf5ac68a9dd892792e7509ad",
     "packages/run-supervisor/rust/src/supervise/windows.rs": "6b7de2b3ee80cb63ea33e77a6837e3838eb558223f34a8b83e79c7861ab4e4a4",
     "packages/run-supervisor/rust/src/terminal_slot.rs": "7dff606945782de29b9c647427d481c4680047087cb1196c3c88f3de5f72cf82",
@@ -809,14 +809,14 @@
     "packages/secrets/rust/tests/no_stdin.rs": "f5a93caf19c759dad53c486e13d953b3f3e3304863cb9ece42bb4e9dcf58f22c",
     "packages/secrets/rust/tests/resolver.rs": "bfa7437b4749119b415a7cce89cb36321f98831aa6c4b0a3e17f0933a445e1a2",
     "packages/session-host/rust/src/direct.rs": "b8952c4872b609a626ad152b033b882567c4a1dd06c6a166529ee379fd34ead5",
-    "packages/session-host/rust/src/host.rs": "67fd60a1254f4a4dab26bc4ea89e0e3319575c9860a26356720a354f16325731",
-    "packages/session-host/rust/src/lib.rs": "e1520a09416766a7e967198ebcf1f24449179f80cf3ed7e469bd5efe7a6a6d19",
+    "packages/session-host/rust/src/host.rs": "72a1011dea8d1f165aaa8b896951864b21825683782a56d62a79a661ab7195eb",
+    "packages/session-host/rust/src/lib.rs": "175d502f9b1697e705eea9fb27ef635d0d2b4fc3408f736b4ff86f171c14d5c7",
     "packages/session-host/rust/src/pane_io.rs": "a43f64ea3c10632baa2bc104ac682448db339af9b7a7bb1cd4406a47b5540a2d",
     "packages/session-host/rust/src/panes.rs": "8e7c5e85979bd8fbb8ef9c2c5996109afecc0f657ee15c1c661ab8ac782e5658",
-    "packages/session-host/rust/src/route.rs": "b4b410e8489a5de64b18615560d1fc1b78d10145c479cb3b577eb1485c6b84ec",
-    "packages/session-host/rust/src/types.rs": "7755dc5bed697b94824bcfc553b8a025ed206b1a0255816c57961c18139623b6",
+    "packages/session-host/rust/src/route.rs": "fe4c3c1dd4f6a49684889f2e602b93286ed689e175e58442961e73b700afa817",
+    "packages/session-host/rust/src/types.rs": "382b8d2bd9a7683f4551695c4fa9f9b2e4485c0e9df41137e22520749820b703",
     "packages/session-host/rust/tests/direct_os.rs": "ffcda2fd5811172f85f54ef093c71b7dd99c0bf4fd12630e9997d4d63149ec64",
-    "packages/session-host/rust/tests/host.rs": "80d87b2f150e5d05812fbc04b7ebc725fdf6f9b1c781ab354a5fe7d6736e1542",
+    "packages/session-host/rust/tests/host.rs": "0278ebde8f29b26593564319c7e394dec44a9cf62228858db8cf78458ebc24cb",
     "packages/terminal-control/rust/src/core.rs": "0fa67399b5c1e59ac6accc448f58675cae90255659685254b48f428631ab66eb",
     "packages/terminal-control/rust/src/driver/herdr.rs": "8e43d642128ef3072b5009f835cdbeb9d03b89711b4be210f370a5953dd749a6",
     "packages/terminal-control/rust/src/driver/mod.rs": "72f4bbc3f4d1c55704fbe1e0cedd1d6ed1e526d5f06838c97ac32bbeab8c175c",
@@ -1115,7 +1115,7 @@
     "src/runner/dispatch/evidence-attribution.mjs": "e286beb61bc988049d44645db9a7a0900ba2431132ce694861ac7c43390b229f",
     "src/runner/dispatch/execution-contract.mjs": "a5b5160f4fb82aa885a961b8f6f66f353a8d455a0ab46a1bd2fe84f527e16e53",
     "src/runner/dispatch/executor-governance.mjs": "8e8f93d957741e107b0e38630d7b0816209019234c93c95140113b231e18f73e",
-    "src/runner/dispatch/herdr-round.mjs": "60c9cba07dd4e6ae6823b12489c9ac0f3b3a5a5090202b7fe8d808e9ce34edf3",
+    "src/runner/dispatch/herdr-round.mjs": "825602ca9134df485b06a1ad6ca7ce314794e825e86e9538f95ccfce11f13329",
     "src/runner/dispatch/hook.mjs": "32e97b8f6a652b2d02346d59e8c3924021acade166102a7fb5fe757aefdbfc89",
     "src/runner/dispatch/llm-accounts.mjs": "5ae6e26c73fa99b0a0e4908bcf01530466b843601d5e95dce9f4b57575d66e1f",
     "src/runner/dispatch/mechanism.mjs": "18ffe81e94a42ca290de501777f0383c1505772c3e6254363ea101469c31cf30",
@@ -1138,7 +1138,7 @@
     "src/runner/dispatch/settlement.mjs": "c17e494e117c60d5fa823b33ba358f4c464d8efe6e6d5f7fd3f9251e1baa9f5d",
     "src/runner/dispatch/shipped-catalog.mjs": "ceb40e02a773598eebe4fc8db48e7400bfb76ce938df20268ce166f0539b8025",
     "src/runner/dispatch/stop-processes-inside.mjs": "255f7cedcb61ad8c3992b6068bb1951ce437f7e98acffac382f6ade7e943c234",
-    "src/runner/dispatch/terminal-slot.mjs": "a997ce7a1f76c280776e9da30ff1431a537f16094ff89560cd079a8010bcfdd5",
+    "src/runner/dispatch/terminal-slot.mjs": "a0726de851c54cc06794c8260514664b9939d78c327773dcb89cb78bcc22150f",
     "src/runner/dispatch/tier-cell.mjs": "91024f5f01c60fba321325214d08b4773535d538374f6cfad4b2ccb16b1c2436",
     "src/runner/dispatch/tool-providers.mjs": "9ba90c333c1e26ee053cea85b59df5421817ecdccd7ea1410613f8e8c3f53ec0",
     "src/runner/dispatch/transport.mjs": "ff8519a280890bc45f5bdd3403dff25721b553ea0afb9e39d55d4dc0ec9c751a",
@@ -1214,7 +1214,7 @@
     "src/runner/worktree.mjs": "91d59e6cfb9c9753846dd573c4cfe8e19834514a31c88772c7c54d949113afbd",
     "src/runner/write-queue.mjs": "a816a82d6c4499cca921f2b105eaaafe646f1413ff202ce3f132c4b84ed7a2b3",
     "src/seat-binding/client.mjs": "206a9ecbbc301f2c3c9688535dbeb60fabbe67052b870a62e23e7481ae82fdd8",
-    "src/session-host/client.mjs": "d7bfbaf1f26d9d8304c15b34fb7fccdbec835d8bda3ed8744562af35a3372f8b",
+    "src/session-host/client.mjs": "a3ea5a9cce373c9d4ea3e2c1c4c80f3135fb09f818c552ec5ac9bf9f561bd558",
     "src/session-rotation/decide.mjs": "c4252cfaf861cc8cdf65829d6b63f8e70ddcc990bde6d6b23343a5a9fe80e80f",
     "src/session-rotation/handoff-store.mjs": "0fdd8f18a406b5c2e1797c331e6bdf5ce72c3ed67a9daef28df5bb3b884aa133",
     "src/session-rotation/measure.mjs": "9707b594c14184c402229fe1cac9c1c67dbd84cd9b0db8ff235a8d51caab50be",
@@ -1279,7 +1279,7 @@
     "src/state/work-event-store.mjs": "a1e9476269ed8da9af7defe9d4b8201232276b15d75a7619e7bbabf022cdf22e",
     "src/state/work.mjs": "8cec6c9060943fb105ff38ade7d57d654747d530bb32bc8d0bb7b89d66a14396",
     "src/state/worker-slots.mjs": "3bd71eb1c2a96d7dbe4d3cf4d87d2b37d0ae55189c2ee873c5a9059e469e374b",
-    "src/terminal-control/client.mjs": "c5527414c00dd1fc6673252ba51f63705240d11ef5f7099fff217598e99ba178",
+    "src/terminal-control/client.mjs": "19de57c7edb3fce0cea998af36dde93f73270daaa37f1f35a1a80b9f0f57fbac",
     "src/terminal-control/config.mjs": "722271395f84821afadd1c10985a1cbadf6904aaa30173d4ec8ee1471ab18763",
     "src/util/agent-skill-dirs.mjs": "82747166ecb7b91205ef3e5cdf469e42e8c239b41b3e548823f1615032998bf5",
     "src/util/capped-jsonl-log.mjs": "1cb7dbdc4e370eaa8d9e9989a71998deb882b0fbdd97cce6689d1073784939a5",
@@ -3872,7 +3872,7 @@
     {
       "path": "scripts/record-mailbox-hook-fixtures.mjs",
       "line": 1192,
-      "spawn": "createTerminalControl -> src/terminal-control/client.mjs:118",
+      "spawn": "createTerminalControl -> src/terminal-control/client.mjs:110",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
     },
@@ -3986,7 +3986,7 @@
     {
       "path": "src/runner/dispatch/assignment-runner.mjs",
       "line": 977,
-      "spawn": "prepareTerminalAttempt -> src/runner/dispatch/herdr-round.mjs:477",
+      "spawn": "prepareTerminalAttempt -> src/runner/dispatch/herdr-round.mjs:480",
       "binary": "(env FGOS_HERDR_BIN)",
       "class": "configured-binary"
     },
@@ -4123,8 +4123,15 @@
     },
     {
       "path": "src/session-host/client.mjs",
-      "line": 101,
+      "line": 159,
       "spawn": "spawnSync",
+      "binary": "(env FGOS_HOST_BIN)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/session-host/client.mjs",
+      "line": 172,
+      "spawn": "spawnAsync -> src/session-host/client.mjs:84",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
     },
@@ -4179,15 +4186,8 @@
     },
     {
       "path": "src/terminal-control/client.mjs",
-      "line": 118,
+      "line": 110,
       "spawn": "spawnSync",
-      "binary": "(env FGOS_HOST_BIN)",
-      "class": "configured-binary"
-    },
-    {
-      "path": "src/terminal-control/client.mjs",
-      "line": 148,
-      "spawn": "spawn",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
     },

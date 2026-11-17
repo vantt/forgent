@@ -5,6 +5,7 @@
 use crate::direct::OsDirect;
 use crate::host::{SessionHost, DEFAULT_GRACE_MS, DEFAULT_READY_MS};
 use crate::types::*;
+use fgos_terminal_control::port::LaunchSpec;
 use fgos_terminal_control::route::{
     emit, error, line, read_stdin, usage, CoreParts, EXIT_MISMATCH, EXIT_OK, EXIT_USAGE,
 };
@@ -13,7 +14,7 @@ use serde_json::{json, Value};
 use std::time::Instant;
 
 pub const PROTOCOL: u64 = 1;
-pub const OPS: [&str; 4] = ["start", "alive", "front", "retire"];
+pub const OPS: [&str; 6] = ["start", "open", "launch", "alive", "front", "retire"];
 
 fn refusal_fields(refusal: &Refusal) -> (String, Value) {
     let mut fields = json!({ "code": refusal.code });
@@ -61,6 +62,33 @@ fn run(op: &str, host: &SessionHost, envelope: &Value) -> Result<(String, Value)
                     ("placed".into(), json!({ "placement": placement }))
                 }
                 StartAnswer::Refused(refusal) => refusal_fields(&refusal),
+            }
+        }
+        "open" => {
+            let open: OpenRequest =
+                serde_json::from_value(request).map_err(|e| format!("request: {e}"))?;
+            match host.open(&open) {
+                OpenAnswer::Opened { placement, slot } => {
+                    let mut fields = json!({ "placement": placement });
+                    if let Some(slot) = slot {
+                        fields["slot"] = json!(slot);
+                    }
+                    ("placed".into(), fields)
+                }
+                OpenAnswer::Refused(refusal) => refusal_fields(&refusal),
+            }
+        }
+        "launch" => {
+            let placement: Placement = whole(&request, "placement")?;
+            let spec: LaunchSpec = whole(&request, "spec")?;
+            match host.launch(&placement, &spec) {
+                LaunchAnswer::Launched(identity) => {
+                    ("launched".into(), json!({ "identity": identity }))
+                }
+                LaunchAnswer::NotStarted { reason } => {
+                    ("not-started".into(), json!({ "reason": reason }))
+                }
+                LaunchAnswer::Refused(refusal) => refusal_fields(&refusal),
             }
         }
         "alive" => {

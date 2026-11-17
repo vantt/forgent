@@ -1,8 +1,8 @@
 # Phase 11: worker attempts placed through the host port (report and spec text for phase 18)
 
-Status: DONE_WITH_CONCERNS. The envelope and intent carry `host`, release-slot is the port's `retire`, the supervisor's pane I/O
+Status: DONE. The envelope and intent carry `host`, release-slot is the port's `retire`, the supervisor's pane I/O
 wraps the crate's `PaneIo`, Node gives panes back through the Session Host client, and one seat-preparation door is exported.
-Two cuts the plan asks for are **not** possible inside this footprint; they are named under "Not done" with the exact reason.
+Allocation and the gate launch moved to the port in a second round (see "Cut closed after the first round").
 
 ## What changed
 
@@ -23,18 +23,28 @@ Both exist because an attempt whose envelope or intent was written before this c
 
 ## Not done, and why
 
-1. **Allocation is still Node's `allocateAsync`, and the gate launch is still the supervisor's `Core::launch`.**
-   The port's `start` is allocate plus launch of one command. For a worker the command is the gate, which the supervisor builds after the
-   controller has allocated, and the supervisor needs the launch's `ProcessIdentity` (the gate's root) before it may send `GO`.
-   `start` answers a `Placement` only, and the Node client has no per-group serialisation queue (`allocateAsync` keeps one so two rounds
-   of a batch do not both open the batch's tab). Closing the cut needs a crate change in `packages/session-host/**` (outside this
-   phase's write scope): a launch-into-an-allocated-slot call that returns the identity, and group serialisation in the Node client.
-   Until then the verify `rg` for `.allocateAsync(` and `Core::launch` still shows those two sites.
-2. **`retire` from Node is no longer queued behind allocates of the same group.** `releaseAsync(close)` waited behind earlier
-   allocate/close calls of its group; `retirePane` is a synchronous port call. The route serialises on the store, but a close racing a
-   sibling allocate of the same batch has lost that Node-side ordering. Decide with the owner whether the client should carry the queue.
-3. **Test placement.** `herdr-private-home-trust.test.mjs` is outside the write scope, so the seat-door test is `test/run-supervisor/prepare-seat.test.mjs` and the retire test is `test/run-supervisor/pane-host.test.mjs` (the plan listed `dispatch-terminal-slot.test.mjs`, but the retire helpers are in `herdr-round.mjs`, not `terminal-slot.mjs`).
-4. **Live proof not run** (`npm run fgos:dev -- run "say ok" --json` in a pane): this round had no herdr session.
+1. **Test placement.** `herdr-private-home-trust.test.mjs` is outside the write scope, so the seat-door test is `test/run-supervisor/prepare-seat.test.mjs` and the retire test is `test/run-supervisor/pane-host.test.mjs` (the plan listed `dispatch-terminal-slot.test.mjs`, but the retire helpers are in `herdr-round.mjs`, not `terminal-slot.mjs`).
+2. `test/suite-baseline.json` still lists `test/terminal-control/group-queue.test.mjs` (retired, see below) and has no row for `test/session-host/group-queue.test.mjs`; the file is outside this phase's footprint.
+
+## Cut closed after the first round (open, launch, queue)
+
+**A. Session Host crate** (`packages/session-host`). Two operations beside `start`, because the supervisor's gate command exists only after the controller has a slot, so `start` (allocate + launch of one command) cannot carry it and cannot return the launched identity the supervisor needs before `GO`:
+- `open(OpenRequest) -> OpenAnswer`: terminal only, Terminal Control allocate and nothing else (`groupKey`, `beside`, `groupSize`, `cwd`, `env`, `display`). Answers the placement plus, when this call allocated it, the `slot` (`tabId`, `paneId`) for the diagnostic line; a key whose pane is already live answers its placement with no slot and allocates nothing.
+- `launch(placement, LaunchSpec) -> LaunchAnswer`: terminal only, Terminal Control launch into the key's slot; `Launched(ProcessIdentity)`, `NotStarted { reason }` (slot kept, never launched into again) or a refusal. A direct placement is refused `unsupported / host-unsupported-here`.
+- `start` is now `open_slot` + `launch` (+ opening), one door; its observable behaviour is unchanged. Contract `host-port.v1.json` carries `open` and `launch` (`openRequest`, `launchSpec`, `processIdentity`); route ops `open` and `launch`; owning proofs in `packages/session-host/rust/tests/host.rs` (two tests: open/launch happy path with slot, group size and idempotent re-open; refusals for a screenless placement and a bad key).
+- Node `src/session-host/client.mjs`: `open`, `launch`, `openAsync`, `retireAsync`, option `config` (the route's core settings) and the `terminal-config-*` route codes kept by name. The per-group promise queue and the async spawn moved here from `src/terminal-control/client.mjs` (moved, not copied; `allocateAsync`, `releaseAsync` and their group map are deleted there, `allocate`/`release` stay as plain calls). `retireAsync(close)` waits behind earlier opens of its group (group from this client's `openAsync` or `{ groupKey }`, else rejected `session-host-unknown-group`).
+
+**B. Node placement.** `herdr-round.mjs` opens through `createPaneHost(...).openAsync` (same `config` as the control, shared per endpoint+config so rounds side by side share one queue) and `abandon` closes through `retireAsync(..., { groupKey })`. `round.paneId` comes from the answer's `slot`. `terminal-slot.mjs` `driverCodeOf` reads the Session Host's `detail` as well as Terminal Control's `reason`. Test moved with the behaviour: `test/terminal-control/group-queue.test.mjs` is retired; `test/session-host/group-queue.test.mjs` owns the same four cases over `openAsync` / `retireAsync` (ordering, other group runs alongside, failed call does not stall, unknown-group close rejected, route error). `test/session-host/client.test.mjs` gains the one wiring proof for `open` / `launch`.
+
+**C. Supervisor.** `supervise/terminal.rs` launches through `SessionHost::launch` over its own core; refusals keep their receipt codes (`terminal-mode-unsupported` for `unsupported`, `terminal-launch-unknown` for `unknown`, `terminal-launch-not-started`), with the same text (`capability: detail`).
+
+**D. Checks.** `rg -n "\.allocateAsync\(|\.releaseAsync\(|\.allocate\(|\.release\(\{" src/runner src/run-supervisor`: no hit. `rg -n "Core::launch|\.allocate\(|\.launch\(" packages/run-supervisor/rust/src`: one hit, `supervise/terminal.rs:738 session_host.launch(...)`, which is the Session Host door. `cargo test`, `clippy --all-targets -D warnings`, `fmt --check` for `fgos-run-supervisor`, `fgos-session-host`, `fgos-terminal-control` green; `cargo check` for `aarch64-apple-darwin` and `x86_64-pc-windows-msvc` green. Node with `FGOS_HOST_BIN` of a host built from this tree (the shared `devhost-target` binary predates `open`/`launch`): `test/run-supervisor/*`, `dispatch-terminal-slot`, `dispatch-runtime-inspect`, `cli/run-verb`, `session-host/*`, `terminal-control/client-route`, `architecture` all pass, 0 fail.
+
+**Live proof.** `npm run -s fgos:dev -- run "say ok" --json` on this machine (herdr running): exit 0, envelope `host: terminal`, claim `done`, closed steps ended with `release-slot`, `herdr pane list` before and after identical (no pane left).
+
+## Spec text, new operations (for `docs/platform/session-host/spec.md`, phase 14 folds it in)
+
+"`open` and `launch` are the two halves of `start` for a controller that learns its command only after the slot exists (the run supervisor's gate). `open` allocates the terminal slot of a key (group, beside, group size, working directory, display) and starts nothing; it answers the placement and, when it allocated, the slot's pane, and a key whose pane is already live answers that placement and allocates nothing. `launch` starts a prepared command in that slot through Terminal Control's durable `launched` marker and answers the process identity of the launched root (or `not-started`, the slot kept and never launched into again, or a refusal). Both are terminal-only: a screenless placement is refused `unsupported / host-unsupported-here`. A Node caller that opens many placements serialises per group (`openAsync`, `retireAsync(close)`), one queue per coordinating process. Decision-history line: 'The Session Host gained `open` and `launch` so the supervisor's gate launch and Node's pane allocation both go through the port; `start` is their composition.'"
 
 ## Spec text for `docs/platform/run-supervisor/spec.md` (phase 18 applies it; shared with plan 261117-1553)
 
@@ -48,8 +58,8 @@ step; an `unknown` refusal leaves it without a receipt so adopt retries, except 
 (read as released only for an adopt-not-started envelope)."
 
 Decision-history line: "Worker attempts are placed through the Session Host port: the envelope carries `host` in place of `mode`,
-release is the port's `retire`, and the supervisor's pane I/O is the crate's `PaneIo` plus the supervisor's watch. Allocation and the gate
-launch stay with the controller and the supervisor until the port can launch into an allocated slot and return its identity."
+release is the port's `retire`, and the supervisor's pane I/O is the crate's `PaneIo` plus the supervisor's watch. Allocation is the port's `open` and the gate
+launch its `launch`; `start` is their composition."
 
 ## Verification
 
@@ -57,4 +67,4 @@ launch stay with the controller and the supervisor until the port can launch int
 - `cargo clippy ... --all-targets` clean; `cargo fmt --check` clean; `cargo check --target aarch64-apple-darwin` for both crates passes.
 - Node (with the staged addon from `scripts/lib/git-addon-stage.mjs`): `test/run-supervisor/*.test.mjs`, `dispatch-terminal-slot`, `dispatch-runtime-inspect`, `architecture`: pass except tests that need a writable machine state, git worktree or `/var/tmp` in this sandbox (`attempt-steps` two pane-seat quarantine cases: `EROFS ... provider-state.lock`; `run-verb`: `EROFS /var/tmp`; three trust cases and one `attention` case that read a linked worktree). None of them touches code changed here; a baseline comparison was not possible (`.git` is read-only in this round).
 - The first design put the retire helpers in `terminal-slot.mjs`; `dispatch-runtime-inspect` caught that this pulled `child_process` into the read-only inspect import graph, so they moved to `herdr-round.mjs`.
-- `rg` for placement calls: `src/runner/dispatch/herdr-round.mjs:520 tc.allocateAsync` and `packages/run-supervisor/rust/src/supervise/terminal.rs:726 core.launch` remain (see "Not done" 1); nothing else places or releases a pane in `src/runner` or `src/run-supervisor`. Read-only Terminal Control users that stay: `worker-session-boot.mjs`, `settle-attempt.mjs`, `inspect.mjs`, `terminal-control-checks.mjs`, `registrations.mjs`.
+- `rg` for placement calls: superseded by the second round (see D below). Read-only Terminal Control users that stay: `worker-session-boot.mjs`, `settle-attempt.mjs`, `inspect.mjs`, `terminal-control-checks.mjs`, `registrations.mjs`.

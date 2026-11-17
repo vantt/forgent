@@ -10,7 +10,7 @@ use fgos_agent_protocol::AgentIo;
 use fgos_terminal_control::core::Want;
 use fgos_terminal_control::port::{
     AllocateRequest, Display, Disposition, LaunchOutcome, LaunchSpec, PaneState,
-    Refusal as PaneRefusal, ReleaseOutcome,
+    Refusal as PaneRefusal, ReleaseOutcome, Slot,
 };
 use std::path::PathBuf;
 
@@ -109,61 +109,22 @@ impl SessionHost<'_> {
             },
             None => None,
         };
-        let group_key = match (&request.group_key, &request.beside) {
-            (Some(group), _) => group.clone(),
-            (None, Some(_)) => {
-                return refuse(Refusal::unknown(
-                    RefusalCode::PlacementUnknown,
-                    "beside needs the groupKey of the placement it opens next to",
-                ))
-            }
-            (None, None) => key.to_string(),
-        };
-        if let Some(beside) = &request.beside {
-            if !valid_key(beside) {
-                return refuse(bad_key(beside));
-            }
-            let seen = self.panes.inspect(
-                beside,
-                Want {
-                    foreground: false,
-                    activity: false,
-                    detail: false,
-                },
-            );
-            if seen.pane != PaneState::Live {
-                return refuse(Refusal::unknown(
-                    RefusalCode::PlacementUnknown,
-                    format!("the placement `{beside}` to open beside is not live"),
-                ));
-            }
-        }
-        // A key with a live placement answers that placement; it never starts a second one.
-        let existing = self.panes.inspect(
-            key,
-            Want {
-                foreground: false,
-                activity: false,
-                detail: false,
-            },
-        );
-        if existing.pane == PaneState::Live {
-            return StartAnswer::Placed(Self::placement(request));
-        }
-        let display: Display = request
-            .display
-            .clone()
-            .and_then(|v| serde_json::from_value(v).ok())
-            .unwrap_or_default();
-        if let Err(r) = self.panes.allocate(&AllocateRequest {
-            key: key.to_string(),
-            group_key,
-            display,
+        let (placement, slot) = match self.open_slot(&OpenRequest {
+            host: request.host,
+            key: request.key.clone(),
+            group_key: request.group_key.clone(),
+            beside: request.beside.clone(),
             group_size: None,
-            cwd: Some(request.cwd.clone()),
+            cwd: request.cwd.clone(),
             env: request.env.clone(),
+            display: request.display.clone(),
         }) {
-            return refuse(from_pane(r));
+            Ok(opened) => opened,
+            Err(r) => return refuse(r),
+        };
+        // A key with a live placement answers that placement; it never starts a second one.
+        if slot.is_none() {
+            return StartAnswer::Placed(placement);
         }
         let spec = LaunchSpec {
             command: request.command.clone(),
@@ -172,12 +133,12 @@ impl SessionHost<'_> {
             env: request.env.clone(),
             expect: None,
         };
-        match self.panes.launch(key, &spec) {
-            Ok(LaunchOutcome::Launched(_)) => {}
-            Ok(LaunchOutcome::NotStarted { reason }) => {
+        match self.launch(&placement, &spec) {
+            LaunchAnswer::Launched(_) => {}
+            LaunchAnswer::NotStarted { reason } => {
                 return refuse(Refusal::unknown(RefusalCode::PlacementUnknown, reason))
             }
-            Err(r) => return refuse(from_pane(r)),
+            LaunchAnswer::Refused(r) => return refuse(r),
         }
         if let (Some(opening), Some(adapter)) = (&request.opening, adapter) {
             let mut io = PaneIo::new(self.panes, key);
@@ -202,6 +163,99 @@ impl SessionHost<'_> {
             }
         }
         StartAnswer::Placed(Self::placement(request))
+    }
+
+    /// Allocate the slot of a terminal placement and start nothing in it. A key whose pane is already
+    /// live answers that placement and allocates nothing.
+    pub fn open(&self, request: &OpenRequest) -> OpenAnswer {
+        match self.open_slot(request) {
+            Ok((placement, slot)) => OpenAnswer::Opened { placement, slot },
+            Err(refusal) => OpenAnswer::Refused(refusal),
+        }
+    }
+
+    /// The placement and the slot this call allocated (`None`: the key's pane was already live).
+    fn open_slot(&self, request: &OpenRequest) -> Result<(Placement, Option<Slot>), Refusal> {
+        if !valid_key(&request.key) {
+            return Err(bad_key(&request.key));
+        }
+        if request.host != HostKind::Terminal {
+            return Err(Refusal::unsupported(
+                RefusalCode::HostUnsupportedHere,
+                "a screenless host has no slot to open; `start` runs its process",
+            ));
+        }
+        let key = request.key.as_str();
+        let placement = Placement {
+            host: request.host,
+            key: request.key.clone(),
+            display: request.display.clone(),
+        };
+        let group_key = match (&request.group_key, &request.beside) {
+            (Some(group), _) => group.clone(),
+            (None, Some(_)) => {
+                return Err(Refusal::unknown(
+                    RefusalCode::PlacementUnknown,
+                    "beside needs the groupKey of the placement it opens next to",
+                ))
+            }
+            (None, None) => key.to_string(),
+        };
+        let probe = Want {
+            foreground: false,
+            activity: false,
+            detail: false,
+        };
+        if let Some(beside) = &request.beside {
+            if !valid_key(beside) {
+                return Err(bad_key(beside));
+            }
+            if self.panes.inspect(beside, probe).pane != PaneState::Live {
+                return Err(Refusal::unknown(
+                    RefusalCode::PlacementUnknown,
+                    format!("the placement `{beside}` to open beside is not live"),
+                ));
+            }
+        }
+        if self.panes.inspect(key, probe).pane == PaneState::Live {
+            return Ok((placement, None));
+        }
+        let display: Display = request
+            .display
+            .clone()
+            .and_then(|v| serde_json::from_value(v).ok())
+            .unwrap_or_default();
+        let allocation = self
+            .panes
+            .allocate(&AllocateRequest {
+                key: key.to_string(),
+                group_key,
+                display,
+                group_size: request.group_size,
+                cwd: Some(request.cwd.clone()),
+                env: request.env.clone(),
+            })
+            .map_err(from_pane)?;
+        Ok((placement, Some(allocation.slot)))
+    }
+
+    /// Start a prepared command in the slot `open` allocated for the placement's key and answer the
+    /// launched process root. The caller needs that identity before it lets the process run on.
+    pub fn launch(&self, placement: &Placement, spec: &LaunchSpec) -> LaunchAnswer {
+        if !valid_key(&placement.key) {
+            return LaunchAnswer::Refused(bad_key(&placement.key));
+        }
+        if placement.host != HostKind::Terminal {
+            return LaunchAnswer::Refused(Refusal::unsupported(
+                RefusalCode::HostUnsupportedHere,
+                "a screenless host has no slot to launch into; `start` runs its process",
+            ));
+        }
+        match self.panes.launch(&placement.key, spec) {
+            Ok(LaunchOutcome::Launched(identity)) => LaunchAnswer::Launched(identity),
+            Ok(LaunchOutcome::NotStarted { reason }) => LaunchAnswer::NotStarted { reason },
+            Err(r) => LaunchAnswer::Refused(from_pane(r)),
+        }
     }
 
     fn start_direct(&self, request: &StartRequest) -> StartAnswer {

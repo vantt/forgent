@@ -344,20 +344,23 @@ function seedAttemptTrust({ trustStore, round, runDir, cwd, repoRoot, fullEnv, w
 const paneHosts = new Map();
 
 /**
- * The Session Host client for one herdr endpoint, shared for the life of the process. `endpointEnv` is the
- * driver environment of the herdr server the pane lives in (only its `HERDR_*` entries, as `herdrEndpointEnv`
- * selects them). Giving a pane back is the host's `retire`; kept here, not in `terminal-slot.mjs`, because that
- * module is read by read-only inspection and the host client spawns a process.
+ * The Session Host client for one herdr endpoint and route configuration, shared for the life of the process:
+ * its queue per group is what keeps two rounds of one batch from both opening the batch's tab, so rounds that
+ * run side by side must share it. `endpointEnv` is the driver environment of the herdr server the pane lives
+ * in (only its `HERDR_*` entries, as `herdrEndpointEnv` selects them). Opening a pane is the host's `open`
+ * and giving it back its `retire`; kept here, not in `terminal-slot.mjs`, because that module is read by
+ * read-only inspection and the host client spawns a process.
  */
-export function createPaneHost({ herdrBin, endpointEnv, hostBin, timeoutMs } = {}) {
+export function createPaneHost({ herdrBin, endpointEnv, config, hostBin, timeoutMs } = {}) {
   const env = endpointEnv ?? {};
-  const identity = JSON.stringify([hostBin ?? null, herdrBin ?? null, env, timeoutMs ?? null]);
+  const identity = JSON.stringify([hostBin ?? null, herdrBin ?? null, env, config ?? null, timeoutMs ?? null]);
   let host = paneHosts.get(identity);
   if (!host) {
     host = createSessionHost({
       ...(hostBin ? { hostBin } : {}),
       ...(herdrBin ? { herdrBin } : {}),
       ...(Object.keys(env).length ? { env } : {}),
+      ...(config ? { config } : {}),
       ...(timeoutMs ? { timeoutMs } : {}),
     });
     paneHosts.set(identity, host);
@@ -491,20 +494,20 @@ export async function prepareTerminalAttempt(ctx) {
   // Built inside the try below: the private home exists from here on, and a terminal config that cannot
   // build a control must give it back like every other failure of this function.
   let tc;
+  let paneHost;
   const display = slotDisplay({ ...workLabel, agent: agentKind, model, role: rawContract?.assignment?.role });
 
   const abandon = async () => {
-    if (tc) { try { retirePane(createPaneHost({ herdrBin, endpointEnv: herdrEndpointEnv(sessionEnv) }), key, 'close'); } catch { /* the pane is the port's to reconcile */ } }
+    // Behind the group's earlier opens, so a close never runs while a sibling's open is choosing its pane.
+    if (paneHost) { try { await paneHost.retireAsync({ host: 'terminal', key }, 'close', { groupKey }); } catch { /* the pane is the port's to reconcile */ } }
     try { await cleanupTrust({ runDir }); } catch { /* a leftover entry costs one line in the store */ }
     if (workerHomePath) { try { redactWorkerHome(workerHomePath); } catch { /* nothing further to do about a home we cannot read */ } }
   };
 
   try {
-    tc = createRoundTerminalControl({
-      herdrBin,
-      herdrEnv: sessionEnv,
-      config: { ...terminalRouteConfig(projectRoot), ...(terminalConfig ?? {}) },
-    });
+    const routeConfig = { ...terminalRouteConfig(projectRoot), ...(terminalConfig ?? {}) };
+    tc = createRoundTerminalControl({ herdrBin, herdrEnv: sessionEnv, config: routeConfig });
+    paneHost = createPaneHost({ herdrBin, endpointEnv: herdrEndpointEnv(sessionEnv), config: routeConfig });
     // A pane already sitting in the caller's own tab joins the group, so the batch opens beside it. A pane
     // that cannot be taken is no anchor: the group simply opens its own tab.
     if (anchorPaneId) {
@@ -513,21 +516,21 @@ export async function prepareTerminalAttempt(ctx) {
     // The caller records the pane's key and endpoint before the pane exists, so a controller killed from
     // here on leaves a record that names the pane to give back.
     beforeAllocate?.({ slot: { key, groupKey }, endpointEnv });
-    let slot;
+    let opened;
     try {
       // The batch size, when the caller knows it, lets the placement policy plan equal panes.
       const groupSize = Number.isInteger(dispatchBatchSize) && dispatchBatchSize > 1 ? { groupSize: dispatchBatchSize } : {};
-      slot = await tc.allocateAsync({ key, groupKey, display, cwd, env: {}, ...groupSize });
+      opened = await paneHost.openAsync({ host: 'terminal', key, groupKey, display, cwd, env: {}, ...groupSize });
     } catch (err) {
       throw round.fail('worker-spawn-fail', err.code ?? 'pane_split_failed',
         `executor failed to start for work "${workId}": terminal-control could not open a pane (${err.code ?? 'unknown'}): ${err.message}`);
     }
-    if (slot.result !== 'slot') {
-      const err = refusalError(slot, `allocate ${key}`);
+    if (opened.result !== 'placed') {
+      const err = refusalError(opened, `open ${key}`);
       throw round.fail('worker-spawn-fail', err.code === 'terminal_unknown' ? 'pane_split_failed' : err.code,
         `executor failed to start for work "${workId}": terminal-control could not open a pane (${err.code}): ${err.message}`);
     }
-    round.paneId = slot.slot.paneId;
+    round.paneId = opened.slot?.paneId ?? null;
     round.note({ status: 'pane-created', paneId: round.paneId });
   } catch (err) {
     await abandon();

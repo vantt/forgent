@@ -35,9 +35,9 @@ export function portKey(raw, fallback = 'run') {
   return cleaned || fallback;
 }
 
-/** The driver error code inside a refusal reason: `herdr agent_blocked: ...` -> `agent_blocked`. */
+/** The driver error code inside a refusal reason (Terminal Control's `reason`, the Session Host's `detail`): `herdr agent_blocked: ...` -> `agent_blocked`. */
 export function driverCodeOf(refusal) {
-  return /^herdr ([a-z_]+):/.exec(refusal?.reason ?? '')?.[1] ?? null;
+  return /^herdr ([a-z_]+):/.exec(refusal?.reason ?? refusal?.detail ?? '')?.[1] ?? null;
 }
 
 /** A refusal as the error the round code branches on. */
@@ -50,9 +50,7 @@ export function refusalError(refusal, what) {
   return new TerminalSlotError(code, `${what}: ${detail}`);
 }
 
-// One client per route configuration for the life of the process: the client's promise queue per
-// group key is what keeps two rounds of one batch from both opening the batch's tab, so rounds that
-// run side by side in this process must share it.
+// One client per route configuration for the life of the process.
 const clients = new Map();
 
 /**

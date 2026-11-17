@@ -32,12 +32,12 @@ use fgos_agent_protocol::terminal::{
 use fgos_agent_protocol::BlockedReason;
 use fgos_process::facts::{self, ProcTuple};
 use fgos_process::{domain_is_empty, domain_kill_all, Domain, DomainState, ProcId};
-use fgos_session_host::PaneIo;
-use fgos_terminal_control::core::{Core, Want};
-use fgos_terminal_control::port::{
-    ExpectedProcess, LaunchOutcome, LaunchSpec, PaneState, ProcessIdentity,
-    Refusal as TerminalRefusal,
+use fgos_session_host::direct::OsDirect;
+use fgos_session_host::{
+    HostKind, LaunchAnswer, PaneIo, Placement, RefusalKind, SessionHost, DEFAULT_GRACE_MS,
 };
+use fgos_terminal_control::core::{Core, Want};
+use fgos_terminal_control::port::{ExpectedProcess, LaunchSpec, PaneState, ProcessIdentity};
 use serde_json::{json, Value};
 
 use super::{
@@ -723,9 +723,21 @@ pub(super) fn run(
     let spec = launch_spec(&plan, run_dir).map_err(Refusal::internal)?;
 
     // The `launched` marker is durable before `launch` returns; only then may a GO exist.
-    let root = match core.launch(&plan.key, &spec) {
-        Ok(LaunchOutcome::Launched(identity)) => identity,
-        Ok(LaunchOutcome::NotStarted { reason }) => {
+    let direct = OsDirect::in_state_root();
+    let session_host = SessionHost {
+        panes: &core,
+        direct: &direct,
+        ready_ms: READY_MS,
+        grace_ms: DEFAULT_GRACE_MS,
+    };
+    let placement = Placement {
+        host: HostKind::Terminal,
+        key: plan.key.clone(),
+        display: None,
+    };
+    let root = match session_host.launch(&placement, &spec) {
+        LaunchAnswer::Launched(identity) => identity,
+        LaunchAnswer::NotStarted { reason } => {
             return super::not_started(
                 envelope,
                 run_dir,
@@ -735,25 +747,19 @@ pub(super) fn run(
                 &reason,
             )
         }
-        Err(TerminalRefusal::Unsupported { capability, detail }) => {
+        LaunchAnswer::Refused(refusal) => {
+            let code = match refusal.result {
+                RefusalKind::Unsupported => "terminal-mode-unsupported",
+                RefusalKind::Unknown => "terminal-launch-unknown",
+            };
             return super::not_started(
                 envelope,
                 run_dir,
                 watch,
                 locks,
-                "terminal-mode-unsupported",
-                &format!("{capability}: {detail}"),
-            )
-        }
-        Err(TerminalRefusal::Unknown { reason }) => {
-            return super::not_started(
-                envelope,
-                run_dir,
-                watch,
-                locks,
-                "terminal-launch-unknown",
-                &reason,
-            )
+                code,
+                &refusal.detail.unwrap_or_default(),
+            );
         }
     };
 

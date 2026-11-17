@@ -465,3 +465,87 @@ fn a_key_that_is_not_a_contract_key_is_refused() {
     );
     assert!(panes.0.borrow().allocated.is_empty());
 }
+
+fn open_request(key: &str) -> OpenRequest {
+    OpenRequest {
+        host: HostKind::Terminal,
+        key: key.into(),
+        group_key: Some("run-1".into()),
+        beside: None,
+        group_size: Some(3),
+        cwd: "/work".into(),
+        env: Default::default(),
+        display: None,
+    }
+}
+
+#[test]
+fn open_allocates_a_slot_and_launch_starts_the_command_in_it_returning_the_identity() {
+    let (panes, direct) = (FakePanes::default(), FakeDirect::default());
+    let h = host(&panes, &direct);
+    match h.open(&open_request("att-1")) {
+        OpenAnswer::Opened { placement: p, slot } => {
+            assert_eq!(p, placement(HostKind::Terminal, "att-1"));
+            assert_eq!(slot.map(|s| s.pane_id), Some("p1".to_string()));
+        }
+        other => panic!("expected a slot, got {other:?}"),
+    }
+    {
+        let log = panes.0.borrow();
+        assert_eq!(log.allocated[0].group_key, "run-1");
+        assert_eq!(log.allocated[0].group_size, Some(3));
+        assert!(log.launched.is_empty(), "open starts nothing");
+    }
+    let spec = LaunchSpec {
+        command: "launcher.sh".into(),
+        args: vec![],
+        cwd: "/work".into(),
+        env: Default::default(),
+        expect: None,
+    };
+    match h.launch(&placement(HostKind::Terminal, "att-1"), &spec) {
+        LaunchAnswer::Launched(identity) => assert_eq!(identity.pid, 1),
+        other => panic!("expected a launch, got {other:?}"),
+    }
+    assert_eq!(panes.0.borrow().launched[0].1.command, "launcher.sh");
+    // A second open of the key answers the live placement, with no new slot, and allocates nothing more.
+    assert!(matches!(
+        h.open(&open_request("att-1")),
+        OpenAnswer::Opened { slot: None, .. }
+    ));
+    assert_eq!(panes.0.borrow().allocated.len(), 1);
+}
+
+#[test]
+fn open_and_launch_refuse_a_screenless_placement_and_a_bad_key() {
+    let (panes, direct) = (FakePanes::default(), FakeDirect::default());
+    let h = host(&panes, &direct);
+    let mut direct_open = open_request("att-1");
+    direct_open.host = HostKind::Direct;
+    let refused = |answer: OpenAnswer| match answer {
+        OpenAnswer::Refused(r) => r.code,
+        other => panic!("expected a refusal, got {other:?}"),
+    };
+    assert_eq!(
+        refused(h.open(&direct_open)),
+        RefusalCode::HostUnsupportedHere
+    );
+    assert_eq!(
+        refused(h.open(&open_request("bad key"))),
+        RefusalCode::PlacementUnknown
+    );
+    let spec = LaunchSpec {
+        command: "x".into(),
+        args: vec![],
+        cwd: "/work".into(),
+        env: Default::default(),
+        expect: None,
+    };
+    for placed in [
+        placement(HostKind::Direct, "att-1"),
+        placement(HostKind::Terminal, "bad key"),
+    ] {
+        assert!(matches!(h.launch(&placed, &spec), LaunchAnswer::Refused(_)));
+    }
+    assert!(panes.0.borrow().allocated.is_empty() && panes.0.borrow().launched.is_empty());
+}

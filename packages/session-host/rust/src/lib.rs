@@ -1,5 +1,5 @@
 //! Session Host: the one port that places an agent session (`start`, `alive`, `front`,
-//! `retire`), for a worker under the run supervisor and for a long-lived head session.
+//! `retire`, and for a controller that builds its command late, `open` then `launch`), for a worker under the run supervisor and for a long-lived head session.
 //!
 //! The wire types are in `types` (contract: `packages/session-host/contracts/host-port.v1.json`),
 //! the Terminal Control surface the terminal adapter needs is `panes::Panes`, the screenless

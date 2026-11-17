@@ -559,7 +559,7 @@
     "test/state/working-tree-clean-unified.test.mjs": 0.9,
     "test/terminal-control/client-route.test.mjs": 1.1,
     "test/terminal-control/contracts.test.mjs": 0.1,
-    "test/terminal-control/group-queue.test.mjs": 0.6,
+    "test/session-host/group-queue.test.mjs": 0.6,
     "test/util/domain-dirs.test.mjs": 0.1,
     "test/util/format-bytes.test.mjs": 0.1,
     "test/util/format-duration.test.mjs": 0.1,

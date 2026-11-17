@@ -41,3 +41,12 @@ test('a refusal comes back as an answer and a bad request throws a named error',
 
   assert.throws(() => host.start({ host: 'direct', key: 'client-head', command: 'claude' }), (err) => err instanceof SessionHostError && err.code === 'session-host-route-usage');
 });
+
+test('open and launch reach the route and a screenless placement is refused for both', () => {
+  const host = createSessionHost({ hostBin: HOST_BIN });
+  const opened = host.open({ host: 'direct', key: 'client-open', cwd: scratch });
+  assert.deepEqual([opened.result, opened.code], ['unsupported', 'host-unsupported-here']);
+  const launched = host.launch({ host: 'direct', key: 'client-open' }, { command: 'true', cwd: scratch });
+  assert.deepEqual([launched.result, launched.code], ['unsupported', 'host-unsupported-here']);
+  assert.throws(() => host.launch({ host: 'terminal', key: 'client-open' }, { cwd: scratch }), (err) => err instanceof SessionHostError && err.code === 'session-host-route-usage');
+});

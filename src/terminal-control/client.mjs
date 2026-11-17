@@ -4,16 +4,9 @@
 // one JSON line comes back. Every decision (grouping, placement, what may be
 // closed) lives in the Rust core; this module only carries the call. A port
 // result (`unsupported`, `unknown` included) is returned as the route gave it.
-//
-// The one thing kept here is the promise queue per `groupKey` for the async
-// `allocate` and `release(close)`: a close must not run while an allocate of
-// the same group is still choosing a pane next to it, and two allocates of
-// one group must see each other's pane. One queue per coordinating process;
-// two processes on one group at worst make two same-named tabs, which is
-// harmless.
 
 import path from 'node:path';
-import { spawn, spawnSync } from 'node:child_process';
+import { spawnSync } from 'node:child_process';
 import { resolveActiveHostBin, routeEnv } from '../util/host-bin-path.mjs';
 import { resolveTerminalConfig } from './config.mjs';
 
@@ -87,8 +80,7 @@ function interpret({ status, signal, stdout, stderr, error, timedOut }, bin, op)
 
 /**
  * createTerminalControl({ hostBin, herdrBin, env, config, timeoutMs }) ->
- *   { allocate, attach, read, inspect, focus, release, capabilities, reconcileScan,
- *     allocateAsync, releaseAsync }
+ *   { allocate, attach, read, inspect, focus, release, capabilities, reconcileScan }
  *
  * `hostBin` defaults to the active release's host (resolved on first call).
  * `herdrBin` is the caller's resolved herdr binary; `env` the driver's
@@ -127,112 +119,16 @@ export function createTerminalControl({ hostBin, herdrBin, env, config, timeoutM
     return interpret({ ...res, timedOut: res.error?.code === 'ETIMEDOUT' }, hostPath, op);
   };
 
-  const callAsync = (op, request = {}) => {
-    let prepared;
-    try {
-      prepared = prepare(op, request);
-    } catch (error) {
-      return Promise.reject(error);
-    }
-    const { hostPath, argv, input } = prepared;
-    return new Promise((resolve, reject) => {
-      const settle = (res) => {
-        try {
-          resolve(interpret(res, hostPath, op));
-        } catch (error) {
-          reject(error);
-        }
-      };
-      let child;
-      try {
-        child = spawn(hostPath, argv, { env: routeEnv(), stdio: ['pipe', 'pipe', 'pipe'], windowsHide: true });
-      } catch (error) {
-        settle({ error });
-        return;
-      }
-      let stdout = '';
-      let stderr = '';
-      let timedOut = false;
-      let spawnError = null;
-      const timer = setTimeout(() => {
-        timedOut = true;
-        child.kill('SIGKILL');
-      }, timeoutMs);
-      // Decode as a stream: a multi-byte character may straddle two chunks.
-      child.stdout.setEncoding('utf8');
-      child.stderr.setEncoding('utf8');
-      child.stdout.on('data', (chunk) => {
-        stdout += chunk;
-        if (stdout.length > MAX_OUTPUT_BYTES) {
-          spawnError = Object.assign(new Error('output exceeded the buffer'), { code: 'ENOBUFS' });
-          child.kill('SIGKILL');
-        }
-      });
-      child.stderr.on('data', (chunk) => { if (stderr.length < MAX_OUTPUT_BYTES) stderr += chunk; });
-      child.stdin.on('error', () => {});
-      child.on('error', (error) => { spawnError = error; });
-      child.on('close', (status, signal) => {
-        clearTimeout(timer);
-        settle({ status, signal, stdout, stderr, error: spawnError, timedOut });
-      });
-      child.stdin.end(input);
-    });
-  };
-
-  // One chain per groupKey; a failed call never blocks the next one.
-  const chains = new Map();
-  const groupOfKey = new Map();
-  const queued = (groupKey, run) => {
-    const previous = chains.get(groupKey) ?? Promise.resolve();
-    const next = previous.then(run, run);
-    const tail = next.catch(() => {});
-    chains.set(groupKey, tail);
-    tail.then(() => {
-      if (chains.get(groupKey) === tail) chains.delete(groupKey);
-    });
-    return next;
-  };
-
   const client = {
-    allocate(request) {
-      groupOfKey.set(request.key, request.groupKey);
-      return callSync('allocate', request);
-    },
+    allocate: (request) => callSync('allocate', request),
     attach: (request) => callSync('attach', request),
     read: (request) => callSync('read', request),
     inspect: (request) => callSync('inspect', request),
     /** Bring the pane of a key this client allocated or attached to the front: `focused`, `unsupported` or `unknown`. */
     focus: (request) => callSync('focus', request),
-    release(request) {
-      const result = callSync('release', request);
-      if (result.result === 'released') groupOfKey.delete(request.key);
-      return result;
-    },
+    release: (request) => callSync('release', request),
     capabilities: (request = {}) => callSync('capabilities', request),
     reconcileScan: (request) => callSync('reconcile-scan', request),
-
-    /** Queued per `request.groupKey`; remembers the key's group for `releaseAsync`. */
-    allocateAsync(request) {
-      groupOfKey.set(request.key, request.groupKey);
-      return queued(request.groupKey, () => callAsync('allocate', request));
-    },
-
-    /** `release` that waits behind earlier allocate/close calls of the same
-     * group. The group is the one the key was allocated under by this client,
-     * or `{ ..., groupKey }` (never sent to the route); a close of a key whose
-     * group is unknown is refused instead of running outside the queue. */
-    releaseAsync({ groupKey, ...request } = {}) {
-      const finish = (result) => {
-        if (result.result === 'released') groupOfKey.delete(request.key);
-        return result;
-      };
-      if (request.disposition !== 'close') return callAsync('release', request).then(finish);
-      const group = groupKey ?? groupOfKey.get(request.key);
-      if (!group) {
-        return Promise.reject(new TerminalControlError('terminal-control-unknown-group', `release(close) of ${request.key}: its groupKey is unknown to this client; pass groupKey`));
-      }
-      return queued(group, () => callAsync('release', request)).then(finish);
-    },
   };
   return client;
 }
