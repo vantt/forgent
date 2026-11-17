@@ -128,6 +128,23 @@ function withAddDirs(args, directories) {
     : [...args.slice(0, existing + 1), ...directories, ...args.slice(existing + 1)];
 }
 
+/**
+ * The directories an argv grants with `--add-dir` (variadic: its values run to the next option). claude
+ * asks for folder trust on each of them, so a pane that is given them must trust them first.
+ */
+export function addDirsOf(args) {
+  if (!Array.isArray(args)) return [];
+  const dirs = [];
+  let variadic = false;
+  for (const value of args) {
+    if (typeof value !== 'string') { variadic = false; continue; }
+    if (value === '--add-dir') { variadic = true; continue; }
+    if (value.startsWith('--add-dir=')) { dirs.push(value.slice('--add-dir='.length)); variadic = false; continue; }
+    if (value.startsWith('-')) { variadic = false; continue; }
+    if (variadic) dirs.push(value);
+  }
+  return dirs;
+}
 
 /**
  * Body of `node src/runner/dispatch.mjs <decide|probe-account|reconcile> ...`, called from the

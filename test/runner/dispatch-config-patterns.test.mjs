@@ -20,6 +20,7 @@ import {
 import { RunnerConfigError } from '../../src/runner/dispatch/runner-config-error.mjs';
 import { readStandardValue, ConfigDoorError } from '../../src/config/facade.mjs';
 import { shippedCatalog } from '../../src/runner/dispatch/shipped-catalog.mjs';
+import { parseYaml } from '../../src/util/yaml.mjs';
 
 const standardRunner = (key) => JSON.parse(JSON.stringify(readStandardValue(key ? `runner.${key}` : 'runner').value));
 
@@ -521,4 +522,47 @@ test('resolveOriginLocations falls back to the first line per file of the neares
   assert.ok(locs.some((l) => /config\.yaml:7/.test(l)));
   assert.ok(locs.some((l) => /config\.yaml:3/.test(l)));
   assert.deepEqual(resolveOriginLocations(origins, ['runner.patterns.other.promise'], '/project'), []);
+});
+
+// Invocation ids state how the agent runs: <cli>-<cli|herdr>[-bwrap], and -bwrap is present exactly when the
+// invocation is confined by bwrap. <cli> is the invocation's command.
+const invocationIdViolations = (executors) => {
+  const violations = [];
+  let checked = 0;
+  for (const [name, executor] of Object.entries(executors ?? {})) {
+    for (const inv of executor?.invocations ?? []) {
+      if (inv.id === undefined) continue;
+      checked += 1;
+      const where = `${name}/${inv.id}`;
+      const shape = new RegExp(`^${inv.command}-(cli|herdr)(-bwrap)?$`);
+      if (!shape.test(inv.id)) violations.push(`${where}: id is not <command>-(cli|herdr)[-bwrap] for command ${inv.command}`);
+      const confined = inv.confinement?.backend === 'bwrap';
+      if (inv.id.endsWith('-bwrap') !== confined) violations.push(`${where}: -bwrap suffix ${inv.id.endsWith('-bwrap') ? 'present' : 'absent'} but confinement.backend is ${inv.confinement?.backend ?? 'unset'}`);
+    }
+  }
+  return { checked, violations };
+};
+
+test('every invocation id in the standard and in the committed config states its transport and confinement', () => {
+  const fromStandard = invocationIdViolations(standardRunner('executors'));
+  assert.ok(fromStandard.checked > 10, 'the standard declares the invocations this guard covers');
+  assert.deepEqual(fromStandard.violations, []);
+  const frozen = path.join(path.dirname(new URL(import.meta.url).pathname), '..', 'fixtures', 'committed-config.yaml');
+  const committed = parseYaml(fs.readFileSync(frozen, 'utf8'), { filename: frozen });
+  assert.deepEqual(invocationIdViolations(committed?.runner?.executors).violations, []);
+});
+
+test('the invocation id guard names a missing -bwrap suffix, a stray one and a wrong command prefix', () => {
+  const { violations } = invocationIdViolations({
+    a: { invocations: [
+      { id: 'codex-herdr', command: 'codex', confinement: { backend: 'bwrap' } },
+      { id: 'pi-cli-bwrap', command: 'pi' },
+      { id: 'omp-herdr-bwrap', command: 'codex', confinement: { backend: 'bwrap' } },
+      { id: 'claude-cli', command: 'claude' },
+    ] },
+  });
+  assert.equal(violations.length, 3);
+  assert.match(violations[0], /codex-herdr: -bwrap suffix absent/);
+  assert.match(violations[1], /pi-cli-bwrap: -bwrap suffix present/);
+  assert.match(violations[2], /omp-herdr-bwrap: id is not/);
 });

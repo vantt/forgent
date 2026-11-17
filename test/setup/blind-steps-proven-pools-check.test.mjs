@@ -21,11 +21,11 @@ const EXECUTORS = {
   // proven: deepseek through a bwrap cli invocation
   deepseek: { kind: 'agent', providerModel: 'deepseek', invocations: [cliBwrap('pi-cli-bwrap', 'pi')] },
   // proven: xai through herdr
-  xai: { kind: 'agent', providerModel: 'xai', invocations: [herdrBwrap('pi-herdr', 'pi')] },
+  xai: { kind: 'agent', providerModel: 'xai', invocations: [herdrBwrap('pi-herdr-bwrap', 'pi')] },
   // deepseek through herdr is not a proven pair (only its cli was measured)
   'glm-herdr': { kind: 'agent', providerModel: 'z-ai', invocations: [herdrBwrap('pi-herdr-glm', 'pi')] },
   // mistral is a family no canary has proven on either transport
-  mistral: { kind: 'agent', providerModel: 'mistral', invocations: [herdrBwrap('agy-herdr', 'agy'), cliBwrap('agy-cli-bwrap', 'agy')] },
+  mistral: { kind: 'agent', providerModel: 'mistral', invocations: [herdrBwrap('agy-herdr-bwrap', 'agy'), cliBwrap('agy-cli-bwrap', 'agy')] },
   // proven family but no confinement: blind could not be enforced on it
   'deepseek-bare': { kind: 'agent', providerModel: 'deepseek', invocations: [{ id: 'pi-cli', via: 'cli', adapter: 'cli-spawn', command: 'pi', args: ['-p', '{prompt}'] }] },
 };
@@ -108,7 +108,7 @@ test('a blind unit whose pool includes mistral fails and names the executor, the
   const result = await run(BLIND, { 'fixture:propose': prefer('deepseek', 'mistral') });
   assert.equal(result.passed, false);
   assert.match(result.message, /blind-fixture\/propose\/ideas \(capability "fixture:propose"\)/);
-  assert.match(result.message, /mistral via agy-herdr \(family mistral, herdr/);
+  assert.match(result.message, /mistral via agy-herdr-bwrap \(family mistral, herdr/);
   assert.match(result.message, /mistral via agy-cli-bwrap \(family mistral, cli/);
   assert.doesNotMatch(result.message, /deepseek via/);
   assert.match(result.message, /remove that executor from the capability's prefer pool/);
@@ -137,7 +137,7 @@ test('an executor with no command of its own takes the family bind gives it from
 test('a capability pool from a prefix entry is resolved by bind like at run time, and a bare verb entry is not one', async () => {
   const viaPrefix = await run(BLIND, { 'fixture:*': prefer('mistral') });
   assert.equal(viaPrefix.passed, false);
-  assert.match(viaPrefix.message, /mistral via agy-herdr/);
+  assert.match(viaPrefix.message, /mistral via agy-herdr-bwrap/);
   // The bare verb of fixture:propose is not a lookup key: the unit has no pool, so nothing unproven can bind.
   const viaBareVerb = await run(BLIND, { propose: prefer('mistral') });
   assert.equal(viaBareVerb.passed, true, viaBareVerb.message);

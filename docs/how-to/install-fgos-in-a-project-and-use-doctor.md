@@ -367,7 +367,7 @@ runner picks executors from that capability's pool in the project config
 "runner": { "capabilities": { "nominal-group:generate": {
   "prefer": [
     { "executor": "claude" },
-    { "executor": "xai", "invocation": "omp-herdr" },
+    { "executor": "xai", "invocation": "omp-herdr-bwrap" },
     { "executor": "openai" },
     { "executor": "glm", "invocation": "pi-cli-bwrap" }
   ] } } }

@@ -1,4 +1,4 @@
-// The committed config's herdr invocations for the non-claude providers (codex/openai, omp/gemini, omp/xai).
+// The committed config's herdr invocations for the non-claude providers (codex/openai, agy/gemini, omp/xai).
 // Each runs an interactive agent in a pane under the bwrap posture, so the home the agent writes its own
 // state into has to be a private one, with the account's login provisioned by the provider account inventory.
 
@@ -11,9 +11,9 @@ const runner = committedRunnerConfig();
 const find = (executor, id) => runner.executors[executor].invocations.find((inv) => inv.id === id);
 
 const providers = [
-  { executor: 'openai', id: 'codex-herdr', command: 'codex', homeVar: 'CODEX_HOME', kind: 'codex', trust: 'codex-toml', store: 'codex' },
-  { executor: 'gemini', id: 'omp-herdr', command: 'omp', homeVar: 'PI_CODING_AGENT_DIR', kind: 'omp', trust: undefined, store: 'omp' },
-  { executor: 'xai', id: 'omp-herdr', command: 'omp', homeVar: 'PI_CODING_AGENT_DIR', kind: 'omp', trust: undefined, store: 'omp' },
+  { executor: 'openai', id: 'codex-herdr-bwrap', command: 'codex', homeVar: 'CODEX_HOME', kind: 'codex', trust: 'codex-toml', store: 'codex' },
+  { executor: 'gemini', id: 'agy-herdr-bwrap', command: 'agy', homeVar: 'HOME', kind: 'agy', trust: 'agy', store: 'agy' },
+  { executor: 'xai', id: 'omp-herdr-bwrap', command: 'omp', homeVar: 'PI_CODING_AGENT_DIR', kind: 'omp', trust: undefined, store: 'omp' },
 ];
 
 for (const p of providers) {
@@ -53,7 +53,7 @@ test('no herdr invocation relies on a bypass flag in place of the sandbox', () =
     }
   }
   // codex keeps its own sandbox off only because bwrap encloses it, and never asks for approval nobody can give.
-  const codex = find('openai', 'codex-herdr');
+  const codex = find('openai', 'codex-herdr-bwrap');
   assert.deepEqual(codex.args.slice(0, 4), ['-s', 'danger-full-access', '-a', 'never']);
 });
 
@@ -64,8 +64,8 @@ test('the codex pane keeps its session in its own process, never on the shared b
   // workspace-write sandbox: it tries to mkdir masks such as <cwd>/.aws inside the read-only
   // workspace and every command fails before it runs. --no-daemon keeps -s danger-full-access
   // in force for the whole session; bwrap stays the confinement.
-  const codex = find('openai', 'codex-herdr');
-  assert.ok(codex.args.includes('--no-daemon'), `codex-herdr args ${JSON.stringify(codex.args)} must carry --no-daemon`);
+  const codex = find('openai', 'codex-herdr-bwrap');
+  assert.ok(codex.args.includes('--no-daemon'), `codex-herdr-bwrap args ${JSON.stringify(codex.args)} must carry --no-daemon`);
 });
 
 test('the account inventory that provisions these homes is machine-global, never declared in the project config', () => {

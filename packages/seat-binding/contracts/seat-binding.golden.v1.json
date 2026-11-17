@@ -207,7 +207,7 @@
               "carriesPosture": true
             },
             {
-              "id": "codex-herdr",
+              "id": "codex-herdr-bwrap",
               "cli": "codex",
               "efforts": [
                 "low",
@@ -1674,7 +1674,7 @@
             "openai": {
               "invocations": [
                 {
-                  "id": "codex-herdr",
+                  "id": "codex-herdr-bwrap",
                   "cli": "codex",
                   "efforts": [
                     "low",
@@ -1685,7 +1685,7 @@
                   "carriesPosture": true
                 }
               ],
-              "defaultInvocation": "codex-herdr"
+              "defaultInvocation": "codex-herdr-bwrap"
             }
           }
         }
@@ -1710,7 +1710,7 @@
             "openai": {
               "invocations": [
                 {
-                  "id": "codex-herdr",
+                  "id": "codex-herdr-bwrap",
                   "cli": "codex",
                   "efforts": [
                     "low",
@@ -1721,7 +1721,7 @@
                   "carriesPosture": true
                 }
               ],
-              "defaultInvocation": "codex-herdr"
+              "defaultInvocation": "codex-herdr-bwrap"
             }
           }
         }
@@ -3677,7 +3677,7 @@
             "gemini": {
               "invocations": [
                 {
-                  "id": "omp-herdr",
+                  "id": "omp-herdr-bwrap",
                   "cli": "omp",
                   "efforts": [
                     "low",
@@ -3699,7 +3699,7 @@
                   "carriesPosture": true
                 }
               ],
-              "defaultInvocation": "omp-herdr"
+              "defaultInvocation": "omp-herdr-bwrap"
             }
           }
         },
@@ -3767,7 +3767,7 @@
             "gemini": {
               "invocations": [
                 {
-                  "id": "omp-herdr",
+                  "id": "omp-herdr-bwrap",
                   "cli": "omp",
                   "efforts": [
                     "low",
@@ -3789,7 +3789,7 @@
                   "carriesPosture": true
                 }
               ],
-              "defaultInvocation": "omp-herdr"
+              "defaultInvocation": "omp-herdr-bwrap"
             }
           }
         },

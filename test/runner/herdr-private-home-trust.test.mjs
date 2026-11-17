@@ -14,9 +14,10 @@ import { pathToFileURL } from 'node:url';
 
 import {
   seedCodexTrust, readCodexTrust, seedAgyTrust, readAgyTrust, removeCodexTrust, TrustStoreError,
-  codexHookTrustHash, seedCodexHookTrust, seedClaudeConfigTrust, readTrust,
+  codexHookTrustHash, codexHookTrustEntries, seedCodexHookTrust, seedClaudeConfigTrust, readTrust,
 } from '../../src/run-supervisor/trust-store.mjs';
 import { trustRoots, trustStorePaths, seedWorkspaceTrust } from '../../src/runner/dispatch/herdr-round.mjs';
+import { addDirsOf } from '../../src/runner/dispatch/cli.mjs';
 
 const dirs = [];
 const tmp = (prefix) => {
@@ -146,6 +147,51 @@ test('codex hooks: the trust hash is the one codex stores for the same hook', ()
   );
 });
 
+// Captured from codex 0.166.0 (linux) in a scratch CODEX_HOME with no login: this hooks.json at
+// `<project>/.codex/hooks.json`, "Trust all and continue" on the "Hooks need review" dialog, and the
+// trusted_hash codex then wrote for each hook. The first hook carries `commandWindows`; codex hashes
+// the platform's command only, so it hashes like the same hook without that field.
+const CAPTURED_HOOKS = {
+  SessionStart: [{ matcher: 'startup|resume', hooks: [{ type: 'command', command: 'echo posix-hook', commandWindows: 'echo win-hook', timeout: 30, statusMessage: 'Loading' }] }],
+  UserPromptSubmit: [{ hooks: [{ type: 'command', command: 'echo plain-hook' }] }],
+};
+const CAPTURED_SESSION_START = 'sha256:941f261a6bf3ad879b8e9df1d7d2d1ea523b53fd027eabf259769d969d521d03';
+const CAPTURED_USER_PROMPT = 'sha256:cb9239eb89b2df600c86a7285aa9ae185b15c204f8151b8b30d485567e24fd32';
+
+test('codex hooks: a hook with commandWindows hashes as codex wrote it, and nothing is skipped silently', () => {
+  const handler = CAPTURED_HOOKS.SessionStart[0].hooks[0];
+  assert.equal(codexHookTrustHash('session_start', 'startup|resume', handler, 'linux'), CAPTURED_SESSION_START);
+  assert.equal(codexHookTrustHash('session_start', 'startup|resume', handler, 'darwin'), CAPTURED_SESSION_START);
+  assert.notEqual(codexHookTrustHash('session_start', 'startup|resume', handler, 'win32'), CAPTURED_SESSION_START, 'windows hashes the windows command');
+  assert.equal(codexHookTrustHash('user_prompt_submit', undefined, CAPTURED_HOOKS.UserPromptSubmit[0].hooks[0], 'linux'), CAPTURED_USER_PROMPT);
+
+  // Same capture run, a real project's hooks: Stop and UserPromptSubmit groups written with `"matcher": "*"`,
+  // which codex ignores for those two events.
+  const stopHandler = { command: "node '/home/vantt/projects/forgent/.codex/hooks/agent-behavior-linter.cjs'", commandWindows: 'node /home/vantt/projects/forgent/.codex/hooks/agent-behavior-linter.cjs', type: 'command' };
+  const promptHandler = { command: "node '/home/vantt/projects/forgent/.codex/hooks/dev-rules-reminder.cjs'", commandWindows: 'node /home/vantt/projects/forgent/.codex/hooks/dev-rules-reminder.cjs', type: 'command' };
+  assert.equal(codexHookTrustHash('stop', '*', stopHandler, 'linux'), 'sha256:22e4496b07c87e7976fccf855d39d941b071401a434ae66566814674d4a21416');
+  assert.equal(codexHookTrustHash('user_prompt_submit', '*', promptHandler, 'linux'), 'sha256:201a9ca8937c95d4c466d21a1de49e9bb6c00df46ab04b6bef03def8d60b61dc');
+
+  const project = tmp('fgos-codex-hooks-captured-');
+  fs.mkdirSync(path.join(project, '.codex'));
+  const file = path.join(project, '.codex', 'hooks.json');
+  const withExtras = {
+    hooks: {
+      ...CAPTURED_HOOKS,
+      SessionEnd: [{ hooks: [{ type: 'command', command: 'echo bye' }] }],
+      Stop: [{ hooks: [{ type: 'prompt', prompt: 'x' }] }],
+    },
+  };
+  fs.writeFileSync(file, JSON.stringify(withExtras));
+  const { entries, skipped } = codexHookTrustEntries(file, 'linux');
+  assert.deepEqual(entries.map((e) => [e.key.slice(project.length + 1), e.hash]), [
+    ['.codex/hooks.json:session_start:0:0', CAPTURED_SESSION_START],
+    ['.codex/hooks.json:user_prompt_submit:0:0', CAPTURED_USER_PROMPT],
+  ]);
+  assert.deepEqual(skipped.map((s) => s.key.slice(project.length + 1)), ['.codex/hooks.json:session_end:0:0', '.codex/hooks.json:stop:0:0'], 'each hook not seeded is named');
+  assert.ok(skipped.every((s) => typeof s.reason === 'string' && s.reason.length > 0));
+});
+
 test('codex hooks: seeding writes one entry per hook into the private config, once', () => {
   const project = tmp('fgos-codex-hooks-project-');
   fs.mkdirSync(path.join(project, '.codex'));
@@ -157,7 +203,7 @@ test('codex hooks: seeding writes one entry per hook into the private config, on
 
   const { keys, skipped } = seedCodexHookTrust(privateConfig, { projectPath: project, repoRoot: project, rootConfigPath: real });
 
-  assert.equal(skipped, 0);
+  assert.deepEqual(skipped, []);
   assert.deepEqual(keys, [
     `${project}/.codex/hooks.json:pre_tool_use:0:0`,
     `${project}/.codex/hooks.json:pre_tool_use:1:0`,
@@ -169,10 +215,23 @@ test('codex hooks: seeding writes one entry per hook into the private config, on
   assert.equal(fs.readFileSync(real, 'utf8'), `[projects."${project}"]\ntrust_level = "trusted"\n`, 'the real account config is not edited');
 });
 
+test('codex hooks: a linked worktree also gets the hooks of the repo root that owns it, which is the file codex loads', () => {
+  const root = tmp('fgos-codex-hooks-root-');
+  const worktree = tmp('fgos-codex-hooks-linked-');
+  for (const dir of [root, worktree]) fs.mkdirSync(path.join(dir, '.codex'));
+  fs.writeFileSync(path.join(root, '.codex', 'hooks.json'), HOOKS_JSON);
+  const config = path.join(tmp('fgos-codex-private-'), 'config.toml');
+  fs.writeFileSync(config, `[projects."${root}"]\ntrust_level = "trusted"\n`);
+
+  const { keys } = seedCodexHookTrust(config, { projectPath: worktree, repoRoot: root });
+
+  assert.deepEqual(keys, [`${root}/.codex/hooks.json:pre_tool_use:0:0`, `${root}/.codex/hooks.json:pre_tool_use:1:0`]);
+});
+
 test('codex hooks: no hooks file seeds nothing, and an untrusted root derives nothing', () => {
   const project = tmp('fgos-codex-hooks-none-');
   const config = path.join(tmp('fgos-codex-private-'), 'config.toml');
-  assert.deepEqual(seedCodexHookTrust(config, { projectPath: project, repoRoot: project, rootConfigPath: config }), { keys: [], skipped: 0 });
+  assert.deepEqual(seedCodexHookTrust(config, { projectPath: project, repoRoot: project, rootConfigPath: config }), { keys: [], skipped: [] });
 
   fs.mkdirSync(path.join(project, '.codex'));
   fs.writeFileSync(path.join(project, '.codex', 'hooks.json'), HOOKS_JSON);
@@ -413,4 +472,43 @@ test('claude: a pane with its own config directory is seeded there and the opera
   assert.equal(readTrust(path.join(privateDir, '.claude.json'), WORKSPACE), true);
   assert.equal(fs.readFileSync(real, 'utf8'), body, 'the operator store is not edited');
   assert.equal(round.trustWritten, false, 'a claude entry is never marked for removal');
+});
+
+test('claude: a composed home trusts the working directory and every directory the seat is granted with --add-dir', () => {
+  const { real, body } = realClaudeStore();
+  const privateDir = tmp('fgos-claude-private-dir-');
+  const runDir = path.join(ROOT, '.fgos', 'assignments', 'unit-1', 'producer', '1', 'runs', '01');
+  const round = { trustWritten: false, note() {} };
+
+  seedWorkspaceTrust({
+    trustStore: { kind: 'claude-json', path: real }, round, cwd: WORKSPACE, repoRoot: ROOT,
+    fullEnv: {}, workerEnv: { CLAUDE_CONFIG_DIR: privateDir }, alsoTrust: [runDir],
+  });
+
+  const config = path.join(privateDir, '.claude.json');
+  assert.equal(readTrust(config, WORKSPACE), true, 'the working directory is trusted');
+  assert.equal(readTrust(config, runDir), true, 'the granted run directory is trusted');
+  assert.equal(fs.readFileSync(real, 'utf8'), body, 'the operator store is not edited');
+});
+
+test('a directory granted with --add-dir is found in the argv, up to the next option', () => {
+  assert.deepEqual(addDirsOf(['--model', 'sonnet', '--add-dir', '/a', '/b', '--settings', '{}']), ['/a', '/b']);
+  assert.deepEqual(addDirsOf(['--model', 'sonnet']), []);
+  assert.deepEqual(addDirsOf(['--add-dir=/x', '--model', 'sonnet', '--add-dir', '/y']), ['/x', '/y']);
+});
+
+test('claude: with no private config directory the operator store gets the working directory only, never a granted run directory', () => {
+  const { real } = realClaudeStore();
+  const runDir = path.join(ROOT, '.fgos', 'assignments', 'unit-1', 'producer', '1', 'runs', '01');
+  const notes = [];
+  const round = { trustWritten: false, note: (patch) => notes.push(patch) };
+
+  seedWorkspaceTrust({
+    trustStore: { kind: 'claude-json', path: real }, round, cwd: WORKSPACE, repoRoot: ROOT,
+    fullEnv: {}, workerEnv: null, alsoTrust: [runDir],
+  });
+
+  assert.equal(readTrust(real, WORKSPACE), true, 'the working directory is seeded as before');
+  assert.equal(readTrust(real, runDir), null, 'a unique run directory is not added to the operator store');
+  assert.ok(notes.some((n) => n.trustSkipped === 'add-dir' && n.dirs[0] === runDir), 'the skipped grant is noted by name');
 });

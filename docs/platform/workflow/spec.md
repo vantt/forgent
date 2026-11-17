@@ -64,7 +64,7 @@ Hôm nay ngược lại: một Workflow là DAG các step mà Workflow runner th
 | AdmissionPort do Execution Core sở hữu, Workflow cài (mục 5.2) | chữ ký cụ thể của port |
 | đơn vị đếm của khung và trần seat launch giao cho Unit (RUL-WF-12) | auto-advance như một runtime thứ hai |
 | `advance` theo Shape C (mục 5.4) | |
-| Work là lớp surface (view, projection) giữa người và engine; Workflow cùng Execution là engine; hai bên nối bằng một contract hoặc adapter, phụ thuộc đi từ Work xuống engine (D-ADR0076) | |
+| Work là lớp surface (view, projection) giữa người và engine; Workflow cùng Execution là engine; hai bên nối bằng một contract hoặc adapter, phụ thuộc đi từ Work xuống engine (D-ADR0076 (Work is the surface)) | |
 | ledger JSONL được làm cứng tại chỗ (RUL-WF-24) | các phase cài đặt, Size 0/Size 1 như kiến trúc |
 | đích supersede một phần: 0048 §2, 0049 §4 (mục 17) | đổi tên file (một bước L10 sau, đề xuất riêng) |
 | ranh giới component diễn đạt bằng lời theo manifest (mục 5) | |

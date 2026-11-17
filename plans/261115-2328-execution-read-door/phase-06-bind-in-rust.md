@@ -45,6 +45,14 @@ when the host answers a native verb (phase 09 adapter); account state comes from
 7. `tests/golden_bind.rs` over `bind.v1.json` bind and explain vectors (every refusal, every provenance source, walk
    with rotation, continuity, pinned account in and out of pool).
 
+8. **Invocation choice is an explicit rule (owner, 2026-11-17, plan.md "Owner decisions", item V2).** Today the default
+   invocation is list order, overridden by a herdr-first rule in `bind.mjs:166-171`. In Rust the choice is decided in
+   `bind` or in the Seat Binding rank, not by a herdr special case: generic forms are preferred, pins stay hard
+   (`seat-binding/spec.md:266`). The rule's naming input (generic vs named forms) comes from design-lap's naming rule
+   (V7); if that rule is not settled on the board when this requirement is reached, stop and tell the plan lead (the
+   rest of 06 does not wait). The port keeps no herdr-first override. Vectors for the rule go in `bind.v1.json`, red first.
+   Phase 09 deletes the Node override with the facade.
+
 ## Files
 
 - Create: `packages/execution/contracts/bind.v1.json`, `packages/execution/rust/src/{bind.rs,explain.rs,accounts.rs}`,

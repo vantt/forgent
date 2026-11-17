@@ -115,7 +115,7 @@ runner:
             - "{prompt}"
           confinement:
             backend: bwrap
-        - id: pi-herdr
+        - id: pi-herdr-bwrap
           via: cli
           adapter: herdr-spawn
           confinement:
@@ -137,7 +137,7 @@ runner:
           interactiveMode:
             exitCommand: "/quit"
             kind: pi
-        - id: codex-herdr
+        - id: codex-herdr-bwrap
           via: cli
           adapter: herdr-spawn
           confinement:
@@ -184,57 +184,58 @@ runner:
             backend: bwrap
     gemini:
       kind: agent
-      description: "Gemini provider via omp (oh-my-pi); Antigravity CLI (agy) invocations removed 2026-10-16. Invocations: omp-herdr (herdr pane), omp-cli-bwrap (headless). The confined account comes from runner.providers.gemini.accounts in the global config."
+      description: "Gemini provider via the Antigravity CLI (agy). Invocations: agy-herdr-bwrap (herdr pane), agy-cli-bwrap (headless). The confined account comes from runner.llmAccounts in the global config. Neither invocation declares a sessionDir, so fgOS keeps no agy transcript of a run; both invocations pass a session-only --settings with toolPermission always-proceed and the deny list of the agy-permissions-configured doctor row, so agy runs commands without prompting and still refuses rm -rf, sudo, force push, hard reset, stash, curl and wget, inside bwrap."
       allowCrossProvider: true
       providerModel: gemini
       invocations:
-        - id: omp-herdr
+        - id: agy-herdr-bwrap
           via: cli
           adapter: herdr-spawn
           confinement:
             backend: bwrap
-          command: omp
+          command: agy
           credentialStore:
-            use: omp
-            homeEnv: PI_CODING_AGENT_DIR
-            sessionDir: sessions
-            files: ["agent.db", "config.yml"]
-          env:
-            PI_CONFIG_DIR: "../../tmp/fgos-omp-config"
+            use: agy
+            homeEnv: HOME
+            files:
+              - ".gemini/antigravity-cli/antigravity-oauth-token"
+              - ".gemini/antigravity-cli/settings.json"
+              - ".gemini/antigravity-cli/installation_id"
+              - ".gemini/antigravity-cli/jetski_state.pbtxt"
+              - ".gemini/antigravity-cli/cache/onboarding.json"
           args:
+            - "--mode"
+            - accept-edits
+            - "--new-project"
+            - "--settings"
+            - '{"toolPermission":"always-proceed","permissions":{"deny":["command(regex:^rm .*-rf)","command(regex:^sudo )","command(regex:^git push .*(--force|-f\\b))","command(regex:^git reset .*--hard)","command(regex:^git stash)","command(regex:^curl )","command(regex:^wget )"]}}'
             - "--model"
             - "{model}"
-            - "--thinking"
-            - medium
-            - "--tools"
-            - "read,write,edit,bash,grep,glob"
-            - "--auto-approve"
           interactiveMode:
             exitCommand: "/exit"
-            kind: omp
-        - id: omp-cli-bwrap
+            kind: agy
+            trustStore:
+              kind: agy
+        - id: agy-cli-bwrap
           via: cli
           adapter: cli-spawn
-          command: omp
+          command: agy
           credentialStore:
-            use: omp
-            homeEnv: PI_CODING_AGENT_DIR
-            sessionDir: sessions
-            files: ["agent.db", "config.yml"]
-          env:
-            PI_CONFIG_DIR: "../../tmp/fgos-omp-config"
+            use: agy
+            homeEnv: HOME
+            files:
+              - ".gemini/antigravity-cli/antigravity-oauth-token"
+              - ".gemini/antigravity-cli/settings.json"
+              - ".gemini/antigravity-cli/installation_id"
+              - ".gemini/antigravity-cli/jetski_state.pbtxt"
+              - ".gemini/antigravity-cli/cache/onboarding.json"
           args:
-            - "--model"
-            - "{model}"
-            - "--thinking"
-            - medium
-            - "--tools"
-            - "read,write,edit,bash,grep,glob"
-            - "--mode"
-            - json
-            - "--auto-approve"
+            - "--settings"
+            - '{"toolPermission":"always-proceed","permissions":{"deny":["command(regex:^rm .*-rf)","command(regex:^sudo )","command(regex:^git push .*(--force|-f\\b))","command(regex:^git reset .*--hard)","command(regex:^git stash)","command(regex:^curl )","command(regex:^wget )"]}}'
             - "-p"
             - "{prompt}"
+            - "--model"
+            - "{model}"
           confinement:
             backend: bwrap
     xai:
@@ -268,7 +269,7 @@ runner:
             - "{prompt}"
           confinement:
             backend: bwrap
-        - id: omp-herdr
+        - id: omp-herdr-bwrap
           via: cli
           adapter: herdr-spawn
           confinement:
@@ -294,7 +295,7 @@ runner:
             kind: omp
     deepseek:
       kind: agent
-      description: "DeepSeek provider via pi CLI, OpenRouter gateway account. --provider omitted -- account dir has a single provider (openrouter). Same account dir also serves other OpenRouter-hosted models (e.g. glm-cli's z-ai route uses a different account/mechanism); --model alone selects deepseek/* here. pi-herdr-openrouter runs the same pi account in a confined herdr pane."
+      description: "DeepSeek provider via pi CLI, OpenRouter gateway account. --provider omitted -- account dir has a single provider (openrouter). Same account dir also serves other OpenRouter-hosted models (e.g. glm-cli's z-ai route uses a different account/mechanism); --model alone selects deepseek/* here. pi-herdr-bwrap runs the same pi account in a confined herdr pane."
       allowCrossProvider: true
       providerModel: deepseek
       invocations:
@@ -321,7 +322,7 @@ runner:
             - "{prompt}"
           confinement:
             backend: bwrap
-        - id: pi-herdr
+        - id: pi-herdr-bwrap
           via: cli
           adapter: herdr-spawn
           confinement:
@@ -384,10 +385,10 @@ runner:
         outputKind: finding
         mutates: false
     fgos-coding-implement:
-      description: "code-implement work for the coding domain executing stage -- preferred executor gemini through omp, claude then openai as fallback."
+      description: "code-implement work for the coding domain executing stage -- preferred executor gemini through agy, claude then openai as fallback."
       prefer:
         - executor: gemini
-          invocation: omp-herdr
+          invocation: agy-herdr-bwrap
         - executor: deepseek
         - executor: glm
         - claude
@@ -397,7 +398,7 @@ runner:
       description: "Canonical coding implementation capability -- compliance-driven coding execution before implementation (D1/D2, docs/history/capability-aware-dispatch-activation/CONTEXT.md)"
       prefer:
         - executor: gemini
-          invocation: omp-herdr
+          invocation: agy-herdr-bwrap
         - executor: deepseek
         - executor: glm
         - claude
@@ -689,7 +690,7 @@ runner:
     "coding:implement":
       prefer:
         - executor: gemini
-          invocation: omp-herdr
+          invocation: agy-herdr-bwrap
         - executor: deepseek
         - executor: glm
         - claude

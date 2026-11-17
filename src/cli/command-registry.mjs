@@ -1630,7 +1630,7 @@ export const COMMAND_REGISTRY = [
           positional: ['executor'],
           required: ['executor'],
         },
-        examples: ['fgos dispatch probe-session gemini', 'fgos dispatch probe-session deepseek --invocation pi-herdr --json'],
+        examples: ['fgos dispatch probe-session gemini', 'fgos dispatch probe-session deepseek --invocation pi-herdr-bwrap --json'],
       },
     },
     examples: [

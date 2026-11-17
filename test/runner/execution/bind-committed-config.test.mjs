@@ -166,21 +166,21 @@ test('every confined invocation with a login account declares its store, and the
 
 // Seat Binding routes only to an agent CLI the machine has. No other test varies PATH: the rest of this file
 // states every CLI installed.
-test('execute binds the CLIs the machine has: none is refused by name with a fix, claude alone binds claude, omp alone binds gemini through omp', () => {
+test('execute binds the CLIs the machine has: none is refused by name with a fix, claude alone binds claude, agy alone binds gemini through agy', () => {
   const writing = ask('execute', ['x.txt']);
   const bindOn = (...installed) => bind(writing, { runnerConfig, session: { ...headless, pathEnv: stubAgentCliDir(...installed) } });
 
   const none = bindOn();
   assert.equal(none.refused.reason, 'agent-cli-missing');
   assert.match(none.refused.detail, /no agent CLI is installed/);
-  assert.match(none.refused.fix, /install one of .*claude.*omp.*fgos doctor/);
+  assert.match(none.refused.fix, /install one of .*agy.*claude.*fgos doctor/);
 
   const onlyClaude = bindOn('claude');
   assert.equal(onlyClaude.refused, undefined, JSON.stringify(onlyClaude.refused));
   assert.equal(onlyClaude.executor, 'claude');
 
-  const onlyOmp = bindOn('omp');
-  assert.equal(onlyOmp.refused, undefined, JSON.stringify(onlyOmp.refused));
-  assert.equal(onlyOmp.executor, 'gemini');
-  assert.equal(onlyOmp.invocation, 'omp-cli-bwrap');
+  const onlyAgy = bindOn('agy');
+  assert.equal(onlyAgy.refused, undefined, JSON.stringify(onlyAgy.refused));
+  assert.equal(onlyAgy.executor, 'gemini');
+  assert.equal(onlyAgy.invocation, 'agy-cli-bwrap');
 });

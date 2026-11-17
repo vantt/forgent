@@ -37,6 +37,9 @@
   "ak:cook",
   "thehive"
  ],
+ "scrub-allowed-strings": [
+  ".gemini/antigravity-cli/antigravity-oauth-token"
+ ],
  "differences": [
   {
    "path": [
@@ -105,6 +108,15 @@
     "skills"
    ],
    "reason": "the standard names no kit skill; the pinned authoring source declares the cook skill this executor loads, which a machine now declares in its own config"
+  },
+  {
+   "path": [
+    "runner",
+    "executors",
+    "deepseek",
+    "description"
+   ],
+   "reason": "the standard description names the invocation id that exists (pi-herdr-bwrap); the pinned authoring source predates the id rule and names a herdr invocation that no config declares"
   },
   {
    "path": [

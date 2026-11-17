@@ -139,17 +139,17 @@ test('an undeclared kind falls back to the command basename, and passes when tha
 });
 
 test('an outdated integration hook fails -- it is installed, so herdr believes it, and it is wrong', () => {
-  const r = checkHerdrExecutorKinds({ executors: herdrExecutor('codex-herdr', { kind: 'codex' }) }, parsed);
+  const r = checkHerdrExecutorKinds({ executors: herdrExecutor('codex-herdr-bwrap', { kind: 'codex' }) }, parsed);
   assert.equal(r.passed, false);
   assert.match(r.message, /outdated/);
-  assert.match(r.message, /codex-herdr/);
+  assert.match(r.message, /codex-herdr-bwrap/);
   assert.match(r.message, /herdr integration install/, 'and says how to fix it');
 });
 
 test('a missing hook only notes itself -- nothing in this dispatch path concludes from agent state any more', () => {
   // herdr spells the Antigravity CLI `agy` when starting an agent and
   // `antigravity-cli` when installing its hook; the check bridges the two.
-  const r = checkHerdrExecutorKinds({ executors: herdrExecutor('agy-herdr', { kind: 'agy', command: 'agy' }) }, parsed);
+  const r = checkHerdrExecutorKinds({ executors: herdrExecutor('agy-herdr-bwrap', { kind: 'agy', command: 'agy' }) }, parsed);
   assert.equal(r.passed, true);
   assert.match(r.message, /antigravity-cli/);
   assert.match(r.message, /no .* integration hook installed/);
@@ -160,9 +160,9 @@ test('the row asks the terminal-control route, which reads herdr\'s own text', {
   const previous = process.env.FGOS_HERDR_BIN;
   process.env.FGOS_HERDR_BIN = fakeHerdr;
   try {
-    const r = checkHerdrExecutorKinds({ executors: herdrExecutor('codex-herdr', { kind: 'codex' }) });
+    const r = checkHerdrExecutorKinds({ executors: herdrExecutor('codex-herdr-bwrap', { kind: 'codex' }) });
     assert.equal(r.passed, false, r.message);
-    assert.match(r.message, /outdated herdr integration hook.*codex-herdr/);
+    assert.match(r.message, /outdated herdr integration hook.*codex-herdr-bwrap/);
     const missing = checkHerdrExecutorKinds({ executors: herdrExecutor('weird', { kind: 'notreal' }) });
     assert.match(missing.message, /herdr supports: pi, claude, codex, agy, gemini/);
     process.env.FGOS_HERDR_BIN = '/no/such/herdr-binary';
@@ -188,7 +188,7 @@ function paneExecutors(providerModel = 'openai') {
       openai: {
         providerModel,
         invocations: [
-          { id: 'codex-herdr', via: 'cli', adapter: 'herdr-spawn', command: 'codex', args: [], credentialStore: { use: 'codex', homeEnv: 'CODEX_HOME' } },
+          { id: 'codex-herdr-bwrap', via: 'cli', adapter: 'herdr-spawn', command: 'codex', args: [], credentialStore: { use: 'codex', homeEnv: 'CODEX_HOME' } },
           { id: 'codex-bwrap', via: 'cli', adapter: 'cli-spawn', command: 'codex', args: [], resourceBindings: [{ resource: 'private-home', target: { kind: 'env', name: 'CODEX_HOME' } }] },
           { id: 'codex-cli', via: 'cli', adapter: 'cli-spawn', command: 'codex', args: [] },
         ],
@@ -200,7 +200,7 @@ function paneExecutors(providerModel = 'openai') {
 test('checkConfinedPaneAccounts fails by name when an invocation that reads a store has no account inventory', () => {
   const r = checkConfinedPaneAccounts(paneExecutors());
   assert.equal(r.passed, false);
-  assert.match(r.message, /executor "openai" invocation "codex-herdr": no runner\.providers\.openai-codex\.accounts/);
+  assert.match(r.message, /executor "openai" invocation "codex-herdr-bwrap": no runner\.providers\.openai-codex\.accounts/);
   assert.doesNotMatch(r.message, /codex-cli/, 'only invocations that read a login store are checked');
   assert.match(r.message, /invocation "codex-bwrap": no runner\.providers/, 'a cli invocation is covered as well as a pane, and an older binding counts');
 });
