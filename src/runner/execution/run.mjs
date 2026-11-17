@@ -363,9 +363,9 @@ function openUnitRun(ctx) {
 }
 
 /** The record keeps the facts finishUnit computed, so the unit summary copies them and never derives them again. */
-function settleUnitRun(ctx, { outcome, infrastructure, infrastructureReason, refused }) {
+function settleUnitRun(ctx, { outcome, infrastructure, infrastructureReason, refused, verify }) {
   ctx.settled = true;
-  ctx.unitRecord.settlement = { outcome, infrastructure, infrastructureReason, refused, settledAt: new Date().toISOString() };
+  ctx.unitRecord.settlement = { outcome, infrastructure, infrastructureReason, refused, ...(verify ? { verify } : {}), settledAt: new Date().toISOString() };
   ctx.unitRecord.execution = { status: 'settled' };
   ctx.persist();
   ctx.scope.settled.unit = true;
@@ -473,12 +473,15 @@ function finishUnit(ctx, { outcome, rounds, results = [], findings = [], ...rest
     };
   });
   const final = started.value ? ruled.outcome : NOT_STARTED_OUTCOME;
+  // A verify that ran wins over the `ran: false` form a caller passed: the two never both describe one run.
+  const verifyRecord = ctx.verifyFacts ? { ran: true, ...ctx.verifyFacts } : null;
   const unitInfrastructure = infrastructure({ outcome: final, outOfScope: ruled.outOfScope, results: attempts });
   settleUnitRun(ctx, {
     outcome: ruled.outcome,
     infrastructure: unitInfrastructure,
     infrastructureReason: unitInfrastructure ? infrastructureReasonOf({ started, ruled, attempts }) : null,
     refused: refusedSeatsOf(attempts),
+    verify: verifyRecord,
   });
   return {
     unitRunId, outcome: final, rounds, results: attempts, findings,
@@ -492,6 +495,7 @@ function finishUnit(ctx, { outcome, rounds, results = [], findings = [], ...rest
     settled: scope.settled,
     warnings: scope.warnings,
     ...rest,
+    ...(verifyRecord ? { verify: verifyRecord } : {}),
   };
 }
 
@@ -537,12 +541,23 @@ function historyOf({ unitRecord, mainRoot, scope, assignmentsDir, unitDir, rebin
  * The deterministic check a round ends with (the unit's `verify`, else its capability's): bounded by
  * `runner.timeoutMs`, holding the Unit's custody so the worktree is not freed while it writes.
  */
-async function verifyUnit({ unitRecord, scope }, targetUnit) {
+async function verifyUnit(ctx, targetUnit) {
+  const { unitRecord, scope } = ctx;
   assertNotCancelled();
   const runnerConfig = unitRecord.configSnapshot.runner;
   const verifyCmd = verifyCommandOf(targetUnit, runnerConfig);
   if (!verifyCmd) return { pass: true };
   const verified = await runVerify({ command: verifyCmd, cwd: unitRecord.worktree, timeoutMs: runnerConfig.timeoutMs, custody: scope.custody });
+  // The last verify decides the outcome, so it is the one the record keeps (the output tail stays out: it is in the failure text).
+  ctx.verifyFacts = {
+    command: verifyCmd,
+    outcome: verified.verdict === 'pass' ? 'pass' : verified.verdict ?? verified.infrastructure,
+    exit: verified.status,
+    passed: verified.verdict === 'pass',
+    durationMs: verified.durationMs,
+    how: verified.how,
+    outputDigest: verified.outputDigest,
+  };
   return answerOfVerify(verified, 'Verification command', verifyCmd);
 }
 
