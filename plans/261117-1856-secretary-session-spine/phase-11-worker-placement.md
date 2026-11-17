@@ -15,7 +15,9 @@ half-moved envelope.
 ## Files this phase may write
 `packages/run-supervisor/**`, `Cargo.lock`, `src/run-supervisor/**`, `test/run-supervisor/**`,
 `src/runner/dispatch/herdr-round.mjs`, `src/runner/dispatch/cli.mjs`, `src/runner/dispatch/terminal-slot.mjs`,
-`test/runner/dispatch-terminal-slot.test.mjs`, `docs/platform/run-supervisor/spec.md`.
+`test/runner/dispatch-terminal-slot.test.mjs`.
+The run-supervisor spec is shared with the ready plan `261117-1553`: write the spec change (placement through the Session
+Host, one decision-history line) into `reports/phase-11-worker-placement.md`; phase 18 applies it.
 `assignment-runner.mjs` is read only: if it must change, stop and report `NEEDS_CONTEXT`.
 
 ## Steps
@@ -28,7 +30,7 @@ half-moved envelope.
 3. Delete every placement path the facts report listed outside the port; `rg` must prove it (Verify).
 4. Move tests with the behaviour: placement cases live in the session-host crate (phase 9); the supervisor and dispatch
    tests keep one wiring proof each and retire the cases the crate now owns (name the owning test in the commit body).
-5. Spec: run supervisor places through the Session Host; decision-history line.
+5. Spec text into the phase report (see above).
 
 ## Verify
 - `cargo test -p fgos-run-supervisor -p fgos-session-host`; clippy and aarch64-apple-darwin check.

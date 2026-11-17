@@ -11,7 +11,8 @@
 
 ## Files this phase may write
 `packages/session-host/rust/**` (new crate `fgos-session-host`), `Cargo.toml` (workspace member), `Cargo.lock`,
-`apps/fgos/**` (internal route `session-host`), `src/session-host/client.mjs`, `test/session-host/client.test.mjs`,
+`apps/fgos/Cargo.toml`, `apps/fgos/src/routing.rs`, `apps/fgos/src/wiring/session_host.rs` (internal route `session-host`;
+if wiring an internal route needs another `apps/fgos` file, stop and report `NEEDS_CONTEXT`), `src/session-host/client.mjs`, `test/session-host/client.test.mjs`,
 `packages/run-supervisor/rust/src/supervise/terminal.rs` (only to call the moved delivery step), `docs/architecture-manifest.json`.
 
 ## Steps
@@ -27,6 +28,9 @@
    client `src/session-host/client.mjs` (`start`, `alive`, `front`, `retire`); add `src/session-host/` to the manifest.
 4. Owning tests: crate tests with a fake terminal core (start/alive/front/retire, beside placement, head-on-direct
    refusal, delivery types full text); one client wiring proof in `test/session-host/client.test.mjs`.
+
+Note: `docs/architecture-manifest.json` is also in the ready plan `261117-1524-windows-plain-path-fold`; your edit is one
+appended layer entry, resolved by rebasing onto it if it lands first.
 
 ## Verify
 - `cargo test -p fgos-session-host -p fgos-run-supervisor`; clippy `-D warnings` and aarch64-apple-darwin check for both.

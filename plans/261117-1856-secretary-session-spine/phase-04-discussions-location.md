@@ -9,15 +9,16 @@
 - Consumers: `domains/coding/skills/fgos-coding-shaping/SKILL.md` (writer), `domains/coding/skills/fgos-coding-discovering/SKILL.md`
   (reader, ~l.127), `core/skills/_shared/plan-contract.md:48`, comments in `src/report/context-render.mjs:4`,
   `src/report/authoritative-match.mjs:16`, `src/state/work.mjs:123,677,737`, `src/state/frontier.mjs:208-209`,
-  `src/state/worker-slots.mjs:11,128`, `bin/fgos.mjs:1816`, `plugins/fgOS/skills/terminal/rename.sh:24`.
+  `src/state/worker-slots.mjs:11,128`, `plugins/fgOS/skills/terminal/rename.sh:24`.
 
 ## Files this phase may write
 `packages/convention/**`, `docs/platform/convention/**`, `docs/history/*/DISCUSSION.md` (moved away),
 `docs/discussions/**`, `domains/coding/skills/**`, `core/skills/_shared/plan-contract.md`, the five `src/` files above
-(comments only), `bin/fgos.mjs` (comment only), `plugins/fgOS/skills/**` (incl. `terminal/rename.sh`, plus renders),
+(comments only), `plugins/fgOS/skills/**` (incl. `terminal/rename.sh`, plus renders),
 `.agents/skills/**`, `.claude/skills/**` (renders).
 
 ## Steps
+0. Leave the comment at `bin/fgos.mjs:1816` alone: phase 15 owns `bin/fgos.mjs` and fixes it.
 1. Add kind `discussion` to the registry: placement `docs/discussions/<slug>/`, main file `DISCUSSION.md`; extend the
    golden test with `convention path --kind discussion --slug x`. Follow how `plan` builds a directory path.
 2. `git mv docs/history/<slug>/DISCUSSION.md docs/discussions/<slug>/DISCUSSION.md` for every file (keep other files of

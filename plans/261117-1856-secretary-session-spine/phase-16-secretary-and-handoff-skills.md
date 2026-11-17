@@ -1,6 +1,6 @@
 # Phase 16: Secretary persona, secretary skill and /handoff skill
 
-Status `draft`: the skill texts name the head verb (owner question 1, phase 15).
+The head verb is `fgos head` (owner 2026-11-17); this phase starts once phase 15 has landed.
 
 ## Inputs (read first)
 - SM-D1, SM-D3, SM-D4, SM-D7, SM-D9, SM-D11, SM-D12 and section 6 "Miu, the front session".
