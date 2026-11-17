@@ -46,7 +46,7 @@ pub fn checkout_integration_script(payload_root: &Path) -> Option<PathBuf> {
         .ok()
         .flatten()?;
     // The line names the script in the plain spelling a shell reads, not the verbatim one a canonical path has.
-    let canonical = fgos_git::plain_path(&repo.trusted_main_root())
+    let canonical = fgos_git::plain_path(repo.trusted_main_root())
         .join("scripts")
         .join(SCRIPT_NAME);
     Some(if canonical.exists() {

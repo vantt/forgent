@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "101b73412a7e87966f83277621829b8169dd52497461654132afd13382f7d886",
+  "payloadDigest": "1c83ab8e9261817ae31da9ac0eac82134d4d3b78bed98b14375c5b021899db8e",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "b8b886cee2ea5ce7ee1153e4795512db135a990de894c27e53c5e778b210be62",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -312,7 +312,7 @@
     "packages/distribution/rust/src/lock.rs": "ee39bccc87c5b34a7799ee886fe3c4b9f59346f22c550c67123efa49f9681f8e",
     "packages/distribution/rust/src/manifest.rs": "7aa7f3d42c3ac708e44cb0bbf4be36c414eaf0b29f0bdafc5bb768901fb46bda",
     "packages/distribution/rust/src/path_links.rs": "fca28665200e6157411d4088829a26c2442bd563d2bd081b3d85a157c218c711",
-    "packages/distribution/rust/src/rc_lines.rs": "107e02e01609fa646d548b31536d5a34ab901fcfe7b3e1bf5f3b43256ba27306",
+    "packages/distribution/rust/src/rc_lines.rs": "3869eb0946dd1d9a128d6fa11892174a22931cd95ddbaa9c9bab8318b43eeddd",
     "packages/distribution/rust/src/release_rows.rs": "fdc6526dcc8ad2e73157094ea8c5eff9b47cebd8796c475dbd24d882bf06b13f",
     "packages/distribution/rust/src/shim.rs": "03ad502807c3743b185f5165f4c5ee7b677d689da3fc9e11e8dabfa44f376d2e",
     "packages/distribution/rust/src/skill_stamp.rs": "f704fd4b3312f43025919a24c2a3b924236baab73f196b1e4f5ceb266bbc24c7",
