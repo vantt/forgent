@@ -118,7 +118,7 @@ The same files are never edited from two places.
 | 0 | [Root-cause gate](phase-00-root-cause-gate.md): design or leftover mess? **Blocks every other phase until the owner signs.** | read-only (git history, specs) | none | findings drafted |
 | 1 | [Fix agy-herdr brief delivery](phase-01-fix-agy-herdr-brief-delivery.md) | repo Rust + fixtures; optional global stopgap | P0 | pending |
 | 2 | [Review agy invocation args](phase-02-review-agy-invocation-args.md) | global config (gemini) | none, but after P1 stopgap if applied | pending |
-| 3 | [Retire legacy invocations in the global config](phase-03-retire-legacy-invocations-global.md) | global config (all agent executors) | D1, D2, P2 | pending |
+| 3 | [Retire legacy invocations in the global config](phase-03-retire-legacy-invocations-global.md) | global config (all agent executors) | D1, D2, P2 | applied 2026-11-17 without renames |
 | 4 | [Naming rule, standard, specs](phase-04-naming-rule-standard-and-specs.md) | repo: standard, tests, fixtures, docs | D1, D2 | pending |
 | 5 | [One account inventory shape](phase-05-one-account-inventory-shape.md) | accounts file (global) + global agy files | P3, P4 (agy `files`), D3 | pending |
 | 6 | [Delete legacy readers](phase-06-delete-legacy-readers.md) | repo: src, schema, doctor, tests, docs | P3, P5, gates G1-G2, D5 | pending |

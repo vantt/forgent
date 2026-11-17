@@ -1,7 +1,7 @@
 ---
 phase: 3
 title: "Retire legacy invocations in the global config, one CLI at a time"
-status: pending
+status: applied 2026-11-17 (design-lap), no id renamed
 priority: P1
 effort: 4h
 depends_on: [D1, D2, P2]
@@ -92,3 +92,31 @@ The acceptance criteria 1-3 from plan.md hold for the five executors, and the pr
 Per executor: `fgos config set --global runner.executors.<e>.invocations '<old flow value from backup>'`,
 or restore the whole file from the backup with the owner present, because a file copy bypasses the
 door's revision check.
+
+## Applied (design-lap machine, 2026-11-17, owner-approved)
+
+Backup: `~/.fgos/private/config-backup-261117-p3/config.global.before-p3.yaml`. No invocation id was renamed
+(the naming decision V7 is still open); only the legacy forms were removed. Pre-flight: no project pins a
+removed id (momentry none; forgentX only in descriptions; mcp-skill-hub is out of scope); no run in flight.
+
+| Executor | Before | After |
+|---|---|---|
+| openai | 12 (8 account-pinned or unconfined, 5 with `resourceBindings`) | `codex-cli-bwrap` (now with explicit `credentialStore {use: codex, homeEnv: CODEX_HOME}`), `codex-herdr`, `pi-cli-bwrap`, `pi-herdr` |
+| xai | 5 | `omp-cli-bwrap`, `omp-herdr` (`PI_CONFIG_DIR` kept, it is a relative name) |
+| deepseek | 4 | `pi-cli-bwrap`, `pi-herdr` |
+| glm | 3 | `pi-cli-bwrap` |
+| gemini | 1 | unchanged (`agy-cli-bwrap`, which gained `files` in P8) |
+| claude | none | unchanged (standard list, so `credentialStore` and `sessionDir` are kept) |
+
+Evidence:
+- `fgos config check`: `config-unknown-key` 0 (was 9, all `resourceBindings`). Acceptance criterion 1 holds.
+- `fgos dispatch explain`: `code:review` binds `codex-cli-bwrap`; inside herdr openai walks `codex-herdr`; gemini `agy-cli-bwrap`; deepseek and z-ai `pi-herdr` and `pi-cli-bwrap`. No legacy id appears.
+- Harness probes: openai/fgovn `healthy` (four runs: codex cli, codex herdr, pi cli, pi herdr; only the first row was read individually, as `ok`); xai/vantt `healthy` (`omp-cli-bwrap` ok, `omp-herdr` ok, model grok-4.7). A real `fgos run` pinned to `thehive/thehive` returned OK through the generic deepseek form.
+- Doctor: the failures that remain are not from this change (tool registry, a stale work step, root drift, an expired openrouter quarantine, release drift). momentry: no new failure (its own failures are hook wiring, tool registry, the same expired quarantine).
+
+Not proven, stated plainly:
+- openai/tetnu was not probed. deepseek and z-ai on the `openrouter` account returned `other` because `probe-account` asks the first cell entry, `thehive/...`, which the openrouter account cannot serve (`Model ... not found`); it is a probe artefact, not a regression (the same model would have been asked before). The OpenRouter fallback route of the generic forms has therefore not been proven live yet.
+- Optional step E (writer-unit confinement check) was not run.
+- The D1 rename and the P2 agy args are untouched.
+
+Rollback per executor: `fgos config set --global runner.executors.<e>.invocations '<old list from the backup>'`.
