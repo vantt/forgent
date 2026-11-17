@@ -5,7 +5,7 @@
   "file": "authoring-source.config.json",
   "copied-from": ".fgos/config.json",
   "commit": "ef4a056d7",
-  "sha256": "9bf53864fbb6f827768cf03836e9183d0bc2504d328e7d9fb13897bace318d36"
+  "sha256": "52ff463bcd547ecced288f18bc9b350031e2670c8d893bab04506a58d13bd20c"
  },
  "exclusions": [
   {
@@ -416,19 +416,6 @@
   {
    "path": [
     "runner",
-    "capabilities",
-    "code:*",
-    "roles",
-    "red-team",
-    "prefer"
-   ],
-   "reason": "the standard appends families to this checker pool so a machine without its preferred family can still seat a red-team checker that differs from the producer; this repository keeps its own list"
-  },
-  {
-   "path": [
-    "runner",
-    "capabilities",
-    "marketing:*",
     "roles",
     "red-team",
     "prefer"

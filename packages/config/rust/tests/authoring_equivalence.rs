@@ -360,13 +360,14 @@ fn the_real_runner_keys_sit_in_the_files_scopes_and_sensitivities_the_spec_gives
         );
         assert_eq!(found.sensitivity, "secret-reference", "{path}");
     }
-    // The five seat-binding keys exist in the project file only.
-    for key in ["tier", "maxTier", "roles", "personas", "seats"] {
-        assert_eq!(
-            node(&format!("runner.capabilities.any.{key}")).scope,
-            "project-only",
-            "{key}"
-        );
+    // The seat-binding keys exist in the project file only.
+    for path in [
+        "runner.capabilities.any.tier",
+        "runner.capabilities.any.maxTier",
+        "runner.roles.red-team",
+        "runner.personas.any",
+    ] {
+        assert_eq!(node(path).scope, "project-only", "{path}");
     }
     // What runs on this machine is read from the trusted main checkout.
     for path in [

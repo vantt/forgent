@@ -329,16 +329,7 @@
         ],
         "rigor": "high",
         "tier": "flagship",
-        "maxTier": "frontier",
-        "seats": {
-          "producer": {
-            "tier": "frontier",
-            "prefer": [
-              "openai",
-              "claude"
-            ]
-          }
-        }
+        "maxTier": "frontier"
       },
       "architecture:synthesize": {
         "description": "acceptance-run binding for a Workflow unit, over the five provider families that can run in a confined herdr pane",
@@ -361,12 +352,7 @@
         ],
         "rigor": "critical",
         "tier": "flagship",
-        "maxTier": "frontier",
-        "seats": {
-          "producer": {
-            "tier": "frontier"
-          }
-        }
+        "maxTier": "frontier"
       },
       "architecture:explain": {
         "description": "acceptance-run binding for a Workflow unit, over the five provider families that can run in a confined herdr pane",
@@ -759,23 +745,14 @@
         ]
       },
       "code:*": {
-        "roles": {
-          "red-team": {
-            "prefer": [
-              "xai"
-            ]
-          }
-        },
         "tier": "advanced"
-      },
-      "marketing:*": {
-        "roles": {
-          "red-team": {
-            "prefer": [
-              "claude"
-            ]
-          }
-        }
+      }
+    },
+    "roles": {
+      "red-team": {
+        "prefer": [
+          "xai"
+        ]
       }
     },
     "executors": {

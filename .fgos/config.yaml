@@ -88,34 +88,6 @@ runner:
         - executor: deepseek
         - executor: glm
         - claude
-    # @fgos:doc One capability: what it is called, which executors serve it and how work on it is held.
-    code:*:
-      # @fgos:doc Per-role tier and executor taste; a role is producer, synthesizer, reviewer, red-team or judge.
-      roles:
-        # @fgos:doc The tier and executors one role, persona or seat prefers.
-        red-team:
-          # @fgos:doc Executors a seat may use, in order: one executor id, or a list whose entries are an id or an object naming an executor, one of its invocation ids and whether it may cross provider. Default: ["xai","claude","openai"].
-          # @fgos:why [6be6fc05-6e06-43af-a3f3-07eb170ce533] COOK 2026-10-26: reviewer seats prefer xai, so a red-team seat limited to xai has no independent family at high rigor and the round settled independence-unsatisfiable (unit-run-1792987741620-ae5ebf3f). Putting openai first gives producer, reviewer, red-team three families. Unset or restore [xai] if openai seats stall.
-          prefer:
-            - openai
-            - xai
-        # @fgos:doc The tier and executors one role, persona or seat prefers.
-        reviewer:
-          # @fgos:doc Executors a seat may use, in order: one executor id, or a list whose entries are an id or an object naming an executor, one of its invocation ids and whether it may cross provider.
-          # @fgos:why [e0397c00-5319-463e-8e23-86031fbc824b] Owner 2026-10-25 21:44 chose (a): deepseek reviewer seats stalled or hit 402 in 4 of 5 rounds of the Part A case (evidence-261025-2126-cook-reviewer-seat-stalls.md); claude read-only seats write no outbox; xai finished every round. Unset when HARDEN lands the pi stall detection.
-          prefer:
-            - xai
-            - openai
-    # @fgos:doc One capability: what it is called, which executors serve it and how work on it is held.
-    marketing:*:
-      # @fgos:doc Per-role tier and executor taste; a role is producer, synthesizer, reviewer, red-team or judge.
-      roles:
-        # @fgos:doc The tier and executors one role, persona or seat prefers.
-        red-team:
-          # @fgos:doc Executors a seat may use, in order: one executor id, or a list whose entries are an id or an object naming an executor, one of its invocation ids and whether it may cross provider. Default: ["claude","openai"].
-          # @fgos:why [9548be33-0b94-4fe0-b02c-5d5eb0240a61] [migrate] carried over from config.json, reason never recorded
-          prefer:
-            - claude
   # @fgos:doc The executor registry: every executor a seat can be bound to, by id.
   executors:
     # @fgos:doc One executor: an agent that runs work or a tool that is only present, with the invocations that start it.
@@ -228,6 +200,22 @@ runner:
       frontier:
         - thehive/zai-org/glm-5.3-flash@thehive
         - z-ai/glm-5.3-flash@openrouter
+  # @fgos:doc Per-role tier and executor taste, for every capability; a role is producer, synthesizer, reviewer, red-team or judge.
+  roles:
+    # @fgos:doc The tier and executors one role or persona prefers.
+    red-team:
+      # @fgos:doc Executors a seat may use, in order: one executor id, or a list whose entries are an id or an object naming an executor, one of its invocation ids and whether it may cross provider. Default: ["xai","claude","openai"].
+      # @fgos:why [ec3510cc-cf0c-43c5-b19e-32964ea523d9] COOK 2026-10-26: reviewer seats prefer xai, so a red-team seat limited to xai has no independent family at high rigor and the round settled independence-unsatisfiable (unit-run-1792987741620-ae5ebf3f). Putting openai first gives producer, reviewer, red-team three families. Unset or restore [xai] if openai seats stall.
+      prefer:
+        - openai
+        - xai
+    # @fgos:doc The tier and executors one role or persona prefers.
+    reviewer:
+      # @fgos:doc Executors a seat may use, in order: one executor id, or a list whose entries are an id or an object naming an executor, one of its invocation ids and whether it may cross provider.
+      # @fgos:why [ec3510cc-cf0c-43c5-b19e-32964ea523d9] Owner 2026-10-25 21:44 chose (a): deepseek reviewer seats stalled or hit 402 in 4 of 5 rounds of the Part A case (evidence-261025-2126-cook-reviewer-seat-stalls.md); claude read-only seats write no outbox; xai finished every round. Unset when HARDEN lands the pi stall detection.
+      prefer:
+        - xai
+        - openai
 # @fgos:doc How far agent work may skip human approval gates.
 gateBypass:
   # @fgos:doc Gate bypass level for agent work; off approves nothing automatically and each higher level approves work up to that size. Values: off | light | standard | heavy. Default: off.
@@ -251,7 +239,7 @@ docRegistry:
   enforce: true
 # @fgos:doc Limits of the agent mailbox, and whether a project opts in to its hooks.
 mailbox:
-  # @fgos:doc Whether fgos setup and doctor --fix install the mailbox hook rows into this project's Claude Code and Codex hook files; false removes the rows they installed. On by default (owner decision 2026-10-28): a project opts out with mailbox.enabled: false. Default: true.
+  # @fgos:doc Whether fgos doctor --fix installs the mailbox hook rows into this project's Claude Code and Codex hook files; false removes the rows it installed. On by default (owner decision 2026-10-28): a project opts out with mailbox.enabled: false. Default: true.
   # @fgos:why [9514b261-1778-4cbd-a231-bec51e3e04d9] owner 2026-10-25: turn the agent mailbox on for the forgent project
   enabled: true
   # @fgos:doc Delivery of mail between machines, through the Event Store and the project's Git remote.
