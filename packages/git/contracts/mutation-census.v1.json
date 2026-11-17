@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "ceda03fef6d0498890bfe06db49b2315318533ead950db02008e8ecdd9c76eec",
+  "payloadDigest": "51045784b2625cc21091c09c55d0294679bd728851c36381a92622a74fd53d4c",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "a5629383f89b4488b252a62f0ea86463e649e33e0a891db1a19af2cd6c136aca",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -1029,10 +1029,10 @@
     "src/runner/dispatch/agent-result-claim-contract.mjs": "9f49db7dee60837452d1ba57b97863cb391d56197080e7e7f256e513672f1bec",
     "src/runner/dispatch/assignment-layout.mjs": "a14f6f1b45e7942181b7ee05b9bb4086fcd705004e70a237fc8c2d11c7e272d9",
     "src/runner/dispatch/assignment-normalizer.mjs": "1e1a922ad6d9ef2c9d8f0e7f6fec77d2c8b83b27ce9adfc8eaf3ec69e200ce6b",
-    "src/runner/dispatch/assignment-runner.mjs": "247abec9be638df43b2a162c79eb28606cd56d831b74095f44f94a12773d132e",
+    "src/runner/dispatch/assignment-runner.mjs": "9d8c1c970b7cde74e46cb535db114d529c32a7c31337091161466964ba8f129a",
     "src/runner/dispatch/assignment.mjs": "44d721e6e0eaf0e60ee484203382ebc50c3d4f6dc886dcbb7b1bec399497c1e7",
     "src/runner/dispatch/brief.mjs": "c51d5398653cd6f839c2902134e627e57af7911b473fe16904478919c2d95e14",
-    "src/runner/dispatch/cli.mjs": "85095ed5fc709db37af99aea1aa4f74ffb51fec27989530497f41b5a13deac3c",
+    "src/runner/dispatch/cli.mjs": "298d19fd6c5c15c9034bcd79471eec307c804340fa2b3c8349fc3f368879c1a7",
     "src/runner/dispatch/config.mjs": "ba70b5f9d94a9be84bba8cc4d0892f0d2216a86062cfe8da8fb393da66ff7705",
     "src/runner/dispatch/confinement/attestation-store.mjs": "25aeaef901e6c331ec84de3f4e072224d3f14c77775ba46fe6b91348ad795805",
     "src/runner/dispatch/confinement/authority.mjs": "2dc70a6d42306184aff303c8a1c565d6a30d87892f57427b5487a2944dd2a727",
@@ -1049,7 +1049,7 @@
     "src/runner/dispatch/evidence-attribution.mjs": "e286beb61bc988049d44645db9a7a0900ba2431132ce694861ac7c43390b229f",
     "src/runner/dispatch/execution-contract.mjs": "a5b5160f4fb82aa885a961b8f6f66f353a8d455a0ab46a1bd2fe84f527e16e53",
     "src/runner/dispatch/executor-governance.mjs": "8e8f93d957741e107b0e38630d7b0816209019234c93c95140113b231e18f73e",
-    "src/runner/dispatch/herdr-round.mjs": "3ed38c5bf07d2ca54dd99f58f4aa4e383133b4c359da821fd1b9342a1b5f0b37",
+    "src/runner/dispatch/herdr-round.mjs": "0afea1970b2d39f429eeb141bcdd1635165adfe079fb919c0c0c5be28929c9a5",
     "src/runner/dispatch/hook.mjs": "32e97b8f6a652b2d02346d59e8c3924021acade166102a7fb5fe757aefdbfc89",
     "src/runner/dispatch/llm-accounts.mjs": "f8d1015b1e9adab52286ef2a871db21c66811ecb9b31c17f1074e34a75b63343",
     "src/runner/dispatch/mechanism.mjs": "18ffe81e94a42ca290de501777f0383c1505772c3e6254363ea101469c31cf30",
@@ -3662,14 +3662,14 @@
     {
       "path": "src/runner/dispatch/assignment-runner.mjs",
       "line": 972,
-      "spawn": "prepareTerminalAttempt -> src/runner/dispatch/herdr-round.mjs:395",
+      "spawn": "prepareTerminalAttempt -> src/runner/dispatch/herdr-round.mjs:401",
       "binary": "(env FGOS_HERDR_BIN)",
       "class": "configured-binary"
     },
     {
       "path": "src/runner/dispatch/assignment-runner.mjs",
-      "line": 1466,
-      "spawn": "awaitBinding -> src/runner/dispatch/assignment-runner.mjs:1082",
+      "line": 1468,
+      "spawn": "awaitBinding -> src/runner/dispatch/assignment-runner.mjs:1084",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
     },

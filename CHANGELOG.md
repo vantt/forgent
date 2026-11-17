@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- A claude seat started by `fgos run` no longer stops at Claude Code's directory-trust prompt for its run directory: every directory the seat is granted with `--add-dir` is trusted in the seat's own claude home, derived from the repository you already trust, as its working directory already was.
 - YAML that fgOS writes (frontmatter of knowledge projections, the decision index, case answer files and project agent files) now goes through the one native YAML door, which escapes invisible bidirectional and zero-width characters instead of writing them raw, and every written block parses back to the same value.
 
 ## [v0.2.0-rc.10] - 2026-11-15

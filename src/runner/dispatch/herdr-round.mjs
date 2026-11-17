@@ -219,38 +219,44 @@ export async function establishConfinement({ confinement, round, fullEnv, cwd, r
  * already be trusted by some other route, and the dialog it might still hit
  * is reported by name by the very next step anyway.
  */
-export function seedWorkspaceTrust({ trustStore, round, cwd, repoRoot, fullEnv, workerEnv = null, accountSource = null }) {
-  const projectPath = path.resolve(cwd);
-  const roots = trustRoots(projectPath, repoRoot ?? path.dirname(projectPath));
+export function seedWorkspaceTrust({ trustStore, round, cwd, repoRoot, fullEnv, workerEnv = null, accountSource = null, alsoTrust = [] }) {
   const stores = trustStorePaths({ trustStore, fullEnv, workerEnv, accountSource });
-  let firstError = null;
-  for (const root of roots) {
-    try {
-      let wrote;
-      if (trustStore.kind === 'codex-toml') {
-        wrote = seedCodexTrust(stores.target, { projectPath, repoRoot: root, rootConfigPath: stores.root });
-        // Only into a worker's own private home: hook trust is never written to the account's real config.
-        if (stores.target !== stores.root) seedHookTrust({ round, target: stores.target, projectPath, repoRoot: root, rootConfigPath: stores.root });
-      } else if (trustStore.kind === 'agy' || trustStore.kind === 'agy-json') {
-        wrote = seedAgyTrust(stores.target, { projectPath, repoRoot: root, rootSettingsPath: stores.root });
-      } else if (stores.target !== stores.root) {
-        wrote = seedClaudeConfigTrust(stores.target, { projectPath, repoRoot: root, rootStorePath: stores.root });
-      } else {
-        wrote = seedTrust(stores.target, { projectPath, repoRoot: root });
+  // The working directory and every directory the agent is granted with `--add-dir`: claude asks about each
+  // one it has not seen, keyed by exact path, so a granted directory left out stops the seat at a dialog.
+  for (const dir of [cwd, ...alsoTrust]) {
+    const projectPath = path.resolve(dir);
+    const roots = trustRoots(projectPath, repoRoot ?? path.dirname(projectPath));
+    let firstError = null;
+    let seeded = false;
+    for (const root of roots) {
+      try {
+        let wrote;
+        if (trustStore.kind === 'codex-toml') {
+          wrote = seedCodexTrust(stores.target, { projectPath, repoRoot: root, rootConfigPath: stores.root });
+          // Only into a worker's own private home: hook trust is never written to the account's real config.
+          if (stores.target !== stores.root) seedHookTrust({ round, target: stores.target, projectPath, repoRoot: root, rootConfigPath: stores.root });
+        } else if (trustStore.kind === 'agy' || trustStore.kind === 'agy-json') {
+          wrote = seedAgyTrust(stores.target, { projectPath, repoRoot: root, rootSettingsPath: stores.root });
+        } else if (stores.target !== stores.root) {
+          wrote = seedClaudeConfigTrust(stores.target, { projectPath, repoRoot: root, rootStorePath: stores.root });
+        } else {
+          wrote = seedTrust(stores.target, { projectPath, repoRoot: root });
+        }
+        // A seed that finds the entry already there wrote nothing: the person (or an earlier
+        // round) owns it, so this round must not remove it on teardown. A claude entry stays in any case:
+        // claude rewrites its own store while it runs, and a removal there could drop what it saved.
+        if (wrote) {
+          round.trustWritten = round.trustWritten || REMOVABLE_TRUST_KINDS.has(trustStore.kind);
+          round.note({ trustSeeded: trustStore.kind });
+        }
+        seeded = true;
+        break;
+      } catch (err) {
+        firstError ??= err;
       }
-      // A seed that finds the entry already there wrote nothing: the person (or an earlier
-      // round) owns it, so this round must not remove it on teardown. A claude entry stays in any case:
-      // claude rewrites its own store while it runs, and a removal there could drop what it saved.
-      if (wrote) {
-        round.trustWritten = REMOVABLE_TRUST_KINDS.has(trustStore.kind);
-        round.note({ trustSeeded: trustStore.kind });
-      }
-      return;
-    } catch (err) {
-      firstError ??= err;
     }
+    if (!seeded) round.note({ trustSeedFailed: firstError?.message ?? 'no trust root to derive from' });
   }
-  round.note({ trustSeedFailed: firstError?.message ?? 'no trust root to derive from' });
 }
 
 /** The trust stores whose entry fgOS takes back when the attempt is over (`cleanup-trust`). */
@@ -321,8 +327,8 @@ function writeTypedBrief({ delivery, briefText, runDir, roundNumber, paths }) {
  * `cleanup-trust` step needs to take a codex or agy entry back when the attempt is over. The record exists
  * only when this call wrote such an entry, so an entry a person vouched for is never removed.
  */
-function seedAttemptTrust({ trustStore, round, runDir, cwd, repoRoot, fullEnv, workerEnv, accountSource }) {
-  seedWorkspaceTrust({ trustStore, round, cwd, repoRoot, fullEnv, workerEnv, accountSource });
+function seedAttemptTrust({ trustStore, round, runDir, cwd, repoRoot, fullEnv, workerEnv, accountSource, alsoTrust }) {
+  seedWorkspaceTrust({ trustStore, round, cwd, repoRoot, fullEnv, workerEnv, accountSource, alsoTrust });
   if (!round.trustWritten) return;
   const { target } = trustStorePaths({ trustStore, fullEnv, workerEnv });
   publishMutableProjection(path.join(runDir, TRUST_CONTEXT_FILE), {
@@ -345,7 +351,7 @@ export async function prepareTerminalAttempt(ctx) {
   const {
     attemptId, runDir: rawRunDir, cwd, repoRoot, prompt, workId, tier, model, runId,
     herdrBin, fullEnv, confinement, permissionMode, agentKind, delivery = 'inline',
-    trustStore, trustAccountSource, attemptEnv, dispatchBatchKey, dispatchBatchSize, anchorPaneId, terminalConfig, workLabel,
+    trustStore, trustAccountSource, trustAlso, attemptEnv, dispatchBatchKey, dispatchBatchSize, anchorPaneId, terminalConfig, workLabel,
     beforeAllocate,
   } = ctx;
   const roundNumber = 1;
@@ -452,7 +458,7 @@ export async function prepareTerminalAttempt(ctx) {
     // already trusted, so writing to the operator's own store for a directory only the worker will ever
     // see would be pure side effect.
     if (trustStore && !workerHomePath) {
-      seedAttemptTrust({ trustStore, round, runDir, cwd, repoRoot, fullEnv, workerEnv: attemptEnv ?? null, accountSource: trustAccountSource ?? null });
+      seedAttemptTrust({ trustStore, round, runDir, cwd, repoRoot, fullEnv, workerEnv: attemptEnv ?? null, accountSource: trustAccountSource ?? null, alsoTrust: trustAlso ?? [] });
     }
   } catch (err) {
     await abandon();

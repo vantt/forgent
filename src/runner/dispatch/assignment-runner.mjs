@@ -51,7 +51,7 @@ import { RunnerConfigError } from './runner-config-error.mjs';
 import { resolveMainCheckoutRoot, resolveRepoRoot, fgosDirFromRoot } from '../paths.mjs';
 import { renderAssignmentPrompt, isReadOnlyAssignment } from './assignment.mjs';
 import { resolveAndRenderOperationPrompt } from './operation-prompt-templates.mjs';
-import { withRunDirAccess } from './cli.mjs';
+import { addDirsOf, withRunDirAccess } from './cli.mjs';
 import { launcherEnv, mintAttemptWriterId, resolveWriterIdentity } from '../../util/session-identity.mjs';
 import { resolveExecutorEnv, workerBaseEnv, caseContextEnv, CASE_ID_ENV, CASE_RESERVATION_ENV } from './adapters.mjs';
 import { compileDispatchPlan, launchPinOf } from './plan.mjs';
@@ -988,6 +988,8 @@ async function buildLaunch(attempt, ctx) {
       agentKind: interactive.kind ?? path.basename(prepResult.attempt.command),
       delivery: opts.promptDelivery ?? process.env.FGOS_HERDR_PROMPT_DELIVERY?.trim() ?? resolvedCmd.promptDelivery ?? 'inline',
       trustStore: interactive.trustStore,
+      // claude asks for trust on the run directory it is granted too, not only on its working directory.
+      trustAlso: interactive.kind === 'claude' ? addDirsOf(attemptArgs) : [],
       trustAccountSource: providerCapacityForLaunch?.status === 'selected'
         ? (resolvedCmd.credentialStore ? credentialSourceForCli(providerCapacityForLaunch, resolvedCmd.credentialStore.use) : null) ?? null
         : null,

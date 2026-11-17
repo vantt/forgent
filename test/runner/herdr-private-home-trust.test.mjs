@@ -17,6 +17,7 @@ import {
   codexHookTrustHash, seedCodexHookTrust, seedClaudeConfigTrust, readTrust,
 } from '../../src/run-supervisor/trust-store.mjs';
 import { trustRoots, trustStorePaths, seedWorkspaceTrust } from '../../src/runner/dispatch/herdr-round.mjs';
+import { addDirsOf } from '../../src/runner/dispatch/cli.mjs';
 
 const dirs = [];
 const tmp = (prefix) => {
@@ -413,4 +414,26 @@ test('claude: a pane with its own config directory is seeded there and the opera
   assert.equal(readTrust(path.join(privateDir, '.claude.json'), WORKSPACE), true);
   assert.equal(fs.readFileSync(real, 'utf8'), body, 'the operator store is not edited');
   assert.equal(round.trustWritten, false, 'a claude entry is never marked for removal');
+});
+
+test('claude: a composed home trusts the working directory and every directory the seat is granted with --add-dir', () => {
+  const { real, body } = realClaudeStore();
+  const privateDir = tmp('fgos-claude-private-dir-');
+  const runDir = path.join(ROOT, '.fgos', 'assignments', 'unit-1', 'producer', '1', 'runs', '01');
+  const round = { trustWritten: false, note() {} };
+
+  seedWorkspaceTrust({
+    trustStore: { kind: 'claude-json', path: real }, round, cwd: WORKSPACE, repoRoot: ROOT,
+    fullEnv: {}, workerEnv: { CLAUDE_CONFIG_DIR: privateDir }, alsoTrust: [runDir],
+  });
+
+  const config = path.join(privateDir, '.claude.json');
+  assert.equal(readTrust(config, WORKSPACE), true, 'the working directory is trusted');
+  assert.equal(readTrust(config, runDir), true, 'the granted run directory is trusted');
+  assert.equal(fs.readFileSync(real, 'utf8'), body, 'the operator store is not edited');
+});
+
+test('a directory granted with --add-dir is found in the argv, up to the next option', () => {
+  assert.deepEqual(addDirsOf(['--model', 'sonnet', '--add-dir', '/a', '/b', '--settings', '{}']), ['/a', '/b']);
+  assert.deepEqual(addDirsOf(['--model', 'sonnet']), []);
 });
