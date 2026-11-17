@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "c7650fc1dc46a2057d3d6d2a230a8fb50df13a938e6de0a8e5e529bcd000a92f",
+  "payloadDigest": "88324acda30784c1633e7c2251374f73e8398054757903227b5b4416dde55d90",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "b8b886cee2ea5ce7ee1153e4795512db135a990de894c27e53c5e778b210be62",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -126,7 +126,7 @@
     "apps/fgos/src/wiring/mod.rs": "67f6a83767fc7130425665f0f385023887f11cfd2a64d12a0d7d84a428be3ea9",
     "apps/fgos/src/wiring/run_dirs.rs": "6c34c6af1c85e8e326272fc1c08602b81e6e53ab778596f36296ef376c94b970",
     "apps/fgos/src/wiring/session.rs": "f2569bef9f072e959f14673c2d2929e2b0b001540a4e147fd5e59082b2e64b43",
-    "apps/fgos/src/wiring/uninstall.rs": "23df6da888b3a3ef2edc1ee44e87358306de56d4709bb611c17840fefbf464a0",
+    "apps/fgos/src/wiring/uninstall.rs": "1c5e55502b62d428ef0f9c560d2762d44ee499ac434741eb68b8208dbd6bce2e",
     "apps/fgos/src/wiring/wire_agents.rs": "a434308907a3e7d87c880ebf95a957e1342b77e83ebe1ee0272002335b7a248c",
     "apps/fgos/tests/cli_tests.rs": "7d2a82de9fbd1658aa5b2094ca01cda661335d92bf644fa97200025ecfefc2c9",
     "apps/fgos/tests/internal_lock_routes.rs": "e8516f4876c8263b1baa1f997bcfbb01715e69d740aa508fd01a0d481fee309e",
@@ -1872,14 +1872,14 @@
     },
     {
       "path": "apps/fgos/src/wiring/uninstall.rs",
-      "line": 1182,
+      "line": 1191,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"
     },
     {
       "path": "apps/fgos/src/wiring/uninstall.rs",
-      "line": 1847,
+      "line": 1856,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"

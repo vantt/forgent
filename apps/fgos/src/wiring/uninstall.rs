@@ -819,11 +819,20 @@ pub fn uninstall_project(root: &Path, apply: bool, machine: &Machine) -> Reversa
         _ => Vec::new(),
     };
 
+    // Project-relative names are written with `/` on every platform, like the labels of the agent configs.
     let rel = |file: &Path| {
         file.strip_prefix(root)
             .ok()
             .filter(|rest| !rest.as_os_str().is_empty())
-            .map_or_else(|| path_text(file), path_text)
+            .map_or_else(
+                || path_text(file),
+                |rest| {
+                    rest.components()
+                        .map(|part| part.as_os_str().to_string_lossy())
+                        .collect::<Vec<_>>()
+                        .join("/")
+                },
+            )
     };
     let mut changes: Vec<String> = Vec::new();
     for result in &hook_changes {
