@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "ba1d68a1e28c6cd51bb53e6fa64b730b4f6865a7bdce1a717ec5912c9a053cca",
+  "payloadDigest": "7c61919cc126a558850900a68340f1f297fa1277b2b1b2fbc0b2c8014d8c5e30",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "a5629383f89b4488b252a62f0ea86463e649e33e0a891db1a19af2cd6c136aca",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -1015,7 +1015,7 @@
     "src/run-supervisor/steps/finalize-home.mjs": "50ea79039751895c8f1eab16b969d8cda2b82662dd3f6d762d391dae5abf726c",
     "src/run-supervisor/steps/settle-attempt.mjs": "41942d3509db3eed93fe70ef260f815ad0154729d6b8a9692b9e33f95c75e6da",
     "src/run-supervisor/stray-writes.mjs": "a089d31b30aefcf02d5fa0880bc521f5c060af8a4bf3da10c59571a896f1a033",
-    "src/run-supervisor/trust-store.mjs": "9d18ebb09e269d047cff03cd1793f71f522bbc90fa0dd1f0850d72a75e3eee71",
+    "src/run-supervisor/trust-store.mjs": "20d66f79de6608ceb43b1af49dd429d8580a2d0d5e3aad1299968b0922f0d54c",
     "src/run-supervisor/worker-artifacts.mjs": "72fd5bd3bec52dbfe0de9075b6c1e84d7de6a177b8123ad270c6bd9fd76273ae",
     "src/runner/agent-definitions.mjs": "cd1cc9fba1db742d1b8edc4f4f43f4a27fe303ae4081417587c2e7a6158b6eab",
     "src/runner/agent-listing.mjs": "ff2d6ccdd3e12ada84c4dce643a98165a0acac2244da24546f1feecbe056b759",

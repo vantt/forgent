@@ -449,7 +449,8 @@ const MATCHERLESS_EVENTS = new Set(['user_prompt_submit', 'stop']);
 
 /** The command codex runs, and so hashes, on `platform`: `commandWindows` replaces `command` on
  * windows only, and the field itself is never part of the hash (captured from codex 0.166.0 on linux:
- * a hook carrying `commandWindows` hashes exactly as the same hook without it). */
+ * a hook carrying `commandWindows` hashes exactly as the same hook without it). The windows branch follows
+ * codex's source and is unmeasured on windows; if it is wrong the seat stops at needs-setup by name. */
 function codexHookCommand(handler, platform) {
   const windows = handler.commandWindows ?? handler.command_windows;
   return platform === 'win32' && typeof windows === 'string' ? windows : handler.command;
