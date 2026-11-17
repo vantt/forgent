@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Windows: a project on a UNC share (`\\host\share`) now gets an absolute agent-hook command, workspace root and payload path instead of a relative `UNC\...` path; one function, `fgos_process::path::plain_path`, now writes every Windows verbatim path, and an architecture-manifest door row fails any new hand-written strip.
 - `fgos doctor --fix` moves per-capability role and persona taste (`runner.capabilities.<x>.roles` and `.personas`) into `runner.roles` and `runner.personas`, where it applies to every capability, and drops capability seats; taste found in the global file is removed, and a conflict between two capabilities is left for you to settle with `fgos config set` or `unset`.
 - A registered workflow definition's unit may declare `tier`, covering every seat the unit runs.
 - `fgos setup` is retired and answers "unknown verb" like any other unknown verb. Onboard a project with `fgctl init`; repair it with `fgos doctor --fix`. It no longer adds a shell-rc source line (existing lines keep working and `fgos uninstall` names them), no longer copies the release's skills into a project, no longer converts retired runner config keys, and no longer sets `core.hooksPath` (the fgOS source checkout uses `npm run setup:hooks`); the doctor row `shell-integration-sourced` is gone. Error texts that told you to run setup now name `fgos doctor --fix`.

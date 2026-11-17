@@ -1297,6 +1297,18 @@
       ],
       "debt": [],
       "reason": "only src/util/yaml.mjs writeFrontmatter writes a frontmatter block, through the crate's emit (the addon's yaml.emit), so quoting is the crate's and every block reads back to its value; a hand writer opens a block with a fence literal: a quoted `---` followed by an escaped newline, a template line ending in `---`, a `---` array element or constant, or a pushed `---`. A Rust reader that cuts a leading fence with `strip_prefix` is not a writer and does not match. Per-line match on code and string text in the scanned roots: YAML text built without a fence literal, or a fence assembled from parts, is not seen"
+    },
+    {
+      "job": "write a Windows verbatim path plainly",
+      "kind": "door",
+      "patterns": [
+        "r#*\"\\\\\\\\\\?\\\\"
+      ],
+      "allowed": [
+        "packages/process/rust/src/path.rs"
+      ],
+      "debt": [],
+      "reason": "only fgos_process::path turns a Windows verbatim path (\\\\?\\D:\\x, \\\\?\\UNC\\host\\share) into the plain spelling Git, cmd.exe, shells and Node accept; a hand strip names the prefix as a Rust raw-string literal. Rust test code and comments are blanked and tests/ dirs are pruned, so test literals do not match; a prefix built without a raw-string literal is not seen"
     }
   ],
   "files": {
