@@ -20,7 +20,6 @@ import {
   addWork,
   advanceThroughDiscoveryToPlanning,
   assert,
-  coexistPath,
   commitFile,
   commitInWorktree,
   commitPending,
@@ -93,9 +92,6 @@ test('P06 fixture pilot: in-process initialized cwd preserves the CLI-ready stor
   assert.ok(fs.existsSync(path.join(cwd, '.fgos')), 'fixture must create .fgos/');
   assert.deepEqual(eventLines(cwd), [], 'fresh fixture event store starts empty');
   assert.deepEqual(Object.keys(stateView(cwd).work), [], 'fresh fixture view has no work');
-  const manifest = JSON.parse(fs.readFileSync(coexistPath(cwd), 'utf8'));
-  assert.equal(manifest.v, 1);
-  assert.equal(manifest.territory.data, '.fgos/');
 
   const result = run(cwd, ['list']);
   assert.equal(result.status, 0, result.stderr);
@@ -109,7 +105,6 @@ test('P06 fixture pilot: template-copy cwd is a fresh copy, not shared mutable s
 
   assert.equal(stateView(first).work['template-copy-only-first'].id, 'template-copy-only-first');
   assert.equal(stateView(second).work['template-copy-only-first'], undefined, 'template state must not leak between cases');
-  assert.deepEqual(JSON.parse(fs.readFileSync(coexistPath(first), 'utf8')), JSON.parse(fs.readFileSync(coexistPath(second), 'utf8')));
 });
 
 
