@@ -32,7 +32,10 @@ change (L10). Node callers stay where S6a owns them (F1) and ask the route; none
    whole walk chain), `bindWorkSeat` send ask, walk, session (with `pathEnv`) and, when `ctx.accounts` is given, the
    account-state overlay that Dispatch's adapter reads per provider key of the lease document (06 Req 4); `askFor` and
    `bindingIdentity` stay. `agentCliMissingRefusal` (`unit-run-start.mjs:213-217`) and `accountQuarantineOf`
-   (`account-pin.mjs:41-50`) call `preflight`, keeping their `pre-admission` timing. The replay check
+   (`account-pin.mjs:41-50`) call `preflight`, keeping their `pre-admission` timing. Known difference (inherited from
+   Node, found in 06): `preflight` reads the runner as given while `bind` keys family spellings first (`family_keyed`),
+   so with a family alias in `modelPolicies` (e.g. `codex:`) a pinned account's quarantine can be read on another
+   pool set than the bind ranks from; decide here whether `preflight` keys the runner too (a vector for it). The replay check
    (`assignment-runner.mjs:300-314`) calls `digest` on the committed runner section before it rebinds.
    `src/runner/execution/seat-policy.mjs` is deleted.
 4. `src/runner/dispatch/plan.mjs`: the binding selectors (`--for`, `--needs-soul`, the purpose seat) are the route's

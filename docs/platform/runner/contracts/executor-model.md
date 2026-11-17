@@ -5,7 +5,7 @@ Document type: Contract
 Audience: Maintainer, implementer, agent that ports or calls the executor model
 Purpose: Name the executor entry, every fact derived from it, the bind answer, the decide answer and the hook verdict, so a second implementation can be proven against the same vectors
 Design status: Draft for owner review. Written from the Node code on origin/main (2026-11-17); no behaviour was changed to write it
-Implementation: Node today (`src/runner/dispatch`, `src/runner/execution`, `src/runner/hook.mjs`). The golden vectors in `packages/execution/contracts/executor-model.v1.json` are recorded from those functions and replayed by `test/runner/dispatch/executor-model-vectors.test.mjs` and by the `fgos-execution` crate (`packages/execution/rust/tests/golden_executor_model.rs`), which derives the same facts in Rust (the account quarantine, the runner semantic check and each tool's live status are replayed by the phases that port them). The bind, decide, hook and listing vectors are recorded by the phases that port them
+Implementation: Node today (`src/runner/dispatch`, `src/runner/execution`, `src/runner/hook.mjs`). The golden vectors in `packages/execution/contracts/executor-model.v1.json` are recorded from those functions and replayed by `test/runner/dispatch/executor-model-vectors.test.mjs` and by the `fgos-execution` crate (`packages/execution/rust/tests/golden_executor_model.rs`), which derives the same facts in Rust (the runner semantic check and each tool's live status are replayed by the phases that port them). The bind's vectors are in `packages/execution/contracts/bind.v1.json`, replayed by the same Node test and by `packages/execution/rust/tests/golden_bind.rs` against the crate's `bind`, `explain`, `preflight`, `seat_config` and `effective_rigor` (Node callers switch to them through the host route in a later phase). The decide, hook and listing vectors are recorded by the phases that port them
 Provenance: Read end to end from the source files named in each section; vectors reviewed by hand against the code path they exercise (plans/261115-2328-execution-read-door/phase-00-facts.md F1 to F3)
 Writer type: Agent draft writer
 Canonical for: What an executor entry means, which facts Execution derives from it, and the shape of the answers `bind`, `dispatch decide`, `dispatch explain` and the dispatch hook give
@@ -29,7 +29,7 @@ Superseded by: None
 | Question | Owner | Where it lives today |
 |---|---|---|
 | Which executor, invocation, model, effort, tier and account runs a seat, and where it goes on failure | Seat Binding (ranks, unchanged) | the `fgos-seat-binding` crate |
-| What an executor entry means, which facts follow from it, and the bind composed from them | Execution (this contract) | `src/runner/execution/bind.mjs`, `src/runner/dispatch/{config,resolve,mechanism,provider-adapter,executor-governance,tool-providers}.mjs` |
+| What an executor entry means, which facts follow from it, and the bind composed from them | Execution (this contract) | `src/runner/execution/bind.mjs`, `src/runner/dispatch/{config,resolve,mechanism,provider-adapter,executor-governance,tool-providers}.mjs`; in Rust `packages/execution/rust/src/{executor_model,accounts,bind,explain}.rs` |
 | Launching: argv, transport, confinement request, leases | Dispatch | `src/runner/dispatch/*` (not in this contract) |
 | Account state (lease, release, quarantine, probe) | Dispatch, as the account-state adapter of the port Seat Binding defines (`provider-capacity`) | `src/runner/dispatch/provider-capacity.mjs` |
 
@@ -77,7 +77,7 @@ cases per fact, named by the fact in the first column.
 | rendered effort levels (`effortLevels`) | `renderedEffortLevels(command)`: the canonical levels (`low`, `medium`, `high`, `max`) when fgOS knows how to set effort on the command's CLI (`claude`, `agy`, `pi`, `omp`, `codex`, by the command's basename), none otherwise. In the launch facts an executor's `supports.reasoningEffort` narrows the list |
 | posture carrying (`posture`) | `resolvePostureInvocation`: whether an executor can apply a posture on this machine, and which invocation carries it. A pure native agent carries it in the lead session. Otherwise the invocation must resolve to a confinement `backend` (its own, else the executor's) that the machine registry lists, enabled, of type `bwrap`, whose executable (the registry's `executable`, else `bwrap`) is on PATH. A named invocation is kept as named or refused; with none named the first `cli` invocation that declares a backend is taken (a `herdr-spawn` one only when the session is in herdr; an id-less one only when it is the first `cli` invocation); an executor with no invocations and a backend of its own carries the posture without naming one |
 | backend registry path (inside posture carrying) | The machine registry is read from `FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH` when set, else `confinement-backends.json` in the global fgOS directory. Absent file is an empty registry; an unreadable or invalid file is a registry that carries nothing. The override is kept as it is today |
-| launch facts (`launchFacts`) | What the bind may know of one executor: `kind`, `family`, `mechanism`, `skills` (`supports.skills`, else none), `invocations[]` (each `{ id, cli?, efforts, carriesPosture }`: `cli` is the credential-store CLI, `efforts` the rendered levels narrowed by `supports.reasoningEffort`, `carriesPosture` the posture-carrying fact for that invocation), `defaultInvocation`, and optional `disallowed`, `missingCli`, `unnamedCarries`. The default invocation is the posture-carrying fact for `read-only` with no invocation named, switched to the first `herdr-spawn` invocation when the session is in herdr and that one carries the posture. When posture is judged at launch (the caller binds only to learn who and which model) every invocation carries it and the first is the default; an executor with no invocations then has one invocation named `command`. `unnamedCarries` marks an executor whose posture is carried with no invocation to name |
+| launch facts (`launchFacts`) | What the bind may know of one executor: `kind`, `family`, `mechanism`, `skills` (`supports.skills`, else none), `invocations[]` (each `{ id, cli?, efforts, carriesPosture }`: `cli` is the credential-store CLI, `efforts` the rendered levels narrowed by `supports.reasoningEffort`, `carriesPosture` the posture-carrying fact for that invocation), `defaultInvocation`, and optional `disallowed`, `missingCli`, `unnamedCarries`. The default invocation is the one an unpinned seat runs, chosen by one explicit rule over the `cli` invocations that carry the posture here and that the session's transport can run (a `herdr-spawn` one only inside herdr): a generic form before a named one, then the session's transport (herdr inside herdr), then declared order. A generic form is an id `<cli>-<cli|herdr>[-bwrap]` where `<cli>` is the program the invocation runs, the transport is `herdr` for a `herdr-spawn` invocation, and `-bwrap` is there exactly when bwrap confines it (D-ADR0077 (invocation names state their confinement)); any other id is a named form, reached by a pin. A pin is never re-chosen: it is kept or refused. When no invocation qualifies the posture-carrying fact's own invocation stays the default. When posture is judged at launch (the caller binds only to learn who and which model) every invocation carries it; an executor with no invocations then has one invocation named `command`. `unnamedCarries` marks an executor whose posture is carried with no invocation to name |
 | missing CLI (`missingCli`, and `missingCli` in launch facts) | The programs an out-of-process agent executor starts (each invocation's command, else the entry's, else the default executor's), as bare names, when none of them is on PATH; none when one is, when the executor starts no program of its own (a native agent, a tool), or when it is in-process. `agentCliMissingRefusal` answers `agent-cli-missing` with `detail` and `fix` when every agent executor of the config is missing its programs |
 | account inventory (`accountInventory`, `llmAccounts`, `stateKey`) | `providerAccountInventory`: accounts per lease-state key, in declared order, each with its login store per CLI. A pool declared in `runner.llmAccounts` supplies its own accounts and replaces the same pool of `runner.providers.<provider>.accounts`; a pool it does not declare keeps the older read. `readLlmAccounts` only reports: what is wrong is listed in `problems` (never thrown). `legacyStateKey(pool)` is the key lease state uses: the family, except `openai` is `openai-codex`. A home path may begin with `~`, `${HOME}` or `$HOME`; it is expanded against the user's home |
 | pinned account quarantine (`accountQuarantine`) | `accountQuarantineOf`: when the account the seat's view holds quarantined now ends (epoch milliseconds; the largest safe integer when only a person clears it), or none. A quarantined login that one real call may lift, with no healthy account in the pool, reads as not quarantined |
@@ -137,8 +137,11 @@ A bind is asked for one seat by `{ ask, ctx, walk }`.
   `independentOf`, `preferIndependentOf`, overrides (tier, executor, invocation, effort, account, timeout, scope) and
   `raiseAuthorized`.
 - `ctx`: the runner config, the session facts (`headless`, `herdrPresent`, `hasNativeAgent`, `pathEnv`,
-  `postureAtLaunch`) and optionally the lease-state location and assignment id (without it the account view is the
-  config alone, which is what a replay and `explain` read).
+  `postureAtLaunch`) and optionally the lease state (without it the account view is the config alone, which is what a
+  replay and `explain` read). Node reads the lease state itself from its location and assignment id; the Rust bind
+  takes it as data: Dispatch's adapter (`readAccountStateOverlay`) reads it once, keyed by the lease document's own
+  provider keys, and the bind maps each pool to its key, so no caller derives the pool set. Machine facts (PATH, the
+  backend registry, herdr presence, home) reach the Rust bind through its `Machine` port.
 - `walk`: where the seat stands after a failure: `tried` (earlier bindings, oldest first), `excludePools`,
   `failedAccounts`, `continuity` (a binding whose executor, model and effort the seat keeps), `from`, `rotation`,
   `detail`, `reason` (default `provider-limit`).
@@ -162,7 +165,7 @@ with a reason), `familySpread`, `account`, `overridesOrigin`, and `fallbackFrom`
 (`next-candidate` with `walk: entry|family`, `account-rotation`, `lease-conflict`, `brief-not-delivered`). A tier's
 provenance also carries `recommendation`, `loweredFrom`, `maxTier` and `raisedBy` when they apply. `bindingInput` is what
 was decided from: the ask, peers, walk, the config digest, the account-view digest, the protocol and the
-host version; never the config body or account facts.
+host version (the route that answers adds it; the bind itself does not know it); never the config body or account facts.
 
 ### 6.3 Refusals
 
@@ -246,12 +249,15 @@ gains protocol 2 in the phase that moves the bind into Rust. The vector file's o
 
 ## 10. Proof
 
-Each derived fact has one owning proof: the vectors of `executor-model.v1.json`. Until the Node functions are deleted
-the Node twin `test/runner/dispatch/executor-model-vectors.test.mjs` replays every vector against them; a Rust port reads
+Each derived fact has one owning proof: the vectors of `executor-model.v1.json` and `bind.v1.json`. Until the Node functions are deleted
+the Node twin `test/runner/dispatch/executor-model-vectors.test.mjs` replays every vector against them, except a vector
+marked `decided`, which states a rule decided after the Node function was written (its `expect` is written by hand and
+the script never records it; the explicit invocation rule of section 3 is one); a Rust port reads
 the same file. A vector marked `knownDefect` records today's output of behaviour that looks wrong: the port keeps it and
-the owner decides in a separate item. The vectors are regenerated, never hand-edited in `expect`, by `scripts/executor-model-vectors.mjs` (`--check` fails on drift). Shapes of
-the bind, decide, hook and listing answers are written here; their vectors are recorded by the phases that move them,
-each in its own file.
+the owner decides in a separate item. The vectors are regenerated, never hand-edited in `expect`, by `scripts/executor-model-vectors.mjs` (`--check` fails on drift), which also
+records `leaseRead`, what Dispatch's adapter reads from a vector's lease state, for a fact that reads it. Shapes of the
+decide, hook and listing answers are written here; their vectors are recorded by the phases that move them, each in its
+own file.
 
 ## 11. Observed differences and open questions
 

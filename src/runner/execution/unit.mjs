@@ -114,6 +114,7 @@ function isSyncRef(ref) {
  * - syncBase?: ref the runner merges into the unit's branch before the worker runs (needs writes)
  * - syncOnly?: set when a unit with a syncBase leaves out its objective: no worker unless the merge conflicts
  * - tier?: the ladder tier a registered workflow definition recommends for every seat of the unit (unit files and stdin are refused it before this runs)
+ *   Any builder that passes unit data from outside input (a file, stdin, a request) must call assertNoUnitTier first.
  * - MUST NOT contain: executor, provider, model, invocation, actors, overrides (G2)
  *
  * @param {unknown} raw

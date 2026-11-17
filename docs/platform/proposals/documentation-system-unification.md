@@ -791,6 +791,19 @@ It never owns canonical documentation, decisions, claims, or work state. It read
 those authorities and emits a derived packet. It must fail closed on unresolved
 authority conflicts or an over-budget mandatory set.
 
+Observed problem it must solve (2026-11-17, measured in this repository): a Claude
+Code session in the main checkout loads the same eight AgentKit rules three times,
+about 17 KB each: `~/projects/.claude/rules/*.md`, `forgent/.claude/rules/*.md`
+(untracked), and the `AGENTKIT-OMP` block in `AGENTS.md`, which exists for omp and
+codex (they do not read `.claude/rules`) but which Claude also reads through
+`CLAUDE.md`'s `@AGENTS.md` import. A linked worktree loads it twice. The duplicate
+fills context that long-lived head sessions need, and shortens the time before a
+session must rotate. Options seen so far: (A) one copy per CLI, with Claude not
+reading the omp/codex block; (B) as a stopgap, drop the untracked
+`forgent/.claude/rules` copy. Related: backlog `p-7eb9e65b` (fgOS and AgentKit
+overwrite each other's registrations); source discussion
+`docs/discussions/secretary-miu/DISCUSSION.md` (point 4).
+
 Suggested subcomponents:
 
 | Subcomponent | Owns |

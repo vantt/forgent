@@ -13,8 +13,10 @@
 
 pub mod accounts;
 pub mod agents;
+pub mod bind;
 pub mod decide;
 pub mod executor_model;
+pub mod explain;
 pub mod hook;
 pub mod ports;
 pub mod runner_check;

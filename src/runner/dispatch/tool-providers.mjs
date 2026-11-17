@@ -8,6 +8,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { isCommandAvailable } from '../paths.mjs';
 import { commitAt } from '../../git/inspect.mjs';
+import { registeredCapabilityOf } from '../execution/capability-config.mjs';
 
 /** The raw `for` list of any executor (`[]` when it declares none): the one reader of `for`. */
 export function forEntriesOf(executor) {
@@ -113,4 +114,17 @@ export function toolProvidersOf(runnerConfig, { capability, repoRoot = process.c
     }
   }
   return providers;
+}
+
+/**
+ * The name of a tool ability no tool is present to serve, else undefined. A capability is a tool ability when a
+ * `kind: "tool"` executor declares it in `for` (its name or one of its row's aliases); it is unserved when every
+ * such tool is probed `missing` or `unknown`. A capability no tool executor names is a label, whatever its row
+ * holds, so it is never reported here.
+ */
+export function unservedToolAbilityOf(runnerConfig, capability, { repoRoot, pathEnv } = {}) {
+  const name = registeredCapabilityOf(runnerConfig, capability) ?? capability;
+  const providers = toolProvidersOf(runnerConfig, { capability: name, ...(repoRoot ? { repoRoot } : {}), ...(pathEnv ? { pathEnv } : {}) });
+  if (providers.length === 0) return undefined;
+  return providers.some(({ status }) => status === 'present' || status === 'stale') ? undefined : name;
 }

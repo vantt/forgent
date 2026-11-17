@@ -13,7 +13,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-import { registeredCapabilityOf } from '../runner/execution/capability-config.mjs';
+import { unservedToolAbilityOf } from '../runner/dispatch/tool-providers.mjs';
 import { globsMeet } from '../runner/dispatch/write-scope.mjs';
 import { RIGOR_ORDER } from './guide-schema.mjs';
 import { normalizeWrite } from './propose-classify.mjs';
@@ -119,7 +119,7 @@ function changedCodeFiles(described, ports) {
  *
  * Codes: `unresolved-scope`, `write-path-invalid` (also whatever the write-scope reader refuses),
  * `write-path-forbidden` (a forbidden tree, a glob that reaches one, a path through a symbolic link), `write-path-missing`,
- * `write-scope-empty`, `capability-unregistered`, `rigor-below-floor`, `test-scan-too-wide`, `write-overlap`.
+ * `write-scope-empty`, `capability-tool-unserved`, `rigor-below-floor`, `test-scan-too-wide`, `write-overlap`.
  *
  * @param {object} params
  * @param {Array<object>} params.slices
@@ -155,8 +155,10 @@ export function validateProposal({ slices, runnerConfig, rigorFloor, ports }) {
 
     const wanted = [slice.askOwnerFirst === true ? null : slice.capability, slice.followUp?.capability];
     for (const capability of wanted) {
-      if (typeof capability === 'string' && capability !== '' && registeredCapabilityOf(runnerConfig, capability) === undefined) {
-        refuse('capability-unregistered', slice, `"${capability}" is not a registered capability (none under runner.capabilities in the config)`, { capability });
+      // A capability no tool executor names is a label the seat binds through the role, persona and tier tables;
+      // only a tool ability needs its tool present.
+      if (typeof capability === 'string' && capability !== '' && unservedToolAbilityOf(runnerConfig, capability) !== undefined) {
+        refuse('capability-tool-unserved', slice, `"${capability}" is a tool ability whose tool is not present (install the tool its kind: tool executor names)`, { capability });
       }
     }
 

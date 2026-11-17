@@ -22,36 +22,10 @@ Role split by which kind of intelligence the work needs, not by mechanism:
 - **`execute`** — compliance-driven work. Value comes from following the
   plan; changes files; must pass verify.
 
-Both are declared via `DEFAULT_CAPABILITY_SLOTS`
-(`src/setup/registrations.mjs`), each carrying only a `description` —
-deliberately no `prefer`/`aliases`/`overrides`: naming which executor
-serves a purpose is a dispatch-*mechanism* decision, and `tsk-5tm-3` D5
-forbids re-deciding that mechanism here.
-
-## Where it's wired in
-
-Layered onto the **same** `runner` config-default registration that
-already carries `DEFAULT_RUNNER_CONFIG` (never a second `key: 'runner'`
-registration — `assembleRegistryDefaults` combines registrations by flat
-per-key assignment, not a deep merge, so a second entry with the same key
-would silently overwrite this one instead of adding to it):
-
-```js
-registerConfigDefault({
-  id: 'runner',
-  key: 'runner',
-  shape: {
-    ...DEFAULT_RUNNER_CONFIG,
-    capabilities: DEFAULT_CAPABILITY_SLOTS,
-    // ...
-  },
-});
-```
-
-A fresh `fgos setup` run fills `runner.capabilities` into any project
-missing it (or missing either slot), the standard `mergeConfigDefaults`
-fill-missing-only path — a project with the slots already present is left
-untouched.
+Both are rows of the standard (`core/config-standard/runner.yaml`), next
+to the `review` job, the tool abilities and the coding rows; a project
+changes which executors serve them with a row of its own in
+`runner.capabilities`.
 
 ## The doctor check
 

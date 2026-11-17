@@ -50,7 +50,12 @@ function memoryPorts(files, { links = [] } = {}) {
 }
 
 const runnerConfig = {
-  capabilities: { 'code:implement': {}, 'code:test': {}, 'docs:write': {}, review: { aliases: ['peer-review'] } },
+  capabilities: {
+    'code:implement': {}, 'code:test': {}, 'docs:write': {}, review: {},
+    'impact-analysis': { description: 'a tool ability', aliases: ['impact_analysis'] },
+  },
+  // The tool that serves impact-analysis is not installed.
+  executors: { 'gone-graph': { kind: 'tool', for: ['impact-analysis'], invocations: [{ via: 'cli', command: 'fgos-no-such-tool-binary', args: [] }] } },
 };
 
 const repo = {
@@ -135,10 +140,13 @@ test('a glob or directory that names no file is refused as empty', () => {
   assert.deepEqual(codes(result), ['write-scope-empty']);
 });
 
-test('a capability, or a follow-up capability, that nothing registers is refused; an alias counts', () => {
-  assert.deepEqual(codes(validate([slice('a', ['src/a/one.mjs'], { capability: 'code:imagine' })])), ['capability-unregistered']);
-  assert.deepEqual(codes(validate([slice('d', ['docs/guide.md'], { capability: 'docs:write', followUp: { capability: 'audit', pattern: 'solo' } })])), ['capability-unregistered']);
-  assert.equal(validate([slice('d', ['docs/guide.md'], { capability: 'docs:write', followUp: { capability: 'peer-review', pattern: 'solo' } })]).ok, true);
+test('a capability no tool executor names is a label and passes; a tool ability, or its alias, whose tool is not present is refused', () => {
+  assert.equal(validate([slice('a', ['src/a/one.mjs'], { capability: 'code:imagine' })]).ok, true);
+  assert.equal(validate([slice('d', ['docs/guide.md'], { capability: 'docs:write', followUp: { capability: 'audit', pattern: 'solo' } })]).ok, true);
+  assert.deepEqual(codes(validate([slice('a', ['src/a/one.mjs'], { capability: 'impact-analysis' })])), ['capability-tool-unserved']);
+  assert.deepEqual(codes(validate([slice('d', ['docs/guide.md'], { capability: 'docs:write', followUp: { capability: 'impact_analysis', pattern: 'solo' } })])), ['capability-tool-unserved']);
+  const served = { ...runnerConfig, executors: { ...runnerConfig.executors, graph: { kind: 'tool', for: ['impact-analysis'], invocations: [{ via: 'cli', command: process.execPath, args: [] }] } } };
+  assert.equal(validate([slice('a', ['src/a/one.mjs'], { capability: 'impact-analysis' })], { runnerConfig: served }).ok, true);
 });
 
 test('a slice that asks the owner first names no capability and is listed, not refused for it', () => {
@@ -233,11 +241,11 @@ test('a slice whose code is too broad to size the tests of is refused as too wid
 
 test('every problem of a proposal is reported together, not only the first', () => {
   const result = validate([
-    slice('a', ['node_modules/x.js'], { capability: 'code:imagine' }),
+    slice('a', ['node_modules/x.js'], { capability: 'impact-analysis' }),
     slice('b', ['src/a/two.mjs'], { rigor: 'low' }),
     slice('c', ['src/a/two.mjs']),
   ], { rigorFloor: 'standard' });
-  assert.deepEqual([...new Set(codes(result))].sort(), ['capability-unregistered', 'rigor-below-floor', 'write-overlap', 'write-path-forbidden']);
+  assert.deepEqual([...new Set(codes(result))].sort(), ['capability-tool-unserved', 'rigor-below-floor', 'write-overlap', 'write-path-forbidden']);
 });
 
 // ---- over a checkout on disk -----------------------------------------------------------------------

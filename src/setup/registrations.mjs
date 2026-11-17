@@ -65,8 +65,7 @@ import { deepEqual } from '../runner/execution/patterns/catalog-entries.mjs';
 import { detectRetiredPatternKeys, RESERVED_PATTERN_NAMES, SEAT_BINDING_MARKER_PATH, formatRetiredKeySentence } from '../runner/execution/patterns/retired-keys.mjs';
 import { isCommandAvailable, resolveMainCheckoutRoot } from '../runner/paths.mjs';
 import {
-  capabilityConfinementOf, capabilityNamesOf, capabilityServesOf, catalogOf, hasCapabilityEntry,
-  hasPreferPool, isCapabilityDeclared, ownMinCheckersOf,
+  capabilityConfinementOf, capabilityNamesOf, capabilityServesOf, catalogOf, hasCapabilityEntry, ownMinCheckersOf,
 } from '../runner/execution/capability-config.mjs';
 import { detectTrunk } from '../runner/worktree.mjs';
 import { listWork } from '../state/store.mjs';
@@ -74,7 +73,7 @@ import { driftStatus, unmergedDeliveries } from '../state/drift-status.mjs';
 import { postLandDrift } from '../state/postland-drift.mjs';
 import { isResolvedStatus } from '../state/frontier.mjs';
 import { getDomain, resolveDomainName, effectiveStep, domainSteps, skillForStep } from '../state/domain-registry.mjs';
-import { toolProvidersOf } from '../runner/dispatch/tool-providers.mjs';
+import { toolProvidersOf, unservedToolAbilityOf } from '../runner/dispatch/tool-providers.mjs';
 import { checkConfig, ConfigDoorError, globalFgosDir, readConfig, readMachineConfig, readProjectConfigSource } from '../config/facade.mjs';
 import { parseYaml } from '../util/yaml.mjs';
 import { legacyStateKey } from '../runner/dispatch/llm-accounts.mjs';
@@ -1234,104 +1233,9 @@ registerCheck({
 });
 registerFix({ id: 'runtime-socket-dir', fix: () => fixRuntimeSocketDir() });
 
-// The curated capability slots. The standard (core/config-standard/runner.yaml) holds the same entries and is
-// what a run reads; this list stays as the reference the doctrine-table tests and the plan lint's registered
-// set pin against. Deliberately no `prefer`/`aliases`/`overrides`: naming which executor serves a purpose is a
-// dispatch-mechanism decision (tsk-5tm-3 D5).
-// Capabilities the shipped Workflow units
-// name. Without a `runner.capabilities` entry bind() has no candidate pool for
-// the unit and refuses it, so a fresh project could not run these Workflows.
-// Description-only on purpose (no `prefer`): which executors serve a
-// capability is that project's own taste.
-function workflowCapabilitySlots(verbsByDomain) {
-  const slots = {};
-  for (const [domain, verbs] of Object.entries(verbsByDomain)) {
-    for (const verb of verbs) {
-      slots[`${domain}:${verb}`] = {
-        description: `Workflow unit capability "${domain}:${verb}" -- declare a "prefer" pool to choose which executors serve it.`,
-      };
-    }
-  }
-  return slots;
-}
-
-export const DEFAULT_CAPABILITY_SLOTS = Object.freeze({
-  advise: {
-    description:
-      'Async product-decision consult -- value comes from disagreement, never changes state, one question/one answer (D2, docs/history/dispatch-activation-and-handoff-redesign/CONTEXT.md)',
-    // Interim posture: P06 must first wire a production backend binding.
-    // Required here would otherwise universally refuse group-thinking.
-    confinement: { mode: 'unconfined' },
-    serves: { outputKind: 'decision', mutates: false },
-  },
-  execute: {
-    description:
-      'Compliance-driven work -- value comes from following the plan, changes files, must pass verify (D2, docs/history/dispatch-activation-and-handoff-redesign/CONTEXT.md)',
-    serves: { outputKind: 'change', mutates: true },
-  },
-  // I19 (core/skills/_shared/capability-matching.md, capability-catalog.md):
-  // generic, domain-neutral independent review -- docs/design/spec/config,
-  // never code (that stays `code:review`). No `prefer`/`overrides` either,
-  // same curated-default-never-pins reasoning as every other slot here.
-  review: {
-    description:
-      'Independent read-only review of a non-code artifact (docs, design, spec, config) before merge/decision -- distinct from code:review (I19, core/skills/_shared/capability-catalog.md).',
-    confinement: { mode: 'unconfined' },
-    serves: { outputKind: 'finding', mutates: false },
-  },
-  // The documentation counterpart of code:implement: the capability `fgos run --capability docs:write`
-  // and the fgos-run skill name for writing docs. Same curated-default-never-pins reasoning.
-  'docs:write': {
-    description:
-      'Canonical documentation authoring capability -- write or update documents (README, specs, guides) in the working tree; declare a "prefer" pool to choose which executors serve it.',
-    serves: { outputKind: 'change', domain: 'docs', mutates: true },
-  },
-  'code:implement': {
-    description:
-      'Canonical coding implementation capability -- compliance-driven coding execution before implementation (D1/D2, docs/history/capability-aware-dispatch-activation/CONTEXT.md)',
-    serves: { outputKind: 'change', domain: 'code', mutates: true },
-  },
-  // P2-runtime (docs/history/agent-coordination-foundation/plan.md):
-  // extended by observed frequency, in this priority order. Deliberately
-  // no `prefer`/`overrides` here either, same reasoning as `code:implement`
-  // above -- a curated default never pins which executor serves it.
-  'code:review': {
-    description:
-      'Canonical coding review capability -- independent review of a coding implementation unit before merge (P2-runtime, docs/history/agent-coordination-foundation/plan.md).',
-    confinement: { mode: 'unconfined' },
-    serves: { outputKind: 'finding', domain: 'code', mutates: false },
-  },
-  'code:test': {
-    description:
-      'Canonical coding test capability -- author or run tests for a coding implementation unit (P2-runtime, docs/history/agent-coordination-foundation/plan.md).',
-    serves: { outputKind: 'verification', domain: 'code' },
-  },
-  'code:debug': {
-    description:
-      'Canonical coding debug capability -- root-cause investigation of a coding defect (P2-runtime, docs/history/agent-coordination-foundation/plan.md).',
-    confinement: { mode: 'unconfined' },
-    serves: { outputKind: 'finding', domain: 'code' },
-  },
-  'code:refactor': {
-    description:
-      'Canonical coding refactor capability -- behavior-preserving structural change to existing code (P2-runtime, docs/history/agent-coordination-foundation/plan.md).',
-    serves: { outputKind: 'change', domain: 'code', mutates: true, behaviorPreserving: true },
-  },
-  ...workflowCapabilitySlots({
-    marketing: ['research', 'write', 'publish'],
-    architecture: ['frame', 'shape', 'critique', 'synthesize', 'explain'],
-    business: ['frame', 'perspectives', 'critique', 'synthesize', 'plan'],
-    delphi: ['propose', 'synthesize'],
-    'group-cognition': ['explore', 'critique', 'synthesize'],
-    'nominal-group': ['generate', 'share', 'vote', 'rank'],
-    coding: ['discover', 'explore', 'plan', 'validate', 'implement'],
-  }),
-});
-
-// Every capability a core/domain Workflow unit names must resolve the way
-// bind() resolves it (exact name, then its `<prefix>:*` entry). One that does not has
-// no candidate pool, so that unit is refused at run time with no earlier signal.
-// A declared entry that carries no `prefer` pool (exact or prefix entry) is reported too.
+// A capability a core/domain Workflow unit names is a label unless a kind: tool executor declares it in `for`: a
+// label's seats bind through the role, persona and tier tables. A tool ability whose tool is not present is
+// refused at run time with no earlier signal, so this row names it.
 // Definitions come from the Workflow loader's one catalog (readWorkflowCatalog): the one that runs for each
 // id, project before shipped. Every string under a key named `capability`, at any depth, is a use. A file
 // that cannot be read, parsed or validated is reported by name, never skipped.
@@ -1364,43 +1268,22 @@ function capabilityValues(root) {
   return found;
 }
 
-// Capabilities the runner loop's worker asks for that no Workflow unit names. A coding item's
-// executing step runs as a Unit of `code:implement` (work-compat.mjs's curated mapping); its other
-// steps ask for `<domain>:<verb>`, the names the domain's Workflow units already use.
-const RUNNER_LOOP_CAPABILITY_USES = Object.freeze([['code:implement', 'runner loop: coding executing step']]);
-
 function checkWorkflowCapabilitiesConfigured(cwd) {
   const { catalog, unreadable } = readWorkflowCatalog(cwd);
-  const uses = workflowCapabilityUses(catalog);
-  for (const [capability, id] of RUNNER_LOOP_CAPABILITY_USES) {
-    uses.set(capability, new Set([...(uses.get(capability) ?? []), id]));
-  }
-  return withUnreadableDefinitions(evaluateWorkflowCapabilities(cwd, uses), unreadable);
+  return withUnreadableDefinitions(evaluateWorkflowCapabilities(cwd, workflowCapabilityUses(catalog)), unreadable);
 }
 
 function evaluateWorkflowCapabilities(cwd, uses) {
   const runner = effectiveSection(cwd, 'runner');
-  const missing = [...uses].filter(([capability]) => !isCapabilityDeclared(runner, capability));
-  if (missing.length > 0) {
-    const list = missing.map(([cap, ids]) => `${cap} (${[...ids].join(', ')})`).join('; ');
+  const unserved = [...uses].filter(([capability]) => unservedToolAbilityOf(runner, capability, { repoRoot: cwd }) !== undefined);
+  if (unserved.length > 0) {
+    const list = unserved.map(([cap, ids]) => `${cap} (${[...ids].join(', ')})`).join('; ');
     return {
       passed: false,
-      message: `runner.capabilities has no entry for Workflow capabilities: ${list} -- declare each under runner.capabilities`,
+      message: `Workflow units name tool abilities whose tool is not present: ${list} -- install the tool its kind: tool executor names, or fix that executor's invocation`,
     };
   }
-  // Declared is not enough: a seat needs a prefer pool, on the exact entry or its prefix entry
-  // (or a tierFallback list for its tier), or it is refused headless. Setup's own slots are description-only on
-  // purpose (which executors serve a capability is the project's taste), so this is a
-  // warning that names the gap rather than a failure on a fresh project.
-  const noPool = [...uses].filter(([capability]) => !hasPreferPool(runner, capability));
-  if (noPool.length > 0) {
-    const list = noPool.map(([cap, ids]) => `${cap} (${[...ids].join(', ')})`).join('; ');
-    return {
-      passed: true,
-      message: `warning: Workflow capabilities declared but with no "prefer" pool, so a headless run of those units is refused: ${list} -- add "prefer" under the exact name or its prefix entry in runner.capabilities`,
-    };
-  }
-  return { passed: true, message: `every capability a Workflow unit names (${uses.size}) is declared in runner.capabilities with a prefer pool` };
+  return { passed: true, message: `every capability a Workflow unit names (${uses.size}) is a label or a tool ability whose tool is present` };
 }
 
 registerCheck({

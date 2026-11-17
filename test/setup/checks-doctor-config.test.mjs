@@ -152,67 +152,36 @@ test('worker-slots-ceiling-usable passes and names a real armed ceiling', () => 
   fs.rmSync(cwd, { recursive: true, force: true });
 });
 
-// A project Workflow naming a capability no entry covers: the shipped Workflows' capabilities are all in the
-// standard, so these tests add a Workflow of the project's own.
+// A project Workflow of the project's own, naming the capabilities given.
 function writeProjectWorkflow(cwd, capabilities) {
   fs.mkdirSync(path.join(cwd, 'core', 'workflows'), { recursive: true });
   const units = capabilities.map((capability, i) => `      - id: u${i}\n        template:\n          capability: ${capability}\n`).join('');
   fs.writeFileSync(path.join(cwd, 'core', 'workflows', 'mine.yaml'), `id: mine\nsteps:\n  - id: s\n    units:\n${units}`);
 }
 
-test('workflow-capabilities-configured passes on the standard alone: every shipped Workflow capability has an entry with a prefer pool', () => {
-  const cwd = mkTemp('doctor-workflow-caps-standard-');
-  const { passed, message } = checkById('workflow-capabilities-configured').check(cwd);
-  assert.equal(passed, true, message);
-  assert.doesNotMatch(message, /^warning/);
-  fs.rmSync(cwd, { recursive: true, force: true });
-});
-
-test('workflow-capabilities-configured names a capability a project Workflow uses that config lacks', () => {
-  const cwd = mkTemp('doctor-workflow-caps-');
+test('workflow-capabilities-configured passes on the standard alone, and a capability with no row is a label that passes', () => {
+  const cwd = mkTemp('doctor-workflow-caps-label-');
+  assert.equal(checkById('workflow-capabilities-configured').check(cwd).passed, true);
   writeProjectWorkflow(cwd, ['mine:frame']);
   const { passed, message } = checkById('workflow-capabilities-configured').check(cwd);
-  assert.equal(passed, false);
-  assert.match(message, /mine:frame \(mine from project\)/);
-  assert.doesNotMatch(message, /marketing:write/, 'a registered capability must not be reported');
-  fs.rmSync(cwd, { recursive: true, force: true });
-});
-
-test('workflow-capabilities-configured accepts a prefix entry, and a bare-verb entry no longer covers a capability', () => {
-  const cwd = mkTemp('doctor-workflow-caps-verb-');
-  fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
-  writeProjectWorkflow(cwd, ['mine:critique']);
-  const write = (entries) => writeProjectConfig(cwd, { runner: { capabilities: entries } });
-  write({ 'mine:*': { description: 'prefix entry', prefer: [{ executor: 'x' }] } });
-  assert.doesNotMatch(checkById('workflow-capabilities-configured').check(cwd).message, /mine:critique/);
-  write({ critique: { description: 'verb entry', prefer: [{ executor: 'x' }] } });
-  assert.match(checkById('workflow-capabilities-configured').check(cwd).message, /no entry for Workflow capabilities: .*mine:critique/);
-  fs.rmSync(cwd, { recursive: true, force: true });
-});
-
-test('workflow-capabilities-configured warns, naming each Workflow capability with no prefer pool', () => {
-  const cwd = mkTemp('doctor-workflow-caps-nopool-');
-  fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
-  writeProjectWorkflow(cwd, ['mine:propose']);
-  writeProjectConfig(cwd, { runner: { capabilities: { 'mine:propose': { description: 'taste-free' } } } });
-  const { passed, message } = checkById('workflow-capabilities-configured').check(cwd);
-  assert.equal(passed, true, 'a taste-free entry is a warning, not a failure');
-  assert.match(message, /^warning: .*no "prefer" pool/);
-  assert.match(message, /mine:propose/);
-  fs.rmSync(cwd, { recursive: true, force: true });
-});
-
-test('workflow-capabilities-configured is clean when each capability resolves to a prefer pool, on its exact entry or its prefix entry', () => {
-  const cwd = mkTemp('doctor-workflow-caps-pool-');
-  fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
-  writeProjectWorkflow(cwd, ['mine:exact', 'other:viaprefix']);
-  writeProjectConfig(cwd, { runner: { capabilities: {
-    'mine:exact': { description: 'exact', prefer: [{ executor: 'x' }] },
-    'other:*': { description: 'prefix', prefer: [{ executor: 'x' }] },
-  } } });
-  const { passed, message } = checkById('workflow-capabilities-configured').check(cwd);
   assert.equal(passed, true, message);
-  assert.doesNotMatch(message, /^warning/);
+  assert.doesNotMatch(message, /warning|mine:frame/);
+  fs.rmSync(cwd, { recursive: true, force: true });
+});
+
+test('workflow-capabilities-configured fails only for a tool ability whose tool is not present, naming it and the Workflow', () => {
+  const cwd = mkTemp('doctor-workflow-caps-tool-');
+  fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
+  writeProjectWorkflow(cwd, ['impact-analysis', 'mine:frame']);
+  assert.equal(checkById('workflow-capabilities-configured').check(cwd).passed, true, 'no tool executor names it: a label');
+  declareExecutor(cwd, 'gone-graph', { kind: 'tool', for: ['impact-analysis'], invocations: [{ via: 'cli', command: 'fgos-no-such-tool-binary', args: [] }] });
+  const failed = checkById('workflow-capabilities-configured').check(cwd);
+  assert.equal(failed.passed, false);
+  assert.match(failed.message, /impact-analysis \(mine from project\)/);
+  assert.doesNotMatch(failed.message, /mine:frame/);
+  declareExecutor(cwd, 'graph', { kind: 'tool', for: ['impact-analysis'], invocations: [{ via: 'cli', command: process.execPath, args: [] }] });
+  const served = checkById('workflow-capabilities-configured').check(cwd);
+  assert.equal(served.passed, true, served.message);
   fs.rmSync(cwd, { recursive: true, force: true });
 });
 

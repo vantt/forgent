@@ -13,6 +13,7 @@ import { DOCTOR_CHECKS } from '../../src/setup/checks.mjs';
 import { registryEntries, runHostDoctor } from './helpers/setup-checks-harness.mjs';
 import { checkBlindStepsUseProvenPools } from '../../src/setup/blind-steps-proven-pools.mjs';
 import { checkSeatBindingDryBind } from '../../src/setup/seat-binding-checks.mjs';
+import { writeProjectConfig } from '../helpers/config-fixture.mjs';
 
 const PARSE_PROBLEM = /cannot be parsed: .* \(line \d+, column \d+\)/;
 
@@ -100,10 +101,11 @@ test('one unparsable workflow does not stop the others from being evaluated, and
   assert.match(blind.message, /not applicable: no Workflow unit is blind/, 'the normal verdict is kept');
   assert.match(blind.message, new RegExp(`core/workflows/broken\\.yaml: ${PARSE_PROBLEM.source}`));
 
-  write('core/workflows/uses-capability.yaml', 'id: uses\nsteps:\n  - id: a\n    units:\n      - id: u\n        template: { capability: nowhere:declared }\n');
+  write('core/workflows/uses-capability.yaml', 'id: uses\nsteps:\n  - id: a\n    units:\n      - id: u\n        template: { capability: impact-analysis }\n');
+  writeProjectConfig(root, { runner: { patterns: { seatBinding: { schema: 1 } }, executors: { 'gone-tool': { kind: 'tool', for: ['impact-analysis'], invocations: [{ via: 'cli', command: 'fgos-no-such-tool-binary', args: [] }] } } } });
   const capabilities = await checkById('workflow-capabilities-configured')(root);
   assert.equal(capabilities.passed, false);
-  assert.match(capabilities.message, /no entry for Workflow capabilities: .*nowhere:declared/, 'the parsable workflow was evaluated');
+  assert.match(capabilities.message, /tool abilities whose tool is not present: impact-analysis/, 'the parsable workflow was evaluated');
   assert.match(capabilities.message, new RegExp(`core/workflows/broken\\.yaml: ${PARSE_PROBLEM.source}`));
 });
 

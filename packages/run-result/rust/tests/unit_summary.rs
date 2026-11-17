@@ -464,16 +464,26 @@ fn optional_verify_record_reads_in_both_shapes_and_a_malformed_one_is_invalid_co
     bad_outcome["outcome"] = json!("green");
     root.summary(&with("unit-run-verify-ran", Some(ran)));
     root.summary(&with("unit-run-verify-timeout", Some(timed_out)));
-    root.summary(&with("unit-run-verify-skipped", Some(json!({"ran": false, "reason": "no command"}))));
+    root.summary(&with(
+        "unit-run-verify-skipped",
+        Some(json!({"ran": false, "reason": "no command"})),
+    ));
     root.summary(&with("unit-run-verify-absent", None));
     root.summary(&with("unit-run-verify-no-passed", Some(no_passed)));
     root.summary(&with("unit-run-verify-bad-outcome", Some(bad_outcome)));
-    root.summary(&with("unit-run-verify-ran-only", Some(json!({"ran": true}))));
+    root.summary(&with(
+        "unit-run-verify-ran-only",
+        Some(json!({"ran": true})),
+    ));
     let mut v2 = unit("unit-run-v2-plain", &[]);
     v2["contract"]["version"] = json!(2);
     root.summary(&v2);
     let scan = scan_unit_summaries(&root.0, &Window::default()).unwrap();
-    let mut ids: Vec<_> = scan.observations.iter().map(|o| o.subject.id.clone()).collect();
+    let mut ids: Vec<_> = scan
+        .observations
+        .iter()
+        .map(|o| o.subject.id.clone())
+        .collect();
     ids.sort();
     assert_eq!(
         ids,
@@ -485,7 +495,10 @@ fn optional_verify_record_reads_in_both_shapes_and_a_malformed_one_is_invalid_co
             "unit-run:unit-run-verify-timeout",
         ]
     );
-    assert_eq!(scan.summaries_skipped_by_reason.get("invalid-contract"), Some(&3));
+    assert_eq!(
+        scan.summaries_skipped_by_reason.get("invalid-contract"),
+        Some(&3)
+    );
 }
 
 #[cfg(unix)]

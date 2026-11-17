@@ -89,7 +89,7 @@ test('every capability of the committed config binds headless to a runnable invo
   assert.ok(bound > 5, 'the committed config binds a real set of capabilities');
 });
 
-test('Workflow capabilities that name a same-verb pool bind headless', () => {
+test('Workflow capabilities with no row of their own (labels) bind headless', () => {
   for (const capability of ['coding:plan', 'group-cognition:critique', 'group-cognition:synthesize', 'delphi:synthesize']) {
     const result = bind(ask(capability), { runnerConfig, session: headless });
     assert.ok(!result.refused, `${capability}: ${JSON.stringify(result.refused)}`);
@@ -127,7 +127,8 @@ test('with no tier list either, a capability with no prefer pool is refused with
 test('a capability gets the same family and model inside herdr and headless; only the transport differs', () => {
   // claude used to be split into a cli executor and a pane-only one, so a pool that named the
   // pane one ran claude inside herdr and fell to the next family headless.
-  for (const capability of ['architecture:explain', 'business:frame', 'architecture:synthesize']) {
+  // A pool that puts claude first (the coding discovery row).
+  for (const capability of ['coding:discover']) {
     for (const rigor of ['low', 'standard', 'high', 'critical']) {
       const unitAsk = { unit: { id: 'u', capability, writes: [], rigor }, role: 'producer' };
       const pane = bind(unitAsk, { runnerConfig, session: { herdrPresent: true } });

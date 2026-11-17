@@ -70,6 +70,7 @@ deletes their Node arms and use cases (L10). `dispatch` stays a `legacy-cli` rou
 5. One `apps/fgos/tests/cli_tests.rs` case per verb (wiring proof), including `hook dispatch-decide` blocking an
    out-of-process `Task` call and allowing an in-process one, and a `PATH` without `node` showing `decide --for`,
    `explain`, `hook dispatch-decide`, `agents list` succeed (no Node child) while `decide --work` names the bridge cause.
+- From phase 05: when regenerating `command-manifest.json`, also fix the stale text in `src/cli/command-registry.mjs`: the plan-lint description (~:1397, "unregistered capability shape"; now a tool ability whose tool is not present) and the `explain --for architecture:synthesize` example (~:1598; `architecture:synthesize` is a label now).
 
 ## Files
 

@@ -384,6 +384,8 @@ runner:
       serves:
         outputKind: finding
         mutates: false
+    # The coding rows from here on stay only because the Work path and the coding skills route through them;
+    # they go once that behaviour has its own home (backlog p-nnbfsrxcss). Other job names are labels: no row.
     fgos-coding-implement:
       description: "code-implement work for the coding domain executing stage -- preferred executor gemini through agy, claude then openai as fallback."
       prefer:
@@ -458,190 +460,6 @@ runner:
         domain: code
         mutates: true
         behaviorPreserving: true
-    "marketing:research":
-      description: "acceptance-run binding for a Workflow unit, over the five provider families that can run in a confined herdr pane"
-      prefer:
-        - executor: claude
-        - executor: openai
-        - executor: gemini
-        - executor: xai
-        - executor: glm
-          invocation: pi-cli-bwrap
-    "marketing:write":
-      description: "acceptance-run binding for a Workflow unit, over the five provider families that can run in a confined herdr pane"
-      prefer:
-        - executor: claude
-        - executor: openai
-        - executor: gemini
-        - executor: xai
-        - executor: glm
-          invocation: pi-cli-bwrap
-    "marketing:publish":
-      description: "acceptance-run binding for a Workflow unit, over the five provider families that can run in a confined herdr pane"
-      prefer:
-        - executor: claude
-        - executor: openai
-        - executor: gemini
-        - executor: xai
-        - executor: glm
-          invocation: pi-cli-bwrap
-    "architecture:frame":
-      description: "acceptance-run binding for a Workflow unit, over the five provider families that can run in a confined herdr pane"
-      prefer:
-        - executor: openai
-        - executor: gemini
-        - executor: xai
-        - executor: claude
-        - executor: deepseek
-      rigor: high
-      tier: flagship
-    "architecture:shape":
-      description: "acceptance-run binding for a Workflow unit, over the five provider families that can run in a confined herdr pane"
-      prefer:
-        - executor: openai
-        - executor: claude
-        - executor: gemini
-        - executor: xai
-        - executor: deepseek
-      rigor: critical
-      tier: flagship
-      maxTier: frontier
-    "architecture:critique":
-      description: "acceptance-run binding for a Workflow unit, over the five provider families that can run in a confined herdr pane"
-      prefer:
-        - executor: xai
-        - executor: gemini
-        - executor: openai
-        - executor: claude
-        - executor: deepseek
-      rigor: high
-      tier: flagship
-      maxTier: frontier
-    "architecture:synthesize":
-      description: "acceptance-run binding for a Workflow unit, over the five provider families that can run in a confined herdr pane"
-      prefer:
-        - executor: claude
-        - executor: gemini
-        - executor: xai
-        - executor: openai
-        - executor: deepseek
-      rigor: critical
-      tier: flagship
-      maxTier: frontier
-    "architecture:explain":
-      description: "acceptance-run binding for a Workflow unit, over the five provider families that can run in a confined herdr pane"
-      prefer:
-        - executor: claude
-        - executor: openai
-        - executor: gemini
-        - executor: xai
-        - executor: deepseek
-      rigor: critical
-      tier: flagship
-    "business:frame":
-      description: "acceptance-run binding for a Workflow unit, over the five provider families that can run in a confined herdr pane"
-      prefer:
-        - executor: claude
-        - executor: openai
-        - executor: gemini
-        - executor: xai
-        - executor: glm
-          invocation: pi-cli-bwrap
-    "business:perspectives":
-      description: "acceptance-run binding for a Workflow unit, over the five provider families that can run in a confined herdr pane"
-      prefer: [gemini, deepseek, glm, claude, openai]
-    "business:critique":
-      description: "acceptance-run binding for a Workflow unit, over the five provider families that can run in a confined herdr pane"
-      prefer:
-        - executor: claude
-        - executor: openai
-        - executor: gemini
-        - executor: xai
-        - executor: glm
-          invocation: pi-cli-bwrap
-    "business:synthesize":
-      description: "acceptance-run binding for a Workflow unit, over the five provider families that can run in a confined herdr pane"
-      prefer:
-        - executor: claude
-        - executor: openai
-        - executor: gemini
-        - executor: xai
-        - executor: glm
-          invocation: pi-cli-bwrap
-      tier: standard
-    "business:plan":
-      description: "acceptance-run binding for a Workflow unit, over the five provider families that can run in a confined herdr pane"
-      prefer:
-        - executor: claude
-        - executor: openai
-        - executor: gemini
-        - executor: xai
-        - executor: glm
-          invocation: pi-cli-bwrap
-    "delphi:propose":
-      description: "Workflow unit capability \"delphi:propose\" -- declare a \"prefer\" pool to choose which executors serve it."
-      prefer: [gemini, deepseek, glm, claude, openai]
-    "delphi:synthesize":
-      description: "Workflow unit capability \"delphi:synthesize\" -- declare a \"prefer\" pool to choose which executors serve it."
-      prefer:
-        - executor: claude
-        - executor: openai
-        - executor: gemini
-        - executor: xai
-        - executor: glm
-          invocation: pi-cli-bwrap
-      tier: standard
-    "group-cognition:explore":
-      description: "Workflow unit capability \"group-cognition:explore\" -- declare a \"prefer\" pool to choose which executors serve it."
-      prefer: [gemini, deepseek, glm, claude, openai]
-    "group-cognition:critique":
-      description: "Workflow unit capability \"group-cognition:critique\" -- declare a \"prefer\" pool to choose which executors serve it."
-      prefer:
-        - executor: claude
-        - executor: openai
-        - executor: gemini
-        - executor: xai
-        - executor: glm
-          invocation: pi-cli-bwrap
-    "group-cognition:synthesize":
-      description: "Workflow unit capability \"group-cognition:synthesize\" -- declare a \"prefer\" pool to choose which executors serve it."
-      prefer:
-        - executor: claude
-        - executor: openai
-        - executor: gemini
-        - executor: xai
-        - executor: glm
-          invocation: pi-cli-bwrap
-    "nominal-group:generate":
-      description: "Workflow unit capability \"nominal-group:generate\" -- declare a \"prefer\" pool to choose which executors serve it."
-      prefer: [gemini, deepseek, glm, claude, openai]
-    "nominal-group:share":
-      description: "Workflow unit capability \"nominal-group:share\" -- declare a \"prefer\" pool to choose which executors serve it."
-      prefer:
-        - executor: claude
-        - executor: openai
-        - executor: gemini
-        - executor: xai
-        - executor: glm
-          invocation: pi-cli-bwrap
-    "nominal-group:vote":
-      description: "Workflow unit capability \"nominal-group:vote\" -- declare a \"prefer\" pool to choose which executors serve it."
-      prefer:
-        - executor: claude
-        - executor: openai
-        - executor: gemini
-        - executor: xai
-        - executor: glm
-          invocation: pi-cli-bwrap
-    "nominal-group:rank":
-      description: "Workflow unit capability \"nominal-group:rank\" -- declare a \"prefer\" pool to choose which executors serve it."
-      prefer:
-        - executor: claude
-        - executor: openai
-        - executor: gemini
-        - executor: xai
-        - executor: glm
-          invocation: pi-cli-bwrap
     "coding:*":
       tier: advanced
     "coding:discover":
@@ -653,42 +471,6 @@ runner:
         - executor: glm
           invocation: pi-cli-bwrap
       description: "Workflow unit capability \"coding:discover\" -- declare a \"prefer\" pool to choose which executors serve it."
-    "coding:explore":
-      prefer:
-        - executor: claude
-        - executor: openai
-        - executor: gemini
-        - executor: xai
-        - executor: glm
-          invocation: pi-cli-bwrap
-      description: "Workflow unit capability \"coding:explore\" -- declare a \"prefer\" pool to choose which executors serve it."
-    "coding:plan":
-      description: "acceptance-run binding for a Workflow unit, over the five provider families that can run in a confined herdr pane"
-      prefer:
-        - executor: claude
-        - executor: openai
-        - executor: gemini
-        - executor: xai
-        - executor: glm
-          invocation: pi-cli-bwrap
-    "coding:validate":
-      prefer:
-        - executor: claude
-        - executor: openai
-        - executor: gemini
-        - executor: xai
-        - executor: glm
-          invocation: pi-cli-bwrap
-      description: "Workflow unit capability \"coding:validate\" -- declare a \"prefer\" pool to choose which executors serve it."
-    "coding:implement":
-      prefer:
-        - executor: gemini
-          invocation: agy-herdr-bwrap
-        - executor: deepseek
-        - executor: glm
-        - claude
-        - openai
-      description: "Workflow unit capability \"coding:implement\" -- declare a \"prefer\" pool to choose which executors serve it."
     "docs:write":
       description: "Canonical documentation authoring capability -- write or update documents (README, specs, guides) in the working tree; declare a \"prefer\" pool to choose which executors serve it."
       serves:
@@ -700,6 +482,7 @@ runner:
     "code:*":
       tier: advanced
   # @fgos:doc Per-role tier and executor taste, for every capability; a role is producer, synthesizer, reviewer, red-team or judge.
+  # Role taste applying to every capability is a stopgap until where taste per job or seat lives is settled (backlog p-bjmoxexuwi).
   roles:
     red-team:
       prefer: [xai, claude, openai]

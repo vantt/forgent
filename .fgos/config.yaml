@@ -144,8 +144,8 @@ runner:
   # @fgos:doc advanced: finds its own way, no ready answer; self-check: must investigate and decide how?; e.g. hard debugging, complex code, many files with no plan
   # @fgos:doc flagship: judgment, design, critique; self-check: is the result an opinion or a design?; e.g. review, red-team, solution design, panel synthesis
   # @fgos:doc frontier: the costliest decisions; self-check: hard to reverse, costly if wrong?; e.g. architecture lock-in, final synthesis of an important council
-  # @fgos:why [9548be33-0b94-4fe0-b02c-5d5eb0240a61] [migrate] carried over from config.json, reason never recorded
-  maxTier: flagship
+  # @fgos:why [ec3510cc-cf0c-43c5-b19e-32964ea523d9] owner 2026-11-17: frontier, so the council seats that recommend frontier still reach it once the architecture capability rows, whose own maxTier lifted the ceiling, are gone
+  maxTier: frontier
   # @fgos:doc Generated trees a unit write scope widens to when it touches their source. Default: [].
   # @fgos:why [9548be33-0b94-4fe0-b02c-5d5eb0240a61] [migrate] carried over from config.json, reason never recorded
   generatedPaths:
