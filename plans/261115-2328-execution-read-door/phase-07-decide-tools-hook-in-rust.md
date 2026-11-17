@@ -17,8 +17,8 @@ hook (unix-only, always exit 0, another root rule), so the dispatch hook gets it
 
 ## Requirements
 
-1. Record `packages/execution/contracts/decide.v1.json` first, from Node on the post-03 tree (scratch script, never
-   committed): every selector form (`executorId`, `--for` with and without `--needs-soul`/`--has-live-task-access`, a
+1. Record `packages/execution/contracts/decide.v1.json` first, from Node on the post-03 tree (inputs by hand, `expect` recorded
+   by a script of the same shape as 01's `scripts/executor-model-vectors.mjs`, with `--check`): every selector form (`executorId`, `--for` with and without `--needs-soul`/`--has-live-task-access`, a
    name with no row, a tool ability present/missing/stale, `--assignment` with a given record, `--work` with a given
    hint, the cwd/repo-root guard, the config root rule), every runner semantic refusal, and hook cases (each CLI's payload
    form, a missing `CLAUDE_PROJECT_DIR`, agy `workspacePaths`, a linked worktree with its own config, a config refusal,

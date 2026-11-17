@@ -15,16 +15,6 @@ import { buildConfinementRequest, validateConfinementRequest } from '../../src/r
 
 const binding = (name) => [{ resource: 'private-home', target: { kind: 'env', name } }];
 
-test('credentialStoreOf: a declared store wins, an older private-home env binding implies one, anything else reads none', () => {
-  const declared = { use: 'pi', homeEnv: 'PI_CODING_AGENT_DIR', files: ['auth.json'] };
-  assert.equal(credentialStoreOf({ command: 'codex', credentialStore: declared, resourceBindings: binding('CODEX_HOME') }), declared);
-  assert.deepEqual(credentialStoreOf({ command: '/usr/local/bin/Codex', resourceBindings: binding('CODEX_HOME') }), { use: 'codex', homeEnv: 'CODEX_HOME' });
-  assert.equal(credentialStoreOf({ command: 'claude' }), null);
-  assert.equal(credentialStoreOf({ command: 'claude', resourceBindings: [{ resource: 'run-output', target: { kind: 'env', name: 'X' } }] }), null);
-  assert.equal(credentialStoreOf({ command: 'claude', resourceBindings: [{ resource: 'private-home', target: { kind: 'argument', token: '{H}' } }] }), null);
-  assert.equal(credentialStoreOf(null), null);
-});
-
 test('credentialStoreProblem names what is wrong with a declaration', () => {
   assert.equal(credentialStoreProblem({ use: 'codex', homeEnv: 'CODEX_HOME' }), null);
   assert.equal(credentialStoreProblem({ use: 'omp', homeEnv: 'PI_CODING_AGENT_DIR', files: ['agent.db', 'bin/fd'] }), null);

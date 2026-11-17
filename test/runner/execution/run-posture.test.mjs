@@ -11,7 +11,7 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 
 import { runUnitWithPort as runUnit } from '../../helpers/run-unit-with-port.mjs';
-import { resolvePosture, canApplyPosture, resolvePostureInvocation } from '../../../src/runner/dispatch/confinement/policies.mjs';
+import { resolvePosture, canApplyPosture } from '../../../src/runner/dispatch/confinement/policies.mjs';
 import { seedFileLocalBwrapRegistry } from '../confinement-registry-fixture.helper.mjs';
 
 seedFileLocalBwrapRegistry();
@@ -239,25 +239,6 @@ test('resolvePosture maps posture onto the built-in policies without building sa
   // an unknown or missing posture never widens access
   assert.equal(resolvePosture({ posture: 'anything-else' }).policyId, 'host-write-denied');
   assert.equal(resolvePosture(undefined).policyId, 'host-write-denied');
-});
-
-test('resolvePostureInvocation selects the first cli invocation that can carry the posture', () => {
-  const ctx = {
-    executors: {
-      two: {
-        invocations: [
-          { id: 'cli-plain', via: 'cli', command: 'x' },
-          { id: 'cli-bwrap', via: 'cli', command: 'x', confinement: { backend: 'bwrap' } },
-        ],
-      },
-      noid: { invocations: [{ via: 'cli', command: 'x' }, { via: 'cli', command: 'y', confinement: { backend: 'bwrap' } }] },
-    },
-  };
-  assert.deepEqual(resolvePostureInvocation({ executor: 'two', invocation: null }, 'read-only', ctx), { ok: true, invocation: 'cli-bwrap' });
-  assert.deepEqual(resolvePostureInvocation({ executor: 'two', invocation: 'cli-bwrap' }, 'read-only', ctx), { ok: true, invocation: 'cli-bwrap' });
-  assert.equal(resolvePostureInvocation({ executor: 'two', invocation: 'cli-plain' }, 'read-only', ctx).ok, false);
-  // a confined invocation with no id cannot be pinned and is not the default one: no approval
-  assert.equal(resolvePostureInvocation({ executor: 'noid', invocation: null }, 'read-only', ctx).ok, false);
 });
 
 test('canApplyPosture needs a declared backend that is registered and executable on this machine', () => {

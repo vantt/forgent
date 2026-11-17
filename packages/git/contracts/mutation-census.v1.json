@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "77c3511610d813871af42c37711b95e6b79cffa231c8030f765cc36a1e532c87",
+  "payloadDigest": "33c26dfd5e5742ed281eb8454e23133342b0e3b446e16b72508c82466a1e56af",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "b8b886cee2ea5ce7ee1153e4795512db135a990de894c27e53c5e778b210be62",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -890,6 +890,7 @@
     "scripts/event-store/settle-host-proof.mjs": "e376107a9be596e06c5d11df91c1211d3a0014983196a6ae93b5c349f50554dc",
     "scripts/event-store/store-increment-worker.mjs": "e14caa7c6067ac0f5c99f18f163431e079894a72e1bded877b0faeeeb7933479",
     "scripts/event-store/v-spawn-bench.mjs": "076166b6a8397ab2cba6d416c234d989140574995930cff5bc996464d55bc21e",
+    "scripts/executor-model-vectors.mjs": "e71d685b61198dd35e8afa6bd7771410abb3e45e2c2851781c13c26f0c61590a",
     "scripts/explain-command-route.mjs": "db546d74676a1c91c3309241dcb618dc438fbae79448f4e2253319657dbbee24",
     "scripts/export-command-selectors.mjs": "8347ac6f9232df87b1e4b3ab8ec20063872796b36119ffb3b3d9c0ba10a4e521",
     "scripts/fgos-session-start-hook.mjs": "6ec944bb42698570cb5cb860d24bde1229d884f968ce0f6771c05b9c11a93af6",

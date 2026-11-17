@@ -1,6 +1,6 @@
 {
  "version": "executor-model.v1",
- "about": "Golden vectors of the executor model: what is derived from an executor entry and the machine, recorded from the Node functions that derive it today. A vector is { name, fact, entry?, runner?, machine?, args?, expect }. fact names the derivation; entry is one executor entry and runner the effective runner config the fact reads; machine describes the machine facts it reads (pathCommands: the only programs on PATH, registry: the confinement backend registry as absent/a document/raw text, home, accountState: the lease state file, files: relative path to text under the repository root, git: a repository with one commit); args are the remaining arguments; expect is the answer, a refusal being { error: { name, code?, message } }. A vector marked knownDefect records today's output of behaviour that looks wrong and is reported, not fixed. A vector marked retiring records a legacy read that goes with its configs; a port may leave it out. The doc is docs/platform/runner/contracts/executor-model.md.",
+ "about": "Golden vectors of the executor model: what is derived from an executor entry and the machine, recorded from the Node functions that derive it today. A vector is { name, fact, entry?, runner?, machine?, args?, expect }. fact names the derivation; entry is one executor entry and runner the effective runner config the fact reads; machine describes the machine facts it reads (pathCommands: the only programs on PATH, registry: the confinement backend registry as absent/a document/raw text, home, accountState: the lease state file, files: relative path to text under the repository root, git: a repository with one commit); args are the remaining arguments; expect is the answer, a refusal being { error: { name, code?, message } }. A vector marked knownDefect records today's output of behaviour that looks wrong and is reported, not fixed. The two vectors that record the legacy resourceBindings read of credentialStore are deleted by the change that removes that read; until then a port keeps today's behaviour, as it does for a knownDefect. The doc is docs/platform/runner/contracts/executor-model.md.",
  "facts": ["defaultExecutor","family","executorLookup","governance","capabilityConfinement","credentialStore","effortLevels","mechanism","posture","launchFacts","missingCli","accountQuarantine","accountInventory","llmAccounts","stateKey","toolProviders","validate"],
  "vectors": [
   {
@@ -38,6 +38,12 @@
    "fact": "defaultExecutor",
    "runner": {"executor":{"command":"/usr/local/bin/claude","args":["-p"]},"executors":{"claude":{"kind":"agent","providerModel":"claude","invocations":[{"id":"claude-cli","via":"cli","adapter":"cli-spawn","command":"claude"}]}}},
    "expect": {"executor":{"command":"/usr/local/bin/claude","args":["-p"]},"executors":{"claude":{"kind":"agent","providerModel":"claude","invocations":[{"id":"claude-cli","via":"cli","adapter":"cli-spawn","command":"claude"}],"command":"/usr/local/bin/claude","args":["-p"]},"/usr/local/bin/claude":{"command":"/usr/local/bin/claude","args":["-p"]}}}
+  },
+  {
+   "name": "defaultExecutor: a default naming another registered program keeps that entry and gives claude the default alone",
+   "fact": "defaultExecutor",
+   "runner": {"executor":{"command":"codex","args":["exec"]},"executors":{"codex":{"kind":"agent","providerModel":"openai","invocations":[{"id":"codex-cli","via":"cli","command":"codex"}]}}},
+   "expect": {"executor":{"command":"codex","args":["exec"]},"executors":{"codex":{"kind":"agent","providerModel":"openai","invocations":[{"id":"codex-cli","via":"cli","command":"codex"}],"command":"codex","args":["exec"]},"claude":{"command":"codex","args":["exec"]}}}
   },
   {
    "name": "family: the spelling \"claude\" names the family claude",
@@ -384,14 +390,24 @@
    "name": "credentialStore: a private-home env binding implies the store of the CLI the command runs",
    "fact": "credentialStore",
    "args": {"invocation":{"command":"/opt/bin/Pi","resourceBindings":[{"resource":"private-home","target":{"kind":"env","name":"PI_CODING_AGENT_DIR"}}]}},
-   "retiring": "a legacy read of resourceBindings for configs written before credentialStore existed; it goes when those configs have moved, and the port keeps only the declared store",
    "expect": {"use":"pi","homeEnv":"PI_CODING_AGENT_DIR"}
   },
   {
    "name": "credentialStore: a private-home binding on a command-less invocation implies nothing",
    "fact": "credentialStore",
    "args": {"invocation":{"resourceBindings":[{"resource":"private-home","target":{"kind":"env","name":"PI_CODING_AGENT_DIR"}}]}},
-   "retiring": "a legacy read of resourceBindings for configs written before credentialStore existed; it goes when those configs have moved, and the port keeps only the declared store",
+   "expect": null
+  },
+  {
+   "name": "credentialStore: a private-home binding whose target is an argument reads none",
+   "fact": "credentialStore",
+   "args": {"invocation":{"command":"claude","resourceBindings":[{"resource":"private-home","target":{"kind":"argument","token":"{H}"}}]}},
+   "expect": null
+  },
+  {
+   "name": "credentialStore: a binding of another resource reads none",
+   "fact": "credentialStore",
+   "args": {"invocation":{"command":"claude","resourceBindings":[{"resource":"run-output","target":{"kind":"env","name":"X"}}]}},
    "expect": null
   },
   {
@@ -538,6 +554,13 @@
    "fact": "mechanism",
    "runner": {"executor":{"command":"claude","args":["-p"]},"executors":{}},
    "args": {"executorId":"claude","hasLiveTaskAccess":true},
+   "expect": "out-of-process"
+  },
+  {
+   "name": "mechanism: a tool with its own command is out-of-process whatever the session has",
+   "fact": "mechanism",
+   "runner": {"executor":{"command":"claude","args":["{prompt}"]},"executors":{"classify":{"kind":"tool","command":"agy","args":["{prompt}"]}}},
+   "args": {"executorId":"classify","hasLiveTaskAccess":true},
    "expect": "out-of-process"
   },
   {
@@ -731,6 +754,14 @@
    "machine": {"pathCommands":["claude","codex","pi","agy","omp","bwrap"],"registry":{"contract":"confinement-backend-registry.v1","confinementBackends":{"bwrap":{"type":"bwrap","enabled":true}}}},
    "args": {"candidate":{"executor":"typed"}},
    "expect": {"ok":true,"invocation":null}
+  },
+  {
+   "name": "posture: a confined invocation with no id is not the default one, so nothing is approved",
+   "fact": "posture",
+   "runner": {"executors":{"noid":{"kind":"agent","invocations":[{"via":"cli","command":"x"},{"via":"cli","command":"y","confinement":{"backend":"bwrap"}}]}}},
+   "machine": {"pathCommands":["bwrap"],"registry":{"contract":"confinement-backend-registry.v1","confinementBackends":{"bwrap":{"type":"bwrap","enabled":true}}}},
+   "args": {"candidate":{"executor":"noid","invocation":null}},
+   "expect": {"ok":false,"invocation":null}
   },
   {
    "name": "launchFacts: executors on a machine with every CLI and a working backend (outside herdr)",
@@ -1253,6 +1284,12 @@
    "expect": "xai"
   },
   {
+   "name": "stateKey: the pool gemini is keyed gemini in lease state",
+   "fact": "stateKey",
+   "args": {"pool":"gemini"},
+   "expect": "gemini"
+  },
+  {
    "name": "toolProviders: an mcp tool whose scan target exists is present and names its mcp tool and its cli command",
    "fact": "toolProviders",
    "runner": {"executors":{"gitnexus":{"kind":"tool","for":["impact-analysis"],"scanTarget":".gitnexus","invocations":[{"id":"gitnexus-mcp","via":"mcp","tools":{"impact-analysis":"impact"}},{"id":"gitnexus-cli","via":"cli","command":"gitnexus"}]}}},
@@ -1355,6 +1392,125 @@
    "machine": {"pathCommands":["a"]},
    "args": {"capability":"x"},
    "expect": [{"executorId":"second","capability":"x","status":"missing","command":"b"},{"executorId":"first","capability":"x","status":"present","command":"a"}]
+  },
+  {
+   "name": "toolProviders: an executor serving two capabilities answers the second",
+   "fact": "toolProviders",
+   "runner": {"executors":{"multi":{"kind":"tool","for":["first","second"],"invocations":[{"id":"m","via":"cli","command":"multi"}]}}},
+   "machine": {"pathCommands":["multi"]},
+   "args": {"capability":"second"},
+   "expect": [{"executorId":"multi","capability":"second","status":"present","command":"multi"}]
+  },
+  {
+   "name": "toolProviders: an executor serving two capabilities answers none for a third",
+   "fact": "toolProviders",
+   "runner": {"executors":{"multi":{"kind":"tool","for":["first","second"],"invocations":[{"id":"m","via":"cli","command":"multi"}]}}},
+   "machine": {"pathCommands":["multi"]},
+   "args": {"capability":"third"},
+   "expect": []
+  },
+  {
+   "name": "toolProviders: spellings are folded: asking \"impact-analysis\" over two differently spelled for entries",
+   "fact": "toolProviders",
+   "runner": {"executors":{"a":{"kind":"tool","for":["Impact Analysis"]},"b":{"kind":"tool","for":["impact_analysis"]}}},
+   "machine": {},
+   "args": {"capability":"impact-analysis"},
+   "expect": [{"executorId":"a","capability":"impact-analysis","status":"unknown"},{"executorId":"b","capability":"impact-analysis","status":"unknown"}]
+  },
+  {
+   "name": "toolProviders: spellings are folded: asking \"IMPACT_ANALYSIS\" over two differently spelled for entries",
+   "fact": "toolProviders",
+   "runner": {"executors":{"a":{"kind":"tool","for":["Impact Analysis"]},"b":{"kind":"tool","for":["impact_analysis"]}}},
+   "machine": {},
+   "args": {"capability":"IMPACT_ANALYSIS"},
+   "expect": [{"executorId":"a","capability":"impact-analysis","status":"unknown"},{"executorId":"b","capability":"impact-analysis","status":"unknown"}]
+  },
+  {
+   "name": "toolProviders: spellings are folded: asking \" Impact Analysis \" over two differently spelled for entries",
+   "fact": "toolProviders",
+   "runner": {"executors":{"a":{"kind":"tool","for":["Impact Analysis"]},"b":{"kind":"tool","for":["impact_analysis"]}}},
+   "machine": {},
+   "args": {"capability":" Impact Analysis "},
+   "expect": [{"executorId":"a","capability":"impact-analysis","status":"unknown"},{"executorId":"b","capability":"impact-analysis","status":"unknown"}]
+  },
+  {
+   "name": "toolProviders: spellings are folded: asking \"\" over two differently spelled for entries",
+   "fact": "toolProviders",
+   "runner": {"executors":{"a":{"kind":"tool","for":["Impact Analysis"]},"b":{"kind":"tool","for":["impact_analysis"]}}},
+   "machine": {},
+   "args": {"capability":""},
+   "expect": []
+  },
+  {
+   "name": "toolProviders: spellings are folded: asking \"---\" over two differently spelled for entries",
+   "fact": "toolProviders",
+   "runner": {"executors":{"a":{"kind":"tool","for":["Impact Analysis"]},"b":{"kind":"tool","for":["impact_analysis"]}}},
+   "machine": {},
+   "args": {"capability":"---"},
+   "expect": []
+  },
+  {
+   "name": "toolProviders: a cli tool is missing when another program is on PATH",
+   "fact": "toolProviders",
+   "runner": {"executors":{"herdr":{"kind":"tool","for":["pane-labeling"],"invocations":[{"id":"m","via":"cli","command":"fgos-herdr-probe"}]}}},
+   "machine": {"pathCommands":["another-tool"]},
+   "args": {"capability":"pane-labeling"},
+   "expect": [{"executorId":"herdr","capability":"pane-labeling","status":"missing","command":"fgos-herdr-probe"}]
+  },
+  {
+   "name": "toolProviders: a tool with a herdr-spawn invocation or an mcp invocation without a target cannot be probed",
+   "fact": "toolProviders",
+   "runner": {"executors":{"bare":{"kind":"tool","for":["x"]},"noTarget":{"kind":"tool","for":["x"],"invocations":[{"via":"mcp","command":"mcp:t"}]},"other":{"kind":"tool","for":["x"],"invocations":[{"via":"herdr-spawn"}]}}},
+   "machine": {},
+   "args": {"capability":"x"},
+   "expect": [{"executorId":"bare","capability":"x","status":"unknown"},{"executorId":"noTarget","capability":"x","status":"unknown"},{"executorId":"other","capability":"x","status":"unknown"}]
+  },
+  {
+   "name": "toolProviders: the mcp tool is read from its tools key folded, the command from the cli invocation",
+   "fact": "toolProviders",
+   "runner": {"executors":{"both":{"kind":"tool","for":["impact-analysis"],"invocations":[{"id":"m","via":"cli","command":"impact-cli"},{"via":"mcp","command":"mcp:impact","tools":{"Impact Analysis":"mcp__impact__run","other":"mcp__impact__other"}}]}}},
+   "machine": {"pathCommands":["impact-cli"]},
+   "args": {"capability":"impact-analysis"},
+   "expect": [{"executorId":"both","capability":"impact-analysis","status":"present","mcpTool":"mcp__impact__run","command":"impact-cli"}]
+  },
+  {
+   "name": "toolProviders: providers come in registry order when no tool has anything to probe",
+   "fact": "toolProviders",
+   "runner": {"executors":{"second":{"kind":"tool","for":["x"]},"first":{"kind":"tool","for":["x"]}}},
+   "machine": {},
+   "args": {"capability":"x"},
+   "expect": [{"executorId":"second","capability":"x","status":"unknown"},{"executorId":"first","capability":"x","status":"unknown"}]
+  },
+  {
+   "name": "toolProviders: with no capability a tool is listed once per distinct capability, an agent and a bare tool serve none",
+   "fact": "toolProviders",
+   "runner": {"executors":{"multi":{"kind":"tool","for":["a","b","A"]},"single":{"kind":"tool","for":["c"]},"agent":{"kind":"agent","for":["d"]},"none":{"kind":"tool"}}},
+   "machine": {},
+   "args": {},
+   "expect": [{"executorId":"multi","capability":"a","status":"unknown"},{"executorId":"multi","capability":"b","status":"unknown"},{"executorId":"single","capability":"c","status":"unknown"}]
+  },
+  {
+   "name": "toolProviders: a config with no executors has no providers",
+   "fact": "toolProviders",
+   "runner": {},
+   "machine": {},
+   "args": {"capability":"x"},
+   "expect": []
+  },
+  {
+   "name": "toolProviders: no config has no providers",
+   "fact": "toolProviders",
+   "machine": {},
+   "args": {},
+   "expect": []
+  },
+  {
+   "name": "toolProviders: an unreadable index record reads as not stale",
+   "fact": "toolProviders",
+   "runner": {"executors":{"index":{"kind":"tool","for":["impact-analysis"],"scanTarget":".index","invocations":[{"via":"mcp","command":"mcp:index","tools":{"impact-analysis":"mcp__index__impact"}}]}}},
+   "machine": {"files":{".index/meta.json":"{ not json"},"git":true},
+   "args": {"capability":"impact-analysis"},
+   "expect": [{"executorId":"index","capability":"impact-analysis","status":"present","mcpTool":"mcp__index__impact"}]
   },
   {
    "name": "validate: the standard executors are valid",

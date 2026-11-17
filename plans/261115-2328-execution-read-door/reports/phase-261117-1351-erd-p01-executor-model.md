@@ -10,47 +10,56 @@ Branch `execution-read-door/p01`, cut from `origin/execution-read-door/integrati
   rule, the hook (payload, verdict, exit contract), who decides what, the version, and four observed differences. Written by
   hand: `fgos doc` manages knowledge-slot docs (reserve, register), not hand-named contracts, so it has no create path for
   this file; the header block follows `unit-run-result.md`.
-- `packages/execution/contracts/executor-model.v1.json` (new): 218 vectors over 17 facts (`defaultExecutor`, `family`,
+- `packages/execution/contracts/executor-model.v1.json` (new): 239 vectors over 17 facts (`defaultExecutor`, `family`,
   `executorLookup`, `governance`, `capabilityConfinement`, `credentialStore`, `effortLevels`, `mechanism`, `posture`,
   `launchFacts`, `missingCli`, `accountQuarantine`, `accountInventory`, `llmAccounts`, `stateKey`, `toolProviders`,
-  `validate`), recorded from today's Node functions by a scratch script under `.fgos/runtime/tmp/` (not committed;
-  recording twice is byte-identical). Each vector carries its own `machine` block (PATH programs, confinement registry,
+  `validate`), recorded from today's Node functions by the committed `scripts/executor-model-vectors.mjs` (rewrites only
+  `expect`; `--check` exits non-zero on drift), the one regenerate path for 06, 07, 08 and 15. Each vector carries its own `machine` block (PATH programs, confinement registry,
   home, lease state, files, a git repository), so no vector depends on the machine. Every vector was read by hand against the
   code path; the notable ones are in the doc, section 11.
 - `test/runner/dispatch/executor-model-vectors.test.mjs` (new, 1 test): "Node launch code derives the same executor facts as
   the executor-model contract". Also asserts the file's fact list equals the facts covered and vector names are unique.
-- `test/helpers/executor-model-vectors.helper.mjs` (new, not in the phase file list): the evaluator the recorder and the test
-  share, so the two cannot read a vector differently. One evaluator, no copy.
+- `test/helpers/executor-model-vectors.helper.mjs` and `scripts/executor-model-vectors.mjs` (new, listed in the phase file now): the
+  evaluator the script and the test share, and the record/`--check` script.
 - `docs/platform/component-boundary.md` (one row), `docs/platform/runner/subcomponents/h-f34e0d170d89/spec.md` (one Pointers
-  line), `docs/reading-map.md` (one row), `test/suite-baseline.json` (regenerated).
+  line), `docs/reading-map.md` (one row), `test/suite-baseline.json` is NOT changed on this branch (regenerated once at landing).
 - Not recorded here, by design: bind, decide, hook and listing vectors (phases 06, 07, 08). Their shapes are in the doc.
   The seat-config digest is a bind fact; its shape is in the doc and its vectors belong with bind.
 
 ## credentialStoreOf case recorded
 
-The cleanup phase (15) had **not** landed on `origin/execution-read-door/integration` (head 03c9be920) when I reached it. I
-recorded the case **with** the `resourceBindings` inference, and marked the two inference vectors `"retiring"` so a port keeps
-only the declared store and the Node twin test drops them with the inference. When 15 lands, delete those two vectors (the
-file says which) and re-record nothing else.
+Phase 15 had not landed on `origin/execution-read-door/integration` when I reached it, so the vectors include the
+`resourceBindings` inference (two vectors). They carry no special mark: the change that removes the inference deletes them,
+and until then a port keeps today's behaviour, as for a `knownDefect`. The doc and the file's `about` say so.
 
-## Retired test -> owner now
+## Retired test -> owner now (vectors of `executor-model.v1.json` are the owner)
 
-None. No test was retired.
+| Retired test | Owner now (vector, fact) |
+|---|---|
+| `default-executor-merge.test.mjs`: keeps a registered executor's invocations; fills the entry named by its command; unchanged registry without a default; another program replaces the entry; absolute path keeps the entry (5 tests) | `defaultExecutor` vectors (7). The non-mutation test stays: no vector observes the input |
+| `credential-store.test.mjs`: `credentialStoreOf` declared / older env binding / none | `credentialStore` vectors (9). `credentialStoreProblem` and the config-check tests stay |
+| `tool-providers.test.mjs`: two-capability read, spelling fold, agent ignores `for`, cli present/missing, unknown, mcpTool+command, config order, no capability, no executors (9 tests) | `toolProviders` vectors (28). Kept: `forEntriesOf`, `servedCapabilitiesOf`, absolute-path cli (a vector cannot name a temp path), the mcp probe test (needs the real HEAD sha for "index records HEAD") |
+| `llm-accounts.test.mjs`: old state key of a pool | `stateKey` vectors (9) |
+| `dispatch.test.mjs`: five `decideExecutorDispatchMechanism` tests; `lookupExecutor` literal id (x2) and nothing resolves | `mechanism` (+1 tool-with-command vector) and `executorLookup` vectors. Kept: "lookupExecutor never binds a purpose", and every `validateRunnerConfigShape` test (each asserts a specific message or a mixed scenario; not a same-layer duplicate of one vector) |
+| `run-posture.test.mjs`: `resolvePostureInvocation` first carrying invocation | `posture` vectors (+1 id-less vector). `canApplyPosture` stays (another function) |
+
+Kept on purpose, not duplicates: `capability-config.test.mjs` (every case mixes other readers, wrapped configs or prototype
+names around `capabilityConfinementOf`), `dispatch-confinement-policies.test.mjs` posture test (directory and absolute-path
+executables are not expressible as a vector).
 
 ## Gates run
 
 All green: `test/runner/dispatch/executor-model-vectors.test.mjs` (1/1), `test/setup/git-mutation-census.test.mjs`,
 `test/architecture.test.mjs` (71), `test/scripts/doc-health.test.mjs` (8), `test/scripts/check-decision-citation-drift.test.mjs`
-(33), `test/runner/dead-vocabulary-guard.test.mjs` (10, reads the runner spec), `test/scripts/test-proof-inventory.test.mjs`
-(31). `node scripts/doc-health.mjs`: 0 findings. `node scripts/git-one-door-scan.mjs --root .`: 0 undeclared; the
+(33), `test/runner/dead-vocabulary-guard.test.mjs` (10), `test/scripts/test-proof-inventory.test.mjs` (31), and each touched test file
+and its neighbours one per run (`default-executor-merge`, `credential-store`, `tool-providers`, `llm-accounts`, `dispatch` 215,
+`run-posture`, `capability-config`, `dispatch-confinement-policies`, `provider-per-cli-credential-sources`,
+`provider-pool-lease`, `dispatch-config-patterns`), all green; `scripts/executor-model-vectors.mjs --check` passes. `node scripts/doc-health.mjs`: 0 findings. `node scripts/git-one-door-scan.mjs --root .`: 0 undeclared; the
 census regenerated byte-identical (no census hunk). No Rust changed; no cargo gate besides the host build the test needs
 (debug host built once in `erd-p01-target`). Red first: the test and helper were pushed (a93a23b19) before the vector file existed.
 
 ## Things to know
 
-- `test/suite-baseline.json` regenerated on this tree: the base's line was stale (620 files, 8 030 tests, 2 294 Rust tests at
-  sha 85ac6480) so the diff shows 611 files, 7 964 tests, 3 053 Rust tests. That is the tree's drift, not this change (+1
-  file, +1 test). `wallSeconds` and `cpuSeconds` kept (no full suite run).
 - The twin test needs the Seat Binding host (it reads the launch view through `explainSeat`, the only door that builds it)
   and the Git addon (tool staleness), like `bind.test.mjs`; both come from `scripts/run-tests.mjs`. No test-only switch.
 - Vectors set PATH to a temporary directory holding only the stubbed programs a vector lists, and HOME only when a fact
@@ -71,5 +80,5 @@ census regenerated byte-identical (no census hunk). No Rust changed; no cargo ga
 - The doc stays Draft: the owner has not reviewed it.
 
 Status: DONE_WITH_CONCERNS
-Summary: Contract doc, 218 recorded vectors over 17 facts and the Node twin test are in; gates green.
-Concerns: credentialStoreOf recorded with the legacy inference (two vectors marked `retiring`); one extra helper file; suite baseline shows unrelated drift.
+Summary: Contract doc, 239 recorded vectors over 17 facts and the Node twin test are in; gates green.
+Concerns: credentialStoreOf vectors include the legacy inference until its removal change deletes them.
