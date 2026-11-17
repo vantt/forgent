@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "9f4f08697a55294cba01136797ebf0fb9b7614ddb8e9f1f49e26d5fc11223db5",
+  "payloadDigest": "ceda03fef6d0498890bfe06db49b2315318533ead950db02008e8ecdd9c76eec",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "a5629383f89b4488b252a62f0ea86463e649e33e0a891db1a19af2cd6c136aca",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -204,7 +204,7 @@
     "packages/agent-protocol/rust/src/lib.rs": "dd9d8764d9af4b9a503c2f1c5768b5b32829062d060767a64d19fff9faa21077",
     "packages/agent-protocol/rust/src/outcome.rs": "65ce7057bb4e1670a1db4891a8d1a5a131424b3bbbcafe2f595f04069853ec93",
     "packages/agent-protocol/rust/src/port.rs": "e7114a49dc37bffd9e5cbaae36b4a8a7f22be5892d8062d4c63f96d09d402e43",
-    "packages/agent-protocol/rust/src/terminal/agy.rs": "f5362dace92aba76fa0a63043cd32436dc64198a2101206455d5bca52bad1916",
+    "packages/agent-protocol/rust/src/terminal/agy.rs": "9024ad417305a5eba5ff25e93c517bad9c2e019b203f5cc9d4630a009ac8e9a5",
     "packages/agent-protocol/rust/src/terminal/claude.rs": "30603dcba3c52317c9278f74f71c69135baded8e0865bbe33e4a818b173c46bd",
     "packages/agent-protocol/rust/src/terminal/codex.rs": "3ffb4de7b61daa202f06634b6914c505dbb402f2b40e8b45235f79bbf83d03aa",
     "packages/agent-protocol/rust/src/terminal/common.rs": "6dfb6d011a247da4c7fd3d580ef0030c91bd8ccbdac19dfb4d8b939f386fd744",
