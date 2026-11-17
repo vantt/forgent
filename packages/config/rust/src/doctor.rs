@@ -135,7 +135,8 @@ fn leaves(json: &Value) -> Vec<Vec<Segment>> {
 
 /// The per-capability taste keys a file still holds (`runner.capabilities.<x>.roles|personas|seats`)
 /// and what moving them takes. Roles and personas go to `runner.roles` and `runner.personas`, leaf by
-/// leaf; a seat has no place in the new shape and is dropped.
+/// leaf, but only in a file that may hold them (the project file: the new tables are project-only);
+/// a seat has no place in the new shape and is dropped, and so is taste found in the global file.
 #[derive(Debug, Default)]
 pub(crate) struct TastePlan {
     /// Every retired entry, at the depth of the role, persona or seat name.
@@ -149,9 +150,20 @@ pub(crate) struct TastePlan {
 #[derive(Debug)]
 pub(crate) struct TasteName {
     pub path: Vec<Segment>,
-    pub seat: bool,
+    pub fate: Fate,
     /// The other path holding a different value for the same target, when there is one.
     pub conflict: Option<String>,
+}
+
+/// What becomes of one retired entry.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum Fate {
+    /// Moved to `runner.roles` or `runner.personas`, where it applies to every capability.
+    Moved,
+    /// Dropped: a seat, or an entry that holds no taste (not a mapping, or empty).
+    Removed,
+    /// Dropped because the file cannot hold the new tables; the taste belongs in the project file.
+    Homeless,
 }
 
 #[derive(Debug)]
@@ -172,9 +184,9 @@ fn key(name: &str) -> Segment {
     Segment::Key(name.to_string())
 }
 
-/// What the retired taste keys of the file `json` need. Reads the one file; nothing about the other
-/// layers or the standard.
-pub(crate) fn taste_plan(json: &Value) -> TastePlan {
+/// What the retired taste keys of the file `json` need; `moves` says whether the file may hold the new
+/// tables. Reads the one file; nothing about the other layers or the standard.
+pub(crate) fn taste_plan(json: &Value, moves: bool) -> TastePlan {
     let mut plan = TastePlan::default();
     let base = [key("runner"), key("capabilities")];
     let Some(rows) = json_at(json, &base).and_then(Value::as_object) else {
@@ -198,18 +210,19 @@ pub(crate) fn taste_plan(json: &Value) -> TastePlan {
                 plan.keys.push(key_gone);
             }
             let entries = table.as_object().filter(|m| !m.is_empty());
-            let Some(entries) = entries.filter(|_| kind != "seats") else {
-                let names = table
-                    .as_object()
-                    .filter(|m| !m.is_empty() && kind == "seats");
-                let paths = names.map_or(vec![held.clone()], |m| {
+            let Some(entries) = entries.filter(|_| kind != "seats" && moves) else {
+                let fate = match (kind, entries.is_some()) {
+                    ("seats", _) | (_, false) => Fate::Removed,
+                    _ => Fate::Homeless,
+                };
+                let paths = entries.map_or(vec![held.clone()], |m| {
                     m.keys()
                         .map(|n| [held.clone(), vec![key(n)]].concat())
                         .collect()
                 });
                 plan.names.extend(paths.into_iter().map(|path| TasteName {
                     path,
-                    seat: kind == "seats",
+                    fate,
                     conflict: None,
                 }));
                 continue;
@@ -250,7 +263,7 @@ pub(crate) fn taste_plan(json: &Value) -> TastePlan {
                 }
                 plan.names.push(TasteName {
                     path,
-                    seat: false,
+                    fate: Fate::Moved,
                     conflict,
                 });
             }
@@ -315,13 +328,14 @@ impl Judged<'_> {
             };
             self.put(out, row, &change.finding.path, detail);
         }
-        let taste = taste_plan(&json);
+        let taste = taste_plan(&json, self.kind != SourceKind::Global);
         let stuck = taste.blocked();
         for name in taste.names {
-            let detail = match (&name.conflict, name.seat) {
+            let detail = match (&name.conflict, name.fate) {
                 (Some(other), _) => format!("conflict {other}"),
-                (None, true) => "removed".to_string(),
-                (None, false) => "moved".to_string(),
+                (None, Fate::Removed) => "removed".to_string(),
+                (None, Fate::Homeless) => "removed belongs-in-project-file".to_string(),
+                (None, Fate::Moved) => "widened-to-every-capability".to_string(),
             };
             let mut found = Finding::new("config-capability-taste-moved", &detail);
             found = found.at(&self.name, &name.path, Some(self.doc));

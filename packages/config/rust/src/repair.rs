@@ -2,6 +2,7 @@
 //! owns the work (the write transaction, the machine files, the relocation); none has a second
 //! implementation of it. A repair with nothing left to do changes nothing, so a second run applies
 //! nothing. A report names fix id and path, never a value. A confined session is refused.
+use std::collections::BTreeSet;
 use std::fs;
 use std::path::Path;
 
@@ -121,14 +122,18 @@ fn edit_files(
     Ok(paths)
 }
 
-/// The reason a value moved without one of its own is written with.
+/// The reason a value moved without one of its own is written with, and the one for a removal.
 const MOVED_REASON: &str = "[doctor:fix] moved out of the capability row";
+const REMOVED_REASON: &str = "[doctor:fix] retired capability taste removed";
 
-/// `move-capability-taste` on the project and global YAML files: the roles and personas a capability
-/// row holds go to `runner.roles` and `runner.personas` with the reason line each value carried, the
-/// seats go away. One write transaction takes the new values and removes the old keys together, so the
-/// file is sound under a schema that no longer allows the old keys; a value whose reason differs from
-/// that transaction's is then written again under its own. A file where two places give one target
+/// `move-capability-taste` on the project and global YAML files. In the project file the roles and
+/// personas a capability row holds go to `runner.roles` and `runner.personas` (so a value written for one
+/// capability now applies to every capability) with the reason text each carried, and the seats go away.
+/// The global file cannot hold the new tables, so its retired keys are only removed. One write
+/// transaction takes the new values and removes the old keys together, so the file is sound under a
+/// schema that no longer allows the old keys. The write door takes one reason per transaction, so a
+/// value whose reason differs from that transaction's is written again under its own in a following
+/// transaction chained on the revision the first one made. A file where two places give one target
 /// different values is left as it is (the row names both paths).
 fn move_taste(
     ctx: &Context,
@@ -137,11 +142,13 @@ fn move_taste(
 ) -> Result<Vec<String>, SnapshotError> {
     let mut paths = Vec::new();
     for kind in [SourceKind::Project, SourceKind::Global] {
-        let Some(file) = yaml_file(&req(kind))? else {
+        // One request per file: its revision is the one the read and the write both stand on.
+        let mut base = req(kind);
+        let Some(file) = yaml_file(&base)? else {
             continue;
         };
         let doc = parse(&file.bytes, Profile::StrictConfig, YAML_NAME)?;
-        let plan = taste_plan(&doc.to_json()?);
+        let plan = taste_plan(&doc.to_json()?, kind == SourceKind::Project);
         if plan.keys.is_empty() || plan.blocked() {
             continue;
         }
@@ -158,7 +165,7 @@ fn move_taste(
         let first = reasons
             .first()
             .cloned()
-            .unwrap_or_else(|| MOVED_REASON.into());
+            .unwrap_or_else(|| REMOVED_REASON.into());
         let sets = plan.sets.iter().map(|set| Edit::Set {
             path: set.to.clone(),
             value: set.value.clone(),
@@ -167,15 +174,14 @@ fn move_taste(
             .keys
             .iter()
             .map(|path| Edit::Unset { path: path.clone() });
-        let mut request = req(kind);
-        request.edits = sets.chain(unsets).collect();
-        request.reason = first.clone();
-        request.acknowledge_comment_loss = true;
-        commit(ctx, &request, writer)?;
-        let mut rewritten: Vec<&String> = reasons.iter().filter(|r| **r != first).collect();
-        rewritten.dedup();
-        for reason in rewritten {
+        base.edits = sets.chain(unsets).collect();
+        base.reason = first.clone();
+        base.acknowledge_comment_loss = true;
+        let mut revision = commit(ctx, &base, writer)?.new_revision;
+        let others: BTreeSet<&String> = reasons.iter().filter(|r| **r != first).collect();
+        for reason in others {
             let mut request = req(kind);
+            request.expected = Some(revision);
             request.edits = plan
                 .sets
                 .iter()
@@ -187,7 +193,7 @@ fn move_taste(
                 })
                 .collect();
             request.reason = reason.clone();
-            commit(ctx, &request, writer)?;
+            revision = commit(ctx, &request, writer)?.new_revision;
         }
         paths.extend(plan.names.iter().map(|name| format_path(&name.path)));
     }

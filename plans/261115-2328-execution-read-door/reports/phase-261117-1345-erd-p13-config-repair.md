@@ -41,3 +41,17 @@ Further gates: `cargo test -p fgos --bin fgos wiring::doctor` (107 ok), `cargo c
 ## Unresolved questions
 
 None.
+
+## Review changes (OPC verdict CHANGES)
+
+- Lost update: `move_taste` builds one request per file; the read and the main commit stand on its revision, and each follow-up commit chains `expected = Some(previous new_revision)`. Test `move_capability_taste_does_not_overwrite_a_concurrent_change` (a change made after the request was built is refused with `config-write-conflict`, file untouched).
+- Global file: the new tables are project-only, so there the fix only removes the keys (each path reported); the finding says `removed belongs-in-project-file`. The fixture schema marks `runner.roles` and `runner.personas` project-only; the old global-move case is replaced by `fix-move-capability-taste-only-removes-in-the-global-file` and a row case.
+- Scope widening: the finding detail for a moved entry is `widened-to-every-capability`; the row description and config spec say so. (The adapter's apply message stays `N repaired`; the doctor row text carries the detail.)
+- Reason rewrite stays a following transaction (the write door takes one reason per transaction); stated in the config spec. The reasons to rewrite come from an ordered set (no adjacent-only dedup).
+- Actor: case `fix-move-capability-taste-moves-a-role-with-its-reason` now has the original `[alice]` and the writer `vantt`; the file ends with `[vantt]`, same reason text.
+- Empty or non-mapping role/persona table: reported and applied as `removed`, not `moved` (cases for fix and row).
+- Phase file header changed to "same activation as 03"; row stays at fail.
+
+### CHANGELOG `[Unreleased]` line (HARDEN adds it on landing)
+
+`fgos doctor --fix` moves per-capability role and persona taste (`runner.capabilities.<x>.roles` and `.personas`) into `runner.roles` and `runner.personas`, where it applies to every capability, and drops capability seats; taste found in the global file is removed, and a conflict between two capabilities is left for you to settle with `fgos config set` or `unset`.
