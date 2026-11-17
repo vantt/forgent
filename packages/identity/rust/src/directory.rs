@@ -34,10 +34,14 @@ pub const MAX_ENTRIES: usize = 512;
 const MAX_SCAN: usize = 2 * MAX_ENTRIES;
 /// The role kinds: a role alias is a prefix and a name of the Convention
 /// identifier kind beside it. This list is the one place that knows them.
-pub const ROLE_KINDS: [(&str, &str); 2] = [("lead:", "lane-id"), ("work:", "work-item-id")];
+pub const ROLE_KINDS: [(&str, &str); 3] = [
+    ("lead:", "lane-id"),
+    ("work:", "work-item-id"),
+    ("head:", "head-name"),
+];
 /// What a refused role is not, for the refusal detail.
 const ROLE_SHAPE: &str =
-    "`lead:<LANE>` with a Convention lane-id or `work:<name>` with a Convention work-item-id";
+    "`lead:<LANE>` with a Convention lane-id, `work:<name>` with a Convention work-item-id or `head:<persona>-<name>` with a Convention head-name";
 const FORMAT_VERSION: u32 = 1;
 const FILE_SUFFIX: &str = ".json";
 const FILE_HASH_LENGTH: usize = 12;

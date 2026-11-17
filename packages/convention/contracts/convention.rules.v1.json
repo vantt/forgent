@@ -259,6 +259,14 @@
       "reserved": []
     },
     {
+      "id": "head-name",
+      "description": "A head session's role name, the part after `head:` in a role alias (`head:secretary-miu`): `<persona>-<name>`, a persona (an agent-definition name, agent-name) then a session name of 1 to 32 of `[a-z0-9-]`; the `head:` prefix is Identity's, not Convention's. Only the character set and the 97-character bound (64 + 1 + 32) are checked here.",
+      "first": "abcdefghijklmnopqrstuvwxyz",
+      "rest": "abcdefghijklmnopqrstuvwxyz0123456789-",
+      "maxLength": 97,
+      "reserved": []
+    },
+    {
       "id": "backlog-id",
       "description": "A new backlog row id: `p-<10 base32>` when minted by Identity (docs/platform/identity/spec.md, section 4a). Rows written earlier (`p-<8 hex>`, `STR27`, `wf-...`) keep their ids.",
       "first": "abcdefghijklmnopqrstuvwxyz",

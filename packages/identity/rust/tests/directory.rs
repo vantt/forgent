@@ -803,3 +803,44 @@ fn a_full_id_resolves_the_exact_live_entry_of_this_machine_and_never_another_mac
     );
     let _ = fs::remove_dir_all(root);
 }
+
+#[test]
+fn a_head_role_names_a_persona_and_a_session_name_and_only_one_live_session_holds_it() {
+    use fgos_identity::directory::role_problem;
+    assert_eq!(role_problem("head:secretary-miu"), None);
+    assert!(role_problem("head:Secretary").is_some());
+    assert!(role_problem("head:").is_some());
+    assert!(role_problem(&format!("head:secretary-{}", "a".repeat(98))).is_some());
+
+    let root = state_root();
+    let alive = judge(&[]);
+    directory::register(
+        &root,
+        entry("aaaa", Some(10), &["head:secretary-miu"]),
+        false,
+        &alive,
+    )
+    .unwrap();
+    let refused = directory::register(
+        &root,
+        entry("bbbb", Some(20), &["head:secretary-miu"]),
+        false,
+        &alive,
+    )
+    .unwrap_err();
+    assert_eq!(refused.reason, "role-held");
+
+    directory::register(
+        &root,
+        entry("bbbb", Some(20), &["head:secretary-miu"]),
+        true,
+        &alive,
+    )
+    .unwrap();
+    assert_eq!(
+        directory::resolve(&root, "head:secretary-miu", &alive, None)
+            .unwrap()
+            .handle,
+        "claude-bbbb@fg"
+    );
+}
