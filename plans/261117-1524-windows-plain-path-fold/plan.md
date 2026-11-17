@@ -2,7 +2,7 @@
 contract: plan-v1
 title: "Fold the Windows verbatim-path strip copies onto fgos_process::path"
 description: "Ten hand-written \\?\ strips call the one door; a door row fails any new copy; a verbatim UNC root stops turning relative."
-status: ready
+status: done
 priority: P2
 effort: 1d
 branch: trial/pathfold

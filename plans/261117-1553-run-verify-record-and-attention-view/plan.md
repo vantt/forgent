@@ -1,7 +1,7 @@
 ---
 contract: plan-v1
 title: "Keep the verify result in the run record, and one attention view on dispatch inspect"
-status: ready
+status: done
 priority: P2
 blockedBy: []
 footprint:
