@@ -47,6 +47,10 @@ session-rotation; planner designs it). Two unproven rotation mechanics, statusli
 `/clear` via `herdr pane send-text` (spike first inside session-rotation). Whether Miu's protocol fits the rendered
 persona sections or the renderer is extended (task persona-door).
 
+**Name collision found after settling (2026-11-17).** `fgos session start|end|list|gc` already exists: a per-session
+detached git worktree lifecycle (`fgos session --help`). The verb name in SM-D6 is provisional; the planner checks that
+verb's prior art and callers and proposes a name or a merge as an owner question.
+
 **Source backlog ids.** `p-r4u2ewexvn` (this topic). Filed as their own rows: `p-5igcekysul` (mailbox resolves an
 agent head beside Identity), `p-pgmxt7n7hx` (domain registry vs `domains/`, `coding` default); the three-copies
 measurement was appended to `p-7eb9e65b`.
