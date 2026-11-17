@@ -9,7 +9,8 @@ topics itself by the product priority list and reports the order (candidate D-ID
 owner rejected "owner types /clear"; accepted automatic rotation with two thresholds (soft at rest, hard with verbatim
 carry-over), replacing the claude process either way. Owner also wants a user-invoked `/handoff` shortcut and asked
 for deep research on existing handoff skills (research done, report
-`plans/reports/research-261117-1624-handoff-skills-research.md`). Point 3 question asked: default when a domain has no shaper. No D-ID minted yet.
+`plans/reports/research-261117-1624-handoff-skills-research.md`). Point 3: owner chose a domain-free shaper in core (A); unsure domain -> ask
+owner one line, never default to coding. Minted SM-D1 (topic ordering), SM-D2 (automatic rotation). Now on point 5. No D-ID minted yet.
 
 ## 2. Mục tiêu & đề bài
 
@@ -27,7 +28,7 @@ sessions, not in the secretary's chat.
 |---|---|---|
 | 1 | Persona content and protocol (does / never does) | discussing. Provisionally clear: Miu orders topics itself and reports (owner, round 2). Provisionally clear: automatic rotation at turn end (Stop hook), soft ~40% only at rest, hard ~70% with verbatim last message + pending question; process replaced (new+close or in-pane replace); plus user `/handoff`. Open: handoff method (research pending) |
 | 2 | Placement and activation (`core/agents/secretary.yaml`, `claude --agent secretary` in herdr, opening shaper tabs) | open |
-| 3 | Domain classification without Work (reuse fgos-clarifying; default when a domain has no shaper) | open |
+| 3 | Domain classification without Work | provisionally clear: Miu calls `fgos-clarifying` directly (verdict-only); no shaper -> core domain-free shaper (owner chose A); unsure domain -> ask owner, no `coding` default. Open: registry vs `domains/` mismatch (marketing, council) |
 | 4 | Token saving (3x always-loaded rules, model choice, short agent results, peer mail only on decisions) | open, needs owner approval |
 | 5 | Where the topic list lives (portfolio file vs board) without coupling to Work | open |
 
@@ -35,6 +36,8 @@ sessions, not in the secretary's chat.
 
 | D-ID | Decision | Rationale | Date |
 |---|---|---|---|
+| SM-D1 | Miu orders topics itself by the AGENTS.md product priority list and reports the order; asks the owner only on a real tie or when a reorder delays something already promised | Product priority #2: decide inside the approved frame; owner "Miu tự xếp thứ tự rồi báo lại anh" (round 2, unrevised since) | 2026-11-17 |
+| SM-D2 | Miu's session rotates automatically, never by the owner: checked at turn end; soft threshold (~40% context) only when at rest (no pending question, no in-process background work); hard threshold (~70%) at any turn end, carrying the last Miu message and pending question verbatim; the claude process is replaced (new+close or in-place, either is fine); the owner also gets a user-invoked `/handoff` | Owner forgets `/clear`; owner "ổn, dùng hai ngưỡng ... cách nào cũng được" (round 4, unrevised); method per research report `plans/reports/research-261117-1624-handoff-skills-research.md` | 2026-11-17 |
 
 ## 5. Q&A log
 
@@ -71,6 +74,7 @@ sessions, not in the secretary's chat.
 - 2026-11-17 — Point 3 scout: `fgos-clarifying` is verdict-only, callable without Work; domain list from
   `src/state/domain-registry.mjs` misses `domains/marketing` and `domains/council`; it defaults to `coding`. Asked:
   domain with no shaper -> (A) core domain-free shaper, (B) council business-discussion, (C) park.
+- 2026-11-17 — Owner: "chọn A, shaper dùng chung ở core".
 
 ## 6. Thiết kế đã chốt {#design}
 
