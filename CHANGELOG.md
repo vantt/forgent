@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Invocation ids now state their confinement (D-ADR0077): `codex-herdr`, `pi-herdr`, `omp-herdr` and `agy-herdr` are renamed `codex-herdr-bwrap`, `pi-herdr-bwrap`, `omp-herdr-bwrap` and `agy-herdr-bwrap`, so the `-bwrap` suffix is present exactly when an invocation is bwrap-confined. A global `runner.executors.<id>.invocations` list or a pin that names an old id must be renamed.
 
+- Gemini runs through the Antigravity CLI (`agy`) again, because gemini through omp or pi does not work: the standard's gemini invocations are `agy-cli-bwrap` and `agy-herdr-bwrap`, and the coding pins name `agy-herdr-bwrap`. A machine whose config overrides the gemini invocations or pins an `omp-*` gemini invocation must rename them.
+
 - A claude seat started by `fgos run` no longer stops at Claude Code's directory-trust prompt for its run directory: every directory the seat is granted with `--add-dir` is trusted in the seat's own private claude home, derived from the repository you already trust. When the seat has no private home, your own claude store is left alone for those directories (only the working directory is seeded, as before) and a prompt, if it comes, is reported by name.
 - YAML that fgOS writes (frontmatter of knowledge projections, the decision index, case answer files and project agent files) now goes through the one native YAML door, which escapes invisible bidirectional and zero-width characters instead of writing them raw, and every written block parses back to the same value.
 
