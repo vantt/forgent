@@ -83,6 +83,7 @@ min), review 1. **6 of 14 interventions are the census hook alone.**
 | 4 | scope fidelity | no widened path recorded; seat claims not contradicted by the gate | p1 seat claimed done with 2 failing new cases (contradicted outside the sandbox) |
 | 5 | plan defects | 3 | 2 (one carried over: census in sandbox) |
 | 6 | detection latency | ~0: HARDEN waited on each `fgos run` in the foreground | ~0, same |
+| + | per-round cost of the gate key `runner.capabilities.code:implement.verify: cargo test --workspace` | not measured: every seat ran with an explicit `--verify` (focused cargo test plus clippy), which overrides the key. Outside the sandbox `cargo test --workspace` took ~9 min in the integration gate (15:43-15:52) | not measured: seats ran without `--verify`; the phase-5 run's verify seat returned `findings` in the sandbox, with no time stored. The owner weighs ~9 min per round before keeping the key |
 | 7 | gates at first independent check | integration gate passed first run; unit tests in commit yes; doc + changelog in `74b9e7b14` | gate passed first run except 6 pre-existing workflow failures; tests + docs + changelog in commits |
 
 Friction recorded with `fgos friction record`: the 3 phase-1 entries plus 7 from the shaper at 15:23
