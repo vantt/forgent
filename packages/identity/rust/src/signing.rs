@@ -92,12 +92,7 @@ fn plain_drive_path(path: &str) -> Option<&str> {
 impl Scratch {
     fn new(state_root: &Path) -> Result<Self, Refusal> {
         let name = random_hex128().map_err(|e| refuse("random-unavailable", e.to_string()))?;
-        // `ssh-keygen` on Windows cannot open the verbatim spelling `canonicalize` gives a state root.
-        let root = state_root.to_str().and_then(plain_drive_path);
-        let path = root
-            .map_or_else(|| state_root.to_path_buf(), PathBuf::from)
-            .join("tmp")
-            .join(format!("signing-{name}"));
+        let path = state_root.join("tmp").join(format!("signing-{name}"));
         private_dir(&path)
             .map_err(|e| refuse("signing-scratch-failed", format!("{}: {e}", path.display())))?;
         Ok(Self(path))
@@ -120,6 +115,16 @@ impl Drop for Scratch {
 /// The only place `ssh-keygen` is started. The agent socket is removed from
 /// the environment so a key is only ever taken from the file named by `-f`.
 fn ssh_keygen(args: &[&OsStr], stdin: &[u8]) -> Result<std::process::Output, Refusal> {
+    // On Windows `ssh-keygen` cannot open the verbatim spelling `canonicalize` gives a state root, so a path argument
+    // is handed over in its plain drive spelling.
+    let args: Vec<&OsStr> = args
+        .iter()
+        .map(|arg| {
+            arg.to_str()
+                .and_then(plain_drive_path)
+                .map_or(*arg, OsStr::new)
+        })
+        .collect();
     let mut child = Command::new("ssh-keygen")
         .args(args)
         .env_remove("SSH_AUTH_SOCK")
