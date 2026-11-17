@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "efdaa95e3766fe38658d105e21c3e0f0b7163f0bfe14bcb6ca305a172108d7bd",
+  "payloadDigest": "d4d65f0dca38e79621763a094761ade4f431b648f552a516d50fe5a8c0891281",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "b8b886cee2ea5ce7ee1153e4795512db135a990de894c27e53c5e778b210be62",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -298,7 +298,7 @@
     "packages/convention/rust/tests/golden.rs": "1dcc65df4784f25dbdbe8609765eba2faba6c482da5894cf56523760af7cec03",
     "packages/distribution/rust/examples/print-workspace-shim.rs": "767a8d526d1b030dd4327509a63c9e194ed03fe2ae5a2a263682cd62724dc6d4",
     "packages/distribution/rust/src/agent_config.rs": "7c6c6b0eaa025d3f7ce51d40f7124c3b6e0d7d8e641f9b9f9caeb15276e42be7",
-    "packages/distribution/rust/src/agent_hooks.rs": "5465aaa6b285fb21f967d27d5ffdaa4fc757229f1d15090ef15ecf2721ce0b23",
+    "packages/distribution/rust/src/agent_hooks.rs": "c377ac9c0348bdb4637de1b55e30a8460f56943fc84314cf2981a4f202fdd876",
     "packages/distribution/rust/src/bin_cache.rs": "61732e61ebfcda7d6ea52c34c05603b23655b57212616b9c26214f51525bab2c",
     "packages/distribution/rust/src/canonical.rs": "1ed17ee314cadcd425f25919740a7d80b7596871986c9940094fdd2cf4b7542a",
     "packages/distribution/rust/src/coexistence.rs": "6d9ad8ed722734b4a2c6151dcf4a87f64d1cc37354d3b40754d3f95038684c9e",
@@ -321,11 +321,11 @@
     "packages/distribution/rust/src/source_payload.rs": "59e2f03b1faf51bc3ce5bfa7cc5652d78de3baabed9c4e77534da5cb9237f0a6",
     "packages/distribution/rust/src/store.rs": "1cdaf72bbdf7c4bc0ae3eafd1f37fecd6a358de60c8ce5851ccf9212149174de",
     "packages/distribution/rust/src/suggest.rs": "302d698667662b3544b0761cd53dd87c68594d6f1b1ce52d8b85032627d52182",
-    "packages/distribution/rust/src/test_scratch.rs": "3829302288f512f253efd3a83f81b6d2cc026da7ad9c57dc2a70be2ad5cd59ed",
+    "packages/distribution/rust/src/test_scratch.rs": "7f54aae398aca8c0b0241f22a0155cc0ba9782a91430fba0ceddda0dc19297e3",
     "packages/distribution/rust/src/timer.rs": "c196566898872d769578cbaa35d73845e9ecc09723a5f1dbceeeaba1b3c3aa72",
-    "packages/distribution/rust/src/uninstall.rs": "391b87ae82679a9f9ed9948fe52dca02bc7386afa687ac9ccd320730b8c7dc8e",
-    "packages/distribution/rust/src/verify.rs": "79a9f08e75d0c0ca8f5e04ad8443e4134a3dfbd85a38e01a448d53361463dc69",
-    "packages/distribution/rust/src/workspace.rs": "f4a92926a9db78dc8d884b83fc68f208a9f27a00c144c91e737e2b524b646a88",
+    "packages/distribution/rust/src/uninstall.rs": "c33250178e8d5c098b1c23b6fafe8a7a6bdb9eaad3828bd1a5f7f091924701b8",
+    "packages/distribution/rust/src/verify.rs": "5364a7d340d4ac1401473100ce2c2135016e4a694f9878aeafe7b126a49fd596",
+    "packages/distribution/rust/src/workspace.rs": "fb9de636e764be6e6b8dee390e8e7cd05dd4f3578f79f2d4b64c75ad16f1e2ec",
     "packages/distribution/rust/tests/activation_lock_multiprocess.rs": "ff2818dd10b745ac29c1610effd95ac36552f4aace4525634c6b20f17f325fe0",
     "packages/distribution/rust/tests/fetch_download.rs": "781764dcb50b2143d578f42282f5e4f3a61ad96fce0e861d8cfe6f2529dbf170",
     "packages/distribution/rust/tests/install_lock_multiprocess.rs": "790f1617f49d0a1efea555767705dba32c036e30bd897e0b01b09206342088cb",
@@ -2608,7 +2608,7 @@
     },
     {
       "path": "packages/distribution/rust/src/workspace.rs",
-      "line": 126,
+      "line": 118,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"
@@ -3348,7 +3348,7 @@
       "spawn": "Command::new",
       "binary": ".fgos",
       "class": "argv-runner",
-      "resolvedAt": "packages/distribution/rust/src/agent_hooks.rs:1548"
+      "resolvedAt": "packages/distribution/rust/src/agent_hooks.rs:1540"
     },
     {
       "path": "packages/process/rust/src/spawn.rs",
@@ -3356,7 +3356,7 @@
       "spawn": "Command::new",
       "binary": "bin",
       "class": "argv-runner",
-      "resolvedAt": "packages/distribution/rust/src/agent_hooks.rs:1548"
+      "resolvedAt": "packages/distribution/rust/src/agent_hooks.rs:1540"
     },
     {
       "path": "packages/process/rust/src/spawn.rs",
@@ -3380,7 +3380,7 @@
       "spawn": "Command::new",
       "binary": "fgos",
       "class": "argv-runner",
-      "resolvedAt": "packages/distribution/rust/src/agent_hooks.rs:1548"
+      "resolvedAt": "packages/distribution/rust/src/agent_hooks.rs:1540"
     },
     {
       "path": "packages/process/rust/src/spawn.rs",
@@ -3388,7 +3388,7 @@
       "spawn": "Command::new",
       "binary": "installation",
       "class": "argv-runner",
-      "resolvedAt": "packages/distribution/rust/src/agent_hooks.rs:1548"
+      "resolvedAt": "packages/distribution/rust/src/agent_hooks.rs:1540"
     },
     {
       "path": "packages/process/rust/src/spawn.rs",

@@ -328,16 +328,7 @@ pub fn verify_legacy_node(
         });
     }
 
-    let real_path_clean = {
-        let s = real_path.to_string_lossy();
-        if let Some(stripped) = s.strip_prefix(r"\\?\") {
-            std::path::PathBuf::from(stripped)
-        } else {
-            real_path
-        }
-    };
-
-    Ok(real_path_clean)
+    Ok(fgos_process::path::plain_path(&real_path))
 }
 
 /// Verifies a release tree end-to-end:
