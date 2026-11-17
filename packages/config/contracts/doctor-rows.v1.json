@@ -8,7 +8,8 @@
     "chmod",
     "move-under-private",
     "copy-to-destination",
-    "create-machine-files"
+    "create-machine-files",
+    "move-capability-taste"
   ],
   "rows": [
     {
@@ -109,6 +110,13 @@
       "doctor": "fail",
       "check": "fail",
       "fix": "move-under-private"
+    },
+    {
+      "id": "config-capability-taste-moved",
+      "description": "A project or global file holds runner.capabilities.<x>.roles, .personas or .seats, which moved: roles and personas to runner.roles and runner.personas, seats to the workflow (a seat has no place in the config now). The fix moves each value with its reason line and drops the seats; when two places give one target different values, or the target holds another value, nothing is changed, no fix is offered and the finding names both paths for fgos config set or unset.",
+      "doctor": "fail",
+      "check": "fail",
+      "fix": "move-capability-taste"
     },
     {
       "id": "config-migrate-backup-stale",

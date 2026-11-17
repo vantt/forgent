@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "55b6669df9cda4d58aabd7711099e9023ab19bfe77a6976b1a7699ad44d331f3",
+  "payloadDigest": "5dacd8c20ea2b540dc37bc7207f8538ac00d49a6560032de0edee9df2d0dbaca",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "b8b886cee2ea5ce7ee1153e4795512db135a990de894c27e53c5e778b210be62",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -232,7 +232,7 @@
     "packages/config/rust/src/cache.rs": "a7f20461334a2ead32208e1cb89b573688f142e62320360f592c4ca2d795c4b2",
     "packages/config/rust/src/detect.rs": "e0342fdde6d040aebd93d00acc5ea4af45a6245f92e61f0bfa47c4b7fec628bf",
     "packages/config/rust/src/docs.rs": "8cdf4205e353461f06b33e3d9ce305f5cf72161194cd06d04445a50328a78658",
-    "packages/config/rust/src/doctor.rs": "043a7a1f6fb0d82dfc19f20d97dcd8ce773c60abdd7430b3230d69dc2c6f4041",
+    "packages/config/rust/src/doctor.rs": "25c2792a761195c1259977f76cce6ea3ed713ce290b3c6172e5dac03a82d78e1",
     "packages/config/rust/src/error.rs": "a2aeeaafc49c764721802606c8f52408cdae7816ba3ffd16a44b278f709d399e",
     "packages/config/rust/src/event_store.rs": "287751b6f18bcbd9881640c5a2b0e03a57cc95939b1996b84795952de6db12ea",
     "packages/config/rust/src/files.rs": "9826c4fa553b7a22a7e2dbb611927d9229e5e3e3278986e89df724973fb9de4f",
@@ -247,7 +247,7 @@
     "packages/config/rust/src/provider/unix_verbs.rs": "d687d27be755a15ad3b188e0c147e2185b90b4eaa4d8b711baca56d5d9fc30e6",
     "packages/config/rust/src/redact.rs": "189b980926959017d23755edc63b0fc91a5b7d351ada839ebe019dd5d3110677",
     "packages/config/rust/src/relocate.rs": "1e4e4f9835e89c6c4a7f3ae5b4dc0073cf28ec7cc7a8494cf64f1ddda53ffbad",
-    "packages/config/rust/src/repair.rs": "1b455b187eca9c20227e9c77fce0a043fd02509935d254d3957ff794215b9a10",
+    "packages/config/rust/src/repair.rs": "e137310ce26094b1c7d461e053a4aa749d740e8af5620f570a47f3edd4c42a74",
     "packages/config/rust/src/schema.rs": "f2b0258798482b89f2c176cc06d6346f96ba79ab48fa9098bd1ebaa59cb74446",
     "packages/config/rust/src/scope.rs": "5893b31c0cec4fa74942ea50c599fe7f567544b2544be1c0889167a4b6ed1d64",
     "packages/config/rust/src/session.rs": "47efd4cd09cdccbba2bdcae03a79c1d0697fadcecd525705fda2aa491a76127f",

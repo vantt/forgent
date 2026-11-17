@@ -7,12 +7,14 @@ use std::path::Path;
 
 use fgos_durable_file::{install_once_with_mode, Installed};
 use fgos_identity::WriterIdentity;
+use fgos_yaml_doc::path::format_path;
 use fgos_yaml_doc::{parse, Profile, Segment};
 use serde_json::Value;
 
-use crate::doctor::strays;
+use crate::doctor::{strays, taste_plan};
 use crate::files::{read_beneath, select_source, LoadedFile, Source};
 use crate::files::{PRIVATE_FILE_MODE, YAML_NAME};
+use crate::grammar::parse_block;
 use crate::locks::{hold, GLOBAL_CONFIG};
 use crate::machine::{ensure_private_dir, fix_modes, refused, token, TOKEN_FILE};
 use crate::relocate::{copy, plan, Held, MoveRequest};
@@ -22,13 +24,14 @@ use crate::write::{commit, io_error, refresh, target_revision, Edit, WriteReques
 use crate::ConfigRefusal;
 
 /// The fix ids this module applies; `contracts/doctor-rows.v1.json` lists the same.
-const FIXES: [&str; 6] = [
+const FIXES: [&str; 7] = [
     "refresh-docs",
     "remove-redundant",
     "chmod",
     "move-under-private",
     "copy-to-destination",
     "create-machine-files",
+    "move-capability-taste",
 ];
 
 /// What `fix` did, by fix id and path; never a value.
@@ -114,6 +117,79 @@ fn edit_files(
             commit(ctx, &request, writer)?
         };
         paths.extend(done.applied.into_iter().map(|(path, _)| path));
+    }
+    Ok(paths)
+}
+
+/// The reason a value moved without one of its own is written with.
+const MOVED_REASON: &str = "[doctor:fix] moved out of the capability row";
+
+/// `move-capability-taste` on the project and global YAML files: the roles and personas a capability
+/// row holds go to `runner.roles` and `runner.personas` with the reason line each value carried, the
+/// seats go away. One write transaction takes the new values and removes the old keys together, so the
+/// file is sound under a schema that no longer allows the old keys; a value whose reason differs from
+/// that transaction's is then written again under its own. A file where two places give one target
+/// different values is left as it is (the row names both paths).
+fn move_taste(
+    ctx: &Context,
+    req: &impl Fn(SourceKind) -> WriteRequest,
+    writer: &WriterIdentity,
+) -> Result<Vec<String>, SnapshotError> {
+    let mut paths = Vec::new();
+    for kind in [SourceKind::Project, SourceKind::Global] {
+        let Some(file) = yaml_file(&req(kind))? else {
+            continue;
+        };
+        let doc = parse(&file.bytes, Profile::StrictConfig, YAML_NAME)?;
+        let plan = taste_plan(&doc.to_json()?);
+        if plan.keys.is_empty() || plan.blocked() {
+            continue;
+        }
+        let reasons: Vec<String> = plan
+            .sets
+            .iter()
+            .map(|set| {
+                let block = parse_block(&doc.comments_at(&set.from).unwrap_or_default());
+                block
+                    .why
+                    .map_or_else(|| MOVED_REASON.to_string(), |(_, why)| why)
+            })
+            .collect();
+        let first = reasons
+            .first()
+            .cloned()
+            .unwrap_or_else(|| MOVED_REASON.into());
+        let sets = plan.sets.iter().map(|set| Edit::Set {
+            path: set.to.clone(),
+            value: set.value.clone(),
+        });
+        let unsets = plan
+            .keys
+            .iter()
+            .map(|path| Edit::Unset { path: path.clone() });
+        let mut request = req(kind);
+        request.edits = sets.chain(unsets).collect();
+        request.reason = first.clone();
+        request.acknowledge_comment_loss = true;
+        commit(ctx, &request, writer)?;
+        let mut rewritten: Vec<&String> = reasons.iter().filter(|r| **r != first).collect();
+        rewritten.dedup();
+        for reason in rewritten {
+            let mut request = req(kind);
+            request.edits = plan
+                .sets
+                .iter()
+                .zip(&reasons)
+                .filter(|(_, own)| *own == reason)
+                .map(|(set, _)| Edit::Set {
+                    path: set.to.clone(),
+                    value: set.value.clone(),
+                })
+                .collect();
+            request.reason = reason.clone();
+            commit(ctx, &request, writer)?;
+        }
+        paths.extend(plan.names.iter().map(|name| format_path(&name.path)));
     }
     Ok(paths)
 }
@@ -241,6 +317,7 @@ pub fn fix(
                     .filter(|_| made == Installed::Created)
                     .collect()
             }
+            "move-capability-taste" => move_taste(ctx, &req, writer)?,
             "copy-to-destination" => copy_missing(ctx, &moving, writer)?,
             _ => {
                 let mut moved = Vec::new();
