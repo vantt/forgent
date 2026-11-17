@@ -41,8 +41,7 @@ export {
 import crypto from 'node:crypto';
 import { createGitInspect, gitPortOptions } from '../../git/inspect.mjs';
 import { inspectEntries, inspectPath } from '../../util/git-paths.mjs';
-import { bind } from '../execution/bind.mjs';
-import { seatConfigDigestOf } from '../execution/seat-policy.mjs';
+import { bind, seatConfigDigestOf } from '../execution/bind.mjs';
 import { walkStateOf } from '../execution/account-rotation.mjs';
 import { bindSeatOf } from '../execution/seat-resolver.mjs';
 import { legacyStateKey } from './llm-accounts.mjs';

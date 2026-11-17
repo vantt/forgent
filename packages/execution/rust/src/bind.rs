@@ -1154,8 +1154,10 @@ pub fn preflight(
     now: u64,
 ) -> Preflight {
     let pin_quarantined_until = pin.and_then(|pin| {
-        let launch_view = launch_view_of(runner, BindSession::default(), machine);
-        let view = account_view(runner, &launch_view, account_state, now, machine);
+        // The pool set the bind ranks from: family spellings are keyed first, as the bind reads the runner.
+        let runner = family_keyed(runner);
+        let launch_view = launch_view_of(&runner, BindSession::default(), machine);
+        let view = account_view(&runner, &launch_view, account_state, now, machine);
         view["pools"]
             .get(&pin.pool)
             .and_then(Value::as_array)?

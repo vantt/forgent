@@ -1,11 +1,10 @@
 // Runs one vector of packages/execution/contracts/executor-model.v1.json or bind.v1.json against the Node functions
 // that derive the executor facts and bind a seat. The same file serves whoever records the vectors and the test that
 // replays them, so the two can never read a vector differently. A vector is
-// `{ name, fact, entry?, runner?, machine?, args?, leaseRead?, decided?, expect }`; `machine` describes the machine facts a derivation reads (what is on PATH, the confinement backend registry, the
+// `{ name, fact, entry?, runner?, machine?, args?, leaseRead?, expect }`; `machine` describes the machine facts a derivation reads (what is on PATH, the confinement backend registry, the
 // home directory, lease state, files and a git repository), so a vector never depends on the machine running it.
 
 import fs from 'node:fs';
-import { isDeepStrictEqual } from 'node:util';
 import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
@@ -20,9 +19,8 @@ import { legacyStateKey, readLlmAccounts } from '../../src/runner/dispatch/llm-a
 import { decideExecutorDispatchMechanism } from '../../src/runner/dispatch/mechanism.mjs';
 import { resolvePostureInvocation } from '../../src/runner/dispatch/confinement/policies.mjs';
 import { toolProvidersOf } from '../../src/runner/dispatch/tool-providers.mjs';
-import { accountQuarantineOf, agentCliMissingRefusal, bind, explainSeat } from '../../src/runner/execution/bind.mjs';
+import { accountQuarantineOf, agentCliMissingRefusal, bind, explainSeat, seatConfigDigestOf } from '../../src/runner/execution/bind.mjs';
 import { explainCapability } from '../../src/runner/execution/explain.mjs';
-import { seatConfigDigestOf } from '../../src/runner/execution/seat-policy.mjs';
 import { effectiveRigorOf } from '../../src/runner/execution/seat-resolver.mjs';
 
 const REGISTRY_ENV = 'FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH';
@@ -84,7 +82,7 @@ export function withMachine(machine = {}, fn) {
 function launchFactsOf(runner, session) {
   ensureScriptAddon();
   const unit = { id: 'executor-model-vector', capability: 'execute', writes: [] };
-  const { launchView } = explainSeat({ unit, role: 'producer' }, { runnerConfig: runner, session: { headless: true, ...session } }, { chain: false });
+  const { launchView } = explainSeat({ unit, role: 'producer' }, { runnerConfig: runner, session: { headless: true, ...session } });
   if (!launchView) throw new Error('the seat was refused before a launch view was built');
   return launchView.executors;
 }
@@ -172,25 +170,6 @@ const evaluatorOf = (vector) => {
 export function evaluateVector(vector) {
   const evaluate = evaluatorOf(vector);
   return answerOf(() => withMachine(vector.machine, (paths) => evaluate({ args: {}, ...vector }, paths)));
-}
-
-/**
- * The one reason a vector may be marked `decided`: the explicit invocation rule the owner chose on 2026-11-17, after
- * the Node bind was written (generic forms as D-ADR0077 (invocation names state their confinement) names them). A mark
- * with any other text is refused, so the mark cannot become a general way to silence a vector.
- */
-export const DECIDED_RULE = "invocation choice is an explicit rule (owner, 2026-11-17): a generic form <cli>-<cli|herdr>[-bwrap] before a named one, the session's transport first (herdr inside herdr), then declared order; a pin is kept";
-
-/**
- * Why a `decided` vector is not a valid statement of the decided rule, or null when it is: its mark must be the
- * decided rule, its `expect` must be written, and Node must still answer differently (when Node answers the rule, the
- * mark is removed and the vector re-recorded). `got` is Node's answer.
- */
-export function decidedProblem(vector, got) {
-  if (vector.decided !== DECIDED_RULE) return `${vector.name}: a vector may be marked decided only for the explicit invocation rule`;
-  if (vector.expect === null || vector.expect === undefined) return `${vector.name}: a decided vector states its expect by hand; it is null`;
-  if (isDeepStrictEqual(got, vector.expect)) return `${vector.name}: Node now answers the decided rule; remove the decided mark and re-record`;
-  return null;
 }
 
 /** The facts that read lease state through Dispatch's adapter. */

@@ -19,7 +19,7 @@ import { deriveOperationCapability } from '../operation-capability.mjs';
 import { SEAT_ROLES, effectiveRigorOf } from '../execution/seat-resolver.mjs';
 import { capabilityRigorOf, hasOwnPreferPool, registeredCapabilityOf } from '../execution/capability-config.mjs';
 import { isReadOnlyAssignment } from './assignment.mjs';
-import { bindWorkSeat } from '../execution/bind.mjs';
+import { bindWorkSeat, purposeSeatFromHost } from '../execution/bind.mjs';
 
 /** The source Seat Binding recorded for one field of a bound seat, carried over as it is. */
 function bindingSource(binding, field) {
@@ -358,6 +358,10 @@ const TOOL_ANSWERS = {
  *    so the executor named is the one that would run (or the refusal that would stop it);
  * 4. otherwise nothing is configured: no executor, never a fallback tier.
  *
+ * The Node twin of the host's purpose door (`purposeSeatFromHost`, proven by the decide vectors), kept for the
+ * bind-free selectors (an executor id, a Work hint) so a launch or a fan-out asks no host for them; it goes when
+ * the launch moves to Rust.
+ *
  * @returns {{configured: boolean, executorId: string|null, executor?: object, bindingSource: string|null,
  *   invocationId?: string, binding?: object, refused?: {reason: string, detail: string},
  *   tool?: {mechanism: string, reasonCode: string, stale?: true, mcpTool?: string, command?: string,
@@ -566,7 +570,8 @@ export function compileDispatchPlan(
   }
 
   if (!executorId && purpose) {
-    const answer = purposeSeatOf(cfg, purpose, { repoRoot });
+    // A purpose is a binding selector: what serves it is the host's answer (one call), never derived here.
+    const answer = purposeSeatFromHost(cfg, purpose, { repoRoot });
     const answered = planOfPurposeAnswer(shell, purpose, answer);
     if (answered) return answered;
     resolved = answer;

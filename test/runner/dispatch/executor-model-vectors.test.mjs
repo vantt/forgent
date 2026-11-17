@@ -13,19 +13,17 @@ import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { BIND_FACTS, decidedProblem, evaluateVector, leaseReadOf, VECTOR_FACTS } from '../../helpers/executor-model-vectors.helper.mjs';
+import { BIND_FACTS, evaluateVector, leaseReadOf, VECTOR_FACTS } from '../../helpers/executor-model-vectors.helper.mjs';
 
 const CONTRACT = JSON.parse(fs.readFileSync(new URL('../../../packages/execution/contracts/executor-model.v1.json', import.meta.url), 'utf8'));
 const BIND_CONTRACT = JSON.parse(fs.readFileSync(new URL('../../../packages/execution/contracts/bind.v1.json', import.meta.url), 'utf8'));
 
-/** Node's answer is the recorded one; for a decided vector it must still differ, under the one decided rule. */
+/** Node's answer is the recorded one. */
 function replay(vector) {
-  const got = evaluateVector(vector);
-  if (vector.decided === undefined) assert.deepEqual(got, vector.expect, vector.name);
-  else assert.equal(decidedProblem(vector, got), null);
+  assert.deepEqual(evaluateVector(vector), vector.expect, vector.name);
 }
 
-test('Node launch code derives the same executor facts as the executor-model contract; a decided vector still differs from Node', () => {
+test('Node launch code derives the same executor facts as the executor-model contract', () => {
   assert.equal(CONTRACT.version, 'executor-model.v1');
   assert.deepEqual([...new Set(CONTRACT.vectors.map((vector) => vector.fact))].sort(), [...VECTOR_FACTS].sort(), 'every derived fact has at least one vector');
   assert.deepEqual(CONTRACT.facts, [...new Set(CONTRACT.vectors.map((vector) => vector.fact))], 'the fact list names the facts the vectors cover');
@@ -36,7 +34,7 @@ test('Node launch code derives the same executor facts as the executor-model con
   }
 });
 
-test('Node bind answers as the bind contract records; a decided vector still differs from Node', () => {
+test('the Node bind facade answers as the bind contract records, through the host route', () => {
   assert.equal(BIND_CONTRACT.version, 'bind.v1');
   assert.deepEqual([...new Set(BIND_CONTRACT.vectors.map((vector) => vector.fact))].sort(), [...BIND_FACTS].sort(), 'every answer has at least one vector');
   assert.deepEqual(BIND_CONTRACT.facts, [...new Set(BIND_CONTRACT.vectors.map((vector) => vector.fact))]);

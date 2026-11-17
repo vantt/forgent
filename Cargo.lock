@@ -221,6 +221,7 @@ dependencies = [
  "fgos-distribution",
  "fgos-durable-file",
  "fgos-event-store",
+ "fgos-execution",
  "fgos-git",
  "fgos-holder-lock",
  "fgos-host-runtime",

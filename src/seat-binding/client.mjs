@@ -1,8 +1,9 @@
-// client.mjs -- thin Node client of `fgos internal seat-binding`.
+// client.mjs -- thin Node client of `fgos internal seat-binding --protocol 2`.
 //
 // One process per call: the request goes to the host binary on stdin, one JSON
-// line comes back. Every decision (tier, ranking, refusal, explanation) lives
-// in the Rust crate; this module only carries the call and fails closed. There
+// line comes back. Every decision (the bind, its walk, what serves a purpose,
+// the pre-admission facts, the seat config digest) lives in the Rust crates;
+// this module only carries the call and fails closed. There
 // is no JS policy fallback: a host without the route, an answer that is not
 // the contract, a timeout, or a call made while this process holds a state
 // lock each throw a named SeatBindingError, and no path returns a binding
@@ -17,8 +18,9 @@ import { spawnSync } from 'node:child_process';
 import { resolveActiveHostBin, routeEnv } from '../util/host-bin-path.mjs';
 import { hotLockDepth } from '../holder-lock/hot-guard.mjs';
 import { OWN_PAYLOAD_ROOT, releasePayloadRoot, realpathOrNull } from '../run-supervisor/payload-root.mjs';
+import { RunnerConfigError } from '../runner/dispatch/runner-config-error.mjs';
 
-export const PROTOCOL = 1;
+export const PROTOCOL = 2;
 /** Same bound as the other short host routes (src/util/host-bin.mjs). */
 export const SEAT_BINDING_TIMEOUT_MS = 5_000;
 const MAX_OUTPUT_BYTES = 8 * 1024 * 1024;
@@ -81,23 +83,40 @@ function interpret({ status, signal, stdout, stderr, error }, bin, op) {
     throw new SeatBindingError('seat-binding-route-bad-output', `${bin} seat-binding ${op} answered something that is not the route contract: ${text.slice(0, 200)}`);
   }
   if (line.result === 'error') {
-    if (line.code === 'host-version-mismatch') throw new SeatBindingError('host-version-mismatch', `${bin} seat-binding ${op}: ${line.message}`);
+    // An older host refuses this protocol by name, or does not know the operation at all (`usage`).
+    if (line.code === 'host-version-mismatch' || line.code === 'usage') throw new SeatBindingError('host-version-mismatch', `${bin} seat-binding ${op}: ${line.message}`);
     throw new SeatBindingError('seat-binding-route-rejected', `${bin} seat-binding ${op}: ${line.code}: ${line.message}`);
   }
   if (line.protocol !== PROTOCOL) {
     throw new SeatBindingError('host-version-mismatch', `${bin} seat-binding ${op} speaks protocol ${line.protocol}, this payload speaks ${PROTOCOL}`);
   }
+  if (line.result === 'failed') throw decisionError(line.failure);
+  if (line.result !== 'ok') {
+    throw new SeatBindingError('seat-binding-route-bad-output', `${bin} seat-binding ${op} answered result ${JSON.stringify(line.result)}`);
+  }
   return line;
 }
 
 /**
+ * A decision the host could not make, as the error class the Node callers catch: a runner refusal is a
+ * RunnerConfigError carrying its code, a value out of range a RangeError; any other class keeps its name.
+ */
+function decisionError(failure) {
+  const { name, code, message } = failure ?? {};
+  if (name === 'RunnerConfigError') return new RunnerConfigError(message, code === undefined ? {} : { code });
+  const error = name === 'RangeError' ? new RangeError(message) : new Error(message);
+  if (typeof name === 'string' && name !== 'RangeError') error.name = name;
+  if (code !== undefined) error.code = code;
+  return error;
+}
+
+/**
  * createSeatBindingClient({ hostBin, cwd, fgosDir, payloadRoot, timeoutMs }) ->
- *   { bindSeat(request), tierLadder(), hostBin() }
+ *   { bind, explain, plan, preflight, digest, tierLadder, hostBin }
  *
- * `bindSeat(request)` takes the crate's BindInput (the facade collects the
- * ask, config, peers, walk, accountView, launchView and `now`) and returns the
- * crate's BindOutput plus `hostVersion`. A refusal comes back as a result
- * (`ok: false`, `refusal`), not as an exception: it is a decision. The host is
+ * Each operation takes its request (every one but the ladder carries the `runner` section it is decided under)
+ * and returns the answer body plus `hostVersion`. A refused seat is a result (`binding.refused`), not an exception;
+ * a decision the request cannot make throws its error class (RunnerConfigError, RangeError, ...). The host is
  * resolved once per client, and again when the resolved binary has gone.
  */
 export function createSeatBindingClient({ hostBin, cwd, fgosDir, payloadRoot, timeoutMs = SEAT_BINDING_TIMEOUT_MS } = {}) {
@@ -144,18 +163,31 @@ export function createSeatBindingClient({ hostBin, cwd, fgosDir, payloadRoot, ti
     return interpret(res, hostPath, op);
   };
 
+  /** One operation whose answer must carry `field` (checked by `valid`), returned with the host version. */
+  const answered = (op, field, valid) => (request) => {
+    const { v: _v, protocol: _protocol, op: _op, result: _result, ...body } = call(op, request);
+    if (!valid(body[field])) {
+      throw new SeatBindingError('seat-binding-route-bad-output', `${bin()} seat-binding ${op} answered without ${field}`);
+    }
+    return body;
+  };
+  const isObject = (value) => value !== null && typeof value === 'object' && !Array.isArray(value);
+
   return {
     hostBin: bin,
-    bindSeat(request) {
-      const line = call('bind', { input: { protocol: PROTOCOL, ...request } });
-      if (!line.output || typeof line.output.ok !== 'boolean' || (line.result !== (line.output.ok ? 'ok' : 'refused'))) {
-        throw new SeatBindingError('seat-binding-route-bad-output', `${bin()} seat-binding bind answered without a bind output`);
-      }
-      return { ...line.output, hostVersion: line.hostVersion };
-    },
+    /** `{ runner, ask, session, walk, accountState?, now }` -> `{ binding, hostVersion }`. */
+    bind: answered('bind', 'binding', isObject),
+    /** The bind request -> `{ binding, policy?, ranked?, explain?, launchView?, walk, hostVersion }`. */
+    explain: answered('explain', 'walk', Array.isArray),
+    /** `{ runner, purpose, repoRoot, session, now }` -> `{ seat, hostVersion }`. */
+    plan: answered('plan', 'seat', isObject),
+    /** `{ runner, session, pin?, accountState?, now }` -> `{ preflight, hostVersion }`. */
+    preflight: answered('preflight', 'preflight', isObject),
+    /** `{ runner }` -> `{ config, digest, hostVersion }`. */
+    digest: answered('digest', 'digest', (digest) => typeof digest === 'string'),
     tierLadder() {
       const line = call('ladder', {});
-      if (line.result !== 'ok' || !Array.isArray(line.ladder?.vocabulary)) {
+      if (!Array.isArray(line.ladder?.vocabulary)) {
         throw new SeatBindingError('seat-binding-route-bad-output', `${bin()} seat-binding ladder answered without a ladder`);
       }
       return { ...line.ladder, hostVersion: line.hostVersion };
@@ -166,12 +198,9 @@ export function createSeatBindingClient({ hostBin, cwd, fgosDir, payloadRoot, ti
 let defaultClient = null;
 const client = () => (defaultClient ??= createSeatBindingClient());
 
-export function bindSeat(request) {
-  return client().bindSeat(request);
-}
-
-export function tierLadder() {
-  return client().tierLadder();
+/** The default client: the host this payload resolves (see `resolveSeatBindingHost`). */
+export function seatBindingClient() {
+  return client();
 }
 
 /** For tests: forget the host the default client resolved. */

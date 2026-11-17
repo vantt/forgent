@@ -244,16 +244,15 @@ The PreToolUse hook guards Agent and Task calls by running `decide` for the call
 
 ## 9. The version
 
-The binding keeps `contractVersion` `v1alpha1`: its consumers read it from run records. The route request to Seat Binding
-gains protocol 2 in the phase that moves the bind into Rust. The vector file's own version is `executor-model.v1`.
+The binding keeps `contractVersion` `v1alpha1`: its consumers read it from run records. The Node payload asks the bind
+through the host route at protocol 2 (`apps/fgos/src/wiring/seat_binding.rs`), whose request carries the runner section. The vector file's own version is `executor-model.v1`.
 
 ## 10. Proof
 
 Each derived fact has one owning proof: the vectors of `executor-model.v1.json` and `bind.v1.json`. Until the Node functions are deleted
-the Node twin `test/runner/dispatch/executor-model-vectors.test.mjs` replays every vector against them, except a vector
-marked `decided`, which states a rule decided after the Node function was written (its `expect` is written by hand and
-the script never records it; the explicit invocation rule of section 3 is one); a Rust port reads
-the same file. A vector marked `knownDefect` records today's output of behaviour that looks wrong: the port keeps it and
+the Node twin `test/runner/dispatch/executor-model-vectors.test.mjs` replays every vector against them; the Node bind,
+explain, pre-admission and digest answers come through the host route (`fgos internal seat-binding --protocol 2`), so
+for `bind.v1.json` that replay is the wiring proof of the route. A Rust port reads the same file. A vector marked `knownDefect` records today's output of behaviour that looks wrong: the port keeps it and
 the owner decides in a separate item. The vectors are regenerated, never hand-edited in `expect`, by `scripts/executor-model-vectors.mjs` (`--check` fails on drift), which also
 records `leaseRead`, what Dispatch's adapter reads from a vector's lease state, for a fact that reads it. Shapes of the
 decide, hook and listing answers are written here; their vectors are recorded by the phases that move them, each in its

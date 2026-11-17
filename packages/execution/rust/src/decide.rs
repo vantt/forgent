@@ -202,6 +202,8 @@ impl DecideFailure {
 pub struct BoundSeat {
     pub executor: String,
     pub invocation: Option<String>,
+    /// The whole binding, as [`crate::bind::bind`] answers it.
+    pub binding: Value,
 }
 
 /// Why Seat Binding bound no seat.
@@ -291,6 +293,7 @@ impl SeatBinder for CrateBinder<'_> {
                 .get("invocation")
                 .and_then(Value::as_str)
                 .map(str::to_string),
+            binding: bound,
         })
     }
 }
@@ -690,6 +693,94 @@ fn purpose_seat(
         };
     }
     Ok(named_answer)
+}
+
+/// The purpose door's answer in the shape the Node launch reads it (`purposeSeatOf`): `configured`, `executorId`,
+/// `executor` (its registry entry, absent when there is none), `bindingSource` (`executor-id`, `default`,
+/// `tool-provider`, `seat-binding` or null), and the one of `tool` (the probed tools), `binding` with
+/// `invocationId` (the seat Seat Binding bound) or `refused` that answered it.
+pub fn purpose_seat_answer(
+    runner: &Value,
+    purpose: Option<&str>,
+    probe: &dyn ToolProbe,
+    binder: &dyn SeatBinder,
+) -> Result<Value, ModelError> {
+    let entry_of = |id: &str| {
+        runner
+            .get("executors")
+            .and_then(|executors| executors.get(id))
+            .filter(|entry| !entry.is_null())
+            .cloned()
+    };
+    let with_entry = |mut answer: Value, id: &str| {
+        if let Some(entry) = entry_of(id) {
+            answer["executor"] = entry;
+        }
+        answer
+    };
+    Ok(match purpose_seat(runner, purpose, probe, binder)? {
+        PurposeAnswer::Named { .. } => {
+            let found = lookup_executor(runner, purpose);
+            let mut answer = json!({
+                "executorId": found.executor_id,
+                "configured": found.configured,
+                "bindingSource": found.binding_source,
+            });
+            if let Some(entry) = found.executor {
+                answer["executor"] = entry.clone();
+            }
+            answer
+        }
+        PurposeAnswer::Tool {
+            executor_id,
+            mechanism,
+            reason_code,
+            stale,
+            mcp_tool,
+            command,
+            providers,
+        } => {
+            let mut tool = json!({ "mechanism": mechanism, "reasonCode": reason_code });
+            if stale {
+                tool["stale"] = json!(true);
+            }
+            if let Some(mcp_tool) = mcp_tool {
+                tool["mcpTool"] = json!(mcp_tool);
+            }
+            if let Some(command) = command {
+                tool["command"] = json!(command);
+            }
+            tool["providers"] = providers
+                .iter()
+                .map(|(id, status)| json!({ "executorId": id, "status": status.as_str() }))
+                .collect();
+            let answer = json!({
+                "configured": true,
+                "executorId": executor_id,
+                "bindingSource": "tool-provider",
+                "tool": tool,
+            });
+            with_entry(answer, &executor_id)
+        }
+        PurposeAnswer::Bound(seat) => {
+            let mut answer = json!({
+                "configured": true,
+                "executorId": seat.executor,
+                "bindingSource": "seat-binding",
+                "binding": seat.binding,
+            });
+            if let Some(invocation) = &seat.invocation {
+                answer["invocationId"] = json!(invocation);
+            }
+            with_entry(answer, &seat.executor)
+        }
+        PurposeAnswer::Refused { code, detail } => json!({
+            "configured": true,
+            "executorId": null,
+            "bindingSource": null,
+            "refused": { "reason": code, "detail": detail },
+        }),
+    })
 }
 
 // ---- resolving an out-of-process dispatch ----------------------------------------------------------------

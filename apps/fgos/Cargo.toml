@@ -20,6 +20,8 @@ fgos-holder-lock = { path = "../../packages/holder-lock/rust" }
 fgos-run-supervisor = { path = "../../packages/run-supervisor/rust" }
 fgos-terminal-control = { path = "../../packages/terminal-control/rust" }
 fgos-seat-binding = { path = "../../packages/seat-binding/rust" }
+# The bind, explain, preflight and purpose door the seat-binding route serves to the Node payload.
+fgos-execution = { path = "../../packages/execution/rust" }
 fgos-mailbox = { path = "../../packages/mailbox/rust/store" }
 fgos-mailbox-core = { path = "../../packages/mailbox/rust/core" }
 fgos-durable-file = { path = "../../packages/durable-file/rust" }

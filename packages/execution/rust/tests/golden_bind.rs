@@ -1,7 +1,6 @@
 //! Replays the vectors of `packages/execution/contracts/bind.v1.json`: the binding of one seat, the dispatch explain
 //! answer, the pre-admission facts, the seat config slice and its digest, and effective rigor. The vectors are read,
-//! never copied. Lease state arrives as Dispatch's adapter reads it (`leaseRead`), the input the bind takes; a vector
-//! marked `decided` states a rule decided after the Node bind was written and is replayed like any other.
+//! never copied. Lease state arrives as Dispatch's adapter reads it (`leaseRead`), the input the bind takes.
 
 mod common;
 
