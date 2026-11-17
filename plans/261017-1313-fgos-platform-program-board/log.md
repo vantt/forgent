@@ -1,3 +1,4 @@
+- 2026-11-17 23:32 DESIGN-LAP: every machine's accounts are on runner.llmAccounts (design-lap, fg-server, fg-server2); design-lap check 0 fails, probes healthy, real runs ok; empty runner.providers.<p>.accounts shells remain (door cannot unset them), phase 16 may proceed (also move agy-permissions.mjs:160)
 - 2026-11-17 23:25 HARDEN: fg-server2 accounts are on runner.llmAccounts only (p-ag76llwilb done; pools added: z-ai, deepseek; runner.providers accounts removed; probes: 9 healthy/12)
 - 2026-11-17 23:12 DESIGN-LAP: llmAccounts pools declared for every provider incl. z-ai and deepseek (backup kept); runner.providers NOT removed yet: probe gemini/tetcu72 harness leg hangs in agy -p (bwrap) though direct use works; waiting on owner; machines on llmAccounts so far: fg-server; design-lap pending, fg-server2 pending p-ag76llwilb
 - 2026-11-17 22:31 FG-SERVER: fg-server accounts are on runner.llmAccounts only

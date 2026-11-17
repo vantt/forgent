@@ -1,7 +1,7 @@
 ---
 phase: 5
 title: "One account inventory shape (runner.llmAccounts)"
-status: applied on design-lap 2026-11-17 except step 6 (deferred)
+status: applied on design-lap 2026-11-17 (empty legacy shells remain, see door finding)
 priority: P2
 effort: 3h
 depends_on: [P3, D3, P4 step 3 (agy files known)]
@@ -101,11 +101,21 @@ Backup: `~/.fgos/private/config-backup-261117-p5/` (accounts file and global con
   pi herdr, all `ok`), xai/vantt (omp cli, omp herdr), gemini/tetcu72 and gemini/tetnu (`agy-cli-bwrap`).
   claude/main was not probed (headless claude stops at the trust prompt).
 
-**Step 6 deferred on purpose.** `runner.providers` is not removed yet. The lease already prefers `llmAccounts`
-per pool, so the legacy copies change no behaviour; but `fgos dispatch probe-account` reads accounts only from
-`runner.providers`, so removing it now would leave no way to probe any account. The S5 / MP-C change that
-deletes the reader must first make `probe-account` read `llmAccounts` (and ask the model of the account's own
-pool, not the first tier-cell entry). Until then the legacy copies and the two dead pools stay, and this phase
-closes with step 6 once that lands.
+**Step 6 applied (design-lap, 2026-11-17 23:3x).** The earlier claim here that `probe-account` reads only
+`runner.providers` was wrong: it reads both blocks through `providerAccountInventory` (HARDEN guide
+`plans/261115-2328-execution-read-door/reports/guide-261117-2230-design-lap-llm-accounts-move.md`, fact 2).
+Done: pools `z-ai` and `deepseek` added to `runner.llmAccounts` (copies of the `openrouter` account, the pools
+an unbound glm or deepseek seat leases from); every legacy account removed one by one with
+`fgos config unset runner.providers.<p>.accounts.<a> --global`. Proof after: `fgos config check` 0 fails;
+doctor `llm-accounts-shape` ok (12 accounts, 9 pools); harness probes healthy for openai/fgovn, openai/tetnu,
+xai/vantt; real `fgos run` ok for deepseek (48 s) and gemini/tetnu (87 s) and gemini/tetcu72 (417 s, slow, correct).
+The doctor row `agy-sub-homes-configured` now says "nothing to check" (the coverage gap the guide predicted;
+phase 16 must move `src/setup/agy-permissions.mjs:160` to `llmAccounts`).
+
+**Door finding.** `unset runner.providers --global` edits only `config.yaml` and removes the empty
+`runner.providers.<p>` entries there; the accounts file then refuses every write (`config-key-in-wrong-file`).
+Do not run it first: remove the accounts through the per-account path, and the empty `accounts: {}` shells in the
+accounts file cannot be removed through the door (they stay, harmless, with their empty entries in `config.yaml`).
+A hand edit of the private file, or a door fix, is left to the owner and the S5 reader deletion.
 
 Rollback: restore the accounts file from the backup through the door, or by file copy with the owner present.
