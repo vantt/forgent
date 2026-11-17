@@ -219,7 +219,7 @@ impl Prefer {
     }
 }
 
-/// `roles.<role>`, `personas.<name>`, `seats.<seat>` entries.
+/// `roles.<role>` and `personas.<name>` entries: taste that applies to every capability.
 #[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Scope {
@@ -238,12 +238,6 @@ pub struct CapabilityEntry {
     pub max_tier: Option<Tier>,
     #[serde(default)]
     pub prefer: Option<Vec<Prefer>>,
-    #[serde(default)]
-    pub roles: Table<Scope>,
-    #[serde(default)]
-    pub personas: Table<Scope>,
-    #[serde(default)]
-    pub seats: Table<Scope>,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -276,6 +270,10 @@ pub struct Config {
     pub tier_fallback: Table<Vec<String>>,
     #[serde(default)]
     pub model_policies: Table<Table<Cell>>,
+    #[serde(default)]
+    pub roles: Table<Scope>,
+    #[serde(default)]
+    pub personas: Table<Scope>,
     #[serde(default)]
     pub capabilities: Table<CapabilityEntry>,
 }
@@ -583,8 +581,6 @@ pub struct Policy {
     pub tier_fallback: Vec<String>,
     /// Cells at the final tier by family; a family without a key serves no cell.
     pub cells: BTreeMap<String, Vec<CellEntry>>,
-    /// Config path that sets this seat's tier (the line to edit).
-    pub seat_tier_path: String,
     pub effective_rigor: Rigor,
     pub ask: Ask,
 }

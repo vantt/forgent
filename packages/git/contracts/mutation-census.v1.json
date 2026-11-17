@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "efa5df6290bab56ee752ff17118327c957dee241ea5cbd5978ef7964590e6ac1",
+  "payloadDigest": "d6cdb00c0858a89e92b6869a4771f585dd3e6191b69f4aee5623ef380992bdb6",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "b8b886cee2ea5ce7ee1153e4795512db135a990de894c27e53c5e778b210be62",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -770,9 +770,9 @@
     "packages/run-supervisor/rust/tests/unix_lease_record.rs": "a0e5eee52e0bc00552f9c1bb6f7ffb5d42d959e134ac636a51325c0cffe0b5cb",
     "packages/seat-binding/rust/src/explain.rs": "86501b9c3cd4c2870041135d15ddf53e555e9710ac6ba8cfd6a27e4f8da77811",
     "packages/seat-binding/rust/src/lib.rs": "68825754d282aaa175e964347b86b0685a6d07375657a43f09cefe4f919ba98a",
-    "packages/seat-binding/rust/src/model.rs": "8a903d16e30b9fa52917a12ac0a8175a19a76528b1f5f19d0edd93c83666ad23",
-    "packages/seat-binding/rust/src/policy.rs": "ca93a8c356448adbd935f04a310f82eb53894ea76d25a1a55c065e545e83e8e7",
-    "packages/seat-binding/rust/src/rank.rs": "7a5c02424890755fe923882b281f4b01391eb7d7111737488c7b5129b48515ff",
+    "packages/seat-binding/rust/src/model.rs": "cf3d334e63118ae3534e07b0e7e3efaf6af3b3e897259cfee1530b97dea0ea68",
+    "packages/seat-binding/rust/src/policy.rs": "27cfef47914b95b9bc94ae30cbdde534cd9c21812ba005d4f8571bdbc7c33480",
+    "packages/seat-binding/rust/src/rank.rs": "2e748995658b94938c3aefea189e4e119f1b954ddfae432947f0c4cbb8687e3d",
     "packages/seat-binding/rust/src/route.rs": "b14ba0cee5bd2aee535f2b76ea96bc0ef532e4166016a26c98d89c11d2fd484f",
     "packages/seat-binding/rust/src/tier.rs": "8c13a47153cb90274751bca8b36b5d20e349c50dacbcf06631c65195c73fe24c",
     "packages/seat-binding/rust/tests/golden.rs": "3536ea649db21c346bd59829b33aa461e05e902d4f603ad15bc8db79d71eb561",

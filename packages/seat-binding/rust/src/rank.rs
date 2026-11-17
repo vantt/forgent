@@ -308,11 +308,11 @@ fn run_bases(
             let mut r = Refusal::new(
                 "tier-cell-missing",
                 format!(
-                    "{} {} — no allowed executor has a cell; change {} or set {}",
+                    "{} {} — no allowed executor has a cell; change {} or the tier set by {}",
                     label(policy),
                     policy.tier.name(),
                     policy.prefer_source,
-                    policy.seat_tier_path
+                    policy.tier_source
                 ),
             );
             r.config = Some(policy.prefer_source.clone());

@@ -98,11 +98,7 @@
         },
         "architecture:shape": {
           "rigor": "critical",
-          "maxTier": "frontier",
-          "prefer": [
-            "claude",
-            "openai"
-          ]
+          "maxTier": "frontier"
         },
         "architecture:critique": {
           "maxTier": "frontier"
@@ -841,7 +837,7 @@
         }
       },
       "explainContains": [
-        "change capabilities.\"architecture:shape\".prefer or the tier set by workflow:w/u/system"
+        "change capabilities.\"architecture:shape\".prefer or the tier set by maxTier"
       ],
       "skippedReasons": [
         "tier-cell-missing"
@@ -1303,6 +1299,16 @@
           "capability": "architecture:shape",
           "seat": "system",
           "role": "producer"
+        },
+        "config": {
+          "capabilities": {
+            "architecture:shape": {
+              "prefer": [
+                "claude",
+                "openai"
+              ]
+            }
+          }
         }
       },
       "expected": {
@@ -3330,7 +3336,11 @@
         "ask": {
           "capability": "architecture:critique",
           "seat": "producer",
-          "role": "producer"
+          "role": "producer",
+          "workflow": {
+            "tier": "frontier",
+            "source": "workflow:w/u/producer"
+          }
         },
         "config": {
           "maxTier": null,
