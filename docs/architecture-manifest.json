@@ -67,7 +67,7 @@
     "src/runner/execution/capability-config.mjs": 0,
     "src/runner/worktree.mjs": 2,
     "src/seat-binding/": 5,
-  "src/session-rotation/": 2,
+    "src/session-rotation/": 2,
     "src/setup/": 9,
     "src/state/": 7,
     "src/state/fgos-file-registry.mjs": 0,

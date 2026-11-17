@@ -18,7 +18,7 @@ is a Node script) and only orchestrates Rust doors (durable file writes, secrets
 `packages/config/contracts/fixtures/registry-defaults.v1.json` if it must list the section. <!-- Updated: Validation Session 1 -->
 
 ## Steps
-1. Config `sessionRotation`: `soft` 0.40, `hard` 0.70, `keep` 10, `windowTokens` (default from the spike), and
+1. Config `sessionRotation`: `soft` 0.40, `hard` 0.70, `keep` 10, `windowSize` (default from the spike), and
    `personas.<name>.{soft,hard,reload}` (SM-D13: a persona may set its own thresholds; the global values are the
    defaults; `reload` lists the portfolio paths the successor rereads). `decide.test.mjs` covers a persona override. Schema and standard file; project overrides
    per the vision doc (project wins over global). If registering a new area needs a file outside this footprint, stop.

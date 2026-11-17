@@ -6,6 +6,8 @@ export function thresholdsFor(config, persona) {
   const own = config?.personas?.[persona] ?? {};
   const soft = own.soft ?? config.soft;
   const hard = own.hard ?? config.hard;
+  if (soft === undefined) throw new TypeError(`session rotation: soft threshold is missing${persona ? ` for persona ${persona}` : ''}`);
+  if (hard === undefined) throw new TypeError(`session rotation: hard threshold is missing${persona ? ` for persona ${persona}` : ''}`);
   if (!(soft <= hard)) throw new RangeError(`session rotation: soft ${soft} is above hard ${hard}${own.soft !== undefined || own.hard !== undefined ? ` for persona ${persona}` : ''}`);
   return { soft, hard };
 }

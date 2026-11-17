@@ -25,6 +25,7 @@ const SECRET_PATTERNS = [
 const ASSIGNMENT = /\b([A-Za-z0-9_.-]*(?:secret|password|passwd|token|api[_-]?key|credential)[A-Za-z0-9_.-]*)(\s*[:=]\s*)(?:"[^"\n]*"|'[^'\n]*'|[^\s"',;]+)/gi;
 
 /** `text` with secret-shaped values (keys, bearer and JWT tokens, private keys, `name=value` credentials) masked. */
+// Local on purpose: no free-text redactor exists in JS (the Rust secrets redactor masks declared values only), so these patterns are best-effort.
 export function redactText(text) {
   let out = String(text);
   for (const pattern of SECRET_PATTERNS) out = out.replace(pattern, REDACTION);
@@ -58,7 +59,7 @@ export function buildHandoff({ persona, name, sessionId, rotate, portfolio = [],
  * Write one handoff. Refuses to overwrite an existing file, installs `latest.json` last, then prunes to the newest
  * `keep`. Returns `{ file, path }`.
  */
-export function writeHandoff({ fgosDir, persona, name, sessionId, rotate, keep = 10, now = new Date(), ...content }) {
+export function writeHandoff({ fgosDir, persona, name, sessionId, rotate, keep, now = new Date(), ...content }) {
   const dir = dirOf(fgosDir, persona, name);
   const sid8 = String(sessionId).replace(/[^A-Za-z0-9]/g, '').slice(0, 8);
   if (!sid8) throw new TypeError('handoff store: sessionId has no usable characters');

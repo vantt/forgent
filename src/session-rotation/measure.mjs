@@ -29,7 +29,8 @@ function parse(line) {
 }
 
 /** Newest sidecar record of `sessionId` (any session when null) whose `ts` is later than `afterTs`, or null. */
-export function latestSidecarRecord(sidecarPath, { sessionId = null, afterTs = -Infinity } = {}) {
+export function latestSidecarRecord(sidecarPath, { sessionId = null, afterTs } = {}) {
+  if (!Number.isFinite(afterTs)) throw new TypeError('latestSidecarRecord needs afterTs (ms): only a record newer than the Stop hook counts as fresh');
   let found = null;
   for (const line of readLines(sidecarPath)) {
     const record = parse(line);
@@ -74,6 +75,7 @@ const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
  * hook's timestamp, ms), else falls back to the transcript and marks the answer stale. Null when neither has data.
  */
 export async function measureContext({ sidecarPath, transcriptPath, sessionId = null, afterTs, windowSize, waitMs = FRESH_WAIT_MS, now = Date.now, pollMs = POLL_MS }) {
+  if (!Number.isFinite(afterTs)) throw new TypeError('measureContext needs afterTs (ms): only a record newer than the Stop hook counts as fresh');
   const deadline = now() + waitMs;
   for (;;) {
     const fresh = sidecarPath ? measureFromSidecarRecord(latestSidecarRecord(sidecarPath, { sessionId, afterTs })) : null;

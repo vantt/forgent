@@ -31,7 +31,7 @@ of phase 8 and confirms the executor shape of phase 14.
 4. Window size: record `context_window_size` for the models bind() picks at tier `standard` here, and whether any
    transcript field names it.
 5. Write the report: for each mechanic `works | does not work | flaky (n of 10)`, the evidence, and the decision rule
-   for phase 8 (measure = sidecar when fresh within N seconds, else transcript sum / `sessionRotation.windowTokens`; or
+   for phase 8 (measure = sidecar when fresh within N seconds, else transcript sum / `sessionRotation.windowSize`; or
    transcript only) and for phase 14 (`/clear` recorded as a no-second-session fallback only, per SM-D13).
 6. Clean up: close every pane you allocated (release through the route), remove scratch files.
 

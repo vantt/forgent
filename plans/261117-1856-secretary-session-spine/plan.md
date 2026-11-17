@@ -344,7 +344,7 @@ Kept below as the record of what was asked.
   supervisor call; phase 9's verify greps that `deliver_brief`/`await_ready` are defined only there.
 - **Rotation closes a live session wrongly.** Two-step rule: retire only after the successor answered; every failure
   leaves the old one; the executor never SIGKILLs. A spike outcome that disproves the sidecar falls back to the transcript
-  measure with the window size from config (`sessionRotation.windowTokens`), already in phase 8's shape.
+  measure with the window size from config (`sessionRotation.windowSize`), already in phase 8's shape.
 - **Statusline ownership.** If the spike shows a sidecar needs this repo's or the user's `statusLine` changed, phase 8 uses
   the transcript measure only and the statusline change becomes a new owner question, not a silent edit.
 - **Overlap with two ready plans.** See "Why the plan stays `draft`": phases 12, 13, 15, 17, 18 wait; 8 and 9 rebase one
