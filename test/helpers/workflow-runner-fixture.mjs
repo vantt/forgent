@@ -10,7 +10,7 @@ import path from 'node:path';
 import { spawn } from 'node:child_process';
 
 import { setupWorkflowFixtureRepo } from './workflow-fixture-repo.mjs';
-import { writeProjectConfig, readProjectConfig } from './config-fixture.mjs';
+import { writeProjectConfig, readProjectConfig, tasteServedBy } from './config-fixture.mjs';
 import { readWorkflowEvents } from '../../src/workflow/store.mjs';
 import { acquireSync, createLockScope } from '../../src/holder-lock/index.mjs';
 
@@ -90,6 +90,8 @@ export function useDistinctFamilies(tmp, names) {
   for (const capability of Object.values(cfg.runner.capabilities)) {
     capability.prefer = names.map((executor) => ({ executor }));
   }
+  // Role and persona taste has pools of their own that win over a capability's; they must name these executors, not the setup's `test-node`, which is gone.
+  Object.assign(cfg.runner, tasteServedBy(names));
   writeProjectConfig(tmp, cfg);
 }
 
