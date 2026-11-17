@@ -81,8 +81,6 @@ export function useDistinctFamilies(tmp, names) {
     cfg.runner.executors[name] = {
       kind: 'agent',
       allowCrossProvider: true,
-      command,
-      args: [script, '{prompt}'],
       providerModel: name,
       invocations: [{ id: 'cli-default', via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' }, command, args: [script, '{prompt}'] }],
     };

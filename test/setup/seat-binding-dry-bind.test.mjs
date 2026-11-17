@@ -383,7 +383,7 @@ const POSTURE_TIERS = Object.fromEntries(['nano', 'standard', 'advanced', 'flags
 const POSTURE_POLICIES = Object.fromEntries(['claude', 'gemini', 'openai', 'xai', 'z-ai', 'deepseek'].map((family) => [family, POSTURE_TIERS]));
 const cliBwrap = (id, command) => ({ id, via: 'cli', adapter: 'cli-spawn', command, args: ['-p', '{prompt}'], confinement: { backend: 'bwrap' } });
 const bwrapAgent = (family) => ({ kind: 'agent', providerModel: family, invocations: [cliBwrap(`${family}-cli-bwrap`, family)] });
-const unconfinedAgent = (family) => ({ kind: 'agent', providerModel: family, command: family, args: ['-p', '{prompt}'] });
+const unconfinedAgent = (family) => ({ kind: 'agent', providerModel: family, invocations: [{ id: 'cli', via: 'cli', command: family, args: ['-p', '{prompt}'] }] });
 
 async function posture(config) {
   seedFileLocalBwrapRegistry();

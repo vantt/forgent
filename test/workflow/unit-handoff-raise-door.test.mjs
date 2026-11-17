@@ -20,7 +20,6 @@ const COMMAND = { claude: 'claude', openai: 'codex', gemini: 'agy' };
 const executor = (family) => ({
   kind: 'agent',
   providerModel: family,
-  command: COMMAND[family],
   invocations: [{
     id: `${family}-cli`, via: 'cli', adapter: 'cli-spawn', command: COMMAND[family], confinement: { backend: 'bwrap' },
     credentialStore: { use: family, homeEnv: `${family.toUpperCase()}_HOME`, files: ['login'] },

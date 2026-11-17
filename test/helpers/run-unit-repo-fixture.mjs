@@ -42,8 +42,6 @@ export function setupGitRepo() {
           kind: 'agent',
           description: 'Test node agent',
           allowCrossProvider: true,
-          command: process.execPath,
-          args: [],
           providerModel: 'node',
           invocations: [
             {
@@ -142,8 +140,6 @@ export function reviewedConfig(repoRoot, executorNames) {
     executors[name] = {
       kind: 'agent',
       allowCrossProvider: true,
-      command,
-      args: [script, '{prompt}'],
       providerModel: name,
       invocations: [{ id: 'cli-default', via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' }, command, args: [script, '{prompt}'] }],
     };
@@ -242,7 +238,6 @@ export function writeScopedWorker(repoRoot, { files, waitFor = null, summary = '
   );
   const cfg = readProjectConfig(repoRoot);
   for (const executor of Object.values(cfg.runner.executors)) {
-    executor.args = [script, '{prompt}'];
     for (const invocation of executor.invocations) invocation.args = [script, '{prompt}'];
   }
   writeProjectConfig(repoRoot, cfg);

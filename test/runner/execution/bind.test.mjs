@@ -72,27 +72,24 @@ function createMockRunnerConfig() {
       claude: {
         kind: 'agent',
         provider: 'claude',
-        command: 'claude',
         invocations: [
-          { id: 'claude-cli', via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' } },
-          { id: 'claude-herdr', via: 'cli', adapter: 'herdr-spawn', confinement: { backend: 'bwrap' } },
+          { id: 'claude-cli', via: 'cli', adapter: 'cli-spawn', command: 'claude', confinement: { backend: 'bwrap' } },
+          { id: 'claude-herdr', via: 'cli', adapter: 'herdr-spawn', command: 'claude', confinement: { backend: 'bwrap' } },
         ],
       },
       codex: {
         kind: 'agent',
         provider: 'openai',
-        command: 'codex',
         invocations: [
-          { id: 'codex-cli', via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' } },
-          { id: 'codex-herdr-bwrap', via: 'cli', adapter: 'herdr-spawn', confinement: { backend: 'bwrap' } },
+          { id: 'codex-cli', via: 'cli', adapter: 'cli-spawn', command: 'codex', confinement: { backend: 'bwrap' } },
+          { id: 'codex-herdr-bwrap', via: 'cli', adapter: 'herdr-spawn', command: 'codex', confinement: { backend: 'bwrap' } },
         ],
       },
       'gemini-cli': {
         kind: 'agent',
         provider: 'gemini',
-        command: 'agy',
         invocations: [
-          { id: 'gemini-spawn', via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' } },
+          { id: 'gemini-spawn', via: 'cli', adapter: 'cli-spawn', command: 'agy', confinement: { backend: 'bwrap' } },
         ],
       },
       'native-agent': {
@@ -339,7 +336,6 @@ function twoInvocationConfig(extraCapabilities = {}) {
       duo: {
         kind: 'agent',
         provider: 'claude',
-        command: 'duo',
         invocations: [
           { id: 'duo-plain', via: 'cli', adapter: 'cli-spawn', command: 'duo' },
           { id: 'duo-herdr', via: 'cli', adapter: 'herdr-spawn', command: 'duo', confinement: { backend: 'bwrap' } },
@@ -349,7 +345,7 @@ function twoInvocationConfig(extraCapabilities = {}) {
             adapter: 'cli-spawn',
             command: 'duo',
             confinement: { backend: 'bwrap' },
-            resourceBindings: [{ resource: 'private-home', target: { kind: 'env', name: 'HOME' } }],
+            credentialStore: { use: 'duo', homeEnv: 'HOME' },
           },
         ],
       },
@@ -632,7 +628,7 @@ test('bind: an effort the executor does not declare, or its CLI cannot render, r
   assert.deepEqual(declared.refused.rendered, ['low', 'medium']);
 
   const blind = createMockRunnerConfig();
-  blind.executors.claude.command = 'unknown-bin';
+  for (const invocation of blind.executors.claude.invocations) invocation.command = 'unknown-bin';
   blind.capabilities['code:implement'].prefer = [{ executor: 'claude' }];
   blind.modelPolicies.claude.standard = [{ model: 'claude-3-5-sonnet', effort: 'high' }];
   const cannot = bind(implementAsk, { runnerConfig: blind, session: {} });
@@ -648,7 +644,7 @@ function accountConfig(accounts) {
     capabilities: { 'docs:write': { prefer: [{ executor: 'alpha' }] } },
     executors: {
       alpha: {
-        kind: 'agent', providerModel: 'alpha', command: 'pi',
+        kind: 'agent', providerModel: 'alpha',
         invocations: [{ id: 'alpha-cli', via: 'cli', adapter: 'cli-spawn', command: 'pi', confinement: { backend: 'bwrap' }, credentialStore: { use: 'pi', homeEnv: 'PI_HOME', files: ['auth.json'] } }],
       },
     },

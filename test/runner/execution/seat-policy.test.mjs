@@ -23,7 +23,7 @@ const runner = () => ({
     'impact-analysis': { description: 'a tool capability', prefer: 'gitnexus', serves: ['impact'], confinement: { mode: 'required' } },
     'architecture:*': { tier: 'flagship', prefer: ['claude'], rigor: 'high', roles: { 'red-team': { prefer: ['xai'], $comment: 'ignored' } }, $comment: 'ignored' },
   },
-  executors: { claude: { command: 'claude' } },
+  executors: { claude: { invocations: [{ id: 'claude-cli', via: 'cli', command: 'claude' }]} },
   timeoutMs: 5000,
 });
 
@@ -44,7 +44,7 @@ test('the config digest ignores key order, comments and everything outside the s
   reordered.capabilities = Object.fromEntries(Object.entries(reordered.capabilities).reverse());
   reordered.$comment = 'a ladder';
   reordered.timeoutMs = 1;
-  reordered.executors.claude.command = 'other';
+  reordered.executors.claude.invocations[0].command = 'other';
   assert.equal(seatConfigDigestOf(reordered).digest, base);
   const retiered = runner();
   retiered.capabilities['architecture:*'].tier = 'frontier';

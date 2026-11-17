@@ -93,7 +93,7 @@ const TIERS = ['nano', 'mini', 'standard', 'advanced', 'flagship', 'frontier'];
  * order. Account inventory is global-only config, so it goes into a private HOME, and the
  * provider-capacity state lives in a runtime directory of its own.
  */
-export function setup(providers, { prefer = Object.keys(providers), recentlyUsed = {}, declaredStore = false, cells = {}, tierFallback = null, llmAccounts = null } = {}) {
+export function setup(providers, { prefer = Object.keys(providers), recentlyUsed = {}, cells = {}, tierFallback = null, llmAccounts = null } = {}) {
   const repoRoot = fixtureDir('fgos-failover-');
   const git = (args, cwd = repoRoot) => execFileSync('git', args, { cwd, stdio: 'ignore' });
   git(['init', '-b', 'main']);
@@ -117,8 +117,6 @@ export function setup(providers, { prefer = Object.keys(providers), recentlyUsed
       kind: 'agent',
       allowCrossProvider: true,
       providerModel: family,
-      command,
-      args,
       invocations: [{
         id: `${name}-cli`,
         via: 'cli',
@@ -126,10 +124,8 @@ export function setup(providers, { prefer = Object.keys(providers), recentlyUsed
         confinement: { backend: 'bwrap' },
         command,
         args,
-        // A pool declared in llmAccounts needs the store (and its login files) declared by the invocation.
-        ...(declaredStore
-          ? { credentialStore: { use: family, homeEnv: 'ACCOUNT_HOME', files: ['login'] } }
-          : { resourceBindings: [{ resource: 'private-home', target: { kind: 'env', name: 'ACCOUNT_HOME' } }] }),
+        // The store (and its login files) a pool declared in llmAccounts hands to the confined launch.
+        credentialStore: { use: family, homeEnv: 'ACCOUNT_HOME', files: ['login'] },
       }],
     };
     if (Object.keys(logins).length > 0) {

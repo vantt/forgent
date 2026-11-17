@@ -15,7 +15,7 @@ test('omp-natives-present finds the native addon where omp extracts it and fails
   fs.mkdirSync(bin);
   const env = { PATH: bin, HOME: home };
   const check = (over = {}) => checkOmpNativesPresent({ env, home, platform: 'linux', arch: 'x64', ...over });
-  const users = ompExecutorsOf({ executors: { gemini: { invocations: [{ id: 'omp-herdr-bwrap', command: 'omp' }] }, claude: { command: 'claude' } } });
+  const users = ompExecutorsOf({ executors: { gemini: { invocations: [{ id: 'omp-herdr-bwrap', command: 'omp' }] }, claude: { invocations: [{ id: 'claude-cli', via: 'cli', command: 'claude' }]} } });
   assert.deepEqual(users, ['gemini']);
 
   const missingOmp = check({ ompExecutors: users });

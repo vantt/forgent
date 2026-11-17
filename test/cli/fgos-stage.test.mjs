@@ -181,8 +181,6 @@ test('fgos plan on a standard plan without caller verdict advances Work to execu
     executors: {
       'fixture-validator': {
         kind: 'agent',
-        command: process.execPath,
-        args: [executorScript],
         allowCrossProvider: true,
         providerModel: 'node',
         invocations: [{ id: 'cli', via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' }, command: process.execPath, args: [executorScript, '{prompt}'] }],

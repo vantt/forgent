@@ -201,7 +201,7 @@ test('checkAgySubHomesConfigured passes when no agy sub-HOMEs are referenced in 
   const config = {
     runner: {
       executors: {
-        claude: { command: 'claude' },
+        claude: { invocations: [{ id: 'claude-cli', via: 'cli', command: 'claude' }]},
       },
     },
   };

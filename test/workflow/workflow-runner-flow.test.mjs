@@ -115,7 +115,6 @@ test('the owner request and earlier step output reach each unit objective', asyn
     `,
   );
   const cfg = readProjectConfig(tmp);
-  cfg.runner.executors['test-node'].args = [spy, '{prompt}'];
   cfg.runner.executors['test-node'].invocations[0].args = [spy, '{prompt}'];
   writeProjectConfig(tmp, cfg);
 

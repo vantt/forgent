@@ -438,8 +438,7 @@ test('PRODUCTION-DOOR FIXTURE: executeAssignment persists effective-execution-co
     executors: {
       'mock-cli': {
         providerModel: 'claude',
-        command: 'mock-cli',
-        adapter: 'cli-spawn',
+        invocations: [{ id: 'mock-cli-cli', via: 'cli', command: 'mock-cli', adapter: 'cli-spawn' }]
       },
     },
   };

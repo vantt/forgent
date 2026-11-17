@@ -22,8 +22,6 @@ seedStubAgentClis('alpha-bin', 'beta-bin', 'gamma-bin');
 const executor = (family) => ({
   kind: 'agent',
   providerModel: family,
-  command: `${family}-bin`,
-  args: ['{prompt}'],
   invocations: [{ id: 'cli', via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' }, command: `${family}-bin`, args: ['{prompt}'] }],
 });
 

@@ -143,19 +143,12 @@ test('every invocation that declares a login store reads the store its command l
       const label = `${executorId}/${inv.id}`;
       assert.equal(inv.confinement?.backend, 'bwrap', `${label}: only a confined invocation reads a store through a private home`);
       assert.equal(store.use, path.basename(inv.command), `${label}: the store key is the command's CLI`);
-      assert.equal(inv.resourceBindings, undefined, `${label}: the store replaces the older private-home binding`);
       assert.equal(inv.env?.[store.homeEnv], undefined, `${label}: the driver sets ${store.homeEnv}; env does not point at the real store`);
     }
   }
 });
 
 test('every confined invocation with a login account declares its store, and the id of one names no account', () => {
-  for (const [executorId, entry] of Object.entries(executors)) {
-    for (const inv of entry.invocations ?? []) {
-      if (inv.resourceBindings === undefined) continue;
-      assert.fail(`${executorId}/${inv.id} keeps the older private-home binding; declare credentialStore instead`);
-    }
-  }
   const named = /-(fgovn|tetnu|tetcu72|vantt|openrouter|gemini-tetcu72)$/;
   for (const [executorId, entry] of Object.entries(executors)) {
     for (const inv of entry.invocations ?? []) {

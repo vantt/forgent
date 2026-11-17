@@ -65,8 +65,6 @@ function setupTestRepo() {
           kind: 'agent',
           description: 'Test agent',
           allowCrossProvider: true,
-          command: process.execPath,
-          args: [echoScript, '{prompt}'],
           providerModel: 'node',
           invocations: [{ id: 'cli-default', via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' }, command: process.execPath, args: [echoScript, '{prompt}'] }],
         },
@@ -280,7 +278,7 @@ test('fgos run on a machine with no agent CLI is refused by name with the fix, a
   setRunnerConfig(tmp, (runner) => {
     const absent = '/no/such/agent-cli';
     const { command: _command, ...executor } = runner.executors['test-node'];
-    return { ...runner, executors: { 'test-node': { ...executor, command: absent, invocations: [{ ...executor.invocations[0], command: absent }] } } };
+    return { ...runner, executors: { 'test-node': { ...executor,  invocations: [{ ...executor.invocations[0], command: absent }] } } };
   });
   const bin = makeFixtureDir('fgos-cli-run-bin-');
   fs.symlinkSync(execFileSync('sh', ['-c', 'command -v git'], { encoding: 'utf8' }).trim(), path.join(bin, 'git'));

@@ -82,8 +82,6 @@ export function setupWorkflowFixtureRepo({
           kind: 'agent',
           description: 'Test node executor',
           allowCrossProvider: true,
-          command: process.execPath,
-          args: [echoScript, '{prompt}'],
           providerModel: 'node',
           invocations: [{ id: 'cli-default', via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' }, command: process.execPath, args: [echoScript, '{prompt}'] }],
         },

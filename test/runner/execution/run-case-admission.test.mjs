@@ -75,8 +75,6 @@ function setup(families = ['okay']) {
       kind: 'agent',
       allowCrossProvider: true,
       providerModel: family,
-      command,
-      args,
       invocations: [{ id: 'cli-default', via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' }, command, args }],
     };
   }

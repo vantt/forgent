@@ -95,8 +95,6 @@ function setupProbeRepo(executorNames) {
     executors[name] = {
       kind: 'agent',
       allowCrossProvider: true,
-      command,
-      args: [script, '{prompt}'],
       providerModel: name,
       invocations: [{ id: 'cli-default', via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' }, command, args: [script, '{prompt}'] }],
     };
@@ -177,7 +175,7 @@ test('a run uses the confined invocation that was approved, not the executor fir
   const alpha = cfg.runner.executors.alpha;
   const confined = { ...alpha.invocations[0], id: 'cli-confined' };
   alpha.invocations = [
-    { id: 'cli-plain', via: 'cli', adapter: 'cli-spawn', command: alpha.command, args: [failScript, '{prompt}'] },
+    { id: 'cli-plain', via: 'cli', adapter: 'cli-spawn', command: alpha.invocations[0].command, args: [failScript, '{prompt}'] },
     confined,
   ];
   writeProjectConfig(repoRoot, cfg);
@@ -263,7 +261,7 @@ test('resolvePostureInvocation selects the first cli invocation that can carry t
 test('canApplyPosture needs a declared backend that is registered and executable on this machine', () => {
   const executors = {
     confined: { invocations: [{ id: 'cli-bwrap', via: 'cli', confinement: { backend: 'bwrap' } }, { id: 'cli-plain', via: 'cli' }] },
-    plain: { command: 'x', invocations: [{ id: 'cli-plain', via: 'cli' }] },
+    plain: { invocations: [{ id: 'cli-plain', via: 'cli', command: 'x', args: [] }] },
   };
   const ctx = { executors };
   assert.equal(canApplyPosture({ executor: 'confined', invocation: 'cli-bwrap' }, 'read-only', ctx), true);

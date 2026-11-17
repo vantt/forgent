@@ -66,7 +66,7 @@ function setup({ mainFiles = { 'base.txt': 'from main\n' }, branchFiles = { 'min
       modelPolicies: { alpha: { standard: 'alpha-std' } },
       executors: {
         alpha: {
-          kind: 'agent', allowCrossProvider: true, command, args: [script, '{prompt}'], providerModel: 'alpha',
+          kind: 'agent', allowCrossProvider: true,   providerModel: 'alpha',
           invocations: [{ id: 'cli-default', via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' }, command, args: [script, '{prompt}'] }],
         },
       },

@@ -7,7 +7,6 @@ import path from 'node:path';
 import os from 'node:os';
 import { loadRunnerConfigForDir, validateRunnerConfigShape } from '../../src/runner/dispatch/config.mjs';
 import { RunnerConfigError } from '../../src/runner/dispatch/runner-config-error.mjs';
-import { normalizeLegacyConfinement } from '../../src/runner/dispatch/confinement/policies.mjs';
 import { terminalPromptDelivery } from '../../src/runner/dispatch/assignment-runner.mjs';
 import { resolveExecutorConfig, lookupExecutor } from '../../src/runner/dispatch/resolve.mjs';
 import { writeGlobalConfig, writeProjectConfig, withHome } from '../helpers/config-fixture.mjs';
@@ -40,28 +39,34 @@ function loadWith(executorEntry) {
 
 const FULL_CONFINEMENT = { privateHome: true, isolatedSession: true, ownWorktree: true };
 
-test('A1: the loader keeps the declared profile and normalizes its legacy confinement flags', () => {
+/** The runner config of one executor whose only cli invocation declares `fields`, after the checks that compare two fields. */
+function loadInvocation(fields) {
+  return loadWith({ invocations: [{ id: 'sample-cli', via: 'cli', command: 'claude', args: ['{prompt}'], ...fields }] });
+}
+
+test('A1: the loader keeps the profile an invocation declares', () => {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-profile-cfg-'));
   const home = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-profile-home-'));
   const { executor, executors, ...project } = runnerWith({
     executors: {
       sample: {
-        kind: 'agent', command: 'claude', args: ['{prompt}'], promptDelivery: 'file-pointer', permissionMode: 'bypass', confinement: FULL_CONFINEMENT,
+        kind: 'agent',
+        invocations: [{ id: 'sample-cli', via: 'cli', command: 'claude', args: ['{prompt}'], promptDelivery: 'file-pointer', permissionMode: 'bypass', confinement: FULL_CONFINEMENT }],
       },
     },
   });
   writeProjectConfig(dir, { runner: project });
   writeGlobalConfig(home, { runner: { executor, executors } });
   const cfg = withHome(home, () => loadRunnerConfigForDir(dir));
-  const e = cfg.executors.sample;
-  assert.equal(e.permissionMode, 'bypass');
-  assert.deepEqual(e.confinement, normalizeLegacyConfinement(FULL_CONFINEMENT));
-  assert.equal(e.promptDelivery, 'file-pointer');
+  const [inv] = cfg.executors.sample.invocations;
+  assert.equal(inv.permissionMode, 'bypass');
+  assert.deepEqual(inv.confinement, FULL_CONFINEMENT);
+  assert.equal(inv.promptDelivery, 'file-pointer');
 });
 
 test('C5: bypass without any confinement is refused at load, by name', () => {
   assert.throws(
-    () => loadWith({ command: 'claude', args: ['{prompt}'], permissionMode: 'bypass' }),
+    () => loadInvocation({ permissionMode: 'bypass' }),
     (err) => {
       assert.ok(err instanceof RunnerConfigError);
       assert.match(err.message, /confinement/i);
@@ -75,7 +80,7 @@ test('C5: bypass with a PARTIAL confinement is refused -- two of three is not co
   for (const missing of ['privateHome', 'isolatedSession', 'ownWorktree']) {
     const confinement = { ...FULL_CONFINEMENT, [missing]: false };
     assert.throws(
-      () => loadWith({ command: 'claude', args: ['{prompt}'], permissionMode: 'bypass', confinement }),
+      () => loadInvocation({ permissionMode: 'bypass', confinement }),
       (err) => err instanceof RunnerConfigError && /confinement/i.test(err.message) && err.message.includes(missing),
       `expected refusal naming the missing flag when ${missing} is false`,
     );
@@ -83,8 +88,8 @@ test('C5: bypass with a PARTIAL confinement is refused -- two of three is not co
 });
 
 test('C5: bypass with full confinement loads, and ask mode needs none -- the invariant constrains bypass only', () => {
-  assert.doesNotThrow(() => loadWith({ command: 'claude', args: ['{prompt}'], permissionMode: 'bypass', confinement: FULL_CONFINEMENT }));
-  assert.doesNotThrow(() => loadWith({ command: 'claude', args: ['{prompt}'], permissionMode: 'ask' }));
+  assert.doesNotThrow(() => loadInvocation({ permissionMode: 'bypass', confinement: FULL_CONFINEMENT }));
+  assert.doesNotThrow(() => loadInvocation({ permissionMode: 'ask' }));
 });
 
 test('A1: a removed field is named rather than ignored', () => {
@@ -92,26 +97,19 @@ test('A1: a removed field is named rather than ignored', () => {
     // `receipt` was removed: it had one legal value and no reader anywhere.
     // A config still carrying it is told so, rather than having it quietly do
     // nothing -- which is what a field nothing consults already does.
-    () => loadWith({ command: 'claude', args: ['{prompt}'], receipt: 'receiver-written-file' }),
+    () => loadWith({ receipt: 'receiver-written-file' }),
     (err) => err instanceof RunnerConfigError && /receipt/.test(err.message) && /removed/.test(err.message),
   );
 });
 
-test('a pane worker takes its prompt delivery from the resolved command only, the environment never overrides it', () => {
-  const before = process.env.FGOS_HERDR_PROMPT_DELIVERY;
-  process.env.FGOS_HERDR_PROMPT_DELIVERY = 'file-pointer';
-  try {
-    assert.equal(terminalPromptDelivery({}, {}), 'inline');
-    assert.equal(terminalPromptDelivery({}, { promptDelivery: 'inline' }), 'inline');
-    assert.equal(terminalPromptDelivery({}, { promptDelivery: 'file-pointer' }), 'file-pointer');
-  } finally {
-    if (before === undefined) delete process.env.FGOS_HERDR_PROMPT_DELIVERY;
-    else process.env.FGOS_HERDR_PROMPT_DELIVERY = before;
-  }
+test('a pane worker takes its prompt delivery from the resolved command, inline when it declares none', () => {
+  assert.equal(terminalPromptDelivery({}), 'inline');
+  assert.equal(terminalPromptDelivery({ promptDelivery: 'inline' }), 'inline');
+  assert.equal(terminalPromptDelivery({ promptDelivery: 'file-pointer' }), 'file-pointer');
 });
 
 test('a launch field declared on the executor is refused by name, pointing at the invocation that carries it', () => {
-  const fields = { command: 'claude', args: ['{prompt}'], adapter: 'cli-spawn', env: { A: '1' }, permissionMode: 'ask', promptDelivery: 'inline', confinement: FULL_CONFINEMENT, interactiveMode: { exitCommand: '/exit' }, liveOutput: { streamFlags: [], renderer: 'r' }, resourceBindings: [] };
+  const fields = { command: 'claude', args: ['{prompt}'], adapter: 'cli-spawn', env: { A: '1' }, permissionMode: 'ask', promptDelivery: 'inline', interactiveMode: { exitCommand: '/exit' }, liveOutput: { streamFlags: [], renderer: 'r' }, resourceBindings: [] };
   for (const [field, value] of Object.entries(fields)) {
     assert.throws(
       () => loadWith({ [field]: value, invocations: [{ id: 'sample-cli', via: 'cli', command: 'claude', args: ['{prompt}'] }] }),
@@ -125,12 +123,12 @@ test('A1: trustStore is declared where it is read, and only there', () => {
   // It used to be declared on the executor and read from `interactiveMode`, so the validator guarded a field
   // nothing consulted. Declared on the executor it is now refused, naming where it belongs.
   assert.throws(
-    () => loadWith({ command: 'c', args: ['{prompt}'], trustStore: { kind: 'claude-json' } }),
+    () => loadWith({ trustStore: { kind: 'claude-json' } }),
     (err) => err instanceof RunnerConfigError && /trustStore/.test(err.message) && /interactiveMode/.test(err.message),
   );
 });
 
-test('A1: the profile reaches the resolver without resolve.mjs being changed for it', () => {
+test('A1: the profile of the chosen invocation reaches the resolved command', () => {
   // resolveExecutorConfig already returns `{ ...executor, governance }`, so the declared profile rides along
   // with that spread. Asserting it here is what makes that a contract instead of a coincidence -- and it is the
   // reason the resolver, whose blast radius impact analysis reports as HIGH, did not have to be edited for it.
@@ -138,12 +136,8 @@ test('A1: the profile reaches the resolver without resolve.mjs being changed for
     executors: {
       profiled: {
         kind: 'agent',
-        command: 'claude',
-        args: ['{prompt}'],
         providerModel: 'claude',
-        permissionMode: 'bypass',
-        confinement: FULL_CONFINEMENT,
-        promptDelivery: 'file-pointer',
+        invocations: [{ id: 'profiled-cli', via: 'cli', command: 'claude', args: ['{prompt}'], permissionMode: 'bypass', confinement: FULL_CONFINEMENT, promptDelivery: 'file-pointer' }],
       },
     },
   });
@@ -189,7 +183,7 @@ test('Phase D: the retired top-level "readOnlyExecutorRedirects" and "placementP
 
 test('Phase D correction: declaring readOnlyRedirect ON an executor entry is refused at load, by name', () => {
   assert.throws(
-    () => loadWith({ command: 'claude', args: ['{prompt}'], readOnlyRedirect: 'claude-reviewer' }),
+    () => loadWith({ readOnlyRedirect: 'claude-reviewer' }),
     (err) => err instanceof RunnerConfigError && /readOnlyRedirect/.test(err.message) && /retired|removed/.test(err.message),
   );
 });

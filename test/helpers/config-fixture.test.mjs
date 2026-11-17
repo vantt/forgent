@@ -99,7 +99,7 @@ test('the raw readers, the existence check and the gateway token helpers name th
 
 test('a fixture\'s executors and aliases go to the machine home, never the project file, and read back whole', () => {
   const dir = mkRepo();
-  const value = { runner: { timeoutMs: 1, executor: { command: 'x', args: [] }, executors: { a: { kind: 'agent', command: 'x', args: [] } }, capabilities: { c: { aliases: ['d'], description: 'e' } } } };
+  const value = { runner: { timeoutMs: 1, executor: { command: 'x', args: [] }, executors: { a: { kind: 'agent', invocations: [{ id: 'a-cli', via: 'cli', command: 'x', args: [] }] } }, capabilities: { c: { aliases: ['d'], description: 'e' } } } };
   writeProjectConfig(dir, value);
   const onDisk = readRawProjectConfig(dir);
   assert.ok(!/executor|aliases/.test(onDisk), 'the project file holds none of the machine keys');

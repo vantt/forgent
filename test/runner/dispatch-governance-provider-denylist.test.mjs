@@ -88,12 +88,12 @@ test('direct dispatch gate enforces canonical provider matching for OpenAI famil
     },
     executors: {
       'exec-openai': {
-        command: 'codex',
+        invocations: [{ id: 'exec-openai-cli', via: 'cli', command: 'codex' }],
         providerModel: 'openai',
         allowCrossProvider: true,
       },
       'exec-openai-codex': {
-        command: 'codex',
+        invocations: [{ id: 'exec-openai-codex-cli', via: 'cli', command: 'codex' }],
         providerModel: 'openai-codex',
         allowCrossProvider: true,
       },
@@ -172,8 +172,7 @@ for (const c of DOOR_FAMILY_CASES) {
       modelPolicies: { claude: { standard: 'claude-3-7-sonnet' }, [c.providerModel]: { standard: 'door-model' } },
       executors: {
         'door-target': {
-          command: process.execPath,
-          args: [worker.scriptPath],
+          invocations: [{ id: 'door-target-cli', via: 'cli', command: process.execPath, args: [worker.scriptPath] }],
           providerModel: c.providerModel,
           allowCrossProvider: true,
         },
@@ -227,20 +226,17 @@ test('governance gates enforce canonical provider matching for Z-AI family alias
     },
     executors: {
       claude: {
-        command: process.execPath,
-        args: [workerSource.scriptPath],
+        invocations: [{ id: 'claude-cli', via: 'cli', command: process.execPath, args: [workerSource.scriptPath] }],
         providerModel: 'claude',
         allowCrossProvider: true,
       },
       'target-glm': {
-        command: process.execPath,
-        args: [workerGlm.scriptPath],
+        invocations: [{ id: 'target-glm-cli', via: 'cli', command: process.execPath, args: [workerGlm.scriptPath] }],
         providerModel: 'glm',
         allowCrossProvider: true,
       },
       'target-zai': {
-        command: process.execPath,
-        args: [workerZai.scriptPath],
+        invocations: [{ id: 'target-zai-cli', via: 'cli', command: process.execPath, args: [workerZai.scriptPath] }],
         providerModel: 'z-ai',
         allowCrossProvider: true,
       },
@@ -304,20 +300,17 @@ test('governance gates enforce canonical provider matching for Gemini family ali
     },
     executors: {
       claude: {
-        command: process.execPath,
-        args: [workerSource.scriptPath],
+        invocations: [{ id: 'claude-cli', via: 'cli', command: process.execPath, args: [workerSource.scriptPath] }],
         providerModel: 'claude',
         allowCrossProvider: true,
       },
       'target-gemini': {
-        command: process.execPath,
-        args: [workerGemini.scriptPath],
+        invocations: [{ id: 'target-gemini-cli', via: 'cli', command: process.execPath, args: [workerGemini.scriptPath] }],
         providerModel: 'gemini',
         allowCrossProvider: true,
       },
       'target-agy': {
-        command: process.execPath,
-        args: [workerAgy.scriptPath],
+        invocations: [{ id: 'target-agy-cli', via: 'cli', command: process.execPath, args: [workerAgy.scriptPath] }],
         providerModel: 'agy',
         allowCrossProvider: true,
       },

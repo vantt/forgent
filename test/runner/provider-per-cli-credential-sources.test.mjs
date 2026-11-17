@@ -192,7 +192,7 @@ test('the store key the invocation declares picks the login store, not the basen
     const wrapped = providerCapacityForInvocation(selection, { command: '/opt/bin/agent-wrapper', credentialStore: { use: 'pi', homeEnv: 'PI_CODING_AGENT_DIR' } });
     assert.equal(wrapped.credentialSource.home, w.piHome);
     const inferred = providerCapacityForInvocation(selection, { command: '/usr/local/bin/codex', resourceBindings: [{ resource: 'private-home', target: { kind: 'env', name: 'CODEX_HOME' } }] });
-    assert.equal(inferred.credentialSource.home, w.codexHome, 'an older config is read through the same door');
+    assert.equal(inferred.credentialSource, null, 'an older private-home binding no longer implies a store');
   } finally { w.cleanup(); }
 });
 
@@ -269,16 +269,15 @@ test('the unlock probe calls through the store of the CLI the dispatch runs', as
 test('the account probe leases the account into each confined CLI it has a store for', () => {
   const w = workspace();
   try {
-    const binding = (name) => [{ resource: 'private-home', target: { kind: 'env', name } }];
     const cfg = {
       providers: { openai: { accounts: { acct: perCliAccount(w) } } },
       executors: {
         openai: {
           providerModel: 'openai',
           invocations: [
-            { id: 'codex-cli-bwrap', via: 'cli', command: 'codex', confinement: { backend: 'bwrap' }, resourceBindings: binding('CODEX_HOME') },
-            { id: 'pi-cli-bwrap-other', via: 'cli', command: 'pi', confinement: { backend: 'bwrap' }, resourceBindings: binding('PI_CODING_AGENT_DIR') },
-            { id: 'omp-cli-bwrap', via: 'cli', command: 'omp', confinement: { backend: 'bwrap' }, resourceBindings: binding('PI_CODING_AGENT_DIR') },
+            { id: 'codex-cli-bwrap', via: 'cli', command: 'codex', confinement: { backend: 'bwrap' }, credentialStore: { use: 'codex', homeEnv: 'CODEX_HOME' } },
+            { id: 'pi-cli-bwrap-other', via: 'cli', command: 'pi', confinement: { backend: 'bwrap' }, credentialStore: { use: 'pi', homeEnv: 'PI_CODING_AGENT_DIR' } },
+            { id: 'omp-cli-bwrap', via: 'cli', command: 'omp', confinement: { backend: 'bwrap' }, credentialStore: { use: 'omp', homeEnv: 'PI_CODING_AGENT_DIR' } },
             { id: 'pi-cli-plain', via: 'cli', command: 'pi', env: { PI_CODING_AGENT_DIR: w.piHome } },
           ],
         },

@@ -19,7 +19,6 @@ const account = (id) => ({ label: id, credentialSource: { kind: 'home-files', ho
 const agent = (family) => ({
   kind: 'agent',
   providerModel: family,
-  command: `${family}-bin`,
   invocations: [{ id: `${family}-cli`, via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' }, credentialStore: { use: family, homeEnv: `${family.toUpperCase()}_HOME`, files: ['login'] } }],
 });
 const tiers = (cell) => ({ nano: cell, standard: cell, advanced: cell, flagship: cell, frontier: cell });

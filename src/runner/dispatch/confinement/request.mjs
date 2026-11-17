@@ -425,7 +425,7 @@ export function buildConfinementRequest({
       permissionMode: invocation.permissionMode,
       confinement: invocation.confinement ? (normalizeLegacyConfinement(invocation.confinement, `executor.${execId}.confinement`) ?? invocation.confinement) : invocation.confinement,
       adapter: invocation.adapter || "cli-spawn",
-      // The login store the launch reads (declared, or inferred from an older config): the driver hands
+      // The login store the launch declares: the driver hands
       // that store's files to the private home and points `homeEnv` at it. Absent when it reads none.
       ...(credentialStoreOf(invocation) ? { credentialStore: credentialStoreOf(invocation) } : {}),
       ...(invocation.method || invocation.url ? {

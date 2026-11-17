@@ -25,7 +25,6 @@ function deepseekConfig() {
       deepseek: {
         kind: 'agent',
         providerModel: 'deepseek',
-        command: 'pi',
         invocations: [{ id: 'pi-cli-bwrap', via: 'cli', adapter: 'cli-spawn', command: 'pi', args: ['--model', '{model}', '-p', '{prompt}'], confinement: { backend: 'bwrap' }, credentialStore: { use: 'pi', homeEnv: 'PI_CODING_AGENT_DIR', files: ['auth.json'] } }],
       },
     },
@@ -73,14 +72,12 @@ test('explain names why an entry is out: a pool with no account holding the CLI\
   assert.equal(out.reason, 'pool-unusable');
 });
 
-test('explain names the store an older config implies, and none for an invocation that reads no store', () => {
+test('explain names no store for an invocation that declares none, whatever older binding it carries', () => {
   const cfg = deepseekConfig();
   const [inv] = cfg.executors.deepseek.invocations;
   delete cfg.llmAccounts;
   delete inv.credentialStore;
   inv.resourceBindings = [{ resource: 'private-home', target: { kind: 'env', name: 'PI_CODING_AGENT_DIR' } }];
-  assert.deepEqual(explainCapability(cfg, { capability: 'research', session: headless }).credentialStore, { use: 'pi', homeEnv: 'PI_CODING_AGENT_DIR', source: 'inferred' });
-  delete inv.resourceBindings;
   assert.equal(explainCapability(cfg, { capability: 'research', session: headless }).credentialStore, null);
 });
 

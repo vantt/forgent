@@ -11,7 +11,6 @@
 import { familyOf } from './provider-adapter.mjs';
 import { EXECUTOR_CARRIES, CLAUDE_CLI_COMMANDS, EXECUTOR_MISSING_MESSAGE } from './config.mjs';
 import { RunnerConfigError } from './runner-config-error.mjs';
-import { credentialStoreOf } from './provider-capacity.mjs';
 import { capabilityConfinementOf, hasCapabilityEntry, registeredCapabilityOf } from '../execution/capability-config.mjs';
 import { servedCapabilitiesOf } from './tool-providers.mjs';
 
@@ -286,11 +285,11 @@ export function resolveExecutorConfig(cfg, tier, executorId, fgosDir, contentCar
     defaultCliInvocation = cfg.executor.invocations.find((inv) => inv.via === 'cli');
   }
   const byExecutor = cliInvocation
-    ? { command: cliInvocation.command, args: cliInvocation.args, adapter: cliInvocation.adapter, provider: executorEntry?.provider, env: cliInvocation.env ?? executorEntry?.env, liveOutput: cliInvocation.liveOutput ?? executorEntry?.liveOutput, interactiveMode: cliInvocation.interactiveMode ?? executorEntry?.interactiveMode, promptDelivery: cliInvocation.promptDelivery ?? executorEntry?.promptDelivery, permissionMode: cliInvocation.permissionMode ?? executorEntry?.permissionMode, confinement: cliInvocation.confinement ?? executorEntry?.confinement, credentialStore: credentialStoreOf({ command: cliInvocation.command, credentialStore: cliInvocation.credentialStore, resourceBindings: cliInvocation.resourceBindings ?? executorEntry?.resourceBindings }) }
+    ? { command: cliInvocation.command, args: cliInvocation.args, adapter: cliInvocation.adapter, provider: executorEntry?.provider, env: cliInvocation.env, liveOutput: cliInvocation.liveOutput, interactiveMode: cliInvocation.interactiveMode, promptDelivery: cliInvocation.promptDelivery, permissionMode: cliInvocation.permissionMode, confinement: cliInvocation.confinement, credentialStore: cliInvocation.credentialStore ?? null }
     : executorEntry && (executorEntry.adapter || executorEntry.command)
       ? executorEntry
       : defaultCliInvocation
-        ? { command: defaultCliInvocation.command, args: defaultCliInvocation.args, adapter: defaultCliInvocation.adapter, provider: cfg?.executor?.provider, env: defaultCliInvocation.env ?? cfg?.executor?.env, liveOutput: defaultCliInvocation.liveOutput ?? cfg?.executor?.liveOutput, interactiveMode: defaultCliInvocation.interactiveMode ?? cfg?.executor?.interactiveMode, promptDelivery: defaultCliInvocation.promptDelivery ?? cfg?.executor?.promptDelivery, permissionMode: defaultCliInvocation.permissionMode ?? cfg?.executor?.permissionMode, confinement: defaultCliInvocation.confinement ?? cfg?.executor?.confinement, credentialStore: credentialStoreOf({ command: defaultCliInvocation.command, credentialStore: defaultCliInvocation.credentialStore, resourceBindings: defaultCliInvocation.resourceBindings ?? cfg?.executor?.resourceBindings }) }
+        ? { command: defaultCliInvocation.command, args: defaultCliInvocation.args, adapter: defaultCliInvocation.adapter, provider: cfg?.executor?.provider, env: defaultCliInvocation.env ?? cfg?.executor?.env, liveOutput: defaultCliInvocation.liveOutput, interactiveMode: defaultCliInvocation.interactiveMode, promptDelivery: defaultCliInvocation.promptDelivery, permissionMode: defaultCliInvocation.permissionMode, confinement: defaultCliInvocation.confinement, credentialStore: defaultCliInvocation.credentialStore ?? null }
         : resolvedViaAgentType
           ? buildAgentTypeExecutor(cfg.executor, effectiveAgentType)
           : undefined;
@@ -304,7 +303,7 @@ export function resolveExecutorConfig(cfg, tier, executorId, fgosDir, contentCar
   // Inspect providerFamily and effective egress {kind, target, content}.
   // An env override (e.g. ANTHROPIC_BASE_URL, OPENAI_BASE_URL, BASE_URL)
   // or a non-Claude command/provider routes egress to a cross-provider backend.
-  const envBlock = executor.env ?? cliInvocation?.env ?? executorEntry?.env;
+  const envBlock = executor.env ?? cliInvocation?.env;
   const envTarget = envBlock?.ANTHROPIC_BASE_URL || envBlock?.OPENAI_BASE_URL || envBlock?.BASE_URL;
   // Security review finding (self-review, 2026-08-25): a substring check
   // (`envTarget.includes('api.anthropic.com')`) is bypassable by any URL

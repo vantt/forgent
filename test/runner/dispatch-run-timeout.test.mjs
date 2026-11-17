@@ -45,7 +45,7 @@ test('runner.timeoutMs is held to the same ceiling as a run timeout', async () =
         timeoutMs,
         defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
         modelPolicies: { node: { standard: 'node-std' } },
-        executors: { 'test-node': { kind: 'agent', command: process.execPath, args: ['{prompt}'], providerModel: 'node' } },
+        executors: { 'test-node': { kind: 'agent', invocations: [{ id: 'test-node-cli', via: 'cli', command: process.execPath, args: ['{prompt}'] }],  providerModel: 'node' } },
       },
     });
     write(RUN_TIMEOUT_MAX_MS);

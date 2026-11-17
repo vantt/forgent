@@ -372,7 +372,7 @@ fn a_project_file_may_only_turn_own_worktree_on() {
 /// refused by name at its line, and the same text in the global file is accepted.
 #[test]
 fn a_project_file_cannot_set_what_runs_or_loosen_how_it_is_confined() {
-    let cases: [(&str, &[&str], &str); 11] = [
+    let cases: [(&str, &[&str], &str); 8] = [
         (
             "executor-command",
             &["runner:", "  executor:", "    command: tool"],
@@ -382,28 +382,6 @@ fn a_project_file_cannot_set_what_runs_or_loosen_how_it_is_confined() {
             "executor-args",
             &["runner:", "  executor:", "    args: [a]"],
             "runner.executor.args",
-        ),
-        (
-            "executor-entry-command",
-            &[
-                "runner:",
-                "  executors:",
-                "    ex:",
-                "      kind: agent",
-                "      command: tool",
-            ],
-            "runner.executors.ex.command",
-        ),
-        (
-            "executor-entry-args",
-            &[
-                "runner:",
-                "  executors:",
-                "    ex:",
-                "      kind: agent",
-                "      args: [a]",
-            ],
-            "runner.executors.ex.args",
         ),
         (
             "invocation-list",
@@ -418,17 +396,6 @@ fn a_project_file_cannot_set_what_runs_or_loosen_how_it_is_confined() {
                 "          args: [a]",
             ],
             "runner.executors.ex.invocations",
-        ),
-        (
-            "invocation-permission-mode",
-            &[
-                "runner:",
-                "  executors:",
-                "    ex:",
-                "      kind: agent",
-                "      permissionMode: bypass",
-            ],
-            "runner.executors.ex.permissionMode",
         ),
         (
             "confinement-backend",
@@ -497,21 +464,9 @@ fn a_project_file_cannot_set_what_runs_or_loosen_how_it_is_confined() {
         "    command: tool",
         "    args: [a]",
     ];
-    let entry = [
-        "runner:",
-        "  executors:",
-        "    ex:",
-        "      kind: agent",
-        "      command: tool",
-        "      args: [a]",
-    ];
     for (name, lines, path) in cases {
         let global: &[&str] = if path.starts_with("runner.executor.") {
             &executor
-        } else if path.starts_with("runner.executors.ex.")
-            && (path.ends_with(".command") || path.ends_with(".args"))
-        {
-            &entry
         } else {
             lines
         };

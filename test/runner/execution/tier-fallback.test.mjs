@@ -19,7 +19,6 @@ const FAMILIES = ['alpha', 'beta', 'gamma', 'delta'];
 const executor = (family) => ({
   kind: 'agent',
   providerModel: family,
-  command: `${family}-bin`,
   invocations: [{
     id: `${family}-cli`,
     via: 'cli',

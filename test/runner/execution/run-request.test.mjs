@@ -170,7 +170,7 @@ function runRepo() {
       defaultExecutor: 'test-node',
       defaults: { tier: 'standard' },
       modelPolicies: { node: { standard: 'node-std' } },
-      executors: { 'test-node': { kind: 'agent', description: 'Test agent', command: process.execPath, args: ['{prompt}'], providerModel: 'node', allowCrossProvider: true } },
+      executors: { 'test-node': { kind: 'agent', description: 'Test agent', invocations: [{ id: 'test-node-cli', via: 'cli', command: process.execPath, args: ['{prompt}'] }],  providerModel: 'node', allowCrossProvider: true } },
       capabilities: { 'docs:write': capabilityServedBy('test-node', 'docs:write') },
       patterns: { seatBinding: { schema: 1 } },
     },

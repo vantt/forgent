@@ -11,7 +11,7 @@ export function invocationsKeepingNoSession(cfg) {
     if ((executor?.kind ?? 'agent') !== 'agent') continue;
     for (const invocation of executor.invocations ?? []) {
       if (invocation?.via !== 'cli' || !(invocation.confinement ?? executor.confinement)?.backend) continue;
-      if (!credentialStoreOf({ ...invocation, command: invocation.command ?? executor.command })?.sessionDir) found.push(`${executorId}/${invocation.id}`);
+      if (!credentialStoreOf(invocation)?.sessionDir) found.push(`${executorId}/${invocation.id}`);
     }
   }
   return found;

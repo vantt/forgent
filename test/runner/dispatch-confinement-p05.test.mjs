@@ -493,10 +493,7 @@ test("Doctor check: confinement-herdr-maturity reports partial maturity for herd
         executors: {
           "herdr-agent": {
             kind: "agent",
-            adapter: "herdr-spawn",
-            command: "claude",
-            args: [],
-            interactiveMode: { exitCommand: "/exit", kind: "claude" },
+            invocations: [{ id: 'herdr-agent-cli', via: 'cli', adapter: "herdr-spawn", command: "claude", args: [], interactiveMode: { exitCommand: "/exit", kind: "claude" } }],
             confinement: {
               privateHome: true,
               isolatedSession: true,
@@ -523,11 +520,7 @@ test("Doctor check: confinement-herdr-maturity fails if bypass is missing full c
         executors: {
           "herdr-agent": {
             kind: "agent",
-            adapter: "herdr-spawn",
-            command: "claude",
-            args: [],
-            permissionMode: "bypass",
-            interactiveMode: { exitCommand: "/exit", kind: "claude" },
+            invocations: [{ id: 'herdr-agent-cli', via: 'cli', adapter: "herdr-spawn", command: "claude", args: [], permissionMode: "bypass", interactiveMode: { exitCommand: "/exit", kind: "claude" } }],
             confinement: {
               ownWorktree: true, // missing privateHome & isolatedSession
             },
@@ -559,9 +552,7 @@ test("Doctor check: confinement-herdr-maturity reports not-applicable when no he
           ...headlessFirst,
           "cli-agent": {
             kind: "agent",
-            adapter: "cli-spawn",
-            command: "node",
-            args: [],
+            invocations: [{ id: 'cli-agent-cli', via: 'cli', adapter: "cli-spawn", command: "node", args: [] }]
           },
         },
       },

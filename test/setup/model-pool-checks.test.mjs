@@ -12,7 +12,7 @@ import { seedStubAgentClis } from '../helpers/agent-clis.mjs';
 seedStubAgentClis('claude', 'codex', 'omp', 'pi', 'odd');
 
 function agent(providerModel, command = providerModel) {
-  return { kind: 'agent', providerModel, command, args: ['{prompt}'], invocations: [{ id: `${command}-cli`, via: 'cli', adapter: 'cli-spawn', command, args: ['{prompt}'] }] };
+  return { kind: 'agent', providerModel,   invocations: [{ id: `${command}-cli`, via: 'cli', adapter: 'cli-spawn', command, args: ['{prompt}'] }] };
 }
 
 /** Run one check with `runner` as the project runner section and `globalRunner` as the machine's: its account pools go to the accounts file, the rest to the global config. */

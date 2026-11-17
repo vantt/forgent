@@ -19,7 +19,7 @@ const ALL_TIER_MODELS = { nano: 'm', mini: 'm', standard: 'm', advanced: 'm', fl
 // The config of a caller that states none: two agent executors, claude and pi.
 const twoExecutorConfig = () => ({
   executor: { command: 'claude' },
-  executors: { claude: { kind: 'agent', providerModel: 'claude', command: 'claude', args: ['{prompt}'] }, pi: { kind: 'agent', providerModel: 'pi', command: 'pi', args: ['{prompt}'] } },
+  executors: { claude: { kind: 'agent', providerModel: 'claude', invocations: [{ id: 'claude-cli', via: 'cli', command: 'claude', args: ['{prompt}'] }] }, pi: { kind: 'agent', providerModel: 'pi', invocations: [{ id: 'pi-cli', via: 'cli', command: 'pi', args: ['{prompt}'] }] } },
   modelPolicies: { claude: ALL_TIER_MODELS, pi: ALL_TIER_MODELS },
 });
 const effectiveDispatchPolicy = (args) => policyOf({ ...args, runnerConfig: bindable(args.runnerConfig ?? twoExecutorConfig()) });
@@ -177,7 +177,7 @@ test('governance gate rejects disallowed egress/provider', () => {
   // the actual governance rejection, not the registry-absent fail-closed path.
   const runnerConfig = {
     executor: { command: 'claude' },
-    executors: { 'disallowed-provider': { kind: 'agent', providerModel: 'disallowed-provider', command: 'disallowed-provider' } },
+    executors: { 'disallowed-provider': { kind: 'agent', providerModel: 'disallowed-provider', invocations: [{ id: 'disallowed-provider-cli', via: 'cli', command: 'disallowed-provider' }]} },
     modelPolicies: { 'disallowed-provider': { standard: 'disallowed-provider-model' } },
   };
 
@@ -266,7 +266,7 @@ test('the dispatch policy derives providerModel from the registered executor ent
   const runnerConfig = {
     executor: { command: 'claude' },
     executors: {
-      'glm-cli': { kind: 'agent', providerModel: 'z-ai', command: 'glm' },
+      'glm-cli': { kind: 'agent', providerModel: 'z-ai', invocations: [{ id: 'glm-cli-cli', via: 'cli', command: 'glm' }]},
     },
     modelPolicies: {
       'z-ai': { standard: 'glm-4.6' },
@@ -330,7 +330,7 @@ test('the dispatch policy defaults providerModel to "claude" only when the execu
   const runnerConfig = {
     executor: { command: 'claude' },
     executors: {
-      'custom-claude-executor': { kind: 'agent', command: 'claude' },
+      'custom-claude-executor': { kind: 'agent', invocations: [{ id: 'custom-claude-executor-cli', via: 'cli', command: 'claude' }]},
     },
     modelPolicies: {
       claude: { standard: 'claude-3-7-sonnet-20250219' },
@@ -351,7 +351,7 @@ test('the dispatch policy rejects an unregistered preferExecutor before spawn wh
   const runnerConfig = {
     executor: { command: 'claude' },
     executors: {
-      claude: { kind: 'agent', command: 'claude' },
+      claude: { kind: 'agent', invocations: [{ id: 'claude-cli', via: 'cli', command: 'claude' }]},
     },
     modelPolicies: { claude: { standard: 'claude-3-7-sonnet-20250219' } },
   };
@@ -372,7 +372,7 @@ test('governance disallowedProviders (family) and disallowedExecutors (id) are i
     const runnerConfig = {
       executor: { command: 'claude' },
       executors: {
-        'glm-cli': { kind: 'agent', providerModel: 'z-ai', command: 'glm' },
+        'glm-cli': { kind: 'agent', providerModel: 'z-ai', invocations: [{ id: 'glm-cli-cli', via: 'cli', command: 'glm' }]},
       },
       modelPolicies: {
         'z-ai': { standard: 'glm-4.6' },

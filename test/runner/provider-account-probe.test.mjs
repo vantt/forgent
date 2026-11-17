@@ -38,7 +38,7 @@ const cfg = {
         {
           id: 'codex-herdr-static', via: 'cli', adapter: 'herdr-spawn', command: 'codex', args: [],
           confinement: { backend: 'bwrap' }, env: { CODEX_HOME: '/homes/codex-other' },
-          resourceBindings: [{ resource: 'private-home', target: { kind: 'env', name: 'CODEX_HOME' } }],
+          credentialStore: { use: 'codex', homeEnv: 'CODEX_HOME' },
         },
         pi('pi-cli-acct', { env: { PI_CODING_AGENT_DIR: '/homes/pi-acct' } }),
         pi('pi-cli-other', { env: { PI_CODING_AGENT_DIR: '/homes/pi-other' } }),

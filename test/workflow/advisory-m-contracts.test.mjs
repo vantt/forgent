@@ -74,8 +74,7 @@ function fixture(t, mode) {
     defaults: { tier: 'standard' },
     modelPolicies: { node: { standard: 'node-std', flagship: 'node-high', frontier: 'node-top' } },
     executors: { 'test-node': {
-      kind: 'agent', allowCrossProvider: true, command: process.execPath,
-      args: [worker, '{prompt}'], providerModel: 'node',
+      kind: 'agent', allowCrossProvider: true, providerModel: 'node',
       invocations: [{ id: 'cli-default', via: 'cli', adapter: 'cli-spawn',
         confinement: { backend: 'bwrap' }, command: process.execPath, args: [worker, '{prompt}'] }],
     } },

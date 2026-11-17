@@ -109,7 +109,6 @@ test('a writing unit\'s verify child borrows the custody lease while it runs', {
   // Only the producer writes; the checker keeps the read-only settling worker.
   const cfg = readProjectConfig(repoRoot);
   const settling = [path.join(repoRoot, 'settling-worker.mjs'), '{prompt}'];
-  cfg.runner.executors.beta.args = settling;
   for (const invocation of cfg.runner.executors.beta.invocations) invocation.args = settling;
   writeProjectConfig(repoRoot, cfg);
   const probe = path.join(repoRoot, 'verify-probe.json');

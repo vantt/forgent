@@ -255,17 +255,11 @@ export function credentialStoreProblem(store) {
 }
 
 /**
- * The login store an invocation reads: the `credentialStore` it declares, else (config written before
- * that field existed: the machine-global config and other projects still carry it) the one its
- * `private-home` env binding implies, keyed by the CLI its command runs. Null when it reads none. The
- * inference is the only reader of `resourceBindings`; it goes when those configs have moved.
+ * The login store an invocation reads: the `credentialStore` it declares, else null. An invocation that
+ * declares none reads none; nothing is inferred from the command or its environment.
  */
 export function credentialStoreOf(invocation) {
-  if (!invocation) return null;
-  if (invocation.credentialStore) return invocation.credentialStore;
-  const binding = (invocation.resourceBindings ?? []).find((b) => b?.resource === 'private-home' && b.target?.kind === 'env' && b.target.name);
-  const use = commandCli(invocation.command);
-  return binding && use ? { use, homeEnv: binding.target.name } : null;
+  return invocation?.credentialStore ?? null;
 }
 
 /**

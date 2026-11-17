@@ -153,7 +153,7 @@ function executorFacts(id, entry, { runnerConfig, executors, session }) {
   // the posture to the launch: the confinement authority judges it when the assignment starts.
   const atLaunch = session.postureAtLaunch === true;
   const invocations = (entry.invocations ?? []).filter((inv) => typeof inv?.id === 'string' && inv.id).map((inv) => {
-    const store = credentialStoreOf({ ...inv, command: commandOf(runnerConfig, entry, inv) });
+    const store = credentialStoreOf(inv);
     const efforts = renderedEffortLevels(commandOf(runnerConfig, entry, inv));
     return {
       id: inv.id,

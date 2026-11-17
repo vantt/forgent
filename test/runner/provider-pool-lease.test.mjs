@@ -43,8 +43,8 @@ function config(llmAccounts, extra = {}) {
     timeoutMs: 1000,
     modelPolicies: { claude: { standard: 'sonnet' }, openai: { standard: 'gpt' }, deepseek: { standard: 'flash' } },
     executors: {
-      openai: { kind: 'agent', providerModel: 'openai', command: 'codex', args: ['{prompt}'], invocations: [piInvocation('openai-pi')] },
-      deepseek: { kind: 'agent', providerModel: 'deepseek', command: 'pi', args: ['{prompt}'], invocations: [piInvocation('deepseek-pi')] },
+      openai: { kind: 'agent', providerModel: 'openai',   invocations: [piInvocation('openai-pi')] },
+      deepseek: { kind: 'agent', providerModel: 'deepseek',   invocations: [piInvocation('deepseek-pi')] },
     },
     llmAccounts,
     ...extra,
@@ -110,8 +110,8 @@ test('the files of a store come from the invocations of the pool family first, t
   }, {
     modelPolicies: { xai: {}, gemini: {} },
     executors: {
-      xai: { kind: 'agent', providerModel: 'xai', command: 'omp', args: ['{prompt}'], invocations: [omp(['agent.db', 'config.yml', 'models.db'])] },
-      gemini: { kind: 'agent', providerModel: 'gemini', command: 'omp', args: ['{prompt}'], invocations: [omp(['agent.db', 'config.yml'])] },
+      xai: { kind: 'agent', providerModel: 'xai',   invocations: [omp(['agent.db', 'config.yml', 'models.db'])] },
+      gemini: { kind: 'agent', providerModel: 'gemini',   invocations: [omp(['agent.db', 'config.yml'])] },
     },
   });
   const { inventory } = deriveLegacyInventory(runner);

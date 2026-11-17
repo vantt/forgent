@@ -379,7 +379,7 @@ test('spawnWorker passes an executor\'s own resolved env to the worker, never in
       // An id of its own: one named after a standard executor would replace that one's invocations, which the standard's capabilities name.
       executors: {
         'glm-env': {
-          kind: 'agent', command: process.execPath, args: [envEcho], providerModel: 'node', allowCrossProvider: true, env,
+          kind: 'agent', providerModel: 'node', allowCrossProvider: true,
           invocations: [{ id: 'cli', via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' }, command: process.execPath, args: [envEcho], env }],
         },
       },
@@ -413,7 +413,7 @@ test('spawnWorker binds the tier its capability declares; the capability rigor o
     const fx = fixture({
       executors: {
         agy: {
-          kind: 'agent', command: process.execPath, args, providerModel: 'gemini', allowCrossProvider: true,
+          kind: 'agent', providerModel: 'gemini', allowCrossProvider: true,
           invocations: [{ id: 'cli', via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' }, command: process.execPath, args }],
         },
       },

@@ -57,8 +57,8 @@ function writeConfig(fgosDir) {
       executor: { command: 'claude', args: ['{prompt}'] },
       capabilities: { blocked: { description: 'a purpose only a tool serves' }, 'fgos-coding-implement': { prefer: 'ag1' } },
       executors: {
-        'tool-only': { kind: 'tool', for: ['blocked'], command: 'agy', args: ['{prompt}'], allowCrossProvider: true },
-        ag1: { kind: 'agent', command: 'claude', args: ['{prompt}'] },
+        'tool-only': { kind: 'tool', for: ['blocked'], allowCrossProvider: true },
+        ag1: { kind: 'agent', invocations: [{ id: 'claude-cli', via: 'cli', command: 'claude', args: ['{prompt}'] }] },
       },
       modelPolicies: { claude: { standard: 'sonnet' } },
       timeoutMs: 5000,
