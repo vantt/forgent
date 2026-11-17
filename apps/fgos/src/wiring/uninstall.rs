@@ -1806,7 +1806,8 @@ mod tests {
     // ----- the git hooks path -----
 
     /// Wires the hooks path the way an install does: through RepositoryConfig, which keeps the ownership proof.
-    #[cfg(unix)]
+    /// Linux only: the Git door keeps its operation journal there and refuses to configure a repository elsewhere.
+    #[cfg(target_os = "linux")]
     fn wire_hooks(world: &World) {
         let driver = GitDriver::new(&world.state).unwrap();
         let ResolveRepo::Repository(repo) =
@@ -1820,7 +1821,7 @@ mod tests {
         assert_eq!(report.status, "owned");
     }
 
-    #[cfg(unix)]
+    #[cfg(target_os = "linux")]
     #[test]
     fn a_hooks_path_fgos_wired_is_unset_and_its_untracked_hook_and_empty_directory_go() {
         let world = World::new("unwire");
@@ -1854,7 +1855,7 @@ mod tests {
         assert!(!world.project.join(".githooks").exists());
     }
 
-    #[cfg(unix)]
+    #[cfg(target_os = "linux")]
     #[test]
     fn a_hooks_directory_reached_through_a_link_loses_its_setting_but_nothing_inside_it() {
         let world = World::new("linked-hooks");
@@ -1877,7 +1878,7 @@ mod tests {
             .any(|k| k.starts_with("git: .githooks is reached through a symbolic link (")));
     }
 
-    #[cfg(unix)]
+    #[cfg(target_os = "linux")]
     #[test]
     fn a_tracked_pre_commit_survives_the_unwiring_byte_for_byte() {
         let world = World::new("tracked-hook");
