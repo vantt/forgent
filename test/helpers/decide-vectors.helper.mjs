@@ -11,7 +11,7 @@
 //                 paths in the answer read <main>, <worktree>, <outside>
 //   hookPayload   the normalized call of a hook payload (`args.raw`, `args.format`, `args.env`, `args.cwd`)
 //   hookVerdict   the dispatch hook's verdict for a normalized call, `decide` answering `args.decided` or failing
-//                 with `args.failure` ({ kind: door | door-failed | runner | other, code?, message }); a call whose
+//                 with `args.failure` ({ kind: door | runner | other, code?, message }); a call whose
 //                 project exists is judged in a repository whose project config holds `runner`
 //   hookAnswer    what the hook prints and exits with for a verdict in a format
 //   attribute     a runner refusal (`args.error`: message, code?, path?, paths?, detail?) as the config load raises it,
@@ -27,7 +27,6 @@ import { attributeRunnerConfigError, refuseGlobalRigorToTier, validateRunnerConf
 import { configRootFor, decideOver, guardCwdRepoRootDivergence } from '../../src/runner/dispatch/decide.mjs';
 import { decideDispatchHook } from '../../src/runner/dispatch/hook.mjs';
 import { answer as hookAnswer, normalizeHookPayload } from '../../src/runner/hook.mjs';
-import { ConfigDoorError } from '../../src/config/facade.mjs';
 import { RunnerConfigError } from '../../src/runner/dispatch/runner-config-error.mjs';
 import { withMachine } from './executor-model-vectors.helper.mjs';
 import { writeRawProjectConfig } from './config-fixture.mjs';
@@ -89,12 +88,9 @@ async function withProject(runner, fn) {
 }
 
 function failureOf({ kind, code, message }) {
-  if (kind === 'door' || kind === 'door-failed') {
-    const err = new ConfigDoorError({ id: code });
-    err.message = message;
-    return err;
-  }
-  if (kind === 'runner') return new RunnerConfigError(message, code === undefined ? {} : { code });
+  // A door refusal or failure reaches the hook as the config load raises it: wrapped in a RunnerConfigError that
+  // carries the door's id as its code (loadRunnerConfigForDir), never as the bare ConfigDoorError.
+  if (kind === 'door' || kind === 'runner') return new RunnerConfigError(message, code === undefined ? {} : { code });
   return new Error(message);
 }
 

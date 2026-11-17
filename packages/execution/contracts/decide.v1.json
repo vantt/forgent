@@ -466,16 +466,16 @@
    "expect": {"blocked":true,"reason":"this Task call cannot be dispatched: \"general-purpose\" has executors of its own and decide answered unavailable for it (no reason reported). Fix that cause (run `fgos dispatch decide --for \"general-purpose\" --needs-soul --has-live-task-access` to see it), or use a subagent type that has no executors of its own. (decided via: decide --for \"general-purpose\" --needs-soul --has-live-task-access)"}
   },
   {
-   "name": "hookVerdict: a config door refusal blocks with the door's message",
+   "name": "hookVerdict: a config file the door refuses blocks the call with the door's code",
    "fact": "hookVerdict",
-   "args": {"call":{"format":"standard","toolName":"Task","toolInput":{},"transcriptPath":null,"projectDir":"/p"},"projectDirExists":true,"failure":{"kind":"door","code":"config-parse","message":"config-parse .fgos/config.yaml:3:1"}},
-   "expect": {"blocked":true,"reason":"this Task call cannot be routed because the config is unusable: config-parse .fgos/config.yaml:3:1. Run `fgos config check` to list every refusal with its fix, correct the file, then retry."}
+   "args": {"call":{"format":"standard","toolName":"Task","toolInput":{},"transcriptPath":null,"projectDir":"/p"},"projectDirExists":true,"failure":{"kind":"door","code":"config-parse","message":"config-parse project:config.yaml:3:1"}},
+   "expect": {"blocked":true,"reason":"this Task call cannot be routed because the config is unusable: config-parse. Run `fgos config check` to list every refusal with its fix, correct the file, then retry."}
   },
   {
-   "name": "hookVerdict: a failure of the config door itself allows",
+   "name": "hookVerdict: a config file the door cannot read blocks the call with the door's code",
    "fact": "hookVerdict",
-   "args": {"call":{"format":"standard","toolName":"Task","toolInput":{},"transcriptPath":null,"projectDir":"/p"},"projectDirExists":true,"failure":{"kind":"door-failed","code":"config-io","message":"config-io"}},
-   "expect": {"blocked":false}
+   "args": {"call":{"format":"standard","toolName":"Task","toolInput":{},"transcriptPath":null,"projectDir":"/p"},"projectDirExists":true,"failure":{"kind":"door","code":"config-io","message":"config-io project:config.yaml"}},
+   "expect": {"blocked":true,"reason":"this Task call cannot be routed because the config is unusable: config-io. Run `fgos config check` to list every refusal with its fix, correct the file, then retry."}
   },
   {
    "name": "hookVerdict: a runner refusal with a config code blocks with the code",
@@ -655,6 +655,38 @@
    "runner": {"executors":{"vec-agent":{"kind":"agent","providerModel":"claude","agentType":"vec-agent-type"}},"modelPolicies":{"claude":{"standard":"sonnet"}}},
    "args": {"assignment":"asg-vec","assignmentItem":{"assignmentId":"asg-vec","operation":"vec-op","skills":[],"policy":{"preferExecutor":"vec-agent"},"role":"reviewer","mutation":"read-only","domain":"vec"},"hasLiveTaskAccess":true},
    "expect": {"mechanism":"in-process","agentType":"vec-agent-type","configured":true,"reasonCodes":["native-first.rule-2.live-task-access"],"executorId":"vec-agent"}
+  },
+  {
+   "name": "hookPayload: a payload with an unpaired surrogate escape is still judged, a paired one is kept",
+   "fact": "hookPayload",
+   "args": {"raw":"{\"tool_name\":\"Task\",\"tool_input\":{},\"cwd\":\"/x\\ud800\",\"note\":\"\\udc00 and \\ud83d\\ude00\"}","env":{},"cwd":"/started"},
+   "expect": {"format":"standard","toolName":"Task","toolInput":{},"transcriptPath":null,"projectDir":"/started"}
+  },
+  {
+   "name": "hookPayload: a CLAUDE_PROJECT_DIR that is only a byte-order mark is no directory",
+   "fact": "hookPayload",
+   "args": {"raw":"{\"tool_name\":\"Task\"}","env":{"CLAUDE_PROJECT_DIR":"﻿"},"cwd":"/started"},
+   "expect": {"format":"standard","toolName":"Task","toolInput":{},"transcriptPath":null,"projectDir":"/started"}
+  },
+  {
+   "name": "hookVerdict: a subagent type that is only a byte-order mark is judged as general-purpose",
+   "fact": "hookVerdict",
+   "args": {"call":{"format":"standard","toolName":"Task","toolInput":{"subagent_type":"﻿"},"transcriptPath":null,"projectDir":"/p"},"projectDirExists":true,"decided":{"mechanism":"unavailable","configured":true,"reasonCodes":["x"]}},
+   "expect": {"blocked":true,"reason":"this Task call cannot be dispatched: \"general-purpose\" has executors of its own and decide answered unavailable for it (x). Fix that cause (run `fgos dispatch decide --for \"general-purpose\" --needs-soul --has-live-task-access` to see it), or use a subagent type that has no executors of its own. (decided via: decide --for \"general-purpose\" --needs-soul --has-live-task-access)"}
+  },
+  {
+   "name": "globalRigorToTier: an origin with no file is named config.json by Node and left unnamed natively, the adapter names every file",
+   "fact": "globalRigorToTier",
+   "args": {"origins":[{"path":"runner.rigorToTier","layer":"global","file":null,"line":12,"column":5}]},
+   "expect": {"error":{"name":"RunnerConfigError","message":"~/.fgos/config.json:12:5 runner.rigorToTier no longer exists: rigor no longer chooses a tier; delete the key."}},
+   "nativeExpect": {"error":{"name":"RunnerConfigError","message":"~/.fgos/<file>:12:5 runner.rigorToTier no longer exists: rigor no longer chooses a tier; delete the key."}}
+  },
+  {
+   "name": "attribute: a project origin with no file is named config.yaml by Node and left unnamed natively, the adapter names every file",
+   "fact": "attribute",
+   "args": {"error":{"message":"m","path":"runner.patterns.reviewed","detail":"d."},"origins":[{"path":"runner.patterns.reviewed","layer":"project","file":null,"line":7,"column":1}],"projectDir":"/p"},
+   "expect": {"error":{"name":"RunnerConfigError","message":"runner config (/p/.fgos/config.yaml:7 patterns.reviewed) d."}},
+   "nativeExpect": {"error":{"name":"RunnerConfigError","message":"runner config (/p/.fgos/<file>:7 patterns.reviewed) d."}}
   }
  ]
 }
