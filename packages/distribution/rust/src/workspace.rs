@@ -54,15 +54,7 @@ pub fn workspace_root_of(start_dir: &Path) -> Result<PathBuf, WorkspaceError> {
         }
     })?;
     let canonical = std::fs::canonicalize(root.root)?;
-    let clean = {
-        let s = canonical.to_string_lossy();
-        if let Some(stripped) = s.strip_prefix(r"\\?\") {
-            PathBuf::from(stripped)
-        } else {
-            canonical
-        }
-    };
-    Ok(clean)
+    Ok(fgos_process::path::plain_path(&canonical))
 }
 
 /// Computes `workspaceId` as the first 16 hex chars of `sha256(realpath(workspace root))`.
