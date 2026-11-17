@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "9bb09b2c3bdaf81d2a22c353450f0b940b129c180f69f248d2fbcee6307af9af",
+  "payloadDigest": "dc0eef5fe1fcf344611eee5059889c12099e704de9581d2eabeb50db9a5991c0",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "b8b886cee2ea5ce7ee1153e4795512db135a990de894c27e53c5e778b210be62",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -46,7 +46,7 @@
     ".agents/skills/fgos-coding-planning/references/bootstrap-and-lane.md": "dbaa105f50a448ddbd91a74516da636fcecf95316136dc2eefc6a026cf1624c8",
     ".agents/skills/fgos-coding-planning/references/split-and-child-specs.md": "d15bbb0c0b52d6bca57ede0d785dce5a4682db90912a499f9ee164b457e25c77",
     ".agents/skills/fgos-coding-planning/references/verify-sync-and-gap.md": "28868fc46d6ab5756da701d9561508bb5122b686dabab9b8cfa608e78007d6e0",
-    ".agents/skills/fgos-coding-shaping/SKILL.md": "7eac2cf87c262a479bab058685ccce6b93087a20e7f68638c3873db9dcc0d865",
+    ".agents/skills/fgos-coding-shaping/SKILL.md": "885670e2fa849a3258ddfcac287186d0a439d8f4ad8b051beeb56fbb21bfa40e",
     ".agents/skills/fgos-coding-validating/SKILL.md": "a11234e7ee790f301c3ffc3b110b18f1b374085627f6f23b9756d9302d2d3686",
     ".agents/skills/fgos-coding-validating/references/bootstrap-and-reality-gate.md": "1b193d3f360cda011b61b93fdaa01b33836b94e7a5d7d2a1c5b5146710fc2e15",
     ".agents/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md": "0e699291a19227b487ed68b2334c82b531e890a8ca2ac532e1f0086bb60641ec",
@@ -202,7 +202,7 @@
     "domains/coding/skills/fgos-coding-planning/references/bootstrap-and-lane.md": "3d105acc669252ba60d02244b944b77812ddbd65d3087035cc5fcf4e95bd98bd",
     "domains/coding/skills/fgos-coding-planning/references/split-and-child-specs.md": "5d48fdf43978474a8339f75bf2b1bc9e215e02545a2cbda4019845d6feb42297",
     "domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md": "db2245509419fdefcac0dee5b740fe2f75da7092e68c93a695bd302cc22b292d",
-    "domains/coding/skills/fgos-coding-shaping/SKILL.md": "a8232d4ff0fe82fdebe74290ada92b89623e23c579e687103761e8cc7a501e34",
+    "domains/coding/skills/fgos-coding-shaping/SKILL.md": "369020db6dd09c4b42bbd8d60137fa19bf3f08642a2172cb08b0a205d011ca34",
     "domains/coding/skills/fgos-coding-validating/SKILL.md": "2c06f3db85104c5e11447b3761fd22bb0fd7ea6555de81c865617dc66f5969ad",
     "domains/coding/skills/fgos-coding-validating/references/bootstrap-and-reality-gate.md": "87fc99c578613ed738ba35186366f96a89caddf24e040761bbc37aa9c9fed581",
     "domains/coding/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md": "a6309b897ca51eed64c361807c084c32e03a33e8da26d89b5932513fe985dfc7",
