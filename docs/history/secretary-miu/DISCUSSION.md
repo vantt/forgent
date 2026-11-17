@@ -65,8 +65,9 @@ measurement was appended to `p-7eb9e65b`.
 
 Settled 2026-11-17 after 19 rounds. All five brief points plus two that grew out of them (generic session rotation,
 discussion location) are settled as SM-D1..SM-D13, with three open points that block only some tasks (hand-off block).
-Ready for a planner run per `core/skills/_shared/plan-contract.md`. This file moved from `docs/history/secretary-miu/`
-to `docs/discussions/secretary-miu/` by owner decision (SM-D8).
+Ready for a planner run per `core/skills/_shared/plan-contract.md`. This file stays in `docs/history/secretary-miu/`
+until the Convention kind `discussion` exists: SM-D8 chose `docs/discussions/secretary-miu/`, but Convention refuses
+`docs/discussions/**` (`unplaced-docs`), so the move waits for that kind.
 
 ## 2. Mục tiêu & đề bài
 
@@ -164,8 +165,8 @@ session rotation serves every long-lived head session, and head sessions must be
   says it is the only authority deriving full ids, handles and liveness (head = highest terminal-holding ancestor).
   Mailbox's own head finder (`adapters::claude_head::find_head`, `hookFacts`) may duplicate it -> separate backlog item
   (to file at exit; this session writes only this file).
-- 2026-11-17 — Owner: "docs/discussions/<slug>/*, nên để vào folder, biết đâu phình ra sau này." File moved to
-  `docs/discussions/secretary-miu/DISCUSSION.md`.
+- 2026-11-17 — Owner: "docs/discussions/<slug>/*, nên để vào folder, biết đâu phình ra sau này." A move there was tried and
+  refused by Convention (`unplaced-docs`); the file stays in `docs/history/secretary-miu/` until the kind `discussion` lands.
 - 2026-11-17 — Miu proposed questions in the topic folder (A). Owner: "chọn A. nhưng nó chỉ đúng một phần ... khi làm
   plan còn câu hỏi không, và liệu khi triển khai thì câu hỏi nằm đâu?" Scout: plan-contract item 5 (owner questions
   batched in plan.md, plan stays draft, untouched phases ready); `fgos workflow status` open gates +
