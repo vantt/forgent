@@ -1,7 +1,7 @@
 ---
 phase: 1
 title: "Baseline and setup"
-status: ready
+status: completed
 effort: 0.5h
 owner: HARDEN
 ---

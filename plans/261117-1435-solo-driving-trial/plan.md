@@ -1,7 +1,7 @@
 ---
 title: "Solo driving trial: drive 1-2 real items through the role model by hand"
 description: "Run shaper, planner, supervisor, leader, workers and watcher by hand on 1-2 small real backlog items, measure every step, land through HARDEN, and report the numbers and gaps to the portfolio-driving draft."
-status: pending
+status: in-progress
 priority: P2
 effort: 6h
 branch: plan/solo-driving-trial
@@ -41,10 +41,10 @@ spec `plans/reports/spec-261116-1042-plan-supervisor.md` §2 (roles), §4 (index
 
 | # | Phase | Status | Depends on | Owns (writes) |
 |---|---|---|---|---|
-| 1 | [Baseline and setup](phase-01-baseline-and-setup.md) | ready | none | this plan dir `reports/measures-template.md` |
-| 1b | [Shaper without Work and the plan contract](phase-01b-shaper-without-work-and-plan-contract.md) | ready | 1 | (a) shaper skill paths of its agent; (b) `core/skills/_shared/plan-contract.md`, `scripts/plan-contract-check.mjs`, its test, `planner-brief-template.md`, this plan dir |
-| 2 | [Shape and plan the items](phase-02-shape-and-plan-items.md) | blocked (owner Q1) | 1b, Q1 | per item: `DISCUSSION.md`, item plan dir |
-| 3 | [Drive and land](phase-03-drive-and-land.md) | pending | 2, Q2 | per item: case worktree + branch; item `reports/measures.md` |
+| 1 | [Baseline and setup](phase-01-baseline-and-setup.md) | completed | none | this plan dir `reports/measures-template.md` |
+| 1b | [Shaper without Work and the plan contract](phase-01b-shaper-without-work-and-plan-contract.md) | completed (landed 6ec9da752, a6f22e0f6) | 1 | (a) shaper skill paths of its agent; (b) `core/skills/_shared/plan-contract.md`, `scripts/plan-contract-check.mjs`, its test, `planner-brief-template.md`, this plan dir |
+| 2 | [Shape and plan the items](phase-02-shape-and-plan-items.md) | ready (Q1 answered) | 1b, Q1 | per item: `DISCUSSION.md`, item plan dir |
+| 3 | [Drive and land](phase-03-drive-and-land.md) | pending (Q2 answered; gate key effective once this branch lands) | 2, Q2 | per item: case worktree + branch; item `reports/measures.md` |
 | 4 | [Trial report](phase-04-trial-report.md) | pending | 3 | draft plan `reports/trial-*.md`, draft plan `notes.md` |
 
 Phases run in order (1, 1b, 2, 3, 4; the two parts of 1b run at once); items inside phases 2-3 may run one after the other or side by side (disjoint files).
@@ -76,6 +76,15 @@ kind and wait time, every friction via `fgos friction record --layer ...`, and l
 - **Q2 (blocks phase 3 start): the whole-tree gate.** `runner.capabilities.code:implement.verify` is unset in this
   project (`fgos config explain` shows `current: null`), so `fgos workflow propose` refuses `gate-command-missing`.
   Default for Rust-only items: `cargo test --workspace`; the full `npm test` stays HARDEN's land gate. Details: phase 3.
+
+## Owner answers
+
+Given 2026-11-17 ~14:43 (Asia/Saigon) by the owner in HARDEN's window; relayed to the phase-1 session.
+
+| Q | Answer | Effect |
+|---|---|---|
+| Q1 | First item `p-2r54ft6njh` (fold the Windows plain-path copies). Second item `p-d3vxsgz6to` items 2-4, started only after the first lands cleanly. | Phase 2 unblocked; items run one after the other, not side by side. |
+| Q2 | Set `runner.capabilities.code:implement.verify` to `cargo test --workspace` for the trial. | Set through `fgos config set` in the project `.fgos/config.yaml` on branch `trial/solo-phase-1`. It is a `command` key, read only from the main checkout (`docs/platform/config/spec.md` section 5 rule 6), so it takes effect when HARDEN lands the branch. Rollback: `fgos config unset`. |
 
 ## Exit (measurable)
 
