@@ -11,7 +11,7 @@ import path from 'node:path';
 
 import { bind } from '../../../src/runner/execution/bind.mjs';
 import { seedFileLocalBwrapRegistry } from '../confinement-registry-fixture.helper.mjs';
-import { seedStubAgentClis, stubAgentCliDir } from '../../helpers/agent-clis.mjs';
+import { seedStubAgentClis } from '../../helpers/agent-clis.mjs';
 
 seedFileLocalBwrapRegistry();
 seedStubAgentClis('claude', 'codex', 'omp', 'pi', 'agy');
@@ -97,52 +97,6 @@ test('Workflow capabilities with no row of their own (labels) bind headless', ()
   }
 });
 
-test('a Workflow capability with no prefer pool takes the families the tier lists, the last line of the prefer column', () => {
-  // A name the committed config does not declare, so no pool added to the config later can
-  // turn this into a bind.
-  const capability = 'coding:no-pool-declared';
-  assert.equal(runnerConfig.capabilities[capability], undefined);
-  assert.equal(runnerConfig.capabilities['no-pool-declared'], undefined);
-  const result = bind(ask(capability), { runnerConfig, session: headless });
-  assert.ok(!result.refused, JSON.stringify(result.refused));
-  assert.equal(result.tier, 'advanced', 'the coding:* default tier');
-  assert.equal(result.provenance.executor.source, 'tierFallback.advanced');
-  assert.equal(result.executor, 'gemini', 'the first family of tierFallback.advanced that can serve the seat');
-});
-
-test('the committed config\'s reviewer order applies to a reviewer seat of any capability', () => {
-  const result = bind({ unit: { id: 'u', capability: 'coding:no-pool-declared', writes: [] }, role: 'reviewer' }, { runnerConfig, session: headless });
-  assert.ok(!result.refused, JSON.stringify(result.refused));
-  assert.equal(result.provenance.executor.source, 'roles.reviewer.prefer');
-  assert.equal(result.executor, 'xai', 'the first family of runner.roles.reviewer the machine can serve');
-});
-
-test('with no tier list either, a capability with no prefer pool is refused with a structured reason, never guessed', () => {
-  const capability = 'coding:no-pool-declared';
-  const result = bind(ask(capability), { runnerConfig: { ...runnerConfig, tierFallback: undefined }, session: headless });
-  assert.equal(result.refused.reason, 'headless-no-executor');
-  assert.match(result.refused.detail, /coding:no-pool-declared/);
-});
-
-test('a capability gets the same family and model inside herdr and headless; only the transport differs', () => {
-  // claude used to be split into a cli executor and a pane-only one, so a pool that named the
-  // pane one ran claude inside herdr and fell to the next family headless.
-  // A pool that puts claude first (the coding discovery row).
-  for (const capability of ['coding:discover']) {
-    for (const rigor of ['low', 'standard', 'high', 'critical']) {
-      const unitAsk = { unit: { id: 'u', capability, writes: [], rigor }, role: 'producer' };
-      const pane = bind(unitAsk, { runnerConfig, session: { herdrPresent: true } });
-      const cli = bind(unitAsk, { runnerConfig, session: headless });
-      assert.ok(!pane.refused && !cli.refused, `${capability}/${rigor}: ${JSON.stringify(pane.refused ?? cli.refused)}`);
-      assert.equal(pane.executor, 'claude', `${capability}/${rigor}`);
-      assert.equal(cli.executor, pane.executor, `${capability}/${rigor}`);
-      assert.equal(cli.model, pane.model, `${capability}/${rigor}`);
-      assert.equal(pane.invocation, 'claude-herdr-bwrap', `${capability}/${rigor}`);
-      assertRunnable(cli, `${capability}/${rigor} headless`);
-    }
-  }
-});
-
 test('every invocation that declares a login store reads the store its command logs in', () => {
   for (const [executorId, entry] of Object.entries(executors)) {
     for (const inv of entry.invocations ?? []) {
@@ -163,25 +117,4 @@ test('every confined invocation with a login account declares its store, and the
       if (inv.credentialStore) assert.doesNotMatch(inv.id, named, `${executorId}/${inv.id}: an account is leased at launch, so the id does not carry its name`);
     }
   }
-});
-
-// Seat Binding routes only to an agent CLI the machine has. No other test varies PATH: the rest of this file
-// states every CLI installed.
-test('execute binds the CLIs the machine has: none is refused by name with a fix, claude alone binds claude, agy alone binds gemini through agy', () => {
-  const writing = ask('execute', ['x.txt']);
-  const bindOn = (...installed) => bind(writing, { runnerConfig, session: { ...headless, pathEnv: stubAgentCliDir(...installed) } });
-
-  const none = bindOn();
-  assert.equal(none.refused.reason, 'agent-cli-missing');
-  assert.match(none.refused.detail, /no agent CLI is installed/);
-  assert.match(none.refused.fix, /install one of .*agy.*claude.*fgos doctor/);
-
-  const onlyClaude = bindOn('claude');
-  assert.equal(onlyClaude.refused, undefined, JSON.stringify(onlyClaude.refused));
-  assert.equal(onlyClaude.executor, 'claude');
-
-  const onlyAgy = bindOn('agy');
-  assert.equal(onlyAgy.refused, undefined, JSON.stringify(onlyAgy.refused));
-  assert.equal(onlyAgy.executor, 'gemini');
-  assert.equal(onlyAgy.invocation, 'agy-cli-bwrap');
 });

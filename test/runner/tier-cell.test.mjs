@@ -11,13 +11,7 @@ import path from 'node:path';
 import { parseTierCell } from '../../src/runner/dispatch/tier-cell.mjs';
 import { loadRunnerConfigForDir, supportsPolicyTier } from '../../src/runner/dispatch/config.mjs';
 import { RunnerConfigError } from '../../src/runner/dispatch/runner-config-error.mjs';
-import { bind } from '../../src/runner/execution/bind.mjs';
-import { seedFileLocalBwrapRegistry } from './confinement-registry-fixture.helper.mjs';
 import { writeGlobalConfig, writeProjectConfig } from '../helpers/config-fixture.mjs';
-import { seedStubAgentClis } from '../helpers/agent-clis.mjs';
-
-seedFileLocalBwrapRegistry();
-seedStubAgentClis('claude', 'fam');
 
 test('a plain model is served by the pool named after its family', () => {
   assert.deepEqual(parseTierCell('sonnet', 'claude'), [{ model: 'sonnet', pool: 'claude', explicitPool: false }]);
@@ -118,41 +112,6 @@ test('a project cell overrides the global cell of the same tier, and the global 
   assert.equal(cfg.modelPolicies.claude.flagship, 'opus@vertex');
 });
 
-test('a global cell reaches the binding: bind runs the first entry of a global list cell', () => {
-  const { cfg } = loadWith({ claude: { standard: 'sonnet' } }, { claude: { advanced: ['x@other', 'opus@f', 'sonnet'] } });
-  const runnerConfig = bindConfig(cfg.modelPolicies.claude.advanced);
-  const result = bind(ask, { runnerConfig, ...headless });
-  assert.ok(!result.refused, JSON.stringify(result.refused));
-  assert.equal(result.model, 'opus');
-});
-
-function bindConfig(cell) {
-  return {
-    modelPolicies: { f: { standard: cell } },
-    defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
-    capabilities: { work: { prefer: [{ executor: 'fam' }] } },
-    executors: {
-      fam: { kind: 'agent', providerModel: 'f',  invocations: [{ id: 'fam-cli', via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' } }] },
-    },
-  };
-}
-
-const ask = { unit: { id: 'u', capability: 'work', writes: [], rigor: 'standard' }, role: 'reviewer' };
-const headless = { session: { herdrPresent: false, hasNativeAgent: false } };
-
-test('bind skips an entry whose pool has no account and runs the next entry served by the family pool', () => {
-  const result = bind(ask, { runnerConfig: bindConfig(['x@other', 'y']), ...headless });
-  assert.ok(!result.refused, JSON.stringify(result.refused));
-  assert.equal(result.model, 'y');
-});
-
-test('bind never runs an entry whose pool nothing can pay for, even when it is the only one', () => {
-  // The pool declares no account in either inventory and is not the family-named pool.
-  const result = bind(ask, { runnerConfig: bindConfig('x@other'), ...headless });
-  assert.notEqual(result.model, 'x');
-  assert.notEqual(result.model, 'x@other');
-});
-
 // ---- the {model, pool?, effort?} object form ----------------------------------------------------
 
 test('an object cell names a model, and optionally a pool and a reasoning effort', () => {
@@ -188,16 +147,9 @@ test('an object cell with no model, an unknown key, an empty pool or an effort o
   }
 });
 
-test('an object cell\'s effort reaches the binding as the cell\'s promise, and supportsPolicyTier sees the cell', () => {
+test('supportsPolicyTier sees an object cell', () => {
   const cfg = { modelPolicies: { claude: { advanced: [{ model: 'opus', effort: 'high' }, 'sonnet'] } } };
   assert.equal(supportsPolicyTier(cfg, 'claude', 'advanced'), true);
-  const runnerConfig = bindConfig([{ model: 'opus', effort: 'high' }, 'sonnet']);
-  for (const invocation of runnerConfig.executors.fam.invocations) invocation.command = 'claude';
-  const result = bind(ask, { runnerConfig, ...headless });
-  assert.ok(!result.refused, JSON.stringify(result.refused));
-  assert.equal(result.model, 'opus');
-  assert.equal(result.reasoningEffort, 'high');
-  assert.deepEqual(result.provenance.reasoningEffort, { value: 'high', source: 'cell' });
 });
 
 test('a project config may write object cells; a bad one fails to load and names the cell', () => {
@@ -205,10 +157,4 @@ test('a project config may write object cells; a bad one fails to load and names
   assert.deepEqual(cfg.modelPolicies.claude.advanced, { model: 'opus', effort: 'high' });
   assert.throws(() => loadWith({ claude: { advanced: { model: 'opus', effort: 'xhigh' } } }), /runner\.modelPolicies\.claude\.advanced \(oneOf\)/);
   assert.throws(() => loadWith({ claude: { advanced: { effort: 'high' } } }), /runner\.modelPolicies\.claude\.advanced \(oneOf\)/);
-});
-
-test('bind runs the model of an object cell like the model of a string cell', () => {
-  const result = bind(ask, { runnerConfig: bindConfig({ model: 'm-obj' }), ...headless });
-  assert.ok(!result.refused, JSON.stringify(result.refused));
-  assert.equal(result.model, 'm-obj');
 });

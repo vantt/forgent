@@ -1,5 +1,6 @@
-// fgos dispatch explain: the binding a run would get for a capability, laid beside the tier cell and
-// the accounts of the pools on the walk. It binds through bind() and reads nothing else that decides.
+// fgos dispatch explain on the committed config: it agrees with bind() for every capability. What explain reports
+// (the entry that runs, the cell, the walk, the accounts of each pool, a refusal) is owned by the explain vectors of
+// packages/execution/contracts/bind.v1.json.
 
 import '../../helpers/process-tmp-root.mjs';
 import { seedStubAgentClis } from '../../helpers/agent-clis.mjs';
@@ -15,97 +16,6 @@ import { seedFileLocalBwrapRegistry } from '../confinement-registry-fixture.help
 seedFileLocalBwrapRegistry();
 
 const headless = { headless: true, herdrPresent: false };
-
-function deepseekConfig() {
-  return {
-    defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
-    modelPolicies: { deepseek: { standard: ['deepseek-v4-flash@deepseek-api', 'deepseek/deepseek-v4-flash'] } },
-    capabilities: { research: { prefer: [{ executor: 'deepseek' }] } },
-    executors: {
-      deepseek: {
-        kind: 'agent',
-        providerModel: 'deepseek',
-        invocations: [{ id: 'pi-cli-bwrap', via: 'cli', adapter: 'cli-spawn', command: 'pi', args: ['--model', '{model}', '-p', '{prompt}'], confinement: { backend: 'bwrap' }, credentialStore: { use: 'pi', homeEnv: 'PI_CODING_AGENT_DIR', files: ['auth.json'] } }],
-      },
-    },
-    providers: { deepseek: { accounts: { openrouter: { credentialSource: { kind: 'home-files', home: '/srv/pi-openrouter', files: ['auth.json'] } } } } },
-    llmAccounts: {
-      deepseek: { direct: { credentialStore: { pi: '/srv/pi-deepseek' } } },
-      'deepseek-api': { key1: { credentialStore: { pi: '/srv/pi-deepseek-api' } } },
-    },
-  };
-}
-
-test('explain reports the entry that runs, the entries that follow it and the pools of the walk', () => {
-  const result = explainCapability(deepseekConfig(), { capability: 'research', session: headless });
-  assert.equal(result.family, 'deepseek');
-  assert.equal(result.executor.id, 'deepseek');
-  assert.equal(result.executor.source, 'capabilities."research".prefer');
-  assert.equal(result.invocation, 'pi-cli-bwrap');
-  assert.deepEqual(result.credentialStore, { use: 'pi', homeEnv: 'PI_CODING_AGENT_DIR', files: ['auth.json'], source: 'declared' });
-  assert.equal(result.tier.value, 'standard');
-  assert.equal(result.tier.source, 'defaults.tier');
-  assert.equal(result.tier.maxTier, null);
-  assert.equal(result.tier.loweredFrom, null);
-  assert.match(result.tier.definition, /^standard: /, 'the tier is named with its definition');
-  assert.equal(result.model.value, 'deepseek-v4-flash', 'the first entry of the cell whose pool can run it');
-  assert.equal(result.pool, 'deepseek-api');
-  assert.deepEqual(result.cell.entries, [
-    { model: 'deepseek-v4-flash', pool: 'deepseek-api', status: 'used' },
-    { model: 'deepseek/deepseek-v4-flash', pool: 'deepseek', status: 'fallback' },
-  ]);
-  assert.deepEqual(result.walk.map((step) => [step.pool, step.model, step.store]), [
-    ['deepseek-api', 'deepseek-v4-flash', 'pi'],
-    ['deepseek', 'deepseek/deepseek-v4-flash', 'pi'],
-  ]);
-});
-
-test('explain names why an entry is out: a pool with no account holding the CLI\'s store', () => {
-  const cfg = deepseekConfig();
-  delete cfg.llmAccounts['deepseek-api'];
-  const result = explainCapability(cfg, { capability: 'research', session: headless });
-  assert.equal(result.model.value, 'deepseek/deepseek-v4-flash');
-  assert.deepEqual(result.cell.entries.map((e) => [e.pool, e.status]), [['deepseek-api', 'unusable'], ['deepseek', 'used']]);
-  assert.match(result.cell.entries[0].reason, /pool "deepseek-api" has no account/);
-  const out = result.candidates.find((c) => c.pool === 'deepseek-api');
-  assert.equal(out.state, 'out');
-  assert.equal(out.reason, 'pool-unusable');
-});
-
-test('explain names no store for an invocation that declares none, whatever older binding it carries', () => {
-  const cfg = deepseekConfig();
-  const [inv] = cfg.executors.deepseek.invocations;
-  delete cfg.llmAccounts;
-  delete inv.credentialStore;
-  inv.resourceBindings = [{ resource: 'private-home', target: { kind: 'env', name: 'PI_CODING_AGENT_DIR' } }];
-  assert.equal(explainCapability(cfg, { capability: 'research', session: headless }).credentialStore, null);
-});
-
-test('explain lists the accounts of each pool on the walk in declared order, with what keeps one from running', () => {
-  const cfg = deepseekConfig();
-  cfg.llmAccounts['deepseek-api'] = {
-    key1: { credentialStore: { pi: '/srv/pi-a' } },
-    key2: { credentialStore: { pi: '/srv/pi-b' }, disabled: true },
-    key3: { credentialStore: { omp: '/srv/omp-c' } },
-  };
-  const { accounts } = explainCapability(cfg, { capability: 'research', session: headless });
-  assert.deepEqual(accounts.map((a) => a.pool), ['deepseek-api', 'deepseek']);
-  assert.equal(accounts[0].source, 'llmAccounts');
-  assert.deepEqual(accounts[0].accounts, [
-    { id: 'key1', usable: true },
-    { id: 'key2', usable: false, reason: 'disabled' },
-    { id: 'key3', usable: false, reason: 'no "pi" login store' },
-  ]);
-  assert.deepEqual(accounts[1].accounts, [{ id: 'direct', usable: true }]);
-});
-
-test('explain carries a refusal instead of a binding', () => {
-  const config = deepseekConfig();
-  config.capabilities.research.prefer = [];
-  const result = explainCapability(config, { capability: 'research', session: headless });
-  assert.ok(result.refused);
-  assert.equal(result.family, undefined);
-});
 
 test('explain on the committed config agrees with bind() for every capability', () => {
   const runnerConfig = loadRunnerConfigForDir(committedConfigDir());
