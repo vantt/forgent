@@ -1,7 +1,7 @@
 # Phase 05: the business capability rows leave the standard; capability names become labels
 
-Start after: 02, 03, 14 landed **and the owner's answers to Q2, Q3 and Q4** (this is the one phase that waits on the
-owner; every other phase proceeds). Never at the same time as 09 (both edit `assignment-runner.mjs`) or 11 (both edit
+Start after: 02, 03, 14 landed and S4 is on main (the owner's Q2, Q3, Q4 answers are in; Q2 and Q3 are stopgaps, see
+plan.md "Owner decisions"). Never at the same time as 09 (both edit `assignment-runner.mjs`) or 11 (both edit
 `registrations.mjs`): whichever starts first lands first. Rules:
 [phase-lead-rules.md](phase-lead-rules.md). Facts: F6, F7, F10. Worktree `erd-p05`, report slug `erd-p05-capability-rows`.
 Effort: 3d.
@@ -14,17 +14,29 @@ runs". 03 moved role taste to `runner.roles`; 14 lets a registered workflow unit
 the rows carry more than taste (F10): decide routing (`purposeSeatOf` needs a row's own `prefer`), the `code:*`
 confinement and invocation pins, the `maxTier: frontier` ceiling of three architecture rows, the default red-team
 checker keyed by `code`, a second curated catalog (`DEFAULT_CAPABILITY_SLOTS`), and the names the Work path and coding
-skills route through. Q2-Q4 decide those; this phase carries out the answers.
+skills route through. The owner answered Q2 = (a), Q3 = (c) and Q4 = (a) (2026-11-17); Q2 and Q3 are stopgaps (real fixes: p-bjmoxexuwi, p-nnbfsrxcss);
+this phase carries out exactly those answers.
 
 ## Requirements
 
-1. Delete the rows the answers select from `core/config-standard/runner.yaml`: all 37 under Q3 (a) or (b); under Q3 (c)
-   all but the rows the Work path and the coding skills route through (the set `rg` finds in `src/runner/work-*.mjs`,
-   `domains/coding/**` and `core/skills/**` as `--for`/`--capability`/candidate names; listed in the report, each kept
-   row becomes `debt` in phase 12's "capability rows hold jobs and tool abilities" row with `retiredBy: S7`).
+1. Q3 = (c). Delete from `core/config-standard/runner.yaml` the 28-29 council, business and marketing rows of the F6
+   census (`architecture:*` 5, `business:*` 5, `delphi:*` 2, `group-cognition:*` 3, `nominal-group:*` 4, `marketing:*`
+   3 plus its wildcard, and the other business names no coding path routes through). Keep, as the coding rows the Work
+   path and skills route through: `fgos-coding-implement`, `code:implement`, `code:review`, `code:debug`, `code:test`,
+   `code:refactor`, `docs:write`, the `coding:*` wildcard and the `code:*` wildcard (default red-team checker key). The
+   lead confirms the kept set with `rg` for `--for`/`--capability`/candidate names in `src/runner/work-*.mjs`,
+   `domains/coding/**` and `core/skills/**`, lists it in the report, and moves a row between deleted and kept only
+   when `rg` shows a route through it (the 28-29 count is the owner's estimate). Each kept row becomes `debt` in phase
+   12's "capability rows hold jobs and tool abilities" row with `retiredBy: S7` and a reason citing p-nnbfsrxcss
+   ("stopgap: the coding rows' behaviour gets a proper home, no debt left").
+1a. Q2 = (a). Drop each deleted row's own `prefer` order, the `seats.producer` orders and tier of
+   `architecture:{critique,synthesize}` (`tierFallback` decides; those seats take the unit tier), and the differing
+   red-team order of `marketing:*`. Keep the coding red-team order and the reviewer order globally in
+   `runner.roles` (03). Leave a one-line note beside `runner.roles` that this is a stopgap tracked by p-bjmoxexuwi.
+   Q4 = (a): this repo's `maxTier` becomes `frontier` in `.fgos/config.yaml`.
 2. Each deleted council and marketing row's `tier` and `rigor` go into the workflow units that name the capability:
    `rigor` as the unit's `rigor` (unless the unit already declares one at least as strong), `tier` as the unit `tier`
-   (14). Ceilings (`maxTier: frontier` of `architecture:{shape,critique,synthesize}`) follow Q4.
+   (14). Ceilings (`maxTier: frontier` of `architecture:{shape,critique,synthesize}`) follow Q4 = (a).
 3. D9, labels: a capability with no row binds as a unit seat through `runner.personas`/`runner.roles`, the workflow
    tier and `tierFallback`. Decide's purpose rule does not change: a name without its own `prefer` pool is never
    routed out of process (`plan.mjs:354-395`), so a custom `subagent_type` keeps being allowed by the hook. Consumers:
@@ -38,7 +50,7 @@ skills route through. Q2-Q4 decide those; this phase carries out the answers.
    - Strict confinement (`dispatch/config.mjs:736-755`) checks rows only; show on the post-change tree whether a
      strict-mode project refuses a label seat at launch; if not, the strict check refuses a workflow unit whose label
      has no row, by name (strict means every capability declares confinement).
-4. Per the Q3 answer, the named consumers (F10): coding doctrine (`domains/coding/skills/fgos-coding-planning/SKILL.md`,
+4. Per Q3 = (c) (kept coding rows stay; only consumers of the deleted names change), the named consumers (F10): coding doctrine (`domains/coding/skills/fgos-coding-planning/SKILL.md`,
    `domains/coding/skills/fgos-coding-implement/{SKILL.md,references/implement-and-collaboration.md}`,
    `domains/coding/slice-kinds.yaml`, `core/skills/_shared/{capability-catalog,capability-matching,planning-capability-awareness,executor-dispatch-fallback}.md`,
    `core/skills/fgos-run/SKILL.md`, `core/skills/fgos-cook/references/{case-and-doors,propose}.md`), `propose.mjs:450`
@@ -65,12 +77,12 @@ skills route through. Q2-Q4 decide those; this phase carries out the answers.
 
 ## Acceptance
 
-- `runner.capabilities` in the standard holds the five rows (plus the Q3 (c) debt rows, if chosen); the Req 5 table
+- `runner.capabilities` in the standard holds the five rows plus the Q3 (c) kept coding rows as `debt`; the Req 5 table
   shows only answered differences; `seat-binding-dry-bind` passes for the seven council workflows;
   `rg -n "DEFAULT_CAPABILITY_SLOTS" src test` finds nothing.
 
 ## Risks / rollback
 
 - A review or debug seat loses `host-write-denied` (M x H): Req 5 shows the confinement anchor per unit kind.
-- Work coding dispatch changes (M x H): Req 5's `decide --work` rows; Q3 (c) keeps the Work path whole.
+- Work coding dispatch changes (M x H): Req 5's `decide --work` rows; Q3 = (c) keeps the Work path whole.
 - Revert: one commit series (data, two lint rules, one catalog).

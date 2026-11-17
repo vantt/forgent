@@ -35,8 +35,8 @@ capability rows of the capability-reads plan (F4) still name Node modules as the
    - **"execution doctor judgments"** (S4's per-group shape, e.g. "holder-lock and mailbox doctor judgments"): the
      moved judges' Node function names and Rust `fn` names; allowed `packages/execution/rust/src/checks.rs` and
      `apps/fgos/src/wiring/doctor/execution.rs`.
-   - **"capability rows hold jobs and tool abilities"**: the business names deleted in 05 as standard keys; under Q3 (c)
-     the kept coding rows as `debt` with `retiredBy: S7`.
+   - **"capability rows hold jobs and tool abilities"**: the business names deleted in 05 as standard keys; under Q3 = (c)
+     the kept coding rows as `debt` with `retiredBy: S7` and a reason citing p-nnbfsrxcss.
    - **"retired Node S5 code"**: names that must not come back (`decideDispatchHook`, `explainCapability`,
      `seat-policy.mjs`, `internal seat-binding --protocol 1`, the `node src/runner/dispatch.mjs decide` alias,
      `scripts/dispatch-decide-hook.mjs`).
