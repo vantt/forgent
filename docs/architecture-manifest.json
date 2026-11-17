@@ -67,6 +67,7 @@
     "src/runner/execution/capability-config.mjs": 0,
     "src/runner/worktree.mjs": 2,
     "src/seat-binding/": 5,
+    "src/session-host/": 3,
     "src/session-rotation/": 2,
     "src/setup/": 9,
     "src/state/": 7,
@@ -774,6 +775,7 @@
         { "path": "packages/run-supervisor/rust/src/adopt.rs", "reason": "its own parse_args for the adopt internal route" },
         { "path": "packages/run-supervisor/rust/src/supervise.rs", "reason": "its own parse_args for the supervise internal route" },
         { "path": "packages/terminal-control/rust/src/route.rs", "reason": "the terminal-control internal route's argument reader" },
+        { "path": "packages/session-host/rust/src/route.rs", "reason": "the session-host internal route's argument reader, the same shape as terminal-control's" },
         { "path": "apps/fgctl/src/help.rs", "reason": "fgctl is a separate CLI with its own help words" },
         { "path": "scripts/write-test-marker.mjs", "reason": "a test-runner script with its own flags, not the CLI's parser" }
       ],
@@ -1469,6 +1471,7 @@
     "src/holder-lock/lock-scope.mjs": "infra",
     "src/terminal-control/client.mjs": "infra",
     "src/seat-binding/client.mjs": "infra",
+    "src/session-host/client.mjs": "infra",
     "src/terminal-control/config.mjs": "infra",
     "src/state/event-log.mjs": "kernel",
     "src/state/hot-lock.mjs": "infra",

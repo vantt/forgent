@@ -1,0 +1,48 @@
+// The one wiring proof of the Session Host: the Node client reaches the Rust crate through the
+// internal route of the real host binary (FGOS_HOST_BIN, built from this checkout) and every
+// operation comes back as the contract says. What each operation decides (the refusals, the
+// delivery of an opening, SIGTERM before SIGKILL) is owned by the crate's own tests.
+import '../helpers/process-tmp-root.mjs';
+import { test, after, before } from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import { createSessionHost, SessionHostError } from '../../src/session-host/client.mjs';
+
+const HOST_BIN = process.env.FGOS_HOST_BIN;
+const scratch = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-sh-client-'));
+
+before(() => {
+  assert.ok(HOST_BIN && fs.existsSync(HOST_BIN), `set FGOS_HOST_BIN to a host built from this checkout: ${HOST_BIN}`);
+  process.env.FGOS_STATE_ROOT = path.join(scratch, 'state');
+});
+
+after(() => {
+  fs.rmSync(scratch, { recursive: true, force: true });
+});
+
+test('start, alive, front and retire answer through the route on the direct host', { skip: process.platform === 'win32' }, () => {
+  const host = createSessionHost({ hostBin: HOST_BIN, graceMs: 5_000 });
+  const placement = { host: 'direct', key: 'client-worker' };
+
+  assert.equal(host.alive(placement).result, 'gone');
+  const started = host.start({ host: 'direct', key: 'client-worker', cwd: scratch, command: 'sleep', args: ['60'] });
+  assert.equal(started.result, 'placed');
+  assert.deepEqual(started.placement, placement);
+  assert.equal(host.alive(placement).result, 'live');
+
+  const fronted = host.front(placement);
+  assert.deepEqual([fronted.result, fronted.code], ['unsupported', 'host-unsupported-here']);
+
+  assert.equal(host.retire(placement, 'close').result, 'retired');
+  assert.equal(host.alive(placement).result, 'gone');
+});
+
+test('a refusal comes back as an answer and a bad request throws a named error', () => {
+  const host = createSessionHost({ hostBin: HOST_BIN });
+  const head = host.start({ host: 'direct', key: 'client-head', cwd: scratch, command: 'claude', role: 'head' });
+  assert.deepEqual([head.result, head.code], ['unsupported', 'head-needs-interactive-host']);
+
+  assert.throws(() => host.start({ host: 'direct', key: 'client-head', command: 'claude' }), (err) => err instanceof SessionHostError && err.code === 'session-host-route-usage');
+});

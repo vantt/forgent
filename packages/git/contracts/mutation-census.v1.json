@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "f33df6704ea808fb61e43d2860dde8570613160047f7a8efc505e6b902d0fe65",
+  "payloadDigest": "7f9702d051e041bb30662ba9d72bcf88ac01a83abde3367c13b926f4094d0a08",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "68bd36c02991c59a52f206cb092605f9aa16d218d0f52eb2cb34d1db8d4d9ace",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -91,7 +91,7 @@
     "apps/fgos/src/help.rs": "a7f18814361555860a4f0a44e3bb3c12246f5cb00d124f725e9a506857c2dd8d",
     "apps/fgos/src/invocation_doors.rs": "35c39f0f8dfd80ce87b299ce21c501d7e61f710f38d0309ae52b7355eaa9bd90",
     "apps/fgos/src/legacy_exec.rs": "3516964122e7f002fed147e2f78de3f12df1a0274dd51349bdebff9bac8427d8",
-    "apps/fgos/src/main.rs": "7d60f87240a27091fe04373aa10be936156fbf6162167128ad09b0602dcf2f84",
+    "apps/fgos/src/main.rs": "fcb52a0e682de059373db34e89bddb2d2f3e104c900e24918ca44bdf8bd475d4",
     "apps/fgos/src/routing.rs": "3ca6e2b3260cb48e306c708cc84bf153a2934dfc0b243e053bfbd83a12b68af9",
     "apps/fgos/src/wiring/doctor/bridge.rs": "e81ad0636f30dda82f59913b69c8d97c9ded9437d3c984f3b555e120a56c999e",
     "apps/fgos/src/wiring/doctor/config.rs": "8f1605e073c819280496d1c884dd5d13191ba94fb7e47f9bad47ff2f652a01f6",
@@ -808,6 +808,15 @@
     "packages/secrets/rust/tests/file_source.rs": "04ba41dc003e347c40986379d25996417e952d5e912ce64a822a25078217781d",
     "packages/secrets/rust/tests/no_stdin.rs": "f5a93caf19c759dad53c486e13d953b3f3e3304863cb9ece42bb4e9dcf58f22c",
     "packages/secrets/rust/tests/resolver.rs": "bfa7437b4749119b415a7cce89cb36321f98831aa6c4b0a3e17f0933a445e1a2",
+    "packages/session-host/rust/src/direct.rs": "02d617b344f4b9a9d2f80aa891a5e8f8d1b167eb54548005d52f0629f29faeb1",
+    "packages/session-host/rust/src/host.rs": "a1b0b87de055b7548ed5b1c6b4c51113c6f68a03e2788e54af086d574919e4f2",
+    "packages/session-host/rust/src/lib.rs": "e1520a09416766a7e967198ebcf1f24449179f80cf3ed7e469bd5efe7a6a6d19",
+    "packages/session-host/rust/src/pane_io.rs": "a43f64ea3c10632baa2bc104ac682448db339af9b7a7bb1cd4406a47b5540a2d",
+    "packages/session-host/rust/src/panes.rs": "8e7c5e85979bd8fbb8ef9c2c5996109afecc0f657ee15c1c661ab8ac782e5658",
+    "packages/session-host/rust/src/route.rs": "b51c597a30b65ae5929e5f295f1fdd2c4a001b2c65be5fff819fa4f4a69474d7",
+    "packages/session-host/rust/src/types.rs": "7081969639a0b359a05b149ee61b1da62369d065736b3d6328304e6a420130a0",
+    "packages/session-host/rust/tests/direct_os.rs": "ffcda2fd5811172f85f54ef093c71b7dd99c0bf4fd12630e9997d4d63149ec64",
+    "packages/session-host/rust/tests/host.rs": "de38e2c8d042bb6d505ab75975f7a2867d7e44b8b3693022cdcc32e9788dc4cf",
     "packages/terminal-control/rust/src/core.rs": "0fa67399b5c1e59ac6accc448f58675cae90255659685254b48f428631ab66eb",
     "packages/terminal-control/rust/src/driver/herdr.rs": "8e43d642128ef3072b5009f835cdbeb9d03b89711b4be210f370a5953dd749a6",
     "packages/terminal-control/rust/src/driver/mod.rs": "72f4bbc3f4d1c55704fbe1e0cedd1d6ed1e526d5f06838c97ac32bbeab8c175c",
@@ -1203,6 +1212,7 @@
     "src/runner/worktree.mjs": "91d59e6cfb9c9753846dd573c4cfe8e19834514a31c88772c7c54d949113afbd",
     "src/runner/write-queue.mjs": "a816a82d6c4499cca921f2b105eaaafe646f1413ff202ce3f132c4b84ed7a2b3",
     "src/seat-binding/client.mjs": "206a9ecbbc301f2c3c9688535dbeb60fabbe67052b870a62e23e7481ae82fdd8",
+    "src/session-host/client.mjs": "d7bfbaf1f26d9d8304c15b34fb7fccdbec835d8bda3ed8744562af35a3372f8b",
     "src/session-rotation/decide.mjs": "c4252cfaf861cc8cdf65829d6b63f8e70ddcc990bde6d6b23343a5a9fe80e80f",
     "src/session-rotation/handoff-store.mjs": "0fdd8f18a406b5c2e1797c331e6bdf5ce72c3ed67a9daef28df5bb3b884aa133",
     "src/session-rotation/measure.mjs": "9707b594c14184c402229fe1cac9c1c67dbd84cd9b0db8ff235a8d51caab50be",
@@ -3571,6 +3581,20 @@
       "class": "rust-test"
     },
     {
+      "path": "packages/session-host/rust/src/direct.rs",
+      "line": 97,
+      "spawn": "Command::new <- packages/session-host/rust/src/direct.rs:97",
+      "binary": "(deserialized configuration (StartRequest.command))",
+      "class": "configured-binary"
+    },
+    {
+      "path": "packages/session-host/rust/src/route.rs",
+      "line": 90,
+      "spawn": "Command::new <- packages/terminal-control/rust/src/driver/herdr.rs:398",
+      "binary": "(parsed configuration (match envelope.get(\"herdrBin\") { None | Some(Value::Null) =>))",
+      "class": "configured-binary"
+    },
+    {
       "path": "packages/terminal-control/rust/src/driver/herdr.rs",
       "line": 398,
       "spawn": "Command::new",
@@ -4101,6 +4125,21 @@
       "spawn": "run -> src/seat-binding/client.mjs:126",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
+    },
+    {
+      "path": "src/session-host/client.mjs",
+      "line": 101,
+      "spawn": "spawnSync",
+      "binary": "(env FGOS_HOST_BIN)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/session-host/client.mjs",
+      "line": 101,
+      "spawn": "spawnSync",
+      "binary": "param hostBin",
+      "class": "uncalled-wrapper",
+      "function": "createSessionHost"
     },
     {
       "path": "src/setup/doctor-bridge.mjs",

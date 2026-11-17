@@ -165,6 +165,15 @@ fn main() {
                 .collect();
             std::process::exit(fgos_terminal_control::route::main(&rest));
         }
+        // `session-host <op>`: the placement port for worker and head sessions, one operation per
+        // process (see `fgos_session_host::route`).
+        if args.get(2).is_some_and(|a| a == "session-host") {
+            let rest: Vec<String> = args[3..]
+                .iter()
+                .map(|a| a.to_string_lossy().into_owned())
+                .collect();
+            std::process::exit(fgos_session_host::route::main(&rest));
+        }
         // `seat-binding <op>`: the seat binding decision the Node payload must
         // not copy (see `fgos_seat_binding::route`).
         if args.get(2).is_some_and(|a| a == "seat-binding") {

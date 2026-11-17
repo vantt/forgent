@@ -1,0 +1,14 @@
+[package]
+name = "fgos-session-host"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+fgos-agent-protocol = { path = "../../agent-protocol/rust" }
+fgos-terminal-control = { path = "../../terminal-control/rust" }
+fgos-durable-file = { path = "../../durable-file/rust" }
+fgos-process = { path = "../../process/rust" }
+fgos-holder-lock = { path = "../../holder-lock/rust" }
+serde = { workspace = true }
+serde_json = { workspace = true }

@@ -232,6 +232,7 @@ dependencies = [
  "fgos-run-result",
  "fgos-run-supervisor",
  "fgos-seat-binding",
+ "fgos-session-host",
  "fgos-terminal-control",
  "fgos-work-state",
  "fgos-yaml-doc",
@@ -518,6 +519,19 @@ name = "fgos-secrets"
 version = "0.2.0"
 dependencies = [
  "libc",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
+name = "fgos-session-host"
+version = "0.2.0"
+dependencies = [
+ "fgos-agent-protocol",
+ "fgos-durable-file",
+ "fgos-holder-lock",
+ "fgos-process",
+ "fgos-terminal-control",
  "serde",
  "serde_json",
 ]
