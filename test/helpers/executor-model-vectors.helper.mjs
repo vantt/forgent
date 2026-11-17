@@ -1,7 +1,7 @@
-// Runs one vector of packages/execution/contracts/executor-model.v1.json against the Node functions that derive
-// the executor facts. The same file serves whoever records the vectors and the one test that replays them, so the
-// two can never read a vector differently. A vector is `{ name, fact, entry?, runner?, machine?, args?, expect }`;
-// `machine` describes the machine facts a derivation reads (what is on PATH, the confinement backend registry, the
+// Runs one vector of packages/execution/contracts/executor-model.v1.json or bind.v1.json against the Node functions
+// that derive the executor facts and bind a seat. The same file serves whoever records the vectors and the test that
+// replays them, so the two can never read a vector differently. A vector is
+// `{ name, fact, entry?, runner?, machine?, args?, leaseRead?, decided?, expect }`; `machine` describes the machine facts a derivation reads (what is on PATH, the confinement backend registry, the
 // home directory, lease state, files and a git repository), so a vector never depends on the machine running it.
 
 import fs from 'node:fs';
@@ -14,12 +14,15 @@ import { familyOf, renderedEffortLevels } from '../../src/runner/dispatch/provid
 import { lookupExecutor } from '../../src/runner/dispatch/resolve.mjs';
 import { resolveExecutorGovernance, resolveExecutorProvider } from '../../src/runner/dispatch/executor-governance.mjs';
 import { capabilityConfinementOf } from '../../src/runner/execution/capability-config.mjs';
-import { credentialStoreOf, providerAccountInventory } from '../../src/runner/dispatch/provider-capacity.mjs';
+import { credentialStoreOf, providerAccountInventory, readAccountStateOverlay } from '../../src/runner/dispatch/provider-capacity.mjs';
 import { legacyStateKey, readLlmAccounts } from '../../src/runner/dispatch/llm-accounts.mjs';
 import { decideExecutorDispatchMechanism } from '../../src/runner/dispatch/mechanism.mjs';
 import { resolvePostureInvocation } from '../../src/runner/dispatch/confinement/policies.mjs';
 import { toolProvidersOf } from '../../src/runner/dispatch/tool-providers.mjs';
-import { accountQuarantineOf, agentCliMissingRefusal, explainSeat } from '../../src/runner/execution/bind.mjs';
+import { accountQuarantineOf, agentCliMissingRefusal, bind, explainSeat } from '../../src/runner/execution/bind.mjs';
+import { explainCapability } from '../../src/runner/execution/explain.mjs';
+import { seatConfigDigestOf } from '../../src/runner/execution/seat-policy.mjs';
+import { effectiveRigorOf } from '../../src/runner/execution/seat-resolver.mjs';
 
 const REGISTRY_ENV = 'FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH';
 
@@ -112,12 +115,78 @@ const evaluators = {
   validate: ({ runner }) => { validateRunnerConfigShape(runner, 'vector runner'); return { ok: true }; },
 };
 
-/** Every derived fact a vector may name. */
+/**
+ * Runs `fn` with the clock reading `now`: Node's bind reads `Date.now()` where the Rust bind takes `now` as an input,
+ * so a vector states the time it is bound at.
+ */
+function at(now, fn) {
+  if (now === undefined) return fn();
+  const real = Date.now;
+  Date.now = () => now;
+  try {
+    return fn();
+  } finally {
+    Date.now = real;
+  }
+}
+
+/** A binding as `bind` answers it: the host version is the route's, not the bind's, so it is not part of the answer. */
+function bindingAnswer(binding) {
+  if (binding?.bindingInput) delete binding.bindingInput.hostVersion;
+  return binding;
+}
+
+/** The bind's session over the vector machine: its PATH is the machine's. */
+const sessionOf = (args, paths) => ({ ...(args.session ?? {}), pathEnv: paths.binDir });
+
+/** Lease state the bind reads (`args.accounts` names the assignment), as `bind` takes it. */
+const accountsOf = (args, paths) => (args.accounts ? { runtimeDir: paths.runtimeDir, ...(args.accounts.assignmentId ? { assignmentId: args.accounts.assignmentId } : {}) } : undefined);
+
+/** The answers of packages/execution/contracts/bind.v1.json: the bind, the explain answer, the pre-admission facts, the config slice and its digest, effective rigor. */
+const bindEvaluators = {
+  bind: ({ runner, args }, paths) => at(args.now, () => bindingAnswer(bind(args.ask, { runnerConfig: runner, session: sessionOf(args, paths), accounts: accountsOf(args, paths) }, { walk: args.walk ?? {} }))),
+  explain: ({ runner, args }, paths) => at(args.now, () => explainCapability(runner, { capability: args.capability, rigor: args.rigor, session: sessionOf(args, paths) })),
+  preflight: ({ runner, args }, paths) => at(args.now, () => {
+    const missing = agentCliMissingRefusal(runner, sessionOf(args, paths));
+    const until = args.pin ? accountQuarantineOf(runner, args.pin, { runtimeDir: paths.runtimeDir, now: args.now }) : null;
+    return { ...(missing ? { agentCliMissing: missing } : {}), ...(until !== null ? { pinQuarantinedUntil: until } : {}) };
+  }),
+  seatConfig: ({ runner }) => seatConfigDigestOf(runner),
+  effectiveRigor: ({ runner, args }) => effectiveRigorOf(args.unit, runner, { fallback: 'standard' }) ?? null,
+};
+
+/** Every derived fact a vector of executor-model.v1.json may name. */
 export const VECTOR_FACTS = Object.freeze(Object.keys(evaluators));
+
+/** Every answer a vector of bind.v1.json may name. */
+export const BIND_FACTS = Object.freeze(Object.keys(bindEvaluators));
+
+const evaluatorOf = (vector) => {
+  const evaluate = evaluators[vector.fact] ?? bindEvaluators[vector.fact];
+  if (!evaluate) throw new Error(`vector "${vector.name}" names the unknown fact "${vector.fact}"`);
+  return evaluate;
+};
 
 /** The answer the Node functions give for one vector (never throws; a refusal is part of the answer). */
 export function evaluateVector(vector) {
-  const evaluate = evaluators[vector.fact];
-  if (!evaluate) throw new Error(`vector "${vector.name}" names the unknown fact "${vector.fact}"`);
+  const evaluate = evaluatorOf(vector);
   return answerOf(() => withMachine(vector.machine, (paths) => evaluate({ args: {}, ...vector }, paths)));
+}
+
+/** The facts that read lease state through Dispatch's adapter. */
+const LEASE_READERS = new Set(['accountQuarantine', 'bind', 'preflight']);
+
+/**
+ * What Dispatch's adapter (`readAccountStateOverlay`) reads from the vector's lease state, the account state a binder
+ * that takes it as an input is handed; undefined when the vector's fact reads no lease state or it has none.
+ */
+export function leaseReadOf(vector) {
+  const args = vector.args ?? {};
+  if (!LEASE_READERS.has(vector.fact) || !vector.machine?.accountState) return undefined;
+  if (vector.fact === 'bind' && !args.accounts) return undefined;
+  return withMachine(vector.machine, (paths) => readAccountStateOverlay({
+    runtimeDir: paths.runtimeDir,
+    ...(args.accounts?.assignmentId ? { assignmentId: args.accounts.assignmentId } : {}),
+    now: args.now ?? Date.now(),
+  }));
 }
