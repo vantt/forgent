@@ -3949,7 +3949,21 @@ fn bridge_node(prefix: &str, request: &Path, answer: &str) -> (PathBuf, String) 
     scripted_node(prefix, &format!("cat > '{}'\n{answer}", request.display()))
 }
 
-#[cfg(unix)]
+#[cfg(target_os = "macos")]
+#[test]
+fn init_on_macos_installs_and_names_the_work_store_unsupported() {
+    let world = InitWorld::new("fgos_init_macos");
+    let request = world.base.join("request.json");
+    let (node_dir, path) = bridge_node("fgos_init_macos_node", &request, BRIDGE_END_LINE);
+
+    let answer = world.data(&world.init(&path, &["--json"]));
+    assert_eq!(answer["workStore"], "unsupported-platform");
+    assert!(world.fgos_file("config.yaml").is_file());
+    let _ = fs::remove_dir_all(node_dir);
+}
+
+// The Work store step is Linux only; elsewhere init names it unsupported and the Node step never runs.
+#[cfg(target_os = "linux")]
 #[test]
 fn init_makes_the_machine_and_project_files_in_process_and_asks_node_only_for_the_work_store() {
     let world = InitWorld::new("fgos_init_fresh");
@@ -3982,7 +3996,8 @@ fn init_makes_the_machine_and_project_files_in_process_and_asks_node_only_for_th
 
 /// After a fresh `init` the Git journal exists and is trusted, so the first doctor of the project finds the
 /// `git-operation-journal` row passing and has no Git fix to name.
-#[cfg(unix)]
+// The Work store step is Linux only; elsewhere init names it unsupported and the Node step never runs.
+#[cfg(target_os = "linux")]
 #[test]
 fn after_a_fresh_init_the_git_journal_row_passes_and_no_git_fix_is_named() {
     let world = InitWorld::new("fgos_init_wal");
@@ -4163,7 +4178,8 @@ fn init_never_replaces_a_private_token_that_differs_and_stops_before_the_later_s
     let _ = fs::remove_dir_all(&node_dir);
 }
 
-#[cfg(unix)]
+// The Work store step is Linux only; elsewhere init names it unsupported and the Node step never runs.
+#[cfg(target_os = "linux")]
 #[test]
 fn a_legacy_global_file_init_may_not_move_leaves_it_and_the_event_store_config_refuses_it_by_name()
 {
@@ -4200,7 +4216,8 @@ fn a_legacy_global_file_init_may_not_move_leaves_it_and_the_event_store_config_r
     let _ = fs::remove_dir_all(&node_dir);
 }
 
-#[cfg(unix)]
+// The Work store step is Linux only; elsewhere init names it unsupported and the Node step never runs.
+#[cfg(target_os = "linux")]
 #[test]
 fn a_refusal_of_the_work_store_keeps_the_payloads_text_and_exit_category_and_the_later_steps_do_not_run(
 ) {
@@ -4230,7 +4247,8 @@ exit 2"#,
     let _ = fs::remove_dir_all(&node_dir);
 }
 
-#[cfg(unix)]
+// The Work store step is Linux only; elsewhere init names it unsupported and the Node step never runs.
+#[cfg(target_os = "linux")]
 #[test]
 fn init_without_node_is_a_missing_precondition_after_the_steps_that_need_none() {
     let world = InitWorld::new("fgos_init_nonode");
