@@ -1,6 +1,6 @@
 # Phase 13 report: Config repair moves per-capability taste
 
-Status: NEEDS_CONTEXT (stop rule reached; Config crate work is complete and green)
+Status: DONE (plan lead approved the doctor wiring as part of this phase)
 
 ## What changed
 
@@ -23,12 +23,14 @@ None retired.
 - `cargo test -p fgos-config`: all green (golden_doctor owns the new vectors)
 - `cargo check -p fgos-config --target x86_64-pc-windows-msvc` and `aarch64-apple-darwin`: ok
 - Probe of this repo's `.fgos/config.yaml` (throwaway, not committed): `code:*` red-team and reviewer plan as moves, `marketing:*` red-team conflicts and names `runner.capabilities.code:*.roles.red-team.prefer`; no fix offered until the person decides. Matches the acceptance text, except the fix applies nothing and the row names the paths (no refusal code added).
-- Not run: Node tests, architecture/doc-health gates (the wiring below blocks them first).
 
-## Stop rule: needs a decision
+## Doctor wiring (approved by the plan lead)
 
-`fgos doctor --fix` only runs fixes of rows its adapter lists. The adapter `apps/fgos/src/wiring/doctor/config.rs` (`ROW_IDS`, `FIX_IDS`) and `packages/distribution/contracts/doctor-registry.v1.json` list the Config rows one by one, and
-`wiring::doctor::config::tests::the_adapter_has_exactly_the_rows_and_fixes_of_the_contract_under_the_ids_the_registry_gives` already fails on this branch (verified). Without the wiring the row is invisible to doctor and the fix never runs. The change is three mechanical lines (row id, fix id `config-move-capability-taste`, two registry entries) plus the row/fix lists in `docs/platform/config/spec.md` and `packaging-distribution` docs, all outside the phase's file list. Not done; awaiting the plan lead.
+One row id and one fix id, owner Rust, no bridge row or `layers` touched: `apps/fgos/src/wiring/doctor/config.rs` (`ROW_IDS`, `FIX_IDS` with `config-move-capability-taste`), two entries in `packages/distribution/contracts/doctor-registry.v1.json`, measured counts in `wiring/doctor/mod.rs` (110 rows, 57 native, 28 fixes) and `test/setup/registrations.test.mjs` (57 rows, 23 fixes to Rust), and the row/fix lines in `docs/platform/config/spec.md`, `packaging-distribution/spec.md` and `contracts/setup-doctor-registry.md`.
+
+Accepted differences from the phase text: a conflict applies nothing, offers no fix and the finding names both paths (no refusal code); a moved value keeps its reason text and its `[actor]` becomes the session running the fix.
+
+Further gates: `cargo test -p fgos --bin fgos wiring::doctor` (107 ok), `cargo clippy -p fgos --all-targets -- -D warnings`, `cargo fmt --all --check`, Node (one file per run): checks-doctor-config, config-door, registrations, pre-commit-config-check, git-mutation-census, architecture, doc-health, check-decision-citation-drift all green; one-door scan 0 undeclared.
 
 ## Also noted
 
@@ -38,4 +40,4 @@ None retired.
 
 ## Unresolved questions
 
-1. Approve the wiring edits (adapter, registry, docs) as part of this phase, or give them to another phase?
+None.

@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "5dacd8c20ea2b540dc37bc7207f8538ac00d49a6560032de0edee9df2d0dbaca",
+  "payloadDigest": "1002beb46a8241a41ce90f903254fcf420008193cf98c581d701d8b2f5064d7e",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "b8b886cee2ea5ce7ee1153e4795512db135a990de894c27e53c5e778b210be62",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -92,13 +92,13 @@
     "apps/fgos/src/main.rs": "7d60f87240a27091fe04373aa10be936156fbf6162167128ad09b0602dcf2f84",
     "apps/fgos/src/routing.rs": "3ca6e2b3260cb48e306c708cc84bf153a2934dfc0b243e053bfbd83a12b68af9",
     "apps/fgos/src/wiring/doctor/bridge.rs": "1d6a672ff6d7ea89acd003b068bdee9342b63cb9216f8b76f9261f3c07e2d6ba",
-    "apps/fgos/src/wiring/doctor/config.rs": "97a5d1653dccc89f3788232544fe4bbd640b91fb24c5f592fcce075862c91273",
+    "apps/fgos/src/wiring/doctor/config.rs": "8f1605e073c819280496d1c884dd5d13191ba94fb7e47f9bad47ff2f652a01f6",
     "apps/fgos/src/wiring/doctor/event_store.rs": "61c66e050710eb6ea4aa2f8cb4643bdf91f8cd63bb482f1674de4614edf46e34",
     "apps/fgos/src/wiring/doctor/git.rs": "6005888e2f001b67929d65669376e062819ef687f2b70697b607df12f10a5eba",
     "apps/fgos/src/wiring/doctor/holder_lock.rs": "1c1c2e7ee193dd50f01b161e8198de7ec93193ca48f20533694e44a83818dc58",
     "apps/fgos/src/wiring/doctor/identity.rs": "40499cf62343b256decce7c1905cee1bc2f2a5f07e9d7b389f824d8c44de273f",
     "apps/fgos/src/wiring/doctor/mailbox.rs": "8de4fb5222d9cba45cf7a269e5bb18cb2cd804333c13316821d2ebde5c16219b",
-    "apps/fgos/src/wiring/doctor/mod.rs": "de02a45a0dca0837251bb5c2004271c7c2565867146fe811f505ac95959df90f",
+    "apps/fgos/src/wiring/doctor/mod.rs": "0c6d013e59178b1e860b0c485346322027079d8f0fbc5e6e6bdb1ff2c2a0c795",
     "apps/fgos/src/wiring/doctor/observe.rs": "277742f65ac2d3ac816d11c212b27ba0fffebd5e121dce4f8370154cd864e03e",
     "apps/fgos/src/wiring/doctor/packaging.rs": "2e9c24031035b2d9431b8f6e6a44b31246b385f222d2b78a34b273e6118f3898",
     "apps/fgos/src/wiring/event_store_clone.rs": "923d718f7a6bd5705cbe6e4d4c8393672c1ef4a2142facc9ada314307a4d7574",
