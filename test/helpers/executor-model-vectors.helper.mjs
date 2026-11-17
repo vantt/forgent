@@ -5,6 +5,7 @@
 // home directory, lease state, files and a git repository), so a vector never depends on the machine running it.
 
 import fs from 'node:fs';
+import { isDeepStrictEqual } from 'node:util';
 import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
@@ -171,6 +172,25 @@ const evaluatorOf = (vector) => {
 export function evaluateVector(vector) {
   const evaluate = evaluatorOf(vector);
   return answerOf(() => withMachine(vector.machine, (paths) => evaluate({ args: {}, ...vector }, paths)));
+}
+
+/**
+ * The one reason a vector may be marked `decided`: the explicit invocation rule the owner chose on 2026-11-17, after
+ * the Node bind was written (generic forms as D-ADR0077 (invocation names state their confinement) names them). A mark
+ * with any other text is refused, so the mark cannot become a general way to silence a vector.
+ */
+export const DECIDED_RULE = "invocation choice is an explicit rule (owner, 2026-11-17): a generic form <cli>-<cli|herdr>[-bwrap] before a named one, the session's transport first (herdr inside herdr), then declared order; a pin is kept";
+
+/**
+ * Why a `decided` vector is not a valid statement of the decided rule, or null when it is: its mark must be the
+ * decided rule, its `expect` must be written, and Node must still answer differently (when Node answers the rule, the
+ * mark is removed and the vector re-recorded). `got` is Node's answer.
+ */
+export function decidedProblem(vector, got) {
+  if (vector.decided !== DECIDED_RULE) return `${vector.name}: a vector may be marked decided only for the explicit invocation rule`;
+  if (vector.expect === null || vector.expect === undefined) return `${vector.name}: a decided vector states its expect by hand; it is null`;
+  if (isDeepStrictEqual(got, vector.expect)) return `${vector.name}: Node now answers the decided rule; remove the decided mark and re-record`;
+  return null;
 }
 
 /** The facts that read lease state through Dispatch's adapter. */

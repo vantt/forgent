@@ -12,7 +12,7 @@ import { canApplyPosture, resolvePostureInvocation } from '../dispatch/confineme
 import { MODEL_POLICY_TIERS, assertReasoningEffort, assertRunTimeoutMs } from '../dispatch/config.mjs';
 import { RunnerConfigError } from '../dispatch/runner-config-error.mjs';
 import { isCommandAvailable } from '../paths.mjs';
-import { credentialSourceForCli, credentialStoreOf, providerAccountInventory, readAccountStates } from '../dispatch/provider-capacity.mjs';
+import { credentialSourceForCli, credentialStoreOf, providerAccountInventory, readAccountStateOverlay } from '../dispatch/provider-capacity.mjs';
 import { parseTierCell } from '../dispatch/tier-cell.mjs';
 import { legacyStateKey } from '../dispatch/llm-accounts.mjs';
 import { PRODUCER_POSTURE, effectiveRigorOf, workflowTierOf } from './seat-resolver.mjs';
@@ -225,8 +225,10 @@ function accountViewOf(runnerConfig, launchView, accounts = null, now = Date.now
       } catch { /* a malformed cell is the config validator's to report */ }
     }
   }
+  // The lease state is read once, keyed by the lease document's provider keys; each pool reads its own key.
+  const overlay = accounts ? readAccountStateOverlay({ assignmentId: accounts.assignmentId, runtimeDir: accounts.runtimeDir, now }) : {};
   const poolOf = (pool) => {
-    const states = accounts ? readAccountStates({ provider: legacyStateKey(pool), assignmentId: accounts.assignmentId, runtimeDir: accounts.runtimeDir, now }) : {};
+    const states = overlay[legacyStateKey(pool)] ?? {};
     const declared = Object.entries(inventory[legacyStateKey(pool)]?.accounts ?? {});
     const out = (state) => state?.quarantinedUntil != null && state.quarantinedUntil > now;
     const healthy = declared.some(([id, account]) => account.disabled !== true && !out(states[id]));

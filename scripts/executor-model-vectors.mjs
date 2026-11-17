@@ -8,8 +8,10 @@
 // reads from the vector's lease state, the input a binder that takes account state as data is handed. This script
 // rewrites only those recorded values, through the same evaluator the replay tests use
 // (test/helpers/executor-model-vectors.helper.mjs), and keeps the file's one layout: a vector is a line per key. A
-// new vector is added with `"expect": null` and recorded by running this script. A vector marked `decided` states a
-// rule decided after the Node functions were written: its `expect` is written by hand, never recorded here.
+// new vector is added with `"expect": null` and recorded by running this script. A vector marked `decided` states the
+// explicit invocation rule decided after the Node functions were written: its `expect` is written by hand, never
+// recorded here, and recording or checking refuses it unless the mark is that rule, the expect is written and Node
+// still answers differently.
 //
 //   node scripts/executor-model-vectors.mjs           rewrite the recorded values of both contracts
 //   node scripts/executor-model-vectors.mjs --check   exit 1 when any recorded value has drifted, naming the vectors
@@ -50,11 +52,15 @@ export function serialize({ vectors, ...head }) {
 }
 
 /** One vector with its recorded values recomputed: `leaseRead` (when the fact reads lease state), then `expect`. */
-function recordVector(vector, { evaluateVector, leaseReadOf }) {
-  if (vector.decided) return vector;
-  const { expect: _expect, leaseRead: _leaseRead, ...inputs } = vector;
+function recordVector(vector, { evaluateVector, leaseReadOf, decidedProblem }) {
+  const { expect, leaseRead: _leaseRead, ...inputs } = vector;
   const leaseRead = leaseReadOf(vector);
-  return { ...inputs, ...(leaseRead === undefined ? {} : { leaseRead }), expect: evaluateVector(vector) };
+  const got = evaluateVector(vector);
+  if (vector.decided !== undefined) {
+    const problem = decidedProblem(vector, got);
+    if (problem) throw new Error(problem);
+  }
+  return { ...inputs, ...(leaseRead === undefined ? {} : { leaseRead }), expect: vector.decided !== undefined ? expect : got };
 }
 
 /** The contract with every recorded value and the fact list recomputed from today's Node functions. */
@@ -76,7 +82,14 @@ async function main(argv) {
   let failed = false;
   for (const contractUrl of contractUrls) {
     const current = JSON.parse(fs.readFileSync(contractUrl, 'utf8'));
-    const next = await recorded(current);
+    let next;
+    try {
+      next = await recorded(current);
+    } catch (err) {
+      console.error(`${current.version} vectors: ${err.message}`);
+      failed = true;
+      continue;
+    }
     if (argv.includes('--check')) {
       const drifted = driftedNames(next, current);
       if (drifted.length > 0 || !isDeepStrictEqual(next.facts, current.facts)) {

@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "12a064ed5638ca2b4956d3c3f33e531803052877efe5773e856a40b85301cac3",
+  "payloadDigest": "a1f8d49e51529fbb0f8011a1e8ca6ebdb26c494fa295d05528fd7c0f03976283",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "68bd36c02991c59a52f206cb092605f9aa16d218d0f52eb2cb34d1db8d4d9ace",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -904,7 +904,7 @@
     "scripts/event-store/settle-host-proof.mjs": "e376107a9be596e06c5d11df91c1211d3a0014983196a6ae93b5c349f50554dc",
     "scripts/event-store/store-increment-worker.mjs": "e14caa7c6067ac0f5c99f18f163431e079894a72e1bded877b0faeeeb7933479",
     "scripts/event-store/v-spawn-bench.mjs": "076166b6a8397ab2cba6d416c234d989140574995930cff5bc996464d55bc21e",
-    "scripts/executor-model-vectors.mjs": "ae782c384d55d182c903e407de8af68a22b6dabd830273337ab01d20c00f1319",
+    "scripts/executor-model-vectors.mjs": "cefab85de6abf267957c688eb1ae9b75492c8dd27cc53b1e478d809b21614874",
     "scripts/explain-command-route.mjs": "db546d74676a1c91c3309241dcb618dc438fbae79448f4e2253319657dbbee24",
     "scripts/export-command-selectors.mjs": "8347ac6f9232df87b1e4b3ab8ec20063872796b36119ffb3b3d9c0ba10a4e521",
     "scripts/fgos-session-start-hook.mjs": "6ec944bb42698570cb5cb860d24bde1229d884f968ce0f6771c05b9c11a93af6",
@@ -1132,7 +1132,7 @@
     "src/runner/dispatch/write-scope.mjs": "c072555a8e9c8608d25272c63823ded8b72d57843f22d2112af76338ab8e8212",
     "src/runner/execution/account-pin.mjs": "aa1c7f9a9233de8278d46f46cf32ef6568051fbe59430866729c30fb55ec04dc",
     "src/runner/execution/account-rotation.mjs": "3f7263e6d0a291ce33aa9c44381138a6ca436f20543565ef857c8f7936388cbe",
-    "src/runner/execution/bind.mjs": "479b103ad4884ad80e60dc399fcecd1c7184d41b0447d18595e1bfb69a2bac66",
+    "src/runner/execution/bind.mjs": "7fc63e4876789e3cdf3363d53b434ae6e97913f38c32519b894f4bab8a99b9e0",
     "src/runner/execution/capability-config.mjs": "080196a7484b32d0f4e667403a559129c24c9232948cc2c187dd60dcf8dc7d0f",
     "src/runner/execution/case-admission-port.mjs": "9039951a11acbf69cb549239387cc32ae00617b3ae65bd4682908389b01cdebf",
     "src/runner/execution/case-run-paths.mjs": "4beb8229fa90709bea11c6260c4aee23a99b224a9e6314e69ec74696b86e3ce3",
