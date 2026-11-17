@@ -38,7 +38,8 @@ function run(cwd, args) {
 // capability catalog and every other default come from the standard.
 function tmpCwd() {
   const cwd = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-plan-lint-cli-'));
-  const runner = { executor: { command: 'true', args: [] }, patterns: { seatBinding: { schema: 1 } } };
+  // The tool that serves impact-analysis is not installed here.
+  const runner = { executor: { command: 'true', args: [] }, patterns: { seatBinding: { schema: 1 } }, executors: { 'gone-graph': { kind: 'tool', for: ['impact-analysis'], invocations: [{ via: 'cli', command: 'fgos-no-such-tool-binary', args: [] }] } } };
   fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
   writeProjectConfig(cwd, { runner });
   return cwd;
@@ -117,7 +118,7 @@ test('--json omitted (default) prints a human-readable report naming each unit\'
   assert.match(result.stdout, /coding implementation/i);
 });
 
-test('a hard finding (a tool ability no tool executor serves) exits 1, --json reports ok:false', () => {
+test('a hard finding (a tool ability whose tool is not present) exits 1, --json reports ok:false', () => {
   const cwd = tmpCwd();
   const rel = writePlan(cwd, 'plan.md', `- unit: apply the fix\n  capability: impact-analysis\n`);
   const result = run(cwd, ['plan-lint', rel, '--json']);

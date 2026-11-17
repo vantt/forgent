@@ -8,7 +8,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { initFixtureRepo } from '../../helpers/git-fixture.mjs';
-import { forEntriesOf, servedCapabilitiesOf, toolProvidersOf } from '../../../src/runner/dispatch/tool-providers.mjs';
+import { forEntriesOf, servedCapabilitiesOf, toolProvidersOf, unservedToolAbilityOf } from '../../../src/runner/dispatch/tool-providers.mjs';
 
 function tmpDir() {
   return fs.realpathSync.native(fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-tool-providers-')));
@@ -71,3 +71,28 @@ test('toolProvidersOf probes an mcp tool by its scanTarget: missing, present, an
   assert.equal(ask()[0].status, 'present', 'an unreadable index record never reports staleness it did not see');
 });
 
+test('a capability no tool executor names is a label whatever its row holds; a tool ability is unserved only when no tool for it is present', () => {
+  const pathEnv = pathWith('graph-cli');
+  const cli = (command) => ({ kind: 'tool', for: ['graph'], invocations: [{ via: 'cli', command, args: [] }] });
+  const cfg = (executors) => ({
+    capabilities: {
+      'arch:frame': { confinement: { mode: 'required', policy: 'host-write-denied' } },
+      'arch:shape': { tier: 'frontier' },
+      'arch:critique': { rigor: 'high' },
+      'arch:explain': { description: 'description only' },
+      'arch:empty': {},
+      graph: { description: 'a tool ability', aliases: ['code_graph'] },
+    },
+    executors,
+  });
+  const none = cfg({});
+  for (const name of ['arch:frame', 'arch:shape', 'arch:critique', 'arch:explain', 'arch:empty', 'arch:norow', 'graph']) {
+    assert.equal(unservedToolAbilityOf(none, name, { pathEnv }), undefined, name);
+  }
+  const missing = cfg({ g: cli('graph-cli-not-installed') });
+  assert.equal(unservedToolAbilityOf(missing, 'graph', { pathEnv }), 'graph');
+  assert.equal(unservedToolAbilityOf(missing, 'code_graph', { pathEnv }), 'graph', 'an alias names the row');
+  assert.equal(unservedToolAbilityOf(missing, 'arch:frame', { pathEnv }), undefined);
+  const present = cfg({ g: cli('graph-cli-not-installed'), h: cli('graph-cli') });
+  assert.equal(unservedToolAbilityOf(present, 'graph', { pathEnv }), undefined, 'one present tool serves it');
+});

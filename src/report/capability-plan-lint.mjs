@@ -485,7 +485,7 @@ export function lintPhaseUnits(contentOrPath, { config, phase, cellId } = {}) {
           source: 'unit-block',
           severity: 'warn',
           code: 'capability.tool-unserved',
-          message: `unit "${u.id}" capability "${cap}" is a tool ability no tool executor serves`,
+          message: `unit "${u.id}" capability "${cap}" is a tool ability whose tool is not present`,
         });
       }
     }
@@ -593,8 +593,8 @@ function matchesCellId(entry, cellId) {
 
 /**
  * @param {string} text - raw plan.md content
- * @param {object} [runner] - the caller's runner config (`config.runner` is unwrapped). A capability with no
- *   row is a label and passes; only a tool ability no tool executor serves is flagged. Never reads config
+ * @param {object} [runner] - the caller's runner config (`config.runner` is unwrapped). A capability no tool
+ *   executor names is a label and passes; only a tool ability whose tool is not present is flagged. Never reads config
  *   itself; stays pure.
  * @param {{ cellId?: string, phase?: number }} [options] - `cellId` scopes the result to
  *   only the unit block or Product Gates row whose id matches; when given
@@ -688,7 +688,7 @@ export function lintPlanCapabilityAnnotations(textOrPath, runnerConfig = {}, opt
         source: ctx.source,
         severity: 'hard',
         code: 'capability.tool-unserved',
-        message: `capability "${bare}" is a tool ability no tool executor serves -- declare a kind: tool executor whose "for" lists it, or mark the unit "unresolved"`,
+        message: `capability "${bare}" is a tool ability whose tool is not present -- install the tool its kind: tool executor names, or mark the unit "unresolved"`,
       });
     }
   };

@@ -6,7 +6,7 @@ import {
   catalogOf, capabilityNamesOf, hasCapabilityEntry, registeredCapabilityOf,
   capabilityPersonaOf, capabilityRigorOf, minCheckersOf, ownMinCheckersOf, capabilityVerifyOf,
   capabilityConfinementOf, capabilityServesOf, capabilityDescriptionOf, preferOf,
-  hasOwnPreferPool, isToolAbilityRow, bindingTasteOf,
+  hasOwnPreferPool, bindingTasteOf,
 } from '../../../src/runner/execution/capability-config.mjs';
 
 // The shapes of the repo's own runner config: string and list `prefer` (with an invocation pin), aliases,
@@ -103,15 +103,6 @@ test('a null or string entry is not an entry and an array entry is', () => {
   assert.deepEqual(capabilityNamesOf(runner), Object.keys(runner.capabilities), 'names are the own keys, entries or not');
   assert.deepEqual(capabilityNamesOf({ capabilities: 'x' }), []);
   assert.deepEqual(capabilityNamesOf(undefined), []);
-});
-
-test('a tool ability is an own row with no prefer pool and no serves; a label and a row with either are not', () => {
-  const tools = { capabilities: { graph: { description: 'only a tool serves it' }, job: { serves: { outputKind: 'finding' } }, pooled: { prefer: ['claude'] }, 'lane:*': {} } };
-  assert.equal(isToolAbilityRow(tools, 'graph'), true);
-  assert.equal(isToolAbilityRow(tools, 'job'), false);
-  assert.equal(isToolAbilityRow(tools, 'pooled'), false);
-  assert.equal(isToolAbilityRow(tools, 'lane:x'), false, 'a label covered only by a prefix entry has no row of its own');
-  assert.equal(isToolAbilityRow(tools, 'nope'), false);
 });
 
 test('the catalog is the raw section value', () => {

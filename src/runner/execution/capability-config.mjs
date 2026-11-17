@@ -103,15 +103,6 @@ export const preferOf = (runner, capability) => exactEntryOf(runner, capability)
 /** Whether the exact entry names at least one executor in `prefer`. */
 export const hasOwnPreferPool = (runner, name) => usablePrefer(exactEntryOf(runner, name)?.prefer);
 
-/**
- * Whether the exact entry is a tool ability: a row naming no `prefer` pool and no `serves`, so only a tool
- * executor's `for` can serve it. A name with no row is a label, never a tool ability.
- */
-export const isToolAbilityRow = (runner, name) => {
-  const entry = exactEntryOf(runner, name);
-  return entry !== undefined && !usablePrefer(entry.prefer) && entry.serves === undefined;
-};
-
 /** The description of the exact entry, else of its `<prefix>:*` entry; null when neither has one. */
 export function capabilityDescriptionOf(runner, capability) {
   if (typeof capability !== 'string') return null;

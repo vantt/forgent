@@ -155,10 +155,10 @@ export function validateProposal({ slices, runnerConfig, rigorFloor, ports }) {
 
     const wanted = [slice.askOwnerFirst === true ? null : slice.capability, slice.followUp?.capability];
     for (const capability of wanted) {
-      // A capability with no row is a label the seat binds through the role, persona and tier tables; only a tool
-      // ability needs something in the config to serve it.
+      // A capability no tool executor names is a label the seat binds through the role, persona and tier tables;
+      // only a tool ability needs its tool present.
       if (typeof capability === 'string' && capability !== '' && unservedToolAbilityOf(runnerConfig, capability) !== undefined) {
-        refuse('capability-tool-unserved', slice, `"${capability}" is a tool ability no tool executor serves (declare a kind: tool executor whose "for" lists it)`, { capability });
+        refuse('capability-tool-unserved', slice, `"${capability}" is a tool ability whose tool is not present (install the tool its kind: tool executor names)`, { capability });
       }
     }
 

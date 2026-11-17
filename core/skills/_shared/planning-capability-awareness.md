@@ -108,7 +108,7 @@ A read-only lint against this exact convention exists at
 (`lintPlanCapabilityAnnotations(text, runnerConfig)`): given a
 plan's text, it checks that every `- unit:`/`capability:` block names one
 syntactically valid (or explicitly `unresolved`) capability, never a tool
-ability no tool executor serves, and pins no
+ability whose tool is not present, and pins no
 `executor`/`provider`/`model`/`tier`. It reads text and
 returns findings — it writes nothing, and nothing calls it automatically
 yet (no execution-boundary guard exists; P3 gates that on real, observed

@@ -22,7 +22,12 @@ const runnerConfig = readStandardValue('runner').value;
 const shipped = shippedCatalog();
 const implement = runnerConfig.capabilities['code:implement'];
 // The project declares the command the final gate runs; the standard config declares none.
-const declaredGate = { ...runnerConfig, capabilities: { ...runnerConfig.capabilities, 'code:implement': { ...implement, verify: 'node gate.mjs' } } };
+const declaredGate = {
+  ...runnerConfig,
+  capabilities: { ...runnerConfig.capabilities, 'code:implement': { ...implement, verify: 'node gate.mjs' } },
+  // The tool that serves impact-analysis is not installed.
+  executors: { ...runnerConfig.executors, 'gone-graph': { kind: 'tool', for: ['impact-analysis'], invocations: [{ via: 'cli', command: 'fgos-no-such-tool-binary', args: [] }] } },
+};
 
 const guide = {
   id: 'coding/feature',

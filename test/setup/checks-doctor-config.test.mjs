@@ -169,15 +169,17 @@ test('workflow-capabilities-configured passes on the standard alone, and a capab
   fs.rmSync(cwd, { recursive: true, force: true });
 });
 
-test('workflow-capabilities-configured fails only for a tool ability no tool executor serves, naming it and the Workflow', () => {
+test('workflow-capabilities-configured fails only for a tool ability whose tool is not present, naming it and the Workflow', () => {
   const cwd = mkTemp('doctor-workflow-caps-tool-');
   fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
   writeProjectWorkflow(cwd, ['impact-analysis', 'mine:frame']);
+  assert.equal(checkById('workflow-capabilities-configured').check(cwd).passed, true, 'no tool executor names it: a label');
+  declareExecutor(cwd, 'gone-graph', { kind: 'tool', for: ['impact-analysis'], invocations: [{ via: 'cli', command: 'fgos-no-such-tool-binary', args: [] }] });
   const failed = checkById('workflow-capabilities-configured').check(cwd);
   assert.equal(failed.passed, false);
   assert.match(failed.message, /impact-analysis \(mine from project\)/);
   assert.doesNotMatch(failed.message, /mine:frame/);
-  declareExecutor(cwd, 'graph', { kind: 'tool', for: ['impact-analysis'], description: 'graph tool' });
+  declareExecutor(cwd, 'graph', { kind: 'tool', for: ['impact-analysis'], invocations: [{ via: 'cli', command: process.execPath, args: [] }] });
   const served = checkById('workflow-capabilities-configured').check(cwd);
   assert.equal(served.passed, true, served.message);
   fs.rmSync(cwd, { recursive: true, force: true });

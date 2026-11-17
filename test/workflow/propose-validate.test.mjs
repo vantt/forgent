@@ -51,12 +51,11 @@ function memoryPorts(files, { links = [] } = {}) {
 
 const runnerConfig = {
   capabilities: {
-    'code:implement': { serves: { outputKind: 'change' } },
-    'code:test': { serves: { outputKind: 'verification' } },
-    'docs:write': { serves: { outputKind: 'change' } },
-    review: { serves: { outputKind: 'finding' } },
+    'code:implement': {}, 'code:test': {}, 'docs:write': {}, review: {},
     'impact-analysis': { description: 'a tool ability', aliases: ['impact_analysis'] },
   },
+  // The tool that serves impact-analysis is not installed.
+  executors: { 'gone-graph': { kind: 'tool', for: ['impact-analysis'], invocations: [{ via: 'cli', command: 'fgos-no-such-tool-binary', args: [] }] } },
 };
 
 const repo = {
@@ -141,12 +140,12 @@ test('a glob or directory that names no file is refused as empty', () => {
   assert.deepEqual(codes(result), ['write-scope-empty']);
 });
 
-test('a capability with no row is a label and passes; a tool ability, or its alias, that no tool executor serves is refused', () => {
+test('a capability no tool executor names is a label and passes; a tool ability, or its alias, whose tool is not present is refused', () => {
   assert.equal(validate([slice('a', ['src/a/one.mjs'], { capability: 'code:imagine' })]).ok, true);
   assert.equal(validate([slice('d', ['docs/guide.md'], { capability: 'docs:write', followUp: { capability: 'audit', pattern: 'solo' } })]).ok, true);
   assert.deepEqual(codes(validate([slice('a', ['src/a/one.mjs'], { capability: 'impact-analysis' })])), ['capability-tool-unserved']);
   assert.deepEqual(codes(validate([slice('d', ['docs/guide.md'], { capability: 'docs:write', followUp: { capability: 'impact_analysis', pattern: 'solo' } })])), ['capability-tool-unserved']);
-  const served = { ...runnerConfig, executors: { graph: { kind: 'tool', for: ['impact-analysis'] } } };
+  const served = { ...runnerConfig, executors: { ...runnerConfig.executors, graph: { kind: 'tool', for: ['impact-analysis'], invocations: [{ via: 'cli', command: process.execPath, args: [] }] } } };
   assert.equal(validate([slice('a', ['src/a/one.mjs'], { capability: 'impact-analysis' })], { runnerConfig: served }).ok, true);
 });
 

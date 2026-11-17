@@ -136,10 +136,10 @@ capability either — see that skill's own doc for the split.
    <name>` to resolve something, not a hypothetical future need. A workflow
    step that only needs a name for its seats needs no row: name it, and
    give the step its own `tier` and `rigor`.
-2. A tool ability (something only a `kind: "tool"` executor serves) gets a
-   row in the standard with a one-line `description` and no `prefer` or
-   `serves`, plus the tool executor whose `for` lists it; a workflow unit,
-   a proposal or a plan naming a tool ability no tool executor serves is
-   refused (`capability-tool-unserved`, `capability.tool-unserved`, doctor
-   `workflow-capabilities-configured`).
+2. A tool ability is a capability a `kind: "tool"` executor lists in its
+   `for`; give it a row in the standard with a one-line `description`. A
+   workflow unit, a proposal or a plan naming a tool ability whose tool is
+   not present is refused (`capability-tool-unserved`,
+   `capability.tool-unserved`, doctor `workflow-capabilities-configured`);
+   a capability no tool executor names is a label, whatever its row holds.
 3. Add one row to the table above.

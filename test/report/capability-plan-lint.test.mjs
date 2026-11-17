@@ -18,8 +18,10 @@ import { execFileSync, spawnSync } from 'node:child_process';
 import os from 'node:os';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-// The standard's runner section: its rows, and no tool executor, so its tool abilities are unserved.
-const STANDARD_RUNNER = JSON.parse(JSON.stringify(readStandardValue('runner').value));
+// The standard's runner section, plus a tool executor for impact-analysis whose tool is not installed.
+const STANDARD = JSON.parse(JSON.stringify(readStandardValue('runner').value));
+const GONE_GRAPH = { kind: 'tool', for: ['impact-analysis'], invocations: [{ via: 'cli', command: 'fgos-no-such-tool-binary', args: [] }] };
+const STANDARD_RUNNER = { ...STANDARD, executors: { ...STANDARD.executors, 'gone-graph': GONE_GRAPH } };
 
 test('a plan with valid, registered, unpinned units passes clean', () => {
   const text = `# Plan
@@ -60,7 +62,7 @@ test('an invalid capability shape (not generic, not domain:capability) is flagge
   assert.match(result.findings[0].message, /not a valid canonical shape/);
 });
 
-test('a capability with no row is a label and passes; a tool ability no tool executor serves is flagged capability.tool-unserved, naming the remedy', () => {
+test('a capability no tool executor names is a label and passes; a tool ability whose tool is not present is flagged capability.tool-unserved, naming the remedy', () => {
   const label = lintPlanCapabilityAnnotations(`- unit: apply the fix\n  capability: code:teleport\n`, STANDARD_RUNNER);
   assert.equal(label.ok, true);
   assert.deepEqual(label.findings, []);
@@ -70,8 +72,8 @@ test('a capability with no row is a label and passes; a tool ability no tool exe
   const result = lintPlanCapabilityAnnotations(text, STANDARD_RUNNER);
   assert.equal(result.ok, false);
   assert.equal(result.findings[0].code, 'capability.tool-unserved');
-  assert.match(result.findings[0].message, /no tool executor serves/);
-  const served = { ...STANDARD_RUNNER, executors: { graph: { kind: 'tool', for: ['impact-analysis'] } } };
+  assert.match(result.findings[0].message, /whose tool is not present/);
+  const served = { ...STANDARD_RUNNER, executors: { ...STANDARD_RUNNER.executors, graph: { kind: 'tool', for: ['impact-analysis'], invocations: [{ via: 'cli', command: process.execPath, args: [] }] } } };
   assert.equal(lintPlanCapabilityAnnotations(text, served).ok, true);
 });
 
@@ -310,7 +312,7 @@ test('a backticked Capability cell naming an unserved tool ability is still flag
   const result = lintPlanCapabilityAnnotations(text, STANDARD_RUNNER);
   assert.equal(result.ok, false);
   assert.equal(result.findings[0].code, 'capability.tool-unserved');
-  assert.match(result.findings[0].message, /capability "impact-analysis" is a tool ability no tool executor serves/);
+  assert.match(result.findings[0].message, /capability "impact-analysis" is a tool ability whose tool is not present/);
 });
 
 test('"unresolved-foo" is never treated as the exact "unresolved" hedge token', () => {
@@ -466,8 +468,8 @@ Overview text
   const config = {
     runner: {
       capabilities: {
-        'docs:write': { description: 'Write documentation', serves: { outputKind: 'change' } },
-        'code:review': { description: 'Review code', serves: { outputKind: 'finding' } },
+        'docs:write': { description: 'Write documentation' },
+        'code:review': { description: 'Review code' },
       },
     },
   };
@@ -602,7 +604,7 @@ test('lintPhaseUnits allows overlapping writes when units have dependency relati
   assert.equal(collisions.length, 0);
 });
 
-test('lintPhaseUnits accepts a label and warns on a tool ability no tool executor serves, read from a config given as runner', () => {
+test('lintPhaseUnits accepts a label and warns on a tool ability whose tool is not present, read from a config given as runner', () => {
   const text = `## Units
 - unit: u-label
   capability: deploy:custom-target
@@ -616,7 +618,7 @@ test('lintPhaseUnits accepts a label and warns on a tool ability no tool executo
   capability: unresolved (needs review)
   objective: "Unresolved capability"
 `;
-  const config = { runner: { capabilities: { 'impact-analysis': { description: 'A tool ability' } } } };
+  const config = { runner: { capabilities: { 'impact-analysis': { description: 'A tool ability' } }, executors: { 'gone-graph': GONE_GRAPH } } };
   const result = lintPhaseUnits(text, { config });
   // An unserved tool ability is a warning, so ok is true.
   assert.equal(result.ok, true);
@@ -625,7 +627,7 @@ test('lintPhaseUnits accepts a label and warns on a tool ability no tool executo
   assert.ok(unserved.every((f) => f.severity === 'warn'));
   const unres = result.findings.filter((f) => f.code === 'capability.unresolved');
   assert.deepEqual(unres.map((f) => f.unit), ['u-unresolved']);
-  const served = { runner: { ...config.runner, executors: { graph: { kind: 'tool', for: ['impact-analysis'] } } } };
+  const served = { runner: { ...config.runner, executors: { graph: { kind: 'tool', for: ['impact-analysis'], invocations: [{ via: 'cli', command: process.execPath, args: [] }] } } } };
   assert.deepEqual(lintPhaseUnits(text, { config: served }).findings.filter((f) => f.code === 'capability.tool-unserved'), []);
 });
 

@@ -1233,9 +1233,9 @@ registerCheck({
 });
 registerFix({ id: 'runtime-socket-dir', fix: () => fixRuntimeSocketDir() });
 
-// A capability a core/domain Workflow unit names with no row is a label: its seats bind through the role,
-// persona and tier tables. A tool ability is different: only a tool executor's `for` serves it, so a unit naming
-// one that no tool executor declares is refused at run time with no earlier signal.
+// A capability a core/domain Workflow unit names is a label unless a kind: tool executor declares it in `for`: a
+// label's seats bind through the role, persona and tier tables. A tool ability whose tool is not present is
+// refused at run time with no earlier signal, so this row names it.
 // Definitions come from the Workflow loader's one catalog (readWorkflowCatalog): the one that runs for each
 // id, project before shipped. Every string under a key named `capability`, at any depth, is a use. A file
 // that cannot be read, parsed or validated is reported by name, never skipped.
@@ -1275,15 +1275,15 @@ function checkWorkflowCapabilitiesConfigured(cwd) {
 
 function evaluateWorkflowCapabilities(cwd, uses) {
   const runner = effectiveSection(cwd, 'runner');
-  const unserved = [...uses].filter(([capability]) => unservedToolAbilityOf(runner, capability) !== undefined);
+  const unserved = [...uses].filter(([capability]) => unservedToolAbilityOf(runner, capability, { repoRoot: cwd }) !== undefined);
   if (unserved.length > 0) {
     const list = unserved.map(([cap, ids]) => `${cap} (${[...ids].join(', ')})`).join('; ');
     return {
       passed: false,
-      message: `Workflow units name tool abilities no tool executor serves: ${list} -- declare a kind: tool executor whose "for" lists each under runner.executors`,
+      message: `Workflow units name tool abilities whose tool is not present: ${list} -- install the tool its kind: tool executor names, or fix that executor's invocation`,
     };
   }
-  return { passed: true, message: `every capability a Workflow unit names (${uses.size}) is a label or a tool ability a tool executor serves` };
+  return { passed: true, message: `every capability a Workflow unit names (${uses.size}) is a label or a tool ability whose tool is present` };
 }
 
 registerCheck({

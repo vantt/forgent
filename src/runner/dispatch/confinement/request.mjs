@@ -368,7 +368,7 @@ export function buildConfinementRequest({
       // Strict mode means every capability declares its confinement; a label (no row) declares none.
       if (cfg?.confinement?.strict === true) {
         throw new ConfinementPolicyError(
-          `strict mode: capability "${cap}" has no runner.capabilities row declaring confinement (confinement-policy-missing).`,
+          `strict mode: capability "${cap}" has no runner.capabilities row of its own declaring confinement (an alias of a row does not count; name the row) (confinement-policy-missing).`,
         );
       }
       let legacy = null;

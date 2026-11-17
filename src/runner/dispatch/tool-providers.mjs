@@ -8,7 +8,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { isCommandAvailable } from '../paths.mjs';
 import { commitAt } from '../../git/inspect.mjs';
-import { isToolAbilityRow, registeredCapabilityOf } from '../execution/capability-config.mjs';
+import { registeredCapabilityOf } from '../execution/capability-config.mjs';
 
 /** The raw `for` list of any executor (`[]` when it declares none): the one reader of `for`. */
 export function forEntriesOf(executor) {
@@ -18,20 +18,6 @@ export function forEntriesOf(executor) {
 /** The capabilities a tool executor serves; an agent executor serves none (its `for` is inert). */
 export function servedCapabilitiesOf(executor) {
   return executor?.kind === 'tool' ? forEntriesOf(executor) : [];
-}
-
-/**
- * The registered name of a tool ability that no tool executor of the config declares in its `for`, else
- * undefined. `capability` may be the row's name or one of its aliases; a name with no row is a label, which a
- * unit seat binds through the role, persona and tier tables, so it is never reported here.
- */
-export function unservedToolAbilityOf(runnerConfig, capability) {
-  const name = registeredCapabilityOf(runnerConfig, capability);
-  if (name === undefined || !isToolAbilityRow(runnerConfig, name)) return undefined;
-  const wanted = normalizeCapability(name);
-  const executors = runnerConfig?.executors && typeof runnerConfig.executors === 'object' ? Object.values(runnerConfig.executors) : [];
-  const served = executors.some((executor) => servedCapabilitiesOf(executor).some((entry) => normalizeCapability(entry) === wanted));
-  return served ? undefined : name;
 }
 
 /** A capability label folded to kebab-case: `Impact Analysis`, `impact_analysis` and `impact-analysis` are one name. */
@@ -128,4 +114,17 @@ export function toolProvidersOf(runnerConfig, { capability, repoRoot = process.c
     }
   }
   return providers;
+}
+
+/**
+ * The name of a tool ability no tool is present to serve, else undefined. A capability is a tool ability when a
+ * `kind: "tool"` executor declares it in `for` (its name or one of its row's aliases); it is unserved when every
+ * such tool is probed `missing` or `unknown`. A capability no tool executor names is a label, whatever its row
+ * holds, so it is never reported here.
+ */
+export function unservedToolAbilityOf(runnerConfig, capability, { repoRoot, pathEnv } = {}) {
+  const name = registeredCapabilityOf(runnerConfig, capability) ?? capability;
+  const providers = toolProvidersOf(runnerConfig, { capability: name, ...(repoRoot ? { repoRoot } : {}), ...(pathEnv ? { pathEnv } : {}) });
+  if (providers.length === 0) return undefined;
+  return providers.some(({ status }) => status === 'present' || status === 'stale') ? undefined : name;
 }

@@ -65,6 +65,7 @@ capability rows of the capability-reads plan (F4) still name Node modules as the
    edits before pulling; build, stage and activate the release in one window; right after activation run
    `fgos doctor --fix` in every project (13's repair moves per-capability taste; a conflicting value stops for the person,
    named); then `fgos doctor` through the installed shim; linked on the board.
+- From phase 05: specs still name deleted symbols: `docs/platform/runner/subcomponents/h-6979005beaf7/spec.md:193` (`RUNNER_LOOP_CAPABILITY_USES`), `docs/platform/config/spec.md:161` and `docs/platform/seat-binding/spec.md:476` (`DEFAULT_CAPABILITY_SLOTS`). The CHANGELOG line must say that another project whose `maxTier` is `flagship` now has its architecture frontier seats capped at flagship (the rows' own `maxTier: frontier` is gone; this repo raised its own to frontier).
 
 ## Files
 
