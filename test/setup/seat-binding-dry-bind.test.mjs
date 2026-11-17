@@ -19,11 +19,12 @@ import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixtu
 // consulting the machine's confinement backend registry: the run depends only on the fixture.
 const FAMILIES = { alpha: 'claude', beta: 'xai', gamma: 'z-ai', delta: 'deepseek' };
 
-function runnerConfig(capabilities) {
+function runnerConfig(capabilities, taste = {}) {
   return {
     executors: Object.fromEntries(Object.entries(FAMILIES).map(([id, family]) => [id, { agentType: id, providerModel: family }])),
     modelPolicies: Object.fromEntries(Object.values(FAMILIES).map((family) => [family, { nano: 'm', standard: 'm', advanced: 'm', flagship: 'm', frontier: 'm' }])),
     capabilities,
+    ...taste,
     // The effective config always carries the standard's loop settings; the reviewed loop reads its round limit from them.
     loops: shippedCatalog().loops,
   };
@@ -276,7 +277,7 @@ steps:
 `;
 
 test('a unit with a persona and blind is bound as the run starts it: the persona taste of the seat decides its tier', async () => {
-  const config = runnerConfig({ 'fixture:draft': { ...prefer('alpha'), personas: { panelist: { tier: 'frontier' } } } });
+  const config = runnerConfig({ 'fixture:draft': prefer('alpha') }, { personas: { panelist: { tier: 'frontier' } } });
   config.modelPolicies.claude = { standard: 'm' };
   const payloadRoot = mkPackageRoot(PERSONA_WORKFLOW);
   try {

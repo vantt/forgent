@@ -205,17 +205,21 @@ runner:
     # @fgos:doc The tier and executors one role or persona prefers.
     red-team:
       # @fgos:doc Executors a seat may use, in order: one executor id, or a list whose entries are an id or an object naming an executor, one of its invocation ids and whether it may cross provider. Default: ["xai","claude","openai"].
-      # @fgos:why [ec3510cc-cf0c-43c5-b19e-32964ea523d9] COOK 2026-10-26: reviewer seats prefer xai, so a red-team seat limited to xai has no independent family at high rigor and the round settled independence-unsatisfiable (unit-run-1792987741620-ae5ebf3f). Putting openai first gives producer, reviewer, red-team three families. Unset or restore [xai] if openai seats stall.
+      # @fgos:why [ec3510cc-cf0c-43c5-b19e-32964ea523d9] COOK 2026-10-26: reviewer seats prefer xai, so a red-team seat limited to xai has no independent family at high rigor and the round settled independence-unsatisfiable (unit-run-1792987741620-ae5ebf3f). Putting openai first gives producer, reviewer, red-team three families. Unset or restore [xai] if openai seats stall. 2026-11-17: claude and gemini appended so the order stays and the pool is wide enough once runner.roles applies to every capability; with two families the architecture:critique and architecture:synthesize seats were refused independence-unsatisfiable.
       prefer:
         - openai
         - xai
+        - claude
+        - gemini
     # @fgos:doc The tier and executors one role or persona prefers.
     reviewer:
       # @fgos:doc Executors a seat may use, in order: one executor id, or a list whose entries are an id or an object naming an executor, one of its invocation ids and whether it may cross provider.
-      # @fgos:why [ec3510cc-cf0c-43c5-b19e-32964ea523d9] Owner 2026-10-25 21:44 chose (a): deepseek reviewer seats stalled or hit 402 in 4 of 5 rounds of the Part A case (evidence-261025-2126-cook-reviewer-seat-stalls.md); claude read-only seats write no outbox; xai finished every round. Unset when HARDEN lands the pi stall detection.
+      # @fgos:why [ec3510cc-cf0c-43c5-b19e-32964ea523d9] Owner 2026-10-25 21:44 chose (a): deepseek reviewer seats stalled or hit 402 in 4 of 5 rounds of the Part A case (evidence-261025-2126-cook-reviewer-seat-stalls.md); claude read-only seats write no outbox; xai finished every round. Unset when HARDEN lands the pi stall detection. 2026-11-17: claude and gemini appended so the order stays and the pool is wide enough once runner.roles applies to every capability; with two families the architecture:critique and architecture:synthesize seats were refused independence-unsatisfiable.
       prefer:
         - xai
         - openai
+        - claude
+        - gemini
 # @fgos:doc How far agent work may skip human approval gates.
 gateBypass:
   # @fgos:doc Gate bypass level for agent work; off approves nothing automatically and each higher level approves work up to that size. Values: off | light | standard | heavy. Default: off.

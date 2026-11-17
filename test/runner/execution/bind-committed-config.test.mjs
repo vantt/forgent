@@ -30,7 +30,7 @@ const executors = runnerConfig.executors;
 const NEEDS_PRIVATE_HOME = new Set(['openai', 'gemini', 'xai', 'deepseek']);
 
 const headless = { headless: true };
-const ask = (capability, writes = []) => ({ unit: { id: 'u', capability, writes }, role: writes.length ? 'producer' : 'reviewer' });
+const ask = (capability, writes = []) => ({ unit: { id: 'u', capability, writes }, role: 'producer' });
 
 function invocationOf(binding) {
   return executors[binding.executor].invocations.find((inv) => inv.id === binding.invocation);
@@ -122,7 +122,7 @@ test('a capability gets the same family and model inside herdr and headless; onl
   // pane one ran claude inside herdr and fell to the next family headless.
   for (const capability of ['architecture:explain', 'business:frame', 'architecture:synthesize']) {
     for (const rigor of ['low', 'standard', 'high', 'critical']) {
-      const unitAsk = { unit: { id: 'u', capability, writes: [], rigor }, role: 'reviewer' };
+      const unitAsk = { unit: { id: 'u', capability, writes: [], rigor }, role: 'producer' };
       const pane = bind(unitAsk, { runnerConfig, session: { herdrPresent: true } });
       const cli = bind(unitAsk, { runnerConfig, session: headless });
       assert.ok(!pane.refused && !cli.refused, `${capability}/${rigor}: ${JSON.stringify(pane.refused ?? cli.refused)}`);

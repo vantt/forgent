@@ -121,8 +121,6 @@ export function capabilityDescriptionOf(runner, capability) {
 
 // ---- the slice the seat-binding crate reads --------------------------------------------------------
 
-const SCOPE_GROUPS = Object.freeze(['roles', 'personas', 'seats']);
-
 /** `prefer` in the shape the crate reads: a list of executor ids and `{executor, invocation}` pins. */
 const preferList = (prefer) => (typeof prefer === 'string' ? [prefer] : prefer);
 
@@ -137,14 +135,36 @@ function bindingFieldsOf(entry) {
   const out = {};
   for (const key of ['tier', 'maxTier']) if (entry[key] !== undefined) out[key] = entry[key];
   if (entry.prefer !== undefined) out.prefer = preferList(entry.prefer);
-  for (const group of SCOPE_GROUPS) {
-    if (!isPlainObject(entry[group])) continue;
-    out[group] = Object.fromEntries(Object.entries(entry[group]).filter(([, scope]) => isPlainObject(scope)).map(([name, scope]) => [name, scopeOf(scope)]));
-  }
   return out;
 }
 
-/** Per capability, the binding fields the crate reads: tier, maxTier, prefer, roles, personas, seats. */
-export const bindingTasteOf = (runner) => Object.fromEntries(
-  Object.entries(runner?.capabilities ?? {}).filter(([, entry]) => isPlainObject(entry)).map(([name, entry]) => [name, bindingFieldsOf(entry)]),
+const tasteTableOf = (table) => Object.fromEntries(
+  Object.entries(isPlainObject(table) ? table : {}).filter(([, scope]) => isPlainObject(scope)).map(([name, scope]) => [name, scopeOf(scope)]),
 );
+
+/**
+ * The taste the crate reads: per capability the tier, maxTier and prefer, and the `roles` and `personas` tables,
+ * which apply to every capability.
+ */
+const tasteSlice = (runner) => ({
+  capabilities: Object.fromEntries(
+    Object.entries(runner?.capabilities ?? {}).filter(([, entry]) => isPlainObject(entry)).map(([name, entry]) => [name, bindingFieldsOf(entry)]),
+  ),
+  roles: tasteTableOf(runner?.roles),
+  personas: tasteTableOf(runner?.personas),
+});
+
+export const bindingTasteOf = tasteSlice;
+
+/** Every `prefer` the crate reads, with where it sits: `capabilities.<name>`, `roles.<role>` or `personas.<name>`. */
+export function* preferSitesOf(runner) {
+  const taste = tasteSlice(runner);
+  for (const [name, entry] of Object.entries(taste.capabilities)) {
+    if (entry.prefer !== undefined) yield { prefer: entry.prefer, site: `capabilities.${name}` };
+  }
+  for (const table of ['roles', 'personas']) {
+    for (const [key, scope] of Object.entries(taste[table])) {
+      if (scope.prefer !== undefined) yield { prefer: scope.prefer, site: `${table}.${key}` };
+    }
+  }
+}

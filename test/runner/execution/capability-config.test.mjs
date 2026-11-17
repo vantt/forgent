@@ -10,15 +10,13 @@ import {
 } from '../../../src/runner/execution/capability-config.mjs';
 
 // The shapes of the repo's own runner config: string and list `prefer` (with an invocation pin), aliases,
-// confinement, a prefix entry with roles, seats and minCheckers, persona, verify, serves.
+// confinement, a prefix entry with minCheckers, persona, verify, serves, and the role and persona taste tables.
 const runner = Object.freeze({
   capabilities: Object.freeze({
     'impact-analysis': { description: 'blast radius', prefer: 'gitnexus', serves: ['gitnexus'] },
     review: { aliases: ['code-review'], prefer: [{ executor: 'claude', invocation: 'fast' }, 'codex'], confinement: { mode: 'required' }, rigor: 'high' },
     'code:*': {
       description: 'code work', tier: 'T2', maxTier: 'T3', prefer: ['claude'], rigor: 'standard', minCheckers: ['red-team'],
-      roles: { reviewer: { tier: 'T3', prefer: 'codex', extra: 1 }, bad: 'x' },
-      personas: { pm: { tier: 'T1' } }, seats: { s1: { prefer: ['claude'] } },
     },
     'code:implement': { persona: 'builder', verify: 'npm test', description: 'implement', blank: 1 },
     'code:debug': { prefer: '   ', minCheckers: [] },
@@ -28,6 +26,8 @@ const runner = Object.freeze({
     text: 'x',
     list: ['x'],
   }),
+  roles: Object.freeze({ reviewer: { tier: 'T3', prefer: 'codex', extra: 1 }, bad: 'x' }),
+  personas: Object.freeze({ pm: { tier: 'T1' } }),
 });
 
 const wrapped = { runner: runner };
@@ -76,7 +76,7 @@ test('a config wrapped as runner.capabilities holds no catalog: every read, look
   assert.equal(preferOf(wrapped, 'review'), undefined);
   assert.equal(hasCapabilityEntry(wrapped, 'review'), false);
   assert.deepEqual(capabilityNamesOf(wrapped), []);
-  assert.deepEqual(bindingTasteOf(wrapped), {});
+  assert.deepEqual(bindingTasteOf(wrapped), { capabilities: {}, roles: {}, personas: {} });
 });
 
 test('an alias resolves to its key, an own key wins over an alias and a string aliases value is ignored', () => {
@@ -153,20 +153,17 @@ test('verify, confinement, serves and description are read raw from the exact en
   assert.equal(capabilityDescriptionOf(runner, undefined), null);
 });
 
-test('the binding taste keeps only the crate fields and normalizes a string prefer to a list', () => {
-  const taste = bindingTasteOf(runner);
-  assert.deepEqual(taste['impact-analysis'], { prefer: ['gitnexus'] });
-  assert.deepEqual(taste.review, { prefer: [{ executor: 'claude', invocation: 'fast' }, 'codex'] });
-  assert.deepEqual(taste['code:*'], {
-    tier: 'T2', maxTier: 'T3', prefer: ['claude'],
-    roles: { reviewer: { tier: 'T3', prefer: ['codex'] } },
-    personas: { pm: { tier: 'T1' } },
-    seats: { s1: { prefer: ['claude'] } },
-  });
-  assert.deepEqual(taste['code:implement'], {}, 'persona, verify and description are not binding fields');
-  assert.equal('nothing' in taste, false);
-  assert.equal('text' in taste, false);
-  assert.equal('list' in taste, false, 'an array is not an entry for the crate');
+test('the binding taste keeps only the crate fields, per capability and in the role and persona tables and normalizes a string prefer to a list', () => {
+  const { capabilities, roles, personas } = bindingTasteOf(runner);
+  assert.deepEqual(capabilities['impact-analysis'], { prefer: ['gitnexus'] });
+  assert.deepEqual(capabilities.review, { prefer: [{ executor: 'claude', invocation: 'fast' }, 'codex'] });
+  assert.deepEqual(capabilities['code:*'], { tier: 'T2', maxTier: 'T3', prefer: ['claude'] });
+  assert.deepEqual(capabilities['code:implement'], {}, 'persona, verify and description are not binding fields');
+  assert.equal('nothing' in capabilities, false);
+  assert.equal('text' in capabilities, false);
+  assert.equal('list' in capabilities, false, 'an array is not an entry for the crate');
+  assert.deepEqual(roles, { reviewer: { tier: 'T3', prefer: ['codex'] } }, 'a role entry keeps tier and prefer only; a non-object is dropped');
+  assert.deepEqual(personas, { pm: { tier: 'T1' } });
 });
 
 test('an invalid rigor throws the same RangeError text', () => {

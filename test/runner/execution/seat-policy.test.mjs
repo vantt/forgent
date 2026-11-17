@@ -21,8 +21,10 @@ const runner = () => ({
   modelPolicies: { claude: { standard: 'sonnet', flagship: 'opus' } },
   capabilities: {
     'impact-analysis': { description: 'a tool capability', prefer: 'gitnexus', serves: ['impact'], confinement: { mode: 'required' } },
-    'architecture:*': { tier: 'flagship', prefer: ['claude'], rigor: 'high', roles: { 'red-team': { prefer: ['xai'], $comment: 'ignored' } }, $comment: 'ignored' },
+    'architecture:*': { tier: 'flagship', prefer: ['claude'], rigor: 'high', $comment: 'ignored' },
   },
+  roles: { 'red-team': { prefer: ['xai'], $comment: 'ignored' } },
+  personas: { critic: { tier: 'flagship' } },
   executors: { claude: { command: 'claude' } },
   timeoutMs: 5000,
 });
@@ -31,9 +33,11 @@ const ask = (extra = {}) => ({ capability: 'architecture:shape', seat: 'system',
 
 test('the request carries the slice of the runner config seat choice reads, with a string prefer as a list and no comment', () => {
   const config = seatConfigOf(runner());
-  assert.deepEqual(Object.keys(config).sort(), ['capabilities', 'defaults', 'maxTier', 'modelPolicies', 'tierFallback']);
+  assert.deepEqual(Object.keys(config).sort(), ['capabilities', 'defaults', 'maxTier', 'modelPolicies', 'personas', 'roles', 'tierFallback']);
   assert.deepEqual(config.capabilities['impact-analysis'], { prefer: ['gitnexus'] }, 'catalog text and confinement are not seat choice');
-  assert.deepEqual(config.capabilities['architecture:*'], { tier: 'flagship', prefer: ['claude'], roles: { 'red-team': { prefer: ['xai'] } } });
+  assert.deepEqual(config.capabilities['architecture:*'], { tier: 'flagship', prefer: ['claude'] });
+  assert.deepEqual(config.roles, { 'red-team': { prefer: ['xai'] } });
+  assert.deepEqual(config.personas, { critic: { tier: 'flagship' } });
   assert.equal(JSON.stringify(seatConfigDigestOf(runner()).config).includes('$comment'), false);
 });
 

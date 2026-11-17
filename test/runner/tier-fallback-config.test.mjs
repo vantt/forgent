@@ -112,7 +112,7 @@ const refusedLoad = (runner, pattern, globalRunner) => assert.throws(() => loadR
   return true;
 });
 
-test('a project config may declare the default tier, a capability tier and ceiling, and role, persona and seat taste', () => {
+test('a project config may declare the default tier, a capability tier and ceiling, and role and persona taste', () => {
   const { cfg } = loadRunner(runnerWith({
     defaults: { tier: 'standard' },
     maxTier: 'flagship',
@@ -122,15 +122,14 @@ test('a project config may declare the default tier, a capability tier and ceili
         tier: 'frontier',
         maxTier: 'frontier',
         rigor: 'critical',
-        roles: { reviewer: { tier: 'flagship', prefer: ['claude'] }, 'red-team': { prefer: [{ executor: 'openai' }] } },
-        personas: { 'code-reviewer': { tier: 'flagship' } },
-        seats: { 'system-owner': { tier: 'frontier', prefer: ['openai'] } },
       },
     },
+    roles: { reviewer: { tier: 'flagship', prefer: ['claude'] }, 'red-team': { prefer: [{ executor: 'openai' }] } },
+    personas: { 'code-reviewer': { tier: 'flagship' } },
   }));
   assert.equal(cfg.defaults.tier, 'standard');
-  assert.equal(cfg.capabilities['architecture:shape'].roles['red-team'].prefer[0].executor, 'openai');
-  assert.equal(cfg.capabilities['architecture:shape'].seats['system-owner'].tier, 'frontier');
+  assert.equal(cfg.roles['red-team'].prefer[0].executor, 'openai');
+  assert.equal(cfg.personas['code-reviewer'].tier, 'flagship');
 });
 
 test('a tier name outside the vocabulary fails the load and names the key path', () => {
@@ -138,32 +137,28 @@ test('a tier name outside the vocabulary fails the load and names the key path',
   refusedLoad(runnerWith({ maxTier: 'huge' }), /runner\.maxTier \(enum\)/);
   refusedLoad(runnerWith({ capabilities: { 'code:*': { tier: 'big' } } }), /runner\.capabilities\.code:\*\.tier \(enum\)/);
   refusedLoad(runnerWith({ capabilities: { 'code:*': { maxTier: 'big' } } }), /runner\.capabilities\.code:\*\.maxTier \(enum\)/);
-  refusedLoad(runnerWith({ capabilities: { 'code:*': { roles: { reviewer: { tier: 'big' } } } } }), /runner\.capabilities\.code:\*\.roles\.reviewer\.tier \(enum\)/);
-  refusedLoad(runnerWith({ capabilities: { 'code:*': { personas: { 'code-reviewer': { tier: 'big' } } } } }), /personas\.code-reviewer\.tier \(enum\)/);
-  refusedLoad(runnerWith({ capabilities: { 'code:*': { seats: { judge: { tier: 'big' } } } } }), /seats\.judge\.tier \(enum\)/);
+  refusedLoad(runnerWith({ roles: { reviewer: { tier: 'big' } } }), /runner\.roles\.reviewer\.tier \(enum\)/);
+  refusedLoad(runnerWith({ personas: { 'code-reviewer': { tier: 'big' } } }), /runner\.personas\.code-reviewer\.tier \(enum\)/);
 });
 
-test('roles are the five roles only, a seat is a seat id, a persona is a persona name', () => {
-  refusedLoad(runnerWith({ capabilities: { 'code:*': { roles: { checker: { tier: 'standard' } } } } }), /runner\.capabilities\.code:\*\.roles \(additionalProperties\)/);
-  refusedLoad(runnerWith({ capabilities: { 'code:*': { seats: { 'Member One': { tier: 'standard' } } } } }), /seats.*"Member One".*seat id/);
-  refusedLoad(runnerWith({ capabilities: { 'code:*': { seats: { verify: { tier: 'standard' } } } } }), /seats.*"verify".*seat id/);
-  refusedLoad(runnerWith({ capabilities: { 'code:*': { personas: { 'Code Reviewer': { tier: 'standard' } } } } }), /personas.*"Code Reviewer".*persona name/);
+test('roles are the five roles only, a persona is a persona name', () => {
+  refusedLoad(runnerWith({ roles: { checker: { tier: 'standard' } } }), /runner\.roles \(additionalProperties\)/);
+  refusedLoad(runnerWith({ personas: { 'Code Reviewer': { tier: 'standard' } } }), /personas.*"Code Reviewer".*persona name/);
 });
 
-test('a role, persona or seat entry holds tier and prefer only; there is no families key', () => {
-  refusedLoad(runnerWith({ capabilities: { 'code:*': { roles: { reviewer: { families: ['claude'] } } } } }), /roles\.reviewer \(additionalProperties\)/);
+test('a role or persona entry holds tier and prefer only; there is no families key', () => {
+  refusedLoad(runnerWith({ roles: { reviewer: { families: ['claude'] } } }), /runner\.roles\.reviewer \(additionalProperties\)/);
   refusedLoad(runnerWith({ capabilities: { 'code:*': { families: ['claude'] } } }), /runner\.capabilities\.code:\* \(additionalProperties\)/);
-  refusedLoad(runnerWith({ capabilities: { 'code:*': { seats: { judge: 'standard' } } } }), /seats\.judge \(type\)/);
+  refusedLoad(runnerWith({ personas: { judge: 'standard' } }), /runner\.personas\.judge \(type\)/);
   refusedLoad(runnerWith({ defaults: { tier: 'standard', prefer: ['claude'] } }), /runner\.defaults \(additionalProperties\)/);
 });
 
 test('an empty prefer list is a load error wherever prefer sits, and every prefer names a registered executor', () => {
   refusedLoad(runnerWith({ capabilities: { 'code:*': { prefer: [] } } }), /code:\*\.prefer \(minItems\)/);
-  refusedLoad(runnerWith({ capabilities: { 'code:*': { roles: { reviewer: { prefer: [] } } } } }), /roles\.reviewer\.prefer \(minItems\)/);
-  refusedLoad(runnerWith({ capabilities: { 'code:*': { personas: { 'code-reviewer': { prefer: [] } } } } }), /personas\.code-reviewer\.prefer \(minItems\)/);
-  refusedLoad(runnerWith({ capabilities: { 'code:*': { seats: { judge: { prefer: [] } } } } }), /seats\.judge\.prefer \(minItems\)/);
-  refusedLoad(runnerWith({ capabilities: { 'code:*': { seats: { judge: { prefer: ['nobody'] } } } } }), /seats\.judge.*"prefer" names "nobody" but no such executor/);
-  refusedLoad(runnerWith({ capabilities: { 'code:*': { roles: { reviewer: { prefer: [{ executor: 'claude', invocation: 'missing' }] } } } } }), /roles\.reviewer.*invocation "missing"/);
+  refusedLoad(runnerWith({ roles: { reviewer: { prefer: [] } } }), /roles\.reviewer\.prefer \(minItems\)/);
+  refusedLoad(runnerWith({ personas: { 'code-reviewer': { prefer: [] } } }), /personas\.code-reviewer\.prefer \(minItems\)/);
+  refusedLoad(runnerWith({ personas: { judge: { prefer: ['nobody'] } } }), /personas\.judge.*"prefer" names "nobody" but no such executor/);
+  refusedLoad(runnerWith({ roles: { reviewer: { prefer: [{ executor: 'claude', invocation: 'missing' }] } } }), /roles\.reviewer.*invocation "missing"/);
 });
 
 test('the schema marker is {schema: 1|2} inside patterns and nothing else', () => {

@@ -221,7 +221,7 @@ test('a persona file that names a model tier or preference is refused and told w
   for (const [name, field] of [['picky', 'prefer'], ['ranked', 'tier']]) {
     assert.throws(
       () => resolveAgentDefinition(name, { projectRoot: root }),
-      new RegExp(`\\(fgos/agents/${name}\\.yaml\\) persona-model-taste-not-allowed: "${field}".*capabilities\\.<cap>\\.personas\\.<name>`),
+      new RegExp(`\\(fgos/agents/${name}\\.yaml\\) persona-model-taste-not-allowed: "${field}".*runner\\.personas\\.<name>`),
     );
     assert.match(agentShapeProblem(name, fs.readFileSync(path.join(root, `fgos/agents/${name}.yaml`), 'utf8')), /^persona-model-taste-not-allowed/);
   }

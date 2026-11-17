@@ -182,6 +182,7 @@ Known gaps against this direction:
   no model fields (D-ADR0072). The family of the agent that is currently
   running never changes the order, because the config is the only authority
   over it.
+- Capability rows, step 2 in progress: persona and role taste moved out of the rows into `runner.personas` and `runner.roles` (D-ADR0080); the business rows go next.
 
 ## 7. Related Anchors
 

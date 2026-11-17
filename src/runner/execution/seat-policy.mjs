@@ -24,12 +24,12 @@ const MAX_CACHED = 2000;
  */
 const asCrateJson = (value) => JSON.parse(JSON.stringify(value));
 
-/** The slice of a runner config the crate reads: tier vocabulary, cells, fallback order and the per-capability taste. */
+/** The slice of a runner config the crate reads: tier vocabulary, cells, fallback order and the capability, role and persona taste. */
 export function seatConfigOf(runnerConfig) {
   const runner = runnerConfig?.runner && !runnerConfig.modelPolicies ? runnerConfig.runner : (runnerConfig ?? {});
   const config = {};
   for (const key of SEAT_CONFIG_KEYS) if (runner[key] !== undefined) config[key] = runner[key];
-  config.capabilities = bindingTasteOf(runner);
+  Object.assign(config, bindingTasteOf(runner));
   return asCrateJson(config);
 }
 

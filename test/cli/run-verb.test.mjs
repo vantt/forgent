@@ -305,7 +305,8 @@ test('fgos run --capability and --persona are the unit\'s own declarations: a co
   fs.writeFileSync(path.join(tmp, 'fgos', 'agents', 'test-voice.yaml'), 'name: test-voice\ndescription: A test voice\n');
   setRunnerConfig(tmp, (runner) => ({
     ...runner,
-    capabilities: { ...runner.capabilities, 'docs:write': { ...runner.capabilities['docs:write'], tier: 'flagship', personas: { 'test-voice': { tier: 'frontier' } } } },
+    capabilities: { ...runner.capabilities, 'docs:write': { ...runner.capabilities['docs:write'], tier: 'flagship' } },
+    personas: { 'test-voice': { tier: 'frontier' } },
   }));
   const byCapability = unitRecordOf(tmp, runCli(['Check it', '--capability', 'docs:write', '--dir', tmp], tmp)).bindings['producer/1'][0].binding;
   assert.equal(byCapability.tier, 'flagship');
