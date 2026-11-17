@@ -2446,7 +2446,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         return invokeDispatchInspectOperation({
           operationId: 'dispatch.runtime.inspect', effect: 'read',
           ctx: { cwd: repoRootForDispatch, repoRoot: repoRootForDispatch },
-          payload: { selector: { run: flags.run, assignment: flags.assignment, cwd: flags.cwd, providerCapacity: flags['provider-capacity'] === true, terminal: flags.terminal === true } },
+          payload: { selector: { run: flags.run, assignment: flags.assignment, cwd: flags.cwd, providerCapacity: flags['provider-capacity'] === true, terminal: flags.terminal === true, attention: flags.attention === true, since: flags.since } },
         });
       }
       if (sub === 'reconcile') {
@@ -3732,6 +3732,12 @@ async function main() {
       } else if (verb === 'workflow' && positional[0] === 'propose' && !flags.json) {
         const { renderProposalText } = await import('../src/workflow/propose.mjs');
         process.stdout.write(renderProposalText(data));
+      } else if (verb === 'dispatch' && sub === 'inspect' && flags.attention === true && !flags.json) {
+        // One line per run that needs a person, then one line for the terminal part unless it scanned clean.
+        const terminal = data.terminal;
+        const terminalLine = !terminal || (terminal.state === 'scanned' && !terminal.findings?.length) ? []
+          : [terminal.state === 'scanned' ? `terminal scanned: ${terminal.findings.map((f) => f.text).join('; ')}` : `terminal ${terminal.state}: ${terminal.reason}`];
+        process.stdout.write(`${[...(data.lines ?? []), ...terminalLine].join('\n')}${data.lines?.length || terminalLine.length ? '\n' : ''}`);
       } else {
         process.stdout.write(`${JSON.stringify(wrapEnvelope(data), null, 2)}\n`);
       }
