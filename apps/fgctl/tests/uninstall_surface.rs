@@ -181,7 +181,9 @@ fn without_yes_and_without_a_terminal_it_prints_the_plan_and_changes_nothing() {
         stdout.contains("settings.json: remove the fgOS hook"),
         "{stdout}"
     );
-    assert!(stdout.contains(".fgos/installation"), "{stdout}");
+    // The directory is named the way the platform spells a path.
+    let installation = Path::new(".fgos").join("installation");
+    assert!(stdout.contains(installation.to_str().unwrap()), "{stdout}");
     assert!(
         stdout.contains("Keeps:") && stdout.contains("Nothing changed"),
         "{stdout}"
@@ -301,7 +303,8 @@ fn purge_refuses_a_state_root_that_is_the_home_directory() {
 #[test]
 fn a_project_whose_shim_is_gone_cannot_be_applied_but_can_be_planned() {
     let world = World::new("no-shim", OK_ANSWER, 0);
-    std::fs::remove_file(world.project().join(".fgos/installation/bin/fgos")).unwrap();
+    let shim = if cfg!(windows) { "fgos.cmd" } else { "fgos" };
+    std::fs::remove_file(world.project().join(".fgos/installation/bin").join(shim)).unwrap();
     let plan = world.run(&["uninstall"]);
     assert_eq!(plan.status.code(), Some(0));
     assert!(
