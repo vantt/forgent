@@ -272,6 +272,17 @@ Delete (by the phase in brackets; the phase files are the authority, D14; 00 che
 - [07] `src/setup/{agent-hooks,claude-code-hooks,agy-permissions,mailbox-claude-accept,project-launcher,agent-wiring}.mjs`; `version-info.mjs`, `mailbox-limits.mjs`, `omp-natives-checks.mjs` if 00 finds no other user
 - Their tests (owners named per phase); the transitional parity runner and tables [12]
 
+
+### Added during execution
+
+Found by comparing `git diff --name-only origin/main...HEAD` with this section at the close; each was touched by the phase named and stays inside its job.
+
+- Goldens read by the owning crates' tests (03, 01, 02, 08, 09): `apps/fgctl/tests/goldens/uninstall-answer-{plan,failed}.json`, `packages/distribution/rust/tests/goldens/{agent-hooks-vectors,bin-cache-file,doctor-base-release,launcher-digests,managed-timer-units}.json`.
+- Rust rows' readers moved or extended for the in-process rows (04, 05, 06): `packages/git/rust/src/{repository_config,repository_facts}.rs` with `packages/git/rust/tests/{repository_config,repository_facts}.rs`; `packages/event-store/rust/src/{legacy_import,refspec}.rs`; `packages/identity/rust/src/{machine,signing}.rs` with `packages/identity/rust/tests/{attempt_writer_id,machine,signing}.rs`; `packages/mailbox/rust/store/src/limits.rs`; `packages/observe/rust/src/shard.rs`; `packages/seat-binding/rust/src/tier.rs`; `packages/process/rust/src/{spawn.rs,platform/windows_spawn.rs}`.
+- Node modules whose last bridged-row reader or helper moved (04-07, 11): `src/event-store/{index,native}.mjs`, `src/util/{identity-mint,release-targets,session-identity}.mjs`, `domains/coding/slice-kinds.yaml`.
+- Tests and helpers that named a deleted path or a moved row: `test/cli/helpers/fgos-cli-harness.mjs`, `test/helpers/{cli-entry,doctor-bridge-labels}.mjs`, `test/config/{config-door,facade}.test.mjs`, `test/distribution/{native-addon,source-payload}.test.mjs`, `test/event-store/{phase07-fixture.mjs,topologies.test.mjs,triggers.test.mjs}`, `test/observe/invocation-fault-log.test.mjs`, `test/report/{authoritative-match,context-render,decision-index}.test.mjs`, `test/runner/dispatch-runtime-inspect.test.mjs`, `test/util/session-identity.test.mjs`, `test/workflow/propose-classify.test.mjs`, `test/rust-host/fixtures/invocation-root-table.json`.
+- Docs that named setup or the Node doctor: `docs/platform/packaging-distribution/verification/{install-and-release-proof,packaging-checklist}.md`, `docs/platform/work-state/architecture/implementation-pointers.md`.
+- Removed at the close: `test/rust-host/verb-parity.test.mjs` and `test/rust-host/parity-cases/` (the runner and the four tables, as planned).
 ## Collision watch
 
 Checked on `origin/main` `445e65679`. Landed and closed for S4's purpose: capability reads (`1c30f30f8`, verdict
