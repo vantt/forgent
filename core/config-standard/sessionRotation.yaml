@@ -1,0 +1,14 @@
+# @fgos:v1
+# see: fgos config standard
+# @fgos:doc When a long-running head session is rotated into a fresh one, and what the successor rereads.
+sessionRotation:
+  # @fgos:doc Fraction of the context window at which a session rotates once it is at rest. Minimum: 0. Default: 0.4.
+  soft: 0.4
+  # @fgos:doc Fraction of the context window at which a session rotates at the next safe point even when a question is pending; must be at least soft. Minimum: 0. Default: 0.7.
+  hard: 0.7
+  # @fgos:doc Newest handoff files kept per persona and name; older ones are removed. Minimum: 1. Default: 10.
+  keep: 10
+  # @fgos:doc Context window size, counted as the model counts it, used when the status line reports none. Minimum: 1. Default: 1000000.
+  windowSize: 1000000
+  # @fgos:doc Per-persona overrides of soft and hard, and the portfolio paths its successor rereads, by bare persona name.
+  personas: {}

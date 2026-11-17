@@ -16,12 +16,12 @@ macro_rules! sections {
 /// `(section, YAML text)` in schema-set order.
 pub const SCHEMAS: &[(&str, &str)] = sections!("config-schema", ".schema.yaml";
     checkpoint, cleanup, dispatch, docRegistry, eventStore, gateBypass, gateway, herdrOrchestrator,
-    herdrWebDashboard, invariantChecks, ironLaw, mailbox, runner, secrets, terminal, workerSlots,
+    herdrWebDashboard, invariantChecks, ironLaw, mailbox, runner, secrets, sessionRotation, terminal, workerSlots,
     worktreeSetup);
 /// `(section, YAML text)` in schema-set order.
 pub const STANDARD: &[(&str, &str)] = sections!("config-standard", ".yaml";
     checkpoint, cleanup, dispatch, docRegistry, eventStore, gateBypass, gateway, herdrOrchestrator,
-    herdrWebDashboard, invariantChecks, ironLaw, mailbox, runner, secrets, terminal, workerSlots,
+    herdrWebDashboard, invariantChecks, ironLaw, mailbox, runner, secrets, sessionRotation, terminal, workerSlots,
     worktreeSetup);
 
 /// sha256 over the sorted `(kind, name, bytes)` triples of both sets, as lowercase hex; the key of

@@ -1,0 +1,44 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+$id: urn:fgos:config-schema:sessionRotation:v1
+$comment: "owner: session-host"
+description: "When a long-running head session is rotated into a fresh one, and what the successor rereads."
+type: object
+additionalProperties: false
+properties:
+  soft:
+    description: Fraction of the context window at which a session rotates once it is at rest.
+    type: number
+    minimum: 0
+  hard:
+    description: Fraction of the context window at which a session rotates at the next safe point even when a question is pending; must be at least soft.
+    type: number
+    minimum: 0
+  keep:
+    description: Newest handoff files kept per persona and name; older ones are removed.
+    type: integer
+    minimum: 1
+  windowSize:
+    description: Context window size, counted as the model counts it, used when the status line reports none.
+    type: integer
+    minimum: 1
+  personas:
+    description: Per-persona overrides of soft and hard, and the portfolio paths its successor rereads, by bare persona name.
+    type: object
+    additionalProperties:
+      description: One persona's thresholds and reload paths.
+      type: object
+      additionalProperties: false
+      properties:
+        soft:
+          description: This persona's soft fraction; the global value when absent.
+          type: number
+          minimum: 0
+        hard:
+          description: This persona's hard fraction; the global value when absent.
+          type: number
+          minimum: 0
+        reload:
+          description: Repo-relative portfolio paths the successor rereads before acting.
+          type: array
+          items:
+            type: string
