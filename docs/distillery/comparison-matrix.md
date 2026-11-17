@@ -239,7 +239,7 @@ OKF là reference format ngoài họ harness chính; các điểm giao cắt đ�
 
 ## council-of-high-intelligence vs fgOS (2026-10-04, @fd9f4e5)
 
-So sánh cơ chế thảo luận nhiều agent: council (`sources/council-of-high-intelligence.md`) với các cơ chế sẵn có của fgOS (Pattern `panel`/`reviewed` ở `src/runner/execution/patterns/`, Workflow thảo luận ở `core/workflows/{architecture-advisory,delphi,nominal-group,group-cognition,business-discussion}.yaml`). Cột fgOS ghi hiện trạng ĐÃ kiểm trong code, không phải ý định.
+So sánh cơ chế thảo luận nhiều agent: council (`sources/council-of-high-intelligence.md`) với các cơ chế sẵn có của fgOS (Pattern `panel`/`reviewed` ở `src/runner/execution/patterns/`, Workflow thảo luận ở `domains/council/workflows/{architecture-advisory,delphi,nominal-group,group-cognition,business-discussion}.yaml`). Cột fgOS ghi hiện trạng ĐÃ kiểm trong code, không phải ý định.
 
 | Feature | council | fgOS hiện có | Best | Ghi chú |
 |---|---|---|---|---|

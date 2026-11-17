@@ -4,7 +4,7 @@
 context investigator, three independent shapers (system, alternative,
 constraint), architecture critic, synthesizer, independent red-team, and an
 on-demand specialist — against the registered `architecture-advisory` Workflow
-(`core/workflows/architecture-advisory.yaml`). It is executed through the unified
+(`domains/council/workflows/architecture-advisory.yaml`). It is executed through the unified
 `fgos workflow` door (`fgos workflow start architecture-advisory`,
 `fgos workflow status <workflowRunId>`).
 

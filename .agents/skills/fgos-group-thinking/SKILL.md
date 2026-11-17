@@ -25,7 +25,7 @@ kind, and routes to a named Workflow or collaboration pattern. Never ask a perso
 this lower layer executes named definitions.
 
 Discussion patterns in fgOS are represented as:
-1. **Discussion Workflows** in `core/workflows/*.yaml`, executed by the
+1. **Discussion Workflows** in `domains/council/workflows/*.yaml`, executed by the
    Workflow Runner (`src/workflow/runner.mjs`) and CLI (`fgos workflow`):
    - `council-lite`: One blind panel with three analytic postures and a split-first verdict, no gate (judges options the person already has)
    - `delphi`: Multi-round Delphi deliberation (blind proposals -> feedback synthesis -> second round -> final consensus)
@@ -55,7 +55,7 @@ cross-provider review.
 
 ## 1. Discover available Workflows & Patterns
 
-Workflows are declared in `core/workflows/*.yaml` and validated by
+Workflows are declared in `domains/council/workflows/*.yaml` and validated by
 `src/workflow/definition.mjs`. Use the Workflow loader to list registered workflows:
 
 ```bash
@@ -174,7 +174,7 @@ or name the same catalog pattern, else the door refuses `selector-conflict`.
 ## The gate, and why it holds
 This gate forwards requests directly to the Workflow Runner or unit execution
 subsystem. It guarantees that:
-1. Workflow IDs are validated against discovered YAML definitions in `core/workflows/*.yaml` or `domains/<domain>/workflows/*.yaml`.
+1. Workflow IDs are validated against discovered YAML definitions in `domains/<domain>/workflows/*.yaml` or a project `core/workflows/*.yaml`.
 2. All steps and units satisfy G2 constraints (no infrastructure leaks such as hardcoded executors, models, or tiers in workflow definitions).
 3. Human gates park deterministically until explicitly answered via `fgos workflow answer`.
 4. Completed runs emit structured artifacts and events for replay and verification.

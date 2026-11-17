@@ -1,4 +1,4 @@
-# core/workflows/nominal-group.yaml — Nominal Group Technique Workflow
+# domains/council/workflows/nominal-group.yaml — Nominal Group Technique Workflow
 # Nominal Group Technique workflow with silent idea generation,
 # round-robin sharing & consolidation, voting & ranking, and final ranking synthesis.
 

@@ -17,7 +17,7 @@ seedFileLocalBwrapRegistry();
 const BASELINE = JSON.parse(fs.readFileSync(path.resolve('test/fixtures/workflow/playbook-observable-order.json'), 'utf8'));
 
 test('the baseline names every registered playbook and the units wave', () => {
-  const registered = fs.readdirSync(path.resolve('core/workflows')).filter((f) => f.endsWith('.yaml')).map((f) => f.replace(/\.yaml$/, ''));
+  const registered = fs.readdirSync(path.resolve('domains/council/workflows')).filter((f) => f.endsWith('.yaml')).map((f) => f.replace(/\.yaml$/, ''));
   for (const id of registered) assert.ok(PLAYBOOKS.includes(id), `playbook ${id} is registered but not in the order guard`);
   assert.deepEqual(Object.keys(BASELINE).sort(), [...PLAYBOOKS, 'units/order-guard'].sort());
 });

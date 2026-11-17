@@ -165,7 +165,7 @@ Known gaps against this direction:
   `preferIndependentOf` to `independentOf` in
   `src/runner/execution/loops/panel.mjs`. Today independence is a soft
   preference.
-- The councils in `core/workflows` move into a named domain.
+- The councils moved out of the core workflows into the `domains/council` domain; their business capability rows move with the workflows later.
 - Capability rows, decided by the owner on 2026-11-14 in two steps. First,
   every reader of `runner.capabilities` goes through `bind()` or its result.
   This step landed on 2026-11-14: the rule is one line in section 3 of the

@@ -1,4 +1,4 @@
-# core/workflows/delphi.yaml — Delphi Deliberation Workflow
+# domains/council/workflows/delphi.yaml — Delphi Deliberation Workflow
 # Multi-round Delphi deliberation workflow with anonymous blind proposals,
 # mediated feedback synthesis, second-round revision, and final consensus.
 

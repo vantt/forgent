@@ -14,7 +14,7 @@ not the end user. The canonical request-kind to route map ships with the skill, 
 [`request-kinds-and-routes.md`](../../core/skills/fgos-advise/references/request-kinds-and-routes.md).
 
 This guide is deliberately example-driven. Workflow definitions live in
-`core/workflows/*.yaml`, and single-unit patterns live in the pattern catalog,
+`domains/<d>/workflows/*.yaml`, and single-unit patterns live in the pattern catalog,
 `runner.patterns` in the shipped standard
 ([`core/config-standard/runner.yaml`](../../core/config-standard/runner.yaml)) with
 your project's own entries layered over it. Read the skill's own `SKILL.md`

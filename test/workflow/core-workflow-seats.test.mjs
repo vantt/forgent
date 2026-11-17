@@ -16,7 +16,7 @@ import { resolveSeats } from '../../src/runner/execution/seat-resolver.mjs';
 import { loopOf } from '../../src/runner/execution/patterns/catalog.mjs';
 import { shippedCatalog } from '../../src/runner/dispatch/shipped-catalog.mjs';
 
-const dir = new URL('../../core/workflows/', import.meta.url);
+const dir = new URL('../../domains/council/workflows/', import.meta.url);
 const workflows = fs.readdirSync(dir).filter((name) => name.endsWith('.yaml')).map((name) => {
   const raw = parseYaml(fs.readFileSync(new URL(name, dir), 'utf8'), { filename: name });
   return validateWorkflowChecked(raw);

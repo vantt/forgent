@@ -24,7 +24,7 @@ was already chosen. The person states the question and what they will do with
 the answer; this skill infers the request kind, looks it up in
 [`references/request-kinds-and-routes.md`](references/request-kinds-and-routes.md)
 (the only kind-to-route map), and launches the named Workflow
-(`core/workflows/*.yaml`) or collaboration pattern from `runner.patterns` in the
+(`domains/<domain>/workflows/*.yaml`) or collaboration pattern from `runner.patterns` in the
 effective Config (shipped declarations: `core/config-standard/runner.yaml`).
 
 It is not the interview-driven `ak:advise` / advisor agent of another kit. That

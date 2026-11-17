@@ -450,7 +450,7 @@ Không function nào trong `src/workflow` dài quá 300 dòng; dài nhất là `
 
 > **Tên trường trong các phác thảo chỉ để minh hoạ. Spec không khoá bố cục YAML.** Điều được khoá là hành vi quan sát được mô tả sau mỗi phác thảo.
 
-### 10.1 `core/workflows/council-lite.yaml`
+### 10.1 `domains/council/workflows/council-lite.yaml`
 
 **Trước** (47 dòng): một step `discussion`, một unit `deliberate` (`capability: delphi:propose`, `pattern: panel`, `blind: true`, ba roleTask panelist + synthesizer, contextRefs tới ba file posture). Vòng DAG chờ Unit, ghi `workflow.complete`. Thứ tự "ý kiến blind trước tổng hợp" nằm trong pattern panel; không gì trong run nói *vì sao*.
 

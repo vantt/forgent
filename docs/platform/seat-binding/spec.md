@@ -420,7 +420,7 @@ Plan của code change phải chứng minh mọi mục sau; không mục nào đ
 
 `maxTier` (toàn cục và capability) là trần chi phí duy nhất của đợt này, nên trần đó và hiển thị `max-tier-cap` là thứ kiểm soát chi tiêu.
 
-Lỗi sống ngoài spec này: `{objective}` rò vào `roleTasks` của checker trong `core/workflows/architecture-advisory.yaml`.
+Lỗi sống ngoài spec này: `{objective}` rò vào `roleTasks` của checker trong `domains/council/workflows/architecture-advisory.yaml`.
 
 ## 13. Bằng chứng xác minh (đọc-only, 2026-10-20)
 

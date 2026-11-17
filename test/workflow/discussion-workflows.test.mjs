@@ -12,8 +12,8 @@ import { validateWorkflow } from '../../src/workflow/definition.mjs';
 import { loadWorkflow, loadWorkflowWithSource, discoverWorkflows } from '../../src/workflow/loader.mjs';
 
 test('delphi.yaml schema validation & discovery', () => {
-  const filePath = path.resolve('core/workflows/delphi.yaml');
-  assert.ok(fs.existsSync(filePath), 'core/workflows/delphi.yaml must exist');
+  const filePath = path.resolve('domains/council/workflows/delphi.yaml');
+  assert.ok(fs.existsSync(filePath), 'domains/council/workflows/delphi.yaml must exist');
 
   const content = fs.readFileSync(filePath, 'utf8');
   const raw = parseYaml(content);
@@ -64,8 +64,8 @@ test('delphi.yaml schema validation & discovery', () => {
 });
 
 test('nominal-group.yaml schema validation & discovery', () => {
-  const filePath = path.resolve('core/workflows/nominal-group.yaml');
-  assert.ok(fs.existsSync(filePath), 'core/workflows/nominal-group.yaml must exist');
+  const filePath = path.resolve('domains/council/workflows/nominal-group.yaml');
+  assert.ok(fs.existsSync(filePath), 'domains/council/workflows/nominal-group.yaml must exist');
 
   const content = fs.readFileSync(filePath, 'utf8');
   const raw = parseYaml(content);
@@ -112,8 +112,8 @@ test('nominal-group.yaml schema validation & discovery', () => {
 });
 
 test('group-cognition.yaml schema validation & discovery', () => {
-  const filePath = path.resolve('core/workflows/group-cognition.yaml');
-  assert.ok(fs.existsSync(filePath), 'core/workflows/group-cognition.yaml must exist');
+  const filePath = path.resolve('domains/council/workflows/group-cognition.yaml');
+  assert.ok(fs.existsSync(filePath), 'domains/council/workflows/group-cognition.yaml must exist');
 
   const content = fs.readFileSync(filePath, 'utf8');
   const raw = parseYaml(content);
