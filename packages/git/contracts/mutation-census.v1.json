@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "e6b900d16c6e1ada777fbed1abe3c272cecd10dd1e82771a40181200e08efffa",
+  "payloadDigest": "0d3250475b01c640338aea2f019de56e5532de5c973660f0dca8606f82214ce1",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "b8b886cee2ea5ce7ee1153e4795512db135a990de894c27e53c5e778b210be62",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -87,7 +87,7 @@
     "apps/fgos/src/cli_presenter.rs": "6e50cf7387a4ce98eec1d3705b8bf33150960e6180559f9bbe6cb8c1529e2d15",
     "apps/fgos/src/cli_projector.rs": "b373c7d507a8dbb8e5806bbbae888e2487fc70305c9643c2d6dbf158ab45a79a",
     "apps/fgos/src/help.rs": "a7f18814361555860a4f0a44e3bb3c12246f5cb00d124f725e9a506857c2dd8d",
-    "apps/fgos/src/invocation_doors.rs": "d15662243805b9c43da87571db94c2b3010531041ba3fef0219ac11d49bfbccd",
+    "apps/fgos/src/invocation_doors.rs": "52beed06039e155fb33e75604d88c5656fb59a7f64431c51416f056bf9785d4f",
     "apps/fgos/src/legacy_exec.rs": "65dcba1272b6c8ec9680e17974893a1aa6a5603aba17d134d5000c1edd024292",
     "apps/fgos/src/main.rs": "7d60f87240a27091fe04373aa10be936156fbf6162167128ad09b0602dcf2f84",
     "apps/fgos/src/routing.rs": "3ca6e2b3260cb48e306c708cc84bf153a2934dfc0b243e053bfbd83a12b68af9",

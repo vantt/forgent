@@ -560,6 +560,15 @@ mod tests {
         }
     }
 
+    /// A path without the `\\?\` form Windows gives a canonical one: the doors answer plain paths there, and `/` or
+    /// `..` inside a verbatim path is not read as a separator.
+    fn plain(path: &Path) -> PathBuf {
+        match path.to_str().and_then(|p| p.strip_prefix(r"\\?\")) {
+            Some(plain) => PathBuf::from(plain),
+            None => path.to_path_buf(),
+        }
+    }
+
     fn scratch() -> PathBuf {
         static NEXT: AtomicU32 = AtomicU32::new(0);
         let dir = std::env::temp_dir().join(format!(
@@ -569,13 +578,7 @@ mod tests {
         ));
         let _ = std::fs::remove_dir_all(&dir);
         std::fs::create_dir_all(&dir).unwrap();
-        // Canonical, without the `\\?\` form Windows adds: the doors answer plain paths there and `/` or `..` in a
-        // verbatim path is not read as a separator.
-        let canonical = std::fs::canonicalize(dir).unwrap();
-        match canonical.to_str().and_then(|p| p.strip_prefix(r"\\?\")) {
-            Some(plain) => PathBuf::from(plain),
-            None => canonical,
-        }
+        std::fs::canonicalize(dir).unwrap()
     }
 
     /// A main checkout laid out on disk the way the host reads it (no Git process): `main/.git` and a store,
@@ -898,7 +901,7 @@ mod tests {
         std::fs::create_dir_all(base.join("elsewhere")).unwrap();
         let wire = route(serde_json::json!({"selector": "wire-agents", "store": "none"}));
         let lifecycle = Recorder::new(true);
-        let main = base.join("main");
+        let main = plain(&base.join("main"));
         for rest in [
             vec![],
             vec!["--dir", base.join("elsewhere").to_str().unwrap()],
@@ -1098,7 +1101,7 @@ mod tests {
 
     #[test]
     fn the_project_is_the_dir_as_named_else_the_found_root_and_never_the_global_directory() {
-        let base = scratch();
+        let base = plain(&scratch());
         let home = base.join("home");
         std::fs::create_dir_all(home.join(".fgos")).unwrap();
         std::fs::create_dir_all(home.join("work/repo")).unwrap();
