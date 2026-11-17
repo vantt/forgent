@@ -184,7 +184,7 @@ runner:
             backend: bwrap
     gemini:
       kind: agent
-      description: "Gemini provider via the Antigravity CLI (agy). Invocations: agy-herdr-bwrap (herdr pane), agy-cli-bwrap (headless). The confined account comes from runner.providers.gemini.accounts in the global config."
+      description: "Gemini provider via the Antigravity CLI (agy). Invocations: agy-herdr-bwrap (herdr pane), agy-cli-bwrap (headless). The confined account comes from runner.llmAccounts in the global config. Neither invocation declares a sessionDir, so fgOS keeps no agy transcript of a run; agy edits files headless without an approval mode but runs shell commands only where the account home enables always-proceed in its settings."
       allowCrossProvider: true
       providerModel: gemini
       invocations:
