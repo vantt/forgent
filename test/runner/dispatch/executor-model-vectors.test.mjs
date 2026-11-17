@@ -8,6 +8,10 @@ import '../../helpers/process-tmp-root.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import { spawnSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
 import { evaluateVector, VECTOR_FACTS } from '../../helpers/executor-model-vectors.helper.mjs';
 
 const CONTRACT = JSON.parse(fs.readFileSync(new URL('../../../packages/execution/contracts/executor-model.v1.json', import.meta.url), 'utf8'));
@@ -20,4 +24,32 @@ test('Node launch code derives the same executor facts as the executor-model con
   for (const vector of CONTRACT.vectors) {
     assert.deepEqual(evaluateVector(vector), vector.expect, vector.name);
   }
+});
+
+const SCRIPT = fileURLToPath(new URL('../../../scripts/executor-model-vectors.mjs', import.meta.url));
+
+function check(contractPath, env) {
+  return spawnSync(process.execPath, [SCRIPT, '--check', '--contract', contractPath], { encoding: 'utf8', env });
+}
+
+test('the vector script answers from the replay test environment, whatever shell starts it, and still fails on a changed expect', () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-vectors-'));
+  const stubBin = path.join(dir, 'bin');
+  fs.mkdirSync(stubBin);
+  for (const cli of ['codex', 'pi', 'omp', 'agy']) {
+    fs.writeFileSync(path.join(stubBin, cli), '#!/bin/sh\nexit 0\n', { mode: 0o755 });
+  }
+  const dirty = { ...process.env, PATH: `${stubBin}${path.delimiter}${process.env.PATH}`, HERDR_ENV: '1', HERDR_PANE_ID: 'pane-1', HERDR_SOCKET_PATH: '/nonexistent/herdr.sock' };
+  const contractPath = path.join(dir, 'executor-model.v1.json');
+  fs.copyFileSync(new URL('../../../packages/execution/contracts/executor-model.v1.json', import.meta.url), contractPath);
+
+  const clean = check(contractPath, dirty);
+  assert.equal(clean.status, 0, clean.stderr);
+
+  const changed = JSON.parse(fs.readFileSync(contractPath, 'utf8'));
+  changed.vectors[0].expect = { changed: true };
+  fs.writeFileSync(contractPath, JSON.stringify(changed));
+  const drifted = check(contractPath, dirty);
+  assert.notEqual(drifted.status, 0);
+  assert.match(drifted.stderr, new RegExp(changed.vectors[0].name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
 });
