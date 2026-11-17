@@ -360,34 +360,23 @@ test('a run records tier and model with the source Seat Binding gave them, never
   }
 });
 
-// A run that ran verify keeps what it measured, once, at settlement: the result, unit.json and unit-summary.json carry one object.
-for (const { name, command, passed, outcome, exit, timeoutMs } of [
-  { name: 'a passing verify', command: 'true', passed: true, outcome: 'pass', exit: 0 },
-  { name: 'a failing verify', command: 'exit 3', passed: false, outcome: 'findings', exit: 3 },
-  { name: 'a verify that timed out', command: 'sleep 30', passed: false, outcome: 'timeout', exit: null, timeoutMs: 1000 },
-]) {
-  test(`fgos run --verify keeps the facts of ${name} in the result, unit.json and unit-summary.json`, () => {
-    const tmp = setupTestRepo();
-    if (timeoutMs) setRunnerConfig(tmp, (runner) => ({ ...runner, timeoutMs }));
-    const args = ['Write the release notes', '--capability', 'docs:write', '--pattern', 'solo', '--verify', command, '--json', '--dir', tmp];
-    let stdout;
-    try {
-      stdout = runCli(args, tmp);
-    } catch (err) {
-      stdout = err.stdout; // a run whose verify found problems settles as findings and exits non-zero, still printing its result
-    }
-    const { unitRunId, verify: reported } = JSON.parse(stdout).data;
-    const unitDir = path.join(tmp, '.fgos', 'assignments', unitRunId);
-    const recorded = JSON.parse(fs.readFileSync(path.join(unitDir, 'unit.json'), 'utf8')).settlement.verify;
-    const summarized = JSON.parse(fs.readFileSync(path.join(unitDir, 'unit-summary.json'), 'utf8')).verify;
-    assert.equal(recorded.ran, true);
-    assert.equal(recorded.command, command);
-    assert.equal(recorded.passed, passed);
-    assert.equal(recorded.outcome, outcome);
-    assert.equal(recorded.exit, exit);
-    assert.ok(recorded.durationMs >= 0);
-    assert.match(recorded.outputDigest, /^sha256:[0-9a-f]{64}$/);
-    assert.deepEqual(summarized, recorded);
-    assert.deepEqual(reported, recorded);
-  });
-}
+// One wiring proof: the verify facts a run measured reach the result, unit.json and unit-summary.json as one object.
+// What each verdict means (pass, findings with its exit, timeout) is owned by test/runner/execution/custody-door.test.mjs.
+test('fgos run --verify keeps the facts of a failing verify in the result, unit.json and unit-summary.json', () => {
+  const tmp = setupTestRepo();
+  const args = ['Write the release notes', '--capability', 'docs:write', '--pattern', 'solo', '--verify', 'exit 3', '--json', '--dir', tmp];
+  let stdout;
+  try {
+    stdout = runCli(args, tmp);
+  } catch (err) {
+    stdout = err.stdout; // a run whose verify found problems settles as findings and exits non-zero, still printing its result
+  }
+  const { unitRunId, verify: reported } = JSON.parse(stdout).data;
+  const unitDir = path.join(tmp, '.fgos', 'assignments', unitRunId);
+  const recorded = JSON.parse(fs.readFileSync(path.join(unitDir, 'unit.json'), 'utf8')).settlement.verify;
+  const summarized = JSON.parse(fs.readFileSync(path.join(unitDir, 'unit-summary.json'), 'utf8')).verify;
+  assert.deepEqual({ ran: recorded.ran, command: recorded.command, passed: recorded.passed, outcome: recorded.outcome, exit: recorded.exit }, { ran: true, command: 'exit 3', passed: false, outcome: 'findings', exit: 3 });
+  assert.match(recorded.outputDigest, /^sha256:[0-9a-f]{64}$/);
+  assert.deepEqual(summarized, recorded);
+  assert.deepEqual(reported, recorded);
+});
