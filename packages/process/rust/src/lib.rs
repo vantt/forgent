@@ -14,6 +14,7 @@ pub mod control;
 pub mod facts;
 #[cfg(unix)]
 pub mod mapped;
+pub mod path;
 pub mod platform;
 pub mod spawn;
 

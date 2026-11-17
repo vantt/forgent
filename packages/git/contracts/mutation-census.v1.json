@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "2a7fdd9650c43a1f9262ea6947d38bdf5eb17b4b28987a49d19320feb0d354c5",
+  "payloadDigest": "c852c1a445945de9dc234ec17b58f2992af36925880ed6f589789ae16ce6ac68",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "b8b886cee2ea5ce7ee1153e4795512db135a990de894c27e53c5e778b210be62",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -434,7 +434,7 @@
     "packages/git/node-addon/src/single_load.rs": "23fe7cc00220b39b3f7265806e6be0f01bc9e38b3a95c9582c72d4fccf96d313",
     "packages/git/node-addon/src/yaml.rs": "e0de6f2e07d5d3e2f90d4ecae7c9900b5dd0e563b77ef7248977ba5e3f4de577",
     "packages/git/node-addon/tests/yaml_parts.rs": "e6d7103f8d30358c7209070c1e662c6872be94b769d4184415e9b79a09d00e97",
-    "packages/git/rust/src/driver.rs": "de13165ccc3945fc8382d361e6f74b9bee41464aae6145a84d31fbecc7d3fccb",
+    "packages/git/rust/src/driver.rs": "31df187b75fb745cc72509f29aeae0a81ac7927071875e6d226024a98339d2ac",
     "packages/git/rust/src/incidents.rs": "b5f15a7e609c8c7311991df23a0044acf35f8556441b65fc16c85ae4319e888a",
     "packages/git/rust/src/inspect.rs": "f01f4b4709058650ef9643c8331aa20ab69eef7353abca9769eacb8b829fa2e7",
     "packages/git/rust/src/invocation_root.rs": "854396e23b8c00d76c6560d3682fa4c940dc7050280dae10eae1b7af3ff85463",
@@ -551,7 +551,7 @@
     "packages/identity/rust/src/resolve.rs": "c9b611f02aed198b1acfe408f24cdcfaf77d112dcb906f7290315603707c1f68",
     "packages/identity/rust/src/session.rs": "c47d0ee2bc070e02979f702a17031d48799867de27dd0688c74d6477a255c5a2",
     "packages/identity/rust/src/shared.rs": "0af34e63b1832c74dd7f48aabca466b6ff425b93bd6c54b9206ca29f04c0d995",
-    "packages/identity/rust/src/signing.rs": "bf21b83848b45c5d524dbab3616d339ea079fe740a1be8c4124d0796a7e1174c",
+    "packages/identity/rust/src/signing.rs": "65a7416bd747708cd5994b485017f982b723fa2534d0532a847661f04cbac173",
     "packages/identity/rust/src/text.rs": "9639cf6ee8a57d88dbc620a505575ce1054b437c0ac2172426e93193bd45604a",
     "packages/identity/rust/tests/attempt_writer_id.rs": "4a2c27555d3acbedc432e097e5701ecb26c229e7d4283623ec331fad5f11ba36",
     "packages/identity/rust/tests/directory.rs": "23a4e315960c947278a9863a435c281a7e94dae6ee5fac2a89eec351e5326eb8",
@@ -686,8 +686,9 @@
     "packages/process/rust/src/containment/windows.rs": "8eee30e9e8c730cb5ae2eab973fa56162929d294c68987aa6ebf79b6b5035ae0",
     "packages/process/rust/src/control.rs": "5e24c3db11e30aa6ee44721c6d82df09d8f99bc459b3872bac4627cfa196c276",
     "packages/process/rust/src/facts.rs": "e340f6764b55bce7da3865adfac42d6f8bc1a762e81ac256c37a156143ef22c5",
-    "packages/process/rust/src/lib.rs": "04300ba7c8c97873f67e9815d914f71db93ab5b9ac5c4afb7235d45dcb1a078b",
+    "packages/process/rust/src/lib.rs": "c47302fd82858c35af541b81914684a8a481ff217fe3fe8ecef7d1f58a6fce94",
     "packages/process/rust/src/mapped.rs": "c4b337e6f32bb1b209d7d9953d844f806c97510abdf9a4ab6a4e77c5ffefd1fc",
+    "packages/process/rust/src/path.rs": "2d3a82397f7396adb211e9a78181a62a7c7d01c68a07b0d86ad93c4af6fdb333",
     "packages/process/rust/src/platform/linux.rs": "85e36414323a2e7cdd274503b715ba31f320e8d2d61dea689b06c7ad891a3a2b",
     "packages/process/rust/src/platform/macos.rs": "dcc9cc3a1e41d80b4ab19088420d2a7a77a76279c4382f6536d61ae60f5c520b",
     "packages/process/rust/src/platform/mod.rs": "b4ff396d9b969422f781e6255727dc0928ca00da032db87c7f7fc497d1be879f",
@@ -2757,14 +2758,14 @@
     },
     {
       "path": "packages/git/rust/src/driver.rs",
-      "line": 3100,
+      "line": 3085,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"
     },
     {
       "path": "packages/git/rust/src/driver.rs",
-      "line": 3411,
+      "line": 3396,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"
@@ -3391,7 +3392,7 @@
       "spawn": "Command::new",
       "binary": "ssh",
       "class": "argv-runner",
-      "resolvedAt": "packages/identity/rust/src/signing.rs:195"
+      "resolvedAt": "packages/identity/rust/src/signing.rs:187"
     },
     {
       "path": "packages/process/rust/src/spawn.rs",
@@ -3399,7 +3400,7 @@
       "spawn": "Command::new",
       "binary": "ssh-keygen",
       "class": "argv-runner",
-      "resolvedAt": "packages/identity/rust/src/signing.rs:192"
+      "resolvedAt": "packages/identity/rust/src/signing.rs:184"
     },
     {
       "path": "packages/process/rust/src/spawn.rs",

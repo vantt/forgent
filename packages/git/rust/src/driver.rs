@@ -1812,23 +1812,8 @@ fn text_path(path: &Path) -> Result<String> {
         .map(|text| plain_drive_path(text).unwrap_or(text).to_owned())
         .ok_or_else(|| failure("non-utf8-authority-path"))
 }
-/// A path as it leaves the driver. `fs::canonicalize` returns a Windows verbatim drive path
-/// (`\\?\D:\...`), the driver's one internal spelling of a real path; Git rejects it as `GIT_DIR`
-/// or `-C` and Node cannot walk it, so every path that leaves for a child Git (here or through
-/// `text_path`) or for the addon's callers passes through this one function.
-pub fn plain_path(path: &Path) -> PathBuf {
-    path.to_str()
-        .and_then(plain_drive_path)
-        .map_or_else(|| path.to_path_buf(), PathBuf::from)
-}
-/// The plain spelling of a verbatim drive path, `None` for any other path. A verbatim UNC path
-/// (`\\?\UNC\host\share`) stays as it is: it has no plain drive spelling.
-fn plain_drive_path(path: &str) -> Option<&str> {
-    let rest = path.strip_prefix(r"\\?\")?;
-    let bytes = rest.as_bytes();
-    (bytes.len() >= 3 && bytes[0].is_ascii_alphabetic() && bytes[1] == b':' && bytes[2] == b'\\')
-        .then_some(rest)
-}
+use fgos_process::path::plain_drive_path;
+pub use fgos_process::path::plain_path;
 /// The main checkout of the repository holding `start` (or the repository
 /// directory of a bare one), read from disk only: it walks up from `start`
 /// to the first `.git` (or bare layout) and, for a linked worktree's `.git`
@@ -3421,18 +3406,6 @@ mod tests {
             release(handle),
             fgos_holder_lock::Release::Released { .. }
         ));
-    }
-    #[test]
-    fn verbatim_drive_paths_are_written_plainly_and_nothing_else_changes() {
-        assert_eq!(
-            plain_drive_path(r"\\?\D:\a\forgent\repo"),
-            Some(r"D:\a\forgent\repo")
-        );
-        assert_eq!(plain_drive_path(r"\\?\d:\"), Some(r"d:\"));
-        assert_eq!(plain_drive_path(r"\\?\UNC\host\share\repo"), None);
-        assert_eq!(plain_drive_path(r"\\?\D:"), None);
-        assert_eq!(plain_drive_path(r"D:\a\forgent"), None);
-        assert_eq!(plain_drive_path("/tmp/forgent"), None);
     }
     #[test]
     fn a_path_reaches_a_child_git_only_through_the_plain_spelling() {
