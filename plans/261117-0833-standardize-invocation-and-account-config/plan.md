@@ -123,7 +123,7 @@ The same files are never edited from two places.
 | 5 | [One account inventory shape](phase-05-one-account-inventory-shape.md) | accounts file (global) + global agy files | P3, P4 (agy `files`), D3 | pending |
 | 6 | [Delete legacy readers](phase-06-delete-legacy-readers.md) | repo: src, schema, doctor, tests, docs | P3, P5, gates G1-G2, D5 | pending |
 | 7 | [Owner-gated cleanups](phase-07-owner-gated-cleanups.md) | global + project config, capacity state | P3; last step after release activation | pending |
-| 8 | [Split the gemini pool](phase-08-split-gemini-pool-for-capped-account.md) (owner, 2026-11-17: only mucdong capped at advanced; uses the existing `model@pool` tier cells, as deepseek/thehive does) | global config and accounts file only | none strictly; best after P5 | pending |
+| 8 | [Split the gemini pool](phase-08-split-gemini-pool-for-capped-account.md) (owner, 2026-11-17: only mucdong capped at advanced; uses the existing `model@pool` tier cells, as deepseek/thehive does) | global config and accounts file only | none strictly; best after P5 | applied 2026-11-17, live proof pending |
 
 As-is inventory: [inventory.md](inventory.md). Decisions in full: [decisions.md](decisions.md).
 

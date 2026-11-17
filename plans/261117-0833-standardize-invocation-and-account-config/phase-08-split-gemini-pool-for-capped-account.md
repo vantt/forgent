@@ -61,3 +61,26 @@ is no state to unwind. The mucdong launch failure at flagship tiers returns, not
   no longer matters once mucdong is out of the high-tier walk.
 - Quarantine and lease state are kept per pool, so mucdong's history starts clean under the new
   pool (the earlier quarantine is already cleared).
+
+## Applied (design-lap machine, 2026-11-17)
+
+Backups: `~/.fgos/private/config-backup-261117-p8/` (global config and accounts file before P8).
+
+1. `agy-cli-bwrap` now declares `credentialStore.files` (the five agy login files), because an
+   account in `runner.llmAccounts` stores only a directory. The existing accounts use the same list.
+2. `runner.llmAccounts.gemini-lite.mucdong` added (same login directory); mucdong removed from
+   `runner.providers.gemini.accounts`. tetcu72 and tetnu stay in pool `gemini` (transition read).
+3. `runner.modelPolicies.gemini`: nano, mini, standard and advanced list `gemini` then `gemini-lite`;
+   flagship and frontier name only `gemini` (`gemini-4-argon-high`).
+
+Evidence: `fgos dispatch explain --for review` (tier standard) walks pool gemini (tetcu72, tetnu) then
+gemini-lite (mucdong); `explain --for architecture:frame` shows only pool gemini at flagship. Doctor:
+`model-policy-pools` ok (28 entries), `llm-accounts-shape` ok, `executor-family-unique` ok,
+`confined-pane-accounts` ok. All five agy login files of mucdong exist under its login directory.
+
+Not proven live: no run has yet reached mucdong through the new pool. Two tool limits found:
+`probe-account` reads accounts only from `runner.providers`, so it answers `nothing-to-probe` for pool
+`gemini-lite`; and `fgos run --account gemini-lite/mucdong` is refused because a pin needs the seat's
+first choice to be served by that pool (pins stay hard, `seat-binding/spec.md:266`). The first real
+proof is a natural walk to mucdong, readable with `fgos dispatch show-run`. Rollback: restore the two
+backups. Both limits belong to S5 / MP-C (the `runner.providers` reader), not to this plan.
