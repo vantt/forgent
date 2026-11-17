@@ -291,15 +291,16 @@ test('packages/work-state/contracts/domain-entry-steps.json matches the entry st
   assert.deepEqual(contract, expected);
 });
 
-test('the clarifying vocabulary names every domain directory and the test-only fixtures', async () => {
-  const { clarifyingDomainVocabulary, FIXTURE_DOMAINS } = await import('../../src/state/domain-registry.mjs');
+test('the clarifying vocabulary is exactly the domain directories plus the registry keys that have no directory', async () => {
+  const { clarifyingDomainVocabulary, DOMAINS } = await import('../../src/state/domain-registry.mjs');
   const dirs = fs
     .readdirSync(path.join(__dirname, '..', '..', 'domains'), { withFileTypes: true })
     .filter((e) => e.isDirectory())
     .map((e) => e.name);
+  const fixtures = Object.keys(DOMAINS).filter((k) => !dirs.includes(k));
+  assert.deepEqual([...fixtures].sort(), ['fixture-marketing', 'synthetic', 'triage']);
   const vocab = clarifyingDomainVocabulary();
-  for (const d of dirs) assert.ok(vocab.includes(d), `domains/${d} missing from the clarifying vocabulary`);
+  assert.deepEqual([...vocab].sort(), [...new Set([...dirs, ...fixtures])].sort());
   assert.ok(vocab.includes('marketing') && vocab.includes('council'));
-  for (const f of FIXTURE_DOMAINS) assert.ok(vocab.includes(f));
   assert.equal(new Set(vocab).size, vocab.length);
 });

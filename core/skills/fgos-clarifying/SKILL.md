@@ -22,8 +22,8 @@ description: >-
 The first thing that touches a raw submission, before any work item exists.
 Its two questions are *intent* (does this session already understand what
 the text is asking for, well enough to let an item be created from it?) and
-*domain* (which registered domain — `coding`/`synthetic`/`triage`/
-`fixture-marketing`/… — does it belong to?). It never asks a question by
+*domain* (which domain in the vocabulary from `clarifyingDomainVocabulary()`
+in `src/state/domain-registry.mjs` does it belong to?). It never asks a question by
 default — silence is the normal outcome. It only speaks when the goal
 itself is genuinely unclear, not when a detail is merely unspecified.
 

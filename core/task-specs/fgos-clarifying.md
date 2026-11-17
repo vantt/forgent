@@ -4,11 +4,11 @@ domain: core | lifecycle: Init | role: classifier | requires-skill: fgos-clarify
 
 ## Input
 - Raw submission text provided at submission time (untrusted string).
-- Registered domain vocabulary (`Object.keys(DOMAINS)` from `src/state/domain-registry.mjs`).
+- Domain vocabulary (`clarifyingDomainVocabulary()` from `src/state/domain-registry.mjs`).
 
 ## Output
 - Verdict object `{title?, description?, domain, domainUnsure?, question?}` returned directly to caller.
-- Domain classification (`coding`, `synthetic`, `triage`, `fixture-marketing`, etc.); when no domain fits, the unsure verdict `domain: null`, `domainUnsure: true` with a one-line question naming the candidate domains.
+- Domain classification (one name from that vocabulary); when no domain fits, the unsure verdict `domain: null`, `domainUnsure: true` with a one-line question naming the candidate domains.
 - Optional restatement/rewrite of vague `title`/`description` reported via one-line change message (`ap thang roi bao lai mot dong`).
 - Single concrete question when submission goal/intent is not understood (`chi hoi khi khong hieu`).
 - **No state write** — verdict returned directly to launcher before item creation.
