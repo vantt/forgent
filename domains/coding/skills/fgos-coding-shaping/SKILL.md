@@ -143,7 +143,7 @@ form for a small item: only §1, §4 and the hand-off block are required; §2,
 
 0. **No item** (see "Work item or not"): create a linked worktree with
    `fgos worktree create <path> --branch <name>` (never a raw
-   `git worktree add`) on a plain branch, skip step 1 entirely, locate or create `DISCUSSION.md`, and go on
+   Git command) on a plain branch, skip step 1 entirely, locate or create `DISCUSSION.md`, and go on
    to step 2. Steps 1, 3's `fgos decision` call and the Terminal handoff's
    `fgos edit` apply to the item path only.
 
