@@ -94,7 +94,7 @@ test('a unit verify command runs in the worktree after the producing round and a
   reviewedConfig(repoRoot, ['alpha', 'beta']);
   const res = await reviewedRun(repoRoot, worktreeDir, { id: 'u-verify-ok', verify: `node -e "require('fs').writeFileSync('verify-ran.txt', process.cwd())"` });
   assert.equal(res.outcome, 'pass');
-  assert.equal(res.verify, undefined, 'a run that verified says nothing about missing verify');
+  assert.equal(res.verify.ran, true, 'a run that verified records the verify it ran, never a missing one');
   assert.equal(res.results.filter((r) => r.seat === 'verify' && r.outcome === 'pass').length, 1);
   assert.equal(fs.realpathSync(fs.readFileSync(path.join(worktreeDir, 'verify-ran.txt'), 'utf8')), fs.realpathSync(worktreeDir));
 });
@@ -164,7 +164,7 @@ test('a verify declared on the capability is used when the unit names none', asy
   assert.ok(res.findings.some((f) => /exited 5/.test(f)));
 });
 
-test('a reviewed run with no verify command passes but says it verified nothing; the code-change preset pins none', async () => {
+test('a reviewed run with no verify command passes but says it verified nothing, in the result, unit.json and unit-summary.json; the code-change preset pins none', async () => {
   const { repoRoot, worktreeDir } = setupGitRepo();
   reviewedConfig(repoRoot, ['alpha', 'beta']);
   const res = await reviewedRun(repoRoot, worktreeDir, { id: 'u-no-verify', pattern: 'code-change' }, 'code-change');
@@ -172,6 +172,10 @@ test('a reviewed run with no verify command passes but says it verified nothing;
   assert.equal(res.verify.ran, false);
   assert.match(res.verify.reason, /no verify command/);
   assert.equal(res.results.some((r) => r.seat === 'verify'), false);
+  // The record and the summary keep the same `ran: false` shape the result returns.
+  const unitDir = path.join(repoRoot, '.fgos', 'assignments', res.unitRunId);
+  assert.deepEqual(JSON.parse(fs.readFileSync(path.join(unitDir, 'unit.json'), 'utf8')).settlement.verify, res.verify);
+  assert.deepEqual(JSON.parse(fs.readFileSync(path.join(unitDir, 'unit-summary.json'), 'utf8')).verify, res.verify);
 });
 
 test('a solo run needs no verify and does not claim to have skipped one', async () => {

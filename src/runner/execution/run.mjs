@@ -474,7 +474,7 @@ function finishUnit(ctx, { outcome, rounds, results = [], findings = [], ...rest
   });
   const final = started.value ? ruled.outcome : NOT_STARTED_OUTCOME;
   // A verify that ran wins over the `ran: false` form a caller passed: the two never both describe one run.
-  const verifyRecord = ctx.verifyFacts ? { ran: true, ...ctx.verifyFacts } : null;
+  const verifyRecord = ctx.verifyFacts ? { ran: true, ...ctx.verifyFacts } : (rest.verify ?? null);
   const unitInfrastructure = infrastructure({ outcome: final, outOfScope: ruled.outOfScope, results: attempts });
   settleUnitRun(ctx, {
     outcome: ruled.outcome,
@@ -548,7 +548,7 @@ async function verifyUnit(ctx, targetUnit) {
   const verifyCmd = verifyCommandOf(targetUnit, runnerConfig);
   if (!verifyCmd) return { pass: true };
   const verified = await runVerify({ command: verifyCmd, cwd: unitRecord.worktree, timeoutMs: runnerConfig.timeoutMs, custody: scope.custody });
-  // The last verify decides the outcome, so it is the one the record keeps (the output tail stays out: it is in the failure text).
+  // The verify of the current round decides the outcome, so it is the one the record keeps (the output tail stays out: it is in the failure text).
   ctx.verifyFacts = {
     command: verifyCmd,
     outcome: verified.verdict === 'pass' ? 'pass' : verified.verdict ?? verified.infrastructure,
@@ -648,6 +648,8 @@ async function runRoleBody(ctx, { seat, unit: seatUnit, round = 1, independentOf
     ask: () => askFor(request, ctx.seatLedger, ctx.askContext),
   };
   const { unitRecord, mainRoot, scope } = ctx;
+  // A new round starts with no verify record: the record is the verify of the round the run ends in, never an earlier one.
+  if (round > (ctx.verifyRound ?? 0)) { ctx.verifyRound = round; ctx.verifyFacts = null; }
   const recorded = unitRecord.bindings[role.key] ?? [];
   // A resumed seat whose last attempt did not pass is bound again, as the attempt after the last one.
   const rebinding = ctx.rebindKeys.delete(role.key);
