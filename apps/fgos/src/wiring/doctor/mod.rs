@@ -225,9 +225,13 @@ const GROUPS: &[&Rows] = &[
 
 /// The rows and fixes a Rust component judges in process, by id. The registry's `inRust` lists must equal
 /// [`NativeOwner::row_ids`] and [`NativeOwner::fix_ids`]; a test pins it.
-pub struct NativeOwner;
+/// `node` is the bridge whose Node reports the version the row `node-version-and-git` judges; without one the row
+/// judges Git alone.
+pub struct NativeOwner<'a> {
+    pub node: Option<&'a bridge::NodeBridge>,
+}
 
-impl NativeOwner {
+impl NativeOwner<'_> {
     pub fn row_ids() -> Vec<&'static str> {
         GROUPS
             .iter()
@@ -245,11 +249,34 @@ impl NativeOwner {
     }
 }
 
+/// The row whose Node half the report's owner judges, from the version the bridge's own Node reported: no process
+/// is started to ask.
+const NODE_AND_GIT: &str = "node-version-and-git";
+
+/// The Git half of the row (`outcome`) with the Node half in front of it: a Node that is missing or older than the
+/// release requires fails the row and names the Node to install; a passing row names both versions.
+fn with_node(outcome: RowOutcome, node: bridge::NodeFact) -> RowOutcome {
+    let Some(verdict) = node.verdict(&bridge::node_requirement()) else {
+        return outcome;
+    };
+    match (verdict, outcome) {
+        (Err(message), _) => judged(false, message),
+        (Ok(version), RowOutcome::Judged(mut result)) if result.passed => {
+            result.message = Some(format!(
+                "node {version}, {}",
+                result.message.unwrap_or_default()
+            ));
+            RowOutcome::Judged(result)
+        }
+        (Ok(_), outcome) => outcome,
+    }
+}
+
 fn no_answer(id: &str, what: &str) -> String {
     format!("no {what} {id} is judged in process")
 }
 
-impl RowOwner for NativeOwner {
+impl RowOwner for NativeOwner<'_> {
     /// One fix at a time, in the order asked: a fix may rely on one before it, whichever group owns each.
     fn run_fixes(&self, root: &Path, ids: &[&str]) -> Vec<FixResult> {
         ids.iter()
@@ -284,10 +311,14 @@ impl RowOwner for NativeOwner {
         ids.iter()
             .zip(answers)
             .map(|(id, answer)| {
-                answer.unwrap_or_else(|| RowOutcome::Unavailable {
+                let outcome = answer.unwrap_or_else(|| RowOutcome::Unavailable {
                     message: no_answer(id, "row"),
                     next: "run fgos doctor again".to_owned(),
-                })
+                });
+                match (self.node, *id) {
+                    (Some(bridge), NODE_AND_GIT) => with_node(outcome, bridge.node_fact()),
+                    _ => outcome,
+                }
             })
             .collect()
     }
@@ -368,7 +399,9 @@ impl OperationProvider for DoctorProvider {
                     &request,
                     &registry,
                     &Owners {
-                        native: &NativeOwner,
+                        native: &NativeOwner {
+                            node: Some(&bridge),
+                        },
                         bridge: &bridge,
                     },
                 )
@@ -394,6 +427,46 @@ mod tests {
 
     fn request(args: &[&str]) -> DoctorRequest {
         project_doctor_request(&os(args), Ok(PathBuf::from("/p"))).unwrap()
+    }
+
+    fn git_passes() -> RowOutcome {
+        judged(true, "git available")
+    }
+
+    fn text(outcome: RowOutcome) -> (bool, String) {
+        match outcome {
+            RowOutcome::Judged(result) => (result.passed, result.message.unwrap_or_default()),
+            RowOutcome::Unavailable { message, .. } => (false, message),
+        }
+    }
+
+    #[test]
+    fn the_node_row_names_the_version_the_bridge_reported_and_fails_where_node_is_old_or_missing() {
+        use bridge::NodeFact;
+        let ok = with_node(git_passes(), NodeFact::Version("v22.4.1".into()));
+        assert_eq!(text(ok), (true, "node v22.4.1, git available".to_owned()));
+        let old = with_node(git_passes(), NodeFact::Version("v16.20.2".into()));
+        assert_eq!(
+            text(old),
+            (false, "node v16.20.2 \u{2014} need >=18".to_owned())
+        );
+        let (passed, missing) = text(with_node(
+            git_passes(),
+            NodeFact::Missing("No such file or directory (os error 2)".into()),
+        ));
+        assert!(!passed);
+        assert!(missing.starts_with("node is not available"), "{missing}");
+        assert!(missing.ends_with("install Node 18 or newer"), "{missing}");
+        // Nothing reported yet: the row judges Git alone, and a failing Git row stays as it was.
+        assert_eq!(
+            text(with_node(git_passes(), NodeFact::Unknown)),
+            (true, "git available".to_owned())
+        );
+        let git_fails = with_node(
+            judged(false, "git not available: x"),
+            NodeFact::Version("v22.0.0".into()),
+        );
+        assert_eq!(text(git_fails), (false, "git not available: x".to_owned()));
     }
 
     #[test]

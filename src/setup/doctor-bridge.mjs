@@ -47,15 +47,16 @@ function refusalLine(error) {
 /**
  * Runs one request. `write` receives each result line; `runBridged` is the body map of the registry
  * (src/setup/registrations.mjs) and `initStore` creates the Work store of a `.fgos` directory. Ends with an `end`
- * line carrying the count, so the host can tell a finished call from one that stopped. A refusal (a malformed
+ * line carrying the count and the version of the Node that ran it (the host judges that version against the release's
+ * `requires.node`, so it starts no Node of its own to ask), so the host can tell a finished call from one that stopped. A refusal (a malformed
  * request, an id with no body) is one `refusal` line.
  */
-export async function serve(text, { write, runBridged, initStore }) {
+export async function serve(text, { write, runBridged, initStore, nodeVersion = process.version }) {
   let request;
   try { request = parseRequest(text); } catch (error) { write(resultLine('refusal', { message: error.message })); return 2; }
   if (request.phase === 'work-store-init') {
     try { await initStore(path.join(request.dir, '.fgos')); } catch (error) { write(refusalLine(error)); return 2; }
-    write(resultLine('end', { count: 0 }));
+    write(resultLine('end', { count: 0, nodeVersion }));
     return 0;
   }
   let count = 0;
@@ -68,7 +69,7 @@ export async function serve(text, { write, runBridged, initStore }) {
     write(refusalLine(error));
     return 2;
   }
-  write(resultLine('end', { count }));
+  write(resultLine('end', { count, nodeVersion }));
   return 0;
 }
 

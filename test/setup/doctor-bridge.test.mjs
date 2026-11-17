@@ -47,6 +47,7 @@ test('rows come back in the order asked, each as one line, and the call ends wit
   assert.deepEqual(kinds.map((entry) => entry.kind), ['row', 'row', 'end']);
   assert.deepEqual(kinds.slice(0, 2).map((entry) => entry.id), ['agent-type-names-unique', 'operation-prompt-templates-valid']);
   assert.equal(kinds[2].count, 2);
+  assert.equal(kinds[2].nodeVersion, process.version, 'the end line names the Node that ran the call');
   for (const entry of kinds.slice(0, 2)) assert.equal(typeof entry.passed, 'boolean');
 });
 

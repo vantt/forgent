@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "about": "The contract of the Node rows bridge: the one door the Rust host uses to reach the doctor rows and fixes whose layers Node still owns (owner bridge:<step> in doctor-registry.v1.json). The host starts `module` of the legacy payload with the payload's Node, writes one request as JSON on its stdin and reads one line per result from its stdout. Only a line that starts with resultPrefix is a result, so output a body prints can never be read as one; each result is written as soon as it exists, so a crash keeps what was produced; the call ends with one `end` line carrying the number of results, and a call without it did not finish. A malformed request or an id with no body is one `refusal` line. One more request shares the door until the Work layer moves: `work-store-init` creates the Work store of the project's `.fgos` (the Event Store rebuild `fgos init` needs); it has no ids, answers with an `end` line of count 0 when it worked, and with a `refusal` line whose optional `category` is the error's exit category when it did not. The level of a row (`status` when the row does not say it), the fix of a failing row, `ok` and `next` are the host's, never the bridge's. Each side reads `vectors`: the Node module writes exactly `line` for `kind` and `body`, the host reads `line` back as `body`. The bridge ends with the last Node-owned row.",
+  "about": "The contract of the Node rows bridge: the one door the Rust host uses to reach the doctor rows and fixes whose layers Node still owns (owner bridge:<step> in doctor-registry.v1.json). The host starts `module` of the legacy payload with the payload's Node, writes one request as JSON on its stdin and reads one line per result from its stdout. Only a line that starts with resultPrefix is a result, so output a body prints can never be read as one; each result is written as soon as it exists, so a crash keeps what was produced; the call ends with one `end` line carrying the number of results and, optionally, `nodeVersion` (the `process.version` of the Node that ran the call, which the host judges against the release's `requires.node` instead of starting a Node of its own), and a call without it did not finish. A malformed request or an id with no body is one `refusal` line. One more request shares the door until the Work layer moves: `work-store-init` creates the Work store of the project's `.fgos` (the Event Store rebuild `fgos init` needs); it has no ids, answers with an `end` line of count 0 when it worked, and with a `refusal` line whose optional `category` is the error's exit category when it did not. The level of a row (`status` when the row does not say it), the fix of a failing row, `ok` and `next` are the host's, never the bridge's. Each side reads `vectors`: the Node module writes exactly `line` for `kind` and `body`, the host reads `line` back as `body`. The bridge ends with the last Node-owned row.",
   "module": "src/setup/doctor-bridge.mjs",
   "resultPrefix": "\u001eFGOS-DOCTOR-BRIDGE ",
   "request": {
@@ -33,7 +33,9 @@
       "required": [
         "count"
       ],
-      "optional": []
+      "optional": [
+        "nodeVersion"
+      ]
     },
     "refusal": {
       "required": [
@@ -86,6 +88,15 @@
         "count": 2
       },
       "line": "\u001eFGOS-DOCTOR-BRIDGE {\"kind\":\"end\",\"count\":2}\n"
+    },
+    {
+      "name": "the end of a call that reports the Node that ran it",
+      "kind": "end",
+      "body": {
+        "count": 2,
+        "nodeVersion": "v22.4.1"
+      },
+      "line": "\u001eFGOS-DOCTOR-BRIDGE {\"kind\":\"end\",\"count\":2,\"nodeVersion\":\"v22.4.1\"}\n"
     },
     {
       "name": "a refusal of the whole call",

@@ -27,16 +27,39 @@ pub fn describe_operation_error(error: &fgos_git::OperationError) -> String {
     }
 }
 
+/// Why the Git WAL could not be opened.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum OpenWalError {
+    /// The controller activation fence is missing: only an activation (`fgctl init`, `fgctl upgrade`) places it, so
+    /// no fix of fgOS's own can open the WAL.
+    FenceMissing,
+    Other(String),
+}
+
+impl std::fmt::Display for OpenWalError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::FenceMissing => f.write_str("git-fence-missing"),
+            Self::Other(text) => f.write_str(text),
+        }
+    }
+}
+
 /// Creates and trusts the Git WAL of the repository at `root` (opening it is what makes it trusted), through the
 /// one call both `fgos init` and the `git-wal-dir` doctor fix make. `Ok(false)` when `root` is no repository.
-pub fn open_wal(driver: &fgos_git::GitDriver, root: &std::path::Path) -> Result<bool, String> {
+pub fn open_wal(
+    driver: &fgos_git::GitDriver,
+    root: &std::path::Path,
+) -> Result<bool, OpenWalError> {
     match driver
         .resolve_repo(root, root)
-        .map_err(|error| describe_operation_error(&error))?
+        .map_err(|error| OpenWalError::Other(describe_operation_error(&error)))?
     {
-        fgos_git::ResolveRepo::Repository(repo) => fgos_git::wal::Wal::open(&repo)
-            .map(|_| true)
-            .map_err(|error| error.to_string()),
+        fgos_git::ResolveRepo::Repository(repo) => match fgos_git::wal::Wal::open(&repo) {
+            Ok(_) => Ok(true),
+            Err(fgos_git::wal::WalError::FenceMissing) => Err(OpenWalError::FenceMissing),
+            Err(error) => Err(OpenWalError::Other(error.to_string())),
+        },
         _ => Ok(false),
     }
 }

@@ -599,7 +599,8 @@ pub fn run(registry: &Registry, owners: &Owners, root: &Path, options: Options) 
         .map(|entry| owners.kind_of_row(registry, entry))
         .collect();
     let mut judged: HashMap<OwnerKind, std::vec::IntoIter<RowOutcome>> = HashMap::new();
-    for kind in [OwnerKind::Native, OwnerKind::Bridge] {
+    // The bridge answers first: what its Node reports (its version) is a fact a native row judges.
+    for kind in [OwnerKind::Bridge, OwnerKind::Native] {
         let ids: Vec<&str> = registry
             .rows
             .iter()

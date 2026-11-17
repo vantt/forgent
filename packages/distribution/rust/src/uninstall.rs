@@ -132,11 +132,15 @@ fn comparable(path: &Path) -> Vec<String> {
 /// directory, or a directory that contains the home directory. One answer for the state-root guard and for the
 /// project half of `fgos uninstall`.
 pub fn broad_root(path: &Path, home: Option<&Path>) -> Option<&'static str> {
+    // Both sides are compared as the places they name: a home reached through a link (`/home` -> `/var/home`) is the
+    // same directory as its target. A path that does not resolve is compared as written.
+    let resolved = |p: &Path| std::fs::canonicalize(p).unwrap_or_else(|_| p.to_path_buf());
+    let path = resolved(path);
     if path.parent().is_none() {
         return Some("the filesystem root");
     }
-    let parts = comparable(path);
-    let home_parts = comparable(home?);
+    let parts = comparable(&path);
+    let home_parts = comparable(&resolved(home?));
     if home_parts == parts {
         Some("your home directory")
     } else {
@@ -685,6 +689,64 @@ mod tests {
         } else {
             unix_shaped.to_string()
         }
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn a_home_reached_through_a_link_is_the_same_place_as_its_target() {
+        let base = std::fs::canonicalize(scratch("linked-home")).unwrap();
+        let real = base.join("real");
+        let home = real.join("people/me");
+        std::fs::create_dir_all(home.join("work")).unwrap();
+        let link = base.join("link");
+        std::os::unix::fs::symlink(&real, &link).unwrap();
+        let linked_home = link.join("people/me");
+        // The root as the root door gives it (resolved) against a home written through the link, and the reverse.
+        assert_eq!(
+            broad_root(&home, Some(&linked_home)),
+            Some("your home directory")
+        );
+        assert_eq!(
+            broad_root(&linked_home, Some(&home)),
+            Some("your home directory")
+        );
+        // A directory that contains the home, whichever side is linked.
+        assert_eq!(
+            broad_root(&real, Some(&linked_home)),
+            Some("a directory that contains your home directory")
+        );
+        assert_eq!(
+            broad_root(&link, Some(&home)),
+            Some("a directory that contains your home directory")
+        );
+        // A project under the home is no broad root, linked or not.
+        assert_eq!(broad_root(&home.join("work"), Some(&linked_home)), None);
+        let _ = std::fs::remove_dir_all(&base);
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn a_root_reached_through_a_linked_ancestor_is_judged_as_the_place_it_names() {
+        let base = std::fs::canonicalize(scratch("linked-ancestor")).unwrap();
+        let home = base.join("people/me");
+        std::fs::create_dir_all(home.join("work")).unwrap();
+        // `alias` is a link to the home itself; `people-link` is a link to the directory that holds the home.
+        let alias = base.join("alias");
+        std::os::unix::fs::symlink(&home, &alias).unwrap();
+        let people_link = base.join("people-link");
+        std::os::unix::fs::symlink(base.join("people"), &people_link).unwrap();
+        // The root is the home through a link: refused as the home, not accepted as a path that differs in text.
+        assert_eq!(broad_root(&alias, Some(&home)), Some("your home directory"));
+        // A directory below the link's target is a project under the home, not a broad root.
+        assert_eq!(broad_root(&alias.join("work"), Some(&home)), None);
+        // A link to a directory that holds the home is a directory that contains the home.
+        assert_eq!(
+            broad_root(&people_link, Some(&home)),
+            Some("a directory that contains your home directory")
+        );
+        // A project reached through that link, below the home, is fine.
+        assert_eq!(broad_root(&people_link.join("me/work"), Some(&home)), None);
+        let _ = std::fs::remove_dir_all(&base);
     }
 
     #[test]

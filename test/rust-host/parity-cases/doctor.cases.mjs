@@ -41,7 +41,18 @@ add('strict-with-a-value-is-not-strict', [call(['--strict', 'yes'])]);
 add('pretty-with-an-empty-value-is-json', [call(['--pretty', ''])]);
 add('from-a-subdirectory', [call([], { cwd: 'sub' })]);
 add('from-a-linked-worktree', [{ do: 'linkedWorktree' }, call([], { cwd: 'linked' })]);
-add('fresh-repository-with-no-setup', [call([], { cwd: 'fresh' }), { do: 'storeAppeared', cwd: 'fresh' }]);
+// Accepted change: a repository with no Git WAL and no activation fence (no `fgctl init` placed it) cannot be repaired
+// by `doctor --fix`, which opens the WAL and needs the fence; the host's row names `fgctl init` as its fix, and says
+// so, where the base release named `fgos doctor --fix (git-wal-dir)`. Each side's text and fix are pinned.
+const NO_FENCE_JOURNAL = {
+  rows: ['git-operation-journal'],
+  base: /^the Git WAL is not initialized; run `fgos doctor --fix` \(git-wal-dir\)$/,
+  host: /^the Git WAL is not initialized and the controller activation fence is missing, so `fgos doctor --fix` cannot create it; run `fgctl init` \(or `fgctl upgrade`\) in this project to place the fence$/,
+  fix: { base: 'fgos doctor --fix', host: 'fgctl init' },
+  next: { base: 'fgos doctor --fix', host: 'fgctl init' },
+};
+
+add('fresh-repository-with-no-setup', [call([], { cwd: 'fresh' }), { do: 'storeAppeared', cwd: 'fresh' }], { acceptedText: NO_FENCE_JOURNAL });
 add('outside-any-repository', [call([], { cwd: 'outside' }), { do: 'storeAppeared', cwd: 'outside' }]);
 add('legacy-config-project', [call([], { cwd: 'legacy' })]);
 add('dir-names-another-project', [{ do: 'otherProject' }, call(['--dir', '$OTHER'])]);
@@ -58,7 +69,7 @@ add('dir-bare', [call(['--dir'])]);
 add('git-remote-without-mapping', [{ do: 'remoteProject' }, call([], { cwd: 'remote' }), call(['--fix'], { cwd: 'remote' }), { do: 'gitConfig', cwd: 'remote' }], { disk: true });
 add('git-obsolete-fetch-mapping', [{ do: 'remoteProject', obsolete: true }, call([], { cwd: 'remote' }), call(['--fix'], { cwd: 'remote' }), { do: 'gitConfig', cwd: 'remote' }, call([], { cwd: 'remote' })], { disk: true });
 add('git-merge-in-progress-and-native-lock', [{ do: 'mergeAndLock' }, call([])]);
-add('clone-of-this-repository', [{ do: 'cloneThisRepository' }, call([], { cwd: 'clone' })]);
+add('clone-of-this-repository', [{ do: 'cloneThisRepository' }, call([], { cwd: 'clone' })], { acceptedText: NO_FENCE_JOURNAL });
 
 // Writing: `--fix` runs every fix first and judges the rows after the repair.
 add('fix', [call(['--fix'])], { disk: true });
@@ -67,7 +78,7 @@ add('fix-pretty', [call(['--fix', '--pretty'])], { disk: true });
 add('fix-strict', [call(['--fix', '--strict'])], { disk: true });
 add('fix-twice-is-idempotent', [call(['--fix']), call(['--fix']), call([])], { disk: true });
 add('fix-in-a-legacy-config-project', [call(['--fix'], { cwd: 'legacy' }), call([], { cwd: 'legacy' })], { disk: true });
-add('fix-in-a-fresh-repository', [call(['--fix'], { cwd: 'fresh' })], { disk: true });
+add('fix-in-a-fresh-repository', [call(['--fix'], { cwd: 'fresh' })], { disk: true, acceptedText: NO_FENCE_JOURNAL });
 add('fix-outside-any-repository', [call(['--fix'], { cwd: 'outside' })], { disk: true });
 add('fix-from-a-linked-worktree', [{ do: 'linkedWorktree' }, call(['--fix'], { cwd: 'linked' })], { disk: true });
 add('fix-with-a-value-still-fixes', [call(['--fix', 'yes'])], { disk: true });
@@ -117,7 +128,7 @@ add('identity-outside-any-repository', [call([], { cwd: 'outside' })]);
 add('identity-activation-record-without-a-host', [{ do: 'pendingActivation' }, call([])]);
 add('observe-directory-present', [{ do: 'observeDir' }, call([])], { disk: true });
 add('observe-friction-store-symlinked', [{ do: 'symlinkedFriction' }, call([])]);
-add('observe-fresh-repository-writes-nothing', [call([], { cwd: 'fresh' }), { do: 'observeAppeared', cwd: 'fresh' }]);
+add('observe-fresh-repository-writes-nothing', [call([], { cwd: 'fresh' }), { do: 'observeAppeared', cwd: 'fresh' }], { acceptedText: NO_FENCE_JOURNAL });
 
 // The packaging rows: the hook files of the five agent CLIs (fixed, judged against a runnable shim, written in an
 // earlier release's form), the reports on a person's own agent config, the global path cache, the committed pin and
@@ -473,7 +484,8 @@ function describe(text, ignoreRows = [], accepted = null, side = 'host') {
   if (!data?.checks) return { text: withoutRetiredLines(text) };
   return {
     ok: data.ok,
-    next: data.next,
+    // The accepted fix of a row is also one entry of `next`; each side's entry is dropped after it was pinned above.
+    next: accepted?.next ? data.next.filter((entry) => entry !== accepted.next[side]) : data.next,
     fixed: data.fixed,
     // The compatibility row's `detail.versions` listed the Node addon's own component versions; the host has no addon, so
     // it lists the Git component's (accepted change); the floor in `detail` is compared.
@@ -484,7 +496,8 @@ function describe(text, ignoreRows = [], accepted = null, side = 'host') {
         : id === 'git-operation-journal' && rawDetail?.journal ? { ...rawDetail, journal: { ...rawDetail.journal, retainedBytes: '<n>', oldestRetainedAtMs: '<ms>' } } : rawDetail;
       if (accepted?.rows.includes(id)) {
         assert.match(message, accepted[side], `${id}: the ${side} text of the accepted difference`);
-        return { id, status, passed, fix, message: '<ACCEPTED TEXT>', detail, description };
+        if (accepted.fix) assert.equal(fix, accepted.fix[side], `${id}: the ${side} fix of the accepted difference`);
+        return { id, status, passed, fix: accepted.fix ? '<ACCEPTED FIX>' : fix, message: '<ACCEPTED TEXT>', detail, description };
       }
       return { id, status, passed, fix, message, detail, description };
     }),

@@ -223,11 +223,22 @@ async function runScript(entry, testCase) {
   }
 }
 
+/** The one key the host adds to the answer where the activation fence is missing. */
+const WAL_FENCE_WARNING = ',"gitWalWarning":"Git WAL not initialised: git-fence-missing; run `fgctl init` (or `fgctl upgrade`) in this project to place the activation fence, then run fgos init again"';
+
 /** Runs one case on the base release (entry A) and the host (entry B), each on a fresh world, and compares them. */
 export async function runPreparedCase(entryA, entryB, testCase) {
   const differences = [];
   try {
     const [base, host] = [await runScript(entryA, testCase), await runScript(entryB, testCase)];
+    // Accepted change: the host also creates the Git WAL, and without the activation fence it says so (the base
+    // release never touched the WAL). The warning is pinned here and left out of the comparison.
+    if (testCase.world.fence === false) {
+      for (const output of host.outputs) {
+        assert.ok(output.stdout.includes(WAL_FENCE_WARNING), `${testCase.id}: the host did not warn about the missing fence: ${output.stdout}`);
+        output.stdout = output.stdout.replace(WAL_FENCE_WARNING, '');
+      }
+    }
     const same = (left, right, what) => {
       try { assert.deepEqual(left, right); } catch (error) { differences.push(`${what} differ: ${error.message.split('\n').slice(0, 60).join('\n')}`); }
     };

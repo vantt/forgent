@@ -298,7 +298,7 @@ fn node_spy_dir(prefix: &str) -> (PathBuf, PathBuf, String) {
         .to_string();
     let spy_script = temp_dir.join("node");
     let script_content = format!(
-        "#!/bin/sh\necho \"SPY_PID:$$ $*\" >> \"{}\"\nexec \"{real_node}\" \"$@\"\n",
+        "#!/bin/sh\necho \"SPY_PID:$$\" >> \"{}\"\nexec \"{real_node}\" \"$@\"\n",
         spy_log.display(),
     );
     fs::write(&spy_script, script_content).unwrap();
@@ -462,7 +462,7 @@ fn test_native_version_zero_node_child_process_spy() {
     {
         use std::os::unix::fs::PermissionsExt;
         let script_content = format!(
-            "#!/bin/sh\necho \"SPY_PID:$$ $*\" >> \"{}\"\nexec \"{}\" \"$@\"\n",
+            "#!/bin/sh\necho \"SPY_PID:$$\" >> \"{}\"\nexec \"{}\" \"$@\"\n",
             spy_log.display(),
             real_node.display()
         );
@@ -563,7 +563,7 @@ fn test_native_gate_bypass_zero_node_child_process_spy() {
     {
         use std::os::unix::fs::PermissionsExt;
         let script_content = format!(
-            "#!/bin/sh\necho \"SPY_PID:$$ $*\" >> \"{}\"\nexec \"{}\" \"$@\"\n",
+            "#!/bin/sh\necho \"SPY_PID:$$\" >> \"{}\"\nexec \"{}\" \"$@\"\n",
             spy_log.display(),
             real_node.display()
         );
@@ -3509,19 +3509,10 @@ fn doctor_starts_one_node_child_for_all_its_bridged_rows() {
     assert!(envelope["data"]["checks"].as_array().unwrap().len() > 100);
 
     let starts = fs::read_to_string(&spy_log).unwrap_or_default();
-    let (probes, bridge_calls): (Vec<&str>, Vec<&str>) = starts
-        .lines()
-        .filter(|l| l.starts_with("SPY_PID:"))
-        .partition(|l| l.ends_with(" --version"));
     assert_eq!(
-        bridge_calls.len(),
+        starts.lines().filter(|l| l.starts_with("SPY_PID:")).count(),
         1,
         "the rows of Node-owned layers are one bridge call: {starts}"
-    );
-    assert_eq!(
-        probes.len(),
-        1,
-        "the node-version-and-git row reads `node --version` once: {starts}"
     );
     let _ = fs::remove_dir_all(&project);
     let _ = fs::remove_dir_all(&spy_dir);
@@ -3582,7 +3573,7 @@ fn an_interrupt_of_the_host_ends_the_bridge_child_and_everything_it_started() {
     let (spy_dir, path) = scripted_node(
         "fgos_doctor_sigintnode",
         &format!(
-            "[ \"$1\" = --version ] && {{ echo v22.0.0; exit 0; }}\ncat >/dev/null\nsh -c 'echo $$ > \"{pid}\"; exec sleep 300'",
+            "cat >/dev/null\nsh -c 'echo $$ > \"{pid}\"; exec sleep 300'",
             pid = grandchild.display()
         ),
     );
@@ -4004,12 +3995,7 @@ fn after_a_fresh_init_the_git_journal_row_passes_and_no_git_fix_is_named() {
     )
     .unwrap();
     let request = world.base.join("request.json");
-    let (node_dir, path) = bridge_node(
-        "fgos_init_wal_node",
-        &request,
-        &format!("[ \"$1\" = --version ] && {{ echo v22.0.0; exit 0; }}\n{BRIDGE_END_LINE}"),
-    );
-    // The scripted node answers the version probe, then the bridge request.
+    let (node_dir, path) = bridge_node("fgos_init_wal_node", &request, BRIDGE_END_LINE);
     let first = world.data(&world.init(&path, &["--json"]));
     assert!(first.get("gitWalWarning").is_none(), "{first}");
 
@@ -4038,6 +4024,23 @@ fn after_a_fresh_init_the_git_journal_row_passes_and_no_git_fix_is_named() {
             .any(|entry| entry.as_str().is_some_and(|s| s.contains("git-wal"))),
         "{}",
         envelope["data"]["next"]
+    );
+    let _ = fs::remove_dir_all(&world.base);
+    let _ = fs::remove_dir_all(&node_dir);
+}
+
+/// Without the controller's activation fence `init` cannot create the Git WAL, and says which command places it.
+#[cfg(unix)]
+#[test]
+fn init_without_the_activation_fence_warns_and_names_fgctl() {
+    let world = InitWorld::new("fgos_init_nofence");
+    let request = world.base.join("request.json");
+    let (node_dir, path) = bridge_node("fgos_init_nofence_node", &request, BRIDGE_END_LINE);
+    let first = world.data(&world.init(&path, &["--json"]));
+    let warning = first["gitWalWarning"].as_str().expect("a warning");
+    assert!(
+        warning.starts_with("Git WAL not initialised: git-fence-missing; run `fgctl init`"),
+        "{warning}"
     );
     let _ = fs::remove_dir_all(&world.base);
     let _ = fs::remove_dir_all(&node_dir);

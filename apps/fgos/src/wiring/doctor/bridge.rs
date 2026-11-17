@@ -52,6 +52,8 @@ enum Line {
     Fix(FixResult),
     End {
         count: usize,
+        #[serde(default, rename = "nodeVersion")]
+        node_version: Option<String>,
     },
     Refusal {
         message: String,
@@ -105,6 +107,29 @@ impl Fault {
     }
 }
 
+/// How the bridge's child is made: the production launcher runs the payload's module; a test gives its own.
+pub type Launch = Box<dyn Fn() -> Result<Command, Fault> + Send + Sync>;
+
+/// The bridge to the Node-owned rows.
+pub struct NodeBridge {
+    launch: Launch,
+    check_deadline: Duration,
+    fix_deadline: Duration,
+    work_store_deadline: Duration,
+    /// What the calls so far showed of the Node that runs the bridge.
+    node: std::sync::Mutex<NodeFact>,
+}
+
+/// What a bridge call showed of Node: the version of the Node that answered, the cause when none could start, or
+/// nothing yet. It is how the row `node-version-and-git` judges Node without starting one of its own.
+#[derive(Debug, Clone, PartialEq, Eq, Default)]
+pub enum NodeFact {
+    #[default]
+    Unknown,
+    Version(String),
+    Missing(String),
+}
+
 /// The Node floor a release that declares no `requires.node` is judged against.
 const DEFAULT_NODE_REQUIREMENT: &str = ">=18";
 
@@ -117,15 +142,25 @@ pub fn node_requirement() -> String {
         .unwrap_or_else(|| DEFAULT_NODE_REQUIREMENT.to_owned())
 }
 
-/// How the bridge's child is made: the production launcher runs the payload's module; a test gives its own.
-pub type Launch = Box<dyn Fn() -> Result<Command, Fault> + Send + Sync>;
-
-/// The bridge to the Node-owned rows.
-pub struct NodeBridge {
-    launch: Launch,
-    check_deadline: Duration,
-    fix_deadline: Duration,
-    work_store_deadline: Duration,
+impl NodeFact {
+    /// The Node half of `node-version-and-git`: `None` when no call showed anything (the row then judges Git
+    /// alone), the version when it meets `requirement`, else the failure that names the Node to install.
+    pub fn verdict(&self, requirement: &str) -> Option<Result<String, String>> {
+        let wanted = requirement.trim().strip_prefix(">=").map_or_else(
+            || requirement.trim().to_owned(),
+            |v| format!("{} or newer", v.trim()),
+        );
+        match self {
+            NodeFact::Unknown => None,
+            NodeFact::Missing(cause) => Some(Err(format!(
+                "node is not available ({cause}) \u{2014} install Node {wanted}"
+            ))),
+            NodeFact::Version(printed) => Some(
+                fgos_distribution::init::node_version_satisfies(printed, requirement)
+                    .map_err(|_| format!("node {printed} \u{2014} need {}", requirement.trim())),
+            ),
+        }
+    }
 }
 
 /// The command that runs `doctor-bridge.mjs` from the active release's payload.
@@ -161,7 +196,27 @@ impl NodeBridge {
             check_deadline,
             fix_deadline,
             work_store_deadline: WORK_STORE_DEADLINE,
+            node: std::sync::Mutex::new(NodeFact::Unknown),
         }
+    }
+
+    fn remember_node(&self, fact: NodeFact) {
+        let mut node = self
+            .node
+            .lock()
+            .expect("the node fact is never held across a panic");
+        // The first thing a call showed stands: a version beats a later failure of another call.
+        if *node == NodeFact::Unknown {
+            *node = fact;
+        }
+    }
+
+    /// What the calls so far showed of Node.
+    pub fn node_fact(&self) -> NodeFact {
+        self.node
+            .lock()
+            .expect("the node fact is never held across a panic")
+            .clone()
     }
 
     /// Creates the Work store of the project at `root` (`fgos init`'s one step Node still owns): `Ok` once the
@@ -211,7 +266,8 @@ impl NodeBridge {
                 (stdout, stderr, None, true)
             }
             Err(error) if error.kind() == std::io::ErrorKind::NotFound => {
-                return (Vec::new(), Some(Fault::NodeMissing(error.to_string())))
+                self.remember_node(NodeFact::Missing(error.to_string()));
+                return (Vec::new(), Some(Fault::NodeMissing(error.to_string())));
             }
             Err(error) => {
                 return (
@@ -229,7 +285,15 @@ impl NodeBridge {
                 continue;
             };
             match serde_json::from_str::<Line>(json) {
-                Ok(Line::End { count }) => ended = count == lines.len(),
+                Ok(Line::End {
+                    count,
+                    node_version,
+                }) => {
+                    ended = count == lines.len();
+                    if let Some(version) = node_version {
+                        self.remember_node(NodeFact::Version(version));
+                    }
+                }
                 Ok(Line::Refusal { message, category }) => refused = Some((message, category)),
                 Ok(line) => lines.push(line),
                 Err(error) => {
@@ -684,7 +748,17 @@ mod contract_tests {
                         "{name}"
                     );
                 }
-                Line::End { count } => assert_eq!(body["count"], count, "{name}"),
+                Line::End {
+                    count,
+                    node_version,
+                } => {
+                    assert_eq!(body["count"], count, "{name}");
+                    assert_eq!(
+                        body.get("nodeVersion").and_then(|v| v.as_str()),
+                        node_version.as_deref(),
+                        "{name}"
+                    );
+                }
                 Line::Refusal { message, category } => {
                     assert_eq!(body["message"], message.as_str(), "{name}");
                     assert_eq!(

@@ -626,6 +626,14 @@
       "reason": "`lock`, `lock-status` and `git` run in the host: the lock report is status.rs, the fence is fence.rs and the Git status and recovery composition is incidents.rs; the Node report, the Node fence with its terminal question, the parameter reader and the lock-file table are gone, and no file may bring one back (`doors` rows for each job carry their own patterns for the Rust names)"
     },
     {
+      "job": "retired Node S4 verb code",
+      "kind": "door",
+      "patterns": ["\\bsetupUseCase\\b", "\\bmaterializeSkillsIntoProject\\b", "\\bcreateProjectSkillGuard\\b", "\\binsertSourceLine\\b", "\\bconvertRunnerPatternsConfig\\b", "\\bwireAgentsUseCase\\b", "\\buninstallProject\\b", "\\binitStoreUseCase\\b", "\\bsettleLegacyConfig\\b", "\\bwriteCoexistenceManifest\\b", "\\brunDoctor\\b", "\\binstallAgentHooks\\b"],
+      "allowed": [],
+      "debt": [],
+      "reason": "`doctor`, `init`, `uninstall` and `wire-agents` run in the host and `setup` is retired: the Node use cases of those verbs, the setup use case, the skill copy into a project, the shell-rc line writer, the runner-config conversion, the Node doctor runner and the Node coexistence writer are gone, and no file may bring one back. `uninstallAgentHooks` and `deleteGuardPrefilter` stay out while `src/setup/agent-hooks.mjs` still ships for the frozen mailbox experiment file sets"
+    },
+    {
       "job": "retired Node help renderer",
       "kind": "door",
       "patterns": ["\\brenderHelpText\\b", "\\brenderGuide\\b", "\\bprintVerbHelp\\b", "\\bhandleVerbHelp\\b", "\\bhandleHelp\\b", "\\brefuseHelp\\b", "\\bformatDeprecation\\b"],
@@ -1192,6 +1200,7 @@
       "kind": "door",
       "patterns": [
         "Command::new\\(\"node\"\\)",
+        "run_bounded(?:_command)?\\(\\s*\"node\"",
         "\\blegacy_exec::",
         "\\.arg\\(\"hook\"\\)",
         "\"hook\"\\.into\\(\\), KIND_"

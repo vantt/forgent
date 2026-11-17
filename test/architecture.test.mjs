@@ -1925,6 +1925,20 @@ test('door check: every name of the retired Node config, identity and observe do
   }
 });
 
+test('door check: every name of the retired Node S4 verb code fails when a file declares it again', () => {
+  const row = manifest.doors.find((r) => r.job === 'retired Node S4 verb code');
+  assert.ok(row && row.allowed.length === 0, 'the retired-names row exists and allows no file');
+  const names = ['setupUseCase', 'materializeSkillsIntoProject', 'createProjectSkillGuard', 'insertSourceLine', 'convertRunnerPatternsConfig', 'wireAgentsUseCase', 'uninstallProject', 'initStoreUseCase', 'settleLegacyConfig', 'writeCoexistenceManifest', 'runDoctor', 'installAgentHooks'];
+  assert.equal(row.patterns.length, names.length);
+  for (const name of names) {
+    const failures = checkDoors([row], new Map([['src/seeded.mjs', `function ${name}() {}\n`]]));
+    assert.equal(failures.length, 1, `${name} must fail the door`);
+    assert.match(failures[0], /retired name/);
+  }
+  // A name that is still a live function elsewhere is not on the row.
+  assert.deepEqual(checkDoors([row], new Map([['src/seeded.mjs', 'function uninstallAgentHooks() {}\nfunction deleteGuardPrefilter() {}\n']])), []);
+});
+
 test('door check: every name of the retired Node S2 verb code fails when a file declares it again', () => {
   const row = manifest.doors.find((r) => r.job === 'retired Node S2 verb code');
   assert.ok(row && row.allowed.length === 0, 'the retired-names row exists and allows no file');
@@ -2028,6 +2042,7 @@ test('door rows of the doctor registry, the Node rows bridge and Node from the p
   // Node from a native packaging verb: a node spawn or a legacy_exec call in an adapter, init, uninstall or wire-agents.
   for (const file of ['apps/fgos/src/wiring/doctor/git.rs', 'apps/fgos/src/wiring/init.rs', 'apps/fgos/src/wiring/uninstall.rs', 'apps/fgos/src/wiring/wire_agents.rs']) {
     assert.equal(hits('no Node from the native packaging verbs', file, 'let c = Command::new("node");\n').length, 1, file);
+    assert.equal(hits('no Node from the native packaging verbs', file, 'fgos_process::spawn::run_bounded("node", ["--version"], &env, None, None, t);\n').length, 1, file);
     assert.equal(hits('no Node from the native packaging verbs', file, 'crate::legacy_exec::execute_legacy_cli(a, b, c);\n').length, 1, file);
     assert.equal(hits('no Node from the native packaging verbs', file, 'Command::new(shim).arg("hook").arg("mailbox");\n').length, 1, file);
   }

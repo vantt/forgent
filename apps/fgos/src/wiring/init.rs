@@ -106,6 +106,9 @@ impl StepFailure {
     }
 }
 
+/// What the Git WAL step says when the controller activation fence is missing: a fix of fgOS's own cannot place it.
+const FENCE_MISSING_WAL: &str = "git-fence-missing; run `fgctl init` (or `fgctl upgrade`) in this project to place the activation fence, then run fgos init again";
+
 /// Every step of init, one question each; [`run`] decides the order and which ones may refuse.
 pub trait Steps {
     fn mint_machine_id(&self) -> Result<(), StepFailure>;
@@ -189,7 +192,7 @@ pub fn run(steps: &dyn Steps, root: &Path) -> Result<Done, CategorisedRefusal> {
     let git_wal_warning = steps
         .initialize_git_wal(root)
         .err()
-        .map(|cause| format!("Git WAL not initialised: {cause}; `fgos doctor` names the repair"));
+        .map(|cause| format!("Git WAL not initialised: {cause}"));
     let (git_recovery, git_recovery_warning) = match steps.recover_git(root) {
         Ok(recovery) => (recovery, None),
         Err(cause) => (
@@ -322,7 +325,12 @@ impl Steps for Live {
     fn initialize_git_wal(&self, root: &Path) -> Result<(), String> {
         let driver = fgos_git::GitDriver::new(&self.state_root)
             .map_err(|error| super::git_incidents::describe_operation_error(&error))?;
-        super::git_incidents::open_wal(&driver, root).map(|_| ())
+        super::git_incidents::open_wal(&driver, root)
+            .map(|_| ())
+            .map_err(|error| match error {
+                super::git_incidents::OpenWalError::FenceMissing => FENCE_MISSING_WAL.to_owned(),
+                other => other.to_string(),
+            })
     }
 
     fn recover_git(&self, root: &Path) -> Result<Option<Value>, String> {
@@ -742,7 +750,7 @@ mod tests {
         let answer = data(run(&fake, Path::new("/p")));
         assert_eq!(
             answer.git_wal_warning.as_deref(),
-            Some("Git WAL not initialised: the directory is not private; `fgos doctor` names the repair")
+            Some("Git WAL not initialised: the directory is not private")
         );
         assert_eq!(fake.calls().last(), Some(&"git-recovery"));
         let ok = data(run(&Fake::default(), Path::new("/p")));
