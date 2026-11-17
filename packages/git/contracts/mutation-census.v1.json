@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "a02fd8e56727a05451299a1d574ba09b07a8830b09e4e33994e304a4e258c34b",
+  "payloadDigest": "e290cbc878fc64e19238b6e24fa96da27d814868c81a9879479ec4e36b685dcc",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "b8b886cee2ea5ce7ee1153e4795512db135a990de894c27e53c5e778b210be62",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -296,7 +296,7 @@
     "packages/convention/rust/tests/golden.rs": "1dcc65df4784f25dbdbe8609765eba2faba6c482da5894cf56523760af7cec03",
     "packages/distribution/rust/examples/print-workspace-shim.rs": "767a8d526d1b030dd4327509a63c9e194ed03fe2ae5a2a263682cd62724dc6d4",
     "packages/distribution/rust/src/agent_config.rs": "f138dda801ed919badfdcf06acb91869f83f96518316f2dfcd348fe8663237c3",
-    "packages/distribution/rust/src/agent_hooks.rs": "8f97add8f11a82c2276375e3aab96fb551ac85e4f427130fa29822de3cc46257",
+    "packages/distribution/rust/src/agent_hooks.rs": "cda80a42e43c3dea1ceaf9aeee4f86977e87b670480a806d846036043fd7f14e",
     "packages/distribution/rust/src/bin_cache.rs": "61732e61ebfcda7d6ea52c34c05603b23655b57212616b9c26214f51525bab2c",
     "packages/distribution/rust/src/canonical.rs": "1ed17ee314cadcd425f25919740a7d80b7596871986c9940094fdd2cf4b7542a",
     "packages/distribution/rust/src/coexistence.rs": "6d9ad8ed722734b4a2c6151dcf4a87f64d1cc37354d3b40754d3f95038684c9e",
@@ -306,7 +306,7 @@
     "packages/distribution/rust/src/fgctl_refresh.rs": "36fd15b0c6159e9b9541fbadb2ea5a05f61c9ced1364216e6cbce45170aa4c5a",
     "packages/distribution/rust/src/git_gate.rs": "7d50addca54b78ca0b5d6b61c9d857b2de82016a1cc53faefc7c1038da163cba",
     "packages/distribution/rust/src/init.rs": "f34acace8b3e3c4d0b6183ffcf763eb4d3fc6e5d499832aa2dfe9bd12e4995ec",
-    "packages/distribution/rust/src/launcher.rs": "b2b2cd644a131368941df08ad63e8605ed366329a503e12ae352d36ab8dfe069",
+    "packages/distribution/rust/src/launcher.rs": "115508c51b87547733480dafefd435aae307b3c355def876389f81be55f089e2",
     "packages/distribution/rust/src/launcher.sh": "c669cabae9ce658cca3ab3e91326e96d313a7512d4737e0641519ac5df6acf70",
     "packages/distribution/rust/src/lib.rs": "1ca7d79fc5079f278e842a61196efc2c05355dc02dcb8da0e4983d0ca23f615c",
     "packages/distribution/rust/src/lock.rs": "ee39bccc87c5b34a7799ee886fe3c4b9f59346f22c550c67123efa49f9681f8e",
@@ -319,7 +319,7 @@
     "packages/distribution/rust/src/source_payload.rs": "59e2f03b1faf51bc3ce5bfa7cc5652d78de3baabed9c4e77534da5cb9237f0a6",
     "packages/distribution/rust/src/store.rs": "1cdaf72bbdf7c4bc0ae3eafd1f37fecd6a358de60c8ce5851ccf9212149174de",
     "packages/distribution/rust/src/suggest.rs": "302d698667662b3544b0761cd53dd87c68594d6f1b1ce52d8b85032627d52182",
-    "packages/distribution/rust/src/test_scratch.rs": "93c7b453c854f6fb900fd31e8106908d17158e711fe0671787fb7fcbe9f23ee9",
+    "packages/distribution/rust/src/test_scratch.rs": "3829302288f512f253efd3a83f81b6d2cc026da7ad9c57dc2a70be2ad5cd59ed",
     "packages/distribution/rust/src/timer.rs": "83f4b2efcaf0382ef2b2a83084ee680e69870eaaa789a9b055fc2f1e1715b8ed",
     "packages/distribution/rust/src/uninstall.rs": "c239bf1249825db23867a8cb0b3af9c10d80b2c85f58ef3a6f9353500860b8f9",
     "packages/distribution/rust/src/verify.rs": "79a9f08e75d0c0ca8f5e04ad8443e4134a3dfbd85a38e01a448d53361463dc69",
@@ -2512,14 +2512,14 @@
     },
     {
       "path": "packages/distribution/rust/src/launcher.rs",
-      "line": 538,
+      "line": 540,
       "spawn": "Command::new",
       "binary": "cmd.exe",
       "class": "rust-test"
     },
     {
       "path": "packages/distribution/rust/src/launcher.rs",
-      "line": 599,
+      "line": 601,
       "spawn": "Command::new",
       "binary": "? launcher of run",
       "class": "rust-test"

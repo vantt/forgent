@@ -509,7 +509,9 @@ mod tests {
         let launcher = sb.bin.join("fgos.cmd");
         write_launcher(&launcher, true).unwrap();
         let state = sb.root.join("state");
-        let digest = "a".repeat(64);
+        // A digest with every hex digit in it: the launcher's digit check strips the digits one after the other from
+        // what is left, which a digest of one repeated digit would empty before the last strip.
+        let digest = "0123456789abcdef".repeat(4);
         // A stand-in release host: a copy of cmd.exe, so `fgos.exe /d /c echo <text>` prints the text.
         let release_bin = state
             .join("releases")
@@ -553,7 +555,7 @@ mod tests {
             inside.status,
             String::from_utf8_lossy(&inside.stderr)
         );
-        activation(&format!("sha256:{}", "b".repeat(64)));
+        activation(&format!("sha256:{}", "fedcba9876543210".repeat(4)));
         let missing = run(&["doctor"], &sub, &state);
         assert_eq!(missing.status.code(), Some(126));
         assert!(String::from_utf8_lossy(&missing.stderr)

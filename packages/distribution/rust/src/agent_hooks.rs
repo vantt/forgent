@@ -2145,12 +2145,10 @@ mod tests {
         fn new(label: &str, sub: &str) -> Fixture {
             static COUNTER: std::sync::atomic::AtomicUsize = std::sync::atomic::AtomicUsize::new(0);
             let n = COUNTER.fetch_add(1, std::sync::atomic::Ordering::SeqCst);
-            let base = std::fs::canonicalize(std::env::temp_dir())
-                .unwrap()
-                .join(format!(
-                    "fgos-agent-hooks-{}-{n}-{label}",
-                    std::process::id()
-                ));
+            let base = crate::test_scratch::canonical(&std::env::temp_dir()).join(format!(
+                "fgos-agent-hooks-{}-{n}-{label}",
+                std::process::id()
+            ));
             let _ = std::fs::remove_dir_all(&base);
             let root = base.join(sub);
             let home = base.join("home");
