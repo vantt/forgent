@@ -1,10 +1,10 @@
-import { attentionView, inspectDispatchRuntime, projectStoreRoot, validateInspectionSelector, withRunsCache } from '../../runner/dispatch/runtime-inspection.mjs';
+import { attentionView, inspectDispatchRuntime, validateInspectionSelector, withRunsCache } from '../../runner/dispatch/runtime-inspection.mjs';
 import { readMachineConfig } from '../../config/facade.mjs';
 import { inspectProviderCapacity } from '../../runner/dispatch/provider-capacity.mjs';
 import { readAttemptView } from './show-run.mjs';
 import { createTerminalControl, scanTerminalAllocations } from '../../terminal-control/client.mjs';
 import { resolveHerdrBin } from '../../runner/dispatch/terminal-slot.mjs';
-import { fgosDirFromRoot } from '../../runner/paths.mjs';
+import { fgosDirFromRoot, resolveMainCheckoutRoot } from '../../runner/paths.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
 
@@ -31,6 +31,9 @@ function withAttemptView(repoRoot, inspected) {
 export function inspectDispatchUseCase(ctx, options = {}) {
   return withRunsCache(() => {
     try {
+      if (options.attention === true && (options.terminal === true || options.providerCapacity === true)) {
+        throw new DispatchInspectError(`dispatch inspect --attention cannot be combined with ${options.terminal === true ? '--terminal' : '--provider-capacity'}; run each view on its own`);
+      }
       if (options.providerCapacity === true) {
         return inspectProviderCapacity({
           // The machine's own runner (global file, accounts layer when unconfined, standard), never a project's.
@@ -49,7 +52,7 @@ export function inspectDispatchUseCase(ctx, options = {}) {
       const repoRoot = ctx?.repoRoot ?? ctx?.cwd ?? process.cwd();
       if (options.attention === true) {
         // Every worktree of the project shares the main checkout's store; the view reads that one.
-        const storeRoot = projectStoreRoot(repoRoot);
+        const storeRoot = resolveMainCheckoutRoot(repoRoot) ?? repoRoot;
         const view = attentionView(storeRoot, { since: options.since }, {
           view: (runDir) => readAttemptView(runDir, { fgosDir: fgosDirFromRoot(storeRoot) }),
         });
