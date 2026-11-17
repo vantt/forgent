@@ -47,7 +47,7 @@ const AGY_SETTINGS = JSON.stringify({
 });
 
 // Seat Binding counts only the CLIs this machine has: the fact tests below state which are installed.
-seedStubAgentClis('claude', 'codex', 'omp', 'pi', 'glm');
+seedStubAgentClis('claude', 'codex', 'omp', 'pi', 'glm', 'agy');
 
 /**
  * Derive read-only enforcement mechanism from policy-shaped flags present in args:

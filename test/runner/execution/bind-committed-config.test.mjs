@@ -14,7 +14,7 @@ import { seedFileLocalBwrapRegistry } from '../confinement-registry-fixture.help
 import { seedStubAgentClis, stubAgentCliDir } from '../../helpers/agent-clis.mjs';
 
 seedFileLocalBwrapRegistry();
-seedStubAgentClis('claude', 'codex', 'omp', 'pi');
+seedStubAgentClis('claude', 'codex', 'omp', 'pi', 'agy');
 
 // The project config names the pools its tier cells use; the account inventory that pays for
 // them lives in the machine-global config, so the test declares the one pool the cells name.
