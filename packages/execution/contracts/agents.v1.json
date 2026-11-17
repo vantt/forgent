@@ -1,0 +1,96 @@
+{
+ "version": "agents.v1",
+ "about": "Golden vectors of the agent listing: the personas a seat lookup can find and what is wrong with or hidden about them, recorded from the Node listing. A vector is { name, project, install, expect }: project and install map a project-relative path to a file's text, and install is null when the project is its own install. Re-record with node scripts/agents-vectors.mjs.",
+ "vectors": [
+  {
+   "name": "a well-formed definition has no problems and no render warnings",
+   "project": {"fgos/agents/a.yaml":"name: a\ndescription: a posture\npersona:\n  voice: plain\n  style: short\n  archetype: a checker\ndecision_boundary:\n  can_decide:\n    - one thing\n  must_escalate:\n    - another\n"},
+   "install": null,
+   "expect": {"agents":[{"name":"a","tier":"workspace","source":"fgos/agents/a.yaml","shadows":[],"description":"a posture","problems":[],"warnings":[]}],"masked":[],"duplicates":[],"ignored":[]}
+  },
+  {
+   "name": "keys the renderer drops are named and a block scalar description is read in full",
+   "project": {"fgos/agents/a.yaml":"name: a\ndescription: >\n  a long folded\n  description\npersona:\n  voice: |\n    two lines\n  tone: calm\ndecision_boundary:\n  may_decide:\n    - x\n"},
+   "install": null,
+   "expect": {"agents":[{"name":"a","tier":"workspace","source":"fgos/agents/a.yaml","shadows":[],"description":"a long folded description","problems":[],"warnings":["persona.tone is not rendered (only voice, style, archetype are)","decision_boundary.may_decide is not rendered (only can_decide, must_escalate are)"]}],"masked":[],"duplicates":[],"ignored":[]}
+  },
+  {
+   "name": "a file that is not valid YAML reports the parser's line and column and no description",
+   "project": {"fgos/agents/a.yaml":"name: a\npersona: [unclosed\n","fgos/agents/malformed.yaml":"name: malformed\ndescription: a: b\n","fgos/agents/dup.yaml":"name: dup\nname: dup\ndescription: x\n"},
+   "install": null,
+   "expect": {"agents":[{"name":"a","tier":"workspace","source":"fgos/agents/a.yaml","shadows":[],"description":"","problems":["cannot be parsed: syntax error (line 3, column 1)"],"warnings":[]},{"name":"dup","tier":"workspace","source":"fgos/agents/dup.yaml","shadows":[],"description":"","problems":["cannot be parsed: duplicate key (line 2, column 1)"],"warnings":[]},{"name":"malformed","tier":"workspace","source":"fgos/agents/malformed.yaml","shadows":[],"description":"","problems":["cannot be parsed: syntax error (line 2, column 15)"],"warnings":[]}],"masked":[],"duplicates":[],"ignored":[]}
+  },
+  {
+   "name": "the first tier holding a name wins, lower copies are shadows and a yml file is ignored",
+   "project": {"core/agents/planner.yaml":"name: planner\ndescription: planner posture\n","domains/finance/agents/planner.yaml":"name: planner\ndescription: planner posture\n","fgos/agents/broken.yaml":"name: other\ndescription: x\n","fgos/agents/typo.yml":"name: typo\ndescription: typo posture\n"},
+   "install": null,
+   "expect": {"agents":[{"name":"broken","tier":"workspace","source":"fgos/agents/broken.yaml","shadows":[],"description":"x","problems":["must declare name: broken (got \"other\")"],"warnings":[]},{"name":"planner","tier":"domain","source":"domains/finance/agents/planner.yaml","shadows":["core/agents/planner.yaml"],"description":"planner posture","problems":[],"warnings":[]}],"masked":[],"duplicates":[],"ignored":["fgos/agents/typo.yml"]}
+  },
+  {
+   "name": "a name in three tiers lists both lower copies in lookup order",
+   "project": {"core/agents/critic.yaml":"name: critic\ndescription: core critic\n","domains/a/agents/critic.yaml":"name: critic\ndescription: domain critic\n","fgos/agents/critic.yaml":"name: critic\ndescription: workspace critic\n"},
+   "install": null,
+   "expect": {"agents":[{"name":"critic","tier":"workspace","source":"fgos/agents/critic.yaml","shadows":["domains/a/agents/critic.yaml","core/agents/critic.yaml"],"description":"workspace critic","problems":[],"warnings":[]}],"masked":[],"duplicates":[],"ignored":[]}
+  },
+  {
+   "name": "a name in two domains is a duplicate of the domain tier and the second copy is a shadow",
+   "project": {"domains/a/agents/reader.yaml":"name: reader\ndescription: a reader\n","domains/b/agents/reader.yaml":"name: reader\ndescription: b reader\n"},
+   "install": null,
+   "expect": {"agents":[{"name":"reader","tier":"domain","source":"domains/a/agents/reader.yaml","shadows":["domains/b/agents/reader.yaml"],"description":"a reader","problems":[],"warnings":[]}],"masked":[],"duplicates":[{"tier":"domain","label":"domains/*/agents","name":"reader","files":["domains/a/agents/reader.yaml","domains/b/agents/reader.yaml"]}],"ignored":[]}
+  },
+  {
+   "name": "a project core agents folder hides the installed core personas it lacks and a project domains folder hides nothing",
+   "project": {"core/agents/own-core.yaml":"name: own-core\ndescription: own-core posture\n","domains/legal/agents/clause-reader.yaml":"name: clause-reader\ndescription: clause-reader posture\n"},
+   "install": {"core/agents/council-critic.yaml":"name: council-critic\ndescription: council-critic posture\n","core/agents/own-core.yaml":"name: own-core\ndescription: shipped own-core\n","domains/marketing/agents/offer-critic.yaml":"name: offer-critic\ndescription: offer-critic posture\n"},
+   "expect": {"agents":[{"name":"offer-critic","tier":"domain","source":"domains/marketing/agents/offer-critic.yaml","shadows":[],"description":"offer-critic posture","problems":[],"warnings":[]},{"name":"own-core","tier":"core","source":"core/agents/own-core.yaml","shadows":[],"description":"own-core posture","problems":[],"warnings":[]}],"masked":[{"name":"council-critic","tier":"core","source":"core/agents/council-critic.yaml","hiddenBy":"core/agents/ of this project"}],"duplicates":[],"ignored":[]}
+  },
+  {
+   "name": "a project without its own core folder hides nothing from the install",
+   "project": {"fgos/agents/mine.yaml":"name: mine\ndescription: mine posture\n"},
+   "install": {"core/agents/council-critic.yaml":"name: council-critic\ndescription: council-critic posture\n","domains/marketing/agents/offer-critic.yaml":"name: offer-critic\ndescription: offer-critic posture\n"},
+   "expect": {"agents":[{"name":"mine","tier":"workspace","source":"fgos/agents/mine.yaml","shadows":[],"description":"mine posture","problems":[],"warnings":[]},{"name":"offer-critic","tier":"domain","source":"domains/marketing/agents/offer-critic.yaml","shadows":[],"description":"offer-critic posture","problems":[],"warnings":[]},{"name":"council-critic","tier":"core","source":"core/agents/council-critic.yaml","shadows":[],"description":"council-critic posture","problems":[],"warnings":[]}],"masked":[],"duplicates":[],"ignored":[]}
+  },
+  {
+   "name": "a persona that names tier or prefer is refused with where model taste goes",
+   "project": {"fgos/agents/tiered.yaml":"name: tiered\ndescription: x\ntier: high\n","fgos/agents/preferred.yaml":"name: preferred\ndescription: x\nprefer: [claude]\n","fgos/agents/both.yaml":"name: both\ndescription: x\nprefer: [claude]\ntier: high\n"},
+   "install": null,
+   "expect": {"agents":[{"name":"both","tier":"workspace","source":"fgos/agents/both.yaml","shadows":[],"description":"x","problems":["persona-model-taste-not-allowed: \"tier\" is a model choice and a persona does not make one; set it at runner.personas.<name> in the runner config"],"warnings":[]},{"name":"preferred","tier":"workspace","source":"fgos/agents/preferred.yaml","shadows":[],"description":"x","problems":["persona-model-taste-not-allowed: \"prefer\" is a model choice and a persona does not make one; set it at runner.personas.<name> in the runner config"],"warnings":[]},{"name":"tiered","tier":"workspace","source":"fgos/agents/tiered.yaml","shadows":[],"description":"x","problems":["persona-model-taste-not-allowed: \"tier\" is a model choice and a persona does not make one; set it at runner.personas.<name> in the runner config"],"warnings":[]}],"masked":[],"duplicates":[],"ignored":[]}
+  },
+  {
+   "name": "values that are not text where the renderer reads text are refused by path",
+   "project": {"fgos/agents/desc-list.yaml":"name: desc-list\ndescription: [a, b]\n","fgos/agents/voice-map.yaml":"name: voice-map\ndescription: x\npersona:\n  voice: {a: b}\n","fgos/agents/item-map.yaml":"name: item-map\ndescription: x\ndecision_boundary:\n  can_decide:\n    - ok\n    - a: b\n","fgos/agents/list-map.yaml":"name: list-map\ndescription: x\ndecision_boundary:\n  must_escalate: {a: b}\n","fgos/agents/list-text.yaml":"name: list-text\ndescription: x\ndecision_boundary:\n  can_decide: just text\n","fgos/agents/list-null.yaml":"name: list-null\ndescription: x\ndecision_boundary:\n  can_decide:\n"},
+   "install": null,
+   "expect": {"agents":[{"name":"desc-list","tier":"workspace","source":"fgos/agents/desc-list.yaml","shadows":[],"description":"","problems":["description is a list, not text; an unquoted \": \" inside the text makes YAML read a mapping, quote it"],"warnings":[]},{"name":"item-map","tier":"workspace","source":"fgos/agents/item-map.yaml","shadows":[],"description":"x","problems":["decision_boundary.can_decide[1] is a mapping; an unquoted \": \" inside the text makes YAML read a mapping, quote it"],"warnings":[]},{"name":"list-map","tier":"workspace","source":"fgos/agents/list-map.yaml","shadows":[],"description":"x","problems":["decision_boundary.must_escalate is a mapping, not a list; an unquoted \": \" inside the text makes YAML read a mapping, quote it"],"warnings":[]},{"name":"list-null","tier":"workspace","source":"fgos/agents/list-null.yaml","shadows":[],"description":"x","problems":[],"warnings":[]},{"name":"list-text","tier":"workspace","source":"fgos/agents/list-text.yaml","shadows":[],"description":"x","problems":["decision_boundary.can_decide is text, not a list"],"warnings":[]},{"name":"voice-map","tier":"workspace","source":"fgos/agents/voice-map.yaml","shadows":[],"description":"x","problems":["persona.voice is a mapping, not text; an unquoted \": \" inside the text makes YAML read a mapping, quote it"],"warnings":[]}],"masked":[],"duplicates":[],"ignored":[]}
+  },
+  {
+   "name": "a missing, mismatched, numeric or empty name and a missing description are named",
+   "project": {"fgos/agents/no-name.yaml":"description: x\n","fgos/agents/other.yaml":"name: another\ndescription: x\n","fgos/agents/123.yaml":"name: 123\ndescription: x\n","fgos/agents/blank.yaml":"name: '  '\ndescription: x\n","fgos/agents/no-desc.yaml":"name: no-desc\n","fgos/agents/empty-desc.yaml":"name: empty-desc\ndescription: '   '\n"},
+   "install": null,
+   "expect": {"agents":[{"name":"123","tier":"workspace","source":"fgos/agents/123.yaml","shadows":[],"description":"x","problems":[],"warnings":[]},{"name":"blank","tier":"workspace","source":"fgos/agents/blank.yaml","shadows":[],"description":"x","problems":["must declare name: blank (got null)"],"warnings":[]},{"name":"empty-desc","tier":"workspace","source":"fgos/agents/empty-desc.yaml","shadows":[],"description":"","problems":["must declare a non-empty description"],"warnings":[]},{"name":"no-desc","tier":"workspace","source":"fgos/agents/no-desc.yaml","shadows":[],"description":"","problems":["must declare a non-empty description"],"warnings":[]},{"name":"no-name","tier":"workspace","source":"fgos/agents/no-name.yaml","shadows":[],"description":"x","problems":["must declare name: no-name (got null)"],"warnings":[]},{"name":"other","tier":"workspace","source":"fgos/agents/other.yaml","shadows":[],"description":"x","problems":["must declare name: other (got \"another\")"],"warnings":[]}],"masked":[],"duplicates":[],"ignored":[]}
+  },
+  {
+   "name": "an empty file and a file that is not a mapping name no declared name",
+   "project": {"fgos/agents/empty.yaml":"","fgos/agents/list.yaml":"- a\n- b\n","fgos/agents/scalar.yaml":"just text\n"},
+   "install": null,
+   "expect": {"agents":[{"name":"empty","tier":"workspace","source":"fgos/agents/empty.yaml","shadows":[],"description":"","problems":["must declare name: empty (got null)"],"warnings":[]},{"name":"list","tier":"workspace","source":"fgos/agents/list.yaml","shadows":[],"description":"","problems":["must declare name: list (got null)"],"warnings":[]},{"name":"scalar","tier":"workspace","source":"fgos/agents/scalar.yaml","shadows":[],"description":"","problems":["must declare name: scalar (got null)"],"warnings":[]}],"masked":[],"duplicates":[],"ignored":[]}
+  },
+  {
+   "name": "a description is folded to one line and scalars read like JavaScript text",
+   "project": {"fgos/agents/spaced.yaml":"name: spaced\ndescription: \"  one \\t two\\n three\\u00a0four  \"\n","fgos/agents/float.yaml":"name: float\ndescription: 1.50\n","fgos/agents/whole.yaml":"name: whole\ndescription: 2.0\n","fgos/agents/flag.yaml":"name: flag\ndescription: true\n","fgos/agents/big.yaml":"name: big\ndescription: 1e21\n"},
+   "install": null,
+   "expect": {"agents":[{"name":"big","tier":"workspace","source":"fgos/agents/big.yaml","shadows":[],"description":"1e+21","problems":[],"warnings":[]},{"name":"flag","tier":"workspace","source":"fgos/agents/flag.yaml","shadows":[],"description":"true","problems":[],"warnings":[]},{"name":"float","tier":"workspace","source":"fgos/agents/float.yaml","shadows":[],"description":"1.5","problems":[],"warnings":[]},{"name":"spaced","tier":"workspace","source":"fgos/agents/spaced.yaml","shadows":[],"description":"one two three four","problems":[],"warnings":[]},{"name":"whole","tier":"workspace","source":"fgos/agents/whole.yaml","shadows":[],"description":"2","problems":[],"warnings":[]}],"masked":[],"duplicates":[],"ignored":[]}
+  },
+  {
+   "name": "unrendered keys are listed with array-index keys first like a JavaScript object",
+   "project": {"fgos/agents/keys.yaml":"name: keys\ndescription: x\npersona:\n  zeta: 1\n  voice: v\n  \"10\": a\n  \"2\": b\n  \"02\": c\n  alpha: 2\ndecision_boundary:\n  \"1\": x\n  can_decide: [a]\n"},
+   "install": null,
+   "expect": {"agents":[{"name":"keys","tier":"workspace","source":"fgos/agents/keys.yaml","shadows":[],"description":"x","problems":[],"warnings":["persona.2 is not rendered (only voice, style, archetype are)","persona.10 is not rendered (only voice, style, archetype are)","persona.zeta is not rendered (only voice, style, archetype are)","persona.02 is not rendered (only voice, style, archetype are)","persona.alpha is not rendered (only voice, style, archetype are)","decision_boundary.1 is not rendered (only can_decide, must_escalate are)"]}],"masked":[],"duplicates":[],"ignored":[]}
+  },
+  {
+   "name": "no files list nothing",
+   "project": {},
+   "install": null,
+   "expect": {"agents":[],"masked":[],"duplicates":[],"ignored":[]}
+  }
+ ]
+}

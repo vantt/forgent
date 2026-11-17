@@ -26,7 +26,7 @@ import { isMainModule } from './lib/is-main-module.mjs';
 export const CONTRACT_URL = new URL('../packages/execution/contracts/executor-model.v1.json', import.meta.url);
 
 /** Replace this process's environment by the replay test's, the one `buildTestEnv` gives every test run. */
-async function adoptTestEnvironment() {
+export async function adoptTestEnvironment() {
   const { buildTestEnv } = await import('./run-tests.mjs');
   const testEnv = buildTestEnv(process.env);
   for (const key of Object.keys(process.env)) if (!(key in testEnv)) delete process.env[key];

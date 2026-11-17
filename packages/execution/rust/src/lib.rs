@@ -12,5 +12,6 @@
 //! come through the one trait the host implements, [`ports::Machine`].
 
 pub mod accounts;
+pub mod agents;
 pub mod executor_model;
 pub mod ports;

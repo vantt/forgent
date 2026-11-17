@@ -847,9 +847,11 @@
       "allowed": [
         "src/runner/agent-definitions.mjs",
         { "path": "src/util/domain-dirs.mjs", "reason": "defines the domain layout (a domain's agents/ folder) that the door reads" },
-        { "path": "src/cli/command-registry.mjs", "reason": "help text naming the tiers a persona is looked up in; no directory is read" }
+        { "path": "src/cli/command-registry.mjs", "reason": "help text naming the tiers a persona is looked up in; no directory is read" },
+        { "path": "packages/execution/rust/src/agents.rs", "reason": "the listing's judgement names the core tier folder in the masked answer; the host still reads the directories" }
       ],
       "debt": [],
+      "retiredBy": "S6a: the doctor row agent-type-names-unique moves to Rust and the Node listing is deleted",
       "reason": "one module knows the tier directories and their order"
     },
     {
