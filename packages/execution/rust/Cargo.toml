@@ -1,0 +1,15 @@
+[package]
+name = "fgos-execution"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+# Seat Binding stays the ranking authority; the bind and the agents listing (later phases) compose it.
+fgos-seat-binding = { path = "../../seat-binding/rust" }
+# The agents listing reads YAML documents through the one YAML door.
+fgos-yaml-doc = { path = "../../yaml-doc/rust" }
+serde = { workspace = true }
+# preserve_order: the declared order of executors and accounts is part of what the facts mean (the account
+# order is the order the lease tries them in).
+serde_json = { workspace = true, features = ["preserve_order"] }
