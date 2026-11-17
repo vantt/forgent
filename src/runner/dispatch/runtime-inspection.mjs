@@ -6,6 +6,7 @@ import { interpretRunResult } from './run-result.mjs';
 import { assignmentDir, listAssignmentRuns } from './assignment-layout.mjs';
 import { attemptLockState } from './visibility-session.mjs';
 import { outcomeOfRunResult } from '../execution/unit-run-history.mjs';
+import { ERROR_OUTCOMES } from '../execution/outcome.mjs';
 
 const INSPECTION_STATUSES = new Set(['resolved', 'partial', 'ambiguous', 'conflicting', 'not-found']);
 const json = (file) => { try { return JSON.parse(fs.readFileSync(file, 'utf8')); } catch { return null; } };
@@ -264,40 +265,43 @@ export function inspectDispatchRuntime(root, options = {}, { now = () => new Dat
   const ownershipComplete = found.every((l) => owner(l, root, all).complete), complete = evidenceComplete && !malformed && ownershipComplete, hint = complete && active.length === 1 && !conflict ? authority(active[0], root, all) : null, status = conflict ? 'conflicting' : complete ? 'resolved' : 'partial';
   return { inspectionStatus: status, subject: { kind: 'cwd', id: identity.path, locations: found.map(project) }, observations: [{ kind: 'cwd-aggregate', source: 'workspace-evidence', level: complete && !conflict ? 'correlated' : 'partial', value: aggregate }], runObservation: null, runResult: null, ...(hint ? { recoveryAuthority: hint } : {}), reconciliation: { state: conflict || !complete ? 'manual-required' : 'not-needed', reason: conflict ? 'Workspace guard/projection or concurrency facts conflict.' : !complete ? 'Workspace guard/projection evidence or Run materialization is incomplete or corrupt.' : 'Inspection is read-only and does not repair guards.' }, links: { assignmentIds: uniq(found.map((l) => l.assignmentId)), coordinationIds: [], runIds: found.map((l) => l.run.runId) } };
 }
-const ATTENTION_KINDS = Object.freeze(['failed', 'blocked', 'refused', 'needs-human', 'past-deadline', 'idle']);
-const DATE_BOUND = /^\d{4}-\d{2}-\d{2}(?:[T ].*)?$/;
-
-/** The instant (UTC ms) an `--attention --since` bound names: RFC 3339 or a bare `YYYY-MM-DD` (midnight UTC). */
-export function parseAttentionSince(since) {
-  const raw = typeof since === 'string' ? since.trim() : '';
-  const ms = DATE_BOUND.test(raw) ? Date.parse(raw) : NaN;
-  if (!Number.isFinite(ms)) throw new Error('dispatch inspect --attention requires --since <RFC 3339 time or YYYY-MM-DD>');
-  return ms;
-}
+const ATTENTION_KINDS = Object.freeze(['failed', 'blocked', 'refused', 'needs-human', 'past-deadline', 'controller-dead', 'idle']);
+const DATE_ONLY = /^(\d{4})-(\d{2})-(\d{2})$/;
+const DATE_TIME = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.\d+)?(Z|[+-](\d{2}):(\d{2}))$/;
 
 /**
- * The root whose `.fgos` holds the runs of every worktree of the project: a linked worktree shares the main
- * checkout's store, so its git common dir (`<main>/.git`) names it. Anything else is its own root.
+ * The instant (UTC ms) an `--attention --since` bound names: a bare `YYYY-MM-DD` (midnight UTC), or a full date-time
+ * with `Z` or `±hh:mm`. Every field must survive a round trip through the calendar, so `2026-02-30` is refused, not
+ * rolled over into March, and a time with no offset is refused rather than read in the local zone.
  */
-export function projectStoreRoot(root) {
-  const { root: checkout, commonDir } = workspace(root);
-  return commonDir && path.basename(commonDir) === '.git' ? path.dirname(commonDir) : checkout;
+export function parseAttentionSince(since) {
+  const raw = typeof since === 'string' ? since : '';
+  const m = DATE_ONLY.exec(raw) ?? DATE_TIME.exec(raw);
+  const [y, mo, d, h = 0, mi = 0, sec = 0] = m ? m.slice(1, 7).map((v) => (v === undefined ? 0 : Number(v))) : [];
+  const fields = m ? new Date(Date.UTC(y, mo - 1, d, h, mi, sec)) : null;
+  const offsetOk = !m?.[8] || (Number(m[8]) <= 23 && Number(m[9]) <= 59);
+  const roundTrips = fields && y >= 1000 && fields.getUTCFullYear() === y && fields.getUTCMonth() === mo - 1 && fields.getUTCDate() === d
+    && fields.getUTCHours() === h && fields.getUTCMinutes() === mi && fields.getUTCSeconds() === sec;
+  const ms = roundTrips && offsetOk ? Date.parse(raw) : NaN;
+  if (!Number.isFinite(ms)) throw new Error('dispatch inspect --attention requires --since <YYYY-MM-DD, or a date-time with Z or ±hh:mm>');
+  return ms;
 }
 
 const toMs = (value) => { const ms = typeof value === 'string' ? Date.parse(value) : NaN; return Number.isFinite(ms) ? ms : null; };
 const seatGroup = (assignmentId) => String(assignmentId ?? '').replace(/-fb\d+(?=\/|$)/, '');
 
-// The row a settled run earns, or null when it passed. Early ends name themselves in the receipt reason.
+// The row a settled attempt earns, or null. Only an attempt that ended in error alerts (the outcome module's
+// ERROR_OUTCOMES); `pass` and `findings` are verdicts, and findings belong to the unit's outcome, not to a row of
+// the attempt. Early ends name themselves in the receipt reason.
 function settledAttention(l, terminal) {
   const outcome = outcomeOfRunResult(terminal.value);
-  if (outcome === 'pass') return null;
+  if (!ERROR_OUTCOMES.includes(outcome)) return null;
   const receiptReason = String(json(path.join(l.runDir, 'receipt.json'))?.reason ?? '');
   const failure = terminal.value?.classification?.failure?.code;
   const named = failure ? ` (${failure})` : '';
   if (/^terminal:needs-/.test(receiptReason)) return { kind: 'needs-human', reason: `the run stopped for a person: ${receiptReason}` };
   if (outcome === 'blocked' || outcome === 'provider-limit' || /^terminal:blocked/.test(receiptReason)) return { kind: 'blocked', reason: `blocked${receiptReason ? `: ${receiptReason}` : named || ` (${outcome})`}` };
   if (outcome === 'policy-refusal') return { kind: 'refused', reason: `refused by policy${named}` };
-  if (outcome === 'findings') return { kind: 'failed', reason: 'the run settled with findings' };
   return { kind: 'failed', reason: `the run failed${named}` };
 }
 
@@ -307,8 +311,12 @@ function settledAttention(l, terminal) {
  * its idle clock in memory and writes no readable record of the last real screen activity, and a file time
  * is not that (the run supervisor spec, "Idle in a pane").
  *
- * `view(runDir)` is the caller's read of the attempt's unit state (`{ unitState, resumeCommand }`), injected
- * so this module stays below the verbs.
+ * A run with no result is judged by its attempt lock. Held and past its declared timeout: `past-deadline`, timed at
+ * the observation, since it is late now however long ago it started. Not held: `controller-dead`, unless a resume
+ * already replaced the attempt or its unit settled.
+ *
+ * `view(runDir)` is the caller's read of the attempt's unit state (`{ attemptState, unitState, resumeCommand }`),
+ * injected so this module stays below the verbs.
  *
  * @returns {{contract:{id:string,version:number}, since:string, observedAt:string, rows:object[], idle:{state:string,reason:string}, lines:string[]}}
  */
@@ -324,17 +332,25 @@ export function attentionView(root, { since }, { now = () => new Date().toISOStr
   const rows = [];
   for (const { l, terminal } of settled) {
     const startedMs = toMs(l.run.startedAt);
-    let found = null, atMs = startedMs;
+    let found = null, atMs = startedMs, attempt = null;
     if (terminal.present) {
       atMs = settledAtMs(l, terminal) ?? startedMs;
       found = terminal.corrupt ? { kind: 'failed', reason: 'the run result is unreadable' } : settledAttention(l, terminal);
       if (found && !terminal.corrupt && recovered(l, atMs ?? 0)) found = null;
-    } else if (startedMs !== null && Number.isFinite(l.run.timeoutMs) && attemptLockState(l.runDir) === 'held' && nowMs - startedMs > l.run.timeoutMs) {
-      found = { kind: 'past-deadline', reason: `still running ${Math.round((nowMs - startedMs) / 1000)}s after its declared timeout of ${Math.round(l.run.timeoutMs / 1000)}s (from the run record, not the supervisor's clock)` };
+    } else if (l.run.settlement !== 'abandoned-legacy') {
+      const lock = attemptLockState(l.runDir);
+      if (lock === 'held' && startedMs !== null && Number.isFinite(l.run.timeoutMs) && nowMs - startedMs > l.run.timeoutMs) {
+        found = { kind: 'past-deadline', reason: `still running ${Math.round((nowMs - startedMs) / 1000)}s after its declared timeout of ${Math.round(l.run.timeoutMs / 1000)}s (from the run record, not the supervisor's clock)` };
+        atMs = nowMs;
+      } else if (lock === 'free' && atMs !== null && atMs >= sinceMs) {
+        attempt = view(l.runDir) ?? {};
+        const goneOn = attempt.attemptState === 'superseded' || attempt.unitState === 'completed' || attempt.unitState === 'failed';
+        if (!goneOn) found = { kind: 'controller-dead', reason: 'no result and nobody holds the attempt lock: its controller died' };
+      }
     }
     if (!found || atMs === null || atMs < sinceMs) continue;
-    const attempt = view(l.runDir) ?? {};
-    const live = !terminal.present;
+    attempt ??= view(l.runDir) ?? {};
+    const live = found.kind === 'past-deadline';
     const nextCommand = attempt.resumeCommand ?? (live ? `fgos dispatch watch ${l.run.runId}` : `fgos dispatch inspect --run ${l.run.runId}`);
     const worktree = l.run.cwd ? workspace(l.run.cwd).root : null;
     rows.push({ runId: l.run.runId, assignmentId: l.assignmentId ?? null, worktree, kind: found.kind, reason: found.reason, nextCommand, line: `${found.kind} ${l.run.runId} ${worktree ?? '-'} ${found.reason} -> ${nextCommand}`, atMs });

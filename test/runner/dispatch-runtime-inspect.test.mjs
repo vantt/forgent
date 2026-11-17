@@ -6,6 +6,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { execFileSync } from 'node:child_process';
 import {
   inspectDispatchRuntime,
   attentionView,
@@ -291,26 +292,30 @@ function attentionFixture() {
   add('u/seat/1', 'r-first', one, '2026-11-17T08:00:00.000Z', settledAt('r-first', 'u/seat/1', 'failed', '2026-11-17T08:10:00.000Z'));
   add('u/seat/1-fb1', 'r-fallback', one, '2026-11-17T08:11:00.000Z', settledAt('r-fallback', 'u/seat/1-fb1', 'done', '2026-11-17T08:12:00.000Z'));
   add('a-old', 'r-old', two, '2026-11-10T08:00:00.000Z', settledAt('r-old', 'a-old', 'failed', '2026-11-10T08:05:00.000Z'));
-  // Live and not past its timeout: no row, and not read as live either without a held attempt lock.
+  // A round that ended with findings and the next round that passed: findings belong to the unit's outcome, no row.
+  const findings = { ...classified('r-find', 'u2/producer/1', 'failed', 'reported', { assessment: { verdict: 'findings' } }), agentClaim: { summary: 'two broken links' }, settledAt: '2026-11-17T08:13:00.000Z' };
+  add('u2/producer/1', 'r-find', one, '2026-11-17T08:12:00.000Z', findings);
+  add('u2/producer/2', 'r-find-fixed', one, '2026-11-17T08:14:00.000Z', settledAt('r-find-fixed', 'u2/producer/2', 'done', '2026-11-17T08:15:00.000Z'));
+  // No result and nobody holds its attempt lock: its controller died.
   add('a-live', 'r-live', one, '2026-11-17T08:00:00.000Z', null, { timeoutMs: 3600000, status: 'running' });
   return { root, one, two };
 }
 const NOW = () => '2026-11-17T10:00:00.000Z';
 const kinds = (got) => Object.fromEntries(got.rows.map((r) => [r.runId, r.kind]));
 
-test('attention lists failed, blocked, refused and needs-human runs of every worktree with a reason and a next command', () => {
+test('attention lists failed, blocked, refused, needs-human and controller-dead runs of every worktree with a reason and a next command', () => {
   const { root, one, two } = attentionFixture();
   const got = attentionView(root, { since: '2026-11-17' }, { now: NOW });
-  assert.deepEqual(kinds(got), { 'r-fail': 'failed', 'r-block': 'blocked', 'r-refuse': 'refused', 'r-human': 'needs-human' });
+  assert.deepEqual(kinds(got), { 'r-fail': 'failed', 'r-block': 'blocked', 'r-refuse': 'refused', 'r-human': 'needs-human', 'r-live': 'controller-dead' });
   assert.deepEqual([...new Set(got.rows.map((r) => r.worktree))].sort(), [fs.realpathSync(one), fs.realpathSync(two)].sort());
   for (const row of got.rows) { assert.ok(row.reason.length > 0); assert.equal(row.nextCommand, `fgos dispatch inspect --run ${row.runId}`); assert.equal(row.line, `${row.kind} ${row.runId} ${row.worktree} ${row.reason} -> ${row.nextCommand}`); }
   assert.deepEqual(got.lines, got.rows.map((r) => r.line));
   assert.equal(got.contract.id, 'attention-view');
 });
-test('attention leaves out a settled pass, a failure a later fallback passed, and runs older than since (date-only bound included)', () => {
+test('attention leaves out a settled pass, a failure a later fallback passed, a round that ended with findings, and runs older than since (date-only bound included)', () => {
   const { root } = attentionFixture();
   const got = attentionView(root, { since: '2026-11-17' }, { now: NOW });
-  for (const absent of ['r-pass', 'r-first', 'r-fallback', 'r-old', 'r-live']) assert.equal(kinds(got)[absent], undefined, absent);
+  for (const absent of ['r-pass', 'r-first', 'r-fallback', 'r-find', 'r-find-fixed', 'r-old']) assert.equal(kinds(got)[absent], undefined, absent);
   assert.equal(kinds(attentionView(root, { since: '2026-11-01T00:00:00Z' }, { now: NOW }))['r-old'], 'failed');
   assert.equal(kinds(attentionView(root, { since: '2026-11-17T08:07:00.000Z' }, { now: NOW }))['r-block'], undefined);
 });
@@ -320,13 +325,23 @@ test('attention takes the next command from the unit view', () => {
   assert.equal(got.rows.find((r) => r.runId === 'r-fail').nextCommand, 'fgos run --resume unit-x');
   assert.equal(got.idle.state, 'not-readable');
 });
+test('attention names an attempt whose controller died with its resume command, and drops it once a resume replaced it or its unit settled', () => {
+  const { root } = attentionFixture();
+  const awaiting = attentionView(root, { since: '2026-11-17' }, { now: NOW, view: (runDir) => (runDir.includes('a-live') ? { attemptState: 'unprobed', unitState: 'awaiting-resume', resumeCommand: 'fgos run --resume unit-y' } : {}) });
+  const row = awaiting.rows.find((r) => r.runId === 'r-live');
+  assert.equal(row.kind, 'controller-dead');
+  assert.match(row.reason, /controller died/);
+  assert.equal(row.nextCommand, 'fgos run --resume unit-y');
+  for (const gone of [{ attemptState: 'superseded' }, { unitState: 'completed' }, { unitState: 'failed' }]) {
+    assert.equal(kinds(attentionView(root, { since: '2026-11-17' }, { now: NOW, view: () => gone }))['r-live'], undefined, JSON.stringify(gone));
+  }
+});
 test('attention names a live run past its declared timeout only while its supervisor holds the attempt lock', () => {
   const { root, one } = attentionFixture();
   const attempt = path.join(root, '.fgos', 'assignments', 'a-live', 'runs', '01');
-  assert.equal(attentionView(root, { since: '2026-11-17' }, { now: NOW }).rows.some((r) => r.runId === 'r-live'), false, 'an hour of 2h is not yet late, and nobody holds the lock');
   const late = fs.readFileSync(path.join(attempt, 'run.json'), 'utf8').replace('3600000', '60000');
   fs.writeFileSync(path.join(attempt, 'run.json'), late);
-  assert.equal(attentionView(root, { since: '2026-11-17' }, { now: NOW }).rows.some((r) => r.runId === 'r-live'), false, 'no held lock: not a live run');
+  assert.equal(kinds(attentionView(root, { since: '2026-11-17' }, { now: NOW }))['r-live'], 'controller-dead', 'no held lock: not a live run');
   const held = acquireSync(createLockScope('test-supervisor'), 'attempt', { runDir: path.join(root, '.fgos', 'assignments', 'a-live'), NN: '01' });
   assert.equal(held.result, 'acquired');
   try {
@@ -335,28 +350,34 @@ test('attention names a live run past its declared timeout only while its superv
     assert.match(row.reason, /declared timeout of 60s/);
     assert.equal(row.nextCommand, 'fgos dispatch watch r-live');
     assert.equal(row.worktree, fs.realpathSync(one));
+    // Late now, though it started before the bound: a live row is timed at the observation.
+    assert.equal(kinds(attentionView(root, { since: '2026-11-17T09:00:00Z' }, { now: NOW }))['r-live'], 'past-deadline');
+    fs.writeFileSync(path.join(attempt, 'run.json'), late.replace('60000', '86400000'));
+    assert.equal(kinds(attentionView(root, { since: '2026-11-17' }, { now: NOW }))['r-live'], undefined, 'held and within its timeout: no row');
   } finally { held.handle.release(); }
 });
 test('attention requires since and refuses another selector beside it', () => {
   assert.throws(() => validateInspectionSelector({ attention: true }), /--since/);
-  assert.throws(() => validateInspectionSelector({ attention: true, since: 'yesterday' }), /--since/);
+  for (const refused of ['yesterday', '2026-11-17T08:00', '2026-02-30', '2026-11-17 Z']) assert.throws(() => validateInspectionSelector({ attention: true, since: refused }), /--since/, refused);
+  assert.doesNotThrow(() => validateInspectionSelector({ attention: true, since: '2026-11-17T08:00:00+07:00' }));
   assert.throws(() => validateInspectionSelector({ attention: true, since: '2026-11-17', run: 'r' }), /exactly one selector/);
   assert.throws(() => validateInspectionSelector({ run: 'r', since: '2026-11-17' }), /belongs to --attention/);
   assert.deepEqual(validateInspectionSelector({ attention: true, since: '2026-11-17' }), { kind: 'attention', id: '2026-11-17' });
 });
 test('attention through the use case reads the shared store from a linked worktree and writes nothing', () => {
   const { root } = attentionFixture();
-  const main = path.join(root, 'main'); fs.mkdirSync(path.join(main, '.git'), { recursive: true });
+  const main = path.join(root, 'main'), linked = path.join(root, 'linked');
+  const git = (cwd, ...args) => execFileSync('git', ['-c', 'user.name=t', '-c', 'user.email=t@example.invalid', ...args], { cwd, stdio: 'pipe' });
+  fs.mkdirSync(main); git(main, 'init', '-q'); git(main, 'commit', '-q', '--allow-empty', '-m', 'init'); git(main, 'worktree', 'add', '-q', linked);
   fs.renameSync(path.join(root, '.fgos'), path.join(main, '.fgos'));
-  const linked = path.join(root, 'linked'); fs.mkdirSync(linked); fs.mkdirSync(path.join(main, '.git', 'worktrees', 'linked'), { recursive: true });
-  fs.writeFileSync(path.join(main, '.git', 'worktrees', 'linked', 'commondir'), '../..');
-  fs.writeFileSync(path.join(linked, '.git'), `gitdir: ${path.join(main, '.git', 'worktrees', 'linked')}\n`);
   const terminalControl = { capabilities: () => ({ defaults: { allocationGraceMs: 60000 } }), reconcileScan: () => ({ result: 'scan', findings: [] }) };
   const listing = () => { const out = []; const walk = (d) => { for (const e of fs.readdirSync(d, { withFileTypes: true })) { const f = path.join(d, e.name); if (e.isDirectory()) walk(f); else out.push(`${f}:${fs.statSync(f).mtimeMs}:${fs.statSync(f).size}`); } }; walk(path.join(main, '.fgos')); return out.sort(); };
   const before = listing();
   const got = inspectDispatchUseCase({ repoRoot: linked }, { attention: true, since: '2026-11-17', terminalControl, globalConfigPath: path.join(root, 'no-global-config.json') });
-  assert.deepEqual(Object.keys(kinds(got)).sort(), ['r-block', 'r-fail', 'r-human', 'r-refuse']);
+  assert.deepEqual(Object.keys(kinds(got)).sort(), ['r-block', 'r-fail', 'r-human', 'r-live', 'r-refuse']);
   assert.match(got.terminal.state, /^(scanned|not-scanned)$/); // the scan itself is owned by the terminal-control client test
   assert.deepEqual(listing(), before);
   assert.throws(() => inspectDispatchUseCase({ repoRoot: linked }, { attention: true, terminalControl }), /--since/);
+  assert.throws(() => inspectDispatchUseCase({ repoRoot: linked }, { attention: true, since: '2026-11-17', terminal: true, terminalControl }), /--attention cannot be combined with --terminal/);
+  assert.throws(() => inspectDispatchUseCase({ repoRoot: linked }, { attention: true, since: '2026-11-17', providerCapacity: true }), /--attention cannot be combined with --provider-capacity/);
 });
