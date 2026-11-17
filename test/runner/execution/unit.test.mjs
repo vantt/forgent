@@ -64,7 +64,6 @@ test('validateUnit: G2 check rejects disallowed execution mechanics fields', () 
     'executor',
     'provider',
     'model',
-    'tier',
     'invocation',
     'actors',
     'overrides',
@@ -274,8 +273,15 @@ test('validateUnit: persona is a non-empty string and is kept', () => {
 test('validateUnit: the G2 message names the mechanics a unit still may not pin', () => {
   assert.throws(
     () => validateUnit({ id: 'u1', objective: 'obj', capability: 'verb', executor: 'codex' }),
-    (err) => /executor, provider, model, tier, invocation, actors, overrides\)/.test(err.message) && !/prefer/.test(err.message),
+    (err) => /executor, provider, model, invocation, actors, overrides\)/.test(err.message) && !/prefer/.test(err.message),
   );
+});
+
+test('validateUnit: a tier is one of the ladder tiers and survives validation', () => {
+  const base = { id: 'u-tier', objective: 'obj', capability: 'verb' };
+  assert.equal(validateUnit({ ...base, tier: 'flagship' }).tier, 'flagship');
+  assert.equal('tier' in validateUnit(base), false);
+  assert.throws(() => validateUnit({ ...base, tier: 'huge' }), (err) => err instanceof RunnerConfigError && /unit\.tier/.test(err.message));
 });
 
 test('validateUnit: verify is a non-empty command string and survives validation', () => {

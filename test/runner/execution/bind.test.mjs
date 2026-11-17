@@ -242,6 +242,17 @@ test('the bind ask holds a seat to the executor of a seat bound earlier that mus
   assert.equal(bind(ask, { runnerConfig: onlyCodex, session: {} }).refused?.reason, 'independence-unsatisfiable');
 });
 
+test('a reviewed unit that declares a tier binds its producer and checker seats at it, naming the unit as the source', () => {
+  const runnerConfig = createMockRunnerConfig();
+  const unit = { id: 'review-it', capability: 'docs:write', writes: [], tier: 'flagship' };
+  const ledger = createSeatLedger();
+  for (const seat of [{ ...CHECKER, seat: 'red-team' }, { seat: 'producer', role: 'producer', posture: CHECKER.posture }]) {
+    const bound = bind(askFor({ seat, unit }, ledger, { workflowId: 'wf' }), { runnerConfig, session: {} });
+    assert.equal(bound.tier, 'flagship', seat.seat);
+    assert.equal(bound.provenance.tier.source, 'workflow:wf/review-it', seat.seat);
+  }
+});
+
 test('bind: governance rejects disallowed provider', () => {
   const runnerConfig = createMockRunnerConfig();
   runnerConfig.governance = {

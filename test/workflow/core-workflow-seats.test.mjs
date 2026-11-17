@@ -127,6 +127,17 @@ test('a units file may declare seats but never a seat tier', () => {
   );
 });
 
+test('a unit tier is checked against the ladder in a registered definition and refused by name in a units file', () => {
+  const unitWith = (tier) => ({ id: 'x', title: 'x', steps: [{ id: 's', title: 's', units: [{ id: 'u', template: { capability: 'a:b', objective: 'x', tier } }] }] });
+  assert.equal(validateWorkflowChecked(unitWith('flagship')).steps[0].units[0].template.tier, 'flagship');
+  assert.throws(() => validateWorkflowChecked(unitWith('huge')), /tier "huge"/);
+  assert.throws(() => validateWorkflowChecked(unitWith('flagship'), { source: 'units-file' }), /cannot carry tier/);
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-units-tier-'));
+  const file = path.join(root, 'units.json');
+  fs.writeFileSync(file, JSON.stringify({ units: [{ id: 'u1', capability: 'fixture:x', objective: 'Do it', tier: 'frontier' }] }));
+  assert.throws(() => translateUnitsToWorkflow(file), /cannot carry tier/);
+});
+
 test('a workflow definition refuses prefer, executor and overrides on a seat', () => {
   const base = { id: 'x', title: 'x', steps: [{ id: 's', title: 's', units: [{ id: 'u', template: { capability: 'a:b', objective: 'x', pattern: 'panel', seats: [] } }] }] };
   for (const key of ['prefer', 'executor', 'overrides']) {

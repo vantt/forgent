@@ -40,6 +40,15 @@ test('infrastructure fields are refused on the workflow, a step, a unit, its tem
   refuses(step({ operations: [{ id: 'o', policy: { overrides: 'x' } }] }), /operations\[0\]\.policy contains disallowed infrastructure field "overrides"/);
 });
 
+test('a registered definition may give a unit a tier; its step and its workflow may not', () => {
+  const wf = (unit, extra = {}) => ({ id: 'wf', ...extra, steps: [{ id: 's', ...(extra.stepTier ? { tier: 'x' } : {}), units: [unit] }] });
+  const nested = validateWorkflow(wf({ template: { capability: 'c', tier: 'flagship' } }));
+  assert.equal(nested.steps[0].units[0].template.tier, 'flagship');
+  const flat = validateWorkflow(wf({ capability: 'c', tier: 'flagship' }));
+  assert.equal(flat.steps[0].units[0].template.tier, 'flagship');
+  refuses(wf({ capability: 'c' }, { stepTier: true }), /steps\[0\] \(id: "s"\) contains disallowed infrastructure field "tier"/);
+});
+
 test('only a units file may give a unit template a soft prefer', () => {
   const raw = { id: 'wf', steps: [{ id: 's', units: [{ template: { capability: 'c', prefer: { executor: 'e' } } }] }] };
   refuses(raw, /template contains disallowed infrastructure field "prefer"/);
