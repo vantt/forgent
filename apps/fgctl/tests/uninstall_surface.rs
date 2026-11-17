@@ -61,24 +61,38 @@ impl World {
             "{}\n",
         )
         .unwrap();
-        let shim = project
-            .join(".fgos")
-            .join("installation")
-            .join("bin")
-            .join("fgos");
+        let bin = project.join(".fgos").join("installation").join("bin");
         let log = home.join("shim-calls.log");
-        std::fs::write(
-            &shim,
-            format!(
-                "#!/bin/sh\necho \"$@\" >> '{}'\ncat <<'EOF'\n{answer}\nEOF\nexit {exit}\n",
-                log.display()
-            ),
-        )
-        .unwrap();
         #[cfg(unix)]
         {
             use std::os::unix::fs::PermissionsExt;
+            let shim = bin.join("fgos");
+            std::fs::write(
+                &shim,
+                format!(
+                    "#!/bin/sh\necho \"$@\" >> '{}'\ncat <<'EOF'\n{answer}\nEOF\nexit {exit}\n",
+                    log.display()
+                ),
+            )
+            .unwrap();
             std::fs::set_permissions(&shim, std::fs::Permissions::from_mode(0o755)).unwrap();
+        }
+        // The Windows launcher of a project is `fgos.cmd`; the stand-in logs its arguments and prints the answer.
+        #[cfg(windows)]
+        {
+            let answer_file = home.join("shim-answer.json");
+            std::fs::write(&answer_file, answer).unwrap();
+            // cmd.exe does not read the `\\?\` form `canonicalize` returns.
+            let plain = |path: &Path| path.display().to_string().replacen(r"\\?\", "", 1);
+            std::fs::write(
+                bin.join("fgos.cmd"),
+                format!(
+                    "@echo off\r\necho %*>>\"{}\"\r\ntype \"{}\"\r\nexit /b {exit}\r\n",
+                    plain(&log),
+                    plain(&answer_file)
+                ),
+            )
+            .unwrap();
         }
         let state = home.join("state").join("fgos");
         let release = state
