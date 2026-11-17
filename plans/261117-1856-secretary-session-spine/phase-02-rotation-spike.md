@@ -5,7 +5,7 @@ of phase 8 and confirms the executor shape of phase 14.
 
 ## Inputs (read first)
 - `plans/reports/research-261117-1624-handoff-skills-research.md` §4a, §4b, "Limitations / unverified".
-- `docs/discussions/secretary-miu/DISCUSSION.md` SM-D2, SM-D13.
+- `docs/history/secretary-miu/DISCUSSION.md` SM-D2, SM-D13.
 - Claude Code docs for hooks and statusline (https://code.claude.com/docs/en/hooks, /statusline): fields
   `context_window.used_percentage`, `context_window_size`, Stop input fields, SessionStart `source`.
 - `.claude/settings.json` (current `statusLine` is the user's AgentKit script under another path; do not edit it).
@@ -26,6 +26,8 @@ of phase 8 and confirms the executor shape of phase 14.
 3. `/clear` via Terminal Control: in a pane allocated through the route (never raw `herdr pane send-text`), send `/clear`
    followed by Enter when the session is idle; record whether SessionStart fires with `source=clear` and whether
    `additionalContext` (under 10,000 chars) reaches the new conversation.
+3b. At rest: record whether the Stop payload says anything about in-process background tasks (phase 8's at-rest rule
+   assumes it); if not, name the fact the hook can use instead. <!-- Updated: Validation Session 1 -->
 4. Window size: record `context_window_size` for the models bind() picks at tier `standard` here, and whether any
    transcript field names it.
 5. Write the report: for each mechanic `works | does not work | flaky (n of 10)`, the evidence, and the decision rule

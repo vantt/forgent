@@ -1,6 +1,10 @@
 # Phase 15: Head verb binding — start and rotate
 
 Owner answer 2026-11-17: the verb is **`fgos head`** (a new noun; the existing `fgos session` worktree verb is untouched).
+The name is provisional: backlog `p-g2iprtzptz` will merge or retire the old `fgos session` and rename this verb to
+`fgos session` with no alias. Keep the literal in as few places as possible (spec verb section, registry entry, one
+line per phase 16 skill, CHANGELOG marked provisional). Identity's `head:` role and `FGOS_HEAD_ROLE` are Identity's word
+and do not follow that rename. <!-- Updated: Validation Session 1 -->
 Status `draft` until the ready plans `261117-1553` and `261117-1524` are `done` (shared command registry, manifest,
 `bin/fgos.mjs`, `test/cli/**`).
 

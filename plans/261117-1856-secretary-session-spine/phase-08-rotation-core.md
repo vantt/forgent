@@ -13,11 +13,14 @@ is a Node script) and only orchestrates Rust doors (durable file writes, secrets
 
 ## Files this phase may write
 `src/session-rotation/**` (except `rotate.mjs`, phase 14), `test/session-rotation/**` (except `rotate.test.mjs`),
-`core/config-standard/sessionRotation.yaml`, `core/config-schema/sessionRotation.schema.yaml`, `docs/architecture-manifest.json`.
+`core/config-standard/sessionRotation.yaml`, `core/config-schema/sessionRotation.schema.yaml`, `docs/architecture-manifest.json`,
+`packages/config/rust/src/bundle.rs` (the hand-kept section list, l.17-25, alphabetical) and
+`packages/config/contracts/fixtures/registry-defaults.v1.json` if it must list the section. <!-- Updated: Validation Session 1 -->
 
 ## Steps
 1. Config `sessionRotation`: `soft` 0.40, `hard` 0.70, `keep` 10, `windowTokens` (default from the spike), and
-   `personas.<name>.reload` (list of portfolio paths the successor rereads). Schema and standard file; project overrides
+   `personas.<name>.{soft,hard,reload}` (SM-D13: a persona may set its own thresholds; the global values are the
+   defaults; `reload` lists the portfolio paths the successor rereads). `decide.test.mjs` covers a persona override. Schema and standard file; project overrides
    per the vision doc (project wins over global). If registering a new area needs a file outside this footprint, stop.
 2. `measure.mjs`: context used as a fraction, from the source the spike chose (sidecar if fresh, else the transcript:
    last non-sidechain assistant entry, deduped by `message.id`, input + cache_creation + cache_read over the window).
@@ -36,7 +39,8 @@ appended layer entry, resolved by rebasing onto it if it lands first.
 
 ## Verify
 - `node --test test/session-rotation/*.test.mjs` passes; `node --test test/architecture.test.mjs` passes.
-- `node --test` the config schema/standard tests (`rg -l "config-standard" test | head`) pass.
+- `node --test` the config schema/standard tests (`rg -l "config-standard" test | head`) pass; `cargo test -p fgos-config`
+  (its `golden_schema` test fails when the bundle list and `core/config-*` disagree).
 
 ## Rollback
 `git revert` the phase commit.

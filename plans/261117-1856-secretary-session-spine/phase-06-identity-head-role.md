@@ -8,7 +8,8 @@
 - Identity tests: `packages/identity/rust/tests/`.
 
 ## Files this phase may write
-`packages/identity/**`, `packages/convention/contracts/convention.rules.v1.json`, `docs/platform/identity/**`.
+`packages/identity/**`, `packages/convention/contracts/convention.rules.v1.json`, `packages/convention/rust/tests/golden.rs`
+(if it enumerates identifier kinds), `docs/platform/identity/**`. <!-- Updated: Validation Session 1 -->
 
 ## Steps
 1. Add role kind `head:` whose name is `<persona>-<name>` (persona: an agent-definition name; name: `[a-z0-9-]{1,32}`),
@@ -17,7 +18,7 @@
    session claiming the same `head:` role is refused the same way a duplicate `lead:` role is (read how `lead:` behaves
    first and match it; do not invent a new rule).
 3. One owning test in the identity crate's tests ("a head role names a persona and a session name, and only one live
-   session holds it"). Spec: one line in the role section and one decision-history entry.
+   session holds it; `--take` moves it to the caller", the move rotation relies on). Spec: one line in the role section and one decision-history entry.
 
 ## Verify
 - `cargo test -p fgos-identity -p fgos-convention`; clippy and aarch64-apple-darwin check.
