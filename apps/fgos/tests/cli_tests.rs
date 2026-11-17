@@ -3999,16 +3999,15 @@ fn after_a_fresh_init_the_git_journal_row_passes_and_no_git_fix_is_named() {
     let first = world.data(&world.init(&path, &["--json"]));
     assert!(first.get("gitWalWarning").is_none(), "{first}");
 
-    let output = Command::new(fgos_bin())
-        .args(["doctor", "--json"])
-        .current_dir(&world.project)
-        .env("PATH", &path)
-        .env("HOME", &world.home)
-        .env("FGOS_STATE_ROOT", &world.state)
-        .env("FGOS_ACTIVE_RELEASE_PATH", repo_root())
-        .env("FGOS_ACTIVE_MANIFEST_PATH", ensure_dev_manifest())
-        .output()
-        .expect("failed to execute fgos");
+    let output = doctor_in(
+        &world.project,
+        &path,
+        &["--json"],
+        &[
+            ("HOME", world.home.to_str().unwrap()),
+            ("FGOS_STATE_ROOT", world.state.to_str().unwrap()),
+        ],
+    );
     let envelope: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
     let checks = envelope["data"]["checks"].as_array().unwrap();
     let journal = checks

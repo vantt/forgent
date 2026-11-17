@@ -320,9 +320,14 @@ fn repository_config(run: &Run, context: &Context, facts: &RepositoryFacts) -> R
 fn operation_journal(facts: &RepositoryFacts) -> RowResult {
     let journal = &facts.journal;
     let fence_missing = journal.initialized && !facts.activation_fence;
-    // No WAL and no fence: the fix that creates the WAL opens it, and opening it needs the fence, so the row's
-    // command is the one that places the fence, not `fgos doctor --fix`.
-    let unplaceable = !journal.initialized && !facts.activation_fence;
+    // Without the fence no `fgos` fix can help: opening a missing WAL needs it, and a WAL that exists refuses every
+    // write without it. Only an activation places it, so the row's command is `fgctl upgrade` for a project that has a
+    // WAL (it was activated once) and `fgctl init` for one that has none.
+    let activation_command = (!facts.activation_fence).then_some(if journal.initialized {
+        "fgctl upgrade"
+    } else {
+        "fgctl init"
+    });
     // Every WAL-writing door refuses without the controller's activation fence, so a WAL without it is a hard stop.
     let mut verdict = row(
         vec![
@@ -351,8 +356,8 @@ fn operation_journal(facts: &RepositoryFacts) -> RowResult {
         "the Git WAL is readable".to_owned(),
         json!({"journal": journal}),
     );
-    if unplaceable {
-        verdict.fix_command = Some("fgctl init".to_owned());
+    if let Some(command) = activation_command {
+        verdict.fix_command = Some(command.to_owned());
     }
     verdict
 }
@@ -794,6 +799,9 @@ mod tests {
             text.starts_with("git-fence-missing: ") && text.contains("fgctl upgrade"),
             "{text}"
         );
+        // A failing row's fix command is the report's `fix` and one entry of `next` (the engine owns that rule).
+        assert_eq!(row.level().as_str(), "fail");
+        assert_eq!(row.fix_command.as_deref(), Some("fgctl upgrade"));
     }
 
     #[test]
@@ -808,6 +816,8 @@ mod tests {
             text.contains("fgctl init") && !text.contains("git-wal-dir"),
             "{text}"
         );
+        assert_eq!(row.level().as_str(), "fail");
+        assert_eq!(row.fix_command.as_deref(), Some("fgctl init"));
     }
 
     #[test]

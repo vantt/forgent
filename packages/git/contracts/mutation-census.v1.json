@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "ea7ea9dc744fb46a7cecec14a2819a6569280313eed598f3d7e390bb6ad1f6d4",
+  "payloadDigest": "a8a3595529e1ccfd31b83666576e82ac16ab7a03e24f995e4f028746df3c5b0a",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "b8b886cee2ea5ce7ee1153e4795512db135a990de894c27e53c5e778b210be62",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -91,14 +91,14 @@
     "apps/fgos/src/legacy_exec.rs": "65dcba1272b6c8ec9680e17974893a1aa6a5603aba17d134d5000c1edd024292",
     "apps/fgos/src/main.rs": "7d60f87240a27091fe04373aa10be936156fbf6162167128ad09b0602dcf2f84",
     "apps/fgos/src/routing.rs": "3ca6e2b3260cb48e306c708cc84bf153a2934dfc0b243e053bfbd83a12b68af9",
-    "apps/fgos/src/wiring/doctor/bridge.rs": "50cf7c38b673649e424345456bcd6829f9325fd255fc3210960a8ebc0b173d7e",
+    "apps/fgos/src/wiring/doctor/bridge.rs": "1d6a672ff6d7ea89acd003b068bdee9342b63cb9216f8b76f9261f3c07e2d6ba",
     "apps/fgos/src/wiring/doctor/config.rs": "97a5d1653dccc89f3788232544fe4bbd640b91fb24c5f592fcce075862c91273",
     "apps/fgos/src/wiring/doctor/event_store.rs": "61c66e050710eb6ea4aa2f8cb4643bdf91f8cd63bb482f1674de4614edf46e34",
-    "apps/fgos/src/wiring/doctor/git.rs": "ef742f9e5133d35e19469f9349ccf9f0db5524da1d313ce7b9c5629071383c9c",
+    "apps/fgos/src/wiring/doctor/git.rs": "2d181c5aee1ae1d8fd5746a186d23020ab4b81ab898d5c0b687b737a5909c6a7",
     "apps/fgos/src/wiring/doctor/holder_lock.rs": "75b6efcf2c782e6508595d5049214226a5ffedefe73b3dc7f6ea018fd89bc232",
     "apps/fgos/src/wiring/doctor/identity.rs": "c77b8f84fb27f10717b264bb839e5c79dd2a817d51263779bb7d233db9469a55",
     "apps/fgos/src/wiring/doctor/mailbox.rs": "8de4fb5222d9cba45cf7a269e5bb18cb2cd804333c13316821d2ebde5c16219b",
-    "apps/fgos/src/wiring/doctor/mod.rs": "4b9d78bd95f48dbf107f243d42187db88b00e76456f1e50bbc27a3e080a21617",
+    "apps/fgos/src/wiring/doctor/mod.rs": "de02a45a0dca0837251bb5c2004271c7c2565867146fe811f505ac95959df90f",
     "apps/fgos/src/wiring/doctor/observe.rs": "277742f65ac2d3ac816d11c212b27ba0fffebd5e121dce4f8370154cd864e03e",
     "apps/fgos/src/wiring/doctor/packaging.rs": "ffb362bee742dd0885ac507f99102d4b099c30dd4625134cef4e499d2a6b32af",
     "apps/fgos/src/wiring/event_store_clone.rs": "923d718f7a6bd5705cbe6e4d4c8393672c1ef4a2142facc9ada314307a4d7574",
@@ -128,7 +128,7 @@
     "apps/fgos/src/wiring/session.rs": "f2569bef9f072e959f14673c2d2929e2b0b001540a4e147fd5e59082b2e64b43",
     "apps/fgos/src/wiring/uninstall.rs": "3a26ef78acee70ba6bae99ac15c10955809eecf62a5548df977de518ef77ccdd",
     "apps/fgos/src/wiring/wire_agents.rs": "a434308907a3e7d87c880ebf95a957e1342b77e83ebe1ee0272002335b7a248c",
-    "apps/fgos/tests/cli_tests.rs": "289ba4ed81eb36c265967ab06aa302a3152892e70000aa53aba8956498a3fbff",
+    "apps/fgos/tests/cli_tests.rs": "7d2a82de9fbd1658aa5b2094ca01cda661335d92bf644fa97200025ecfefc2c9",
     "apps/fgos/tests/internal_lock_routes.rs": "e8516f4876c8263b1baa1f997bcfbb01715e69d740aa508fd01a0d481fee309e",
     "apps/fgos/tests/mailbox_routes.rs": "fe4bb33069a6f6eb6f02b052e4581fcfc69ce37dcdfd146280f9c935c14511a6",
     "apps/fgos/tests/mailbox_sync_child.rs": "047e70662085d6f91fa786c9000eb494711f610d37cd63a24f29dc884116763d",
@@ -321,7 +321,7 @@
     "packages/distribution/rust/src/suggest.rs": "302d698667662b3544b0761cd53dd87c68594d6f1b1ce52d8b85032627d52182",
     "packages/distribution/rust/src/test_scratch.rs": "244cd414a2413dfa0bb1410e6206ea24844ea1860e825eae90072d2ea123fab7",
     "packages/distribution/rust/src/timer.rs": "d1a12b661c529be10aa7f62b978dbccc843fbf76947322d9b65df98fe0b2be43",
-    "packages/distribution/rust/src/uninstall.rs": "d2bf638358064f65ea2d92d6711fb4df9e9da35512eae01b2afd2285f09a8e45",
+    "packages/distribution/rust/src/uninstall.rs": "c239bf1249825db23867a8cb0b3af9c10d80b2c85f58ef3a6f9353500860b8f9",
     "packages/distribution/rust/src/verify.rs": "79a9f08e75d0c0ca8f5e04ad8443e4134a3dfbd85a38e01a448d53361463dc69",
     "packages/distribution/rust/src/workspace.rs": "ceb38606817fe7fe75d832d2c207e1b544cef3a2105acfb8892d2e1c25985fab",
     "packages/distribution/rust/tests/activation_lock_multiprocess.rs": "ff2818dd10b745ac29c1610effd95ac36552f4aace4525634c6b20f17f325fe0",
@@ -1800,7 +1800,7 @@
     },
     {
       "path": "apps/fgos/src/wiring/doctor/bridge.rs",
-      "line": 416,
+      "line": 433,
       "spawn": "Command::new",
       "binary": "sh",
       "class": "rust-test"
@@ -1827,7 +1827,7 @@
     },
     {
       "path": "apps/fgos/src/wiring/doctor/mod.rs",
-      "line": 625,
+      "line": 637,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"
@@ -2269,13 +2269,6 @@
     {
       "path": "apps/fgos/tests/cli_tests.rs",
       "line": 3911,
-      "spawn": "Command::new",
-      "binary": "? bin",
-      "class": "rust-test"
-    },
-    {
-      "path": "apps/fgos/tests/cli_tests.rs",
-      "line": 4002,
       "spawn": "Command::new",
       "binary": "? bin",
       "class": "rust-test"

@@ -404,7 +404,7 @@ Collisions), plus the planner's own checks (`fgos internal` namespace, `locks.rs
 | 22 | Two stamp forms (wrapper marker and assembled header); the render also reads the stamp | Medium | Accept: contract covers both; the row says "writer and reader" | 02 |
 | 23 | Q2 lacked harm for (b) and gain for (c); user-visible removals decided silently | Medium | Accept: Q2 completed; "Decided and reported" list with veto | Q2, V1-V4 |
 | 24 | D11 ignores `MailboxAnswer`; `provider.rs` missing; phase 03 invented a doctor "text render" | Medium | Accept | D11, D3, 03 |
-| 25 | `node-version-and-git` in Rust reports a spawned `node --version`, not the payload's `process.version` | Medium | Accept: marked volatile in parity; the message names the spawned Node | 00, 04 |
+| 25 | `node-version-and-git` in Rust must judge the payload's Node, not a Node of its own | Medium | Resolved at the close: the rows bridge's `end` line carries the `process.version` of the Node that ran the call and the row judges that against `requires.node` (a missing Node, or one that never ends its call, fails it); no `node --version` is spawned | 00, 04, 12 |
 | 26 | Ratchet the bridged row count per step | Medium | Reject: it would block a legitimate new WORK readiness row; the step label requirement and the exact-set test bound the bridge instead | - |
 
 Also accepted without a row: `runDoctor` ends at 312 (not 327); init exit codes at `command-registry.mjs:452-456`; the

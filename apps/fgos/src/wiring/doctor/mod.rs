@@ -457,6 +457,18 @@ mod tests {
         assert!(!passed);
         assert!(missing.starts_with("node is not available"), "{missing}");
         assert!(missing.ends_with("install Node 18 or newer"), "{missing}");
+        // A Node that started and never ended its call (it could not load the payload, exited non-zero or timed out)
+        // reported no version: the row fails and names the Node to install.
+        let (passed, failed) = text(with_node(
+            git_passes(),
+            NodeFact::Failed("it stopped before it finished (exit status: 3)".into()),
+        ));
+        assert!(!passed);
+        assert!(
+            failed.starts_with("node did not report its version (it stopped before it finished")
+                && failed.ends_with("install Node 18 or newer"),
+            "{failed}"
+        );
         // Nothing reported yet: the row judges Git alone, and a failing Git row stays as it was.
         assert_eq!(
             text(with_node(git_passes(), NodeFact::Unknown)),

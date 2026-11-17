@@ -128,6 +128,9 @@ pub enum NodeFact {
     Unknown,
     Version(String),
     Missing(String),
+    /// A Node started but never sent its `end` line (it exited non-zero, timed out, or could not load the payload,
+    /// as a Node older than the payload supports or a broken install does): its version is unknown.
+    Failed(String),
 }
 
 /// The Node floor a release that declares no `requires.node` is judged against.
@@ -154,6 +157,9 @@ impl NodeFact {
             NodeFact::Unknown => None,
             NodeFact::Missing(cause) => Some(Err(format!(
                 "node is not available ({cause}) \u{2014} install Node {wanted}"
+            ))),
+            NodeFact::Failed(cause) => Some(Err(format!(
+                "node did not report its version ({cause}); install Node {wanted}"
             ))),
             NodeFact::Version(printed) => Some(
                 fgos_distribution::init::node_version_satisfies(printed, requirement)
@@ -205,8 +211,13 @@ impl NodeBridge {
             .node
             .lock()
             .expect("the node fact is never held across a panic");
-        // The first thing a call showed stands: a version beats a later failure of another call.
-        if *node == NodeFact::Unknown {
+        // The first thing a call showed stands, except that a version replaces an earlier failed start: a Node that
+        // answered once is a Node that runs.
+        let replace = matches!(
+            (&*node, &fact),
+            (NodeFact::Unknown, _) | (NodeFact::Failed(_), NodeFact::Version(_))
+        );
+        if replace {
             *node = fact;
         }
     }
@@ -318,6 +329,12 @@ impl NodeBridge {
         } else {
             None
         };
+        if !ended {
+            // The child started and never finished: nothing it printed reports a Node that works.
+            if let Some(fault) = &fault {
+                self.remember_node(NodeFact::Failed(fault.message()));
+            }
+        }
         (lines, fault)
     }
 }
@@ -558,6 +575,28 @@ mod tests {
                 category: Some("lock-timeout".into())
             })
         );
+    }
+
+    #[test]
+    fn a_node_that_starts_and_never_ends_the_call_is_a_failed_fact_and_a_later_version_replaces_it()
+    {
+        let crashed = scripted(
+            "cat >/dev/null; echo 'cannot load the payload' >&2; exit 3",
+            Duration::from_secs(20),
+        );
+        assert_eq!(crashed.node_fact(), NodeFact::Unknown);
+        let _ = crashed.judge_rows(Path::new("/p"), &["a"]);
+        match crashed.node_fact() {
+            NodeFact::Failed(cause) => {
+                assert!(cause.contains("stopped before it finished"), "{cause}")
+            }
+            other => panic!("expected a failed fact, got {other:?}"),
+        }
+        crashed.remember_node(NodeFact::Version("v22.0.0".into()));
+        assert_eq!(crashed.node_fact(), NodeFact::Version("v22.0.0".into()));
+        // A version already seen is not displaced by a later failed call.
+        crashed.remember_node(NodeFact::Failed("later".into()));
+        assert_eq!(crashed.node_fact(), NodeFact::Version("v22.0.0".into()));
     }
 
     #[test]

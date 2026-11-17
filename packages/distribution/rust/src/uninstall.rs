@@ -128,13 +128,17 @@ fn comparable(path: &Path) -> Vec<String> {
         .collect()
 }
 
+/// The place `path` names: its canonical form, or the path as written when it does not resolve.
+fn resolved(path: &Path) -> PathBuf {
+    std::fs::canonicalize(path).unwrap_or_else(|_| path.to_path_buf())
+}
+
 /// Names what `path` is when it is a place no uninstall may act on as a whole: the filesystem root, the home
 /// directory, or a directory that contains the home directory. One answer for the state-root guard and for the
 /// project half of `fgos uninstall`.
 pub fn broad_root(path: &Path, home: Option<&Path>) -> Option<&'static str> {
     // Both sides are compared as the places they name: a home reached through a link (`/home` -> `/var/home`) is the
     // same directory as its target. A path that does not resolve is compared as written.
-    let resolved = |p: &Path| std::fs::canonicalize(p).unwrap_or_else(|_| p.to_path_buf());
     let path = resolved(path);
     if path.parent().is_none() {
         return Some("the filesystem root");
@@ -172,9 +176,10 @@ pub fn guard_store_root(
     if let Some(reason) = broad_root(root, home) {
         return refuse(&format!("the state root is {reason}"));
     }
-    let root_parts = comparable(root);
-    if home.is_some_and(|h| comparable(h).starts_with(&root_parts))
-        || comparable(workspace_root).starts_with(&root_parts)
+    // The ancestor check compares the places the paths name, as `broad_root` does.
+    let root_parts = comparable(&resolved(root));
+    if home.is_some_and(|h| comparable(&resolved(h)).starts_with(&root_parts))
+        || comparable(&resolved(workspace_root)).starts_with(&root_parts)
     {
         return refuse("the state root contains your home directory or this project");
     }
@@ -721,6 +726,25 @@ mod tests {
         );
         // A project under the home is no broad root, linked or not.
         assert_eq!(broad_root(&home.join("work"), Some(&linked_home)), None);
+        let _ = std::fs::remove_dir_all(&base);
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn a_state_root_that_is_a_link_to_a_directory_holding_the_home_or_the_project_is_refused() {
+        let base = std::fs::canonicalize(scratch("linked-store-root")).unwrap();
+        let home = base.join("people/me");
+        let project = base.join("people/me/work");
+        std::fs::create_dir_all(&project).unwrap();
+        let people_link = base.join("people-link");
+        std::os::unix::fs::symlink(base.join("people"), &people_link).unwrap();
+        assert!(guard_store_root(&people_link, Some(&home), &project).is_err());
+        // Linked or not, a state root that holds neither is fine.
+        let store = base.join("store");
+        std::fs::create_dir_all(&store).unwrap();
+        let store_link = base.join("store-link");
+        std::os::unix::fs::symlink(&store, &store_link).unwrap();
+        assert!(guard_store_root(&store_link, Some(&home), &project).is_ok());
         let _ = std::fs::remove_dir_all(&base);
     }
 
