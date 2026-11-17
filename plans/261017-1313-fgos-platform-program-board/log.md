@@ -1,3 +1,4 @@
+- 2026-11-17 17:03 OPC: MERGE fix/workflow-red-after-p15 faef894be (workflow-runner fixture's useDistinctFamilies restates runner.roles/personas via tasteServedBy; main red was the 03 taste move, not p15). OPC run 30/30. Suggested backlog: fixture guard that every prefer names a registered executor.
 - 2026-11-17 17:00 HARDEN: HOLD landings on main: CI 44054077975 (45ad5c4a0) red on 6 workflow seats/persona CLI tests (workflow start exits 4; workflow-runner-seats, workflow-store-ledger, workflow-runner-cli). COMMUNICATION fixing on fix/workflow-red-after-p15. The earlier main-red (fgos-config windows, fixtures) is fixed in 5a8d16894; nothing else red in that run.
 - 2026-11-17 16:16 HARDEN: IN-MAIN pathfold 8923097a3, S5 p01b ac39a1c64, S5 p15 45ad5c4a0
 - 2026-11-17 16:07 HARDEN: HOLD lifted: main-red fix in main 5a8d16894 (cfg(unix) migrate_options; fixtures follow the taste move). Landing trial/pathfold, S5 p01b, S5 p15 next.
