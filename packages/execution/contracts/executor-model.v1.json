@@ -1680,6 +1680,666 @@
    "fact": "validate",
    "runner": {"executors":{"claude":{"kind":"agent","providerModel":"claude","supports":{"reasoningEffort":["low","medium","high"]},"invocations":[{"id":"claude-cli","via":"cli","adapter":"cli-spawn","command":"claude"},{"id":"claude-cli-bwrap","via":"cli","adapter":"cli-spawn","command":"claude","credentialStore":{"use":"claude","homeEnv":"CLAUDE_CONFIG_DIR","sessionDir":"projects","files":[".credentials.json"]},"confinement":{"backend":"bwrap"}},{"id":"claude-herdr-bwrap","via":"cli","adapter":"herdr-spawn","command":"claude","credentialStore":{"use":"claude","homeEnv":"CLAUDE_CONFIG_DIR","sessionDir":"projects","files":[".credentials.json"]},"confinement":{"backend":"bwrap"}}]},"openai":{"kind":"agent","providerModel":"openai","invocations":[{"id":"codex-cli-bwrap","via":"cli","adapter":"cli-spawn","command":"codex","credentialStore":{"use":"codex","homeEnv":"CODEX_HOME"},"confinement":{"backend":"bwrap"}},{"id":"pi-herdr-bwrap","via":"cli","adapter":"herdr-spawn","command":"pi","credentialStore":{"use":"pi","homeEnv":"PI_CODING_AGENT_DIR","sessionDir":"sessions","files":["auth.json"]},"confinement":{"backend":"bwrap"}},{"id":"codex-herdr-bwrap","via":"cli","adapter":"herdr-spawn","command":"codex","credentialStore":{"use":"codex","homeEnv":"CODEX_HOME"},"confinement":{"backend":"bwrap"}},{"id":"pi-cli-bwrap","via":"cli","adapter":"cli-spawn","command":"pi","credentialStore":{"use":"pi","homeEnv":"PI_CODING_AGENT_DIR","sessionDir":"sessions","files":["auth.json"]},"confinement":{"backend":"bwrap"}}]}},"loops":{"reviewed":{"bounds":{"noSuchParam":{"min":1,"max":2}}}}},
    "expect": {"error":{"name":"RunnerConfigError","message":"runner config (vector runner loops.reviewed.bounds.noSuchParam) is not a parameter read by the \"reviewed\" loop."}}
+  },
+  {
+   "name": "validate: a retired placementPolicy key is refused with what replaced it",
+   "fact": "validate",
+   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude"}},"placementPolicy":{}},
+   "expect": {"error":{"name":"RunnerConfigError","message":"runner config (vector runner) declares retired \"placementPolicy\": read-only posture is enforced by OS confinement; delete the key."}}
+  },
+  {
+   "name": "validate: a retired rigorToTier key is refused with what replaced it",
+   "fact": "validate",
+   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude"}},"rigorToTier":{}},
+   "expect": {"error":{"name":"RunnerConfigError","message":"runner config (vector runner) declares retired \"rigorToTier\": rigor no longer chooses a tier; delete the key and declare \"tier\" per capability, role, persona or seat."}}
+  },
+  {
+   "name": "validate: a retired readOnlyExecutorRedirects key is refused with what replaced it",
+   "fact": "validate",
+   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude"}},"readOnlyExecutorRedirects":{}},
+   "expect": {"error":{"name":"RunnerConfigError","message":"runner config (vector runner) declares retired \"readOnlyExecutorRedirects\": read-only posture is enforced by OS confinement; delete the key."}}
+  },
+  {
+   "name": "validate: a retired executor field receipt is refused with why",
+   "fact": "validate",
+   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude","receipt":{}}}},
+   "expect": {"error":{"name":"RunnerConfigError","message":"runner config (vector runner executors.a) \"receipt\" was removed. It had one legal value and no reader anywhere in the repo. The rule it stood for -- a round concludes only from a file the receiver wrote -- is not configurable and never was; it is what the herdr round does unconditionally."}}
+  },
+  {
+   "name": "validate: a retired executor field readOnlyRedirect is refused with why",
+   "fact": "validate",
+   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude","readOnlyRedirect":{}}}},
+   "expect": {"error":{"name":"RunnerConfigError","message":"runner config (vector runner executors.a) \"readOnlyRedirect\" was removed. readOnlyRedirect was retired. Read-only posture is enforced by OS confinement (Phase 6)."}}
+  },
+  {
+   "name": "validate: a retired executor field rigorOverrides is refused with why",
+   "fact": "validate",
+   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude","rigorOverrides":{}}}},
+   "expect": {"error":{"name":"RunnerConfigError","message":"runner config (vector runner executors.a) \"rigorOverrides\" was removed. express per-tier models in runner.modelPolicies.<family> instead."}}
+  },
+  {
+   "name": "validate: a retired resourceBindings on an invocation is refused with the credentialStore replacement",
+   "fact": "validate",
+   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude","invocations":[{"id":"x","via":"cli","adapter":"cli-spawn","command":"claude","resourceBindings":[]}]}}},
+   "expect": {"error":{"name":"RunnerConfigError","message":"runner config (vector runner executors.a invocations[0]) \"resourceBindings\" was removed. Declare the login store the invocation reads as \"credentialStore\": { \"use\": <cli>, \"homeEnv\": <variable> }."}}
+  },
+  {
+   "name": "validate: a capability alias counts as a declared capability for a tool for-entry",
+   "fact": "validate",
+   "runner": {"capabilities":{"review":{"aliases":["code-review"]}},"executors":{"t":{"kind":"tool","providerModel":"x","for":["code-review"]}}},
+   "expect": {"ok":true}
+  },
+  {
+   "name": "validate: a capability alias counts as a declared capability for an mcp tools key",
+   "fact": "validate",
+   "runner": {"capabilities":{"review":{"aliases":["code-review"]}},"executors":{"a":{"kind":"agent","providerModel":"claude","invocations":[{"id":"m","via":"mcp","tools":{"code-review":{}}}]}}},
+   "expect": {"ok":true}
+  },
+  {
+   "name": "validate: a credentialStore with a use that is not a login store key is refused",
+   "fact": "validate",
+   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude","invocations":[{"id":"x","via":"cli","adapter":"cli-spawn","command":"claude","credentialStore":{"use":"Bad","homeEnv":"X"},"confinement":{"backend":"bwrap"}}]}}},
+   "expect": {"error":{"name":"RunnerConfigError","message":"runner config (vector runner executors.a invocations[0]) \"credentialStore\" \"use\" must name a login store, a lowercase key such as \"codex\" or \"pi\"."}}
+  },
+  {
+   "name": "validate: a credentialStore with a homeEnv that is not a variable name is refused",
+   "fact": "validate",
+   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude","invocations":[{"id":"x","via":"cli","adapter":"cli-spawn","command":"claude","credentialStore":{"use":"codex","homeEnv":"1X"},"confinement":{"backend":"bwrap"}}]}}},
+   "expect": {"error":{"name":"RunnerConfigError","message":"runner config (vector runner executors.a invocations[0]) \"credentialStore\" \"homeEnv\" must be an environment variable name."}}
+  },
+  {
+   "name": "validate: a credentialStore with an empty files list is refused",
+   "fact": "validate",
+   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude","invocations":[{"id":"x","via":"cli","adapter":"cli-spawn","command":"claude","credentialStore":{"use":"codex","homeEnv":"X","files":[]},"confinement":{"backend":"bwrap"}}]}}},
+   "expect": {"error":{"name":"RunnerConfigError","message":"runner config (vector runner executors.a invocations[0]) \"credentialStore\" \"files\" must be a non-empty list of relative paths without \"..\"."}}
+  },
+  {
+   "name": "validate: a credentialStore with a files entry with a parent segment is refused",
+   "fact": "validate",
+   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude","invocations":[{"id":"x","via":"cli","adapter":"cli-spawn","command":"claude","credentialStore":{"use":"codex","homeEnv":"X","files":["../a"]},"confinement":{"backend":"bwrap"}}]}}},
+   "expect": {"error":{"name":"RunnerConfigError","message":"runner config (vector runner executors.a invocations[0]) \"credentialStore\" \"files\" must be a non-empty list of relative paths without \"..\"."}}
+  },
+  {
+   "name": "validate: a credentialStore with a files entry that repeats is refused",
+   "fact": "validate",
+   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude","invocations":[{"id":"x","via":"cli","adapter":"cli-spawn","command":"claude","credentialStore":{"use":"codex","homeEnv":"X","files":["a","a"]},"confinement":{"backend":"bwrap"}}]}}},
+   "expect": {"error":{"name":"RunnerConfigError","message":"runner config (vector runner executors.a invocations[0]) \"credentialStore\" \"files\" must not repeat a path."}}
+  },
+  {
+   "name": "validate: a credentialStore with an absolute sessionDir is refused",
+   "fact": "validate",
+   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude","invocations":[{"id":"x","via":"cli","adapter":"cli-spawn","command":"claude","credentialStore":{"use":"codex","homeEnv":"X","sessionDir":"/abs"},"confinement":{"backend":"bwrap"}}]}}},
+   "expect": {"error":{"name":"RunnerConfigError","message":"runner config (vector runner executors.a invocations[0]) \"credentialStore\" \"sessionDir\" must be a relative path without \"..\"."}}
+  },
+  {
+   "name": "validate: a credentialStore on an mcp invocation is refused as unconfined",
+   "fact": "validate",
+   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude","invocations":[{"id":"m","via":"mcp","credentialStore":{"use":"codex","homeEnv":"X"},"confinement":{"backend":"bwrap"}}]}}},
+   "expect": {"error":{"name":"RunnerConfigError","message":"runner config (vector runner executors.a invocations[0]) declares \"credentialStore\" without a confinement backend. A store is handed to the launch through its private home, so only a confined \"cli\" invocation can read one; an unconfined invocation reads its store through \"env\"."}}
+  },
+  {
+   "name": "validate: a valid credentialStore with files and sessionDir under a confinement backend is accepted",
+   "fact": "validate",
+   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude","invocations":[{"id":"x","via":"cli","adapter":"cli-spawn","command":"claude","credentialStore":{"use":"codex","homeEnv":"CODEX_HOME","files":["auth.json"],"sessionDir":"sessions"},"confinement":{"backend":"bwrap"}}]}}},
+   "expect": {"ok":true}
+  },
+  {
+   "name": "validate: bypass confinement is satisfied by the controls spelling",
+   "fact": "validate",
+   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude","invocations":[{"id":"x","via":"cli","adapter":"cli-spawn","command":"claude","permissionMode":"bypass","confinement":{"controls":{"home":"private","session":"isolated","workspace":"own"}}}]}}},
+   "expect": {"ok":true}
+  },
+  {
+   "name": "validate: bypass takes the executor-level confinement when the invocation has none",
+   "fact": "validate",
+   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude","invocations":[{"id":"x","via":"cli","adapter":"cli-spawn","command":"claude","permissionMode":"bypass"}],"confinement":{"privateHome":true,"isolatedSession":true,"ownWorktree":true}}}},
+   "expect": {"ok":true}
+  },
+  {
+   "name": "validate: a prefer list of pins naming a declared invocation is valid",
+   "fact": "validate",
+   "runner": {"executors":{"claude":{"kind":"agent","providerModel":"claude","invocations":[{"id":"claude-cli","via":"cli","adapter":"cli-spawn","command":"claude"}]}},"capabilities":{"execute":{"prefer":[{"executor":"claude","invocation":"claude-cli"},"claude"]}}},
+   "expect": {"ok":true}
+  },
+  {
+   "name": "validate: a prefer inside a persona is checked like the entry prefer",
+   "fact": "validate",
+   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude"}},"personas":{"reviewer":{"prefer":"ghost"}}},
+   "expect": {"error":{"name":"RunnerConfigError","message":"runner config (vector runner personas.reviewer) \"prefer\" names \"ghost\" but no such executor is registered."}}
+  },
+  {
+   "name": "validate: a persona with a valid name is accepted",
+   "fact": "validate",
+   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude"}},"personas":{"reviewer":{"tier":"high"}}},
+   "expect": {"ok":true}
+  },
+  {
+   "name": "validate: a capability confinement that is not an object is refused",
+   "fact": "validate",
+   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude"}},"capabilities":{"execute":{"confinement":"required"}}},
+   "expect": {"error":{"name":"ConfinementPolicyError","message":"runner config (vector runner capabilities.execute.confinement) must be an object."}}
+  },
+  {
+   "name": "validate: a capability confinement with an unknown mode is refused",
+   "fact": "validate",
+   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude"}},"capabilities":{"execute":{"confinement":{"mode":"maybe"}}}},
+   "expect": {"error":{"name":"ConfinementPolicyError","message":"runner config (vector runner capabilities.execute.confinement) \"mode\" must be one of required/preferred/unconfined, got: \"maybe\"."}}
+  },
+  {
+   "name": "validate: an unconfined confinement with a policy key is refused",
+   "fact": "validate",
+   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude"}},"capabilities":{"execute":{"confinement":{"mode":"unconfined","policy":"workspace-write"}}}},
+   "expect": {"error":{"name":"ConfinementPolicyError","message":"runner config (vector runner capabilities.execute.confinement) contains disallowed key \"policy\" for mode \"unconfined\"."}}
+  },
+  {
+   "name": "validate: an unconfined confinement with an extra key is refused",
+   "fact": "validate",
+   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude"}},"capabilities":{"execute":{"confinement":{"mode":"unconfined","extra":1}}}},
+   "expect": {"error":{"name":"ConfinementPolicyError","message":"runner config (vector runner capabilities.execute.confinement) contains disallowed key \"extra\" for mode \"unconfined\"."}}
+  },
+  {
+   "name": "validate: an unconfined confinement that allows invocation override is refused",
+   "fact": "validate",
+   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude"}},"capabilities":{"execute":{"confinement":{"mode":"unconfined","allowInvocationOverride":true}}}},
+   "expect": {"error":{"name":"ConfinementPolicyError","message":"runner config (vector runner capabilities.execute.confinement) \"allowInvocationOverride\" must be false or omitted when mode is \"unconfined\"."}}
+  },
+  {
+   "name": "validate: an unconfined confinement is valid",
+   "fact": "validate",
+   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude"}},"capabilities":{"execute":{"confinement":{"mode":"unconfined","allowInvocationOverride":false}}}},
+   "expect": {"ok":true}
+  },
+  {
+   "name": "validate: a required confinement without a policy is refused",
+   "fact": "validate",
+   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude"}},"capabilities":{"execute":{"confinement":{"mode":"required"}}}},
+   "expect": {"error":{"name":"ConfinementPolicyError","message":"runner config (vector runner capabilities.execute.confinement) \"policy\" must be a non-empty string when mode is \"required\"."}}
+  },
+  {
+   "name": "validate: a required confinement with an unknown key is refused",
+   "fact": "validate",
+   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude"}},"capabilities":{"execute":{"confinement":{"mode":"required","policy":"workspace-write","extra":1}}}},
+   "expect": {"error":{"name":"ConfinementPolicyError","message":"runner config (vector runner capabilities.execute.confinement) contains unknown key \"extra\"."}}
+  },
+  {
+   "name": "validate: a preferred confinement with a non-boolean allowInvocationOverride is refused",
+   "fact": "validate",
+   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude"}},"capabilities":{"execute":{"confinement":{"mode":"preferred","policy":"workspace-write","allowInvocationOverride":"yes"}}}},
+   "expect": {"error":{"name":"ConfinementPolicyError","message":"runner config (vector runner capabilities.execute.confinement) \"allowInvocationOverride\" must be a boolean when present."}}
+  },
+  {
+   "name": "validate: a preferred confinement naming an unknown policy is accepted outside strict mode",
+   "fact": "validate",
+   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude"}},"capabilities":{"execute":{"confinement":{"mode":"preferred","policy":"no-such-policy"}}}},
+   "expect": {"ok":true}
+  },
+  {
+   "name": "validate: a preferred confinement naming an unknown policy is refused in strict mode",
+   "fact": "validate",
+   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude"}},"confinement":{"strict":true},"capabilities":{"execute":{"confinement":{"mode":"preferred","policy":"no-such-policy"}}}},
+   "expect": {"error":{"name":"RunnerConfigError","message":"runner config (vector runner capabilities.execute) references unknown policy \"no-such-policy\" in strict mode (confinement-policy-missing)."}}
+  },
+  {
+   "name": "validate: strict confinement with every capability declaring a built-in policy is valid",
+   "fact": "validate",
+   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude"}},"confinement":{"strict":true},"capabilities":{"execute":{"confinement":{"mode":"required","policy":"workspace-write"}}}},
+   "expect": {"ok":true}
+  },
+  {
+   "name": "validate: a required confinement may name a custom policy",
+   "fact": "validate",
+   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude"}},"confinementPolicies":{"custom":{"contract":"confinement-policy.v1","controls":{"hostWrite":"deny","hostRead":"allow","networkEgress":"allow","process":"host","home":"host","session":"shared","workspace":"shared"},"grants":[{"resource":"run-output","access":"write","scope":"dispatch"}]}},"capabilities":{"execute":{"confinement":{"mode":"required","policy":"custom"}}}},
+   "expect": {"ok":true}
+  },
+  {
+   "name": "validate: a confinement policy that is not an object is refused",
+   "fact": "validate",
+   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude"}},"confinementPolicies":{"custom":"x"}},
+   "expect": {"error":{"name":"ConfinementPolicyError","message":"runner config (vector runner confinementPolicies.custom) must be an object."}}
+  },
+  {
+   "name": "validate: a confinement policy with an unknown key is refused",
+   "fact": "validate",
+   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude"}},"confinementPolicies":{"custom":{"contract":"confinement-policy.v1","controls":{"hostWrite":"deny","hostRead":"allow","networkEgress":"allow","process":"host","home":"host","session":"shared","workspace":"shared"},"grants":[{"resource":"run-output","access":"write","scope":"dispatch"}],"extra":1}}},
+   "expect": {"error":{"name":"ConfinementPolicyError","message":"runner config (vector runner confinementPolicies.custom) contains unknown key \"extra\". Allowed keys: contract, controls, grants, networkFilter."}}
+  },
+  {
+   "name": "validate: a confinement policy with the wrong contract is refused",
+   "fact": "validate",
+   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude"}},"confinementPolicies":{"custom":{"contract":"v0","controls":{"hostWrite":"deny","hostRead":"allow","networkEgress":"allow","process":"host","home":"host","session":"shared","workspace":"shared"},"grants":[{"resource":"run-output","access":"write","scope":"dispatch"}]}}},
+   "expect": {"error":{"name":"ConfinementPolicyError","message":"runner config (vector runner confinementPolicies.custom) \"contract\" must be \"confinement-policy.v1\", got: \"v0\"."}}
+  },
+  {
+   "name": "validate: a confinement policy whose controls are not an object is refused",
+   "fact": "validate",
+   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude"}},"confinementPolicies":{"custom":{"contract":"confinement-policy.v1","controls":[],"grants":[{"resource":"run-output","access":"write","scope":"dispatch"}]}}},
+   "expect": {"error":{"name":"ConfinementPolicyError","message":"runner config (vector runner confinementPolicies.custom) \"controls\" must be an object."}}
+  },
+  {
+   "name": "validate: a confinement policy with an unknown control is refused",
+   "fact": "validate",
+   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude"}},"confinementPolicies":{"custom":{"contract":"confinement-policy.v1","controls":{"hostWrite":"deny","hostRead":"allow","networkEgress":"allow","process":"host","home":"host","session":"shared","workspace":"shared","bogus":"x"},"grants":[{"resource":"run-output","access":"write","scope":"dispatch"}]}}},
+   "expect": {"error":{"name":"ConfinementPolicyError","message":"runner config (vector runner confinementPolicies.custom.controls) contains unknown control \"bogus\". Allowed controls: hostWrite, hostRead, networkEgress, process, home, session, workspace."}}
+  },
+  {
+   "name": "validate: a confinement policy missing a control is refused",
+   "fact": "validate",
+   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude"}},"confinementPolicies":{"custom":{"contract":"confinement-policy.v1","controls":{"hostWrite":"deny","hostRead":"allow","networkEgress":"allow","process":"host","session":"shared","workspace":"shared"},"grants":[{"resource":"run-output","access":"write","scope":"dispatch"}]}}},
+   "expect": {"error":{"name":"ConfinementPolicyError","message":"runner config (vector runner confinementPolicies.custom.controls) is missing required control \"home\"."}}
+  },
+  {
+   "name": "validate: a confinement policy with an illegal control value is refused",
+   "fact": "validate",
+   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude"}},"confinementPolicies":{"custom":{"contract":"confinement-policy.v1","controls":{"hostWrite":"maybe","hostRead":"allow","networkEgress":"allow","process":"host","home":"host","session":"shared","workspace":"shared"},"grants":[{"resource":"run-output","access":"write","scope":"dispatch"}]}}},
+   "expect": {"error":{"name":"ConfinementPolicyError","message":"runner config (vector runner confinementPolicies.custom.controls.hostWrite) must be one of deny/allow, got: \"maybe\"."}}
+  },
+  {
+   "name": "validate: a confinement policy whose grants are not an array is refused",
+   "fact": "validate",
+   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude"}},"confinementPolicies":{"custom":{"contract":"confinement-policy.v1","controls":{"hostWrite":"deny","hostRead":"allow","networkEgress":"allow","process":"host","home":"host","session":"shared","workspace":"shared"},"grants":{}}}},
+   "expect": {"error":{"name":"ConfinementPolicyError","message":"runner config (vector runner confinementPolicies.custom) \"grants\" must be an array."}}
+  },
+  {
+   "name": "validate: a confinement policy grant that is not an object is refused",
+   "fact": "validate",
+   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude"}},"confinementPolicies":{"custom":{"contract":"confinement-policy.v1","controls":{"hostWrite":"deny","hostRead":"allow","networkEgress":"allow","process":"host","home":"host","session":"shared","workspace":"shared"},"grants":["x"]}}},
+   "expect": {"error":{"name":"ConfinementPolicyError","message":"runner config (vector runner confinementPolicies.custom.grants[0]) must be an object."}}
+  },
+  {
+   "name": "validate: a confinement policy grant with an unknown key is refused",
+   "fact": "validate",
+   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude"}},"confinementPolicies":{"custom":{"contract":"confinement-policy.v1","controls":{"hostWrite":"deny","hostRead":"allow","networkEgress":"allow","process":"host","home":"host","session":"shared","workspace":"shared"},"grants":[{"resource":"r","access":"read","scope":"dispatch","extra":1}]}}},
+   "expect": {"error":{"name":"ConfinementPolicyError","message":"runner config (vector runner confinementPolicies.custom.grants[0]) contains unknown key \"extra\". Allowed keys: resource, access, scope, optional."}}
+  },
+  {
+   "name": "validate: a confinement policy grant with an empty resource is refused",
+   "fact": "validate",
+   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude"}},"confinementPolicies":{"custom":{"contract":"confinement-policy.v1","controls":{"hostWrite":"deny","hostRead":"allow","networkEgress":"allow","process":"host","home":"host","session":"shared","workspace":"shared"},"grants":[{"resource":" ","access":"read","scope":"dispatch"}]}}},
+   "expect": {"error":{"name":"ConfinementPolicyError","message":"runner config (vector runner confinementPolicies.custom.grants[0]) \"resource\" must be a non-empty string."}}
+  },
+  {
+   "name": "validate: a confinement policy that grants one resource twice is refused",
+   "fact": "validate",
+   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude"}},"confinementPolicies":{"custom":{"contract":"confinement-policy.v1","controls":{"hostWrite":"deny","hostRead":"allow","networkEgress":"allow","process":"host","home":"host","session":"shared","workspace":"shared"},"grants":[{"resource":"r","access":"read","scope":"dispatch"},{"resource":"r","access":"write","scope":"dispatch"}]}}},
+   "expect": {"error":{"name":"ConfinementPolicyError","message":"runner config (vector runner confinementPolicies.custom.grants[1]) duplicate resource grant for \"r\"."}}
+  },
+  {
+   "name": "validate: a confinement policy grant with an illegal access is refused",
+   "fact": "validate",
+   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude"}},"confinementPolicies":{"custom":{"contract":"confinement-policy.v1","controls":{"hostWrite":"deny","hostRead":"allow","networkEgress":"allow","process":"host","home":"host","session":"shared","workspace":"shared"},"grants":[{"resource":"r","access":"all","scope":"dispatch"}]}}},
+   "expect": {"error":{"name":"ConfinementPolicyError","message":"runner config (vector runner confinementPolicies.custom.grants[0]) \"access\" must be one of read-write/write/read, got: \"all\"."}}
+  },
+  {
+   "name": "validate: a confinement policy grant with an illegal scope is refused",
+   "fact": "validate",
+   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude"}},"confinementPolicies":{"custom":{"contract":"confinement-policy.v1","controls":{"hostWrite":"deny","hostRead":"allow","networkEgress":"allow","process":"host","home":"host","session":"shared","workspace":"shared"},"grants":[{"resource":"r","access":"read","scope":"machine"}]}}},
+   "expect": {"error":{"name":"ConfinementPolicyError","message":"runner config (vector runner confinementPolicies.custom.grants[0]) \"scope\" must be \"dispatch\", got: \"machine\"."}}
+  },
+  {
+   "name": "validate: a confinement policy grant with a non-boolean optional is refused",
+   "fact": "validate",
+   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude"}},"confinementPolicies":{"custom":{"contract":"confinement-policy.v1","controls":{"hostWrite":"deny","hostRead":"allow","networkEgress":"allow","process":"host","home":"host","session":"shared","workspace":"shared"},"grants":[{"resource":"r","access":"read","scope":"dispatch","optional":"yes"}]}}},
+   "expect": {"error":{"name":"ConfinementPolicyError","message":"runner config (vector runner confinementPolicies.custom.grants[0]) \"optional\" must be a boolean when present."}}
+  },
+  {
+   "name": "validate: a confinement policy with a filtered network and no filter is refused",
+   "fact": "validate",
+   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude"}},"confinementPolicies":{"custom":{"contract":"confinement-policy.v1","controls":{"hostWrite":"deny","hostRead":"allow","networkEgress":"filtered","process":"host","home":"host","session":"shared","workspace":"shared"},"grants":[{"resource":"run-output","access":"write","scope":"dispatch"}]}}},
+   "expect": {"error":{"name":"ConfinementPolicyError","message":"runner config (vector runner confinementPolicies.custom) \"networkFilter\" is required when networkEgress is \"filtered\"."}}
+  },
+  {
+   "name": "validate: a confinement policy with a filter and an unfiltered network is refused",
+   "fact": "validate",
+   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude"}},"confinementPolicies":{"custom":{"contract":"confinement-policy.v1","controls":{"hostWrite":"deny","hostRead":"allow","networkEgress":"allow","process":"host","home":"host","session":"shared","workspace":"shared"},"grants":[{"resource":"run-output","access":"write","scope":"dispatch"}],"networkFilter":{"defaultAction":"deny","allow":[]}}}},
+   "expect": {"error":{"name":"ConfinementPolicyError","message":"runner config (vector runner confinementPolicies.custom) \"networkFilter\" is only permitted when networkEgress is \"filtered\"."}}
+  },
+  {
+   "name": "validate: a custom confinement policy that is well formed is valid",
+   "fact": "validate",
+   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude"}},"confinementPolicies":{"custom":{"contract":"confinement-policy.v1","controls":{"hostWrite":"deny","hostRead":"allow","networkEgress":"allow","process":"host","home":"host","session":"shared","workspace":"shared"},"grants":[{"resource":"r","access":"read","scope":"dispatch","optional":true}]}}},
+   "expect": {"ok":true}
+  },
+  {
+   "name": "validate: a network filter that is not an object is refused",
+   "fact": "validate",
+   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude"}},"confinementPolicies":{"custom":{"contract":"confinement-policy.v1","controls":{"hostWrite":"deny","hostRead":"allow","networkEgress":"filtered","process":"host","home":"host","session":"shared","workspace":"shared"},"grants":[{"resource":"run-output","access":"write","scope":"dispatch"}],"networkFilter":"x"}}},
+   "expect": {"error":{"name":"ConfinementPolicyError","message":"runner config (vector runner confinementPolicies.custom.networkFilter) must be an object."}}
+  },
+  {
+   "name": "validate: a network filter with an unknown key is refused",
+   "fact": "validate",
+   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude"}},"confinementPolicies":{"custom":{"contract":"confinement-policy.v1","controls":{"hostWrite":"deny","hostRead":"allow","networkEgress":"filtered","process":"host","home":"host","session":"shared","workspace":"shared"},"grants":[{"resource":"run-output","access":"write","scope":"dispatch"}],"networkFilter":{"defaultAction":"deny","allow":[],"extra":1}}}},
+   "expect": {"error":{"name":"ConfinementPolicyError","message":"runner config (vector runner confinementPolicies.custom.networkFilter) contains unknown key \"extra\"."}}
+  },
+  {
+   "name": "validate: a network filter whose default action is not deny is refused",
+   "fact": "validate",
+   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude"}},"confinementPolicies":{"custom":{"contract":"confinement-policy.v1","controls":{"hostWrite":"deny","hostRead":"allow","networkEgress":"filtered","process":"host","home":"host","session":"shared","workspace":"shared"},"grants":[{"resource":"run-output","access":"write","scope":"dispatch"}],"networkFilter":{"defaultAction":"allow","allow":[]}}}},
+   "expect": {"error":{"name":"ConfinementPolicyError","message":"runner config (vector runner confinementPolicies.custom.networkFilter) \"defaultAction\" must be \"deny\", got: \"allow\"."}}
+  },
+  {
+   "name": "validate: a network filter whose allow is not an array is refused",
+   "fact": "validate",
+   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude"}},"confinementPolicies":{"custom":{"contract":"confinement-policy.v1","controls":{"hostWrite":"deny","hostRead":"allow","networkEgress":"filtered","process":"host","home":"host","session":"shared","workspace":"shared"},"grants":[{"resource":"run-output","access":"write","scope":"dispatch"}],"networkFilter":{"defaultAction":"deny","allow":{}}}}},
+   "expect": {"error":{"name":"ConfinementPolicyError","message":"runner config (vector runner confinementPolicies.custom.networkFilter) \"allow\" must be an array of allowlist rules."}}
+  },
+  {
+   "name": "validate: a network filter rule that is not an object is refused",
+   "fact": "validate",
+   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude"}},"confinementPolicies":{"custom":{"contract":"confinement-policy.v1","controls":{"hostWrite":"deny","hostRead":"allow","networkEgress":"filtered","process":"host","home":"host","session":"shared","workspace":"shared"},"grants":[{"resource":"run-output","access":"write","scope":"dispatch"}],"networkFilter":{"defaultAction":"deny","allow":["x"]}}}},
+   "expect": {"error":{"name":"ConfinementPolicyError","message":"runner config (vector runner confinementPolicies.custom.networkFilter.allow[0]) must be an object."}}
+  },
+  {
+   "name": "validate: a network filter rule with an unknown key is refused",
+   "fact": "validate",
+   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude"}},"confinementPolicies":{"custom":{"contract":"confinement-policy.v1","controls":{"hostWrite":"deny","hostRead":"allow","networkEgress":"filtered","process":"host","home":"host","session":"shared","workspace":"shared"},"grants":[{"resource":"run-output","access":"write","scope":"dispatch"}],"networkFilter":{"defaultAction":"deny","allow":[{"protocol":"tcp","destination":{"kind":"dns","value":"example.com"},"ports":[443],"extra":1}]}}}},
+   "expect": {"error":{"name":"ConfinementPolicyError","message":"runner config (vector runner confinementPolicies.custom.networkFilter.allow[0]) contains unknown key \"extra\"."}}
+  },
+  {
+   "name": "validate: a network filter rule with an illegal protocol is refused",
+   "fact": "validate",
+   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude"}},"confinementPolicies":{"custom":{"contract":"confinement-policy.v1","controls":{"hostWrite":"deny","hostRead":"allow","networkEgress":"filtered","process":"host","home":"host","session":"shared","workspace":"shared"},"grants":[{"resource":"run-output","access":"write","scope":"dispatch"}],"networkFilter":{"defaultAction":"deny","allow":[{"protocol":"icmp","destination":{"kind":"dns","value":"example.com"},"ports":[443]}]}}}},
+   "expect": {"error":{"name":"ConfinementPolicyError","message":"runner config (vector runner confinementPolicies.custom.networkFilter.allow[0]) \"protocol\" must be \"tcp\" or \"udp\", got: \"icmp\"."}}
+  },
+  {
+   "name": "validate: a network filter rule whose destination is not an object is refused",
+   "fact": "validate",
+   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude"}},"confinementPolicies":{"custom":{"contract":"confinement-policy.v1","controls":{"hostWrite":"deny","hostRead":"allow","networkEgress":"filtered","process":"host","home":"host","session":"shared","workspace":"shared"},"grants":[{"resource":"run-output","access":"write","scope":"dispatch"}],"networkFilter":{"defaultAction":"deny","allow":[{"protocol":"tcp","destination":"x","ports":[443]}]}}}},
+   "expect": {"error":{"name":"ConfinementPolicyError","message":"runner config (vector runner confinementPolicies.custom.networkFilter.allow[0]) \"destination\" must be an object."}}
+  },
+  {
+   "name": "validate: a network filter destination with an unknown key is refused",
+   "fact": "validate",
+   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude"}},"confinementPolicies":{"custom":{"contract":"confinement-policy.v1","controls":{"hostWrite":"deny","hostRead":"allow","networkEgress":"filtered","process":"host","home":"host","session":"shared","workspace":"shared"},"grants":[{"resource":"run-output","access":"write","scope":"dispatch"}],"networkFilter":{"defaultAction":"deny","allow":[{"protocol":"tcp","destination":{"kind":"dns","value":"a.com","extra":1},"ports":[443]}]}}}},
+   "expect": {"error":{"name":"ConfinementPolicyError","message":"runner config (vector runner confinementPolicies.custom.networkFilter.allow[0].destination) contains unknown key \"extra\"."}}
+  },
+  {
+   "name": "validate: a network filter destination with an illegal kind is refused",
+   "fact": "validate",
+   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude"}},"confinementPolicies":{"custom":{"contract":"confinement-policy.v1","controls":{"hostWrite":"deny","hostRead":"allow","networkEgress":"filtered","process":"host","home":"host","session":"shared","workspace":"shared"},"grants":[{"resource":"run-output","access":"write","scope":"dispatch"}],"networkFilter":{"defaultAction":"deny","allow":[{"protocol":"tcp","destination":{"kind":"ip","value":"1.1.1.1"},"ports":[443]}]}}}},
+   "expect": {"error":{"name":"ConfinementPolicyError","message":"runner config (vector runner confinementPolicies.custom.networkFilter.allow[0].destination) \"kind\" must be \"dns\" or \"cidr\", got: \"ip\"."}}
+  },
+  {
+   "name": "validate: a network filter destination with an empty value is refused",
+   "fact": "validate",
+   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude"}},"confinementPolicies":{"custom":{"contract":"confinement-policy.v1","controls":{"hostWrite":"deny","hostRead":"allow","networkEgress":"filtered","process":"host","home":"host","session":"shared","workspace":"shared"},"grants":[{"resource":"run-output","access":"write","scope":"dispatch"}],"networkFilter":{"defaultAction":"deny","allow":[{"protocol":"tcp","destination":{"kind":"dns","value":" "},"ports":[443]}]}}}},
+   "expect": {"error":{"name":"ConfinementPolicyError","message":"runner config (vector runner confinementPolicies.custom.networkFilter.allow[0].destination) \"value\" must be a non-empty string."}}
+  },
+  {
+   "name": "validate: a network filter dns destination with a wildcard is refused",
+   "fact": "validate",
+   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude"}},"confinementPolicies":{"custom":{"contract":"confinement-policy.v1","controls":{"hostWrite":"deny","hostRead":"allow","networkEgress":"filtered","process":"host","home":"host","session":"shared","workspace":"shared"},"grants":[{"resource":"run-output","access":"write","scope":"dispatch"}],"networkFilter":{"defaultAction":"deny","allow":[{"protocol":"tcp","destination":{"kind":"dns","value":"*.example.com"},"ports":[443]}]}}}},
+   "expect": {"error":{"name":"ConfinementPolicyError","message":"runner config (vector runner confinementPolicies.custom.networkFilter.allow[0].destination) DNS destination \"*.example.com\" must not contain wildcard \"*\"."}}
+  },
+  {
+   "name": "validate: a network filter cidr with no slash is refused",
+   "fact": "validate",
+   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude"}},"confinementPolicies":{"custom":{"contract":"confinement-policy.v1","controls":{"hostWrite":"deny","hostRead":"allow","networkEgress":"filtered","process":"host","home":"host","session":"shared","workspace":"shared"},"grants":[{"resource":"run-output","access":"write","scope":"dispatch"}],"networkFilter":{"defaultAction":"deny","allow":[{"protocol":"tcp","destination":{"kind":"cidr","value":"10.0.0.1"},"ports":[443]}]}}}},
+   "expect": {"error":{"name":"ConfinementPolicyError","message":"runner config (vector runner confinementPolicies.custom.networkFilter.allow[0].destination) invalid CIDR \"10.0.0.1\"."}}
+  },
+  {
+   "name": "validate: a network filter cidr with two slashes is refused",
+   "fact": "validate",
+   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude"}},"confinementPolicies":{"custom":{"contract":"confinement-policy.v1","controls":{"hostWrite":"deny","hostRead":"allow","networkEgress":"filtered","process":"host","home":"host","session":"shared","workspace":"shared"},"grants":[{"resource":"run-output","access":"write","scope":"dispatch"}],"networkFilter":{"defaultAction":"deny","allow":[{"protocol":"tcp","destination":{"kind":"cidr","value":"10.0.0.1/8/8"},"ports":[443]}]}}}},
+   "expect": {"error":{"name":"ConfinementPolicyError","message":"runner config (vector runner confinementPolicies.custom.networkFilter.allow[0].destination) invalid CIDR \"10.0.0.1/8/8\"."}}
+  },
+  {
+   "name": "validate: a network filter cidr with a non-numeric prefix is refused",
+   "fact": "validate",
+   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude"}},"confinementPolicies":{"custom":{"contract":"confinement-policy.v1","controls":{"hostWrite":"deny","hostRead":"allow","networkEgress":"filtered","process":"host","home":"host","session":"shared","workspace":"shared"},"grants":[{"resource":"run-output","access":"write","scope":"dispatch"}],"networkFilter":{"defaultAction":"deny","allow":[{"protocol":"tcp","destination":{"kind":"cidr","value":"10.0.0.1/x"},"ports":[443]}]}}}},
+   "expect": {"error":{"name":"ConfinementPolicyError","message":"runner config (vector runner confinementPolicies.custom.networkFilter.allow[0].destination) invalid CIDR prefix \"x\"."}}
+  },
+  {
+   "name": "validate: a network filter cidr with an IPv4 prefix above 32 is refused",
+   "fact": "validate",
+   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude"}},"confinementPolicies":{"custom":{"contract":"confinement-policy.v1","controls":{"hostWrite":"deny","hostRead":"allow","networkEgress":"filtered","process":"host","home":"host","session":"shared","workspace":"shared"},"grants":[{"resource":"run-output","access":"write","scope":"dispatch"}],"networkFilter":{"defaultAction":"deny","allow":[{"protocol":"tcp","destination":{"kind":"cidr","value":"10.0.0.1/33"},"ports":[443]}]}}}},
+   "expect": {"error":{"name":"ConfinementPolicyError","message":"runner config (vector runner confinementPolicies.custom.networkFilter.allow[0].destination) IPv4 CIDR prefix must be between 0 and 32, got 33."}}
+  },
+  {
+   "name": "validate: a network filter cidr with an IPv4 octet above 255 is refused",
+   "fact": "validate",
+   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude"}},"confinementPolicies":{"custom":{"contract":"confinement-policy.v1","controls":{"hostWrite":"deny","hostRead":"allow","networkEgress":"filtered","process":"host","home":"host","session":"shared","workspace":"shared"},"grants":[{"resource":"run-output","access":"write","scope":"dispatch"}],"networkFilter":{"defaultAction":"deny","allow":[{"protocol":"tcp","destination":{"kind":"cidr","value":"10.0.0.256/8"},"ports":[443]}]}}}},
+   "expect": {"error":{"name":"ConfinementPolicyError","message":"runner config (vector runner confinementPolicies.custom.networkFilter.allow[0].destination) invalid IPv4 octet in \"10.0.0.256/8\"."}}
+  },
+  {
+   "name": "validate: a network filter cidr with an IPv6 prefix above 128 is refused",
+   "fact": "validate",
+   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude"}},"confinementPolicies":{"custom":{"contract":"confinement-policy.v1","controls":{"hostWrite":"deny","hostRead":"allow","networkEgress":"filtered","process":"host","home":"host","session":"shared","workspace":"shared"},"grants":[{"resource":"run-output","access":"write","scope":"dispatch"}],"networkFilter":{"defaultAction":"deny","allow":[{"protocol":"tcp","destination":{"kind":"cidr","value":"::1/129"},"ports":[443]}]}}}},
+   "expect": {"error":{"name":"ConfinementPolicyError","message":"runner config (vector runner confinementPolicies.custom.networkFilter.allow[0].destination) IPv6 CIDR prefix must be between 0 and 128, got 129."}}
+  },
+  {
+   "name": "validate: a network filter cidr with an address that is neither IPv4 nor IPv6 is refused",
+   "fact": "validate",
+   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude"}},"confinementPolicies":{"custom":{"contract":"confinement-policy.v1","controls":{"hostWrite":"deny","hostRead":"allow","networkEgress":"filtered","process":"host","home":"host","session":"shared","workspace":"shared"},"grants":[{"resource":"run-output","access":"write","scope":"dispatch"}],"networkFilter":{"defaultAction":"deny","allow":[{"protocol":"tcp","destination":{"kind":"cidr","value":"host/8"},"ports":[443]}]}}}},
+   "expect": {"error":{"name":"ConfinementPolicyError","message":"runner config (vector runner confinementPolicies.custom.networkFilter.allow[0].destination) invalid CIDR \"host/8\"."}}
+  },
+  {
+   "name": "validate: a network filter cidr is canonicalised before the duplicate rule check",
+   "fact": "validate",
+   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude"}},"confinementPolicies":{"custom":{"contract":"confinement-policy.v1","controls":{"hostWrite":"deny","hostRead":"allow","networkEgress":"filtered","process":"host","home":"host","session":"shared","workspace":"shared"},"grants":[{"resource":"run-output","access":"write","scope":"dispatch"}],"networkFilter":{"defaultAction":"deny","allow":[{"protocol":"tcp","destination":{"kind":"cidr","value":"10.0.0.0/8"},"ports":[443]},{"protocol":"tcp","destination":{"kind":"cidr","value":"10.0.0.0/8"},"ports":[443]}]}}}},
+   "expect": {"error":{"name":"ConfinementPolicyError","message":"runner config (vector runner confinementPolicies.custom.networkFilter.allow[1]) duplicate allow rule entry."}}
+  },
+  {
+   "name": "validate: a network filter with canonical IPv4 and IPv6 cidr rules is valid",
+   "fact": "validate",
+   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude"}},"confinementPolicies":{"custom":{"contract":"confinement-policy.v1","controls":{"hostWrite":"deny","hostRead":"allow","networkEgress":"filtered","process":"host","home":"host","session":"shared","workspace":"shared"},"grants":[{"resource":"run-output","access":"write","scope":"dispatch"}],"networkFilter":{"defaultAction":"deny","allow":[{"protocol":"tcp","destination":{"kind":"cidr","value":"10.0.0.0/8"},"ports":[443]},{"protocol":"tcp","destination":{"kind":"cidr","value":"fe80::1/64"},"ports":[443]},{"protocol":"tcp","destination":{"kind":"dns","value":"example.com"},"ports":[443]}]}}}},
+   "expect": {"ok":true}
+  },
+  {
+   "name": "validate: a network filter rule without ports is refused",
+   "fact": "validate",
+   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude"}},"confinementPolicies":{"custom":{"contract":"confinement-policy.v1","controls":{"hostWrite":"deny","hostRead":"allow","networkEgress":"filtered","process":"host","home":"host","session":"shared","workspace":"shared"},"grants":[{"resource":"run-output","access":"write","scope":"dispatch"}],"networkFilter":{"defaultAction":"deny","allow":[{"protocol":"tcp","destination":{"kind":"dns","value":"example.com"},"ports":[]}]}}}},
+   "expect": {"error":{"name":"ConfinementPolicyError","message":"runner config (vector runner confinementPolicies.custom.networkFilter.allow[0]) \"ports\" must be a non-empty array of port numbers."}}
+  },
+  {
+   "name": "validate: a network filter port outside the range is refused",
+   "fact": "validate",
+   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude"}},"confinementPolicies":{"custom":{"contract":"confinement-policy.v1","controls":{"hostWrite":"deny","hostRead":"allow","networkEgress":"filtered","process":"host","home":"host","session":"shared","workspace":"shared"},"grants":[{"resource":"run-output","access":"write","scope":"dispatch"}],"networkFilter":{"defaultAction":"deny","allow":[{"protocol":"tcp","destination":{"kind":"dns","value":"example.com"},"ports":[0]}]}}}},
+   "expect": {"error":{"name":"ConfinementPolicyError","message":"runner config (vector runner confinementPolicies.custom.networkFilter.allow[0]) port 0 must be an integer between 1 and 65535."}}
+  },
+  {
+   "name": "validate: a network filter port that is not an integer is refused",
+   "fact": "validate",
+   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude"}},"confinementPolicies":{"custom":{"contract":"confinement-policy.v1","controls":{"hostWrite":"deny","hostRead":"allow","networkEgress":"filtered","process":"host","home":"host","session":"shared","workspace":"shared"},"grants":[{"resource":"run-output","access":"write","scope":"dispatch"}],"networkFilter":{"defaultAction":"deny","allow":[{"protocol":"tcp","destination":{"kind":"dns","value":"example.com"},"ports":["443"]}]}}}},
+   "expect": {"error":{"name":"ConfinementPolicyError","message":"runner config (vector runner confinementPolicies.custom.networkFilter.allow[0]) port \"443\" must be an integer between 1 and 65535."}}
+  },
+  {
+   "name": "validate: a network filter rule that repeats a port is refused",
+   "fact": "validate",
+   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude"}},"confinementPolicies":{"custom":{"contract":"confinement-policy.v1","controls":{"hostWrite":"deny","hostRead":"allow","networkEgress":"filtered","process":"host","home":"host","session":"shared","workspace":"shared"},"grants":[{"resource":"run-output","access":"write","scope":"dispatch"}],"networkFilter":{"defaultAction":"deny","allow":[{"protocol":"tcp","destination":{"kind":"dns","value":"example.com"},"ports":[443,443]}]}}}},
+   "expect": {"error":{"name":"ConfinementPolicyError","message":"runner config (vector runner confinementPolicies.custom.networkFilter.allow[0]) duplicate port 443 in allowlist."}}
+  },
+  {
+   "name": "validate: a network filter that repeats a rule is refused",
+   "fact": "validate",
+   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude"}},"confinementPolicies":{"custom":{"contract":"confinement-policy.v1","controls":{"hostWrite":"deny","hostRead":"allow","networkEgress":"filtered","process":"host","home":"host","session":"shared","workspace":"shared"},"grants":[{"resource":"run-output","access":"write","scope":"dispatch"}],"networkFilter":{"defaultAction":"deny","allow":[{"protocol":"tcp","destination":{"kind":"dns","value":"example.com"},"ports":[80,443]},{"protocol":"tcp","destination":{"kind":"dns","value":"example.com"},"ports":[443,80]}]}}}},
+   "expect": {"error":{"name":"ConfinementPolicyError","message":"runner config (vector runner confinementPolicies.custom.networkFilter.allow[1]) duplicate allow rule entry."}}
+  },
+  {
+   "name": "validate: a generatedPaths from that is an absolute path is refused",
+   "fact": "validate",
+   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude"}},"generatedPaths":[{"from":"/gen","also":[]}]},
+   "expect": {"error":{"name":"RunnerConfigError","message":"runner config (vector runner) generatedPaths[0].from: write entry must be repo-relative, got absolute path \"/gen\"."}}
+  },
+  {
+   "name": "validate: a generatedPaths from with a parent segment is refused",
+   "fact": "validate",
+   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude"}},"generatedPaths":[{"from":"a/../b","also":[]}]},
+   "expect": {"error":{"name":"RunnerConfigError","message":"runner config (vector runner) generatedPaths[0].from: write entry must not contain a \"..\" segment, got: \"a/../b\"."}}
+  },
+  {
+   "name": "validate: a generatedPaths from with a loose double star is refused",
+   "fact": "validate",
+   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude"}},"generatedPaths":[{"from":"gen**/x","also":[]}]},
+   "expect": {"error":{"name":"RunnerConfigError","message":"runner config (vector runner) generatedPaths[0].from: \"**\" must be a whole path segment, got segment \"gen**\" in \"gen**/x\"."}}
+  },
+  {
+   "name": "validate: a generatedPaths from with a backslash is refused",
+   "fact": "validate",
+   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude"}},"generatedPaths":[{"from":"a\\b","also":[]}]},
+   "expect": {"error":{"name":"RunnerConfigError","message":"runner config (vector runner) generatedPaths[0].from: write entry must not contain a backslash or NUL byte, got: \"a\\\\b\"."}}
+  },
+  {
+   "name": "validate: a generatedPaths from that names nothing is refused",
+   "fact": "validate",
+   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude"}},"generatedPaths":[{"from":"./","also":[]}]},
+   "expect": {"error":{"name":"RunnerConfigError","message":"runner config (vector runner) generatedPaths[0].from: write entry must name a path inside the repo, got: \"./\"."}}
+  },
+  {
+   "name": "validate: a generatedPaths from that is a pathspec magic is refused",
+   "fact": "validate",
+   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude"}},"generatedPaths":[{"from":":(top)x","also":[]}]},
+   "expect": {"error":{"name":"RunnerConfigError","message":"runner config (vector runner) generatedPaths[0].from: write entry must not start with \":\" (git pathspec magic), got: \":(top)x\"."}}
+  },
+  {
+   "name": "validate: a generatedPaths from that starts with a glob segment is refused",
+   "fact": "validate",
+   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude"}},"generatedPaths":[{"from":"*/gen","also":[]}]},
+   "expect": {"error":{"name":"RunnerConfigError","message":"runner config (vector runner) generatedPaths[0].from must start with a literal directory, got \"*/gen\"."}}
+  },
+  {
+   "name": "validate: a generatedPaths also entry that is absolute is refused",
+   "fact": "validate",
+   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude"}},"generatedPaths":[{"from":"gen","also":["ok","/abs"]}]},
+   "expect": {"error":{"name":"RunnerConfigError","message":"runner config (vector runner) generatedPaths[0].also[1]: write entry must be repo-relative, got absolute path \"/abs\"."}}
+  },
+  {
+   "name": "validate: a generatedPaths entry with a literal directory is valid",
+   "fact": "validate",
+   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude"}},"generatedPaths":[{"from":"./gen//out/**","also":["docs/a*"]}]},
+   "expect": {"ok":true}
+  },
+  {
+   "name": "validate: a retired pattern key research-fan-out-gated is refused with its replacement",
+   "fact": "validate",
+   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude"}},"patterns":{"research-fan-out-gated":{}}},
+   "expect": {"error":{"name":"RunnerConfigError","code":"config-key-retired","message":"runner config (vector runner patterns): runner.patterns.research-fan-out-gated was retired; use runner.patterns.research-fan-out instead."}}
+  },
+  {
+   "name": "validate: two retired pattern keys are refused in one message",
+   "fact": "validate",
+   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude"}},"patterns":{"defaultRule":{},"reviewed":{"maxRounds":3}}},
+   "expect": {"error":{"name":"RunnerConfigError","code":"config-key-retired","message":"runner config (vector runner patterns): runner.patterns.defaultRule was retired; delete the key.\nrunner config (vector runner patterns): runner.patterns.reviewed.maxRounds was retired; use runner.loops.reviewed.maxRounds instead."}}
+  },
+  {
+   "name": "validate: the seatBinding pattern entry is not checked as a pattern",
+   "fact": "validate",
+   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude"}},"patterns":{"seatBinding":{"schema":"x"}}},
+   "expect": {"ok":true}
+  },
+  {
+   "name": "validate: declared pattern seats that are valid are accepted",
+   "fact": "validate",
+   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude"}},"patterns":{"solo":{"defaults":{"seats":[{"seat":"author","role":"producer"},{"seat":"critic","role":"reviewer","persona":" p "}]}}}},
+   "expect": {"ok":true}
+  },
+  {
+   "name": "validate: declared pattern seats that are empty are refused",
+   "fact": "validate",
+   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude"}},"patterns":{"solo":{"defaults":{"seats":[]}}}},
+   "expect": {"error":{"name":"RunnerConfigError","code":"invalid-seats","message":"runner config (vector runner patterns.solo.defaults.seats) must be a non-empty array of { seat, role }"}}
+  },
+  {
+   "name": "validate: a declared pattern seat that is not an object is refused",
+   "fact": "validate",
+   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude"}},"patterns":{"solo":{"defaults":{"seats":["x"]}}}},
+   "expect": {"error":{"name":"RunnerConfigError","code":"invalid-seats","message":"runner config (vector runner patterns.solo.defaults.seats[0]) must be an object { seat, role, persona?, tier? }"}}
+  },
+  {
+   "name": "validate: a declared pattern seat with an unknown key is refused",
+   "fact": "validate",
+   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude"}},"patterns":{"solo":{"defaults":{"seats":[{"seat":"a","role":"producer","extra":1}]}}}},
+   "expect": {"error":{"name":"RunnerConfigError","code":"invalid-seats","message":"runner config (vector runner patterns.solo.defaults.seats[0].extra) has unknown key \"extra\"; a seat declares only seat, role, persona and tier"}}
+  },
+  {
+   "name": "validate: a declared pattern seat with a reserved seat id is refused",
+   "fact": "validate",
+   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude"}},"patterns":{"solo":{"defaults":{"seats":[{"seat":"verify","role":"producer"}]}}}},
+   "expect": {"error":{"name":"RunnerConfigError","code":"param-invalid","message":"runner config (vector runner patterns.solo.defaults.seats[0].seat) \"verify\" is a reserved seat id; reserved: [verify, verifier]"}}
+  },
+  {
+   "name": "validate: a declared pattern seat with the other reserved seat id is refused",
+   "fact": "validate",
+   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude"}},"patterns":{"solo":{"defaults":{"seats":[{"seat":"verifier","role":"producer"}]}}}},
+   "expect": {"error":{"name":"RunnerConfigError","code":"param-invalid","message":"runner config (vector runner patterns.solo.defaults.seats[0].seat) \"verifier\" is a reserved seat id; reserved: [verify, verifier]"}}
+  },
+  {
+   "name": "validate: a declared pattern seat whose id the run layout owns is refused",
+   "fact": "validate",
+   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude"}},"patterns":{"solo":{"defaults":{"seats":[{"seat":"runs","role":"producer"}]}}}},
+   "expect": {"error":{"name":"RunnerConfigError","code":"invalid-seat-id","message":"runner config (vector runner patterns.solo.defaults.seats[0].seat) \"runs\" is reserved (runs, outbox, inbox, inputs, unit-control, control, sync, verify, verifier)"}}
+  },
+  {
+   "name": "validate: a declared pattern seat whose id is not a slug is refused",
+   "fact": "validate",
+   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude"}},"patterns":{"solo":{"defaults":{"seats":[{"seat":"Bad Seat","role":"producer"}]}}}},
+   "expect": {"error":{"name":"RunnerConfigError","code":"invalid-seat-id","message":"runner config (vector runner patterns.solo.defaults.seats[0].seat) \"Bad Seat\" must be 1-40 characters: a lowercase letter, then lowercase letters, digits or \"-\""}}
+  },
+  {
+   "name": "validate: a declared pattern seat with no id is refused",
+   "fact": "validate",
+   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude"}},"patterns":{"solo":{"defaults":{"seats":[{"role":"producer"}]}}}},
+   "expect": {"error":{"name":"RunnerConfigError","code":"invalid-seat-id","message":"runner config (vector runner patterns.solo.defaults.seats[0].seat) undefined must be 1-40 characters: a lowercase letter, then lowercase letters, digits or \"-\""}}
+  },
+  {
+   "name": "validate: a declared pattern seat declared twice is refused",
+   "fact": "validate",
+   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude"}},"patterns":{"solo":{"defaults":{"seats":[{"seat":"a","role":"producer"},{"seat":"a","role":"producer"}]}}}},
+   "expect": {"error":{"name":"RunnerConfigError","code":"duplicate-seat","message":"runner config (vector runner patterns.solo.defaults.seats[1].seat) \"a\" is declared twice in this unit"}}
+  },
+  {
+   "name": "validate: a declared pattern seat with an unknown role is refused",
+   "fact": "validate",
+   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude"}},"patterns":{"solo":{"defaults":{"seats":[{"seat":"a","role":"boss"}]}}}},
+   "expect": {"error":{"name":"RunnerConfigError","code":"invalid-seat-role","message":"runner config (vector runner patterns.solo.defaults.seats[0].role) must be one of [producer, synthesizer, reviewer, red-team, judge], got \"boss\""}}
+  },
+  {
+   "name": "validate: a declared pattern seat with a blank persona is refused",
+   "fact": "validate",
+   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude"}},"patterns":{"solo":{"defaults":{"seats":[{"seat":"a","role":"producer","persona":"  "}]}}}},
+   "expect": {"error":{"name":"RunnerConfigError","code":"invalid-seats","message":"runner config (vector runner patterns.solo.defaults.seats[0].persona) must be a non-empty string"}}
+  },
+  {
+   "name": "validate: a reviewed loop whose rigor checkers are not cumulative is refused",
+   "fact": "validate",
+   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude"}},"loops":{"reviewed":{"checkersByRigor":{"low":["reviewer"],"standard":["red-team"]}}}},
+   "expect": {"error":{"name":"RunnerConfigError","message":"runner config (vector runner loops.reviewed.checkersByRigor) is not cumulative: \"standard\" does not include checker \"reviewer\" from weaker rigor \"low\"."}}
+  },
+  {
+   "name": "validate: a reviewed loop whose rigor checkers are cumulative is valid",
+   "fact": "validate",
+   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude"}},"loops":{"reviewed":{"checkersByRigor":{"low":["reviewer"],"standard":["reviewer","red-team"],"critical":["reviewer","red-team"]}}}},
+   "expect": {"ok":true}
+  },
+  {
+   "name": "validate: a reviewed loop bound within its limits is valid",
+   "fact": "validate",
+   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude"}},"loops":{"reviewed":{"bounds":{"maxRounds":{"min":1,"max":5}}}}},
+   "expect": {"ok":true}
+  },
+  {
+   "name": "validate: a loop that reads no bounded parameter refuses any bound",
+   "fact": "validate",
+   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude"}},"loops":{"solo":{"bounds":{"maxRounds":{"min":1,"max":5}}}}},
+   "expect": {"error":{"name":"RunnerConfigError","message":"runner config (vector runner loops.solo.bounds.maxRounds) is not a parameter read by the \"solo\" loop."}}
+  },
+  {
+   "name": "validate: a machine backend registry under the runner key is refused",
+   "fact": "validate",
+   "runner": {"runner":{"confinementBackends":{}},"executors":{"a":{"kind":"agent","providerModel":"claude"}}},
+   "expect": {"error":{"name":"ConfinementBackendRegistryError","message":"runner config (vector runner) cannot define or override \"confinementBackends\" — machine backend instance deployment config is managed at the machine level (confinement-backend-registry-forbidden)."}}
+  },
+  {
+   "name": "validate: a provider inventory that is not an object is refused under the source label",
+   "fact": "validate",
+   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude"}},"providers":[]},
+   "expect": {"error":{"name":"ProviderCapacityConfigError","message":"runner config (vector runner.providers) must be an object mapping provider -> { accounts } when present."}}
+  },
+  {
+   "name": "validate: a valid provider inventory is accepted",
+   "fact": "validate",
+   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude"}},"providers":{"claude":{"accounts":{"main":{"credentialSource":{"kind":"codex-home","home":"/h"}}}}}},
+   "expect": {"ok":true}
   }
  ]
 }

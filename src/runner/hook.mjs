@@ -46,7 +46,7 @@ export function normalizeHookPayload(raw, { format = null, env = process.env, cw
 }
 
 /** What `fgos hook <kind>` prints and exits with for a verdict, in the protocol of the call's format. */
-function answer(verdict, format) {
+export function answer(verdict, format) {
   if (format === 'agy') {
     const decision = verdict.blocked ? { decision: 'deny', reason: `BLOCKED: ${verdict.reason}` } : { decision: 'allow' };
     return { exitCode: 0, stdout: `${JSON.stringify(decision)}\n`, stderr: '' };

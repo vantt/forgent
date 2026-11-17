@@ -3,25 +3,26 @@
 //! copied. A vector marked `knownDefect` records behaviour that looks wrong; the port keeps it, so it is replayed
 //! like any other.
 
+mod common;
+
+use common::VectorProbe;
 use fgos_execution::accounts::{legacy_state_key, provider_account_inventory, read_llm_accounts};
 use fgos_execution::executor_model::{
     agent_cli_missing_refusal, capability_confinement, credential_store_of, family_of,
     launch_facts, lookup_executor, mechanism, rendered_effort_levels, resolve_executor_governance,
-    resolve_executor_provider, resolve_posture_invocation, tool_for_entries, with_default_executor,
-    Candidate, FamilySource, Governance, ModelError, Session,
+    resolve_executor_provider, resolve_posture_invocation, with_default_executor, Candidate,
+    FamilySource, Governance, ModelError, Session,
 };
 use fgos_execution::ports::{Backend, Machine};
+use fgos_execution::runner_check::check_runner_config;
+use fgos_execution::tools::{tool_providers, ToolProvider};
 use serde_json::{json, Map, Value};
 
 /// What this replay does not state yet, so a vector can never be skipped unseen. An entry is (fact, field, owning
 /// module): with a field, only that field of the expected answer is left out of the comparison; with none, the
 /// whole fact is not replayed and `evaluate` must still know nothing of it. The module named is the one that
 /// replays it from this same file and removes the entry.
-const REPLAYED_LATER: &[(&str, Option<&str>, &str)] = &[
-    ("accountQuarantine", None, "bind.rs"),
-    ("validate", None, "runner_check.rs"),
-    ("toolProviders", Some("status"), "tools.rs"),
-];
+const REPLAYED_LATER: &[(&str, Option<&str>, &str)] = &[("accountQuarantine", None, "bind.rs")];
 
 struct VectorMachine {
     path_commands: Vec<String>,
@@ -233,29 +234,20 @@ fn evaluate(vector: &Value) -> Option<Value> {
         }
         "llmAccounts" => read_llm_accounts(runner, &machine).to_json(),
         "stateKey" => json!(legacy_state_key(args["pool"].as_str().unwrap_or_default())),
-        "toolProviders" => {
-            // What an entry says: who serves the capability, with its mcp tool and cli command. The expected
-            // answer also carries each tool's live `status`, which the probe port replays later.
-            let capability = args.get("capability").and_then(Value::as_str);
-            let served = tool_for_entries(runner, capability);
-            Value::Array(
-                served
-                    .into_iter()
-                    .map(|entry| {
-                        let mut out = Map::new();
-                        out.insert("executorId".into(), json!(entry.executor_id));
-                        out.insert("capability".into(), json!(entry.capability));
-                        if let Some(tool) = entry.mcp_tool {
-                            out.insert("mcpTool".into(), json!(tool));
-                        }
-                        if let Some(command) = entry.command {
-                            out.insert("command".into(), json!(command));
-                        }
-                        Value::Object(out)
-                    })
-                    .collect(),
+        "validate" => match check_runner_config(runner, "vector runner") {
+            Ok(_) => json!({ "ok": true }),
+            Err(refusal) => refused(refusal.error),
+        },
+        "toolProviders" => Value::Array(
+            tool_providers(
+                runner,
+                args.get("capability").and_then(Value::as_str),
+                &VectorProbe::of(vector),
             )
-        }
+            .iter()
+            .map(ToolProvider::to_json)
+            .collect(),
+        ),
         _ => return None,
     })
 }

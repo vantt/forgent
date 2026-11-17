@@ -37,7 +37,7 @@ function answerOf(call) {
  * `pathCommands` (the only programs on PATH), `registry` (absent when null or missing, a document, or raw text),
  * `home` (when a fact expands it; left alone otherwise, the Git port needs the real one), `accountState` (the lease state file), `files` (relative path -> text) and `git` (a repository with one commit).
  */
-function withMachine(machine = {}, fn) {
+export function withMachine(machine = {}, fn) {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'executor-model-vector-'));
   const saved = { PATH: process.env.PATH, HOME: process.env.HOME, [REGISTRY_ENV]: process.env[REGISTRY_ENV] };
   try {
