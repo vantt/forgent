@@ -13,7 +13,9 @@ for deep research on existing handoff skills (research done, report
 owner one line, never default to coding. Minted SM-D1 (topic ordering), SM-D2 (automatic rotation). Miu then raised
 "auto-compaction + reload from files" as a cheaper alternative (Amp's choice); owner kept B (automatic rotation), asked
 for the best possible quality, and widened it: the rotation/handoff mechanism is generic for every kind of long-lived
-session, not limited to Miu. Now asking which sessions it covers. No D-ID minted yet.
+session, not limited to Miu. Name "session rotation" accepted; scope provisionally accepted; handoff files live in
+gitignored `.fgos/runtime/session-rotation/<persona>-<name>/` (agreed round 9). Minted SM-D3 (core shaper). Now on
+point 5 (topic list). No D-ID minted yet.
 
 ## 2. Mục tiêu & đề bài
 
@@ -32,7 +34,7 @@ sessions, not in the secretary's chat.
 | 1 | Persona content and protocol (does / never does) | discussing. Provisionally clear: Miu orders topics itself and reports (owner, round 2). Provisionally clear: automatic rotation at turn end (Stop hook), soft ~40% only at rest, hard ~70% with verbatim last message + pending question; process replaced (new+close or in-pane replace); plus user `/handoff`. Open: handoff method (research pending) |
 | 2 | Placement and activation (`core/agents/secretary.yaml`, `claude --agent secretary` in herdr, opening shaper tabs) | open |
 | 3 | Domain classification without Work | provisionally clear: Miu calls `fgos-clarifying` directly (verdict-only); no shaper -> core domain-free shaper (owner chose A); unsure domain -> ask owner, no `coding` default. Open: registry vs `domains/` mismatch (marketing, council) |
-| 6 | Generic session rotation for every long-lived session (owner, round 7): which sessions, where it lives in core, name (avoid clash with `src/state/handoff.mjs` role-call legality and `src/workflow/unit-handoff.mjs` unit outputs) | open |
+| 6 | Generic session rotation | provisionally clear: name `session-rotation` (owner); covers every head session run with a persona (persona yaml declares soft/hard thresholds and state files, core defaults otherwise), not `fgos run` seats (run supervisor owns them) nor subagents; Claude first behind a port, other CLIs via adapters reusing mailbox `hookFacts`; spike the two unproven mechanics first; two-step replacement (new answers before old closes); files under `.fgos/runtime/session-rotation/<persona>-<name>/<yymmdd-hhmm>-<sid8>.md` immutable + `latest.json` pointer written atomically, keep last 10, redacted. Open: which core component owns it (point 2) |
 | 4 | Token saving (3x always-loaded rules, model choice, short agent results, peer mail only on decisions) | open, needs owner approval |
 | 5 | Where the topic list lives (portfolio file vs board) without coupling to Work | open |
 
@@ -42,6 +44,7 @@ sessions, not in the secretary's chat.
 |---|---|---|---|
 | SM-D1 | Miu orders topics itself by the AGENTS.md product priority list and reports the order; asks the owner only on a real tie or when a reorder delays something already promised | Product priority #2: decide inside the approved frame; owner "Miu tự xếp thứ tự rồi báo lại anh" (round 2, unrevised since) | 2026-11-17 |
 | SM-D2 | Miu's session rotates automatically, never by the owner: checked at turn end; soft threshold (~40% context) only when at rest (no pending question, no in-process background work); hard threshold (~70%) at any turn end, carrying the last Miu message and pending question verbatim; the claude process is replaced (new+close or in-place, either is fine); the owner also gets a user-invoked `/handoff` | Owner forgets `/clear`; owner "ổn, dùng hai ngưỡng ... cách nào cũng được" (round 4, unrevised); method per research report `plans/reports/research-261117-1624-handoff-skills-research.md` | 2026-11-17 |
+| SM-D3 | A domain with no shaper of its own is shaped by one domain-free shaper in core, which reads the domain's doctrine from `domains/<d>/AGENTS.md`; coding keeps only its own overlay. When the domain is unclear Miu asks the owner one line instead of defaulting to `coding` | Owner "chọn A, shaper dùng chung ở core" (round 5, unrevised); the no-item shaping path holds nothing coding-specific; one door (L10) | 2026-11-17 |
 
 ## 5. Q&A log
 
@@ -85,6 +88,11 @@ sessions, not in the secretary's chat.
   "anh muốn B. nhưng hãy làm tốt nhất có thể." -> SM-D2 stands; mechanism becomes generic. Prior art scouted:
   `src/state/handoff.mjs` (team-harness call legality) and `src/workflow/unit-handoff.mjs` (Unit outputs) use the word
   "handoff" for other things; no session-rotation mechanism exists in src/apps/packages.
+- 2026-11-17 — Miu proposed scope (head sessions with a persona; not `fgos run` seats or subagents; Claude first) and
+  quality bar. Owner: "đồng ý session-rotation. tạm chấp nhận phạm vi ... ghi đè nguyên khối là sao, ghi lên file nào,
+  đặt tên file ra sao? sao không ghi vào một folder và gitignore?" Miu explained atomic write (temp + rename),
+  proposed `.fgos/runtime/session-rotation/` (already ignored, beside `.fgos/runtime/mailbox`), lineage folder per
+  persona + name, immutable timestamped files + `latest.json`, keep 10. Owner: "đồng ý, đặt theo persona + tên phiên".
 
 ## 6. Thiết kế đã chốt {#design}
 
