@@ -502,10 +502,11 @@ mod tests {
         let minted = fix_machine_key(&state);
         if minted.changed != Some(true) {
             // No OpenSSH on this machine: the fix says so and the row keeps warning.
-            assert!(minted
-                .message
-                .unwrap()
-                .starts_with("machine signing key not minted: ssh-keygen-missing"));
+            let said = minted.message.unwrap();
+            assert!(
+                said.starts_with("machine signing key not minted: ssh-keygen-missing"),
+                "{said}"
+            );
             let _ = fs::remove_dir_all(state);
             return;
         }

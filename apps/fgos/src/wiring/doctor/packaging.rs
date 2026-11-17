@@ -402,12 +402,16 @@ mod tests {
             Ran::Failed(cause) => assert_eq!(cause, "ENOENT"),
             Ran::Ok => panic!("a tool that does not exist ran"),
         }
-        let (passed, message) = said_by(curl_row(&env));
-        assert!(passed, "a missing curl is a warning, never a failure");
-        assert!(
-            message.starts_with("warning: curl is not usable on PATH (ENOENT); fgctl init cannot download a release"),
-            "{message}"
-        );
+        // Windows finds curl.exe in its system directory whatever PATH says, so only there can curl be absent.
+        #[cfg(unix)]
+        {
+            let (passed, message) = said_by(curl_row(&env));
+            assert!(passed, "a missing curl is a warning, never a failure");
+            assert!(
+                message.starts_with("warning: curl is not usable on PATH (ENOENT); fgctl init cannot download a release"),
+                "{message}"
+            );
+        }
         let (passed, message) = said_by(bwrap_row(&env));
         assert!(!passed);
         assert_eq!(

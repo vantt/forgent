@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "e5dce8db1643b5c595e846081f31241a925615ec0a23e4765df8b87a6b2fdb4f",
+  "payloadDigest": "e6b900d16c6e1ada777fbed1abe3c272cecd10dd1e82771a40181200e08efffa",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "b8b886cee2ea5ce7ee1153e4795512db135a990de894c27e53c5e778b210be62",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -96,11 +96,11 @@
     "apps/fgos/src/wiring/doctor/event_store.rs": "61c66e050710eb6ea4aa2f8cb4643bdf91f8cd63bb482f1674de4614edf46e34",
     "apps/fgos/src/wiring/doctor/git.rs": "387d33a73bd778d0508a601d43a4ec4df5c83cb4da051dea47096de8a5526d7d",
     "apps/fgos/src/wiring/doctor/holder_lock.rs": "75b6efcf2c782e6508595d5049214226a5ffedefe73b3dc7f6ea018fd89bc232",
-    "apps/fgos/src/wiring/doctor/identity.rs": "c77b8f84fb27f10717b264bb839e5c79dd2a817d51263779bb7d233db9469a55",
+    "apps/fgos/src/wiring/doctor/identity.rs": "40499cf62343b256decce7c1905cee1bc2f2a5f07e9d7b389f824d8c44de273f",
     "apps/fgos/src/wiring/doctor/mailbox.rs": "8de4fb5222d9cba45cf7a269e5bb18cb2cd804333c13316821d2ebde5c16219b",
     "apps/fgos/src/wiring/doctor/mod.rs": "de02a45a0dca0837251bb5c2004271c7c2565867146fe811f505ac95959df90f",
     "apps/fgos/src/wiring/doctor/observe.rs": "277742f65ac2d3ac816d11c212b27ba0fffebd5e121dce4f8370154cd864e03e",
-    "apps/fgos/src/wiring/doctor/packaging.rs": "ffb362bee742dd0885ac507f99102d4b099c30dd4625134cef4e499d2a6b32af",
+    "apps/fgos/src/wiring/doctor/packaging.rs": "2e9c24031035b2d9431b8f6e6a44b31246b385f222d2b78a34b273e6118f3898",
     "apps/fgos/src/wiring/event_store_clone.rs": "923d718f7a6bd5705cbe6e4d4c8393672c1ef4a2142facc9ada314307a4d7574",
     "apps/fgos/src/wiring/events.rs": "472018eb9c3e76867d7e50f388de9248edd6803011972fa1f43eb72bf64a8386",
     "apps/fgos/src/wiring/gateway_control.rs": "4d0497382df90574bbe4f65a249d0977bc23e1334c7ad7c83f13351d8ff22ca8",
