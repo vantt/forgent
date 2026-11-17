@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "88324acda30784c1633e7c2251374f73e8398054757903227b5b4416dde55d90",
+  "payloadDigest": "7051f130684d418d3355df1ed526b90268a8ad753bab24625cb4f7beba7f1eb4",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "b8b886cee2ea5ce7ee1153e4795512db135a990de894c27e53c5e778b210be62",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -551,7 +551,7 @@
     "packages/identity/rust/src/resolve.rs": "c9b611f02aed198b1acfe408f24cdcfaf77d112dcb906f7290315603707c1f68",
     "packages/identity/rust/src/session.rs": "c47d0ee2bc070e02979f702a17031d48799867de27dd0688c74d6477a255c5a2",
     "packages/identity/rust/src/shared.rs": "0af34e63b1832c74dd7f48aabca466b6ff425b93bd6c54b9206ca29f04c0d995",
-    "packages/identity/rust/src/signing.rs": "a5ad7d5b2774542d6cd2bec3c3b8838d0a058708b8d09f4caf3ede5dec6f14de",
+    "packages/identity/rust/src/signing.rs": "5a972b1aa966ac1e9c779c823647bb7faa895829f44214b0525a0b3d527ebfa4",
     "packages/identity/rust/src/text.rs": "9639cf6ee8a57d88dbc620a505575ce1054b437c0ac2172426e93193bd45604a",
     "packages/identity/rust/tests/attempt_writer_id.rs": "4a2c27555d3acbedc432e097e5701ecb26c229e7d4283623ec331fad5f11ba36",
     "packages/identity/rust/tests/directory.rs": "23a4e315960c947278a9863a435c281a7e94dae6ee5fac2a89eec351e5326eb8",
@@ -3391,7 +3391,7 @@
       "spawn": "Command::new",
       "binary": "ssh",
       "class": "argv-runner",
-      "resolvedAt": "packages/identity/rust/src/signing.rs:177"
+      "resolvedAt": "packages/identity/rust/src/signing.rs:190"
     },
     {
       "path": "packages/process/rust/src/spawn.rs",
@@ -3399,7 +3399,7 @@
       "spawn": "Command::new",
       "binary": "ssh-keygen",
       "class": "argv-runner",
-      "resolvedAt": "packages/identity/rust/src/signing.rs:174"
+      "resolvedAt": "packages/identity/rust/src/signing.rs:187"
     },
     {
       "path": "packages/process/rust/src/spawn.rs",

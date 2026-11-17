@@ -81,10 +81,23 @@ use crate::machine::private_dir;
 /// shared temp directory.
 struct Scratch(PathBuf);
 
+/// The plain spelling of a verbatim drive path (`\\?\D:\...`), `None` for any other path.
+fn plain_drive_path(path: &str) -> Option<&str> {
+    let rest = path.strip_prefix(r"\\?\")?;
+    let bytes = rest.as_bytes();
+    (bytes.len() >= 3 && bytes[0].is_ascii_alphabetic() && bytes[1] == b':' && bytes[2] == b'\\')
+        .then_some(rest)
+}
+
 impl Scratch {
     fn new(state_root: &Path) -> Result<Self, Refusal> {
         let name = random_hex128().map_err(|e| refuse("random-unavailable", e.to_string()))?;
-        let path = state_root.join("tmp").join(format!("signing-{name}"));
+        // `ssh-keygen` on Windows cannot open the verbatim spelling `canonicalize` gives a state root.
+        let root = state_root.to_str().and_then(plain_drive_path);
+        let path = root
+            .map_or_else(|| state_root.to_path_buf(), PathBuf::from)
+            .join("tmp")
+            .join(format!("signing-{name}"));
         private_dir(&path)
             .map_err(|e| refuse("signing-scratch-failed", format!("{}: {e}", path.display())))?;
         Ok(Self(path))
@@ -518,4 +531,17 @@ pub fn verify(state_root: &Path, bytes: &[u8], signature: &Signature) -> Result<
         first_seen,
         state,
     })
+}
+
+#[cfg(test)]
+mod tests {
+    use super::plain_drive_path;
+
+    #[test]
+    fn a_verbatim_drive_path_is_spelled_plainly_and_no_other_path_changes() {
+        assert_eq!(plain_drive_path(r"\\?\C:\Users\me"), Some(r"C:\Users\me"));
+        assert_eq!(plain_drive_path(r"\\?\UNC\host\share"), None);
+        assert_eq!(plain_drive_path(r"C:\Users\me"), None);
+        assert_eq!(plain_drive_path("/home/me"), None);
+    }
 }
