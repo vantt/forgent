@@ -67,3 +67,37 @@ test('public CLI fail-closes duplicate admitted materializations and composite R
   const malformed = fs.mkdtempSync(path.join(os.tmpdir(), 'dispatch-inspect-cli-')); assignment(malformed, 'a'); materialize(malformed, 'a', 'good', undefined, true); admission(malformed, 'a', 'good'); const bad = path.join(malformed, '.fgos', 'assignments', 'a', 'runs', '02'); fs.mkdirSync(bad, { recursive: true }); fs.writeFileSync(path.join(bad, 'run.json'), '{broken'); answer = run(['dispatch', 'inspect', ...cliRoot(malformed), '--run', 'good']); assert.equal(answer.status, 0, answer.stderr); data = JSON.parse(answer.stdout).data; assert.equal(data.inspectionStatus, 'partial'); assert.equal(data.recoveryAuthority, undefined);
   const cwdRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'dispatch-inspect-cli-')), cwd = path.join(cwdRoot, 'cwd'); fs.mkdirSync(cwd); assignment(cwdRoot, 'a'); assignment(cwdRoot, 'b'); materialize(cwdRoot, 'a', 'good', cwd, true); materialize(cwdRoot, 'b', 'bad', cwd, true); admission(cwdRoot, 'a', 'good'); fs.mkdirSync(path.join(cwdRoot, '.fgos', 'dispatch'), { recursive: true }); fs.writeFileSync(path.join(cwdRoot, '.fgos', 'dispatch.lock'), '{}'); fs.writeFileSync(path.join(cwdRoot, '.fgos', 'workspace-evidence.json'), '{}'); fs.writeFileSync(path.join(cwdRoot, '.fgos', 'dispatch', 'projection-conflicts.json'), '[]'); answer = run(['dispatch', 'inspect', ...cliRoot(cwdRoot), '--cwd', cwd]); assert.equal(answer.status, 0, answer.stderr); data = JSON.parse(answer.stdout).data; assert.equal(data.inspectionStatus, 'partial'); assert.equal(data.recoveryAuthority, undefined);
 });
+
+test('public CLI --attention lists a failed run and a live run past its timeout with reason and next command, in json and text, and refuses a missing bound or a second selector', async () => {
+  const { acquireSync, createLockScope } = await import('../../src/holder-lock/index.mjs');
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'dispatch-inspect-cli-')), work = path.join(root, 'work');
+  fs.mkdirSync(path.join(work, '.git'), { recursive: true });
+  const put = (id, runId, extra, result) => {
+    assignment(root, id); admission(root, id, runId);
+    const dir = path.join(root, '.fgos', 'assignments', id, 'runs', '01'); fs.mkdirSync(dir, { recursive: true });
+    fs.writeFileSync(path.join(dir, 'run.json'), JSON.stringify({ assignmentId: id, runId, cwd: work, startedAt: '2026-11-17T08:00:00.000Z', ...extra }));
+    if (result) fs.writeFileSync(path.join(dir, 'result.json'), JSON.stringify(result));
+  };
+  put('a-fail', 'r-fail', {}, {
+    contract: { id: 'assignment-run-result', version: 2 }, runId: 'r-fail', assignmentId: 'a-fail', status: 'failed', confidence: 'failed', settledAt: '2026-11-17T08:05:00.000Z',
+    classification: { execution: { status: 'failed', exitCode: 1 }, assessment: { verdict: 'pass' }, confidence: { level: 'failed', basis: ['exit-nonzero'] }, failure: { family: 'unknown', code: 'worker-exit' }, policy: { disposition: 'allow', code: null }, delivery: { mode: 'fresh' }, provenance: 'native-v2' },
+  });
+  put('a-live', 'r-live', { timeoutMs: 60000, status: 'running' });
+  const held = acquireSync(createLockScope('test-supervisor'), 'attempt', { runDir: path.join(root, '.fgos', 'assignments', 'a-live'), NN: '01' });
+  assert.equal(held.result, 'acquired');
+  try {
+    const json = run(['dispatch', 'inspect', ...cliRoot(root), '--attention', '--since', '2026-11-17', '--json']);
+    assert.equal(json.status, 0, json.stderr);
+    const rows = JSON.parse(json.stdout).data.rows;
+    assert.deepEqual(rows.map((r) => [r.runId, r.kind]).sort(), [['r-fail', 'failed'], ['r-live', 'past-deadline']]);
+    for (const row of rows) { assert.ok(row.reason); assert.ok(row.nextCommand); }
+    const text = run(['dispatch', 'inspect', ...cliRoot(root), '--attention', '--since', '2026-11-17']);
+    assert.equal(text.status, 0, text.stderr);
+    assert.equal(text.stdout.split('\n').filter((l) => /^(failed|past-deadline) /.test(l)).length, 2);
+    assert.doesNotMatch(text.stdout, /^\{/);
+  } finally { held.handle.release(); }
+  const bare = run(['dispatch', 'inspect', ...cliRoot(root), '--attention']);
+  assert.equal(bare.status, 4); assert.match(bare.stderr, /--since/);
+  const two = run(['dispatch', 'inspect', ...cliRoot(root), '--attention', '--since', '2026-11-17', '--run', 'x']);
+  assert.equal(two.status, 4); assert.match(two.stderr, /exactly one selector/);
+});

@@ -3000,7 +3000,7 @@
           ]
         },
         "inspect": {
-          "description": "Dispatch-owned runtime inspection of a Run, an Assignment, a working directory's dispatch lock, provider capacity, or terminal allocations.",
+          "description": "Dispatch-owned runtime inspection of a Run, an Assignment, a working directory's dispatch lock, provider capacity, terminal allocations, or the runs that need a person (--attention).",
           "parameters": {
             "type": "object",
             "properties": {
@@ -3023,6 +3023,14 @@
               "terminal": {
                 "type": "boolean",
                 "description": "Report terminal slots allocated but never launched and retained panes past their time; reads only, closes nothing."
+              },
+              "attention": {
+                "type": "boolean",
+                "description": "List the runs that need a person since a time, across every worktree of the project; one line each with the reason and the next command. Needs --since."
+              },
+              "since": {
+                "type": "string",
+                "description": "With --attention: only runs started or settled at or after this time (RFC 3339 or YYYY-MM-DD)."
               }
             },
             "required": []
@@ -3032,7 +3040,8 @@
             "fgos dispatch inspect --assignment asgn_abc123",
             "fgos dispatch inspect --cwd /workspace/project",
             "fgos dispatch inspect --provider-capacity",
-            "fgos dispatch inspect --terminal"
+            "fgos dispatch inspect --terminal",
+            "fgos dispatch inspect --attention --since 2026-11-17"
           ]
         },
         "watch": {
