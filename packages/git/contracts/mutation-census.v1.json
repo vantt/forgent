@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "885c79137298a3dd4f79026961bb414a3142ec3227f329d6dc8311340d6692f6",
+  "payloadDigest": "12fb4d7eab780d18e3277584c5081e6a782cb21be41e71991b1e3b5b7bed765f",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "b8b886cee2ea5ce7ee1153e4795512db135a990de894c27e53c5e778b210be62",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -409,7 +409,7 @@
     "packages/event-store/rust/tests/walk_certified.rs": "5dcea368cef656e692996410ac26e203ee8ba9d202e4096f3bd7f74925af7eb6",
     "packages/execution/rust/src/accounts.rs": "624088d405903d3041d3fae92cc23caf7e01dbe4c0a5592141a0c8cd4e2ab989",
     "packages/execution/rust/src/agents.rs": "423fbb2c8eb252aad2b8390a66f22715f1e09a93020ffe5ff5c349927a769743",
-    "packages/execution/rust/src/decide.rs": "f398e21b77d759cb57b4925716d115d1f15b4ec8de774a8973019447edfe7c6e",
+    "packages/execution/rust/src/decide.rs": "d556465c3b352bcfab91d6a426f7d7b4a44691c2a35b2d7cef77158e15400e38",
     "packages/execution/rust/src/executor_model.rs": "592c7d761855cd2196f71491f1ee1f2ef5d7a800add4998e391198c35fad4fc9",
     "packages/execution/rust/src/hook.rs": "3af4bc09b1623a335eed293347f80fed821027e19e52c16db692988dc2e72e71",
     "packages/execution/rust/src/lib.rs": "36a30528adc80d249b909d2a075a17cb196cd0ab5beee021e9eb487280e713b7",

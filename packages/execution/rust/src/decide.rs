@@ -881,8 +881,11 @@ fn refused(message: String) -> DecideFailure {
     DecideFailure::Refused(ModelError::runner(message))
 }
 
-/// The decision over a runner section the caller loaded (before the default executor is layered on, which this
-/// does). The answer carries `executorId` only when the caller did not name it.
+/// The decision over a runner section the caller loaded and checked ([`load_checked_runner`]), before the default
+/// executor is layered on, which this does. The caller composes `fgos dispatch decide` around it: the `--repo-root`
+/// guard ([`guard_cwd_repo_root`]), the project root (the invocation-root door), the config root ([`config_root_for`]), the
+/// Work hint and the assignment record read at that root. The answer carries `executorId` only when the caller did
+/// not name it.
 pub fn decide_over(
     loaded_runner: &Value,
     req: &DecideRequest,
@@ -1065,36 +1068,6 @@ pub fn decide_over(
         .filter(|t| !t.is_empty())
         .map(str::to_string);
     Ok(named_out(out))
-}
-
-/// `fgos dispatch decide`: the cwd/repo-root guard, the config root, the checked runner config, then the
-/// decision. `cwd` is the directory the caller names (else the process's own). The assignment record, when
-/// `--assignment` names one, is read by the caller from `<root>/.fgos/assignments/<id>/assignment.json`.
-pub struct DecideContext<'a> {
-    pub workspace: &'a dyn Workspace,
-    pub probe: &'a dyn ToolProbe,
-    pub binder: &'a dyn SeatBinder,
-}
-
-/// The project root a decide reads from: `--repo-root`, else the main checkout of `cwd`, else its worktree root.
-pub fn decide_root(
-    workspace: &dyn Workspace,
-    cwd: &str,
-    repo_root: Option<&str>,
-) -> Result<String, DecideFailure> {
-    if let Some(root) = repo_root.filter(|r| !r.is_empty()) {
-        return Ok(root.to_string());
-    }
-    if let Some(main) = workspace.main_checkout_root(cwd) {
-        return Ok(main);
-    }
-    workspace.repo_root(cwd).map_err(|message| {
-        DecideFailure::Refused(ModelError {
-            name: "StoreError",
-            code: None,
-            message,
-        })
-    })
 }
 
 /// The run door a caller uses instead of dispatching `executor_id` directly: `--provider` names agent executors
