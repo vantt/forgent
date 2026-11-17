@@ -43,9 +43,9 @@ spec `plans/reports/spec-261116-1042-plan-supervisor.md` §2 (roles), §4 (index
 |---|---|---|---|---|
 | 1 | [Baseline and setup](phase-01-baseline-and-setup.md) | completed | none | this plan dir `reports/measures-template.md` |
 | 1b | [Shaper without Work and the plan contract](phase-01b-shaper-without-work-and-plan-contract.md) | completed (landed 6ec9da752, a6f22e0f6) | 1 | (a) shaper skill paths of its agent; (b) `core/skills/_shared/plan-contract.md`, `scripts/plan-contract-check.mjs`, its test, `planner-brief-template.md`, this plan dir |
-| 2 | [Shape and plan the items](phase-02-shape-and-plan-items.md) | ready (Q1 answered) | 1b, Q1 | per item: `DISCUSSION.md`, item plan dir |
-| 3 | [Drive and land](phase-03-drive-and-land.md) | pending (Q2 answered; gate key effective once this branch lands) | 2, Q2 | per item: case worktree + branch; item `reports/measures.md` |
-| 4 | [Trial report](phase-04-trial-report.md) | pending | 3 | draft plan `reports/trial-*.md`, draft plan `notes.md` |
+| 2 | [Shape and plan the items](phase-02-shape-and-plan-items.md) | completed (both items planned) | 1b, Q1 | per item: `DISCUSSION.md`, item plan dir |
+| 3 | [Drive and land](phase-03-drive-and-land.md) | in-progress (item 1 landed 45ad5c4a0; item 2 `trial/watch-attention` 63b32f557 gate green, waiting on the main HOLD) | 2, Q2 | per item: case worktree + branch; item `reports/measures.md` |
+| 4 | [Trial report](phase-04-trial-report.md) | completed (report `plans/261117-1430-portfolio-driving-draft/reports/trial-261117-1705-solo-driving-trial.md`) | 3 | draft plan `reports/trial-*.md`, draft plan `notes.md` |
 
 Phases run in order (1, 1b, 2, 3, 4; the two parts of 1b run at once); items inside phases 2-3 may run one after the other or side by side (disjoint files).
 
