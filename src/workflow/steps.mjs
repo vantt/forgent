@@ -43,6 +43,7 @@ export function unitFieldsOfTemplate(template) {
     ...(template.prefer ? { prefer: template.prefer } : {}),
     ...(template.persona ? { persona: template.persona } : {}),
     ...(template.seats ? { seats: template.seats } : {}),
+    ...(template.tier !== undefined ? { tier: template.tier } : {}),
     ...(template.timeoutMs !== undefined ? { timeoutMs: template.timeoutMs } : {}),
     ...(template.verify !== undefined ? { verify: template.verify } : {}),
     ...(template.skills !== undefined ? { skills: template.skills } : {}),

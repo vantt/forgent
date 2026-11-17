@@ -7,7 +7,7 @@ import { RIGOR_VALUES } from '../rigor.mjs';
 import { checkDeclaredSeats } from './seat-resolver.mjs';
 import { canonicalizeWriteEntry } from '../dispatch/write-scope.mjs';
 
-const DISALLOWED_UNIT_FIELDS = Object.freeze(['executor', 'provider', 'model', 'tier', 'invocation', 'actors', 'overrides']);
+const DISALLOWED_UNIT_FIELDS = Object.freeze(['executor', 'provider', 'model', 'invocation', 'actors', 'overrides']);
 
 const PREFER_ENTRY_KEYS = new Set(['executor', 'invocation']);
 
@@ -113,7 +113,8 @@ function isSyncRef(ref) {
  *   (checker and panel roles are not asked for them)
  * - syncBase?: ref the runner merges into the unit's branch before the worker runs (needs writes)
  * - syncOnly?: set when a unit with a syncBase leaves out its objective: no worker unless the merge conflicts
- * - MUST NOT contain: executor, provider, model, tier, invocation, actors, overrides (G2)
+ * - tier?: the ladder tier a registered workflow definition recommends for every seat of the unit (unit files and stdin are refused it before this runs)
+ * - MUST NOT contain: executor, provider, model, invocation, actors, overrides (G2)
  *
  * @param {unknown} raw
  * @returns {Readonly<{
@@ -228,6 +229,10 @@ export function validateUnit(raw) {
     }
   }
 
+  if (raw.tier !== undefined && !MODEL_POLICY_TIERS.includes(raw.tier)) {
+    throw new RunnerConfigError(`unit.tier must be one of [${MODEL_POLICY_TIERS.join(', ')}], got: ${JSON.stringify(raw.tier)}.`);
+  }
+
   if (raw.persona !== undefined && (typeof raw.persona !== 'string' || !raw.persona.trim())) {
     throw new RunnerConfigError('unit.persona must be a non-empty string when present.');
   }
@@ -264,6 +269,7 @@ export function validateUnit(raw) {
     ...(pattern !== undefined ? { pattern } : {}),
     ...(prefer !== undefined ? { prefer } : {}),
     ...(seats !== undefined ? { seats } : {}),
+    ...(raw.tier !== undefined ? { tier: raw.tier } : {}),
     ...(raw.persona !== undefined ? { persona: raw.persona.trim() } : {}),
     ...(raw.timeoutMs !== undefined ? { timeoutMs: raw.timeoutMs } : {}),
     ...(raw.verify !== undefined ? { verify: raw.verify.trim() } : {}),

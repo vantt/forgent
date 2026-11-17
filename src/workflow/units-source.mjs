@@ -7,6 +7,7 @@ import { parseYaml } from '../util/yaml.mjs';
 
 import { validateWorkflowChecked as validateWorkflow } from './checked.mjs';
 import { validateUnit } from '../runner/execution/unit.mjs';
+import { assertNoUnitTier } from '../runner/execution/seat-resolver.mjs';
 import { RunnerConfigError } from '../runner/dispatch/runner-config-error.mjs';
 
 const BRANCH_SAFE_ID = /^[A-Za-z0-9][A-Za-z0-9._-]*$/;
@@ -47,6 +48,7 @@ export function translateUnitsToWorkflow(unitsPath) {
   const steps = rawUnits.map((raw, i) => {
     let unit;
     try {
+      assertNoUnitTier(raw, 'a units file');
       unit = validateUnit(raw);
     } catch (err) {
       throw new RunnerConfigError(`units[${i}]: ${err.message}`);

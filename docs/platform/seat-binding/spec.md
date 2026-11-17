@@ -171,7 +171,7 @@ Tên tier sai trong config là lỗi load. Việc hạ tier duy nhất từng x�
 
 | Bên khai | Khoá | Ghi chú |
 |---|---|---|
-| Workflow unit | `capability`, `pattern`, `persona?`, `rigor?`, `seats: [{seat, role, persona?, tier?}]` | `tier` là khuyến nghị; không bao giờ `prefer`, `executor`, `overrides` |
+| Workflow unit | `capability`, `pattern`, `persona?`, `rigor?`, `tier?`, `seats: [{seat, role, persona?, tier?}]` | `tier` là khuyến nghị: của ghế trước, rồi của unit (phủ mọi ghế unit chạy, cả ghế checker do pattern sinh); chỉ định nghĩa workflow đã đăng ký được khai, file unit/stdin bị từ chối; không bao giờ `prefer`, `executor`, `overrides` |
 | Domain package (đợt sau) | `tier`, độc lập | chỉ phần mang theo được; không bao giờ `prefer` |
 | Project `.fgos/config.json` `runner` | `defaults`, `maxTier`, `tierFallback`, `modelPolicies`, `capabilities` | tiếng nói cuối, trong khuôn mục 5.4 |
 | Global `~/.fgos/config.json` | `llmAccounts`, executor máy | không nhận khoá mới đợt này (mục 9) |
