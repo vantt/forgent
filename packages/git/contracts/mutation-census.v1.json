@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "39749d431b47c14446cb648d8f5b9753fc272a9dfb780a01422b15b9a7fcc4b8",
+  "payloadDigest": "839b20c45a6a6bc7d868d5802009fd0d3c77de3ee7c9f12e7b3dd001a7f64e3c",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "b8b886cee2ea5ce7ee1153e4795512db135a990de894c27e53c5e778b210be62",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -313,17 +313,17 @@
     "packages/distribution/rust/src/manifest.rs": "7aa7f3d42c3ac708e44cb0bbf4be36c414eaf0b29f0bdafc5bb768901fb46bda",
     "packages/distribution/rust/src/path_links.rs": "fca28665200e6157411d4088829a26c2442bd563d2bd081b3d85a157c218c711",
     "packages/distribution/rust/src/rc_lines.rs": "592ff52dc8a61ae12f757339f4e5d2feee46dc4e50ac719544be2b3cdacf0fff",
-    "packages/distribution/rust/src/release_rows.rs": "670a1417a5ab0a94eebc07491227f5f32b6a5dc6ab303a97c9b9bfc1307e06c4",
+    "packages/distribution/rust/src/release_rows.rs": "09224a9242b141135f97c38d6bd9bd5c134599fd7975288d31843193f0b48d81",
     "packages/distribution/rust/src/shim.rs": "03ad502807c3743b185f5165f4c5ee7b677d689da3fc9e11e8dabfa44f376d2e",
     "packages/distribution/rust/src/skill_stamp.rs": "f704fd4b3312f43025919a24c2a3b924236baab73f196b1e4f5ceb266bbc24c7",
-    "packages/distribution/rust/src/source_payload.rs": "764c5265dab13417708ddf6cbe5d611da1ce0b79311605ce91a581b6aa7db3ca",
+    "packages/distribution/rust/src/source_payload.rs": "59e2f03b1faf51bc3ce5bfa7cc5652d78de3baabed9c4e77534da5cb9237f0a6",
     "packages/distribution/rust/src/store.rs": "1cdaf72bbdf7c4bc0ae3eafd1f37fecd6a358de60c8ce5851ccf9212149174de",
     "packages/distribution/rust/src/suggest.rs": "302d698667662b3544b0761cd53dd87c68594d6f1b1ce52d8b85032627d52182",
-    "packages/distribution/rust/src/test_scratch.rs": "244cd414a2413dfa0bb1410e6206ea24844ea1860e825eae90072d2ea123fab7",
+    "packages/distribution/rust/src/test_scratch.rs": "93c7b453c854f6fb900fd31e8106908d17158e711fe0671787fb7fcbe9f23ee9",
     "packages/distribution/rust/src/timer.rs": "d1a12b661c529be10aa7f62b978dbccc843fbf76947322d9b65df98fe0b2be43",
     "packages/distribution/rust/src/uninstall.rs": "c239bf1249825db23867a8cb0b3af9c10d80b2c85f58ef3a6f9353500860b8f9",
     "packages/distribution/rust/src/verify.rs": "79a9f08e75d0c0ca8f5e04ad8443e4134a3dfbd85a38e01a448d53361463dc69",
-    "packages/distribution/rust/src/workspace.rs": "ceb38606817fe7fe75d832d2c207e1b544cef3a2105acfb8892d2e1c25985fab",
+    "packages/distribution/rust/src/workspace.rs": "e63cf386b5471fb905efd657d2029022e27ba9ec5da8068436b0d395310749a9",
     "packages/distribution/rust/tests/activation_lock_multiprocess.rs": "ff2818dd10b745ac29c1610effd95ac36552f4aace4525634c6b20f17f325fe0",
     "packages/distribution/rust/tests/fetch_download.rs": "781764dcb50b2143d578f42282f5e4f3a61ad96fce0e861d8cfe6f2529dbf170",
     "packages/distribution/rust/tests/install_lock_multiprocess.rs": "790f1617f49d0a1efea555767705dba32c036e30bd897e0b01b09206342088cb",
@@ -2533,14 +2533,14 @@
     },
     {
       "path": "packages/distribution/rust/src/release_rows.rs",
-      "line": 1262,
+      "line": 1265,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"
     },
     {
       "path": "packages/distribution/rust/src/release_rows.rs",
-      "line": 1397,
+      "line": 1400,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"

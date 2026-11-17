@@ -856,7 +856,8 @@ mod tests {
             message(&row),
             format!(
                 "rust host binary present and executable: {}",
-                binary.display()
+                // the row names the entry with the platform's own separators
+                binary.components().collect::<PathBuf>().display()
             )
         );
         put_json(&release, "manifest.json", &json!({ "entries": {} }));
@@ -960,7 +961,9 @@ mod tests {
             process_cwd: &dir,
         };
         let row = check_legacy_node_payload_present(&cwd, &plain);
-        assert!(!row.passed && message(&row).contains("legacy-node/bin/fgos.mjs"));
+        // The row names the entry the way the platform joins `libexec/legacy-node` and `bin/fgos.mjs`.
+        let named = Path::new("legacy-node").join("bin/fgos.mjs");
+        assert!(!row.passed && message(&row).contains(&named.display().to_string()));
     }
 
     #[test]
@@ -1016,7 +1019,7 @@ mod tests {
     impl Fixture {
         fn new() -> Self {
             let dir = scratch("rr-drift");
-            let temp = fs::canonicalize(&*dir).unwrap();
+            let temp = dir.to_path_buf();
             let source = temp.join("checkout");
             let release = temp.join("release");
             let outside = temp.join("outside");

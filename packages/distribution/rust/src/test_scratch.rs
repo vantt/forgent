@@ -37,9 +37,20 @@ pub(crate) fn scratch(label: &str) -> Scratch {
             NEXT.fetch_add(1, Ordering::Relaxed)
         ));
         match std::fs::create_dir(&dir) {
-            Ok(()) => return Scratch(dir),
+            Ok(()) => return Scratch(canonical(&dir)),
             Err(e) if e.kind() == std::io::ErrorKind::AlreadyExists => continue,
             Err(e) => panic!("scratch directory {}: {e}", dir.display()),
         }
+    }
+}
+
+/// The directory as the OS itself spells it: no symbolic link in the path (the temporary directory of macOS
+/// sits behind one, and the code under test refuses a linked ancestor), no short `RUNNER~1` name, and none of
+/// the `\\?\` form Windows gives a canonical path, which Git and the shell reject.
+fn canonical(dir: &Path) -> PathBuf {
+    let real = std::fs::canonicalize(dir).unwrap_or_else(|_| dir.to_path_buf());
+    match real.to_str().and_then(|text| text.strip_prefix(r"\\?\")) {
+        Some(plain) if !plain.starts_with("UNC\\") => PathBuf::from(plain),
+        _ => real,
     }
 }

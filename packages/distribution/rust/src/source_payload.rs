@@ -338,7 +338,8 @@ mod tests {
                 &json!({ "files": [entry] }).to_string(),
             )
         };
-        declare("/etc");
+        // Rooted without a drive letter is not absolute on Windows.
+        declare(if cfg!(windows) { r"C:\Windows" } else { "/etc" });
         assert!(
             refused(&dir).starts_with("Absolute path refused in declared release payload entry")
         );

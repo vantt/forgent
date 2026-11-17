@@ -134,7 +134,7 @@ mod tests {
     #[test]
     fn test_workspace_root_of_subdirectory_and_linked_worktree_is_the_main_checkout() {
         let scratch_dir = crate::test_scratch::scratch("fgctl-root");
-        let base = std::fs::canonicalize(&*scratch_dir).unwrap();
+        let base = scratch_dir.to_path_buf();
         let main = base.join("main");
         std::fs::create_dir_all(main.join("docs")).unwrap();
         git(&main, &["init", "-q", "-b", "main"]);
