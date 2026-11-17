@@ -1,0 +1,877 @@
+{
+ "packet": "final-recommendation",
+ "revision": "second revision of the revisit packet. It replaces unit-run-1794898080767-81113980/producer/1-fb1 only where listed under what_changed with since = 'producer/1-fb1'; everything else is carried byte for byte from that packet.",
+ "summary": "Fixed the findings that the reviewer and the red team reported on the previous revision and changed nothing else: a withdrawal now voids a delivery and is printed on the board (RT-4.1); the writer of the validation record is one named process and the observer of a finished unit or case is named, with what is still unproven left open (RT-4.2); the invented branch count is corrected (RT-4.3); the records folder and the board are kept out of the digested subject, the board is regenerated only at landing so branches cannot conflict on it, and the P2 dependency on the Event Store and holder-lock is stated as a gate that P1 does not have (reviewer findings 1 to 3).",
+ "status": "advice-only. No owner approval beyond the two quoted owner decisions, no reviewer or red-team approval of this packet, no implementation plan. The reviewer of the previous revision reported three findings and the red team three; this revision answers them and its answers have been examined by no seat. The record shapes below are a starting design for P0 to be measured by the tool in P1 to P3, not a closed design.",
+ "question": "How to establish, maintain and keep healthy the project's board/portfolio and plans as the base for driving plans with short-lived roles: boss, shaper, planner, supervisor, leader, workers, watcher.",
+ "authority": {
+  "owner_decided": [
+   "D-ADR0079 (origin/main, docs/platform/runner/decisions/h-36d872fbb0e5.md:1964, commit 4a7eb5a54): portfolio, board, backlog and plans are the project's source of truth and live in the project repository; the board is generated from plans and backlog, never hand-edited; Work is the UX layer, manages its own data, and is replaceable; the portfolio does not depend on Work.",
+   "D-ADR0076 (same file, line 1921): Workflow and Execution are the engine; Work holds no engine behaviour.",
+   "Board line 2026-11-17 13:22 (origin/main, plans/261017-1313-fgos-platform-program-board/log.md): build P1 to P3 first as this repository's tool by promoting tools/plan-supervisor from origin/plan-supervisor-prototype, measure, then plan the move into fgOS as verbs/skills; workers through fgos run --pattern solo first, deeper patterns later; run state through fgOS doors (Event Store / holder-lock), not per-machine files; every piece of work goes through a plan; agents short-lived."
+  ],
+  "left_open_by_the_owner_records": [
+   "The portfolio data model, status vocabulary and board generator (D-ADR0079, not decided here).",
+   "Where claim and lease state for a running plan lives, within fgOS doors (D-ADR0079, not decided here).",
+   "Where claim, slot and settlement state move to, and the Work-to-engine contract (D-ADR0076, not decided here)."
+  ],
+  "this_packet_decides_nothing": "Everything under verdict.design is a recommendation for those open points."
+ },
+ "verdict": {
+  "position": "Recommended starting design, not adopted and not closed. Establish: two authored sources in the repository (backlog rows for why, plan directories for what and how), add-only record files beside each plan bound to a digest of the plan's declared files, and one generated committed board of durable facts. Maintain: every change to a source lands with its record, and the board is regenerated in the landing commit on the target; a check in CI fails only the affected plan. Keep healthy: a timer-run, non-LLM sweep reads the board plus run facts kept through fgOS doors and records exceptions. Build it first as tools/plan-supervisor (promoted, with its private parser, TTL lock, home-directory state and claim queue replaced by fgOS doors), measure it on real plans, then plan the move into fgOS.",
+  "confidence": "medium on the layering (repository owns portfolio truth, engine owns execution, fgOS doors own run state), which now rests on two owner records and on source read by several seats. Low to medium on the record shapes (D3, D5, D11): they are this seat's answer to the red-team findings; the previous revision of them was examined once and three closures did not hold (RT-4.1, RT-4.2), and the corrections in this revision have been examined by no seat. Low on the continuation rule (D12): it rests on door text that was read and not exercised. The tool-first placement is what makes that acceptable: the shapes are measured before they become fgOS contracts.",
+  "design": [
+   {
+    "id": "D1",
+    "rule": "Two authored sources in the repository; every other portfolio file is a record or generated.",
+    "detail": "Backlog row = intent, authored by the boss. Plan directory = decisions and delivery shape, authored by the shaper then the planner. The canonical link is plan to outcome (`covers` in plan.md frontmatter); the backlog-side view is derived. Ownership is stated per file kind in D8, not as 'one writer each' (that phrase in the first packet contradicted its own role table; red-team RT-3.5).",
+    "changed": "wording only"
+   },
+   {
+    "id": "D2",
+    "rule": "The execution envelope is authored inside plan.md frontmatter.",
+    "detail": "`inputs` (the plan's own files, an explicit list with no patterns; nothing under the plan's `records/` folder and not the board file, both reserved: publishing refuses such an entry, and the digest step skips those paths even if one is listed), `writes` or an explicit read-only marker, `blockedBy`, `covers`, `target`. plan.md is always in the digested subject, so changing any envelope field changes the digest. All reads go through src/util/yaml.mjs readFrontmatter. Day-one reading, made explicit: a plan with no `published` record is `draft` whatever its frontmatter holds, including the 7 plans with no frontmatter at all; required-field checks apply when publishing and to plans that already have a `published` record, where a failure prints `invalid`. readFrontmatter itself returns an empty meta for a missing block (yaml.mjs:91), so the refusal is the tool's check, not the reader's.",
+    "changed": "day-one precedence stated (RT-3.5); records folder and board reserved out of the subject (reviewer/1 finding 1)"
+   },
+   {
+    "id": "D3",
+    "rule": "Records are add-only files named by kind and subject digest, not lines in one shared log.",
+    "detail": "plans/<dir>/records/<kind>-<digest>.json, kinds: published, validated, returned, withdrawn, delivered. A record is never edited or deleted; a new plan revision has a new digest and so new file names. Because a record sits beside the plan, the `records/` folder is never part of the digested subject (D2); otherwise adding a record would change the digest it is named by. A `withdrawn-<digest>` record is final for that digest: it cancels `published`, `validated` and `delivered` at the same digest for every reading in D5 and D6, and the plan comes back only by a revision, which has a new digest. Two worktrees adding records never touch the same file, which removes the concurrent-append question of a shared JSONL (RT-3.5). The digest is taken over the committed bytes of `inputs` at a named commit; publishing refuses a dirty, empty, absolute or symlinked subject, because digestSubject({files}) reads working-tree bytes and accepts all four (ref-digests.mjs:90-96). No `published` record means draft, so the existing plans need no rewrite and no status mapping.",
+    "changed": "per-digest files replace publication.jsonl; digest over committed bytes; records folder outside the subject (reviewer/1 finding 1); what a withdrawn record cancels is stated (RT-4.1)"
+   },
+   {
+    "id": "D4",
+    "rule": "`ready` means published and validated at the same digest, and the validation happens before pickup through an existing door.",
+    "detail": "The first packet narrowed `ready` to 'structurally sound' and accepted wasted launches; the red team is right that this keeps the long lifecycle the owner asked to cut (RT-3.4, RT-3.7). Revised: the validation is a read-only unit through `fgos run` (no --writes, no worktree, no implementation case), pattern solo first as the owner set, a reviewed pattern later. The unit has no write scope and writes only its own report. The validation tick, the non-LLM tool process that called `fgos run` and waited for it to return, reads the settled result and adds the record: `validated-<digest>` holding the unit run id, the base commit and the verdict, or `returned-<digest>` with the report reference when the validation failed. The previous revision said in D4 that the unit writes the record and in D8 that the tick does; the tick is the one writer (RT-4.2). This is an agent claim checked by the tool, weaker than a Workflow receipt (case-projection.mjs isValidReceipt), and the engine still runs judge and validate inside the implementation case (propose.mjs:212-223; inheritFrom refuses another guide or base, case-inherit.mjs:85-88). So the cost today is double validation, measured in P3; removing it is an engine change and stays open.",
+    "changed": "one writer for the validation record: the tick, not the unit (RT-4.2)"
+   },
+   {
+    "id": "D5",
+    "rule": "Delivery is a record written in the landing commit by the landing step, and the dependency test is against the plan's current digest.",
+    "detail": "`delivered-<digest>` = {digest built, case id, evaluator from RECEIPT_EVALUATORS, milestone, passed: true, target}. It is written by the landing step in the commit that lands the change on the target (merge or squash commit), never by a worker and never in a later commit: the runner commits only a unit's declared writes (assignment.mjs, write-scope text near 792-801), so a worker cannot land it, and a later hand commit would survive a revert (RT-3.3). Dependency test, on the target commit only: let d be the digest of P's `inputs` there; P satisfies a dependent when `delivered-d` exists with passed true, a listed evaluator and a milestone, and no `withdrawn-d` exists on that commit. A delivery is taken back without editing the plan by adding `withdrawn-d` with the decision reference that asked for it: P then prints `withdrawn` and its dependents are held with reason 'dependency withdrawn'. The record takes back the claim, not the code; whether the landed change is also reverted is the boss's decision and is a separate landing (RT-4.1). If P was edited after delivery, d has no delivered record and dependents are held with reason 'dependency revised after delivery' unless they pin the delivered digest. This fails closed in three cases: deliver A then publish B and withdraw B, deliver A then publish B and never deliver it (RT-3.1), and deliver A then withdraw A at the same digest (RT-4.1). Named consequence: a delivered plan is frozen; follow-up work is a new plan. What the test still does not prove is in K3 and K11.",
+    "changed": "the dependency test now requires that no withdrawn record exists at the delivered digest (RT-4.1)"
+   },
+   {
+    "id": "D6",
+    "rule": "The board is a generated file committed in the repository; a command adds the live overlay.",
+    "detail": "D-ADR0079 point 1 puts the board in the repository and says it is generated, never hand-edited. The committed board (path from the fgos convention door) holds durable facts only: per backlog outcome its covering plans, per plan one label and its dependency ids and digest. Never a holder, machine, case liveness or failure text. Merge rule: a work branch never commits the board file. The landing step regenerates it from the merged tree inside the landing commit, so two branches cannot conflict on it; a change made straight on the target regenerates it in that same commit. On a branch, CI runs the generator in check mode only (it must produce a board from the merged sources and writes nothing); on the target, CI checks drift. Where a landing is made by a host merge button that cannot run the generator, the same check adds a regeneration commit right after; that is safe for the board because it holds only derived facts, and it is not allowed for a `delivered` record (D5). A git merge driver was considered and not chosen: a driver is defined in each clone's git configuration, not in the repository, so it does not travel with the project (reviewer/1 finding 2). The same tool run as a command adds running, engine-unknown and open exceptions from D11. One vocabulary, printed in this precedence: invalid, withdrawn (a withdrawn record exists for the current digest; shown as 'withdrawn after delivery' when a delivered record exists at that digest too), draft, stale (a published record exists but not for the current digest), published (not yet validated), held (with reason: returned, dependency, dependency withdrawn, validation aged, conflicting writes), eligible, running (overlay only), delivered. `ready` is the name for published plus validated and prints as held or eligible; `admitted` is the engine's word and the board never prints it (RT-3.5). The role packet is the command's per-plan JSON output plus the plan files.",
+    "changed": "committed generated board is now the default (was command-only); vocabulary and precedence fixed; `withdrawn` is a printed label above draft (RT-4.1); branches never commit the board, the landing step regenerates it (reviewer/1 finding 2)"
+   },
+   {
+    "id": "D7",
+    "rule": "Upkeep has three parts, and the third one records what it finds.",
+    "detail": "(a) Transactional: whoever changes a source runs the check and commits source and record together; the board is regenerated in the landing commit (D6). (b) CI on changes under the plans and backlog paths: fails only the affected plan; old unrelated debt is reported, not blocking. (c) Sweep: a timer-run command, no LLM, exits each run; it reads the board and the run facts of D11 and appends one deduplicated exception event per plan, digest and kind through the Event Store door, with the role that owns the next action. Age since the run-opened fact is detectable from the first day. For a run with no settle fact the sweep also reads the engine by the recorded id and is the backstop observer of D12. Whether that read tells a healthy run from a stuck one is not shown (K2). The first packet's sweep wrote nothing and had no recorded start to measure from (RT-3.6).",
+    "changed": "the board is regenerated at landing (reviewer/1 finding 2); the sweep is the backstop observer (RT-4.2)"
+   },
+   {
+    "id": "D8",
+    "rule": "Each role is one short invocation with one obligation and a named file kind it may add.",
+    "detail": "boss: backlog rows, priority, owner decisions. shaper: discussion to locked decisions in the plan directory. planner: plan.md and envelope, `published` and `withdrawn` records. validation unit (read-only fgos run): its report only. validation tick (non-LLM tool process that called `fgos run` and waits for it to return): adds `validated` or `returned` (D4). supervisor tick: select one eligible plan, start it, record the run-opened fact (D11), exit. leader and workers: inside the case only, through fgos run; they never touch the portfolio. landing step: a separate invocation that lands and writes `delivered` in the landing commit and regenerates the board; who sees that the case passed and starts it is D12. watcher: the sweep. The first packet gave the supervisor two obligations across time (start, then return at landing); they are now two invocations and no session has to remember to come back (RT-3.3).",
+    "changed": "validation record writer named once; the start of the landing step refers to D12 (RT-4.2)"
+   },
+   {
+    "id": "D9",
+    "rule": "Existing surfaces are left, not rewritten.",
+    "detail": "Legacy plan frontmatter untouched. The hand-kept program board keeps its log as history; its lane table stops being the eligibility signal once the generated board covers those lanes, and the AGENTS.md instruction changes in that same change (D-ADR0079 says the board is never hand-edited, so this is now a direction, not an option). scripts/check-backlog-reconciliation.mjs is a separate audit of backlog rows against RECONCILIATION.md, neither used nor silenced by the portfolio.",
+    "changed": "program-board replacement is now a direction"
+   },
+   {
+    "id": "D10",
+    "rule": "Placement: this repository's tool first, then fgOS.",
+    "detail": "P1: portfolio data (D1 to D5), generated board and check. P2: manual supervisor tick. P3: leader plus solo workers with the pilot's measures. All three as tools/plan-supervisor promoted from origin/plan-supervisor-prototype. From the prototype keep the generated-board idea, dependency checks, test cases and friction measures; replace its line parser (drops block-style lists) with readFrontmatter, its 30-minute TTL lock with holder-lock, its home-directory state and claim queue with D11, and do not carry its status words (`todo`, alias `done`). Tool thresholds stay tool options while it is a repository tool; on the move into fgOS they become config-standard keys with doctor rows (install gate in AGENTS.md). Move when the measures in named default N9 are in and one project other than fgOS has used it (mission 1).",
+    "changed": "new; the first packet rejected the prototype outright"
+   },
+   {
+    "id": "D11",
+    "rule": "Run state goes through fgOS doors: facts in the Event Store, exclusion in holder-lock.",
+    "detail": "The supervisor tick takes a holder-lock for portfolio selection, re-reads the board on the target, starts the case or unit, appends a run-opened fact {plan, digest, case or unit run id, base} to the Event Store in the `project` scope, releases and exits. The landing step and the validation tick append the matching settle facts. The board overlay and the sweep read these facts and query the engine by the recorded id, never by planCaseSlug. This gives the board the engine key before delivery, which the first packet lacked (RT-3.2). Limits read from source: holder-lock is kernel locks on one machine (component-boundary.md:86), so it stops two ticks on one machine, not on two; Event Store facts reach another machine only after seal, push and fetch (event-store/spec.md:49, 63, 202); and that spec records the owner's 2026-10-17 decision that claims and leases are runtime state outside the event store, so the fact is history, not the claim. Named default N10 covers the gap; question Q4 asks the owner to record the placement D-ADR0079 left open. How the tool reaches the two doors, read now: `fgos events` offers sync, status, seal and export and no append; `fgos lock` offers fence, and `fgos lock-status` reports; neither CLI lets a caller append an event or take a lock. The Event Store consumer manifest (packages/event-store/contracts/consumers.v1.json) registers work, porting and identity among its consumers and no portfolio consumer, and the tester of the previous revision reports that the spec refuses unregistered event types. So P2 has a named gate: a registered event contract for the run facts, a registered lock name for portfolio selection, and a way to reach both. While it is a repository tool it imports the two facades from inside this repository, subject to the import guard of docs/architecture-manifest.json; on the move into fgOS it uses a CLI verb, which a consuming project needs anyway. P1 uses neither door: it reads files, Git and the YAML reader and writes record files and the board, so P1 is not blocked by this gate (reviewer/1 finding 3, R8).",
+    "changed": "how the tool reaches the Event Store and holder-lock, and that P1 needs neither (reviewer/1 finding 3)"
+   },
+   {
+    "id": "D12",
+    "rule": "Continuation: the process that started a run is the one that sees it finish, and the sweep is the backstop.",
+    "detail": "The previous revision said the landing step is 'started when the case reports passed' and that 'the tick adds the record', and named nobody who is still running when that happens (RT-4.2). Rule: the observer is a non-LLM tool process, never an agent session. (1) Validation: `fgos run` is the door that binds, runs and settles one unit and returns its result (AGENTS.md dispatch section; with --json the result is under data.results). The validation tick calls it, waits, and adds the record. It lives as long as the unit, which costs a process and no model tokens. (2) Implementation: the tool's driver process, started by the supervisor's selection, opens the run, appends the run-opened fact, and waits on the engine call. `startWorkflow` advances in the calling process until the run completes, fails or parks, or with `detached` hands advancing to `fgos workflow resume <id> --foreground` and points the caller at `fgos workflow status <id>`; a conductor case is opened with no process, so there the driver is whoever runs the proposed command list, which under the owner's roles is the leader started through `fgos run`, and the tool process waiting on that `fgos run` is the observer (src/workflow/case-verbs.mjs:100-112). When the call returns, the driver appends the settle fact and, on passed, starts the landing step; on anything else it appends an exception. (3) Backstop: when that process died, the sweep finds a run-opened fact with no settle fact, reads `fgos workflow status <recorded id>` (registry text: run state plus advance {running, pid}, case milestones, closable; 'a conductor case [is running] while an attempt of its is alive') and either starts the next step or appends an exception. So the worst delay from a finished run to its next step is one sweep interval. Not proven: the status read was taken from the command registry text and was not exercised; that its output tells passed from failed and parked precisely enough to start a landing is unverified; the sweep's own write path is the Event Store append gated in D11; and a tick that dies after the engine start and before the run-opened append leaves a run no fact names (tester of the previous revision, REV-2; recorded as F27, open). The supervisor role stays short: it selects and exits; the waiting is done by the tool process.",
+    "changed": "new; answers RT-4.2"
+   }
+  ],
+  "not_included": [
+   "claims, slots, leases or settlement inside portfolio files (engine side, D-ADR0076)",
+   "per-machine files for run state (owner, 2026-11-17)",
+   "anything that must travel with the project stored only in Work (D-ADR0079)",
+   "a standing LLM session for any role",
+   "bulk migration of old plans",
+   "a new persistence engine",
+   "a new engine verb for validation (D4 uses the existing fgos run door)"
+  ]
+ },
+ "red_team_answers": [
+  {
+   "finding": "RT-3.1 delivery predicate stays true after withdraw and after a newer unpublished revision",
+   "disposition": "accepted; the correction of the withdraw half is new in this revision and unreviewed",
+   "answer": "The predicate now tests the plan's current digest on the target commit, requires passed true, and requires that no withdrawn record exists at that digest (D5). The two newer-revision cases held the dependents in the previous revision already; the withdraw half did not, as RT-4.1 showed, and is corrected here. The first packet's F4 'resolved' was wrong, and so was the previous revision's plain 'accepted' for this finding.",
+   "still_open": "The test re-hashes the plan's files, not the delivered code. A later change to the delivered code that is not a revert of the landing commit is not seen (K11)."
+  },
+  {
+   "finding": "RT-3.2 no case id before delivery; two supervisors can both start; `held` after failed validation is not durable",
+   "disposition": "accepted in part (was 'accepted'; narrowed after RT-4.2)",
+   "answer": "Run-opened facts through the Event Store give the board the engine key from the start; a holder-lock serializes selection on one machine (D11). A failed validation is a committed `returned-<digest>` record, so it survives the 14-day case prune and clears only when the plan is revised (D3, D4).",
+   "still_open": "Two machines can still both start the same plan between sync points (K9, N10, Q4). A repository tool cannot append to the Event Store through the CLI today and no portfolio consumer is registered (D11), so the run-opened fact is a P2 gate, not a working mechanism. Who adds the `validated` or `returned` record is now one process (D4, D12), but the backstop for a tick that died rests on a status read that was not exercised. A tick that dies between the engine start and the run-opened append leaves a run that no fact names, on one machine too (tester REV-2, F27)."
+  },
+  {
+   "finding": "RT-3.3 'travels with the landing' contradicts the commit door and Q3; supervisor has two obligations",
+   "disposition": "accepted in part (was 'accepted'; narrowed after RT-4.2)",
+   "answer": "The delivered record is written by a separate landing step inside the landing commit, never by a worker and never in a later commit (D5, D8). The first packet's Q3 recommendation (add the line by hand afterwards) is withdrawn.",
+   "still_open": "Until the tool performs landings, the person or role that merges adds the record in the merge commit; whether this repository's landing practice (the OPC merges in the board log) can carry that step was not checked with whoever runs it. 'Started when the case reports passed' had no observer in the previous revision; D12 names the tool's driver process and the sweep as backstop, and that rule is unreviewed and partly unverified (K13)."
+  },
+  {
+   "finding": "RT-3.4 F2, F4 and F5 were marked resolved while the text did not close them",
+   "disposition": "accepted",
+   "answer": "Dispositions are restated under attributed_findings: F2 is open with a partial route (D4), F4 is a revised unreviewed design, F5 is accepted in part. No finding is marked resolved by a design no seat has examined."
+  },
+  {
+   "finding": "RT-3.5 the contract contradicts itself: writers, vocabulary, stale across worktrees, draft versus fail-closed",
+   "disposition": "accepted",
+   "answer": "Writers are per record kind (D8); one printed vocabulary with precedence (D6); digest over committed bytes at a named commit, so two worktrees agree (D3); draft wins on day one and required-field checks apply at publish (D2); record files replace the shared log (D3).",
+   "still_open": "digestSubject has no commit-reading mode that this seat verified; the tool either refuses a dirty subject or reads blobs through the Git door. Which one is a P1 choice."
+  },
+  {
+   "finding": "RT-3.6 the sweep does not see the stall it was added for and leaves no durable report",
+   "disposition": "accepted in part",
+   "answer": "The sweep now has a recorded start (run-opened fact) and records exceptions (D7c), so 'opened longer than the threshold with no settle fact' is detectable.",
+   "still_open": "The previous revision said no seat found a liveness read. That was too strong: `fgos workflow status <id>` is described in the command registry as returning run state and advance {running, pid}, and the tester of the previous revision points at it and at Run Supervisor probes. What is missing is the link from a plan to the case or unit id (D11 supplies it once its gate is met) and proof that 'running' means healthy progress; until then age stays the proxy and will give false alarms on long runs. How the exception reaches a person is Work's job under D-ADR0079 and no channel was verified. The previous revision's 'thirteen execution-read-door branches' was wrong (RT-4.3): this checkout's remote-tracking refs show six heads under origin (execution-read-door/integration, /p01, /p13, /p15, plan/execution-read-door, plan/execution-read-door-decisions), three of them also as local branches. None was inspected, so whether they supply a further read is unknown (K2)."
+  },
+  {
+   "finding": "RT-3.7 'adopt' overstates a design that declines the owner's objective",
+   "disposition": "accepted",
+   "answer": "The verdict is now 'recommended starting design, not closed'. The two points the red team named are changed, not defended: the board is a committed generated file (D6) and readiness includes validation before pickup (D4).",
+   "still_open": "Whether the solo validation unit is strong enough to keep agents out until a plan is really ready is exactly what P3 must measure (R2)."
+  },
+  {
+   "finding": "RT-4.1 (red-team/1 on the previous revision) a withdrawn record at the delivered digest still satisfied dependents, and the board could not print it",
+   "disposition": "accepted",
+   "answer": "D5 now requires that no `withdrawn-d` exists; D3 states that a withdrawn record cancels published, validated and delivered at its digest and is final for that digest; D6 prints `withdrawn` above draft and adds the held reason 'dependency withdrawn'; N11 is extended. The red team's charge that the previous 'accepted' on RT-3.1 hid the withdraw half is correct.",
+   "still_open": "The withdrawal takes back the claim, not the landed code; a retraction that should also remove the code is a separate landing nobody is forced to make (K11 extended). Who may withdraw a delivered digest is stated only as 'the planner, with a decision reference'; that authority has not been examined (missing expertise)."
+  },
+  {
+   "finding": "RT-4.2 (red-team/1 on the previous revision) D4 and D8 disagreed on who writes the validation record; no role is running when the unit or the case finishes; the closures of RT-3.2 and RT-3.3 depended on a completion read the packet said was not found",
+   "disposition": "accepted in part",
+   "answer": "One writer: the validation tick (D4, D8). An observer is named: the non-LLM tool process that made the engine call and waits for it, with the sweep reading `fgos workflow status` by the recorded id as backstop (D12). RT-3.2 and RT-3.3 are no longer marked plainly accepted.",
+   "still_open": "The status read was taken from registry text, not exercised, and its fitness to trigger a landing is unverified; the sweep's write path is gated (D11); the tick-death window before the run-opened append is open (F27). The red team's sentence that the short-lived split moved the memory into a missing signal is answered by a rule, not by evidence (K13, R10)."
+  },
+  {
+   "finding": "RT-4.3 (red-team/1 on the previous revision) 'thirteen execution-read-door branches' is not true of this repository",
+   "disposition": "accepted",
+   "answer": "The count is withdrawn. Read now from this checkout's refs: six heads under origin, three of them also local; none inspected. The corrected statement is in RT-3.6 still_open, K2 and evidence.",
+   "still_open": "The six branches remain unread."
+  },
+  {
+   "finding": "Missing-expertise omission (red-team/1 on the previous revision): who observes a passed case or a finished validation unit",
+   "disposition": "accepted",
+   "answer": "Added to the `missing expertise` array."
+  }
+ ],
+ "evidence": {
+  "verified_by_this_seat_now": [
+   "Read in full: the previous revision (unit-run-1794898080767-81113980/producer/1-fb1), the reviewer/1 and red-team/1 reports on it, the six supplied context refs, and the tester/1 summary report and the head of its packet.",
+   "Local checkout HEAD is 882bad7fc; the local remote-tracking origin/main is 0f320351f (no fetch was run). The previous revision named a53b5b88d and the tester 6e25658d; the ref moved, which falsifies neither. D-ADR0076 is the heading at line 1921 and D-ADR0079 at line 1964 of docs/platform/runner/decisions/h-36d872fbb0e5.md on that origin/main.",
+   "Between local HEAD and that origin/main, among src/workflow, src/util/yaml.mjs, src/cli/command-registry.mjs, src/runner/dispatch/assignment.mjs, packages/event-store and docs/platform/component-boundary.md, the files that differ are src/workflow/{checked,definition,steps,units-source}.mjs, four Rust files of packages/event-store, and command-registry.mjs with no changed line naming workflow status, fgos events, lock fence or lock-status. The files cited in this packet (case-verbs, propose, case-inherit, case-projection, ref-digests, case-close, yaml.mjs, assignment.mjs, the consumer manifest) do not differ.",
+   "src/cli/command-registry.mjs (local HEAD): `fgos events <sync|status|seal|export>` (line 1734); `fgos lock fence <name>` (2433) and `fgos lock-status`, read-only (2462); `fgos workflow status` described as read-only run state plus advance {running, pid, logPath, lastLines, hint} and case {milestones, eligible activities, open gates, live reservations, closable}, with 'a conductor case [is running] while an attempt of its is alive'. Text read; no verb was run.",
+   "src/workflow/case-verbs.mjs:100-112: a new Workflow run is advanced in the calling process until it completes, fails or parks; with `detached` it returns once recorded and `fgos workflow resume <id> --foreground` advances it; a conductor case is opened with no process.",
+   "packages/event-store/contracts/consumers.v1.json begins with consumers work, porting and identity; no portfolio consumer was seen in the part read (the tester lists work, porting, identity and mailbox).",
+   "`git branch -a --list '*execution-read-door*'`: three local branches (execution-read-door/p01, /p13, /p15) and six under remotes/origin (execution-read-door/integration, /p01, /p13, /p15, plan/execution-read-door, plan/execution-read-door-decisions). `git ls-remote` was not run.",
+   ".gitattributes holds no merge driver rule; its comment records that earlier `merge=union` rules were removed.",
+   "tools/ on the local checkout holds platform-probe and terminal-gate-probe only."
+  ],
+  "carried_unchanged_from_earlier_reports": [
+   "Plan census (114 directories, 111 plan.md, the status spellings, 52 plans with inline blockedBy, zero plans with footprint, base, covers or ready; 7 plans with no frontmatter): first final packet, confirmed by red-team/1 of that run.",
+   "readFrontmatter at yaml.mjs:89, writeFrontmatter at :115; inheritFrom refusals at case-inherit.mjs:85-88; commandsFor order at propose.mjs:212-223; digestSubject files-branch behaviour at ref-digests.mjs:90-96; isValidReceipt at case-projection.mjs:17-28; DEFAULT_PRUNE_DAYS 14 and pruneQuietly call sites: critique round 2, reviewer/2 and red-team/1.",
+   "check-backlog-reconciliation.mjs fails with 121 problems over 153 proposed rows and is in check:before-merge; slice-kinds.yaml singleRunMaxPaths 3: red-team round 2 and red-team/1.",
+   "Prototype parser drops block-style lists; its lock takes over after a 30-minute TTL; the pilot's unnoticed failure of about 43 minutes: constraint seat, synthesis, prototype reports.",
+   "Program board carries SHA256 machine-key fingerprints, not private keys: constraint seat, reviewer/2."
+  ],
+  "not_done": [
+   "No tests, builds, pilots or prototypes were run; no fgos verb was run; nothing in the workspace was changed.",
+   "The reviewer/1 and tester/1 reports on the first final packet (unit-run-1794896346099-f2f0a434) were not among the supplied context refs and were not read.",
+   "The tester/1 packet on the previous revision was read at its summary and at the head of its findings only; its findings are recorded as F27 to F30, open, and are not fixed here because this round's instruction limits the fixes to the reviewer and red-team findings.",
+   "That a tool under tools/ may import the Event Store and holder-lock facades under the architecture manifest's import guard is not verified.",
+   "`fgos run --pattern solo` is taken from the owner's words; the flag was not exercised.",
+   "The six execution-read-door branches and docs/platform/run-supervisor/spec.md were not read.",
+   "The four first-round seat reports were used through the synthesis and critique reports."
+  ],
+  "sources": [
+   "/home/vantt/projects/forgent/.fgos/assignments/unit-run-1794890645978-147c02e3/producer/1/runs/01/outbox/report-1.md",
+   "/home/vantt/projects/forgent/.fgos/assignments/unit-run-1794890972953-82c23978/synthesis/1/runs/01/outbox/report-1.md",
+   "/home/vantt/projects/forgent/.fgos/assignments/unit-run-1794895144579-473ed4e0/producer/2/runs/01/outbox/report-1.md",
+   "/home/vantt/projects/forgent/.fgos/assignments/unit-run-1794895144579-473ed4e0/reviewer/2/runs/01/outbox/report-1.md",
+   "/home/vantt/projects/forgent/.fgos/assignments/unit-run-1794895144579-473ed4e0/red-team/2/runs/01/outbox/report-1.md",
+   "/home/vantt/projects/forgent/.fgos/assignments/unit-run-1794896346099-f2f0a434/red-team/1/runs/01/outbox/report-1.md",
+   "/home/vantt/projects/forgent/.fgos/assignments/unit-run-1794896346099-f2f0a434/producer/1/runs/01/outbox/report-1.md",
+   "/home/vantt/projects/forgent/.fgos/assignments/unit-run-1794898080767-81113980/producer/1-fb1/runs/01/outbox/report-1.md",
+   "/home/vantt/projects/forgent/.fgos/assignments/unit-run-1794898080767-81113980/reviewer/1/runs/01/outbox/report-1.md",
+   "/home/vantt/projects/forgent/.fgos/assignments/unit-run-1794898080767-81113980/red-team/1/runs/01/outbox/report-1.md",
+   "/home/vantt/projects/forgent/.fgos/assignments/unit-run-1794898080767-81113980/tester/1/runs/01/outbox/report-1.md"
+  ],
+  "verified_by_the_previous_revision_and_carried": [
+   "The owner's placement decision is the 2026-11-17 13:22 line in plans/261017-1313-fgos-platform-program-board/log.md on origin/main (confirmed by red-team/1 on that revision).",
+   "tools/plan-supervisor on origin/plan-supervisor-prototype holds 10 files including scripts/plan-board.mjs, scripts/watchdog.sh and a systemd timer (confirmed by red-team/1 on that revision).",
+   "docs/platform/event-store/spec.md: events are sealed to refs/fgos/events/<machine-id> (line 49), shared by push and fetch (63), `project` scope reaches other machines after seal, push and fetch (202), claims and leases are runtime state outside the event store (59) (confirmed by red-team/1 on that revision).",
+   "docs/platform/component-boundary.md:86: Holder-lock never takes a lock from a live holder and never decides from a pid, TTL or mtime; 'one machine' is an inference the red team called fair.",
+   "src/runner/dispatch/assignment.mjs brief text: the runner commits only files inside the declared scope; none declared means it commits nothing.",
+   "`fgos run` without --writes is read-only and --writes is what needs a worktree (red-team/1 on that revision, from the run command text)."
+  ]
+ },
+ "alternatives": [
+  {
+   "option": "Command-only board, nothing committed (alternative and constraint seats; default of the first packet)",
+   "for": "No file that every plan change touches; no drift check; no risk of committing operational text.",
+   "against": "D-ADR0079 point 1 names the board among the things that live in the repository and travel with it.",
+   "disposition": "No longer the default. Returns if the owner says D-ADR0079 meant only that the board's sources live in the repository (Q1)."
+  },
+  {
+   "option": "One append-only publication.jsonl per plan (first packet)",
+   "for": "One file to read per plan.",
+   "against": "Two writers appending from different worktrees conflict; red-team RT-3.5.",
+   "disposition": "Replaced by per-digest record files (D3)."
+  },
+  {
+   "option": "Mutable sidecar publication.json, delete to unpublish (constraint, synthesis)",
+   "for": "Smallest artifact; no plan-byte edit.",
+   "against": "Envelope outside the digested subject; deleting loses delivery history.",
+   "disposition": "Rejected, unchanged."
+  },
+  {
+   "option": "Marks and delivery kept only in the Event Store",
+   "for": "Append-only by construction; an fgOS door the owner named.",
+   "against": "Readiness and delivery are portfolio truth and must be in the repository (D-ADR0079); event refs are per machine and absent from a plain clone.",
+   "disposition": "Rejected for portfolio truth; adopted for run facts (D11)."
+  },
+  {
+   "option": "Promote the prototype as it is",
+   "for": "Exists, was piloted on three slices, and the owner chose it as the starting tool.",
+   "against": "Its claims, TTL lock, home-directory state and line parser contradict the owner's run-state decision, holder-lock's rule and the YAML door.",
+   "disposition": "Promote and replace those four parts (D10). The first packet's flat rejection is withdrawn."
+  },
+  {
+   "option": "A new engine entry for pre-case validation (red-team round 2, recommendation 1)",
+   "for": "Validation evidence the engine itself would accept, so no double validation.",
+   "against": "A new engine door while D-ADR0076 says finish Workflow first.",
+   "disposition": "Deferred. D4 meets the need now through read-only fgos run; R2 names when to reopen."
+  },
+  {
+   "option": "Keep `ready` structural and validate only inside the implementation case (first packet D4)",
+   "for": "No extra unit per plan.",
+   "against": "Agents enter before the plan is known to be ready; red-team RT-3.7.",
+   "disposition": "Rejected."
+  },
+  {
+   "option": "Do nothing",
+   "for": "No cost now.",
+   "against": "Planless runs stay admitted, readiness stays a free-text word, the hand-kept program log stays the hand-over medium, against two owner decisions.",
+   "disposition": "Rejected."
+  },
+  {
+   "option": "A git merge driver that regenerates the board on conflict (reviewer/1 finding 2 names it as one possibility)",
+   "for": "Branches could keep committing the board; merges would not stop.",
+   "against": "A merge driver is defined in each clone's git configuration; only its name is in .gitattributes. It would not travel with the project and a clone without it conflicts.",
+   "disposition": "Not chosen; the landing step regenerates instead (D6)."
+  },
+  {
+   "option": "An agent session that waits for the run to finish and then lands",
+   "for": "Needs no status read and no sweep.",
+   "against": "It is the long agent lifecycle the owner asked to cut.",
+   "disposition": "Rejected; a non-LLM process waits, the sweep is the backstop (D12)."
+  }
+ ],
+ "attributed_findings": [
+  {
+   "id": "F1",
+   "from": "critique producer round 2, finding 1",
+   "finding": "A receipt whose envelope sits outside the hashed subject stays published when writes or dependencies change.",
+   "disposition": "accepted; addressed by D2; unchanged"
+  },
+  {
+   "id": "F2",
+   "from": "critique producer finding 2; red-team RT-1, RT-2.1, RT-3.4",
+   "finding": "Proposal approval is not validation; case inheritance cannot carry validation across guides or a moved base.",
+   "disposition": "accepted; OPEN. D4 gives a pre-pickup validation through read-only fgos run, which is an agent claim and does not remove the in-case validation. Changed from 'resolved'."
+  },
+  {
+   "id": "F3",
+   "from": "critique producer finding 3; system seat",
+   "finding": "A receipt-only view drops the backlog half.",
+   "disposition": "accepted; D1 and D6 list outcomes with no plan and partial coverage; advisory only; unchanged"
+  },
+  {
+   "id": "F4",
+   "from": "critique producer finding 4; red-team RT-3, RT-2.2, RT-3.1",
+   "finding": "A mutable sidecar mixes state with history; the first packet's delivery predicate stayed true after withdraw or a newer revision.",
+   "disposition": "accepted; revised in D3 and D5, and corrected again in this revision for the withdraw half (RT-4.1); unreviewed."
+  },
+  {
+   "id": "F5",
+   "from": "red-team RT-2.3, RT-3.4",
+   "finding": "'Accepted output on the target' needs a mechanical predicate that a hand edit cannot satisfy.",
+   "disposition": "accepted in part. D5 states the predicate and requires passed true, evaluator and milestone, but the record is still a committed copy (K3). Changed from 'accepted; predicate stated'."
+  },
+  {
+   "id": "F6",
+   "from": "red-team RT-2.4",
+   "finding": "The reconciliation script audits backlog rows, not plans; the count is 121.",
+   "disposition": "accepted; D9; unchanged"
+  },
+  {
+   "id": "F7",
+   "from": "red-team RT-2.5, RT-3.6; prototype note",
+   "finding": "Trigger-only checks leave a stalled run unseen; the first packet's sweep had nothing to measure from and wrote nothing.",
+   "disposition": "accepted in part; D7c, D11 and D12; an engine status read exists as door text, its link to a plan and its meaning for health are missing (K2)"
+  },
+  {
+   "id": "F8",
+   "from": "critique producer finding 5; red-team RT-3.2",
+   "finding": "planCaseSlug is not the ledger key; the board had no engine key before delivery.",
+   "disposition": "accepted; D11, which is now stated as a P2 gate because no CLI append exists and no portfolio consumer is registered"
+  },
+  {
+   "id": "F9",
+   "from": "critique producer finding 6; constraint seat",
+   "finding": "digestSubject only hashes; empty lists, absolute paths, symlinks and working-tree bytes pass.",
+   "disposition": "accepted; D3 publish refusals; unchanged in substance"
+  },
+  {
+   "id": "F10",
+   "from": "constraint seat",
+   "finding": "The prototype line parser turns a block-style dependency list into an empty list.",
+   "disposition": "accepted; D2 and D10; now a condition of promoting the prototype"
+  },
+  {
+   "id": "F11",
+   "from": "alternative seat",
+   "finding": "No mark means draft, so no legacy migration is needed.",
+   "disposition": "accepted; D3; unchanged"
+  },
+  {
+   "id": "F12",
+   "from": "framing seat; synthesis",
+   "finding": "A checker cannot enforce plan-first; the admission doors still accept planless work.",
+   "disposition": "accepted; the owner has now stated that every piece of work goes through a plan, so only the timing of enforcement is open (Q2)"
+  },
+  {
+   "id": "F13",
+   "from": "synthesis",
+   "finding": "Sidecar chosen because the YAML door had no writer.",
+   "disposition": "rejected as stale; unchanged"
+  },
+  {
+   "id": "F14",
+   "from": "synthesis",
+   "finding": "Blanket failure on an empty declared-writes list.",
+   "disposition": "rejected; read-only must be declared explicitly; unchanged"
+  },
+  {
+   "id": "F15",
+   "from": "red-team RT-1 (stronger form)",
+   "finding": "Opening a case is itself implementation.",
+   "disposition": "not adopted; unchanged; D4 no longer depends on it"
+  },
+  {
+   "id": "F16",
+   "from": "reviewer/2",
+   "finding": "Passed the round-2 critique.",
+   "disposition": "noted; a pass of the critique, not of any design; unchanged"
+  },
+  {
+   "id": "F17",
+   "from": "red-team/1 on the first packet, RT-3.3",
+   "finding": "A worker cannot land the delivery line and a later hand commit survives a revert.",
+   "disposition": "accepted; D5 and D8; Q3 of the first packet withdrawn"
+  },
+  {
+   "id": "F18",
+   "from": "red-team/1 on the first packet, RT-3.5",
+   "finding": "Writers, vocabulary, stale reading and day-one reading contradicted each other.",
+   "disposition": "accepted; D2, D3, D6, D8"
+  },
+  {
+   "id": "F19",
+   "from": "red-team/1 on the first packet, RT-3.7",
+   "finding": "'Adopt' and 'resolved' read as a closed design.",
+   "disposition": "accepted; verdict wording and dispositions changed"
+  },
+  {
+   "id": "F20",
+   "from": "red-team/1 on the previous revision, RT-4.1",
+   "finding": "The dependency test never required the absence of a withdrawn record at the delivered digest, and the board had no word for it.",
+   "disposition": "accepted; D3, D5, D6, N11; unreviewed"
+  },
+  {
+   "id": "F21",
+   "from": "red-team/1 on the previous revision, RT-4.2",
+   "finding": "D4 and D8 named different writers for the validation record, and nothing observed a finished unit or a passed case once the short roles had exited.",
+   "disposition": "accepted in part; writer fixed in D4 and D8; observer named in D12 on door text that was not exercised; OPEN on evidence"
+  },
+  {
+   "id": "F22",
+   "from": "red-team/1 on the previous revision, RT-4.3",
+   "finding": "The count of thirteen execution-read-door branches was invented.",
+   "disposition": "accepted; corrected to six remote heads, three also local, none inspected"
+  },
+  {
+   "id": "F23",
+   "from": "red-team/1 on the previous revision, missing expertise",
+   "finding": "The array omitted the observer of run completion.",
+   "disposition": "accepted; added"
+  },
+  {
+   "id": "F24",
+   "from": "reviewer/1 on the previous revision, finding 1",
+   "finding": "`records/` must be reserved and excluded from the digest.",
+   "disposition": "accepted; D2, D3, N13"
+  },
+  {
+   "id": "F25",
+   "from": "reviewer/1 on the previous revision, finding 2",
+   "finding": "The merge strategy for the generated board is unspecified and merges would fail non-interactively.",
+   "disposition": "accepted; D6, N14; the host-button case leaves the board stale for one commit"
+  },
+  {
+   "id": "F26",
+   "from": "reviewer/1 on the previous revision, finding 3",
+   "finding": "Whether P2 shells out or imports, and that P1 must not be blocked by unexported facades.",
+   "disposition": "accepted; D11; the import guard was not checked"
+  },
+  {
+   "id": "F27",
+   "from": "tester/1 on the previous revision, REV-2 (high)",
+   "finding": "Appending run-opened only after starting the case leaves a window in which a killed tick leaves a live run that no fact names, and the next tick starts a second one, on one machine too.",
+   "disposition": "recorded; OPEN; not fixed in this round (outside the fixes this round was limited to). D12 names the window and does not close it."
+  },
+  {
+   "id": "F28",
+   "from": "tester/1 on the previous revision, REV-1 (high)",
+   "finding": "One immutable file per kind and digest cannot hold a second validation of the same digest at another base, which N12 requires, and two validators collide on the same file name.",
+   "disposition": "recorded; OPEN; not fixed in this round. It bears on D3, D4 and N12 and contradicts D3's sentence that two worktrees never touch the same file."
+  },
+  {
+   "id": "F29",
+   "from": "tester/1 on the previous revision, REV-3 (high)",
+   "finding": "A digest over committed bytes does not prove that a validation unit reading a changing shared checkout inspected those bytes.",
+   "disposition": "recorded; OPEN; not fixed in this round."
+  },
+  {
+   "id": "F30",
+   "from": "tester/1 on the previous revision (medium)",
+   "finding": "Engine reads exist (Workflow status, Run Supervisor probes); what is missing is the link from plan to case, unit and attempt and their interpretation, not the reads themselves.",
+   "disposition": "accepted where it overlaps RT-4.2 and RT-4.3: K2 and the RT-3.6 answer are corrected. The Run Supervisor probes were not read by this seat."
+  }
+ ],
+ "unresolved_dissent": [
+  {
+   "topic": "Committed board versus command",
+   "sides": "framing and system for a generated committed page; alternative and constraint for command only (2 against 2)",
+   "state": "Not settled by the panel. This packet's default changed to the committed board on this seat's reading of D-ADR0079 point 1; the objections of the alternative and constraint seats (a conflict-prone file, drift, operational text in commits) stand as risk K10 and were not answered by those seats."
+  },
+  {
+   "topic": "Scheduled checking",
+   "sides": "red-team: required now; critique producer: not needed for first delivery; constraint: no timer",
+   "state": "The seats did not converge. The packet includes the sweep in the tool's later phase; the red team's point that it cannot yet see a true stall stands."
+  },
+  {
+   "topic": "Legacy plans",
+   "sides": "framing and system: classify an active cohort; alternative and constraint: leave untouched",
+   "state": "Files stay untouched and active plans are published one by one; whether a program index such as HARDEN is split into worker-sized plans is not settled."
+  },
+  {
+   "topic": "Backlog Status column",
+   "sides": "alternative: shrink to proposed, declined, superseded; system: derive display only; constraint: portfolio ignores backlog health",
+   "state": "open; the packet changes nothing in the column"
+  },
+  {
+   "topic": "Where the readiness mark lives",
+   "sides": "framing and system: frontmatter; constraint and synthesis: sidecar; red-team round 2: frontmatter or an immutable ledger",
+   "state": "This packet's split (envelope in frontmatter, add-only record files) is a second new proposal no seat has examined."
+  },
+  {
+   "topic": "Validation before pickup",
+   "sides": "red-team: a lightweight engine validation adapter is required; critique producer: prove an existing route first",
+   "state": "open. D4 uses read-only fgos run as the existing route; the red team's demand for evidence the engine accepts is not met."
+  },
+  {
+   "topic": "Where the claim for a running plan lives",
+   "sides": "owner: fgOS doors such as Event Store or holder-lock; Event Store spec: claims and leases are runtime state outside the event store; prototype: its own claim files",
+   "state": "open; D11 is a default, Q4 asks for the record"
+  },
+  {
+   "topic": "Who continues a plan after a run ends",
+   "sides": "red-team: the short-lived split leaves no observer and the signal is missing; this seat: a non-LLM waiting process plus the sweep reading the engine status by recorded id; tester: engine reads exist but their link to a plan and their meaning are missing",
+   "state": "open. D12 is a rule on door text that was not exercised; no seat has examined it."
+  },
+  {
+   "topic": "Whether the record scheme of D3 survives repeated and concurrent validation",
+   "sides": "tester: it does not (REV-1); this seat's D3 says worktrees never touch the same file",
+   "state": "open; the tester's objection stands unanswered in this revision (F28)."
+  }
+ ],
+ "named_defaults": [
+  {
+   "id": "N1",
+   "default": "The board is a generated committed file of durable facts; the same tool as a command adds the live overlay. Branches do not commit it; see N14. (changed)"
+  },
+  {
+   "id": "N2",
+   "default": "No `published` record means draft; old plans are not edited."
+  },
+  {
+   "id": "N3",
+   "default": "Subject is an explicit non-empty list of repo-relative files declared in plan.md, with no patterns, digested over committed bytes; publishing refuses a dirty or symlinked subject and any entry under the plan's records folder or naming the board file. (changed)"
+  },
+  {
+   "id": "N4",
+   "default": "Backlog findings are advisory; only a plan's own contradiction or an undelivered dependency holds that plan."
+  },
+  {
+   "id": "N5",
+   "default": "Unknown engine state prints engine-unknown and never frees a plan."
+  },
+  {
+   "id": "N6",
+   "default": "Plan-first applies to all work with no size exemption, as the owner stated; shown as not enforced until the engine doors change."
+  },
+  {
+   "id": "N7",
+   "default": "The sweep is a timer-run command, no LLM; it writes nothing to portfolio files and appends exception events through the Event Store door. (changed)"
+  },
+  {
+   "id": "N8",
+   "default": "Plans and backlog paths come from config and the fgos convention door, so a consuming project is not tied to this repository's layout."
+  },
+  {
+   "id": "N9",
+   "default": "Order and measures: P1 data, generated board and check on two or three real active plans; P2 manual supervisor tick with run facts; P3 leader and solo workers; then CI and the sweep; admission enforcement last, as an engine change. Measure plan defects caught before pickup, share of validated plans returned in the case, time from failure to first report, cold-resume success from the packet alone, upkeep effort per change, and session length per role. (changed)"
+  },
+  {
+   "id": "N10",
+   "default": "One supervising machine per project during P1 to P3; another machine syncs event refs before it selects and treats a run-opened fact for the same digest as held. (new)"
+  },
+  {
+   "id": "N11",
+   "default": "A delivered plan is frozen; follow-up work is a new plan, and a dependent may pin a delivered digest. A delivery is taken back by a withdrawn record at the same digest, which holds dependents; it is final for that digest. (changed)"
+  },
+  {
+   "id": "N12",
+   "default": "Validation ages: a plan whose `inputs` or `writes` paths changed on the target since the validation base is held as 'validation aged' until revalidated. (new)"
+  },
+  {
+   "id": "N13",
+   "default": "The `records/` folder of a plan and the board file are reserved paths: never in `inputs`, never in a unit's `writes`. (new)"
+  },
+  {
+   "id": "N14",
+   "default": "A work branch never commits the board. The landing step regenerates it in the landing commit; after a host-button merge the check adds a regeneration commit. No merge driver. (new)"
+  },
+  {
+   "id": "N15",
+   "default": "The process that made the engine call waits for it and starts the next step (record, settle fact, landing step); it is a tool process, not an agent. The sweep is the backstop and reads the engine status by the recorded id. (new)"
+  },
+  {
+   "id": "N16",
+   "default": "The tool reaches the Event Store and holder-lock by importing their facades while it is a repository tool, and by CLI verbs after the move into fgOS; P1 uses neither. (new)"
+  }
+ ],
+ "owner_questions": [
+  {
+   "id": "Q1",
+   "what": "D-ADR0079 says the board lives in the repository and is generated. This packet reads that as a committed generated file.",
+   "cause": "The panel split 2 against 2 on a committed page before the decision existed.",
+   "options": "committed generated board plus live command (one file many changes touch; readable in any clone and on the repository host) / command only with sources in the repository (no sync cost; needs the tool to read it)",
+   "recommendation": "committed generated board plus live command",
+   "scope": "display only; reversible"
+  },
+  {
+   "id": "Q2",
+   "what": "When planless runs stop being admitted, and whether the 3-path allowance in slice-kinds.yaml goes.",
+   "cause": "The owner set plan-first; the engine doors still admit planless work.",
+   "options": "after P3 measures are in (no disruption while the tool is young) / now (stops ad-hoc work before the board can carry it) / keep the allowance (contradicts the stated rule)",
+   "recommendation": "after P3, with no allowance",
+   "scope": "engine admission doors; its own decision record"
+  },
+  {
+   "id": "Q4",
+   "what": "Where the claim for a running plan lives: D-ADR0079 left it open among fgOS doors.",
+   "cause": "holder-lock excludes on one machine only; the Event Store spec keeps claims outside the event store.",
+   "options": "run-opened fact in the Event Store plus a holder-lock per tick, one supervising machine (works with today's doors; no cross-machine exclusion) / wait for an engine-side claim from the D-ADR0076 follow-up (correct home; blocks P2)",
+   "recommendation": "the first, for P1 to P3 only",
+   "scope": "tool phase; to be replaced by the engine-side record"
+  }
+ ],
+ "withdrawn_owner_questions": [
+  {
+   "id": "Q3",
+   "was": "accept a hand-added delivered line for the first cohort",
+   "why": "A later hand commit survives a revert of the landing (RT-3.3); replaced by D5."
+  }
+ ],
+ "residual_risks": [
+  {
+   "id": "K1",
+   "risk": "A validated plan still fails in-case validation, and every plan is validated twice until the engine accepts pre-pickup evidence.",
+   "watch": "share of validated plans returned in the case; cost of the validation unit"
+  },
+  {
+   "id": "K2",
+   "risk": "A stalled or silently failed run is detected by age and by a status read whose 'running' is not shown to mean healthy progress. The earlier wording 'no engine liveness read was found' was too strong: `fgos workflow status` is described as reporting advance and attempt liveness, but it was not exercised and the plan-to-case link exists only once D11's gate is met.",
+   "watch": "time from failure to first report; false alarms on long runs"
+  },
+  {
+   "id": "K3",
+   "risk": "A `delivered` record is a committed copy of an engine receipt; after the case is pruned nothing can check it against the engine, and whoever can commit to the target can write one.",
+   "watch": "CI check that the record was added in a commit that also changes paths under the plan's writes and names a listed evaluator; review of landing commits"
+  },
+  {
+   "id": "K4",
+   "risk": "Undeclared inputs: a file list cannot find an assumption nobody listed.",
+   "watch": "validation failures traced to files outside `inputs`"
+  },
+  {
+   "id": "K5",
+   "risk": "Parallel edits to docs/backlog.md conflict.",
+   "watch": "merge conflicts on that file"
+  },
+  {
+   "id": "K6",
+   "risk": "The portfolio or the tool becomes an early Work or engine design ahead of the Workflow-first order of D-ADR0076.",
+   "watch": "any request to add claim, slot or settlement behaviour to portfolio files or to the tool"
+  },
+  {
+   "id": "K7",
+   "risk": "Two instruction sources during transition: AGENTS.md still points platform lanes at the hand-kept program board.",
+   "watch": "lanes updated in one place and not the other"
+  },
+  {
+   "id": "K8",
+   "risk": "The check is bypassed like the reconciliation gate, which is red while in check:before-merge.",
+   "watch": "CI failures on affected plans merged anyway"
+  },
+  {
+   "id": "K9",
+   "risk": "Two machines start the same plan between event syncs.",
+   "watch": "two run-opened facts for one digest"
+  },
+  {
+   "id": "K10",
+   "risk": "The committed board drifts from its sources, or is stale for one commit after a host-button merge; a branch that commits it against N14 brings the merge conflict back.",
+   "watch": "conflicts and drift-check failures on the board file per week"
+  },
+  {
+   "id": "K11",
+   "risk": "Delivered code is later changed without reverting the landing commit, so a dependency still reads as satisfied; and a withdrawn delivery leaves its code on the target unless a separate landing removes it.",
+   "watch": "dependents failing validation against a delivered dependency"
+  },
+  {
+   "id": "K12",
+   "risk": "The tool, built as a repository tool, hard-codes this repository's layout and cannot move into fgOS or serve another project.",
+   "watch": "paths or names not taken from config or the convention door"
+  },
+  {
+   "id": "K13",
+   "risk": "A passed case or a finished validation sits with no next step because the waiting process died and the sweep is not running, is gated, or misreads the status.",
+   "watch": "time from the engine's terminal state to the settle fact; runs with a run-opened fact and no settle fact older than one sweep interval"
+  },
+  {
+   "id": "K14",
+   "risk": "A run is started and the tick dies before the run-opened fact is appended; nothing names the run and a second one is started (tester REV-2).",
+   "watch": "two cases or units for one plan digest in the engine's own records"
+  },
+  {
+   "id": "K15",
+   "risk": "The P2 gate (event contract, lock name) turns into fgOS platform work that delays the tool, or is bypassed with a per-machine file against the owner's decision.",
+   "watch": "any run-state file written by the tool outside the two doors"
+  }
+ ],
+ "reversal_triggers": [
+  {
+   "id": "R1",
+   "trigger": "The owner says D-ADR0079 meant the board's sources, not a committed board file; or the board file conflicts more than it informs.",
+   "then": "return to command only"
+  },
+  {
+   "id": "R2",
+   "trigger": "More than about one in four validated plans is returned by in-case validation across the first ten, or double validation costs more than it saves.",
+   "then": "reopen pre-pickup validation as an engine decision"
+  },
+  {
+   "id": "R3",
+   "trigger": "A dependency needs more than 'delivered at this digest', for example a named interface version.",
+   "then": "extend the predicate with a named output, by a new record"
+  },
+  {
+   "id": "R4",
+   "trigger": "The Work council (backlog p-xpc327btjz) defines the Work-to-engine contract.",
+   "then": "Work or its replacement reads and writes the portfolio through the same doors (D-ADR0079 point 4); the tool's command stops being the only reader"
+  },
+  {
+   "id": "R5",
+   "trigger": "The engine gains a clone-visible landing record or an engine-side claim.",
+   "then": "drop the copied `delivered` record or the D11 default and read the engine"
+  },
+  {
+   "id": "R6",
+   "trigger": "A cold agent given only the per-plan packet and the plan files still needs chat history or the program log in two trials.",
+   "then": "the packet shape is wrong; stop before P2"
+  },
+  {
+   "id": "R7",
+   "trigger": "A consuming project cannot use it without files specific to the fgOS repository.",
+   "then": "rework paths and config before the move into fgOS (D-ADR0035)"
+  },
+  {
+   "id": "R8",
+   "trigger": "A repository tool cannot append project-scope events or hold a registered lock through the existing facades.",
+   "then": "P2 waits for that door; P1 proceeds, since it needs neither"
+  },
+  {
+   "id": "R9",
+   "trigger": "A project needs portfolio state that cannot live in its repository.",
+   "then": "D-ADR0079's own reversal condition applies; reopen by a new record"
+  },
+  {
+   "id": "R10",
+   "trigger": "`fgos workflow status` cannot tell passed from failed and parked for a recorded id well enough to start a landing, or the waiting process cannot be kept alive on the owner's machines.",
+   "then": "continuation needs an engine-side completion signal; P3 waits for it and the landing step is started by a person meanwhile"
+  },
+  {
+   "id": "R11",
+   "trigger": "Landings in this repository cannot run the generator or add a record inside the landing commit.",
+   "then": "the delivered record cannot be trusted as written; reopen D5 before P3, and keep the board as a command until then"
+  }
+ ],
+ "what_changed": [
+  {
+   "since": "producer/1-fb1",
+   "change": "D5 dependency test requires that no withdrawn record exists at the delivered digest; D3 states what a withdrawn record cancels; D6 prints `withdrawn` and the held reason 'dependency withdrawn'; N11 and K11 extended.",
+   "why": "Red-team RT-4.1: a withdrawn delivery still satisfied dependents and the board had no word for it."
+  },
+  {
+   "since": "producer/1-fb1",
+   "change": "D4 and D8 name one writer of the validation record (the validation tick). New D12 names who observes a finished unit or case (the waiting non-LLM tool process, the sweep as backstop). RT-3.2 and RT-3.3 dispositions changed from 'accepted' to 'accepted in part'. K13, K14, R10, N15 and a dissent row added.",
+   "why": "Red-team RT-4.2: the two designs disagreed on the writer and no role was running at completion."
+  },
+  {
+   "since": "producer/1-fb1",
+   "change": "'Thirteen execution-read-door branches' replaced by the count read from the refs (six remote heads, three also local, none inspected). K2 and the RT-3.6 answer no longer say that no liveness read was found.",
+   "why": "Red-team RT-4.3; tester's medium finding, confirmed against the command registry text."
+  },
+  {
+   "since": "producer/1-fb1",
+   "change": "`missing expertise` gains the observer of run completion.",
+   "why": "Red-team/1 on the previous revision, missing-expertise section."
+  },
+  {
+   "since": "producer/1-fb1",
+   "change": "`records/` and the board file are reserved and kept out of the digested subject (D2, D3, N3, N13).",
+   "why": "Reviewer/1 finding 1."
+  },
+  {
+   "since": "producer/1-fb1",
+   "change": "Branches never commit the board; the landing step regenerates it; CI on a branch only checks; no merge driver (D6, D7a, N1, N14, K10, R11, one alternative row). The verdict sentence on maintenance was reworded to match.",
+   "why": "Reviewer/1 finding 2."
+  },
+  {
+   "since": "producer/1-fb1",
+   "change": "D11 states how the tool reaches the Event Store and holder-lock, that no CLI append or lock verb and no portfolio consumer exist today, that this gates P2 and not P1 (N16, K15); F8 disposition reworded.",
+   "why": "Reviewer/1 finding 3."
+  },
+  {
+   "since": "producer/1-fb1",
+   "change": "Evidence split into what this seat read now and what the previous revision read; tester/1 findings recorded as F27 to F30, open.",
+   "why": "The earlier 'verified now' list would otherwise claim reads this seat did not repeat; surviving findings must stay visible and are not approval."
+  },
+  {
+   "since": "producer/1-fb1",
+   "change": "Unchanged: D1, D9, D10, the owner questions Q1, Q2 and Q4, the withdrawn Q3, alternatives already listed, findings F1 to F3, F5, F6 and F9 to F19, the earlier dissent rows, N2, N4 to N10 and N12, K1, K3 to K9 and K12, R1 to R9, and the authority section.",
+   "why": "Not named by the reviewer or red-team findings of this round."
+  },
+  {
+   "change": "Board default: command-only became a generated committed board plus a live command.",
+   "why": "D-ADR0079 point 1.",
+   "since": "first final packet (unit-run-1794896346099-f2f0a434/producer/1)"
+  },
+  {
+   "change": "Placement added (D10): promote tools/plan-supervisor and replace its private parts; the flat rejection of the prototype is withdrawn.",
+   "why": "Owner's placement decision of 2026-11-17 13:22.",
+   "since": "first final packet (unit-run-1794896346099-f2f0a434/producer/1)"
+  },
+  {
+   "change": "Run state added (D11): run-opened and settle facts through the Event Store, per-tick holder-lock, one supervising machine.",
+   "why": "Owner: run state through fgOS doors, not per-machine files; red-team RT-3.2.",
+   "since": "first final packet (unit-run-1794896346099-f2f0a434/producer/1)"
+  },
+  {
+   "change": "publication.jsonl became add-only per-digest record files; digest over committed bytes.",
+   "why": "Red-team RT-3.5.",
+   "since": "first final packet (unit-run-1794896346099-f2f0a434/producer/1)"
+  },
+  {
+   "change": "`ready` now requires a pre-pickup validation record produced by a read-only fgos run unit; a failed validation is a committed `returned` record.",
+   "why": "Red-team RT-3.2, RT-3.4, RT-3.7; owner: agents short-lived, solo pattern first.",
+   "since": "first final packet (unit-run-1794896346099-f2f0a434/producer/1)"
+  },
+  {
+   "change": "Delivery predicate tests the plan's current digest and requires passed true; the record is written in the landing commit by a separate landing step; hand-added lines withdrawn.",
+   "why": "Red-team RT-3.1, RT-3.3, RT-3.4.",
+   "since": "first final packet (unit-run-1794896346099-f2f0a434/producer/1)"
+  },
+  {
+   "change": "One printed vocabulary with precedence; day-one reading stated; writers stated per record kind.",
+   "why": "Red-team RT-3.5.",
+   "since": "first final packet (unit-run-1794896346099-f2f0a434/producer/1)"
+  },
+  {
+   "change": "Sweep records exceptions and measures from the run-opened fact.",
+   "why": "Red-team RT-3.6.",
+   "since": "first final packet (unit-run-1794896346099-f2f0a434/producer/1)"
+  },
+  {
+   "change": "Verdict wording and the dispositions of F2, F4, F5 no longer say adopted or resolved.",
+   "why": "Red-team RT-3.4, RT-3.7.",
+   "since": "first final packet (unit-run-1794896346099-f2f0a434/producer/1)"
+  },
+  {
+   "change": "Unchanged: D1, D2 and D9 in substance, the no-migration property, the engine boundary, the evidence carried from earlier seats, the dissent rows on legacy plans, the backlog Status column and scheduled checking, and findings F1, F3, F6, F9 to F16.",
+   "why": "Not affected by the owner request or by the red-team findings.",
+   "since": "first final packet (unit-run-1794896346099-f2f0a434/producer/1)"
+  }
+ ],
+ "missing expertise": [
+  "Workflow engine maintainer: whether a pre-case validation route, an engine-side claim or a clone-visible landing record is planned",
+  "Event Store maintainer: whether a repository tool can append project-scope events today, and seal and sync cadence across the owner's three machines",
+  "Holder-lock maintainer: registering a lock for portfolio selection in the lock registry",
+  "Git landing policy across machines: squash versus merge, revert handling, who performs landings in this repository",
+  "Concurrent add-only record files and a generated board file under git merge across worktrees",
+  "Authority for writing a delivered record that dependents trust after the case is pruned",
+  "Operator of a consuming project outside the fgOS repository",
+  "Operations: scheduling the sweep and delivering its exceptions to a person on the owner's machines",
+  "Owner reading habits: where and on what device the board is read",
+  "Observer of run completion: who or what sees a passed case or a finished validation unit and starts the landing step or the record tick once the supervisor tick has exited (Workflow status and Run Supervisor maintainers)",
+  "Authority to withdraw a delivered plan digest and to decide whether the landed code is reverted with it"
+ ],
+ "reviewer_answers": [
+  {
+   "finding": "reviewer/1 finding 1: an `inputs` entry that matches `records/` would make writing a record change the digest",
+   "disposition": "accepted",
+   "answer": "`inputs` is an explicit file list with no patterns; `records/` and the board file are reserved; publishing refuses an entry under them and the digest step skips them (D2, D3, N3, N13).",
+   "still_open": "Nothing beyond building it in P1."
+  },
+  {
+   "finding": "reviewer/1 finding 2: two branches that both touched the generated board make a non-interactive merge fail; the merge strategy is not specified",
+   "disposition": "accepted",
+   "answer": "Branches never commit the board; the landing step regenerates it in the landing commit; CI on a branch runs the generator in check mode only; a host merge button is followed by a regeneration commit; a merge driver is not chosen because it lives in per-clone git configuration (D6, D7a, N14).",
+   "still_open": "Between a host-button merge and its regeneration commit the board on the target is stale for one commit (K10). Whether this repository's landings go through a step that can run the generator was not checked with whoever performs them."
+  },
+  {
+   "finding": "reviewer/1 finding 3: whether the P2 tick shells out to CLI verbs or imports library modules, and that P1 must not be blocked",
+   "disposition": "accepted",
+   "answer": "Read now: no CLI verb appends an event or takes a lock, and no portfolio consumer is registered. P2 is gated on a registered event contract and lock name; the repository tool imports the facades inside this repository and moves to a CLI verb on the move into fgOS; P1 uses neither door (D11, R8).",
+   "still_open": "Whether the import guard of the architecture manifest lets a tool under tools/ import those facades was not checked. Adding a consumer and a lock name is a change to fgOS itself, ahead of the tool-first order the owner set; that it is small enough to belong to P2 is this seat's judgement."
+  }
+ ]
+}

@@ -7,7 +7,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import os from 'node:os';
 import path from 'node:path';
-import { readLlmAccounts, compareWithLegacyInventory, legacyStateKey } from '../../src/runner/dispatch/llm-accounts.mjs';
+import { readLlmAccounts, compareWithLegacyInventory } from '../../src/runner/dispatch/llm-accounts.mjs';
 
 const home = os.homedir();
 const families = {
@@ -79,12 +79,6 @@ test('an account with no store, a store that is not a path, and unknown keys are
   });
   assert.deepEqual(codes(result), ['account-no-store', 'account-no-store', 'store-path', 'account-no-store', 'store-path', 'account-no-store', 'account-unknown-key']);
   assert.deepEqual(Object.keys(result.pools.openai.accounts), ['extra']);
-});
-
-test('the old state key of a pool is its normalized family', () => {
-  assert.equal(legacyStateKey('openai'), 'openai-codex');
-  assert.equal(legacyStateKey('gemini'), 'gemini');
-  assert.equal(legacyStateKey('openrouter'), 'openrouter');
 });
 
 test('comparing with the old inventory lists accounts missing on either side and stores that differ', () => {

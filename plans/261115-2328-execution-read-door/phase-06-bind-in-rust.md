@@ -14,7 +14,7 @@ when the host answers a native verb (phase 09 adapter); account state comes from
 ## Requirements
 
 0. First, record `packages/execution/contracts/bind.v1.json` from Node on the post-03 integration head (fixture configs
-   in the new shape, scratch script under `.fgos/runtime/tmp/`, never committed): bind (walk, rotation, continuity,
+   in the new shape, `expect` recorded by a script of the same shape as 01's `scripts/executor-model-vectors.mjs`, with `--check`): bind (walk, rotation, continuity,
    overrides, persona chain, pinned account in and out of pool, every refusal), explain, pre-admission facts, and the
    seat-config digest bytes (a cross-language vector: Node computes, Rust must match). Commit it red first.
 1. `src/bind.rs`: `pub fn bind(req: &BindRequest, machine: &dyn Machine, now: u64) -> Binding` where `BindRequest =
