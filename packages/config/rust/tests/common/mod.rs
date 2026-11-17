@@ -178,6 +178,8 @@ pub fn write_request(
 }
 
 /// The options of a migration run in a case directory (locks beside the files).
+/// Unix only, like the migration it configures.
+#[cfg(unix)]
 pub fn migrate_options(
     dir: &Path,
     accept: bool,

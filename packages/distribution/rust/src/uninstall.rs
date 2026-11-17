@@ -113,14 +113,16 @@ fn owns_entry_name(kind: EntryKind, name: &str) -> bool {
     }
 }
 
-/// A path as comparable components. Windows paths are case-insensitive and `\\?\C:\x` names
-/// the same place as `C:\x`, so both fold away there; elsewhere components compare as they are.
+/// A path as comparable components. Windows paths are case-insensitive, so components fold to
+/// lower case there; `\\?\C:\x` and `C:\x` agree because the door strips the verbatim prefix first.
+/// Elsewhere components compare as they are.
 fn comparable(path: &Path) -> Vec<String> {
-    path.components()
+    fgos_process::path::plain_path(path)
+        .components()
         .map(|c| {
             let part = c.as_os_str().to_string_lossy();
             if cfg!(windows) {
-                part.trim_start_matches(r"\\?\").to_lowercase()
+                part.to_lowercase()
             } else {
                 part.into_owned()
             }

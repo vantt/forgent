@@ -301,7 +301,7 @@ impl Prefilter {
 /// agent starts the hook in.
 fn shim_operand(root: &Path) -> String {
     let resolved = std::fs::canonicalize(root).unwrap_or_else(|_| absolute(root));
-    let resolved = strip_verbatim(resolved);
+    let resolved = fgos_process::path::plain_path(&resolved);
     let shim = project_shim_path(&resolved);
     format!("'{}'", shim.to_string_lossy().replace('\'', r"'\''"))
 }
@@ -311,14 +311,6 @@ fn absolute(path: &Path) -> PathBuf {
         path.to_path_buf()
     } else {
         std::env::current_dir().map_or_else(|_| path.to_path_buf(), |cwd| cwd.join(path))
-    }
-}
-
-fn strip_verbatim(path: PathBuf) -> PathBuf {
-    let text = path.to_string_lossy();
-    match text.strip_prefix(r"\\?\") {
-        Some(rest) => PathBuf::from(rest),
-        None => path,
     }
 }
 

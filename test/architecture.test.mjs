@@ -2108,6 +2108,7 @@ test('door rows catch a process signal, a /proc read and a second lock taker, an
   assert.equal(outsideDoor('process facts: read /proc', 'src/x.mjs', "fs.readFileSync('/proc/cpuinfo');\n").length, 1);
   assert.equal(outsideDoor('take a holder lock from Node', 'src/x.mjs', 'nativeDoor().holderLock.take();\n').length, 1);
   assert.equal(outsideDoor('kernel lock primitive', 'packages/p/rust/src/x.rs', 'unsafe { libc::flock(fd, 2) };\n').length, 1);
+  assert.equal(outsideDoor('write a Windows verbatim path plainly', 'packages/p/rust/src/x.rs', 'let s = p.strip_prefix(r"\\\\?\\")?;\n').length, 1);
   assert.deepEqual(outsideDoor('process control: signal a process or group', 'src/x.mjs', '// process.kill(pid, 15)\n'), []);
   assert.deepEqual(outsideDoor('process facts: read /proc', 'src/x.mjs', '/* reads /proc/self/stat */\n'), []);
   assert.deepEqual(outsideDoor('kernel lock primitive', 'packages/p/rust/src/x.rs', '// LockFileEx is what Windows offers\nstruct LockFileExDriver;\n'), []);

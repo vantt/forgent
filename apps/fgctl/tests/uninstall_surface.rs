@@ -83,7 +83,7 @@ impl World {
             let answer_file = home.join("shim-answer.json");
             std::fs::write(&answer_file, answer).unwrap();
             // cmd.exe does not read the `\\?\` form `canonicalize` returns.
-            let plain = |path: &Path| path.display().to_string().replacen(r"\\?\", "", 1);
+            let plain = |path: &Path| fgos_git::plain_path(path).display().to_string();
             std::fs::write(
                 bin.join("fgos.cmd"),
                 format!(

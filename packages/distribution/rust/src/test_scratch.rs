@@ -49,8 +49,5 @@ pub(crate) fn scratch(label: &str) -> Scratch {
 /// the `\\?\` form Windows gives a canonical path, which Git and the shell reject.
 pub(crate) fn canonical(dir: &Path) -> PathBuf {
     let real = std::fs::canonicalize(dir).unwrap_or_else(|_| dir.to_path_buf());
-    match real.to_str().and_then(|text| text.strip_prefix(r"\\?\")) {
-        Some(plain) if !plain.starts_with("UNC\\") => PathBuf::from(plain),
-        _ => real,
-    }
+    fgos_process::path::plain_path(&real)
 }
