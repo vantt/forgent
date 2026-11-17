@@ -14,7 +14,7 @@ runs". 03 moved role taste to `runner.roles`; 14 lets a registered workflow unit
 the rows carry more than taste (F10): decide routing (`purposeSeatOf` needs a row's own `prefer`), the `code:*`
 confinement and invocation pins, the `maxTier: frontier` ceiling of three architecture rows, the default red-team
 checker keyed by `code`, a second curated catalog (`DEFAULT_CAPABILITY_SLOTS`), and the names the Work path and coding
-skills route through. Q2-Q4 decide those; this phase carries out the answers.
+skills route through. Q2 and Q3 decide those (Q4 is answered: raise this repo's `maxTier` to `frontier`); this phase carries out the answers.
 
 ## Requirements
 

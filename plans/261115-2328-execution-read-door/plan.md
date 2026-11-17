@@ -74,7 +74,7 @@ known defect, which becomes a backlog row); launch, lease, transport and confine
 | 14 | [Workflow unit tier](phase-14-workflow-unit-tier.md) | `src/workflow/definition.mjs`, `seat-resolver.mjs`, `unit.mjs` (message), workflow spec, one line of seat-binding spec 6.1. Exists because step 2 would otherwise drop checker seats to the default tier; adds only the tier declaration on registered workflow units; stop and ask the plan lead if it grows | S4 landed | 1.5d | pending |
 | 03 | [Taste tables](phase-03-seat-binding-config-shape.md) | `packages/seat-binding/**` (model, policy, explain, golden), schema, standard roles/seats blocks, `capability-config.mjs`, `seat-policy.mjs`, `dispatch/config.mjs`, `agent-definitions.mjs`, `.fgos/config.yaml`, seat-binding spec 6, `vision.md` | S4 landed; lands after 02, 13, 14 | 3d | pending |
 | 04 | [Crate and executor model](phase-04-crate-executor-model.md) | `packages/execution/rust/{Cargo.toml,src/{lib,ports,executor_model}.rs,tests/golden_executor_model.rs}`, root `Cargo.toml`, `Cargo.lock` | 01 | 2.5d | pending |
-| 05 | [Capability rows removal](phase-05-capability-rows-removal.md) | standard rows, council/marketing unit tier+rigor, `propose-validate.mjs`, `capability-plan-lint.mjs`, `registrations.mjs` (catalog, workflow row), Q3 consumers | 02, 03, 14 **and owner answers Q2-Q4**; never beside 09 or 11 | 3d | pending |
+| 05 | [Capability rows removal](phase-05-capability-rows-removal.md) | standard rows, council/marketing unit tier+rigor, `propose-validate.mjs`, `capability-plan-lint.mjs`, `registrations.mjs` (catalog, workflow row), Q3 consumers | 02, 03, 14 **and owner answers Q2 and Q3**; never beside 09 or 11 | 3d | pending |
 | 06 | [Bind in Rust](phase-06-bind-in-rust.md) | `packages/execution/contracts/bind.v1.json`, `src/{bind,explain,accounts}.rs`, `tests/golden_bind.rs` | 04, 03 | 3.5d | pending |
 | 07 | [Decide, config check, tools, hook in Rust](phase-07-decide-tools-hook-in-rust.md) | `packages/execution/contracts/decide.v1.json`, `src/{runner_check,decide,tools,hook}.rs`, `tests/golden_decide.rs`, one vector test in `test/runner/dispatch.test.mjs` | 04, 03; lands after 06 | 4d | pending |
 | 08 | [Agents listing in Rust](phase-08-agents-listing-in-rust.md) | `src/agents.rs`, `contracts/agents.v1.json`, `tests/golden_agents.rs`, `test/runner/agent-listing.test.mjs` | 04, 03 | 1.5d | pending |
@@ -87,7 +87,7 @@ known defect, which becomes a backlog row); launch, lease, transport and confine
 
 ```text
 wave 1:  01 contract   02 councils   13 config repair   14 unit tier   03 taste tables (lands after 02, 13, 14)
-wave 2:  04 crate (01)                           05 rows out (02, 03, 14 + owner Q2-Q4; whenever answered)
+wave 2:  04 crate (01)                           05 rows out (02, 03, 14 + owner Q2, Q3; whenever answered)
 wave 3:  06 bind (04, 03)   07 decide (04, 03; lands after 06)   08 agents (04, 03)
 wave 4:  09 route + Node callers (06, 07)
 wave 5:  10 native verbs (09, 08)   11 doctor rows (07, 08, 09)
@@ -222,9 +222,11 @@ move with it; a machine whose config 13 already moved needs 13's move reversed b
 
 ## Owner questions (batch)
 
-Only phase 05 waits on these (Q2-Q4); every other phase proceeds. Q1 has a default.
+Only phase 05 waits on these (Q2 and Q3 still open; Q1 and Q4 answered 2026-11-17); every other phase proceeds.
 
 ### Q1: what is the councils' domain called?
+
+**Status: answered 2026-11-17: (a) `council`.**
 
 - **What is happening:** phase 02 moves the seven council workflows (`architecture-advisory`, `-reopen`,
   `business-discussion`, `council-lite`, `delphi`, `group-cognition`, `nominal-group`) from `core/workflows` into a
@@ -237,6 +239,8 @@ Only phase 05 waits on these (Q2-Q4); every other phase proceeds. Q1 has a defau
 - **Scope of the answer:** the directory name and `owningDomain`; workflow names do not change. Default (a) if unanswered.
 
 ### Q2: taste that has no place once the rows go
+
+**Status: open (2026-11-17: the owner asked HARDEN to explain which preferences go and which rows stay; HARDEN relays the decision).**
 
 - **What is happening:** phase 03 moves role taste to one `runner.roles` table and phase 05 deletes the business rows.
   Three kinds of taste have no single place: each row's own `prefer` order (five architecture orders differ from the
@@ -256,6 +260,8 @@ Only phase 05 waits on these (Q2-Q4); every other phase proceeds. Q1 has a defau
 - **Scope of the answer:** what 03 and 05 write into the standard and this repo's config; no code.
 
 ### Q3: what happens to the coding rows the Work path and coding skills route through?
+
+**Status: open (same explanation pending as Q2).**
 
 - **What is happening:** `fgos-coding-implement`, `code:implement`, `code:review`, `code:debug`, `code:test`,
   `code:refactor`, `docs:write`, `coding:*` are business rows, but they also carry behaviour: decide routes
@@ -279,6 +285,8 @@ Only phase 05 waits on these (Q2-Q4); every other phase proceeds. Q1 has a defau
 
 ### Q4: where does the architecture seats' `frontier` ceiling go?
 
+**Status: answered 2026-11-17: (a) raise this repo's `maxTier` to `frontier`.**
+
 - **What is happening:** `architecture:{shape,critique,synthesize}` carry `maxTier: frontier`, which lets their
   frontier seats (`architecture-advisory.yaml:39`, the two `seats.producer`) run above this repo's `maxTier: flagship`
   (`.fgos/config.yaml:176`). Once the rows go, a workflow can recommend `frontier` but cannot raise the ceiling, so
@@ -289,6 +297,18 @@ Only phase 05 waits on these (Q2-Q4); every other phase proceeds. Q1 has a defau
   workflow-unit ceiling key (about 1d; a new budget mechanism).
 - **Recommendation:** (a): same behaviour as today, no mechanism.
 - **Scope of the answer:** this repo's project config (05 writes it); other projects keep their own `maxTier`.
+
+## Owner decisions
+
+Owner answers of 2026-11-17 (about 08:40), relayed by HARDEN and confirmed by the owner in the COMMUNICATION window at 08:34 the same day.
+
+| Item | Decision | Effect |
+|---|---|---|
+| Q1 | The default: the councils' domain is `council` | Phases 02, 13 and 14 keep the name as written |
+| Q4 | The recommendation: raise this repo's `maxTier` to `frontier` | Phase 05 writes it into this repo's config; other projects keep their own |
+| Item 5 | The COMMUNICATION lane may lead the S5 phases | They still wait for S4 to be on main (D12) |
+| Item 6 | Regenerate the four stale `.claude/agents` files (backlog p-bazzipipk5) | Consequence: the model lines drop and the agents run on the session's model; if the generator should write a model, that is its own item |
+| Q2, Q3 | Open: the owner asked HARDEN to explain exactly which preferences go and which rows stay; HARDEN relays the decision | Phase 05 waits on these two only |
 
 ## Red Team Review
 
@@ -325,7 +345,7 @@ Rejected without the evidence filter: none (every finding cited file:line).
 Decision deltas: seven rows move, `seat-binding-route` stays (`bridge:S6a`); route ops are six and carry the runner
 section; bind-free selectors stay a Node twin, so `mechanism.mjs` stays; vectors split into `executor-model` (01),
 `bind` (06), `decide` (07), `agents` (08), `checks` (11); no `compiled.json` for the council domain; council tier and
-rigor move in 05 (not 02) through 14's unit tier; 05 waits on Q2-Q4; Q4 is now the ceiling question and the config-key
+rigor move in 05 (not 02) through 14's unit tier; 05 waited on Q2-Q4 (now Q2 and Q3 only, see Owner decisions); Q4 is now the ceiling question and the config-key
 question became decision D11 (phase 13). Searched all plan files for `bind.v1.json` in 01, `compiled.json`,
 `eight rows`, `mechanism.mjs is deleted`, `no-runner`, `none added per dispatch`, `Q4: moved config keys`,
 `06 Req 3 ... phase 09 switches`: remaining hits are in this review section only, where they name what changed.
@@ -345,4 +365,4 @@ question became decision D11 (phase 13). Searched all plan files for `bind.v1.js
 
 This plan runs as a delegated planner with no live owner channel; the critical questions were settled from evidence
 (D1-D20). The four that depend on owner intent (domain name, lost taste, coding rows and Work, the frontier ceiling)
-are Q1-Q4; only phase 05 waits on Q2-Q4.
+are Q1-Q4; only phase 05 waits, now on Q2 and Q3 only.
