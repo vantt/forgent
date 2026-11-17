@@ -1,5 +1,8 @@
 # Phase 13: Owner-question reader over the three stage places
 
+Status `draft` until the ready plans `261117-1553` and `261117-1524` are `done` (shared command registry, manifest,
+`bin/fgos.mjs`, `test/cli/**`, architecture manifest).
+
 ## Inputs (read first)
 - SM-D9 (three stages, three places; known debt, do not consolidate the stores), SM-D7 (five-part batch).
 - `QUESTIONS.md` format defined by phase 7 in `core/skills/fgos-shaping/SKILL.md`.

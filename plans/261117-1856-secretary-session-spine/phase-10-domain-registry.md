@@ -1,7 +1,7 @@
 # Phase 10: Domain registry names the domains that exist
 
-Status `draft`: runs only if the owner answers question 2 with "pull in" (plan.md "Owner questions"). On "keep out",
-the phase is marked `withdrawn` and `p-pgmxt7n7hx` stays its own item.
+The owner pulled `p-pgmxt7n7hx` into this plan (2026-11-17). This phase delivers its registry half; phase 7 already
+delivers the unsure verdict. Phase 18's report names the row as delivered (the planner does not edit the backlog).
 
 ## Inputs (read first)
 - Backlog row `p-pgmxt7n7hx` in `docs/backlog.md` (its acceptance text is this phase's bar).

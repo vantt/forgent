@@ -1,6 +1,6 @@
 # Phase 17: Rotation hooks, doctor row and install wiring
 
-Status `draft`: the hook calls the head verb (owner question 1, phase 15).
+The head verb is `fgos head` (owner 2026-11-17); this phase starts once phase 15 has landed.
 
 ## Inputs (read first)
 - Phase 8 (`measure`, `decide`), phase 14 (`requestRotation`, `rotateHeadSession`), phase 12 (SessionStart hook).

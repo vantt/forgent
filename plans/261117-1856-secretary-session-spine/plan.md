@@ -48,7 +48,9 @@ footprint:
   - docs/architecture-manifest.json
   - Cargo.toml
   - Cargo.lock
-  - apps/fgos/**
+  - apps/fgos/Cargo.toml
+  - apps/fgos/src/routing.rs
+  - apps/fgos/src/wiring/session_host.rs
   - src/session-host/**
   - test/session-host/**
   - src/state/domain-registry.mjs
@@ -87,8 +89,10 @@ created: 2026-11-17
 
 # Secretary Miu, one start door and host port for head sessions, automatic session rotation
 
-The plan is `draft` because two owner questions are open (section "Owner questions"). They block only phases 10, 15,
-16, 17 and the integration phase 18. Every other phase is `ready` and may start now.
+Both owner questions are answered (2026-11-17: verb `fgos head`; `p-pgmxt7n7hx` pulled in). The plan stays `draft`
+only because its footprint overlaps two other `ready` plans, `261117-1553-run-verify-record-and-attention-view` and
+`261117-1524-windows-plain-path-fold` (see "Contract check"); the check refuses two active plans that share files.
+Phases 13, 15 and 18 touch those shared files and wait for both plans to land; every other phase is `ready`.
 
 ## Outcome
 
@@ -165,7 +169,7 @@ answered `unavailable / tool.missing`, so the blast radius below is from `rg`, a
 
 ## Acceptance criteria
 
-1. `fgos <head verb> start secretary --name miu` (verb name per owner question 1) opens a herdr tab running the CLI
+1. `fgos head start secretary --name miu` opens a herdr tab running the CLI
    bind() chose at tier `standard`, the persona text typed visibly into the composer by the shared delivery step, and
    `fgos identity session` lists the session with role `head:secretary-miu`; the same verb opens `shaper --name <slug>`.
    Proof: `node --test test/session-host/head-start.test.mjs` (behaviour) and one live check recorded in phase 18's report.
@@ -177,8 +181,9 @@ answered `unavailable / tool.missing`, so the blast radius below is from `rg`, a
 4. `docs/platform/session-host/spec.md` holds the port contract with both paper adapters; `rg -n "mode.*terminal|allocateAsync"
    src/runner src/run-supervisor` finds no placement outside the Session Host client, and the run supervisor places through
    `fgos-session-host`. Proof: `cargo test -p fgos-session-host -p fgos-run-supervisor`, `node --test test/run-supervisor`.
-5. `fgos-clarifying` returns an explicit unsure verdict instead of `coding`; a marketing request is classified
-   `marketing` (needs owner question 2) and shaped by `core/skills/fgos-shaping`. Proof: phase 7 and 10 tests.
+5. `fgos-clarifying` returns an explicit unsure verdict instead of `coding`; its vocabulary names every domain of
+   `domains/` (`p-pgmxt7n7hx`, pulled in), so a marketing request is classified `marketing` and shaped by
+   `core/skills/fgos-shaping`. Proof: phase 7 and 10 tests; live check in phase 18.
 6. `fgos convention path --kind discussion --slug x` answers `docs/discussions/x/`; `ls docs/history/*/DISCUSSION.md` is empty.
 7. The owner-question reader lists one batch from a fixture with one open question per stage, each tagged topic + stage.
    Proof: `node --test test/portfolio/open-questions.test.mjs`.
@@ -192,7 +197,7 @@ answered `unavailable / tool.missing`, so the blast radius below is from `rg`, a
   (`plans/261117-1430-portfolio-driving-draft`); consolidating owner questions into one place (SM-D9 debt).
 - Building adapters other than `terminal` and `direct` (cloud, UI, SDK are checked on paper only); a head session on `direct`.
 - Rules loaded three times (H3 Agent Context Engine, `p-7eb9e65b`); the mailbox head finder (`p-5igcekysul`).
-- The domain registry alignment (`p-pgmxt7n7hx` first half) unless the owner answers question 2 with "pull in".
+- (`p-pgmxt7n7hx`, the domain registry, is no longer a non-goal: the owner pulled it in, phase 10.)
 - No `--yagni` flag was passed: the full scope of the hand-off block is delivered, nothing beyond it.
 
 ## Leader rules (every phase)
@@ -217,45 +222,54 @@ answered `unavailable / tool.missing`, so the blast radius below is from `rg`, a
 | 1 | [Host-port contract, home and blast radius](phase-01-host-port-contract.md) | - | docs/platform/session-host/**, packages/session-host/contracts/**, docs/platform/component-boundary.md, docs/reading-map.md, plans/261117-1856-secretary-session-spine/reports/facts-host-port.md | 1 | ready |
 | 2 | [Spike: statusline sidecar timing and /clear via Terminal Control](phase-02-rotation-spike.md) | - | plans/261117-1856-secretary-session-spine/reports/spike-rotation.md | 1 | ready |
 | 3 | [One persona door for head sessions](phase-03-persona-door.md) | - | src/runner/agent-definitions.mjs, src/runner/dispatch/assignment.mjs, test/runner/agent-definitions.test.mjs | 1 | ready |
-| 4 | [Discussions move to docs/discussions with Convention kind discussion](phase-04-discussions-location.md) | - | packages/convention/**, docs/platform/convention/**, docs/history/*/DISCUSSION.md, docs/discussions/**, domains/coding/skills/**, core/skills/_shared/plan-contract.md, src/report/context-render.mjs, src/report/authoritative-match.mjs, src/state/work.mjs, src/state/frontier.mjs, src/state/worker-slots.mjs, bin/fgos.mjs, plugins/fgOS/skills/**, .agents/skills/**, .claude/skills/** | 1 | ready |
+| 4 | [Discussions move to docs/discussions with Convention kind discussion](phase-04-discussions-location.md) | - | packages/convention/**, docs/platform/convention/**, docs/history/*/DISCUSSION.md, docs/discussions/**, domains/coding/skills/**, core/skills/_shared/plan-contract.md, src/report/context-render.mjs, src/report/authoritative-match.mjs, src/state/work.mjs, src/state/frontier.mjs, src/state/worker-slots.mjs, plugins/fgOS/skills/**, .agents/skills/**, .claude/skills/** | 1 | ready |
 | 5 | [Terminal Control focus operation](phase-05-terminal-focus.md) | 1 | packages/terminal-control/**, src/terminal-control/**, test/terminal-control/**, docs/platform/terminal-control/** | 2 | ready |
 | 6 | [Identity head role kind](phase-06-identity-head-role.md) | 4 | packages/identity/**, packages/convention/contracts/convention.rules.v1.json, docs/platform/identity/** | 2 | ready |
 | 7 | [Core domain-free shaper and unsure domain verdict](phase-07-core-shaper.md) | 4 | core/skills/fgos-shaping/**, core/skills/fgos-clarifying/**, domains/coding/skills/fgos-coding-shaping/**, plugins/fgOS/skills/**, .agents/skills/**, .claude/skills/** | 2 | ready |
 | 8 | [Rotation core: measure, decide, handoff store, config](phase-08-rotation-core.md) | 2 | src/session-rotation/**, test/session-rotation/**, core/config-standard/sessionRotation.yaml, core/config-schema/sessionRotation.schema.yaml, docs/architecture-manifest.json | 2 | ready |
-| 9 | [Session Host crate, route, client and the shared opening-text delivery](phase-09-session-host-crate.md) | 1, 5 | packages/session-host/rust/**, Cargo.toml, Cargo.lock, apps/fgos/**, src/session-host/client.mjs, test/session-host/client.test.mjs, packages/run-supervisor/rust/src/supervise/terminal.rs, docs/architecture-manifest.json | 3 | ready |
-| 10 | [Domain registry names the domains that exist](phase-10-domain-registry.md) | 7 | src/state/domain-registry.mjs, test/state/**, test/intake/**, core/skills/fgos-clarifying/**, plugins/fgOS/skills/**, .agents/skills/**, .claude/skills/** | 3 | draft |
-| 11 | [Worker attempts placed through the host port](phase-11-worker-placement.md) | 9 | packages/run-supervisor/**, Cargo.lock, src/run-supervisor/**, test/run-supervisor/**, src/runner/dispatch/herdr-round.mjs, src/runner/dispatch/cli.mjs, src/runner/dispatch/terminal-slot.mjs, test/runner/dispatch-terminal-slot.test.mjs, docs/platform/run-supervisor/spec.md | 4 | ready |
+| 9 | [Session Host crate, route, client and the shared opening-text delivery](phase-09-session-host-crate.md) | 1, 5 | packages/session-host/rust/**, Cargo.toml, Cargo.lock, apps/fgos/Cargo.toml, apps/fgos/src/routing.rs, apps/fgos/src/wiring/session_host.rs, src/session-host/client.mjs, test/session-host/client.test.mjs, packages/run-supervisor/rust/src/supervise/terminal.rs, docs/architecture-manifest.json | 3 | ready |
+| 10 | [Domain registry names the domains that exist](phase-10-domain-registry.md) | 7 | src/state/domain-registry.mjs, test/state/**, test/intake/**, core/skills/fgos-clarifying/**, plugins/fgOS/skills/**, .agents/skills/**, .claude/skills/** | 3 | ready |
+| 11 | [Worker attempts placed through the host port](phase-11-worker-placement.md) | 9 | packages/run-supervisor/**, Cargo.lock, src/run-supervisor/**, test/run-supervisor/**, src/runner/dispatch/herdr-round.mjs, src/runner/dispatch/cli.mjs, src/runner/dispatch/terminal-slot.mjs, test/runner/dispatch-terminal-slot.test.mjs | 4 | ready |
 | 12 | [Head-start use case and Identity registration at SessionStart](phase-12-head-start.md) | 3, 6, 9 | src/session-host/head-start.mjs, test/session-host/head-start.test.mjs, scripts/fgos-session-start-hook.mjs, src/setup/agent-hooks.mjs, packages/distribution/contracts/agent-hooks.v1.json, test/setup/agent-hooks.test.mjs, .claude/settings.json | 4 | ready |
-| 13 | [Owner-question reader over the three stage places](phase-13-owner-questions.md) | 7 | src/portfolio/**, test/portfolio/**, src/cli/command-registry.mjs, packages/host-runtime/contracts/command-manifest.json, packages/host-runtime/contracts/command-routes.json, bin/fgos.mjs, test/cli/questions-verb.test.mjs, docs/architecture-manifest.json | 4 | ready |
+| 13 | [Owner-question reader over the three stage places](phase-13-owner-questions.md) | 7 | src/portfolio/**, test/portfolio/**, src/cli/command-registry.mjs, packages/host-runtime/contracts/command-manifest.json, packages/host-runtime/contracts/command-routes.json, bin/fgos.mjs, test/cli/questions-verb.test.mjs, docs/architecture-manifest.json | 4 | draft |
 | 14 | [Rotation executor: two-step replacement](phase-14-rotation-executor.md) | 2, 8, 12 | src/session-rotation/rotate.mjs, test/session-rotation/rotate.test.mjs, docs/platform/session-host/spec.md | 5 | ready |
-| 15 | [Head verb binding: start and rotate](phase-15-head-verb.md) | 12, 13, 14 | src/cli/command-registry.mjs, packages/host-runtime/contracts/command-manifest.json, packages/host-runtime/contracts/command-routes.json, bin/fgos.mjs, apps/fgos/**, test/cli/head-verb.test.mjs, docs/platform/session-host/spec.md | 6 | draft |
-| 16 | [Secretary persona, secretary skill and /handoff skill](phase-16-secretary-and-handoff-skills.md) | 3, 7, 13, 15 | core/agents/secretary.yaml, core/skills/fgos-secretary/**, core/skills/handoff/**, .claude/agents/**, plugins/fgOS/skills/**, .agents/skills/**, .claude/skills/** | 7 | draft |
-| 17 | [Rotation hooks, doctor row and install wiring](phase-17-rotation-hooks.md) | 14, 15 | scripts/fgos-session-rotation-hook.mjs, scripts/fgos-session-start-hook.mjs, src/setup/agent-hooks.mjs, packages/distribution/contracts/agent-hooks.v1.json, packages/distribution/contracts/doctor-registry.v1.json, test/setup/agent-hooks.test.mjs, .claude/settings.json | 7 | draft |
-| 18 | [Integration, live checks and full gate](phase-18-integration.md) | 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17 | CHANGELOG.md, docs/reading-map.md, packages/git/contracts/mutation-census.v1.json, plans/261117-1856-secretary-session-spine/reports/integration.md | 8 | draft |
+| 15 | [Head verb binding: start and rotate](phase-15-head-verb.md) | 12, 13, 14 | src/cli/command-registry.mjs, packages/host-runtime/contracts/command-manifest.json, packages/host-runtime/contracts/command-routes.json, bin/fgos.mjs, test/cli/head-verb.test.mjs, docs/platform/session-host/spec.md | 6 | draft |
+| 16 | [Secretary persona, secretary skill and /handoff skill](phase-16-secretary-and-handoff-skills.md) | 3, 7, 13, 15 | core/agents/secretary.yaml, core/skills/fgos-secretary/**, core/skills/handoff/**, .claude/agents/**, plugins/fgOS/skills/**, .agents/skills/**, .claude/skills/** | 7 | ready |
+| 17 | [Rotation hooks, doctor row and install wiring](phase-17-rotation-hooks.md) | 14, 15 | scripts/fgos-session-rotation-hook.mjs, scripts/fgos-session-start-hook.mjs, src/setup/agent-hooks.mjs, packages/distribution/contracts/agent-hooks.v1.json, packages/distribution/contracts/doctor-registry.v1.json, test/setup/agent-hooks.test.mjs, .claude/settings.json | 7 | ready |
+| 18 | [Integration, live checks and full gate](phase-18-integration.md) | 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17 | CHANGELOG.md, docs/reading-map.md, docs/platform/run-supervisor/spec.md, packages/git/contracts/mutation-census.v1.json, plans/261117-1856-secretary-session-spine/reports/integration.md | 8 | draft |
 
 **Waves.** 1: phases 1-4. 2: 5-8. 3: 9-10. 4: 11-13. 5: 14. 6: 15. 7: 16-17. 8: 18. Layers stay serial: the port
 contract (1) lands before the crate (9), the crate before its two consumers (11, 12), the head-start use case before
 rotation (14), and the verb (15) before anything whose text names it (16, 17).
 
 **Hot files and why they do not collide.** `docs/architecture-manifest.json`: phases 8 (W2), 9 (W3), 13 (W4), one per
-wave, each adds its own `src/` directory. `Cargo.lock`: 9 (W3), 11 (W4). `apps/fgos/**`: 9 (W3), 15 (W6). Command
-registry, manifest, routes and `bin/fgos.mjs`: 4 (W1, a comment only), 13 (W4), 15 (W6). Skill renders: 4, 7, 10, 16 in
+wave, each adds its own `src/` directory. `Cargo.lock`: 9 (W3), 11 (W4). Command registry, manifest, routes and `bin/fgos.mjs`: 13 (W4), 15 (W6)
+(the stale DISCUSSION.md comment at `bin/fgos.mjs:1816` is fixed by phase 15, not phase 4). Skill renders: 4, 7, 10, 16 in
 waves 1, 2, 3, 7. `scripts/fgos-session-start-hook.mjs`, agent-hooks and `.claude/settings.json`: 12 (W4), 17 (W7).
 `core/skills/fgos-clarifying/**`: 7 (W2), 10 (W3). `docs/platform/session-host/spec.md`: 1 (W1), 14 (W5), 15 (W6); phases 9, 11 and
 12 write their spec additions into their phase report and phase 14 folds them in (they do not write the spec).
 `packages/run-supervisor/rust/src/supervise/terminal.rs`: 9 (W3) moves the delivery step out, 11 (W4) owns the rest.
 Mutation census: regenerated per commit, owned by 18.
 
-**Contract check.** `scripts/plan-contract-check.mjs --plan plans/261117-1856-secretary-session-spine` printed `ok`
-(2026-11-17). From a linked worktree the YAML door refuses (`git-addon-unavailable`), so the planner ran this branch's
-script with its `src/` resolved to the activated release's payload (same YAML door, same rules). Reading also confirms:
-every phase sits in a later wave than each dependency, and no two phases of one wave overlap by fixed prefix.
-`--all` flags no overlap for this plan while it is `draft`; once it turns `ready` it will overlap the ready plan
-`261117-1553-run-verify-record-and-attention-view` (`bin/fgos.mjs`, command registry and manifest, `test/cli/**`,
-`docs/platform/run-supervisor/spec.md`, `CHANGELOG.md`, census): phases 11, 13, 15 and 18 must start after that plan
-lands, or `blockedBy` is set to it at that moment (see Risks).
+**Contract check.** `scripts/plan-contract-check.mjs --plan plans/261117-1856-secretary-session-spine` prints `ok` while
+the plan is `draft`. From a linked worktree the YAML door refuses (`git-addon-unavailable`), so the planner ran this
+branch's script with its `src/` resolved to the activated release's payload (same YAML door, same rules). Reading also
+confirms every phase sits in a later wave than each dependency, and no two phases of one wave overlap by fixed prefix.
+
+**Why the plan stays `draft`.** Set to `ready`, the check refuses it: its footprint overlaps two `ready` plans on main.
+- `261117-1553-run-verify-record-and-attention-view`: `bin/fgos.mjs`, `src/cli/command-registry.mjs`,
+  `packages/host-runtime/contracts/command-manifest.json`, `test/cli/**`, `docs/platform/run-supervisor/spec.md`,
+  `CHANGELOG.md`, the census. Here: phases 13, 15, 18.
+- `261117-1524-windows-plain-path-fold`: `docs/architecture-manifest.json`, `CHANGELOG.md`, the census. Here: phases 8, 9,
+  13 (one appended layer entry each) and 18.
+Phases 8 and 9 stay `ready`: their only shared file is one appended layer entry in `docs/architecture-manifest.json`,
+resolved by a rebase onto whichever lands first. Phases 13, 15 and 18 are `draft` until both plans are `done`. Whoever
+sees the second of them land sets those three phases and the plan to `ready`, after `--plan` prints `ok` again.
 
 ## Owner questions
+
+Both answered by the owner on 2026-11-17: question 1 **(a) `fgos head`**, question 2 **(a) pull `p-pgmxt7n7hx` in**.
+Kept below as the record of what was asked.
 
 1. **Head-session verb name: `fgos session start` is already taken.**
    - *Chuyện gì đang xảy ra:* SM-D6 named the head-session door `fgos session start <persona> --name <name>`, but
@@ -306,9 +320,8 @@ lands, or `blockedBy` is set to it at that moment (see Risks).
   measure with the window size from config (`sessionRotation.windowTokens`), already in phase 8's shape.
 - **Statusline ownership.** If the spike shows a sidecar needs this repo's or the user's `statusLine` changed, phase 8 uses
   the transcript measure only and the statusline change becomes a new owner question, not a silent edit.
-- **Overlap with `261117-1553-run-verify-record-and-attention-view`.** Shared files listed under "Contract check". Phase 4 touches `bin/fgos.mjs` for one comment only (a trivial rebase); phases 1-10,
-  12, 14, 16, 17 do not touch them. Before setting this plan `ready`, if that plan is still `ready` or `running`, add it
-  to `blockedBy` or hold phases 11, 13, 15, 18 until it is `done`.
+- **Overlap with two ready plans.** See "Why the plan stays `draft`": phases 13, 15, 18 wait; 8 and 9 rebase one
+  appended manifest entry. If either plan is withdrawn instead of landing, the wait ends the same way.
 - **Rollback.** Each phase is one commit (or a short series) on its own branch; revert the phase's merge commit and
   regenerate the census, manifest and renders on the reverted tree. Phase 4's move is reverted as one commit (`git revert`),
   which restores every `docs/history/*/DISCUSSION.md`. The whole plan reverts by reverting phase 18's merge set in reverse wave order.

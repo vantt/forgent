@@ -31,6 +31,9 @@ is a Node script) and only orchestrates Rust doors (durable file writes, secrets
 6. Owning tests: `test/session-rotation/measure.test.mjs`, `decide.test.mjs`, `handoff-store.test.mjs` (immutable,
    atomic latest, keep 10, redaction), each the lowest layer for its behaviour.
 
+Note: `docs/architecture-manifest.json` is also in the ready plan `261117-1524-windows-plain-path-fold`; your edit is one
+appended layer entry, resolved by rebasing onto it if it lands first.
+
 ## Verify
 - `node --test test/session-rotation/*.test.mjs` passes; `node --test test/architecture.test.mjs` passes.
 - `node --test` the config schema/standard tests (`rg -l "config-standard" test | head`) pass.
