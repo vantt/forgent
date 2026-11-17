@@ -108,3 +108,5 @@ deletes their Node arms and use cases (L10). `dispatch` stays a `legacy-cli` rou
 - The landed S4 bridge may have no operation dispatch beyond doctor phases (its `work-store-init` is S4 phase 10, open
   at planning) (M x M): re-read item 2 before starting; if the shape does not fit, adding the operation is part of this
   phase (+0.5d) and the bridge contract change goes to OPC with the phase.
+
+- Decision for the host adapter of `agents list` (08 hands it the files): Node sorts directory entries with `localeCompare`, the replay of `golden_agents.rs` sorts bytewise; decide the one order here and add a vector with a mixed-punctuation name that proves it.
