@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "cc4543f4464f4f3576ab584e53a3c32cb79079a92a222b38bd616d6e463bb19c",
+  "payloadDigest": "132b16df540e0b8c9bd089f72afb4b86ff126650e7a7b5cd09be1091f3ab8b1a",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "b8b886cee2ea5ce7ee1153e4795512db135a990de894c27e53c5e778b210be62",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -131,7 +131,7 @@
     "apps/fgos/src/wiring/wire_agents.rs": "a434308907a3e7d87c880ebf95a957e1342b77e83ebe1ee0272002335b7a248c",
     "apps/fgos/tests/cli_tests.rs": "64c55cd302bce0d5357d15160e6fd751486699f4048438bba21f5cd85e8dd669",
     "apps/fgos/tests/internal_lock_routes.rs": "e8516f4876c8263b1baa1f997bcfbb01715e69d740aa508fd01a0d481fee309e",
-    "apps/fgos/tests/mailbox_routes.rs": "fe4bb33069a6f6eb6f02b052e4581fcfc69ce37dcdfd146280f9c935c14511a6",
+    "apps/fgos/tests/mailbox_routes.rs": "fc79181cb60b3976f2023f5a3a1e444f310c6a21a06ccf6735ef66a821dbcd73",
     "apps/fgos/tests/mailbox_sync_child.rs": "047e70662085d6f91fa786c9000eb494711f610d37cd63a24f29dc884116763d",
     "apps/fgos/tests/windows_borrow.rs": "4e77453a5386cf512a22db39e6a529e163c7dc930d8795c93ef05e60ba19c7b9",
     "apps/fgos/tests/windows_doctor_lock_rows.rs": "943ba00e7be5382a532ad47bfa38f6fef888428910e5f70ee18518edeb1eeb63",
@@ -2318,42 +2318,42 @@
     },
     {
       "path": "apps/fgos/tests/mailbox_routes.rs",
-      "line": 144,
+      "line": 146,
       "spawn": "Command::new",
       "binary": "/bin/sh",
       "class": "rust-test"
     },
     {
       "path": "apps/fgos/tests/mailbox_routes.rs",
-      "line": 930,
+      "line": 932,
       "spawn": "Command::new",
       "binary": "? name of cli_like",
       "class": "rust-test"
     },
     {
       "path": "apps/fgos/tests/mailbox_routes.rs",
-      "line": 1024,
+      "line": 1026,
       "spawn": "Command::new",
       "binary": "? name of cli_like",
       "class": "rust-test"
     },
     {
       "path": "apps/fgos/tests/mailbox_routes.rs",
-      "line": 1224,
+      "line": 1226,
       "spawn": "Command::new",
       "binary": "? name of cli_like",
       "class": "rust-test"
     },
     {
       "path": "apps/fgos/tests/mailbox_routes.rs",
-      "line": 2887,
+      "line": 2889,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"
     },
     {
       "path": "apps/fgos/tests/mailbox_routes.rs",
-      "line": 3021,
+      "line": 3023,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"
