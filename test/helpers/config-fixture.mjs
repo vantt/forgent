@@ -214,30 +214,33 @@ export function plainConfig(value) {
   return JSON.parse(JSON.stringify(value));
 }
 
-let standardCapabilities;
-/** The standard's capability catalog (no machine or project file), read once. */
-function standardCapabilityCatalog() {
-  standardCapabilities ??= plainConfig(readMachineConfig({ globalDir: path.join(os.tmpdir(), 'fgos-no-machine-config') }).value.runner.capabilities);
-  return standardCapabilities;
+let standardRunner;
+/** The standard's runner section (no machine or project file), read once. */
+function standardRunnerConfig() {
+  standardRunner ??= plainConfig(readMachineConfig({ globalDir: path.join(os.tmpdir(), 'fgos-no-machine-config') }).value.runner);
+  return standardRunner;
 }
 
 /**
- * A capability entry of a fixture project that only `executors` (one id or a pool, in order) serve, at one tier. The bundled standard also
- * carries seat, role and persona scopes (and `<family>:*` wildcard scopes) with pools of their own, and a scope
- * wins over the capability's pool; the entry restates every scope the standard has for `name` so the fixture's
- * executor serves each seat, never a real CLI the standard names.
+ * A capability entry of a fixture project that only `executors` (one id or a pool, in order) serve, at one tier.
+ * Role and persona taste is not per capability: pair this with `tasteServedBy` in the same `runner` section so
+ * the fixture's executor also serves the roles and personas the standard gives pools of their own.
  */
-export function capabilityServedBy(executors, name, { tier = 'standard', rigor = 'standard' } = {}) {
-  const catalog = standardCapabilityCatalog();
+export function capabilityServedBy(executors, _name, { tier = 'standard', rigor = 'standard' } = {}) {
+  return { prefer: [executors].flat().map((executor) => ({ executor })), rigor, tier };
+}
+
+/**
+ * The `runner.roles` and `runner.personas` tables of a fixture project that only `executors` serve: every role and
+ * persona the standard declares taste for, restated over the fixture's pool. Role and persona taste wins over a
+ * capability's pool, so without this a fixture seat of that role is bound to the real CLIs the standard names.
+ * Spread the result into the fixture's `runner` section.
+ */
+export function tasteServedBy(executors, { tier = 'standard' } = {}) {
   const prefer = [executors].flat().map((executor) => ({ executor }));
-  const entry = { prefer, rigor, tier };
-  const scopes = [catalog[name], ...Object.entries(catalog).filter(([key]) => key.endsWith(':*') && name.startsWith(key.slice(0, -1))).map(([, value]) => value)];
-  for (const group of ['seats', 'roles', 'personas']) {
-    for (const scope of scopes) {
-      for (const key of Object.keys(scope?.[group] ?? {})) (entry[group] ??= {})[key] = { prefer, tier };
-    }
-  }
-  return entry;
+  const restated = (table) => Object.fromEntries(Object.keys(table ?? {}).map((key) => [key, { prefer, tier }]));
+  const { roles, personas } = standardRunnerConfig();
+  return { roles: restated(roles), personas: restated(personas) };
 }
 
 /** Whether the project under `dir` holds a config file (the YAML one). */

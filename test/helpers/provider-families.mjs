@@ -3,7 +3,9 @@
 // Panels (members plus a synthesizer) and reviewed units need a distinct provider family per role, so a
 // fixture config with one fake executor can only run solo units. This clones the config's
 // `test-node` executor into `count` executors, each its own provider family (distinct
-// providerModel and model policy), and lets every capability prefer all of them.
+// providerModel and model policy), and lets every capability, role and persona prefer all of them.
+
+import { tasteServedBy } from './config-fixture.mjs';
 
 export function withProviderFamilies(cfg, count = 4) {
   const base = cfg.runner.executors['test-node'];
@@ -14,12 +16,12 @@ export function withProviderFamilies(cfg, count = 4) {
     cfg.runner.executors[name] = { ...base, providerModel: `node${i}` };
     cfg.runner.modelPolicies[`node${i}`] = { ...(cfg.runner.modelPolicies.node || {}) };
   }
-  for (const capability of Object.values(cfg.runner.capabilities || {})) {
-    capability.prefer = names.map((executor) => ({ executor }));
-    // A seat, role or persona scope of the capability has a pool of its own, which wins over the capability's.
-    for (const group of ['seats', 'roles', 'personas']) {
-      for (const scope of Object.values(capability[group] || {})) scope.prefer = capability.prefer;
-    }
+  for (const capability of Object.values(cfg.runner.capabilities || {})) capability.prefer = names.map((executor) => ({ executor }));
+  // Role and persona taste (the standard's, and the config's own) has a pool of its own, which wins over the capability's.
+  const taste = tasteServedBy(names);
+  for (const group of ['roles', 'personas']) {
+    cfg.runner[group] = { ...taste[group], ...cfg.runner[group] };
+    for (const scope of Object.values(cfg.runner[group])) scope.prefer = names.map((executor) => ({ executor }));
   }
   return cfg;
 }
