@@ -443,37 +443,53 @@ function sortedJson(value) {
   return value;
 }
 
-/** The trust hash codex computes for one command hook. */
-export function codexHookTrustHash(eventName, matcher, handler) {
-  const hook = { type: 'command', command: handler.command, timeout: handler.timeout ?? DEFAULT_HOOK_TIMEOUT_SEC, async: handler.async === true };
+// Events codex reads no matcher for: a matcher written on their group is dropped before hashing
+// (measured on codex 0.166.0: a `"matcher": "*"` on Stop and UserPromptSubmit hooks is absent from the hash).
+const MATCHERLESS_EVENTS = new Set(['user_prompt_submit', 'stop']);
+
+/** The command codex runs, and so hashes, on `platform`: `commandWindows` replaces `command` on
+ * windows only, and the field itself is never part of the hash (captured from codex 0.166.0 on linux:
+ * a hook carrying `commandWindows` hashes exactly as the same hook without it). */
+function codexHookCommand(handler, platform) {
+  const windows = handler.commandWindows ?? handler.command_windows;
+  return platform === 'win32' && typeof windows === 'string' ? windows : handler.command;
+}
+
+/** The trust hash codex computes for one command hook on `platform` (the platform the seat runs on). */
+export function codexHookTrustHash(eventName, matcher, handler, platform = process.platform) {
+  const hook = { type: 'command', command: codexHookCommand(handler, platform), timeout: handler.timeout ?? DEFAULT_HOOK_TIMEOUT_SEC, async: handler.async === true };
   if (typeof handler.statusMessage === 'string') hook.statusMessage = handler.statusMessage;
   const identity = { event_name: eventName, hooks: [hook] };
-  if (typeof matcher === 'string') identity.matcher = matcher;
+  if (typeof matcher === 'string' && !MATCHERLESS_EVENTS.has(eventName)) identity.matcher = matcher;
   return `sha256:${createHash('sha256').update(JSON.stringify(sortedJson(identity))).digest('hex')}`;
 }
 
-/** Hook entries of a hooks.json as `{ key, hash }`, plus how many handlers could not be hashed
- * faithfully (other handler types, fields whose normalisation is not reproduced here). */
-export function codexHookTrustEntries(hooksJsonPath) {
+/** Hook entries of a hooks.json as `{ key, hash }`, plus the handlers that could not be hashed
+ * faithfully as `{ key, reason }` (other handler types, fields whose normalisation is not
+ * reproduced here), so each one is reported by name. */
+export function codexHookTrustEntries(hooksJsonPath, platform = process.platform) {
   let parsed;
   try {
     parsed = JSON.parse(readAgentFileSync(hooksJsonPath, MAX_PROJECT_FILE_BYTES).toString('utf8'));
   } catch (err) {
-    if (err.code === 'ENOENT') return { entries: [], skipped: 0 };
+    if (err.code === 'ENOENT') return { entries: [], skipped: [] };
     throw new TrustStoreError('unreadable-store', `could not read codex hooks at ${hooksJsonPath}: ${err.message}`, { hooksJsonPath });
   }
   const entries = [];
-  let skipped = 0;
+  const skipped = [];
   for (const [event, groups] of Object.entries(parsed?.hooks ?? {})) {
     const eventName = event.replace(/([a-z0-9])([A-Z])/g, '$1_$2').toLowerCase();
     (Array.isArray(groups) ? groups : []).forEach((group, groupIndex) => {
       (Array.isArray(group?.hooks) ? group.hooks : []).forEach((handler, handlerIndex) => {
-        const hashable = eventName !== 'session_end' && handler?.type === 'command' && typeof handler.command === 'string'
-          && handler.additionalContextLimit === undefined && handler.commandWindows === undefined && handler.command_windows === undefined;
-        if (!hashable) { skipped += 1; return; }
+        const key = `${hooksJsonPath}:${eventName}:${groupIndex}:${handlerIndex}`;
+        let reason = null;
+        if (eventName === 'session_end') reason = 'event session_end is not hashed here';
+        else if (handler?.type !== 'command' || typeof handler.command !== 'string') reason = `handler type ${JSON.stringify(handler?.type)} is not a command`;
+        else if (handler.additionalContextLimit !== undefined) reason = 'additionalContextLimit is not normalised here';
+        if (reason) { skipped.push({ key, reason }); return; }
         entries.push({
-          key: `${hooksJsonPath}:${eventName}:${groupIndex}:${handlerIndex}`,
-          hash: codexHookTrustHash(eventName, group.matcher, handler),
+          key,
+          hash: codexHookTrustHash(eventName, group.matcher, handler, platform),
         });
       });
     });
@@ -489,13 +505,23 @@ function codexHookHeader(key) {
  * Trust the project's codex hooks in `configPath`, which must be a worker's PRIVATE config: it is
  * created by fgOS and deleted with the home, so nothing here is ever removed again and the
  * operator's own config is never edited. Idempotent: a key already present (at any indentation)
- * is left as it is. Returns `{ keys, skipped }`.
+ * is left as it is. Returns `{ keys, skipped }`, `skipped` being `{ key, reason }` per hook not seeded.
  */
 export function seedCodexHookTrust(configPath, { projectPath, repoRoot, rootConfigPath } = {}) {
   if (typeof projectPath !== 'string' || !path.isAbsolute(projectPath)) {
     throw new TrustStoreError('invalid-path', `seedCodexHookTrust: projectPath must be absolute, got "${projectPath}".`);
   }
-  const { entries, skipped } = codexHookTrustEntries(path.join(projectPath, '.codex', 'hooks.json'));
+  // codex loads a linked worktree's hooks from the repo root that owns it (measured on codex 0.166.0: the
+  // worktree's own .codex/hooks.json is not read, the root's is, and its keys name the root's path), so both
+  // files are covered; a key for a file codex does not load is inert.
+  const hookFiles = [...new Set([projectPath, repoRoot].filter((dir) => typeof dir === 'string' && path.isAbsolute(dir)))].map((dir) => path.join(dir, '.codex', 'hooks.json'));
+  const entries = [];
+  const skipped = [];
+  for (const file of hookFiles) {
+    const found = codexHookTrustEntries(file);
+    entries.push(...found.entries);
+    skipped.push(...found.skipped);
+  }
   if (entries.length === 0) return { keys: [], skipped };
   const rootStore = rootConfigPath ?? configPath;
   if (readCodexTrust(rootStore, repoRoot) !== true) {

@@ -272,7 +272,7 @@ function seedHookTrust({ round, target, projectPath, repoRoot, rootConfigPath })
   try {
     const { keys, skipped } = seedCodexHookTrust(target, { projectPath, repoRoot, rootConfigPath });
     if (keys.length) round.note({ hookTrustSeeded: keys.length });
-    if (skipped) round.note({ hookTrustSkipped: skipped });
+    if (skipped.length) round.note({ hookTrustSkipped: skipped.map(({ key, reason }) => `${key} (${reason})`) });
   } catch (err) {
     round.note({ hookTrustSeedFailed: err.message });
   }

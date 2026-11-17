@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- A codex seat started by `fgos run` no longer hangs on codex's "Hooks need review" dialog: the hook trust fgOS seeds now matches the hash codex itself writes for hooks that carry `commandWindows` and for Stop and UserPromptSubmit hooks written with a matcher, and in a linked worktree it covers the owning repo root's `.codex/hooks.json`, which is the file codex loads there. A hook that still cannot be seeded is named in the run's `hookTrustSkipped` note, and an unseeded hook ends the seat early as needs-setup instead of waiting out the 35-minute ceiling.
+
 - Invocation ids now state their confinement (D-ADR0077): `codex-herdr`, `pi-herdr`, `omp-herdr` and `agy-herdr` are renamed `codex-herdr-bwrap`, `pi-herdr-bwrap`, `omp-herdr-bwrap` and `agy-herdr-bwrap`, so the `-bwrap` suffix is present exactly when an invocation is bwrap-confined. A global `runner.executors.<id>.invocations` list or a pin that names an old id must be renamed.
 
 - Gemini runs through the Antigravity CLI (`agy`) again, because gemini through omp or pi does not work: the standard's gemini invocations are `agy-cli-bwrap` and `agy-herdr-bwrap`, and the coding pins name `agy-herdr-bwrap`. A machine whose config overrides the gemini invocations or pins an `omp-*` gemini invocation must rename them.

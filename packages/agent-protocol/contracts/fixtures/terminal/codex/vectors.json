@@ -704,6 +704,33 @@
       "source": "the codex TUI's error line (its error marker, then the sentence codex prints on its stderr, measured 2026-10-13); the screen text is the one the pane wiring test has always used, not a fresh capture: no real quota screen of any CLI is recorded in the repo"
     },
     {
+      "name": "hooks-review-dialog-needs-a-person-and-is-never-typed-at",
+      "step": "await-ready",
+      "script": {
+        "frames": [
+          {
+            "at": 0,
+            "screen": "launch echo",
+            "inspection": {
+              "state": "idle",
+              "visibleIdle": false,
+              "matchedRule": false,
+              "promptText": ""
+            }
+          },
+          {
+            "at": 1000,
+            "file": "hooks-review"
+          }
+        ]
+      },
+      "expect": {
+        "outcome": "needs-human",
+        "readiness": "needs-human"
+      },
+      "source": "real screen: codex 0.166.0 started in a scratch CODEX_HOME with a trusted folder and a project .codex/hooks.json whose hooks have no trusted_hash, captured with `tmux capture-pane`"
+    },
+    {
       "name": "a-quoted-usage-limit-sentence-is-not-the-reason-a-deadline-stop-names",
       "step": "classify-stop",
       "script": {
