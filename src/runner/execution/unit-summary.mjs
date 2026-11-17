@@ -153,6 +153,7 @@ export function buildUnitSummary(unitDir, { legacyCompletion = null } = {}) {
     infrastructure: typeof settlement?.infrastructure === 'boolean' ? settlement.infrastructure : null,
     infrastructureReason: typeof settlement?.infrastructureReason === 'string' ? settlement.infrastructureReason : null,
     refused: Array.isArray(settlement?.refused) ? settlement.refused : [],
+    ...(settlement?.verify && typeof settlement.verify === 'object' && typeof settlement.verify.ran === 'boolean' ? { verify: settlement.verify } : {}),
     startedAt: timestamp(record.createdAt),
     settledAt: outcome === 'unknown' ? null
       : timestamp(settlement?.settledAt) ?? timestamp(legacy?.settledAt) ?? settlementTimes.at(-1) ?? null,
