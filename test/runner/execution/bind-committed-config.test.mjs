@@ -110,6 +110,13 @@ test('a Workflow capability with no prefer pool takes the families the tier list
   assert.equal(result.executor, 'gemini', 'the first family of tierFallback.advanced that can serve the seat');
 });
 
+test('the committed config\'s reviewer order applies to a reviewer seat of any capability', () => {
+  const result = bind({ unit: { id: 'u', capability: 'coding:no-pool-declared', writes: [] }, role: 'reviewer' }, { runnerConfig, session: headless });
+  assert.ok(!result.refused, JSON.stringify(result.refused));
+  assert.equal(result.provenance.executor.source, 'roles.reviewer.prefer');
+  assert.equal(result.executor, 'xai', 'the first family of runner.roles.reviewer the machine can serve');
+});
+
 test('with no tier list either, a capability with no prefer pool is refused with a structured reason, never guessed', () => {
   const capability = 'coding:no-pool-declared';
   const result = bind(ask(capability), { runnerConfig: { ...runnerConfig, tierFallback: undefined }, session: headless });

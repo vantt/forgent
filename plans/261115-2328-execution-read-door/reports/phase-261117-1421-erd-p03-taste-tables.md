@@ -21,6 +21,13 @@ The two orders now apply to every capability, councils included. With only two f
 | per-capability roles/personas/seats cases in tier-fallback-config.test.mjs | same file, now on `runner.roles`/`runner.personas`; seat cases removed (behaviour gone); schema refusal of the old keys owned by golden_validate row "persona and role taste are not capability keys" |
 | capability-config seat/roles slice cases | same test, new slice shape |
 
+## Review round
+- D-ADR0080 was claimed on refs/fgos/seq/d-adr at 14:20 (claim-156db1affc204fbc).
+- Executor-model vectors: "a prefer inside a role is checked like the entry prefer" and "a persona key that is not a persona name is refused" now take `runner.roles` / `runner.personas` inputs (re-recorded with the script, `--check` 238 match); "a seat key that is not a seat id is refused" deleted as removed behaviour (seat taste moved to the workflow).
+- Doctor row conflict text names `fgos config patch` (one transaction) instead of set/unset.
+- Reviewer-order binding on the committed config is owned by the new case "the committed config's reviewer order applies to a reviewer seat of any capability" in bind-committed-config.test.mjs.
+- repo-differences provenance says "reshaped at 9758cb1bf"; one `bindingTasteOf` name; tier-cell-missing wording "change X, or change the tier (now set by Y)".
+
 ## Gates
 - cargo fmt --check, clippy -D warnings, `cargo test -p fgos-seat-binding -p fgos-config`: green. `cargo check` for x86_64-pc-windows-msvc and aarch64-apple-darwin: green.
 - Node one file per run, all green: capability-config, seat-policy, config-snapshot-hash, runner-schema-vocabulary, agent-definitions, tier-fallback-config, dispatch (223), dispatch-executor-profile, explain, run-verify-pin, run-summary-resume, run-verb, seat-binding-dry-bind, unit-handoff-raise-door, bind-committed-config, architecture, git-mutation-census, doc-health, decision-citation-drift (the last three before the final merge; census and architecture re-run after it). Full sweep of 49 importing test files done once, failures fixed.

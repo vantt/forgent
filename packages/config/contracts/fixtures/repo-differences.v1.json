@@ -3,7 +3,7 @@
  "about": "The authoring equivalence record: this repository's tuned config, pinned, against the bundled standard files. differences are the paths where the pinned source differs from the standard layer (maps compared per entry, lists as leaves), each with its reason; standard-only are paths the standard holds and the source does not. Owning test: tests/authoring_equivalence.rs.",
  "source": {
   "file": "authoring-source.config.json",
-  "copied-from": ".fgos/config.json",
+  "copied-from": ".fgos/config.json at ef4a056d7, reshaped at 9758cb1bf (taste moved to runner.roles; seat and marketing blocks removed)",
   "commit": "ef4a056d7",
   "sha256": "52ff463bcd547ecced288f18bc9b350031e2670c8d893bab04506a58d13bd20c"
  },

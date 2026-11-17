@@ -308,7 +308,7 @@ fn run_bases(
             let mut r = Refusal::new(
                 "tier-cell-missing",
                 format!(
-                    "{} {} — no allowed executor has a cell; change {} or the tier set by {}",
+                    "{} {} — no allowed executor has a cell; change {}, or change the tier (now set by {})",
                     label(policy),
                     policy.tier.name(),
                     policy.prefer_source,

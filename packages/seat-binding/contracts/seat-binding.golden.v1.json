@@ -837,7 +837,7 @@
         }
       },
       "explainContains": [
-        "change capabilities.\"architecture:shape\".prefer or the tier set by maxTier"
+        "change capabilities.\"architecture:shape\".prefer, or change the tier (now set by maxTier)"
       ],
       "skippedReasons": [
         "tier-cell-missing"

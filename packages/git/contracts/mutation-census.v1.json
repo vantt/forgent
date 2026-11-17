@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "a8b72f0a88b64ae8d491a2e3518fcbcb31618c650c592ef91abe834dd31bd8fe",
+  "payloadDigest": "7602ffca467c1619cd5fb3ba62a4326ff18021840f96acdddc00eaf616ef4d4a",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "b8b886cee2ea5ce7ee1153e4795512db135a990de894c27e53c5e778b210be62",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -772,7 +772,7 @@
     "packages/seat-binding/rust/src/lib.rs": "68825754d282aaa175e964347b86b0685a6d07375657a43f09cefe4f919ba98a",
     "packages/seat-binding/rust/src/model.rs": "cf3d334e63118ae3534e07b0e7e3efaf6af3b3e897259cfee1530b97dea0ea68",
     "packages/seat-binding/rust/src/policy.rs": "27cfef47914b95b9bc94ae30cbdde534cd9c21812ba005d4f8571bdbc7c33480",
-    "packages/seat-binding/rust/src/rank.rs": "2e748995658b94938c3aefea189e4e119f1b954ddfae432947f0c4cbb8687e3d",
+    "packages/seat-binding/rust/src/rank.rs": "7f7aeb81c53d4bf4930ca8ccd8d61b53ac076c6e9e13c2c83f9c226d6622c590",
     "packages/seat-binding/rust/src/route.rs": "b14ba0cee5bd2aee535f2b76ea96bc0ef532e4166016a26c98d89c11d2fd484f",
     "packages/seat-binding/rust/src/tier.rs": "8c13a47153cb90274751bca8b36b5d20e349c50dacbcf06631c65195c73fe24c",
     "packages/seat-binding/rust/tests/golden.rs": "3536ea649db21c346bd59829b33aa461e05e902d4f603ad15bc8db79d71eb561",
@@ -1117,7 +1117,7 @@
     "src/runner/execution/account-pin.mjs": "aa1c7f9a9233de8278d46f46cf32ef6568051fbe59430866729c30fb55ec04dc",
     "src/runner/execution/account-rotation.mjs": "3f7263e6d0a291ce33aa9c44381138a6ca436f20543565ef857c8f7936388cbe",
     "src/runner/execution/bind.mjs": "69930126949b48f337e75bdf1a9a6d1447ec6b2c2aa5cc62195c2a2792768f3d",
-    "src/runner/execution/capability-config.mjs": "046be93203125b45343324d1530abb176a09e852e441463d0377c7abf28be9fc",
+    "src/runner/execution/capability-config.mjs": "f7374dc1126810a188f1011a8f7f26cfc74c897518d1dc1f5f78a3871c662964",
     "src/runner/execution/case-admission-port.mjs": "9039951a11acbf69cb549239387cc32ae00617b3ae65bd4682908389b01cdebf",
     "src/runner/execution/case-run-paths.mjs": "4beb8229fa90709bea11c6260c4aee23a99b224a9e6314e69ec74696b86e3ce3",
     "src/runner/execution/commit-unit-work.mjs": "d8853dc5d42a53fa2578304de8ef38d55f04e4c9250a4185999a9d7b1f86a158",
