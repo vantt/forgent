@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "c71eb73fca7eb03f512083d409c74848575a336dea6da216d57acbb2cf661946",
+  "payloadDigest": "e9705584fc18dfd2897aedb6269c30b8971d8f89251bc3bd2d41b331a4f2e497",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "b8b886cee2ea5ce7ee1153e4795512db135a990de894c27e53c5e778b210be62",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -1102,7 +1102,7 @@
     "src/runner/dispatch/run-result.mjs": "e1551ba898c5432e8a0e7cebde1030c473a461eca4761a2c586eb1444145b140",
     "src/runner/dispatch/run-timeout.mjs": "9d0bb5adca999cf689b8a0c6dce0cfc28f122de1393785fcb620f6f669086d40",
     "src/runner/dispatch/runner-config-error.mjs": "9671bbf3bd275167e8611ae5abe909c87e699a6583e7b7e7c2d519ee013d1c0e",
-    "src/runner/dispatch/runtime-inspection.mjs": "b536d9b4fdfd9480915b6c84b8035b5345c9007f94e5b213361230f98f3f94e1",
+    "src/runner/dispatch/runtime-inspection.mjs": "aa228070973faa02cbb8be4ae8084ab46542b32b965247eace975dcc051af31e",
     "src/runner/dispatch/settlement.mjs": "c17e494e117c60d5fa823b33ba358f4c464d8efe6e6d5f7fd3f9251e1baa9f5d",
     "src/runner/dispatch/shipped-catalog.mjs": "ceb40e02a773598eebe4fc8db48e7400bfb76ce938df20268ce166f0539b8025",
     "src/runner/dispatch/stop-processes-inside.mjs": "255f7cedcb61ad8c3992b6068bb1951ce437f7e98acffac382f6ade7e943c234",
@@ -1265,7 +1265,7 @@
     "src/util/spawn-detached-fgos.mjs": "866621bef7a6ca6900a2b90f9488a0ab139b573c41c6b885b61af470523c1be1",
     "src/util/unique-tmp-tag.mjs": "712eb59d8753224dc3197af5739a3a01fa4188f0b60e6e8ed22a1854d8b68dde",
     "src/util/yaml.mjs": "48f2bb8d843984b5fe0928af539b68c4b704eede410ad8a980301337fdc571a4",
-    "src/verbs/dispatch/inspect.mjs": "6c687f7604aa011fa9db645aefb7efd11ec943b079b7b62f0fdba52703a78668",
+    "src/verbs/dispatch/inspect.mjs": "88b5d5f619c1e9aca116956fad31e333c828231e3d803561d655b59d2430a909",
     "src/verbs/dispatch/reconcile.mjs": "caedd393114d8e85ded4323f2aaafd0f8a24a0603d9dc2e4bf8f88131d8f36e6",
     "src/verbs/dispatch/recover.mjs": "cf8c7458dcda950aa106ead81960bce4107c01ec587fab83a8aab34ac5943b7e",
     "src/verbs/dispatch/show-run.mjs": "6ed836d83f8fc71863fc2ce04115b7d0d63f2fb1f42e8bccabc94b812cb179c9",
