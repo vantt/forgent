@@ -1,7 +1,7 @@
 ---
 contract: plan-v1
 title: "Secretary Miu, one start door and host port for head sessions, automatic session rotation"
-status: draft
+status: ready
 priority: P1
 blockedBy: []
 footprint:
@@ -105,10 +105,7 @@ created: 2026-11-17
 
 # Secretary Miu, one start door and host port for head sessions, automatic session rotation
 
-Both owner questions are answered (2026-11-17: verb `fgos head`, provisional per backlog `p-g2iprtzptz`; `p-pgmxt7n7hx` pulled in). The plan stays `draft`
-only because its footprint overlaps two other `ready` plans, `261117-1553-run-verify-record-and-attention-view` and
-`261117-1524-windows-plain-path-fold` (see "Contract check"); the check refuses two active plans that share files.
-Phases 12, 13, 15, 17 and 18 touch those shared files and wait for both plans to land; every other phase is `ready`.
+Both owner questions are answered (2026-11-17: verb `fgos head`, provisional per backlog `p-g2iprtzptz`; `p-pgmxt7n7hx` pulled in). The two overlapping plans (`261117-1553-run-verify-record-and-attention-view`, `261117-1524-windows-plain-path-fold`) landed and are marked done (2026-11-17), so every phase is `ready` and the contract check prints `ok`.
 
 ## Outcome
 
@@ -255,13 +252,13 @@ answered `unavailable / tool.missing`, so the blast radius below is from `rg`, a
 | 9 | [Session Host crate, route, client and the shared opening-text delivery](phase-09-session-host-crate.md) | 1, 5 | packages/session-host/rust/**, Cargo.toml, Cargo.lock, apps/fgos/Cargo.toml, apps/fgos/src/main.rs, src/session-host/client.mjs, test/session-host/client.test.mjs, docs/architecture-manifest.json | 3 | ready |
 | 10 | [Domain registry names the domains that exist](phase-10-domain-registry.md) | 7 | src/state/domain-registry.mjs, test/state/**, test/intake/**, core/skills/fgos-clarifying/**, plugins/fgOS/skills/**, .agents/skills/**, .claude/skills/** | 3 | ready |
 | 11 | [Worker attempts placed through the host port](phase-11-worker-placement.md) | 9 | packages/run-supervisor/**, Cargo.lock, src/run-supervisor/**, test/run-supervisor/**, src/runner/dispatch/herdr-round.mjs, src/runner/dispatch/cli.mjs, src/runner/dispatch/terminal-slot.mjs, test/runner/dispatch-terminal-slot.test.mjs | 4 | ready |
-| 12 | [Head-start use case and Identity registration at SessionStart](phase-12-head-start.md) | 3, 6, 9, 11 | src/session-host/head-start.mjs, test/session-host/head-start.test.mjs, packages/distribution/rust/src/agent_hooks.rs, packages/distribution/rust/tests/goldens/agent-hooks-vectors.json, src/setup/agent-hooks.mjs, packages/distribution/contracts/agent-hooks.v1.json, test/setup/agent-hooks.test.mjs, .claude/settings.json | 5 | draft |
-| 13 | [Owner-question reader over the three stage places](phase-13-owner-questions.md) | 7 | src/portfolio/**, test/portfolio/**, src/cli/command-registry.mjs, packages/host-runtime/contracts/command-manifest.json, packages/host-runtime/contracts/command-routes.json, bin/fgos.mjs, test/cli/questions-verb.test.mjs, docs/architecture-manifest.json, scripts/plan-contract-check.mjs | 4 | draft |
+| 12 | [Head-start use case and Identity registration at SessionStart](phase-12-head-start.md) | 3, 6, 9, 11 | src/session-host/head-start.mjs, test/session-host/head-start.test.mjs, packages/distribution/rust/src/agent_hooks.rs, packages/distribution/rust/tests/goldens/agent-hooks-vectors.json, src/setup/agent-hooks.mjs, packages/distribution/contracts/agent-hooks.v1.json, test/setup/agent-hooks.test.mjs, .claude/settings.json | 5 | ready |
+| 13 | [Owner-question reader over the three stage places](phase-13-owner-questions.md) | 7 | src/portfolio/**, test/portfolio/**, src/cli/command-registry.mjs, packages/host-runtime/contracts/command-manifest.json, packages/host-runtime/contracts/command-routes.json, bin/fgos.mjs, test/cli/questions-verb.test.mjs, docs/architecture-manifest.json, scripts/plan-contract-check.mjs | 4 | ready |
 | 14 | [Rotation executor: two-step replacement](phase-14-rotation-executor.md) | 2, 8, 12 | src/session-rotation/rotate.mjs, test/session-rotation/rotate.test.mjs, docs/platform/session-host/spec.md | 6 | ready |
-| 15 | [Head verb binding: start and rotate](phase-15-head-verb.md) | 12, 13, 14 | src/cli/command-registry.mjs, packages/host-runtime/contracts/command-manifest.json, packages/host-runtime/contracts/command-routes.json, bin/fgos.mjs, test/cli/head-verb.test.mjs, docs/platform/session-host/spec.md | 7 | draft |
+| 15 | [Head verb binding: start and rotate](phase-15-head-verb.md) | 12, 13, 14 | src/cli/command-registry.mjs, packages/host-runtime/contracts/command-manifest.json, packages/host-runtime/contracts/command-routes.json, bin/fgos.mjs, test/cli/head-verb.test.mjs, docs/platform/session-host/spec.md | 7 | ready |
 | 16 | [Secretary persona, secretary skill and /handoff skill](phase-16-secretary-and-handoff-skills.md) | 3, 7, 13, 15 | core/agents/secretary.yaml, core/skills/fgos-secretary/**, core/skills/handoff/**, .claude/agents/**, plugins/fgOS/skills/**, .agents/skills/**, .claude/skills/** | 8 | ready |
-| 17 | [Rotation hooks, doctor row and install wiring](phase-17-rotation-hooks.md) | 14, 15 | src/session-rotation/hook.mjs, bin/fgos.mjs, src/cli/command-registry.mjs, packages/host-runtime/contracts/command-manifest.json, packages/host-runtime/contracts/command-routes.json, packages/distribution/rust/src/agent_hooks.rs, packages/distribution/rust/tests/goldens/agent-hooks-vectors.json, src/setup/agent-hooks.mjs, packages/distribution/contracts/agent-hooks.v1.json, packages/distribution/contracts/doctor-registry.v1.json, test/setup/agent-hooks.test.mjs, .claude/settings.json | 8 | draft |
-| 18 | [Integration, live checks and full gate](phase-18-integration.md) | 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17 | CHANGELOG.md, docs/reading-map.md, docs/platform/run-supervisor/spec.md, packages/git/contracts/mutation-census.v1.json, plans/261117-1856-secretary-session-spine/reports/integration.md | 9 | draft |
+| 17 | [Rotation hooks, doctor row and install wiring](phase-17-rotation-hooks.md) | 14, 15 | src/session-rotation/hook.mjs, bin/fgos.mjs, src/cli/command-registry.mjs, packages/host-runtime/contracts/command-manifest.json, packages/host-runtime/contracts/command-routes.json, packages/distribution/rust/src/agent_hooks.rs, packages/distribution/rust/tests/goldens/agent-hooks-vectors.json, src/setup/agent-hooks.mjs, packages/distribution/contracts/agent-hooks.v1.json, packages/distribution/contracts/doctor-registry.v1.json, test/setup/agent-hooks.test.mjs, .claude/settings.json | 8 | ready |
+| 18 | [Integration, live checks and full gate](phase-18-integration.md) | 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17 | CHANGELOG.md, docs/reading-map.md, docs/platform/run-supervisor/spec.md, packages/git/contracts/mutation-census.v1.json, plans/261117-1856-secretary-session-spine/reports/integration.md | 9 | ready |
 
 **Waves.** 1: phases 1-4. 2: 5-8. 3: 9-10. 4: 11, 13. 5: 12. 6: 14. 7: 15. 8: 16-17. 9: 18. Layers stay serial: the port
 contract (1) lands before the crate (9), the crate before its two consumers (11, then 12, which also needs 11's seat
