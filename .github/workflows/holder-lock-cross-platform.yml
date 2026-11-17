@@ -9,7 +9,8 @@ on:
     paths:
       - 'packages/holder-lock/**'
       - 'packages/process/**'
-      - 'packages/distribution/rust/src/init.rs'
+      - 'packages/distribution/rust/**'
+      - 'packages/identity/**'
       - 'apps/fgos/**'
       - 'apps/fgctl/**'
       - 'src/holder-lock/**'
@@ -54,7 +55,7 @@ jobs:
         run: npm install
 
       - name: Rust tests
-        run: cargo test -p fgos-process -p fgos-holder-lock -p fgos-distribution -p fgos -p fgctl --no-fail-fast
+        run: cargo test -p fgos-process -p fgos-holder-lock -p fgos-distribution -p fgos-identity -p fgos -p fgctl --no-fail-fast
 
       - name: Build the host binary
         run: cargo build -p fgos
