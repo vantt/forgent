@@ -522,6 +522,46 @@ pub fn capability_confinement<'a>(runner: &'a Value, capability: &str) -> Option
     }
 }
 
+/// The registered name a capability goes by: its own key (holding an entry: an object or an array), else the first
+/// key whose entry lists it in `aliases`; `None` when the catalog registers nothing by that name. The one reader of
+/// what the catalog registers: the config check, the purpose door and the run door hint all ask here.
+pub fn registered_capability_of<'a>(runner: &'a Value, name: &Value) -> Option<&'a str> {
+    let section = runner.get("capabilities")?.as_object()?;
+    let is_entry = |value: &Value| value.is_object() || value.is_array();
+    if let Some((key, _)) = name
+        .as_str()
+        .and_then(|key| section.get_key_value(key))
+        .filter(|(_, entry)| is_entry(entry))
+    {
+        return Some(key.as_str());
+    }
+    section
+        .iter()
+        .filter(|(_, entry)| is_entry(entry))
+        .find(|(_, entry)| {
+            entry
+                .get("aliases")
+                .and_then(Value::as_array)
+                .is_some_and(|aliases| aliases.contains(name))
+        })
+        .map(|(key, _)| key.as_str())
+}
+
+/// Whether the exact entry of `name` names at least one executor in `prefer` (a non-blank id, or a non-empty list):
+/// only such a purpose is bound by Seat Binding when `decide` is asked for it.
+pub fn has_own_prefer_pool(runner: &Value, name: &str) -> bool {
+    let entry = runner
+        .get("capabilities")
+        .and_then(Value::as_object)
+        .and_then(|section| section.get(name))
+        .filter(|entry| entry.is_object() || entry.is_array());
+    match entry.and_then(|entry| entry.get("prefer")) {
+        Some(Value::String(id)) => !id.trim().is_empty(),
+        Some(Value::Array(list)) => !list.is_empty(),
+        _ => false,
+    }
+}
+
 /// The login store an invocation reads: the `credentialStore` it declares, else none. Nothing is inferred from
 /// the command or its environment.
 pub fn credential_store_of(invocation: &Value) -> Option<&Value> {

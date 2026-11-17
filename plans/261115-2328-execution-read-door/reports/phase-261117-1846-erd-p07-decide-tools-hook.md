@@ -29,7 +29,7 @@ every decide, hook, validate and tool-status vector replays in Rust, the bind-de
 - `src/hook.rs`: `normalize_hook_payload`, `dispatch_verdict` (Node's texts), `hook_answer` (exit 2 standard, agy
   JSON exit 0), `serve_hook` (a payload that does not normalize allows in the flag's format; a panicking verdict
   allows in the call's format).
-- Vectors: `packages/execution/contracts/decide.v1.json` (99 vectors, facts `decide`, `configRoot`,
+- Vectors: `packages/execution/contracts/decide.v1.json` (104 vectors, facts `decide`, `configRoot`,
   `repoRootGuard`, `hookPayload`, `hookVerdict`, `hookAnswer`, `attribute`, `globalRigorToTier`), recorded by the
   committed hermetic `scripts/decide-vectors.mjs` (`--check`; buildTestEnv like the executor-model script, whose
   `serialize` and `adoptTestEnvironment` it reuses) through `test/helpers/decide-vectors.helper.mjs`.
@@ -57,7 +57,7 @@ every decide, hook, validate and tool-status vector replays in Rust, the bind-de
 | `cargo clippy -p fgos-execution --all-targets -- -D warnings` | clean |
 | `cargo test -p fgos-execution` | green (golden_decide, golden_executor_model, golden_bind, golden_agents, unit tests) |
 | `cargo check -p fgos-execution --all-targets --target x86_64-pc-windows-msvc` / `aarch64-apple-darwin` | green |
-| `node scripts/decide-vectors.mjs --check` | 99 match |
+| `node scripts/decide-vectors.mjs --check` | 104 match |
 | `node scripts/executor-model-vectors.mjs --check` | executor-model 348, bind 90 match |
 | `test/runner/dispatch.test.mjs` | 216/0 (`executor-model-vectors.test.mjs` 3/0) |
 | `test/runner/assignment-dispatch.test.mjs`, `test/scripts/dispatch-decide-hook.test.mjs`, `test/scripts/decision-question-hook.test.mjs`, `test/runner/dispatch/executor-model-vectors.test.mjs` | 50/0, 20/0, 11/0, 2/0 |
@@ -82,6 +82,30 @@ while Node answers differently, checked by `decidedProblem`): every decide `expe
 `bind.v1.json` through `scripts/executor-model-vectors.mjs`; `scripts/decide-vectors.mjs` stays separate but imports
 that script's `adoptTestEnvironment` (run-tests' `buildTestEnv`) and `serialize`, so there is one environment
 definition and one file layout.
+
+## Review changes (OPC CHANGES on 787b4a3be)
+
+- F1, config door: the hook vectors recorded a bare `ConfigDoorError`, a shape production never raises
+  (`loadRunnerConfigForDir` wraps every door error into a `RunnerConfigError` carrying the door's `config-*` id), and
+  the Rust hook allowed the door's own failures (`config-io` and the other door ids). The helper now raises the wrapped
+  shape; `DecideFailure::DoorFailed` is gone and `ConfigDoor` covers a file the door refuses or cannot read; the hook
+  blocks on every `config-*` code. The reason stays the code, as Node gives it today (not the door message). Vectors
+  renamed: "a config file the door refuses blocks the call with the door's code", "a config file the door cannot read
+  blocks the call with the door's code".
+- F2: D20 in plan.md says only `config-*` coded refusals block (of the semantic ones only `config-key-retired`), pointing
+  at p-lqjyc7umub.
+- F3: the catalog's registered name and own-prefer-pool readers live once, in `executor_model.rs` next to
+  `capability_confinement`; `runner_check` and `decide` call them.
+- F4: an unpaired surrogate escape in a payload is replaced by `\uFFFD` before parsing, so the call is judged as Node
+  judges it (vector "a payload with an unpaired surrogate escape is still judged, a paired one is kept").
+- F5: the hook's blank test trims as JavaScript does (`runner_check::js_trim`, U+FEFF included); vectors for a
+  byte-order-mark subagent type and `CLAUDE_PROJECT_DIR`.
+- F6, changed natively: an origin with no file. Node names `config.json` (global `rigorToTier`) or `config.yaml`
+  (attribution); the crate never spells a config file name (door row "locate and read a project config file") and
+  prints `<file>`, so the phase 10 adapter names every project and global origin's file. Two vectors state both
+  answers (`expect` Node's, `nativeExpect` the crate's).
+- F7: phase-10-native-verbs.md requirement 2 names the `decide` cli_tests case as the one wiring proof of
+  `load_checked_runner`'s order.
 
 ## Left
 
@@ -114,5 +138,5 @@ definition and one file layout.
 - None.
 
 Status: DONE
-Summary: Runner check, tools, hook and decide are in Rust; all 99 decide vectors, the validate vectors and the tool
+Summary: Runner check, tools, hook and decide are in Rust; all 104 decide vectors, the validate vectors and the tool
 status replay, the bind-dependent ones through 06's bind.

@@ -62,7 +62,7 @@ known defect, which becomes a backlog row); launch, lease, transport and confine
 | D17 | A registered workflow unit may declare `tier` (14); units files keep refusing it | owner direction "a workflow step declares the tier and rigor it needs"; `unit.mjs:10`, `seat-resolver.mjs:346-366` |
 | D18 | The council domain is not a Work domain: no `registry.yaml`, no `compiled.json` | `domain-compile.mjs:22-26`, `domain-registry.mjs:66-82` |
 | D19 | The native hook has its own lane outcome and normalizer (ported from `normalizeHookPayload`), cross-platform, exit 2 to block, a panic allows; the mailbox hook is not reused | mailbox lane is unix-only and exits 0 always (`wiring/mod.rs:14-18`, `mailbox_hook.rs:4-6`); `src/runner/hook.mjs:28-44` |
-| D20 | The native decide, explain and hook run the runner's semantic config check (ported `validateRunnerConfigShape`) and treat its refusals as config refusals | `dispatch/config.mjs:714-777`; otherwise the guard turns fail-open |
+| D20 | The native decide, explain and hook run the runner's semantic config check (ported `validateRunnerConfigShape`) and treat its refusals as config refusals. Amended at phase 07: only refusals carrying a `config-*` code block the hook, as in Node today; of the semantic refusals only `config-key-retired` carries one, so the rest allow until the owner decides p-lqjyc7umub. Every refusal or failure of the config door (wrapped with its `config-*` id) blocks | `dispatch/config.mjs:714-777`; otherwise the guard turns fail-open; `runner_check.rs` (`config-key-retired`), `hook.rs` `config_refusal_text` |
 
 ## Phases
 

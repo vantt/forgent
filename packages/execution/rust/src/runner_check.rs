@@ -10,7 +10,7 @@
 #![allow(clippy::result_large_err)]
 
 use crate::accounts::{is_cli_key, is_inside, validate_provider_account_inventory};
-use crate::executor_model::{capability_confinement, ModelError};
+use crate::executor_model::{capability_confinement, registered_capability_of, ModelError};
 use fgos_convention::packaged_rules;
 use serde_json::{Map, Value};
 use std::fmt;
@@ -78,7 +78,7 @@ fn js_space(c: char) -> bool {
     matches!(c, '\u{0009}'..='\u{000d}' | '\u{0020}' | '\u{00a0}' | '\u{1680}' | '\u{2000}'..='\u{200a}' | '\u{2028}' | '\u{2029}' | '\u{202f}' | '\u{205f}' | '\u{3000}' | '\u{feff}')
 }
 
-fn js_trim(text: &str) -> &str {
+pub(crate) fn js_trim(text: &str) -> &str {
     text.trim_matches(js_space)
 }
 
@@ -172,10 +172,6 @@ fn fields_of(value: Option<&Value>) -> impl Iterator<Item = (&String, &Value)> {
     value.and_then(Value::as_object).into_iter().flatten()
 }
 
-fn is_entry(value: &Value) -> bool {
-    value.is_object() || value.is_array()
-}
-
 /// A non-empty string once trimmed (`typeof x === "string" && x.trim()`).
 fn is_filled(value: Option<&Value>) -> bool {
     value
@@ -189,29 +185,6 @@ fn js_integer(value: &Value) -> Option<f64> {
 }
 
 // ---- the capability catalog (`runner.capabilities`) ------------------------------------------------------
-
-fn capabilities_of(runner: &Value) -> Option<&Map<String, Value>> {
-    runner.get("capabilities").and_then(Value::as_object)
-}
-
-/// Whether the catalog registers `name`: an entry of its own, or an entry that lists it in `aliases`.
-fn is_registered(runner: &Value, name: &Value) -> bool {
-    let Some(section) = capabilities_of(runner) else {
-        return false;
-    };
-    if name
-        .as_str()
-        .is_some_and(|key| section.get(key).is_some_and(is_entry))
-    {
-        return true;
-    }
-    section.values().any(|entry| {
-        entry
-            .get("aliases")
-            .and_then(Value::as_array)
-            .is_some_and(|aliases| aliases.contains(name))
-    })
-}
 
 /// The scopes of a taste table (`roles`, `personas`): the entries that are plain objects, in declared order.
 fn taste_scopes<'a>(
@@ -909,7 +882,7 @@ fn check_invocation(
     check_bypass_is_confined(invocation, label, executor_confinement)?;
     if str_of(invocation, "via") == Some("mcp") {
         for capability in fields_of(present(invocation, "tools")).map(|(name, _)| name) {
-            if !is_registered(runner, &Value::String(capability.clone())) {
+            if registered_capability_of(runner, &Value::String(capability.clone())).is_none() {
                 return Err(RunnerCheckError::config(format!(
                     "runner config ({label}) \"tools\" key \"{capability}\" is not declared in \"capabilities\" \u{2014} add it there first."
                 )));
@@ -954,7 +927,7 @@ fn check_executor_entry(runner: &Value, executor: &Value, label: &str, executor_
     // `for` describes `kind: "tool"` executors; on an agent it is inert and `fgos doctor` names it.
     if let Some(purposes) = executor.get("for").and_then(Value::as_array) {
         for purpose in purposes {
-            if !is_registered(runner, purpose) {
+            if registered_capability_of(runner, purpose).is_none() {
                 return Err(RunnerCheckError::config(format!(
                     "runner config ({label}) \"for\" entry \"{}\" is not declared in \"capabilities\" \u{2014} add it there first.",
                     js_display(Some(purpose))

@@ -15,8 +15,9 @@
 
 use crate::bind::{bind, effective_rigor, BindRequest, BindSession};
 use crate::executor_model::{
-    lookup_executor, mechanism, resolve_executor_governance, resolve_executor_provider,
-    with_default_executor, Governance, Mechanism, ModelError,
+    has_own_prefer_pool, lookup_executor, mechanism, registered_capability_of,
+    resolve_executor_governance, resolve_executor_provider, with_default_executor, Governance,
+    Mechanism, ModelError,
 };
 use crate::ports::Machine;
 use crate::runner_check::{check_runner_config, RunnerCheckError};
@@ -173,11 +174,11 @@ impl DecideAnswer {
 /// Why `decide` could not answer.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum DecideFailure {
-    /// The config door refused the project's config (it does not parse, breaks a schema, sits in the wrong
-    /// scope): `code` is the door's failure id, `message` names every refusal's file and position.
+    /// The config door could not give the project's config: it refused the file (it does not parse, breaks a
+    /// schema, sits in the wrong scope) or failed reading it (an operating-system error, no main checkout).
+    /// `code` is the door's `config-*` id, `message` names files and positions, never a value. Either way the
+    /// config cannot be judged, so the hook blocks on it as it blocks on any other `config-*` refusal.
     ConfigDoor { code: String, message: String },
-    /// The config door itself failed (an operating-system error, no main checkout): not a refusal of the file.
-    DoorFailed { code: String, message: String },
     /// A refusal of the request or of the runner config (the semantic check included).
     Refused(ModelError),
     /// Seat Binding refused the seat of an assignment record: a runner refusal whose code is the refusal's reason.
@@ -187,8 +188,7 @@ pub enum DecideFailure {
 impl DecideFailure {
     pub fn message(&self) -> &str {
         match self {
-            DecideFailure::ConfigDoor { message, .. }
-            | DecideFailure::DoorFailed { message, .. } => message,
+            DecideFailure::ConfigDoor { message, .. } => message,
             DecideFailure::Refused(error) => &error.message,
             DecideFailure::SeatRefused { message, .. } => message,
         }
@@ -596,40 +596,6 @@ enum PurposeAnswer {
     Bound(BoundSeat),
     /// Seat Binding refused the seat.
     Refused { code: String, detail: String },
-}
-
-/// Whether the exact entry of `name` names at least one executor in `prefer`.
-fn has_own_prefer_pool(runner: &Value, name: &str) -> bool {
-    let entry = runner
-        .get("capabilities")
-        .filter(|c| c.is_object() || c.is_array())
-        .and_then(|c| c.as_object())
-        .and_then(|c| c.get(name))
-        .filter(|e| e.is_object() || e.is_array());
-    match entry.and_then(|e| e.get("prefer")) {
-        Some(Value::String(s)) => !s.trim().is_empty(),
-        Some(Value::Array(list)) => !list.is_empty(),
-        _ => false,
-    }
-}
-
-/// The registered name a capability goes by: its own key, else the first key that lists it in `aliases`.
-pub fn registered_capability_of<'a>(runner: &'a Value, name: &str) -> Option<&'a str> {
-    let section = runner.get("capabilities").and_then(Value::as_object)?;
-    let is_entry = |v: &Value| v.is_object() || v.is_array();
-    if let Some((key, _)) = section.get_key_value(name).filter(|(_, v)| is_entry(v)) {
-        return Some(key.as_str());
-    }
-    section
-        .iter()
-        .filter(|(_, v)| is_entry(v))
-        .find(|(_, entry)| {
-            entry
-                .get("aliases")
-                .and_then(Value::as_array)
-                .is_some_and(|aliases| aliases.iter().any(|a| a.as_str() == Some(name)))
-        })
-        .map(|(key, _)| key.as_str())
 }
 
 fn status_rank(status: ToolStatus) -> u8 {
@@ -1306,7 +1272,7 @@ pub fn decide_over(
         }
         let mut codes = vec!["selector.unregistered"];
         if selector_type == "purpose"
-            && purpose.is_some_and(|p| registered_capability_of(runner, p).is_none())
+            && purpose.is_some_and(|p| registered_capability_of(runner, &json!(p)).is_none())
         {
             codes.push("capability.unknown");
         }
@@ -1387,7 +1353,7 @@ pub fn run_door_hint(
     };
     let is_agent = executor.is_some_and(|(_, entry)| kind(entry) == "agent");
     let registered = match (capability.filter(|c| !c.is_empty()), runner) {
-        (Some(capability), Some(runner)) => registered_capability_of(runner, capability),
+        (Some(capability), Some(runner)) => registered_capability_of(runner, &json!(capability)),
         _ => None,
     };
     let mut command = vec!["fgos run \"<prompt>\"".to_string()];

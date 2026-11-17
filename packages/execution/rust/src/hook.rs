@@ -9,11 +9,13 @@
 //!
 //! One rule for both formats: a payload that is empty or does not parse allows the call, and so does any failure
 //! of the verdict itself, a panic included (the hook is an enforcement layer on top of a working dispatch surface,
-//! never a second point of failure for it). Two failures block: a refusal of the project's config, because
-//! allowing the call would let it bypass the rules the broken file declares, and a project directory that does
-//! not exist, since no rule can be read from it.
+//! never a second point of failure for it). Two failures block: a config refusal (a `config-*` code: the
+//! semantic check's, or the config door's when it refuses the file or cannot read it), because allowing the call would
+//! let it bypass rules the config declares or that cannot be judged, and a project directory that does not exist,
+//! since no rule can be read from it.
 
 use crate::decide::{DecideAnswer, DecideFailure};
+use crate::runner_check::js_trim;
 use serde_json::{json, Map, Value};
 use std::panic::{catch_unwind, AssertUnwindSafe};
 
@@ -58,8 +60,50 @@ impl HookCall {
     }
 }
 
+/// A string that is not blank once trimmed the way JavaScript trims (U+FEFF included).
 fn is_text(value: Option<&str>) -> bool {
-    value.is_some_and(|text| !text.trim().is_empty())
+    value.is_some_and(|text| !js_trim(text).is_empty())
+}
+
+/// The payload with every `\u` escape of an unpaired UTF-16 surrogate replaced by `\uFFFD`. JSON.parse reads such
+/// an escape into a string the hook still judges (it prints as U+FFFD), where a Rust string cannot hold it; only a
+/// real escape inside the text is touched, a paired surrogate is kept.
+fn without_lone_surrogates(raw: &str) -> std::borrow::Cow<'_, str> {
+    let unit = |at: usize| -> Option<u16> {
+        let hex = raw.get(at + 2..at + 6)?;
+        (raw.get(at..at + 2) == Some("\\u")).then_some(())?;
+        u16::from_str_radix(hex, 16).ok()
+    };
+    let is_high = |u: u16| (0xD800..0xDC00).contains(&u);
+    let is_low = |u: u16| (0xDC00..0xE000).contains(&u);
+    let bytes = raw.as_bytes();
+    let mut out: Option<String> = None;
+    let (mut i, mut copied) = (0, 0);
+    while i < bytes.len() {
+        if bytes[i] != b'\\' {
+            i += 1;
+            continue;
+        }
+        match unit(i) {
+            Some(high) if is_high(high) && unit(i + 6).is_some_and(is_low) => i += 12,
+            Some(lone) if is_high(lone) || is_low(lone) => {
+                let text = out.get_or_insert_with(String::new);
+                text.push_str(&raw[copied..i]);
+                text.push_str("\\uFFFD");
+                i += 6;
+                copied = i;
+            }
+            Some(_) => i += 6,
+            None => i += 2,
+        }
+    }
+    match out {
+        None => std::borrow::Cow::Borrowed(raw),
+        Some(mut text) => {
+            text.push_str(&raw[copied..]);
+            std::borrow::Cow::Owned(text)
+        }
+    }
 }
 
 /// One call shape for both formats; `None` when the payload is empty or not a JSON object (the caller allows).
@@ -73,7 +117,8 @@ pub fn normalize_hook_payload(
     if !is_text(Some(raw)) {
         return None;
     }
-    let Ok(Value::Object(data)) = serde_json::from_str::<Value>(raw) else {
+    let Ok(Value::Object(data)) = serde_json::from_str::<Value>(&without_lone_surrogates(raw))
+    else {
         return None;
     };
     let agy = format == Some("agy") || data.contains_key("toolCall");
@@ -120,12 +165,12 @@ pub enum Verdict {
 /// The tool names an agent call goes by.
 const AGENT_TOOL_NAMES: &[&str] = &["Agent", "Task", "task"];
 
-/// The text a config refusal names, or `None` for any other failure (which allows the call): the door's refusal
-/// message (ids, files and positions only, never a value), or the `config-*` code of a runner refusal. A runner
-/// refusal without such a code is not a config refusal today, so it allows.
+/// The `config-*` code of a config refusal, or `None` for any other failure (which allows the call). A config the
+/// door refuses or cannot read carries its door id, as `decide` raises it; a runner refusal carries its own code. A
+/// runner refusal without a `config-*` code is not a config refusal today (p-lqjyc7umub), so it allows.
 fn config_refusal_text(failure: &DecideFailure) -> Option<String> {
     match failure {
-        DecideFailure::ConfigDoor { message, .. } => Some(message.clone()),
+        DecideFailure::ConfigDoor { code, .. } if code.starts_with("config-") => Some(code.clone()),
         DecideFailure::Refused(error) if error.name == "RunnerConfigError" => error
             .code
             .filter(|code| code.starts_with("config-"))

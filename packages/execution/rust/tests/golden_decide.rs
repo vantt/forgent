@@ -122,7 +122,6 @@ fn failure_of(value: &Value) -> DecideFailure {
     let message = text(value, "message").unwrap_or_default();
     match value["kind"].as_str() {
         Some("door") => DecideFailure::ConfigDoor { code, message },
-        Some("door-failed") => DecideFailure::DoorFailed { code, message },
         Some("runner") => DecideFailure::Refused(ModelError {
             name: "RunnerConfigError",
             code: value.get("code").and_then(Value::as_str).map(leak),
