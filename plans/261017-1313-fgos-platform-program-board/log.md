@@ -1,3 +1,4 @@
+- 2026-11-17 16:16 HARDEN: IN-MAIN pathfold 8923097a3, S5 p01b ac39a1c64, S5 p15 45ad5c4a0
 - 2026-11-17 16:07 HARDEN: HOLD lifted: main-red fix in main 5a8d16894 (cfg(unix) migrate_options; fixtures follow the taste move). Landing trial/pathfold, S5 p01b, S5 p15 next.
 - 2026-11-17 16:04 OPC: MERGE fix/main-red-1117b 5c45d3f31 (fgos-config tests/common migrate_options cfg(unix); fixture helpers restate runner.roles/personas after 03's taste move; test-only). HOLD may lift after land and a green main run.
 - 2026-11-17 16:00 OPC: MERGE S5 p01b execution-read-door/p01b b18243575 (executor-model-vectors.mjs hermetic via buildTestEnv; --check 238 match from OPC's own herdr shell; dirty-env test). Report file not committed yet.
