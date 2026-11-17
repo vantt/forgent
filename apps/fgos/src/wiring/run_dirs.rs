@@ -260,25 +260,31 @@ mod tests {
             serde_json::json!({"path": "assignments/work/runs/02", "kind": "dir"}),
         ]);
         let instances = run_instances(&tree.fgos());
-        let fgos = text(&tree.fgos());
+        // The directories are named with the platform's own separators.
+        let under = |tail: &[&str]| {
+            tail.iter()
+                .fold(tree.fgos(), |dir, part| dir.join(part))
+                .to_string_lossy()
+                .into_owned()
+        };
         assert_eq!(
             instances["advance"],
             vec![Params::from([(
                 "workflowRunDir".to_owned(),
-                format!("{fgos}/workflow-runs/case-1")
+                under(&["workflow-runs", "case-1"])
             )])]
         );
         assert_eq!(
             instances["recovery"],
             vec![Params::from([(
                 "runDir".to_owned(),
-                format!("{fgos}/assignments/work/runs/02")
+                under(&["assignments", "work", "runs", "02"])
             )])]
         );
         assert_eq!(
             instances["attempt"],
             vec![Params::from([
-                ("runDir".to_owned(), format!("{fgos}/assignments/work")),
+                ("runDir".to_owned(), under(&["assignments", "work"])),
                 ("NN".to_owned(), "02".to_owned())
             ])]
         );

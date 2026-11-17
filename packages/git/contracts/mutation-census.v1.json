@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "1c83ab8e9261817ae31da9ac0eac82134d4d3b78bed98b14375c5b021899db8e",
+  "payloadDigest": "46929ca8bb6c8fd2b43962e8644b51d392e48b7e5c4217f3072577f6e59faf3a",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "b8b886cee2ea5ce7ee1153e4795512db135a990de894c27e53c5e778b210be62",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -124,7 +124,7 @@
     "apps/fgos/src/wiring/mailbox_verbs_unsupported.rs": "8f4ceadc33463deea690b89514b083d529675f2200052f2c67d151613eed7021",
     "apps/fgos/src/wiring/metrics_sources.rs": "504e2c72b52a5da8d8d23a862403d47986811234809f364ee6006c6957f6c583",
     "apps/fgos/src/wiring/mod.rs": "67f6a83767fc7130425665f0f385023887f11cfd2a64d12a0d7d84a428be3ea9",
-    "apps/fgos/src/wiring/run_dirs.rs": "6c34c6af1c85e8e326272fc1c08602b81e6e53ab778596f36296ef376c94b970",
+    "apps/fgos/src/wiring/run_dirs.rs": "8248bf1a45d37e2ca03315dea11489b6b90362a47479244a10a7c71648e90f60",
     "apps/fgos/src/wiring/session.rs": "f2569bef9f072e959f14673c2d2929e2b0b001540a4e147fd5e59082b2e64b43",
     "apps/fgos/src/wiring/uninstall.rs": "1c5e55502b62d428ef0f9c560d2762d44ee499ac434741eb68b8208dbd6bce2e",
     "apps/fgos/src/wiring/wire_agents.rs": "a434308907a3e7d87c880ebf95a957e1342b77e83ebe1ee0272002335b7a248c",
