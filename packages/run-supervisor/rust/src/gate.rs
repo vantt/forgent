@@ -196,6 +196,7 @@ pub(crate) fn load_config(path: &Path) -> Result<Config, String> {
         (Some(boot), Some(ns)) => Some((boot.to_string(), ns)),
         _ => None,
     };
+    // `host_of` also reads `mode`: an envelope a controller wrote before placement went through the Session Host.
     let terminal = match crate::envelope::host_of(&value) {
         Some("terminal") => true,
         Some("direct") => false,

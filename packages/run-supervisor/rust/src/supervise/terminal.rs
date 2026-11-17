@@ -34,7 +34,8 @@ use fgos_process::facts::{self, ProcTuple};
 use fgos_process::{domain_is_empty, domain_kill_all, Domain, DomainState, ProcId};
 use fgos_session_host::direct::OsDirect;
 use fgos_session_host::{
-    HostKind, LaunchAnswer, PaneIo, Placement, RefusalKind, SessionHost, DEFAULT_GRACE_MS,
+    HostKind, LaunchAnswer, PaneIo, Placement, RefusalKind, SendFailure, SessionHost,
+    DEFAULT_GRACE_MS,
 };
 use fgos_terminal_control::core::{Core, Want};
 use fgos_terminal_control::port::{ExpectedProcess, LaunchSpec, PaneState, ProcessIdentity};
@@ -651,9 +652,6 @@ struct TermIo<'a, 'b> {
     sup: &'a mut Sup<'b>,
 }
 
-/// How `PaneIo::send` words a send that typed nothing because the agent is not the pane's foreground program.
-const NOTHING_TYPED: &str = "nothing was typed: ";
-
 impl AgentIo for TermIo<'_, '_> {
     fn send(&mut self, input: &SendInput) -> Result<(), IoError> {
         // A cancel, deadline or lost gate seen since the last tick must stop this send: a long
@@ -662,11 +660,11 @@ impl AgentIo for TermIo<'_, '_> {
         if self.sup.finished() {
             return Err(IoError::Io("the attempt is ending".into()));
         }
-        let sent = self.pane.send(input);
-        // Nothing was typed. The agent is not the pane's foreground program, so it cannot take a
-        // brief: the attempt ends with the reason on its receipt, a failed attempt for the settlement.
-        if let Err(IoError::Io(why)) = &sent {
-            if let Some(reason) = why.strip_prefix(NOTHING_TYPED) {
+        match self.pane.send_typed(input) {
+            Ok(()) => Ok(()),
+            // Nothing was typed. The agent is not the pane's foreground program, so it cannot take a
+            // brief: the attempt ends with the reason on its receipt, a failed attempt for the settlement.
+            Err(SendFailure::ForegroundNotAgent { reason }) => {
                 eprintln!("fgos internal supervise: nothing typed into the pane: {reason}");
                 eprintln!(
                     "fgos internal supervise: pane foreground facts: {}",
@@ -674,9 +672,10 @@ impl AgentIo for TermIo<'_, '_> {
                 );
                 self.sup
                     .begin_stop("cancel", Some(REASON_FOREGROUND_NOT_AGENT));
+                Err(IoError::Io(format!("nothing was typed: {reason}")))
             }
+            Err(SendFailure::Io(e)) => Err(e),
         }
-        sent
     }
 
     fn screen(&mut self) -> Result<String, IoError> {

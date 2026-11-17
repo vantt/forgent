@@ -8,6 +8,7 @@
 //! (`FGOS_HERDR_BIN`, `HERDR_SESSION`, `HERDR_SOCKET_PATH`), so the controller
 //! that starts the supervisor decides which herdr it talks to.
 
+use std::cell::RefCell;
 use std::path::Path;
 use std::time::{SystemTime, UNIX_EPOCH};
 
@@ -185,10 +186,13 @@ pub enum ReleaseFailure {
 }
 
 /// The Terminal Control surface of the Session Host over the supervisor's core. The only thing it adds is
-/// the retain window a kept pane carries (`until`), which the port's own `Core` wrapper does not know.
+/// the retain window a kept pane carries (`until`), which the port's own `Core` wrapper does not know,
+/// and the reason the core kept the slot instead of releasing it: the host answers `Retired` for a kept
+/// slot whose pane is gone, but only a `Released` marker in the Terminal Control store is a receipt.
 struct SlotPanes<'a> {
     core: &'a Core<'a>,
     until: Option<u64>,
+    kept: RefCell<Option<String>>,
 }
 
 impl Panes for SlotPanes<'_> {
@@ -223,7 +227,11 @@ impl Panes for SlotPanes<'_> {
     }
 
     fn release(&self, key: &str, disposition: Disposition) -> Result<ReleaseOutcome, Refusal> {
-        self.core.release(key, disposition, self.until)
+        let outcome = self.core.release(key, disposition, self.until);
+        if let Ok(ReleaseOutcome::KeptUnknown { reason }) = &outcome {
+            *self.kept.borrow_mut() = Some(reason.clone());
+        }
+        outcome
     }
 }
 
@@ -241,7 +249,11 @@ pub fn release(
         None
     };
     let core = backend.core();
-    let panes = SlotPanes { core: &core, until };
+    let panes = SlotPanes {
+        core: &core,
+        until,
+        kept: RefCell::new(None),
+    };
     let direct = OsDirect::in_state_root();
     let host = SessionHost {
         panes: &panes,
@@ -258,7 +270,17 @@ pub fn release(
         Disposition::Close => Retirement::Close,
         Disposition::Retain => Retirement::Retain,
     };
-    match host.retire(&placement, retirement) {
+    let answer = host.retire(&placement, retirement);
+    // The core kept the slot: no marker was written, whatever the host made of the pane being gone.
+    // No server incarnation ever recording the key is the only proof that no pane was allocated.
+    if let Some(reason) = panes.kept.take() {
+        return Err(if backend.ever_recorded(key) {
+            ReleaseFailure::Retry(reason)
+        } else {
+            ReleaseFailure::NoRecord(reason)
+        });
+    }
+    match answer {
         RetireAnswer::Retired => Ok(serde_json::json!({
             "disposition": match disposition {
                 Disposition::Close => "close",
@@ -270,9 +292,7 @@ pub fn release(
             let reason = refusal.detail.unwrap_or_default();
             match refusal.result {
                 RefusalKind::Unsupported => Err(ReleaseFailure::Unsupported(reason)),
-                RefusalKind::Unknown if !backend.ever_recorded(key) => {
-                    Err(ReleaseFailure::NoRecord(reason))
-                }
+                // A refusal the core itself raised (a store or driver error) proves nothing about absence.
                 RefusalKind::Unknown => Err(ReleaseFailure::Retry(reason)),
             }
         }

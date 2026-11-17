@@ -173,6 +173,21 @@ fn terminal_control_that_cannot_prove_it_may_close_leaves_the_step_open_for_adop
 }
 
 #[test]
+fn a_slot_the_core_kept_with_its_pane_gone_still_has_no_receipt_until_it_is_marked_released() {
+    let case = case("rs-kept-gone", "true");
+    case.receipt("exited", true);
+    // The pane is gone but nothing proves what it ran: the core keeps the slot and writes no Released
+    // marker, so the step must stay open for adopt rather than record a release that did not happen.
+    case.herdr.set_flag("gone", true);
+    let outcome = case.run();
+    assert!(
+        matches!(&outcome, StepsOutcome::Retry { step_id, .. } if step_id == "release-slot"),
+        "{outcome:?}"
+    );
+    assert!(case.release_detail().is_none());
+}
+
+#[test]
 fn a_step_that_asks_for_a_retry_leaves_the_slot_undecided() {
     let case = case(
         "rs-retry",

@@ -21,6 +21,9 @@ fn refusal_fields(refusal: &Refusal) -> (String, Value) {
     if let Some(detail) = &refusal.detail {
         fields["detail"] = json!(detail);
     }
+    if let Some(capability) = &refusal.capability {
+        fields["capability"] = json!(capability);
+    }
     let result = match refusal.result {
         RefusalKind::Unsupported => "unsupported",
         RefusalKind::Unknown => "unknown",

@@ -113,6 +113,9 @@ pub struct Refusal {
     pub code: RefusalCode,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub detail: Option<String>,
+    /// The Terminal Control capability the driver lacks, when an `unsupported` answer comes from there.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub capability: Option<String>,
 }
 
 impl Refusal {
@@ -121,6 +124,7 @@ impl Refusal {
             result: RefusalKind::Unsupported,
             code,
             detail: Some(detail.into()),
+            capability: None,
         }
     }
 
@@ -129,6 +133,7 @@ impl Refusal {
             result: RefusalKind::Unknown,
             code,
             detail: Some(detail.into()),
+            capability: None,
         }
     }
 }
@@ -139,8 +144,8 @@ pub enum StartAnswer {
     Refused(Refusal),
 }
 
-/// What `open` answers: the placement, and the slot this call allocated for it (absent when the key's
-/// pane was already live, so nothing was allocated).
+/// What `open` answers: the placement, and its slot: the one this call allocated, or the one a live key's
+/// pane already holds (absent only when that slot could not be read back).
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum OpenAnswer {
     Opened {

@@ -481,21 +481,14 @@ export async function prepareTerminalAttempt(ctx) {
     binding: { confinement, permissionMode, trustStore, trustAlso, trustAccountSource },
     round, runDir, cwd, repoRoot, fullEnv, herdrBin, attemptEnv,
   });
-  round.herdrSession = sessionEnv?.HERDR_SESSION ?? null;
-  if (round.herdrSession) round.note({ herdrSession: round.herdrSession });
-
-  const projectRoot = repoRoot ?? cwd;
-  const groupKey = portKey(dispatchBatchKey ?? runId ?? workId ?? key);
-  // The herdr endpoint the pane lives behind: the session this round lives in.
-  const endpointEnv = {
-    ...(herdrBin ? { FGOS_HERDR_BIN: herdrBin } : {}),
-    ...herdrEndpointEnv(sessionEnv),
-  };
-  // Built inside the try below: the private home exists from here on, and a terminal config that cannot
-  // build a control must give it back like every other failure of this function.
+  // The seat's trust entry and private home exist from here on: everything below runs in the try, so a
+  // failure anywhere before the handover (a terminal config that cannot build a control included) gives
+  // them back through `abandon`.
   let tc;
   let paneHost;
-  const display = slotDisplay({ ...workLabel, agent: agentKind, model, role: rawContract?.assignment?.role });
+  let groupKey;
+  let endpointEnv;
+  let display;
 
   const abandon = async () => {
     // Behind the group's earlier opens, so a close never runs while a sibling's open is choosing its pane.
@@ -505,6 +498,17 @@ export async function prepareTerminalAttempt(ctx) {
   };
 
   try {
+    round.herdrSession = sessionEnv?.HERDR_SESSION ?? null;
+    if (round.herdrSession) round.note({ herdrSession: round.herdrSession });
+
+    const projectRoot = repoRoot ?? cwd;
+    groupKey = portKey(dispatchBatchKey ?? runId ?? workId ?? key);
+    // The herdr endpoint the pane lives behind: the session this round lives in.
+    endpointEnv = {
+      ...(herdrBin ? { FGOS_HERDR_BIN: herdrBin } : {}),
+      ...herdrEndpointEnv(sessionEnv),
+    };
+    display = slotDisplay({ ...workLabel, agent: agentKind, model, role: rawContract?.assignment?.role });
     const routeConfig = { ...terminalRouteConfig(projectRoot), ...(terminalConfig ?? {}) };
     tc = createRoundTerminalControl({ herdrBin, herdrEnv: sessionEnv, config: routeConfig });
     paneHost = createPaneHost({ herdrBin, endpointEnv: herdrEndpointEnv(sessionEnv), config: routeConfig });

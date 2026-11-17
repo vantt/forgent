@@ -37,10 +37,13 @@ pub struct SessionHost<'a> {
 
 fn from_pane(refusal: PaneRefusal) -> Refusal {
     match refusal {
-        PaneRefusal::Unsupported { capability, detail } => Refusal::unsupported(
-            RefusalCode::HostUnsupportedHere,
-            format!("{capability}: {detail}"),
-        ),
+        PaneRefusal::Unsupported { capability, detail } => Refusal {
+            capability: Some(capability.clone()),
+            ..Refusal::unsupported(
+                RefusalCode::HostUnsupportedHere,
+                format!("{capability}: {detail}"),
+            )
+        },
         PaneRefusal::Unknown { reason } => Refusal::unknown(RefusalCode::PlacementUnknown, reason),
     }
 }
@@ -166,12 +169,44 @@ impl SessionHost<'_> {
     }
 
     /// Allocate the slot of a terminal placement and start nothing in it. A key whose pane is already
-    /// live answers that placement and allocates nothing.
+    /// live answers that placement with the slot it already holds and allocates nothing.
     pub fn open(&self, request: &OpenRequest) -> OpenAnswer {
         match self.open_slot(request) {
-            Ok((placement, slot)) => OpenAnswer::Opened { placement, slot },
+            Ok((placement, Some(slot))) => OpenAnswer::Opened {
+                placement,
+                slot: Some(slot),
+            },
+            // Terminal Control's allocation is idempotent for a live key: asking again returns the slot
+            // the pane already has. The slot is a diagnostic, so a refusal here leaves it out.
+            Ok((placement, None)) => OpenAnswer::Opened {
+                slot: self.live_slot(request),
+                placement,
+            },
             Err(refusal) => OpenAnswer::Refused(refusal),
         }
+    }
+
+    /// The slot a live key's pane already holds.
+    fn live_slot(&self, request: &OpenRequest) -> Option<Slot> {
+        let display: Display = request
+            .display
+            .clone()
+            .and_then(|v| serde_json::from_value(v).ok())
+            .unwrap_or_default();
+        self.panes
+            .allocate(&AllocateRequest {
+                key: request.key.clone(),
+                group_key: request
+                    .group_key
+                    .clone()
+                    .unwrap_or_else(|| request.key.clone()),
+                display,
+                group_size: request.group_size,
+                cwd: Some(request.cwd.clone()),
+                env: request.env.clone(),
+            })
+            .ok()
+            .map(|a| a.slot)
     }
 
     /// The placement and the slot this call allocated (`None`: the key's pane was already live).

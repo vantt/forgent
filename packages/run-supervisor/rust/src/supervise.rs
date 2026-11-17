@@ -565,6 +565,7 @@ fn supervise(args: &SuperviseArgs) -> Result<i32, Refusal> {
         .as_str()
         .map(PathBuf::from)
         .ok_or_else(|| invalid("runDir missing"))?;
+    // `host_of` also reads `mode`: an envelope a controller wrote before placement went through the Session Host.
     let terminal = match crate::envelope::host_of(&envelope) {
         Some("direct") => false,
         Some("terminal") => true,
@@ -979,7 +980,7 @@ mod tests {
         fs::write(dir.join("secret"), "{\"attemptId\":\"a1\"}").unwrap();
         std::os::unix::fs::symlink(dir.join("secret"), dir.join("gate-exit.json")).unwrap();
         let envelope = json!({
-            "attemptId": "a1", "digest": "d", "runDir": dir, "mode": "direct",
+            "attemptId": "a1", "digest": "d", "runDir": dir, "host": "direct",
             "deadlines": {"gateKillGraceMs": 1000},
             "launch": {"capture": {"stdout": out, "stderr": err}, "outboxDir": dir.join("outbox")},
             "agentProtocol": {"cli": "claude"},

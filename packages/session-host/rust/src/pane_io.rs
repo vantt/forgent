@@ -21,8 +21,18 @@ fn io_err(refusal: impl std::fmt::Debug) -> IoError {
     IoError::Io(format!("{refusal:?}"))
 }
 
-impl AgentIo for PaneIo<'_> {
-    fn send(&mut self, input: &SendInput) -> Result<(), IoError> {
+/// Why a send through a pane typed nothing or failed.
+#[derive(Debug)]
+pub enum SendFailure {
+    /// Nothing was typed: the agent is not the pane's foreground program, so it cannot take text.
+    ForegroundNotAgent { reason: String },
+    /// The send could not be made or confirmed.
+    Io(IoError),
+}
+
+impl PaneIo<'_> {
+    /// `AgentIo::send` with the "not the foreground program" answer kept apart from a failed send.
+    pub fn send_typed(&self, input: &SendInput) -> Result<(), SendFailure> {
         match self
             .panes
             .send(
@@ -31,14 +41,25 @@ impl AgentIo for PaneIo<'_> {
                 input.keys.as_deref(),
                 input.submit,
             )
-            .map_err(io_err)?
+            .map_err(io_err)
+            .map_err(SendFailure::Io)?
         {
             SendOutcome::Sent => Ok(()),
-            // Nothing was typed: the agent is not the pane's foreground program, so it cannot take text.
             SendOutcome::ForegroundNotAgent { reason } => {
-                Err(IoError::Io(format!("nothing was typed: {reason}")))
+                Err(SendFailure::ForegroundNotAgent { reason })
             }
         }
+    }
+}
+
+impl AgentIo for PaneIo<'_> {
+    fn send(&mut self, input: &SendInput) -> Result<(), IoError> {
+        self.send_typed(input).map_err(|failure| match failure {
+            SendFailure::ForegroundNotAgent { reason } => {
+                IoError::Io(format!("nothing was typed: {reason}"))
+            }
+            SendFailure::Io(e) => e,
+        })
     }
 
     fn screen(&mut self) -> Result<String, IoError> {

@@ -32,8 +32,17 @@ struct FakePanes(RefCell<PaneLog>);
 impl Panes for FakePanes {
     fn allocate(&self, request: &AllocateRequest) -> Result<Allocation, PaneRefusal> {
         let mut log = self.0.borrow_mut();
+        // Like the core: asking again for a live key returns its slot and allocates nothing.
+        if !log.live.insert(request.key.clone()) {
+            return Ok(Allocation {
+                slot: Slot {
+                    tab_id: "t1".into(),
+                    pane_id: "p1".into(),
+                },
+                origin: Origin::Allocated,
+            });
+        }
         log.allocated.push(request.clone());
-        log.live.insert(request.key.clone());
         Ok(Allocation {
             slot: Slot {
                 tab_id: "t1".into(),
@@ -508,11 +517,14 @@ fn open_allocates_a_slot_and_launch_starts_the_command_in_it_returning_the_ident
         other => panic!("expected a launch, got {other:?}"),
     }
     assert_eq!(panes.0.borrow().launched[0].1.command, "launcher.sh");
-    // A second open of the key answers the live placement, with no new slot, and allocates nothing more.
-    assert!(matches!(
-        h.open(&open_request("att-1")),
-        OpenAnswer::Opened { slot: None, .. }
-    ));
+    // A second open of the key answers the live placement with the slot it already holds, and allocates
+    // nothing more.
+    match h.open(&open_request("att-1")) {
+        OpenAnswer::Opened {
+            slot: Some(slot), ..
+        } => assert_eq!(slot.pane_id, "p1"),
+        other => panic!("expected the live slot, got {other:?}"),
+    }
     assert_eq!(panes.0.borrow().allocated.len(), 1);
 }
 

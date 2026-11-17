@@ -15,6 +15,6 @@ pub mod route;
 pub mod types;
 
 pub use host::{SessionHost, DEFAULT_GRACE_MS, DEFAULT_READY_MS};
-pub use pane_io::PaneIo;
+pub use pane_io::{PaneIo, SendFailure};
 pub use panes::Panes;
 pub use types::*;

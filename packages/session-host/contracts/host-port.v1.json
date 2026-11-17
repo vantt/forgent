@@ -34,7 +34,8 @@
       "properties": {
         "result": { "enum": ["unsupported", "unknown"] },
         "code": { "enum": ["head-needs-interactive-host", "host-unsupported-here", "opening-delivery-unsupported", "pane-not-ready", "placement-unknown", "key-in-use"] },
-        "detail": { "type": "string" }
+        "detail": { "type": "string" },
+        "capability": { "type": "string", "description": "The Terminal Control capability the driver lacks; present on an unsupported answer that came from the driver." }
       }
     },
     "openRequest": {
@@ -103,7 +104,7 @@
     "open": {
       "request": { "$ref": "#/$defs/openRequest" },
       "answer": { "oneOf": [
-        { "type": "object", "required": ["result", "placement"], "additionalProperties": false, "properties": { "result": { "const": "placed" }, "placement": { "$ref": "#/$defs/placement" }, "slot": { "type": "object", "required": ["tabId", "paneId"], "additionalProperties": false, "description": "The slot this call allocated, for a diagnostic line; absent when the key's pane was already live.", "properties": { "tabId": { "type": "string" }, "paneId": { "type": "string" } } } } },
+        { "type": "object", "required": ["result", "placement"], "additionalProperties": false, "properties": { "result": { "const": "placed" }, "placement": { "$ref": "#/$defs/placement" }, "slot": { "type": "object", "required": ["tabId", "paneId"], "additionalProperties": false, "description": "The slot of the placement, for a diagnostic line: the one this call allocated, or the one a live key's pane already holds; absent only when that slot could not be read back.", "properties": { "tabId": { "type": "string" }, "paneId": { "type": "string" } } } } },
         { "$ref": "#/$defs/refusal" }
       ] },
       "rules": [
