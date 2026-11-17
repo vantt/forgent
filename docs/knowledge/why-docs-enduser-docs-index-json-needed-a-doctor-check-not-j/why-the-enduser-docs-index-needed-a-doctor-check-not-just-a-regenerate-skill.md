@@ -80,7 +80,7 @@ path rather than a second implementation of the same logic.
 ## Why this matters beyond one missing check
 
 This item's own broader framing ties it to a live discussion (`docs/
-history/compound-learn-artifact-registry/DISCUSSION.md`, constraint R6):
+discussions/compound-learn-artifact-registry/DISCUSSION.md`, constraint R6):
 a post-write step that depends on "someone remembers to run it" degrades
 measurably over time — this case's own 32%→36% drift over a single day is
 concrete evidence for that argument, not a hypothetical. Registering the
@@ -93,5 +93,5 @@ invariant instead.
 - Workshop plan tsk-1m0 (external source, no repository content commit) — full plan and locked decisions.
 - `src/report/enduser-index.mjs` — `buildEnduserIndex`, the pure function
   both the check and the real regenerate verb share.
-- `docs/history/compound-learn-artifact-registry/DISCUSSION.md` — the
+- `docs/discussions/compound-learn-artifact-registry/DISCUSSION.md` — the
   wider discussion this finding fed evidence into.

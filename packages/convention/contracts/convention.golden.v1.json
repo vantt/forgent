@@ -48,6 +48,12 @@
       "expected": {"kind":"plan","name":"261006-1415-convention-component","at":"2026-10-06T14:15:00.000-05:00","offset":"-05:00"}
     },
     {
+      "name": "discussion path",
+      "operation": "path",
+      "input": {"kind":"discussion","slug":"x"},
+      "expected": {"kind":"discussion","path":"docs/discussions/x/"}
+    },
+    {
       "name": "plan path",
       "operation": "path",
       "input": {"kind":"plan","slug":"convention-component","at":"2026-10-06T14:15:00+07:00"},

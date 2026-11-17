@@ -21,7 +21,7 @@ title="${3:-}"
 
 [ -n "$task_id" ] || exit 0
 
-# Capability gate (D5, docs/history/orchestrator-worker-slots/DISCUSSION.md
+# Capability gate (D5, docs/discussions/orchestrator-worker-slots/DISCUSSION.md
 # §6 "Nhãn: session tự đặt qua helper skill có gate"). Pane labeling is an
 # adapter-swappable capability, served by a tool executor that declares it in
 # `for` (here `runner.executors.herdr`):

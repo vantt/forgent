@@ -673,7 +673,7 @@ export function validateWorkShape(work, touchedFields) {
   }
 
   // domainFields (per decision record 0027, D6 — "Ngoài phạm vi supersede
-  // D1-D3"; full design in docs/history/phase-2-status-category-schema/
+  // D1-D3"; full design in docs/discussions/phase-2-status-category-schema/
   // DISCUSSION.md §task-domain-fields): OPTIONAL additive nested object
   // carrying per-domain data alongside the domain-agnostic fields above —
   // shape `{ [domainName]: {...} }`. Same optional-additive convention as

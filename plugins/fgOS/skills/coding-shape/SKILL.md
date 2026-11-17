@@ -29,7 +29,7 @@ every `DISCUSSION.md` edit, every hand-off decision belongs to
 2. **Invoke `fgos-coding-shaping` in interactive mode.** Load the skill
    with the argument from step 1, mode: live discussion (not distill —
    that is `fgOS:coding-shape-distill`'s job). It locates or creates the
-   relevant `docs/history/<feature>/DISCUSSION.md`, holds the open
+   relevant `docs/discussions/<feature>/DISCUSSION.md`, holds the open
    conversation, and owns every decision about pacing, scouting, and when
    to regenerate its own §6 synthesis.
 

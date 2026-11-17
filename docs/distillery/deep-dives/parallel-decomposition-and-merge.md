@@ -103,4 +103,4 @@ Chỗ hở 3 khớp với 1: một gói soạn động không có `capacities.<i
 
 Rủi ro kèm theo, phải xử khi port: cổng `allowCrossProvider` hiện gác theo capacity id (`dispatch.mjs:691-693` — từ chối khi một capacity `kind:"cli"` resolve ra lệnh không-phải-Claude mà chưa bật cờ). Gói soạn động mang nội dung khác nhau mỗi lần ⇒ cổng phải chuyển thành gác **per-dispatch**, không còn per-capacity.
 
-Thảo luận thiết kế đang chạy trên chính ba chỗ hở này: `docs/history/two-layer-dispatch/DISCUSSION.md` (item `tsk-2t6`), với D2 (thêm lý do song-song-hoá), D3 (capacity ad-hoc prompt động), D4 (gác lớp helper-mà-ghi-file).
+Thảo luận thiết kế đang chạy trên chính ba chỗ hở này: `docs/discussions/two-layer-dispatch/DISCUSSION.md` (item `tsk-2t6`), với D2 (thêm lý do song-song-hoá), D3 (capacity ad-hoc prompt động), D4 (gác lớp helper-mà-ghi-file).

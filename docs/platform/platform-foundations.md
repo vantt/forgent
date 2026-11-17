@@ -690,7 +690,7 @@ repo-lồng tương tự trước đây (không phải chưa thử tới) và ch
 lui vì gặp vấn đề thật trong thực tế — quyết định này không mở lại hướng
 đó.
 
-Quyết định chốt trong `docs/history/fgos-mission-boundary/DISCUSSION.md`
+Quyết định chốt trong `docs/discussions/fgos-mission-boundary/DISCUSSION.md`
 (5 vòng thảo luận, 2026-08-17) và `docs/history/
 fgos-mission-boundary/CONTEXT.md`.
 
@@ -767,7 +767,7 @@ nhân đôi chỗ ghi, vi phạm KISS.
 
 - D-ADR0030 (`docs/platform/runner/decisions/h-36d872fbb0e5.md#0030-thêm-bậc-ưu-tiên-2-release-con-người-vào-thứ-tự-ưu-tiên-sản-phẩm`) — thang ưu tiên sản phẩm mà quyết
   định này đứng cạnh, không phải bên trong.
-- `docs/history/fgos-mission-boundary/DISCUSSION.md` — toàn bộ thảo luận,
+- `docs/discussions/fgos-mission-boundary/DISCUSSION.md` — toàn bộ thảo luận,
   §6 thiết kế tổng hợp, §7 task breakdown.
 - `docs/history/fgos-mission-boundary/CONTEXT.md` — locked decisions,
   bằng chứng scout đầy đủ.

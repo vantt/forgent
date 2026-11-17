@@ -38,7 +38,7 @@ H3 Agent Context Engine, `docs/platform/proposals/documentation-system-unificati
 5. A non-coding request (e.g. marketing) is classified by `fgos-clarifying` without Work, an unclear domain gets one
    owner question (no `coding` default), and it is shaped by the core domain-free shaper.
 6. Discussions live in `docs/discussions/<slug>/` named by a Convention kind `discussion`; the 40 existing
-   `docs/history/*/DISCUSSION.md` files and every consumer moved in the same change.
+   the former `docs/history/` DISCUSSION files and every consumer moved in the same change.
 7. Miu lists every open owner question from the three stage places in one batch, each tagged with its topic and stage.
 8. `npm test` and `cargo test --workspace` green; each new behaviour has one owning proof (design principle 8).
 
@@ -304,11 +304,11 @@ D-IDs: SM-D3. Depends on discussions-location. Draft verify: `npm run build:skil
 shapes with the core shaper.
 
 ### Discussions location {#task-discussions-location}
-Goal: Convention kind `discussion` -> `docs/discussions/<slug>/`; move the 40 `docs/history/*/DISCUSSION.md` and every
+Goal: Convention kind `discussion` -> `docs/discussions/<slug>/`; move the 40 DISCUSSION files out of `docs/history/` and every
 consumer (skills, plan-contract, `src/report/context-render.mjs`, `src/report/authoritative-match.mjs`,
 `src/state/work.mjs`, `src/state/frontier.mjs`, `src/state/worker-slots.mjs`, `plugins/fgOS/skills/terminal/rename.sh`)
 in one change. D-IDs: SM-D8. Draft verify: `fgos convention path --kind discussion` answers; no
-`docs/history/*/DISCUSSION.md` left; `npm test`.
+no DISCUSSION file left under `docs/history/`; `npm test`.
 
 ### Owner question batch {#task-owner-questions}
 Goal: `QUESTIONS.md` format in a discussion folder; Miu's reader over the three stage places producing one batch

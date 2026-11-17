@@ -1,6 +1,6 @@
 // test/e2e/fixture-marketing-domain.test.mjs — tsk-38t-7, the capstone
 // proof for decision record 0027 / tsk-38t's whole Phase 2 multi-domain
-// schema (docs/history/phase-2-status-category-schema/DISCUSSION.md
+// schema (docs/discussions/phase-2-status-category-schema/DISCUSSION.md
 // §"Test domain giả lập thứ 2 chứng minh thiết kế"). Mirrors
 // test/e2e/synthetic-domain.test.mjs's own real mkdtemp-git-repo + real
 // bin/fgos.mjs child-process harness style exactly — every assertion here

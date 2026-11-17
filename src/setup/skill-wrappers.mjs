@@ -1,7 +1,7 @@
 // skill-wrappers.mjs — generates `.claude/skills/<name>/SKILL.md` thin-
 // wrapper stubs from `.agents/skills/<name>/SKILL.md` (tsk-1qi, D5/D7 of
 // docs/history/install-setup-external-project-reliability/CONTEXT.md,
-// D7 of docs/history/core-foundation-domain-boundary/DISCUSSION.md).
+// D7 of docs/discussions/core-foundation-domain-boundary/DISCUSSION.md).
 //
 // Canonical skill authoring lives under `core/skills/` (platform-level)
 // and `domains/<domain>/skills/` (domain-owned). `assembleSkills`

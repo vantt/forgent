@@ -1,5 +1,5 @@
 // agent-roster.mjs — reads the real agent-type roster (the agent-definitions door's tiers) and a task-spec's own header
-// fields, for docs/history/core-foundation-domain-boundary/DISCUSSION.md's D20/D22
+// fields, for docs/discussions/core-foundation-domain-boundary/DISCUSSION.md's D20/D22
 // eligibility-inversion resolution (resolveAgentTypeForTaskSpec, src/runner/dispatch/cli.mjs). LAYER: infra
 // (same tier as dispatch/cli.mjs, which is the runtime consumer this
 // module exists for) -- one-directional-layer forbids dispatch/cli.mjs

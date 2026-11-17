@@ -169,5 +169,5 @@ carries its own `.fgos/`).
   — cause 3, fixed
 - `docs/how-to/recover-from-a-merge-loop-merge-conflict-block-by-running-fgos-catchup.md`
   — the merge-conflict playbook (part of direction B)
-- `docs/history/merge-conductor-throughput-and-human-release/DISCUSSION.md`
+- `docs/discussions/merge-conductor-throughput-and-human-release/DISCUSSION.md`
   — the full shaping discussion this diagnosis was distilled from

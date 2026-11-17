@@ -8,7 +8,7 @@ area-scoped-reset-per-file (`RUL<n>`, resets inside each
 `docs/history/<feature>/CONTEXT.md`). That 3-tier shape is correct and
 stays as-is — upstream project `beegog` independently converged on the
 identical structure, recorded in
-`docs/history/self-contained-id-references/DISCUSSION.md`. What was
+`docs/discussions/self-contained-id-references/DISCUSSION.md`. What was
 missing was a single, canonical rule for how to CITE one of these ids
 from anywhere other than its own home file — this fragment is that rule
 (one rule, one home, learned from `beegog`'s own prompt-writing standard

@@ -582,7 +582,7 @@ không phụ thuộc từ vựng domain. Bản thân report nguồn
 round 4) ban đầu kết luận **"domain sở hữu TOÀN BỘ bảng transition"** — một
 khung rộng hơn record này thật sự chốt. Khung đó đã bị xét lại và THU HẸP
 trong phiên `fgos-coding-exploring` cho `tsk-38t`
-(`docs/history/phase-2-status-category-schema/DISCUSSION.md`, đọc toàn văn):
+(`docs/discussions/phase-2-status-category-schema/DISCUSSION.md`, đọc toàn văn):
 §1 tự ghi nhận "Đây là thu hẹp thật so với kết luận round-4 của report gốc
 ('domain sở hữu TOÀN BỘ bảng transition') — thu hẹp lại đúng phạm vi domain
 thật sự cần tự khai (đoạn đầu vòng đời)". Quyết định (chốt vòng 3, seq 5571, xác nhận
@@ -871,7 +871,7 @@ planning chi tiết per-file (vòng 22).
   mới). Chức danh (PO/PM/TechLead/SE/Tester) = **agent-type definition
   sẵn có** (`.claude/agents/*.md`), khai eligibility bằng đúng **một
   field frontmatter `claims: [phiếu]`** — positions suy ra từ phiếu.
-  *(Ghi chú: Field `claims:` trong D-12 đã bị đảo ngược bởi decision D-20 tại `docs/history/core-foundation-domain-boundary/DISCUSSION.md:461` và `assignable-to` được đổi tên thành `agent:` bởi decision D-26 tại `:467`. Mô hình hiện hành: agent-type khai báo `skills:` trên agent-type definition; task-spec khai báo `requires-skill:` hoặc chỉ định agent-type cụ thể qua `agent:`).*
+  *(Ghi chú: Field `claims:` trong D-12 đã bị đảo ngược bởi decision D-20 tại `docs/discussions/core-foundation-domain-boundary/DISCUSSION.md:461` và `assignable-to` được đổi tên thành `agent:` bởi decision D-26 tại `:467`. Mô hình hiện hành: agent-type khai báo `skills:` trên agent-type definition; task-spec khai báo `requires-skill:` hoặc chỉ định agent-type cụ thể qua `agent:`).*
   Không roster file, không humans registry, không agent-pools: pool size
   = worker-slots sẵn có; spawn-on-demand = runner/dispatch sẵn có; thẩm
   quyền human = pull-door verbs sẵn có (approve/answer do người chạy).

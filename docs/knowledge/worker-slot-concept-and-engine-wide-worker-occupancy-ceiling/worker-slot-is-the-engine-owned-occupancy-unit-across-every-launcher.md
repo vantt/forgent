@@ -459,7 +459,7 @@ by — the `tsk-1oz`/`tsk-qrs` fixes above:
 
 - `docs/reference/fgos-slots-verb-output-fields.md` — the `fgos slots`
   CLI verb's real output shape, the read-only half of this design
-- `docs/history/orchestrator-worker-slots/DISCUSSION.md` — the full
+- `docs/discussions/orchestrator-worker-slots/DISCUSSION.md` — the full
   shaping discussion this design was distilled from
 - `docs/history/orchestrator-worker-slots/RESEARCH.md` — the discovery
   research backing D9's two code-fact citations

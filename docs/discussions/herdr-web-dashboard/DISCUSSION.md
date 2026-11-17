@@ -172,7 +172,7 @@ fgos-coding-shaping D6):
 
 **Scout theo gợi ý #5 — tìm cuộc bàn trước đó (luật Scout First + tránh
 quyết định lại cái đã quyết).** `grep` toàn `docs/` ra
-`docs/history/gate-question-quality-and-routing/DISCUSSION.md` (items
+`docs/discussions/gate-question-quality-and-routing/DISCUSSION.md` (items
 `tsk-65i` + `tsk-539`, cả hai `todo/discovery`, 12+ vòng bàn, bắt đầu
 2026-08-08). Đọc toàn bộ 1614 dòng. Đây không phải một cuộc bàn tình cờ
 liên quan — nó **đã đề xuất gần như đúng kiến trúc item này** (round 4:

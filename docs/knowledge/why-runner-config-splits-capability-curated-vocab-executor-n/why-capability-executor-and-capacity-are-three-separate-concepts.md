@@ -216,7 +216,7 @@ found while reviewing `plans/reports/
 task-dispatch-system-architecture-spec-260815-1916-concepts-triggers-config-and-real-flows-report.md`
 against marketing-cockpit's real `executor-registry.yaml`
 (`docs/distillery/sources/marketing-cockpit.md`). The item's own
-`docs/history/capability-executor-registry-unification/DISCUSSION.md#design`
+`docs/discussions/capability-executor-registry-unification/DISCUSSION.md#design`
 reference has since been cleaned up from disk; the decisions above are
 copied verbatim from the `.fgos/` event-log record against `tsk-in1`
 (D1-D15). Related follow-up: `docs/explanation/

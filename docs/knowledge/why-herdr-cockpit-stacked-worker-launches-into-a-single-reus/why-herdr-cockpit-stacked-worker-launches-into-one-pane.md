@@ -70,7 +70,7 @@ states the admin lane deliberately has no engine-tracked occupancy at
 all ("the admin lane never claims a work item... nothing here to
 count"), so the `doing_item_ids()`-style check that fixed defect 1 has no
 equivalent fact to check here. The worker-slot design's own Round 6-8
-arc (`docs/history/orchestrator-worker-slots/DISCUSSION.md`) had already
+arc (`docs/discussions/orchestrator-worker-slots/DISCUSSION.md`) had already
 settled "how do we know a worker is done" for the *execution* lane via
 hard state transitions — but never covered a long-running *admin* loop's
 relaunch-after-natural-exit question at all. This is exactly why the gap

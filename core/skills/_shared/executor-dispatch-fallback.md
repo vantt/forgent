@@ -167,7 +167,7 @@ response, never retry blind.
 
 ## Ad-hoc executor: a runtime-composed task instead of `<PROMPT_TEMPLATE>`
 
-`docs/history/two-layer-dispatch/DISCUSSION.md` D3/D6/D6b/D10: an executor
+`docs/discussions/two-layer-dispatch/DISCUSSION.md` D3/D6/D6b/D10: an executor
 whose consuming skill has no single fixed question to ask — the parent
 composes a different command each time, depending on what it just decided
 to split off — cannot fill in a registered `<PROMPT_TEMPLATE>` at all.
@@ -240,7 +240,7 @@ reasoning would have been.
 
 ## Provider/tier judgment for an ad-hoc dispatch (D5/D7/D10/D12)
 
-`docs/history/two-layer-dispatch/DISCUSSION.md` D12: this is an optional,
+`docs/discussions/two-layer-dispatch/DISCUSSION.md` D12: this is an optional,
 per-dispatch REFINEMENT on top of everything above — it never adds a
 second dispatch mechanism, and it never requires splitting `work.tier`
 into a separate field (D12 picked the smaller path over a field split:

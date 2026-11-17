@@ -96,5 +96,5 @@ the whole-batch overflow rule the design doc's D7/D8 describe).
 
 - `docs/explanation/worker-slot-is-the-engine-owned-occupancy-unit-across-every-launcher.md`
   — the design decisions (D1-D10) this verb and gate implement
-- `docs/history/orchestrator-worker-slots/DISCUSSION.md#task-slot-ledger`
+- `docs/discussions/orchestrator-worker-slots/DISCUSSION.md#task-slot-ledger`
   — the shaping discussion this item's own footprint was scoped from

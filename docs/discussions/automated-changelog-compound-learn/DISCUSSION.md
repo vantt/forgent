@@ -6,7 +6,7 @@ Vòng 4. D-tsk12m-A/B/C đã mint từ vòng 3 (§4). Câu D (session tự phán
 "user-visible", không heuristic file-touched) giữ nguyên qua vòng 3→4,
 **đủ điều kiện mint nhưng chưa mint** — chờ chốt cùng lượt với lộ trình
 dưới. Điểm E (tầm nhìn đa-audience) đã tách sang
-`docs/history/compound-learn-artifact-registry/DISCUSSION.md`.
+`docs/discussions/compound-learn-artifact-registry/DISCUSSION.md`.
 
 Vòng 4 mở một trục MỚI, không có trong 3 vòng trước: **lộ trình đưa
 changelog vào đời — thủ công trước, cơ giới hoá sau** — và tìm ra một
@@ -40,10 +40,10 @@ thuộc phạm vi thảo luận này.
 | 2 | Ghi nội dung trước, tag sau, chỉ tag khi đã commit ở HEAD | RÕ | `compound` verb's D3 check (`git cat-file -e HEAD:<path>`) — bất kỳ đường ghi mới nào cũng phải theo đúng thứ tự này |
 | 3 | Model "grow vs create" (additive, không xoá/rút gọn) | RÕ, tái dùng được | Khớp tự nhiên bản chất changelog — mỗi entry cộng dồn |
 | A | Vị trí file `CHANGELOG.md` | **D-tsk12m-A** | Chốt: repo root. `fgos-coding-compounding` SKILL.md cần sửa câu chữ hard rule (exemption cho changelog) khi vào giai đoạn planning |
-| B | Điểm quyết "có đáng ghi changelog không" nằm ở đâu | **D-tsk12m-B** | Mở rộng `fgos-coding-compounding`, hình dạng registry mở-rộng-được (tiền lệ `registerCheck`/`registerFix`). Phạm vi/thiết kế registry cụ thể → tách sang `docs/history/compound-learn-artifact-registry/DISCUSSION.md` |
+| B | Điểm quyết "có đáng ghi changelog không" nằm ở đâu | **D-tsk12m-B** | Mở rộng `fgos-coding-compounding`, hình dạng registry mở-rộng-được (tiền lệ `registerCheck`/`registerFix`). Phạm vi/thiết kế registry cụ thể → tách sang `docs/discussions/compound-learn-artifact-registry/DISCUSSION.md` |
 | C | Version heading cho entry mới | **D-tsk12m-C** | Chuỗi chính xác **`## [Unreleased]`** (có ngoặc vuông, đúng chuẩn Keep a Changelog mà D-tsk12m-A đã cam kết). Cắt-release là bước thủ công riêng, ngoài phạm vi `tsk-12m`. *Làm rõ 2026-08-09: các dòng ghi tắt `## Unreleased` không ngoặc trong văn xuôi §5 là cùng một thứ viết gọn, không phải quyết định khác — pin lại ở đây vì `tsk-3ip` PARSE đúng chuỗi này, sai một ký tự là check đọc trượt.* |
 | D | "User-visible" định nghĩa bằng gì | TRẢ LỜI V3 (chưa D-ID, chờ vòng 4) | Chốt D2: session tự phán đoán có bằng chứng ngay lúc retrospective, cùng kỷ luật chọn quadrant (không mặc định, không coin-flip) — hệ quả tự nhiên của D-tsk12m-B |
-| E | Tầm nhìn compound-learn đa-audience | TÁCH RA | Chuyển sang discussion riêng `docs/history/compound-learn-artifact-registry/DISCUSSION.md` (yêu cầu chủ sản phẩm, 2026-08-07 vòng 3) — không còn theo dõi ở đây |
+| E | Tầm nhìn compound-learn đa-audience | TÁCH RA | Chuyển sang discussion riêng `docs/discussions/compound-learn-artifact-registry/DISCUSSION.md` (yêu cầu chủ sản phẩm, 2026-08-07 vòng 3) — không còn theo dõi ở đây |
 | F | **Ranh giới: cơ chế nào làm được TRƯỚC khi chốt phương án tổng thể** | RÕ (vòng 4) | Không phải chia theo "chặng", mà theo **cơ chế đó LÀM GÌ**. Loại **quan sát/nhắc** (nag, doctor check, bộ đếm) không quyết gì, không viết gì, không chặn ai → độc lập hoàn toàn với câu hỏi phương án của `tsk-28x`. Loại **quyết/viết/chặn** (phán đoán changelog-worthy, sinh nội dung entry, chặn merge khi thiếu entry) → kẹt sau nó. Xem §6 |
 | G | Chặng 1 (ghi tay) tự nó KHÔNG sinh số đo | RÕ (vòng 4, tự sửa lỗi) | Vòng 4 ban đầu tuyên bố "chặng 1 là chặng ĐO". Sai: ghi tay không ghi lại gì đo được — ba con số cần (tần suất user-visible, tỉ lệ suy-ra-cơ-học-được, **tỉ lệ quên**) sẽ chỉ là cảm giác. Chính lỗi "không ai nhớ" lặp ở tầng trên. Cần chặng 2 (bộ đếm) mới đo thật được |
 | H | Số đo của changelog KHÔNG mở khoá nửa storytelling | RÕ (vòng 4) | Câu hỏi phương án (`tsk-28x` §6.4) phủ CẢ changelog lẫn marketing-storytelling. Chặng 1+2 chỉ sinh bằng chứng cho nửa changelog. Nửa storytelling cần phép thử RIÊNG (Cách 1 — mặt đọc trên vỉa ask/tranh cãi). Hai phép thử ĐỘC LẬP, chạy song song được — không phải một chuỗi tuần tự. Nhất quán với lỗi 3 của `tsk-28x` vòng 4 (gộp nhầm artifact cơ học với artifact phán đoán) |

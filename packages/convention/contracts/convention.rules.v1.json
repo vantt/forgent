@@ -121,7 +121,8 @@
     {"id":"doc-guide-runbook-2","kind":"guide-runbook","shape":"placement-glob","glob":"docs/platform/<area>/playbooks/**/<file>","cardinality":"collection","roots":["docs/"],"scope":["docs/platform/<area>/playbooks/**"],"posture":"block","canonical":true},
     {"id":"doc-proposal-1","kind":"proposal","shape":"placement-glob","glob":"docs/platform/proposals/**/<file>","cardinality":"collection","roots":["docs/"],"scope":["docs/platform/proposals/**"],"posture":"block"},
     {"id":"doc-proposal-2","kind":"proposal","shape":"placement-glob","glob":"docs/platform/<area>/proposals/**/<file>","cardinality":"collection","roots":["docs/"],"scope":["docs/platform/<area>/proposals/**"],"posture":"block"},
-    {"id":"doc-discussion-scratchpad-1","kind":"discussion-scratchpad","shape":"placement-glob","glob":"docs/history/<feature>/DISCUSSION.md","cardinality":"singleton","roots":["docs/"],"scope":["docs/history/<feature>/DISCUSSION.md"],"posture":"block"},
+    {"id":"doc-discussion-scratchpad-1","kind":"discussion-scratchpad","shape":"placement-glob","glob":"docs/discussions/<slug>/DISCUSSION.md","cardinality":"singleton","roots":["docs/"],"scope":["docs/discussions/<slug>/DISCUSSION.md"],"posture":"block"},
+    {"id":"doc-discussion-scratchpad-2","kind":"discussion-scratchpad","shape":"placement-glob","glob":"docs/discussions/<slug>/**/<file>","cardinality":"collection","roots":["docs/"],"scope":["docs/discussions/<slug>/**"],"posture":"block"},
     {"id":"doc-generated-doc-1","kind":"generated-doc","shape":"placement-glob","glob":"docs/generated/**/<file>","cardinality":"collection","roots":["docs/"],"scope":["docs/generated/**"],"posture":"block","generated":true},
     {"id":"doc-history-1","kind":"history","shape":"placement-glob","glob":"docs/platform/history/**/<file>","cardinality":"collection","roots":["docs/"],"scope":["docs/platform/history/**"],"posture":"block"},
     {"id":"doc-history-2","kind":"history","shape":"placement-glob","glob":"docs/platform/<area>/history/**/<file>","cardinality":"collection","roots":["docs/"],"scope":["docs/platform/<area>/history/**"],"posture":"block"},
@@ -175,7 +176,22 @@
     {"id":"index-decisions-child","kind":"collection-index","shape":"placement-glob","glob":"docs/platform/<area>/subcomponents/<subcomponent>/decisions/README.md","cardinality":"singleton","roots":["docs/"],"scope":[],"posture":"block","canonical":true},
     {"id":"index-verification-child","kind":"collection-index","shape":"placement-glob","glob":"docs/platform/<area>/subcomponents/<subcomponent>/verification/README.md","cardinality":"singleton","roots":["docs/"],"scope":[],"posture":"block","canonical":true},
     {"id":"index-history-child","kind":"collection-index","shape":"placement-glob","glob":"docs/platform/<area>/subcomponents/<subcomponent>/history/README.md","cardinality":"singleton","roots":["docs/"],"scope":[],"posture":"block","canonical":true},
-    {"id":"decision-index","kind":"generated-decision-index","shape":"placement-glob","glob":"docs/decisions/index.md","cardinality":"singleton","roots":["docs/"],"scope":["docs/decisions/index.md"],"posture":"block","generated":true,"metadataExempt":true}
+    {"id":"decision-index","kind":"generated-decision-index","shape":"placement-glob","glob":"docs/decisions/index.md","cardinality":"singleton","roots":["docs/"],"scope":["docs/decisions/index.md"],"posture":"block","generated":true,"metadataExempt":true},
+    {
+      "id": "discussion",
+      "kind": "discussion",
+      "shape": "name-template",
+      "template": "{slug}/",
+      "roots": ["docs/discussions/"],
+      "scope": [],
+      "posture": "warn",
+      "cutoff": "3faf81996",
+      "compatibility": [],
+      "canonical": false,
+      "metadataExempt": true,
+      "generated": false,
+      "requiredMetadataFields": []
+    }
   ],
   "identifiers": [
     {

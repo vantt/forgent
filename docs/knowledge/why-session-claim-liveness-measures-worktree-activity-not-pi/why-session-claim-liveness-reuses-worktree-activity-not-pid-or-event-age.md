@@ -108,7 +108,7 @@ report did.
 
 - `docs/history/session-claim-liveness/CONTEXT.md` — full decision
   record (D1–D5) and scout evidence.
-- `docs/history/session-claim-liveness/DISCUSSION.md` — the full
+- `docs/discussions/session-claim-liveness/DISCUSSION.md` — the full
   conversational design record behind the locked decisions.
 - `docs/history/pick-reattach-live-worktree/CONTEXT.md` — the reattach
   mechanism this feature reuses rather than rebuilding.

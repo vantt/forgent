@@ -122,7 +122,7 @@ was gathered to inform:
 - **Whether `discovery`-stage items should carry the full
   worktree/commit/full-suite-verify/merge ritual `executing` items
   currently carry** — the open D7 question named in
-  `docs/history/fanout-and-delegation-rubric/DISCUSSION.md`.
+  `docs/discussions/fanout-and-delegation-rubric/DISCUSSION.md`.
 - **Whether the `.fgos-runner.json` parallel-dispatch configuration**
   (`parallel.maxRoots: 4` × `maxLeavesPerRoot: 4` — up to 16 full test
   suites running concurrently) **is actually reasonable**, given the

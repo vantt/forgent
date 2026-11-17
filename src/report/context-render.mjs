@@ -1,7 +1,7 @@
 // context-render.mjs — renders CONTEXT.md's "## Locked decisions" table
 // from `state.decisions` instead of a skill hand-typing it (tsk-1lv-3,
 // CONTEXT.md D3). Mirrors bee-context-locking's own stance, quoted in
-// docs/history/canonical-decision-projection/DISCUSSION.md round 6: "it
+// docs/discussions/canonical-decision-projection/DISCUSSION.md round 6: "it
 // renders; it does not decide … every locked-decision row comes from the
 // caller's resolved input verbatim, never originated." `fgos decision --id
 // <item-id>` (tsk-63c) is already the real write door for a locked D-ID;

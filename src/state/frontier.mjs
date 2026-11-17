@@ -205,7 +205,7 @@ export function indexChildrenByParent(work) {
 // delivered, supersede, base workflow model D1-D3)
 // this is now a HYBRID read, not a flat literal Set, because the 10
 // statuses split into two groups with different rules (0027's own audit,
-// §"Hệ quả 1 chi tiết", `docs/history/phase-2-status-category-schema/
+// §"Hệ quả 1 chi tiết", `docs/discussions/phase-2-status-category-schema/
 // DISCUSSION.md` §6):
 //   - the FOUR tail-segment statuses (`delivered`/`retrospective`/
 //     `cleanup`/`done`) never get relabeled by any domain (D1) — literal

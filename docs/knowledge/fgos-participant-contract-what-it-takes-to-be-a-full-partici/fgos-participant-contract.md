@@ -259,6 +259,6 @@ directly.
   the locked architecture this page makes usable.
 - [Decision 0011](../decisions/0011-version-tuong-minh-cho-moi-contract.md) —
   the version-token convention.
-- `docs/history/gate-question-quality-and-routing/DISCUSSION.md`,
+- `docs/discussions/gate-question-quality-and-routing/DISCUSSION.md`,
   "Làm rõ ở vòng 9" — the design discussion that produced this page, and
   first wrote down the read/write table reproduced above.

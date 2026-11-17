@@ -277,7 +277,11 @@ fn documentation_placement_admits_constitution_shapes_and_refuses_unplaced_paths
         ("docs/platform/sample/reports/proof.md", "history"),
         ("docs/platform/history/old.md", "history"),
         (
-            "docs/history/feature/DISCUSSION.md",
+            "docs/discussions/feature/DISCUSSION.md",
+            "discussion-scratchpad",
+        ),
+        (
+            "docs/discussions/feature/QUESTIONS.md",
             "discussion-scratchpad",
         ),
         ("docs/history/feature/old.md", "history"),

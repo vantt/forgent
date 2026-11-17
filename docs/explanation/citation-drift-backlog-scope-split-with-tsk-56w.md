@@ -12,7 +12,7 @@ calibration slice, across 73 files.
 ## Why the scope was narrowed mid-flight
 
 While planning, a live coordination surfaced with `tsk-56w`
-(`docs/history/skill-prose-cleanup/DISCUSSION.md` D1), which had locked a
+(`docs/discussions/skill-prose-cleanup/DISCUSSION.md` D1), which had locked a
 **stricter** rule for `.agents/skills/**/SKILL.md` and `plugins/fgOS/
 skills/**/SKILL.md`: remove every governance id (`ADR<n>`/`RUL<n>`/D-local)
 outright — never gloss, never footnote. The reason those 61 skill files

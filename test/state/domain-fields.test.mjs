@@ -3,7 +3,7 @@ import { initializeWorkRepository } from '../helpers/work-store-release.mjs';
 // test/state/domain-fields.test.mjs — decision record 0027, D6 (docs/
 // decisions/0027-domain-so-huu-status-doan-truoc-delivered-supersede-base-
 // workflow-model-d1-d3.md's "Ngoài phạm vi supersede D1-D3" paragraph; full
-// design in docs/history/phase-2-status-category-schema/DISCUSSION.md
+// design in docs/discussions/phase-2-status-category-schema/DISCUSSION.md
 // §task-domain-fields): the optional `domainFields` field on a work item —
 // `{ [domainName]: {...} }`, optional-additive (RUL11), written only through
 // `work.add`/`work.edit`, whole-object overwrite on edit (never a deep

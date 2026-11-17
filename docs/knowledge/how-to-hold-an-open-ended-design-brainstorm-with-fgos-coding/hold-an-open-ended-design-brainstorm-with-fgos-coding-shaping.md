@@ -28,7 +28,7 @@ replacement for either.
 
 One coherent living document per feature — never one file per task, to
 avoid fragmenting the read-through — at
-`docs/history/<feature>/DISCUSSION.md`, with fixed sections in order:
+`docs/discussions/<feature>/DISCUSSION.md`, with fixed sections in order:
 
 1. **Trạng thái hiện tại** — status recap, updated every round, so a
    multi-day-resumable discussion can pick back up cleanly.

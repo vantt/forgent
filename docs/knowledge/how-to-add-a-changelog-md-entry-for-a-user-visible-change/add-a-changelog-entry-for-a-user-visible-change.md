@@ -107,6 +107,6 @@ undecided, tracked separately from this observe/remind step.
 
 - `AGENTS.md` — "Install/setup/doctor gate" section, where the
   changelog question lives.
-- `docs/history/automated-changelog-compound-learn/DISCUSSION.md` — the
+- `docs/discussions/automated-changelog-compound-learn/DISCUSSION.md` — the
   fuller decision record (D-tsk12m-A/B/C) behind this bootstrap and the
   staged roadmap it's step one of.

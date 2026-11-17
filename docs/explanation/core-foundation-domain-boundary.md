@@ -120,7 +120,7 @@ driving loop's lifetime stay uncapped.
 
 ## Where to look for detail
 
-`docs/history/core-foundation-domain-boundary/DISCUSSION.md` §4 (decision
+`docs/discussions/core-foundation-domain-boundary/DISCUSSION.md` §4 (decision
 table) and §5 (Q&A log) carry the full round-by-round rationale and scout
 evidence behind every D-ID above — this doc summarizes at implementation
 altitude, not a substitute for that record.

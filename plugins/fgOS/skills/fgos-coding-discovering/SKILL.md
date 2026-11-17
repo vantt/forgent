@@ -124,7 +124,7 @@ lệch khỏi hợp đồng đã khoá (tsk-2t9c D16 — task-spec này đã t�
    chưa biết có tồn tại trong repo không, một quyết định phạm vi chưa
    chốt. Không liệt kê một câu hỏi mà chính repo đã trả lời sẵn (tránh
    đúng lỗi đã từng xảy ra ở vòng chạy hỏng ghi trong
-   `docs/history/discover-stage-graph-and-skill-layering/DISCUSSION.md`
+   `docs/discussions/discover-stage-graph-and-skill-layering/DISCUSSION.md`
    §5 vòng 1-3 — hỏi người một câu scout đã trả lời sẵn).
 
 3. **Gọi helper `fgos-researching`.** Với mỗi điểm mơ hồ ở bước 2, gọi

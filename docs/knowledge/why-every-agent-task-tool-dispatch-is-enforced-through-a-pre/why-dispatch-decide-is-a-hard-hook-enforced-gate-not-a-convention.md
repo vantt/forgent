@@ -381,7 +381,7 @@ working as intended, not a gap:
    none of which are gated through `decide` either.
 4. The shared dispatch-reasoning fragment every skill consults names
    exactly four valid reasons to dispatch instead of working inline
-   (`docs/history/two-layer-dispatch/DISCUSSION.md` D2) — a single
+   (`docs/discussions/two-layer-dispatch/DISCUSSION.md` D2) — a single
    `WebSearch` call inside a skill's own reasoning is "doing it inline,"
    not a separate step being handed to anyone.
 5. The closest real precedent — organized multi-branch research fan-out in

@@ -645,7 +645,7 @@ This proves the writer is registry-first. Migration tooling proves folding. They
 
 ## 17. Pointers
 
-- Source discussion: `docs/history/compound-learn-artifact-registry/DISCUSSION.md`.
+- Source discussion: `docs/discussions/compound-learn-artifact-registry/DISCUSSION.md`.
 - Advisor prompt/report: `plans/reports/for-external-advisor-260825-1209-doc-identity-axis-topic-registry-design-report.md`.
 - Current write-side spec: `docs/platform/work-state/contracts/knowledge-registry.md#spec-soạn-nuôi-tài-liệu-người-dùng-cuối-enduser-docs-authoring`.
 - Current read-side spec: `docs/platform/work-state/contracts/knowledge-registry.md#spec-chỉ-mục-đọc-theo-tag-tài-liệu-người-dùng-cuối-enduser-docs-index`.

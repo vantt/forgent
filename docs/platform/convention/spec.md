@@ -84,6 +84,7 @@ A name template recognizes and generates one repository artifact name. The initi
 |---|---|---|---|
 | `report` | `{type}-{YYMMDD-HHMM}-{slug}.md` | `plans/reports/` | Canonical form with optional `-report` suffix before `.md`; an external `GH-<n>` type prefix is accepted by `check` |
 | `plan` | `{YYMMDD-HHMM}-{slug}` | direct child directory of `plans/`, containing `plan.md` and `phase-NN-<name>.md` | Directory names emitted by `ak plan create` that satisfy the timestamp and slug rules |
+| `discussion` | `{slug}/` | `docs/discussions/` (a directory per discussion: `DISCUSSION.md`, optional `QUESTIONS.md`) | none. The placement side of the same artifact keeps the kind name `discussion-scratchpad` (`docs/discussions/<slug>/DISCUSSION.md` singleton, `docs/discussions/<slug>/**` collection), because one kind has exactly one shape |
 | `journal` | `journal-{YYMMDD-HHMM}-{slug}.md` | `plans/journals/` | Existing external-tool form `{YYYY-MM-DD}-{slug}.md`; `docs/journals/` is reported as informational `wrong-location`, not migrated by this plan |
 
 Canonical generation never emits a compatibility form.

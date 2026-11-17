@@ -332,7 +332,7 @@ grouped board with in-place quick actions and filtering, not a flat table.
 - `docs/history/herdr-web-dashboard/CONTEXT.md` — the fourteen locked
   decisions this spec cites throughout, plus the scout evidence
   behind them.
-- `docs/history/herdr-web-dashboard/DISCUSSION.md` — the five discussion
+- `docs/discussions/herdr-web-dashboard/DISCUSSION.md` — the five discussion
   rounds those decisions came out of.
 - `docs/history/herdr-web-dashboard/plan.md` — the build shape: five pieces
   (config/doctor, server core and sign-in, taskboard, task detail, alternative

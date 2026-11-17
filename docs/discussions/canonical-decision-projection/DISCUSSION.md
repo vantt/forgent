@@ -745,7 +745,7 @@ fgos-coding-exploring.
 
 ### Round 9 — 2026-08-17T10:38Z — đối chiếu tsk-37i (work song song)
 
-**Đọc trực tiếp** `docs/history/self-contained-id-references/DISCUSSION.md`
+**Đọc trực tiếp** `docs/discussions/self-contained-id-references/DISCUSSION.md`
 trên branch `fgw/tsk-37i` (không checkout, `git show`) — 336 dòng, 8 round,
 D1 đã lock (seq 18919): *"Cấu trúc 3 tầng trích dẫn hiện có của fgOS
 (global-vĩnh viễn / scope-theo-file / cục bộ-1-feature) đã xác nhận đúng,
@@ -1060,7 +1060,7 @@ giải quyết. một lần chúng ta đã thử nổ lực rồi nhưng hình n
   để 2 tài liệu trong cùng 1 quadrant (vd 2 bài `how-to`) mang audience
   khác nhau — schema không có chỗ cho việc đó.
 - **"Một lần đã thử" = tsk-28x**, đọc trực tiếp
-  `docs/history/compound-learn-artifact-registry/DISCUSSION.md`: điểm D
+  `docs/discussions/compound-learn-artifact-registry/DISCUSSION.md`: điểm D
   ("Ai giữ 'một chủ đề một chủ sở hữu' khi số tài liệu tăng") — **CHƯA RÕ,
   chưa bàn vòng 3**; điểm E ("Ranh giới scope tsk-28x vs tsk-12m") —
   **CHƯA RÕ, đã đổi bản chất so với vòng 1-2**. tsk-28x's dòng 45-46 tự nêu

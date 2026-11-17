@@ -70,9 +70,9 @@
   ],
   "plugins/fgOS/skills/_shared/executor-dispatch-fallback.md": [
     "d-local-outside-home:D2:`docs/history/agent-executor-generalized-capacity-helper/CONTEXT.md` D2).",
-    "d-local-outside-home:D3:`docs/history/two-layer-dispatch/DISCUSSION.md` D3/D6/D6b/D10: an executor",
-    "d-local-outside-home:D6:`docs/history/two-layer-dispatch/DISCUSSION.md` D3/D6/D6b/D10: an executor",
-    "d-local-outside-home:D10:`docs/history/two-layer-dispatch/DISCUSSION.md` D3/D6/D6b/D10: an executor",
+    "d-local-outside-home:D3:`docs/discussions/two-layer-dispatch/DISCUSSION.md` D3/D6/D6b/D10: an executor",
+    "d-local-outside-home:D6:`docs/discussions/two-layer-dispatch/DISCUSSION.md` D3/D6/D6b/D10: an executor",
+    "d-local-outside-home:D10:`docs/discussions/two-layer-dispatch/DISCUSSION.md` D3/D6/D6b/D10: an executor",
     "d-local-outside-home:D8:| `id` | `<scope>#p<n>` (D8: the `p` stays literal — renaming the concept never changes this shape) | Reference id (see below) so a parent can match a returned digest back to the task that asked for it when several are in flight at once — never a lifecycle id: no claim, no reserve, no cap, no merge (D4 stays exactly as gated as it always was). The `#` makes this id permanently invalid against `work.mjs`'s `ID_PATTERN` (`src/state/work.mjs:24`) — structurally, not by convention, so a task id can never be mistaken for a real work item. |",
     "d-local-outside-home:D4:| `id` | `<scope>#p<n>` (D8: the `p` stays literal — renaming the concept never changes this shape) | Reference id (see below) so a parent can match a returned digest back to the task that asked for it when several are in flight at once — never a lifecycle id: no claim, no reserve, no cap, no merge (D4 stays exactly as gated as it always was). The `#` makes this id permanently invalid against `work.mjs`'s `ID_PATTERN` (`src/state/work.mjs:24`) — structurally, not by convention, so a task id can never be mistaken for a real work item. |",
     "d-local-outside-home:D10:Plus two fields that may be left blank (D10): `provider` and `tier`. No",
@@ -82,7 +82,7 @@
     "d-local-outside-home:D7:## Provider/tier judgment for an ad-hoc dispatch (D5/D7/D10/D12)",
     "d-local-outside-home:D10:## Provider/tier judgment for an ad-hoc dispatch (D5/D7/D10/D12)",
     "d-local-outside-home:D12:## Provider/tier judgment for an ad-hoc dispatch (D5/D7/D10/D12)",
-    "d-local-outside-home:D12:`docs/history/two-layer-dispatch/DISCUSSION.md` D12: this is an optional,",
+    "d-local-outside-home:D12:`docs/discussions/two-layer-dispatch/DISCUSSION.md` D12: this is an optional,",
     "d-local-outside-home:D12:into a separate field (D12 picked the smaller path over a field split:"
   ],
   "plugins/fgOS/skills/answer/SKILL.md": [
@@ -273,7 +273,6 @@
   ],
   "plugins/fgOS/skills/terminal/SKILL.md": [
     "d-local-outside-home:D5:herdr (D5,",
-    "d-local-outside-home:D1:entry (tsk-in1-1 D1: config-declared, not a CLI verb):",
     "d-local-outside-home:D2:**Labels are write-only, for humans** (D2). Nothing in fgOS may ever read a"
   ],
   "plugins/fgOS/skills/triage/SKILL.md": [

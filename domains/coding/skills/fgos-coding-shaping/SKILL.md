@@ -4,7 +4,7 @@ user-invocable: false
 description: >-
   Hold an open-ended, multi-day-resumable design brainstorm for one or more
   related coding-domain work items, upstream of fgos-coding-exploring/fgos-coding-planning,
-  keeping one coherent docs/history/<feature>/DISCUSSION.md per feature
+  keeping one coherent docs/discussions/<feature>/DISCUSSION.md per feature
   instead of locking decisions Socratically round by round. Use when a
   request needs real back-and-forth exploration -- revisiting, comparing
   options, changing one's mind -- before anything should be locked, or when
@@ -18,7 +18,7 @@ description: >-
 
 Holds a genuinely conversational design discussion — never a Socratic lock
 like the skills `fgos-coding-exploring`/`fgos-coding-planning` and the `/fgOS:discover` command use — and keeps one
-living `docs/history/<feature>/DISCUSSION.md` per feature. Once the
+living `docs/discussions/<feature>/DISCUSSION.md` per feature. Once the
 discussion converges, this skill's only exit is a native-first handoff into
 `fgos-coding-exploring` then `fgos-coding-planning`, the same terminal-state discipline
 Superpowers' own `brainstorming` skill states directly: *"The ONLY skill you
@@ -100,7 +100,7 @@ see the "Distill mode" section below for how the second one differs.
 
 ## `DISCUSSION.md` shape
 
-`docs/history/<feature>/DISCUSSION.md`, seven fixed sections, in order. Short
+`docs/discussions/<feature>/DISCUSSION.md`, seven fixed sections, in order. Short
 form for a small item: only §1, §4 and the hand-off block are required; §2,
 §3, §5, §6, §7 are optional.
 
@@ -186,9 +186,11 @@ form for a small item: only §1, §4 and the hand-off block are required; §2,
    `docsRef`/`refs` pointing at an existing `DISCUSSION.md`, open it and
    read §1 first — that recap is the fastest way back into where a prior
    round left off. Otherwise create the file with all seven section
-   headers present (even if some start empty), under
-   `docs/history/<feature>/DISCUSSION.md` where `<feature>` is a
-   descriptive kebab-case name for the thing being discussed.
+   headers present (even if some start empty), as `DISCUSSION.md` inside
+   the directory that `fgos convention path --kind discussion --slug <feature>`
+   answers (`docs/discussions/<feature>/`), where `<feature>` is a
+   descriptive kebab-case name for the thing being discussed. Never
+   hand-build that path.
 
 2. **Scout, then discuss.** Before asking anything genuinely new, scout the
    relevant product source, existing docs, and any related items the same
@@ -262,7 +264,7 @@ item:
    `DISCUSSION.md` — never the whole file:
 
    ```bash
-   fgos edit "<item-id>" --refs "docs/history/<feature>/DISCUSSION.md#task-<slug>"
+   fgos edit "<item-id>" --refs "docs/discussions/<feature>/DISCUSSION.md#task-<slug>"
    ```
 
 2. In this same session, invoke `fgos-coding-exploring` for that item, then

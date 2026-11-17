@@ -20,12 +20,12 @@ Related:
 - docs/platform/component-boundary.md
 - docs/platform/platform-foundations.md
 - docs/platform/observe/spec.md
-- docs/history/compound-learn-artifact-registry/DISCUSSION.md
+- docs/discussions/compound-learn-artifact-registry/DISCUSSION.md
 - plans/reports/for-external-advisor-260825-1209-doc-identity-axis-topic-registry-design-report.md
 - plans/reports/council-261106-2216-docos-h2-document-identity-architecture-panel-outcome.md
 ```
 
-Read with: [documentation area spec](../../spec.md), [knowledge-registry contract](../../../work-state/contracts/knowledge-registry.md), [Convention spec](../../../convention/spec.md), [component boundary](../../../component-boundary.md), [platform foundations L3](../../../platform-foundations.md#l3-luật-store-truth-ở-jsonl-db-là-view), [observe spec](../../../observe/spec.md), [2026-08 identity discussion](../../../../history/compound-learn-artifact-registry/DISCUSSION.md), [2026-08 advisor brief](../../../../../plans/reports/for-external-advisor-260825-1209-doc-identity-axis-topic-registry-design-report.md), [2026-11-06 panel outcome](../../../../../plans/reports/council-261106-2216-docos-h2-document-identity-architecture-panel-outcome.md).
+Read with: [documentation area spec](../../spec.md), [knowledge-registry contract](../../../work-state/contracts/knowledge-registry.md), [Convention spec](../../../convention/spec.md), [component boundary](../../../component-boundary.md), [platform foundations L3](../../../platform-foundations.md#l3-luật-store-truth-ở-jsonl-db-là-view), [observe spec](../../../observe/spec.md), [2026-08 identity discussion](../../../../discussions/compound-learn-artifact-registry/DISCUSSION.md), [2026-08 advisor brief](../../../../../plans/reports/for-external-advisor-260825-1209-doc-identity-axis-topic-registry-design-report.md), [2026-11-06 panel outcome](../../../../../plans/reports/council-261106-2216-docos-h2-document-identity-architecture-panel-outcome.md).
 
 ## 1. Current Summary
 
@@ -366,7 +366,7 @@ A value is added only together with its area spec and its row in the [component 
 | `lookup` | `vocabulary`, `generated-doc` | `lookup-table` |
 | `proof` | `verification`, `evidence-payload` | `evidence` |
 | `navigation` | `platform-portal`, `area-portal`, `subcomponent-portal`, `collection-index`, `portal`, `reading-map` | — |
-| `past-state` | `history`, `proposal`, `discussion-scratchpad` | — |
+| `past-state` | `history`, `proposal`, `discussion-scratchpad` (placement of `docs/discussions/<slug>/**`; its name-template twin is kind `discussion`) | — |
 
 The six user-document roles the owner admitted on 2026-11-06 map one to one onto six values, so no role is lost and none is added.
 
@@ -660,7 +660,7 @@ The non-coding profiles (6.2 to 6.4) bind only after the same measurement on a r
 - [Governance](../../../governance.md)
 - [Observe spec](../../../observe/spec.md)
 - [Event store spec](../../../event-store/spec.md)
-- [2026-08 identity discussion](../../../../history/compound-learn-artifact-registry/DISCUSSION.md)
+- [2026-08 identity discussion](../../../../discussions/compound-learn-artifact-registry/DISCUSSION.md)
 - [2026-08 advisor brief](../../../../../plans/reports/for-external-advisor-260825-1209-doc-identity-axis-topic-registry-design-report.md)
 - [2026-11-06 panel outcome](../../../../../plans/reports/council-261106-2216-docos-h2-document-identity-architecture-panel-outcome.md)
 
