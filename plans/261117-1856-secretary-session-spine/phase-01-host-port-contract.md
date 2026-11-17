@@ -4,7 +4,7 @@ Facts phase. Writes the contract and the evidence the build phases rely on; chan
 
 ## Inputs (read first)
 - `plan.md` sections "Design settled by this plan" (the contract draft, the home decision) and "Risks".
-- `docs/discussions/secretary-miu/DISCUSSION.md` SM-D6, SM-D10, SM-D13 and section 6 (binding; do not reopen).
+- `docs/history/secretary-miu/DISCUSSION.md` SM-D6, SM-D10, SM-D13 and section 6 (binding; do not reopen).
 - `docs/platform/component-boundary.md` §4 (rows Run Supervisor, Terminal Control, Identity); `docs/platform/terminal-control/spec.md`
   (stands alone, usable without a run; Windows declares no pane capability); `docs/platform/run-supervisor/spec.md` §5.3, §16.
 - Code: `src/run-supervisor/direct-launch.mjs:110-260`, `src/runner/dispatch/herdr-round.mjs:400-520`,
@@ -23,9 +23,16 @@ Facts phase. Writes the contract and the evidence the build phases rely on; chan
 1. Blast radius by `rg` (record every hit with file:line in the facts report): `writeAttemptIntent`, `buildEnvelope`,
    `terminalSocketPath`, `envelope\["mode"\]|"mode"`, `allocateAsync|releaseAsync|\.allocate\(|\.release\(` on a terminal
    client, `createRoundTerminalControl`, `terminal_slot`, `StartMode::`, readers of `intent.json`/`envelope.json` in
-   `src/verbs/dispatch`, `src/runner/dispatch/recover*`, `adopt.rs`, Windows custody. Name each test file that drives them.
+   `src/verbs/dispatch`, `src/runner/dispatch/recover*`, `adopt.rs` (l.462 reads, l.511 writes `mode`), Windows custody,
+   `src/runner/dispatch/worker-session-boot.mjs:128` (a non-placement Terminal Control caller that stays). Name each test
+   file that drives them. <!-- Updated: Validation Session 1 - wider grep -->
+   Also record where a binding becomes a pane command, env, account home and trust (`prepareTerminalAttempt`,
+   `herdr-round.mjs:354`): phase 11 exports that step for phase 12.
+   Also record the delivery door the port reuses: `fgos-agent-protocol` `adapter_for`/`await_ready`/`deliver_brief` over
+   `AgentIo` (`packages/agent-protocol/rust/src/terminal/mod.rs:435,554`), driven by `supervise/terminal.rs` `drive`.
 2. Fix the cut lines for phase 9 and 11: exactly which Rust functions move into `fgos-session-host` (terminal start =
-   allocate + launch + ready-wait + typed opening text; retire = release; alive = inspect/carrier ping; direct start =
+   allocate + launch, plus ready-wait + opening text through agent-protocol only when an opening is given (a worker's
+   brief stays in the supervisor's watched `drive`); retire = release; alive = inspect/carrier ping; direct start =
    start a prepared command without a screen) and which stay in the run supervisor (lock, containment, deadline, idle,
    settle). Containment never moves. If the facts show a cut that cannot hold, stop and report `NEEDS_CONTEXT`.
 3. Write `docs/platform/session-host/spec.md` in the area-spec shape (purpose, owns / does not own, port contract with

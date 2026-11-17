@@ -9,7 +9,8 @@
 - `test/runner/agent-definitions.test.mjs` (owning tests of the door).
 
 ## Files this phase may write
-`src/runner/agent-definitions.mjs`, `src/runner/dispatch/assignment.mjs`, `test/runner/agent-definitions.test.mjs`.
+`src/runner/agent-definitions.mjs`, `src/runner/dispatch/assignment.mjs`, `test/runner/agent-definitions.test.mjs`,
+`test/runner/assignment.test.mjs` (today's owner of the persona-section cases, l.156-190 and l.502).
 
 ## Steps
 1. Find whether the worker brief already renders a skills section (`rg -n "skills" src/runner/dispatch/assignment.mjs src/runner/execution`).
@@ -20,10 +21,16 @@
 3. Add `pinPersona(name, { projectRoot, workflow })` returning the same `{name, digest, text, identity}` shape
    `unitPersonaPin` returns, by reusing `resolveAgentDefinition`; leave `unitPersonaPin` calling it if that removes a
    duplicate, otherwise leave it as is.
+<!-- Updated: Validation Session 1 - no brief skills section exists; the skills line goes in the one shared section -->
+   Validation found none: `rg -n "kills" src/runner/dispatch/assignment.mjs` hits only workflow-op `skills` (l.294, 425,
+   962), never a rendered section; personas already declare `skills:` (`core/agents/planner.yaml:20` and six others).
 4. Skills: if step 1 found a brief skills section, export it from the same door and render a persona's `skills:` through
    it; if not, add `skills` to the projected persona and render it as one line `Skills to load: a, b` (the smallest
-   extension; justified because without it the secretary protocol skill never reaches the session).
-5. One owning test in `test/runner/agent-definitions.test.mjs`: "a head session and a worker brief render the same
+   extension; justified because without it the secretary protocol skill never reaches the session). The line is part
+   of the one shared section, so worker briefs with a persona gain it too (SM-D10: "exactly as a worker brief does");
+   name this worker-brief change in the commit body and run the brief tests below.
+5. Move the render cases of `test/runner/assignment.test.mjs` to the door's test, keep one brief-wiring case there
+   (principle 8), and name the new owner in the commit body. One owning test in `test/runner/agent-definitions.test.mjs`: "a head session and a worker brief render the same
    persona section for the same persona", plus the skills line case. Do not add a second test elsewhere.
 
 ## Verify

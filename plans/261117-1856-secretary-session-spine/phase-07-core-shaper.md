@@ -1,7 +1,7 @@
 # Phase 7: Core domain-free shaper and unsure domain verdict
 
 ## Inputs (read first)
-- SM-D3, SM-D8, SM-D9, SM-D12 in `docs/discussions/secretary-miu/DISCUSSION.md`.
+- SM-D3, SM-D8, SM-D9, SM-D12 in `docs/history/secretary-miu/DISCUSSION.md`.
 - `domains/coding/skills/fgos-coding-shaping/SKILL.md` (no-item path at ~l.16-49, seven-section DISCUSSION.md shape
   ~l.102, `discussion:` marker `settled|paused` ~l.243-303, exits to `fgos-coding-exploring`/`fgos-coding-planning`).
 - `core/skills/fgos-clarifying/SKILL.md` l.80-90 and l.125-130 (defaults to `coding`).
