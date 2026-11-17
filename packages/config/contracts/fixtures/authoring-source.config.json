@@ -84,7 +84,7 @@
         "prefer": [
           {
             "executor": "gemini",
-            "invocation": "omp-herdr-bwrap"
+            "invocation": "omp-herdr"
           },
           {
             "executor": "deepseek"
@@ -101,7 +101,7 @@
         "prefer": [
           {
             "executor": "gemini",
-            "invocation": "omp-herdr-bwrap"
+            "invocation": "omp-herdr"
           },
           {
             "executor": "deepseek"
@@ -733,7 +733,7 @@
         "prefer": [
           {
             "executor": "gemini",
-            "invocation": "omp-herdr-bwrap"
+            "invocation": "omp-herdr"
           },
           {
             "executor": "deepseek"
@@ -965,7 +965,7 @@
             }
           },
           {
-            "id": "pi-herdr-bwrap",
+            "id": "pi-herdr",
             "via": "cli",
             "adapter": "herdr-spawn",
             "confinement": {
@@ -999,7 +999,7 @@
             }
           },
           {
-            "id": "codex-herdr-bwrap",
+            "id": "codex-herdr",
             "via": "cli",
             "adapter": "herdr-spawn",
             "confinement": {
@@ -1074,7 +1074,7 @@
         "providerModel": "gemini",
         "invocations": [
           {
-            "id": "omp-herdr-bwrap",
+            "id": "omp-herdr",
             "via": "cli",
             "adapter": "herdr-spawn",
             "confinement": {
@@ -1187,7 +1187,7 @@
             }
           },
           {
-            "id": "omp-herdr-bwrap",
+            "id": "omp-herdr",
             "via": "cli",
             "adapter": "herdr-spawn",
             "confinement": {
@@ -1268,7 +1268,7 @@
             }
           },
           {
-            "id": "pi-herdr-bwrap",
+            "id": "pi-herdr",
             "via": "cli",
             "adapter": "herdr-spawn",
             "confinement": {

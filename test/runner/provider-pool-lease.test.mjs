@@ -278,7 +278,7 @@ test('doctor warns about a store no invocation declares files for, and stays qui
   assert.equal(covered.passed, true);
   assert.match(covered.message, /declares 2 accounts in 1 pools/);
 
-  const uncovered = runCheck(config({ openrouter: { 'or-a': { credentialStore: { agy: '/srv/agy/or-a' } } } }));
+  const uncovered = runCheck(config({ openrouter: { 'or-a': { credentialStore: { zed: '/srv/zed/or-a' } } } }));
   assert.equal(uncovered.passed, true);
-  assert.match(uncovered.message, /^warning: .*openrouter\/or-a \(agy\)/);
+  assert.match(uncovered.message, /^warning: .*openrouter\/or-a \(zed\)/);
 });

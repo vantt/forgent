@@ -1,4 +1,4 @@
-// The committed config's herdr invocations for the non-claude providers (codex/openai, omp/gemini, omp/xai).
+// The committed config's herdr invocations for the non-claude providers (codex/openai, agy/gemini, omp/xai).
 // Each runs an interactive agent in a pane under the bwrap posture, so the home the agent writes its own
 // state into has to be a private one, with the account's login provisioned by the provider account inventory.
 
@@ -12,7 +12,7 @@ const find = (executor, id) => runner.executors[executor].invocations.find((inv)
 
 const providers = [
   { executor: 'openai', id: 'codex-herdr-bwrap', command: 'codex', homeVar: 'CODEX_HOME', kind: 'codex', trust: 'codex-toml', store: 'codex' },
-  { executor: 'gemini', id: 'omp-herdr-bwrap', command: 'omp', homeVar: 'PI_CODING_AGENT_DIR', kind: 'omp', trust: undefined, store: 'omp' },
+  { executor: 'gemini', id: 'agy-herdr-bwrap', command: 'agy', homeVar: 'HOME', kind: 'agy', trust: 'agy', store: 'agy' },
   { executor: 'xai', id: 'omp-herdr-bwrap', command: 'omp', homeVar: 'PI_CODING_AGENT_DIR', kind: 'omp', trust: undefined, store: 'omp' },
 ];
 

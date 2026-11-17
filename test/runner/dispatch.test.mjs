@@ -449,7 +449,7 @@ test('resolveExecutorCommand still enforces cross-provider governance for an inv
   );
 });
 
-test('the committed .fgos/config.json runner section declares the consolidated gemini executor (executor-provider-naming 2026-09-17, replacing the former "agy" executor id): invocations[]-shaped, kind agent, allowCrossProvider true, run through omp with the tier model passed on every invocation', () => {
+test('the committed .fgos/config.json runner section declares the consolidated gemini executor (executor-provider-naming 2026-09-17, replacing the former "agy" executor id): invocations[]-shaped, kind agent, allowCrossProvider true, run through agy with the tier model passed on every invocation', () => {
   const cfg = committedRunnerConfig();
   const executor = cfg.executors?.gemini;
   assert.ok(executor, 'executors.gemini must exist');
@@ -457,18 +457,18 @@ test('the committed .fgos/config.json runner section declares the consolidated g
   assert.equal(executor.allowCrossProvider, true);
   assert.ok(Array.isArray(executor.invocations));
   const ids = executor.invocations.map((inv) => inv.id);
-  for (const id of ['omp-herdr-bwrap', 'omp-cli-bwrap']) {
+  for (const id of ['agy-herdr-bwrap', 'agy-cli-bwrap']) {
     assert.ok(ids.includes(id), `gemini must declare the "${id}" invocation`);
   }
-  // The Antigravity CLI is no longer installed; nothing may still spawn it.
-  assert.ok(executor.invocations.every((inv) => inv.command === 'omp'), `gemini invocations must all run omp, got ${JSON.stringify(executor.invocations.map((inv) => inv.command))}`);
+  // gemini runs through the Antigravity CLI; omp and pi do not serve it.
+  assert.ok(executor.invocations.every((inv) => inv.command === 'agy'), `gemini invocations must all run agy, got ${JSON.stringify(executor.invocations.map((inv) => inv.command))}`);
   for (const inv of executor.invocations) {
-    // Without --model omp runs its profile default whatever the tier asked for.
+    // Without --model agy runs its default model whatever the tier asked for.
     const at = inv.args.indexOf('--model');
     assert.ok(at >= 0 && inv.args[at + 1] === '{model}', `${inv.id} must pass --model {model}`);
     assert.deepEqual(inv.confinement, { backend: 'bwrap' }, `${inv.id} runs confined`);
   }
-  const headless = executor.invocations.find((inv) => inv.id === 'omp-cli-bwrap');
+  const headless = executor.invocations.find((inv) => inv.id === 'agy-cli-bwrap');
   assert.equal(headless.via, 'cli');
   assert.equal(headless.adapter, 'cli-spawn');
   assert.ok(headless.args.includes('{prompt}'));

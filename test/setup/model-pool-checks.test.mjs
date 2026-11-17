@@ -81,7 +81,7 @@ test('executor-skills-installed passes when the declared skill is installed and 
   assert.doesNotMatch(partial.message, /\.agents\/skills/);
   const both = runCheck('executor-skills-installed', { executors: { ...declared.executors, ...twoClis } }, undefined, install(...standardDirs, '.omp/skills'));
   assert.equal(both.passed, true, both.message);
-  assert.match(both.message, /not checked, no known skill directory: multi \(cli odd\)/);
+  assert.match(both.message, /not checked, no known skill directory: gemini \(cli agy\), multi \(cli odd\)/);
 });
 
 test('executor-skills-installed skips an executor whose CLI is not installed instead of failing it', () => {

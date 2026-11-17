@@ -184,57 +184,54 @@ runner:
             backend: bwrap
     gemini:
       kind: agent
-      description: "Gemini provider via omp (oh-my-pi); Antigravity CLI (agy) invocations removed 2026-10-16. Invocations: omp-herdr-bwrap (herdr pane), omp-cli-bwrap (headless). The confined account comes from runner.providers.gemini.accounts in the global config."
+      description: "Gemini provider via the Antigravity CLI (agy). Invocations: agy-herdr-bwrap (herdr pane), agy-cli-bwrap (headless). The confined account comes from runner.providers.gemini.accounts in the global config."
       allowCrossProvider: true
       providerModel: gemini
       invocations:
-        - id: omp-herdr-bwrap
+        - id: agy-herdr-bwrap
           via: cli
           adapter: herdr-spawn
           confinement:
             backend: bwrap
-          command: omp
+          command: agy
           credentialStore:
-            use: omp
-            homeEnv: PI_CODING_AGENT_DIR
-            sessionDir: sessions
-            files: ["agent.db", "config.yml"]
-          env:
-            PI_CONFIG_DIR: "../../tmp/fgos-omp-config"
+            use: agy
+            homeEnv: HOME
+            files:
+              - ".gemini/antigravity-cli/antigravity-oauth-token"
+              - ".gemini/antigravity-cli/settings.json"
+              - ".gemini/antigravity-cli/installation_id"
+              - ".gemini/antigravity-cli/jetski_state.pbtxt"
+              - ".gemini/antigravity-cli/cache/onboarding.json"
           args:
+            - "--mode"
+            - accept-edits
+            - "--new-project"
             - "--model"
             - "{model}"
-            - "--thinking"
-            - medium
-            - "--tools"
-            - "read,write,edit,bash,grep,glob"
-            - "--auto-approve"
           interactiveMode:
             exitCommand: "/exit"
-            kind: omp
-        - id: omp-cli-bwrap
+            kind: agy
+            trustStore:
+              kind: agy
+        - id: agy-cli-bwrap
           via: cli
           adapter: cli-spawn
-          command: omp
+          command: agy
           credentialStore:
-            use: omp
-            homeEnv: PI_CODING_AGENT_DIR
-            sessionDir: sessions
-            files: ["agent.db", "config.yml"]
-          env:
-            PI_CONFIG_DIR: "../../tmp/fgos-omp-config"
+            use: agy
+            homeEnv: HOME
+            files:
+              - ".gemini/antigravity-cli/antigravity-oauth-token"
+              - ".gemini/antigravity-cli/settings.json"
+              - ".gemini/antigravity-cli/installation_id"
+              - ".gemini/antigravity-cli/jetski_state.pbtxt"
+              - ".gemini/antigravity-cli/cache/onboarding.json"
           args:
-            - "--model"
-            - "{model}"
-            - "--thinking"
-            - medium
-            - "--tools"
-            - "read,write,edit,bash,grep,glob"
-            - "--mode"
-            - json
-            - "--auto-approve"
             - "-p"
             - "{prompt}"
+            - "--model"
+            - "{model}"
           confinement:
             backend: bwrap
     xai:
@@ -384,10 +381,10 @@ runner:
         outputKind: finding
         mutates: false
     fgos-coding-implement:
-      description: "code-implement work for the coding domain executing stage -- preferred executor gemini through omp, claude then openai as fallback."
+      description: "code-implement work for the coding domain executing stage -- preferred executor gemini through agy, claude then openai as fallback."
       prefer:
         - executor: gemini
-          invocation: omp-herdr-bwrap
+          invocation: agy-herdr-bwrap
         - executor: deepseek
         - executor: glm
         - claude
@@ -397,7 +394,7 @@ runner:
       description: "Canonical coding implementation capability -- compliance-driven coding execution before implementation (D1/D2, docs/history/capability-aware-dispatch-activation/CONTEXT.md)"
       prefer:
         - executor: gemini
-          invocation: omp-herdr-bwrap
+          invocation: agy-herdr-bwrap
         - executor: deepseek
         - executor: glm
         - claude
@@ -689,7 +686,7 @@ runner:
     "coding:implement":
       prefer:
         - executor: gemini
-          invocation: omp-herdr-bwrap
+          invocation: agy-herdr-bwrap
         - executor: deepseek
         - executor: glm
         - claude

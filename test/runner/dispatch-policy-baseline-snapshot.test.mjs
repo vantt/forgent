@@ -116,8 +116,8 @@ export function resolveNormalizedSnapshotRow(cfg, executorId, workTier, throwawa
  */
 export const CANONICAL_EXECUTOR_DESCRIPTORS = [
   { label: 'claude', executorId: 'claude', invocationId: 'claude-cli' },
-  { label: 'gemini-cli', executorId: 'gemini', invocationId: 'omp-cli-bwrap' },
-  { label: 'gemini-herdr', executorId: 'gemini', invocationId: 'omp-herdr-bwrap' },
+  { label: 'gemini-cli', executorId: 'gemini', invocationId: 'agy-cli-bwrap' },
+  { label: 'gemini-herdr', executorId: 'gemini', invocationId: 'agy-herdr-bwrap' },
   { label: 'codex-bwrap', executorId: 'openai', invocationId: 'codex-cli-bwrap' },
   // `pi` was a literal config duplicate of `codex-pi` before executor-provider-naming (2026-09-17); the
   // merged `openai` executor keeps one pi invocation, and an account is leased at launch rather than named
@@ -154,8 +154,7 @@ export function resolveSnapshotRowByLabel(cfg, label, workTier, throwawayDir) {
  * (plans/260917-executor-profile-schema-migration/plan.md Phase A):
  * genuinely dormant, self-described as never wired to any capability, zero
  * other reference anywhere in src/ or test/ before removal.
- * `agy-cli`/`agy-herdr-bwrap` became `gemini-cli`/`gemini-herdr` when gemini moved from
- * the Antigravity CLI to omp's gemini-tetcu72 profile (agy is no longer installed).
+ * `gemini-cli`/`gemini-herdr` run the Antigravity CLI (`agy-cli-bwrap`, `agy-herdr-bwrap`).
  * executor-id-consolidation Step 2: each of these 12 canonical LABELS
  * (not necessarily a real, distinct executor id any more -- see
  * CANONICAL_EXECUTOR_DESCRIPTORS above) still resolves successfully.
@@ -386,30 +385,23 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     bindingSource: 'executor-id',
     provider: 'gemini',
     model: 'gemini-3.8-flash-low',
-    command: 'omp',
+    command: 'agy',
     args: [
-      '--model',
-      'gemini-3.8-flash-low',
-      '--thinking',
-      'medium',
-      '--tools',
-      'read,write,edit,bash,grep,glob',
-      '--mode',
-      'json',
-      '--auto-approve',
       '-p',
-      '<prompt>'
+      '<prompt>',
+      '--model',
+      'gemini-3.8-flash-low'
     ],
-    envKeys: [
-      'PI_CONFIG_DIR'
-    ],
+    envKeys: [],
     credentialStore: {
-      use: 'omp',
-      homeEnv: 'PI_CODING_AGENT_DIR',
-      sessionDir: 'sessions',
+      use: 'agy',
+      homeEnv: 'HOME',
       files: [
-        'agent.db',
-        'config.yml'
+        '.gemini/antigravity-cli/antigravity-oauth-token',
+        '.gemini/antigravity-cli/settings.json',
+        '.gemini/antigravity-cli/installation_id',
+        '.gemini/antigravity-cli/jetski_state.pbtxt',
+        '.gemini/antigravity-cli/cache/onboarding.json'
       ]
     },
     adapter: 'cli-spawn',
@@ -423,30 +415,23 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     bindingSource: 'executor-id',
     provider: 'gemini',
     model: 'gemini-3.8-flash-medium',
-    command: 'omp',
+    command: 'agy',
     args: [
-      '--model',
-      'gemini-3.8-flash-medium',
-      '--thinking',
-      'medium',
-      '--tools',
-      'read,write,edit,bash,grep,glob',
-      '--mode',
-      'json',
-      '--auto-approve',
       '-p',
-      '<prompt>'
+      '<prompt>',
+      '--model',
+      'gemini-3.8-flash-medium'
     ],
-    envKeys: [
-      'PI_CONFIG_DIR'
-    ],
+    envKeys: [],
     credentialStore: {
-      use: 'omp',
-      homeEnv: 'PI_CODING_AGENT_DIR',
-      sessionDir: 'sessions',
+      use: 'agy',
+      homeEnv: 'HOME',
       files: [
-        'agent.db',
-        'config.yml'
+        '.gemini/antigravity-cli/antigravity-oauth-token',
+        '.gemini/antigravity-cli/settings.json',
+        '.gemini/antigravity-cli/installation_id',
+        '.gemini/antigravity-cli/jetski_state.pbtxt',
+        '.gemini/antigravity-cli/cache/onboarding.json'
       ]
     },
     adapter: 'cli-spawn',
@@ -460,30 +445,23 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     bindingSource: 'executor-id',
     provider: 'gemini',
     model: 'gemini-4-argon-high',
-    command: 'omp',
+    command: 'agy',
     args: [
-      '--model',
-      'gemini-4-argon-high',
-      '--thinking',
-      'medium',
-      '--tools',
-      'read,write,edit,bash,grep,glob',
-      '--mode',
-      'json',
-      '--auto-approve',
       '-p',
-      '<prompt>'
+      '<prompt>',
+      '--model',
+      'gemini-4-argon-high'
     ],
-    envKeys: [
-      'PI_CONFIG_DIR'
-    ],
+    envKeys: [],
     credentialStore: {
-      use: 'omp',
-      homeEnv: 'PI_CODING_AGENT_DIR',
-      sessionDir: 'sessions',
+      use: 'agy',
+      homeEnv: 'HOME',
       files: [
-        'agent.db',
-        'config.yml'
+        '.gemini/antigravity-cli/antigravity-oauth-token',
+        '.gemini/antigravity-cli/settings.json',
+        '.gemini/antigravity-cli/installation_id',
+        '.gemini/antigravity-cli/jetski_state.pbtxt',
+        '.gemini/antigravity-cli/cache/onboarding.json'
       ]
     },
     adapter: 'cli-spawn',
@@ -497,26 +475,24 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     bindingSource: 'executor-id',
     provider: 'gemini',
     model: 'gemini-3.8-flash-low',
-    command: 'omp',
+    command: 'agy',
     args: [
+      '--mode',
+      'accept-edits',
+      '--new-project',
       '--model',
-      'gemini-3.8-flash-low',
-      '--thinking',
-      'medium',
-      '--tools',
-      'read,write,edit,bash,grep,glob',
-      '--auto-approve'
+      'gemini-3.8-flash-low'
     ],
-    envKeys: [
-      'PI_CONFIG_DIR'
-    ],
+    envKeys: [],
     credentialStore: {
-      use: 'omp',
-      homeEnv: 'PI_CODING_AGENT_DIR',
-      sessionDir: 'sessions',
+      use: 'agy',
+      homeEnv: 'HOME',
       files: [
-        'agent.db',
-        'config.yml'
+        '.gemini/antigravity-cli/antigravity-oauth-token',
+        '.gemini/antigravity-cli/settings.json',
+        '.gemini/antigravity-cli/installation_id',
+        '.gemini/antigravity-cli/jetski_state.pbtxt',
+        '.gemini/antigravity-cli/cache/onboarding.json'
       ]
     },
     adapter: 'herdr-spawn',
@@ -530,26 +506,24 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     bindingSource: 'executor-id',
     provider: 'gemini',
     model: 'gemini-3.8-flash-medium',
-    command: 'omp',
+    command: 'agy',
     args: [
+      '--mode',
+      'accept-edits',
+      '--new-project',
       '--model',
-      'gemini-3.8-flash-medium',
-      '--thinking',
-      'medium',
-      '--tools',
-      'read,write,edit,bash,grep,glob',
-      '--auto-approve'
+      'gemini-3.8-flash-medium'
     ],
-    envKeys: [
-      'PI_CONFIG_DIR'
-    ],
+    envKeys: [],
     credentialStore: {
-      use: 'omp',
-      homeEnv: 'PI_CODING_AGENT_DIR',
-      sessionDir: 'sessions',
+      use: 'agy',
+      homeEnv: 'HOME',
       files: [
-        'agent.db',
-        'config.yml'
+        '.gemini/antigravity-cli/antigravity-oauth-token',
+        '.gemini/antigravity-cli/settings.json',
+        '.gemini/antigravity-cli/installation_id',
+        '.gemini/antigravity-cli/jetski_state.pbtxt',
+        '.gemini/antigravity-cli/cache/onboarding.json'
       ]
     },
     adapter: 'herdr-spawn',
@@ -563,26 +537,24 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     bindingSource: 'executor-id',
     provider: 'gemini',
     model: 'gemini-4-argon-high',
-    command: 'omp',
+    command: 'agy',
     args: [
+      '--mode',
+      'accept-edits',
+      '--new-project',
       '--model',
-      'gemini-4-argon-high',
-      '--thinking',
-      'medium',
-      '--tools',
-      'read,write,edit,bash,grep,glob',
-      '--auto-approve'
+      'gemini-4-argon-high'
     ],
-    envKeys: [
-      'PI_CONFIG_DIR'
-    ],
+    envKeys: [],
     credentialStore: {
-      use: 'omp',
-      homeEnv: 'PI_CODING_AGENT_DIR',
-      sessionDir: 'sessions',
+      use: 'agy',
+      homeEnv: 'HOME',
       files: [
-        'agent.db',
-        'config.yml'
+        '.gemini/antigravity-cli/antigravity-oauth-token',
+        '.gemini/antigravity-cli/settings.json',
+        '.gemini/antigravity-cli/installation_id',
+        '.gemini/antigravity-cli/jetski_state.pbtxt',
+        '.gemini/antigravity-cli/cache/onboarding.json'
       ]
     },
     adapter: 'herdr-spawn',
@@ -1038,23 +1010,23 @@ describe('dispatch policy baseline snapshot harness (Phase 00)', () => {
   describe('named explicit baseline facts', () => {
     // (a) gemini-cli heavy AND gemini-herdr heavy both resolve model to gemini-4-argon-high (policy tier frontier, D15),
     // and the model reaches omp's argv: without --model omp runs its profile default whatever the tier.
-    test('fact (a): gemini-cli heavy and gemini-herdr heavy resolve to gemini-4-argon-high and pass it to omp (policy tier frontier, D15)', () => {
+    test('fact (a): gemini-cli heavy and gemini-herdr heavy resolve to gemini-4-argon-high and pass it to agy (policy tier frontier, D15)', () => {
       for (const label of ['gemini-cli', 'gemini-herdr']) {
         const row = resolveSnapshotRowByLabel(cfg, label, 'heavy', throwawayDir);
         assert.equal(row.model, 'gemini-4-argon-high', `${label} heavy model must be gemini-4-argon-high`);
         assert.equal(row.provider, 'gemini');
-        assert.equal(row.command, 'omp');
+        assert.equal(row.command, 'agy');
         const at = row.args.indexOf('--model');
         assert.ok(at >= 0 && row.args[at + 1] === 'gemini-4-argon-high', `${label} heavy must pass --model gemini-4-argon-high, got ${JSON.stringify(row.args)}`);
       }
     });
 
     // (b) the purpose reaches gemini-herdr, so its rows are not repeated under the purpose's name
-    test('fact (b): fgos-coding-implement is bound by Seat Binding to gemini\'s omp pane invocation, whose rows are the gemini-herdr rows above', () => {
+    test('fact (b): fgos-coding-implement is bound by Seat Binding to gemini\'s agy pane invocation, whose rows are the gemini-herdr rows above', () => {
       const { executorId: resolvedExecutorId, invocationId: resolvedInvocationId, bindingSource } = purposeSeatOf(cfg, 'fgos-coding-implement');
       assert.equal(bindingSource, 'seat-binding', 'the purpose is answered by Seat Binding');
-      assert.equal(resolvedExecutorId, 'gemini', 'resolvedExecutorId resolves to gemini (executor-provider-naming 2026-09-17 -- was agy)');
-      assert.equal(resolvedInvocationId, 'omp-herdr-bwrap', 'resolvedInvocationId pins gemini\'s omp pane invocation');
+      assert.equal(resolvedExecutorId, 'gemini', 'resolvedExecutorId resolves to gemini');
+      assert.equal(resolvedInvocationId, 'agy-herdr-bwrap', 'resolvedInvocationId pins gemini\'s agy pane invocation');
     });
 
 
