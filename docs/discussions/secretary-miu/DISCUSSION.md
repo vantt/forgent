@@ -51,6 +51,12 @@ persona sections or the renderer is extended (task persona-door).
 detached git worktree lifecycle (`fgos session --help`). The verb name in SM-D6 is provisional; the planner checks that
 verb's prior art and callers and proposes a name or a merge as an owner question.
 
+**Owner requirement added after settling (2026-11-17).** When a head session opens in a pane, its opening prompt is
+typed visibly into the CLI composer (full text, not a pointer such as "read file X"), so a person watching the pane
+sees exactly what the session was told; a screenless host may pass it on the command line or by file. Reuse the
+brief-delivery step terminal worker seats already use; never `herdr pane run` with unquoted arguments (it joins them
+into the shell line, which split the planner's first prompt at a `;`).
+
 **Source backlog ids.** `p-r4u2ewexvn` (this topic). Filed as their own rows: `p-5igcekysul` (mailbox resolves an
 agent head beside Identity), `p-pgmxt7n7hx` (domain registry vs `domains/`, `coding` default); the three-copies
 measurement was appended to `p-7eb9e65b`.
