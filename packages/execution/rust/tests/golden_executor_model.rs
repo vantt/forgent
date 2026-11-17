@@ -5,10 +5,10 @@
 
 use fgos_execution::accounts::{legacy_state_key, provider_account_inventory, read_llm_accounts};
 use fgos_execution::executor_model::{
-    agent_cli_missing_refusal, capability_confinement, check_provider_disallowed, credential_store_of, family_of,
+    agent_cli_missing_refusal, capability_confinement, credential_store_of, family_of,
     launch_facts, lookup_executor, mechanism, rendered_effort_levels, resolve_executor_governance,
-    resolve_executor_provider, resolve_posture_invocation, tool_for_entries, with_default_executor, Candidate,
-    FamilySource, Governance, ModelError, Session,
+    resolve_executor_provider, resolve_posture_invocation, tool_for_entries, with_default_executor,
+    Candidate, FamilySource, Governance, ModelError, Session,
 };
 use fgos_execution::ports::{Backend, Machine};
 use serde_json::{json, Map, Value};
@@ -47,10 +47,17 @@ impl VectorMachine {
             path_commands: machine
                 .and_then(|m| m.get("pathCommands"))
                 .and_then(Value::as_array)
-                .map(|list| list.iter().filter_map(|c| c.as_str().map(str::to_string)).collect())
+                .map(|list| {
+                    list.iter()
+                        .filter_map(|c| c.as_str().map(str::to_string))
+                        .collect()
+                })
                 .unwrap_or_default(),
             registry,
-            home: machine.and_then(|m| m.get("home")).and_then(Value::as_str).map(str::to_string),
+            home: machine
+                .and_then(|m| m.get("home"))
+                .and_then(Value::as_str)
+                .map(str::to_string),
             herdr,
         }
     }
@@ -62,11 +69,23 @@ impl Machine for VectorMachine {
     }
 
     fn posture_backend(&self, id: &str) -> Option<Backend> {
-        let instance = self.registry.as_ref()?.get("confinementBackends")?.get(id)?;
+        let instance = self
+            .registry
+            .as_ref()?
+            .get("confinementBackends")?
+            .get(id)?;
         Some(Backend {
             enabled: instance.get("enabled") != Some(&json!(false)),
-            kind: instance.get("type").and_then(Value::as_str).unwrap_or_default().to_string(),
-            executable: instance.get("executable").and_then(Value::as_str).filter(|e| !e.is_empty()).map(str::to_string),
+            kind: instance
+                .get("type")
+                .and_then(Value::as_str)
+                .unwrap_or_default()
+                .to_string(),
+            executable: instance
+                .get("executable")
+                .and_then(Value::as_str)
+                .filter(|e| !e.is_empty())
+                .map(str::to_string),
         })
     }
 
@@ -98,7 +117,11 @@ fn runner_of(vector: &Value) -> &Value {
 fn string_list(value: Option<&Value>) -> Vec<String> {
     value
         .and_then(Value::as_array)
-        .map(|list| list.iter().filter_map(|s| s.as_str().map(str::to_string)).collect())
+        .map(|list| {
+            list.iter()
+                .filter_map(|s| s.as_str().map(str::to_string))
+                .collect()
+        })
         .unwrap_or_default()
 }
 
@@ -115,7 +138,10 @@ fn evaluate(vector: &Value) -> Option<Value> {
                 (Some(entry), _) => FamilySource::from_json(Some(entry)),
                 (None, source) => FamilySource::from_json(source),
             };
-            json!(family_of(source, args.get("command").and_then(Value::as_str)))
+            json!(family_of(
+                source,
+                args.get("command").and_then(Value::as_str)
+            ))
         }
         "executorLookup" => {
             let found = lookup_executor(runner, args.get("executorId").and_then(Value::as_str));
@@ -134,7 +160,9 @@ fn evaluate(vector: &Value) -> Option<Value> {
                 disallowed_providers: string_list(options.get("disallowedProviders")),
                 disallowed_executors: string_list(options.get("disallowedExecutors")),
             };
-            let primary = args["primaryExecutor"].as_str().expect("governance names an executor");
+            let primary = args["primaryExecutor"]
+                .as_str()
+                .expect("governance names an executor");
             answer_or_refusal(resolve_executor_provider(runner, primary, &governance).and_then(|resolved| {
                 let canonical = resolve_executor_governance(primary, &resolved.family, &governance)?;
                 Ok(json!({ "resolvedProvider": resolved.family, "canonicalProvider": canonical }))
@@ -142,10 +170,16 @@ fn evaluate(vector: &Value) -> Option<Value> {
         }
         "capabilityConfinement" => {
             let capability = args["capability"].as_str().unwrap_or_default();
-            capability_confinement(runner, capability).cloned().unwrap_or(Value::Null)
+            capability_confinement(runner, capability)
+                .cloned()
+                .unwrap_or(Value::Null)
         }
-        "credentialStore" => credential_store_of(&args["invocation"]).cloned().unwrap_or(Value::Null),
-        "effortLevels" => json!(rendered_effort_levels(args.get("command").and_then(Value::as_str))),
+        "credentialStore" => credential_store_of(&args["invocation"])
+            .cloned()
+            .unwrap_or(Value::Null),
+        "effortLevels" => json!(rendered_effort_levels(
+            args.get("command").and_then(Value::as_str)
+        )),
         "mechanism" => json!(mechanism(
             runner,
             args.get("executorId").and_then(Value::as_str),
@@ -166,7 +200,8 @@ fn evaluate(vector: &Value) -> Option<Value> {
         }
         "launchFacts" => {
             let session = args.get("session").unwrap_or(&Value::Null);
-            let machine = VectorMachine::of(vector, session.get("herdrPresent") == Some(&json!(true)));
+            let machine =
+                VectorMachine::of(vector, session.get("herdrPresent") == Some(&json!(true)));
             let facts = launch_facts(
                 runner,
                 &Session {
@@ -175,16 +210,26 @@ fn evaluate(vector: &Value) -> Option<Value> {
                 },
                 &machine,
             );
-            Value::Object(facts.into_iter().map(|(id, facts)| (id, json!(facts))).collect())
+            Value::Object(
+                facts
+                    .into_iter()
+                    .map(|(id, facts)| (id, json!(facts)))
+                    .collect(),
+            )
         }
         "missingCli" => {
-            let session = Session { has_native_agent: args.get("hasNativeAgent") == Some(&json!(true)), posture_at_launch: false };
+            let session = Session {
+                has_native_agent: args.get("hasNativeAgent") == Some(&json!(true)),
+                posture_at_launch: false,
+            };
             match agent_cli_missing_refusal(runner, &session, &machine) {
                 Some(refusal) => json!(refusal),
                 None => Value::Null,
             }
         }
-        "accountInventory" => answer_or_refusal(provider_account_inventory(runner, &machine).map(Value::Object)),
+        "accountInventory" => {
+            answer_or_refusal(provider_account_inventory(runner, &machine).map(Value::Object))
+        }
         "llmAccounts" => read_llm_accounts(runner, &machine).to_json(),
         "stateKey" => json!(legacy_state_key(args["pool"].as_str().unwrap_or_default())),
         "toolProviders" => {
@@ -226,7 +271,10 @@ fn expected(vector: &Value) -> Value {
             .expect("a tool provider vector lists providers")
             .iter()
             .map(|provider| {
-                let mut kept = provider.as_object().expect("a provider is an object").clone();
+                let mut kept = provider
+                    .as_object()
+                    .expect("a provider is an object")
+                    .clone();
                 kept.remove("status");
                 Value::Object(kept)
             })
@@ -236,9 +284,13 @@ fn expected(vector: &Value) -> Value {
 
 #[test]
 fn every_executor_model_vector_has_the_answer_the_contract_records() {
-    let path = concat!(env!("CARGO_MANIFEST_DIR"), "/../contracts/executor-model.v1.json");
-    let contract: Value = serde_json::from_str(&std::fs::read_to_string(path).expect("the vector file is committed"))
-        .expect("the vector file is JSON");
+    let path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../contracts/executor-model.v1.json"
+    );
+    let contract: Value =
+        serde_json::from_str(&std::fs::read_to_string(path).expect("the vector file is committed"))
+            .expect("the vector file is JSON");
     assert_eq!(contract["version"], "executor-model.v1");
     let vectors = contract["vectors"].as_array().expect("vectors");
 
@@ -247,7 +299,10 @@ fn every_executor_model_vector_has_the_answer_the_contract_records() {
     let mut wrong = Vec::new();
     for vector in vectors {
         let fact = vector["fact"].as_str().expect("fact").to_string();
-        if REPLAYED_LATER.iter().any(|(later_fact, _)| *later_fact == fact) {
+        if REPLAYED_LATER
+            .iter()
+            .any(|(later_fact, _)| *later_fact == fact)
+        {
             *later.entry(fact).or_default() += 1;
             continue;
         }
@@ -259,17 +314,33 @@ fn every_executor_model_vector_has_the_answer_the_contract_records() {
                 answer,
                 expected(vector)
             )),
-            None => panic!("vector {:?} names the fact {fact:?} that nothing replays", vector["name"]),
+            None => panic!(
+                "vector {:?} names the fact {fact:?} that nothing replays",
+                vector["name"]
+            ),
         }
     }
-    assert!(wrong.is_empty(), "{} vectors differ:\n{}", wrong.len(), wrong.join("\n"));
+    assert!(
+        wrong.is_empty(),
+        "{} vectors differ:\n{}",
+        wrong.len(),
+        wrong.join("\n")
+    );
 
-    let facts: Vec<&str> = contract["facts"].as_array().unwrap().iter().map(|f| f.as_str().unwrap()).collect();
+    let facts: Vec<&str> = contract["facts"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|f| f.as_str().unwrap())
+        .collect();
     for fact in &facts {
         assert!(
             replayed.contains_key(*fact) || later.contains_key(*fact),
             "the fact {fact} has no replay and is not listed in REPLAYED_LATER"
         );
     }
-    assert_eq!(replayed.values().sum::<usize>() + later.values().sum::<usize>(), vectors.len());
+    assert_eq!(
+        replayed.values().sum::<usize>() + later.values().sum::<usize>(),
+        vectors.len()
+    );
 }
