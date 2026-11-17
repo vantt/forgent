@@ -14,7 +14,8 @@ owner one line, never default to coding. Minted SM-D1 (topic ordering), SM-D2 (a
 "auto-compaction + reload from files" as a cheaper alternative (Amp's choice); owner kept B (automatic rotation), asked
 for the best possible quality, and widened it: the rotation/handoff mechanism is generic for every kind of long-lived
 session, not limited to Miu. Name "session rotation" accepted; scope provisionally accepted; handoff files live in
-gitignored `.fgos/runtime/session-rotation/<persona>-<name>/` (agreed round 9). Minted SM-D3 (core shaper). Point 5: owner chose
+gitignored `.fgos/runtime/session-rotation/<persona>-<name>/` (agreed round 9). Minted SM-D3 (core shaper). Point 5 settled (SM-D4; owner questions in three stage-owned places, consolidation noted as later debt). Minted SM-D5
+(handoff file layout + Identity authority). Now on point 2 (placement and activation). Earlier: point 5 owner chose
 A (no own topic list; backlog row per request, read status from backlog / discussion marker / plan status). Owner then
 raised: (1) discussions should leave messy `docs/history` -> `docs/discussions/*` or `docs/shaper/*` (owner chose
 `docs/discussions/<slug>/` folder, room to grow; this file moved there); (2) session/head identity must come from Identity,
@@ -39,7 +40,7 @@ sessions, not in the secretary's chat.
 | 3 | Domain classification without Work | provisionally clear: Miu calls `fgos-clarifying` directly (verdict-only); no shaper -> core domain-free shaper (owner chose A); unsure domain -> ask owner, no `coding` default. Open: registry vs `domains/` mismatch (marketing, council) |
 | 6 | Generic session rotation | provisionally clear: name `session-rotation` (owner); covers every head session run with a persona (persona yaml declares soft/hard thresholds and state files, core defaults otherwise), not `fgos run` seats (run supervisor owns them) nor subagents; Claude first behind a port, other CLIs via adapters reusing mailbox `hookFacts`; spike the two unproven mechanics first; two-step replacement (new answers before old closes); files under `.fgos/runtime/session-rotation/<persona>-<name>/<yymmdd-hhmm>-<sid8>.md` immutable + `latest.json` pointer written atomically, keep last 10, redacted. Session and head identity come from Identity (owner: mailbox only consumes; `docs/platform/identity/spec.md` §3), pane from herdr; idea: lineage = Identity role alias taken with `--take`. Open: which core component owns it (point 2) |
 | 4 | Token saving (3x always-loaded rules, model choice, short agent results, peer mail only on decisions) | open, needs owner approval |
-| 5 | Topic list | provisionally clear (owner chose A): no separate list; each actionable request = one backlog row (`fgos identity mint backlog`); discussions and plans carry that id; status read from backlog Status, `discussion:` marker, plan `status`. Open: where pending owner questions live |
+| 5 | Topic list | settled as SM-D4: no separate list; each actionable request = one backlog row (`fgos identity mint backlog`); discussions and plans carry that id; status read from backlog Status, `discussion:` marker, plan `status`. Pending owner questions: three stages, three existing places (discussion -> `docs/discussions/<slug>/QUESTIONS.md`, new; plan -> `plan.md` owner-questions section per plan-contract item 5; execution -> open Workflow case gates, answered by `fgos workflow answer`); run `needs-human`/`blocked` are incidents the supervisor turns into a gate or plan question when it cannot resolve them; Miu reads all three and batches, answers go back through each stage's door. Known debt (owner): questions still spread over three places; consolidate later, operate first |
 | 7 | Discussion file location: out of `docs/history` (owner). Owner chose a folder `docs/discussions/<slug>/` (main file `DISCUSSION.md`), name through a new Convention kind `discussion`; moving needs all consumers (shaping/discovering/plugin skills, plan-contract, `src/report/context-render.mjs`, `src/report/authoritative-match.mjs`, `src/state/work.mjs`, `src/state/frontier.mjs`, `src/state/worker-slots.mjs`, `plugins/fgOS/skills/terminal/rename.sh`) and the 40 existing files moved in one change (L10) | provisionally clear (round 11) |
 
 ## 4. Quyết định đã chốt
@@ -49,6 +50,8 @@ sessions, not in the secretary's chat.
 | SM-D1 | Miu orders topics itself by the AGENTS.md product priority list and reports the order; asks the owner only on a real tie or when a reorder delays something already promised | Product priority #2: decide inside the approved frame; owner "Miu tự xếp thứ tự rồi báo lại anh" (round 2, unrevised since) | 2026-11-17 |
 | SM-D2 | Miu's session rotates automatically, never by the owner: checked at turn end; soft threshold (~40% context) only when at rest (no pending question, no in-process background work); hard threshold (~70%) at any turn end, carrying the last Miu message and pending question verbatim; the claude process is replaced (new+close or in-place, either is fine); the owner also gets a user-invoked `/handoff` | Owner forgets `/clear`; owner "ổn, dùng hai ngưỡng ... cách nào cũng được" (round 4, unrevised); method per research report `plans/reports/research-261117-1624-handoff-skills-research.md` | 2026-11-17 |
 | SM-D3 | A domain with no shaper of its own is shaped by one domain-free shaper in core, which reads the domain's doctrine from `domains/<d>/AGENTS.md`; coding keeps only its own overlay. When the domain is unclear Miu asks the owner one line instead of defaulting to `coding` | Owner "chọn A, shaper dùng chung ở core" (round 5, unrevised); the no-item shaping path holds nothing coding-specific; one door (L10) | 2026-11-17 |
+| SM-D4 | Miu keeps no topic list of its own: each actionable owner request becomes one backlog row (`fgos identity mint backlog`), discussions and plans carry that id, and Miu reads status from the backlog Status column, the `discussion:` marker and the plan `status` | One source of truth (D-ADR0079, design principle 7); owner "Đồng ý A" (round 10, unrevised) | 2026-11-17 |
+| SM-D5 | Rotation handoff files live in gitignored `.fgos/runtime/session-rotation/<persona>-<name>/`, one immutable `<yymmdd-hhmm>-<sid8>.md` per rotation plus an atomically written `latest.json`, last 10 kept, redacted; session and head identity come from Identity, the pane from herdr, never from mailbox | Owner "đồng ý, đặt theo persona + tên phiên" (round 9) and "identity mới là nơi cung cấp, mailbox chỉ dùng" (round 10), both unrevised | 2026-11-17 |
 
 ## 5. Q&A log
 
@@ -106,6 +109,11 @@ sessions, not in the secretary's chat.
   (to file at exit; this session writes only this file).
 - 2026-11-17 — Owner: "docs/discussions/<slug>/*, nên để vào folder, biết đâu phình ra sau này." File moved to
   `docs/discussions/secretary-miu/DISCUSSION.md`.
+- 2026-11-17 — Miu proposed questions in the topic folder (A). Owner: "chọn A. nhưng nó chỉ đúng một phần ... khi làm
+  plan còn câu hỏi không, và liệu khi triển khai thì câu hỏi nằm đâu?" Scout: plan-contract item 5 (owner questions
+  batched in plan.md, plan stays draft, untouched phases ready); `fgos workflow status` open gates +
+  `fgos workflow answer`. Miu proposed three stages, three places. Owner: "đủ rồi ... cần note lại là chỗ này vẫn chưa
+  ổn lắm vì các vấn đề ở câu hỏi vẫn còn ở [nhiều] nơi, cần gom, nhưng để nâng cấp sau. vận hành được trước."
 
 ## 6. Thiết kế đã chốt {#design}
 
