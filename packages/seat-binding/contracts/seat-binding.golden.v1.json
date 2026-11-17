@@ -77,6 +77,13 @@
           "standard": "glm-5"
         }
       },
+      "roles": {
+        "red-team": {
+          "prefer": [
+            "xai"
+          ]
+        }
+      },
       "capabilities": {
         "architecture:*": {
           "tier": "flagship",
@@ -87,34 +94,18 @@
             "gemini",
             "xai",
             "deepseek"
-          ],
-          "roles": {
-            "red-team": {
-              "prefer": [
-                "xai"
-              ]
-            }
-          }
+          ]
         },
         "architecture:shape": {
           "rigor": "critical",
           "maxTier": "frontier",
-          "seats": {
-            "system": {
-              "prefer": [
-                "claude",
-                "openai"
-              ]
-            }
-          }
+          "prefer": [
+            "claude",
+            "openai"
+          ]
         },
         "architecture:critique": {
-          "maxTier": "frontier",
-          "seats": {
-            "producer": {
-              "tier": "frontier"
-            }
-          }
+          "maxTier": "frontier"
         },
         "group-cognition:*": {
           "prefer": [
@@ -127,15 +118,6 @@
               "invocation": "pi-cli-bwrap"
             }
           ]
-        },
-        "code:*": {
-          "roles": {
-            "red-team": {
-              "prefer": [
-                "xai"
-              ]
-            }
-          }
         },
         "code:review": {
           "prefer": [
@@ -482,31 +464,6 @@
       }
     },
     {
-      "name": "critique producer takes the seat tier key of its capability",
-      "patch": {
-        "ask": {
-          "capability": "architecture:critique",
-          "seat": "producer",
-          "role": "producer",
-          "label": "architecture-advisory / critique"
-        }
-      },
-      "expected": {
-        "ok": true,
-        "policy": {
-          "tier": "frontier",
-          "tierSource": "capabilities.\"architecture:critique\".seats.producer.tier"
-        },
-        "ranked": {
-          "candidates": [
-            {
-              "model": "fable"
-            }
-          ]
-        }
-      }
-    },
-    {
       "name": "critique reviewer is hard independent of the producer family",
       "patch": {
         "ask": {
@@ -558,7 +515,7 @@
       ]
     },
     {
-      "name": "critique red-team takes the role taste from the prefix and is pairwise independent at high rigor",
+      "name": "critique red-team takes the role taste from the roles table and is pairwise independent at high rigor",
       "patch": {
         "ask": {
           "capability": "architecture:critique",
@@ -591,7 +548,7 @@
       "expected": {
         "ok": true,
         "policy": {
-          "preferSource": "capabilities.\"architecture:*\".roles.red-team.prefer"
+          "preferSource": "roles.red-team.prefer"
         },
         "ranked": {
           "candidates": [
@@ -613,7 +570,7 @@
         }
       },
       "explainContains": [
-        "prefer: capabilities.\"architecture:*\".roles.red-team.prefer = [xai]"
+        "prefer: roles.red-team.prefer = [xai]"
       ]
     },
     {
@@ -634,15 +591,11 @@
           }
         },
         "config": {
-          "capabilities": {
-            "architecture:*": {
-              "roles": {
-                "red-team": {
-                  "prefer": [
-                    "openai"
-                  ]
-                }
-              }
+          "roles": {
+            "red-team": {
+              "prefer": [
+                "openai"
+              ]
             }
           }
         },
@@ -697,15 +650,11 @@
           }
         },
         "config": {
-          "capabilities": {
-            "architecture:*": {
-              "roles": {
-                "red-team": {
-                  "prefer": [
-                    "openai"
-                  ]
-                }
-              }
+          "roles": {
+            "red-team": {
+              "prefer": [
+                "openai"
+              ]
             }
           }
         },
@@ -877,13 +826,9 @@
           "capabilities": {
             "architecture:shape": {
               "maxTier": null,
-              "seats": {
-                "system": {
-                  "prefer": [
-                    "deepseek"
-                  ]
-                }
-              }
+              "prefer": [
+                "deepseek"
+              ]
             }
           }
         }
@@ -892,11 +837,11 @@
         "ok": false,
         "refusal": {
           "reason": "tier-cell-missing",
-          "config": "capabilities.\"architecture:shape\".seats.system.prefer"
+          "config": "capabilities.\"architecture:shape\".prefer"
         }
       },
       "explainContains": [
-        "change capabilities.\"architecture:shape\".seats.system.prefer or set capabilities.\"architecture:shape\".seats.system.tier"
+        "change capabilities.\"architecture:shape\".prefer or the tier set by workflow:w/u/system"
       ],
       "skippedReasons": [
         "tier-cell-missing"
@@ -1162,7 +1107,7 @@
       }
     },
     {
-      "name": "seat key beats persona beats role beats workflow beats capability default",
+      "name": "a persona key beats a role key beats the workflow recommendation beats the capability default",
       "patch": {
         "ask": {
           "capability": "architecture:shape",
@@ -1177,56 +1122,17 @@
         "config": {
           "capabilities": {
             "architecture:*": {
-              "tier": "mini",
-              "roles": {
-                "red-team": {
-                  "tier": "nano"
-                }
-              },
-              "personas": {
-                "system-lens": {
-                  "tier": "standard"
-                }
-              },
-              "seats": {
-                "system": {
-                  "tier": "flagship"
-                }
-              }
+              "tier": "mini"
             }
-          }
-        }
-      },
-      "expected": {
-        "ok": true,
-        "policy": {
-          "tier": "flagship",
-          "tierSource": "capabilities.\"architecture:*\".seats.system.tier"
-        }
-      }
-    },
-    {
-      "name": "persona key beats role key",
-      "patch": {
-        "ask": {
-          "capability": "architecture:shape",
-          "seat": "x",
-          "role": "red-team",
-          "persona": "system-lens"
-        },
-        "config": {
-          "capabilities": {
-            "architecture:*": {
-              "roles": {
-                "red-team": {
-                  "tier": "nano"
-                }
-              },
-              "personas": {
-                "system-lens": {
-                  "tier": "standard"
-                }
-              }
+          },
+          "roles": {
+            "red-team": {
+              "tier": "nano"
+            }
+          },
+          "personas": {
+            "system-lens": {
+              "tier": "standard"
             }
           }
         }
@@ -1235,7 +1141,66 @@
         "ok": true,
         "policy": {
           "tier": "standard",
-          "tierSource": "capabilities.\"architecture:*\".personas.system-lens.tier"
+          "tierSource": "personas.system-lens.tier"
+        }
+      }
+    },
+    {
+      "name": "a persona list beats a role list and both beat the capability list",
+      "patch": {
+        "ask": {
+          "capability": "architecture:shape",
+          "seat": "x",
+          "role": "red-team",
+          "persona": "system-lens"
+        },
+        "config": {
+          "personas": {
+            "system-lens": {
+              "prefer": [
+                "gemini"
+              ]
+            }
+          }
+        }
+      },
+      "expected": {
+        "ok": true,
+        "policy": {
+          "preferSource": "personas.system-lens.prefer"
+        }
+      },
+      "executors": [
+        "gemini"
+      ]
+    },
+    {
+      "name": "a persona key beats a role key",
+      "patch": {
+        "ask": {
+          "capability": "architecture:shape",
+          "seat": "x",
+          "role": "red-team",
+          "persona": "system-lens"
+        },
+        "config": {
+          "roles": {
+            "red-team": {
+              "tier": "nano"
+            }
+          },
+          "personas": {
+            "system-lens": {
+              "tier": "standard"
+            }
+          }
+        }
+      },
+      "expected": {
+        "ok": true,
+        "policy": {
+          "tier": "standard",
+          "tierSource": "personas.system-lens.tier"
         }
       }
     },
@@ -1252,13 +1217,9 @@
           }
         },
         "config": {
-          "capabilities": {
-            "architecture:*": {
-              "roles": {
-                "reviewer": {
-                  "tier": "advanced"
-                }
-              }
+          "roles": {
+            "reviewer": {
+              "tier": "advanced"
             }
           }
         }
@@ -1270,7 +1231,8 @@
           "recommendation": {
             "tier": "frontier",
             "source": "workflow:w/u/x"
-          }
+          },
+          "tierSource": "roles.reviewer.tier"
         }
       },
       "explainContains": [
@@ -1335,7 +1297,7 @@
       ]
     },
     {
-      "name": "prefer lists replace and are not merged; the seat list wins over the prefix list",
+      "name": "prefer lists replace and are not merged; the exact capability list wins over the prefix list",
       "patch": {
         "ask": {
           "capability": "architecture:shape",
@@ -1346,7 +1308,7 @@
       "expected": {
         "ok": true,
         "policy": {
-          "preferSource": "capabilities.\"architecture:shape\".seats.system.prefer"
+          "preferSource": "capabilities.\"architecture:shape\".prefer"
         }
       },
       "executors": [
@@ -1379,7 +1341,7 @@
       ]
     },
     {
-      "name": "the first role-level prefer is taken from the prefix map entry per key",
+      "name": "the role list applies to a capability that has no entry for it",
       "patch": {
         "ask": {
           "capability": "code:debug",
@@ -1390,7 +1352,7 @@
       "expected": {
         "ok": true,
         "policy": {
-          "preferSource": "capabilities.\"code:*\".roles.red-team.prefer"
+          "preferSource": "roles.red-team.prefer"
         }
       },
       "executors": [
@@ -1471,14 +1433,12 @@
           }
         },
         "config": {
+          "personas": {
+            "heavy": {
+              "tier": "frontier"
+            }
+          },
           "capabilities": {
-            "misc:*": {
-              "personas": {
-                "heavy": {
-                  "tier": "frontier"
-                }
-              }
-            },
             "misc:thing": {
               "maxTier": "frontier"
             }
@@ -1505,13 +1465,9 @@
           }
         },
         "config": {
-          "capabilities": {
-            "misc:*": {
-              "personas": {
-                "heavy": {
-                  "tier": "advanced"
-                }
-              }
+          "personas": {
+            "heavy": {
+              "tier": "advanced"
             }
           }
         }
@@ -1539,13 +1495,9 @@
           }
         },
         "config": {
-          "capabilities": {
-            "architecture:*": {
-              "personas": {
-                "light": {
-                  "tier": "standard"
-                }
-              }
+          "personas": {
+            "light": {
+              "tier": "standard"
             }
           }
         }
@@ -2958,15 +2910,11 @@
       "name": "a role key outside the five is a config error",
       "patch": {
         "config": {
-          "capabilities": {
-            "architecture:*": {
-              "roles": {
-                "panelist": {
-                  "prefer": [
-                    "claude"
-                  ]
-                }
-              }
+          "roles": {
+            "panelist": {
+              "prefer": [
+                "claude"
+              ]
             }
           }
         }
@@ -2974,7 +2922,27 @@
       "expected": {
         "ok": false,
         "refusal": {
-          "reason": "invalid-config"
+          "reason": "invalid-config",
+          "config": "roles.panelist"
+        }
+      }
+    },
+    {
+      "name": "an empty persona prefer list is a config error naming the line",
+      "patch": {
+        "config": {
+          "personas": {
+            "system-lens": {
+              "prefer": []
+            }
+          }
+        }
+      },
+      "expected": {
+        "ok": false,
+        "refusal": {
+          "reason": "invalid-config",
+          "config": "personas.system-lens.prefer"
         }
       }
     },
