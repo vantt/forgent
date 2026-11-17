@@ -1,3 +1,4 @@
+- 2026-11-17 23:25 HARDEN: fg-server2 accounts are on runner.llmAccounts only (p-ag76llwilb done; pools added: z-ai, deepseek; runner.providers accounts removed; probes: 9 healthy/12)
 - 2026-11-17 23:12 DESIGN-LAP: llmAccounts pools declared for every provider incl. z-ai and deepseek (backup kept); runner.providers NOT removed yet: probe gemini/tetcu72 harness leg hangs in agy -p (bwrap) though direct use works; waiting on owner; machines on llmAccounts so far: fg-server; design-lap pending, fg-server2 pending p-ag76llwilb
 - 2026-11-17 22:31 FG-SERVER: fg-server accounts are on runner.llmAccounts only
 - 2026-11-17 22:11 SUPERVISOR: secretary plan 261117-1856 wave 4 IN-MAIN: p13 fgos questions --open 5c7cf3d13, p11 worker placement through Session Host c5bdb8213 (envelope host replaces mode; open+launch ops; group queue moved into session-host client; release-slot retries until Released marker; live fgos run ok, no pane left). Next: wave 5 (12).
