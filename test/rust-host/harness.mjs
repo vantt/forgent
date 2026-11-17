@@ -438,10 +438,16 @@ export async function runCaseOnEntry(entry, testCase, options = {}) {
     ? diffDirectorySnapshots(beforeSnapshot, afterSnapshot)
     : null;
 
-  // Cleanup scratch directory
-  try {
-    fs.rmSync(scratchBase, { recursive: true, force: true });
-  } catch (_) {}
+  // Cleanup scratch directory. A caller whose command leaves detached children (the event-store sync child) passes
+  // `heldScratch` and removes the directory itself once the case ends: the child inherited PATH with this directory's
+  // git shim first, and a shim removed under it makes its git probe fail and record an invocation fault on one side only.
+  if (options.heldScratch) {
+    options.heldScratch.push(scratchBase);
+  } else {
+    try {
+      fs.rmSync(scratchBase, { recursive: true, force: true });
+    } catch (_) {}
+  }
 
   const stdout = Buffer.concat(stdoutChunks);
   const stderr = Buffer.concat(stderrChunks);
@@ -736,7 +742,9 @@ export async function runDifferentialCase(entryA, entryB, testCase, options = {}
 // suite runs many cases at once, so a loaded runner needs far more than a lone case's bound.
 const ISOLATED_STEP_TIMEOUT_MS = 90000;
 
-async function runMultiStepIsolatedWrite(entryA, entryB, testCase, options = {}) {
+async function runMultiStepIsolatedWrite(entryA, entryB, testCase, callerOptions = {}) {
+  const heldScratch = [];
+  const options = { ...callerOptions, heldScratch };
   const scratchA = path.join(os.tmpdir(), "fgos-iso-A-" + crypto.randomBytes(6).toString("hex"));
   const scratchB = path.join(os.tmpdir(), "fgos-iso-B-" + crypto.randomBytes(6).toString("hex"));
   fs.mkdirSync(scratchA, { recursive: true });
@@ -868,6 +876,7 @@ async function runMultiStepIsolatedWrite(entryA, entryB, testCase, options = {})
     fs.rmSync(scratchB, { recursive: true, force: true });
     fs.rmSync(homeA, { recursive: true, force: true });
     fs.rmSync(homeB, { recursive: true, force: true });
+    for (const dir of heldScratch) fs.rmSync(dir, { recursive: true, force: true });
   }
 }
 
