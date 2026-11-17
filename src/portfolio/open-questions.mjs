@@ -76,7 +76,14 @@ function executionQuestions(root) {
       const read = readCaseProjection(root, runId, { retryTail: true });
       state = read.state;
       gates = read.projection.openGates ?? [];
-    } catch { return []; }
+    } catch (err) {
+      // An unreadable case must not drop a parked gate silently: list it so the owner sees it.
+      return [{
+        topic: runId, stage: 'execution', ref: `workflow:${runId}`,
+        question: `unreadable workflow case: ${err?.message ?? String(err)}`,
+        answerDoor: `fgos workflow status ${runId}`,
+      }];
+    }
     if (!['running', 'parked'].includes(state.status)) return [];
     return gates.map((g) => ({
       topic: runId, stage: 'execution', ref: `workflow:${runId}#${g.stepId}`, question: String(g.question ?? ''),

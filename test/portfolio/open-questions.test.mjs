@@ -74,6 +74,20 @@ test('one open question per stage yields one batch of three, tagged by topic and
   assert.match(text, /\[discussion\].*\n.*Which store owns/);
 });
 
+test('a workflow case whose ledger cannot be read is listed as unreadable, never dropped', () => {
+  const root = makeFixtureDir('fgos-open-questions-');
+  const runId = parkedGate(root);
+  fs.writeFileSync(path.join(root, '.fgos', 'workflow-runs', runId, 'events.jsonl'), '{not json\n');
+
+  const items = collectOpenQuestions(root);
+
+  assert.equal(items.length, 1);
+  assert.equal(items[0].stage, 'execution');
+  assert.equal(items[0].ref, `workflow:${runId}`);
+  assert.match(items[0].question, /^unreadable workflow case: .*corrupt/);
+  assert.equal(items[0].answerDoor, `fgos workflow status ${runId}`);
+});
+
 test('nothing open renders one plain line', () => {
   assert.equal(renderOpenQuestions(collectOpenQuestions(makeFixtureDir('fgos-open-questions-empty-'))), 'No open owner questions.');
 });

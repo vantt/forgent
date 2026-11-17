@@ -2264,11 +2264,6 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       return computedSchedule(dir, candidateIds);
     }
 
-    // Read-only door onto lintPlanCapabilityAnnotations (src/report/
-    // capability-plan-lint.mjs): a plan author's own static check, never
-    // wired into `doctor` or any automatic gate. The runner config is THIS
-    // repo's own live config, read via `loadRunnerConfigForDir`, which never
-    // writes, so a read-only lint never mutates state as a side effect of being run.
     // Read-only portfolio verb: the open owner questions of the discussion, plan and execution stages,
     // read through src/portfolio and never written.
     case 'questions': {
@@ -2277,6 +2272,11 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       return { questions: collectOpenQuestions(path.dirname(dir)) };
     }
 
+    // Read-only door onto lintPlanCapabilityAnnotations (src/report/
+    // capability-plan-lint.mjs): a plan author's own static check, never
+    // wired into `doctor` or any automatic gate. The runner config is THIS
+    // repo's own live config, read via `loadRunnerConfigForDir`, which never
+    // writes, so a read-only lint never mutates state as a side effect of being run.
     case 'plan-lint': {
       const rawPath = optionalField(positional[0], 'plan-lint requires a <path> to a plan directory, plan.md, or phase file, e.g. `fgos plan-lint plans/<track>`.');
       if (rawPath === undefined) {

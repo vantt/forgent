@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "07ccc90de78d217afca21049045198be718b596a91db0b4fc69ce257f4a9dcf7",
+  "payloadDigest": "7c7ed43c5a5e5acb92709dcf9a0849c08e768d7a7df3f7d7c566127b612eeeee",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "68bd36c02991c59a52f206cb092605f9aa16d218d0f52eb2cb34d1db8d4d9ace",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -141,7 +141,7 @@
     "apps/fgos/tests/windows_semantics_probe.rs": "ecb59690bbf1259baa1defb6417c24005138526bb565f216f9db3c2ad784d240",
     "apps/fgos/tests/windows_support/mod.rs": "2b8a17676526c87ea5ecfb2074a70a3511fbf9267f9de78a35dc355f272830fb",
     "bin/fgos-runner.mjs": "24fa9b497547a104912b90ab98b3d53fbbe0068a5977a7a04724789c8e717156",
-    "bin/fgos.mjs": "6d086a8c09ee71d8e4a72ebed982f48038de4e724ca2b5e56753126274ed6899",
+    "bin/fgos.mjs": "7b53b51bdbf0986c0771534eae6d1040b36f605cb209c0d9649fe56edecbfb07",
     "core/skills/_shared/capability-catalog.md": "5b53b25182fc2834519869b19d3076dd2635f4eec889966eaa3425d82537b49a",
     "core/skills/_shared/capability-matching.md": "eb67cde05d45c171c1d4803f9d2fbec5fc63565b9fd0a0549c866a7eb262521d",
     "core/skills/_shared/catchup-self-recovery.md": "3b77650c71a0225f00ffa8fe9524d7c0052977204f425c1999225b6f80802c69",
@@ -1051,7 +1051,7 @@
     "src/observe/approve-fault-log.mjs": "43005f90192376164aa68c1877da5f20020b03de47b85bca7b3f381baa003077",
     "src/observe/friction-client.mjs": "fed25bf075c01a565f255762a06cf2c714c7145a29b8086bdbfcf58e543d5d40",
     "src/observe/invocation-fault-log.mjs": "6788526f7fb07984c92d03c66603f88c5eb73fa4501fbf2a541e5fbe42fc319f",
-    "src/portfolio/open-questions.mjs": "1d3f36c6adfbe522379bfda99bb0e1b3643644b0fb62e3331288785067741a12",
+    "src/portfolio/open-questions.mjs": "be5c3ae3c91c4ef63a33fd2f16e6af5f47cdd61294db438ed9fd4a8e14d31eb2",
     "src/portfolio/plan-sections.mjs": "71767079e1cb3a3831737d031048c64f97f473fc830503b0feb70a3e33da9829",
     "src/report/authoritative-match.mjs": "4678762776ac5a748426cee142ab90a474f479374205d3997a5cb92e26277a1c",
     "src/report/capability-plan-lint.mjs": "9dc219714a73cc7bbd6cfb1675b69703c78c38859b93192b02730dc46789ac85",
