@@ -1,0 +1,86 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "session-host/host-port.v1.json",
+  "title": "Session Host port, version 1",
+  "description": "The one port that places an agent session: start, alive, front, retire. Adapters: terminal (Terminal Control), direct (screenless prepared command). Spec: docs/platform/session-host/spec.md.",
+  "contract": { "id": "session-host-port", "version": 1 },
+  "$defs": {
+    "key": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$", "description": "Same key shape as terminal-control; for a run the attempt id, for a head session <persona>-<name>." },
+    "host": { "enum": ["terminal", "direct"] },
+    "display": { "type": "object", "description": "Terminal Control display fields; written to the screen only, never read back.", "additionalProperties": true },
+    "opening": {
+      "type": "object",
+      "required": ["text", "delivery"],
+      "additionalProperties": false,
+      "properties": {
+        "text": { "type": "string", "minLength": 1, "description": "The full opening text, never a pointer to a file." },
+        "delivery": { "enum": ["typed", "argument", "file"], "description": "typed: through the shared delivery step into the composer, visibly (terminal only). argument or file: a screenless host passes it itself." }
+      }
+    },
+    "placement": {
+      "type": "object",
+      "required": ["host", "key"],
+      "additionalProperties": false,
+      "properties": {
+        "host": { "$ref": "#/$defs/host" },
+        "key": { "$ref": "#/$defs/key" },
+        "display": { "$ref": "#/$defs/display" }
+      }
+    },
+    "refusal": {
+      "type": "object",
+      "required": ["result", "code"],
+      "additionalProperties": false,
+      "properties": {
+        "result": { "enum": ["unsupported", "unknown"] },
+        "code": { "enum": ["head-needs-interactive-host", "host-unsupported-here", "opening-delivery-unsupported", "pane-not-ready", "placement-unknown", "key-in-use", "unknown"] },
+        "detail": { "type": "string" }
+      }
+    },
+    "startRequest": {
+      "type": "object",
+      "required": ["host", "key", "cwd", "command"],
+      "additionalProperties": false,
+      "properties": {
+        "host": { "$ref": "#/$defs/host" },
+        "key": { "$ref": "#/$defs/key" },
+        "groupKey": { "$ref": "#/$defs/key", "description": "Panes of one group share a tab (terminal only)." },
+        "beside": { "$ref": "#/$defs/key", "description": "Open next to this existing placement (terminal only)." },
+        "cwd": { "type": "string", "minLength": 1 },
+        "env": { "type": "object", "additionalProperties": { "type": "string" } },
+        "command": { "type": "string", "minLength": 1, "description": "The prepared command. For direct it is already contained: the adapter never builds containment." },
+        "args": { "type": "array", "items": { "type": "string" } },
+        "opening": { "$ref": "#/$defs/opening" },
+        "display": { "$ref": "#/$defs/display" },
+        "role": { "enum": ["worker", "head"], "default": "worker", "description": "head on host direct is refused." }
+      }
+    }
+  },
+  "operations": {
+    "start": {
+      "request": { "$ref": "#/$defs/startRequest" },
+      "answer": { "oneOf": [ { "$ref": "#/$defs/placement" }, { "$ref": "#/$defs/refusal" } ] },
+      "rules": [
+        "terminal: Terminal Control allocate, then launch (quoted line), then, only when opening is given, await_ready and deliver_brief through fgos-agent-protocol over the port's own PaneIo.",
+        "direct: starts the prepared command without a screen; opening.delivery must be argument or file, typed is refused with opening-delivery-unsupported.",
+        "role head with host direct answers unsupported / head-needs-interactive-host.",
+        "a key that already has a live placement answers that placement; it never starts a second one."
+      ]
+    },
+    "alive": {
+      "request": { "type": "object", "required": ["placement"], "additionalProperties": false, "properties": { "placement": { "$ref": "#/$defs/placement" } } },
+      "answer": { "type": "object", "required": ["result"], "additionalProperties": false, "properties": { "result": { "enum": ["live", "gone", "unknown"] }, "detail": { "type": "string" } } },
+      "rules": ["unknown is never turned into gone.", "answers whether the placement exists; who the session is and whether it is the live holder of a role stays Identity's."]
+    },
+    "front": {
+      "request": { "type": "object", "required": ["placement"], "additionalProperties": false, "properties": { "placement": { "$ref": "#/$defs/placement" } } },
+      "answer": { "oneOf": [ { "type": "object", "required": ["result"], "additionalProperties": false, "properties": { "result": { "const": "fronted" } } }, { "$ref": "#/$defs/refusal" } ] },
+      "rules": ["terminal: the focus operation of Terminal Control.", "direct and any screenless host: unsupported."]
+    },
+    "retire": {
+      "request": { "type": "object", "required": ["placement", "disposition"], "additionalProperties": false, "properties": { "placement": { "$ref": "#/$defs/placement" }, "disposition": { "enum": ["close", "retain"] } } },
+      "answer": { "oneOf": [ { "type": "object", "required": ["result"], "additionalProperties": false, "properties": { "result": { "const": "retired" } } }, { "$ref": "#/$defs/refusal" } ] },
+      "rules": ["terminal: Terminal Control release; only a pane the port started is closed, never a tab.", "retiring a placement already gone answers retired."]
+    }
+  }
+}
