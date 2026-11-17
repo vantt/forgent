@@ -1370,3 +1370,86 @@ mod tests {
         assert_eq!(run_claude_step(&args, &env, &BoundedRunner), Ok(()));
     }
 }
+
+#[cfg(test)]
+mod agy_standard_settings_tests {
+    use super::*;
+    use fgos_config::schema::Schemas;
+    use fgos_config::standard::Standard;
+
+    /// `(invocation id, None when its `--settings` value equals `agy_permissions_default()`, else why not)`
+    /// for every invocation whose command is `agy`, across every executor of `runner.executors`.
+    fn agy_settings_verdicts(executors: &Value) -> Vec<(String, Option<String>)> {
+        let mut verdicts = Vec::new();
+        for executor in executors.as_object().into_iter().flat_map(|m| m.values()) {
+            let invocations = executor["invocations"].as_array().into_iter().flatten();
+            for invocation in invocations.filter(|i| i["command"] == "agy") {
+                let id = invocation["id"].as_str().unwrap_or("<no id>").to_string();
+                let args: Vec<&str> = invocation["args"]
+                    .as_array()
+                    .into_iter()
+                    .flatten()
+                    .filter_map(Value::as_str)
+                    .collect();
+                let settings = args
+                    .iter()
+                    .position(|a| *a == "--settings")
+                    .and_then(|i| args.get(i + 1));
+                let verdict = match settings.map(|s| serde_json::from_str::<Value>(s)) {
+                    None => Some("no --settings value".to_string()),
+                    Some(Err(e)) => Some(format!("--settings is not JSON: {e}")),
+                    Some(Ok(v)) if v != agy_permissions_default() => Some(format!(
+                        "--settings {v} differs from agy_permissions_default()"
+                    )),
+                    Some(Ok(_)) => None,
+                };
+                verdicts.push((id, verdict));
+            }
+        }
+        verdicts
+    }
+
+    fn standard_executors() -> Value {
+        let (schemas, _) = Schemas::bundled().unwrap();
+        let standard = Standard::bundled(&schemas).unwrap();
+        standard.value()["runner"]["executors"].clone()
+    }
+
+    #[test]
+    fn every_agy_invocation_of_the_config_standard_passes_exactly_the_agy_permissions_default_as_its_settings(
+    ) {
+        let verdicts = agy_settings_verdicts(&standard_executors());
+        let ids: Vec<&str> = verdicts.iter().map(|(id, _)| id.as_str()).collect();
+        assert!(
+            ids.contains(&"agy-herdr-bwrap") && ids.contains(&"agy-cli-bwrap"),
+            "agy invocations found: {ids:?}"
+        );
+        let drift: Vec<_> = verdicts.iter().filter(|(_, v)| v.is_some()).collect();
+        assert!(
+            drift.is_empty(),
+            "agy --settings drifted from the deny list: {drift:?}"
+        );
+    }
+
+    #[test]
+    fn an_agy_invocation_whose_settings_lose_a_deny_rule_or_the_flag_is_named_as_drifted() {
+        let mut executors = standard_executors();
+        let gemini = executors["gemini"]["invocations"].as_array_mut().unwrap();
+        let args = gemini[0]["args"].as_array_mut().unwrap();
+        let at = args.iter().position(|a| a == "--settings").unwrap() + 1;
+        let mut settings: Value = serde_json::from_str(args[at].as_str().unwrap()).unwrap();
+        settings["permissions"]["deny"]
+            .as_array_mut()
+            .unwrap()
+            .pop();
+        args[at] = Value::String(settings.to_string());
+        let gemini_args = gemini[1]["args"].as_array_mut().unwrap();
+        gemini_args
+            .retain(|a| a != "--settings" && !a.as_str().is_some_and(|s| s.starts_with('{')));
+        let verdicts = agy_settings_verdicts(&executors);
+        assert!(
+            verdicts.iter().filter(|(_, v)| v.is_some()).count() == 2,
+            "{verdicts:?}"
+        );
+    }
+}

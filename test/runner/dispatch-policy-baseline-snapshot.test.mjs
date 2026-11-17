@@ -27,8 +27,10 @@ import { parseTierCell } from '../../src/runner/dispatch/tier-cell.mjs';
 import { resolveExecutorCommand } from '../../src/runner/dispatch/transport.mjs';
 
 // The session-only agy settings both gemini invocations pass: command permission with the deny list
-// of the agy-permissions-configured doctor row (agy_permissions_default in
-// packages/distribution/rust/src/agent_config.rs).
+// of the agy-permissions-configured doctor row. That the standard's agy --settings equal
+// agy_permissions_default() is owned by the Rust test
+// every_agy_invocation_of_the_config_standard_passes_exactly_the_agy_permissions_default_as_its_settings
+// (packages/distribution/rust/src/agent_config.rs); this literal only states the snapshot's expectation.
 const AGY_SETTINGS = JSON.stringify({
   toolPermission: 'always-proceed',
   permissions: {
