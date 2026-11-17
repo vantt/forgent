@@ -145,6 +145,10 @@ sessions, not in the secretary's chat.
   (`src/runner/agent-definitions.mjs`), CLI-agnostic. A head started with `claude --agent` would inject it a second,
   Claude-only way.
 - 2026-11-17 — Owner: "đồng ý, một cửa nạp persona cho cả hai nhánh". Minted SM-D6 (spine + host port).
+- 2026-11-17 — Miu proposed Sonnet in config. Owner: "hồi xưa ... chỉ khai mức thông minh và mức cố gắng, không khai
+  family. như vậy là làm cho persona hay capability?" Scout: Seat Binding declares tiers for capabilities, roles and
+  personas; effort lives in each family's tier cell. Owner: "đồng ý, Miu dùng tier standard mặc định. ... sao effort lại
+  nằm trong tier. tưởng 2 cái điều chỉnh độc lập."
 
 ## 6. Thiết kế đã chốt {#design}
 
