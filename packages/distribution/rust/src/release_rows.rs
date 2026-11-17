@@ -961,9 +961,13 @@ mod tests {
             process_cwd: &dir,
         };
         let row = check_legacy_node_payload_present(&cwd, &plain);
-        // The row names the entry the way the platform joins `libexec/legacy-node` and `bin/fgos.mjs`.
-        let named = Path::new("legacy-node").join("bin/fgos.mjs");
-        assert!(!row.passed && message(&row).contains(&named.display().to_string()));
+        // The row names the entry with the platform's own separators.
+        assert!(
+            !row.passed
+                && message(&row)
+                    .replace('\\', "/")
+                    .contains("legacy-node/bin/fgos.mjs")
+        );
     }
 
     #[test]
@@ -1258,6 +1262,8 @@ mod tests {
         counts(&row, 1, 0, 0);
     }
 
+    // The Git door does not trust a linked worktree on Windows (untrusted-worktree).
+    #[cfg(unix)]
     #[test]
     fn a_linked_worktree_is_judged_by_the_activation_of_its_own_directory_only() {
         let f = Fixture::new();

@@ -131,6 +131,8 @@ mod tests {
         assert!(status.success(), "git {args:?}");
     }
 
+    // The Git door does not trust a linked worktree on Windows (untrusted-worktree).
+    #[cfg(unix)]
     #[test]
     fn test_workspace_root_of_subdirectory_and_linked_worktree_is_the_main_checkout() {
         let scratch_dir = crate::test_scratch::scratch("fgctl-root");
