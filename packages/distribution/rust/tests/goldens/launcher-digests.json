@@ -1,5 +1,5 @@
 {
   "note": "sha256 of the launcher bodies the earlier Node module wrote, so the Rust bodies are pinned to the bytes already installed on machines",
   "sh": "c669cabae9ce658cca3ab3e91326e96d313a7512d4737e0641519ac5df6acf70",
-  "cmd": "9911a3eaf44dde825ccfccf1cdd6e276a6b59316e42c417b77f8404219590e2b"
+  "cmd": "d6a36c258f10617b1ec15854fe212f438245e6307458603ccf00ea1311c6a121"
 }

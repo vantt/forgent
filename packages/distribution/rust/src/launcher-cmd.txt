@@ -40,7 +40,7 @@ if not defined HEX goto refuse
 if not "!HEX:~64!"=="" goto refuse
 if "!HEX:~63,1!"=="" goto refuse
 set "REST=!HEX!"
-for %%C in (0 1 2 3 4 5 6 7 8 9 a b c d e f) do set "REST=!REST:%%C=!"
+for %%C in (0 1 2 3 4 5 6 7 8 9 a b c d e f) do if defined REST set "REST=!REST:%%C=!"
 if defined REST goto refuse
 set "WHY=the state root !STORE! is not an absolute path (set USERPROFILE or FGOS_STATE_ROOT)"
 set "ABS="
