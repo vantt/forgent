@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- A run that ran its verify command keeps the command, exit status, pass or fail and duration in its record: `verify` in the unit settlement, `unit-summary.json` and the `fgos run --json` result, where it used to say only `{ran:false}`.
+- `fgos dispatch inspect --attention --since <time>` lists the runs that need a person across every worktree of the project, one line each with the reason and the next command; it reads only and writes nothing.
 - Windows: a project on a UNC share (`\\host\share`) now gets an absolute agent-hook command, workspace root and payload path instead of a relative `UNC\...` path; one function, `fgos_process::path::plain_path`, now writes every Windows verbatim path, and an architecture-manifest door row fails any new hand-written strip.
 - `fgos doctor --fix` moves per-capability role and persona taste (`runner.capabilities.<x>.roles` and `.personas`) into `runner.roles` and `runner.personas`, where it applies to every capability, and drops capability seats; taste found in the global file is removed, and a conflict between two capabilities is left for you to settle with `fgos config set` or `unset`.
 - A registered workflow definition's unit may declare `tier`, covering every seat the unit runs.
