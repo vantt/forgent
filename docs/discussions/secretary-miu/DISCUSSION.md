@@ -130,6 +130,10 @@ sessions, not in the secretary's chat.
   Injection á. mà sao lại có tiết kiệm token ở đây nhỉ?" then "có, em tìm gì document unification, sẽ có về Agent
   Context Injection trong đó" -> found H3 Agent Context Engine in the documentation unification proposal. Owner wants
   Miu's model settled in this topic.
+- 2026-11-17 — Owner: "em đưa vụ token qua tài liệu đó chưa?" (not yet; now added to the proposal §4.7.2) and "suy nghĩ
+  thêm vụ adapter chỗ Terminal. và 1 luồng kích hoạt bật session. fgos run và fgos session có thật sự khác biệt rõ
+  rệt, có nên là 1 cửa nhưng 2 đường bên trong? tách nhánh và hội tụ tại 1 điểm?" Scout: run supervisor already
+  places an attempt `direct` (no pane) or `terminal` (`src/run-supervisor/direct-launch.mjs:185,208`).
 
 ## 6. Thiết kế đã chốt {#design}
 
