@@ -43,7 +43,7 @@ case "$1 $2" in
   "status server") sed "s#\"socket\":\"[^\"]*\"#\"socket\":\"$FAKE_HERDR_SOCKET\"#" "$dir/status-server.json" ;;
   "tab create") cat "$dir/tab-create.json" ;;
   "integration status") cat "$dir/integration-status.txt" ;;
-  "tab rename"|"pane rename"|"pane run"|"pane send-text"|"pane send-keys"|"agent prompt") cat "$dir/pane-close-ok.json" ;;
+  "tab rename"|"tab focus"|"pane rename"|"pane run"|"pane send-text"|"pane send-keys"|"agent prompt") cat "$dir/pane-close-ok.json" ;;
   "pane split") cat "$dir/pane-split.json" ;;
   "pane layout") cat "$dir/pane-layout-two-panes.json" ;;
   "agent explain") cat "$dir/agent-explain.json" ;;

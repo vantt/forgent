@@ -107,6 +107,7 @@ fn declares_what_herdr_can_do_after_one_probe() {
         "process.info",
         "activity.state",
         "label",
+        "focus",
         "layout.geometry",
     ] {
         assert!(caps.contains(&expected), "{expected} missing from {caps:?}");
@@ -174,6 +175,7 @@ fn each_capability_runs_the_expected_command() {
     assert_eq!(d.process_info("wS:p59Y").unwrap().shell_pid, 2785881);
     assert_eq!(d.activity("wS:p59Y").unwrap().state, "working");
     d.label_pane("wS:p59Y", "seat 1").unwrap();
+    d.focus("wS:p59Y").unwrap();
     assert_eq!(d.pane_liveness("wS:p59Y").unwrap(), PaneLiveness::Live);
     assert_eq!(d.layout_geometry("wS:p59Y").unwrap().panes.len(), 2);
 
@@ -190,6 +192,8 @@ fn each_capability_runs_the_expected_command() {
         "pane process-info --pane wS:p59Y",
         "agent get wS:p59Y",
         "pane rename wS:p59Y seat 1",
+        "pane get wS:p59Y",
+        "tab focus wS:tD2",
         "pane get wS:p59Y",
         "pane layout --pane wS:p59Y",
     ];

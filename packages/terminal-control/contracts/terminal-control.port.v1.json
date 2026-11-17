@@ -90,6 +90,11 @@
       "input": { "key": "key", "display": "display" },
       "results": ["ok", "unsupported", "unknown"]
     },
+    "focus": {
+      "input": { "key": "key; only a key the store holds, never a pane the core did not allocate or attach" },
+      "results": ["focused", "unsupported", "unknown"],
+      "effects": ["brings the slot's pane to the front for a person: herdr focuses the pane's current tab (herdr focuses a pane only by direction, never by id); nothing else changes and the record is never edited"]
+    },
     "capabilities": {
       "input": { "agents": "optional boolean: also answer agentKinds and integrations (two more herdr reads; omitted otherwise)" },
       "results": ["capabilities"],
@@ -106,6 +111,7 @@
     "launched": { "result": "launched", "identity": "identity" },
     "not-started": { "result": "not-started", "reason": "string" },
     "ok": { "result": "ok" },
+    "focused": { "result": "focused" },
     "foreground-not-agent": { "result": "foreground-not-agent", "reason": "string; nothing was typed: the pane's shell is in the foreground, or its foreground could not be read or identified" },
     "screen": { "result": "screen", "screen": "string" },
     "inspection": {

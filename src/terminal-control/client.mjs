@@ -87,7 +87,7 @@ function interpret({ status, signal, stdout, stderr, error, timedOut }, bin, op)
 
 /**
  * createTerminalControl({ hostBin, herdrBin, env, config, timeoutMs }) ->
- *   { allocate, attach, read, inspect, release, capabilities, reconcileScan,
+ *   { allocate, attach, read, inspect, focus, release, capabilities, reconcileScan,
  *     allocateAsync, releaseAsync }
  *
  * `hostBin` defaults to the active release's host (resolved on first call).
@@ -201,6 +201,8 @@ export function createTerminalControl({ hostBin, herdrBin, env, config, timeoutM
     attach: (request) => callSync('attach', request),
     read: (request) => callSync('read', request),
     inspect: (request) => callSync('inspect', request),
+    /** Bring the pane of a key this client allocated or attached to the front: `focused`, `unsupported` or `unknown`. */
+    focus: (request) => callSync('focus', request),
     release(request) {
       const result = callSync('release', request);
       if (result.result === 'released') groupOfKey.delete(request.key);

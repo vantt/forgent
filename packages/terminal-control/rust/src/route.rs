@@ -25,7 +25,7 @@ const EXIT_MISMATCH: i32 = 3;
 const CODE_BELOW_FLOOR: &str = "terminal-config-below-floor";
 const MAX_STDIN: u64 = 1024 * 1024;
 
-pub const OPS: [&str; 10] = [
+pub const OPS: [&str; 11] = [
     "allocate",
     "attach",
     "launch",
@@ -34,6 +34,7 @@ pub const OPS: [&str; 10] = [
     "inspect",
     "release",
     "label",
+    "focus",
     "capabilities",
     "reconcile-scan",
 ];
@@ -395,6 +396,13 @@ fn dispatch(
             let key: String = field(request, "key")?;
             let display: Display = field(request, "display")?;
             answer(core.label(&key, &display), ok_answer)
+        }
+        "focus" => {
+            let key: String = field(request, "key")?;
+            match core.focus(&key) {
+                Ok(()) => ("focused".into(), json!({})),
+                Err(refusal) => refusal_fields(&refusal),
+            }
         }
         "capabilities" => {
             let agents: Option<bool> = optional(request, "agents")?;

@@ -352,6 +352,30 @@ fn a_driver_without_the_capability_is_unsupported() {
 }
 
 #[test]
+fn focus_fronts_only_the_pane_of_a_key_the_store_holds() {
+    let driver = MemDriver::new(352, 69);
+    let held = core(&driver, &MeasuredSplit, state_dir("focus"));
+    let pane = held.allocate(&request("a", "g")).unwrap().slot.pane_id;
+    held.focus("a").unwrap();
+    assert_eq!(
+        driver.log.borrow().last().unwrap(),
+        &format!("focus {pane}")
+    );
+    let before = driver.log.borrow().len();
+    assert!(matches!(
+        held.focus("never-held"),
+        Err(Refusal::Unknown { .. })
+    ));
+    assert_eq!(driver.log.borrow().len(), before, "no pane was touched");
+    let bare = MemDriver::with_caps(352, 69, vec![]);
+    let bare_core = core(&bare, &MeasuredSplit, state_dir("focus-bare"));
+    assert!(matches!(
+        bare_core.focus("a"),
+        Err(Refusal::Unsupported { .. })
+    ));
+}
+
+#[test]
 fn invalid_keys_are_refused() {
     let driver = MemDriver::new(352, 69);
     let core = core(&driver, &MeasuredSplit, state_dir("keys"));

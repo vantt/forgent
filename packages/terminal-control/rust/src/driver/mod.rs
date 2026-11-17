@@ -8,7 +8,7 @@ use crate::port::{Refusal, ServerIncarnation};
 use serde::{Deserialize, Serialize};
 
 /// Capability names, exactly as `driver-capabilities.v1.json` spells them.
-pub const CAPABILITIES: [&str; 12] = [
+pub const CAPABILITIES: [&str; 13] = [
     "tab.create",
     "pane.split",
     "pane.close",
@@ -19,6 +19,7 @@ pub const CAPABILITIES: [&str; 12] = [
     "process.info",
     "activity.state",
     "label",
+    "focus",
     "layout.geometry",
     "server.incarnation",
 ];
@@ -197,6 +198,14 @@ pub trait TerminalDriver {
         })
     }
     fn label_pane(&self, pane: &str, label: &str) -> DriverResult<()>;
+    /// Bring the pane to the front for a person: its tab is focused. A driver
+    /// that cannot says so by name.
+    fn focus(&self, _pane: &str) -> DriverResult<()> {
+        Err(Refusal::Unsupported {
+            capability: "focus".into(),
+            detail: format!("driver {} cannot focus a pane", self.name()),
+        })
+    }
     /// Geometry of the tab holding `pane`: the rects the multiplexer reports, one read.
     fn layout_geometry(&self, pane: &str) -> DriverResult<TabGeometry>;
     /// The socket the driver talks to, when it can be named without asking the server.

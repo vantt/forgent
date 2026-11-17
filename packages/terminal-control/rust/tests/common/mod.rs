@@ -443,6 +443,10 @@ impl TerminalDriver for MemDriver {
             .push(format!("label.pane {pane} {label}"));
         Ok(())
     }
+    fn focus(&self, pane: &str) -> DriverResult<()> {
+        self.log.borrow_mut().push(format!("focus {pane}"));
+        Ok(())
+    }
     fn layout_geometry(&self, pane: &str) -> DriverResult<TabGeometry> {
         if self.vanish_on_layout.borrow().as_deref() == Some(pane) {
             self.vanish_on_layout.borrow_mut().take();

@@ -49,7 +49,7 @@ test('every port operation has a route op and only names results the port define
 });
 
 test('operations that touch the terminal can answer unsupported and unknown', () => {
-  for (const op of ['allocate', 'attach', 'launch', 'send', 'read', 'label']) {
+  for (const op of ['allocate', 'attach', 'launch', 'send', 'read', 'label', 'focus']) {
     assert.ok(port.operations[op].results.includes('unsupported'), op);
     assert.ok(port.operations[op].results.includes('unknown'), op);
   }

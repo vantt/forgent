@@ -952,6 +952,15 @@ impl<'a> Core<'a> {
             .label_pane(&record.pane_id, &display.pane_label(&record.group_key))
     }
 
+    /// Bring the pane of a key this store holds to the front. Never a pane
+    /// the core did not allocate or attach.
+    pub fn focus(&self, key: &str) -> Result<(), Refusal> {
+        self.need("focus")?;
+        let (store, _) = self.open()?;
+        let record = self.live_record(&store, key)?;
+        self.driver.focus(&record.pane_id)
+    }
+
     /// What the driver can do. A named anchor pane is answered by whether the
     /// driver resolves it; agent facts are read only when asked for.
     pub fn capabilities(&self, ask: CapabilitiesAsk) -> CapabilitiesReport {

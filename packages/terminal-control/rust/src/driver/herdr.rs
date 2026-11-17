@@ -594,6 +594,7 @@ fn probe(config: &HerdrConfig) -> (Vec<&'static str>, Option<String>) {
         "process.info",
         "activity.state",
         "label",
+        "focus",
     ];
     if matches!(exec(config, &["pane", "layout", "--help"], timeout), Ok(out) if out.status == Some(0))
     {
@@ -858,6 +859,19 @@ impl TerminalDriver for HerdrDriver {
     fn label_pane(&self, pane: &str, label: &str) -> DriverResult<()> {
         self.require("label")?;
         self.run(&["pane", "rename", pane, label]).map(|_| ())
+    }
+
+    /// herdr focuses a pane only by direction, never by id, so the pane's
+    /// current tab (read now, the pane may have moved) is the focus target.
+    fn focus(&self, pane: &str) -> DriverResult<()> {
+        self.require("focus")?;
+        let result = self.run(&["pane", "get", pane])?;
+        let tab = result
+            .get("pane")
+            .and_then(|p| text(p, "tab_id"))
+            .ok_or_else(|| unknown("herdr pane get answered no tab_id"))?
+            .to_string();
+        self.run(&["tab", "focus", &tab]).map(|_| ())
     }
 
     fn layout_geometry(&self, pane: &str) -> DriverResult<TabGeometry> {

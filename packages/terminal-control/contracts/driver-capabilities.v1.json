@@ -12,13 +12,14 @@
     { "name": "process.info", "meaning": "foreground process group and processes of a pane" },
     { "name": "activity.state", "meaning": "agent lifecycle state of the pane (idle, working, blocked, done)" },
     { "name": "label", "meaning": "set display labels of a tab or pane" },
+    { "name": "focus", "meaning": "bring a pane to the front for a person (herdr: focus the pane's tab)" },
     { "name": "layout.geometry", "meaning": "real rect of the tab area and of every pane in it" },
     { "name": "server.incarnation", "meaning": "identity of the multiplexer server process: peer credentials of its socket, then start time and boot id of that pid" }
   ],
   "drivers": {
     "herdr": {
-      "linux": ["tab.create", "pane.split", "pane.close", "pane.run", "send.text", "send.keys", "read.screen", "process.info", "activity.state", "label", "layout.geometry", "server.incarnation"],
-      "macos": ["tab.create", "pane.split", "pane.close", "pane.run", "send.text", "send.keys", "read.screen", "process.info", "activity.state", "label", "layout.geometry", "server.incarnation"],
+      "linux": ["tab.create", "pane.split", "pane.close", "pane.run", "send.text", "send.keys", "read.screen", "process.info", "activity.state", "label", "focus", "layout.geometry", "server.incarnation"],
+      "macos": ["tab.create", "pane.split", "pane.close", "pane.run", "send.text", "send.keys", "read.screen", "process.info", "activity.state", "label", "focus", "layout.geometry", "server.incarnation"],
       "windows": [],
       "absent": [],
       "notes": [

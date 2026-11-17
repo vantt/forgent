@@ -101,6 +101,8 @@ test('every operation of the port answers through the route', () => {
   assert.match(refused.reason, /shell/);
   assert.equal(tc.read({ key: 'k-one', lines: 5 }).screen, 'line one\nline two\n');
 
+  assert.equal(tc.focus({ key: 'k-one' }).result, 'focused');
+  assert.notEqual(tc.focus({ key: 'k-never-held' }).result, 'focused', 'a key the store does not hold is never focused');
   const inspection = tc.inspect({ key: 'k-one' });
   assert.equal(inspection.result, 'inspection');
   assert.equal(inspection.pane, 'live');

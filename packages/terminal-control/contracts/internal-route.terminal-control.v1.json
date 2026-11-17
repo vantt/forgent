@@ -4,7 +4,7 @@
   "description": "Internal route the Node client calls, one process per operation. Not a user verb. The caller serializes calls of one groupKey (one promise queue per coordinating process).",
   "argv": {
     "required": ["<op>", "--protocol 1", "--json"],
-    "op": { "enum": ["allocate", "attach", "launch", "send", "read", "inspect", "release", "label", "capabilities", "reconcile-scan"] }
+    "op": { "enum": ["allocate", "attach", "launch", "send", "read", "inspect", "release", "label", "focus", "capabilities", "reconcile-scan"] }
   },
   "stdin": {
     "shape": {
