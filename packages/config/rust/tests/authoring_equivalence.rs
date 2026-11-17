@@ -277,9 +277,28 @@ fn no_machine_or_owner_specific_string_is_in_the_standard_files() {
     for needle in fixture["scrub-search-strings"].as_array().unwrap() {
         let needle = needle.as_str().unwrap();
         for (name, text) in bundle::STANDARD {
+            let text = without_allowed(&fixture, text);
             assert!(!text.contains(needle), "{name}.yaml holds {needle:?}");
         }
     }
+}
+
+/// The text with each exactly allowed string removed, so a needle stays as strong for everything else.
+fn without_allowed(fixture: &Value, text: &str) -> String {
+    let mut kept = text.to_string();
+    for allowed in fixture["scrub-allowed-strings"].as_array().unwrap() {
+        kept = kept.replace(allowed.as_str().unwrap(), "");
+    }
+    kept
+}
+
+#[test]
+fn the_scrub_needles_still_catch_what_is_not_exactly_allowed() {
+    let fixture = fixture();
+    let allowed = fixture["scrub-allowed-strings"][0].as_str().unwrap();
+    assert_eq!(without_allowed(&fixture, allowed), "");
+    let other = format!("{allowed}\n.gemini/antigravity-cli/other-token");
+    assert!(without_allowed(&fixture, &other).contains("token"));
 }
 
 #[test]

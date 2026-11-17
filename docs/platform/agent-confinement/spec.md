@@ -496,6 +496,7 @@ trong pane (`agentKnownToHerdr: detected`, trạng thái `unknown` → `working`
 mask và `--unshare-pid` giữ nguyên. agy chưa chứng minh được: `agy-herdr-bwrap` hỏng cả khi không blind
 (`foreground process ... does not match prepared command argv`), `agy-cli-bwrap` dừng vì hết quota
 của tài khoản.
+Cập nhật 2026-11-17 (D-ADR0078): agy đã được chứng minh lại. `agy-cli-bwrap` (`unit-run-1794892920619-ac12c197`) chạy qua bwrap và `agy-herdr-bwrap` (`unit-run-1794893048929-c81ec7a0`) chạy trong pane herdr, cả hai trên tài khoản tetnu; herdr chỉ qua khi agy có `toolPermission: always-proceed` cho phiên, nếu không pane dừng ở lời nhắc duyệt lệnh (`unit-run-1794892958472-fcb91107`). Dòng trên là kết quả của canary 2026-10-05, giữ nguyên như lịch sử.
 
 Dispatch `blind` bị **từ chối, không bao giờ chạy không-blind**, với lý do có tên, trước khi
 spawn: `blind-requires-confinement` (mode không phải `required`/không có policy),
