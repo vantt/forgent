@@ -870,7 +870,10 @@ mod tests {
             ..Fake::default()
         };
         let answer = serde_json::to_value(data(run(&fake, Path::new("/p")))).unwrap();
-        assert_eq!(answer["dir"], "/p/.fgos");
+        assert_eq!(
+            answer["dir"],
+            Path::new("/p").join(".fgos").to_str().unwrap()
+        );
         assert_eq!(answer["legacyConfig"], json!(["copy", "finish"]));
         assert_eq!(answer["legacyConfigNote"], GLOBAL_MOVED_NOTE);
         assert_eq!(answer["gitHeadless"], true);

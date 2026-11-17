@@ -569,7 +569,13 @@ mod tests {
         ));
         let _ = std::fs::remove_dir_all(&dir);
         std::fs::create_dir_all(&dir).unwrap();
-        std::fs::canonicalize(dir).unwrap()
+        // Canonical, without the `\\?\` form Windows adds: the doors answer plain paths there and `/` or `..` in a
+        // verbatim path is not read as a separator.
+        let canonical = std::fs::canonicalize(dir).unwrap();
+        match canonical.to_str().and_then(|p| p.strip_prefix(r"\\?\")) {
+            Some(plain) => PathBuf::from(plain),
+            None => canonical,
+        }
     }
 
     /// A main checkout laid out on disk the way the host reads it (no Git process): `main/.git` and a store,
@@ -892,7 +898,7 @@ mod tests {
         std::fs::create_dir_all(base.join("elsewhere")).unwrap();
         let wire = route(serde_json::json!({"selector": "wire-agents", "store": "none"}));
         let lifecycle = Recorder::new(true);
-        let main = std::fs::canonicalize(base.join("main")).unwrap();
+        let main = base.join("main");
         for rest in [
             vec![],
             vec!["--dir", base.join("elsewhere").to_str().unwrap()],
