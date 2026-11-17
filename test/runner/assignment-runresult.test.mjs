@@ -394,8 +394,7 @@ test('mutating assignment with uncommitted modified file captures real changedFi
     executors: {
       claude: {
         kind: 'agent',
-        command: process.execPath,
-        args: [executorScript, '{prompt}'],
+        invocations: [{ id: 'claude-cli', via: 'cli', command: process.execPath, args: [executorScript, '{prompt}'] }],
         allowCrossProvider: true,
       },
     },
@@ -1334,8 +1333,7 @@ test('executeAssignment captures gitBefore pre-launch when the worker commits th
     executors: {
       claude: {
         kind: 'agent',
-        command: process.execPath,
-        args: [executorScript, '{prompt}'],
+        invocations: [{ id: 'claude-cli', via: 'cli', command: process.execPath, args: [executorScript, '{prompt}'] }],
         allowCrossProvider: true,
       },
     },
@@ -1411,8 +1409,7 @@ test('executeAssignment captures gitBefore pre-launch when the worker commits th
     executors: {
       claude: {
         kind: 'agent',
-        command: process.execPath,
-        args: [executorScript, '{prompt}'],
+        invocations: [{ id: 'claude-cli', via: 'cli', command: process.execPath, args: [executorScript, '{prompt}'] }],
         allowCrossProvider: true,
       },
     },
@@ -1760,7 +1757,7 @@ function scopedWriteRun({ writes, claim, stage = 'executing', operation = 'imple
     process.exit(0);
   `);
   const runnerConfig = {
-    executors: { claude: { kind: 'agent', command: process.execPath, args: [executorScript, '{prompt}'], allowCrossProvider: true } },
+    executors: { claude: { kind: 'agent', invocations: [{ id: 'claude-cli', via: 'cli', command: process.execPath, args: [executorScript, '{prompt}'] }],  allowCrossProvider: true } },
     modelPolicies: { claude: { standard: 'test-model' } },
     timeoutMs: 5000,
   };

@@ -141,17 +141,13 @@ export function findAgySubHomes(cwd = process.cwd(), { homeDir = process.env.HOM
   if (runner.executors && typeof runner.executors === 'object') {
     for (const [executorId, exec] of Object.entries(runner.executors)) {
       if (!exec || typeof exec !== 'object') continue;
-      checkEnv(exec.env, {
-        executorId,
-        command: exec.command,
-      });
       if (Array.isArray(exec.invocations)) {
         for (const inv of exec.invocations) {
           if (inv && typeof inv === 'object') {
             checkEnv(inv.env, {
               executorId,
               invocationId: inv.id,
-              command: inv.command ?? exec.command,
+              command: inv.command,
             });
           }
         }

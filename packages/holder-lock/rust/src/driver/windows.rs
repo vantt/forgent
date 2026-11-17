@@ -228,15 +228,7 @@ impl LockDriver for LockFileExDriver {
             buf.resize(len + 1, 0);
         }
         let path = std::ffi::OsString::from_wide(&buf);
-        let text = path.to_string_lossy();
-        // `\\?\UNC\server\share` -> `\\server\share`; `\\?\C:\x` -> `C:\x`.
-        Ok(match text.strip_prefix(r"\\?\UNC\") {
-            Some(rest) => PathBuf::from(format!(r"\\{rest}")),
-            None => match text.strip_prefix(r"\\?\") {
-                Some(rest) => PathBuf::from(rest),
-                None => PathBuf::from(path),
-            },
-        })
+        Ok(fgos_process::path::plain_path_unc_share(Path::new(&path)))
     }
 
     fn holders(&self, _file: &File) -> HoldersList {

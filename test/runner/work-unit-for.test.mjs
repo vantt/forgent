@@ -152,14 +152,14 @@ test('prefer names the step executor only when it is configured', () => {
   assert.equal(none.unitData.prefer, undefined);
   const boundCfg = bindable({
     executor: { command: 'claude', args: ['{prompt}'] },
-    executors: { claude: { kind: 'agent', providerModel: 'claude', command: 'claude', args: ['{prompt}'] } },
+    executors: { claude: { kind: 'agent', providerModel: 'claude', invocations: [{ id: 'claude-cli', via: 'cli', command: 'claude', args: ['{prompt}'] }] } },
     modelPolicies: { claude: { standard: 'sonnet' } },
     capabilities: { 'fgos-coding-implement': { prefer: 'claude' } },
   });
   const viaCapability = workUnitFor(item(), { cfg: boundCfg, worktree: '/wt' });
   assert.deepEqual(viaCapability.unitData.prefer, ['claude'], 'the soft prefer is the executor Seat Binding binds for the step');
   const direct = workUnitFor(item(), {
-    cfg: { executors: { 'fgos-coding-implement': { command: 'x' } } },
+    cfg: { executors: { 'fgos-coding-implement': { invocations: [{ id: 'fgos-coding-implement-cli', via: 'cli', command: 'x' }]} } },
     worktree: '/wt',
   });
   assert.deepEqual(direct.unitData.prefer, ['fgos-coding-implement']);
@@ -168,7 +168,7 @@ test('prefer names the step executor only when it is configured', () => {
 test('a step purpose Seat Binding refuses leaves the Unit with no soft prefer, to be refused where it runs', () => {
   const refusedCfg = bindable({
     executor: { command: 'claude', args: ['{prompt}'] },
-    executors: { claude: { kind: 'agent', providerModel: 'claude', command: 'claude', args: ['{prompt}'] } },
+    executors: { claude: { kind: 'agent', providerModel: 'claude', invocations: [{ id: 'claude-cli', via: 'cli', command: 'claude', args: ['{prompt}'] }] } },
     modelPolicies: { claude: { standard: 'sonnet' } },
     capabilities: { 'fgos-coding-implement': { prefer: 'not-registered' } },
   });

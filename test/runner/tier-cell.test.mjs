@@ -132,7 +132,7 @@ function bindConfig(cell) {
     defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
     capabilities: { work: { prefer: [{ executor: 'fam' }] } },
     executors: {
-      fam: { kind: 'agent', providerModel: 'f', command: 'fam', invocations: [{ id: 'fam-cli', via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' } }] },
+      fam: { kind: 'agent', providerModel: 'f',  invocations: [{ id: 'fam-cli', via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' } }] },
     },
   };
 }
@@ -192,7 +192,7 @@ test('an object cell\'s effort reaches the binding as the cell\'s promise, and s
   const cfg = { modelPolicies: { claude: { advanced: [{ model: 'opus', effort: 'high' }, 'sonnet'] } } };
   assert.equal(supportsPolicyTier(cfg, 'claude', 'advanced'), true);
   const runnerConfig = bindConfig([{ model: 'opus', effort: 'high' }, 'sonnet']);
-  runnerConfig.executors.fam.command = 'claude';
+  for (const invocation of runnerConfig.executors.fam.invocations) invocation.command = 'claude';
   const result = bind(ask, { runnerConfig, ...headless });
   assert.ok(!result.refused, JSON.stringify(result.refused));
   assert.equal(result.model, 'opus');

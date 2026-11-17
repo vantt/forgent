@@ -1571,9 +1571,8 @@ export function checkTrustStoresReadable(cwd, runnerCfg = {}) {
   }
 
   for (const [id, executor] of Object.entries(runnerCfg.executors ?? {})) {
-    checkOne(executor?.interactiveMode?.trustStore, executor?.env, `executor "${id}"`);
     for (const inv of executor?.invocations ?? []) {
-      checkOne(inv?.interactiveMode?.trustStore, inv?.env ?? executor?.env, `executor "${id}" invocation "${inv?.id ?? '?'}"`);
+      checkOne(inv?.interactiveMode?.trustStore, inv?.env, `executor "${id}" invocation "${inv?.id ?? '?'}"`);
     }
   }
 
@@ -1608,8 +1607,8 @@ export function checkConfinedPaneAccounts(runnerCfg = {}, providerInventory = un
   const notes = [];
   for (const [id, executor] of Object.entries(runnerCfg.executors ?? {})) {
     for (const inv of executor?.invocations ?? []) {
-      const command = inv?.command ?? executor.command;
-      const store = credentialStoreOf(inv && { ...inv, command });
+      const command = inv?.command;
+      const store = credentialStoreOf(inv);
       if (!store) continue;
       const label = `executor "${id}" invocation "${inv.id ?? '?'}"`;
       // A CLI this machine does not have starts no pane, so its login is nobody's to find.
@@ -1648,20 +1647,22 @@ export function checkConfinedPaneAccounts(runnerCfg = {}, providerInventory = un
 export function checkExecutorConfinement(runnerCfg = {}) {
   const offenders = [];
   for (const [id, executor] of Object.entries(runnerCfg.executors ?? {})) {
-    if (executor?.permissionMode !== 'bypass') continue;
-    const c = executor.confinement ?? {};
-    const missing = [];
-    if (!(c.privateHome === true || c.controls?.home === 'private')) missing.push('privateHome');
-    if (!(c.isolatedSession === true || c.controls?.session === 'isolated')) missing.push('isolatedSession');
-    if (!(c.ownWorktree === true || c.controls?.workspace === 'own')) missing.push('ownWorktree');
-    if (missing.length > 0) offenders.push(`${id} (missing ${missing.join(', ')})`);
+    for (const inv of executor?.invocations ?? []) {
+      if (inv?.permissionMode !== 'bypass') continue;
+      const c = inv.confinement ?? executor.confinement ?? {};
+      const missing = [];
+      if (!(c.privateHome === true || c.controls?.home === 'private')) missing.push('privateHome');
+      if (!(c.isolatedSession === true || c.controls?.session === 'isolated')) missing.push('isolatedSession');
+      if (!(c.ownWorktree === true || c.controls?.workspace === 'own')) missing.push('ownWorktree');
+      if (missing.length > 0) offenders.push(`${id}/${inv.id ?? '?'} (missing ${missing.join(', ')})`);
+    }
   }
   if (offenders.length === 0) {
-    return { passed: true, message: 'every executor declaring bypass also declares full confinement' };
+    return { passed: true, message: 'every invocation declaring bypass also declares full confinement' };
   }
   return {
     passed: false,
-    message: `executors declare "permissionMode": "bypass" without full confinement: ${offenders.join('; ')}`,
+    message: `invocations declare "permissionMode": "bypass" without full confinement: ${offenders.join('; ')}`,
   };
 }
 
@@ -1682,7 +1683,6 @@ export function checkInvocationGitWriteGrants(runnerCfg = {}) {
   const offenders = [];
   if (grantsGitWrite(runnerCfg.executor?.args)) offenders.push('executor');
   for (const [id, executor] of Object.entries(runnerCfg.executors ?? {})) {
-    if (grantsGitWrite(executor?.args)) offenders.push(`executors.${id}`);
     for (const invocation of executor?.invocations ?? []) {
       if (grantsGitWrite(invocation?.args)) offenders.push(`executors.${id}.invocations.${invocation.id ?? '?'}`);
     }
@@ -1726,11 +1726,9 @@ const HERDR_KIND_TO_INTEGRATION = Object.freeze({ agy: 'antigravity-cli' });
  * any more, a missing hook costs latency and precision rather than
  * correctness.
  */
-/** An executor's own declared invocation shape (legacy, no `invocations[]`)
- * still needs an `adapter` to check, so this falls back to the executor
- * itself when no `via: 'cli'` entry exists. */
+/** The first `via: 'cli'` invocation of an executor entry; undefined when it has none. */
 function resolveCliInvocation(executor) {
-  return (executor?.invocations ?? []).find((i) => i.via === 'cli') ?? executor;
+  return (executor?.invocations ?? []).find((i) => i.via === 'cli');
 }
 
 export function checkHerdrExecutorKinds(runnerCfg = {}, ask = askHerdrFacts) {
@@ -2530,12 +2528,11 @@ export function checkConfinementHerdrMaturity(cwd) {
     return { passed: true, status: 'skip', message: `runner config not readable, herdr maturity check skipped: ${err.message}` };
   }
   const executors = runner?.executors || {};
-  const herdrExecutors = Object.entries(executors)
-    .filter(([_, exec]) => {
-      if (!exec || typeof exec !== 'object') return false;
-      const invocation = resolveCliInvocation(exec);
-      return invocation.adapter === 'herdr-spawn';
-    });
+  // Every herdr-spawn cli invocation of every executor, not only the first cli one.
+  const herdrInvocations = Object.entries(executors).flatMap(([id, exec]) => (exec && typeof exec === 'object' ? exec.invocations ?? [] : [])
+    .filter((inv) => inv?.via === 'cli' && inv.adapter === 'herdr-spawn')
+    .map((invocation) => ({ id, exec, invocation })));
+  const herdrExecutors = [...new Set(herdrInvocations.map((entry) => entry.id))];
 
   if (herdrExecutors.length === 0) {
     return {
@@ -2547,15 +2544,15 @@ export function checkConfinementHerdrMaturity(cwd) {
 
   // Validate bypass pairing on herdr executors
   const invalidBypass = [];
-  for (const [id, exec] of herdrExecutors) {
-    if (exec.permissionMode === 'bypass') {
-      const conf = exec.confinement;
+  for (const { id, exec, invocation } of herdrInvocations) {
+    if (invocation.permissionMode === 'bypass') {
+      const conf = invocation.confinement ?? exec.confinement;
       const normalized = conf ? normalizeLegacyConfinement(conf) : null;
       const hasWorkspace = Boolean(normalized?.controls?.workspace === 'own' || conf?.ownWorktree);
       const hasHome = Boolean(normalized?.controls?.home === 'private' || conf?.privateHome);
       const hasSession = Boolean(normalized?.controls?.session === 'isolated' || conf?.isolatedSession);
       if (!hasWorkspace || !hasHome || !hasSession) {
-        invalidBypass.push(id);
+        invalidBypass.push(`${id}/${invocation.id ?? '?'}`);
       }
     }
   }

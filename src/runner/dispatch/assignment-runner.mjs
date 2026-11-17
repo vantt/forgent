@@ -169,7 +169,7 @@ function declaredStoreCli(cfg, executorId, pinnedInvocationId) {
   const entry = cfg?.executors?.[executorId] ?? cfg?.executor;
   const invocations = Array.isArray(entry?.invocations) ? entry.invocations.filter((inv) => inv?.via === 'cli') : [];
   const invocation = pinnedInvocationId ? invocations.find((inv) => inv.id === pinnedInvocationId) : invocations[0];
-  return invocation ? (credentialStoreOf({ ...invocation, command: invocation.command ?? entry.command })?.use ?? null) : null;
+  return invocation ? (credentialStoreOf(invocation)?.use ?? null) : null;
 }
 
 /** The existence and sha256 of each file dirty before the launch, so a later change to one is seen. */
@@ -402,6 +402,11 @@ function validateAssignmentLegality(asgn, opts = {}) {
 
 /** The CLIs whose screens the terminal adapters of the agent protocol know. */
 const TERMINAL_CLIS = new Set(['claude', 'codex', 'agy', 'pi', 'omp']);
+
+/** How the prompt reaches a pane worker: what the resolved command declares, else inline. */
+export function terminalPromptDelivery(resolvedCmd) {
+  return resolvedCmd.promptDelivery ?? 'inline';
+}
 
 /**
  * The argv an interactive agent starts with in a pane: the executor's own args without the prompt (the
@@ -986,7 +991,7 @@ async function buildLaunch(attempt, ctx) {
       confinement: resolvedCmd.confinement,
       permissionMode: resolvedCmd.permissionMode,
       agentKind: interactive.kind ?? path.basename(prepResult.attempt.command),
-      delivery: opts.promptDelivery ?? process.env.FGOS_HERDR_PROMPT_DELIVERY?.trim() ?? resolvedCmd.promptDelivery ?? 'inline',
+      delivery: terminalPromptDelivery(resolvedCmd),
       trustStore: interactive.trustStore,
       // claude asks for trust on the run directory it is granted too, not only on its working directory.
       trustAlso: interactive.kind === 'claude' ? addDirsOf(attemptArgs) : [],

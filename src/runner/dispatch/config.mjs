@@ -430,17 +430,17 @@ function warnIfProviderFamilyUnreliable(executorId, executor) {
     ? executor.invocations.find((inv) => inv.via === 'cli')?.command
     : undefined;
   if (typeof cliInvocationCommand === 'string' && cliInvocationCommand.trim()) return;
-  const command = executor.command;
-  if (typeof command === 'string' && command.trim() && CLAUDE_CLI_COMMANDS.includes(command)) return;
-  const commandDescription = typeof command === 'string' && command.trim() ? JSON.stringify(command) : 'none resolvable from its config';
   console.warn(
-    `fgos: executor "${executorId}" declares no "providerModel"/"provider" and its command ` +
-      `(${commandDescription}) is not a recognized Claude CLI command — its resolved provider ` +
+    `fgos: executor "${executorId}" declares no "providerModel"/"provider" and no invocation yields a command ` +
+      `— its resolved provider ` +
       `family may be unreliable/inconsistent across dispatch code paths. Declare "providerModel" explicitly.`,
   );
 }
 
 const CONFINEMENT_FLAGS = ['privateHome', 'isolatedSession', 'ownWorktree'];
+
+/** The launch fields an invocation carries; an executor entry no longer holds any of them. */
+const LAUNCH_FIELDS_OF_AN_INVOCATION = Object.freeze(['command', 'args', 'adapter', 'env', 'permissionMode', 'promptDelivery', 'interactiveMode', 'liveOutput', 'resourceBindings']);
 
 /**
  * Declarations that no longer mean anything, and why: no schema node describes a removed key, so a config that
@@ -449,6 +449,7 @@ const CONFINEMENT_FLAGS = ['privateHome', 'isolatedSession', 'ownWorktree'];
 const REMOVED_EXECUTOR_FIELDS = Object.freeze({
   receipt: 'It had one legal value and no reader anywhere in the repo. The rule it stood for -- a round concludes only from a file the receiver wrote -- is not configurable and never was; it is what the herdr round does unconditionally.',
   trustStore: 'Declare it on "interactiveMode" instead, which is where the adapter reads it. It used to be declared at the executor level and read from interactiveMode, so its one validated kind guarded a field nothing consulted.',
+  ...Object.fromEntries(LAUNCH_FIELDS_OF_AN_INVOCATION.map((field) => [field, `Declare it on the invocation that launches (executors.<id>.invocations[]), the one place a launch field lives.`])),
   readOnlyRedirect: 'readOnlyRedirect was retired. Read-only posture is enforced by OS confinement (Phase 6).',
   // Spelled in two parts so the retired-vocabulary scan of src does not read this refusal as a live use.
   [['rigor', 'Overrides'].join('')]: 'express per-tier models in runner.modelPolicies.<family> instead.',
@@ -469,9 +470,9 @@ const REMOVED_RUNNER_KEYS = Object.freeze({
  * not ask before acting, which is only defensible when the worker is confined. The refusal names the missing flag,
  * because "confinement incomplete" sends a reader looking through three booleans for the one that is false.
  */
-function checkBypassIsConfined(executor, label) {
-  if (executor.permissionMode !== 'bypass') return;
-  const c = executor.confinement ?? {};
+function checkBypassIsConfined(invocation, label, executorConfinement) {
+  if (invocation.permissionMode !== 'bypass') return;
+  const c = invocation.confinement ?? executorConfinement ?? {};
   const present = {
     privateHome: c.privateHome === true || c.controls?.home === 'private',
     isolatedSession: c.isolatedSession === true || c.controls?.session === 'isolated',
@@ -488,7 +489,12 @@ function checkBypassIsConfined(executor, label) {
 }
 
 /** The rules of one invocation that read beyond its own fields: its tools against the catalog, its store against the confinement. */
-function checkInvocation(invocation, label, isRegistered, executorConfinement) {
+function checkInvocation(invocation, label, isRegistered, executorConfinement, canonicalPath) {
+  if (invocation.resourceBindings !== undefined) {
+    const detail = '"resourceBindings" was removed. Declare the login store the invocation reads as "credentialStore": { "use": <cli>, "homeEnv": <variable> }.';
+    throw new RunnerConfigError(`runner config (${label}) ${detail}`, { path: `${canonicalPath}.resourceBindings`, detail });
+  }
+  checkBypassIsConfined(invocation, label, executorConfinement);
   if (invocation.via === 'mcp') {
     for (const capabilityName of Object.keys(invocation.tools ?? {})) {
       if (!isRegistered(capabilityName)) {
@@ -508,10 +514,11 @@ function checkInvocation(invocation, label, isRegistered, executorConfinement) {
 }
 
 /** The rules of one `executors.<id>` entry that read beyond its own fields. */
-function checkExecutorEntry(executor, label, isRegistered) {
+function checkExecutorEntry(executor, label, isRegistered, executorId) {
   for (const [field, why] of Object.entries(REMOVED_EXECUTOR_FIELDS)) {
     if (executor[field] !== undefined) {
-      throw new RunnerConfigError(`runner config (${label}) "${field}" was removed. ${why}`);
+      const detail = `"${field}" was removed. ${why}`;
+      throw new RunnerConfigError(`runner config (${label}) ${detail}`, { path: `runner.executors.${executorId}.${field}`, detail });
     }
   }
   // `for` describes `kind: "tool"` executors; on an agent it is inert and `fgos doctor` names it.
@@ -522,10 +529,9 @@ function checkExecutorEntry(executor, label, isRegistered) {
       );
     }
   }
-  checkBypassIsConfined(executor, label);
   const seenInvocationIds = new Set();
   (executor.invocations ?? []).forEach((invocation, index) => {
-    checkInvocation(invocation, `${label} invocations[${index}]`, isRegistered, executor.confinement);
+    checkInvocation(invocation, `${label} invocations[${index}]`, isRegistered, executor.confinement, `runner.executors.${executorId}.invocations[${index}]`);
     if (invocation.id === undefined) return;
     if (seenInvocationIds.has(invocation.id)) {
       throw new RunnerConfigError(`runner config (${label}) "invocations" declares "id": "${invocation.id}" more than once — each invocation id must be unique within one executor.`);
@@ -747,7 +753,7 @@ export function validateRunnerConfigShape(cfg, sourceLabel) {
   }
   const isRegistered = (name) => registeredCapabilityOf(cfg, name) !== undefined;
   for (const [executorId, executor] of Object.entries(cfg.executors ?? {})) {
-    checkExecutorEntry(executor, `${sourceLabel} executors.${executorId}`, isRegistered);
+    checkExecutorEntry(executor, `${sourceLabel} executors.${executorId}`, isRegistered, executorId);
     warnIfProviderFamilyUnreliable(executorId, executor);
   }
   checkPreferTargets(cfg, sourceLabel);

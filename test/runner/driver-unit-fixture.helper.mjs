@@ -17,12 +17,14 @@ export function confinedUnitConfig(config = {}) {
   // The test's own executors stay as they are, for whatever else of the loop reads them.
   const executors = { ...(config.executors ?? {}) };
   for (const [id, entry] of Object.entries(source)) {
+    // The launch fields of a flat executor move onto the invocation: an executor entry holds none.
+    const { command, args, adapter: _adapter, env, permissionMode: _permissionMode, promptDelivery: _promptDelivery, interactiveMode: _interactiveMode, liveOutput: _liveOutput, ...rest } = entry;
     executors[`fixture-${id}`] = Array.isArray(entry.invocations) && entry.invocations.length > 0 ? entry : {
       kind: 'agent',
       allowCrossProvider: true,
       providerModel: 'node',
-      ...entry,
-      invocations: [{ id: 'cli', via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' }, command: entry.command, args: entry.args ?? [] }],
+      ...rest,
+      invocations: [{ id: 'cli', via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' }, command, args: args ?? [], ...(env ? { env } : {}) }],
     };
   }
   const first = Object.keys(executors).find((id) => id.startsWith('fixture-'));

@@ -22,19 +22,22 @@ export const LOOP_STEP_EXECUTORS = Object.freeze({
 function confinedEntry(entry) {
   if (!entry || typeof entry !== 'object') return entry;
   if (Array.isArray(entry.invocations) && entry.invocations.length > 0) return entry;
+  // The launch fields of the default executor move onto the invocation: an executor entry holds none.
+  const { command, args, adapter: _adapter, env, permissionMode: _permissionMode, promptDelivery: _promptDelivery, interactiveMode: _interactiveMode, liveOutput: _liveOutput, ...rest } = entry;
   return {
     kind: 'agent',
     allowCrossProvider: true,
     // An executor that names no family would be filed under its command path, which has no model cell.
     ...(entry.providerModel || entry.provider ? {} : { providerModel: 'claude' }),
-    ...entry,
+    ...rest,
     invocations: [{
       id: CONFINED_INVOCATION_ID,
       via: 'cli',
       adapter: 'cli-spawn',
       confinement: { backend: 'bwrap' },
-      command: entry.command,
-      args: entry.args ?? [],
+      command,
+      args: args ?? [],
+      ...(env ? { env } : {}),
     }],
   };
 }

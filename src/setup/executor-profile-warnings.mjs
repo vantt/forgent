@@ -30,9 +30,9 @@ function invocationsCliEntry(executorEntry) {
 function collectArgsAndEnv(executorEntry) {
   const cli = invocationsCliEntry(executorEntry);
   return {
-    args: cli?.args ?? executorEntry?.args ?? [],
-    env: cli?.env ?? executorEntry?.env ?? {},
-    command: cli?.command ?? executorEntry?.command,
+    args: cli?.args ?? [],
+    env: cli?.env ?? {},
+    command: cli?.command,
     providerModel: executorEntry?.providerModel,
   };
 }

@@ -176,7 +176,7 @@ test('dead vocabulary guard: the runner config check rejects dead keys with acti
   assert.throws(
     () => validateRunnerConfigShape({
       ...base,
-      executors: { gemini: { kind: 'agent', command: 'gemini', args: [], providerModel: 'gemini', rigorOverrides: { heavy: 'advanced' } } },
+      executors: { gemini: { kind: 'agent', invocations: [{ id: 'gemini-cli', via: 'cli', command: 'gemini', args: [] }],  providerModel: 'gemini', rigorOverrides: { heavy: 'advanced' } } },
     }, 'test'),
     (err) => err instanceof RunnerConfigError && /"rigorOverrides" was removed\. express per-tier models in runner\.modelPolicies/.test(err.message),
   );

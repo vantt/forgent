@@ -716,9 +716,6 @@ $defs:
             type: string
             pattern: "\\S"
         required: [streamFlags, renderer]
-      resourceBindings:
-        description: "Older form of the login store, read only to infer one."
-        type: array
     required: [via]
     allOf:
       - if:
@@ -787,34 +784,8 @@ $defs:
         description: "The responsibility a tool fills."
         type: string
         pattern: "\\S"
-      command:
-        x-fgos-scope: global-only
-        description: "The program to spawn when the executor has no invocations."
-        type: string
-        pattern: "\\S"
-      args:
-        x-fgos-scope: global-only
-        description: "Arguments of that program."
-        type: array
-        items:
-          type: string
-      adapter:
-        $ref: "#/$defs/adapterName"
-      env:
-        $ref: "#/$defs/envMap"
-      permissionMode:
-        x-fgos-scope: global-only
-        description: "Whether the worker asks before acting."
-        type: string
-        enum: [ask, bypass]
-      promptDelivery:
-        description: "How the prompt reaches the worker."
-        type: string
-        enum: [file-pointer, inline]
       confinement:
         $ref: "#/$defs/launchConfinement"
-      interactiveMode:
-        $ref: "#/$defs/interactiveMode"
       identity:
         description: "Who the executor is for audit."
         type: object
@@ -875,9 +846,6 @@ $defs:
           $ref: "#/$defs/invocation"
         minItems: 1
     required: [kind]
-    dependentRequired:
-      command: [args]
-      args: [command]
   accountSource:
     description: "Where the login of one account lives."
     type: object

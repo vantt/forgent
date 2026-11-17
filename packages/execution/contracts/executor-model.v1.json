@@ -1,6 +1,6 @@
 {
  "version": "executor-model.v1",
- "about": "Golden vectors of the executor model: what is derived from an executor entry and the machine, recorded from the Node functions that derive it today. A vector is { name, fact, entry?, runner?, machine?, args?, expect }. fact names the derivation; entry is one executor entry and runner the effective runner config the fact reads; machine describes the machine facts it reads (pathCommands: the only programs on PATH, registry: the confinement backend registry as absent/a document/raw text, home, accountState: the lease state file, files: relative path to text under the repository root, git: a repository with one commit); args are the remaining arguments; expect is the answer, a refusal being { error: { name, code?, message } }. A vector marked knownDefect records today's output of behaviour that looks wrong and is reported, not fixed. The two vectors that record the legacy resourceBindings read of credentialStore are deleted by the change that removes that read; until then a port keeps today's behaviour, as it does for a knownDefect. The doc is docs/platform/runner/contracts/executor-model.md.",
+ "about": "Golden vectors of the executor model: what is derived from an executor entry and the machine, recorded from the Node functions that derive it today. A vector is { name, fact, entry?, runner?, machine?, args?, expect }. fact names the derivation; entry is one executor entry and runner the effective runner config the fact reads; machine describes the machine facts it reads (pathCommands: the only programs on PATH, registry: the confinement backend registry as absent/a document/raw text, home, accountState: the lease state file, files: relative path to text under the repository root, git: a repository with one commit); args are the remaining arguments; expect is the answer, a refusal being { error: { name, code?, message } }. A vector marked knownDefect records today's output of behaviour that looks wrong and is reported, not fixed. The doc is docs/platform/runner/contracts/executor-model.md.",
  "facts": ["defaultExecutor","family","executorLookup","governance","capabilityConfinement","credentialStore","effortLevels","mechanism","posture","launchFacts","missingCli","accountQuarantine","accountInventory","llmAccounts","stateKey","toolProviders","validate"],
  "vectors": [
   {
@@ -384,18 +384,6 @@
    "name": "credentialStore: an env binding that is not the private home reads none",
    "fact": "credentialStore",
    "args": {"invocation":{"command":"pi","resourceBindings":[{"resource":"workspace","target":{"kind":"env","name":"X"}}]}},
-   "expect": null
-  },
-  {
-   "name": "credentialStore: a private-home env binding implies the store of the CLI the command runs",
-   "fact": "credentialStore",
-   "args": {"invocation":{"command":"/opt/bin/Pi","resourceBindings":[{"resource":"private-home","target":{"kind":"env","name":"PI_CODING_AGENT_DIR"}}]}},
-   "expect": {"use":"pi","homeEnv":"PI_CODING_AGENT_DIR"}
-  },
-  {
-   "name": "credentialStore: a private-home binding on a command-less invocation implies nothing",
-   "fact": "credentialStore",
-   "args": {"invocation":{"resourceBindings":[{"resource":"private-home","target":{"kind":"env","name":"PI_CODING_AGENT_DIR"}}]}},
    "expect": null
   },
   {
@@ -1537,15 +1525,21 @@
    "expect": {"error":{"name":"RunnerConfigError","message":"runner config (vector runner executors.t) \"for\" entry \"unknown-cap\" is not declared in \"capabilities\" — add it there first."}}
   },
   {
-   "name": "validate: bypass permission without full confinement names the missing flags",
+   "name": "validate: a launch field on the executor entry is refused by name",
    "fact": "validate",
-   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude","permissionMode":"bypass","confinement":{"privateHome":true}}}},
-   "expect": {"error":{"name":"RunnerConfigError","message":"runner config (vector runner executors.a) declares \"permissionMode\": \"bypass\" without full confinement -- missing isolatedSession, ownWorktree. A worker that never asks before acting is only defensible when it is confined, so bypass requires privateHome, isolatedSession, ownWorktree to all be true."}}
+   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude","permissionMode":"bypass"}}},
+   "expect": {"error":{"name":"RunnerConfigError","message":"runner config (vector runner executors.a) \"permissionMode\" was removed. Declare it on the invocation that launches (executors.<id>.invocations[]), the one place a launch field lives."}}
   },
   {
-   "name": "validate: bypass permission with full confinement is valid",
+   "name": "validate: an invocation with bypass permission and no full confinement names the missing flags",
    "fact": "validate",
-   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude","permissionMode":"bypass","confinement":{"privateHome":true,"isolatedSession":true,"ownWorktree":true}}}},
+   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude","invocations":[{"id":"cli","via":"cli","command":"claude","args":[],"permissionMode":"bypass"}],"confinement":{"privateHome":true}}}},
+   "expect": {"error":{"name":"RunnerConfigError","message":"runner config (vector runner executors.a invocations[0]) declares \"permissionMode\": \"bypass\" without full confinement -- missing isolatedSession, ownWorktree. A worker that never asks before acting is only defensible when it is confined, so bypass requires privateHome, isolatedSession, ownWorktree to all be true."}}
+  },
+  {
+   "name": "validate: an invocation with bypass permission and full confinement is valid",
+   "fact": "validate",
+   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude","invocations":[{"id":"cli","via":"cli","command":"claude","args":[],"permissionMode":"bypass"}],"confinement":{"privateHome":true,"isolatedSession":true,"ownWorktree":true}}}},
    "expect": {"ok":true}
   },
   {

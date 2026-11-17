@@ -664,7 +664,7 @@ test('loadRunnerConfigForDir refuses a global file that holds the retired rigorT
 test('the runner config check does not warn for a "executors.<id>" entry that declares providerModel explicitly', () => {
   const runner = {
     executor: { command: 'claude', args: ['{prompt}'] },
-    executors: { 'glm-cli': { kind: 'agent', providerModel: 'z-ai', command: 'glm', args: [] } },
+    executors: { 'glm-cli': { kind: 'agent', providerModel: 'z-ai', invocations: [{ id: 'glm-cli-cli', via: 'cli', command: 'glm', args: [] }] } },
     modelPolicies: { claude: { standard: 'sonnet' }, 'z-ai': { standard: 'glm-4.6' } },
     defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
     timeoutMs: 1000,
@@ -683,7 +683,7 @@ test('the runner config check does not warn for a "executors.<id>" entry that de
 test('the runner config check does not warn for a "executors.<id>" entry with a Claude CLI command and no providerModel (correct default case)', () => {
   const runner = {
     executor: { command: 'claude', args: ['{prompt}'] },
-    executors: { 'custom-claude-executor': { kind: 'agent', command: 'claude', args: ['{prompt}'] } },
+    executors: { 'custom-claude-executor': { kind: 'agent', invocations: [{ id: 'custom-claude-executor-cli', via: 'cli', command: 'claude', args: ['{prompt}'] }] } },
     modelPolicies: { claude: { standard: 'sonnet' } },
     defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
     timeoutMs: 1000,
@@ -699,10 +699,10 @@ test('the runner config check does not warn for a "executors.<id>" entry with a 
   }
 });
 
-test('the runner config check warns (never throws) for a "executors.<id>" entry with a non-Claude command and no providerModel/provider', () => {
+test('the runner config check warns (never throws) for an agent "executors.<id>" entry with no providerModel/provider and no invocation that yields a command', () => {
   const runner = {
     executor: { command: 'claude', args: ['{prompt}'] },
-    executors: { 'bare-nonclaude': { kind: 'agent', command: 'some-other-tool', args: [] } },
+    executors: { 'bare-agent': { kind: 'agent' } },
     modelPolicies: { claude: { standard: 'sonnet' } },
     defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
     timeoutMs: 1000,
@@ -713,8 +713,7 @@ test('the runner config check warns (never throws) for a "executors.<id>" entry 
   try {
     assert.doesNotThrow(() => validateRunnerConfigShape(runner, 'test'));
     assert.equal(calls.length, 1);
-    assert.match(calls[0][0], /bare-nonclaude/);
-    assert.match(calls[0][0], /some-other-tool/);
+    assert.match(calls[0][0], /bare-agent/);
   } finally {
     console.warn = original;
   }
@@ -765,34 +764,6 @@ test('the runner config check skips provider-family warning when every invocatio
   try {
     assert.doesNotThrow(() => validateRunnerConfigShape(runner, 'test'));
     assert.equal(calls.length, 0, 'warning must be skipped when every invocation is non-CLI');
-  } finally {
-    console.warn = original;
-  }
-});
-
-test('the runner config check still warns when an executor has a CLI invocation with unrecognized command and no providerModel (R8)', () => {
-  const runner = {
-    executor: { command: 'claude', args: ['{prompt}'] },
-    capabilities: { 'custom-job': {} },
-    executors: {
-      customTool: {
-        kind: 'agent',
-        for: ['custom-job'],
-        command: 'unrecognized-binary',
-        args: ['{prompt}'],
-      },
-    },
-    modelPolicies: { claude: { standard: 'sonnet' } },
-    defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
-    timeoutMs: 1000,
-  };
-  const original = console.warn;
-  const calls = [];
-  console.warn = (...args) => calls.push(args);
-  try {
-    assert.doesNotThrow(() => validateRunnerConfigShape(runner, 'test'));
-    assert.equal(calls.length, 1);
-    assert.match(calls[0][0], /customTool/);
   } finally {
     console.warn = original;
   }
@@ -956,7 +927,7 @@ test('resolveExecutorCommand throws for an unknown adapter even on a raw config 
 test('resolveExecutorCommand honors a executors.<executorId> override ahead of the global executor', () => {
   const cfg = {
     executor: { command: '/global/executor', args: ['{prompt}'] },
-    executors: { 'fgos-code-implement': { kind: 'agent', command: '/executor/executor', args: ['{prompt}'], allowCrossProvider: true } },
+    executors: { 'fgos-code-implement': { kind: 'agent', invocations: [{ id: 'fgos-code-implement-cli', via: 'cli', command: '/executor/executor', args: ['{prompt}'] }],  allowCrossProvider: true } },
     modelPolicies: { claude: { frontier: 'opus', standard: 'opus' }, node: { frontier: 'opus', standard: 'opus' } },
     timeoutMs: 5000,
   };
@@ -995,8 +966,7 @@ test('resolveExecutorCommand resolves "judge-decompose" through its own executor
     executors: {
       'judge-decompose': {
         kind: 'agent',
-        command: 'claude',
-        args: ['{prompt}', '--allowedTools', 'Task,WebSearch,WebFetch,Read,Bash(rg:*),Bash(git add:*),Bash(git commit:*)'],
+        invocations: [{ id: 'judge-decompose-cli', via: 'cli', command: 'claude', args: ['{prompt}', '--allowedTools', 'Task,WebSearch,WebFetch,Read,Bash(rg:*),Bash(git add:*),Bash(git commit:*)'] }]
       },
     },
     modelPolicies: { claude: { nano: 'haiku', standard: 'sonnet', frontier: 'opus' }, node: { nano: 'haiku', standard: 'sonnet', frontier: 'opus' } },
@@ -1009,7 +979,7 @@ test('resolveExecutorCommand resolves "judge-decompose" through its own executor
 test('resolveExecutorCommand with a executors block present but no matching executorId stays on today\'s tier/global behavior, byte-identical', () => {
   const cfg = {
     executor: { command: '/global/executor', args: ['{prompt}'] },
-    executors: { 'some-other-executor': { kind: 'agent', command: '/other/executor', args: ['{prompt}'] } },
+    executors: { 'some-other-executor': { kind: 'agent', invocations: [{ id: 'some-other-executor-cli', via: 'cli', command: '/other/executor', args: ['{prompt}'] }] } },
     modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   };
@@ -1151,7 +1121,7 @@ for (const kind of ['mcp', 'skill', 'http', 'binary']) {
   test(`resolveExecutorCommand throws when a kind:"${kind}" executor resolves to a non-Claude command with no allowCrossProvider (D13)`, () => {
     const cfg = {
       executor: { command: 'claude', args: ['{prompt}'] },
-      executors: { 'fgos-code-implement': { kind, command: 'agy', args: ['{prompt}'] } },
+      executors: { 'fgos-code-implement': { kind, invocations: [{ id: 'fgos-code-implement-cli', via: 'cli', command: 'agy', args: ['{prompt}'] }] } },
       modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
       timeoutMs: 5000,
     };
@@ -1255,7 +1225,7 @@ test('resolveExecutorCommand prefers a static agentType over a caller-supplied r
 test('resolveExecutorCommand ignores resolvedAgentType entirely for an executor with its own command/args (agy/claude/codex/pi\'s real shape) — the D20 wiring never changes dispatch for any executor this repo actually configures today', () => {
   const cfg = {
     executor: { command: 'claude', args: ['{prompt}'] },
-    executors: { agy: { kind: 'agent', command: 'agy', args: ['-p', '{prompt}'], allowCrossProvider: true } },
+    executors: { agy: { kind: 'agent', invocations: [{ id: 'agy-cli', via: 'cli', command: 'agy', args: ['-p', '{prompt}'] }],  allowCrossProvider: true } },
     modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   };
@@ -1286,8 +1256,7 @@ test('resolveExecutorCommand still prefers a executor\'s own command/args over a
       'judge-discovery': {
         kind: 'agent',
         agentType: 'should-never-be-used',
-        command: 'claude',
-        args: ['-p', '{prompt}', '--model', '{model}', '--allowedTools', 'Task,Bash(rg:*)'],
+        invocations: [{ id: 'judge-discovery-cli', via: 'cli', command: 'claude', args: ['-p', '{prompt}', '--model', '{model}', '--allowedTools', 'Task,Bash(rg:*)'] }]
       },
     },
     modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
@@ -1368,7 +1337,7 @@ test('decideExecutorCli omits agentType entirely for a kind:"tool" executor that
   const root = mkTempDir();
   writeRunnerConfigFixture(root, {
     executor: { command: 'claude', args: ['{prompt}'] },
-    executors: { 'submit-assist-classify': { kind: 'tool', command: 'agy', args: ['{prompt}'], allowCrossProvider: true } },
+    executors: { 'submit-assist-classify': { kind: 'tool', invocations: [{ id: 'submit-assist-classify-cli', via: 'cli', command: 'agy', args: ['{prompt}'] }],  allowCrossProvider: true } },
     modelPolicies: { agy: { nano: 'flash-3.5', standard: 'flash-3.5' }, node: { nano: 'flash-3.5', standard: 'flash-3.5' } },
     timeoutMs: 5000,
   });
@@ -1412,7 +1381,7 @@ test('decideExecutorCli --needs-soul never overrides a real registered purpose m
   writeRunnerConfigFixture(root, {
     executor: { command: 'claude', args: ['{prompt}'] },
     capabilities: { judge: { prefer: 'gather' } },
-    executors: { gather: { kind: 'agent', command: 'agy', args: ['{prompt}'], allowCrossProvider: true } },
+    executors: { gather: { kind: 'agent', invocations: [{ id: 'gather-cli', via: 'cli', command: 'agy', args: ['{prompt}'] }],  allowCrossProvider: true } },
     modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' }, gemini: { standard: 'gemini-flash' } },
     timeoutMs: 5000,
   });
@@ -1775,7 +1744,7 @@ test('dispatch CLI: --repo-root alone with process.cwd() resolving to a DIFFEREN
   const scriptPath = writeEchoExecutor(repo2.repoRoot);
   writeRunnerConfigFixture(repo2.repoRoot, {
     executor: { command: process.execPath, args: [scriptPath, '{prompt}'] },
-    executors: { probe: { kind: 'agent', command: process.execPath, args: [scriptPath], allowCrossProvider: true } },
+    executors: { probe: { kind: 'agent', invocations: [{ id: 'probe-cli', via: 'cli', command: process.execPath, args: [scriptPath] }],  allowCrossProvider: true } },
     modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   });
@@ -1795,7 +1764,7 @@ test('dispatch CLI: --repo-root alone with process.cwd() resolving to the SAME p
   const scriptPath = writeEchoExecutor(repoRoot);
   writeRunnerConfigFixture(repoRoot, {
     executor: { command: process.execPath, args: [scriptPath, '{prompt}'] },
-    executors: { probe: { kind: 'agent', command: process.execPath, args: [scriptPath], allowCrossProvider: true } },
+    executors: { probe: { kind: 'agent', invocations: [{ id: 'probe-cli', via: 'cli', command: process.execPath, args: [scriptPath] }],  allowCrossProvider: true } },
     modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   });
@@ -1816,7 +1785,7 @@ test('dispatch CLI: both --cwd and --repo-root given unchanged, no guard fires',
   const scriptPath = writeEchoExecutor(repo2.repoRoot);
   writeRunnerConfigFixture(repo2.repoRoot, {
     executor: { command: process.execPath, args: [scriptPath, '{prompt}'] },
-    executors: { probe: { kind: 'agent', command: process.execPath, args: [scriptPath], allowCrossProvider: true } },
+    executors: { probe: { kind: 'agent', invocations: [{ id: 'probe-cli', via: 'cli', command: process.execPath, args: [scriptPath] }],  allowCrossProvider: true } },
     modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   });
@@ -1836,7 +1805,7 @@ test('dispatch CLI: neither given unchanged, existing default-process.cwd() beha
   const scriptPath = writeEchoExecutor(repoRoot);
   writeRunnerConfigFixture(repoRoot, {
     executor: { command: process.execPath, args: [scriptPath, '{prompt}'] },
-    executors: { probe: { kind: 'agent', command: process.execPath, args: [scriptPath], allowCrossProvider: true } },
+    executors: { probe: { kind: 'agent', invocations: [{ id: 'probe-cli', via: 'cli', command: process.execPath, args: [scriptPath] }],  allowCrossProvider: true } },
     modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   });
@@ -1865,7 +1834,7 @@ test('dispatch CLI: neither given unchanged, existing default-process.cwd() beha
 test('resolveExecutorCommand throws when a kind:"cli" executor resolves to a non-Claude command with no allowCrossProvider', () => {
   const cfg = {
     executor: { command: 'claude', args: ['{prompt}'] },
-    executors: { 'fgos-code-implement': { kind: 'agent', command: 'agy', args: ['{prompt}'] } },
+    executors: { 'fgos-code-implement': { kind: 'agent', invocations: [{ id: 'fgos-code-implement-cli', via: 'cli', command: 'agy', args: ['{prompt}'] }] } },
     modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   };
@@ -1878,7 +1847,7 @@ test('resolveExecutorCommand throws when a kind:"cli" executor resolves to a non
 test('resolveExecutorCommand dispatches normally when the same non-Claude executor sets allowCrossProvider: true', () => {
   const cfg = {
     executor: { command: 'claude', args: ['{prompt}'] },
-    executors: { 'fgos-code-implement': { kind: 'agent', command: 'agy', args: ['{prompt}'], allowCrossProvider: true } },
+    executors: { 'fgos-code-implement': { kind: 'agent', invocations: [{ id: 'fgos-code-implement-cli', via: 'cli', command: 'agy', args: ['{prompt}'] }],  allowCrossProvider: true } },
     modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   };
@@ -1903,7 +1872,7 @@ test('resolveExecutorCommand never requires allowCrossProvider for a kind:"cli" 
 test('resolveExecutorCommand never requires allowCrossProvider for a kind:"cli" executor that resolves to Claude\'s own CLI', () => {
   const cfg = {
     executor: { command: 'claude', args: ['{prompt}'] },
-    executors: { 'fgos-code-implement': { kind: 'agent', command: 'claude', args: ['{prompt}'] } },
+    executors: { 'fgos-code-implement': { kind: 'agent', invocations: [{ id: 'fgos-code-implement-cli', via: 'cli', command: 'claude', args: ['{prompt}'] }] } },
     modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   };
@@ -1914,7 +1883,7 @@ test('resolveExecutorCommand never requires allowCrossProvider for a kind:"cli" 
 test('resolveExecutorCommand cross-provider governance is kind-independent (D5, tsk-in1-4): a kind:"tool" executor resolving to a non-Claude command via its own flat command/args still needs allowCrossProvider — no kind alone ever exempts it, only an agentType-resolved path does (kind:"task" used to be the exempt-by-kind value; retired)', () => {
   const cfg = {
     executor: { command: 'claude', args: ['{prompt}'] },
-    executors: { distill: { kind: 'tool', command: 'agy', args: ['{prompt}'] } },
+    executors: { distill: { kind: 'tool', invocations: [{ id: 'distill-cli', via: 'cli', command: 'agy', args: ['{prompt}'] }] } },
     modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   };
@@ -1953,7 +1922,7 @@ test('resolveExecutorCommand throws for a non-Claude "cli" executor even when fg
   initStore(dir);
   const cfg = {
     executor: { command: 'claude', args: ['{prompt}'] },
-    executors: { 'fgos-code-implement': { kind: 'agent', command: 'agy', args: ['{prompt}'] } },
+    executors: { 'fgos-code-implement': { kind: 'agent', invocations: [{ id: 'fgos-code-implement-cli', via: 'cli', command: 'agy', args: ['{prompt}'] }] } },
     modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   };
@@ -2015,7 +1984,7 @@ test('the runner config check rejects an mcp invocation\'s "tools" map whose key
 function carriesCfg(carries) {
   return {
     executor: { command: '/global/executor', args: ['{prompt}'] },
-    executors: { gather: { kind: 'agent', command: 'agy', args: ['{prompt}'], for: ['judge'], carries, allowCrossProvider: true } },
+    executors: { gather: { kind: 'agent', invocations: [{ id: 'gather-cli', via: 'cli', command: 'agy', args: ['{prompt}'] }],  for: ['judge'], carries, allowCrossProvider: true } },
     modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   };
@@ -2065,7 +2034,7 @@ test('resolveExecutorCommand accepts a "carries: repo-content" executor handed E
 test('resolveExecutorCommand never triggers the carries gate for a executor that declares no carries at all — byte-identical to every pre-D15 executor', () => {
   const cfg = {
     executor: { command: '/global/executor', args: ['{prompt}'] },
-    executors: { 'submit-assist-classify': { kind: 'agent', command: 'agy', args: ['{prompt}'], allowCrossProvider: true } },
+    executors: { 'submit-assist-classify': { kind: 'agent', invocations: [{ id: 'submit-assist-classify-cli', via: 'cli', command: 'agy', args: ['{prompt}'] }],  allowCrossProvider: true } },
     modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   };
@@ -2079,7 +2048,7 @@ test('resolveExecutorCommand never triggers the carries gate for a executor that
 
 test('lookupExecutor never binds a purpose, neither through a capability prefer nor through an executor\'s own "for"', () => {
   const cfg = {
-    executors: { 'totally-unrelated-name': { kind: 'agent', command: 'agy', for: ['review'] }, agy: { kind: 'agent', command: 'agy' } },
+    executors: { 'totally-unrelated-name': { kind: 'agent', invocations: [{ id: 'totally-unrelated-name-cli', via: 'cli', command: 'agy' }], for: ['review'] }, agy: { kind: 'agent', invocations: [{ id: 'agy-cli', via: 'cli', command: 'agy' }]} },
     capabilities: { 'fgos-coding-implement': { prefer: 'agy' } },
   };
   for (const purpose of ['review', 'fgos-coding-implement']) {
@@ -2121,8 +2090,8 @@ test('purposeSeatOf names the next prefer entry when the first one\'s CLI is not
   const cfg = bindable({
     executor: { command: 'claude', args: ['{prompt}'] },
     executors: {
-      absent: { kind: 'agent', providerModel: 'gemini', command: 'fgos-test-cli-that-is-not-installed', args: ['{prompt}'], allowCrossProvider: true },
-      agy: { kind: 'agent', providerModel: 'gemini', command: 'agy', args: ['{prompt}'], allowCrossProvider: true },
+      absent: { kind: 'agent', providerModel: 'gemini', invocations: [{ id: 'absent-cli', via: 'cli', command: 'fgos-test-cli-that-is-not-installed', args: ['{prompt}'] }],  allowCrossProvider: true },
+      agy: { kind: 'agent', providerModel: 'gemini', invocations: [{ id: 'agy-cli', via: 'cli', command: 'agy', args: ['{prompt}'] }],  allowCrossProvider: true },
     },
     capabilities: { judge: { prefer: ['absent', 'agy'] } },
     modelPolicies: PURPOSE_MODELS,
@@ -2135,7 +2104,7 @@ test('purposeSeatOf names the next prefer entry when the first one\'s CLI is not
 test('purposeSeatOf reports a refusal, not an executor, when no preferred executor can serve the seat', () => {
   const cfg = bindable({
     executor: { command: 'claude', args: ['{prompt}'] },
-    executors: { agy: { kind: 'agent', providerModel: 'gemini', command: 'agy', args: ['{prompt}'], allowCrossProvider: true } },
+    executors: { agy: { kind: 'agent', providerModel: 'gemini', invocations: [{ id: 'agy-cli', via: 'cli', command: 'agy', args: ['{prompt}'] }],  allowCrossProvider: true } },
     capabilities: { judge: { prefer: 'agy' } },
     modelPolicies: { claude: { standard: 'sonnet' } },
   });
@@ -2149,7 +2118,7 @@ test('purposeSeatOf reports a refusal, not an executor, when no preferred execut
 test('purposeSeatOf leaves a purpose with no pool of its own unconfigured, however many executors exist', () => {
   const cfg = bindable({
     executor: { command: 'claude', args: ['{prompt}'] },
-    executors: { agy: { kind: 'agent', providerModel: 'gemini', command: 'agy', args: ['{prompt}'], allowCrossProvider: true } },
+    executors: { agy: { kind: 'agent', providerModel: 'gemini', invocations: [{ id: 'agy-cli', via: 'cli', command: 'agy', args: ['{prompt}'] }],  allowCrossProvider: true } },
     capabilities: { judge: {}, 'other:*': { prefer: 'agy' } },
     modelPolicies: PURPOSE_MODELS,
   });
@@ -2162,7 +2131,7 @@ test('purposeSeatOf leaves a purpose with no pool of its own unconfigured, howev
 
 test('a string prefer naming an agent executor does not make its capability a candidate when that executor is asked about', () => {
   const cfg = {
-    executors: { agy: { kind: 'agent', command: 'agy' } },
+    executors: { agy: { kind: 'agent', invocations: [{ id: 'agy-cli', via: 'cli', command: 'agy' }]} },
     capabilities: { judge: { prefer: 'agy' } },
   };
   const { capability } = resolveCapabilityDetailsFromHints({ cfg, executorId: 'agy', resolvedExecutor: cfg.executors.agy, hints: {} });
@@ -2172,7 +2141,7 @@ test('a string prefer naming an agent executor does not make its capability a ca
 test('resolveExecutorCommand\'s allowCrossProvider error names the executor and the executors key to set the flag on', () => {
   const cfg = {
     executor: { command: 'claude', args: ['{prompt}'] },
-    executors: { agy: { kind: 'agent', command: 'agy', args: ['{prompt}'] } }, // no allowCrossProvider
+    executors: { agy: { kind: 'agent', invocations: [{ id: 'agy-cli', via: 'cli', command: 'agy', args: ['{prompt}'] }] } }, // no allowCrossProvider
     modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
   };
   assert.throws(
@@ -2283,7 +2252,7 @@ test('decideExecutorCli answers a positional capability row name the way a purpo
     executor: { command: 'claude', args: ['{prompt}'] },
     // allowCrossProvider: true -- see the "(0a fix)" test's own comment
     // above for why this is required now (second-round self-review finding).
-    executors: { agy: { kind: 'agent', command: 'agy', args: ['{prompt}'], allowCrossProvider: true } },
+    executors: { agy: { kind: 'agent', invocations: [{ id: 'agy-cli', via: 'cli', command: 'agy', args: ['{prompt}'] }],  allowCrossProvider: true } },
     capabilities: { 'fgos-coding-implement': { prefer: 'agy' } },
     modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' }, gemini: { standard: 'gemini-flash' } },
     timeoutMs: 5000,
@@ -2347,7 +2316,7 @@ test('decideExecutorCli resolves purpose-based (--for) to the same result a posi
   writeRunnerConfigFixture(root, {
     executor: { command: 'claude', args: ['{prompt}'] },
     capabilities: { judge: { prefer: 'gather' } },
-    executors: { gather: { kind: 'agent', command: 'agy', args: ['{prompt}'], allowCrossProvider: true } },
+    executors: { gather: { kind: 'agent', invocations: [{ id: 'gather-cli', via: 'cli', command: 'agy', args: ['{prompt}'] }],  allowCrossProvider: true } },
     modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' }, gemini: { standard: 'gemini-flash' } },
     timeoutMs: 5000,
   });
@@ -2510,7 +2479,7 @@ test('decide --work: an item with its own agentType resolves the same executor a
 
 test('decide --work keeps the item rigor: a risk-heavy item plans at rigor high, a low item never drops below the capability floor', () => {
   const cfg = {
-    executors: { 'fgos-coding-implement': { command: 'claude', args: ['{prompt}'] } },
+    executors: { 'fgos-coding-implement': { invocations: [{ id: 'fgos-coding-implement-cli', via: 'cli', command: 'claude', args: ['{prompt}'] }] } },
     capabilities: { 'fgos-coding-implement': { rigor: 'standard' } },
     modelPolicies: { claude: { standard: 's', flagship: 'f', frontier: 'x', nano: 'n' } },
   };
@@ -2541,7 +2510,7 @@ test('decide --work: a resolver that still returns the old { workItem, executorI
 
 test('decide --work: an item with a malformed legacy rigor still resolves its executor, as before the hint', () => {
   const cfg = {
-    executors: { 'fgos-coding-implement': { command: 'claude', args: ['{prompt}'] } },
+    executors: { 'fgos-coding-implement': { invocations: [{ id: 'fgos-coding-implement-cli', via: 'cli', command: 'claude', args: ['{prompt}'] }] } },
     modelPolicies: { claude: { standard: 's', flagship: 'f', frontier: 'x', nano: 'n' } },
   };
   const legacy = sampleWork({ id: 'tsk-legacy-rigor', rigor: 'extreme' });
@@ -2572,7 +2541,7 @@ test('decideExecutorCli resolves work-item-based (--work) to the executor Seat B
   });
   writeRunnerConfigFixture(root, {
     executor: { command: 'claude', args: ['{prompt}'] },
-    executors: { agy: { kind: 'agent', command: 'agy', args: ['{prompt}'], allowCrossProvider: true } },
+    executors: { agy: { kind: 'agent', invocations: [{ id: 'agy-cli', via: 'cli', command: 'agy', args: ['{prompt}'] }],  allowCrossProvider: true } },
     capabilities: { 'fgos-coding-implement': { prefer: 'agy' } },
     modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' }, gemini: { standard: 'gemini-flash' } },
     timeoutMs: 5000,
@@ -2679,7 +2648,7 @@ test('a positional executorId still wins over --work when both are somehow passe
     executor: { command: 'claude', args: ['{prompt}'] },
     executors: {
       'fgos-coding-implement': { kind: 'agent', agentType: 'general-purpose' },
-      explicit: { kind: 'tool', command: 'agy', args: ['{prompt}'], allowCrossProvider: true },
+      explicit: { kind: 'tool', invocations: [{ id: 'explicit-cli', via: 'cli', command: 'agy', args: ['{prompt}'] }],  allowCrossProvider: true },
     },
     modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
@@ -2825,7 +2794,7 @@ test('fanoutBatchExecutorCli returns candidate as unavailable when executor is g
   const scriptPath = writeCommittingExecutor(dir);
   writeRunnerConfigFixture(repoRoot, {
     executor: { command: '/global/executor', args: ['{prompt}'] },
-    executors: { 'fgos-coding-implement': { kind: 'agent', command: process.execPath, args: [scriptPath] } },
+    executors: { 'fgos-coding-implement': { kind: 'agent', invocations: [{ id: 'fgos-coding-implement-cli', via: 'cli', command: process.execPath, args: [scriptPath] }] } },
     modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   });
@@ -2962,13 +2931,11 @@ test('resolveExecutorCommand returns env block from resolved executor', () => {
     executors: {
       glm: {
         kind: 'agent',
-        command: 'claude',
-        args: ['-p', '{prompt}'],
-        allowCrossProvider: true,
-        env: {
+        invocations: [{ id: 'glm-cli', via: 'cli', command: 'claude', args: ['-p', '{prompt}'], env: {
           ANTHROPIC_BASE_URL: 'https://openrouter.ai/api',
           ANTHROPIC_AUTH_TOKEN: '${TEST_OPENROUTER_KEY}',
-        },
+        } }],
+        allowCrossProvider: true,
       },
     },
     modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
@@ -2982,7 +2949,7 @@ test('resolveExecutorCommand returns env block from resolved executor', () => {
   });
 });
 
-test('registered executors.glm entry resolves command "claude" and env block', () => {
+test('registered executors.glm entry resolves command "claude" and env block from its invocation', () => {
   // The project config under test merges with the global one at HOME; a real
   // ~/.fgos/config.json on the machine must not leak executors into it.
   const originalHome = process.env.HOME;
@@ -2995,15 +2962,13 @@ test('registered executors.glm entry resolves command "claude" and env block', (
         glmbridge: {
           kind: 'agent',
           description: 'Claude Code CLI routing to OpenRouter GLM 5.2 model',
-          command: 'claude',
-          args: ['-p', '{prompt}', '--model', '{model}'],
-          allowCrossProvider: true,
-          env: {
+          invocations: [{ id: 'glmbridge-cli', via: 'cli', command: 'claude', args: ['-p', '{prompt}', '--model', '{model}'], env: {
             ANTHROPIC_BASE_URL: 'https://openrouter.ai/api',
             ANTHROPIC_AUTH_TOKEN: '${GLM_OPENROUTER_API_KEY}',
             ANTHROPIC_MODEL: 'z-ai/glm-5.2',
             ANTHROPIC_API_KEY: '',
-          },
+          } }],
+          allowCrossProvider: true,
         },
       },
       modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
@@ -3016,11 +2981,12 @@ test('registered executors.glm entry resolves command "claude" and env block', (
     const cfg = loadRunnerConfigForDir(repoRoot);
     assert.ok(cfg.executors.glmbridge, 'executors.glm is registered');
     assert.equal(cfg.executors.glmbridge.kind, 'agent');
-    assert.equal(cfg.executors.glmbridge.command, 'claude');
-    assert.equal(cfg.executors.glmbridge.env.ANTHROPIC_BASE_URL, 'https://openrouter.ai/api');
-    assert.equal(cfg.executors.glmbridge.env.ANTHROPIC_AUTH_TOKEN, '${GLM_OPENROUTER_API_KEY}');
-    assert.equal(cfg.executors.glmbridge.env.ANTHROPIC_MODEL, 'z-ai/glm-5.2');
-    assert.equal(cfg.executors.glmbridge.env.ANTHROPIC_API_KEY, '');
+    const [glmInvocation] = cfg.executors.glmbridge.invocations;
+    assert.equal(glmInvocation.command, 'claude');
+    assert.equal(glmInvocation.env.ANTHROPIC_BASE_URL, 'https://openrouter.ai/api');
+    assert.equal(glmInvocation.env.ANTHROPIC_AUTH_TOKEN, '${GLM_OPENROUTER_API_KEY}');
+    assert.equal(glmInvocation.env.ANTHROPIC_MODEL, 'z-ai/glm-5.2');
+    assert.equal(glmInvocation.env.ANTHROPIC_API_KEY, '');
   
     const res = resolveExecutorCommand(cfg, { prompt: 'test', model: 'sonnet', tier: 'standard', executorId: 'glmbridge' });
     assert.equal(res.command, 'claude');
@@ -3042,7 +3008,7 @@ test('decideExecutorCli resolves --for via capabilities.<name>.prefer returning 
     // (second-round self-review finding); without it this executor would
     // correctly report unavailable/configured:false, which is not what
     // THIS test is pinning (executor resolution via capabilities.prefer).
-    executors: { agy: { kind: 'agent', command: 'agy', args: ['{prompt}'], for: ['fgos-coding-implement'], allowCrossProvider: true } },
+    executors: { agy: { kind: 'agent', invocations: [{ id: 'agy-cli', via: 'cli', command: 'agy', args: ['{prompt}'] }],  for: ['fgos-coding-implement'], allowCrossProvider: true } },
     capabilities: { 'fgos-coding-implement': { prefer: 'agy' } },
     modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
@@ -3053,7 +3019,7 @@ test('decideExecutorCli resolves --for via capabilities.<name>.prefer returning 
 
 test('compileDispatchPlan builds a canonical DispatchPlan for all four selector forms (0b)', () => {
   const cfg = {
-    executors: { agy: { kind: 'agent', command: 'agy', args: ['{prompt}'], allowCrossProvider: true } },
+    executors: { agy: { kind: 'agent', invocations: [{ id: 'agy-cli', via: 'cli', command: 'agy', args: ['{prompt}'] }],  allowCrossProvider: true } },
     capabilities: { 'fgos-coding-implement': { prefer: 'agy' } },
     modelPolicies: SLICE_D_MODEL_POLICIES,
   };
@@ -3101,7 +3067,7 @@ test('compileDispatchPlan builds a canonical DispatchPlan for all four selector 
 
 test('compileDispatchPlan selector precedence matches actual resolution precedence: an explicit executorId always wins over work/purpose, even when both are passed (self-review finding)', () => {
   const cfg = {
-    executors: { agy: { kind: 'agent', command: 'agy', args: ['{prompt}'], allowCrossProvider: true } },
+    executors: { agy: { kind: 'agent', invocations: [{ id: 'agy-cli', via: 'cli', command: 'agy', args: ['{prompt}'] }],  allowCrossProvider: true } },
   };
   const sample = sampleWork();
   // Both executorId AND work are passed -- resolution's own `if (!executorId
@@ -3148,7 +3114,7 @@ test('compileDispatchPlan never reports a governance-blocked executor as dispatc
     executors: {
       // cross-provider (non-Claude command), deliberately no allowCrossProvider
       // declared -- resolveExecutorConfig throws for this at real dispatch time.
-      blockedExec: { kind: 'agent', command: 'some-other-cli', args: ['{prompt}'] },
+      blockedExec: { kind: 'agent', invocations: [{ id: 'blockedexec-cli', via: 'cli', command: 'some-other-cli', args: ['{prompt}'] }] },
     },
   };
   const plan = compileDispatchPlan(cfg, { executorId: 'blockedExec' });
@@ -3215,7 +3181,7 @@ test('compileDispatchPlan merges tier/model/providerModel/provenance/policy for 
     // (config.mjs's warnIfProviderFamilyUnreliable) where
     // the dispatch policy's provider derivation defaults to
     // "claude" -- pre-existing, orthogonal to what this test pins.
-    executors: { agy: { kind: 'agent', command: 'agy', args: ['{prompt}'], providerModel: 'agy', allowCrossProvider: true } },
+    executors: { agy: { kind: 'agent', invocations: [{ id: 'agy-cli', via: 'cli', command: 'agy', args: ['{prompt}'] }],  providerModel: 'agy', allowCrossProvider: true } },
     modelPolicies: SLICE_D_MODEL_POLICIES,
   };
   const plan = compileDispatchPlan(cfg, { executorId: 'agy' });
@@ -3230,7 +3196,7 @@ test('compileDispatchPlan merges tier/model/providerModel/provenance/policy for 
 
 test('compileDispatchPlan merges the same fields for a --for capability selector from the seat Seat Binding bound', () => {
   const cfg = {
-    executors: { agy: { kind: 'agent', command: 'agy', args: ['{prompt}'], allowCrossProvider: true } },
+    executors: { agy: { kind: 'agent', invocations: [{ id: 'agy-cli', via: 'cli', command: 'agy', args: ['{prompt}'] }],  allowCrossProvider: true } },
     capabilities: { 'fgos-coding-implement': { prefer: 'agy' } },
     modelPolicies: SLICE_D_MODEL_POLICIES,
   };
@@ -3278,7 +3244,7 @@ test('compileDispatchPlan applies the capability\'s tier and rigor when synthesi
 
 test('compileDispatchPlan does not bind a --for purpose through an executor\'s own "for" array (no capabilities.<name>.prefer)', () => {
   const cfg = {
-    executors: { agy: { kind: 'agent', command: 'agy', args: ['{prompt}'], for: ['fgos-coding-implement'], allowCrossProvider: true } },
+    executors: { agy: { kind: 'agent', invocations: [{ id: 'agy-cli', via: 'cli', command: 'agy', args: ['{prompt}'] }],  for: ['fgos-coding-implement'], allowCrossProvider: true } },
     capabilities: { 'fgos-coding-implement': {} },
     modelPolicies: SLICE_D_MODEL_POLICIES,
   };
@@ -3290,7 +3256,7 @@ test('compileDispatchPlan does not bind a --for purpose through an executor\'s o
 
 test('compileDispatchPlan merges policy fields from a real Assignment (assignmentItem), matching the dispatch policy\'s own output', () => {
   const cfg = {
-    executors: { agy: { kind: 'agent', command: 'agy', args: ['{prompt}'], allowCrossProvider: true } },
+    executors: { agy: { kind: 'agent', invocations: [{ id: 'agy-cli', via: 'cli', command: 'agy', args: ['{prompt}'] }],  allowCrossProvider: true } },
     modelPolicies: SLICE_D_MODEL_POLICIES,
     defaults: { tier: 'frontier' },
   };
@@ -3313,8 +3279,8 @@ test('compileDispatchPlan merges policy fields from a real Assignment (assignmen
 test('compileDispatchPlan throws the dispatch-decide-mismatch error when a real Assignment\'s cliOverride.preferExecutor disagrees with the decided executor', () => {
   const cfg = {
     executors: {
-      agy: { kind: 'agent', command: 'agy', args: ['{prompt}'], allowCrossProvider: true },
-      claude: { kind: 'agent', command: 'claude', args: ['{prompt}'] },
+      agy: { kind: 'agent', invocations: [{ id: 'agy-cli', via: 'cli', command: 'agy', args: ['{prompt}'] }],  allowCrossProvider: true },
+      claude: { kind: 'agent', invocations: [{ id: 'claude-cli', via: 'cli', command: 'claude', args: ['{prompt}'] }] },
     },
     modelPolicies: SLICE_D_MODEL_POLICIES,
   };
@@ -3342,8 +3308,8 @@ test('compileDispatchPlan throws the dispatch-decide-mismatch error when a real 
 test('compileDispatchPlan never throws over a policy mismatch on a synthesized (non-Assignment) request -- decide --for/--executor-id stays non-fatal', () => {
   const cfg = {
     executors: {
-      agy: { kind: 'agent', command: 'agy', args: ['{prompt}'], allowCrossProvider: true },
-      claude: { kind: 'agent', command: 'claude', args: ['{prompt}'] },
+      agy: { kind: 'agent', invocations: [{ id: 'agy-cli', via: 'cli', command: 'agy', args: ['{prompt}'] }],  allowCrossProvider: true },
+      claude: { kind: 'agent', invocations: [{ id: 'claude-cli', via: 'cli', command: 'claude', args: ['{prompt}'] }] },
     },
     modelPolicies: SLICE_D_MODEL_POLICIES,
   };
@@ -3364,7 +3330,7 @@ test('compileDispatchPlan never throws over a policy mismatch on a synthesized (
 test('compileDispatchPlan preserves the requested capability\'s provenance when an explicit executor-id overrides it (Slice E required proof case: explicit executor override preserves requested capability provenance)', () => {
   const cfg = {
     executors: {
-      agy: { kind: 'agent', command: 'agy', args: ['{prompt}'], providerModel: 'agy', allowCrossProvider: true },
+      agy: { kind: 'agent', invocations: [{ id: 'agy-cli', via: 'cli', command: 'agy', args: ['{prompt}'] }],  providerModel: 'agy', allowCrossProvider: true },
     },
     modelPolicies: SLICE_D_MODEL_POLICIES,
   };
@@ -3383,7 +3349,7 @@ test('compileDispatchPlan preserves the requested capability\'s provenance when 
 test('compileDispatchPlan governance-blocked and unavailable branches never populate the new policy fields (no partial/misleading merge)', () => {
   const blockedCfg = {
     executor: { command: 'claude', args: ['{prompt}'] },
-    executors: { blockedExec: { kind: 'agent', command: 'some-other-cli', args: ['{prompt}'] } },
+    executors: { blockedExec: { kind: 'agent', invocations: [{ id: 'blockedexec-cli', via: 'cli', command: 'some-other-cli', args: ['{prompt}'] }] } },
     modelPolicies: SLICE_D_MODEL_POLICIES,
   };
   const blockedPlan = compileDispatchPlan(blockedCfg, { executorId: 'blockedExec' });

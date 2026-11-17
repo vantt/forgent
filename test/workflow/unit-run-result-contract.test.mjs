@@ -58,7 +58,6 @@ test('a three-seat case settles from contract fields alone: an infrastructure se
   cfg.runner.executors['broken-node'] = {
     ...cfg.runner.executors['test-node'],
     description: 'Fixture executor whose worker is missing until the test installs it',
-    args,
     invocations: [{ id: 'cli-default', via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' }, command: process.execPath, args }],
   };
   cfg.runner.capabilities['docs:flaky'] = { prefer: [{ executor: 'broken-node' }], rigor: 'standard', tier: 'standard' };

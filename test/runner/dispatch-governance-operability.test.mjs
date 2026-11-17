@@ -86,8 +86,7 @@ test('governance-blocked versus unregistered result shape across public CLI and 
         executors: {
           'blocked-worker': {
             kind: 'agent',
-            command: 'echo',
-            args: ['blocked'],
+            invocations: [{ id: 'blocked-worker-cli', via: 'cli', command: 'echo', args: ['blocked'] }],
             providerModel: 'openai-codex',
             allowCrossProvider: false,
           },
@@ -122,14 +121,12 @@ test('cross-provider executor without explicit opt-in fails closed BEFORE worker
   const runnerConfig = {
     executors: {
       claude: {
-        command: process.execPath,
-        args: [workerScript],
+        invocations: [{ id: 'claude-cli', via: 'cli', command: process.execPath, args: [workerScript] }],
         providerModel: 'claude',
         allowCrossProvider: true,
       },
       'codex-bwrap': {
-        command: process.execPath,
-        args: [workerScript],
+        invocations: [{ id: 'codex-bwrap-cli', via: 'cli', command: process.execPath, args: [workerScript] }],
         providerModel: 'openai-codex',
         // No allowCrossProvider: prompt content would leave the Claude ecosystem.
       },
@@ -189,14 +186,12 @@ test('an opted-in cross-provider executor runs and records executor + provider i
   const runnerConfig = {
     executors: {
       claude: {
-        command: process.execPath,
-        args: [workerScript, '{prompt}', '--model', '{model}'],
+        invocations: [{ id: 'claude-cli', via: 'cli', command: process.execPath, args: [workerScript, '{prompt}', '--model', '{model}'] }],
         providerModel: 'claude',
         allowCrossProvider: true,
       },
       'codex-bwrap': {
-        command: process.execPath,
-        args: [workerScript, '{prompt}', '--model', '{model}'],
+        invocations: [{ id: 'codex-bwrap-cli', via: 'cli', command: process.execPath, args: [workerScript, '{prompt}', '--model', '{model}'] }],
         providerModel: 'openai-codex',
         allowCrossProvider: true,
       },

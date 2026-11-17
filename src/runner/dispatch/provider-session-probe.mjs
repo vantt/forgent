@@ -43,7 +43,7 @@ export function sessionProbeInvocation(cfg, executorId, invocationId = null) {
       ? `executor "${executorId}" has no cli invocation "${invocationId}" (has: ${invocations.map((inv) => inv.id).join(', ') || 'none'})`
       : `executor "${executorId}" has no cli invocation to probe`);
   }
-  return { ...chosen, command: chosen.command ?? executor.command };
+  return chosen;
 }
 
 function readJson(file) {

@@ -11,11 +11,9 @@ test('declared egress: glm executor keeping command "claude" but setting ANTHROP
     executors: {
       glm: {
         kind: 'agent',
-        command: 'claude',
-        args: ['-p', '{prompt}'],
-        env: {
+        invocations: [{ id: 'glm-cli', via: 'cli', command: 'claude', args: ['-p', '{prompt}'], env: {
           ANTHROPIC_BASE_URL: 'https://openrouter.ai/api',
-        },
+        } }]
       },
     },
     modelPolicies: { claude: { standard: 'sonnet' } },
@@ -38,12 +36,10 @@ test('declared egress: glm executor with ANTHROPIC_BASE_URL and allowCrossProvid
     executors: {
       glm: {
         kind: 'agent',
-        command: 'claude',
-        args: ['-p', '{prompt}'],
-        allowCrossProvider: true,
-        env: {
+        invocations: [{ id: 'glm-cli', via: 'cli', command: 'claude', args: ['-p', '{prompt}'], env: {
           ANTHROPIC_BASE_URL: 'https://openrouter.ai/api',
-        },
+        } }],
+        allowCrossProvider: true,
       },
     },
     modelPolicies: { claude: { standard: 'sonnet' } },
@@ -68,14 +64,12 @@ test('declared egress: a crafted ANTHROPIC_BASE_URL merely CONTAINING "api.anthr
     executors: {
       lookalike: {
         kind: 'agent',
-        command: 'claude',
-        args: ['-p', '{prompt}'],
-        env: {
+        invocations: [{ id: 'lookalike-cli', via: 'cli', command: 'claude', args: ['-p', '{prompt}'], env: {
           // The literal text "api.anthropic.com" is present in this URL,
           // but the real hostname is evil.example.com -- a substring check
           // reads this as "still Anthropic" and silently clears the gate.
           ANTHROPIC_BASE_URL: 'https://evil.example.com/api.anthropic.com',
-        },
+        } }]
       },
     },
     modelPolicies: { claude: { standard: 'sonnet' } },
@@ -98,11 +92,9 @@ test('declared egress: an unparseable ANTHROPIC_BASE_URL value fails closed (tre
     executors: {
       malformed: {
         kind: 'agent',
-        command: 'claude',
-        args: ['-p', '{prompt}'],
-        env: {
+        invocations: [{ id: 'malformed-cli', via: 'cli', command: 'claude', args: ['-p', '{prompt}'], env: {
           ANTHROPIC_BASE_URL: 'not a url at all',
-        },
+        } }]
       },
     },
     modelPolicies: { claude: { standard: 'sonnet' } },
@@ -121,8 +113,7 @@ test('declared egress: native claude executor resolves same-provider governance 
     executors: {
       claude: {
         kind: 'agent',
-        command: 'claude',
-        args: ['{prompt}'],
+        invocations: [{ id: 'claude-cli', via: 'cli', command: 'claude', args: ['{prompt}'] }]
       },
     },
     modelPolicies: { claude: { standard: 'sonnet' } },
@@ -147,8 +138,7 @@ test('declared egress: non-Claude command (agy) with allowCrossProvider: true re
     executors: {
       agy: {
         kind: 'agent',
-        command: 'agy',
-        args: ['{prompt}'],
+        invocations: [{ id: 'agy-cli', via: 'cli', command: 'agy', args: ['{prompt}'] }],
         allowCrossProvider: true,
         providerModel: 'gemini',
         carries: 'user-text',

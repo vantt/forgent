@@ -2160,7 +2160,7 @@ test('malformed scalars in request refuse with param-invalid without escaping as
 });
 
 test('a runner config with no patterns section resolves against the shipped catalog and never reads its own keys as pattern names', () => {
-  const runnerConfig = { executors: { claude: { command: 'claude' } }, defaults: { tier: 'standard' } };
+  const runnerConfig = { executors: { claude: { invocations: [{ id: 'claude-cli', via: 'cli', command: 'claude' }]} }, defaults: { tier: 'standard' } };
   const resolved = resolveCollaboration({
     unit: { id: 'u', prompt: 'p' },
     selectors: { callerString: 'reviewed' },

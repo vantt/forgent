@@ -53,14 +53,14 @@ test('checkTrustStoreWritable passes for a readable store and fails by name for 
   }
 });
 
-test('checkExecutorConfinement passes when no executor declares bypass', () => {
-  const r = checkExecutorConfinement({ executors: { a: { kind: 'agent' }, b: { kind: 'agent', permissionMode: 'ask' } } });
+test('checkExecutorConfinement passes when no invocation declares bypass', () => {
+  const r = checkExecutorConfinement({ executors: { a: { kind: 'agent' }, b: { kind: 'agent', invocations: [{ id: 'cli', via: 'cli', permissionMode: 'ask' }] } } });
   assert.equal(r.passed, true);
 });
 
 test('checkExecutorConfinement passes for a fully confined bypass executor', () => {
   const r = checkExecutorConfinement({
-    executors: { a: { kind: 'agent', permissionMode: 'bypass', confinement: { privateHome: true, isolatedSession: true, ownWorktree: true } } },
+    executors: { a: { kind: 'agent', invocations: [{ id: 'cli', via: 'cli', permissionMode: 'bypass' }], confinement: { privateHome: true, isolatedSession: true, ownWorktree: true } } },
   });
   assert.equal(r.passed, true);
 });
@@ -70,7 +70,7 @@ test('checkExecutorConfinement passes for a bypass executor with normalized cont
     executors: {
       a: {
         kind: 'agent',
-        permissionMode: 'bypass',
+        invocations: [{ id: 'cli', via: 'cli', permissionMode: 'bypass' }],
         confinement: {
           contract: 'confinement-policy.v1',
           controls: { home: 'private', session: 'isolated', workspace: 'own' },
@@ -84,8 +84,8 @@ test('checkExecutorConfinement passes for a bypass executor with normalized cont
 test('checkExecutorConfinement fails and names the executor and the missing flags', () => {
   const r = checkExecutorConfinement({
     executors: {
-      safe: { kind: 'agent', permissionMode: 'ask' },
-      risky: { kind: 'agent', permissionMode: 'bypass', confinement: { privateHome: true } },
+      safe: { kind: 'agent', invocations: [{ id: 'cli', via: 'cli', permissionMode: 'ask' }] },
+      risky: { kind: 'agent', invocations: [{ id: 'cli', via: 'cli', permissionMode: 'bypass' }], confinement: { privateHome: true } },
     },
   });
   assert.equal(r.passed, false);
@@ -189,7 +189,7 @@ function paneExecutors(providerModel = 'openai') {
         providerModel,
         invocations: [
           { id: 'codex-herdr-bwrap', via: 'cli', adapter: 'herdr-spawn', command: 'codex', args: [], credentialStore: { use: 'codex', homeEnv: 'CODEX_HOME' } },
-          { id: 'codex-bwrap', via: 'cli', adapter: 'cli-spawn', command: 'codex', args: [], resourceBindings: [{ resource: 'private-home', target: { kind: 'env', name: 'CODEX_HOME' } }] },
+          { id: 'codex-bwrap', via: 'cli', adapter: 'cli-spawn', command: 'codex', args: [], credentialStore: { use: 'codex', homeEnv: 'CODEX_HOME' } },
           { id: 'codex-cli', via: 'cli', adapter: 'cli-spawn', command: 'codex', args: [] },
         ],
       },

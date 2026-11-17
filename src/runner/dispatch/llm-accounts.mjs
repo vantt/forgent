@@ -214,7 +214,7 @@ function declaredStoreFiles(runnerConfig, poolKey) {
   for (const executor of Object.values(runnerConfig?.executors ?? {})) {
     const family = legacyStateKey(executor?.providerModel ?? executor?.provider ?? '');
     for (const invocation of Array.isArray(executor?.invocations) ? executor.invocations : []) {
-      const store = credentialStoreOf({ ...invocation, command: invocation.command ?? executor.command });
+      const store = credentialStoreOf(invocation);
       if (!store?.files) continue;
       add(all, store.use, store.files);
       if (family === poolKey) add(own, store.use, store.files);
@@ -311,7 +311,7 @@ export function machineLoginStores({ homeDir = os.homedir(), env = process.env, 
     if (name) add(env[name]);
   }
   for (const executor of plainValues(runner.executors)) {
-    for (const invocation of [executor, ...(Array.isArray(executor?.invocations) ? executor.invocations : [])]) {
+    for (const invocation of Array.isArray(executor?.invocations) ? executor.invocations : []) {
       const store = credentialStoreOf(invocation);
       // `HOME` names the user's home, not a login directory: the CLI's own login home under it is listed above.
       if (typeof store?.homeEnv === 'string' && store.homeEnv !== 'HOME') add(env[store.homeEnv]);

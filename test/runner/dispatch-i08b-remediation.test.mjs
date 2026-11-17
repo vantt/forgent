@@ -67,14 +67,12 @@ test('F5: declared vendor takes precedence over CLI harness; cross-vendor execut
     },
     executors: {
       claude: {
-        command: 'pi',
-        args: [workerScript],
+        invocations: [{ id: 'claude-cli', via: 'cli', command: 'pi', args: [workerScript] }],
         providerModel: 'deepseek',
         allowCrossProvider: true,
       },
       'target-openai': {
-        command: 'pi',
-        args: [workerScript],
+        invocations: [{ id: 'target-openai-cli', via: 'cli', command: 'pi', args: [workerScript] }],
         providerModel: 'openai',
         allowCrossProvider: false,
       },
@@ -118,8 +116,7 @@ test('F5: declared vendor takes precedence over CLI harness; cross-vendor execut
     },
     executors: {
       'codex-target': {
-        command: process.execPath,
-        args: [workerScript],
+        invocations: [{ id: 'codex-target-cli', via: 'cli', command: process.execPath, args: [workerScript] }],
         providerModel: 'openai-codex',
         allowCrossProvider: true,
       },

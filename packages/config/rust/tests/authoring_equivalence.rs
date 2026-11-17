@@ -387,9 +387,6 @@ fn the_real_runner_keys_sit_in_the_files_scopes_and_sensitivities_the_spec_gives
     for path in [
         "runner.executor.command",
         "runner.executor.args",
-        "runner.executors.any.command",
-        "runner.executors.any.args",
-        "runner.executors.any.permissionMode",
         "runner.executors.any.confinement.backend",
         "runner.executors.any.confinement.privateHome",
         "runner.executors.any.confinement.isolatedSession",

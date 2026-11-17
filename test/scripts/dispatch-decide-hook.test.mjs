@@ -44,14 +44,14 @@ const OUT_OF_PROCESS_CONFIG = {
   ...IN_PROCESS_CONFIG,
   modelPolicies: { claude: { standard: 'sonnet' }, gemini: { standard: 'gemini-flash' } },
   capabilities: { blocked: { prefer: 'agy' } },
-  executors: { agy: { kind: 'agent', providerModel: 'gemini', command: 'agy', args: ['{prompt}'], allowCrossProvider: true } },
+  executors: { agy: { kind: 'agent', providerModel: 'gemini', invocations: [{ id: 'agy-cli', via: 'cli', command: 'agy', args: ['{prompt}'] }],  allowCrossProvider: true } },
 };
 // A capability row with its own executor pool whose only executor Seat Binding cannot place: its CLI is not installed.
 const UNBINDABLE_POOL_CONFIG = {
   ...IN_PROCESS_CONFIG,
   modelPolicies: OUT_OF_PROCESS_CONFIG.modelPolicies,
   capabilities: { judge: { prefer: 'absent' } },
-  executors: { absent: { kind: 'agent', providerModel: 'gemini', command: 'fgos-test-cli-that-is-not-installed', args: ['{prompt}'], allowCrossProvider: true } },
+  executors: { absent: { kind: 'agent', providerModel: 'gemini', invocations: [{ id: 'absent-cli', via: 'cli', command: 'fgos-test-cli-that-is-not-installed', args: ['{prompt}'] }],  allowCrossProvider: true } },
 };
 
 /** The payload each format sends for a tool call; `stray` is a cwd the payload claims, which no verdict may read. */

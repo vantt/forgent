@@ -271,7 +271,7 @@ test('executeAssignment rejects human-only assignment before spawning', async ()
 
 test('compileDispatchPlan produces selector.type: "assignment" and resolves executor from assignment policy', () => {
   const cfg = { executors: {
-    claude: { command: 'claude', args: ['{prompt}'] },
+    claude: { invocations: [{ id: 'claude-cli', via: 'cli', command: 'claude', args: ['{prompt}'] }] },
   }, modelPolicies: { claude: {
     standard: 'claude-3-7-sonnet-20250219',
   }, [process.execPath]: {
@@ -355,8 +355,7 @@ test('compileDispatchPlan and executeAssignment respect cliOverride.preferExecut
   executors: {
     custom_executor: {
       allowCrossProvider: true,
-      command: process.execPath,
-      args: [executorScript, '{prompt}'],
+      invocations: [{ id: 'custom-executor-cli', via: 'cli', command: process.execPath, args: [executorScript, '{prompt}'] }]
     },
   }, modelPolicies: { claude: { standard: 'test-model' }, [process.execPath]: { standard: 'test-model' } }, defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
   timeoutMs: 5000, };
@@ -534,13 +533,11 @@ test('provider capacity selection happens after Run admission, records redacted 
     },
     executors: {
       claude: {
-        command: process.execPath,
-        args: [codex.scriptPath, '{prompt}'],
+        invocations: [{ id: 'claude-cli', via: 'cli', command: process.execPath, args: [codex.scriptPath, '{prompt}'] }],
         allowCrossProvider: true,
       },
       'codex-bwrap': {
-        command: process.execPath,
-        args: [codex.scriptPath, '{prompt}', '--model', '{model}'],
+        invocations: [{ id: 'codex-bwrap-cli', via: 'cli', command: process.execPath, args: [codex.scriptPath, '{prompt}', '--model', '{model}'] }],
         providerModel: 'openai-codex',
         kind: 'agent',
         allowCrossProvider: true,
@@ -613,13 +610,11 @@ test('provider capacity refusal after Run admission settles the attempt (never a
     },
     executors: {
       claude: {
-        command: process.execPath,
-        args: [codex.scriptPath, '{prompt}'],
+        invocations: [{ id: 'claude-cli', via: 'cli', command: process.execPath, args: [codex.scriptPath, '{prompt}'] }],
         allowCrossProvider: true,
       },
       'codex-bwrap': {
-        command: process.execPath,
-        args: [codex.scriptPath, '{prompt}', '--model', '{model}'],
+        invocations: [{ id: 'codex-bwrap-cli', via: 'cli', command: process.execPath, args: [codex.scriptPath, '{prompt}', '--model', '{model}'] }],
         providerModel: 'openai-codex',
         kind: 'agent',
         allowCrossProvider: true,
@@ -702,10 +697,9 @@ function buildFallbackFixture(tempDir, { primaryQuarantined, fallbackQuarantined
   const codexExecutor = writeArgvRecordingExecutor(tempDir, 'codex-fallback-candidate');
   const runnerConfig = {
     executors: {
-      claude: { command: process.execPath, args: [claudeExecutor.scriptPath, '{prompt}'], allowCrossProvider: true },
+      claude: { invocations: [{ id: 'claude-cli', via: 'cli', command: process.execPath, args: [claudeExecutor.scriptPath, '{prompt}'] }],  allowCrossProvider: true },
       'codex-bwrap': {
-        command: process.execPath,
-        args: [codexExecutor.scriptPath, '{prompt}', '--model', '{model}'],
+        invocations: [{ id: 'codex-bwrap-cli', via: 'cli', command: process.execPath, args: [codexExecutor.scriptPath, '{prompt}', '--model', '{model}'] }],
         providerModel: 'openai-codex',
         kind: 'agent',
         allowCrossProvider: true,
@@ -890,8 +884,7 @@ test('tool executors bypass provider capacity selection even with matching provi
 
   const runnerConfig = {
     executor: {
-      command: process.execPath,
-      args: [codex.scriptPath, '{prompt}', '--model', '{model}'],
+      invocations: [{ id: 'cli', via: 'cli', command: process.execPath, args: [codex.scriptPath, '{prompt}', '--model', '{model}'] }],
       providerModel: 'openai-codex',
       kind: 'tool',
       allowCrossProvider: true,
@@ -970,13 +963,11 @@ test('a genuinely mutating assignment (implement-item, default implementer role)
 
   const runnerConfig = { executors: {
     claude: {
-      command: process.execPath,
-      args: [workerScriptPath, '{prompt}', '--allowedTools', 'Bash(git add:*),Bash(git commit:*)'],
+      invocations: [{ id: 'claude-cli', via: 'cli', command: process.execPath, args: [workerScriptPath, '{prompt}', '--allowedTools', 'Bash(git add:*),Bash(git commit:*)'] }],
       allowCrossProvider: true,
     },
     'claude-reviewer': {
-      command: process.execPath,
-      args: [reviewer.scriptPath, '{prompt}'],
+      invocations: [{ id: 'claude-reviewer-cli', via: 'cli', command: process.execPath, args: [reviewer.scriptPath, '{prompt}'] }],
       allowCrossProvider: true,
     },
   }, modelPolicies: { claude: { standard: 'test-model' }, [process.execPath]: { standard: 'test-model' } }, defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
@@ -1012,8 +1003,7 @@ test('Cell 6.3 Fix Round 1: absent claude-reviewer config entry falls back uncha
 
   const runnerConfig = { executors: {
     claude: {
-      command: process.execPath,
-      args: [worker.scriptPath, '{prompt}', '--allowedTools', 'Bash(git add:*),Bash(git commit:*)'],
+      invocations: [{ id: 'claude-cli', via: 'cli', command: process.execPath, args: [worker.scriptPath, '{prompt}', '--allowedTools', 'Bash(git add:*),Bash(git commit:*)'] }],
       allowCrossProvider: true,
     },
     // no "claude-reviewer" entry configured

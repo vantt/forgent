@@ -9,6 +9,7 @@ import path from 'node:path';
 import { readConfig, readMachineConfig } from '../../src/config/facade.mjs';
 import {
   capabilityServedBy,
+  tasteServedBy,
   existingProjectConfigPaths,
   gatewayTokenPath,
   machineHome,
@@ -71,13 +72,13 @@ test('plainConfig turns a null-prototype tree into ordinary objects that deepEqu
   assert.equal(Object.getPrototypeOf(plainConfig(tree)), Object.prototype);
 });
 
-test('a capability entry served by a fixture executor restates every seat, role and persona scope the standard declares for it', () => {
+test('a capability entry is served by the fixture executors alone, and the role and persona taste the standard declares is restated over them', () => {
   const entry = capabilityServedBy(['alpha', 'beta'], 'architecture:critique');
   assert.deepEqual(entry.prefer, [{ executor: 'alpha' }, { executor: 'beta' }]);
   assert.equal(entry.tier, 'standard');
-  assert.deepEqual(entry.seats.producer, { prefer: entry.prefer, tier: 'standard' }, 'the standard names real CLIs for this seat; the fixture executor replaces them');
-  const wildcard = capabilityServedBy('alpha', 'code:implement');
-  assert.deepEqual(wildcard.roles['red-team'], { prefer: [{ executor: 'alpha' }], tier: 'standard' }, 'a <family>:* scope of the standard applies too');
+  assert.equal(entry.roles, undefined, 'role taste is not a capability field');
+  const taste = tasteServedBy('alpha');
+  assert.deepEqual(taste.roles['red-team'], { prefer: [{ executor: 'alpha' }], tier: 'standard' }, 'the standard names real CLIs for this role; the fixture executor replaces them');
 });
 
 test('the raw readers, the existence check and the gateway token helpers name the files the writers write', () => {
@@ -99,7 +100,7 @@ test('the raw readers, the existence check and the gateway token helpers name th
 
 test('a fixture\'s executors and aliases go to the machine home, never the project file, and read back whole', () => {
   const dir = mkRepo();
-  const value = { runner: { timeoutMs: 1, executor: { command: 'x', args: [] }, executors: { a: { kind: 'agent', command: 'x', args: [] } }, capabilities: { c: { aliases: ['d'], description: 'e' } } } };
+  const value = { runner: { timeoutMs: 1, executor: { command: 'x', args: [] }, executors: { a: { kind: 'agent', invocations: [{ id: 'a-cli', via: 'cli', command: 'x', args: [] }] } }, capabilities: { c: { aliases: ['d'], description: 'e' } } } };
   writeProjectConfig(dir, value);
   const onDisk = readRawProjectConfig(dir);
   assert.ok(!/executor|aliases/.test(onDisk), 'the project file holds none of the machine keys');

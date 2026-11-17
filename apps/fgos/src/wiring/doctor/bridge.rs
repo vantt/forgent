@@ -180,13 +180,7 @@ fn payload_launch() -> Result<Command, Fault> {
             "the legacy payload carries no {BRIDGE_MODULE}"
         )));
     }
-    let module = {
-        let text = module.to_string_lossy();
-        match text.strip_prefix(r"\\?\") {
-            Some(stripped) => std::path::PathBuf::from(stripped),
-            None => module,
-        }
-    };
+    let module = fgos_process::path::plain_path(&module);
     Ok(legacy_exec::payload_command(&module))
 }
 

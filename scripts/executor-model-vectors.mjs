@@ -8,16 +8,31 @@
 //
 //   node scripts/executor-model-vectors.mjs           rewrite the `expect` values
 //   node scripts/executor-model-vectors.mjs --check   exit 1 when any `expect` has drifted, naming the vectors
+//   --contract <file>                                 read and write that file instead of the committed contract
 //
-// It needs the same machine facts as the replay test: a Seat Binding host (FGOS_HOST_BIN, else built with cargo) and
-// the Git addon.
+// To re-record: run `node scripts/executor-model-vectors.mjs` from any shell, then `--check`, and review the diff of
+// the contract. The script gives itself the environment of the replay test (the one `scripts/run-tests.mjs` builds:
+// only the OS and toolchain variables, no HERDR_*, a private temp root), so the answer does not depend on the shell
+// it was started from, its PATH, its HOME or the agent CLIs installed on the machine.
+//
+// It needs a Seat Binding host (FGOS_HOST_BIN, else built with cargo) and the Git addon, as the replay test does.
 
 import fs from 'node:fs';
+import path from 'node:path';
+import { pathToFileURL } from 'node:url';
 import { isDeepStrictEqual } from 'node:util';
-import { ensureHostBin } from './lib/git-addon-stage.mjs';
 import { isMainModule } from './lib/is-main-module.mjs';
 
 export const CONTRACT_URL = new URL('../packages/execution/contracts/executor-model.v1.json', import.meta.url);
+
+/** Replace this process's environment by the replay test's, the one `buildTestEnv` gives every test run. */
+async function adoptTestEnvironment() {
+  const { buildTestEnv } = await import('./run-tests.mjs');
+  const testEnv = buildTestEnv(process.env);
+  for (const key of Object.keys(process.env)) if (!(key in testEnv)) delete process.env[key];
+  Object.assign(process.env, testEnv);
+  await import('../test/helpers/process-tmp-root.mjs');
+}
 
 const line = (value) => JSON.stringify(value);
 
@@ -36,8 +51,10 @@ export async function recorded(contract) {
 }
 
 async function main(argv) {
-  process.env.FGOS_HOST_BIN = ensureHostBin(process.env);
-  const current = JSON.parse(fs.readFileSync(CONTRACT_URL, 'utf8'));
+  await adoptTestEnvironment();
+  const at = argv.indexOf('--contract');
+  const contractUrl = at >= 0 ? pathToFileURL(path.resolve(argv[at + 1])) : CONTRACT_URL;
+  const current = JSON.parse(fs.readFileSync(contractUrl, 'utf8'));
   const next = await recorded(current);
   if (argv.includes('--check')) {
     const drifted = next.vectors.filter((vector, index) => !isDeepStrictEqual(vector.expect, current.vectors[index].expect)).map((vector) => vector.name);
@@ -48,7 +65,7 @@ async function main(argv) {
     console.log(`executor-model vectors: ${current.vectors.length} vectors match`);
     return;
   }
-  fs.writeFileSync(CONTRACT_URL, serialize(next));
+  fs.writeFileSync(contractUrl, serialize(next));
   console.log(`executor-model vectors: recorded ${next.vectors.length} vectors over ${next.facts.length} facts`);
 }
 

@@ -77,8 +77,6 @@ function setupRepo({ capabilities } = {}) {
   const executor = {
     kind: 'agent',
     allowCrossProvider: true,
-    command: process.execPath,
-    args: [script, '{prompt}'],
     providerModel: 'node',
     invocations: [{ id: 'cli-default', via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' }, command: process.execPath, args: [script, '{prompt}'] }],
   };
@@ -408,7 +406,6 @@ test('a caller runnerConfig decides which executor runs the driver operation', a
   const notReady = path.join(notReadyDir, 'worker.mjs');
   fs.writeFileSync(notReady, WORKER.replace("verdict: 'READY'", "verdict: 'NOT READY'"));
   const alt = JSON.parse(JSON.stringify(runner));
-  alt.executors.fake.args = [notReady, '{prompt}'];
   alt.executors.fake.invocations[0].args = [notReady, '{prompt}'];
   const work = workItem('tsk-drv-altcfg');
   const outcome = await executeDriverOperationChoice(work, { operation: 'validate-plan', dispatch: 'assignment', stage: 'planning' }, { repoRoot: repo, cwd: repo, runnerConfig: alt });

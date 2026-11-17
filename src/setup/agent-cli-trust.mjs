@@ -46,9 +46,8 @@ function codexConfigPaths(runnerConfig, homeDir, notInstalled) {
     }
   };
   for (const [id, executor] of Object.entries(runnerConfig?.executors ?? {})) {
-    consider(id, executor?.env, executor?.interactiveMode?.trustStore, executor?.command);
     for (const inv of executor?.invocations ?? []) {
-      consider(`${id}/${inv?.id ?? '?'}`, inv?.env ?? executor?.env, inv?.interactiveMode?.trustStore, inv?.command ?? executor?.command);
+      consider(`${id}/${inv?.id ?? '?'}`, inv?.env, inv?.interactiveMode?.trustStore, inv?.command);
     }
   }
   return found;

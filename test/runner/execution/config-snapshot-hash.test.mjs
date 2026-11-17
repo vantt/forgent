@@ -19,7 +19,7 @@ const runner = () => ({
   roles: { 'red-team': { prefer: ['xai'] } },
   personas: { critic: { tier: 'flagship' } },
   patterns: { seatBinding: { schema: 1 } },
-  executors: { claude: { command: 'claude' } },
+  executors: { claude: { invocations: [{ id: 'claude-cli', via: 'cli', command: 'claude' }] } },
   governance: null,
   timeoutMs: 5000,
 });
@@ -70,7 +70,7 @@ test('a snapshot keeps no account inventory: llmAccounts and providers are machi
   const snapshot = snapshotRunnerConfig('/unused', cfg);
   assert.equal(snapshot.runner.llmAccounts, undefined);
   assert.equal(snapshot.runner.providers, undefined);
-  assert.equal(snapshot.runner.executors.claude.command, 'claude', 'what seat choice and the run read stays');
+  assert.equal(snapshot.runner.executors.claude.invocations[0].command, 'claude', 'what seat choice and the run read stays');
   assert.equal(snapshot.hash, snapshotRunnerConfig('/unused', runner()).hash, 'the inventory is not part of the hash either');
   assert.deepEqual(accountInventoryConfigOf(cfg), { llmAccounts: cfg.llmAccounts, providers: cfg.providers });
 });

@@ -91,8 +91,6 @@ function setupRepo({ effortCli = false } = {}) {
           kind: 'agent',
           description: 'Test node executor',
           allowCrossProvider: true,
-          command,
-          args,
           providerModel: 'node',
           invocations: [{ id: 'cli-default', via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' }, command, args }],
         },
@@ -116,7 +114,7 @@ function useTwoFamilies(tmp) {
     fs.symlinkSync(process.execPath, command);
     const args = [worker, '{prompt}'];
     cfg.runner.executors[name] = {
-      kind: 'agent', allowCrossProvider: true, command, args, providerModel: name,
+      kind: 'agent', allowCrossProvider: true,   providerModel: name,
       invocations: [{ id: 'cli-default', via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' }, command, args }],
     };
     cfg.runner.modelPolicies[name] = { nano: `${name}-nano`, standard: `${name}-std`, advanced: `${name}-adv`, flagship: `${name}-flagship`, frontier: `${name}-frontier` };
@@ -373,7 +371,7 @@ test('workflow with two units on different providers pins account only on matchi
     if (!fs.existsSync(command)) fs.symlinkSync(process.execPath, command);
     const args = [worker, '{prompt}'];
     cfg.runner.executors[name] = {
-      kind: 'agent', allowCrossProvider: true, command, args, providerModel: name,
+      kind: 'agent', allowCrossProvider: true,   providerModel: name,
       invocations: [{ id: 'cli-default', via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' }, command, args }],
     };
     cfg.runner.modelPolicies[name] = { nano: `${name}-nano`, standard: `${name}-std`, advanced: `${name}-adv`, flagship: `${name}-flagship`, frontier: `${name}-frontier` };

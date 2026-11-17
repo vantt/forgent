@@ -18,11 +18,11 @@ import { execFileSync } from 'node:child_process';
 const VERSION_TIMEOUT_MS = 10_000;
 const FIX_HINT = 'run omp once outside the sandbox after every update';
 
-/** The ids of the executors that run omp (an invocation's own command, else the executor's). */
+/** The ids of the executors that run omp (an invocation's command). */
 export function ompExecutorsOf(runnerCfg = {}) {
   const runsOmp = (command) => typeof command === 'string' && path.basename(command) === 'omp';
   return Object.entries(runnerCfg.executors ?? {})
-    .filter(([, executor]) => runsOmp(executor?.command) || (executor?.invocations ?? []).some((inv) => runsOmp(inv?.command ?? executor?.command)))
+    .filter(([, executor]) => (executor?.invocations ?? []).some((inv) => runsOmp(inv?.command)))
     .map(([id]) => id);
 }
 

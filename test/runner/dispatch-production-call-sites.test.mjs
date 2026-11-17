@@ -33,14 +33,11 @@ const IMPLEMENT_CAPABILITY = 'fgos-coding-implement';
 
 const HERDR_EXECUTOR = {
   kind: 'agent',
-  adapter: 'herdr-spawn',
-  command: 'agy',
+  invocations: [{ id: 'cli', via: 'cli', adapter: 'herdr-spawn', command: 'agy', args: ['-i', '{prompt}', '--mode', 'accept-edits'], interactiveMode: { exitCommand: '/exit', kind: 'agy' } }],
   providerModel: 'agy',
-  args: ['-i', '{prompt}', '--mode', 'accept-edits'],
   // agy is not a Claude CLI, so the cross-provider egress gate refuses it
   // unless the executor says so -- the same declaration the live config makes.
   allowCrossProvider: true,
-  interactiveMode: { exitCommand: '/exit', kind: 'agy' },
 };
 
 /**

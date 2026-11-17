@@ -10,14 +10,11 @@ import { familyOf } from '../dispatch/provider-adapter.mjs';
 import { readLlmAccounts, legacyStateKey } from '../dispatch/llm-accounts.mjs';
 import { credentialSourceForCli, credentialStoreOf, providerAccountInventory } from '../dispatch/provider-capacity.mjs';
 
-/**
- * The login store the bound invocation reads, and whether the config declares it or it is inferred from
- * an older config's private-home binding; null when the invocation is not named or reads none.
- */
+/** The login store the bound invocation declares; null when the invocation is not named or declares none. */
 function storeOfBinding(executorEntry, invocationId) {
   const entry = invocationId ? executorEntry?.invocations?.find((inv) => inv?.id === invocationId) : null;
-  const store = entry ? credentialStoreOf({ ...entry, command: entry.command ?? executorEntry.command }) : null;
-  return store ? { ...store, source: entry.credentialStore ? 'declared' : 'inferred' } : null;
+  const store = credentialStoreOf(entry);
+  return store ? { ...store, source: 'declared' } : null;
 }
 
 /**
