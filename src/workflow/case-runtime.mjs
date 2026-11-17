@@ -19,6 +19,7 @@ import { appendWorkflowEvent, readWorkflowEvents } from './store.mjs';
 import { gateOfStep, projectCase } from './case-projection.mjs';
 import { repairCaseBindings, unbindWorktree } from './case-bindings.mjs';
 import { installOnce, replaceDurably } from '../native/door.mjs';
+import { writeFrontmatter } from '../util/yaml.mjs';
 import { readAgentFileSync } from '../native/proof-helpers.mjs';
 
 /** The id prefix of the Unit run a case gate makes; a gate has no unit record to resume. */
@@ -181,8 +182,12 @@ function roundProblem({ events, round }) {
   return null;
 }
 
-/** The text of an answer file, drawn from its rounds. A view: deleting it loses nothing. */
-function renderAnswerFile(caseId, stepId, rounds) {
+/**
+ * The text of an answer file, drawn from its rounds. A view: deleting it loses nothing. Coercion keeps it from
+ * throwing on a malformed round; the only refusals left are the YAML door's own limits (a value over the
+ * profile's size bound), which propagate by name from `writeFrontmatter` and are never caught here.
+ */
+function renderAnswerFile(caseId, stepId, rounds, file) {
   const latest = rounds.at(-1);
   const entries = rounds.map((r) => [
     `### Round at ${r.answeredAt} (${r.approved ? 'Approved' : 'Clarification'})`,
@@ -194,13 +199,15 @@ function renderAnswerFile(caseId, stepId, rounds) {
     r.answer,
     '',
   ].join('\n'));
-  return [
-    '---',
-    `approved: ${latest.approved ? 'yes' : 'no'}`,
-    `occurrence: ${latest.occurrence}`,
-    `round: ${latest.round}`,
-    `subjectDigest: ${latest.subjectDigest ?? 'none'}`,
-    '---',
+  // The rounds are agent-written input, so each field is coerced to the plain value the door can round-trip.
+  const plain = (value) => (Number.isInteger(value) ? value : String(value));
+  const meta = {
+    approved: latest.approved ? 'yes' : 'no',
+    occurrence: plain(latest.occurrence),
+    round: plain(latest.round),
+    subjectDigest: String(latest.subjectDigest ?? 'none'),
+  };
+  return writeFrontmatter(meta, [
     '',
     `# Owner's answer at the "${stepId}" gate`,
     '',
@@ -217,14 +224,14 @@ function renderAnswerFile(caseId, stepId, rounds) {
     '## Rounds',
     '',
     ...entries,
-  ].join('\n');
+  ].join('\n'), file);
 }
 
 function renderGateAnswerFile(mainRoot, caseId, stepId) {
   const { file } = roundsDir(mainRoot, caseId, stepId);
   const rounds = roundsOf(mainRoot, caseId, stepId);
   if (rounds.length === 0) return;
-  writeText(file, renderAnswerFile(caseId, stepId, rounds));
+  writeText(file, renderAnswerFile(caseId, stepId, rounds, file));
 }
 
 const roundConsumed = (events, r) => events.some((e) => e.type === 'gate.answer' && e.payload?.stepId === r.stepId

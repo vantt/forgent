@@ -33,3 +33,19 @@ fn a_refusal_names_rule_file_and_position_and_never_the_input() {
     );
     assert!(!format!("{failure:?}").contains("SECRET"));
 }
+
+#[test]
+fn emit_text_keeps_key_order_and_passes_a_crate_refusal_through_value_free() {
+    let text = fgos_node_addon::yaml::emit_text(r#"{"b":1,"a":["x: y",2]}"#, "t.yaml").unwrap();
+    assert_eq!(text, "b: 1\na:\n  - \"x: y\"\n  - 2\n");
+    let refused =
+        fgos_node_addon::yaml::emit_text("{\"a\\u200bb\":\"SECRET\"}", "k.yaml").unwrap_err();
+    assert_eq!(
+        (refused.id.as_str(), refused.file.as_str()),
+        ("zero-width", "k.yaml")
+    );
+    assert!(!format!("{refused:?}").contains("SECRET"));
+    let bad = fgos_node_addon::yaml::emit_text("{SECRET", "j.yaml").unwrap_err();
+    assert_eq!(bad.id, "yaml-internal-error");
+    assert!(!format!("{bad:?}").contains("SECRET"));
+}

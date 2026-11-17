@@ -201,17 +201,21 @@ const HOST = process.env.FGOS_HOST_BIN;
 /** A group-writable locks directory makes every seal refuse, while a read verb never takes that lock. */
 const refuseSeals = (repo) => fs.chmodSync(path.join(repo, '.git/fgos/events/locks'), 0o775);
 
-test('a failing end trigger leaves a record, and the command it ended still succeeds', (t) => {
+test('a failing end trigger leaves a record, and the command it ended still succeeds', async (t) => {
   const { repo, dir, store } = workRepo(t);
   addAt(store, 3600);
   refuseSeals(repo);
   const env = { ...process.env }; delete env.FGOS_DISPATCH_DEPTH;
   const list = spawnSync(process.execPath, [BIN, 'list', '--dir', dir], { cwd: repo, encoding: 'utf8', env });
   assert.equal(list.status, 0, list.stderr);
-  const [record, ...rest] = faultRecords(repo, dir);
-  assert.deepEqual(rest, []);
-  assert.equal(record.faultClass, 'event-store-end-trigger');
-  assert.equal(record.message, 'event-store-lock-dir-invalid');
+  // The sync child the command handed off fails on the same refused locks directory and records that too, whenever it gets
+  // to run; the record is read once the child has written its own, so the set is the same on a slow machine.
+  const records = await waitFor('the detached sync child to record its failure', () => {
+    const found = faultRecords(repo, dir);
+    return found.some((record) => record.faultClass === 'event-store-child') ? found : null;
+  });
+  assert.deepEqual(records.map((record) => record.faultClass).sort(), ['event-store-child', 'event-store-end-trigger']);
+  assert.equal(records.find((record) => record.faultClass === 'event-store-end-trigger').message, 'event-store-lock-dir-invalid');
 });
 
 test('a failing start trigger of a dispatched worker leaves a record before the verb runs, and the command still succeeds', (t) => {

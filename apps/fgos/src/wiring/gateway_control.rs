@@ -1232,7 +1232,7 @@ mod tests {
         let child = throwaway(None);
         let mut record = child.record();
         let start: u64 = record["startTime"].as_str().unwrap().parse().unwrap();
-        record["startTime"] = (start - 1_000_000).to_string().into();
+        record["startTime"] = start.wrapping_add(1_000_000).to_string().into();
         write_entry(
             &root,
             &json!({"pid": child.pid, "record": record, "port": 4170}),

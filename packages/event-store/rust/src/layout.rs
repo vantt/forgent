@@ -94,17 +94,21 @@ impl Layout {
         let entries = match std::fs::read_dir(&self.root) {
             Ok(entries) => entries,
             Err(e) if e.kind() == std::io::ErrorKind::NotFound => return Ok(Vec::new()),
-            Err(e) => return Err(io(e)),
+            Err(e) => return Err(io("read_dir", &self.root)(e)),
         };
         let mut streams = Vec::new();
         for entry in entries {
-            let entry = entry.map_err(io)?;
+            let entry = entry.map_err(io("read_dir_entry", &self.root))?;
             if let Some(stream) = entry
                 .file_name()
                 .to_str()
                 .and_then(|n| StreamId::parse(n).ok())
             {
-                if entry.file_type().map_err(io)?.is_dir() {
+                if entry
+                    .file_type()
+                    .map_err(io("file_type", &entry.path()))?
+                    .is_dir()
+                {
                     streams.push(stream);
                 }
             }

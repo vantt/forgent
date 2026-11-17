@@ -50,7 +50,7 @@ Phase-lead rules: [plan.md](plan.md). Branch `rust-verb-migration-program/s4-p09
    `--dir`; an unknown flag. Plus `apps/fgctl/tests/uninstall_surface.rs` against the real host shim once, checking
    the sub-shapes `fgctl` reads; the 14 fake-shim fixtures are regenerated from the real host's output.
 4. Delete (D14; 06 has removed the doctor's timer use): the arm, `src/setup/uninstall-project.mjs`,
-   `src/setup/managed-timer.mjs`, `uninstallAgentHooks`, `uninstallGitHooks` and `mainCheckoutHookWired` (`git-hooks.mjs` keeps `installGitHooks`
+   `src/setup/managed-timer.mjs` (in no frozen set, deleted freely), `uninstallGitHooks` and `mainCheckoutHookWired` (`git-hooks.mjs` keeps `installGitHooks`
    for `scripts/install-git-hooks.mjs`), `generatedSkillDirs`, uninstall's import of `shell-rc.mjs` (the file keeps
    insertion until 11 and `detectRcFiles` for the session-start hook, D18), `integrationScriptPath` if no other user,
    `EXIT_OF.uninstall`, the Node tests whose behaviour moved; `rg` each name before the commit.
@@ -68,8 +68,8 @@ Phase-lead rules: [plan.md](plan.md). Branch `rust-verb-migration-program/s4-p09
 ## Files
 
 - Create: `apps/fgos/src/wiring/uninstall.rs`, `test/rust-host/parity-cases/uninstall.cases.mjs` (deleted by 12).
-- Modify: host files per the recipe, `bin/fgos.mjs`, `src/setup/{agent-hooks,git-hooks,shell-rc,skill-wrappers,checks}.mjs`
-  (exports out), `src/cli/{verb-exit,command-registry}.mjs` (description: "the git hooks fgOS wired" instead of
+- Modify: host files per the recipe, `bin/fgos.mjs`, `src/setup/{git-hooks,shell-rc,skill-wrappers,checks}.mjs`
+  (exports out; `agent-hooks.mjs` is frozen and untouched, so `uninstallAgentHooks` stays there as debt), `src/cli/{verb-exit,command-registry}.mjs` (description: "the git hooks fgOS wired" instead of
   "`fgos setup` wired"), `apps/fgctl/tests/uninstall_surface.rs`, tests, baseline, manifest, census.
 - Delete: as requirement 4.
 

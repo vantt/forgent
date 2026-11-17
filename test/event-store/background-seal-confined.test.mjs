@@ -2,7 +2,7 @@
 // read-only, so the command is refused before it appends anything: no event exists to lose and no seal child is ever
 // started in the domain. A seal child that did exist would share the fate proven in direct-crash-matrix (a session
 // leader the worker leaves behind dies with the attempt domain), and the next command outside seals the backlog.
-import '../helpers/process-tmp-root.mjs';
+import { waitForSealChildrenOf } from '../helpers/process-tmp-root.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -32,6 +32,8 @@ test('a CLI Work command inside a confined attempt is refused read-only, starts 
   const cli = (args) => spawnSync(process.execPath, [BIN_FGOS, ...args, '--dir', project.repoDir], { cwd: project.repoDir, env: project.env, encoding: 'utf8' });
   const added = cli(['add', 'cf-1', '--title', 'T', '--kind', 'task', '--risk', 'light', '--verify', 'npm test', '--step', 'executing', '--description', 'confined seal fixture']);
   assert.equal(added.status, 0, added.stderr);
+  // The add's own detached seal and sync children may outlive it on a slow machine; the "no seal child" check below must only see children of the confined attempt.
+  waitForSealChildrenOf(project.repoDir);
   const dirOf = path.join(project.repoDir, '.fgos');
   const store = prepareWorkStore(dirOf, dirOf).store;
   const total = () => store.read({ streams: ['project'] }, []).events.length;

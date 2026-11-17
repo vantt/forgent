@@ -2267,3 +2267,27 @@ test('door rows for the agent hook table and a person\'s agent config catch a se
   assert.equal(outsideDoor(keywords, 'packages/p/rust/src/x.rs', 'const KW: [&str; 2] = [\"xargs\", \"clean\"];\n').length, 1);
   assert.deepEqual(outsideDoor(keywords, 'src/x.mjs', '// the PREFILTER_WORDS list is data\n'), []);
 });
+
+test('door row for a YAML frontmatter fence catches each literal way to open a block and ignores other dashes', () => {
+  const job = 'write a YAML frontmatter fence';
+  const caught = [
+    "fs.writeFileSync(p, '---\\nname: x\\n---\\n');",
+    'const t = "---\\r\\nname: x\\r\\n";',
+    'let md = `---\nname: x\n---`;',
+    "const F = '---';",
+    "const lines = ['---', 'a: 1'];",
+    "lines.push('---');",
+  ];
+  for (const source of caught) assert.equal(outsideDoor(job, 'src/x.mjs', `${source}\n`).length, 1, source);
+  const passed = [
+    'log(`--- ${label} ---`);',
+    "const sep = '--- label ---';",
+    "const row = '|---|---|';",
+    "if (line.startsWith('---')) skip();",
+    "if (line.startsWith('--- a/x')) skip();",
+    "// '---\\n'",
+    'const FENCE = /^---\\r?\\n/;',
+  ];
+  for (const source of passed) assert.deepEqual(outsideDoor(job, 'src/x.mjs', `${source}\n`), [], source);
+  assert.deepEqual(outsideDoor(job, 'packages/p/rust/src/x.rs', 'if rest.starts_with("---") {}\n'), []);
+});

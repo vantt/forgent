@@ -35,6 +35,7 @@ test('the addon marker names the config namespace at the version this payload ca
   const v = nativeDoor().versions();
   assert.equal(v.config, 4);
   assert.equal(combinedAbiMatches(v, v.napi), true);
+  assert.equal(combinedAbiMatches({ ...v, yaml: 1 }, v.napi), false, 'an addon before emit');
   assert.equal(combinedAbiMatches({ ...v, config: 3 }, v.napi), false, 'an addon before eventStore and globalDir');
   assert.equal(combinedAbiMatches({ ...v, config: undefined }, v.napi), false, 'an addon with no config namespace');
 });

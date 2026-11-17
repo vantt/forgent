@@ -26,7 +26,7 @@ const waitFor = async (what, predicate, timeoutMs = 20000) => {
   }
 };
 
-function workspace() {
+async function workspace() {
   const cwd = fs.realpathSync(initGitCwd());
   // Through a CLI child, so this test process never holds a pending seal of its own that would race the receipts.
   assert.equal(addViaCli(cwd, 'bs-1').status, 0);
@@ -38,14 +38,18 @@ function workspace() {
     return fs.existsSync(file) ? JSON.parse(fs.readFileSync(file)).lastSeq : 0;
   };
   const total = () => store.read({ streams: ['project'] }, []).events.length;
-  const sealChildren = () => {
+  const childrenRunning = (verb) => {
     const views = scan({});
     return views === 'unsupported' ? [] : views.filter((view) => {
       const args = Array.isArray(view.cmdline) ? view.cmdline.join(' ') : String(view.cmdline);
-      return view.pid !== process.pid && args.includes(' events seal ') && args.includes(cwd);
+      return view.pid !== process.pid && args.includes(` events ${verb} `) && args.includes(cwd);
     });
   };
+  const sealChildren = () => childrenRunning('seal');
   const env = { ...process.env, FGOS_SESSION_ID: 'fgos-cli-harness-test' };
+  // The add's own seal and sync children take the seal lock until they exit, and on a slow machine they outlive the add: a test
+  // that then takes the lock itself or expects an inline seal would meet a child instead of a free lock.
+  await waitFor('the setup seal and sync children to exit', () => childrenRunning('seal').length === 0 && childrenRunning('sync').length === 0);
   return {
     cwd, receipt, total, sealChildren, env, eventRoot,
     holdSeal: () => holdLockInChild('event-seal', { eventOpenRoot: eventRoot }),
@@ -58,7 +62,7 @@ const holdSealFor = async (t, w) => { const holder = await w.holdSeal(); t.after
 const gone = (views) => views.every((view) => view.tuple === null || judge(view.tuple) === 'dead');
 
 test('a CLI Work command returns before its seal, a detached child then certifies it, and the child exits', async (t) => {
-  const w = workspace();
+  const w = await workspace();
   const holder = await holdSealFor(t, w);
   const before = w.receipt();
   const moved = w.move('blocked');
@@ -73,7 +77,7 @@ test('a CLI Work command returns before its seal, a detached child then certifie
 });
 
 test('a burst of CLI commands ends with every event sealed, no child running and no lock held', async (t) => {
-  const w = workspace();
+  const w = await workspace();
   for (const to of ['blocked', 'todo', 'blocked', 'todo', 'blocked']) assert.equal(w.move(to).status, 0);
   await waitFor('every event sealed', () => w.receipt() === w.total());
   await waitFor('no seal child left', () => w.sealChildren().length === 0);
@@ -83,7 +87,7 @@ test('a burst of CLI commands ends with every event sealed, no child running and
 });
 
 test('a seal child killed before it seals loses nothing and the next command seals both events', async (t) => {
-  const w = workspace();
+  const w = await workspace();
   const holder = await holdSealFor(t, w);
   assert.equal(w.move('blocked').status, 0);
   const [child] = await waitFor('the seal child', () => { const found = w.sealChildren(); return found.length ? found : null; });
@@ -97,7 +101,7 @@ test('a seal child killed before it seals loses nothing and the next command sea
 });
 
 test('a seal child that cannot be started never fails the command, and the next command seals', async (t) => {
-  const w = workspace();
+  const w = await workspace();
   // Not the receipt: the command's own start trigger may seal the older setup event inline, child or no child.
   const refused = path.join(w.cwd, 'refused-spawns.log');
   const result = spawnSync(process.execPath, ['--require', REFUSE_SPAWN, BIN, 'move', 'bs-1', '--to', 'blocked'], { cwd: w.cwd, env: { ...w.env, REFUSED_SPAWN_LOG: refused }, encoding: 'utf8' });
@@ -110,7 +114,7 @@ test('a seal child that cannot be started never fails the command, and the next 
 });
 
 test('a seal child lives on when the CLI process group is interrupted', { skip: process.platform === 'win32' && 'process groups are a unix notion' }, async (t) => {
-  const w = workspace();
+  const w = await workspace();
   const holder = await holdSealFor(t, w);
   const cli = spawn(process.execPath, [BIN, 'move', 'bs-1', '--to', 'blocked'], { cwd: w.cwd, env: w.env, detached: true, stdio: 'ignore' });
   const [child] = await waitFor('the seal child', () => { const found = w.sealChildren(); return found.length ? found : null; });
@@ -125,7 +129,7 @@ test('a seal child lives on when the CLI process group is interrupted', { skip: 
 });
 
 test('a dispatched worker seals inline: the command returns sealed and starts no seal child', async () => {
-  const w = workspace();
+  const w = await workspace();
   const moved = spawnSync(process.execPath, [BIN, 'move', 'bs-1', '--to', 'blocked'], { cwd: w.cwd, env: { ...w.env, FGOS_DISPATCH_DEPTH: '1' }, encoding: 'utf8' });
   assert.equal(moved.status, 0, moved.stderr);
   assert.equal(w.receipt(), w.total(), 'the seal was done by the command itself');
@@ -134,7 +138,7 @@ test('a dispatched worker seals inline: the command returns sealed and starts no
 });
 
 test('a detached seal or publish child skips quietly when its state root is gone and never rebuilds it', async () => {
-  const w = workspace();
+  const w = await workspace();
   const stateRoot = path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'bs-state-')), 'state');
   const env = { ...w.env, FGOS_STATE_ROOT: stateRoot };
   assert.equal(spawnSync(process.execPath, [BIN, 'move', 'bs-1', '--to', 'blocked'], { cwd: w.cwd, env, encoding: 'utf8' }).status, 0);

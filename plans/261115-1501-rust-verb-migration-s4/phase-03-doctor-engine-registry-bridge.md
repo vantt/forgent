@@ -42,7 +42,7 @@ Phase-lead rules: [plan.md](plan.md). Branch `rust-verb-migration-program/s4-p03
    `registrations.mjs:291-297`); status derivation (`fail` when not passed; `warn` for a
    passing `warning:` message; `skip` when the row says so; else `ok`); a failing row's `fix` (the registered fix's
    command `fgos doctor --fix` when a fix repairs it, else the row's `fixCommand`, else `null`); `ok`, `next` (each
-   fix command once, registry order); `--fix` runs fixes first in exact registry order and reports `fixed[]`;
+   fix command once, registry order); `--fix` runs fixes first in exact registry order and reports `fixed[]` with a `changed` key always (additive; eight fixes report none today, so parity needs no per-id exception);
    `--strict`; the JSON envelope and the `--pretty` render (ANSI only on a terminal without `NO_COLOR`, as
    `src/setup/ansi.mjs`; there is no other text form, `bin/fgos.mjs:3912-3926`). One lenient serde type for the report
    (every field optional, unknown fields ignored), which `init.rs` `closing_block` and `doctor_is_clean` now read;
@@ -57,7 +57,8 @@ Phase-lead rules: [plan.md](plan.md). Branch `rust-verb-migration-program/s4-p03
    script (D5), reads the request from stdin and runs `runBridged(request)` from `src/setup/checks.mjs` over the
    existing bodies (no ordering or status logic in Node any more); no verb, no route, no `bin/fgos.mjs` arm.
    Host side `apps/fgos/src/wiring/doctor/bridge.rs`: starts it through `legacy_exec.rs`'s payload resolution and
-   spawn, moved into one function both callers use (environment, manifest fields only, signal forwarding through
+   spawn, moved into one function both callers use and which verifies the release payload once per host process,
+   not on every call (environment, manifest fields only, signal forwarding through
    the same `CHILD_PID` path); the child gets a fresh recursion guard and an inherited one does not stop it; one call
    per consecutive bridged fix segment in registry order and one for all bridged checks (D5); a deadline from 00 F21
    kills the process tree; the module routes any stdout write of a body to stderr and prints one JSON line per
@@ -84,10 +85,13 @@ Phase-lead rules: [plan.md](plan.md). Branch `rust-verb-migration-program/s4-p03
    removes its entries), "Node rows bridge" (patterns `doctor-bridge`, `runBridged`; allowed `bridge.rs`,
    `src/setup/doctor-bridge.mjs`, `src/setup/checks.mjs`; `retiredBy` S7), "no Node from the native packaging verbs"
    (patterns: a `node` spawn, `legacy_exec::`, a legacy verb spawn; allowed `apps/fgos/src/legacy_exec.rs` and
-   `wiring/doctor/bridge.rs`; scanned paths include `apps/fgos/src/wiring/doctor/**` and `wiring/{init,uninstall,wire_agents}.rs`).
-9. **D4 test** in `test/architecture.test.mjs`: for each bridged row, the registry's judge module's import closure
-   (from `docs/architecture-manifest.json` tiers) has a Node-only layer and its highest step equals the label; a row
-   whose closure has no Node-only layer left fails ("move it"). Negative cases in the report.
+   `wiring/doctor/bridge.rs`, plus a named allowance for the hook rows' probe of the project shim (`hook dispatch-decide`,
+   `hook main-checkout-delete-guard`, `hook mailbox`: the shim is spawned, not Node, with the guard removed); scanned paths include `apps/fgos/src/wiring/doctor/**` and `wiring/{init,uninstall,wire_agents}.rs`).
+9. **D4 test** in `test/architecture.test.mjs`: labels follow the facts report's section 4 rule, not a plain import
+   closure (which misclassified rows): expand only `src/setup` modules, honour the manifest `tierExceptions` edges,
+   take an explicit S5 file list, and keep `domain-registry-compiled` and `capability-serves-valid` as named entries
+   the test knows; the label equals the highest step reached, and a bridged row with no Node-only layer left fails
+   ("move it"). Negative cases in the report.
 
 ## Test owners after the move
 

@@ -4,7 +4,8 @@
 mod common;
 
 use common::*;
-use fgos_yaml_doc::{parse, Document};
+use fgos_yaml_doc::edit::emit;
+use fgos_yaml_doc::{parse, Document, Value};
 use serde_json::Value as Json;
 
 fn text_of(bytes: &[u8]) -> String {
@@ -48,6 +49,56 @@ fn edits_match_the_golden_cases() {
             }
         }
     }
+    assert!(
+        failures.is_empty(),
+        "{} failing:\n{}",
+        failures.len(),
+        failures.join("\n")
+    );
+}
+
+/// `emit` is `parse("")` then `set` of the whole value: it must give the bytes, or the refusal,
+/// of every empty-document whole-value `set` case above, so it has no fixtures of its own.
+#[test]
+fn emit_is_the_whole_value_set_on_an_empty_document() {
+    let mut failures = Vec::new();
+    let mut seen = 0;
+    for case in fixture_cases("edit") {
+        let ops = case["ops"].as_array().expect("ops");
+        let whole_value_on_empty = case["input"]["text"].as_str() == Some("")
+            && ops.len() == 1
+            && ops[0]["op"] == "set"
+            && ops[0]["path"] == "";
+        if !whole_value_on_empty {
+            continue;
+        }
+        seen += 1;
+        let value = Value::from_json(&ops[0]["value"]);
+        for profile in profiles_of(&case) {
+            let label = format!("{} [{}]", id(&case), profile.name());
+            match (emit(&value, profile, "edit.yaml"), &case["expect"]) {
+                (Ok(bytes), expect) if expect["output"].is_string() => {
+                    let want = expect["output"].as_str().unwrap_or("");
+                    if text_of(&bytes) != want {
+                        failures.push(format!(
+                            "{label}: emitted {:?}, want {want:?}",
+                            text_of(&bytes)
+                        ));
+                    }
+                }
+                (Err(refusal), expect) if expect["refusal"].is_object() => {
+                    if refusal.rule != expect["refusal"]["rule"].as_str().unwrap_or("") {
+                        failures.push(format!("{label}: refused with {}", refusal.rule));
+                    }
+                }
+                (got, _) => failures.push(format!(
+                    "{label}: unexpected outcome {:?}",
+                    got.map(|b| text_of(&b))
+                )),
+            }
+        }
+    }
+    assert!(seen >= 15, "only {seen} whole-value cases found");
     assert!(
         failures.is_empty(),
         "{} failing:\n{}",

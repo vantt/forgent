@@ -115,7 +115,7 @@ pub fn sync_status(layout: &Layout) -> Result<SyncRecord, Error> {
             Ok(record)
         }
         Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(SyncRecord::default()),
-        Err(e) => Err(io(e)),
+        Err(e) => Err(io("read", &layout.root.join("sync.json"))(e)),
     }
 }
 fn tip(port: &dyn Publication, repo: &RepoHandle, reference: &str) -> Result<Option<Oid>, Error> {

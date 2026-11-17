@@ -1280,6 +1280,22 @@
       ],
       "retiredBy": "S6a: the confinement rows move to Rust and call the Rust smoke test",
       "reason": "the version, launcher, hook-wiring, agent-config report, curl, bwrap and global path cache rows and fixes are judged in process by the host over the packaging modules (agent_hooks, agent_config, launcher, bin_cache), never by a Node body; guards the definitions by name, so a second judge of the same row must be declared. Not covered, by design of a pattern check: a differently named body. The Node `checkBwrapAvailable` that the confinement rows of S6a still call is a different job (a smoke test of a named binary) and stays until they move"
+    },
+    {
+      "job": "write a YAML frontmatter fence",
+      "kind": "door",
+      "patterns": [
+        "(['\"`])---(?:\\\\r)?\\\\n",
+        "`---$",
+        "(['\"`])---\\1\\s*[,\\];]",
+        "\\.push\\(\\s*(['\"`])---\\1\\s*\\)"
+      ],
+      "allowed": [
+        "src/util/yaml.mjs",
+        { "path": "core/skills/distill/scripts/distill.mjs", "reason": "standalone shipped skill script; runs in user projects without the fgOS addon" }
+      ],
+      "debt": [],
+      "reason": "only src/util/yaml.mjs writeFrontmatter writes a frontmatter block, through the crate's emit (the addon's yaml.emit), so quoting is the crate's and every block reads back to its value; a hand writer opens a block with a fence literal: a quoted `---` followed by an escaped newline, a template line ending in `---`, a `---` array element or constant, or a pushed `---`. Per-line match on code and string text in the scanned roots: YAML text built without a fence literal, or a fence assembled from parts, is not seen"
     }
   ],
   "files": {

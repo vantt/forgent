@@ -188,7 +188,7 @@ Wave C: [12 close]
 | `packages/distribution/rust/src/init.rs` | 02 (the root call, D13), 03 (the closing block reads the shared report type), 07 (`pin_drift` is the row's one reader) |
 | `src/setup/checks.mjs`, `src/setup/doctor-bridge.mjs` | 03 (bridge), 04 (`mainCheckoutHookWired` re-export stays), 09 (`integrationScriptPath` and `mainCheckoutHookWired` out), 11, 10 (`work-store-init`) |
 | `src/setup/git-hooks.mjs` | 04 (D17: `wired()` reads the RepositoryConfig report), 09 (`uninstallGitHooks`, `mainCheckoutHookWired` out) |
-| `src/setup/{shell-rc,skill-wrappers,agent-hooks}.mjs` | `shell-rc`: 09 (uninstall's use out), 11 (insertion out; detection stays, D18); `skill-wrappers`: 02 (reads the stamp contract in its test), 09 (`generatedSkillDirs` out), 11 (`materializeSkillsIntoProject`, `createProjectSkillGuard` out); `agent-hooks`: 01 (prefilter from data), 09 (`uninstallAgentHooks` out), 07 (file out) |
+| `src/setup/{shell-rc,skill-wrappers,agent-hooks}.mjs` | `shell-rc`: 09 (uninstall's use out), 11 (insertion out; detection stays, D18); `skill-wrappers`: 02 (reads the stamp contract in its test), 09 (`generatedSkillDirs` out), 11 (`materializeSkillsIntoProject`, `createProjectSkillGuard` out); `agent-hooks`: untouched (frozen, MAIL 2026-11-15; stays as debt) |
 | `apps/fgos/src/wiring/mod.rs`, `apps/fgos/tests/cli_tests.rs` | 03, 08, 09, 10 (one `mod` line or one case each) |
 | `packages/distribution/rust/Cargo.toml` (D15 edges) | 01 or 02, whichever lands first; `Cargo.lock` by the step lead |
 | `packages/config/rust/src/provider.rs` | 03 (D11) |
@@ -237,9 +237,8 @@ Modify:
 - Contracts: `command-route-annotations.json`, the two generated route files, census, `packages/config/contracts/doctor-rows.v1.json` (only its registry reference, 05)
 - Node: `bin/fgos.mjs`, `src/cli/command-registry.mjs`, `src/cli/verb-exit.mjs`, `src/setup/registrations.mjs`,
   `src/setup/{checks,git-hooks,shell-rc,skill-wrappers}.mjs`, the bridged row modules that stay (their imports shrink),
-  `scripts/lib/mailbox-live-confined.mjs` (01, F11), `scripts/event-store/forge-probe.sh` (04: it imports
-  `fixGitFetchMapping` from `git-checks.mjs`), the MAIL experiment files that list `src/setup/agent-hooks.mjs`
-  (`scripts/lib/mailbox-behaviour-v7{e,h,i}.mjs`, `test/scripts/mailbox-behaviour-v7h.test.mjs`; 07, after MAIL answers, collision table)
+  `scripts/event-store/forge-probe.sh` (04: it imports
+  `fixGitFetchMapping` from `git-checks.mjs`), no MAIL experiment file or frozen set is touched (`src/setup/agent-hooks.mjs` and `scripts/lib/mailbox-live-confined.mjs` stay untouched as debt)
 - CI: `.github/workflows/{ci.yml,release-assets-check.yml,holder-lock-cross-platform.yml}` (lines naming deleted tests or paths)
 - Tests: `test/architecture.test.mjs`, `test/suite-baseline.json`, `test/git/main-checkout-delete-guard.test.mjs` (D9),
   `test/rust-host/{command-routes,closing-block,fgctl-init-preflight-tail,fgctl-upgrade}.test.mjs`,
@@ -266,10 +265,10 @@ Delete (by the phase in brackets; the phase files are the authority, D14; 00 che
 - [05] `src/setup/{config-checks,identity-checks}.mjs`, the Observe row bodies
 - [06] `src/setup/holder-lock-checks.mjs`, `terminal-control-checks.mjs` (only if F2 moves its rows), the mailbox row bodies
 - [08] `wireAgentsUseCase` and the `wire-agents` renderer (the file `agent-wiring.mjs` goes in 07)
-- [09] `src/setup/{uninstall-project,managed-timer}.mjs`; `uninstallAgentHooks`, `uninstallGitHooks`, `mainCheckoutHookWired`, `generatedSkillDirs`
+- [09] `src/setup/{uninstall-project,managed-timer}.mjs`; `uninstallGitHooks`, `mainCheckoutHookWired`, `generatedSkillDirs`
 - [11] `src/setup/{setup-use-case,runner-config-conversion,ansi}.mjs` (the advice the bridged `runner-patterns-config` row reads moves next to it, F14), `shell-rc.mjs`'s insertion (detection stays, D18), `materializeSkillsIntoProject`, `createProjectSkillGuard`
 - [10] `src/verbs/state/{init,settle-legacy-config}.mjs`, `src/install/coexist.mjs`, `src/git/status.mjs`, `src/setup/event-store-fixes.mjs`
-- [07] `src/setup/{agent-hooks,claude-code-hooks,agy-permissions,mailbox-claude-accept,project-launcher,agent-wiring}.mjs`; `version-info.mjs`, `mailbox-limits.mjs`, `omp-natives-checks.mjs` if 00 finds no other user
+- [07] `src/setup/{claude-code-hooks,agy-permissions,mailbox-claude-accept,project-launcher,agent-wiring}.mjs`; `version-info.mjs`, `mailbox-limits.mjs`, `omp-natives-checks.mjs` if 00 finds no other user
 - Their tests (owners named per phase); the transitional parity runner and tables [12]
 
 
@@ -295,13 +294,13 @@ Checked on `origin/main` `445e65679`. Landed and closed for S4's purpose: capabi
 | `src/setup/registrations.mjs` (Work rows 1422-1562, `domain-registry-compiled` 1113, `worker-slots-ceiling-usable` 1971) | rows stay bridged (`bridge:S7`); S4 only removes other rows | doctor-readiness-only phase 09 (WORK's six Work rows and the Work pointer, `plans/261106-1216-doctor-readiness-only/plan.md:71`), held with the Work lane | if WORK lands first, rebase and keep the registry contract's ids equal (exact-set test fails by name); if S4 lands first, WORK edits the bridged bodies and the registry entries |
 | `apps/fgos/src/{main.rs,routing.rs}`, `command-registry.mjs` (hook entry), generated routes | doctor, init, uninstall, wire-agents lines | program S1 (hook verdicts; may run beside any step) | additive list lines; regenerate after the second landing; S1 does not touch `src/setup/` |
 | `test/git/main-checkout-delete-guard.test.mjs` | reads the prefilter from the D9 data file instead of `agent-hooks.mjs` | S1 ports the guard verdict and owns this test after it | if S1 lands first, 01 edits S1's Rust test reader instead; one owner of the list either way |
-| `src/setup/agent-hooks.mjs` (mailbox hook rows), `managed-timer.mjs` (mailbox sync timer), `scripts/lib/mailbox-live-confined.mjs` | moved to Rust (01, 02) | MAIL lane (board "Các luồng", running) | 00 reads the MAIL row and its open branch; if MAIL edits the hook rows, the edit lands in the Rust table's data file; one owner |
+| `src/setup/agent-hooks.mjs` (mailbox hook rows), `managed-timer.mjs` (mailbox sync timer), `scripts/lib/mailbox-live-confined.mjs` | `managed-timer.mjs` moved to Rust (02) and deleted (09); `agent-hooks.mjs` and `mailbox-live-confined.mjs` stay frozen as debt, twin in Rust (01), untouched until MAIL re-measures | MAIL lane (board "Các luồng", running) | 00 reads the MAIL row and its open branch; if MAIL edits the hook rows, the edit lands in the Rust table's data file and the Node file stays MAIL's; one owner |
 | `src/config/facade.mjs` (`initConfigFile`, `checkConfig`, `fixConfig`) | init and config rows call the crate directly; the facade stays for its other callers | CFG Slice C (`plans/261023-1649-yaml-config-slice-c-node-door-cutover`, status cell `in-progress` since 10-23) | 00 checks whether Slice C is live; S4 deletes no facade function another caller uses |
 | `AGENTS.md` ("Install/setup/doctor gate") | the registry path and the setup sentence (12) | RULE lane (running since 10-21; writes `AGENTS.md` only after its own cutover) | one section; rebase |
 | `test/suite-baseline.json` | rows of deleted test files | TEST lane (test governance) | different rows; rebase |
 | `docs/architecture-manifest.json` | new `doors` rows; `files` entries out; debt entries removed (`workspace.rs`, `setup-use-case.mjs`) | any landing plan adding rows | additive; second lander reruns `test/architecture.test.mjs`; a stale debt entry fails by name |
 | `packages/git/contracts/mutation-census.v1.json` | regenerated | every product change | regenerate after each landing |
-| `scripts/lib/mailbox-behaviour-v7{e,h,i}.mjs`, `test/scripts/mailbox-behaviour-v7h.test.mjs` (frozen preregistered file sets list `src/setup/agent-hooks.mjs`; the test copies it) | 07 deletes `agent-hooks.mjs` | MAIL lane (experiment evidence) | 00 asks MAIL how the frozen sets treat a deleted file; 07 waits for the answer (an item, not a block on other phases) |
+| `scripts/lib/mailbox-behaviour-v7{e,h,i}.mjs`, `test/scripts/mailbox-behaviour-v7h.test.mjs` (frozen preregistered file sets list `src/setup/agent-hooks.mjs`; the test copies it) | none: `agent-hooks.mjs` stays (MAIL answered 2026-11-15, see Decision log) | MAIL lane (experiment evidence) | S4 does not touch the frozen sets or the files they list |
 | `src/setup/registrations.mjs` (+13 lines), new `src/setup/paseo-checks.mjs`, `setup-doctor-registry.md`, `apps/fgos/src/main.rs` | registry and host files | unmerged branch `origin/spike/paseo-external` (9 commits) adds a doctor row | if it lands first, its row enters the registry contract with an owner (exact-set test fails by name otherwise); if S4 lands first, the spike adds its row to the contract |
 | `.github/workflows/{ci.yml,release-assets-check.yml,holder-lock-cross-platform.yml}` | lines naming deleted tests and paths | `ci/cache-and-cancel` (open, edits CI files) | different lines; rebase |
 
@@ -439,7 +438,8 @@ refs are compared in its parity; `--dir` and the default envelope of `uninstall`
   `core.hooksPath` to a project's own `.githooks` (`setup-use-case.mjs:56`; `installGitHooks` acts only when
   `<main>/.githooks` exists, `git-hooks.mjs:23-33`). The only project that ships `.githooks` is the fgOS source, which
   wires it with `npm run setup:hooks` (AGENTS.md "Scratch artifacts"); the doctor row `main-checkout-hook-wired` keeps
-  reporting it and names that command. Veto means: register a fix for that row (fill-only, the same code).
+  reporting it and names that command. Corrected 2026-11-15 (Decision log, last entry): the row applies only to a
+  project whose `.githooks/pre-commit` carries fgOS's own guard; every other project with a `.githooks/` never fails on it. Veto means: register a fix for that row (fill-only, the same code).
 - **V2. No command copies the release's skills into a project.** Only `setup` did (`materializeSkillsIntoProject`);
   `fgctl init`, the supported onboarding, never ran it; Claude gets fgOS skills from the plugin `wire-agents` installs;
   existing copies stay. Non-Claude agents in an external project get no fgOS skills from the supported path (item).
@@ -451,7 +451,13 @@ refs are compared in its parity; `--dir` and the default envelope of `uninstall`
 
 ## Decision log
 
-2026-11-15 15:55, owner answers relayed by HARDEN: Q3 = (a), all four verbs move in S4 with the one bounded Node rows bridge. Q2 = (b), decided by HARDEN inside the approved frame and reported with no veto: Node stays required until S6, revisited there. V1-V4 were reported to the owner and not vetoed, so they stand. All phases are unblocked; phase 07 still waits for MAIL on the frozen v7e/v7h/v7i file sets (asked by mailbox 2026-11-15).
+2026-11-15 15:55, owner answers relayed by HARDEN: Q3 = (a), all four verbs move in S4 with the one bounded Node rows bridge. Q2 = (b), decided by HARDEN inside the approved frame and reported with no veto: Node stays required until S6, revisited there. V1-V4 were reported to the owner and not vetoed, so they stand. All phases are unblocked; phase 07 waited for MAIL on the frozen v7e/v7h/v7i file sets (answered 2026-11-15, next entry).
+
+2026-11-15 17:10, MAIL (lead of the mailbox lane) answered, checked in `test/scripts/mailbox-behaviour-v7e|v7h|v7i|v7n.test.mjs`: a frozen file is a measurement input; deleting or porting it is a new measurement, so no hash refresh and no silent re-freeze. Consequence: (1) `src/setup/agent-hooks.mjs` (frozen by v7e, v7h, v7i) stays as is with its tests and is listed in the doors table as debt "moves to the Rust owner when V7e/h/i are re-measured (MAIL)"; the Rust `agent_hooks.rs` from phase 01 is a twin until then, `retiredBy` naming the re-measure. (2) `scripts/lib/mailbox-live-confined.mjs` (v7h, v7i, v7n) stays, already debt (HARDEN, V7n case). (3) `src/setup/managed-timer.mjs` is in no frozen set: ported and deleted freely (02, 09). (4) `packages/mailbox/contracts/limits.v1.json` is frozen by content: its bytes do not change. Phase 07's deletion list therefore excludes `agent-hooks.mjs` and `mailbox-live-confined.mjs`; phases 01 and 09 no longer edit them. The bridge-deletion and "last Node packaging modules deleted" exit lines of phases 07, 09 and 12 and the program plan's S7 line `delete the bridge module` stay valid, except that `agent-hooks.mjs` stays until MAIL re-measures (after rc.9, MAIL's call); if S4 wants the files gone sooner, MAIL schedules the re-measure and S4 does not touch the sets.
+
+2026-11-15 18:00, HARDEN decided inside the approved frame and reported to the owner, after the phase 00 facts report (`reports/phase-261115-1658-s4-p00-facts.md`, section 5): (1) V1's wording is corrected. The doctor row `main-checkout-hook-wired` applies only to a project whose `.githooks/pre-commit` carries fgOS's own guard; every other project with a `.githooks/` never fails on it; its text names `npm run setup:hooks`, never `setup`. Reason: AGENTS.md says a rule about the fgOS repo's own files never makes a project "not ready" (the premise "only the fgOS source ships `.githooks`" was false, report B2). Owner phase: 04, which carries the row. (2) Reconciliations accepted: phase 03's row-labelling rule (import closure with manifest tiers) is replaced by the report's section 4 rule (expand only `src/setup`, honour `tierExceptions`, explicit S5 file list, `domain-registry-compiled` and `capability-serves-valid` as named entries) because the import-closure test misclassified rows; the bridge verifies the release payload once per host process, not per call; the hook rows' shim probe gets a named allowance in phase 03's `doors` ban on legacy-verb spawns; eight doctor fixes report no `changed` key, and phase 03 emits `changed` always (additive field) so parity needs no per-id exception; the measured row split is 56 judged in Rust and 53 bridged (S5 8, S6a 31, S6b 6, S7 8), live registry 109 rows; phase 11 also covers the five Rust refusal texts that name `setup` (`refspec.rs`, `legacy_import.rs`, event-store `identity.rs` and `identity/machine.rs`); `mailbox-limits.mjs` cannot be deleted while the frozen `agent-hooks.mjs` imports it. Filed: backlog `p-abazvjazgt` (`doctor --fix` never converges on an unactivated project).
+
+2026-11-15 20:55, owner answer relayed by OPC, and OPC's review note of phase 08: (1) `fgos uninstall` itself refuses `/`, `$HOME` and any ancestor of either with a precondition refusal (exit 2), besides fgctl's purge guard; phase 09 is not reopened, the work is a phase 12 close item with one test, one spec line (6.1) and a mention in the close's `[Unreleased]` line. (2) RUL11: `root_policy`, `acts_on_resolved_root`, `takes_lenient_root` and `ignores_dir` in `apps/fgos/src/invocation_doors.rs` fold into one table of verb-root behaviour, in phase 12 after phases 09, 10 and 11 have added their verbs; one proof per behaviour kept.
 
 ## Owner questions (batch)
 
@@ -537,7 +543,7 @@ Answered 2026-11-15 (see "Decision log"): Q3 = (a), Q2 = (b); no phase waits on 
   `src/setup/doctor-bridge.mjs` and its host caller". Each of those steps restores the parity runner from history for
   its rows (as S4 restores S3's) and keeps 00's doctor fixtures.
 - The S2+S3 plan and the one-door-debt plan still carry `status: pending` though landed; update them with `ak plan`.
-- MAIL: how the frozen v7e/v7h/v7i preregistered file sets treat the deleted `src/setup/agent-hooks.mjs` (07 waits).
+- MAIL (answered 2026-11-15): `src/setup/agent-hooks.mjs` and `scripts/lib/mailbox-live-confined.mjs` stay as debt until MAIL re-measures V7e/h/i after rc.9; S7's "delete the bridge module" line stays valid, the Node hook module stays until then.
 - Outside S4: `apps/fgctl/src/help.rs` keeps its own argument reading (`parse CLI arguments (twin)` debt, `retiredBy`
   S7); non-Claude agents in an external project get no fgOS skills through the supported onboarding (V2): its own
   backlog item if wanted; `active-release-matches-checkout` if 00 F18 leaves it bridged as repository tooling.

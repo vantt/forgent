@@ -24,9 +24,13 @@ Phase-lead rules: [plan.md](plan.md). Branch `rust-verb-migration-program/s4-p12
 2. **Retired-code row** "retired Node S4 verb code" (allowed none): `setupUseCase`, `materializeSkillsIntoProject`,
    `createProjectSkillGuard`, `insertSourceLine`, `convertRunnerPatternsConfig`, `wireAgentsUseCase`, the Node
    uninstall use case's name (F8), `initStoreUseCase`, `settleLegacyConfig`, `writeCoexistenceManifest`, `runDoctor`,
-   `installAgentHooks`, `uninstallAgentHooks`, `deleteGuardPrefilter` (as a function); each with a seeded-file case.
-   A name still used elsewhere stays out (say which).
-3. **Bridge bound.** The registry's bridge set equals 00's table minus the rows S4 moved; no row is labelled
+   `deleteGuardPrefilter` (as a function, outside `agent-hooks.mjs`); each with a seeded-file case.
+   `installAgentHooks` and `uninstallAgentHooks` stay out: they live in the frozen `src/setup/agent-hooks.mjs`, which
+   stays as debt until MAIL re-measures V7e/h/i. A name still used elsewhere stays out (say which).
+3. **Frozen debt.** `src/setup/agent-hooks.mjs` and `scripts/lib/mailbox-live-confined.mjs` remain, with their tests, as
+   named `doors` debt (`retiredBy` the MAIL re-measure); the report says so and does not claim "last Node packaging
+   modules deleted" without that exception.
+4. **Bridge bound.** The registry's bridge set equals 00's table minus the rows S4 moved; no row is labelled
    `bridge:S4`; the D4 import-closure test passes; the report lists the set per step (S5, S6a, S6b, S7) with counts and
    the bridge-call count of a `doctor --fix` run, for the program plan's rows. 00's doctor fixtures are kept in the
    report (paths and setup) for S5-S7.
@@ -59,6 +63,18 @@ Phase-lead rules: [plan.md](plan.md). Branch `rust-verb-migration-program/s4-p12
 7. **File-set check:** `git diff --name-only origin/main...HEAD` against plan.md's file set; add what is missing to
    plan.md under "Added during execution".
 8. **Hand-off:** the `## [Unreleased]` lines of 03-11 to the step lead; the program-plan items (S5-S7 bridged rows).
+
+## Close items added 2026-11-15 (Decision log)
+
+1. **`fgos uninstall` refuses its own root.** Phase 09 stays closed. In `apps/fgos/src/wiring/uninstall.rs` (and the root
+   door where it fits) a root that is `/`, `$HOME` or an ancestor of either is a precondition refusal, exit 2, before
+   any plan, in addition to fgctl's purge guard. One test covers `/`, `$HOME` and an ancestor of a project under HOME.
+   One line in `docs/platform/packaging-distribution/spec.md` 6.1 (done in the decision-log commit). The close's
+   `[Unreleased]` CHANGELOG line mentions it.
+2. **One table of verb-root behaviour (RUL11).** After phases 09, 10 and 11 have added their verbs, fold `root_policy`,
+   `acts_on_resolved_root`, `takes_lenient_root` and `ignores_dir` in `apps/fgos/src/invocation_doors.rs` (four per-verb
+   matches over the same few verbs) into one table, in `invocation_doors` or on the route annotation, so a verb's root
+   rules sit in one row. One proof per behaviour is kept; no test is weakened.
 
 ## Files
 

@@ -9,10 +9,10 @@
 //! edit would rewrite is never dropped silently (`comment-would-be-lost`).
 
 use crate::backend::{Kind, Node, Style};
-use crate::comment::sanitize;
+use crate::comment::{sanitize, Hidden};
 use crate::document::{parse, Document};
 use crate::guard::guard;
-use crate::model::{rule, Refusal, Segment, Value};
+use crate::model::{rule, Profile, Refusal, Segment, Value};
 use crate::profile::{resolve, Resolved};
 
 /// Whether an edit may drop a note: `set` and `remove` both take it.
@@ -34,6 +34,17 @@ pub struct Comments {
 }
 
 // ---- the public operations ----
+
+/// A whole new document for `value`: the empty document with `value` set at the root. The output
+/// parses back, under `profile`, to `value`, or the call refuses; rendering depends only on the
+/// value, never on a file that was there before.
+pub fn emit(value: &Value, profile: Profile, file: &str) -> Result<Vec<u8>, Refusal> {
+    guard(|| {
+        let mut doc = parse(b"", profile, file)?;
+        doc.set(&[], value.clone(), CommentLoss::Refuse)?;
+        Ok(doc.to_bytes())
+    })
+}
 
 impl Document {
     /// The document after every edit.
@@ -77,6 +88,10 @@ impl Document {
         let allow_loss = ack == CommentLoss::Acknowledge;
         self.check_value(&value, path)?;
         let (chain, matched) = self.locate(path);
+        if path.is_empty() && chain.is_empty() {
+            let splice = self.plan_new_root(&value);
+            return self.commit(splice, value);
+        }
         let mut expected = self.value().clone();
         if matched == path.len() && !chain.is_empty() {
             apply_set(&mut expected, path, value.clone()).map_err(|()| self.not_found(path))?;
@@ -1010,7 +1025,7 @@ fn plain_ok(text: &str, in_flow: bool) -> bool {
     }
     if text
         .chars()
-        .any(|c| (c.is_control() && c != '\t') || matches!(c, '\u{2028}' | '\u{2029}' | '\u{FEFF}'))
+        .any(|c| (c.is_control() && c != '\t') || needs_escape(c))
     {
         return false;
     }
@@ -1039,9 +1054,14 @@ fn plain_ok(text: &str, in_flow: bool) -> bool {
 }
 
 fn single_ok(text: &str) -> bool {
-    !text
-        .chars()
-        .any(|c| c.is_control() || matches!(c, '\u{2028}' | '\u{2029}' | '\u{FEFF}'))
+    !text.chars().any(|c| c.is_control() || needs_escape(c))
+}
+
+/// Characters no style but a double-quoted escape may carry: line separators, the byte-order
+/// mark and the hidden set (bidi controls, zero-width characters) that would be invisible in a
+/// diff. The value is the same either way; only its bytes become visible.
+fn needs_escape(c: char) -> bool {
+    matches!(c, '\u{2028}' | '\u{2029}') || Hidden::of(c).is_some()
 }
 
 fn double_quoted(text: &str) -> String {
@@ -1054,7 +1074,7 @@ fn double_quoted(text: &str) -> String {
             '\n' => out.push_str("\\n"),
             '\t' => out.push_str("\\t"),
             '\r' => out.push_str("\\r"),
-            c if c.is_control() || matches!(c, '\u{2028}' | '\u{2029}' | '\u{FEFF}') => {
+            c if c.is_control() || needs_escape(c) => {
                 out.push_str(&format!("\\u{:04X}", c as u32));
             }
             c => out.push(c),
@@ -1070,10 +1090,9 @@ fn block_ok(text: &str) -> bool {
     let body = text.strip_suffix('\n').unwrap_or(text);
     !body.is_empty()
         && !body.ends_with('\n')
-        && !text.chars().any(|c| {
-            (c.is_control() && c != '\n' && c != '\t')
-                || matches!(c, '\u{2028}' | '\u{2029}' | '\u{FEFF}')
-        })
+        && !text
+            .chars()
+            .any(|c| (c.is_control() && c != '\n' && c != '\t') || needs_escape(c))
         && !body.starts_with([' ', '\t', '\n'])
         && body
             .split('\n')
@@ -1376,6 +1395,24 @@ impl Document {
         let render = self.render_for(&[], None);
         let mut lines = Vec::new();
         render.entry_lines(key, value, 0, &mut lines);
+        self.append_root_lines(&render, &lines)
+    }
+
+    /// The whole value of a document that has no content yet, in one splice at the end.
+    fn plan_new_root(&self, value: &Value) -> Splice {
+        let render = self.render_for(&[], None);
+        let mut lines = Vec::new();
+        match value {
+            Value::Map(entries) if entries.is_empty() => lines.push("{}".to_string()),
+            Value::Seq(items) if items.is_empty() => lines.push("[]".to_string()),
+            Value::Map(entries) => render.map_lines(entries, 0, &mut lines),
+            Value::Seq(items) => render.seq_lines(items, 0, &mut lines),
+            scalar => lines.push(render.scalar(scalar, false)),
+        }
+        self.append_root_lines(&render, &lines)
+    }
+
+    fn append_root_lines(&self, render: &Render, lines: &[String]) -> Splice {
         let joined = lines.join(render.eol);
         let end = self.text.len();
         let text = if end == self.src().base || self.text.ends_with('\n') {

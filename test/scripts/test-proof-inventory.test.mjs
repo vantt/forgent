@@ -361,4 +361,11 @@ test('suiteReport prints the size and cost line against the baseline, warns when
   assert.ok(dirty.lines.includes('suite: warning: admission rules not checked: git diff failed'));
   assert.ok(dirty.lines.includes('suite: warning: change against the merge base not measured: no merge base'));
   assert.match(dirty.lines[0], /, \? s wall/);
+
+  // One shard: only its files are counted, costed and compared with the baseline, yet a clone with a file of
+  // another shard still fails, and the line says where the shard stands against the mean load.
+  const shard = suiteReport({ files: ['test/b.test.mjs'], cloneFiles: files, shard: { index: 2, total: 2, load: 12.4, mean: 10 }, wallSeconds: 3, cpuSeconds: 11, fileCpu: { 'test/b.test.mjs': 11 }, cwd: dir, baselinePath, admission: () => [], change: () => null });
+  assert.equal(shard.status, 1, 'a clone that spans a file outside this shard is still found');
+  assert.equal(shard.lines[0], 'suite: shard 2/2: 1 files, 2 test() calls, 2 Rust tests, 3 s wall, 11 s CPU (baseline 1 / 2 / 2 Rust / ? s / 10 s CPU at 012345678); load 12 of mean 10 (1.24)');
+  assert.equal(shard.calls.length, 2, 'the calls reported are the shard files\' own');
 });

@@ -125,15 +125,61 @@ test('a release publishes only after the whole suite: publish needs the suite, w
   // The jobs a release skips are exactly the pull-request tuning ones; the suite itself always runs.
   assert.match(ci, /selector-plan:\n\s+name: selector-plan\n\s+if: \$\{\{ !inputs\.release-gate \}\}/);
   assert.match(ci, /compare:\n(?:.*\n)*?\s+if: \$\{\{ always\(\) && !inputs\.release-gate \}\}/);
-  // The test job may skip only its toolchain install and Rust cache on a release, which stays on a clean
+  // A shard job may skip only its toolchain install and Rust cache on a release, which stays on a clean
   // runner; every other step, the suite above all, runs on a release too.
-  const testJob = ci.slice(ci.indexOf('\n  test:'), ci.indexOf('\n  selector-plan:'));
-  const gatedSteps = testJob.split(/\n(?=      - )/).filter((step) => step.includes('release-gate'));
-  assert.equal(gatedSteps.length, 2, 'the test job gates exactly its toolchain and rust-cache steps');
+  const shardJob = ci.slice(ci.indexOf('\n  test-shard:'), ci.indexOf('\n  test:'));
+  const gatedSteps = shardJob.split(/\n(?=      - )/).filter((step) => step.includes('release-gate'));
+  assert.equal(gatedSteps.length, 2, 'the shard job gates exactly its toolchain and rust-cache steps');
   for (const step of gatedSteps) {
     assert.match(step, /^      - if: \$\{\{ !inputs\.release-gate \}\}\n/, 'a gated step carries only the plain release-gate skip');
     assert.match(step, /name: Rust toolchain\n|uses: Swatinem\/rust-cache@/, 'only the toolchain and rust-cache steps may be gated');
   }
+});
+
+test('the release suite runs every shard and one aggregate check fails when any shard fails or never reports', () => {
+  const ci = read('.github', 'workflows', 'ci.yml');
+  const shardJob = ci.slice(ci.indexOf('\n  test-shard:'), ci.indexOf('\n  test:'));
+  const aggregate = ci.slice(ci.indexOf('\n  test:'), ci.indexOf('\n  selector-plan:'));
+  const jobHeader = (job) => job.split(/\n    steps:/)[0];
+
+  // The matrix is the contiguous shard list 1..N and every place that names N agrees with it.
+  const matrix = /matrix:\n\s+shard: \[([\d, ]+)\]/.exec(shardJob);
+  assert.ok(matrix, 'the shard job has a shard matrix');
+  const shards = matrix[1].split(',').map((n) => Number(n.trim()));
+  const total = shards.length;
+  assert.deepEqual(shards, Array.from({ length: total }, (_, i) => i + 1), 'shards are 1..N with no gap');
+  assert.ok(total >= 2, 'the suite is split');
+  const named = [...shardJob.matchAll(/matrix\.shard \}\}\/(\d+)|shard-\$\{\{ matrix\.shard \}\}-of-(\d+)\.xml/g)].map((m) => Number(m[1] ?? m[2]));
+  assert.ok(named.length >= 4, 'the name, run line, junit name and marker all carry N');
+  assert.ok(named.every((n) => n === total), `every N in the shard job equals the matrix size ${total}`);
+  assert.match(shardJob, /name: test shard \(\$\{\{ matrix\.shard \}\}\/\d+\)/);
+  assert.match(shardJob, /--shard=\$\{\{ matrix\.shard \}\}\/\d+/);
+  // The report the run writes, the one the marker reads and the name the merge expects are one file name.
+  const junit = `test-results/shard-\${{ matrix.shard }}-of-${total}.xml`;
+  assert.ok(shardJob.includes(`--test-reporter=junit --test-reporter-destination=${junit}`), 'the run writes the shard junit under the merge name');
+  assert.ok(shardJob.includes(`--type full --xml ${junit} `), 'the marker reads that same junit');
+  assert.ok(shardJob.includes(`--manifest \${{ matrix.shard }}/${total} --out test-results/shard-\${{ matrix.shard }}-of-${total}.files.json`), 'the shard records its files under the merge name before the tests run');
+  assert.ok(shardJob.indexOf('--manifest') < shardJob.indexOf('npm test --'), 'the manifest is written before the suite can crash');
+  assert.match(shardJob, /fail-fast: false/);
+  assert.match(shardJob, /name: test-shard-\$\{\{ matrix\.shard \}\}\n\s+path: test-results\//);
+
+  // The aggregate keeps the identity compare and the base-run download rely on.
+  const header = jobHeader(aggregate);
+  assert.match(header, /^\n  test:\n    name: test \(ubuntu-latest\)\n    needs: test-shard\n/);
+  assert.match(header, /\n    if: \$\{\{ !cancelled\(\) \}\}\n/, 'it runs after a failed shard and is skipped only when the run is cancelled');
+  assert.doesNotMatch(header, /always\(\)/);
+  assert.match(aggregate, /node scripts\/merge-test-shards\.mjs --dir shards --out test-results/);
+  assert.match(aggregate, /pattern: test-shard-\*/);
+  assert.match(aggregate, /name: full-results-ubuntu-latest\n\s+path: test-results\//);
+  const lastStep = aggregate.split(/\n(?=      - )/).pop();
+  assert.match(lastStep, /if: always\(\)/);
+  assert.match(lastStep, /needs\.test-shard\.result \}\}" = "success"/, 'it fails unless every shard job succeeded');
+  assert.match(lastStep, /steps\.merge\.outcome \}\}" = "success"/, 'and unless the exact-set merge passed');
+  assert.match(ci, /compare:\n\s+name: compare\n\s+needs: \[selector-plan, related, test\]/);
+
+  // Neither job is skipped on a release: only the toolchain and cache steps are gated, never a job.
+  assert.doesNotMatch(jobHeader(shardJob), /release-gate/);
+  assert.doesNotMatch(header, /release-gate/);
 });
 
 test('release assets workflow builds Linux on ubuntu-22.04 and Windows on windows-latest, never newer Linux', () => {

@@ -22,7 +22,9 @@ Phase-lead rules: [plan.md](plan.md). Branch `rust-verb-migration-program/s4-p04
   fails; `setup-doctor-registry.md:183`), `node-version-and-git` (986; it shares `gitFacts` and `gitFloor` with the Git
   rows, `registrations.mjs:2, 392`, so it moves here; its Node half spawns `node --version`, marked volatile in parity),
   `main-checkout-hook-wired` (RepositoryConfig hooks path, `registrations.mjs:1126`;
-  message names `npm run setup:hooks` where the project ships `.githooks`, never `fgos setup`, F15). Fixes
+  applies only to a project whose `.githooks/pre-commit` carries fgOS's own guard, every other project with a
+  `.githooks/` never fails on it (plan.md Decision log 2026-11-15 18:00, report B2); message names
+  `npm run setup:hooks`, never `fgos setup`, F15). Fixes
   `git-driver-directories`, `git-wal-dir`, `git-publication-refspecs` (`registrations.mjs:3790-3792`).
 - Event Store: `event-store-open-root`, `event-store-machine-id`, `event-store-legacy-layout`, `event-store-incidents`
   (pointer; fails on integrity problems, skipped peer mirrors and their sync warnings, `setup-doctor-registry.md:71`),

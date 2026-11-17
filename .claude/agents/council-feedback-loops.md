@@ -1,7 +1,6 @@
 ---
 name: council-feedback-loops
-description: Council task posture: feedback loops. Method: trace cause-and-effect chains, reinforcing and balancing loops, delays, and measurable signals for the viable options; compare a local intervention with a structural one without assuming either is superior. Mark hypothesized loops as hypotheses. Blind spot: abstraction without an actionable recommendation. End with an explicit position, one concrete intervention or a supported no-change position, its evidence, and what would change it. No option is preferred in advance; agreement is as valid as disagreement.
-model: sonnet
+description: "Council task posture: feedback loops. Method: trace cause-and-effect chains, reinforcing and balancing loops, delays, and measurable signals for the viable options; compare a local intervention with a structural one without assuming either is superior. Mark hypothesized loops as hypotheses. Blind spot: abstraction without an actionable recommendation. End with an explicit position, one concrete intervention or a supported no-change position, its evidence, and what would change it. No option is preferred in advance; agreement is as valid as disagreement."
 tools: Read, Bash
 ---
 

@@ -25,19 +25,23 @@ concurrency:
   cancel-in-progress: ${{ github.ref != 'refs/heads/main' && !startsWith(github.ref, 'refs/tags/') }}
 
 jobs:
-  test:
-    name: test (${{ matrix.os }})
+  # The full suite runs as 5 duration-balanced shards (`npm test -- --shard=k/5`), one job each, then
+  # the `test` job below merges their reports and proves together they ran every test file exactly once.
+  # Changing the shard count means changing the matrix, the `/5` in the run line and the junit name together;
+  # test/scripts/release-packaging.test.mjs pins that they agree.
+  test-shard:
+    name: test shard (${{ matrix.shard }}/5)
     strategy:
       fail-fast: false
       matrix:
-        # The full suite runs on Linux only: its runner, blind-unit confinement,
-        # panel and file-permission tests are written for Linux (bubblewrap, POSIX
-        # modes). Windows is proven by the focused tests in release-assets-check.yml
-        # (installer, launchers, release assets); macOS is not a supported target.
-        os: [ubuntu-latest]
+        shard: [1, 2, 3, 4, 5]
+    # The full suite runs on Linux only: its runner, blind-unit confinement,
+    # panel and file-permission tests are written for Linux (bubblewrap, POSIX
+    # modes). Windows is proven by the focused tests in release-assets-check.yml
+    # (installer, launchers, release assets); macOS is not a supported target.
     # Backstop so a hung run fails in bounded time instead of GitHub's 6h job cap.
-    runs-on: ${{ matrix.os }}
-    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
     steps:
       - uses: actions/checkout@v4
         with:
@@ -50,7 +54,6 @@ jobs:
           fetch-depth: 0
 
       - name: Install Linux test tools
-        if: runner.os == 'Linux'
         # Ubuntu 24.04 blocks unprivileged user namespaces via AppArmor, which
         # leaves bwrap installed but unable to build a sandbox; lift it so the
         # required-confinement tests really run here instead of skipping.
@@ -86,23 +89,28 @@ jobs:
       - name: Build Rust release binaries for npm tests
         run: cargo build --locked --release --workspace
 
-      # Full suite (docs/distribution-vision.md tsk-49r D1): already
-      # includes test/install-packaging.test.mjs (the pack -> install -g ->
-      # fgos init proof) and test/setup/doctor-fresh-run.test.mjs (the
-      # fresh-runner fgos doctor proof, D4) on every OS in the matrix above.
+      # The files this shard is given, written before the tests so a crash cannot lose it. The merge matches it
+      # against the junit: a test file that loads its tests from a data: URL reports under that URL, not its path.
+      - name: Record the files of shard ${{ matrix.shard }}/5
+        run: node scripts/merge-test-shards.mjs --manifest ${{ matrix.shard }}/5 --out test-results/shard-${{ matrix.shard }}-of-5.files.json
+
+      # This shard of the full suite (docs/distribution-vision.md tsk-49r D1): the shards together include
+      # test/install-packaging.test.mjs (the pack -> install -g -> fgos init proof) and
+      # test/setup/doctor-fresh-run.test.mjs (the fresh-runner fgos doctor proof, D4). Every run-tests check
+      # (timeouts, leftovers, strays, clone and admission ERRORs) runs per shard; the shard prints its own
+      # `suite:` size line and shard imbalance line in this log.
       #
       # `mkdir -p test-results` runs first because `--test-reporter-destination`
       # never creates its own output directory: node --test opens the file for
       # writing at test-run start and crashes (ENOENT, exit 7, zero tests run)
-      # the instant that directory is missing. `shell: bash` keeps the same
-      # mkdir/test invocation on all three OSes in the matrix.
-      - name: npm test (includes install-packaging matrix proof)
+      # the instant that directory is missing.
+      - name: npm test (shard ${{ matrix.shard }}/5)
         id: run-tests
         shell: bash
         run: |
           mkdir -p test-results
           set +e
-          npm test -- --test-reporter=spec --test-reporter-destination=stdout --test-reporter=junit --test-reporter-destination=test-results/full.xml
+          npm test -- --shard=${{ matrix.shard }}/5 --test-reporter=spec --test-reporter-destination=stdout --test-reporter=junit --test-reporter-destination=test-results/shard-${{ matrix.shard }}-of-5.xml
           code=$?
           echo "exit_code=$code" >> "$GITHUB_OUTPUT"
           exit $code
@@ -111,7 +119,56 @@ jobs:
 
       - name: Write test marker
         if: always()
-        run: node scripts/write-test-marker.mjs --type full --xml test-results/full.xml --exit-code "${{ steps.run-tests.outputs.exit_code }}"
+        run: node scripts/write-test-marker.mjs --type full --xml test-results/shard-${{ matrix.shard }}-of-5.xml --exit-code "${{ steps.run-tests.outputs.exit_code }}"
+        env:
+          JOB_STATUS: ${{ job.status }}
+
+      - name: Upload shard results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-shard-${{ matrix.shard }}
+          path: test-results/
+          retention-days: 14
+
+  # The check the rest of the workflow reads: id `test`, name `test (ubuntu-latest)`, artifact
+  # `full-results-ubuntu-latest` (compare and the base-run download use that name). `!cancelled()` runs it
+  # after a failed shard so the failure shows here, and skips it only when the whole run is cancelled
+  # (a skipped check never reads as green: the last step fails unless every shard succeeded).
+  # A shard that never reported (cancelled, timed out, no artifact) fails the merge by name.
+  # `compare` reads the merged file exactly as it read the single report: its verdict on a commit equals the
+  # verdict computed from the shard reports of that commit (proved in test/scripts/test-shards.test.mjs).
+  test:
+    name: test (ubuntu-latest)
+    needs: test-shard
+    if: ${{ !cancelled() }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Download shard results
+        uses: actions/download-artifact@v4
+        with:
+          pattern: test-shard-*
+          path: shards/
+
+      - name: Merge shard results and check every test file ran exactly once
+        id: merge
+        if: always()
+        run: node scripts/merge-test-shards.mjs --dir shards --out test-results
+
+      - name: Write test marker
+        if: always()
+        run: node scripts/write-test-marker.mjs --type full --xml test-results/full.xml --exit-code "${{ steps.merge.outputs.exit_code }}"
         env:
           JOB_STATUS: ${{ job.status }}
 
@@ -119,9 +176,16 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: full-results-${{ matrix.os }}
+          name: full-results-ubuntu-latest
           path: test-results/
+          if-no-files-found: ignore
           retention-days: 14
+
+      - name: Fail unless every shard succeeded and the merge passed
+        if: always()
+        run: |
+          echo "shards: ${{ needs.test-shard.result }}, merge: ${{ steps.merge.outcome }}"
+          [ "${{ needs.test-shard.result }}" = "success" ] && [ "${{ steps.merge.outcome }}" = "success" ]
 
   # `npm test` (scripts/run-tests.mjs, a portable `node --test` wrapper over
   # every discovered test/**/*.test.mjs) cannot see the Rust crate at all,

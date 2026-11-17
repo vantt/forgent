@@ -177,6 +177,37 @@ test('runTests spawns node --test with the discovered files as argv elements and
   assert.equal('UNRELATED' in captured.opts.env, false);
 });
 
+test('a shard runs only the files its partition gives, split by the weights given, and an unusable --shard refuses before anything is staged or spawned', () => {
+  const root = tmpFixtureRoot();
+  const names = ['a', 'b', 'c', 'd'].map((n) => `${n}.test.mjs`);
+  for (const name of names) write(root, name);
+  const weights = { 'a.test.mjs': 9, 'b.test.mjs': 1, 'c.test.mjs': 1, 'd.test.mjs': 1 };
+  const argvOf = (index) => {
+    let argv = null;
+    const result = runTests({ root, cwd: root, shard: { index, total: 2 }, weights, forwardedArgs: ['--test-name-pattern=x'], env: { PATH: '/usr/bin' }, spawn: (_, args) => { argv = args; return { status: 0 }; } });
+    assert.equal(result.shard.index, index);
+    assert.equal(result.allFiles.length, 4);
+    return argv.slice(argv.indexOf('--test-name-pattern=x') + 1);
+  };
+  assert.deepEqual(argvOf(1), ['a.test.mjs']);
+  assert.deepEqual(argvOf(2), ['b.test.mjs', 'c.test.mjs', 'd.test.mjs']);
+
+  const cli = (...args) => spawnSync(process.execPath, [path.join(REPO_ROOT, 'scripts', 'run-tests.mjs'), ...args], { encoding: 'utf8' });
+  for (const bad of ['--shard=0/3', '--shard=x']) {
+    const refused = cli(bad);
+    assert.equal(refused.status, 1);
+    assert.match(refused.stderr, new RegExp(`invalid shard "${bad.slice(8)}"`));
+  }
+  for (const spaced of [['--shard', '2/5'], ['--shard']]) {
+    const refused = cli(...spaced);
+    assert.equal(refused.status, 1, `${spaced.join(' ')} is refused, not passed to node --test`);
+    assert.match(refused.stderr, /invalid shard ".*": expected --shard=k\/n/);
+  }
+  const combined = cli('--shard=1/2', 'test/scripts/run-tests.test.mjs');
+  assert.equal(combined.status, 1);
+  assert.match(combined.stderr, /cannot be combined with chosen test files/);
+});
+
 test('chosen test files run alone in the staged environment, and a path that is not a file fails by name before anything spawns', () => {
   const root = tmpFixtureRoot();
   const f = write(root, 'x.test.mjs');
@@ -325,7 +356,7 @@ function mirroredRepoRoot(prefix) {
   fs.copyFileSync(realLibPath, path.join(root, 'scripts', 'lib', 'is-main-module.mjs'));
   fs.copyFileSync(realQueueLibPath, path.join(root, 'scripts', 'lib', 'full-suite-queue.mjs'));
   // ...and the libraries run-tests.mjs and the distribution builder (its one-door census step) import.
-  for (const rel of ['lib/dev-host-manifest.mjs', 'lib/test-file-cpu.mjs', 'lib/git-addon-stage.mjs', 'lib/git-dir-layout.mjs', 'lib/git-ports.mjs', 'git-addon.mjs', 'lib/js-source-lexer.mjs', 'lib/git-spawn-match.mjs', 'lib/rust-source.mjs', 'lib/test-file-watchdog.mjs', 'git-one-door-scan.mjs']) {
+  for (const rel of ['lib/dev-host-manifest.mjs', 'lib/test-file-cpu.mjs', 'lib/git-addon-stage.mjs', 'lib/git-dir-layout.mjs', 'lib/git-ports.mjs', 'git-addon.mjs', 'lib/js-source-lexer.mjs', 'lib/git-spawn-match.mjs', 'lib/rust-source.mjs', 'lib/test-file-watchdog.mjs', 'lib/test-shards.mjs', 'git-one-door-scan.mjs']) {
     fs.copyFileSync(fileURLToPath(new URL(`../../scripts/${rel}`, import.meta.url)), path.join(root, 'scripts', rel));
   }
   // run-tests.mjs builds the native addon record through the distribution builder's helpers.

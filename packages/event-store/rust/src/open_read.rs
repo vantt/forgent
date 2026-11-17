@@ -183,21 +183,21 @@ pub(crate) fn read_optional(path: &Path) -> Result<Option<Vec<u8>>, Error> {
     let mut file = match File::open(path) {
         Ok(f) => f,
         Err(e) if e.kind() == std::io::ErrorKind::NotFound => return Ok(None),
-        Err(e) => return Err(io(e)),
+        Err(e) => return Err(io("open", path)(e)),
     };
     let mut bytes = Vec::new();
-    file.read_to_end(&mut bytes).map_err(io)?;
+    file.read_to_end(&mut bytes).map_err(io("read", path))?;
     Ok(Some(bytes))
 }
 pub(crate) fn segments(layout: &StreamLayout) -> Result<Vec<(u64, u64, PathBuf)>, Error> {
     let entries = match fs::read_dir(layout.closed()) {
         Ok(e) => e,
         Err(e) if e.kind() == std::io::ErrorKind::NotFound => return Ok(Vec::new()),
-        Err(e) => return Err(io(e)),
+        Err(e) => return Err(io("read_dir", &layout.closed())(e)),
     };
     let mut out = Vec::new();
     for entry in entries {
-        let entry = entry.map_err(io)?;
+        let entry = entry.map_err(io("read_dir_entry", &layout.closed()))?;
         let name = entry.file_name();
         let name = name
             .to_str()
@@ -265,10 +265,11 @@ pub fn read_own_with_fs(
     match File::open(paths.active()) {
         Ok(mut file) => {
             point(fs, Point::AfterActiveOpen)?;
-            file.read_to_end(&mut active).map_err(io)?;
+            file.read_to_end(&mut active)
+                .map_err(io("read", &paths.active()))?;
         }
         Err(e) if e.kind() == std::io::ErrorKind::NotFound => (),
-        Err(e) => return Err(io(e)),
+        Err(e) => return Err(io("open", &paths.active())(e)),
     }
     point(fs, Point::AfterActiveRead)?;
     let mut events = decode(&active, origin, stream, false)?.events;

@@ -34,7 +34,7 @@ fn destination(out: &Path) -> Result<(), Error> {
     }
     let mut parent = out.parent();
     while let Some(p) = parent {
-        let m = fs::symlink_metadata(p).map_err(io)?;
+        let m = fs::symlink_metadata(p).map_err(io("stat", p))?;
         if !m.is_dir() || m.file_type().is_symlink() {
             return Err(invalid("export parent must be a real directory"));
         }
@@ -49,7 +49,7 @@ fn destination(out: &Path) -> Result<(), Error> {
     };
     #[cfg(not(unix))]
     let builder = fs::DirBuilder::new();
-    builder.create(out).map_err(io)?;
+    builder.create(out).map_err(io("create_dir", out))?;
     Ok(())
 }
 fn write(out: &Path, name: &str, bytes: &[u8]) -> Result<(), Error> {
@@ -66,11 +66,14 @@ fn write(out: &Path, name: &str, bytes: &[u8]) -> Result<(), Error> {
         match fs::create_dir(&parent) {
             Ok(()) => (),
             Err(e) if e.kind() == std::io::ErrorKind::AlreadyExists => {
-                if !fs::symlink_metadata(&parent).map_err(io)?.is_dir() {
+                if !fs::symlink_metadata(&parent)
+                    .map_err(io("stat", &parent))?
+                    .is_dir()
+                {
                     return Err(invalid("export path is not a directory"));
                 }
             }
-            Err(e) => return Err(io(e)),
+            Err(e) => return Err(io("create_dir", &parent)(e)),
         }
     }
     if fgos_durable_file::install_once_with_mode(&parent, parts.last().unwrap(), bytes, 0o600)

@@ -1,7 +1,6 @@
 ---
 name: council-assumptions
-description: Council task posture: assumption testing. Method: identify at most three load-bearing assumptions; test what each implies and whether the available evidence contradicts it; distinguish a disproved assumption from an unknown one. Blind spot: questioning without convergence. Stop after three levels of questioning and end with an explicit position, its evidence, and what would change it. No option is preferred in advance; agreement is as valid as disagreement.
-model: sonnet
+description: "Council task posture: assumption testing. Method: identify at most three load-bearing assumptions; test what each implies and whether the available evidence contradicts it; distinguish a disproved assumption from an unknown one. Blind spot: questioning without convergence. Stop after three levels of questioning and end with an explicit position, its evidence, and what would change it. No option is preferred in advance; agreement is as valid as disagreement."
 tools: Read, Bash
 ---
 

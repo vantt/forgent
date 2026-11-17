@@ -21,7 +21,7 @@ pub fn machine_id(config_value: Option<&str>, state_root: &Path) -> Result<Strin
     let value = match config_value {
         Some(value) => value.to_owned(),
         None => fgos_identity::machine::read(state_root).map_err(|e| match e {
-            fgos_identity::Error::Io(e) => io(e),
+            fgos_identity::Error::Io(e) => io("read_machine_id", state_root)(e),
             e => Error::new(ErrorCode::EventStoreMachineId, e.to_string()),
         })?,
     };
@@ -46,7 +46,7 @@ pub struct StoreIdentity {
 #[cfg(target_os = "linux")]
 fn dev_ino(path: &Path) -> Result<String, Error> {
     use std::os::unix::fs::MetadataExt;
-    let meta = fs::metadata(path).map_err(io)?;
+    let meta = fs::metadata(path).map_err(io("metadata", path))?;
     Ok(format!("{}:{}", meta.dev(), meta.ino()))
 }
 #[cfg(not(target_os = "linux"))]
@@ -61,7 +61,7 @@ pub(crate) fn random_id() -> Result<String, Error> {
         if e.kind() == std::io::ErrorKind::Unsupported {
             Error::new(ErrorCode::EventStoreUnsupportedPlatform, e.to_string())
         } else {
-            io(e)
+            io("read_random", Path::new("<os random source>"))(e)
         }
     })
 }
@@ -69,15 +69,16 @@ impl StoreIdentity {
     /// Recovery only: caller must hold event-append and exclude live initializers.
     /// Phase 02 calls this before initialization, never concurrently with publication.
     pub fn sweep_temps_under_append_lock(layout: &Layout) -> Result<(), Error> {
-        fgos_durable_file::sweep_stale_temps(&layout.root).map_err(io)?;
+        fgos_durable_file::sweep_stale_temps(&layout.root)
+            .map_err(io("sweep_temps", &layout.root))?;
         let mut removed = false;
         let entries = match fs::read_dir(&layout.root) {
             Ok(entries) => entries,
             Err(e) if e.kind() == std::io::ErrorKind::NotFound => return Ok(()),
-            Err(e) => return Err(io(e)),
+            Err(e) => return Err(io("read_dir", &layout.root)(e)),
         };
         for entry in entries {
-            let entry = entry.map_err(io)?;
+            let entry = entry.map_err(io("read_dir_entry", &layout.root))?;
             if entry
                 .file_name()
                 .to_str()
@@ -85,20 +86,20 @@ impl StoreIdentity {
                 .and_then(|n| n.strip_suffix(".tmp"))
                 .is_some_and(valid_store_id)
             {
-                fs::remove_file(entry.path()).map_err(io)?;
+                fs::remove_file(entry.path()).map_err(io("remove_file", &entry.path()))?;
                 removed = true;
             }
         }
         if removed {
             File::open(&layout.root)
                 .and_then(|f| f.sync_all())
-                .map_err(io)?;
+                .map_err(io("sync_dir", &layout.root))?;
         }
         Ok(())
     }
 
     pub fn open(layout: &Layout, machine: &str) -> Result<Self, Error> {
-        let bytes = fs::read(layout.store()).map_err(io)?;
+        let bytes = fs::read(layout.store()).map_err(io("read", &layout.store()))?;
         let identity: Self = serde_json::from_slice(&bytes).map_err(|e| invalid(e.to_string()))?;
         if identity.v != 1
             || !valid_store_id(&identity.store_id)
@@ -133,7 +134,7 @@ impl StoreIdentity {
         match fs::symlink_metadata(layout.store()) {
             Ok(_) => return Self::open(layout, machine),
             Err(e) if e.kind() == std::io::ErrorKind::NotFound => (),
-            Err(e) => return Err(io(e)),
+            Err(e) => return Err(io("stat", &layout.store())(e)),
         }
         if !valid_machine_id(machine) || !valid_timestamp(created_at) {
             return Err(invalid("invalid machine id or creation timestamp"));
@@ -150,13 +151,15 @@ impl StoreIdentity {
                 .into(),
             common_dir_dev_ino: dev_ino(&layout.common_dir)?,
         };
-        fs::create_dir_all(&layout.root).map_err(io)?;
+        fs::create_dir_all(&layout.root).map_err(io("create_dir_all", &layout.root))?;
         // Persist newly created directory entries as well as store.json itself.
         for parent in [layout.root.parent().unwrap(), layout.common_dir.as_path()] {
-            File::open(parent).and_then(|f| f.sync_all()).map_err(io)?;
+            File::open(parent)
+                .and_then(|f| f.sync_all())
+                .map_err(io("sync_dir", parent))?;
         }
         fgos_durable_file::install_once(&layout.root, "store.json", &line(&identity)?)
-            .map_err(|e| io(e.source))?;
+            .map_err(|e| io("install_once", &layout.root.join("store.json"))(e.source))?;
         Self::open(layout, machine)
     }
 }

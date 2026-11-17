@@ -10,6 +10,7 @@ import os from 'node:os';
 import path from 'node:path';
 
 import { projectAgentMarkdown, AgentDefinitionError, findAgentYamlFiles, resolveAgentFiles, projectAll } from '../../scripts/project-agents.mjs';
+import { readFrontmatter } from '../../src/util/yaml.mjs';
 import { writeProjectConfig } from '../helpers/config-fixture.mjs';
 
 function mkTempDir() {
@@ -44,8 +45,13 @@ tool-scope:
 
 test('tool-scope maps exactly into the generated tools: frontmatter -- no silent add, no silent drop (D1)', () => {
   const markdown = projectAgentMarkdown('test-agent', VALID_YAML);
-  const toolsLine = markdown.split('\n').find((line) => line.startsWith('tools:'));
-  assert.equal(toolsLine, 'tools: Read, Grep, Bash');
+  assert.equal(readFrontmatter(markdown).meta.tools, 'Read, Grep, Bash');
+});
+
+test('a description holding a colon and a space reads back unchanged: the writer quotes where YAML needs it', () => {
+  const description = 'Council task posture: assumption testing.';
+  const markdown = projectAgentMarkdown('test-agent', VALID_YAML.replace('description: A test agent.', `description: "${description}"`));
+  assert.deepEqual(readFrontmatter(markdown).meta, { name: 'test-agent', description, tools: 'Read, Grep, Bash' });
 });
 
 test('a persona rigor names no model: the projected agent carries no model line and inherits the session\'s', () => {
@@ -58,11 +64,10 @@ test('a persona rigor names no model: the projected agent carries no model line 
 // skills (tsk-397 D20): optional eligibility field --
 // projects through unfiltered when present, is entirely absent from the
 // frontmatter when the source yaml never declares it.
-test('skills, when declared, projects into the frontmatter as a bracketed list', () => {
+test('skills, when declared, project into the frontmatter as a list in declared order', () => {
   const withSkills = VALID_YAML + '\nskills:\n  - fgos-coding-implement\n  - fgos-coding-validating\n';
   const markdown = projectAgentMarkdown('test-agent', withSkills);
-  const skillsLine = markdown.split('\n').find((line) => line.startsWith('skills:'));
-  assert.equal(skillsLine, 'skills: [fgos-coding-implement, fgos-coding-validating]');
+  assert.deepEqual(readFrontmatter(markdown).meta.skills, ['fgos-coding-implement', 'fgos-coding-validating']);
 });
 
 test('skills is absent from the frontmatter when the source yaml never declares it (backward compatible)', () => {

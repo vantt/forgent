@@ -75,7 +75,7 @@ pub fn status(
     let identity = match fs::symlink_metadata(layout.store()) {
         Ok(_) => Some(crate::identity::StoreIdentity::open(layout, machine)?),
         Err(e) if e.kind() == std::io::ErrorKind::NotFound => None,
-        Err(e) => return Err(io(e)),
+        Err(e) => return Err(io("stat", &layout.store())(e)),
     };
     let origin = identity.as_ref().map(|i| i.store_id.as_str()).unwrap_or("");
     let mut streams = layout.streams()?;
@@ -134,9 +134,12 @@ pub fn status(
         }
 
         let closed = match fs::read_dir(paths.closed()) {
-            Ok(e) => e.collect::<Result<Vec<_>, _>>().map_err(io)?.len(),
+            Ok(e) => e
+                .collect::<Result<Vec<_>, _>>()
+                .map_err(io("read_dir", &paths.closed()))?
+                .len(),
             Err(e) if e.kind() == std::io::ErrorKind::NotFound => 0,
-            Err(e) => return Err(io(e)),
+            Err(e) => return Err(io("read_dir", &paths.closed())(e)),
         };
         rows.push(json!({"stream":stream.as_str(),"unsealedCount":local.events.len(),"oldestUnsealedAgeSec":age,"closedSegmentsPending":closed,"lastReceipt":crate::receipt::Receipt::read(&paths.sealed())?}));
     }

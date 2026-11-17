@@ -136,10 +136,12 @@ pub(crate) fn recover(
         let file = OpenOptions::new()
             .write(true)
             .open(paths.active())
-            .map_err(io)?;
-        file.set_len(active.committed_len as u64).map_err(io)?;
+            .map_err(io("open", &paths.active()))?;
+        file.set_len(active.committed_len as u64)
+            .map_err(io("truncate", &paths.active()))?;
         point(fs, Point::AfterTruncate)?;
-        fs.sync_file(&file).map_err(io)?;
+        fs.sync_file(&file)
+            .map_err(io("sync_file", &paths.active()))?;
         point(fs, Point::AfterTruncateFsync)?;
     }
     if hint.is_none_or(|s| s < durable_high) {
@@ -154,16 +156,22 @@ pub(crate) fn prepare_stream(
     fs: &dyn FileSystem,
 ) -> Result<StreamLayout, Error> {
     let paths = layout.stream(stream);
-    let created = !paths.closed().try_exists().map_err(io)?;
-    fs::create_dir_all(paths.closed()).map_err(io)?;
+    let created = !paths
+        .closed()
+        .try_exists()
+        .map_err(io("exists", &paths.closed()))?;
+    fs::create_dir_all(paths.closed()).map_err(io("create_dir_all", &paths.closed()))?;
     if created {
-        fs.sync_directory(&paths.closed()).map_err(io)?;
+        fs.sync_directory(&paths.closed())
+            .map_err(io("sync_dir", &paths.closed()))?;
     }
     // Existence is not durability: a predecessor may die after mkdir but before
     // syncing the stream entry in the store root. Re-establish this before ack.
-    fs.sync_directory(&layout.root).map_err(io)?;
+    fs.sync_directory(&layout.root)
+        .map_err(io("sync_dir", &layout.root))?;
     // Also covers a predecessor killed after creating active but before dir sync.
-    fs.sync_directory(&paths.root).map_err(io)?;
+    fs.sync_directory(&paths.root)
+        .map_err(io("sync_dir", &paths.root))?;
     Ok(paths)
 }
 pub fn append(
@@ -276,24 +284,28 @@ pub fn append_with_fs(
             OpenOptions::new()
                 .append(true)
                 .open(paths.active())
-                .map_err(io)?,
+                .map_err(io("open", &paths.active()))?,
             false,
         ),
-        Err(e) => return Err(io(e)),
+        Err(e) => return Err(io("open", &paths.active())(e)),
     };
     point(fs, Point::BeforeAppendWrite)?;
-    let written = fs.write_batch(&mut file, &bytes).map_err(io)?;
+    let written = fs
+        .write_batch(&mut file, &bytes)
+        .map_err(io("write", &paths.active()))?;
     point(fs, Point::AfterAppendWrite)?;
     if written != bytes.len() {
-        return Err(io(std::io::Error::new(
+        return Err(io("write", &paths.active())(std::io::Error::new(
             ErrorKind::WriteZero,
             "short batch write; no ack",
         )));
     }
-    fs.sync_file(&file).map_err(io)?;
+    fs.sync_file(&file)
+        .map_err(io("sync_file", &paths.active()))?;
     point(fs, Point::AfterAppendFsync)?;
     if created {
-        fs.sync_directory(&paths.root).map_err(io)?;
+        fs.sync_directory(&paths.root)
+            .map_err(io("sync_dir", &paths.root))?;
     }
     point(fs, Point::AfterAppendDirFsync)?;
     drop(file);
