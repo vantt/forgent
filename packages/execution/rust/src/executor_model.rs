@@ -111,6 +111,22 @@ impl ModelError {
         }
     }
 
+    pub(crate) fn confinement_policy(message: String) -> Self {
+        ModelError {
+            name: "ConfinementPolicyError",
+            code: None,
+            message,
+        }
+    }
+
+    pub(crate) fn confinement_backend_registry(message: String) -> Self {
+        ModelError {
+            name: "ConfinementBackendRegistryError",
+            code: None,
+            message,
+        }
+    }
+
     /// The refusal as the vectors state it: `{ name, code?, message }`.
     pub fn to_json(&self) -> Value {
         let mut out = Map::new();

@@ -14,19 +14,23 @@
 //                 with `args.failure` ({ kind: door | door-failed | runner | other, code?, message }); a call whose
 //                 project exists is judged in a repository whose project config holds `runner`
 //   hookAnswer    what the hook prints and exits with for a verdict in a format
+//   attribute     a runner refusal (`args.error`: message, code?, path?, paths?, detail?) as the config load raises it,
+//                 named by the file and line of `args.origins` under `args.projectDir`
+//   globalRigorToTier  the refusal of `runner.rigorToTier` set in the global file, from `args.origins`
 
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { ensureScriptAddon } from '../../scripts/lib/git-ports.mjs';
-import { validateRunnerConfigShape } from '../../src/runner/dispatch/config.mjs';
+import { attributeRunnerConfigError, refuseGlobalRigorToTier, validateRunnerConfigShape } from '../../src/runner/dispatch/config.mjs';
 import { configRootFor, decideOver, guardCwdRepoRootDivergence } from '../../src/runner/dispatch/decide.mjs';
 import { decideDispatchHook } from '../../src/runner/dispatch/hook.mjs';
 import { answer as hookAnswer, normalizeHookPayload } from '../../src/runner/hook.mjs';
 import { ConfigDoorError } from '../../src/config/facade.mjs';
 import { RunnerConfigError } from '../../src/runner/dispatch/runner-config-error.mjs';
 import { withMachine } from './executor-model-vectors.helper.mjs';
+import { writeRawProjectConfig } from './config-fixture.mjs';
 
 /** A refusal as the vectors state it: `{ error: { name, code?, message } }`. */
 const refusalOf = (err) => ({ error: { name: err.name, ...(err.code === undefined ? {} : { code: err.code }), message: err.message } });
@@ -54,10 +58,7 @@ function withLayout({ worktreeConfig = false } = {}, fn) {
     const worktree = path.join(root, 'worktree');
     git(main, 'worktree', 'add', '-q', '--detach', worktree);
     fs.mkdirSync(path.join(worktree, 'sub'));
-    if (worktreeConfig) {
-      fs.mkdirSync(path.join(worktree, '.fgos'));
-      fs.writeFileSync(path.join(worktree, '.fgos', 'config.yaml'), 'runner: {}\n');
-    }
+    if (worktreeConfig) writeRawProjectConfig(worktree, 'runner: {}\n');
     const outside = path.join(root, 'outside');
     fs.mkdirSync(outside);
     const places = { main, worktree: fs.realpathSync(worktree), outside };
@@ -76,8 +77,8 @@ async function withProject(runner, fn) {
   const home = process.env.HOME;
   try {
     const project = repository(root, 'project');
-    fs.mkdirSync(path.join(project, '.fgos'));
-    fs.writeFileSync(path.join(project, '.fgos', 'config.yaml'), `${JSON.stringify({ runner: runner ?? {} })}\n`);
+    // Written as it is: the hint reads the project file the vector states, with no key moved to the global layer.
+    writeRawProjectConfig(project, `${JSON.stringify({ runner: runner ?? {} })}\n`);
     fs.mkdirSync(path.join(root, 'home'));
     process.env.HOME = path.join(root, 'home');
     return await fn(project);
@@ -131,6 +132,15 @@ const evaluators = {
     return withProject(runner, (project) => judge({ ...args.call, projectDir: project }));
   },
   hookAnswer: ({ args }) => hookAnswer(args.verdict, args.format),
+  attribute: ({ args }) => {
+    const { message, ...fields } = args.error;
+    const err = new RunnerConfigError(message, fields);
+    return refusalOf(attributeRunnerConfigError(err, args.origins, args.projectDir) ?? err);
+  },
+  globalRigorToTier: ({ args }) => {
+    refuseGlobalRigorToTier(args.origins);
+    return { ok: true };
+  },
 };
 
 /** Every fact a vector may name. */

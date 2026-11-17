@@ -9,6 +9,8 @@ rust-version.workspace = true
 fgos-seat-binding = { path = "../../seat-binding/rust" }
 # The agents listing reads YAML documents through the one YAML door.
 fgos-yaml-doc = { path = "../../yaml-doc/rust" }
+# The seat id and persona name rules are Convention's; the check reads the same contract entries.
+fgos-convention = { path = "../../convention/rust" }
 serde = { workspace = true }
 # preserve_order: the declared order of executors and accounts is part of what the facts mean (the account
 # order is the order the lease tries them in).

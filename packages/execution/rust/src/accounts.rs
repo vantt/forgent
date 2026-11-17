@@ -54,7 +54,7 @@ fn is_absolute(path: &str) -> bool {
 }
 
 /// A path that stays inside a directory: relative, and with no `..` part.
-fn is_inside(path: &str) -> bool {
+pub(crate) fn is_inside(path: &str) -> bool {
     !is_absolute(path) && !path.split(['/', '\\']).any(|part| part == "..")
 }
 
@@ -77,7 +77,7 @@ fn expand_credential_home(home: &str, machine: &dyn Machine) -> Option<String> {
     is_absolute(&expanded).then_some(expanded)
 }
 
-fn is_cli_key(key: &str) -> bool {
+pub(crate) fn is_cli_key(key: &str) -> bool {
     let mut chars = key.chars();
     chars
         .next()
@@ -161,47 +161,48 @@ fn normalize_credential_source(source: &Value, label: &str) -> Result<Value, Mod
 /// Refuses the config where it would split one provider across two keys or carry placement policy.
 pub fn validate_provider_account_inventory(
     runner: &Value,
+    label: &str,
 ) -> Result<Map<String, Value>, ModelError> {
-    const LABEL: &str = "runner config";
+    let label_text = label;
     let Some(providers) = runner.get("providers") else {
         return Ok(Map::new());
     };
     let refuse = |text: String| ModelError::provider_capacity(text);
     let Some(providers) = providers.as_object() else {
-        return Err(refuse(format!("runner config ({LABEL}.providers) must be an object mapping provider -> {{ accounts }} when present.")));
+        return Err(refuse(format!("runner config ({label_text}.providers) must be an object mapping provider -> {{ accounts }} when present.")));
     };
     let mut raw_names: Vec<(String, String)> = Vec::new();
     let mut normalized = Map::new();
     for (provider, entry) in providers {
         if provider.is_empty() {
             return Err(refuse(format!(
-                "runner config ({LABEL}.providers) provider id must be a non-empty string."
+                "runner config ({label_text}.providers) provider id must be a non-empty string."
             )));
         }
         let canonical = legacy_state_key(provider);
         if let Some((_, first)) = raw_names.iter().find(|(key, _)| *key == canonical) {
             return Err(refuse(format!(
-                "runner config ({LABEL}.providers) declares both \"{first}\" and \"{provider}\", which normalize to the same provider family \"{canonical}\" -- consolidate their accounts under one key."
+                "runner config ({label_text}.providers) declares both \"{first}\" and \"{provider}\", which normalize to the same provider family \"{canonical}\" -- consolidate their accounts under one key."
             )));
         }
         raw_names.push((canonical.clone(), provider.clone()));
         let Some(entry_fields) = entry.as_object() else {
             return Err(refuse(format!(
-                "runner config ({LABEL}.providers.{provider}) must be an object."
+                "runner config ({label_text}.providers.{provider}) must be an object."
             )));
         };
         if let Some(key) = entry_fields.keys().find(|key| key.as_str() != "accounts") {
-            return Err(refuse(format!("runner config ({LABEL}.providers.{provider}) contains unknown key \"{key}\". Slice 1 only allows: accounts.")));
+            return Err(refuse(format!("runner config ({label_text}.providers.{provider}) contains unknown key \"{key}\". Slice 1 only allows: accounts.")));
         }
         let Some(accounts) = entry_fields.get("accounts") else {
             continue;
         };
         let Some(accounts) = accounts.as_object() else {
-            return Err(refuse(format!("runner config ({LABEL}.providers.{provider}.accounts) must be a keyed object, not an array.")));
+            return Err(refuse(format!("runner config ({label_text}.providers.{provider}.accounts) must be a keyed object, not an array.")));
         };
         let mut inventory = Map::new();
         for (account_id, account) in accounts {
-            let at = format!("{LABEL}.providers.{provider}.accounts");
+            let at = format!("{label_text}.providers.{provider}.accounts");
             if !is_safe_key(account_id) {
                 return Err(refuse(format!(
                     "runner config ({at}) account id must be a non-empty safe key, got {}.",
@@ -661,7 +662,7 @@ pub fn provider_account_inventory(
     runner: &Value,
     machine: &dyn Machine,
 ) -> Result<Map<String, Value>, ModelError> {
-    let mut inventory = validate_provider_account_inventory(runner)?;
+    let mut inventory = validate_provider_account_inventory(runner, "runner config")?;
     if runner.get("llmAccounts").is_some() {
         inventory.extend(derive_legacy_inventory(runner, machine));
     }

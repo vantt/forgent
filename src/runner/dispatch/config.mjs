@@ -250,7 +250,7 @@ function normalizeConfigConfinement(cfg) {
  * `runner.rigorToTier` is retired. Set in the global file it is refused here, naming that file (the shape check
  * below names the project directory, which is not where the key is).
  */
-function refuseGlobalRigorToTier(origins) {
+export function refuseGlobalRigorToTier(origins) {
   const at = origins.find((o) => o.layer === 'global' && (o.path === 'runner.rigorToTier' || o.path.startsWith('runner.rigorToTier.')));
   if (!at) return;
   // The provenance file of the global layer is `global:<name>`.
