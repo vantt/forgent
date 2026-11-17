@@ -4,8 +4,9 @@ discussion: open
 
 ## 1. Trạng thái hiện tại
 
-Round 1 (2026-11-17). Owner decisions from the brief are inputs (§2). Five open points (§3); discussing point 1
-(persona content and protocol). No D-ID minted yet.
+Round 2 (2026-11-17). Point 1: draft persona presented (does / never does, see §5); owner chose that Miu orders
+topics itself by the product priority list and reports the order (candidate D-ID, holds one more round). Now asking
+when Miu rotates its own session. No D-ID minted yet.
 
 ## 2. Mục tiêu & đề bài
 
@@ -21,7 +22,7 @@ sessions, not in the secretary's chat.
 
 | # | Point | State |
 |---|---|---|
-| 1 | Persona content and protocol (does / never does) | discussing |
+| 1 | Persona content and protocol (does / never does) | discussing. Provisionally clear: Miu orders topics itself and reports (owner, round 2). Open: session rotation trigger |
 | 2 | Placement and activation (`core/agents/secretary.yaml`, `claude --agent secretary` in herdr, opening shaper tabs) | open |
 | 3 | Domain classification without Work (reuse fgos-clarifying; default when a domain has no shaper) | open |
 | 4 | Token saving (3x always-loaded rules, model choice, short agent results, peer mail only on decisions) | open, needs owner approval |
@@ -38,6 +39,12 @@ sessions, not in the secretary's chat.
   (persona shape: role, persona, decision_boundary, tool-scope, skills), `core/skills/_shared/decision-question.md`,
   `plans/261117-1430-portfolio-driving-draft/plan.md`, audit `plans/reports/audit-261117-1545-supervisor-watcher-audit.md`
   (main checkout).
+- 2026-11-17 — Miu proposed the point-1 draft: does = classify domain, answer inline only what portfolio files
+  answer, open shaper for >1-2 rounds or detail reading, planner on `settled`, supervisor on `ready`, keep topic list,
+  report <=10 lines, batch five-part questions, rotate own session via handoff; never = read diffs, edit code/docs
+  (except topic list), run tests, land, discuss a topic in depth itself, know any domain's steps. Asked who orders
+  topics. Owner: "Miu tự xếp thứ tự rồi báo lại anh." (Miu orders by product priority, reports; asks only on a tie or
+  when a reorder delays something promised.)
 
 ## 6. Thiết kế đã chốt {#design}
 
