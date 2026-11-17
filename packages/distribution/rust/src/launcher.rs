@@ -272,8 +272,8 @@ mod tests {
         fn new(label: &str) -> Sandbox {
             static COUNTER: std::sync::atomic::AtomicUsize = std::sync::atomic::AtomicUsize::new(0);
             let n = COUNTER.fetch_add(1, std::sync::atomic::Ordering::SeqCst);
-            let root = std::fs::canonicalize(std::env::temp_dir())
-                .unwrap()
+            // Plain, not verbatim: cmd.exe cannot run a program named by a `\\?\` path.
+            let root = crate::test_scratch::canonical(&std::env::temp_dir())
                 .join(format!("fgos-launcher-{}-{n}-{label}", std::process::id()));
             let _ = std::fs::remove_dir_all(&root);
             let bin = root.join("bin");
