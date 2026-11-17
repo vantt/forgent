@@ -25,10 +25,24 @@ import { seedStubAgentClis } from '../helpers/agent-clis.mjs';
 import { familyOf } from '../../src/runner/dispatch/provider-adapter.mjs';
 import { parseTierCell } from '../../src/runner/dispatch/tier-cell.mjs';
 import { resolveExecutorCommand } from '../../src/runner/dispatch/transport.mjs';
-import { AGY_PERMISSIONS_DEFAULT } from '../../src/setup/agy-permissions.mjs';
 
-// The session-only agy settings both gemini invocations pass: command permission with the deny list.
-const AGY_SETTINGS = JSON.stringify(AGY_PERMISSIONS_DEFAULT);
+// The session-only agy settings both gemini invocations pass: command permission with the deny list
+// of the agy-permissions-configured doctor row (agy_permissions_default in
+// packages/distribution/rust/src/agent_config.rs).
+const AGY_SETTINGS = JSON.stringify({
+  toolPermission: 'always-proceed',
+  permissions: {
+    deny: [
+      'command(regex:^rm .*-rf)',
+      'command(regex:^sudo )',
+      'command(regex:^git push .*(--force|-f\\b))',
+      'command(regex:^git reset .*--hard)',
+      'command(regex:^git stash)',
+      'command(regex:^curl )',
+      'command(regex:^wget )',
+    ],
+  },
+});
 
 // Seat Binding counts only the CLIs this machine has: the fact tests below state which are installed.
 seedStubAgentClis('claude', 'codex', 'omp', 'pi', 'glm');
