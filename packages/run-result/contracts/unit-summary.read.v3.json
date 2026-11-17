@@ -47,6 +47,26 @@
         }
       }
     },
+    "verify": {
+      "description": "Optional, additive (version stays 3). What the run's verify command did. An absent key means not recorded, never a pass; readers must not read absence as success.",
+      "oneOf": [
+        {"type": "object", "required": ["ran", "reason"], "properties": {"ran": {"const": false}, "reason": {"type": "string", "minLength": 1}}},
+        {
+          "type": "object",
+          "required": ["ran", "command", "outcome", "exit", "passed", "durationMs", "how", "outputDigest"],
+          "properties": {
+            "ran": {"const": true},
+            "command": {"type": "string", "minLength": 1},
+            "outcome": {"enum": ["pass", "findings", "timeout", "not-run"]},
+            "exit": {"type": ["integer", "null"]},
+            "passed": {"type": "boolean"},
+            "durationMs": {"type": "integer", "minimum": 0},
+            "how": {"type": "string", "minLength": 1},
+            "outputDigest": {"type": "string", "minLength": 1}
+          }
+        }
+      ]
+    },
     "startedAt": {"$ref": "#/definitions/nullableString", "description": "Unit creation time, used only for duration; never a substitute for settlement."},
     "settledAt": {"type": "string", "minLength": 1, "description": "Required owner settlement time; historical null timestamps are skipped, never creation-derived."},
     "stanceOptions": {"type": "array", "items": {"type": "string", "minLength": 1}},
