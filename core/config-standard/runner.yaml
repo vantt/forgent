@@ -725,8 +725,8 @@ runner:
       nano: gemini-3.8-flash-low
       standard: gemini-3.8-flash-medium
       advanced: gemini-3.8-flash-high
-      flagship: gemini-4-argon-high
-      frontier: gemini-4-argon-high
+      flagship: gemini-3.8-flash-high
+      frontier: gemini-3.8-flash-high
       mini: gemini-3.8-flash-low
     openai:
       nano:

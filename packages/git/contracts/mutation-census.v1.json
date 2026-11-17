@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "5cbbd3679b9675a97d2a3b36cb8a807ebc177a91034cbe7cee08a6c067c52781",
+  "payloadDigest": "f9f96856231b0c6c28ee315a05439bb567910d99a4e5b1b68eb74a697c98b016",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "b8b886cee2ea5ce7ee1153e4795512db135a990de894c27e53c5e778b210be62",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -260,7 +260,7 @@
     "packages/config/rust/tests/authoring_equivalence.rs": "46e9a166aa6a5425bbae6e9b9ca83ace0b6e536ec8692bec3a0a16b1450d4c16",
     "packages/config/rust/tests/cache.rs": "ba9cd4ddbb8d675ec3282627e29aceecc995e73f095dc3b712a7a0a45dc7d852",
     "packages/config/rust/tests/common/machine_fs.rs": "2f4c2c9d6fab2a8520b7ad9be364deff38cb249861a9a8836fce038a6346c7e3",
-    "packages/config/rust/tests/common/mod.rs": "4f7a2f693900b05e65987b7f64e10f974afa68702152e0c6aac614866f5e37eb",
+    "packages/config/rust/tests/common/mod.rs": "5bdc1aed6a085cc4dc28eadcc41cdca1a9896cbf1e20e31d9b2a23cb18a04c8c",
     "packages/config/rust/tests/detect_path.rs": "f0e84aca639c9c945f1d46b61e5495c475dcc86a700ea8bc4e1d2be7f1d2d85c",
     "packages/config/rust/tests/event_store_section.rs": "329489875f0e8a5216bc6dd27c29d12941f0c39cd698fda3b29b9b5b339f0a50",
     "packages/config/rust/tests/failure_matrix.rs": "8a2c7f53b474a13d803b4c0bbf12b17f951203a8ffcb4bc367328ee1cb63a853",
@@ -273,7 +273,7 @@
     "packages/config/rust/tests/golden_init.rs": "073795cb5dba366187bdb5bb44292d268f25214e0be1ec6855455735ae9e13f7",
     "packages/config/rust/tests/golden_lint.rs": "998d9f358da34dd171e6b24642b04173be773d95ca689973efb8d15fc69ab02b",
     "packages/config/rust/tests/golden_meta.rs": "3ba3eb9dcb44bd5a6be43c32545aca479b6757c40bce4222da428e7f3afc91a7",
-    "packages/config/rust/tests/golden_migrate.rs": "2eaba9594daba7967b55de7e2d31ad02ce44325e07a356972442bb7bc1df5dac",
+    "packages/config/rust/tests/golden_migrate.rs": "6d49505e3e5404bf0256a97bbee547c199536510ebd47e2fdbc8f986032d27f0",
     "packages/config/rust/tests/golden_no_echo.rs": "b161c4b4c784d6558346ac927c25f57e395d10ca4237e53bf36a19a5814ca51f",
     "packages/config/rust/tests/golden_schema.rs": "bfb95ce662b2840b6ec2ee8e0c9edf66040b11cf220f0f7c888b987b18476e61",
     "packages/config/rust/tests/golden_scope.rs": "ebcf9054e332984689d13529f2cbf7c80600cd2272eebaad99cb0cd639084afb",
