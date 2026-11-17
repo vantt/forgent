@@ -3,7 +3,7 @@ title: "S5, the Execution read door: bind, the executor model, decide, hook and 
 description: "One bind() in Rust over a written executor-model contract; dispatch decide/explain, hook dispatch-decide and agents native; the bridge:S5 doctor rows in Rust; capability step 2 (business rows out, runner.personas and runner.roles, unit tier) with the councils' move to a domain."
 status: pending
 priority: P1
-effort: 36d (14 executable phases; longest chain 01 -> 04 -> 07 -> 09 -> 10 -> 12, about 18.5d)
+effort: 38.5d (16 executable phases; longest chain 01 -> 04 -> 07 -> 09 -> 10 -> 12, about 18.5d)
 branch: plan/execution-read-door
 tags: [refactor, one-door, rust, host, execution, seat-binding, capabilities]
 blockedBy: [rust-verb-migration-s4]
@@ -74,7 +74,7 @@ known defect, which becomes a backlog row); launch, lease, transport and confine
 | 13 | [Config repair for moved taste](phase-13-config-taste-move-fix.md) | `packages/config/contracts/doctor-rows.v1.json`, `packages/config/rust/src/{repair,doctor}.rs` + tests. Exists because step 2 would otherwise make a refused config block every agent Task call; repairs only the retired per-capability keys; stop and ask the plan lead if it grows | S4 landed | 1.5d | pending |
 | 14 | [Workflow unit tier](phase-14-workflow-unit-tier.md) | `src/workflow/definition.mjs`, `seat-resolver.mjs`, `unit.mjs` (message), workflow spec, one line of seat-binding spec 6.1. Exists because step 2 would otherwise drop checker seats to the default tier; adds only the tier declaration on registered workflow units; stop and ask the plan lead if it grows | S4 landed | 1.5d | pending |
 | 03 | [Taste tables](phase-03-seat-binding-config-shape.md) | `packages/seat-binding/**` (model, policy, explain, golden), schema, standard roles/seats blocks, `capability-config.mjs`, `seat-policy.mjs`, `dispatch/config.mjs`, `agent-definitions.mjs`, `.fgos/config.yaml`, seat-binding spec 6, `vision.md` | S4 landed; lands after 02, 13, 14 | 3d | pending |
-| 04 | [Crate and executor model](phase-04-crate-executor-model.md) | `packages/execution/rust/{Cargo.toml,src/{lib,ports,executor_model}.rs,tests/golden_executor_model.rs}`, root `Cargo.toml`, `Cargo.lock` | 01 | 2.5d | pending |
+| 04 | [Crate and executor model](phase-04-crate-executor-model.md) | `packages/execution/rust/{Cargo.toml,src/{lib,ports,executor_model}.rs,tests/golden_executor_model.rs}`, root `Cargo.toml`, `Cargo.lock` | 01, 15 | 2.5d | pending |
 | 05 | [Capability rows removal](phase-05-capability-rows-removal.md) | standard rows, council/marketing unit tier+rigor, `propose-validate.mjs`, `capability-plan-lint.mjs`, `registrations.mjs` (catalog, workflow row), Q3 consumers | 02, 03, 14 S4 on main; never beside 09 or 11 | 3d | pending |
 | 06 | [Bind in Rust](phase-06-bind-in-rust.md) | `packages/execution/contracts/bind.v1.json`, `src/{bind,explain,accounts}.rs`, `tests/golden_bind.rs` | 04, 03 | 3.5d | pending |
 | 07 | [Decide, config check, tools, hook in Rust](phase-07-decide-tools-hook-in-rust.md) | `packages/execution/contracts/decide.v1.json`, `src/{runner_check,decide,tools,hook}.rs`, `tests/golden_decide.rs`, one vector test in `test/runner/dispatch.test.mjs` | 04, 03; lands after 06 | 4d | pending |
@@ -82,15 +82,17 @@ known defect, which becomes a backlog row); launch, lease, transport and confine
 | 09 | [Route protocol 2 and Node callers](phase-09-route-and-node-callers.md) | `apps/fgos/src/wiring/seat_binding.rs`, `main.rs` route line, `apps/fgos/Cargo.toml`, crate `route.rs` (delete), `client.mjs`, `bind.mjs`, `seat-policy.mjs` (delete), `plan.mjs`, `assignment-runner.mjs` (replay digest), `unit-run-start.mjs`, `account-pin.mjs`, parity runner | 06, 07; never beside 05 | 4d | pending |
 | 10 | [Native verbs](phase-10-native-verbs.md) | host `main.rs` providers, `routing.rs`, `cli_projector.rs`, `catalog.rs`, annotations, generated routes, `command-registry.mjs`, `verb-exit.mjs`, `bin/fgos.mjs`, `runner/hook.mjs`, `dispatch/{hook,decide,cli}.mjs`, `dispatch.mjs`, `explain.mjs`, `scripts/dispatch-decide-hook.mjs`, `doctor-bridge.mjs` + contract, alias mentions, `ARM_STATIC_IMPORTS`, parity tables | 09, 08 | 4d | pending |
 | 11 | [Doctor rows](phase-11-doctor-rows.md) | `src/checks.rs`, `contracts/checks.v1.json`, `wiring/doctor/{execution,mod}.rs`, `doctor-registry.v1.json`, `registrations.mjs` (rows), omp/agy row modules | 07, 08, 09; never beside 05 | 2.5d | pending |
+| 15 | [Legacy invocation and launch code](phase-15-legacy-invocation-code-removal.md) | `provider-capacity.mjs` (credential store inference), `assignment-runner.mjs` (one line), `runner.schema.yaml` (duplicate launch fields), their tests and fixtures. Pure deletion (V4); stop and ask the plan lead if it needs a data change | S4 landed; lands before 04; never beside 05 or 09 | 1.5d | pending |
+| 16 | [llmAccounts-only reader](phase-16-llm-accounts-only-reader.md) | `provider-capacity.mjs`, `llm-accounts.mjs`, schema entry `providers.<p>.accounts` (V3 code). Gated on design-lap's board line "all machines on llmAccounts" | that line; 06 landed; never beside 09 | 1d | pending |
 | 12 | [Doors, docs, close](phase-12-doors-docs-close.md) | `docs/architecture-manifest.json` `doors`, seeded cases, docs, `CHANGELOG.md`, `docs/backlog.md`, program S5 row, guide | all | 2.5d | pending |
 
 ## Parallel map
 
 ```text
-wave 1:  01 contract   02 councils   13 config repair   14 unit tier   03 taste tables (lands after 02, 13, 14)
-wave 2:  04 crate (01)                           05 rows out (02, 03, 14; S4 on main)
+wave 1:  01 contract   02 councils   13 config repair   14 unit tier   15 legacy code   03 taste tables (lands after 02, 13, 14)
+wave 2:  04 crate (01, 15)                           05 rows out (02, 03, 14; S4 on main)
 wave 3:  06 bind (04, 03)   07 decide (04, 03; lands after 06)   08 agents (04, 03)
-wave 4:  09 route + Node callers (06, 07)
+wave 4:  09 route + Node callers (06, 07)   16 llmAccounts-only reader (design-lap line, 06; not beside 09)
 wave 5:  10 native verbs (09, 08)   11 doctor rows (07, 08, 09)
 wave 6:  12 close (all)
 ```
@@ -309,6 +311,7 @@ Owner answers of 2026-11-17 (about 08:40), relayed by HARDEN and confirmed by th
 | Item 5 | The COMMUNICATION lane may lead the S5 phases | They still wait for S4 to be on main (D12) |
 | Item 6 | Regenerate the four stale `.claude/agents` files (backlog p-bazzipipk5) | Consequence: the model lines drop and the agents run on the session's model; if the generator should write a model, that is its own item |
 | Q2 | (a), relayed by HARDEN (not yet seen by the owner in the COMMUNICATION window). Owner: "ok with the recommendation, but it is only a stopgap". Drop the per-row `prefer` orders, the architecture producer-seat orders and tier, and the differing red-team order; the coding red-team order and the reviewer order are kept globally. **TEMPORARY (stopgap), real fix tracked in p-bjmoxexuwi** (priority medium: where provider taste per job or seat lives, if it needs a home at all) | Phase 05 writes it; council seats may land on another family first |
+| V2, V3, V4 split | Owner, 2026-11-17 10:53 (relayed by HARDEN, not yet seen by the owner in the COMMUNICATION window): invocation and account config standardization is split between design-lap (forgentx-46: per-machine config and accounts to the new shapes (V1, V3 data), the invocation naming rule (V7, superseding agent-confinement spec.md:413), the agy stopgap (V5)) and S5 (code). V6 needs nothing. | S5 takes **V2** (invocation choice an explicit rule, generic forms preferred, pins hard, decided in the Rust bind or seat-binding rank, not the herdr-first override `bind.mjs:166-171`): folded into 06 (rule) and 09 (override deleted); stops if V7's naming rule is not on the board. **V4** (delete `credentialStoreOf` inference, duplicate executor-level launch fields in the schema, `FGOS_HERDR_PROMPT_DELIVERY`): phase 15. **V3 code** (delete the `providers.<p>.accounts` reader and schema entry): phase 16, gated on design-lap's board line "all machines on llmAccounts". Nothing starts before S4 is on main |
 | Q3 | (c), relayed by HARDEN, same owner words. Delete the 28-29 council, business and marketing rows; the coding rows that Work and the skills route through stay as named `debt` entries with `retiredBy: S7`. **TEMPORARY (stopgap), real fix tracked in p-nnbfsrxcss** (priority high: the coding rows' behaviour gets a proper home, with no debt left) | Phase 05 writes it; the `debt` reason cites p-nnbfsrxcss |
 
 ## Red Team Review

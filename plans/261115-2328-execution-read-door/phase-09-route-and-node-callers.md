@@ -56,7 +56,7 @@ change (L10). Node callers stay where S6a owns them (F1) and ask the route; none
   digest only), `src/runner/execution/{unit-run-start,account-pin}.mjs`, `src/runner/dispatch/provider-capacity.mjs`
   (the overlay reader, if the existing readers do not already give it), their tests, `docs/architecture-manifest.json`
   (entries of deleted files), `test/suite-baseline.json`, mutation census.
-- Delete: `packages/seat-binding/rust/src/route.rs`, `src/runner/execution/seat-policy.mjs`,
+- Delete: the herdr-first default-invocation override (`bind.mjs:166-171`; replaced by 06's explicit rule, V2), `packages/seat-binding/rust/src/route.rs`, `src/runner/execution/seat-policy.mjs`,
   `test/runner/execution/seat-policy.test.mjs`.
 - Tests retired (owner now): `test/runner/execution/bind.test.mjs` decision cases -> `golden_bind.rs`, keeping one wiring
   test (facade round trip through the route) in `test/seat-binding/client.test.mjs`;
