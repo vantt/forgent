@@ -9,7 +9,6 @@ import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
 import {
   inspectDispatchRuntime,
-  attentionView,
   validateInspectionSelector,
   VALID_PHASES,
   VALID_RESOURCE_STATES,
@@ -17,6 +16,7 @@ import {
   VALID_COMPLETENESS,
   INSPECTION_STATUSES,
 } from '../../src/runner/dispatch/runtime-inspection.mjs';
+import { attentionView } from '../../src/runner/dispatch/attention-view.mjs';
 import { invokeDispatchInspectOperation, inspectDispatchUseCase } from '../../src/verbs/dispatch/inspect.mjs';
 
 const fixture = () => fs.mkdtempSync(path.join(os.tmpdir(), 'dispatch-inspect-'));

@@ -1367,6 +1367,7 @@
     "src/runner/dispatch/run-result.mjs": "infra",
     "src/runner/dispatch/usage-parsers.mjs": "infra",
     "src/runner/dispatch/runtime-inspection.mjs": "infra",
+    "src/runner/dispatch/attention-view.mjs": "infra",
     "src/runner/dispatch/reconciliation-planner.mjs": "infra",
     "src/runner/dispatch/operation-prompt-templates.mjs": "infra",
     "src/runner/dispatch/provider-adapter.mjs": "infra",
