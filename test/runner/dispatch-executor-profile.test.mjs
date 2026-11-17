@@ -113,7 +113,7 @@ test('a launch field declared on the executor is refused by name, pointing at th
   for (const [field, value] of Object.entries(fields)) {
     assert.throws(
       () => loadWith({ [field]: value, invocations: [{ id: 'sample-cli', via: 'cli', command: 'claude', args: ['{prompt}'] }] }),
-      (err) => err instanceof RunnerConfigError && err.message.includes(`"${field}" was removed`) && /invocation/.test(err.message),
+      (err) => err instanceof RunnerConfigError && err.message.includes(`"${field}" was removed`) && /invocation/.test(err.message) && err.path === `runner.executors.sample.${field}`,
       `expected "${field}" on the executor to be refused`,
     );
   }

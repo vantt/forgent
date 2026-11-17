@@ -48,9 +48,7 @@ export function checkExecutorFamilyUnique(cwd) {
 const CLI_USER_SKILL_DIRS = { claude: '.claude/skills', codex: '.agents/skills' };
 
 function invocationCommands(entry) {
-  const commands = Array.isArray(entry.invocations) && entry.invocations.length > 0
-    ? entry.invocations.map(inv => inv?.command)
-    : [entry.command];
+  const commands = (entry.invocations ?? []).map(inv => inv?.command);
   return [...new Set(commands.filter(c => typeof c === 'string' && c !== ''))];
 }
 

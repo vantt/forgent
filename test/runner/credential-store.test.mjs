@@ -58,7 +58,7 @@ test('the runner config check accepts a store on a confined cli invocation, whic
 test('the runner config check refuses an older private-home binding on an invocation, naming the store to declare instead', () => {
   assert.throws(
     () => validateRunnerConfigShape(runnerWith({ invocations: [cliInvocation({ confinement: { backend: 'bwrap' }, resourceBindings: binding('CODEX_HOME') })] }), 'test'),
-    (err) => err instanceof RunnerConfigError && /"resourceBindings" was removed/.test(err.message) && /credentialStore/.test(err.message),
+    (err) => err instanceof RunnerConfigError && /"resourceBindings" was removed/.test(err.message) && /credentialStore/.test(err.message) && err.path === 'runner.executors.agent.invocations[0].resourceBindings',
   );
 });
 

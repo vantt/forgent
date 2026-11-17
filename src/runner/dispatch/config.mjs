@@ -489,9 +489,10 @@ function checkBypassIsConfined(invocation, label, executorConfinement) {
 }
 
 /** The rules of one invocation that read beyond its own fields: its tools against the catalog, its store against the confinement. */
-function checkInvocation(invocation, label, isRegistered, executorConfinement) {
+function checkInvocation(invocation, label, isRegistered, executorConfinement, canonicalPath) {
   if (invocation.resourceBindings !== undefined) {
-    throw new RunnerConfigError(`runner config (${label}) "resourceBindings" was removed. Declare the login store the invocation reads as "credentialStore": { "use": <cli>, "homeEnv": <variable> }.`);
+    const detail = '"resourceBindings" was removed. Declare the login store the invocation reads as "credentialStore": { "use": <cli>, "homeEnv": <variable> }.';
+    throw new RunnerConfigError(`runner config (${label}) ${detail}`, { path: `${canonicalPath}.resourceBindings`, detail });
   }
   checkBypassIsConfined(invocation, label, executorConfinement);
   if (invocation.via === 'mcp') {
@@ -513,10 +514,11 @@ function checkInvocation(invocation, label, isRegistered, executorConfinement) {
 }
 
 /** The rules of one `executors.<id>` entry that read beyond its own fields. */
-function checkExecutorEntry(executor, label, isRegistered) {
+function checkExecutorEntry(executor, label, isRegistered, executorId) {
   for (const [field, why] of Object.entries(REMOVED_EXECUTOR_FIELDS)) {
     if (executor[field] !== undefined) {
-      throw new RunnerConfigError(`runner config (${label}) "${field}" was removed. ${why}`);
+      const detail = `"${field}" was removed. ${why}`;
+      throw new RunnerConfigError(`runner config (${label}) ${detail}`, { path: `runner.executors.${executorId}.${field}`, detail });
     }
   }
   // `for` describes `kind: "tool"` executors; on an agent it is inert and `fgos doctor` names it.
@@ -529,7 +531,7 @@ function checkExecutorEntry(executor, label, isRegistered) {
   }
   const seenInvocationIds = new Set();
   (executor.invocations ?? []).forEach((invocation, index) => {
-    checkInvocation(invocation, `${label} invocations[${index}]`, isRegistered, executor.confinement);
+    checkInvocation(invocation, `${label} invocations[${index}]`, isRegistered, executor.confinement, `runner.executors.${executorId}.invocations[${index}]`);
     if (invocation.id === undefined) return;
     if (seenInvocationIds.has(invocation.id)) {
       throw new RunnerConfigError(`runner config (${label}) "invocations" declares "id": "${invocation.id}" more than once — each invocation id must be unique within one executor.`);
@@ -751,7 +753,7 @@ export function validateRunnerConfigShape(cfg, sourceLabel) {
   }
   const isRegistered = (name) => registeredCapabilityOf(cfg, name) !== undefined;
   for (const [executorId, executor] of Object.entries(cfg.executors ?? {})) {
-    checkExecutorEntry(executor, `${sourceLabel} executors.${executorId}`, isRegistered);
+    checkExecutorEntry(executor, `${sourceLabel} executors.${executorId}`, isRegistered, executorId);
     warnIfProviderFamilyUnreliable(executorId, executor);
   }
   checkPreferTargets(cfg, sourceLabel);

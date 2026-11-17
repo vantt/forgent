@@ -32,3 +32,11 @@
 2. CHANGELOG line for phase 12: "A runner executor entry no longer carries launch fields (command, args, adapter, env, permissionMode, promptDelivery, interactiveMode); declare them on the invocation. resourceBindings is refused: declare credentialStore. FGOS_HERDR_PROMPT_DELIVERY is gone."
 3. Other machines' config that still sets these keys is refused at load; design-lap's per-machine move covers it.
 4. Touched two of HARDEN's five files: bind-committed-config.test.mjs (deleted two resourceBindings assertions, not the seedStubAgentClis line) and model-pool-checks.test.mjs (dropped dual executor-level command/args). Rebase after their fix lands.
+
+## Review round (CHANGES) follow-up
+- Vectors: the two bypass vectors now put `permissionMode` on `executors.a.invocations[0]` (they prove the per-invocation bypass rule: missing flags named / valid); a new vector records the removed-field refusal. 237 vectors, `--check` green.
+- Dead entry-level fallbacks deleted in agent-cli-trust, registrations (trust-store env, store check incl. the `credentialStoreOf` command spread, git-write grants on `executor.args`, stale comment), omp-natives-checks, executor-profile-warnings, model-pool-checks, agy-permissions. `provider-session-probe` dropped `chosen.command ?? executor.command`: its callers (cli.mjs) pass `loadRunnerConfigForDir` output, not `withDefaultExecutor` output.
+- Removed-field and `resourceBindings` refusals now carry `path: runner.executors.<id>.<field>` (invocation: `...invocations[i].resourceBindings`) so a stale key is attributed to its file; tests assert the path.
+- `checkConfinementHerdrMaturity` now checks every herdr-spawn cli invocation (message names `executor/invocation`); its not-applicable test now keeps only headless invocations.
+- For the plan lead: "mount `runner.executor` as an invocation so there is one in-memory shape" (readers in resolve, bind, assignment-runner, mechanism, plan, policies, executor-governance still read flat `command/args/adapter/env`).
+- `test/rust-host/release-tree.test.mjs` fails only for a missing release addon (environmental).

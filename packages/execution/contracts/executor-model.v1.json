@@ -1525,16 +1525,22 @@
    "expect": {"error":{"name":"RunnerConfigError","message":"runner config (vector runner executors.t) \"for\" entry \"unknown-cap\" is not declared in \"capabilities\" — add it there first."}}
   },
   {
-   "name": "validate: bypass permission without full confinement names the missing flags",
+   "name": "validate: a launch field on the executor entry is refused by name",
    "fact": "validate",
-   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude","permissionMode":"bypass","confinement":{"privateHome":true}}}},
+   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude","permissionMode":"bypass"}}},
    "expect": {"error":{"name":"RunnerConfigError","message":"runner config (vector runner executors.a) \"permissionMode\" was removed. Declare it on the invocation that launches (executors.<id>.invocations[]), the one place a launch field lives."}}
   },
   {
-   "name": "validate: bypass permission with full confinement is valid",
+   "name": "validate: an invocation with bypass permission and no full confinement names the missing flags",
    "fact": "validate",
-   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude","permissionMode":"bypass","confinement":{"privateHome":true,"isolatedSession":true,"ownWorktree":true}}}},
-   "expect": {"error":{"name":"RunnerConfigError","message":"runner config (vector runner executors.a) \"permissionMode\" was removed. Declare it on the invocation that launches (executors.<id>.invocations[]), the one place a launch field lives."}}
+   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude","invocations":[{"id":"cli","via":"cli","command":"claude","args":[],"permissionMode":"bypass"}],"confinement":{"privateHome":true}}}},
+   "expect": {"error":{"name":"RunnerConfigError","message":"runner config (vector runner executors.a invocations[0]) declares \"permissionMode\": \"bypass\" without full confinement -- missing isolatedSession, ownWorktree. A worker that never asks before acting is only defensible when it is confined, so bypass requires privateHome, isolatedSession, ownWorktree to all be true."}}
+  },
+  {
+   "name": "validate: an invocation with bypass permission and full confinement is valid",
+   "fact": "validate",
+   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude","invocations":[{"id":"cli","via":"cli","command":"claude","args":[],"permissionMode":"bypass"}],"confinement":{"privateHome":true,"isolatedSession":true,"ownWorktree":true}}}},
+   "expect": {"ok":true}
   },
   {
    "name": "validate: an invocation id repeated inside one executor is refused",
