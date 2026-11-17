@@ -468,7 +468,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     workTier: 'heavy',
     bindingSource: 'executor-id',
     provider: 'gemini',
-    model: 'gemini-4-argon-high',
+    model: 'gemini-3.8-flash-high',
     command: 'agy',
     args: [
       '--settings',
@@ -476,7 +476,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
       '-p',
       '<prompt>',
       '--model',
-      'gemini-4-argon-high'
+      'gemini-3.8-flash-high'
     ],
     envKeys: [],
     credentialStore: {
@@ -566,7 +566,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     workTier: 'heavy',
     bindingSource: 'executor-id',
     provider: 'gemini',
-    model: 'gemini-4-argon-high',
+    model: 'gemini-3.8-flash-high',
     command: 'agy',
     args: [
       '--mode',
@@ -575,7 +575,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
       '--settings',
       AGY_SETTINGS,
       '--model',
-      'gemini-4-argon-high'
+      'gemini-3.8-flash-high'
     ],
     envKeys: [],
     credentialStore: {
@@ -1040,16 +1040,16 @@ describe('dispatch policy baseline snapshot harness (Phase 00)', () => {
   });
 
   describe('named explicit baseline facts', () => {
-    // (a) gemini-cli heavy AND gemini-herdr heavy both resolve model to gemini-4-argon-high (policy tier frontier, D15),
+    // (a) gemini-cli heavy AND gemini-herdr heavy both resolve model to gemini-3.8-flash-high (policy tier frontier, D15),
     // and the model reaches omp's argv: without --model omp runs its profile default whatever the tier.
-    test('fact (a): gemini-cli heavy and gemini-herdr heavy resolve to gemini-4-argon-high and pass it to agy (policy tier frontier, D15)', () => {
+    test('fact (a): gemini-cli heavy and gemini-herdr heavy resolve to gemini-3.8-flash-high and pass it to agy (policy tier frontier, D15)', () => {
       for (const label of ['gemini-cli', 'gemini-herdr']) {
         const row = resolveSnapshotRowByLabel(cfg, label, 'heavy', throwawayDir);
-        assert.equal(row.model, 'gemini-4-argon-high', `${label} heavy model must be gemini-4-argon-high`);
+        assert.equal(row.model, 'gemini-3.8-flash-high', `${label} heavy model must be gemini-3.8-flash-high`);
         assert.equal(row.provider, 'gemini');
         assert.equal(row.command, 'agy');
         const at = row.args.indexOf('--model');
-        assert.ok(at >= 0 && row.args[at + 1] === 'gemini-4-argon-high', `${label} heavy must pass --model gemini-4-argon-high, got ${JSON.stringify(row.args)}`);
+        assert.ok(at >= 0 && row.args[at + 1] === 'gemini-3.8-flash-high', `${label} heavy must pass --model gemini-3.8-flash-high, got ${JSON.stringify(row.args)}`);
       }
     });
 

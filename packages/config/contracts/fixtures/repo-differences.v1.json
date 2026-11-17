@@ -265,6 +265,24 @@
   {
    "path": [
     "runner",
+    "modelPolicies",
+    "gemini",
+    "flagship"
+   ],
+   "reason": "the standard names a model agy serves (gemini-3.8-flash-high); the pinned authoring source predates gemini running only through agy and names gemini-4-argon-high, which agy refuses"
+  },
+  {
+   "path": [
+    "runner",
+    "modelPolicies",
+    "gemini",
+    "frontier"
+   ],
+   "reason": "the standard names a model agy serves (gemini-3.8-flash-high); the pinned authoring source predates gemini running only through agy and names gemini-4-argon-high, which agy refuses"
+  },
+  {
+   "path": [
+    "runner",
     "timeoutMs"
    ],
    "reason": "scalar the code already defaults (900000): the standard takes the code default, this repository runs 2100000"
