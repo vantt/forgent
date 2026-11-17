@@ -44,7 +44,8 @@ change (L10). Node callers stay where S6a owns them (F1) and ask the route; none
    `retiredBy: S6a` (D5). `src/runner/dispatch/mechanism.mjs` therefore stays (twin, D7).
 5. `src/runner/execution/explain.mjs` keeps working through `explainSeat` until 10 deletes it.
 6. Restore the transitional parity runner from history as S4 did (re-read item 5): `test/rust-host/verb-parity.test.mjs`
-   (this phase is its one restorer; 10 and 11 add tables). Deleted in 12.
+   (this phase is its one restorer; 10 and 11 add tables), on the side branch `execution-read-door/parity-runner`
+   only, never on the phase branch (D14).
 7. Measure host calls and wall time per `fgos run` seat, per replay and per dispatch before and after (report).
    Expected: bind unchanged (one call per bind), the explain walk chain from one call per step to one, one `preflight`
    per run start (Node computed it in process before), one `digest` per replay, no call added for bind-free dispatch
@@ -52,7 +53,7 @@ change (L10). Node callers stay where S6a owns them (F1) and ask the route; none
 
 ## Files
 
-- Create: `apps/fgos/src/wiring/seat_binding.rs`, the transitional parity runner.
+- Create: `apps/fgos/src/wiring/seat_binding.rs`; the transitional parity runner on the side branch (D14).
 - Modify: `apps/fgos/src/main.rs` (route line), `apps/fgos/src/wiring/mod.rs`, `apps/fgos/Cargo.toml`,
   `packages/seat-binding/rust/src/lib.rs` (drop `pub mod route`), `src/seat-binding/client.mjs`,
   `src/runner/execution/bind.mjs`, `src/runner/dispatch/plan.mjs`, `src/runner/dispatch/assignment-runner.mjs` (replay

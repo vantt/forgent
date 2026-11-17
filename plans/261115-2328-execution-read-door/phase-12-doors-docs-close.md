@@ -1,4 +1,4 @@
-# Phase 12: doors rows, docs, parity close and the landing guide
+# Phase 12: doors rows, docs, parity counts and the landing guide
 
 Start after: every other phase (01-11, 13, 14) landed. Wave 6. Rules: [phase-lead-rules.md](phase-lead-rules.md). Facts: all; re-read items 6, 8.
 Worktree `erd-p12`, report slug `erd-p12-close`. Effort: 2d.
@@ -45,8 +45,8 @@ capability rows of the capability-reads plan (F4) still name Node modules as the
      capability" (`tools.rs`; Node `tool-providers.mjs` keeps only what S6a launch reads, as debt), "agent definition
      tier directories" (add the Rust host adapter as allowed).
    - If 11 deferred it, delete `src/runner/agent-listing.mjs` and its twin test now.
-2. Parity close: re-run every S5 parity table against the base release, record counts, then delete the restored runner
-   and the tables (they never reach main).
+2. Parity close: nothing to delete; the runner and the tables live on `execution-read-door/parity-runner` and the
+   local gate branches of 10 and 11 and never landed (D14). Record the counts 10 and 11 reported.
 3. Docs: `docs/platform/runner/spec.md` "Execution Core and Dispatch" (bind composition is Rust; Node S6a callers
    ask the route), `docs/platform/seat-binding/spec.md` section 3 (who asks; route protocol 2) and 16 (pointers),
    `docs/platform/host-invocation-routing/spec.md` route counts, `docs/platform/component-boundary.md` Seat Binding row
@@ -72,7 +72,7 @@ capability rows of the capability-reads plan (F4) still name Node modules as the
 - Modify: `docs/architecture-manifest.json`, `test/architecture.test.mjs` (seeded cases), the docs of Req 3,
   `CHANGELOG.md`, `docs/backlog.md`, `plans/261114-2051-rust-verb-migration-program/plan.md` (S5 row), this plan's
   `plan.md` status (through `ak plan`), mutation census.
-- Delete: the transitional parity runner and tables; `src/runner/agent-listing.mjs` and its test if 11 deferred them.
+- Delete: `src/runner/agent-listing.mjs` and its test if 11 deferred them.
 - Net size: about +200 manifest lines, +80 test lines, docs edits.
 
 ## Acceptance

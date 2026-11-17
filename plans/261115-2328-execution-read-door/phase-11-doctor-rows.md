@@ -47,7 +47,7 @@ them, keep S4's fixtures.
 
 - Create: `packages/execution/rust/src/checks.rs`, `packages/execution/rust/tests/golden_checks.rs`,
   `packages/execution/contracts/checks.v1.json` (vectors recorded from the Node judges before they go),
-  `apps/fgos/src/wiring/doctor/execution.rs`, the doctor parity table.
+  `apps/fgos/src/wiring/doctor/execution.rs`. The doctor parity table only on a local gate branch: the runner lives on the side branch `execution-read-door/parity-runner` (pushed, never landed): merge it into a LOCAL gate branch cut from this phase's head, add the table file(s) there, run `node scripts/run-tests.mjs test/rust-host/verb-parity.test.mjs` with `FGOS_TEST_PARITY_BASE` naming the staged pre-change release (recipe in `test/rust-host/harness.mjs`), put the counts in the report, and push the phase branch WITHOUT the runner and the tables (a pre-land gate, never part of a landed head) (D14).
 - Modify: `packages/execution/rust/src/lib.rs`, `apps/fgos/src/wiring/doctor/mod.rs`,
   `packages/distribution/contracts/doctor-registry.v1.json`, `src/setup/registrations.mjs`, the S4-left omp/agy modules,
   `src/runner/execution/capability-config.mjs` (drop `capabilityServesOf` if unused), `apps/fgos/tests/cli_tests.rs` (one
@@ -64,7 +64,7 @@ them, keep S4's fixtures.
 ## Acceptance
 
 - No `bridge:S5` owner left; `seat-binding-route` is `bridge:S6a`; `layers` names no module as S5; exact-set tests and
-  per-row parity green; `fgos doctor` on this repo shows the moved rows with the base release's status.
+  per-row parity green on the local gate branch (counts in the report); `fgos doctor` on this repo shows the moved rows with the base release's status.
 
 ## Risks / rollback
 

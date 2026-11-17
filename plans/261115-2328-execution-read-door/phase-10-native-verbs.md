@@ -49,9 +49,9 @@ deletes their Node arms and use cases (L10). `dispatch` stays a `legacy-cli` rou
      (`components.legacyNode.root` of the activated release, resolved by `apps/fgos/src/legacy_exec.rs:69
      resolve_payload_path`, never PATH or cwd: `core/agents`, `domains/*/agents`) and the project
      (`fgos/agents`); 08's `list`.
-3. Parity: on 09's restored runner, tables
+3. Parity: tables
    `test/rust-host/parity-cases/{dispatch-decide,dispatch-explain,hook-dispatch-decide,agents}.cases.mjs` (every refusal
-   of each arm), run green against the base release before deleting Node code. Transitional: phase 12 deletes them.
+   of each arm), run green against the base release before deleting Node code. the runner lives on the side branch `execution-read-door/parity-runner` (pushed, never landed): merge it into a LOCAL gate branch cut from this phase's head, add the table file(s) there, run `node scripts/run-tests.mjs test/rust-host/verb-parity.test.mjs` with `FGOS_TEST_PARITY_BASE` naming the staged pre-change release (recipe in `test/rust-host/harness.mjs`), put the counts in the report, and push the phase branch WITHOUT the runner and the tables (a pre-land gate, never part of a landed head).
 4. Delete (same phase): the `decide`, `explain` and `agents` arms of `bin/fgos.mjs` and imports no other arm uses
    (`ARM_STATIC_IMPORTS` lines in `test/architecture.test.mjs`), `EXIT_OF` entries, `src/runner/dispatch/hook.mjs`, the
    `dispatch-decide` kind in `src/runner/hook.mjs:17,66`, `src/runner/execution/explain.mjs`, the decide use case in
@@ -77,7 +77,7 @@ deletes their Node arms and use cases (L10). `dispatch` stays a `legacy-cli` rou
 
 ## Files
 
-- Create: `apps/fgos/src/wiring/{dispatch_decide.rs,agents.rs}`, four transitional parity tables.
+- Create: `apps/fgos/src/wiring/{dispatch_decide.rs,agents.rs}`; the four parity tables only on the local gate branch (Req 3, D14).
 - Modify (also): the doctrine, docs and tests of Req 4's alias list; `scripts/check-decision-codes.baseline.json` when a
   retired test's title is pinned there (`:162` pins a `decideExecutorCli` title).
 - Modify: `apps/fgos/src/{main.rs,routing.rs,cli_projector.rs}`, `apps/fgos/src/wiring/mod.rs`,
@@ -94,7 +94,7 @@ deletes their Node arms and use cases (L10). `dispatch` stays a `legacy-cli` rou
   that drive `decideExecutorCli` -> `golden_decide.rs` (cases) and `cli_tests.rs` (one wiring); `dispatch-decide-hook.test.mjs`
   -> `golden_decide.rs` hook vectors and the `cli_tests.rs` hook case; `explain.test.mjs` -> `golden_bind.rs`;
   hook cases in `test/setup/{claude-code-hooks,agent-hooks}.test.mjs` that only reach the verdict -> same. Each named.
-- Net size: about -900 Node lines, -700 Node test lines, +600 Rust host lines, parity tables (transitional).
+- Net size: about -900 Node lines, -700 Node test lines, +600 Rust host lines (parity tables never land).
 
 ## Acceptance
 

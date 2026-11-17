@@ -56,7 +56,7 @@ known defect, which becomes a backlog row); launch, lease, transport and confine
 | D11 | Moved config keys get a Config repair (`move-capability-taste`, phase 13) in Config's existing repair mechanism; refusing by name alone would make the hook block every Task call until a person edits the file | `packages/config/rust/src/repair.rs`, `doctor-rows.v1.json`; `dispatch/hook.mjs:50-54` |
 | D12 | S5 starts when S4 is on main; no S5 phase runs beside S4 | program "layers stay serial"; owner "one T at a time" |
 | D13 | The `node src/runner/dispatch.mjs decide` alias and `scripts/dispatch-decide-hook.mjs` go with the Node decide and hook, with every live mention | `dispatch/cli.mjs:21,166`; `scripts/dispatch-decide-hook.mjs:1-6`; F10 list |
-| D14 | Parity runner restored on the integration branch once (09) and deleted at close | S4 file set ("never reach main") |
+| D14 | Parity runner restored once (09) on the side branch `execution-read-door/parity-runner`, merged only into local gate branches of 10 and 11 and never landed; nothing to delete at close | S4 file set ("never reach main"); plan lead 2026-11-17 (no integration branch) |
 | D15 | `seat-binding-route` stays Node (`bridge:S6a`) | its rule ("probe the binary the Node client runs") needs a Node payload (`client.mjs:11-14,43-50`); a Rust copy would be an undeclared twin |
 | D16 | Landing preconditions: no run in flight and no open mutating assignment; then activate; then `fgos doctor --fix` in every project | protocol 2 meets old payloads (`client.mjs:43-50`); the replay digest slice changes (F10); 13's repair |
 | D17 | A registered workflow unit may declare `tier` (14); units files keep refusing it | owner direction "a workflow step declares the tier and rigor it needs"; `unit.mjs:10`, `seat-resolver.mjs:346-366` |
@@ -109,8 +109,8 @@ wave 6:  12 close (all)
   (09 then 10), `src/setup/registrations.mjs` (05, 11), `src/runner/dispatch/assignment-runner.mjs` (05, 09),
   `core/config-standard/runner.yaml` (03 then 05), `docs/platform/seat-binding/spec.md` (14, then 03, then 12),
   `src/runner/execution/seat-resolver.mjs` (14 then 05), `src/runner/execution/capability-config.mjs` (03, 05, 11),
-  `test/runner/dispatch.test.mjs` (07, then 10), `docs/reading-map.md` (01 then 12), the transitional parity runner (09
-  creates; 10 and 11 add separate table files). Every other file has exactly one owner.
+  `test/runner/dispatch.test.mjs` (07, then 10), `docs/reading-map.md` (01 then 12). The parity runner
+  is not a hot file: it lives on the side branch `execution-read-door/parity-runner` (D14) and never lands. Every other file has exactly one owner.
 
 ## Data flow
 

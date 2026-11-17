@@ -43,8 +43,12 @@ Worktree `/home/vantt/projects/forgent-worktrees/erd-p09`, Cargo target `erd-p09
   `decided` mechanism with them (helper `DECIDED_RULE`/`decidedProblem`, the script's branch, the contract doc text).
   New vector: "preflight: a pin written with a family alias is judged on the pool set the bind ranks, where the alias is
   keyed to its family". 38 bind vectors added for retired Node cases (below); 129 bind vectors, 348 executor-model.
-- **Parity runner.** `test/rust-host/verb-parity.test.mjs` restored from `9772db47d^`; it reads every
-  `parity-cases/*.cases.mjs` file, so phases 10 and 11 add a table file and never edit the runner. No table yet.
+- **Parity runner (plan lead decision, D14).** `test/rust-host/verb-parity.test.mjs` restored from `9772db47d^` on the
+  side branch `execution-read-door/parity-runner` (one commit over this phase's head, pushed, never landed); the phase
+  branch carries no runner and no `FGOS_TEST_PARITY_BASE` dependence. The runner reads every `parity-cases/*.cases.mjs`
+  file, so 10 and 11 merge the side branch into a local gate branch, add their table file there, run it against the
+  pre-change release and push their phase branch without it. `harness.mjs` was not changed. Plan text updated: D14,
+  the hot-file list, phase 09 Req 6, phase 10 Req 3 and files, phase 11 files and acceptance, phase 12 step 2 and files.
 - **Smaller.** `capabilityPersonaOf` (its one caller was the Node bind) is deleted; the seat-binding spec pointers name
   the protocol 2 route and the facade; the `seat-binding-route` doctor row text says protocol 2; the manifest drops
   `seat-policy.mjs`.
@@ -173,14 +177,11 @@ facade, and `seat-binding-route` answers ladder at protocol 2.
 | seat-binding client, route-doctor-check, executor-model-vectors twin | 18/0, 4/0, 3/0 |
 | every test `rg -l "bind.mjs\|seat-policy\|seat-binding/client\|plan.mjs"` lists (bind, bind-committed-config, tier-fallback, explain, account-pin, account-rotation, run-gate, capability-config, tier-cell, dispatch-execute-effort, assignment-dispatch, dispatch, dispatch-plan-policy, dispatch-policy-baseline-snapshot, dispatch-governance-provider-denylist, dead-vocabulary-guard, dispatch-reconciliation-import-graph, registrations, checks-doctor-config, agent-cli-trust-check, capability-catalog-doctrine, seat-binding-dry-bind, visibility-checks, work-size-rigor) | all green (2, 5, 1, 1, 13, 18, 20, 13, 16, 13, 50, 216, 37, 24, 11, 10, 25, 54, 24, 12, 9, 25, 25, 6) |
 | the `stubAgentCliDir` users (3 files left) | green, through `pathEnv` |
-| `test/rust-host/verb-parity.test.mjs` | 1/0 (no table yet) |
+| `test/rust-host/verb-parity.test.mjs` (side branch only) | 1/0 (no table yet), run before it left the phase branch |
 | Not run | full `npm test`, `cargo test --workspace` (plan lead) |
 
 ## Anything left
 
-- The parity runner has no table; with no integration branch (each phase lands on main), a table added by 10 or 11
-  needs `FGOS_TEST_PARITY_BASE` in every suite run on main or fails; D14 assumed it never reaches main. Plan lead to
-  decide how 10 and 11 run their tables.
 - `--for` with a purpose that names an executor costs one more host call than before (the plan op, then the policy
   bind); only the Node `decide` (native in phase 10) asks it.
 - Kept behaviour: `Machine::on_path` judges a directory named like a program as not startable (Node's bare-name lookup
@@ -189,7 +190,17 @@ facade, and `seat-binding-route` answers ladder at protocol 2.
 
 ## Unresolved questions
 
-1. Parity tables on main (above).
+None (the parity question was decided by the plan lead: side branch, local gate branches, never landed).
+
+## Landing guide text for HARDEN (D16)
+
+1. Drain: no unit run in flight and no open mutating assignment on the machine (`fgos dispatch inspect`); a payload of
+   the old release still running meets protocol 2 and fails by name (`host-version-mismatch`), and a recorded binding's
+   replay digest is now the host's.
+2. Build, stage and activate the release from the landed head in one window (host and payload together; the route and
+   the client change protocol together).
+3. `fgos doctor --fix` in every project, then `fgos doctor` through the installed shim: `seat-binding-route` must say
+   "answers ladder at protocol 2".
 
 ## Proposed `## [Unreleased]` line
 
