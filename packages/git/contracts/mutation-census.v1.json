@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "38a9071d4ccb0c6ea229f52d05bf707eadedd789ac498b4875f62a932a5efe15",
+  "payloadDigest": "9b4b77a8e0b8a4b1baa15f42554958e8a9807149bb6a78a54288540a36ba4f99",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "b8b886cee2ea5ce7ee1153e4795512db135a990de894c27e53c5e778b210be62",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -94,7 +94,7 @@
     "apps/fgos/src/wiring/doctor/bridge.rs": "1d6a672ff6d7ea89acd003b068bdee9342b63cb9216f8b76f9261f3c07e2d6ba",
     "apps/fgos/src/wiring/doctor/config.rs": "97a5d1653dccc89f3788232544fe4bbd640b91fb24c5f592fcce075862c91273",
     "apps/fgos/src/wiring/doctor/event_store.rs": "61c66e050710eb6ea4aa2f8cb4643bdf91f8cd63bb482f1674de4614edf46e34",
-    "apps/fgos/src/wiring/doctor/git.rs": "2d181c5aee1ae1d8fd5746a186d23020ab4b81ab898d5c0b687b737a5909c6a7",
+    "apps/fgos/src/wiring/doctor/git.rs": "387d33a73bd778d0508a601d43a4ec4df5c83cb4da051dea47096de8a5526d7d",
     "apps/fgos/src/wiring/doctor/holder_lock.rs": "75b6efcf2c782e6508595d5049214226a5ffedefe73b3dc7f6ea018fd89bc232",
     "apps/fgos/src/wiring/doctor/identity.rs": "c77b8f84fb27f10717b264bb839e5c79dd2a817d51263779bb7d233db9469a55",
     "apps/fgos/src/wiring/doctor/mailbox.rs": "8de4fb5222d9cba45cf7a269e5bb18cb2cd804333c13316821d2ebde5c16219b",

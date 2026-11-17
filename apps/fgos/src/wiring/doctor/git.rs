@@ -785,6 +785,8 @@ mod tests {
         fix(&f.run(), id).unwrap()
     }
 
+    // The Git door keeps its operation journal on Linux only; elsewhere it refuses by name.
+    #[cfg(target_os = "linux")]
     #[test]
     fn the_journal_row_fails_with_git_fence_missing_when_a_git_wal_has_lost_the_controller_activation_fence(
     ) {
@@ -804,6 +806,8 @@ mod tests {
         assert_eq!(row.fix_command.as_deref(), Some("fgctl upgrade"));
     }
 
+    // The Git door's repository driver is Unix only; elsewhere it refuses by name.
+    #[cfg(unix)]
     #[test]
     fn without_the_activation_fence_the_missing_wal_row_names_fgctl_and_not_a_fix_that_cannot_run()
     {
@@ -820,6 +824,8 @@ mod tests {
         assert_eq!(row.fix_command.as_deref(), Some("fgctl init"));
     }
 
+    // The Git door's repository driver is Unix only; elsewhere it refuses by name.
+    #[cfg(unix)]
     #[test]
     fn the_journal_row_fails_and_names_the_fix_while_no_git_wal_exists() {
         let f = Fixture::new("nowal");
@@ -835,6 +841,8 @@ mod tests {
         assert_eq!(row.detail.unwrap()["journal"]["initialized"], json!(false));
     }
 
+    // The Git door keeps its operation journal on Linux only; elsewhere it refuses by name.
+    #[cfg(target_os = "linux")]
     #[test]
     fn the_wal_fix_initializes_once_and_reports_nothing_changed_the_second_time() {
         let f = Fixture::new("walfix");
@@ -846,6 +854,31 @@ mod tests {
             Some("Git WAL initialized and trusted")
         );
         assert!(row_of(&f, "git-operation-journal").passed);
+    }
+
+    #[cfg(all(unix, not(target_os = "linux")))]
+    #[test]
+    fn without_a_git_journal_on_this_platform_the_wal_fix_refuses_by_name_and_changes_nothing() {
+        let f = Fixture::new("walfix-refused");
+        let fix = fixed(&f, "git-wal-dir");
+        assert_ne!(fix.changed, Some(true));
+        assert_eq!(
+            fix.message.as_deref(),
+            Some("warning: Git setup refused: git-wal-unsupported")
+        );
+    }
+
+    #[cfg(not(unix))]
+    #[test]
+    fn without_a_git_driver_on_this_platform_the_rows_that_read_it_fail_naming_the_platform() {
+        let f = Fixture::new("driver-refused");
+        let row = row_of(&f, "git-component-compatible");
+        assert!(!row.passed);
+        assert!(
+            message(&row).contains("config-platform-unsupported"),
+            "{}",
+            message(&row)
+        );
     }
 
     #[test]
@@ -860,6 +893,8 @@ mod tests {
             .starts_with("fgOS Git driver directories"));
     }
 
+    // The Git door's repository driver is Unix only; elsewhere it refuses by name.
+    #[cfg(unix)]
     #[test]
     fn the_repository_rows_report_information_not_a_failure_outside_a_git_repository() {
         let f = Fixture::plain("norepo");
@@ -897,6 +932,8 @@ mod tests {
         );
     }
 
+    // The Git door's repository driver is Unix only; elsewhere it refuses by name.
+    #[cfg(unix)]
     #[test]
     fn the_incidents_row_never_fails_it_counts_native_locks_and_a_merge_in_progress_and_points_to_fgos_git_status(
     ) {
@@ -925,6 +962,8 @@ mod tests {
         );
     }
 
+    // The Git door keeps its operation journal on Linux only; elsewhere it refuses by name.
+    #[cfg(target_os = "linux")]
     #[test]
     fn the_repository_config_row_skips_naming_the_command_that_adds_a_remote_while_there_is_no_remote(
     ) {
@@ -939,6 +978,8 @@ mod tests {
         assert!(message(&row).contains("no Git remote \"origin\""));
     }
 
+    // The Git door keeps its operation journal on Linux only; elsewhere it refuses by name.
+    #[cfg(target_os = "linux")]
     #[test]
     fn the_fetch_mapping_fix_has_nothing_to_repair_and_says_so_without_a_failure_while_there_is_no_remote(
     ) {
@@ -1052,6 +1093,8 @@ mod tests {
         }
     }
 
+    // The Git door's repository driver is Unix only; elsewhere it refuses by name.
+    #[cfg(unix)]
     #[test]
     fn the_git_half_of_the_floor_row_passes_where_git_is_available_and_starts_no_node() {
         let f = Fixture::new("floor");
@@ -1060,6 +1103,8 @@ mod tests {
         assert_eq!(message(&row), "git available");
     }
 
+    // The Git door's repository driver is Unix only; elsewhere it refuses by name.
+    #[cfg(unix)]
     #[test]
     fn the_hook_row_applies_only_to_a_project_whose_pre_commit_is_the_fgos_guard() {
         let f = Fixture::new("hooks");
@@ -1127,6 +1172,8 @@ mod tests {
         assert!(after.passed, "{}", message(&after));
     }
 
+    // The Git door keeps its operation journal on Linux only; elsewhere it refuses by name.
+    #[cfg(target_os = "linux")]
     #[test]
     fn the_repository_config_row_names_an_untrusted_transport_setting_without_echoing_its_value() {
         let f = Fixture::new("transport");
@@ -1159,6 +1206,8 @@ mod tests {
         assert!(message(&helper).contains("persist-credentials: false"));
     }
 
+    // The Git door keeps its operation journal on Linux only; elsewhere it refuses by name.
+    #[cfg(target_os = "linux")]
     #[test]
     fn an_obsolete_legacy_mapping_on_the_origin_or_the_configured_remote_fails_the_row_and_the_fix_repairs_each(
     ) {
@@ -1216,6 +1265,8 @@ mod tests {
         assert!(row_of(&f, "git-repository-config").passed);
     }
 
+    // The Git door keeps its operation journal on Linux only; elsewhere it refuses by name.
+    #[cfg(target_os = "linux")]
     #[test]
     fn an_obsolete_mapping_on_only_the_configured_remote_is_repaired_there_and_never_on_an_origin_that_does_not_exist(
     ) {
@@ -1245,6 +1296,8 @@ mod tests {
             .any(|line| line == obsolete));
     }
 
+    // The Git door's repository driver is Unix only; elsewhere it refuses by name.
+    #[cfg(unix)]
     #[test]
     fn reserved_legacy_mirror_refs_are_named_by_the_repository_config_row() {
         let f = Fixture::new("reserved");
@@ -1258,6 +1311,8 @@ mod tests {
         assert!(message(&row).contains(bad), "{}", message(&row));
     }
 
+    // The Git door's repository driver is Unix only; elsewhere it refuses by name.
+    #[cfg(unix)]
     #[test]
     fn the_compatibility_row_keeps_its_facts_under_detail_so_its_message_stays_one_sentence() {
         let f = Fixture::new("detail");
