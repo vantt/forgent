@@ -84,7 +84,7 @@ function createMockRunnerConfig() {
         command: 'codex',
         invocations: [
           { id: 'codex-cli', via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' } },
-          { id: 'codex-herdr', via: 'cli', adapter: 'herdr-spawn', confinement: { backend: 'bwrap' } },
+          { id: 'codex-herdr-bwrap', via: 'cli', adapter: 'herdr-spawn', confinement: { backend: 'bwrap' } },
         ],
       },
       'gemini-cli': {

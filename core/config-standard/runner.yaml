@@ -115,7 +115,7 @@ runner:
             - "{prompt}"
           confinement:
             backend: bwrap
-        - id: pi-herdr
+        - id: pi-herdr-bwrap
           via: cli
           adapter: herdr-spawn
           confinement:
@@ -137,7 +137,7 @@ runner:
           interactiveMode:
             exitCommand: "/quit"
             kind: pi
-        - id: codex-herdr
+        - id: codex-herdr-bwrap
           via: cli
           adapter: herdr-spawn
           confinement:
@@ -184,11 +184,11 @@ runner:
             backend: bwrap
     gemini:
       kind: agent
-      description: "Gemini provider via omp (oh-my-pi); Antigravity CLI (agy) invocations removed 2026-10-16. Invocations: omp-herdr (herdr pane), omp-cli-bwrap (headless). The confined account comes from runner.providers.gemini.accounts in the global config."
+      description: "Gemini provider via omp (oh-my-pi); Antigravity CLI (agy) invocations removed 2026-10-16. Invocations: omp-herdr-bwrap (herdr pane), omp-cli-bwrap (headless). The confined account comes from runner.providers.gemini.accounts in the global config."
       allowCrossProvider: true
       providerModel: gemini
       invocations:
-        - id: omp-herdr
+        - id: omp-herdr-bwrap
           via: cli
           adapter: herdr-spawn
           confinement:
@@ -268,7 +268,7 @@ runner:
             - "{prompt}"
           confinement:
             backend: bwrap
-        - id: omp-herdr
+        - id: omp-herdr-bwrap
           via: cli
           adapter: herdr-spawn
           confinement:
@@ -321,7 +321,7 @@ runner:
             - "{prompt}"
           confinement:
             backend: bwrap
-        - id: pi-herdr
+        - id: pi-herdr-bwrap
           via: cli
           adapter: herdr-spawn
           confinement:
@@ -387,7 +387,7 @@ runner:
       description: "code-implement work for the coding domain executing stage -- preferred executor gemini through omp, claude then openai as fallback."
       prefer:
         - executor: gemini
-          invocation: omp-herdr
+          invocation: omp-herdr-bwrap
         - executor: deepseek
         - executor: glm
         - claude
@@ -397,7 +397,7 @@ runner:
       description: "Canonical coding implementation capability -- compliance-driven coding execution before implementation (D1/D2, docs/history/capability-aware-dispatch-activation/CONTEXT.md)"
       prefer:
         - executor: gemini
-          invocation: omp-herdr
+          invocation: omp-herdr-bwrap
         - executor: deepseek
         - executor: glm
         - claude
@@ -689,7 +689,7 @@ runner:
     "coding:implement":
       prefer:
         - executor: gemini
-          invocation: omp-herdr
+          invocation: omp-herdr-bwrap
         - executor: deepseek
         - executor: glm
         - claude
