@@ -775,7 +775,7 @@
     },
     {
       "id": "seat-binding-route",
-      "description": "the host Seat Binding runs answers the internal seat-binding route at protocol 1",
+      "description": "the host Seat Binding runs answers the internal seat-binding route at protocol 2",
       "owner": "bridge:S5",
       "judge": [
         "src/seat-binding/client.mjs"
