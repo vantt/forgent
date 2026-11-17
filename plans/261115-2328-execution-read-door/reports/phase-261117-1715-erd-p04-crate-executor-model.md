@@ -10,7 +10,7 @@ Status: DONE_WITH_CONCERNS. Branch `execution-read-door/p04`, based on origin/ma
   mechanism, posture, launch facts, missing CLI, tool entries) and `accounts` (account inventory, `llmAccounts`
   reader, state key). Pure: no file, clock or environment access.
 - `tests/golden_executor_model.rs` reads `packages/execution/contracts/executor-model.v1.json` (the only owner, no
-  copy) and replays 175 of 239 vectors; `knownDefect` vectors (path command is not reduced to its program) keep
+  copy) and replays 200 of 237 vectors; `knownDefect` vectors (path command is not reduced to its program) keep
   today's behaviour and pass.
 - Docs: one clause each in `docs/reading-map.md` and the contract's "Implementation" line. Census regenerated.
 - Machine port has `home_dir` beyond the three methods the phase text lists: the account inventory expands `~`,
