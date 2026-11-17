@@ -584,6 +584,77 @@
    "fact": "attribute",
    "args": {"error":{"message":"m","path":"runner.patterns.reviewed.defaults.seats","detail":"d."},"origins":[{"path":"runner.modelPolicies.claude.standard","layer":"project","file":"project:config.yaml","line":2,"column":1}],"projectDir":"/p"},
    "expect": {"error":{"name":"RunnerConfigError","message":"m"}}
+  },
+  {
+   "name": "decide: an assignment record whose policy is not an object is refused",
+   "fact": "decide",
+   "runner": {"executors":{"vec-agent":{"kind":"agent","providerModel":"claude","agentType":"vec-agent-type"}},"modelPolicies":{"claude":{"standard":"sonnet"}}},
+   "args": {"assignment":"asg-vec","assignmentItem":{"assignmentId":"asg-vec","operation":"vec-op","skills":[],"policy":["x"]},"hasLiveTaskAccess":true},
+   "expect": {"error":{"name":"RunnerConfigError","message":"assignment.policy must be an object when provided"}}
+  },
+  {
+   "name": "decide: an assignment record with the retired minTier is refused",
+   "fact": "decide",
+   "runner": {"executors":{"vec-agent":{"kind":"agent","providerModel":"claude","agentType":"vec-agent-type"}},"modelPolicies":{"claude":{"standard":"sonnet"}}},
+   "args": {"assignment":"asg-vec","assignmentItem":{"assignmentId":"asg-vec","operation":"vec-op","skills":[],"policy":{"preferExecutor":"vec-agent","minTier":"standard"}},"hasLiveTaskAccess":true},
+   "expect": {"error":{"name":"RunnerConfigError","message":"assignment policy field \"minTier\" was removed; normalize persisted assignments at the load boundary or use \"rigor\"/\"tier\""}}
+  },
+  {
+   "name": "decide: an assignment record with an unknown rigor is refused",
+   "fact": "decide",
+   "runner": {"executors":{"vec-agent":{"kind":"agent","providerModel":"claude","agentType":"vec-agent-type"}},"modelPolicies":{"claude":{"standard":"sonnet"}}},
+   "args": {"assignment":"asg-vec","assignmentItem":{"assignmentId":"asg-vec","operation":"vec-op","skills":[],"policy":{"preferExecutor":"vec-agent"},"rigor":"extreme"},"hasLiveTaskAccess":true},
+   "expect": {"error":{"name":"RunnerConfigError","message":"invalid assignment rigor \"extreme\". Valid rigors: [low, standard, high, critical]"}}
+  },
+  {
+   "name": "decide: an assignment record with an unknown reasoning effort is refused",
+   "fact": "decide",
+   "runner": {"executors":{"vec-agent":{"kind":"agent","providerModel":"claude","agentType":"vec-agent-type"}},"modelPolicies":{"claude":{"standard":"sonnet"}}},
+   "args": {"assignment":"asg-vec","assignmentItem":{"assignmentId":"asg-vec","operation":"vec-op","skills":[],"policy":{"preferExecutor":"vec-agent","reasoningEffort":"huge"}},"hasLiveTaskAccess":true},
+   "expect": {"error":{"name":"RunnerConfigError","message":"invalid reasoningEffort \"huge\". Valid values: [low, medium, high, max]"}}
+  },
+  {
+   "name": "decide: an assignment record with an unknown tier is refused",
+   "fact": "decide",
+   "runner": {"executors":{"vec-agent":{"kind":"agent","providerModel":"claude","agentType":"vec-agent-type"}},"modelPolicies":{"claude":{"standard":"sonnet"}}},
+   "args": {"assignment":"asg-vec","assignmentItem":{"assignmentId":"asg-vec","operation":"vec-op","skills":[],"policy":{"preferExecutor":"vec-agent","tier":"giant"}},"hasLiveTaskAccess":true},
+   "expect": {"error":{"name":"RunnerConfigError","message":"invalid explicit tier \"giant\". Valid tiers: [nano, mini, standard, advanced, flagship, frontier]"}}
+  },
+  {
+   "name": "decide: an assignment record with a null repeat mode is refused",
+   "fact": "decide",
+   "runner": {"executors":{"vec-agent":{"kind":"agent","providerModel":"claude","agentType":"vec-agent-type"}},"modelPolicies":{"claude":{"standard":"sonnet"}}},
+   "args": {"assignment":"asg-vec","assignmentItem":{"assignmentId":"asg-vec","operation":"vec-op","skills":[],"policy":{"preferExecutor":"vec-agent","repeatMode":null}},"hasLiveTaskAccess":true},
+   "expect": {"error":{"name":"RunnerConfigError","message":"invalid repeatMode \"null\". Valid repeatModes: [pre-delivery, post-delivery]"}}
+  },
+  {
+   "name": "decide: an assignment record pinning an executor that cannot serve is refused",
+   "fact": "decide",
+   "runner": {"executors":{"vec-agent":{"kind":"agent","providerModel":"claude","agentType":"vec-agent-type"}},"modelPolicies":{"claude":{"standard":"sonnet"}}},
+   "args": {"assignment":"asg-vec","assignmentItem":{"assignmentId":"asg-vec","operation":"vec-op","skills":[],"policy":{"preferExecutor":"vec-ghost"}},"hasLiveTaskAccess":true},
+   "expect": {"error":{"name":"RunnerConfigError","code":"unknown-executor","message":"unknown-executor: vec-op/producer: executor \"vec-ghost\" is not registered"}}
+  },
+  {
+   "name": "decide: an assignment record asking a tier above its seat's is refused by Seat Binding",
+   "fact": "decide",
+   "runner": {"executors":{"vec-agent":{"kind":"agent","providerModel":"claude","agentType":"vec-agent-type"}},"modelPolicies":{"claude":{"standard":"sonnet"}}},
+   "args": {"assignment":"asg-vec","assignmentItem":{"assignmentId":"asg-vec","operation":"vec-op","skills":[],"policy":{"preferExecutor":"vec-agent","tier":"frontier"}},"hasLiveTaskAccess":true},
+   "expect": {"error":{"name":"RunnerConfigError","code":"tier-escalation-unauthorized","message":"tier-escalation-unauthorized: vec-op/producer: override asks for frontier above the resolved standard (defaults.tier); an override may only keep or lower the tier"}}
+  },
+  {
+   "name": "decide: an assignment record with no executor of its own runs on the default executor",
+   "fact": "decide",
+   "runner": {"executor":{"command":"claude","args":["-p"]},"modelPolicies":{"claude":{"standard":"sonnet"}}},
+   "args": {"assignment":"asg-vec","assignmentItem":{"assignmentId":"asg-vec","operation":"vec-op","skills":[],"policy":{}},"hasLiveTaskAccess":false},
+   "expect": {"mechanism":"out-of-process","configured":true,"reasonCodes":["native-first.0033.cli-spawn-shaped"],"executorId":"claude"},
+   "machine": {"pathCommands":["claude"]}
+  },
+  {
+   "name": "decide: a read-only reviewer assignment record runs on its executor",
+   "fact": "decide",
+   "runner": {"executors":{"vec-agent":{"kind":"agent","providerModel":"claude","agentType":"vec-agent-type"}},"modelPolicies":{"claude":{"standard":"sonnet"}}},
+   "args": {"assignment":"asg-vec","assignmentItem":{"assignmentId":"asg-vec","operation":"vec-op","skills":[],"policy":{"preferExecutor":"vec-agent"},"role":"reviewer","mutation":"read-only","domain":"vec"},"hasLiveTaskAccess":true},
+   "expect": {"mechanism":"in-process","agentType":"vec-agent-type","configured":true,"reasonCodes":["native-first.rule-2.live-task-access"],"executorId":"vec-agent"}
   }
  ]
 }

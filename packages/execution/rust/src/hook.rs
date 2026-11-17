@@ -130,6 +130,9 @@ fn config_refusal_text(failure: &DecideFailure) -> Option<String> {
             .code
             .filter(|code| code.starts_with("config-"))
             .map(str::to_string),
+        DecideFailure::SeatRefused { code, .. } if code.starts_with("config-") => {
+            Some(code.clone())
+        }
         _ => None,
     }
 }

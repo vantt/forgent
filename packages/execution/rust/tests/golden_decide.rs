@@ -4,11 +4,11 @@
 
 mod common;
 
-use common::VectorProbe;
+use common::{VectorMachine, VectorProbe};
 use fgos_execution::decide::{
     attribute_runner_refusal, config_root_for, decide_over, guard_cwd_repo_root,
-    refuse_global_rigor_to_tier, run_door_hint, BindFailure, BoundSeat, DecideAnswer,
-    DecideFailure, DecideRequest, LoadedRunner, RunnerOrigin, SeatBinder, Workspace,
+    refuse_global_rigor_to_tier, run_door_hint, CrateBinder, DecideAnswer, DecideFailure,
+    DecideRequest, LoadedRunner, RunnerOrigin, Workspace,
 };
 use fgos_execution::executor_model::ModelError;
 use fgos_execution::hook::{
@@ -16,40 +16,6 @@ use fgos_execution::hook::{
 };
 use fgos_execution::runner_check::{check_runner_config, RunnerCheckError};
 use serde_json::{json, Value};
-use std::cell::Cell;
-
-/// The vectors whose answer needs Seat Binding's bind, which this replay does not have yet: the test binder
-/// refuses to answer, the vector must ask it, and its answer is not compared. The bind module replays them and
-/// removes them from this list.
-const WAIT_FOR_BIND: &[&str] = &[
-    "decide: an assignment record runs on the executor its dispatch policy names",
-    "decide: a purpose with a prefer pool of its own is bound by Seat Binding",
-    "decide: a purpose whose prefer pool cannot serve the seat is unavailable with the refusal",
-];
-
-struct NoBind {
-    asked: Cell<bool>,
-}
-
-impl SeatBinder for NoBind {
-    fn bind_purpose(&self, _: &Value, _: &str) -> Result<BoundSeat, BindFailure> {
-        self.asked.set(true);
-        Err(BindFailure::Failed(ModelError {
-            name: "SeatBindingError",
-            code: None,
-            message: "no bind in this replay".into(),
-        }))
-    }
-
-    fn assignment_executor(&self, _: &Value, _: &Value) -> Result<String, ModelError> {
-        self.asked.set(true);
-        Err(ModelError {
-            name: "SeatBindingError",
-            code: None,
-            message: "no bind in this replay".into(),
-        })
-    }
-}
 
 /// A main checkout `<main>`, one linked worktree `<worktree>` of it (with a `sub` directory) and `<outside>`.
 struct Layout {
@@ -191,12 +157,15 @@ fn verdict_json(verdict: &Verdict) -> Value {
     }
 }
 
-/// The answer of one vector, and whether it asked Seat Binding.
-fn evaluate(vector: &Value) -> (Value, bool) {
+/// The answer of one vector. Seat Binding binds through the crate's own bind over the machine the vector
+/// describes, from the config alone, as `bindWorkSeat` does.
+fn evaluate(vector: &Value) -> Value {
     let args = vector.get("args").cloned().unwrap_or(Value::Null);
     let runner = vector.get("runner").cloned().unwrap_or_else(|| json!({}));
-    let binder = NoBind {
-        asked: Cell::new(false),
+    let machine = VectorMachine::of(vector, false);
+    let binder = CrateBinder {
+        machine: &machine,
+        now: 0,
     };
     let answer = match vector["fact"].as_str().expect("a fact") {
         "decide" => {
@@ -215,6 +184,9 @@ fn evaluate(vector: &Value) -> (Value, bool) {
                 Ok(_) => match decide_over(&runner, &request, &VectorProbe::of(vector), &binder) {
                     Ok(answer) => answer.to_json(),
                     Err(DecideFailure::Refused(error)) => refusal(&error),
+                    Err(DecideFailure::SeatRefused { code, message }) => json!({
+                        "error": { "name": "RunnerConfigError", "code": code, "message": message }
+                    }),
                     Err(other) => panic!("a pure decide fails only by refusal: {other:?}"),
                 },
             }
@@ -308,7 +280,7 @@ fn evaluate(vector: &Value) -> (Value, bool) {
         },
         other => panic!("vector names the unknown fact {other:?}"),
     };
-    (answer, binder.asked.get())
+    answer
 }
 
 #[test]
@@ -323,22 +295,7 @@ fn every_decide_and_hook_vector_has_the_answer_the_contract_records() {
     let mut replayed = 0;
     for vector in vectors {
         let name = vector["name"].as_str().unwrap_or_default();
-        let (answer, asked_bind) = evaluate(vector);
-        let waits = WAIT_FOR_BIND.contains(&name);
-        if waits != asked_bind {
-            wrong.push(format!(
-                "{name}\n   {}",
-                if waits {
-                    "listed in WAIT_FOR_BIND but never asks Seat Binding"
-                } else {
-                    "asks Seat Binding but is not listed in WAIT_FOR_BIND"
-                }
-            ));
-            continue;
-        }
-        if waits {
-            continue;
-        }
+        let answer = evaluate(vector);
         let expected = vector.get("nativeExpect").unwrap_or(&vector["expect"]);
         if answer == *expected {
             replayed += 1;
@@ -354,5 +311,5 @@ fn every_decide_and_hook_vector_has_the_answer_the_contract_records() {
         wrong.len(),
         wrong.join("\n")
     );
-    assert_eq!(replayed + WAIT_FOR_BIND.len(), vectors.len());
+    assert_eq!(replayed, vectors.len());
 }

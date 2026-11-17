@@ -1,8 +1,7 @@
 # Phase 07 report: decide, the runner config check, the tool probe and the hook in Rust
 
-Branch `execution-read-door/p07`, based on `origin/main` after the agents listing landed. Status: every part that
-does not need Seat Binding's bind is done and pushed; the purpose-with-a-prefer-pool path and the assignment-record
-path wait for phase 06's `bind` on main (three vectors listed by name, see "Left").
+Branch `execution-read-door/p07`, with `origin/main` merged after phase 06 (bind) landed (11a62d41b). Status: done;
+every decide, hook, validate and tool-status vector replays in Rust, the bind-dependent ones through 06's bind.
 
 ## What changed
 
@@ -21,11 +20,16 @@ path wait for phase 06's `bind` on main (three vectors listed by name, see "Left
   `guard_cwd_repo_root`, `run_door_hint`, `attribute_runner_refusal` / `origin_locations`,
   `refuse_global_rigor_to_tier`, `load_checked_runner` (door section, global `rigorToTier`, semantic check under
   `<root>/.fgos runner`, attribution), ports `Workspace` and `SeatBinder`. Usage text names `fgos dispatch decide`
-  (D13).
+  (D13). `SeatBinder` has one method, the Work seat (`bindWorkSeat`'s ask: headless, posture at launch, no writes,
+  no raise); `CrateBinder` implements it over 06's `fgos_execution::bind::bind` from the config alone (no lease
+  state, as `bindWorkSeat` reads none). The executor an assignment record runs on is ported from
+  `effectiveDispatchPolicy` with every refusal before it (policy shape, `minTier`, workflow YAML tier and model,
+  rigor, effort, tier, the bind and its hard pin, governance, repeat mode); the rest of that policy (tier, model,
+  provenance) never reaches the decide answer and stays with the launch.
 - `src/hook.rs`: `normalize_hook_payload`, `dispatch_verdict` (Node's texts), `hook_answer` (exit 2 standard, agy
   JSON exit 0), `serve_hook` (a payload that does not normalize allows in the flag's format; a panicking verdict
   allows in the call's format).
-- Vectors: `packages/execution/contracts/decide.v1.json` (89 vectors, facts `decide`, `configRoot`,
+- Vectors: `packages/execution/contracts/decide.v1.json` (99 vectors, facts `decide`, `configRoot`,
   `repoRootGuard`, `hookPayload`, `hookVerdict`, `hookAnswer`, `attribute`, `globalRigorToTier`), recorded by the
   committed hermetic `scripts/decide-vectors.mjs` (`--check`; buildTestEnv like the executor-model script, whose
   `serialize` and `adoptTestEnvironment` it reuses) through `test/helpers/decide-vectors.helper.mjs`.
@@ -51,29 +55,47 @@ path wait for phase 06's `bind` on main (three vectors listed by name, see "Left
 |---|---|
 | `cargo fmt -p fgos-execution --check` | clean (`--all --check` fails only on `packages/run-result/rust/tests/unit_summary.rs`, already on main) |
 | `cargo clippy -p fgos-execution --all-targets -- -D warnings` | clean |
-| `cargo test -p fgos-execution` | green (golden_decide, golden_executor_model, golden_agents, unit tests) |
+| `cargo test -p fgos-execution` | green (golden_decide, golden_executor_model, golden_bind, golden_agents, unit tests) |
 | `cargo check -p fgos-execution --all-targets --target x86_64-pc-windows-msvc` / `aarch64-apple-darwin` | green |
-| `node scripts/decide-vectors.mjs --check` | 89 match |
-| `node scripts/executor-model-vectors.mjs --check` | 348 match |
-| `test/runner/dispatch.test.mjs` | 216/0 |
+| `node scripts/decide-vectors.mjs --check` | 99 match |
+| `node scripts/executor-model-vectors.mjs --check` | executor-model 348, bind 90 match |
+| `test/runner/dispatch.test.mjs` | 216/0 (`executor-model-vectors.test.mjs` 3/0) |
 | `test/runner/assignment-dispatch.test.mjs`, `test/scripts/dispatch-decide-hook.test.mjs`, `test/scripts/decision-question-hook.test.mjs`, `test/runner/dispatch/executor-model-vectors.test.mjs` | 50/0, 20/0, 11/0, 2/0 |
 | `test/setup/git-mutation-census.test.mjs`, `test/architecture.test.mjs`, `test/scripts/doc-health.test.mjs`, `test/scripts/check-decision-citation-drift.test.mjs` | 1/0, 71/0, 8/0, 33/0 |
 | `node scripts/git-one-door-scan.mjs --root .` | 0 undeclared sites |
 
+## The three vectors that needed the bind
+
+| Vector | Rust | Node twin |
+|---|---|---|
+| decide: a purpose with a prefer pool of its own is bound by Seat Binding | `purpose_seat` asks `CrateBinder`, which calls 06's `bind` | `compileDispatchPlan` -> `purposeSeatOf` -> `bindWorkSeat`, through the Seat Binding host route (`fgos internal seat-binding`) |
+| decide: a purpose whose prefer pool cannot serve the seat is unavailable with the refusal | same; the bind's `{ refused }` becomes `seat-binding.refused` with `reason: detail` | same path; `bindWorkSeat` throws the coded refusal, `purposeSeatOf` turns it into `refused` |
+| decide: an assignment record runs on the executor its dispatch policy names | `assignment_executor` (ported policy checks) then `CrateBinder` | `compileDispatchPlan` -> `effectiveDispatchPolicy` -> `bindWorkSeat`, through the host route |
+
+The Node twin (`test/runner/dispatch.test.mjs`, all decide vectors through `decideOver`) keeps binding through the
+host route until S6a; both sides answer the same recorded `expect`. Ten more assignment vectors cover the refusals
+the port carries (policy not an object, `minTier`, rigor, effort, tier, null repeat mode, an unregistered pin, a tier
+escalation refused by Seat Binding, the default executor as the pin, a read-only reviewer record).
+
+None of the decide vectors uses 06's `decided` mechanism (a hand-written `expect` under the V2 mark text, kept only
+while Node answers differently, checked by `decidedProblem`): every decide `expect` is Node's answer. 06 records
+`bind.v1.json` through `scripts/executor-model-vectors.mjs`; `scripts/decide-vectors.mjs` stays separate but imports
+that script's `adoptTestEnvironment` (run-tests' `buildTestEnv`) and `serialize`, so there is one environment
+definition and one file layout.
+
 ## Left
 
-- After 06 lands: implement `SeatBinder` over 06's `bind` (`bind_purpose`: the `bindWorkSeat` ask, headless,
-  `postureAtLaunch`, no writes; `assignment_executor`: the executor of the effective dispatch policy of a record),
-  then remove the three names in `WAIT_FOR_BIND` of `golden_decide.rs` (the test fails if a listed vector stops
-  asking the binder or an unlisted one starts).
+- Phase 10: compose decide in the adapter (guard, invocation-root door, `config_root_for`, `load_checked_runner`,
+  Work hint bridge, assignment record via the no-follow reader, `decide_over` with `CrateBinder`); the `Workspace`
+  adapter must name the file of every project and global origin (the crate never spells a config file name: the
+  "locate and read a project config file" door row); print the check's warnings; `caller` is not a decide input (it
+  never reaches the answer); map `DecideFailure::SeatRefused` to a `RunnerConfigError` with its code.
 - The policy of a synthesized assignment is not computed in Rust: it never reaches the decide answer (a pinned
   synthetic either binds to the pin or is swallowed) except a Seat Binding route failure, which an in-process bind
   does not have. The `planForUnconfiguredWork` governance-gate branch is unreachable (vector "a work hint naming an
   unregistered executor under a default executor still dispatches native-first") and is not ported.
-- Phase 10: compose decide in the adapter (guard, invocation-root door, `config_root_for`, `load_checked_runner`,
-  Work hint bridge, assignment record via the no-follow reader, `decide_over`); the `Workspace` adapter must name the
-  file of every project and global origin (the crate never spells a config file name: the "locate and read a project
-  config file" door row); print the check's warnings; `caller` is not a decide input (it never reaches the answer).
+- `REPLAYED_LATER` in `golden_executor_model.rs` is now empty (06 removed `accountQuarantine`, this phase `validate`
+  and the `toolProviders` status).
 
 ## Behaviour kept as it is (backlog candidates, not fixed)
 
@@ -89,8 +111,8 @@ path wait for phase 06's `bind` on main (three vectors listed by name, see "Left
 
 ## Unresolved questions
 
-- None blocking. The landing comes after 06's.
+- None.
 
-Status: DONE_WITH_CONCERNS
-Summary: Runner check, tools, hook and decide are in Rust with 89 decide vectors and the validate and tool-status
-vectors replayed; the bind-dependent purpose and assignment paths wait for phase 06.
+Status: DONE
+Summary: Runner check, tools, hook and decide are in Rust; all 99 decide vectors, the validate vectors and the tool
+status replay, the bind-dependent ones through 06's bind.

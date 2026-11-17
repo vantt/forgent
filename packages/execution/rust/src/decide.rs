@@ -13,11 +13,15 @@
 //! Ports: the tools are probed through [`ToolProbe`], Seat Binding through [`SeatBinder`], and the repository and
 //! config facts the config root rule reads through [`Workspace`]. The crate stays pure.
 
+use crate::bind::{bind, effective_rigor, BindRequest, BindSession};
 use crate::executor_model::{
-    lookup_executor, mechanism, with_default_executor, Mechanism, ModelError,
+    lookup_executor, mechanism, resolve_executor_governance, resolve_executor_provider,
+    with_default_executor, Governance, Mechanism, ModelError,
 };
+use crate::ports::Machine;
 use crate::runner_check::{check_runner_config, RunnerCheckError};
 use crate::tools::{tool_providers, ToolProbe, ToolStatus};
+use fgos_seat_binding::Tier;
 use serde_json::{json, Map, Value};
 
 /// The usage refusal when no selector is given.
@@ -176,6 +180,8 @@ pub enum DecideFailure {
     DoorFailed { code: String, message: String },
     /// A refusal of the request or of the runner config (the semantic check included).
     Refused(ModelError),
+    /// Seat Binding refused the seat of an assignment record: a runner refusal whose code is the refusal's reason.
+    SeatRefused { code: String, message: String },
 }
 
 impl DecideFailure {
@@ -184,6 +190,7 @@ impl DecideFailure {
             DecideFailure::ConfigDoor { message, .. }
             | DecideFailure::DoorFailed { message, .. } => message,
             DecideFailure::Refused(error) => &error.message,
+            DecideFailure::SeatRefused { message, .. } => message,
         }
     }
 }
@@ -207,13 +214,85 @@ pub enum BindFailure {
     Failed(ModelError),
 }
 
-/// Seat Binding, as `decide` asks it.
+/// The ask of one Work seat (`bindWorkSeat`): a headless Unit with no writes, posture judged at launch, no raise.
+#[derive(Debug, Clone, PartialEq)]
+pub struct WorkSeatAsk {
+    /// `{ id, capability, rigor?, prefer? }`.
+    pub unit: Value,
+    pub role: String,
+    pub read_only: bool,
+    /// At most one override: `{ executor?, invocation?, tier?, reasoningEffort? }`.
+    pub overrides: Vec<Value>,
+}
+
+/// Seat Binding, as `decide` asks it: one Work seat.
 pub trait SeatBinder {
-    /// The seat of a purpose with a `prefer` pool of its own: a headless Unit of that capability, posture judged at
-    /// launch, no writes.
-    fn bind_purpose(&self, runner: &Value, purpose: &str) -> Result<BoundSeat, BindFailure>;
-    /// The executor the effective dispatch policy of an assignment record runs on.
-    fn assignment_executor(&self, runner: &Value, record: &Value) -> Result<String, ModelError>;
+    fn bind_work_seat(&self, runner: &Value, ask: &WorkSeatAsk) -> Result<BoundSeat, BindFailure>;
+}
+
+/// The Work seat through the crate's own [`crate::bind::bind`], from the config alone (no lease state is read,
+/// as `bindWorkSeat` reads none): the adapter the host gives `decide`.
+pub struct CrateBinder<'a> {
+    pub machine: &'a dyn Machine,
+    /// Epoch milliseconds.
+    pub now: u64,
+}
+
+impl SeatBinder for CrateBinder<'_> {
+    fn bind_work_seat(&self, runner: &Value, ask: &WorkSeatAsk) -> Result<BoundSeat, BindFailure> {
+        let mut unit = ask.unit.clone();
+        unit["writes"] = json!([]);
+        let request = json!({
+            "unit": unit,
+            "seat": "producer",
+            "role": ask.role,
+            "readOnly": ask.read_only,
+            "overrides": ask.overrides,
+            "raiseAuthorized": false,
+        });
+        let walk = json!({});
+        let bound = bind(
+            &BindRequest {
+                ask: &request,
+                runner,
+                session: BindSession {
+                    headless: true,
+                    has_native_agent: false,
+                    posture_at_launch: true,
+                },
+                walk: &walk,
+                account_state: None,
+            },
+            self.machine,
+            self.now,
+        )
+        .map_err(BindFailure::Failed)?;
+        if let Some(refused) = bound.get("refused") {
+            let text = |key: &str| {
+                refused
+                    .get(key)
+                    .and_then(Value::as_str)
+                    .unwrap_or_default()
+                    .to_string()
+            };
+            let fix = text("fix");
+            return Err(BindFailure::Refused {
+                code: text("reason"),
+                detail: if fix.is_empty() {
+                    text("detail")
+                } else {
+                    format!("{}; {fix}", text("detail"))
+                },
+            });
+        }
+        Ok(BoundSeat {
+            executor: bound["executor"].as_str().unwrap_or_default().to_string(),
+            invocation: bound
+                .get("invocation")
+                .and_then(Value::as_str)
+                .map(str::to_string),
+        })
+    }
 }
 
 /// One origin of a runner config value, as the config door reports it.
@@ -616,12 +695,32 @@ fn purpose_seat(
         });
     }
     if has_own_prefer_pool(runner, purpose) {
-        return match binder.bind_purpose(runner, purpose) {
+        let ask = WorkSeatAsk {
+            unit: json!({ "id": purpose, "capability": purpose }),
+            role: "producer".into(),
+            read_only: false,
+            overrides: Vec::new(),
+        };
+        return match binder.bind_work_seat(runner, &ask) {
             Ok(seat) => Ok(PurposeAnswer::Bound(seat)),
             Err(BindFailure::Refused { code, detail }) => {
                 Ok(PurposeAnswer::Refused { code, detail })
             }
-            Err(BindFailure::Failed(error)) => Err(error),
+            // A coded runner refusal of the bind is a refusal of the seat too; any other failure is not swallowed.
+            Err(BindFailure::Failed(error)) => match error.code {
+                Some(code) if error.name == "RunnerConfigError" => {
+                    let prefix = format!("{code}: ");
+                    Ok(PurposeAnswer::Refused {
+                        code: code.to_string(),
+                        detail: error
+                            .message
+                            .strip_prefix(&prefix)
+                            .unwrap_or(&error.message)
+                            .to_string(),
+                    })
+                }
+                _ => Err(error),
+            },
         };
     }
     Ok(named_answer)
@@ -815,6 +914,203 @@ fn dispatch_refusal(
     None
 }
 
+// ---- the executor of an assignment record ----------------------------------------------------------------
+
+const RIGORS: [&str; 4] = ["low", "standard", "high", "critical"];
+const REASONING_EFFORTS: [&str; 4] = ["low", "medium", "high", "max"];
+const REPEAT_MODES: [&str; 2] = ["pre-delivery", "post-delivery"];
+const SEAT_ROLES: [&str; 5] = ["producer", "synthesizer", "reviewer", "red-team", "judge"];
+
+/// The capability an operation runs under when its policy declares none: the work product's primary capability,
+/// else the domain's `review` row when the catalog has it, else `review`.
+fn derived_capability(record: &Value, policy: &Value, runner: &Value) -> Option<String> {
+    if let Some(declared) = policy.get("capability") {
+        return declared.as_str().map(str::to_string);
+    }
+    let result_kind = match record.get("result") {
+        Some(result) if !result.is_null() => result.get("kind"),
+        _ => record.get("resultKind"),
+    };
+    if result_kind.and_then(Value::as_str) == Some("work-product") {
+        return record
+            .get("primaryCapability")
+            .filter(|p| truthy(Some(p)))
+            .and_then(Value::as_str)
+            .map(str::to_string);
+    }
+    let domain = record
+        .get("domain")
+        .filter(|d| truthy(Some(d)))
+        .map(|d| js_text(Some(d)));
+    let section = runner.get("capabilities").and_then(Value::as_object);
+    match domain.map(|d| format!("{d}:review")) {
+        Some(row)
+            if section
+                .and_then(|s| s.get(&row))
+                .is_some_and(|e| e.is_object() || e.is_array()) =>
+        {
+            Some(row)
+        }
+        _ => Some("review".into()),
+    }
+}
+
+/// The executor the effective dispatch policy of an assignment record runs on, with the refusals the policy gives
+/// before it: the record's policy shape, its rigor, effort and tier demands, then Seat Binding's bind of the seat
+/// with the record's executor (else the default executor) as a hard pin, then governance and the repeat mode.
+fn assignment_executor(
+    runner: &Value,
+    record: &Value,
+    binder: &dyn SeatBinder,
+) -> Result<String, DecideFailure> {
+    let refuse = |message: String| DecideFailure::Refused(ModelError::runner(message));
+    let empty = json!({});
+    let policy = match record.get("policy") {
+        None => &empty,
+        Some(policy) if policy.is_object() => policy,
+        Some(_) => {
+            return Err(refuse(
+                "assignment.policy must be an object when provided".into(),
+            ))
+        }
+    };
+    if policy.get("minTier").is_some() {
+        return Err(refuse("assignment policy field \"minTier\" was removed; normalize persisted assignments at the load boundary or use \"rigor\"/\"tier\"".into()));
+    }
+    let from_yaml = truthy(policy.get("_fromYaml"));
+    if from_yaml && policy.get("tier").is_some() {
+        return Err(refuse("workflow YAML cannot set explicit tier; declare the tier in the project config (capability, role, persona or seat), or set it at actor/assignment/CLI scope".into()));
+    }
+    if truthy(policy.get("model")) && !truthy(record.get("_allowLiteralModel")) && from_yaml {
+        return Err(refuse("workflow YAML cannot pin literal model names; declare the cell in modelPolicies or name a persona".into()));
+    }
+    let mut demand: Option<&str> = None;
+    for (value, label) in [
+        (policy.get("rigor"), "operation"),
+        (record.get("rigor"), "assignment"),
+    ] {
+        let Some(value) = value else { continue };
+        let Some(rigor) = RIGORS.iter().copied().find(|r| value.as_str() == Some(r)) else {
+            return Err(refuse(format!(
+                "invalid {label} rigor \"{}\". Valid rigors: [{}]",
+                js_text(Some(value)),
+                RIGORS.join(", ")
+            )));
+        };
+        let rank = |r: &str| RIGORS.iter().position(|x| *x == r);
+        if demand.is_none_or(|best| rank(rigor) > rank(best)) {
+            demand = Some(rigor);
+        }
+    }
+    let capability = match present(policy, "capability").or_else(|| present(record, "capability")) {
+        None => derived_capability(record, policy, runner),
+        Some(value) => value.as_str().map(str::to_string),
+    };
+    let rigor = effective_rigor(
+        &json!({ "rigor": demand, "capability": capability }),
+        runner,
+    )
+    .map_err(DecideFailure::Refused)?
+    .unwrap_or("standard");
+    let effort = policy.get("reasoningEffort");
+    if let Some(effort) =
+        effort.filter(|e| !REASONING_EFFORTS.iter().any(|r| e.as_str() == Some(r)))
+    {
+        return Err(refuse(format!(
+            "invalid reasoningEffort \"{}\". Valid values: [{}]",
+            js_text(Some(effort)),
+            REASONING_EFFORTS.join(", ")
+        )));
+    }
+    // `??`: an empty preferExecutor is a name (no pin, and no default executor either).
+    let named = present(policy, "preferExecutor").map(|e| e.as_str().unwrap_or_default());
+    let default = present(runner, "executor").and_then(|default| {
+        let executors = runner.get("executors").and_then(Value::as_object);
+        [str_of(default, "command"), Some("claude")]
+            .into_iter()
+            .flatten()
+            .find(|id| !id.is_empty() && executors.is_none_or(|all| truthy(all.get(*id))))
+    });
+    let pinned = named.or(default).filter(|p| !p.is_empty());
+    let tier = policy.get("tier");
+    if let Some(tier) = tier.filter(|t| t.as_str().and_then(Tier::parse).is_none()) {
+        return Err(refuse(format!(
+            "invalid explicit tier \"{}\". Valid tiers: [{}]",
+            js_text(Some(tier)),
+            Tier::ALL.map(Tier::name).join(", ")
+        )));
+    }
+    let mut overrides = Map::new();
+    if let Some(pinned) = pinned {
+        overrides.insert("executor".into(), json!(pinned));
+    }
+    if let Some(tier) = tier {
+        overrides.insert("tier".into(), tier.clone());
+    }
+    if let Some(effort) = effort {
+        overrides.insert("reasoningEffort".into(), effort.clone());
+    }
+    let operation = record.get("operation").filter(|o| !o.is_null());
+    let mut unit = json!({
+        "id": operation.cloned().unwrap_or_else(|| json!("work-seat")),
+        "capability": capability.unwrap_or_default(),
+        "rigor": rigor,
+    });
+    if let Some(pinned) = pinned {
+        unit["prefer"] = json!([pinned]);
+    }
+    let role = record
+        .get("role")
+        .and_then(Value::as_str)
+        .filter(|r| SEAT_ROLES.contains(r))
+        .unwrap_or("producer");
+    let ask = WorkSeatAsk {
+        unit,
+        role: role.into(),
+        read_only: record.get("mutation").and_then(Value::as_str) == Some("read-only"),
+        overrides: if overrides.is_empty() {
+            Vec::new()
+        } else {
+            vec![Value::Object(overrides)]
+        },
+    };
+    let seat = match binder.bind_work_seat(runner, &ask) {
+        Ok(seat) => seat,
+        Err(BindFailure::Refused { code, detail }) => {
+            return Err(DecideFailure::SeatRefused {
+                message: format!("{code}: {detail}"),
+                code,
+            })
+        }
+        Err(BindFailure::Failed(error)) => return Err(DecideFailure::Refused(error)),
+    };
+    if let Some(pinned) = pinned.filter(|p| *p != seat.executor) {
+        return Err(DecideFailure::SeatRefused {
+            code: "pin-unsatisfiable".into(),
+            message: format!(
+                "pin-unsatisfiable: preferExecutor \"{pinned}\" is not registered or cannot serve this seat; Seat Binding chose \"{}\"",
+                seat.executor
+            ),
+        });
+    }
+    let governance = Governance::default();
+    let provider = resolve_executor_provider(runner, &seat.executor, &governance)
+        .map_err(DecideFailure::Refused)?;
+    // An undeclared repeat mode is null, which is refused when the policy states it null.
+    if let Some(mode) = policy.get("repeatMode") {
+        if !REPEAT_MODES.iter().any(|r| mode.as_str() == Some(r)) {
+            return Err(refuse(format!(
+                "invalid repeatMode \"{}\". Valid repeatModes: [{}]",
+                js_text(Some(mode)),
+                REPEAT_MODES.join(", ")
+            )));
+        }
+    }
+    resolve_executor_governance(&seat.executor, &provider.family, &governance)
+        .map_err(DecideFailure::Refused)?;
+    Ok(seat.executor)
+}
+
 // ---- deciding --------------------------------------------------------------------------------------------
 
 fn native_first_code(live: bool) -> &'static str {
@@ -927,12 +1223,11 @@ pub fn decide_over(
     let mut bound: Option<BoundSeat> = None;
 
     if executor_id.is_none() {
-        if let (Some(_), Some(record)) = (assignment, &req.assignment_record) {
-            executor_id = Some(
-                binder
-                    .assignment_executor(runner, record)
-                    .map_err(DecideFailure::Refused)?,
-            );
+        if let (Some(_), Some(record)) = (
+            assignment,
+            req.assignment_record.as_ref().filter(|r| !r.is_null()),
+        ) {
+            executor_id = Some(assignment_executor(runner, record, binder)?);
         }
     }
 
