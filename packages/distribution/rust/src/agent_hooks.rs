@@ -2223,7 +2223,10 @@ mod tests {
         }
 
         fn env(&self) -> impl Fn(&str) -> Option<String> + '_ {
-            move |key| (key == "HOME").then(|| self.home.to_string_lossy().into_owned())
+            move |key| {
+                matches!(key, "HOME" | "USERPROFILE")
+                    .then(|| self.home.to_string_lossy().into_owned())
+            }
         }
 
         fn process_env(&self) -> Vec<(String, String)> {
@@ -2300,7 +2303,15 @@ mod tests {
                 }
             }
         }
-        assert_eq!(Value::Object(got), want);
+        for (cli, rows) in want.as_object().unwrap() {
+            let rows = rows.as_array().unwrap();
+            let got_rows = got[cli].as_array().unwrap();
+            assert_eq!(got_rows.len(), rows.len(), "{cli} row count");
+            for (at, row) in rows.iter().enumerate() {
+                assert_eq!(&got_rows[at], row, "{cli} row {at}");
+            }
+        }
+        assert_eq!(got.len(), want.as_object().unwrap().len());
     }
 
     fn run_case(case: &Value) {

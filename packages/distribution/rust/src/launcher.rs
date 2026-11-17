@@ -511,7 +511,12 @@ mod tests {
         activation(&format!("sha256:{digest}"));
         let inside = run(&["/d", "/c", "echo", "release-ran"], &sub, &state);
         let text = String::from_utf8_lossy(&inside.stdout);
-        assert!(text.contains("release-ran") && !text.contains("PLANTED"));
+        assert!(
+            text.contains("release-ran") && !text.contains("PLANTED"),
+            "status {:?}, stdout {text}, stderr {}",
+            inside.status,
+            String::from_utf8_lossy(&inside.stderr)
+        );
         activation(&format!("sha256:{}", "b".repeat(64)));
         let missing = run(&["doctor"], &sub, &state);
         assert_eq!(missing.status.code(), Some(126));
