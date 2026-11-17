@@ -2290,4 +2290,7 @@ test('door row for a YAML frontmatter fence catches each literal way to open a b
   ];
   for (const source of passed) assert.deepEqual(outsideDoor(job, 'src/x.mjs', `${source}\n`), [], source);
   assert.deepEqual(outsideDoor(job, 'packages/p/rust/src/x.rs', 'if rest.starts_with("---") {}\n'), []);
+  const rustReader = 'let c = text.strip_prefix("---\\r\\n").or_else(|| text.strip_prefix("---\\n"))?;\n';
+  assert.deepEqual(outsideDoor(job, 'packages/p/rust/src/x.rs', rustReader), [], 'a reader that strips the fence');
+  assert.equal(outsideDoor(job, 'packages/p/rust/src/x.rs', 'let t = format!("---\\n{body}---\\n");\n').length, 1, 'a Rust writer still fails');
 });
