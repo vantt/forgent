@@ -1,7 +1,7 @@
 ---
 phase: 4
 title: "Trial report"
-status: pending
+status: completed
 blockedBy: [phase-3]
 effort: 1h
 owner: HARDEN
