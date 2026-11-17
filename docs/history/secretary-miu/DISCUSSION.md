@@ -49,7 +49,9 @@ persona sections or the renderer is extended (task persona-door).
 
 **Name collision found after settling (2026-11-17).** `fgos session start|end|list|gc` already exists: a per-session
 detached git worktree lifecycle (`fgos session --help`). The verb name in SM-D6 is provisional; the planner checks that
-verb's prior art and callers and proposes a name or a merge as an owner question.
+verb's prior art and callers and proposes a name or a merge as an owner question. Owner (2026-11-17): `fgos head` is a
+provisional name; backlog p-g2iprtzptz (priority high) investigates merging or retiring the old `fgos session`, then
+renames `fgos head` to `fgos session`.
 
 **Owner requirement added after settling (2026-11-17).** When a head session opens in a pane, its opening prompt is
 typed visibly into the CLI composer (full text, not a pointer such as "read file X"), so a person watching the pane
