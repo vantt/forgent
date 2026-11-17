@@ -1088,7 +1088,7 @@ mod tests {
         fn hooks(&self) {
             let home = self.home.to_string_lossy().into_owned();
             install_all(&self.project, &move |key| {
-                (key == "HOME").then(|| home.clone())
+                matches!(key, "HOME" | "USERPROFILE").then(|| home.clone())
             })
             .unwrap();
         }
