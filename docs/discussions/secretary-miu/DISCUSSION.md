@@ -47,11 +47,9 @@ session-rotation; planner designs it). Two unproven rotation mechanics, statusli
 `/clear` via `herdr pane send-text` (spike first inside session-rotation). Whether Miu's protocol fits the rendered
 persona sections or the renderer is extended (task persona-door).
 
-**Source backlog ids.** None yet: per SM-D4 this topic needs its own backlog row (`fgos identity mint backlog`), to be
-created when it is handed over. Items to file as their own rows: (a) mailbox's own head finder
-(`adapters::claude_head::find_head`, `hookFacts`) may duplicate Identity's head resolution; (b)
-`src/state/domain-registry.mjs` lacks `marketing` and `council` that exist under `domains/`, and `fgos-clarifying`
-defaults to `coding`; (c) append today's three-copies measurement to `p-7eb9e65b`.
+**Source backlog ids.** `p-r4u2ewexvn` (this topic). Filed as their own rows: `p-5igcekysul` (mailbox resolves an
+agent head beside Identity), `p-pgmxt7n7hx` (domain registry vs `domains/`, `coding` default); the three-copies
+measurement was appended to `p-7eb9e65b`.
 
 ## 1. Trạng thái hiện tại
 
