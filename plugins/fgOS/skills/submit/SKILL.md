@@ -32,7 +32,7 @@ item is ever created (step 4) — not after, at stage `discovery`, the way
 tsk-5wz originally wired it. `fgos-clarifying`'s own contract changed with
 it (tsk-qod D1/D2, `clarify` retired as a stage entirely): it is now a
 pure Init-time, verdict-only helper that reads the raw submitted text and
-returns `{title?, description?, domain, question?}` straight back to this
+returns `{title?, description?, domain, domainUnsure?, question?}` straight back to this
 skill — it never touches item state itself, because at this point no item
 exists yet to touch. `submit` (step 5) is called with whatever text/domain
 that verdict settled on. `tier`/`kind`/`risk` are never re-judged here at
@@ -121,7 +121,7 @@ later by `discovery`'s own judgment, not by this skill.
 
    For a live interactive session: invoke the `fgos-clarifying` skill on the raw text
    from step 1 — there is no item yet, so it reads text only, never an
-   id. It returns `{title?, description?, domain, question?}` (verdict-
+   id. It returns `{title?, description?, domain, domainUnsure?, question?}` (verdict-
    only — it writes no state itself, tsk-qod D1/D2):
 
    - **`question` present** — the intent itself is unclear. STOP here and
@@ -135,7 +135,10 @@ later by `discovery`'s own judgment, not by this skill.
      the conversation alone; the fresh verdict is what actually clears the
      gate (and still needs a `domain` classification either way).
    - **`question` absent** — intent is understood. Carry the verdict's
-     `domain` (always present) into step 5's `--domain` flag. If the
+     `domain` (always present once intent is clear) into step 5's `--domain`
+     flag. An unsure verdict (`domain: null`, `domainUnsure: true`) always
+     carries a `question` naming the candidate domains, so it takes the
+     branch above; never pass a null domain to `--domain`. If the
      verdict also included a rewritten `title`/`description`, use that
      text (and report the one-line rewrite the skill already gave you) in
      place of the step 1 original for step 5; otherwise use step 1's text
