@@ -19,9 +19,9 @@ use std::time::{Duration, Instant};
 /// The protocol this route speaks.
 pub const PROTOCOL: u64 = 1;
 
-const EXIT_OK: i32 = 0;
-const EXIT_USAGE: i32 = 2;
-const EXIT_MISMATCH: i32 = 3;
+pub const EXIT_OK: i32 = 0;
+pub const EXIT_USAGE: i32 = 2;
+pub const EXIT_MISMATCH: i32 = 3;
 const CODE_BELOW_FLOOR: &str = "terminal-config-below-floor";
 const MAX_STDIN: u64 = 1024 * 1024;
 
@@ -57,7 +57,7 @@ pub const DEFAULT_ALLOCATION_GRACE_MS: u64 = 60_000;
 pub const DEFAULT_LAUNCH_IDENTIFY_TIMEOUT_MS: u64 = 5_000;
 pub const DEFAULT_SHELL_READY_TIMEOUT_MS: u64 = 10_000;
 
-fn line(result: &str, fields: Value) -> String {
+pub fn line(result: &str, fields: Value) -> String {
     let mut map = Map::new();
     map.insert("v".into(), json!(1));
     map.insert("protocol".into(), json!(PROTOCOL));
@@ -69,18 +69,18 @@ fn line(result: &str, fields: Value) -> String {
 }
 
 /// One line on stdout; a closed pipe is the caller's business, not a panic.
-fn emit(text: &str) {
+pub fn emit(text: &str) {
     use std::io::Write;
     let _ = writeln!(std::io::stdout(), "{text}");
 }
 
-fn error(code: &str, message: &str, exit: i32) -> i32 {
+pub fn error(code: &str, message: &str, exit: i32) -> i32 {
     eprintln!("fgos internal: {code}: {message}");
     emit(&line("error", json!({ "code": code, "message": message })));
     exit
 }
 
-fn usage(message: &str) -> i32 {
+pub fn usage(message: &str) -> i32 {
     error("usage", message, EXIT_USAGE)
 }
 
@@ -143,9 +143,9 @@ fn whole<T: DeserializeOwned>(request: &Value) -> Result<T, String> {
 
 /// A config the core will not run with: the route's error code and what to tell the caller.
 #[derive(Debug)]
-struct ConfigRefusal {
-    code: &'static str,
-    message: String,
+pub struct ConfigRefusal {
+    pub code: &'static str,
+    pub message: String,
 }
 
 impl From<String> for ConfigRefusal {
@@ -226,6 +226,34 @@ fn core_config(envelope: &Value) -> Result<(CoreConfig, Box<dyn PlacementPolicy>
         shell_ready_timeout_ms: number("shellReadyTimeoutMs", DEFAULT_SHELL_READY_TIMEOUT_MS)?,
     };
     Ok((core, policy))
+}
+
+/// What one route process builds its `Core` from: the driver, the placement policy and the core
+/// config, all read from the stdin envelope. Every route that drives panes through the core builds
+/// it here, so the user's terminal config reaches all of them the same way.
+pub struct CoreParts {
+    driver: HerdrDriver,
+    policy: Box<dyn PlacementPolicy>,
+    config: CoreConfig,
+}
+
+impl CoreParts {
+    /// `started` is when the route began; the envelope's `timeoutMs` counts from it.
+    pub fn from_envelope(envelope: &Value, started: Instant) -> Result<Self, ConfigRefusal> {
+        let (config, policy) = core_config(envelope)?;
+        let herdr = herdr_config(envelope, started, std::env::var("HERDR_SOCKET_PATH").ok())?;
+        Ok(CoreParts {
+            driver: HerdrDriver::new(herdr),
+            policy,
+            config,
+        })
+    }
+
+    /// The route is a child of its caller: the OS names the caller, the request never does.
+    pub fn core(&self) -> Core<'_> {
+        Core::new(&self.driver, self.policy.as_ref(), self.config.clone())
+            .with_caller(identity::parent_of_this_process())
+    }
 }
 
 /// The caller's whole budget for this operation rides in `timeoutMs`; herdr commands may use
@@ -437,7 +465,7 @@ fn dispatch(
     })
 }
 
-fn read_stdin() -> Result<Value, String> {
+pub fn read_stdin() -> Result<Value, String> {
     let mut buf = Vec::new();
     std::io::stdin()
         .take(MAX_STDIN + 1)
@@ -506,22 +534,15 @@ pub fn main(args: &[String]) -> i32 {
         None | Some("herdr") => {}
         Some(other) => return usage(&format!("unknown driver {other}")),
     }
-    let (config, policy) = match core_config(&envelope) {
-        Ok(c) => c,
+    let parts = match CoreParts::from_envelope(&envelope, started) {
+        Ok(p) => p,
         Err(refusal) => return error(refusal.code, &refusal.message, EXIT_USAGE),
-    };
-    let herdr = match herdr_config(&envelope, started, std::env::var("HERDR_SOCKET_PATH").ok()) {
-        Ok(c) => c,
-        Err(message) => return usage(&message),
     };
     let request = envelope
         .get("request")
         .cloned()
         .unwrap_or_else(|| json!({}));
-    let driver = HerdrDriver::new(herdr);
-    // The route is a child of its caller: the OS names the caller, the request never does.
-    let core =
-        Core::new(&driver, policy.as_ref(), config).with_caller(identity::parent_of_this_process());
+    let core = parts.core();
     match dispatch(op, &core, &request, anchor_pane(&envelope)) {
         Ok((result, fields)) => {
             let mut fields = fields;

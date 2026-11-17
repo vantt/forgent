@@ -210,66 +210,29 @@ fn outcome_name(outcome: SignalOutcome) -> &'static str {
 }
 
 /// The refusal of a signal. Holders signalled before it keep the signal they were sent, so the message names them.
-fn signal_refused(
-    holder: &Holder,
-    signal: Signal,
-    outcome: SignalOutcome,
-    already_sent: &[Holder],
-) -> FenceError {
-    let earlier = if already_sent.is_empty() {
-        String::new()
-    } else {
-        format!(
-            "; already sent {}: pid {}",
-            signal_name(signal),
-            pids(already_sent)
-        )
+fn signal_refused(refused: control::SignalRefused<Holder>) -> FenceError {
+    let sent_note = |holders: &[Holder], signal: Signal| {
+        if holders.is_empty() {
+            String::new()
+        } else {
+            format!(
+                "; already sent {}: pid {}",
+                signal_name(signal),
+                pids(holders)
+            )
+        }
     };
+    let earlier = sent_note(&refused.already_sent, refused.signal)
+        + &sent_note(&refused.already_asked, Signal::Term);
     named(
         "lock-fence-signal-refused",
         format!(
             "pid {} refused {}: {}{earlier}",
-            holder.pid,
-            signal_name(signal),
-            outcome_name(outcome)
+            refused.target.pid,
+            signal_name(refused.signal),
+            outcome_name(refused.outcome)
         ),
     )
-}
-
-/// Who was sent `signal`, and who has no such signal on this platform (`unsupported`: Windows has no graceful
-/// one). A holder that is no longer the recorded process was sent nothing and needs no signal; any other refusal
-/// is named.
-fn send_all(holders: &[Holder], signal: Signal) -> Result<(Vec<Holder>, Vec<Holder>), FenceError> {
-    let (mut sent, mut unsupported) = (Vec::new(), Vec::new());
-    for holder in holders {
-        match control::signal_record(&holder.record, signal) {
-            SignalOutcome::Sent => sent.push(holder.clone()),
-            SignalOutcome::Unsupported if signal == Signal::Term => {
-                unsupported.push(holder.clone())
-            }
-            SignalOutcome::IdentityMismatch | SignalOutcome::NotFound => {}
-            other => {
-                return Err(signal_refused(holder, signal, other, &sent));
-            }
-        }
-    }
-    Ok((sent, unsupported))
-}
-
-fn wait_until_gone(
-    still_holding: &dyn Fn(Vec<Holder>) -> Vec<Holder>,
-    holders: Vec<Holder>,
-    ms: u64,
-) -> Vec<Holder> {
-    let deadline = Instant::now() + Duration::from_millis(ms);
-    let mut left = holders;
-    loop {
-        left = still_holding(left);
-        if left.is_empty() || Instant::now() >= deadline {
-            return left;
-        }
-        std::thread::sleep(Duration::from_millis(POLL_MS));
-    }
 }
 
 struct Terminated {
@@ -284,31 +247,19 @@ fn terminate_holders(
     holders: &[Holder],
     still_holding: &dyn Fn(Vec<Holder>) -> Vec<Holder>,
 ) -> Result<Terminated, FenceError> {
-    let (sent, unsupported) = send_all(holders, Signal::Term)?;
-    let askable: Vec<Holder> = holders
-        .iter()
-        .filter(|holder| !unsupported.iter().any(|u| u.pid == holder.pid))
-        .cloned()
-        .collect();
-    let waited = wait_until_gone(still_holding, askable, TERM_WAIT_MS);
-    let to_kill: Vec<Holder> = unsupported.into_iter().chain(waited).collect();
-    let (killed, _) = send_all(&to_kill, Signal::Kill).map_err(|err| match err {
-        FenceError::Named {
-            code,
-            message,
-            listing,
-        } if !sent.is_empty() => FenceError::Named {
-            code,
-            message: format!("{message}; already sent term: pid {}", pids(&sent)),
-            listing,
-        },
-        other => other,
-    })?;
-    let left = wait_until_gone(still_holding, to_kill, KILL_WAIT_MS);
+    let ended = control::terminate_with_grace(
+        holders,
+        &|holder, signal| control::signal_record(&holder.record, signal),
+        still_holding,
+        Duration::from_millis(TERM_WAIT_MS),
+        Duration::from_millis(KILL_WAIT_MS),
+        Duration::from_millis(POLL_MS),
+    )
+    .map_err(signal_refused)?;
     Ok(Terminated {
-        terminated: sent.iter().map(|holder| holder.pid).collect(),
-        killed: killed.iter().map(|holder| holder.pid).collect(),
-        left,
+        terminated: ended.asked.iter().map(|holder| holder.pid).collect(),
+        killed: ended.killed.iter().map(|holder| holder.pid).collect(),
+        left: ended.left,
     })
 }
 
@@ -1047,7 +998,9 @@ mod tests {
         foreign.pid += 1;
         foreign.record.pid_ns = Some("pid:[1]".into());
         foreign.record.pid = Some(fgos_process::ProcId(foreign.pid));
-        let err = send_all(&[first.clone(), foreign.clone()], Signal::Term).unwrap_err();
+        let err = terminate_holders(&[first.clone(), foreign.clone()], &|list| list)
+            .err()
+            .expect("the foreign holder refuses the signal");
         assert_eq!(
             err.to_string(),
             format!(

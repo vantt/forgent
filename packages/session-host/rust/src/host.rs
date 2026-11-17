@@ -13,13 +13,11 @@ use fgos_terminal_control::port::{
     Refusal as PaneRefusal, ReleaseOutcome,
 };
 use std::path::PathBuf;
-use std::time::{Duration, Instant};
 
 /// How long an agent gets to put its prompt up before an opening text is typed.
 pub const DEFAULT_READY_MS: u64 = 60_000;
 /// How long a screenless process gets to leave after SIGTERM before it is killed.
 pub const DEFAULT_GRACE_MS: u64 = 10_000;
-const POLL: Duration = Duration::from_millis(50);
 
 /// A head session has no result claim, so the delivery step never finds one.
 struct NoOutbox;
@@ -194,10 +192,12 @@ impl SessionHost<'_> {
             match adapter.deliver_brief(&mut io, &opening.text, &mut NoOutbox) {
                 TerminalOutcome::Delivered => {}
                 other => {
+                    // A retry must start clean, never answer `placed` for a session that got no opening.
+                    let _ = self.panes.release(key, Disposition::Close);
                     return refuse(Refusal::unknown(
                         RefusalCode::PaneNotReady,
                         format!("the opening text was typed but not confirmed: {other:?}"),
-                    ))
+                    ));
                 }
             }
         }
@@ -212,22 +212,12 @@ impl SessionHost<'_> {
                 "a head session needs a host with a message channel; a screenless host has none yet",
             ));
         }
-        let mut prepared = request.clone();
         if let Some(opening) = &request.opening {
-            match opening.delivery {
-                Delivery::Typed => {
-                    return refuse(Refusal::unsupported(
-                        RefusalCode::OpeningDeliveryUnsupported,
-                        "a screenless host has no composer to type into; pass the opening by argument or file",
-                    ))
-                }
-                Delivery::Argument => prepared.args.push(opening.text.clone()),
-                Delivery::File => match self.direct.opening_file(&request.key, &opening.text) {
-                    Ok(path) => prepared.args.push(path.to_string_lossy().into_owned()),
-                    Err(e) => {
-                        return refuse(Refusal::unknown(RefusalCode::PlacementUnknown, e))
-                    }
-                },
+            if opening.delivery == Delivery::Typed {
+                return refuse(Refusal::unsupported(
+                    RefusalCode::OpeningDeliveryUnsupported,
+                    "a screenless host has no composer to type into; pass the opening by argument or file",
+                ));
             }
         }
         match self.direct.liveness(&request.key) {
@@ -239,6 +229,17 @@ impl SessionHost<'_> {
                 ))
             }
             Liveness::Gone => {}
+        }
+        let mut prepared = request.clone();
+        if let Some(opening) = &request.opening {
+            match opening.delivery {
+                Delivery::Typed => unreachable!("refused before the key was judged"),
+                Delivery::Argument => prepared.args.push(opening.text.clone()),
+                Delivery::File => match self.direct.opening_file(&request.key, &opening.text) {
+                    Ok(path) => prepared.args.push(path.to_string_lossy().into_owned()),
+                    Err(e) => return refuse(Refusal::unknown(RefusalCode::PlacementUnknown, e)),
+                },
+            }
         }
         match self.direct.spawn(&prepared) {
             Ok(()) => StartAnswer::Placed(Self::placement(request)),
@@ -345,33 +346,14 @@ impl SessionHost<'_> {
             self.direct.forget(key);
             return RetireAnswer::Retired;
         }
-        // SIGTERM first, then the grace; SIGKILL only if it was ignored for all of it.
-        if let Err(e) = self.direct.terminate(key) {
-            return unknown(e);
-        }
-        let until = Instant::now() + Duration::from_millis(self.grace_ms);
-        loop {
-            match self.direct.liveness(key) {
-                Liveness::Gone => {
-                    self.direct.forget(key);
-                    return RetireAnswer::Retired;
-                }
-                Liveness::Live | Liveness::Unknown if Instant::now() >= until => break,
-                _ => std::thread::sleep(POLL),
+        // The ask, the grace and the kill belong to the shared primitive behind `end`.
+        match self.direct.end(key, self.grace_ms) {
+            Ok(Liveness::Gone) => {
+                self.direct.forget(key);
+                return RetireAnswer::Retired;
             }
-        }
-        if self.direct.liveness(key) == Liveness::Live {
-            if let Err(e) = self.direct.kill(key) {
-                return unknown(e);
-            }
-            let after = Instant::now() + Duration::from_millis(self.grace_ms.max(1_000));
-            while Instant::now() < after {
-                if self.direct.liveness(key) == Liveness::Gone {
-                    self.direct.forget(key);
-                    return RetireAnswer::Retired;
-                }
-                std::thread::sleep(POLL);
-            }
+            Ok(_) => {}
+            Err(e) => return unknown(e),
         }
         unknown(format!(
             "`{key}` is still not judged gone after the grace; its handle is kept"

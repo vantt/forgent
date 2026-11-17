@@ -131,6 +131,141 @@ pub fn signal_record(record: &Record, sig: Signal) -> SignalOutcome {
     }
 }
 
+/// [`signal_record`] for a process that leads its own process group (started with `process_group(0)`): after the
+/// identity-checked signal reached the leader, the rest of the group gets it too, so children do not outlive
+/// their session. Where there are no process groups (Windows) this is [`signal_record`].
+pub fn signal_record_group(record: &Record, sig: Signal) -> SignalOutcome {
+    let outcome = signal_record(record, sig);
+    #[cfg(unix)]
+    if outcome == SignalOutcome::Sent {
+        if let Some(group) = record
+            .pid
+            .and_then(|pid| libc::pid_t::try_from(pid.0).ok())
+            .filter(|group| *group > 1)
+        {
+            // The leader was just judged to be that exact process, and a process group id is never reused while
+            // the leader lives; ESRCH (no other member) is expected and not an error.
+            // SAFETY: kill with a negative pid signals the group of that id.
+            unsafe {
+                libc::kill(-group, signo(sig));
+            }
+        }
+    }
+    outcome
+}
+
+/// What [`terminate_with_grace`] did, by target.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Terminated<T> {
+    /// Targets that were sent the ask to stop.
+    pub asked: Vec<T>,
+    /// Targets that were sent the kill (the ones that ignored the ask, and those that cannot be asked).
+    pub killed: Vec<T>,
+    /// Targets still alive after the kill wait.
+    pub left: Vec<T>,
+}
+
+/// A signal one target refused; targets signalled before it keep the signal they were sent.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct SignalRefused<T> {
+    pub target: T,
+    pub signal: Signal,
+    pub outcome: SignalOutcome,
+    /// Targets already sent `signal` in the same round.
+    pub already_sent: Vec<T>,
+    /// Targets already asked to stop, when the refusal came in the kill round.
+    pub already_asked: Vec<T>,
+}
+
+/// What one signalling round did: who was sent the signal, and (for the ask only) who cannot be asked on this
+/// platform. A target that is no longer the recorded process was sent nothing and needs no signal; any other
+/// refusal ends the round.
+struct Round<T> {
+    sent: Vec<T>,
+    unsupported: Vec<T>,
+    askable: Vec<T>,
+}
+
+fn send_round<T: Clone>(
+    targets: &[T],
+    sig: Signal,
+    signal: &dyn Fn(&T, Signal) -> SignalOutcome,
+) -> Result<Round<T>, SignalRefused<T>> {
+    let mut round = Round {
+        sent: Vec::new(),
+        unsupported: Vec::new(),
+        askable: Vec::new(),
+    };
+    for target in targets {
+        match signal(target, sig) {
+            SignalOutcome::Sent => {
+                round.sent.push(target.clone());
+                round.askable.push(target.clone());
+            }
+            SignalOutcome::Unsupported if sig == Signal::Term => {
+                round.unsupported.push(target.clone())
+            }
+            SignalOutcome::IdentityMismatch | SignalOutcome::NotFound => {
+                round.askable.push(target.clone())
+            }
+            outcome => {
+                return Err(SignalRefused {
+                    target: target.clone(),
+                    signal: sig,
+                    outcome,
+                    already_sent: round.sent,
+                    already_asked: Vec::new(),
+                })
+            }
+        }
+    }
+    Ok(round)
+}
+
+fn wait_until_gone<T>(
+    still_alive: &dyn Fn(Vec<T>) -> Vec<T>,
+    targets: Vec<T>,
+    wait: std::time::Duration,
+    poll: std::time::Duration,
+) -> Vec<T> {
+    let deadline = std::time::Instant::now() + wait;
+    let mut left = targets;
+    loop {
+        left = still_alive(left);
+        if left.is_empty() || std::time::Instant::now() >= deadline {
+            return left;
+        }
+        std::thread::sleep(poll);
+    }
+}
+
+/// The one way fgOS ends processes: ask (`Term`), wait up to `term_wait`, kill what is left (at once for a target
+/// that cannot be asked, as on Windows), wait up to `kill_wait`. `signal` sends one signal to one target by
+/// identity; `still_alive(list)` is the subset of `list` that still runs.
+pub fn terminate_with_grace<T: Clone>(
+    targets: &[T],
+    signal: &dyn Fn(&T, Signal) -> SignalOutcome,
+    still_alive: &dyn Fn(Vec<T>) -> Vec<T>,
+    term_wait: std::time::Duration,
+    kill_wait: std::time::Duration,
+    poll: std::time::Duration,
+) -> Result<Terminated<T>, SignalRefused<T>> {
+    let ask = send_round(targets, Signal::Term, signal)?;
+    let waited = wait_until_gone(still_alive, ask.askable, term_wait, poll);
+    let to_kill: Vec<T> = ask.unsupported.into_iter().chain(waited).collect();
+    let asked = ask.sent;
+    let kill = send_round(&to_kill, Signal::Kill, signal).map_err(|mut refused| {
+        refused.already_asked = asked.clone();
+        refused
+    })?;
+    let left = wait_until_gone(still_alive, to_kill, kill_wait, poll);
+    Ok(Terminated {
+        asked,
+        killed: kill.sent,
+        left,
+    })
+}
+
 /// This process and its ancestors, nearest first, read one pid at a time; off Linux the chain is this process alone.
 pub fn self_chain() -> Vec<u32> {
     let mut chain = vec![std::process::id()];
@@ -426,5 +561,103 @@ mod tests {
     fn a_record_of_this_process_names_its_identity() {
         let me = facts::self_identity().expect("this process has an identity here");
         assert_eq!(tuple_of(&me.to_record()), Some(me));
+    }
+
+    mod grace {
+        use super::*;
+        use std::cell::RefCell;
+        use std::time::Duration;
+
+        const MS: Duration = Duration::from_millis(1);
+
+        #[test]
+        fn a_target_that_ignores_the_ask_is_killed_after_the_wait() {
+            let sent = RefCell::new(Vec::new());
+            let alive = RefCell::new(true);
+            let ended = terminate_with_grace(
+                &[1u32],
+                &|_, sig| {
+                    sent.borrow_mut().push(sig);
+                    if sig == Signal::Kill {
+                        *alive.borrow_mut() = false;
+                    }
+                    SignalOutcome::Sent
+                },
+                &|list| if *alive.borrow() { list } else { Vec::new() },
+                Duration::from_millis(20),
+                Duration::from_millis(20),
+                MS,
+            )
+            .unwrap();
+            assert_eq!(*sent.borrow(), vec![Signal::Term, Signal::Kill]);
+            assert_eq!(
+                (ended.asked, ended.killed, ended.left),
+                (vec![1], vec![1], vec![])
+            );
+        }
+
+        #[test]
+        fn a_target_that_cannot_be_asked_is_killed_at_once() {
+            let started = std::time::Instant::now();
+            let sent = RefCell::new(Vec::new());
+            let ended = terminate_with_grace(
+                &[7u32],
+                &|_, sig| {
+                    sent.borrow_mut().push(sig);
+                    if sig == Signal::Term {
+                        SignalOutcome::Unsupported
+                    } else {
+                        SignalOutcome::Sent
+                    }
+                },
+                &|_| Vec::new(),
+                Duration::from_secs(30),
+                Duration::from_secs(30),
+                MS,
+            )
+            .unwrap();
+            assert!(started.elapsed() < Duration::from_secs(5));
+            assert_eq!(*sent.borrow(), vec![Signal::Term, Signal::Kill]);
+            assert_eq!((ended.asked, ended.killed), (vec![], vec![7]));
+        }
+
+        #[test]
+        fn a_refused_signal_names_the_targets_already_signalled() {
+            let refused = terminate_with_grace(
+                &[1u32, 2],
+                &|target, _| {
+                    if *target == 2 {
+                        SignalOutcome::IdentityUnknown
+                    } else {
+                        SignalOutcome::Sent
+                    }
+                },
+                &|list| list,
+                MS,
+                MS,
+                MS,
+            )
+            .unwrap_err();
+            assert_eq!(
+                (refused.target, refused.signal, refused.already_sent),
+                (2, Signal::Term, vec![1])
+            );
+        }
+
+        #[test]
+        fn a_target_that_is_already_gone_is_not_waited_on() {
+            let started = std::time::Instant::now();
+            let ended = terminate_with_grace(
+                &[1u32],
+                &|_, _| SignalOutcome::NotFound,
+                &|_| Vec::new(),
+                Duration::from_secs(30),
+                Duration::from_secs(30),
+                MS,
+            )
+            .unwrap();
+            assert!(started.elapsed() < Duration::from_secs(1));
+            assert!(ended.asked.is_empty() && ended.killed.is_empty() && ended.left.is_empty());
+        }
     }
 }

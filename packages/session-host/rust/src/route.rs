@@ -5,50 +5,15 @@
 use crate::direct::OsDirect;
 use crate::host::{SessionHost, DEFAULT_GRACE_MS, DEFAULT_READY_MS};
 use crate::types::*;
-use fgos_terminal_control::core::{Core, CoreConfig};
-use fgos_terminal_control::driver::herdr::{HerdrConfig, HerdrDriver};
-use fgos_terminal_control::identity;
-use fgos_terminal_control::policy::policy_by_name;
 use fgos_terminal_control::route::{
-    DEFAULT_ALLOCATION_GRACE_MS, DEFAULT_LAUNCH_IDENTIFY_TIMEOUT_MS, DEFAULT_LIMITS,
-    DEFAULT_SHELL_READY_TIMEOUT_MS,
+    emit, error, line, read_stdin, usage, CoreParts, EXIT_MISMATCH, EXIT_OK, EXIT_USAGE,
 };
 use serde::de::DeserializeOwned;
-use serde_json::{json, Map, Value};
-use std::io::Read;
-use std::time::{Duration, Instant};
+use serde_json::{json, Value};
+use std::time::Instant;
 
 pub const PROTOCOL: u64 = 1;
 pub const OPS: [&str; 4] = ["start", "alive", "front", "retire"];
-
-const EXIT_OK: i32 = 0;
-const EXIT_USAGE: i32 = 2;
-const EXIT_MISMATCH: i32 = 3;
-const MAX_STDIN: u64 = 1024 * 1024;
-
-fn line(result: &str, fields: Value) -> String {
-    let mut map = Map::new();
-    map.insert("v".into(), json!(1));
-    map.insert("protocol".into(), json!(PROTOCOL));
-    map.insert("result".into(), json!(result));
-    map.extend(object(fields));
-    Value::Object(map).to_string()
-}
-
-fn emit(text: &str) {
-    use std::io::Write;
-    let _ = writeln!(std::io::stdout(), "{text}");
-}
-
-fn error(code: &str, message: &str, exit: i32) -> i32 {
-    eprintln!("fgos internal: {code}: {message}");
-    emit(&line("error", json!({ "code": code, "message": message })));
-    exit
-}
-
-fn usage(message: &str) -> i32 {
-    error("usage", message, EXIT_USAGE)
-}
 
 fn refusal_fields(refusal: &Refusal) -> (String, Value) {
     let mut fields = json!({ "code": refusal.code });
@@ -67,59 +32,6 @@ fn whole<T: DeserializeOwned>(request: &Value, name: &str) -> Result<T, String> 
         .get(name)
         .ok_or_else(|| format!("request.{name} is missing"))?;
     serde_json::from_value(value.clone()).map_err(|e| format!("request.{name}: {e}"))
-}
-
-fn read_stdin() -> Result<Value, String> {
-    let mut buf = Vec::new();
-    std::io::stdin()
-        .take(MAX_STDIN + 1)
-        .read_to_end(&mut buf)
-        .map_err(|e| format!("stdin: {e}"))?;
-    if buf.len() as u64 > MAX_STDIN {
-        return Err("stdin exceeds 1 MiB".into());
-    }
-    if buf.iter().all(u8::is_ascii_whitespace) {
-        return Ok(json!({}));
-    }
-    serde_json::from_slice(&buf).map_err(|e| format!("stdin is not JSON: {e}"))
-}
-
-/// The caller's whole budget for this operation rides in `timeoutMs`; herdr commands may use nine
-/// tenths of it, so a stuck command is answered `unknown` before the caller gives up.
-fn herdr_config(envelope: &Value, started: Instant) -> Result<HerdrConfig, String> {
-    let mut config = HerdrConfig::new(match envelope.get("herdrBin") {
-        None | Some(Value::Null) => String::new(),
-        Some(v) => v.as_str().ok_or("herdrBin needs a string")?.to_string(),
-    });
-    if let Some(env) = envelope.get("env") {
-        let map = env.as_object().ok_or("env needs an object of strings")?;
-        for (key, value) in map {
-            let value = value
-                .as_str()
-                .ok_or_else(|| format!("env.{key} needs a string"))?;
-            match key.as_str() {
-                "HERDR_SESSION" => config.session = Some(value.to_string()),
-                "HERDR_SOCKET_PATH" => config.socket_path = Some(value.to_string()),
-                _ => {}
-            }
-            config.env.push((key.clone(), value.to_string()));
-        }
-    }
-    if let Some(v) = envelope.get("timeoutMs").filter(|v| !v.is_null()) {
-        let ms = v
-            .as_u64()
-            .filter(|ms| *ms >= 1)
-            .ok_or("timeoutMs needs an integer >= 1")?;
-        config.deadline = Some(started + Duration::from_millis(ms - ms / 10));
-    }
-    // herdr sets `HERDR_SOCKET_PATH` in every pane it creates; a caller inside one reaches the same
-    // server, and a named session is never redirected to the inherited socket of another one.
-    if config.socket_path.is_none() && config.session.is_none() {
-        config.socket_path = std::env::var("HERDR_SOCKET_PATH")
-            .ok()
-            .filter(|p| !p.is_empty());
-    }
-    Ok(config)
 }
 
 fn milliseconds(envelope: &Value, name: &str, default: u64) -> Result<u64, String> {
@@ -246,28 +158,11 @@ pub fn main(args: &[String]) -> i32 {
         Ok(t) => t,
         Err(message) => return usage(&message),
     };
-    let herdr = match herdr_config(&envelope, started) {
-        Ok(c) => c,
-        Err(message) => return usage(&message),
-    };
-    let policy = match policy_by_name(None) {
+    let parts = match CoreParts::from_envelope(&envelope, started) {
         Ok(p) => p,
-        Err(e) => return usage(&e.to_string()),
+        Err(refusal) => return error(refusal.code, &refusal.message, EXIT_USAGE),
     };
-    let driver = HerdrDriver::new(herdr);
-    // The route is a child of its caller: the OS names the caller, the request never does.
-    let core = Core::new(
-        &driver,
-        policy.as_ref(),
-        CoreConfig {
-            state_root: fgos_terminal_control::store::default_state_root(),
-            limits: DEFAULT_LIMITS,
-            allocation_grace_ms: DEFAULT_ALLOCATION_GRACE_MS,
-            launch_identify_timeout_ms: DEFAULT_LAUNCH_IDENTIFY_TIMEOUT_MS,
-            shell_ready_timeout_ms: DEFAULT_SHELL_READY_TIMEOUT_MS,
-        },
-    )
-    .with_caller(identity::parent_of_this_process());
+    let core = parts.core();
     let direct = OsDirect::in_state_root();
     let host = SessionHost {
         panes: &core,

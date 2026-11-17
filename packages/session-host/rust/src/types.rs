@@ -1,7 +1,7 @@
 //! The request and answer types of the contract `session-host/host-port.v1.json`.
 
 use serde::{Deserialize, Serialize};
-use serde_json::{Map, Value};
+use serde_json::Value;
 use std::collections::BTreeMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
@@ -159,11 +159,4 @@ pub fn valid_key(key: &str) -> bool {
         && bytes
             .iter()
             .all(|b| b.is_ascii_alphanumeric() || matches!(b, b'.' | b'_' | b'-'))
-}
-
-pub(crate) fn object(value: Value) -> Map<String, Value> {
-    match value {
-        Value::Object(map) => map,
-        _ => Map::new(),
-    }
 }

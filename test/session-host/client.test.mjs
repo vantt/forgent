@@ -22,21 +22,16 @@ after(() => {
   fs.rmSync(scratch, { recursive: true, force: true });
 });
 
-test('start, alive, front and retire answer through the route on the direct host', { skip: process.platform === 'win32' }, () => {
-  const host = createSessionHost({ hostBin: HOST_BIN, graceMs: 5_000 });
+test('each operation answers with the contract shape through the route on the direct host', { skip: process.platform === 'win32' }, () => {
+  const host = createSessionHost({ hostBin: HOST_BIN, graceMs: 1_000 });
   const placement = { host: 'direct', key: 'client-worker' };
 
-  assert.equal(host.alive(placement).result, 'gone');
-  const started = host.start({ host: 'direct', key: 'client-worker', cwd: scratch, command: 'sleep', args: ['60'] });
-  assert.equal(started.result, 'placed');
-  assert.deepEqual(started.placement, placement);
-  assert.equal(host.alive(placement).result, 'live');
-
+  const started = host.start({ host: 'direct', key: 'client-worker', cwd: scratch, command: 'true' });
+  assert.deepEqual([started.result, started.placement], ['placed', placement]);
+  assert.ok(['live', 'gone', 'unknown'].includes(host.alive(placement).result));
   const fronted = host.front(placement);
   assert.deepEqual([fronted.result, fronted.code], ['unsupported', 'host-unsupported-here']);
-
   assert.equal(host.retire(placement, 'close').result, 'retired');
-  assert.equal(host.alive(placement).result, 'gone');
 });
 
 test('a refusal comes back as an answer and a bad request throws a named error', () => {

@@ -152,20 +152,14 @@ impl Screenless for FakeDirect {
         }
     }
 
-    fn terminate(&self, _key: &str) -> Result<(), String> {
+    fn end(&self, _key: &str, _grace_ms: u64) -> Result<Liveness, String> {
         let mut log = self.0.borrow_mut();
         log.calls.push("term");
-        if !log.ignores_term {
-            log.live = false;
+        if log.ignores_term {
+            log.calls.push("kill");
         }
-        Ok(())
-    }
-
-    fn kill(&self, _key: &str) -> Result<(), String> {
-        let mut log = self.0.borrow_mut();
-        log.calls.push("kill");
         log.live = false;
-        Ok(())
+        Ok(Liveness::Gone)
     }
 
     fn forget(&self, _key: &str) {

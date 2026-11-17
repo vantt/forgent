@@ -2,22 +2,24 @@
 //! screen, judge it by the OS process facts, stop it. Containment is never built here.
 
 use crate::types::{Liveness, StartRequest};
-use fgos_process::control::{signal_record, Signal, SignalOutcome};
+use fgos_process::control::{signal_record_group, terminate_with_grace};
 use fgos_process::facts::{identity_of_child, judge_here, Record, Verdict};
+use fgos_process::spawn::resolve_program;
 use fgos_process::ProcId;
 use serde_json::{json, Value};
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
+use std::time::Duration;
 
 /// What the direct adapter needs from the OS, by key.
 pub trait Screenless {
     /// Start the prepared command and remember which process it is.
     fn spawn(&self, request: &StartRequest) -> Result<(), String>;
     fn liveness(&self, key: &str) -> Liveness;
-    /// Ask the process to end (SIGTERM). `Err` when no signal could be sent.
-    fn terminate(&self, key: &str) -> Result<(), String>;
-    /// End it now. Only after `terminate` was ignored for the grace.
-    fn kill(&self, key: &str) -> Result<(), String>;
+    /// Ask the process group to end, wait up to `grace_ms`, kill what is left (at once where it cannot be asked,
+    /// as on Windows). The answer is what the key's process is judged to be afterwards; `Err` when no signal
+    /// could be sent.
+    fn end(&self, key: &str, grace_ms: u64) -> Result<Liveness, String>;
     /// Drop what was remembered for the key.
     fn forget(&self, key: &str);
     /// Where the opening text of a `file` delivery is written; the caller passes the path as an argument.
@@ -67,21 +69,6 @@ impl OsDirect {
             Err(_) => Handle::Unreadable,
         }
     }
-
-    fn signal(&self, key: &str, sig: Signal) -> Result<(), String> {
-        let record = match self.handle(key) {
-            Handle::Missing => return Ok(()),
-            Handle::Unreadable => return Err(format!("the handle of `{key}` is unreadable")),
-            Handle::Process(record) => record,
-        };
-        match signal_record(&record, sig) {
-            // Not there any more, or no longer that process: nothing to end.
-            SignalOutcome::Sent | SignalOutcome::NotFound | SignalOutcome::IdentityMismatch => {
-                Ok(())
-            }
-            other => Err(format!("no signal reached `{key}`: {other:?}")),
-        }
-    }
 }
 
 /// Replace `name` in `dir` durably, owner-readable only.
@@ -94,7 +81,19 @@ fn write_private(dir: &Path, name: &str, bytes: &[u8]) -> Result<(), String> {
 impl Screenless for OsDirect {
     fn spawn(&self, request: &StartRequest) -> Result<(), String> {
         std::fs::create_dir_all(&self.dir).map_err(|e| format!("{}: {e}", self.dir.display()))?;
-        let mut command = Command::new(&request.command);
+        let program = resolve_program(
+            &request.command,
+            &std::env::var("PATH").unwrap_or_default(),
+            &std::env::var("PATHEXT").unwrap_or_default(),
+            cfg!(windows),
+        )
+        .ok_or_else(|| {
+            format!(
+                "cannot start {}: no such program on the path",
+                request.command
+            )
+        })?;
+        let mut command = Command::new(program);
         command
             .args(&request.args)
             .envs(&request.env)
@@ -136,12 +135,27 @@ impl Screenless for OsDirect {
         }
     }
 
-    fn terminate(&self, key: &str) -> Result<(), String> {
-        self.signal(key, Signal::Term)
-    }
-
-    fn kill(&self, key: &str) -> Result<(), String> {
-        self.signal(key, Signal::Kill)
+    fn end(&self, key: &str, grace_ms: u64) -> Result<Liveness, String> {
+        let record = match self.handle(key) {
+            Handle::Missing => return Ok(Liveness::Gone),
+            Handle::Unreadable => return Err(format!("the handle of `{key}` is unreadable")),
+            Handle::Process(record) => record,
+        };
+        let grace = Duration::from_millis(grace_ms);
+        terminate_with_grace(
+            &[record],
+            &|record, sig| signal_record_group(record, sig),
+            &|list| {
+                list.into_iter()
+                    .filter(|record| judge_here(record) != Verdict::Dead)
+                    .collect()
+            },
+            grace,
+            grace.max(Duration::from_secs(1)),
+            Duration::from_millis(50),
+        )
+        .map_err(|refused| format!("no signal reached `{key}`: {:?}", refused.outcome))?;
+        Ok(self.liveness(key))
     }
 
     fn forget(&self, key: &str) {
