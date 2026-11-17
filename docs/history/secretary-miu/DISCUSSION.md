@@ -8,8 +8,8 @@ Round 2 (2026-11-17). Point 1: draft persona presented (does / never does, see �
 topics itself by the product priority list and reports the order (candidate D-ID, holds one more round). Rotation:
 owner rejected "owner types /clear"; accepted automatic rotation with two thresholds (soft at rest, hard with verbatim
 carry-over), replacing the claude process either way. Owner also wants a user-invoked `/handoff` shortcut and asked
-for deep research on existing handoff skills (researcher running, report
-`plans/reports/research-261117-1624-handoff-skills-research.md`). No D-ID minted yet.
+for deep research on existing handoff skills (research done, report
+`plans/reports/research-261117-1624-handoff-skills-research.md`). Point 3 question asked: default when a domain has no shaper. No D-ID minted yet.
 
 ## 2. Mục tiêu & đề bài
 
@@ -61,6 +61,16 @@ sessions, not in the secretary's chat.
   đóng hoặc replace, cách nào cũng được)... research sâu xem có ai làm sẵn skill dạng handoff... muốn có shortcut
   dạng /handoff được gọi chủ động bởi user." Prior art found locally: `ak-handoff` (continuation contract, never
   launches a runtime unless `--dispatch`).
+- 2026-11-17 — Research done (report above). Findings: Amp dropped `/handoff` for auto-compaction (2026-05-06);
+  `ak-handoff` upstream `davidondrej/skills` (MIT), reuse redaction + verify-before-act, not its 9-section schema;
+  Stop payload has no context metric, last non-sidechain assistant entry in the transcript gives input + cache
+  tokens (dedupe by message.id); window size only via statusline `context_window_size` (sidecar file); no documented
+  way for a hook to restart claude, safest = external new+close via herdr; cheap spike = `/clear` via
+  `herdr pane send-text` + SessionStart `source=clear`; `/handoff` = skill with `disable-model-invocation: true`
+  calling the same script. Untested: statusline timing, `/clear` via send-text.
+- 2026-11-17 — Point 3 scout: `fgos-clarifying` is verdict-only, callable without Work; domain list from
+  `src/state/domain-registry.mjs` misses `domains/marketing` and `domains/council`; it defaults to `coding`. Asked:
+  domain with no shaper -> (A) core domain-free shaper, (B) council business-discussion, (C) park.
 
 ## 6. Thiết kế đã chốt {#design}
 
