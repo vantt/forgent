@@ -9,7 +9,7 @@ description: >-
   launcher, BEFORE `fgos submit` ever creates the item. Never Socratic by
   default: this skill starts silent and only speaks when it genuinely
   cannot tell what the text is asking for. Verdict-only — it never writes
-  state, it returns `{title?, description?, domain, question?}` straight
+  state, it returns `{title?, description?, domain, domainUnsure?, question?}` straight
   back to whichever launcher called it. Examples: "a person just typed a
   submit request, is its intent clear", "decide whether this needs a
   person before any item gets created", "classify which domain this
