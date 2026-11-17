@@ -6,7 +6,10 @@ discussion: open
 
 Round 2 (2026-11-17). Point 1: draft persona presented (does / never does, see §5); owner chose that Miu orders
 topics itself by the product priority list and reports the order (candidate D-ID, holds one more round). Rotation:
-owner rejected "owner types /clear" (forgets often), so rotation must be automatic; now discussing the right moment. No D-ID minted yet.
+owner rejected "owner types /clear"; accepted automatic rotation with two thresholds (soft at rest, hard with verbatim
+carry-over), replacing the claude process either way. Owner also wants a user-invoked `/handoff` shortcut and asked
+for deep research on existing handoff skills (researcher running, report
+`plans/reports/research-261117-1624-handoff-skills-research.md`). No D-ID minted yet.
 
 ## 2. Mục tiêu & đề bài
 
@@ -22,7 +25,7 @@ sessions, not in the secretary's chat.
 
 | # | Point | State |
 |---|---|---|
-| 1 | Persona content and protocol (does / never does) | discussing. Provisionally clear: Miu orders topics itself and reports (owner, round 2). Open: rotation must be automatic (owner, round 3); right moment and signal under discussion |
+| 1 | Persona content and protocol (does / never does) | discussing. Provisionally clear: Miu orders topics itself and reports (owner, round 2). Provisionally clear: automatic rotation at turn end (Stop hook), soft ~40% only at rest, hard ~70% with verbatim last message + pending question; process replaced (new+close or in-pane replace); plus user `/handoff`. Open: handoff method (research pending) |
 | 2 | Placement and activation (`core/agents/secretary.yaml`, `claude --agent secretary` in herdr, opening shaper tabs) | open |
 | 3 | Domain classification without Work (reuse fgos-clarifying; default when a domain has no shaper) | open |
 | 4 | Token saving (3x always-loaded rules, model choice, short agent results, peer mail only on decisions) | open, needs owner approval |
@@ -50,6 +53,14 @@ sessions, not in the secretary's chat.
   `tab`/`pane run`/`pane close`; Miu cannot type `/clear` itself. Proposed (A) owner `/clear` + handoff updated
   every state-changing turn, (B) self-rotation via herdr later. Owner: "không đồng ý, anh còn quên miết, đưa thêm
   thảo luận: thời điểm phù hợp để đổi phiên." -> rotation must not depend on the owner.
+- 2026-11-17 — Miu proposed: check at turn end (`Stop` hook reads context tokens from `transcript_path`), signals =
+  context size / session age / owner idle / `PreCompact` fallback. Owner asked what breaks when rotating mid-chat.
+  Miu listed: unwritten nuance, short answers losing their question, in-process background work killed, keystrokes
+  during restart, cold cache; proposed soft (rest only) + hard (verbatim carry-over) thresholds.
+- 2026-11-17 — Owner: "ổn, dùng hai ngưỡng, mỗi khi handoff có thể thay thế claude hiện tại bằng claude mới (tạo mới +
+  đóng hoặc replace, cách nào cũng được)... research sâu xem có ai làm sẵn skill dạng handoff... muốn có shortcut
+  dạng /handoff được gọi chủ động bởi user." Prior art found locally: `ak-handoff` (continuation contract, never
+  launches a runtime unless `--dispatch`).
 
 ## 6. Thiết kế đã chốt {#design}
 
