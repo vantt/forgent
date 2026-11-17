@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "1271deef130ef258732dc2e1fcee9c7c30d6d97df9365c1c138e72ac8ef00212",
+  "payloadDigest": "8b96cd0f4fe95e75734c331002094c22c4d0b2a9079bac5473b01c4a6cca1e72",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "68bd36c02991c59a52f206cb092605f9aa16d218d0f52eb2cb34d1db8d4d9ace",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -300,7 +300,7 @@
     "packages/convention/rust/tests/golden.rs": "441f8301cc35be9151f492d151eac4cfe7fe4c589045c1b8ae9d1ac21119f2df",
     "packages/distribution/rust/examples/print-workspace-shim.rs": "767a8d526d1b030dd4327509a63c9e194ed03fe2ae5a2a263682cd62724dc6d4",
     "packages/distribution/rust/src/agent_config.rs": "7c6c6b0eaa025d3f7ce51d40f7124c3b6e0d7d8e641f9b9f9caeb15276e42be7",
-    "packages/distribution/rust/src/agent_hooks.rs": "c377ac9c0348bdb4637de1b55e30a8460f56943fc84314cf2981a4f202fdd876",
+    "packages/distribution/rust/src/agent_hooks.rs": "2d723e5a7ac5a5fd816f804a281fd7304e3a8a56c475c88a87ed6a39d3ed2a2a",
     "packages/distribution/rust/src/bin_cache.rs": "61732e61ebfcda7d6ea52c34c05603b23655b57212616b9c26214f51525bab2c",
     "packages/distribution/rust/src/canonical.rs": "1ed17ee314cadcd425f25919740a7d80b7596871986c9940094fdd2cf4b7542a",
     "packages/distribution/rust/src/coexistence.rs": "6d9ad8ed722734b4a2c6151dcf4a87f64d1cc37354d3b40754d3f95038684c9e",
@@ -1215,11 +1215,12 @@
     "src/runner/write-queue.mjs": "a816a82d6c4499cca921f2b105eaaafe646f1413ff202ce3f132c4b84ed7a2b3",
     "src/seat-binding/client.mjs": "206a9ecbbc301f2c3c9688535dbeb60fabbe67052b870a62e23e7481ae82fdd8",
     "src/session-host/client.mjs": "a3ea5a9cce373c9d4ea3e2c1c4c80f3135fb09f818c552ec5ac9bf9f561bd558",
+    "src/session-host/head-start.mjs": "a87d16934ceca69019c54215e345fe07fa125f56f297dbf91730f6be72d2a55d",
     "src/session-rotation/decide.mjs": "c4252cfaf861cc8cdf65829d6b63f8e70ddcc990bde6d6b23343a5a9fe80e80f",
     "src/session-rotation/handoff-store.mjs": "0fdd8f18a406b5c2e1797c331e6bdf5ce72c3ed67a9daef28df5bb3b884aa133",
     "src/session-rotation/measure.mjs": "9707b594c14184c402229fe1cac9c1c67dbd84cd9b0db8ff235a8d51caab50be",
     "src/setup/agent-cli-trust.mjs": "c42fb3fcb298d53609dcf76893366e45cd2007ab3c0b52a9446f8740b9a8600b",
-    "src/setup/agent-hooks.mjs": "b8cc0592f2b625213629bed03754d128691792e9c41077d0e22a3df12e714647",
+    "src/setup/agent-hooks.mjs": "0f2db4f62f9b4fad2e68af65f24f430c77274fc09e1367f4457e21561f09cbe6",
     "src/setup/agy-permissions.mjs": "f2370eb0e40de31783ab33ebdfd6d452369b014f78786c9d2338653f0d1e7ed4",
     "src/setup/bin-discovery.mjs": "b5302797ac763fecb24608818bdc8bf37850e0cd5d7a9d98ae677e1f3e684633",
     "src/setup/blind-steps-proven-pools.mjs": "b3da45e89da558eaa65990245ef6a39d7534b67be4e40e68544324734dc6dd66",
@@ -1356,7 +1357,81 @@
     "src/workflow/units-source.mjs": "b664f86f0c111e52d6d20b6d194f0e51af27f81a856a72799d5191a0084bff33",
     "scripts/lib/git-one-door-declarations.v1.json": "3ff089b6fdbb59c6e58f912603ba8a3e2bae612a1ecebe94e6bc95db590e30d7"
   },
-  "sites": [],
+  "sites": [
+    {
+      "path": "src/runner/dispatch/herdr-round.mjs",
+      "line": 187,
+      "spawn": "ensureWorkerSession -> src/runner/dispatch/worker-session-boot.mjs:156",
+      "binary": "param herdrBin (establishConfinement escapes: imported dynamically in a form the caller resolver does not follow (src/session-host/head-start.mjs:124))",
+      "family": "unresolved-binary",
+      "siteId": "establishConfinement:896de95fcdc3b1ce1cccaa9153a692719f66c7e88a818c5116d910c3d52a0ac4",
+      "callerDigests": [
+        "7c2df0c92462d1884215f4de0bb396272b4c762cf212fae869a3c675e9b0d294"
+      ],
+      "escapes": [
+        "imported dynamically in a form the caller resolver does not follow (src/session-host/head-start.mjs:124)"
+      ]
+    },
+    {
+      "path": "src/runner/dispatch/herdr-round.mjs",
+      "line": 359,
+      "spawn": "createSessionHost -> src/session-host/client.mjs:159",
+      "binary": "param hostBin (createPaneHost escapes: imported dynamically in a form the caller resolver does not follow (src/session-host/head-start.mjs:124))",
+      "family": "unresolved-binary",
+      "siteId": "createPaneHost:32c9b3cd5a8cee3b10e4cd411fc51f5bae206a1b5655c68e9e8e5410fa906eec",
+      "callerDigests": [
+        "b08734897b5e2dd8dab960222bf4c6f7ef6c48c31181d0869c1ca5f884789b50",
+        "dd460d67ee44619ecd0fb8b530bd64dc6f655165842478382018d5a0e988aba3"
+      ],
+      "escapes": [
+        "imported dynamically in a form the caller resolver does not follow (src/session-host/head-start.mjs:124)"
+      ]
+    },
+    {
+      "path": "src/runner/dispatch/herdr-round.mjs",
+      "line": 397,
+      "spawn": "establishConfinement -> src/runner/dispatch/herdr-round.mjs:187",
+      "binary": "param herdrBin (prepareSeat escapes: imported dynamically in a form the caller resolver does not follow (src/session-host/head-start.mjs:124))",
+      "family": "unresolved-binary",
+      "siteId": "prepareSeat:d7e8b7bab77aa4e040552088edca05be5c914e709969b9deda9f3930e430d56a",
+      "callerDigests": [
+        "13be1c5eb112ca281b4b3609f9cb329ecff7f2a6fb2b06185b11dcacea022632"
+      ],
+      "escapes": [
+        "imported dynamically in a form the caller resolver does not follow (src/session-host/head-start.mjs:124)"
+      ]
+    },
+    {
+      "path": "src/runner/dispatch/herdr-round.mjs",
+      "line": 480,
+      "spawn": "prepareSeat -> src/runner/dispatch/herdr-round.mjs:397",
+      "binary": "param ctx (prepareTerminalAttempt escapes: imported dynamically in a form the caller resolver does not follow (src/session-host/head-start.mjs:124))",
+      "family": "unresolved-binary",
+      "siteId": "prepareTerminalAttempt:0750a13c19a29d4f52f64a9625a722e5f25662a156ac87c5039e49177b70d14a",
+      "callerDigests": [
+        "477c38afc210c669c5d31f0df6a95f10627877a04e324e7838a59fa22304e0c7"
+      ],
+      "escapes": [
+        "imported dynamically in a form the caller resolver does not follow (src/session-host/head-start.mjs:124)"
+      ]
+    },
+    {
+      "path": "src/runner/dispatch/terminal-slot.mjs",
+      "line": 66,
+      "spawn": "createTerminalControl -> src/terminal-control/client.mjs:110",
+      "binary": "param hostBin (createRoundTerminalControl escapes: imported dynamically in a form the caller resolver does not follow (src/session-host/head-start.mjs:126))",
+      "family": "unresolved-binary",
+      "siteId": "createRoundTerminalControl:4f0eb673bed6cc915c37de607aafbd020b6651ef084521b3e44971d02ff9b299",
+      "callerDigests": [
+        "1d351d9c0c409ff75aa9b84eea0a113cf76de112e02b0f7da52c1e964eecd78c",
+        "1ddfe3947b01fc968ce66e3476b97d6d2e5ef103900b35a95838ca8db89fa756",
+        "243561525700bea62652521cf936d0de91f792375b2a269822f8e4f060161fae"
+      ],
+      "escapes": [
+        "imported dynamically in a form the caller resolver does not follow (src/session-host/head-start.mjs:126)"
+      ]
+    }
+  ],
   "classes": [
     {
       "path": ".agents/skills/distill/scripts/distill.mjs",
@@ -3384,7 +3459,7 @@
       "spawn": "Command::new",
       "binary": ".fgos",
       "class": "argv-runner",
-      "resolvedAt": "packages/distribution/rust/src/agent_hooks.rs:1540"
+      "resolvedAt": "packages/distribution/rust/src/agent_hooks.rs:1547"
     },
     {
       "path": "packages/process/rust/src/spawn.rs",
@@ -3392,7 +3467,7 @@
       "spawn": "Command::new",
       "binary": "bin",
       "class": "argv-runner",
-      "resolvedAt": "packages/distribution/rust/src/agent_hooks.rs:1540"
+      "resolvedAt": "packages/distribution/rust/src/agent_hooks.rs:1547"
     },
     {
       "path": "packages/process/rust/src/spawn.rs",
@@ -3416,7 +3491,7 @@
       "spawn": "Command::new",
       "binary": "fgos",
       "class": "argv-runner",
-      "resolvedAt": "packages/distribution/rust/src/agent_hooks.rs:1540"
+      "resolvedAt": "packages/distribution/rust/src/agent_hooks.rs:1547"
     },
     {
       "path": "packages/process/rust/src/spawn.rs",
@@ -3424,7 +3499,7 @@
       "spawn": "Command::new",
       "binary": "installation",
       "class": "argv-runner",
-      "resolvedAt": "packages/distribution/rust/src/agent_hooks.rs:1540"
+      "resolvedAt": "packages/distribution/rust/src/agent_hooks.rs:1547"
     },
     {
       "path": "packages/process/rust/src/spawn.rs",
@@ -4132,6 +4207,13 @@
       "path": "src/session-host/client.mjs",
       "line": 172,
       "spawn": "spawnAsync -> src/session-host/client.mjs:84",
+      "binary": "(env FGOS_HOST_BIN)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/session-host/head-start.mjs",
+      "line": 64,
+      "spawn": "spawnSync",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
     },

@@ -199,6 +199,12 @@ const CLAUDE_DELETE_GUARD_COMMAND = deleteGuardScript(CLAUDE_SHIM, HOOK_KINDS.DE
  * itself skips a seat the runner started. */
 const SESSION_REGISTER_ARGS = 'identity session --register';
 const SESSION_REGISTER_TIMEOUT_SEC = 10;
+/** The session-register command over a shim operand. A session started with `FGOS_HEAD_ROLE` claims that role;
+ * when the claim is refused (a live session holds it, as a rotation predecessor does) it registers without the
+ * role, which moves later. Unset, it registers plainly. Silent on failure. */
+const SESSION_REGISTER_LEGACY = ['identity session --register >/dev/null || true'];
+const sessionRegisterCommand = (shim) =>
+  `[ -n "$FGOS_HEAD_ROLE" ] && ${shim} ${SESSION_REGISTER_ARGS} --role "$FGOS_HEAD_ROLE" >/dev/null 2>&1 || ${shim} ${SESSION_REGISTER_ARGS} >/dev/null || true`;
 
 /**
  * Every fgOS hook a JSON hook file carries, one row per (cli, kind, event): the file, where the row
@@ -219,9 +225,9 @@ const hookRows = (repoRoot) => [
   // The CLIs whose recorded hook events name a session start: Claude Code (`SessionStart`, no matcher:
   // every source), Codex (`SessionStart`, measured on 0.162.1) and agy (`SessionStart`, a flat entry,
   // measured on 1.4.2). omp and pi have none in their facts and register at their first fgOS verb.
-  { cli: 'claude', kind: HOOK_KINDS.SESSION, event: 'SessionStart', matcher: null, command: `S=${CLAUDE_SHIM}; [ -x "$S" ] || exit 0; "$S" ${SESSION_REGISTER_ARGS} >/dev/null || true`, timeout: SESSION_REGISTER_TIMEOUT_SEC },
-  { cli: 'codex', kind: HOOK_KINDS.SESSION, event: 'SessionStart', matcher: null, command: `${shimCommand(repoRoot, SESSION_REGISTER_ARGS)} >/dev/null || true`, timeout: SESSION_REGISTER_TIMEOUT_SEC },
-  { cli: 'agy', kind: HOOK_KINDS.SESSION, event: 'SessionStart', group: 'fgos-session-register', flat: true, command: `${shimCommand(repoRoot, SESSION_REGISTER_ARGS)} >/dev/null || true`, timeout: SESSION_REGISTER_TIMEOUT_SEC },
+  { cli: 'claude', kind: HOOK_KINDS.SESSION, event: 'SessionStart', matcher: null, command: `S=${CLAUDE_SHIM}; [ -x "$S" ] || exit 0; ${sessionRegisterCommand('"$S"')}`, legacyMarkers: SESSION_REGISTER_LEGACY, timeout: SESSION_REGISTER_TIMEOUT_SEC },
+  { cli: 'codex', kind: HOOK_KINDS.SESSION, event: 'SessionStart', matcher: null, command: sessionRegisterCommand(shimOperand(repoRoot)), legacyMarkers: SESSION_REGISTER_LEGACY, timeout: SESSION_REGISTER_TIMEOUT_SEC },
+  { cli: 'agy', kind: HOOK_KINDS.SESSION, event: 'SessionStart', group: 'fgos-session-register', flat: true, command: sessionRegisterCommand(shimOperand(repoRoot)), legacyMarkers: SESSION_REGISTER_LEGACY, timeout: SESSION_REGISTER_TIMEOUT_SEC },
   { cli: 'codex', kind: HOOK_KINDS.DISPATCH, event: 'PreToolUse', matcher: '.*', command: shimCommand(repoRoot, 'hook dispatch-decide') },
   { cli: 'codex', kind: HOOK_KINDS.DECISION, event: 'PreToolUse', matcher: 'RequestUserInput|ask.*', command: shimCommand(repoRoot, 'hook decision-question') },
   { cli: 'codex', kind: HOOK_KINDS.DELETE_GUARD, event: 'PreToolUse', matcher: '^(Bash|shell|exec_command|local_shell)$', command: wrappedDeleteGuard(repoRoot, HOOK_KINDS.DELETE_GUARD), ownedPattern: wrappedGuardPattern('') },

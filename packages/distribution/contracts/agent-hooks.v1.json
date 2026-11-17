@@ -50,7 +50,7 @@
         "kind": "session-register",
         "event": "SessionStart",
         "matcher": null,
-        "command": "S=\"${CLAUDE_PROJECT_DIR}/.fgos/installation/bin/fgos\"; [ -x \"$S\" ] || exit 0; \"$S\" identity session --register >/dev/null || true",
+        "command": "S=\"${CLAUDE_PROJECT_DIR}/.fgos/installation/bin/fgos\"; [ -x \"$S\" ] || exit 0; [ -n \"$FGOS_HEAD_ROLE\" ] && \"$S\" identity session --register --role \"$FGOS_HEAD_ROLE\" >/dev/null 2>&1 || \"$S\" identity session --register >/dev/null || true",
         "timeout": 10
       }
     ],
@@ -60,7 +60,7 @@
         "kind": "session-register",
         "event": "SessionStart",
         "matcher": null,
-        "command": "'<ROOT>/.fgos/installation/bin/fgos' identity session --register >/dev/null || true",
+        "command": "[ -n \"$FGOS_HEAD_ROLE\" ] && '<ROOT>/.fgos/installation/bin/fgos' identity session --register --role \"$FGOS_HEAD_ROLE\" >/dev/null 2>&1 || '<ROOT>/.fgos/installation/bin/fgos' identity session --register >/dev/null || true",
         "timeout": 10
       },
       {
@@ -110,7 +110,7 @@
         "event": "SessionStart",
         "group": "fgos-session-register",
         "flat": true,
-        "command": "'<ROOT>/.fgos/installation/bin/fgos' identity session --register >/dev/null || true",
+        "command": "[ -n \"$FGOS_HEAD_ROLE\" ] && '<ROOT>/.fgos/installation/bin/fgos' identity session --register --role \"$FGOS_HEAD_ROLE\" >/dev/null 2>&1 || '<ROOT>/.fgos/installation/bin/fgos' identity session --register >/dev/null || true",
         "timeout": 10
       },
       {

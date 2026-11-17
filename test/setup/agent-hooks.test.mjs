@@ -650,8 +650,9 @@ test('setup writes a SessionStart registration row for Claude Code, Codex and ag
   installAllAgentHooks(repoRoot);
   const shim = path.join(fs.realpathSync(repoRoot), '.fgos', 'installation', 'bin', 'fgos');
   const claude = readFile(repoRoot, 'claude').hooks.SessionStart;
-  assert.deepEqual(claude, [{ hooks: [{ type: 'command', command: `S="\${CLAUDE_PROJECT_DIR}/.fgos/installation/bin/fgos"; [ -x "$S" ] || exit 0; "$S" identity session --register >/dev/null || true`, timeout: 10 }] }]);
-  const command = `'${shim}' identity session --register >/dev/null || true`;
+  const registerOver = (operand) => `[ -n "$FGOS_HEAD_ROLE" ] && ${operand} identity session --register --role "$FGOS_HEAD_ROLE" >/dev/null 2>&1 || ${operand} identity session --register >/dev/null || true`;
+  assert.deepEqual(claude, [{ hooks: [{ type: 'command', command: `S="\${CLAUDE_PROJECT_DIR}/.fgos/installation/bin/fgos"; [ -x "$S" ] || exit 0; ${registerOver('"$S"')}`, timeout: 10 }] }]);
+  const command = registerOver(`'${shim}'`);
   assert.deepEqual(readFile(repoRoot, 'codex').hooks.SessionStart, [{ hooks: [{ type: 'command', command, timeout: 10 }] }]);
   assert.deepEqual(readFile(repoRoot, 'agy')['fgos-session-register'], { enabled: true, SessionStart: [{ type: 'command', command, timeout: 10 }] });
   for (const ext of ['.omp/extensions/fgos-hooks.ts', '.pi/extensions/fgos-hooks.ts']) {
@@ -670,6 +671,43 @@ test('setup writes a SessionStart registration row for Claude Code, Codex and ag
   agy['fgos-session-register'].SessionStart = [{ hooks: agy['fgos-session-register'].SessionStart }];
   fs.writeFileSync(agyFile, JSON.stringify(agy));
   assert.match(checkAgyHook(repoRoot).message, /in a shape AGY does not read: session-register SessionStart/);
+  fs.rmSync(repoRoot, { recursive: true, force: true });
+});
+
+test('the session-register row claims the head role when FGOS_HEAD_ROLE is set, falls back to a plain registration when the role is refused, and registers plainly when it is unset', () => {
+  const repoRoot = mkTempDir('agent-hooks-head-role-');
+  const log = path.join(repoRoot, 'calls.log');
+  const shimDir = path.join(repoRoot, '.fgos', 'installation', 'bin');
+  fs.mkdirSync(shimDir, { recursive: true });
+  // The fake shim records its arguments and refuses a --role claim when REFUSE_ROLE is set (a live session holds it).
+  fs.writeFileSync(path.join(shimDir, 'fgos'), `#!/bin/sh\necho "$*" >> "${log}"\ncase "$*" in *--role*) [ -n "$REFUSE_ROLE" ] && { echo role-held >&2; exit 65; };; esac\nexit 0\n`, { mode: 0o755 });
+  installAllAgentHooks(repoRoot);
+  const rows = readFile(repoRoot, 'claude').hooks.SessionStart;
+  const command = rows[0].hooks[0].command;
+  const run = (env) => {
+    fs.rmSync(log, { force: true });
+    const res = spawnSync('/bin/sh', ['-c', command], { env: { PATH: process.env.PATH, CLAUDE_PROJECT_DIR: repoRoot, ...env }, encoding: 'utf8' });
+    assert.equal(res.status, 0);
+    assert.equal(res.stdout, '');
+    return fs.readFileSync(log, 'utf8').trim().split('\n');
+  };
+  assert.deepEqual(run({}), ['identity session --register']);
+  assert.deepEqual(run({ FGOS_HEAD_ROLE: 'head:planner-probe' }), ['identity session --register --role head:planner-probe']);
+  assert.deepEqual(run({ FGOS_HEAD_ROLE: 'head:planner-probe', REFUSE_ROLE: '1' }), ['identity session --register --role head:planner-probe', 'identity session --register']);
+  fs.rmSync(repoRoot, { recursive: true, force: true });
+});
+
+test('an install replaces the earlier plain session-register command in place and never adds a second row', () => {
+  const repoRoot = mkTempDir('agent-hooks-register-upgrade-');
+  mockRunnableShim(repoRoot);
+  const file = path.join(repoRoot, FILES.claude);
+  fs.mkdirSync(path.dirname(file), { recursive: true });
+  const earlier = `S="\${CLAUDE_PROJECT_DIR}/.fgos/installation/bin/fgos"; [ -x "$S" ] || exit 0; "$S" identity session --register >/dev/null || true`;
+  fs.writeFileSync(file, JSON.stringify({ hooks: { SessionStart: [{ hooks: [{ type: 'command', command: earlier, timeout: 10 }] }] } }));
+  installAllAgentHooks(repoRoot);
+  const rows = readFile(repoRoot, 'claude').hooks.SessionStart;
+  assert.equal(rows.length, 1);
+  assert.match(rows[0].hooks[0].command, /--role "\$FGOS_HEAD_ROLE"/);
   fs.rmSync(repoRoot, { recursive: true, force: true });
 });
 

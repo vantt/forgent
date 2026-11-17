@@ -51,6 +51,10 @@ pub fn shim_relative() -> &'static str {
 pub use crate::shim::project_shim_path;
 
 const SESSION_REGISTER_ARGS: &str = "identity session --register";
+/// The role a head session is started with (`head:<persona>-<name>`); the register row claims it when set.
+const HEAD_ROLE_ENV: &str = "FGOS_HEAD_ROLE";
+/// The tail every earlier register command ended with; an install replaces such a row in place.
+const SESSION_REGISTER_LEGACY: &[&str] = &["identity session --register >/dev/null || true"];
 const SESSION_REGISTER_TIMEOUT_SEC: u64 = 10;
 const AGY_ALLOW: &str = r#"{"decision":"allow"}"#;
 
@@ -316,6 +320,15 @@ fn absolute(path: &Path) -> PathBuf {
 
 fn shim_command(root: &Path, args: &str) -> String {
     format!("{} {args}", shim_operand(root))
+}
+
+/// The session-register command over a shim operand. A session started with `FGOS_HEAD_ROLE` claims that role;
+/// when the claim is refused (a live session holds it, as a rotation predecessor does) it registers without the
+/// role, which moves later. Unset, it registers plainly. Silent on failure.
+fn session_register_command(shim: &str) -> String {
+    format!(
+        "[ -n \"${HEAD_ROLE_ENV}\" ] && {shim} {SESSION_REGISTER_ARGS} --role \"${HEAD_ROLE_ENV}\" >/dev/null 2>&1 || {shim} {SESSION_REGISTER_ARGS} >/dev/null || true"
+    )
 }
 
 fn claude_shim() -> String {
@@ -601,7 +614,7 @@ pub fn hook_rows(root: &Path, mailbox_timeout: u64) -> Vec<HookRow> {
             None => row,
         }
     };
-    let session = shim_command(root, SESSION_REGISTER_ARGS);
+    let session = session_register_command(&shim_operand(root));
     vec![
         HookRow::new(
             "claude",
@@ -639,27 +652,21 @@ pub fn hook_rows(root: &Path, mailbox_timeout: u64) -> Vec<HookRow> {
             KIND_SESSION,
             "SessionStart",
             format!(
-                "S={}; [ -x \"$S\" ] || exit 0; \"$S\" {SESSION_REGISTER_ARGS} >/dev/null || true",
-                claude_shim()
+                "S={}; [ -x \"$S\" ] || exit 0; {}",
+                claude_shim(),
+                session_register_command("\"$S\"")
             ),
         )
+        .legacy(SESSION_REGISTER_LEGACY)
         .timeout(SESSION_REGISTER_TIMEOUT_SEC),
-        HookRow::new(
-            "codex",
-            KIND_SESSION,
-            "SessionStart",
-            format!("{session} >/dev/null || true"),
-        )
-        .timeout(SESSION_REGISTER_TIMEOUT_SEC),
-        HookRow::new(
-            "agy",
-            KIND_SESSION,
-            "SessionStart",
-            format!("{session} >/dev/null || true"),
-        )
-        .group("fgos-session-register")
-        .flat()
-        .timeout(SESSION_REGISTER_TIMEOUT_SEC),
+        HookRow::new("codex", KIND_SESSION, "SessionStart", session.clone())
+            .legacy(SESSION_REGISTER_LEGACY)
+            .timeout(SESSION_REGISTER_TIMEOUT_SEC),
+        HookRow::new("agy", KIND_SESSION, "SessionStart", session.clone())
+            .group("fgos-session-register")
+            .flat()
+            .legacy(SESSION_REGISTER_LEGACY)
+            .timeout(SESSION_REGISTER_TIMEOUT_SEC),
         HookRow::new(
             "codex",
             KIND_DISPATCH,

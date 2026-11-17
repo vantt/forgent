@@ -1,0 +1,21 @@
+# Phase 12: head-start use case and Identity registration at SessionStart
+
+Status: DONE_WITH_CONCERNS (one file outside the footprint needs a row; the live pane step was not run).
+
+## What changed
+- `src/session-host/head-start.mjs`: `startHeadSession({ persona, name, projectRoot, beside?, gen?, hostKind? }, ports?)`. Refuses a bad persona or name, a non-terminal host (`head-needs-interactive-host`) and a running rotation (`ports.rotationHolds`, supplied by phase 14; the lock is that phase's). Asks Identity (`fgos identity resolve head:<p>-<n>`) whether a live session holds the role; if so it fronts it and returns `{already:true}`. Otherwise it binds (`bindHeadSeat`: persona selector, so the crate takes `runner.personas.<p>.tier`, else `defaults.tier`), resolves the executor command, prepares the seat through `prepareSeat` (phase 11 door, no copy), pins the persona, renders the opening (persona section, which carries the skills line, plus the start ritual), and places it through the Session Host `start` with host `terminal`, key `head-<p>-<n>-<gen>`, display `{id, title}`, env `FGOS_HEAD_ROLE` and `FGOS_HEAD_GEN`, opening `typed`. Binding, seat, opening, pin and handoff load the runner lazily, because `src/session-host/` is layer 3 and the runner is above it.
+- Placement lookup: Terminal Control has no lookup by key prefix (`src/terminal-control/client.mjs` exposes none), so the live key is kept in `.fgos/runtime/session-rotation/<p>-<n>/placement.json` (atomic, `replaceDurably`), written after a successful start; a live role with no record is refused `placement-unknown`.
+- Hook row: the `session-register` row (Rust `agent_hooks.rs`, Node mirror `src/setup/agent-hooks.mjs`, contract `agent-hooks.v1.json`, golden vectors, this repo's `.claude/settings.json` through `installClaudeHook`) now reads `[ -n "$FGOS_HEAD_ROLE" ] && <shim> identity session --register --role "$FGOS_HEAD_ROLE" >/dev/null 2>&1 || <shim> identity session --register >/dev/null || true`: a refused claim falls back to a plain registration; unset registers as before. The three rows carry the earlier command's tail as a legacy marker, so an install replaces the old row in place (before this, an upgrade appended a second row; caught on this repo's own settings file, covered by a test).
+- Goldens: the 80 recorded command strings were rewritten mechanically; no new case was added because every existing case embeds the row, and the behaviour (role set, refused, unset) is proved by running the command against a fake shim in `test/setup/agent-hooks.test.mjs`.
+
+## Proof
+- `node scripts/run-tests.mjs test/session-host/head-start.test.mjs`: 8 pass (tier from persona not default, full persona text typed, role and generation env, beside, fronting, placement-unknown, refusals, no record after a refused start).
+- `test/setup/agent-hooks.test.mjs`: 44 pass (includes vector replay, role claim/fallback/unset, upgrade replaces in place).
+- `cargo test -p fgos-distribution agent_hooks`: 11 pass; clippy `-D warnings`, fmt, `cargo check --target aarch64-apple-darwin` green. The full `cargo test -p fgos-distribution` has 7 failures in git-dependent tests (`.git` is read-only here); none touch the hook table.
+- Real bind against this repo's config: `planner` binds at tier `advanced` (executor gemini).
+
+## Concerns
+1. `test/architecture.test.mjs` fails its one-to-one manifest check until `docs/architecture-manifest.json` has a row for `src/session-host/head-start.mjs` (outside the footprint; suggested kind `use-case`, next to `src/session-host/client.mjs`).
+2. The live step (open a herdr tab with `planner-probe`, read `fgos identity session`, retire it) was not run: it would start a real agent session in the user's herdr from a confined round. The default seat preparation (`prepareSeat` with a minimal round) is therefore unproven live; run the plan's live command through `npm run fgos:dev` first.
+3. `fgos identity resolve` output shape (`data.id`) is assumed; only exit code and `not-found` decide liveness.
+4. `.git` is read-only, so a prior `git checkout` of settings was impossible; `.claude/settings.json` was repaired by editing out the duplicate row my first install run appended, then re-run idempotently.
