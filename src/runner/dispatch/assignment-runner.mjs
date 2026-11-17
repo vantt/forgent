@@ -403,6 +403,11 @@ function validateAssignmentLegality(asgn, opts = {}) {
 /** The CLIs whose screens the terminal adapters of the agent protocol know. */
 const TERMINAL_CLIS = new Set(['claude', 'codex', 'agy', 'pi', 'omp']);
 
+/** How the prompt reaches a pane worker: what the caller asked for, else the resolved command declares, else inline. */
+export function terminalPromptDelivery(opts, resolvedCmd) {
+  return opts.promptDelivery ?? process.env.FGOS_HERDR_PROMPT_DELIVERY?.trim() ?? resolvedCmd.promptDelivery ?? 'inline';
+}
+
 /**
  * The argv an interactive agent starts with in a pane: the executor's own args without the prompt (the
  * supervisor types the brief at the prompt instead), the access to the run directory a claude seat
@@ -986,7 +991,7 @@ async function buildLaunch(attempt, ctx) {
       confinement: resolvedCmd.confinement,
       permissionMode: resolvedCmd.permissionMode,
       agentKind: interactive.kind ?? path.basename(prepResult.attempt.command),
-      delivery: opts.promptDelivery ?? process.env.FGOS_HERDR_PROMPT_DELIVERY?.trim() ?? resolvedCmd.promptDelivery ?? 'inline',
+      delivery: terminalPromptDelivery(opts, resolvedCmd),
       trustStore: interactive.trustStore,
       // claude asks for trust on the run directory it is granted too, not only on its working directory.
       trustAlso: interactive.kind === 'claude' ? addDirsOf(attemptArgs) : [],

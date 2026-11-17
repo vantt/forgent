@@ -8,6 +8,7 @@ import os from 'node:os';
 import { loadRunnerConfigForDir, validateRunnerConfigShape } from '../../src/runner/dispatch/config.mjs';
 import { RunnerConfigError } from '../../src/runner/dispatch/runner-config-error.mjs';
 import { normalizeLegacyConfinement } from '../../src/runner/dispatch/confinement/policies.mjs';
+import { terminalPromptDelivery } from '../../src/runner/dispatch/assignment-runner.mjs';
 import { resolveExecutorConfig, lookupExecutor } from '../../src/runner/dispatch/resolve.mjs';
 import { writeGlobalConfig, writeProjectConfig, withHome } from '../helpers/config-fixture.mjs';
 
@@ -94,6 +95,30 @@ test('A1: a removed field is named rather than ignored', () => {
     () => loadWith({ command: 'claude', args: ['{prompt}'], receipt: 'receiver-written-file' }),
     (err) => err instanceof RunnerConfigError && /receipt/.test(err.message) && /removed/.test(err.message),
   );
+});
+
+test('a pane worker takes its prompt delivery from the resolved command only, the environment never overrides it', () => {
+  const before = process.env.FGOS_HERDR_PROMPT_DELIVERY;
+  process.env.FGOS_HERDR_PROMPT_DELIVERY = 'file-pointer';
+  try {
+    assert.equal(terminalPromptDelivery({}, {}), 'inline');
+    assert.equal(terminalPromptDelivery({}, { promptDelivery: 'inline' }), 'inline');
+    assert.equal(terminalPromptDelivery({}, { promptDelivery: 'file-pointer' }), 'file-pointer');
+  } finally {
+    if (before === undefined) delete process.env.FGOS_HERDR_PROMPT_DELIVERY;
+    else process.env.FGOS_HERDR_PROMPT_DELIVERY = before;
+  }
+});
+
+test('a launch field declared on the executor is refused by name, pointing at the invocation that carries it', () => {
+  const fields = { command: 'claude', args: ['{prompt}'], adapter: 'cli-spawn', env: { A: '1' }, permissionMode: 'ask', promptDelivery: 'inline', confinement: FULL_CONFINEMENT, interactiveMode: { exitCommand: '/exit' }, liveOutput: { streamFlags: [], renderer: 'r' }, resourceBindings: [] };
+  for (const [field, value] of Object.entries(fields)) {
+    assert.throws(
+      () => loadWith({ [field]: value, invocations: [{ id: 'sample-cli', via: 'cli', command: 'claude', args: ['{prompt}'] }] }),
+      (err) => err instanceof RunnerConfigError && err.message.includes(`"${field}" was removed`) && /invocation/.test(err.message),
+      `expected "${field}" on the executor to be refused`,
+    );
+  }
 });
 
 test('A1: trustStore is declared where it is read, and only there', () => {

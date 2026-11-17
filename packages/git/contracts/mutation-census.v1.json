@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "55b6669df9cda4d58aabd7711099e9023ab19bfe77a6976b1a7699ad44d331f3",
+  "payloadDigest": "523cffcc72df536c1188a176a2fad3083a72f0316f6c766d3558e3800de80812",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "b8b886cee2ea5ce7ee1153e4795512db135a990de894c27e53c5e778b210be62",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -277,7 +277,7 @@
     "packages/config/rust/tests/golden_scope.rs": "ebcf9054e332984689d13529f2cbf7c80600cd2272eebaad99cb0cd639084afb",
     "packages/config/rust/tests/golden_snapshot.rs": "86ab3cfbc24c4628b773ab605851a252cc010a27bef43ba2e173201a0967bd3f",
     "packages/config/rust/tests/golden_standard.rs": "3bd34618f08bf494a9866ed803997e993e625e65ce01543e14c531d93cdeec07",
-    "packages/config/rust/tests/golden_validate.rs": "c424f48adb477a416b14344e6be574429c6315f5abef0eff02597682d7148ff3",
+    "packages/config/rust/tests/golden_validate.rs": "d83504f7a6f111bf8dd33df6af5900f0c1b88653385dd5a1c03dad7d31b3cb7d",
     "packages/config/rust/tests/inspect_verbs.rs": "a1ba88f0b5056847d4ba2c253c6790dce341c6c1f3b769f4712816e7a1b69ce0",
     "packages/config/rust/tests/lock_rows.rs": "271a60b5f310401dbf8f4ea395f6a4c82a60628428c2549d3c16804d89737a41",
     "packages/config/rust/tests/machine_files.rs": "a5f68680b61a0f92b62e466689f09a9591b4014dc5ac217301fdeba4f323149d",
@@ -1059,7 +1059,7 @@
     "src/runner/dispatch/agent-result-claim-contract.mjs": "9f49db7dee60837452d1ba57b97863cb391d56197080e7e7f256e513672f1bec",
     "src/runner/dispatch/assignment-layout.mjs": "a14f6f1b45e7942181b7ee05b9bb4086fcd705004e70a237fc8c2d11c7e272d9",
     "src/runner/dispatch/assignment-normalizer.mjs": "1e1a922ad6d9ef2c9d8f0e7f6fec77d2c8b83b27ce9adfc8eaf3ec69e200ce6b",
-    "src/runner/dispatch/assignment-runner.mjs": "9d8c1c970b7cde74e46cb535db114d529c32a7c31337091161466964ba8f129a",
+    "src/runner/dispatch/assignment-runner.mjs": "829b68f83b85d41eeb0902d3f151fd506ee1c31a00eff7c1d4f054f24ee6478b",
     "src/runner/dispatch/assignment.mjs": "44d721e6e0eaf0e60ee484203382ebc50c3d4f6dc886dcbb7b1bec399497c1e7",
     "src/runner/dispatch/brief.mjs": "c51d5398653cd6f839c2902134e627e57af7911b473fe16904478919c2d95e14",
     "src/runner/dispatch/cli.mjs": "4a0b1ed8bfe2dd026985005e80dc8b8fbef8d8a2132f9e2052a8568d491153b3",
@@ -3938,15 +3938,15 @@
     },
     {
       "path": "src/runner/dispatch/assignment-runner.mjs",
-      "line": 972,
+      "line": 977,
       "spawn": "prepareTerminalAttempt -> src/runner/dispatch/herdr-round.mjs:405",
       "binary": "(env FGOS_HERDR_BIN)",
       "class": "configured-binary"
     },
     {
       "path": "src/runner/dispatch/assignment-runner.mjs",
-      "line": 1468,
-      "spawn": "awaitBinding -> src/runner/dispatch/assignment-runner.mjs:1084",
+      "line": 1473,
+      "spawn": "awaitBinding -> src/runner/dispatch/assignment-runner.mjs:1089",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
     },

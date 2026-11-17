@@ -15,13 +15,11 @@ import { buildConfinementRequest, validateConfinementRequest } from '../../src/r
 
 const binding = (name) => [{ resource: 'private-home', target: { kind: 'env', name } }];
 
-test('credentialStoreOf: a declared store wins, an older private-home env binding implies one, anything else reads none', () => {
+test('credentialStoreOf: only a declared store counts, an older private-home env binding no longer implies one', () => {
   const declared = { use: 'pi', homeEnv: 'PI_CODING_AGENT_DIR', files: ['auth.json'] };
   assert.equal(credentialStoreOf({ command: 'codex', credentialStore: declared, resourceBindings: binding('CODEX_HOME') }), declared);
-  assert.deepEqual(credentialStoreOf({ command: '/usr/local/bin/Codex', resourceBindings: binding('CODEX_HOME') }), { use: 'codex', homeEnv: 'CODEX_HOME' });
+  assert.equal(credentialStoreOf({ command: '/usr/local/bin/Codex', resourceBindings: binding('CODEX_HOME') }), null);
   assert.equal(credentialStoreOf({ command: 'claude' }), null);
-  assert.equal(credentialStoreOf({ command: 'claude', resourceBindings: [{ resource: 'run-output', target: { kind: 'env', name: 'X' } }] }), null);
-  assert.equal(credentialStoreOf({ command: 'claude', resourceBindings: [{ resource: 'private-home', target: { kind: 'argument', token: '{H}' } }] }), null);
   assert.equal(credentialStoreOf(null), null);
 });
 
@@ -75,11 +73,11 @@ test('the runner config check refuses a malformed store and a store on an invoca
   refuse(cliInvocation({ confinement: { backend: 'bwrap' }, credentialStore: 'codex' }), /must be an object/);
 });
 
-test('the resolved command carries the declared store, or the one an older binding implies, or none', () => {
+test('the resolved command carries the declared store, and none for an older binding or no declaration', () => {
   const resolve = (invocations) => resolveExecutorCommand(runnerWith({ invocations }), { prompt: 'p', model: 'm', tier: 'standard', executorId: 'agent', fgosDir: os.tmpdir(), contentCarries: 'repo-content', invocationId: invocations[0].id });
   const confinement = { backend: 'bwrap' };
   assert.deepEqual(resolve([cliInvocation({ confinement, credentialStore: { use: 'pi', homeEnv: 'PI_CODING_AGENT_DIR' } })]).credentialStore, { use: 'pi', homeEnv: 'PI_CODING_AGENT_DIR' });
-  assert.deepEqual(resolve([cliInvocation({ confinement, resourceBindings: binding('CODEX_HOME') })]).credentialStore, store);
+  assert.equal(resolve([cliInvocation({ confinement, resourceBindings: binding('CODEX_HOME') })]).credentialStore, null);
   assert.equal(resolve([cliInvocation({ confinement })]).credentialStore, null);
 });
 
@@ -93,11 +91,11 @@ function requestFor(invocation) {
   });
 }
 
-test('the confinement request carries the store the invocation reads, declared or inferred, and rejects a malformed one', () => {
+test('the confinement request carries the store the invocation declares, and rejects a malformed one', () => {
   assert.deepEqual(requestFor({ command: 'codex', args: [], credentialStore: store }).invocation.credentialStore, store);
-  assert.deepEqual(requestFor({ command: 'codex', args: [], resourceBindings: binding('CODEX_HOME') }).invocation.credentialStore, store);
   assert.equal('credentialStore' in requestFor({ command: 'claude', args: [] }).invocation, false);
-  assert.equal('resourceBindings' in requestFor({ command: 'codex', args: [], resourceBindings: binding('CODEX_HOME') }).invocation, false);
+  const older = requestFor({ command: 'codex', args: [], resourceBindings: binding('CODEX_HOME') }).invocation;
+  assert.equal('credentialStore' in older || 'resourceBindings' in older, false);
   const request = requestFor({ command: 'codex', args: [], credentialStore: store });
   assert.throws(() => validateConfinementRequest({ ...request, invocation: { ...request.invocation, credentialStore: { use: 'codex' } } }), /invocation\.credentialStore .*"homeEnv"/);
 });
