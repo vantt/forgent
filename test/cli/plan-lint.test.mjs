@@ -12,7 +12,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
 
-import { writeProjectConfig } from '../helpers/config-fixture.mjs';
+import { writeGlobalConfig, writeProjectConfig } from '../helpers/config-fixture.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const FGOS = path.resolve(__dirname, '../../bin/fgos.mjs');
@@ -25,6 +25,8 @@ const FGOS = path.resolve(__dirname, '../../bin/fgos.mjs');
 // validateCapabilitiesShape here). Isolate HOME to a throwaway, empty
 // directory for every spawn so this suite never reads that shared file.
 const ISOLATED_HOME = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-plan-lint-home-'));
+// The machine declares the tool that serves impact-analysis, and it is not installed.
+writeGlobalConfig(ISOLATED_HOME, { runner: { executors: { 'gone-graph': { kind: 'tool', for: ['impact-analysis'], invocations: [{ via: 'cli', command: 'fgos-no-such-tool-binary', args: [] }] } } } });
 
 function run(cwd, args) {
   return spawnSync(process.execPath, [FGOS, ...args], {
@@ -38,8 +40,7 @@ function run(cwd, args) {
 // capability catalog and every other default come from the standard.
 function tmpCwd() {
   const cwd = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-plan-lint-cli-'));
-  // The tool that serves impact-analysis is not installed here.
-  const runner = { executor: { command: 'true', args: [] }, patterns: { seatBinding: { schema: 1 } }, executors: { 'gone-graph': { kind: 'tool', for: ['impact-analysis'], invocations: [{ via: 'cli', command: 'fgos-no-such-tool-binary', args: [] }] } } };
+  const runner = { executor: { command: 'true', args: [] }, patterns: { seatBinding: { schema: 1 } } };
   fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
   writeProjectConfig(cwd, { runner });
   return cwd;

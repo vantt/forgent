@@ -14,9 +14,11 @@ Branch `execution-read-door/p05` (base `origin/main` 8b4602f5c). Owner answers a
   critical was already the effective rigor) + tier flagship; `explain` (both) rigor critical + tier flagship;
   `business:synthesize` and both `delphi:synthesize` units tier standard.
 - `.fgos/config.yaml`: `maxTier: frontier` (Q4).
-- Labels (D9): `unservedToolAbilityOf` (tool-providers.mjs) + `isToolAbilityRow` (capability-config.mjs). A tool
-  ability is a row with no `prefer` pool and no `serves`; only such a row with no tool executor whose `for` lists it
-  is refused. Consumers: `propose-validate.mjs` (code `capability-tool-unserved`, was `capability-unregistered`),
+- Labels (D9): `unservedToolAbilityOf` (tool-providers.mjs, owning test in `test/runner/dispatch/tool-providers.test.mjs`).
+  A capability is a tool ability when a `kind: tool` executor lists it in `for` (name or alias); it is refused only
+  when none of those tools is probed present or stale. Any other capability is a label, whatever its row holds
+  (rows with only confinement, tier, rigor, a description, or empty). (Review F1: the first cut defined it as a row
+  with no prefer and no serves, which caught ordinary label rows; replaced.) Consumers: `propose-validate.mjs` (code `capability-tool-unserved`, was `capability-unregistered`),
   `capability-plan-lint.mjs` (code `capability.tool-unserved`, was `capability.unregistered`; API now takes the
   runner config, `bin/fgos.mjs` passes it), doctor `workflow-capabilities-configured` (fails only for an unserved tool
   ability; the no-prefer-pool warning and `RUNNER_LOOP_CAPABILITY_USES` are gone).
@@ -24,6 +26,8 @@ Branch `execution-read-door/p05` (base `origin/main` 8b4602f5c). Owner answers a
   `isCapabilityDeclared`, `hasPreferPool` deleted.
 - Strict confinement: shown on the post-change tree that a label seat launched unconfined in strict mode
   (`buildConfinementRequest`, omitted branch); it is now refused at launch by name (`confinement-policy-missing`).
+  The lookup is exact-key, so an alias of a confined row is refused too; the message says an alias does not count
+  (review F4).
 - Phase 14 nits: `checked.mjs` ladder check kept with a comment (definition-time error naming step and unit);
   `unit.mjs` doc comment says outside-input builders must call `assertNoUnitTier`.
 - Doctrine: `capability-catalog.md`, `planning-capability-awareness.md`, `fgos-cook/references/propose.md`,
@@ -86,10 +90,16 @@ Every difference is explained by Q2, Q3 or Q4; none unexplained.
 | confinement p04 "R7 read-only slots unconfined" | behaviour removed (catalog deleted; standard rows declare host-write-denied) |
 | doctor "names a capability config lacks", "prefix entry / bare verb", "warns no prefer pool", "clean with prefer pool" | `checks-doctor-config.test.mjs` "label passes" and "fails only for an unserved tool ability" |
 | plan-lint phase units "flags every unit as unregistered", "exact key and prefix entry" | `capability-plan-lint.test.mjs` "lintPhaseUnits accepts a label and warns on a tool ability..." |
-| capability-config `isCapabilityDeclared`/`hasPreferPool` assertions | behaviour removed (functions deleted); `isToolAbilityRow` case added |
+| capability-config `isCapabilityDeclared`/`hasPreferPool` assertions | behaviour removed (functions deleted); the tool-ability rule is owned by `tool-providers.test.mjs` |
 | bind-committed-config claude-first cases for architecture/business rows | same test on `coding:discover` (dropped orders: Q2) |
 
 ## Gates run
+
+- After review (F1, F4) and merging origin/main with a regenerated census: tool-providers, propose, propose-validate,
+  capability-plan-lint, cli plan-lint, checks-doctor-config, yaml-parse-failures, capability-config,
+  dispatch-confinement-policies, seat-binding-dry-bind, capability-catalog-doctrine, bind-committed-config,
+  advisory-m-contracts, discussion-workflows, git-mutation-census, architecture, doc-health,
+  check-decision-citation-drift, setup/checks: all green, no ERROR lines.
 
 - Red commit c695a480d pushed first. Green head below.
 - Node, one file per run via `scripts/run-tests.mjs`: 126 files (every file using the config fixture helpers,
@@ -105,7 +115,11 @@ Every difference is explained by Q2, Q3 or Q4; none unexplained.
 - `src/cli/command-registry.mjs` plan-lint description ("unregistered capability shape") and the
   `explain --for architecture:synthesize` example are stale text; the manifest is regenerated only by phase 10, so I
   left both for it (the example still works: explain of a label).
-- Phase 12: doors row "capability rows hold jobs and tool abilities" (debt entries above); seat-binding spec narrative.
+- Phase 12: doors row "capability rows hold jobs and tool abilities" (debt entries above); specs still naming deleted
+  symbols: `docs/platform/runner/subcomponents/h-6979005beaf7/spec.md:193` (`RUNNER_LOOP_CAPABILITY_USES`),
+  `docs/platform/config/spec.md:161` and `docs/platform/seat-binding/spec.md:476` (`DEFAULT_CAPABILITY_SLOTS`); the
+  CHANGELOG line must say another project with `maxTier: flagship` now has its architecture frontier seats capped at
+  flagship. Lines added to the phase 10 and phase 12 files.
 - `docs/reference/runner-capabilities-advise-execute-slots.md` still describes a retired `advise-execute-capabilities-configured`
   check (pre-existing, out of scope).
 
@@ -117,6 +131,6 @@ Every difference is explained by Q2, Q3 or Q4; none unexplained.
 
 ## Unresolved questions
 
-- None blocking. Definition choice to confirm in review: "tool ability" = a row with no `prefer` and no `serves`.
+- None.
 
 Status: DONE
