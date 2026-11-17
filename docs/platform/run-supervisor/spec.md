@@ -259,6 +259,8 @@ What happens when the controller of `fgos run` goes away, by cause. The contract
 
 A unit whose controller died never continues on its own. Only an explicit `fgos run --resume <unit>` goes on (owner decision 2026-10-16). `dispatch inspect`, `dispatch show-run` and `fgos run --json` name the state (`unitState`, `attemptState`, `resumeCommand`); `fgos doctor` no longer counts them: read them per run.
 
+`fgos dispatch inspect --attention --since <T>` (`T` is an RFC 3339 time or a `YYYY-MM-DD` date, midnight UTC) is the one read across every worktree of the project: it lists the runs started or settled at or after `T` that need a person, one line each with the kind, reason and next command (`failed`, `blocked`, `refused`, `needs-human`, or `past-deadline` for a live run past its declared timeout). It reads the run records and writes nothing. The deadline row comes from the run record's `startedAt` and `timeoutMs` with a held attempt lock, not from the supervisor's clock; there are no idle rows, because the supervisor keeps its idle clock in memory and writes no readable record of it ("Idle in a pane"). It takes exactly one selector, so `--attention` needs `--since` and no other selector.
+
 `--resume` goes through adopt for the last attempt of every seat and round, before anything else, and never starts a second supervisor for an attempt that already has a binding or a receipt (`supervise` refuses to start there):
 
 | Attempt state | Resume |
