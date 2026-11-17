@@ -1,4 +1,5 @@
-import { attentionView, inspectDispatchRuntime, validateInspectionSelector, withRunsCache } from '../../runner/dispatch/runtime-inspection.mjs';
+import { inspectDispatchRuntime, validateInspectionSelector, withRunsCache } from '../../runner/dispatch/runtime-inspection.mjs';
+import { attentionView } from '../../runner/dispatch/attention-view.mjs';
 import { readMachineConfig } from '../../config/facade.mjs';
 import { inspectProviderCapacity } from '../../runner/dispatch/provider-capacity.mjs';
 import { readAttemptView } from './show-run.mjs';
