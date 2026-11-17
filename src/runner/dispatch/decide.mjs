@@ -19,7 +19,7 @@ import { compileDispatchPlan } from './plan.mjs';
  * main checkout. A worktree whose config file the door refuses surfaces the refusal; only not finding a
  * repository for `cwd` falls back to `root`.
  */
-function configRootFor(cwd, root) {
+export function configRootFor(cwd, root) {
   if (!cwd) return root;
   let wtRoot;
   let mainRoot;
@@ -169,7 +169,7 @@ export async function decideExecutorCli(
   }
   const root = repoRoot ?? resolveMainCheckoutRoot(cwd) ?? resolveRepoRoot(cwd);
   const configRoot = configRootFor(cwd, root);
-  const cfg = withDefaultExecutor(loadRunnerConfigForDir(configRoot));
+  const loaded = loadRunnerConfigForDir(configRoot);
 
   let workHint;
   if (!executorIdArg && workIdArg) {
@@ -178,14 +178,7 @@ export async function decideExecutorCli(
         `--work needs the Work layer to resolve "${workIdArg}" to its dispatch executor; run "fgos dispatch decide --work ${workIdArg}" instead of the bare dispatch module.`,
       );
     }
-    const resolved = resolveWork({ workId: workIdArg, stage: stageArg, fgosDir: fgosDirFromRoot(root) });
-    if (!resolved) {
-      throw new RunnerConfigError(`no work item "${workIdArg}" found -- cannot resolve its dispatch executor.`);
-    }
-    // The executor identity is required (null when the Workflow declares none); a resolver
-    // that leaves it out is refused by the plan instead of falling back to a default executor.
-    refuseWorkItemInput(resolved, 'the --work resolver result', WORK_ITEM_KEYS);
-    workHint = resolved;
+    workHint = resolveWork({ workId: workIdArg, stage: stageArg, fgosDir: fgosDirFromRoot(root) }) ?? undefined;
   }
 
   let assignmentItem;
@@ -204,7 +197,7 @@ export async function decideExecutorCli(
     }
   }
 
-  const plan = compileDispatchPlan(cfg, {
+  return decideOver(loaded, {
     executorId: executorIdArg,
     for: purpose,
     workId: workIdArg,
@@ -215,6 +208,26 @@ export async function decideExecutorCli(
     workHint,
     assignmentItem,
     repoRoot: configRoot,
+  });
+}
+
+/**
+ * The decision over a runner config already loaded and checked: the default executor layered on, the Work hint
+ * refused when it carries a Work item, then the plan and the answer `decide` prints. `workHint` is what the Work
+ * layer resolved for `workId` (undefined when it found no item); `assignmentItem` the record `assignment` names;
+ * `repoRoot` the root a tool's `scanTarget` and `HEAD` resolve against.
+ */
+export function decideOver(loadedRunner, { executorId: executorIdArg, workId: workIdArg, workHint, ...selectors } = {}) {
+  if (!executorIdArg && workIdArg && workHint) {
+    // The executor identity is required (null when the Workflow declares none); a resolver
+    // that leaves it out is refused by the plan instead of falling back to a default executor.
+    refuseWorkItemInput(workHint, 'the --work resolver result', WORK_ITEM_KEYS);
+  }
+  const plan = compileDispatchPlan(withDefaultExecutor(loadedRunner), {
+    executorId: executorIdArg,
+    workId: workIdArg,
+    workHint,
+    ...selectors,
   });
 
   const resolvedIndirectly = !executorIdArg;

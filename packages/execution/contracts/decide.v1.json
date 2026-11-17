@@ -1,0 +1,692 @@
+{
+ "version": "decide.v1",
+ "about": "Golden vectors of fgos dispatch decide and of the PreToolUse dispatch hook, recorded from the Node code that answers them today (scripts/decide-vectors.mjs; evaluator test/helpers/decide-vectors.helper.mjs). A vector is { name, fact, runner?, machine?, args, expect, nativeExpect? }. fact decide: the decision over a loaded runner section (the semantic config check under the label 'vector runner' first, then the default executor layered on and the answer), args the selectors (executorId, for, workId with workHint, assignment with assignmentItem, needsSoul, hasLiveTaskAccess), machine what the tool probe reads as in executor-model.v1.json. fact configRoot: whose config a decide reads over a main checkout and one linked worktree. fact repoRootGuard: --repo-root without --cwd. fact hookPayload: the normalized hook call. fact hookVerdict: the hook's verdict for a call, decide answering args.decided or failing with args.failure. fact hookAnswer: what the hook prints and exits with. expect is the answer, a refusal being { error: { name, code?, message } }. nativeExpect, where present, is the native answer where it differs on purpose (the usage text names fgos dispatch decide, not the retired Node alias). The rules of the semantic config check itself are proven by the validate vectors of executor-model.v1.json and are not repeated here.",
+ "facts": ["decide","configRoot","repoRootGuard","hookPayload","hookVerdict","hookAnswer","attribute","globalRigorToTier"],
+ "vectors": [
+  {
+   "name": "decide: no selector is refused with the usage",
+   "fact": "decide",
+   "runner": {},
+   "args": {},
+   "expect": {"error":{"name":"RunnerConfigError","message":"usage: node src/runner/dispatch.mjs decide <executorId> [--has-live-task-access] | decide --for <purpose> [--needs-soul] [--has-live-task-access] | decide --work <workId> [--stage <stage>] [--has-live-task-access] | decide --assignment <assignmentId> [--has-live-task-access] | decide --needs-soul [--has-live-task-access]"}},
+   "nativeExpect": {"error":{"name":"RunnerConfigError","message":"usage: fgos dispatch decide <executorId> [--has-live-task-access] | decide --for <purpose> [--needs-soul] [--has-live-task-access] | decide --work <workId> [--stage <stage>] [--has-live-task-access] | decide --assignment <assignmentId> [--has-live-task-access] | decide --needs-soul [--has-live-task-access]"}}
+  },
+  {
+   "name": "decide: an agent executor named with live task access runs in process with its agent type",
+   "fact": "decide",
+   "runner": {"executors":{"vec-agent":{"kind":"agent","agentType":"vec-agent-type"}}},
+   "args": {"executorId":"vec-agent","hasLiveTaskAccess":true},
+   "expect": {"mechanism":"in-process","agentType":"vec-agent-type","configured":true,"reasonCodes":["native-first.rule-2.live-task-access"]}
+  },
+  {
+   "name": "decide: an agent executor named without live task access has no command to run and no default executor",
+   "fact": "decide",
+   "runner": {"executors":{"vec-agent":{"kind":"agent","agentType":"vec-agent-type"}}},
+   "args": {"executorId":"vec-agent"},
+   "expect": {"mechanism":"unavailable","configured":true,"reasonCodes":["native-first.0033.cli-spawn-shaped","governance.blocked"],"blockedReason":"no runner.executor: none set and no assistant CLI found on PATH; set one with fgos config set runner.executor ... --reason ..."}
+  },
+  {
+   "name": "decide: an executor id with no registry entry is unavailable",
+   "fact": "decide",
+   "runner": {"executors":{"vec-agent":{"kind":"agent"}}},
+   "args": {"executorId":"vec-ghost","hasLiveTaskAccess":true},
+   "expect": {"mechanism":"unavailable","configured":false,"reasonCodes":["native-first.0033.cli-spawn-shaped","selector.unregistered"]}
+  },
+  {
+   "name": "decide: a claude cli executor runs out of process",
+   "fact": "decide",
+   "runner": {"executors":{"vec-cli":{"kind":"agent","providerModel":"claude","invocations":[{"id":"vec-cli-x","via":"cli","adapter":"cli-spawn","command":"claude","args":[]}]}}},
+   "args": {"executorId":"vec-cli","hasLiveTaskAccess":true},
+   "expect": {"mechanism":"out-of-process","configured":true,"reasonCodes":["native-first.0033.cli-spawn-shaped"]}
+  },
+  {
+   "name": "decide: a cli invocation without args cannot be resolved to a command",
+   "fact": "decide",
+   "runner": {"executors":{"vec-cli":{"kind":"agent","providerModel":"claude","invocations":[{"id":"vec-cli-x","via":"cli","command":"claude"}]}}},
+   "args": {"executorId":"vec-cli"},
+   "expect": {"mechanism":"unavailable","configured":true,"reasonCodes":["native-first.0033.cli-spawn-shaped","governance.blocked"],"blockedReason":"runner config \"executor\" must have a string \"command\" and an \"args\" array."}
+  },
+  {
+   "name": "decide: a cross-provider cli executor without allowCrossProvider is blocked",
+   "fact": "decide",
+   "runner": {"executors":{"vec-codex":{"kind":"agent","providerModel":"openai","invocations":[{"id":"vec-codex-x","via":"cli","command":"codex","args":[]}]}}},
+   "args": {"executorId":"vec-codex"},
+   "expect": {"mechanism":"unavailable","configured":true,"reasonCodes":["native-first.0033.cli-spawn-shaped","governance.blocked"],"blockedReason":"executor \"vec-codex\" resolves to cross-provider egress target \"codex\" — prompt content would leave the Claude ecosystem. Set executors.vec-codex.allowCrossProvider: true to permit this."}
+  },
+  {
+   "name": "decide: a cross-provider cli executor with allowCrossProvider runs out of process",
+   "fact": "decide",
+   "runner": {"executors":{"vec-codex":{"kind":"agent","providerModel":"openai","allowCrossProvider":true,"invocations":[{"id":"vec-codex-x","via":"cli","command":"codex","args":[]}]}}},
+   "args": {"executorId":"vec-codex"},
+   "expect": {"mechanism":"out-of-process","configured":true,"reasonCodes":["native-first.0033.cli-spawn-shaped"]}
+  },
+  {
+   "name": "decide: a base URL whose host is not the Anthropic API routes egress across providers",
+   "fact": "decide",
+   "runner": {"executors":{"vec-cli":{"kind":"agent","providerModel":"claude","invocations":[{"id":"vec-cli-x","via":"cli","command":"claude","args":[],"env":{"ANTHROPIC_BASE_URL":"https://evil.example.com/api.anthropic.com"}}]}}},
+   "args": {"executorId":"vec-cli"},
+   "expect": {"mechanism":"unavailable","configured":true,"reasonCodes":["native-first.0033.cli-spawn-shaped","governance.blocked"],"blockedReason":"executor \"vec-cli\" resolves to cross-provider egress target \"https://evil.example.com/api.anthropic.com\" — prompt content would leave the Claude ecosystem. Set executors.vec-cli.allowCrossProvider: true to permit this."}
+  },
+  {
+   "name": "decide: a base URL on a subdomain of the Anthropic API stays within the provider",
+   "fact": "decide",
+   "runner": {"executors":{"vec-cli":{"kind":"agent","providerModel":"claude","invocations":[{"id":"vec-cli-x","via":"cli","command":"claude","args":[],"env":{"BASE_URL":"https://eu.api.anthropic.com/v1"}}]}}},
+   "args": {"executorId":"vec-cli"},
+   "expect": {"mechanism":"out-of-process","configured":true,"reasonCodes":["native-first.0033.cli-spawn-shaped"]}
+  },
+  {
+   "name": "decide: an executor that declares what content it carries is blocked, decide declares none",
+   "fact": "decide",
+   "runner": {"executors":{"vec-cli":{"kind":"agent","providerModel":"claude","carries":"user-text","invocations":[{"id":"vec-cli-x","via":"cli","command":"claude","args":[]}]}}},
+   "args": {"executorId":"vec-cli"},
+   "expect": {"mechanism":"unavailable","configured":true,"reasonCodes":["native-first.0033.cli-spawn-shaped","governance.blocked"],"blockedReason":"executor \"vec-cli\" declares \"carries: user-text\" but this dispatch did not declare what content it carries — pass an explicit content class before dispatch."}
+  },
+  {
+   "name": "decide: an executor with only an mcp invocation cannot be dispatched through a cli",
+   "fact": "decide",
+   "runner": {"executors":{"vec-mcp":{"kind":"agent","providerModel":"claude","invocations":[{"id":"m","via":"mcp"}]}}},
+   "args": {"executorId":"vec-mcp"},
+   "expect": {"mechanism":"unavailable","configured":true,"reasonCodes":["native-first.0033.cli-spawn-shaped","governance.blocked"],"blockedReason":"executor \"vec-mcp\" declares \"invocations\" but none is dispatchable via \"cli\" (has: mcp) — resolveExecutorConfig only ever spawns a cli invocation; this executor cannot be dispatched this way."}
+  },
+  {
+   "name": "decide: the default executor layered on answers to its own command",
+   "fact": "decide",
+   "runner": {"executor":{"command":"claude","args":["-p"]}},
+   "args": {"for":"claude"},
+   "expect": {"mechanism":"out-of-process","configured":true,"reasonCodes":["native-first.0033.cli-spawn-shaped"],"executorId":"claude"}
+  },
+  {
+   "name": "decide: a purpose a present cli tool serves is answered in process with its command and every provider probed",
+   "fact": "decide",
+   "runner": {"capabilities":{"vec-cap":{}},"executors":{"vec-tool":{"kind":"tool","for":["vec-cap"],"invocations":[{"via":"cli","command":"vec-tool-cmd"}]},"vec-tool-b":{"kind":"tool","for":["vec-cap"],"invocations":[{"via":"cli","command":"vec-other"}]}}},
+   "machine": {"pathCommands":["vec-other"]},
+   "args": {"for":"vec-cap"},
+   "expect": {"mechanism":"in-process","command":"vec-other","providers":[{"executorId":"vec-tool","status":"missing"},{"executorId":"vec-tool-b","status":"present"}],"configured":true,"reasonCodes":["tool.present"],"executorId":"vec-tool-b"}
+  },
+  {
+   "name": "decide: a purpose whose only tool is missing is unavailable",
+   "fact": "decide",
+   "runner": {"capabilities":{"vec-cap":{}},"executors":{"vec-tool":{"kind":"tool","for":["vec-cap"],"invocations":[{"via":"cli","command":"vec-tool-cmd"}]}}},
+   "machine": {"pathCommands":[]},
+   "args": {"for":"vec-cap","needsSoul":true,"hasLiveTaskAccess":true},
+   "expect": {"mechanism":"unavailable","providers":[{"executorId":"vec-tool","status":"missing"}],"configured":true,"reasonCodes":["tool.missing"],"executorId":"vec-tool"}
+  },
+  {
+   "name": "decide: a purpose whose mcp tool index is behind HEAD is in process and stale",
+   "fact": "decide",
+   "runner": {"capabilities":{"vec-cap":{}},"executors":{"vec-index":{"kind":"tool","for":["vec-cap"],"scanTarget":".vec-index","invocations":[{"via":"mcp","tools":{"vec-cap":"mcp__vec__run"}}]}}},
+   "machine": {"files":{".vec-index/meta.json":"{\"lastCommit\":\"0000000000000000000000000000000000000000\"}"},"git":true},
+   "args": {"for":"vec-cap"},
+   "expect": {"mechanism":"in-process","mcpTool":"mcp__vec__run","stale":true,"providers":[{"executorId":"vec-index","status":"stale"}],"configured":true,"reasonCodes":["tool.stale"],"executorId":"vec-index"}
+  },
+  {
+   "name": "decide: a present tool that names nothing to call is unavailable",
+   "fact": "decide",
+   "runner": {"capabilities":{"vec-cap":{}},"executors":{"vec-index":{"kind":"tool","for":["vec-cap"],"scanTarget":".vec-index","invocations":[{"via":"mcp","tools":{}}]}}},
+   "machine": {"files":{".vec-index/meta.json":"{}"}},
+   "args": {"for":"vec-cap"},
+   "expect": {"mechanism":"unavailable","providers":[{"executorId":"vec-index","status":"present"}],"configured":true,"reasonCodes":["tool.unnamed"],"executorId":"vec-index"}
+  },
+  {
+   "name": "decide: a tool with nothing to probe is unprobeable",
+   "fact": "decide",
+   "runner": {"capabilities":{"vec-cap":{}},"executors":{"vec-bare":{"kind":"tool","for":["vec-cap"]}}},
+   "args": {"for":"vec-cap"},
+   "expect": {"mechanism":"unavailable","providers":[{"executorId":"vec-bare","status":"unknown"}],"configured":true,"reasonCodes":["tool.unprobeable"],"executorId":"vec-bare"}
+  },
+  {
+   "name": "decide: a positional name a tool serves is answered like a purpose, without naming the executor",
+   "fact": "decide",
+   "runner": {"capabilities":{"vec-cap":{}},"executors":{"vec-tool":{"kind":"tool","for":["vec-cap"],"invocations":[{"via":"cli","command":"vec-tool-cmd"}]}}},
+   "machine": {"pathCommands":["vec-tool-cmd"]},
+   "args": {"executorId":"vec-cap"},
+   "expect": {"mechanism":"in-process","command":"vec-tool-cmd","providers":[{"executorId":"vec-tool","status":"present"}],"configured":true,"reasonCodes":["tool.present"]}
+  },
+  {
+   "name": "decide: a purpose naming a registered executor is that executor",
+   "fact": "decide",
+   "runner": {"executors":{"vec-agent":{"kind":"agent","agentType":"vec-agent-type"}}},
+   "args": {"for":"vec-agent","hasLiveTaskAccess":true},
+   "expect": {"mechanism":"in-process","agentType":"vec-agent-type","configured":true,"reasonCodes":["native-first.rule-2.live-task-access"],"executorId":"vec-agent"}
+  },
+  {
+   "name": "decide: an unknown purpose with need-soul and live task access runs in process",
+   "fact": "decide",
+   "runner": {},
+   "args": {"for":"planner","needsSoul":true,"hasLiveTaskAccess":true},
+   "expect": {"mechanism":"in-process","configured":false,"reasonCodes":["native-first.rule-2.live-task-access"]}
+  },
+  {
+   "name": "decide: an unknown purpose with need-soul and no live task access runs out of process",
+   "fact": "decide",
+   "runner": {},
+   "args": {"for":"planner","needsSoul":true},
+   "expect": {"mechanism":"out-of-process","configured":false,"reasonCodes":["native-first.rule-1.no-native-mechanism"]}
+  },
+  {
+   "name": "decide: an unknown purpose alone is unavailable and named unknown",
+   "fact": "decide",
+   "runner": {},
+   "args": {"for":"planner"},
+   "expect": {"mechanism":"unavailable","configured":false,"reasonCodes":["selector.unregistered","capability.unknown"]}
+  },
+  {
+   "name": "decide: a registered capability without a prefer pool is unavailable but not unknown",
+   "fact": "decide",
+   "runner": {"capabilities":{"vec-row":{"aliases":["vec-alias"]}}},
+   "args": {"for":"vec-alias"},
+   "expect": {"mechanism":"unavailable","configured":false,"reasonCodes":["selector.unregistered"]}
+  },
+  {
+   "name": "decide: need-soul alone runs in process with live task access",
+   "fact": "decide",
+   "runner": {},
+   "args": {"needsSoul":true,"hasLiveTaskAccess":true},
+   "expect": {"mechanism":"in-process","configured":false,"reasonCodes":["native-first.rule-2.live-task-access"]}
+  },
+  {
+   "name": "decide: a work hint naming a registered executor is that executor",
+   "fact": "decide",
+   "runner": {"executors":{"vec-agent":{"kind":"agent","agentType":"vec-agent-type"}}},
+   "args": {"workId":"tsk-vec","workHint":{"workExecutorId":"vec-agent","agentType":null},"hasLiveTaskAccess":true},
+   "expect": {"mechanism":"in-process","agentType":"vec-agent-type","configured":true,"reasonCodes":["native-first.rule-2.live-task-access"],"executorId":"vec-agent"}
+  },
+  {
+   "name": "decide: a work hint naming no executor with no default executor dispatches native-first",
+   "fact": "decide",
+   "runner": {},
+   "args": {"workId":"tsk-vec","workHint":{"workExecutorId":null},"hasLiveTaskAccess":true},
+   "expect": {"mechanism":"in-process","configured":false,"reasonCodes":["native-first.rule-2.live-task-access"]}
+  },
+  {
+   "name": "decide: a work hint naming an unregistered executor dispatches native-first under that name",
+   "fact": "decide",
+   "runner": {},
+   "args": {"workId":"tsk-vec","workHint":{"workExecutorId":"vec-ghost"}},
+   "expect": {"mechanism":"out-of-process","configured":false,"reasonCodes":["native-first.rule-1.no-native-mechanism"],"executorId":"vec-ghost"}
+  },
+  {
+   "name": "decide: a work hint naming an unregistered executor under a default executor still dispatches native-first",
+   "fact": "decide",
+   "runner": {"executor":{"command":"claude","args":["-p"]},"modelPolicies":{"claude":{"standard":"sonnet"}}},
+   "args": {"workId":"tsk-vec","workHint":{"workExecutorId":"vec-ghost"},"hasLiveTaskAccess":true},
+   "expect": {"mechanism":"in-process","configured":false,"reasonCodes":["native-first.rule-2.live-task-access"],"executorId":"vec-ghost"}
+  },
+  {
+   "name": "decide: a work hint naming a capability a tool serves is answered by the tool",
+   "fact": "decide",
+   "runner": {"capabilities":{"vec-cap":{}},"executors":{"vec-tool":{"kind":"tool","for":["vec-cap"],"invocations":[{"via":"cli","command":"vec-tool-cmd"}]}}},
+   "machine": {"pathCommands":["vec-tool-cmd"]},
+   "args": {"workId":"tsk-vec","workHint":{"workExecutorId":"vec-cap"}},
+   "expect": {"mechanism":"in-process","command":"vec-tool-cmd","providers":[{"executorId":"vec-tool","status":"present"}],"configured":true,"reasonCodes":["tool.present"],"executorId":"vec-tool"}
+  },
+  {
+   "name": "decide: a work id the Work layer found no item for is refused",
+   "fact": "decide",
+   "runner": {},
+   "args": {"workId":"tsk-vec"},
+   "expect": {"error":{"name":"RunnerConfigError","message":"no work item \"tsk-vec\" found -- cannot resolve its dispatch executor."}}
+  },
+  {
+   "name": "decide: a work hint without the executor identity is refused",
+   "fact": "decide",
+   "runner": {},
+   "args": {"workId":"tsk-vec","workHint":{"agentType":"x"}},
+   "expect": {"error":{"name":"RunnerConfigError","message":"work item \"tsk-vec\" was supplied without the executor identity its Workflow step resolves to -- the Work layer must resolve it (dispatch does not look steps up)."}}
+  },
+  {
+   "name": "decide: a work hint carrying a Work item is refused",
+   "fact": "decide",
+   "runner": {},
+   "args": {"workId":"tsk-vec","workHint":{"workExecutorId":null,"workItem":{}}},
+   "expect": {"error":{"name":"RunnerConfigError","message":"the --work resolver result takes no Work item (workItem): pass its demand as generic inputs (assignment rigor/domain, a work hint, capability hints, agent type)"}}
+  },
+  {
+   "name": "decide: an assignment with no readable record is unavailable",
+   "fact": "decide",
+   "runner": {"executors":{"vec-agent":{"kind":"agent"}}},
+   "args": {"assignment":"asg-vec","hasLiveTaskAccess":true},
+   "expect": {"mechanism":"unavailable","configured":false,"reasonCodes":["selector.unregistered"]}
+  },
+  {
+   "name": "decide: an assignment record runs on the executor its dispatch policy names",
+   "fact": "decide",
+   "runner": {"executors":{"vec-agent":{"kind":"agent","providerModel":"claude","agentType":"vec-agent-type"}},"modelPolicies":{"claude":{"standard":"sonnet"}}},
+   "args": {"assignment":"asg-vec","assignmentItem":{"assignmentId":"asg-vec","operation":"vec-op","policy":{"preferExecutor":"vec-agent"},"skills":[]},"hasLiveTaskAccess":true},
+   "expect": {"mechanism":"in-process","agentType":"vec-agent-type","configured":true,"reasonCodes":["native-first.rule-2.live-task-access"],"executorId":"vec-agent"}
+  },
+  {
+   "name": "decide: a purpose with a prefer pool of its own is bound by Seat Binding",
+   "fact": "decide",
+   "runner": {"executors":{"vec-agent":{"kind":"agent","providerModel":"claude","agentType":"vec-agent-type"}},"modelPolicies":{"claude":{"standard":"sonnet"}},"capabilities":{"vec-row":{"prefer":"vec-agent","tier":"standard"}}},
+   "args": {"for":"vec-row","hasLiveTaskAccess":true},
+   "expect": {"mechanism":"in-process","agentType":"vec-agent-type","configured":true,"reasonCodes":["native-first.rule-2.live-task-access"],"executorId":"vec-agent"}
+  },
+  {
+   "name": "decide: a purpose whose prefer pool cannot serve the seat is unavailable with the refusal",
+   "fact": "decide",
+   "runner": {"executors":{"vec-agent":{"kind":"agent","providerModel":"claude"}},"modelPolicies":{"claude":{"standard":"sonnet"}},"capabilities":{"vec-row":{"prefer":"vec-agent","tier":"frontier"}}},
+   "args": {"for":"vec-row","hasLiveTaskAccess":true},
+   "expect": {"mechanism":"unavailable","configured":true,"reasonCodes":["seat-binding.refused"],"blockedReason":"tier-cell-missing: vec-row/producer frontier — no allowed executor has a cell; change capabilities.\"vec-row\".prefer, or change the tier (now set by capabilities.\"vec-row\".tier)"}
+  },
+  {
+   "name": "decide: a config refusal with a config code stops the decision",
+   "fact": "decide",
+   "runner": {"patterns":{"defaultRule":{"promise":"p","loop":"solo"}}},
+   "args": {"needsSoul":true},
+   "expect": {"error":{"name":"RunnerConfigError","code":"config-key-retired","message":"runner config (vector runner patterns): runner.patterns.defaultRule was retired; delete the key."}}
+  },
+  {
+   "name": "decide: a semantic config refusal without a code stops the decision",
+   "fact": "decide",
+   "runner": {"capabilities":{"execute":{"prefer":"vec-ghost"}}},
+   "args": {"needsSoul":true},
+   "expect": {"error":{"name":"RunnerConfigError","message":"runner config (vector runner capabilities.execute) \"prefer\" names \"vec-ghost\" but no such executor is registered."}}
+  },
+  {
+   "name": "configRoot: from the main checkout the main checkout's config is read",
+   "fact": "configRoot",
+   "args": {"cwd":"main","worktreeConfig":true},
+   "expect": "<main>"
+  },
+  {
+   "name": "configRoot: a linked worktree with its own config reads it",
+   "fact": "configRoot",
+   "args": {"cwd":"worktree","worktreeConfig":true},
+   "expect": "<worktree>"
+  },
+  {
+   "name": "configRoot: a directory inside a linked worktree with its own config reads the worktree's",
+   "fact": "configRoot",
+   "args": {"cwd":"worktree-sub","worktreeConfig":true},
+   "expect": "<worktree>"
+  },
+  {
+   "name": "configRoot: a linked worktree without a config reads the main checkout's",
+   "fact": "configRoot",
+   "args": {"cwd":"worktree","worktreeConfig":false},
+   "expect": "<main>"
+  },
+  {
+   "name": "configRoot: a directory outside any repository reads the main checkout's",
+   "fact": "configRoot",
+   "args": {"cwd":"outside","worktreeConfig":true},
+   "expect": "<main>"
+  },
+  {
+   "name": "configRoot: no directory reads the main checkout's",
+   "fact": "configRoot",
+   "args": {"cwd":"none","worktreeConfig":true},
+   "expect": "<main>"
+  },
+  {
+   "name": "repoRootGuard: --repo-root with --cwd is accepted",
+   "fact": "repoRootGuard",
+   "args": {"processIn":"outside","cwd":"worktree","repoRoot":"main"},
+   "expect": {"ok":true}
+  },
+  {
+   "name": "repoRootGuard: --repo-root naming the process's main checkout is accepted",
+   "fact": "repoRootGuard",
+   "args": {"processIn":"main","repoRoot":"main"},
+   "expect": {"ok":true}
+  },
+  {
+   "name": "repoRootGuard: from a linked worktree --repo-root naming its main checkout is accepted",
+   "fact": "repoRootGuard",
+   "args": {"processIn":"worktree","repoRoot":"main"},
+   "expect": {"ok":true}
+  },
+  {
+   "name": "repoRootGuard: from outside any repository --repo-root is refused",
+   "fact": "repoRootGuard",
+   "args": {"processIn":"outside","repoRoot":"main"},
+   "expect": {"error":{"name":"RunnerConfigError","message":"--repo-root (\"<main>\") passed without --cwd, but process.cwd() main checkout root resolved to not a main checkout — pass --cwd explicitly."}}
+  },
+  {
+   "name": "repoRootGuard: --repo-root naming another root than the process's main checkout is refused",
+   "fact": "repoRootGuard",
+   "args": {"processIn":"main","repoRoot":"worktree"},
+   "expect": {"error":{"name":"RunnerConfigError","message":"--repo-root (\"<worktree>\") passed without --cwd, but process.cwd() main checkout root resolved to \"<main>\" — pass --cwd explicitly."}}
+  },
+  {
+   "name": "hookPayload: a standard payload is judged in CLAUDE_PROJECT_DIR, never in its own cwd",
+   "fact": "hookPayload",
+   "args": {"raw":"{\"tool_name\":\"Task\",\"tool_input\":{\"subagent_type\":\"planner\"},\"cwd\":\"/tmp\",\"transcript_path\":\"/t.jsonl\"}","env":{"CLAUDE_PROJECT_DIR":"/project"},"cwd":"/started"},
+   "expect": {"format":"standard","toolName":"Task","toolInput":{"subagent_type":"planner"},"transcriptPath":"/t.jsonl","projectDir":"/project"}
+  },
+  {
+   "name": "hookPayload: a standard payload without CLAUDE_PROJECT_DIR is judged where the hook started",
+   "fact": "hookPayload",
+   "args": {"raw":"{\"tool_name\":\"Agent\",\"tool_input\":{}}","env":{"CLAUDE_PROJECT_DIR":"  "},"cwd":"/started"},
+   "expect": {"format":"standard","toolName":"Agent","toolInput":{},"transcriptPath":null,"projectDir":"/started"}
+  },
+  {
+   "name": "hookPayload: an agy payload is judged in its first workspace path",
+   "fact": "hookPayload",
+   "args": {"raw":"{\"toolCall\":{\"name\":\"Task\",\"args\":{\"agent\":\"x\"}},\"workspacePaths\":[\"/ws\",\"/other\"],\"transcript_path\":\"/t\"}","env":{"CLAUDE_PROJECT_DIR":"/project"},"cwd":"/started"},
+   "expect": {"format":"agy","toolName":"Task","toolInput":{"agent":"x"},"transcriptPath":null,"projectDir":"/ws"}
+  },
+  {
+   "name": "hookPayload: an agy payload without a workspace path falls back to CLAUDE_PROJECT_DIR",
+   "fact": "hookPayload",
+   "args": {"raw":"{\"toolCall\":{\"name\":\"Task\"},\"workspacePaths\":[\"\"]}","env":{"CLAUDE_PROJECT_DIR":"/project"},"cwd":"/started"},
+   "expect": {"format":"agy","toolName":"Task","toolInput":{},"transcriptPath":null,"projectDir":"/project"}
+  },
+  {
+   "name": "hookPayload: the agy flag reads a payload as agy whatever its shape",
+   "fact": "hookPayload",
+   "args": {"raw":"{\"tool_name\":\"Task\",\"tool_input\":{\"subagent_type\":\"x\"}}","format":"agy","env":{},"cwd":"/started"},
+   "expect": {"format":"agy","toolInput":{},"transcriptPath":null,"projectDir":"/started"}
+  },
+  {
+   "name": "hookPayload: a null toolCall still marks the agy format",
+   "fact": "hookPayload",
+   "args": {"raw":"{\"toolCall\":null}","env":{},"cwd":"/started"},
+   "expect": {"format":"agy","toolInput":{},"transcriptPath":null,"projectDir":"/started"}
+  },
+  {
+   "name": "hookPayload: a tool input that is not an object reads as empty, a null tool name is kept",
+   "fact": "hookPayload",
+   "args": {"raw":"{\"tool_name\":null,\"tool_input\":[1,2]}","env":{},"cwd":"/started"},
+   "expect": {"format":"standard","toolName":null,"toolInput":{},"transcriptPath":null,"projectDir":"/started"}
+  },
+  {
+   "name": "hookPayload: an empty payload has no call",
+   "fact": "hookPayload",
+   "args": {"raw":" \n","env":{},"cwd":"/started"},
+   "expect": null
+  },
+  {
+   "name": "hookPayload: a payload that does not parse has no call",
+   "fact": "hookPayload",
+   "args": {"raw":"{not json","env":{},"cwd":"/started"},
+   "expect": null
+  },
+  {
+   "name": "hookPayload: a JSON array has no call",
+   "fact": "hookPayload",
+   "args": {"raw":"[{\"tool_name\":\"Task\"}]","env":{},"cwd":"/started"},
+   "expect": null
+  },
+  {
+   "name": "hookPayload: JSON null has no call",
+   "fact": "hookPayload",
+   "args": {"raw":"null","env":{},"cwd":"/started"},
+   "expect": null
+  },
+  {
+   "name": "hookVerdict: a tool other than an agent call is allowed",
+   "fact": "hookVerdict",
+   "args": {"call":{"format":"standard","toolName":"Bash","toolInput":{},"transcriptPath":null,"projectDir":"/nonexistent/vector-project"},"projectDirExists":false},
+   "expect": {"blocked":false}
+  },
+  {
+   "name": "hookVerdict: an agent call whose project directory does not exist is blocked",
+   "fact": "hookVerdict",
+   "args": {"call":{"format":"standard","toolName":"Task","toolInput":{"subagent_type":"planner"},"transcriptPath":null,"projectDir":"/nonexistent/vector-project"},"projectDirExists":false},
+   "expect": {"blocked":true,"reason":"this Task call cannot be routed because the project directory \"/nonexistent/vector-project\" does not exist; set CLAUDE_PROJECT_DIR (or start the hook inside the project) and retry."}
+  },
+  {
+   "name": "hookVerdict: an in-process answer allows the call",
+   "fact": "hookVerdict",
+   "args": {"call":{"format":"standard","toolName":"Agent","toolInput":{},"transcriptPath":null,"projectDir":"/p"},"projectDirExists":true,"decided":{"mechanism":"in-process","configured":false,"reasonCodes":["native-first.rule-2.live-task-access"]}},
+   "expect": {"blocked":false}
+  },
+  {
+   "name": "hookVerdict: an out-of-process answer names the run door with the agent executor and the registered capability",
+   "fact": "hookVerdict",
+   "runner": {"capabilities":{"vec-row":{"prefer":"vec-agent"}},"executors":{"vec-agent":{"kind":"agent","providerModel":"claude"}}},
+   "args": {"call":{"format":"standard","toolName":"Task","toolInput":{"subagent_type":"vec-row"},"transcriptPath":null,"projectDir":"/p"},"projectDirExists":true,"decided":{"mechanism":"out-of-process","configured":true,"reasonCodes":["native-first.0033.cli-spawn-shaped"],"executorId":"vec-agent"}},
+   "expect": {"blocked":true,"reason":"this Task call resolves to out-of-process dispatch (no native in-process handler for \"vec-row\"). Run it through `fgos run \"<prompt>\" --provider vec-agent --capability vec-row [--writes <paths> --worktree <path>]` (--provider is a preference: bind may choose another executor that serves the capability) instead of calling this tool directly -- it runs the task as one unit and hands back the real result. (decided via: decide --for \"vec-row\" --needs-soul --has-live-task-access)"}
+  },
+  {
+   "name": "hookVerdict: an out-of-process answer naming a tool executor says to call the tool",
+   "fact": "hookVerdict",
+   "runner": {"capabilities":{"vec-cap":{}},"executors":{"vec-tool":{"kind":"tool","for":["vec-cap"]}}},
+   "args": {"call":{"format":"agy","toolName":"task","toolInput":{"agent":"vec-unlisted"},"transcriptPath":null,"projectDir":"/p"},"projectDirExists":true,"decided":{"mechanism":"out-of-process","configured":true,"reasonCodes":[],"executorId":"vec-tool"}},
+   "expect": {"blocked":true,"reason":"this task call resolves to out-of-process dispatch (no native in-process handler for \"vec-unlisted\"). Run it through `fgos run \"<prompt>\" [--writes <paths> --worktree <path>]`; \"vec-tool\" is a tool executor, which fgos run cannot name -- call that tool directly instead instead of calling this tool directly -- it runs the task as one unit and hands back the real result. (decided via: decide --for \"vec-unlisted\" --needs-soul --has-live-task-access)"}
+  },
+  {
+   "name": "hookVerdict: an unavailable answer names its blocked reason",
+   "fact": "hookVerdict",
+   "args": {"call":{"format":"standard","toolName":"Task","toolInput":{"subagent_type":"vec-row"},"transcriptPath":null,"projectDir":"/p"},"projectDirExists":true,"decided":{"mechanism":"unavailable","configured":true,"reasonCodes":["seat-binding.refused"],"blockedReason":"no-pool: nothing serves it"}},
+   "expect": {"blocked":true,"reason":"this Task call cannot be dispatched: \"vec-row\" has executors of its own and decide answered unavailable for it (no-pool: nothing serves it). Fix that cause (run `fgos dispatch decide --for \"vec-row\" --needs-soul --has-live-task-access` to see it), or use a subagent type that has no executors of its own. (decided via: decide --for \"vec-row\" --needs-soul --has-live-task-access)"}
+  },
+  {
+   "name": "hookVerdict: an unavailable answer without a blocked reason names its reason codes",
+   "fact": "hookVerdict",
+   "args": {"call":{"format":"standard","toolName":"Task","toolInput":{},"transcriptPath":null,"projectDir":"/p"},"projectDirExists":true,"decided":{"mechanism":"unavailable","configured":true,"reasonCodes":["governance.blocked","x"],"blockedReason":null}},
+   "expect": {"blocked":true,"reason":"this Task call cannot be dispatched: \"general-purpose\" has executors of its own and decide answered unavailable for it (governance.blocked, x). Fix that cause (run `fgos dispatch decide --for \"general-purpose\" --needs-soul --has-live-task-access` to see it), or use a subagent type that has no executors of its own. (decided via: decide --for \"general-purpose\" --needs-soul --has-live-task-access)"}
+  },
+  {
+   "name": "hookVerdict: an unavailable answer with nothing to name says so",
+   "fact": "hookVerdict",
+   "args": {"call":{"format":"standard","toolName":"Task","toolInput":{},"transcriptPath":null,"projectDir":"/p"},"projectDirExists":true,"decided":{"mechanism":"unavailable","configured":false,"reasonCodes":[]}},
+   "expect": {"blocked":true,"reason":"this Task call cannot be dispatched: \"general-purpose\" has executors of its own and decide answered unavailable for it (no reason reported). Fix that cause (run `fgos dispatch decide --for \"general-purpose\" --needs-soul --has-live-task-access` to see it), or use a subagent type that has no executors of its own. (decided via: decide --for \"general-purpose\" --needs-soul --has-live-task-access)"}
+  },
+  {
+   "name": "hookVerdict: a config file the door refuses blocks the call with the door's code",
+   "fact": "hookVerdict",
+   "args": {"call":{"format":"standard","toolName":"Task","toolInput":{},"transcriptPath":null,"projectDir":"/p"},"projectDirExists":true,"failure":{"kind":"door","code":"config-parse","message":"config-parse project:config.yaml:3:1"}},
+   "expect": {"blocked":true,"reason":"this Task call cannot be routed because the config is unusable: config-parse. Run `fgos config check` to list every refusal with its fix, correct the file, then retry."}
+  },
+  {
+   "name": "hookVerdict: a config file the door cannot read blocks the call with the door's code",
+   "fact": "hookVerdict",
+   "args": {"call":{"format":"standard","toolName":"Task","toolInput":{},"transcriptPath":null,"projectDir":"/p"},"projectDirExists":true,"failure":{"kind":"door","code":"config-io","message":"config-io project:config.yaml"}},
+   "expect": {"blocked":true,"reason":"this Task call cannot be routed because the config is unusable: config-io. Run `fgos config check` to list every refusal with its fix, correct the file, then retry."}
+  },
+  {
+   "name": "hookVerdict: a runner refusal with a config code blocks with the code",
+   "fact": "hookVerdict",
+   "args": {"call":{"format":"standard","toolName":"Task","toolInput":{},"transcriptPath":null,"projectDir":"/p"},"projectDirExists":true,"failure":{"kind":"runner","code":"config-key-retired","message":"runner config (x): runner.patterns.defaultRule was retired; delete the key."}},
+   "expect": {"blocked":true,"reason":"this Task call cannot be routed because the config is unusable: config-key-retired. Run `fgos config check` to list every refusal with its fix, correct the file, then retry."}
+  },
+  {
+   "name": "hookVerdict: a runner refusal without a code allows, as today",
+   "fact": "hookVerdict",
+   "args": {"call":{"format":"standard","toolName":"Task","toolInput":{},"transcriptPath":null,"projectDir":"/p"},"projectDirExists":true,"failure":{"kind":"runner","message":"runner config (x capabilities.execute) \"prefer\" names \"ghost\" but no such executor is registered."}},
+   "expect": {"blocked":false}
+  },
+  {
+   "name": "hookVerdict: a runner refusal with another code allows",
+   "fact": "hookVerdict",
+   "args": {"call":{"format":"standard","toolName":"Task","toolInput":{},"transcriptPath":null,"projectDir":"/p"},"projectDirExists":true,"failure":{"kind":"runner","code":"pin-unsatisfiable","message":"pin-unsatisfiable: x"}},
+   "expect": {"blocked":false}
+  },
+  {
+   "name": "hookVerdict: any other failure of decide allows",
+   "fact": "hookVerdict",
+   "args": {"call":{"format":"standard","toolName":"Task","toolInput":{},"transcriptPath":null,"projectDir":"/p"},"projectDirExists":true,"failure":{"kind":"other","message":"not a git checkout"}},
+   "expect": {"blocked":false}
+  },
+  {
+   "name": "hookAnswer: a standard allow prints nothing and exits 0",
+   "fact": "hookAnswer",
+   "args": {"verdict":{"blocked":false},"format":"standard"},
+   "expect": {"exitCode":0,"stdout":"","stderr":""}
+  },
+  {
+   "name": "hookAnswer: a standard block exits 2 with the reason on stderr",
+   "fact": "hookAnswer",
+   "args": {"verdict":{"blocked":true,"reason":"why \"quoted\""},"format":"standard"},
+   "expect": {"exitCode":2,"stdout":"","stderr":"BLOCKED: why \"quoted\"\n"}
+  },
+  {
+   "name": "hookAnswer: an agy allow answers JSON and exits 0",
+   "fact": "hookAnswer",
+   "args": {"verdict":{"blocked":false},"format":"agy"},
+   "expect": {"exitCode":0,"stdout":"{\"decision\":\"allow\"}\n","stderr":""}
+  },
+  {
+   "name": "hookAnswer: an agy block answers a deny and exits 0",
+   "fact": "hookAnswer",
+   "args": {"verdict":{"blocked":true,"reason":"why \"quoted\"\nline"},"format":"agy"},
+   "expect": {"exitCode":0,"stdout":"{\"decision\":\"deny\",\"reason\":\"BLOCKED: why \\\"quoted\\\"\\nline\"}\n","stderr":""}
+  },
+  {
+   "name": "attribute: a refusal at a path with its own origin names that file and line",
+   "fact": "attribute",
+   "args": {"error":{"message":"runner config (/p/.fgos runner patterns.reviewed) uses reserved name \"x\".","path":"runner.patterns.reviewed","detail":"uses reserved name \"x\"."},"origins":[{"path":"runner.patterns.reviewed","layer":"project","file":"project:config.yaml","line":7,"column":1}],"projectDir":"/p"},
+   "expect": {"error":{"name":"RunnerConfigError","message":"runner config (/p/.fgos/config.yaml:7 patterns.reviewed) uses reserved name \"x\"."}}
+  },
+  {
+   "name": "attribute: a refusal under a value with no origin of its own names its nearest ancestor's",
+   "fact": "attribute",
+   "args": {"error":{"message":"m","path":"runner.loops.reviewed.bounds.maxRounds","detail":"is not a parameter."},"origins":[{"path":"runner.loops.reviewed","layer":"global","file":"global:config.yaml","line":3,"column":1}],"projectDir":"/p"},
+   "expect": {"error":{"name":"RunnerConfigError","message":"runner config (~/.fgos/config.yaml:3 loops.reviewed.bounds.maxRounds) is not a parameter."}}
+  },
+  {
+   "name": "attribute: a refusal of a container names the origins under it, once per location",
+   "fact": "attribute",
+   "args": {"error":{"message":"m","path":"runner.patterns","detail":"d."},"origins":[{"path":"runner.patterns.a.loop","layer":"project","file":"project:config.yaml","line":4,"column":1},{"path":"runner.patterns.b.loop","layer":"standard","file":null,"line":9,"column":1},{"path":"runner.patterns.a.promise","layer":"project","file":"project:config.yaml","line":4,"column":1}],"projectDir":"/p"},
+   "expect": {"error":{"name":"RunnerConfigError","message":"runner config (/p/.fgos/config.yaml:4, <standard>:9 patterns) d."}}
+  },
+  {
+   "name": "attribute: a refusal of two paths names their common parent",
+   "fact": "attribute",
+   "args": {"error":{"message":"m","code":"config-key-retired","paths":["runner.loops.reviewed.bounds.maxRounds.min","runner.loops.reviewed.bounds.maxRounds.max"],"detail":"min (5) must be <= max (2)."},"origins":[{"path":"runner.loops.reviewed.bounds.maxRounds.min","layer":"project","file":"project:config.yaml","line":5,"column":1},{"path":"runner.loops.reviewed.bounds.maxRounds.max","layer":"project","file":"project:config.yaml","line":6,"column":1}],"projectDir":"/p"},
+   "expect": {"error":{"name":"RunnerConfigError","code":"config-key-retired","message":"runner config (/p/.fgos/config.yaml:5, /p/.fgos/config.yaml:6 loops.reviewed.bounds.maxRounds) min (5) must be <= max (2)."}}
+  },
+  {
+   "name": "attribute: a missing key deep in an entry names the first line of its nearest existing parent per file",
+   "fact": "attribute",
+   "args": {"error":{"message":"m","path":"runner.patterns.reviewed.defaults.seats","detail":"d."},"origins":[{"path":"runner.patterns.reviewed.promise","layer":"project","file":"project:config.yaml","line":9,"column":1},{"path":"runner.patterns.reviewed.loop","layer":"project","file":"project:config.yaml","line":8,"column":1},{"path":"runner.patterns.reviewed.loop","layer":"global","file":"global:config.yaml","line":4,"column":1}],"projectDir":"/p"},
+   "expect": {"error":{"name":"RunnerConfigError","message":"runner config (/p/.fgos/config.yaml:8, ~/.fgos/config.yaml:4 patterns.reviewed.defaults.seats) d."}}
+  },
+  {
+   "name": "attribute: a refusal no origin locates keeps its own message",
+   "fact": "attribute",
+   "args": {"error":{"message":"runner config (/p/.fgos runner executors.a) \"trustStore\" was removed.","path":"runner.executors.a.trustStore","detail":"\"trustStore\" was removed."},"origins":[{"path":"runner.patterns.a","layer":"project","file":"project:config.yaml","line":4,"column":1}],"projectDir":"/p"},
+   "expect": {"error":{"name":"RunnerConfigError","message":"runner config (/p/.fgos runner executors.a) \"trustStore\" was removed."}}
+  },
+  {
+   "name": "attribute: a refusal without a path keeps its own message",
+   "fact": "attribute",
+   "args": {"error":{"message":"runner config (/p/.fgos runner) strict mode requires explicit capabilities declared (confinement-policy-missing)."},"origins":[{"path":"runner.patterns.a","layer":"project","file":"project:config.yaml","line":4,"column":1}],"projectDir":"/p"},
+   "expect": {"error":{"name":"RunnerConfigError","message":"runner config (/p/.fgos runner) strict mode requires explicit capabilities declared (confinement-policy-missing)."}}
+  },
+  {
+   "name": "globalRigorToTier: rigorToTier in the global file is refused naming its file, line and column",
+   "fact": "globalRigorToTier",
+   "args": {"origins":[{"path":"runner.rigorToTier.high","layer":"global","file":"global:config.yaml","line":12,"column":5}]},
+   "expect": {"error":{"name":"RunnerConfigError","message":"~/.fgos/config.yaml:12:5 runner.rigorToTier no longer exists: rigor no longer chooses a tier; delete the key."}}
+  },
+  {
+   "name": "globalRigorToTier: rigorToTier in the project file is left to the semantic check",
+   "fact": "globalRigorToTier",
+   "args": {"origins":[{"path":"runner.rigorToTier","layer":"project","file":"project:config.yaml","line":2,"column":1}]},
+   "expect": {"ok":true}
+  },
+  {
+   "name": "attribute: a missing key whose parent entries hold no origin keeps its own message",
+   "fact": "attribute",
+   "args": {"error":{"message":"m","path":"runner.patterns.reviewed.defaults.seats","detail":"d."},"origins":[{"path":"runner.modelPolicies.claude.standard","layer":"project","file":"project:config.yaml","line":2,"column":1}],"projectDir":"/p"},
+   "expect": {"error":{"name":"RunnerConfigError","message":"m"}}
+  },
+  {
+   "name": "decide: an assignment record whose policy is not an object is refused",
+   "fact": "decide",
+   "runner": {"executors":{"vec-agent":{"kind":"agent","providerModel":"claude","agentType":"vec-agent-type"}},"modelPolicies":{"claude":{"standard":"sonnet"}}},
+   "args": {"assignment":"asg-vec","assignmentItem":{"assignmentId":"asg-vec","operation":"vec-op","skills":[],"policy":["x"]},"hasLiveTaskAccess":true},
+   "expect": {"error":{"name":"RunnerConfigError","message":"assignment.policy must be an object when provided"}}
+  },
+  {
+   "name": "decide: an assignment record with the retired minTier is refused",
+   "fact": "decide",
+   "runner": {"executors":{"vec-agent":{"kind":"agent","providerModel":"claude","agentType":"vec-agent-type"}},"modelPolicies":{"claude":{"standard":"sonnet"}}},
+   "args": {"assignment":"asg-vec","assignmentItem":{"assignmentId":"asg-vec","operation":"vec-op","skills":[],"policy":{"preferExecutor":"vec-agent","minTier":"standard"}},"hasLiveTaskAccess":true},
+   "expect": {"error":{"name":"RunnerConfigError","message":"assignment policy field \"minTier\" was removed; normalize persisted assignments at the load boundary or use \"rigor\"/\"tier\""}}
+  },
+  {
+   "name": "decide: an assignment record with an unknown rigor is refused",
+   "fact": "decide",
+   "runner": {"executors":{"vec-agent":{"kind":"agent","providerModel":"claude","agentType":"vec-agent-type"}},"modelPolicies":{"claude":{"standard":"sonnet"}}},
+   "args": {"assignment":"asg-vec","assignmentItem":{"assignmentId":"asg-vec","operation":"vec-op","skills":[],"policy":{"preferExecutor":"vec-agent"},"rigor":"extreme"},"hasLiveTaskAccess":true},
+   "expect": {"error":{"name":"RunnerConfigError","message":"invalid assignment rigor \"extreme\". Valid rigors: [low, standard, high, critical]"}}
+  },
+  {
+   "name": "decide: an assignment record with an unknown reasoning effort is refused",
+   "fact": "decide",
+   "runner": {"executors":{"vec-agent":{"kind":"agent","providerModel":"claude","agentType":"vec-agent-type"}},"modelPolicies":{"claude":{"standard":"sonnet"}}},
+   "args": {"assignment":"asg-vec","assignmentItem":{"assignmentId":"asg-vec","operation":"vec-op","skills":[],"policy":{"preferExecutor":"vec-agent","reasoningEffort":"huge"}},"hasLiveTaskAccess":true},
+   "expect": {"error":{"name":"RunnerConfigError","message":"invalid reasoningEffort \"huge\". Valid values: [low, medium, high, max]"}}
+  },
+  {
+   "name": "decide: an assignment record with an unknown tier is refused",
+   "fact": "decide",
+   "runner": {"executors":{"vec-agent":{"kind":"agent","providerModel":"claude","agentType":"vec-agent-type"}},"modelPolicies":{"claude":{"standard":"sonnet"}}},
+   "args": {"assignment":"asg-vec","assignmentItem":{"assignmentId":"asg-vec","operation":"vec-op","skills":[],"policy":{"preferExecutor":"vec-agent","tier":"giant"}},"hasLiveTaskAccess":true},
+   "expect": {"error":{"name":"RunnerConfigError","message":"invalid explicit tier \"giant\". Valid tiers: [nano, mini, standard, advanced, flagship, frontier]"}}
+  },
+  {
+   "name": "decide: an assignment record with a null repeat mode is refused",
+   "fact": "decide",
+   "runner": {"executors":{"vec-agent":{"kind":"agent","providerModel":"claude","agentType":"vec-agent-type"}},"modelPolicies":{"claude":{"standard":"sonnet"}}},
+   "args": {"assignment":"asg-vec","assignmentItem":{"assignmentId":"asg-vec","operation":"vec-op","skills":[],"policy":{"preferExecutor":"vec-agent","repeatMode":null}},"hasLiveTaskAccess":true},
+   "expect": {"error":{"name":"RunnerConfigError","message":"invalid repeatMode \"null\". Valid repeatModes: [pre-delivery, post-delivery]"}}
+  },
+  {
+   "name": "decide: an assignment record pinning an executor that cannot serve is refused",
+   "fact": "decide",
+   "runner": {"executors":{"vec-agent":{"kind":"agent","providerModel":"claude","agentType":"vec-agent-type"}},"modelPolicies":{"claude":{"standard":"sonnet"}}},
+   "args": {"assignment":"asg-vec","assignmentItem":{"assignmentId":"asg-vec","operation":"vec-op","skills":[],"policy":{"preferExecutor":"vec-ghost"}},"hasLiveTaskAccess":true},
+   "expect": {"error":{"name":"RunnerConfigError","code":"unknown-executor","message":"unknown-executor: vec-op/producer: executor \"vec-ghost\" is not registered"}}
+  },
+  {
+   "name": "decide: an assignment record asking a tier above its seat's is refused by Seat Binding",
+   "fact": "decide",
+   "runner": {"executors":{"vec-agent":{"kind":"agent","providerModel":"claude","agentType":"vec-agent-type"}},"modelPolicies":{"claude":{"standard":"sonnet"}}},
+   "args": {"assignment":"asg-vec","assignmentItem":{"assignmentId":"asg-vec","operation":"vec-op","skills":[],"policy":{"preferExecutor":"vec-agent","tier":"frontier"}},"hasLiveTaskAccess":true},
+   "expect": {"error":{"name":"RunnerConfigError","code":"tier-escalation-unauthorized","message":"tier-escalation-unauthorized: vec-op/producer: override asks for frontier above the resolved standard (defaults.tier); an override may only keep or lower the tier"}}
+  },
+  {
+   "name": "decide: an assignment record with no executor of its own runs on the default executor",
+   "fact": "decide",
+   "runner": {"executor":{"command":"claude","args":["-p"]},"modelPolicies":{"claude":{"standard":"sonnet"}}},
+   "args": {"assignment":"asg-vec","assignmentItem":{"assignmentId":"asg-vec","operation":"vec-op","skills":[],"policy":{}},"hasLiveTaskAccess":false},
+   "expect": {"mechanism":"out-of-process","configured":true,"reasonCodes":["native-first.0033.cli-spawn-shaped"],"executorId":"claude"},
+   "machine": {"pathCommands":["claude"]}
+  },
+  {
+   "name": "decide: a read-only reviewer assignment record runs on its executor",
+   "fact": "decide",
+   "runner": {"executors":{"vec-agent":{"kind":"agent","providerModel":"claude","agentType":"vec-agent-type"}},"modelPolicies":{"claude":{"standard":"sonnet"}}},
+   "args": {"assignment":"asg-vec","assignmentItem":{"assignmentId":"asg-vec","operation":"vec-op","skills":[],"policy":{"preferExecutor":"vec-agent"},"role":"reviewer","mutation":"read-only","domain":"vec"},"hasLiveTaskAccess":true},
+   "expect": {"mechanism":"in-process","agentType":"vec-agent-type","configured":true,"reasonCodes":["native-first.rule-2.live-task-access"],"executorId":"vec-agent"}
+  },
+  {
+   "name": "hookPayload: a payload with an unpaired surrogate escape is still judged, a paired one is kept",
+   "fact": "hookPayload",
+   "args": {"raw":"{\"tool_name\":\"Task\",\"tool_input\":{},\"cwd\":\"/x\\ud800\",\"note\":\"\\udc00 and \\ud83d\\ude00\"}","env":{},"cwd":"/started"},
+   "expect": {"format":"standard","toolName":"Task","toolInput":{},"transcriptPath":null,"projectDir":"/started"}
+  },
+  {
+   "name": "hookPayload: a CLAUDE_PROJECT_DIR that is only a byte-order mark is no directory",
+   "fact": "hookPayload",
+   "args": {"raw":"{\"tool_name\":\"Task\"}","env":{"CLAUDE_PROJECT_DIR":"﻿"},"cwd":"/started"},
+   "expect": {"format":"standard","toolName":"Task","toolInput":{},"transcriptPath":null,"projectDir":"/started"}
+  },
+  {
+   "name": "hookVerdict: a subagent type that is only a byte-order mark is judged as general-purpose",
+   "fact": "hookVerdict",
+   "args": {"call":{"format":"standard","toolName":"Task","toolInput":{"subagent_type":"﻿"},"transcriptPath":null,"projectDir":"/p"},"projectDirExists":true,"decided":{"mechanism":"unavailable","configured":true,"reasonCodes":["x"]}},
+   "expect": {"blocked":true,"reason":"this Task call cannot be dispatched: \"general-purpose\" has executors of its own and decide answered unavailable for it (x). Fix that cause (run `fgos dispatch decide --for \"general-purpose\" --needs-soul --has-live-task-access` to see it), or use a subagent type that has no executors of its own. (decided via: decide --for \"general-purpose\" --needs-soul --has-live-task-access)"}
+  },
+  {
+   "name": "globalRigorToTier: an origin with no file is named config.json by Node and left unnamed natively, the adapter names every file",
+   "fact": "globalRigorToTier",
+   "args": {"origins":[{"path":"runner.rigorToTier","layer":"global","file":null,"line":12,"column":5}]},
+   "expect": {"error":{"name":"RunnerConfigError","message":"~/.fgos/config.json:12:5 runner.rigorToTier no longer exists: rigor no longer chooses a tier; delete the key."}},
+   "nativeExpect": {"error":{"name":"RunnerConfigError","message":"~/.fgos/<file>:12:5 runner.rigorToTier no longer exists: rigor no longer chooses a tier; delete the key."}}
+  },
+  {
+   "name": "attribute: a project origin with no file is named config.yaml by Node and left unnamed natively, the adapter names every file",
+   "fact": "attribute",
+   "args": {"error":{"message":"m","path":"runner.patterns.reviewed","detail":"d."},"origins":[{"path":"runner.patterns.reviewed","layer":"project","file":null,"line":7,"column":1}],"projectDir":"/p"},
+   "expect": {"error":{"name":"RunnerConfigError","message":"runner config (/p/.fgos/config.yaml:7 patterns.reviewed) d."}},
+   "nativeExpect": {"error":{"name":"RunnerConfigError","message":"runner config (/p/.fgos/<file>:7 patterns.reviewed) d."}}
+  }
+ ]
+}

@@ -802,7 +802,7 @@ session must rotate. Options seen so far: (A) one copy per CLI, with Claude not
 reading the omp/codex block; (B) as a stopgap, drop the untracked
 `forgent/.claude/rules` copy. Related: backlog `p-7eb9e65b` (fgOS and AgentKit
 overwrite each other's registrations); source discussion
-`docs/discussions/secretary-miu/DISCUSSION.md` (point 4).
+`docs/history/secretary-miu/DISCUSSION.md` (point 4).
 
 Suggested subcomponents:
 

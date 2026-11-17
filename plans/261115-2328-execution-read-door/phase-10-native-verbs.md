@@ -21,6 +21,9 @@ deletes their Node arms and use cases (L10). `dispatch` stays a `legacy-cli` rou
    Refusals keep Node's category and exact text; unknown flags get Node's exact text from the annotation.
 2. Adapters (`apps/fgos/src/wiring/{dispatch_decide.rs,agents.rs}` and the hook arm) call `fgos-execution` in process
    with 09's `Machine`/`ToolProbe` implementations; `decide`, `explain` and the hook run 07's `runner_check` first:
+   07's `load_checked_runner` order (door section, global `rigorToTier` refusal, semantic check, attribution) has no
+   vector of its own: this phase's `cli_tests.rs` case for `decide` carries its one wiring proof (a project whose config
+   breaks a semantic rule is refused with the attributed text).
    - `decide`: `--cwd`/`--repo-root` guard (`decide.mjs:251-265`); the project root through the invocation-root door and
      the config root by 07's `configRootFor` rule (a worktree's own config wins); config through `fgos-config`; `--assignment <id>` must be one plain path segment (else refused by name), then
      `.fgos/assignments/<id>/assignment.json` is read with `open_beneath` under a byte cap; absent or unreadable = no

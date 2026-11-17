@@ -3363,3 +3363,37 @@ test('compileDispatchPlan governance-blocked and unavailable branches never popu
   assert.equal(unavailablePlan.policy, undefined);
 });
 
+
+// --- the decide contract (packages/execution/contracts/decide.v1.json): the Rust crate owns the answer of
+// `fgos dispatch decide` and of the dispatch hook; this is the Node twin, replaying the same vectors against
+// `decideOver` (compileDispatchPlan and the answer it prints) and the hook modules until they are deleted.
+
+test('Node decide and the dispatch hook answer every vector of the decide contract as recorded', async () => {
+  const { evaluateDecideVector, DECIDE_FACTS } = await import('../helpers/decide-vectors.helper.mjs');
+  const contract = JSON.parse(fs.readFileSync(new URL('../../packages/execution/contracts/decide.v1.json', import.meta.url), 'utf8'));
+  assert.equal(contract.version, 'decide.v1');
+  assert.deepEqual([...contract.facts].sort(), [...DECIDE_FACTS].sort(), 'every fact has at least one vector');
+  assert.equal(new Set(contract.vectors.map((vector) => vector.name)).size, contract.vectors.length, 'vector names are unique');
+  for (const vector of contract.vectors) {
+    assert.deepEqual(await evaluateDecideVector(vector), vector.expect, vector.name);
+  }
+});
+
+test('the decide vector script answers from the replay test environment and fails on a changed expect', () => {
+  const script = new URL('../../scripts/decide-vectors.mjs', import.meta.url).pathname;
+  const dir = mkTempDir();
+  const contractPath = path.join(dir, 'decide.v1.json');
+  const contract = JSON.parse(fs.readFileSync(new URL('../../packages/execution/contracts/decide.v1.json', import.meta.url), 'utf8'));
+  // The configRoot and hook payload vectors read no machine, so a few of them check the script quickly.
+  const sample = contract.vectors.filter((vector) => ['configRoot', 'hookPayload'].includes(vector.fact)).slice(0, 3);
+  fs.writeFileSync(contractPath, JSON.stringify({ ...contract, facts: [...new Set(sample.map((vector) => vector.fact))], vectors: sample }));
+  const dirty = { ...process.env, CLAUDE_PROJECT_DIR: '/elsewhere', HERDR_ENV: '1' };
+  const check = () => spawnSync(process.execPath, [script, '--check', '--contract', contractPath], { encoding: 'utf8', env: dirty });
+  const clean = check();
+  assert.equal(clean.status, 0, clean.stderr);
+  sample[0].expect = { changed: true };
+  fs.writeFileSync(contractPath, JSON.stringify({ ...contract, facts: [...new Set(sample.map((vector) => vector.fact))], vectors: sample }));
+  const drifted = check();
+  assert.notEqual(drifted.status, 0);
+  assert.match(drifted.stderr, /configRoot: from the main checkout/);
+});

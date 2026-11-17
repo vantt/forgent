@@ -625,6 +625,24 @@ export function readAccountStates({ provider, assignmentId, runtimeDir, now = Da
 }
 
 /**
+ * The account state Seat Binding overlays on the declared accounts, keyed by the lease document's own provider
+ * keys: `readAccountStates` for every provider the document lists and for the one an assignment of
+ * `assignmentId` holds an account of. The binder maps each pool to its key; nothing here knows the pools.
+ *
+ * @returns {Record<string, ReturnType<typeof readAccountStates>>}
+ */
+export function readAccountStateOverlay({ assignmentId, runtimeDir, now = Date.now(), cooldownMs } = {}) {
+  const state = readState(providerCapacityStatePaths(runtimeDir).statePath);
+  const keys = new Set(Object.keys(state.providers ?? {}));
+  if (assignmentId) {
+    for (const held of Object.keys(state.assignments ?? {})) {
+      if (held.endsWith(`:${assignmentId}`)) keys.add(held.slice(0, -(assignmentId.length + 1)));
+    }
+  }
+  return Object.fromEntries([...keys].map((provider) => [provider, readAccountStates({ provider, assignmentId, runtimeDir, now, cooldownMs })]));
+}
+
+/**
  * Lease exactly the account Seat Binding named. The ranking was done before the lock; under the lock this
  * only re-checks that the account can still be taken (enabled, holding a login store for `cli`, not
  * quarantined) and writes the lease. An account that cannot is a `lease-conflict` the runner answers with a

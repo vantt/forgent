@@ -47,6 +47,18 @@ session-rotation; planner designs it). Two unproven rotation mechanics, statusli
 `/clear` via `herdr pane send-text` (spike first inside session-rotation). Whether Miu's protocol fits the rendered
 persona sections or the renderer is extended (task persona-door).
 
+**Name collision found after settling (2026-11-17).** `fgos session start|end|list|gc` already exists: a per-session
+detached git worktree lifecycle (`fgos session --help`). The verb name in SM-D6 is provisional; the planner checks that
+verb's prior art and callers and proposes a name or a merge as an owner question. Owner (2026-11-17): `fgos head` is a
+provisional name; backlog p-g2iprtzptz (priority high) investigates merging or retiring the old `fgos session`, then
+renames `fgos head` to `fgos session`.
+
+**Owner requirement added after settling (2026-11-17).** When a head session opens in a pane, its opening prompt is
+typed visibly into the CLI composer (full text, not a pointer such as "read file X"), so a person watching the pane
+sees exactly what the session was told; a screenless host may pass it on the command line or by file. Reuse the
+brief-delivery step terminal worker seats already use; never `herdr pane run` with unquoted arguments (it joins them
+into the shell line, which split the planner's first prompt at a `;`).
+
 **Source backlog ids.** `p-r4u2ewexvn` (this topic). Filed as their own rows: `p-5igcekysul` (mailbox resolves an
 agent head beside Identity), `p-pgmxt7n7hx` (domain registry vs `domains/`, `coding` default); the three-copies
 measurement was appended to `p-7eb9e65b`.
@@ -55,8 +67,9 @@ measurement was appended to `p-7eb9e65b`.
 
 Settled 2026-11-17 after 19 rounds. All five brief points plus two that grew out of them (generic session rotation,
 discussion location) are settled as SM-D1..SM-D13, with three open points that block only some tasks (hand-off block).
-Ready for a planner run per `core/skills/_shared/plan-contract.md`. This file moved from `docs/history/secretary-miu/`
-to `docs/discussions/secretary-miu/` by owner decision (SM-D8).
+Ready for a planner run per `core/skills/_shared/plan-contract.md`. This file stays in `docs/history/secretary-miu/`
+until the Convention kind `discussion` exists: SM-D8 chose `docs/discussions/secretary-miu/`, but Convention refuses
+`docs/discussions/**` (`unplaced-docs`), so the move waits for that kind.
 
 ## 2. Mục tiêu & đề bài
 
@@ -154,8 +167,8 @@ session rotation serves every long-lived head session, and head sessions must be
   says it is the only authority deriving full ids, handles and liveness (head = highest terminal-holding ancestor).
   Mailbox's own head finder (`adapters::claude_head::find_head`, `hookFacts`) may duplicate it -> separate backlog item
   (to file at exit; this session writes only this file).
-- 2026-11-17 — Owner: "docs/discussions/<slug>/*, nên để vào folder, biết đâu phình ra sau này." File moved to
-  `docs/discussions/secretary-miu/DISCUSSION.md`.
+- 2026-11-17 — Owner: "docs/discussions/<slug>/*, nên để vào folder, biết đâu phình ra sau này." A move there was tried and
+  refused by Convention (`unplaced-docs`); the file stays in `docs/history/secretary-miu/` until the kind `discussion` lands.
 - 2026-11-17 — Miu proposed questions in the topic folder (A). Owner: "chọn A. nhưng nó chỉ đúng một phần ... khi làm
   plan còn câu hỏi không, và liệu khi triển khai thì câu hỏi nằm đâu?" Scout: plan-contract item 5 (owner questions
   batched in plan.md, plan stays draft, untouched phases ready); `fgos workflow status` open gates +
