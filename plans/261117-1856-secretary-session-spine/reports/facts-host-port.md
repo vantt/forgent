@@ -1,6 +1,6 @@
 # Facts: host port, placement blast radius and cut lines
 
-Read on branch `sec/p01` (base b704fdd08). Impact analysis: `fgos dispatch decide --for impact-analysis` answered `unavailable / tool.missing` when the plan was written (plan.md "Prior art"); not re-run here. **impact-analysis degraded (GitNexus missing), blast radius from rg** (weak proof). `git log -S'placement' -- src/run-supervisor` is empty (plan.md): no earlier host abstraction existed.
+Read on branch `sec/p01` (base 94275a833). Impact analysis: `fgos dispatch decide --for impact-analysis` answered `unavailable / tool.missing` when the plan was written (plan.md "Prior art"); not re-run here. **impact-analysis degraded (GitNexus missing), blast radius from rg** (weak proof). `git log -S'placement' -- src/run-supervisor` is empty (plan.md): no earlier host abstraction existed.
 
 ## 1. Blast radius (rg, file:line)
 
@@ -24,7 +24,7 @@ Tests listed per row are the files that drive the hit.
 
 ## 2. Where a binding becomes a pane command, env, account home and trust
 
-`prepareTerminalAttempt` (`src/runner/dispatch/herdr-round.mjs:354`): opens the round and writes the typed brief (`:392-401`), `establishConfinement` (private worker home, `:403`), builds the display and the endpoint env (`herdrEndpointEnv`), `beforeAllocate` (records key and endpoint before the pane exists), `tc.allocateAsync` (`:448`), then `seedAttemptTrust` only when there is no private home (`:466`). It returns `{slot, paneId, workerHomePath, endpointEnv, tc, display, abandon}`. The pane command itself is built later by the supervisor (`terminal.rs launch_spec :270`) from the envelope launch block. Phase 11 exports the binding-to-command-and-trust step (everything except the allocate call) for phase 12.
+`prepareTerminalAttempt` (`src/runner/dispatch/herdr-round.mjs:354`): opens the round and writes the typed brief (`:392-401`), `establishConfinement` (private worker home, `:403`), builds the display and the endpoint env (`herdrEndpointEnv`), `beforeAllocate` (records key and endpoint before the pane exists), `tc.allocateAsync` (`:448`), then `seedAttemptTrust` only when there is no private home (`:465`). It returns `{slot, paneId, workerHomePath, endpointEnv, tc, display, abandon}`. The pane command itself is built later by the supervisor (`terminal.rs launch_spec :270`) from the envelope launch block. Phase 11 exports the binding-to-command-and-trust step (everything except the allocate call) for phase 12.
 
 ## 3. The delivery door the port reuses
 

@@ -33,7 +33,7 @@
       "additionalProperties": false,
       "properties": {
         "result": { "enum": ["unsupported", "unknown"] },
-        "code": { "enum": ["head-needs-interactive-host", "host-unsupported-here", "opening-delivery-unsupported", "pane-not-ready", "placement-unknown", "key-in-use", "unknown"] },
+        "code": { "enum": ["head-needs-interactive-host", "host-unsupported-here", "opening-delivery-unsupported", "pane-not-ready", "placement-unknown", "key-in-use"] },
         "detail": { "type": "string" }
       }
     },
