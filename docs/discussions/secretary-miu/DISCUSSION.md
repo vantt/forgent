@@ -15,7 +15,9 @@ owner one line, never default to coding. Minted SM-D1 (topic ordering), SM-D2 (a
 for the best possible quality, and widened it: the rotation/handoff mechanism is generic for every kind of long-lived
 session, not limited to Miu. Name "session rotation" accepted; scope provisionally accepted; handoff files live in
 gitignored `.fgos/runtime/session-rotation/<persona>-<name>/` (agreed round 9). Minted SM-D3 (core shaper). Point 5 settled (SM-D4; owner questions in three stage-owned places, consolidation noted as later debt). Minted SM-D5
-(handoff file layout + Identity authority). Now on point 2 (placement and activation). Earlier: point 5 owner chose
+(handoff file layout + Identity authority). Point 2: owner agreed one thin "start a head session" door going straight to Terminal Control (not the run
+supervisor), shared by owner start, Miu opening shaper tabs, and session rotation; owner flagged that head sessions may
+later be opened by something other than herdr, so the door's port needs more thought (open, §3 row 2). Earlier: point 5 owner chose
 A (no own topic list; backlog row per request, read status from backlog / discussion marker / plan status). Owner then
 raised: (1) discussions should leave messy `docs/history` -> `docs/discussions/*` or `docs/shaper/*` (owner chose
 `docs/discussions/<slug>/` folder, room to grow; this file moved there); (2) session/head identity must come from Identity,
@@ -36,7 +38,7 @@ sessions, not in the secretary's chat.
 | # | Point | State |
 |---|---|---|
 | 1 | Persona content and protocol (does / never does) | discussing. Provisionally clear: Miu orders topics itself and reports (owner, round 2). Provisionally clear: automatic rotation at turn end (Stop hook), soft ~40% only at rest, hard ~70% with verbatim last message + pending question; process replaced (new+close or in-pane replace); plus user `/handoff`. Open: handoff method (research pending) |
-| 2 | Placement and activation (`core/agents/secretary.yaml`, `claude --agent secretary` in herdr, opening shaper tabs) | open |
+| 2 | Placement and activation | provisionally clear: persona at `core/agents/secretary.yaml` (projected by `scripts/project-agents.mjs` to `.claude/agents/secretary.md`); one thin "start a head session" door for owner start, Miu opening shaper/planner/supervisor tabs and session rotation; it reuses Terminal Control (`packages/terminal-control/rust`, herdr driver) for the pane, Identity for who/role, and never the run supervisor (that wraps short-lived worker attempts: lock, sandbox, deadlines, brief, settle). **Open, needs deeper thought (owner):** head sessions may later be hosted by something other than a herdr pane (tmux, a Work-like UI or integration such as multica, a remote/cloud session, an SDK process), so the door must sit on a host port of which Terminal Control is only one adapter; what that port's contract is (start, alive?, focus, retire) and where it lives is undecided |
 | 3 | Domain classification without Work | provisionally clear: Miu calls `fgos-clarifying` directly (verdict-only); no shaper -> core domain-free shaper (owner chose A); unsure domain -> ask owner, no `coding` default. Open: registry vs `domains/` mismatch (marketing, council) |
 | 6 | Generic session rotation | provisionally clear: name `session-rotation` (owner); covers every head session run with a persona (persona yaml declares soft/hard thresholds and state files, core defaults otherwise), not `fgos run` seats (run supervisor owns them) nor subagents; Claude first behind a port, other CLIs via adapters reusing mailbox `hookFacts`; spike the two unproven mechanics first; two-step replacement (new answers before old closes); files under `.fgos/runtime/session-rotation/<persona>-<name>/<yymmdd-hhmm>-<sid8>.md` immutable + `latest.json` pointer written atomically, keep last 10, redacted. Session and head identity come from Identity (owner: mailbox only consumes; `docs/platform/identity/spec.md` §3), pane from herdr; idea: lineage = Identity role alias taken with `--take`. Open: which core component owns it (point 2) |
 | 4 | Token saving (3x always-loaded rules, model choice, short agent results, peer mail only on decisions) | open, needs owner approval |
@@ -114,6 +116,13 @@ sessions, not in the secretary's chat.
   batched in plan.md, plan stays draft, untouched phases ready); `fgos workflow status` open gates +
   `fgos workflow answer`. Miu proposed three stages, three places. Owner: "đủ rồi ... cần note lại là chỗ này vẫn chưa
   ổn lắm vì các vấn đề ở câu hỏi vẫn còn ở [nhiều] nơi, cần gom, nhưng để nâng cấp sau. vận hành được trước."
+- 2026-11-17 — Point 2. Miu proposed (A) each place calls herdr itself vs (B) one "start a head session" door.
+  Owner: "hiện bật pane bằng kiểu gì?" and "fgos run bật pane bằng gì? các hội đồng bật các seats bằng cách gì?"
+  Scout: `fgos run` and `fgos workflow start` (council seats are Units) share bind() -> runUnit -> dispatch
+  herdr-round/terminal-slot -> run supervisor `src/run-supervisor/direct-launch.mjs` -> `src/terminal-control/client.mjs`
+  -> Rust route + `driver/herdr.rs` (`tab create`/`pane split`). Terminal Control spec says it is usable without a run.
+  Miu corrected B: a thin door straight to Terminal Control, not through the run supervisor. Owner: "ok, đồng ý, nhưng
+  cần suy nghĩ kỹ chỗ này hơn vì có thể sau này khi tích hợp, các phiên chính không đơn thuần được mở bằng herdr."
 
 ## 6. Thiết kế đã chốt {#design}
 
