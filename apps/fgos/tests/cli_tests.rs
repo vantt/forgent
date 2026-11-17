@@ -4044,7 +4044,8 @@ fn after_a_fresh_init_the_git_journal_row_passes_and_no_git_fix_is_named() {
 }
 
 /// Without the controller's activation fence `init` cannot create the Git WAL, and says which command places it.
-#[cfg(unix)]
+// init initialises the Git journal, which the Git door keeps on Linux only.
+#[cfg(target_os = "linux")]
 #[test]
 fn init_without_the_activation_fence_warns_and_names_fgctl() {
     let world = InitWorld::new("fgos_init_nofence");

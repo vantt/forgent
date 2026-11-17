@@ -934,8 +934,9 @@ mod tests {
         );
     }
 
-    // The Git door's repository driver is Unix only; elsewhere it refuses by name.
-    #[cfg(unix)]
+    // These rows read the repository through the Git door, which keeps its journal on Linux only; macOS answers them
+    // differently from run to run.
+    #[cfg(target_os = "linux")]
     #[test]
     fn the_incidents_row_never_fails_it_counts_native_locks_and_a_merge_in_progress_and_points_to_fgos_git_status(
     ) {
@@ -1105,8 +1106,9 @@ mod tests {
         assert_eq!(message(&row), "git available");
     }
 
-    // The Git door's repository driver is Unix only; elsewhere it refuses by name.
-    #[cfg(unix)]
+    // These rows read the repository through the Git door, which keeps its journal on Linux only; macOS answers them
+    // differently from run to run.
+    #[cfg(target_os = "linux")]
     #[test]
     fn the_hook_row_applies_only_to_a_project_whose_pre_commit_is_the_fgos_guard() {
         let f = Fixture::new("hooks");
