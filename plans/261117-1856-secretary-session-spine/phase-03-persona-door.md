@@ -1,0 +1,35 @@
+# Phase 3: One persona door for head sessions
+
+## Inputs (read first)
+- `src/runner/agent-definitions.mjs` (`resolveAgentDefinition` l.252, `projectPersona` l.136, `PERSONA_KEYS` l.123,
+  `BOUNDARY_KEYS` l.124, `readAgentDefinition` returns `skills` l.117 but nothing renders it).
+- `src/runner/dispatch/assignment.mjs` `renderPersonaSection` (l.641, not exported; pinned text wins at l.650; called l.758, l.770).
+- `src/runner/execution/unit-run-start.mjs` `unitPersonaPin` (l.42) for the pin shape `{name, digest, text, identity}`.
+- `plan.md` "Persona protocol vs rendered sections"; SM-D10 in the discussion.
+- `test/runner/agent-definitions.test.mjs` (owning tests of the door).
+
+## Files this phase may write
+`src/runner/agent-definitions.mjs`, `src/runner/dispatch/assignment.mjs`, `test/runner/agent-definitions.test.mjs`.
+
+## Steps
+1. Find whether the worker brief already renders a skills section (`rg -n "skills" src/runner/dispatch/assignment.mjs src/runner/execution`).
+   Record the answer in the commit body.
+2. Move the persona-section rendering into the agent-definitions door as one exported function
+   `renderPersonaSection(personaRef, { projectRoot, workflow, pinnedText })` (same output bytes as today), and make
+   `assignment.mjs` call it; delete its private copy (one door, L10).
+3. Add `pinPersona(name, { projectRoot, workflow })` returning the same `{name, digest, text, identity}` shape
+   `unitPersonaPin` returns, by reusing `resolveAgentDefinition`; leave `unitPersonaPin` calling it if that removes a
+   duplicate, otherwise leave it as is.
+4. Skills: if step 1 found a brief skills section, export it from the same door and render a persona's `skills:` through
+   it; if not, add `skills` to the projected persona and render it as one line `Skills to load: a, b` (the smallest
+   extension; justified because without it the secretary protocol skill never reaches the session).
+5. One owning test in `test/runner/agent-definitions.test.mjs`: "a head session and a worker brief render the same
+   persona section for the same persona", plus the skills line case. Do not add a second test elsewhere.
+
+## Verify
+- `node --test test/runner/agent-definitions.test.mjs` passes.
+- `node --test test/cli/run-verb.test.mjs test/workflow/workflow-runner-seats.test.mjs` pass (existing persona consumers; no edit).
+- `rg -n "function renderPersonaSection" src` finds exactly one definition.
+
+## Rollback
+`git revert` the phase commit.
