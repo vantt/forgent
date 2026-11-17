@@ -493,7 +493,7 @@ tuyệt đối tới report nguồn): claude (herdr), codex (herdr và cli bwrap
 deepseek (pi cli bwrap) đều đọc bản chép, gặp `ENOENT` ở nguồn và chỉ thấy chuỗi của chính mình
 trong `.fgos/assignments`. Dưới `--unshare-pid` và mask thư mục socket herdr, herdr vẫn nhận ra agent
 trong pane (`agentKnownToHerdr: detected`, trạng thái `unknown` → `working` → `idle`/kết thúc), nên
-mask và `--unshare-pid` giữ nguyên. agy chưa chứng minh được: `agy-herdr` hỏng cả khi không blind
+mask và `--unshare-pid` giữ nguyên. agy chưa chứng minh được: `agy-herdr-bwrap` hỏng cả khi không blind
 (`foreground process ... does not match prepared command argv`), `agy-cli-bwrap` dừng vì hết quota
 của tài khoản.
 

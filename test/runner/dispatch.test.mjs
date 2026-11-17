@@ -457,7 +457,7 @@ test('the committed .fgos/config.json runner section declares the consolidated g
   assert.equal(executor.allowCrossProvider, true);
   assert.ok(Array.isArray(executor.invocations));
   const ids = executor.invocations.map((inv) => inv.id);
-  for (const id of ['omp-herdr', 'omp-cli-bwrap']) {
+  for (const id of ['omp-herdr-bwrap', 'omp-cli-bwrap']) {
     assert.ok(ids.includes(id), `gemini must declare the "${id}" invocation`);
   }
   // The Antigravity CLI is no longer installed; nothing may still spawn it.
@@ -3318,7 +3318,7 @@ test('compileDispatchPlan merges the same fields for a --for capability selector
 test('compileDispatchPlan applies the capability\'s tier and rigor when synthesizing policy for a --for capability selector', () => {
   const cfg = {
     executors: {
-      'agy-herdr': {
+      'agy-herdr-bwrap': {
         kind: 'agent',
         invocations: [{ id: 'agy-herdr-cli', via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' }, command: 'agy', args: ['{prompt}', '--model', '{model}'] }],
         providerModel: 'gemini',
@@ -3327,7 +3327,7 @@ test('compileDispatchPlan applies the capability\'s tier and rigor when synthesi
     },
     capabilities: {
       'fgos-coding-implement': {
-        prefer: 'agy-herdr',
+        prefer: 'agy-herdr-bwrap',
         rigor: 'high',
         tier: 'flagship',
       },
@@ -3340,7 +3340,7 @@ test('compileDispatchPlan applies the capability\'s tier and rigor when synthesi
 
   const plan = compileDispatchPlan(cfg, { for: 'fgos-coding-implement' });
   assert.equal(plan.policy.rigor, 'high', 'the capability rigor is recorded as a demand');
-  assert.equal(plan.executorId, 'agy-herdr');
+  assert.equal(plan.executorId, 'agy-herdr-bwrap');
   assert.equal(plan.bindingSource, 'seat-binding');
   assert.equal(plan.providerModel, 'gemini');
   assert.equal(plan.tier, 'flagship');

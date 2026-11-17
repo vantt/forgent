@@ -44,7 +44,7 @@ function agyHome(home, name, settings) {
 }
 
 const codexExecutor = (dir) => ({
-  openai: { providerModel: 'openai', invocations: [{ id: 'codex-herdr', adapter: 'herdr-spawn', env: { CODEX_HOME: dir }, interactiveMode: { trustStore: { kind: 'codex-toml' } } }] },
+  openai: { providerModel: 'openai', invocations: [{ id: 'codex-herdr-bwrap', adapter: 'herdr-spawn', env: { CODEX_HOME: dir }, interactiveMode: { trustStore: { kind: 'codex-toml' } } }] },
 });
 const agyExecutor = (dir) => ({
   gemini: { providerModel: 'gemini', invocations: [{ id: 'agy-cli', env: { HOME: dir } }] },
@@ -89,7 +89,7 @@ test('a codex home without an entry for the project fails with the exact lines t
     const before = fs.readFileSync(path.join(dir, 'config.toml'), 'utf8');
     const result = check(fixture, codexExecutor(dir));
     assert.equal(result.passed, false);
-    assert.match(result.message, new RegExp(`${path.join(dir, 'config.toml').replace(/[.*+?^${}()|[\]\\]/g, '\\$&')} \\(openai/codex-herdr\\) has no entry`));
+    assert.match(result.message, new RegExp(`${path.join(dir, 'config.toml').replace(/[.*+?^${}()|[\]\\]/g, '\\$&')} \\(openai/codex-herdr-bwrap\\) has no entry`));
     assert.ok(result.message.includes(`[projects."${fixture.project}"] trust_level = "trusted"`));
     assert.ok(!result.message.includes('sk-do-not-print'));
     assert.equal(fs.readFileSync(path.join(dir, 'config.toml'), 'utf8'), before);

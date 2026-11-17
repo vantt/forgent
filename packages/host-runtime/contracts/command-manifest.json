@@ -3356,7 +3356,7 @@
           },
           "examples": [
             "fgos dispatch probe-session gemini",
-            "fgos dispatch probe-session deepseek --invocation pi-herdr --json"
+            "fgos dispatch probe-session deepseek --invocation pi-herdr-bwrap --json"
           ]
         }
       },

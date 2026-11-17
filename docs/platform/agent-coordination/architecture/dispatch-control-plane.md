@@ -124,8 +124,8 @@ all fields were already accepted by a typed normalizer.
   "target": { "kind": "capability | executor", "value": "code:implement" },
   "policy": {
     "rigor": "standard",
-    "preferExecutor": "agy-herdr",
-    "fallbackExecutors": ["codex-herdr"],
+    "preferExecutor": "agy-herdr-bwrap",
+    "fallbackExecutors": ["codex-herdr-bwrap"],
     "preferPersona": "code-reviewer",
     "visibility": "headless"
   },
@@ -203,7 +203,7 @@ is separately discovered by the leaf resolver. Callers supply composed inputs;
 {
   "requestedTarget": { "kind": "capability", "value": "code:implement" },
   "requestedCapability": "code:implement",
-  "selectedExecutor": "agy-herdr",
+  "selectedExecutor": "agy-herdr-bwrap",
   "bindingSource": "seat-binding",
   "providerModel": "gemini",
   "tier": "standard",

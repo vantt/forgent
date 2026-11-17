@@ -117,7 +117,7 @@ export function resolveNormalizedSnapshotRow(cfg, executorId, workTier, throwawa
 export const CANONICAL_EXECUTOR_DESCRIPTORS = [
   { label: 'claude', executorId: 'claude', invocationId: 'claude-cli' },
   { label: 'gemini-cli', executorId: 'gemini', invocationId: 'omp-cli-bwrap' },
-  { label: 'gemini-herdr', executorId: 'gemini', invocationId: 'omp-herdr' },
+  { label: 'gemini-herdr', executorId: 'gemini', invocationId: 'omp-herdr-bwrap' },
   { label: 'codex-bwrap', executorId: 'openai', invocationId: 'codex-cli-bwrap' },
   // `pi` was a literal config duplicate of `codex-pi` before executor-provider-naming (2026-09-17); the
   // merged `openai` executor keeps one pi invocation, and an account is leased at launch rather than named
@@ -150,11 +150,11 @@ export function resolveSnapshotRowByLabel(cfg, label, workTier, throwawayDir) {
  * codex-bwrap, codex-readonly, pi, glm-cli] across tiers
  * [light, standard, heavy] resolve successfully in the legacy config without errors.
  * None are skipped.
- * `claude-herdr`/`pi-herdr` were removed from both config and this matrix
+ * `claude-herdr`/`pi-herdr-bwrap` were removed from both config and this matrix
  * (plans/260917-executor-profile-schema-migration/plan.md Phase A):
  * genuinely dormant, self-described as never wired to any capability, zero
  * other reference anywhere in src/ or test/ before removal.
- * `agy-cli`/`agy-herdr` became `gemini-cli`/`gemini-herdr` when gemini moved from
+ * `agy-cli`/`agy-herdr-bwrap` became `gemini-cli`/`gemini-herdr` when gemini moved from
  * the Antigravity CLI to omp's gemini-tetcu72 profile (agy is no longer installed).
  * executor-id-consolidation Step 2: each of these 12 canonical LABELS
  * (not necessarily a real, distinct executor id any more -- see
@@ -1054,7 +1054,7 @@ describe('dispatch policy baseline snapshot harness (Phase 00)', () => {
       const { executorId: resolvedExecutorId, invocationId: resolvedInvocationId, bindingSource } = purposeSeatOf(cfg, 'fgos-coding-implement');
       assert.equal(bindingSource, 'seat-binding', 'the purpose is answered by Seat Binding');
       assert.equal(resolvedExecutorId, 'gemini', 'resolvedExecutorId resolves to gemini (executor-provider-naming 2026-09-17 -- was agy)');
-      assert.equal(resolvedInvocationId, 'omp-herdr', 'resolvedInvocationId pins gemini\'s omp pane invocation');
+      assert.equal(resolvedInvocationId, 'omp-herdr-bwrap', 'resolvedInvocationId pins gemini\'s omp pane invocation');
     });
 
 
