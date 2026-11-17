@@ -88,16 +88,25 @@ impl SearchPath<'_> {
     }
 }
 
+/// How far into a file the launcher's marker line sits at most, and the most a launcher can weigh. The real
+/// `fgos` binary carries the launcher text as data, so the marker anywhere in a file does not make it ours: only
+/// a small script that names itself at its top does.
+const MARKER_WINDOW: usize = 256;
+const LAUNCHER_MAX_BYTES: usize = 64 * 1024;
+
+fn is_launcher_text(bytes: &[u8]) -> bool {
+    bytes.len() <= LAUNCHER_MAX_BYTES
+        && String::from_utf8_lossy(&bytes[..bytes.len().min(MARKER_WINDOW)])
+            .contains(LAUNCHER_MARKER)
+}
+
 /// Where `fgos` stands on `search`.
 pub fn inspect_launcher(search: SearchPath) -> LauncherStatus {
     let body = launcher_body(search.windows);
     if let Some(first) = search.find("fgos") {
-        let text = std::fs::read(&first)
-            .ok()
-            .map(|b| String::from_utf8_lossy(&b).into_owned());
-        let state = match text {
-            Some(text) if text.contains(LAUNCHER_MARKER) => {
-                if text == body {
+        let state = match std::fs::read(&first) {
+            Ok(bytes) if is_launcher_text(&bytes) => {
+                if bytes == body.as_bytes() {
                     LauncherState::Ready
                 } else {
                     LauncherState::Stale
@@ -292,6 +301,13 @@ mod tests {
     }
 
     #[cfg(unix)]
+    fn write_script_bytes(file: &Path, bytes: &[u8]) {
+        use std::os::unix::fs::PermissionsExt;
+        std::fs::write(file, bytes).unwrap();
+        std::fs::set_permissions(file, std::fs::Permissions::from_mode(0o755)).unwrap();
+    }
+
+    #[cfg(unix)]
     fn write_script(file: &Path, text: &str) {
         use std::os::unix::fs::PermissionsExt;
         std::fs::create_dir_all(file.parent().unwrap()).unwrap();
@@ -386,6 +402,26 @@ mod tests {
             "#!/bin/sh\necho npm-global\n"
         );
         assert!(!sb.bin.join("fgos").exists());
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn a_binary_that_carries_the_launcher_text_as_data_is_foreign_and_never_overwritten() {
+        let sb = Sandbox::new("binary");
+        sb.put_fgctl();
+        let file = sb.bin.join("fgos");
+        let mut bytes = vec![0x7f, b'E', b'L', b'F', 0, 0, 0, 0];
+        bytes.resize(MARKER_WINDOW + 8, 0);
+        bytes.extend_from_slice(launcher_body(false).as_bytes());
+        write_script_bytes(&file, &bytes);
+        let path = sb.bin.to_string_lossy().into_owned();
+        assert_eq!(
+            inspect_launcher(sb.search(&path)).state,
+            LauncherState::Foreign
+        );
+        let fix = fix_project_launcher(sb.search(&path)).unwrap();
+        assert!(!fix.fixed);
+        assert_eq!(std::fs::read(&file).unwrap(), bytes);
     }
 
     #[cfg(unix)]
