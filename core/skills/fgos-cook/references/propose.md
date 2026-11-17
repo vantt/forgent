@@ -73,7 +73,7 @@ everything is the owner's own decision, not a proposal.
 | `unresolved-scope`, `write-path-invalid`, `slice-write-invalid`, `write-path-forbidden`, `write-path-missing`, `write-scope-empty` | A write path cannot be judged or is not allowed (outside the repository, a symlink, `.git`, `node_modules`, run state, the whole repository, a new file whose directory is absent, a glob naming nothing). Name real files or directories. |
 | `write-overlap` | Two slices write the same path, including a test added to both. Merge them or make their paths disjoint. |
 | `test-scan-too-wide` | The slice changes so much code that its tests cannot be sized. Split it. |
-| `capability-unregistered` | A capability is not registered in the runner config. Pick one from `../../_shared/capability-catalog.md`. |
+| `capability-tool-unserved` | A slice names a tool ability no tool executor serves. Declare the tool executor, or pick another capability from `../../_shared/capability-catalog.md`. |
 | `rigor-below-floor`, `slice-rigor-below-table`, `slice-raise-invalid`, `slice-raise-needs-reason` | A rigor may only be raised, with a reason, to a value of `low`, `standard`, `high`, `critical`. |
 | `gate-command-missing` | Declare `capabilities.code:implement.verify` in the runner config; the final gate runs only that command. |
 | `guide-activity-missing` | The guide lacks an activity the commands need; use `coding/feature` or ask. |

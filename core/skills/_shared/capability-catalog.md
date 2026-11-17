@@ -74,14 +74,18 @@ Each capability may declare a `serves` attribute set — the machine-readable pr
 | `impact-analysis` | generic | — | Code-graph blast-radius lookup (upstream/downstream callers, affected flows). | MCP/tool provider (this repo's live config maps it to `gitnexus`, `kind: "tool"`, `via: "mcp"`) |
 | `pane-labeling` | generic | — | Write a session/task id onto a terminal pane's label for a human watching a screen. | adapter (herdr-only today) |
 
-Every entry above is either already registered in
-`src/setup/registrations.mjs`'s `DEFAULT_CAPABILITY_SLOTS` or already
-live in the config's `runner.capabilities` (`fgos config show`) (with the generic
-`review` slot introduced in doctrine and pending config schema
-registration; `decide --for review` currently returns the default
-mechanism). Do not treat this table as exhaustive forever,
-and do not treat it as a place to pre-invent capabilities nobody has asked
-`decide` for yet (P2-runtime: extend only by observed frequency).
+Every entry above is a row of the standard (`core/config-standard/runner.yaml`,
+`fgos config show` for a live project's effective view): the generic jobs, the
+tool abilities, and the coding rows the Work path and the coding skills route
+through, which stay until their behaviour has its own home. A workflow step
+may also name a capability with no row (a council or marketing step such as
+`architecture:shape`): that name is a label. Its seats bind through
+`runner.roles`, `runner.personas`, the step's own `tier` and `rigor`, and
+`tierFallback`; `decide --for <label>` answers `unavailable` (or `in-process`
+with `--needs-soul`), never `out-of-process`. Do not treat this table as
+exhaustive forever, and do not treat it as a place to pre-invent capabilities
+nobody has asked `decide` for yet (P2-runtime: extend only by observed
+frequency).
 
 ## Capability execution guidance: not agent-only
 
@@ -98,7 +102,7 @@ before deciding how to act on it.
 
 ## Catalog entries never pin provider/model/executor
 
-A catalog entry (`DEFAULT_CAPABILITY_SLOTS`, or a live project's
+A catalog entry (a row of the standard, or of a live project's
 `runner.capabilities`) may carry `description`/`aliases`/`prefer`/
 `overrides`, but the catalog's *canonical identity* — the name itself —
 never encodes a provider, model, tier, or executor. `prefer` names which
@@ -128,10 +132,13 @@ capability either — see that skill's own doc for the split.
 ## Registering a new capability
 
 1. Confirm real, observed demand — a caller already needs `decide --for
-   <name>` to resolve something, not a hypothetical future need.
-2. Add the name to `DEFAULT_CAPABILITY_SLOTS` in
-   `src/setup/registrations.mjs` with a one-line `description`, no
-   `prefer`/`overrides` (a curated default never pins an executor).
+   <name>` to resolve something, not a hypothetical future need. A workflow
+   step that only needs a name for its seats needs no row: name it, and
+   give the step its own `tier` and `rigor`.
+2. A tool ability (something only a `kind: "tool"` executor serves) gets a
+   row in the standard with a one-line `description` and no `prefer` or
+   `serves`, plus the tool executor whose `for` lists it; a workflow unit,
+   a proposal or a plan naming a tool ability no tool executor serves is
+   refused (`capability-tool-unserved`, `capability.tool-unserved`, doctor
+   `workflow-capabilities-configured`).
 3. Add one row to the table above.
-4. Only after step 2 lands does `fgos doctor` discover the
-   slot; a capability with no registered default is invisible to both.

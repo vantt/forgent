@@ -82,7 +82,7 @@ function fixture(t, mode) {
     patterns: { seatBinding: { schema: 1 } },
     loops: {
       reviewed: { maxRounds: 2, checkersByRigor: {
-        standard: ['reviewer'], high: ['reviewer'],
+        standard: ['reviewer'], high: ['reviewer'], critical: ['reviewer'],
       } },
     },
   } });

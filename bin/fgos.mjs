@@ -2266,10 +2266,9 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
 
     // Read-only door onto lintPlanCapabilityAnnotations (src/report/
     // capability-plan-lint.mjs): a plan author's own static check, never
-    // wired into `doctor` or any automatic gate. `registered` is always
-    // `Object.keys(runner.capabilities)` from THIS repo's own live config,
-    // read via `loadRunnerConfigForDir`, which never writes, so a read-only
-    // lint never mutates state as a side effect of being run.
+    // wired into `doctor` or any automatic gate. The runner config is THIS
+    // repo's own live config, read via `loadRunnerConfigForDir`, which never
+    // writes, so a read-only lint never mutates state as a side effect of being run.
     case 'plan-lint': {
       const rawPath = optionalField(positional[0], 'plan-lint requires a <path> to a plan directory, plan.md, or phase file, e.g. `fgos plan-lint plans/<track>`.');
       if (rawPath === undefined) {
@@ -2298,8 +2297,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         }
         throw err;
       }
-      const { capabilityNamesOf, capabilityDescriptionOf } = await import('../src/runner/execution/capability-config.mjs');
-      const registered = capabilityNamesOf(cfg);
+      const { capabilityDescriptionOf } = await import('../src/runner/execution/capability-config.mjs');
 
       let targetPath = absPath;
       let result;
@@ -2324,14 +2322,14 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         }
         targetPath = planMd;
         const text = fs.readFileSync(targetPath, 'utf8');
-        result = lintPlanCapabilityAnnotations(text, registered, cellId !== undefined ? { cellId } : {});
+        result = lintPlanCapabilityAnnotations(text, cfg, cellId !== undefined ? { cellId } : {});
       } else {
         targetPath = absPath;
         if (/^phase-\d+/i.test(path.basename(targetPath))) {
           result = lintPhaseUnits(targetPath, { config: cfg, cellId });
         } else {
           const text = fs.readFileSync(targetPath, 'utf8');
-          result = lintPlanCapabilityAnnotations(text, registered, cellId !== undefined ? { cellId } : {});
+          result = lintPlanCapabilityAnnotations(text, cfg, cellId !== undefined ? { cellId } : {});
         }
       }
 

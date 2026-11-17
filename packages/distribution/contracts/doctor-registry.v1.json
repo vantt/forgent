@@ -462,7 +462,7 @@
     },
     {
       "id": "workflow-capabilities-configured",
-      "description": "every capability a core/domain Workflow unit names is declared in runner.capabilities",
+      "description": "no core/domain Workflow unit names a tool ability that no tool executor serves; a capability with no row is a label and passes",
       "owner": "bridge:S6b",
       "judge": [
         "src/runner/execution/capability-config.mjs",

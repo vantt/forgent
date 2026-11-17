@@ -195,7 +195,7 @@ fn this_repositorys_project_file_migrates_with_the_same_effective_value() {
     let report = project(&ctx, &roots, &writer, &opts, |_| Ok(())).unwrap();
     // The one-key sections `gateway` and `lock` go, the tier ladder `$comment` converts, 38 values stay (the programs and tool executors are the global file's; the rest is this repository's own, including the six executors' cook skill declaration, the six model cells served through the thehive pool, which the standard no longer carries, and the two gemini cells naming a model agy no longer serves).
     assert_eq!(report.kept.len(), 38);
-    assert_eq!(report.dropped_redundant.len(), 232);
+    assert_eq!(report.dropped_redundant.len(), 166);
     assert_eq!(report.dropped_retired, ["lock.predecessorKillWaitMs"]);
     // The two gateway keys, and the copies of the standard's own global-only values (executor
     // order, invocation lists) the old file carried: none holds anything the standard lacks.
@@ -214,7 +214,7 @@ fn this_repositorys_project_file_migrates_with_the_same_effective_value() {
     assert!(report.machine_overrides.is_empty() && report.unknown_kept.is_empty());
     let yaml = fs::read_to_string(dir.join("project/.fgos/config.yaml")).unwrap();
     assert!(
-        yaml.lines().count() * 5 < source.split(|b| *b == b'\n').count(),
+        yaml.lines().count() * 4 < source.split(|b| *b == b'\n').count(),
         "the file shrinks to the project's own differences: {} lines",
         yaml.lines().count()
     );

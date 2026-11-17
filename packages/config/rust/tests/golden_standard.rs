@@ -100,35 +100,36 @@ fn every_standard_agent_pool_names_both_claude_and_openai() {
         }
     };
     let mut pools = 0;
+    let mut lists = Vec::new();
     for (capability, entry) in runner["capabilities"].as_object().unwrap() {
-        let mut lists = vec![(format!("{capability}.prefer"), &entry["prefer"])];
-        for group in ["seats", "personas", "roles"] {
-            for (key, scope) in entry[group].as_object().into_iter().flatten() {
-                lists.push((
-                    format!("{capability}.{group}.{key}.prefer"),
-                    &scope["prefer"],
-                ));
-            }
+        lists.push((
+            format!("capabilities.{capability}.prefer"),
+            &entry["prefer"],
+        ));
+    }
+    for table in ["roles", "personas"] {
+        for (key, scope) in runner[table].as_object().into_iter().flatten() {
+            lists.push((format!("{table}.{key}.prefer"), &scope["prefer"]));
         }
-        for (path, list) in lists {
-            if !list.is_array() {
-                continue;
-            }
-            let listed = names(list);
-            if listed
-                .iter()
-                .all(|name| runner["executors"][name]["kind"] == "agent")
-            {
-                pools += 1;
-                need_both(format!("capabilities.{path}"), listed);
-            }
+    }
+    for (path, list) in lists {
+        if !list.is_array() {
+            continue;
+        }
+        let listed = names(list);
+        if listed
+            .iter()
+            .all(|name| runner["executors"][name]["kind"] == "agent")
+        {
+            pools += 1;
+            need_both(path, listed);
         }
     }
     for (tier, list) in runner["tierFallback"].as_object().unwrap() {
         need_both(format!("tierFallback.{tier}"), names(list));
     }
     assert!(
-        pools > 30,
+        pools >= 10,
         "the standard's agent pools were not found ({pools})"
     );
     assert!(gaps.is_empty(), "{gaps:#?}");

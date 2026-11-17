@@ -44,6 +44,7 @@ steps:
       - id: synthesize-feedback
         template:
           capability: delphi:synthesize
+          tier: standard
           pattern: solo
           persona: synthesizer
           objective: Synthesize round 1 proposals into an anonymized mediated feedback summary. Name each position only by its seat label and never repeat seat ids such as member-1 or the order in which seats map to participants, so no reader can tell whose position is whose
@@ -76,6 +77,7 @@ steps:
       - id: synthesize-consensus
         template:
           capability: delphi:synthesize
+          tier: standard
           pattern: solo
           persona: synthesizer
           objective: >-

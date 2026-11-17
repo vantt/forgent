@@ -3,7 +3,7 @@ import path from 'node:path';
 
 import { parseYaml } from '../util/yaml.mjs';
 import { validateUnit } from '../runner/execution/unit.mjs';
-import { capabilityNamesOf, isCapabilityDeclared as declaresCapability, registeredCapabilityOf } from '../runner/execution/capability-config.mjs';
+import { unservedToolAbilityOf } from '../runner/dispatch/tool-providers.mjs';
 import { shippedCatalog } from '../runner/dispatch/shipped-catalog.mjs';
 import { RESERVED_PATTERN_NAMES } from '../runner/execution/patterns/retired-keys.mjs';
 // capability-plan-lint.mjs — static/read-only harness (docs/history/
@@ -129,17 +129,6 @@ export function pathsOverlap(a, b) {
     }
   }
   return false;
-}
-
-/** A capability is declared by its exact key, one of its aliases, or its `<prefix>:*` entry. */
-function isCapabilityDeclared(cap, runner) {
-  if (!runner || typeof runner !== 'object') return true;
-  if (Array.isArray(runner) || runner instanceof Set) {
-    const set = runner instanceof Set ? runner : new Set(runner);
-    const prefixKey = cap.includes(':') ? `${cap.split(':')[0]}:*` : null;
-    return set.has(cap) || (prefixKey !== null && set.has(prefixKey));
-  }
-  return declaresCapability(runner, cap) || registeredCapabilityOf(runner, cap) !== undefined;
 }
 
 function extractUnitBlocks(content) {
@@ -489,14 +478,14 @@ export function lintPhaseUnits(contentOrPath, { config, phase, cellId } = {}) {
           code: 'capability.unresolved',
           message: `unit "${u.id}" capability is unresolved -- resolve before merge`,
         });
-      } else if (runner && !isCapabilityDeclared(cap, runner)) {
+      } else if (unservedToolAbilityOf(runner, cap) !== undefined) {
         pushFinding({
           line: u.line,
           unit: u.id,
           source: 'unit-block',
           severity: 'warn',
-          code: 'capability.unregistered',
-          message: `unit "${u.id}" capability "${cap}" is not declared in config.runner.capabilities`,
+          code: 'capability.tool-unserved',
+          message: `unit "${u.id}" capability "${cap}" is a tool ability no tool executor serves`,
         });
       }
     }
@@ -604,12 +593,10 @@ function matchesCellId(entry, cellId) {
 
 /**
  * @param {string} text - raw plan.md content
- * @param {string[]} registeredCapabilities - canonical names to check
- *   against (e.g. `Object.keys(runner.capabilities)` from the caller's own
- *   config). Never defaulted here -- the caller owns what "registered"
- *   means for its own config, this module has no opinion. Never reads
- *   config or infers from prose itself; stays pure.
- * @param {{ cellId?: string }} [options] - `cellId` scopes the result to
+ * @param {object} [runner] - the caller's runner config (`config.runner` is unwrapped). A capability with no
+ *   row is a label and passes; only a tool ability no tool executor serves is flagged. Never reads config
+ *   itself; stays pure.
+ * @param {{ cellId?: string, phase?: number }} [options] - `cellId` scopes the result to
  *   only the unit block or Product Gates row whose id matches; when given
  *   and nothing matches, the result carries a single `capability.undeclared`
  *   (severity `hard`) finding instead.
@@ -619,17 +606,8 @@ function matchesCellId(entry, cellId) {
  *   findings: Array<{line: number|null, unit: string|null, source: string|null, code: string, severity: 'hard'|'warn', message: string}>,
  * }}
  */
-export function lintPlanCapabilityAnnotations(textOrPath, registeredCapabilitiesOrOptions = [], maybeOptions = {}) {
-  let registeredCapabilities;
-  let options;
-
-  if (Array.isArray(registeredCapabilitiesOrOptions) || registeredCapabilitiesOrOptions instanceof Set) {
-    registeredCapabilities = registeredCapabilitiesOrOptions;
-    options = maybeOptions ?? {};
-  } else {
-    options = registeredCapabilitiesOrOptions ?? {};
-    registeredCapabilities = options.registeredCapabilities ?? (options.config ? capabilityNamesOf(options.config) : []);
-  }
+export function lintPlanCapabilityAnnotations(textOrPath, runnerConfig = {}, options = {}) {
+  const runner = runnerConfig?.runner ?? runnerConfig;
 
   if (options.phase !== undefined) {
     const planDir = typeof textOrPath === 'string' && fs.existsSync(textOrPath) && fs.statSync(textOrPath).isDirectory()
@@ -637,14 +615,14 @@ export function lintPlanCapabilityAnnotations(textOrPath, registeredCapabilities
       : (typeof textOrPath === 'string' && fs.existsSync(textOrPath) ? path.dirname(textOrPath) : null);
     if (planDir) {
       const resolvedFile = resolvePhaseFile(planDir, options.phase);
-      return lintPhaseUnits(resolvedFile, options);
+      return lintPhaseUnits(resolvedFile, { ...options, config: runner });
     }
-    return lintPhaseUnits(textOrPath, options);
+    return lintPhaseUnits(textOrPath, { ...options, config: runner });
   }
 
   if (typeof textOrPath === 'string' && !textOrPath.includes('\n') && fs.existsSync(textOrPath)) {
     if (/^phase-\d+/i.test(path.basename(textOrPath))) {
-      return lintPhaseUnits(textOrPath, options);
+      return lintPhaseUnits(textOrPath, { ...options, config: runner });
     }
   }
 
@@ -662,7 +640,6 @@ export function lintPlanCapabilityAnnotations(textOrPath, registeredCapabilities
   }
 
   const { cellId } = options;
-  const registered = new Set(registeredCapabilities ?? []);
   const lines = String(text ?? '').split('\n');
   const units = [];
   const findings = [];
@@ -704,14 +681,14 @@ export function lintPlanCapabilityAnnotations(textOrPath, registeredCapabilities
         code: 'capability.invalid-shape',
         message: `capability "${bare}" is not a valid canonical shape (generic "name" or domain-scoped "domain:name")`,
       });
-    } else if (!registered.has(bare)) {
+    } else if (unservedToolAbilityOf(runner, bare) !== undefined) {
       pushFinding({
         line: ctx.line,
         unit: ctx.unit,
         source: ctx.source,
         severity: 'hard',
-        code: 'capability.unregistered',
-        message: `capability "${bare}" is not registered -- mark it "unresolved" explicitly or register it in DEFAULT_CAPABILITY_SLOTS first`,
+        code: 'capability.tool-unserved',
+        message: `capability "${bare}" is a tool ability no tool executor serves -- declare a kind: tool executor whose "for" lists it, or mark the unit "unresolved"`,
       });
     }
   };

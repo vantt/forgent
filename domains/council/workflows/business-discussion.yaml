@@ -73,6 +73,7 @@ steps:
       - id: synthesize-strategy
         template:
           capability: business:synthesize
+          tier: standard
           pattern: solo
           objective: >-
             Formulate coherent strategic recommendation documenting consensus, trade-offs, and dissent.

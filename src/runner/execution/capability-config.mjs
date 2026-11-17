@@ -3,11 +3,10 @@
 // returns an entry object.
 //
 // Two section rules, nothing else:
-//   flat    `runner.capabilities`, own keys only. Every function below except the five named next.
-//   lookup  `capabilityPersonaOf`, `capabilityRigorOf`, `minCheckersOf`, `isCapabilityDeclared` and
-//           `hasPreferPool` read the entries that apply to a capability, most specific first: its exact key,
-//           then its `<prefix>:*` entry (the text before the first colon; a name with no colon has no prefix
-//           entry, and the bare verb of `code:review` is never a key).
+//   flat    `runner.capabilities`, own keys only. Every function below except the three named next.
+//   lookup  `capabilityPersonaOf`, `capabilityRigorOf` and `minCheckersOf` read the entries that apply to a
+//           capability, most specific first: its exact key, then its `<prefix>:*` entry (the text before the
+//           first colon; a name with no colon has no prefix entry, and the bare verb of `code:review` is never a key).
 // An "entry" is an own key whose value is a non-null object (an array counts, as the doctor rows treat it).
 
 import { RIGOR_VALUES } from '../rigor.mjs';
@@ -49,9 +48,6 @@ export const capabilityNamesOf = (runner) => {
 /** Whether `name` is an own key holding an entry. */
 export const hasCapabilityEntry = (runner, name) => exactEntryOf(runner, name) !== undefined;
 
-/** Whether a capability has an entry of its own or a `<prefix>:*` one. */
-export const isCapabilityDeclared = (cfg, capability) => entriesOf(cfg, capability).length > 0;
-
 /**
  * The registered name a capability goes by: its own key, else the first key (insertion order) that lists it
  * in `aliases`; undefined when nothing registers it.
@@ -87,9 +83,6 @@ export function minCheckersOf(cfg, capability) {
   return found ? { key: found.key, minCheckers: found.entry.minCheckers } : null;
 }
 
-/** Whether the exact entry or its prefix entry names at least one executor in `prefer`. */
-export const hasPreferPool = (cfg, capability) => entriesOf(cfg, capability).some(({ entry }) => usablePrefer(entry.prefer));
-
 // ---- fields read from the exact entry --------------------------------------------------------------
 
 /** The exact entry's `minCheckers`, raw; undefined when absent. */
@@ -109,6 +102,15 @@ export const preferOf = (runner, capability) => exactEntryOf(runner, capability)
 
 /** Whether the exact entry names at least one executor in `prefer`. */
 export const hasOwnPreferPool = (runner, name) => usablePrefer(exactEntryOf(runner, name)?.prefer);
+
+/**
+ * Whether the exact entry is a tool ability: a row naming no `prefer` pool and no `serves`, so only a tool
+ * executor's `for` can serve it. A name with no row is a label, never a tool ability.
+ */
+export const isToolAbilityRow = (runner, name) => {
+  const entry = exactEntryOf(runner, name);
+  return entry !== undefined && !usablePrefer(entry.prefer) && entry.serves === undefined;
+};
 
 /** The description of the exact entry, else of its `<prefix>:*` entry; null when neither has one. */
 export function capabilityDescriptionOf(runner, capability) {

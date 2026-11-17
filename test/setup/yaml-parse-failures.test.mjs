@@ -100,10 +100,10 @@ test('one unparsable workflow does not stop the others from being evaluated, and
   assert.match(blind.message, /not applicable: no Workflow unit is blind/, 'the normal verdict is kept');
   assert.match(blind.message, new RegExp(`core/workflows/broken\\.yaml: ${PARSE_PROBLEM.source}`));
 
-  write('core/workflows/uses-capability.yaml', 'id: uses\nsteps:\n  - id: a\n    units:\n      - id: u\n        template: { capability: nowhere:declared }\n');
+  write('core/workflows/uses-capability.yaml', 'id: uses\nsteps:\n  - id: a\n    units:\n      - id: u\n        template: { capability: impact-analysis }\n');
   const capabilities = await checkById('workflow-capabilities-configured')(root);
   assert.equal(capabilities.passed, false);
-  assert.match(capabilities.message, /no entry for Workflow capabilities: .*nowhere:declared/, 'the parsable workflow was evaluated');
+  assert.match(capabilities.message, /tool abilities no tool executor serves: impact-analysis/, 'the parsable workflow was evaluated');
   assert.match(capabilities.message, new RegExp(`core/workflows/broken\\.yaml: ${PARSE_PROBLEM.source}`));
 });
 

@@ -61,7 +61,7 @@ test('an invalid capability shape (not generic, not domain:capability) is flagge
 });
 
 test('a capability with no row is a label and passes; a tool ability no tool executor serves is flagged capability.tool-unserved, naming the remedy', () => {
-  const label = lintPlanCapabilityAnnotations(`- unit: apply the fix\n  capability: impact-analysis\n`, STANDARD_RUNNER);
+  const label = lintPlanCapabilityAnnotations(`- unit: apply the fix\n  capability: code:teleport\n`, STANDARD_RUNNER);
   assert.equal(label.ok, true);
   assert.deepEqual(label.findings, []);
   const text = `- unit: blast radius
@@ -466,8 +466,8 @@ Overview text
   const config = {
     runner: {
       capabilities: {
-        'docs:write': { description: 'Write documentation' },
-        'code:review': { description: 'Review code' },
+        'docs:write': { description: 'Write documentation', serves: { outputKind: 'change' } },
+        'code:review': { description: 'Review code', serves: { outputKind: 'finding' } },
       },
     },
   };
@@ -704,7 +704,7 @@ test('lintPlanCapabilityAnnotations supports options.phase to target phase files
 `,
     );
 
-    const result = lintPlanCapabilityAnnotations(tmpDir, { phase: 2 });
+    const result = lintPlanCapabilityAnnotations(tmpDir, STANDARD_RUNNER, { phase: 2 });
     assert.equal(result.ok, true);
     assert.equal(result.units.length, 1);
     assert.equal(result.units[0].id, 'u-phase2');

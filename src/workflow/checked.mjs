@@ -27,6 +27,8 @@ export function validateWorkflowChecked(raw, options) {
   for (const step of workflow.steps) {
     for (const unit of step.units ?? []) {
       if (options?.source === 'units-file') assertNoUnitTier(unit.template, 'a units file');
+      // validateUnit checks the same ladder when the unit runs; here a bad tier is refused when the definition
+      // loads, naming its step and unit.
       const tier = unit.template?.tier;
       if (tier !== undefined && !MODEL_POLICY_TIERS.includes(tier)) {
         throw new RunnerConfigError(`step "${step.id}" unit "${unit.id}" tier "${tier}" must be one of [${MODEL_POLICY_TIERS.join(', ')}]`);

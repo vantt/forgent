@@ -54,9 +54,10 @@ policy or substitute an inline panel. Do not use historical dispatch recipes.
 ## Registered linear advice
 
 `architecture-advisory` follows framing → blind shaping → reviewed critique →
-reviewed high-rigor synthesis → explanation → human close. The registered
-capabilities remain `architecture:frame`, `architecture:shape`,
-`architecture:critique`, `architecture:synthesize`, and `architecture:explain`.
+reviewed critical-rigor synthesis → explanation → human close. Its steps name
+`architecture:frame`, `architecture:shape`, `architecture:critique`,
+`architecture:synthesize`, and `architecture:explain`; these are labels with no
+capability row, and each step declares its own tier and rigor.
 Shaping seat tasks use fixed system, alternative, and constraint lenses through
 registered template params; synthesis checker tasks target the producer's final packet.
 No capability name is a promise of a distinct provider or isolated session.
@@ -92,7 +93,7 @@ Workflow owns the transition after the answer; closing is still not advice appro
 
 ## Bounded reopen
 
-A material revisit uses only `architecture-advisory-reopen`: reviewed high-rigor
+A material revisit uses only `architecture-advisory-reopen`: reviewed critical-rigor
 synthesis → explanation → human close. Supply settled parent reports with repeatable
 `--context-ref unit-run:<unitRunId>/<role>`, plus the new owner's words verbatim.
 These references resolve from the state root; plain paths are rejected across repos:

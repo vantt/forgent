@@ -63,7 +63,7 @@ A static harness or lint (`plan-lint`) reads these declared units and verifies t
   concern (Seat Binding through `decide`), never a plan
   artifact — a plan that pins an executor has leaked an execution-time
   decision into a planning-time document.
-- A unit whose capability is not yet registered gets flagged as
+- A unit whose capability is not settled yet gets flagged as
   unresolved rather than assigned a guessed name — see
   `capability-catalog.md`'s "Registering a new capability" section.
 
@@ -105,10 +105,11 @@ whichever session picks up each unit runs
 
 A read-only lint against this exact convention exists at
 `src/report/capability-plan-lint.mjs`
-(`lintPlanCapabilityAnnotations(text, registeredCapabilities)`): given a
+(`lintPlanCapabilityAnnotations(text, runnerConfig)`): given a
 plan's text, it checks that every `- unit:`/`capability:` block names one
-syntactically valid, registered (or explicitly `unresolved`) capability
-and pins no `executor`/`provider`/`model`/`tier`. It reads text and
+syntactically valid (or explicitly `unresolved`) capability, never a tool
+ability no tool executor serves, and pins no
+`executor`/`provider`/`model`/`tier`. It reads text and
 returns findings — it writes nothing, and nothing calls it automatically
 yet (no execution-boundary guard exists; P3 gates that on real, observed
 dogfood non-compliance, not on this fragment's own say-so). Point a plan

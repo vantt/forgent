@@ -23,6 +23,8 @@ steps:
       - id: frame-context
         template:
           capability: architecture:frame
+          rigor: high
+          tier: flagship
           pattern: solo
           persona: advisor
           objective: Frame problem context and investigate architectural constraints
@@ -33,6 +35,8 @@ steps:
       - id: shape-proposals
         template:
           capability: architecture:shape
+          rigor: critical
+          tier: flagship
           pattern: panel
           blind: true
           seats:
@@ -53,6 +57,8 @@ steps:
       - id: critique-proposals
         template:
           capability: architecture:critique
+          rigor: high
+          tier: flagship
           pattern: reviewed
           acceptOutcomes: [pass, findings]
           objective: Critique proposals, identify risks, and stress-test constraints; preserve attributed findings and dissent without claiming approval.
@@ -63,8 +69,9 @@ steps:
       - id: synthesize-recommendation
         template:
           capability: architecture:synthesize
+          tier: flagship
           pattern: reviewed
-          rigor: high
+          rigor: critical
           acceptOutcomes: [pass, findings]
           params:
             minCheckers: [reviewer, red-team]
@@ -85,6 +92,8 @@ steps:
       - id: explain-recommendation
         template:
           capability: architecture:explain
+          rigor: critical
+          tier: flagship
           pattern: solo
           persona: advisor
           objective: >-
