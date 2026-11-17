@@ -84,6 +84,31 @@ fn infrastructure_facts(value: &Value) -> bool {
             .is_some_and(|seats| seats.iter().all(refused_seat))
 }
 
+const VERIFY_OUTCOMES: [&str; 4] = ["pass", "findings", "timeout", "not-run"];
+
+/// The optional record of the verify command the run ended with. Absent means not recorded, which the
+/// reader accepts; a present value must be one of the two shapes.
+fn verify_facts(value: &Value) -> bool {
+    let Some(verify) = value.get("verify") else {
+        return true;
+    };
+    match verify["ran"].as_bool() {
+        Some(false) => string(&verify["reason"]),
+        Some(true) => {
+            string(&verify["command"])
+                && verify["outcome"]
+                    .as_str()
+                    .is_some_and(|outcome| VERIFY_OUTCOMES.contains(&outcome))
+                && (verify["exit"].is_null() || verify["exit"].is_i64() || verify["exit"].is_u64())
+                && verify["passed"].is_boolean()
+                && verify["durationMs"].is_u64()
+                && string(&verify["how"])
+                && string(&verify["outputDigest"])
+        }
+        None => false,
+    }
+}
+
 fn valid_summary(value: &Value, directory_name: &str) -> bool {
     let version = value["contract"]["version"].as_u64();
     value["contract"]["id"] == "unit-summary"
@@ -91,6 +116,7 @@ fn valid_summary(value: &Value, directory_name: &str) -> bool {
         && version.is_some_and(|version| {
             version < INFRASTRUCTURE_FACTS_VERSION || infrastructure_facts(value)
         })
+        && verify_facts(value)
         && value["unitRunId"] == directory_name
         && nullable_string(value.get("startedAt"))
         && nullable_string(value.get("pattern"))

@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "e1f5049db454210988af299fe9414d39d49c129793e4109209a0ba8f40a36de2",
+  "payloadDigest": "1aa013f9a315aec54daf8e4c36f756113e1cc4ff13e4bdcd4b1591e4145b9937",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "b8b886cee2ea5ce7ee1153e4795512db135a990de894c27e53c5e778b210be62",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -717,10 +717,10 @@
     "packages/process/rust/tests/windows_job_domain.rs": "ef875f367c2bd361ba1e9743eb021bedfd7fac299781cc650e72fe06d6ba419c",
     "packages/process/rust/tests/windows_spawn.rs": "ac45d3b618d92790e926c41e7910f95f46440aab35ce1100e7f16c7a6b73fa97",
     "packages/run-result/rust/src/lib.rs": "55e1ac4cce85b1b897adba8dcc51c7fb11ef2c29eaf731cada25eaeb5f3ccad3",
-    "packages/run-result/rust/src/unit_summary.rs": "df87fdcb400430cfa000652bab55473fb136cab6a3b39c4821dd3da342186b8a",
+    "packages/run-result/rust/src/unit_summary.rs": "955bcf0b189e0aaaddfc78a2d685bda10838bc0857b2853a5ddb829ac358a6e2",
     "packages/run-result/rust/tests/layout_fixture.rs": "3fa57f7b3ee9292dd3b1242a971b276659a7684d90e67daa62119c6c1a08acb6",
     "packages/run-result/rust/tests/unit_result_fixtures.rs": "27dde9cbedb4c47898a9ffc077b591caf221ff39bdbf188a44b0e5d7e2b39481",
-    "packages/run-result/rust/tests/unit_summary.rs": "feb6eea8b2d7f83e68d093f0a1dd9a523d4cefe02dd1899c56021dee9d7292aa",
+    "packages/run-result/rust/tests/unit_summary.rs": "3230adf447ef5dab06623be34ea9a1ce1b983fd905bdcf1306e6f44b4ddd6e28",
     "packages/run-supervisor/rust/examples/gate_agent.rs": "91486ceb4f500a9b8b06975c3cf98ebcdc65cdb8629b863304520c14240e80fd",
     "packages/run-supervisor/rust/examples/gate_harness.rs": "7412bfe67e635bdc37b2c100b0498670209bd54faa2714830929ce346b603742",
     "packages/run-supervisor/rust/examples/internal_harness.rs": "8801bb6f1b52e89a113be1b1392b577d7db603c407e903038a4199a9fdf0e76e",

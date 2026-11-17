@@ -438,6 +438,56 @@ fn reader_reports_root_wide_missing_and_unusable_summaries_without_reconstructio
     }
 }
 
+#[test]
+fn optional_verify_record_reads_in_both_shapes_and_a_malformed_one_is_invalid_contract() {
+    let root = Fixture::new();
+    let with = |id: &str, verify: Option<Value>| {
+        let mut summary = unit(id, &[]);
+        summary["contract"]["version"] = json!(3);
+        summary["infrastructure"] = json!(false);
+        summary["infrastructureReason"] = Value::Null;
+        summary["refused"] = json!([]);
+        if let Some(verify) = verify {
+            summary["verify"] = verify;
+        }
+        summary
+    };
+    let ran = json!({"ran": true, "command": "npm test", "outcome": "pass", "exit": 0, "passed": true,
+        "durationMs": 1200, "how": "shell", "outputDigest": "sha256:abc"});
+    let mut timed_out = ran.clone();
+    timed_out["outcome"] = json!("timeout");
+    timed_out["exit"] = Value::Null;
+    timed_out["passed"] = json!(false);
+    let mut no_passed = ran.clone();
+    no_passed.as_object_mut().unwrap().remove("passed");
+    let mut bad_outcome = ran.clone();
+    bad_outcome["outcome"] = json!("green");
+    root.summary(&with("unit-run-verify-ran", Some(ran)));
+    root.summary(&with("unit-run-verify-timeout", Some(timed_out)));
+    root.summary(&with("unit-run-verify-skipped", Some(json!({"ran": false, "reason": "no command"}))));
+    root.summary(&with("unit-run-verify-absent", None));
+    root.summary(&with("unit-run-verify-no-passed", Some(no_passed)));
+    root.summary(&with("unit-run-verify-bad-outcome", Some(bad_outcome)));
+    root.summary(&with("unit-run-verify-ran-only", Some(json!({"ran": true}))));
+    let mut v2 = unit("unit-run-v2-plain", &[]);
+    v2["contract"]["version"] = json!(2);
+    root.summary(&v2);
+    let scan = scan_unit_summaries(&root.0, &Window::default()).unwrap();
+    let mut ids: Vec<_> = scan.observations.iter().map(|o| o.subject.id.clone()).collect();
+    ids.sort();
+    assert_eq!(
+        ids,
+        [
+            "unit-run:unit-run-v2-plain",
+            "unit-run:unit-run-verify-absent",
+            "unit-run:unit-run-verify-ran",
+            "unit-run:unit-run-verify-skipped",
+            "unit-run:unit-run-verify-timeout",
+        ]
+    );
+    assert_eq!(scan.summaries_skipped_by_reason.get("invalid-contract"), Some(&3));
+}
+
 #[cfg(unix)]
 #[test]
 fn reader_does_not_follow_unit_file_or_state_symlinks() {
