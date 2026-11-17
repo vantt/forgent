@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "ec68fc6fdf2d83659dd5405790f6fcfe64c09d995e9d199c6976c97743531541",
+  "payloadDigest": "bf49c2e89184165bcc8a84709a31d123c188a76b890605dfeaeb0b933d496b18",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "b8b886cee2ea5ce7ee1153e4795512db135a990de894c27e53c5e778b210be62",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -321,7 +321,7 @@
     "packages/distribution/rust/src/suggest.rs": "302d698667662b3544b0761cd53dd87c68594d6f1b1ce52d8b85032627d52182",
     "packages/distribution/rust/src/test_scratch.rs": "3829302288f512f253efd3a83f81b6d2cc026da7ad9c57dc2a70be2ad5cd59ed",
     "packages/distribution/rust/src/timer.rs": "83f4b2efcaf0382ef2b2a83084ee680e69870eaaa789a9b055fc2f1e1715b8ed",
-    "packages/distribution/rust/src/uninstall.rs": "c239bf1249825db23867a8cb0b3af9c10d80b2c85f58ef3a6f9353500860b8f9",
+    "packages/distribution/rust/src/uninstall.rs": "391b87ae82679a9f9ed9948fe52dca02bc7386afa687ac9ccd320730b8c7dc8e",
     "packages/distribution/rust/src/verify.rs": "79a9f08e75d0c0ca8f5e04ad8443e4134a3dfbd85a38e01a448d53361463dc69",
     "packages/distribution/rust/src/workspace.rs": "13992ca4de13df3a7e6a7522822c3947864c6fa2d8c23050a8fe0de893381dcb",
     "packages/distribution/rust/tests/activation_lock_multiprocess.rs": "ff2818dd10b745ac29c1610effd95ac36552f4aace4525634c6b20f17f325fe0",

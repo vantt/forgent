@@ -775,20 +775,23 @@ mod tests {
 
     #[test]
     fn purge_guard_refuses_root_home_relative_dotdot_and_ancestors() {
-        let home = PathBuf::from(abs("/home/someone"));
-        let project = PathBuf::from(abs("/home/someone/work/app"));
+        let home = PathBuf::from(abs("/fgos-people/someone"));
+        let project = PathBuf::from(abs("/fgos-people/someone/work/app"));
         let refused =
             |root: &str| guard_store_root(Path::new(root), Some(&home), &project).is_err();
         assert!(refused(&abs("/")));
-        assert!(refused(&abs("/home/someone")));
-        assert!(refused(&abs("/home")), "an ancestor of the home directory");
-        assert!(refused("relative/state/fgos"));
-        assert!(refused(&abs("/home/someone/.local/../../other")));
+        assert!(refused(&abs("/fgos-people/someone")));
         assert!(
-            refused(&abs("/home/someone/work")),
+            refused(&abs("/fgos-people")),
+            "an ancestor of the home directory"
+        );
+        assert!(refused("relative/state/fgos"));
+        assert!(refused(&abs("/fgos-people/someone/.local/../../other")));
+        assert!(
+            refused(&abs("/fgos-people/someone/work")),
             "an ancestor of the project"
         );
-        assert!(!refused(&abs("/home/someone/.local/state/fgos")));
+        assert!(!refused(&abs("/fgos-people/someone/.local/state/fgos")));
     }
 
     #[test]
