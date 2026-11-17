@@ -77,9 +77,10 @@ itself is genuinely unclear, not when a detail is merely unspecified.
 - **Classify `domain` — a real duty, not a stub (D5, D2 of this item's own
   CONTEXT.md).** `domain` is a required field on the verdict (never
   omitted, even on an unclear intent; it is `null` when unsure). Read the registered domain vocabulary
-  mechanically — `Object.keys(DOMAINS)` from
-  `src/state/domain-registry.mjs` (today: `coding`, `synthetic`,
-  `triage`, `fixture-marketing`) — never a hardcoded list of your own.
+  mechanically — `clarifyingDomainVocabulary()` from
+  `src/state/domain-registry.mjs` (every `domains/` directory — today:
+  `coding`, `council`, `marketing` — plus the test-only fixtures
+  `synthetic`, `triage`, `fixture-marketing`) — never a hardcoded list of your own.
   Judge which one the submitted text fits from its own content directly
   (a live session judgment, same discipline as the intent verdict itself).
   When nothing about the text points to a registered domain, never assume
@@ -123,7 +124,7 @@ itself is genuinely unclear, not when a detail is merely unspecified.
      ever creating an item.
 
 3. **Classify domain.** Regardless of the intent verdict, read the
-   registered domain vocabulary (`Object.keys(DOMAINS)`,
+   registered domain vocabulary (`clarifyingDomainVocabulary()`,
    `src/state/domain-registry.mjs`) and judge which one the text
    fits. When nothing fits with confidence, return `domain: null`,
    `domainUnsure: true` and a one-line question naming the candidate

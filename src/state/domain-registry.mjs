@@ -167,6 +167,19 @@ export const DOMAINS = Object.freeze({
   }),
 });
 
+/** The test-only fixture domains: registered here for lifecycle proofs, with no `domains/` directory of their own. */
+export const FIXTURE_DOMAINS = Object.freeze(['synthetic', 'triage', 'fixture-marketing']);
+
+/**
+ * The domain vocabulary `fgos-clarifying` classifies against: every directory under `domains/` (so a domain with
+ * no compiled workflow, such as `marketing` or `council`, is still named) followed by the fixture domains. A
+ * directory domain is listed whether or not it has a compiled registry; `DOMAINS` stays the set that can run Work.
+ */
+export function clarifyingDomainVocabulary({ payloadRoot } = {}) {
+  const names = domainCatalog(payloadRoot ? { payloadRoot } : undefined).domains.map((d) => d.name);
+  return Object.freeze([...names, ...FIXTURE_DOMAINS.filter((f) => !names.includes(f))]);
+}
+
 /**
  * Resolve a (possibly absent or unrecognized) domain name to a real key in
  * `DOMAINS`. Absent reads as `DEFAULT_DOMAIN` silently (every legacy item has no
