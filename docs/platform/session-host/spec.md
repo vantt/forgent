@@ -10,6 +10,9 @@ Canonical: Yes
 Owner: Session Host component
 Source: packages/session-host/rust (planned), src/session-host/client.mjs (planned)
 Contracts: packages/session-host/contracts/
+Provenance: First committed on branch sec/p01 (2026-11-17)
+Writer type: Human + agent coauthor
+Last reviewed: 2026-11-17
 Canonical for: the placement port (start, alive, front, retire) for worker and head sessions
 Use this when: Placing an agent session, adding a host adapter, or changing how a session opening text is delivered
 Do not use this for: Run state, deadlines, containment (run supervisor); which pane (Terminal Control); who a session is (Identity)
@@ -71,7 +74,7 @@ Both columns fit the four operations with no field the other column cannot fill:
 
 ## 6. Layer
 
-Above Terminal Control (L2), below the run supervisor (L4). The dependency is one way: run supervisor → Session Host → Terminal Control. Rust crate `fgos-session-host` (`packages/session-host/rust`) with a thin Node client (`src/session-host/client.mjs`) behind an internal route; no user verb.
+Above Terminal Control (L2), below the run supervisor (L4). The dependency is one way: run supervisor → Session Host → Terminal Control. Rust crate `fgos-session-host` (planned at packages/session-host/rust) with a thin Node client (planned at src/session-host/client.mjs) behind an internal route; no user verb.
 
 ## 7. Shared entities
 
