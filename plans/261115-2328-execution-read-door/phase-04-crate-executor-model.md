@@ -45,7 +45,9 @@ by `executor-model.v1.json` (01).
 
 ## Acceptance
 
-- Every vector of `executor-model.v1.json` passes; `cargo tree -p fgos-execution` shows no I/O crate (no `fgos-config`,
+- 201 vectors of `executor-model.v1.json` are replayed and 37 more are listed in `REPLAYED_LATER` (each with its
+  owning module, never a phase number: `accountQuarantine` in `bind.rs`, `validate` in `runner_check.rs`, the
+  `status` field of `toolProviders` in `tools.rs`); a whole fact listed there must still be unreplayed or the test fails; `cargo tree -p fgos-execution` shows no I/O crate (no `fgos-config`,
   `fgos-git`, `fgos-holder-lock`): the crate stays pure.
 
 ## Risks / rollback

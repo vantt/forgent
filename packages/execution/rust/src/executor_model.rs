@@ -36,32 +36,28 @@ fn array_of<'a>(value: &'a Value, key: &str) -> &'a [Value] {
         .map_or(&[], Vec::as_slice)
 }
 
-/// The executors of a runner section, whether it is the section or wraps it as `runner`.
+/// The executors of a runner section (the caller unwraps a config that nests it as `runner`).
 fn executors_of(runner: &Value) -> Option<&Map<String, Value>> {
-    present(runner, "executors")
-        .or_else(|| {
-            runner
-                .get("runner")
-                .and_then(|section| present(section, "executors"))
-        })
-        .and_then(Value::as_object)
+    present(runner, "executors").and_then(Value::as_object)
 }
 
 /// The command of the legacy default executor.
 fn default_command_of(runner: &Value) -> Option<&str> {
-    fn of(section: &Value) -> Option<&str> {
-        section
-            .get("executor")
-            .and_then(|default| str_of(default, "command"))
-    }
-    of(runner).or_else(|| runner.get("runner").and_then(of))
+    runner
+        .get("executor")
+        .and_then(|default| str_of(default, "command"))
+}
+
+/// A path separator: `/`, and `\` too on Windows (Node's `path.basename` follows the platform).
+fn is_separator(c: char) -> bool {
+    c == '/' || (cfg!(windows) && c == '\\')
 }
 
 /// The program name of a command, as Node's `path.basename`.
 fn basename(command: &str) -> &str {
     command
-        .trim_end_matches('/')
-        .rsplit('/')
+        .trim_end_matches(is_separator)
+        .rsplit(is_separator)
         .next()
         .unwrap_or_default()
 }
@@ -269,6 +265,15 @@ fn executor_family(runner: &Value, id: &str) -> String {
     family_of(FamilySource::Entry(entry), command)
 }
 
+/// Whether the legacy default executor answers to `id`: by its own command, or by the command or id of its
+/// first invocation.
+fn names_default_executor(default: &Value, id: &str) -> bool {
+    let first = array_of(default, "invocations").first();
+    str_of(default, "command") == Some(id)
+        || first
+            .is_some_and(|inv| str_of(inv, "command") == Some(id) || str_of(inv, "id") == Some(id))
+}
+
 // ---- lookup ----------------------------------------------------------------------------------------------
 
 /// The answer of [`lookup_executor`]: a state, never an error.
@@ -306,14 +311,8 @@ pub fn lookup_executor<'a>(runner: &'a Value, executor_id: Option<&str>) -> Look
                 binding_source: Some("default"),
             };
         }
-        let first = array_of(default, "invocations").first();
         let id = executor_id.unwrap_or_default();
-        let named = id == "executor"
-            || str_of(default, "command") == Some(id)
-            || first.is_some_and(|inv| {
-                str_of(inv, "command") == Some(id) || str_of(inv, "id") == Some(id)
-            });
-        if named {
+        if id == "executor" || names_default_executor(default, id) {
             return Lookup {
                 executor_id: Some(id.to_string()),
                 executor: Some(default),
@@ -337,6 +336,25 @@ pub fn lookup_executor<'a>(runner: &'a Value, executor_id: Option<&str>) -> Look
 pub struct Governance {
     pub disallowed_providers: Vec<String>,
     pub disallowed_executors: Vec<String>,
+}
+
+impl Governance {
+    /// The deny lists a runner section declares (none when it declares none).
+    pub fn of(runner: &Value) -> Self {
+        let list = |key: &str| -> Vec<String> {
+            runner
+                .get("governance")
+                .map(|governance| array_of(governance, key))
+                .unwrap_or_default()
+                .iter()
+                .filter_map(|entry| entry.as_str().map(str::to_string))
+                .collect()
+        };
+        Governance {
+            disallowed_providers: list("disallowedProviders"),
+            disallowed_executors: list("disallowedExecutors"),
+        }
+    }
 }
 
 /// Whether a provider is on the deny list, both compared in the one family vocabulary, and the family the
@@ -382,12 +400,10 @@ pub fn resolve_executor_provider(
     let entry = registry
         .and_then(|executors| executors.get(primary))
         .filter(|entry| !entry.is_null());
-    let default = runner.get("executor");
-    let first = default.and_then(|d| array_of(d, "invocations").first());
     let implicit_default = primary == "claude"
-        || default.and_then(|d| str_of(d, "command")) == Some(primary)
-        || first.and_then(|inv| str_of(inv, "command")) == Some(primary)
-        || first.and_then(|inv| str_of(inv, "id")) == Some(primary);
+        || runner
+            .get("executor")
+            .is_some_and(|default| names_default_executor(default, primary));
     if registry.is_some() && entry.is_none() && !implicit_default {
         return Err(ModelError::runner(format!(
             "preferExecutor \"{primary}\" is not a registered executor (runnerConfig.executors has no such entry)."
@@ -435,24 +451,14 @@ pub fn resolve_executor_governance(
 }
 
 /// Why governance rules an executor out as a launch fact, or `None` when it does not.
-fn disallowed_reason(runner: &Value, id: &str, entry: &Value, family: &str) -> Option<String> {
-    let governance = present(runner, "governance").or_else(|| {
-        runner
-            .get("runner")
-            .and_then(|section| present(section, "governance"))
-    });
-    let list = |key: &str| -> Vec<String> {
-        governance
-            .map(|g| {
-                array_of(g, key)
-                    .iter()
-                    .filter_map(|v| v.as_str().map(str::to_string))
-                    .collect()
-            })
-            .unwrap_or_default()
-    };
+fn disallowed_reason(
+    governance: &Governance,
+    id: &str,
+    entry: &Value,
+    family: &str,
+) -> Option<String> {
     let (denied, canonical) = check_provider_disallowed(
-        &list("disallowedProviders"),
+        &governance.disallowed_providers,
         family,
         str_of(entry, "command").or(Some(id)),
     );
@@ -464,7 +470,8 @@ fn disallowed_reason(runner: &Value, id: &str, entry: &Value, family: &str) -> O
         };
         return Some(format!("provider \"{named}\" is disallowed"));
     }
-    list("disallowedExecutors")
+    governance
+        .disallowed_executors
         .iter()
         .any(|denied_id| denied_id == id)
         .then(|| format!("executor \"{id}\" is disallowed"))
@@ -802,6 +809,7 @@ pub struct LaunchFacts {
 
 fn executor_facts(
     runner: &Value,
+    governance: &Governance,
     id: &str,
     entry: &Value,
     session: &Session,
@@ -898,12 +906,8 @@ fn executor_facts(
             "agent"
         },
         family: family.clone(),
-        mechanism: if mechanism == Mechanism::OutOfProcess {
-            "out-of-process"
-        } else {
-            "in-process"
-        },
-        disallowed: disallowed_reason(runner, id, entry, &family),
+        mechanism: mechanism.as_str(),
+        disallowed: disallowed_reason(governance, id, entry, &family),
         missing_cli: missing_clis(runner, id, entry, session, machine)
             .map(|names| names.join(" or "))
             .filter(|text| !text.is_empty()),
@@ -926,6 +930,7 @@ pub fn launch_facts(
     session: &Session,
     machine: &dyn Machine,
 ) -> Vec<(String, LaunchFacts)> {
+    let governance = Governance::of(runner);
     executors_of(runner)
         .into_iter()
         .flatten()
@@ -933,7 +938,7 @@ pub fn launch_facts(
         .map(|(id, entry)| {
             (
                 id.clone(),
-                executor_facts(runner, id, entry, session, machine),
+                executor_facts(runner, &governance, id, entry, session, machine),
             )
         })
         .collect()

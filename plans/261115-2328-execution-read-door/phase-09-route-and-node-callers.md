@@ -19,7 +19,7 @@ change (L10). Node callers stay where S6a owns them (F1) and ask the route; none
    `--for`, `--needs-soul`), `preflight` (06 Req 3), `digest` (06 Req 5), `ladder` (the `seat-binding-route` row's probe,
    which stays Node, D15). Every request carries its `runner` section (Node callers hold the run's snapshot; the native
    verbs call the crate in process, 10), so there is no config-reading branch here. It implements `Machine` and
-   `ToolProbe`: PATH lookup through one existing helper (pick one of F8's three and name it), the machine confinement
+   `ToolProbe`: PATH lookup through `fgos_process::spawn::resolve_program`, the one PATH door (`Machine::on_path` goes through it; a path with a separator is judged by its executable bit as Node does); `home_dir` maps an empty home to `None` (the crate keeps Node's reading of `Some("")`, where `~/x` becomes `/x`, pinned by a vector), the machine confinement
    backend registry (path and `FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH` override as `backend-registry.mjs:187-198`),
    herdr presence (`HERDR_ENV=1` and an existing `HERDR_SOCKET_PATH`, `run.mjs:63`), `session.pathEnv` when given, tool
    index commit and `HEAD` through `fgos-git` inspect. Every file it reads is opened no-follow beneath its root with

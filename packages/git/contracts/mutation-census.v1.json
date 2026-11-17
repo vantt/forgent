@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "7daa5e9008076949a470148bd3a46732ddaa9729fb01a52b8db421429bfcdf91",
+  "payloadDigest": "c4271c908e7f8dee1ee3a87988d254be15fa353464a757fd8025dec4656b8452",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "b8b886cee2ea5ce7ee1153e4795512db135a990de894c27e53c5e778b210be62",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -407,11 +407,11 @@
     "packages/event-store/rust/tests/v_event.rs": "8c9722beb4118579e6348f750f0e6e6da3032c6624d8619bae31bdfa35bb7c8a",
     "packages/event-store/rust/tests/vectors.rs": "aaa5d2f5828aad45706d1bf0ef1a8747d44065d85dd3c22437a7e7d8eb07dd67",
     "packages/event-store/rust/tests/walk_certified.rs": "5dcea368cef656e692996410ac26e203ee8ba9d202e4096f3bd7f74925af7eb6",
-    "packages/execution/rust/src/accounts.rs": "bf2e8e24cf1a2fd952012e60c2d9f7b899db5df0be3b60105d035ab3dbd1ec8b",
-    "packages/execution/rust/src/executor_model.rs": "d4bda2f4038eae9e52d631f900f653c9d7af279ea9497a6b66934623ce31ae7e",
+    "packages/execution/rust/src/accounts.rs": "7e4375b85c3c56f97ab51cc270f8189c2460da8a1136688d165eb357e6ee178b",
+    "packages/execution/rust/src/executor_model.rs": "2386bc000aba225012292f5c504eec635e17260ded79156857ce7758ae19cbce",
     "packages/execution/rust/src/lib.rs": "cab51f876ed8d9731cfd1ffc2c4db0a811f36c1edc9286456f77dda0e3f379ed",
     "packages/execution/rust/src/ports.rs": "fbc7367df945bc70a4889c2629013fac99f4e5359620d66c7f2dec1cfe587c83",
-    "packages/execution/rust/tests/golden_executor_model.rs": "64f3c3b02f202dddf638b017ed06a88eb5b75c6067f835379c7a24b3bf1e36ae",
+    "packages/execution/rust/tests/golden_executor_model.rs": "d4b0d9de95fec20608e079b446c90a2d7f36d2237c8e2e999a118478d8c445aa",
     "packages/git/node-addon/build.rs": "fcbd1ff3f627a7553fa1704dc6f558998daff8bc256015c37aace62cc49ce584",
     "packages/git/node-addon/examples/e3_fixture.rs": "f3a98f5c8de968be2109b9958a5a7d0efeca7fa5000493278277d7bba035a75a",
     "packages/git/node-addon/src/agent_protocol.rs": "2ce97fafe42160657665c87ef6b5a4cdf657ab5d6ac83a8ee289c9b8fe2996fe",

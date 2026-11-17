@@ -59,7 +59,9 @@ hook (unix-only, always exit 0, another root rule), so the dispatch hook gets it
 
 ## Acceptance
 
-- Every decide and hook vector passes in Rust; the bind-free selector vectors pass through Node `compileDispatchPlan`.
+- The phase removes `validate` (and the `status` field of `toolProviders`) from `REPLAYED_LATER` and replays them
+  from `executor-model.v1.json`; `decide.v1.json` must not re-record the `validate` vectors (two proofs of one
+  behaviour). Every decide and hook vector passes in Rust; the bind-free selector vectors pass through Node `compileDispatchPlan`.
 
 ## Risks / rollback
 

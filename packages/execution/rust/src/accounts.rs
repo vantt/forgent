@@ -43,10 +43,6 @@ pub fn legacy_state_key(pool: &str) -> String {
     }
 }
 
-fn is_plain_object(value: &Value) -> bool {
-    value.is_object()
-}
-
 fn is_absolute(path: &str) -> bool {
     path.starts_with('/')
         || (cfg!(windows)
@@ -167,11 +163,7 @@ pub fn validate_provider_account_inventory(
     runner: &Value,
 ) -> Result<Map<String, Value>, ModelError> {
     const LABEL: &str = "runner config";
-    let section = runner
-        .get("runner")
-        .filter(|inner| is_plain_object(inner))
-        .unwrap_or(runner);
-    let Some(providers) = section.get("providers") else {
+    let Some(providers) = runner.get("providers") else {
         return Ok(Map::new());
     };
     let refuse = |text: String| ModelError::provider_capacity(text);
@@ -670,12 +662,8 @@ pub fn provider_account_inventory(
     machine: &dyn Machine,
 ) -> Result<Map<String, Value>, ModelError> {
     let mut inventory = validate_provider_account_inventory(runner)?;
-    let section = runner
-        .get("runner")
-        .filter(|inner| is_plain_object(inner))
-        .unwrap_or(runner);
-    if section.get("llmAccounts").is_some() {
-        inventory.extend(derive_legacy_inventory(section, machine));
+    if runner.get("llmAccounts").is_some() {
+        inventory.extend(derive_legacy_inventory(runner, machine));
     }
     Ok(inventory)
 }

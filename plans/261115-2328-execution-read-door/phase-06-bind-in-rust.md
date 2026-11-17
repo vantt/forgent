@@ -55,11 +55,13 @@ when the host answers a native verb (phase 09 adapter); account state comes from
 
 ## Files
 
-- Create: `packages/execution/contracts/bind.v1.json`, `packages/execution/rust/src/{bind.rs,explain.rs,accounts.rs}`,
+- Create: `packages/execution/contracts/bind.v1.json`, `packages/execution/rust/src/{bind.rs,explain.rs}`,
   `packages/execution/rust/tests/golden_bind.rs`.
-- Modify: `packages/execution/rust/src/lib.rs` (`pub mod` lines), mutation census.
+- Modify: `packages/execution/rust/src/lib.rs` (`pub mod` lines), `packages/execution/rust/src/accounts.rs` (the
+  account inventory and `llmAccounts` reader exist already; the account view and lease-state reads are added),
+  mutation census.
 - Delete: none (Node bind is switched in 09). Tests retired: none here.
-- Net size: about +1 100 Rust lines, +400 test lines.
+- Net size: about +700 Rust lines, +400 test lines.
 
 ## Steps
 
@@ -67,7 +69,8 @@ when the host answers a native verb (phase 09 adapter); account state comes from
 
 ## Acceptance
 
-- Every bind and explain vector passes; `bind.rs` has no I/O (all machine facts through `Machine`).
+- Every bind and explain vector passes; the phase removes `accountQuarantine` from `REPLAYED_LATER` and replays it
+  from `executor-model.v1.json`; `bind.rs` has no I/O (all machine facts through `Machine`).
 
 ## Risks / rollback
 

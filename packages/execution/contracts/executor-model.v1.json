@@ -1224,6 +1224,13 @@
    "expect": {"pools":{"openrouter":{"accounts":{"a":{"label":"a","disabled":false,"stores":{"pi":"/h"}}}}},"problems":[{"code":"account-label","at":"runner.llmAccounts.openrouter.a.label","detail":"must be a non-empty string when present"},{"code":"account-disabled","at":"runner.llmAccounts.openrouter.a.disabled","detail":"must be true or false when present"}]}
   },
   {
+   "name": "llmAccounts: an empty home directory makes ~ the filesystem root, as Node reads it",
+   "fact": "llmAccounts",
+   "runner": {"llmAccounts":{"openrouter":{"a":{"credentialStore":{"pi":"~/x"}}}}},
+   "machine": {"home":""},
+   "expect": {"pools":{"openrouter":{"accounts":{"a":{"label":"a","disabled":false,"stores":{"pi":"/x"}}}}},"problems":[]}
+  },
+  {
    "name": "stateKey: the pool openai is keyed openai-codex in lease state",
    "fact": "stateKey",
    "args": {"pool":"openai"},

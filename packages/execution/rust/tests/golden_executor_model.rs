@@ -12,14 +12,15 @@ use fgos_execution::executor_model::{
 };
 use fgos_execution::ports::{Backend, Machine};
 use serde_json::{json, Map, Value};
-use std::collections::BTreeMap;
 
-/// Facts whose derivation reads state this crate does not own yet; each names the phase that ports it and replays
-/// the same vectors. `toolProviders` is replayed here for what an entry says (who serves a capability, its mcp tool
-/// and command); the live status of each waits for the probe port.
-const REPLAYED_LATER: &[(&str, &str)] = &[
-    ("accountQuarantine", "reads the lease state file (the bind)"),
-    ("validate", "the runner semantic check (the decision)"),
+/// What this replay does not state yet, so a vector can never be skipped unseen. An entry is (fact, field, owning
+/// module): with a field, only that field of the expected answer is left out of the comparison; with none, the
+/// whole fact is not replayed and `evaluate` must still know nothing of it. The module named is the one that
+/// replays it from this same file and removes the entry.
+const REPLAYED_LATER: &[(&str, Option<&str>, &str)] = &[
+    ("accountQuarantine", None, "bind.rs"),
+    ("validate", None, "runner_check.rs"),
+    ("toolProviders", Some("status"), "tools.rs"),
 ];
 
 struct VectorMachine {
@@ -259,27 +260,35 @@ fn evaluate(vector: &Value) -> Option<Value> {
     })
 }
 
-/// The expected answer, reduced to what `evaluate` can state for the fact.
+/// The expected answer without the fields `REPLAYED_LATER` leaves out for the vector's fact.
 fn expected(vector: &Value) -> Value {
-    let expect = vector["expect"].clone();
-    if vector["fact"] != "toolProviders" {
-        return expect;
+    let dropped: Vec<&str> = REPLAYED_LATER
+        .iter()
+        .filter(|(fact, field, _)| vector["fact"] == *fact && field.is_some())
+        .filter_map(|(_, field, _)| *field)
+        .collect();
+    let without = |answer: &Value| match answer {
+        Value::Object(fields) => {
+            let mut kept = fields.clone();
+            dropped.iter().for_each(|field| {
+                kept.remove(*field);
+            });
+            Value::Object(kept)
+        }
+        other => other.clone(),
+    };
+    match &vector["expect"] {
+        Value::Array(list) => Value::Array(list.iter().map(without).collect()),
+        other => without(other),
     }
-    Value::Array(
-        expect
-            .as_array()
-            .expect("a tool provider vector lists providers")
-            .iter()
-            .map(|provider| {
-                let mut kept = provider
-                    .as_object()
-                    .expect("a provider is an object")
-                    .clone();
-                kept.remove("status");
-                Value::Object(kept)
-            })
-            .collect(),
-    )
+}
+
+/// Whether the vector's recorded answer carries the field (an array answer: any of its items).
+fn states_field(vector: &Value, field: &str) -> bool {
+    match &vector["expect"] {
+        Value::Array(list) => list.iter().any(|item| item.get(field).is_some()),
+        other => other.get(field).is_some(),
+    }
 }
 
 #[test]
@@ -294,53 +303,53 @@ fn every_executor_model_vector_has_the_answer_the_contract_records() {
     assert_eq!(contract["version"], "executor-model.v1");
     let vectors = contract["vectors"].as_array().expect("vectors");
 
-    let mut replayed: BTreeMap<String, usize> = BTreeMap::new();
-    let mut later: BTreeMap<String, usize> = BTreeMap::new();
+    let mut replayed = 0;
+    let mut later = 0;
     let mut wrong = Vec::new();
     for vector in vectors {
-        let fact = vector["fact"].as_str().expect("fact").to_string();
-        if REPLAYED_LATER
+        let fact = vector["fact"].as_str().expect("fact");
+        let name = vector["name"].as_str().unwrap_or_default();
+        let whole_fact_later = REPLAYED_LATER
             .iter()
-            .any(|(later_fact, _)| *later_fact == fact)
-        {
-            *later.entry(fact).or_default() += 1;
+            .any(|(later_fact, field, _)| *later_fact == fact && field.is_none());
+        let answer = evaluate(vector);
+        if whole_fact_later {
+            if answer.is_some() {
+                wrong.push(format!(
+                    "{name}\n   replayed now; remove from REPLAYED_LATER"
+                ));
+            }
+            later += 1;
             continue;
         }
-        match evaluate(vector) {
-            Some(answer) if answer == expected(vector) => *replayed.entry(fact).or_default() += 1,
+        match answer {
+            Some(answer) if answer == expected(vector) => replayed += 1,
             Some(answer) => wrong.push(format!(
-                "{}\n   got      {}\n   expected {}",
-                vector["name"].as_str().unwrap_or_default(),
-                answer,
+                "{name}\n   got      {answer}\n   expected {}",
                 expected(vector)
             )),
-            None => panic!(
-                "vector {:?} names the fact {fact:?} that nothing replays",
-                vector["name"]
-            ),
+            None => wrong.push(format!(
+                "{name}\n   names the fact {fact:?} that nothing replays and REPLAYED_LATER does not list"
+            )),
+        }
+    }
+    for (fact, field, owner) in REPLAYED_LATER {
+        let own: Vec<&Value> = vectors.iter().filter(|v| v["fact"] == *fact).collect();
+        let used = match field {
+            None => !own.is_empty(),
+            Some(field) => own.iter().any(|v| states_field(v, field)),
+        };
+        if !used {
+            wrong.push(format!(
+                "REPLAYED_LATER entry ({fact}, {field:?}, {owner}) matches no vector"
+            ));
         }
     }
     assert!(
         wrong.is_empty(),
-        "{} vectors differ:\n{}",
+        "{} problems:\n{}",
         wrong.len(),
         wrong.join("\n")
     );
-
-    let facts: Vec<&str> = contract["facts"]
-        .as_array()
-        .unwrap()
-        .iter()
-        .map(|f| f.as_str().unwrap())
-        .collect();
-    for fact in &facts {
-        assert!(
-            replayed.contains_key(*fact) || later.contains_key(*fact),
-            "the fact {fact} has no replay and is not listed in REPLAYED_LATER"
-        );
-    }
-    assert_eq!(
-        replayed.values().sum::<usize>() + later.values().sum::<usize>(),
-        vectors.len()
-    );
+    assert_eq!(replayed + later, vectors.len());
 }
