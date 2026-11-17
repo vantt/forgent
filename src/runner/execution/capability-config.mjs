@@ -4,7 +4,7 @@
 //
 // Two section rules, nothing else:
 //   flat    `runner.capabilities`, own keys only. Every function below except the three named next.
-//   lookup  `capabilityPersonaOf`, `capabilityRigorOf` and `minCheckersOf` read the entries that apply to a
+//   lookup  `capabilityRigorOf` and `minCheckersOf` read the entries that apply to a
 //           capability, most specific first: its exact key, then its `<prefix>:*` entry (the text before the
 //           first colon; a name with no colon has no prefix entry, and the bare verb of `code:review` is never a key).
 // An "entry" is an own key whose value is a non-null object (an array counts, as the doctor rows treat it).
@@ -61,12 +61,6 @@ export function registeredCapabilityOf(runner, name) {
 }
 
 // ---- fields read by exact-then-prefix lookup -------------------------------------------------------
-
-/** The persona a capability defaults to, with the key that declares it; null when none. */
-export function capabilityPersonaOf(cfg, capability) {
-  const found = entriesOf(cfg, capability).find(({ entry }) => entry.persona);
-  return found ? { persona: found.entry.persona, key: found.key } : null;
-}
 
 /** The rigor a capability declares: its exact entry, else the `<prefix>:*` entry's. */
 export function capabilityRigorOf(cfg, capability) {

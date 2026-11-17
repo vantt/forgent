@@ -62,14 +62,15 @@ pub fn main(args: &[String]) -> i32 {
 
 /// The route over a request and an environment: the exit code and the one answer line.
 pub fn run(args: &[String], stdin: &str, env: &dyn Fn(&str) -> Option<String>) -> (i32, Value) {
-    let named = args.first().filter(|first| !first.starts_with("--"));
-    let op = named.map(String::as_str).unwrap_or("");
+    // `<op> --protocol <n>`: the first other word is the operation, any further one is unknown.
+    let mut op = "";
     let mut protocol: Option<&str> = None;
     let mut unknown: Option<&str> = None;
-    let mut iter = args.iter().skip(usize::from(named.is_some()));
+    let mut iter = args.iter();
     while let Some(arg) = iter.next() {
         match arg.as_str() {
             "--protocol" => protocol = iter.next().map(String::as_str).or(Some("")),
+            word if op.is_empty() => op = word,
             other => unknown = unknown.or(Some(other)),
         }
     }

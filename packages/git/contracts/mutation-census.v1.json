@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "13ac44c2313b9301e8317a6551c19a38934591b414401edf8021ba0ed55cf423",
+  "payloadDigest": "c237912b968dd613ab3755d53b89381fb7a50db8577fb36d23d1d83d2ec83cc8",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "68bd36c02991c59a52f206cb092605f9aa16d218d0f52eb2cb34d1db8d4d9ace",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -126,7 +126,7 @@
     "apps/fgos/src/wiring/metrics_sources.rs": "504e2c72b52a5da8d8d23a862403d47986811234809f364ee6006c6957f6c583",
     "apps/fgos/src/wiring/mod.rs": "0ce8a60830472a3d625e49207dbb1ad543e2cba78fb993d96c177f41032a8fde",
     "apps/fgos/src/wiring/run_dirs.rs": "8248bf1a45d37e2ca03315dea11489b6b90362a47479244a10a7c71648e90f60",
-    "apps/fgos/src/wiring/seat_binding.rs": "36888894014c38fcfe2fa9a977d4ed01af6114dcb37ef9056ccd54d6497e441c",
+    "apps/fgos/src/wiring/seat_binding.rs": "a254110abbff5e533fd71c2e50f7b58aa3d4b5c859e0b604f8a090a488684d4b",
     "apps/fgos/src/wiring/session.rs": "f2569bef9f072e959f14673c2d2929e2b0b001540a4e147fd5e59082b2e64b43",
     "apps/fgos/src/wiring/uninstall.rs": "1c5e55502b62d428ef0f9c560d2762d44ee499ac434741eb68b8208dbd6bce2e",
     "apps/fgos/src/wiring/wire_agents.rs": "a434308907a3e7d87c880ebf95a957e1342b77e83ebe1ee0272002335b7a248c",
@@ -1139,7 +1139,7 @@
     "src/runner/execution/account-pin.mjs": "aa1c7f9a9233de8278d46f46cf32ef6568051fbe59430866729c30fb55ec04dc",
     "src/runner/execution/account-rotation.mjs": "3f7263e6d0a291ce33aa9c44381138a6ca436f20543565ef857c8f7936388cbe",
     "src/runner/execution/bind.mjs": "ff7c71baaae20d5f8ebe7fadea15674c093660028ff52e3ff9a4d05f393cb449",
-    "src/runner/execution/capability-config.mjs": "080196a7484b32d0f4e667403a559129c24c9232948cc2c187dd60dcf8dc7d0f",
+    "src/runner/execution/capability-config.mjs": "1bfda7ae4896eb93138a9638e8fe78f45065b6ac924d3a1632fe088a4fa0e975",
     "src/runner/execution/case-admission-port.mjs": "9039951a11acbf69cb549239387cc32ae00617b3ae65bd4682908389b01cdebf",
     "src/runner/execution/case-run-paths.mjs": "4beb8229fa90709bea11c6260c4aee23a99b224a9e6314e69ec74696b86e3ce3",
     "src/runner/execution/commit-unit-work.mjs": "d8853dc5d42a53fa2578304de8ef38d55f04e4c9250a4185999a9d7b1f86a158",

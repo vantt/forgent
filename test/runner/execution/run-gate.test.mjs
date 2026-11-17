@@ -11,7 +11,7 @@ import { execFileSync } from 'node:child_process';
 import { runUnitWithPort as runUnit } from '../../helpers/run-unit-with-port.mjs';
 import { resolveGitRoots, snapshotRunnerConfig, detectHerdrPresent } from '../../../src/runner/execution/run.mjs';
 import { loadRunnerConfigForDir, runnerOriginsOf } from '../../../src/runner/dispatch/config.mjs';
-import { seatConfigDigestOf } from '../../../src/runner/execution/seat-policy.mjs';
+import { seatConfigDigestOf } from '../../../src/runner/execution/bind.mjs';
 import { seedFileLocalBwrapRegistry } from '../confinement-registry-fixture.helper.mjs';
 
 // posture filtering consults the machine backend registry; keep it file-local

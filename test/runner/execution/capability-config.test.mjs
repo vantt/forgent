@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 
 import {
   catalogOf, capabilityNamesOf, hasCapabilityEntry, registeredCapabilityOf,
-  capabilityPersonaOf, capabilityRigorOf, minCheckersOf, ownMinCheckersOf, capabilityVerifyOf,
+  capabilityRigorOf, minCheckersOf, ownMinCheckersOf, capabilityVerifyOf,
   capabilityConfinementOf, capabilityServesOf, capabilityDescriptionOf, preferOf,
   hasOwnPreferPool, bindingTasteOf,
 } from '../../../src/runner/execution/capability-config.mjs';
@@ -33,7 +33,6 @@ const runner = Object.freeze({
 const wrapped = { runner: runner };
 
 test('a capability reads its exact entry before its prefix entry', () => {
-  assert.deepEqual(capabilityPersonaOf(runner, 'code:implement'), { persona: 'builder', key: 'code:implement' });
   assert.equal(capabilityRigorOf(runner, 'review'), 'high');
   assert.equal(capabilityRigorOf(runner, 'code:implement'), 'standard', 'the prefix entry covers a name with no rigor of its own');
   assert.deepEqual(minCheckersOf(runner, 'code:implement'), { key: 'code:*', minCheckers: ['red-team'] });
@@ -47,24 +46,20 @@ test('when the exact entry and the prefix entry both declare a field, the exact 
       'lane:bare': { description: 'no persona, rigor or checkers of its own' },
     },
   };
-  assert.deepEqual(capabilityPersonaOf(both, 'lane:exact'), { persona: 'exact-persona', key: 'lane:exact' });
   assert.equal(capabilityRigorOf(both, 'lane:exact'), 'critical');
   assert.deepEqual(minCheckersOf(both, 'lane:exact'), { key: 'lane:exact', minCheckers: ['exact-checker'] });
-  assert.deepEqual(capabilityPersonaOf(both, 'lane:other'), { persona: 'prefix-persona', key: 'lane:*' });
   assert.equal(capabilityRigorOf(both, 'lane:other'), 'low');
-  assert.deepEqual(capabilityPersonaOf(both, 'lane:bare'), { persona: 'prefix-persona', key: 'lane:*' }, 'a field the exact entry lacks falls to the prefix entry');
-  assert.equal(capabilityRigorOf(both, 'lane:bare'), 'low');
+  assert.equal(capabilityRigorOf(both, 'lane:bare'), 'low', 'a field the exact entry lacks falls to the prefix entry');
 });
 
 test('a name with no colon has no prefix entry and the bare verb is never consulted', () => {
   assert.equal(capabilityRigorOf(runner, 'x:review'), undefined);
-  assert.equal(capabilityPersonaOf(runner, 'code'), null, 'a bare prefix is not code:*');
+  assert.equal(minCheckersOf(runner, 'code'), null, 'a bare prefix is not code:*');
 });
 
 test('a config wrapped as runner.capabilities holds no catalog: every read, lookups included, is flat only', () => {
   assert.equal(capabilityRigorOf(wrapped, 'review'), undefined);
   assert.equal(minCheckersOf(wrapped, 'code:x'), null);
-  assert.equal(capabilityPersonaOf(wrapped, 'code:implement'), null);
   assert.equal(capabilityVerifyOf(wrapped, 'code:implement'), undefined);
   assert.equal(capabilityConfinementOf(wrapped, 'review'), undefined);
   assert.equal(preferOf(wrapped, 'review'), undefined);
