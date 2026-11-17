@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "df2dd9992231f3c00b167f02b52b78d85c7526daa74639b90ce813850c8dafa4",
+  "payloadDigest": "9bb09b2c3bdaf81d2a22c353450f0b940b129c180f69f248d2fbcee6307af9af",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "b8b886cee2ea5ce7ee1153e4795512db135a990de894c27e53c5e778b210be62",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -12,7 +12,7 @@
     ".agents/skills/_shared/decision-question.md": "59e905ab0e06d35299aed5420de2edafbe83bfb1030bc200dad423db38950393",
     ".agents/skills/_shared/executor-dispatch-fallback.md": "d806641547175c4729f9bdf2bd73d70fc9f06df498988745536e79782b545d62",
     ".agents/skills/_shared/fgos-cli-fallback.md": "de0c928316be7ec03cee52d43974e249bbaae9fe3d90ac3fa2c175705eefc587",
-    ".agents/skills/_shared/plan-contract.md": "691a9d196241f0844a1026bb6cb96cf69aacd18ade9c9e51b324b10d17eeecc3",
+    ".agents/skills/_shared/plan-contract.md": "d38fd88a19d7c3c3d89c5b662cdc416d09c3e2143da777ead9f58a1e13686084",
     ".agents/skills/_shared/planning-capability-awareness.md": "561e363512ec35c45c76adfbe9ea19078287356f22cb14a0ae9d557efc2af5c9",
     ".agents/skills/distill/CREATION-LOG.md": "60afdb5c524fa528f6771c9d9a7d4e3ef2bdb1364ff6abf1bdd3210fb5c9d9d9",
     ".agents/skills/distill/SKILL.md": "f77023f445a8ceaa8c64cea237504712aa76b9f0f8c07cd8843d991c93ea4bec",
@@ -151,7 +151,7 @@
     "core/skills/_shared/decision-question.md": "b53bfbc91ef5fbe5833c2dec5c7181df1d1b5d276248d795722095d2f1d2c8b7",
     "core/skills/_shared/executor-dispatch-fallback.md": "b223bcaf033927952816f6fbce78cebe314fdff1206d983a3b10fd9f8e7d2d94",
     "core/skills/_shared/fgos-cli-fallback.md": "923bc223a8cd0b81bc2cd5785083e9650f304f87b40f595645f227a383797dd5",
-    "core/skills/_shared/plan-contract.md": "f701024583ecbb12725da09122697c8b96570a7bb2ba5b18fabe994b8fe8869c",
+    "core/skills/_shared/plan-contract.md": "ddeb53147d7dbea59d11c468c58b0610dde1d3dea060b0afde5fc3a7795f3cb5",
     "core/skills/_shared/planning-capability-awareness.md": "7861685a25da135cdeb05158236f15491dfa4061bd3ba146ccf5093ab9e48301",
     "core/skills/distill/CREATION-LOG.md": "15a662efd1f47e8ba07be655d4f3397e45901f9666676584c264c43511943486",
     "core/skills/distill/SKILL.md": "0f474b897fcf2d45dedd6798805c03a324738803cd91fca790eb391d0c0e6bf8",

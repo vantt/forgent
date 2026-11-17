@@ -3,15 +3,23 @@
 
 The contract every plan satisfies, whichever planning skill wrote it (`ak-plan`,
 `fgos-coding-planning`, or another). No planning skill is changed; the contract wraps
-it and a mechanical check enforces it.
+it and a check enforces it.
 
 **Before running any planning skill, read this contract; the output must satisfy it;
 run the check.**
+
+`scripts/plan-contract-check.mjs` is the fgOS repository's own check; other projects do
+not ship it. In the fgOS repo, run it:
 
 ```bash
 node scripts/plan-contract-check.mjs --plan plans/<dir>   # one plan, any error exits 1
 node scripts/plan-contract-check.mjs --all                # every plan; legacy plans are warned, not failed
 ```
+
+In any other project, the planner applies the same rules by reading the plan: the required
+keys and sections are present, each phase sits in a later wave than its dependencies, and no
+two phases in one wave share a footprint. The planner then states in the plan, under the
+phase table, that it checked these and what it found.
 
 Plans are project data: plain files in the repository, generic and self-describing, with
 no UI-specific or project-specific keys (D-ADR0079). An engine runs from them with no UI;
@@ -102,8 +110,8 @@ The phase table has exactly these columns (order free):
 
 ## 5. Rules
 
-- `ready` is set last, and only after `scripts/plan-contract-check.mjs --plan <dir>` passes
-  with no error.
+- `ready` is set last, and only after the check passes with no error: the script in the
+  fgOS repo, the planner's stated reading check elsewhere.
 - A plan blocked by an owner question stays `draft` as a whole, but every phase the answer
   does not touch is marked `ready` in the phase table and may start. List the blocked phase
   and its question; do not hold the others.
