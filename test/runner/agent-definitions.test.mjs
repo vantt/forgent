@@ -12,11 +12,16 @@ import {
   AGENT_FILE_MAX_BYTES,
   INSTALL_ROOT,
   agentShapeProblem,
+  pinPersona,
   readAgentDefinition,
+  renderPersonaSection,
   findAgentDuplicates,
   resolveAgentDefinition,
   scanAgentTiers,
 } from '../../src/runner/agent-definitions.mjs';
+
+import { renderAssignmentPrompt } from '../../src/runner/dispatch/assignment.mjs';
+import { buildAssignment } from '../helpers/declared-assignment.mjs';
 
 const definition = (name, extra = '') => `name: ${name}\ndescription: ${name} posture\n${extra}`;
 
@@ -226,4 +231,90 @@ test('a persona file that names a model tier or preference is refused and told w
     assert.match(agentShapeProblem(name, fs.readFileSync(path.join(root, `fgos/agents/${name}.yaml`), 'utf8')), /^persona-model-taste-not-allowed/);
   }
   assert.equal(resolveAgentDefinition('steady', { projectRoot: root }).tier, 'workspace', 'rigor stays a plain persona field');
+});
+
+// ─── the persona section a head session and a worker brief share ────────────
+
+const sectionOf = (t, files, personaRef = 'critic', extra = {}) => {
+  const { root, write } = makeProject(t);
+  for (const [rel, text] of Object.entries(files)) write(rel, text);
+  return renderPersonaSection(personaRef, { projectRoot: root, ...extra }).join('\n');
+};
+
+test('a persona file is read with the YAML parser: block scalars in full, comments stripped, lists rendered', (t) => {
+  const section = sectionOf(t, {
+    'core/agents/critic.yaml': [
+      'name: critic',
+      'description: >',
+      '  Blunt reviewer who',
+      '  reads the whole diff.',
+      'persona:',
+      '  voice: plain # inline comment',
+      '  archetype: 1e3',
+      'decision_boundary:',
+      '  can_decide:',
+      '    - wording',
+      '  must_escalate: [scope, budget]',
+      '',
+    ].join('\n'),
+  });
+  assert.match(section, /^Description: Blunt reviewer who reads the whole diff\.$/m);
+  assert.match(section, /^Voice: plain$/m);
+  assert.match(section, /^Archetype: 1000$/m);
+  assert.match(section, /Can decide:\n- wording\nMust escalate:\n- scope\n- budget/);
+});
+
+test('a persona file that is not valid YAML renders one visible could-not-parse line and no half-read fields', (t) => {
+  const section = sectionOf(t, { 'core/agents/critic.yaml': 'name: critic\ndescription: Blunt reviewer\npersona:\n  voice: direct: no hedging\n  style: short\n' });
+  assert.match(section, /^Persona "critic" could not be parsed: .* \(line 4, column \d+\)$/m);
+  assert.doesNotMatch(section, /Voice:|Style:|Description:|Decision Boundaries/);
+});
+
+test('pinned text that is a mapping where text belongs renders one visible line, not a silent drop', (t) => {
+  const pinned = 'name: critic\ndescription: Blunt reviewer\npersona:\n  voice: calm\ndecision_boundary:\n  must_escalate:\n    - Escalate when: budget exceeded\n    - plain item\n';
+  const section = sectionOf(t, {}, 'critic', { pinnedText: pinned });
+  assert.match(section, /^Persona "critic" cannot be rendered: decision_boundary\.must_escalate\[0\] is a mapping/m);
+  assert.doesNotMatch(section, /Voice:|Must escalate:/);
+});
+
+test('an unpinned persona that lives only in the workspace tier renders its text', (t) => {
+  const section = sectionOf(t, { 'fgos/agents/critic.yaml': 'name: critic\ndescription: Workspace critic\npersona:\n  voice: calm\n' });
+  assert.match(section, /^Description: Workspace critic$/m);
+  assert.match(section, /^Voice: calm$/m);
+});
+
+test('a persona that names a model taste renders one failure line instead of throwing', (t) => {
+  const section = sectionOf(t, { 'core/agents/critic.yaml': 'name: critic\ndescription: Blunt\ntier: strong\n' });
+  assert.match(section, /^Persona "critic" cannot be rendered: persona-model-taste-not-allowed: "tier"/m);
+  assert.doesNotMatch(section, /^Description:/m);
+});
+
+test('a persona found in no tier keeps the bare persona section', (t) => {
+  const section = sectionOf(t, { 'core/agents/other.yaml': 'name: other\ndescription: x\n' });
+  assert.match(section, /^# Persona$/m);
+  assert.doesNotMatch(section, /could not be parsed|cannot be rendered|Description:/);
+});
+
+test('a persona that declares skills renders one skills line, and none when it declares none', (t) => {
+  const withSkills = sectionOf(t, { 'core/agents/critic.yaml': definition('critic', 'skills:\n  - fgos-secretary\n  - handoff\n') });
+  assert.match(withSkills, /^Skills to load: fgos-secretary, handoff$/m);
+  const without = sectionOf(t, { 'core/agents/critic.yaml': definition('critic') });
+  assert.doesNotMatch(without, /Skills to load/);
+});
+
+test('a head session and a worker brief render the same persona section for the same persona', (t) => {
+  const { root, write } = makeProject(t);
+  write('core/agents/critic.yaml', definition('critic', 'persona:\n  voice: calm\nskills: [handoff]\n'));
+  const assignment = buildAssignment({ workId: 'tsk-same', stage: 'planning', operation: 'validate-plan' });
+  const brief = renderAssignmentPrompt(assignment, { repoRoot: root, persona: { value: 'critic', source: { scope: 'default', id: 'reviewer' } } });
+  const section = renderPersonaSection('critic', { projectRoot: root }).join('\n');
+  assert.ok(brief.includes(section), 'the brief carries the door\'s section verbatim');
+});
+
+test('pinPersona returns the name, digest, text and identity the lookup resolved', (t) => {
+  const { root, write } = makeProject(t);
+  const text = definition('critic');
+  write('core/agents/critic.yaml', text);
+  const pin = pinPersona('critic', { projectRoot: root });
+  assert.deepEqual(pin, { name: 'critic', digest: crypto.createHash('sha256').update(text).digest('hex'), text, identity: 'core:core/agents/critic' });
 });

@@ -45,8 +45,7 @@ import path from 'node:path';
 import { resolveTaskSpecPath } from '../paths.mjs';
 
 import { RunnerConfigError } from './runner-config-error.mjs';
-import { describeYamlError, parseYaml } from '../../util/yaml.mjs';
-import { AgentNotFoundError, nonTextPersonaValues, projectPersona, resolveAgentDefinition } from '../agent-definitions.mjs';
+import { renderPersonaSection } from '../agent-definitions.mjs';
 import {
   NORMALIZER_VERSION,
   READ_ONLY_ROLES,
@@ -628,74 +627,6 @@ function buildInlineAssignment({ provenance, workId, createdBy, options = {} }) 
   return Object.freeze(assignment);
 }
 
-/** The one visible line for a persona that was found but cannot be rendered; the door's own reason, without its name and path prefix. */
-function personaFailureLine(personaRef, error) {
-  if (!(error instanceof RunnerConfigError)) return `Persona "${personaRef}" could not be parsed: ${describeYamlError(error)}`;
-  const reason = error.message.replace(/^persona "[^"]*" \([^)]*\) /, '');
-  const parsePrefix = 'cannot be parsed: ';
-  return reason.startsWith(parsePrefix)
-    ? `Persona "${personaRef}" could not be parsed: ${reason.slice(parsePrefix.length)}`
-    : `Persona "${personaRef}" cannot be rendered: ${reason}`;
-}
-
-function renderPersonaSection(personaRef, options = {}) {
-  const root = options.repoRoot ?? options.cwd ?? process.cwd();
-  let content = null;
-  let parseFailure = null;
-  // Text a caller pinned when it bound the persona wins over any file: the same definition
-  // reaches every attempt and every resume, whatever the file says by then. Otherwise the
-  // agent-definitions door finds the file; a persona it does not find renders as the bare section.
-  const pinned = options.persona?.pinnedText;
-  try {
-    const text = typeof pinned === 'string'
-      ? pinned
-      : resolveAgentDefinition(personaRef, { projectRoot: root }).text;
-    const parsed = parseYaml(text, { filename: `${personaRef}.yaml` });
-    const [nonText] = nonTextPersonaValues(parsed);
-    if (nonText) parseFailure = `Persona "${personaRef}" cannot be rendered: ${nonText}`;
-    else content = projectPersona(parsed);
-  } catch (error) {
-    if (!(error instanceof AgentNotFoundError)) parseFailure = personaFailureLine(personaRef, error);
-  }
-
-  const lines = [
-    '',
-    '# Persona',
-    `You are acting under the resolved persona "${personaRef}". Let this persona`,
-    'shape tone, emphasis, and judgment calls for this assignment, without',
-    'overriding the Role, Objective, or Constraints stated elsewhere in this prompt.',
-  ];
-  if (parseFailure) lines.push(parseFailure);
-
-  if (content && typeof content === 'object') {
-    if (content.description) {
-      lines.push(`Description: ${content.description}`);
-    }
-    if (content.persona && typeof content.persona === 'object') {
-      if (content.persona.voice) lines.push(`Voice: ${content.persona.voice}`);
-      if (content.persona.style) lines.push(`Style: ${content.persona.style}`);
-      if (content.persona.archetype) lines.push(`Archetype: ${content.persona.archetype}`);
-    }
-    if (content.decision_boundary && typeof content.decision_boundary === 'object') {
-      lines.push('', '## Decision Boundaries');
-      if (Array.isArray(content.decision_boundary.can_decide) && content.decision_boundary.can_decide.length > 0) {
-        lines.push('Can decide:');
-        for (const item of content.decision_boundary.can_decide) {
-          lines.push(`- ${item}`);
-        }
-      }
-      if (Array.isArray(content.decision_boundary.must_escalate) && content.decision_boundary.must_escalate.length > 0) {
-        lines.push('Must escalate:');
-        for (const item of content.decision_boundary.must_escalate) {
-          lines.push(`- ${item}`);
-        }
-      }
-    }
-  }
-
-  return lines;
-}
-
 /**
  * Render standard prompt text for an Assignment (Step 03 / Step 04).
  * Keeps prompt references as refs rather than embedding large file contents.
@@ -753,9 +684,11 @@ export function renderAssignmentPrompt(assignment, options = {}) {
     ...(assignment.stage && assignment.operation ? [`Stage operation: ${assignment.stage}.${assignment.operation}`] : []),
   ];
 
+  const personaSection = () => renderPersonaSection(personaRef, { projectRoot: options.repoRoot ?? options.cwd ?? process.cwd(), pinnedText: options.persona?.pinnedText });
+
   if (renderedTemplateResult) {
     if (personaRef) {
-      lines.push(...renderPersonaSection(personaRef, options));
+      lines.push(...personaSection());
     }
     lines.push('', renderedTemplateResult.renderedBody);
   } else {
@@ -767,7 +700,7 @@ export function renderAssignmentPrompt(assignment, options = {}) {
     );
 
     if (personaRef) {
-      lines.push(...renderPersonaSection(personaRef, options));
+      lines.push(...personaSection());
     }
 
     lines.push('Context refs:');

@@ -19,7 +19,7 @@ import { resolveMutatingCwdPosture } from '../dispatch/execution-contract.mjs';
 import { declaredOperationFields } from '../dispatch/assignment.mjs';
 import { assertRunTimeoutMs, runnerOriginsOf } from '../dispatch/config.mjs';
 import { RunnerConfigError } from '../dispatch/runner-config-error.mjs';
-import { AgentNotFoundError, resolveAgentDefinition } from '../agent-definitions.mjs';
+import { AgentNotFoundError, pinPersona } from '../agent-definitions.mjs';
 import { validateUnit, normalizeWorkflowLink } from './unit.mjs';
 import { CaseAdmissionRefusedError, PORT_MISSING } from './case-admission-port.mjs';
 import { assertPinnedAccountsUsable } from './account-pin.mjs';
@@ -42,8 +42,7 @@ import { currentAttemptOf, lastAttempts } from './unit-state.mjs';
 function unitPersonaPin(persona, mainRoot, workflow) {
   if (typeof persona !== 'string') return null;
   try {
-    const { name, digest, text, identity } = resolveAgentDefinition(persona, { projectRoot: mainRoot, workflow });
-    return { name, digest, text, identity };
+    return pinPersona(persona, { projectRoot: mainRoot, workflow });
   } catch (err) {
     if (err instanceof AgentNotFoundError) return null;
     throw err;

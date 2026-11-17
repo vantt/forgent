@@ -127,8 +127,8 @@ const scalarText = (value) => (isScalar(value) ? String(value).trim() : '');
 const textList = (value) => (Array.isArray(value) ? value.filter(isScalar).map((item) => String(item).trim()).filter(Boolean) : []);
 
 /**
- * What the persona renderer shows from a parsed definition: `description`, `persona.voice|style|archetype`
- * (text) and `decision_boundary.can_decide|must_escalate` (lists of text). Scalars are rendered with
+ * What the persona renderer shows from a parsed definition: `description`, `skills` (a list of text),
+ * `persona.voice|style|archetype` (text) and `decision_boundary.can_decide|must_escalate` (lists of text). Scalars are rendered with
  * `String()`; a missing or non-scalar value is ''/[] and renders nothing.
  *
  * @param {object|null} data a parsed definition (see readAgentDefinition)
@@ -139,6 +139,7 @@ export function projectPersona(data) {
   return {
     description: scalarText(data?.description),
     persona: Object.fromEntries(PERSONA_KEYS.map((key) => [key, scalarText(persona[key])])),
+    skills: textList(data?.skills),
     decision_boundary: Object.fromEntries(BOUNDARY_KEYS.map((key) => [key, textList(boundary[key])])),
   };
 }
@@ -269,4 +270,71 @@ export function resolveAgentDefinition(name, options) {
   const searched = tiers.map(({ label, dir }) => `${label} (${dir})`).join('; ');
   const hint = tiers.flatMap(({ dir, relDir }) => (fs.existsSync(path.join(dir, `${name}.yml`)) ? [`${relDir}/${name}.yml`] : []))[0];
   throw new AgentNotFoundError(`persona "${name}" not found; searched ${searched}${hint ? `; ${hint} exists but only .yaml files are read` : ''}`);
+}
+
+/** The one visible line for a persona that was found but cannot be rendered; the door's own reason, without its name and path prefix. */
+function personaFailureLine(personaRef, error) {
+  if (!(error instanceof RunnerConfigError)) return `Persona "${personaRef}" could not be parsed: ${describeYamlError(error)}`;
+  const reason = error.message.replace(/^persona "[^"]*" \([^)]*\) /, '');
+  const parsePrefix = 'cannot be parsed: ';
+  return reason.startsWith(parsePrefix)
+    ? `Persona "${personaRef}" could not be parsed: ${reason.slice(parsePrefix.length)}`
+    : `Persona "${personaRef}" cannot be rendered: ${reason}`;
+}
+
+/**
+ * The persona section of a prompt, as lines: the one rendering a worker brief and a head session share.
+ * Text a caller pinned when it bound the persona wins over any file, so the same definition reaches every
+ * attempt and every resume; otherwise the lookup above finds the file, and a persona it does not find
+ * renders as the bare section. A definition that cannot be read renders one visible failure line.
+ *
+ * @param {string} personaRef
+ * @param {{ projectRoot: string, installRoot?: string, workflow?: { workflowDir?: string|null, owningDomain?: string|null }|null, pinnedText?: string }} options
+ * @returns {string[]}
+ */
+export function renderPersonaSection(personaRef, { pinnedText, ...lookup }) {
+  let content = null;
+  let parseFailure = null;
+  try {
+    const text = typeof pinnedText === 'string' ? pinnedText : resolveAgentDefinition(personaRef, lookup).text;
+    const parsed = parseYaml(text, { filename: `${personaRef}.yaml` });
+    const [nonText] = nonTextPersonaValues(parsed);
+    if (nonText) parseFailure = `Persona "${personaRef}" cannot be rendered: ${nonText}`;
+    else content = projectPersona(parsed);
+  } catch (error) {
+    if (!(error instanceof AgentNotFoundError)) parseFailure = personaFailureLine(personaRef, error);
+  }
+
+  const lines = [
+    '',
+    '# Persona',
+    `You are acting under the resolved persona "${personaRef}". Let this persona`,
+    'shape tone, emphasis, and judgment calls for this assignment, without',
+    'overriding the Role, Objective, or Constraints stated elsewhere in this prompt.',
+  ];
+  if (parseFailure) lines.push(parseFailure);
+  if (!content) return lines;
+
+  if (content.description) lines.push(`Description: ${content.description}`);
+  if (content.persona.voice) lines.push(`Voice: ${content.persona.voice}`);
+  if (content.persona.style) lines.push(`Style: ${content.persona.style}`);
+  if (content.persona.archetype) lines.push(`Archetype: ${content.persona.archetype}`);
+  if (content.skills.length > 0) lines.push(`Skills to load: ${content.skills.join(', ')}`);
+  lines.push('', '## Decision Boundaries');
+  if (content.decision_boundary.can_decide.length > 0) lines.push('Can decide:', ...content.decision_boundary.can_decide.map((item) => `- ${item}`));
+  if (content.decision_boundary.must_escalate.length > 0) lines.push('Must escalate:', ...content.decision_boundary.must_escalate.map((item) => `- ${item}`));
+  return lines;
+}
+
+/**
+ * A persona bound once: its name, digest, exact text and qualified identity, the shape a run pins so every
+ * attempt and resume renders the same definition. Throws what the lookup throws, including AgentNotFoundError.
+ *
+ * @param {string} name
+ * @param {{ projectRoot: string, installRoot?: string, workflow?: { workflowDir?: string|null, owningDomain?: string|null }|null }} options
+ * @returns {{ name: string, digest: string, text: string, identity: string }}
+ */
+export function pinPersona(name, options) {
+  const { digest, text, identity } = resolveAgentDefinition(name, options);
+  return { name, digest, text, identity };
 }

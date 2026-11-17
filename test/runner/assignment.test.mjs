@@ -501,108 +501,22 @@ test('buildAssignment({ stage: "decompose", operation: "decompose" }) refuses mi
 
 // ─── persona text is read as YAML ────────────────────────────────────────────
 
-function personaPrompt(personaYaml, { pinned } = {}) {
+// The render cases live with their owner, test/runner/agent-definitions.test.mjs; this is the one wiring proof:
+// the brief hands the bound persona's pinned text and root to the door.
+test('a brief renders a pinned persona through the agent-definitions door, and the pin wins over the file', () => {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-persona-render-'));
   try {
     fs.mkdirSync(path.join(root, 'core', 'agents'), { recursive: true });
-    if (personaYaml !== null) fs.writeFileSync(path.join(root, 'core', 'agents', 'critic.yaml'), personaYaml);
+    fs.writeFileSync(path.join(root, 'core', 'agents', 'critic.yaml'), 'name: critic\ndescription: from the file\n');
     const assignment = buildAssignment({ workId: 'tsk-persona', stage: 'planning', operation: 'validate-plan' });
-    return renderAssignmentPrompt(assignment, {
+    const prompt = renderAssignmentPrompt(assignment, {
       repoRoot: root,
-      persona: { value: 'critic', source: { scope: 'default', id: 'reviewer' }, ...(pinned === undefined ? {} : { pinnedText: pinned }) },
+      persona: { value: 'critic', source: { scope: 'default', id: 'reviewer' }, pinnedText: 'name: critic\ndescription: pinned one\npersona:\n  voice: calm\n' },
     });
+    assert.match(prompt, /^Description: pinned one$/m);
+    assert.match(prompt, /^Voice: calm$/m);
+    assert.doesNotMatch(prompt, /from the file/);
   } finally {
     fs.rmSync(root, { recursive: true, force: true });
   }
-}
-
-const LEGACY_ONLY_TEXT = 'name: critic\ndescription: Blunt reviewer\npersona:\n  voice: direct: no hedging\n  style: short\n';
-
-test('a persona file is read with the YAML parser: block scalars in full, comments stripped, lists rendered', () => {
-  const prompt = personaPrompt([
-    'name: critic',
-    'description: >',
-    '  Blunt reviewer who',
-    '  reads the whole diff.',
-    'persona:',
-    '  voice: plain # inline comment',
-    '  archetype: 1e3',
-    'decision_boundary:',
-    '  can_decide:',
-    '    - wording',
-    '  must_escalate: [scope, budget]',
-    '',
-  ].join('\n'));
-  assert.match(prompt, /^Description: Blunt reviewer who reads the whole diff\.$/m);
-  assert.match(prompt, /^Voice: plain$/m);
-  assert.match(prompt, /^Archetype: 1000$/m);
-  assert.match(prompt, /Can decide:\n- wording\nMust escalate:\n- scope\n- budget/);
-});
-
-test('a persona file that is not valid YAML renders one visible could-not-parse line and no half-read fields', () => {
-  const prompt = personaPrompt(LEGACY_ONLY_TEXT);
-  assert.match(prompt, /^Persona "critic" could not be parsed: .* \(line 4, column \d+\)$/m);
-  assert.doesNotMatch(prompt, /Voice:|Style:|Description:|Decision Boundaries/);
-});
-
-const MAPPING_ITEM_TEXT = [
-  'name: critic',
-  'description: Blunt reviewer',
-  'persona:',
-  '  voice: calm',
-  'decision_boundary:',
-  '  must_escalate:',
-  '    - Escalate when: budget exceeded',
-  '    - plain item',
-  '',
-].join('\n');
-
-test('a persona file whose list item reads as a mapping renders one visible line, not a silent drop', () => {
-  const prompt = personaPrompt(MAPPING_ITEM_TEXT);
-  assert.match(prompt, /^Persona "critic" cannot be rendered: decision_boundary\.must_escalate\[0\] is a mapping/m);
-  assert.doesNotMatch(prompt, /Voice:|Must escalate:/);
-});
-
-test('pinned persona text that parses is read by the parser, and wins over the file', () => {
-  const prompt = personaPrompt('name: critic\ndescription: from the file\n', { pinned: 'name: critic\ndescription: pinned one\npersona:\n  voice: calm\n' });
-  assert.match(prompt, /^Description: pinned one$/m);
-  assert.match(prompt, /^Voice: calm$/m);
-  assert.doesNotMatch(prompt, /from the file/);
-});
-
-// ─── persona definitions are found through the agent-definitions door ────────
-
-function tierPrompt(files) {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-persona-tiers-'));
-  try {
-    for (const [rel, text] of Object.entries(files)) {
-      fs.mkdirSync(path.dirname(path.join(root, rel)), { recursive: true });
-      fs.writeFileSync(path.join(root, rel), text);
-    }
-    const assignment = buildAssignment({ workId: 'tsk-tiers', stage: 'planning', operation: 'validate-plan' });
-    return renderAssignmentPrompt(assignment, {
-      repoRoot: root,
-      persona: { value: 'critic', source: { scope: 'default', id: 'reviewer' } },
-    });
-  } finally {
-    fs.rmSync(root, { recursive: true, force: true });
-  }
-}
-
-test('an unpinned persona that lives only in the workspace tier renders its text', () => {
-  const prompt = tierPrompt({ 'fgos/agents/critic.yaml': 'name: critic\ndescription: Workspace critic\npersona:\n  voice: calm\n' });
-  assert.match(prompt, /^Description: Workspace critic$/m);
-  assert.match(prompt, /^Voice: calm$/m);
-});
-
-test('a persona that names a model taste renders one failure line instead of throwing', () => {
-  const prompt = tierPrompt({ 'core/agents/critic.yaml': 'name: critic\ndescription: Blunt\ntier: strong\n' });
-  assert.match(prompt, /^Persona "critic" cannot be rendered: persona-model-taste-not-allowed: "tier"/m);
-  assert.doesNotMatch(prompt, /^Description:/m);
-});
-
-test('a persona found in no tier keeps the bare persona section', () => {
-  const prompt = tierPrompt({ 'core/agents/other.yaml': 'name: other\ndescription: x\n' });
-  assert.match(prompt, /^# Persona$/m);
-  assert.doesNotMatch(prompt, /could not be parsed|cannot be rendered|Description:/);
 });
