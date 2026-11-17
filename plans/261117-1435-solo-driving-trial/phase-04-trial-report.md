@@ -20,8 +20,10 @@ owner: HARDEN
    (spec §9 / §13.5), anything that would need a new mechanism (listed as ideas with evidence, not done, RUL104).
 4. Lessons appended to `plans/261117-1430-portfolio-driving-draft/notes.md` (create if absent), one line each, linking
    the report.
-5. Say plainly: 1-2 items is observation only (spec §12 rule 5), not a basis for redesign.
-6. Clean up: gate key per Q2's answer, read-only prototype worktree, throwaway state dir.
+5. Tell the owner (veto point): the plan contract added one key, `contract: plan-v1`, to the owner's key list so
+   the check can tell contract plans from legacy ones; the owner may veto it.
+6. Say plainly: 1-2 items is observation only (spec §12 rule 5), not a basis for redesign.
+7. Clean up: gate key per Q2's answer, read-only prototype worktree, throwaway state dir.
 
 ## Validation
 

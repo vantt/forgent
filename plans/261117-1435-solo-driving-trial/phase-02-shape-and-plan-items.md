@@ -2,7 +2,7 @@
 phase: 2
 title: "Shape and plan the items"
 status: blocked
-blockedBy: [phase-1, owner-Q1]
+blockedBy: [phase-1b, owner-Q1]
 effort: 1.5h
 owner: owner (shaper) + planner subagent
 ---
@@ -32,7 +32,7 @@ owner: owner (shaper) + planner subagent
    branch, the terminal handoff into exploring/planning); record each skip as one friction
    (`fgos friction record --subject <backlog-id> --layer skill --error-class <class> --disposition <d> --producer shaper`,
    values per `fgos friction record --help`). Note session start/end times.
-2. **Planner** (one short subagent, or `fgos run "<brief>" --pattern solo --writes <plan dir> --worktree <wt>`):
+2. **Planner** (brief: `planner-brief-template.md`, which requires the plan contract and `plan-contract-check.mjs --plan <dir>` before `ready`; one short subagent, or `fgos run "<brief>" --pattern solo --writes <plan dir> --worktree <wt>`):
    input `DISCUSSION.md#task-*`; path from `fgos convention path --kind plan --slug <item-slug>`; `ak-plan` fast mode;
    frontmatter includes `footprint: [paths]` (code + tests + docs/CHANGELOG the repo rules require) and `base: <full
    sha>`; `status: ready` is the last edit. Commit on `trial/<item-slug>`.

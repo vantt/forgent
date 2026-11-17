@@ -27,6 +27,15 @@ invoke after brainstorming is writing-plans."* This skill never writes
 applies a stage move — it produces the material those two skills consume,
 nothing more.
 
+**Work item or not.** Every `fgos pick`/`submit`/`decision`/`edit --refs`/
+`rollup` call and the `fgw/<id>` branch below applies only when the
+conversation is about an existing Work item (an id was passed, or the person
+asks to file one). With no item — the default for the portfolio flow — this
+skill writes only `DISCUSSION.md`, in a linked worktree on a plain branch,
+records decisions inside `DISCUSSION.md` (§4), and exits through the
+"settled, hand to the planner" or pause exit below. The item path is
+unchanged for Work users.
+
 Two entry points share this one skill (`fgOS:coding-shape` for live
 discussion, `fgOS:coding-shape-distill <doc-path>` for fast doc-ingest) —
 see the "Distill mode" section below for how the second one differs.
@@ -43,6 +52,11 @@ see the "Distill mode" section below for how the second one differs.
   expected here, not a failure. Contrast this directly with
   `fgos-coding-exploring`, which assigns a D-ID the moment an answer lands — this
   skill deliberately does not.
+- One question per turn. A question with real choices uses the five-part form
+  of `../_shared/decision-question.md`; never stack several questions in one
+  message.
+- "Not sure" (`chưa chắc`): offer a default with its reversal trigger and
+  record it as provisional in §3, never as settled.
 - Never force convergence with a structured-choice tool. Ask in open
   conversational prose, exactly like `fgos-coding-exploring`'s own question rule,
   but applied to the *whole* loop here, not just individual questions — no
@@ -65,7 +79,7 @@ see the "Distill mode" section below for how the second one differs.
   changes the design's shape — never appended to piecemeal like §3/§4/§5.
   A stale, un-regenerated §6 left standing after a shape-changing
   decision is a defect, not a minor omission.
-- Never invent an index file across a parent's eventual child tasks. Reuse
+- Item path only: never invent an index file across a parent's eventual child tasks. Reuse
   the existing `parent` field, `fgos rollup <id>`, and `fgos-coding-planning`
   step 4's own mandatory split-list section — this skill does not
   design task tracking of its own.
@@ -77,7 +91,8 @@ see the "Distill mode" section below for how the second one differs.
   ```bash
   fgos <verb> ...
   ```
-- Commit `DISCUSSION.md` to the item's `fgw/<id>` branch at the end of
+- Commit `DISCUSSION.md` to the item's `fgw/<id>` branch (no item: the plain
+  worktree branch) at the end of
   every round that changed it — the same one-artifact-per-stop discipline
   `fgos-coding-exploring`/`fgos-coding-planning`/`fgos-coding-implement` already follow, so a
   session resuming this discussion days later on a fresh claim sees the
@@ -85,7 +100,9 @@ see the "Distill mode" section below for how the second one differs.
 
 ## `DISCUSSION.md` shape
 
-`docs/history/<feature>/DISCUSSION.md`, seven fixed sections, in order:
+`docs/history/<feature>/DISCUSSION.md`, seven fixed sections, in order. Short
+form for a small item: only §1, §4 and the hand-off block are required; §2,
+§3, §5, §6, §7 are optional.
 
 1. **Trạng thái hiện tại** — a short recap, rewritten every round: where
    the discussion stands, what just got settled, what's still open. The
@@ -97,7 +114,7 @@ see the "Distill mode" section below for how the second one differs.
    from unclear to clear (never append-only — this table's whole point is
    showing current state).
 4. **Quyết định đã chốt** — a D-ID table, append-only. Each entry that
-   lands here is also recorded via a real
+   lands here is (item path only) also recorded via a real
    `fgos decision --text "<D-ID>: <summary>" --rationale "..." --id <item-id>
    --relation none` (or `--relation supersedes:<old-D-ID>` when this D-ID
    explicitly revises an earlier one already locked in this same
@@ -124,7 +141,13 @@ see the "Distill mode" section below for how the second one differs.
 
 ## Flow
 
-1. **Claim (`fgos pick <id>`) before writing anything, then locate or
+0. **No item** (see "Work item or not"): create a linked worktree with
+   `fgos worktree create <path> --branch <name>` (never a raw
+   Git command) on a plain branch, skip step 1 entirely, locate or create `DISCUSSION.md`, and go on
+   to step 2. Steps 1, 3's `fgos decision` call and the Terminal handoff's
+   `fgos edit` apply to the item path only.
+
+1. **Item path: claim (`fgos pick <id>`) before writing anything, then locate or
    create `DISCUSSION.md`.** Every `DISCUSSION.md` write must land on the
    item's own `fgw/<id>` branch, never on the main checkout — this step is
    what makes the "commit `DISCUSSION.md` to `fgw/<id>`" hard rule below
@@ -214,7 +237,22 @@ where §§2–7's content comes from. Instead of live Q&A:
   (this mode can still hold a short live exchange for gaps the source
   doesn't cover) or leaves it recorded as open in §3 for a later round.
 
-## Terminal handoff (Native-First Dispatch)
+## Exits without a Work item
+
+Both exits write the `discussion:` marker and a hand-off block at the top of
+`DISCUSSION.md`, commit, and STOP. Neither calls `fgos-coding-exploring` or
+`fgos-coding-planning`.
+
+- **Settled, hand to the planner.** Every point is either settled with a D-ID
+  or listed as open with what blocks it (the settled criterion). The block
+  holds: outcome, constraints, non-goals, acceptance criteria; the open points
+  that block only some parts; the source backlog ids; and the line
+  `discussion: settled`. A separate planner run takes it, per
+  `core/skills/_shared/plan-contract.md`.
+- **Pause.** Set `discussion: paused`, update the §1 recap so the thread can
+  resume days later, commit, stop.
+
+## Terminal handoff (Native-First Dispatch, item path)
 
 Once the person confirms the discussion in `DISCUSSION.md` has converged
 (§6 is stable, §7 is real), this skill's only next step, for each relevant
@@ -261,6 +299,7 @@ rule for its `brainstorming` skill. The only door out of here is into
 
 Violating the letter of the rules is violating the spirit of the rules.
 
-Discussion converged, `DISCUSSION.md` written and committed. Invoke
+No item: `DISCUSSION.md` committed with `discussion: settled` or `paused`;
+stop. Item path: discussion converged, `DISCUSSION.md` written and committed. Invoke
 `fgos-coding-exploring` (directly, native-first) for each item whose `refs` now
 points at this file.
