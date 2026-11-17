@@ -25,6 +25,10 @@ import { seedStubAgentClis } from '../helpers/agent-clis.mjs';
 import { familyOf } from '../../src/runner/dispatch/provider-adapter.mjs';
 import { parseTierCell } from '../../src/runner/dispatch/tier-cell.mjs';
 import { resolveExecutorCommand } from '../../src/runner/dispatch/transport.mjs';
+import { AGY_PERMISSIONS_DEFAULT } from '../../src/setup/agy-permissions.mjs';
+
+// The session-only agy settings both gemini invocations pass: command permission with the deny list.
+const AGY_SETTINGS = JSON.stringify(AGY_PERMISSIONS_DEFAULT);
 
 // Seat Binding counts only the CLIs this machine has: the fact tests below state which are installed.
 seedStubAgentClis('claude', 'codex', 'omp', 'pi', 'glm');
@@ -387,6 +391,8 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     model: 'gemini-3.8-flash-low',
     command: 'agy',
     args: [
+      '--settings',
+      AGY_SETTINGS,
       '-p',
       '<prompt>',
       '--model',
@@ -417,6 +423,8 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     model: 'gemini-3.8-flash-medium',
     command: 'agy',
     args: [
+      '--settings',
+      AGY_SETTINGS,
       '-p',
       '<prompt>',
       '--model',
@@ -447,6 +455,8 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     model: 'gemini-4-argon-high',
     command: 'agy',
     args: [
+      '--settings',
+      AGY_SETTINGS,
       '-p',
       '<prompt>',
       '--model',
@@ -480,6 +490,8 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
       '--mode',
       'accept-edits',
       '--new-project',
+      '--settings',
+      AGY_SETTINGS,
       '--model',
       'gemini-3.8-flash-low'
     ],
@@ -511,6 +523,8 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
       '--mode',
       'accept-edits',
       '--new-project',
+      '--settings',
+      AGY_SETTINGS,
       '--model',
       'gemini-3.8-flash-medium'
     ],
@@ -542,6 +556,8 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
       '--mode',
       'accept-edits',
       '--new-project',
+      '--settings',
+      AGY_SETTINGS,
       '--model',
       'gemini-4-argon-high'
     ],

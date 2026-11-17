@@ -155,7 +155,7 @@ runner:
     gemini:
       # @fgos:doc What the executor is and how its invocations differ.
       # @fgos:why [9548be33-0b94-4fe0-b02c-5d5eb0240a61] [migrate] carried over from config.json, reason never recorded
-      description: "Gemini provider via the Antigravity CLI (agy). Invocations: agy-herdr-bwrap (herdr pane), agy-cli-bwrap (headless). The confined account comes from runner.llmAccounts in the global config. Neither invocation declares a sessionDir, so fgOS keeps no agy transcript of a run; agy edits files headless without an approval mode but runs shell commands only where the account home enables always-proceed in its settings."
+      description: "Gemini provider via the Antigravity CLI (agy). Invocations: agy-herdr-bwrap (herdr pane), agy-cli-bwrap (headless). The confined account comes from runner.llmAccounts in the global config. Neither invocation declares a sessionDir, so fgOS keeps no agy transcript of a run; both invocations pass a session-only --settings with toolPermission always-proceed and the deny list of the agy-permissions-configured doctor row, so agy runs commands without prompting and still refuses rm -rf, sudo, force push, hard reset, stash, curl and wget, inside bwrap."
     # @fgos:doc One executor: an agent that runs work or a tool that is only present, with the invocations that start it.
     xai:
       # @fgos:doc What the executor is and how its invocations differ.
