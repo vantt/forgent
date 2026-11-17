@@ -2128,6 +2128,8 @@ mod tests {
     }
 
     /// The replay vectors recorded from the earlier Node module.
+    // Only the Unix-only recorded-case test uses it.
+    #[cfg_attr(not(unix), allow(dead_code))]
     fn vectors() -> &'static Value {
         static DOC: OnceLock<Value> = OnceLock::new();
         DOC.get_or_init(|| {
@@ -2135,12 +2137,16 @@ mod tests {
         })
     }
 
+    // Only the Unix-only recorded-case test uses it.
+    #[cfg_attr(not(unix), allow(dead_code))]
     struct Fixture {
         base: PathBuf,
         root: PathBuf,
         home: PathBuf,
     }
 
+    // Only the Unix-only recorded-case test uses it.
+    #[cfg_attr(not(unix), allow(dead_code))]
     impl Fixture {
         fn new(label: &str, sub: &str) -> Fixture {
             static COUNTER: std::sync::atomic::AtomicUsize = std::sync::atomic::AtomicUsize::new(0);
@@ -2238,6 +2244,8 @@ mod tests {
         }
     }
 
+    // Only the Unix-only recorded-case test uses it.
+    #[cfg_attr(not(unix), allow(dead_code))]
     fn tree_of(value: &Value) -> BTreeMap<String, String> {
         value
             .as_object()
@@ -2317,6 +2325,8 @@ mod tests {
         assert_eq!(got.len(), want.as_object().unwrap().len());
     }
 
+    // Only the Unix-only recorded-case test uses it.
+    #[cfg_attr(not(unix), allow(dead_code))]
     fn run_case(case: &Value) {
         let id = case["id"].as_str().unwrap();
         let cli = case["cli"].as_str().unwrap();

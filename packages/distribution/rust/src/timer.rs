@@ -1075,6 +1075,8 @@ mod tests {
         w.with(Some(PathBuf::from(BIN)), body)
     }
 
+    // Only the Unix-only unit tests use it.
+    #[cfg_attr(not(unix), allow(dead_code))]
     fn schedule_by_name(name: &str) -> Schedule {
         Schedule::ALL
             .into_iter()

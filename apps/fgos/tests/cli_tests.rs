@@ -3370,6 +3370,8 @@ fn scripted_node(prefix: &str, body: &str) -> (PathBuf, String) {
 const BRIDGE_END_LINE: &str = r#"printf '\036FGOS-DOCTOR-BRIDGE {"kind":"end","count":0}\n'"#;
 
 /// `fgos doctor <args>` in `cwd` with its own HOME and state root, against the checkout's dev release.
+// Only the Unix-only doctor cases use it.
+#[cfg_attr(not(unix), allow(dead_code))]
 fn doctor_in(
     cwd: &Path,
     path: &str,
@@ -3958,7 +3960,11 @@ fn init_on_macos_installs_and_names_the_work_store_unsupported() {
 
     let answer = world.data(&world.init(&path, &["--json"]));
     assert_eq!(answer["workStore"], "unsupported-platform");
-    assert!(world.fgos_file("config.yaml").is_file());
+    for file in ["config.yaml", "coexistence.json"] {
+        assert!(world.fgos_file(file).is_file(), "{file}");
+    }
+    assert!(world.state.join("machine-id").is_file());
+    assert!(answer["gitWalWarning"].is_string(), "{answer}");
     let _ = fs::remove_dir_all(node_dir);
 }
 
