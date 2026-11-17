@@ -513,7 +513,13 @@ mod tests {
         let (passed, text) = message(kernel_semantics(&dirs));
         assert!(passed, "{text}");
         assert!(!text.starts_with("warning:"), "{text}");
-        assert!(text.contains(&format!("workspace {} {{\"driver\":\"flock\",\"exclusion\":\"kernel\",\"borrow\":\"kernel\",\"holders\":\"kernel\"}}, two-process probe green", dirs.workspace.display())), "{text}");
+        // Only Linux lists the holders of a lock; elsewhere the probe reports them unsupported.
+        let holders = if cfg!(target_os = "linux") {
+            "kernel"
+        } else {
+            "unsupported"
+        };
+        assert!(text.contains(&format!("workspace {} {{\"driver\":\"flock\",\"exclusion\":\"kernel\",\"borrow\":\"kernel\",\"holders\":\"{holders}\"}}, two-process probe green", dirs.workspace.display())), "{text}");
         assert!(
             text.contains(&format!("machine {} ", dirs.machine.display()))
                 && text.contains(", two-process probe green")

@@ -858,12 +858,14 @@ mod tests {
 
     #[cfg(all(unix, not(target_os = "linux")))]
     #[test]
-    fn without_a_git_journal_on_this_platform_the_wal_fix_refuses_by_name_and_changes_nothing() {
+    fn without_a_git_journal_on_this_platform_the_wal_fix_refuses_by_name_once_the_directories_exist(
+    ) {
         let f = Fixture::new("walfix-refused");
-        let fix = fixed(&f, "git-wal-dir");
-        assert_ne!(fix.changed, Some(true));
+        fixed(&f, "git-wal-dir");
+        let again = fixed(&f, "git-wal-dir");
+        assert_eq!(again.changed, Some(false));
         assert_eq!(
-            fix.message.as_deref(),
+            again.message.as_deref(),
             Some("warning: Git setup refused: git-wal-unsupported")
         );
     }
