@@ -1,4 +1,4 @@
-import { inspectDispatchRuntime, validateInspectionSelector, withRunsCache } from '../../runner/dispatch/runtime-inspection.mjs';
+import { attentionView, inspectDispatchRuntime, projectStoreRoot, validateInspectionSelector, withRunsCache } from '../../runner/dispatch/runtime-inspection.mjs';
 import { readMachineConfig } from '../../config/facade.mjs';
 import { inspectProviderCapacity } from '../../runner/dispatch/provider-capacity.mjs';
 import { readAttemptView } from './show-run.mjs';
@@ -47,6 +47,18 @@ export function inspectDispatchUseCase(ctx, options = {}) {
       }
       validateInspectionSelector(options);
       const repoRoot = ctx?.repoRoot ?? ctx?.cwd ?? process.cwd();
+      if (options.attention === true) {
+        // Every worktree of the project shares the main checkout's store; the view reads that one.
+        const storeRoot = projectStoreRoot(repoRoot);
+        const view = attentionView(storeRoot, { since: options.since }, {
+          view: (runDir) => readAttemptView(runDir, { fgosDir: fgosDirFromRoot(storeRoot) }),
+        });
+        const terminal = scanTerminalAllocations(storeRoot, {
+          globalConfigPath: options.globalConfigPath,
+          terminalControl: options.terminalControl ?? createTerminalControl({ herdrBin: resolveHerdrBin() }),
+        });
+        return { ...view, terminal };
+      }
       return withAttemptView(repoRoot, inspectDispatchRuntime(repoRoot, options));
     } catch (error) {
       if (error instanceof DispatchInspectError) throw error;

@@ -5,6 +5,7 @@ import path from 'node:path';
 import { interpretRunResult } from './run-result.mjs';
 import { assignmentDir, listAssignmentRuns } from './assignment-layout.mjs';
 import { attemptLockState } from './visibility-session.mjs';
+import { outcomeOfRunResult } from '../execution/unit-run-history.mjs';
 
 const INSPECTION_STATUSES = new Set(['resolved', 'partial', 'ambiguous', 'conflicting', 'not-found']);
 const json = (file) => { try { return JSON.parse(fs.readFileSync(file, 'utf8')); } catch { return null; } };
@@ -247,7 +248,7 @@ function one(l, root, now, all) {
 function workspace(input) { const absolute = path.resolve(input); let cursor = absolute; try { if (!fs.statSync(cursor).isDirectory()) cursor = path.dirname(cursor); } catch { return { path: absolute, root: absolute, commonDir: null, key: absolute }; } for (;;) { const dot = path.join(cursor, '.git'); if (fs.existsSync(dot)) { let gitDir = dot; try { if (fs.statSync(dot).isFile()) { const m = /^gitdir:\s*(.+)\s*$/m.exec(fs.readFileSync(dot, 'utf8')); if (m) gitDir = path.resolve(cursor, m[1]); } } catch {} const common = text(path.join(gitDir, 'commondir')), commonDir = common ? path.resolve(gitDir, common) : gitDir; return { path: absolute, root: real(cursor), commonDir: real(commonDir), key: `${real(cursor)}::${real(commonDir)}` }; } const parent = path.dirname(cursor); if (parent === cursor) break; cursor = parent; } return { path: absolute, root: absolute, commonDir: null, key: absolute }; }
 const missing = (kind, id, reason) => ({ inspectionStatus: 'not-found', subject: { kind, id, locations: [] }, observations: [], runObservation: null, runResult: null, reconciliation: { state: 'not-needed', reason }, links: { assignmentIds: [], coordinationIds: [], runIds: [] } });
 
-export function validateInspectionSelector(options = {}) { const supplied = [['run', options.run], ['assignment', options.assignment], ['cwd', options.cwd]].filter(([, v]) => typeof v === 'string' && v.trim()); if (supplied.length !== 1) throw new Error('dispatch inspect requires exactly one selector: --run, --assignment, or --cwd'); return { kind: supplied[0][0], id: supplied[0][1] }; }
+export function validateInspectionSelector(options = {}) { const supplied = [['run', options.run], ['assignment', options.assignment], ['cwd', options.cwd]].filter(([, v]) => typeof v === 'string' && v.trim()); if (options.attention === true) supplied.push(['attention', options.since]); if (supplied.length !== 1) throw new Error('dispatch inspect requires exactly one selector: --run, --assignment, --cwd, or --attention --since <time>'); if (supplied[0][0] === 'attention') { parseAttentionSince(options.since); } else if (options.since !== undefined) throw new Error('dispatch inspect --since belongs to --attention'); return { kind: supplied[0][0], id: supplied[0][1] }; }
 export function inspectDispatchRuntime(root, options = {}, { now = () => new Date().toISOString(), bypassRunsCache = false, runsCache = null } = {}) {
   const selector = validateInspectionSelector(options), all = allRuns(root, { bypassCache: bypassRunsCache, runsCache }), base = fgosDir(root);
   if (selector.kind === 'run') { const found = all.filter((l) => !l.malformed && l.run.runId === selector.id); if (!found.length) return missing('run', selector.id, 'No matching Run was found in registered Assignment or ad-hoc Run repositories.'); if (found.length > 1) return { ...missing('run', selector.id, 'More than one Run repository owns this run id.'), inspectionStatus: 'ambiguous', subject: { kind: 'run', id: selector.id, locations: found.map(project) }, reconciliation: { state: 'manual-required', reason: 'More than one Run repository owns this run id.' }, links: { assignmentIds: uniq(found.map((l) => l.assignmentId)), coordinationIds: [], runIds: [selector.id] } }; return one(found[0], root, now, all); }
@@ -263,7 +264,88 @@ export function inspectDispatchRuntime(root, options = {}, { now = () => new Dat
   const ownershipComplete = found.every((l) => owner(l, root, all).complete), complete = evidenceComplete && !malformed && ownershipComplete, hint = complete && active.length === 1 && !conflict ? authority(active[0], root, all) : null, status = conflict ? 'conflicting' : complete ? 'resolved' : 'partial';
   return { inspectionStatus: status, subject: { kind: 'cwd', id: identity.path, locations: found.map(project) }, observations: [{ kind: 'cwd-aggregate', source: 'workspace-evidence', level: complete && !conflict ? 'correlated' : 'partial', value: aggregate }], runObservation: null, runResult: null, ...(hint ? { recoveryAuthority: hint } : {}), reconciliation: { state: conflict || !complete ? 'manual-required' : 'not-needed', reason: conflict ? 'Workspace guard/projection or concurrency facts conflict.' : !complete ? 'Workspace guard/projection evidence or Run materialization is incomplete or corrupt.' : 'Inspection is read-only and does not repair guards.' }, links: { assignmentIds: uniq(found.map((l) => l.assignmentId)), coordinationIds: [], runIds: found.map((l) => l.run.runId) } };
 }
+const ATTENTION_KINDS = Object.freeze(['failed', 'blocked', 'refused', 'needs-human', 'past-deadline', 'idle']);
+const DATE_BOUND = /^\d{4}-\d{2}-\d{2}(?:[T ].*)?$/;
+
+/** The instant (UTC ms) an `--attention --since` bound names: RFC 3339 or a bare `YYYY-MM-DD` (midnight UTC). */
+export function parseAttentionSince(since) {
+  const raw = typeof since === 'string' ? since.trim() : '';
+  const ms = DATE_BOUND.test(raw) ? Date.parse(raw) : NaN;
+  if (!Number.isFinite(ms)) throw new Error('dispatch inspect --attention requires --since <RFC 3339 time or YYYY-MM-DD>');
+  return ms;
+}
+
+/**
+ * The root whose `.fgos` holds the runs of every worktree of the project: a linked worktree shares the main
+ * checkout's store, so its git common dir (`<main>/.git`) names it. Anything else is its own root.
+ */
+export function projectStoreRoot(root) {
+  const { root: checkout, commonDir } = workspace(root);
+  return commonDir && path.basename(commonDir) === '.git' ? path.dirname(commonDir) : checkout;
+}
+
+const toMs = (value) => { const ms = typeof value === 'string' ? Date.parse(value) : NaN; return Number.isFinite(ms) ? ms : null; };
+const seatGroup = (assignmentId) => String(assignmentId ?? '').replace(/-fb\d+(?=\/|$)/, '');
+
+// The row a settled run earns, or null when it passed. Early ends name themselves in the receipt reason.
+function settledAttention(l, terminal) {
+  const outcome = outcomeOfRunResult(terminal.value);
+  if (outcome === 'pass') return null;
+  const receiptReason = String(json(path.join(l.runDir, 'receipt.json'))?.reason ?? '');
+  const failure = terminal.value?.classification?.failure?.code;
+  const named = failure ? ` (${failure})` : '';
+  if (/^terminal:needs-/.test(receiptReason)) return { kind: 'needs-human', reason: `the run stopped for a person: ${receiptReason}` };
+  if (outcome === 'blocked' || outcome === 'provider-limit' || /^terminal:blocked/.test(receiptReason)) return { kind: 'blocked', reason: `blocked${receiptReason ? `: ${receiptReason}` : named || ` (${outcome})`}` };
+  if (outcome === 'policy-refusal') return { kind: 'refused', reason: `refused by policy${named}` };
+  if (outcome === 'findings') return { kind: 'failed', reason: 'the run settled with findings' };
+  return { kind: 'failed', reason: `the run failed${named}` };
+}
+
+/**
+ * The runs of the whole project (every worktree) that need a person, started or settled at or after `since`.
+ * Computed from the run records on each call; nothing is stored. Idle is not reported: the supervisor keeps
+ * its idle clock in memory and writes no readable record of the last real screen activity, and a file time
+ * is not that (the run supervisor spec, "Idle in a pane").
+ *
+ * `view(runDir)` is the caller's read of the attempt's unit state (`{ unitState, resumeCommand }`), injected
+ * so this module stays below the verbs.
+ *
+ * @returns {{contract:{id:string,version:number}, since:string, observedAt:string, rows:object[], idle:{state:string,reason:string}, lines:string[]}}
+ */
+export function attentionView(root, { since }, { now = () => new Date().toISOString(), view = () => ({}), runsCache = null } = {}) {
+  const sinceMs = parseAttentionSince(since), observedAt = now(), nowMs = Date.parse(observedAt);
+  const valid = allRuns(root, { runsCache }).filter((l) => !l.malformed && l.run.runId);
+  const settled = valid.map((l) => ({ l, terminal: result(l) }));
+  const outcomes = new Map(settled.filter(({ terminal }) => terminal.present && !terminal.corrupt).map(({ l, terminal }) => [l, outcomeOfRunResult(terminal.value)]));
+  // A failed attempt that a later attempt or fallback of the same seat settled as a pass is a measure, not an alert.
+  const settledAtMs = (l, terminal) => toMs(terminal.value?.settledAt) ?? (() => { try { return fs.statSync(path.join(l.runDir, 'result.json')).mtimeMs; } catch { return null; } })();
+  const passedAt = settled.filter(({ l }) => outcomes.get(l) === 'pass').map(({ l, terminal }) => ({ l, atMs: settledAtMs(l, terminal) ?? 0 }));
+  const recovered = (l, atMs) => passedAt.some((o) => o.l !== l && seatGroup(o.l.assignmentId) === seatGroup(l.assignmentId) && o.atMs >= atMs);
+  const rows = [];
+  for (const { l, terminal } of settled) {
+    const startedMs = toMs(l.run.startedAt);
+    let found = null, atMs = startedMs;
+    if (terminal.present) {
+      atMs = settledAtMs(l, terminal) ?? startedMs;
+      found = terminal.corrupt ? { kind: 'failed', reason: 'the run result is unreadable' } : settledAttention(l, terminal);
+      if (found && !terminal.corrupt && recovered(l, atMs ?? 0)) found = null;
+    } else if (startedMs !== null && Number.isFinite(l.run.timeoutMs) && attemptLockState(l.runDir) === 'held' && nowMs - startedMs > l.run.timeoutMs) {
+      found = { kind: 'past-deadline', reason: `still running ${Math.round((nowMs - startedMs) / 1000)}s after its declared timeout of ${Math.round(l.run.timeoutMs / 1000)}s (from the run record, not the supervisor's clock)` };
+    }
+    if (!found || atMs === null || atMs < sinceMs) continue;
+    const attempt = view(l.runDir) ?? {};
+    const live = !terminal.present;
+    const nextCommand = attempt.resumeCommand ?? (live ? `fgos dispatch watch ${l.run.runId}` : `fgos dispatch inspect --run ${l.run.runId}`);
+    const worktree = l.run.cwd ? workspace(l.run.cwd).root : null;
+    rows.push({ runId: l.run.runId, assignmentId: l.assignmentId ?? null, worktree, kind: found.kind, reason: found.reason, nextCommand, line: `${found.kind} ${l.run.runId} ${worktree ?? '-'} ${found.reason} -> ${nextCommand}`, atMs });
+  }
+  rows.sort((a, b) => a.atMs - b.atMs || a.runId.localeCompare(b.runId));
+  const out = rows.map(({ atMs, ...row }) => row);
+  return { contract: { id: 'attention-view', version: 1 }, since, observedAt, rows: out, idle: { state: 'not-readable', reason: 'the supervisor keeps its idle clock in memory; no readable record, so no idle rows' }, lines: out.map((r) => r.line) };
+}
+
 export {
+  ATTENTION_KINDS,
   INSPECTION_STATUSES,
   VALID_PHASES,
   VALID_RESOURCE_STATES,
