@@ -431,6 +431,7 @@
             "roles": [
               [
                 "producer",
+                "red-team",
                 "reviewer"
               ]
             ],
@@ -452,7 +453,8 @@
               [
                 "producer",
                 "red-team",
-                "reviewer"
+                "reviewer",
+                "tester"
               ]
             ],
             "outcome": "pass",
@@ -503,7 +505,8 @@
               [
                 "producer",
                 "red-team",
-                "reviewer"
+                "reviewer",
+                "tester"
               ]
             ],
             "outcome": "pass",
