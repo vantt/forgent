@@ -1,6 +1,6 @@
 # Phase 13: a Config repair moves per-capability taste into the new tables
 
-Start after: S4 on main, plan approved. Wave 1, parallel with 01, 02, 14; **03 lands after this phase**. Rules:
+Start after: S4 on main, plan approved. Wave 1, parallel with 01, 02, 14; **same activation as 03: no release containing 13 is cut or activated without 03** (until 03 lands the row fails with no fix, so `fgos config check` exits 65 and the pre-commit hook refuses commits staging this repo's `.fgos/config.yaml`). Rules:
 [phase-lead-rules.md](phase-lead-rules.md). Facts: F6, F10 (Config repair mechanism). Worktree `erd-p13`, report slug
 `erd-p13-taste-move-fix`. Effort: 1.5d.
 
@@ -37,7 +37,7 @@ is one more registered fix of that mechanism (D11), not a new migration tool.
    workflow, phase 14): the fix removes it and its report names each removed path. Idempotent: a second run applies
    nothing. A confined session is refused (the module's existing rule).
 3. Golden vectors in the Config crate's repair tests: a single move, two capabilities agreeing, two disagreeing
-   (refused, nothing written), a target already set, `seats` removed and reported, a global file, a file with none.
+   (refused, nothing written), a target already set, `seats` removed and reported, a global file (the new tables are project-only, so the fix only removes there and the finding says the taste belongs in the project file), a concurrent change refused, a file with none.
 4. The row is a readiness repair (AGENTS.md "registered fix only when the repair is safe and about readiness"): the
    moved values keep their meaning; only conflicting values stop for a person.
 

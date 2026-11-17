@@ -211,3 +211,54 @@ fn run_fix(
         again.applied
     );
 }
+
+/// A change another writer makes after the repair built its request is refused, never overwritten: the
+/// read and the write of the move stand on the one revision the request carries.
+#[test]
+fn move_capability_taste_does_not_overwrite_a_concurrent_change() {
+    let fixture = common::fixture("doctor.v1.json");
+    let (schemas, standard) = common::schemas_and_standard(&fixture);
+    let ctx = Context {
+        schemas: &schemas,
+        standard: &standard,
+        digest: "d",
+        detectors: &NoDetectors,
+    };
+    let case = common::cases("doctor.v1.json")
+        .into_iter()
+        .find(|c| c["id"] == "fix-move-capability-taste-moves-a-role-with-its-reason")
+        .unwrap();
+    let dir = common::temp("doctor", "taste-concurrent");
+    let roots = common::lay_out(&dir, &case["input"]);
+    fs::create_dir_all(dir.join("home/.fgos")).unwrap();
+    settle(&dir, &case["input"]);
+    let file = dir.join("project/.fgos/config.yaml");
+    let concurrent = format!(
+        "{}\n# changed by someone else\n",
+        fs::read_to_string(&file).unwrap()
+    );
+    let build = |kind: SourceKind| {
+        let target = if kind == SourceKind::Global {
+            "global"
+        } else {
+            "project"
+        };
+        let (request, _) = common::write_request(
+            &dir,
+            &json!({"target": target, "edits": [], "reason": "r"}),
+            roots.clone(),
+        );
+        if kind == SourceKind::Project {
+            fs::write(&file, &concurrent).unwrap();
+        }
+        request
+    };
+    let writer = common::writer(&case["input"]["writer"]);
+    let got = fix(&ctx, build, &writer, &["move-capability-taste"], false);
+    assert!(
+        matches!(&got, Err(SnapshotError::Refused(found)) if found[0].code == "config-write-conflict"),
+        "{got:?}"
+    );
+    assert_eq!(fs::read_to_string(&file).unwrap(), concurrent);
+    let _ = fs::remove_dir_all(&dir);
+}

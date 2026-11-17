@@ -35,6 +35,19 @@
    "type: object",
    "x-fgos-merge: deep",
    "additionalProperties: {}"
+  ],
+  "runner": [
+   "type: object",
+   "properties:",
+   "  roles: {type: object, additionalProperties: {type: object, properties: {prefer: {type: array, items: {type: string}}, tier: {type: string}}}, x-fgos-scope: project-only}",
+   "  personas: {type: object, additionalProperties: {type: object, properties: {prefer: {type: array, items: {type: string}}, tier: {type: string}}}, x-fgos-scope: project-only}",
+   "  capabilities:",
+   "    type: object",
+   "    additionalProperties:",
+   "      type: object",
+   "      additionalProperties: false",
+   "      properties:",
+   "        prefer: {type: array, items: {type: string}}"
   ]
  },
  "standard": {
@@ -1173,6 +1186,783 @@
    },
    "expect": {
     "applied": []
+   }
+  },
+  {
+   "id": "fix-move-capability-taste-moves-a-role-with-its-reason",
+   "why": "a capability's role goes to runner.roles with the reason text it carried, now under the writer's own actor; the old key goes",
+   "input": {
+    "files": {
+     "project/.fgos/config.yaml": [
+      "runner:",
+      "  capabilities:",
+      "    code:",
+      "      roles:",
+      "        red-team:",
+      "          # @fgos:why [alice] xai attacks hardest.",
+      "          prefer:",
+      "            - xai",
+      "            - claude"
+     ]
+    },
+    "writer": {
+     "session": "vantt"
+    },
+    "fix": [
+     "move-capability-taste"
+    ]
+   },
+   "expect": {
+    "applied": [
+     [
+      "move-capability-taste",
+      "runner.capabilities.code.roles.red-team"
+     ]
+    ],
+    "files": {
+     "project/.fgos/config.yaml": [
+      "runner:",
+      "  capabilities: {}",
+      "  roles:",
+      "    red-team:",
+      "      # @fgos:why [vantt] xai attacks hardest.",
+      "      prefer:",
+      "        - xai",
+      "        - claude"
+     ]
+    }
+   }
+  },
+  {
+   "id": "fix-move-capability-taste-merges-two-capabilities-that-agree",
+   "why": "one value, two sources: written once, both sources go",
+   "input": {
+    "files": {
+     "project/.fgos/config.yaml": [
+      "runner:",
+      "  capabilities:",
+      "    code:",
+      "      roles:",
+      "        red-team:",
+      "          # @fgos:why [vantt] xai attacks hardest.",
+      "          prefer:",
+      "            - xai",
+      "            - claude",
+      "    marketing:",
+      "      roles:",
+      "        red-team:",
+      "          # @fgos:why [vantt] same order.",
+      "          prefer:",
+      "            - xai",
+      "            - claude"
+     ]
+    },
+    "writer": {
+     "session": "vantt"
+    },
+    "fix": [
+     "move-capability-taste"
+    ]
+   },
+   "expect": {
+    "applied": [
+     [
+      "move-capability-taste",
+      "runner.capabilities.code.roles.red-team"
+     ],
+     [
+      "move-capability-taste",
+      "runner.capabilities.marketing.roles.red-team"
+     ]
+    ],
+    "files": {
+     "project/.fgos/config.yaml": [
+      "runner:",
+      "  capabilities: {}",
+      "  roles:",
+      "    red-team:",
+      "      # @fgos:why [vantt] xai attacks hardest.",
+      "      prefer:",
+      "        - xai",
+      "        - claude"
+     ]
+    }
+   }
+  },
+  {
+   "id": "fix-move-capability-taste-changes-nothing-when-capabilities-disagree",
+   "why": "two capabilities give red-team different orders: nothing is written, not even the reviewer",
+   "input": {
+    "files": {
+     "project/.fgos/config.yaml": [
+      "runner:",
+      "  capabilities:",
+      "    code:",
+      "      roles:",
+      "        red-team:",
+      "          # @fgos:why [vantt] xai first.",
+      "          prefer:",
+      "            - xai",
+      "            - claude",
+      "    marketing:",
+      "      roles:",
+      "        red-team:",
+      "          # @fgos:why [vantt] claude only.",
+      "          prefer:",
+      "            - claude",
+      "    docs:",
+      "      roles:",
+      "        reviewer:",
+      "          # @fgos:why [vantt] reviewer taste.",
+      "          prefer:",
+      "            - xai",
+      "            - openai"
+     ]
+    },
+    "writer": {
+     "session": "vantt"
+    },
+    "fix": [
+     "move-capability-taste"
+    ]
+   },
+   "expect": {
+    "applied": [],
+    "files": {
+     "project/.fgos/config.yaml": [
+      "runner:",
+      "  capabilities:",
+      "    code:",
+      "      roles:",
+      "        red-team:",
+      "          # @fgos:why [vantt] xai first.",
+      "          prefer:",
+      "            - xai",
+      "            - claude",
+      "    marketing:",
+      "      roles:",
+      "        red-team:",
+      "          # @fgos:why [vantt] claude only.",
+      "          prefer:",
+      "            - claude",
+      "    docs:",
+      "      roles:",
+      "        reviewer:",
+      "          # @fgos:why [vantt] reviewer taste.",
+      "          prefer:",
+      "            - xai",
+      "            - openai"
+     ]
+    }
+   }
+  },
+  {
+   "id": "fix-move-capability-taste-changes-nothing-when-the-target-holds-another-value",
+   "why": "the target already set to a different value: the person decides",
+   "input": {
+    "files": {
+     "project/.fgos/config.yaml": [
+      "runner:",
+      "  roles:",
+      "    red-team:",
+      "      # @fgos:why [vantt] chosen.",
+      "      prefer:",
+      "        - claude",
+      "  capabilities:",
+      "    code:",
+      "      roles:",
+      "        red-team:",
+      "          # @fgos:why [vantt] from the row.",
+      "          prefer:",
+      "            - xai"
+     ]
+    },
+    "writer": {
+     "session": "vantt"
+    },
+    "fix": [
+     "move-capability-taste"
+    ]
+   },
+   "expect": {
+    "applied": [],
+    "files": {
+     "project/.fgos/config.yaml": [
+      "runner:",
+      "  roles:",
+      "    red-team:",
+      "      # @fgos:why [vantt] chosen.",
+      "      prefer:",
+      "        - claude",
+      "  capabilities:",
+      "    code:",
+      "      roles:",
+      "        red-team:",
+      "          # @fgos:why [vantt] from the row.",
+      "          prefer:",
+      "            - xai"
+     ]
+    }
+   }
+  },
+  {
+   "id": "fix-move-capability-taste-drops-the-old-key-when-the-target-holds-the-same-value",
+   "why": "an equal target is kept as it is; only the old key goes",
+   "input": {
+    "files": {
+     "project/.fgos/config.yaml": [
+      "runner:",
+      "  roles:",
+      "    red-team:",
+      "      # @fgos:why [vantt] chosen.",
+      "      prefer:",
+      "        - xai",
+      "  capabilities:",
+      "    code:",
+      "      roles:",
+      "        red-team:",
+      "          # @fgos:why [vantt] from the row.",
+      "          prefer:",
+      "            - xai"
+     ]
+    },
+    "writer": {
+     "session": "vantt"
+    },
+    "fix": [
+     "move-capability-taste"
+    ]
+   },
+   "expect": {
+    "applied": [
+     [
+      "move-capability-taste",
+      "runner.capabilities.code.roles.red-team"
+     ]
+    ],
+    "files": {
+     "project/.fgos/config.yaml": [
+      "runner:",
+      "  roles:",
+      "    red-team:",
+      "      # @fgos:why [vantt] chosen.",
+      "      prefer:",
+      "        - xai",
+      "  capabilities: {}"
+     ]
+    }
+   }
+  },
+  {
+   "id": "fix-move-capability-taste-removes-seats-and-names-each",
+   "why": "a seat has no place in the new shape; each removed path is reported",
+   "input": {
+    "files": {
+     "project/.fgos/config.yaml": [
+      "runner:",
+      "  capabilities:",
+      "    code:",
+      "      # @fgos:why [vantt] writer order.",
+      "      prefer:",
+      "        - claude",
+      "      seats:",
+      "        producer:",
+      "          prefer:",
+      "            - claude",
+      "        critic:",
+      "          prefer:",
+      "            - xai"
+     ]
+    },
+    "writer": {
+     "session": "vantt"
+    },
+    "fix": [
+     "move-capability-taste"
+    ]
+   },
+   "expect": {
+    "applied": [
+     [
+      "move-capability-taste",
+      "runner.capabilities.code.seats.producer"
+     ],
+     [
+      "move-capability-taste",
+      "runner.capabilities.code.seats.critic"
+     ]
+    ],
+    "files": {
+     "project/.fgos/config.yaml": [
+      "runner:",
+      "  capabilities:",
+      "    code:",
+      "      # @fgos:why [vantt] writer order.",
+      "      prefer:",
+      "        - claude"
+     ]
+    }
+   }
+  },
+  {
+   "id": "fix-move-capability-taste-keeps-each-value-its-own-reason",
+   "why": "values with different reasons each keep theirs",
+   "input": {
+    "files": {
+     "project/.fgos/config.yaml": [
+      "runner:",
+      "  capabilities:",
+      "    code:",
+      "      roles:",
+      "        red-team:",
+      "          # @fgos:why [vantt] xai attacks hardest.",
+      "          prefer:",
+      "            - xai",
+      "    docs:",
+      "      personas:",
+      "        editor:",
+      "          # @fgos:why [vantt] editors are picky.",
+      "          prefer:",
+      "            - openai"
+     ]
+    },
+    "writer": {
+     "session": "vantt"
+    },
+    "fix": [
+     "move-capability-taste"
+    ]
+   },
+   "expect": {
+    "applied": [
+     [
+      "move-capability-taste",
+      "runner.capabilities.code.roles.red-team"
+     ],
+     [
+      "move-capability-taste",
+      "runner.capabilities.docs.personas.editor"
+     ]
+    ],
+    "files": {
+     "project/.fgos/config.yaml": [
+      "runner:",
+      "  capabilities: {}",
+      "  roles:",
+      "    red-team:",
+      "      # @fgos:why [vantt] xai attacks hardest.",
+      "      prefer:",
+      "        - xai",
+      "  personas:",
+      "    editor:",
+      "      # @fgos:why [vantt] editors are picky.",
+      "      prefer:",
+      "        - openai"
+     ]
+    }
+   }
+  },
+  {
+   "id": "fix-move-capability-taste-leaves-a-file-without-them-alone",
+   "why": "nothing retired: nothing applied",
+   "input": {
+    "files": {
+     "project/.fgos/config.yaml": [
+      "runner:",
+      "  capabilities:",
+      "    code:",
+      "      # @fgos:why [vantt] writer order.",
+      "      prefer:",
+      "        - claude"
+     ]
+    },
+    "writer": {
+     "session": "vantt"
+    },
+    "fix": [
+     "move-capability-taste"
+    ]
+   },
+   "expect": {
+    "applied": [],
+    "files": {
+     "project/.fgos/config.yaml": [
+      "runner:",
+      "  capabilities:",
+      "    code:",
+      "      # @fgos:why [vantt] writer order.",
+      "      prefer:",
+      "        - claude"
+     ]
+    }
+   }
+  },
+  {
+   "id": "capability-taste-is-a-row-with-the-move-fix-and-names-paths-only",
+   "why": "the retired keys fail the file; the finding names each entry, never a value",
+   "input": {
+    "files": {
+     "project/.fgos/config.yaml": [
+      "runner:",
+      "  capabilities:",
+      "    code:",
+      "      roles:",
+      "        red-team:",
+      "          # @fgos:why [vantt] xai attacks hardest.",
+      "          prefer:",
+      "            - xai",
+      "      seats:",
+      "        producer:",
+      "          prefer:",
+      "            - claude"
+     ]
+    },
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "rows": [
+     [
+      "config-capability-taste-moved",
+      "project:config.yaml",
+      "runner.capabilities.code.roles.red-team"
+     ],
+     [
+      "config-capability-taste-moved",
+      "project:config.yaml",
+      "runner.capabilities.code.seats.producer"
+     ],
+     [
+      "config-comment-missing-why",
+      "project:config.yaml",
+      "runner.capabilities.code.seats.producer.prefer"
+     ],
+     [
+      "config-schema",
+      "project:config.yaml",
+      "runner.capabilities.code"
+     ],
+     [
+      "config-unknown-key",
+      "project:config.yaml",
+      "runner.capabilities.code.roles"
+     ],
+     [
+      "config-unknown-key",
+      "project:config.yaml",
+      "runner.capabilities.code.seats"
+     ]
+    ],
+    "fixes": {
+     "config-capability-taste-moved": "move-capability-taste"
+    },
+    "severity": {
+     "config-capability-taste-moved": [
+      "fail",
+      "fail"
+     ]
+    },
+    "absent": [
+     "xai"
+    ],
+    "details": {
+     "config-capability-taste-moved runner.capabilities.code.roles.red-team": "widened-to-every-capability",
+     "config-capability-taste-moved runner.capabilities.code.seats.producer": "removed"
+    }
+   }
+  },
+  {
+   "id": "capability-taste-conflict-names-both-paths-and-offers-no-fix",
+   "why": "two capabilities disagree: the finding at the second names the first; no fix is offered",
+   "input": {
+    "files": {
+     "project/.fgos/config.yaml": [
+      "runner:",
+      "  capabilities:",
+      "    code:",
+      "      roles:",
+      "        red-team:",
+      "          # @fgos:why [vantt] xai first.",
+      "          prefer:",
+      "            - xai",
+      "            - claude",
+      "    marketing:",
+      "      roles:",
+      "        red-team:",
+      "          # @fgos:why [vantt] claude only.",
+      "          prefer:",
+      "            - claude",
+      "    docs:",
+      "      roles:",
+      "        reviewer:",
+      "          # @fgos:why [vantt] reviewer taste.",
+      "          prefer:",
+      "            - xai",
+      "            - openai"
+     ]
+    },
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "rows": [
+     [
+      "config-capability-taste-moved",
+      "project:config.yaml",
+      "runner.capabilities.code.roles.red-team"
+     ],
+     [
+      "config-schema",
+      "project:config.yaml",
+      "runner.capabilities.code"
+     ],
+     [
+      "config-unknown-key",
+      "project:config.yaml",
+      "runner.capabilities.code.roles"
+     ],
+     [
+      "config-capability-taste-moved",
+      "project:config.yaml",
+      "runner.capabilities.marketing.roles.red-team"
+     ],
+     [
+      "config-schema",
+      "project:config.yaml",
+      "runner.capabilities.marketing"
+     ],
+     [
+      "config-unknown-key",
+      "project:config.yaml",
+      "runner.capabilities.marketing.roles"
+     ],
+     [
+      "config-capability-taste-moved",
+      "project:config.yaml",
+      "runner.capabilities.docs.roles.reviewer"
+     ],
+     [
+      "config-schema",
+      "project:config.yaml",
+      "runner.capabilities.docs"
+     ],
+     [
+      "config-unknown-key",
+      "project:config.yaml",
+      "runner.capabilities.docs.roles"
+     ]
+    ],
+    "details": {
+     "config-capability-taste-moved runner.capabilities.marketing.roles.red-team": "runner.capabilities.code.roles.red-team.prefer",
+     "config-capability-taste-moved runner.capabilities.docs.roles.reviewer": "widened-to-every-capability",
+     "config-capability-taste-moved runner.capabilities.code.roles.red-team": "widened-to-every-capability"
+    },
+    "fixes": {
+     "config-capability-taste-moved": null
+    }
+   }
+  },
+  {
+   "id": "fix-move-capability-taste-only-removes-in-the-global-file",
+   "why": "the new tables are project-only, so the global file's retired keys are removed, each path reported, and nothing is written to runner.roles",
+   "input": {
+    "files": {
+     "home/.fgos/config.yaml": [
+      "runner:",
+      "  capabilities:",
+      "    code:",
+      "      roles:",
+      "        red-team:",
+      "          # @fgos:why [vantt] xai attacks hardest.",
+      "          prefer:",
+      "            - xai",
+      "      seats:",
+      "        producer:",
+      "          prefer:",
+      "            - claude"
+     ]
+    },
+    "writer": {
+     "session": "vantt"
+    },
+    "fix": [
+     "move-capability-taste"
+    ]
+   },
+   "expect": {
+    "applied": [
+     [
+      "move-capability-taste",
+      "runner.capabilities.code.roles.red-team"
+     ],
+     [
+      "move-capability-taste",
+      "runner.capabilities.code.seats.producer"
+     ]
+    ],
+    "files": {
+     "home/.fgos/config.yaml": [
+      "runner:",
+      "  capabilities: {}"
+     ]
+    }
+   }
+  },
+  {
+   "id": "capability-taste-in-the-global-file-is-removed-and-belongs-in-the-project-file",
+   "why": "a role in the global file cannot move; the finding says it is removed and where it belongs",
+   "input": {
+    "files": {
+     "home/.fgos/config.yaml": [
+      "runner:",
+      "  capabilities:",
+      "    code:",
+      "      roles:",
+      "        red-team:",
+      "          # @fgos:why [vantt] xai attacks hardest.",
+      "          prefer:",
+      "            - xai"
+     ]
+    },
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "rows": [
+     [
+      "config-capability-taste-moved",
+      "global:config.yaml",
+      "runner.capabilities.code.roles.red-team"
+     ],
+     [
+      "config-schema",
+      "global:config.yaml",
+      "runner.capabilities.code"
+     ],
+     [
+      "config-unknown-key",
+      "global:config.yaml",
+      "runner.capabilities.code.roles"
+     ]
+    ],
+    "details": {
+     "config-capability-taste-moved runner.capabilities.code.roles.red-team": "belongs-in-project-file"
+    },
+    "fixes": {
+     "config-capability-taste-moved": "move-capability-taste"
+    }
+   }
+  },
+  {
+   "id": "fix-move-capability-taste-removes-an-empty-table-and-says-removed",
+   "why": "a table that holds no taste is removed, not moved",
+   "input": {
+    "files": {
+     "project/.fgos/config.yaml": [
+      "runner:",
+      "  capabilities:",
+      "    code:",
+      "      # @fgos:why [vantt] writer order.",
+      "      prefer:",
+      "        - claude",
+      "      roles: {}",
+      "      personas: null"
+     ]
+    },
+    "writer": {
+     "session": "vantt"
+    },
+    "fix": [
+     "move-capability-taste"
+    ]
+   },
+   "expect": {
+    "applied": [
+     [
+      "move-capability-taste",
+      "runner.capabilities.code.roles"
+     ],
+     [
+      "move-capability-taste",
+      "runner.capabilities.code.personas"
+     ]
+    ],
+    "files": {
+     "project/.fgos/config.yaml": [
+      "runner:",
+      "  capabilities:",
+      "    code:",
+      "      # @fgos:why [vantt] writer order.",
+      "      prefer:",
+      "        - claude"
+     ]
+    }
+   }
+  },
+  {
+   "id": "capability-taste-empty-table-is-removed-not-moved",
+   "why": "a table that holds no taste is reported as removed, not moved",
+   "input": {
+    "files": {
+     "project/.fgos/config.yaml": [
+      "runner:",
+      "  capabilities:",
+      "    code:",
+      "      # @fgos:why [vantt] writer order.",
+      "      prefer:",
+      "        - claude",
+      "      roles: {}",
+      "      personas: null"
+     ]
+    },
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "rows": [
+     [
+      "config-capability-taste-moved",
+      "project:config.yaml",
+      "runner.capabilities.code.roles"
+     ],
+     [
+      "config-capability-taste-moved",
+      "project:config.yaml",
+      "runner.capabilities.code.personas"
+     ],
+     [
+      "config-comment-missing-why",
+      "project:config.yaml",
+      "runner.capabilities.code.roles"
+     ],
+     [
+      "config-comment-missing-why",
+      "project:config.yaml",
+      "runner.capabilities.code.personas"
+     ],
+     [
+      "config-schema",
+      "project:config.yaml",
+      "runner.capabilities.code"
+     ],
+     [
+      "config-unknown-key",
+      "project:config.yaml",
+      "runner.capabilities.code.roles"
+     ],
+     [
+      "config-unknown-key",
+      "project:config.yaml",
+      "runner.capabilities.code.personas"
+     ]
+    ],
+    "details": {
+     "config-capability-taste-moved runner.capabilities.code.roles": "removed"
+    }
    }
   }
  ]

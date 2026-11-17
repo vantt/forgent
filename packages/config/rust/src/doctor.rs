@@ -133,6 +133,145 @@ fn leaves(json: &Value) -> Vec<Vec<Segment>> {
     out
 }
 
+/// The per-capability taste keys a file still holds (`runner.capabilities.<x>.roles|personas|seats`)
+/// and what moving them takes. Roles and personas go to `runner.roles` and `runner.personas`, leaf by
+/// leaf, but only in a file that may hold them (the project file: the new tables are project-only);
+/// a seat has no place in the new shape and is dropped, and so is taste found in the global file.
+#[derive(Debug, Default)]
+pub(crate) struct TastePlan {
+    /// Every retired entry, at the depth of the role, persona or seat name.
+    pub names: Vec<TasteName>,
+    /// The leaf writes into the new tables, for the leaves whose target is not set yet.
+    pub sets: Vec<TasteSet>,
+    /// The keys that go whole: each retired key, or the capability row when it holds nothing else.
+    pub keys: Vec<Vec<Segment>>,
+}
+
+#[derive(Debug)]
+pub(crate) struct TasteName {
+    pub path: Vec<Segment>,
+    pub fate: Fate,
+    /// The other path holding a different value for the same target, when there is one.
+    pub conflict: Option<String>,
+}
+
+/// What becomes of one retired entry.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum Fate {
+    /// Moved to `runner.roles` or `runner.personas`, where it applies to every capability.
+    Moved,
+    /// Dropped: a seat, or an entry that holds no taste (not a mapping, or empty).
+    Removed,
+    /// Dropped because the file cannot hold the new tables; the taste belongs in the project file.
+    Homeless,
+}
+
+#[derive(Debug)]
+pub(crate) struct TasteSet {
+    pub to: Vec<Segment>,
+    pub value: Value,
+    pub from: Vec<Segment>,
+}
+
+impl TastePlan {
+    /// A conflict stops the whole move: a person decides which value stays.
+    pub fn blocked(&self) -> bool {
+        self.names.iter().any(|name| name.conflict.is_some())
+    }
+}
+
+fn key(name: &str) -> Segment {
+    Segment::Key(name.to_string())
+}
+
+/// What the retired taste keys of the file `json` need; `moves` says whether the file may hold the new
+/// tables. Reads the one file; nothing about the other layers or the standard.
+pub(crate) fn taste_plan(json: &Value, moves: bool) -> TastePlan {
+    let mut plan = TastePlan::default();
+    let base = [key("runner"), key("capabilities")];
+    let Some(rows) = json_at(json, &base).and_then(Value::as_object) else {
+        return plan;
+    };
+    for (capability, row) in rows {
+        for kind in ["roles", "personas", "seats"] {
+            let Some(table) = row.get(kind) else { continue };
+            let held: Vec<Segment> = [base.to_vec(), vec![key(capability), key(kind)]].concat();
+            // A row holding nothing but retired keys goes whole: it keeps no meaning without them.
+            let only_retired = row.as_object().is_some_and(|m| {
+                m.keys()
+                    .all(|k| ["roles", "personas", "seats"].contains(&k.as_str()))
+            });
+            let key_gone = if only_retired {
+                held[..held.len() - 1].to_vec()
+            } else {
+                held.clone()
+            };
+            if !plan.keys.contains(&key_gone) {
+                plan.keys.push(key_gone);
+            }
+            let entries = table.as_object().filter(|m| !m.is_empty());
+            let Some(entries) = entries.filter(|_| kind != "seats" && moves) else {
+                let fate = match (kind, entries.is_some()) {
+                    ("seats", _) | (_, false) => Fate::Removed,
+                    _ => Fate::Homeless,
+                };
+                let paths = entries.map_or(vec![held.clone()], |m| {
+                    m.keys()
+                        .map(|n| [held.clone(), vec![key(n)]].concat())
+                        .collect()
+                });
+                plan.names.extend(paths.into_iter().map(|path| TasteName {
+                    path,
+                    fate,
+                    conflict: None,
+                }));
+                continue;
+            };
+            for (name, value) in entries {
+                let path: Vec<Segment> = [held.clone(), vec![key(name)]].concat();
+                let target = vec![key("runner"), key(kind), key(name)];
+                let relative = match value.as_object().filter(|m| !m.is_empty()) {
+                    Some(_) => leaves(value),
+                    None => vec![Vec::new()],
+                };
+                let mut conflict = None;
+                for rel in relative {
+                    let (from, to) = (
+                        [path.clone(), rel.clone()].concat(),
+                        [target.clone(), rel.clone()].concat(),
+                    );
+                    let Some(leaf) = json_at(value, &rel) else {
+                        continue;
+                    };
+                    let there = json_at(json, &to)
+                        .map(|v| (v, format_path(&to)))
+                        .or_else(|| {
+                            let earlier = plan.sets.iter().find(|s| s.to == to)?;
+                            Some((&earlier.value, format_path(&earlier.from)))
+                        });
+                    match there {
+                        None => plan.sets.push(TasteSet {
+                            to,
+                            value: leaf.clone(),
+                            from,
+                        }),
+                        Some((other, _)) if other == leaf => {}
+                        Some((_, at)) => {
+                            conflict.get_or_insert(at);
+                        }
+                    }
+                }
+                plan.names.push(TasteName {
+                    path,
+                    fate: Fate::Moved,
+                    conflict,
+                });
+            }
+        }
+    }
+    plan
+}
+
 /// One parsed config file with what its rows need.
 struct Judged<'a> {
     ctx: &'a Context<'a>,
@@ -188,6 +327,21 @@ impl Judged<'_> {
                 DocKind::Drift => ("config-doc-drift", "drift"),
             };
             self.put(out, row, &change.finding.path, detail);
+        }
+        let taste = taste_plan(&json, self.kind != SourceKind::Global);
+        let stuck = taste.blocked();
+        for name in taste.names {
+            let detail = match (&name.conflict, name.fate) {
+                (Some(other), _) => format!("conflict {other}"),
+                (None, Fate::Removed) => "removed".to_string(),
+                (None, Fate::Homeless) => "removed belongs-in-project-file".to_string(),
+                (None, Fate::Moved) => "widened-to-every-capability".to_string(),
+            };
+            let mut found = Finding::new("config-capability-taste-moved", &detail);
+            found = found.at(&self.name, &name.path, Some(self.doc));
+            // With a conflict in the file nothing is offered to apply: the person decides first.
+            found.fix = found.fix.filter(|_| !stuck);
+            out.push(found);
         }
         for path in ctx.schemas.undescribed(&json) {
             self.put(out, "config-unknown-key", &path, "unknown");
