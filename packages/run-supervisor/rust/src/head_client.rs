@@ -161,7 +161,7 @@ mod tests {
         });
         let data = request_head(
             &path,
-            "head rotate",
+            "session rotate",
             &json!({ "persona": "p" }),
             "id1",
             Duration::from_secs(5),
@@ -170,7 +170,7 @@ mod tests {
         assert_eq!(data, json!({ "started": true }));
         assert_eq!(
             server.join().unwrap(),
-            json!({ "type": "REQUEST", "id": "id1", "verb": "head rotate", "args": { "persona": "p" } })
+            json!({ "type": "REQUEST", "id": "id1", "verb": "session rotate", "args": { "persona": "p" } })
         );
     }
 

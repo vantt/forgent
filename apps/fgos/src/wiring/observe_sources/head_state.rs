@@ -13,7 +13,7 @@
 //! `retired` with record `ts` = `retiredAt`, and Session Host is not asked. A `retiredAt` that is not a valid instant
 //! is no signal: the head is projected as if it had none. The placement writer's schema
 //! (`{ role, gen, placement, runDir, persona, startedAt }`, session-host spec 8.4) has no field that already means
-//! retired; the next `head start` of the lineage replaces the file and so clears it.
+//! retired; the next `session start` of the lineage replaces the file and so clears it.
 
 use super::HEAD_STATE_KIND;
 use fgos_observe::record::types::{AttrValue, Basis, Origin, Record, SubjectRef, RECORD_VERSION};
@@ -111,7 +111,7 @@ fn state_name(liveness: Liveness) -> &'static str {
     }
 }
 
-/// One placement file, as the head start wrote it.
+/// One placement file, as `session start` wrote it.
 struct Head {
     role: String,
     persona: Option<String>,

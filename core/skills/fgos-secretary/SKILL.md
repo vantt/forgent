@@ -23,14 +23,14 @@ depth in its own chat, or applies any domain's steps.
    title) and add one row to `docs/backlog.md`. Discussions and plans carry that id. Your sandbox keeps `docs/`
    read-only, the backlog included, so never edit it in place: copy it to a scratch file
    (`cp docs/backlog.md "${TMPDIR:-/tmp}/backlog.md"`), edit the copy, then hand the whole copy to your supervisor with
-   `fgos head write docs/backlog.md < "${TMPDIR:-/tmp}/backlog.md"`, which replaces the file atomically. Copy right before
+   `fgos session write docs/backlog.md < "${TMPDIR:-/tmp}/backlog.md"`, which replaces the file atomically. Copy right before
    you edit, so a row the host added since (a pull) is not lost. `plans/` and `docs/discussions/` stay writable directly.
 3. **Route.**
 
    | State of the topic | Route |
    |---|---|
    | status question | answer inline from the backlog Status column, the `discussion:` marker and the plan `status` |
-   | needs more than 1-2 rounds or detail reading | `fgos head start shaper --name <slug>` (the domain's shaper when it has one, else the core shaper using `fgos-shaping`) |
+   | needs more than 1-2 rounds or detail reading | `fgos session start shaper --name <slug>` (the domain's shaper when it has one, else the core shaper using `fgos-shaping`) |
    | `discussion: settled` | hand to a planner |
    | plan `ready` | hand to a supervisor |
 

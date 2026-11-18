@@ -38,7 +38,7 @@ export async function startHead({ persona, name, beside = null, projectRoot } = 
 }
 
 /**
- * The one door to ask for a rotation, whoever asks: a confined head sends `head rotate` through its socket, anyone else
+ * The one door to ask for a rotation, whoever asks: a confined head sends `session rotate` through its socket, anyone else
  * calls `requestRotation` directly (`projectRoot` is then required). Returns `{ started, ... }` as `requestRotation` does.
  */
 export async function rotateHead({ persona, name, reason, stopFacts, projectRoot } = {}, { env = process.env, ports = {}, request = requestHeadRotate } = {}) {
@@ -72,11 +72,11 @@ function ownLineage(args, envelope) {
 }
 
 /**
- * Runs the verb of one request for the attempt in `runDir`, in this attempt's project: `head start`, `head rotate`,
- * `head answered` or `head restore role` (which only checks its arguments: the supervisor registers the role). Returns `{ exit, line }`: the one JSON line to print, `{result: 'done', data}` or
+ * Runs the verb of one request for the attempt in `runDir`, in this attempt's project: `session start`, `session rotate`,
+ * `session answered` or `session restore role` (which only checks its arguments: the supervisor registers the role). Returns `{ exit, line }`: the one JSON line to print, `{result: 'done', data}` or
  * `{result: 'error', code, message}`, and the exit code (0 done, 70 error). Who may ask and for what was decided by
  * the supervisor before it ran this; the verb arguments are re-checked here because they come from the sandbox.
- * `head rotate` returns at once (the rotation runs detached); `head answered` is the one verb of a successor that does
+ * `session rotate` returns at once (the rotation runs detached); `session answered` is the one verb of a successor that does
  * not hold the role yet: it records the answer, and the supervisor moves the role after this line says done.
  */
 export async function runHeadRequest({ runDir, request }, ports = {}) {

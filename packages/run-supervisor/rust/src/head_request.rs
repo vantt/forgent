@@ -5,7 +5,7 @@
 //! each request is checked and performed outside. This module is only transport and enforcement: it decides
 //! nothing about who holds a role (Identity does) or what a verb means (the Node payload behind
 //! `fgos internal head-request` does), and it learns what the role may ask for and write from the envelope, never
-//! from a table. One verb it performs itself: `head write`, the only way a head changes a granted file, because the
+//! from a table. One verb it performs itself: `session write`, the only way a head changes a granted file, because the
 //! sandbox keeps every granted file read-only. Contract: `packages/run-supervisor/contracts/head-request.v1.json`.
 
 use std::collections::BTreeMap;
@@ -34,12 +34,12 @@ use crate::route::{refuse, Flags};
 pub(crate) const ENTRY: &str = "src/session-host/head-request.mjs";
 /// How long one request may run before its child is killed (the head's own launch waits up to 45 s).
 pub const VERB_TIMEOUT: Duration = Duration::from_millis(60_000);
-/// Largest request frame: a `head write` carries the whole new content of a granted file in one. Only a `head write`
+/// Largest request frame: a `session write` carries the whole new content of a granted file in one. Only a `session write`
 /// may exceed the GO channel's limit ([`MAX_FRAME_BYTES`]), and only one such large request is read or run at a time;
 /// replies stay within the GO limit.
 pub const MAX_REQUEST_BYTES: usize = 4 * 1024 * 1024;
 /// Most JSON values (objects, arrays, strings, numbers, ...) one request frame may hold, counted while it is parsed:
-/// a frame of many tiny elements is refused before it is built. A `head rotate` with its full stop facts holds about 60.
+/// a frame of many tiny elements is refused before it is built. A `session rotate` with its full stop facts holds about 60.
 pub const MAX_REQUEST_VALUES: usize = 256;
 /// Deepest nesting of one request frame (frame, args, stop facts, portfolio, path is 5).
 const MAX_REQUEST_DEPTH: usize = 8;
@@ -52,20 +52,20 @@ const STDOUT_LIMIT: u64 = 65_536;
 const MAX_ID_LEN: usize = 64;
 /// The one verb of a rotation successor, which does not hold the role yet: the supervisor checks only that the
 /// attempt's own session is registered, and after the verb reports done it moves the role to that session.
-pub const ANSWERED_VERB: &str = "head answered";
+pub const ANSWERED_VERB: &str = "session answered";
 /// The verb that gives a role back to a live head when a failed rotation left nobody holding it: the same
 /// registered check, and after the route reports done the role is registered again without `take`, so Identity
 /// refuses (`role-held`) when another live session holds it.
-pub const RESTORE_VERB: &str = "head restore role";
+pub const RESTORE_VERB: &str = "session restore role";
 /// The verb that binds the agent session a head runs as to this attempt, answered by the supervisor itself (no route
 /// child): Identity registers that session on the attempt's gate and moves the attempt's roles to it
 /// (`bind_agent_session`), so the head resolves as its CLI session. The role step is "registered", as for
 /// [`ANSWERED_VERB`]: a successor binds before it holds the role.
-pub const BIND_VERB: &str = "head bind session";
+pub const BIND_VERB: &str = "session bind session";
 /// The verb that replaces a granted file of the head's role, answered by the supervisor itself (no route child): the
 /// path must be named exactly by `envelope.session.writes` and be a regular file reached without a symlink, and the
 /// new content is installed atomically through the durable-file door ([`write_granted`]).
-pub const WRITE_VERB: &str = "head write";
+pub const WRITE_VERB: &str = "session write";
 
 /// Verbs of a session that does not (yet) hold its role: the role check is "registered", and after the route reports
 /// done the supervisor registers the role for the attempt's session. The flag is Identity's `take`.
@@ -990,8 +990,8 @@ mod tests {
         assert!(valid_id("a1-b_2.c"));
         assert!(!valid_id("") && !valid_id("has space") && !valid_id(&"x".repeat(65)));
         assert_eq!(
-            loggable("head start\nforged line"),
-            "head start?forged line"
+            loggable("session start\nforged line"),
+            "session start?forged line"
         );
         assert_eq!(loggable(&"v".repeat(100)).len(), 32);
     }

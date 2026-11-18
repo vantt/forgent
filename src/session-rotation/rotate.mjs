@@ -2,7 +2,7 @@
 //
 // The successor is started next to the old session (`placeHead`, the one launch path of a head) while the old one
 // still holds the role. The successor takes the role only by answering: its own hook reports its first turn through
-// the request socket (`head answered`), which lands in `markSuccessorAnswered` below, and its own supervisor then moves
+// the request socket (`session answered`), which lands in `markSuccessorAnswered` below, and its own supervisor then moves
 // the role in Identity. The executor ends the old session only after it sees the answer on disk, Identity naming the
 // successor as the holder, and the answer naming the question the old session had pending. A session is ended by asking
 // its own supervisor to stop it (`cancel-requested.json`): the supervisor stops the agent and its release step closes
@@ -119,7 +119,7 @@ const incident = (dir, line) => {
 
 /**
  * Records the first answer of the successor, the one fact the executor waits for. Called through the request socket
- * (`head answered`) with the successor's own `key` (its attempt's unit run id, from the envelope, never from the
+ * (`session answered`) with the successor's own `key` (its attempt's unit run id, from the envelope, never from the
  * sandbox). Refused `no-rotation-pending` when this lineage has no rotation waiting for that key (the executor removes
  * `rotation.json` before it gives up, so a late answer is refused), and `answer-mismatch` when `rotationId` is not
  * exactly the pending rotation's id; the role does not move in either case. This is the one place the answer is
@@ -281,7 +281,7 @@ export async function rotateHeadSession(request, ports = {}) {
   };
 
   // Identity is the authority on who holds the role: a deadline that passed while the role was moving finishes the
-  // rotation instead of ending the role holder. rotation.json goes first, so no later `head answered` is accepted.
+  // rotation instead of ending the role holder. rotation.json goes first, so no later `session answered` is accepted.
   const abandon = async (code, detail) => {
     fs.rmSync(pendingFile, { force: true });
     if (successor) {
@@ -354,7 +354,7 @@ export async function rotateHeadSession(request, ports = {}) {
 // ---- the one entry callers use ------------------------------------------------------------------------
 
 /**
- * The one entry that asks for a rotation, for every caller (the request socket's `head rotate`, `fgos head rotate`, a
+ * The one entry that asks for a rotation, for every caller (the request socket's `session rotate`, `fgos session rotate`, a
  * hook outside the sandbox): checks the request, writes it under the lineage folder and starts `rotateHeadSession`
  * as a detached process through the one detach door, then returns at once; a Stop hook never waits for a rotation.
  * Returns `{ started: true, pid }`, or `{ started: false, reason }` for `rotation-in-progress` or `spawn-failed`.

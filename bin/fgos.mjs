@@ -3382,12 +3382,12 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
     // Head sessions: a thin arm over the use cases that own the behaviour. Exit codes: a malformed argument is
     // validation (4), a refusal or a request that did not start anything is precondition (2), a rotation already
     // running is conflict (3).
-    case 'head': {
-      const sub = requireSubVerb('head', positional);
+    case 'session': {
+      const sub = requireSubVerb('session', positional);
       if (sub === 'write') {
         // A confined head's one way to change a granted file: its supervisor writes it outside the sandbox.
-        const target = requireField(positional[1], 'head write requires a path: fgos head write <path> < new-content');
-        if (process.stdin.isTTY) throw new StoreError('validation', 'head write reads the new content from stdin: fgos head write <path> < new-content');
+        const target = requireField(positional[1], 'session write requires a path: fgos session write <path> < new-content');
+        if (process.stdin.isTTY) throw new StoreError('validation', 'session write reads the new content from stdin: fgos session write <path> < new-content');
         const { requestHeadWrite } = await import('../src/session-host/head-request-client.mjs');
         const chunks = [];
         for await (const chunk of process.stdin) chunks.push(chunk);
@@ -3397,8 +3397,8 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
           throw new StoreError(HEAD_ARGUMENT_CODES.has(err.code) ? 'validation' : 'precondition', `${err.code ?? 'head-refused'}: ${err.message}`);
         }
       }
-      const persona = requireField(positional[1], `head ${sub} requires a persona: fgos head ${sub} <persona> --name <name>`);
-      const name = requireField(flags.name, `head ${sub} requires --name <name>`);
+      const persona = requireField(positional[1], `session ${sub} requires a persona: fgos session ${sub} <persona> --name <name>`);
+      const name = requireField(flags.name, `session ${sub} requires --name <name>`);
       const { startHead, rotateHead } = await import('../src/session-host/head-request.mjs');
       const { resolveGitRoots } = await import('../src/runner/execution/run.mjs');
       // A resolver, not a path: startHead and rotateHead call it only when the caller is not confined.
