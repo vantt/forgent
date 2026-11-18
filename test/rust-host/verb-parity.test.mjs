@@ -22,14 +22,7 @@ const JOBS = 4;
 function baseEntry() {
   const file = process.env.FGOS_TEST_PARITY_BASE;
   assert.ok(file, "FGOS_TEST_PARITY_BASE is not set: it names the description file of the staged base release (recipe in test/rust-host/harness.mjs)");
-  const base = JSON.parse(fs.readFileSync(file, "utf8"));
-  return {
-    type: "node",
-    executable: process.execPath,
-    target: path.join(base.releasePath, "bin/fgos.mjs"),
-    spec: `node:${base.releasePath}`,
-    env: { FGOS_HOST_BIN: base.hostBin, FGOS_ACTIVE_RELEASE_PATH: base.releasePath, FGOS_ACTIVE_MANIFEST_PATH: base.manifestPath },
-  };
+  return parseEntry(`release:${file}`);
 }
 
 for (const name of TABLES) {
