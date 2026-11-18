@@ -108,3 +108,21 @@ test('waiting: a land given a wait budget enters once the holder is gone; no wai
     await killHolder(holder);
   }
 });
+
+test('a worktree-admin held by a REAL separate process refuses the land as a retryable lock-held naming that process, not an unclassified merge failure', async () => {
+  const target = 'fgw/tsk-admin';
+  const repoRoot = leafRepo([target]);
+  const before = git(repoRoot, ['rev-parse', target]);
+  const holder = await holdLockInChild('worktree-admin', { fgosDir: path.join(repoRoot, '.fgos') });
+  try {
+    const err = await land(repoRoot, target, { lockWaitMs: 0 }).then((r) => r, (e) => e);
+    assert.ok(err instanceof MergeError, `expected MergeError, got ${JSON.stringify(err)}`);
+    assert.equal(err.code, 'lock-held');
+    assert.equal(err.lock, 'worktree-admin');
+    assert.match(err.message, /worktree admin is held by another process/);
+    assert.deepEqual(err.holders, [holder.child.pid]);
+    assert.equal(git(repoRoot, ['rev-parse', target]), before, 'nothing was published while worktree-admin was held');
+  } finally {
+    await killHolder(holder);
+  }
+});

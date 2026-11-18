@@ -1005,6 +1005,9 @@ export async function landRunnerItem(repoRoot, item, {
       // Land waits for its own full-ref slot at prepare and for main at publish.
       throw lockHeld(phase === 'prepare' ? mergeSlot : ['main-checkout', { fgosDir }, 'main checkout (land)']);
     }
+    // Land takes worktree-admin itself at prepare and at publish; a busy one
+    // is refused before any effect, so it is a retryable lock-held in both.
+    if (cause === 'worktree-admin-held') throw lockHeld(['worktree-admin', { fgosDir }, 'worktree admin']);
     // Preserve Land's stale result, including operation identity and recovery
     // evidence. Never re-run verification or CAS against a different target.
     if (detail.errorClass === 'stale' || cause === 'land-target-changed' || cause === 'land-cas-lost') throw err;
