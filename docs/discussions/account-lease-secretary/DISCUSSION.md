@@ -6,7 +6,7 @@ topic: backlog row p-mnymjukvqd (seat-binding / accounts)
 shaper: lead:ACCOUNT-SHAPE (claude-mkz3@fg-server2), opened by head:secretary-miu
 opened: 2026-11-18 18:08
 domain: platform (seat binding, runner accounts); không có domains/<domain>/AGENTS.md riêng
-open owner questions: QUESTIONS.md (Q1 đã trả lời B; Q2 đã trả lời (tetcu, anhdvh, van.tran), còn chờ chủ dự án đăng nhập từng thư mục; Q3, Q4 có mặc định)
+open owner questions: QUESTIONS.md (Q1 đã trả lời B; Q2 đã trả lời (tetcu, anhdvh, van.tran), đã đăng nhập đủ ba thư mục; Q3, Q4 có mặc định)
 ```
 
 ## Hand-off cho planner
@@ -19,7 +19,7 @@ open owner questions: QUESTIONS.md (Q1 đã trả lời B; Q2 đã trả lời (
   2. `fgos dispatch explain` cho một ghế pane bất kỳ không bao giờ liệt kê tài khoản của Miu trong walk.
   3. Một lần khởi động thật của một pane claude lease đúng một tài khoản của pool pane; một lần khởi động thật của Miu (đường đã chọn ở Q1) chạy đúng tài khoản của Miu và không tiêu quota pane.
   4. Hết quota pool pane: bằng chứng thật (hoặc ca vàng của crate) rằng ghế đổi tài khoản, rồi đổi family, rồi từ chối theo tên; Miu vẫn chạy.
-- **Open points that block only some parts.** Q1 đã trả lời B nên task `miu-start` không còn bị chặn bởi owner. Q2 đã trả lời; task `pane-pool` còn chờ chủ dự án tự đăng nhập ba thư mục (agent không đăng nhập hộ). Q3 và Q4 có mặc định, không chặn.
+- **Open points that block only some parts.** Q1 đã trả lời B nên task `miu-start` không còn bị chặn bởi owner. Q2 đã trả lời; ba thư mục đã được chủ dự án đăng nhập (tetcu, anhdvh, van.tran), `task-pane-pool` không còn chờ owner. Q3 và Q4 có mặc định, không chặn.
 - **Source ids.** p-mnymjukvqd; quyết định 86 Q2 (docs/platform/agent-confinement/spec.md mục 4 của danh sách store); RUL102, RUL105, RUL106 (docs/platform/runner/subcomponents/h-6979005beaf7/spec.md); D-ADR0072 (docs/platform/seat-binding/spec.md).
 
 ## 1. Trạng thái hiện tại
@@ -79,6 +79,7 @@ Id cục bộ của phiên shaping; planner mint D-ADR qua `fgos identity mint d
 - 2026-11-18 18:40 — Q2 trả lời: `tetcu`, `anhdvh`, `van.tran` (OD5).
 - 2026-11-18 18:38 — Chủ dự án: `tetcu` đã đăng nhập. Kiểm tra chỉ đọc: thư mục `~/.fgos/private/claude-tetcu` có file login, là tài khoản Anthropic khác Miu và khác `vantt` (so định danh, chỉ in đúng/sai). Quyền thư mục là 775, trong khi `claude-vantt` là 700; nên siết về 700 (login nằm trong đó). Chưa thêm vào `accounts.yaml` (phiên shaping chỉ đọc), việc của planner.
 - 2026-11-18 18:42 — Chủ dự án: `anhdvh` đã đăng nhập; kiểm tra chỉ đọc cùng cách với `tetcu`, kết quả ghi trong báo cáo của phiên.
+- 2026-11-18 18:44 — Chủ dự án: `van.tran` đã đăng nhập (thư mục `~/.fgos/private/claude-van.tran`); kiểm tra chỉ đọc như hai tài khoản trước. Ba tài khoản pane đã sẵn sàng; `task-pane-pool` không còn chờ chủ dự án.
 
 ## 6. Thiết kế đã chốt {#design}
 
