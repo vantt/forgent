@@ -1,7 +1,8 @@
 ---
 phase: 11
 title: "Release correctness: plugin version follows the product, a release needs the whole test suite, the consumer proof upgrades from the previous tag and runs doctor and uninstall"
-status: completed
+status: done
+closed: "landed on main 2026-11-09..12; closed by plans/reports/closing-261112-1817-harden-packaging-distribution.md"
 depends_on: ["P09 landed (consumer script variable lines)", "P06 landed (consumer init expectations)", "P08 landed for the uninstall smoke step only"]
 parallel: "group G4 with P08 and P10; sole writer of release.yml, prepare-release.mjs and the consumer scripts from here"
 effort: ~1d

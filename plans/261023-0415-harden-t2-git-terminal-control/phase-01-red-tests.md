@@ -1,7 +1,8 @@
 ---
 phase: 01
 title: "Red tests for every finding this plan fixes that is not yet reproduced"
-status: pending
+status: done
+closed: "landed in the track merge a01f725bf (plan landed on main 084da2df7; plans/reports/closing-261023-2228-harden-t2-git-terminal-control.md)"
 depends_on: []
 parallel: "none; first and alone"
 effort: ~1d

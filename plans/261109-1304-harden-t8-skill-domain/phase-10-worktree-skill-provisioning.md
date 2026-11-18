@@ -1,7 +1,8 @@
 ---
 phase: 10
 title: "Worktree skill provisioning, kit-agnostic: a new worktree receives every foreign (git-ignored, not fgOS-owned) skill dir of the main checkout's skill roots, with no kit name and no glob on a vendor prefix; hardlink only if a probe proves it safe, else a real copy; a rerun never nests"
-status: completed
+status: done
+closed: "landed (plan table row 10)"
 depends_on: []
 parallel: "group A; one line of .fgos/config.yaml; the config component and the owner machine own the file"
 effort: ~0.5d

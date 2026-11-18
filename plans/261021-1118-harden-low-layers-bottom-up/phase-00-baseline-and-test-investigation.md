@@ -1,7 +1,7 @@
 ---
 phase: 00
 title: "T0 baseline + one-time whole-suite test investigation"
-status: pending
+status: done
 depends_on: []
 effort: ~2d
 ---

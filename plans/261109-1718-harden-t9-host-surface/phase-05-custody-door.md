@@ -1,7 +1,8 @@
 ---
 phase: 05
 title: "one run-supervisor door to run a command under worktree custody, and one Execution door that runs a verify under custody and classifies it; workflow stops naming the custody mechanisms"
-status: completed
+status: done
+closed: "landed (plan table; plans/reports/closing-261113-1947-harden-t9-host-surface.md, commit 3ee10a3fa)"
 depends_on: ["04 landed (layer order)", "COOK's unit-run-result contract text (branch cook/unit-run-result, tip 444dd1b1b: section 7 names both doors)", "owner decision 85 (approved)"]
 parallel: "T4 (Execution layer); beside P19 (file-disjoint); touches no bin/fgos.mjs range"
 effort: ~1.5d

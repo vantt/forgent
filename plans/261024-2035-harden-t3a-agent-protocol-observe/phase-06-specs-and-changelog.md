@@ -1,7 +1,8 @@
 ---
 phase: 06
 title: "Specs, contracts prose, component boundary and CHANGELOG follow the code"
-status: pending
+status: done
+closed: "landed 48a45a5f5 (phases 01-06, board log 2026-10-24 22:50)"
 depends_on: [02, 03, 04, 05]
 parallel: "none; the only writer of CHANGELOG.md and of the spec files in this plan"
 effort: ~0.5d

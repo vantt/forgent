@@ -1,7 +1,8 @@
 ---
 phase: 05
 title: "Run scan typed read in run-result; observe-run-coverage drops its Node admission twin (owner Q2 (b))"
-status: pending
+status: done
+closed: "landed 48a45a5f5 (phases 01-06, board log 2026-10-24 22:50)"
 depends_on: [02, 04]
 parallel: "with phase 03; after 02 (registrations.mjs) and 04 (run-result, wiring)"
 effort: ~0.5d

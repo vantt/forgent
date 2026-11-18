@@ -1,7 +1,8 @@
 ---
 phase: 12
 title: "Test structure: each seat decision proven once (Rust golden), Node seat tests prove only what the facade adds; failover decisions proven on the pure answer with three real launches kept; pre-admission refusals never launch; exec budget counted at the client; the failover skip fails where bwrap is claimed; executor-posture-coverage folds into seat-binding-dry-bind"
-status: pending
+status: done
+closed: "landed cfff2aa7f..e3de56c54"
 depends_on: [10, 11]
 parallel: "none (wave 7)"
 effort: ~1.5d

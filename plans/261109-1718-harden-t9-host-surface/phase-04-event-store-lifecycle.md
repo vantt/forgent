@@ -1,7 +1,8 @@
 ---
 phase: 04
 title: "Event Store lifecycle in one wrapper, fault logs below the shell and redacted, detached child below the shell, init as a use case"
-status: landed
+status: done
+closed: "landed (plan table; plans/reports/closing-261113-1947-harden-t9-host-surface.md, commit 3ee10a3fa)"
 depends_on: ["03 landed"]
 parallel: "T3 layer; alone in its layer"
 effort: ~1.25d

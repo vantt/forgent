@@ -1,7 +1,8 @@
 ---
 phase: 03
 title: "One case reader, one run-directory door that refuses a non-case id, and one durable-write path for the case files"
-status: pending
+status: done
+closed: "landed 639bf6986..b353b95bf"
 depends_on: [01, 02]
 parallel: "wave 1, alone (the door lands with every caller, L10, and the callers are in every wave-2 lane's files)"
 effort: ~1d

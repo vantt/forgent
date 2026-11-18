@@ -1,7 +1,8 @@
 ---
 phase: 07
 title: "Doctor: Git 10 → 6 rows, terminal 3 → 2 rows, one inspectGit per run, one sentence per failing row"
-status: pending
+status: done
+closed: "landed in the track merge a01f725bf (plan landed on main 084da2df7; plans/reports/closing-261023-2228-harden-t2-git-terminal-control.md)"
 depends_on: [05, 06]
 parallel: "with phase 08 (disjoint files)"
 effort: ~1d

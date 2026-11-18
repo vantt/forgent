@@ -1,7 +1,8 @@
 ---
 phase: 6
 title: "Unit summary v3: infrastructure, infrastructureReason and refused are persisted"
-status: pending
+status: done
+closed: "landed 0799bd187..b9e052f99 (board log 2026-11-14 04:56)"
 depends_on: []
 parallel: "wave 1 with P01 and P03; shares the fgos-run-result crate with P03 but no file"
 branch: harden/acct-b-p06

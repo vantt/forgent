@@ -1,7 +1,8 @@
 ---
 phase: 05
 title: "Doctor 9 → 5 with no condition lost, the four specs and the boundary rows, AGENTS.md's checkout-channel text, the state-root route and the kill-wait key deleted"
-status: pending
+status: done
+closed: "landed in the track merge c56f1eae3 (plan landed on main 7833d5df1; plans/reports/closing-261022-2003-harden-t1-holder-lock-identity-door.md)"
 depends_on: [03, 04]
 parallel: "none (shares registrations.mjs, holder-lock-checks.mjs, the specs and the boundary with its neighbours)"
 effort: ~1d

@@ -1,7 +1,8 @@
 ---
 phase: 02
 title: "Outcome authority: the supervisor names a provider stop in receipt.reason (deadline stops and direct exits), settle maps names to outcomes, the three screen/stderr judges go, one newest-result rule"
-status: pending
+status: done
+closed: "landed 0c1e509e2..231c91f51 (plans/reports/closing-261104-1734-harden-t4-run-supervisor.md section 1)"
 depends_on: []
 parallel: "wave 1, with phases 01 and 03 (disjoint files)"
 effort: ~1.5d

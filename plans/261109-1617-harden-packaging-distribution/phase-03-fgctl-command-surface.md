@@ -1,7 +1,8 @@
 ---
 phase: 03
 title: "fgctl command surface: --version, per-verb help that exits 0, usage errors exit 2 with a did-you-mean, task-ordered no-args help"
-status: completed
+status: done
+closed: "landed on main 2026-11-09..12; closed by plans/reports/closing-261112-1817-harden-packaging-distribution.md"
 depends_on: []
 parallel: "group G1 with P05 and P09; first writer of apps/fgctl/src/main.rs"
 effort: ~0.75d

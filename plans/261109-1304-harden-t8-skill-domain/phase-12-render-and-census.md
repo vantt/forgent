@@ -1,7 +1,8 @@
 ---
 phase: 12
 title: "Render and census: one npm run build:skills with the staged addon over every source change, one census regeneration, a second run that writes nothing, and the one tracked-render assertion; lands as one unit with the source-text phases"
-status: landed
+status: done
+closed: "landed 1e14daec0"
 depends_on: [01, 02, 03, 04, 05, 09, 11]
 parallel: "group E, alone"
 effort: ~0.5d

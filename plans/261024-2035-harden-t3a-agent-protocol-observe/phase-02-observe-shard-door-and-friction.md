@@ -1,7 +1,8 @@
 ---
 phase: 02
 title: "Observe: one shard door for every store, friction fixes, thin Node client"
-status: pending
+status: done
+closed: "landed 48a45a5f5 (phases 01-06, board log 2026-10-24 22:50)"
 depends_on: [01]
 parallel: "with phase 03 (disjoint files); before 04 and 05 (same crate, same registrations.mjs)"
 effort: ~1.5d

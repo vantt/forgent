@@ -1,7 +1,8 @@
 ---
 phase: 05
 title: "Git consolidation, one port file per slice: one error mapping and one constructor per code, one layout cause, one transaction skeleton, the WAL on the T0 leaves, the rest of the remote/readers duplication, dead surface, the port contract made true"
-status: pending
+status: done
+closed: "landed in the track merge a01f725bf (plan landed on main 084da2df7; plans/reports/closing-261023-2228-harden-t2-git-terminal-control.md)"
 depends_on: [03, 04]
 parallel: "none for Git files; phase 06 may run beside it"
 effort: ~2d

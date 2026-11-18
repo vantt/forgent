@@ -1,7 +1,8 @@
 ---
 phase: 34
 title: "A pane seat whose omp gave up on a provider wait settles `provider-limit` at once"
-status: landed
+status: done
+closed: "landed 2026-11-12 (report plans/reports/lead-261112-1523-harden-t9-p34-pane-provider-limit-settle.md)"
 depends_on: []
 parallel: "touches only the agent-protocol classifier, its fixtures and one run-supervisor test"
 ---

@@ -1,7 +1,8 @@
 ---
 phase: 17
 title: "T1 fix: one kill-wait constant from the holder-lock crate; the identity crate judges its own shared directory"
-status: pending
+status: done
+closed: "landed 67002b8dc"
 depends_on: ["none inside T9 (T1 is closed; this is a fix of a closed layer, decision 83)"]
 parallel: "T1 slot, beside P02 (file-disjoint); P10's identity row switch waits for it"
 effort: ~0.5d

@@ -1,7 +1,8 @@
 ---
 phase: 13
 title: "Conditional on A2: one repository handle per process carrying formats and the config stamp"
-status: pending
+status: done
+closed: "landed in the track merge a01f725bf (plan landed on main 084da2df7; plans/reports/closing-261023-2228-harden-t2-git-terminal-control.md)"
 condition: "runs only if the owner picks A2 in Q3"
 depends_on: [09]
 parallel: "with phases 10, 11, 12, 16; before phase 15 if both run (same driver functions)"

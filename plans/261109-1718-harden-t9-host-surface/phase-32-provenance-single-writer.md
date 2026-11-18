@@ -1,7 +1,8 @@
 ---
 phase: 32
 title: "Provenance single writer: Seat Binding writes it, Dispatch copies it"
-status: landed
+status: done
+closed: "landed 2026-11-12 (report plans/reports/lead-261112-1505-harden-t9-p32-provenance-single-writer.md)"
 depends_on: [21, 30]
 parallel: "file-disjoint from P31 (run.mjs durationMs, run-result fixtures, seat-providers.mjs)"
 ---

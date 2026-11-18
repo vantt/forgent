@@ -1,7 +1,8 @@
 ---
 phase: 2
 title: "The receipt carries `providerSignal`"
-status: pending
+status: done
+closed: "landed 661148e5e..aafd433e4 (board log 2026-11-14 05:47)"
 depends_on: [1]
 parallel: "after P01; file-disjoint with P03, P06; touches only packages/run-supervisor/** and its spec"
 branch: harden/acct-b-p02

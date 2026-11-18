@@ -1,7 +1,8 @@
 ---
 phase: 15
 title: "Conditional on A4: PATH out of the Git floor key"
-status: pending
+status: done
+closed: "not triggered: A4 not taken (decision 21; plans/reports/closing-261023-2228-harden-t2-git-terminal-control.md section 4)"
 condition: "runs only if the owner picks A4 in Q3 (the arbitration recommends not to)"
 depends_on: [09]
 parallel: "with phases 10, 11, 12, 16; after phase 13 if both run (same driver functions)"

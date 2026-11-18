@@ -1,7 +1,8 @@
 ---
 phase: 09
 title: "PROPOSED - AWAITING OWNER APPROVAL: Workflow reads infrastructure and evaluations from the unit-run-result instead of re-deriving them; one legacy reader for old records"
-status: pending
+status: done
+closed: "landed 2026-11-12 (report plans/reports/lead-261112-1217-harden-t9-p09-workflow-retry-flag.md)"
 depends_on: ["07 landed (the fields exist)", "owner approval of COOK's four-step split (decision 81)"]
 parallel: "T6 (Workflow layer); beside P08 and P24 (file-disjoint: this phase owns store.mjs, case-projection.mjs, the admission-port acceptance test and definition.mjs)"
 effort: ~1d

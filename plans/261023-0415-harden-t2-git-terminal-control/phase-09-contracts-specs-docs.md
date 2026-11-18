@@ -1,7 +1,8 @@
 ---
 phase: 09
 title: "Contracts verified, the T2 target shapes written into the specs, reading map, CHANGELOG"
-status: pending
+status: done
+closed: "landed in the track merge a01f725bf (plan landed on main 084da2df7; plans/reports/closing-261023-2228-harden-t2-git-terminal-control.md)"
 depends_on: [07, 08]
 parallel: "none"
 effort: ~0.5d

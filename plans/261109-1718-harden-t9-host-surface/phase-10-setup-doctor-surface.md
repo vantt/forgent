@@ -1,7 +1,8 @@
 ---
 phase: 10
 title: "Setup, doctor and wire-agents arms as use cases; retire fgos preflight; one shim probe per shim per doctor run; claude plugin calls in parallel; mailbox timer names only the activated host"
-status: pending
+status: done
+closed: "landed daa6ef903 (2026-11-14)"
 depends_on: ["08 landed (T6 closed; layer order)", "17, 19, 22 landed (the component answers the three rows call)", "24 landed (workflow catalog; registrations.mjs chain)", "packaging P02, P04, P08 landed, or the arm each owns skipped (doctor arm, version/help, uninstall)"]
 parallel: "T8 layer; alone in its layer; the Rust and gateway phases run beside it"
 effort: ~1.5d

@@ -1,7 +1,8 @@
 ---
 phase: 31
 title: "Duration and family: Execution writes each attempt's wall time; the binding's family is the one Workflow reads"
-status: landed
+status: done
+closed: "landed 2026-11-12 (report plans/reports/lead-261112-1426-harden-t9-p31-duration-and-family.md)"
 depends_on: [21, 30]
 parallel: "run.mjs, handoff-refs.mjs, the run-result fixtures and their two owning tests are P30's until it lands; the durationMs hunk is made after P30 is on main"
 ---

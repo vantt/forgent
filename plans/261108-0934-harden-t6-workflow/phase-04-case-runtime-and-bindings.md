@@ -1,7 +1,8 @@
 ---
 phase: 04
 title: "Case runtime and bindings: a writing reservation proven dead is released, the gate's child dies with it, reservation files go, binding repair runs on the case's own normal path, the inbox reads safely, and advance.log holds progress only"
-status: pending
+status: done
+closed: "landed 85f498825..57c844228"
 depends_on: [03, "08 landed before the drain-release commit"]
 parallel: "wave 2, with 05, 06, 07, 08, 09"
 effort: ~1.5d

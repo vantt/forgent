@@ -1,7 +1,8 @@
 ---
 phase: 10
 title: "Pattern deviation at admission: the Execution Core sends the selected pattern, admission classifies a swap as an unlisted route, and the per-door activity lookup goes"
-status: landed
+status: done
+closed: "landed fd939a3d0"
 depends_on: [04, 06, 08]
 parallel: "wave 3, with 11 and 12 (bin/fgos.mjs: this phase edits the run arm only)"
 effort: ~0.5d

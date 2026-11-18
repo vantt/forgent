@@ -1,7 +1,8 @@
 ---
 phase: 09
 title: "Small scripts: delete the script whose engine is gone, make distill refuse a path-escaping name, write AGENTS.md through the durable door, refuse an effective-set write that would strand a worktree"
-status: landed
+status: done
+closed: "landed (distill c8325c203 in the landing unit)"
 depends_on: []
 parallel: "group A; the distill commit lands with P12 (landing unit, see plan.md)"
 effort: ~1d

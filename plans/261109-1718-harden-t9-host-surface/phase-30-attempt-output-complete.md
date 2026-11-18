@@ -1,7 +1,8 @@
 ---
 phase: 30
 title: "Attempt output: Dispatch settlement declares whether a seat's report is complete, Execution writes the attempt output"
-status: landed
+status: done
+closed: "landed 2026-11-12 (report plans/reports/lead-261112-1320-harden-t9-p30-attempt-output-complete.md)"
 depends_on: [7]
 parallel: "file-disjoint from P29 (store.mjs, legacy-ledger-read.mjs, case-projection.mjs)"
 ---

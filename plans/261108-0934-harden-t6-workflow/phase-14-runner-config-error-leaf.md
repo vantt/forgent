@@ -1,7 +1,8 @@
 ---
 phase: 14
 title: "RunnerConfigError moves to an import-free leaf; every importer, source and test, moves in one mechanical commit with no re-export"
-status: pending
+status: done
+closed: "landed e9255a3e6"
 depends_on: ["01-13 landed", "announced quiet window with no open branch on the importers"]
 parallel: "wave 5, alone"
 effort: ~0.5d

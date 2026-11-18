@@ -1,7 +1,8 @@
 ---
 phase: 14
 title: "Gateway: loopback by default, caller recorded on every request, Rhai execute limits, concurrency cap, file reads that cannot follow a link, bounded JWKS client"
-status: pending
+status: done
+closed: "landed 2026-11-12"
 depends_on: ["none for everything but the call-site switch, which waits for P13 on main"]
 parallel: "gateway lane; sole writer of gateway.rs, mcp.rs, cf_access.rs and core/config-standard/gateway.yaml; beside P12, P13, P15"
 effort: ~1d

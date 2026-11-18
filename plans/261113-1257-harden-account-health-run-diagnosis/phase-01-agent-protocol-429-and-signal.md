@@ -1,7 +1,8 @@
 ---
 phase: 1
 title: "Agent-protocol: 429 is a quota stop; the provider's signal is extracted"
-status: pending
+status: done
+closed: "landed e5b03f378..4620b44e2 (board log 2026-11-14 01:36)"
 depends_on: []
 parallel: "wave 1 with P03 and P06; touches only packages/agent-protocol/** and its spec"
 branch: harden/acct-b-p01

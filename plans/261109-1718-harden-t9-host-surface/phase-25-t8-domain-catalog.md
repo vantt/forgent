@@ -1,7 +1,8 @@
 ---
 phase: 25
 title: "PROPOSED - AWAITING OWNER APPROVAL: T8 fix: one domain catalog on the payload root; callers stop choosing their own root; compiled.json gets a version"
-status: pending
+status: done
+closed: "landed 47b721427 (2026-11-14)"
 depends_on: ["owner approval (a new door, RUL104; T8 closing report 2026-11-09 17:52, open items)", "24 landed (loader.mjs)", "10 landed (registrations.mjs chain)", "15 landed (skill-wrappers.mjs)"]
 parallel: "T8 slot, after P10; touches no bin/fgos.mjs range"
 effort: ~0.75d

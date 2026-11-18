@@ -1,7 +1,8 @@
 ---
 phase: 3
 title: "Run Result: a provider limit has its own category; a seat that left no claim and no report is infra"
-status: pending
+status: done
+closed: "landed 433dfea6a..8e0bdcb9a (board log 2026-11-14 04:16)"
 depends_on: []
 parallel: "wave 1 with P01 and P06; P04 waits for it (shared settlement.mjs)"
 branch: harden/acct-b-p03

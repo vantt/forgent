@@ -1,7 +1,8 @@
 ---
 phase: 07
 title: "Execution applies the scope rule and the verify round before it settles, then writes the unit-run-result fields (final outcome, infrastructure, outOfScope, evaluations, report read) with a fixture per outcome"
-status: completed
+status: done
+closed: "landed 2026-11-12 (report plans/reports/lead-261112-1059-harden-t9-p07-unit-run-result-fields.md)"
 depends_on: ["05 landed (verify door; unit-handoff.mjs and run.mjs writer order)", "20 landed (one outcome module: its predicates compute infrastructure)", "21 landed (run.mjs writer order)", "COOK's unit-run-result contract text (branch cook/unit-run-result, tip 444dd1b1b)", "owner approval of COOK's four-step split (decision 81)"]
 parallel: "T5 (Execution layer), last T5 phase; beside P22 if P22 is still open (file-disjoint); touches no bin/fgos.mjs range"
 effort: ~1.5d

@@ -547,10 +547,6 @@ Open items at close (T5C section 10): P04 half B (landed later), seat-start foll
 - Load differed between baseline and after in several rows (T4C node batch, T5C per-file loop at load up to 35.6); the closing reports say these are not like for like.
 - Whole-suite wall time versus phase 00 is a root-level number and is not in any of these files.
 
-Status: DONE_WITH_CONCERNS
-Summary: Draft written at the scratchpad path for T3a, T3b, T4, T5 with each number's source key; T3a and T3b have only "before" numbers and plan estimates, with "after" and measured net delta marked not recorded.
-Concerns/Blockers: Per-layer sections (c) to (f) for T3 rely on the arbitration reports and the plan's owner-decision list, which went beyond the files listed in the brief. The landing and part-2 reports that may hold T3 "after" numbers were not read. Finding counts (raw, accepted, rejected) exist in none of the sources read, so they are marked not recorded.
-
 ## 5. Verification done by the lead on main `0981437d2`
 
 Source checks, no tests run. The `EchoProvider` operation descriptor is still in the production catalog (`packages/host-runtime/rust/src/catalog.rs:117-121`); `RouterPolicy` is still an empty struct (`operation_provider_router.rs:29`); the admission gate still carries its own "tautological" known-limitation comment (`authority_gate.rs`, `allow_catalog_policies`). A `fgos doctor --json` run at 13:48 failed its Node rows bridge after 30 s on this machine under load from other lanes; it says nothing about the layers and was not repeated.
@@ -626,10 +622,10 @@ Closed with evidence in the ledger (not re-listed as open): H1, H2/H3 recorded, 
 
 1. The whole-suite wall time was measured under shared load (section 2); a quiet-machine re-run is optional. Two reds on main need an owner: the stale `workflow start --plan` test (metrics lane) and the instruction projections.
 2. DECIDED 2026-11-18 (owner answer relayed by `forgent-c0`, not heard directly by the lead): the T9 misses (211 modules at entry, doctor 15 s against 12 s, Node +550 over estimate) are accepted and T9 closes.
-3. DECIDED AND DONE 2026-11-18 (owner chose 1, 2 and 4; plan `plans/261118-1818-harden-t9-leftovers`): doctor row timing (`8a754445e`), echo fixture out of the production catalog (`817d322f6`), empty `RouterPolicy` deleted (`d9fedea48`); the admission gate stays deferred (backlog p-ltwb2h3k6s). Before the work, the T9 inputs open on main were: doctor per-row timing (owner pick 2b), `test.fixture.echo` in the production catalog, the tautological admission gate, the empty `RouterPolicy`. Pick which become items; none is built until chosen (RUL104).
+3. DECIDED AND DONE 2026-11-18 (owner chose 1, 2 and 4; plan `plans/261118-1818-harden-t9-leftovers`): doctor row timing (`8a754445e`), echo fixture out of the production catalog (`817d322f6`), empty `RouterPolicy` deleted (`d9fedea48`); the admission gate stays deferred (backlog p-ltwb2h3k6s). Current state: of the four T9 inputs, three are built and on main (listed above) and the fourth, the tautological admission gate, is deliberately deferred and tracked as backlog `p-ltwb2h3k6s` (`docs/backlog.md`); nothing in this list is waiting for an owner pick.
 4. DECIDED 2026-11-18 (same relay): option B, Work stays deferred until after the packaging release; no T7 council now.
 5. CLOSED: Packaging Q-A and Q-B are already settled in `docs/platform/packaging-distribution/spec.md:197` (checked by the lead): `fgos` keeps exit 4 for usage errors, `fgos doctor` exits 0 and 1 with `--strict`. `fgctl` follows the packaging standard.
 6. Ledger rows H3, H9 to H13, H17, H22, H23, H24 carry no receiver closure line, and H12 names a session (`forgentx-5f`) that does not run.
-7. The T6 close date is 2026-11-08 in the T6 closing report and board; 2026-11-18 is the owner's answer on phase 20 step 2 (option A, no plain-run retention rule). The T6 phase 17 file front matter still reads `pending`.
+7. The T6 close date is 2026-11-08 in the T6 closing report and board; 2026-11-18 is the owner's answer on phase 20 step 2 (option A, no plain-run retention rule). The stale front matter of the T6 phase files (phase 17 among them) was closed against its commits in the status pass of backlog `p-nnidbiq3l2`.
 8. T0 named exceptions, accept/reject reasons for T0 and T1, and T1 Node/test estimates sit in `docs/platform/component-boundary.md` and the arbitration reports, which this report did not read.
 9. The S6a planner and the sibling plan-row edits are not decided; they are not part of phase 07.

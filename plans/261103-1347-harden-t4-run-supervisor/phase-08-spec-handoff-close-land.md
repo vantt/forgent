@@ -1,7 +1,8 @@
 ---
 phase: 08
 title: "Close: spec and docs lines handed to DOC (docs/ frozen), re-measure against the baseline, closing report, owner-machine guide complete"
-status: pending
+status: done
+closed: "closed by plans/reports/closing-261104-1734-harden-t4-run-supervisor.md (main abbc4a98e, all phases on main)"
 depends_on: [01, 02, 03, 04, 05, 06, 07]
 parallel: "none"
 effort: ~1d (plus DOC's own time after DOC Land)

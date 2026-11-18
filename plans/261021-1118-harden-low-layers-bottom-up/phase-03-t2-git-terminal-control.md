@@ -1,7 +1,7 @@
 ---
 phase: 03
 title: "T2: Git, Terminal-control"
-status: pending
+status: done
 depends_on: [02 closed]
 effort: ~5d (rough)
 ---

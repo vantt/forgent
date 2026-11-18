@@ -1,7 +1,8 @@
 ---
 phase: 10
 title: "Conditional on Q1 = (a): fewer fsyncs on a worktree add, the pin still durable before the effect"
-status: pending
+status: done
+closed: "withdrawn: the owner dropped F-C2 (decision 23, plans/reports/closing-261023-2228-harden-t2-git-terminal-control.md section 4 'Dropped or not taken')"
 condition: "runs only if the owner answers yes to Q1 with option (a); with (b) the big lead re-plans this file; with (c) or no answer it does not run"
 depends_on: [09]
 parallel: "with phases 11, 12, 14 (disjoint files); before 13 and 15 (they also touch driver.rs only if run; refs.rs is this phase's alone)"

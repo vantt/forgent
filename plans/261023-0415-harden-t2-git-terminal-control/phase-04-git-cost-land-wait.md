@@ -1,7 +1,8 @@
 ---
 phase: 04
 title: "Git cost: patterned list_refs (F-C4), gitPortOptions reuse (F-C5), F-C3 kept by evidence; the Land wait moves into the Land port"
-status: pending
+status: done
+closed: "landed in the track merge a01f725bf (plan landed on main 084da2df7; plans/reports/closing-261023-2228-harden-t2-git-terminal-control.md)"
 depends_on: [02]
 parallel: "with phase 03 (disjoint files); with phase 06"
 effort: ~1.5d

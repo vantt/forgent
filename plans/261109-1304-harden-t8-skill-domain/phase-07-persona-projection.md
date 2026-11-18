@@ -1,7 +1,8 @@
 ---
 phase: 07
 title: "Persona projection: scripts/project-agents.mjs stays a manual script and stops being able to overwrite an agent file it did not write (output name is the source stem, a newline in a scalar is refused, an unstamped target is refused by name)"
-status: completed
+status: done
+closed: "landed (plan table row 07)"
 depends_on: []
 parallel: "group A; P11 follows with one import line"
 effort: ~0.5d

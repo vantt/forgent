@@ -1,7 +1,7 @@
 ---
 title: "HARDEN packaging and distribution sub-plan: first contact, safe install and uninstall, correct releases, fast re-runs"
 description: "Closes the audit's remaining MUST fails under owner decision 80 (Q1 a, Q3 a, Q4/5 a): thirteen phases in the skill's order (UX, safety, correctness, speed), one writer per hot file, T9-aware."
-status: completed
+status: done
 priority: P1
 effort: ~12d of lead work (12 phases plus a close); ~6d critical path; widest group 3 leads
 branch: main (plan only; each phase runs on its own track branch `harden/pkg-pNN-<slug>` in its own linked worktree from origin/main)

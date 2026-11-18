@@ -1,7 +1,8 @@
 ---
 phase: 15
 title: "Spec, measure, close: Part A shapes and the settled rules into the Workflow spec, stale text gone, contract and help text fixed, backlog rows settled, re-measure on the activated release, Vietnamese guide finished, layer closed with net size at or below zero"
-status: pending
+status: done
+closed: "closed by plans/reports/closing-261108-1838-harden-t6-workflow.md"
 depends_on: ["01-14 landed"]
 parallel: "close"
 effort: ~1d

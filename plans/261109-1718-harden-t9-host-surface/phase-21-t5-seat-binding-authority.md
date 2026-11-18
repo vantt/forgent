@@ -1,7 +1,8 @@
 ---
 phase: 21
 title: "T5 fix: Seat Binding is the one authority for binding facts: provenance passes through Dispatch unchanged, one provider family, one account-usable judgement"
-status: pending
+status: done
+closed: "landed 2026-11-12 (report plans/reports/lead-261112-0704-harden-t9-p21-seat-binding-authority.md)"
 depends_on: ["06 landed (dispatch/cli.mjs, unit-run-start.mjs writer order)", "20 landed (run.mjs writer order)"]
 parallel: "T5 slot, second wave: beside P22 if still open (file-disjoint); before P07"
 effort: ~1d

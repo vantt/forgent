@@ -1,7 +1,8 @@
 ---
 phase: 02
 title: "Layering: the shared leaf modules leave Dispatch for the lowest layer that needs them, a guard keeps lower layers from importing Dispatch, and a no-undef pass joins the gate"
-status: pending
+status: done
+closed: "landed 98e1c5824..7a4fa3654"
 depends_on: [01]
 parallel: "none (wave 1 alone: import lines in about 35 production files and 60 tests)"
 effort: ~0.5d

@@ -1,7 +1,8 @@
 ---
 phase: 10
 title: "Execution core cut: runUnitBody splits along its seams, the provider-limit answer becomes a pure function, the run and the dry bind share one ask builder, the first unit record goes through the durable door"
-status: pending
+status: done
+closed: "landed 0029e325b..c5242df59"
 depends_on: [07, 09]
 parallel: "none in practice (run.mjs chain; assignment.mjs after P09); may overlap P11 (disjoint files)"
 effort: ~1d

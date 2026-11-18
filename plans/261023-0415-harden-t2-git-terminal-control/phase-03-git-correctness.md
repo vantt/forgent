@@ -1,7 +1,8 @@
 ---
 phase: 03
 title: "Git correctness: config recovery durability (CF05), WAL temporaries (CF06), rejected push (CF08), local counter durability (CF09)"
-status: pending
+status: done
+closed: "landed in the track merge a01f725bf (plan landed on main 084da2df7; plans/reports/closing-261023-2228-harden-t2-git-terminal-control.md)"
 depends_on: [02]
 parallel: "with phase 04 (disjoint files); with phase 06"
 effort: ~1d

@@ -1,7 +1,8 @@
 ---
 phase: 06
 title: "Doctor rows: agent-claims-resolve accepts a claim only when the skill name is owned, executor-skills-installed accepts a user-level skill dir and refuses an empty SKILL.md and names worktree provisioning; no row added or lost"
-status: completed
+status: done
+closed: "landed (plan table row 06)"
 depends_on: []
 parallel: "group A; P08 and P11 follow on registrations.mjs"
 effort: ~0.5d

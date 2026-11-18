@@ -1,7 +1,8 @@
 ---
 phase: 01
 title: "Adopt custody judges (B-1, RT4-06), sweep folded into the client (S14), doctor 8 → 5 with release-gone as a warning (3b), lock-scan out of the route contract"
-status: pending
+status: done
+closed: "landed 3a940e2a8 (plans/reports/closing-261104-1734-harden-t4-run-supervisor.md section 1)"
 depends_on: []
 parallel: "wave 1, with phases 02 and 03 (disjoint files)"
 effort: ~1.5d

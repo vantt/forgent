@@ -1,7 +1,8 @@
 ---
 phase: 18
 title: "T3 fix: config defaults live only in the config door (dispatch section schema; maxRounds read from config)"
-status: landed
+status: done
+closed: "landed 936a9152f..0680cb40b"
 depends_on: ["none inside T9 (T3 is closed; fix of a closed layer, decision 83)"]
 parallel: "T3 slot, beside P04 (file-disjoint); must land before P20 (both touch loops/reviewed.mjs)"
 effort: ~0.5d

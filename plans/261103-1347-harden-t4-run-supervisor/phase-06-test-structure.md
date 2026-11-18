@@ -1,7 +1,8 @@
 ---
 phase: 06
 title: "Test structure: Node crash-matrix rows Rust owns retire (one wiring row kept), crash-matrix-adopt-resume collapsed to one case per resume branch, one wait helper per language"
-status: pending
+status: done
+closed: "landed 4e86aec63, 1dc20857b (plans/reports/closing-261104-1734-harden-t4-run-supervisor.md section 1)"
 depends_on: [01, 04, 05]
 parallel: "none (it touches Rust and Node test files several phases edit)"
 effort: ~1d

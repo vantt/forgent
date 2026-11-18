@@ -1,7 +1,8 @@
 ---
 phase: 01
 title: "Red-test intake: route the committed red tests to the phases that turn them green"
-status: pending
+status: done
+closed: "landed 48a45a5f5 (phases 01-06, board log 2026-10-24 22:50)"
 depends_on: []
 parallel: "first; minutes of work, then phases 02 and 03 start"
 effort: ~0.25d

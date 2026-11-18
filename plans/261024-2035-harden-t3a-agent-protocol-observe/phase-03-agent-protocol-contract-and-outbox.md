@@ -1,7 +1,8 @@
 ---
 phase: 03
 title: "Agent protocol: blocked(usage-limit) in terminal mode, bounded outbox, one reason renderer, deletions"
-status: pending
+status: done
+closed: "landed 48a45a5f5 (phases 01-06, board log 2026-10-24 22:50)"
 depends_on: [01]
 parallel: "with phases 02, 04, 05 (disjoint files; shares only census and Cargo.lock, both regenerated)"
 effort: ~1d

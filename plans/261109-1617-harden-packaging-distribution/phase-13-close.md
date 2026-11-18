@@ -1,7 +1,8 @@
 ---
 phase: 13
 title: "Close: re-run the skill checklist on the final tree, Vietnamese guide, closing report, spec and verification docs"
-status: completed
+status: done
+closed: "landed on main 2026-11-09..12; closed by plans/reports/closing-261112-1817-harden-packaging-distribution.md"
 depends_on: ["P01-P12 landed on main"]
 parallel: "group G6, last"
 effort: ~0.5d

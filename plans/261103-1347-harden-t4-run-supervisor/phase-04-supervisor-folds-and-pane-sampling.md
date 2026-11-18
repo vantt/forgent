@@ -1,7 +1,8 @@
 ---
 phase: 04
 title: "Supervisor folds: one watch tick (S4), no heartbeat file (S6), one start-refusal writer and one peer_uid (S13), terminal /proc readers onto T0 facts (S5), pane screen sampled only while idle can come first (5a), agent-writable files read through the bounded reader, the 30 s real wait out of the crate tests"
-status: pending
+status: done
+closed: "landed fad7e0fab (plans/reports/closing-261104-1734-harden-t4-run-supervisor.md section 1)"
 depends_on: [01, 02, 03]
 parallel: "wave 2, with phase 05 (disjoint files)"
 effort: ~1.5d

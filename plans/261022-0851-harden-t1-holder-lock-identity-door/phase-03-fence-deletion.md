@@ -1,7 +1,8 @@
 ---
 phase: 03
 title: "Fence deletion, Node part: fences.mjs, the lock-fences row and fix, the registry's fence columns, the five fence test files"
-status: pending
+status: done
+closed: "landed in the track merge c56f1eae3 (plan landed on main 7833d5df1; plans/reports/closing-261022-2003-harden-t1-holder-lock-identity-door.md)"
 depends_on: [02]
 parallel: "with phase 04 (disjoint files; both add one CHANGELOG line, the later lander rebases that hunk)"
 effort: ~1d

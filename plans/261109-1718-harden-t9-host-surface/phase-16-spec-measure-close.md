@@ -1,7 +1,8 @@
 ---
 phase: 16
 title: "Close: spec and settled shapes, re-measure, Vietnamese owner-machine guide, closing report, lessons appended"
-status: pending
+status: done
+closed: "landed 2026-11-14 (plans/reports/closing-261113-1947-harden-t9-host-surface.md)"
 depends_on: ["01-04, 06, 08, 10, 12-15, 17-24, 26 landed", "05, 07, 09, 11, 25 landed, or handed off with their text intact"]
 parallel: "none: last"
 effort: ~1d

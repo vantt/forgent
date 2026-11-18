@@ -1,7 +1,8 @@
 ---
 phase: 14
 title: "Budget cut: the seven functions over 300 lines, the three line budgets, the run.test.mjs split"
-status: pending
+status: done
+closed: "landed 7055cf874..477f96684, 477f96684..dbec1f5f2, dbec1f5f2..83e4cca9e (three lots, 11-06)"
 depends_on: [09, 10, 12, 13]
 parallel: "three lots with disjoint file sets (1 confinement + test split, 2 execution core files, 3 patterns + dispatch plan/settlement); one lead each, own worktree; land one lot at a time"
 effort: ~1d

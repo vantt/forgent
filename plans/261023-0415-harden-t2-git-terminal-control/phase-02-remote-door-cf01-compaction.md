@@ -1,7 +1,8 @@
 ---
 phase: 02
 title: "CF01 liveness evidence; the one remote door (RT01, F-7, CF07, display-form pin); Worktree and Refs compaction (F-C1)"
-status: pending
+status: done
+closed: "landed in the track merge a01f725bf (plan landed on main 084da2df7; plans/reports/closing-261023-2228-harden-t2-git-terminal-control.md)"
 depends_on: [01]
 parallel: "none for Git files; phase 06 may run beside it"
 effort: ~1d

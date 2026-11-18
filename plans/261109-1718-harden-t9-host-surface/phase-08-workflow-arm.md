@@ -1,7 +1,8 @@
 ---
 phase: 08
 title: "Workflow arm: frame parse, seats split and resume refusals move into the workflow use case; slug import"
-status: pending
+status: done
+closed: "landed (plan table; plans/reports/closing-261113-1947-harden-t9-host-surface.md, commit 3ee10a3fa)"
 depends_on: ["06, 20, 21, 22 landed, and 07 if approved (T5 closed; layer order; unit-handoff.mjs after 05 and 07)"]
 parallel: "T6 (Workflow layer); beside P09 and P24 (file-disjoint: this phase owns index.mjs, propose.mjs and unitOverridesOf in unit-handoff.mjs; P09 owns store.mjs, case-projection.mjs, definition.mjs; P24 owns loader.mjs and the setup readers)"
 effort: ~0.5d

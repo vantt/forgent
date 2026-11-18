@@ -1,7 +1,8 @@
 ---
 phase: 05
 title: "Claude private trust store: an unconfined claude pane reads a config store private to its attempt, fgOS never writes the operator's ~/.claude.json; the remaining operator-store writers (codex, agy) resolve links and report failures"
-status: pending
+status: done
+closed: "landed de7454638..8f521eb2f (codex, agy) and ca69911f6..6b5c80f9b (claude)"
 depends_on: [02]
 parallel: "wave 2, with 03, 04, 07"
 effort: ~1.5d (includes one measured live claude run by the big lead)

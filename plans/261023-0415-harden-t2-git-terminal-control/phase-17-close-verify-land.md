@@ -1,7 +1,8 @@
 ---
 phase: 17
 title: "Close: independent verify, re-measure against R2, land on both machines (D8 census in the guide), rollback, closing report"
-status: pending
+status: done
+closed: "landed in the track merge a01f725bf (plan landed on main 084da2df7; plans/reports/closing-261023-2228-harden-t2-git-terminal-control.md)"
 depends_on: [09]
 parallel: "none; last (after every conditional phase the owner said yes to before this phase starts)"
 effort: ~1d plus the owner's landing slot

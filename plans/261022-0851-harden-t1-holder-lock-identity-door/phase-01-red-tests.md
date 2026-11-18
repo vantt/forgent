@@ -1,7 +1,8 @@
 ---
 phase: 01
 title: "Red tests for the reproduced Highs and Mediums no test owns yet"
-status: pending
+status: done
+closed: "landed in the track merge c56f1eae3 (plan landed on main 7833d5df1; plans/reports/closing-261022-2003-harden-t1-holder-lock-identity-door.md)"
 depends_on: []
 parallel: "none; committed first, each case turned green by the phase named in its row"
 effort: ~1d

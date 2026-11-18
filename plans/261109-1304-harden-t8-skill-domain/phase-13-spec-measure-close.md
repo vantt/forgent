@@ -1,7 +1,8 @@
 ---
 phase: 13
 title: "Spec, measure, close: Part A shapes and the settled rules into the two owning docs, contract and alignment rows, CHANGELOG, backlog items, re-measure on the activated release, Vietnamese owner guide finished, closing report, layer net size at or below zero"
-status: landed
+status: done
+closed: "closed by plans/reports/closing-261109-1752-harden-t8-skill-domain.md"
 depends_on: ["01-12 landed"]
 parallel: "close"
 effort: ~1d

@@ -1,7 +1,8 @@
 ---
 phase: 22
 title: "T5 fix: the confinement request constructor always sets the mode; confinement owns its orphan judgement and removal"
-status: pending
+status: done
+closed: "landed (plan table; plans/reports/closing-261113-1947-harden-t9-host-surface.md, commit 3ee10a3fa)"
 depends_on: ["05 landed if approved, else 04 (layer order)", "26 landed (authority.mjs, cleanup.mjs writer order)"]
 parallel: "T5 slot, first wave: beside P06 and P20 (file-disjoint); P10's confinement row switch waits for it"
 effort: ~0.5d

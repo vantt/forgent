@@ -1,7 +1,8 @@
 ---
 phase: 14
 title: "Conditional on A3: a cause catalogue causes.v1.json generated from one Cause enum"
-status: pending
+status: done
+closed: "not triggered: A3 not taken (decision 21; plans/reports/closing-261023-2228-harden-t2-git-terminal-control.md section 4)"
 condition: "runs only if the owner picks A3 in Q3 for T2 (the arbitration recommends A3 later, as its own item)"
 depends_on: [09]
 parallel: "none: alone and last of the conditional phases (it touches every Git source file)"

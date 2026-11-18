@@ -1,7 +1,8 @@
 ---
 phase: 11
 title: "Domain-dirs door: one listDomainDirs in a src/util leaf replaces the repeated readdirSync(domains) walks in the T8, T5 and T6 callers in the same change; the WORK caller becomes a filed item"
-status: completed
+status: done
+closed: "landed d6cc9ab76"
 depends_on: [01, 02, 03, 06, 07, 08]
 parallel: "group D, alone: one import and call per caller file"
 effort: ~0.5d

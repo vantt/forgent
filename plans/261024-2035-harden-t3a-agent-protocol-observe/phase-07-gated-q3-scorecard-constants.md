@@ -1,7 +1,8 @@
 ---
 phase: 07
 title: "GATED: owner Q3 — remove the constant or always-zero metrics harness sections and the unbuilt coordination-session contract"
-status: pending
+status: done
+closed: "landed 8622c1066 (2026-10-25)"
 gated_by: "owner Q3 (open since decision 32: the owner asked what it means)"
 depends_on: [04, "owner answers Q3 = remove"]
 parallel: "runs only after 04 (same harness/scorecard files); never blocks 01–06 or the landing"

@@ -1,7 +1,8 @@
 ---
 phase: 19
 title: "Status accounts for every run: workflow status lists each finished seat's executor, family, model and account for presets and --units runs too, read from the result already on the ledger"
-status: pending
+status: done
+closed: "landed 66567ab26"
 depends_on: ["01-15 on main (T6 as closed 2026-11-08)"]
 parallel: "final wave, with 16, 17, 18 and 20 step 1 (disjoint files)"
 effort: ~0.5d

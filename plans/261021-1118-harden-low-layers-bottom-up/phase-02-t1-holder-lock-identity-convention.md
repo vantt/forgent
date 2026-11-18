@@ -1,7 +1,7 @@
 ---
 phase: 02
 title: "T1: Holder-lock, Session Identity, Convention"
-status: pending
+status: done
 depends_on: [01 closed, SEAT landed (close only)]
 effort: ~4d (rough)
 ---

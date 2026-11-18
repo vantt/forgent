@@ -1,7 +1,8 @@
 ---
 phase: 19
 title: "T4 fix: the run-supervisor adopt route answers whether an attempt is stuck and why; doctor stops parsing envelopes"
-status: pending
+status: done
+closed: "landed (plan table; plans/reports/closing-261113-1947-harden-t9-host-surface.md, commit 3ee10a3fa)"
 depends_on: ["none inside T9 (T4 is closed; fix of a closed layer, decision 83)"]
 parallel: "T4 slot, beside P05 (file-disjoint); P10's run-attempts-stuck row switch waits for it"
 effort: ~0.75d

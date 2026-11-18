@@ -1,7 +1,8 @@
 ---
 phase: 13
 title: "Test owners and split: each behaviour proven by its owning pure function, one real-seat wiring proof per engine path, the pure fold in the ledger test, definition cases in their own file, fixed waits replaced by the ledger event, and the 2 300-line runner test split by fixture cluster"
-status: landed
+status: done
+closed: "landed 2c2a2e153..46720a519"
 depends_on: [02, 05, 06, 11]
 parallel: "wave 4 (alone among test owners); P12's wiring step may still be open (disjoint files)"
 effort: ~1.5d

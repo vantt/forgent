@@ -1,7 +1,8 @@
 ---
 phase: 03
 title: "Credential and confinement: masks hide every account login store (Q3b), a host-only record beside each private home lets held homes settle again (A7), a written-back login is applied only after the probe proves its account (A8)"
-status: pending
+status: done
+closed: "landed accc31973..51d5d02dd"
 depends_on: [02]
 parallel: "wave 2, with 04, 05, 07 (disjoint files)"
 effort: ~1.5d

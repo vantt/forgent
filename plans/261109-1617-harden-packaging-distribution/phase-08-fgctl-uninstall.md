@@ -1,7 +1,8 @@
 ---
 phase: 08
 title: "fgctl uninstall: reverse what fgOS wrote in the project, keep user config and data, --purge also removes the release store (Q3 a)"
-status: completed (2026-11-12)
+status: done
+closed: "landed on main 2026-11-09..12; closed by plans/reports/closing-261112-1817-harden-packaging-distribution.md"
 depends_on: ["P03 landed (fgctl main.rs)", "P04 landed (bin/fgos.mjs and command registry)", "in-flight (2) landed (to name its removal path)"]
 parallel: "group G4 with P10 and P11"
 effort: ~2d

@@ -1,7 +1,7 @@
 ---
 title: "HARDEN T5 sub-plan: Execution Core, Dispatch & Confinement, Seat Binding, Run Result"
 description: "Step 4 of the HARDEN per-layer loop for T5: the accepted findings still open after batches A-D, owner decisions 61 and 62 (Q1a, Q2b, Q3b, Q5a; additions A3, A4, A5, A7, A8) split into thirteen sub-phases with serialized hot files, net size below zero, self-landing on fg-server2 and a Vietnamese owner-machine guide."
-status: completed
+status: done
 priority: P1
 effort: ~9d lead time (P01 0.5d; P02 0.5d; wave 2 P03 ∥ P04 ∥ P05 ∥ P07 ≈ 1.5d; wave 3 P08 ∥ P11 ≈ 1.5d; P06 1d; P09 1d; P10 1d; P12 1.5d; P13 1d)
 branch: main (plan only; each phase runs on its own track branch `harden/t5-pNN-<slug>` in its own linked worktree from origin/main)

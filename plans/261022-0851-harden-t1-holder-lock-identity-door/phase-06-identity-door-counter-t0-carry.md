@@ -1,7 +1,8 @@
 ---
 phase: 06
 title: "Identity door after SEAT, one depth counter, proc_tree.rs onto fgos-process, T0's post-SEAT carry list"
-status: pending
+status: done
+closed: "landed in the track merge c56f1eae3 (plan landed on main 7833d5df1; plans/reports/closing-261022-2003-harden-t1-holder-lock-identity-door.md)"
 depends_on: [05]
 parallel: "none (SEAT landed 2026-10-22 02:48, so the gate is open; shares hot-lock.mjs, door.mjs and the boundary with its neighbours)"
 effort: ~1d

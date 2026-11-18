@@ -1,7 +1,8 @@
 ---
 phase: 07
 title: "Small fixes: the provider state drops an assignment once its outcome is recorded, one worker-session server per session, recover stops offering driver actions that do nothing, the stderr text judge goes where vectors cover it, the herdr deadline module folds into its one reader"
-status: pending
+status: done
+closed: "landed 3f81fa916..36b59f731"
 depends_on: [02]
 parallel: "wave 2, with 03, 04, 05"
 effort: ~1.5d

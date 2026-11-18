@@ -1,7 +1,8 @@
 ---
 phase: 04
 title: "Observe plumbing deletions: one flag parser, one provider arm, dead fallbacks and sources, time-based tests"
-status: pending
+status: done
+closed: "landed 48a45a5f5 (phases 01-06, board log 2026-10-24 22:50)"
 depends_on: [02, 03]
 parallel: "after 02 (same crate) and after 03 for requirement 10 only (the Windows helper in fgos-durable-file); before 05 (shares apps/fgos/src/wiring/metrics_sources.rs and packages/run-result)"
 effort: ~1.5d

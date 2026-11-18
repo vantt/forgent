@@ -1,7 +1,8 @@
 ---
 phase: 11
 title: "Architecture rule forbidding src/workflow from naming the worktree custody mechanisms; tier field per file; three-seat council acceptance test on contract fields only"
-status: landed
+status: done
+closed: "landed 2026-11-12 (report plans/reports/lead-261112-1248-harden-t9-p11-architecture-rule.md)"
 depends_on: ["05 landed (custody door; the custody imports are gone)", "07 landed (result fields)", "09 landed (Workflow reads them)"]
 parallel: "T6 (Workflow layer), after P09; beside P23 (file-disjoint); touches no bin/fgos.mjs range; may land before P10"
 effort: ~0.75d

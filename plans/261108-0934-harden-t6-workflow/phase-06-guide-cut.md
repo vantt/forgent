@@ -1,7 +1,8 @@
 ---
 phase: 06
 title: "Guide cut: validateWorkflow becomes a composition of named normalizers, the vocabulary is defined once in the lowest file, a dependsOn cycle is refused, the doctor reads definitions through the loader, and the Work step-machine residue sits in named normalizers for T7"
-status: pending
+status: done
+closed: "landed 35436e8a5..d07b8b3c6"
 depends_on: [03]
 parallel: "wave 2, with 04, 05, 07, 08, 09"
 effort: ~1.5d

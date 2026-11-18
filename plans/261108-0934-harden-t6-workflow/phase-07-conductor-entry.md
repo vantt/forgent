@@ -1,7 +1,8 @@
 ---
 phase: 07
 title: "Conductor entry: propose reads each finished ledger once and digests only a case that can be inherited, one glob engine and one write-path normalizer, one slice-shape authority, dead names gone"
-status: pending
+status: done
+closed: "landed a7b70d50f..bb388da2e"
 depends_on: [03]
 parallel: "wave 2, with 04, 05, 06, 08, 09"
 effort: ~1d

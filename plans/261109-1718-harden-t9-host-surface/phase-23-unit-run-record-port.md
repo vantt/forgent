@@ -1,7 +1,8 @@
 ---
 phase: 23
 title: "T5/T6 fix: a Unit-run record port; Workflow stops reading Execution's private files and stops settling or deleting Unit runs itself"
-status: completed
+status: done
+closed: "landed 2026-11-12 (report plans/reports/lead-261112-1248-harden-t9-p23-unit-run-record-port.md)"
 depends_on: ["08 landed (unit-handoff.mjs writer order)", "07 and 09 landed if approved (unit-handoff.mjs, case-admission-port.mjs writer order; the settle shape); if they are handed off, this phase uses today's settle payload", "COOK's unit-run-result text (case admission port shape)"]
 parallel: "T6 slot, after P08 and P09; beside P11 (file-disjoint)"
 effort: ~1d

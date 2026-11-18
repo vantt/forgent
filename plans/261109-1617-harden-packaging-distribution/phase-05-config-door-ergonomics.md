@@ -1,7 +1,8 @@
 ---
 phase: 05
 title: "Config door ergonomics: unknown keys are refused with a did-you-mean, the reason error names the flag, explain resolves runtime keys"
-status: completed
+status: done
+closed: "landed on main 2026-11-09..12; closed by plans/reports/closing-261112-1817-harden-packaging-distribution.md"
 depends_on: []
 parallel: "group G1 with P03 and P09; touches only packages/config and one cli test"
 effort: ~0.5d

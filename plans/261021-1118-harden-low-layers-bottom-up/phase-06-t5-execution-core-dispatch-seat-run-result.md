@@ -1,7 +1,7 @@
 ---
 phase: 06
 title: "T5: Execution Core, Dispatch Transport & Confinement, Seat Binding, Run Result Evaluator"
-status: pending
+status: done
 depends_on: [05 closed, SEAT landed]
 effort: ~7d (rough; largest Node block)
 ---

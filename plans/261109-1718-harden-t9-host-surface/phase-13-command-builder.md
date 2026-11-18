@@ -1,7 +1,8 @@
 ---
 phase: 13
 title: "One shim-or-refuse command builder for the gateway, the dashboard and the common crate; no node fallback"
-status: pending
+status: done
+closed: "landed 2026-11-09"
 depends_on: ["none (shim-root landed for the `is_confined` lines: re-read `fgos.rs` after it lands)"]
 parallel: "gateway/dashboard lane; beside P12, P14 (P14's call-site switch waits for this phase), P15"
 effort: ~0.5d

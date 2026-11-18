@@ -1,7 +1,8 @@
 ---
 phase: 20
 title: "T5 fix: one Execution outcome module (closed table, classes, predicates, exit codes) replaces the loop copies and the two rerun lists"
-status: pending
+status: done
+closed: "landed 2026-11-12 (report plans/reports/lead-261112-1007-harden-t9-p20-outcome-module.md)"
 depends_on: ["05 landed if approved, else 04 (layer order; run.mjs writer order)", "18 landed (loops/reviewed.mjs)"]
 parallel: "T5 slot, first wave: beside P06 and P22 (file-disjoint)"
 effort: ~0.75d

@@ -1,7 +1,8 @@
 ---
 phase: 04
 title: "Hot-mutex fixes (S-F1, HL-N8/N9, Windows paths), the private state-root and .fgos copies, T0-R1, T0-R2, R3, the Lows, T0's size-debt test retirements"
-status: pending
+status: done
+closed: "landed in the track merge c56f1eae3 (plan landed on main 7833d5df1; plans/reports/closing-261022-2003-harden-t1-holder-lock-identity-door.md)"
 depends_on: [02]
 parallel: "with phase 03 (disjoint files; both add one CHANGELOG line)"
 effort: ~1.5d

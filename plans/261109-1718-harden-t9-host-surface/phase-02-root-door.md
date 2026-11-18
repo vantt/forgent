@@ -1,7 +1,8 @@
 ---
 phase: 02
 title: "Invocation-root door: one answer to which project a command acts on, host-bin lookup without a cross-checkout fallback, lock-status arithmetic below the arm"
-status: pending
+status: done
+closed: "landed (plan table; plans/reports/closing-261113-1947-harden-t9-host-surface.md, commit 3ee10a3fa)"
 depends_on: ["shim-root branch on origin/main (the Rust root walk stops below $HOME)"]
 parallel: "T0/T1 layer; alone in its layer; beside P01, P12-P15"
 effort: ~1d

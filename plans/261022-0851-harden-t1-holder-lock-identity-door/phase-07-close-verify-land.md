@@ -1,7 +1,8 @@
 ---
 phase: 07
 title: "Close: independent verify, re-measure against the baseline, land on both machines, rollback plan, closing report"
-status: pending
+status: done
+closed: "landed in the track merge c56f1eae3 (plan landed on main 7833d5df1; plans/reports/closing-261022-2003-harden-t1-holder-lock-identity-door.md)"
 depends_on: [06]
 parallel: "none; last"
 effort: ~1d plus the owner's landing slot on the owner machine

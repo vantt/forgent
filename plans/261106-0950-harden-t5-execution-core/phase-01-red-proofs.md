@@ -1,7 +1,8 @@
 ---
 phase: 01
 title: "Red proofs: one failing test per open defect, in the file that owns its behaviour, shown red on main; never landed alone"
-status: pending
+status: done
+closed: "done 11-06 on branch harden/t5-p01-red-proofs, never landed alone; proofs counted where each lands (plan table row 01)"
 depends_on: []
 parallel: "none (wave 0; short)"
 effort: ~0.5d

@@ -1,7 +1,8 @@
 ---
 phase: 16
 title: "Conditional on A5: herdr capabilities cached per binary identity and server incarnation"
-status: pending
+status: done
+closed: "not triggered: A5 not taken (decision 21; plans/reports/closing-261023-2228-harden-t2-git-terminal-control.md section 4)"
 condition: "runs only if the owner picks A5 in Q3 (the arbitration recommends not to)"
 depends_on: [09]
 parallel: "with phases 10, 12, 13, 15; after phase 11 if both run (same driver file)"

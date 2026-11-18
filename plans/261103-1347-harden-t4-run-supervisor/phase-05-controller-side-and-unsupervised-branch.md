@@ -1,7 +1,8 @@
 ---
 phase: 05
 title: "Controller side: cancel written for a launching attempt (B-4), binding wait derived (B-5), lazy step import and no Node re-check (S7), one settled-result reader (S12); delete the non-supervised branch and the http adapter (decision 59 answer 4a)"
-status: pending
+status: done
+closed: "landed 864a390fd..23740e065 (plans/reports/closing-261104-1734-harden-t4-run-supervisor.md section 1)"
 depends_on: [02, 03]
 parallel: "wave 2, with phase 04 (disjoint files); may also run beside phase 01 if 01 has not landed (disjoint files)"
 effort: ~1.5d

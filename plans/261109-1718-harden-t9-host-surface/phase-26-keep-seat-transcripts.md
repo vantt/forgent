@@ -1,7 +1,8 @@
 ---
 phase: 26
 title: "Keep seat transcripts: finalize-home copies the attempt home's sessions/ into the run directory before it removes the home"
-status: pending
+status: done
+closed: "landed 45b0fe65f..93fa8d1ef"
 depends_on: ["owner decision 84", "COOK's unit-run-result text (branch cook/unit-run-result, §4 `activity`, §9)"]
 parallel: "starts now, beside P12-P15 and the layer chain; shares files only with P22 (confinement/authority.mjs, cleanup.mjs), P06 and P21 (dispatch/cli.mjs), P10 (command-routes.json, registrations.mjs pointer row): this phase lands first and they rebase on it"
 effort: ~1.25d

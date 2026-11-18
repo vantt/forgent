@@ -1,7 +1,8 @@
 ---
 phase: 03
 title: "Gate one door: argv through route::Flags (S2), envelope through read_verified (S3), process relations through T0 facts (S5 gate half), one writer-id path (S9), spawn error by ErrorKind (B-8), group kill before reap (B-10), gate_pid1 without its fixed 57 s loop"
-status: pending
+status: done
+closed: "landed fa9e84c1c..8e0f53264 (plans/reports/closing-261104-1734-harden-t4-run-supervisor.md section 1)"
 depends_on: []
 parallel: "wave 1, with phases 01 and 02 (disjoint files)"
 effort: ~1.5d

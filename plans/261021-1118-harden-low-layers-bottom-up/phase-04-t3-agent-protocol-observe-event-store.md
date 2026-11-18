@@ -1,7 +1,7 @@
 ---
 phase: 04
 title: "T3: Agent protocol, Observe, Event Store"
-status: pending
+status: done
 depends_on: [03 closed, "ES store layer done (Event Store part only)"]
 effort: ~4d (rough)
 ---

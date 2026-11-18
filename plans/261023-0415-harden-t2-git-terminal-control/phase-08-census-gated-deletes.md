@@ -1,7 +1,8 @@
 ---
 phase: 08
 title: "Census-gated drain deletes (legacy worktree:{root} acceptances, compat fields, v1 compact receipts), the Q3 spec sentence, the Q4 Node arms"
-status: pending
+status: done
+closed: "landed in the track merge a01f725bf (plan landed on main 084da2df7; plans/reports/closing-261023-2228-harden-t2-git-terminal-control.md)"
 depends_on: [05]
 parallel: "with phase 07 (disjoint files)"
 effort: ~0.5d plus the owner-machine census answer

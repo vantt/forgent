@@ -1,7 +1,8 @@
 ---
 phase: 11
 title: "Conditional on Q2 = (a): the last pane access moves behind the terminal-control port (anchor pane, agent kinds and integrations, socket path, caller ownership on attach)"
-status: pending
+status: done
+closed: "landed in the track merge a01f725bf (plan landed on main 084da2df7; plans/reports/closing-261023-2228-harden-t2-git-terminal-control.md)"
 condition: "runs only if the owner answers yes to Q2 with option (a); with (b) or no answer it does not run and phase 09's spec exceptions stand"
 depends_on: [09]
 parallel: "with phases 10, 12, 13, 15 (disjoint files); before 16 if both run (same driver file)"

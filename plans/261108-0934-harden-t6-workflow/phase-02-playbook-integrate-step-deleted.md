@@ -1,7 +1,8 @@
 ---
 phase: 02
 title: "The Playbook integrate step is deleted: no second merge door to the trunk; a definition that declares it is refused by name; the Land consumer proof moves where OPC places it"
-status: pending
+status: done
+closed: "landed 37a94a335..76e8a3aa5"
 depends_on: ["OPC's pick for the Land consumer proof (step 1)"]
 parallel: "wave 0, with 01"
 effort: ~1d

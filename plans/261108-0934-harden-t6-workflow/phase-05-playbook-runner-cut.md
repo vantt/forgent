@@ -1,7 +1,8 @@
 ---
 phase: 05
 title: "Playbook runner cut: advanceWorkflowRun becomes a short loop over named steps, the ledger stops copying seat evidence, the account dry bind goes and status shows each seat's account, escaping throws fold into the unit, and resume reruns an infrastructure failure while refusing a verdict by name"
-status: pending
+status: done
+closed: "landed e6f99f78d..2b858ca64"
 depends_on: [03, "08 landed before the dry-bind deletion"]
 parallel: "wave 2, with 04, 06, 07, 08, 09"
 effort: ~2d

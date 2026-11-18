@@ -1,7 +1,8 @@
 ---
 phase: 06
 title: "Terminal-control: observation-only scan (CF02), tuple ownership (CF03), honest durability (CF04), Process spawn door and deadline wait (CF10), the core owns its rules (E-14), dead surface and Node copies deleted (E-13, E-15, E-16, E-26), contracts made true (F-8)"
-status: pending
+status: done
+closed: "landed in the track merge a01f725bf (plan landed on main 084da2df7; plans/reports/closing-261023-2228-harden-t2-git-terminal-control.md)"
 depends_on: [01]
 parallel: "with phases 02–05 (disjoint files; see plan.md parallel marks)"
 effort: ~2d

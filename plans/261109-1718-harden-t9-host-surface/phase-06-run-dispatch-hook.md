@@ -1,7 +1,8 @@
 ---
 phase: 06
 title: "Run, dispatch, hook verdicts, agents and tool arms: buildRunRequest, one verdict per hook kind judged against the project dir, decide split from the assignment runner"
-status: pending
+status: done
+closed: "landed 2026-11-12 (report plans/reports/lead-261112-0651-harden-t9-p06-run-dispatch-hook.md)"
 depends_on: ["05 landed, or 04 landed if 05 is not approved"]
 parallel: "T5 layer, first wave: beside P20 and P22 (file-disjoint); P21 waits for it (dispatch/cli.mjs, unit-run-start.mjs)"
 effort: ~2d

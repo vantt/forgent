@@ -1,7 +1,8 @@
 ---
 phase: 08
 title: "Execution Core seams: a writing Unit takes worktree custody before admission, a Workflow run-level pin that no seat takes runs the unit unpinned at the door, a unit-run report is read from its own seat only, and admitProposal becomes six pure guards with no unread output"
-status: pending
+status: done
+closed: "landed 2465e26c8"
 depends_on: [03]
 parallel: "wave 2, with 04, 05, 06, 07, 09; lands first in the wave (04's release and 05's dry-bind deletion rely on it)"
 effort: ~0.5d

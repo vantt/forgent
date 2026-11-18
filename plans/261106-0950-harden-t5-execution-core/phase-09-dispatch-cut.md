@@ -1,7 +1,8 @@
 ---
 phase: 09
 title: "Dispatch cut: executeAssignment becomes named steps over one attempt object, admitRunAttempt gets its own module, the refused-lease settlement moves to settlement.mjs; duplicates, no-op catches and plan labels go"
-status: pending
+status: done
+closed: "landed 8215cc226..d3ed00d67"
 depends_on: [06, 07]
 parallel: "none (assignment-runner.mjs chain; feeds assignment.mjs to P10)"
 effort: ~1d

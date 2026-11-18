@@ -1,7 +1,7 @@
 ---
 title: "HARDEN account health B: per-run diagnosis (quota vs harness on the record)"
 description: "Every run says by itself which side failed: 429 is a quota stop, the receipt carries the provider's own signal, quarantine is dated from it, provider-limit gets its own category, a refused outbox is infra, the unit summary keeps the infra facts, each fault leaves an audit line, and the Node wording list retires."
-status: completed
+status: done
 priority: P1
 effort: ~3.75d of lead work (6 phases); critical path P01 -> P02 -> P04 -> P05 ~2.25d
 branch: main (plan only; each phase on its own branch `harden/acct-b-pNN` in its own linked worktree)

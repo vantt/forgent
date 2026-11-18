@@ -1,7 +1,8 @@
 ---
 phase: 5
 title: "Retire the Node wording list; the probes judge through the Rust matcher"
-status: pending
+status: done
+closed: "landed c9be6c950..20a802547 (board log 2026-11-14 07:54)"
 depends_on: [1, 4]
 parallel: "last; serial after P04 (shared provider-capacity.test.mjs); file-disjoint with P06"
 branch: harden/acct-b-p05

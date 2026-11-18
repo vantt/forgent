@@ -1,7 +1,8 @@
 ---
 phase: 28
 title: "Worker env allowlist: a seat starts from named ambient variables, not the runner's whole environment"
-status: landed
+status: done
+closed: "landed 2026-11-12 (report plans/reports/lead-261112-1132-harden-t9-p28-worker-env-allowlist.md)"
 depends_on: []
 parallel: "file-disjoint from P07 (run.mjs, unit-handoff, unit-run-start, settle); P27 (confinement authority, bwrap driver, herdr-round, trust-store) is not touched"
 ---

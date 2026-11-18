@@ -1,7 +1,8 @@
 ---
 phase: 07
 title: "Adopt closes an attempt that has its lock and no envelope as abandoned-not-started and its home is finalized by finalize-home; the legacy sweep, its doctor row, its fix and the abandon-legacy intent go (decision 59 answer 2a); doctor 5 → 4"
-status: pending (gated on OQ-1 and OQ-2 in plan.md)
+status: done
+closed: "landed 7b82bf9b2, b6f9a545c; OQ-1 and OQ-2 answered (a) (plans/reports/closing-261104-1734-harden-t4-run-supervisor.md section 1)"
 depends_on: [01, 05, 06]
 parallel: "none; the only owner-gated phase; nothing waits on it but phase 08"
 effort: ~1d after the answers

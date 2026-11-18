@@ -1,7 +1,8 @@
 ---
 phase: 04
 title: "Config: a project layer may only tighten a capability's confinement (refused by name otherwise); executor command and args become global-only once UQ-1 is answered"
-status: pending
+status: done
+closed: "landed 10a6b8425..fcdffd361 (half A) and bbbf52f00..27759bb01 (half B)"
 depends_on: [02]
 parallel: "wave 2, with 03, 05, 07 (Rust config crate and the runner schema only)"
 effort: ~1d (tighten half) + ~0.5d (command half, after UQ-1)

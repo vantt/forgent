@@ -1,7 +1,8 @@
 ---
 phase: 4
 title: "Settle: the signal rides on the failure, the quarantine is dated from it, every fault leaves an audit line"
-status: pending
+status: done
+closed: "landed 77642a4cc..6b04f4452 (board log 2026-11-14 06:46)"
 depends_on: [2, 3]
 parallel: "serial after P02 and P03; P05 waits for it (shared provider-capacity.test.mjs)"
 branch: harden/acct-b-p04

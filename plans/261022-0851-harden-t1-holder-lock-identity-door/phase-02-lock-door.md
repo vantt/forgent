@@ -1,7 +1,8 @@
 ---
 phase: 02
 title: "The holderLock door on Linux/macOS: facade onto the addon, route modes and Node copies deleted, git hook as a cold host client"
-status: pending
+status: done
+closed: "landed in the track merge c56f1eae3 (plan landed on main 7833d5df1; plans/reports/closing-261022-2003-harden-t1-holder-lock-identity-door.md)"
 depends_on: [01]
 parallel: "none (every later phase shares a file with this one)"
 effort: ~2d

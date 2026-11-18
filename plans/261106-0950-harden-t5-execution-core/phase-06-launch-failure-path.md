@@ -1,7 +1,8 @@
 ---
 phase: 06
 title: "Launch failure path: a launch refused before the handover gives back its private home and its pane; adopt of an intent-only attempt releases the pane by key"
-status: pending
+status: done
+closed: "landed 9d70a47cd..d481b1cf0"
 depends_on: [03, 05, 08, 11]
 parallel: "none (assignment-runner.mjs, herdr-round.mjs, registrations.mjs chains; after 11 for registrations.mjs)"
 effort: ~1d

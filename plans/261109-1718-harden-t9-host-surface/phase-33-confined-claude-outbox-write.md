@@ -1,7 +1,8 @@
 ---
 phase: 33
 title: "A confined headless claude seat writes its outbox"
-status: landed
+status: done
+closed: "landed 2026-11-12 (report plans/reports/lead-261112-1415-harden-t9-p33-confined-claude-outbox-write.md)"
 depends_on: []
 parallel: "P32 also edits assignment-runner.mjs; this phase touches only the args-selection hunk and lands or rebases after it"
 ---

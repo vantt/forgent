@@ -1,7 +1,8 @@
 ---
 phase: 08
 title: "Run Result: the outcome of a run record is derived once, in Rust, through the combined addon; the Node derivation is deleted in the same change; one written contract version (V3), V4 gone"
-status: pending
+status: done
+closed: "landed eba902022..7cb2cd535"
 depends_on: [02, 05]
 parallel: "wave 3, with 11 (disjoint files)"
 effort: ~1.5d

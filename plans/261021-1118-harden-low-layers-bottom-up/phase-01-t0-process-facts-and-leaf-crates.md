@@ -1,7 +1,7 @@
 ---
 phase: 01
 title: "T0: Process Facts & Control + Containment port, host-runtime, canonical-json, durable-file"
-status: pending
+status: done
 depends_on: [00]
 effort: ~4d (rough, re-estimated by the sub-plan)
 ---

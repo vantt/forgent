@@ -1,7 +1,8 @@
 ---
 phase: 11
 title: "Config: type, enum, range and required rules leave config.mjs for the runner schema; Node keeps cross-field rules; loadRunnerConfig and the dispatch.mjs barrel go"
-status: pending
+status: done
+closed: "landed 68c426c31..e5ac48e88"
 depends_on: [03, 04]
 parallel: "wave 3, with 08 (and with 10 if the waves overlap: disjoint files)"
 effort: ~1.5d (sized function by function)

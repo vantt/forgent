@@ -1,7 +1,8 @@
 ---
 phase: 29
 title: "`refused` has one meaning: a seat's own fact; a refused seat is never infrastructure"
-status: landed
+status: done
+closed: "landed 2026-11-12 (report plans/reports/lead-261112-1321-harden-t9-p29-refused-one-meaning.md)"
 depends_on: [09, 20]
 parallel: "P30 edits run.mjs and assignment-runner.mjs; this phase touches neither"
 ---

@@ -1,7 +1,8 @@
 ---
 phase: 01
 title: "Render core, deletions first: retire the 63 reference-model and retired-skill tests, delete the Gemini generator and adapter classifier with its 24 tests (Q1 a), remove the two no-op options, so the file every later commit touches is about 600 lines smaller"
-status: landed
+status: done
+closed: "landed 381b18296, 4f2535874"
 depends_on: []
 parallel: "group A, chain head; P02 and P03 (edit) follow on the same file"
 effort: ~1d

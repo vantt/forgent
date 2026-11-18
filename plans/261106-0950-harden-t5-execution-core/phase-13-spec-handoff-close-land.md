@@ -1,7 +1,8 @@
 ---
 phase: 13
 title: "Close: Part A shapes and every settled fact into the area specs, backlog rows and hand-offs recorded, re-measure against the baseline, closing report, owner-machine guide complete"
-status: pending
+status: done
+closed: "landed 57149ebe9..9251c0190 (docs); layer closed 11-08 (plans/reports/closing-261106-2006-harden-t5-execution-core.md)"
 depends_on: [01, 02, 03, 04, 05, 06, 07, 08, 09, 10, 11, 12]
 parallel: "none"
 effort: ~1d

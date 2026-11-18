@@ -1,7 +1,8 @@
 ---
 phase: 24
 title: "T6 fix: one workflowCatalog({projectRoot}), project first then payload, source per id; setup and doctor read it; workflowRoots and the setup reader deleted"
-status: pending
+status: done
+closed: "landed (plan table; plans/reports/closing-261113-1947-harden-t9-host-surface.md, commit 3ee10a3fa)"
 depends_on: ["owner decision 83 (AU-21 a)", "21 landed (registrations.mjs chain)"]
 parallel: "T6 slot, beside P08 and P09 (file-disjoint); must land before P10 and P25 (registrations.mjs, loader.mjs)"
 effort: ~0.75d
