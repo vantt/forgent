@@ -82,6 +82,7 @@ phạm vi.
 | OM-D11 | Reader câu hỏi (Node → Rust, cột thời điểm) trả về secretary để chủ dự án bàn riêng. Plan này chỉ đăng ký kind `fgos.question.asked` / `fgos.question.answered` (refs plan/phase/discussion, attr stage discussion|plan|execution); bên sở hữu câu hỏi sinh chúng sau qua cửa ghi. Tới lúc đó phần "chờ chủ dự án" của thước đo 2 và thước đo 3 trả `unmeasured` kèm lý do; không phải làm lại gì ở đây | chủ dự án, Q7 | 2026-11-18 |
 | OM-D12 | Kind/attr/measure khai báo tại nơi dùng (component, skill, project `.fgos/observe/kinds/`); Observe giữ envelope, tên chuẩn dùng chung và bộ máy ghi/truy vấn, gộp mọi khai báo lúc chạy, test chặn trùng tên. Thêm số đo / vấn đề mới không sửa code Observe | chủ dự án, Q10 | 2026-11-18 |
 | OM-D13 | Câu hỏi cho chủ dự án đi qua verb Rust `fgos questions ask|answer`: ghi giờ hỏi/trả lời, phát `fgos.question.asked|answered` qua cửa ghi Observe, một parser cho các nơi lưu câu hỏi, Node chỉ là caller mỏng. Cấu trúc thông tin câu hỏi (người hỏi, nơi xem chung, đánh thức) bàn ở Q11 | chủ dự án qua secretary, Q7 | 2026-11-18 |
+| OM-D14 | Tổ chức component câu hỏi (nguồn sự thật, thông tin người hỏi, nơi xem/trả lời chung, đánh thức) không thuộc ops-metrics; mở shaper riêng, tư liệu bàn giao ở §6 F và báo cáo scout-261118-1125. Ops-metrics chỉ phụ thuộc vào sự kiện `fgos.question.asked|answered` | chủ dự án, Q11 | 2026-11-18 |
 
 ## 5. Q&A log
 
@@ -119,6 +120,7 @@ phạm vi.
 - 2026-11-18 ~13:00 — Chủ dự án: đồng ý Q10 → OM-D12. Discussion settled.
 - 2026-11-18 ~14:30 — Chủ dự án (qua secretary) trả lời Q7: verb Rust `fgos questions ask|answer` → OM-D13; mở lại bàn
   cấu trúc thông tin câu hỏi (người hỏi, UI chung, đánh thức) → Q11.
+- 2026-11-18 ~15:00 — Chủ dự án: ops-metrics chỉ cần ask/answer; tổ chức component câu hỏi mở shaper riêng → OM-D14.
 
 ## 6. Thiết kế đã chốt {#design}
 
@@ -343,7 +345,10 @@ flowchart LR
   FR --> F
 ```
 
-### 6 F. Câu hỏi cho chủ dự án: thông tin, nơi trả lời, đánh thức (Q11, đang bàn)
+### 6 F. Câu hỏi cho chủ dự án — chuyển sang shaper riêng (OM-D14)
+
+Ngoài phạm vi ops-metrics: plan này chỉ cần `fgos questions ask|answer` phát `fgos.question.asked|answered`
+(OM-D13). Phần dưới là tư liệu bàn giao cho shaper của component câu hỏi.
 
 Hiện trạng (`plans/reports/scout-261118-1125-owner-question-routing.md`): bốn nơi lưu câu hỏi (`fgos ask`,
 `QUESTIONS.md`, mục câu hỏi của plan, gate Workflow), bốn kiểu khoá, chỉ `fgos ask` ghi người viết (id Identity),
