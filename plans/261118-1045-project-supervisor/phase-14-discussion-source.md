@@ -19,6 +19,9 @@ phase 16.
   but no path-history walk of its own.
 - Kind shape from phase 3 `observe-kinds.json`: `fgos.discussion.status` (attrs for `from`, `to`, the path).
 
+- Dependencies are already in the crate (phase 3 declares `fgos-observe`, `fgos-git` and the Git test support).
+- Trunk: `packages/git/rust/src/inspect.rs:237` (`resolve_trunk`); the watcher fetches before each full tick (phase 11), so the source reads the trunk's remote-tracking ref when it is ahead of local `main`, else local `main`.
+
 ## Footprint
 `packages/supervision/rust/src/discussion_source.rs`, `packages/supervision/rust/tests/discussion_source.rs`.
 
@@ -28,7 +31,7 @@ phase 16.
 1. `discussion_source.rs`: a trait `DiscussionHistory` (`commits(paths_glob) -> Vec<Commit>` oldest first,
    `blob(commit, path) -> Option<String>`) satisfied by the one door found in Step 0, plus
    `DiscussionSource::records(window) -> Vec<Record>`.
-2. Paths: `docs/discussions/*/DISCUSSION.md` and `plans/reports/shaping-*.md`, on `main` only. A branch that has not
+2. Paths: `docs/discussions/*/DISCUSSION.md` and `plans/reports/shaping-*.md`, on the trunk only (see Inputs). A branch that has not
    landed has no discussion state.
 3. For each path, walk its commits in order, read the marker of each blob, and emit a record when the state differs
    from the previous commit's (the first commit's `from` is `none`). Record `ts` is the commit time; `ref` is the
@@ -41,7 +44,8 @@ phase 16.
    - an edit that leaves the marker alone gives no record;
    - a commit on a side branch not merged to `main` gives no record;
    - both marker sites (`docs/discussions` and `plans/reports/shaping-*`) are read;
-   - a replay over the same window gives the same ids.
+   - a replay over the same window gives the same ids;
+   - with a fetched remote-tracking ref ahead of local `main`, a flip pushed from another clone is read.
 
 ## Verify
 - `cargo test -p fgos-supervision --test discussion_source` passes; clippy `-D warnings` clean.

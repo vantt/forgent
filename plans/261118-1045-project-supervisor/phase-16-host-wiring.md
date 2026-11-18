@@ -1,37 +1,51 @@
 # Phase 16 — Host wiring of the new verbs
 
-Binds the Supervision crate and the lane view to the `fgos` host: `watcher tick`, `supervisor wake|plans|queue|handled|done`, `land`, and the lane form of `slots`. It also injects the new Observe kinds, adds the `supervisor-events-unhandled` doctor row, and regenerates the command contracts. Sole writer of the command registry, the generated contracts and `Cargo.lock` in its wave.
+Binds the Supervision crate and the lane view to the `fgos` host: `watcher tick`, `supervisor wake|plans|queue|handled|done`,
+`land`, `request result`, `session stop`, the `--for-question` flag of `session start`, and the lane form of `slots`.
+It adds the one confined routing rule (PS-20), injects the new Observe kinds, adds the supervision doctor rows, and
+regenerates the command contracts. Sole writer of the command registry, `bin/fgos.mjs`, the generated contracts and
+`Cargo.lock` in its wave.
 
 ## Inputs
-Step 0: re-grep every line below after the session-verb, ops-metrics and read-door plans land. Verb names follow the session-verb plan (PS-16). A finding that changes a decision stops the phase with `NEEDS_CONTEXT`.
-- Template for a native verb with sub-commands: `apps/fgos/src/wiring/events.rs` and `session.rs` (`AVAILABLE_SUBCOMMANDS`, `*_OPERATION_ID`, `*_DESCRIPTOR`, `*Provider::for_descriptor`); registration sites `apps/fgos/src/main.rs:112-129` (`COMPOSITION_PROVIDERS`) and `:300-347` (`register_provider` loops); route table `apps/fgos/src/routing.rs:79` (`NATIVE_SUBCOMMANDS`).
-- Registry entries: `src/cli/command-registry.mjs` (`native: true`, e.g. `mailbox` :1188; `slots` :1319). Generation: `scripts/export-command-selectors.mjs` writes `command-routes.json` and `command-manifest.json`; proof `test/rust-host/command-routes.test.mjs`.
-- Old `slots` body: `bin/fgos.mjs:2189` (`case 'slots'`, imports at :93 and :108). Lane view: the public reader of phase 6 in `packages/run-supervisor/rust/src/lanes.rs`.
-- Observe wiring: `apps/fgos/src/wiring/metrics_sources.rs`; `observe_declarations.rs` is created by ops-metrics phase 8 or 11 (must have landed). The crate's kinds file `packages/supervision/rust/observe-kinds.json` (phase 3) is `include_str!`-ed and injected there, never loaded from `packages/`.
+Step 0: re-grep every line below after the session-verb, ops-metrics, read-door and owner-question-store plans land
+(they write `main.rs`, `routing.rs`, `observe_declarations.rs`, the registry and the routes). Verb names follow the
+session-verb plan (PS-16). A finding that changes a decision stops the phase with `NEEDS_CONTEXT`.
+- Template for a native verb with sub-commands: `apps/fgos/src/wiring/events.rs` and `session.rs` (`AVAILABLE_SUBCOMMANDS`, `*_OPERATION_ID`, `*_DESCRIPTOR`, `*Provider::for_descriptor`); registration sites `apps/fgos/src/main.rs:112-129` (`COMPOSITION_PROVIDERS`) and `:300-347` (`register_provider` loops); route table `apps/fgos/src/routing.rs:79-93` (`NATIVE_SUBCOMMANDS`) and the route decision (`rg -n "fn route|native" apps/fgos/src/routing.rs apps/fgos/src/main.rs`).
+- Confined door: phase 10's `SOCKET_VERBS` and `requestHeadVerb` (`src/session-host/head-request-client.mjs`); the marker `FGOS_CONFINED=1` (`src/config/facade.mjs` `CONFINED_MARKER_ENV`); today's per-verb confined branch `bin/fgos.mjs:3473-3487`.
+- Registry entries: `src/cli/command-registry.mjs` (`native: true`, e.g. `mailbox` :1188; `slots` :1319; `worktree` :124-130). Generation: `scripts/export-command-selectors.mjs` writes `command-routes.json` and `command-manifest.json`; proof `test/rust-host/command-routes.test.mjs`.
+- Old `slots` body: `bin/fgos.mjs:2189` (`case 'slots'`); imports `:93` (`claimWork, ClaimError, readWorkerSlotCeiling` from claim-port) and `:108` (`countWorkerSlots, hasWorkerSlotRoom`). Lane view: `packages/run-supervisor/rust/src/lanes.rs` `snapshot` (phase 6).
+- Observe wiring: `apps/fgos/src/wiring/metrics_sources.rs`; `observe_declarations.rs` (created by ops-metrics phase 1, extended by its phase 11 and by the owner-question store). The crate's kinds file `packages/supervision/rust/observe-kinds.json` is `include_str!`-ed and injected there.
 - Doctor group template: `apps/fgos/src/wiring/doctor/mailbox.rs` (`GROUP`), listed at `doctor/mod.rs:212-222` (`GROUPS`); registry `packages/distribution/contracts/doctor-registry.v1.json` (`inRust`, `rows`).
 - Crate APIs from phases 7, 8, 11, 12, 14: `land`, `queue`, `watcher`, `wake`/`supervisor`, `discussion_source`. Config keys from phase 4 are read here (composition root), never inside Observe or the crate.
+- Phase 10's `stopHeadSession` (`src/session-host/head-stop.mjs`) and ticket reader.
 
-**Covered by the footprint:** route annotations (`command-route-annotations.json`, one entry per new native verb, e.g. `events` :16, `session` :67), flag parsing in `apps/fgos/src/cli_projector.rs` (:285-301), and the gateway pass-through of `fgos slots --json` (`apps/fgos-gateway/src/gateway.rs:1134`, `apps/fgos-gateway/web/src/api/types.ts:143`, `fgos-gateway-api-v1.yaml:561`), which move to the `{lanes}` shape in this phase (L10). The `watcher` lock row comes from phase 6.
+**Covered by the footprint:** route annotations (`command-route-annotations.json`, one entry per new native verb, e.g. `events` :16, `session` :67), flag parsing in `apps/fgos/src/cli_projector.rs` (:285-301), and the gateway pass-through of `fgos slots --json` (`apps/fgos-gateway/src/gateway.rs:1134`, `apps/fgos-gateway/web/src/api/types.ts:143`, `fgos-gateway-api-v1.yaml:561`), which move to the `{lanes}` shape in this phase (L10).
 
 ## Footprint
 `apps/fgos/Cargo.toml`, `Cargo.lock`, `apps/fgos/src/main.rs`, `apps/fgos/src/routing.rs`, `apps/fgos/src/wiring/mod.rs`, `apps/fgos/src/wiring/supervision.rs`, `apps/fgos/src/wiring/observe_declarations.rs`, `apps/fgos/src/wiring/metrics_sources.rs`, `apps/fgos/src/wiring/doctor/supervision.rs`, `apps/fgos/src/wiring/doctor/mod.rs`, `apps/fgos/tests/supervision_verbs.rs`, `packages/distribution/contracts/doctor-registry.v1.json`, `src/cli/command-registry.mjs`, `packages/host-runtime/contracts/command-manifest.json`, `packages/host-runtime/contracts/command-routes.json`, `packages/host-runtime/contracts/command-route-annotations.json`, `apps/fgos/src/cli_projector.rs`, `apps/fgos-gateway/src/gateway.rs`, `apps/fgos-gateway/web/src/api/types.ts`, `docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml`, `bin/fgos.mjs`, `test/cli/**`.
 
 ## Steps
 1. `apps/fgos/Cargo.toml`: depend on `fgos-supervision`; `cargo update -p fgos-supervision` is the only `Cargo.lock` change (no hand merge).
-2. `wiring/supervision.rs`: one provider per verb family. It resolves the project root, reads config values (`watcher.*`, `supervisor.maxLeads`, `land.*`, `workerSlots.ceiling`) through the config door, builds the crate's ports (Event Store queue, Git Land/Remote, session start through the head door) and calls the crate. No logic of its own. `slots` calls the lane view and answers `{lanes:{ceiling,live,free,seats}}`.
+2. `wiring/supervision.rs`: one provider per verb family. It resolves the project root, reads config values (`watcher.*`, `supervisor.maxLeads`, `land.*`, `workerSlots.ceiling`) through the config door, builds the crate's ports (Event Store queue, Git Land/Remote/inspect, Identity resolve and project read, the head-start door for session start, the mailbox notifier, the definitions runner with each `watcher.definitions` entry and the pace file resolved like the attention view) and calls the crate. No logic of its own. `land` takes `--footprint` only from the request route (a lead's plan, phase 10) and `--test <path>...`; `slots` calls the lane view and answers `{lanes:{ceiling,live,free,seats}}`.
 3. `routing.rs` `NATIVE_SUBCOMMANDS` and `main.rs` provider table and registration: add `watcher` (`tick`), `supervisor` (`wake`, `plans`, `queue`, `handled`, `done`); `land` and `slots` are plain native verbs.
-4. `command-registry.mjs`: add `watcher`, `supervisor`, `land` entries with `native: true`; mark `slots` native and replace its text with the lane form. Delete `case 'slots'` and its two imports from `bin/fgos.mjs` (the other users of the old count are retired in phase 17). Then run `node scripts/export-command-selectors.mjs`; commit the regenerated manifest and routes.
-5. Observe: add the crate's kinds file to `observe_declarations.rs`; register the discussion source in `metrics_sources.rs`.
-6. Doctor: `doctor/supervision.rs` with row `supervisor-events-unhandled` (read-only pointer: "N unhandled, run `fgos supervisor queue`"; warns, never fails, no fix); add to `GROUPS`, to `inRust.rows` and `rows`. Phase 15 already added `watcher-timer`.
-7. `tests/supervision_verbs.rs`: one wiring proof per verb through the real host on a temp project (`watcher tick` raises one row, `supervisor wake` with no live supervisor reports the start, `plans`, `queue`, `handled`, `done` refuses while an event is unhandled, `land` on a fixture remote, `slots --json` shape). Case logic stays in the crate tests; do not copy it.
-8. `test/cli/command-registry.test.mjs` and the existing `slots` test: update to the lane shape (the old occupancy test is retired in phase 17 with its module).
+4. Confined routing rule (PS-20): in the host's route decision, a call whose environment has `FGOS_CONFINED=1` and whose verb (selector) is in the head-request contract's verb list goes to the Node payload, whatever its native route; this is the only new rule. In `bin/fgos.mjs`, one arm before the verb switch: confined and a `SOCKET_VERBS` verb -> build the contract args from the flags and call `requestHeadVerb`; print its JSON. It covers `land`, `run`, `worktree create`, `request result`, `session start|stop`, `supervisor handled|done`; the existing `head`/`session` start and rotate branches keep their door.
+5. Node verbs (registry + `bin/fgos.mjs` arms): `request result [<id>] [--wait <s>]` (phase 10's reader; unconfined it reads the caller's own tickets by role env); `session stop <persona> --name <n> [--reason <t>]` (calls `stopHeadSession`; unconfined callers allowed); `session start` gains `--for-question <id>` (passed to `startHead`).
+6. `command-registry.mjs`: add `watcher`, `supervisor`, `land` entries with `native: true`; mark `slots` native and replace its text with the lane form. Delete `case 'slots'` from `bin/fgos.mjs`, remove `readWorkerSlotCeiling` from the claim-port import at `:93` (keep `claimWork, ClaimError`) and delete the `:108` import. Then run `node scripts/export-command-selectors.mjs`; commit the regenerated manifest and routes.
+7. Observe: add the crate's kinds file to `observe_declarations.rs`; register the discussion source in `metrics_sources.rs`.
+8. Doctor: `doctor/supervision.rs`, group `supervision`, three read-only rows, no fix, add to `GROUPS`, `inRust.rows` and `rows`:
+   - `supervisor-events-unhandled`: pointer, "N unhandled, run `fgos supervisor queue`"; warns, never fails;
+   - `supervision-pace`: runs `core/watcher/pace/watcher-overdue` and `supervisor-idle-burn` read-only; warns with the rows (a stopped watcher cannot report itself, PS-22);
+   - `land-gates-configured`: warns when `watcher.enabled` is true and `land.gates` is empty ("every `fgos land` refuses `land-gate-missing`; set `land.gates`").
+9. `tests/supervision_verbs.rs`: one wiring proof per verb through the real host on a temp project (`watcher tick` raises one row and sends one notify through a fake mailbox host for a `notify` kind, `supervisor wake` with no live supervisor reports the start, `plans`, `queue`, `handled`, `done` refuses while an event is unhandled, `land` on a fixture remote, `slots --json` shape) and one proof per doctor row (warns on its fixture, passes otherwise). Case logic stays in the crate tests.
+10. `test/cli/**`: the registry test and the existing `slots` test move to the lane shape (the old occupancy test is retired in phase 17 with its module); one test proves a confined call of `land` goes to `requestHeadVerb` (fake socket) and `session stop` reaches `stopHeadSession`.
 
 ## Verify
 - `cargo test -p fgos --test supervision_verbs` and `cargo test -p fgos` pass.
-- `node scripts/run-tests.mjs test/cli/command-registry.test.mjs test/rust-host/command-routes.test.mjs` passes.
+- `node scripts/run-tests.mjs test/cli test/rust-host/command-routes.test.mjs` passes.
 - `node scripts/export-command-selectors.mjs --check` reports no drift.
-- `npm run fgos:dev -- slots --json` prints `lanes`; `npm run fgos:dev -- doctor --json` has `watcher-timer` and `supervisor-events-unhandled`.
+- `npm run fgos:dev -- slots --json` prints `lanes`; `npm run fgos:dev -- doctor --json` has `watcher-timer`, `supervisor-events-unhandled`, `supervision-pace`, `land-gates-configured`.
 - `cargo clippy -p fgos -- -D warnings` clean.
 
 ## Rollback
-Revert the merge commit and rerun the export script. The crate stays inert; the timer of phase 15 then runs a verb that is gone, so set `watcher.enabled` false first.
+Set `watcher.enabled` false first (the timer of phase 15 would run a verb that is gone), then revert the merge commit and
+rerun the export script. The crate stays inert.

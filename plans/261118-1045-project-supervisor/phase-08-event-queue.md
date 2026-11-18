@@ -4,6 +4,7 @@ The watcher raises an event once; the supervisor drains it. The queue is Event S
 machine or a restart never loses or doubles an event. Rust, in `fgos-supervision`.
 
 ## Inputs
+- Dependencies are already in the crate (phase 3 declares `fgos-event-store` and the test-support dev-dependency).
 - Step 0: re-grep every name below. Phase 3 declares the contract and the consumer row; if its type names differ from
   the ones here, use phase 3's and stop with `NEEDS_CONTEXT` only if the shape differs (not just the spelling).
 - `packages/supervision/contracts/event-streams.v1.json` and the `supervision` row in
@@ -24,7 +25,8 @@ machine or a restart never loses or doubles an event. Rust, in `fgos-supervision
 0. Re-grep inputs; confirm `mod queue;` is in `packages/supervision/rust/src/lib.rs` and the two event types exist.
 1. Event types (from phase 3): `supervision.event-raised` `{id, kind, ref, ts, reason, nextCommand}` and
    `supervision.event-handled` `{id, by}`. Stream `project`. `id` is a deterministic 16-hex string the watcher builds
-   from `kind`, `ref` and the row instant, so the same row raised twice has the same id.
+   from `kind`, `subject` and the row's state-change instant `ts` (phase 11 step 2.5), so the same row raised twice has
+   the same id; `ref` carries the subject.
 2. `queue.rs` public surface (one door, no other module touches the stream):
    - `Queue::open(layout, machine, writer) -> Result<Queue, QueueError>`.
    - `raise(&self, RaisedEvent) -> Result<Raised, QueueError>`; `Raised` is `New` or `Duplicate`. It folds the stream
@@ -37,8 +39,9 @@ machine or a restart never loses or doubles an event. Rust, in `fgos-supervision
    every machine's mirror, so two machines raising the same id show one event and a handle on either closes it.
 4. Errors are `QueueError { code, detail }`: `event-unknown`, `store-unavailable` (the Event Store refused or could not
    be read; never turned into "empty"), `bad-event` (empty `kind`/`ref`, an `id` that is not 16 hex).
-5. No compaction, no cache file: the stream is small and read whole each call. If a measure later says otherwise, that
-   is a new item, not this phase.
+5. No compaction, no cache file: the stream is small and read whole each call (pace rows are never raised, PS-22, so it
+   grows one row per real event). If a measure later says otherwise, that is a new item, not this phase. Across machines
+   a handle reaches the peer at its next Event Store sync (spec note).
 6. Tests in `tests/queue.rs`, one behaviour each, over a temp-dir Event Store:
    - the same id raised twice yields one unhandled event and `Raised::Duplicate` the second time;
    - `mark_handled` removes it from `unhandled` and a second call is a no-op;

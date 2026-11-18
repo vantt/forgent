@@ -12,16 +12,18 @@ Step 0: re-grep every line below. Other plans touch `doctor-registry.v1.json` an
 - `plans/261118-1045-project-supervisor/reports/spike-timer-head-start.md` (phase 2): the service environment a timer needs so the watcher can start the supervisor head. If it is missing, stop with `BLOCKED`.
 
 ## Footprint
-`packages/distribution/rust/src/timer.rs`, `apps/fgos/src/wiring/doctor/mailbox.rs`, `packages/distribution/contracts/doctor-registry.v1.json`, `docs/platform/packaging-distribution/spec.md`.
+`packages/distribution/rust/src/timer.rs`, `apps/fgos/src/wiring/doctor/mailbox.rs`, `apps/fgos/src/wiring/doctor/mod.rs`, `packages/distribution/contracts/doctor-registry.v1.json`, `docs/platform/packaging-distribution/spec.md`.
 
 ## Steps
 1. Add `Schedule::WatcherTick`; grow `ALL` to three. Fill every `match` table: name `watcher-tick`, marker `fgos-managed: watcher-timer`, stem prefix `fgos-watcher`, texts that say the timer wakes the watcher, which decides nothing.
 2. `schedule_of`: `None` unless `/watcher/enabled` is `true`; interval = `/watcher/activeIntervalSec` (positive integer). The tick itself skips work during idle (PS-13), so the unit uses the active interval only.
 3. `command`: `watcher tick --dir <projectRoot>` (same `Word::Named` shape as the other two).
 4. `service_vars`: the environment the spike result lists (at least PATH from `probe_path`, plus whatever it proves a head start needs). Put each variable in one place; do not copy `probe_path`.
-5. Doctor: add `watcher-timer` to `ROWS`, `FIXES`, both match arms and the group-equality test in `mailbox.rs`; add the row and fix to `doctor-registry.v1.json` in `rows`, `fixes`, `inRust.rows` and `inRust.fixes`, owner `rust:packaging`, with a description that matches the registry style. Update the group-count test in `doctor/mod.rs` only if it pins counts (`rg -n "mailbox-sync-timer" apps/fgos`).
-6. Update the two lists in `packaging-distribution/spec.md:586-587` with `watcher-timer`.
-7. Tests, in `timer.rs`: extend the existing per-schedule loops to the new variant (they already prove render on both platforms, off-when-disabled, orphan removal, stale/missing/disabled states). Add one test that pins the rendered command and the config keys that turn it on. No second copy of the loop cases.
+   Survival: render the setting the spike proved keeps a started head alive after the oneshot unit exits (`render_systemd` writes `Type=oneshot` at `:356` with the default `KillMode=control-group`): `KillMode=process` for the watcher unit only, or a `systemd-run --user --scope` wrapper in the start adapter if that is what the spike proved (then nothing changes here and the report says so). The launchd plist gets the equivalent the spike's macOS note names.
+5. Doctor: add `watcher-timer` to `ROWS`, `FIXES`, both match arms and the group-equality test in `mailbox.rs`; add the row and fix to `doctor-registry.v1.json` in `rows`, `fixes`, `inRust.rows` and `inRust.fixes`, owner `rust:packaging`, with a description that matches the registry style. Update a count in `doctor/mod.rs` only if it pins the mailbox group's rows (`rg -n "mailbox-sync-timer" apps/fgos`); the file is in this phase's footprint for that edit alone (phase 16 writes it in the next wave).
+6. Windows: the `no_scheduler` arm (`timer.rs:187`) of `WatcherTick` says supervision does not run on this platform (no timer scheduler); the row warns with that text, never fails.
+7. Update the two lists in `packaging-distribution/spec.md:586-587` with `watcher-timer`.
+8. Tests, in `timer.rs`: extend the existing per-schedule loops to the new variant (they already prove render on both platforms, off-when-disabled, orphan removal, stale/missing/disabled states). Add one test that pins the rendered command, the survival setting and the config keys that turn it on. No second copy of the loop cases.
 
 ## Verify
 - `cargo test -p fgos-distribution timer` passes, with the watcher unit rendered for `linux` and `darwin`.
