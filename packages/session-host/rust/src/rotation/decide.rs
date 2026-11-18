@@ -190,13 +190,16 @@ mod tests {
 
     fn config() -> RotationConfig {
         RotationConfig::from_section(&json!({
-            "soft": 0.4, "hard": 0.7, "windowSize": 1000000,
-            "personas": { "p": { "soft": 0.1 }, "q": { "reload": ["plans/a.md"] } }
+            "soft": 0.4, "hard": 0.7, "keep": 10, "windowSize": 1000000,
+            "personas": { "miu": { "soft": 0.2, "hard": 0.5, "reload": ["a.md"] }, "half": { "hard": 0.9 } }
         }))
         .unwrap()
     }
+    fn run_for(persona: &str, fraction: Option<f64>, rest: AtRest) -> Decision {
+        decide(fraction, config().thresholds_for(persona).unwrap(), rest)
+    }
     fn run(fraction: Option<f64>, rest: AtRest) -> Decision {
-        decide(fraction, config().thresholds_for("none").unwrap(), rest)
+        run_for("other", fraction, rest)
     }
 
     #[test]
@@ -241,13 +244,17 @@ mod tests {
     }
 
     #[test]
-    fn a_persona_override_replaces_the_global_threshold_and_a_partial_one_keeps_the_other() {
+    fn a_persona_override_replaces_the_global_thresholds_and_a_partial_one_keeps_the_other_global()
+    {
+        let rest = AtRest::default();
+        assert_eq!(run_for("miu", Some(0.25), rest).rotate, Level::Soft);
+        assert_eq!(run_for("miu", Some(0.5), rest).rotate, Level::Hard);
         let c = config();
         assert_eq!(
-            c.thresholds_for("p").unwrap(),
+            c.thresholds_for("half").unwrap(),
             Thresholds {
-                soft: 0.1,
-                hard: 0.7
+                soft: 0.4,
+                hard: 0.9
             }
         );
         assert_eq!(
@@ -257,14 +264,20 @@ mod tests {
                 hard: 0.7
             }
         );
-        assert_eq!(c.reload_of("q"), ["plans/a.md".to_string()]);
-        assert!(c.reload_of("p").is_empty());
+        assert_eq!(c.reload_of("miu"), ["a.md".to_string()]);
+        assert!(c.reload_of("half").is_empty());
     }
 
     #[test]
     fn soft_above_hard_is_refused_by_name_and_a_missing_key_is_not_defaulted() {
         let mut c = config();
-        c.personas.get_mut("p").unwrap().soft = Some(0.9);
+        c.personas.insert(
+            "p".into(),
+            PersonaRotation {
+                soft: Some(0.9),
+                ..PersonaRotation::default()
+            },
+        );
         assert!(c
             .thresholds_for("p")
             .unwrap_err()

@@ -34,3 +34,18 @@ Status: DONE (live check done, through the real request socket; no Claude head, 
 ## Open
 - Heads started before this change have no `FGOS_HEAD_PERSONA/NAME` (hook does nothing for them) and no `runDir` (refused `placement-unknown`): restart them.
 - Node writer `handoff-store.mjs` and the rest of the head Node modules stay: backlog p-kkkgpg6dzc.
+
+## Review round: every case of the deleted Node tests and its Rust owner
+The sidecar poll keeps waiting for a file that does not exist yet (the first port stopped early), and a sidecar `ts` is epoch milliseconds or ISO-8601 as in Node (`parse_iso_millis`). All in `packages/session-host/rust/src/rotation/`.
+
+`measure.test.mjs` (5 cases):
+- sidecar newer than Stop gives the fraction from its own window size: `measure::tests::a_sidecar_record_newer_than_the_stop_timestamp_gives_the_fraction_from_its_own_window_size`
+- sidecar older than Stop is not fresh, stale transcript used: `...a_sidecar_record_older_than_the_stop_timestamp_is_not_fresh_and_the_stale_transcript_is_used`
+- a record that lands while waiting (Node: the file did not exist yet): `...a_sidecar_file_created_while_waiting_is_taken` (plus `...a_record_that_lands_in_an_existing_sidecar_while_waiting_is_taken`)
+- transcript sum, last non-sidechain entry, once per message id: `...the_transcript_sum_uses_the_last_non_sidechain_assistant_entry_once_per_message_id`
+- no data at all measures nothing: `...no_data_at_all_measures_nothing`
+- ISO-8601 timestamps (a Node behaviour with no Node test): `...a_timestamp_is_epoch_milliseconds_or_iso_8601_and_a_record_older_than_the_stop_is_not_fresh`
+
+`decide.test.mjs` (8 cases, same config values): below soft, soft, hard (`below_soft_nothing_rotates`, `at_rest_between_soft_and_hard_rotates_soft_and_at_or_above_hard_rotates_hard`); pending question holds soft not hard (`a_pending_question_holds_soft_but_not_hard`); background task or cron (`a_running_background_task_or_cron_blocks_every_level`); unmeasured (`an_unmeasured_session_never_rotates`); persona override with soft and hard of `miu`, partial `half`, global `other` (`a_persona_override_replaces_the_global_thresholds_and_a_partial_one_keeps_the_other_global`); soft above hard refused by name (`soft_above_hard_is_refused_by_name_and_a_missing_key_is_not_defaulted`).
+
+Consequence: with no sidecar writer shipped, every head Stop now waits the full 1500 ms for a record before using the transcript (Node behaviour; well under the 80 s hook timeout).

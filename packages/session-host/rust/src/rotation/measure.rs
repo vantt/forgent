@@ -67,24 +67,104 @@ pub fn from_sidecar_record(record: &Value) -> Option<Measure> {
     })
 }
 
-/// The newest record of `session_id` (any session when `None`) whose numeric `ts` (epoch milliseconds) is later
-/// than `after_ms`.
+/// Days from 1970-01-01 to the civil date (proleptic Gregorian).
+fn days_from_civil(y: i64, m: i64, d: i64) -> i64 {
+    let y = if m <= 2 { y - 1 } else { y };
+    let era = y.div_euclid(400);
+    let yoe = y - era * 400;
+    let doy = (153 * (if m > 2 { m - 3 } else { m + 9 }) + 2) / 5 + d - 1;
+    let doe = yoe * 365 + yoe / 4 - yoe / 100 + doy;
+    era * 146_097 + doe - 719_468
+}
+
+/// Epoch milliseconds of an ISO-8601 timestamp: `YYYY-MM-DD`, optionally `THH:MM[:SS[.fff]]` and then `Z` or
+/// `+HH:MM`; with no offset it is UTC. `None` for anything else.
+pub fn parse_iso_millis(text: &str) -> Option<f64> {
+    let b = text.as_bytes();
+    let num = |from: usize, len: usize| -> Option<i64> {
+        let part = text.get(from..from + len)?;
+        part.bytes()
+            .all(|c| c.is_ascii_digit())
+            .then(|| part.parse().ok())
+            .flatten()
+    };
+    if b.len() < 10 || b[4] != b'-' || b[7] != b'-' {
+        return None;
+    }
+    let (y, mo, d) = (num(0, 4)?, num(5, 2)?, num(8, 2)?);
+    if !(1..=12).contains(&mo) || !(1..=31).contains(&d) {
+        return None;
+    }
+    let (mut h, mut mi, mut sec, mut frac_ms, mut offset_min) = (0, 0, 0, 0.0, 0);
+    let mut at = 10;
+    if at < b.len() {
+        if b[at] != b'T' && b[at] != b' ' {
+            return None;
+        }
+        (h, mi) = (num(at + 1, 2)?, num(at + 4, 2)?);
+        if b.get(at + 3) != Some(&b':') || h > 24 || mi > 59 {
+            return None;
+        }
+        at += 6;
+        if b.get(at) == Some(&b':') {
+            sec = num(at + 1, 2)?;
+            if sec > 59 {
+                return None;
+            }
+            at += 3;
+            if b.get(at) == Some(&b'.') {
+                let digits = text[at + 1..]
+                    .bytes()
+                    .take_while(u8::is_ascii_digit)
+                    .count();
+                if digits == 0 {
+                    return None;
+                }
+                frac_ms = format!("0.{}", &text[at + 1..at + 1 + digits])
+                    .parse::<f64>()
+                    .ok()?
+                    * 1000.0;
+                at += 1 + digits;
+            }
+        }
+        match &text[at..] {
+            "" | "Z" => {}
+            zone if zone.len() == 6
+                && (zone.starts_with('+') || zone.starts_with('-'))
+                && zone.as_bytes()[3] == b':' =>
+            {
+                let sign = if zone.starts_with('-') { -1 } else { 1 };
+                offset_min = sign * (num(at + 1, 2)? * 60 + num(at + 4, 2)?);
+            }
+            _ => return None,
+        }
+    }
+    let secs = days_from_civil(y, mo, d) * 86_400 + h * 3600 + mi * 60 + sec - offset_min * 60;
+    Some(secs as f64 * 1000.0 + frac_ms)
+}
+
+/// A sidecar record's `ts` in epoch milliseconds: a number, or an ISO-8601 string.
+fn ts_ms(record: &Value) -> Option<f64> {
+    match record.get("ts")? {
+        Value::Number(n) => n.as_f64(),
+        Value::String(text) => parse_iso_millis(text),
+        _ => None,
+    }
+}
+
+/// The newest record of `session_id` (any session when `None`) whose `ts` is later than `after_ms`.
 pub fn latest_sidecar_record(
     sidecar: &Path,
     session_id: Option<&str>,
     after_ms: u64,
 ) -> Option<Value> {
-    let mut found: Option<(u64, Value)> = None;
+    let mut found: Option<(f64, Value)> = None;
     for record in lines_of(sidecar) {
         if session_id.is_some_and(|id| record.get("session_id").and_then(Value::as_str) != Some(id))
         {
             continue;
         }
-        let Some(ts) = record
-            .get("ts")
-            .and_then(Value::as_u64)
-            .filter(|ts| *ts > after_ms)
-        else {
+        let Some(ts) = ts_ms(&record).filter(|ts| *ts > after_ms as f64) else {
             continue;
         };
         if found.as_ref().is_none_or(|(best, _)| ts >= *best) {
@@ -140,8 +220,8 @@ pub struct Sources<'a> {
     pub window_size: u64,
 }
 
-/// The context fraction of a session. Waits up to `wait` for a sidecar record newer than `after_ms` (no wait when
-/// the sidecar file does not exist), else falls back to the transcript and marks the answer stale. `None` when
+/// The context fraction of a session. Waits up to `wait` for a sidecar record newer than `after_ms` (the file may appear
+/// during the wait), else falls back to the transcript and marks the answer stale. `None` when
 /// neither has data.
 pub fn measure(sources: &Sources, wait: Duration) -> Option<Measure> {
     let deadline = Instant::now() + wait;
@@ -154,7 +234,7 @@ pub fn measure(sources: &Sources, wait: Duration) -> Option<Measure> {
             {
                 return Some(fresh);
             }
-            if !sidecar.exists() || Instant::now() >= deadline {
+            if Instant::now() >= deadline {
                 break;
             }
             std::thread::sleep(POLL);
@@ -249,10 +329,10 @@ mod tests {
     }
 
     #[test]
-    fn a_sidecar_record_that_lands_while_waiting_is_taken() {
+    fn a_sidecar_file_created_while_waiting_is_taken() {
         let d = dir("c");
         let sidecar = d.join("c.jsonl");
-        std::fs::write(&sidecar, "").unwrap();
+        let _ = std::fs::remove_file(&sidecar);
         let late = sidecar.clone();
         let writer = std::thread::spawn(move || {
             std::thread::sleep(Duration::from_millis(50));
@@ -268,16 +348,80 @@ mod tests {
         )
         .unwrap();
         writer.join().unwrap();
-        assert_eq!(m.fraction, 0.1);
+        assert_eq!((m.source, m.fraction), (Source::Sidecar, 0.1));
     }
 
     #[test]
-    fn a_missing_sidecar_file_is_not_waited_for() {
-        let d = dir("e");
+    fn a_record_that_lands_in_an_existing_sidecar_while_waiting_is_taken() {
+        let d = dir("c2");
+        let sidecar = write(&d, "c2.jsonl", &[]);
+        let late = sidecar.clone();
+        let writer = std::thread::spawn(move || {
+            std::thread::sleep(Duration::from_millis(50));
+            std::fs::write(
+                &late,
+                format!("{}\n", rec(u64::MAX / 2, "s", 200_000, 1_000_000)),
+            )
+            .unwrap();
+        });
+        let m = measure(
+            &sources(Some(&sidecar), None, 1),
+            Duration::from_millis(1500),
+        )
+        .unwrap();
+        writer.join().unwrap();
+        assert_eq!(m.fraction, 0.2);
+    }
+
+    #[test]
+    fn a_timestamp_is_epoch_milliseconds_or_iso_8601_and_a_record_older_than_the_stop_is_not_fresh()
+    {
+        let d = dir("iso");
+        assert_eq!(
+            parse_iso_millis("2026-11-18T03:00:00Z"),
+            Some(1_794_970_800_000.0)
+        );
+        assert_eq!(
+            parse_iso_millis("2026-11-18T10:00:00.250+07:00"),
+            Some(1_794_970_800_250.0)
+        );
+        assert_eq!(
+            parse_iso_millis("2026-11-18T03:00:00"),
+            Some(1_794_970_800_000.0)
+        );
+        assert_eq!(parse_iso_millis("1970-01-01"), Some(0.0));
+        assert_eq!(parse_iso_millis("not a date"), None);
+        assert_eq!(parse_iso_millis("2026-13-01T00:00:00Z"), None);
+        let iso = |ts: &str, tokens: u64| json!({ "ts": ts, "session_id": "s", "context_window": { "context_window_size": 1_000_000, "current_usage": usage(tokens, 0, 0) } });
+        let sidecar = write(
+            &d,
+            "iso.jsonl",
+            &[
+                iso("2026-11-18T03:00:00.000Z", 700_000),
+                iso("2026-11-18T03:00:05.000Z", 300_000),
+                json!({ "ts": "garbage", "session_id": "s" }),
+            ],
+        );
+        let m = measure(
+            &sources(Some(&sidecar), None, 1_794_970_802_000),
+            Duration::ZERO,
+        )
+        .unwrap();
+        assert_eq!(m.fraction, 0.3);
+        assert!(measure(
+            &sources(Some(&sidecar), None, 1_794_970_805_000),
+            Duration::ZERO
+        )
+        .is_none());
+    }
+
+    #[test]
+    fn no_data_at_all_measures_nothing() {
+        let d = dir("none");
         let started = Instant::now();
         assert!(measure(
             &sources(Some(&d.join("none")), Some(&d.join("none2")), 0),
-            Duration::from_secs(5)
+            Duration::ZERO
         )
         .is_none());
         assert!(started.elapsed() < Duration::from_secs(1));

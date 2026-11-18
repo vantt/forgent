@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "31958499bdd41eabd3eef416266bfafed9d7f29b5a6ba6ea9b447a0f52e5c864",
+  "payloadDigest": "643cfb33aa722ea0aed63e00643ef8513ec64106bbb42eac4b7fe46920083bbf",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "68bd36c02991c59a52f206cb092605f9aa16d218d0f52eb2cb34d1db8d4d9ace",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -821,9 +821,9 @@
     "packages/session-host/rust/src/lib.rs": "35c771b23f9ce12dd05cb437ab2c60b7f777f05ca69d4ecccb66c6fba554efd0",
     "packages/session-host/rust/src/pane_io.rs": "89858eb698529482651871aaf7c8662978c50298ddf70a8c9e0def8c26f7289f",
     "packages/session-host/rust/src/panes.rs": "8e7c5e85979bd8fbb8ef9c2c5996109afecc0f657ee15c1c661ab8ac782e5658",
-    "packages/session-host/rust/src/rotation/decide.rs": "a95009473a097457c4ce7ca53b29c500be2a60cc3175c57b9b6f2a5153c2411d",
+    "packages/session-host/rust/src/rotation/decide.rs": "5c62147098dfbfb925599883514c60cacbf358824788550484c3aa43d04fecf0",
     "packages/session-host/rust/src/rotation/handoff.rs": "e8e9ae1716197905858f3ca63be7a423ad219acb01656914a973517d1add553a",
-    "packages/session-host/rust/src/rotation/measure.rs": "9886b281eaadf90d465db7b31a2bebe8fba95f14da3760283ec8c48437c5b9ab",
+    "packages/session-host/rust/src/rotation/measure.rs": "ba587ad96b3cfd40eabd82e021d80775a7b617eb0a68c36ec09bde2cc7559d6e",
     "packages/session-host/rust/src/rotation/mod.rs": "3cc361c5e48ec17a59aa62a459c6917c9ba65f02f5cbd845896c51d2f0bd1750",
     "packages/session-host/rust/src/route.rs": "b59dd4a17104c3ee177712e93258ced8574a3feeeab997cc2e49e606008122d9",
     "packages/session-host/rust/src/types.rs": "c11cdb42d69f78fa2b709f45d801a54bdc6b3447e7786e94c816bd5f12464cc4",
