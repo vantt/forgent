@@ -291,7 +291,8 @@ Nháp — planner sẽ chia phase theo plan contract.
 ### observe-contract {#task-observe-contract}
 §6.0 tầng 1: contract v2 (bản ghi, registry kind/subject/attr/measure, truy vấn) + một cửa ghi + verb truy vấn, đi
 trước mọi task khác; nguồn chiếu hiện có (run, unit summary) và store friction chuyển qua nó. Verify: golden fixture
-ghi→truy vấn ở `cargo test -p fgos-observe`.
+ghi→truy vấn ở `cargo test -p fgos-observe`. Registry đầu tiên phải có `fgos.supervisor.tick` (§6 E): phase producer
+của plan supervisor (session shape-supervisor) chờ phase này — phụ thuộc ngoài, ghi vào plan khi viết.
 
 ### usage-survey {#task-usage-survey}
 Khảo sát mỗi CLI (claude, codex, pi, omp, agy, gemini...) in token/tiền ở đâu. §6 A. Verify: báo cáo kèm mẫu đầu ra thật.
