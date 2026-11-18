@@ -421,6 +421,8 @@ export async function prepareSeat({ binding, round, runDir, cwd, repoRoot, fullE
  * homes, the pane, the trust entry.
  *
  * `beforeAllocate({slot, endpointEnv})`, when given, is called right before the pane is allocated.
+ * `opening: 'verbatim'` types `prompt` as the brief instead of rendering the worker brief around it; `display`
+ * names the pane's tab instead of the work label; `beside` opens it next to a live placement of that key.
  * Returns what the envelope names (`briefPath`, `outboxDir`, `slot`), the herdr endpoint the supervisor
  * is started with, and `abandon()`: what a controller that fails before the handover calls to give the
  * pane back and take the credential and the trust entry out again. After the handover none of it is the
@@ -431,7 +433,7 @@ export async function prepareTerminalAttempt(ctx) {
     attemptId, runDir: rawRunDir, cwd, repoRoot, prompt, workId, tier, model, runId,
     herdrBin, fullEnv, confinement, permissionMode, agentKind, delivery = 'inline',
     trustStore, trustAccountSource, trustAlso, attemptEnv, dispatchBatchKey, dispatchBatchSize, anchorPaneId, terminalConfig, workLabel,
-    beforeAllocate,
+    beforeAllocate, opening = 'brief', beside,
   } = ctx;
   const roundNumber = 1;
   const runDir = path.resolve(rawRunDir);
@@ -469,7 +471,8 @@ export async function prepareTerminalAttempt(ctx) {
           : { path: paths.resultPath, schema: 'agent-result.v1', required: true },
       }
     : null;
-  const briefText = renderBrief({ prompt, round: roundNumber, runDir, agentName, effectiveContract });
+  // `verbatim`: a session attempt's opening is typed as it is, with no result claim or outbox words around it.
+  const briefText = opening === 'verbatim' ? prompt : renderBrief({ prompt, round: roundNumber, runDir, agentName, effectiveContract });
   fs.writeFileSync(paths.briefPath, briefText);
   if (effectiveContract && fs.existsSync(paths.effectiveExecutionContractPath)) {
     try { publishMutableProjection(paths.effectiveExecutionContractPath, effectiveContract); } catch { /* the brief already names the claim path */ }
@@ -508,7 +511,7 @@ export async function prepareTerminalAttempt(ctx) {
       ...(herdrBin ? { FGOS_HERDR_BIN: herdrBin } : {}),
       ...herdrEndpointEnv(sessionEnv),
     };
-    display = slotDisplay({ ...workLabel, agent: agentKind, model, role: rawContract?.assignment?.role });
+    display = ctx.display ?? slotDisplay({ ...workLabel, agent: agentKind, model, role: rawContract?.assignment?.role });
     const routeConfig = { ...terminalRouteConfig(projectRoot), ...(terminalConfig ?? {}) };
     tc = createRoundTerminalControl({ herdrBin, herdrEnv: sessionEnv, config: routeConfig });
     paneHost = createPaneHost({ herdrBin, endpointEnv: herdrEndpointEnv(sessionEnv), config: routeConfig });
@@ -524,7 +527,7 @@ export async function prepareTerminalAttempt(ctx) {
     try {
       // The batch size, when the caller knows it, lets the placement policy plan equal panes.
       const groupSize = Number.isInteger(dispatchBatchSize) && dispatchBatchSize > 1 ? { groupSize: dispatchBatchSize } : {};
-      opened = await paneHost.openAsync({ host: 'terminal', key, groupKey, display, cwd, env: {}, ...groupSize });
+      opened = await paneHost.openAsync({ host: 'terminal', key, groupKey, display, cwd, env: {}, ...(beside ? { beside } : {}), ...groupSize });
     } catch (err) {
       throw round.fail('worker-spawn-fail', err.code ?? 'pane_split_failed',
         `executor failed to start for work "${workId}": terminal-control could not open a pane (${err.code ?? 'unknown'}): ${err.message}`);

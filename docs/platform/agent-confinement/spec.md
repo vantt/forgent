@@ -444,6 +444,8 @@ backend, generic composition cho mọi tổ hợp control, hoặc đổi tên ex
 
 **Grant `workspace-paths`.** `{ resource: 'workspace-paths', access: 'read-write', scope: 'dispatch', paths: [...] }`: mỗi phần tử của `paths` là một đường dẫn tương đối so với root của project (`context.repoRoot`), được bind ghi riêng (`--bind`); phần còn lại của root vẫn chỉ đọc. Shape bị từ chối theo tên khi `paths` rỗng, là đường dẫn tuyệt đối, chứa `..` hoặc ký tự glob; resolver từ chối đường dẫn không tồn tại (`workspace-path-missing`) hoặc là symlink (`confinement-grant-invalid`). Chỉ session head dùng grant này; bảng grant theo role nằm ở `src/session-host/head-grants.mjs`.
 
+**Launch context `kind`.** `assignmentLaunchContext` mang một discriminator duy nhất, `kind: 'assignment' | 'session'` (vắng nghĩa là `assignment`). `assignment` giữ nguyên mọi field bắt buộc (run control epoch, digest của dispatch plan và evaluator baseline). `session` (session head) cần `run {runId, assignmentId = head key, attempt}`, `command {launchCommandId}` và `session {role}`, và từ chối nếu có `controlEpoch`, `controlTokenDigest`, `dispatchPlanDigest` hay `evaluatorBaselineDigest`. Một session không có run control vì không có gì để settle, và một head sống duy nhất của persona và tên được rào bằng việc Identity đăng ký role, không phải bằng control epoch.
+
 Việc parser hiểu một field không có nghĩa backend đã support field đó. Default
 phải từ chối requirement ngoài matrix thay vì nhận rồi bỏ qua.
 

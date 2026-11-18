@@ -31,7 +31,7 @@ use fgos_agent_protocol::terminal::{
 };
 use fgos_agent_protocol::BlockedReason;
 use fgos_identity::directory::register_writer;
-use fgos_identity::resolve::{HeadRef, WriterKey};
+use fgos_identity::resolve::{HeadRef, WriterKey, ENV_ORDER};
 use fgos_process::facts::{self, ProcTuple};
 use fgos_process::{domain_is_empty, domain_kill_all, Domain, DomainState, ProcId};
 use fgos_session_host::direct::OsDirect;
@@ -887,7 +887,8 @@ pub(super) fn run(
 fn register_session(session: &SessionPlan, gate: &ProcTuple) {
     let state_root = fgos_holder_lock::state_root::state_root().0;
     let key = WriterKey {
-        source: "FGOS_SESSION_ID",
+        // The attempt's writer id is the first variable of Identity's rule, the one the gate exports.
+        source: ENV_ORDER[0],
         value: &session.writer_id,
     };
     let head = HeadRef {

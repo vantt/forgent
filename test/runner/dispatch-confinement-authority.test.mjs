@@ -7,7 +7,7 @@ import os from "node:os";
 import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
 import { buildConfinementAttestation, prepareConfinementForLaunch } from "../../src/runner/dispatch/confinement/authority.mjs";
-import { buildConfinementRequest, validateConfinementRequest } from "../../src/runner/dispatch/confinement/request.mjs";
+import { buildConfinementRequest, validateAssignmentLaunchContext, validateConfinementRequest } from "../../src/runner/dispatch/confinement/request.mjs";
 import { ensureMachineBackendRegistryDefaults } from "../../src/runner/dispatch/confinement/backend-registry.mjs";
 import { resolveConfinementPolicy } from "../../src/runner/dispatch/confinement/policies.mjs";
 import { loadAttestationRecord } from "../../src/runner/dispatch/confinement/attestation-store.mjs";
@@ -522,4 +522,29 @@ test("a request whose requirement names no mode is refused by the constructor, a
   assert.throws(() => buildConfinementRequest({ ...base, requirement: { policyId: null, policy: null } }), /requirement\.mode must be one of/);
   const built = buildConfinementRequest(base);
   assert.equal(built.requirement.mode, "unconfined");
+});
+
+test("a session launch context is its own shape: ids and role in, every run-control field refused", () => {
+  const session = () => ({
+    contract: "assignment-launch-context.v1",
+    kind: "session",
+    run: { runId: "run_head-planner-probe-1_01", assignmentId: "head-planner-probe-1", attempt: 1 },
+    command: { launchCommandId: "cmd_1" },
+    session: { role: "head:planner-probe" },
+  });
+  assert.doesNotThrow(() => validateAssignmentLaunchContext(session()));
+  for (const [section, name, value] of [["run", "dispatchPlanDigest", "sha256:a"], ["run", "evaluatorBaselineDigest", "sha256:b"], ["command", "controlEpoch", 1], ["command", "controlTokenDigest", "sha256:c"]]) {
+    const ctx = session();
+    ctx[section][name] = value;
+    assert.throws(() => validateAssignmentLaunchContext(ctx), (err) => err.code === "confinement-launch-context-invalid" && err.message.includes(`${section}.${name}`));
+  }
+  const noRole = session();
+  delete noRole.session;
+  assert.throws(() => validateAssignmentLaunchContext(noRole), /session\.role/);
+  // The assignment shape stays strict: the same ids without the control fields are still refused.
+  const weakened = { ...session(), kind: "assignment" };
+  assert.throws(() => validateAssignmentLaunchContext(weakened), /belongs to kind "session"/);
+  delete weakened.session;
+  assert.throws(() => validateAssignmentLaunchContext(weakened), /dispatchPlanDigest|controlEpoch/);
+  assert.throws(() => validateAssignmentLaunchContext({ ...session(), kind: "other" }), /kind must be one of/);
 });

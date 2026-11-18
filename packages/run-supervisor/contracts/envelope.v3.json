@@ -117,8 +117,8 @@
       "v": { "const": 1 },
       "attemptId": "string, equal to the envelope's attemptId",
       "env": "object string -> string, secret environment of the agent",
-      "controlEpoch": "integer, run-control epoch acquired by the controller for this attempt",
-      "controlToken": "string, run-control token of the attempt; settle uses it through commitRunSettlement and never acquires a new epoch while it exists"
+      "controlEpoch": "integer, run-control epoch acquired by the controller for this attempt; null for a session attempt (it has no run control: nothing settles it, and the one live head of a persona and name is fenced by Identity's role)",
+      "controlToken": "string, run-control token of the attempt; settle uses it through commitRunSettlement and never acquires a new epoch while it exists; null for a session attempt"
     },
     "readers": "supervisor (gate env), settle-attempt step, adopt. Never copied into any other file, log or receipt."
   },

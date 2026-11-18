@@ -439,7 +439,7 @@ function seatIdOf(asgn) {
  * caller is already settling or refusing, its own outcome must not be replaced, and a lease left
  * behind is reclaimed once its Run is dead. It is still said aloud instead of swallowed.
  */
-function releaseSelectedProviderLease(selection, runId, runtimeDir) {
+export function releaseSelectedProviderLease(selection, runId, runtimeDir) {
   try {
     releaseProviderAccountLease({ provider: selection.provider, accountId: selection.accountId, runId, runtimeDir });
   } catch (err) {
@@ -598,7 +598,7 @@ function unitRunIdOf(asgn) {
   return asgn.unitRunId || asgn.provenance?.unitRunId || asgn.assignmentId?.split('/')[0];
 }
 
-async function leaseAccountForAttempt({ cfg, opts, compiledPlan, effectivePolicy, executorId, pinnedInvocationId, assignmentsDir, assignmentId, unitRunId, runId, runDir, repoRoot }) {
+export async function leaseAccountForAttempt({ cfg, opts, compiledPlan, effectivePolicy, executorId, pinnedInvocationId, assignmentsDir, assignmentId, unitRunId, runId, runDir, repoRoot }) {
   const pin = launchPinOf(opts);
   const boundPool = pin.pool && pin.executor === executorId ? pin.pool : null;
   const provider = boundPool
@@ -678,8 +678,10 @@ async function leaseAccountForAttempt({ cfg, opts, compiledPlan, effectivePolicy
  * The one attempt this controller launches: what it owns until the handover (the attempt locks, the pane of a
  * terminal attempt, the provider lease, its run control) and how far it got. `closeAttempt` reads only this.
  */
-function openAttempt({ runDir, runId, attemptId, unitRunId, terminal, cwd, host, stepEnv, custody, leaseRuntimeDir }) {
+export function openAttempt({ runDir, runId, attemptId, unitRunId, terminal, cwd, host, stepEnv, custody, leaseRuntimeDir, session = false }) {
   return {
+    // A session attempt (a head session) has no result and no run control; its steps carry no settle step.
+    session,
     runDir,
     runId,
     attemptId,
@@ -710,7 +712,7 @@ function openAttempt({ runDir, runId, attemptId, unitRunId, terminal, cwd, host,
 }
 
 /** The attempt intent, only ever under the attempt lock; a terminal attempt publishes it again with its pane before allocating it. */
-function publishAttemptIntent(attempt, pane = null) {
+export function publishAttemptIntent(attempt, pane = null) {
   writeAttemptIntent({
     runDir: path.resolve(attempt.runDir),
     attemptId: attempt.attemptId,
@@ -720,6 +722,7 @@ function publishAttemptIntent(attempt, pane = null) {
     host: attempt.host,
     stepEnv: attempt.stepEnv,
     pane,
+    session: attempt.session,
   });
   attempt.intentWritten = true;
   attempt.intentNamesPane = pane !== null;
@@ -778,7 +781,7 @@ function resumedRunOutcome(runDir, runId) {
  * confined launch copies a login, and which invocation is confined is settled later, so any executor that can
  * be confined (by posture, executor config or a confined invocation) counts. Renewal never blocks the dispatch.
  */
-async function renewLeasedLogin(selection, { cfg, opts, executorId, pinnedInvocationId, confinementRequirement }) {
+export async function renewLeasedLogin(selection, { cfg, opts, executorId, pinnedInvocationId, confinementRequirement }) {
   const launchExecutor = cfg.executors?.[executorId] ?? cfg.executor;
   const isConfined = (entry) => entry?.confinement && typeof entry.confinement === 'object' && Object.keys(entry.confinement).length > 0;
   const mayCopyCredential = confinementRequirement.mode !== 'unconfined'
@@ -872,6 +875,79 @@ async function buildLaunch(attempt, ctx) {
     command: { launchCommandId: attemptId, controlEpoch, controlTokenDigest: computeSha256Digest(controlToken) },
   };
 
+  const mutating = ctx.effectiveMutation === 'mutating';
+  const seated = await prepareAttemptSeat(attempt, {
+    cfg, opts, root, fgosDir, cwd, executorId,
+    pinnedInvocationId: ctx.pinnedInvocationId,
+    effectivePolicy,
+    prompt,
+    capability: compiledPlan.capability || 'code:implement',
+    assignmentLaunchContext,
+    providerCapacity: providerCapacityForLaunch,
+    providerCapacityEvidence: ctx.providerCapacityEvidence,
+    confinementRequirement: ctx.confinementRequirement,
+    // A workspace-write posture grants the directory the work happens in (the Unit worktree), never the main
+    // checkout that holds fgOS state.
+    repoRoot: ctx.postureBinding?.posture === 'workspace-write' ? cwd : root,
+    contextRefs: opts.blind === true ? assignment.contextRefs : undefined,
+    timeoutMs,
+    dispatchBatchKey: ctx.dispatchBatchKey,
+    workLabel: workLabelOf(assignment),
+    anchorPaneId: process.env.FGOS_HERDR_ANCHOR_PANE?.trim() || undefined,
+    mutating: mutating && opts.forceSharedCwd !== true,
+    settings: attemptSettings,
+  }, {
+    // The contract is persisted after Authority resolution, before the supervisor is spawned: a requested policy
+    // alone is not enforcement evidence.
+    afterConfinement: ({ prepResult, providerCapacityEvidence }) => {
+      const effectiveContract = buildEffectiveExecutionContract({
+        ...ctx.contractInput,
+        providerCapacity: providerCapacityEvidence,
+        confinement: { requirement: prepResult.preparedInvocation.requirement, backend: prepResult.preparedInvocation.backend },
+      });
+      publishMutableProjection(path.join(runDir, EFFECTIVE_EXECUTION_CONTRACT_FILE), effectiveContract);
+      // The persisted contract does not name the role; the brief a pane worker reads has to (an assessment
+      // role must be told its claim needs assessment.verdict).
+      return { ...effectiveContract, assignment: { role: assignment.role, posture: assignment.posture, operation: assignment.operation } };
+    },
+    // The context the settle step needs, before the envelope is written and the supervisor exists.
+    beforeEnvelope: ({ resolvedCmd, providerCapacityEvidence }) => {
+      publishMutableProjection(path.join(attemptRunDir, 'assignment.json'), assignment);
+      writeSettleContext(attemptRunDir, {
+        launchCommandId: attemptId,
+        repoRoot: root,
+        strayWatch: { repoRoot: root, cwd, before: strayWatch.before },
+        resolvedExecutorId: executorId,
+        effectivePolicy,
+        reasoningEffort: resolvedCmd.reasoningEffort,
+        modelCheck: resolvedCmd.modelCheck ?? null,
+        providerCapacitySelection: attempt.lease,
+        providerCapacityEvidence,
+        inputDigests: ctx.inputDigests,
+        providerCapacityRuntimeDir: opts.providerCapacityRuntimeDir ?? null,
+      });
+    },
+  });
+  return { envelope: seated.envelope, settings: attemptSettings };
+}
+
+/**
+ * The seat of one attempt, the part a worker attempt and a head session share: the resolved command, the confinement
+ * the Authority prepared for it, a terminal attempt's pane and folder trust, the immutable envelope with its secret
+ * side file. `seat` carries what the caller decided (see `buildLaunch` and `launchSessionAttempt`); `hooks` are the
+ * caller's own steps: `afterConfinement({ prepResult, providerCapacityEvidence })` returns the effective contract the
+ * brief is rendered with (or nothing), `beforeEnvelope({ resolvedCmd, prepResult, providerCapacityEvidence })` runs
+ * right before the envelope is written. A session attempt (`seat.session`) has no run control, no brief contract and
+ * no result: `seat.opening` is typed verbatim and the envelope names its ceiling.
+ * Returns `{ envelope, resolvedCmd, prepResult, providerCapacityEvidence, effectiveContract }`.
+ */
+export async function prepareAttemptSeat(attempt, seat, hooks = {}) {
+  const { cfg, opts, root, fgosDir, executorId, effectivePolicy, prompt, timeoutMs, settings } = seat;
+  const { runDir, runId, attemptId, cwd } = attempt;
+  const attemptRunDir = path.resolve(runDir);
+  const { controlEpoch, controlToken } = attempt.control ?? {};
+  const session = seat.session ?? null;
+
   let resolvedCmd = resolveExecutorCommand(cfg, {
     prompt,
     model: effectivePolicy.model,
@@ -882,7 +958,7 @@ async function buildLaunch(attempt, ctx) {
     fgosDir,
     attestRoot: cwd,
     // An explicit caller pin names the invocation; otherwise the executor's own choice stands.
-    invocationId: ctx.pinnedInvocationId ?? undefined,
+    invocationId: seat.pinnedInvocationId ?? undefined,
   });
   // Admitted into a case: the worker's own environment names it, from this admission and no other.
   if (opts.caseContext) resolvedCmd = { ...resolvedCmd, env: { ...resolvedCmd.env, ...caseContextEnv(opts.caseContext) } };
@@ -899,17 +975,17 @@ async function buildLaunch(attempt, ctx) {
     : withRunDirAccess({ adapter: 'cli-spawn', command: resolvedCmd.command, args: resolvedCmd.args, outboxDir: attemptPaths(attemptRunDir, attemptId).outboxDir });
 
   const prepResult = await prepareConfinementForLaunch(buildConfinementRequest({
-    capability: compiledPlan.capability || 'code:implement',
+    capability: seat.capability,
     stageSkill: executorId,
     executorId,
     cfg,
-    assignmentLaunchContext,
+    assignmentLaunchContext: seat.assignmentLaunchContext,
     invocation: {
       command: resolvedCmd.command,
       args: attemptArgs,
       argsTemplate: resolvedCmd.argsTemplate,
       prompt,
-      env: resolvedCmd.env,
+      env: { ...resolvedCmd.env, ...(seat.launchEnv ?? {}) },
       liveOutput: resolvedCmd.liveOutput,
       interactiveMode: resolvedCmd.interactiveMode,
       promptDelivery: resolvedCmd.promptDelivery,
@@ -922,14 +998,12 @@ async function buildLaunch(attempt, ctx) {
       body: resolvedCmd.body,
       credentialStore: resolvedCmd.credentialStore,
     },
-    providerCapacity: providerCapacityForLaunch,
+    providerCapacity: seat.providerCapacity,
     ...(opts.blind === true ? { blind: true } : {}),
     context: {
       cwd,
-      ...(opts.blind === true ? { contextRefs: assignment.contextRefs } : {}),
-      // A workspace-write posture grants the directory the work happens in (the Unit worktree), never the main
-      // checkout that holds fgOS state.
-      repoRoot: ctx.postureBinding?.posture === 'workspace-write' ? cwd : root,
+      ...(seat.contextRefs ? { contextRefs: seat.contextRefs } : {}),
+      repoRoot: seat.repoRoot,
       runDir: attemptRunDir,
       fgosDir,
       timeoutMs,
@@ -939,19 +1013,19 @@ async function buildLaunch(attempt, ctx) {
       workId: executorId,
       tier: effectivePolicy.tier,
       model: effectivePolicy.model,
-      dispatchBatchKey: ctx.dispatchBatchKey,
+      dispatchBatchKey: seat.dispatchBatchKey,
       controlToken,
       controlEpoch,
       launchCommandId: attemptId,
     },
-    requirement: ctx.confinementRequirement,
+    requirement: seat.confinementRequirement,
     attemptId,
     launchMode: attempt.terminal ? 'terminal' : 'direct',
     gateCommand: attemptGateCommand(attempt.host.hostBin, runDir, { goSocket: terminalSocket }),
     attemptBinds: prepareAttemptFiles(runDir, attemptId),
   }), { adapterPort: opts.adapterPort });
 
-  let providerCapacityEvidence = ctx.providerCapacityEvidence;
+  let providerCapacityEvidence = seat.providerCapacityEvidence;
   if (providerCapacityEvidence && prepResult?.providerCapacity?.credentialProvisioned === true) {
     providerCapacityEvidence = { ...providerCapacityEvidence, credentialProvisioned: true };
     const selectionPath = path.join(runDir, 'provider-capacity-selection.json');
@@ -961,14 +1035,8 @@ async function buildLaunch(attempt, ctx) {
     } catch { /* the settle context below still carries the provisioned evidence */ }
   }
 
-  // Persisted after Authority resolution, before the supervisor is spawned: a requested policy alone is not
-  // enforcement evidence.
-  const effectiveContract = buildEffectiveExecutionContract({
-    ...ctx.contractInput,
-    providerCapacity: providerCapacityEvidence,
-    confinement: { requirement: prepResult.preparedInvocation.requirement, backend: prepResult.preparedInvocation.backend },
-  });
-  publishMutableProjection(path.join(runDir, EFFECTIVE_EXECUTION_CONTRACT_FILE), effectiveContract);
+  // Persisted after Authority resolution, before the supervisor is spawned.
+  const effectiveContract = hooks.afterConfinement?.({ prepResult, providerCapacityEvidence }) ?? null;
 
   // A terminal attempt gets what only its controller can give before the supervisor exists: the brief on disk,
   // the pane the port allocates for the attempt's key, the folder-trust entry.
@@ -980,7 +1048,8 @@ async function buildLaunch(attempt, ctx) {
       runDir,
       cwd,
       repoRoot: root,
-      prompt,
+      prompt: seat.opening ?? prompt,
+      opening: seat.opening !== undefined ? 'verbatim' : 'brief',
       workId: executorId,
       tier: effectivePolicy.tier,
       model: effectivePolicy.model,
@@ -995,40 +1064,41 @@ async function buildLaunch(attempt, ctx) {
       trustStore: interactive.trustStore,
       // claude asks for trust on the run directory it is granted too, not only on its working directory.
       trustAlso: interactive.kind === 'claude' ? addDirsOf(attemptArgs) : [],
-      trustAccountSource: providerCapacityForLaunch?.status === 'selected'
-        ? (resolvedCmd.credentialStore ? credentialSourceForCli(providerCapacityForLaunch, resolvedCmd.credentialStore.use) : null) ?? null
+      trustAccountSource: seat.providerCapacity?.status === 'selected'
+        ? (resolvedCmd.credentialStore ? credentialSourceForCli(seat.providerCapacity, resolvedCmd.credentialStore.use) : null) ?? null
         : null,
-      dispatchBatchKey: ctx.dispatchBatchKey,
+      dispatchBatchKey: seat.dispatchBatchKey,
       dispatchBatchSize: opts.dispatchBatchSize,
-      anchorPaneId: process.env.FGOS_HERDR_ANCHOR_PANE?.trim() || undefined,
+      anchorPaneId: seat.anchorPaneId,
       terminalConfig: opts.terminalConfig,
-      workLabel: workLabelOf(assignment),
+      workLabel: seat.workLabel,
+      display: seat.display,
+      beside: seat.beside,
       beforeAllocate: attempt.intentWritten ? (pane) => publishAttemptIntent(attempt, pane) : undefined,
-      // The persisted contract does not name the role; the brief a pane worker reads has to (an assessment
-      // role must be told its claim needs assessment.verdict).
-      effectiveContract: { ...effectiveContract, assignment: { role: assignment.role, posture: assignment.posture, operation: assignment.operation } },
+      effectiveContract,
     });
   }
 
   // The envelope, the secret side file and the context the settle step needs. The envelope is immutable from
   // here on; nothing the controller still learns changes what the attempt runs.
-  const mutating = ctx.effectiveMutation === 'mutating';
+  const mutating = seat.mutating === true;
   const envelopeBody = buildEnvelope({
     attemptId,
     unitRunId: attempt.unitRunId,
     runDir: attemptRunDir,
     host: attempt.host,
     cwd: prepResult.attempt.cwd,
-    mutating: mutating && opts.forceSharedCwd !== true,
+    mutating,
     attempt: attempt.terminal ? { ...prepResult.attempt, env: withoutPaneEnv(prepResult.attempt.env) } : prepResult.attempt,
     timeoutMs,
     idleTimeoutMs: attempt.terminal ? PANE_IDLE_TIMEOUT_MS : cfg.idleTimeoutMs,
     maxOutputBytes: cfg.maxBuffer || 10485760,
     cli: attempt.terminal && TERMINAL_CLIS.has(resolvedCmd.interactiveMode?.kind) ? resolvedCmd.interactiveMode.kind : commandCli(prepResult.attempt.command),
     stepEnv: attempt.stepEnv,
-    gateKillGraceMs: attemptSettings.gateKillGraceMs,
-    killWaitMs: attemptSettings.killWaitMs,
+    gateKillGraceMs: settings.gateKillGraceMs,
+    killWaitMs: settings.killWaitMs,
     identity: attemptIdentity,
+    ...(session ? { session, ceilingMs: seat.ceilingMs } : {}),
     ...(attempt.terminal
       ? {
         terminal: {
@@ -1047,20 +1117,7 @@ async function buildLaunch(attempt, ctx) {
       ? { cwdLeaseFile: attempt.locks.cwdLease.path, ...(process.platform === 'win32' ? { cwdLeaseOwner: attempt.locks.cwdLease.domainEndpoint() } : {}) }
       : {}),
   });
-  publishMutableProjection(path.join(attemptRunDir, 'assignment.json'), assignment);
-  writeSettleContext(attemptRunDir, {
-    launchCommandId: attemptId,
-    repoRoot: root,
-    strayWatch: { repoRoot: root, cwd, before: strayWatch.before },
-    resolvedExecutorId: executorId,
-    effectivePolicy,
-    reasoningEffort: resolvedCmd.reasoningEffort,
-    modelCheck: resolvedCmd.modelCheck ?? null,
-    providerCapacitySelection: attempt.lease,
-    providerCapacityEvidence,
-    inputDigests: ctx.inputDigests,
-    providerCapacityRuntimeDir: opts.providerCapacityRuntimeDir ?? null,
-  });
+  hooks.beforeEnvelope?.({ resolvedCmd, prepResult, providerCapacityEvidence });
   const envelope = writeAttemptFiles({
     runDir: attemptRunDir,
     body: envelopeBody,
@@ -1070,20 +1127,20 @@ async function buildLaunch(attempt, ctx) {
     controlEpoch,
     controlToken,
   });
-  return { envelope, settings: attemptSettings };
+  return { envelope, resolvedCmd, prepResult, providerCapacityEvidence, effectiveContract };
 }
 
+
 /**
- * Hand the attempt to the supervisor and wait only for its binding, then read the answer the settle step
- * writes. Whatever the outcome, only the attempt copy of the locks closes here; the controller keeps cwd custody.
+ * The first half of `awaitBinding`, callable alone: hand the attempt to the supervisor and wait only for its
+ * binding. A Ctrl-C from the handover until the binding is known waits for the binding and then cancels the
+ * attempt; one that came earlier refuses the launch (cancel-registry.mjs). Returns `{ bound, supervisor }`;
+ * only the attempt copy of the locks closes here.
  */
-async function awaitBinding(attempt, { envelope, settings, onChunk, timeoutMs }) {
-  const { runDir, runId } = attempt;
-  const attemptRunDir = path.resolve(runDir);
+export async function startAndBind(attempt, { envelope }) {
+  const attemptRunDir = path.resolve(attempt.runDir);
   let bound;
   let supervisor;
-  // A Ctrl-C from here until the binding is known waits for the binding and then cancels the attempt; one that
-  // came earlier refuses the launch (cancel-registry.mjs).
   beginAttemptLaunch(attemptRunDir);
   try {
     supervisor = startSupervisor({ envelope, locks: attempt.locks, stepEnv: attempt.stepEnv, extraEnv: attempt.terminalPrep?.endpointEnv });
@@ -1095,6 +1152,17 @@ async function awaitBinding(attempt, { envelope, settings, onChunk, timeoutMs })
     attempt.locks.releaseAttempt();
     endAttemptLaunch(attemptRunDir);
   }
+  return { bound, supervisor };
+}
+
+/**
+ * Hand the attempt to the supervisor and wait only for its binding, then read the answer the settle step
+ * writes. Whatever the outcome, only the attempt copy of the locks closes here; the controller keeps cwd custody.
+ */
+async function awaitBinding(attempt, { envelope, settings, onChunk, timeoutMs }) {
+  const { runDir, runId } = attempt;
+  const attemptRunDir = path.resolve(runDir);
+  const { bound, supervisor } = await startAndBind(attempt, { envelope });
   if (bound.state !== 'bound') {
     // The supervisor may have finished the attempt (or refused it) in the same breath: adopt judges what is on
     // disk. Without a settled answer the launch is unknown, never "not started".
@@ -1161,7 +1229,7 @@ function settledBy(attempt, settled) {
  * A supervised attempt that never produced its result is still the supervisor's (and, after it, the adopt
  * door's): its run control token and lease stay, the settle step and the lease reclaim use them.
  */
-async function closeAttempt(attempt) {
+export async function closeAttempt(attempt) {
   const { runDir, runId } = attempt;
   let homeGivenBack = true;
   if (!attempt.handedOver) {

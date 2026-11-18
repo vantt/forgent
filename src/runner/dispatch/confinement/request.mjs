@@ -123,6 +123,44 @@ export function crossCheckAssignmentLaunchContext(launchContext, context = null)
   }
 }
 
+const LAUNCH_CONTEXT_KINDS = ["assignment", "session"];
+
+/**
+ * What a session launch context may not carry: the evidence of a run control. A session (a head session) is not
+ * a unit of work, so nothing settles it and no control epoch is taken for it; the one live head of a persona and
+ * name is fenced by Identity's role registration, not by a control epoch. A context that carries these fields is
+ * an assignment context in disguise and is refused rather than read leniently.
+ */
+const SESSION_FORBIDDEN_FIELDS = [
+  ["run", "dispatchPlanDigest"],
+  ["run", "evaluatorBaselineDigest"],
+  ["command", "controlEpoch"],
+  ["command", "controlTokenDigest"],
+];
+
+function launchContextInvalid(message) {
+  const err = new Error(message);
+  err.code = "confinement-launch-context-invalid";
+  return err;
+}
+
+/** The session shape: ids of the run and command, the head's role, and none of the run-control fields. */
+function validateSessionLaunchContext(launchContext) {
+  const { run, command, session } = launchContext;
+  for (const [section, name] of SESSION_FORBIDDEN_FIELDS) {
+    if (launchContext[section] && launchContext[section][name] !== undefined) {
+      throw launchContextInvalid(`session assignmentLaunchContext.${section}.${name} is a run-control field; a session has no run control.`);
+    }
+  }
+  if (!run || typeof run !== "object" || Array.isArray(run)) throw launchContextInvalid("session assignmentLaunchContext.run must be an object.");
+  if (typeof run.runId !== "string" || !run.runId.trim()) throw launchContextInvalid("session assignmentLaunchContext.run.runId must be a non-empty string.");
+  if (typeof run.assignmentId !== "string" || !run.assignmentId.trim()) throw launchContextInvalid("session assignmentLaunchContext.run.assignmentId (the head key) must be a non-empty string.");
+  if (!Number.isInteger(run.attempt) || run.attempt < 1) throw launchContextInvalid("session assignmentLaunchContext.run.attempt must be a positive integer.");
+  if (!command || typeof command !== "object" || Array.isArray(command)) throw launchContextInvalid("session assignmentLaunchContext.command must be an object.");
+  if (typeof command.launchCommandId !== "string" || !command.launchCommandId.trim()) throw launchContextInvalid("session assignmentLaunchContext.command.launchCommandId must be a non-empty string.");
+  if (!session || typeof session !== "object" || typeof session.role !== "string" || !session.role.trim()) throw launchContextInvalid("session assignmentLaunchContext.session.role must be a non-empty string.");
+}
+
 export function validateAssignmentLaunchContext(launchContext, context = null) {
   if (!launchContext || typeof launchContext !== "object" || Array.isArray(launchContext)) {
     const err = new Error("assignmentLaunchContext must be an object.");
@@ -138,6 +176,19 @@ export function validateAssignmentLaunchContext(launchContext, context = null) {
     const err = new Error(`assignmentLaunchContext contract must be "assignment-cli-spawn-launch-context.v1" or "assignment-herdr-spawn-launch-context.v1", got "${launchContext.contract}".`);
     err.code = "confinement-launch-context-invalid";
     throw err;
+  }
+  // `kind` is the one discriminator; a context without it is an assignment, whose fields stay required as ever.
+  const kind = launchContext.kind ?? "assignment";
+  if (!LAUNCH_CONTEXT_KINDS.includes(kind)) {
+    throw launchContextInvalid(`assignmentLaunchContext kind must be one of ${LAUNCH_CONTEXT_KINDS.join("/")}, got: ${JSON.stringify(kind)}.`);
+  }
+  if (kind === "session") {
+    validateSessionLaunchContext(launchContext);
+    if (context) crossCheckAssignmentLaunchContext(launchContext, context);
+    return launchContext;
+  }
+  if (launchContext.session !== undefined) {
+    throw launchContextInvalid("assignmentLaunchContext.session belongs to kind \"session\".");
   }
   const { run, command } = launchContext;
   if (!run || typeof run !== "object" || Array.isArray(run)) {

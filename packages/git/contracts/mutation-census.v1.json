@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "077e77012199a0cbba9c5d2bd47d7853ed451e602825571960887084aa0243d4",
+  "payloadDigest": "fe36883368b6c89e28c2854c9c983d4ee1d9318927b5a0b56ab973927215c57f",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "68bd36c02991c59a52f206cb092605f9aa16d218d0f52eb2cb34d1db8d4d9ace",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -755,7 +755,7 @@
     "packages/run-supervisor/rust/src/route.rs": "707891c1da2ad85f17fb1cd6a49f90e7c68b5dbce638bef95a2eb5c03ac8bdcd",
     "packages/run-supervisor/rust/src/steps.rs": "444b8f91a8bc04ee0a0baefedf9a7a61069d2864ebc33cbb32e84f185d725cd9",
     "packages/run-supervisor/rust/src/supervise.rs": "0d4e76702bb6e8a18078410034156f7738b2467e66c238706a0a47738be4b6e9",
-    "packages/run-supervisor/rust/src/supervise/terminal.rs": "cb14a09127e2ccdb4fd7882a1ffe5c0980e90c57f332e16e3528e5c1a6c05d4f",
+    "packages/run-supervisor/rust/src/supervise/terminal.rs": "9a0bddd94405b35355d980a6486ce9747de753435954f59046564a5af8ee8244",
     "packages/run-supervisor/rust/src/supervise/unix.rs": "d9510693da158bf18e139257b3672c6641247b76cf5ac68a9dd892792e7509ad",
     "packages/run-supervisor/rust/src/supervise/windows.rs": "6b7de2b3ee80cb63ea33e77a6837e3838eb558223f34a8b83e79c7861ab4e4a4",
     "packages/run-supervisor/rust/src/terminal_slot.rs": "bfd0e9264f5918edce9f0a66a39579c92e9a642462ba33acab3f84bb07d124e2",
@@ -1094,7 +1094,7 @@
     "src/runner/dispatch/agent-result-claim-contract.mjs": "9f49db7dee60837452d1ba57b97863cb391d56197080e7e7f256e513672f1bec",
     "src/runner/dispatch/assignment-layout.mjs": "a14f6f1b45e7942181b7ee05b9bb4086fcd705004e70a237fc8c2d11c7e272d9",
     "src/runner/dispatch/assignment-normalizer.mjs": "1e1a922ad6d9ef2c9d8f0e7f6fec77d2c8b83b27ce9adfc8eaf3ec69e200ce6b",
-    "src/runner/dispatch/assignment-runner.mjs": "7e3a6b25784a2b2abc79a81e056d31848502a82e9f111a9740058ef2ac990e50",
+    "src/runner/dispatch/assignment-runner.mjs": "5a1d91cc94d3f80f65ae92fbf31f29c1fe8b02216ac8e012742947382f4792be",
     "src/runner/dispatch/assignment.mjs": "e17a8b1dd75893d3b0607a6f333fbccc32678e9c69f9ba42caa9169ba9135d1c",
     "src/runner/dispatch/attention-view.mjs": "3595f6cc09a1b9e8b3e84ca8a87864ea4b2e3b6ffde0178f8d95fc556be7866e",
     "src/runner/dispatch/brief.mjs": "c51d5398653cd6f839c2902134e627e57af7911b473fe16904478919c2d95e14",
@@ -1108,14 +1108,14 @@
     "src/runner/dispatch/confinement/drivers/bwrap.mjs": "875d820698501916c68798ac5d9a14c7af472d52696b61902831765334289116",
     "src/runner/dispatch/confinement/policies.mjs": "bf21ad7d049589f96a3c44158799365a3688e2f9294e6fb31057b0d525da1635",
     "src/runner/dispatch/confinement/probes/harness.mjs": "7ea51a10a96a29a288c838b09b5c53c15c092e98e72719908a9107c4d27f1243",
-    "src/runner/dispatch/confinement/request.mjs": "f5cab16695a98cda7a3b5d2a0aae1f45b3fac2bd9ee2f79e1ca5cb8d344e5ee5",
+    "src/runner/dispatch/confinement/request.mjs": "5f258813377ceed3e96952cbb9658675fbbe0ee67d8b24ab079b254604c3b47c",
     "src/runner/dispatch/confinement/resources.mjs": "6a029ae685db7cdc29a0cff6f6dbf1bed41b85cf61aece0eb8d0dd269303de91",
     "src/runner/dispatch/decide.mjs": "639ede62afc32412a5b6c5771cf813f7cf447f24e36a292b559ada443e02645c",
     "src/runner/dispatch/effective-execution-contract.mjs": "480db713d456636153c6b2c476ac57eac98dd908e1c3bf9434afc8bbdb37f669",
     "src/runner/dispatch/evidence-attribution.mjs": "e286beb61bc988049d44645db9a7a0900ba2431132ce694861ac7c43390b229f",
     "src/runner/dispatch/execution-contract.mjs": "a5b5160f4fb82aa885a961b8f6f66f353a8d455a0ab46a1bd2fe84f527e16e53",
     "src/runner/dispatch/executor-governance.mjs": "8e8f93d957741e107b0e38630d7b0816209019234c93c95140113b231e18f73e",
-    "src/runner/dispatch/herdr-round.mjs": "e26056f63158c72b8f27d98e70d48effe5a5d8bf51d6d44e70bb5d5efe542c50",
+    "src/runner/dispatch/herdr-round.mjs": "40a2e3d9c8088ef8a5f6419be09db7e56e878ceb6cf8e047e9cdc2d666bade24",
     "src/runner/dispatch/hook.mjs": "32e97b8f6a652b2d02346d59e8c3924021acade166102a7fb5fe757aefdbfc89",
     "src/runner/dispatch/llm-accounts.mjs": "5ae6e26c73fa99b0a0e4908bcf01530466b843601d5e95dce9f4b57575d66e1f",
     "src/runner/dispatch/mechanism.mjs": "18ffe81e94a42ca290de501777f0383c1505772c3e6254363ea101469c31cf30",
@@ -1135,6 +1135,7 @@
     "src/runner/dispatch/run-timeout.mjs": "9d0bb5adca999cf689b8a0c6dce0cfc28f122de1393785fcb620f6f669086d40",
     "src/runner/dispatch/runner-config-error.mjs": "9671bbf3bd275167e8611ae5abe909c87e699a6583e7b7e7c2d519ee013d1c0e",
     "src/runner/dispatch/runtime-inspection.mjs": "d844f76a21a87797d3e6b7c96f1fbe1e8f48e5e4131f31cf149df34e24aff986",
+    "src/runner/dispatch/session-attempt.mjs": "2559bfe57ca997e9795ec61a0ddb3531f13187eedd6b28c0cc2da1f78bd19154",
     "src/runner/dispatch/settlement.mjs": "c17e494e117c60d5fa823b33ba358f4c464d8efe6e6d5f7fd3f9251e1baa9f5d",
     "src/runner/dispatch/shipped-catalog.mjs": "ceb40e02a773598eebe4fc8db48e7400bfb76ce938df20268ce166f0539b8025",
     "src/runner/dispatch/stop-processes-inside.mjs": "255f7cedcb61ad8c3992b6068bb1951ce437f7e98acffac382f6ade7e943c234",
@@ -1215,6 +1216,8 @@
     "src/runner/write-queue.mjs": "a816a82d6c4499cca921f2b105eaaafe646f1413ff202ce3f132c4b84ed7a2b3",
     "src/seat-binding/client.mjs": "206a9ecbbc301f2c3c9688535dbeb60fabbe67052b870a62e23e7481ae82fdd8",
     "src/session-host/client.mjs": "a3ea5a9cce373c9d4ea3e2c1c4c80f3135fb09f818c552ec5ac9bf9f561bd558",
+    "src/session-host/head-grants.mjs": "9c65c53610d67ed6f6d1ef46f86938505047f3d901adf53809cd1c9f6f1f7346",
+    "src/session-host/head-start.mjs": "f9384b7d9c9e574ffdb371e9ba6a92e0524dc8534177ae07df3fb734fb7b663f",
     "src/session-rotation/decide.mjs": "c4252cfaf861cc8cdf65829d6b63f8e70ddcc990bde6d6b23343a5a9fe80e80f",
     "src/session-rotation/handoff-store.mjs": "0fdd8f18a406b5c2e1797c331e6bdf5ce72c3ed67a9daef28df5bb3b884aa133",
     "src/session-rotation/measure.mjs": "9707b594c14184c402229fe1cac9c1c67dbd84cd9b0db8ff235a8d51caab50be",
@@ -3985,15 +3988,15 @@
     },
     {
       "path": "src/runner/dispatch/assignment-runner.mjs",
-      "line": 977,
-      "spawn": "prepareTerminalAttempt -> src/runner/dispatch/herdr-round.mjs:480",
+      "line": 1045,
+      "spawn": "prepareTerminalAttempt -> src/runner/dispatch/herdr-round.mjs:483",
       "binary": "(env FGOS_HERDR_BIN)",
       "class": "configured-binary"
     },
     {
       "path": "src/runner/dispatch/assignment-runner.mjs",
-      "line": 1473,
-      "spawn": "awaitBinding -> src/runner/dispatch/assignment-runner.mjs:1089",
+      "line": 1541,
+      "spawn": "awaitBinding -> src/runner/dispatch/assignment-runner.mjs:1165",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
     },
@@ -4002,6 +4005,13 @@
       "line": 587,
       "spawn": "verifyRequiredProbe -> src/runner/dispatch/confinement/authority.mjs:136",
       "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/runner/dispatch/session-attempt.mjs",
+      "line": 116,
+      "spawn": "startAndBind -> src/runner/dispatch/assignment-runner.mjs:1146",
+      "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
     },
     {
@@ -4132,6 +4142,13 @@
       "path": "src/session-host/client.mjs",
       "line": 172,
       "spawn": "spawnAsync -> src/session-host/client.mjs:84",
+      "binary": "(env FGOS_HOST_BIN)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/session-host/head-start.mjs",
+      "line": 67,
+      "spawn": "spawnSync",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
     },
