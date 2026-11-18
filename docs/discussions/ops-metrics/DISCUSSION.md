@@ -11,7 +11,7 @@ nghĩa của tầng trên, chạy qua truy vấn chung, Observe không biết ch
 
 Vòng 6: Q2 → OM-D6, Q5 → OM-D7, Q8 → OM-D8, Q9 → OM-D9; Q6 chuyển sang session shaper supervisor, ở đây chỉ làm cơ
 chế định nghĩa phát hiện chung (OM-D10). Đã học skillstation (`plans/reports/research-261118-1017-…`), 8 bài học vào
-§6.0; nháp contract tầng 1 ở §6.0.1. Q7 trả về secretary (OM-D11). Không còn câu hỏi mở cho chủ dự án; sẵn sàng chốt discussion và chuyển planner.
+§6.0; nháp contract tầng 1 ở §6.0.1. Q7 trả về secretary (OM-D11). Mở Q10 (khai báo kind tại nơi dùng).
 
 ## 2. Mục tiêu & đề bài
 
@@ -89,6 +89,8 @@ phạm vi.
   mới (họ sinh), token theo head session, sự kiện trạng thái plan, placement/gone của head. Đổi tên event theo OM-D8
   → `fgos.supervisor.tick` (§6 E).
 - 2026-11-18 ~12:45 — Chủ dự án: Q7 trả về secretary để bàn riêng, đo lại ở đây sau như pace → OM-D11.
+- 2026-11-18 ~12:55 — Chủ dự án: đăng ký một số đo mới / vấn đề mới để quan sát làm tại nơi dùng được không, hay
+  phải vào Observe code lại? → đề xuất khai báo tại nơi dùng, Q10.
 
 ## 6. Thiết kế đã chốt {#design}
 
@@ -149,7 +151,13 @@ Một bản ghi (ví dụ: một attempt của run vừa settle, chiếu từ `u
 }
 ```
 
-Registry (một file contract, versioned, có fixture): mỗi `kind` khai báo subject kind cho phép, attr/measure dùng
+Registry khai báo tại nơi dùng (đề xuất, Q10): Observe chỉ giữ envelope, các tên chuẩn dùng chung (`gen_ai.*`, và
+`fgos.plan`, `fgos.phase`, `fgos.session`, `fgos.account`...) và bộ máy ghi/truy vấn. Mỗi bên sở hữu một kind khai báo
+nó trong file của chính mình (component: `packages/<x>/contracts/observe-kinds.json`; skill/công cụ: thư mục của nó;
+project dùng fgOS: `.fgos/observe/kinds/*.json` — cho mission #2, workflow của project tự đo cái của nó). Observe gộp
+mọi khai báo lúc chạy; một test chặn trùng tên giữa các khai báo. Thêm một số đo / một vấn đề mới để quan sát = thêm
+khai báo + định nghĩa truy vấn ở nơi dùng, không vào Observe sửa code.
+Registry (khai báo gộp, versioned, có fixture): mỗi `kind` khai báo subject kind cho phép, attr/measure dùng
 được; mỗi attr khai báo kiểu và tập giá trị nếu đóng; mỗi measure khai báo đơn vị và phép gộp hợp lệ (sum cho
 token, p50/p90 cho thời gian). Ghi một bản ghi vi phạm registry: từ chối và đếm `rejected`, không bao giờ làm hỏng
 việc gọi.
