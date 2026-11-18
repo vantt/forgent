@@ -5,17 +5,19 @@
 //! `main` when it is ahead of local `main` (the watcher fetches before a full tick), else local `main`. A branch that
 //! has not landed has no discussion state.
 //!
-//! The trunk is followed along first parents and each commit is compared with its first parent, so a merge shows the
-//! flips it brought in, at the merge. A root commit has nothing to compare with and records nothing.
+//! The trunk is followed along first parents through `GitDriver::walk_changes`, the one history read door, so a merge
+//! shows the flips it brought in, at the merge, and a root commit is read like any other: a discussion first committed
+//! there goes from `none` to its state.
 //!
 //! Per path the state starts as `none`. A commit that changes the path and carries a readable marker whose value
 //! differs from the state emits one record and moves the state. A commit that leaves the marker alone, drops it, or
-//! cannot be read keeps the state: no flip is invented. A deleted file emits nothing; a pure rename carries the state
-//! to the new path.
+//! cannot be read keeps the state: no flip is invented. A deleted file emits nothing. A rename emits nothing either:
+//! the file is the same discussion under a new name, so its state moves with it (taking the marker the renamed file
+//! carries, so a later edit is compared with what the file said when it moved).
 
 use fgos_git::{
-    DiffScope, DiffSides, GitDriver, Inspect, Oid, PathRead, PathValue, ReadObject, RefName,
-    RefValue, RepoHandle, ResolveRepo, TrunkFact, WalkBounds,
+    GitDriver, Inspect, Oid, PathRead, PathValue, RefName, RefValue, RepoHandle, ResolveRepo,
+    TrunkFact, WalkChanges,
 };
 use fgos_observe::record::types::{AttrValue, Basis, Origin, Record, SubjectRef, RECORD_VERSION};
 use fgos_observe::time::ParsedWindow;
@@ -33,12 +35,11 @@ const NONE_STATE: &str = "none";
 const DISCUSSION_PREFIX: &str = "docs/discussions/";
 const DISCUSSION_FILE: &str = "DISCUSSION.md";
 const MARKER_LINES: usize = 12;
-const WALK_PAGE: usize = 1000;
-const WALK_BYTES: usize = 8 * 1024 * 1024;
-const OBJECT_BYTES: usize = 8 * 1024 * 1024;
+const WALK_COMMITS: usize = 1_000_000;
+const WALK_BYTES: usize = 64 * 1024 * 1024;
 const FILE_BYTES: usize = 256 * 1024;
 
-/// A path a trunk commit changed (not deleted). `from` is the old path of a detected rename.
+/// A path a trunk commit changed (not deleted). `from` is the old path when the change is a rename.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct PathChange {
     pub path: String,
@@ -53,12 +54,11 @@ pub struct HistoryCommit {
     pub changes: Vec<PathChange>,
 }
 
-/// The one history the source reads. A glob is a literal prefix, optionally followed by `*` (any rest of the
-/// path), or `<prefix>*<suffix>` with one `*` standing for any run of characters.
+/// The one history the source reads.
 pub trait DiscussionHistory {
-    /// Trunk commits, oldest first, each with the paths that changed and match one of `globs`. A commit that
-    /// changes none of them may be left out.
-    fn commits(&self, globs: &[&str]) -> Result<Vec<HistoryCommit>, String>;
+    /// Trunk commits, oldest first, root included, each with the paths under one of the literal `prefixes` that
+    /// changed. A commit that changes none of them may be left out.
+    fn commits(&self, prefixes: &[&str]) -> Result<Vec<HistoryCommit>, String>;
     /// The text of `path` at `commit`; `None` when the file is absent, not a blob, or not readable text.
     fn blob(&self, commit: &str, path: &str) -> Result<Option<String>, String>;
 }
@@ -77,10 +77,9 @@ impl<H: DiscussionHistory> DiscussionSource<H> {
     /// is the state before it, so the window only filters what is returned.
     pub fn records(&self, window: &Window) -> Result<Vec<Record>, String> {
         let window = ParsedWindow::parse(window)?;
-        let commits = self.history.commits(&[
-            "docs/discussions/*/DISCUSSION.md",
-            "plans/reports/shaping-*.md",
-        ])?;
+        let commits = self
+            .history
+            .commits(&["docs/discussions", "plans/reports"])?;
         let mut states: HashMap<String, String> = HashMap::new();
         let mut out = Vec::new();
         for commit in &commits {
@@ -88,23 +87,20 @@ impl<H: DiscussionHistory> DiscussionSource<H> {
                 let Some(subject) = subject_of(&change.path) else {
                     continue;
                 };
-                let previous = states
-                    .get(&change.path)
-                    .or_else(|| change.from.as_ref().and_then(|from| states.get(from)))
-                    .cloned();
                 let marker = self
                     .history
                     .blob(&commit.sha, &change.path)?
                     .and_then(|text| marker_of(&text));
-                let state = match marker {
-                    Some(state) => state,
-                    None => {
-                        // Absent or unreadable marker: the previous state stands, a rename carries it along.
-                        if let Some(previous) = previous {
-                            states.insert(change.path.clone(), previous);
-                        }
-                        continue;
+                if let Some(source) = &change.from {
+                    // A rename is the same discussion under a new name: no flip, the state moves with it.
+                    if let Some(state) = marker.or_else(|| states.get(source).cloned()) {
+                        states.insert(change.path.clone(), state);
                     }
+                    continue;
+                }
+                let previous = states.get(&change.path).cloned();
+                let Some(state) = marker else {
+                    continue; // Absent or unreadable marker: the previous state stands.
                 };
                 let from = previous.unwrap_or_else(|| NONE_STATE.to_owned());
                 states.insert(change.path.clone(), state.clone());
@@ -185,17 +181,6 @@ fn marker_of(text: &str) -> Option<String> {
         let word = !value.is_empty() && value.chars().all(|c| c.is_alphanumeric() || c == '_');
         word.then(|| value.to_owned())
     })
-}
-
-fn glob_matches(glob: &str, path: &str) -> bool {
-    match glob.split_once('*') {
-        None => path == glob,
-        Some((prefix, suffix)) => {
-            path.len() >= prefix.len() + suffix.len()
-                && path.starts_with(prefix)
-                && path.ends_with(suffix)
-        }
-    }
 }
 
 fn rfc3339_utc(ms: i64) -> Option<String> {
@@ -288,155 +273,76 @@ impl GitDiscussionHistory {
         Ok(tips)
     }
 
-    /// The first parent of every commit reachable from `tips`.
-    fn first_parents(&self, tips: &[Oid]) -> Result<HashMap<String, Option<String>>, String> {
-        let mut parents = HashMap::new();
-        let mut cursor = None;
-        loop {
-            let page = self
-                .driver
-                .walk_commits(
-                    &self.repo,
-                    tips,
-                    &[],
-                    cursor,
-                    WalkBounds {
-                        max_commits: WALK_PAGE,
-                        max_bytes: WALK_BYTES,
-                    },
-                )
-                .map_err(|e| e.cause)?;
-            for commit in &page.commits {
-                parents.insert(
-                    commit.oid.as_str().to_owned(),
-                    commit.parents.first().map(|p| p.as_str().to_owned()),
-                );
-            }
-            match page.next_cursor {
-                Some(next) if !page.complete => cursor = Some(next),
-                _ => return Ok(parents),
-            }
-        }
-    }
-
-    /// The trunk tip, first parents back to the root, oldest first.
-    fn trunk_chain(&self) -> Result<Vec<Oid>, String> {
+    /// The trunk tip: local `main` unless a later candidate carries it (is ahead of it).
+    fn trunk_tip(&self) -> Result<Option<Oid>, String> {
         let tips = self.trunk_candidates()?;
-        if tips.is_empty() {
-            return Ok(Vec::new());
-        }
-        let parents = self.first_parents(&tips)?;
-        let chain_of = |tip: &Oid| {
-            let mut chain = vec![tip.as_str().to_owned()];
-            while let Some(Some(parent)) = chain.last().and_then(|c| parents.get(c)) {
-                chain.push(parent.clone());
-            }
-            chain
+        let Some((first, rest)) = tips.split_first() else {
+            return Ok(None);
         };
-        // The first candidate wins unless a later one is ahead of it (carries it on its own first-parent line).
-        let mut best = (chain_of(&tips[0]), &tips[0]);
-        for tip in &tips[1..] {
-            let chain = chain_of(tip);
-            if chain.iter().any(|c| c == best.1.as_str()) {
-                best = (chain, tip);
+        let mut best = first.clone();
+        for tip in rest {
+            let ahead = |a: &Oid, b: &Oid| -> Result<bool, String> {
+                Ok(self
+                    .driver
+                    .count_commits(&self.repo, a, Some(b))
+                    .map_err(|e| e.cause)?
+                    > 0)
+            };
+            if ahead(tip, &best)? && !ahead(&best, tip)? {
+                best = tip.clone();
             }
         }
-        let format = self.repo.object_format();
-        let mut chain = best
-            .0
-            .iter()
-            .map(|sha| Oid::parse(sha, format).map_err(|_| "invalid-oid".to_owned()))
-            .collect::<Result<Vec<_>, _>>()?;
-        chain.reverse();
-        Ok(chain)
-    }
-
-    fn committer_times(&self, ids: &[Oid]) -> Result<Vec<Option<i64>>, String> {
-        let mut times = Vec::with_capacity(ids.len());
-        for group in ids.chunks(250) {
-            let objects = self
-                .driver
-                .read_objects(&self.repo, group, OBJECT_BYTES)
-                .map_err(|e| e.cause)?;
-            times.extend(objects.into_iter().map(|object| match object {
-                ReadObject::Present { bytes, .. } => {
-                    committer_seconds(&bytes).map(|seconds| seconds * 1000)
-                }
-                ReadObject::Missing => None,
-            }));
-        }
-        Ok(times)
-    }
-
-    fn changes(
-        &self,
-        parent: &Oid,
-        commit: &Oid,
-        globs: &[&str],
-    ) -> Result<Vec<PathChange>, String> {
-        let scope = DiffScope {
-            prefix: None,
-            renames: true,
-        };
-        let mut found = Vec::new();
-        let mut cursor = None;
-        loop {
-            let page = self
-                .driver
-                .diff(
-                    &self.repo,
-                    DiffSides::Objects(parent, commit),
-                    &scope,
-                    cursor,
-                    4096,
-                )
-                .map_err(|e| e.cause)?;
-            for entry in &page.entries {
-                if entry.change == b'D' {
-                    continue;
-                }
-                let Ok(path) = String::from_utf8(entry.path.clone()) else {
-                    continue;
-                };
-                if !globs.iter().any(|g| glob_matches(g, &path)) {
-                    continue;
-                }
-                let from = entry
-                    .from
-                    .as_ref()
-                    .and_then(|f| String::from_utf8(f.clone()).ok());
-                found.push(PathChange { path, from });
-            }
-            match page.next_cursor {
-                Some(next) if !page.complete => cursor = Some(next),
-                _ => return Ok(found),
-            }
-        }
+        Ok(Some(best))
     }
 }
 
 impl DiscussionHistory for GitDiscussionHistory {
-    fn commits(&self, globs: &[&str]) -> Result<Vec<HistoryCommit>, String> {
-        let chain = self.trunk_chain()?;
-        let times = self.committer_times(&chain)?;
-        let mut out = Vec::new();
-        for (index, (commit, time)) in chain.iter().zip(&times).enumerate() {
-            let (Some(parent), Some(ts_ms)) = (index.checked_sub(1).map(|i| &chain[i]), *time)
-            else {
-                continue; // The root has nothing to compare with.
-            };
-            let changes = self.changes(parent, commit, globs)?;
-            if !changes.is_empty() {
-                out.push(HistoryCommit {
-                    sha: commit.as_str().to_owned(),
-                    ts_ms,
-                    changes,
-                });
-            }
+    fn commits(&self, prefixes: &[&str]) -> Result<Vec<HistoryCommit>, String> {
+        let Some(tip) = self.trunk_tip()? else {
+            return Ok(Vec::new());
+        };
+        let walked = self
+            .driver
+            .walk_changes(
+                &self.repo,
+                &WalkChanges {
+                    tips: &[tip],
+                    first_parent: true,
+                    since: None,
+                    paths: prefixes,
+                    renames: true,
+                    max_commits: WALK_COMMITS,
+                    max_bytes: WALK_BYTES,
+                },
+            )
+            .map_err(|e| e.cause)?;
+        if walked.truncated {
+            return Err("discussion-history-truncated".to_owned());
         }
-        Ok(out)
+        Ok(walked
+            .commits
+            .iter()
+            .rev()
+            .map(|commit| HistoryCommit {
+                sha: commit.oid.as_str().to_owned(),
+                ts_ms: commit.commit_time * 1000,
+                changes: commit
+                    .changes
+                    .iter()
+                    .filter(|change| change.status != b'D')
+                    .filter_map(|change| {
+                        Some(PathChange {
+                            path: String::from_utf8(change.path.clone()).ok()?,
+                            from: change
+                                .from
+                                .as_ref()
+                                .and_then(|from| String::from_utf8(from.clone()).ok()),
+                        })
+                    })
+                    .collect(),
+            })
+            .collect())
     }
-
     fn blob(&self, commit: &str, path: &str) -> Result<Option<String>, String> {
         let oid = Oid::parse(commit, self.repo.object_format()).map_err(|_| "invalid-oid")?;
         let reads: Vec<PathRead> = self
@@ -448,15 +354,6 @@ impl DiscussionHistory for GitDiscussionHistory {
             _ => None,
         })
     }
-}
-
-/// `committer Name <mail> 1700000000 +0700` in the header of a raw commit object.
-fn committer_seconds(commit: &[u8]) -> Option<i64> {
-    let mut header = commit.split(|b| *b == b'\n').take_while(|l| !l.is_empty());
-    let line = std::str::from_utf8(header.find(|l| l.starts_with(b"committer "))?).ok()?;
-    let mut tail = line.rsplit(' ');
-    let _zone = tail.next()?;
-    tail.next()?.parse().ok()
 }
 
 #[cfg(test)]

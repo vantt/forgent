@@ -257,3 +257,102 @@ fn a_flip_pushed_from_another_clone_is_read_through_the_remote_tracking_ref() {
         ]
     );
 }
+
+const BODY: &str =
+    "a body long enough for rename detection to match the two paths\nsecond line\nthird line\n";
+
+#[test]
+fn a_discussion_first_committed_in_the_root_commit_goes_from_none_to_its_state() {
+    let f = Fixture::new("root");
+    let repo = f.base.join("repo");
+    git(
+        &f.base,
+        &["init", "-q", "--initial-branch=main", "repo"],
+        None,
+    );
+    f.identify(&repo);
+    let full = repo.join(D1);
+    fs::create_dir_all(full.parent().unwrap()).unwrap();
+    fs::write(full, "discussion: settled\n").unwrap();
+    git(&repo, &["add", "."], None);
+    git(
+        &repo,
+        &["commit", "-q", "-m", "root"],
+        Some("2026-11-02T00:00:00Z"),
+    );
+    let records = f.source(&repo).records(&Window::default()).unwrap();
+    assert_eq!(
+        flips(&records),
+        [(D1.into(), "none".into(), "settled".into())]
+    );
+}
+
+#[test]
+fn a_rename_emits_nothing_and_carries_the_state_to_the_new_path() {
+    let f = Fixture::new("rename");
+    let repo = f.init("repo");
+    commit_file(
+        &repo,
+        "docs/discussions/old/notes.md",
+        &format!("discussion: settled\n{BODY}"),
+        "2026-11-02T00:00:00Z",
+    );
+    git(
+        &repo,
+        &[
+            "mv",
+            "docs/discussions/old/notes.md",
+            "docs/discussions/old/DISCUSSION.md",
+        ],
+        None,
+    );
+    git(
+        &repo,
+        &["commit", "-q", "-m", "rename"],
+        Some("2026-11-03T00:00:00Z"),
+    );
+    let records = f.source(&repo).records(&Window::default()).unwrap();
+    // The file was not a discussion path before: no record at all, and none for the move.
+    assert_eq!(flips(&records), []);
+    commit_file(
+        &repo,
+        "docs/discussions/old/DISCUSSION.md",
+        &format!("discussion: settled\n{BODY}more\n"),
+        "2026-11-04T00:00:00Z",
+    );
+    let records = f.source(&repo).records(&Window::default()).unwrap();
+    assert_eq!(flips(&records), []);
+}
+
+#[test]
+fn a_rename_that_edits_the_marker_emits_no_flip() {
+    let f = Fixture::new("rename-edit");
+    let repo = f.init("repo");
+    let (old, new) = (D1, "docs/discussions/d2/DISCUSSION.md");
+    commit_file(
+        &repo,
+        old,
+        &format!("discussion: draft\n{BODY}"),
+        "2026-11-02T00:00:00Z",
+    );
+    fs::create_dir_all(repo.join("docs/discussions/d2")).unwrap();
+    git(&repo, &["mv", old, new], None);
+    fs::write(repo.join(new), format!("discussion: settled\n{BODY}")).unwrap();
+    git(&repo, &["add", "."], None);
+    git(
+        &repo,
+        &["commit", "-q", "-m", "rename and settle"],
+        Some("2026-11-03T00:00:00Z"),
+    );
+    commit_file(
+        &repo,
+        new,
+        &format!("discussion: settled\n{BODY}edited\n"),
+        "2026-11-04T00:00:00Z",
+    );
+    let records = f.source(&repo).records(&Window::default()).unwrap();
+    assert_eq!(
+        flips(&records),
+        [(old.into(), "none".into(), "draft".into())]
+    );
+}
