@@ -11,7 +11,7 @@ nghĩa của tầng trên, chạy qua truy vấn chung, Observe không biết ch
 
 Vòng 6: Q2 → OM-D6, Q5 → OM-D7, Q8 → OM-D8, Q9 → OM-D9; Q6 chuyển sang session shaper supervisor, ở đây chỉ làm cơ
 chế định nghĩa phát hiện chung (OM-D10). Đã học skillstation (`plans/reports/research-261118-1017-…`), 8 bài học vào
-§6.0; nháp contract tầng 1 ở §6.0.1. Còn mở: Q7 (reader câu hỏi Node → Rust).
+§6.0; nháp contract tầng 1 ở §6.0.1. Q7 trả về secretary (OM-D11). Không còn câu hỏi mở cho chủ dự án; sẵn sàng chốt discussion và chuyển planner.
 
 ## 2. Mục tiêu & đề bài
 
@@ -60,6 +60,7 @@ phạm vi.
 | OM-D8 | Tên trong registry theo mô hình và tên OpenTelemetry chỗ đã có chuẩn (gồm GenAI `gen_ai.*`); tên riêng `fgos.*` cho phần chỉ fgOS có; không SDK/collector OTel trong lõi; OTel đổi tên thì registry ghi alias | chủ dự án, Q8 | 2026-11-18 |
 | OM-D9 | Friction có attr `fgos.friction.kind` với năm giá trị: bug, instability, missing, awkward, doc (thêm sau qua registry) | chủ dự án, Q9 | 2026-11-18 |
 | OM-D10 | "Pace" là gì do session shaper supervisor quyết (nơi đang định hình hành vi supervisor). Plan này không định nghĩa pace; nó làm cho quy tắc phát hiện của attention view là định nghĩa có tên (truy vấn + ngưỡng + kind row), chạy chung, để thêm pacer sau chỉ là thêm một định nghĩa, không đổi code hay contract | chủ dự án, Q6 | 2026-11-18 |
+| OM-D11 | Reader câu hỏi (Node → Rust, cột thời điểm) trả về secretary để chủ dự án bàn riêng. Plan này chỉ đăng ký kind `fgos.question.asked` / `fgos.question.answered` (refs plan/phase/discussion, attr stage discussion|plan|execution); bên sở hữu câu hỏi sinh chúng sau qua cửa ghi. Tới lúc đó phần "chờ chủ dự án" của thước đo 2 và thước đo 3 trả `unmeasured` kèm lý do; không phải làm lại gì ở đây | chủ dự án, Q7 | 2026-11-18 |
 
 ## 5. Q&A log
 
@@ -87,6 +88,7 @@ phạm vi.
 - 2026-11-18 ~12:30 — Shaper supervisor trả lời Q6: pace = lịch tick; hai row overdue / idle-burn; cần event tick
   mới (họ sinh), token theo head session, sự kiện trạng thái plan, placement/gone của head. Đổi tên event theo OM-D8
   → `fgos.supervisor.tick` (§6 E).
+- 2026-11-18 ~12:45 — Chủ dự án: Q7 trả về secretary để bàn riêng, đo lại ở đây sau như pace → OM-D11.
 
 ## 6. Thiết kế đã chốt {#design}
 
@@ -208,7 +210,8 @@ có (`.fgos/runtime/tmp/sec/run-phase.sh`) và skill driving truyền cờ này.
   này lo cho nguồn của chúng có trong contract: span phase (từ run có khoá B), sự kiện `plan.status` chiếu từ lịch sử
   git của `plan.md`, `question.asked/answered`, verify lần đầu. Thước đo có nguồn trong plan này: 1, 2, 3, 7; 4, 5, 6 trả `unmeasured` + dòng backlog (OM-D6).
 - Thời gian chờ chủ dự án: câu hỏi (QUESTIONS.md, mục câu hỏi của plan, gate) mang `asked`/`answered` thời điểm;
-  reader câu hỏi hiện là Node (`src/portfolio/open-questions.mjs`, 115 dòng) — cách tách theo Q7.
+  reader câu hỏi hiện là Node (`src/portfolio/open-questions.mjs`, 115 dòng) — không làm ở đây (OM-D11): plan này chỉ
+  đăng ký kind `fgos.question.*`; producer thuộc bên sở hữu câu hỏi.
 
 **D. Friction: ghi nhận, phân loại, gom nhóm (Observe, Rust).** Đang bàn. Theo §6.0, friction là kind
 `friction.recorded` / `friction.resolved` của contract chung; `kind`, `layer`, `errorClass`, `disposition` là attr
@@ -306,7 +309,7 @@ Khảo sát mỗi CLI (claude, codex, pi, omp, agy, gemini...) in token/tiền �
 
 ### driving-measures {#task-driving-measures}
 §6 C (OM-D5): nguồn `plan.status`, `question.*`, span phase vào contract; bảy thước đo là định nghĩa truy vấn ở tầng
-lái. Theo OM-D6; phụ thuộc Q7. Verify: fixture plan với lịch sử git dựng sẵn, chạy định nghĩa qua `metrics query`.
+lái. Theo OM-D6; phần câu hỏi theo OM-D11. Verify: fixture plan với lịch sử git dựng sẵn, chạy định nghĩa qua `metrics query`.
 
 ### friction-link-trend {#task-friction-link-trend}
 §6 D. Verify: `cargo test -p fgos-observe` cho kind mới và bucket.
