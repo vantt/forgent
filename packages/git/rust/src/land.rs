@@ -117,6 +117,17 @@ impl LandSession {
         self.receipt.as_ref()
     }
 }
+/// A target's rank-20 merge slot held outside a Land, by a write that moves the same branch
+/// (a main-checkout commit and its push). While it lives no Land of that target can prepare,
+/// and it lends the slot to the lower-ranked doors it calls (ScopedCommit, catch-up, Remote).
+pub struct MergeSlot {
+    slot: LockScope<'static>,
+}
+impl MergeSlot {
+    pub fn lend(&self) -> Result<Vec<BorrowedHandle<'_>>> {
+        held(&self.slot)
+    }
+}
 fn params(repo: &RepoHandle) -> BTreeMap<String, String> {
     BTreeMap::from([(
         "fgosDir".into(),
@@ -673,6 +684,35 @@ impl GitDriver {
             error.stderr.truncate(64 * 1024);
             error
         })
+    }
+    /// Hold `destination`'s merge slot, waiting at most `wait_ms`; a slot still held then (a live
+    /// Land session or another holder) refuses `merge-slot-busy`.
+    pub fn acquire_merge_slot(
+        &self,
+        repo: &RepoHandle,
+        destination: &RefName,
+        wait_ms: u64,
+    ) -> Result<MergeSlot> {
+        require_lock_scope_platform()?;
+        if !destination.as_str().starts_with("refs/heads/") {
+            return Err(failure("invalid-refs-request"));
+        }
+        let mut slot = LockScope::seeded(vec![]).map_err(failure)?;
+        let mut p = params(repo);
+        p.insert("ref".into(), slot_key(destination.as_str()));
+        match slot.acquire("merge-slot", &p, Wait::Ms(wait_ms)) {
+            Ok(_) => Ok(MergeSlot { slot }),
+            Err(fgos_holder_lock::ScopeError::Acquire(acquire))
+                if matches!(
+                    *acquire,
+                    fgos_holder_lock::Acquire::Held { .. }
+                        | fgos_holder_lock::Acquire::Timeout { .. }
+                ) =>
+            {
+                Err(failure("merge-slot-busy"))
+            }
+            Err(other) => Err(failure(other)),
+        }
     }
     /// Waits at most `wait_ms` for the main checkout; publication itself is never retried.
     pub fn publish_land<F: wal::FileSystem>(

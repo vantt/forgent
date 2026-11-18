@@ -180,7 +180,7 @@ impl Fixture {
         command: &LandCommand,
         config: &LandConfig,
     ) -> Result<fgos_supervision::land::LandOutcome, fgos_supervision::land::LandRefusal> {
-        run_land(&self.env, "op", &self.ids, command, config)
+        run_land(&self.env, "op", &self.ids, command, config, 30_000)
     }
 }
 
@@ -190,6 +190,7 @@ fn run_land(
     ids: &AtomicU64,
     command: &LandCommand,
     config: &LandConfig,
+    wait_ms: u64,
 ) -> Result<fgos_supervision::land::LandOutcome, fgos_supervision::land::LandRefusal> {
     let next = || format!("{prefix}-{}", ids.fetch_add(1, Ordering::Relaxed));
     let ports = LandPorts {
@@ -199,7 +200,7 @@ fn run_land(
         writer: "fixture",
         operation_id: &next,
         runner: &ShellRunner,
-        wait_ms: 30_000,
+        wait_ms,
     };
     land(command, config, &ports)
 }
@@ -535,8 +536,8 @@ fn two_concurrent_lands_into_one_target_serialize() {
     let second = Env::open(&f.temp);
     let cfg = config(vec![gate("true")]);
     let (first_result, second_result) = std::thread::scope(|s| {
-        let h1 = s.spawn(|| run_land(&f.env, "one", &ids, &branch("one"), &cfg));
-        let h2 = s.spawn(|| run_land(&second, "two", &ids, &branch("two"), &cfg));
+        let h1 = s.spawn(|| run_land(&f.env, "one", &ids, &branch("one"), &cfg, 30_000));
+        let h2 = s.spawn(|| run_land(&second, "two", &ids, &branch("two"), &cfg, 30_000));
         (h1.join().unwrap(), h2.join().unwrap())
     });
     for result in [&first_result, &second_result] {
@@ -625,4 +626,49 @@ fn a_paths_land_into_a_target_the_main_checkout_is_not_on_refuses() {
         other_before
     );
     assert_eq!(f.local_tip(), trunk_before);
+}
+
+#[test]
+fn a_paths_land_refuses_busy_while_a_land_of_its_target_holds_the_merge_slot() {
+    let f = Fixture::new();
+    f.topic("topic", &[("b", "incoming\n")]);
+    let request = fgos_git::LandRequest {
+        source: git(&f.main, &["rev-parse", "refs/heads/topic"]),
+        target: f.local_tip(),
+        destination: "refs/heads/trunk".into(),
+        message: "branch land".into(),
+        squash: false,
+        footprint: None,
+        subtree: None,
+        files: vec![],
+    };
+    let session = f
+        .env
+        .driver
+        .prepare_land(
+            &f.env.repo,
+            vec![],
+            &request,
+            "fixture",
+            "branch-land",
+            &fgos_git::wal::OsFileSystem,
+            0,
+        )
+        .unwrap();
+    let (remote_before, local_before) = (f.remote_tip(), f.local_tip());
+    fs::write(f.main.join("a"), "landed\n").unwrap();
+    let refusal = run_land(
+        &f.env,
+        "paths",
+        &f.ids,
+        &paths(&["a"]),
+        &config(vec![gate("true")]),
+        0,
+    )
+    .unwrap_err();
+    assert_eq!(refusal.code, "merge-slot-busy", "{refusal}");
+    assert_eq!(f.local_tip(), local_before);
+    assert_eq!(f.remote_tip(), remote_before);
+    assert_eq!(fs::read_to_string(f.main.join("a")).unwrap(), "landed\n");
+    drop(session);
 }
