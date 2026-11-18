@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "4596f3a9b803bd04ab76f7b079ad69808fc9d418ba312063acd00a4e47582d24",
+  "payloadDigest": "c2129027616636008ee15db26562dca88869638fc58a48d66f38e002be6b7bd3",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "764929356f623ea67c3f918c5414cef1541da5c03a23bd9fa0acfae4a31df38b",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -1159,7 +1159,7 @@
     "src/holder-lock/protocol.mjs": "888c8f1a088a0eecbe7efd2accf92a6919a0cfb33fb55bff655b5b781845796b",
     "src/holder-lock/registry.mjs": "0894e75c7cc6beebad96ca56288b637ec74dd7d704be836f376b36bdd3154247",
     "src/holder-lock/state-root.mjs": "32e20fe0ba65c796b9af5f91646a4ff0f84ad5fade0e4d7d8beaed014d82ba04",
-    "src/identity/directory-store.mjs": "8106b1802b910b8644835f82b2f466934144e1ddcf7146c7042d1380e9862102",
+    "src/identity/directory-store.mjs": "16c34739d50192abf55734e28cc93991df35e6afd67032ddb77da8cc5820c06c",
     "src/intake/classify.mjs": "988c7876bb2fa1d711176f392fa52fda2f63b3fa383315d22d6a52f495d57a06",
     "src/intake/discovery.mjs": "9a56d70dc35f4dadfbe83f2eaa89ddc693396f830b8a3dcba6d37fb9a322cd08",
     "src/intake/plan-verdict-from-plan-md.mjs": "1472684acd2398d71885e73ee5b365a42e9a263f5581ce5ce0518c857fb71f09",
@@ -1425,7 +1425,7 @@
     "src/verbs/dispatch/show-run.mjs": "6ed836d83f8fc71863fc2ce04115b7d0d63f2fb1f42e8bccabc94b812cb179c9",
     "src/verbs/dispatch/watch.mjs": "e82fb8d94c5d76bc64b006bab2742e777f50785a4c4b12c91f15723864e457a3",
     "src/verbs/events/context.mjs": "6579eafcb90bf8a80d12b86e9ac132c6eb6e27f122942480b5062efbae181716",
-    "src/verbs/events/rebuild.mjs": "878c422f69b2aef971be694291a2ddfa7f5c705442b662e18f8d9df61720eae5",
+    "src/verbs/events/rebuild.mjs": "11afb6c7390273ba45b8e700dbbffaf1bff0d0fef47a501dd75e8262808fc8ed",
     "src/verbs/merge/approve.mjs": "72ecd7f71a0fc3627c655271cee0c825acd9bc51e31aa1fd0f37e4d1750f99a9",
     "src/verbs/merge/catchup.mjs": "3c73bf052a078cbe1ef40a271c32e7772da918637abf7cd2bbb7065dbd2be245",
     "src/verbs/merge/iron-law-level.mjs": "7535987e203033abffcc4ce72f7062489aa7673db6cbb80f0a527dc288ac6087",
