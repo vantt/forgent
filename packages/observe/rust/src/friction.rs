@@ -7,12 +7,12 @@
 
 use crate::contract::{RecordSource, SourceError, Subject, Window};
 use crate::query::{bucket_start, run, Agg, AggValue, Bucket, Query, QueryContext};
-use crate::record::registry::{load_registry, EmbeddedDeclaration, Registry};
+use crate::record::registry::{EmbeddedDeclaration, Registry};
 use crate::record::store::{new_record_id, RecordDoor, WriteOutcome, RECORDS_STORE};
 use crate::record::types::{
     AttrValue, Basis, Origin, Record, Redaction, SubjectRef, DETAIL_MAX_BYTES, RECORD_VERSION,
 };
-use crate::shard::{self, is_session_shard, StoredRecord, TornTail, UnsafeShard};
+use crate::shard::{self, is_session_shard, StoredRecord, UnsafeShard};
 use crate::store_lock::acquire_store_lock;
 use crate::time::{now_iso, ParsedWindow};
 use fgos_host_runtime::civil_time::{format_unix_millis_rfc3339, parse_rfc3339_millis};
@@ -213,6 +213,7 @@ pub enum ResolveTarget {
 
 /// A friction event with its stamp parsed once and the line it came from. Events of both stores are held in one
 /// shape: `value` is the old shard form, so every reader and the settle rule see one thing.
+#[derive(Clone)]
 struct Event {
     value: Value,
     /// `None` only for a resolve whose stamp is free text (written by a past migration).
@@ -683,14 +684,8 @@ fn utc_stamp(millis: i64) -> Result<String, String> {
     format_unix_millis_rfc3339(millis, 0).ok_or_else(|| "instant out of range".to_owned())
 }
 
-/// The v2 record of one old shard line, or why the line cannot become one. `after` is the stamp of the nearest
-/// earlier line of the same shard, for a resolve whose own stamp is missing.
-fn migrated_record(
-    event: &Value,
-    shard: &str,
-    line: usize,
-    after: Option<i64>,
-) -> Result<Record, String> {
+/// The v2 record of one old shard line, or why the line cannot become one.
+fn migrated_record(event: &Value, shard: &str, line: usize) -> Result<Record, String> {
     let text = |name: &str| event.get(name).and_then(Value::as_str);
     let resolved = event.get("type").and_then(Value::as_str) == Some("friction-resolved");
     let subject = event.get("subject");
@@ -704,13 +699,9 @@ fn migrated_record(
     let (Some(kind), Some(id)) = (field("kind"), field("id")) else {
         return Err("no subject".to_owned());
     };
-    let millis = match text("ts").and_then(stamp_millis) {
-        Some(millis) => millis,
-        None if resolved => after
-            .map(|m| m + 1)
-            .ok_or_else(|| "a resolve with no instant and no earlier line".to_owned())?,
-        None => return Err("ts is not an RFC 3339 instant".to_owned()),
-    };
+    let millis = text("ts")
+        .and_then(stamp_millis)
+        .ok_or_else(|| "ts is not an RFC 3339 instant".to_owned())?;
     let ts = match text("ts") {
         Some(ts) if stamp_millis(ts) == Some(millis) && !ts.ends_with('~') => ts.to_owned(),
         _ => utc_stamp(millis)?,
@@ -793,90 +784,128 @@ fn stored_friction(root: &Path) -> Result<(HashSet<String>, usize), String> {
     Ok((ids, friction))
 }
 
-/// Copies every old `friction` shard line into the v2 record store, each under its fixed id `legacy:<shard>:<line>`.
-/// The whole run holds the observe lock, checks the ids of the whole record store (every writer's shard) before
-/// writing, and appends once, so a second run, or a run from another writer, writes nothing already there. The old
-/// shards are not touched. A line that cannot become a valid record is counted and named, never silently dropped.
+/// The id an event has as a v2 record: its own, or for an old shard line its legacy id.
+fn event_id(event: &Event) -> String {
+    event
+        .record
+        .as_ref()
+        .map_or_else(|| legacy_id(&event.shard, event.line), |r| r.id.clone())
+}
+
+fn unsettled_ids(events: &[Event]) -> BTreeSet<String> {
+    unsettled(events).into_iter().map(event_id).collect()
+}
+
+/// The store as readers would see it once `written` is appended to this writer's record shard: each migrated old
+/// line replaced by its record, at the end of that shard.
+fn migrated_view(events: &[Event], written: &[&Record]) -> Vec<Event> {
+    let writer = shard::writer_shard_name();
+    let ids: HashSet<&str> = written.iter().map(|r| r.id.as_str()).collect();
+    let last_line = events
+        .iter()
+        .filter(|e| e.store == RECORDS_STORE && e.shard == writer)
+        .map(|e| e.line)
+        .max()
+        .unwrap_or(0);
+    let kept = events
+        .iter()
+        .filter(|e| e.record.is_some() || !ids.contains(event_id(e).as_str()))
+        .cloned();
+    let appended = written.iter().enumerate().filter_map(|(i, record)| {
+        Some(Event {
+            value: old_form(record)?,
+            millis: stamp_millis(&record.ts),
+            store: RECORDS_STORE,
+            shard: writer.clone(),
+            line: last_line + i + 1,
+            record: Some((*record).clone()),
+        })
+    });
+    kept.chain(appended).collect()
+}
+
+/// Copies every old `friction` shard line into the v2 record store through the record door, each under its fixed
+/// id `legacy:<shard>:<line>`. The whole run holds the observe lock, checks the ids of the whole record store (every
+/// writer's shard) before writing, and appends once, so a second run, or a run from another writer, writes nothing
+/// already there. Before writing it proves the settle rule gives the same unsettled frictions over the store as it
+/// is and as it would be after the append; if not, it writes nothing and names the frictions that would change.
+/// The old shards are not touched. A line that cannot become a valid record is counted and named, never silently
+/// dropped.
 pub fn migrate_to_records(root: &Path) -> Result<Value, String> {
-    let _lock = acquire_store_lock(root).map_err(|e| e.to_string())?;
-    let registry = load_registry(&[FRICTION_DECLARATION], None, Some(root))
-        .map_err(|e| format!("registry load failed: {e}"))?;
+    let lock = acquire_store_lock(root).map_err(|e| e.to_string())?;
+    let door = friction_door(root);
     let (existing, before) = stored_friction(root)?;
     let old = shard::read_store(root, STORE, UnsafeShard::Fail).map_err(|e| e.to_string())?;
 
     let mut counts = MigrationCounts::default();
-    let mut lines = Vec::new();
+    let mut records = Vec::new();
+    let mut places = Vec::new();
     let mut already = 0;
-    let mut last: HashMap<&str, i64> = HashMap::new();
-    let mut recorded_at: HashMap<(&str, String, String), i64> = HashMap::new();
     for StoredRecord { value, shard, line } in &old.records {
-        let kind = value.get("type").and_then(Value::as_str).unwrap_or("");
-        let resolved = match kind {
-            "friction-recorded" => {
-                counts.recorded_in += 1;
-                false
-            }
-            "friction-resolved" => {
-                counts.resolved_in += 1;
-                true
-            }
+        match value.get("type").and_then(Value::as_str).unwrap_or("") {
+            "friction-recorded" => counts.recorded_in += 1,
+            "friction-resolved" => counts.resolved_in += 1,
             _ => {
                 counts.other_lines += 1;
                 continue;
             }
-        };
+        }
         let place = format!("{shard}:{line}");
-        let mut record =
-            match migrated_record(value, shard, *line, last.get(shard.as_str()).copied()) {
-                Ok(record) => record,
-                Err(reason) => {
-                    counts.unusable.push(format!("{place}: {reason}"));
-                    continue;
-                }
-            };
-        let mut millis = parse_rfc3339_millis(&record.ts);
-        let key = (
-            shard.as_str(),
-            record.subject.kind.clone(),
-            record.subject.id.clone(),
-        );
-        match (resolved, millis) {
-            (false, Some(m)) => {
-                recorded_at.insert(key, m);
+        let record = match migrated_record(value, shard, *line) {
+            Ok(record) => record,
+            Err(reason) => {
+                counts.unusable.push(format!("{place}: {reason}"));
+                continue;
             }
-            // Inside a session shard an equal instant settles by file order; keep that after the lines share
-            // one shard.
-            (true, Some(m)) if recorded_at.get(&key) == Some(&m) && is_session_shard(shard) => {
-                millis = Some(m + 1);
-                record.ts = utc_stamp(m + 1)?;
-            }
-            _ => {}
-        }
-        if let Some(m) = millis {
-            last.insert(shard.as_str(), m);
-        }
+        };
         if existing.contains(&record.id) {
             already += 1;
             continue;
         }
-        if let Err(e) = registry.validate(&record) {
-            counts.unusable.push(format!("{place}: {e}"));
-            continue;
+        records.push(record);
+        places.push(place);
+    }
+
+    let admitted: Vec<&Record> = records.iter().filter(|r| door.admits(r).is_ok()).collect();
+    if !admitted.is_empty() {
+        let events = read_events(root)?;
+        let (now, then) = (
+            unsettled_ids(&events),
+            unsettled_ids(&migrated_view(&events, &admitted)),
+        );
+        if now != then {
+            return Ok(json!({
+                "ok": false,
+                "in": { "recorded": counts.recorded_in, "resolved": counts.resolved_in, "other": counts.other_lines },
+                "written": 0,
+                "alreadyMigrated": already,
+                "unusable": counts.unusable,
+                "settleChanged": {
+                    "settledByMigration": now.difference(&then).collect::<Vec<_>>(),
+                    "unsettledByMigration": then.difference(&now).collect::<Vec<_>>(),
+                },
+                "records": { "before": before, "after": before },
+            }));
         }
-        lines.push(shard::encode_line(&record).map_err(|e| format!("{place}: {e}"))?);
     }
-    if !lines.is_empty() {
-        shard::append_lines(root, RECORDS_STORE, TornTail::Heal, &lines)
-            .map_err(|e| format!("append failed: {e}"))?;
+
+    let mut written = 0;
+    for (outcome, place) in door.write_all_held(&lock, records).into_iter().zip(&places) {
+        match outcome {
+            WriteOutcome::Written => written += 1,
+            WriteOutcome::Duplicate => already += 1,
+            WriteOutcome::Rejected(e) => counts.unusable.push(format!("{place}: {e}")),
+            WriteOutcome::Failed(e) => return Err(format!("{place}: {e}")),
+        }
     }
-    let (_, after) = stored_friction(root)?;
+    drop(lock);
     Ok(json!({
         "ok": counts.unusable.is_empty(),
         "in": { "recorded": counts.recorded_in, "resolved": counts.resolved_in, "other": counts.other_lines },
-        "written": lines.len(),
+        "written": written,
         "alreadyMigrated": already,
         "unusable": counts.unusable,
-        "records": { "before": before, "after": after },
+        "records": { "before": before, "after": before + written },
     }))
 }
 
@@ -1809,20 +1838,65 @@ mod tests {
         let _ = fs::remove_dir_all(&tmp);
     }
 
+    const MIGRATE_ROOT: &str = "FRICTION_TEST_MIGRATE_ROOT";
+    const MIGRATE_REPORT: &str = "FRICTION_TEST_MIGRATE_REPORT";
+
+    /// Child body: migrate the store at `MIGRATE_ROOT` as the writer named by `FGOS_SESSION_ID` and store the
+    /// report at `MIGRATE_REPORT`. Does nothing in an ordinary run.
+    #[test]
+    fn migrate_child_entry() {
+        let Ok(root) = std::env::var(MIGRATE_ROOT) else {
+            return;
+        };
+        let report = migrate_to_records(Path::new(&root)).unwrap();
+        fs::write(std::env::var(MIGRATE_REPORT).unwrap(), report.to_string()).unwrap();
+    }
+
+    /// Starts a migrate of `root` in a child process with the writer identity `writer`.
+    fn migrate_as(root: &Path, writer: &str) -> (std::process::Child, std::path::PathBuf) {
+        let report = root.join(format!("report-{writer}.json"));
+        let child = std::process::Command::new(std::env::current_exe().unwrap())
+            .args([
+                "--exact",
+                "friction::tests::migrate_child_entry",
+                "--test-threads",
+                "1",
+            ])
+            .env("FGOS_SESSION_ID", writer)
+            .env(MIGRATE_ROOT, root)
+            .env(MIGRATE_REPORT, &report)
+            .stdin(std::process::Stdio::null())
+            .stdout(std::process::Stdio::null())
+            .spawn()
+            .unwrap();
+        (child, report)
+    }
+
+    fn finished(child: (std::process::Child, std::path::PathBuf)) -> Value {
+        let (mut child, report) = child;
+        assert!(child.wait().unwrap().success(), "migrate child failed");
+        serde_json::from_slice(&fs::read(report).unwrap()).unwrap()
+    }
+
     #[test]
     fn a_store_migrated_by_two_writers_or_half_migrated_counts_every_friction_once() {
         let tmp = temp_root("migrate-mixed");
         old_store(&tmp);
-        migrate_to_records(&tmp).unwrap();
-        // Another writer migrated the same lines into its own shard.
-        let records = tmp.join(".fgos/observe/records");
-        let shard = fs::read_dir(&records)
-            .unwrap()
-            .filter_map(Result::ok)
-            .find(|e| e.path().extension().is_some_and(|x| x == "jsonl"))
-            .unwrap()
-            .path();
-        fs::copy(&shard, records.join("other-writer.jsonl")).unwrap();
+        // Two writers migrate at once: the lock lets one write every line and the other find them all there.
+        let (a, b) = (
+            migrate_as(&tmp, "migrate-writer-a"),
+            migrate_as(&tmp, "migrate-writer-b"),
+        );
+        let mut reports = [finished(a), finished(b)];
+        reports.sort_by_key(|r| r["written"].as_u64());
+        assert_eq!(
+            (reports[0]["written"].clone(), reports[1]["written"].clone()),
+            (json!(0), json!(3)),
+            "{reports:?}"
+        );
+        assert_eq!(reports[0]["alreadyMigrated"], 3);
+        assert_eq!(reports[0]["records"], json!({ "before": 3, "after": 3 }));
+        assert_eq!(stored_records(&tmp).len(), 3);
 
         let listed = list(&tmp, None, None, None).unwrap();
         assert_eq!(listed.as_array().unwrap().len(), 2, "{listed}");
@@ -1860,6 +1934,57 @@ mod tests {
         for dir in [&tmp, &half, &one] {
             let _ = fs::remove_dir_all(dir);
         }
+    }
+
+    #[test]
+    fn a_migration_that_would_change_what_is_settled_writes_nothing_and_names_the_friction() {
+        let tmp = temp_root("migrate-settle");
+        let at = "2026-10-01T10:00:00.000Z";
+        // In two session shards an equal instant does not settle; moved into one shard in order, it would.
+        fs::write(
+            friction_dir(&tmp).join("sess-a.jsonl"),
+            format!("{}\n", recorded_line("tsk-x", at)),
+        )
+        .unwrap();
+        fs::write(
+            friction_dir(&tmp).join("sess-b.jsonl"),
+            format!("{}\n", resolved_line("tsk-x", at)),
+        )
+        .unwrap();
+        let report = finished(migrate_as(&tmp, "migrate-writer-settle"));
+        assert_eq!(report["ok"], false, "{report}");
+        assert_eq!(report["written"], 0);
+        assert_eq!(
+            report["settleChanged"],
+            json!({ "settledByMigration": ["legacy:sess-a:1"], "unsettledByMigration": [] })
+        );
+        assert!(stored_records(&tmp).is_empty());
+        assert_eq!(show(&tmp, "work:tsk-x").unwrap()["unsettled"], 1);
+        let _ = fs::remove_dir_all(&tmp);
+    }
+
+    #[test]
+    fn a_migrate_that_leaves_a_line_behind_fails_the_command() {
+        let tmp = temp_root("migrate-cli");
+        old_store(&tmp);
+        fs::write(
+            friction_dir(&tmp).join("broken.jsonl"),
+            format!("{}\n", recorded_line("tsk-c", "not a stamp")),
+        )
+        .unwrap();
+        let err = crate::friction_cli::dispatch(&crate::contract::ObserveRequest {
+            operation: "friction".into(),
+            sub: "migrate".into(),
+            args: vec!["--to-records".into()],
+            root: tmp.clone(),
+            stdin: None,
+        })
+        .unwrap_err();
+        assert!(err.starts_with("friction-migrate-incomplete: "), "{err}");
+        assert!(err.contains("broken:1"), "{err}");
+        // The usable lines were still written once.
+        assert_eq!(stored_records(&tmp).len(), 3);
+        let _ = fs::remove_dir_all(&tmp);
     }
 
     #[test]

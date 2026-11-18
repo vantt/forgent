@@ -120,7 +120,12 @@ pub fn dispatch(req: &ObserveRequest) -> Result<serde_json::Value, String> {
             if !flags.switch("--to-records") {
                 return Err(invalid_input("migrate needs --to-records"));
             }
-            friction::migrate_to_records(&req.root)
+            // An explicit operator command, not a fail-open side channel: a run that left anything behind fails.
+            let report = friction::migrate_to_records(&req.root)?;
+            if report["ok"] != true {
+                return Err(format!("friction-migrate-incomplete: {report}"));
+            }
+            Ok(report)
         }
         "list" => {
             let flags = parse(&["--kind", "--layer", "--since"], &[], false)?;

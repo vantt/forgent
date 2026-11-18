@@ -189,6 +189,54 @@ fn a_duplicate_id_is_accepted_and_ignored_and_a_missing_id_gets_a_random_one() {
 }
 
 #[test]
+fn a_batch_under_a_lock_the_caller_holds_gets_the_same_checks_and_counts_without_waiting_on_itself()
+{
+    let root = temp_root("batch");
+    let door = door(&root).with_lock_wait(Duration::from_millis(50));
+    assert_eq!(door.write(run_attempt("stored")), WriteOutcome::Written);
+    let mut refused = run_attempt("refused");
+    refused.redaction = None;
+    let held = acquire_store_lock_within(&root, Duration::from_secs(5)).unwrap();
+    let outcomes = door.write_all_held(
+        &held,
+        vec![
+            run_attempt("a"),
+            run_attempt("stored"),
+            run_attempt("a"),
+            refused,
+            run_attempt(""),
+        ],
+    );
+    drop(held);
+    assert_eq!(
+        outcomes[..3],
+        [
+            WriteOutcome::Written,
+            WriteOutcome::Duplicate,
+            WriteOutcome::Duplicate
+        ]
+    );
+    assert!(
+        matches!(outcomes[3], WriteOutcome::Rejected(_)),
+        "{outcomes:?}"
+    );
+    assert_eq!(outcomes[4], WriteOutcome::Written);
+    assert_eq!(RecordStoreSource.records(&root, &all()).unwrap().len(), 3);
+    let h = health(&root);
+    assert_eq!(
+        (
+            counter(&h, "accepted"),
+            counter(&h, "written"),
+            counter(&h, "duplicates"),
+            counter(&h, "rejected"),
+            counter(&h, "errors")
+        ),
+        (6, 3, 2, 1, 0)
+    );
+    let _ = fs::remove_dir_all(&root);
+}
+
+#[test]
 fn a_refused_record_raises_rejected_and_never_errors_and_is_not_stored() {
     let root = temp_root("refused");
     let door = door(&root);
