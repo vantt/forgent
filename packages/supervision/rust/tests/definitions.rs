@@ -515,7 +515,7 @@ fn a_lead_is_recognised_by_either_role_form_and_a_non_lead_head_is_never_one() {
                 // The definition reads both kinds, so a source must serve each; this plan is merely ready.
                 json!({
                     "v": 2, "id": "p1", "kind": "fgos.plan.status", "ts": "2026-11-18T10:00:00Z",
-                    "subject": { "kind": "plan", "id": "p1" },
+                    "subject": { "kind": "plan", "id": "plans/p1" },
                     "attrs": { "fgos.plan.change": "status", "fgos.plan.to": "ready" },
                     "basis": "observed", "origin": { "source": "fixture" }
                 })
