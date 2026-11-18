@@ -289,3 +289,34 @@ fn the_adopt_door_takes_a_lane_for_a_live_worker_and_a_full_pool_reports_lane_po
     let _ = agent.wait();
     assert_eq!(lanes::snapshot(&lock_root(&free_root), 1).live, 0);
 }
+
+#[test]
+fn the_adopt_door_takes_no_lane_for_a_worker_the_lock_admission_ended_and_a_full_pool_does_not_refuse_it(
+) {
+    use support::adopt_fixture::{attempt, dead_tuple, live_process};
+    let root = state_root("adopt-door-orphan");
+    let seat = hold(&root, 0);
+    let a = attempt("lane-adopt-door-orphan", &["settle-attempt"]);
+    // A dead gate left its domain behind: the recorded process still lives until the lock's admission ends it.
+    let (mut orphan, tuple) = live_process();
+    a.bind_domain(
+        &dead_tuple(),
+        &fgos_holder_lock::predecessor::domain_json(&fgos_process::Domain::LinuxGate(
+            tuple.clone(),
+        )),
+    );
+    a.declare(&tuple);
+    a.gate_exit("agent");
+    name_lane_pool(&a, 1);
+    let line = adopt_with_state_root(&root, &a.dir);
+    assert_eq!(line["state"], "adopted", "{line}");
+    assert!(
+        line.get("lane").is_none(),
+        "a worker the admission ended takes no lane, so a full pool reports nothing: {line}"
+    );
+    assert!(
+        !orphan.wait().unwrap().success(),
+        "the admission ended the domain"
+    );
+    drop(seat);
+}

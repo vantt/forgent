@@ -84,6 +84,7 @@ import {
   startSupervisor,
   waitForBinding,
   bindingWaitMs,
+  settlementCeilingMs,
   removeAttemptIntent,
   writeAttemptFiles,
   writeAttemptIntent,
@@ -1195,7 +1196,7 @@ async function awaitBinding(attempt, { envelope, settings, onChunk, timeoutMs })
       child: supervisor.child,
       capture: envelope.launch.capture,
       onChunk,
-      ceilingMs: timeoutMs + settings.gateKillGraceMs + 120_000,
+      ceilingMs: settlementCeilingMs(envelope, { timeoutMs, gateKillGraceMs: settings.gateKillGraceMs }),
       readSettledResult,
     });
   } finally {

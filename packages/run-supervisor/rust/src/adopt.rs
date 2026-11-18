@@ -220,13 +220,13 @@ pub fn adopt_one(dir: &Path, args: &AdoptArgs) -> Verdict {
     // Lock free is not enough: the domain must be provably empty.
     // A supervisor that died between declaring the domain and binding it left only the declared record.
     let declared = read_json(&predecessor::record_path(&lock_path));
-    let domain_state = match (&binding, &declared) {
-        (Some(binding), _) => domain_of(
-            &json!({"v": 1, "domainKind": binding["domain"]["kind"], "domainId": binding["domain"]["id"]}),
+    let domain_record = match (&binding, declared) {
+        (Some(binding), _) => Some(
+            json!({"v": 1, "domainKind": binding["domain"]["kind"], "domainId": binding["domain"]["id"]}),
         ),
-        (None, Some(record)) => domain_of(record),
-        (None, None) => DomainState::Empty,
+        (None, record) => record,
     };
+    let domain_state = domain_record.as_ref().map_or(DomainState::Empty, domain_of);
     // A best-effort domain does not hold an agent that leads a group of its own: the published agent counts too.
     let agent = best_effort_agent(dir, binding.as_ref());
     let domain_state = match domain_state {
@@ -261,7 +261,7 @@ pub fn adopt_one(dir: &Path, args: &AdoptArgs) -> Verdict {
         &resource,
         binding.is_some(),
         agent,
-        domain_state != DomainState::Empty,
+        domain_record.as_ref(),
         envelope_json.as_ref(),
         args,
     )
@@ -336,7 +336,7 @@ fn adopt_locked(
     resource: &Resource,
     bound: bool,
     agent: Option<Record>,
-    domain_live: bool,
+    domain_record: Option<&Value>,
     envelope: Option<&Value>,
     args: &AdoptArgs,
 ) -> Verdict {
@@ -353,7 +353,9 @@ fn adopt_locked(
         }
     };
     // A live worker this adopter re-owns holds a lane while it does, so the pool's live count never undercounts;
-    // a full pool keeps the worker and says so.
+    // a full pool keeps the worker and says so. Judged only now: the lock's admission ended a domain its dead
+    // holder left behind, and a worker it ended holds no lane.
+    let domain_live = domain_record.is_some_and(|record| domain_of(record) != DomainState::Empty);
     let live_worker = domain_live
         || agent
             .as_ref()
