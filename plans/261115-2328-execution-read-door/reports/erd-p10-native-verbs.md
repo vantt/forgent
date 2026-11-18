@@ -66,3 +66,9 @@ Deleted: the `decide`, `explain` and `agents` arms of `bin/fgos.mjs`; `src/runne
 | `test/runner/dispatch-governance-operability.test.mjs`: governance-blocked vs unregistered shape | `golden_decide.rs` governance vectors |
 
 Kept and changed: the retired-door test now also pins that `decide` is an unknown alias sub-command and that the legacy payload refuses the native `dispatch-decide` hook kind by name; the symlinked-entry test of `dispatch.mjs` drives `reconcile`; `subcommand-flag-drift` reads the native `dispatch` flags from `project_dispatch_request`; `plan.mjs` usage names `fgos dispatch decide`. Not run here: `verb-parity` (needs `FGOS_TEST_PARITY_BASE`, a staged base release) and `fgctl-uninstall` (needs a release `fgctl`). Historical docs (history, discussions, decisions, explanation, knowledge narratives, verification logs) still say `node src/runner/dispatch.mjs decide`; they record what was true then and are left.
+
+## Parity tables kept off main
+
+The four parity tables and `execution-world.mjs` ran green against base `7655f4f3e` (counts above) and were removed
+before landing: with tables present, `test/rust-host/verb-parity.test.mjs` needs a staged base release
+(`FGOS_TEST_PARITY_BASE`) and would fail `npm test` on main. Restore them from commit `0d3ee1395` to re-run parity.
