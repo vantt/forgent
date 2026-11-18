@@ -14,7 +14,9 @@ hỏi lại thành Q5 (ngưỡng "plan đứng yên") và Q6 (nghĩa của "pace
 OM-D3 (Rust cho phần mới) đổi chỗ đặt code ở §6 A, C, E; mở Q7 (reader câu hỏi đang là Node).
 Vòng 3: chủ dự án hỏi friction được ghi nhận, phân loại, gom nhóm thế nào — đề xuất ở §6 D.
 Vòng 4: chủ dự án đặt khung ba tầng (OM-D4): contract ghi/truy vấn trước hết, tích hợp sau, lưu trữ tự do. §6.0 mới;
-friction (§6 D) trở thành một loại sự kiện trong contract chung. Mở Q8 (chuẩn tên). Các phần không phụ thuộc chúng (nguồn token/duration/account, khoá plan/phase, chiều
+friction (§6 D) trở thành một loại sự kiện trong contract chung. Mở Q8 (chuẩn tên).
+Vòng 5: OM-D5 — bảy thước đo và các quy tắc phát hiện là định nghĩa của tầng trên, chạy qua truy vấn chung; bỏ verb
+`metrics plans`. Các phần không phụ thuộc chúng (nguồn token/duration/account, khoá plan/phase, chiều
 `--by`, friction) shape tiếp được.
 
 ## 2. Mục tiêu & đề bài
@@ -58,6 +60,7 @@ phạm vi.
 | OM-D2 | Cost đo bằng token theo model/provider/account/plan/phase trước; tiền (bảng giá, tiền ước tính) hoãn vì chưa có tool/hạ tầng nào lo giá — không build trong plan này | chủ dự án, Q1 | 2026-11-18 |
 | OM-D3 | Mọi phần viết MỚI của plan này viết bằng Rust khi làm được mà không ảnh hưởng phần đang có; Node chỉ còn là caller mỏng nếu cần. Không viết lại phần đã land chỉ để đổi ngôn ngữ | chủ dự án qua secretary | 2026-11-18 |
 | OM-D4 | Ba tầng, thứ tự ưu tiên: (1) contract công khai ghi + truy vấn — phổ quát, chuẩn, ít đổi, ghi được mọi thứ khi cần, đọc được mọi kiểu khi cần — phải tốt và chuẩn sớm; (2) cơ chế tích hợp với agent và hạ tầng — quan sát nhiều nơi, nhiều khoảnh khắc mà không làm giảm hiệu quả hay làm sai agent/tiến trình, phát triển dần; (3) lưu trữ bên trong — tự do đổi, chấp nhận chi phí migration | chủ dự án | 2026-11-18 |
+| OM-D5 | Bảy thước đo bộ lái (và mọi khái niệm kiểu "lead time của plan", "plan đứng yên") là khái niệm của tầng trên — chỗ cần quan sát (bộ lái/portfolio/supervisor) — không cố định trong tầng Observe. Observe chỉ biết bản ghi, span, refs, phép lọc/nhóm/gộp | chủ dự án | 2026-11-18 |
 
 ## 5. Q&A log
 
@@ -75,6 +78,8 @@ phạm vi.
 - 2026-11-18 ~11:20 — Chủ dự án: việc này có ba phần — (1) contract công khai ghi/truy vấn, phổ quát, chuẩn, ít đổi;
   (2) tích hợp với agent và hạ tầng, quan sát nhiều nơi mà không làm chậm/sai; (3) lưu trữ bên trong, đổi được. Ưu
   tiên làm thật tốt (1) trước → OM-D4, §6.0.
+- 2026-11-18 ~11:35 — Chủ dự án: bảy thước đo là khái niệm của tầng trên (chỗ cần quan sát), không cố định trong tầng
+  Observe → OM-D5.
 
 ## 6. Thiết kế đã chốt {#design}
 
@@ -99,6 +104,9 @@ riêng. Đề xuất v2 (để bàn):
 - `origin`: ai phát (component, writer session, host, release).
 - Tên attr/measure theo một registry semantic convention; chỗ nào chuẩn ngoài đã có tên thì dùng tên đó (Q8).
 - Tiến hoá chỉ cộng thêm; `v` của envelope chỉ đổi khi phá vỡ.
+Tầng 1 không chứa khái niệm của bên dùng (OM-D5): không "plan", "lead time", "bảy thước đo" cứng trong code Observe —
+plan, phase chỉ là loại subject/ref trong registry. Bên dùng khai báo định nghĩa của mình (một file định nghĩa truy vấn
+có tên, nằm ở chỗ của bên dùng) và chạy nó qua truy vấn chung.
 Truy vấn: một verb chung (`fgos metrics query`, mở rộng họ `metrics`, không họ mới): `--kind`, `--where k=v`,
 `--ref plan:<dir>`, `--since/--until`, `--by <attrs>`, `--bucket day|week`, `--agg count|sum|p50|p90|max <measure>`.
 Truy vấn thấy hai loại nguồn như nhau: sự kiện đã ghi qua cửa ghi, và sự kiện *chiếu* từ bản ghi do component khác
@@ -140,8 +148,10 @@ có (`.fgos/runtime/tmp/sec/run-phase.sh`) và skill driving truyền cờ này.
   xu hướng.
 - `metrics harness` token transcript: tách theo model và theo session; session nối sang vai (head/lead) qua Identity
   để thấy chi phí của secretary/supervisor ngoài run.
-- Verb mới trong cùng họ: `fgos metrics plans [--plan <dir>] [--since]` — mỗi plan: trạng thái và thời điểm chuyển
-  (đọc lịch sử git của `plan.md` qua cửa Git), lead time ready→done, thời gian theo phase (từ run có khoá B), token, tỉ lệ hỏng, và bảy thước đo — thước đo nào chưa có nguồn trả `unmeasured` kèm lý do (theo Q2).
+- Không có verb `metrics plans` trong Observe (OM-D5). Bảy thước đo, lead time ready→done, thời gian theo phase là
+  định nghĩa truy vấn của tầng lái (chỗ đặt: skill/công cụ lái, chi tiết của planner), chạy bằng `metrics query`. Plan
+  này lo cho nguồn của chúng có trong contract: span phase (từ run có khoá B), sự kiện `plan.status` chiếu từ lịch sử
+  git của `plan.md`, `question.asked/answered`, verify lần đầu. Thước đo nào chưa có nguồn: theo Q2.
 - Thời gian chờ chủ dự án: câu hỏi (QUESTIONS.md, mục câu hỏi của plan, gate) mang `asked`/`answered` thời điểm;
   reader câu hỏi hiện là Node (`src/portfolio/open-questions.mjs`, 115 dòng) — cách tách theo Q7.
 
@@ -169,7 +179,8 @@ trong registry; gom nhóm là truy vấn `--by errorClass --bucket week`.
 - Subject kind `plan` (p-7nqygnztum) và `backlog`, qua cửa convention.
 
 **E. Attention view (Node `attention-view.mjs`, contract v2: row không bắt buộc `runId`).** Ba kind row mới, chỉ
-phát hiện:
+phát hiện. Theo OM-D5, quy tắc "đứng yên", "head chết", "pace" là định nghĩa của tầng supervisor (truy vấn có tên +
+ngưỡng trong config), attention view chạy chúng; Observe không biết các khái niệm này:
 - `head-gone`: một head/lead có placement ghi nhận (lineage rotation / head placement) mà Session Host `alive` trả
   `gone` và chưa retire, hoặc Identity không còn liệt kê.
 - `plan-no-progress`: plan `running` không có tín hiệu tiến (commit trên nhánh, run settle mang khoá plan, dòng
@@ -179,7 +190,7 @@ Ngưỡng là config key mới qua standard + schema. Logic phát hiện viết 
 được bằng Rust thì viết Rust); view Node chỉ nối dây.
 
 **Ngoài phạm vi.** Cảnh báo/mailbox; tiền và bảng giá (OM-D2); sửa độ ổn định của council (p-24dxhwq7zr, chỉ lấy phần đo: attempt/resume ×
-token theo unit, có sẵn khi xong A+C); retention run dir (p-tslryr3buq) — nhưng `metrics plans` phải đọc được plan
+token theo unit, có sẵn khi xong A+C); retention run dir (p-tslryr3buq) — nhưng truy vấn phải đọc được plan
 đã xong sau khi run dir bị prune (snapshot đo của plan khi `done`, ghi qua store `snapshots` có sẵn); p-ixrbglli5o.
 
 ```mermaid
@@ -193,7 +204,7 @@ flowchart LR
   end
   subgraph Readers
     M[fgos metrics runs/discussions --by ... --bucket]
-    MP[fgos metrics plans: lead time + 7 measures]
+    MP[định nghĩa của tầng lái: lead time + 7 thước đo\nchạy qua metrics query]
     F[fgos friction list/rank --bucket]
     AV[dispatch inspect --attention: head-gone, plan-no-progress, pace]
   end
@@ -223,9 +234,9 @@ Khảo sát mỗi CLI (claude, codex, pi, omp, agy, gemini...) in token/tiền �
 ### observe-dimensions {#task-observe-dimensions}
 §6 C: attrs mới, `--by`, `--bucket`, token theo model/session. Verify: `cargo test -p fgos-observe -p fgos-run-result`.
 
-### metrics-plans {#task-metrics-plans}
-§6 C: `fgos metrics plans`, thời gian chờ chủ dự án, bảy thước đo. Phụ thuộc Q2. Verify: fixture plan với lịch sử
-git dựng sẵn.
+### driving-measures {#task-driving-measures}
+§6 C (OM-D5): nguồn `plan.status`, `question.*`, span phase vào contract; bảy thước đo là định nghĩa truy vấn ở tầng
+lái. Phụ thuộc Q2, Q7. Verify: fixture plan với lịch sử git dựng sẵn, chạy định nghĩa qua `metrics query`.
 
 ### friction-link-trend {#task-friction-link-trend}
 §6 D. Verify: `cargo test -p fgos-observe` cho kind mới và bucket.
