@@ -4,6 +4,7 @@
 use fgos_event_store::{
     append::{append, AppendRequest, EventInput},
     cursor::Cursor,
+    errors::ErrorCode,
     identity::StoreIdentity,
     layout::{Layout, StreamId},
     read::{read, ReadRequest},
@@ -17,6 +18,8 @@ use std::collections::{BTreeMap, BTreeSet};
 const RAISED: &str = "supervision.event-raised";
 const HANDLED: &str = "supervision.event-handled";
 const STREAM: &str = "project";
+const STALE: &str = "stale-view";
+const MAX_ATTEMPTS: usize = 8;
 
 /// A refusal with a fixed code (`event-unknown`, `store-unavailable`, `bad-event`) and its cause.
 #[derive(Debug, Clone, PartialEq, Eq, thiserror::Error)]
@@ -101,7 +104,7 @@ fn valid_id(id: &str) -> bool {
 struct Folded {
     raised: BTreeMap<String, RaisedEvent>,
     handled: BTreeSet<String>,
-    /// Positions already covered, minus this store's own, for the append's stale check.
+    /// Positions already covered, this store's own included, for the append's stale check.
     cover: BTreeMap<String, u64>,
 }
 
@@ -139,12 +142,28 @@ impl Queue {
     /// Append `event` unless its id is already raised on any machine.
     pub fn raise(&self, event: RaisedEvent) -> Result<Raised, QueueError> {
         event.validate()?;
-        let (folded, origin) = self.fold()?;
-        if folded.raised.contains_key(&event.id) {
-            return Ok(Raised::Duplicate);
+        self.retrying(|| {
+            let (folded, origin) = self.fold()?;
+            if folded.raised.contains_key(&event.id) {
+                return Ok(Raised::Duplicate);
+            }
+            self.append(RAISED, event.payload(), folded.cover, &origin)?;
+            Ok(Raised::New)
+        })
+    }
+
+    /// Run `attempt` again, refolding, while the append refuses a stale own-stream position.
+    fn retrying<T>(
+        &self,
+        mut attempt: impl FnMut() -> Result<T, QueueError>,
+    ) -> Result<T, QueueError> {
+        for _ in 0..MAX_ATTEMPTS {
+            match attempt() {
+                Err(e) if e.code == STALE => continue,
+                other => return other,
+            }
         }
-        self.append(RAISED, event.payload(), folded.cover, &origin)?;
-        Ok(Raised::New)
+        Err(unavailable("own stream kept changing: retry"))
     }
 
     /// Raised and not handled, ordered by `ts` then `id`.
@@ -160,39 +179,45 @@ impl Queue {
     /// Close `ids`. Already handled ids are skipped; an id never raised refuses `event-unknown`
     /// and nothing is written. Returns how many ids this call closed.
     pub fn mark_handled(&self, ids: &[String], by: &str) -> Result<usize, QueueError> {
-        let (folded, origin) = self.fold()?;
-        let mut closing = BTreeSet::new();
-        for id in ids {
-            if !folded.raised.contains_key(id) {
-                return Err(QueueError {
-                    code: "event-unknown",
-                    detail: format!("no event raised with id {id}"),
-                });
+        self.retrying(|| {
+            let (folded, origin) = self.fold()?;
+            let mut closing = BTreeSet::new();
+            for id in ids {
+                if !folded.raised.contains_key(id) {
+                    return Err(QueueError {
+                        code: "event-unknown",
+                        detail: format!("no event raised with id {id}"),
+                    });
+                }
+                if !folded.handled.contains(id) {
+                    closing.insert(id.clone());
+                }
             }
-            if !folded.handled.contains(id) {
-                closing.insert(id.clone());
+            let mut cover = folded.cover;
+            let mut origin = origin;
+            for id in &closing {
+                let (next, own) =
+                    self.append(HANDLED, json!({"id": id, "by": by}), cover, &origin)?;
+                cover = next;
+                origin = own;
             }
-        }
-        let mut cover = folded.cover;
-        for id in &closing {
-            let result = self.append(HANDLED, json!({"id": id, "by": by}), cover, &origin)?;
-            cover = result;
-        }
-        Ok(closing.len())
+            Ok(closing.len())
+        })
     }
 
     fn stream() -> Result<StreamId, QueueError> {
         StreamId::parse(STREAM).map_err(unavailable)
     }
 
-    /// Append one event; returns the cover for the next append of the same call.
+    /// Append one event; returns the cover and the store id for the next append of the same call.
+    /// A stale own-stream position is refused with `stale-view` so the caller refolds.
     fn append(
         &self,
         event_type: &str,
         payload: Value,
         cover: BTreeMap<String, u64>,
         origin: &str,
-    ) -> Result<BTreeMap<String, u64>, QueueError> {
+    ) -> Result<(BTreeMap<String, u64>, String), QueueError> {
         let result = append(
             &self.layout,
             &self.registry,
@@ -210,7 +235,16 @@ impl Queue {
                 held_ranks: &[],
             },
         )
-        .map_err(unavailable)?;
+        .map_err(|e| {
+            if e.code == ErrorCode::StaleCursor {
+                QueueError {
+                    code: STALE,
+                    detail: e.detail,
+                }
+            } else {
+                unavailable(e)
+            }
+        })?;
         // The store minted its identity on the first append when it had none.
         let own = if origin.is_empty() {
             result.ack.origin.clone()
@@ -218,8 +252,8 @@ impl Queue {
             origin.to_owned()
         };
         let mut next = cover;
-        next.remove(&format!("{own}:{STREAM}"));
-        Ok(next)
+        next.insert(format!("{own}:{STREAM}"), result.ack.last_seq);
+        Ok((next, own))
     }
 
     fn fold(&self) -> Result<(Folded, String), QueueError> {
@@ -247,6 +281,12 @@ impl Queue {
             },
         )
         .map_err(unavailable)?;
+        if let Some(skipped) = result.skipped_mirrors.first() {
+            return Err(unavailable(format!(
+                "mirror {} skipped ({}): run `fgos events sync` and retry",
+                skipped.ref_name, skipped.code
+            )));
+        }
         if !result.deferred.is_empty() || !result.missing.is_empty() {
             return Err(unavailable(
                 "incomplete history: run `fgos events sync` and retry",
@@ -269,8 +309,7 @@ impl Queue {
                 _ => {}
             }
         }
-        let mut cover: BTreeMap<String, u64> = result.cursor.cover.into_iter().collect();
-        cover.remove(&format!("{origin}:{STREAM}"));
+        let cover: BTreeMap<String, u64> = result.cursor.cover.into_iter().collect();
         Ok((
             Folded {
                 raised,
