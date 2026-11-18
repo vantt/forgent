@@ -1,7 +1,7 @@
 // agy-permissions.mjs — infra layer: agy's (Antigravity Cli) command-permission settings
 // (tsk-1xm, docs/history/agy-permission-capability-allowlist/). What stays here is the sub-HOME reading the
-// executor config's agy rows need (`agy-sub-homes-configured`, and the agent CLI trust row): the same settings in
-// each agy sub-HOME the executor config names. The row over the person's own settings file and the settings
+// executor config's agy rows need (`agy-sub-homes-configured`, and the agent CLI trust row): the sub-HOMEs the
+// executor config and the `gemini` pool of `runner.llmAccounts` name. The row over the person's own settings file and the settings
 // `fgos wire-agents` shows are `packages/distribution/rust/src/agent_config.rs`'s; fgOS never writes the
 // person's file: always-proceed widens what agy may do in the person's own sessions too.
 //
@@ -22,36 +22,6 @@ import os from 'node:os';
 import path from 'node:path';
 
 import { isConfigRefusal, readConfig } from '../config/facade.mjs';
-
-/**
- * Absolute path to agy's one real on-disk settings file (RESEARCH.md
- * Round 1: confirmed the only agy settings file on this machine, shared
- * across every workspace/session, no per-project override exists).
- */
-export function agySettingsPath(homeDir = os.homedir()) {
-  return path.join(homeDir, '.gemini', 'antigravity-cli', 'settings.json');
-}
-
-/**
- * Reads and parses agy's settings.json for the given home directory
- * (defaults to real $HOME). Never throws: a missing file reads as `{}`
- * (nothing configured yet), and an unparseable file also reads as `{}`
- * rather than crashing `doctor`/`setup` on a file this module does not
- * own the shape of.
- */
-export function readAgySettings(homeDir = os.homedir()) {
-  const settingsPath = agySettingsPath(homeDir);
-  if (!fs.existsSync(settingsPath)) {
-    return {};
-  }
-  try {
-    const raw = fs.readFileSync(settingsPath, 'utf8');
-    const parsed = JSON.parse(raw);
-    return parsed !== null && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : {};
-  } catch {
-    return {};
-  }
-}
 
 /**
  * Resolves a raw HOME path (e.g. "${HOME}/.agy-homes/mucdong" or "~/.agy-homes/mucdong")
@@ -155,14 +125,13 @@ export function findAgySubHomes(cwd = process.cwd(), { homeDir = process.env.HOM
     }
   }
 
-  // The credential homes of the declared gemini accounts. A confined (herdr or bwrap) invocation
-  // runs as the account the capacity layer picks for the provider, so these homes matter as much as
-  // the HOME an invocation names.
-  const geminiAccounts = runner.providers?.gemini?.accounts;
+  // The credential homes of the accounts of the `gemini` pool of `runner.llmAccounts`. A confined (herdr or bwrap)
+  // invocation runs as the account the capacity layer picks for the pool, so these homes matter as much as the
+  // HOME an invocation names.
+  const geminiAccounts = runner.llmAccounts?.gemini;
   if (geminiAccounts && typeof geminiAccounts === 'object') {
     for (const [accountId, account] of Object.entries(geminiAccounts)) {
-      // One store for every CLI, or the agy store of an account that keeps one per CLI.
-      const rawPath = (account?.credentialSources ? account.credentialSources.agy : account?.credentialSource)?.home;
+      const rawPath = account?.credentialStore?.agy;
       if (typeof rawPath !== 'string' || !rawPath.trim()) continue;
       const resolved = path.resolve(resolveSubHomePath(rawPath.trim(), homeDir));
       if (seenPaths.has(resolved)) continue;
@@ -175,8 +144,10 @@ export function findAgySubHomes(cwd = process.cwd(), { homeDir = process.env.HOM
 }
 
 /**
- * Doctor check: verifies that each agy sub-HOME referenced in executor configs
- * has its own settings.json with toolPermission: "always-proceed".
+ * Doctor check: verifies that each agy sub-HOME referenced in the executor configs and in the `gemini` pool of
+ * `runner.llmAccounts` is a directory that exists. The settings a run needs (always-proceed and the deny list) are
+ * passed to agy per invocation as a session-only `--settings`, so no sub-HOME's own settings.json is read on a run
+ * and none is demanded here.
  *
  * @param {string} [cwd] Working directory containing `.fgos/config.json`
  * @param {object} [opts]
@@ -189,46 +160,20 @@ export function checkAgySubHomesConfigured(cwd = process.cwd(), { homeDir = proc
   if (subHomes.length === 0) {
     return {
       passed: true,
-      message: 'no agy sub-HOMEs referenced in executor configs — nothing to check',
+      message: 'no agy sub-HOMEs referenced in executor configs or the gemini accounts — nothing to check',
     };
   }
 
-  const missing = [];
-  const misconfigured = [];
-  const passed = [];
-
-  for (const { rawPath, resolvedPath } of subHomes) {
-    const settingsPath = agySettingsPath(resolvedPath);
-    if (!fs.existsSync(settingsPath)) {
-      missing.push(`${rawPath} (${settingsPath} not found)`);
-      continue;
-    }
-    const settings = readAgySettings(resolvedPath);
-    if (settings.toolPermission !== 'always-proceed') {
-      misconfigured.push(
-        `${rawPath} (${settingsPath}: toolPermission is "${settings.toolPermission ?? 'missing'}", must be "always-proceed")`,
-      );
-      continue;
-    }
-    passed.push(rawPath);
-  }
-
-  if (missing.length > 0 || misconfigured.length > 0) {
-    const problems = [];
-    if (missing.length > 0) {
-      problems.push(`missing settings.json: ${missing.join(', ')}`);
-    }
-    if (misconfigured.length > 0) {
-      problems.push(`misconfigured settings.json: ${misconfigured.join(', ')}`);
-    }
+  const missing = subHomes.filter(({ resolvedPath }) => !fs.existsSync(resolvedPath) || !fs.statSync(resolvedPath).isDirectory());
+  if (missing.length > 0) {
     return {
       passed: false,
-      message: `agy sub-HOME check failed (${problems.join('; ')}) — each sub-HOME must have .gemini/antigravity-cli/settings.json with toolPermission: "always-proceed"`,
+      message: `agy sub-HOME check failed (not a directory: ${missing.map(({ rawPath, resolvedPath }) => `${rawPath} (${resolvedPath})`).join(', ')}) — each sub-HOME an executor or a gemini account names must exist`,
     };
   }
 
   return {
     passed: true,
-    message: `all ${subHomes.length} agy sub-HOME(s) configured (${passed.join(', ')}) with toolPermission=always-proceed`,
+    message: `all ${subHomes.length} agy sub-HOME(s) exist (${subHomes.map(({ rawPath }) => rawPath).join(', ')})`,
   };
 }

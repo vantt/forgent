@@ -153,10 +153,10 @@ fn run_fix(
         .collect();
     let writer = common::writer(&input["writer"]);
     let build = |kind: SourceKind| {
-        let target = if kind == SourceKind::Global {
-            "global"
-        } else {
-            "project"
+        let target = match kind {
+            SourceKind::Global => "global",
+            SourceKind::Accounts => "accounts",
+            SourceKind::Project => "project",
         };
         common::write_request(
             dir,

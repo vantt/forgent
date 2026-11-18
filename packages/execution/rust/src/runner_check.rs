@@ -9,7 +9,7 @@
 // The refusal carries the positions Node's error carries; it is built once, on the cold path of a refused config.
 #![allow(clippy::result_large_err)]
 
-use crate::accounts::{is_cli_key, is_inside, validate_provider_account_inventory};
+use crate::accounts::{is_cli_key, is_inside, refuse_retired_provider_accounts};
 use crate::executor_model::{capability_confinement, registered_capability_of, ModelError};
 use fgos_convention::packaged_rules;
 use serde_json::{Map, Value};
@@ -1549,7 +1549,7 @@ pub fn check_runner_config(
         warnings.extend(provider_family_warning(executor_id, executor));
     }
     check_prefer_targets(runner, source_label)?;
-    validate_provider_account_inventory(runner, source_label)?;
+    refuse_retired_provider_accounts(runner, source_label)?;
     if let Some(patterns) = runner.get("patterns") {
         validate_runner_patterns_shape(patterns, &format!("{source_label} patterns"))?;
     }

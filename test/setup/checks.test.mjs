@@ -520,7 +520,7 @@ test('provider-capacity-state doctor check reports quarantine without clearing i
   const cwd = mkTemp('doctor-provider-capacity-cwd-');
   const fgosHome = path.join(homeDir, '.fgos');
   fs.mkdirSync(fgosHome, { recursive: true });
-  writeAccountsFile(fgosHome, { providers: { 'openai-codex': { accounts: { tetnu: { label: 'Tetnu', credentialSource: { kind: 'codex-home', home: path.join(homeDir, 'codex-tetnu') } } } } } });
+  writeAccountsFile(fgosHome, { llmAccounts: { openai: { tetnu: { label: 'Tetnu', credentialStore: { codex: path.join(homeDir, 'codex-tetnu') } } } } });
   const stateDir = path.join(fgosHome, 'runtime', 'provider-capacity');
   fs.mkdirSync(stateDir, { recursive: true });
   const statePath = path.join(stateDir, 'state.json');

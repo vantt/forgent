@@ -12,7 +12,7 @@ use crate::executor_model::{
     ModelError, NULL,
 };
 use crate::ports::Machine;
-use serde_json::{json, Map, Value};
+use serde_json::{json, Value};
 
 /// A seat explained: its binding (or `{ refused }`), the crate's answer, the launch view, and the walk.
 pub struct SeatExplanation {
@@ -84,18 +84,12 @@ fn store_of_binding(entry: &Value, invocation: Option<&str>) -> Value {
 fn accounts_of(runner: &Value, pool: &str, cli: Option<&str>, machine: &dyn Machine) -> Value {
     let key = legacy_state_key(pool);
     let mut problems: Vec<Value> = Vec::new();
-    let accounts = match provider_account_inventory(runner, machine) {
-        Ok(inventory) => inventory
-            .get(&key)
-            .and_then(|provider| provider.get("accounts"))
-            .and_then(Value::as_object)
-            .cloned()
-            .unwrap_or_default(),
-        Err(error) => {
-            problems.push(json!({ "code": "inventory-invalid", "at": "runner.providers", "detail": error.message }));
-            Map::new()
-        }
-    };
+    let accounts = provider_account_inventory(runner, machine)
+        .get(&key)
+        .and_then(|provider| provider.get("accounts"))
+        .and_then(Value::as_object)
+        .cloned()
+        .unwrap_or_default();
     let declared = runner
         .get("llmAccounts")
         .is_some_and(|accounts| accounts.get(pool).is_some());

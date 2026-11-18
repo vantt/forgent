@@ -1,13 +1,12 @@
 // runner.llmAccounts.<pool>.<account>.credentialStore.<cli> is the machine's account inventory.
-// The reader reports what is wrong instead of throwing, and can be set against the old
-// runner.providers.<provider>.accounts inventory the lease still reads.
+// The reader reports what is wrong instead of throwing.
 
 import '../helpers/process-tmp-root.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import os from 'node:os';
 import path from 'node:path';
-import { readLlmAccounts, compareWithLegacyInventory } from '../../src/runner/dispatch/llm-accounts.mjs';
+import { readLlmAccounts } from '../../src/runner/dispatch/llm-accounts.mjs';
 
 const home = os.homedir();
 const families = {
@@ -79,40 +78,4 @@ test('an account with no store, a store that is not a path, and unknown keys are
   });
   assert.deepEqual(codes(result), ['account-no-store', 'account-no-store', 'store-path', 'account-no-store', 'store-path', 'account-no-store', 'account-unknown-key']);
   assert.deepEqual(Object.keys(result.pools.openai.accounts), ['extra']);
-});
-
-test('comparing with the old inventory lists accounts missing on either side and stores that differ', () => {
-  const result = compareWithLegacyInventory({
-    ...families,
-    providers: {
-      openai: {
-        accounts: {
-          tetnu: { credentialSources: { codex: { kind: 'codex-home', home: '${HOME}/.codex-tetnu' } } },
-          tetcu72: { credentialSources: { codex: { kind: 'codex-home', home: '${HOME}/.codex-tetcu72' } } },
-        },
-      },
-      'z-ai': { accounts: { openrouter: { credentialSource: { kind: 'home-files', home: '${HOME}/.pi/accounts/openrouter', files: ['auth.json'] } } } },
-    },
-    llmAccounts: {
-      openai: {
-        tetnu: { credentialStore: { codex: '${HOME}/.codex-tetnu' } },
-        tetcu72: { credentialStore: { codex: '${HOME}/.codex-other' } },
-        fresh: { credentialStore: { codex: '${HOME}/.codex-fresh' } },
-      },
-      'z-ai': { openrouter: { credentialStore: { pi: '${HOME}/.pi/accounts/openrouter', omp: '${HOME}/.pi/accounts/openrouter' } } },
-    },
-  });
-  assert.deepEqual(result.problems, []);
-  assert.deepEqual(result.onlyLegacy, []);
-  assert.deepEqual(result.onlyNew, [{ pool: 'openai', account: 'fresh' }]);
-  assert.deepEqual(result.storeMismatch.map((m) => `${m.pool}/${m.account}`), ['openai/tetcu72']);
-});
-
-test('an old account the new inventory does not carry is listed under its old provider key', () => {
-  const result = compareWithLegacyInventory({
-    ...families,
-    providers: { gemini: { accounts: { tetcu72: { credentialSources: { omp: { kind: 'home-files', home: '/x', files: ['a'] } } } } } },
-  });
-  assert.deepEqual(result.onlyLegacy, [{ pool: 'gemini', account: 'tetcu72' }]);
-  assert.deepEqual(result.onlyNew, []);
 });

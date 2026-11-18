@@ -26,7 +26,6 @@ import {
   recordAccountProbe,
   recordProviderAccountFault,
   releaseProviderAccountLease,
-  validateProviderAccountInventory,
 } from '../../src/runner/dispatch/provider-capacity.mjs';
 import { reconcileProviderCapacityQuarantineUseCase } from '../../src/verbs/dispatch/reconcile.mjs';
 import { selfRecord } from '../../src/native/process-identity.mjs';
@@ -54,13 +53,11 @@ function runnerConfig() {
     executor: { command: 'claude', args: ['{prompt}'] },
     modelPolicies: { claude: { standard: 'sonnet' } },
     timeoutMs: 1000,
-    providers: {
-      'openai-codex': {
-        accounts: {
-          a: { label: 'codex/a', credentialSource: { kind: 'codex-home', home: '/tmp/a' } },
-          b: { label: 'codex/b', credentialSource: { kind: 'codex-home', home: '/tmp/b' } },
-          c: { label: 'codex/c', credentialSource: { kind: 'codex-home', home: '/tmp/c' } },
-        },
+    llmAccounts: {
+      openai: {
+        a: { label: 'codex/a', credentialStore: { codex: '/tmp/a' } },
+        b: { label: 'codex/b', credentialStore: { codex: '/tmp/b' } },
+        c: { label: 'codex/c', credentialStore: { codex: '/tmp/c' } },
       },
     },
   };
@@ -679,24 +676,6 @@ test('an audit log that cannot be written drops its record with a warning and ne
   assert.equal(warnings.filter((line) => /provider-capacity audit log not written/.test(line)).length, 1);
 });
 
-test('inventory: a home-files credential source lists relative files and is carried through to the selected account', () => {
-  const inventory = validateProviderAccountInventory({
-    providers: { xai: { accounts: { vantt: { credentialSource: { kind: 'home-files', home: '/home/u/.pi/accounts/x', files: ['auth.json', 'bin/fd'] } } } } },
-  });
-  assert.deepEqual(inventory.xai.accounts.vantt.credentialSource, { kind: 'home-files', home: '/home/u/.pi/accounts/x', files: ['auth.json', 'bin/fd'] });
-});
-
-test('inventory: a home-files source with no files, an escaping or absolute path, or files on another kind is refused by name', () => {
-  const withSource = (credentialSource) => ({ providers: { xai: { accounts: { a: { credentialSource } } } } });
-  const home = '/home/u/x';
-  assert.throws(() => validateProviderAccountInventory(withSource({ kind: 'home-files', home })), /files\) must be a non-empty list of relative paths/);
-  assert.throws(() => validateProviderAccountInventory(withSource({ kind: 'home-files', home, files: [] })), /non-empty list/);
-  assert.throws(() => validateProviderAccountInventory(withSource({ kind: 'home-files', home, files: ['../up'] })), /relative paths without "\.\."/);
-  assert.throws(() => validateProviderAccountInventory(withSource({ kind: 'home-files', home, files: ['/abs'] })), /relative paths without "\.\."/);
-  assert.throws(() => validateProviderAccountInventory(withSource({ kind: 'codex-home', home, files: ['auth.json'] })), /only valid for kind "home-files"/);
-  assert.throws(() => validateProviderAccountInventory(withSource({ kind: 'dir-mount', home })), /must be one of codex-home, home-files/);
-});
-
 test('a quota quarantine lasts as long as the provider says, in hours, minutes and seconds', () => {
   const now = Date.parse('2026-10-05T10:00:00.000Z');
   const fromScreen = classifyProviderCapacityFault({
@@ -750,7 +729,7 @@ test('a provider wait or reset longer than a day quarantines for a day, so text 
 test('an owner-set quarantine keeps the account out of selection until its end time', () => {
   const dir = mkTempDir();
   const globalConfigPath = globalConfigFile(dir);
-  writeAccountsFile(path.join(dir, '.fgos'), { providers: runnerConfig().providers });
+  writeAccountsFile(path.join(dir, '.fgos'), { llmAccounts: runnerConfig().llmAccounts });
   const until = new Date(Date.now() + 3600_000).toISOString();
 
   const refusedPast = reconcileProviderCapacityQuarantineUseCase({}, {
@@ -993,7 +972,7 @@ test('a probe result is recorded: a login or quota stop quarantines through the 
   const now = Date.parse('2026-11-14T10:00:00.000Z');
   const audit = () => fs.readFileSync(providerCapacityStatePaths(runtimeDir).auditPath, 'utf8').trim().split('\n').map((line) => JSON.parse(line));
   const quarantineOf = () => inspectProviderCapacity({
-    runnerConfig: { providers: { gemini: { accounts: { a: { label: 'a', credentialSource: { kind: 'codex-home', home: '/tmp/a' } } } } } }, runtimeDir,
+    runnerConfig: { llmAccounts: { gemini: { a: { label: 'a', credentialStore: { codex: '/tmp/a' } } } } }, runtimeDir,
   }).providers.gemini.accounts.a.quarantine;
   const base = { provider: 'gemini', accountId: 'a', runtimeDir, now };
 

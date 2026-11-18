@@ -43,22 +43,20 @@ test('fgos doctor reports the agy-permissions and agy sub-HOME rows', () => {
   fs.rmSync(homeDir, { recursive: true, force: true });
 });
 
-test('findAgySubHomes also finds the credential homes of the declared gemini accounts, which a confined pane actually runs as', () => {
+test('findAgySubHomes also finds the agy login homes of the gemini pool of runner.llmAccounts, which a confined pane actually runs as', () => {
   const fakeHome = '/home/fakeuser';
   const config = {
     runner: {
       executors: {
         gemini: { invocations: [{ id: 'agy-1', command: 'agy', env: { HOME: '${HOME}/.agy-homes/acc-1' } }] },
       },
-      providers: {
+      llmAccounts: {
         gemini: {
-          accounts: {
-            'acc-1': { credentialSource: { kind: 'home-files', home: '${HOME}/.agy-homes/acc-1', files: ['x'] } },
-            'acc-2': { credentialSource: { kind: 'home-files', home: '${HOME}/.agy-homes/acc-2', files: ['x'] } },
-          },
+          'acc-1': { credentialStore: { agy: '${HOME}/.agy-homes/acc-1' } },
+          'acc-2': { credentialStore: { agy: '${HOME}/.agy-homes/acc-2', pi: '${HOME}/.pi/accounts/acc-2' } },
         },
         xai: {
-          accounts: { vantt: { credentialSource: { kind: 'home-files', home: '${HOME}/.pi/accounts/grok-vantt', files: ['x'] } } },
+          vantt: { credentialStore: { pi: '${HOME}/.pi/accounts/grok-vantt' } },
         },
       },
     },
@@ -67,7 +65,7 @@ test('findAgySubHomes also finds the credential homes of the declared gemini acc
   assert.deepEqual(
     found.map((f) => f.resolvedPath).sort(),
     [path.resolve('/home/fakeuser/.agy-homes/acc-1'), path.resolve('/home/fakeuser/.agy-homes/acc-2')].sort(),
-    'one entry per home, the xai pi account is not an agy home',
+    'one entry per home: the agy store of a gemini account, not its pi store and not another pool',
   );
 });
 
@@ -108,91 +106,46 @@ test('findAgySubHomes discovers agy sub-HOMEs across single and multi-executor c
   );
 });
 
-test('checkAgySubHomesConfigured passes when all referenced sub-HOMEs have toolPermission=always-proceed', () => {
+test('checkAgySubHomesConfigured passes when every referenced sub-HOME exists, whether an executor or a gemini account names it', () => {
   const tempBase = mkTemp('agy-sub-pass-');
   const home1 = path.join(tempBase, 'home1');
   const home2 = path.join(tempBase, 'home2');
-
-  for (const h of [home1, home2]) {
-    const sPath = path.join(h, '.gemini', 'antigravity-cli', 'settings.json');
-    fs.mkdirSync(path.dirname(sPath), { recursive: true });
-    fs.writeFileSync(sPath, JSON.stringify({ toolPermission: 'always-proceed' }));
-  }
+  fs.mkdirSync(home1, { recursive: true });
+  fs.mkdirSync(home2, { recursive: true });
 
   const config = {
     runner: {
-      executors: {
-        gemini: {
-          invocations: [
-            { id: 'agy-1', command: 'agy', env: { HOME: home1 } },
-            { id: 'agy-2', command: 'agy', env: { HOME: home2 } },
-          ],
-        },
-      },
+      executors: { gemini: { invocations: [{ id: 'agy-1', command: 'agy', env: { HOME: home1 } }] } },
+      llmAccounts: { gemini: { second: { credentialStore: { agy: home2 } } } },
     },
   };
 
   const res = checkAgySubHomesConfigured('/dummy', { config });
   assert.equal(res.passed, true);
-  assert.match(res.message, /all 2 agy sub-HOME\(s\) configured/);
+  assert.match(res.message, /all 2 agy sub-HOME\(s\) exist/);
+  // The home holds no settings.json: a run passes its settings per invocation, so none is demanded.
 
   fs.rmSync(tempBase, { recursive: true, force: true });
 });
 
-test('checkAgySubHomesConfigured fails when a sub-HOME is missing settings.json', () => {
+test('checkAgySubHomesConfigured fails when a referenced sub-HOME does not exist', () => {
   const tempBase = mkTemp('agy-sub-missing-');
   const homeOk = path.join(tempBase, 'homeOk');
   const homeMissing = path.join(tempBase, 'homeMissing');
-
-  const sPath = path.join(homeOk, '.gemini', 'antigravity-cli', 'settings.json');
-  fs.mkdirSync(path.dirname(sPath), { recursive: true });
-  fs.writeFileSync(sPath, JSON.stringify({ toolPermission: 'always-proceed' }));
+  fs.mkdirSync(homeOk, { recursive: true });
 
   const config = {
     runner: {
-      executors: {
-        gemini: {
-          invocations: [
-            { id: 'agy-1', command: 'agy', env: { HOME: homeOk } },
-            { id: 'agy-2', command: 'agy', env: { HOME: homeMissing } },
-          ],
-        },
-      },
+      executors: { gemini: { invocations: [{ id: 'agy-1', command: 'agy', env: { HOME: homeOk } }] } },
+      llmAccounts: { gemini: { gone: { credentialStore: { agy: homeMissing } } } },
     },
   };
 
   const res = checkAgySubHomesConfigured('/dummy', { config });
   assert.equal(res.passed, false);
-  assert.match(res.message, /missing settings\.json/);
+  assert.match(res.message, /not a directory/);
   assert.ok(res.message.includes(homeMissing));
-
-  fs.rmSync(tempBase, { recursive: true, force: true });
-});
-
-test('checkAgySubHomesConfigured fails when a sub-HOME has misconfigured toolPermission', () => {
-  const tempBase = mkTemp('agy-sub-misconf-');
-  const homeBad = path.join(tempBase, 'homeBad');
-
-  const sPath = path.join(homeBad, '.gemini', 'antigravity-cli', 'settings.json');
-  fs.mkdirSync(path.dirname(sPath), { recursive: true });
-  fs.writeFileSync(sPath, JSON.stringify({ toolPermission: 'request-review' }));
-
-  const config = {
-    runner: {
-      executors: {
-        gemini: {
-          invocations: [
-            { id: 'agy-1', command: 'agy', env: { HOME: homeBad } },
-          ],
-        },
-      },
-    },
-  };
-
-  const res = checkAgySubHomesConfigured('/dummy', { config });
-  assert.equal(res.passed, false);
-  assert.match(res.message, /misconfigured settings\.json/);
-  assert.match(res.message, /request-review/);
+  assert.ok(!res.message.includes(homeOk));
 
   fs.rmSync(tempBase, { recursive: true, force: true });
 });

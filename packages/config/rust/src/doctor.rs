@@ -184,6 +184,26 @@ fn key(name: &str) -> Segment {
     Segment::Key(name.to_string())
 }
 
+/// The `runner.providers.<provider>.accounts` keys that hold an empty mapping: leftover shells of the retired
+/// account inventory (the accounts live in `runner.llmAccounts`). A provider that lists accounts is not one
+/// of them; the runner config door refuses it by name.
+pub(crate) fn empty_provider_accounts(json: &Value) -> Vec<Vec<Segment>> {
+    let base = [key("runner"), key("providers")];
+    let Some(providers) = json_at(json, &base).and_then(Value::as_object) else {
+        return Vec::new();
+    };
+    providers
+        .iter()
+        .filter(|(_, entry)| {
+            entry
+                .get("accounts")
+                .and_then(Value::as_object)
+                .is_some_and(|accounts| accounts.is_empty())
+        })
+        .map(|(provider, _)| [base.to_vec(), vec![key(provider), key("accounts")]].concat())
+        .collect()
+}
+
 /// What the retired taste keys of the file `json` need; `moves` says whether the file may hold the new
 /// tables. Reads the one file; nothing about the other layers or the standard.
 pub(crate) fn taste_plan(json: &Value, moves: bool) -> TastePlan {
@@ -317,6 +337,11 @@ impl Judged<'_> {
             let copy = self.role == "global" && legacy && state == Held::Missing;
             found.fix = copy.then_some("copy-to-destination");
             out.push(found);
+        }
+        if self.kind == SourceKind::Accounts {
+            for path in empty_provider_accounts(&json) {
+                self.put(out, "config-empty-provider-accounts", &path, "empty");
+            }
         }
         if legacy || self.kind == SourceKind::Accounts {
             return;

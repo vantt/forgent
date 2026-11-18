@@ -7,7 +7,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { replaceDurably } from '../../native/door.mjs';
 import { globalFgosDir, readMachineAccounts } from '../../config/facade.mjs';
-import { deriveLegacyInventory, legacyStateKey } from './llm-accounts.mjs';
+import { deriveLegacyInventory } from './llm-accounts.mjs';
 import { resolveHolderLiveness, selfRecord } from '../../native/process-identity.mjs';
 import { acquire, acquireSync, createLockScope, lockHolders, resolveLock, resolveLockRoot, runBorrowed } from '../../holder-lock/index.mjs';
 import { appendFaultRecord } from '../../util/capped-jsonl-log.mjs';
@@ -15,18 +15,6 @@ import { appendFaultRecord } from '../../util/capped-jsonl-log.mjs';
 export const PROVIDER_CAPACITY_STATE_CONTRACT = 'provider-capacity-state.v1';
 export const PROVIDER_CAPACITY_SELECTION_CONTRACT = 'provider-capacity-selection.v1';
 export const PROVIDER_CAPACITY_AUDIT_CONTRACT = 'provider-capacity-audit.v1';
-
-const FORBIDDEN_ACCOUNT_KEYS = Object.freeze([
-  'executor', 'executors', 'capability', 'capabilities', 'model', 'models',
-  'modelTier', 'mutation', 'confinement', 'tool', 'tools', 'fallback',
-  'providerFallback', 'runtime', 'runtimeClass', 'providerRuntime',
-  'providerRuntimes',
-]);
-
-const PROVIDER_ENTRY_KEYS = Object.freeze(['accounts']);
-const ACCOUNT_ENTRY_KEYS = Object.freeze(['label', 'credentialSource', 'credentialSources']);
-const CREDENTIAL_SOURCE_KEYS = Object.freeze(['kind', 'home', 'files']);
-const CREDENTIAL_SOURCE_KINDS = Object.freeze(['codex-home', 'home-files']);
 
 export class ProviderCapacityConfigError extends Error {
   constructor(message, { code } = {}) {
@@ -54,141 +42,9 @@ function isPlainObject(value) {
   return value !== null && typeof value === 'object' && !Array.isArray(value);
 }
 
-export function validateProviderAccountInventory(runnerConfig, sourceLabel = 'runner config') {
-  const runnerSection = isPlainObject(runnerConfig?.runner) ? runnerConfig.runner : runnerConfig;
-  const providers = runnerSection?.providers;
-  if (providers === undefined) return {};
-  if (!isPlainObject(providers)) {
-    throw new ProviderCapacityConfigError(`runner config (${sourceLabel}.providers) must be an object mapping provider -> { accounts } when present.`);
-  }
-  // M6: keyed by the NORMALIZED provider family ('openai' and 'openai-codex'
-  // are the same bucket) -- a config declaring accounts under both spellings
-  // is refused with a named collision rather than silently splitting one
-  // provider's accounts across two never-jointly-visible inventory keys
-  // (the fault classifier and lease/quarantine lookups only ever see one).
-  const rawToNormalized = {};
-  const normalized = {};
-  for (const [provider, providerEntry] of Object.entries(providers)) {
-    if (!provider || typeof provider !== 'string') {
-      throw new ProviderCapacityConfigError(`runner config (${sourceLabel}.providers) provider id must be a non-empty string.`);
-    }
-    const canonicalProvider = legacyStateKey(provider);
-    if (normalized[canonicalProvider] !== undefined) {
-      throw new ProviderCapacityConfigError(
-        `runner config (${sourceLabel}.providers) declares both "${rawToNormalized[canonicalProvider]}" and "${provider}", which normalize to the same provider family "${canonicalProvider}" -- consolidate their accounts under one key.`,
-      );
-    }
-    rawToNormalized[canonicalProvider] = provider;
-    if (!isPlainObject(providerEntry)) {
-      throw new ProviderCapacityConfigError(`runner config (${sourceLabel}.providers.${provider}) must be an object.`);
-    }
-    for (const key of Object.keys(providerEntry)) {
-      if (!PROVIDER_ENTRY_KEYS.includes(key)) {
-        throw new ProviderCapacityConfigError(
-          `runner config (${sourceLabel}.providers.${provider}) contains unknown key "${key}". Slice 1 only allows: ${PROVIDER_ENTRY_KEYS.join(', ')}.`,
-        );
-      }
-    }
-    const accounts = providerEntry.accounts;
-    if (accounts === undefined) continue;
-    if (!isPlainObject(accounts)) {
-      throw new ProviderCapacityConfigError(`runner config (${sourceLabel}.providers.${provider}.accounts) must be a keyed object, not an array.`);
-    }
-    normalized[canonicalProvider] = { accounts: {} };
-    for (const [accountId, account] of Object.entries(accounts)) {
-      validateAccountId(accountId, `${sourceLabel}.providers.${provider}.accounts`);
-      if (!isPlainObject(account)) {
-        throw new ProviderCapacityConfigError(`runner config (${sourceLabel}.providers.${provider}.accounts.${accountId}) must be an object.`);
-      }
-      for (const key of Object.keys(account)) {
-        if (FORBIDDEN_ACCOUNT_KEYS.includes(key)) {
-          throw new ProviderCapacityConfigError(
-            `runner config (${sourceLabel}.providers.${provider}.accounts.${accountId}) must not declare "${key}"; accounts may only describe credentials/capacity, not placement policy.`,
-          );
-        }
-        if (!ACCOUNT_ENTRY_KEYS.includes(key)) {
-          throw new ProviderCapacityConfigError(
-            `runner config (${sourceLabel}.providers.${provider}.accounts.${accountId}) contains unknown key "${key}". Allowed keys: ${ACCOUNT_ENTRY_KEYS.join(', ')}.`,
-          );
-        }
-      }
-      if (account.label !== undefined && (typeof account.label !== 'string' || !account.label.trim())) {
-        throw new ProviderCapacityConfigError(`runner config (${sourceLabel}.providers.${provider}.accounts.${accountId}.label) must be a non-empty string when present.`);
-      }
-      const where = `${sourceLabel}.providers.${provider}.accounts.${accountId}`;
-      const hasSingle = account.credentialSource !== undefined;
-      const hasPerCli = account.credentialSources !== undefined;
-      if (hasSingle === hasPerCli) {
-        throw new ProviderCapacityConfigError(
-          `runner config (${where}) must declare exactly one of "credentialSource" (one login store for every CLI) or "credentialSources" (one login store per CLI, keyed by the CLI command name).`,
-        );
-      }
-      const entry = { id: accountId, label: account.label ?? accountId };
-      if (hasSingle) {
-        entry.credentialSource = normalizeCredentialSource(account.credentialSource, `${where}.credentialSource`);
-      } else {
-        if (!isPlainObject(account.credentialSources) || Object.keys(account.credentialSources).length === 0) {
-          throw new ProviderCapacityConfigError(`runner config (${where}.credentialSources) must be a non-empty object mapping a CLI command name (codex, pi, omp, agy, ...) to a credential source.`);
-        }
-        entry.credentialSources = {};
-        for (const [cli, source] of Object.entries(account.credentialSources)) {
-          if (!CLI_KEY.test(cli)) {
-            throw new ProviderCapacityConfigError(`runner config (${where}.credentialSources) key ${JSON.stringify(cli)} must be a CLI command name (lower-case letters, digits, "-" or "_").`);
-          }
-          entry.credentialSources[cli] = { ...normalizeCredentialSource(source, `${where}.credentialSources.${cli}`), cli };
-        }
-      }
-      normalized[canonicalProvider].accounts[accountId] = entry;
-    }
-  }
-  return Object.freeze(normalized);
-}
-
-function validateAccountId(accountId, label) {
-  if (typeof accountId !== 'string' || !/^[a-zA-Z0-9][a-zA-Z0-9_.-]*$/.test(accountId)) {
-    throw new ProviderCapacityConfigError(`runner config (${label}) account id must be a non-empty safe key, got ${JSON.stringify(accountId)}.`);
-  }
-  // The account order is the key order of the object, and a JS object lists a digits-only key before every other.
-  if (/^\d+$/.test(accountId)) {
-    throw new ProviderCapacityConfigError(`runner config (${label}) account id ${JSON.stringify(accountId)} is digits only; such a key sorts before the others and would break the declared account order. Add a letter.`);
-  }
-}
-
 const CLI_KEY = /^[a-z0-9][a-z0-9_-]*$/;
 const ENV_NAME = /^[A-Za-z_][A-Za-z0-9_]*$/;
 const CREDENTIAL_STORE_KEYS = Object.freeze(['use', 'homeEnv', 'files', 'sessionDir']);
-
-function normalizeCredentialSource(credentialSource, label) {
-  if (!isPlainObject(credentialSource)) {
-    throw new ProviderCapacityConfigError(`runner config (${label}) must be an object.`);
-  }
-  for (const key of Object.keys(credentialSource)) {
-    if (!CREDENTIAL_SOURCE_KEYS.includes(key)) {
-      throw new ProviderCapacityConfigError(
-        `runner config (${label}) contains unknown key "${key}". Allowed keys: ${CREDENTIAL_SOURCE_KEYS.join(', ')}.`,
-      );
-    }
-  }
-  if (!CREDENTIAL_SOURCE_KINDS.includes(credentialSource.kind)) {
-    throw new ProviderCapacityConfigError(`runner config (${label}.kind) must be one of ${CREDENTIAL_SOURCE_KINDS.join(', ')}.`);
-  }
-  if (typeof credentialSource.home !== 'string' || !credentialSource.home.trim()) {
-    throw new ProviderCapacityConfigError(`runner config (${label}.home) must be a non-empty string.`);
-  }
-  if (credentialSource.kind === 'home-files') {
-    const files = credentialSource.files;
-    if (!Array.isArray(files) || files.length === 0 || files.some((f) => typeof f !== 'string' || !f.trim() || path.isAbsolute(f) || f.split(/[\\/]/).includes('..'))) {
-      throw new ProviderCapacityConfigError(`runner config (${label}.files) must be a non-empty list of relative paths without "..".`);
-    }
-  } else if (credentialSource.files !== undefined) {
-    throw new ProviderCapacityConfigError(`runner config (${label}.files) is only valid for kind "home-files".`);
-  }
-  return {
-    kind: credentialSource.kind,
-    home: credentialSource.home,
-    ...(credentialSource.kind === 'home-files' ? { files: [...credentialSource.files] } : {}),
-  };
-}
 
 /** The CLI an invocation runs: the basename of its command, lower-cased; null when there is none. */
 export function commandCli(command) {
@@ -276,16 +132,12 @@ export function providerCapacityForInvocation(selection, invocation) {
 }
 
 /**
- * The accounts the lease, probe, pin and renewal read, per state key. A pool declared in
- * `runner.llmAccounts` supplies its own accounts; a pool it does not declare keeps reading
- * `runner.providers.<provider>.accounts`. That second read is the transition read: it goes, with the
- * `runner.providers` key, once every fgOS release on the machine reads `runner.llmAccounts`.
+ * The accounts the lease, probe, pin and renewal read, per state key: those of `runner.llmAccounts`. A config
+ * that still lists accounts under `runner.providers` is refused by the config door, which owns that rule.
  */
 export function providerAccountInventory(runnerConfig) {
-  const legacy = validateProviderAccountInventory(runnerConfig, 'runner config');
   const section = isPlainObject(runnerConfig?.runner) ? runnerConfig.runner : runnerConfig;
-  if (section?.llmAccounts === undefined) return legacy;
-  return Object.freeze({ ...legacy, ...deriveLegacyInventory(section).inventory });
+  return Object.freeze(deriveLegacyInventory(section).inventory);
 }
 
 export function hasProviderAccounts(runnerConfig, provider) {

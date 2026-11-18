@@ -25,12 +25,11 @@ const executor = (family) => ({
   invocations: [{ id: 'cli', via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' }, command: `${family}-bin`, args: ['{prompt}'] }],
 });
 
-const runnerConfig = (prefer, providers = {}) => ({
+const runnerConfig = (prefer) => ({
   defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
   modelPolicies: { alpha: { standard: 'm' }, beta: { standard: 'm' }, gamma: { standard: 'm' } },
   executors: { alpha: executor('alpha'), 'alpha-lite': executor('alpha'), beta: executor('beta'), gamma: executor('gamma') },
   capabilities: { 'docs:write': { prefer: prefer.map((name) => ({ executor: name })), rigor: 'standard' } },
-  providers,
 });
 
 const ask = { unit: { id: 'u', capability: 'docs:write', writes: [] }, role: 'producer', readOnly: true };
@@ -51,15 +50,9 @@ test('a retry needs a usable account and never exceeds the accounts the provider
 test('the rotation state counts the enabled accounts of the pool and drops the quarantined ones', () => {
   const home = makeFixtureDir('fgos-rotation-');
   try {
-    const providers = {
-      alpha: {
-        accounts: {
-          a1: { credentialSource: { kind: 'home-files', home, files: ['login'] } },
-          a2: { credentialSource: { kind: 'home-files', home, files: ['login'] } },
-        },
-      },
-    };
-    const cfg = runnerConfig(['alpha', 'beta'], providers);
+    const cfg = runnerConfig(['alpha', 'beta']);
+    cfg.executors.alpha.invocations[0].credentialStore = { use: 'alpha', homeEnv: 'ALPHA_HOME', files: ['login'] };
+    cfg.llmAccounts = { alpha: { a1: { credentialStore: { alpha: home } }, a2: { credentialStore: { alpha: home } } } };
     const runtimeDir = path.join(home, 'capacity');
     fs.mkdirSync(runtimeDir, { recursive: true });
     assert.deepEqual(inspectAccountRotation({ runnerConfig: cfg, pool: 'alpha', runtimeDir }), { pool: 'alpha', total: 2, healthy: 2 });

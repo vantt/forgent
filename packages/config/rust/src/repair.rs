@@ -12,7 +12,7 @@ use fgos_yaml_doc::path::format_path;
 use fgos_yaml_doc::{parse, Profile, Segment};
 use serde_json::Value;
 
-use crate::doctor::{strays, taste_plan};
+use crate::doctor::{empty_provider_accounts, strays, taste_plan};
 use crate::files::{read_beneath, select_source, LoadedFile, Source};
 use crate::files::{PRIVATE_FILE_MODE, YAML_NAME};
 use crate::grammar::parse_block;
@@ -21,11 +21,13 @@ use crate::machine::{ensure_private_dir, fix_modes, refused, token, TOKEN_FILE};
 use crate::relocate::{copy, plan, Held, MoveRequest};
 use crate::scope::SourceKind;
 use crate::snapshot::{split_global, Context, SessionClass, SnapshotError, SnapshotRequest};
-use crate::write::{commit, io_error, refresh, target_revision, Edit, WriteRequest};
+use crate::write::{
+    commit, io_error, refresh, target_revision, without_project, Edit, WriteRequest,
+};
 use crate::ConfigRefusal;
 
 /// The fix ids this module applies; `contracts/doctor-rows.v1.json` lists the same.
-const FIXES: [&str; 7] = [
+const FIXES: [&str; 8] = [
     "refresh-docs",
     "remove-redundant",
     "chmod",
@@ -33,6 +35,7 @@ const FIXES: [&str; 7] = [
     "copy-to-destination",
     "create-machine-files",
     "move-capability-taste",
+    "remove-empty-provider-accounts",
 ];
 
 /// What `fix` did, by fix id and path; never a value.
@@ -200,6 +203,67 @@ fn move_taste(
     Ok(paths)
 }
 
+const EMPTY_ACCOUNTS_REASON: &str = "[doctor:fix] empty retired provider accounts removed";
+
+/// `remove-empty-provider-accounts` on the accounts file: each `runner.providers.<provider>.accounts` that holds
+/// an empty mapping goes, and with it the provider entry when that was all it held, `runner.providers` when
+/// no provider is left, and `runner` when that was all it held. A provider that lists accounts is left as it is (the runner config door refuses it by
+/// name); nothing else of the file is touched.
+fn remove_empty_provider_accounts(
+    ctx: &Context,
+    req: &impl Fn(SourceKind) -> WriteRequest,
+    writer: &WriterIdentity,
+) -> Result<Vec<String>, SnapshotError> {
+    let mut request = req(SourceKind::Accounts);
+    request.roots = without_project(&request.roots);
+    let (parent, dir) = split_global(&request.roots.global_dir)?;
+    let name = dir.join("private").join("accounts.yaml");
+    let max = Profile::StrictConfig.limits().input_bytes;
+    let Some(file) = read_beneath(parent, &name, max)? else {
+        return Ok(Vec::new());
+    };
+    let json = parse(&file.bytes, Profile::StrictConfig, YAML_NAME)?.to_json()?;
+    let shells = empty_provider_accounts(&json);
+    if shells.is_empty() {
+        return Ok(Vec::new());
+    }
+    let providers = json["runner"]["providers"].as_object();
+    let held = |provider: &str| providers.and_then(|all| all.get(provider)?.as_object());
+    let mut edits = Vec::new();
+    let mut whole = 0;
+    for shell in &shells {
+        let Segment::Key(provider) = &shell[2] else {
+            continue;
+        };
+        if held(provider).is_some_and(|entry| entry.len() == 1) {
+            whole += 1;
+            edits.push(Edit::Unset {
+                path: shell[..3].to_vec(),
+            });
+        } else {
+            edits.push(Edit::Unset {
+                path: shell.clone(),
+            });
+        }
+    }
+    if providers.is_some_and(|all| all.len() == whole) {
+        // The key that held nothing else goes whole: an emptied `runner` in the accounts file would be a key in the
+        // wrong file.
+        let alone = json["runner"]
+            .as_object()
+            .is_some_and(|runner| runner.len() == 1);
+        edits = vec![Edit::Unset {
+            path: shells[0][..if alone { 1 } else { 2 }].to_vec(),
+        }];
+    }
+    request.expected = Some(file.revision);
+    request.edits = edits;
+    request.reason = EMPTY_ACCOUNTS_REASON.into();
+    request.acknowledge_comment_loss = true;
+    commit(ctx, &request, writer)?;
+    Ok(shells.iter().map(|path| format_path(path)).collect())
+}
+
 /// Copies the account pool and token keys the global JSON holds and the destination lacks.
 fn copy_missing(
     ctx: &Context,
@@ -324,6 +388,7 @@ pub fn fix(
                     .collect()
             }
             "move-capability-taste" => move_taste(ctx, &req, writer)?,
+            "remove-empty-provider-accounts" => remove_empty_provider_accounts(ctx, &req, writer)?,
             "copy-to-destination" => copy_missing(ctx, &moving, writer)?,
             _ => {
                 let mut moved = Vec::new();

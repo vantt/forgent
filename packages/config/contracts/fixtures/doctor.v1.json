@@ -47,7 +47,13 @@
    "      type: object",
    "      additionalProperties: false",
    "      properties:",
-   "        prefer: {type: array, items: {type: string}}"
+   "        prefer: {type: array, items: {type: string}}",
+   "  providers:",
+   "    type: object",
+   "    additionalProperties:",
+   "      type: object",
+   "      properties:",
+   "        accounts: {type: object, x-fgos-file: accounts, x-fgos-scope: global-only, additionalProperties: {type: object}}"
   ]
  },
  "standard": {
@@ -1963,6 +1969,149 @@
     "details": {
      "config-capability-taste-moved runner.capabilities.code.roles": "removed"
     }
+   }
+  },
+  {
+   "id": "empty-provider-accounts-is-a-row-with-the-remove-fix",
+   "why": "a leftover accounts: {} of the retired inventory is a warning the fix clears",
+   "input": {
+    "files": {
+     "home/.fgos/private/accounts.yaml": [
+      "runner:",
+      "  providers:",
+      "    openai:",
+      "      accounts: {}"
+     ]
+    },
+    "writer": {
+     "session": "vantt"
+    }
+   },
+   "expect": {
+    "rows": [
+     [
+      "config-empty-provider-accounts",
+      "accounts:accounts.yaml",
+      "runner.providers.openai.accounts"
+     ]
+    ],
+    "fixes": {
+     "config-empty-provider-accounts": "remove-empty-provider-accounts"
+    },
+    "severity": {
+     "config-empty-provider-accounts": [
+      "warn",
+      "warn"
+     ]
+    }
+   }
+  },
+  {
+   "id": "fix-remove-empty-provider-accounts-drops-the-providers-key-when-nothing-else-is-in-it",
+   "why": "every provider entry held only an empty accounts, so runner.providers goes whole and the other keys stay",
+   "input": {
+    "files": {
+     "home/.fgos/private/accounts.yaml": [
+      "accounts:",
+      "  a:",
+      "    login: x",
+      "runner:",
+      "  providers:",
+      "    openai:",
+      "      accounts: {}",
+      "    gemini:",
+      "      accounts: {}"
+     ]
+    },
+    "writer": {
+     "session": "vantt"
+    },
+    "fix": [
+     "remove-empty-provider-accounts"
+    ]
+   },
+   "expect": {
+    "applied": [
+     [
+      "remove-empty-provider-accounts",
+      "runner.providers.openai.accounts"
+     ],
+     [
+      "remove-empty-provider-accounts",
+      "runner.providers.gemini.accounts"
+     ]
+    ],
+    "files": {
+     "home/.fgos/private/accounts.yaml": [
+      "accounts:",
+      "  a:",
+      "    login: x"
+     ]
+    }
+   }
+  },
+  {
+   "id": "fix-remove-empty-provider-accounts-leaves-a-provider-that-lists-accounts",
+   "why": "a provider with accounts is the runner config door's refusal, not this repair's; only the empty one goes",
+   "input": {
+    "files": {
+     "home/.fgos/private/accounts.yaml": [
+      "runner:",
+      "  providers:",
+      "    openai:",
+      "      accounts:",
+      "        work:",
+      "          login: x",
+      "    gemini:",
+      "      accounts: {}"
+     ]
+    },
+    "writer": {
+     "session": "vantt"
+    },
+    "fix": [
+     "remove-empty-provider-accounts"
+    ]
+   },
+   "expect": {
+    "applied": [
+     [
+      "remove-empty-provider-accounts",
+      "runner.providers.gemini.accounts"
+     ]
+    ],
+    "files": {
+     "home/.fgos/private/accounts.yaml": [
+      "runner:",
+      "  providers:",
+      "    openai:",
+      "      accounts:",
+      "        work:",
+      "          login: x"
+     ]
+    }
+   }
+  },
+  {
+   "id": "fix-remove-empty-provider-accounts-leaves-a-file-without-shells-alone",
+   "why": "no shell, nothing applied",
+   "input": {
+    "files": {
+     "home/.fgos/private/accounts.yaml": [
+      "accounts:",
+      "  a:",
+      "    login: x"
+     ]
+    },
+    "writer": {
+     "session": "vantt"
+    },
+    "fix": [
+     "remove-empty-provider-accounts"
+    ]
+   },
+   "expect": {
+    "applied": []
    }
   }
  ]

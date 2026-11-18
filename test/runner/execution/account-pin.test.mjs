@@ -15,7 +15,7 @@ import { seedStubAgentClis } from '../../helpers/agent-clis.mjs';
 seedFileLocalBwrapRegistry();
 seedStubAgentClis('alpha-bin', 'beta-bin', 'delta-bin', 'gamma-bin', 'omp', 'agy');
 
-const account = (id) => ({ label: id, credentialSource: { kind: 'home-files', home: `/nonexistent/${id}`, files: ['login'] } });
+const account = (id, family) => ({ label: id, credentialStore: { [family]: `/nonexistent/${id}` } });
 const agent = (family) => ({
   kind: 'agent',
   providerModel: family,
@@ -37,11 +37,9 @@ const runnerConfig = {
     'docs:gamma': { prefer: [{ executor: 'gamma' }] },
     'docs:tool': { prefer: [{ executor: 'probe' }] },
   },
-  providers: {
-    alpha: { accounts: { a1: account('a1'), a2: account('a2') } },
-    beta: { accounts: { b1: account('b1') } },
-  },
   llmAccounts: {
+    alpha: { a1: account('a1', 'alpha'), a2: account('a2', 'alpha') },
+    beta: { b1: account('b1', 'beta') },
     router: { r1: { credentialStore: { alpha: '/nonexistent/r1', delta: '/nonexistent/r1' } }, r2: { credentialStore: { alpha: '/nonexistent/r2', delta: '/nonexistent/r2' }, disabled: true } },
   },
 };
@@ -133,8 +131,8 @@ test('the pin follows the override scope: a role the override does not name bind
 test('the dispatch config of a pinned binding lists only the pinned account of its pool', () => {
   const bound = bind(ask([{ origin: 'human-cli', account: 'alpha/a2' }]), ctx);
   const pinned = runnerConfigForBinding(runnerConfig, bound);
-  assert.deepEqual(Object.keys(pinned.providers.alpha.accounts), ['a2']);
-  assert.deepEqual(Object.keys(pinned.providers.beta.accounts), ['b1'], 'other pools are untouched');
+  assert.deepEqual(Object.keys(pinned.llmAccounts.alpha), ['a2']);
+  assert.deepEqual(Object.keys(pinned.llmAccounts.beta), ['b1'], 'other pools are untouched');
   assert.equal(runnerConfigForBinding(runnerConfig, { executor: 'alpha' }), runnerConfig, 'an unpinned binding keeps the config as it is');
 
   const viaRouter = runnerConfigForBinding(runnerConfig, bind(ask([{ origin: 'human-cli', account: 'router/r1' }], 'docs:delta'), ctx));
@@ -155,13 +153,13 @@ test('a pinned account launches through the invocation whose login store it hold
         ],
       },
     },
-    providers: {
-      ...runnerConfig.providers,
-      alpha: { accounts: {
-        both: { label: 'both', credentialSources: { omp: account('both').credentialSource, agy: account('both').credentialSource } },
-        agyOnly: { label: 'agyOnly', credentialSources: { agy: account('agyOnly').credentialSource } },
-        none: { label: 'none', credentialSources: { codex: account('none').credentialSource } },
-      } },
+    llmAccounts: {
+      ...runnerConfig.llmAccounts,
+      alpha: {
+        both: { label: 'both', credentialStore: { omp: '/nonexistent/both', agy: '/nonexistent/both' } },
+        agyOnly: { label: 'agyOnly', credentialStore: { agy: '/nonexistent/agyOnly' } },
+        none: { label: 'none', credentialStore: { codex: '/nonexistent/none' } },
+      },
     },
   };
   const pinned = bind(ask([{ origin: 'human-cli', account: 'alpha/agyOnly' }]), { ...ctx, runnerConfig: twoClis });

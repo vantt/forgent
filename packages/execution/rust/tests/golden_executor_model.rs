@@ -154,7 +154,7 @@ fn evaluate(vector: &Value) -> Option<Value> {
             }
         }
         "accountInventory" => {
-            answer_or_refusal(provider_account_inventory(runner, &machine).map(Value::Object))
+            json!(provider_account_inventory(runner, &machine))
         }
         "llmAccounts" => read_llm_accounts(runner, &machine).to_json(),
         "accountQuarantine" => {

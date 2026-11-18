@@ -561,7 +561,7 @@ function withHome(home, fn) {
 test('the registered check reads the global inventory even from a directory with no project config', () => {
   const home = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-cred-doctor-home-'));
   try {
-    writeAccountsFile(path.join(home, '.fgos'), { providers: { openai: { accounts: { acct: perCliCodexOnly } } } });
+    writeAccountsFile(path.join(home, '.fgos'), { llmAccounts: { openai: { acct: { credentialStore: { codex: '/x' } } } } });
     // The inventory names "openai" accounts under their normalized provider family, as the runtime does.
     const pending = path.join(home, '.fgos', 'runtime', 'provider-capacity', 'account-locks', 'openai-codex', 'acct', 'pending', `${String(Date.now() - 3 * 24 * HOUR).padStart(15, '0')}-abcd0123`);
     fs.mkdirSync(pending, { recursive: true });
@@ -584,7 +584,6 @@ test('the registered check reads the global inventory even from a directory with
 test('the registered check fails with the reason when the global config cannot be read, and never echoes what the file says', () => {
   for (const [label, content, location, named, wantReason] of [
     ['not json', '{ "runner": { "x": "LOOKS-LIKE-A-SECRET-VALUE" } oops', 'config.yaml', 'config.yaml', /machine config unreadable \(config-parse /],
-    ['refused by the validator', JSON.stringify({ runner: { providers: { openai: { accounts: { acct: { unknownKey: true } } } } } }), 'accounts.yaml', null, /machine config refused by the provider inventory validator/],
   ]) {
     const home = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-cred-doctor-home-'));
     try {

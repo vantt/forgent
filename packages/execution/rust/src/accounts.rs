@@ -1,7 +1,7 @@
 //! The machine's LLM accounts and the per-state-key inventory the lease reads. Two sources feed it:
 //! `runner.llmAccounts.<pool>.<account>` (each account names, per agent CLI, the directory where that CLI keeps
-//! the account's login) and the older `runner.providers.<provider>.accounts`, which stays the source for every
-//! pool `llmAccounts` does not declare. `read_llm_accounts` only reports: what is wrong is listed in `problems`.
+//! the account's login); the older `runner.providers.<provider>.accounts` is retired and refused by name when it
+//! lists accounts. `read_llm_accounts` only reports: what is wrong is listed in `problems`.
 //! The semantics are `executor-model.md` ("account inventory"); the vectors of `executor-model.v1.json` prove them.
 
 use crate::executor_model::{credential_store_of, family_of, FamilySource, ModelError};
@@ -9,27 +9,6 @@ use crate::ports::Machine;
 use serde::Serialize;
 use serde_json::{json, Map, Value};
 
-const FORBIDDEN_ACCOUNT_KEYS: [&str; 17] = [
-    "executor",
-    "executors",
-    "capability",
-    "capabilities",
-    "model",
-    "models",
-    "modelTier",
-    "mutation",
-    "confinement",
-    "tool",
-    "tools",
-    "fallback",
-    "providerFallback",
-    "runtime",
-    "runtimeClass",
-    "providerRuntime",
-    "providerRuntimes",
-];
-const ACCOUNT_ENTRY_KEYS: [&str; 3] = ["label", "credentialSource", "credentialSources"];
-const CREDENTIAL_SOURCE_KEYS: [&str; 3] = ["kind", "home", "files"];
 const LLM_ACCOUNT_KEYS: [&str; 3] = ["credentialStore", "label", "disabled"];
 
 /// The key lease state uses for a pool while it reads the old inventory: the family, except `openai` is
@@ -95,203 +74,31 @@ fn digits_only(key: &str) -> bool {
     !key.is_empty() && key.chars().all(|c| c.is_ascii_digit())
 }
 
-// ---- runner.providers.<provider>.accounts ----------------------------------------------------------------
+// ---- runner.providers.<provider>.accounts (retired) ------------------------------------------------------
 
-fn normalize_credential_source(source: &Value, label: &str) -> Result<Value, ModelError> {
-    let refuse =
-        |text: String| ModelError::provider_capacity(format!("runner config ({label}{text}"));
-    let Some(fields) = source.as_object() else {
-        return Err(refuse(") must be an object.".into()));
+/// `runner.providers.<provider>.accounts` was retired: accounts are declared in `runner.llmAccounts`. A provider that
+/// still lists accounts is refused by name. An empty list is a leftover shell and loads; `fgos doctor --fix`
+/// removes it (the config repair `remove-empty-provider-accounts`).
+pub fn refuse_retired_provider_accounts(runner: &Value, label: &str) -> Result<(), ModelError> {
+    let Some(providers) = runner.get("providers").and_then(Value::as_object) else {
+        return Ok(());
     };
-    if let Some(key) = fields
-        .keys()
-        .find(|key| !CREDENTIAL_SOURCE_KEYS.contains(&key.as_str()))
-    {
-        return Err(refuse(format!(
-            ") contains unknown key \"{key}\". Allowed keys: {}.",
-            CREDENTIAL_SOURCE_KEYS.join(", ")
-        )));
+    let messages: Vec<String> = providers
+        .iter()
+        .filter(|(_, entry)| {
+            entry
+                .get("accounts")
+                .and_then(Value::as_object)
+                .is_some_and(|accounts| !accounts.is_empty())
+        })
+        .map(|(provider, _)| {
+            format!("runner config ({label}): runner.providers.{provider}.accounts was retired; declare the accounts in runner.llmAccounts.<pool>.<account>.credentialStore instead.")
+        })
+        .collect();
+    if messages.is_empty() {
+        return Ok(());
     }
-    let kind = fields
-        .get("kind")
-        .and_then(Value::as_str)
-        .filter(|kind| ["codex-home", "home-files"].contains(kind));
-    let Some(kind) = kind else {
-        return Err(refuse(
-            ".kind) must be one of codex-home, home-files.".into(),
-        ));
-    };
-    if !fields
-        .get("home")
-        .and_then(Value::as_str)
-        .is_some_and(|home| !home.trim().is_empty())
-    {
-        return Err(refuse(".home) must be a non-empty string.".into()));
-    }
-    let mut out = Map::new();
-    out.insert("kind".into(), json!(kind));
-    out.insert("home".into(), fields["home"].clone());
-    if kind == "home-files" {
-        let files = fields
-            .get("files")
-            .and_then(Value::as_array)
-            .filter(|list| !list.is_empty());
-        let valid = files.filter(|list| {
-            list.iter().all(|file| {
-                file.as_str()
-                    .is_some_and(|f| !f.trim().is_empty() && is_inside(f))
-            })
-        });
-        let Some(files) = valid else {
-            return Err(refuse(
-                ".files) must be a non-empty list of relative paths without \"..\".".into(),
-            ));
-        };
-        out.insert("files".into(), Value::Array(files.clone()));
-    } else if fields.contains_key("files") {
-        return Err(refuse(
-            ".files) is only valid for kind \"home-files\".".into(),
-        ));
-    }
-    Ok(Value::Object(out))
-}
-
-/// The accounts `runner.providers` declares, keyed by the lease-state key of the provider, in the declared order.
-/// Each account has one login store for every CLI (`credentialSource`) or one per CLI (`credentialSources`).
-/// Refuses the config where it would split one provider across two keys or carry placement policy.
-pub fn validate_provider_account_inventory(
-    runner: &Value,
-    label: &str,
-) -> Result<Map<String, Value>, ModelError> {
-    let label_text = label;
-    let Some(providers) = runner.get("providers") else {
-        return Ok(Map::new());
-    };
-    let refuse = |text: String| ModelError::provider_capacity(text);
-    let Some(providers) = providers.as_object() else {
-        return Err(refuse(format!("runner config ({label_text}.providers) must be an object mapping provider -> {{ accounts }} when present.")));
-    };
-    let mut raw_names: Vec<(String, String)> = Vec::new();
-    let mut normalized = Map::new();
-    for (provider, entry) in providers {
-        if provider.is_empty() {
-            return Err(refuse(format!(
-                "runner config ({label_text}.providers) provider id must be a non-empty string."
-            )));
-        }
-        let canonical = legacy_state_key(provider);
-        if let Some((_, first)) = raw_names.iter().find(|(key, _)| *key == canonical) {
-            return Err(refuse(format!(
-                "runner config ({label_text}.providers) declares both \"{first}\" and \"{provider}\", which normalize to the same provider family \"{canonical}\" -- consolidate their accounts under one key."
-            )));
-        }
-        raw_names.push((canonical.clone(), provider.clone()));
-        let Some(entry_fields) = entry.as_object() else {
-            return Err(refuse(format!(
-                "runner config ({label_text}.providers.{provider}) must be an object."
-            )));
-        };
-        if let Some(key) = entry_fields.keys().find(|key| key.as_str() != "accounts") {
-            return Err(refuse(format!("runner config ({label_text}.providers.{provider}) contains unknown key \"{key}\". Slice 1 only allows: accounts.")));
-        }
-        let Some(accounts) = entry_fields.get("accounts") else {
-            continue;
-        };
-        let Some(accounts) = accounts.as_object() else {
-            return Err(refuse(format!("runner config ({label_text}.providers.{provider}.accounts) must be a keyed object, not an array.")));
-        };
-        let mut inventory = Map::new();
-        for (account_id, account) in accounts {
-            let at = format!("{label_text}.providers.{provider}.accounts");
-            if !is_safe_key(account_id) {
-                return Err(refuse(format!(
-                    "runner config ({at}) account id must be a non-empty safe key, got {}.",
-                    json!(account_id)
-                )));
-            }
-            if digits_only(account_id) {
-                return Err(refuse(format!(
-                    "runner config ({at}) account id {} is digits only; such a key sorts before the others and would break the declared account order. Add a letter.",
-                    json!(account_id)
-                )));
-            }
-            let Some(fields) = account.as_object() else {
-                return Err(refuse(format!(
-                    "runner config ({at}.{account_id}) must be an object."
-                )));
-            };
-            for key in fields.keys() {
-                if FORBIDDEN_ACCOUNT_KEYS.contains(&key.as_str()) {
-                    return Err(refuse(format!(
-                        "runner config ({at}.{account_id}) must not declare \"{key}\"; accounts may only describe credentials/capacity, not placement policy."
-                    )));
-                }
-                if !ACCOUNT_ENTRY_KEYS.contains(&key.as_str()) {
-                    return Err(refuse(format!(
-                        "runner config ({at}.{account_id}) contains unknown key \"{key}\". Allowed keys: {}.",
-                        ACCOUNT_ENTRY_KEYS.join(", ")
-                    )));
-                }
-            }
-            if fields
-                .get("label")
-                .is_some_and(|label| !label.as_str().is_some_and(|text| !text.trim().is_empty()))
-            {
-                return Err(refuse(format!("runner config ({at}.{account_id}.label) must be a non-empty string when present.")));
-            }
-            let where_ = format!("{at}.{account_id}");
-            let (single, per_cli) = (
-                fields.contains_key("credentialSource"),
-                fields.contains_key("credentialSources"),
-            );
-            if single == per_cli {
-                return Err(refuse(format!(
-                    "runner config ({where_}) must declare exactly one of \"credentialSource\" (one login store for every CLI) or \"credentialSources\" (one login store per CLI, keyed by the CLI command name)."
-                )));
-            }
-            let mut out = Map::new();
-            out.insert("id".into(), json!(account_id));
-            out.insert(
-                "label".into(),
-                fields
-                    .get("label")
-                    .cloned()
-                    .unwrap_or_else(|| json!(account_id)),
-            );
-            if single {
-                out.insert(
-                    "credentialSource".into(),
-                    normalize_credential_source(
-                        &fields["credentialSource"],
-                        &format!("{where_}.credentialSource"),
-                    )?,
-                );
-            } else {
-                let sources = fields["credentialSources"].as_object().filter(|map| !map.is_empty()).ok_or_else(|| {
-                    refuse(format!("runner config ({where_}.credentialSources) must be a non-empty object mapping a CLI command name (codex, pi, omp, agy, ...) to a credential source."))
-                })?;
-                let mut per = Map::new();
-                for (cli, source) in sources {
-                    if !is_cli_key(cli) {
-                        return Err(refuse(format!(
-                            "runner config ({where_}.credentialSources) key {} must be a CLI command name (lower-case letters, digits, \"-\" or \"_\").",
-                            json!(cli)
-                        )));
-                    }
-                    let mut normalized_source = normalize_credential_source(
-                        source,
-                        &format!("{where_}.credentialSources.{cli}"),
-                    )?;
-                    normalized_source["cli"] = json!(cli);
-                    per.insert(cli.clone(), normalized_source);
-                }
-                out.insert("credentialSources".into(), Value::Object(per));
-            }
-            inventory.insert(account_id.clone(), Value::Object(out));
-        }
-        normalized.insert(canonical, json!({ "accounts": Value::Object(inventory) }));
-    }
-    Ok(normalized)
+    Err(ModelError::coded("config-key-retired", messages.join("\n")))
 }
 
 // ---- runner.llmAccounts ----------------------------------------------------------------------------------
@@ -619,7 +426,7 @@ fn declared_store_files(runner: &Value, state_key: &str, cli: &str) -> Option<Ve
 /// credential source per CLI, in the declared order. A `codex` store is a `codex-home`; any other store is
 /// `home-files` with the files the invocations of that store declare. A store no invocation declares files for
 /// cannot be copied into a private home, so that CLI is left out of the account and named in `unusableFor`.
-fn derive_legacy_inventory(runner: &Value, machine: &dyn Machine) -> Map<String, Value> {
+pub fn provider_account_inventory(runner: &Value, machine: &dyn Machine) -> Map<String, Value> {
     let mut inventory = Map::new();
     for pool in read_llm_accounts(runner, machine).pools {
         let state_key = legacy_state_key(&pool.name);
@@ -654,19 +461,6 @@ fn derive_legacy_inventory(runner: &Value, machine: &dyn Machine) -> Map<String,
         inventory.insert(state_key, json!({ "accounts": accounts }));
     }
     inventory
-}
-
-/// The accounts the lease, probe, pin and renewal read, per state key. A pool declared in `runner.llmAccounts`
-/// supplies its own accounts; a pool it does not declare keeps reading `runner.providers.<provider>.accounts`.
-pub fn provider_account_inventory(
-    runner: &Value,
-    machine: &dyn Machine,
-) -> Result<Map<String, Value>, ModelError> {
-    let mut inventory = validate_provider_account_inventory(runner, "runner config")?;
-    if runner.get("llmAccounts").is_some() {
-        inventory.extend(derive_legacy_inventory(runner, machine));
-    }
-    Ok(inventory)
 }
 
 // ---- the account view Seat Binding ranks from -----------------------------------------------------------
@@ -743,7 +537,7 @@ pub fn account_view(
     now: u64,
     machine: &dyn Machine,
 ) -> Value {
-    let inventory = provider_account_inventory(runner, machine).unwrap_or_default();
+    let inventory = provider_account_inventory(runner, machine);
     let mut clis: Vec<&str> = Vec::new();
     let mut pools: Vec<String> = Vec::new();
     for facts in launch_view.values() {

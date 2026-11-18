@@ -333,7 +333,7 @@ properties:
             description: "Whether the account is out of rotation."
             type: boolean
   providers:
-    description: "Older account inventory by provider; read only until every release reads llmAccounts."
+    description: "Retired account inventory by provider; the accounts live in llmAccounts. Only an empty accounts list may remain, until fgos doctor --fix removes it; a provider that lists accounts is refused by name."
     type: object
     additionalProperties:
       description: "One provider."
@@ -343,23 +343,11 @@ properties:
           x-fgos-file: accounts
           x-fgos-scope: global-only
           x-fgos-sensitivity: secret-reference
-          description: "The accounts of the provider by id, in the order they are leased. Lives in the accounts file."
+          description: "Retired; declare the accounts in llmAccounts. An empty list is a leftover that fgos doctor --fix removes."
           type: object
           additionalProperties:
-            description: "One account."
+            description: "A listed account, refused by name when the runner config is checked."
             type: object
-            properties:
-              label:
-                description: "Name shown in reports."
-                type: string
-                minLength: 1
-              credentialSource:
-                $ref: "#/$defs/accountSource"
-              credentialSources:
-                description: "Login store per CLI command name."
-                type: object
-                additionalProperties:
-                  $ref: "#/$defs/accountSource"
 $defs:
   tierName:
     description: "One tier of the model ladder."
@@ -846,23 +834,6 @@ $defs:
           $ref: "#/$defs/invocation"
         minItems: 1
     required: [kind]
-  accountSource:
-    description: "Where the login of one account lives."
-    type: object
-    properties:
-      kind:
-        description: "Kind of login store."
-        type: string
-        enum: [codex-home, home-files]
-      home:
-        description: "Directory of the login store."
-        type: string
-        minLength: 1
-      files:
-        description: "Files of the login store."
-        type: array
-        items:
-          type: string
   loopBounds:
     description: "Bounds on loop parameters."
     type: object

@@ -223,18 +223,20 @@ test('checkConfinedPaneAccounts passes while some credential file of the store e
   const home = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-pane-accounts-'));
   try {
     fs.writeFileSync(path.join(home, 'auth.json'), '{}');
-    const withInventory = (source) => ({ ...paneExecutors(), providers: { openai: { accounts: { acct: { credentialSource: source } } } } });
-    assert.equal(checkConfinedPaneAccounts(withInventory({ kind: 'codex-home', home })).passed, true);
-    assert.equal(checkConfinedPaneAccounts(withInventory({ kind: 'home-files', home, files: ['auth.json'] })).passed, true);
-    const partial = checkConfinedPaneAccounts(withInventory({ kind: 'home-files', home, files: ['auth.json', 'models.json'] }));
+    // The files of a store are the ones the invocation declares; a codex store with none declared is its auth.json.
+    const withInventory = (files) => {
+      const cfg = paneExecutors();
+      for (const inv of cfg.executors.openai.invocations) if (inv.credentialStore && files) inv.credentialStore = { ...inv.credentialStore, files };
+      return { ...cfg, llmAccounts: { openai: { acct: { credentialStore: { codex: home } } } } };
+    };
+    assert.equal(checkConfinedPaneAccounts(withInventory()).passed, true);
+    assert.equal(checkConfinedPaneAccounts(withInventory(['auth.json'])).passed, true);
+    const partial = checkConfinedPaneAccounts(withInventory(['auth.json', 'models.json']));
     assert.equal(partial.passed, true, 'a store with some of its files present still logs in');
     assert.match(partial.message, /account "acct" has 1 of 2 credential file\(s\); absent: models\.json/);
-    const none = checkConfinedPaneAccounts(withInventory({ kind: 'home-files', home, files: ['models.json', 'settings.json'] }));
+    const none = checkConfinedPaneAccounts(withInventory(['models.json', 'settings.json']));
     assert.equal(none.passed, false);
     assert.match(none.message, /account "acct" has none of models\.json, settings\.json under .*nothing is copied/);
-    const invalid = checkConfinedPaneAccounts(withInventory({ kind: 'home-files', home }));
-    assert.equal(invalid.passed, false);
-    assert.match(invalid.message, /provider account inventory is invalid/);
   } finally {
     fs.rmSync(home, { recursive: true, force: true });
   }
@@ -248,7 +250,7 @@ test('checkConfinedPaneAccounts expands ~, $HOME and ${HOME} the way dispatch do
     fs.writeFileSync(path.join(fakeHome, 'creds', 'auth.json'), '{}');
     process.env.HOME = fakeHome;
     for (const prefix of ['$HOME', '${HOME}', '~']) {
-      const cfg = { ...paneExecutors(), providers: { openai: { accounts: { acct: { credentialSource: { kind: 'codex-home', home: `${prefix}/creds` } } } } } };
+      const cfg = { ...paneExecutors(), llmAccounts: { openai: { acct: { credentialStore: { codex: `${prefix}/creds` } } } } };
       assert.equal(checkConfinedPaneAccounts(cfg).passed, true, `${prefix} is the user's home`);
     }
   } finally {
@@ -257,13 +259,13 @@ test('checkConfinedPaneAccounts expands ~, $HOME and ${HOME} the way dispatch do
   }
 });
 
-test('checkConfinedPaneAccounts takes the files the invocation declares over the account list', () => {
+test('checkConfinedPaneAccounts checks the files the invocation declares for the store', () => {
   const home = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-pane-declared-'));
   try {
     fs.writeFileSync(path.join(home, 'agent.db'), '');
     const cfg = {
       executors: { openai: { providerModel: 'openai', invocations: [{ id: 'omp-bwrap', command: 'omp', credentialStore: { use: 'omp', homeEnv: 'PI_CODING_AGENT_DIR', files: ['agent.db'] } }] } },
-      providers: { openai: { accounts: { acct: { credentialSource: { kind: 'home-files', home, files: ['auth.json'] } } } } },
+      llmAccounts: { openai: { acct: { credentialStore: { omp: home } } } },
     };
     const r = checkConfinedPaneAccounts(cfg);
     assert.equal(r.passed, true, r.message);
@@ -326,8 +328,8 @@ test('the registered confined-pane-accounts check reads the global inventory fro
     const creds = path.join(home, 'creds');
     fs.mkdirSync(creds);
     const entry = DOCTOR_CHECKS.find((c) => c.id === 'confined-pane-accounts');
-    const runner = (accounts) => ({ ...paneExecutors(), providers: { openai: { accounts } } });
-    writeConfigContent(home, { runner: runner({ acct: { credentialSource: { kind: 'codex-home', home: creds } } }) });
+    const runner = (accounts) => ({ ...paneExecutors(), llmAccounts: { openai: accounts } });
+    writeConfigContent(home, { runner: runner({ acct: { credentialStore: { codex: creds } } }) });
     const missing = withHome(home, () => entry.check(home));
     assert.equal(missing.passed, false, missing.message);
     assert.match(missing.message, /account "acct" has none of auth\.json/);
@@ -363,7 +365,7 @@ test('checkConfinedPaneAccounts looks providers and accounts up by own property,
   try {
     fs.writeFileSync(path.join(home, 'auth.json'), '{}');
     // An account whose id is a prototype member name is a real account.
-    const cfg = { ...paneExecutors(), providers: { openai: { accounts: { constructor: { credentialSource: { kind: 'codex-home', home } } } } } };
+    const cfg = { ...paneExecutors(), llmAccounts: { openai: { constructor: { credentialStore: { codex: home } } } } };
     const r = checkConfinedPaneAccounts(cfg);
     assert.equal(r.passed, true, r.message);
     assert.match(r.message, /account "constructor" has its 1 credential file/);

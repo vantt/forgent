@@ -120,14 +120,6 @@ impl ModelError {
         }
     }
 
-    pub(crate) fn provider_capacity(message: String) -> Self {
-        ModelError {
-            name: "ProviderCapacityConfigError",
-            code: None,
-            message,
-        }
-    }
-
     pub(crate) fn confinement_policy(message: String) -> Self {
         ModelError {
             name: "ConfinementPolicyError",

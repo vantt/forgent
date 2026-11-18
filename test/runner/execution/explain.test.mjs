@@ -28,7 +28,6 @@ function deepseekConfig() {
         invocations: [{ id: 'pi-cli-bwrap', via: 'cli', adapter: 'cli-spawn', command: 'pi', args: ['--model', '{model}', '-p', '{prompt}'], confinement: { backend: 'bwrap' }, credentialStore: { use: 'pi', homeEnv: 'PI_CODING_AGENT_DIR', files: ['auth.json'] } }],
       },
     },
-    providers: { deepseek: { accounts: { openrouter: { credentialSource: { kind: 'home-files', home: '/srv/pi-openrouter', files: ['auth.json'] } } } } },
     llmAccounts: {
       deepseek: { direct: { credentialStore: { pi: '/srv/pi-deepseek' } } },
       'deepseek-api': { key1: { credentialStore: { pi: '/srv/pi-deepseek-api' } } },

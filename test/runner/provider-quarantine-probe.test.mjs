@@ -17,8 +17,8 @@ const PROVIDER = 'openai-codex';
 
 function setup(accountIds = ['a', 'b']) {
   const runtimeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-quarantine-probe-test-'));
-  const accounts = Object.fromEntries(accountIds.map((id) => [id, { label: id, credentialSource: { kind: 'codex-home', home: `/tmp/${id}` } }]));
-  const runnerConfig = { executor: { command: 'claude', args: ['{prompt}'] }, timeoutMs: 1000, providers: { [PROVIDER]: { accounts } } };
+  const accounts = Object.fromEntries(accountIds.map((id) => [id, { label: id, credentialStore: { codex: `/tmp/${id}` } }]));
+  const runnerConfig = { executor: { command: 'claude', args: ['{prompt}'] }, timeoutMs: 1000, llmAccounts: { openai: accounts } };
   return { runtimeDir, runnerConfig };
 }
 

@@ -105,14 +105,9 @@ test('dispatch reconcile provider-capacity clear-quarantine validates the machin
   const runtimeDir = path.join(dir, 'runtime');
   const runnerConfig = {
     runner: {
-      providers: {
-        'openai-codex': {
-          accounts: {
-            tetnu: {
-              label: 'Tetnu',
-              credentialSource: { kind: 'codex-home', home: path.join(dir, 'codex-tetnu') },
-            },
-          },
+      llmAccounts: {
+        openai: {
+          tetnu: { label: 'Tetnu', credentialStore: { codex: path.join(dir, 'codex-tetnu') } },
         },
       },
     },

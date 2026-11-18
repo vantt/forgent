@@ -994,7 +994,7 @@
   {
    "name": "accountQuarantine: an account with no lease state is not quarantined",
    "fact": "accountQuarantine",
-   "runner": {"executors":{"openai":{"kind":"agent","providerModel":"openai","invocations":[{"id":"codex-cli-bwrap","via":"cli","adapter":"cli-spawn","command":"codex","credentialStore":{"use":"codex","homeEnv":"CODEX_HOME"},"confinement":{"backend":"bwrap"}},{"id":"pi-herdr-bwrap","via":"cli","adapter":"herdr-spawn","command":"pi","credentialStore":{"use":"pi","homeEnv":"PI_CODING_AGENT_DIR","sessionDir":"sessions","files":["auth.json"]},"confinement":{"backend":"bwrap"}},{"id":"codex-herdr-bwrap","via":"cli","adapter":"herdr-spawn","command":"codex","credentialStore":{"use":"codex","homeEnv":"CODEX_HOME"},"confinement":{"backend":"bwrap"}},{"id":"pi-cli-bwrap","via":"cli","adapter":"cli-spawn","command":"pi","credentialStore":{"use":"pi","homeEnv":"PI_CODING_AGENT_DIR","sessionDir":"sessions","files":["auth.json"]},"confinement":{"backend":"bwrap"}}]}},"providers":{"openai-codex":{"accounts":{"work":{"credentialSources":{"codex":{"kind":"codex-home","home":"/home/vector/.codex-work"}}},"spare":{"credentialSources":{"codex":{"kind":"codex-home","home":"/home/vector/.codex-spare"}}}}}}},
+   "runner": {"executors":{"openai":{"kind":"agent","providerModel":"openai","invocations":[{"id":"codex-cli-bwrap","via":"cli","adapter":"cli-spawn","command":"codex","credentialStore":{"use":"codex","homeEnv":"CODEX_HOME"},"confinement":{"backend":"bwrap"}},{"id":"pi-herdr-bwrap","via":"cli","adapter":"herdr-spawn","command":"pi","credentialStore":{"use":"pi","homeEnv":"PI_CODING_AGENT_DIR","sessionDir":"sessions","files":["auth.json"]},"confinement":{"backend":"bwrap"}},{"id":"codex-herdr-bwrap","via":"cli","adapter":"herdr-spawn","command":"codex","credentialStore":{"use":"codex","homeEnv":"CODEX_HOME"},"confinement":{"backend":"bwrap"}},{"id":"pi-cli-bwrap","via":"cli","adapter":"cli-spawn","command":"pi","credentialStore":{"use":"pi","homeEnv":"PI_CODING_AGENT_DIR","sessionDir":"sessions","files":["auth.json"]},"confinement":{"backend":"bwrap"}}]}},"llmAccounts":{"openai":{"work":{"credentialStore":{"codex":"/home/vector/.codex-work"}},"spare":{"credentialStore":{"codex":"/home/vector/.codex-spare"}}}}},
    "machine": {},
    "args": {"account":{"pool":"openai","id":"work"},"now":1800000000000},
    "expect": null
@@ -1002,7 +1002,7 @@
   {
    "name": "accountQuarantine: an account quarantined until a time in the future gives that time",
    "fact": "accountQuarantine",
-   "runner": {"executors":{"openai":{"kind":"agent","providerModel":"openai","invocations":[{"id":"codex-cli-bwrap","via":"cli","adapter":"cli-spawn","command":"codex","credentialStore":{"use":"codex","homeEnv":"CODEX_HOME"},"confinement":{"backend":"bwrap"}},{"id":"pi-herdr-bwrap","via":"cli","adapter":"herdr-spawn","command":"pi","credentialStore":{"use":"pi","homeEnv":"PI_CODING_AGENT_DIR","sessionDir":"sessions","files":["auth.json"]},"confinement":{"backend":"bwrap"}},{"id":"codex-herdr-bwrap","via":"cli","adapter":"herdr-spawn","command":"codex","credentialStore":{"use":"codex","homeEnv":"CODEX_HOME"},"confinement":{"backend":"bwrap"}},{"id":"pi-cli-bwrap","via":"cli","adapter":"cli-spawn","command":"pi","credentialStore":{"use":"pi","homeEnv":"PI_CODING_AGENT_DIR","sessionDir":"sessions","files":["auth.json"]},"confinement":{"backend":"bwrap"}}]}},"providers":{"openai-codex":{"accounts":{"work":{"credentialSources":{"codex":{"kind":"codex-home","home":"/home/vector/.codex-work"}}},"spare":{"credentialSources":{"codex":{"kind":"codex-home","home":"/home/vector/.codex-spare"}}}}}}},
+   "runner": {"executors":{"openai":{"kind":"agent","providerModel":"openai","invocations":[{"id":"codex-cli-bwrap","via":"cli","adapter":"cli-spawn","command":"codex","credentialStore":{"use":"codex","homeEnv":"CODEX_HOME"},"confinement":{"backend":"bwrap"}},{"id":"pi-herdr-bwrap","via":"cli","adapter":"herdr-spawn","command":"pi","credentialStore":{"use":"pi","homeEnv":"PI_CODING_AGENT_DIR","sessionDir":"sessions","files":["auth.json"]},"confinement":{"backend":"bwrap"}},{"id":"codex-herdr-bwrap","via":"cli","adapter":"herdr-spawn","command":"codex","credentialStore":{"use":"codex","homeEnv":"CODEX_HOME"},"confinement":{"backend":"bwrap"}},{"id":"pi-cli-bwrap","via":"cli","adapter":"cli-spawn","command":"pi","credentialStore":{"use":"pi","homeEnv":"PI_CODING_AGENT_DIR","sessionDir":"sessions","files":["auth.json"]},"confinement":{"backend":"bwrap"}}]}},"llmAccounts":{"openai":{"work":{"credentialStore":{"codex":"/home/vector/.codex-work"}},"spare":{"credentialStore":{"codex":"/home/vector/.codex-spare"}}}}},
    "machine": {"accountState":{"providers":{"openai-codex":{"accounts":{"work":{"quarantine":{"kind":"timed","until":"2027-01-15T09:00:00.000Z","reasonCode":"quota-limit","resetKnown":true}}}}}}},
    "args": {"account":{"pool":"openai","id":"work"},"now":1800000000000},
    "leaseRead": {"openai-codex":{"work":{"sticky":false,"quarantinedUntil":1800003600000,"probeable":false,"probeFailed":false}}},
@@ -1011,7 +1011,7 @@
   {
    "name": "accountQuarantine: a quarantine that has passed is no quarantine",
    "fact": "accountQuarantine",
-   "runner": {"executors":{"openai":{"kind":"agent","providerModel":"openai","invocations":[{"id":"codex-cli-bwrap","via":"cli","adapter":"cli-spawn","command":"codex","credentialStore":{"use":"codex","homeEnv":"CODEX_HOME"},"confinement":{"backend":"bwrap"}},{"id":"pi-herdr-bwrap","via":"cli","adapter":"herdr-spawn","command":"pi","credentialStore":{"use":"pi","homeEnv":"PI_CODING_AGENT_DIR","sessionDir":"sessions","files":["auth.json"]},"confinement":{"backend":"bwrap"}},{"id":"codex-herdr-bwrap","via":"cli","adapter":"herdr-spawn","command":"codex","credentialStore":{"use":"codex","homeEnv":"CODEX_HOME"},"confinement":{"backend":"bwrap"}},{"id":"pi-cli-bwrap","via":"cli","adapter":"cli-spawn","command":"pi","credentialStore":{"use":"pi","homeEnv":"PI_CODING_AGENT_DIR","sessionDir":"sessions","files":["auth.json"]},"confinement":{"backend":"bwrap"}}]}},"providers":{"openai-codex":{"accounts":{"work":{"credentialSources":{"codex":{"kind":"codex-home","home":"/home/vector/.codex-work"}}},"spare":{"credentialSources":{"codex":{"kind":"codex-home","home":"/home/vector/.codex-spare"}}}}}}},
+   "runner": {"executors":{"openai":{"kind":"agent","providerModel":"openai","invocations":[{"id":"codex-cli-bwrap","via":"cli","adapter":"cli-spawn","command":"codex","credentialStore":{"use":"codex","homeEnv":"CODEX_HOME"},"confinement":{"backend":"bwrap"}},{"id":"pi-herdr-bwrap","via":"cli","adapter":"herdr-spawn","command":"pi","credentialStore":{"use":"pi","homeEnv":"PI_CODING_AGENT_DIR","sessionDir":"sessions","files":["auth.json"]},"confinement":{"backend":"bwrap"}},{"id":"codex-herdr-bwrap","via":"cli","adapter":"herdr-spawn","command":"codex","credentialStore":{"use":"codex","homeEnv":"CODEX_HOME"},"confinement":{"backend":"bwrap"}},{"id":"pi-cli-bwrap","via":"cli","adapter":"cli-spawn","command":"pi","credentialStore":{"use":"pi","homeEnv":"PI_CODING_AGENT_DIR","sessionDir":"sessions","files":["auth.json"]},"confinement":{"backend":"bwrap"}}]}},"llmAccounts":{"openai":{"work":{"credentialStore":{"codex":"/home/vector/.codex-work"}},"spare":{"credentialStore":{"codex":"/home/vector/.codex-spare"}}}}},
    "machine": {"accountState":{"providers":{"openai-codex":{"accounts":{"work":{"quarantine":{"kind":"timed","until":"2027-01-15T07:59:59.000Z","reasonCode":"quota-limit","resetKnown":true}}}}}}},
    "args": {"account":{"pool":"openai","id":"work"},"now":1800000000000},
    "leaseRead": {"openai-codex":{"work":{"sticky":false,"quarantinedUntil":1799999999000,"probeable":false,"probeFailed":false}}},
@@ -1020,7 +1020,7 @@
   {
    "name": "accountQuarantine: a quarantine only a person clears holds until the largest safe integer while a sibling account is healthy",
    "fact": "accountQuarantine",
-   "runner": {"executors":{"openai":{"kind":"agent","providerModel":"openai","invocations":[{"id":"codex-cli-bwrap","via":"cli","adapter":"cli-spawn","command":"codex","credentialStore":{"use":"codex","homeEnv":"CODEX_HOME"},"confinement":{"backend":"bwrap"}},{"id":"pi-herdr-bwrap","via":"cli","adapter":"herdr-spawn","command":"pi","credentialStore":{"use":"pi","homeEnv":"PI_CODING_AGENT_DIR","sessionDir":"sessions","files":["auth.json"]},"confinement":{"backend":"bwrap"}},{"id":"codex-herdr-bwrap","via":"cli","adapter":"herdr-spawn","command":"codex","credentialStore":{"use":"codex","homeEnv":"CODEX_HOME"},"confinement":{"backend":"bwrap"}},{"id":"pi-cli-bwrap","via":"cli","adapter":"cli-spawn","command":"pi","credentialStore":{"use":"pi","homeEnv":"PI_CODING_AGENT_DIR","sessionDir":"sessions","files":["auth.json"]},"confinement":{"backend":"bwrap"}}]}},"providers":{"openai-codex":{"accounts":{"work":{"credentialSources":{"codex":{"kind":"codex-home","home":"/home/vector/.codex-work"}}},"spare":{"credentialSources":{"codex":{"kind":"codex-home","home":"/home/vector/.codex-spare"}}}}}}},
+   "runner": {"executors":{"openai":{"kind":"agent","providerModel":"openai","invocations":[{"id":"codex-cli-bwrap","via":"cli","adapter":"cli-spawn","command":"codex","credentialStore":{"use":"codex","homeEnv":"CODEX_HOME"},"confinement":{"backend":"bwrap"}},{"id":"pi-herdr-bwrap","via":"cli","adapter":"herdr-spawn","command":"pi","credentialStore":{"use":"pi","homeEnv":"PI_CODING_AGENT_DIR","sessionDir":"sessions","files":["auth.json"]},"confinement":{"backend":"bwrap"}},{"id":"codex-herdr-bwrap","via":"cli","adapter":"herdr-spawn","command":"codex","credentialStore":{"use":"codex","homeEnv":"CODEX_HOME"},"confinement":{"backend":"bwrap"}},{"id":"pi-cli-bwrap","via":"cli","adapter":"cli-spawn","command":"pi","credentialStore":{"use":"pi","homeEnv":"PI_CODING_AGENT_DIR","sessionDir":"sessions","files":["auth.json"]},"confinement":{"backend":"bwrap"}}]}},"llmAccounts":{"openai":{"work":{"credentialStore":{"codex":"/home/vector/.codex-work"}},"spare":{"credentialStore":{"codex":"/home/vector/.codex-spare"}}}}},
    "machine": {"accountState":{"providers":{"openai-codex":{"accounts":{"work":{"quarantine":{"kind":"manual-clear","reasonCode":"auth-token"}}}}}}},
    "args": {"account":{"pool":"openai","id":"work"},"now":1800000000000},
    "leaseRead": {"openai-codex":{"work":{"sticky":false,"quarantinedUntil":9007199254740991,"probeable":true,"probeFailed":false}}},
@@ -1029,7 +1029,7 @@
   {
    "name": "accountQuarantine: a quota lock whose end fgOS guessed is liftable by one real call when no account of the pool is healthy",
    "fact": "accountQuarantine",
-   "runner": {"executors":{"openai":{"kind":"agent","providerModel":"openai","invocations":[{"id":"codex-cli-bwrap","via":"cli","adapter":"cli-spawn","command":"codex","credentialStore":{"use":"codex","homeEnv":"CODEX_HOME"},"confinement":{"backend":"bwrap"}},{"id":"pi-herdr-bwrap","via":"cli","adapter":"herdr-spawn","command":"pi","credentialStore":{"use":"pi","homeEnv":"PI_CODING_AGENT_DIR","sessionDir":"sessions","files":["auth.json"]},"confinement":{"backend":"bwrap"}},{"id":"codex-herdr-bwrap","via":"cli","adapter":"herdr-spawn","command":"codex","credentialStore":{"use":"codex","homeEnv":"CODEX_HOME"},"confinement":{"backend":"bwrap"}},{"id":"pi-cli-bwrap","via":"cli","adapter":"cli-spawn","command":"pi","credentialStore":{"use":"pi","homeEnv":"PI_CODING_AGENT_DIR","sessionDir":"sessions","files":["auth.json"]},"confinement":{"backend":"bwrap"}}]}},"providers":{"openai-codex":{"accounts":{"work":{"credentialSources":{"codex":{"kind":"codex-home","home":"/home/vector/.codex-work"}}},"spare":{"credentialSources":{"codex":{"kind":"codex-home","home":"/home/vector/.codex-spare"}}}}}}},
+   "runner": {"executors":{"openai":{"kind":"agent","providerModel":"openai","invocations":[{"id":"codex-cli-bwrap","via":"cli","adapter":"cli-spawn","command":"codex","credentialStore":{"use":"codex","homeEnv":"CODEX_HOME"},"confinement":{"backend":"bwrap"}},{"id":"pi-herdr-bwrap","via":"cli","adapter":"herdr-spawn","command":"pi","credentialStore":{"use":"pi","homeEnv":"PI_CODING_AGENT_DIR","sessionDir":"sessions","files":["auth.json"]},"confinement":{"backend":"bwrap"}},{"id":"codex-herdr-bwrap","via":"cli","adapter":"herdr-spawn","command":"codex","credentialStore":{"use":"codex","homeEnv":"CODEX_HOME"},"confinement":{"backend":"bwrap"}},{"id":"pi-cli-bwrap","via":"cli","adapter":"cli-spawn","command":"pi","credentialStore":{"use":"pi","homeEnv":"PI_CODING_AGENT_DIR","sessionDir":"sessions","files":["auth.json"]},"confinement":{"backend":"bwrap"}}]}},"llmAccounts":{"openai":{"work":{"credentialStore":{"codex":"/home/vector/.codex-work"}},"spare":{"credentialStore":{"codex":"/home/vector/.codex-spare"}}}}},
    "machine": {"accountState":{"providers":{"openai-codex":{"accounts":{"work":{"quarantine":{"kind":"timed","until":"2027-01-15T09:00:00.000Z","reasonCode":"quota-limit","resetKnown":false}},"spare":{"quarantine":{"kind":"timed","until":"2027-01-15T09:00:00.000Z","reasonCode":"quota-limit","resetKnown":false}}}}}}},
    "args": {"account":{"pool":"openai","id":"work"},"now":1800000000000},
    "leaseRead": {"openai-codex":{"work":{"sticky":false,"quarantinedUntil":1800003600000,"probeable":true,"probeFailed":false},"spare":{"sticky":false,"quarantinedUntil":1800003600000,"probeable":true,"probeFailed":false}}},
@@ -1038,7 +1038,7 @@
   {
    "name": "accountQuarantine: a quota lock whose end fgOS guessed stays quarantined while another account of the pool is healthy",
    "fact": "accountQuarantine",
-   "runner": {"executors":{"openai":{"kind":"agent","providerModel":"openai","invocations":[{"id":"codex-cli-bwrap","via":"cli","adapter":"cli-spawn","command":"codex","credentialStore":{"use":"codex","homeEnv":"CODEX_HOME"},"confinement":{"backend":"bwrap"}},{"id":"pi-herdr-bwrap","via":"cli","adapter":"herdr-spawn","command":"pi","credentialStore":{"use":"pi","homeEnv":"PI_CODING_AGENT_DIR","sessionDir":"sessions","files":["auth.json"]},"confinement":{"backend":"bwrap"}},{"id":"codex-herdr-bwrap","via":"cli","adapter":"herdr-spawn","command":"codex","credentialStore":{"use":"codex","homeEnv":"CODEX_HOME"},"confinement":{"backend":"bwrap"}},{"id":"pi-cli-bwrap","via":"cli","adapter":"cli-spawn","command":"pi","credentialStore":{"use":"pi","homeEnv":"PI_CODING_AGENT_DIR","sessionDir":"sessions","files":["auth.json"]},"confinement":{"backend":"bwrap"}}]}},"providers":{"openai-codex":{"accounts":{"work":{"credentialSources":{"codex":{"kind":"codex-home","home":"/home/vector/.codex-work"}}},"spare":{"credentialSources":{"codex":{"kind":"codex-home","home":"/home/vector/.codex-spare"}}}}}}},
+   "runner": {"executors":{"openai":{"kind":"agent","providerModel":"openai","invocations":[{"id":"codex-cli-bwrap","via":"cli","adapter":"cli-spawn","command":"codex","credentialStore":{"use":"codex","homeEnv":"CODEX_HOME"},"confinement":{"backend":"bwrap"}},{"id":"pi-herdr-bwrap","via":"cli","adapter":"herdr-spawn","command":"pi","credentialStore":{"use":"pi","homeEnv":"PI_CODING_AGENT_DIR","sessionDir":"sessions","files":["auth.json"]},"confinement":{"backend":"bwrap"}},{"id":"codex-herdr-bwrap","via":"cli","adapter":"herdr-spawn","command":"codex","credentialStore":{"use":"codex","homeEnv":"CODEX_HOME"},"confinement":{"backend":"bwrap"}},{"id":"pi-cli-bwrap","via":"cli","adapter":"cli-spawn","command":"pi","credentialStore":{"use":"pi","homeEnv":"PI_CODING_AGENT_DIR","sessionDir":"sessions","files":["auth.json"]},"confinement":{"backend":"bwrap"}}]}},"llmAccounts":{"openai":{"work":{"credentialStore":{"codex":"/home/vector/.codex-work"}},"spare":{"credentialStore":{"codex":"/home/vector/.codex-spare"}}}}},
    "machine": {"accountState":{"providers":{"openai-codex":{"accounts":{"work":{"quarantine":{"kind":"timed","until":"2027-01-15T09:00:00.000Z","reasonCode":"quota-limit","resetKnown":false}}}}}}},
    "args": {"account":{"pool":"openai","id":"work"},"now":1800000000000},
    "leaseRead": {"openai-codex":{"work":{"sticky":false,"quarantinedUntil":1800003600000,"probeable":true,"probeFailed":false}}},
@@ -1047,7 +1047,7 @@
   {
    "name": "accountQuarantine: a dead login is liftable by one real call when no account of the pool is healthy, so it reads as not quarantined",
    "fact": "accountQuarantine",
-   "runner": {"executors":{"openai":{"kind":"agent","providerModel":"openai","invocations":[{"id":"codex-cli-bwrap","via":"cli","adapter":"cli-spawn","command":"codex","credentialStore":{"use":"codex","homeEnv":"CODEX_HOME"},"confinement":{"backend":"bwrap"}},{"id":"pi-herdr-bwrap","via":"cli","adapter":"herdr-spawn","command":"pi","credentialStore":{"use":"pi","homeEnv":"PI_CODING_AGENT_DIR","sessionDir":"sessions","files":["auth.json"]},"confinement":{"backend":"bwrap"}},{"id":"codex-herdr-bwrap","via":"cli","adapter":"herdr-spawn","command":"codex","credentialStore":{"use":"codex","homeEnv":"CODEX_HOME"},"confinement":{"backend":"bwrap"}},{"id":"pi-cli-bwrap","via":"cli","adapter":"cli-spawn","command":"pi","credentialStore":{"use":"pi","homeEnv":"PI_CODING_AGENT_DIR","sessionDir":"sessions","files":["auth.json"]},"confinement":{"backend":"bwrap"}}]}},"providers":{"openai-codex":{"accounts":{"work":{"credentialSources":{"codex":{"kind":"codex-home","home":"/home/vector/.codex-work"}}},"spare":{"credentialSources":{"codex":{"kind":"codex-home","home":"/home/vector/.codex-spare"}}}}}}},
+   "runner": {"executors":{"openai":{"kind":"agent","providerModel":"openai","invocations":[{"id":"codex-cli-bwrap","via":"cli","adapter":"cli-spawn","command":"codex","credentialStore":{"use":"codex","homeEnv":"CODEX_HOME"},"confinement":{"backend":"bwrap"}},{"id":"pi-herdr-bwrap","via":"cli","adapter":"herdr-spawn","command":"pi","credentialStore":{"use":"pi","homeEnv":"PI_CODING_AGENT_DIR","sessionDir":"sessions","files":["auth.json"]},"confinement":{"backend":"bwrap"}},{"id":"codex-herdr-bwrap","via":"cli","adapter":"herdr-spawn","command":"codex","credentialStore":{"use":"codex","homeEnv":"CODEX_HOME"},"confinement":{"backend":"bwrap"}},{"id":"pi-cli-bwrap","via":"cli","adapter":"cli-spawn","command":"pi","credentialStore":{"use":"pi","homeEnv":"PI_CODING_AGENT_DIR","sessionDir":"sessions","files":["auth.json"]},"confinement":{"backend":"bwrap"}}]}},"llmAccounts":{"openai":{"work":{"credentialStore":{"codex":"/home/vector/.codex-work"}},"spare":{"credentialStore":{"codex":"/home/vector/.codex-spare"}}}}},
    "machine": {"accountState":{"providers":{"openai-codex":{"accounts":{"work":{"quarantine":{"kind":"manual-clear","reasonCode":"auth-token"}},"spare":{"quarantine":{"kind":"manual-clear","reasonCode":"auth-token","probe":{"status":"failed","attemptedAt":"2027-01-15T05:13:20.000Z"}}}}}}}},
    "args": {"account":{"pool":"openai","id":"work"},"now":1800000000000},
    "leaseRead": {"openai-codex":{"work":{"sticky":false,"quarantinedUntil":9007199254740991,"probeable":true,"probeFailed":false},"spare":{"sticky":false,"quarantinedUntil":9007199254740991,"probeable":true,"probeFailed":true}}},
@@ -1056,7 +1056,7 @@
   {
    "name": "accountQuarantine: an account the inventory does not list gives none",
    "fact": "accountQuarantine",
-   "runner": {"executors":{"openai":{"kind":"agent","providerModel":"openai","invocations":[{"id":"codex-cli-bwrap","via":"cli","adapter":"cli-spawn","command":"codex","credentialStore":{"use":"codex","homeEnv":"CODEX_HOME"},"confinement":{"backend":"bwrap"}},{"id":"pi-herdr-bwrap","via":"cli","adapter":"herdr-spawn","command":"pi","credentialStore":{"use":"pi","homeEnv":"PI_CODING_AGENT_DIR","sessionDir":"sessions","files":["auth.json"]},"confinement":{"backend":"bwrap"}},{"id":"codex-herdr-bwrap","via":"cli","adapter":"herdr-spawn","command":"codex","credentialStore":{"use":"codex","homeEnv":"CODEX_HOME"},"confinement":{"backend":"bwrap"}},{"id":"pi-cli-bwrap","via":"cli","adapter":"cli-spawn","command":"pi","credentialStore":{"use":"pi","homeEnv":"PI_CODING_AGENT_DIR","sessionDir":"sessions","files":["auth.json"]},"confinement":{"backend":"bwrap"}}]}},"providers":{"openai-codex":{"accounts":{"work":{"credentialSources":{"codex":{"kind":"codex-home","home":"/home/vector/.codex-work"}}},"spare":{"credentialSources":{"codex":{"kind":"codex-home","home":"/home/vector/.codex-spare"}}}}}}},
+   "runner": {"executors":{"openai":{"kind":"agent","providerModel":"openai","invocations":[{"id":"codex-cli-bwrap","via":"cli","adapter":"cli-spawn","command":"codex","credentialStore":{"use":"codex","homeEnv":"CODEX_HOME"},"confinement":{"backend":"bwrap"}},{"id":"pi-herdr-bwrap","via":"cli","adapter":"herdr-spawn","command":"pi","credentialStore":{"use":"pi","homeEnv":"PI_CODING_AGENT_DIR","sessionDir":"sessions","files":["auth.json"]},"confinement":{"backend":"bwrap"}},{"id":"codex-herdr-bwrap","via":"cli","adapter":"herdr-spawn","command":"codex","credentialStore":{"use":"codex","homeEnv":"CODEX_HOME"},"confinement":{"backend":"bwrap"}},{"id":"pi-cli-bwrap","via":"cli","adapter":"cli-spawn","command":"pi","credentialStore":{"use":"pi","homeEnv":"PI_CODING_AGENT_DIR","sessionDir":"sessions","files":["auth.json"]},"confinement":{"backend":"bwrap"}}]}},"llmAccounts":{"openai":{"work":{"credentialStore":{"codex":"/home/vector/.codex-work"}},"spare":{"credentialStore":{"codex":"/home/vector/.codex-spare"}}}}},
    "machine": {},
    "args": {"account":{"pool":"openai","id":"ghost"},"now":1800000000000},
    "expect": null
@@ -1069,60 +1069,11 @@
    "expect": {}
   },
   {
-   "name": "accountInventory: an account with one login store for every CLI",
+   "name": "accountInventory: llmAccounts supply the pools of the inventory",
    "fact": "accountInventory",
-   "runner": {"providers":{"openai":{"accounts":{"work":{"credentialSource":{"kind":"codex-home","home":"/h/codex-work"}}}}}},
+   "runner": {"executors":{"openai":{"kind":"agent","providerModel":"openai","invocations":[{"id":"codex-cli-bwrap","via":"cli","adapter":"cli-spawn","command":"codex","credentialStore":{"use":"codex","homeEnv":"CODEX_HOME"},"confinement":{"backend":"bwrap"}},{"id":"pi-herdr-bwrap","via":"cli","adapter":"herdr-spawn","command":"pi","credentialStore":{"use":"pi","homeEnv":"PI_CODING_AGENT_DIR","sessionDir":"sessions","files":["auth.json"]},"confinement":{"backend":"bwrap"}},{"id":"codex-herdr-bwrap","via":"cli","adapter":"herdr-spawn","command":"codex","credentialStore":{"use":"codex","homeEnv":"CODEX_HOME"},"confinement":{"backend":"bwrap"}},{"id":"pi-cli-bwrap","via":"cli","adapter":"cli-spawn","command":"pi","credentialStore":{"use":"pi","homeEnv":"PI_CODING_AGENT_DIR","sessionDir":"sessions","files":["auth.json"]},"confinement":{"backend":"bwrap"}}]}},"llmAccounts":{"openai":{"fresh":{"credentialStore":{"codex":"${HOME}/.codex-fresh","pi":"~/.pi-fresh"},"label":"Fresh"},"off":{"credentialStore":{"codex":"/abs/off"},"disabled":true}}}},
    "machine": {"home":"/home/vector"},
-   "expect": {"openai-codex":{"accounts":{"work":{"id":"work","label":"work","credentialSource":{"kind":"codex-home","home":"/h/codex-work"}}}}}
-  },
-  {
-   "name": "accountInventory: an account with a store per CLI, keyed by the CLI command name",
-   "fact": "accountInventory",
-   "runner": {"providers":{"gemini":{"accounts":{"a":{"label":"Primary","credentialSources":{"agy":{"kind":"home-files","home":"/h/agy","files":["auth.json"]},"pi":{"kind":"home-files","home":"/h/pi","files":["auth.json"]}}}}}}},
-   "machine": {"home":"/home/vector"},
-   "expect": {"gemini":{"accounts":{"a":{"id":"a","label":"Primary","credentialSources":{"agy":{"kind":"home-files","home":"/h/agy","files":["auth.json"],"cli":"agy"},"pi":{"kind":"home-files","home":"/h/pi","files":["auth.json"],"cli":"pi"}}}}}}
-  },
-  {
-   "name": "accountInventory: the openai and openai-codex spellings are one provider and may not both be declared",
-   "fact": "accountInventory",
-   "runner": {"providers":{"openai":{"accounts":{}},"openai-codex":{"accounts":{}}}},
-   "machine": {"home":"/home/vector"},
-   "expect": {"error":{"name":"ProviderCapacityConfigError","message":"runner config (runner config.providers) declares both \"openai\" and \"openai-codex\", which normalize to the same provider family \"openai-codex\" -- consolidate their accounts under one key."}}
-  },
-  {
-   "name": "accountInventory: an account must declare exactly one of credentialSource and credentialSources",
-   "fact": "accountInventory",
-   "runner": {"providers":{"openai":{"accounts":{"a":{"credentialSource":{"kind":"codex-home","home":"/h/a"},"credentialSources":{"codex":{"kind":"codex-home","home":"/h/a"}}}}}}},
-   "machine": {"home":"/home/vector"},
-   "expect": {"error":{"name":"ProviderCapacityConfigError","message":"runner config (runner config.providers.openai.accounts.a) must declare exactly one of \"credentialSource\" (one login store for every CLI) or \"credentialSources\" (one login store per CLI, keyed by the CLI command name)."}}
-  },
-  {
-   "name": "accountInventory: an account may not carry placement policy",
-   "fact": "accountInventory",
-   "runner": {"providers":{"openai":{"accounts":{"a":{"credentialSource":{"kind":"codex-home","home":"/h/a"},"tier":"flagship"}}}}},
-   "machine": {"home":"/home/vector"},
-   "expect": {"error":{"name":"ProviderCapacityConfigError","message":"runner config (runner config.providers.openai.accounts.a) contains unknown key \"tier\". Allowed keys: label, credentialSource, credentialSources."}}
-  },
-  {
-   "name": "accountInventory: a digits-only account id is refused for the order it would break",
-   "fact": "accountInventory",
-   "runner": {"providers":{"openai":{"accounts":{"12":{"credentialSource":{"kind":"codex-home","home":"/h/a"}}}}}},
-   "machine": {"home":"/home/vector"},
-   "expect": {"error":{"name":"ProviderCapacityConfigError","message":"runner config (runner config.providers.openai.accounts) account id \"12\" is digits only; such a key sorts before the others and would break the declared account order. Add a letter."}}
-  },
-  {
-   "name": "accountInventory: a home-files source needs a relative file list",
-   "fact": "accountInventory",
-   "runner": {"providers":{"openai":{"accounts":{"a":{"credentialSource":{"kind":"home-files","home":"/h/a","files":["/abs"]}}}}}},
-   "machine": {"home":"/home/vector"},
-   "expect": {"error":{"name":"ProviderCapacityConfigError","message":"runner config (runner config.providers.openai.accounts.a.credentialSource.files) must be a non-empty list of relative paths without \"..\"."}}
-  },
-  {
-   "name": "accountInventory: llmAccounts supply a pool and replace the same pool of providers",
-   "fact": "accountInventory",
-   "runner": {"executors":{"openai":{"kind":"agent","providerModel":"openai","invocations":[{"id":"codex-cli-bwrap","via":"cli","adapter":"cli-spawn","command":"codex","credentialStore":{"use":"codex","homeEnv":"CODEX_HOME"},"confinement":{"backend":"bwrap"}},{"id":"pi-herdr-bwrap","via":"cli","adapter":"herdr-spawn","command":"pi","credentialStore":{"use":"pi","homeEnv":"PI_CODING_AGENT_DIR","sessionDir":"sessions","files":["auth.json"]},"confinement":{"backend":"bwrap"}},{"id":"codex-herdr-bwrap","via":"cli","adapter":"herdr-spawn","command":"codex","credentialStore":{"use":"codex","homeEnv":"CODEX_HOME"},"confinement":{"backend":"bwrap"}},{"id":"pi-cli-bwrap","via":"cli","adapter":"cli-spawn","command":"pi","credentialStore":{"use":"pi","homeEnv":"PI_CODING_AGENT_DIR","sessionDir":"sessions","files":["auth.json"]},"confinement":{"backend":"bwrap"}}]}},"providers":{"openai":{"accounts":{"old":{"credentialSource":{"kind":"codex-home","home":"/h/old"}}}},"gemini":{"accounts":{"legacy":{"credentialSource":{"kind":"codex-home","home":"/h/legacy"}}}}},"llmAccounts":{"openai":{"fresh":{"credentialStore":{"codex":"${HOME}/.codex-fresh","pi":"~/.pi-fresh"},"label":"Fresh"},"off":{"credentialStore":{"codex":"/abs/off"},"disabled":true}}}},
-   "machine": {"home":"/home/vector"},
-   "expect": {"openai-codex":{"accounts":{"fresh":{"id":"fresh","label":"Fresh","disabled":false,"credentialSources":{"codex":{"kind":"codex-home","home":"/home/vector/.codex-fresh","cli":"codex"},"pi":{"kind":"home-files","home":"/home/vector/.pi-fresh","files":["auth.json"],"cli":"pi"}}},"off":{"id":"off","label":"off","disabled":true,"credentialSources":{"codex":{"kind":"codex-home","home":"/abs/off","cli":"codex"}}}}},"gemini":{"accounts":{"legacy":{"id":"legacy","label":"legacy","credentialSource":{"kind":"codex-home","home":"/h/legacy"}}}}}
+   "expect": {"openai-codex":{"accounts":{"fresh":{"id":"fresh","label":"Fresh","disabled":false,"credentialSources":{"codex":{"kind":"codex-home","home":"/home/vector/.codex-fresh","cli":"codex"},"pi":{"kind":"home-files","home":"/home/vector/.pi-fresh","files":["auth.json"],"cli":"pi"}}},"off":{"id":"off","label":"off","disabled":true,"credentialSources":{"codex":{"kind":"codex-home","home":"/abs/off","cli":"codex"}}}}}}
   },
   {
    "name": "accountInventory: a store no invocation declares files for is left out of the account and named unusable",
@@ -1141,9 +1092,9 @@
   {
    "name": "accountInventory: the account order is the declared order",
    "fact": "accountInventory",
-   "runner": {"providers":{"openai":{"accounts":{"b":{"credentialSource":{"kind":"codex-home","home":"/h/b"}},"a":{"credentialSource":{"kind":"codex-home","home":"/h/a"}}}}}},
+   "runner": {"llmAccounts":{"openai":{"b":{"credentialStore":{"codex":"/h/b"}},"a":{"credentialStore":{"codex":"/h/a"}}}}},
    "machine": {"home":"/home/vector"},
-   "expect": {"openai-codex":{"accounts":{"b":{"id":"b","label":"b","credentialSource":{"kind":"codex-home","home":"/h/b"}},"a":{"id":"a","label":"a","credentialSource":{"kind":"codex-home","home":"/h/a"}}}}}
+   "expect": {"openai-codex":{"accounts":{"b":{"id":"b","label":"b","disabled":false,"credentialSources":{"codex":{"kind":"codex-home","home":"/h/b","cli":"codex"}}},"a":{"id":"a","label":"a","disabled":false,"credentialSources":{"codex":{"kind":"codex-home","home":"/h/a","cli":"codex"}}}}}}
   },
   {
    "name": "llmAccounts: no inventory is no pools and no problems",
@@ -1652,10 +1603,10 @@
    "expect": {"error":{"name":"ConfinementBackendRegistryError","message":"runner config (vector runner) cannot define or override \"confinementBackends\" — machine backend instance deployment config is managed at the machine level (confinement-backend-registry-forbidden)."}}
   },
   {
-   "name": "validate: a provider inventory that declares both spellings of one provider is refused",
+   "name": "validate: a provider with an empty accounts list is a leftover shell that loads",
    "fact": "validate",
    "runner": {"executors":{"claude":{"kind":"agent","providerModel":"claude","supports":{"reasoningEffort":["low","medium","high"]},"invocations":[{"id":"claude-cli","via":"cli","adapter":"cli-spawn","command":"claude"},{"id":"claude-cli-bwrap","via":"cli","adapter":"cli-spawn","command":"claude","credentialStore":{"use":"claude","homeEnv":"CLAUDE_CONFIG_DIR","sessionDir":"projects","files":[".credentials.json"]},"confinement":{"backend":"bwrap"}},{"id":"claude-herdr-bwrap","via":"cli","adapter":"herdr-spawn","command":"claude","credentialStore":{"use":"claude","homeEnv":"CLAUDE_CONFIG_DIR","sessionDir":"projects","files":[".credentials.json"]},"confinement":{"backend":"bwrap"}}]},"openai":{"kind":"agent","providerModel":"openai","invocations":[{"id":"codex-cli-bwrap","via":"cli","adapter":"cli-spawn","command":"codex","credentialStore":{"use":"codex","homeEnv":"CODEX_HOME"},"confinement":{"backend":"bwrap"}},{"id":"pi-herdr-bwrap","via":"cli","adapter":"herdr-spawn","command":"pi","credentialStore":{"use":"pi","homeEnv":"PI_CODING_AGENT_DIR","sessionDir":"sessions","files":["auth.json"]},"confinement":{"backend":"bwrap"}},{"id":"codex-herdr-bwrap","via":"cli","adapter":"herdr-spawn","command":"codex","credentialStore":{"use":"codex","homeEnv":"CODEX_HOME"},"confinement":{"backend":"bwrap"}},{"id":"pi-cli-bwrap","via":"cli","adapter":"cli-spawn","command":"pi","credentialStore":{"use":"pi","homeEnv":"PI_CODING_AGENT_DIR","sessionDir":"sessions","files":["auth.json"]},"confinement":{"backend":"bwrap"}}]}},"providers":{"openai":{"accounts":{}},"openai-codex":{"accounts":{}}}},
-   "expect": {"error":{"name":"ProviderCapacityConfigError","message":"runner config (vector runner.providers) declares both \"openai\" and \"openai-codex\", which normalize to the same provider family \"openai-codex\" -- consolidate their accounts under one key."}}
+   "expect": {"ok":true}
   },
   {
    "name": "validate: generatedPaths must open with a literal directory",
@@ -2336,15 +2287,9 @@
    "expect": {"error":{"name":"ConfinementBackendRegistryError","message":"runner config (vector runner) cannot define or override \"confinementBackends\" — machine backend instance deployment config is managed at the machine level (confinement-backend-registry-forbidden)."}}
   },
   {
-   "name": "validate: a provider inventory that is not an object is refused under the source label",
+   "name": "validate: an llmAccounts inventory is accepted",
    "fact": "validate",
-   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude"}},"providers":[]},
-   "expect": {"error":{"name":"ProviderCapacityConfigError","message":"runner config (vector runner.providers) must be an object mapping provider -> { accounts } when present."}}
-  },
-  {
-   "name": "validate: a valid provider inventory is accepted",
-   "fact": "validate",
-   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude"}},"providers":{"claude":{"accounts":{"main":{"credentialSource":{"kind":"codex-home","home":"/h"}}}}}},
+   "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude"}},"llmAccounts":{"claude":{"main":{"credentialStore":{"claude":"/h"}}}}},
    "expect": {"ok":true}
   }
  ]

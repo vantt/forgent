@@ -15,7 +15,6 @@ import {
   providerAccountInventory,
   providerCapacityForInvocation,
   tryAcquireAccountLock,
-  ProviderCapacityConfigError,
 } from '../../src/runner/dispatch/provider-capacity.mjs';
 import { createCredentialProbe } from '../../src/runner/dispatch/provider-credential-probe.mjs';
 import {
@@ -53,43 +52,36 @@ function workspace() {
   };
 }
 
+const PI_FILES = ['auth.json', 'settings.json', 'bin/fd'];
+
+// One account of the `openai` pool that keeps a login store for codex and one for pi.
 const perCliAccount = (w) => ({
   label: 'acct',
-  credentialSources: {
-    codex: { kind: 'codex-home', home: w.codexHome },
-    pi: { kind: 'home-files', home: w.piHome, files: ['auth.json', 'settings.json', 'bin/fd'] },
-  },
+  credentialStore: { codex: w.codexHome, pi: w.piHome },
 });
 
-const runnerConfig = (accounts) => ({ providers: { openai: { accounts } } });
+// The pi invocation names the files a pi store copies into a private home.
+const runnerConfig = (accounts) => ({
+  executors: {
+    openai: {
+      kind: 'agent',
+      providerModel: 'openai',
+      invocations: [{ id: 'pi-cli', via: 'cli', command: 'pi', credentialStore: { use: 'pi', homeEnv: 'PI_CODING_AGENT_DIR', files: PI_FILES } }],
+    },
+  },
+  llmAccounts: { openai: accounts },
+});
 
-test('an account may declare one credential source per CLI; the single-source form stays as it was', () => {
+test('an account declares one login store per CLI, and each CLI reads its own', () => {
   const w = workspace();
   try {
-    const inv = providerAccountInventory(runnerConfig({
-      multi: perCliAccount(w),
-      single: { credentialSource: { kind: 'codex-home', home: w.codexHome } },
-    }));
-    assert.deepEqual(inv['openai-codex'].accounts.single, { id: 'single', label: 'single', credentialSource: { kind: 'codex-home', home: w.codexHome } });
+    const inv = providerAccountInventory(runnerConfig({ multi: perCliAccount(w) }));
     const multi = inv['openai-codex'].accounts.multi;
     assert.equal(multi.credentialSource, undefined);
     assert.deepEqual(multi.credentialSources.codex, { kind: 'codex-home', home: w.codexHome, cli: 'codex' });
-    assert.deepEqual(multi.credentialSources.pi, { kind: 'home-files', home: w.piHome, files: ['auth.json', 'settings.json', 'bin/fd'], cli: 'pi' });
+    assert.deepEqual(multi.credentialSources.pi, { kind: 'home-files', home: w.piHome, files: PI_FILES, cli: 'pi' });
     assert.equal(credentialSourceForCli(multi, 'pi').home, w.piHome);
     assert.equal(credentialSourceForCli(multi, 'omp'), null);
-    assert.equal(credentialSourceForCli(inv['openai-codex'].accounts.single, 'pi').home, w.codexHome, 'one store serves every CLI');
-  } finally { w.cleanup(); }
-});
-
-test('an account must declare exactly one of credentialSource or credentialSources, keyed by CLI name', () => {
-  const w = workspace();
-  try {
-    const source = { kind: 'codex-home', home: w.codexHome };
-    assert.throws(() => providerAccountInventory(runnerConfig({ a: { credentialSource: source, credentialSources: { codex: source } } })), ProviderCapacityConfigError);
-    assert.throws(() => providerAccountInventory(runnerConfig({ a: { label: 'x' } })), /exactly one of/);
-    assert.throws(() => providerAccountInventory(runnerConfig({ a: { credentialSources: {} } })), /non-empty object/);
-    assert.throws(() => providerAccountInventory(runnerConfig({ a: { credentialSources: { 'Pi Cli': source } } })), /CLI command name/);
-    assert.throws(() => providerAccountInventory(runnerConfig({ a: { credentialSources: { pi: { kind: 'home-files', home: w.piHome } } } })), /credentialSources\.pi\.files/);
   } finally { w.cleanup(); }
 });
 
@@ -98,7 +90,7 @@ test('the lease of a pinned CLI hands over that CLI store, and skips an account 
   try {
     const cfg = runnerConfig({
       multi: perCliAccount(w),
-      codexOnly: { credentialSources: { codex: { kind: 'codex-home', home: w.codexHome } } },
+      codexOnly: { credentialStore: { codex: w.codexHome } },
     });
     const codexOnly = acquireNamedAccountLease({ runnerConfig: cfg, provider: 'openai-codex', accountId: 'codexOnly', runId: 'run-codex-only', runtimeDir: w.runtimeDir, cli: 'pi' });
     assert.equal(codexOnly.status, 'refused', 'the codex-only account cannot serve pi');
@@ -113,14 +105,6 @@ test('the lease of a pinned CLI hands over that CLI store, and skips an account 
     assert.equal(none.status, 'refused');
     assert.equal(none.reason, LEASE_CONFLICT_REASON);
     assert.match(none.detail, /holds no "omp" login store/);
-
-    const single = acquireNamedAccountLease({
-      runnerConfig: runnerConfig({ s: { credentialSource: { kind: 'codex-home', home: w.codexHome } } }),
-      provider: 'openai-codex', accountId: 's', runId: 'run-single', runtimeDir: w.runtimeDir, cli: 'pi',
-    });
-    assert.equal(single.status, 'selected');
-    assert.deepEqual(single.credentialSource, { kind: 'codex-home', home: w.codexHome });
-    assert.equal(single.credentialSources, undefined);
   } finally { w.cleanup(); }
 });
 
@@ -270,13 +254,13 @@ test('the account probe leases the account into each confined CLI it has a store
   const w = workspace();
   try {
     const cfg = {
-      providers: { openai: { accounts: { acct: perCliAccount(w) } } },
+      llmAccounts: { openai: { acct: perCliAccount(w) } },
       executors: {
         openai: {
           providerModel: 'openai',
           invocations: [
             { id: 'codex-cli-bwrap', via: 'cli', command: 'codex', confinement: { backend: 'bwrap' }, credentialStore: { use: 'codex', homeEnv: 'CODEX_HOME' } },
-            { id: 'pi-cli-bwrap-other', via: 'cli', command: 'pi', confinement: { backend: 'bwrap' }, credentialStore: { use: 'pi', homeEnv: 'PI_CODING_AGENT_DIR' } },
+            { id: 'pi-cli-bwrap-other', via: 'cli', command: 'pi', confinement: { backend: 'bwrap' }, credentialStore: { use: 'pi', homeEnv: 'PI_CODING_AGENT_DIR', files: PI_FILES } },
             { id: 'omp-cli-bwrap', via: 'cli', command: 'omp', confinement: { backend: 'bwrap' }, credentialStore: { use: 'omp', homeEnv: 'PI_CODING_AGENT_DIR' } },
             { id: 'pi-cli-plain', via: 'cli', command: 'pi', env: { PI_CODING_AGENT_DIR: w.piHome } },
           ],

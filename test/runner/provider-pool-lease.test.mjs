@@ -17,7 +17,6 @@ import {
   providerAccountInventory,
   providerCapacityStatePaths,
   quarantineProviderAccount,
-  validateProviderAccountInventory,
 } from '../../src/runner/dispatch/provider-capacity.mjs';
 import { deriveLegacyInventory, legacyStateKey, readLlmAccounts } from '../../src/runner/dispatch/llm-accounts.mjs';
 import { configPinnedToAccount } from '../../src/runner/dispatch/provider-account-probe.mjs';
@@ -66,23 +65,20 @@ test('a pool declared in llmAccounts supplies its accounts in declared order, un
   assert.equal(legacyStateKey('openai'), 'openai-codex');
 });
 
-test('a pool llmAccounts declares replaces the same pool of runner.providers; other pools keep reading runner.providers', () => {
+test('the inventory is runner.llmAccounts alone: a runner.providers list adds no pool and replaces none', () => {
   const providers = {
     'openai-codex': { accounts: { old: { credentialSource: { kind: 'codex-home', home: '/srv/old' } } } },
     xai: { accounts: { vantt: { credentialSource: { kind: 'home-files', home: '/srv/xai', files: ['agent.db'] } } } },
   };
   const inventory = providerAccountInventory(config({ openai: { fresh: { credentialStore: { codex: '/srv/codex/fresh' } } } }, { providers }));
+  assert.deepEqual(Object.keys(inventory), ['openai-codex']);
   assert.deepEqual(Object.keys(inventory['openai-codex'].accounts), ['fresh']);
-  assert.deepEqual(Object.keys(inventory.xai.accounts), ['vantt']);
-  // The legacy-only reader still shows what runner.providers declares.
-  assert.deepEqual(Object.keys(validateProviderAccountInventory(config({ openai: {} }, { providers }))['openai-codex'].accounts), ['old']);
 });
 
-test('a config without llmAccounts reads runner.providers exactly as before', () => {
-  const providers = { xai: { accounts: { vantt: { credentialSource: { kind: 'home-files', home: '/srv/xai', files: ['agent.db'] } } } } };
-  const { llmAccounts, ...plain } = config(undefined, { providers });
+test('a config without llmAccounts has no accounts', () => {
+  const { llmAccounts, ...plain } = config(undefined);
   assert.equal(llmAccounts, undefined);
-  assert.deepEqual(providerAccountInventory(plain), validateProviderAccountInventory(plain));
+  assert.deepEqual(providerAccountInventory(plain), {});
 });
 
 test('a derived account has one credential source per CLI: codex-home for codex, the declared files for any other store', () => {
@@ -191,9 +187,9 @@ test('pools keep separate leases and quarantine: quarantining one pool leaves an
   assert.equal(providers.openrouter.accounts.main.openLeases.length, 0);
 });
 
-test('the pool openai keeps its legacy state key, so a lease taken under the old inventory is the same account', () => {
+test('the pool openai keeps its legacy state key, so a lease taken before the config gained an account is the same account', () => {
   const runtimeDir = mkRuntimeDir();
-  const oldConfig = config(undefined, { providers: { 'openai-codex': { accounts: { tetnu: { credentialSource: { kind: 'codex-home', home: '/srv/codex/tetnu' } } } } } });
+  const oldConfig = config({ openai: { tetnu: { credentialStore: { codex: '/srv/codex/tetnu' } } } });
   const first = acquireNamedAccountLease({ runnerConfig: oldConfig, provider: 'openai-codex', accountId: 'tetnu', assignmentId: 'asgn', runId: 'run1', runtimeDir });
   assert.equal(first.accountId, 'tetnu');
   quarantineProviderAccount({ provider: 'openai-codex', accountId: 'tetnu', reasonCode: 'quota-limit', until: '2999-01-01T00:00:00.000Z', runtimeDir });
@@ -202,7 +198,7 @@ test('the pool openai keeps its legacy state key, so a lease taken under the old
   assert.equal(
     acquireNamedAccountLease({ runnerConfig: newConfig, provider: 'openai-codex', accountId: 'tetnu', assignmentId: 'other', runId: 'run2', runtimeDir }).reason,
     LEASE_CONFLICT_REASON,
-    'the quarantine written under the old inventory still applies to tetnu',
+    'the quarantine written before the config gained spare still applies to tetnu',
   );
   const second = acquireNamedAccountLease({ runnerConfig: newConfig, provider: 'openai-codex', accountId: 'spare', assignmentId: 'other', runId: 'run3', runtimeDir });
   assert.equal(second.accountId, 'spare');
@@ -221,11 +217,7 @@ test('a pinned account narrows the llmAccounts pool, so the lease can take only 
   assert.equal(selected.accountId, 'or-b');
 });
 
-test('a digits-only account id is refused by both inventories, naming the reason', () => {
-  assert.throws(
-    () => validateProviderAccountInventory({ providers: { openai: { accounts: { 7: { credentialSource: { kind: 'codex-home', home: '/x' } } } } } }),
-    /digits only.*declared account order/,
-  );
+test('a digits-only account id is refused, naming the reason', () => {
   const { pools, problems } = readLlmAccounts({ llmAccounts: { openrouter: { 42: { credentialStore: { pi: '/x' } }, ok: { credentialStore: { pi: '/y' } } } } });
   assert.deepEqual(problems.map((p) => p.code), ['account-id']);
   assert.match(problems[0].detail, /digits only/);

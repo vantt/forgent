@@ -17,7 +17,6 @@ import { resolveExecutorCommand, resolveExecutorEnv, DispatchError, DEFAULT_ADAP
 import { decideDispatchMechanism } from '../../src/runner/dispatch/mechanism.mjs';
 import { resolveAgentTypeForTaskSpec } from '../../src/runner/dispatch/cli.mjs';
 import { decideExecutorCli } from '../../src/runner/dispatch/decide.mjs';
-import { validateProviderAccountInventory, ProviderCapacityConfigError } from '../../src/runner/dispatch/provider-capacity.mjs';
 import { buildPrompt, executorIdForWork } from '../../src/runner/work-compat.mjs';
 import { spawnWorker, resolveAgentTypeForWork, resolveWorkForDispatch, workDispatchHint } from '../../src/runner/work-dispatch.mjs';
 import { executeAssignment } from '../../src/runner/dispatch/assignment-runner.mjs';
@@ -294,57 +293,6 @@ test('the runner config check refuses a runner config that still carries rigorTo
     () => validateRunnerConfigShape(runner, 'test'),
     (err) => err instanceof RunnerConfigError && /retired "rigorToTier".*delete the key/.test(err.message),
   );
-});
-
-test('validateProviderAccountInventory accepts keyed global Codex accounts', () => {
-  const inventory = validateProviderAccountInventory({
-    providers: {
-      'openai-codex': {
-        accounts: {
-          tetcu72: {
-            label: 'codex/tetcu72',
-            credentialSource: { kind: 'codex-home', home: '${HOME}/.codex-tetcu72' },
-          },
-          tetnu: {
-            credentialSource: { kind: 'codex-home', home: '${HOME}/.codex-tetnu' },
-          },
-        },
-      },
-    },
-  }, 'global runner config');
-  assert.equal(inventory['openai-codex'].accounts.tetcu72.label, 'codex/tetcu72');
-  assert.equal(inventory['openai-codex'].accounts.tetnu.label, 'tetnu');
-});
-
-test('the runner config check rejects provider accounts declared as an array', () => {
-  const runner = {
-    executor: { command: 'claude', args: ['{prompt}'] },
-    modelPolicies: { claude: { standard: 'sonnet' } },
-    defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
-    timeoutMs: 1000,
-    providers: { 'openai-codex': { accounts: [] } },
-  };
-  assert.throws(() => validateRunnerConfigShape(runner, 'test'), ProviderCapacityConfigError);
-});
-
-test('the runner config check rejects provider account entries that declare placement policy', () => {
-  const runner = {
-    executor: { command: 'claude', args: ['{prompt}'] },
-    modelPolicies: { claude: { standard: 'sonnet' } },
-    defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
-    timeoutMs: 1000,
-    providers: {
-      'openai-codex': {
-        accounts: {
-          tetnu: {
-            credentialSource: { kind: 'codex-home', home: '${HOME}/.codex-tetnu' },
-            model: 'gpt-5-codex',
-          },
-        },
-      },
-    },
-  };
-  assert.throws(() => validateRunnerConfigShape(runner, 'test'), /must not declare "model"/);
 });
 
 test('loadRunnerConfigForDir refuses a project-local account inventory (providers or llmAccounts), naming the key', () => {

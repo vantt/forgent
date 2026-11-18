@@ -548,14 +548,9 @@ test('provider capacity selection happens after Run admission, records redacted 
       'openai-codex': { standard: 'gpt-test-standard' },
     },
     timeoutMs: 5000,
-    providers: {
+    llmAccounts: {
       'openai-codex': {
-        accounts: {
-          tetcu72: {
-            label: 'codex/tetcu72',
-            credentialSource: { kind: 'codex-home', home: path.join(tempDir, 'codex-tetcu72') },
-          },
-        },
+        tetcu72: { label: 'codex/tetcu72', credentialStore: { codex: path.join(tempDir, 'codex-tetcu72') } },
       },
     },
   };
@@ -625,14 +620,9 @@ test('provider capacity refusal after Run admission settles the attempt (never a
       'openai-codex': { standard: 'gpt-test-standard' },
     },
     timeoutMs: 5000,
-    providers: {
+    llmAccounts: {
       'openai-codex': {
-        accounts: {
-          tetcu72: {
-            label: 'codex/tetcu72',
-            credentialSource: { kind: 'codex-home', home: path.join(tempDir, 'codex-tetcu72') },
-          },
-        },
+        tetcu72: { label: 'codex/tetcu72', credentialStore: { codex: path.join(tempDir, 'codex-tetcu72') } },
       },
     },
   };
@@ -710,16 +700,12 @@ function buildFallbackFixture(tempDir, { primaryQuarantined, fallbackQuarantined
       'openai-codex': { standard: 'gpt-test-standard' },
     },
     timeoutMs: 5000,
-    providers: {
+    llmAccounts: {
       claude: {
-        accounts: {
-          'claude-acct': { label: 'claude/primary', credentialSource: { kind: 'codex-home', home: path.join(tempDir, 'claude-home') } },
-        },
+        'claude-acct': { label: 'claude/primary', credentialStore: { claude: path.join(tempDir, 'claude-home') } },
       },
       'openai-codex': {
-        accounts: {
-          'codex-acct': { label: 'codex/fallback', credentialSource: { kind: 'codex-home', home: path.join(tempDir, 'codex-home') } },
-        },
+        'codex-acct': { label: 'codex/fallback', credentialStore: { codex: path.join(tempDir, 'codex-home') } },
       },
     },
   };
@@ -775,16 +761,12 @@ function buildConfinementFallbackFixture(tempDir, { fallbackHasConfinedInvocatio
       'openai-codex': { standard: 'gpt-test-standard' },
     },
     timeoutMs: 5000,
-    providers: {
+    llmAccounts: {
       claude: {
-        accounts: {
-          'claude-acct': { label: 'claude/primary', credentialSource: { kind: 'codex-home', home: path.join(tempDir, 'claude-home') } },
-        },
+        'claude-acct': { label: 'claude/primary', credentialStore: { claude: path.join(tempDir, 'claude-home') } },
       },
       'openai-codex': {
-        accounts: {
-          'codex-acct': { label: 'codex/fallback', credentialSource: { kind: 'codex-home', home: path.join(tempDir, 'codex-home') } },
-        },
+        'codex-acct': { label: 'codex/fallback', credentialStore: { codex: path.join(tempDir, 'codex-home') } },
       },
     },
   };
@@ -893,14 +875,9 @@ test('tool executors bypass provider capacity selection even with matching provi
       'openai-codex': { standard: 'gpt-test-standard' },
     },
     timeoutMs: 5000,
-    providers: {
+    llmAccounts: {
       'openai-codex': {
-        accounts: {
-          tetcu72: {
-            label: 'codex/tetcu72',
-            credentialSource: { kind: 'codex-home', home: path.join(tempDir, 'codex-tetcu72') },
-          },
-        },
+        tetcu72: { label: 'codex/tetcu72', credentialStore: { codex: path.join(tempDir, 'codex-tetcu72') } },
       },
     },
   };

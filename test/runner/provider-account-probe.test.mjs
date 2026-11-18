@@ -25,8 +25,8 @@ after(() => { for (const d of dirs) fs.rmSync(d, { recursive: true, force: true 
 
 const pi = (id, extra = {}) => ({ id, via: 'cli', adapter: 'cli-spawn', command: 'pi', args: ['-p', '{prompt}'], ...extra });
 const cfg = {
-  providers: {
-    openai: { accounts: { acct: { label: 'acct', credentialSource: { kind: 'codex-home', home: '/homes/codex-acct' } } } },
+  llmAccounts: {
+    openai: { acct: { label: 'acct', credentialStore: { codex: '/homes/codex-acct', pi: '/homes/pi-acct' } } },
   },
   executors: {
     openai: {
@@ -131,10 +131,10 @@ test('the verdict reads only counted rows: confined harness invocations and dire
 });
 
 test('the door gets a config pinned to the one account, and other providers and accounts are left alone', () => {
-  const wide = { ...cfg, providers: { ...cfg.providers, openai: { accounts: { ...cfg.providers.openai.accounts, spare: { label: 'spare', credentialSource: { kind: 'codex-home', home: '/homes/spare' } } } }, xai: { accounts: { v: {} } } } };
+  const wide = { ...cfg, llmAccounts: { ...cfg.llmAccounts, openai: { ...cfg.llmAccounts.openai, spare: { label: 'spare', credentialStore: { codex: '/homes/spare' } } }, xai: { v: { credentialStore: { pi: '/homes/v' } } } } };
   const pinned = configPinnedToAccount(wide, { provider: 'openai-codex', accountId: 'acct' });
-  assert.deepEqual(Object.keys(pinned.providers.openai.accounts), ['acct']);
-  assert.deepEqual(pinned.providers.xai, wide.providers.xai);
+  assert.deepEqual(Object.keys(pinned.llmAccounts.openai), ['acct']);
+  assert.deepEqual(pinned.llmAccounts.xai, wide.llmAccounts.xai);
   assert.equal(pinned.executors, wide.executors);
 });
 
@@ -143,7 +143,7 @@ test('a declared store key, not the command, decides which confined invocations 
     id, via: 'cli', adapter: 'cli-spawn', command: '/opt/bin/agent-wrapper', args: [], confinement: { backend: 'bwrap' }, ...(credentialStore ? { credentialStore } : {}),
   });
   const wrappedCfg = {
-    providers: cfg.providers,
+    llmAccounts: cfg.llmAccounts,
     executors: {
       openai: {
         kind: 'agent',
@@ -227,7 +227,7 @@ test('every CLI starts before any finishes, each under a read-only posture bindi
     assert.deepEqual(cliOverride, { preferExecutor: 'openai', preferInvocation: assignment.binding.invocation, leaseAccount: 'acct' }, 'the door launches the pinned invocation and leases the account it probes, not its own pick');
     assert.equal(assignment.policy.preferInvocation, assignment.binding.invocation);
     assert.equal(assignment.provenance.contract.mutation, 'read-only');
-    assert.deepEqual(Object.keys(runnerConfig.providers.openai.accounts), ['acct']);
+    assert.deepEqual(Object.keys(runnerConfig.llmAccounts.openai), ['acct']);
   }
   assert.deepEqual(closed, [{ paneId: 'p-1', herdrSession: 'fgos-workers', terminalKey: 'k-1' }]);
   const row = report.results.find((r) => r.invocationId === 'codex-herdr-static');
@@ -241,10 +241,10 @@ test('every CLI starts before any finishes, each under a read-only posture bindi
 });
 
 test('each CLI is probed on the strongest model a tier cell names for the account\'s pool, and the row says which', async () => {
-  const omp = (id) => ({ id, via: 'cli', adapter: 'cli-spawn', command: 'omp', args: ['--model', '{model}'], confinement: { backend: 'bwrap' }, credentialStore: { use: 'omp', homeEnv: 'PI_CODING_AGENT_DIR' } });
+  const omp = (id) => ({ id, via: 'cli', adapter: 'cli-spawn', command: 'omp', args: ['--model', '{model}'], confinement: { backend: 'bwrap' }, credentialStore: { use: 'omp', homeEnv: 'PI_CODING_AGENT_DIR', files: ['agent.db'] } });
   const geminiCfg = {
-    providers: {
-      gemini: { accounts: { acct: { label: 'acct', credentialSource: { kind: 'home-files', home: '/homes/omp-acct', files: ['agent.db'] } } } },
+    llmAccounts: {
+      gemini: { acct: { label: 'acct', credentialStore: { omp: '/homes/omp-acct' } } },
     },
     modelPolicies: {
       gemini: { standard: 'gemini-flash', flagship: ['gemini-pro@vertex', { model: 'gemini-argon-high' }] },
@@ -313,23 +313,15 @@ test('a run settled as a provider limit is the account\'s login or quota by the 
 });
 
 test('a store with a login is called on the harness model of its CLI; a layout with no call is no-probe and takes no lock', async () => {
-  const omp = { id: 'omp-cli-bwrap', via: 'cli', adapter: 'cli-spawn', command: 'omp', args: [], confinement: { backend: 'bwrap' }, credentialStore: { use: 'omp', homeEnv: 'PI_CODING_AGENT_DIR' } };
+  const omp = { id: 'omp-cli-bwrap', via: 'cli', adapter: 'cli-spawn', command: 'omp', args: [], confinement: { backend: 'bwrap' }, credentialStore: { use: 'omp', homeEnv: 'PI_CODING_AGENT_DIR', files: ['agent.db'] } };
+  const odd = { id: 'odd-cli-bwrap', via: 'cli', adapter: 'cli-spawn', command: 'odd', args: [], confinement: { backend: 'bwrap' }, credentialStore: { use: 'odd', homeEnv: 'ODD_HOME', files: ['mystery.bin'] } };
   const perCli = {
-    providers: {
-      gemini: {
-        accounts: {
-          acct: {
-            label: 'acct',
-            credentialSources: {
-              omp: { kind: 'home-files', home: '/homes/omp-acct', files: ['agent.db'] },
-              odd: { kind: 'home-files', home: '/homes/odd-acct', files: ['mystery.bin'] },
-            },
-          },
-        },
-      },
+    llmAccounts: {
+      gemini: { acct: { label: 'acct', credentialStore: { omp: '/homes/omp-acct', odd: '/homes/odd-acct' } } },
     },
     modelPolicies: { gemini: { flagship: 'gemini-argon-high' } },
-    executors: { gemini: { kind: 'agent', providerModel: 'gemini', invocations: [omp] } },
+    // The odd store's files come from an invocation of another family, which no probe of this account runs.
+    executors: { gemini: { kind: 'agent', providerModel: 'gemini', invocations: [omp] }, other: { kind: 'agent', providerModel: 'xai', invocations: [odd] } },
   };
   const locks = [];
   const asked = [];
@@ -430,7 +422,7 @@ test('probe-account --all sweeps enabled accounts in declared order, --record wr
 });
 
 test('a sweep goes on past an account whose probe throws and reports it', async () => {
-  const accountCfg = { providers: { openai: { accounts: { a: { credentialSource: { kind: 'codex-home', home: '/homes/a' } }, b: { credentialSource: { kind: 'codex-home', home: '/homes/b' } } } } }, executors: {} };
+  const accountCfg = { llmAccounts: { openai: { a: { credentialStore: { codex: '/homes/a' } }, b: { credentialStore: { codex: '/homes/b' } } } }, executors: {} };
   const swept = await runAccountSweep({
     cfg: accountCfg, repoRoot: tmp('fgos-account-probe-sweep-'), leg: 'direct', record: true,
     acquireLock: async () => ({ spawnHolding: null, release() {} }),

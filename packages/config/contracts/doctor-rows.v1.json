@@ -9,7 +9,8 @@
     "move-under-private",
     "copy-to-destination",
     "create-machine-files",
-    "move-capability-taste"
+    "move-capability-taste",
+    "remove-empty-provider-accounts"
   ],
   "rows": [
     {
@@ -117,6 +118,13 @@
       "doctor": "fail",
       "check": "fail",
       "fix": "move-capability-taste"
+    },
+    {
+      "id": "config-empty-provider-accounts",
+      "description": "The accounts file holds runner.providers.<provider>.accounts as an empty mapping, a leftover of the retired account inventory (the accounts live in runner.llmAccounts). The fix removes each empty accounts key, the provider entry when that was all it held, and runner.providers when no provider is left; a provider that still lists accounts is not touched here (the runner config refuses it by name).",
+      "doctor": "warn",
+      "check": "warn",
+      "fix": "remove-empty-provider-accounts"
     },
     {
       "id": "config-migrate-backup-stale",

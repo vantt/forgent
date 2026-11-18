@@ -151,21 +151,6 @@ test('llm-accounts-shape passes on a valid global inventory and fails on one in 
   assert.match(alias.message, /family "openai"/);
 });
 
-test('llm-accounts-vs-legacy compares only once runner.llmAccounts exists, and warns on what differs', () => {
-  const legacy = { providers: { gemini: { accounts: { tetcu72: { credentialSources: { omp: { kind: 'home-files', home: '/srv/omp-tetcu72', files: ['auth.json'] } } } } } } };
-  const notDeclared = runCheck('llm-accounts-vs-legacy', {}, legacy);
-  assert.equal(notDeclared.passed, true);
-  assert.match(notDeclared.message, /nothing to compare/);
-
-  const same = runCheck('llm-accounts-vs-legacy', {}, { ...legacy, llmAccounts: { gemini: { tetcu72: { credentialStore: { omp: '/srv/omp-tetcu72' } } } } });
-  assert.equal(same.passed, true);
-  assert.match(same.message, /matches/);
-
-  const differ = runCheck('llm-accounts-vs-legacy', {}, { ...legacy, llmAccounts: { gemini: { other: { credentialStore: { omp: '/srv/omp-other' } } } } });
-  assert.equal(differ.passed, true);
-  assert.match(differ.message, /^warning: .*only in runner\.providers: gemini\/tetcu72.*only in runner\.llmAccounts: gemini\/other/);
-});
-
 test('tier-fallback passes the list of the standard, passes a served list of all six tiers, and warns about a family the walk would skip', () => {
   // The standard declares the walk order of every tier.
   const none = runCheck('tier-fallback', {});

@@ -6,15 +6,15 @@
 //
 // `readLlmAccounts` only reports. It never throws: what is wrong is listed in `problems` for doctor and
 // `fgos dispatch explain`. `deriveLegacyInventory` turns the accounts it accepts into the per-CLI
-// credential source shape the lease, probe and renewal read; a pool declared here replaces the same
-// pool of `runner.providers.<provider>.accounts`, which stays the source for every pool not declared.
+// credential source shape the lease, probe and renewal read. This is the only account inventory:
+// `runner.providers.<provider>.accounts` is retired and the config door refuses it by name.
 
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { readConfig, readMachineConfig } from '../../config/facade.mjs';
 import { familyOf } from './provider-adapter.mjs';
-import { credentialStoreOf, expandCredentialHome, validateProviderAccountInventory } from './provider-capacity.mjs';
+import { credentialStoreOf, expandCredentialHome } from './provider-capacity.mjs';
 
 const ACCOUNT_KEYS = Object.freeze(['credentialStore', 'label', 'disabled']);
 // Not digits only: a JS object lists such a key before every other, which would reorder the declared account order.
@@ -139,67 +139,13 @@ export function readLlmAccounts(runnerConfig) {
 }
 
 /**
- * The key the lease's state uses for a pool while it still reads the old inventory: the old
- * inventory keyed providers by the CLI-derived name of their family (`openai` is `openai-codex`).
- * The only place that spelling is made; every other reader names the family with `familyOf`.
+ * The key the lease's state uses for a pool: the state keyed providers by the CLI-derived name of their
+ * family (`openai` is `openai-codex`). The only place that spelling is made; every other reader names the
+ * family with `familyOf`.
  */
 export function legacyStateKey(pool) {
   const family = familyOf(pool);
   return family === 'openai' ? 'openai-codex' : (family || pool);
-}
-
-function legacyStores(account) {
-  const stores = {};
-  if (account.credentialSources) {
-    for (const [cli, source] of Object.entries(account.credentialSources)) stores[cli] = expandCredentialHome(source.home);
-  } else if (account.credentialSource) {
-    stores['*'] = expandCredentialHome(account.credentialSource.home);
-  }
-  return stores;
-}
-
-/**
- * Accounts the old inventory (`runner.providers.<provider>.accounts`) and `runner.llmAccounts`
- * disagree on. The old inventory keys accounts by normalized provider family, the new one by pool,
- * matched here through `legacyStateKey`. An old account with one store for every CLI matches a new
- * one when every new store is that directory.
- *
- * @returns {{onlyLegacy: {pool: string, account: string}[], onlyNew: {pool: string, account: string}[], storeMismatch: {pool: string, account: string, legacy: object, current: object}[], problems: object[]}}
- */
-export function compareWithLegacyInventory(runnerConfig) {
-  const { pools, problems } = readLlmAccounts(runnerConfig);
-  let legacy = {};
-  try {
-    legacy = validateProviderAccountInventory(runnerConfig, 'runner config');
-  } catch (err) {
-    problems.push({ code: 'legacy-inventory-invalid', at: 'runner.providers', detail: err.message });
-  }
-  const newByKey = new Map();
-  for (const [pool, entry] of Object.entries(pools)) {
-    for (const [account, value] of Object.entries(entry.accounts)) newByKey.set(`${legacyStateKey(pool)}\u0000${account}`, { pool, account, value });
-  }
-  const onlyLegacy = [];
-  const storeMismatch = [];
-  const seen = new Set();
-  for (const [provider, entry] of Object.entries(legacy)) {
-    for (const [account, value] of Object.entries(entry.accounts ?? {})) {
-      const key = `${provider}\u0000${account}`;
-      const current = newByKey.get(key);
-      if (!current) {
-        onlyLegacy.push({ pool: provider, account });
-        continue;
-      }
-      seen.add(key);
-      const old = legacyStores(value);
-      const now = current.value.stores;
-      const same = old['*'] !== undefined
-        ? Object.values(now).every((dir) => dir === old['*'])
-        : Object.keys(old).length === Object.keys(now).length && Object.entries(old).every(([cli, dir]) => now[cli] === dir);
-      if (!same) storeMismatch.push({ pool: current.pool, account, legacy: old, current: now });
-    }
-  }
-  const onlyNew = [...newByKey.entries()].filter(([key]) => !seen.has(key)).map(([, v]) => ({ pool: v.pool, account: v.account }));
-  return { onlyLegacy, onlyNew, storeMismatch, problems };
 }
 
 /** Login files per CLI, from the stores the invocations declare, those of the pool's own family first. */
@@ -276,8 +222,8 @@ const CLI_LOGIN_HOMES = Object.freeze([
 const plainValues = (value) => (isPlainObject(value) ? Object.values(value) : []);
 
 /**
- * Every login directory this machine names: each store of the account inventory (`runner.llmAccounts`,
- * `runner.providers`) expanded as the lease expands it, each agent CLI's default login home and the value of its
+ * Every login directory this machine names: each store of the account inventory (`runner.llmAccounts`)
+ * expanded as the lease expands it, each agent CLI's default login home and the value of its
  * home variable in `env`, and each executor's `credentialStore.homeEnv` value, read from the config the lease
  * reads (the project's when `projectRoot` is given). `inPlaceCli` is the CLI of a launch that reads its own login
  * in place (it declares no credentialStore): its homes stay visible to that launch alone, whatever names them. One that does not
@@ -299,12 +245,6 @@ export function machineLoginStores({ homeDir = os.homedir(), env = process.env, 
   };
   for (const pool of plainValues(runner.llmAccounts)) {
     for (const account of plainValues(pool)) plainValues(account?.credentialStore).forEach(add);
-  }
-  for (const provider of plainValues(runner.providers)) {
-    for (const account of plainValues(provider?.accounts)) {
-      add(account?.credentialSource?.home);
-      for (const source of plainValues(account?.credentialSources)) add(source?.home);
-    }
   }
   for (const { env: name, dir } of CLI_LOGIN_HOMES) {
     add(path.join(homeDir, dir));
