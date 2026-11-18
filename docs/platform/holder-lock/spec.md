@@ -145,7 +145,7 @@ Run control is not a kind: its ledger and CAS stay as they are, with no garbage 
 
 `<eventOpenRoot>` is the resolved Git common directory plus `fgos/events`; Event Store owns its two repo mutexes, `event-seal` (58) and `event-append` (70), at `<eventOpenRoot>/locks/<name>.lock`. Both have no legacy path. Only Rust resolves this template; Node refuses these rows with `lock-not-node-owned`. Append is released before Git calls; seal is never taken inside the Work gate.
 
-One row per lock: `name`, `kind`, `scope` (`repo`, `machine`, `run`), `rank`, `v3Path`, `owner` (the track that cut it over: `4.2`, `4.3`, `4.4`, `6.2`, `event-store`, `git`, `documentation`, and `mailbox` for the mailbox record's own row), and a note. The legacy path and shape and the fence of each row were deleted with the Node fence mechanism (section 12).
+One row per lock: `name`, `kind`, `scope` (`repo`, `machine`, `run`), `rank`, `v3Path`, `owner` (the track that cut it over: `4.2`, `4.3`, `4.4`, `6.2`, `event-store`, `git`, `documentation`, `mailbox` for the mailbox record's own row, and `session-host` for the head rotation lock), and a note. The legacy path and shape and the fence of each row were deleted with the Node fence mechanism (section 12).
 
 Ranks (a scope may only take a lock of a higher rank than every lock it holds):
 
@@ -161,7 +161,7 @@ Ranks (a scope may only take a lock of a higher rank than every lock it holds):
 | 58 | `event-seal` | mutex |
 | 60 | `state`, `porting-events` | hot-mutex |
 | 70 | `event-append` | mutex |
-| 80 | leaves: `sessions`, `advance`, `reconcile`, `recovery`, `full-suite`, `provider-account`, `provider-state`, `worker-session`, `agent-trust-store`, `identity-pins`, `observe`, `activation`, `install`, `project-config`, `global-config`, `mailbox` | mutex, lease |
+| 80 | leaves: `sessions`, `advance`, `reconcile`, `recovery`, `full-suite`, `provider-account`, `provider-state`, `worker-session`, `agent-trust-store`, `identity-pins`, `observe`, `activation`, `install`, `project-config`, `global-config`, `mailbox`, `session-rotation` | mutex, lease |
 
 The ranks 58 (`event-seal`) and 70 (`event-append`) above are declared by the signed [Event Store spec §4](../event-store/spec.md#4-layering-and-locks), D-ADR0055 (event log as sealed changesets on per-machine refs); implementation has not started. They are planned additions to the shipped registry, which currently declares neither rank nor lock. They do not claim a registered kind, path or cutover. The design permits `state` (60) → `event-append` (70) and forbids seal/sync under `state`; registry and implementation must land together under the Event Store proof gates.
 
@@ -178,6 +178,8 @@ Locks cut over by the Rust-callers track (registry owner `4.4`), all leaves of r
 Git adds `repo-config`, a repo mutex at rank 80, `<fgosDir>/locks/repo-config.lock`, with no legacy path. It serializes the local fetch-mapping writer; Git's native `config.lock` also excludes ordinary Git config writers.
 
 Mailbox adds `mailbox`, a repo mutex at rank 80, `<fgosDir>/locks/mailbox.lock`, with no legacy path. It serializes every mutation of the agent mailbox's snapshot (docs/platform/agent-mailbox/spec.md §6.4); held briefly, never across an emit. Only the mailbox's Rust store (`packages/mailbox/rust/store/src/record`) takes it. The row's `<fgosDir>` template is one Node's `resolveLock` can fill, as for `repo-config`, so this is a rule of use rather than a refusal: no Node code takes `mailbox`, and refusing it in Node would need a second owner list in the facade.
+
+Session Host adds `session-rotation`, a repo mutex at rank 80, `<fgosDir>/locks/session-rotation--<id>.lock` (`<id>` is `<persona>-<name>`), with no legacy path. It admits one rotation at a time per head lineage (docs/platform/session-host/spec.md); the rotation executor holds it for the whole rotation, and `head start` probes it so no head is started while a rotation runs. A holder that dies leaves it free at once.
 
 The observe lock waits at most 4 s (so the host names `observe-lock-timeout` before `invokeHost`'s 5 s kill), has no TTL, and the shard snapshot is written under it. The activation and install locks are held by `fgctl` through the crate it links; a holder that is killed leaves the lock free at once. Until the main-checkout lock is cut over, `fgctl` checks the main checkout with `probe` (shared, non-blocking, never held) plus the v1 read, and reads a directory at `.fgos/main-checkout.lock` (a tombstone) as "moved".
 

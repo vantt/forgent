@@ -21,6 +21,10 @@ properties:
     description: Context window size, counted as the model counts it, used when the status line reports none.
     type: integer
     minimum: 1
+  answerWaitMs:
+    description: Milliseconds the rotation executor waits for the successor to answer before it retires the successor and keeps the old session.
+    type: integer
+    minimum: 1000
   personas:
     description: Per-persona overrides of soft and hard, and the portfolio paths its successor rereads, by bare persona name.
     type: object

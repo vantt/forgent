@@ -12,7 +12,7 @@
     "58": { "kinds": ["mutex"], "note": "event-seal" },
     "60": { "kinds": ["hot-mutex"], "note": "hot state (events + claims)" },
     "70": { "kinds": ["mutex"], "note": "event-append" },
-    "80": { "kinds": ["mutex", "lease"], "note": "leaves: sessions, advance, reconcile, recovery, observe, provider account, activation, install, full-suite, repo-config, mailbox" }
+    "80": { "kinds": ["mutex", "lease"], "note": "leaves: sessions, advance, reconcile, recovery, observe, provider account, activation, install, full-suite, repo-config, mailbox, session-rotation" }
   },
   "locks": [
     {
@@ -262,6 +262,15 @@
       "v3Path": "<lockRoot>/global-config.lock",
       "owner": "config",
       "note": "new lock, no v1 predecessor; serializes writes to the three global files: ~/.fgos/config.yaml, ~/.fgos/private/accounts.yaml and ~/.fgos/private/gateway-token"
+    },
+    {
+      "name": "session-rotation",
+      "kind": "mutex",
+      "scope": "repo",
+      "rank": 80,
+      "v3Path": "<fgosDir>/locks/session-rotation--<id>.lock",
+      "owner": "session-host",
+      "note": "new lock, no v1 predecessor; one rotation at a time per head lineage, <id> is <persona>-<name> (src/session-rotation/rotate.mjs)"
     }
   ]
 }

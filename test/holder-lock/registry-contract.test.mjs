@@ -275,3 +275,11 @@ test('the mailbox mutex is a repo leaf at rank 80 owned by the mailbox', () => {
   assert.notDeepEqual(validate({ ...row, owner: 'unknown' }, schema.$defs.lock, schema), []);
   assert.match(registry.ranks['80'].note, /\bmailbox\b/);
 });
+
+test('the session-rotation mutex is a repo leaf at rank 80 owned by the session host, one file per lineage', () => {
+  const row = registry.locks.find((lock) => lock.name === 'session-rotation');
+  assert.deepEqual({ kind: row.kind, scope: row.scope, rank: row.rank, owner: row.owner, v3Path: row.v3Path },
+    { kind: 'mutex', scope: 'repo', rank: 80, owner: 'session-host', v3Path: '<fgosDir>/locks/session-rotation--<id>.lock' });
+  assert.deepEqual(validate(row, schema.$defs.lock, schema), []);
+  assert.match(registry.ranks['80'].note, /\bsession-rotation\b/);
+});

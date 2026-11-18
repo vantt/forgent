@@ -10,5 +10,7 @@ sessionRotation:
   keep: 10
   # @fgos:doc Context window size, counted as the model counts it, used when the status line reports none. Minimum: 1. Default: 1000000.
   windowSize: 1000000
+  # @fgos:doc Milliseconds the rotation executor waits for the successor to answer before it retires the successor and keeps the old session. Minimum: 1000. Default: 120000.
+  answerWaitMs: 120000
   # @fgos:doc Per-persona overrides of soft and hard, and the portfolio paths its successor rereads, by bare persona name.
   personas: {}
