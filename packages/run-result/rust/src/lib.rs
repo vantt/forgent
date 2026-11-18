@@ -1,7 +1,9 @@
 //! Run Result Evaluator observation source (Lane A2 - Phase F2).
 
+pub mod projection;
 pub mod unit_summary;
 pub mod usage;
+pub use projection::{RunProjectionSource, RUN_DECLARATION};
 pub use unit_summary::scan_unit_summaries;
 
 use fgos_host_runtime::civil_time::parse_rfc3339_millis;
@@ -602,7 +604,6 @@ const RECORD_KEYS: &[&str] = &[
     "executor",
     "status",
     "confinement",
-    "durationMs",
     "usage",
     "classification",
     "adapter",
@@ -710,7 +711,7 @@ fn run_observation(
             .cloned()
             .unwrap_or(Value::Null),
     );
-    for key in ["status", "confinement", "durationMs", "usage"] {
+    for key in ["status", "confinement", "usage"] {
         attrs.insert(
             key.to_string(),
             record.get(key).cloned().unwrap_or(Value::Null),

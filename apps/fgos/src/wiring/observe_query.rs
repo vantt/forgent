@@ -8,6 +8,7 @@ use fgos_observe::metrics_cli::RecordEnvironment;
 use fgos_observe::record::registry::EmbeddedDeclaration;
 use fgos_observe::sources::claude_transcripts::ClaudeTranscriptsSource;
 use fgos_observe::RecordSource;
+use fgos_run_result::RunProjectionSource;
 use serde_json::Value;
 use std::path::{Path, PathBuf};
 
@@ -29,7 +30,10 @@ impl RecordEnvironment for HostRecordEnvironment {
     }
 
     fn record_sources(&self) -> Vec<Box<dyn RecordSource>> {
-        vec![Box::new(ClaudeTranscriptsSource::new())]
+        vec![
+            Box::new(ClaudeTranscriptsSource::new()),
+            Box::new(RunProjectionSource::new()),
+        ]
     }
 
     fn config_number(&self, root: &Path, key: &str) -> Result<Option<f64>, String> {
@@ -93,8 +97,46 @@ mod tests {
             [
                 "fgos-observe-health",
                 "fgos-observe-friction",
-                "fgos-observe-transcripts"
+                "fgos-observe-transcripts",
+                "fgos-run-result"
             ]
         );
+    }
+
+    #[test]
+    fn every_kind_a_host_record_source_states_is_declared_by_the_embedded_list() {
+        let registry = crate::wiring::observe_declarations::build_registry(None, None).unwrap();
+        let env = HostRecordEnvironment {
+            payload_root: no_payload,
+        };
+        let sources = env.record_sources();
+        assert!(!sources.is_empty());
+        for source in &sources {
+            registry.check_source_kinds(source.as_ref()).unwrap();
+        }
+    }
+
+    #[test]
+    fn a_source_stating_an_undeclared_kind_is_refused_by_name() {
+        struct Stray;
+        impl RecordSource for Stray {
+            fn source_id(&self) -> &'static str {
+                "stray"
+            }
+            fn kinds(&self) -> &[&str] {
+                &["fgos.stray.kind"]
+            }
+            fn records(
+                &self,
+                _: &Path,
+                _: &fgos_observe::Window,
+            ) -> Result<Vec<fgos_observe::record::types::Record>, fgos_observe::SourceError>
+            {
+                Ok(Vec::new())
+            }
+        }
+        let registry = crate::wiring::observe_declarations::build_registry(None, None).unwrap();
+        let refusal = registry.check_source_kinds(&Stray).unwrap_err();
+        assert!(refusal.contains("stray") && refusal.contains("fgos.stray.kind"));
     }
 }

@@ -887,7 +887,6 @@ export async function settleRunOutcome({
     role: assignment?.role ?? null,
     ...(effectivePolicy ? { policy: withLaunchFacts(effectivePolicy, { reasoningEffort, modelWarnings }), executorRedirected } : {}),
     settledAt,
-    durationMs: durationOrNull,
     // The pinned input digests taken at launch; a run settled by recovery reads them from the
     // run.json the admission wrote.
     ...((inputDigests ?? runMeta?.inputDigests)?.length ? { inputDigests: inputDigests ?? runMeta.inputDigests } : {}),

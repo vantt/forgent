@@ -8,6 +8,7 @@
 mod declaration;
 mod discover;
 mod merge;
+mod sources;
 mod validate;
 
 pub use declaration::{

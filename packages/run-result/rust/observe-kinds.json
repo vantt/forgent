@@ -1,0 +1,66 @@
+{
+  "contract": "observe-kinds.v1",
+  "attrs": {
+    "fgos.account.id": { "type": "string" },
+    "fgos.executor.id": { "type": "string" },
+    "fgos.persona": { "type": "string" },
+    "fgos.seat.id": { "type": "string" },
+    "fgos.seat.role": { "type": "string" },
+    "fgos.outcome": { "type": "string" },
+    "fgos.failure.code": { "type": "string" },
+    "fgos.fallback": { "type": "bool" },
+    "fgos.usage.source": { "type": "string" },
+    "fgos.usage.reason": { "type": "string" },
+    "fgos.workflow": { "type": "string" },
+    "fgos.pattern": { "type": "string" },
+    "fgos.infrastructure": { "type": "bool" },
+    "fgos.verify.outcome": { "type": "string", "values": ["pass", "findings", "timeout", "not-run"] },
+    "fgos.verify.how": { "type": "string" },
+    "fgos.verify.round": { "type": "int" }
+  },
+  "measures": {
+    "fgos.duration": { "unit": "ms", "aggs": ["sum", "min", "max", "avg", "p50", "p90"] },
+    "fgos.attempts": { "unit": "count", "aggs": ["sum", "min", "max", "avg", "p50", "p90"] },
+    "fgos.seats": { "unit": "count", "aggs": ["sum", "min", "max", "avg", "p50", "p90"] },
+    "fgos.usage.total_tokens": { "unit": "token", "aggs": ["sum", "max", "p50", "p90"] },
+    "fgos.usage.reasoning_tokens": { "unit": "token", "aggs": ["sum", "max", "p50", "p90"] }
+  },
+  "kinds": {
+    "fgos.run.attempt": {
+      "subjects": ["run"],
+      "attrs": [
+        "gen_ai.provider.name",
+        "gen_ai.request.model",
+        "fgos.account.id",
+        "fgos.executor.id",
+        "fgos.persona",
+        "fgos.seat.id",
+        "fgos.seat.role",
+        "fgos.outcome",
+        "fgos.failure.code",
+        "fgos.fallback",
+        "fgos.usage.source",
+        "fgos.usage.reason"
+      ],
+      "measures": [
+        "gen_ai.usage.input_tokens",
+        "gen_ai.usage.output_tokens",
+        "gen_ai.usage.cache_read.input_tokens",
+        "gen_ai.usage.cache_creation.input_tokens",
+        "fgos.usage.total_tokens",
+        "fgos.usage.reasoning_tokens",
+        "fgos.duration"
+      ]
+    },
+    "fgos.unit.settled": {
+      "subjects": ["unit"],
+      "attrs": ["fgos.workflow", "fgos.pattern", "fgos.outcome", "fgos.infrastructure"],
+      "measures": ["fgos.attempts", "fgos.seats"]
+    },
+    "fgos.unit.verify": {
+      "subjects": ["unit"],
+      "attrs": ["fgos.verify.outcome", "fgos.verify.how", "fgos.verify.round"],
+      "measures": ["fgos.duration"]
+    }
+  }
+}
