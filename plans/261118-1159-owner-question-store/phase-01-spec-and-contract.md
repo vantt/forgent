@@ -27,9 +27,13 @@ This phase writes docs and JSON contracts only. It writes no code.
    - `answered`: `{id, option?, text?, by, via?, answeredAt}`;
    - `acked`: `{id, by, at}`;
    - `cancelled`: `{id, by, reason, at}`.
-3. Write `packages/questions/contracts/questions-input.v1.json`, the `ask --input` JSON shape (QP-5 and QP-17).
+3. Write `packages/questions/contracts/questions-input.v1.json`, the `ask --input` JSON shape (QP-5, QP-17 and
+   QP-19). It holds `headline` and `blocks` and every QP-19 limit as data (`maxLength`, `minItems`/`maxItems`), so
+   the code reads the limits from the contract and keeps no copy of its own. Add `headline` and `blocks` to the
+   `asked` record in step 2.
 4. Write `packages/questions/contracts/refusals.v1.json`. It names each refusal and its exit category:
    - `asker-unresolved`
+   - `question-unclear` (names the field and the rule)
    - `ref-invalid`
    - `parts-incomplete`
    - `question-unknown`

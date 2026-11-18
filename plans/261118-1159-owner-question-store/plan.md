@@ -116,6 +116,15 @@ These are inside the settled frame. They are decided on evidence, not asked. Say
 | QP-17 | Each option may carry `recommended: true`, and exactly one option does (none only with `--open-discovery`). `answer` takes `--option <label>` and/or `--text <note>`, so the answer is a choice, free text, or both. S04 preselects the recommended option, so the common answer is one click | the fork's recommended flag on the option and its preselected radio; the five-part template keeps its recommendation text, and the flag only points at one option |
 | QP-18 | The `answered` event, the hook line and `show` name the asker's handle and role, and the list prints a "needs you" count first | the fork's wake worked only once the answer named the asker (`3df3e309`); the supervisor resumes by the stored handle |
 
+**Clear questions, light load on the owner** (added 2026-11-18 at the owner's request). Checking only that the five
+parts exist does not make a question easy to answer. Three more decisions cover this:
+
+| id | decision | ground |
+|---|---|---|
+| QP-19 | `ask` checks the **shape** of a question, not only that its parts exist. It refuses with `question-unclear` and names the field and the rule that failed. The rules are:<br>- a `headline` field of at most 120 characters, one line, saying the decision to make;<br>- `what` and `cause` each at most 600 characters;<br>- 2-4 options, each a `label` of at most 60 characters, with `does`, `gain`, `harm` and `cost` all present;<br>- exactly one option with `recommended: true`;<br>- `scope` saying what a yes allows and what it does not;<br>- a `blocks` field naming what waits on the answer;<br>- every file or decision the question cites is a link or a `path:line`, never "as above" or a bare code;<br>- one question is one decision: a second decision is a second `ask`.<br>The limits live in the input contract (`questions-input.v1.json`), not in the code. | AGENTS.md priority #2 (answer the most in one sitting) and `decision-question.md` (2-4 options, each with its cost). The owner may read the question days later without any chat context, so it must stand alone. A mechanical check catches what can be measured, and step 3 of phase 8 covers the rest |
+| QP-20 | Reading is layered. The list shows one line per question: `headline`, the recommended option, `blocks` and age. `show` and S04 then give the full five parts. S04 opens with the recommended option preselected (QP-17), and each option shows its cost next to it | the fork's radio group with the recommended option preselected, and its "needs you" view. Showing every part of every question at once is the overload being avoided |
+| QP-21 | Miu batches from `fgos questions`. A batch holds at most 5 questions and is ordered by how much each answer unblocks (`blocks`), then by plan priority, then by age. Each question comes headline first, so the owner can answer "Q1 yes, Q2 B" in one line. The writing guide in `decision-question.md` gains a short "make it easy to answer" section: plain words in the owner's language, define any term or code before using it, put the recommendation and its reason first, give the cost in numbers, and say what happens if the owner does not answer yet | priority #2 asks for batches, and a capped, ordered batch keeps the load bounded. Some rules (plain words, defined terms) cannot be checked mechanically, so the guide carries them, and the secretary rewrites a question that breaks them before showing it |
+
 Not taken from the fork:
 - a due date, which the fork records and never acts on;
 - a 2-8 option cap, because the template says 2-4;
@@ -138,6 +147,9 @@ definition file and the gateway routes.
    - `ask` returns a `q-` id and records the asker (session id, handle, roles, persona), `askedAt`, stage, ref and the
      five parts;
    - a missing part, a bad ref and an unresolved asker are refused by name;
+   - each QP-19 shape rule has a case refused with `question-unclear` that names the field and the rule: a long
+     headline, 1 option or 5 options, two recommended options, an option without cost, no `blocks`, "as above"
+     without a link;
    - no input field sets the asker.
 2. The same test proves the following:
    - `answer` records `{option, text, by, via, answeredAt}` once, and a second answer gives
@@ -151,7 +163,8 @@ definition file and the gateway routes.
    raises the write door's counter.
 4. `cargo test -p fgos --test questions_verb` proves three things:
    - `fgos questions` lists the store's open questions and the open gates and `fgos ask` items from a fixture, each
-     row carrying its answer command;
+     row on one line with headline, recommended option, `blocks`, age and answer command, and a "needs you"
+     count first;
    - a failing work read still lists the store;
    - `fgos questions --open` is an unknown flag.
 5. `cargo test -p fgos --test questions_hook`, on a fixture with two sessions, proves that each session is told only

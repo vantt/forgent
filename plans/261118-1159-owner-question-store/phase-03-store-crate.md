@@ -33,7 +33,8 @@
    head:<p>, pane?}`. When the asker cannot be resolved it returns `asker-unresolved`. No input sets the asker.
 5. Write `refcheck.rs`, which implements the three `--ref` forms of QP-7 against the main checkout root.
 6. Write the use cases in `usecase.rs`:
-   - `ask(input, ref, flags)`: validate the parts (QP-5 and QP-17), mint an id, append `asked`. With `--supersedes`,
+   - `ask(input, ref, flags)`: validate the parts and the shape rules (QP-5, QP-17 and QP-19, with the limits read
+     from the input contract), mint an id, append `asked`. With `--supersedes`,
      append `cancelled` for the old question under the same lock.
    - `answer(id, option?, text?, via?)`: check that the caller is the owner (QP-16), check that the question is open,
      and append `answered`.
@@ -44,7 +45,7 @@
      Observe failure never undoes a recorded question.
 7. Write the tests in `tests/store_*.rs`, covering acceptance 1-3, over a temp main root:
    - the fields of a recorded ask;
-   - each refusal by name;
+   - each refusal by name, plus one `question-unclear` case for each QP-19 rule;
    - answer once and the conflict fold;
    - the owner rule;
    - the ack/cancel rule;

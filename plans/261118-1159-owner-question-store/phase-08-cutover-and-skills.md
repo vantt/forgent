@@ -22,7 +22,8 @@ when the planner is closed. The ids are recorded in this phase's report.
 ## Steps
 0. Re-grep the open questions. They change daily.
 1. For each open `QUESTIONS.md` row, run `fgos questions ask --migrated --ref discussion:<topic>#Q<n> --input …`.
-   Build the five parts from the row. A row without options becomes `--open-discovery`. Add the `q-` id to a new
+   Build the five parts, the `headline` and `blocks` from the row,
+   so that the result passes the QP-19 check. A row without options becomes `--open-discovery`. Add the `q-` id to a new
    `qid` column.
 2. For each open draft-plan owner question, ask it the same way with `--ref plan:<dir>`, and send its planner the id.
 3. Change the skills so that they:
@@ -31,6 +32,9 @@ when the planner is closed. The ids are recorded in this phase's report.
    - continue the work the question does not block;
    - on the hook line, write the answer and the decision back to the origin, then `fgos questions ack <id>`;
    - cancel or supersede a question that is no longer needed.
+   - Add a "make it easy to answer" section to `decision-question.md` (QP-21).
+   - The secretary batches at most 5 questions in QP-21 order, headline first, and rewrites a question that breaks
+     the guide before showing it.
    The plan contract's "Owner questions" section lists `q-` ids with a one-line summary. The secretary batches from
    `fgos questions`.
 4. Run `npm run build:skills`.

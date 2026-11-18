@@ -19,7 +19,8 @@ See the phase table in `plan.md`, row 7.
    answers as the owner, because the gateway token is the owner's.
 2. Add the MCP tools `list_questions` and `answer_question` over the same two calls.
 3. Add the client methods and types in the web app. In `NeedsAnswer.tsx`, list the store questions with a "needs
-   you" count, show the five parts with a radio group that preselects the recommended option, and add an optional
+   you" count, show each question by its `headline`, recommended option and `blocks` first, expanding to the five parts with the
+   cost next to each option (QP-20), with a radio group that preselects the recommended option, and add an optional
    note. The `fgos ask` items stay listed beside them.
 4. Update the API yaml and the S04 screen spec.
 5. Tests:

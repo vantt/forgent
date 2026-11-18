@@ -25,8 +25,9 @@ See the phase table in `plan.md`, row 4.
 1. Register `fgos_questions::OBSERVE_KINDS` in `observe_declarations.rs`.
 2. Write `apps/fgos/src/wiring/questions.rs`. It parses the sub-verbs (`list` by default, `show`, `ask`, `answer`,
    `ack`, `cancel`), calls the use cases, and renders text and `--json` through the house envelope.
-   - The text list prints a "needs you: N" line first. Each row then gives its id, age, asker handle and role, ref, a
-     one-line `what`, and its answer command.
+   - The text list prints a "needs you: N" line first. The rows then follow in QP-21 order (`blocks` first, then
+     priority, then age). Each row is one line: id, `headline`, recommended option, `blocks`, age and answer command.
+     The asker and ref are shown by `show`.
    - `show` prints the five parts with the recommended option marked, and the answer state.
 3. Write the work-sources read. Move only the gate and `fgos ask` part of `open-questions.mjs` into
    `src/portfolio/work-questions.mjs`, as a module run through `legacy_exec` the way `bridge.rs` runs its module: one
