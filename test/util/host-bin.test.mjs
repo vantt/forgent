@@ -53,6 +53,9 @@ test('resolveHostBin returns the host of the project\'s own active release', {
     fs.writeFileSync(path.join(project, '.fgos', 'installation', 'activation.json'), JSON.stringify({ status: 'ready', releasePath: release }));
     assert.equal(resolveHostBin(project), path.join(release, 'bin', 'fgos'));
     assert.equal(resolveHostBin(path.join(project, '.fgos')), path.join(release, 'bin', 'fgos'), 'a .fgos path names its project');
+    const below = path.join(project, 'a', 'b');
+    fs.mkdirSync(below, { recursive: true });
+    assert.equal(resolveHostBin(below), path.join(release, 'bin', 'fgos'), 'from below an activated project the walk finds it');
   } finally {
     if (original !== undefined) process.env.FGOS_HOST_BIN = original;
     fs.rmSync(project, { recursive: true, force: true });
