@@ -314,7 +314,7 @@ mod tests {
             ("FGOS_SESSION_ID", "att-cmd_9"),
             ("CLAUDE_CODE_SESSION_ID", "uuid-9"),
         ]);
-        directory::register_writer(&root, None, &attempt, &gate, &[], false).unwrap();
+        directory::register_writer(&root, None, &attempt, &gate, &[], false, None).unwrap();
         // Registered but not bound: the CLI variable alone never moves the caller off its attempt id.
         let unbound = current_from(&root, pid, &lookup).unwrap();
         assert!(
@@ -328,7 +328,7 @@ mod tests {
             source: "CLAUDE_CODE_SESSION_ID",
             value: "uuid-9",
         };
-        directory::bind_agent_session(&root, None, &attempt, &claude, &gate, pid).unwrap();
+        directory::bind_agent_session(&root, None, &attempt, &claude, &gate, pid, None).unwrap();
         let bound = current_from(&root, pid, &lookup).unwrap();
         assert!(bound.info.id.ends_with("/uuid-9"), "{}", bound.info.id);
         assert!(

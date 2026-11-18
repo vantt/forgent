@@ -936,7 +936,15 @@ fn register_session(session: &SessionPlan, gate: &ProcTuple) {
         start_time: gate.start_time.clone(),
     };
     let register = |roles: &[String]| {
-        register_writer(&state_root, Some(&session.cwd), &key, &head, roles, false)
+        register_writer(
+            &state_root,
+            Some(&session.cwd),
+            &key,
+            &head,
+            roles,
+            false,
+            None,
+        )
     };
     let refused = match register(std::slice::from_ref(&session.role)) {
         Ok(_) => return,

@@ -38,6 +38,9 @@ pub struct Candidate {
     /// Set only for a session of another machine (flattened into the object).
     #[serde(flatten, skip_serializing_if = "Option::is_none")]
     pub remote: Option<Remote>,
+    /// The fields of this session a resolve query matched (`ambiguous`, `stale`); empty otherwise.
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub matched: Vec<String>,
 }
 
 /// The answer is a refusal, not a result: the CLI prints `detail` and exits

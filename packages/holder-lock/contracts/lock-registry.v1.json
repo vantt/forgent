@@ -133,6 +133,15 @@
       "note": "serialises pins confirm against forget (packages/identity/rust/src/pins.rs)"
     },
     {
+      "name": "identity-directory",
+      "kind": "mutex",
+      "scope": "machine",
+      "rank": 80,
+      "v3Path": "<lockRoot>/identity-directory.lock",
+      "owner": "identity",
+      "note": "serialises every read-modify-write of an existing session entry (role moves, drops, binds, identifier refreshes) so none loses another's change (packages/identity/rust/src/directory.rs); create-once registration and reads take no lock"
+    },
+    {
       "name": "dispatch-cwd",
       "kind": "lease",
       "scope": "repo",

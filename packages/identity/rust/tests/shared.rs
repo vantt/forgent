@@ -3,7 +3,7 @@
 //! never touches the real state root or machine key.
 
 use fgos_identity::current::MachineInfo;
-use fgos_identity::directory::{self, Entry, Listed};
+use fgos_identity::directory::{self, Entry, Listed, NoTerminal};
 use fgos_identity::pins::PinState;
 use fgos_identity::refusal::Liveness;
 use fgos_identity::shared::{
@@ -52,6 +52,9 @@ fn session(machine_id: &str, name: &str, roles: &[&str], registered_at: &str) ->
         roles: roles.iter().map(|r| r.to_string()).collect(),
         liveness: Liveness::Alive,
         remote: None,
+        ids: None,
+        matched: Vec::new(),
+        stale: Vec::new(),
     }
 }
 
@@ -266,25 +269,31 @@ fn a_live_local_holder_beats_a_remote_one_and_a_remote_full_id_resolves_through_
     directory::register(&viewer, local, false, &alive).unwrap();
 
     assert_eq!(
-        directory::resolve(&viewer, "lead:MAIL", &alive, Some(&view))
+        directory::resolve(&viewer, "lead:MAIL", &alive, Some(&view), &NoTerminal)
             .unwrap()
             .id,
         "viewer-vvvvvv/loc"
     );
     assert_eq!(
-        directory::resolve(&viewer, "lead:IDENT", &alive, Some(&view))
+        directory::resolve(&viewer, "lead:IDENT", &alive, Some(&view), &NoTerminal)
             .unwrap()
             .id,
         "alpha-aaaaaa/one"
     );
     assert_eq!(
-        directory::resolve(&viewer, "alpha-aaaaaa/one", &alive, Some(&view))
-            .unwrap()
-            .liveness,
+        directory::resolve(
+            &viewer,
+            "alpha-aaaaaa/one",
+            &alive,
+            Some(&view),
+            &NoTerminal
+        )
+        .unwrap()
+        .liveness,
         Liveness::Remote
     );
     assert_eq!(
-        directory::resolve(&viewer, "alpha-aaaaaa/one", &alive, None)
+        directory::resolve(&viewer, "alpha-aaaaaa/one", &alive, None, &NoTerminal)
             .unwrap_err()
             .reason,
         "not-found"

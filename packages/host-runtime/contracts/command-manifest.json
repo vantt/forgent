@@ -2149,7 +2149,7 @@
     {
       "name": "identity",
       "invoke": "fgos identity [writer|machine|session|project|resolve|list|mint|pins]",
-      "description": "Read-only unless --alias, --init, --new, --register, --role, --drop-role, --forget, --confirm, `list --prune` or `mint`: who this process, this machine and this project are, through the native Identity component (docs/platform/identity/spec.md). Bare `fgos identity` is `writer`: which writer the calling process is, as {id, source}. Tries FGOS_SESSION_ID, CODEX_THREAD_ID, PI_SESSION_ID, CLAUDE_CODE_SESSION_ID in order (source env); otherwise the highest ancestor holding a controlling terminal, else the caller's session id (source pid); otherwise the caller pid (source unresolved). `machine` prints the machine id minted by `fgos doctor --fix`, its handle, its alias and the fingerprint of its signing key; `pins` lists the machine keys this machine pinned the first time it saw them, each `seen` or `confirmed`; `session` prints this session's full id and its stable handle (`claude-4f2a@fg-server`); `project` prints the project id every clone shares (the tracked file `.fgos/project.json`), also from a linked worktree; `session --register` puts this session in the local directory of this machine, `resolve <handle|lead:LANE|work:NAME>` names exactly one live session of it and `list` shows them; `mint <kind>` gives a new id that travels between machines. Bare also carries optional `machine` and `session` parts, `null` when unknown; it never writes.",
+      "description": "Read-only unless --alias, --init, --new, --register, --role, --drop-role, --forget, --confirm, `list --prune` or `mint`: who this process, this machine and this project are, through the native Identity component (docs/platform/identity/spec.md). Bare `fgos identity` is `writer`: which writer the calling process is, as {id, source}. Tries FGOS_SESSION_ID, CODEX_THREAD_ID, PI_SESSION_ID, CLAUDE_CODE_SESSION_ID in order (source env); otherwise the highest ancestor holding a controlling terminal, else the caller's session id (source pid); otherwise the caller pid (source unresolved). `machine` prints the machine id minted by `fgos doctor --fix`, its handle, its alias and the fingerprint of its signing key; `pins` lists the machine keys this machine pinned the first time it saw them, each `seen` or `confirmed`; `session` prints this session's full id and its stable handle (`claude-4f2a@fg-server`); `project` prints the project id every clone shares (the tracked file `.fgos/project.json`), also from a linked worktree; `session --register` puts this session in the local directory of this machine, `resolve <any identifier>` names exactly one live session of it by any identifier it holds and `list` shows them; `mint <kind>` gives a new id that travels between machines. Bare also carries optional `machine` and `session` parts, `null` when unknown; it never writes.",
       "parameters": {
         "type": "object",
         "properties": {
@@ -2255,13 +2255,13 @@
           ]
         },
         "resolve": {
-          "description": "The one live session a handle (`claude-4f2a@fg-server`) or a role alias (`lead:MAIL`, `work:<name>`) names in the local directory of this machine: {id, handle, cli, projectId, clone, registeredAt, roles, liveness}. Exit 65 [not-found] or [ambiguous] with the candidates in the message; a session whose head process is dead is never returned.",
+          "description": "The one live session an identifier names in the local directory of this machine, matched exactly in this order: a socket path (starting with `/`), a full id (`<machine-id>/<local id>`), a role alias (`lead:MAIL`, `work:<name>`, `head:<persona>-<name>`), a pid (all digits: the head's or the CLI session's), else a handle (`claude-4f2a@fg-server`), CLI session id or name, terminal pane id, tab id or slot key, or mailbox name. Prints the whole record: {id, handle, cli, projectId, clone, registeredAt, roles, liveness, ids?, matched, stale?}; `ids` holds the session's other identifiers (cliSession, terminal, mailbox, head), `matched` the fields the query matched, `stale` the groups out of date. Exit 65 [not-found], [ambiguous] (each candidate names the fields it matched) or [stale] (only a CLI session whose process ended matches) with the candidates in the message; a session whose head process is dead is never returned.",
           "parameters": {
             "type": "object",
             "properties": {
               "query": {
                 "type": "string",
-                "description": "A session handle or a role alias (positional)."
+                "description": "Any identifier of the session: handle, role alias, full id, pid, socket path, CLI session id or name, pane id, tab id, slot key or mailbox name (positional)."
               }
             },
             "positional": [
@@ -2273,7 +2273,9 @@
           },
           "examples": [
             "fgos identity resolve claude-4f2a@fg-server --json",
-            "fgos identity resolve lead:MAIL"
+            "fgos identity resolve lead:MAIL",
+            "fgos identity resolve head:secretary-miu --json",
+            "fgos identity resolve w1-p3 --json"
           ]
         },
         "list": {

@@ -15,7 +15,7 @@
 //! resolved session is used only when it is one of this record's heads, a
 //! role delivery names the holder in the report, and candidates are cut to
 //! this record's heads, never the machine's sessions.
-use fgos_identity::directory::{is_role_alias, register_writer, resolve};
+use fgos_identity::directory::{is_role_alias, register_writer, resolve, NoTerminal};
 use fgos_identity::resolve::{HeadRef, WriterKey as IdentityKey, ENV_ORDER};
 use fgos_identity::session::cli_of;
 use fgos_identity::{session_for, Candidate, Liveness as IdentityLiveness, SessionInfo};
@@ -163,7 +163,7 @@ fn ensure_registered_via(
         Ok(session) => session.info,
         Err(refusal) => return refused(refusal.reason),
     };
-    match resolve(state_root, &own.handle, &judge_here, None) {
+    match resolve(state_root, &own.handle, &judge_here, None, &NoTerminal) {
         Ok(listed) if listed.id == own.id => None,
         Ok(_) => Some("ident-handle-in-use".to_string()),
         Err(refusal) if refusal.reason == "not-found" => match head_socket {
@@ -174,7 +174,7 @@ fn ensure_registered_via(
                     .err()
                     .and_then(|error| refused(&error.code))
             }
-            None => register_writer(state_root, clone_dir, &key, &head_ref, &[], false)
+            None => register_writer(state_root, clone_dir, &key, &head_ref, &[], false, None)
                 .err()
                 .and_then(|refusal| refused(refusal.reason)),
         },
@@ -224,7 +224,7 @@ pub fn address(state_root: Option<&Path>, to: &str, heads: &[HeadView]) -> Addre
         key: view.key.clone(),
         role_holder: is_role.then(|| (to.to_string(), info.handle.clone())),
     };
-    match resolve(root, to, &judge_here, None) {
+    match resolve(root, to, &judge_here, None, &NoTerminal) {
         Ok(listed) => ours
             .iter()
             .find(|(_, info)| info.id == listed.id && (!by_handle || info.handle == to))
@@ -294,7 +294,7 @@ pub fn handle_conflicts(state_root: &Path, heads: &[HeadView]) -> Vec<HandleConf
             .iter()
             .find(|(_, other)| other.id != info.id && other.handle == info.handle)
             .map(|(_, other)| other.id.clone());
-        let held = || match resolve(state_root, &info.handle, &judge_here, None) {
+        let held = || match resolve(state_root, &info.handle, &judge_here, None, &NoTerminal) {
             Ok(listed) if listed.id != info.id => Some(listed.id),
             _ => None,
         };

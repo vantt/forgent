@@ -98,7 +98,8 @@ pub enum Verb {
     /// `session [--register [--role <role> [--take]] | --drop-role <role>]`: this session's
     /// full id and handle, and its entry in the local directory.
     Session(SessionAction),
-    /// `resolve <handle|role|full id>`: the one live session it names.
+    /// `resolve <any identifier>`: the one live session it names (a handle, role, full id, pid, socket, CLI
+    /// session id or name, pane, tab or mailbox name).
     Resolve { query: String },
     /// `list [--project] [--prune] [--machine <handle|id>]`: the sessions the machine knows.
     List {
@@ -514,22 +515,30 @@ fn answer(
                     cwd.as_deref(),
                     &role.iter().cloned().collect::<Vec<_>>(),
                     *take,
+                    None,
                 )?;
                 publish(request, door, &root, Some(&listed));
                 Ok(serde_json::to_value(listed).expect("Listed always serializes"))
             }
         },
         Verb::Resolve { query } => {
-            let listed = match directory::resolve(&root, query, &judge_here, None) {
-                // Local first: other machines are asked only when this one has no answer.
-                Err(missing) if missing.reason == "not-found" => {
-                    match remote_view(request, door, &root) {
-                        Some(view) => directory::resolve(&root, query, &judge_here, Some(&view))?,
-                        None => return Err(missing),
+            let listed =
+                match directory::resolve(&root, query, &judge_here, None, &directory::NoTerminal) {
+                    // Local first: other machines are asked only when this one has no answer.
+                    Err(missing) if missing.reason == "not-found" => {
+                        match remote_view(request, door, &root) {
+                            Some(view) => directory::resolve(
+                                &root,
+                                query,
+                                &judge_here,
+                                Some(&view),
+                                &directory::NoTerminal,
+                            )?,
+                            None => return Err(missing),
+                        }
                     }
-                }
-                other => other?,
-            };
+                    other => other?,
+                };
             Ok(serde_json::to_value(listed).expect("Listed always serializes"))
         }
         Verb::List {

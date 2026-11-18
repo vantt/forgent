@@ -375,7 +375,13 @@ pub fn identity_holds(
     let Some(own) = own_session(state_root, writer_id, head)? else {
         return Ok(false);
     };
-    match fgos_identity::directory::resolve(state_root, role, &judge_here, None) {
+    match fgos_identity::directory::resolve(
+        state_root,
+        role,
+        &judge_here,
+        None,
+        &fgos_identity::directory::NoTerminal,
+    ) {
         Ok(holder) => Ok(holder.id == own),
         Err(r) if r.reason == "not-found" => Ok(false),
         Err(r) => Err(hold_error(r)),
@@ -417,6 +423,7 @@ pub fn identity_take(
         head,
         &[role.to_string()],
         take,
+        None,
     )
     .map(|_| ())
     .map_err(hold_error)
@@ -453,6 +460,7 @@ pub fn identity_bind(
         &agent,
         head,
         peer,
+        None,
     )
     .map(|listed| json!({"id": listed.id, "handle": listed.handle}))
     .map_err(hold_error)

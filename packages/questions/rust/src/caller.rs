@@ -60,6 +60,7 @@ impl CallerSource for IdentityCaller {
             &session.info.id,
             &fgos_process::facts::judge_here,
             None,
+            &directory::NoTerminal,
         )
         .map(|listed| listed.roles)
         .unwrap_or_default();

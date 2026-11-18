@@ -483,7 +483,7 @@ fn register(root: &Path, writer_id: &str, roles: &[&str]) {
         value: writer_id,
     };
     let roles: Vec<String> = roles.iter().map(|r| r.to_string()).collect();
-    fgos_identity::directory::register_writer(root, None, &key, &head, &roles, false)
+    fgos_identity::directory::register_writer(root, None, &key, &head, &roles, false, None)
         .unwrap_or_else(|r| panic!("register {writer_id}: {} {}", r.reason, r.detail));
 }
 
@@ -895,7 +895,14 @@ fn the_bind_verb_moves_the_role_to_the_agent_session_of_the_connecting_process_a
     pump.join().unwrap();
     assert_eq!(done["result"], "done", "{done}");
     assert_eq!(done["data"]["id"], "fg-abc234/uuid-bind");
-    let holder = fgos_identity::directory::resolve(&root, role, &facts::judge_here, None).unwrap();
+    let holder = fgos_identity::directory::resolve(
+        &root,
+        role,
+        &facts::judge_here,
+        None,
+        &fgos_identity::directory::NoTerminal,
+    )
+    .unwrap();
     assert_eq!(
         (holder.id.as_str(), holder.cli.as_str()),
         ("fg-abc234/uuid-bind", "claude")

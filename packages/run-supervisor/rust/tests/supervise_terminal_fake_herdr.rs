@@ -400,6 +400,7 @@ fn a_session_attempt_holds_its_role_through_a_blocked_screen_and_ends_only_when_
             "head:planner-probe",
             &fgos_process::facts::judge_here,
             None,
+            &fgos_identity::directory::NoTerminal,
         )
     };
     wait_until(STEP, "the session to hold its role in Identity", || {
