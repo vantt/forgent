@@ -67,41 +67,6 @@ impl EncodedMessage {
                 content_type: "application/octet-stream".to_string(),
                 bytes: b.clone(),
             })
-        } else if let Some(action) = request
-            .input
-            .downcast_ref::<crate::providers::builtin::EchoAction>()
-        {
-            let val = match action {
-                crate::providers::builtin::EchoAction::Echo(msg) => {
-                    serde_json::json!({ "message": msg })
-                }
-                crate::providers::builtin::EchoAction::Delay { duration, message } => {
-                    serde_json::json!({
-                        "delay_ms": duration.as_millis(),
-                        "message": message,
-                    })
-                }
-                crate::providers::builtin::EchoAction::Panic(msg) => serde_json::json!({
-                    "crash": "before_response",
-                    "message": msg,
-                }),
-                crate::providers::builtin::EchoAction::Park(reason) => serde_json::json!({
-                    "park": reason,
-                }),
-                crate::providers::builtin::EchoAction::Fail(msg) => serde_json::json!({
-                    "action": "fail",
-                    "message": msg,
-                }),
-            };
-            let bytes = serde_json::to_vec(&val).map_err(|e| {
-                ProviderError::SemanticValidation(format!("failed to serialize EchoAction: {e}"))
-            })?;
-            Ok(Self {
-                contract_id,
-                contract_version,
-                content_type: "application/json".to_string(),
-                bytes,
-            })
         } else {
             let bytes = serde_json::to_vec(&serde_json::Value::Null).unwrap();
             Ok(Self {

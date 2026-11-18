@@ -11,10 +11,6 @@ use crate::contracts::{OperationCatalog, ProviderDescriptor, RegistrySnapshot};
 
 #[cfg(test)]
 use crate::catalog::CATALOG;
-#[cfg(test)]
-use crate::contracts::{ContractRef, OperationId, ProviderLifecycle};
-#[cfg(test)]
-use std::borrow::Cow;
 
 /// Builds an immutable [`RegistrySnapshot`].
 ///
@@ -68,27 +64,10 @@ pub fn build_snapshot(
     }
 }
 
-/// Fixture provider descriptor for `test.fixture.echo`.
+/// Test providers table containing only the in-crate echo fixture provider.
 #[cfg(test)]
-pub(crate) const FIXTURE_ECHO_PROVIDER: ProviderDescriptor = ProviderDescriptor {
-    provider_id: Cow::Borrowed("test.fixture.echo.builtin"),
-    operation_id: OperationId::from_static("test.fixture.echo"),
-    component_class: Cow::Borrowed("test"),
-    mechanism: Cow::Borrowed("builtin"),
-    lifecycle: ProviderLifecycle::Singleton,
-    request_contract: ContractRef::from_static("test.fixture.echo.request", "1.0.0"),
-    outcome_contract: ContractRef::from_static("test.fixture.echo.outcome", "1.0.0"),
-    allowed_hosts: &["cli", "remote", "test"],
-    allowed_modes: &["sync", "test"],
-    capabilities: &[],
-    replacement: None,
-    concurrency: None,
-    health: None,
-};
-
-/// Test providers table containing only in-crate fixture providers.
-#[cfg(test)]
-pub(crate) const TEST_PROVIDERS: &[ProviderDescriptor] = &[FIXTURE_ECHO_PROVIDER];
+pub(crate) const TEST_PROVIDERS: &[ProviderDescriptor] =
+    &[crate::echo_operation::ECHO_PROVIDER_DESCRIPTOR];
 
 /// Crate-private snapshot built only from in-crate fixture providers, for this
 /// phase's own tests. It never references `fgos-distribution`.

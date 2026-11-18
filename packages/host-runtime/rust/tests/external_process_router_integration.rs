@@ -11,7 +11,10 @@
 //! (e) External provider claims to reserved namespaces (distribution.build.show, work.gate-bypass.show)
 //!     are refused by ExternalProcessLinker with LinkerError::ReservedNamespace.
 
-use fgos_host_runtime::catalog::CATALOG;
+#[path = "support/echo_operation.rs"]
+mod echo_operation;
+
+use echo_operation::{echo_catalog, EchoAction, EchoProvider, ECHO_PROVIDER_DESCRIPTOR};
 use fgos_host_runtime::contracts::{
     ContractRef, HostInvocation, OperationCatalog, OperationDescriptor, OperationEffect,
     OperationId, OperationIdempotency, OperationRequest, ProviderDescriptor, ProviderOutcome,
@@ -21,7 +24,6 @@ use fgos_host_runtime::invocation_service::{
     InMemoryEventSink, InvocationService, InvocationTerminalState,
 };
 use fgos_host_runtime::operation_provider_router::{select, RouterPolicy, SelectionInput};
-use fgos_host_runtime::providers::builtin::{EchoAction, EchoProvider, ECHO_PROVIDER_DESCRIPTOR};
 use fgos_host_runtime::providers::external_process::{
     ExternalManifest, ExternalProcessConfig, ExternalProcessLinker, ExternalProcessProviderAdapter,
     LinkerError, COMPONENT_PROTOCOL_VERSION, FIXTURE_OPERATION_ID, FIXTURE_PROVIDER_ID,
@@ -72,7 +74,7 @@ fn test_catalog() -> OperationCatalog {
     static CATALOG_CELL: std::sync::OnceLock<&'static [OperationDescriptor]> =
         std::sync::OnceLock::new();
     CATALOG_CELL.get_or_init(|| {
-        let mut entries = CATALOG.to_vec();
+        let mut entries = echo_catalog().to_vec();
         entries.push(OperationDescriptor {
             operation_id: OperationId::from_static(FIXTURE_OPERATION_ID),
             owning_component_id: Cow::Borrowed("test"),
@@ -151,7 +153,7 @@ fn test_registry_snapshot_links_catalog_and_derived_adapter_without_panic() {
     let (snapshot, derived_desc) = build_test_snapshot();
 
     assert_eq!(snapshot.fingerprint(), "test-snapshot-r2-p5");
-    assert_eq!(snapshot.catalog().len(), CATALOG.len() + 1);
+    assert_eq!(snapshot.catalog().len(), echo_catalog().len() + 1);
     assert_eq!(snapshot.providers().len(), 2);
 
     let fixture_desc = snapshot

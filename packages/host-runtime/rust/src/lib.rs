@@ -21,6 +21,11 @@ pub use invocation_service::{
     InvocationTerminalState, NoopEventSink, OperationProvider,
 };
 pub use operation_provider_router::{select, RouterPolicy, SelectionInput, SelectionRefused};
-pub use providers::builtin::{EchoAction, EchoProvider, ECHO_PROVIDER_DESCRIPTOR};
 pub use providers::external_process::*;
 pub use registry::build_snapshot;
+
+#[cfg(test)]
+extern crate self as fgos_host_runtime;
+#[cfg(test)]
+#[path = "../tests/support/echo_operation.rs"]
+pub(crate) mod echo_operation;
