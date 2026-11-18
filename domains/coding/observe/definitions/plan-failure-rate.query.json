@@ -1,0 +1,1 @@
+{"name":"plan-failure-rate","requires":["fgos.run.attempt"],"query":{"kind":["fgos.run.attempt"],"by":["ref:plan","fgos.outcome"],"agg":["count"]}}

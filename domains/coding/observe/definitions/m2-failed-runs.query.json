@@ -1,0 +1,1 @@
+{"name":"m2-failed-runs","requires":["fgos.run.attempt"],"query":{"kind":["fgos.run.attempt"],"where":[{"field":"fgos.outcome","op":"ne","value":"pass"}],"by":["ref:plan"],"agg":["count","sum:fgos.duration"]}}

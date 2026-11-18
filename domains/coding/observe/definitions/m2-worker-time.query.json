@@ -1,0 +1,1 @@
+{"name":"m2-worker-time","requires":["fgos.run.attempt"],"query":{"kind":["fgos.run.attempt"],"where":[{"field":"fgos.outcome","op":"eq","value":"pass"}],"by":["ref:plan"],"agg":["sum:fgos.duration","count"]}}

@@ -1,0 +1,1 @@
+{"name":"plan-tokens","requires":["fgos.run.attempt"],"query":{"kind":["fgos.run.attempt"],"by":["ref:plan","gen_ai.provider.name","fgos.account.id","gen_ai.request.model"],"agg":["sum:fgos.usage.total_tokens","sum:gen_ai.usage.input_tokens","sum:gen_ai.usage.output_tokens","count"]}}

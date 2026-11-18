@@ -1,0 +1,1 @@
+{"name":"m2-recheck-time","requires":["fgos.unit.verify"],"query":{"kind":["fgos.unit.verify"],"by":["ref:plan"],"agg":["sum:fgos.duration","count"]}}

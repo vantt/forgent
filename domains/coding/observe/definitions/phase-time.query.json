@@ -1,0 +1,1 @@
+{"name":"phase-time","requires":["fgos.run.attempt"],"query":{"kind":["fgos.run.attempt"],"by":["ref:plan","ref:phase"],"agg":["sum:fgos.duration","count"]}}

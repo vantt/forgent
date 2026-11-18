@@ -1,0 +1,1 @@
+{"name":"m3-interventions","requires":["fgos.question.asked","fgos.question.answered"],"query":{"kind":["fgos.question.answered"],"by":["ref:plan"],"agg":["count"]}}

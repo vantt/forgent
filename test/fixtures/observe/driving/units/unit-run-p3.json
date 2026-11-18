@@ -1,0 +1,86 @@
+{
+  "contract": {
+    "id": "unit-summary",
+    "version": 3
+  },
+  "unitRunId": "unit-run-p3",
+  "workflow": {
+    "runId": "wf-1",
+    "stepId": "s",
+    "unitId": "unit-run-p3"
+  },
+  "pattern": "solo",
+  "capability": "execute",
+  "outcome": "pass",
+  "infrastructure": false,
+  "infrastructureReason": null,
+  "refused": [],
+  "startedAt": "2026-11-18T12:00:00.000Z",
+  "settledAt": "2026-11-18T12:22:00.000Z",
+  "stanceOptions": [],
+  "seats": [
+    {
+      "seat": "producer",
+      "role": "producer",
+      "kind": "producer",
+      "round": 1,
+      "final": {
+        "assignmentId": "x/producer/e",
+        "runId": "run-e",
+        "executor": "alpha",
+        "provider": "openai",
+        "model": "gpt-y",
+        "accountId": "a2",
+        "persona": "builder",
+        "outcome": "pass",
+        "fallbackFrom": null,
+        "durationMs": 1200000,
+        "usage": {
+          "inputTokens": 3000,
+          "outputTokens": 1000,
+          "totalTokens": 4000,
+          "source": "stdout",
+          "reason": null
+        },
+        "stance": {
+          "status": "missing"
+        }
+      },
+      "attempts": [
+        {
+          "assignmentId": "x/producer/e",
+          "runId": "run-e",
+          "executor": "alpha",
+          "provider": "openai",
+          "model": "gpt-y",
+          "accountId": "a2",
+          "persona": "builder",
+          "outcome": "pass",
+          "fallbackFrom": null,
+          "durationMs": 1200000,
+          "usage": {
+            "inputTokens": 3000,
+            "outputTokens": 1000,
+            "totalTokens": 4000,
+            "source": "stdout",
+            "reason": null
+          }
+        }
+      ]
+    }
+  ],
+  "plan": {
+    "dir": "plans/261118-1000-demo-plan",
+    "phase": "3"
+  },
+  "verify": {
+    "ran": true,
+    "command": "npm test",
+    "outcome": "pass",
+    "exit": 0,
+    "passed": true,
+    "durationMs": 90000,
+    "how": "shell",
+    "outputDigest": "sha256:abc"
+  }
+}
