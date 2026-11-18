@@ -19,12 +19,15 @@ directory" lists `llm-accounts.mjs` as debt.
 - `packages/execution/engine/src/accounts/` ports them; implements `fgos-execution`'s account-state port (S5 D4).
 - Global directory through the F0 global-directory door (`fgos-config`), never a private path.
 - Locks through `fgos-holder-lock`; same lock names and scopes as Node (lock registry unchanged).
-- Golden vectors `packages/execution/contracts/accounts.v1.json` recorded from Node; probe parsing vectors from the
-  usage-parser fixtures.
+- Golden vectors under `packages/execution/contracts/accounts/` recorded by
+  `test/golden-recorders/accounts.recorder.mjs` (committed); probe parsing vectors from the usage-parser fixtures; the
+  lease state file read accepts every generation in the phase 00 corpus.
+- The `llm-accounts.mjs` debt of door row "global fgOS directory" and the `provider-credential-probe.mjs` entry of
+  "process control: signal a process or group" are dropped by phase 21, which deletes those files.
 
 ## Steps
 
-Record vectors; red `engine/tests/accounts.rs`; port; green; report.
+Commit the recorder; record vectors; red `engine/tests/accounts.rs`; port; green; report.
 
 ## Validation
 

@@ -13,12 +13,14 @@ Wave 3. Depends on: 3. Effort 1.5d. Library only (engine module `run_result`).
 
 - `packages/execution/engine/src/run_result/` ports the writer, readers and attribution over `fgos-run-result`; no
   second outcome type.
-- Golden vectors `packages/execution/contracts/run-result-write.v1.json`: written bytes per outcome class, reader
-  answers for v2 and v3 fixtures, attribution of stray writes.
+- Golden vectors under `packages/execution/contracts/run-result/` recorded by
+  `test/golden-recorders/run-result.recorder.mjs`: written bytes per outcome class, reader answers for v2 and v3
+  fixtures, attribution of stray writes; readers replay the phase 00 corpus (F13).
+- A run result Rust writes is read by the previous Node release (reverse-read fixture for phase 22, F12).
 
 ## Steps
 
-Record vectors; red `engine/tests/run_result.rs`; port; green; report.
+Commit the recorder; record vectors; red `engine/tests/run_result.rs`; port; green; report.
 
 ## Validation
 
@@ -27,4 +29,4 @@ Record vectors; red `engine/tests/run_result.rs`; port; green; report.
 ## Risk and rollback
 
 Risk: readers of old run records (v2) break `dispatch show-run`/`inspect` after cutover. Vectors include v2 and v3
-fixtures from `.fgos/assignments` shapes. Rollback: revert.
+fixtures and the corpus. Rollback: revert.

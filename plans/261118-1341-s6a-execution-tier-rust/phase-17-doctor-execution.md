@@ -1,6 +1,7 @@
 # Phase 17: doctor rows, executor, accounts, run supervisor, terminal
 
-Wave 5. Depends on: 5, 9, 10, 11, 13, 15. Effort 2.5d.
+Wave 6. Depends on: 5, 9, 10, 11, 13b, 15. Effort 2.5d. Cut-over phase: run the re-sync step of the phase-lead rules
+first (`src/setup`, `src/runner/agent-definitions.mjs`).
 
 ## Context
 
@@ -12,13 +13,15 @@ The other 21 `bridge:S6a` rows plus `seat-binding-route` (S5 D15). Executor and 
 `terminal-control`, `terminal-allocations`, `trust-store-readable`, `non-claude-trust-stores-readable`,
 `agent-cli-project-trusted`. Node judges: `src/setup/{registrations,run-supervisor-checks,model-pool-checks,
 executor-profile-warnings,session-keep-declared,agent-cli-trust,terminal-control-checks}.mjs` and the row parts of
-`src/runner/agent-definitions.mjs`. Door rows closed by this move (phase 22 edits `doors`): "person's agent config
-writes" (agent CLI trust rows), "agent definition tier directories" (`agent-type-names-unique`, Node listing deleted).
+`src/runner/agent-definitions.mjs`. Door rows edited by this move, in the same change (V4): "person's agent config
+writes" (agent CLI trust rows: the Node reader debt goes), "agent definition tier directories" (`agent-type-names-unique`:
+the Node listing's allowed entry goes when the listing is deleted), and any `allowed`/`debt` entry naming a deleted row
+module.
 
 ## Requirements
 
 - Rust judges in `apps/fgos/src/wiring/doctor/{execution,run_supervisor,terminal}.rs` (extend S5's `execution.rs`)
-  over `fgos-execution` (executor model), engine `accounts`, `credentials`, `transport`, `assignment` (prompt templates),
+  over `fgos-execution` (executor model), engine `accounts`, `credentials`, `transport`, `contract` (prompt templates),
   `fgos-run-supervisor::controller` (runtime dir, trust store, config), `fgos-terminal-control`; registry rows to
   `inRust`.
 - `agent-type-names-unique`: the host's agent listing (S5 `agents.rs` + `wiring/agents.rs`) judges it; the Node
@@ -29,12 +32,14 @@ writes" (agent CLI trust rows), "agent definition tier directories" (`agent-type
   20, the row is judged in Rust by probing the route the client calls; else it is deleted with a "behaviour removed"
   note and phase 20 deletes the client.
 - Delete the Node row modules and bodies; their tests retire to Rust owners; parity table grows to these rows.
+- The Node listing in `agent-definitions.mjs` imports `RunnerConfigError` from `src/runner/dispatch/runner-config-error.mjs`
+  (`:21`); if the file survives this phase, that import switches in phase 20 with the other config callers.
 - `src/setup/seat-binding-checks.mjs` and `blind-steps-proven-pools.mjs` import tier-5 modules: if they judge rows
   already in Rust after S5, their remaining imports switch here to the host route or are deleted with them (census).
 
 ## Steps
 
-As phase 15: red Rust tests and parity rows, wire, flip registry, delete Node, retire tests.
+As phase 15: re-sync, red Rust tests and parity rows, wire, flip registry, delete Node and edit doors, retire tests.
 
 ## Validation
 

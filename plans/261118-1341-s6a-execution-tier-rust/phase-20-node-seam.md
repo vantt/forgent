@@ -1,56 +1,81 @@
 # Phase 20: Node consumer seam; Execution Core Node deleted
 
-Wave 8. Depends on: 17, 19. Effort 2.5d.
+Wave 9. Depends on: 17, 19. Effort 3d. Cut-over phase: run the re-sync step of the phase-lead rules first.
 
 ## Context
 
-After phase 19 the host serves `fgos run`, the internal execution routes and the attempt steps. The Node callers above
-tier 5 (planner scan §2; phase 00 section 2 classes each symbol) still import `src/runner/execution/**`,
-`src/run-supervisor/**` and parts of `src/runner/dispatch/**`. This phase moves every one of them onto a door (P4)
-and deletes `src/runner/execution/**` and `src/run-supervisor/**`.
+After phase 19 the host serves `fgos run`, the internal execution routes and the attempt steps, and
+`src/native/execution-door.mjs` exists. The Node callers above tier 5 (phase 00 §2, every import and string hit
+classed) still import `src/runner/execution/**`, `src/run-supervisor/**` and parts of `src/runner/dispatch/**`. This
+phase moves every one onto a door (P4, P14, P15, P18) and deletes `src/runner/execution/**` and `src/run-supervisor/**`.
 
 ## Requirements
 
-- `host` class: `src/workflow/runner.mjs` spawns `fgos run --unit <file> --json --admission-fd 3` asynchronously
-  (never `spawnSync`) and serves the four port operations from its existing port over fd 3; on child exit without
-  `settle` it settles with `releasedUnitRunSettle`. `src/workflow/case-gate.mjs` custody and verify,
-  `src/runner/loop.mjs:104` `sweepAttempts`, `src/session-rotation/rotate.mjs:27` `requestCancel` call
-  `fgos internal execution <op> --protocol 1` through the host-spawn code `src/seat-binding/client.mjs` already uses
-  (host resolution through `src/util/host-bin-path.mjs`, protocol check, `host-version-mismatch`). No new client
-  module: if more than one caller needs it, phase 00 names where that existing code moves (tier 0), as a move.
-- `addon` class: an addon `execution` namespace over `fgos-execution` (`packages/git/node-addon/src/execution.rs`,
-  `versions().execution`, `src/native/door.mjs` ABI check) serves `validateUnit`, write-scope checks, outcome
-  predicates, case paths, pattern lookup, seat checks and the other pure helpers phase 00 lists.
-- `move-up` class: `git mv` into the one consuming layer (for example `RunnerConfigError` into `src/workflow/` if only
-  Workflow uses it after the cutovers); one copy, no twin.
-- `config` class: `loadRunnerConfigForDir` callers (`src/workflow/{case-gate,runner,propose,case-start}.mjs`,
-  `bin/fgos-runner.mjs`) switch to the config facade under `src/config/` (F0 "locate and read a project config file"
-  door); `bin/fgos.mjs`'s own imports are phase 21's.
-- `script` class: `scripts/run-tests.mjs`, `scripts/lib/test-file-watchdog.mjs`, `scripts/run-rust-dev-host.mjs`
-  (stop-processes-inside), `scripts/lib/mailbox-live-confined.mjs` (bwrap prepare, resources, credential expiry),
-  `scripts/backfill-unit-summaries.mjs` switch to the door phase 00 names (addon or host route), or the script is
-  deleted if its job is gone (report).
-- `src/verbs/state/read.mjs`, `src/runner/work-dispatch.mjs`, `src/portfolio/open-questions.mjs`,
-  `src/report/capability-plan-lint.mjs`, `src/cli/verb-exit.mjs` switch per their class.
-- Delete `src/runner/execution/**` and `src/run-supervisor/**`; manifest layer/tier entries and debt paths naming
-  them removed; Node tests under `test/runner/execution/**`, `test/run-supervisor/**` retired to their Rust owners
-  (report table); one Node wiring test in `test/workflow/` for the peer (incl. "child dies between admit and settle:
-  the reservation is released").
+- `host` class, Workflow: `src/workflow/runner.mjs` calls `runUnitInHost` with the same options object it gives
+  `runUnit` today (`:160-180`) and its existing port; `onCaseAdmitted` records `recordScheduled` after a granted admit
+  (V18). On `{ unsettled }` it settles nothing: the reservation stays live and the existing `releaseDeadReservations`
+  (`src/workflow/case-runtime.mjs:103-110`) decides it under the advance hold with `reservationDead`'s proof (custody +
+  unit-run record, `:73-79`), never a blind `releasedUnitRunSettle` (P16, F5). `src/workflow/case-gate.mjs` custody and
+  verify call `executionOp('custody'|'verify', ...)`.
+- `host` class, Work callers (P14, V2): `src/runner/operation-choice.mjs:2327-2341`, `src/runner/work-dispatch.mjs:129-143`,
+  `src/runner/fanout-batch.mjs:108-118` replace `runUnit(` with `runUnitInHost(` (same options, same port built from
+  `createCaseAdmissionPort`), and `src/session-host/head-start.mjs:121` replaces the `launchSessionAttempt` import with
+  `launchSessionInHost`. Only the call site and its import change; no other Work logic is edited; `fgos run` argv is
+  not widened. `src/runner/loop.mjs:104` `sweepAttempts` and `src/session-rotation/rotate.mjs:27` `requestCancel` call
+  `executionOp('sweep-attempts'|'cancel', ...)`. Binding helpers (`loop.mjs:83`, `head-start.mjs:108` `bind`) switch to
+  the door phase 00 names (S5's seat-binding client or the addon).
+- `addon` class (P4b, P15): an addon `execution` namespace (`packages/git/node-addon/src/execution.rs`,
+  `versions().execution`, `src/native/door.mjs` ABI check) over `fgos-execution`, `fgos-config`, `fgos-holder-lock`,
+  `fgos-durable-file` and `fgos-run-supervisor` (`default-features = false, features = ["lease"]`; added to
+  `packages/git/node-addon/Cargo.toml`) serves the pure helpers phase 00 lists (`validateUnit`, write-scope checks,
+  outcome predicates, case paths, pattern lookup, seat checks, handoff refs), `loadRunnerConfigForDir` with
+  `RunnerConfigError` codes (6c), and the effectful reads `custodyHeld`, `unitRunFacts`, `judgeUnitRun` (6c judgements
+  over files, holder lists and the lease inspection). `src/native/execution-door.mjs` re-exports them with the Node
+  names, so a caller changes only its import line.
+- `config` class (V5): every `loadRunnerConfigForDir` caller (`src/workflow/{case-gate,runner,propose,case-start}.mjs`,
+  `bin/fgos-runner.mjs:25`, `src/runner/{operation-choice,fanout-batch}.mjs`, `src/session-host/head-start.mjs:126`,
+  `src/runner/agent-definitions.mjs:21` for `RunnerConfigError`) imports it from `src/native/execution-door.mjs`; no
+  switch to `src/config/facade.mjs` (it lacks the checks, `facade.mjs:80`). `bin/fgos.mjs`'s own imports are phase 21's.
+  The door row "locate and read a project config file" moves its allowed path in phase 21 with the file.
+- `move-up` class: `git mv` into the one consuming layer; one copy, no twin.
+- `script` class: `scripts/lib/mailbox-live-confined.mjs` (bwrap prepare, resources, credential expiry),
+  `scripts/backfill-unit-summaries.mjs`, `scripts/record-mailbox-hook-fixtures.mjs:1188` (worker-session boot) switch
+  to the door phase 00 names (addon or host route), or the script is deleted if its job is gone (report).
+- `src/verbs/state/read.mjs`, `src/portfolio/open-questions.mjs`, `src/report/capability-plan-lint.mjs`,
+  `src/cli/verb-exit.mjs`, `src/runner/{work-compat,operation-capability}.mjs`, `src/setup/*` remaining imports switch
+  per their class.
+- Delete `src/runner/execution/**` and `src/run-supervisor/**`, and the recorders under `test/golden-recorders/` whose
+  only Node source was there (vectors stay). Same change (V4): manifest tier/layer entries, and every `doors`
+  `allowed`/`debt` entry naming a deleted file ("list run directories (twin)": `client.mjs`, `case-run-paths.mjs`;
+  "process facts: read /proc": `runtime-dir.mjs`; "canonical JSON bytes" and "agent hook table": `trust-store.mjs`;
+  "the raw capability section ...": `execution/run.mjs`; S5 twin rows naming these files). Node tests under
+  `test/runner/execution/**`, `test/run-supervisor/**`, `test/workflow/**` and `test/helpers/{run-unit-with-port,run-unit-repo-fixture,declared-assignment,ownership-marker,work-seat-config}.mjs`
+  and the other files phase 00 §6 assigns here are retired, switched or moved (report table).
 - P11: delete `src/seat-binding/client.mjs` if phase 17 found no remaining caller.
 
 ## Steps
 
-1. Red: the workflow peer wiring test; a test that runs a workflow case step end to end through the host.
-2. Switch callers class by class; delete directories; regenerate census and suite baseline.
-3. `rg -n "runner/execution/|run-supervisor/" src bin scripts` must return only `src/util/payload-root.mjs`-free hits
-   of other paths (i.e. nothing).
+1. Re-sync from main; report table.
+2. Red: the Workflow peer wiring test (incl. "child killed after admit and before settle: the reservation stays live
+   and the dead-reservation sweep decides it"); one Work call-site wiring test (`operation-choice` runs a unit through
+   the host and gets the same result shape); a workflow case step end to end through the host.
+3. Switch callers class by class; delete directories; regenerate census and suite baseline.
+4. Rerun `test/golden-recorders/seam-scan.mjs` and the phase 00 string scan: no hit into `src/runner/execution/` or
+   `src/run-supervisor/` outside them. Anchored check (V16):
+   `rg -n -e "src/(runner/execution|run-supervisor)/" -e "\.\./run-supervisor/" -e "'\./execution/" src bin scripts`
+   returns nothing.
 
 ## Validation
 
 Acceptance 2 path checks for the two directories; `node scripts/run-tests.mjs` over `test/workflow/**`,
-`test/runner/loop*.test.mjs`, every test importing a switched file; `test/architecture.test.mjs`; lead-rules gates.
+`test/runner/loop*.test.mjs`, `test/runner/operation-choice.test.mjs`, `test/session-host/head-start.test.mjs` and every
+test importing a switched file; `test/architecture.test.mjs`; lead-rules gates.
 
 ## Risk and rollback
 
-Risk: Workflow case runs slower (a process per unit) or deadlock on fd 3. Measure one case before and after (report);
-the parent reads fd 3 asynchronously. Rollback: revert the phase (directories return; phase 19 still serves the verb).
+Risk: Workflow or Work runs slower (a process per unit). Measure one case and one Work step before and after (report).
+Risk: peer deadlock: the server reads the child's stdout continuously and answers on stdin; stderr drained
+concurrently. Risk: the dead-reservation proof cannot tell a settled committed run from a never-started one
+(`case-runtime.mjs:73-79` releases both as not-started); this exists today when Workflow itself dies, so RUL104 keeps
+it and the phase report files it as a backlog row. Rollback: revert the phase (directories return; phase 19 still
+serves the verb).

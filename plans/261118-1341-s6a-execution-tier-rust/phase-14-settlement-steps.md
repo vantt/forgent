@@ -18,11 +18,13 @@ engine dependency (phase 19 wires `attempt_step.rs` to the host route).
   function the host's attempt-step route will call with the envelope and receipt the supervisor passes today (same
   receipt files, same idempotence: a step re-run after a crash finds its receipt).
 - finalize-home calls phase 10's staging; cleanup-trust calls phase 05's trust store.
-- Golden vectors `packages/execution/contracts/settlement.v1.json`; integration test runs each step twice (idempotence).
+- Golden vectors under `packages/execution/contracts/settlement/` recorded by
+  `test/golden-recorders/settlement.recorder.mjs`; integration test runs each step twice (idempotence); receipt files
+  Rust writes are read by the previous Node release (reverse-read fixture for phase 22, F12).
 
 ## Steps
 
-Record vectors; red `engine/tests/settlement.rs`; port; green; report.
+Commit the recorder; record vectors; red `engine/tests/settlement.rs`; port; green; report.
 
 ## Validation
 

@@ -1,33 +1,32 @@
-# Phase 08: confinement driver, cleanup, probes
+# Phase 08: confinement driver, backend registry, attestation
 
-Wave 3. Depends on: 3. Lands after 07. Effort 2.5d. Library only (engine module `confinement::driver`).
+Wave 3. Depends on: 3. Effort 1.5d. Library only (engine module `confinement::driver`). Split from the old phase 8
+(2 891 Node lines); 8b follows in wave 4.
 
 ## Context
 
 `src/runner/dispatch/confinement/`: `drivers/bwrap.mjs` (745: `prepareBwrapSync`, calls credential renewal's
-`copyCredentialFiles` at provisioning), `cleanup.mjs` (554: attempt ownership markers, kept credential homes,
-orphan judgement and removal), `attestation-store.mjs` (355), `backend-registry.mjs` (378: machine registry file,
-schema `confinement-backend-registry.v1`), `probes/harness.mjs` (859: falsification probes, peer-run-hidden). Process
-containment primitives stay in `fgos-process` (`packages/process/rust/src/containment/linux.rs`); this module builds
-the bwrap argv and runs the probes through the process door. Doctor rows `confinement-backend-registry-readable`,
-`confinement-orphaned-resources-reaped`, `credential-copies-retained`, `confinement-bwrap-platform`,
-`confinement-probe-freshness`, `confinement-blind-read`, `confinement-herdr-maturity` use it (phase 15).
+`copyCredentialFiles` at provisioning), `backend-registry.mjs` (378: machine registry file, schema
+`confinement-backend-registry.v1`), `attestation-store.mjs` (355). 1 478 lines. Process containment primitives stay in
+`fgos-process` (`packages/process/rust/src/containment/linux.rs`); this module builds the bwrap argv and runs it
+through the process door. Doctor rows `confinement-backend-registry-readable`, `confinement-bwrap-platform`,
+`confinement-herdr-maturity` use it (phase 15).
 
 ## Requirements
 
 - `packages/execution/engine/src/confinement/driver/` ports them; the credential copy at provisioning calls the
-  `credentials` module through the trait fixed in the skeleton (phase 10 implements it; tests here use a real temp
-  login fixture through that trait's fs implementation once 10 lands, a fake trait implementation before).
-- The bwrap smoke test for a named binary lives here (it replaces Node `checkBwrapAvailable`, debt of the "packaging
-  doctor judgments" door row; phase 15 switches the rows).
-- `/proc` reads go through `fgos-process` (door row "process facts: read /proc").
-- Golden vectors `packages/execution/contracts/confinement-driver.v1.json` for argv construction and cleanup judgement;
-  probe harness tested on Linux with a real `bwrap` when present (skipped by capability, not by env switch: the test
-  asks the backend registry, as doctor does).
+  `credentials` module through the trait fixed in the skeleton (phase 10 implements it; tests here use a fake trait
+  implementation until 10 lands, then a real temp login fixture).
+- The bwrap smoke test for a named binary lives here (it replaces Node `checkBwrapAvailable`; phase 15 switches the
+  rows and removes the debt).
+- `/proc` reads go through `fgos-process` (door row "process facts: read /proc"; the `bwrap.mjs` debt entry goes in
+  phase 21, which deletes the file).
+- Golden vectors under `packages/execution/contracts/confinement-driver/` (argv construction, registry reads) recorded
+  by `test/golden-recorders/confinement-driver.recorder.mjs`.
 
 ## Steps
 
-Record vectors; red `engine/tests/confinement_driver.rs`; port; green; report.
+Commit the recorder; record vectors; red `engine/tests/confinement_driver.rs`; port; green; report.
 
 ## Validation
 
@@ -35,4 +34,4 @@ Record vectors; red `engine/tests/confinement_driver.rs`; port; green; report.
 
 ## Risk and rollback
 
-Risk: orphan cleanup deletes a live home. Port the judgement as is; vectors include a live-owner case. Rollback: revert.
+Risk: bwrap argv drift exposes a path. Vectors pin argv per policy. Rollback: revert.

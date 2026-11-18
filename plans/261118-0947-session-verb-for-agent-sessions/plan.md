@@ -6,7 +6,7 @@ priority: P1
 blockedBy:
   - 261117-1856-secretary-session-spine
   - 261115-2328-execution-read-door
-  - 261118-1341-s6a-execution-tier-rust
+  - 261118-1455-s6a-worktree-door
 footprint:
   - plans/261118-0947-session-verb-for-agent-sessions/**
   - apps/fgos/src/wiring/session.rs
@@ -54,8 +54,6 @@ created: 2026-11-18
 ---
 
 > **Hold (owner 2026-11-18 13:10, option A):** no phase starts until the S6a shaping (fgos worktree to Rust) settles; the rename needs phase 3, which is the session-worktree retirement, so the worktree work is done once with S6a.
-
-> **Blocked by S6a phase 1 only (2026-11-18):** `blockedBy` lists plan `261118-1341-s6a-execution-tier-rust` because plan-contract `blockedBy` holds plan names only; the real wait is that plan's phase 1 (one worktree door in Rust, `fgos worktree create --bare` and `remove` native). Phase 1 lands on main by itself, so this plan may start once it has landed, not when all of S6a closes. Plan `261118-1045-project-supervisor` is not in `blockedBy`: its P6 is a landing gate, not a start dependency.
 
 # Give `fgos session` back to agent sessions
 
