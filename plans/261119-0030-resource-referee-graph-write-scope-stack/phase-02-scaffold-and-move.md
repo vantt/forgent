@@ -1,7 +1,8 @@
 # Phase 2: Workspace scaffold and write-scope move
 
 One phase owns every manifest edge so later phases never edit `Cargo.toml`, `Cargo.lock` or a crate
-manifest. It commits in its own linked worktree (decision 14).
+manifest. It commits in its own linked worktree (decision 14). The names it creates follow the owner's
+answer to Owner question 1; if that is open, the names in `plan.md` apply.
 
 ## Inputs
 
@@ -20,12 +21,13 @@ manifest. It commits in its own linked worktree (decision 14).
 2. Point the consumers' `path` entries at the new location and fix the `members` list.
 3. Create the two skeleton crates and declare every dependency edge up front: `graph` depends on no internal crate; `resource-referee` on `graph` and `write-scope`; the native addon on `write-scope`, `graph` and `resource-referee`; `apps/fgos` on `supervision`, `write-scope`, `graph` and `resource-referee`; the supervisor only on `write-scope` (it already does). Both new crates declare `serde` and `serde_json` with `workspace = true`. No new external crate is added.
 4. Search the repository for the anchored old path (`rg "packages/git/write-scope"`) and update every hit outside history files: the known ones are `test/workflow/propose-classify.test.mjs:48` and the RUL84 lines of `docs/platform/git/spec.md`. The substring `git/write-scope` also matches `test/git/write-scope-parity.test.mjs`, so always use the anchored pattern.
-5. Regenerate `Cargo.lock` once; commit it with the manifests. Do not regenerate the mutation census: phase 10 owns it.
-6. Announce the move to the lanes that hold `Cargo.toml` and `packages/git` (board) before starting.
+5. Regenerate `Cargo.lock` once; commit it with the manifests. Do not regenerate the mutation census.
+6. Run the census scan without `--write-census` and list the changed entries; each must be a moved or new file of this phase.
+7. Announce the move to the lanes that hold `Cargo.toml` and `packages/git` (board) before starting.
 
 ## Verify
 
-`cargo build --workspace --locked -j4` and `cargo test -p fgos-write-scope`, run alone with `free -g` checked first, then `node --test test/workflow/propose-classify.test.mjs`. `rg "packages/git/write-scope"` finds nothing outside history. The node addon still builds: `cargo build -p fgos-node-addon --locked`. `test/git/one-door.test.mjs` is expected to be red until phase 10.
+`cargo build --workspace --locked -j4` and `cargo test -p fgos-write-scope`, run alone with `free -g` checked first, then `node --test test/workflow/propose-classify.test.mjs test/distribution/native-addon.test.mjs`. `rg "packages/git/write-scope"` finds nothing outside history. The node addon still builds (`cargo build -p fgos-node-addon --locked`) and `apps/fgos-gateway` still builds from its own lock without changing it. `test/git/one-door.test.mjs` is expected to be red until the final landing.
 
 ## Rollback
 

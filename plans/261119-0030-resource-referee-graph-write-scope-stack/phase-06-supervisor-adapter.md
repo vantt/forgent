@@ -13,9 +13,11 @@
 ## Steps
 
 1. Before the swap, write a table of old-versus-new cases for `portfolio.rs::overlaps`: `src/**`, a bare `*`, an empty entry, `.`, `..`, an absolute path, a backslash, a trailing slash, a glob under a directory. Run it against the old function and record the outcomes.
-2. Replace `overlaps` and `normalize` with calls to `fgos-write-scope`; keep `admissible` and its public signature. An entry that does not canonicalize counts as overlapping everything (decision 17), never as disjoint and never a panic.
-3. Delete the old function and the comment that says the rule is kept equal to the JS copy. List every divergence from the old outcomes for the CHANGELOG (phase 9 writes it).
-4. Extend the existing `portfolio` tests rather than copying overlap cases: the cases live with `write-scope`; here the adapter tests are the case table, the malformed-entry rule, and one case proving `admissible` still excludes a plan overlapping a running one.
+2. Replace `overlaps` and `normalize` with calls to `fgos-write-scope`; keep `admissible` and its public signature. A plan with an entry that does not canonicalize is not admissible, never a panic and never disjoint, and no other plan is affected (decision 17).
+3. Add a reporting function next to `admissible` that returns the named reason `footprint-entry-invalid` with the plan and the entry, and surface it through the supervisor's existing status or report output (find the place; it is the way an operator learns why a ready plan does not start).
+4. Delete the old function and the comment that says the rule is kept equal to the JS copy. List every divergence from the old outcomes for the CHANGELOG (phase 9 writes it).
+5. Tests: the table above, one adapter case for the malformed entry with its reported reason, and one case proving `admissible` still excludes a plan overlapping a running one. The owning test of the behaviour stays in `write-scope`.
+6. Run the census scan without `--write-census` and list the changed entries against this phase's footprint.
 
 ## Verify
 

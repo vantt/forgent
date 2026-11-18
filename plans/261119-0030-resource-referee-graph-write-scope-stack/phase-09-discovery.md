@@ -8,7 +8,7 @@ not know the existing door.
 
 - `core/skills/_shared/plan-contract.md` sections 4 and 5.
 - `core/skills/fgos-coding-planning/SKILL.md` and its `references/approach-and-shape.md`, `references/split-and-child-specs.md`; `core/skills/fgos-cook/references/reading-ak-plans.md`.
-- The door's help text from phase 7; the divergence list from phase 6; `CHANGELOG.md` `## [Unreleased]`.
+- The door's help text and final name from phase 7b; the divergence list from phase 6 and the differences recorded in phase 8; `CHANGELOG.md` `## [Unreleased]`.
 
 ## Files it may write
 
@@ -17,9 +17,9 @@ not know the existing door.
 ## Steps
 
 1. In `plan-contract.md` section 4 add the step: before fixing the phase table, run the door on the draft (`--units` before the files exist, `--plan` after); in a project without fgOS the planner applies the same rule by hand as section 4 already states.
-2. In the planning skill's split guidance and in `reading-ak-plans.md` add one pointer line each, next to the existing `fgos graph` references; no duplicated rule text.
+2. In the planning skill's split guidance and in `reading-ak-plans.md` add one pointer line each, next to the existing `fgos graph` references, saying which tool each line means; no duplicated rule text.
 3. Run `npm run build:skills`; never edit generated files by hand.
-4. Add the three packages to `docs/reading-map.md`, one line each pointing to their specs; this is the index a developer reads before writing a new path or graph helper.
+4. Add the three packages to `docs/reading-map.md`, one line each pointing to their specs, and say how the package `graph` differs from the Work verb; this is the index a developer reads before writing a new path or graph helper.
 5. Add the CHANGELOG lines: the new door; Work advisories now seeing containment and globs; the decompose gate staying advisory with its new findings; the fan-out verifier reporting new conflicts; the supervisor admission divergences listed in phase 6.
 
 ## Verify
