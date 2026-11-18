@@ -77,6 +77,7 @@ Id cục bộ của phiên shaping; planner mint D-ADR qua `fgos identity mint d
 - 2026-11-18 18:32 — Q1 trả lời B (OD4).
 
 - 2026-11-18 18:40 — Q2 trả lời: `tetcu`, `anhdvh`, `van.tran` (OD5).
+- 2026-11-18 18:38 — Chủ dự án: `tetcu` đã đăng nhập. Kiểm tra chỉ đọc: thư mục `~/.fgos/private/claude-tetcu` có file login, là tài khoản Anthropic khác Miu và khác `vantt` (so định danh, chỉ in đúng/sai). Quyền thư mục là 775, trong khi `claude-vantt` là 700; nên siết về 700 (login nằm trong đó). Chưa thêm vào `accounts.yaml` (phiên shaping chỉ đọc), việc của planner.
 
 ## 6. Thiết kế đã chốt {#design}
 
