@@ -175,6 +175,20 @@ fn a_side_branch_not_merged_to_main_gives_no_record() {
 }
 
 #[test]
+fn a_checked_out_unmerged_side_branch_that_descends_from_main_is_not_the_trunk() {
+    let f = Fixture::new("side-checked-out");
+    let repo = f.init("repo");
+    commit_file(&repo, D1, "discussion: draft\n", "2026-11-02T00:00:00Z");
+    git(&repo, &["checkout", "-q", "-b", "side"], None);
+    commit_file(&repo, D1, "discussion: settled\n", "2026-11-03T00:00:00Z");
+    let records = f.source(&repo).records(&Window::default()).unwrap();
+    assert_eq!(
+        flips(&records),
+        [(D1.into(), "none".into(), "draft".into())]
+    );
+}
+
+#[test]
 fn both_marker_sites_are_read() {
     let f = Fixture::new("sites");
     let repo = f.init("repo");

@@ -17,7 +17,7 @@
 
 use fgos_git::{
     GitDriver, Inspect, Oid, PathRead, PathValue, RefName, RefValue, RepoHandle, ResolveRepo,
-    TrunkFact, WalkChanges,
+    WalkChanges,
 };
 use fgos_observe::record::types::{AttrValue, Basis, Origin, Record, SubjectRef, RECORD_VERSION};
 use fgos_observe::time::ParsedWindow;
@@ -246,29 +246,43 @@ impl GitDiscussionHistory {
         )
     }
 
-    /// Local `main`, the trunk the Git door names, and the remote-tracking `main`, in preference order.
-    fn trunk_candidates(&self) -> Result<Vec<Oid>, String> {
-        let mut names = vec!["refs/heads/main".to_owned()];
-        if let TrunkFact::Known(name) = self
-            .driver
-            .resolve_trunk(&self.repo, None)
-            .map_err(|e| e.cause)?
-        {
-            names.push(name.as_str().to_owned());
-        }
-        names.push("refs/remotes/origin/main".to_owned());
-        let mut tips: Vec<Oid> = Vec::new();
-        let mut seen = Vec::new();
-        for name in names {
-            if seen.contains(&name) {
-                continue;
+    /// The trunk's branch name: the remote HEAD target when it exists, else `main`, else `master`, else `main`
+    /// (the rule `detectTrunk` applies). The checkout's attached branch never names the trunk.
+    fn trunk_branch(&self) -> Result<String, String> {
+        const PREFIX: &str = "refs/remotes/origin/";
+        if let Ok(head) = RefName::parse("refs/remotes/origin/HEAD") {
+            if let RefValue::Symbolic(target) = self
+                .driver
+                .resolve_ref(&self.repo, &head)
+                .map_err(|e| e.cause)?
+            {
+                if let Some(name) = target.as_str().strip_prefix(PREFIX) {
+                    return Ok(name.to_owned());
+                }
             }
+        }
+        for name in ["main", "master"] {
+            if self.resolve(&format!("refs/heads/{name}"))?.is_some() {
+                return Ok(name.to_owned());
+            }
+        }
+        Ok("main".to_owned())
+    }
+
+    /// The local trunk branch and its remote-tracking twin, in preference order.
+    fn trunk_candidates(&self) -> Result<Vec<Oid>, String> {
+        let branch = self.trunk_branch()?;
+        let names = [
+            format!("refs/heads/{branch}"),
+            format!("refs/remotes/origin/{branch}"),
+        ];
+        let mut tips: Vec<Oid> = Vec::new();
+        for name in names {
             if let Some(oid) = self.resolve(&name)? {
                 if !tips.iter().any(|t| t.as_str() == oid.as_str()) {
                     tips.push(oid);
                 }
             }
-            seen.push(name);
         }
         Ok(tips)
     }
