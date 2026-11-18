@@ -1,1 +1,1 @@
-{"name":"plan-failure-rate","requires":["fgos.run.attempt"],"query":{"kind":["fgos.run.attempt"],"by":["ref:plan","fgos.outcome"],"agg":["count"]}}
+{"name":"plan-failure-rate","requires":["fgos.run.attempt"],"query":{"kind":["fgos.run.attempt"],"by":["ref:plan","fgos.outcome"],"agg":["count"]},"row":{"kind":"plan-failure-rate","reason":"a count of run attempts per plan and outcome; the failure rate is the reader's division of the non-pass count by the plan's total","nextCommand":"fgos metrics query --def domains/coding/observe/definitions"}}
