@@ -25,16 +25,13 @@ import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
 import { resolveDiscovery } from '../../src/intake/discovery.mjs';
 import { createMissBreaker } from '../../src/runner/anti-loop.mjs';
 import { writeProjectConfig } from '../helpers/config-fixture.mjs';
+import { invokeHost } from '../../src/util/host-bin.mjs';
 
-// Friction records live in the Observe store (.fgos/observe/friction/*.jsonl),
-// not in the work event log.
-function readFrictionRecords(dir) {
-  const fgosDir = path.basename(dir) === '.fgos' ? dir : path.join(dir, '.fgos');
-  const frictionDir = path.join(fgosDir, 'observe', 'friction');
-  if (!fs.existsSync(frictionDir)) return [];
-  return fs.readdirSync(frictionDir)
-    .filter((f) => f.endsWith('.jsonl'))
-    .flatMap((f) => fs.readFileSync(path.join(frictionDir, f), 'utf8').trim().split('\n').filter(Boolean).map((line) => JSON.parse(line)));
+// Friction records live in the Observe record store, read through the host's own
+// friction door (the store's shape is the host's), not the work event log.
+function readFrictionRecords(dir, workId) {
+  const root = path.basename(dir) === '.fgos' ? path.dirname(dir) : dir;
+  return invokeHost(['friction', 'show', `work:${workId}`], { dir: root }).records ?? [];
 }
 
 // Workers run confined (bwrap) as Unit runs: posture checks consult the
@@ -999,7 +996,7 @@ test('verify-miss: worker commits the wrong thing -> retry once, then park to bl
 
   // friction channel (S2 — kênh 2 của capture): the runner blames itself at
   // the same park choke-point, layer attributed mechanically from the class.
-  const friction = readFrictionRecords(dir).find((r) => r.subject?.kind === 'work' && r.subject?.id === 'item-miss');
+  const friction = readFrictionRecords(dir, 'item-miss').find((r) => r.type === 'friction-recorded');
   assert.ok(friction, 'friction written on the park branch');
   assert.equal(friction.disposition, 'parked');
   assert.equal(friction.errorClass, 'verify-miss');
@@ -1271,7 +1268,7 @@ test('breaker trip: a goal-check miss at threshold parks the item and halts the 
 
   // friction channel (S2): the HALT path writes friction too — a halt must
   // not be silent any more than a park (ghi CẢ đường thất bại).
-  const friction = readFrictionRecords(dir).find((r) => r.subject?.kind === 'work' && r.subject?.id === 'item-breaker');
+  const friction = readFrictionRecords(dir, 'item-breaker').find((r) => r.type === 'friction-recorded');
   assert.ok(friction, 'friction written on the halt branch');
   assert.equal(friction.disposition, 'halted');
   assert.equal(friction.errorClass, 'verify-miss');

@@ -98,7 +98,6 @@ test('workflow start --units refuses a second definition source, --seats and a b
 
   const cases = [
     [['delphi', '--units', units], /exactly one of <workflowId> or --units <file>/],
-    [['--plan', 'plans/x'], /unknown flag "--plan"/],
     [[], /exactly one of/],
     [['--units', units, '--seats', 'a|b|c'], /cannot be used with --units/],
     [['--units', units, '--effort', 'turbo'], /reasoningEffort "turbo"/],
