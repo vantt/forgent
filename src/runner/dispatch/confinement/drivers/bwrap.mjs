@@ -223,8 +223,10 @@ function blindRefusals(request, resolvedResources) {
 }
 
 // Mounts bound back inside a machine-private root after its mask (the dispatch's own home, the program it runs and
-// the install directories of its CLI).
-const BOUND_BACK = new Set(['hidden-root', 'own-assignment', 'private-home', 'launch-program']);
+// the install directories of its CLI, and a head session's peer sessions: the session sockets under the user runtime
+// directory and the session registry under the Claude login home, read-only; assessBwrap accepts that grant for a
+// session launch only).
+const BOUND_BACK = new Set(['hidden-root', 'own-assignment', 'private-home', 'launch-program', PEER_SESSIONS_RESOURCE]);
 
 /**
  * Refusal specific to machine-private roots (spec section 9.3), for every confined request: the

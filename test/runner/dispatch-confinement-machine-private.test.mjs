@@ -30,6 +30,8 @@ import { computeProbeFingerprint, probeMachinePrivateHidden, MACHINE_PRIVATE_FAL
 import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
 import { writeAccountsFile } from '../helpers/config-fixture.mjs';
 import { machineLoginStores } from '../../src/runner/dispatch/llm-accounts.mjs';
+import { requirementOf } from '../../src/runner/dispatch/session-attempt.mjs';
+import { grantOf } from '../../src/session-host/head-grants.mjs';
 
 const HAS_WORKING_BWRAP = os.platform() === 'linux'
   && cp.spawnSync('/usr/bin/bwrap', ['--ro-bind', '/', '/', '--', 'true'], { stdio: 'ignore' }).status === 0;
@@ -471,6 +473,52 @@ test('a workspace, cwd or repo root inside a machine-private root is refused bef
   }
   const ok = await withHome(host, () => assessBwrap(requestFor(host), backendFor(host)).mismatches);
   assert.deepEqual(ok, []);
+});
+
+// A head granted its peers reads the session sockets under the user runtime directory and the session registry under
+// the Claude login home: both lie inside machine-private roots, and both are bound back read-only after the masks.
+test('a head granted its peers starts with the session sockets and registry inside machine-private roots, and a non-session launch carrying that grant is still refused', async () => {
+  const host = makeHost({ withPrivate: false, socketBase: 'with-sockets' });
+  const registry = path.join(host.home, '.claude', 'sessions');
+  fs.mkdirSync(registry, { recursive: true, mode: 0o700 });
+  for (const dir of ['plans', 'docs/discussions']) fs.mkdirSync(path.join(host.project, dir), { recursive: true });
+  fs.writeFileSync(path.join(host.project, 'docs', 'backlog.md'), '');
+  const role = 'head:secretary-miu';
+  const launch = (assignmentLaunchContext) => buildConfinementRequest({
+    capability: 'execute',
+    executorId: 'bwrap-exec',
+    dispatchId: 'disp_head',
+    requirement: requirementOf(grantOf(role)),
+    backendId: 'bwrap',
+    ...(assignmentLaunchContext ? { assignmentLaunchContext } : {}),
+    invocation: { command: 'node', args: ['-e', 'process.exit(0)'], env: {}, adapter: 'herdr-spawn' },
+    context: { cwd: host.project, repoRoot: host.project, runDir: host.runDir, fgosDir: host.fgosDir },
+  });
+  const session = {
+    contract: 'assignment-launch-context.v1', kind: 'session', run: { runId: 'run_head_01', assignmentId: 'head', attempt: 1 },
+    command: { launchCommandId: 'cmd_head' }, session: { role },
+  };
+  await withHome(host, async () => {
+    const roots = resolveMachinePrivateRoots({ homeDir: host.home, claudeSocketBase: host.claudeSocketBase, xdgRuntimeDir: host.claudeSocketBase, xdgConfigHome: null, herdrSocketPath: null, loginStores: machineLoginStores({ homeDir: host.home, env: {} }) });
+    assert.ok(roots.some((root) => isInsideRoot(host.sessionSockets, root)), 'the session sockets lie inside a machine-private root');
+    assert.ok(roots.some((root) => isInsideRoot(registry, root)), 'the session registry lies inside a machine-private root');
+
+    const request = launch(session);
+    const assessment = assessBwrap(request, backendFor(host));
+    assert.deepEqual(assessment.mismatches, []);
+    assert.equal(assessment.coverage['grant:peer-sessions'], 'satisfied');
+    const out = await prepareBwrap({ resources: assessment.resources, coverage: assessment.coverage }, request, backendFor(host));
+    const args = out.invocation.args;
+    const head = args.slice(0, args.indexOf('--'));
+    await out.cleanup();
+    const sockets = indexOfFlag(head, '--ro-bind', host.sessionSockets);
+    assert.ok(sockets > indexOfFlag(head, '--tmpfs', host.claudeSocketBase) && indexOfFlag(head, '--tmpfs', host.claudeSocketBase) > 0, 'the sockets are bound back read-only after the runtime directory mask');
+    assert.ok(indexOfFlag(head, '--ro-bind', registry) > 0, 'the registry is bound read-only');
+
+    const refused = assessBwrap(launch(null), backendFor(host));
+    assert.equal(refused.coverage['grant:peer-sessions'], 'unsatisfied');
+    assert.ok(refused.mismatches.some((m) => m.code === 'confinement-grant-invalid' && /peer-sessions/.test(m.detail)), JSON.stringify(refused.mismatches));
+  });
 });
 
 test('the probe fingerprint carries the digest of the list, so a changed list refreshes every proof', () => {
