@@ -121,6 +121,46 @@ sở hữu (run result, unit summary, lịch sử git của plan, câu hỏi) qu
 chỗ khác vào store (một nguồn sự thật). Các verb hiện có (`metrics runs`, `discussions`, `friction rank`...) về sau
 là preset trên truy vấn chung (L10, từng bước).
 
+#### 6.0.1 Nháp chi tiết contract tầng 1
+
+Một bản ghi (ví dụ: một attempt của run vừa settle, chiếu từ `unit-summary.json`):
+
+```json
+{
+  "v": 2,
+  "id": "sha256:unit-run-1794...:producer/1/01",
+  "kind": "fgos.run.attempt",
+  "ts": "2026-11-18T02:32:33Z", "endTs": "2026-11-18T02:35:21Z",
+  "subject": {"kind": "run", "id": "unit-run-1794.../producer/1/01"},
+  "refs": [{"kind": "plan", "id": "plans/261117-1856-secretary-session-spine"}, {"kind": "phase", "id": "16"}],
+  "attrs": {"gen_ai.provider.name": "anthropic", "gen_ai.request.model": "claude-opus-5-5",
+            "fgos.account.id": "tetnu", "fgos.executor.id": "claude", "fgos.outcome": "pass"},
+  "measures": {"gen_ai.usage.input_tokens": 41200, "gen_ai.usage.output_tokens": 3900, "fgos.duration": 168000},
+  "basis": "derived", "origin": {"source": "run-result", "release": "0.x.y", "configRev": "..."}
+}
+```
+
+Registry (một file contract, versioned, có fixture): mỗi `kind` khai báo subject kind cho phép, attr/measure dùng
+được; mỗi attr khai báo kiểu và tập giá trị nếu đóng; mỗi measure khai báo đơn vị và phép gộp hợp lệ (sum cho
+token, p50/p90 cho thời gian). Ghi một bản ghi vi phạm registry: từ chối và đếm `rejected`, không bao giờ làm hỏng
+việc gọi.
+
+Truy vấn (một ngữ pháp, CLI và API Rust cùng một bộ):
+
+```text
+fgos metrics query --kind fgos.run.attempt --since 2026-11-01 \
+  --where fgos.outcome!=pass --ref plan:plans/261117-1856-secretary-session-spine \
+  --by gen_ai.provider.name,fgos.account.id --bucket week \
+  --agg count --agg sum:gen_ai.usage.input_tokens --agg p90:fgos.duration
+```
+
+Kết quả: envelope `fgos.v1`, mỗi dòng = một nhóm (giá trị chiều + bucket + các phép gộp), kèm `insufficient` khi
+dưới cỡ mẫu, và `coverage` (bao nhiêu bản ghi thiếu attr được nhóm theo). Định nghĩa có tên của tầng trên (OM-D5)
+là chính các đối số này lưu thành file.
+
+Năm store hiện có sau này đi qua contract này (friction, case, eval, snapshot, invocation-faults → các `kind`
+`fgos.friction.*`, `fgos.case.*`...); thứ tự chuyển và việc gộp store là chuyện tầng 3, planner chia phase.
+
 **Tầng 2 — tích hợp với agent và hạ tầng (tốt = quan sát nhiều nơi, nhiều lúc, không làm chậm hay làm sai agent và
 tiến trình; cải thiện dần).** Cửa ghi: API Rust trong `fgos-observe` + `fgos observe`-style CLI qua host; mọi lần ghi
 là phụ, có hạn thời gian, lỗi ghi không bao giờ đổi kết quả của việc chính (đã là luật "kênh phụ best-effort" của
