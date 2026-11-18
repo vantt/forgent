@@ -195,14 +195,28 @@ fn stamp(millis: i64) -> String {
     )
 }
 
-/// The instant a row stands for, which is the id of its event: the newest record's instant, or, for a count over a
-/// run of failures, the first record of the run (`max:ts` less the `span` that ends at it).
+/// The instant a row stands for, which is the id of its event (the README's row-to-event rule): the newest record's
+/// instant; for a count over a run of point records, the first record of the run (`max:ts` less `span`); for one span
+/// without a count, its end (`max:ts` plus `span`).
 fn row_ts(row: &Value) -> String {
-    let newest = row["aggs"]["max:ts"].as_str().unwrap();
-    match row["aggs"].get("span").and_then(Value::as_f64) {
-        Some(span) => stamp(millis(newest) - (span * 1000.0) as i64),
-        None => newest.to_owned(),
+    let aggs = &row["aggs"];
+    let newest = millis(aggs["max:ts"].as_str().unwrap());
+    let span = aggs
+        .get("span")
+        .and_then(Value::as_f64)
+        .map(|s| (s * 1000.0) as i64);
+    match (span, aggs.get("count").is_some()) {
+        (Some(span), true) => stamp(newest - span),
+        (Some(span), false) => stamp(newest + span),
+        (None, _) => stamp(newest),
     }
+}
+
+/// Does the answer count a run of records (its instant is the run's first record)?
+fn run_count(answer: &Value) -> bool {
+    rows(answer)
+        .first()
+        .is_some_and(|r| r["aggs"].get("count").is_some() && r["aggs"].get("span").is_some())
 }
 
 fn config_of(expected: &Value) -> Vec<(String, f64)> {
@@ -322,6 +336,16 @@ fn a_matching_fixture_run_again_over_an_overlapping_window_gives_the_same_subjec
             want["later"]["since"].as_str(),
             &env,
         );
+        if run_count(&first) {
+            // A run's first record is read from the window, so its instant holds only while the later window still
+            // reaches it; the README names the grammar a window-free run needs.
+            let later_since = millis(want["later"]["since"].as_str().unwrap());
+            let first_record = millis(want["ts"].as_str().unwrap());
+            assert!(
+                later_since <= first_record,
+                "{name}: later window still holds the run's first record"
+            );
+        }
         let (a, b) = (&rows(&first)[0], &rows(&second)[0]);
         assert_eq!(group_of(a), group_of(b), "{name}");
         assert_eq!(row_ts(a), row_ts(b), "{name}");
