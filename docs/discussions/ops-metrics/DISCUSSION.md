@@ -9,7 +9,7 @@ supervisor detection thuộc plan này, chỉ hiện ở attention view (D1); đ
 Rust (D3); khung ba tầng, contract ghi/truy vấn làm tốt nhất trước (D4); bảy thước đo và quy tắc phát hiện là định
 nghĩa của tầng trên, chạy qua truy vấn chung, Observe không biết chúng (D5).
 
-Đang mở (QUESTIONS.md): Q2 (thước đo nào có nguồn trong plan này), Q5 (ngưỡng "plan đứng yên"), Q6 (nghĩa "pace"),
+Q2 → OM-D6, Q5 → OM-D7. Đang mở (QUESTIONS.md): Q6 (nghĩa "pace"),
 Q7 (reader câu hỏi Node → Rust), Q8 (bộ tên gốc theo OpenTelemetry). Friction (§6 D) chờ chủ dự án xem năm loại
 `kind`. Đã học skillstation (báo cáo research-261118-1017), đưa 8 bài học vào §6.0. Việc tiếp: chi tiết contract tầng 1 —
 hình bản ghi, registry, ngữ pháp truy vấn.
@@ -38,11 +38,11 @@ phạm vi.
 | V6 | Tiền: không bảng giá; account phần lớn là subscription | hoãn (OM-D2) | `rg usd/per_million`: không có |
 | V7 | Lead time plan ready→done | rõ hướng | trạng thái chỉ có trong lịch sử git của `plan.md` (`plan-contract.md:43`), không field thời điểm |
 | V8 | Thời gian chờ chủ dự án | rõ thiếu | `QUESTIONS.md`, câu hỏi trong plan: không timestamp (`src/portfolio/open-questions.mjs:33-36`); gate có `answeredAt` (`src/workflow/case-runtime.mjs`) |
-| V9 | Thước đo 3-6 không có nguồn trên main | **mở → Q2** | prototype dùng file tsv ghi tay (`plan-board.mjs:431-525`) |
+| V9 | Thước đo 3-6 không có nguồn trên main | chốt OM-D6 | prototype dùng file tsv ghi tay (`plan-board.mjs:431-525`) |
 | V10 | Friction: không kind `plan`/`backlog`, không xu hướng, gần như không ai ghi nữa | rõ | `observe.friction.v1.json`; 10 bản ghi tháng 11; không skill nào gọi `friction record` |
 | V11 | Supervisor/lead là gì trên main | rõ | head session `head:<persona>-<name>` (commit `771c44ce8`), lead `lead:<LANE>`; Identity `liveness`; Session Host `alive(placement)` (`docs/platform/session-host/spec.md:49`) |
 | V12 | "Pace" (R9) nghĩa là gì khi chỉ phát hiện | **mở → Q6** | audit R9: nhịp tick thích ứng — là hành vi, không phải tín hiệu |
-| V13 | Ngưỡng no-progress | **mở → Q5** | audit R7 "hai tick không tiến"; trên main supervisor là LLM head, không có tick đếm được |
+| V13 | Ngưỡng no-progress | chốt OM-D7 | audit R7 "hai tick không tiến"; trên main supervisor là LLM head, không có tick đếm được |
 | V14 | Attention view chỉ có row gắn run | rõ | `attention-view.mjs:44-82`: row giả định `runId`, sort dòng 79; contract `attention-view` v1 |
 | V16 | Friction ghi gì, ai ghi, phân loại và gom thế nào | đang bàn | 762 record, 21 chữ ký, layer: docs 284, verification 249, state 221 — gần hết từ writer tự động thời Work; trial 11-17 ghi `--layer skill` bị từ chối (`friction.rs:13,79`) nên tự ghi friction `layer-not-published`; `rank` gom theo subject (`friction.rs:350-398`) |
 | V15 | Retention run dir (p-tslryr3buq) xoá mất lịch sử đo | ghi chú | plan này không phụ thuộc run dir sống mãi: snapshot đo theo plan phải còn sau prune — xem §6 E |
@@ -56,6 +56,8 @@ phạm vi.
 | OM-D3 | Mọi phần viết MỚI của plan này viết bằng Rust khi làm được mà không ảnh hưởng phần đang có; Node chỉ còn là caller mỏng nếu cần. Không viết lại phần đã land chỉ để đổi ngôn ngữ | chủ dự án qua secretary | 2026-11-18 |
 | OM-D4 | Ba tầng, thứ tự ưu tiên: (1) contract công khai ghi + truy vấn — phổ quát, chuẩn, ít đổi, ghi được mọi thứ khi cần, đọc được mọi kiểu khi cần — phải tốt và chuẩn sớm; (2) cơ chế tích hợp với agent và hạ tầng — quan sát nhiều nơi, nhiều khoảnh khắc mà không làm giảm hiệu quả hay làm sai agent/tiến trình, phát triển dần; (3) lưu trữ bên trong — tự do đổi, chấp nhận chi phí migration | chủ dự án | 2026-11-18 |
 | OM-D5 | Bảy thước đo bộ lái (và mọi khái niệm kiểu "lead time của plan", "plan đứng yên") là khái niệm của tầng trên — chỗ cần quan sát (bộ lái/portfolio/supervisor) — không cố định trong tầng Observe. Observe chỉ biết bản ghi, span, refs, phép lọc/nhóm/gộp | chủ dự án | 2026-11-18 |
+| OM-D6 | Plan này dựng nguồn cho thước đo 1 (hoàn tất), 2 (lead time tách bốn phần), 7 (qua cổng lần đầu) và 3 (can thiệp, từ thời điểm hỏi/trả lời câu hỏi). Thước đo 4 (bám phạm vi), 5 (lỗi plan do validate), 6 (độ trễ phát hiện) trả `unmeasured` kèm lý do, mỗi cái thành một dòng backlog | chủ dự án, Q2 | 2026-11-18 |
+| OM-D7 | "Plan đứng yên" = plan `running` không có tín hiệu tiến (commit trên nhánh, run settle mang khoá plan, dòng board) trong N phút; N là config, mặc định 60; về sau N theo phase từ median đã đo khi đủ mẫu | chủ dự án, Q5 | 2026-11-18 |
 
 ## 5. Q&A log
 
@@ -77,6 +79,7 @@ phạm vi.
   Observe → OM-D5.
 - 2026-11-18 ~11:45 — Chủ dự án: học repo vantt/skillstation (nhiều kỹ thuật quan sát) → báo cáo research, bài học
   vào §6.0.
+- 2026-11-18 ~12:00 — Chủ dự án: Q2, Q5 đồng ý đề xuất → OM-D6, OM-D7.
 
 ## 6. Thiết kế đã chốt {#design}
 
@@ -156,7 +159,7 @@ có (`.fgos/runtime/tmp/sec/run-phase.sh`) và skill driving truyền cờ này.
 - Không có verb `metrics plans` trong Observe (OM-D5). Bảy thước đo, lead time ready→done, thời gian theo phase là
   định nghĩa truy vấn của tầng lái (chỗ đặt: skill/công cụ lái, chi tiết của planner), chạy bằng `metrics query`. Plan
   này lo cho nguồn của chúng có trong contract: span phase (từ run có khoá B), sự kiện `plan.status` chiếu từ lịch sử
-  git của `plan.md`, `question.asked/answered`, verify lần đầu. Thước đo nào chưa có nguồn: theo Q2.
+  git của `plan.md`, `question.asked/answered`, verify lần đầu. Thước đo có nguồn trong plan này: 1, 2, 3, 7; 4, 5, 6 trả `unmeasured` + dòng backlog (OM-D6).
 - Thời gian chờ chủ dự án: câu hỏi (QUESTIONS.md, mục câu hỏi của plan, gate) mang `asked`/`answered` thời điểm;
   reader câu hỏi hiện là Node (`src/portfolio/open-questions.mjs`, 115 dòng) — cách tách theo Q7.
 
@@ -190,7 +193,7 @@ ngưỡng trong config), attention view chạy chúng; Observe không biết cá
   `gone` và chưa retire, hoặc Identity không còn liệt kê.
 - `plan-no-progress`: plan `running` không có tín hiệu tiến (commit trên nhánh, run settle mang khoá plan, dòng
   board) trong ngưỡng (Q4).
-- pace: theo Q6. Ngưỡng đứng yên: theo Q5.
+- pace: theo Q6. Ngưỡng đứng yên: OM-D7 (config, mặc định 60 phút).
 Ngưỡng là config key mới qua standard + schema. Logic phát hiện viết bằng Rust (chủ dự án 11-18: code mới viết
 được bằng Rust thì viết Rust); view Node chỉ nối dây.
 
@@ -241,10 +244,10 @@ Khảo sát mỗi CLI (claude, codex, pi, omp, agy, gemini...) in token/tiền �
 
 ### driving-measures {#task-driving-measures}
 §6 C (OM-D5): nguồn `plan.status`, `question.*`, span phase vào contract; bảy thước đo là định nghĩa truy vấn ở tầng
-lái. Phụ thuộc Q2, Q7. Verify: fixture plan với lịch sử git dựng sẵn, chạy định nghĩa qua `metrics query`.
+lái. Theo OM-D6; phụ thuộc Q7. Verify: fixture plan với lịch sử git dựng sẵn, chạy định nghĩa qua `metrics query`.
 
 ### friction-link-trend {#task-friction-link-trend}
 §6 D. Verify: `cargo test -p fgos-observe` cho kind mới và bucket.
 
 ### attention-supervisor {#task-attention-supervisor}
-§6 E. Phụ thuộc Q5, Q6. Verify: test của `attention-view` với head placement và plan giả.
+§6 E. Theo OM-D7; phụ thuộc Q6. Verify: test của `attention-view` với head placement và plan giả.
