@@ -6,49 +6,28 @@ priority: P1
 blockedBy: []
 footprint:
   - plans/261118-0936-ops-metrics/**
-  - packages/observe/**
-  - packages/run-result/**
-  - packages/host-runtime/contracts/command-routes.json
-  - packages/config/contracts/fixtures/**
-  - apps/fgos/src/wiring/doctor/observe.rs
-  - apps/fgos/observe-kinds.json
-  - apps/fgos/tests/**
-  - src/runner/execution/run-request.mjs
-  - src/runner/execution/unit.mjs
-  - src/runner/execution/unit-summary.mjs
-  - src/runner/execution/run.mjs
-  - src/run-supervisor/steps/settle-attempt.mjs
-  - src/workflow/case-verbs.mjs
-  - src/runner/dispatch/settlement.mjs
-  - src/runner/dispatch/usage-parsers.mjs
-  - src/runner/dispatch/agent-result-claim-contract.mjs
+  - packages/observe/rust/src/query/**
+  - packages/observe/rust/src/definition/**
+  - packages/observe/rust/src/metrics_cli/query.rs
+  - packages/observe/rust/tests/query_*.rs
+  - packages/observe/rust/tests/definition_*.rs
+  - test/fixtures/observe/query/**
+  - src/cli/command-registry.mjs
+  - packages/host-runtime/contracts/command-manifest.json
   - src/runner/dispatch/attention-view.mjs
   - src/verbs/dispatch/inspect.mjs
-  - src/observe/friction-client.mjs
-  - src/cli/command-registry.mjs
-  - core/skills/**
   - core/attention/**
   - core/config-standard/dispatch.yaml
   - core/config-schema/dispatch.schema.yaml
-  - domains/coding/skills/**
-  - domains/coding/observe/**
-  - .agents/skills/**
-  - plugins/fgOS/skills/**
-  - .claude/skills/**
-  - test/runner/execution/unit-summary.test.mjs
-  - test/runner/execution/run-request.test.mjs
-  - test/runner/usage-parsers.test.mjs
-  - test/runner/run-result-source-scan.test.mjs
-  - test/runner/assignment-runresult.test.mjs
+  - packages/config/contracts/fixtures/**
   - test/runner/dispatch-runtime-inspect.test.mjs
-  - test/observe/friction-client.test.mjs
-  - test/suite-baseline.json
-  - test/fixtures/observe/**
-  - docs/architecture-manifest.json
+  - domains/coding/observe/**
+  - apps/fgos/tests/driving_definitions.rs
+  - test/fixtures/observe/driving/**
   - docs/platform/observe/**
   - docs/backlog.md
-  - CHANGELOG.md
   - packages/distribution/contracts/doctor-registry.v1.json
+  - apps/fgos/src/wiring/doctor/observe.rs
 base: ebff368da7c1d1d705c2ec386dd53d5b20544cd4
 source:
   - docs/discussions/ops-metrics/DISCUSSION.md
