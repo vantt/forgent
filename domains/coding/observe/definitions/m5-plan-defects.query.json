@@ -1,0 +1,1 @@
+{"name":"m5-plan-defects","requires":["fgos.plan.defect.found"],"query":{"kind":["fgos.plan.defect.found"],"by":["ref:plan"],"agg":["count"]},"row":{"kind":"unmeasured","reason":"No source emits plan-defect records yet; backlog row opened by phase 16 for the driving measure 5 source.","nextCommand":"fgos metrics query --def domains/coding/observe/definitions"}}

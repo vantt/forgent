@@ -1,0 +1,86 @@
+{
+  "contract": {
+    "id": "unit-summary",
+    "version": 3
+  },
+  "unitRunId": "unit-run-p2-retry",
+  "workflow": {
+    "runId": "wf-1",
+    "stepId": "s",
+    "unitId": "unit-run-p2-retry"
+  },
+  "pattern": "solo",
+  "capability": "execute",
+  "outcome": "pass",
+  "infrastructure": false,
+  "infrastructureReason": null,
+  "refused": [],
+  "startedAt": "2026-11-18T11:00:00.000Z",
+  "settledAt": "2026-11-18T11:03:00.000Z",
+  "stanceOptions": [],
+  "seats": [
+    {
+      "seat": "producer",
+      "role": "producer",
+      "kind": "producer",
+      "round": 1,
+      "final": {
+        "assignmentId": "x/producer/d",
+        "runId": "run-d",
+        "executor": "alpha",
+        "provider": "anthropic",
+        "model": "claude-x",
+        "accountId": "a1",
+        "persona": "builder",
+        "outcome": "pass",
+        "fallbackFrom": null,
+        "durationMs": 120000,
+        "usage": {
+          "inputTokens": 200,
+          "outputTokens": 100,
+          "totalTokens": 300,
+          "source": "stdout",
+          "reason": null
+        },
+        "stance": {
+          "status": "missing"
+        }
+      },
+      "attempts": [
+        {
+          "assignmentId": "x/producer/d",
+          "runId": "run-d",
+          "executor": "alpha",
+          "provider": "anthropic",
+          "model": "claude-x",
+          "accountId": "a1",
+          "persona": "builder",
+          "outcome": "pass",
+          "fallbackFrom": null,
+          "durationMs": 120000,
+          "usage": {
+            "inputTokens": 200,
+            "outputTokens": 100,
+            "totalTokens": 300,
+            "source": "stdout",
+            "reason": null
+          }
+        }
+      ]
+    }
+  ],
+  "plan": {
+    "dir": "plans/261118-1000-demo-plan",
+    "phase": "2"
+  },
+  "verify": {
+    "ran": true,
+    "command": "npm test",
+    "outcome": "pass",
+    "exit": 0,
+    "passed": true,
+    "durationMs": 30000,
+    "how": "shell",
+    "outputDigest": "sha256:abc"
+  }
+}

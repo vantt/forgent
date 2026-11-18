@@ -1,0 +1,86 @@
+{
+  "contract": {
+    "id": "unit-summary",
+    "version": 3
+  },
+  "unitRunId": "unit-run-p1",
+  "workflow": {
+    "runId": "wf-1",
+    "stepId": "s",
+    "unitId": "unit-run-p1"
+  },
+  "pattern": "solo",
+  "capability": "execute",
+  "outcome": "pass",
+  "infrastructure": false,
+  "infrastructureReason": null,
+  "refused": [],
+  "startedAt": "2026-11-18T10:00:00.000Z",
+  "settledAt": "2026-11-18T10:12:00.000Z",
+  "stanceOptions": [],
+  "seats": [
+    {
+      "seat": "producer",
+      "role": "producer",
+      "kind": "producer",
+      "round": 1,
+      "final": {
+        "assignmentId": "x/producer/a",
+        "runId": "run-a",
+        "executor": "alpha",
+        "provider": "anthropic",
+        "model": "claude-x",
+        "accountId": "a1",
+        "persona": "builder",
+        "outcome": "pass",
+        "fallbackFrom": null,
+        "durationMs": 600000,
+        "usage": {
+          "inputTokens": 800,
+          "outputTokens": 200,
+          "totalTokens": 1000,
+          "source": "stdout",
+          "reason": null
+        },
+        "stance": {
+          "status": "missing"
+        }
+      },
+      "attempts": [
+        {
+          "assignmentId": "x/producer/a",
+          "runId": "run-a",
+          "executor": "alpha",
+          "provider": "anthropic",
+          "model": "claude-x",
+          "accountId": "a1",
+          "persona": "builder",
+          "outcome": "pass",
+          "fallbackFrom": null,
+          "durationMs": 600000,
+          "usage": {
+            "inputTokens": 800,
+            "outputTokens": 200,
+            "totalTokens": 1000,
+            "source": "stdout",
+            "reason": null
+          }
+        }
+      ]
+    }
+  ],
+  "plan": {
+    "dir": "plans/261118-1000-demo-plan",
+    "phase": "1"
+  },
+  "verify": {
+    "ran": true,
+    "command": "npm test",
+    "outcome": "pass",
+    "exit": 0,
+    "passed": true,
+    "durationMs": 120000,
+    "how": "shell",
+    "outputDigest": "sha256:abc"
+  }
+}

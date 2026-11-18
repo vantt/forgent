@@ -1,0 +1,1 @@
+{"name":"m6-detection-latency","requires":["fgos.plan.defect.detected"],"query":{"kind":["fgos.plan.defect.detected"],"by":["ref:plan"],"agg":["span","count"]},"row":{"kind":"unmeasured","reason":"No source emits detection records yet; backlog row opened by phase 16 for the driving measure 6 source.","nextCommand":"fgos metrics query --def domains/coding/observe/definitions"}}

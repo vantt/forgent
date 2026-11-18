@@ -1,0 +1,80 @@
+{
+  "contract": {
+    "id": "unit-summary",
+    "version": 3
+  },
+  "unitRunId": "unit-run-other",
+  "workflow": {
+    "runId": "wf-2",
+    "stepId": "s",
+    "unitId": "unit-run-other"
+  },
+  "pattern": "solo",
+  "capability": "execute",
+  "outcome": "fail",
+  "infrastructure": false,
+  "infrastructureReason": null,
+  "refused": [],
+  "startedAt": "2026-11-18T11:00:00.000Z",
+  "settledAt": "2026-11-18T11:10:00.000Z",
+  "stanceOptions": [],
+  "seats": [
+    {
+      "seat": "producer",
+      "role": "producer",
+      "kind": "producer",
+      "round": 1,
+      "final": {
+        "assignmentId": "y/producer/f",
+        "runId": "run-f",
+        "executor": "beta",
+        "provider": "google",
+        "model": "gemini-z",
+        "accountId": "a3",
+        "persona": "builder",
+        "outcome": "fail",
+        "fallbackFrom": null,
+        "durationMs": 400000,
+        "usage": {
+          "inputTokens": 500,
+          "outputTokens": 200,
+          "totalTokens": 700,
+          "source": "stdout",
+          "reason": null
+        },
+        "stance": {
+          "status": "missing"
+        }
+      },
+      "attempts": [
+        {
+          "assignmentId": "y/producer/f",
+          "runId": "run-f",
+          "executor": "beta",
+          "provider": "google",
+          "model": "gemini-z",
+          "accountId": "a3",
+          "persona": "builder",
+          "outcome": "fail",
+          "fallbackFrom": null,
+          "durationMs": 400000,
+          "usage": {
+            "inputTokens": 500,
+            "outputTokens": 200,
+            "totalTokens": 700,
+            "source": "stdout",
+            "reason": null
+          }
+        }
+      ]
+    }
+  ],
+  "plan": {
+    "dir": "plans/261118-0800-other-plan",
+    "phase": "1"
+  },
+  "verify": {
+    "ran": false,
+    "reason": "no verify command"
+  }
+}
