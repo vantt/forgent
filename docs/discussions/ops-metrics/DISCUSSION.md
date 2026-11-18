@@ -305,7 +305,9 @@ active, k config mặc định 3) và `supervisor-idle-burn` (wake tiêu token k
 `noop` vượt ngưỡng).
 Trigger đánh thức: `head-gone` và `plan-no-progress` là định nghĩa của plan này (phase 10). `plan-became-ready`,
 `plan-done`, `plan-priority-changed`, `lane-freed` là định nghĩa của bên supervisor (nơi dùng, OM-D5/OM-D12), viết
-trên sự kiện plan này cung cấp: `fgos.plan.status` (gồm cả đổi `priority`) và `fgos.head.state` (gồm `retired`).
+trên sự kiện plan này cung cấp: `fgos.plan.status` (gồm cả đổi `priority`), `fgos.head.state` (`retired` = lead
+kết thúc) và `fgos.run.attempt` (lane = seat worker dùng chung giữa các plan; `lane-freed` = span attempt kết thúc,
+mang khoá plan/phase và `fgos.seat.id`, `fgos.seat.role`, `fgos.slot.id` — phase 3 + 6).
 Watcher đọc "mới từ tick trước" bằng `--since <ts tick trước>`.
 Registry đầu tiên phải nhận được hai kind này (khai báo của bên supervisor, OM-D12). Để pacer diễn đạt được, contract phải có sẵn nguồn hoạt động của head session: sự kiện
 hoạt động theo session (statusline sidecar / transcript) và token theo session — nằm trong §6 C.
