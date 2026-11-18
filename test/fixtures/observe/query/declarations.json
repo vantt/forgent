@@ -5,7 +5,9 @@
     "fgos.outcome": { "type": "string", "values": ["pass", "fail", "partial"] },
     "fgos.head.state": { "type": "string", "values": ["live", "gone", "retired"] },
     "fgos.plan.status": { "type": "string", "values": ["ready", "running", "done", "blocked"] },
-    "fgos.supervisor.trigger": { "type": "string" }
+    "fgos.supervisor.trigger": { "type": "string" },
+    "fgos.supervisor.outcome": { "type": "string", "values": ["started", "failed"] },
+    "fgos.head.role": { "type": "string" }
   },
   "measures": {
     "fgos.duration": { "unit": "ms", "aggs": ["sum", "avg", "min", "max", "p50", "p90"] },
@@ -19,14 +21,14 @@
       "attrs": ["gen_ai.provider.name", "gen_ai.request.model", "fgos.outcome"],
       "measures": ["gen_ai.usage.input_tokens", "gen_ai.usage.output_tokens", "fgos.duration"]
     },
-    "fgos.head.state": { "subjects": ["head"], "attrs": ["fgos.head.state"] },
+    "fgos.head.state": { "subjects": ["head"], "attrs": ["fgos.head.state", "fgos.head.role"] },
     "fgos.plan.status": { "subjects": ["plan"], "attrs": ["fgos.plan.status"] },
     "fgos.plan.activity": { "subjects": ["plan"] },
     "fgos.watcher.tick": {
       "subjects": ["session"],
       "measures": ["fgos.watcher.interval", "fgos.plans.ready", "fgos.plans.running"]
     },
-    "fgos.supervisor.wake": { "subjects": ["session"], "attrs": ["fgos.supervisor.trigger"] },
+    "fgos.supervisor.wake": { "subjects": ["session"], "attrs": ["fgos.supervisor.trigger", "fgos.supervisor.outcome"] },
     "fgos.session.usage": {
       "subjects": ["session"],
       "measures": ["gen_ai.usage.input_tokens", "gen_ai.usage.output_tokens"]

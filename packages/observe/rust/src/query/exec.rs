@@ -4,7 +4,9 @@ use super::aggregate::{
     compare, compute, cond_matches, field, newest, number, Item, RECORD_FIELDS,
 };
 use super::error::{invalid, QueryError};
-use super::model::{Agg, Anchor, Cond, Having, LatestPer, Operand, Query, WindowOn};
+use super::model::{
+    Agg, Anchor, Cond, Factor, Filter, Having, LatestPer, Op, Operand, Query, WindowOn,
+};
 use super::result::{AggValue, Coverage, QueryResult, ResultRow};
 use super::time::{
     bucket_start, format_instant, parse_absolute, parse_duration_millis, parse_instant,
@@ -93,24 +95,43 @@ impl Names<'_> {
         Ok(Some(resolved))
     }
 
-    /// Filters that run before any join, so a joined name would never be set there and is refused.
+    /// Filters that run before any join, so a joined name would never be set there and is refused. An `any` group
+    /// needs at least one branch and every branch at least one entry; `prefix` needs a string.
     fn conds<'c>(
         &self,
         what: &'static str,
-        conds: &'c [Cond],
-    ) -> Result<Vec<(&'c Cond, String)>, QueryError> {
-        conds
+        filters: &'c [Filter],
+    ) -> Result<Vec<Check<'c>>, QueryError> {
+        filters
             .iter()
-            .map(|c| {
-                let resolved = self.resolve(&c.field)?;
-                if self.joined(&resolved).is_some() {
-                    return Err(invalid(
-                        what,
-                        &c.field,
-                        "a joined name is set only after where, where_latest and without run; use having",
-                    ));
+            .map(|f| match f {
+                Filter::Cond(c) => {
+                    let resolved = self.resolve(&c.field)?;
+                    if self.joined(&resolved).is_some() {
+                        return Err(invalid(
+                            what,
+                            &c.field,
+                            "a joined name is set only after where, where_latest and without run; use having",
+                        ));
+                    }
+                    if c.op == Op::Prefix && !c.value.as_ref().is_some_and(|v| v.is_string()) {
+                        return Err(invalid(what, &c.field, "prefix takes a string value"));
+                    }
+                    Ok(Check::Cond(c, resolved))
                 }
-                Ok((c, resolved))
+                Filter::Any { any } => {
+                    if any.is_empty() || any.iter().any(Vec::is_empty) {
+                        return Err(invalid(
+                            what,
+                            "any",
+                            "an any group needs at least one branch, and every branch at least one condition",
+                        ));
+                    }
+                    any.iter()
+                        .map(|branch| self.conds(what, branch))
+                        .collect::<Result<_, _>>()
+                        .map(Check::Any)
+                }
             })
             .collect()
     }
@@ -124,13 +145,48 @@ impl Names<'_> {
     }
 }
 
+/// A condition list with its names resolved: a condition and its canonical field, or an `any` group of branches.
+enum Check<'c> {
+    Cond(&'c Cond, String),
+    Any(Vec<Vec<Check<'c>>>),
+}
+
+/// Every entry holds; an `any` entry holds when every entry of one of its branches does.
+fn holds(item: &Item, checks: &[Check]) -> bool {
+    checks.iter().all(|check| match check {
+        Check::Cond(c, f) => cond_matches(item, c, f),
+        Check::Any(branches) => branches.iter().any(|b| holds(item, b)),
+    })
+}
+
+fn param(ctx: &QueryContext, name: &str) -> Result<f64, QueryError> {
+    ctx.params
+        .get(name)
+        .copied()
+        .ok_or_else(|| QueryError::MissingParam {
+            name: name.to_owned(),
+        })
+}
+
+fn factor(ctx: &QueryContext, k: &Factor) -> Result<f64, QueryError> {
+    match k {
+        Factor::Number(n) => Ok(*n),
+        Factor::Param { param: name } => param(ctx, name),
+    }
+}
+
 fn check_operand(names: &Names, ctx: &QueryContext, operand: &Operand) -> Result<(), QueryError> {
     match operand {
         Operand::Const(_) => Ok(()),
-        Operand::Param(name) if ctx.params.contains_key(name) => Ok(()),
-        Operand::Param(name) => Err(QueryError::MissingParam { name: name.clone() }),
-        Operand::Agg { agg, .. } => names.agg_measure(agg).map(|_| ()),
-        Operand::Latest { measure, .. } => names.resolve(measure).map(|_| ()),
+        Operand::Param(name) => param(ctx, name).map(|_| ()),
+        Operand::Agg { agg, k } => {
+            factor(ctx, k)?;
+            names.agg_measure(agg).map(|_| ())
+        }
+        Operand::Latest { measure, k } => {
+            factor(ctx, k)?;
+            names.resolve(measure).map(|_| ())
+        }
     }
 }
 
@@ -144,10 +200,12 @@ fn operand_value(
         Operand::Const(c) => Some(*c),
         Operand::Param(name) => ctx.params.get(name).copied(),
         Operand::Agg { agg, k } => {
+            let k = factor(ctx, k).ok()?;
             let measure = names.agg_measure(agg).ok().flatten();
             compute(agg, measure.as_deref(), items, ctx.now_millis).map(|v| v.as_f64() * k)
         }
         Operand::Latest { measure, k } => {
+            let k = factor(ctx, k).ok()?;
             let name = names.resolve(measure).ok()?;
             newest(items).and_then(|i| number(i, &name)).map(|v| v * k)
         }
@@ -190,6 +248,13 @@ pub fn run(query: &Query, ctx: &QueryContext) -> Result<QueryResult, QueryError>
         let within = parse_duration_millis(&w.within)?;
         if let Some(on) = &w.on {
             names.subject_kind("without on", on)?;
+        }
+        if w.latest && w.anchor != Anchor::Record {
+            return Err(invalid(
+                "without",
+                &w.kind.join(","),
+                "latest reads the newest record at or before the record's ts; it takes anchor record",
+            ));
         }
         let back_from_now = ctx
             .now_millis
@@ -341,7 +406,7 @@ pub fn run(query: &Query, ctx: &QueryContext) -> Result<QueryResult, QueryError>
         .filter(|i| {
             since.is_none_or(|s| on_instant(i) >= s) && until.is_none_or(|u| on_instant(i) <= u)
         })
-        .filter(|i| where_.iter().all(|(c, f)| cond_matches(i, c, f)))
+        .filter(|i| holds(i, &where_))
         .collect();
     if let Some(key) = &query.latest_per {
         let mut latest: HashMap<(String, String), Item> = HashMap::new();
@@ -365,7 +430,7 @@ pub fn run(query: &Query, ctx: &QueryContext) -> Result<QueryResult, QueryError>
         }
         primary = latest.into_values().collect();
     }
-    primary.retain(|i| where_latest.iter().all(|(c, f)| cond_matches(i, c, f)));
+    primary.retain(|i| holds(i, &where_latest));
 
     // Joins add measures of records that share a ref.
     for join in &query.join {
@@ -392,40 +457,55 @@ pub fn run(query: &Query, ctx: &QueryContext) -> Result<QueryResult, QueryError>
         }
     }
 
-    // Anti-joins drop a record that has a matching record in the window. With `on`, the pool is indexed by ref id.
+    // Anti-joins drop a record that has a matching record in the window, or, with `latest`, whose newest record in
+    // the window matches. With `on`, the pool is indexed by ref id.
     for (w, conds, within, back_from_now) in &withouts {
         let kinds: BTreeSet<&str> = w.kind.iter().map(String::as_str).collect();
-        let pool: Vec<Item> = items_of(&kinds)
-            .into_iter()
-            .filter(|r| conds.iter().all(|(c, f)| cond_matches(r, c, f)))
-            .collect();
-        let mut by_ref: HashMap<&str, Vec<i64>> = HashMap::new();
+        let mut pool: Vec<Item> = items_of(&kinds);
+        if !w.latest {
+            pool.retain(|r| holds(r, conds));
+        }
+        let mut by_ref: HashMap<&str, Vec<usize>> = HashMap::new();
         if let Some(on) = &w.on {
-            for r in &pool {
+            for (idx, r) in pool.iter().enumerate() {
                 for id in r.ref_ids(on) {
-                    by_ref.entry(id).or_default().push(r.ts);
+                    by_ref.entry(id).or_default().push(idx);
                 }
             }
         }
         let mut kept = Vec::with_capacity(primary.len());
         for p in primary {
+            let back_from_record = || {
+                p.ts.checked_sub(*within).ok_or_else(|| {
+                    invalid("within", &w.within, "reaches before the earliest instant")
+                })
+            };
             let (lo, hi) = match w.anchor {
                 Anchor::Now => (*back_from_now, ctx.now_millis),
-                Anchor::Record => (
-                    p.ts.checked_sub(*within).ok_or_else(|| {
-                        invalid("within", &w.within, "reaches before the earliest instant")
-                    })?,
-                    p.end,
+                Anchor::Record if w.latest => (back_from_record()?, p.ts),
+                Anchor::Record => (back_from_record()?, p.end),
+                Anchor::After => (
+                    p.ts.saturating_add(1),
+                    p.ts.saturating_add(*within).min(ctx.now_millis),
                 ),
             };
-            let inside = |ts: &i64| (lo..=hi).contains(ts);
-            let found = match &w.on {
-                Some(on) => p.ref_ids(on).any(|id| {
-                    by_ref
-                        .get(id)
-                        .is_some_and(|stamps| stamps.iter().any(inside))
-                }),
-                None => pool.iter().any(|r| inside(&r.ts)),
+            let candidates: Vec<&Item> = match &w.on {
+                Some(on) => p
+                    .ref_ids(on)
+                    .flat_map(|id| by_ref.get(id).into_iter().flatten().copied())
+                    .collect::<BTreeSet<usize>>()
+                    .into_iter()
+                    .map(|idx| &pool[idx])
+                    .collect(),
+                None => pool.iter().collect(),
+            };
+            let mut inside = candidates.into_iter().filter(|r| (lo..=hi).contains(&r.ts));
+            let found = if w.latest {
+                inside
+                    .max_by(|a, b| a.ts.cmp(&b.ts).then_with(|| a.rec.id.cmp(&b.rec.id)))
+                    .is_some_and(|r| holds(r, conds))
+            } else {
+                inside.next().is_some()
             };
             if !found {
                 kept.push(p);

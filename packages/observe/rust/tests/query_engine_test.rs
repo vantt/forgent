@@ -550,6 +550,217 @@ fn without_drops_a_record_that_has_a_match_in_the_window_from_now_or_from_the_re
     assert!(ask(&q("now", "45m")).rows.is_empty());
 }
 
+/// Heads with a role: a live lead head and a live worker head. The fixture's h3 is live without a role.
+const ROLE_HEADS: &[&str] = &[
+    r#"{"v":2,"id":"head-r1","kind":"fgos.head.state","ts":"2026-11-18T11:00:00Z","subject":{"kind":"head","id":"h4"},"attrs":{"fgos.head.state":"live","fgos.head.role":"head:lead-ops"},"basis":"observed","origin":{"source":"fixture"}}"#,
+    r#"{"v":2,"id":"head-r2","kind":"fgos.head.state","ts":"2026-11-18T11:00:00Z","subject":{"kind":"head","id":"h5"},"attrs":{"fgos.head.state":"live","fgos.head.role":"head:worker"},"basis":"observed","origin":{"source":"fixture"}}"#,
+];
+
+#[test]
+fn prefix_matches_a_string_field_that_starts_with_the_text_and_never_a_missing_or_non_string_one() {
+    let count = |kind: &str, cond: &str| {
+        let q = query(&format!(
+            r#"{{"kind":["{kind}"],"where":[{cond}],"agg":["count"]}}"#
+        ));
+        ask_with(&q, NOW, &[], ROLE_HEADS).unwrap().rows[0].count
+    };
+    // h4 only: h5's role is another prefix and the fixture heads carry no role.
+    assert_eq!(
+        count(
+            "fgos.head.state",
+            r#"{"field":"fgos.head.role","op":"prefix","value":"head:lead-"}"#
+        ),
+        1
+    );
+    assert_eq!(
+        count(
+            "fgos.head.state",
+            r#"{"field":"fgos.head.role","op":"prefix","value":"head:"}"#
+        ),
+        2
+    );
+    // R1's duration 4200000 is a number, so a text prefix of it never matches.
+    assert_eq!(
+        count(
+            "fgos.run.attempt",
+            r#"{"field":"fgos.duration","op":"prefix","value":"42"}"#
+        ),
+        0
+    );
+}
+
+#[test]
+fn an_any_group_holds_when_every_condition_of_one_branch_holds() {
+    // The watcher is active while a plan's latest status is running, or a lead head's latest state is live.
+    let q = query(
+        r#"{"kind":["fgos.plan.status","fgos.head.state"],"latest_per":"subject","by":["subject.id"],
+            "where_latest":[{"any":[[{"field":"fgos.plan.status","op":"eq","value":"running"}],
+                                    [{"field":"fgos.head.state","op":"eq","value":"live"},
+                                     {"field":"fgos.head.role","op":"prefix","value":"head:lead-"}]]}]}"#,
+    );
+    // Plans A, B and C run; h3 is live without a role, so no head holds the second branch.
+    assert_eq!(
+        groups(&ask_at(&q, NOW, &[]).unwrap(), "subject.id"),
+        ["A", "B", "C"]
+    );
+    // h4 is a live lead; h5 is live but no lead.
+    assert_eq!(
+        groups(&ask_with(&q, NOW, &[], ROLE_HEADS).unwrap(), "subject.id"),
+        ["A", "B", "C", "h4"]
+    );
+}
+
+#[test]
+fn an_after_anchored_without_drops_a_record_that_a_matching_record_follows_up_to_within_or_now() {
+    let wake = |id: &str, ts: &str, outcome: &str| {
+        format!(
+            r#"{{"v":2,"id":"{id}","kind":"fgos.supervisor.wake","ts":"{ts}","subject":{{"kind":"session","id":"sup-w"}},"attrs":{{"fgos.supervisor.outcome":"{outcome}"}},"basis":"observed","origin":{{"source":"fixture"}}}}"#
+        )
+    };
+    let wakes = [
+        wake("w-f1", "2026-11-18T09:00:00Z", "failed"),
+        wake("w-s1", "2026-11-18T09:30:00Z", "started"),
+        wake("w-f2", "2026-11-18T10:15:00Z", "failed"),
+        wake("w-f3", "2026-11-18T10:40:00Z", "failed"),
+    ];
+    let wakes: Vec<&str> = wakes.iter().map(String::as_str).collect();
+    let failed_since_started = |within: &str| {
+        let q = query(&format!(
+            r#"{{"kind":["fgos.supervisor.wake"],
+                "where":[{{"field":"fgos.supervisor.outcome","op":"eq","value":"failed"}}],
+                "without":[{{"kind":["fgos.supervisor.wake"],
+                             "where":[{{"field":"fgos.supervisor.outcome","op":"eq","value":"started"}}],
+                             "within":"{within}","anchor":"after"}}],
+                "agg":["count","min:ts"]}}"#
+        ));
+        let row = ask_with(&q, NOW, &[], &wakes).unwrap().rows.remove(0);
+        (row.count, row.aggs["min:ts"])
+    };
+    // Only the failures after the last started stay; the run's first failure is 10:15.
+    assert_eq!(
+        failed_since_started("30d"),
+        (2, Some(AggValue::Instant(instant("2026-11-18T10:15:00Z"))))
+    );
+    // `within` caps the window: 20 minutes after 09:00 does not reach the 09:30 start.
+    assert_eq!(
+        failed_since_started("20m"),
+        (3, Some(AggValue::Instant(instant("2026-11-18T09:00:00Z"))))
+    );
+}
+
+#[test]
+fn a_latest_without_drops_a_record_only_when_the_newest_record_in_force_at_it_matches() {
+    let q = |latest: bool| {
+        query(&format!(
+            r#"{{"kind":["fgos.supervisor.wake"],
+                "where":[{{"field":"fgos.supervisor.trigger","op":"eq","value":"plan-no-progress"}}],
+                "without":[{{"kind":["fgos.watcher.tick"],"latest":{latest},"within":"1h","anchor":"record",
+                             "where":[{{"field":"fgos.plans.running","op":"gt","value":0}}]}},
+                           {{"kind":["fgos.watcher.tick"],"latest":{latest},"within":"1h","anchor":"record",
+                             "where":[{{"field":"fgos.plans.ready","op":"gt","value":0}}]}}],
+                "agg":["count"]}}"#
+        ))
+    };
+    let idle_tick = r#"{"v":2,"id":"tick-idle","kind":"fgos.watcher.tick","ts":"2026-11-18T11:45:00Z","subject":{"kind":"session","id":"watcher"},"measures":{"fgos.watcher.interval":300,"fgos.plans.ready":0,"fgos.plans.running":0},"basis":"observed","origin":{"source":"fixture","host":"alpha"}}"#;
+    let count =
+        |latest: bool, extra: &[&str]| ask_with(&q(latest), NOW, &[], extra).unwrap().rows[0].count;
+    // The 11:50 wake: the tick in force is the busy 11:20 one, so it goes.
+    assert_eq!(count(true, &[]), 0);
+    // An idle tick at 11:45 is now the one in force, so the wake stays...
+    assert_eq!(count(true, &[idle_tick]), 1);
+    // ...where a plain anti-join still finds the busy 11:20 tick in the hour and drops it.
+    assert_eq!(count(false, &[idle_tick]), 0);
+}
+
+#[test]
+fn the_factor_k_can_be_a_parameter_the_caller_fills() {
+    let mut q = definition("watcher-overdue");
+    q.where_.push(
+        serde_json::from_str(r#"{"field":"origin.host","op":"eq","value":"alpha"}"#).unwrap(),
+    );
+    q.having[0].rhs =
+        serde_json::from_str(r#"{"latest":{"measure":"fgos.watcher.interval","k":{"param":"k"}}}"#)
+            .unwrap();
+    let rows = |k: f64| {
+        ask_at(&q, NOW, &[("min_running", 0.0), ("k", k)])
+            .unwrap()
+            .rows
+            .len()
+    };
+    // The newest alpha tick is 2400 s old: over 3 x 300 s, under 10 x 300 s.
+    assert_eq!(rows(3.0), 1);
+    assert_eq!(rows(10.0), 0);
+    assert_eq!(
+        ask_at(&q, NOW, &[("min_running", 0.0)]),
+        Err(QueryError::MissingParam { name: "k".into() })
+    );
+}
+
+#[test]
+fn max_end_and_min_ts_are_the_latest_end_and_the_earliest_start_as_instants() {
+    let mut q = definition("lane-freed");
+    q.agg = vec!["max:end".parse().unwrap(), "min:ts".parse().unwrap()];
+    let result = ask(&q);
+    assert_eq!(groups(&result, "origin.host"), ["alpha", "beta"]);
+    let at = |row: usize, agg: &str| result.rows[row].aggs[agg];
+    // alpha: R1 10:00-11:10 and R5 10:30-11:30. beta: R4 11:45-11:50.
+    assert_eq!(
+        at(0, "max:end"),
+        Some(AggValue::Instant(instant("2026-11-18T11:30:00Z")))
+    );
+    assert_eq!(
+        at(0, "min:ts"),
+        Some(AggValue::Instant(instant("2026-11-18T10:00:00Z")))
+    );
+    assert_eq!(
+        at(1, "max:end"),
+        Some(AggValue::Instant(instant("2026-11-18T11:50:00Z")))
+    );
+    let json = serde_json::to_value(&result.rows[1]).unwrap();
+    assert_eq!(json["aggs"]["min:ts"], "2026-11-18T11:45:00.000Z");
+}
+
+#[test]
+fn a_meaningless_use_of_the_newer_forms_is_refused_with_the_reason() {
+    let refused = |json: &str| match ask_at(&query(json), NOW, &[]) {
+        Err(QueryError::Invalid { message, .. }) => message,
+        other => panic!("not refused: {other:?}"),
+    };
+    // `latest` reads the record in force at the record's ts: anchored now or after it means nothing.
+    for anchor in ["now", "after"] {
+        let message = refused(&format!(
+            r#"{{"kind":["fgos.supervisor.wake"],"without":[{{"kind":["fgos.watcher.tick"],"latest":true,"within":"1h","anchor":"{anchor}"}}]}}"#
+        ));
+        assert!(message.contains("takes anchor record"), "{message}");
+    }
+    assert!(refused(
+        r#"{"kind":["fgos.head.state"],"where":[{"field":"fgos.head.role","op":"prefix","value":4}]}"#
+    )
+    .contains("prefix takes a string"));
+    for any in ["[]", "[[]]"] {
+        let message = refused(&format!(
+            r#"{{"kind":["fgos.head.state"],"where_latest":[{{"any":{any}}}]}}"#
+        ));
+        assert!(message.contains("at least one branch"), "{message}");
+    }
+    // Names inside a branch are checked like any other condition.
+    assert!(matches!(
+        ask_at(
+            &query(
+                r#"{"kind":["fgos.head.state"],"where":[{"any":[[{"field":"nope","op":"exists"}]]}]}"#
+            ),
+            NOW,
+            &[]
+        ),
+        Err(QueryError::UnknownField { .. })
+    ));
+    // An any group is only `any`.
+    assert!(serde_json::from_str::<Query>(
+        r#"{"kind":["fgos.head.state"],"where":[{"any":[],"field":"x"}]}"#
+    )
+    .is_err());
+}
+
 #[test]
 fn a_group_that_matches_nothing_is_one_empty_row_only_when_nothing_groups_it() {
     let none = query(
@@ -808,6 +1019,25 @@ fn every_definition_round_trips_through_its_serialized_form() {
         seen += 1;
     }
     assert_eq!(seen, 7);
+}
+
+#[test]
+fn every_newer_form_round_trips_through_its_serialized_form() {
+    let parsed = query(
+        r#"{"kind":["fgos.supervisor.wake"],
+            "where":[{"field":"fgos.supervisor.outcome","op":"prefix","value":"fail"}],
+            "where_latest":[{"any":[[{"field":"fgos.supervisor.trigger","op":"exists"}],
+                                    [{"any":[[{"field":"basis","op":"eq","value":"observed"}]]}]]}],
+            "agg":["max:end","min:ts"],
+            "having":[{"lhs":{"agg":{"agg":"count","k":{"param":"k"}}},"op":"gt",
+                       "rhs":{"latest":{"measure":"fgos.duration","k":2.5}}}],
+            "without":[{"kind":["fgos.supervisor.wake"],"within":"30d","anchor":"after"},
+                       {"kind":["fgos.watcher.tick"],"within":"1h","anchor":"record","latest":true}]}"#,
+    );
+    let written = serde_json::to_string(&parsed).unwrap();
+    let reparsed: Query = serde_json::from_str(&written).unwrap();
+    assert_eq!(reparsed, parsed);
+    assert_eq!(serde_json::to_string(&reparsed).unwrap(), written);
 }
 
 #[test]

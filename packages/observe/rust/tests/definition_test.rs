@@ -1,7 +1,7 @@
 //! Named definitions through `fgos metrics query --def`: the seven detections and measures that consumers write,
 //! over the test-local declarations of the query fixtures; no Observe source names any of their kinds.
 
-use fgos_observe::definition::DEFINITION_SUFFIX;
+use fgos_observe::definition::{self, Definition, DefinitionWindow, DEFINITION_SUFFIX};
 use fgos_observe::metrics_cli::query::dispatch_query;
 use fgos_observe::metrics_cli::RecordEnvironment;
 use fgos_observe::record::registry::EmbeddedDeclaration;
@@ -304,6 +304,70 @@ fn a_config_backed_parameter_is_resolved_by_the_composition_root_and_an_unset_ke
         answer(&all, "watcher-overdue")["unmeasured"],
         "config-unset: supervisor.minRunning"
     );
+
+    // A config-backed parameter also fills an operand's factor `k`, and its unset key is unmeasured the same way.
+    write_definition(&defs, "watcher-overdue", |d| {
+        d["query"]["where"] = json!([{ "field": "origin.host", "op": "eq", "value": "alpha" }]);
+        d["query"]["having"][0]["rhs"]["latest"]["k"] = json!({ "param": "k" });
+        d["params"] = json!({
+            "min_running": { "value": 0 },
+            "k": { "configKey": "watcher.overdueFactor" },
+        });
+    });
+    let overdue = |config: Vec<(&'static str, f64)>| {
+        let all = query(
+            &root,
+            &["--def", defs.to_str().unwrap(), "--now", NOW],
+            &TestEnvironment { config },
+        );
+        answer(&all, "watcher-overdue").clone()
+    };
+    assert_eq!(
+        overdue(vec![("watcher.overdueFactor", 3.0)])["rows"]
+            .as_array()
+            .unwrap()
+            .len(),
+        1
+    );
+    assert_eq!(
+        overdue(vec![])["unmeasured"],
+        "config-unset: watcher.overdueFactor"
+    );
+}
+
+#[test]
+fn a_definition_that_owns_its_window_keeps_its_bounds_when_the_caller_windows_the_run() {
+    let text = |name: &str, window: &str| {
+        format!(
+            r#"{{"name":"{name}",{window}"query":{{"kind":["fgos.supervisor.wake"],
+                "where":[{{"field":"fgos.supervisor.outcome","op":"eq","value":"failed"}}],
+                "without":[{{"kind":["fgos.supervisor.wake"],
+                             "where":[{{"field":"fgos.supervisor.outcome","op":"eq","value":"started"}}],
+                             "within":"30d","anchor":"after"}}],
+                "agg":["count","min:ts"]}}}}"#
+        )
+    };
+    let own =
+        Definition::parse("own", &text("supervisor-wake-failed", r#""window":"own","#)).unwrap();
+    let caller = Definition::parse("caller", &text("windowed", "")).unwrap();
+    assert_eq!(own.window, DefinitionWindow::Own);
+    assert_eq!(caller.window, DefinitionWindow::Caller);
+    let mut defs = vec![own.clone(), caller];
+    definition::window(
+        &mut defs,
+        Some("2026-11-18T10:30:00Z"),
+        Some("2026-11-18T12:00:00Z"),
+    );
+    assert_eq!((&defs[0].query.since, &defs[0].query.until), (&None, &None));
+    assert_eq!(defs[1].query.since.as_deref(), Some("2026-11-18T10:30:00Z"));
+    assert_eq!(defs[1].query.until.as_deref(), Some("2026-11-18T12:00:00Z"));
+    // `own` round-trips; the default `caller` is left out of the written form.
+    let written = serde_json::to_string(&own).unwrap();
+    assert_eq!(Definition::parse("again", &written).unwrap(), own);
+    assert!(!serde_json::to_string(&defs[1])
+        .unwrap()
+        .contains(r#""window":"#));
+    assert!(Definition::parse("bad", &text("bad", r#""window":"mine","#)).is_err());
 }
 
 #[test]
