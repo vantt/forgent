@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "bb485e69d093b6a0e3ac64b5bc28209e15f480dcef776dc8757353b5de9b5921",
+  "payloadDigest": "0a6eea972f565c51aad4a33bd7b8196945f665e4924a8681162af8fba2e516b5",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "764929356f623ea67c3f918c5414cef1541da5c03a23bd9fa0acfae4a31df38b",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -1255,7 +1255,7 @@
     "src/runner/dispatch/run-result.mjs": "0a42e38a5e3ab4e32953a77b126936d2e117869736b6ef2d0e9b851a11f1f10d",
     "src/runner/dispatch/run-timeout.mjs": "9d0bb5adca999cf689b8a0c6dce0cfc28f122de1393785fcb620f6f669086d40",
     "src/runner/dispatch/runner-config-error.mjs": "9671bbf3bd275167e8611ae5abe909c87e699a6583e7b7e7c2d519ee013d1c0e",
-    "src/runner/dispatch/runtime-inspection.mjs": "63c881303204586766e3344afb2db36d0c0b56bcd436460b4a6914b885c309f7",
+    "src/runner/dispatch/runtime-inspection.mjs": "3ce9f61a48afbc739c5c83b261ba09bc3864decd810c13c5d0345ebf467b1649",
     "src/runner/dispatch/session-attempt.mjs": "fdc3057b98b4f964ac2e37804b583b72aa2669fb81484a5562554724f76bde1d",
     "src/runner/dispatch/settlement.mjs": "cfd864b660cf2a5ee2b49d0fae43a98952fefb84d4670cd6037624d08a418d10",
     "src/runner/dispatch/shipped-catalog.mjs": "ceb40e02a773598eebe4fc8db48e7400bfb76ce938df20268ce166f0539b8025",
