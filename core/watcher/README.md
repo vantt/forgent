@@ -21,6 +21,11 @@ The id is derived from `kind|subject|ts`, so a re-run over an overlapping window
 `lane-freed` answers one row per host (`origin.host`, newest attempt per run) with `max:end`: the end of the host's newest ended attempt.
 
 `supervisor-wake-failed` and `supervisor-stuck` count the failures since the last `started` wake: an anti-join `after` drops a failure that a later `started` follows. Their window is their own (`"window": "own"`, `since` `-30d`), so the watcher's `--since` never moves the run's first record and the event id holds.
+The own window slides: its `since` is `-30d` from now, so an incident older than 30 days with no later `started` wake leaves the window and re-raises once with a new `ts` (a new event id). Wider history is not read.
+
+`plan-ready-waiting` is also `"window": "own"` with `since` `-30d`: Observe cuts by window before `latest_per`, so with the caller's window a plan that became ready before the lookback would never be reported after a missed edge or lost state. A plan ready for longer than 30 days leaves the window the same way.
+
+Plan subject ids and plan refs are `plans/<name>`, never the bare name.
 
 A lead is a head whose `fgos.head.role` starts `head:lead-` or `lead:` (`lead-ended`, `watcher-active`). `watcher-active` raises one row per running plan or live lead; no row means idle. `watcher-overdue` takes its factor from `watcher.overdueFactor`; `supervisor-idle-burn` tests only the newest tick at or before the wake.
 

@@ -3,7 +3,9 @@
   "requires": [
     "fgos.plan.status"
   ],
+  "window": "own",
   "query": {
+    "since": "-30d",
     "kind": [
       "fgos.plan.status"
     ],
