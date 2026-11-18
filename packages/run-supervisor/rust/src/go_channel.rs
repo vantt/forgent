@@ -113,6 +113,18 @@ pub(crate) fn peer_uid(stream: &UnixStream) -> Option<libc::uid_t> {
     peer_cred(stream).map(|cred| cred.uid)
 }
 
+/// The pid of the process on the other end of a connected socket, as this process's PID namespace names it.
+#[cfg(target_os = "linux")]
+pub(crate) fn peer_pid(stream: &UnixStream) -> Option<u32> {
+    peer_cred(stream).and_then(|cred| u32::try_from(cred.pid).ok().filter(|pid| *pid > 0))
+}
+
+/// No portable peer pid elsewhere: a request that needs it is refused.
+#[cfg(all(unix, not(target_os = "linux")))]
+pub(crate) fn peer_pid(_stream: &UnixStream) -> Option<u32> {
+    None
+}
+
 #[cfg(all(unix, not(target_os = "linux")))]
 pub(crate) fn peer_uid(stream: &UnixStream) -> Option<libc::uid_t> {
     let (mut uid, mut gid): (libc::uid_t, libc::gid_t) = (0, 0);

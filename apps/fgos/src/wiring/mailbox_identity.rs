@@ -19,10 +19,12 @@ use fgos_identity::directory::{is_role_alias, register_writer, resolve};
 use fgos_identity::resolve::{HeadRef, WriterKey as IdentityKey, ENV_ORDER};
 use fgos_identity::session::cli_of;
 use fgos_identity::{session_for, Candidate, Liveness as IdentityLiveness, SessionInfo};
+use fgos_mailbox::hook::resolve::HEAD_REQUEST_SOCKET_ENV;
 use fgos_mailbox::hook::shell::BoundHead;
 use fgos_mailbox::verbs::HeadView;
 use fgos_mailbox_core::{AliasCandidate, AliasRefusal, Cli, Liveness, WriterKey};
 use fgos_process::facts::{judge_here, Record};
+use fgos_run_supervisor::head_client::{request_head, REPLY_TIMEOUT};
 use std::path::{Path, PathBuf};
 
 /// Identity's state root, as the `identity` verbs resolve it (an explicit
@@ -113,6 +115,12 @@ fn identity_key<'a>(key: &'a WriterKey, cli: &Cli) -> Option<IdentityKey<'a>> {
 /// Returns the hook-outcome reason when it did not hold; nothing is retried
 /// in this process.
 ///
+/// Inside a confined head (its env names the head request socket) Identity's
+/// directory is read-only, so the head's session is not registered here: the
+/// head's own supervisor is asked to bind it to the attempt it runs in
+/// (`head bind session`), which registers it on the attempt's gate and moves
+/// the attempt's role to it, so a role alias reaches this head's mailbox key.
+///
 /// Known limit, inside the same-user boundary of spec §8 item 3: the
 /// watchdog may end the process inside Identity's durable write and leave
 /// its temporary file in Identity's directory. Identity's scan reads only
@@ -123,6 +131,22 @@ pub fn ensure_registered(
     clone_dir: Option<&Path>,
     cli: &Cli,
     head: &BoundHead,
+) -> Option<String> {
+    let socket = std::env::var_os(HEAD_REQUEST_SOCKET_ENV)
+        .filter(|path| !path.is_empty())
+        .map(PathBuf::from);
+    ensure_registered_via(state_root, clone_dir, cli, head, socket.as_deref())
+}
+
+/// The request-socket verb that binds a head's agent session to its attempt.
+const BIND_SESSION_VERB: &str = "head bind session";
+
+fn ensure_registered_via(
+    state_root: &Path,
+    clone_dir: Option<&Path>,
+    cli: &Cli,
+    head: &BoundHead,
+    head_socket: Option<&Path>,
 ) -> Option<String> {
     let refused = |reason: &str| Some(format!("ident:{reason}"));
     let Some(key) = identity_key(&head.writer, cli) else {
@@ -138,11 +162,18 @@ pub fn ensure_registered(
     match resolve(state_root, &own.handle, &judge_here, None) {
         Ok(listed) if listed.id == own.id => None,
         Ok(_) => Some("ident-handle-in-use".to_string()),
-        Err(refusal) if refusal.reason == "not-found" => {
-            register_writer(state_root, clone_dir, &key, &head_ref, &[], false)
+        Err(refusal) if refusal.reason == "not-found" => match head_socket {
+            Some(socket) => {
+                let args = serde_json::json!({ "source": key.source, "value": key.value });
+                let id = format!("mbx-{}", std::process::id());
+                request_head(socket, BIND_SESSION_VERB, &args, &id, REPLY_TIMEOUT)
+                    .err()
+                    .and_then(|error| refused(&error.code))
+            }
+            None => register_writer(state_root, clone_dir, &key, &head_ref, &[], false)
                 .err()
-                .and_then(|refusal| refused(refusal.reason))
-        }
+                .and_then(|refusal| refused(refusal.reason)),
+        },
         Err(refusal) => refused(refusal.reason),
     }
 }
@@ -486,6 +517,66 @@ mod tests {
         for root in [stale, live] {
             let _ = std::fs::remove_dir_all(root);
         }
+    }
+
+    /// Serves one request on a socket of its own and answers it with `reply`; returns the request it read.
+    fn one_reply(
+        tag: &str,
+        reply: serde_json::Value,
+    ) -> (PathBuf, std::thread::JoinHandle<serde_json::Value>) {
+        use fgos_run_supervisor::go_channel::{read_frame, write_frame};
+        let dir = std::env::temp_dir().join(format!("mbx-bind-{tag}-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&dir);
+        std::fs::create_dir_all(&dir).unwrap();
+        let path = dir.join("req.sock");
+        let listener = std::os::unix::net::UnixListener::bind(&path).unwrap();
+        let server = std::thread::spawn(move || {
+            let (mut conn, _) = listener.accept().unwrap();
+            let request = read_frame(&mut conn).unwrap();
+            let mut answer = reply;
+            answer["id"] = request["id"].clone();
+            write_frame(&mut conn, &answer).unwrap();
+            request
+        });
+        (path, server)
+    }
+
+    #[test]
+    fn inside_a_confined_head_the_head_is_bound_through_its_request_socket_and_identity_is_not_written(
+    ) {
+        let claude = Cli::new("claude").unwrap();
+        let root = state_root("bind");
+        let (socket, server) = one_reply(
+            "done",
+            serde_json::json!({ "type": "REPLY", "result": "done", "data": {} }),
+        );
+        let head = bound("wiring-bound-head", None);
+        assert_eq!(
+            super::ensure_registered_via(&root, None, &claude, &head, Some(&socket)),
+            None
+        );
+        let request = server.join().unwrap();
+        assert_eq!(request["verb"], "head bind session");
+        assert_eq!(
+            request["args"],
+            serde_json::json!({ "source": "CLAUDE_CODE_SESSION_ID", "value": "wiring-bound-head" })
+        );
+        assert_eq!(
+            entries(&root),
+            0,
+            "the read-only directory is never written from the sandbox"
+        );
+        // A refused bind is the hook outcome, under Identity's prefix.
+        let (socket, server) = one_reply(
+            "refused",
+            serde_json::json!({ "type": "REPLY", "result": "refused", "code": "session-bind-failed", "detail": "x" }),
+        );
+        assert_eq!(
+            super::ensure_registered_via(&root, None, &claude, &head, Some(&socket)).as_deref(),
+            Some("ident:session-bind-failed")
+        );
+        server.join().unwrap();
+        let _ = std::fs::remove_dir_all(root);
     }
 
     #[test]

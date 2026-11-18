@@ -21,7 +21,8 @@ use fgos_identity::resolve::{HeadRef, WriterKey, ENV_ORDER};
 use fgos_process::{facts, ProcId};
 use fgos_run_supervisor::go_channel::{read_frame, write_frame, MAX_FRAME_BYTES};
 use fgos_run_supervisor::head_request::{
-    identity_holds, identity_registered, identity_take, Config, HeadRequests, HoldError,
+    identity_bind, identity_holds, identity_registered, identity_take, Config, HeadRequests,
+    HoldError, BIND_VERB,
 };
 use serde_json::{json, Value};
 
@@ -140,6 +141,12 @@ fn serve_with(
                     detail: "internal identity text".into(),
                 })
             }
+        }),
+        bind_session: Box::new(|_, _| {
+            Err(HoldError {
+                code: "not-in-this-test".into(),
+                detail: String::new(),
+            })
         }),
         log: Box::new(move |line| sink.lock().unwrap().push(line.to_string())),
     });
@@ -375,6 +382,7 @@ fn the_contract_names_exactly_the_refusal_codes_and_verbs_the_server_speaks() {
             "peer-uid",
             "role-not-held",
             "role-take-failed",
+            "session-bind-failed",
             "session-not-registered",
             "verb-failed",
             "verb-not-granted",
@@ -392,6 +400,7 @@ fn the_contract_names_exactly_the_refusal_codes_and_verbs_the_server_speaks() {
         verbs,
         [
             "head answered",
+            "head bind session",
             "head restore role",
             "head rotate",
             "head start"
@@ -443,22 +452,22 @@ fn identity_gives_the_role_only_to_the_attempts_own_session_and_fails_closed_whe
     // (a) the attempt's own session holds the role.
     let own = state_root("own", true);
     register(&own, "att-own", &[role]);
-    assert_eq!(identity_holds(&own, role, "att-own"), Ok(true));
+    assert_eq!(identity_holds(&own, role, "att-own", None), Ok(true));
     // (b) another live session holds it, or nobody does.
     let other = state_root("other", true);
     register(&other, "att-other", &[role]);
     register(&other, "att-own", &[]);
-    assert_eq!(identity_holds(&other, role, "att-own"), Ok(false));
+    assert_eq!(identity_holds(&other, role, "att-own", None), Ok(false));
     assert_eq!(
-        identity_holds(&other, role, "att-never-registered"),
+        identity_holds(&other, role, "att-never-registered", None),
         Ok(false)
     );
     let none = state_root("none", true);
     register(&none, "att-own", &[]);
-    assert_eq!(identity_holds(&none, role, "att-own"), Ok(false));
+    assert_eq!(identity_holds(&none, role, "att-own", None), Ok(false));
     // (c) Identity cannot answer: an error with its refusal code, never a yes.
     let broken = state_root("broken", false);
-    let err = identity_holds(&broken, role, "att-own").unwrap_err();
+    let err = identity_holds(&broken, role, "att-own", None).unwrap_err();
     assert!(err.code.starts_with("machine-id"), "{err:?}");
     assert!(!err.detail.is_empty());
 }
@@ -709,12 +718,12 @@ fn identity_registers_a_successor_without_the_role_and_take_moves_it_from_the_pr
     let root = state_root("take", true);
     register(&root, "att-old", &[role]);
     register(&root, "att-new", &[]);
-    assert_eq!(identity_registered(&root, "att-new"), Ok(true));
+    assert_eq!(identity_registered(&root, "att-new", None), Ok(true));
     assert_eq!(
-        identity_registered(&root, "att-never-registered"),
+        identity_registered(&root, "att-never-registered", None),
         Ok(false)
     );
-    assert_eq!(identity_holds(&root, role, "att-new"), Ok(false));
+    assert_eq!(identity_holds(&root, role, "att-new", None), Ok(false));
 
     let pid = std::process::id();
     let head = HeadRef {
@@ -722,11 +731,11 @@ fn identity_registers_a_successor_without_the_role_and_take_moves_it_from_the_pr
         start_time: facts::identity_of(ProcId(pid)).unwrap().start_time,
     };
     identity_take(&root, &root, role, "att-new", &head, true).expect("take");
-    assert_eq!(identity_holds(&root, role, "att-new"), Ok(true));
-    assert_eq!(identity_holds(&root, role, "att-old"), Ok(false));
+    assert_eq!(identity_holds(&root, role, "att-new", None), Ok(true));
+    assert_eq!(identity_holds(&root, role, "att-old", None), Ok(false));
 
     let broken = state_root("take-broken", false);
-    assert!(identity_registered(&broken, "att-new")
+    assert!(identity_registered(&broken, "att-new", None)
         .unwrap_err()
         .code
         .starts_with("machine-id"));
@@ -744,12 +753,12 @@ fn restore_gives_the_role_back_only_through_a_registration_without_take() {
     };
     // Nobody holds the role (a late take landed on a dead successor): the old head registers it again.
     identity_take(&root, &root, role, "att-old", &head, false).expect("restore");
-    assert_eq!(identity_holds(&root, role, "att-old"), Ok(true));
+    assert_eq!(identity_holds(&root, role, "att-old", None), Ok(true));
     // A live holder is never displaced by a restore: Identity refuses `role-held`.
     register(&root, "att-new", &[]);
     let refusal = identity_take(&root, &root, role, "att-new", &head, false).unwrap_err();
     assert_eq!(refusal.code, "role-held");
-    assert_eq!(identity_holds(&root, role, "att-old"), Ok(true));
+    assert_eq!(identity_holds(&root, role, "att-old", None), Ok(true));
 }
 
 #[test]
@@ -766,4 +775,80 @@ fn the_restore_verb_needs_only_a_registered_session_and_registers_after_done() {
     );
     assert_eq!(ask(&served.socket, "head restore role")["result"], "done");
     assert_eq!(*took.lock().unwrap(), 1);
+}
+
+// ---- binding the agent session: answered by the supervisor, against a real state root --------------
+
+#[test]
+fn the_bind_verb_moves_the_role_to_the_agent_session_of_the_connecting_process_and_later_checks_follow_it(
+) {
+    let role = "head:secretary-x";
+    let root = state_root("bind", true);
+    register(&root, "att-bind", &[role]);
+    let pid = std::process::id();
+    let gate = HeadRef {
+        pid,
+        start_time: facts::identity_of(ProcId(pid)).unwrap().start_time,
+    };
+    let dir = std::env::temp_dir().join(format!("fgos-head-req-bind-{pid}"));
+    let _ = fs::remove_dir_all(&dir);
+    fs::create_dir_all(&dir).unwrap();
+    let socket = dir.join("req.sock");
+    let listener = UnixListener::bind(&socket).unwrap();
+    listener.set_nonblocking(true).unwrap();
+    let (r1, r2, r3, r4) = (root.clone(), root.clone(), root.clone(), root.clone());
+    let (g1, g2, g3, g4) = (gate.clone(), gate.clone(), gate.clone(), gate.clone());
+    let server = HeadRequests::new(Config {
+        run_dir: dir.clone(),
+        host_bin: "/bin/false".into(),
+        cwd: dir.clone(),
+        env: BTreeMap::new(),
+        verbs: vec![BIND_VERB.to_string()],
+        verb_timeout: Duration::from_secs(5),
+        holds_role: Box::new(move || identity_holds(&r1, role, "att-bind", Some(&g1))),
+        registered: Box::new(move || identity_registered(&r2, "att-bind", Some(&g2))),
+        take_role: Box::new(move |take| identity_take(&r3, &r3, role, "att-bind", &g3, take)),
+        bind_session: Box::new(move |args, peer| {
+            identity_bind(&r4, &r4, "att-bind", &g4, args, peer)
+        }),
+        log: Box::new(|_| {}),
+    });
+    let stop = Arc::new(AtomicBool::new(false));
+    let flag = stop.clone();
+    let pump = std::thread::spawn(move || {
+        while !flag.load(Ordering::SeqCst) {
+            server.poll(&listener);
+            std::thread::sleep(Duration::from_millis(10));
+        }
+    });
+    let bind = |args: Value| {
+        request(
+            &socket,
+            &json!({"type": "REQUEST", "id": "b1", "verb": BIND_VERB, "args": args}),
+        )
+    };
+    let refused = bind(json!({"source": "FGOS_SESSION_ID", "value": "att-other"}));
+    assert_eq!(refused["code"], "session-bind-failed");
+    assert_eq!(refused["detail"], "invalid-writer-key");
+    assert_eq!(
+        bind(json!({"source": "CLAUDE_CODE_SESSION_ID"}))["detail"],
+        "bad-args"
+    );
+    let done = bind(json!({"source": "CLAUDE_CODE_SESSION_ID", "value": "uuid-bind"}));
+    stop.store(true, Ordering::SeqCst);
+    pump.join().unwrap();
+    assert_eq!(done["result"], "done", "{done}");
+    assert_eq!(done["data"]["id"], "fg-abc234/uuid-bind");
+    let holder = fgos_identity::directory::resolve(&root, role, &facts::judge_here, None).unwrap();
+    assert_eq!(
+        (holder.id.as_str(), holder.cli.as_str()),
+        ("fg-abc234/uuid-bind", "claude")
+    );
+    // The socket's role check now asks for the bound session; without the gate it is the attempt alone.
+    assert_eq!(
+        identity_holds(&root, role, "att-bind", Some(&gate)),
+        Ok(true)
+    );
+    assert_eq!(identity_holds(&root, role, "att-bind", None), Ok(false));
+    let _ = fs::remove_dir_all(&dir);
 }

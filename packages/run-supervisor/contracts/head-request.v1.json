@@ -38,6 +38,13 @@
       "identity": "registered-then-register",
       "rule": "same role step as head answered (this attempt's own session is registered and live, session-not-registered otherwise); a refused registration is role-take-failed with Identity's code in detail. The executor reaches this socket as the same user (peer uid)"
     },
+    "head bind session": {
+      "args": { "source": "string, required: the CLI's own session variable the agent names itself by (CLAUDE_CODE_SESSION_ID, CODEX_THREAD_ID, PI_SESSION_ID), never FGOS_SESSION_ID", "value": "string, required: the agent's session id under that variable; exactly these two keys" },
+      "does": "answered by the supervisor itself, no route child: Identity's bind_agent_session registers the agent session on the attempt's gate and moves every role the attempt holds to it (take), so the head resolves as its CLI session and a role alias reaches the mailbox key its hooks bind. The connecting process (SO_PEERCRED pid, as the supervisor's PID namespace names it) must be the gate or run under it; Identity refuses an attempt with no live entry on the gate and an agent id that is a live session on another head. Afterwards the role checks of this socket ask for the session the attempt is (the bound one when there is one) and a role move registers on it",
+      "data": "{id, handle} of the bound session",
+      "identity": "registered-then-bind",
+      "rule": "the role step is the registered one of head answered (a successor binds before it holds the role); a refused bind is session-bind-failed with Identity's code in detail (bad-args, peer-unknown, gate-unknown, invalid-writer-key, caller-not-under-head, attempt-not-registered, session-in-use, head-not-live, ...). The mailbox hook of a confined head sends it the first time it binds a head, instead of writing Identity's read-only directory"
+    },
     "head answered": {
       "args": { "persona": "string, required", "name": "string, required; spelled as the envelope's own role, as for head rotate", "sessionId": "string, required: the successor's Identity session id", "rotationId": "string, required: 16 lowercase hex characters, the id of the pending rotation exactly as the handoff's `Rotation id:` line carries it; the successor reads it from its handoff and echoes it, no other match is made", "message": "string, required: the successor's first assistant message, kept as evidence, at most 8000 characters" },
       "does": "markSuccessorAnswered (src/session-rotation/rotate.mjs): records the answer of the successor the lineage's pending rotation waits for. The key is the attempt's own (envelope.unitRunId), never an argument. Refused no-rotation-pending when no rotation waits for that key (the executor removes its pending record before it gives up, so a late answer is refused), answer-mismatch when rotationId is not exactly the pending rotation's id; this is the one place an answer is checked",
@@ -49,7 +56,7 @@
   "order": [
     "peer uid",
     "one request frame",
-    "role: Identity resolves the role to the live session it names and that session must be this attempt's own (role-not-held otherwise, including when Identity cannot answer: the request fails closed). For `head answered` the step is instead: this attempt's own session is registered and live (session-not-registered, failing closed the same way)",
+    "role: Identity resolves the role to the live session it names and that session must be this attempt's own (role-not-held otherwise, including when Identity cannot answer: the request fails closed). For `head answered`, `head restore role` and `head bind session` the step is instead: this attempt's own session is registered and live (session-not-registered, failing closed the same way)",
     "verb: must be one of envelope.session.verbs (verb-not-granted)",
     "busy: at most one request runs at a time (busy)",
     "run: `<hostBin> internal head-request --protocol 1 --run-dir <attemptDir>`, request on stdin"
@@ -68,6 +75,7 @@
     "verb-not-granted": "the verb is not in envelope.session.verbs",
     "busy": "another request is running",
     "session-not-registered": "head answered only: Identity does not list this attempt's own session as live; when Identity could not answer the detail is its refusal code only",
+    "session-bind-failed": "head bind session only: Identity refused to bind the session; detail is its code",
     "role-take-failed": "head answered only: the route recorded the answer but Identity refused to move the role to this session (detail is its code, for example gate-unknown or head-not-live); the executor then finds no holder change and retires the successor",
     "verb-failed": "the route child failed; detail is the entry's own code (for example head-key-used, bad-persona, start-refused) or the exit",
     "verb-timeout": "the verb ran longer than verbTimeoutMs"

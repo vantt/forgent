@@ -844,3 +844,102 @@ fn a_head_role_names_a_persona_and_a_session_name_and_only_one_live_session_hold
         "claude-bbbb@fg"
     );
 }
+
+fn attempt_key(id: &str) -> fgos_identity::WriterKey<'_> {
+    fgos_identity::WriterKey {
+        source: "FGOS_SESSION_ID",
+        value: id,
+    }
+}
+
+fn claude_key(id: &str) -> fgos_identity::WriterKey<'_> {
+    fgos_identity::WriterKey {
+        source: "CLAUDE_CODE_SESSION_ID",
+        value: id,
+    }
+}
+
+#[test]
+fn an_attempt_binds_its_agent_session_on_its_head_and_the_role_moves_to_it_under_the_clis_label() {
+    let root = machine_root();
+    let me = std::process::id();
+    let gate = head_of(me);
+    let role = vec!["head:secretary-miu".to_string()];
+    let attempt = attempt_key("att-cmd_1");
+    directory::register_writer(&root, None, &attempt, &gate, &role, false).unwrap();
+    let before = directory::resolve(&root, "head:secretary-miu", &judge(&[]), None).unwrap();
+    assert_eq!(
+        (before.id.as_str(), before.cli.as_str()),
+        ("fg-abc234/att-cmd_1", "worker")
+    );
+
+    let bound =
+        directory::bind_agent_session(&root, None, &attempt, &claude_key("uuid-1"), &gate, me)
+            .unwrap();
+    assert_eq!(bound.id, "fg-abc234/uuid-1");
+    assert_eq!(bound.cli, "claude");
+    assert_eq!(bound.roles, role);
+    let holder = directory::resolve(&root, "head:secretary-miu", &judge(&[]), None).unwrap();
+    assert_eq!(holder.id, bound.id, "the role left the attempt entry");
+    assert!(holder.handle.starts_with("claude-"), "{}", holder.handle);
+    // The attempt is now that session; without its head only its own entry is looked at.
+    let now = |head| {
+        directory::attempt_session(&root, &attempt, head, &judge(&[]))
+            .unwrap()
+            .unwrap()
+            .id
+    };
+    assert_eq!(now(Some(&gate)), bound.id);
+    assert_eq!(now(None), "fg-abc234/att-cmd_1");
+    // A later role registration of the attempt lands on the bound session.
+    let other = vec!["head:secretary-miu".to_string(), "lead:MAIL".to_string()];
+    let again =
+        directory::register_attempt_roles(&root, None, &attempt, &gate, &other, false).unwrap();
+    assert_eq!(again.id, bound.id);
+    assert_eq!(again.roles, other);
+    // Binding the same session again is a refresh.
+    assert!(
+        directory::bind_agent_session(&root, None, &attempt, &claude_key("uuid-1"), &gate, me)
+            .is_ok()
+    );
+    let _ = fs::remove_dir_all(root);
+}
+
+#[test]
+fn a_bind_from_outside_the_head_of_an_unregistered_attempt_with_an_attempt_key_or_another_heads_session_is_refused(
+) {
+    let root = machine_root();
+    let me = std::process::id();
+    let gate = head_of(me);
+    let attempt = attempt_key("att-cmd_2");
+    let bind = |agent: &fgos_identity::WriterKey, caller: u32| {
+        directory::bind_agent_session(&root, None, &attempt, agent, &gate, caller)
+            .unwrap_err()
+            .reason
+    };
+    assert_eq!(bind(&claude_key("uuid-2"), me), "attempt-not-registered");
+    directory::register_writer(&root, None, &attempt, &gate, &[], false).unwrap();
+    assert_eq!(bind(&attempt_key("att-cmd_3"), me), "invalid-writer-key");
+    assert_eq!(bind(&claude_key("att-cmd_3"), me), "invalid-writer-key");
+    assert_eq!(
+        bind(&claude_key("uuid-2"), std::os::unix::process::parent_id()),
+        "caller-not-under-head"
+    );
+    let mut other = std::process::Command::new("sleep")
+        .arg("30")
+        .spawn()
+        .unwrap();
+    directory::register_writer(
+        &root,
+        None,
+        &claude_key("uuid-2"),
+        &head_of(other.id()),
+        &[],
+        false,
+    )
+    .unwrap();
+    assert_eq!(bind(&claude_key("uuid-2"), me), "session-in-use");
+    other.kill().unwrap();
+    other.wait().unwrap();
+    let _ = fs::remove_dir_all(root);
+}

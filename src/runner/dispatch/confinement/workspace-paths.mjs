@@ -1,4 +1,5 @@
-// workspace-paths.mjs -- the shape rule of a workspace-paths grant, and the error the confinement shapes throw.
+// workspace-paths.mjs -- the shape rule of a workspace-paths grant, the names of the grants a head session adds, and
+// the error the confinement shapes throw.
 //
 // A leaf: it imports nothing of the confinement layer, so the resolver, the policy shape check and the launch of a
 // head all reach the one path check without pulling the backend registry (and with it the drivers) into their imports.
@@ -7,6 +8,9 @@ import path from 'node:path';
 
 /** The grant that binds named paths of the project root writable: one entry of `paths`, relative to the root. */
 export const WORKSPACE_PATHS_RESOURCE = 'workspace-paths';
+
+/** The grant that binds the project's mailbox record writable: its lock file and its runtime directory, nothing else of `.fgos`. */
+export const MAILBOX_RECORD_RESOURCE = 'mailbox-record';
 
 /** `paths` of a workspace-paths grant: relative, inside the root, no glob; refused by name, never normalized into range. */
 export function validateWorkspacePaths(paths, label) {

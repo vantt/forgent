@@ -75,6 +75,8 @@ import {
 import { checkConfinementProbeFreshness } from '../../src/setup/registrations.mjs';
 import { assessAndPrepare, buildConfinementAttestation } from '../../src/runner/dispatch/confinement/authority.mjs';
 import { buildConfinementRequest } from '../../src/runner/dispatch/confinement/request.mjs';
+import { requirementOf } from '../../src/runner/dispatch/session-attempt.mjs';
+import { grantOf } from '../../src/session-host/head-grants.mjs';
 
 function hasWorkingBwrap(binary = '/usr/bin/bwrap') {
   if (os.platform() !== 'linux') return false;
@@ -1264,6 +1266,67 @@ test('a workspace-write producer in a linked worktree cannot write git metadata;
     assert.equal(commitUnitWork({ ...gitArgs, baseline: next.baseline, unitId: 'u1', summary: 'again', scope: ['**'] }).status, 'no-changes');
   } finally {
     custody?.release();
+    fs.rmSync(base, { recursive: true, force: true });
+  }
+});
+
+/** A project with a docs directory: the granted backlog and discussions, other files, a subdirectory and a symlink. */
+function docsProject(base) {
+  fs.mkdirSync(path.join(base, 'docs', 'discussions'), { recursive: true });
+  fs.mkdirSync(path.join(base, 'docs', 'sub'));
+  fs.mkdirSync(path.join(base, 'plans'));
+  fs.writeFileSync(path.join(base, 'docs', 'backlog.md'), 'old\n');
+  fs.writeFileSync(path.join(base, 'docs', 'other.md'), 'keep\n');
+  fs.writeFileSync(path.join(base, 'docs', '.hidden'), 'keep\n');
+  fs.symlinkSync('other.md', path.join(base, 'docs', 'link'));
+  fs.mkdirSync(path.join(base, '.fgos'));
+}
+
+test('a launched secretary shape replaces docs/backlog.md through a temp file, takes the mailbox lock and writes the record, and every other docs and .fgos path stays read-only', async (t) => {
+  if (!HAS_WORKING_BWRAP) return t.skip('no working bwrap on this machine');
+  // Outside /tmp: the sandbox mounts a private tmpfs there.
+  const base = fs.mkdtempSync(path.join(fs.existsSync('/var/tmp') ? '/var/tmp' : os.tmpdir(), 'fgos-secretary-shape-'));
+  try {
+    docsProject(base);
+    const fgosDir = path.join(base, '.fgos');
+    const headGrants = requirementOf(grantOf('head:secretary-miu')).policy.grants.filter((g) => ['workspace-paths', 'mailbox-record'].includes(g.resource));
+    assert.deepEqual(headGrants.map((g) => g.resource), ['workspace-paths', 'mailbox-record']);
+    const resources = resolveConfinementResources({ dispatchId: 'disp_secretary', context: { cwd: base, repoRoot: base, fgosDir }, grants: headGrants });
+    const plan = { contract: 'confinement-plan.v1', dispatchId: 'disp_secretary', decision: 'execute', coverage: {}, resources };
+    const record = '.fgos/runtime/mailbox/record';
+    const script = [
+      // The editor's atomic write: a temp file beside the target, a rename over it, in place when the rename fails.
+      'printf "new\\n" > docs/backlog.md.tmp.2',
+      '{ mv -f docs/backlog.md.tmp.2 docs/backlog.md 2>/dev/null || cat docs/backlog.md.tmp.2 > docs/backlog.md; }',
+      'echo d > docs/discussions/new.md',
+      'echo p > plans/p.md',
+      '[ -L docs/link ] && [ "$(cat docs/.hidden)" = keep ]',
+      '! (echo x >> docs/other.md) 2>/dev/null',
+      '! rm -f docs/other.md 2>/dev/null',
+      '! (echo x > docs/sub/x.md) 2>/dev/null',
+      // The mailbox: its lock opened read-write (O_CREAT), its record replaced by temp file and rename; nothing else of .fgos.
+      '(exec 3<>.fgos/locks/mailbox.lock)',
+      `mkdir -p ${record} && echo s > ${record}/snapshot.json.tmp && mv ${record}/snapshot.json.tmp ${record}/snapshot.json`,
+      '! (exec 4<>.fgos/locks/other.lock) 2>/dev/null',
+      '! (echo x > .fgos/stray) 2>/dev/null',
+    ].join(' && ');
+    const prepared = await prepareBwrap(plan, {
+      dispatchId: 'disp_secretary',
+      executorId: 'x',
+      invocation: { command: 'sh', args: ['-c', script], env: { PATH: process.env.PATH } },
+      context: { cwd: base, runDir: base },
+    }, { id: 'bwrap', type: 'bwrap', config: {} });
+    const run = cp.spawnSync(prepared.invocation.command, prepared.invocation.args, { cwd: base, env: prepared.invocation.env, encoding: 'utf8' });
+    assert.equal(run.status, 0, `${run.stderr}${run.stdout}`);
+    assert.equal(fs.readFileSync(path.join(base, 'docs', 'backlog.md'), 'utf8'), 'new\n', 'the host backlog changed');
+    assert.ok(!fs.existsSync(path.join(base, 'docs', 'backlog.md.tmp.2')), 'the temp file stayed in the sandbox');
+    assert.equal(fs.readFileSync(path.join(base, 'docs', 'other.md'), 'utf8'), 'keep\n');
+    assert.ok(fs.existsSync(path.join(base, 'docs', 'discussions', 'new.md')));
+    assert.ok(fs.existsSync(path.join(base, 'plans', 'p.md')));
+    assert.equal(fs.readFileSync(path.join(base, record, 'snapshot.json'), 'utf8'), 's\n');
+    assert.deepEqual(fs.readdirSync(path.join(fgosDir, 'locks')), ['mailbox.lock']);
+    assert.ok(!fs.existsSync(path.join(fgosDir, 'stray')));
+  } finally {
     fs.rmSync(base, { recursive: true, force: true });
   }
 });

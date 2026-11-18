@@ -148,28 +148,90 @@ pub struct CurrentSession {
 
 /// Who the process `caller_pid` is on this machine: the real env, the real
 /// OS process tree and the machine id under `state_root`. Reads only (one
-/// small file and `/proc`), no network, no lock; refused `machine-id-*` when
-/// the machine id is missing and `unresolved` when the caller cannot be told
-/// from any other.
+/// small file and `/proc`, and for a runner attempt two directory entries),
+/// no network, no lock; refused `machine-id-*` when the machine id is
+/// missing and `unresolved` when the caller cannot be told from any other.
+/// A runner attempt whose agent session its supervisor bound is that agent
+/// session (`directory::bind_agent_session`).
 pub fn current_session(
     state_root: &Path,
     caller_pid: u32,
     fgos_dir: Option<&Path>,
 ) -> Result<CurrentSession, Refusal> {
+    current_from(state_root, caller_pid, fgos_dir, &|key| {
+        std::env::var(key).ok()
+    })
+}
+
+fn current_from(
+    state_root: &Path,
+    caller_pid: u32,
+    fgos_dir: Option<&Path>,
+    lookup: &dyn Fn(&str) -> Option<String>,
+) -> Result<CurrentSession, Refusal> {
     let machine = machine_info(state_root)?;
     let tree = crate::proc_tree::os_process_tree();
-    let identity = resolve(
-        &|key| std::env::var(key).ok(),
-        tree.as_ref(),
-        caller_pid,
-        fgos_dir,
-    );
+    let identity = resolve(lookup, tree.as_ref(), caller_pid, fgos_dir);
     let local = session::local(&identity, &os_pid_facts).ok_or_else(|| Refusal {
         reason: "unresolved",
         detail: "this session cannot be told from any other: no session id in the environment and no process holding a terminal".into(),
         candidates: Vec::new(),
     })?;
+    let local = bound_agent_local(state_root, &machine, &identity, &local, lookup).unwrap_or(local);
     Ok(named(&machine, local))
+}
+
+/// The agent session a runner attempt runs as, when its supervisor bound one
+/// (`directory::bind_agent_session`): the caller resolved to an attempt id
+/// from `FGOS_SESSION_ID`, its env also carries the agent CLI's own session
+/// variable, and the directory holds that session live on the attempt's own
+/// head. A CLI variable alone never moves the caller off the attempt id: an
+/// unbound attempt (every worker) stays itself.
+fn bound_agent_local(
+    state_root: &Path,
+    machine: &MachineInfo,
+    identity: &WriterIdentity,
+    attempt: &Local,
+    lookup: &dyn Fn(&str) -> Option<String>,
+) -> Option<Local> {
+    if identity.env_var != Some(crate::resolve::ENV_ORDER[0])
+        || !crate::attempt::is_attempt_writer_id(&attempt.id)
+    {
+        return None;
+    }
+    let agent = crate::resolve::ENV_ORDER[1..].iter().find_map(|source| {
+        let value = lookup(source)?;
+        session::key_local(&WriterKey {
+            source,
+            value: &value,
+        })
+    })?;
+    // pi and omp share one variable, so the handle may carry either label.
+    let labels: &[&'static str] = if agent.cli == "pi" {
+        &["pi", "omp"]
+    } else {
+        std::slice::from_ref(&agent.cli)
+    };
+    let handles: Vec<String> = labels
+        .iter()
+        .map(|cli| {
+            session::handle(
+                &Local {
+                    id: agent.id.clone(),
+                    cli,
+                },
+                &machine.handle,
+            )
+        })
+        .collect();
+    let (id, cli) = crate::directory::bound_agent(
+        state_root,
+        &session::handle(attempt, &machine.handle),
+        &handles,
+        &fgos_process::facts::judge_here,
+    )?;
+    let cli = labels.iter().copied().find(|label| *label == cli)?;
+    (id == session::full_id(&machine.id, &agent)).then_some(Local { id: agent.id, cli })
 }
 
 fn named(machine: &MachineInfo, local: Local) -> CurrentSession {
@@ -220,4 +282,80 @@ pub fn session_for(
         ..local
     };
     Ok(named(&machine_info(state_root)?, local))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::current_from;
+    use crate::directory;
+    use crate::resolve::{HeadRef, WriterKey};
+
+    fn env(pairs: &'static [(&'static str, &'static str)]) -> impl Fn(&str) -> Option<String> {
+        move |key| {
+            pairs
+                .iter()
+                .find(|(k, _)| *k == key)
+                .map(|(_, v)| v.to_string())
+        }
+    }
+
+    #[test]
+    fn an_attempt_whose_supervisor_bound_its_agent_session_is_that_session_and_an_unbound_one_stays_itself(
+    ) {
+        let root = std::env::temp_dir().join(format!("fgos-identity-bound-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&root);
+        std::fs::create_dir_all(&root).unwrap();
+        crate::machine::mint(&root, "testhost").unwrap();
+        let pid = std::process::id();
+        let gate = HeadRef {
+            pid,
+            start_time: fgos_process::facts::identity_of(fgos_process::ProcId(pid))
+                .unwrap()
+                .start_time,
+        };
+        let attempt = WriterKey {
+            source: "FGOS_SESSION_ID",
+            value: "att-cmd_9",
+        };
+        let lookup = env(&[
+            ("FGOS_SESSION_ID", "att-cmd_9"),
+            ("CLAUDE_CODE_SESSION_ID", "uuid-9"),
+        ]);
+        directory::register_writer(&root, None, &attempt, &gate, &[], false).unwrap();
+        // Registered but not bound: the CLI variable alone never moves the caller off its attempt id.
+        let unbound = current_from(&root, pid, None, &lookup).unwrap();
+        assert!(
+            unbound.info.id.ends_with("/att-cmd_9"),
+            "{}",
+            unbound.info.id
+        );
+        assert!(unbound.info.handle.starts_with("worker-"));
+
+        let claude = WriterKey {
+            source: "CLAUDE_CODE_SESSION_ID",
+            value: "uuid-9",
+        };
+        directory::bind_agent_session(&root, None, &attempt, &claude, &gate, pid).unwrap();
+        let bound = current_from(&root, pid, None, &lookup).unwrap();
+        assert!(bound.info.id.ends_with("/uuid-9"), "{}", bound.info.id);
+        assert!(
+            bound.info.handle.starts_with("claude-"),
+            "{}",
+            bound.info.handle
+        );
+        assert_eq!(bound.local.cli, "claude");
+        // Another attempt carrying the same CLI variable is not the bound one: it stays itself.
+        let stranger = current_from(
+            &root,
+            pid,
+            None,
+            &env(&[
+                ("FGOS_SESSION_ID", "att-cmd_other"),
+                ("CLAUDE_CODE_SESSION_ID", "uuid-9"),
+            ]),
+        )
+        .unwrap();
+        assert!(stranger.info.id.ends_with("/att-cmd_other"));
+        let _ = std::fs::remove_dir_all(root);
+    }
 }

@@ -17,6 +17,7 @@ import { copyCredentialFiles, credentialWriteBackTarget, loginLifeProblem } from
 import { commandCli, credentialStoreOf, expandCredentialHome } from '../../provider-capacity.mjs';
 import { DEFAULT_SEAT_TIMEOUT_MS, resolveConfinementResources, isInsideRoot, requestIsBlind } from '../resources.mjs';
 import { assertAttestationStoreIsolated } from '../attestation-store.mjs';
+import { MAILBOX_RECORD_RESOURCE } from '../workspace-paths.mjs';
 import { resolveRuntimeSocketDir } from '../../../../run-supervisor/runtime-dir.mjs';
 import { computeSha256Digest } from '../../../../native/proof-helpers.mjs';
 
@@ -424,7 +425,7 @@ export function assessBwrap(request, backend) {
   const policyId = request.requirement?.policyId;
   const isWorkspaceWrite = policyId === 'workspace-write';
 
-  const allowedResources = new Set(['run-output', 'private-home', 'executor-credentials', 'workspace-paths']);
+  const allowedResources = new Set(['run-output', 'private-home', 'executor-credentials', 'workspace-paths', MAILBOX_RECORD_RESOURCE]);
   if (isWorkspaceWrite) {
     allowedResources.add('workspace');
     allowedResources.add('workspace-git-metadata');
@@ -638,6 +639,17 @@ export function prepareBwrapSync(plan, request, backend) {
         }
       }
 
+      // A parent shell (resources.mjs fileGrantParents): a tmpfs over the directory, its other entries bound back
+      // read-only; the granted entries inside it are bound after it as ordinary mounts.
+      if (res.delivery === 'shell') {
+        bwrapArgs.push('--tmpfs', res.executionTarget.path);
+        for (const entry of res.kept ?? []) {
+          if (entry.symlink !== undefined) bwrapArgs.push('--symlink', entry.symlink, entry.path);
+          else bwrapArgs.push('--ro-bind', entry.path, entry.path);
+        }
+        return;
+      }
+
       const isWritable = res.access === 'write' || res.access === 'read-write';
       if (isWritable) {
         bwrapArgs.push('--bind', res.hostTarget, res.executionTarget.path);
@@ -668,10 +680,12 @@ export function prepareBwrapSync(plan, request, backend) {
     // every hidden root, the masks, a blind dispatch's own directory read-only, the mounts inside a hidden root
     // (outbox, own home, the program and its install directories), and last the masks made read-only.
     const insideMasked = (res) => [...hidden, ...(own ? [own] : [])].some((h) => res.executionTarget?.path && isInsideRoot(res.executionTarget.path, h.executionTarget.path));
-    mounts.filter((r) => !insideMasked(r)).forEach(materialize);
+    // Parent shells first: a tmpfs over a directory hides every mount made in it before.
+    const shellsFirst = (list) => [...list.filter((r) => r.delivery === 'shell'), ...list.filter((r) => r.delivery !== 'shell')];
+    shellsFirst(mounts.filter((r) => !insideMasked(r))).forEach(materialize);
     for (const h of hidden) bwrapArgs.push('--tmpfs', h.executionTarget.path);
     if (own) bwrapArgs.push('--ro-bind', own.hostTarget, own.executionTarget.path);
-    mounts.filter(insideMasked).forEach(materialize);
+    shellsFirst(mounts.filter(insideMasked)).forEach(materialize);
     bindAttemptFiles();
     for (const h of hidden) bwrapArgs.push('--remount-ro', h.executionTarget.path);
 

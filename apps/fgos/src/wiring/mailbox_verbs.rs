@@ -632,14 +632,17 @@ pub(crate) fn system_nudge(versions: &VersionSources) -> SystemNudge {
     }
 }
 
-/// The caller's writer key: session identity's, attribution only.
+/// The caller's writer key: session identity's, attribution only; a head
+/// session attempt is its CLI session, as its hook binds it
+/// (`head_cli_session`).
 fn caller(fgos_dir: &Path) -> Option<WriterKey> {
-    WriterKey::new(
-        fgos_identity::resolve_current(Some(fgos_dir))
-            .id
-            .to_string(),
-    )
-    .ok()
+    let id = fgos_mailbox::hook::resolve::head_cli_session(&|name| std::env::var(name).ok())
+        .unwrap_or_else(|| {
+            fgos_identity::resolve_current(Some(fgos_dir))
+                .id
+                .to_string()
+        });
+    WriterKey::new(id).ok()
 }
 
 /// The answer to a send that went (or was refused) on the cross-machine path.

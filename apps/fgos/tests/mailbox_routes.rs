@@ -643,6 +643,20 @@ fn mailbox_send_inbox_and_inbox_claim_print_contract_text_and_exit_by_outcome() 
         String::from_utf8_lossy(&listed.stdout).contains("state=recorded"),
         "{listed:?}"
     );
+    // A head session attempt (runner id, CLI session, head request socket) reads the inbox of its CLI session;
+    // without the socket it is a runner attempt with no address.
+    let cli = [("CLAUDE_CODE_SESSION_ID", Path::new(WRITER))];
+    let head = [
+        cli[0],
+        ("FGOS_HEAD_REQUEST_SOCKET", Path::new("/run/s.sock")),
+    ];
+    let as_head = scene.run_env(&main, Some("att-cmd_1"), &["mailbox", "inbox"], b"", &head);
+    assert!(
+        String::from_utf8_lossy(&as_head.stdout).contains("state=recorded"),
+        "{as_head:?}"
+    );
+    let as_worker = scene.run_env(&main, Some("att-cmd_1"), &["mailbox", "inbox"], b"", &cli);
+    assert_eq!(String::from_utf8_lossy(&as_worker.stdout), no_address);
 }
 
 #[test]

@@ -1,7 +1,7 @@
 // head-grants.mjs -- what a head session's role may write and ask for.
 //
 // One frozen table keyed by persona and one reader, `grantOf(role)`, which nothing else bypasses: the launch reads
-// `writes` (project-relative paths the sandbox binds writable) and the request socket reads `verbs`. A later
+// `writes` (project-relative paths the sandbox binds writable) and `mailbox`, and the request socket reads `verbs`. A later
 // change moves the data into the standard config by changing only the body of `grantOf`.
 
 /**
@@ -13,17 +13,28 @@ export const HEAD_REQUEST_SOCKET_ENV = 'FGOS_HEAD_REQUEST_SOCKET';
 /** `head:<persona>-<name>`; the persona and the name may both hold hyphens, so the table decides where they split. */
 const ROLE_PATTERN = /^head:([a-z][a-z0-9-]*)$/;
 
-const NONE = Object.freeze({ writes: Object.freeze([]), verbs: Object.freeze([]) });
+const NONE = Object.freeze({ writes: Object.freeze([]), verbs: Object.freeze([]), mailbox: false });
 
-/** Every head may rotate itself, report its first turn as a successor and take its role back after a failed rotation; only the secretary may also start sessions. */
-const ROTATION_VERBS = Object.freeze(['head rotate', 'head answered', 'head restore role']);
+/**
+ * The verb a head binds its agent's own session with (the supervisor moves the role from the attempt to it in
+ * Identity, so the head resolves as its CLI session), the one verb the supervisor answers itself.
+ */
+export const HEAD_BIND_SESSION_VERB = 'head bind session';
 
+/**
+ * Every head may bind its agent session, rotate itself, report its first turn as a successor and take its role back
+ * after a failed rotation; only the secretary may also start sessions.
+ */
+const HEAD_VERBS = Object.freeze([HEAD_BIND_SESSION_VERB, 'head rotate', 'head answered', 'head restore role']);
+
+/** `mailbox`: the sandbox binds the project's mailbox lock and record writable, so the head can send and receive mail. */
 const GRANTS = Object.freeze({
   secretary: Object.freeze({
     writes: Object.freeze(['plans', 'docs/backlog.md', 'docs/discussions']),
-    verbs: Object.freeze(['head start', ...ROTATION_VERBS]),
+    verbs: Object.freeze(['head start', ...HEAD_VERBS]),
+    mailbox: true,
   }),
-  shaper: Object.freeze({ writes: Object.freeze([]), verbs: ROTATION_VERBS }),
+  shaper: Object.freeze({ writes: Object.freeze([]), verbs: HEAD_VERBS, mailbox: false }),
 });
 
 export class HeadGrantError extends Error {
@@ -35,7 +46,7 @@ export class HeadGrantError extends Error {
 }
 
 /**
- * The grant of a head role: `{ writes, verbs }`, both frozen arrays. A persona the table does not name holds
+ * The grant of a head role: `{ writes, verbs, mailbox }`, two frozen arrays and a boolean. A persona the table does not name holds
  * nothing. A role that is not `head:<persona>-<name>` is refused.
  *
  * The persona matches a table key exactly. A caller that knows the persona passes it, which is the only exact

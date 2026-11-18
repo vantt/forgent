@@ -15,7 +15,8 @@ import path from 'node:path';
 import os from 'node:os';
 import { globalFgosDir } from '../../../config/facade.mjs';
 import { resolveConfinementTempRoot } from './cleanup.mjs';
-import { validateWorkspacePaths } from './workspace-paths.mjs';
+import { MAILBOX_RECORD_RESOURCE, validateWorkspacePaths } from './workspace-paths.mjs';
+import { resolveLock } from '../../../holder-lock/registry.mjs';
 import { createGitInspect, gitPortOptions } from '../../../git/inspect.mjs';
 import { userRuntimeDir } from '../../../run-supervisor/runtime-dir.mjs';
 import { machineLoginStores } from '../llm-accounts.mjs';
@@ -39,6 +40,25 @@ export const BLIND_HIDDEN_ROOTS = Object.freeze([
   '{fgosDir}/runtime/mailbox',
   '{confinementTempRoot}',
 ]);
+
+/**
+ * What a mailbox-record grant binds, created when missing so the bind can be made: the lock file of the holder-lock
+ * registry's `mailbox` row (an existing inode, opened and flocked in place; the lock file is never replaced) and the
+ * mailbox runtime directory (owned by packages/mailbox/rust/store/src/record/paths.rs), where the record is written
+ * by temp file and rename. A `.fgos` that cannot take them refuses the grant by name.
+ */
+function mailboxRecordPaths(fgosDir) {
+  const lock = resolveLock('mailbox', { fgosDir }).v3Path;
+  const dir = path.join(path.resolve(fgosDir), 'runtime', 'mailbox');
+  try {
+    fs.mkdirSync(path.dirname(lock), { recursive: true });
+    fs.closeSync(fs.openSync(lock, fs.constants.O_RDWR | fs.constants.O_CREAT, 0o644));
+    fs.mkdirSync(dir, { recursive: true, mode: 0o700 });
+  } catch (err) {
+    throw new ConfinementResourceError('mailbox-record-unavailable', `the mailbox record under ${fgosDir} cannot be prepared: ${err.message}`);
+  }
+  return [{ kind: 'lock', hostPath: lock }, { kind: 'record', hostPath: dir }];
+}
 
 /** The directory Claude Code keeps one control socket per open session in (`<pid>.sock`). */
 export const SESSION_SOCKET_DIR = 'cc-socks';
@@ -353,6 +373,43 @@ export function isInsideRoot(target, root) {
   return target === root || target.startsWith(root.endsWith(path.sep) ? root : root + path.sep);
 }
 
+/**
+ * The parent shells of the file entries of a workspace-paths grant. A file bound on its own cannot be replaced
+ * atomically: an editor writes its temp file beside the target and renames it over, and both fail in a read-only
+ * parent. So the parent of a granted file becomes a tmpfs (`delivery: 'shell'`), every other entry it holds on the host
+ * is bound back read-only (a symlink is recreated as one), and the granted entries are bound writable after it. A temp
+ * file then lands on the tmpfs; the rename over the bound file fails busy and the editor writes in place. New names in
+ * the parent live only in the sandbox, and entries the host adds later are not seen until the next launch. A file whose
+ * parent is itself a granted directory (or lies in one) needs no shell. Shallow parents come first, so a deeper shell
+ * is made over the read-only entry its parent bound back.
+ */
+function fileGrantParents(entries) {
+  const dirs = entries.filter((e) => !e.isFile).map((e) => e.hostTarget);
+  const granted = new Set(entries.map((e) => e.hostTarget));
+  const parents = [...new Set(entries.filter((e) => e.isFile).map((e) => path.dirname(e.hostTarget)))]
+    .filter((parent) => !dirs.some((dir) => isInsideRoot(parent, dir)))
+    .sort((a, b) => a.split(path.sep).length - b.split(path.sep).length || a.localeCompare(b));
+  return parents.map((parent) => {
+    const kept = fs.readdirSync(parent, { withFileTypes: true })
+      .map((dirent) => path.join(parent, dirent.name))
+      .filter((entry) => !granted.has(entry))
+      .sort()
+      .map((entry) => (fs.lstatSync(entry).isSymbolicLink() ? { path: entry, symlink: fs.readlinkSync(entry) } : { path: entry }));
+    const rel = path.relative(entries[0].declaredRoot, parent) || '.';
+    return {
+      resource: 'workspace-paths',
+      identity: `workspace-paths-parent:${rel}`,
+      hostTarget: parent,
+      executionTarget: { location: 'host', path: parent },
+      delivery: 'shell',
+      collect: 'none',
+      access: 'read',
+      allocation: 'existing',
+      kept,
+    };
+  });
+}
+
 function realPathOrNull(p) {
   try {
     return fs.realpathSync(p);
@@ -587,6 +644,7 @@ export function resolveConfinementResources({
     } catch (err) {
       throw new ConfinementResourceError('confinement-grant-invalid', err.message);
     }
+    const entries = [];
     for (const rel of grant.paths) {
       const target = path.join(root, rel);
       const seen = fs.lstatSync(target, { throwIfNoEntry: false });
@@ -596,10 +654,37 @@ export function resolveConfinementResources({
       if (seen.isSymbolicLink()) {
         throw new ConfinementResourceError('confinement-grant-invalid', `workspace-paths entry "${rel}" is a symbolic link; name the real path.`);
       }
-      const { hostTarget } = canonicalizeAndVerifySubpath(target, root, 'workspace-paths');
+      const { hostTarget, declaredRoot } = canonicalizeAndVerifySubpath(target, root, 'workspace-paths');
+      entries.push({ rel, hostTarget, declaredRoot, isFile: !seen.isDirectory() });
+    }
+    // The parent shells go first: each one is a tmpfs over its directory, and a mount made before it would vanish.
+    resolved.push(...fileGrantParents(entries));
+    for (const { rel, hostTarget } of entries) {
       resolved.push({
         resource: 'workspace-paths',
         identity: `workspace-paths:${rel}`,
+        hostTarget,
+        executionTarget: { location: 'host', path: hostTarget },
+        delivery: 'mount',
+        collect: 'none',
+        access: grant.access,
+        allocation: 'existing',
+      });
+    }
+  }
+
+  // 2c. mailbox-record: the project's mailbox lock file and the mailbox runtime directory, writable, and nothing else
+  // of `.fgos`. A send and a hook drain take that lock and write only under that directory.
+  if (grantsByResource.has(MAILBOX_RECORD_RESOURCE)) {
+    const grant = grantsByResource.get(MAILBOX_RECORD_RESOURCE);
+    if (!context.fgosDir) {
+      throw new ConfinementResourceError('confinement-grant-invalid', `${MAILBOX_RECORD_RESOURCE} requires context.fgosDir.`);
+    }
+    for (const { kind, hostPath } of mailboxRecordPaths(context.fgosDir)) {
+      const { hostTarget } = canonicalizeAndVerifySubpath(hostPath, context.fgosDir, MAILBOX_RECORD_RESOURCE);
+      resolved.push({
+        resource: MAILBOX_RECORD_RESOURCE,
+        identity: `${MAILBOX_RECORD_RESOURCE}:${kind}`,
         hostTarget,
         executionTarget: { location: 'host', path: hostTarget },
         delivery: 'mount',

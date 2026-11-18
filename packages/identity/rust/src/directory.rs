@@ -551,6 +551,224 @@ pub fn register_writer(
     register_session(state_root, session, Some(record), clone_dir, roles, take)
 }
 
+/// Whether the head process recorded as `entry`'s liveness is the one `head` names (same pid, same start time).
+fn on_head(entry: &Entry, head: &HeadRef) -> bool {
+    entry
+        .liveness
+        .as_ref()
+        .map(Record::from_json)
+        .is_some_and(|record| {
+            record.pid.map(|pid| pid.0) == Some(head.pid)
+                && record.start_time.as_deref() == Some(head.start_time.as_str())
+        })
+}
+
+/// Whether `entry` is a runner attempt's own entry (its local id is an attempt writer id): never an agent session.
+fn is_attempt_entry(entry: &Entry) -> bool {
+    entry
+        .id
+        .split_once('/')
+        .is_some_and(|(_, local)| crate::attempt::is_attempt_writer_id(local))
+}
+
+/// Whether `pid` is `ancestor` or one of its descendants, walking parents up the process table.
+fn descends(tree: &dyn ProcessTree, mut pid: u32, ancestor: u32) -> bool {
+    for _ in 0..MAX_ANCESTRY_WALK {
+        if pid == ancestor {
+            return true;
+        }
+        match tree.stat(pid) {
+            Some(stat) if stat.ppid != 0 && stat.ppid != pid => pid = stat.ppid,
+            _ => return false,
+        }
+    }
+    false
+}
+
+/// Upper bound on parent hops when a caller is checked against a head, so a cyclic table stops.
+const MAX_ANCESTRY_WALK: usize = 4096;
+
+fn refused(reason: &'static str, detail: String) -> Refusal {
+    Refusal {
+        candidates: Vec::new(),
+        reason,
+        detail,
+    }
+}
+
+/// Binds the agent session an attempt runs to that attempt: a runner attempt (writer key `attempt`, registered with
+/// its gate `head` as liveness) launches an agent CLI that names itself by its own session variable (`agent`). The
+/// agent's session is registered with the same head and takes every role the attempt holds, so the role resolves to the
+/// session the agent, its hooks and its mail are keyed by, under the CLI's own label. The two entries share one head and
+/// end together.
+///
+/// Refused `invalid-writer-key` when `agent` is not a CLI session variable's key (an attempt id is never an agent
+/// session), `head-not-live` when the head is not running with its start time, `caller-not-under-head` when
+/// `caller_pid` (the process that asks, as the kernel names it) is neither the head nor one of its descendants,
+/// `attempt-not-registered` when the attempt has no live entry on that head, and `session-in-use` when the agent's id
+/// is already a live session on another head. Every other rule is [`register`]'s.
+pub fn bind_agent_session(
+    state_root: &Path,
+    clone_dir: Option<&Path>,
+    attempt: &WriterKey,
+    agent: &WriterKey,
+    head: &HeadRef,
+    caller_pid: u32,
+) -> Result<Listed, Refusal> {
+    bind_agent_session_in(
+        state_root,
+        clone_dir,
+        attempt,
+        agent,
+        head,
+        caller_pid,
+        os_process_tree().as_ref(),
+    )
+}
+
+fn bind_agent_session_in(
+    state_root: &Path,
+    clone_dir: Option<&Path>,
+    attempt: &WriterKey,
+    agent: &WriterKey,
+    head: &HeadRef,
+    caller_pid: u32,
+    tree: &dyn ProcessTree,
+) -> Result<Listed, Refusal> {
+    if agent.checked().is_none_or(|(source, value)| {
+        source == crate::resolve::ENV_ORDER[0] || crate::attempt::is_attempt_writer_id(value)
+    }) {
+        return Err(refused(
+            "invalid-writer-key",
+            format!(
+                "{:?} does not name an agent session: the source must be a CLI's own session variable ({}) and the value a usable id",
+                agent.source,
+                crate::resolve::ENV_ORDER[1..].join(", ")
+            ),
+        ));
+    }
+    let record = read_head(head).map_err(|detail| refused("head-not-live", detail))?;
+    if !descends(tree, caller_pid, head.pid) {
+        return Err(refused(
+            "caller-not-under-head",
+            format!(
+                "process {caller_pid} does not run under the head {}, so it cannot bind a session to it",
+                head.pid
+            ),
+        ));
+    }
+    let own = session_for(state_root, attempt, None)?;
+    let rows = scan(state_root, &judge_here)?.rows;
+    let live_on_head = |row: &&Row| row.verdict != Verdict::Dead && on_head(&row.entry, head);
+    let Some(attempt_row) = rows
+        .iter()
+        .filter(live_on_head)
+        .find(|row| row.entry.id == own.info.id)
+    else {
+        return Err(refused(
+            "attempt-not-registered",
+            format!(
+                "{} has no live entry on the head {}; the supervisor registers it when the gate starts",
+                own.info.id, head.pid
+            ),
+        ));
+    };
+    let session = session_for(state_root, agent, Some(head))?;
+    if let Some(other) = rows.iter().find(|row| {
+        row.entry.id == session.info.id
+            && row.verdict != Verdict::Dead
+            && !on_head(&row.entry, head)
+    }) {
+        return Err(refused(
+            "session-in-use",
+            format!(
+                "{} is already the live session {} on another head; an attempt binds only its own agent session",
+                session.info.id, other.entry.handle
+            ),
+        ));
+    }
+    let roles = attempt_row.entry.roles.clone();
+    register_session(state_root, session, Some(record), clone_dir, &roles, true)
+}
+
+/// The session the attempt of writer key `attempt` is now: the agent session bound to it on `head`
+/// ([`bind_agent_session`]) when one is live, else the attempt's own entry when it is live, else `None`. Without a head
+/// only the attempt's own entry is looked at.
+pub fn attempt_session(
+    state_root: &Path,
+    attempt: &WriterKey,
+    head: Option<&HeadRef>,
+    judge: Judge,
+) -> Result<Option<Listed>, Refusal> {
+    let own = session_for(state_root, attempt, None)?;
+    let rows = scan(state_root, judge)?.rows;
+    let live = |row: &&Row| row.verdict != Verdict::Dead;
+    let bound = head.and_then(|head| {
+        rows.iter()
+            .filter(live)
+            .find(|row| !is_attempt_entry(&row.entry) && on_head(&row.entry, head))
+    });
+    Ok(bound
+        .or_else(|| {
+            rows.iter()
+                .filter(live)
+                .find(|row| row.entry.id == own.info.id)
+        })
+        .map(|row| Listed::of(&row.entry, row.verdict)))
+}
+
+/// Registers `roles` (with `take`) for the session the attempt is ([`attempt_session`]): the agent session bound on
+/// `head` when there is one, else the attempt's own key through [`register_writer`].
+pub fn register_attempt_roles(
+    state_root: &Path,
+    clone_dir: Option<&Path>,
+    attempt: &WriterKey,
+    head: &HeadRef,
+    roles: &[String],
+    take: bool,
+) -> Result<Listed, Refusal> {
+    let bound = scan(state_root, &judge_here)?.rows.into_iter().find(|row| {
+        row.verdict != Verdict::Dead && !is_attempt_entry(&row.entry) && on_head(&row.entry, head)
+    });
+    match bound {
+        Some(row) => {
+            let mut entry = row.entry;
+            entry.roles = roles.to_vec();
+            register(state_root, entry, take, &judge_here)
+        }
+        None => register_writer(state_root, clone_dir, attempt, head, roles, take),
+    }
+}
+
+/// The agent session bound to the attempt `attempt_local` ([`bind_agent_session`]), read from the two entries alone:
+/// the agent entry named by `agent_handles` (the handles its key may carry) shares the attempt entry's head and both
+/// are not dead. Returns the agent entry's id and CLI label.
+pub(crate) fn bound_agent(
+    state_root: &Path,
+    attempt_handle: &str,
+    agent_handles: &[String],
+    judge: Judge,
+) -> Option<(String, String)> {
+    let attempt = read_named(state_root, attempt_handle, judge)?;
+    let record = Record::from_json(attempt.entry.liveness.as_ref()?);
+    let head = HeadRef {
+        pid: record.pid?.0,
+        start_time: record.start_time?,
+    };
+    if attempt.verdict == Verdict::Dead {
+        return None;
+    }
+    agent_handles
+        .iter()
+        .filter_map(|handle| read_named(state_root, handle, judge))
+        .find(|row| {
+            row.verdict != Verdict::Dead
+                && !is_attempt_entry(&row.entry)
+                && on_head(&row.entry, &head)
+        })
+        .map(|row| (row.entry.id, row.entry.cli))
+}
+
 /// Removes `role` from the entry of the session `own_id`, and from no other:
 /// a session drops only what it holds itself, so a role of another live
 /// session can only move through `take` on a registration. Refused

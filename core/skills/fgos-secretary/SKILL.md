@@ -30,7 +30,9 @@ depth in its own chat, or applies any domain's steps.
    | `discussion: settled` | hand to a planner |
    | plan `ready` | hand to a supervisor |
 
-   Message a peer session only when a decision is needed from it, never for progress.
+   Message a peer session only when a decision is needed from it, never for progress. Send it with
+   `fgos mailbox send --to <role or handle>` (for example `--to lead:OPC`), never with SendMessage: the head's sandbox
+   reaches the project mailbox, not the peers' session sockets. Mail sent to you arrives through the mailbox hook.
 4. **Order.** Order the topics by the product priority in AGENTS.md (Ship Faster, Release con nguoi, DoD, Polish Sau
    DoD). A real tie goes to the owner as a question.
 

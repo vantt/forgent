@@ -18,7 +18,7 @@ import { fgosDirFromRoot } from '../paths.mjs';
 import { withDefaultExecutor } from './config.mjs';
 import { createCredentialRenewal } from './provider-credential-renewal.mjs';
 import { BUILTIN_POLICIES } from './confinement/policies.mjs';
-import { WORKSPACE_PATHS_RESOURCE } from './confinement/workspace-paths.mjs';
+import { MAILBOX_RECORD_RESOURCE, WORKSPACE_PATHS_RESOURCE } from './confinement/workspace-paths.mjs';
 import {
   closeAttempt, leaseAccountForAttempt, openAttempt, prepareAttemptSeat, publishAttemptIntent,
   releaseSelectedProviderLease, renewLeasedLogin, startAndBind,
@@ -36,14 +36,17 @@ export class SessionLaunchError extends Error {
 const ATTEMPT_STR = '01';
 
 /**
- * The requirement of a head: the read-only posture plus the writable project paths its grant names. The paths grant is
- * required (`optional: false`): a bind that cannot be made refuses the launch by name, it never starts the head read-only.
+ * The requirement of a head: the read-only posture plus the writable project paths its grant names and, when its grant
+ * says `mailbox`, the mailbox record. Both grants are required (`optional: false`): a bind that cannot be made refuses
+ * the launch by name, it never starts the head read-only.
  */
-function requirementOf(grant) {
+export function requirementOf(grant) {
   const base = BUILTIN_POLICIES['host-write-denied'];
-  const policy = grant.writes.length === 0
-    ? base
-    : { ...base, grants: [...base.grants, { resource: WORKSPACE_PATHS_RESOURCE, access: 'read-write', scope: 'dispatch', optional: false, paths: [...grant.writes] }] };
+  const extra = [
+    ...(grant.writes.length === 0 ? [] : [{ resource: WORKSPACE_PATHS_RESOURCE, access: 'read-write', scope: 'dispatch', optional: false, paths: [...grant.writes] }]),
+    ...(grant.mailbox ? [{ resource: MAILBOX_RECORD_RESOURCE, access: 'read-write', scope: 'dispatch', optional: false }] : []),
+  ];
+  const policy = extra.length === 0 ? base : { ...base, grants: [...base.grants, ...extra] };
   return { mode: 'required', policyId: 'host-write-denied', policy };
 }
 

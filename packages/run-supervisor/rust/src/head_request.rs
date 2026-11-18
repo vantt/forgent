@@ -24,7 +24,7 @@ use fgos_process::spawn::{run_bounded_command, Outcome as BoundedOutcome};
 use serde_json::{json, Value};
 
 use crate::attempt_step::exec_payload;
-use crate::go_channel::{peer_uid, read_frame, write_frame, FrameError};
+use crate::go_channel::{peer_pid, peer_uid, read_frame, write_frame, FrameError};
 use crate::route::{refuse, Flags};
 
 /// The Node payload entry the route child runs.
@@ -45,6 +45,11 @@ pub const ANSWERED_VERB: &str = "head answered";
 /// registered check, and after the route reports done the role is registered again without `take`, so Identity
 /// refuses (`role-held`) when another live session holds it.
 pub const RESTORE_VERB: &str = "head restore role";
+/// The verb that binds the agent session a head runs as to this attempt, answered by the supervisor itself (no route
+/// child): Identity registers that session on the attempt's gate and moves the attempt's roles to it
+/// (`bind_agent_session`), so the head resolves as its CLI session. The role step is "registered", as for
+/// [`ANSWERED_VERB`]: a successor binds before it holds the role.
+pub const BIND_VERB: &str = "head bind session";
 
 /// Verbs of a session that does not (yet) hold its role: the role check is "registered", and after the route reports
 /// done the supervisor registers the role for the attempt's session. The flag is Identity's `take`.
@@ -84,6 +89,7 @@ fn invalid(why: impl Into<String>) -> EnvelopeError {
 
 type HoldsRole = Box<dyn Fn() -> Result<bool, HoldError> + Send + Sync>;
 type TakesRole = Box<dyn Fn(bool) -> Result<(), HoldError> + Send + Sync>;
+type BindsSession = Box<dyn Fn(&Value, Option<u32>) -> Result<Value, HoldError> + Send + Sync>;
 type LogLine = Box<dyn Fn(&str) + Send + Sync>;
 
 /// What serving the socket needs, all of it from the envelope except the two ports.
@@ -105,6 +111,9 @@ pub struct Config {
     /// Registers the envelope's role for this attempt's session after [`ANSWERED_VERB`] (`take`: true) or
     /// [`RESTORE_VERB`] (false) reported done.
     pub take_role: TakesRole,
+    /// [`BIND_VERB`]: binds the agent session the request's args name (`{source, value}`, a writer key) for the
+    /// connecting process (its pid as the kernel names it, `None` when unknown); the reply's data on success.
+    pub bind_session: BindsSession,
     /// One line per request, for `supervisor.log`.
     pub log: LogLine,
 }
@@ -205,22 +214,35 @@ impl HeadRequests {
             verbs,
             verb_timeout: VERB_TIMEOUT,
             holds_role: Box::new({
-                let (state_root, role, writer_id) =
-                    (state_root.clone(), role.clone(), writer_id.clone());
-                move || identity_holds(&state_root, &role, &writer_id)
+                let (state_root, role, writer_id, gate) = (
+                    state_root.clone(),
+                    role.clone(),
+                    writer_id.clone(),
+                    gate.clone(),
+                );
+                move || identity_holds(&state_root, &role, &writer_id, known(&gate).as_ref())
             }),
             registered: Box::new({
-                let (state_root, writer_id) = (state_root.clone(), writer_id.clone());
-                move || identity_registered(&state_root, &writer_id)
+                let (state_root, writer_id, gate) =
+                    (state_root.clone(), writer_id.clone(), gate.clone());
+                move || identity_registered(&state_root, &writer_id, known(&gate).as_ref())
+            }),
+            bind_session: Box::new({
+                let (state_root, writer_id, gate, cwd) = (
+                    state_root.clone(),
+                    writer_id.clone(),
+                    gate.clone(),
+                    cwd.clone(),
+                );
+                move |args, peer| {
+                    let head = known(&gate).ok_or_else(gate_unknown)?;
+                    identity_bind(&state_root, &cwd, &writer_id, &head, args, peer)
+                }
             }),
             take_role: Box::new({
                 let gate = gate.clone();
                 move |take| {
-                    let head = gate.lock().unwrap_or_else(|e| e.into_inner()).clone();
-                    let head = head.ok_or_else(|| HoldError {
-                        code: "gate-unknown".into(),
-                        detail: "the attempt's gate is not known yet".into(),
-                    })?;
+                    let head = known(&gate).ok_or_else(gate_unknown)?;
                     identity_take(&state_root, &cwd, &role, &writer_id, &head, take)
                 }
             }),
@@ -252,16 +274,56 @@ impl HeadRequests {
     }
 }
 
-/// Identity's answer to "does this attempt's session hold the role": the session the writer id names is the one
-/// `resolve` finds holding it. Nothing is cached; a role that rotation moved away stops answering yes at once.
-pub fn identity_holds(state_root: &Path, role: &str, writer_id: &str) -> Result<bool, HoldError> {
-    let key = WriterKey {
+/// The gate once the attempt has one.
+fn known(gate: &Mutex<Option<HeadRef>>) -> Option<HeadRef> {
+    gate.lock().unwrap_or_else(|e| e.into_inner()).clone()
+}
+
+fn gate_unknown() -> HoldError {
+    HoldError {
+        code: "gate-unknown".into(),
+        detail: "the attempt's gate is not known yet".into(),
+    }
+}
+
+fn attempt_key(writer_id: &str) -> WriterKey<'_> {
+    WriterKey {
         source: ENV_ORDER[0],
         value: writer_id,
+    }
+}
+
+/// The session this attempt is in Identity now: the agent session bound on its gate `head` when there is one, else
+/// the attempt's own (Identity's `attempt_session`).
+fn own_session(
+    state_root: &Path,
+    writer_id: &str,
+    head: Option<&HeadRef>,
+) -> Result<Option<String>, HoldError> {
+    fgos_identity::directory::attempt_session(
+        state_root,
+        &attempt_key(writer_id),
+        head,
+        &judge_here,
+    )
+    .map(|found| found.map(|listed| listed.id))
+    .map_err(hold_error)
+}
+
+/// Identity's answer to "does this attempt's session hold the role": the session this attempt is (its own, or the
+/// agent session bound on its gate `head`) is the one `resolve` finds holding it. Nothing is cached; a role that
+/// rotation moved away stops answering yes at once.
+pub fn identity_holds(
+    state_root: &Path,
+    role: &str,
+    writer_id: &str,
+    head: Option<&HeadRef>,
+) -> Result<bool, HoldError> {
+    let Some(own) = own_session(state_root, writer_id, head)? else {
+        return Ok(false);
     };
-    let own = fgos_identity::current::session_for(state_root, &key, None).map_err(hold_error)?;
     match fgos_identity::directory::resolve(state_root, role, &judge_here, None) {
-        Ok(holder) => Ok(holder.id == own.info.id),
+        Ok(holder) => Ok(holder.id == own),
         Err(r) if r.reason == "not-found" => Ok(false),
         Err(r) => Err(hold_error(r)),
     }
@@ -274,23 +336,19 @@ fn hold_error(r: fgos_identity::refusal::Refusal) -> HoldError {
     }
 }
 
-/// Identity's answer to "is this attempt's session registered and live": the full id of the session the writer id
-/// names is one `resolve` finds. A session that never registered, or whose head is gone, is `Ok(false)`.
-pub fn identity_registered(state_root: &Path, writer_id: &str) -> Result<bool, HoldError> {
-    let key = WriterKey {
-        source: ENV_ORDER[0],
-        value: writer_id,
-    };
-    let own = fgos_identity::current::session_for(state_root, &key, None).map_err(hold_error)?;
-    match fgos_identity::directory::resolve(state_root, &own.info.id, &judge_here, None) {
-        Ok(found) => Ok(found.id == own.info.id),
-        Err(r) if r.reason == "not-found" => Ok(false),
-        Err(r) => Err(hold_error(r)),
-    }
+/// Identity's answer to "is this attempt's session registered and live": its own entry, or the agent session bound
+/// on its gate `head`. A session that never registered, or whose head is gone, is `Ok(false)`.
+pub fn identity_registered(
+    state_root: &Path,
+    writer_id: &str,
+    head: Option<&HeadRef>,
+) -> Result<bool, HoldError> {
+    own_session(state_root, writer_id, head).map(|own| own.is_some())
 }
 
-/// Registers `role` for the session of `writer_id`; with `take` it moves from the live holder (Identity's own `take`, the supervisor only transports the fact that
-/// the attempt is that session). The gate is the head Identity records liveness against.
+/// Registers `role` for the session this attempt is (the agent session bound on the gate `head` when there is one,
+/// else the attempt's own); with `take` it moves from the live holder (Identity's own `take`, the supervisor only
+/// transports the fact that the attempt is that session). The gate is the head Identity records liveness against.
 pub fn identity_take(
     state_root: &Path,
     cwd: &Path,
@@ -299,19 +357,54 @@ pub fn identity_take(
     head: &HeadRef,
     take: bool,
 ) -> Result<(), HoldError> {
-    let key = WriterKey {
-        source: ENV_ORDER[0],
-        value: writer_id,
-    };
-    fgos_identity::directory::register_writer(
+    fgos_identity::directory::register_attempt_roles(
         state_root,
         Some(cwd),
-        &key,
+        &attempt_key(writer_id),
         head,
         &[role.to_string()],
         take,
     )
     .map(|_| ())
+    .map_err(hold_error)
+}
+
+/// [`BIND_VERB`]: Identity binds the agent session `args` names (`{"source": <CLI session variable>, "value": <id>}`)
+/// to this attempt on its gate `head`, for the connecting process `peer` (which must run under the gate). Returns the
+/// bound session's `{id, handle}`.
+pub fn identity_bind(
+    state_root: &Path,
+    cwd: &Path,
+    writer_id: &str,
+    head: &HeadRef,
+    args: &Value,
+    peer: Option<u32>,
+) -> Result<Value, HoldError> {
+    let text = |name: &str| {
+        args[name]
+            .as_str()
+            .filter(|_| args.as_object().is_some_and(|o| o.len() == 2))
+    };
+    let (Some(source), Some(value)) = (text("source"), text("value")) else {
+        return Err(HoldError {
+            code: "bad-args".into(),
+            detail: "args must be exactly {source, value}, both strings".into(),
+        });
+    };
+    let peer = peer.ok_or_else(|| HoldError {
+        code: "peer-unknown".into(),
+        detail: "the kernel did not name the connecting process".into(),
+    })?;
+    let agent = WriterKey { source, value };
+    fgos_identity::directory::bind_agent_session(
+        state_root,
+        Some(cwd),
+        &attempt_key(writer_id),
+        &agent,
+        head,
+        peer,
+    )
+    .map(|listed| json!({"id": listed.id, "handle": listed.handle}))
     .map_err(hold_error)
 }
 
@@ -384,6 +477,7 @@ fn serve(cfg: &Config, busy: &AtomicBool, mut stream: UnixStream) {
     let _ = stream.set_write_timeout(Some(READ_DEADLINE));
     // SAFETY: getuid has no failure mode.
     let own = unsafe { libc::getuid() };
+    let peer_pid = peer_pid(&stream);
     let (id, verb, outcome) = if !uid_allowed(peer_uid(&stream), own) {
         (None, None, refused("peer-uid"))
     } else {
@@ -393,7 +487,7 @@ fn serve(cfg: &Config, busy: &AtomicBool, mut stream: UnixStream) {
         };
         match read_request(&mut reader) {
             Ok(request) => {
-                let outcome = decide(cfg, busy, &request);
+                let outcome = decide(cfg, busy, &request, peer_pid);
                 (Some(request.id), Some(request.verb), outcome)
             }
             Err(id) => (id, None, refused("bad-frame")),
@@ -455,9 +549,10 @@ fn read_request(reader: &mut impl Read) -> Result<Request, Option<String>> {
 }
 
 /// The checks in contract order, then the verb.
-fn decide(cfg: &Config, busy: &AtomicBool, request: &Request) -> Outcome {
+fn decide(cfg: &Config, busy: &AtomicBool, request: &Request, peer: Option<u32>) -> Outcome {
     let moves = role_move(&request.verb);
-    let (check, not_so) = if moves.is_some() {
+    let binds = request.verb == BIND_VERB;
+    let (check, not_so) = if moves.is_some() || binds {
         (&cfg.registered, "session-not-registered")
     } else {
         (&cfg.holds_role, "role-not-held")
@@ -486,6 +581,21 @@ fn decide(cfg: &Config, busy: &AtomicBool, request: &Request) -> Outcome {
         return refused("busy");
     }
     let _busy = Busy(busy);
+    if binds {
+        return match (cfg.bind_session)(&request.args, peer) {
+            Ok(data) => Outcome::Done(data),
+            Err(why) => {
+                (cfg.log)(&format!(
+                    "head-request {} identity {}: {}",
+                    request.id, why.code, why.detail
+                ));
+                Outcome::Refused {
+                    code: "session-bind-failed",
+                    detail: Some(why.code),
+                }
+            }
+        };
+    }
     let outcome = run_verb(cfg, request);
     if let (Some(take), Outcome::Done(_)) = (moves, &outcome) {
         if let Err(why) = (cfg.take_role)(take) {
