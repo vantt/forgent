@@ -658,7 +658,7 @@ async function main() {
     return;
   }
   try {
-    const { id, source } = identityData(hostBin, ['identity', '--json', '--pid', String(process.pid), '--fgos-dir', fgosDir], repoRoot);
+    const { id, source } = identityData(hostBin, ['identity', '--json', '--pid', String(process.pid)], repoRoot);
     if (typeof source !== 'string' || (typeof id !== 'string' && !Number.isInteger(id))) throw new Error(`${hostBin} identity printed an unexpected answer`);
     writer = { id, source };
   } catch (err) {
