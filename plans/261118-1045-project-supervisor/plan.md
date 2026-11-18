@@ -153,7 +153,7 @@ Decided by the planner inside that frame (evidence-backed; say so if one is wron
 | PS-21 | Detection survives late commits, other machines and lost state: each full tick fetches the trunk; edge definitions run `--since lastTick - watcher.lookbackSec`, and a missing state uses `now - lookbackSec`; the Event Store queue dedupes by stable id; level definitions (`plan-ready-waiting`) raise the current state once per status commit | edge-only windows lose a branch commit with an older time (red team H2); ops-metrics source ids are deterministic per commit (its phase 11 step 2), so overlap costs nothing |
 | PS-22 | Pace definitions live in `core/watcher/pace/` and are never raised: the tick reads `watcher-active` for pace; doctor row `supervision-pace` runs `watcher-overdue` and `supervisor-idle-burn` read-only | a pace row in the raised set would wake the supervisor every tick (red team H3); a stopped watcher cannot report itself, so doctor does |
 | PS-23 | One planner starter per settled discussion: the supervisor, on `discussion-settled`, unless a plan's `source` already names the discussion or a planner head for it is live. The secretary hands a settled discussion over (reports it) instead of starting a planner | Round 8 keeps the trigger as the long-term mechanism; two starters write two plans (validator M10, red team M5) |
-| PS-24 | **Pending owner question Q1.** The lead's sandbox writes only its plan dir; the plan's footprint, read from the trunk tip, bounds `run --writes` and the branch diff of `land` (refused `land-outside-footprint`) and is passed as `LandRequest.footprint`; a lead's `land --paths` that changes its own `footprint` is refused | footprint as sandbox writes can name `.`, `.git`, `.githooks` (`validateWorkspacePaths`, `src/runner/dispatch/confinement/workspace-paths.mjs:18-34`, denies only absolute, `..`, `.fgos` and globs) and dirties the main checkout, which makes the lead's own lands refuse `main-checkout-dirty-mid-merge` (`land.rs:262-271`) |
+| PS-24 | **Owner answer Q1 = (A), 2026-11-18.** The lead's sandbox writes only its plan dir; the plan's footprint, read from the trunk tip, bounds `run --writes` and the branch diff of `land` (refused `land-outside-footprint`) and is passed as `LandRequest.footprint`; a lead's `land --paths` that changes its own `footprint` is refused | footprint as sandbox writes can name `.`, `.git`, `.githooks` (`validateWorkspacePaths`, `src/runner/dispatch/confinement/workspace-paths.mjs:18-34`, denies only absolute, `..`, `.fgos` and globs) and dirties the main checkout, which makes the lead's own lands refuse `main-checkout-dirty-mid-merge` (`land.rs:262-271`) |
 
 **Planner changes to the draft input.** (1) `blockedBy` adds `261115-2328-execution-read-door` and
 `261118-1159-owner-question-store` (both write `main.rs`, `routing.rs`, `observe_declarations.rs`, the command
@@ -166,7 +166,7 @@ the Git Land port's existing rank-20 merge slot instead of a second lock, and PS
 Git has no rebase port (RUL104). The settled "holder-lock, one per project" for the supervisor becomes the Identity role
 (PS-8), since a holder-lock is bound to one process. Item 3 says the supervisor "never lands"; it lands portfolio edits
 with `land --paths` only (PS-6, PS-14), never code. If a linear `main` is wanted, the Land port's `squash` flag gives
-it without new code. Item 4 ("the plan's footprint as writes") is the subject of owner question Q1 (PS-24). Phase 17
+it without new code. Item 4 ("the plan's footprint as writes") was amended by the owner's answer to Q1 (A, PS-24). Phase 17
 touches the Work layer only to delete the work-item slot count that `workerSlots.ceiling` no longer means (L10).
 
 ## Acceptance criteria
@@ -252,17 +252,17 @@ accepted only from the asker or its successor: the supervisor passes the questio
 | 8 | [Event queue in the Event Store](phase-08-event-queue.md) | 3 | packages/supervision/rust/src/queue.rs, packages/supervision/rust/tests/queue.rs | 2 | ready |
 | 10 | [Request transport: confined door, ticket verbs, session stop](phase-10-request-transport.md) | 3 | packages/run-supervisor/contracts/head-request.v1.json, packages/run-supervisor/rust/src/head_request.rs, packages/run-supervisor/rust/tests/head_request*.rs, src/session-host/head-request.mjs, src/session-host/head-request-client.mjs, src/session-host/head-stop.mjs, src/session-host/head-plan.mjs, src/session-host/head-start.mjs, test/session-host/head-request.test.mjs, test/session-host/head-stop.test.mjs, test/session-host/head-plan.test.mjs, docs/platform/session-host/spec.md | 2 | ready |
 | 13 | [Trigger and pace definitions](phase-13-trigger-definitions.md) | 3, 4 | core/watcher/**, packages/supervision/rust/tests/definitions.rs, packages/supervision/rust/tests/fixtures/definitions/** | 2 | ready |
-| 9 | [Personas and grants](phase-09-personas-and-grants.md) | 3, 10 | src/session-host/head-grants.mjs, src/session-host/head-start.mjs, test/session-host/head-start.test.mjs, core/agents/supervisor.yaml, core/agents/lead.yaml, core/agents/planner.yaml, .claude/agents/** | 3 | draft |
+| 9 | [Personas and grants](phase-09-personas-and-grants.md) | 3, 10 | src/session-host/head-grants.mjs, src/session-host/head-start.mjs, test/session-host/head-start.test.mjs, core/agents/supervisor.yaml, core/agents/lead.yaml, core/agents/planner.yaml, .claude/agents/** | 3 | ready |
 | 11 | [Watcher tick and mailbox notifier](phase-11-watcher-tick.md) | 3, 4, 6, 8, 13 | packages/supervision/rust/src/watcher.rs, packages/supervision/rust/src/notify.rs, packages/supervision/rust/tests/watcher.rs | 3 | ready |
 | 12 | [Wake door and supervisor verbs](phase-12-wake-and-supervisor-verbs.md) | 2, 3, 8, 10 | packages/supervision/rust/src/wake.rs, packages/supervision/rust/src/supervisor.rs, packages/supervision/rust/tests/wake.rs | 3 | ready |
 | 14 | [Discussion status source](phase-14-discussion-source.md) | 3 | packages/supervision/rust/src/discussion_source.rs, packages/supervision/rust/tests/discussion_source.rs | 3 | ready |
 | 15 | [Watcher timer schedule and doctor row](phase-15-watcher-timer.md) | 2, 4 | packages/distribution/rust/src/timer.rs, apps/fgos/src/wiring/doctor/mailbox.rs, apps/fgos/src/wiring/doctor/mod.rs, packages/distribution/contracts/doctor-registry.v1.json, docs/platform/packaging-distribution/spec.md | 3 | ready |
 | 16 | [Host wiring of the new verbs](phase-16-host-wiring.md) | 6, 7, 8, 10, 11, 12, 13, 14, 15 | apps/fgos/Cargo.toml, Cargo.lock, apps/fgos/src/main.rs, apps/fgos/src/routing.rs, apps/fgos/src/wiring/mod.rs, apps/fgos/src/wiring/supervision.rs, apps/fgos/src/wiring/observe_declarations.rs, apps/fgos/src/wiring/metrics_sources.rs, apps/fgos/src/wiring/doctor/supervision.rs, apps/fgos/src/wiring/doctor/mod.rs, apps/fgos/tests/supervision_verbs.rs, packages/distribution/contracts/doctor-registry.v1.json, src/cli/command-registry.mjs, packages/host-runtime/contracts/command-manifest.json, packages/host-runtime/contracts/command-routes.json, packages/host-runtime/contracts/command-route-annotations.json, apps/fgos/src/cli_projector.rs, apps/fgos-gateway/src/gateway.rs, apps/fgos-gateway/web/src/api/types.ts, docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml, bin/fgos.mjs, test/cli/** | 4 | ready |
 | 17 | [Retire the work-item slot count, arm the lane pool](phase-17-retire-work-item-slots.md) | 16 | src/state/worker-slots.mjs, src/runner/claim-port.mjs, src/runner/loop.mjs, src/runner/fanout-batch.mjs, src/setup/**, core/config-standard/workerSlots.yaml, core/config-schema/workerSlots.schema.yaml, packages/config/contracts/fixtures/**, packages/distribution/contracts/doctor-registry.v1.json, docs/platform/component-boundary.md, docs/platform/packaging-distribution/spec.md, test/suite-baseline.json, test/state/worker-slots.test.mjs, test/state/report-verb.test.mjs, test/state/gate-bypass.test.mjs, test/event-store/v-auth-01.test.mjs, test/runner/claim-port.test.mjs, test/runner/claim-capacity-race.test.mjs, test/runner/loop.test.mjs, test/runner/dispatch.test.mjs, test/setup/checks-doctor-config.test.mjs, test/architecture.test.mjs, docs/architecture-manifest.json | 5 | ready |
-| 18 | [Skills: supervisor, lead, planner no-item path, secretary handoff](phase-18-skills.md) | 9, 16 | core/skills/fgos-supervisor/**, core/skills/fgos-lead/**, core/skills/fgos-secretary/**, core/skills/fgos-fanout/**, core/task-specs/fgos-fanout.md, core/agents/supervisor.yaml, core/agents/lead.yaml, .claude/agents/**, domains/coding/skills/fgos-coding-planning/**, .agents/skills/**, .claude/skills/**, plugins/fgOS/skills/** | 5 | draft |
+| 18 | [Skills: supervisor, lead, planner no-item path, secretary handoff](phase-18-skills.md) | 9, 16 | core/skills/fgos-supervisor/**, core/skills/fgos-lead/**, core/skills/fgos-secretary/**, core/skills/fgos-fanout/**, core/task-specs/fgos-fanout.md, core/agents/supervisor.yaml, core/agents/lead.yaml, .claude/agents/**, domains/coding/skills/fgos-coding-planning/**, .agents/skills/**, .claude/skills/**, plugins/fgOS/skills/** | 5 | ready |
 | 19 | [Integration, live run and full gate](phase-19-integration.md) | 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18 | CHANGELOG.md, docs/backlog.md, docs/platform/supervision/spec.md, docs/reading-map.md, .fgos/config.yaml, packages/git/contracts/mutation-census.v1.json, plans/261118-1045-project-supervisor/reports/integration.md | 6 | ready |
 
-Phases 9 and 18 stay `draft`: they wait on owner question Q1 (the lead's write grant). Every other phase is `ready`
+Q1 is answered (A), so every phase is `ready`
 inside the plan's frame and may start once the plan's blockers are `done`.
 
 **Ops-metrics waits** (its 16-phase table): phase 3 kinds file → ops 1; phase 10 `retired` signal → ops 11; phase 11 →
@@ -285,27 +285,12 @@ once by 3 (declares every module) and never again. Checked by `node scripts/plan
 
 ## Owner questions
 
-**Q1. The lead's write grant (blocks phases 9 and 18; validator M5, red team C3/D1).**
+None open. Q1 (the lead's write grant) was answered by the owner on 2026-11-18: **(A)**. The lead's sandbox writes
+only its plan dir; the plan's footprint, read from the trunk tip, bounds `run --writes` and `land` (PS-24). This
+amends settled item 4 for the lead only.
 
-1. **What is happening:** settled item 4 gives a lead "the plan's footprint as writes" in its sandbox. A footprint can
-   name `.`, `.git` or `.githooks`, and this plan's own footprint holds `.githooks/pre-commit`. A hook written there
-   runs unconfined at the next commit in the main checkout, and a lead could widen its own footprint in `plan.md`.
-2. **Cause:** checked `validateWorkspacePaths` (`src/runner/dispatch/confinement/workspace-paths.mjs:18-34`): it denies
-   only absolute paths, `..`, `.fgos` and globs. A lead never needs to edit code in the main checkout: workers write in
-   linked worktrees, and any lead edit there makes its own lands refuse `main-checkout-dirty-mid-merge` (`land.rs:262-271`).
-3. **Options:**
-   - (A) Lead writes = its plan dir only; the footprint, read from the trunk tip, bounds `run --writes` and `land`
-     (PS-24). Gain: no sandbox escape, no self-blocked lands. Harm: a lead cannot hot-fix a file in place. Cost:
-     ~40 lines in phases 9/10, already planned.
-   - (B) Keep footprint writes, plus a deny list (`.`, `.git`, `.githooks`, hook paths, `Cargo.toml`/`build.rs`) and a
-     read of the footprint from the trunk tip. Gain: the settled wording. Harm: keeps the class "an LLM writes its own
-     grant"; dirty-main-checkout land refusals stay. Cost: ~30 lines in phase 9.
-   - (C) Keep as written. Cost 0; the escape stays.
-4. **Recommendation:** (A). It removes the escape and the self-blocked lands together; the bound on runs and lands is
-   built either way (red team H4).
-5. **Scope of the answer:** a yes to (A) amends settled item 4 for the lead only and unblocks phases 9 and 18 as
-   written. (B) changes phase 9 step 2 to footprint writes plus the deny list. No other persona's grant and no other
-   phase changes.
+**Approval.** Owner-approved 2026-11-18. The status stays `draft` until every `blockedBy` plan is `done`; then it turns
+`ready` with no other change.
 
 ## Risks and rollback
 

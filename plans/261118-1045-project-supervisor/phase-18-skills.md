@@ -1,7 +1,6 @@
 # Phase 18 — Skills: supervisor, lead, planner no-item path, secretary handoff
 
-**Waits on owner question Q1 (plan.md "Owner questions")**: the lead skill says where a lead writes. Written for the
-recommended answer (A, plan dir only); under (B) only the lead skill's "writes" sentence changes.
+**Owner question Q1 answered (A), 2026-11-18:** the lead skill says a lead writes only its plan dir.
 
 Teaches the new roles through skills. `fgos-supervisor` and `fgos-lead` are new; `fgos-secretary`, `fgos-fanout` and
 `fgos-coding-planning` change in the few lines the new machinery makes wrong. The sole writer of skill sources and

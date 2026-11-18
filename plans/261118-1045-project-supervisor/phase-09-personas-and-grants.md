@@ -1,8 +1,6 @@
 # Phase 9 — Personas and grants
 
-**Waits on owner question Q1 (plan.md "Owner questions").** Steps below are written for the recommended answer (A):
-the lead's sandbox writes only its plan dir. Under answer (B), step 2 returns the footprint prefixes as writes and adds
-the deny list named in Q1. Do not start before the answer is recorded in plan.md.
+**Owner question Q1 answered (A), 2026-11-18:** the lead's sandbox writes only its plan dir.
 
 Adds the three personas the supervisor plan needs (`supervisor`, `lead`, `planner` as a head) and the grant table rows
 that confine them (PS-14, PS-16, PS-24). The grant table stays the one reader (`grantOf`); nothing else bypasses it.
