@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "9bb933002030b0a096c0c4b30effa4e19767c3087b1b1e00a123dbeeb97c2890",
+  "payloadDigest": "63ff74e988bf8a67d33d781228df14976d9548b64921be44f36c8381fe2c851f",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "764929356f623ea67c3f918c5414cef1541da5c03a23bd9fa0acfae4a31df38b",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -106,7 +106,7 @@
     "apps/fgos/src/wiring/doctor/holder_lock.rs": "2a6d8f4513a042d4178cad1942782b63b4445ae558b6018dcdc8c93c80dfaff6",
     "apps/fgos/src/wiring/doctor/identity.rs": "7a9f3c22d0380030120fa13bffcb136e30cb245bde06092c2a650c0b0f76f419",
     "apps/fgos/src/wiring/doctor/mailbox.rs": "44dadd32096ec6059f41f3ec46b1576d24ca272712f9ff5880ba58595bf7cf3b",
-    "apps/fgos/src/wiring/doctor/mod.rs": "6f1e2478051ffd59a0ede0d0b44fa178c1eadd4ffc51492d88ba61473a8338fa",
+    "apps/fgos/src/wiring/doctor/mod.rs": "506190643bb665471bb5e25617395c3f4a74d64bd34aff2c474d741fed0516b5",
     "apps/fgos/src/wiring/doctor/observe.rs": "a91f721e558e5378a5bc305c8aaf617b2859fe3234088e66bcc20df06ae0741c",
     "apps/fgos/src/wiring/doctor/packaging.rs": "cc62d9a55a1a9c36fd2c47f2c426c0ec2c300cf6b35898b45c646fac1afea3f4",
     "apps/fgos/src/wiring/event_store_clone.rs": "923d718f7a6bd5705cbe6e4d4c8393672c1ef4a2142facc9ada314307a4d7574",
@@ -136,7 +136,7 @@
     "apps/fgos/src/wiring/observe_query.rs": "14a143c025a7694a64b71497a6510cc1c6435942e4b116d7bea345c6c83433f3",
     "apps/fgos/src/wiring/observe_sources/head_state.rs": "e2ae90a3785af0e5fb10ab81cc9f27448f2f63b8f056ab8d5dd882acf1dee2a3",
     "apps/fgos/src/wiring/observe_sources/mod.rs": "d5fb81609b375af587eed807d6c81ff70565fbc7ca8cdea1f6a22f3f3149afc1",
-    "apps/fgos/src/wiring/observe_sources/plan_history.rs": "ed33e9dd42c918737e9ea5bfbfccf77bf7354761d02469930889031235ddfd6f",
+    "apps/fgos/src/wiring/observe_sources/plan_history.rs": "38cec91849c282960311c3f851e99ec50608ff253de753a798c3af79d03fb185",
     "apps/fgos/src/wiring/observe_sources/plan_text.rs": "a71317e73180193a53d3e7f9b4b19ad18aef8c989a6e8981ba41108e1b1438c3",
     "apps/fgos/src/wiring/observe_sources/tests/mod.rs": "66830b25cf797333aaa9ead42db7730562a8373f4e606217455bbb06d8c52fa4",
     "apps/fgos/src/wiring/run_dirs.rs": "8248bf1a45d37e2ca03315dea11489b6b90362a47479244a10a7c71648e90f60",
@@ -500,10 +500,10 @@
     "packages/git/node-addon/tests/yaml_parts.rs": "e6d7103f8d30358c7209070c1e662c6872be94b769d4184415e9b79a09d00e97",
     "packages/git/rust/src/driver.rs": "31df187b75fb745cc72509f29aeae0a81ac7927071875e6d226024a98339d2ac",
     "packages/git/rust/src/incidents.rs": "f91693bd549c0f13f7122789e0cb2ba9e742abfaca11e656af5a65a876a896bb",
-    "packages/git/rust/src/inspect.rs": "f01f4b4709058650ef9643c8331aa20ab69eef7353abca9769eacb8b829fa2e7",
+    "packages/git/rust/src/inspect.rs": "69c007a4c1c5f5b6ed25862e97e4b5e81d415931dd1773e768ce1460a5aec5ac",
     "packages/git/rust/src/invocation_root.rs": "854396e23b8c00d76c6560d3682fa4c940dc7050280dae10eae1b7af3ff85463",
     "packages/git/rust/src/land.rs": "585a3c6bfa27716427a90ec3e8d0aca132ca6ce53e169a4cf6860808ad5eb8ce",
-    "packages/git/rust/src/lib.rs": "1049d009e8aee1e4d6d8c5497c2a05442e7977891400bc0201c68a1b7ea903ee",
+    "packages/git/rust/src/lib.rs": "c280433bc9f19de15ce89ea1a692c2eb2272f0b8cd34cfbe80131e2a14a652f1",
     "packages/git/rust/src/native_lock.rs": "49758dea6b6d2f2abae425b31b937817b8c15174a83bf10ce33dd9046cc5139a",
     "packages/git/rust/src/objects.rs": "835dcdc093cbbdad82eb25b82fd28df9de6942789751a57b571f24e389cf23ec",
     "packages/git/rust/src/publication.rs": "2197f50540e53b98b6e62961fe37eaf5f860d6f79fd2559084909d67dca9cd92",
@@ -518,6 +518,7 @@
     "packages/git/rust/src/store_admission.rs": "0b7e6ca596730266033edbd963c9b15c82cac9d4c99a921495d18cd6684931a7",
     "packages/git/rust/src/sync.rs": "1eb485368c46ee609573fadeff4e9e2bb8f19c0d17956e4e0ef14f6ca8280cb2",
     "packages/git/rust/src/wal.rs": "daa876a880327f92bd7eb43f7c00f0c155c209342abca17132e8cacdebdcf6ff",
+    "packages/git/rust/src/walk_changes.rs": "2d077c0e39807d5748c57a26f6be351d737cc43d8091f5c4ee2165e83f16cd61",
     "packages/git/rust/src/worktree.rs": "98bbe52c4ceef242e727d8abd981c93afea7d95f669dea790e2df222b2232cb2",
     "packages/git/rust/tests/borrow_deadline.rs": "6a0db6afad96b62ded1253324e862a29a88129e115bd133292ee30ac5482fa07",
     "packages/git/rust/tests/contracts.rs": "d893e9b4cff68230f19dbe8624c051c318bd0bc3f7600ca7ab4b7a5713ea794d",
@@ -541,6 +542,7 @@
     "packages/git/rust/tests/ssh_transport.rs": "8a2cb55b09c231da46ff5bb90a9ae2b7066ee3859f9568fe2f22c97f1da680c4",
     "packages/git/rust/tests/support/land.rs": "46bec8c0928eb4b53d6db71204661638b626b6dfe199d39f4890444c1b14ac07",
     "packages/git/rust/tests/support/signing.rs": "a083733ad39ab4d35f12a600b5cd90ac08c53ae35686ce66f22147b933bf634c",
+    "packages/git/rust/tests/walk_changes.rs": "f975e1a54d6360760f2f3e0bd974290b56000d9d22876b3284f9049b91ac3782",
     "packages/git/rust/tests/worktree.rs": "fb5ec22b72a58f049c0fd051ae2393f7e3fc7bc73bc1176c8e0e41970da32dde",
     "packages/git/write-scope/src/lib.rs": "8421603ec0e38f418bd241d0db1dc83dd7b3756d994eefa3d29c2e43a8abf9f2",
     "packages/herdr-fgos-common/rust/src/fgos.rs": "46b87d18c99f551c6c9ccbf4df97c7673c99b5af72fa71233166ccfe462e8b52",
@@ -3277,6 +3279,20 @@
     {
       "path": "packages/git/rust/tests/support/land.rs",
       "line": 10,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/git/rust/tests/walk_changes.rs",
+      "line": 7,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/git/rust/tests/walk_changes.rs",
+      "line": 30,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"

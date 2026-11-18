@@ -8,10 +8,6 @@ use crate::{
 };
 use std::time::Duration;
 
-/// Margin before an instant for git's own age cut-off: git stops its walk after a few commits older than the cut-off,
-/// and a branch can carry commits whose time runs behind its parent's. The door still returns only commits whose
-/// committer time is at or after the instant.
-const SKEW_SECONDS: i64 = 3 * 24 * 3600;
 const MAX_COMMITS_CEILING: usize = 1_000_000;
 const MAX_BYTES_CEILING: usize = 256 * 1024 * 1024;
 const MAX_PATHS: usize = 1024;
@@ -119,7 +115,7 @@ impl GitDriver {
         args.push("--format=%x01%H%x00%P%x00%at%x00%ct".into());
         args.push(format!("--max-count={}", request.max_commits + 1));
         if let Some(Since::Instant(seconds)) = &request.since {
-            args.push(format!("--since={}", seconds.saturating_sub(SKEW_SECONDS)));
+            args.push(format!("--since-as-filter={seconds}"));
         }
         args.extend(request.tips.iter().map(|t| t.as_str().to_owned()));
         if let Some(Since::Commit(oid)) = &request.since {
@@ -152,21 +148,18 @@ impl GitDriver {
         if !out.success {
             return Err(out.error("git-command-failed"));
         }
-        let mut commits = parse(repo, &out.stdout)?;
-        let floor = match &request.since {
-            Some(Since::Instant(seconds)) => Some(*seconds),
-            _ => None,
-        };
-        let truncated = commits.len() > request.max_commits;
-        commits.truncate(request.max_commits);
-        commits.retain(|c| floor.is_none_or(|f| c.commit_time >= f));
+        // Git's bound counts every header it prints, merges included, so truncation is judged on headers.
+        let mut headers = parse(repo, &out.stdout)?;
+        let truncated = headers.len() > request.max_commits;
+        headers.truncate(request.max_commits);
+        let commits = headers.into_iter().flatten().collect();
         Ok(ChangedCommits { commits, truncated })
     }
 }
 
 /// `\x01 oid NUL parents NUL author-time NUL committer-time NUL`, then `status NUL path NUL [path NUL]` entries
-/// (the first status token carries the format's newline). A commit with no entries inside the paths is dropped.
-fn parse(repo: &RepoHandle, bytes: &[u8]) -> Result<Vec<ChangedCommit>> {
+/// (the first status token carries the format's newline). A header with no entries inside the paths (a merge) yields `None` but still counts against the bound.
+fn parse(repo: &RepoHandle, bytes: &[u8]) -> Result<Vec<Option<ChangedCommit>>> {
     let bad = || failure("invalid-walk-changes-protocol");
     let tokens = records(bytes.strip_suffix(b"\n").unwrap_or(bytes))?;
     let mut rest = tokens.as_slice();
@@ -201,6 +194,7 @@ fn parse(repo: &RepoHandle, bytes: &[u8]) -> Result<Vec<ChangedCommit>> {
             rest = &tail[arity..];
         }
         if changes.is_empty() {
+            commits.push(None);
             continue;
         }
         let parse_oid = |raw: &[u8]| {
@@ -215,7 +209,7 @@ fn parse(repo: &RepoHandle, bytes: &[u8]) -> Result<Vec<ChangedCommit>> {
                 .and_then(|text| text.parse::<i64>().ok())
                 .ok_or_else(bad)
         };
-        commits.push(ChangedCommit {
+        commits.push(Some(ChangedCommit {
             oid: parse_oid(oid)?,
             parent: parents
                 .split(|b| *b == b' ')
@@ -225,7 +219,7 @@ fn parse(repo: &RepoHandle, bytes: &[u8]) -> Result<Vec<ChangedCommit>> {
             author_time: seconds(author)?,
             commit_time: seconds(committer)?,
             changes,
-        });
+        }));
     }
     Ok(commits)
 }
