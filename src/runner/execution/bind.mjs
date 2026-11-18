@@ -88,9 +88,26 @@ export function viaSeatRoute(call) {
  *   keeps, else `seat-continuity-unavailable`), `from` (the binding left, default the last tried; recorded as
  *   `fallbackFrom`), `rotation` (same candidate, another account), `detail`, `reason` (default `provider-limit`)
  */
-export function bind(ask, ctx, { walk = {} } = {}) {
+export function bind(ask, ctx, { walk = {}, headLaunch = false } = {}) {
   const { binding, hostVersion } = viaSeatRoute(() => routeBind({ ask: ask ?? {}, walk, ...requestOf(ctx, Date.now()) }));
-  return withHostVersion(binding, hostVersion);
+  const refusal = headLaunch ? null : bypassOutsideHeadRefusal(binding, ctx?.runnerConfig);
+  return refusal ? { refused: refusal } : withHostVersion(binding, hostVersion);
+}
+
+/**
+ * A bypass invocation never asks before acting, so only the launch of a head session (`headLaunch`, set by the
+ * head start) may be bound to one; a capability, role or persona pin of it for a worker seat is refused here,
+ * the one place every seat binding goes through.
+ */
+function bypassOutsideHeadRefusal(binding, runnerConfig) {
+  if (!binding || binding.refused || !binding.executor || !binding.invocation) return null;
+  const invocation = runnerConfig?.executors?.[binding.executor]?.invocations?.find((i) => i.id === binding.invocation);
+  if (invocation?.permissionMode !== 'bypass') return null;
+  return {
+    reason: 'bypass-invocation-not-allowed',
+    detail: `invocation "${binding.executor}/${binding.invocation}" never asks before acting and is only for a head session's launch, not a worker seat`,
+    fix: 'name it only under runner.personas.<persona>.prefer of a head persona',
+  };
 }
 
 /**

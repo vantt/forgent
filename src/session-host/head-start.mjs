@@ -118,6 +118,7 @@ export async function bindHeadSeat({ persona, key, runnerConfig }) {
   const binding = bind(
     { unit: { id: key, capability: 'execute', rigor: 'standard', writes: [] }, seat: 'producer', role: 'producer', persona, readOnly: true, raiseAuthorized: false },
     { runnerConfig, session: { headless: false, herdrPresent: true, postureAtLaunch: true } },
+    { headLaunch: true },
   );
   if (binding.refused) {
     throw new HeadStartError('bind-refused', `no seat can serve persona "${persona}": ${binding.refused.reason}: ${binding.refused.detail}${binding.refused.fix ? `; ${binding.refused.fix}` : ''}`);
