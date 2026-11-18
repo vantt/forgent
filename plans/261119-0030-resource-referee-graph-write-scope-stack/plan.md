@@ -3,7 +3,8 @@ contract: plan-v1
 title: One door for resource contention and graph facts, as three independent packages every planner and engine can use
 status: draft
 priority: P2
-blockedBy: []
+blockedBy:
+  - 261118-0947-session-verb-for-agent-sessions
 footprint:
   - plans/261119-0030-resource-referee-graph-write-scope-stack
   - docs/platform/write-scope
@@ -184,12 +185,12 @@ deterministic); a parity corpus; a documented catalog of rule checks.
 
 | id | title | depends-on | footprint | wave | status |
 |---|---|---|---|---|---|
-| 1 | [Specs, boundary rows and contracts](phase-01-specs-and-contracts.md) | - | docs/platform/write-scope, docs/platform/graph, docs/platform/resource-referee, docs/platform/component-boundary.md, packages/graph/contracts, packages/resource-referee/contracts, plans/261119-0030-resource-referee-graph-write-scope-stack/reports | 1 | ready |
+| 1 | [Specs, boundary rows and contracts](phase-01-specs-and-contracts.md) | - | docs/platform/write-scope, docs/platform/graph, docs/platform/resource-referee, docs/platform/component-boundary.md, packages/graph/contracts, packages/resource-referee/contracts, plans/261119-0030-resource-referee-graph-write-scope-stack/reports | 1 | draft |
 | 2 | [Workspace scaffold and write-scope move](phase-02-scaffold-and-move.md) | - | Cargo.toml, Cargo.lock, packages/write-scope, packages/git/write-scope, packages/git/rust/Cargo.toml, packages/git/node-addon/Cargo.toml, packages/supervision/rust/Cargo.toml, packages/graph/rust, packages/resource-referee/rust, test/workflow/propose-classify.test.mjs | 1 | draft |
 | 3 | [write-scope: colliding pairs in a set](phase-03-write-scope-pairs.md) | 1, 2 | packages/write-scope, packages/git/node-addon/src, test/git/write-scope-parity.test.mjs, test/runner/write-scope.test.mjs | 2 | draft |
-| 4 | [graph crate and parity corpus](phase-04-graph-crate.md) | 1, 2 | packages/graph/rust | 2 | ready |
-| 5 | [resource-referee crate](phase-05-resource-referee-crate.md) | 1, 3, 4 | packages/resource-referee/rust | 3 | ready |
-| 6 | [Supervisor adapter](phase-06-supervisor-adapter.md) | 3 | packages/supervision/rust | 3 | ready |
+| 4 | [graph crate and parity corpus](phase-04-graph-crate.md) | 1, 2 | packages/graph/rust | 2 | draft |
+| 5 | [resource-referee crate](phase-05-resource-referee-crate.md) | 1, 3, 4 | packages/resource-referee/rust | 3 | draft |
+| 6 | [Supervisor adapter](phase-06-supervisor-adapter.md) | 3 | packages/supervision/rust | 3 | draft |
 | 7 | [Planner door and plan policy](phase-07-planner-door.md) | 1, 5, 6 | apps/fgos/src, packages/host-runtime/contracts, packages/supervision/contracts | 4 | draft |
 | 8 | [Work, plan-check and plan-lint adapters](phase-08-node-adapters.md) | 7 | src/state/graph-metrics.mjs, src/state/graph-harness.mjs, src/state/store.mjs, src/intake/plan.mjs, src/report/capability-plan-lint.mjs, src/cli/command-registry.mjs, scripts/plan-contract-check.mjs, test/state, test/scripts | 5 | draft |
 | 9 | [Discovery in the contract and skills](phase-09-discovery.md) | 7 | core/skills, plugins/fgOS/skills, .agents/skills, CHANGELOG.md, docs/reading-map.md | 5 | draft |
@@ -204,30 +205,24 @@ declares every dependency edge and the `serde` and `serde_json` entries for the 
 so later phases add none; a phase that must add an external crate stops and asks the lead),
 `mutation-census.v1.json` phase 10 (regenerated once by the lead), `CHANGELOG.md` phase 9.
 
-## Shared files with another active plan
+## Order against another active plan (owner decision 2026-11-19: hard order)
 
-Measured with the plan check's own overlap rule against every `ready` or `running` plan. Only
-`261118-0947-session-verb-for-agent-sessions` overlaps (its footprint is broad: `src/**`, `test/**`,
-`core/skills/**`, `apps/fgos/src/main.rs`, `packages/host-runtime/contracts/**`, the generated skill
-surfaces). Per phase:
+Measured with the plan check's own overlap rule against every `ready` or `running` plan, only
+`261118-0947-session-verb-for-agent-sessions` overlaps. Its footprint is broad (`src/**`, `test/**`,
+`core/skills/**`, `apps/fgos/src/main.rs`, `packages/host-runtime/contracts/**`,
+`packages/git/node-addon/**`, the generated skill surfaces). Phases 2, 3, 7, 8, 9 and 10 write files
+inside it; phases 1, 4, 5 and 6 do not.
 
-| Phase | Overlap with the session-verb plan | Status |
-|---|---|---|
-| 1, 4, 5, 6 | none | `ready` |
-| 2 | `packages/git/node-addon/Cargo.toml`, `test/workflow/propose-classify.test.mjs` (one path line) | `draft` |
-| 3 | `packages/git/node-addon/src`, `test/git/write-scope-parity.test.mjs`, `test/runner/write-scope.test.mjs` | `draft` |
-| 7 | `apps/fgos/src`, `packages/host-runtime/contracts` | `draft` |
-| 8, 9 | the Node adapters, `core/skills`, generated skills, `CHANGELOG.md`, `docs/reading-map.md` | `draft` |
-| 10 | `packages/git/contracts/mutation-census.v1.json`, `test/e2e` | `draft` |
+The owner chose a hard order, so this plan has `blockedBy: [261118-0947-session-verb-for-agent-sessions]`
+and stays `draft` as a whole. `blockedBy` is a plan-level field, so it also holds phases 1, 4, 5 and
+6, which would otherwise have been free to start. If the owner later wants those four to start
+first, split them into their own plan.
 
-The footprints are not narrowed, because those phases really write those files. The plan stays
-`draft` as a whole and the phases that touch nothing of the other plan are `ready`. Phase 1 can start
-now (it also decides how Node calls the packages and the door's name). Phases 4, 5 and 6 are `ready`
-but wait for their dependencies. Before phase 2 starts, message the lane that owns the session-verb
-plan with the files and hunks; the lane that lands second rebases (board rule). If the owner prefers
-a hard order instead, set `blockedBy: [261118-0947-session-verb-for-agent-sessions]`.
-`docs/reading-map.md` moved from phase 1 to phase 9 because it is a discovery index and the one
-file that made phase 1 overlap.
+The check script does not honour `blockedBy` when it looks for overlaps: `activeOverlaps` in
+`scripts/plan-contract-check.mjs:149-157` flags any two `ready` or `running` plans whose footprints
+overlap, while the plan contract says to resolve an overlap by `blockedBy`. So this plan cannot be
+set `ready` while the other plan is `ready` or `running`; once that plan is `done` the overlap
+disappears and this plan can be set `ready`. The mismatch is recorded below as a follow-up.
 
 ## Recorded follow-ups (separate items, not in this plan)
 
@@ -242,6 +237,9 @@ Found while reviewing; each is a duplicate or a candidate of the same kind and i
   `src/workflow/steps.mjs:12`, `packages/event-store/rust/src/order.rs` (event store stability comes
   first), `src/workflow/case-admission.mjs:62`, `src/state/frontier.mjs:315`.
 - The five guards of `src/workflow/case-admission.mjs` are candidate rules for a future ruleset.
+- `activeOverlaps` in `scripts/plan-contract-check.mjs:149-157` ignores `blockedBy`, contradicting the
+  plan contract section 5; either the script skips pairs where one plan is blocked by the other, or
+  the contract text changes. Phase 8 touches this script for another reason and should not absorb it.
 
 ## Owner questions
 
