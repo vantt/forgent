@@ -1,16 +1,58 @@
 {
   "name": "supervisor-idle-burn",
-  "requires": ["fgos.supervisor.wake", "fgos.watcher.tick"],
+  "requires": [
+    "fgos.supervisor.wake",
+    "fgos.watcher.tick"
+  ],
   "query": {
-    "kind": ["fgos.supervisor.wake"],
+    "kind": [
+      "fgos.supervisor.wake"
+    ],
     "where": [
-      { "field": "fgos.supervisor.outcome", "op": "eq", "value": "started" }
+      {
+        "field": "fgos.supervisor.outcome",
+        "op": "eq",
+        "value": "started"
+      }
     ],
     "without": [
-      { "kind": ["fgos.watcher.tick"], "where": [{ "field": "fgos.plans.running", "op": "gt", "value": 0 }], "within": "10m", "anchor": "record" },
-      { "kind": ["fgos.watcher.tick"], "where": [{ "field": "fgos.plans.ready", "op": "gt", "value": 0 }], "within": "10m", "anchor": "record" }
+      {
+        "kind": [
+          "fgos.watcher.tick"
+        ],
+        "where": [
+          {
+            "field": "fgos.plans.running",
+            "op": "gt",
+            "value": 0
+          }
+        ],
+        "within": "1h",
+        "anchor": "record",
+        "latest": true
+      },
+      {
+        "kind": [
+          "fgos.watcher.tick"
+        ],
+        "where": [
+          {
+            "field": "fgos.plans.ready",
+            "op": "gt",
+            "value": 0
+          }
+        ],
+        "within": "1h",
+        "anchor": "record",
+        "latest": true
+      }
     ],
-    "by": ["subject.id"],
-    "agg": ["count", "max:ts"]
+    "by": [
+      "subject.id"
+    ],
+    "agg": [
+      "count",
+      "max:ts"
+    ]
   }
 }

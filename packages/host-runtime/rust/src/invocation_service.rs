@@ -12,7 +12,7 @@ use crate::contracts::{
     ContractRef, HostInvocation, OperationId, ProviderDescriptor, ProviderError, ProviderOutcome,
     RegistrySnapshot,
 };
-use crate::operation_provider_router::{select, RouterPolicy, SelectionInput, SelectionRefused};
+use crate::operation_provider_router::{select, SelectionInput, SelectionRefused};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::future::Future;
@@ -590,7 +590,6 @@ impl InvocationService {
             outcome_contract_version: admitted.operation.outcome_contract.version(),
             host_kind: &invocation.host_kind,
             invocation_mode: "sync",
-            policy: RouterPolicy,
         };
 
         let selected_provider = match select(selection_input, &self.snapshot) {
@@ -940,18 +939,17 @@ impl InvocationService {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::catalog::CATALOG;
     use crate::contracts::{
         ContractRef, HostInvocation, OperationId, OperationRequest, ProviderLifecycle,
     };
-    use crate::providers::builtin::{EchoAction, EchoProvider, ECHO_PROVIDER_DESCRIPTOR};
+    use crate::echo_operation::{echo_catalog, EchoAction, EchoProvider, ECHO_PROVIDER_DESCRIPTOR};
     use std::borrow::Cow;
     use std::time::Duration;
 
     fn build_test_service() -> InvocationService {
         static TEST_PROVIDERS: &[ProviderDescriptor] = &[ECHO_PROVIDER_DESCRIPTOR];
         let snapshot = RegistrySnapshot {
-            catalog: CATALOG,
+            catalog: echo_catalog(),
             providers: TEST_PROVIDERS,
             fingerprint: "test-snapshot-p06",
         };
@@ -1086,13 +1084,13 @@ mod tests {
                 health: None,
             }];
 
-            static SNAPSHOT: RegistrySnapshot = RegistrySnapshot {
-                catalog: CATALOG,
+            let snapshot = RegistrySnapshot {
+                catalog: echo_catalog(),
                 providers: PRIVILEGED_PROVIDERS,
                 fingerprint: "test-grant-refused",
             };
 
-            let service = InvocationService::new(SNAPSHOT.clone());
+            let service = InvocationService::new(snapshot);
             service.register_provider(Arc::new(EchoProvider::with_descriptor(
                 PRIVILEGED_PROVIDERS[0].clone(),
             )));

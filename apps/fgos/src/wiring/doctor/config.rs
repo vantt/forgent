@@ -7,7 +7,7 @@
 use super::CONFIG_ROWS_JSON;
 #[cfg(unix)]
 use fgos_config::doctor::{Consumer, Finding, Severity};
-use fgos_distribution::doctor::{FixResult, RowOutcome, RowResult};
+use fgos_distribution::doctor::{timed, FixResult, RowOutcome, RowResult};
 #[cfg(unix)]
 use serde_json::Value;
 use std::path::Path;
@@ -107,6 +107,7 @@ fn describe(finding: &Finding) -> String {
 #[cfg(unix)]
 fn map_findings(findings: &[&Finding], description: &str) -> RowResult {
     let verdict = |passed: bool, message: String| RowResult {
+        elapsed_ms: None,
         passed,
         status: None,
         message: Some(message),
@@ -144,26 +145,29 @@ fn map_findings(findings: &[&Finding], description: &str) -> RowResult {
 fn rows_from(findings: &Result<Vec<Finding>, String>, ids: &[&str]) -> Vec<RowOutcome> {
     ids.iter()
         .map(|id| {
-            let result = match (findings, contract_row(id)) {
-                (Err(why), _) => RowResult {
-                    passed: false,
-                    status: None,
-                    message: Some(why.clone()),
-                    fix_command: None,
-                    detail: None,
-                },
-                (Ok(findings), Some((row, description))) => {
-                    let own: Vec<&Finding> = findings.iter().filter(|f| f.row == row).collect();
-                    map_findings(&own, &description)
-                }
-                (Ok(_), None) => {
-                    return RowOutcome::Unavailable {
-                        message: format!("the config contract has no row {id}"),
-                        next: "run fgos doctor again".to_owned(),
+            timed(|| {
+                let result = match (findings, contract_row(id)) {
+                    (Err(why), _) => RowResult {
+                        elapsed_ms: None,
+                        passed: false,
+                        status: None,
+                        message: Some(why.clone()),
+                        fix_command: None,
+                        detail: None,
+                    },
+                    (Ok(findings), Some((row, description))) => {
+                        let own: Vec<&Finding> = findings.iter().filter(|f| f.row == row).collect();
+                        map_findings(&own, &description)
                     }
-                }
-            };
-            RowOutcome::Judged(result)
+                    (Ok(_), None) => {
+                        return RowOutcome::Unavailable {
+                            message: format!("the config contract has no row {id}"),
+                            next: "run fgos doctor again".to_owned(),
+                        }
+                    }
+                };
+                RowOutcome::Judged(result)
+            })
         })
         .collect()
 }
@@ -234,6 +238,7 @@ pub fn judge_rows(root: &Path, ids: &[&str]) -> Vec<RowOutcome> {
         ids.iter()
             .map(|_| {
                 RowOutcome::Judged(RowResult {
+                    elapsed_ms: None,
                     passed: false,
                     status: None,
                     message: Some(UNSUPPORTED.to_owned()),

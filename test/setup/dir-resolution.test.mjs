@@ -24,6 +24,16 @@ function initGitWithWorktree(prefix) {
   return { main, wt };
 }
 
+// Two runs never share the wall clock: each row carries the time its check took, and the observe write-health row
+// words its lookback window as "since <now minus a fixed lookback>". Both are timing, not findings, so they are
+// normalized; every other field and message must still match exactly.
+function withoutElapsed(checks) {
+  return checks.map(({ elapsedMs: _elapsedMs, message, ...row }) => ({
+    ...row,
+    message: typeof message === 'string' ? message.replace(/ since \d{4}-\d\d-\d\dT[\d:.]+Z/, ' since <window-start>') : message,
+  }));
+}
+
 function cleanup(...dirs) {
   for (const dir of dirs) fs.rmSync(dir, { recursive: true, force: true });
 }
@@ -62,8 +72,8 @@ test('tsk-2xj: fgos doctor run bare from a linked worktree reports the same chec
     const atMain = runFgos(main, ['doctor'], homeDir);
     assert.equal(atMain.status, 0, atMain.stderr);
     assert.deepEqual(
-      JSON.parse(bare.stdout).data.checks,
-      JSON.parse(atMain.stdout).data.checks,
+      withoutElapsed(JSON.parse(bare.stdout).data.checks),
+      withoutElapsed(JSON.parse(atMain.stdout).data.checks),
       'bare doctor run from inside a linked worktree must resolve to the same main checkout running doctor directly at that checkout does',
     );
   } finally {

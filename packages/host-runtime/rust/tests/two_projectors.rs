@@ -85,15 +85,17 @@ pub mod remote_projector {
     }
 }
 
-use fgos_host_runtime::{
-    EchoProvider, InvocationService, RegistrySnapshot, CATALOG, ECHO_PROVIDER_DESCRIPTOR,
-};
+#[path = "support/echo_operation.rs"]
+mod echo_operation;
+
+use echo_operation::{echo_catalog, EchoProvider, ECHO_PROVIDER_DESCRIPTOR};
+use fgos_host_runtime::{InvocationService, RegistrySnapshot};
 use std::sync::Arc;
 
 fn build_runtime_service() -> InvocationService {
     static PROVIDERS: &[fgos_host_runtime::ProviderDescriptor] = &[ECHO_PROVIDER_DESCRIPTOR];
     let snapshot = RegistrySnapshot {
-        catalog: CATALOG,
+        catalog: echo_catalog(),
         providers: PROVIDERS,
         fingerprint: "snapshot-two-projectors",
     };

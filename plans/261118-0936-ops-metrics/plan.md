@@ -1,7 +1,7 @@
 ---
 contract: plan-v1
 title: "Operations measurement: one observe contract for writing and querying, run facts, friction, attention detections"
-status: ready
+status: running
 priority: P1
 blockedBy: []
 footprint:
@@ -26,8 +26,11 @@ footprint:
   - test/fixtures/observe/driving/**
   - docs/platform/observe/**
   - docs/backlog.md
-  - packages/distribution/contracts/doctor-registry.v1.json
   - apps/fgos/src/wiring/doctor/observe.rs
+  - apps/fgos/src/wiring/doctor/mod.rs
+  - test/setup/registrations.test.mjs
+  - docs/platform/packaging-distribution/contracts/setup-doctor-registry.md
+  - packages/observe/rust/src/friction.rs
 base: ebff368da7c1d1d705c2ec386dd53d5b20544cd4
 source:
   - docs/discussions/ops-metrics/DISCUSSION.md
@@ -169,7 +172,7 @@ their consumers. A detection the supervisor plan adds later (pace, OM-D10), or o
 | 14 | [Attention detections as definitions](phase-14-attention-detections.md) | 7, 8, 11 | src/runner/dispatch/attention-view.mjs, src/verbs/dispatch/inspect.mjs, core/attention/**, core/config-standard/dispatch.yaml, core/config-schema/dispatch.schema.yaml, packages/config/contracts/fixtures/**, test/runner/dispatch-runtime-inspect.test.mjs | 5 | done |
 | 15 | [Driving measures as definitions](phase-15-driving-measures.md) | 7, 8, 11 | domains/coding/observe/**, apps/fgos/tests/driving_definitions.rs, test/fixtures/observe/driving/** | 5 | done |
 | 17 | [Query grammar for the supervisor's definitions](phase-17-grammar-for-supervisor-definitions.md) | 5, 7 | packages/observe/rust/src/query/**, packages/observe/rust/src/definition/**, packages/observe/rust/src/metrics_cli/query.rs, packages/observe/rust/tests/query_*.rs, packages/observe/rust/tests/definition_*.rs, test/fixtures/observe/query/** | 5 | done |
-| 16 | [Docs, backlog, doctor and integration gate](phase-16-docs-and-integration.md) | 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 17 | docs/platform/observe/**, docs/backlog.md, CHANGELOG.md, packages/distribution/contracts/doctor-registry.v1.json, apps/fgos/src/wiring/doctor/observe.rs | 6 | ready |
+| 16 | [Docs, backlog, doctor and integration gate](phase-16-docs-and-integration.md) | 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 17 | docs/platform/observe/**, docs/backlog.md, CHANGELOG.md, packages/distribution/contracts/doctor-registry.v1.json, apps/fgos/src/wiring/doctor/observe.rs | 6 | running |
 
 Contract reading check (planner), after the independent validation of 2026-11-18
 (`reports/validation-261118-plan-review.md`):
@@ -197,6 +200,23 @@ External dependents:
   - Its watcher runs the phase-14 definitions.
 - **The owner-question component** (shaper `shape-owner-questions`, OM-D14). Its `fgos questions ask|answer` emits
   `fgos.question.*` through the phase-4 door, and it declares those kinds itself.
+
+## Remaining gated steps (phase 16)
+
+All code of phases 1-17 is on main (last 0a3f46ac5); the combined-tree gate passed except three tests owned by other
+lanes. Two steps wait on outside events; a short lead finishes them:
+
+1. **Live friction migration.** Gate: a release containing phase 13 (d59b56b6c) is installed, so new friction is no
+   longer written to the old shards. Then run `fgos friction migrate --to-records` in each project with
+   `.fgos/observe/friction/` (main checkout first), record in/out counts here (dry run 2026-11-18: 1372 in, 1372 out),
+   check `fgos doctor` row `observe-friction-migrated` is clear, then delete the old shards (phase 16 step 7).
+2. **CHANGELOG.** Gate: plan 261118-1455 (S6a worktree door) is done, so `CHANGELOG.md` can rejoin this footprint. Add
+   `[Unreleased]` lines for phases 14-17: `fgos dispatch inspect --attention` head-gone / plan-no-progress rows and
+   `dispatch.attention.planNoProgressMinutes`; driving-measure definitions under `domains/coding/observe/definitions`;
+   the phase 17 query forms (prefix, any, anchor after, without.latest, window own, k/within from a param, max:end,
+   min:ts); doctor rows `observe-write-health` and `observe-friction-migrated`.
+
+Then mark phase 16 and the plan `done`.
 
 ## Owner questions
 

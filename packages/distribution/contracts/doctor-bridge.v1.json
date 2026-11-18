@@ -20,7 +20,8 @@
         "status",
         "message",
         "fixCommand",
-        "detail"
+        "detail",
+        "elapsedMs"
       ]
     },
     "fix": {
@@ -66,9 +67,10 @@
         "fixCommand": "install curl",
         "detail": {
           "path": "/usr/bin"
-        }
+        },
+        "elapsedMs": 12
       },
-      "line": "\u001eFGOS-DOCTOR-BRIDGE {\"kind\":\"row\",\"id\":\"curl-available\",\"passed\":false,\"status\":\"fail\",\"message\":\"curl is not on PATH\",\"fixCommand\":\"install curl\",\"detail\":{\"path\":\"/usr/bin\"}}\n"
+      "line": "\u001eFGOS-DOCTOR-BRIDGE {\"kind\":\"row\",\"id\":\"curl-available\",\"passed\":false,\"status\":\"fail\",\"message\":\"curl is not on PATH\",\"fixCommand\":\"install curl\",\"detail\":{\"path\":\"/usr/bin\"},\"elapsedMs\":12}\n"
     },
     {
       "name": "a judged row with only a verdict",

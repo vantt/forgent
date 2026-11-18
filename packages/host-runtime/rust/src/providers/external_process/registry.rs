@@ -241,7 +241,7 @@ impl ExternalProcessLinker {
 
         Self {
             catalog: Some(crate::catalog::CATALOG),
-            builtin_providers: vec![crate::providers::builtin::ECHO_PROVIDER_DESCRIPTOR],
+            builtin_providers: Vec::new(),
             known_capabilities,
             reserved_namespaces,
             expected_contracts,

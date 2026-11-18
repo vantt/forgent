@@ -11,7 +11,11 @@
 use fgos_host_runtime::providers::external_process::{
     parse_contract_ref, ExternalManifest, ExternalProcessLinker, LinkerError, ManifestError,
 };
-use fgos_host_runtime::{ContractRef, OperationId, CATALOG, ECHO_PROVIDER_DESCRIPTOR};
+use fgos_host_runtime::{ContractRef, OperationId};
+#[path = "support/echo_operation.rs"]
+mod echo_operation;
+
+use echo_operation::{echo_catalog, ECHO_PROVIDER_DESCRIPTOR};
 use std::fs;
 use std::path::{Path, PathBuf};
 
@@ -498,7 +502,9 @@ fn linker_refusal_contract_version_exact_match_regression() {
 
 #[test]
 fn linker_refusal_builtin_replacement() {
-    let linker = ExternalProcessLinker::new();
+    let linker = ExternalProcessLinker::new()
+        .with_catalog(echo_catalog())
+        .with_builtin_providers(vec![ECHO_PROVIDER_DESCRIPTOR]);
 
     // 1. Manifest with provider_id matching builtin provider
     let path = fixture_path("manifest_builtin_replacement.yaml");
@@ -612,8 +618,8 @@ fn registry_snapshot_deterministic_output() {
     );
 
     // Verify build_snapshot produces valid RegistrySnapshot with builtin and external providers
-    let snapshot = reg_order_1.build_snapshot(CATALOG, &[ECHO_PROVIDER_DESCRIPTOR]);
-    assert_eq!(snapshot.catalog().len(), CATALOG.len());
+    let snapshot = reg_order_1.build_snapshot(echo_catalog(), &[ECHO_PROVIDER_DESCRIPTOR]);
+    assert_eq!(snapshot.catalog().len(), echo_catalog().len());
     assert_eq!(snapshot.providers().len(), 1 + 3); // 1 builtin + 3 external
     assert_eq!(snapshot.fingerprint(), reg_order_1.fingerprint());
 }

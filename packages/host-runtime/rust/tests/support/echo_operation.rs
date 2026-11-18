@@ -1,16 +1,42 @@
-//! In-memory builtin providers for `fgos-host-runtime`.
+//! Test-only echo operation shared by the crate's unit and integration tests.
 //!
-//! Kernel §6: Builtin providers receive typed Rust requests and return typed outcomes.
-//! R6: Implements one in-memory `test.fixture.echo` `OperationProvider` used only by this crate's tests.
+//! The production catalog never lists `test.fixture.echo`; tests that need an
+//! echo operation take its descriptor, provider and catalog from here.
 
-use crate::contracts::{
-    ContractRef, HostInvocation, OperationId, OperationRequest, ProviderDescriptor, ProviderError,
-    ProviderLifecycle, ProviderOutcome,
+#![allow(dead_code)]
+
+use fgos_host_runtime::{
+    ContractRef, EventSink, HostInvocation, InvocationControl, OperationCatalog,
+    OperationDescriptor, OperationEffect, OperationId, OperationIdempotency, OperationProvider,
+    OperationRequest, ProviderDescriptor, ProviderError, ProviderLifecycle, ProviderOutcome,
+    StreamingMode, CATALOG,
 };
-use crate::invocation_service::{EventSink, InvocationControl, OperationProvider};
 use std::borrow::Cow;
 use std::future::Future;
 use std::pin::Pin;
+
+/// Catalog entry of the echo operation.
+pub const ECHO_OPERATION: OperationDescriptor = OperationDescriptor {
+    operation_id: OperationId::from_static("test.fixture.echo"),
+    owning_component_id: Cow::Borrowed("test"),
+    request_contract: ContractRef::from_static("test.fixture.echo.request", "1.0.0"),
+    outcome_contract: ContractRef::from_static("test.fixture.echo.outcome", "1.0.0"),
+    effect: OperationEffect::Read,
+    idempotency: OperationIdempotency::Safe,
+    authority_policy_id: Cow::Borrowed("test.read"),
+    allowed_host_kinds: &["cli", "remote", "test"],
+    streaming_mode: StreamingMode::None,
+};
+
+/// The production catalog plus the echo operation.
+pub fn echo_catalog() -> OperationCatalog {
+    static CELL: std::sync::OnceLock<&'static [OperationDescriptor]> = std::sync::OnceLock::new();
+    CELL.get_or_init(|| {
+        let mut entries = CATALOG.to_vec();
+        entries.push(ECHO_OPERATION);
+        Box::leak(entries.into_boxed_slice())
+    })
+}
 
 /// Provider descriptor for `test.fixture.echo.builtin`.
 pub const ECHO_PROVIDER_DESCRIPTOR: ProviderDescriptor = ProviderDescriptor {

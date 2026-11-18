@@ -6,7 +6,7 @@
 use super::{judged, project_root_refusal, Rows};
 use crate::wiring::mailbox_verbs;
 use fgos_distribution::agent_hooks::{mailbox_opt_in, refused_config_name, MailboxOptIn};
-use fgos_distribution::doctor::{FixResult, RowOutcome};
+use fgos_distribution::doctor::{timed, FixResult, RowOutcome};
 use fgos_distribution::timer::{
     check_managed_timer, fix_managed_timer, Check, Fix, Schedule, TimerEnv,
 };
@@ -30,12 +30,14 @@ pub const GROUP: Rows = Rows {
 
 fn judge(root: &Path, ids: &[&str]) -> Vec<RowOutcome> {
     ids.iter()
-        .map(|id| match *id {
-            "mailbox-hook" => mailbox_hook(root),
-            "mailbox-sync-timer" => timer_row(Schedule::MailboxSync, root),
-            "account-probe-timer" => timer_row(Schedule::AccountProbe, root),
-            "watcher-timer" => timer_row(Schedule::WatcherTick, root),
-            other => unreachable!("mailbox group asked for row {other}"),
+        .map(|id| {
+            timed(|| match *id {
+                "mailbox-hook" => mailbox_hook(root),
+                "mailbox-sync-timer" => timer_row(Schedule::MailboxSync, root),
+                "account-probe-timer" => timer_row(Schedule::AccountProbe, root),
+                "watcher-timer" => timer_row(Schedule::WatcherTick, root),
+                other => unreachable!("mailbox group asked for row {other}"),
+            })
         })
         .collect()
 }

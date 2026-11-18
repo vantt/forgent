@@ -1,2 +1,3 @@
-{"v":2,"id":"b1","kind":"fgos.head.state","ts":"2026-11-18T09:00:00Z","subject":{"kind":"head","id":"h1"},"attrs":{"fgos.head.state":"live"},"basis":"observed","origin":{"source":"fixture"}}
-{"v":2,"id":"b2","kind":"fgos.head.state","ts":"2026-11-18T11:30:00Z","subject":{"kind":"head","id":"h2"},"attrs":{"fgos.head.state":"gone"},"basis":"observed","origin":{"source":"fixture"}}
+{"v":2,"id":"b1","kind":"fgos.head.state","ts":"2026-11-18T09:00:00Z","subject":{"kind":"head","id":"h1"},"attrs":{"fgos.head.state":"live","fgos.head.role":"head:lead-ops"},"basis":"observed","origin":{"source":"fixture"}}
+{"v":2,"id":"b2","kind":"fgos.head.state","ts":"2026-11-18T11:30:00Z","subject":{"kind":"head","id":"h2"},"attrs":{"fgos.head.state":"retired","fgos.head.role":"head:secretary-miu"},"basis":"observed","origin":{"source":"fixture"}}
+{"v":2,"id":"b3","kind":"fgos.head.state","ts":"2026-11-18T11:40:00Z","subject":{"kind":"head","id":"h3"},"attrs":{"fgos.head.state":"gone","fgos.head.role":"head:lead-sv"},"basis":"observed","origin":{"source":"fixture"}}

@@ -6,7 +6,7 @@
 use super::{Rows, Run};
 use crate::wiring::events::resolve_message;
 use fgos_config::event_store::EventStoreConfig;
-use fgos_distribution::doctor::{FixResult, RowOutcome, RowResult};
+use fgos_distribution::doctor::{timed, FixResult, RowOutcome, RowResult};
 use fgos_event_store::{
     diagnostics, layout::Layout, legacy_import, lifecycle, resolve, resolve::Resolved,
 };
@@ -34,7 +34,9 @@ pub const GROUP: Rows = Rows {
 fn judge_rows(root: &Path, ids: &[&str]) -> Vec<RowOutcome> {
     let run = Run::new(root);
     ids.iter()
-        .map(|id| RowOutcome::Judged(judge(&run, id).expect("the group asked for its own row")))
+        .map(|id| {
+            timed(|| RowOutcome::Judged(judge(&run, id).expect("the group asked for its own row")))
+        })
         .collect()
 }
 
@@ -151,6 +153,7 @@ impl Run<'_> {
 
 fn pass(message: impl Into<String>) -> RowResult {
     RowResult {
+        elapsed_ms: None,
         passed: true,
         status: None,
         message: Some(message.into()),
@@ -165,6 +168,7 @@ fn warn(message: impl Into<String>) -> RowResult {
 
 fn fail(message: impl Into<String>) -> RowResult {
     RowResult {
+        elapsed_ms: None,
         passed: false,
         ..pass(message)
     }

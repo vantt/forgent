@@ -153,20 +153,28 @@ T7 Work stays closed (decision 78: its council opens after T8 and the non-Work a
 
 ## 6. Standing brief for leads
 
-The lead brief `.fgos/runtime/tmp/t6-phase-lead-brief.md` is untracked and lives only in one checkout, which a wipe can remove. Its durable content is the rules above: OL-01, OL-02, OL-03, OL-04, OL-05, OL-07, OL-16, OL-17, OL-18, OL-25 (the stash ban goes at the top of the brief), OL-26, and HL-04, HL-08, HL-21. The skill `cs-hardening` carries these rules in its multi-agent operations reference; a brief template, if one is written, comes from those rules, not from that file.
+The lead brief `.fgos/runtime/tmp/t6-phase-lead-brief.md` is untracked and lives only in one checkout, which a wipe can remove. Its durable content is the rules above: OL-01, OL-02, OL-03, OL-04, OL-05, OL-07, OL-16, OL-17, OL-18, OL-25 (the stash ban goes at the top of the brief), OL-26, and HL-04, HL-08, HL-21. The sibling skill `cs-hardening-ops` carries these rules; a brief template, if one is written, comes from those rules, not from that file.
 
 ## 7. Open questions for the skill
 
 These need the owner. Each is a question about what the skill should keep, not an answer.
 
 - **Q-01 Generic or fgOS-specific.** The method (loop, HL-01 to HL-14) looks generic. fgOS names (`fgos worktree`, census, COOK, OPC, `run-tests`, V7n red) are not. Proposal: the skill keeps the loop and rules in generic words and moves fgOS commands to `references.md` as "proven ways", as `cs-packaging-distribution` does.
-- **Q-02 What "layer" means outside fgOS.** The skill assumes the system already has layers with a lower and an upper. Does `cs-hardening` need a section on how to find the layers first?
+- **Q-02 What "layer" means outside fgOS. Resolved 2026-11-18.** Answered in the skill: workflow step 1 of `cs-hardening` frames the layers first and, if there are none, the first job is a layer map.
 - **Q-03 Language overlays.** HARDEN moved decisions into Rust (design principle 4). Is "Rust first" a rule, or a `languages/rust.md` overlay with a Node overlay beside it?
 - **Q-04 Budgets.** Many budgets were missed and accepted after the fact (T0, T2, T4, T6). Should the skill require the owner to approve size budgets before the sub-plan, and treat a missed budget as a stop, not a note? (HL-14 says so; practice did not follow it in T2.)
 - **Q-05 Council seats.** Four seats ran on different models. Is the seat list fixed, or a template with the red-team seat mandatory?
-- **Q-06 Operational lessons.** OL-01 to OL-18 are mostly multi-agent hygiene, not hardening. Do they belong in `cs-hardening`, or in a sibling skill for running many agent leads? Several (OL-01, OL-03, OL-04) are agent-safety rules with their own hooks.
+- **Q-06 Operational lessons. Resolved 2026-11-18.** Owner decision (relayed by `forgent-c0`): split a sibling skill. `cs-hardening` keeps only lessons that make the code hard (architecture, clean code, explicit contracts, clear component authority); multi-agent operations, tooling traps and landing and process hygiene go to the sibling `cs-hardening-ops`. The sort of all 74 rules is in section 8.
 - **Q-07 Evidence gaps to close before distilling (still open).** No repo record was found for: the first pgrep self-match incident (OL-04; OL-19 records a recurrence on the big lead's word only), the "149 commits" number (OL-10), the late opening of T9 (OL-09), the relayed-review limit (OL-12), and the exact prune race (OL-11). The owner can confirm each or drop it. Leads were asked to end reports with a `## Lessons` section from 2026-11-09; the 2026-11-12 reports carry them and are folded in (HL-21 to HL-28, OL-25 to OL-29).
 - **Q-08 Where the ledger lives. Resolved 2026-11-15.** The ledger stays beside the plan as the stateful evidence record. The skill `cs-hardening` (skillstation hub, `skills/default/cs-hardening/`) holds the distilled rules and is updated the same day a lesson is appended here (OL-37). The ledger is not moved into the skill.
+
+## 8. Which skill holds which rule (decided 2026-11-18)
+
+Sorted by meaning, not by prefix. A rule appears in exactly one skill. Ledger first, skills second (OL-37).
+
+- **`cs-hardening` (31):** HL-01 to HL-10, HL-12, HL-13, HL-14, HL-16 to HL-19, HL-22, HL-24, HL-25, HL-27 to HL-31, HL-35 to HL-37, OL-09, OL-10, OL-11.
+- **`cs-hardening-ops` (43):** HL-11, HL-15, HL-20, HL-21, HL-23, HL-26, HL-32, HL-33, HL-34, and OL-01 to OL-08, OL-12 to OL-37.
+- **Judgment calls.** Kept in `cs-hardening`: HL-10, HL-13, HL-22, HL-24, HL-27, OL-09, OL-10, OL-11. Sent to `cs-hardening-ops`: HL-11, HL-23, HL-26, HL-33, HL-34, OL-16, OL-34. A rule that changes sides changes the table here first.
 
 ## Sources
 

@@ -12,7 +12,7 @@ use crate::wiring::dispatch_decide::HostWorkspace;
 use crate::wiring::process_env;
 use crate::wiring::seat_binding::{HostMachine, HostProbe};
 use fgos_distribution::doctor::FixResult;
-use fgos_distribution::doctor::RowOutcome;
+use fgos_distribution::doctor::{timed, RowOutcome};
 use fgos_execution::checks::{
     agy_sub_homes_configured, capability_serves_valid, cleaned, executor_confinement,
     invocation_git_write_grants, omp_executors_of, omp_natives_present, runner_generated_paths,
@@ -216,38 +216,40 @@ fn judge(root: &Path, ids: &[&str]) -> Vec<RowOutcome> {
     let config = Config::new(root);
     let env = process_env();
     ids.iter()
-        .map(|id| match *id {
-            "runner-generated-paths" => with_raw(&config, runner_generated_paths),
-            "capability-serves-valid" => with_raw(&config, capability_serves_valid),
-            "executor-confinement" => {
-                with_loaded(&config, "confinement not evaluated", executor_confinement)
-            }
-            "invocation-git-write-grants" => with_loaded(
-                &config,
-                "git write grants not evaluated",
-                invocation_git_write_grants,
-            ),
-            "omp-natives-present" => {
-                // An unreadable runner config is its own row's failure; here it only means no executor is
-                // known to run omp.
-                let users = config
-                    .loaded()
-                    .map(|runner| omp_executors_of(&runner))
-                    .unwrap_or_default();
-                row(omp_natives_present(&HostOmp { env: env.clone() }, &users))
-            }
-            "agy-sub-homes-configured" => {
-                // A config the door refuses names no sub-HOME; the config rows report the refusal itself.
-                let runner = config.raw().cloned().unwrap_or_else(|_| json!({}));
-                row(agy_sub_homes_configured(
-                    &runner,
-                    &HostHomes {
-                        home: home_of(&env).to_string_lossy().into_owned(),
-                    },
-                ))
-            }
-            "tool-registry-configured" => tool_row(root),
-            other => unreachable!("execution group asked for row {other}"),
+        .map(|id| {
+            timed(|| match *id {
+                "runner-generated-paths" => with_raw(&config, runner_generated_paths),
+                "capability-serves-valid" => with_raw(&config, capability_serves_valid),
+                "executor-confinement" => {
+                    with_loaded(&config, "confinement not evaluated", executor_confinement)
+                }
+                "invocation-git-write-grants" => with_loaded(
+                    &config,
+                    "git write grants not evaluated",
+                    invocation_git_write_grants,
+                ),
+                "omp-natives-present" => {
+                    // An unreadable runner config is its own row's failure; here it only means no executor is
+                    // known to run omp.
+                    let users = config
+                        .loaded()
+                        .map(|runner| omp_executors_of(&runner))
+                        .unwrap_or_default();
+                    row(omp_natives_present(&HostOmp { env: env.clone() }, &users))
+                }
+                "agy-sub-homes-configured" => {
+                    // A config the door refuses names no sub-HOME; the config rows report the refusal itself.
+                    let runner = config.raw().cloned().unwrap_or_else(|_| json!({}));
+                    row(agy_sub_homes_configured(
+                        &runner,
+                        &HostHomes {
+                            home: home_of(&env).to_string_lossy().into_owned(),
+                        },
+                    ))
+                }
+                "tool-registry-configured" => tool_row(root),
+                other => unreachable!("execution group asked for row {other}"),
+            })
         })
         .collect()
 }

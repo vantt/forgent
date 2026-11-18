@@ -995,6 +995,11 @@ impl GitDriver {
                     Some(&land),
                 )
             });
+        let interrupted = filesystem.checkpoint("land-push-after-transfer");
+        if let Err(e) = interrupted {
+            // A crash here leaves the temporary branch; the Land's recovery deletes it.
+            return Err(failure(e));
+        }
         // Best effort: a leftover branch is only a name for the same commit.
         let _ = self.delete_ref(
             repo,
@@ -1225,10 +1230,7 @@ impl GitDriver {
                 &["rev-parse", &format!("{}^{{tree}}", next.as_str())],
                 &[],
             )?;
-            if head_tree != next_tree
-                || crate::refs::direct(self, repo, target)? != new
-                || crate::refs::direct(self, repo, remote_tracking)? != new
-            {
+            if head_tree != next_tree || crate::refs::direct(self, repo, target)? != new {
                 return Err(recovery("checkout-read-back-recovery-required"));
             }
             let index = self.land_text(repo, &scope, &["write-tree"], &[])?;
@@ -1681,6 +1683,24 @@ impl GitDriver {
         p.insert("ref".into(), slot_key(&req.destination));
         slot.acquire("merge-slot", &p, Wait::Ms(0))
             .map_err(failure)?;
+        // A crashed `push_land_candidate` leaves its temporary branch. The Refs door drops it
+        // under the merge slot with the candidate as exact-old and under the same operation id
+        // as the normal path, so a half-done drop replays. A refusal (branch in use, moved, or
+        // pointing elsewhere) leaves the branch: it is only a name.
+        let push_branch =
+            RefName::parse(&format!("refs/heads/fgos-land-push-{id}")).map_err(failure)?;
+        let pushed_candidate =
+            Oid::parse(&payload.candidate.candidate, repo.object_format()).map_err(failure)?;
+        if crate::refs::direct(self, repo, &push_branch)? != ExpectedTip::Absent {
+            let _ = self.delete_ref(
+                repo,
+                held(&slot)?,
+                &push_branch,
+                &pushed_candidate,
+                writer,
+                &format!("{id}-pushsrc-drop"),
+            );
+        }
         let mut scope = crate::refs::acquire_worktree_admin(
             repo,
             held(&slot)?,

@@ -295,7 +295,11 @@ const NATIVE_SOURCES = {
     subs: RUST('packages/observe/rust/src/metrics_cli/mod.rs'),
     region: (sub) => {
       const file = path.join(REPO_ROOT, `packages/observe/rust/src/metrics_cli/${sub}.rs`);
-      return fs.existsSync(file) ? fs.readFileSync(file, 'utf8') : '';
+      if (!fs.existsSync(file)) return '';
+      // Only the sub-verb's own code: its tests name flags the parser must refuse.
+      const src = fs.readFileSync(file, 'utf8');
+      const tests = src.indexOf('#[cfg(test)]');
+      return tests >= 0 ? src.slice(0, tests) : src;
     },
   },
   friction: {

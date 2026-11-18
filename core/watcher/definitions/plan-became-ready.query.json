@@ -1,14 +1,34 @@
 {
   "name": "plan-became-ready",
-  "requires": ["fgos.plan.status"],
+  "requires": [
+    "fgos.plan.status"
+  ],
   "query": {
-    "kind": ["fgos.plan.status"],
-    "where": [
-      { "field": "fgos.plan.change", "op": "ne", "value": "priority" },
-      { "field": "fgos.plan.status", "op": "eq", "value": "ready" }
+    "kind": [
+      "fgos.plan.status"
     ],
-    "by": ["subject.id"],
-    "agg": ["max:ts"]
+    "where": [
+      {
+        "field": "fgos.plan.change",
+        "op": "eq",
+        "value": "status"
+      },
+      {
+        "field": "fgos.plan.to",
+        "op": "eq",
+        "value": "ready"
+      }
+    ],
+    "by": [
+      "subject.id"
+    ],
+    "agg": [
+      "max:ts"
+    ]
   },
-  "row": { "kind": "plan-became-ready", "reason": "a plan's status changed to ready", "nextCommand": "fgos supervisor plans" }
+  "row": {
+    "kind": "plan-became-ready",
+    "reason": "a plan's status changed to ready",
+    "nextCommand": "fgos supervisor plans"
+  }
 }

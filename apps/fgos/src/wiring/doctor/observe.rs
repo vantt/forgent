@@ -1,10 +1,24 @@
-//! The doctor rows of the Observe component. Both are read-only: the Observe directory is never created by a
-//! doctor run (the store creates it on its first write), and the friction store is read, not touched.
+//! The doctor rows of the Observe component. All are read-only: the Observe directory is never created by a
+//! doctor run (the store creates it on its first write), and the stores are read, not touched. The two pointer rows
+//! (write health, friction migration) only warn and name the verb that shows or settles what they count.
 
-use fgos_distribution::doctor::{FixResult, RowOutcome, RowResult};
+use fgos_distribution::doctor::{timed, FixResult, RowOutcome, RowResult};
+use fgos_host_runtime::civil_time::{format_unix_millis_rfc3339, parse_rfc3339_millis};
+use fgos_observe::contract::{RecordSource, Window};
+use fgos_observe::record::store::HealthSource;
 use std::path::{Path, PathBuf};
 
-pub const ROW_IDS: &[&str] = &["observe-dir-writable", "observe-host-resolvable"];
+pub const ROW_IDS: &[&str] = &[
+    "observe-dir-writable",
+    "observe-host-resolvable",
+    "observe-write-health",
+    "observe-friction-migrated",
+];
+
+/// How far back the write-health pointer looks: writers whose counters changed in this span.
+const HEALTH_LOOKBACK_MILLIS: i64 = 7 * 24 * 60 * 60 * 1000;
+const HEALTH_VERB: &str = "fgos metrics query --kind fgos.observe.health";
+const MIGRATE_VERB: &str = "fgos friction migrate --to-records";
 
 fn no_fixes(_: &Path, ids: &[&str]) -> Vec<FixResult> {
     ids.iter()
@@ -22,6 +36,7 @@ pub const GROUP: super::Rows = super::Rows {
 
 fn row(passed: bool, message: String) -> RowOutcome {
     RowOutcome::Judged(RowResult {
+        elapsed_ms: None,
         passed,
         status: None,
         message: Some(message),
@@ -64,17 +79,87 @@ pub fn host_resolvable_row(root: &Path, host: &Path) -> RowOutcome {
     }
 }
 
+/// Counts the records the write door refused (`rejected`) or dropped (`errors`), summed over every writer whose
+/// counters changed since `since`. Counters are per writer and cumulative, so a writer that is still writing keeps
+/// its old counts in the sum until it stops; the verb shows each writer and its last error.
+fn health_failures(root: &Path, since: &str) -> Result<u64, String> {
+    let window = Window {
+        since: Some(since.to_owned()),
+        until: None,
+    };
+    let records = HealthSource
+        .records(root, &window)
+        .map_err(|e| e.to_string())?;
+    Ok(records
+        .iter()
+        .flat_map(|r| {
+            ["fgos.observe.health.rejected", "fgos.observe.health.errors"]
+                .into_iter()
+                .filter_map(|name| r.measures.get(name).and_then(|n| n.as_u64()))
+        })
+        .sum())
+}
+
+/// Pointer: records the write door refused or dropped. Passes with a warning when any were counted, and never
+/// fails: a write failure never changes its caller's outcome, so it is an incident to read, not a readiness gap.
+pub fn write_health_row(root: &Path, now_millis: i64) -> RowOutcome {
+    let Some(since) = format_unix_millis_rfc3339(now_millis - HEALTH_LOOKBACK_MILLIS, 0) else {
+        return row(
+            true,
+            format!("warning: no clock to window the write health; run `{HEALTH_VERB}`"),
+        );
+    };
+    match health_failures(root, &since) {
+        Ok(0) => row(
+            true,
+            format!("no observe write rejected or dropped since {since}"),
+        ),
+        Ok(n) => row(
+            true,
+            format!("warning: {n} rejected/errors since {since}; run `{HEALTH_VERB}`"),
+        ),
+        Err(why) => row(
+            true,
+            format!("warning: observe write health unreadable ({why}); run `{HEALTH_VERB}`"),
+        ),
+    }
+}
+
+/// Pointer: old friction shards the record store lacks. Warns while any remain; the migration is an explicit
+/// operator command, so the row neither fails nor repairs.
+pub fn friction_migrated_row(root: &Path) -> RowOutcome {
+    match fgos_observe::friction::unmigrated_count(root) {
+        Ok(0) => row(true, "friction store holds no unmigrated old shard lines".into()),
+        Ok(n) => row(
+            true,
+            format!("warning: friction store not migrated ({n} old lines missing from the records store); run `{MIGRATE_VERB}`"),
+        ),
+        Err(why) => row(
+            true,
+            format!("warning: friction migration state unreadable ({why}); run `{MIGRATE_VERB}`"),
+        ),
+    }
+}
+
+fn now_millis() -> i64 {
+    parse_rfc3339_millis(&fgos_observe::time::now_iso()).unwrap_or_default()
+}
+
 /// Judges the Observe rows `ids` of the project at `root`.
 pub fn judge_rows(root: &Path, ids: &[&str]) -> Vec<RowOutcome> {
     let host = std::env::current_exe().unwrap_or_else(|_| PathBuf::from("fgos"));
     ids.iter()
-        .map(|id| match *id {
-            "observe-dir-writable" => dir_writable_row(root),
-            "observe-host-resolvable" => host_resolvable_row(root, &host),
-            other => RowOutcome::Unavailable {
-                message: format!("no observe row {other}"),
-                next: "run fgos doctor again".to_owned(),
-            },
+        .map(|id| {
+            timed(|| match *id {
+                "observe-dir-writable" => dir_writable_row(root),
+                "observe-host-resolvable" => host_resolvable_row(root, &host),
+                "observe-write-health" => write_health_row(root, now_millis()),
+                "observe-friction-migrated" => friction_migrated_row(root),
+                other => RowOutcome::Unavailable {
+                    message: format!("no observe row {other}"),
+                    next: "run fgos doctor again".to_owned(),
+                },
+            })
         })
         .collect()
 }
@@ -125,6 +210,131 @@ mod tests {
             (true, ".fgos/observe is writable".into())
         );
         assert_eq!(fs::read_dir(root.join(".fgos/observe")).unwrap().count(), 0);
+        let _ = fs::remove_dir_all(root);
+    }
+
+    /// A record of a kind no declaration names: the door refuses it and counts it in this writer's health.
+    fn refused_write(root: &Path) {
+        use fgos_observe::record::store::{RecordDoor, WriteOutcome, HEALTH_DECLARATION};
+        use fgos_observe::record::types::{Basis, Origin, Record, SubjectRef, RECORD_VERSION};
+        let door = RecordDoor::new(root.to_path_buf(), vec![HEALTH_DECLARATION], None);
+        let outcome = door.write(Record {
+            v: RECORD_VERSION,
+            id: "doctor-row-probe".into(),
+            kind: "no.such.kind".into(),
+            ts: "2026-11-18T10:00:00Z".into(),
+            end_ts: None,
+            subject: SubjectRef {
+                kind: "session".into(),
+                id: "s".into(),
+            },
+            refs: Vec::new(),
+            attrs: Default::default(),
+            measures: Default::default(),
+            basis: Basis::Observed,
+            origin: Origin {
+                source: "doctor-test".into(),
+                ..Origin::default()
+            },
+            detail: None,
+            redaction: None,
+        });
+        assert!(matches!(outcome, WriteOutcome::Rejected(_)), "{outcome:?}");
+    }
+
+    #[test]
+    fn write_health_points_at_the_health_query_while_recent_writes_were_refused_and_never_fails() {
+        let root = temp("health");
+        let (passed, text) = message(write_health_row(&root, now_millis()));
+        assert!(
+            passed && text.starts_with("no observe write rejected or dropped since"),
+            "{text}"
+        );
+        assert!(
+            !root.join(".fgos").exists(),
+            "a read never creates the directory"
+        );
+
+        refused_write(&root);
+        let (passed, text) = message(write_health_row(&root, now_millis()));
+        assert!(passed, "a pointer never fails: {text}");
+        assert!(
+            text.starts_with("warning: 1 rejected/errors since ")
+                && text.ends_with("; run `fgos metrics query --kind fgos.observe.health`"),
+            "{text}"
+        );
+
+        // A writer whose counters last changed before the look-back window is not counted.
+        let later = now_millis() + HEALTH_LOOKBACK_MILLIS + 60_000;
+        let (passed, text) = message(write_health_row(&root, later));
+        assert!(
+            passed && text.starts_with("no observe write rejected"),
+            "{text}"
+        );
+        let _ = fs::remove_dir_all(root);
+    }
+
+    #[test]
+    fn friction_migration_warns_while_old_shard_lines_are_missing_from_the_records_store_and_clears_after_migrate(
+    ) {
+        let root = temp("friction-migrated");
+        let (passed, text) = message(friction_migrated_row(&root));
+        assert!(
+            passed && text == "friction store holds no unmigrated old shard lines",
+            "{text}"
+        );
+        assert!(
+            !root.join(".fgos").exists(),
+            "a read never creates the directory"
+        );
+
+        let old = root.join(".fgos/observe/friction");
+        fs::create_dir_all(&old).unwrap();
+        let line = |kind: &str, ts: &str| {
+            serde_json::json!({
+                "v": 1, "type": kind, "ts": ts,
+                "subject": { "kind": "work", "id": "tsk-a" },
+                "layer": "docs", "errorClass": "doc-drift", "disposition": "advisory",
+                "detail": "d", "producer": "test", "by": "test", "reason": "done"
+            })
+            .to_string()
+        };
+        fs::write(
+            old.join("old-writer.jsonl"),
+            format!(
+                "{}\n{}\n",
+                line("friction-recorded", "2026-10-01T10:00:00.000Z"),
+                line("friction-resolved", "2026-10-02T10:00:00.000Z")
+            ),
+        )
+        .unwrap();
+        let (passed, text) = message(friction_migrated_row(&root));
+        assert!(passed, "the row only warns: {text}");
+        assert_eq!(
+            text,
+            "warning: friction store not migrated (2 old lines missing from the records store); run `fgos friction migrate --to-records`"
+        );
+
+        let report = fgos_observe::friction::migrate_to_records(&root).unwrap();
+        assert_eq!(report["written"], 2, "{report}");
+        let (passed, text) = message(friction_migrated_row(&root));
+        assert!(
+            passed && text == "friction store holds no unmigrated old shard lines",
+            "{text}"
+        );
+        assert!(
+            old.join("old-writer.jsonl").exists(),
+            "the row never touches the old shards"
+        );
+        let _ = fs::remove_dir_all(root);
+    }
+
+    #[test]
+    fn every_observe_row_has_its_own_judge() {
+        let root = temp("all-rows");
+        for outcome in judge_rows(&root, ROW_IDS) {
+            assert!(matches!(outcome, RowOutcome::Judged(_)));
+        }
         let _ = fs::remove_dir_all(root);
     }
 

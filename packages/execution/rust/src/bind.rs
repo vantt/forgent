@@ -218,6 +218,8 @@ fn fields_of(entry: &Value, keys: &[&str]) -> Value {
     Value::Object(out)
 }
 
+/// A `roles` or `personas` table as seat choice reads it: per scope the tier, `prefer` and `pool`. A role that
+/// names a pool is carried too, so Seat Binding refuses that line by name instead of the slice dropping it.
 fn taste_table(table: Option<&Value>) -> Value {
     Value::Object(
         table
@@ -225,13 +227,13 @@ fn taste_table(table: Option<&Value>) -> Value {
             .into_iter()
             .flatten()
             .filter(|(_, scope)| scope.is_object())
-            .map(|(name, scope)| (name.clone(), fields_of(scope, &["tier"])))
+            .map(|(name, scope)| (name.clone(), fields_of(scope, &["tier", "pool"])))
             .collect(),
     )
 }
 
 /// The slice of a runner section seat choice reads: the tier vocabulary, cells and fallback order, and per
-/// capability the tier, `maxTier` and `prefer`, with the `roles` and `personas` taste tables.
+/// capability the tier, `maxTier` and `prefer`, with the `roles` and `personas` taste tables (tier, `prefer`, `pool`).
 pub fn seat_config(runner: &Value) -> Value {
     let runner = match runner.get("runner") {
         Some(nested) if truthy(Some(nested)) && runner.get("modelPolicies").is_none() => nested,

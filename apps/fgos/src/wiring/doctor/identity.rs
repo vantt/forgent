@@ -4,7 +4,7 @@
 //! this adapter words them as the report's `{ passed, message }`. Levels follow the doctor convention: `passed:
 //! false` fails, a message starting with `warning:` warns, anything else passes.
 
-use fgos_distribution::doctor::{FixResult, RowOutcome, RowResult};
+use fgos_distribution::doctor::{timed, FixResult, RowOutcome, RowResult};
 use fgos_identity::refusal::Refusal;
 use fgos_identity::{current, machine, project, shared, signing};
 use std::path::{Path, PathBuf};
@@ -33,6 +33,7 @@ pub const GROUP: super::Rows = super::Rows {
 
 fn row(passed: bool, message: impl Into<String>) -> RowOutcome {
     RowOutcome::Judged(RowResult {
+        elapsed_ms: None,
         passed,
         status: None,
         message: Some(message.into()),
@@ -321,17 +322,19 @@ pub fn judge_rows(root: &Path, ids: &[&str]) -> Vec<RowOutcome> {
     let state_root = fgos_holder_lock::state_root::state_root().0;
     let host = std::env::current_exe().unwrap_or_else(|_| PathBuf::from("fgos"));
     ids.iter()
-        .map(|id| match *id {
-            "writer-identity-resolvable" => writer_identity_row(root, &host),
-            "identity-machine-id" => machine_id_row(&state_root, &host),
-            "identity-machine-key" => machine_key_row(&state_root, &host),
-            "identity-ssh-keygen" => ssh_keygen_row(&signing::probe_openssh()),
-            "identity-project-id" => project_id_row(&state_root, root, &host),
-            "identity-shared-directory" => shared_directory_row(root),
-            other => RowOutcome::Unavailable {
-                message: format!("no identity row {other}"),
-                next: "run fgos doctor again".to_owned(),
-            },
+        .map(|id| {
+            timed(|| match *id {
+                "writer-identity-resolvable" => writer_identity_row(root, &host),
+                "identity-machine-id" => machine_id_row(&state_root, &host),
+                "identity-machine-key" => machine_key_row(&state_root, &host),
+                "identity-ssh-keygen" => ssh_keygen_row(&signing::probe_openssh()),
+                "identity-project-id" => project_id_row(&state_root, root, &host),
+                "identity-shared-directory" => shared_directory_row(root),
+                other => RowOutcome::Unavailable {
+                    message: format!("no identity row {other}"),
+                    next: "run fgos doctor again".to_owned(),
+                },
+            })
         })
         .collect()
 }

@@ -227,6 +227,10 @@ pub struct Scope {
     pub tier: Option<Tier>,
     #[serde(default)]
     pub prefer: Option<Vec<Prefer>>,
+    /// Account pool every seat of this persona leases from, for every family it walks. Personas only;
+    /// a role entry that sets it is refused.
+    #[serde(default)]
+    pub pool: Option<String>,
 }
 
 #[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
@@ -577,6 +581,12 @@ pub struct Policy {
     pub definition: String,
     pub prefer: Vec<Prefer>,
     pub prefer_source: String,
+    /// The pool the resolved persona names and its config path (`personas.<name>.pool`); every cell
+    /// entry of the policy already carries it.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub pool: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub pool_source: Option<String>,
     /// `tierFallback.<tier>`: family names, the walk order after the first list.
     pub tier_fallback: Vec<String>,
     /// Cells at the final tier by family; a family without a key serves no cell.

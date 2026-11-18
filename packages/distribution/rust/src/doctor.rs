@@ -57,6 +57,19 @@ pub struct RowResult {
     /// The facts behind the one-sentence message, kept as the row gave them.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub detail: Option<Value>,
+    /// Whole milliseconds the row took where it ran; a row that does not say it is reported as 0.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub elapsed_ms: Option<u64>,
+}
+
+/// Judges one row and stamps how long it took; owners wrap the judgement of each row in it.
+pub fn timed(judge: impl FnOnce() -> RowOutcome) -> RowOutcome {
+    let started = std::time::Instant::now();
+    let mut outcome = judge();
+    if let RowOutcome::Judged(result) = &mut outcome {
+        result.elapsed_ms = Some(started.elapsed().as_millis() as u64);
+    }
+    outcome
 }
 
 impl RowResult {
@@ -476,6 +489,9 @@ pub struct ReportRow {
     pub fix: Option<FixField>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub detail: Option<Value>,
+    /// Whole milliseconds the row took, measured where it ran (0 for a row its owner could not judge).
+    #[serde(default, rename = "elapsedMs", skip_serializing_if = "Option::is_none")]
+    pub elapsed_ms: Option<u64>,
 }
 
 /// The `fix` of a failing row: a command, or null.
@@ -657,6 +673,7 @@ pub fn run(registry: &Registry, owners: &Owners, root: &Path, options: Options) 
                     message: result.message,
                     fix: repair,
                     detail: result.detail,
+                    elapsed_ms: Some(result.elapsed_ms.unwrap_or(0)),
                 });
             }
             RowOutcome::Unavailable {
@@ -674,6 +691,7 @@ pub fn run(registry: &Registry, owners: &Owners, root: &Path, options: Options) 
                     message: Some(message),
                     fix: Some(FixField::Nobody(())),
                     detail: None,
+                    elapsed_ms: Some(0),
                 });
             }
         }
@@ -862,6 +880,7 @@ mod tests {
                             message: Some("fine".into()),
                             fix_command: None,
                             detail: None,
+                            elapsed_ms: None,
                         })
                     })
                 })
@@ -876,6 +895,7 @@ mod tests {
             message: Some(message.to_owned()),
             fix_command: None,
             detail: None,
+            elapsed_ms: None,
         })
     }
 
@@ -950,6 +970,7 @@ mod tests {
                 message: Some(message.to_owned()),
                 fix_command: None,
                 detail: None,
+                elapsed_ms: None,
             }
             .level()
         };
@@ -982,6 +1003,7 @@ mod tests {
                     message: Some("drifted".into()),
                     fix_command: Some("fgos config check".into()),
                     detail: None,
+                    elapsed_ms: None,
                 }),
             ),
             (
@@ -1223,9 +1245,53 @@ mod tests {
         let names: Vec<&String> = row.as_object().unwrap().keys().collect();
         assert_eq!(
             names,
-            ["id", "description", "passed", "status", "message", "fix"]
+            [
+                "id",
+                "description",
+                "passed",
+                "status",
+                "message",
+                "fix",
+                "elapsedMs"
+            ]
         );
         assert!(row["fix"].is_null());
+    }
+
+    #[test]
+    fn every_row_reports_its_own_elapsed_milliseconds_and_an_unjudged_row_reports_zero() {
+        let mut slow = judged(true, "slow");
+        if let RowOutcome::Judged(result) = &mut slow {
+            result.elapsed_ms = Some(7);
+        }
+        let unjudged = RowOutcome::Unavailable {
+            message: "no answer".into(),
+            next: "retry".into(),
+        };
+        let native = Scripted::new(vec![("gamma", slow), ("alpha", unjudged)]);
+        let bridge = Scripted::bridge(vec![]);
+        let report = run(
+            &registry(),
+            &Owners {
+                native: &native,
+                bridge: &bridge,
+            },
+            Path::new("/p"),
+            Options { fix: false },
+        );
+        let rows = report.checks.unwrap();
+        let elapsed = |id: &str| {
+            let row = rows
+                .iter()
+                .find(|row| row.id.as_deref() == Some(id))
+                .unwrap();
+            serde_json::to_value(row).unwrap()["elapsedMs"].as_u64()
+        };
+        assert_eq!(elapsed("gamma"), Some(7));
+        assert_eq!(elapsed("alpha"), Some(0));
+        assert!(rows.iter().all(|row| row.elapsed_ms.is_some()));
+        let stamped = timed(|| judged(true, "x"));
+        assert!(matches!(stamped, RowOutcome::Judged(r) if r.elapsed_ms.is_some()));
     }
 
     #[test]

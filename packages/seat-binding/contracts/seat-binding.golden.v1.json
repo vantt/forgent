@@ -3806,6 +3806,554 @@
           "reason": "account-pin-no-login"
         }
       }
+    },
+    {
+      "name": "a persona with a pool binds claude on that pool and leases its account; the same seat with no persona binds the family pool",
+      "patch": {
+        "ask": {
+          "capability": "misc:thing",
+          "seat": "x",
+          "role": "producer",
+          "persona": "miu"
+        },
+        "config": {
+          "personas": {
+            "miu": {
+              "pool": "claude-miu"
+            }
+          }
+        },
+        "accountView": {
+          "pools": {
+            "claude": [
+              {
+                "id": "main",
+                "clis": [
+                  "claude"
+                ],
+                "sticky": true
+              },
+              {
+                "id": "spare",
+                "clis": [
+                  "claude"
+                ]
+              }
+            ],
+            "openai": [
+              {
+                "id": "work",
+                "clis": [
+                  "codex"
+                ]
+              }
+            ],
+            "claude-miu": [
+              {
+                "id": "vantt",
+                "clis": [
+                  "claude"
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "expected": {
+        "ok": true,
+        "policy": {
+          "pool": "claude-miu",
+          "poolSource": "personas.miu.pool"
+        },
+        "ranked": {
+          "candidates": [
+            {
+              "executor": "claude",
+              "pool": "claude-miu",
+              "account": "vantt",
+              "accounts": [
+                "vantt"
+              ]
+            }
+          ]
+        }
+      },
+      "explainContains": [
+        "pool: personas.miu.pool = claude-miu",
+        "account claude-miu/vantt"
+      ]
+    },
+    {
+      "name": "a seat with no persona never leases the persona pool",
+      "patch": {
+        "ask": {
+          "capability": "misc:thing",
+          "seat": "x",
+          "role": "producer"
+        },
+        "config": {
+          "personas": {
+            "miu": {
+              "pool": "claude-miu"
+            }
+          }
+        },
+        "accountView": {
+          "pools": {
+            "claude": [
+              {
+                "id": "main",
+                "clis": [
+                  "claude"
+                ],
+                "sticky": true
+              },
+              {
+                "id": "spare",
+                "clis": [
+                  "claude"
+                ]
+              }
+            ],
+            "openai": [
+              {
+                "id": "work",
+                "clis": [
+                  "codex"
+                ]
+              }
+            ],
+            "claude-miu": [
+              {
+                "id": "vantt",
+                "clis": [
+                  "claude"
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "expected": {
+        "ok": true,
+        "ranked": {
+          "candidates": [
+            {
+              "executor": "claude",
+              "pool": "claude",
+              "account": "main"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "a persona that names no pool binds exactly as a seat with no persona",
+      "patch": {
+        "ask": {
+          "capability": "misc:thing",
+          "seat": "x",
+          "role": "producer",
+          "persona": "plain"
+        },
+        "config": {
+          "personas": {
+            "plain": {
+              "prefer": [
+                "claude"
+              ]
+            }
+          }
+        },
+        "accountView": {
+          "pools": {
+            "claude": [
+              {
+                "id": "main",
+                "clis": [
+                  "claude"
+                ],
+                "sticky": true
+              },
+              {
+                "id": "spare",
+                "clis": [
+                  "claude"
+                ]
+              }
+            ],
+            "openai": [
+              {
+                "id": "work",
+                "clis": [
+                  "codex"
+                ]
+              }
+            ],
+            "claude-miu": [
+              {
+                "id": "vantt",
+                "clis": [
+                  "claude"
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "expected": {
+        "ok": true,
+        "ranked": {
+          "candidates": [
+            {
+              "executor": "claude",
+              "pool": "claude",
+              "account": "main"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "every pane account quarantined walks to the next family and never names the persona pool",
+      "patch": {
+        "ask": {
+          "capability": "misc:thing",
+          "seat": "x",
+          "role": "producer"
+        },
+        "config": {
+          "personas": {
+            "miu": {
+              "pool": "claude-miu"
+            }
+          }
+        },
+        "accountView": {
+          "pools": {
+            "claude": [
+              {
+                "id": "main",
+                "clis": [
+                  "claude"
+                ],
+                "quarantinedUntil": 9000
+              },
+              {
+                "id": "spare",
+                "clis": [
+                  "claude"
+                ],
+                "quarantinedUntil": 9000
+              }
+            ],
+            "openai": [
+              {
+                "id": "work",
+                "clis": [
+                  "codex"
+                ]
+              }
+            ],
+            "claude-miu": [
+              {
+                "id": "vantt",
+                "clis": [
+                  "claude"
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "expected": {
+        "ok": true,
+        "ranked": {
+          "candidates": [
+            {
+              "executor": "openai",
+              "pool": "openai"
+            }
+          ]
+        }
+      },
+      "skippedReasons": [
+        "no-account-available"
+      ]
+    },
+    {
+      "name": "every pane account quarantined with no other family left refuses by name and never reaches the persona pool",
+      "patch": {
+        "ask": {
+          "capability": "misc:thing",
+          "seat": "x",
+          "role": "producer"
+        },
+        "config": {
+          "personas": {
+            "miu": {
+              "pool": "claude-miu"
+            }
+          },
+          "tierFallback": {
+            "standard": [
+              "claude"
+            ]
+          }
+        },
+        "accountView": {
+          "pools": {
+            "claude": [
+              {
+                "id": "main",
+                "clis": [
+                  "claude"
+                ],
+                "quarantinedUntil": 9000
+              },
+              {
+                "id": "spare",
+                "clis": [
+                  "claude"
+                ],
+                "quarantinedUntil": 9000
+              }
+            ],
+            "openai": [
+              {
+                "id": "work",
+                "clis": [
+                  "codex"
+                ]
+              }
+            ],
+            "claude-miu": [
+              {
+                "id": "vantt",
+                "clis": [
+                  "claude"
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "expected": {
+        "ok": false,
+        "refusal": {
+          "reason": "no-account-available"
+        }
+      }
+    },
+    {
+      "name": "a persona pool with every account quarantined refuses by name and never falls into the family pool",
+      "patch": {
+        "ask": {
+          "capability": "misc:thing",
+          "seat": "x",
+          "role": "producer",
+          "persona": "miu"
+        },
+        "config": {
+          "personas": {
+            "miu": {
+              "pool": "claude-miu",
+              "prefer": [
+                "claude"
+              ]
+            }
+          },
+          "tierFallback": {
+            "standard": [
+              "claude"
+            ]
+          }
+        },
+        "accountView": {
+          "pools": {
+            "claude": [
+              {
+                "id": "main",
+                "clis": [
+                  "claude"
+                ],
+                "sticky": true
+              },
+              {
+                "id": "spare",
+                "clis": [
+                  "claude"
+                ]
+              }
+            ],
+            "openai": [
+              {
+                "id": "work",
+                "clis": [
+                  "codex"
+                ]
+              }
+            ],
+            "claude-miu": [
+              {
+                "id": "vantt",
+                "clis": [
+                  "claude"
+                ],
+                "quarantinedUntil": 9000
+              }
+            ]
+          }
+        }
+      },
+      "expected": {
+        "ok": false,
+        "refusal": {
+          "reason": "no-account-available"
+        }
+      }
+    },
+    {
+      "name": "a persona pool that does not exist refuses pool-unusable and never uses the family pool",
+      "patch": {
+        "ask": {
+          "capability": "misc:thing",
+          "seat": "x",
+          "role": "producer",
+          "persona": "miu"
+        },
+        "config": {
+          "personas": {
+            "miu": {
+              "pool": "claude-missing",
+              "prefer": [
+                "claude"
+              ]
+            }
+          },
+          "tierFallback": {
+            "standard": [
+              "claude"
+            ]
+          }
+        },
+        "accountView": {
+          "pools": {
+            "claude": [
+              {
+                "id": "main",
+                "clis": [
+                  "claude"
+                ],
+                "sticky": true
+              },
+              {
+                "id": "spare",
+                "clis": [
+                  "claude"
+                ]
+              }
+            ],
+            "openai": [
+              {
+                "id": "work",
+                "clis": [
+                  "codex"
+                ]
+              }
+            ],
+            "claude-miu": [
+              {
+                "id": "vantt",
+                "clis": [
+                  "claude"
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "expected": {
+        "ok": false,
+        "refusal": {
+          "reason": "pool-unusable"
+        }
+      }
+    },
+    {
+      "name": "a persona pool named like a walked family with no account refuses pool-unusable and never runs on the executor's own login",
+      "patch": {
+        "ask": {
+          "capability": "misc:thing",
+          "seat": "x",
+          "role": "producer",
+          "persona": "miu"
+        },
+        "config": {
+          "personas": {
+            "miu": {
+              "pool": "claude",
+              "prefer": [
+                "claude"
+              ]
+            }
+          },
+          "tierFallback": {
+            "standard": [
+              "claude"
+            ]
+          }
+        },
+        "accountView": {
+          "pools": {
+            "claude": null
+          }
+        }
+      },
+      "expected": {
+        "ok": false,
+        "refusal": {
+          "reason": "pool-unusable"
+        }
+      }
+    },
+    {
+      "name": "a role entry that names a pool is a config error naming the line",
+      "patch": {
+        "config": {
+          "roles": {
+            "red-team": {
+              "pool": "claude-miu"
+            }
+          }
+        }
+      },
+      "expected": {
+        "ok": false,
+        "refusal": {
+          "reason": "invalid-config",
+          "config": "roles.red-team.pool"
+        }
+      }
+    },
+    {
+      "name": "a blank persona pool is a config error naming the line",
+      "patch": {
+        "config": {
+          "personas": {
+            "miu": {
+              "pool": " "
+            }
+          }
+        }
+      },
+      "expected": {
+        "ok": false,
+        "refusal": {
+          "reason": "invalid-config",
+          "config": "personas.miu.pool"
+        }
+      }
     }
   ]
 }

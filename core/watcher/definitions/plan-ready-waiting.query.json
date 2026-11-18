@@ -1,17 +1,39 @@
 {
   "name": "plan-ready-waiting",
-  "requires": ["fgos.plan.status"],
+  "requires": [
+    "fgos.plan.status"
+  ],
+  "window": "own",
   "query": {
-    "kind": ["fgos.plan.status"],
+    "since": "-30d",
+    "kind": [
+      "fgos.plan.status"
+    ],
     "where": [
-      { "field": "fgos.plan.change", "op": "ne", "value": "priority" }
+      {
+        "field": "fgos.plan.change",
+        "op": "eq",
+        "value": "status"
+      }
     ],
     "latest_per": "subject",
     "where_latest": [
-      { "field": "fgos.plan.status", "op": "eq", "value": "ready" }
+      {
+        "field": "fgos.plan.to",
+        "op": "eq",
+        "value": "ready"
+      }
     ],
-    "by": ["subject.id"],
-    "agg": ["max:ts"]
+    "by": [
+      "subject.id"
+    ],
+    "agg": [
+      "max:ts"
+    ]
   },
-  "row": { "kind": "plan-ready-waiting", "reason": "a plan is ready and no lead has taken it", "nextCommand": "fgos supervisor plans" }
+  "row": {
+    "kind": "plan-ready-waiting",
+    "reason": "a plan is ready and no lead has taken it",
+    "nextCommand": "fgos supervisor plans"
+  }
 }

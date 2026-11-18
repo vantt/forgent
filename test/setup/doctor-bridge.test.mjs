@@ -61,6 +61,9 @@ test('a row that returns no verdict or throws fails its own row and never ends t
   registerCheck({ id: 'bridge-test-async-throws', check: async () => { throw new Error('rejected'); } });
   registerCheck({ id: 'bridge-test-fine', check: () => ({ passed: true, status: 'skip', message: 'nothing to judge', fixCommand: 'run x', detail: { n: 1 } }) });
   await run({ ...bodies, ids: ['bridge-test-throws', 'bridge-test-silent', 'bridge-test-fine', 'bridge-test-async', 'bridge-test-async-throws'] }, (result) => seen.push(result));
+  // Every row, thrown or silent included, carries the whole milliseconds its own body took.
+  for (const result of seen) assert.ok(Number.isInteger(result.elapsedMs) && result.elapsedMs >= 0, `${result.id}: ${result.elapsedMs}`);
+  for (const result of seen) delete result.elapsedMs;
   assert.deepEqual(seen[0], { id: 'bridge-test-throws', passed: false, message: 'exploded' });
   assert.equal(seen[1].passed, false);
   assert.match(seen[1].message, /returned no verdict/);

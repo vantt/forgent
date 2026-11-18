@@ -2,10 +2,8 @@
 //!
 //! Kernel §6: In-process and external operation providers.
 
-pub mod builtin;
 pub mod external_process;
 
-pub use builtin::{EchoAction, EchoProvider, ECHO_PROVIDER_DESCRIPTOR};
 pub use external_process::{
     adapter, bound_invocation_supervisor, frame_codec, parse_contract_ref,
     BoundInvocationSupervisor, CodecError, ExpectedContracts, ExternalManifest,

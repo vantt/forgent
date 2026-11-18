@@ -16,7 +16,7 @@ use fgos_distribution::agent_hooks::{
     check_hook, install_hook, install_message, mailbox_opt_in, BoundedRunner, HookCheck, ProbeMemo,
 };
 use fgos_distribution::bin_cache::refresh_global_bin_cache;
-use fgos_distribution::doctor::{FixResult, RowOutcome, RowResult};
+use fgos_distribution::doctor::{timed, FixResult, RowOutcome, RowResult};
 use fgos_distribution::launcher::{
     check_project_launcher, fix_project_launcher, source_checkout, LauncherCheck, SearchPath,
 };
@@ -88,33 +88,36 @@ fn judge(root: &Path, ids: &[&str]) -> Vec<RowOutcome> {
     // The rows of one call share the shim probes of the hook rows: each distinct probe runs once.
     let memo = ProbeMemo::default();
     ids.iter()
-        .map(|id| match *id {
-            "cli-version-visible" => version_row(),
-            "project-fgos-launcher" => launcher_row(&env),
-            "dispatch-decide-hook-wired" => agent_hook_row(root, "claude", &env, &memo),
-            "codex-hook-wired" => agent_hook_row(root, "codex", &env, &memo),
-            "agy-hook-wired" => agent_hook_row(root, "agy", &env, &memo),
-            "omp-hook-wired" => agent_hook_row(root, "omp", &env, &memo),
-            "pi-hook-wired" => agent_hook_row(root, "pi", &env, &memo),
-            "agy-permissions-configured" => agy_permissions_row(&env),
-            "curl-available" => curl_row(&env),
-            "bwrap-available" => bwrap_row(&env),
-            "mailbox-claude-accept" => mailbox_accept_row(root, &env),
-            "claude-plugin-marketplace" => {
-                let check = check_claude_plugin_marketplace(&env, &BoundedRunner);
-                judged(check.passed, check.message)
-            }
-            "rust-host-binary-present" => release_row(root, check_rust_host_binary_present),
-            "rust-host-target-supported" => RowOutcome::Judged(check_rust_host_target_supported(
-                std::env::consts::OS,
-                std::env::consts::ARCH,
-            )),
-            "legacy-node-payload-present" => release_row(root, check_legacy_node_payload_present),
-            "active-release-matches-checkout" => {
-                release_row(root, check_active_release_matches_checkout)
-            }
-            "activation-matches-pin" => RowOutcome::Judged(check_activation_matches_pin(root)),
-            other => unreachable!("packaging group asked for row {other}"),
+        .map(|id| {
+            timed(|| match *id {
+                "cli-version-visible" => version_row(),
+                "project-fgos-launcher" => launcher_row(&env),
+                "dispatch-decide-hook-wired" => agent_hook_row(root, "claude", &env, &memo),
+                "codex-hook-wired" => agent_hook_row(root, "codex", &env, &memo),
+                "agy-hook-wired" => agent_hook_row(root, "agy", &env, &memo),
+                "omp-hook-wired" => agent_hook_row(root, "omp", &env, &memo),
+                "pi-hook-wired" => agent_hook_row(root, "pi", &env, &memo),
+                "agy-permissions-configured" => agy_permissions_row(&env),
+                "curl-available" => curl_row(&env),
+                "bwrap-available" => bwrap_row(&env),
+                "mailbox-claude-accept" => mailbox_accept_row(root, &env),
+                "claude-plugin-marketplace" => {
+                    let check = check_claude_plugin_marketplace(&env, &BoundedRunner);
+                    judged(check.passed, check.message)
+                }
+                "rust-host-binary-present" => release_row(root, check_rust_host_binary_present),
+                "rust-host-target-supported" => RowOutcome::Judged(
+                    check_rust_host_target_supported(std::env::consts::OS, std::env::consts::ARCH),
+                ),
+                "legacy-node-payload-present" => {
+                    release_row(root, check_legacy_node_payload_present)
+                }
+                "active-release-matches-checkout" => {
+                    release_row(root, check_active_release_matches_checkout)
+                }
+                "activation-matches-pin" => RowOutcome::Judged(check_activation_matches_pin(root)),
+                other => unreachable!("packaging group asked for row {other}"),
+            })
         })
         .collect()
 }

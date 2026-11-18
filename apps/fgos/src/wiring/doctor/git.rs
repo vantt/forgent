@@ -6,7 +6,7 @@
 use super::{Rows, Run};
 use crate::wiring::git_incidents::describe_operation_error as describe;
 use fgos_config::event_store::EventStoreConfig;
-use fgos_distribution::doctor::{FixResult, RowOutcome, RowResult, Status};
+use fgos_distribution::doctor::{timed, FixResult, RowOutcome, RowResult, Status};
 use fgos_git::incidents::{FactError, JournalFacts};
 use fgos_git::repository_facts::{inspect_repository, Inspection, RepositoryFacts};
 use fgos_git::{granted_fetch_mappings, GitDriver, RepositoryConfig, ResolveRepo};
@@ -39,7 +39,9 @@ pub const GROUP: Rows = Rows {
 fn judge_rows(root: &Path, ids: &[&str]) -> Vec<RowOutcome> {
     let run = Run::new(root);
     ids.iter()
-        .map(|id| RowOutcome::Judged(judge(&run, id).expect("the group asked for its own row")))
+        .map(|id| {
+            timed(|| RowOutcome::Judged(judge(&run, id).expect("the group asked for its own row")))
+        })
         .collect()
 }
 
@@ -115,6 +117,7 @@ impl Run<'_> {
 
 fn result(passed: bool, message: impl Into<String>, detail: Option<Value>) -> RowResult {
     RowResult {
+        elapsed_ms: None,
         passed,
         status: None,
         message: Some(message.into()),
@@ -307,6 +310,7 @@ fn repository_config(run: &Run, context: &Context, facts: &RepositoryFacts) -> R
         return judged;
     }
     RowResult {
+        elapsed_ms: None,
         status: Some(Status::Skip),
         fix_command: Some(NO_REMOTE_FIX.to_owned()),
         message: Some(format!(

@@ -841,7 +841,7 @@ fn judge(ctx: &Ctx, cand: &Cand, ignore_independence: bool) -> Result<Candidate,
         Some(p) => order_accounts(
             ctx,
             p,
-            &facts.family,
+            policy.pool.is_none().then_some(facts.family.as_str()),
             invocation_facts.and_then(|i| i.cli.as_deref()),
             id,
             cand.entry.as_ref().map(|e| e.model.as_str()),
@@ -872,11 +872,12 @@ fn judge(ctx: &Ctx, cand: &Cand, ignore_independence: bool) -> Result<Candidate,
 }
 
 /// Accounts of `pool` in lease order for a launch through `cli`. A pool with no account runs on the
-/// executor's own login, which only the pool named after the family may do.
+/// executor's own login, which only the implicit pool named after the family may do: `own_login_family`
+/// is that family, and `None` when a persona named the pool, which must then be paid by its own accounts.
 fn order_accounts(
     ctx: &Ctx,
     pool: &str,
-    family: &str,
+    own_login_family: Option<&str>,
     cli: Option<&str>,
     executor: &str,
     model: Option<&str>,
@@ -888,7 +889,7 @@ fn order_accounts(
         .map(Vec::as_slice)
         .unwrap_or(&[]);
     if all.is_empty() {
-        return if pool == family {
+        return if own_login_family == Some(pool) {
             Ok(Vec::new())
         } else {
             Err(rejection("pool-unusable", format!("executor \"{executor}\" with model \"{}\" is not served: pool \"{pool}\" has no account, so nothing can pay for the call", model.unwrap_or(""))))

@@ -25,6 +25,7 @@ const GUIDANCE: &str = "B: npm run fgos:dev -- <verb> runs working-tree code. A:
 
 fn judged(passed: bool, message: impl Into<String>) -> RowResult {
     RowResult {
+        elapsed_ms: None,
         passed,
         status: None,
         message: Some(message.into()),
@@ -35,6 +36,7 @@ fn judged(passed: bool, message: impl Into<String>) -> RowResult {
 
 fn skipped(message: impl Into<String>) -> RowResult {
     RowResult {
+        elapsed_ms: None,
         passed: true,
         status: Some(Status::Skip),
         message: Some(message.into()),
@@ -45,6 +47,7 @@ fn skipped(message: impl Into<String>) -> RowResult {
 
 fn warned(message: impl Into<String>, fix_command: &str) -> RowResult {
     RowResult {
+        elapsed_ms: None,
         passed: true,
         status: None,
         message: Some(message.into()),

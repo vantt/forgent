@@ -27,6 +27,7 @@ import { fileURLToPath } from 'node:url';
 import { domainCatalog } from '../util/domain-dirs.mjs';
 import { checkCompiledDomains } from '../util/domain-compile.mjs';
 import { loadRunnerConfigForDir } from '../runner/dispatch/config.mjs';
+import { defaultLoginHomeStores } from '../runner/dispatch/llm-accounts.mjs';
 import { checkSessionKeepDeclared } from './session-keep-declared.mjs';
 import { INSTALL_ROOT, agentShapeProblem, findAgentDuplicates, readAgentDefinition, scanAgentTiers } from '../runner/agent-definitions.mjs';
 import { isWithinDir } from '../runner/dispatch/assignment-layout.mjs';
@@ -225,7 +226,7 @@ export function runFixes(cwd, fixes = FIX_REGISTRATIONS) {
  * One call of the host's Node rows bridge (src/setup/doctor-bridge.mjs): the bodies of the rows or fixes the
  * registry still gives to Node, run in the order the host asked and nothing else. `phase` is `fix` (every id is a
  * fix id; `onResult` gets `{ id, changed, message }` per fix) or `check` (every id is a row id; `onResult` gets
- * `{ id, passed, status?, message, fixCommand?, detail? }` per row, judged with one shared run so rows that read
+ * `{ id, passed, status?, message, fixCommand?, detail?, elapsedMs }` per row, judged with one shared run so rows that read
  * the same fact read it once). The level, the fix command of a failing row, `ok` and `next` are the host's: this
  * function derives none of them. An id with no body here is a refusal of the whole call, never a silent skip.
  */
@@ -246,6 +247,7 @@ export async function runBridged({ phase, ids, dir }, onResult) {
     // A check may return its result directly or as a promise (one drives promise-based runner code). One that
     // returns nothing usable fails its own row, as one that throws does, and never ends the call.
     let result;
+    const started = performance.now();
     try { result = await check(dir, run); } catch (error) { result = { passed: false, message: error.message }; }
     if (typeof result?.passed !== 'boolean') result = { passed: false, message: `the row returned no verdict (${id})` };
     onResult({
@@ -255,6 +257,7 @@ export async function runBridged({ phase, ids, dir }, onResult) {
       ...(result.message !== undefined && { message: result.message }),
       ...(result.fixCommand !== undefined && { fixCommand: result.fixCommand }),
       ...(result.detail !== undefined && { detail: result.detail }),
+      elapsedMs: Math.round(performance.now() - started),
     });
   }
 }
@@ -774,6 +777,28 @@ registerCheck({
 registerCheck({
   id: 'llm-accounts-shape',
   check: (cwd) => checkLlmAccountsShape(cwd),
+});
+
+// A store on a CLI's own default login home can be renewed by a pane and make the provider revoke the real refresh
+// token (decision 86 Q2). The owner ruled it warns and never refuses, so a single-account user still runs.
+export function checkLlmAccountsDefaultLoginHome(cwd) {
+  let runnerConfig;
+  try {
+    runnerConfig = loadRunnerConfigForDir(cwd);
+  } catch (err) {
+    return { passed: true, message: `runner config not loadable here, not evaluated: ${err.message}` };
+  }
+  const hits = defaultLoginHomeStores(runnerConfig);
+  if (hits.length === 0) return { passed: true, message: 'no runner.llmAccounts store sits on its CLI default login home' };
+  return {
+    passed: true,
+    message: `warning: stores on a default login home: ${hits.map((h) => h.key).join(', ')}; a pane renewing a copy of that login can make the provider revoke the real refresh token and log out your own sessions -- log in a second directory (CLAUDE_CONFIG_DIR=<own dir> claude /login, or the CLI's own home variable) and point the key at it`,
+  };
+}
+
+registerCheck({
+  id: 'llm-accounts-default-login-home',
+  check: (cwd) => checkLlmAccountsDefaultLoginHome(cwd),
 });
 
 // The definition tiers of a shipped release cannot change after build, so `npm test` judges them

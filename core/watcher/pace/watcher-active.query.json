@@ -1,16 +1,64 @@
 {
   "name": "watcher-active",
-  "requires": ["fgos.plan.status"],
+  "requires": [
+    "fgos.plan.status",
+    "fgos.head.state"
+  ],
   "query": {
-    "kind": ["fgos.plan.status"],
+    "kind": [
+      "fgos.plan.status",
+      "fgos.head.state"
+    ],
     "where": [
-      { "field": "fgos.plan.change", "op": "ne", "value": "priority" }
+      {
+        "field": "fgos.plan.change",
+        "op": "ne",
+        "value": "priority"
+      }
     ],
     "latest_per": "subject",
     "where_latest": [
-      { "field": "fgos.plan.status", "op": "eq", "value": "running" }
+      {
+        "any": [
+          [
+            {
+              "field": "fgos.plan.to",
+              "op": "eq",
+              "value": "running"
+            }
+          ],
+          [
+            {
+              "field": "fgos.head.state",
+              "op": "eq",
+              "value": "live"
+            },
+            {
+              "field": "fgos.head.role",
+              "op": "prefix",
+              "value": "head:lead-"
+            }
+          ],
+          [
+            {
+              "field": "fgos.head.state",
+              "op": "eq",
+              "value": "live"
+            },
+            {
+              "field": "fgos.head.role",
+              "op": "prefix",
+              "value": "lead:"
+            }
+          ]
+        ]
+      }
     ],
-    "by": ["subject.id"],
-    "agg": ["count"]
+    "by": [
+      "subject.id"
+    ],
+    "agg": [
+      "count"
+    ]
   }
 }
