@@ -1,16 +1,13 @@
 //! The few Git port calls every operation of the crate shares: opening a repository, paging a listing, and the
 //! worktree-admin hold.
 
-use crate::{Error, ErrorKind, Result};
+use crate::{Error, Result};
 use fgos_git::{
     GitDriver, Ignored, InspectCursor, RepoHandle, ResolveRepo, StatusEntry, Submodules, Untracked,
     WorktreeFact,
 };
-use fgos_holder_lock::{LockScope, Wait};
-use std::collections::BTreeMap;
 use std::path::Path;
 
-const WORKTREE_ADMIN_WAIT_MS: u64 = 30_000;
 const PAGE: usize = 4096;
 
 pub(crate) fn driver(state_root: &Path) -> Result<GitDriver> {
@@ -66,25 +63,6 @@ pub(crate) fn worktrees(driver: &GitDriver, repo: &RepoHandle) -> Result<Vec<Wor
             None => return Ok(rows),
         }
     }
-}
-
-/// The worktree-admin hold of the store at `trusted_main`, waited for. Dropping the scope releases it.
-pub(crate) fn lock_worktree_admin(trusted_main: &Path) -> Result<LockScope<'static>> {
-    let mut scope =
-        LockScope::seeded(vec![]).map_err(|e| Error::new(ErrorKind::Io, e.to_string()))?;
-    let params = BTreeMap::from([(
-        "fgosDir".to_owned(),
-        trusted_main.join(".fgos").to_string_lossy().into_owned(),
-    )]);
-    scope
-        .acquire("worktree-admin", &params, Wait::Ms(WORKTREE_ADMIN_WAIT_MS))
-        .map_err(|e| {
-            Error::new(
-                ErrorKind::LockHeld,
-                format!("worktree admin is held by another process after waiting {WORKTREE_ADMIN_WAIT_MS} ms ({e})"),
-            )
-        })?;
-    Ok(scope)
 }
 
 /// A unique operation id the Git port accepts (letters, digits, `-`, `_`; at most 80).

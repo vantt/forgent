@@ -7,6 +7,7 @@
 //! one path, a flag that takes a value and is given none is a validation refusal, and a flag written before the
 //! path (`remove --discard-ignored ../w`) takes the path as its value, which leaves no path to remove.
 use crate::routing::Call;
+use crate::wiring::dispatch_decide::resolve_path;
 use fgos_checkout::{
     CreateRequest, Error, ErrorKind, Provision, RemoveRequest, ResyncRequest, Resynced,
 };
@@ -21,7 +22,7 @@ use serde_json::{json, Value};
 use std::borrow::Cow;
 use std::ffi::OsString;
 use std::future::Future;
-use std::path::{Component, Path, PathBuf};
+use std::path::{Path, PathBuf};
 use std::pin::Pin;
 
 pub const CREATE_OPERATION_ID: &str = "worktree.create";
@@ -140,7 +141,11 @@ pub fn project_worktree_request(args: &[OsString]) -> Result<WorktreeRequest, Ca
     let positional = &call.parsed().positional;
     if args.first().is_some_and(|verb| verb == "resync-worktree") {
         let path = call.value("path").map_err(CategorisedRefusal::unexpected)?;
-        let branch = named_value(&call, "branch", "resync-worktree --branch requires a name")?;
+        // The Node verb read an empty `--branch=` as absent and fell back to the default branch.
+        let branch = match call.parsed().flag("branch") {
+            Some(FlagValue::One(FlagScalar::Str(text))) if text.is_empty() => None,
+            _ => named_value(&call, "branch", "resync-worktree --branch requires a name")?,
+        };
         return Ok(WorktreeRequest::Resync {
             cwd,
             dir: call.named_dir(),
@@ -203,28 +208,6 @@ pub fn project_worktree_request(args: &[OsString]) -> Result<WorktreeRequest, Ca
             "worktree requires a sub-verb: create <path> | remove <path> --delivered-to <ref> [--discard-ignored]",
         )),
     }
-}
-
-/// `path` resolved against `base` the way `path.resolve` does: joined when relative, with `.` and `..` folded away.
-fn resolve_against(base: &Path, path: &str) -> PathBuf {
-    let joined = if Path::new(path).is_absolute() {
-        PathBuf::from(path)
-    } else {
-        base.join(path)
-    };
-    let mut out = PathBuf::new();
-    for part in joined.components() {
-        match part {
-            Component::CurDir => {}
-            Component::ParentDir => {
-                if !out.pop() {
-                    out.push(part);
-                }
-            }
-            other => out.push(other),
-        }
-    }
-    out
 }
 
 /// The main checkout of the repository `cwd` sits in (`cwd` itself outside a repository), with the identity its
@@ -294,7 +277,7 @@ pub fn run(request: &WorktreeRequest) -> Result<Value, CategorisedRefusal> {
                 repo_root: context.repo_root,
                 state_root: context.state_root,
                 writer: context.writer,
-                path: resolve_against(cwd, path),
+                path: resolve_path(path, cwd),
                 branch: branch.clone(),
                 base: base.clone(),
                 provision: if *bare {
@@ -343,7 +326,7 @@ pub fn run(request: &WorktreeRequest) -> Result<Value, CategorisedRefusal> {
         } => {
             let worktree = path
                 .as_deref()
-                .map_or_else(|| cwd.clone(), |path| resolve_against(cwd, path));
+                .map_or_else(|| cwd.clone(), |path| resolve_path(path, cwd));
             let context = Context::of(&worktree, dir.as_deref())?;
             fgos_checkout::resync(&ResyncRequest {
                 repo_root: context.repo_root,
@@ -398,21 +381,5 @@ impl OperationProvider for WorktreeProvider {
                 output,
             ))
         })
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn a_relative_path_folds_dot_segments_the_way_a_path_resolve_does() {
-        let base = Path::new("/work/repo");
-        assert_eq!(resolve_against(base, "../w"), PathBuf::from("/work/w"));
-        assert_eq!(
-            resolve_against(base, "./a/./b"),
-            PathBuf::from("/work/repo/a/b")
-        );
-        assert_eq!(resolve_against(base, "/abs/../x"), PathBuf::from("/x"));
     }
 }

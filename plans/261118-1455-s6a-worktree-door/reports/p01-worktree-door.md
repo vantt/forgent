@@ -17,8 +17,8 @@
 | `worktree-create`: CLI adapter creates the checkout and emits the JSON envelope | same `cli_tests.rs` case (argv, envelope, no node started) |
 | `worktree-create`: runs the setup commands after the port returns with the main checkout in `FGOS_REPO_ROOT` | `checkout.rs` `provisioning_installs_copies_skills_runs_setup_with_the_main_root_and_records_it`, `no_git_lock_is_held_while_a_setup_command_runs`, `a_failing_setup_command_fails_the_create_and_leaves_the_checkout_and_its_record` |
 | `worktree-remove`: deletes a clean delivered worktree and binds the delivery statement | `checkout.rs` `remove_sets_provisioned_bytes_aside_and_deletes_them_with_the_record`; the digest and fields by `cli_tests.rs` removal case |
-| `worktree-remove`: refuses a dirty worktree, leaves it untouched | the Git port's own remove tests (`packages/git/rust`, `test/git/worktree.test.mjs`); the engine only forwards the refusal (`a_refused_remove_puts_the_set_aside_bytes_back_and_keeps_the_record`) |
-| `worktree-remove`: refuses when the tip is not contained in the delivery target | same Git port proof (`worktree-delivery-unproven`) |
+| `worktree-remove`: refuses a dirty worktree, leaves it untouched | `packages/git/rust/tests/worktree.rs:827` (`worktree-dirty-preserved`) and `test/git/worktree.test.mjs:26` / `:89` (dirty and dirty-preserved removals); the engine only forwards the refusal (`a_refused_remove_puts_the_set_aside_bytes_back_and_keeps_the_record`) |
+| `worktree-remove`: refuses when the tip is not contained in the delivery target | `test/git/worktree.test.mjs:30` (`delivery-unproven`) and `:128` (detached undelivered tip needs a surviving non-fgos ref) |
 | `worktree-remove`: unknown ref, unregistered path, missing `--delivered-to` | `checkout.rs` `remove_refuses_an_unregistered_path_and_an_undeliverable_ref`; exit codes by `cli_tests.rs` `worktree_calls_answer_the_exit_codes_of_their_argv_shape` and `a_removal_of_an_undeliverable_ref_is_refused_and_leaves_the_checkout` |
 | `worktree-remove`: takes back exactly what create provisioned | `checkout.rs` `remove_sets_provisioned_bytes_aside_and_deletes_them_with_the_record`, `a_node_provisioned_checkouts_record_set_aside_exactly_what_it_names` |
 | `worktree-remove`: refuses on a worker-edited copy, puts bytes back, discards only when asked | `checkout.rs` `a_refused_remove_puts_the_set_aside_bytes_back_and_keeps_the_record`, `discard_ignored_deletes_ignored_bytes_after_the_other_checks_and_counts_them` |
@@ -42,5 +42,10 @@
 - Behaviour kept as it was: `--delivered-to HEAD` is refused (`HEAD` is not a ref name the literal resolver takes), so the bare-checkout case removes with the commit's object id. The brief named `HEAD`; if `HEAD` should be accepted that is a new behaviour, left for a backlog row.
 - `fgos-checkout` `resync` message for `--branch` without a value and `--path` without a value are new host-side refusals (Node threw a type error); exit 4 and 1.
 - Windows `remove` stays unproven (CI only `cargo check` for msvc), as the phase risk says.
+
+## Parity differences from the Node verb
+
+- `worktree remove` of a missing path: the message text differs from Node; exit 1 is kept, and the path is checked before the ref.
+- Bare `--branch` (no value): exit 4 here (the phase file requires 4); Node exited 1 with a type error. `resync-worktree --branch=` (empty value) still falls back to the default branch, as Node did.
 
 Status: DONE_WITH_CONCERNS

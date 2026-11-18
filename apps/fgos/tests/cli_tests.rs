@@ -5135,6 +5135,20 @@ fn worktree_calls_answer_the_exit_codes_of_their_argv_shape() {
     ] {
         assert_eq!(code(args), Some(1), "{args:?}");
     }
+    // A refusal with --json answers on stderr only: nothing on stdout, and the line starts with the program name.
+    let refused = world.run(
+        &repo,
+        &[
+            "worktree", "create", "../w", "--branch", "x", "--detach", "--json",
+        ],
+    );
+    assert_eq!(refused.status.code(), Some(1));
+    assert!(refused.stdout.is_empty(), "{:?}", refused.stdout);
+    assert!(
+        String::from_utf8_lossy(&refused.stderr).starts_with("fgos: "),
+        "{:?}",
+        refused.stderr
+    );
     assert!(
         !world.sandbox.join("w").exists(),
         "a refused call made a checkout"

@@ -1,6 +1,5 @@
 use crate::{git, provision, Error, Result};
 use fgos_git::{RefName, WorktreeCreate, WorktreeHandle};
-use fgos_holder_lock::BorrowedHandle;
 use std::path::PathBuf;
 
 /// Whether a new checkout is provisioned.
@@ -54,29 +53,20 @@ pub fn create(request: &CreateRequest) -> Result<Created> {
                 .map_err(|e| Error::invalid(format!("invalid branch: {e:?}")))
         })
         .transpose()?;
-    let handle = {
-        let admin = git::lock_worktree_admin(&request.repo_root)?;
-        let held = admin
-            .handle("worktree-admin")
-            .ok_or_else(|| Error::invalid("the worktree-admin hold is missing"))?;
-        let borrowed = BorrowedHandle::new(held).map_err(|e| {
-            Error::invalid(format!("borrowing the worktree-admin hold failed: {e:?}"))
-        })?;
-        driver
-            .create_worktree(
-                &repo,
-                vec![borrowed],
-                &WorktreeCreate {
-                    path: request.path.clone(),
-                    branch,
-                    base,
-                    session_id: None,
-                },
-                &request.writer,
-                &git::operation_id("worktree"),
-            )
-            .map_err(Error::git)?
-    };
+    let handle = driver
+        .create_worktree(
+            &repo,
+            vec![],
+            &WorktreeCreate {
+                path: request.path.clone(),
+                branch,
+                base,
+                session_id: None,
+            },
+            &request.writer,
+            &git::operation_id("worktree"),
+        )
+        .map_err(Error::git)?;
     let provisioned = request.provision == Provision::Full;
     if provisioned {
         provision::provision(

@@ -2,7 +2,6 @@ use crate::provision::{file_digest, untracked_entries};
 use crate::record::{self, Placed, Record};
 use crate::{git, Error, ErrorKind, Result};
 use fgos_git::{GitDriver, IgnoredBytes, Oid, WorktreeDelivery};
-use fgos_holder_lock::BorrowedHandle;
 use serde_json::json;
 use sha2::{Digest, Sha256};
 use std::fs;
@@ -243,37 +242,25 @@ pub fn remove(request: &RemoveRequest) -> Result<Removed> {
     .map(|b| format!("{b:02x}"))
     .collect();
     let aside = set_provisioned_aside(&driver, request, &target)?;
-    let removal = (|| {
-        let admin = git::lock_worktree_admin(&request.repo_root)?;
-        let held = admin
-            .handle("worktree-admin")
-            .ok_or_else(|| Error::invalid("the worktree-admin hold is missing"))?;
-        let borrowed = BorrowedHandle::new(held).map_err(|e| {
-            Error::new(
-                ErrorKind::Io,
-                format!("borrowing the worktree-admin hold failed: {e:?}"),
-            )
-        })?;
-        driver
-            .remove_worktree(
-                &repo,
-                vec![borrowed],
-                &target,
-                &WorktreeDelivery {
-                    expected_tip: expected_tip.clone(),
-                    delivered_to: delivered.clone(),
-                    evidence_digest: evidence_digest.clone(),
-                },
-                &request.writer,
-                &git::operation_id("worktree"),
-                if request.discard_ignored {
-                    IgnoredBytes::Discard
-                } else {
-                    IgnoredBytes::Preserve
-                },
-            )
-            .map_err(Error::git)
-    })();
+    let removal = driver
+        .remove_worktree(
+            &repo,
+            vec![],
+            &target,
+            &WorktreeDelivery {
+                expected_tip: expected_tip.clone(),
+                delivered_to: delivered.clone(),
+                evidence_digest: evidence_digest.clone(),
+            },
+            &request.writer,
+            &git::operation_id("worktree"),
+            if request.discard_ignored {
+                IgnoredBytes::Discard
+            } else {
+                IgnoredBytes::Preserve
+            },
+        )
+        .map_err(Error::git);
     let discarded = match removal {
         Ok(discarded) => discarded,
         Err(error) => {
