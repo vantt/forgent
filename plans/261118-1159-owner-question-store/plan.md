@@ -1,12 +1,9 @@
 ---
 contract: plan-v1
 title: "Owner-question store: one Rust door, also reachable from confined heads, to ask, answer, receive and cancel owner questions, with events, a receipt hook, one list and S04"
-status: draft
+status: ready
 priority: P1
-blockedBy:
-  - 261118-0936-ops-metrics
-  - 261118-0947-session-verb-for-agent-sessions
-  - 261115-2328-execution-read-door
+blockedBy: []
 footprint:
   - plans/261118-1159-owner-question-store/**
   - docs/platform/questions/**
