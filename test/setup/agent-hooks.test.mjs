@@ -644,6 +644,25 @@ test('the hook table is the only source of each CLI\'s rows', () => {
   fs.rmSync(repoRoot, { recursive: true, force: true });
 });
 
+test('setup writes the questions receipt hook for Claude Code only, on UserPromptSubmit and Stop, and doctor fails a file without it', () => {
+  const repoRoot = mkTempDir('agent-hooks-questions-');
+  mockRunnableShim(repoRoot);
+  installAllAgentHooks(repoRoot);
+  const rows = agentHookRows(repoRoot).filter((row) => row.kind === 'questions');
+  assert.deepEqual(rows.map((row) => `${row.cli} ${row.event} ${row.args}`), ['claude UserPromptSubmit --event user-prompt-submit', 'claude Stop --event stop']);
+  const claude = readFile(repoRoot, 'claude');
+  const questions = (event) => claude.hooks[event].filter((entry) => entry.hooks[0].command.includes('hook questions'));
+  assert.deepEqual(questions('UserPromptSubmit').map((entry) => entry.hooks[0].command), [rows[0].command]);
+  assert.deepEqual(questions('Stop').map((entry) => entry.hooks[0].command), [rows[1].command]);
+  for (const cli of ['codex', 'agy']) assert.ok(!JSON.stringify(readFile(repoRoot, cli)).includes('hook questions'), cli);
+  assert.equal(checkClaudeHook(repoRoot).passed, true);
+  // A file that lost the rows is not wired: the Claude Code doctor row judges every row of the table.
+  const file = path.join(repoRoot, '.claude', 'settings.json');
+  for (const event of ['UserPromptSubmit', 'Stop']) claude.hooks[event] = claude.hooks[event].filter((entry) => !entry.hooks[0].command.includes('hook questions'));
+  fs.writeFileSync(file, JSON.stringify(claude));
+  assert.equal(checkClaudeHook(repoRoot).passed, false);
+});
+
 test('setup writes a SessionStart registration row for Claude Code, Codex and agy, none for omp and pi, and doctor accepts it', () => {
   const repoRoot = mkTempDir('agent-hooks-session-start-');
   mockRunnableShim(repoRoot);
@@ -688,6 +707,8 @@ test('mailbox rows install Stop and PostToolUse for Claude Code and Codex and no
   assert.deepEqual(claude.hooks.Stop, [
     { hooks: [{ type: 'command', command: mailbox.find((r) => r.cli === 'claude' && r.event === 'Stop').command, timeout: 10 }] },
     { hooks: [{ type: 'command', command: `S="\${CLAUDE_PROJECT_DIR}/.fgos/installation/bin/fgos"; [ -x "$S" ] || exit 0; "$S" hook session-rotation --event stop || true`, timeout: 80 }] },
+    // The receipt hook of an answered owner question, after the rotation hook.
+    { hooks: [{ type: 'command', command: `S="\${CLAUDE_PROJECT_DIR}/.fgos/installation/bin/fgos"; [ -x "$S" ] || exit 0; "$S" hook questions --event stop || true`, timeout: 10 }] },
   ]);
   assert.equal(claude.hooks.PostToolUse[0].matcher, '*');
   const shim = path.join(fs.realpathSync(repoRoot), '.fgos', 'installation', 'bin', 'fgos');
@@ -774,8 +795,8 @@ test('mailbox rows install only when the project opts in, and opting out removes
   installCodexHook(repoRoot);
   assert.equal(mailboxIn('claude') + mailboxIn('codex'), 0);
   const after = readFile(repoRoot, 'claude');
-  // The rotation hook does not follow the mailbox opt-in, so it stays beside the user's own hook.
-  assert.deepEqual(after.hooks.Stop.map((entry) => entry.hooks[0].command), [agentHookRows(repoRoot).find((r) => r.cli === 'claude' && r.kind === 'session-rotation' && r.event === 'Stop').command, userOwn]);
+  // The rotation and questions hooks do not follow the mailbox opt-in, so they stay beside the user's own hook.
+  assert.deepEqual(after.hooks.Stop.map((entry) => entry.hooks[0].command), [agentHookRows(repoRoot).find((r) => r.cli === 'claude' && r.kind === 'session-rotation' && r.event === 'Stop').command, agentHookRows(repoRoot).find((r) => r.cli === 'claude' && r.kind === 'questions' && r.event === 'Stop').command, userOwn]);
   assert.equal(after.hooks.PostToolUse, undefined, 'an event left empty by our removal is dropped');
   assert.equal(after.hooks.PreToolUse.length, 3, 'the guards stay');
   assert.equal(readFile(repoRoot, 'codex').hooks.Stop, undefined);
@@ -960,7 +981,7 @@ test('install preserves user hooks on the same events and is idempotent', () => 
   const rows = agentHookRows(repoRoot);
   const post = rows.find((r) => r.cli === 'claude' && r.event === 'PostToolUse');
   assert.deepEqual(settings.hooks.Stop[0], userStop);
-  assert.equal(settings.hooks.Stop.length, 3, 'the user hook, the mailbox checkpoint and the rotation hook');
+  assert.equal(settings.hooks.Stop.length, 4, 'the user hook, the mailbox checkpoint, the rotation hook and the questions hook');
   assert.equal(settings.hooks.PostToolUse.length, 1, 'our hook replaced inside the shared entry');
   assert.deepEqual(settings.hooks.PostToolUse[0].hooks, [{ type: 'command', command: 'audit.sh' }, { type: 'command', command: post.command, timeout: 10 }]);
   fs.rmSync(repoRoot, { recursive: true, force: true });

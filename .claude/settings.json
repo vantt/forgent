@@ -255,6 +255,15 @@
             "timeout": 80
           }
         ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "S=\"${CLAUDE_PROJECT_DIR}/.fgos/installation/bin/fgos\"; [ -x \"$S\" ] || exit 0; \"$S\" hook questions --event stop || true",
+            "timeout": 10
+          }
+        ]
       }
     ],
     "SubagentStart": [
@@ -324,6 +333,15 @@
           {
             "type": "command",
             "command": "P=\"${CLAUDE_PROJECT_DIR}/.claude/hooks/session-heartbeat.cjs\"; [ -f \"$P\" ] || exit 0; exec node \"$P\""
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "S=\"${CLAUDE_PROJECT_DIR}/.fgos/installation/bin/fgos\"; [ -x \"$S\" ] || exit 0; \"$S\" hook questions --event user-prompt-submit || true",
+            "timeout": 10
           }
         ]
       }

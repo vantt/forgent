@@ -268,7 +268,7 @@
     },
     {
       "id": "dispatch-decide-hook-wired",
-      "description": ".claude/settings.json PreToolUse hooks enforce fgos dispatch decide on every Agent/Task call, the decision-question template and the main-checkout delete guard on every Bash call",
+      "description": ".claude/settings.json hooks: PreToolUse enforces fgos dispatch decide on every Agent/Task call, the decision-question template and the main-checkout delete guard on every Bash call; the mailbox, session-rotation and questions (receipt of an answered owner question) hooks sit on Stop, UserPromptSubmit and the other events",
       "owner": "rust:packaging"
     },
     {

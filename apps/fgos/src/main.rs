@@ -302,6 +302,7 @@ fn main() {
             HookKind::Mailbox => wiring::mailbox_hook::main(&cli_args[2..]),
             HookKind::SessionRotation => wiring::session_rotation_hook::main(&cli_args[2..]),
             HookKind::DispatchDecide => wiring::dispatch_decide::hook_main(&cli_args[2..]),
+            HookKind::Questions => wiring::questions_hook::main(&cli_args[2..]),
         }
     }
 

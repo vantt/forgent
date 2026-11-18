@@ -27,6 +27,7 @@ export const HOOK_KINDS = {
   MAILBOX: 'mailbox',
   SESSION: 'session-register',
   ROTATION: 'session-rotation',
+  QUESTIONS: 'questions',
   DELETE_GUARD: 'main-checkout-delete-guard',
 };
 
@@ -208,6 +209,13 @@ const claudeRotationRow = (args, event, timeout) => ({
   command: `S=${CLAUDE_SHIM}; [ -x "$S" ] || exit 0; "$S" hook ${HOOK_KINDS.ROTATION} ${args} || true`, timeout,
 });
 
+// The receipt hook of an answered owner question: Claude Code only, guarded like the rotation hook.
+const QUESTIONS_TIMEOUT_SEC = 10;
+const claudeQuestionsRow = (args, event) => ({
+  cli: 'claude', kind: HOOK_KINDS.QUESTIONS, args, event, matcher: null,
+  command: `S=${CLAUDE_SHIM}; [ -x "$S" ] || exit 0; "$S" hook ${HOOK_KINDS.QUESTIONS} ${args} || true`, timeout: QUESTIONS_TIMEOUT_SEC,
+});
+
 /**
  * Every fgOS hook a JSON hook file carries, one row per (cli, kind, event): the file, where the row
  * lives (`hooks.<Event>` entries, or an agy named group), its matcher (null: the entry has none), and
@@ -230,6 +238,8 @@ const hookRows = (repoRoot) => [
   // measured on 1.4.2). omp and pi have none in their facts and register at their first fgOS verb.
   { cli: 'claude', kind: HOOK_KINDS.SESSION, event: 'SessionStart', matcher: null, command: `S=${CLAUDE_SHIM}; [ -x "$S" ] || exit 0; "$S" ${SESSION_REGISTER_ARGS} >/dev/null || true`, timeout: SESSION_REGISTER_TIMEOUT_SEC },
   claudeRotationRow('--event session-start', 'SessionStart', ROTATION_START_TIMEOUT_SEC),
+  claudeQuestionsRow('--event user-prompt-submit', 'UserPromptSubmit'),
+  claudeQuestionsRow('--event stop', 'Stop'),
   { cli: 'codex', kind: HOOK_KINDS.SESSION, event: 'SessionStart', matcher: null, command: `${shimCommand(repoRoot, SESSION_REGISTER_ARGS)} >/dev/null || true`, timeout: SESSION_REGISTER_TIMEOUT_SEC },
   { cli: 'agy', kind: HOOK_KINDS.SESSION, event: 'SessionStart', group: 'fgos-session-register', flat: true, command: `${shimCommand(repoRoot, SESSION_REGISTER_ARGS)} >/dev/null || true`, timeout: SESSION_REGISTER_TIMEOUT_SEC },
   { cli: 'codex', kind: HOOK_KINDS.DISPATCH, event: 'PreToolUse', matcher: '.*', command: shimCommand(repoRoot, 'hook dispatch-decide') },

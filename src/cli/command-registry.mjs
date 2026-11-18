@@ -927,13 +927,13 @@ export const COMMAND_REGISTRY = [
   {
     name: 'hook',
     invoke: 'fgos hook <kind>',
-    description: 'Execute managed hook guards for supported coding agents (Claude, Codex, AGY, OMP, Pi). Bypasses CLI envelope and store admission to preserve hook exit codes and stdio protocols. `dispatch-decide` is the PreToolUse guard of Agent/Task calls, also served natively by the Rust host: it asks `fgos dispatch decide` for the call\'s subagent type and blocks (exit 2, or a deny answer with `--format=agy`) unless the answer is `in-process`; a payload that does not parse, a failed decision and any other error allow the call, an unusable config blocks it. `mailbox` is the agent mailbox\'s checkpoint (docs/platform/agent-mailbox/spec.md §6.1), served natively by the Rust host: it registers the calling head, prints pending mail in the shape the CLI injects, and always exits 0, printing nothing on any failure. `session-rotation --event stop|session-start` is a head session\'s rotation hook (docs/platform/session-host/spec.md section 8.8), also native: it does nothing outside a head session, asks its own supervisor for `session answered` or `session rotate`, prints only the session start\'s handoff context, and always exits 0. `main-checkout-delete-guard` refuses a shell command that would mass-delete inside the main checkout of a fgOS project (git clean -x/-X, xargs rm, rm -r of the checkout or a top-level runtime directory, find -delete).',
+    description: 'Execute managed hook guards for supported coding agents (Claude, Codex, AGY, OMP, Pi). Bypasses CLI envelope and store admission to preserve hook exit codes and stdio protocols. `dispatch-decide` is the PreToolUse guard of Agent/Task calls, also served natively by the Rust host: it asks `fgos dispatch decide` for the call\'s subagent type and blocks (exit 2, or a deny answer with `--format=agy`) unless the answer is `in-process`; a payload that does not parse, a failed decision and any other error allow the call, an unusable config blocks it. `mailbox` is the agent mailbox\'s checkpoint (docs/platform/agent-mailbox/spec.md §6.1), served natively by the Rust host: it registers the calling head, prints pending mail in the shape the CLI injects, and always exits 0, printing nothing on any failure. `session-rotation --event stop|session-start` is a head session\'s rotation hook (docs/platform/session-host/spec.md section 8.8), also native: it does nothing outside a head session, asks its own supervisor for `session answered` or `session rotate`, prints only the session start\'s handoff context, and always exits 0. `questions --event user-prompt-submit|stop` is the receipt hook of a session whose owner question was answered, also native: it reads only the per-machine view `.fgos/cache/questions.json`, writes nothing, prints one line per answered question that has no ack (a stop blocks once, and only for a notice not yet in the transcript), and always exits 0. `main-checkout-delete-guard` refuses a shell command that would mass-delete inside the main checkout of a fgOS project (git clean -x/-X, xargs rm, rm -r of the checkout or a top-level runtime directory, find -delete).',
     parameters: {
       type: 'object',
       properties: {
         kind: {
           type: 'string',
-          enum: ['dispatch-decide', 'decision-question', 'main-checkout-delete-guard', 'mailbox', 'session-rotation'],
+          enum: ['dispatch-decide', 'decision-question', 'main-checkout-delete-guard', 'mailbox', 'questions', 'session-rotation'],
           description: 'The specific hook guard to execute.',
         },
         format: {
@@ -948,20 +948,20 @@ export const COMMAND_REGISTRY = [
         },
         event: {
           type: 'string',
-          enum: ['stop', 'post-tool-use', 'session-start'],
-          description: 'mailbox: stop or post-tool-use; session-rotation: stop or session-start.',
+          enum: ['stop', 'post-tool-use', 'session-start', 'user-prompt-submit'],
+          description: 'mailbox: stop or post-tool-use; session-rotation: stop or session-start; questions: user-prompt-submit or stop.',
         },
       },
       positional: ['kind'],
       required: ['kind'],
     },
-    examples: ['fgos hook dispatch-decide', 'fgos hook decision-question', 'fgos hook main-checkout-delete-guard', 'fgos hook dispatch-decide --format=agy', 'fgos hook mailbox --cli claude --event post-tool-use', 'fgos hook session-rotation --event stop'],
+    examples: ['fgos hook dispatch-decide', 'fgos hook decision-question', 'fgos hook main-checkout-delete-guard', 'fgos hook dispatch-decide --format=agy', 'fgos hook mailbox --cli claude --event post-tool-use', 'fgos hook session-rotation --event stop', 'fgos hook questions --event user-prompt-submit'],
     touchesState: false,
     store: 'none',
     externalEffect: false,
     paginated: false,
     deprecated: null,
-    native: ['dispatch-decide', 'mailbox', 'mailbox-sync', 'session-rotation'],
+    native: ['dispatch-decide', 'mailbox', 'mailbox-sync', 'questions', 'session-rotation'],
   },
   {
     name: 'decision',

@@ -95,7 +95,7 @@ test('a verb whose registry native list names first positionals routes to the le
   const listed = COMMAND_REGISTRY.filter((e) => Array.isArray(e.native));
   assert.deepEqual(listed.map((e) => e.name).sort(), ['dispatch', 'hook']);
   assert.deepEqual(routes.dispatch.native_subcommands, ['decide', 'explain']);
-  assert.deepEqual(routes.hook.native_subcommands, ['dispatch-decide', 'mailbox', 'mailbox-sync', 'session-rotation']);
+  assert.deepEqual(routes.hook.native_subcommands, ['dispatch-decide', 'mailbox', 'mailbox-sync', 'questions', 'session-rotation']);
   assert.equal(routes.dispatch.route_kind, 'legacy-cli', 'every other dispatch sub-verb still reaches the legacy payload');
   assert.equal(routes.hook.route_kind, 'legacy-cli', 'every other hook kind still reaches the legacy payload');
   const withNativeSubs = Object.values(routes).filter((r) => r.native_subcommands !== undefined).map((r) => r.selector);

@@ -42,6 +42,7 @@ const KIND_DECISION: &str = "decision-question";
 const KIND_MAILBOX: &str = "mailbox";
 const KIND_SESSION: &str = "session-register";
 const KIND_ROTATION: &str = "session-rotation";
+const KIND_QUESTIONS: &str = "questions";
 const KIND_DELETE_GUARD: &str = "main-checkout-delete-guard";
 
 /// The shim relative to the project root, with forward slashes.
@@ -56,6 +57,8 @@ const SESSION_REGISTER_TIMEOUT_SEC: u64 = 10;
 /// A rotation hook's stop waits for the supervisor's `session answered` reply, which may take its 60 s verb bound.
 const ROTATION_STOP_TIMEOUT_SEC: u64 = 80;
 const ROTATION_START_TIMEOUT_SEC: u64 = 10;
+/// The receipt hook reads one cache file and prints; a stop also reads the transcript.
+const QUESTIONS_TIMEOUT_SEC: u64 = 10;
 const AGY_ALLOW: &str = r#"{"decision":"allow"}"#;
 
 // ---------------------------------------------------------------------------------------------------------
@@ -621,6 +624,21 @@ pub fn hook_rows(root: &Path, mailbox_timeout: u64) -> Vec<HookRow> {
         .args(args)
         .timeout(timeout)
     };
+    // The receipt hook of an answered owner question: guarded like the rotation hook, its stdout reaches the session
+    // (a prompt's context line, a stop's block object). It prints nothing for a session with no answer to tell.
+    let claude_questions = |args: &'static str, hook_event: &'static str| {
+        HookRow::new(
+            "claude",
+            KIND_QUESTIONS,
+            hook_event,
+            format!(
+                "S={}; [ -x \"$S\" ] || exit 0; \"$S\" hook {KIND_QUESTIONS} {args} || true",
+                claude_shim()
+            ),
+        )
+        .args(args)
+        .timeout(QUESTIONS_TIMEOUT_SEC)
+    };
     vec![
         HookRow::new(
             "claude",
@@ -669,6 +687,8 @@ pub fn hook_rows(root: &Path, mailbox_timeout: u64) -> Vec<HookRow> {
             "SessionStart",
             ROTATION_START_TIMEOUT_SEC,
         ),
+        claude_questions("--event user-prompt-submit", "UserPromptSubmit"),
+        claude_questions("--event stop", "Stop"),
         HookRow::new(
             "codex",
             KIND_SESSION,
@@ -2438,6 +2458,35 @@ mod tests {
         for case in vectors()["cases"].as_array().unwrap() {
             run_case(case);
         }
+    }
+
+    // The doctor row of Claude Code judges every row of the table, so a questions row missing from the file fails it.
+    #[cfg(unix)]
+    #[test]
+    fn a_claude_hook_file_without_the_questions_rows_fails_the_check_and_an_install_restores_them()
+    {
+        let fx = Fixture::new("questions-rows", "project");
+        let env = fx.env();
+        let process_env = fx.process_env();
+        let runner = test_runner::RetryOnBusy;
+        install_hook(&fx.root, "claude", &env).unwrap();
+        fx.with_shim(true);
+        let check = |fx: &Fixture| {
+            check_hook(&fx.root, "claude", &env, &process_env, &runner, None).unwrap()
+        };
+        assert!(check(&fx).passed, "{}", check(&fx).message);
+        let path = fx.root.join(".claude").join("settings.json");
+        let text = std::fs::read_to_string(&path).unwrap();
+        assert_eq!(text.matches("hook questions --event").count(), 2);
+        let mut config: Value = serde_json::from_str(&text).unwrap();
+        for event in ["UserPromptSubmit", "Stop"] {
+            let entries = config["hooks"][event].as_array_mut().unwrap();
+            entries.retain(|e| !e.to_string().contains("hook questions"));
+        }
+        std::fs::write(&path, serde_json::to_string_pretty(&config).unwrap()).unwrap();
+        assert!(!check(&fx).passed);
+        install_hook(&fx.root, "claude", &env).unwrap();
+        assert!(check(&fx).passed);
     }
 
     #[test]

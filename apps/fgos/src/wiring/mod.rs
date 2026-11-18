@@ -44,6 +44,11 @@ pub mod observe_declarations;
 pub mod observe_query;
 pub mod observe_sources;
 pub mod questions;
+#[cfg(unix)]
+pub mod questions_hook;
+#[cfg(not(unix))]
+#[path = "questions_hook_unsupported.rs"]
+pub mod questions_hook;
 pub mod run_dirs;
 pub mod seat_binding;
 #[cfg(unix)]
