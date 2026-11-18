@@ -3,8 +3,8 @@
 Phase 7 found two refusals in the Git crate that block the plan's landing order (push first, then publish, while
 the Land session is alive; catch local main up to the remote tip when it is behind). The owner chose option A on
 2026-11-18 (`reports/decision-261118-1431-p07-land-push-order.md`): add two narrow Git ports here, then re-run phase
-7 unchanged. Rust. **Merge gate:** a named Git reviewer must review the diff before it lands. lead:OPC is closed and
-no replacement has been named yet. Write and test the phase meanwhile, but do not land it until the reviewer exists.
+7 unchanged. Rust. **Merge gate:** the Git reviewer lead:OPC (`claude-36tm`, reopened by the owner for this plan)
+reviews the diff and the land gate before it lands.
 
 ## Inputs
 Step 0 first: re-grep every item, and run `git log -S'admission_land'`, `-S'main-checkout-fast-forward-refused'` and
@@ -58,7 +58,7 @@ phase would open stops the phase with `NEEDS_CONTEXT`.
   --check`, and `cargo check -p fgos-git` for `x86_64-pc-windows-msvc` and `aarch64-apple-darwin`.
 - `node scripts/git-one-door-scan.mjs --root .` reports no undeclared site; regenerate the census if it moved.
 - Re-run phase 7's tests on `sv/p07` rebased onto this phase: the 11 that failed now pass.
-- The named Git reviewer has signed off before land.
+- lead:OPC has signed off on the diff and the land gate before land.
 
 ## Rollback
 Revert the phase commit. Nothing outside the Git crate calls the new doors until phase 7 lands.

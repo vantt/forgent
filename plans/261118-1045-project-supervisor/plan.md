@@ -308,7 +308,8 @@ main checkout to the remote tip) was answered by the owner on 2026-11-18: **(A)*
 (`reports/decision-261118-1431-p07-land-push-order.md`). A new phase 7a adds two narrow Git doors: a push of the Land's
 own candidate from inside its session, and a main-checkout catch-up that is clean and fast-forward only. Phase 7 then
 re-runs unchanged. No other path is exempted from `main-checkout-fast-forward-refused`. Phase 7a lands only after a
-named Git reviewer has reviewed it; lead:OPC is closed, so the reviewer is still to be named.
+named Git reviewer has reviewed it. The owner reopened lead:OPC (`claude-36tm`) as this plan's Git reviewer on
+2026-11-18, until the plan is done; send it every 7a diff and land gate.
 
 **Approval.** Owner-approved 2026-11-18. The status stays `draft` until every `blockedBy` plan is `done`; then it turns
 `ready` with no other change.
