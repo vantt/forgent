@@ -6,10 +6,6 @@ priority: P1
 blockedBy: []
 footprint:
   - plans/261118-1159-owner-question-store/**
-  - docs/platform/questions/**
-  - docs/platform/identity/spec.md
-  - docs/platform/component-boundary.md
-  - docs/platform/governance.md
   - docs/platform/session-host/spec.md
   - docs/platform/ui-spec/architecture/screens/S04-questions-needing-answer.md
   - docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml
@@ -18,14 +14,7 @@ footprint:
   - docs/architecture-manifest.json
   - docs/discussions/*/QUESTIONS.md
   - CHANGELOG.md
-  - Cargo.toml
   - Cargo.lock
-  - packages/questions/**
-  - packages/identity/rust/src/mint.rs
-  - packages/identity/rust/src/resolve.rs
-  - packages/identity/rust/tests/**
-  - packages/identity/contracts/identity.write.v1.json
-  - packages/event-store/contracts/consumers.v1.json
   - packages/distribution/rust/src/agent_hooks.rs
   - packages/distribution/contracts/doctor-registry.v1.json
   - packages/distribution/contracts/doctor-bridge.v1.json
@@ -55,8 +44,6 @@ footprint:
   - apps/fgos-gateway/web/src/api/**
   - apps/fgos-gateway/web/src/screens/NeedsAnswer.tsx
   - apps/fgos-gateway/web/src/screens/NeedsAnswer.test.tsx
-  - core/questions/**
-  - core/instructions/id-minting.md
   - core/skills/**
   - domains/coding/skills/**
   - .agents/skills/**
@@ -72,7 +59,6 @@ footprint:
   - src/session-host/head-grants.mjs
   - src/session-host/head-request.mjs
   - src/session-host/head-request-client.mjs
-  - package.json
   - src/session-host/head-start.mjs
   - src/cli/command-registry.mjs
   - bin/fgos.mjs
@@ -82,7 +68,6 @@ footprint:
   - test/setup/**
   - test/session-host/**
   - test/rust-host/**
-  - test/fixtures/questions/**
 base: 570780a581227d42e3ab5cbbdbb47e9395848e57
 source:
   - docs/discussions/owner-questions/DISCUSSION.md
