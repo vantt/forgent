@@ -60,3 +60,15 @@ Step 0 first: re-grep every item. A finding that changes a plan decision stops t
 
 ## Rollback
 Revert the phase commit. The crate keeps its stub `land` module; nothing calls it before phase 16.
+
+## Landed (6f20234bd, lead:OPC MERGE 2026-11-18) and follow-ups
+
+Land tests 21/21 on the phase 7a doors (this also meets 7a's acceptance). Review follow-ups, not blocking, done in
+phase 7c after phase 14a lands (both touch the Git crate):
+1. The merge-slot params and slot key are built in five places in `packages/git/rust/src/land.rs` (prepare, the
+   `acquire_merge_slot` door, recover and two more); the internal sites use one helper the door shares (RUL11).
+2. `merge-slot-busy` is classed Refused while `worktree-admin-held` is Busy/retryable; pick one class for "a lock is
+   busy, try again" and use it for both.
+3. `land-paths-push-rejected` tells a human to run raw `git reset --keep`; when fgos has a SafeRestore verb for this (backlog `p-tpqddlbsk6`),
+   point at it instead (no verb exists today: backlog row, not phase 7c).
+
