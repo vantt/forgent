@@ -1,7 +1,7 @@
 ---
 contract: plan-v1
 title: "Give `fgos session` back to agent sessions: retire the session worktree lifecycle, rename `fgos head` to `fgos session`"
-status: draft
+status: ready
 priority: P1
 blockedBy:
   - 261117-1856-secretary-session-spine
@@ -53,7 +53,7 @@ source:
 created: 2026-11-18
 ---
 
-> Hold lifted (owner 2026-11-18 20:4x, option A after the S6a worktree door 1455 landed): this plan runs next; status stays draft until plan 261118-1847 (account lease) is done, because their footprints share src/**, test/**, doctor-registry and CHANGELOG.
+> Hold lifted (owner 2026-11-18 20:4x, option A after the S6a worktree door 1455 landed); ready since account lease 261118-1847 is done (supervisor).
 
 # Give `fgos session` back to agent sessions
 
