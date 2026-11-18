@@ -13,7 +13,7 @@
 // the run supervisor only transports the verbs that reach it (`head-request.mjs`); `placeHead` starts the head.
 //
 // Files under `.fgos/runtime/session-rotation/<persona>-<name>/` (the folder the handoffs and the placement live in):
-// `rotation.json` (the pending rotation: successor key and generation, reason, the old session, its pending question),
+// `rotation.json` (the pending rotation: its id, successor key and generation, reason, the old session, its pending question),
 // `answered.json` (the successor's first answer), `incidents.jsonl`, `rotation.log`, and `request-<id>.json` while a
 // request waits for its executor. One lock per lineage (`session-rotation`) admits one rotation at a time.
 
@@ -75,25 +75,18 @@ function checkRequest({ persona, name, reason, stopFacts, projectRoot }) {
   return { persona, name, reason, projectRoot, stopFacts: checkStopFacts(stopFacts) };
 }
 
-// ---- the question the answer must name -----------------------------------------------------------
+// ---- the token the answer must echo ---------------------------------------------------------------
 
-const words = (text) => new Set(String(text).toLowerCase().match(/[\p{L}\p{N}]{4,}/gu) ?? []);
+const ROTATION_ID_PREFIX = 'Rotation id: ';
+const ROTATION_ID_PATTERN = /^[a-f0-9]{16}$/;
 
-/**
- * Whether the successor's first message names the question the old session left pending. With no pending question any
- * non-empty message passes (the start ritual asks for one line saying that none is pending). With one, at least half of
- * the question's words of four letters or more must appear in the message: a paraphrase passes, a message about
- * something else does not.
- */
-export function answerNamesQuestion(message, pendingQuestion) {
-  if (typeof message !== 'string' || message.trim() === '') return false;
-  if (typeof pendingQuestion !== 'string' || pendingQuestion.trim() === '') return true;
-  const wanted = words(pendingQuestion);
-  if (wanted.size === 0) return true;
-  const have = words(message);
-  let hits = 0;
-  for (const word of wanted) if (have.has(word)) hits += 1;
-  return hits * 2 >= wanted.size;
+/** The line of a handoff that carries the rotation id; the successor reads its id from it and echoes it exactly. */
+export const rotationIdLine = (id) => `${ROTATION_ID_PREFIX}${id}`;
+
+/** The rotation id a handoff text carries, or null. */
+export function rotationIdOf(handoffText) {
+  const match = new RegExp(`^${ROTATION_ID_PREFIX}([a-f0-9]{16})$`, 'm').exec(String(handoffText));
+  return match ? match[1] : null;
 }
 
 // ---- lineage files ---------------------------------------------------------------------------------
@@ -120,18 +113,21 @@ const incident = (dir, line) => {
 /**
  * Records the first answer of the successor, the one fact the executor waits for. Called through the request socket
  * (`head answered`) with the successor's own `key` (its attempt's unit run id, from the envelope, never from the
- * sandbox). Refused `no-rotation-pending` when this lineage has no rotation waiting for that key, and
- * `answer-mismatch` when the message does not name the pending question; the role does not move in either case.
- * `{ sessionId, message }` are the successor's Identity session id and its last assistant message.
+ * sandbox). Refused `no-rotation-pending` when this lineage has no rotation waiting for that key (the executor removes
+ * `rotation.json` before it gives up, so a late answer is refused), and `answer-mismatch` when `rotationId` is not
+ * exactly the pending rotation's id; the role does not move in either case. This is the one place the answer is
+ * checked. `{ sessionId, rotationId, message }` are the successor's Identity session id, the id it read from its
+ * handoff (`rotationIdLine`) and its last assistant message, kept as evidence.
  */
-export function markSuccessorAnswered({ projectRoot, persona, name, key, sessionId, message }, { now = () => new Date() } = {}) {
+export function markSuccessorAnswered({ projectRoot, persona, name, key, sessionId, rotationId, message }, { now = () => new Date() } = {}) {
   try { assertHeadArgs({ persona, name, projectRoot }); } catch (err) { fail(err.code ?? 'bad-args', err.message); }
   if (typeof sessionId !== 'string' || sessionId === '' || sessionId.length > 200) fail('bad-args', 'sessionId must be a non-empty string');
+  if (typeof rotationId !== 'string' || !ROTATION_ID_PATTERN.test(rotationId)) fail('bad-args', 'rotationId must be the 16 hex characters of the handoff\'s rotation id line');
   if (typeof message !== 'string' || message.trim() === '' || message.length > MAX_TEXT) fail('bad-args', `message must be a non-empty string of at most ${MAX_TEXT} characters`);
   const dir = lineageDirOf(projectRoot, persona, name);
   const pending = readJson(path.join(dir, 'rotation.json'));
   if (!pending || pending.successorKey !== key) fail('no-rotation-pending', `${headRoleOf(persona, name)} has no rotation waiting for ${key}`);
-  if (!answerNamesQuestion(message, pending.pendingQuestion)) fail('answer-mismatch', 'the first message does not name the question the old session left pending');
+  if (rotationId !== pending.id) fail('answer-mismatch', 'rotationId is not the id of the pending rotation');
   const record = { gen: pending.gen, key, sessionId, message: redactText(message), answeredAt: now().toISOString() };
   writeJson(dir, 'answered.json', record);
   return { accepted: true, gen: pending.gen };
@@ -164,7 +160,7 @@ const realClock = { now: () => Date.now(), sleep: (ms) => new Promise((resolve) 
  * Rotates the head session of `persona` and `name` into a successor and returns `{ rotated: true, key, gen }`, or
  * `{ rotated: false, reason }` with the old session still alive. `reason` is `soft`, `hard` or `manual`; `stopFacts`
  * are what the old session's last stop knew (`sessionId`, `portfolio`, `delta`, `lastAssistantMessage`,
- * `pendingQuestion`) and go into the handoff.
+ * `pendingQuestion`) and go into the handoff, which also carries the rotation id the successor must echo.
  *
  * `ports` (all optional, for tests): `end(runDir) -> boolean` (asks that session attempt's supervisor to stop it),
  * `identity({ role, projectRoot }) -> { live, session }`, `lock(lineage) -> { release } | null`, `place` (`placeHead`),
@@ -177,62 +173,95 @@ export async function rotateHeadSession(request, ports = {}) {
   const lock = (ports.lock ?? takeLock)({ projectRoot, persona, name });
   if (!lock) return { rotated: false, reason: 'rotation-in-progress' };
   const end = ports.end ?? ((runDir) => requestCancel(runDir, 'session-rotation'));
+  const recordPlacement = ports.recordPlacement ?? writeHeadPlacement;
   const clock = ports.clock ?? realClock;
   const whoHolds = ports.identity ?? ((ask) => identityHolder(ask.role, ask.projectRoot));
+  const pendingFile = path.join(dir, 'rotation.json');
+  let old = null;
+  let gen = null;
+  let successorKey = null;
   let successor = null;
-  const abandon = (code, detail) => {
-    if (successor && !end(successor.runDir)) incident(dir, { event: 'successor-not-ended', code, detail: `no stop request could be written for ${successor.runDir}` });
-    fs.rmSync(path.join(dir, 'rotation.json'), { force: true });
-    incident(dir, { event: 'rotation-failed', role, code, detail });
+
+  // The successor holds the role from here on and is never ended by this path: each step reports its own failure as an
+  // incident and the next one still runs.
+  const complete = (answered, how) => {
+    const step = (name_, fn) => {
+      try { return fn(); } catch (err) {
+        incident(dir, { event: 'step-failed', step: name_, role, detail: String(err.message ?? err).slice(0, 300) });
+        return false;
+      }
+    };
+    step('record-placement', () => recordPlacement(dir, { role, gen, placement: successor.placement, runDir: successor.runDir, persona: successor.persona, startedAt: new Date(clock.now()).toISOString() }));
+    step('clear-pending', () => fs.rmSync(pendingFile, { force: true }));
+    const oldEnded = step('end-old', () => end(old.runDir)) === true;
+    if (!oldEnded) incident(dir, { event: 'old-not-ended', role, code: 'cancel-unwritable', detail: `no stop request could be written for ${old.runDir}` });
+    if (how) incident(dir, { event: 'rotation-completed', role, how, session: answered.sessionId });
+    return { rotated: true, key: successor.key, gen, oldEnded };
+  };
+
+  // Identity is the authority on who holds the role: a deadline that passed while the role was moving finishes the
+  // rotation instead of ending the role holder. rotation.json goes first, so no later `head answered` is accepted.
+  const abandon = async (code, detail) => {
+    fs.rmSync(pendingFile, { force: true });
+    if (successor) {
+      let holder = null;
+      try { holder = await whoHolds({ role, projectRoot }); } catch (err) {
+        incident(dir, { event: 'rotation-failed', role, code, detail, successor: 'kept', why: `Identity could not say who holds the role (${err.code ?? err.message}), so nothing was ended` });
+        return { rotated: false, reason: code, detail, successor: 'kept' };
+      }
+      const answered = readJson(path.join(dir, 'answered.json'));
+      if (holder.live && answered?.gen === gen && answered.key === successorKey && holder.session === answered.sessionId) {
+        return complete(answered, `${code}, but Identity already named the successor holder`);
+      }
+      if (!end(successor.runDir)) incident(dir, { event: 'successor-not-ended', code, detail: `no stop request could be written for ${successor.runDir}` });
+    }
+    incident(dir, { event: 'rotation-failed', role, code, detail, successor: successor ? 'ended' : 'none' });
     return { rotated: false, reason: code, detail };
   };
+
   try {
-    const old = readHeadPlacement(dir);
-    if (!old?.runDir) return abandon('placement-unknown', `${role} has no recorded placement with its run directory under ${dir}`);
+    old = readHeadPlacement(dir);
+    if (!old?.runDir) return await abandon('placement-unknown', `${role} has no recorded placement with its run directory under ${dir}`);
     const holder = await whoHolds({ role, projectRoot });
-    if (!holder.live) return abandon('old-not-live', `${role} is not held by a live session, there is nothing to rotate`);
+    if (!holder.live) return await abandon('old-not-live', `${role} is not held by a live session, there is nothing to rotate`);
     const config = (ports.config ?? readRotationConfig)(projectRoot);
     const bound = config.answerWaitMs ?? DEFAULT_ANSWER_WAIT_MS;
 
+    const id = crypto.randomBytes(8).toString('hex');
     const handoff = writeHandoff({
       fgosDir: path.join(projectRoot, '.fgos'), persona, name, sessionId: stopFacts.sessionId ?? old.placement.key,
-      rotate: reason === 'soft' ? 'soft' : 'hard', keep: config.keep, portfolio: stopFacts.portfolio ?? [], delta: stopFacts.delta ?? '',
+      rotate: reason === 'soft' ? 'soft' : 'hard', keep: config.keep, portfolio: stopFacts.portfolio ?? [],
+      delta: `${rotationIdLine(id)}\n${stopFacts.delta ?? ''}`,
       lastAssistantMessage: stopFacts.lastAssistantMessage ?? null, pendingQuestion: stopFacts.pendingQuestion ?? null,
     });
 
-    const gen = nextHeadGeneration(projectRoot, persona, name);
-    const successorKey = headKeyOf(persona, name, gen);
+    gen = nextHeadGeneration(projectRoot, persona, name);
+    successorKey = headKeyOf(persona, name, gen);
     fs.rmSync(path.join(dir, 'answered.json'), { force: true });
     writeJson(dir, 'rotation.json', {
-      successorKey, gen, reason, handoff: handoff.file, oldKey: old.placement.key, oldSession: holder.session ?? null,
+      id, successorKey, gen, reason, handoff: handoff.file, oldKey: old.placement.key, oldSession: holder.session ?? null,
       pendingQuestion: stopFacts.pendingQuestion ?? null, startedAt: new Date(clock.now()).toISOString(),
     });
     try {
       successor = await (ports.place ?? placeHead)({ persona, name, projectRoot, beside: old.placement.key, gen }, ports.placePorts ?? {});
     } catch (err) {
-      return abandon(err.code ?? 'start-refused', String(err.message ?? err));
+      return await abandon(err.code ?? 'start-refused', String(err.message ?? err));
     }
 
     const deadline = clock.now() + bound;
+    let answered = null;
     for (;;) {
-      const answered = readJson(path.join(dir, 'answered.json'));
-      if (answered && answered.gen === gen && answered.key === successorKey) {
-        if (!answerNamesQuestion(answered.message, stopFacts.pendingQuestion ?? null)) return abandon('answer-mismatch', 'the first message does not name the pending question');
+      const record = readJson(path.join(dir, 'answered.json'));
+      if (record && record.gen === gen && record.key === successorKey) {
         const now = await whoHolds({ role, projectRoot });
-        if (now.live && now.session === answered.sessionId) break;
+        if (now.live && now.session === record.sessionId) { answered = record; break; }
       }
-      if (clock.now() >= deadline) return abandon('no-answer', `no valid answer from ${successorKey} within ${bound} ms`);
+      if (clock.now() >= deadline) return await abandon('no-answer', `no valid answer from ${successorKey} within ${bound} ms`);
       await clock.sleep(ports.pollMs ?? POLL_MS);
     }
-
-    // The role is the successor's: record where it lives first, then let the old session go.
-    writeHeadPlacement(dir, { role, gen, placement: successor.placement, runDir: successor.runDir, persona: successor.persona, startedAt: new Date(clock.now()).toISOString() });
-    fs.rmSync(path.join(dir, 'rotation.json'), { force: true });
-    const oldEnded = end(old.runDir);
-    if (!oldEnded) incident(dir, { event: 'old-not-ended', role, code: 'cancel-unwritable', detail: `no stop request could be written for ${old.runDir}` });
-    return { rotated: true, key: successor.key, gen, oldEnded };
+    return complete(answered, null);
   } catch (err) {
-    return abandon(err.code ?? 'internal', String(err.message ?? err).slice(0, 500));
+    return await abandon(err.code ?? 'internal', String(err.message ?? err).slice(0, 500));
   } finally {
     lock.release();
   }

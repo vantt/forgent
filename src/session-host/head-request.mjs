@@ -111,7 +111,7 @@ export function requestHead(verb, args, { socketPath = process.env[HEAD_REQUEST_
 export const requestHeadStart = (args, options) => requestHead(HEAD_START_VERB, args, options);
 /** `head rotate` over the socket: the old head asks for its own rotation; `args` is `{ persona, name, reason, stopFacts? }`. */
 export const requestHeadRotate = (args, options) => requestHead(HEAD_ROTATE_VERB, args, options);
-/** `head answered` over the socket: the successor reports its first turn; `args` is `{ persona, name, sessionId, message }`. */
+/** `head answered` over the socket: the successor reports its first turn; `args` is `{ persona, name, sessionId, rotationId, message }`. */
 export const requestHeadAnswered = (args, options) => requestHead(HEAD_ANSWERED_VERB, args, options);
 
 const confined = (env) => env[CONFINED_MARKER_ENV] === '1';
@@ -194,9 +194,9 @@ export async function runHeadRequest({ runDir, request }, ports = {}) {
         break;
       }
       case HEAD_ANSWERED_VERB:
-        exactKeys(args, ['persona', 'name', 'sessionId', 'message']);
+        exactKeys(args, ['persona', 'name', 'sessionId', 'rotationId', 'message']);
         ownLineage(args, envelope);
-        data = markSuccessorAnswered({ projectRoot, persona: args.persona, name: args.name, key: envelope.unitRunId, sessionId: args.sessionId, message: args.message });
+        data = markSuccessorAnswered({ projectRoot, persona: args.persona, name: args.name, key: envelope.unitRunId, sessionId: args.sessionId, rotationId: args.rotationId, message: args.message });
         break;
       default:
         throw Object.assign(new Error(`unknown verb ${JSON.stringify(request?.verb)}`), { code: 'unknown-verb' });

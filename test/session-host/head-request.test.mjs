@@ -141,14 +141,14 @@ test('the payload entry runs head rotate and head answered for the envelope\'s o
   assert.equal(other.line.code, 'role-mismatch', 'a head cannot rotate another lineage');
   assert.equal(spawned.length, 1);
 
-  const noRotation = await runHeadRequest({ runDir, request: { verb: 'head answered', args: { persona: 'planner', name: 'x', sessionId: 's1', message: 'ready' } } }, ports);
+  const noRotation = await runHeadRequest({ runDir, request: { verb: 'head answered', args: { persona: 'planner', name: 'x', sessionId: 's1', rotationId: '0123456789abcdef', message: 'ready' } } }, ports);
   assert.equal(noRotation.line.code, 'no-rotation-pending');
   const dir = path.join(project, '.fgos', 'runtime', 'session-rotation', 'planner-x');
   fs.mkdirSync(dir, { recursive: true });
-  fs.writeFileSync(path.join(dir, 'rotation.json'), JSON.stringify({ successorKey: 'head-planner-x-2', gen: 2, pendingQuestion: null }));
-  const answered = await runHeadRequest({ runDir, request: { verb: 'head answered', args: { persona: 'planner', name: 'x', sessionId: 's1', message: 'ready' } } }, ports);
+  fs.writeFileSync(path.join(dir, 'rotation.json'), JSON.stringify({ id: '0123456789abcdef', successorKey: 'head-planner-x-2', gen: 2 }));
+  const answered = await runHeadRequest({ runDir, request: { verb: 'head answered', args: { persona: 'planner', name: 'x', sessionId: 's1', rotationId: '0123456789abcdef', message: 'ready' } } }, ports);
   assert.deepEqual(answered, { exit: 0, line: { result: 'done', data: { accepted: true, gen: 2 } } });
   assert.equal(JSON.parse(fs.readFileSync(path.join(dir, 'answered.json'), 'utf8')).key, 'head-planner-x-2', 'the key is the attempt\'s own, never the sandbox\'s');
-  const stray = await runHeadRequest({ runDir, request: { verb: 'head answered', args: { persona: 'planner', name: 'x', sessionId: 's1', message: 'm', key: 'head-planner-x-9' } } }, ports);
+  const stray = await runHeadRequest({ runDir, request: { verb: 'head answered', args: { persona: 'planner', name: 'x', sessionId: 's1', rotationId: '0123456789abcdef', message: 'm', key: 'head-planner-x-9' } } }, ports);
   assert.equal(stray.line.code, 'bad-args');
 });

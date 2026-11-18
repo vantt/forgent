@@ -10,7 +10,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { answerNamesQuestion, markSuccessorAnswered, requestRotation, rotateHeadSession, rotationHolds } from '../../src/session-rotation/rotate.mjs';
+import { markSuccessorAnswered, requestRotation, rotateHeadSession, rotationHolds, rotationIdOf } from '../../src/session-rotation/rotate.mjs';
 import { lineageDirOf, readHeadPlacement, writeHeadPlacement } from '../../src/session-host/head-start.mjs';
 import { acquireSync, createLockScope } from '../../src/holder-lock/index.mjs';
 
@@ -52,8 +52,11 @@ function fakes(root, { onSleep = () => {}, holder = { live: true, session: 'old-
   return { calls, ports, request: { persona: 'planner', name: 'x', reason: 'soft', projectRoot: root, stopFacts: { sessionId: 'oldsess1', pendingQuestion: 'Should the backlog rows be merged?' } } };
 }
 
-const answer = (root, message = 'I resumed the question whether the backlog rows should be merged.') => markSuccessorAnswered({
-  projectRoot: root, persona: 'planner', name: 'x', key: 'head-planner-x-2', sessionId: 'new-session', message,
+const pendingOf = (root) => JSON.parse(fs.readFileSync(path.join(lineageDirOf(root, 'planner', 'x'), 'rotation.json'), 'utf8'));
+
+/** The successor's answer as its hook sends it: the id it read from its handoff, echoed exactly. */
+const answer = (root, { rotationId = pendingOf(root).id, message = 'I read the handoff.' } = {}) => markSuccessorAnswered({
+  projectRoot: root, persona: 'planner', name: 'x', key: 'head-planner-x-2', sessionId: 'new-session', rotationId, message,
 });
 
 test('the old session is ended only after the successor answered and Identity names it the holder', async (t) => {
@@ -73,7 +76,9 @@ test('the old session is ended only after the successor answered and Identity na
   assert.equal(readHeadPlacement(dir).gen, 2);
   assert.equal(fs.existsSync(path.join(dir, 'rotation.json')), false, 'no rotation is left pending');
   const latest = JSON.parse(fs.readFileSync(path.join(dir, 'latest.json'), 'utf8'));
-  assert.match(fs.readFileSync(path.join(dir, latest.file), 'utf8'), /backlog rows/, 'a rotation hands the question over in the handoff');
+  const handoffText = fs.readFileSync(path.join(dir, latest.file), 'utf8');
+  assert.match(handoffText, /backlog rows/, 'a rotation hands the question over in the handoff');
+  assert.match(rotationIdOf(handoffText) ?? '', /^[a-f0-9]{16}$/, 'the handoff carries the id the successor must echo');
   assert.equal(calls.released, 1, 'the lineage lock is given back');
 });
 
@@ -134,27 +139,67 @@ test('the lineage lock is the real kernel lock: a held lock is seen by the probe
   assert.equal(rotationHolds(lineage), false);
 });
 
-test('a message about something else does not name the pending question and moves nothing', (t) => {
+test('an answer must echo the pending rotation id exactly, and nothing else moves the role', (t) => {
   const { root, dir } = project(t);
-  fs.writeFileSync(path.join(dir, 'rotation.json'), JSON.stringify({ successorKey: 'head-planner-x-2', gen: 2, pendingQuestion: 'Should the backlog rows be merged?' }));
-  assert.throws(() => answer(root, 'Ready, what are we doing today?'), { code: 'answer-mismatch' });
+  fs.writeFileSync(path.join(dir, 'rotation.json'), JSON.stringify({ id: '0123456789abcdef', successorKey: 'head-planner-x-2', gen: 2 }));
+  assert.throws(() => answer(root, { rotationId: 'fedcba9876543210' }), { code: 'answer-mismatch' });
+  assert.throws(() => answer(root, { rotationId: '0123456789ABCDEF' }), { code: 'bad-args' });
+  assert.throws(() => answer(root, { rotationId: null }), { code: 'bad-args' });
   assert.equal(fs.existsSync(path.join(dir, 'answered.json')), false);
   assert.equal(answer(root).accepted, true);
   assert.equal(JSON.parse(fs.readFileSync(path.join(dir, 'answered.json'), 'utf8')).sessionId, 'new-session');
+  fs.rmSync(path.join(dir, 'rotation.json'));
+  assert.throws(() => answer(root, { rotationId: '0123456789abcdef' }), { code: 'no-rotation-pending' }, 'a late answer after the executor gave up is refused');
 });
 
 test('an answer is refused unless the lineage waits for that very successor', (t) => {
   const { root, dir } = project(t);
-  assert.throws(() => answer(root), { code: 'no-rotation-pending' });
-  fs.writeFileSync(path.join(dir, 'rotation.json'), JSON.stringify({ successorKey: 'head-planner-x-9', gen: 9, pendingQuestion: null }));
-  assert.throws(() => answer(root), { code: 'no-rotation-pending' });
+  assert.throws(() => answer(root, { rotationId: '0123456789abcdef' }), { code: 'no-rotation-pending' });
+  fs.writeFileSync(path.join(dir, 'rotation.json'), JSON.stringify({ id: '0123456789abcdef', successorKey: 'head-planner-x-9', gen: 9 }));
+  assert.throws(() => answer(root, { rotationId: '0123456789abcdef' }), { code: 'no-rotation-pending' });
 });
 
-test('with no pending question any non-empty first message passes, with one at least half of its words must appear', () => {
-  assert.equal(answerNamesQuestion('No question is pending.', null), true);
-  assert.equal(answerNamesQuestion('   ', null), false);
-  assert.equal(answerNamesQuestion('Resumed: the backlog rows, merged or not', 'Should the backlog rows be merged?'), true);
-  assert.equal(answerNamesQuestion('Nothing to report', 'Should the backlog rows be merged?'), false);
+test('a role that moved after the deadline completes the rotation instead of ending the role holder', async (t) => {
+  const { root, dir } = project(t);
+  // Identity names the successor only once the executor has removed rotation.json: the role moved at the deadline.
+  const { calls, ports, request } = fakes(root, {
+    holder: () => ({ live: true, session: fs.existsSync(path.join(dir, 'rotation.json')) ? 'old-session' : 'new-session' }),
+    onSleep: (n) => { if (n === 1) answer(root); },
+  });
+  const result = await rotateHeadSession(request, ports);
+  assert.equal(result.rotated, true);
+  assert.deepEqual(calls.end, ['/run/old'], 'only the old session is ended, never the successor');
+  assert.equal(readHeadPlacement(dir).placement.key, 'cmd_new');
+  const line = JSON.parse(fs.readFileSync(path.join(dir, 'incidents.jsonl'), 'utf8').trim());
+  assert.equal(line.event, 'rotation-completed');
+  assert.match(line.how, /no-answer.*already named the successor/);
+});
+
+test('a failure after the successor holds the role keeps it alive and names the failed step', async (t) => {
+  const { root, dir } = project(t);
+  let moved = false;
+  const { calls, ports, request } = fakes(root, {
+    holder: () => ({ live: true, session: moved ? 'new-session' : 'old-session' }),
+    onSleep: (n) => { if (n === 1) { answer(root); moved = true; } },
+  });
+  ports.recordPlacement = () => { throw new Error('disk full'); };
+  const result = await rotateHeadSession(request, ports);
+  assert.equal(result.rotated, true);
+  assert.deepEqual(calls.end, ['/run/old'], 'the role holder is never ended by a later step');
+  assert.equal(fs.existsSync(path.join(dir, 'rotation.json')), false);
+  const line = JSON.parse(fs.readFileSync(path.join(dir, 'incidents.jsonl'), 'utf8').trim());
+  assert.deepEqual({ event: line.event, step: line.step }, { event: 'step-failed', step: 'record-placement' });
+  assert.match(line.detail, /disk full/);
+});
+
+test('when Identity cannot say who holds the role at the deadline nothing is ended', async (t) => {
+  const { root, dir } = project(t);
+  let calls_ = 0;
+  const { calls, ports, request } = fakes(root, { holder: () => { calls_ += 1; if (calls_ > 1) throw Object.assign(new Error('down'), { code: 'identity-unavailable' }); return { live: true, session: 'old-session' }; } });
+  const result = await rotateHeadSession(request, ports);
+  assert.equal(result.successor, 'kept');
+  assert.deepEqual(calls.end, []);
+  assert.equal(JSON.parse(fs.readFileSync(path.join(dir, 'incidents.jsonl'), 'utf8').trim()).successor, 'kept');
 });
 
 test('a request is checked, written beside the lineage and handed to one detached executor entry, returning at once', (t) => {
