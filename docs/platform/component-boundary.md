@@ -1038,7 +1038,7 @@ Likely additional or more explicit boundaries:
 1. Work State And Event Store Kernel.
 
    Existing code under `src/state/events.mjs` (deleted in 53523a917), `src/state/replay.mjs`,
-   `src/state/store.mjs`, and `src/state/fgos-file-registry.mjs` acts as the
+   `src/state/store.mjs`, and `src/util/fgos-file-registry.mjs` (since 2026-11 a T0 leaf every tier joins `.fgos` through) acts as the
    append-only truth substrate, projection layer, lock/CAS layer, and well-known
    `.fgos/` path registry. This can stay internal to Work Lifecycle as an
    implementation boundary, but its authority should be named separately from

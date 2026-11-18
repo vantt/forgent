@@ -467,7 +467,7 @@ A forge may hide custom refs in its UI; reading them goes through `fgos events e
 
 ## 15. Views, cursors and verbs
 
-A view is a cache owned by its consumer (Work: `.fgos/cache/state.json`, `src/state/fgos-file-registry.mjs:35`), never tracked, never truth, rebuildable from zero. A consumer may choose another engine, SQLite included, without touching this spec; that engine's concurrency is the consumer's concern.
+A view is a cache owned by its consumer (Work: `.fgos/cache/state.json`, `src/util/fgos-file-registry.mjs:42`), never tracked, never truth, rebuildable from zero. A consumer may choose another engine, SQLite included, without touching this spec; that engine's concurrency is the consumer's concern.
 
 The cursor is the cache key, and it records coverage, not a position in a global order (section 12). It holds:
 
