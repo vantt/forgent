@@ -713,7 +713,8 @@ impl GitDriver {
         writer: &str,
         id: &str,
     ) -> Result<Outcome> {
-        let mut scope = crate::refs::acquire_worktree_admin(repo, held)?;
+        let mut scope =
+            crate::refs::acquire_worktree_admin(repo, held, fgos_holder_lock::Wait::Ms(5000))?;
         crate::recovery::leaf(&mut scope, repo)?;
         let wal = Wal::open_existing(repo.common_dir(), wal::OsFileSystem)?;
         let chain = wal.inspect(id)?;
