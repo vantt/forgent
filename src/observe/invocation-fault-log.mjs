@@ -36,7 +36,6 @@
 // so without that entry every recorded record would be committed and pushed.
 
 import fs from 'node:fs';
-import path from 'node:path';
 
 import { resolveWriterIdentity } from '../util/session-identity.mjs';
 import { resolveMainCheckoutRoot, fgosDirFromRoot } from '../runner/paths.mjs';
@@ -96,7 +95,7 @@ export function recordInvocationFault({ fgosDir, cwd, verb, sub, faultClass, mes
     let writer = null;
     let writerError;
     try {
-      writer = resolveWriterIdentity(path.dirname(path.dirname(logPath)));
+      writer = resolveWriterIdentity();
     } catch (err) {
       writerError = err?.code ?? 'unknown';
     }

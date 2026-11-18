@@ -17,7 +17,7 @@ Manual session rotation for the current head session.
    if the split is ambiguous) and run:
 
    ```bash
-   fgos head rotate <persona> --name <name>
+   fgos session rotate <persona> --name <name>
    ```
 
 3. Tell the person what the command reported: either the rotation was requested and runs in the background (a successor

@@ -70,12 +70,12 @@ pub struct StoreRead {
 }
 
 /// Shard file stem for the current process's writer, from the session
-/// identity authority: the session id itself for an `env`/`registry`
-/// identity, `pid-<id>` for a `pid`/`unresolved` one.
+/// identity authority: the session id itself for an `env` identity,
+/// `pid-<id>` for a `pid`/`unresolved` one.
 pub fn writer_shard_name() -> String {
-    let identity = resolve_current(None);
+    let identity = resolve_current();
     match identity.source {
-        Source::Env | Source::Registry => identity.id.to_string(),
+        Source::Env => identity.id.to_string(),
         Source::Pid | Source::Unresolved => format!("pid-{}", identity.id),
     }
 }

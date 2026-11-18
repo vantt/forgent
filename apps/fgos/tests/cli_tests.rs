@@ -1527,12 +1527,7 @@ fn identity_data(output: &std::process::Output) -> serde_json::Value {
 }
 
 #[test]
-fn identity_reports_the_env_session_and_confirms_it_from_the_registry() {
-    let dir = std::env::temp_dir().join(format!("fgos_test_identity_{}", std::process::id()));
-    let _ = fs::remove_dir_all(&dir);
-    fs::create_dir_all(&dir).unwrap();
-    fs::write(dir.join("sessions.json"), r#"[{"sessionId":"thread-a"}]"#).unwrap();
-
+fn identity_reports_the_env_session() {
     let env_only = identity_command(&[])
         .env("CODEX_THREAD_ID", "thread-a")
         .env("CLAUDE_CODE_SESSION_ID", "claude-b")
@@ -1542,16 +1537,6 @@ fn identity_reports_the_env_session_and_confirms_it_from_the_registry() {
         identity_data(&env_only),
         serde_json::json!({ "id": "thread-a", "source": "env", "machine": null, "session": null })
     );
-
-    let confirmed = identity_command(&["--fgos-dir", dir.to_str().unwrap()])
-        .env("CODEX_THREAD_ID", "thread-a")
-        .output()
-        .unwrap();
-    assert_eq!(
-        identity_data(&confirmed),
-        serde_json::json!({ "id": "thread-a", "source": "registry", "machine": null, "session": null })
-    );
-    let _ = fs::remove_dir_all(&dir);
 }
 
 #[test]
@@ -1592,7 +1577,8 @@ fn identity_rejects_bad_options() {
         vec!["--pid", "0"],
         vec!["--pid", "abc"],
         vec!["--pid"],
-        vec!["--fgos-dir", ""],
+        // the retired registry flag is an unknown option now
+        vec!["--fgos-dir", ".fgos"],
         vec!["--pid=7"],
         vec!["--unknown"],
     ] {

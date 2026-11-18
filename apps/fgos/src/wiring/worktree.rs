@@ -229,9 +229,7 @@ impl Context {
         })
         .map_err(|refusal| validation(refusal.message))?
         .root;
-        let writer = fgos_identity::resolve::resolve_current(Some(&root.join(".fgos")))
-            .id
-            .to_string();
+        let writer = fgos_identity::resolve::resolve_current().id.to_string();
         Ok(Self {
             repo_root: root,
             state_root: fgos_holder_lock::state_root().0,

@@ -161,19 +161,13 @@ pub fn shared_directory_row(root: &Path) -> RowOutcome {
     }
 }
 
-/// `fgos identity --pid <pid> --fgos-dir <dir>` answered by another host binary, or why it could not.
-fn ask_host(bin: &Path, pid: u32, fgos_dir: &Path) -> Result<String, String> {
+/// `fgos identity --pid <pid>` answered by another host binary, or why it could not.
+fn ask_host(bin: &Path, pid: u32) -> Result<String, String> {
     use fgos_process::spawn::{run_bounded, Outcome};
     let env: Vec<(String, String)> = std::env::vars()
         .filter(|(name, _)| name != "FGOS_INVOCATION_RECORD_PATH")
         .collect();
-    let args = [
-        "identity".to_owned(),
-        "--pid".to_owned(),
-        pid.to_string(),
-        "--fgos-dir".to_owned(),
-        fgos_dir.display().to_string(),
-    ];
+    let args = ["identity".to_owned(), "--pid".to_owned(), pid.to_string()];
     let host = bin.display();
     let output = match run_bounded(bin, args, &env, None, None, PROBE_TIMEOUT) {
         Ok(Outcome::Exited(output)) => output,
@@ -224,7 +218,7 @@ fn ask_host(bin: &Path, pid: u32, fgos_dir: &Path) -> Result<String, String> {
     }
     let data = &envelope["data"];
     let named = data["id"].as_str().is_some_and(|id| !id.is_empty())
-        && matches!(data["source"].as_str(), Some("registry" | "env"));
+        && matches!(data["source"].as_str(), Some("env"));
     let numbered = data["id"].as_u64().is_some_and(|id| id > 0)
         && matches!(data["source"].as_str(), Some("pid" | "unresolved"));
     if !named && !numbered {
@@ -234,14 +228,8 @@ fn ask_host(bin: &Path, pid: u32, fgos_dir: &Path) -> Result<String, String> {
 }
 
 /// What this process is as a writer, in the `{"id","source"}` form the host prints.
-fn here(fgos_dir: &Path) -> String {
-    let tree = fgos_identity::os_process_tree();
-    let identity = fgos_identity::resolve(
-        &|key| std::env::var(key).ok(),
-        tree.as_ref(),
-        std::process::id(),
-        Some(fgos_dir),
-    );
+fn here() -> String {
+    let identity = fgos_identity::resolve_current();
     serde_json::json!({ "id": identity.id, "source": identity.source }).to_string()
 }
 
@@ -271,13 +259,8 @@ fn activation_host(root: &Path) -> (Option<PathBuf>, Vec<String>) {
 /// (the workspace activation). The activation's binary is asked directly, never through a cache, so an older
 /// activated release shows up as a version mismatch even when this host is newer.
 pub fn writer_identity_row(root: &Path, running: &Path) -> RowOutcome {
-    let fgos_dir = root.join(".fgos");
     let pid = std::process::id();
-    let mut parts = vec![format!(
-        "current host: {} -> {}",
-        running.display(),
-        here(&fgos_dir)
-    )];
+    let mut parts = vec![format!("current host: {} -> {}", running.display(), here())];
     let mut failure: Option<String> = None;
     let door = "activation (git commit hook)";
     let (bin, tried) = activation_host(root);
@@ -295,9 +278,9 @@ pub fn writer_identity_row(root: &Path, running: &Path) -> RowOutcome {
         Some(bin) => {
             let same = std::fs::canonicalize(&bin).ok() == std::fs::canonicalize(running).ok();
             let answer = if same {
-                Ok(here(&fgos_dir))
+                Ok(here())
             } else {
-                ask_host(&bin, pid, &fgos_dir)
+                ask_host(&bin, pid)
             };
             match answer {
                 Ok(json) => parts.push(format!("{door}: {} -> {json}", bin.display())),

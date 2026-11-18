@@ -2,7 +2,7 @@
 //
 // One frozen table keyed by persona and one reader, `grantOf(role)`, which nothing else bypasses: the launch reads
 // `writes` (project-relative paths: a directory the sandbox binds writable, a file it keeps read-only that only the
-// request socket's `head write` replaces), `mailbox` and `peers`, and the request socket reads `verbs` and `writes`.
+// request socket's `session write` replaces), `mailbox` and `peers`, and the request socket reads `verbs` and `writes`.
 // A later change moves the data into the standard config by changing only the body of `grantOf`.
 
 /**
@@ -20,13 +20,13 @@ const NONE = Object.freeze({ writes: Object.freeze([]), verbs: Object.freeze([])
  * The verb a head binds its agent's own session with (the supervisor moves the role from the attempt to it in
  * Identity, so the head resolves as its CLI session), the one verb the supervisor answers itself.
  */
-export const HEAD_BIND_SESSION_VERB = 'head bind session';
+export const HEAD_BIND_SESSION_VERB = 'session bind session';
 
 /**
  * Every head may bind its agent session, rotate itself, report its first turn as a successor and take its role back
  * after a failed rotation; only the secretary may also start sessions and write its granted file (the backlog).
  */
-const HEAD_VERBS = Object.freeze([HEAD_BIND_SESSION_VERB, 'head rotate', 'head answered', 'head restore role']);
+const HEAD_VERBS = Object.freeze([HEAD_BIND_SESSION_VERB, 'session rotate', 'session answered', 'session restore role']);
 
 /**
  * `mailbox`: the sandbox binds the project's mailbox lock and record writable, so the head can send and receive mail.
@@ -36,7 +36,7 @@ const HEAD_VERBS = Object.freeze([HEAD_BIND_SESSION_VERB, 'head rotate', 'head a
 const GRANTS = Object.freeze({
   secretary: Object.freeze({
     writes: Object.freeze(['plans', 'docs/backlog.md', 'docs/discussions']),
-    verbs: Object.freeze(['head start', 'head write', ...HEAD_VERBS]),
+    verbs: Object.freeze(['session start', 'session write', ...HEAD_VERBS]),
     mailbox: true,
     peers: true,
   }),

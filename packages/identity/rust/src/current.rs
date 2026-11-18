@@ -153,25 +153,18 @@ pub struct CurrentSession {
 /// missing and `unresolved` when the caller cannot be told from any other.
 /// A runner attempt whose agent session its supervisor bound is that agent
 /// session (`directory::bind_agent_session`).
-pub fn current_session(
-    state_root: &Path,
-    caller_pid: u32,
-    fgos_dir: Option<&Path>,
-) -> Result<CurrentSession, Refusal> {
-    current_from(state_root, caller_pid, fgos_dir, &|key| {
-        std::env::var(key).ok()
-    })
+pub fn current_session(state_root: &Path, caller_pid: u32) -> Result<CurrentSession, Refusal> {
+    current_from(state_root, caller_pid, &|key| std::env::var(key).ok())
 }
 
 fn current_from(
     state_root: &Path,
     caller_pid: u32,
-    fgos_dir: Option<&Path>,
     lookup: &dyn Fn(&str) -> Option<String>,
 ) -> Result<CurrentSession, Refusal> {
     let machine = machine_info(state_root)?;
     let tree = crate::proc_tree::os_process_tree();
-    let identity = resolve(lookup, tree.as_ref(), caller_pid, fgos_dir);
+    let identity = resolve(lookup, tree.as_ref(), caller_pid);
     let local = session::local(&identity, &os_pid_facts).ok_or_else(|| Refusal {
         reason: "unresolved",
         detail: "this session cannot be told from any other: no session id in the environment and no process holding a terminal".into(),
@@ -323,7 +316,7 @@ mod tests {
         ]);
         directory::register_writer(&root, None, &attempt, &gate, &[], false).unwrap();
         // Registered but not bound: the CLI variable alone never moves the caller off its attempt id.
-        let unbound = current_from(&root, pid, None, &lookup).unwrap();
+        let unbound = current_from(&root, pid, &lookup).unwrap();
         assert!(
             unbound.info.id.ends_with("/att-cmd_9"),
             "{}",
@@ -336,7 +329,7 @@ mod tests {
             value: "uuid-9",
         };
         directory::bind_agent_session(&root, None, &attempt, &claude, &gate, pid).unwrap();
-        let bound = current_from(&root, pid, None, &lookup).unwrap();
+        let bound = current_from(&root, pid, &lookup).unwrap();
         assert!(bound.info.id.ends_with("/uuid-9"), "{}", bound.info.id);
         assert!(
             bound.info.handle.starts_with("claude-"),
@@ -348,7 +341,6 @@ mod tests {
         let stranger = current_from(
             &root,
             pid,
-            None,
             &env(&[
                 ("FGOS_SESSION_ID", "att-cmd_other"),
                 ("CLAUDE_CODE_SESSION_ID", "uuid-9"),

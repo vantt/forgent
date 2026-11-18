@@ -190,7 +190,7 @@ fn write(ctx: &Context, roots: &SnapshotRequest, verb: &Verb) -> Result<Value, R
     if roots.class == SessionClass::Confined && !dry {
         return Err(refused(ConfigRefusal::new("config-write-confined")));
     }
-    let writer = resolve_current(None);
+    let writer = resolve_current();
     let one = |kind: SourceKind, edits: Vec<Edit>, reason: &str, ack| -> Result<Value, Refusal> {
         refuse_unknown_keys(ctx, &edits, reason).map_err(refused)?;
         let done =

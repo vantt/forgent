@@ -64,7 +64,7 @@ fn quiet_stop(adapter: Adapter) -> QuietReason {
 /// any is set.
 fn key_from(vars: &Value) -> Option<WriterKey> {
     let lookup = |name: &str| vars[name].as_str().map(String::from);
-    let identity = fgos_identity::env_identity(&lookup, None)?;
+    let identity = fgos_identity::env_identity(&lookup)?;
     Some(WriterKey::new(identity.id.to_string()).unwrap())
 }
 

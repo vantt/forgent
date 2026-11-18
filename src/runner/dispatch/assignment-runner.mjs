@@ -970,7 +970,7 @@ export async function prepareAttemptSeat(attempt, seat, hooks = {}) {
   // `parentWriterId` is the controller's own, so a writer can be traced from the agent back to it.
   const attemptWriterId = mintAttemptWriterId(attemptId);
   let parentWriterId = null;
-  try { parentWriterId = String(resolveWriterIdentity(fgosDir).id); } catch { /* no controller identity: the lineage stays empty */ }
+  try { parentWriterId = String(resolveWriterIdentity().id); } catch { /* no controller identity: the lineage stays empty */ }
   const attemptIdentity = { writerId: attemptWriterId, parentWriterId };
   const terminalSocket = attempt.terminal ? terminalSocketPath(attemptId) : null;
   const attemptArgs = attempt.terminal

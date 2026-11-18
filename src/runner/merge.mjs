@@ -1058,7 +1058,7 @@ export function promoteAfterLand(fgosDir, branch) {
   try {
     stream = `branch:${branchKey(branch)}`;
     const { store } = prepareWorkStore(fgosDir, fgosDir);
-    const promoted = promoteLandedStreams(store, stream, String(resolveWriterIdentity(fgosDir).id), []);
+    const promoted = promoteLandedStreams(store, stream, String(resolveWriterIdentity().id), []);
     return { stream, promoted: promoted.length > 0 };
   } catch (err) {
     return { stream, error: { code: err.code ?? null, message: err.message }, retryable: true };

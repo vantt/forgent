@@ -38,7 +38,7 @@ const ATTEMPT_STR = '01';
 /**
  * The requirement of a head: the read-only posture plus the writable project paths its grant names, when its grant
  * says `mailbox`, the mailbox record, and when it says `peers`, the peer sessions (the host pid space and the session
- * sockets and registry of the machine, read-only). Every grant is required (`optional: false`): a bind that cannot be
+ * sockets and registry of the machine, read-write, so the head's own Claude Code registers and listens beside its peers). Every grant is required (`optional: false`): a bind that cannot be
  * made refuses the launch by name, it never starts the head with less.
  */
 export function requirementOf(grant) {
@@ -46,7 +46,7 @@ export function requirementOf(grant) {
   const extra = [
     ...(grant.writes.length === 0 ? [] : [{ resource: WORKSPACE_PATHS_RESOURCE, access: 'read-write', scope: 'dispatch', optional: false, paths: [...grant.writes] }]),
     ...(grant.mailbox ? [{ resource: MAILBOX_RECORD_RESOURCE, access: 'read-write', scope: 'dispatch', optional: false }] : []),
-    ...(grant.peers ? [{ resource: PEER_SESSIONS_RESOURCE, access: 'read', scope: 'dispatch', optional: false }] : []),
+    ...(grant.peers ? [{ resource: PEER_SESSIONS_RESOURCE, access: 'read-write', scope: 'dispatch', optional: false }] : []),
   ];
   const policy = extra.length === 0 ? base : { ...base, grants: [...base.grants, ...extra] };
   return { mode: 'required', policyId: 'host-write-denied', policy };

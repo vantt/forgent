@@ -155,12 +155,10 @@ pub enum ProjectAction {
 }
 
 /// `pid`: the process asking. When absent, the process that started this
-/// one (unix) or this process itself (elsewhere). `fgos_dir`: whose
-/// registry may confirm an env id; absent skips that confirmation.
+/// one (unix) or this process itself (elsewhere).
 #[derive(Debug, Clone, Default)]
 pub struct IdentityRequest {
     pub pid: Option<u32>,
-    pub fgos_dir: Option<PathBuf>,
     pub verb: Verb,
 }
 
@@ -208,7 +206,6 @@ fn resolve_identity(request: &IdentityRequest) -> WriterIdentity {
         &|key| std::env::var(key).ok(),
         tree.as_ref(),
         caller_pid(request),
-        request.fgos_dir.as_deref(),
     )
 }
 
@@ -498,17 +495,11 @@ fn answer(
         Verb::Mint { kind, release } => mint_answer(&root, kind, *release),
         Verb::Session(action) => match action {
             SessionAction::Read => {
-                let current =
-                    current_session(&root, caller_pid(request), request.fgos_dir.as_deref())?;
+                let current = current_session(&root, caller_pid(request))?;
                 Ok(serde_json::to_value(current.info).expect("SessionInfo always serializes"))
             }
             SessionAction::DropRole { role } => {
-                let listed = directory::drop_current_role(
-                    &root,
-                    caller_pid(request),
-                    request.fgos_dir.as_deref(),
-                    role,
-                )?;
+                let listed = directory::drop_current_role(&root, caller_pid(request), role)?;
                 publish(request, door, &root, Some(&listed));
                 Ok(serde_json::to_value(listed).expect("Listed always serializes"))
             }
@@ -520,7 +511,6 @@ fn answer(
                 let listed = directory::register_current(
                     &root,
                     caller_pid(request),
-                    request.fgos_dir.as_deref(),
                     cwd.as_deref(),
                     &role.iter().cloned().collect::<Vec<_>>(),
                     *take,

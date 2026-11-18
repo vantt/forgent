@@ -1,14 +1,11 @@
 {
   "contract": "identity.writer.golden.v1",
-  "notes": "envCases: expected null means no usable env id, so the process-tree rule decides. registry.kind: none (no fgosDir passed), absent (no sessions.json), rows (a JSON array of those rows), raw (the file holds exactly that text). treeCases: a pid missing from processes cannot be read; tty 0 means no controlling tty.",
+  "notes": "envCases: expected null means no usable env id, so the process-tree rule decides. treeCases: a pid missing from processes cannot be read; tty 0 means no controlling tty.",
   "envCases": [
     {
       "name": "FGOS_SESSION_ID alone",
       "env": {
         "FGOS_SESSION_ID": "fgos-a"
-      },
-      "registry": {
-        "kind": "none"
       },
       "expected": {
         "id": "fgos-a",
@@ -20,9 +17,6 @@
       "env": {
         "CODEX_THREAD_ID": "01a13f6f-thread"
       },
-      "registry": {
-        "kind": "none"
-      },
       "expected": {
         "id": "01a13f6f-thread",
         "source": "env"
@@ -32,9 +26,6 @@
       "name": "CLAUDE_CODE_SESSION_ID alone",
       "env": {
         "CLAUDE_CODE_SESSION_ID": "9493ac81-claude"
-      },
-      "registry": {
-        "kind": "none"
       },
       "expected": {
         "id": "9493ac81-claude",
@@ -46,9 +37,6 @@
       "env": {
         "CODEX_THREAD_ID": "codex-thread-a",
         "CLAUDE_CODE_SESSION_ID": "claude-session-b"
-      },
-      "registry": {
-        "kind": "none"
       },
       "expected": {
         "id": "codex-thread-a",
@@ -62,9 +50,6 @@
         "CODEX_THREAD_ID": "codex-thread-a",
         "CLAUDE_CODE_SESSION_ID": "claude-session-b"
       },
-      "registry": {
-        "kind": "none"
-      },
       "expected": {
         "id": "child-own",
         "source": "env"
@@ -75,9 +60,6 @@
       "env": {
         "FGOS_SESSION_ID": "",
         "CLAUDE_CODE_SESSION_ID": "lead-claude"
-      },
-      "registry": {
-        "kind": "none"
       },
       "expected": {
         "id": "lead-claude",
@@ -90,9 +72,6 @@
         "FGOS_SESSION_ID": "   ",
         "CODEX_THREAD_ID": "codex-thread-a"
       },
-      "registry": {
-        "kind": "none"
-      },
       "expected": {
         "id": "codex-thread-a",
         "source": "env"
@@ -102,9 +81,6 @@
       "name": "value is trimmed",
       "env": {
         "FGOS_SESSION_ID": "  padded-id\t"
-      },
-      "registry": {
-        "kind": "none"
       },
       "expected": {
         "id": "padded-id",
@@ -116,9 +92,6 @@
       "env": {
         "FGOS_SESSION_ID": "wS:p57Z"
       },
-      "registry": {
-        "kind": "none"
-      },
       "expected": null
     },
     {
@@ -126,9 +99,6 @@
       "env": {
         "FGOS_SESSION_ID": "bad value",
         "CLAUDE_CODE_SESSION_ID": "lead-claude"
-      },
-      "registry": {
-        "kind": "none"
       },
       "expected": {
         "id": "lead-claude",
@@ -139,9 +109,6 @@
       "name": "PI_SESSION_ID alone",
       "env": {
         "PI_SESSION_ID": "01a1681b-5502-77ce-870e-b2a223ece46b"
-      },
-      "registry": {
-        "kind": "none"
       },
       "expected": {
         "id": "01a1681b-5502-77ce-870e-b2a223ece46b",
@@ -154,9 +121,6 @@
         "CODEX_THREAD_ID": "codex-thread-a",
         "PI_SESSION_ID": "pi-session-b"
       },
-      "registry": {
-        "kind": "none"
-      },
       "expected": {
         "id": "codex-thread-a",
         "source": "env"
@@ -167,9 +131,6 @@
       "env": {
         "PI_SESSION_ID": "pi-session-b",
         "CLAUDE_CODE_SESSION_ID": "claude-session-b"
-      },
-      "registry": {
-        "kind": "none"
       },
       "expected": {
         "id": "pi-session-b",
@@ -182,9 +143,6 @@
         "FGOS_SESSION_ID": "child-own",
         "PI_SESSION_ID": "pi-session-b"
       },
-      "registry": {
-        "kind": "none"
-      },
       "expected": {
         "id": "child-own",
         "source": "env"
@@ -196,9 +154,6 @@
         "PI_SESSION_ID": "bad value",
         "CLAUDE_CODE_SESSION_ID": "lead-claude"
       },
-      "registry": {
-        "kind": "none"
-      },
       "expected": {
         "id": "lead-claude",
         "source": "env"
@@ -208,9 +163,6 @@
       "name": "200 characters accepted",
       "env": {
         "FGOS_SESSION_ID": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-      },
-      "registry": {
-        "kind": "none"
       },
       "expected": {
         "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
@@ -222,130 +174,12 @@
       "env": {
         "FGOS_SESSION_ID": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
       },
-      "registry": {
-        "kind": "none"
-      },
       "expected": null
     },
     {
       "name": "no env id at all",
       "env": {},
-      "registry": {
-        "kind": "none"
-      },
       "expected": null
-    },
-    {
-      "name": "registry row confirms the id",
-      "env": {
-        "FGOS_SESSION_ID": "sess-1"
-      },
-      "registry": {
-        "kind": "rows",
-        "rows": [
-          {
-            "sessionId": "other"
-          },
-          {
-            "sessionId": "sess-1"
-          }
-        ]
-      },
-      "expected": {
-        "id": "sess-1",
-        "source": "registry"
-      }
-    },
-    {
-      "name": "registry without a matching row",
-      "env": {
-        "FGOS_SESSION_ID": "sess-1"
-      },
-      "registry": {
-        "kind": "rows",
-        "rows": [
-          {
-            "sessionId": "other"
-          }
-        ]
-      },
-      "expected": {
-        "id": "sess-1",
-        "source": "env"
-      }
-    },
-    {
-      "name": "registry file missing",
-      "env": {
-        "FGOS_SESSION_ID": "sess-1"
-      },
-      "registry": {
-        "kind": "absent"
-      },
-      "expected": {
-        "id": "sess-1",
-        "source": "env"
-      }
-    },
-    {
-      "name": "registry file torn",
-      "env": {
-        "FGOS_SESSION_ID": "sess-1"
-      },
-      "registry": {
-        "kind": "raw",
-        "raw": "[{\"sessionId\":\"sess-1\""
-      },
-      "expected": {
-        "id": "sess-1",
-        "source": "env"
-      }
-    },
-    {
-      "name": "registry not an array",
-      "env": {
-        "FGOS_SESSION_ID": "sess-1"
-      },
-      "registry": {
-        "kind": "raw",
-        "raw": "{\"sessionId\":\"sess-1\"}"
-      },
-      "expected": {
-        "id": "sess-1",
-        "source": "env"
-      }
-    },
-    {
-      "name": "registry rows of the wrong shape",
-      "env": {
-        "FGOS_SESSION_ID": "sess-1"
-      },
-      "registry": {
-        "kind": "raw",
-        "raw": "[null, \"sess-1\", {\"sessionId\": 7}]"
-      },
-      "expected": {
-        "id": "sess-1",
-        "source": "env"
-      }
-    },
-    {
-      "name": "registry confirms a codex thread id too",
-      "env": {
-        "CODEX_THREAD_ID": "codex-thread-a"
-      },
-      "registry": {
-        "kind": "rows",
-        "rows": [
-          {
-            "sessionId": "codex-thread-a"
-          }
-        ]
-      },
-      "expected": {
-        "id": "codex-thread-a",
-        "source": "registry"
-      }
     }
   ],
   "treeCases": [

@@ -22,7 +22,7 @@ fn registering_the_current_session_names_it_by_its_own_handle() {
     };
     let pid = std::process::id();
 
-    let own = current_session(&root, pid, None).unwrap();
+    let own = current_session(&root, pid).unwrap();
     assert!(
         own.info.handle.starts_with("claude-"),
         "{}",
@@ -38,7 +38,7 @@ fn registering_the_current_session_names_it_by_its_own_handle() {
 
     let roles = vec!["lead:IDENT".to_string()];
     let listed =
-        directory::register_current(&root, pid, None, Some(root.as_path()), &roles, false).unwrap();
+        directory::register_current(&root, pid, Some(root.as_path()), &roles, false).unwrap();
     assert_eq!(listed.handle, own.info.handle);
     assert_eq!(listed.id, own.info.id);
     assert_eq!(listed.roles, roles);

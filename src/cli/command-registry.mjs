@@ -927,7 +927,7 @@ export const COMMAND_REGISTRY = [
   {
     name: 'hook',
     invoke: 'fgos hook <kind>',
-    description: 'Execute managed hook guards for supported coding agents (Claude, Codex, AGY, OMP, Pi). Bypasses CLI envelope and store admission to preserve hook exit codes and stdio protocols. `dispatch-decide` is the PreToolUse guard of Agent/Task calls, also served natively by the Rust host: it asks `fgos dispatch decide` for the call\'s subagent type and blocks (exit 2, or a deny answer with `--format=agy`) unless the answer is `in-process`; a payload that does not parse, a failed decision and any other error allow the call, an unusable config blocks it. `mailbox` is the agent mailbox\'s checkpoint (docs/platform/agent-mailbox/spec.md §6.1), served natively by the Rust host: it registers the calling head, prints pending mail in the shape the CLI injects, and always exits 0, printing nothing on any failure. `session-rotation --event stop|session-start` is a head session\'s rotation hook (docs/platform/session-host/spec.md section 8.8), also native: it does nothing outside a head session, asks its own supervisor for `head answered` or `head rotate`, prints only the session start\'s handoff context, and always exits 0. `main-checkout-delete-guard` refuses a shell command that would mass-delete inside the main checkout of a fgOS project (git clean -x/-X, xargs rm, rm -r of the checkout or a top-level runtime directory, find -delete).',
+    description: 'Execute managed hook guards for supported coding agents (Claude, Codex, AGY, OMP, Pi). Bypasses CLI envelope and store admission to preserve hook exit codes and stdio protocols. `dispatch-decide` is the PreToolUse guard of Agent/Task calls, also served natively by the Rust host: it asks `fgos dispatch decide` for the call\'s subagent type and blocks (exit 2, or a deny answer with `--format=agy`) unless the answer is `in-process`; a payload that does not parse, a failed decision and any other error allow the call, an unusable config blocks it. `mailbox` is the agent mailbox\'s checkpoint (docs/platform/agent-mailbox/spec.md §6.1), served natively by the Rust host: it registers the calling head, prints pending mail in the shape the CLI injects, and always exits 0, printing nothing on any failure. `session-rotation --event stop|session-start` is a head session\'s rotation hook (docs/platform/session-host/spec.md section 8.8), also native: it does nothing outside a head session, asks its own supervisor for `session answered` or `session rotate`, prints only the session start\'s handoff context, and always exits 0. `main-checkout-delete-guard` refuses a shell command that would mass-delete inside the main checkout of a fgOS project (git clean -x/-X, xargs rm, rm -r of the checkout or a top-level runtime directory, find -delete).',
     parameters: {
       type: 'object',
       properties: {
@@ -1133,7 +1133,7 @@ export const COMMAND_REGISTRY = [
   withSubcommands({
     name: 'identity',
     invoke: 'fgos identity [writer|machine|session|project|resolve|list|mint|pins]',
-    description: 'Read-only unless --alias, --init, --new, --register, --role, --drop-role, --forget, --confirm, `list --prune` or `mint`: who this process, this machine and this project are, through the native Identity component (docs/platform/identity/spec.md). Bare `fgos identity` is `writer`: which writer the calling process is, as {id, source}. Tries FGOS_SESSION_ID, CODEX_THREAD_ID, PI_SESSION_ID, CLAUDE_CODE_SESSION_ID in order (source env, or registry when .fgos/sessions.json lists the id); otherwise the highest ancestor holding a controlling terminal, else the caller\'s session id (source pid); otherwise the caller pid (source unresolved). `machine` prints the machine id minted by `fgos doctor --fix`, its handle, its alias and the fingerprint of its signing key; `pins` lists the machine keys this machine pinned the first time it saw them, each `seen` or `confirmed`; `session` prints this session\'s full id and its stable handle (`claude-4f2a@fg-server`); `project` prints the project id every clone shares (the tracked file `.fgos/project.json`), also from a linked worktree; `session --register` puts this session in the local directory of this machine, `resolve <handle|lead:LANE|work:NAME>` names exactly one live session of it and `list` shows them; `mint <kind>` gives a new id that travels between machines. Bare also carries optional `machine` and `session` parts, `null` when unknown; it never writes.',
+    description: 'Read-only unless --alias, --init, --new, --register, --role, --drop-role, --forget, --confirm, `list --prune` or `mint`: who this process, this machine and this project are, through the native Identity component (docs/platform/identity/spec.md). Bare `fgos identity` is `writer`: which writer the calling process is, as {id, source}. Tries FGOS_SESSION_ID, CODEX_THREAD_ID, PI_SESSION_ID, CLAUDE_CODE_SESSION_ID in order (source env); otherwise the highest ancestor holding a controlling terminal, else the caller\'s session id (source pid); otherwise the caller pid (source unresolved). `machine` prints the machine id minted by `fgos doctor --fix`, its handle, its alias and the fingerprint of its signing key; `pins` lists the machine keys this machine pinned the first time it saw them, each `seen` or `confirmed`; `session` prints this session\'s full id and its stable handle (`claude-4f2a@fg-server`); `project` prints the project id every clone shares (the tracked file `.fgos/project.json`), also from a linked worktree; `session --register` puts this session in the local directory of this machine, `resolve <handle|lead:LANE|work:NAME>` names exactly one live session of it and `list` shows them; `mint <kind>` gives a new id that travels between machines. Bare also carries optional `machine` and `session` parts, `null` when unknown; it never writes.',
     subcommands: {
       writer: {
         description: 'Which writer the calling process is, as {id, source}. Same as bare `fgos identity`; the hook path reads it.',
@@ -1141,11 +1141,10 @@ export const COMMAND_REGISTRY = [
           type: 'object',
           properties: {
             pid: { type: 'number', description: 'The process asking. Defaults to the process that started fgos.' },
-            'fgos-dir': { type: 'string', description: 'The .fgos directory whose sessions.json may confirm an env id. Absent skips that confirmation.' },
           },
           required: [],
         },
-        examples: ['fgos identity writer', 'fgos identity writer --pid 4242 --fgos-dir .fgos'],
+        examples: ['fgos identity writer', 'fgos identity writer --pid 4242'],
       },
       machine: {
         description: 'This machine: {id, handle, alias, keyFingerprint}. The id and the ed25519 signing key are minted once per machine by `fgos doctor --fix`; `keyFingerprint` is `SHA256:...`, null while no key can be read; the handle is the alias when one is set, else the id without its suffix. Exit 65 [machine-id-missing] when no id was minted yet.',
@@ -1164,7 +1163,6 @@ export const COMMAND_REGISTRY = [
           type: 'object',
           properties: {
             pid: { type: 'number', description: 'The process asking. Defaults to the process that started fgos.' },
-            'fgos-dir': { type: 'string', description: 'The .fgos directory whose sessions.json may confirm an env id. Absent skips that confirmation.' },
             register: { type: 'boolean', description: 'Record this session in the local directory of the machine (refreshes an existing entry).' },
             role: { type: 'string', description: 'A role alias: `lead:<LANE>` (lane: A-Z first, then A-Z, 0-9, hyphen; at most 16) or `work:<name>` (a work item id or slug: a-z first, then a-z, 0-9, hyphen; at most 30). Implies --register.' },
             take: { type: 'boolean', description: 'With --role: move the role from the live session that holds it.' },
@@ -2277,9 +2275,9 @@ export const COMMAND_REGISTRY = [
     deprecated: null,
   },
   withSubcommands({
-    name: 'head',
-    invoke: 'fgos head <start|rotate|write>',
-    description: 'Agent head sessions (provisional noun, distinct from the worktree verb "session"): "start" opens the long-lived interactive head of a persona, or fronts the one that already holds the role; "rotate" asks for its replacement by a successor that reads a redacted handoff; "write" replaces a file of a confined head\'s grant (the secretary\'s docs/backlog.md) through its supervisor. From inside a confined head all three go through its request socket.',
+    name: 'session',
+    invoke: 'fgos session <start|rotate|write>',
+    description: 'Agent head sessions: "start" opens the long-lived interactive head of a persona, or fronts the one that already holds the role; "rotate" asks for its replacement by a successor that reads a redacted handoff; "write" replaces a file of a confined head\'s grant (the secretary\'s docs/backlog.md) through its supervisor. From inside a confined head all three go through its request socket.',
     subcommands: {
       start: {
         description: 'Start head:<persona>-<name> as a confined supervised session, or front the live holder of that role.',
@@ -2292,7 +2290,7 @@ export const COMMAND_REGISTRY = [
           positional: ['persona'],
           required: ['persona', 'name'],
         },
-        examples: ['fgos head start secretary --name miu', 'fgos head start shaper --name <slug>'],
+        examples: ['fgos session start secretary --name miu', 'fgos session start shaper --name <slug>'],
       },
       rotate: {
         description: 'Ask for the rotation of a live head (reason manual); returns at once while a detached executor starts the successor and moves the role after it answered.',
@@ -2305,7 +2303,7 @@ export const COMMAND_REGISTRY = [
           positional: ['persona'],
           required: ['persona', 'name'],
         },
-        examples: ['fgos head rotate secretary --name miu'],
+        examples: ['fgos session rotate secretary --name miu'],
       },
       write: {
         description: 'From inside a confined head: replace a granted file with the content on stdin. The head\'s supervisor checks the path (project-relative, named exactly by the grant, a regular file with no symbolic link on the way) and writes it atomically outside the sandbox, where the file is read-only. Answers {path, bytes}.',
@@ -2317,10 +2315,10 @@ export const COMMAND_REGISTRY = [
           positional: ['path'],
           required: ['path'],
         },
-        examples: ['fgos head write docs/backlog.md < "$TMPDIR/backlog.md"'],
+        examples: ['fgos session write docs/backlog.md < "$TMPDIR/backlog.md"'],
       },
     },
-    examples: ['fgos head start secretary --name miu', 'fgos head rotate secretary --name miu', 'fgos head write docs/backlog.md < "$TMPDIR/backlog.md"'],
+    examples: ['fgos session start secretary --name miu', 'fgos session rotate secretary --name miu', 'fgos session write docs/backlog.md < "$TMPDIR/backlog.md"'],
     touchesState: true,
     store: 'none',
     externalEffect: true,

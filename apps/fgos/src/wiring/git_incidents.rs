@@ -144,12 +144,10 @@ pub fn project_git_request(args: &[OsString]) -> GitRequest {
     }
 }
 
-/// The writer a recovery runs as: this process's identity for the main checkout's `.fgos`. An attempted chain is
-/// recovered only by the writer that started it, so every caller of recovery names its writer through this one.
-pub(crate) fn own_writer(fgos_dir: &std::path::Path) -> String {
-    fgos_identity::resolve_current(Some(fgos_dir))
-        .id
-        .to_string()
+/// The writer a recovery runs as: this process's identity. An attempted chain is recovered only by the writer that
+/// started it, so every caller of recovery names its writer through this one.
+pub(crate) fn own_writer() -> String {
+    fgos_identity::resolve_current().id.to_string()
 }
 
 /// What a request answers: the data of the envelope, the caller's refusal, or a failure of the verb itself.
@@ -177,7 +175,7 @@ fn answer(request: &GitRequest) -> Result<Answer, ProviderError> {
     let data = match request.operation {
         GitOperation::Status => serde_json::to_value(read_git_status(&state_root, &root)),
         GitOperation::Recover => {
-            let recovered = recover_git_operations(&state_root, &root, &own_writer)
+            let recovered = recover_git_operations(&state_root, &root, &|_| own_writer())
                 .map_err(|error| ProviderError::ProviderFailed(error.cause().to_owned()))?;
             serde_json::to_value(recovered)
         }

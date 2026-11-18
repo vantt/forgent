@@ -9,9 +9,6 @@
     "pid": {
       "type": "integer",
       "minimum": 1
-    },
-    "fgosDir": {
-      "type": "string"
     }
   },
   "x-stateRoot": "the fgOS state root (FGOS_STATE_ROOT, else the holder-lock resolution); files machine-id and machine-alias; under identity/ the signing key machine-key (mode 600) and machine-key.pub, and pins/<machine-id>",

@@ -32,7 +32,7 @@ fn from_env(pairs: &[(&str, &str)]) -> WriterIdentity {
         .iter()
         .map(|(k, v)| (k.to_string(), v.to_string()))
         .collect();
-    env_identity(&|key| env.get(key).cloned(), None).expect("usable env id")
+    env_identity(&|key| env.get(key).cloned()).expect("usable env id")
 }
 
 fn no_facts(_: u32) -> Option<PidFacts> {
@@ -75,20 +75,6 @@ fn each_env_source_names_its_cli() {
             "{var}"
         );
     }
-}
-
-#[test]
-fn a_registry_confirmed_id_names_the_cli_of_its_env_variable() {
-    let dir = state_root();
-    fs::write(dir.join("sessions.json"), r#"[{"sessionId":"thread-a"}]"#).unwrap();
-    let identity = env_identity(
-        &|key| (key == "CODEX_THREAD_ID").then(|| "thread-a".to_string()),
-        Some(&dir),
-    )
-    .unwrap();
-    assert_eq!(identity.source, Source::Registry);
-    assert_eq!(session::local(&identity, &no_facts).unwrap().cli, "codex");
-    let _ = fs::remove_dir_all(dir);
 }
 
 #[test]
@@ -344,7 +330,7 @@ fn the_resolved_pi_session_takes_its_handle_label_from_the_ancestry_and_other_id
         }
     };
     let cli = |identity: &WriterIdentity| session::local(identity, &no_facts).unwrap().cli;
-    let pi_id = resolve(&env(&[("PI_SESSION_ID", "01a1681b-5502")]), &omp, 30, None);
+    let pi_id = resolve(&env(&[("PI_SESSION_ID", "01a1681b-5502")]), &omp, 30);
     assert_eq!(pi_id.id, WriterId::Session("01a1681b-5502".into()));
     assert_eq!(cli(&pi_id), "omp");
     // Claude and Codex keep their labels and precedence whatever runs above them
@@ -352,12 +338,12 @@ fn the_resolved_pi_session_takes_its_handle_label_from_the_ancestry_and_other_id
         ("CODEX_THREAD_ID", "t-1"),
         ("PI_SESSION_ID", "01a1681b-5502"),
     ]);
-    assert_eq!(cli(&resolve(&both, &omp, 30, None)), "codex");
+    assert_eq!(cli(&resolve(&both, &omp, 30)), "codex");
     let claude = env(&[
         ("CLAUDE_CODE_SESSION_ID", "c-1"),
         ("PI_SESSION_ID", "01a1681b-5502"),
     ]);
-    let claude_id = resolve(&claude, &omp, 30, None);
+    let claude_id = resolve(&claude, &omp, 30);
     assert_eq!(
         claude_id.id,
         WriterId::Session("01a1681b-5502".into()),
@@ -368,7 +354,7 @@ fn the_resolved_pi_session_takes_its_handle_label_from_the_ancestry_and_other_id
         ("PI_SESSION_ID", "bad value"),
         ("CLAUDE_CODE_SESSION_ID", "c-1"),
     ]);
-    let fell = resolve(&bad, &omp, 30, None);
+    let fell = resolve(&bad, &omp, 30);
     assert_eq!(
         (fell.id.clone(), cli(&fell)),
         (WriterId::Session("c-1".into()), "claude")
@@ -408,7 +394,6 @@ fn a_hook_carried_pi_key_with_a_head_pid_gives_the_handle_the_env_path_gives_tha
         &|k| (k == "PI_SESSION_ID").then(|| key.value.to_string()),
         tree.as_ref(),
         head,
-        None,
     );
     let machine = machine_info(&root).unwrap();
     let env_info = session_info(&by_env, &machine, &no_facts).unwrap();

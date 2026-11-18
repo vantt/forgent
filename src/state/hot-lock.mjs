@@ -360,7 +360,7 @@ export function withStateTx(fgosDir, fn, { resource = 'state', prefetched = {} }
   if (hotLockDepth() > 0) {
     throw new HotLockError('hot-lock-reentry', `${resource}: this process already holds a hot mutex; a transaction may not open another`);
   }
-  const writer = prefetched.writer ?? resolveWriterIdentity(fgosDir).id;
+  const writer = prefetched.writer ?? resolveWriterIdentity().id;
   const paths = acquireRecord(fgosDir, resource, recordOfSelf(writer));
   const leaveHotLock = enterHotLock();
   const { tx, commit, revoke } = createTx(fgosDir, { ...prefetched, writer });

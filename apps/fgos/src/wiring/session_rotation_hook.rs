@@ -2,9 +2,9 @@
 //! before the composition root (the route table's `native_subcommands` of `hook`).
 //!
 //! The hook only measures, decides and asks. Identity moves roles and the rotation executor rotates; the hook
-//! reaches them through the head request socket of its own supervisor (`head answered` for a successor's first
-//! answer, `head rotate` for a full context). It does nothing unless `FGOS_HEAD_ROLE` is set (the role is never
-//! parsed: the persona and name come from `FGOS_HEAD_PERSONA` and `FGOS_HEAD_NAME`, declared by the head start
+//! reaches them through the head request socket of its own supervisor (`session answered` for a successor's first
+//! answer, `session rotate` for a full context). It does nothing unless `FGOS_HEAD_ROLE` is set (the role is never
+//! parsed: the persona and name come from `FGOS_HEAD_PERSONA` and `FGOS_HEAD_NAME`, declared by the session start
 //! door), never blocks, prints nothing to the conversation except the session start's one `additionalContext`
 //! object, and ends with status 0 on every path. A failure leaves one line on stderr, which Claude Code does not
 //! show the model. Files read: `packages/session-host/contracts/rotation-files.v1.json`.
@@ -52,7 +52,7 @@ fn parse(args: &[OsString]) -> Option<Event> {
     }
 }
 
-/// The head the call runs in, from the environment the head start door declared.
+/// The head the call runs in, from the environment the session start door declared.
 #[derive(Debug, Clone, PartialEq, Eq)]
 struct Head {
     persona: String,
@@ -156,9 +156,9 @@ fn stop(head: &Head, fgos_dir: &Path, payload: &Value, ports: &Ports) -> Result<
     }
     let args =
         json!({ "persona": head.persona, "name": head.name, "reason": reason, "stopFacts": facts });
-    (ports.ask)("head rotate", &args)
+    (ports.ask)("session rotate", &args)
         .map(|_| ())
-        .map_err(|e| format!("head rotate: {e}"))
+        .map_err(|e| format!("session rotate: {e}"))
 }
 
 /// The successor's first answer: its session id, the rotation id read from its own handoff, and its first message.
@@ -173,9 +173,9 @@ fn answer(head: &Head, lineage: &Path, payload: &Value, ports: &Ports) -> Result
     let rotation_id = rotation_id_of(&latest.text).ok_or("the handoff carries no rotation id")?;
     let session_id = (ports.session_id)().ok_or("this session has no Identity id")?;
     let args = json!({ "persona": head.persona, "name": head.name, "sessionId": session_id, "rotationId": rotation_id, "message": bounded(message) });
-    (ports.ask)("head answered", &args)
+    (ports.ask)("session answered", &args)
         .map(|_| ())
-        .map_err(|e| format!("head answered: {e}"))
+        .map_err(|e| format!("session answered: {e}"))
 }
 
 /// A session start: the latest handoff of the lineage as the one `additionalContext` object, or nothing.
@@ -189,7 +189,7 @@ fn session_start(head: &Head, fgos_dir: &Path) -> Result<Option<String>, String>
 }
 
 /// `<project>/.fgos` of the directory the head was started in: Claude Code's project directory when it names a
-/// directory (its hook cwd follows the model's `cd`), else the cwd. That is the `projectRoot` the head start door
+/// directory (its hook cwd follows the model's `cd`), else the cwd. That is the `projectRoot` the session start door
 /// recorded the lineage under, which is not always the main checkout (a head started in a linked worktree).
 fn fgos_dir_of(claude_project_dir: Option<&std::ffi::OsStr>, cwd: &Path) -> Option<PathBuf> {
     let start = claude_project_dir
@@ -239,7 +239,7 @@ fn run(args: &[OsString]) {
             };
             let session_id = || {
                 let root = state_root()?;
-                fgos_identity::current_session(&root, std::process::id(), Some(&fgos_dir))
+                fgos_identity::current_session(&root, std::process::id())
                     .ok()
                     .map(|s| s.info.id)
             };
@@ -402,7 +402,7 @@ mod tests {
         assert_eq!(
             calls,
             vec![(
-                "head rotate".to_string(),
+                "session rotate".to_string(),
                 json!({
                     "persona": "secretary", "name": "miu", "reason": "soft",
                     "stopFacts": { "portfolio": ["plans/a.md"], "sessionId": "s-1", "lastAssistantMessage": "done" }
@@ -431,7 +431,7 @@ mod tests {
                 detail: None,
             }),
         );
-        assert_eq!(result.unwrap_err(), "head rotate: verb-not-granted");
+        assert_eq!(result.unwrap_err(), "session rotate: verb-not-granted");
     }
 
     #[test]
@@ -464,7 +464,7 @@ mod tests {
         assert_eq!(
             calls,
             vec![(
-                "head answered".to_string(),
+                "session answered".to_string(),
                 json!({
                     "persona": "secretary", "name": "miu", "sessionId": "m1/claude-x", "rotationId": "0123456789abcdef", "message": "ready"
                 })
@@ -473,7 +473,7 @@ mod tests {
         // Another generation is not the successor the rotation waits for: it measures like any head.
         assert_eq!(
             run_stop(&head(Some(1)), &fgos_dir, payload, Ok(json!({}))).0[0].0,
-            "head rotate"
+            "session rotate"
         );
         // No message yet: nothing is sent, and the next stop answers.
         assert!(

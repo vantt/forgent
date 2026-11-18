@@ -15,7 +15,8 @@ export const MAILBOX_RECORD_RESOURCE = 'mailbox-record';
 /**
  * The grant that lets a head reach the agent sessions of its own machine: the launch keeps the host pid space (no pid
  * namespace, so a peer's pid means what the peer wrote), and Claude Code's session socket directory and session
- * registry are bound back read-only. Read-only: the head dials its peers, it never registers or listens beside them.
+ * registry are bound back read-write: the head dials its peers, and its own Claude Code registers and listens beside
+ * them, so they reach it too.
  */
 export const PEER_SESSIONS_RESOURCE = 'peer-sessions';
 

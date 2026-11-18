@@ -235,7 +235,7 @@ test('fast path: an uncontended acquire and release costs at most twice the raw 
   const f = { fgosDir: path.join(dir0, '.fgos'), cleanup: () => fs.rmSync(dir0, { recursive: true, force: true }) };
   fs.mkdirSync(f.fgosDir, { recursive: true });
   try {
-    resolveWriterIdentity(f.fgosDir); // prime the identity cache once, outside the timings
+    resolveWriterIdentity(); // prime the identity cache once, outside the timings
     withStateTx(f.fgosDir, () => {}); // creates the locks directory the raw steps share
     const { dir } = hotPaths(f.fgosDir);
     const rawRecord = path.join(dir, 'bench-raw.hot');

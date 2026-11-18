@@ -117,9 +117,10 @@ export const SESSION_SOCKET_DIR = 'cc-socks';
 const SESSION_REGISTRY_DIR = 'sessions';
 
 /**
- * What a peer-sessions grant binds, read-only: the host's session socket directory at its own path, and the host's
+ * What a peer-sessions grant binds, read-write: the host's session socket directory at its own path, and the host's
  * session registry (`{home}/.claude/sessions`) where the head's Claude Code reads it, under its config directory: the
- * private home when the launch has one, else the host's own. The variable that names the socket base inside is set
+ * private home when the launch has one, else the host's own. Read-write because the head's own Claude Code registers
+ * there (`<pid>.json`, its `.key`) and listens there (`<pid>.sock`), so its peers find and reach it. The variable that names the socket base inside is set
  * to the host's base, so the head looks for its peers where they listen. A directory that does not exist is not
  * bound (no session ever ran there, so there is nobody to reach); a symbolic link is followed to the real directory.
  */
@@ -813,12 +814,12 @@ export function resolveConfinementResources({
     }
   }
 
-  // 5b. peer-sessions: the host's session sockets and session registry, read-only, after the private home they may
+  // 5b. peer-sessions: the host's session sockets and session registry, read-write, after the private home they may
   // land in (a bind over a directory hides every mount made in it before).
   if (grantsByResource.has(PEER_SESSIONS_RESOURCE)) {
     const grant = grantsByResource.get(PEER_SESSIONS_RESOURCE);
-    if (grant.access !== 'read') {
-      throw new ConfinementResourceError('confinement-grant-invalid', `${PEER_SESSIONS_RESOURCE} access must be strictly "read", got "${grant.access}".`);
+    if (grant.access !== 'read-write') {
+      throw new ConfinementResourceError('confinement-grant-invalid', `${PEER_SESSIONS_RESOURCE} access must be strictly "read-write", got "${grant.access}".`);
     }
     const privateHome = resolved.find((r) => r.resource === 'private-home')?.executionTarget.path ?? null;
     for (const { kind, hostPath: hostTarget, target, env } of peerSessionPaths({ homeDir, claudeSocketBase, xdgRuntimeDir, privateHome })) {
@@ -829,7 +830,7 @@ export function resolveConfinementResources({
         executionTarget: { location: 'host', path: target },
         delivery: 'mount',
         collect: 'none',
-        access: 'read',
+        access: 'read-write',
         allocation: 'existing',
         ...(env ? { env } : {}),
       });

@@ -65,7 +65,7 @@ fn serve(
 }
 
 /// What the answered verb asks Identity: is the attempt registered, and the move of the role (counted); and the gate
-/// a head write's caller must run under, checked for real (by default this test process, the one that connects).
+/// a session write's caller must run under, checked for real (by default this test process, the one that connects).
 struct Identity {
     registered: Result<bool, String>,
     take: Result<(), String>,
@@ -213,7 +213,7 @@ fn granted(name: &str, body: &str) -> Served {
         name,
         body,
         Ok(true),
-        &["head start"],
+        &["session start"],
         Duration::from_secs(20),
     )
 }
@@ -248,7 +248,7 @@ fn wait_for_log(served: &Served, needle: &str) -> Vec<String> {
 #[test]
 fn a_granted_request_runs_the_route_child_and_returns_its_line() {
     let served = granted("granted", DONE_LINE);
-    let reply = ask(&served.socket, "head start");
+    let reply = ask(&served.socket, "session start");
     assert_eq!(reply["type"], "REPLY");
     assert_eq!(reply["id"], "r1");
     assert_eq!(reply["result"], "done");
@@ -260,11 +260,11 @@ fn a_granted_request_runs_the_route_child_and_returns_its_line() {
     );
     let stdin: Value =
         serde_json::from_str(&fs::read_to_string(served.dir.join("stdin.json")).unwrap()).unwrap();
-    assert_eq!(stdin["verb"], "head start");
+    assert_eq!(stdin["verb"], "session start");
     assert_eq!(stdin["args"]["persona"], "planner");
     // One log line per request, never its arguments.
     let lines = wait_for_log(&served, "done");
-    assert_eq!(lines, vec!["head-request r1 head start done -"]);
+    assert_eq!(lines, vec!["head-request r1 session start done -"]);
 }
 
 #[test]
@@ -275,7 +275,7 @@ fn a_role_identity_does_not_give_this_session_is_refused_before_the_verb_is_look
             "role",
             DONE_LINE,
             holds,
-            &["head start"],
+            &["session start"],
             Duration::from_secs(5),
         );
         let reply = ask(&served.socket, "not even a verb");
@@ -331,9 +331,9 @@ fn an_oversize_or_malformed_frame_gets_bad_frame_and_the_connection_closes() {
         "closed after the refusal"
     );
     for frame in [
-        json!({"type": "HELLO", "id": "r1", "verb": "head start", "args": {}}),
-        json!({"type": "REQUEST", "id": "bad id!", "verb": "head start", "args": {}}),
-        json!({"type": "REQUEST", "id": "r1", "verb": "head start", "args": []}),
+        json!({"type": "HELLO", "id": "r1", "verb": "session start", "args": {}}),
+        json!({"type": "REQUEST", "id": "bad id!", "verb": "session start", "args": {}}),
+        json!({"type": "REQUEST", "id": "r1", "verb": "session start", "args": []}),
     ] {
         assert_eq!(
             request(&served.socket, &frame)["code"],
@@ -351,16 +351,16 @@ fn a_second_request_while_one_runs_is_busy_and_the_tick_is_never_held() {
         r#"cat > /dev/null; sleep 1; echo '{"v":1,"protocol":1,"result":"done","data":{}}'"#,
     );
     let socket = served.socket.clone();
-    let first = std::thread::spawn(move || ask(&socket, "head start"));
+    let first = std::thread::spawn(move || ask(&socket, "session start"));
     std::thread::sleep(Duration::from_millis(400));
-    assert_eq!(ask(&served.socket, "head start")["code"], "busy");
+    assert_eq!(ask(&served.socket, "session start")["code"], "busy");
     assert_eq!(first.join().unwrap()["result"], "done");
     assert!(
         *served.slowest_poll.lock().unwrap() < Duration::from_millis(250),
         "a pending request held the supervisor's poll"
     );
     // After it ended the next one runs again.
-    assert_eq!(ask(&served.socket, "head start")["result"], "done");
+    assert_eq!(ask(&served.socket, "session start")["result"], "done");
 }
 
 #[test]
@@ -369,11 +369,11 @@ fn a_verb_that_outlives_its_limit_is_killed_and_refused_verb_timeout() {
         "timeout",
         "cat > /dev/null; sleep 30",
         Ok(true),
-        &["head start"],
+        &["session start"],
         Duration::from_millis(400),
     );
     let started = Instant::now();
-    let reply = ask(&served.socket, "head start");
+    let reply = ask(&served.socket, "session start");
     assert_eq!(reply["code"], "verb-timeout");
     assert!(started.elapsed() < Duration::from_secs(10));
 }
@@ -384,13 +384,13 @@ fn a_failing_route_child_is_verb_failed_with_its_own_code_in_the_detail() {
         "failed",
         r#"cat > /dev/null; echo '{"v":1,"protocol":1,"result":"error","code":"head-key-used","message":"x"}'; exit 70"#,
     );
-    let reply = ask(&served.socket, "head start");
+    let reply = ask(&served.socket, "session start");
     assert_eq!(reply["result"], "refused");
     assert_eq!(reply["code"], "verb-failed");
     assert_eq!(reply["detail"], "head-key-used");
 
     let silent = granted("silent", "cat > /dev/null; exit 3");
-    let reply = ask(&silent.socket, "head start");
+    let reply = ask(&silent.socket, "session start");
     assert_eq!(reply["code"], "verb-failed");
     assert_eq!(reply["detail"], "the route ended with exit 3");
 }
@@ -438,12 +438,12 @@ fn the_contract_names_exactly_the_refusal_codes_and_verbs_the_server_speaks() {
     assert_eq!(
         verbs,
         [
-            "head answered",
-            "head bind session",
-            "head restore role",
-            "head rotate",
-            "head start",
-            "head write"
+            "session answered",
+            "session bind session",
+            "session restore role",
+            "session rotate",
+            "session start",
+            "session write"
         ]
     );
     assert_eq!(
@@ -521,7 +521,7 @@ fn session_envelope(dir: &Path, script: &Path) -> Value {
         "hostBin": script,
         "cwd": dir,
         "identity": {"writerId": "att-own"},
-        "session": {"role": "head:planner-x", "verbs": ["head start"], "requestSocketPath": dir.join("req.sock")},
+        "session": {"role": "head:planner-x", "verbs": ["session start"], "requestSocketPath": dir.join("req.sock")},
         "steps": [
             {"stepId": "release-slot", "builtin": true},
             {"stepId": "finalize-home", "env": {"OUT": dir, "FOO": "first"}},
@@ -631,7 +631,7 @@ echo '{"v":1,"protocol":1,"result":"done","data":{"ok":true}}'
             std::thread::sleep(Duration::from_millis(10));
         }
     });
-    let reply = ask(&path, "head start");
+    let reply = ask(&path, "session start");
     stop.store(true, Ordering::SeqCst);
     pump.join().unwrap();
     assert_eq!(reply["result"], "done", "{reply}");
@@ -659,7 +659,7 @@ echo '{"v":1,"protocol":1,"result":"done","data":{"ok":true}}'
             std::thread::sleep(Duration::from_millis(10));
         }
     });
-    let reply = ask(&path, "head start");
+    let reply = ask(&path, "session start");
     stop.store(true, Ordering::SeqCst);
     pump.join().unwrap();
     assert_eq!(reply["code"], "role-not-held");
@@ -672,7 +672,7 @@ echo '{"v":1,"protocol":1,"result":"done","data":{"ok":true}}'
 
 // ---- the successor's verb: registered, not yet holding the role ----------------------------------
 
-const ANSWERED: &str = "head answered";
+const ANSWERED: &str = "session answered";
 
 fn answered_server(name: &str, body: &str, identity: Identity) -> Served {
     // The role is held by the predecessor: the role check would refuse, the registered check must not.
@@ -681,7 +681,7 @@ fn answered_server(name: &str, body: &str, identity: Identity) -> Served {
         body,
         Ok(false),
         identity,
-        &[ANSWERED, "head start"],
+        &[ANSWERED, "session start"],
         Duration::from_secs(20),
     )
 }
@@ -698,10 +698,10 @@ fn the_answered_verb_needs_only_a_registered_session_and_moves_the_role_after_th
     // The log line follows the reply.
     assert_eq!(
         wait_for_log(&served, "done"),
-        vec!["head-request r1 head answered done -"]
+        vec!["head-request r1 session answered done -"]
     );
     // Another verb of the same successor is still checked against the role it does not hold yet.
-    let refused = ask(&served.socket, "head start");
+    let refused = ask(&served.socket, "session start");
     assert_eq!(refused["code"], "role-not-held");
     assert_eq!(
         *took.lock().unwrap(),
@@ -821,10 +821,13 @@ fn the_restore_verb_needs_only_a_registered_session_and_registers_after_done() {
         DONE_LINE,
         Ok(false),
         identity,
-        &["head restore role"],
+        &["session restore role"],
         Duration::from_secs(20),
     );
-    assert_eq!(ask(&served.socket, "head restore role")["result"], "done");
+    assert_eq!(
+        ask(&served.socket, "session restore role")["result"],
+        "done"
+    );
     assert_eq!(*took.lock().unwrap(), 1);
 }
 
@@ -863,7 +866,7 @@ fn the_bind_verb_moves_the_role_to_the_agent_session_of_the_connecting_process_a
         bind_session: Box::new(move |args, peer| {
             identity_bind(&r4, &r4, "att-bind", &g4, args, peer)
         }),
-        caller_under_gate: Box::new(|_| unreachable!("no head write in this test")),
+        caller_under_gate: Box::new(|_| unreachable!("no session write in this test")),
         log: Box::new(|_| {}),
     });
     let stop = Arc::new(AtomicBool::new(false));
@@ -906,7 +909,7 @@ fn the_bind_verb_moves_the_role_to_the_agent_session_of_the_connecting_process_a
     let _ = fs::remove_dir_all(&dir);
 }
 
-// ---- head write: the supervisor replaces a granted file itself ---------------------------------------
+// ---- session write: the supervisor replaces a granted file itself ---------------------------------------
 
 /// A project under the server's cwd: the granted backlog, a sibling, a granted directory, a directory reached through
 /// a symlink and a symlink as a granted file.
@@ -987,7 +990,7 @@ fn head_write_replaces_a_granted_file_atomically_with_its_mode_in_one_large_fram
     assert!(!served.dir.join("argv").exists(), "no route child ran");
     assert_eq!(
         wait_for_log(&served, "done"),
-        vec!["head-request w1 head write done -"]
+        vec!["head-request w1 session write done -"]
     );
 }
 
@@ -1040,7 +1043,7 @@ fn head_write_refuses_a_path_the_grant_does_not_name_exactly_a_climbing_path_and
 fn head_write_needs_the_role_and_the_verb_in_the_grant_before_any_file_is_touched() {
     for (holds, verbs, code) in [
         (Ok(false), &[WRITE_VERB][..], "role-not-held"),
-        (Ok(true), &["head start"][..], "verb-not-granted"),
+        (Ok(true), &["session start"][..], "verb-not-granted"),
     ] {
         let served = serve(
             "write-gate",
@@ -1099,7 +1102,7 @@ fn head_write_from_a_process_outside_the_gate_tree_is_refused_and_writes_nothing
 #[test]
 fn a_frame_of_too_many_or_too_deep_values_or_a_large_frame_that_is_not_head_write_is_bad_frame() {
     let served = granted("bounded", DONE_LINE);
-    let many = json!({"type": "REQUEST", "id": "r1", "verb": "head start",
+    let many = json!({"type": "REQUEST", "id": "r1", "verb": "session start",
         "args": {"persona": "planner", "name": "x", "pad": vec![0; MAX_REQUEST_VALUES]}});
     assert!(serde_json::to_vec(&many).unwrap().len() < MAX_FRAME_BYTES);
     assert_eq!(request(&served.socket, &many)["code"], "bad-frame");
@@ -1108,14 +1111,14 @@ fn a_frame_of_too_many_or_too_deep_values_or_a_large_frame_that_is_not_head_writ
         deep = json!([deep]);
     }
     let deep =
-        json!({"type": "REQUEST", "id": "r1", "verb": "head start", "args": {"persona": deep}});
+        json!({"type": "REQUEST", "id": "r1", "verb": "session start", "args": {"persona": deep}});
     assert_eq!(request(&served.socket, &deep)["code"], "bad-frame");
     // Just under the limits is read.
-    let fits = json!({"type": "REQUEST", "id": "r1", "verb": "head start",
+    let fits = json!({"type": "REQUEST", "id": "r1", "verb": "session start",
         "args": {"persona": "planner", "name": "x", "pad": vec![0; MAX_REQUEST_VALUES - 10]}});
     assert_eq!(request(&served.socket, &fits)["result"], "done");
-    // Only a head write may be larger than a GO frame.
-    let big = json!({"type": "REQUEST", "id": "r1", "verb": "head start",
+    // Only a session write may be larger than a GO frame.
+    let big = json!({"type": "REQUEST", "id": "r1", "verb": "session start",
         "args": {"persona": "p".repeat(MAX_FRAME_BYTES), "name": "x"}});
     let body = serde_json::to_vec(&big).unwrap();
     let mut stream = UnixStream::connect(&served.socket).unwrap();
@@ -1152,6 +1155,6 @@ fn a_second_large_request_is_busy_before_its_body_is_read() {
         (Some("refused"), Some("busy"))
     );
     // A small request is not held by the large slot.
-    assert_eq!(ask(&served.socket, "head start")["result"], "done");
+    assert_eq!(ask(&served.socket, "session start")["result"], "done");
     drop(first);
 }

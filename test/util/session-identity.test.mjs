@@ -1,7 +1,7 @@
 // session-identity.test.mjs -- the Node facade over the Rust identity crate.
 // The rule has one owning proof, packages/identity/rust/tests/golden.rs; these
-// cases prove the door wiring (env, process tree, registry path, the doctor
-// probe's failure codes) against the addon and host built from this checkout
+// cases prove the door wiring (env, process tree, the doctor probe's failure
+// codes) against the addon and host built from this checkout
 // (FGOS_HOST_BIN, set by `npm test`). Probe failure modes use small stand-in
 // executables (unix only).
 import '../helpers/process-tmp-root.mjs';
@@ -77,21 +77,13 @@ test('the dispatch writerId format floor uses the contract id charset and length
 test('every shared env vector resolves the same through the door', (t) => {
   requireHost(t);
   const golden = JSON.parse(fs.readFileSync(path.join(CONTRACTS, 'identity.writer.golden.v1.json'), 'utf8'));
-  const root = tmp('fgos-identity-env-');
   const saved = Object.fromEntries(IDENTITY_ENV_KEYS.map((key) => [key, process.env[key]]));
   try {
-    golden.envCases.forEach((c, i) => {
-      let dir;
-      if (c.registry.kind !== 'none') {
-        dir = path.join(root, `case-${i}`);
-        fs.mkdirSync(dir);
-        if (c.registry.kind === 'rows') fs.writeFileSync(path.join(dir, 'sessions.json'), JSON.stringify(c.registry.rows));
-        if (c.registry.kind === 'raw') fs.writeFileSync(path.join(dir, 'sessions.json'), c.registry.raw);
-      }
+    golden.envCases.forEach((c) => {
       for (const key of IDENTITY_ENV_KEYS) delete process.env[key];
       Object.assign(process.env, c.env);
-      const answer = resolveWriterIdentity(dir);
-      assert.deepEqual(resolveWriterIdentity(dir), answer, `${c.name}: asked twice, answered the same`);
+      const answer = resolveWriterIdentity();
+      assert.deepEqual(resolveWriterIdentity(), answer, `${c.name}: asked twice, answered the same`);
       if (c.expected === null) assert.ok(['pid', 'unresolved'].includes(answer.source), `${c.name}: ${JSON.stringify(answer)}`);
       else assert.deepEqual(answer, c.expected, c.name);
     });
@@ -101,18 +93,6 @@ test('every shared env vector resolves the same through the door', (t) => {
       else process.env[key] = value;
     }
   }
-});
-
-test('no fgos dir means no registry confirmation, never the cwd', (t) => {
-  requireHost(t);
-  const cwd = tmp('fgos-identity-nodir-');
-  fs.mkdirSync(path.join(cwd, '.fgos'));
-  fs.writeFileSync(path.join(cwd, '.fgos', 'sessions.json'), JSON.stringify([{ sessionId: 'sess-cwd' }]));
-  const answer = inFreshProcess('return facade.resolveWriterIdentity();', {
-    cwd,
-    env: cleanEnv({ FGOS_SESSION_ID: 'sess-cwd' }),
-  });
-  assert.deepEqual(answer, { id: 'sess-cwd', source: 'env' });
 });
 
 test('the depth of wrapper layers between the caller and its terminal does not change the id', (t) => {
@@ -148,7 +128,7 @@ fs.writeFileSync(${JSON.stringify(out)}, JSON.stringify({ answer: facade.resolve
 test('without the addon the resolver is host-missing and names the dev door', () => {
   const cwd = tmp('fgos-identity-missing-');
   const result = inFreshProcess(`
-    try { facade.resolveWriterIdentity(${JSON.stringify(path.join(cwd, '.fgos'))}); return { ok: true }; }
+    try { facade.resolveWriterIdentity(); return { ok: true }; }
     catch (err) { return { code: err.code, category: err.category, message: err.message }; }`, {
     cwd,
     env: cleanEnv({ FGOS_HOST_BIN: undefined, FGOS_ACTIVE_RELEASE_PATH: undefined, FGOS_ACTIVE_MANIFEST_PATH: undefined }),

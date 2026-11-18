@@ -74,16 +74,15 @@ hai nằm NGOÀI hợp đồng này.
 
 | source | Ý nghĩa | Độ tin |
 |---|---|---|
-| `registry` | `id` khớp một phiên đang sống trong sổ đăng ký phiên của fgOS (`.fgos/sessions.json`) | Cao nhất — do chính fgOS cấp và xác nhận |
-| `env` | `id` lấy từ biến môi trường phiên agent (`FGOS_SESSION_ID`/`CLAUDE_CODE_SESSION_ID`), nhưng KHÔNG khớp phiên nào đang sống trong sổ đăng ký | Trung bình — ai cũng tự set được biến môi trường |
+| `env` | `id` lấy từ biến môi trường phiên agent (`FGOS_SESSION_ID`/`CODEX_THREAD_ID`/`PI_SESSION_ID`/`CLAUDE_CODE_SESSION_ID`) | Cao nhất — nhưng ai cũng tự set được biến môi trường |
 | `pid` | Không có biến môi trường phiên nào hợp lệ; suy đoán tốt-nhất từ pid một tổ tiên tiến trình gần (terminal tay gõ) | Thấp — best-effort, có thể trùng giữa hai pane cùng shell |
 | `unresolved` | KHÔNG một nguồn nào xác nhận được; `id` vẫn là pid của chính tiến trình ghi (KHÔNG BAO GIỜ rỗng/vắng mặt) — `unresolved` là một NHÃN XUẤT XỨ, không phải danh tính vắng mặt (per str46-io-contract) | Không xác định |
 
 - `writer.id` — cá thể nào đang gọi (phân biệt hai phiên agent chạy song
   song), luôn có mặt.
-- `writer.source` — độ tin của `id` đó, một trong bốn giá trị theo thứ tự ưu
-  tiên: `registry` (đối chiếu được với `.fgos/sessions.json`, tin nhất) ·
-  `env` (biến môi trường, ai cũng set được) · `pid` (tổ tiên cao nhất còn
+- `writer.source` — độ tin của `id` đó, một trong ba giá trị theo thứ tự ưu
+  tiên (event cũ có thể còn mang `registry`, nguồn đã bỏ ngày 2026-11-19, đọc
+  như `env`): `env` (biến môi trường, ai cũng set được) · `pid` (tổ tiên cao nhất còn
   terminal, không có thì session id của tiến trình gọi; best-effort) ·
   `unresolved` (không nguồn nào xác nhận được — `id` vẫn là
   pid của chính tiến trình gọi, KHÔNG rỗng, KHÔNG vắng khoá; chỉ nhãn

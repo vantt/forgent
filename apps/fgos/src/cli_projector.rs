@@ -446,7 +446,7 @@ fn project_config_request(
     Ok(fgos_config::provider::ConfigRequest { root, verb })
 }
 
-/// `fgos identity [--pid <n>] [--fgos-dir <dir>] [--json]`, `fgos identity
+/// `fgos identity [--pid <n>] [--json]`, `fgos identity
 /// machine [--alias <name>] [--json]`, `fgos identity project [--init|--new]
 /// [--handle <name>] [--json]`, `fgos identity session [--register] [--role
 /// lead:<LANE>|work:<name>] [--take]`, `fgos identity resolve <query>`, `fgos identity list
@@ -457,11 +457,11 @@ fn project_identity_request(args: &[OsString]) -> Result<fgos_identity::Identity
     let call = crate::routing::Call::new(args);
     let subcommand = call.sub_word();
     let (verb, allowed): (fgos_identity::Verb, &[&str]) = match subcommand {
-        None | Some("writer") => (fgos_identity::Verb::Writer, &["pid", "fgos-dir"]),
+        None | Some("writer") => (fgos_identity::Verb::Writer, &["pid"]),
         Some("machine") => (fgos_identity::Verb::Machine { alias: None }, &["alias"]),
         Some("session") => (
             fgos_identity::Verb::Session(fgos_identity::SessionAction::Read),
-            &["pid", "fgos-dir", "register", "role", "drop-role", "take"],
+            &["pid", "register", "role", "drop-role", "take"],
         ),
         Some("resolve") => (
             fgos_identity::Verb::Resolve {
@@ -551,9 +551,6 @@ fn project_identity_request(args: &[OsString]) -> Result<fgos_identity::Identity
     let fingerprint = named("fingerprint", "a value")?;
     if let Some(alias) = named("alias", "a value")? {
         request.verb = fgos_identity::Verb::Machine { alias: Some(alias) };
-    }
-    if let Some(dir) = named("fgos-dir", "a value")? {
-        request.fgos_dir = Some(std::path::PathBuf::from(dir));
     }
     if let Some(flag_value) = call.value("pid")? {
         let pid = flag_value
@@ -710,7 +707,6 @@ mod tests {
             .collect();
         let request = project_identity_request(&args).unwrap();
         assert_eq!(request.pid, Some(42));
-        assert_eq!(request.fgos_dir, None);
     }
 
     #[test]

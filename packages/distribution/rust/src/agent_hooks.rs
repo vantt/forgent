@@ -53,7 +53,7 @@ pub use crate::shim::project_shim_path;
 
 const SESSION_REGISTER_ARGS: &str = "identity session --register";
 const SESSION_REGISTER_TIMEOUT_SEC: u64 = 10;
-/// A rotation hook's stop waits for the supervisor's `head answered` reply, which may take its 60 s verb bound.
+/// A rotation hook's stop waits for the supervisor's `session answered` reply, which may take its 60 s verb bound.
 const ROTATION_STOP_TIMEOUT_SEC: u64 = 80;
 const ROTATION_START_TIMEOUT_SEC: u64 = 10;
 const AGY_ALLOW: &str = r#"{"decision":"allow"}"#;

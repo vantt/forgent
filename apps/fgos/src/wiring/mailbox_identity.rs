@@ -118,7 +118,7 @@ fn identity_key<'a>(key: &'a WriterKey, cli: &Cli) -> Option<IdentityKey<'a>> {
 /// Inside a confined head (its env names the head request socket) Identity's
 /// directory is read-only, so the head's session is not registered here: the
 /// head's own supervisor is asked to bind it to the attempt it runs in
-/// (`head bind session`), which registers it on the attempt's gate and moves
+/// (`session bind session`), which registers it on the attempt's gate and moves
 /// the attempt's role to it, so a role alias reaches this head's mailbox key.
 /// A bind that was busy or refused is asked again by later hook calls until
 /// it holds, backing off only after the head's own recent failure
@@ -143,7 +143,7 @@ pub fn ensure_registered(
 }
 
 /// The request-socket verb that binds a head's agent session to its attempt.
-const BIND_SESSION_VERB: &str = "head bind session";
+const BIND_SESSION_VERB: &str = "session bind session";
 
 fn ensure_registered_via(
     state_root: &Path,
@@ -560,7 +560,7 @@ mod tests {
             None
         );
         let request = server.join().unwrap();
-        assert_eq!(request["verb"], "head bind session");
+        assert_eq!(request["verb"], "session bind session");
         assert_eq!(
             request["args"],
             serde_json::json!({ "source": "CLAUDE_CODE_SESSION_ID", "value": "wiring-bound-head" })

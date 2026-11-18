@@ -16,6 +16,13 @@ addresses. Depends on phase 5 (shares `src/session-host/**`, the command registr
   mailbox hook binds a head and keeps its own binding snapshot; `fgos identity resolve <handle|role>` exists.
 - Step 0 also `git log -S` on directory/Entry fields and the mailbox binding snapshot for anything retired before.
 
+## Design (step 0 done 2026-11-19)
+[Design report](reports/phase-07e-design.md): `Entry` keeps `v: 1` and gains optional `ids` groups (cliSession,
+terminal, mailbox, head), each owned by one writer and replaced whole; `directory::resolve` itself becomes the
+any-identifier lookup (exact matching order, `ambiguous` and `stale` answers); a new `identity-directory` machine mutex
+guards rewrites of existing entries; the mailbox drops `Binding.handle` and renders the sender's role. Lead decisions:
+`gen` comes from the envelope (`session.gen`); mailbox `--to` tries exact names, then Identity, then prefixes.
+
 ## Steps
 1. Record: `Entry` gains the session's other identifiers (herdr tab label + pane id, CLI session id/name and messaging
    socket, mailbox address, head persona/name + generation), versioned format, written only through Identity's existing

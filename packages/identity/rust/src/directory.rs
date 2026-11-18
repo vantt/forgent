@@ -515,12 +515,11 @@ fn register_session(
 pub fn register_current(
     state_root: &Path,
     caller_pid: u32,
-    fgos_dir: Option<&Path>,
     clone_dir: Option<&Path>,
     roles: &[String],
     take: bool,
 ) -> Result<Listed, Refusal> {
-    let current = current_session(state_root, caller_pid, fgos_dir)?;
+    let current = current_session(state_root, caller_pid)?;
     let tree = os_process_tree();
     let head = head_liveness(tree.as_ref(), caller_pid, &os_record);
     register_session(state_root, current, head, clone_dir, roles, take)
@@ -921,10 +920,9 @@ pub fn drop_role(root: &Path, own_id: &str, role: &str, judge: Judge) -> Result<
 pub fn drop_current_role(
     state_root: &Path,
     caller_pid: u32,
-    fgos_dir: Option<&Path>,
     role: &str,
 ) -> Result<Listed, Refusal> {
-    let current = current_session(state_root, caller_pid, fgos_dir)?;
+    let current = current_session(state_root, caller_pid)?;
     drop_role(state_root, &current.info.id, role, &judge_here)
 }
 

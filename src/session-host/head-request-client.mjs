@@ -12,13 +12,13 @@ import { HEAD_REQUEST_SOCKET_ENV } from './head-grants.mjs';
 export const PROTOCOL = 1;
 /** Largest reply frame (the GO channel's limit). */
 export const MAX_FRAME_BYTES = 65_536;
-/** Largest request frame: `head write` carries the whole new content of a granted file. */
+/** Largest request frame: `session write` carries the whole new content of a granted file. */
 export const MAX_REQUEST_BYTES = 4 * 1024 * 1024;
-export const HEAD_START_VERB = 'head start';
-export const HEAD_ROTATE_VERB = 'head rotate';
-export const HEAD_ANSWERED_VERB = 'head answered';
-export const HEAD_RESTORE_VERB = 'head restore role';
-export const HEAD_WRITE_VERB = 'head write';
+export const HEAD_START_VERB = 'session start';
+export const HEAD_ROTATE_VERB = 'session rotate';
+export const HEAD_ANSWERED_VERB = 'session answered';
+export const HEAD_RESTORE_VERB = 'session restore role';
+export const HEAD_WRITE_VERB = 'session write';
 /** A reply may take as long as the supervisor lets the verb run (60 s) plus its own overhead. */
 const DEFAULT_REPLY_TIMEOUT_MS = 70_000;
 
@@ -116,18 +116,18 @@ export function requestHead(verb, args, { socketPath = process.env[HEAD_REQUEST_
   });
 }
 
-/** `head start` over the socket. */
+/** `session start` over the socket. */
 export const requestHeadStart = (args, options) => requestHead(HEAD_START_VERB, args, options);
-/** `head rotate` over the socket: the old head asks for its own rotation; `args` is `{ persona, name, reason, stopFacts? }`. */
+/** `session rotate` over the socket: the old head asks for its own rotation; `args` is `{ persona, name, reason, stopFacts? }`. */
 export const requestHeadRotate = (args, options) => requestHead(HEAD_ROTATE_VERB, args, options);
-/** `head answered` over the socket: the successor reports its first turn; `args` is `{ persona, name, sessionId, rotationId, message }`. */
+/** `session answered` over the socket: the successor reports its first turn; `args` is `{ persona, name, sessionId, rotationId, message }`. */
 export const requestHeadAnswered = (args, options) => requestHead(HEAD_ANSWERED_VERB, args, options);
 
-/** `head restore role` over the socket: asks that head's supervisor to register its role again (the effect is the supervisor's). */
+/** `session restore role` over the socket: asks that head's supervisor to register its role again (the effect is the supervisor's). */
 export const requestHeadRestoreRole = (args, options) => requestHead(HEAD_RESTORE_VERB, args, options);
 
 /**
- * `head write` over the socket: the head's supervisor replaces the granted file `path` (project-relative, exactly a
+ * `session write` over the socket: the head's supervisor replaces the granted file `path` (project-relative, exactly a
  * `writes` entry of its grant) with `content` atomically; the sandbox keeps that file read-only. Returns `{path, bytes}`.
  */
 export const requestHeadWrite = ({ path, content }, options) => requestHead(HEAD_WRITE_VERB, { path, content }, options);

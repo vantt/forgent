@@ -14,7 +14,7 @@ Provenance: plans/261118-1045-project-supervisor/plan.md and plans/reports/shapi
 Writer type: Agent draft writer
 Canonical for: The supervision entities, the watcher tick, the supervisor wake and verbs, the lead, the lane pool, the landing use case, their refusals and their trust boundary
 Use this when: Changing how plans are admitted, started, watched, parked or landed without a person
-Do not use this for: Work items or the Work frontier (Work layer), Git mutation primitives (Git), starting a session (Session Host and head start), config storage (Config), the owner-question store (Questions), measurement (Observe)
+Do not use this for: Work items or the Work frontier (Work layer), Git mutation primitives (Git), starting a session (Session Host and `fgos session start`), config storage (Config), the owner-question store (Questions), measurement (Observe)
 Last reviewed: 2026-11-18
 Related:
 - plans/261118-1045-project-supervisor/plan.md
@@ -29,7 +29,7 @@ Related:
 - docs/platform/packaging-distribution/spec.md
 ```
 
-Planned/live legend: every verb, key, lock, file and crate named below is **planned** until the plan's integration phase lands. Verbs that the session-verb plan renames (`fgos head ...` becomes `fgos session start|stop|rotate`, PS-16) are written in the planned `session` form; that plan is on hold, so `fgos session ...` is also planned and the live name today is `fgos head ...`.
+Planned/live legend: every verb, key, lock, file and crate named below is **planned** until the plan's integration phase lands. The session-verb plan renamed `fgos head ...` to `fgos session start|rotate|write` (PS-16); `fgos session start` and `fgos session rotate` are live (Session Host), `fgos session stop` is planned.
 
 ## 1. Overview and boundaries
 
@@ -53,7 +53,7 @@ fgOS coordinates the plans of the project it runs on with no person sitting by. 
 ### Must not own
 - Work items or the Work frontier (`fgos ready`, `schedule`). The portfolio is plan frontmatter only.
 - Git mutation. `fgos land` composes the Git ports (Remote, Land, ScopedCommit); it adds no Git primitive and no rebase.
-- Session start. Session Host and head start start the lead, planner and supervisor.
+- Session start. Session Host and `fgos session start` start the lead, planner and supervisor.
 - Config storage. Keys live in `core/config-standard` and `core/config-schema`.
 - The owner-question store and its answers ([questions/spec.md](../questions/spec.md)); this area only runs its `question-answered` definition and resumes the asker.
 - Measurement. Observe records; this area registers kinds through `observe-kinds.json`.
@@ -93,7 +93,7 @@ All verbs are planned. Flags, defaults and contracts live in `packages/supervisi
 | `fgos supervisor done` | supervisor | Refuses while unhandled events exist; on an empty queue answers done and stops the caller's own session. |
 | `fgos land` | lead (branch), others (`--paths` only) | Land a reviewed phase, or commit exact main-checkout paths. Answers with a ticket. |
 | `fgos request result` | any head | Read a ticket's outcome. |
-| `fgos session start\|stop\|rotate` | supervisor | Start, stop or replace a head (live name today: `fgos head ...`). |
+| `fgos session start\|stop\|rotate` | supervisor | Start, stop or replace a head (`start` and `rotate` live in Session Host; `stop` planned). |
 | `fgos slots` | any | Lane pool: ceiling, live, free, seats. |
 | `fgos questions ask` | supervisor | The owner channel ([questions/spec.md](../questions/spec.md)). |
 

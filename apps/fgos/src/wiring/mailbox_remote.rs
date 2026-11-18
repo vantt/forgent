@@ -751,7 +751,7 @@ pub fn send(
         let machine = MachineRef::from(&machine_info(&root)?);
         // The writer key attributes the append; the event names the sender by its full session id,
         // which the receiver checks against the signer's machine.
-        let session = current_session(&root, std::process::id(), Some(fgos_dir))?;
+        let session = current_session(&root, std::process::id())?;
         let msg = Outgoing {
             id: id.as_str(),
             from: &session.info.id,

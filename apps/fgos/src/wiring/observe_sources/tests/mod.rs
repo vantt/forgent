@@ -325,7 +325,7 @@ fn head_records(answer: Liveness) -> Vec<Record> {
     head_records_with(answer, "")
 }
 
-/// One placement as the head start writes it, with `extra` JSON members appended (e.g. `,"retiredAt":"..."`).
+/// One placement as `session start` writes it, with `extra` JSON members appended (e.g. `,"retiredAt":"..."`).
 fn head_records_with(answer: Liveness, extra: &str) -> Vec<Record> {
     let root = scratch("head");
     let lineage = root.join(".fgos/runtime/session-rotation/planner-x");

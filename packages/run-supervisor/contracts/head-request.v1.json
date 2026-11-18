@@ -1,14 +1,14 @@
 {
   "contract": { "id": "run-supervisor-head-request", "version": 1 },
-  "description": "The request socket of one head session. A confined head cannot reach herdr, so it asks its own run supervisor, over one AF_UNIX socket the sandbox gets read-only, to perform a granted verb outside. The supervisor only transports and enforces: Identity decides who holds the role, `grantOf` (src/session-host/head-grants.mjs) is the only reader of the grant table and its answer reaches the supervisor in the digest-protected envelope (`session.verbs`, `session.writes`), and every verb but `head bind session` and `head write` is the Node payload behind `fgos internal head-request` (internal-route.run-supervisor.v1.json).",
+  "description": "The request socket of one head session. A confined head cannot reach herdr, so it asks its own run supervisor, over one AF_UNIX socket the sandbox gets read-only, to perform a granted verb outside. The supervisor only transports and enforces: Identity decides who holds the role, `grantOf` (src/session-host/head-grants.mjs) is the only reader of the grant table and its answer reaches the supervisor in the digest-protected envelope (`session.verbs`, `session.writes`), and every verb but `session bind session` and `session write` is the Node payload behind `fgos internal head-request` (internal-route.run-supervisor.v1.json).",
   "framing": {
     "frame": "as gate-go.v1.json: 4-byte unsigned big-endian length N, then N bytes of UTF-8 JSON (one object)",
     "maxRequestBytes": 4194304,
     "maxReplyBytes": 65536,
-    "sizes": "a request frame may be up to maxRequestBytes because `head write` carries a whole file; a reply stays within the GO channel's 65536. The length is read first: over maxRequestBytes is bad-frame; over maxReplyBytes is a large request, and while another large request is being read or run it is answered busy before its body is read. A large frame whose verb is not `head write` is bad-frame",
+    "sizes": "a request frame may be up to maxRequestBytes because `session write` carries a whole file; a reply stays within the GO channel's 65536. The length is read first: over maxRequestBytes is bad-frame; over maxReplyBytes is a large request, and while another large request is being read or run it is answered busy before its body is read. A large frame whose verb is not `session write` is bad-frame",
     "maxRequestValues": 256,
     "maxRequestDepth": 8,
-    "bounded": "the frame is parsed with a visitor that counts every JSON value it builds (objects, arrays, strings, numbers, booleans, null) and refuses more than maxRequestValues or nesting deeper than maxRequestDepth while it reads (bad-frame), so many tiny elements are never materialised; only one string, a head write's content, may be large",
+    "bounded": "the frame is parsed with a visitor that counts every JSON value it builds (objects, arrays, strings, numbers, booleans, null) and refuses more than maxRequestValues or nesting deeper than maxRequestDepth while it reads (bad-frame), so many tiny elements are never materialised; only one string, a session write's content, may be large",
     "oversizeOrInvalid": "the supervisor answers REPLY refused bad-frame and closes the connection",
     "readDeadlineMs": "5000 for the whole request frame (not per read)"
   },
@@ -25,41 +25,41 @@
     "REPLY": { "direction": "supervisor -> client", "fields": { "type": "REPLY", "id": "the request's id, null when no valid id was read", "result": { "enum": ["done", "refused"] }, "data": "object, present when done: the verb's own result", "code": "refusal code, present when refused", "detail": "string, optional" } }
   },
   "verbs": {
-    "head start": {
+    "session start": {
       "args": { "persona": "string, required", "name": "string, required", "beside": "string, optional: the live key of the session whose tab the new one opens next to" },
       "does": "startHeadSession (src/session-host/head-start.mjs) in the project of the attempt's envelope (envelope.cwd); a live head of the same role is fronted instead of started",
       "data": "the object startHeadSession returns ({already, role, key, ...})"
     },
-    "head rotate": {
+    "session rotate": {
       "args": { "persona": "string, required", "name": "string, required; with persona it must spell the envelope's own role (head:<persona>-<name>), otherwise role-mismatch: a head asks for its own lineage only", "reason": "soft | hard | manual, required", "stopFacts": "object, optional: sessionId, portfolio (at most 50 paths), delta, lastAssistantMessage, pendingQuestion (strings of at most 8000 characters); anything else is refused bad-stop-facts" },
-      "does": "requestRotation (src/session-rotation/rotate.mjs), the one entry that asks for a rotation (`fgos head rotate` calls the same one): checks the request, writes it under the lineage folder and starts the executor `rotateHeadSession` as a detached process through the detach door, then returns at once; the executor outlives the verb timeout",
+      "does": "requestRotation (src/session-rotation/rotate.mjs), the one entry that asks for a rotation (`fgos session rotate` calls the same one): checks the request, writes it under the lineage folder and starts the executor `rotateHeadSession` as a detached process through the detach door, then returns at once; the executor outlives the verb timeout",
       "data": "{started: true, pid} or {started: false, reason: rotation-in-progress | spawn-failed}",
       "identity": "held"
     },
-    "head restore role": {
-      "args": { "persona": "string, required", "name": "string, required; spelled as the envelope's own role, as for head rotate" },
+    "session restore role": {
+      "args": { "persona": "string, required", "name": "string, required; spelled as the envelope's own role, as for session rotate" },
       "does": "nothing in the route child (it only checks the arguments); the effect is the supervisor's: after the child reports done it registers the envelope's role for this attempt's session again, WITHOUT take. Used by the rotation executor when a failed rotation left no live session holding the role (a late take landed on the ended successor): Identity refuses role-held when any live session holds it, so a restore never displaces a holder",
       "data": "{}",
       "identity": "registered-then-register",
-      "rule": "same role step as head answered (this attempt's own session is registered and live, session-not-registered otherwise); a refused registration is role-take-failed with Identity's code in detail. The executor reaches this socket as the same user (peer uid)"
+      "rule": "same role step as session answered (this attempt's own session is registered and live, session-not-registered otherwise); a refused registration is role-take-failed with Identity's code in detail. The executor reaches this socket as the same user (peer uid)"
     },
-    "head bind session": {
+    "session bind session": {
       "args": { "source": "string, required: the CLI's own session variable the agent names itself by (CLAUDE_CODE_SESSION_ID, CODEX_THREAD_ID, PI_SESSION_ID), never FGOS_SESSION_ID", "value": "string, required: the agent's session id under that variable; exactly these two keys" },
       "does": "answered by the supervisor itself, no route child: Identity's bind_agent_session registers the agent session on the attempt's gate and moves every role the attempt holds to it (take), so the head resolves as its CLI session and a role alias reaches the mailbox key its hooks bind. The connecting process (SO_PEERCRED pid, as the supervisor's PID namespace names it) must be the gate or run under it; Identity refuses an attempt with no live entry on the gate and an agent id that is a live session on another head. Afterwards the role checks of this socket ask for the session the attempt is (the bound one when there is one) and a role move registers on it",
       "data": "{id, handle} of the bound session",
       "identity": "registered-then-bind",
-      "rule": "the role step is the registered one of head answered (a successor binds before it holds the role); a refused bind is session-bind-failed with Identity's code in detail (bad-args, peer-unknown, gate-unknown, invalid-writer-key, caller-not-under-head, agent-not-gate-child, attempt-not-registered, session-in-use, head-not-live, ...). The mailbox hook of a confined head sends it the first time it binds a head, instead of writing Identity's read-only directory"
+      "rule": "the role step is the registered one of session answered (a successor binds before it holds the role); a refused bind is session-bind-failed with Identity's code in detail (bad-args, peer-unknown, gate-unknown, invalid-writer-key, caller-not-under-head, agent-not-gate-child, attempt-not-registered, session-in-use, head-not-live, ...). The mailbox hook of a confined head sends it the first time it binds a head, instead of writing Identity's read-only directory"
     },
-    "head write": {
+    "session write": {
       "args": { "path": "string, required: project-relative, exactly an entry of envelope.session.writes", "content": "string, required: the whole new content (UTF-8); exactly these two keys" },
       "does": "answered by the supervisor itself, no route child: the only way a head changes a granted file, because its sandbox keeps every granted file read-only (granted directories stay bound writable). The path must be plain and relative (no empty, `.` or `..` segment, not absolute: path-invalid), named exactly by an entry of envelope.session.writes (path-not-granted), and an existing regular file reached from envelope.cwd without a symlink at it or at any directory on the way (path-symlink, not-a-file). Its directory is opened once, no-follow at every component, and the content is installed through that descriptor by the durable-file door (Dir::replace: temp file beside it given exactly the old file's mode, fsync, renameat over the name, directory fsync), so nothing is resolved by path after the check and a directory swapped meanwhile is never followed; a reader sees the old or the new file, never a mix; a failure there is write-failed with the step in detail",
-      "peer": "the connecting process (SO_PEERCRED pid) must be the attempt's gate or run under it, the check of head bind session (Identity's caller_under_head): a same-uid process outside the head is refused caller-not-under-gate. The other verbs check the role only: head start, head rotate, head answered and head restore role act on the caller's own lineage or ask the use case to check it, so they are not given this check here",
+      "peer": "the connecting process (SO_PEERCRED pid) must be the attempt's gate or run under it, the check of session bind session (Identity's caller_under_head): a same-uid process outside the head is refused caller-not-under-gate. The other verbs check the role only: session start, session rotate, session answered and session restore role act on the caller's own lineage or ask the use case to check it, so they are not given this check here",
       "data": "{path, bytes}",
       "identity": "held",
-      "client": "`fgos head write <path>` with the new content on stdin (src/session-host/head-request-client.mjs requestHeadWrite)"
+      "client": "`fgos session write <path>` with the new content on stdin (src/session-host/head-request-client.mjs requestHeadWrite)"
     },
-    "head answered": {
-      "args": { "persona": "string, required", "name": "string, required; spelled as the envelope's own role, as for head rotate", "sessionId": "string, required: the successor's Identity session id", "rotationId": "string, required: 16 lowercase hex characters, the id of the pending rotation exactly as the handoff's `Rotation id:` line carries it; the successor reads it from its handoff and echoes it, no other match is made", "message": "string, required: the successor's first assistant message, kept as evidence, at most 8000 characters" },
+    "session answered": {
+      "args": { "persona": "string, required", "name": "string, required; spelled as the envelope's own role, as for session rotate", "sessionId": "string, required: the successor's Identity session id", "rotationId": "string, required: 16 lowercase hex characters, the id of the pending rotation exactly as the handoff's `Rotation id:` line carries it; the successor reads it from its handoff and echoes it, no other match is made", "message": "string, required: the successor's first assistant message, kept as evidence, at most 8000 characters" },
       "does": "markSuccessorAnswered (src/session-rotation/rotate.mjs): records the answer of the successor the lineage's pending rotation waits for. The key is the attempt's own (envelope.unitRunId), never an argument. Refused no-rotation-pending when no rotation waits for that key (the executor removes its pending record before it gives up, so a late answer is refused), answer-mismatch when rotationId is not exactly the pending rotation's id; this is the one place an answer is checked",
       "data": "{accepted: true, gen}",
       "identity": "registered-then-take",
@@ -69,11 +69,11 @@
   "order": [
     "peer uid",
     "one request frame",
-    "role: Identity resolves the role to the live session it names and that session must be this attempt's own (role-not-held otherwise, including when Identity cannot answer: the request fails closed). For `head answered`, `head restore role` and `head bind session` the step is instead: this attempt's own session is registered and live (session-not-registered, failing closed the same way)",
+    "role: Identity resolves the role to the live session it names and that session must be this attempt's own (role-not-held otherwise, including when Identity cannot answer: the request fails closed). For `session answered`, `session restore role` and `session bind session` the step is instead: this attempt's own session is registered and live (session-not-registered, failing closed the same way)",
     "verb: must be one of envelope.session.verbs (verb-not-granted)",
-    "peer (head write only): the connecting process runs under the gate (caller-not-under-gate)",
+    "peer (session write only): the connecting process runs under the gate (caller-not-under-gate)",
     "busy: at most one request runs at a time (busy)",
-    "run: `<hostBin> internal head-request --protocol 1 --run-dir <attemptDir>`, request on stdin; `head bind session` and `head write` are answered by the supervisor itself instead"
+    "run: `<hostBin> internal head-request --protocol 1 --run-dir <attemptDir>`, request on stdin; `session bind session` and `session write` are answered by the supervisor itself instead"
   ],
   "run": {
     "child": "started with exactly the step environment of the envelope, the envelope's cwd, its own process group, and the parent-death signal on Linux; stdout is its one JSON line, stderr goes to supervisor.log",
@@ -88,16 +88,16 @@
     "role-not-held": "Identity does not give this attempt's session the envelope's role; when Identity could not answer the detail is its refusal code only (its text goes to supervisor.log, never to the client)",
     "verb-not-granted": "the verb is not in envelope.session.verbs",
     "busy": "another request is running, or another large request (over maxReplyBytes) is being read or run",
-    "session-not-registered": "head answered only: Identity does not list this attempt's own session as live; when Identity could not answer the detail is its refusal code only",
-    "session-bind-failed": "head bind session only: Identity refused to bind the session; detail is its code",
-    "bad-args": "head write only: args are not exactly {path, content}, both strings",
-    "path-invalid": "head write only: the path is empty, absolute, or has an empty, `.` or `..` segment",
-    "path-not-granted": "head write only: no entry of envelope.session.writes names the path exactly",
-    "path-symlink": "head write only: the file or a directory on the way to it is a symbolic link",
-    "not-a-file": "head write only: the granted path does not exist or is not a regular file (a granted directory is written in the sandbox, not here)",
-    "caller-not-under-gate": "head write only: the connecting process is not the attempt's gate nor one of its descendants; detail is Identity's code (caller-not-under-head, head-not-live) or gate-unknown, peer-unknown",
-    "write-failed": "head write only: the durable write failed; detail names the error and the step (a failure after the rename means the new content may already be in place)",
-    "role-take-failed": "head answered only: the route recorded the answer but Identity refused to move the role to this session (detail is its code, for example gate-unknown or head-not-live); the executor then finds no holder change and retires the successor",
+    "session-not-registered": "session answered only: Identity does not list this attempt's own session as live; when Identity could not answer the detail is its refusal code only",
+    "session-bind-failed": "session bind session only: Identity refused to bind the session; detail is its code",
+    "bad-args": "session write only: args are not exactly {path, content}, both strings",
+    "path-invalid": "session write only: the path is empty, absolute, or has an empty, `.` or `..` segment",
+    "path-not-granted": "session write only: no entry of envelope.session.writes names the path exactly",
+    "path-symlink": "session write only: the file or a directory on the way to it is a symbolic link",
+    "not-a-file": "session write only: the granted path does not exist or is not a regular file (a granted directory is written in the sandbox, not here)",
+    "caller-not-under-gate": "session write only: the connecting process is not the attempt's gate nor one of its descendants; detail is Identity's code (caller-not-under-head, head-not-live) or gate-unknown, peer-unknown",
+    "write-failed": "session write only: the durable write failed; detail names the error and the step (a failure after the rename means the new content may already be in place)",
+    "role-take-failed": "session answered only: the route recorded the answer but Identity refused to move the role to this session (detail is its code, for example gate-unknown or head-not-live); the executor then finds no holder change and retires the successor",
     "verb-failed": "the route child failed; detail is the entry's own code (for example head-key-used, bad-persona, start-refused) or the exit",
     "verb-timeout": "the verb ran longer than verbTimeoutMs"
   },

@@ -244,12 +244,11 @@ pub fn recover_git_operations(
     writer: Option<String>,
 ) -> Result<Value> {
     check()?;
-    let own = |fgos_dir: &Path| {
-        fgos_identity::resolve_current(Some(fgos_dir))
-            .id
-            .to_string()
+    let writer_for = |_: &Path| {
+        writer
+            .clone()
+            .unwrap_or_else(|| fgos_identity::resolve_current().id.to_string())
     };
-    let writer_for = |fgos_dir: &Path| writer.clone().unwrap_or_else(|| own(fgos_dir));
     let recovered =
         incidents::recover_git_operations(Path::new(&state_root), Path::new(&cwd), &writer_for)
             .map_err(fact_error)?;
