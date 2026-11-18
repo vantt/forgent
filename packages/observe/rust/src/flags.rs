@@ -25,12 +25,8 @@ impl Flags {
         takes_positional: bool,
     ) -> Result<Self, String> {
         let tokens: Vec<OsString> = args.iter().map(OsString::from).collect();
-        let repeatable: Vec<&str> = value_flags
-            .iter()
-            .filter_map(|flag| flag.strip_prefix("--"))
-            .collect();
         let parsed =
-            parse_args_repeating(&tokens, &repeatable).map_err(|error| error.to_string())?;
+            parse_args_repeating(&tokens, value_flags).map_err(|error| error.to_string())?;
         let mut flags = Self::default();
         let mut words = parsed.positional.clone();
         for (key, value) in &parsed.flags {

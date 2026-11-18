@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "9e2588142b8b17cdea6038d4aca1b656382f0a94bcc4cef1c85d3665fa01aa8b",
+  "payloadDigest": "78bf431cc93c7b5612f213c0b8009c96c2fa1bd52eb64cd29859daf5173c4cb3",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "764929356f623ea67c3f918c5414cef1541da5c03a23bd9fa0acfae4a31df38b",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -547,7 +547,7 @@
     "packages/host-runtime/rust/src/authority_gate.rs": "ad3c0a21cc5b98ec3d8d321d0b700d1378a35fe3a8531b7ed32ccabbf2e4fe17",
     "packages/host-runtime/rust/src/catalog.rs": "03ea2f1f12742f3498884e8af26673656d25101594a32d12d7c686e0cfc64223",
     "packages/host-runtime/rust/src/civil_time.rs": "7f206726328eb334c91c8ca2592191d6dead76b91b68ffaf633e7cda40c3625f",
-    "packages/host-runtime/rust/src/cli_args.rs": "e588d4a6ec7ea0c6e5585fe4df747a511b2cef25e485530b3a0e7828ba8bdbfd",
+    "packages/host-runtime/rust/src/cli_args.rs": "ae90aba73faa4f3f97edd8de3add1e48c7de478af9d51776c2cf6f8b7ca313f4",
     "packages/host-runtime/rust/src/contracts.rs": "cce88423448c798e71d43929bbbf1a8f29a70680fb9b3081b1e8df828387a54e",
     "packages/host-runtime/rust/src/exit_codes.rs": "f161428fcaa8de111886461f9f0fd40279fe918ba3052dfd9f6502e2c1896368",
     "packages/host-runtime/rust/src/invocation_service.rs": "bd9602d7ae4849bb434d2fe92aaa098c28ce9225ab6ef30b61fbbdb1a197bd55",
@@ -685,7 +685,7 @@
     "packages/observe/rust/src/contract.rs": "cbabd57b3830b782f7f3cd5f5502942be2475afeef53d5437e0ffdc742e03d41",
     "packages/observe/rust/src/definition/mod.rs": "e18ee58a19278980ac094c846c2fb1755a7846916ea88d312e5352ac4ae75d5e",
     "packages/observe/rust/src/eval_journal.rs": "ffe997154de882250f59d9eb10b4f66d5676bfdbe31bba334f39fd2393b4f508",
-    "packages/observe/rust/src/flags.rs": "befb4427d1efec910abfeaa22b793672dbbc186a78bdc5bd4d30286d8f5f100f",
+    "packages/observe/rust/src/flags.rs": "b64ca40450334b970171609030adb196bd6a11e7f1f65c452fe7872c4f5ae268",
     "packages/observe/rust/src/friction.rs": "e58a457d592c94f116c447433b03cf28458330d6f7f3e7ef7cde3166f03db067",
     "packages/observe/rust/src/friction_cli.rs": "6d8ea429c7e8905b2065665b9d3788350eae8239b791b09387b5b5ba4718b0cd",
     "packages/observe/rust/src/invocation_fault.rs": "7416bdc7ab41d497e84961afd23c8f8f91773aaa001358b6caaaa1dd56f50c67",

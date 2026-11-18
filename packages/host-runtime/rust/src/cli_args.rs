@@ -80,7 +80,7 @@ pub fn parse_args(args: &[OsString]) -> Result<ParsedArgs, ParseArgsError> {
     parse_args_repeating(args, &[])
 }
 
-/// [`parse_args`] where the flags in `repeatable` (names without `--`) also collect every use, beside the shared
+/// [`parse_args`] where the flags in `repeatable` (written as `--name`) also collect every use, beside the shared
 /// `REPEATABLE_FLAGS`: a verb whose grammar repeats its own flags keeps each use instead of the last.
 pub fn parse_args_repeating(
     args: &[OsString],
@@ -129,7 +129,11 @@ fn record(
         return;
     }
     let slot = flags.iter().position(|(name, _)| name == key);
-    if REPEATABLE_FLAGS.contains(&key) || repeatable.contains(&key) {
+    if REPEATABLE_FLAGS.contains(&key)
+        || repeatable
+            .iter()
+            .any(|flag| flag.strip_prefix("--") == Some(key))
+    {
         match slot.map(|at| &mut flags[at].1) {
             Some(FlagValue::Many(all)) => all.push(scalar),
             _ => flags.push((key.to_owned(), FlagValue::Many(vec![scalar]))),
